@@ -12,7 +12,7 @@
 
 #include "game/transcendental/cosmos.h"
 
-void convex_partitioned_shape::add_convex_polygon(const std::vector <vec2>& verts) {
+void convex_partitioned_shape::add_convex_polygon(const convex_poly& verts) {
 	convex_polys.push_back(verts);
 }
 
@@ -34,9 +34,11 @@ void convex_partitioned_shape::mult_vertices(vec2 mult) {
 		std::reverse(c.begin(), c.end());
 	}
 
+#if ENABLE_POLYGONIZATION
 	for (auto& v : debug_original) {
 		v *= mult;
 	}
+#endif
 }
 
 void convex_partitioned_shape::from_renderable(const_entity_handle handle) {
@@ -72,7 +74,9 @@ void convex_partitioned_shape::from_sprite(const components::sprite& sprite, boo
 		for (auto& v : new_concave)
 			v -= origin;
 
+#if ENABLE_POLYGONIZATION
 		debug_original = new_concave;
+#endif
 		add_concave_polygon(new_concave);
 
 		mult_vertices(vec2(1, -1));
@@ -84,7 +88,7 @@ void convex_partitioned_shape::from_sprite(const components::sprite& sprite, boo
 		b2PolygonShape shape;
 		shape.SetAsBox(static_cast<float>(rect_size.x) / 2.f * PIXELS_TO_METERSf, static_cast<float>(rect_size.y) / 2.f * PIXELS_TO_METERSf);
 
-		std::vector<vec2> new_convex_polygon;
+		convex_poly new_convex_polygon;
 
 		for (int i = 0; i < shape.GetVertexCount(); ++i)
 			new_convex_polygon.push_back(vec2(shape.GetVertex(i))*METERS_TO_PIXELSf);
@@ -128,27 +132,39 @@ void convex_partitioned_shape::add_concave_polygon(const std::vector <vec2> &ver
 
 		auto first_v = new_convex[0];
 
-		const unsigned max_vertices = 8;
+		const unsigned max_vertices = CONVEX_POLY_VERTEX_COUNT;
 
 		if (new_convex.size() > max_vertices) {
 			unsigned first = 1;
 
 			while (first + max_vertices - 2 < new_convex.size() - 1) {
-				std::vector<vec2> new_poly;
+				convex_poly new_poly;
 				new_poly.push_back(new_convex[0]);
-				new_poly.insert(new_poly.end(), new_convex.begin() + first, new_convex.begin() + first + max_vertices - 2 + 1);
+				//new_poly.insert(new_poly.end(), new_convex.begin() + first, new_convex.begin() + first + max_vertices - 2 + 1);
+				auto s = new_convex.begin() + first;
+				auto e = new_convex.begin() + first + max_vertices - 2 + 1;
+				
+				while (s != e)
+					new_poly.push_back(*s++);
+
 				convex_polys.push_back(new_poly);
 				first += max_vertices - 2;
 			}
 
-			std::vector<vec2> last_poly;
+			convex_poly last_poly;
 			last_poly.push_back(new_convex[0]);
 			last_poly.push_back(new_convex[first]);
-			last_poly.insert(last_poly.end(), new_convex.begin() + first, new_convex.end());
+
+			// last_poly.insert(last_poly.end(), new_convex.begin() + first, new_convex.end());
+			auto s = new_convex.begin() + first;
+			auto e = new_convex.end();
+
+			while (s != e)
+				last_poly.push_back(*s++);
 
 			convex_polys.push_back(last_poly);
 		}
 		else
-			convex_polys.push_back(new_convex);
+			convex_polys.push_back(convex_poly(new_convex.begin(), new_convex.end()));
 	}
 }

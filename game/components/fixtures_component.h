@@ -46,7 +46,7 @@ namespace components {
 			}
 		};
 
-		std::vector<convex_partitioned_collider> colliders;
+		augs::constant_size_vector<convex_partitioned_collider, COLLIDERS_COUNT> colliders;
 		bool activated = true;
 
 		std::array<components::transform, colliders_offset_type::OFFSET_COUNT> offsets_for_created_shapes;
@@ -69,7 +69,7 @@ namespace components {
 
 		convex_partitioned_collider& new_collider() {
 			colliders.push_back(convex_partitioned_collider());
-			return *colliders.rbegin();
+			return *(colliders.end()-1);
 		}
 	};
 }

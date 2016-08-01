@@ -12,13 +12,12 @@ namespace resources {
 		img = augs::image();
 		img.from_file(filename);
 		tex.set(&img);
+
 		filename.resize(filename.size() - 4);
 		filename += "_polygonized.png";
 
-#if ENABLE_POLYGONIZATION_IN_DEBUG || !(_DEBUG || NDEBUG)
 		if (augs::file_exists(filename))
 			polygonize_from_file(filename);
-#endif
 	}
 	
 	void texture_with_image::polygonize_from_file(std::string filename) {

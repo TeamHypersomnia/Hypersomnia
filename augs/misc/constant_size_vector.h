@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include "augs/ensure.h"
 
 namespace augs  {
 	template<class T, int const_count>
@@ -11,6 +12,22 @@ namespace augs  {
 	public:
 		typedef typename arr_type::iterator iterator;
 		typedef typename arr_type::const_iterator const_iterator;
+		typedef T value_type;
+		
+		constant_size_vector() = default;
+
+		template <class Iter>
+		constant_size_vector(Iter first, Iter last) {
+			assign(first, last);
+		}
+
+		template <class Iter>
+		void assign(Iter first, Iter last) {
+			clear();
+
+			while (first != last)
+				push_back(*first++);
+		}
 
 		void push_back(const T& obj) {
 			ensure(count < capacity());

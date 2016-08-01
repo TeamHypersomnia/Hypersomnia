@@ -1,2 +1,2 @@
 #pragma once
-#define ENABLE_POLYGONIZATION_IN_DEBUG 0
+

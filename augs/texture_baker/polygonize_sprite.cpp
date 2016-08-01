@@ -1,5 +1,6 @@
 #include "image.h"
 #include "augs/log.h"
+#include "augs/build_settings.h"
 
 #define OFFSET_COUNT 8
 
@@ -15,6 +16,7 @@ namespace augs {
 	std::vector<vec2i> image::get_polygonized() const {
 
 		std::vector<vec2i> vertices;
+#if ENABLE_POLYGONIZATION
 		std::vector<bool> pixelFields;
 		pixelFields.resize(size.area(), false);
 		for (int i = 0;i < size.h;++i)
@@ -73,7 +75,9 @@ namespace augs {
 				pixelFields[current.pos.y * size.w + current.pos.x] = true;
 			}	
 		}while (!quit);
-		
+#else
+		vertices = { vec2(0, 0), vec2(size.w, 0), vec2(size.w, size.h), vec2(0, size.h) };
+#endif
 		return vertices;	
 	}	
 
