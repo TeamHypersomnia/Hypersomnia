@@ -1,11 +1,12 @@
 #pragma once
-#include <vector>
+#include "game/container_sizes.h"
+#include "augs/misc/constant_size_vector.h"
+
 #include "game/transcendental/entity_id.h"
 #include "game/detail/inventory_slot_id.h"
 
 #include "game/transcendental/entity_handle_declaration.h"
 #include "augs/misc/stepped_timing.h"
-#include <set>
 
 namespace components {
 	struct item_slot_transfers {
@@ -22,7 +23,7 @@ namespace components {
 			}
 		} mounting;
 
-		std::set<entity_id> only_pick_these_items;
+		augs::constant_size_vector<entity_id, ONLY_PICK_THESE_ITEMS_COUNT> only_pick_these_items;
 		bool pick_all_touched_items_if_list_to_pick_empty = true;
 
 		augs::stepped_cooldown pickup_timeout = augs::stepped_cooldown(200);

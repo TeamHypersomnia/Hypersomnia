@@ -55,7 +55,7 @@ void item_system::handle_trigger_confirmations_as_pick_requests(fixed_step& step
 
 		if (item_slot_transfers && item && item_entity.get_owning_transfer_capability().dead()) {
 			auto& pick_list = item_slot_transfers->only_pick_these_items;
-			bool found_on_subscription_list = pick_list.find(item_entity) != pick_list.end();
+			bool found_on_subscription_list = found_in(pick_list, item_entity);
 
 			bool item_subscribed = (pick_list.empty() && item_slot_transfers->pick_all_touched_items_if_list_to_pick_empty)
 				|| found_in(item_slot_transfers->only_pick_these_items, item_entity);

@@ -21,6 +21,8 @@ namespace augs  {
 			assign(first, last);
 		}
 
+		constant_size_vector(std::initializer_list<T> l) : constant_size_vector(l.begin(), l.end()) {}
+
 		template <class Iter>
 		void assign(Iter first, Iter last) {
 			clear();
@@ -93,6 +95,10 @@ namespace augs  {
 
 		size_t size() const {
 			return count;
+		}
+
+		bool empty() const {
+			return size() == 0;
 		}
 
 		size_t capacity() const {

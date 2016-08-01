@@ -1,4 +1,7 @@
 #pragma once
+#include "game/container_sizes.h"
+#include "augs/misc/constant_size_vector.h"
+
 #include "augs/math/vec2.h"
 #include "game/transcendental/entity_id.h"
 
@@ -19,7 +22,7 @@ namespace components {
 
 		bool apply_movement_forces = true;
 
-		std::vector<subscribtion> response_receivers;
+		augs::constant_size_vector<subscribtion, MOVEMENT_RESPONSE_RECEIVERS_COUNT> response_receivers;
 		
 		bool moving_left = false;
 		bool moving_right = false;

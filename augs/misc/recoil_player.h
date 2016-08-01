@@ -3,10 +3,13 @@
 #include "augs/math/vec2.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
+#include "augs/misc/constant_size_vector.h"
+#include "game/container_sizes.h"
+
 class recoil_player {
 	int delta_offset = 0;
 public:
-	std::vector<vec2> offsets;
+	augs::constant_size_vector<vec2, RECOIL_PLAYER_OFFSET_COUNT> offsets;
 	unsigned current_offset = 0;
 	bool reversed = false;
 	unsigned repeat_last_n_offsets = 5;

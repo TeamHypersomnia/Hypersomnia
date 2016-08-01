@@ -1,10 +1,10 @@
 #pragma once
-
-#include <vector>
-
 #include "augs/math/vec2.h" 
 #include "game/components/transform_component.h"
 #include "game/enums/melee_state.h"
+
+#include "game/container_sizes.h"
+#include "augs/misc/constant_size_vector.h"
 
 namespace components {
 	struct melee {
@@ -44,7 +44,7 @@ namespace components {
 
 		melee_state current_state = melee_state::FREE;
 
-		std::vector<components::transform> offset_positions[4];
+		augs::constant_size_vector<components::transform, MELEE_OFFSET_POSITIONS_COUNT> offset_positions[4];
 		stage action_stage = stage::FIRST_STAGE;
 
 		void reset_move_flags() {
