@@ -101,7 +101,9 @@ void convex_partitioned_shape::from_sprite(const components::sprite& sprite, boo
 
 void convex_partitioned_shape::from_polygon(const components::polygon& poly) {
 	type = POLYGON;
-	add_concave_polygon(poly.original_polygon);
+	std::vector <vec2> vv;
+	vv.assign(poly.original_polygon.begin(), poly.original_polygon.end());
+	add_concave_polygon(vv);
 }
 
 void convex_partitioned_shape::add_concave_polygon(const std::vector <vec2> &verts) {

@@ -53,7 +53,7 @@ namespace components {
 			);
 		}
 
-		static void make_rect(vec2 pos, vec2 size, float rotation_degrees, vec2 out[4], bool pos_at_center);
+		static void make_rect(vec2 pos, vec2 size, float rotation_degrees, std::array<vec2, 4>& out, bool pos_at_center);
 
 		vec2 get_size() const;
 

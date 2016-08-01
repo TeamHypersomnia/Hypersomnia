@@ -21,7 +21,7 @@ namespace components {
 		camera_transform = state.camera_transform;
 	}
 
-	void sprite::make_rect(vec2 pos, vec2 size, float angle, vec2 v[4], bool pos_at_center) {
+	void sprite::make_rect(vec2 pos, vec2 size, float angle, std::array<vec2, 4>& v, bool pos_at_center) {
 		vec2 origin = pos;
 		
 		if(pos_at_center)
@@ -61,7 +61,7 @@ namespace components {
 	}
 
 	void sprite::draw(const drawing_input& in) const {
-		static thread_local vec2 v[4];
+		std::array<vec2, 4> v;
 		ensure(tex != assets::texture_id::INVALID_TEXTURE);
 
 		vec2i transform_pos = in.renderable_transform.pos;
@@ -144,7 +144,7 @@ namespace components {
 	}
 	
 	augs::rects::ltrb<float> sprite::get_aabb(components::transform transform, bool screen_space_mode) const {
-		static thread_local vec2 v[4];		
+		std::array<vec2, 4> v;		
 		
 		if (screen_space_mode)
 			make_rect(transform.pos + get_size() / 2, get_size(), transform.rotation + rotation_offset, v, true);

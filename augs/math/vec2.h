@@ -1,5 +1,6 @@
 #pragma once
 #include <algorithm>
+#include <array>
 #include "rects.h"
 #include "augs/misc/randomization.h"
 #include "declare.h"
@@ -26,8 +27,13 @@ namespace augs {
 		return a * (static_cast<A>(1.0) - alpha) + b * (alpha);
 	}
 
-	template <class T>
-	rects::ltrb<T> get_aabb(vec2t<T>* v, int verts = 4) {
+	template <class C>
+	auto get_aabb(const C& container) {
+		const auto* v = container.data();
+		const unsigned verts = container.size();
+
+		typedef typename std::decay_t<decltype(container[0])>::value_type T;
+
 		auto x_pred = [](vec2t<T> a, vec2t<T> b) { return a.x < b.x; };
 		auto y_pred = [](vec2t<T> a, vec2t<T> b) { return a.y < b.y; };
 
@@ -45,11 +51,6 @@ namespace augs {
 	}
 
 	template <class T>
-	rects::ltrb<T> get_aabb(std::vector<vec2t<T>> v) {
-		return get_aabb(v.data(), v.size());
-	}
-
-	template <class T>
 	rects::ltrb<T> get_aabb_rotated(vec2t<T> initial_size, T rotation) {
 		auto verts = rects::ltrb<T>(0, 0, initial_size.x, initial_size.y).template get_vertices<T>();
 
@@ -57,7 +58,7 @@ namespace augs {
 			v.rotate(rotation, initial_size / 2);
 
 		/* expanded aabb that takes rotation into consideration */
-		return get_aabb<T>(verts.data());
+		return get_aabb(verts);
 	}
 
 	template <class type_val>
@@ -129,6 +130,8 @@ namespace augs {
 
 template <class type>
 struct vec2t {
+	typedef type value_type;
+	
 	type x, y;
 
 	template <class Archive>

@@ -85,6 +85,14 @@ namespace augs  {
 			}
 		}
 
+		T* data() {
+			return &raw[0];
+		}
+
+		const T* data() const {
+			return &raw[0];
+		}
+
 		const_iterator begin() const {
 			return raw.begin();
 		}
@@ -103,6 +111,10 @@ namespace augs  {
 
 		size_t capacity() const {
 			return const_count;
+		}
+
+		void reserve(size_t) {
+			// no-op
 		}
 
 		void pop_back() {

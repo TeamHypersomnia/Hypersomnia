@@ -1,4 +1,6 @@
 #pragma once
+#include "game/container_sizes.h"
+#include "augs/misc/constant_size_vector.h"
 
 #include "augs/math/vec2.h"
 
@@ -30,13 +32,13 @@ namespace components {
 
 		/* the polygon as it was originally, so possibly concave
 		it is later triangulated for rendering and divided into convex polygons for physics */
-		std::vector<vec2> original_polygon;
+		augs::constant_size_vector<vec2, RENDERING_POLYGON_VERTEX_COUNT> original_polygon;
 
 		/* triangulated version of original_polygon, ready to be rendered triangle-by-triangle */
-		std::vector<vertex> triangulated_polygon;
+		augs::constant_size_vector<vertex, RENDERING_POLYGON_TRIANGULATED_VERTEX_COUNT> triangulated_polygon;
 
 		/* indices used in glDrawElements */
-		std::vector<int> indices;
+		augs::constant_size_vector<int, RENDERING_POLYGON_INDEX_COUNT> indices;
 
 		template <class Archive>
 		void serialize(Archive& ar) {

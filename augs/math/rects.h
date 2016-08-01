@@ -206,13 +206,11 @@ namespace augs {
 			}
 
 			template <class S>
-			std::vector<vec2t<S>> get_vertices() const {
-				std::vector<vec2t<S>> out;
-				out.push_back(vec2t<S>(l, t));
-				out.push_back(vec2t<S>(r, t));
-				out.push_back(vec2t<S>(r, b));
-				out.push_back(vec2t<S>(l, b));
-				return std::move(out);
+			std::array<vec2t<S>, 4> get_vertices() const {
+				return{ vec2t<S>(l, t),
+				vec2t<S>(r, t),
+				vec2t<S>(r, b),
+				vec2t<S>(l, b) };
 			}
 
 			template <typename type>

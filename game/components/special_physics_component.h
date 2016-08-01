@@ -1,5 +1,6 @@
 #pragma once
-#include <vector>
+#include "game/container_sizes.h"
+#include "augs/misc/constant_size_vector.h"
 
 #include "game/transcendental/entity_id.h"
 #include "augs/misc/stepped_timing.h"
@@ -7,7 +8,7 @@
 namespace components {
 	struct special_physics {
 		entity_id owner_friction_ground;
-		std::vector<entity_id> owner_friction_grounds;
+		augs::constant_size_vector<entity_id, OWNER_FRICTION_GROUNDS_COUNT> owner_friction_grounds;
 
 		augs::stepped_timeout since_dropped;
 
