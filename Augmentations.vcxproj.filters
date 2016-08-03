@@ -3071,5 +3071,8 @@
     <ClInclude Include="augs\misc\enum_associative_array.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="augs\misc\templated_readwrite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

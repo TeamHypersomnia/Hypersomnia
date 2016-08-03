@@ -30,6 +30,11 @@ namespace augs {
 
 		char* data();
 		const char* data() const;
+
+		char& operator[](size_t);
+		const char& operator[](size_t) const;
+
+		std::string to_string() const;
 		
 		void read(char* data, size_t bytes);
 		void write(const char* data, size_t bytes);

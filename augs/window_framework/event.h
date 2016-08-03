@@ -40,7 +40,8 @@ namespace augs {
 				mdown = WM_MBUTTONDOWN,
 				mup = WM_MBUTTONUP,
 				rdown = WM_RBUTTONDOWN,
-				rup = WM_RBUTTONUP
+				rup = WM_RBUTTONUP,
+				COUNT = 0xF120 + 1
 #elif PLATFORM_LINUX
 				ltripleclick,
 				close,
@@ -194,6 +195,7 @@ namespace augs {
 					LALT = VK_LMENU,
 					RALT = VK_RMENU,
 					DASH = VK_OEM_3,
+					COUNT = 256,
 #elif PLATFORM_LINUX
 					INVALID,
 					LMOUSE,

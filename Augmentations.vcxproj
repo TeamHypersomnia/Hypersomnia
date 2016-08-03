@@ -914,6 +914,7 @@
     <ClInclude Include="augs\misc\pool_handlizer.h" />
     <ClInclude Include="augs\misc\stepped_timing.h" />
     <ClInclude Include="augs\misc\streams.h" />
+    <ClInclude Include="augs\misc\templated_readwrite.h" />
     <ClInclude Include="augs\misc\time_utils.h" />
     <ClInclude Include="game\container_sizes.h" />
     <ClInclude Include="game\detail\world_camera.h" />

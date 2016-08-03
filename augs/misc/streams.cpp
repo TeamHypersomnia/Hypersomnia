@@ -5,25 +5,6 @@ namespace augs {
 	void stream::read(char* data, size_t bytes) {
 		memcpy(data, buf.data() + pos, bytes);
 		pos += bytes;
-
-
-		enum class hja {
-			FIRST,
-			COUNT
-		};
-
-		struct omg {
-			int hhh;
-		};
-
-		enum_associative_array<hja, omg> abc;
-
-		for (auto& itt : abc) {
-			itt.first;
-			itt.second.hhh;
-		}
-		
-		abc[hja::FIRST].hhh;
 	}
 
 	bool stream::operator==(const stream& b) const {
@@ -36,6 +17,18 @@ namespace augs {
 
 	const char* stream::data() const {
 		return buf.data();
+	}
+
+	char& stream::operator[](size_t idx) {
+		return data()[idx];
+	}
+
+	const char& stream::operator[](size_t idx) const {
+		return data()[idx];
+	}
+	
+	std::string stream::to_string() const {
+		return std::string(data(), data() + size());
 	}
 
 	void stream::write(const char* data, size_t bytes) {

@@ -53,6 +53,22 @@ namespace augs {
 			);
 		}
 
+		template <class Archive>
+		void write_object(Archive& ar) const {
+			augs::write_object(ar, pooled);
+			augs::write_object(ar, slots);
+			augs::write_object(ar, indirectors);
+			augs::write_object(ar, free_indirectors);
+		}
+
+		template <class Archive>
+		void read_object(Archive& ar) {
+			augs::read_object(ar, pooled);
+			augs::read_object(ar, slots);
+			augs::read_object(ar, indirectors);
+			augs::read_object(ar, free_indirectors);
+		}
+
 	protected:
 		void initialize_space(int slot_count) {
 			pooled.clear();
@@ -191,12 +207,16 @@ namespace augs {
 			return pooled.data();
 		}
 
-		int size() const {
+		size_t size() const {
 			return slots.size();
 		}
 
-		int capacity() const {
+		size_t capacity() const {
 			return indirectors.size();
+		}
+
+		bool empty() const {
+			return size() == 0;
 		}
 	};
 
@@ -206,6 +226,16 @@ namespace augs {
 		using basic_pool<T>::initialize_space;
 		using basic_pool<T>::allocate;
 		using basic_pool<T>::free;
+		
+		template <class Archive>
+		void write_object(Archive& ar) const {
+			augs::write_object(ar, static_cast<const basic_pool<T>&>(*this));
+		}
+
+		template <class Archive>
+		void read_object(Archive& ar) {
+			augs::read_object(ar, static_cast<basic_pool<T>&>(*this));
+		}
 	};
 
 	template<class T, typename... meta>
@@ -217,6 +247,18 @@ namespace augs {
 			basic_pool<T>::serialize(ar);
 
 			ar(CEREAL_NVP(metas));
+		}
+
+		template <class Archive>
+		void write_object(Archive& ar) const {
+			augs::write_object(ar, static_cast<const basic_pool<T>&>(*this));
+			augs::write_object(ar, metas);
+		}
+
+		template <class Archive>
+		void read_object(Archive& ar) {
+			augs::read_object(ar, static_cast<basic_pool<T>&>(*this));
+			augs::read_object(ar, metas);
 		}
 
 		void initialize_space(int slot_count) {

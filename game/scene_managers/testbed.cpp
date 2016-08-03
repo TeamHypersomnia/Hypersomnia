@@ -230,7 +230,8 @@ namespace scene_managers {
 
 		world.significant.settings.enable_interpolation = true;
 
-		characters = to_id_vector(new_characters);
+		auto id_vector = to_id_vector(new_characters);
+		characters.assign(id_vector.begin(), id_vector.end());
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 	}
 

@@ -95,7 +95,7 @@ void multiverse::simulate() {
 				}
 				if (raw_input.key == window::event::keys::F8) {
 					duplication.new_measurement();
-					stashed_cosmos = main_cosmos;
+					stashed_cosmos = main_cosmos.significant;
 					stashed_timer = main_cosmos_timer;
 					duplication.end_measurement();
 				}

@@ -42,9 +42,6 @@ public:
 
 	class significant_state {
 	public:
-		significant_state() = default;
-		significant_state(const cosmos&);
-
 		all_settings settings;
 
 		augs::fixed_delta delta;
@@ -142,3 +139,23 @@ public:
 		return significant.pool_for_aggregates;
 	}
 };
+
+namespace augs {
+	template<class A>
+	void read_object(A& ar, cosmos::significant_state& significant) {
+		read_object(ar, significant.settings);
+		read_object(ar, significant.delta);
+
+		read_object(ar, significant.pools_for_components);
+		read_object(ar, significant.pool_for_aggregates);
+	}
+
+	template<class A>
+	void write_object(A& ar, const cosmos::significant_state& significant) {
+		write_object(ar, significant.settings);
+		write_object(ar, significant.delta);
+
+		write_object(ar, significant.pools_for_components);
+		write_object(ar, significant.pool_for_aggregates);
+	}
+}

@@ -65,18 +65,12 @@ void cosmos::complete_resubstantialization() {
 	profiler.complete_resubstantiation.end_measurement();
 }
 
-cosmos::significant_state::significant_state(const cosmos& b) {
-	*this = b.significant;
-}
-
 cosmos::cosmos() {
-}
 
-cosmos::cosmos(const cosmos& b) {
-	*this = b;
 }
 
 bool cosmos::operator==(const cosmos& b) const {
+	ensure(false);
 	return significant == b.significant;
 }
 

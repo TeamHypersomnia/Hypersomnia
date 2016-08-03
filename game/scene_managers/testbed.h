@@ -3,6 +3,8 @@
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
+#include "augs/misc/constant_size_vector.h"
+
 namespace augs {
 	struct machine_entropy;
 }
@@ -16,10 +18,10 @@ class world_camera;
 namespace scene_managers {
 	class testbed {
 	public:
-		std::vector<entity_id> characters;
+		augs::constant_size_vector<entity_id, 20> characters;
 		unsigned current_character = 0;
 		entity_id currently_controlled_character;
-		std::vector<entity_id> draw_bodies;
+		augs::constant_size_vector<entity_id, 20> draw_bodies;
 
 		template <class Archive>
 		void serialize(Archive& ar) {
