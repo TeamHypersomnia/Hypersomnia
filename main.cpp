@@ -24,24 +24,17 @@ int main(int argc, char** argv) {
 	window.call_window_script("config.lua");
 	vec2i screen_size = vec2i(window.window.get_screen_rect());
 
-	cosmos c1;
-	cosmos c2;
-
-	//augs::stream delta;
-	//c1.delta_encode(c2, delta);
-	//c2.delta_decode(delta);
-
 	resource_manager.destroy_everything();
 	resource_setups::load_standard_everything();
 
 	multiverse hypersomnia;
 
-	//if (!hypersomnia.try_to_load_save()) {
+	if (!hypersomnia.try_to_load_save()) {
 		hypersomnia.main_cosmos.significant.settings.screen_size = screen_size;
 		hypersomnia.populate_cosmoi();
-	//}
-	//else 
-	//	hypersomnia.main_cosmos.significant.settings.screen_size = screen_size;
+	}
+	else 
+		hypersomnia.main_cosmos.significant.settings.screen_size = screen_size;
 	
 	hypersomnia.try_to_load_or_save_new_session();
 
