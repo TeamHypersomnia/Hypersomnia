@@ -40,7 +40,7 @@ namespace augs {
 			{
 				++idx;
 
-				while (!ptr->is_set[idx] && idx < size_t(Enum::COUNT))
+				while (idx < size_t(Enum::COUNT) && !ptr->is_set[idx])
 					++idx;
 				
 				return *this;
