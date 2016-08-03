@@ -90,9 +90,6 @@ cosmos& cosmos::operator=(const cosmos& b) {
 }
 
 cosmos& cosmos::operator=(const significant_state& b) {
-	this->~cosmos();
-	new (this) cosmos;
-
 	significant = b;
 	complete_resubstantialization();
 	return *this;
@@ -131,7 +128,7 @@ std::vector<const_entity_handle> cosmos::get(processing_subjects list) const {
 }
 
 randomization cosmos::get_rng_for(entity_id id) const {
-	return{ id.version + id.indirection_index + static_cast<size_t>(significant.delta.get_total_steps_passed()) };
+	return { std::abs(id.version) + std::abs(id.indirection_index) + static_cast<size_t>(significant.delta.get_total_steps_passed()) };
 }
 
 entity_handle cosmos::get_handle(entity_id id) {

@@ -313,7 +313,7 @@ void particles_system::spawn_particle(randomization& rng,
 			rng.randval(emission.acceleration);
 	}
 
-	group.particles.particles.push_back(new_particle);
+	group.particles.push_back(new_particle);
 }
 
 void integrate_particle(resources::particle& p, float dt) {
@@ -351,7 +351,7 @@ void particles_system::step_streams_and_particles(fixed_step& step) const {
 		auto& slots = group.stream_slots;
 
 		for (auto& stream_slot : slots) {
-			auto& particles = stream_slot.particles.particles;
+			auto& particles = stream_slot.particles;
 
 			for (auto& particle : particles)
 				integrate_particle(particle, static_cast<float>(delta.in_seconds()));
@@ -391,7 +391,7 @@ void particles_system::step_streams_and_particles(fixed_step& step) const {
 							stream_slot.swing_spread * static_cast<float>(sin((stream_slot.stream_lifetime_ms / 1000.f) * 2 * PI_f * stream_slot.swings_per_sec))
 							, stream_slot.target_spread, stream_info);
 
-						integrate_particle(*stream_slot.particles.particles.rbegin(), time_elapsed);
+						integrate_particle(*stream_slot.particles.rbegin(), time_elapsed);
 						stream_slot.stream_particles_to_spawn -= 1.f;
 					}
 				}
@@ -406,7 +406,7 @@ void particles_system::step_streams_and_particles(fixed_step& step) const {
 		}
 
 		slots.erase(std::remove_if(slots.begin(), slots.end(), [](const components::particle_group::stream& s) {
-			return s.particles.particles.empty() &&
+			return s.particles.empty() &&
 				s.destroy_after_lifetime_passed &&
 				s.stream_lifetime_ms >= s.stream_max_lifetime_ms;
 		}), slots.end());

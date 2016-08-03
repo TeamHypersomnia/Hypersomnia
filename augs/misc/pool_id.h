@@ -8,7 +8,7 @@ namespace augs {
 #if USE_NAMES_FOR_IDS
 		std::string debug_name;
 #endif
-		int version = 0xdeadbeef;
+		int version = -1;
 		int indirection_index = -1;
 
 		raw_pool_id();

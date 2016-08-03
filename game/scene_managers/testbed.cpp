@@ -91,7 +91,7 @@ namespace scene_managers {
 				new_character.get<components::sentience>().minimum_danger_amount_to_evade = 20;
 				new_character.get<components::sentience>().health.value = 300;
 				new_character.get<components::sentience>().health.maximum = 300;
-				ingredients::standard_pathfinding_capability(new_character);
+				//ingredients::standard_pathfinding_capability(new_character);
 				//ingredients::soldier_intelligence(new_character);
 				new_character.recalculate_basic_processing_categories();
 			}
@@ -105,8 +105,8 @@ namespace scene_managers {
 				new_character.get<components::sentience>().minimum_danger_amount_to_evade = 20;
 				new_character.get<components::sentience>().health.value = 300;
 				new_character.get<components::sentience>().health.maximum = 300;
-				ingredients::standard_pathfinding_capability(new_character);
-				ingredients::soldier_intelligence(new_character);
+				//ingredients::standard_pathfinding_capability(new_character);
+				//ingredients::soldier_intelligence(new_character);
 				new_character.recalculate_basic_processing_categories();
 			}
 		}

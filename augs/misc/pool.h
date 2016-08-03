@@ -11,6 +11,8 @@ namespace augs {
 		typedef augs::pool_id<T> id_type;
 		typedef augs::pool_handle<T> handle_type;
 		typedef augs::const_pool_handle<T> const_handle_type;
+
+		typedef std::vector<T> pooled_container_type;
 	
 	protected:
 		struct metadata {
@@ -35,7 +37,7 @@ namespace augs {
 			}
 		};
 
-		std::vector<T> pooled;
+		pooled_container_type pooled;
 		std::vector<metadata> slots;
 		std::vector<indirector> indirectors;
 		std::vector<int> free_indirectors;

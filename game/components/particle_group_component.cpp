@@ -6,7 +6,7 @@ using namespace augs;
 namespace components {
 	void particle_group::draw(const drawing_input& group_input) const {
 		for (auto& s : stream_slots)
-			for (auto it : s.particles.particles) {
+			for (auto it : s.particles) {
 				auto temp_alpha = it.face.color.a;
 
 				if (it.should_disappear) {
