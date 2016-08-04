@@ -250,8 +250,6 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 
 	ray_casts_since_last_step = 0;
 
-	contact_listener listener(step.cosm);
-
 	b2world.Step(static_cast<float32>(delta.in_seconds()), velocityIterations, positionIterations);
 	b2world.ClearForces();
 

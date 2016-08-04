@@ -216,6 +216,7 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 	auto& performance = profiler;
+	physics_system::contact_listener listener(step.cosm);
 
 	profiler.entropy_length.measure(step.entropy.length());
 
@@ -276,14 +277,15 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	item_system().handle_holster_item_intents(step);
 	item_system().handle_throw_item_intents(step);
 
-	driver_system().assign_drivers_from_successful_trigger_hits(step);
-	driver_system().release_drivers_due_to_ending_contact_with_wheel(step);
-
 	damage_system().destroy_outdated_bullets(step);
 	damage_system().destroy_colliding_bullets_and_send_damage(step);
 
 	sentience_system().apply_damage_and_generate_health_events(step);
+	temporary_systems.get<physics_system>().post_and_clear_accumulated_collision_messages(step);
 	sentience_system().cooldown_aimpunches(step);
+
+	driver_system().assign_drivers_from_successful_trigger_hits(step);
+	driver_system().release_drivers_due_to_ending_contact_with_wheel(step);
 
 	particles_system().game_responses_to_particle_effects(step);
 	particles_system().create_particle_effects(step);
@@ -312,6 +314,8 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 
 	bool has_no_destruction_callback_queued_any_additional_destruction = step.messages.get_queue<messages::queue_destruction>().empty();
 	ensure(has_no_destruction_callback_queued_any_additional_destruction);
+
+	listener.~contact_listener();
 
 	destroy_system().perform_deletions(step);
 

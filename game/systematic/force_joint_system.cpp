@@ -17,7 +17,12 @@ void force_joint_system::apply_forces_towards_target_entities(fixed_step& step) 
 	auto& delta = step.get_delta();
 	auto targets = cosmos.get(processing_subjects::WITH_FORCE_JOINT);
 	for (auto& it : targets) {
+		if (!it.has<components::physics>()) continue;
+
 		auto& physics = it.get<components::physics>();
+
+		if (!physics.is_constructed()) continue;
+
 		auto& force_joint = it.get<components::force_joint>();
 		auto chased_entity = cosmos[force_joint.chased_entity];
 
