@@ -43,7 +43,7 @@ void input_system::make_intents_from_raw_entropy(fixed_step& step) {
 			if (raw.key_event == event::NO_CHANGE) {
 				mapped_intent.pressed_flag = true;
 
-				auto found_intent = context.event_to_intent.find(event::message(raw.msg));
+				auto found_intent = context.event_to_intent.find(raw.msg);
 				if (found_intent != context.event_to_intent.end()) {
 					intent = (*found_intent).second;
 					found_context_entry = true;

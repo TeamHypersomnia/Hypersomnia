@@ -38,10 +38,14 @@ namespace augs {
 		friend class augs::component_allocators<is_const, basic_entity_handle<is_const>>;
 
 		template <class T, typename = void>
-		struct component_or_synchronizer {
+		struct component_or_synchronizer_or_disabled {
 			typedef maybe_const_ref_t<is_const, T> return_type;
 
 			basic_entity_handle<is_const> h;
+
+			bool has() const {
+				return h.allocator::template has<T>();
+			}
 
 			return_type get() const {
 				return h.allocator::template get<T>();
@@ -65,30 +69,57 @@ namespace augs {
 		};
 
 		template <class T>
-		struct component_or_synchronizer<T, std::enable_if_t<is_component_synchronized<T>::value>> {
+		struct component_or_synchronizer_or_disabled<T, std::enable_if_t<is_component_synchronized<T>::value && !is_component_disabled<T>::value>> {
 			typedef component_synchronizer<is_const, T> return_type;
 
 			basic_entity_handle<is_const> h;
+
+			bool has() const {
+				return h.allocator::template has<T>();
+			}
 
 			return_type get() const {
 				return component_synchronizer<is_const, T>(h.allocator::template get<T>(), h);
 			}
 
 			void add(const T& t) const {
-				ensure(!h.has<T>());
 				h.allocator::add(t);
 				h.get_cosmos().complete_resubstantialization(h);
 			}
 
 			void remove() const {
-				ensure(h.has<T>());
 				h.allocator::template remove<T>();
 				h.get_cosmos().complete_resubstantialization(h);
 			}
 		};
-		
+
+		template <class T>
+		struct component_or_synchronizer_or_disabled<T, std::enable_if_t<is_component_disabled<T>::value>> {
+			typedef maybe_const_ref_t<is_const, T> return_type;
+
+			basic_entity_handle<is_const> h;
+
+			bool has() const {
+				return false;
+			}
+
+			return_type get() const {
+				static thread_local T t;
+				t = T();
+				return t;
+			}
+
+			void add(const T& t) const {
+
+			}
+
+			void remove() const {
+
+			}
+		};
+
 		template<class T>
-		using component_or_synchronizer_t = typename component_or_synchronizer<T>::return_type;
+		using component_or_synchronizer_t = typename component_or_synchronizer_or_disabled<T>::return_type;
 
 		using base::get;
 		using base::get_meta;
@@ -117,26 +148,23 @@ namespace augs {
 
 		template <class component>
 		bool has() const {
-			return allocator::template has<component>();
+			return component_or_synchronizer_or_disabled<component>({ *this }).has();
 		}
 
 		template<class component>
 		decltype(auto) get() const {
-			ensure(has<component>());
-			return component_or_synchronizer<component>({ *this }).get();
+			return component_or_synchronizer_or_disabled<component>({ *this }).get();
 		}
 
 		template<class component, bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 		decltype(auto) add(const component& c) const {
-			ensure(!has<component>());
-			component_or_synchronizer<component>({ *this }).add(c);
+			component_or_synchronizer_or_disabled<component>({ *this }).add(c);
 			return get<component>();
 		}
 
 		template<class component, bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 		decltype(auto) add(const component_synchronizer<is_const, component>& c) const {
-			ensure(!has<component>());
-			component_or_synchronizer<component>({ *this }).add(c.get_data());
+			component_or_synchronizer_or_disabled<component>({ *this }).add(c.get_data());
 			return get<component>();
 		}
 
@@ -148,7 +176,7 @@ namespace augs {
 
 		template<class component, bool _is_const = is_const, typename = std::enable_if_t<!_is_const>>
 		void remove() const {
-			return component_or_synchronizer<component>({ *this }).remove();
+			return component_or_synchronizer_or_disabled<component>({ *this }).remove();
 		}
 
 		template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>

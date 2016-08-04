@@ -199,7 +199,7 @@ namespace scene_managers {
 		active_context.map_key_to_intent(window::event::keys::A, intent_type::MOVE_LEFT);
 		active_context.map_key_to_intent(window::event::keys::D, intent_type::MOVE_RIGHT);
 
-		active_context.map_event_to_intent(window::event::mousemotion, intent_type::MOVE_CROSSHAIR);
+		active_context.map_event_to_intent(window::event::message::mousemotion, intent_type::MOVE_CROSSHAIR);
 		active_context.map_key_to_intent(window::event::keys::LMOUSE, intent_type::CROSSHAIR_PRIMARY_ACTION);
 		active_context.map_key_to_intent(window::event::keys::RMOUSE, intent_type::CROSSHAIR_SECONDARY_ACTION);
 

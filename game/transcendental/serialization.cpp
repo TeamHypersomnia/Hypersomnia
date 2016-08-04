@@ -96,22 +96,22 @@ bool cosmos::significant_state::operator==(const significant_state& second) cons
 	augs::write_object(this_serialized, *this);
 	augs::write_object(second_serialized, second);
 
-	//size_t mismatch_byte = 0;
-	//
-	//for (size_t i = 0; i < this_serialized.size(); ++i) {
-	//	if (this_serialized[i] != second_serialized[i]) {
-	//		mismatch_byte = i;
-	//		LOG("%x %x", int(this_serialized[i]), int(second_serialized[i]));
-	//		break;
-	//	}
-	//}
-	//
-	//second_serialized.reset_pos();
-	//
-	//significant_state resultant;
-	//augs::read_object(second_serialized, resultant);
+	size_t mismatch_byte = 0;
+	
+	for (size_t i = 0; i < this_serialized.size(); ++i) {
+		if (this_serialized[i] != second_serialized[i]) {
+			mismatch_byte = i;
+			LOG("%x %x", int(this_serialized[i]), int(second_serialized[i]));
+			break;
+		}
+	}
+	
+	second_serialized.reset_pos();
+	
+	significant_state resultant;
+	augs::read_object(second_serialized, resultant);
 
-	//LOG("C1: %x\nC2: %x, mismatch: %x", this_serialized.to_string(), second_serialized.to_string(), mismatch_byte);
+	LOG("C1: %x\nC2: %x, mismatch: %x", this_serialized.to_string(), second_serialized.to_string(), mismatch_byte);
 
 	bool cosmoi_identical = this_serialized == second_serialized;
 	return cosmoi_identical;

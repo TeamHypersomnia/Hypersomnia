@@ -16,33 +16,8 @@ namespace augs {
 				RELEASED = 2
 			};
 
-			enum message {
-#ifdef PLATFORM_WINDOWS
-				ltripleclick,
-				close = SC_CLOSE,
-				move = WM_MOVE,
-				activate = WM_ACTIVATE,
-				minimize = SC_MINIMIZE,
-				maximize = SC_MAXIMIZE,
-				restore = SC_RESTORE,
-				clipboard_change = WM_CLIPBOARDUPDATE,
-				keydown = WM_KEYDOWN,
-				keyup = WM_KEYUP,
-				character = WM_CHAR,
-				unichar = WM_UNICHAR,
-				mousemotion = WM_MOUSEMOVE,
-				wheel = WM_MOUSEWHEEL,
-				ldoubleclick = WM_LBUTTONDBLCLK,
-				mdoubleclick = WM_MBUTTONDBLCLK,
-				rdoubleclick = WM_RBUTTONDBLCLK,
-				ldown = WM_LBUTTONDOWN,
-				lup = WM_LBUTTONUP,
-				mdown = WM_MBUTTONDOWN,
-				mup = WM_MBUTTONUP,
-				rdown = WM_RBUTTONDOWN,
-				rup = WM_RBUTTONUP,
-				COUNT = 0xF120 + 1
-#elif PLATFORM_LINUX
+			enum class message {
+				unknown,
 				ltripleclick,
 				close,
 				move,
@@ -66,7 +41,7 @@ namespace augs {
 				mup,
 				rdown,
 				rup,
-#endif
+				COUNT
 			};
 
 			namespace keys {

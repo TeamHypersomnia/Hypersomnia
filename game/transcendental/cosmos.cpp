@@ -74,7 +74,6 @@ cosmos::cosmos(const cosmos& b) {
 }
 
 bool cosmos::operator==(const cosmos& b) const {
-	ensure(false);
 	return significant == b.significant;
 }
 

@@ -10,6 +10,37 @@
 #include "platform_utils.h"
 
 #ifdef PLATFORM_WINDOWS
+augs::window::event::message translate_enum(UINT m) {
+	switch (m) {
+	case UINT(augs::window::event::message::ltripleclick): return augs::window::event::message::ltripleclick;
+	case SC_CLOSE:					return augs::window::event::message::close; break;
+	case WM_MOVE:					return augs::window::event::message::move; break;
+	case WM_ACTIVATE:				return augs::window::event::message::activate; break;
+	case SC_MINIMIZE:				return augs::window::event::message::minimize; break;
+	case SC_MAXIMIZE:				return augs::window::event::message::maximize; break;
+	case SC_RESTORE:				return augs::window::event::message::restore;  break;
+	case WM_CLIPBOARDUPDATE:		return augs::window::event::message::clipboard_change; break;
+	case WM_KEYDOWN:				return augs::window::event::message::keydown; break;
+	case WM_KEYUP:					return augs::window::event::message::keyup; break;
+	case WM_CHAR:					return augs::window::event::message::character; break;
+	case WM_UNICHAR:				return augs::window::event::message::unichar; break;
+	case WM_MOUSEMOVE:				return augs::window::event::message::mousemotion; break;
+	case WM_MOUSEWHEEL:				return augs::window::event::message::wheel; break;
+	case WM_LBUTTONDBLCLK:			return augs::window::event::message::ldoubleclick; break;
+	case WM_MBUTTONDBLCLK:			return augs::window::event::message::mdoubleclick; break;
+	case WM_RBUTTONDBLCLK:			return augs::window::event::message::rdoubleclick; break;
+	case WM_LBUTTONDOWN:			return augs::window::event::message::ldown; break;
+	case WM_LBUTTONUP:				return augs::window::event::message::lup; break;
+	case WM_MBUTTONDOWN:			return augs::window::event::message::mdown; break;
+	case WM_MBUTTONUP:				return augs::window::event::message::mup; break;
+	case WM_RBUTTONDOWN:			return augs::window::event::message::rdown; break;
+	case WM_RBUTTONUP:				return augs::window::event::message::rup; break;
+	default: break;
+	}
+
+	return augs::window::event::message::unknown;
+}
+
 namespace augs {
 	extern HINSTANCE hinst;
 
@@ -231,7 +262,7 @@ namespace augs {
 				default: DefWindowProc(hwnd, m, wParam, lParam); break;
 				}
 
-				events.msg = event::message(m);
+				events.msg = translate_enum(m);
 		}
 
 		glwindow* glwindow::get_current() {

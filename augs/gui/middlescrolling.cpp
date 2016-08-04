@@ -14,7 +14,7 @@ namespace augs {
 
 		bool middlescrolling::handle_new_raw_state(rect_pool& rects, window::event::state state) {
 			if (rects[subject].alive()) {
-				if (state.msg == window::event::mdown || state.msg == window::event::mdoubleclick)
+				if (state.msg == window::event::message::mdown || state.msg == window::event::message::mdoubleclick)
 					subject = rect_id();
 				
 				return true;
