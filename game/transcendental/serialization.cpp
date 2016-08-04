@@ -54,8 +54,8 @@ void multiverse::load_cosmos_from_file(std::string filename) {
 
 	ensure(main_cosmos.significant.pool_for_aggregates.empty());
 	
-	ensure(cosmos() == cosmos());
-	ensure(main_cosmos == cosmos());
+	//ensure(cosmos() == cosmos());
+	//ensure(main_cosmos == cosmos());
 
 	auto& stream = main_cosmos.reserved_memory_for_serialization;
 	

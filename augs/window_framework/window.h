@@ -42,8 +42,8 @@ namespace augs {
 			bool raw_mouse_input = true;
 			unsigned triple_click_delay; /* maximum delay time for the next click (after doubleclick) to be considered tripleclick (in milliseconds) */
 			
-			void _poll(event::message&, WPARAM, LPARAM);
-			bool poll_event(event::message& out);
+			void _poll(UINT&, WPARAM, LPARAM);
+			bool poll_event(UINT& out);
 		public:
 			renderer gl;
 			
