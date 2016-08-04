@@ -4,6 +4,7 @@
 #include "game/transcendental/entity_handle_declaration.h"
 
 #include "augs/misc/constant_size_vector.h"
+#include "game/container_sizes.h"
 
 namespace augs {
 	struct machine_entropy;
@@ -18,10 +19,10 @@ class world_camera;
 namespace scene_managers {
 	class testbed {
 	public:
-		augs::constant_size_vector<entity_id, 20> characters;
+		augs::constant_size_vector<entity_id, TESTBED_CHARACTERS_COUNT> characters;
 		unsigned current_character = 0;
 		entity_id currently_controlled_character;
-		augs::constant_size_vector<entity_id, 20> draw_bodies;
+		augs::constant_size_vector<entity_id, TESTBED_DRAW_BODIES_COUNT> draw_bodies;
 
 		template <class Archive>
 		void serialize(Archive& ar) {

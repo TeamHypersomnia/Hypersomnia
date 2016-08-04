@@ -69,6 +69,10 @@ cosmos::cosmos() {
 
 }
 
+cosmos::cosmos(const cosmos& b) {
+	*this = b;
+}
+
 bool cosmos::operator==(const cosmos& b) const {
 	ensure(false);
 	return significant == b.significant;
