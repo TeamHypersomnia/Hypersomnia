@@ -3074,5 +3074,8 @@
     <ClInclude Include="augs\misc\templated_readwrite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="augs\padding_byte.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

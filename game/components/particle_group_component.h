@@ -7,6 +7,8 @@
 
 #include "game/detail/state_for_drawing_camera.h"
 
+#include "augs/padding_byte.h"
+
 class physics_system;
 class particles_system;
 
@@ -30,9 +32,11 @@ namespace components {
 
 			bool destroy_after_lifetime_passed = true;
 			bool stop_spawning_particles_if_chased_entity_dead = true;
+			bool enable_streaming = false;
+			padding_byte b1;
 
-			double stream_lifetime_ms = 0.0;
-			double stream_max_lifetime_ms = 0.0;
+			float stream_lifetime_ms = 0.0;
+			float stream_max_lifetime_ms = 0.0;
 			float stream_particles_to_spawn = 0.f;
 
 			float target_spread = 0.f;
@@ -49,7 +53,6 @@ namespace components {
 			float fade_when_ms_remaining = 0.f;
 
 			resources::emission stream_info;
-			bool enable_streaming = false;
 
 			template <class Archive>
 			void serialize(Archive& ar) {
@@ -86,7 +89,7 @@ namespace components {
 			}
 		};
 		
-		bool pause_emission = false;
+		int pause_emission = false;
 		components::transform previous_transform;
 		std::vector<stream> stream_slots;
 

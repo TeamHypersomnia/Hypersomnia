@@ -53,6 +53,9 @@ void multiverse::load_cosmos_from_file(std::string filename) {
 	total_load.new_measurement();
 
 	ensure(main_cosmos.significant.pool_for_aggregates.empty());
+	
+	ensure(cosmos() == cosmos());
+	ensure(main_cosmos == cosmos());
 
 	auto& stream = main_cosmos.reserved_memory_for_serialization;
 	
@@ -79,7 +82,6 @@ void multiverse::load_cosmos_from_file(std::string filename) {
 
 
 bool cosmos::significant_state::operator==(const significant_state& second) const {
-	ensure(false);
 	augs::output_stream_reserver this_serialized_reserver;
 	augs::output_stream_reserver second_serialized_reserver;
 	auto& r1 = this_serialized_reserver;
@@ -116,6 +118,5 @@ bool cosmos::significant_state::operator==(const significant_state& second) cons
 }
 
 bool cosmos::significant_state::operator!=(const significant_state& second) const {
-	ensure(false);
 	return !operator==(second);
 }

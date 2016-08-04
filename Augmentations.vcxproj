@@ -916,6 +916,7 @@
     <ClInclude Include="augs\misc\streams.h" />
     <ClInclude Include="augs\misc\templated_readwrite.h" />
     <ClInclude Include="augs\misc\time_utils.h" />
+    <ClInclude Include="augs\padding_byte.h" />
     <ClInclude Include="game\container_sizes.h" />
     <ClInclude Include="game\detail\world_camera.h" />
     <ClInclude Include="game\transcendental\component_synchronizer.h" />

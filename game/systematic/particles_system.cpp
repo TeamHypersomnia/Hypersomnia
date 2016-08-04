@@ -354,11 +354,11 @@ void particles_system::step_streams_and_particles(fixed_step& step) const {
 			auto& particles = stream_slot.particles;
 
 			for (auto& particle : particles)
-				integrate_particle(particle, static_cast<float>(delta.in_seconds()));
+				integrate_particle(particle, delta.in_seconds());
 
 			if (stream_slot.enable_streaming) {
 				auto& stream_info = stream_slot.stream_info;
-				float stream_delta = static_cast<float>(std::min(delta.in_milliseconds(), stream_slot.stream_max_lifetime_ms - stream_slot.stream_lifetime_ms));
+				float stream_delta = std::min(delta.in_milliseconds(), stream_slot.stream_max_lifetime_ms - stream_slot.stream_lifetime_ms);
 				stream_slot.stream_lifetime_ms += stream_delta;
 				stream_slot.stream_lifetime_ms = std::min(stream_slot.stream_lifetime_ms, stream_slot.stream_max_lifetime_ms);
 
@@ -382,7 +382,7 @@ void particles_system::step_streams_and_particles(fixed_step& step) const {
 				if (!group.pause_emission) {
 					for (int i = 0; i < to_spawn; ++i) {
 						float t = (static_cast<float>(i) / to_spawn);
-						float time_elapsed = (1.f - t) * static_cast<float>(delta.in_seconds());
+						float time_elapsed = (1.f - t) * delta.in_seconds();
 
 						components::transform current_transform(lerp(group.previous_transform.pos, transform.pos, vec2(t, t)),
 							lerp(group.previous_transform.rotation, transform.rotation, t));

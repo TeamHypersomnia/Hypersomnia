@@ -1,5 +1,5 @@
 #pragma once
-#include <array>
+#include <bitset>
 #include "augs/ensure.h"
 #include "augs/templates.h"
 
@@ -8,12 +8,9 @@ namespace augs {
 	class enum_associative_array {
 		typedef std::array<T, size_t(Enum::COUNT)> arr_type;
 
-		std::array<bool, size_t(Enum::COUNT)> is_set;
+		std::bitset<size_t(Enum::COUNT)> is_set;
 		arr_type raw;
 
-		void clear_flags() {
-			std::fill(is_set.begin(), is_set.end(), false);
-		}
 	public:
 		template<bool is_const>
 		class basic_iterator {
@@ -40,7 +37,7 @@ namespace augs {
 			{
 				++idx;
 
-				while (idx < size_t(Enum::COUNT) && !ptr->is_set[idx])
+				while (idx < size_t(Enum::COUNT) && !ptr->is_set.test(idx))
 					++idx;
 				
 				return *this;
@@ -62,10 +59,6 @@ namespace augs {
 		template<bool>
 		friend class basic_iterator;
 
-		enum_associative_array() {
-			clear_flags();
-		}
-
 		iterator begin() {
 			return iterator(this, 0);
 		}
@@ -86,7 +79,7 @@ namespace augs {
 			size_t i = size_t(enum_idx);
 			ensure(i < capacity());
 
-			if (is_set[i])
+			if (is_set.test(i))
 				return iterator(this, i);
 
 			return end();
@@ -96,7 +89,7 @@ namespace augs {
 			size_t i = size_t(enum_idx);
 			ensure(i < capacity());
 
-			if (is_set[i])
+			if (is_set.test(i))
 				return const_iterator(this, i);
 
 			return end();
@@ -104,21 +97,21 @@ namespace augs {
 
 		T& at(Enum enum_idx) {
 			size_t i = size_t(enum_idx);
-			ensure(i < capacity() && is_set[i]);
+			ensure(i < capacity() && is_set.test(i));
 			return raw[i];
 		}
 
 		const T& at(Enum enum_idx) const {
 			size_t i = size_t(enum_idx);
-			ensure(i < capacity() && is_set[i]);
+			ensure(i < capacity() && is_set.test(i));
 			return raw[i];
 		}
 
 		T& operator[](Enum enum_idx) {
 			size_t i = size_t(enum_idx);
 
-			if (!is_set[i]) {
-				is_set[i] = true;
+			if (!is_set.test(i)) {
+				is_set.set(i);
 			}
 
 			return raw[i];
@@ -137,7 +130,7 @@ namespace augs {
 				v.second = T();
 			});
 
-			clear_flags();
+			is_set = std::bitset<size_t(Enum::COUNT)>();
 		}
 	};
 }

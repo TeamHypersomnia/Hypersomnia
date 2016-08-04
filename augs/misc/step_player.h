@@ -14,7 +14,7 @@ namespace augs {
 	private:
 		struct entry_type {
 			entry_internal_type internal_data;
-			int step_occurred;
+			unsigned step_occurred;
 
 			template <class Archive>
 			void serialize(Archive& ar) {
@@ -22,8 +22,8 @@ namespace augs {
 			}
 		};
 
-		int player_position = 0;
-		int next_entry_to_be_replayed = 0;
+		unsigned player_position = 0;
+		unsigned next_entry_to_be_replayed = 0;
 
 		player_state current_player_state = player_state::DISABLED;
 
