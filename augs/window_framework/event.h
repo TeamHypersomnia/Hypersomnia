@@ -347,7 +347,7 @@ namespace augs {
 					}
 				} mouse;
 
-				unsigned msg;
+				message msg;
 				key_changed key_event = key_changed::NO_CHANGE;
 				keys::key key = keys::key::INVALID;
 				bool repeated = false;

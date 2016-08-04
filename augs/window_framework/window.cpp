@@ -75,10 +75,10 @@ namespace augs {
 					break;
 
 				case WM_SYSKEYUP:
-					m = events.msg = WM_KEYUP;
+					m = WM_KEYUP;
 					events.repeated = ((lParam & (1 << 30)) != 0);
 				case WM_SYSKEYDOWN:
-					m = events.msg = WM_KEYDOWN;
+					m = WM_KEYDOWN;
 					events.repeated = ((lParam & (1 << 30)) != 0);
 				case WM_KEYDOWN:
 					//if (!((lParam & (1 << 30)) != 0)) {
@@ -121,7 +121,7 @@ namespace augs {
 
 					if (m == WM_LBUTTONDOWN) {
 						if (doubled && triple_timer.extract<std::chrono::milliseconds>() < triple_click_delay) {
-							m = events.msg = unsigned(message::ltripleclick);
+							m = unsigned(message::ltripleclick);
 							doubled = false;
 						}
 					}
@@ -146,13 +146,13 @@ namespace augs {
 					events.key_event = event::PRESSED;
 					events.key = MOUSE4;
 					events.keys[MOUSE4] = true;
-					events.msg = WM_KEYDOWN;
+					m = WM_KEYDOWN;
 					break;
 				case WM_XBUTTONUP:
 					events.key_event = event::RELEASED;
 					events.key = MOUSE4;
 					events.keys[MOUSE4] = false;
-					events.msg = WM_KEYUP;
+					m = WM_KEYUP;
 					break;
 				case WM_LBUTTONUP:
 					events.key_event = event::RELEASED;
@@ -185,7 +185,7 @@ namespace augs {
 							events.mouse.rdrag.y = events.mouse.pos.y;
 						}
 
-						m = events.msg = WM_MOUSEMOVE;
+						m = WM_MOUSEMOVE;
 					}
 					break;
 
@@ -200,7 +200,7 @@ namespace augs {
 							events.mouse.rel.x = raw->data.mouse.lLastX;
 							events.mouse.rel.y = raw->data.mouse.lLastY;
 
-							m = events.msg = WM_MOUSEMOVE;
+							m = WM_MOUSEMOVE;
 						}
 					}
 
@@ -223,13 +223,15 @@ namespace augs {
 					case SC_CLOSE: break;
 					case SC_MINIMIZE: break;
 					case SC_MAXIMIZE: break;
-					default: DefWindowProc(hwnd, events.msg, wParam, lParam); break;
+					default: DefWindowProc(hwnd, m, wParam, lParam); break;
 					}
-					m = events.msg = wParam;
+					m = wParam;
 					break;
 
-				default: DefWindowProc(hwnd, events.msg, wParam, lParam); return;
+				default: DefWindowProc(hwnd, m, wParam, lParam); break;
 				}
+
+				events.msg = event::message(m);
 		}
 
 		glwindow* glwindow::get_current() {
@@ -335,7 +337,7 @@ namespace augs {
 		bool glwindow::poll_event(UINT& out) {
 			if(PeekMessageW(&wmsg, hwnd, 0, 0, PM_REMOVE)) {
 				 //DispatchMessage(&wmsg); 
-				out = events.msg = wmsg.message;
+				out = wmsg.message;
 				_poll(out, wmsg.wParam, wmsg.lParam);
 				
 				TranslateMessage(&wmsg);
