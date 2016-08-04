@@ -1,9 +1,8 @@
 #pragma once
 #include "augs/log.h"
+#include "augs/build_settings.h"
 
 void cleanup_proc();
-
-#define ENABLE_ENSURE 1
 
 #if ENABLE_ENSURE
 #define ensure(x) if(!(x))\

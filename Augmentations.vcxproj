@@ -290,6 +290,7 @@
     <ClCompile Include="augs\gui\middlescrolling.cpp" />
     <ClCompile Include="augs\gui\rect_handle.cpp" />
     <ClCompile Include="augs\misc\bit_stream.cpp" />
+    <ClCompile Include="augs\misc\delta_compression.cpp" />
     <ClCompile Include="augs\misc\machine_entropy.cpp" />
     <ClCompile Include="augs\misc\pool_id.cpp" />
     <ClCompile Include="augs\misc\streams.cpp" />
@@ -906,6 +907,7 @@
     <ClInclude Include="augs\gui\middlescrolling.h" />
     <ClInclude Include="augs\gui\rect_handle.h" />
     <ClInclude Include="augs\gui\rect_id.h" />
+    <ClInclude Include="augs\misc\delta_compression.h" />
     <ClInclude Include="augs\misc\enum_associative_array.h" />
     <ClInclude Include="augs\misc\bit_stream.h" />
     <ClInclude Include="augs\misc\constant_size_vector.h" />

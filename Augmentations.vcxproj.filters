@@ -987,6 +987,9 @@
     <ClCompile Include="augs\misc\bit_stream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="augs\misc\delta_compression.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3075,6 +3078,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\padding_byte.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\misc\delta_compression.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
