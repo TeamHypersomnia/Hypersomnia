@@ -72,6 +72,7 @@ namespace prefabs {
 			info.filter = filters::see_through_dynamic_object();
 			info.density = 0.6f;
 			info.restitution = 0.3f;
+			colliders.can_driver_shoot_through = true;
 
 			car.angular_air_resistance = 0.55f;
 			car.angular_air_resistance_while_hand_braking = 0.05f;

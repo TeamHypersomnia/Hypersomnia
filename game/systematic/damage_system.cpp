@@ -13,6 +13,8 @@
 #include "game/components/damage_component.h"
 #include "game/components/physics_component.h"
 #include "game/components/transform_component.h"
+#include "game/components/driver_component.h"
+#include "game/components/fixtures_component.h"
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/step.h"
@@ -39,8 +41,23 @@ void damage_system::destroy_colliding_bullets_and_send_damage(fixed_step& step) 
 			auto sender = cosmos[damage.sender];
 
 			bool bullet_colliding_with_sender = sender.get_owner_body() == subject_handle.get_owner_body();
+			bool bullet_colliding_with_senders_vehicle = false;
 
-			if (!bullet_colliding_with_sender && damage.damage_upon_collision && damage.damage_charges_before_destruction > 0) {
+			{
+				auto* driver = sender.get_owner_body().find<components::driver>();
+
+				if (driver) {
+					bullet_colliding_with_senders_vehicle = driver->owned_vehicle == subject_handle.get_owner_body()
+						&& subject_handle.get_owner_body().get<components::fixtures>().can_driver_shoot_through();
+
+					//LOG("ownedveh: %x\n subj owner: %x\n, compo: %x, res: %x",
+					//	driver->owned_vehicle, subject_handle.get_owner_body(),
+					//	subject_handle.get_owner_body().get<components::fixtures>().can_driver_shoot_through(), bullet_colliding_with_senders_vehicle);
+				}
+			}
+
+			if (!bullet_colliding_with_sender && !bullet_colliding_with_senders_vehicle && 
+				damage.damage_upon_collision && damage.damage_charges_before_destruction > 0) {
 				auto& subject_of_impact = subject_handle.get_owner_body().get<components::physics>();
 
 				vec2 impact_velocity = damage.custom_impact_velocity;

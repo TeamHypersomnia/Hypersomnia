@@ -23,13 +23,13 @@ namespace augs {
 
 	void raw_pool_id::set_debug_name(std::string s) {
 #if USE_NAMES_FOR_IDS
-		debug_name = s;
+		debug_name.assign(s.begin(), s.end());
 #endif
 	}
 
 	std::string raw_pool_id::get_debug_name() const {
 #if USE_NAMES_FOR_IDS
-		return debug_name;
+		return std::string(debug_name.begin(), debug_name.end());
 #else
 		return std::string();
 #endif

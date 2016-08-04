@@ -60,6 +60,11 @@ bool basic_fixtures_synchronizer<C>::standard_collision_resolution_disabled() co
 	return component.disable_standard_collision_resolution;
 }
 
+template<bool C>
+bool basic_fixtures_synchronizer<C>::can_driver_shoot_through() const {
+	return component.can_driver_shoot_through;
+}
+
 void component_synchronizer<false, F>::set_offset(colliders_offset_type t, components::transform off) const {
 	component.offsets_for_created_shapes[static_cast<int>(t)] = off;
 	resubstantialization();

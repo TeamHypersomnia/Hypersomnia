@@ -53,6 +53,7 @@ namespace components {
 
 		bool is_friction_ground = false;
 		bool disable_standard_collision_resolution = false;
+		bool can_driver_shoot_through = false;
 
 		template <class Archive>
 		void serialize(Archive& ar) {
@@ -103,6 +104,7 @@ public:
 
 	bool is_friction_ground() const;
 	bool standard_collision_resolution_disabled() const;
+	bool can_driver_shoot_through() const;
 };
 
 template<>

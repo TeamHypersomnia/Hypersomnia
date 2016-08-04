@@ -1,12 +1,16 @@
 #pragma once
-#define USE_NAMES_FOR_IDS 0
+#define USE_NAMES_FOR_IDS 1
+
+#if USE_NAMES_FOR_IDS
+#include "augs/misc/constant_size_vector.h"
+#endif
 
 #include <string>
 namespace augs {
 	class raw_pool_id {
 	public:
 #if USE_NAMES_FOR_IDS
-		std::string debug_name;
+		constant_size_vector<char, 40> debug_name;
 #endif
 		int version = -1;
 		int indirection_index = -1;
