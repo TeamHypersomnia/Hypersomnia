@@ -21,8 +21,9 @@ namespace components {
 			DYNAMIC
 		};
 
-		components::transform transform;
-
+		bool fixed_rotation = false;
+		bool bullet = false;
+		bool angled_damping = false;
 		bool activated = true;
 
 		type body_type = type::DYNAMIC;
@@ -32,10 +33,7 @@ namespace components {
 		vec2 linear_damping_vec;
 		float gravity_scale = 0.f;
 
-		bool fixed_rotation = false;
-		bool bullet = false;
-		bool angled_damping = false;
-
+		components::transform transform;
 		vec2 velocity;
 		float angular_velocity = 0.f;
 

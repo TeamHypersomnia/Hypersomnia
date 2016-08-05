@@ -75,9 +75,6 @@ public:
 	cosmos();
 	cosmos(const cosmos&);
 
-	void delta_encode(cosmos& base, augs::stream& to) const;
-	void delta_decode(augs::stream& from, bool resubstantiate_partially = false);
-
 	cosmos& operator=(const cosmos&);
 	cosmos& operator=(const significant_state&);
 
@@ -105,6 +102,16 @@ public:
 
 		if (handle.has<components::substance>())
 			sys.construct(handle);
+	}
+
+	template<class element_type>
+	auto get_handle(augs::pool_id<element_type> id) {
+		return get_pool(id)[id];
+	}
+
+	template<class element_type>
+	auto get_handle(augs::pool_id<element_type> id) const {
+		return get_pool(id)[id];
 	}
 
 	entity_handle get_handle(entity_id);

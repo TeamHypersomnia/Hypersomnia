@@ -39,6 +39,8 @@ std::wstring cosmic_profiler::sorted_summary() const {
 		summary += m.summary();
 
 	summary += complete_resubstantiation.summary();
+	summary += delta_encoding.summary();
+	summary += delta_decoding.summary();
 
 	return summary;
 }

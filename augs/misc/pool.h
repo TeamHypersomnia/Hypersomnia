@@ -13,6 +13,8 @@ namespace augs {
 		typedef augs::const_pool_handle<T> const_handle_type;
 
 		typedef std::vector<T> pooled_container_type;
+
+		typedef T element_type;
 	
 	protected:
 		struct metadata {
@@ -158,14 +160,29 @@ namespace augs {
 			return{ *this, from_id };
 		}
 
-		void for_each_id(std::function<void(id_type)> f) {
+		template<class Pred>
+		void for_each_with_id(Pred f) {
 			id_type id;
 
-			for(const auto& s : slots) {
+			for (size_t i = 0; i < size(); ++i) {
+				metadata& s = slots[i];
 				id.indirection_index = s.pointing_indirector;
 				id.version = indirectors[s.pointing_indirector].version;
 
-				f(id);
+				f(pooled[i], id);
+			}
+		}
+
+		template<class Pred>
+		void for_each_with_id(Pred f) const {
+			id_type id;
+
+			for (size_t i = 0; i < size(); ++i) {
+				const metadata& s = slots[i];
+				id.indirection_index = s.pointing_indirector;
+				id.version = indirectors[s.pointing_indirector].version;
+
+				f(pooled[i], id);
 			}
 		}
 

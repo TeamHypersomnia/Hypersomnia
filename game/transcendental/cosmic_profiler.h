@@ -23,6 +23,9 @@ public:
 	augs::measurements entropy_length = augs::measurements(L"Entropy length", false);
 	augs::measurements meters[(int)meter_type::METER_COUNT];
 
+	mutable augs::measurements delta_encoding = augs::measurements(L"Delta encoding");
+	mutable augs::measurements delta_decoding = augs::measurements(L"Delta decoding");
+
 	void start(meter_type);
 	void stop(meter_type);
 

@@ -47,10 +47,9 @@ namespace components {
 		};
 
 		augs::constant_size_vector<convex_partitioned_collider, COLLIDERS_COUNT> colliders;
-		bool activated = true;
-
 		std::array<components::transform, colliders_offset_type::OFFSET_COUNT> offsets_for_created_shapes;
 
+		bool activated = true;
 		bool is_friction_ground = false;
 		bool disable_standard_collision_resolution = false;
 		bool can_driver_shoot_through = false;

@@ -283,6 +283,7 @@
     <ClCompile Include="3rdparty\lua\src\lvm.c" />
     <ClCompile Include="3rdparty\lua\src\lzio.c" />
     <ClCompile Include="3rdparty\polypartition\src\polypartition.cpp" />
+    <ClCompile Include="3rdparty\RakNet\Source\BitStream.cpp" />
     <ClCompile Include="augs\ensure.cpp" />
     <ClCompile Include="augs\gui\clipboard.cpp" />
     <ClCompile Include="augs\gui\draw_and_event_infos.cpp" />
@@ -888,6 +889,7 @@
     <ClInclude Include="3rdparty\lua\src\lvm.h" />
     <ClInclude Include="3rdparty\lua\src\lzio.h" />
     <ClInclude Include="3rdparty\polypartition\src\polypartition.h" />
+    <ClInclude Include="3rdparty\RakNet\Source\BitStream.h" />
     <ClInclude Include="augs\build_settings.h" />
     <ClInclude Include="augs\entity_system\aggregate_mixins.h" />
     <ClInclude Include="augs\entity_system\component_aggregate.h" />

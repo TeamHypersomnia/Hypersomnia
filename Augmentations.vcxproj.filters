@@ -990,6 +990,9 @@
     <ClCompile Include="augs\misc\delta_compression.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="3rdparty\RakNet\Source\BitStream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3084,6 +3087,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\minmax.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\RakNet\Source\BitStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

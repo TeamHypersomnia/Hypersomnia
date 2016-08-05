@@ -14,6 +14,7 @@
 #include "game/detail/entity/relations_helpers.h"
 
 class cosmos;
+class cosmic_delta;
 
 template <bool, class>
 class component_synchronizer;
@@ -36,6 +37,7 @@ namespace augs {
 		typedef basic_handle_base<is_const, cosmos, put_all_components_into<component_aggregate>::type> base;
 
 		friend class augs::component_allocators<is_const, basic_entity_handle<is_const>>;
+		friend class cosmic_delta;
 
 		template <class T, typename = void>
 		struct component_or_synchronizer_or_disabled {
