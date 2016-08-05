@@ -14,7 +14,7 @@ namespace augs {
 
 	template <class T>
 	object_delta delta_encode(const T& base_object, const T& encoded_object) {
-		// static_assert(is_memcpy_safe<T>::value, "Attempt to encode a non-trivially copyable type");
+		static_assert(is_memcpy_safe<T>::value, "Attempt to encode a non-trivially copyable type");
 
 		return delta_encode(
 			reinterpret_cast<const char*>(std::addressof(base_object)), 
@@ -26,7 +26,7 @@ namespace augs {
 
 	template <class T>
 	void delta_decode(T& decoded, const object_delta& delta) {
-		// static_assert(is_memcpy_safe<T>::value, "Attempt to decode a non-trivially copyable type");
+		static_assert(is_memcpy_safe<T>::value, "Attempt to decode a non-trivially copyable type");
 
 		delta_decode(reinterpret_cast<char*>(std::addressof(decoded)), sizeof(T), delta);
 	};

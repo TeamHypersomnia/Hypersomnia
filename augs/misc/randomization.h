@@ -1,6 +1,7 @@
 #pragma once
 #include <random>
 #include <utility>
+#include "minmax.h"
 
 struct randomization {
 	std::mt19937 generator;
@@ -13,4 +14,9 @@ struct randomization {
 
 	unsigned randval(std::pair<unsigned, unsigned>);
 	float randval(std::pair<float, float>);
+
+	template<class T>
+	T randval(augs::minmax<T> m) {
+		return randval(m.first, m.second);
+	}
 };

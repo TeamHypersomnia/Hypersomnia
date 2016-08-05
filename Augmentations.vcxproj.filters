@@ -3083,5 +3083,8 @@
     <ClInclude Include="augs\misc\delta_compression.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="augs\misc\minmax.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

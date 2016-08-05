@@ -7,6 +7,7 @@
 
 #include "augs/misc/stepped_timing.h"
 #include "augs/misc/recoil_player.h"
+#include "augs/misc/minmax.h"
 
 class gun_system;
 class processing_system;
@@ -20,7 +21,7 @@ namespace components {
 			AUTOMATIC
 		} action_mode;
 
-		std::pair<float, float> muzzle_velocity;
+		augs::minmax<float> muzzle_velocity;
 
 		float damage_multiplier = 1.f;
 
@@ -33,8 +34,8 @@ namespace components {
 
 		bool trigger_pressed = false;
 
-		std::pair<float, float> shell_velocity;
-		std::pair<float, float> shell_angular_velocity;
+		augs::minmax<float> shell_velocity;
+		augs::minmax<float> shell_angular_velocity;
 
 		float shell_spread_degrees = 20.f;
 
