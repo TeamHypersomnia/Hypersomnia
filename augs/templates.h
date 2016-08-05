@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <functional>
+#include <bitset>
 
 template <class T, class Tuple>
 struct index_in_tuple;
@@ -255,3 +256,34 @@ struct has_type<T, std::tuple<T, Ts...>> : std::true_type {};
 
 template <typename T, typename Tuple>
 using tuple_contains_type = typename has_type<T, Tuple>::type;
+
+
+template <class T>
+struct is_memcpy_safe {
+	static const bool value = std::is_trivially_copyable<T>::value;
+};
+
+template <>
+struct is_memcpy_safe<std::tuple<>> {
+	static const bool value = true;
+};
+
+namespace augs {
+	template <class... Args>
+	class component_aggregate;
+}
+
+template <class... Args>
+struct is_memcpy_safe<augs::component_aggregate<Args...>> {
+	static const bool value = true;
+};
+
+template <class T, class... Args>
+struct is_memcpy_safe<std::tuple<T, Args...>> {
+	static const bool value = is_memcpy_safe<T>::value && is_memcpy_safe<std::tuple<Args...>>::value;
+};
+
+template <class A, class B>
+struct is_memcpy_safe<std::pair<A, B>> {
+	static const bool value = is_memcpy_safe<A>::value && is_memcpy_safe<B>::value;
+};

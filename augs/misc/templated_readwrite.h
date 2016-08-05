@@ -13,11 +13,13 @@ namespace augs {
 
 	template<class A, class T, class...>
 	void read_object(A& ar, T& storage) {
+		// static_assert(is_memcpy_safe<T>::value, "Attempt to read a non-trivially copyable type");
 		ar.read(reinterpret_cast<char*>(&storage), sizeof(T));
 	}
 
 	template<class A, class T, class...>
 	void write_object(A& ar, const T& storage) {
+		// static_assert(is_memcpy_safe<T>::value, "Attempt to write a non-trivially copyable type");
 		ar.write(reinterpret_cast<const char*>(&storage), sizeof(T));
 	}
 
@@ -32,7 +34,8 @@ namespace augs {
 		storage.reserve(c);
 		storage.resize(s);
 
-		ar.read((char*)storage.data(), storage.size() * sizeof(T));
+		// static_assert(is_memcpy_safe<T>::value, "Attempt to read a non-trivially copyable type");
+		ar.read(reinterpret_cast<char*>(storage.data()), storage.size() * sizeof(T));
 	}
 
 	template<class A, class T, class...>
@@ -40,7 +43,8 @@ namespace augs {
 		write_object(ar, storage.capacity());
 		write_object(ar, storage.size());
 
-		ar.write((const char*)storage.data(), storage.size() * sizeof(T));
+		// static_assert(is_memcpy_safe<T>::value, "Attempt to write a non-trivially copyable type");
+		ar.write(reinterpret_cast<const char*>(storage.data()), storage.size() * sizeof(T));
 	}
 
 	template<class A, class T, class...>

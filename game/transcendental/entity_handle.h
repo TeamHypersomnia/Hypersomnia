@@ -40,8 +40,13 @@ namespace augs {
 		template <class T, typename = void>
 		struct component_or_synchronizer_or_disabled {
 			typedef maybe_const_ref_t<is_const, T> return_type;
+			typedef maybe_const_ptr_t<is_const, T> return_ptr;
 
 			basic_entity_handle<is_const> h;
+
+			return_ptr find() const {
+				return h.allocator::template find<T>();
+			}
 
 			bool has() const {
 				return h.allocator::template has<T>();
@@ -96,8 +101,13 @@ namespace augs {
 		template <class T>
 		struct component_or_synchronizer_or_disabled<T, std::enable_if_t<is_component_disabled<T>::value>> {
 			typedef maybe_const_ref_t<is_const, T> return_type;
+			typedef maybe_const_ptr_t<is_const, T> return_ptr;
 
 			basic_entity_handle<is_const> h;
+
+			return_ptr find() const {
+				return nullptr;
+			}
 
 			bool has() const {
 				return false;
@@ -171,7 +181,7 @@ namespace augs {
 		template<class component>
 		decltype(auto) find() const {
 			static_assert(!is_component_synchronized<component>::value, "Cannot return a pointer to synchronized component!");
-			return allocator::template find<component>();
+			return component_or_synchronizer_or_disabled<component>({ *this }).find();
 		}
 
 		template<class component, bool _is_const = is_const, typename = std::enable_if_t<!_is_const>>

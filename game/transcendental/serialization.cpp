@@ -14,10 +14,6 @@ void multiverse::save_cosmos_to_file(std::string filename) {
 
 	augs::output_stream_reserver reserver;
 	
-	ensure(main_cosmos.get_pool(augs::pool_id<components::particle_group>()).empty());
-	ensure(main_cosmos.get_pool(augs::pool_id<components::pathfinding>()).empty());
-	ensure(main_cosmos.get_pool(augs::pool_id<components::visibility>()).empty());
-
 	augs::write_object(reserver, main_cosmos_timer);
 	augs::write_object(reserver, main_cosmos_manager);
 	augs::write_object(reserver, main_cosmos.significant);

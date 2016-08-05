@@ -38,7 +38,9 @@ namespace augs {
 
 	object_delta delta_encode(const char* base_object, const char* encoded_object, size_t length) {
 		object_delta result;
+
 		std::vector<bool> byte_mask;
+		byte_mask.reserve(length);
 
 		for (size_t i = 0; i < length; ++i) {
 			if (base_object[i] == encoded_object[i])
