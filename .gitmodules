@@ -17,3 +17,7 @@
 	path = 3rdparty/cereal
 	url = https://github.com/TeamHypersomnia/cereal.git
 	branch = master
+[submodule "3rdparty/RakNet"]
+	path = 3rdparty/RakNet
+	url = https://github.com/TeamHypersomnia/RakNet.git
+	branch = master
