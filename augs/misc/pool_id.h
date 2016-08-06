@@ -38,9 +38,11 @@ namespace augs {
 		}
 	};
 
-	template<class owner_pool_type>
+	template<class T>
 	class pool_id : public raw_pool_id {
 	public:
+		typedef T element_type;
+
 		using raw_pool_id::raw_pool_id;
 		using raw_pool_id::operator==;
 		using raw_pool_id::operator!=;

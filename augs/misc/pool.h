@@ -57,18 +57,18 @@ namespace augs {
 
 		template <class Archive>
 		void write_object(Archive& ar) const {
-			augs::write_object(ar, pooled);
-			augs::write_object(ar, slots);
-			augs::write_object(ar, indirectors);
-			augs::write_object(ar, free_indirectors);
+			augs::write_with_capacity(ar, pooled);
+			augs::write_with_capacity(ar, slots);
+			augs::write_with_capacity(ar, indirectors);
+			augs::write_with_capacity(ar, free_indirectors);
 		}
 
 		template <class Archive>
 		void read_object(Archive& ar) {
-			augs::read_object(ar, pooled);
-			augs::read_object(ar, slots);
-			augs::read_object(ar, indirectors);
-			augs::read_object(ar, free_indirectors);
+			augs::read_with_capacity(ar, pooled);
+			augs::read_with_capacity(ar, slots);
+			augs::read_with_capacity(ar, indirectors);
+			augs::read_with_capacity(ar, free_indirectors);
 		}
 
 	protected:
@@ -269,13 +269,13 @@ namespace augs {
 		template <class Archive>
 		void write_object(Archive& ar) const {
 			augs::write_object(ar, static_cast<const basic_pool<T>&>(*this));
-			augs::write_object(ar, metas);
+			augs::write_with_capacity(ar, metas);
 		}
 
 		template <class Archive>
 		void read_object(Archive& ar) {
 			augs::read_object(ar, static_cast<basic_pool<T>&>(*this));
-			augs::read_object(ar, metas);
+			augs::read_with_capacity(ar, metas);
 		}
 
 		void initialize_space(int slot_count) {

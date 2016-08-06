@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <functional>
 #include <bitset>
+#include <tuple>
 
 template <class T, class Tuple>
 struct index_in_tuple;

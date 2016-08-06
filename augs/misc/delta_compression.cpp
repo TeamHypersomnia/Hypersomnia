@@ -2,8 +2,8 @@
 #include "augs/ensure.h"
 
 namespace augs {
-	std::vector<size_t> run_length_encoding(const std::vector<bool>& bit_data) {
-		std::vector<size_t> output;
+	std::vector<delta_offset_type> run_length_encoding(const std::vector<bool>& bit_data) {
+		std::vector<delta_offset_type> output;
 
 		bool previous_value = false;
 		size_t current_vec_pos = 0;
@@ -21,9 +21,13 @@ namespace augs {
 					}
 				}
 				else {
+					size_t next_offset = i - current_vec_pos;
+					
 					ensure(output.size() > 0);
-					output.push_back(i - current_vec_pos);
-					current_vec_pos += i - current_vec_pos;
+					ensure(next_offset <= std::numeric_limits<delta_offset_type>::max());
+
+					output.push_back(static_cast<delta_offset_type>(next_offset));
+					current_vec_pos += next_offset;
 				}
 				previous_value = bit_data[i];
 			}

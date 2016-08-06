@@ -1,5 +1,10 @@
+#include "game/transcendental/types_specification/all_component_includes.h"
+#include "augs/misc/templated_readwrite.h"
+
 #include "augs/misc/streams.h"
 #include "augs/misc/delta_compression.h"
+
+#include "augs/misc/pool_id.h"
 
 #include "BitStream.h"
 #include "cosmos.h"
@@ -7,93 +12,143 @@
 
 #include "cosmic_delta.h"
 
-struct entity_change_record {
-	entity_id subject;
+template <class T>
+bool write_delta(const T& base, const T& enco, RakNet::BitStream& out, bool write_changed_bit = false) {
+	auto dt = augs::delta_encode(base, enco);
+	bool has_changed = dt.changed_bytes.size() > 0;
 
-	std::bitset<COMPONENTS_COUNT> components_added;
-	std::bitset<COMPONENTS_COUNT> components_changed;
-	std::bitset<COMPONENTS_COUNT> components_removed;
-	
-	std::vector<augs::object_delta> component_delta_content;
-};
+	if (write_changed_bit)
+		augs::write_object(out, has_changed);
 
-struct new_entity_record {
-	entity_id subject;
-
-	std::bitset<COMPONENTS_COUNT> components_added;
-	std::vector<augs::object_delta> component_delta_content;
-};
-
-class per_entity_delta {
-	std::vector<entity_id> deleted;
-	std::vector<entity_change_record> changed;
-	std::vector<new_entity_record> created;
-};
-
-namespace augs {
-	template<class A>
-	void read_object(A& ar, per_entity_delta& dt) {
-		read_object(ar, dt.deleted);
-		read_object(ar, significant.delta);
-
-		read_object(ar, significant.pools_for_components);
-		read_object(ar, significant.pool_for_aggregates);
+	if (has_changed) {
+		augs::write_vector_short(out, dt.changed_bytes);
+		augs::write_vector_short(out, dt.changed_offsets);
 	}
 
-	template<class A>
-	void write_object(A& ar, const per_entity_delta& significant) {
-		write_object(ar, significant.settings);
-		write_object(ar, significant.delta);
+	return has_changed;
+}
 
-		write_object(ar, significant.pools_for_components);
-		write_object(ar, significant.pool_for_aggregates);
+template <class T>
+void read_delta(T& deco, RakNet::BitStream& in, bool read_changed_bit = false) {
+	augs::object_delta dt;
+
+	bool has_changed = true;
+
+	if (read_changed_bit)
+		augs::read_object(in, has_changed);
+
+	if (has_changed) {
+		augs::read_vector_short(new_content, dt.changed_bytes);
+		augs::read_vector_short(new_content, dt.changed_offsets);
+
+		augs::delta_decode(deco, dt);
 	}
 }
 
-void cosmic_delta::encode(const cosmos& base, const cosmos& encoded, RakNet::BitStream& out) {
-	encoded.profiler.delta_encoding.new_measurement();
+void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStream& out) {
+	enco.profiler.delta_encoding.new_measurement();
 
 	typedef decltype(base.significant.pool_for_aggregates)::element_type aggregate;
-
-	struct change_record {
-		entity_id subject;
-		RakNet::BitStream content;
-	};
-
-	std::vector<change_record> created, changed;
-	std::vector<entity_id> deleted;
-
-	encoded.significant.pool_for_aggregates.for_each_with_id([&base, &encoded, &out](const aggregate& agg, entity_id id) {
-		const_entity_handle encoded_entity = encoded.get_handle(id);
-		const_entity_handle base_entity = base.get_handle(id);
-
-		if (base_entity.alive()) {
-			std::array<bool, COMPONENTS_COUNT> overridden_components;
-
-			const auto& base_components = base_entity.get().component_ids;
-			const auto& encoded_components = agg.component_ids;
-
-			for_each_in_tuples(agg.component_ids, base_entity.get().component_ids, [&encoded, &base](auto encoded_id, auto base_id) {
-				if (encoded[encoded_id].alive() && base[base_id].alive()) {
-
-				}
-			});
-		}
-		else {
-
-		}
-	});
-
-	base.significant.pool_for_aggregates.for_each_with_id([&base, &encoded, &out, &deleted](const aggregate& agg, entity_id id) {
-		const_entity_handle encoded_entity = encoded.get_handle(id);
-		const_entity_handle base_entity = base.get_handle(id);
-
-		if (encoded_entity.dead() && base_entity.alive()) {
-			deleted.push_back(encoded_entity);
-		}
-	});
 	
-	encoded.profiler.delta_encoding.end_measurement();
+	struct per_entity_delta {
+		size_t new_entities = 0;
+		size_t changed_entities = 0;
+		size_t removed_entities = 0;
+
+		RakNet::BitStream stream_for_new;
+		RakNet::BitStream stream_for_changed;
+		RakNet::BitStream stream_for_removed;
+	} dt;
+	
+	components::dynamic_tree_node nn;
+
+	enco.significant.pool_for_aggregates.for_each_with_id([&base, &enco, &dt](const aggregate& agg, entity_id id) {
+		const_entity_handle enco_entity = enco.get_handle(id);
+		const_entity_handle base_entity = base.get_handle(id);
+
+		bool is_new = base_entity.dead();
+
+		const auto& base_relations = is_new ? entity_relations() : base_entity.get_meta<entity_relations>();
+		const auto& base_components = is_new ? aggregate::component_id_tuple() : base_entity.get().component_ids;
+
+		const auto& enco_relations = enco_entity.get_meta<entity_relations>();
+		const auto& enco_components = agg.component_ids;
+
+		bool entity_changed = false;
+
+		std::array<bool, COMPONENTS_COUNT> overridden_components;
+		std::array<bool, COMPONENTS_COUNT> removed_components;
+
+		RakNet::BitStream new_content;
+
+		if (write_delta(base_relations, enco_relations, new_content, true))
+			entity_changed = true;
+
+		for_each_in_tuples(base_components, enco_components,
+			[&overridden_components, &removed_components, &entity_changed, &agg, &enco, &base, &new_content](const auto& enco_id, const auto& base_id) {
+			size_t idx = index_in_tuple<decltype(enco_id), decltype(agg.component_ids)>::value;
+			auto enco_c = enco[enco_id];
+			auto base_c = base[base_id];
+
+			if (enco_c.dead() && base_c.alive()) {
+				removed_components[idx] = true;
+				entity_changed = true;
+				return;
+			}
+
+			typedef typename decltype(enco_id)::element_type component_type;
+
+			if (write_delta(
+				base_c.alive() ? base_c.get() : component_type(),
+				enco_c.alive() ? enco_c.get() : component_type(),
+				new_content)) {
+				entity_changed = true;
+				overridden_components[idx] = true;
+			}
+		}
+		);
+		
+		if (is_new) {
+			augs::write_object(new_content, id);
+			bool completely_default = !entity_changed;
+			
+			augs::write_object(new_content, completely_default);
+
+			if (!completely_default) {
+				for (auto b : overridden_components)
+					augs::write_object(new_content, b);
+
+				augs::write_object(dt.stream_for_new, new_content);
+			}
+
+			++dt.new_entities;
+		}
+		else if (entity_changed) {
+			augs::write_object(new_content, id);
+
+			for (auto b : overridden_components)
+				augs::write_object(new_content, b);
+
+			for (auto b : removed_components)
+				augs::write_object(new_content, b);
+
+			augs::write_object(dt.stream_for_changed, new_content);
+			
+			++dt.changed_entities;
+		}
+	});
+
+	base.significant.pool_for_aggregates.for_each_with_id([&base, &enco, &out, &dt](const aggregate&, entity_id id) {
+		const_entity_handle enco_entity = enco.get_handle(id);
+		const_entity_handle base_entity = base.get_handle(id);
+
+		if (enco_entity.dead() && base_entity.alive()) {
+			++dt.removed_entities;
+			augs::write_object(dt.stream_for_removed, id);
+		}
+	});
+
+	enco.profiler.delta_encoding.end_measurement();
 }
 
 void cosmic_delta::decode(cosmos& into, RakNet::BitStream& in, bool resubstantiate_partially) {

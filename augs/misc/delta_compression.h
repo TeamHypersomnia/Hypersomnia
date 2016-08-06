@@ -3,11 +3,13 @@
 #include "augs/templates.h"
 
 namespace augs {
-	std::vector<size_t> run_length_encoding(const std::vector<bool>& bit_data);
+	typedef unsigned short delta_offset_type;
+
+	std::vector<delta_offset_type> run_length_encoding(const std::vector<bool>& bit_data);
 
 	struct object_delta {
 		std::vector<char> changed_bytes;
-		std::vector<size_t> changed_offsets;
+		std::vector<delta_offset_type> changed_offsets;
 	};
 
 	object_delta delta_encode(const char* base, const char* encoded, size_t length);

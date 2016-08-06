@@ -6,7 +6,9 @@ namespace augs {
 	template <class... components>
 	class component_aggregate {
 	public:
-		tuple_of_t<make_pool_id, components...> component_ids;
+		typedef tuple_of_t<make_pool_id, components...> component_id_tuple;
+
+		component_id_tuple component_ids;
 
 		template <class Archive>
 		void serialize(Archive& ar) {
