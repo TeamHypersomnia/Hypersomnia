@@ -16,40 +16,55 @@ namespace augs {
 	template<class, typename...>
 	class pool_with_meta;
 
+	template<class T, bool _or = false>
+	void verify_type() {
+		static_assert(is_memcpy_safe<T>::value || _or, "Attempt to serialize a non-trivially copyable type");
+	}
+
+	template<class A, class T, class...>
+	void read_bytes(A& ar, T* location, size_t count) {
+		verify_type<T>();
+		ar.read(reinterpret_cast<char*>(location), count * sizeof(T));
+	}
+
+	template<class A, class T, class...>
+	void write_bytes(A& ar, const T* location, size_t count) {
+		verify_type<T>();
+		ar.write(reinterpret_cast<const char*>(location), count * sizeof(T));
+	}
+
+	template<class T, class...>
+	void read_bytes(RakNet::BitStream& ar, T* location, size_t count) {
+		verify_type<T>();
+		ar.Read(reinterpret_cast<char*>(location), count * sizeof(T));
+	}
+
+	template<class T, class...>
+	void write_bytes(RakNet::BitStream& ar, const T* location, size_t count) {
+		verify_type<T>();
+		ar.Write(reinterpret_cast<const char*>(location), count * sizeof(T));
+	}
+
 	template<class A, class T, class...>
 	void read_object(A& ar, T& storage) {
-		static_assert(is_memcpy_safe<T>::value, "Attempt to read a non-trivially copyable type");
-		ar.read(reinterpret_cast<char*>(&storage), sizeof(T));
+		read_bytes(ar, &storage, 1);
 	}
 
 	template<class A, class T, class...>
 	void write_object(A& ar, const T& storage) {
-		static_assert(is_memcpy_safe<T>::value, "Attempt to write a non-trivially copyable type");
-		ar.write(reinterpret_cast<const char*>(&storage), sizeof(T));
+		write_bytes(ar, &storage, 1);
 	}
 
 	template<class T, class...>
 	void read_object(RakNet::BitStream& ar, T& storage) {
-		static_assert(std::is_same<T, RakNet::BitStream>::value || is_memcpy_safe<T>::value, "Attempt to read a non-trivially copyable type");
+		verify_type<T, std::is_same<T, RakNet::BitStream>::value>();
 		ar.Read(storage);
 	}
 
 	template<class T, class...>
 	void write_object(RakNet::BitStream& ar, const T& storage) {
-		static_assert(std::is_same<T, RakNet::BitStream>::value || is_memcpy_safe<T>::value, "Attempt to write a non-trivially copyable type");
+		verify_type<T, std::is_same<T, RakNet::BitStream>::value>();
 		ar.Write(storage);
-	}
-
-	template<class A, class T, class...>
-	void read_objects(A& ar, T* storage, size_t count) {
-		static_assert(is_memcpy_safe<T>::value, "Attempt to read a non-trivially copyable type");
-		ar.read(reinterpret_cast<char*>(&storage), sizeof(T)*count);
-	}
-
-	template<class A, class T, class...>
-	void write_objects(A& ar, const T* storage, size_t count) {
-		static_assert(is_memcpy_safe<T>::value, "Attempt to write a non-trivially copyable type");
-		ar.write(reinterpret_cast<const char*>(&storage), sizeof(T)*count);
 	}
 
 	template<class A, class T, class...>
@@ -58,13 +73,13 @@ namespace augs {
 		read_object(ar, s);
 
 		storage.resize(s);
-		read_objects(ar, storage.data(), storage.size()); 
+		read_bytes(ar, storage.data(), storage.size()); 
 	}
 
 	template<class A, class T, class...>
 	void write_object(A& ar, const std::vector<T>& storage) {
 		write_object(ar, storage.size());
-		write_objects(ar, storage.data(), storage.size());
+		write_bytes(ar, storage.data(), storage.size());
 	}
 
 	template<class A, class T, class...>
@@ -73,7 +88,7 @@ namespace augs {
 		read_object(ar, s);
 
 		storage.resize(s);
-		read_objects(ar, storage.data(), storage.size());
+		read_bytes(ar, storage.data(), storage.size());
 	}
 
 	template<class A, class T, class...>
@@ -81,7 +96,7 @@ namespace augs {
 		ensure(storage.size() <= std::numeric_limits<unsigned short>::max());
 
 		write_object(ar, static_cast<unsigned short>(storage.size()));
-		write_objects(ar, storage.data(), storage.size());
+		write_bytes(ar, storage.data(), storage.size());
 	}
 
 	template<class A, class T, class...>
@@ -95,7 +110,7 @@ namespace augs {
 		storage.reserve(c);
 		storage.resize(s);
 
-		read_objects(ar, storage.data(), storage.size());
+		read_bytes(ar, storage.data(), storage.size());
 
 	}
 
@@ -104,7 +119,7 @@ namespace augs {
 		write_object(ar, storage.capacity());
 		write_object(ar, storage.size());
 
-		write_objects(ar, storage.data(), storage.size());
+		write_bytes(ar, storage.data(), storage.size());
 	}
 
 	template<class A, class T, class...>

@@ -63,6 +63,7 @@ void cosmos::complete_resubstantialization() {
 	});
 
 	profiler.complete_resubstantiation.end_measurement();
+	index_in_tuple<std::decay_t<const components::dynamic_tree_node&>, put_all_components_into<std::tuple>::type>::value;
 }
 
 cosmos::cosmos() {

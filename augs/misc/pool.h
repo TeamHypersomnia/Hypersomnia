@@ -185,6 +185,31 @@ namespace augs {
 				f(pooled[i], id);
 			}
 		}
+		template<class Pred>
+		void for_each_id(Pred f) {
+			id_type id;
+
+			for (size_t i = 0; i < size(); ++i) {
+				metadata& s = slots[i];
+				id.indirection_index = s.pointing_indirector;
+				id.version = indirectors[s.pointing_indirector].version;
+
+				f(id);
+			}
+		}
+
+		template<class Pred>
+		void for_each_id(Pred f) const {
+			id_type id;
+
+			for (size_t i = 0; i < size(); ++i) {
+				const metadata& s = slots[i];
+				id.indirection_index = s.pointing_indirector;
+				id.version = indirectors[s.pointing_indirector].version;
+
+				f(id);
+			}
+		}
 
 		void for_each(std::function<void(T&)> f) {
 			std::for_each(pooled.begin(), pooled.end(), f);

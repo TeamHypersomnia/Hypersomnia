@@ -60,8 +60,6 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 		RakNet::BitStream stream_for_removed;
 	} dt;
 	
-	components::dynamic_tree_node nn;
-
 	enco.significant.pool_for_aggregates.for_each_with_id([&base, &enco, &dt](const aggregate& agg, entity_id id) {
 		const_entity_handle enco_entity = enco.get_handle(id);
 		const_entity_handle base_entity = base.get_handle(id);
@@ -86,7 +84,9 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 
 		for_each_in_tuples(base_components, enco_components,
 			[&overridden_components, &removed_components, &entity_changed, &agg, &enco, &base, &new_content](const auto& enco_id, const auto& base_id) {
-			size_t idx = index_in_tuple<decltype(enco_id), decltype(agg.component_ids)>::value;
+			typedef std::decay_t<decltype(enco_id)> encoded_id_type;
+
+			size_t idx = index_in_tuple<encoded_id_type, decltype(agg.component_ids)>::value;
 			auto enco_c = enco[enco_id];
 			auto base_c = base[base_id];
 
@@ -96,7 +96,7 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 				return;
 			}
 
-			typedef typename decltype(enco_id)::element_type component_type;
+			typedef typename encoded_id_type::element_type component_type;
 
 			if (write_delta(
 				base_c.alive() ? base_c.get() : component_type(),
