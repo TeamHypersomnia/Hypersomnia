@@ -59,7 +59,7 @@ static inline T tabs(T _a)
 }
 
 void render_system::set_current_transforms_as_previous_for_interpolation(cosmos& cosm) const {
-	if (cosm.significant.settings.enable_interpolation) {
+	if (cosm.significant.meta.settings.enable_interpolation) {
 		cosm.get_pool(pool_id<components::transform>()).for_each([](components::transform& t) {
 			t.previous.pos = t.pos;
 			t.previous.rotation = t.rotation;
@@ -71,7 +71,7 @@ void render_system::draw_entities(augs::vertex_triangle_buffer& output, std::vec
 	for (auto e : entities) {
 		for_each_type<components::polygon, components::sprite, /*components::tile_layer,*/ components::particle_group>([e, interpolation_ratio, &output, &in_camera, only_border_highlights](auto T) {
 			typedef decltype(T) renderable_type;
-			bool interpolation_enabled = e.get_cosmos().significant.settings.enable_interpolation;
+			bool interpolation_enabled = e.get_cosmos().significant.meta.settings.enable_interpolation;
 
 			if (e.has<renderable_type>()) {
 				auto& render = e.get<components::render>();

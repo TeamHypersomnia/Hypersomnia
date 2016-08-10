@@ -192,7 +192,7 @@ namespace scene_managers {
 			perform_transfer({ new_item, new_characters[5][slot_function::PRIMARY_HAND] }, step);
 		}
 
-		auto& active_context = world.significant.settings.input;
+		auto& active_context = world.significant.meta.settings.input;
 
 		active_context.map_key_to_intent(window::event::keys::W, intent_type::MOVE_FORWARD);
 		active_context.map_key_to_intent(window::event::keys::S, intent_type::MOVE_BACKWARD);
@@ -221,14 +221,14 @@ namespace scene_managers {
 		//draw_bodies.push_back(new_characters[0]);
 		//draw_bodies.push_back(backpack);
 
-		world.significant.settings.visibility.epsilon_ray_distance_variation = 0.001;
-		world.significant.settings.visibility.epsilon_threshold_obstacle_hit = 10;
-		world.significant.settings.visibility.epsilon_distance_vertex_hit = 1;
+		world.significant.meta.settings.visibility.epsilon_ray_distance_variation = 0.001;
+		world.significant.meta.settings.visibility.epsilon_threshold_obstacle_hit = 10;
+		world.significant.meta.settings.visibility.epsilon_distance_vertex_hit = 1;
 
-		world.significant.settings.pathfinding.draw_memorised_walls = 1;
-		world.significant.settings.pathfinding.draw_undiscovered = 1;
+		world.significant.meta.settings.pathfinding.draw_memorised_walls = 1;
+		world.significant.meta.settings.pathfinding.draw_undiscovered = 1;
 
-		world.significant.settings.enable_interpolation = true;
+		world.significant.meta.settings.enable_interpolation = true;
 
 		auto id_vector = to_id_vector(new_characters);
 		characters.assign(id_vector.begin(), id_vector.end());

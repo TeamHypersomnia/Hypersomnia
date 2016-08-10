@@ -37,7 +37,7 @@ bool multiverse::try_to_load_save() {
 void multiverse::populate_cosmoi() {
 	main_cosmos.reserve_storage_for_entities(50000);
 	
-	main_cosmos.significant.delta = main_cosmos_timer.get_fixed_delta();
+	main_cosmos.significant.meta.delta = main_cosmos_timer.get_fixed_delta();
 
 	main_cosmos.advance_deterministic_schemata(cosmic_entropy(), [this](fixed_step& step) {
 		main_cosmos_manager.populate_world_with_entities(step);
@@ -107,7 +107,7 @@ void multiverse::simulate() {
 					LOG_COLOR(console_color::YELLOW, "Separator");
 				}
 				if (raw_input.key == window::event::keys::F10) {
-					main_cosmos.significant.settings.enable_interpolation = !main_cosmos.significant.settings.enable_interpolation;
+					main_cosmos.significant.meta.settings.enable_interpolation = !main_cosmos.significant.meta.settings.enable_interpolation;
 				}
 			}
 		}
@@ -116,7 +116,7 @@ void multiverse::simulate() {
 
 		renderer::get_current().clear_logic_lines();
 
-		main_cosmos.significant.delta = main_cosmos_timer.get_fixed_delta();
+		main_cosmos.significant.meta.delta = main_cosmos_timer.get_fixed_delta();
 
 		main_cosmos.advance_deterministic_schemata(cosmic_entropy_for_this_step,
 			[this](fixed_step& step) { main_cosmos_manager.pre_solve(step); },

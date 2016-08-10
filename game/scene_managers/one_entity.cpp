@@ -126,7 +126,7 @@ namespace scene_managers {
 		auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
 		prefabs::create_sample_backpack(world, vec2(200, -750));
 
-		auto& active_context = world.significant.settings.input;
+		auto& active_context = world.significant.meta.settings.input;
 
 		active_context.map_key_to_intent(window::event::keys::W, intent_type::MOVE_FORWARD);
 		active_context.map_key_to_intent(window::event::keys::S, intent_type::MOVE_BACKWARD);
@@ -151,12 +151,12 @@ namespace scene_managers {
 		active_context.map_key_to_intent(window::event::keys::SPACE, intent_type::SPACE_BUTTON);
 		active_context.map_key_to_intent(window::event::keys::MOUSE4, intent_type::SWITCH_TO_GUI);
 
-		world.significant.settings.visibility.epsilon_ray_distance_variation = 0.001;
-		world.significant.settings.visibility.epsilon_threshold_obstacle_hit = 10;
-		world.significant.settings.visibility.epsilon_distance_vertex_hit = 1;
+		world.significant.meta.settings.visibility.epsilon_ray_distance_variation = 0.001;
+		world.significant.meta.settings.visibility.epsilon_threshold_obstacle_hit = 10;
+		world.significant.meta.settings.visibility.epsilon_distance_vertex_hit = 1;
 
-		world.significant.settings.pathfinding.draw_memorised_walls = 1;
-		world.significant.settings.pathfinding.draw_undiscovered = 1;
+		world.significant.meta.settings.pathfinding.draw_memorised_walls = 1;
+		world.significant.meta.settings.pathfinding.draw_undiscovered = 1;
 
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 		characters = to_id_vector(new_characters);

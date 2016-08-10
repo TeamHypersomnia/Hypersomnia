@@ -9,12 +9,17 @@
 #include "game/enums/associated_entity_name.h"
 
 #include "game/container_sizes.h"
+#include "game/build_settings.h"
 
 struct entity_relations {
 	augs::enum_associative_array<sub_entity_name, entity_id> sub_entities_by_name;
 	augs::enum_associative_array<associated_entity_name, entity_id> associated_entities_by_name;
 
 	augs::constant_size_vector<entity_id, SUB_ENTITIES_COUNT> sub_entities;
+
+#if COSMOS_TRACKS_GUIDS
+	unsigned guid = 0;
+#endif
 
 	entity_id parent;
 

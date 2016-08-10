@@ -14,7 +14,7 @@
 #include "game/detail/physics_scripts.h"
 
 void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
-	auto& settings = cosmos.significant.settings.pathfinding;
+	auto& settings = cosmos.significant.meta.settings.pathfinding;
 
 	/* prepare epsilons to be used later, just to make the notation more clear */
 	const float epsilon_distance_visible_point_sq = settings.epsilon_distance_visible_point * settings.epsilon_distance_visible_point;

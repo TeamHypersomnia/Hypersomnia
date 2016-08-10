@@ -16,7 +16,7 @@
 void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 	auto& sys = get_sys();
 	auto& cosmos = cosm;
-	auto delta = cosm.significant.delta;
+	auto delta = cosm.significant.meta.delta;
 
 	for (int i = 0; i < 2; ++i) {
 		auto fix_a = contact->GetFixtureA();

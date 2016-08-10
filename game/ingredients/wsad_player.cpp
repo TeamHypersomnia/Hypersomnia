@@ -291,7 +291,7 @@ namespace prefabs {
 			render.layer = render_layer::CROSSHAIR;
 
 			crosshair.sensitivity.set(3, 3);
-			crosshair.visible_world_area = world.significant.settings.screen_size;
+			crosshair.visible_world_area = world.significant.meta.settings.screen_size;
 			crosshair.update_bounds();
 
 			ingredients::make_always_visible(root);

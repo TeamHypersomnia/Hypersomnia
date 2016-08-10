@@ -71,7 +71,7 @@ void multiverse::load_cosmos_from_file(std::string filename) {
 
 	deserialization_pass.end_measurement();
 	
-	main_cosmos.complete_resubstantialization();
+	main_cosmos.refresh_for_new_significant_state();
 
 	total_load.end_measurement();
 }

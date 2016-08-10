@@ -94,7 +94,7 @@ bool components::visibility::line_of_sight_info::sees(entity_id id) const {
 }
 
 void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos) const {
-	auto& settings = cosmos.significant.settings.visibility;
+	auto& settings = cosmos.significant.meta.settings.visibility;
 
 	ensure(settings.epsilon_distance_vertex_hit > 0.f);
 	ensure(settings.epsilon_ray_distance_variation > 0.f);

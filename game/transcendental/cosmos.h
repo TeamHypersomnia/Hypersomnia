@@ -1,6 +1,7 @@
 #pragma once
 #include <functional>
 #include <thread>
+#include "game/build_settings.h"
 #include "augs/misc/streams.h"
 #include "game/transcendental/cosmic_entropy.h"
 
@@ -32,6 +33,22 @@ class cosmos : private storage_for_all_components_and_aggregates, public augs::p
 {
 	void advance_deterministic_schemata(fixed_step& step_state);
 
+#if COSMOS_TRACKS_GUIDS
+	friend class cosmic_delta;
+
+	std::unordered_map<unsigned, entity_id> guid_map_for_transport;
+
+	void assign_next_guid(entity_handle);
+	void clear_guid(entity_handle);
+	unsigned get_guid(const_entity_handle) const;
+	void remap_guids();
+#endif
+
+	template <class D>
+	void for_each_entity_id(D pred) {
+		significant.pool_for_aggregates.for_each_id(pred);
+	}
+
 public:
 	typedef std::function<void(fixed_step&)> fixed_callback;
 	typedef std::function<void(viewing_step&)> variable_callback;
@@ -42,9 +59,15 @@ public:
 
 	class significant_state {
 	public:
-		all_settings settings;
+		struct metadata {
+			all_settings settings;
 
-		augs::fixed_delta delta;
+			augs::fixed_delta delta;
+
+#if COSMOS_TRACKS_GUIDS
+			unsigned next_entity_guid = 0;
+#endif
+		} meta;
 
 		aggregate_pool_type pool_for_aggregates;
 		component_pools_type pools_for_components;
@@ -91,9 +114,11 @@ public:
 	entity_handle clone_entity(entity_id);
 	void delete_entity(entity_id);
 
+	void refresh_for_new_significant_state();
+
 	void complete_resubstantialization();
 	void complete_resubstantialization(entity_handle);
-	
+
 	template<class System>
 	void partial_resubstantialization(entity_handle handle) {
 		auto& sys = temporary_systems.get<System>();
@@ -150,18 +175,14 @@ public:
 namespace augs {
 	template<class A>
 	void read_object(A& ar, cosmos::significant_state& significant) {
-		read_object(ar, significant.settings);
-		read_object(ar, significant.delta);
-
+		read_object(ar, significant.meta);
 		read_object(ar, significant.pools_for_components);
 		read_object(ar, significant.pool_for_aggregates);
 	}
 
 	template<class A>
 	void write_object(A& ar, const cosmos::significant_state& significant) {
-		write_object(ar, significant.settings);
-		write_object(ar, significant.delta);
-
+		write_object(ar, significant.meta);
 		write_object(ar, significant.pools_for_components);
 		write_object(ar, significant.pool_for_aggregates);
 	}

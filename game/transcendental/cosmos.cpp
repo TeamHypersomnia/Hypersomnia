@@ -57,7 +57,7 @@ void cosmos::complete_resubstantialization() {
 		sys.reserve_caches_for_entities(n);
 	});
 
-	significant.pool_for_aggregates.for_each_id([this](entity_id id) {
+	for_each_entity_id([this](entity_id id) {
 		auto h = get_handle(id);
 		complete_resubstantialization(h);
 	});
@@ -83,13 +83,51 @@ bool cosmos::operator!=(const cosmos& b) const {
 }
 
 cosmos& cosmos::operator=(const cosmos& b) {
-	operator=(b.significant);
+	significant = b.significant;
+#if COSMOS_TRACKS_GUIDS
+	guid_map_for_transport = b.guid_map_for_transport;
+#endif
+	complete_resubstantialization();
 	return *this;
+}
+
+#if COSMOS_TRACKS_GUIDS
+
+unsigned cosmos::get_guid(const_entity_handle handle) const {
+	return significant.pool_for_aggregates.get_meta<entity_relations>(handle).guid;
+}
+
+void cosmos::assign_next_guid(entity_handle new_entity) {
+	auto this_guid = significant.meta.next_entity_guid++;
+
+	guid_map_for_transport[this_guid] = new_entity;
+	significant.pool_for_aggregates.get_meta<entity_relations>(new_entity).guid = this_guid;
+}
+
+void cosmos::clear_guid(entity_handle cleared) {
+	guid_map_for_transport.erase(get_guid(cleared));
+}
+
+void cosmos::remap_guids() {
+	guid_map_for_transport.clear();
+
+	for_each_entity_id([this](entity_id id) {
+		guid_map_for_transport[get_guid(get_handle(id))] = id;
+	});
+}
+
+#endif
+
+void cosmos::refresh_for_new_significant_state() {
+#if COSMOS_TRACKS_GUIDS
+	remap_guids();
+#endif
+	complete_resubstantialization();
 }
 
 cosmos& cosmos::operator=(const significant_state& b) {
 	significant = b;
-	complete_resubstantialization();
+	refresh_for_new_significant_state();
 	return *this;
 }
 
@@ -126,7 +164,7 @@ std::vector<const_entity_handle> cosmos::get(processing_subjects list) const {
 }
 
 randomization cosmos::get_rng_for(entity_id id) const {
-	return { std::abs(id.version) + std::abs(id.indirection_index) + static_cast<size_t>(significant.delta.get_total_steps_passed()) };
+	return { std::abs(id.version) + std::abs(id.indirection_index) + static_cast<size_t>(significant.meta.delta.get_total_steps_passed()) };
 }
 
 entity_handle cosmos::get_handle(entity_id id) {
@@ -146,7 +184,11 @@ const_inventory_slot_handle cosmos::get_handle(inventory_slot_id id) const {
 }
 
 entity_handle cosmos::create_entity(std::string debug_name) {
-	return get_handle(allocate_aggregate(debug_name));
+	auto new_entity = get_handle(allocate_aggregate(debug_name));
+#if COSMOS_TRACKS_GUIDS
+	assign_next_guid(new_entity);
+#endif
+	return new_entity;
 }
 
 entity_handle cosmos::clone_entity(entity_id e) {
@@ -156,6 +198,10 @@ entity_handle cosmos::clone_entity(entity_id e) {
 		return get_handle(entity_id());
 
 	auto new_entity = get_handle(clone_aggregate(copied_entity));
+
+#if COSMOS_TRACKS_GUIDS
+	assign_next_guid(new_entity);
+#endif
 
 	new_entity.make_cloned_sub_entities_recursive(e);
 	new_entity.assign_associated_entities(e);
@@ -173,6 +219,7 @@ void cosmos::delete_entity(entity_id e) {
 		LOG("Warning! Attempt to delete a dead entity: %x", e);
 		return;
 	}
+
 	//ensure(handle.alive());
 
 	bool should_destruct_now_to_avoid_repeated_resubstantialization = handle.has<components::substance>();
@@ -180,6 +227,9 @@ void cosmos::delete_entity(entity_id e) {
 	if (should_destruct_now_to_avoid_repeated_resubstantialization)
 		handle.remove<components::substance>();
 
+#if COSMOS_TRACKS_GUIDS
+	clear_guid(handle);
+#endif
 	// now manipulation of substanceless entity won't trigger redundant resubstantialization
 
 	auto owner_body = handle.get_owner_body();
