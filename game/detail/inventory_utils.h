@@ -1,5 +1,4 @@
 #pragma once
-#include <functional>
 #include "game/transcendental/entity_handle.h"
 #include "game/enums/slot_function.h"
 #include "game/detail/item_slot_transfer_request.h"

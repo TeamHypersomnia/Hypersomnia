@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-#include <functional>
 #include "game/components/sprite_component.h"
 #include "game/transcendental/entity_id.h"
 

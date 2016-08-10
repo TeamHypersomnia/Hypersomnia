@@ -109,6 +109,13 @@ std::vector<D> basic_relations_helpers<C, D>::get_fixture_entities() const {
 	return self.get_cosmos()[relations().fixture_entities];
 }
 
+#if COSMOS_TRACKS_GUIDS
+template <bool C, class D>
+unsigned basic_relations_helpers<C, D>::get_guid() const {
+	return relations().guid;
+}
+#endif
+
 template <bool C, class D>
 sub_entity_name basic_relations_helpers<C, D>::get_name_as_sub_entity() const {
 	return relations().name_as_sub_entity;
@@ -118,36 +125,6 @@ template <bool C, class D>
 D basic_relations_helpers<C, D>::operator[](associated_entity_name assoc) const {
 	auto& self = *static_cast<const D*>(this);
 	return self.get_cosmos()[relations().associated_entities_by_name.at(assoc)];
-}
-
-template <bool C, class D>
-void basic_relations_helpers<C, D>::for_each_sub_entity_recursive(std::function<void(D)> callback) const {
-	auto& self = *static_cast<const D*>(this);
-
-	{
-		auto& subs = relations().sub_entities;
-
-		for (auto& s : subs) {
-			auto handle = self.get_cosmos()[s];
-			
-			if (handle.alive()) {
-				callback(handle);
-				handle.for_each_sub_entity_recursive(callback);
-			}
-		}
-	}
-	{
-		auto& subs = relations().sub_entities_by_name;
-
-		for (auto& s : subs) {
-			auto handle = self.get_cosmos()[s.second];
-
-			if (handle.alive()) {
-				callback(handle);
-				handle.for_each_sub_entity_recursive(callback);
-			}
-		}
-	}
 }
 
 template <bool C, class D>

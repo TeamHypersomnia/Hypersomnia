@@ -12,17 +12,6 @@ namespace resources {
 		return *node_pointers[i];
 	}
 	
-	void behaviour_tree::dfs(node& p, std::function<void(node&)> f) {
-		f(p);
-
-		for (auto& c : p.children)
-			dfs(*c, f);
-	}
-
-	void behaviour_tree::dfs_all(std::function<void(node&)> f) {
-		dfs(root, f);
-	}
-
 	void behaviour_tree::build_tree() {
 		int id_counter = 0;
 

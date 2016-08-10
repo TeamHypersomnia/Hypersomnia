@@ -1,6 +1,4 @@
 #pragma once
-#include <functional>
-
 #include "inventory_slot_handle_declaration.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/entity_id.h"
@@ -40,7 +38,20 @@ public:
 	entity_handle_type make_handle(entity_id) const;
 	basic_inventory_slot_handle make_handle(inventory_slot_id) const;
 
-	void for_each_descendant(std::function<void(entity_handle_type item)>) const;
+	template <class F>
+	void for_each_descendant(F callback) const {
+		for (auto& i : get().items_inside) {
+			auto handle = make_handle(i);
+
+			callback(handle);
+
+			auto* container = handle.find<components::container>();
+
+			if (container)
+				for (auto& s : container->slots)
+					handle[s.first].for_each_descendant(callback);
+		}
+	}
 
 	slot_reference get() const;
 	slot_reference operator*() const;

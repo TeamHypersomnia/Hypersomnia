@@ -211,11 +211,13 @@ namespace augs {
 			}
 		}
 
-		void for_each(std::function<void(T&)> f) {
+		template<class Pred>
+		void for_each(Pred f) {
 			std::for_each(pooled.begin(), pooled.end(), f);
 		}
 
-		void for_each(std::function<void(const T&)> f) const {
+		template<class Pred>
+		void for_each(Pred f) const {
 			std::for_each(pooled.begin(), pooled.end(), f);
 		}
 

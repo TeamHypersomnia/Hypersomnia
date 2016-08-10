@@ -6,7 +6,6 @@
 #include "augs/window_framework/window.h"
 
 #include <algorithm>
-#include <functional>
 #include "augs/ensure.h"
 #include "rect_world.h"
 

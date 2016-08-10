@@ -5,7 +5,6 @@
 #include "augs/math/rects.h"
 #include "event.h"
 #include "augs/misc/timer.h"
-#include <functional>
 
 #include "augs/graphics/renderer.h"
 #include "colored_print.h"

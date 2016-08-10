@@ -9,6 +9,7 @@
 #include "augs/misc/time_utils.h"
 #include "game/transcendental/step.h"
 #include "game/transcendental/viewing_session.h"
+#include "game/transcendental/types_specification/all_messages_includes.h"
 
 multiverse::multiverse() 
 	: main_cosmos_timer(60, 5), stashed_timer(main_cosmos_timer)
@@ -41,7 +42,7 @@ void multiverse::populate_cosmoi() {
 
 	main_cosmos.advance_deterministic_schemata(cosmic_entropy(), [this](fixed_step& step) {
 		main_cosmos_manager.populate_world_with_entities(step);
-	});
+	}, [](fixed_step&){});
 }
 
 void multiverse::control(augs::machine_entropy entropy) {

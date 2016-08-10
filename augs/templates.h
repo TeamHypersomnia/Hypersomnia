@@ -5,7 +5,6 @@
 #include <vector>
 #include <iomanip>
 #include <algorithm>
-#include <functional>
 #include <bitset>
 #include <tuple>
 

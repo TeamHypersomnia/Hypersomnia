@@ -94,7 +94,7 @@ cosmos& cosmos::operator=(const cosmos& b) {
 #if COSMOS_TRACKS_GUIDS
 
 unsigned cosmos::get_guid(const_entity_handle handle) const {
-	return significant.pool_for_aggregates.get_meta<entity_relations>(handle).guid;
+	return handle.get_guid();
 }
 
 void cosmos::assign_next_guid(entity_handle new_entity) {
@@ -251,16 +251,9 @@ size_t cosmos::get_maximum_entities() const {
 	return significant.pool_for_aggregates.capacity();
 }
 
-void cosmos::advance_deterministic_schemata(cosmic_entropy input, fixed_callback pre_solve, fixed_callback post_solve) {
+void cosmos::advance_deterministic_schemata(cosmic_entropy input) {
 	fixed_step step(*this, input);
-	
-	if (pre_solve)
-		pre_solve(step);
-
 	advance_deterministic_schemata(step);
-
-	if (post_solve)
-		post_solve(step);
 }
 
 void cosmos::advance_deterministic_schemata(fixed_step& step) {

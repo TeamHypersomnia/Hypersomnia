@@ -1,6 +1,4 @@
 #pragma once
-#include <functional>
-
 namespace augs {
 	struct lua_state_wrapper;
 }

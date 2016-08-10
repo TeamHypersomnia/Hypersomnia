@@ -8,7 +8,6 @@
 
 #include "game/messages/collision_message.h"
 
-#include <functional>
 #include <set>
 
 class cosmos;

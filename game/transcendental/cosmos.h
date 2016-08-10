@@ -1,5 +1,4 @@
 #pragma once
-#include <functional>
 #include <thread>
 #include "game/build_settings.h"
 #include "augs/misc/streams.h"
@@ -50,9 +49,6 @@ class cosmos : private storage_for_all_components_and_aggregates, public augs::p
 	}
 
 public:
-	typedef std::function<void(fixed_step&)> fixed_callback;
-	typedef std::function<void(viewing_step&)> variable_callback;
-
 	storage_for_all_temporary_systems temporary_systems;
 	cosmic_profiler profiler;
 	augs::stream reserved_memory_for_serialization;
@@ -104,9 +100,16 @@ public:
 	bool operator==(const cosmos&) const;
 	bool operator!=(const cosmos&) const;
 
-	void advance_deterministic_schemata(cosmic_entropy input,
-		fixed_callback pre_solve = fixed_callback(), 
-		fixed_callback post_solve = fixed_callback());
+	template<class Pre, class Post>
+	void advance_deterministic_schemata(cosmic_entropy input, Pre pre_solve, Post post_solve) {
+		fixed_step step(*this, input);
+
+		pre_solve(step);
+		advance_deterministic_schemata(step);
+		post_solve(step);
+	}
+
+	void advance_deterministic_schemata(cosmic_entropy input);
 
 	void reserve_storage_for_entities(size_t);
 

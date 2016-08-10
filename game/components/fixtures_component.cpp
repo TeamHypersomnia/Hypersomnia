@@ -8,7 +8,6 @@
 
 #include <numeric>
 #include <string>
-#include <functional>
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/entity_relations.h"

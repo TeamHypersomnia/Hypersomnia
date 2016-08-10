@@ -3,7 +3,6 @@
 #include <memory>
 #include <tuple>
 #include <array>
-#include <functional>
 
 #include "game/transcendental/entity_id.h"
 #include "game/detail/ai/goals.h"
@@ -98,7 +97,17 @@ namespace resources {
 	private:
 		std::vector<const node*> node_pointers;
 
-		void dfs(node& p, std::function<void(node&)>);
-		void dfs_all(std::function<void(node&)>);
+		template<class F>
+		void dfs(node& p, F f) {
+			f(p);
+
+			for (auto& c : p.children)
+				dfs(*c, f);
+		}
+
+		template<class F>
+		void dfs_all(F f) {
+			dfs(root, f);
+		}
 	};
 }

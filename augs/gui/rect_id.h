@@ -1,5 +1,4 @@
 #pragma once
-#include <functional>
 #include "augs/misc/pool_id.h"
 #include "augs/misc/pool_handle.h"
 #include "augs/math/rects.h"

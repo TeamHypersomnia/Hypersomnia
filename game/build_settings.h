@@ -1,3 +1,3 @@
 #pragma once
-#define COSMOS_TRACKS_GUIDS 0
+#define COSMOS_TRACKS_GUIDS 1
 

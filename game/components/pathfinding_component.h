@@ -1,5 +1,4 @@
 #pragma once
-#include <functional>
 #include "augs/math/vec2.h"
 #include "game/transcendental/entity_id.h"
 

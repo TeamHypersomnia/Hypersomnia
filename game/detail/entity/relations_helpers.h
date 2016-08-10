@@ -1,6 +1,4 @@
 #pragma once
-#include <functional>
-
 #include "game/detail/inventory_slot_handle_declaration.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "augs/templates.h"
@@ -10,6 +8,8 @@
 #include "game/enums/slot_function.h"
 #include "game/enums/associated_entity_name.h"
 #include "game/enums/sub_entity_name.h"
+
+#include "game/build_settings.h"
 
 struct entity_relations;
 
@@ -26,13 +26,51 @@ public:
 	entity_handle_type get_owner_body() const;
 	std::vector<entity_handle_type> get_fixture_entities() const;
 
+#if COSMOS_TRACKS_GUIDS
+	unsigned get_guid() const;
+#endif
+
 	inventory_slot_handle_type operator[](slot_function) const;
 	entity_handle_type operator[](sub_entity_name) const;
 	entity_handle_type operator[](associated_entity_name) const;
 
 	sub_entity_name get_name_as_sub_entity() const;
 	
-	void for_each_sub_entity_recursive(std::function<void(entity_handle_type)>) const;
+	template <class F>
+	void for_each_sub_entity_recursive(F callback) const {
+		auto& self = *static_cast<const entity_handle_type*>(this);
+
+		{
+			auto& subs = relations().sub_entities;
+
+			for (auto& s : subs) {
+				auto handle = self.get_cosmos()[s];
+
+				if (handle.alive()) {
+					callback(handle);
+					handle.for_each_sub_entity_recursive(callback);
+				}
+			}
+		}
+
+		{
+			auto& subs = relations().sub_entities_by_name;
+
+			for (auto& s : subs) {
+				auto handle = self.get_cosmos()[s.second];
+
+				if (handle.alive()) {
+					callback(handle);
+					handle.for_each_sub_entity_recursive(callback);
+				}
+			}
+		}
+	}
+
+	template <class F>
+	void for_each_held_id(F callback) const {
+
+	}
 };
 
 template<bool, class>

@@ -1,5 +1,4 @@
 #pragma once
-#include <functional>
 #include "game/detail/inventory_slot_handle_declaration.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
@@ -19,5 +18,20 @@ public:
 	
 	std::vector<entity_handle_type> guns_wielded() const;
 
-	void for_each_contained_item_recursive(std::function<void(basic_entity_handle<is_const>)> f) const;
+	template <class F>
+	void for_each_contained_item_recursive(F callback) const {
+		auto& item = *static_cast<const entity_handle_type*>(this);
+		auto& cosmos = item.get_cosmos();
+
+		if (item.has<components::container>()) {
+			for (auto& s : item.get<components::container>().slots) {
+				auto item_handles = cosmos[s.second.items_inside];
+
+				for (auto it : item_handles) {
+					callback(it);
+					it.for_each_contained_item_recursive(callback);
+				}
+			}
+		}
+	}
 };

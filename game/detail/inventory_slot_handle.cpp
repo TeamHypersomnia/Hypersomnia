@@ -192,22 +192,6 @@ unsigned basic_inventory_slot_handle<C>::calculate_free_space_with_parent_contai
 	return maximum_space;
 }
 
-
-template <bool C>
-void basic_inventory_slot_handle<C>::for_each_descendant(std::function<void(entity_handle_type item)> f) const {
-	for (auto& i : get().items_inside) {
-		auto handle = make_handle(i);
-
-		f(handle);
-
-		auto* container = handle.find<components::container>();
-
-		if (container)
-			for (auto& s : container->slots)
-				handle[s.first].for_each_descendant(f);
-	}
-}
-
 template <bool C>
 bool basic_inventory_slot_handle<C>::can_contain(entity_id id) const {
 	if (dead())

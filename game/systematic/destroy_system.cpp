@@ -1,5 +1,3 @@
-#include <functional>
-
 #include "destroy_system.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_id.h"
@@ -8,6 +6,7 @@
 #include "game/messages/will_soon_be_deleted.h"
 
 #include "game/transcendental/entity_handle.h"
+#include "game/transcendental/entity_relations.h"
 #include "game/transcendental/step.h"
 
 #include "augs/ensure.h"

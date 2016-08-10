@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-#include <functional>
 #include "augs/math/vec2.h"
 #include "augs/window_framework/event.h"
 #include "augs/misc/timer.h"
