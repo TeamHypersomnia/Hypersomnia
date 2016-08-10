@@ -370,8 +370,6 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	animation_system().handle_animation_messages(step);
 	animation_system().progress_animation_states(step);
 
-	performance.start(meter_type::RENDERING);
-
 	position_copying_system().update_transforms(step);
 	rotation_copying_system().update_rotations(step.cosm);
 
