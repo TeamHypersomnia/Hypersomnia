@@ -29,7 +29,7 @@
 
 b2Fixture::b2Fixture()
 {
-	m_userData.unset();
+	m_userData = FixtureUserdata();
 	m_body = NULL;
 	m_next = NULL;
 	m_proxies = NULL;

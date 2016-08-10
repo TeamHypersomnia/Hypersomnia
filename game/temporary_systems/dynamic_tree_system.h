@@ -11,7 +11,7 @@ class physics_system;
 class dynamic_tree_system {
 	friend class cosmos;
 
-	std::vector<entity_id> always_visible_entities;
+	std::vector<unversioned_entity_id> always_visible_entities;
 
 	b2DynamicTree non_physical_objects_tree;
 
@@ -29,5 +29,5 @@ class dynamic_tree_system {
 	void destruct(const_entity_handle);
 public:
 
-	std::vector<entity_id> determine_visible_entities_from_camera(state_for_drawing_camera, const physics_system&) const;
+	std::vector<unversioned_entity_id> determine_visible_entities_from_camera(state_for_drawing_camera, const physics_system&) const;
 };

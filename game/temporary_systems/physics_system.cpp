@@ -109,7 +109,7 @@ void physics_system::fixtures_construct(const_entity_handle handle) {
 				fixdef.filter = c.filter;
 				fixdef.restitution = c.restitution;
 				fixdef.shape = &shape;
-				fixdef.userData = handle;
+				fixdef.userData = handle.get_id();
 
 				auto transformed_shape = c.shape;
 				transformed_shape.offset_vertices(colliders.get_total_offset());
@@ -154,7 +154,7 @@ void physics_system::construct(const_entity_handle handle) {
 			default:ensure(false) break;
 			}
 
-			def.userData = handle;
+			def.userData = handle.get_id();
 			def.bullet = physics_data.bullet;
 			def.position = physics_data.transform.pos * PIXELS_TO_METERSf;
 			def.angle = physics_data.transform.rotation * DEG_TO_RADf;
@@ -214,7 +214,7 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
 
-		auto entity = cosmos[b->GetUserData()];
+		entity_handle entity = cosmos[b->GetUserData()];
 
 		auto& physics = entity.get<components::physics>();
 		auto& special = entity.get<components::special_physics>();
@@ -257,7 +257,7 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 
 	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
-		auto entity = cosmos[b->GetUserData()];
+		entity_handle entity = cosmos[b->GetUserData()];
 		auto& physics = entity.get<components::physics>();
 
 		recurential_friction_handler(step, entity, entity.get_owner_friction_ground());

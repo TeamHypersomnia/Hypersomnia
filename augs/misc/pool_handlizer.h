@@ -11,10 +11,10 @@ namespace augs {
 		decltype(auto) to_handle_vector(const container& vec) {
 			auto& self = *static_cast<derived*>(this);
 
-			std::vector<decltype(self.get_handle(*vec.begin()))> handles;
+			std::vector<decltype(operator[](*vec.begin()))> handles;
 
 			for (auto v : vec)
-				handles.emplace_back(self.get_handle(v));
+				handles.emplace_back(operator[](v));
 
 			return handles;
 		}
@@ -23,10 +23,10 @@ namespace augs {
 		decltype(auto) to_handle_vector(const container& vec) const {
 			auto& self = *static_cast<const derived*>(this);
 
-			std::vector<decltype(self.get_handle(*vec.begin()))> handles;
+			std::vector<decltype(operator[](*vec.begin()))> handles;
 
 			for (auto v : vec)
-				handles.emplace_back(self.get_handle(v));
+				handles.emplace_back(operator[](v));
 
 			return handles;
 		}
@@ -51,6 +51,18 @@ namespace augs {
 		decltype(auto) operator[](pool_id<object_type> from_id) const {
 			auto& self = *static_cast<const derived*>(this);
 			return self.get_handle(from_id);
+		}
+
+		template <class object_type>
+		decltype(auto) operator[](unversioned_id<object_type> unv) {
+			auto& self = *static_cast<derived*>(this);
+			return self.get_handle(self.get_pool(pool_id<object_type>()).make_versioned(unv));
+		}
+
+		template <class object_type>
+		decltype(auto) operator[](unversioned_id<object_type> unv) const {
+			auto& self = *static_cast<const derived*>(this);
+			return self.get_handle(self.get_pool(pool_id<object_type>()).make_versioned(unv));
 		}
 
 		decltype(auto) operator[](inventory_slot_id from_id) {

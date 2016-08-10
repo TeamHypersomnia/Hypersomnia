@@ -22,8 +22,9 @@
 #include <Box2D/Common/b2Math.h>
 #include <Box2D/Collision/Shapes/b2Shape.h>
 #include <memory>
+
 #include "game/transcendental/entity_id.h"
-typedef entity_id Userdata;
+typedef unversioned_entity_id Userdata;
 
 class b2Fixture;
 class b2Joint;

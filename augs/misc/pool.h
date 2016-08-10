@@ -9,6 +9,7 @@ namespace augs {
 	class basic_pool : public pool_handlizer<basic_pool<T>> {
 	public:
 		typedef augs::pool_id<T> id_type;
+		typedef augs::unversioned_id<T> unversioned_id_type;
 		typedef augs::pool_handle<T> handle_type;
 		typedef augs::const_pool_handle<T> const_handle_type;
 
@@ -150,6 +151,13 @@ namespace augs {
 	public:
 		basic_pool(int slot_count = 0) {
 			initialize_space(slot_count);
+		}
+
+		id_type make_versioned(unversioned_id_type unv) const {
+			id_type ver;
+			ver.indirection_index = unv.indirection_index;
+			ver.version = indirectors[unv.indirection_index].version;
+			return ver;
 		}
 
 		handle_type get_handle(id_type from_id) {

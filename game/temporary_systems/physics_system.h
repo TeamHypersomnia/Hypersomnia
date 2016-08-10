@@ -53,7 +53,7 @@ public:
 	struct raycast_output {
 		vec2 intersection, normal;
 		bool hit = false;
-		entity_id what_entity;
+		unversioned_entity_id what_entity;
 	};
 
 	struct edge_edge_output {
@@ -70,7 +70,7 @@ public:
 		};
 
 		std::set<b2Body*> bodies;
-		std::set<entity_id> entities;
+		std::set<unversioned_entity_id> entities;
 		std::set<queried_result> details;
 
 		query_output& operator+=(const query_output& b) {
@@ -84,7 +84,7 @@ public:
 
 	struct query_aabb_output {
 		std::set<b2Body*> bodies;
-		std::set<entity_id> entities;
+		std::set<unversioned_entity_id> entities;
 		std::vector<b2Fixture*> fixtures;
 	};
 

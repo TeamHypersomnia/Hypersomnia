@@ -16,12 +16,12 @@ void dynamic_tree_system::destruct(const_entity_handle handle) {
 	auto& cache = per_entity_cache[index];
 
 	if (cache.is_constructed()) {
-		remove_element(always_visible_entities, entity_id(handle));
+		remove_element(always_visible_entities, handle.get_id());
 
 		if (cache.tree_proxy_id != -1) {
 			auto* userdata = non_physical_objects_tree.GetUserData(cache.tree_proxy_id);
 			ensure(userdata != nullptr);
-			delete ((entity_id*)userdata);
+			delete ((unversioned_entity_id*)userdata);
 			non_physical_objects_tree.DestroyProxy(cache.tree_proxy_id);
 		}
 
@@ -45,14 +45,14 @@ void dynamic_tree_system::construct(const_entity_handle handle) {
 		auto& data = dynamic_tree_node.get_data();
 
 		if (data.always_visible) {
-			always_visible_entities.push_back(handle);
+			always_visible_entities.push_back(handle.get_id());
 		}
 		else {
 			b2AABB input;
 			input.lowerBound = data.aabb.left_top();
 			input.upperBound = data.aabb.right_bottom();
 
-			cache.tree_proxy_id = non_physical_objects_tree.CreateProxy(input, new entity_id(handle));
+			cache.tree_proxy_id = non_physical_objects_tree.CreateProxy(input, new unversioned_entity_id(handle.get_id()));
 		}
 
 		cache.constructed = true;
@@ -63,17 +63,17 @@ void dynamic_tree_system::reserve_caches_for_entities(size_t n) {
 	per_entity_cache.resize(n);
 }
 
-std::vector<entity_id> dynamic_tree_system::determine_visible_entities_from_camera(state_for_drawing_camera in, const physics_system& physics) const {
-	std::vector<entity_id> visible_entities = always_visible_entities;
+std::vector<unversioned_entity_id> dynamic_tree_system::determine_visible_entities_from_camera(state_for_drawing_camera in, const physics_system& physics) const {
+	std::vector<unversioned_entity_id> visible_entities = always_visible_entities;
 
 	auto& result = physics.query_aabb_px(in.transformed_visible_world_area_aabb.left_top(), in.transformed_visible_world_area_aabb.right_bottom(), filters::renderable_query());
 	visible_entities.insert(visible_entities.end(), result.entities.begin(), result.entities.end());
 
 	struct render_listener {
 		const b2DynamicTree* tree;
-		std::vector<entity_id>* visible_entities;
+		std::vector<unversioned_entity_id>* visible_entities;
 		bool QueryCallback(int32 node) {
-			visible_entities->push_back(*((entity_id*)tree->GetUserData(node)));
+			visible_entities->push_back(*((unversioned_entity_id*)tree->GetUserData(node)));
 			return true;
 		}
 	};

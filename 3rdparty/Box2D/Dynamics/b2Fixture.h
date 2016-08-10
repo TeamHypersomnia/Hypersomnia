@@ -28,6 +28,9 @@ class b2Body;
 class b2BroadPhase;
 class b2Fixture;
 
+#include "game/transcendental/entity_id.h"
+typedef unversioned_entity_id FixtureUserdata;
+
 /// This holds contact filtering data.
 struct b2Filter
 {
@@ -79,7 +82,7 @@ struct b2FixtureDef
 	const b2Shape* shape;
 
 	/// Use this to store application specific fixture data.
-	entity_id userData;
+	FixtureUserdata userData;
 
 	/// The friction coefficient, usually in the range [0,1].
 	float32 friction;
@@ -155,10 +158,10 @@ public:
 
 	/// Get the user data that was assigned in the fixture definition. Use this to
 	/// store your application specific data.
-	entity_id GetUserData() const;
+	FixtureUserdata GetUserData() const;
 
 	/// Set the user data. Use this to store your application specific data.
-	void SetUserData(entity_id data);
+	void SetUserData(FixtureUserdata data);
 
 	/// Test a point for containment in this fixture.
 	/// @param p a point in world coordinates.
@@ -240,7 +243,7 @@ protected:
 
 	bool m_isSensor;
 
-	entity_id m_userData;
+	FixtureUserdata m_userData;
 };
 
 inline b2Shape::Type b2Fixture::GetType() const
@@ -268,12 +271,12 @@ inline const b2Filter& b2Fixture::GetFilterData() const
 	return m_filter;
 }
 
-inline entity_id b2Fixture::GetUserData() const
+inline FixtureUserdata b2Fixture::GetUserData() const
 {
 	return m_userData;
 }
 
-inline void b2Fixture::SetUserData(entity_id data)
+inline void b2Fixture::SetUserData(FixtureUserdata data)
 {
 	m_userData = data;
 }

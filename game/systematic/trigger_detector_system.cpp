@@ -112,8 +112,9 @@ void trigger_detector_system::send_trigger_confirmations(fixed_step& step) const
 
 		auto found_physical_triggers = cosmos.temporary_systems.get<physics_system>().query_body(detector_body, filters::trigger());
 
-		for (auto found_trigger : found_physical_triggers.entities) {
-			auto* maybe_trigger = cosmos[found_trigger].find<components::trigger>();
+		for (auto found_trigger_id : found_physical_triggers.entities) {
+			auto found_trigger = cosmos[found_trigger_id];
+			auto* maybe_trigger = found_trigger.find<components::trigger>();
 			
 			if (maybe_trigger && maybe_trigger->react_to_query_detectors)
 				found_triggers.push_back(found_trigger);

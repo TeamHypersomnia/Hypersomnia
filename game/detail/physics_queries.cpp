@@ -6,7 +6,7 @@
 #include "game/detail/physics_scripts.h"
 
 bool physics_system::raycast_input::ShouldRaycast(b2Fixture* fixture) {
-	entity_id fixture_entity = fixture->GetBody()->GetUserData();
+	auto fixture_entity = fixture->GetBody()->GetUserData();
 	return
 		(subject == entity_id() || fixture_entity != subject) &&
 		(b2ContactFilter::ShouldCollide(&subject_filter, &fixture->GetFilterData()));

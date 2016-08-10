@@ -7,3 +7,4 @@ namespace augs {
 }
 
 typedef augs::pool_id<typename put_all_components_into<augs::component_aggregate>::type> entity_id;
+typedef augs::pool_id<typename put_all_components_into<augs::component_aggregate>::type> unversioned_entity_id;
