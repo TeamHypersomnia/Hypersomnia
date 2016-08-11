@@ -43,6 +43,22 @@ namespace components {
 
 		vec2 wheel_offset = vec2(200, 125);
 
+		template<class F>
+		void for_each_held_id(F f) {
+			f(current_driver);
+
+			f(left_wheel_trigger);
+			f(right_wheel_trigger);
+		}
+
+		template<class F>
+		void for_each_held_id(F f) const {
+			f(current_driver);
+
+			f(left_wheel_trigger);
+			f(right_wheel_trigger);
+		}
+
 		template <class Archive>
 		void serialize(Archive& ar) {
 			ar(

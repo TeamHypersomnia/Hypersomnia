@@ -40,6 +40,22 @@ namespace components {
 		// -1.f - the same as the air resistance
 		float angular_air_resistance = 0;
 
+		template<class F>
+		void for_each_held_id(F f) {
+			f(owner_friction_ground);
+
+			for (auto& e : owner_friction_grounds)
+				f(e.target);
+		}
+
+		template<class F>
+		void for_each_held_id(F f) const {
+			f(owner_friction_ground);
+
+			for (const auto& e : owner_friction_grounds)
+				f(e.target);
+		}
+
 		template <class Archive>
 		void serialize(Archive& ar) {
 			ar(

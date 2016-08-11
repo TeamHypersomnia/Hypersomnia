@@ -28,6 +28,24 @@ namespace components {
 
 		augs::stepped_cooldown pickup_timeout = augs::stepped_cooldown(200);
 
+		template<class F>
+		void for_each_held_id(F f) {
+			f(mounting.current_item);
+			f(mounting.intented_mounting_slot.container_entity);
+
+			for (auto& e : only_pick_these_items)
+				f(e);
+		}
+
+		template<class F>
+		void for_each_held_id(F f) const {
+			f(mounting.current_item);
+			f(mounting.intented_mounting_slot.container_entity);
+
+			for (const auto& e : only_pick_these_items)
+				f(e);
+		}
+
 		template <class Archive>
 		void serialize(Archive& ar) {
 			ar(

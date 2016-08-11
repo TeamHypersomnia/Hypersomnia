@@ -48,6 +48,18 @@ namespace components {
 
 		/* speed at which the response receivers speed multiplier reaches 1.0 */
 		float max_speed_for_movement_response = 1.f;
+		
+		template<class F>
+		void for_each_held_id(F f) {
+			for (auto& e : response_receivers)
+				f(e.target);
+		}
+
+		template<class F>
+		void for_each_held_id(F f) const {
+			for (const auto& e : response_receivers)
+				f(e.target);
+		}
 
 		template <class Archive>
 		void serialize(Archive& ar) {

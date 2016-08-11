@@ -28,6 +28,16 @@ namespace components {
 
 		void update_bounds();
 
+		template<class F>
+		void for_each_held_id(F f) {
+			f(character_entity_to_chase);
+		}
+
+		template<class F>
+		void for_each_held_id(F f) const {
+			f(character_entity_to_chase);
+		}
+
 		template <class Archive>
 		void serialize(Archive& ar) {
 			ar(

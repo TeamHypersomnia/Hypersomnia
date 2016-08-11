@@ -21,3 +21,6 @@
 	path = 3rdparty/RakNet
 	url = https://github.com/TeamHypersomnia/RakNet.git
 	branch = master
+[submodule "3rdparty/rectpack2D"]
+	path = 3rdparty/rectpack2D
+	url = https://github.com/TeamHypersomnia/rectpack2D.git

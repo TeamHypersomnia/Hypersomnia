@@ -7,6 +7,16 @@ namespace components {
 		bool react_to_collision_detectors = false;
 		bool react_to_query_detectors = true;
 
+		template<class F>
+		void for_each_held_id(F f) {
+			f(entity_to_be_notified);
+		}
+
+		template<class F>
+		void for_each_held_id(F f) const {
+			f(entity_to_be_notified);
+		}
+
 		template <class Archive>
 		void serialize(Archive& ar) {
 			ar(

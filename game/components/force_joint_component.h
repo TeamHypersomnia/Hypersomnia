@@ -22,6 +22,16 @@ namespace components {
 
 		std::array<vec2, 2> force_offsets;
 
+		template<class F>
+		void for_each_held_id(F f) {
+			f(chased_entity);
+		}
+
+		template<class F>
+		void for_each_held_id(F f) const {
+			f(chased_entity);
+		}
+
 		template <class Archive>
 		void serialize(Archive& ar) {
 			ar(

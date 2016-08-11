@@ -16,6 +16,8 @@ namespace components {
 			EXPONENTIAL
 		};
 		
+		entity_id target;
+
 		int easing_mode = NONE;
 		bool colinearize_item_in_hand = false;
 		
@@ -28,16 +30,26 @@ namespace components {
 
 		unsigned look_mode = look_type::POSITION;
 
-		entity_id target;
-
 		float last_value = 0.0f;
 		bool update_value = true;
 
 		bool use_physical_motor = false;
 
+		template<class F>
+		void for_each_held_id(F f) {
+			f(target);
+		}
+
+		template<class F>
+		void for_each_held_id(F f) const {
+			f(target);
+		}
+		
 		template <class Archive>
 		void serialize(Archive& ar) {
 			ar(
+				CEREAL_NVP(target),
+
 				CEREAL_NVP(easing_mode),
 				CEREAL_NVP(colinearize_item_in_hand),
 
@@ -47,8 +59,6 @@ namespace components {
 				CEREAL_NVP(last_rotation_interpolant),
 
 				CEREAL_NVP(look_mode),
-
-				CEREAL_NVP(target),
 
 				CEREAL_NVP(last_value),
 				CEREAL_NVP(update_value),

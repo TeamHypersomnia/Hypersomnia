@@ -32,6 +32,18 @@ namespace components {
 		float montage_time_ms = 1000;
 		float montage_time_left_ms = 0.f;
 
+		template<class F>
+		void for_each_held_id(F f) {
+			f(current_slot.container_entity);
+			f(target_slot_after_unmount.container_entity);
+		}
+
+		template<class F>
+		void for_each_held_id(F f) const {
+			f(current_slot.container_entity);
+			f(target_slot_after_unmount.container_entity);
+		}
+
 		template <class Archive>
 		void serialize(Archive& ar) {
 			ar(

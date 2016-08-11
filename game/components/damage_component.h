@@ -36,6 +36,16 @@ namespace components {
 
 		vec2 saved_point_of_impact_before_death;
 
+		template<class F>
+		void for_each_held_id(F f) {
+			f(sender);
+		}
+
+		template<class F>
+		void for_each_held_id(F f) const {
+			f(sender);
+		}
+
 		template <class Archive>
 		void serialize(Archive& ar) {
 			ar(

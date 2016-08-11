@@ -66,26 +66,8 @@ public:
 	}
 
 	template <class F>
-	void for_each_outgoing_relation(F callback) const {
-		auto& self = *static_cast<const entity_handle_type*>(this);
-
-		{
-			auto& subs = relations().sub_entities;
-
-			for (auto& s : subs) {
-				auto handle = self.get_cosmos()[s];
-				callback(handle);
-			}
-		}
-
-		{
-			auto& subs = relations().sub_entities_by_name;
-
-			for (auto& s : subs) {
-				auto handle = self.get_cosmos()[s.second];
-				callback(handle);
-			}
-		}
+	void for_each_held_id(F callback) const {
+		relations().for_each_held_id(callback);
 	}
 };
 

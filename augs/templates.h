@@ -206,6 +206,12 @@ struct is_component_synchronized : std::false_type { };
 template<typename T>
 struct is_component_synchronized<T, decltype(std::declval<T>().activated, void())> : std::true_type { };
 
+template<typename T, typename = void>
+struct can_introspect_held_ids : std::false_type { };
+
+template<typename T>
+struct can_introspect_held_ids<T, decltype(std::declval<T>().for_each_id, void())> : std::true_type { };
+
 //template <typename Base, typename Tuple, std::size_t I = 0>
 //struct tuple_ref_index;
 //
