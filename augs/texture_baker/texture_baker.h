@@ -1,13 +1,14 @@
 #pragma once
 #include <vector>
 #include "image.h"
-#include "rectpack.h"
+#include "augs/build_settings.h"
+#include "3rdparty/rectpack2D/src/pack.h"
 
 namespace augs {
 	class texture {
 		friend class atlas;
 		image* img;
-		rects::xywhf<int> rect;
+		rect_xywhf rect;
 		float x, y, w, h;
 		bool ltoa;
 
@@ -40,8 +41,8 @@ namespace augs {
 		static unsigned current;
 		unsigned id;
 		bool mipmaps, lin, rep, built;
-		std::vector<rects::xywhf<int>*> ptr_arr; // for reallocations
-		packing::bin b;
+		std::vector<rect_xywhf*> ptr_arr; // for reallocations
+		std::vector<bin> bins;
 		float adder, mult;
 
 	public:

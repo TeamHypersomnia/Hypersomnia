@@ -1,4 +1,4 @@
-#include "rectpack.h"
+#include "augs/3rdparty/rectpack2D/pack.h"
 #include <vector>
 #include <algorithm>
 #include <array>

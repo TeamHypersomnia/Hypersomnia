@@ -284,6 +284,7 @@
     <ClCompile Include="3rdparty\lua\src\lzio.c" />
     <ClCompile Include="3rdparty\polypartition\src\polypartition.cpp" />
     <ClCompile Include="3rdparty\RakNet\Source\BitStream.cpp" />
+    <ClCompile Include="3rdparty\rectpack2D\src\pack.cpp" />
     <ClCompile Include="augs\ensure.cpp" />
     <ClCompile Include="augs\gui\clipboard.cpp" />
     <ClCompile Include="augs\gui\draw_and_event_infos.cpp" />
@@ -458,7 +459,6 @@
     <ClCompile Include="augs\texture_baker\font.cpp" />
     <ClCompile Include="augs\texture_baker\image.cpp" />
     <ClCompile Include="augs\texture_baker\lodepng.cpp" />
-    <ClCompile Include="augs\texture_baker\rectpack.cpp" />
     <ClCompile Include="augs\texture_baker\texture_baker.cpp" />
     <ClCompile Include="augs\window_framework\event.cpp" />
     <ClCompile Include="augs\window_framework\window.cpp" />
@@ -890,6 +890,7 @@
     <ClInclude Include="3rdparty\lua\src\lzio.h" />
     <ClInclude Include="3rdparty\polypartition\src\polypartition.h" />
     <ClInclude Include="3rdparty\RakNet\Source\BitStream.h" />
+    <ClInclude Include="3rdparty\rectpack2D\src\pack.h" />
     <ClInclude Include="augs\build_settings.h" />
     <ClInclude Include="augs\entity_system\aggregate_mixins.h" />
     <ClInclude Include="augs\entity_system\component_aggregate.h" />
@@ -1159,7 +1160,6 @@
     <ClInclude Include="augs\texture_baker\font.h" />
     <ClInclude Include="augs\texture_baker\image.h" />
     <ClInclude Include="augs\texture_baker\lodepng.h" />
-    <ClInclude Include="augs\texture_baker\rectpack.h" />
     <ClInclude Include="augs\texture_baker\texture_baker.h" />
     <ClInclude Include="augs\window_framework\event.h" />
     <ClInclude Include="augs\window_framework\window.h" />

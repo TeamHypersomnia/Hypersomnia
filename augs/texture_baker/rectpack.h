@@ -1,6 +1,14 @@
 #pragma once
 #include <vector>
+#if INTEGRATE_RECTPACK_WITH_AUGMENTATIONS
 #include "augs/math/rects.h"
+#else
+namespace augs {
+	namespace rects {
+
+	}
+}
+#endif
 
 namespace augs {
 	namespace packing {

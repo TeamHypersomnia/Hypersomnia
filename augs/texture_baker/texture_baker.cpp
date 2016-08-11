@@ -12,11 +12,11 @@ namespace augs {
 	}
 
 	texture::texture() : img(nullptr), ltoa(false) {}
-	texture::texture(image* img) : img(img), rect(img->get_size()), ltoa(false) {}
+	texture::texture(image* img) : img(img), rect(rect_xywhf(0, 0, img->get_size().w, img->get_size().h)), ltoa(false) {}
 
 	void texture::set(image* _img) {
 		img = _img;
-		rect = rects::xywhf<int>(img->get_size());
+		rect = rect_xywhf(0, 0, img->get_size().w, img->get_size().h);
 	}
 
 	void texture::luminosity_to_alpha(bool flag) {
@@ -24,7 +24,7 @@ namespace augs {
 	}
 
 	rects::xywhf<int> texture::get_rect() const {
-		return rect;
+		return rects::xywhf<int>(rect.x, rect.y, rect.w, rect.h, rect.flipped );
 	}
 
 	vec2i texture::get_size() const {
@@ -120,7 +120,7 @@ namespace augs {
 		int cnt = textures.size();
 		ptr_arr.reserve(cnt);
 
-		rects::xywhf<int>** p = ptr_arr.data();
+		rect_xywhf** p = ptr_arr.data();
 
 		for (int i = 0; i < cnt; ++i)
 		{
@@ -129,7 +129,8 @@ namespace augs {
 			p[i]->h += 2;
 		}
 
-		int res = rect2D(p, cnt, max_size, b);
+		bool res = ::pack(p, cnt, max_size, bins);
+		ensure(res && "there's a texture larger than maximum atlas size");
 
 		for (int i = 0; i < cnt; ++i)
 		{
@@ -137,13 +138,13 @@ namespace augs {
 			p[i]->h -= 2;
 		}
 
-		if (res == 1) throw std::runtime_error("not enough space in texture atlas!");
-		if (res == 2) throw std::runtime_error("there's a texture larger than maximum atlas size");
-
-		return !res;
+		return res;
 	}
 
 	void atlas::create_image(int atlas_channels, bool destroy_images) {
+		ensure(bins.size() == 1);
+		const auto& b = bins[0];
+
 		double u = 1.0 / b.size.w;
 		double v = 1.0 / b.size.h;
 

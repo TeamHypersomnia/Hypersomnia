@@ -264,9 +264,6 @@
     <ClCompile Include="augs\texture_baker\lodepng.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="augs\texture_baker\rectpack.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="augs\texture_baker\texture_baker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -993,6 +990,9 @@
     <ClCompile Include="3rdparty\RakNet\Source\BitStream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="3rdparty\rectpack2D\src\pack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -1290,9 +1290,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\texture_baker\lodepng.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\texture_baker\rectpack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\texture_baker\texture_baker.h">
@@ -3090,6 +3087,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="3rdparty\RakNet\Source\BitStream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\rectpack2D\src\pack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
