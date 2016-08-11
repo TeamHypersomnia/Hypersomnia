@@ -4,7 +4,7 @@
 #include "augs/math/rects.h"
 
 namespace components {
-	struct dynamic_tree_node {
+	struct dynamic_tree_node : synchronizable_component {
 		bool always_visible = false;
 		bool activated = true;
 
@@ -28,4 +28,8 @@ template<bool is_const>
 class component_synchronizer<is_const, components::dynamic_tree_node> : public component_synchronizer_base<is_const, components::dynamic_tree_node> {
 public:
 	using component_synchronizer_base<is_const, components::dynamic_tree_node>::component_synchronizer_base;
+
+	bool is_activated() const {
+		return component.activated;
+	}
 };

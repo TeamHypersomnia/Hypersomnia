@@ -2,6 +2,10 @@
 #include "game/transcendental/entity_handle.h"
 #include <type_traits>
 
+struct synchronizable_component {
+
+};
+
 template <bool is_const, class component_type>
 class component_synchronizer_base {
 	template<bool, class, class>
@@ -17,13 +21,9 @@ public:
 		return component;
 	}
 
-	bool is_activated() const {
-		return component.activated;
-	}
-
 	component_synchronizer_base(component_reference c, basic_entity_handle<is_const> h) : component(c), handle(h) {
 	}
 };
 
 template <bool is_const, class component_type>
-class component_synchronizer {};
+class component_synchronizer : public component_synchronizer_base<is_const, component_type> {};

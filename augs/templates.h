@@ -200,11 +200,12 @@ struct maybe_const_ptr { typedef std::conditional_t<is_const, const T*, T*> type
 template<bool is_const, class T>
 using maybe_const_ptr_t = typename maybe_const_ptr<is_const, T>::type;
 
-template<typename T, typename = void>
-struct is_component_synchronized : std::false_type { };
+struct synchronizable_component;
 
 template<typename T>
-struct is_component_synchronized<T, decltype(std::declval<T>().activated, void())> : std::true_type { };
+struct is_component_synchronized {
+	static constexpr bool value = std::is_base_of<synchronizable_component, T>::value;
+};
 
 template <typename T>
 struct has_held_ids_introspector

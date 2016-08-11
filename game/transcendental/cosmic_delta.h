@@ -9,16 +9,16 @@ class cosmos;
 class cosmic_delta {
 	template<class T, class = void>
 	struct held_id_introspector {
-		template<class Ref, class P>
-		static void for_each_held_id(Ref, P) {
+		template<class C, class P>
+		static void for_each_held_id(C&, P) {
 
 		}
 	};
 
 	template <class T>
 	struct held_id_introspector<T, std::enable_if_t<has_held_ids_introspector<T>::value>> {
-		template<class Ref, class P>
-		static void for_each_held_id(Ref ref, P pred) {
+		template<class C, class P>
+		static void for_each_held_id(C& ref, P pred) {
 			ref.for_each_held_id(pred);
 		}
 	};
@@ -33,8 +33,10 @@ class cosmic_delta {
 
 		for_each_in_tuple(ids, [&cosm, &callback](const auto& id) {
 			typedef typename std::decay_t<decltype(id)>::element_type component_type;
+			auto component_handle = cosm[id];
 
-			held_id_introspector<component_type>::for_each_held_id(cosm[id].get(), callback);
+			if(component_handle.alive())
+				held_id_introspector<component_type>::for_each_held_id(component_handle.get(), callback);
 		});
 	}
 

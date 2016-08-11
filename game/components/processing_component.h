@@ -4,7 +4,7 @@
 #include "game/transcendental/component_synchronizer.h"
 
 namespace components {
-	struct processing {
+	struct processing : synchronizable_component {
 		typedef std::bitset<int(processing_subjects::LIST_COUNT)> bitset_type;
 		
 		bool activated = true;
@@ -31,6 +31,7 @@ class basic_processing_synchronizer : public component_synchronizer_base<is_cons
 public:
 	using component_synchronizer_base<is_const, components::processing>::component_synchronizer_base;
 
+	bool is_activated() const;
 	bool is_in(processing_subjects) const;
 	components::processing::bitset_type get_disabled_categories() const;
 	components::processing::bitset_type get_basic_categories() const;

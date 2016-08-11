@@ -63,13 +63,22 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 
 	enco.significant.pool_for_aggregates.for_each_with_id([&base, &enco, &dt](const aggregate& agg, entity_id id) {
 		const_entity_handle enco_entity = enco.get_handle(id);
+#if COSMOS_TRACKS_GUIDS
+		auto stream_written_id = enco_entity.get_guid();
+		auto maybe_base_entity = base.guid_map_for_transport.find(stream_written_id);
+
+		bool is_new = maybe_base_entity == base.guid_map_for_transport.end();
+		entity_id base_entity_id;
+		
+		if(!is_new)
+			base_entity_id = (*maybe_base_entity).second;
+
+		const_entity_handle base_entity = base[base_entity_id];
+#else
 		const_entity_handle base_entity = base.get_handle(id);
-
-		for_each_held_id(enco_entity, [](const entity_id&) {
-
-		});
-
 		bool is_new = base_entity.dead();
+		auto stream_written_id = id;
+#endif
 
 		const auto& base_relations = is_new ? entity_relations() : base_entity.get_meta<entity_relations>();
 		const auto& base_components = is_new ? aggregate::component_id_tuple() : base_entity.get().component_ids;
@@ -128,7 +137,7 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 			++dt.new_entities;
 		}
 		else if (entity_changed) {
-			augs::write_object(new_content, id);
+			augs::write_object(new_content, stream_written_id);
 
 			for (bool flag : overridden_components)
 				augs::write_object(new_content, flag);
@@ -143,10 +152,16 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 	});
 
 	base.significant.pool_for_aggregates.for_each_with_id([&base, &enco, &out, &dt](const aggregate&, entity_id id) {
-		const_entity_handle enco_entity = enco.get_handle(id);
 		const_entity_handle base_entity = base.get_handle(id);
+#if COSMOS_TRACKS_GUIDS
+		auto maybe_enco_entity = enco.guid_map_for_transport.find(base_entity.get_guid());
+		bool is_dead = maybe_enco_entity == enco.guid_map_for_transport.end();
+#else
+		const_entity_handle enco_entity = enco.get_handle(id);
+		bool is_dead = enco_entity.dead();
+#endif
 
-		if (enco_entity.dead() && base_entity.alive()) {
+		if (is_dead) {
 			++dt.removed_entities;
 			augs::write_object(dt.stream_for_removed, id);
 		}

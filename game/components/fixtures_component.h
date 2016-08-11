@@ -18,7 +18,7 @@ class physics_system;
 struct colliders_cache;
 
 namespace components {
-	struct fixtures {
+	struct fixtures : synchronizable_component {
 		struct convex_partitioned_collider {
 			convex_partitioned_shape shape;
 			b2Filter filter;

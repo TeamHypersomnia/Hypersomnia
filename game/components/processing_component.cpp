@@ -82,6 +82,11 @@ P P::get_default(const_entity_handle id) {
 }
 
 template<bool C>
+bool basic_processing_synchronizer<C>::is_activated() const {
+	return component.activated;
+}
+
+template<bool C>
 bool basic_processing_synchronizer<C>::is_in(processing_subjects list) const {
 	return component.processing_subject_categories.test(int(list)) && !component.disabled_categories.test(int(list));
 }

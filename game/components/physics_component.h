@@ -14,7 +14,7 @@ class physics_system;
 struct rigid_body_cache;
 
 namespace components {
-	struct physics {
+	struct physics : synchronizable_component {
 		enum class type {
 			STATIC,
 			KINEMATIC,
