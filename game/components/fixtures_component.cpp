@@ -66,17 +66,17 @@ bool basic_fixtures_synchronizer<C>::can_driver_shoot_through() const {
 
 void component_synchronizer<false, F>::set_offset(colliders_offset_type t, components::transform off) const {
 	component.offsets_for_created_shapes[static_cast<int>(t)] = off;
-	resubstantialization();
+	resubstantiation();
 }
 
 component_synchronizer<false, F>& component_synchronizer<false, F>::operator=(const F& f) {
 	component = f;
-	resubstantialization();
+	resubstantiation();
 	return *this;
 }
 
-void component_synchronizer<false, F>::resubstantialization() const {
-	handle.get_cosmos().partial_resubstantialization<processing_lists_system>(handle);
+void component_synchronizer<false, F>::resubstantiation() const {
+	handle.get_cosmos().partial_resubstantiation<processing_lists_system>(handle);
 }
 
 void component_synchronizer<false, F>::rebuild_density(size_t index) const {
@@ -106,7 +106,7 @@ void component_synchronizer<false, F>::set_density_multiplier(float mult, size_t
 
 void component_synchronizer<false, F>::set_activated(bool flag) const {
 	component.activated = flag;
-	resubstantialization();
+	resubstantiation();
 }
 
 void component_synchronizer<false, F>::set_friction(float fr, size_t index) const {

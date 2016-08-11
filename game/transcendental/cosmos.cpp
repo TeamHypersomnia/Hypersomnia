@@ -45,7 +45,7 @@
 
 #include <sstream>
 
-void cosmos::complete_resubstantialization() {
+void cosmos::complete_resubstantiation() {
 	profiler.complete_resubstantiation.new_measurement();
 
 	temporary_systems.~storage_for_all_temporary_systems();
@@ -59,7 +59,7 @@ void cosmos::complete_resubstantialization() {
 
 	for_each_entity_id([this](entity_id id) {
 		auto h = get_handle(id);
-		complete_resubstantialization(h);
+		complete_resubstantiation(h);
 	});
 
 	profiler.complete_resubstantiation.end_measurement();
@@ -87,7 +87,7 @@ cosmos& cosmos::operator=(const cosmos& b) {
 #if COSMOS_TRACKS_GUIDS
 	guid_map_for_transport = b.guid_map_for_transport;
 #endif
-	complete_resubstantialization();
+	complete_resubstantiation();
 	return *this;
 }
 
@@ -122,7 +122,7 @@ void cosmos::refresh_for_new_significant_state() {
 #if COSMOS_TRACKS_GUIDS
 	remap_guids();
 #endif
-	complete_resubstantialization();
+	complete_resubstantiation();
 }
 
 cosmos& cosmos::operator=(const significant_state& b) {
@@ -131,7 +131,7 @@ cosmos& cosmos::operator=(const significant_state& b) {
 	return *this;
 }
 
-void cosmos::complete_resubstantialization(entity_handle h) {
+void cosmos::complete_resubstantiation(entity_handle h) {
 	temporary_systems.for_each([h](auto& sys) {
 		sys.destruct(h);
 	});
@@ -221,15 +221,15 @@ void cosmos::delete_entity(entity_id e) {
 
 	//ensure(handle.alive());
 
-	bool should_destruct_now_to_avoid_repeated_resubstantialization = handle.has<components::substance>();
+	bool should_destruct_now_to_avoid_repeated_resubstantiation = handle.has<components::substance>();
 
-	if (should_destruct_now_to_avoid_repeated_resubstantialization)
+	if (should_destruct_now_to_avoid_repeated_resubstantiation)
 		handle.remove<components::substance>();
 
 #if COSMOS_TRACKS_GUIDS
 	clear_guid(handle);
 #endif
-	// now manipulation of substanceless entity won't trigger redundant resubstantialization
+	// now manipulation of substanceless entity won't trigger redundant resubstantiation
 
 	auto owner_body = handle.get_owner_body();
 

@@ -88,7 +88,7 @@ public:
 	template <class Archive>
 	void serialize(Archive& ar) {
 		ar(CEREAL_NVP(significant));
-		complete_resubstantialization();
+		complete_resubstantiation();
 	}
 
 	cosmos();
@@ -119,11 +119,11 @@ public:
 
 	void refresh_for_new_significant_state();
 
-	void complete_resubstantialization();
-	void complete_resubstantialization(entity_handle);
+	void complete_resubstantiation();
+	void complete_resubstantiation(entity_handle);
 
 	template<class System>
-	void partial_resubstantialization(entity_handle handle) {
+	void partial_resubstantiation(entity_handle handle) {
 		auto& sys = temporary_systems.get<System>();
 
 		sys.destruct(handle);

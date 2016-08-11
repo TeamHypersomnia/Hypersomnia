@@ -86,18 +86,18 @@ bool basic_processing_synchronizer<C>::is_in(processing_subjects list) const {
 	return component.processing_subject_categories.test(int(list)) && !component.disabled_categories.test(int(list));
 }
 
-void component_synchronizer<false, P>::resubstantialization() const {
-	handle.get_cosmos().partial_resubstantialization<processing_lists_system>(handle);
+void component_synchronizer<false, P>::resubstantiation() const {
+	handle.get_cosmos().partial_resubstantiation<processing_lists_system>(handle);
 }
 
 void component_synchronizer<false, P>::disable_in(processing_subjects list) const {
 	component.disabled_categories.set(int(list), 1);
-	resubstantialization();
+	resubstantiation();
 }
 
 void component_synchronizer<false, P>::enable_in(processing_subjects list) const {
 	component.disabled_categories.set(int(list), 0);
-	resubstantialization();
+	resubstantiation();
 }
 
 template<bool C>
@@ -112,12 +112,12 @@ P::bitset_type basic_processing_synchronizer<C>::get_basic_categories() const {
 
 void component_synchronizer<false, P>::set_disabled_categories(P::bitset_type categories) const {
 	component.disabled_categories = categories;
-	resubstantialization();
+	resubstantiation();
 }
 
 void component_synchronizer<false, P>::set_basic_categories(P::bitset_type categories) const {
 	component.processing_subject_categories = categories;
-	resubstantialization();
+	resubstantiation();
 }
 
 template class basic_processing_synchronizer<false>;

@@ -44,7 +44,7 @@ void relations_helpers<false, D>::set_owner_body(entity_id owner_id) const {
 
 	if (former_owner.alive()) {
 		remove_element(former_owner.relations().fixture_entities, this_id);
-		cosmos.partial_resubstantialization<physics_system>(former_owner);
+		cosmos.partial_resubstantiation<physics_system>(former_owner);
 	}
 
 	self.relations().owner_body = new_owner;
@@ -52,10 +52,10 @@ void relations_helpers<false, D>::set_owner_body(entity_id owner_id) const {
 	if (new_owner.alive()) {
 		remove_element(new_owner.relations().fixture_entities, this_id);
 		new_owner.relations().fixture_entities.push_back(this_id);
-		cosmos.partial_resubstantialization<physics_system>(new_owner);
+		cosmos.partial_resubstantiation<physics_system>(new_owner);
 	}
 	else
-		cosmos.partial_resubstantialization<physics_system>(self);
+		cosmos.partial_resubstantiation<physics_system>(self);
 }
 
 template <class D>

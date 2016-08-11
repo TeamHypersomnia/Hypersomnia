@@ -62,7 +62,7 @@ namespace augs {
 				h.allocator::add(t);
 				
 				if (std::is_same<T, components::substance>()) {
-					h.get_cosmos().complete_resubstantialization(h);
+					h.get_cosmos().complete_resubstantiation(h);
 				}
 			}
 
@@ -70,7 +70,7 @@ namespace augs {
 				h.allocator::template remove<T>();
 
 				if (std::is_same<T, components::substance>()) {
-					h.get_cosmos().complete_resubstantialization(h);
+					h.get_cosmos().complete_resubstantiation(h);
 				}
 			}
 		};
@@ -91,12 +91,12 @@ namespace augs {
 
 			void add(const T& t) const {
 				h.allocator::add(t);
-				h.get_cosmos().complete_resubstantialization(h);
+				h.get_cosmos().complete_resubstantiation(h);
 			}
 
 			void remove() const {
 				h.allocator::template remove<T>();
-				h.get_cosmos().complete_resubstantialization(h);
+				h.get_cosmos().complete_resubstantiation(h);
 			}
 		};
 

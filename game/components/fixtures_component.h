@@ -110,7 +110,7 @@ template<>
 class component_synchronizer<false, components::fixtures> : public basic_fixtures_synchronizer<false> {
 	void rebuild_density(size_t) const;
 
-	void resubstantialization() const;
+	void resubstantiation() const;
 
 public:
 	using basic_fixtures_synchronizer<false>::basic_fixtures_synchronizer;
