@@ -10,12 +10,11 @@
 namespace components {
 	struct render {
 		bool interpolate = true;
+		bool absolute_transform = false;
+		bool draw_border = false;
 
 		render_layer layer = render_layer::INVALID;
 
-		bool absolute_transform = false;
-
-		bool draw_border = false;
 		augs::rgba border_color;
 
 		unsigned last_step_when_visible = 0;
@@ -24,12 +23,11 @@ namespace components {
 		void serialize(Archive& ar) {
 			ar(
 				CEREAL_NVP(interpolate),
+				CEREAL_NVP(absolute_transform),
+				CEREAL_NVP(draw_border),
 
 				CEREAL_NVP(layer),
 
-				CEREAL_NVP(absolute_transform),
-
-				CEREAL_NVP(draw_border),
 				CEREAL_NVP(border_color),
 
 				CEREAL_NVP(last_step_when_visible)
