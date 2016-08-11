@@ -6,13 +6,13 @@
 #include "aggregate_mixins.h"
 
 namespace augs {
-	template <class derived, class aggregate_meta, class... components>
+	template <class derived, class... components>
 	class storage_for_components_and_aggregates {
 		typedef component_aggregate<components...> aggregate_type;
 		typedef pool_id<aggregate_type> aggregate_id;
 
 	public:
-		typedef pool_with_meta<aggregate_type, aggregate_meta> aggregate_pool_type;
+		typedef pool<aggregate_type> aggregate_pool_type;
 		typedef tuple_of_t<make_pool, components...> component_pools_type;
 
 		size_t aggregates_count() const {
@@ -41,6 +41,7 @@ namespace augs {
 			return new_id;
 		}
 
+		template <class excluded_component>
 		aggregate_id clone_aggregate(aggregate_id cloned_aggregate_id) {
 			auto& self = *static_cast<derived*>(this);
 
@@ -49,6 +50,9 @@ namespace augs {
 			auto new_aggregate = self.get_handle(self.get_pool(aggregate_id()).allocate());
 
 			for_each_type<components...>([&cloned_aggregate, &new_aggregate](auto c) {
+				if (std::is_same<excluded_component, decltype(c)>::value)
+					return;
+
 				if (cloned_aggregate.template has<decltype(c)>())
 					new_aggregate += cloned_aggregate.template get<decltype(c)>();
 			});

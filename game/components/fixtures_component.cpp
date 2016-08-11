@@ -10,7 +10,6 @@
 #include <string>
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/transcendental/entity_relations.h"
 
 typedef components::fixtures F;
 

@@ -42,6 +42,10 @@ namespace components {
 	struct sentience;
 	struct attitude;
 	struct processing;
+	struct guid;
+	struct child;
+	struct sub_entities;
+	struct physical_relations;
 	struct substance;
 }
 
@@ -87,7 +91,13 @@ struct put_all_components_into {
 		components::sentience,
 		components::attitude,
 		components::processing,
+		components::guid,
+		components::child,
+		components::sub_entities,
+		components::physical_relations,
+
 		components::substance
+
 	> type;
 };
 
@@ -114,14 +124,13 @@ struct type_count {
 };
 
 class cosmos;
-struct entity_relations;
 
 namespace augs {
-	template<class, class, class...>
+	template<class, class...>
 	class storage_for_components_and_aggregates;
 }
 
-typedef typename put_all_components_into<augs::storage_for_components_and_aggregates, cosmos, entity_relations>::type
+typedef typename put_all_components_into<augs::storage_for_components_and_aggregates, cosmos>::type
 storage_for_all_components_and_aggregates;
 
 constexpr unsigned COMPONENTS_COUNT = put_all_components_into<type_count>::type::value;

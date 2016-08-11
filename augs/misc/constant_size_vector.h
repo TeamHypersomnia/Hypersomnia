@@ -8,13 +8,15 @@ namespace augs  {
 		typedef std::array<T, const_count> arr_type;
 
 		arr_type raw;
-		size_t count = 0;
+		size_t count;
 	public:
 		typedef typename arr_type::iterator iterator;
 		typedef typename arr_type::const_iterator const_iterator;
 		typedef T value_type;
 		
-		constant_size_vector() = default;
+		constant_size_vector() : count(0) {
+
+		}
 
 		template <class Iter>
 		constant_size_vector(Iter first, Iter last) {

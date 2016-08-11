@@ -8,8 +8,6 @@
 
 #include "BitStream.h"
 #include "cosmos.h"
-#include "entity_relations.h"
-
 #include "cosmic_delta.h"
 
 template <class T>
@@ -80,10 +78,7 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 		auto stream_written_id = id;
 #endif
 
-		const auto& base_relations = is_new ? entity_relations() : base_entity.get_meta<entity_relations>();
 		const auto& base_components = is_new ? aggregate::component_id_tuple() : base_entity.get().component_ids;
-
-		const auto& enco_relations = enco_entity.get_meta<entity_relations>();
 		const auto& enco_components = agg.component_ids;
 
 		bool entity_changed = false;
@@ -92,10 +87,7 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 		std::array<bool, COMPONENTS_COUNT> removed_components;
 
 		RakNet::BitStream new_content;
-
-		if (write_delta(base_relations, enco_relations, new_content, true))
-			entity_changed = true;
-
+		
 		for_each_in_tuples(base_components, enco_components,
 			[&overridden_components, &removed_components, &entity_changed, &agg, &enco, &base, &new_content](const auto& enco_id, const auto& base_id) {
 			typedef std::decay_t<decltype(enco_id)> encoded_id_type;
@@ -123,14 +115,14 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 		);
 		
 		if (is_new) {
-			bool completely_default = !entity_changed;
-			
-			augs::write_object(new_content, completely_default);
+#if COSMOS_TRACKS_GUIDS
+			augs::write_object(new_content, stream_written_id);
+#else
+			// otherwise new entity_id assignment needs be deterministic
+#endif
 
-			if (!completely_default) {
-				for (bool flag : overridden_components)
-					augs::write_object(new_content, flag);
-			}
+			for (bool flag : overridden_components)
+				augs::write_object(new_content, flag);
 
 			augs::write_object(dt.stream_for_new, new_content);
 

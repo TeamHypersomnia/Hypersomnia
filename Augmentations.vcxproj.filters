@@ -3092,5 +3092,17 @@
     <ClInclude Include="3rdparty\rectpack2D\src\pack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game\components\sub_entities_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\components\physical_relations_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\components\guid_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\components\child_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

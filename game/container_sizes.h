@@ -1,7 +1,7 @@
 #pragma once
 #include <Box2D/Common/b2Settings.h>
 
-#define SUB_ENTITIES_COUNT 10
+#define SUB_ENTITIES_COUNT 3
 #define FIXTURE_ENTITIES_COUNT 10
 #define SPECIFIC_HOSTILE_ENTITIES_COUNT 5
 #define CONCURRENT_TREES_COUNT 5

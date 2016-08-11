@@ -38,8 +38,6 @@
 
 #include "game/messages/health_event.h"
 
-#include "game/transcendental/entity_relations.h"
-
 #include "game/transcendental/types_specification/all_messages_includes.h"
 #include "game/transcendental/types_specification/all_component_includes.h"
 
@@ -101,7 +99,7 @@ void cosmos::assign_next_guid(entity_handle new_entity) {
 	auto this_guid = significant.meta.next_entity_guid++;
 
 	guid_map_for_transport[this_guid] = new_entity;
-	significant.pool_for_aggregates.get_meta<entity_relations>(new_entity).guid = this_guid;
+	new_entity.get<components::guid>().value = this_guid;
 }
 
 void cosmos::clear_guid(entity_handle cleared) {
@@ -184,30 +182,49 @@ const_inventory_slot_handle cosmos::get_handle(inventory_slot_id id) const {
 }
 
 entity_handle cosmos::create_entity(std::string debug_name) {
+
 	auto new_entity = get_handle(allocate_aggregate(debug_name));
+	new_entity += components::guid();
+
 #if COSMOS_TRACKS_GUIDS
 	assign_next_guid(new_entity);
 #endif
+	//ensure(new_entity.get_id().indirection_index != 37046);
+	//ensure(new_entity.get_id().indirection_index != 36985);
 	return new_entity;
 }
 
-entity_handle cosmos::clone_entity(entity_id e) {
-	const_entity_handle copied_entity = get_handle(e);
+entity_handle cosmos::clone_entity(entity_id copied_entity_id) {
+	const_entity_handle copied_entity = get_handle(copied_entity_id);
 	
 	if (copied_entity.dead())
 		return get_handle(entity_id());
 
-	auto new_entity = get_handle(clone_aggregate(copied_entity));
+	auto new_entity = get_handle(clone_aggregate<components::substance>(copied_entity));
+	//ensure(new_entity.get_id().indirection_index != 37046);
+	//ensure(new_entity.get_id().indirection_index != 36985);
 
 #if COSMOS_TRACKS_GUIDS
 	assign_next_guid(new_entity);
 #endif
 
-	new_entity.make_cloned_sub_entities_recursive(e);
+	// zero-out non-trivial relational components
+
+	for_each_type<components::child, components::physical_relations, components::sub_entities>([copied_entity, new_entity](auto c) {
+		typedef decltype(c) T;
+		
+		if (copied_entity.has<T>())
+			new_entity.get<T>() = T();
+	});
+
+	new_entity.make_cloned_sub_entities_recursive(copied_entity_id);
 	
 	if (copied_entity.get_owner_body() == copied_entity) {
 		new_entity.set_owner_body(new_entity);
 	}
+
+	if (copied_entity.has<components::substance>())
+		new_entity.add(components::substance());
 
 	return new_entity;
 }

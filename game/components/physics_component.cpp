@@ -11,7 +11,6 @@
 #include "game/temporary_systems/physics_system.h"
 #include "augs/ensure.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/transcendental/entity_relations.h"
 
 typedef components::physics P;
 

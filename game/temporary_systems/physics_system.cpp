@@ -276,7 +276,7 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 		physics.component.velocity = METERS_TO_PIXELSf * b->GetLinearVelocity();
 		physics.component.angular_velocity = RAD_TO_DEGf * b->GetAngularVelocity();
 
-		for (auto fe : physics.get_fixture_entities()) {
+		for (const auto& fe : physics.get_fixture_entities()) {
 			auto& fixtures = fe.get<components::fixtures>();
 			auto total_offset = fixtures.get_total_offset();
 
