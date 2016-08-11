@@ -64,11 +64,6 @@ public:
 			}
 		}
 	}
-
-	template <class F>
-	void for_each_held_id(F callback) const {
-		relations().for_each_held_id(callback);
-	}
 };
 
 template<bool, class>

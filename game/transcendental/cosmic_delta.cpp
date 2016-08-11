@@ -57,7 +57,6 @@ struct per_entity_delta {
 
 void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStream& out) {
 	enco.profiler.delta_encoding.new_measurement();
-
 	typedef decltype(base.significant.pool_for_aggregates)::element_type aggregate;
 
 	per_entity_delta dt;
@@ -65,6 +64,10 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 	enco.significant.pool_for_aggregates.for_each_with_id([&base, &enco, &dt](const aggregate& agg, entity_id id) {
 		const_entity_handle enco_entity = enco.get_handle(id);
 		const_entity_handle base_entity = base.get_handle(id);
+
+		for_each_held_id(enco_entity, [](const entity_id&) {
+
+		});
 
 		bool is_new = base_entity.dead();
 

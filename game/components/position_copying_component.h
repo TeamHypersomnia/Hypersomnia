@@ -40,6 +40,16 @@ namespace components {
 		float rotation_previous = 0.0f;
 
 	public:
+		template<class F>
+		void for_each_held_id(F f) {
+			f(target);
+		}
+
+		template<class F>
+		void for_each_held_id(F f) const {
+			f(target);
+		}
+
 		template <class Archive>
 		void serialize(Archive& ar) {
 			ar(
