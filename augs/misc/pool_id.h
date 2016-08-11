@@ -49,7 +49,7 @@ namespace augs {
 
 		template<class B>
 		bool operator!=(const B& b) const {
-			return indirection_index == b.indirection_index;
+			return indirection_index != b.indirection_index;
 		}
 
 		template<class B>
