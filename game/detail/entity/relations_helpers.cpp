@@ -33,15 +33,6 @@ void relations_helpers<false, D>::make_cloned_sub_entities_recursive(entity_id f
 }
 
 template <class D>
-void relations_helpers<false, D>::assign_associated_entities(entity_id from) {
-	auto& self = *static_cast<const D*>(this);
-	auto& cosmos = self.get_cosmos();
-	auto from_rels = cosmos[from].relations();
-
-	relations().associated_entities_by_name = from_rels.associated_entities_by_name;
-}
-
-template <class D>
 void relations_helpers<false, D>::set_owner_body(entity_id owner_id) const {
 	auto& self = *static_cast<const D*>(this);
 
@@ -122,21 +113,10 @@ sub_entity_name basic_relations_helpers<C, D>::get_name_as_sub_entity() const {
 }
 
 template <bool C, class D>
-D basic_relations_helpers<C, D>::operator[](associated_entity_name assoc) const {
-	auto& self = *static_cast<const D*>(this);
-	return self.get_cosmos()[relations().associated_entities_by_name.at(assoc)];
-}
-
-template <bool C, class D>
 D basic_relations_helpers<C, D>::get_parent() const {
 	auto& self = *static_cast<const D*>(this);
 	entity_id parent = relations().parent;
 	return self.get_cosmos()[parent];
-}
-
-template <class D>
-void relations_helpers<false, D>::map_associated_entity(associated_entity_name n, entity_id p) const {
-	relations().associated_entities_by_name[n] = p;
 }
 
 template class basic_relations_helpers<false, basic_entity_handle<false>>;

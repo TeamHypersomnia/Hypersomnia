@@ -6,14 +6,12 @@
 #include "game/transcendental/entity_id.h"
 
 #include "game/enums/sub_entity_name.h"
-#include "game/enums/associated_entity_name.h"
 
 #include "game/container_sizes.h"
 #include "game/build_settings.h"
 
 struct entity_relations {
 	augs::enum_associative_array<sub_entity_name, entity_id> sub_entities_by_name;
-	augs::enum_associative_array<associated_entity_name, entity_id> associated_entities_by_name;
 
 	augs::constant_size_vector<entity_id, SUB_ENTITIES_COUNT> sub_entities;
 
@@ -32,7 +30,6 @@ struct entity_relations {
 	void serialize(Archive& ar) {
 		ar(
 			CEREAL_NVP(sub_entities_by_name),
-			CEREAL_NVP(associated_entities_by_name),
 
 			CEREAL_NVP(sub_entities),
 

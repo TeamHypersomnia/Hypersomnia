@@ -6,7 +6,6 @@
 #include "game/transcendental/entity_id.h"
 
 #include "game/enums/slot_function.h"
-#include "game/enums/associated_entity_name.h"
 #include "game/enums/sub_entity_name.h"
 
 #include "game/build_settings.h"
@@ -32,7 +31,6 @@ public:
 
 	inventory_slot_handle_type operator[](slot_function) const;
 	entity_handle_type operator[](sub_entity_name) const;
-	entity_handle_type operator[](associated_entity_name) const;
 
 	sub_entity_name get_name_as_sub_entity() const;
 	
@@ -68,8 +66,26 @@ public:
 	}
 
 	template <class F>
-	void for_each_held_id(F callback) const {
+	void for_each_outgoing_relation(F callback) const {
+		auto& self = *static_cast<const entity_handle_type*>(this);
 
+		{
+			auto& subs = relations().sub_entities;
+
+			for (auto& s : subs) {
+				auto handle = self.get_cosmos()[s];
+				callback(handle);
+			}
+		}
+
+		{
+			auto& subs = relations().sub_entities_by_name;
+
+			for (auto& s : subs) {
+				auto handle = self.get_cosmos()[s.second];
+				callback(handle);
+			}
+		}
 	}
 };
 
@@ -83,11 +99,9 @@ protected:
 public:
 	void set_owner_body(entity_id) const;
 	void make_cloned_sub_entities_recursive(entity_id copied) const;
-	void assign_associated_entities(entity_id from);
 
 	void add_sub_entity(entity_id p, sub_entity_name optional_name = sub_entity_name::INVALID) const;
 	void map_sub_entity(sub_entity_name n, entity_id p) const;
-	void map_associated_entity(associated_entity_name n, entity_id p) const;
 };
 
 template<class entity_handle_type>

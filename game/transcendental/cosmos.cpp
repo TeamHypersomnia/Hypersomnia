@@ -204,7 +204,6 @@ entity_handle cosmos::clone_entity(entity_id e) {
 #endif
 
 	new_entity.make_cloned_sub_entities_recursive(e);
-	new_entity.assign_associated_entities(e);
 	
 	if (copied_entity.get_owner_body() == copied_entity) {
 		new_entity.set_owner_body(new_entity);
