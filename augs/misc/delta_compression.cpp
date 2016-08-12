@@ -40,7 +40,7 @@ namespace augs {
 	}
 
 
-	object_delta delta_encode(const char* base_object, const char* encoded_object, size_t length) {
+	object_delta delta_encode(const char* base_object, const char* encoded_object, const size_t length) {
 		object_delta result;
 
 		std::vector<bool> byte_mask;
@@ -60,8 +60,8 @@ namespace augs {
 		return std::move(result);
 	};
 
-	void delta_decode(char* ptr, size_t length, const object_delta& delta) {
-		char* original_location = ptr;
+	void delta_decode(char* ptr, const size_t length, const object_delta& delta) {
+		const char * const original_location = ptr;
 
 		const auto& changed_offsets = delta.changed_offsets;
 		const auto& changed_bytes = delta.changed_bytes;
