@@ -12,10 +12,14 @@ namespace augs {
 #if USE_NAMES_FOR_IDS
 		constant_size_vector<char, 40> debug_name;
 #endif
-		struct pool_data {
-			int version = -1;
-			int indirection_index = -1;
-		} pool;
+		union {
+			struct pool_data {
+				int version;
+				int indirection_index;
+			} pool;
+
+			unsigned guid;
+		};
 
 		raw_pool_id();
 
