@@ -24,7 +24,7 @@ class cosmic_delta {
 	};
 
 	template <class H, class F>
-	static void for_each_held_id(H handle, F callback) {
+	static void for_each_held_id(const H handle, F callback) {
 		handle.relations().for_each_held_id(callback);
 
 		const auto& ids = handle.get().component_ids;
@@ -33,7 +33,7 @@ class cosmic_delta {
 
 		for_each_in_tuple(ids, [&cosm, &callback](const auto& id) {
 			typedef typename std::decay_t<decltype(id)>::element_type component_type;
-			auto component_handle = cosm[id];
+			const auto component_handle = cosm[id];
 
 			if(component_handle.alive())
 				held_id_introspector<component_type>::for_each_held_id(component_handle.get(), callback);
@@ -43,7 +43,7 @@ class cosmic_delta {
 	template<class T>
 	static void transform_component_ids_to_guids(T& comp, const cosmos& cosm) {
 		held_id_introspector<T>::for_each_held_id(comp, [&cosm](entity_id& id) {
-			unsigned guid = cosm[id].get_guid();
+			const unsigned guid = cosm[id].get_guid();
 			id = entity_id();
 			id.guid = guid;
 		});
@@ -52,12 +52,12 @@ class cosmic_delta {
 	template<class T>
 	static void transform_component_guids_to_ids(T& comp, const cosmos& cosm) {
 		held_id_introspector<T>::for_each_held_id(comp, [&cosm](entity_id& id) {
-			unsigned guid = id.guid;
+			const unsigned guid = id.guid;
 			id = cosm.guid_map_for_transport.at(guid);
 		});
 	}
 
 public:
 	static void encode(const cosmos& base, const cosmos& encoded, RakNet::BitStream& to);
-	static void decode(cosmos& into, RakNet::BitStream& from, bool resubstantiate_partially = false);
+	static void decode(cosmos& into, RakNet::BitStream& from, const bool resubstantiate_partially = false);
 };
