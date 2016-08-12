@@ -43,7 +43,7 @@ void read_delta(T& deco, RakNet::BitStream& in, const bool read_changed_bit = fa
 	}
 }
 
-struct per_entity_delta {
+struct delted_entity_stream {
 	unsigned new_entities = 0;
 	unsigned changed_entities = 0;
 	unsigned removed_entities = 0;
@@ -58,7 +58,7 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 	enco.profiler.delta_encoding.new_measurement();
 	typedef decltype(base.significant.pool_for_aggregates)::element_type aggregate;
 
-	per_entity_delta dt;
+	delted_entity_stream dt;
 
 	enco.significant.pool_for_aggregates.for_each_with_id([&base, &enco, &dt](const aggregate& agg, entity_id id) {
 		const const_entity_handle enco_entity = enco.get_handle(id);
@@ -197,7 +197,7 @@ void cosmic_delta::decode(cosmos& deco, RakNet::BitStream& in, const bool resubs
 
 	read_delta(deco.significant.meta, in, true);
 
-	per_entity_delta dt;
+	delted_entity_stream dt;
 
 	augs::read_object(in, dt.new_entities);
 	augs::read_object(in, dt.changed_entities);
