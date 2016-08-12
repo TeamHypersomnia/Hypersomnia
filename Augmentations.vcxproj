@@ -953,7 +953,6 @@
     <ClInclude Include="game\detail\convex_partitioned_shape.h" />
     <ClInclude Include="game\transcendental\cosmos.h" />
     <ClInclude Include="game\transcendental\entity_id.h" />
-    <ClInclude Include="game\transcendental\entity_relations.h" />
     <ClInclude Include="game\transcendental\entropy_player.h" />
     <ClInclude Include="game\enums\colliders_offset_type.h" />
     <ClInclude Include="game\game_window.h" />

@@ -3005,9 +3005,6 @@
     <ClInclude Include="game\transcendental\cosmic_entropy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\transcendental\entity_relations.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\transcendental\entropy_player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
