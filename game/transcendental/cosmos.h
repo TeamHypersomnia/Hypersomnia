@@ -41,6 +41,8 @@ class cosmos : private storage_for_all_components_and_aggregates, public augs::p
 	void clear_guid(entity_handle);
 	unsigned get_guid(const_entity_handle) const;
 	void remap_guids();
+
+	entity_handle create_entity_with_specific_guid(std::string debug_name, unsigned specific_guid);
 #endif
 
 	template <class D>

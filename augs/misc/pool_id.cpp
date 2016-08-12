@@ -14,8 +14,9 @@ namespace augs {
 	}
 
 	raw_pool_id::raw_pool_id() {
+		guid = 0;
+		ensure(pool.version == 0);
 		pool.indirection_index = -1;
-		pool.version = -1;
 		set_debug_name("unset");
 	}
 

@@ -162,7 +162,7 @@ std::vector<const_entity_handle> cosmos::get(processing_subjects list) const {
 }
 
 randomization cosmos::get_rng_for(entity_id id) const {
-	return { std::abs(id.pool.version) + std::abs(id.pool.indirection_index) + static_cast<size_t>(significant.meta.delta.get_total_steps_passed()) };
+	return { id.pool.version + std::abs(id.pool.indirection_index) + static_cast<size_t>(significant.meta.delta.get_total_steps_passed()) };
 }
 
 entity_handle cosmos::get_handle(entity_id id) {
@@ -193,6 +193,16 @@ entity_handle cosmos::create_entity(std::string debug_name) {
 	//ensure(new_entity.get_id().pool.indirection_index != 36985);
 	return new_entity;
 }
+
+#if COSMOS_TRACKS_GUIDS
+entity_handle cosmos::create_entity_with_specific_guid(std::string debug_name, unsigned specific_guid) {
+	auto new_entity = get_handle(allocate_aggregate(debug_name));
+	new_entity += components::guid();
+
+	guid_map_for_transport[specific_guid] = new_entity;
+	new_entity.get<components::guid>().value = specific_guid;
+}
+#endif
 
 entity_handle cosmos::clone_entity(entity_id copied_entity_id) {
 	const_entity_handle copied_entity = get_handle(copied_entity_id);

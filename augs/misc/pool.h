@@ -29,7 +29,7 @@ namespace augs {
 
 		struct indirector {
 			int real_index = -1;
-			int version = 0;
+			unsigned version = 0;
 
 			template <class Archive>
 			void serialize(Archive& ar) {

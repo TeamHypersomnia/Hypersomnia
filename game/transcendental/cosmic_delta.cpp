@@ -36,8 +36,8 @@ void read_delta(T& deco, RakNet::BitStream& in, const bool read_changed_bit = fa
 		augs::read_object(in, has_changed);
 
 	if (has_changed) {
-		augs::read_vector_short(new_content, dt.changed_bytes);
-		augs::read_vector_short(new_content, dt.changed_offsets);
+		augs::read_vector_short(in, dt.changed_bytes);
+		augs::read_vector_short(in, dt.changed_offsets);
 
 		augs::delta_decode(deco, dt);
 	}
@@ -48,6 +48,7 @@ struct per_entity_delta {
 	unsigned changed_entities = 0;
 	unsigned removed_entities = 0;
 
+	RakNet::BitStream stream_of_new_guids;
 	RakNet::BitStream stream_for_new;
 	RakNet::BitStream stream_for_changed;
 	RakNet::BitStream stream_for_removed;
@@ -70,9 +71,9 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 
 		const const_entity_handle base_entity = base[base_entity_id];
 #else
-		const_entity_handle base_entity = base.get_handle(id);
-		bool is_new = base_entity.dead();
-		auto stream_written_id = id;
+		const const_entity_handle base_entity = base.get_handle(id);
+		const bool is_new = base_entity.dead();
+		const auto stream_written_id = id;
 #endif
 
 		const auto& base_components = is_new ? aggregate::component_id_tuple() : base_entity.get().component_ids;
@@ -90,8 +91,11 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 			typedef std::decay_t<decltype(enco_id)> encoded_id_type;
 
 			constexpr size_t idx = index_in_tuple<encoded_id_type, decltype(agg.component_ids)>::value;
-			const auto enco_c = enco[enco_id];
 			const auto base_c = base[base_id];
+			const auto enco_c = enco[enco_id];
+
+			if (enco_c.dead() && base_c.dead())
+				return;
 
 			if (enco_c.dead() && base_c.alive()) {
 				removed_components[idx] = true;
@@ -101,20 +105,15 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 
 			typedef typename encoded_id_type::element_type component_type;
 			
-			component_type base_compo = base_c.alive() ? base_c.get() : component_type();
-			component_type enco_compo = enco_c.alive() ? enco_c.get() : component_type();
+			const bool base_component_exists = base_c.alive();
 
-			held_id_introspector<component_type>::for_each_held_id(base_compo, [&base](entity_id& id) {
-				unsigned guid = base[id].get_guid();
-				id = entity_id();
-				//id.guid = guid;
-			});
+			component_type base_compo = base_component_exists ? base_c.get() : component_type();
+			component_type enco_compo = enco_c.get();
 
-			held_id_introspector<component_type>::for_each_held_id(enco_compo, [&enco](entity_id& id) {
-				unsigned guid = enco[id].get_guid();
-				id = entity_id();
-				//id.guid = guid;
-			});
+			if (base_component_exists)
+				transform_component_ids_to_guids(base_compo, base);
+
+			transform_component_ids_to_guids(enco_compo, enco);
 
 			if (write_delta(base_compo, enco_compo, new_content)) {
 				entity_changed = true;
@@ -125,7 +124,7 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 		
 		if (is_new) {
 #if COSMOS_TRACKS_GUIDS
-			augs::write_object(new_content, stream_written_id);
+			augs::write_object(dt.stream_of_new_guids, stream_written_id);
 #else
 			// otherwise new entity_id assignment needs be deterministic
 #endif
@@ -181,6 +180,7 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 		augs::write_object(out, dt.changed_entities);
 		augs::write_object(out, dt.removed_entities);
 
+		augs::write_object(out, dt.stream_of_new_guids);
 		augs::write_object(out, dt.stream_for_new);
 		augs::write_object(out, dt.stream_for_changed);
 		augs::write_object(out, dt.stream_for_removed);
@@ -189,12 +189,125 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 	enco.profiler.delta_encoding.end_measurement();
 }
 
-void cosmic_delta::decode(cosmos& into, RakNet::BitStream& in, bool resubstantiate_partially) {
+void cosmic_delta::decode(cosmos& deco, RakNet::BitStream& in, const bool resubstantiate_partially) {
 	if (in.GetNumberOfUnreadBits() == 0)
 		return;
 	
-	into.profiler.delta_decoding.new_measurement();
+	deco.profiler.delta_decoding.new_measurement();
 
+	read_delta(deco.significant.meta, in, true);
 
-	into.profiler.delta_decoding.end_measurement();
+	per_entity_delta dt;
+
+	augs::read_object(in, dt.new_entities);
+	augs::read_object(in, dt.changed_entities);
+	augs::read_object(in, dt.removed_entities);
+
+	size_t new_guids = dt.new_entities;
+	std::vector<entity_handle> new_entities;
+
+	while (dt.new_entities--) {
+#if COSMOS_TRACKS_GUIDS
+		unsigned new_guid;
+		augs::read_object(in, new_guid);
+		
+		new_entities.emplace_back(deco.create_entity_with_specific_guid("delta_created", new_guid));
+#else
+		// otherwise new entity_id assignment needs be deterministic
+#endif
+	}
+
+	for(const auto& new_entity : new_entities) {
+		std::array<bool, COMPONENTS_COUNT> overridden_components;
+
+		for (bool& flag : overridden_components)
+			augs::read_object(in, flag);
+
+		const auto& agg = new_entity.get();
+		const auto& deco_components = agg.component_ids;
+
+		for_each_in_tuple(deco_components,
+			[&overridden_components, &new_entity, &agg, &deco, &in](const auto& deco_id) {
+			typedef std::decay_t<decltype(deco_id)> encoded_id_type;
+			typedef typename encoded_id_type::element_type component_type;
+
+			constexpr size_t idx = index_in_tuple<encoded_id_type, decltype(agg.component_ids)>::value;
+			
+			if (overridden_components[idx]) {
+				component_type decoded_component;
+
+				read_delta(decoded_component, in);
+				transform_component_guids_to_ids(decoded_component, deco);
+
+				new_entity.add(decoded_component);
+			}
+		}
+		);
+	}
+
+	while (dt.changed_entities--) {
+		unsigned guid_of_changed;
+		augs::read_object(in, guid_of_changed);
+
+		const auto changed_entity = deco[deco.guid_map_for_transport.at(guid_of_changed)];
+
+		std::array<bool, COMPONENTS_COUNT> overridden_components;
+		std::array<bool, COMPONENTS_COUNT> removed_components;
+
+		for (bool& flag : overridden_components)
+			augs::read_object(in, flag);
+
+		for (bool& flag : removed_components)
+			augs::read_object(in, flag);
+
+		const auto& agg = changed_entity.get();
+		const auto& deco_components = agg.component_ids;
+
+		for_each_in_tuple(deco_components,
+			[&overridden_components, &removed_components, &changed_entity, &agg, &deco, &in](const auto& deco_id) {
+			typedef std::decay_t<decltype(deco_id)> encoded_id_type;
+			typedef typename encoded_id_type::element_type component_type;
+
+			constexpr size_t idx = index_in_tuple<encoded_id_type, decltype(agg.component_ids)>::value;
+
+			if (overridden_components[idx]) {
+				const auto deco_c = deco[deco_id];
+
+				const bool base_component_exists = deco_c.alive();
+
+				component_type decoded_component = base_component_exists ? deco_c.get() : component_type();
+
+				if (base_component_exists)
+					transform_component_ids_to_guids(decoded_component, deco);
+
+				read_delta(decoded_component, in);
+
+				transform_component_guids_to_ids(decoded_component, deco);
+
+				if (changed_entity.has<component_type>()) 
+					changed_entity.allocator::get<component_type>() = decoded_component;
+				else
+					changed_entity.add(decoded_component);
+			}
+			else if (removed_components[idx]) {
+				changed_entity.remove<component_type>();
+			}
+		}
+		);
+	}
+
+	while (dt.removed_entities--) {
+#if COSMOS_TRACKS_GUIDS
+		unsigned guid_of_destroyed;
+		augs::read_object(in, guid_of_destroyed);
+
+		deco.delete_entity(deco.guid_map_for_transport.at(guid_of_destroyed));
+#else
+		ensure(false);
+#endif
+	}
+
+	ensure(in.GetNumberOfUnreadBits() == 0);
+
+	deco.profiler.delta_decoding.end_measurement();
 }

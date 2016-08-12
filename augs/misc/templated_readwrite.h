@@ -55,16 +55,16 @@ namespace augs {
 		write_bytes(ar, &storage, 1);
 	}
 
-	template<class T, class...>
-	void read_object(RakNet::BitStream& ar, T& storage) {
+	template<class T, class... Args>
+	void read_object(RakNet::BitStream& ar, T& storage, Args... args) {
 		verify_type<T, std::is_same<T, RakNet::BitStream>::value>();
-		ar.Read(storage);
+		ar.Read(storage, args...);
 	}
 
-	template<class T, class...>
-	void write_object(RakNet::BitStream& ar, const T& storage) {
+	template<class T, class... Args>
+	void write_object(RakNet::BitStream& ar, const T& storage, Args... args) {
 		verify_type<T, std::is_same<T, RakNet::BitStream>::value>();
-		ar.Write(storage);
+		ar.Write(storage, args...);
 	}
 
 	template<class A, class T, class...>

@@ -40,6 +40,23 @@ class cosmic_delta {
 		});
 	}
 
+	template<class T>
+	static void transform_component_ids_to_guids(T& comp, const cosmos& cosm) {
+		held_id_introspector<T>::for_each_held_id(comp, [&cosm](entity_id& id) {
+			unsigned guid = cosm[id].get_guid();
+			id = entity_id();
+			id.guid = guid;
+		});
+	}
+
+	template<class T>
+	static void transform_component_guids_to_ids(T& comp, const cosmos& cosm) {
+		held_id_introspector<T>::for_each_held_id(comp, [&cosm](entity_id& id) {
+			unsigned guid = id.guid;
+			id = cosm.guid_map_for_transport.at(guid);
+		});
+	}
+
 public:
 	static void encode(const cosmos& base, const cosmos& encoded, RakNet::BitStream& to);
 	static void decode(cosmos& into, RakNet::BitStream& from, bool resubstantiate_partially = false);

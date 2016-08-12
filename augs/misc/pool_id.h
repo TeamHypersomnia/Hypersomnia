@@ -14,7 +14,7 @@ namespace augs {
 #endif
 		union {
 			struct pool_data {
-				int version;
+				unsigned version;
 				int indirection_index;
 			} pool;
 
