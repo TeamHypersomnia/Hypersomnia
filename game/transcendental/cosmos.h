@@ -61,7 +61,7 @@ public:
 			augs::fixed_delta delta;
 
 #if COSMOS_TRACKS_GUIDS
-			unsigned next_entity_guid = 0;
+			unsigned next_entity_guid = 1;
 #endif
 		} meta;
 

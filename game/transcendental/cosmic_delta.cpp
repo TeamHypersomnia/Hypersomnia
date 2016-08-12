@@ -103,11 +103,17 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 			}
 
 			typedef typename encoded_id_type::element_type component_type;
+			
+			component_type base_compo = base_c.alive() ? base_c.get() : component_type();
+			component_type enco_compo = enco_c.alive() ? enco_c.get() : component_type();
 
-			if (write_delta(
-				base_c.alive() ? base_c.get() : component_type(),
-				enco_c.alive() ? enco_c.get() : component_type(),
-				new_content)) {
+			held_id_introspector<component_type>::for_each_held_id(base_compo, [&base](entity_id& id) {
+				unsigned guid = base[id].get_guid();
+				id = entity_id();
+
+			});
+
+			if (write_delta(base_compo, enco_compo, new_content)) {
 				entity_changed = true;
 				overridden_components[idx] = true;
 			}
@@ -161,7 +167,7 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 
 	RakNet::BitStream new_meta_content;
 
-	bool meta_changed = write_delta(base.significant.meta, enco.significant.meta, new_meta_content);
+	bool meta_changed = write_delta(base.significant.meta, enco.significant.meta, new_meta_content, true);
 
 	bool has_anything_changed = meta_changed || dt.new_entities || dt.changed_entities || dt.removed_entities;
 
