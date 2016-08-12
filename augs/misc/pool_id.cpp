@@ -5,7 +5,7 @@
 
 namespace augs {
 	std::ostream& operator<<(std::ostream& out, const augs::raw_pool_id &x) {
-		out << "(" << x.indirection_index << ";" << x.version;
+		out << "(" << x.pool.indirection_index << ";" << x.pool.version;
 #if USE_NAMES_FOR_IDS
 		out << ";" << x.get_debug_name();
 #endif
@@ -36,7 +36,7 @@ namespace augs {
 	}
 
 	bool raw_pool_id::operator==(const raw_pool_id& b) const {
-		return std::make_tuple(version, indirection_index) == std::make_tuple(b.version, b.indirection_index);
+		return std::make_tuple(pool.version, pool.indirection_index) == std::make_tuple(b.pool.version, b.pool.indirection_index);
 	}
 
 	bool raw_pool_id::operator!=(const raw_pool_id& b) const {
@@ -44,6 +44,6 @@ namespace augs {
 	}
 
 	bool raw_pool_id::operator<(const raw_pool_id& b) const {
-		return std::make_tuple(version, indirection_index) < std::make_tuple(b.version, b.indirection_index);
+		return std::make_tuple(pool.version, pool.indirection_index) < std::make_tuple(b.pool.version, b.pool.indirection_index);
 	}
 }

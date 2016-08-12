@@ -162,7 +162,7 @@ std::vector<const_entity_handle> cosmos::get(processing_subjects list) const {
 }
 
 randomization cosmos::get_rng_for(entity_id id) const {
-	return { std::abs(id.version) + std::abs(id.indirection_index) + static_cast<size_t>(significant.meta.delta.get_total_steps_passed()) };
+	return { std::abs(id.pool.version) + std::abs(id.pool.indirection_index) + static_cast<size_t>(significant.meta.delta.get_total_steps_passed()) };
 }
 
 entity_handle cosmos::get_handle(entity_id id) {
@@ -189,8 +189,8 @@ entity_handle cosmos::create_entity(std::string debug_name) {
 #if COSMOS_TRACKS_GUIDS
 	assign_next_guid(new_entity);
 #endif
-	//ensure(new_entity.get_id().indirection_index != 37046);
-	//ensure(new_entity.get_id().indirection_index != 36985);
+	//ensure(new_entity.get_id().pool.indirection_index != 37046);
+	//ensure(new_entity.get_id().pool.indirection_index != 36985);
 	return new_entity;
 }
 
@@ -201,8 +201,8 @@ entity_handle cosmos::clone_entity(entity_id copied_entity_id) {
 		return get_handle(entity_id());
 
 	auto new_entity = get_handle(clone_aggregate<components::substance>(copied_entity));
-	//ensure(new_entity.get_id().indirection_index != 37046);
-	//ensure(new_entity.get_id().indirection_index != 36985);
+	//ensure(new_entity.get_id().pool.indirection_index != 37046);
+	//ensure(new_entity.get_id().pool.indirection_index != 36985);
 
 #if COSMOS_TRACKS_GUIDS
 	assign_next_guid(new_entity);

@@ -12,8 +12,10 @@ namespace augs {
 #if USE_NAMES_FOR_IDS
 		constant_size_vector<char, 40> debug_name;
 #endif
-		int version = -1;
-		int indirection_index = -1;
+		struct pool_data {
+			int version = -1;
+			int indirection_index = -1;
+		} pool;
 
 		raw_pool_id();
 
@@ -40,21 +42,23 @@ namespace augs {
 
 	template<class T>
 	struct unversioned_id {
-		int indirection_index = -1;
+		struct {
+			int indirection_index = -1;
+		} pool;
 
 		template<class B>
 		bool operator==(const B& b) const {
-			return indirection_index == b.indirection_index;
+			return pool.indirection_index == b.pool.indirection_index;
 		}
 
 		template<class B>
 		bool operator!=(const B& b) const {
-			return indirection_index != b.indirection_index;
+			return pool.indirection_index != b.pool.indirection_index;
 		}
 
 		template<class B>
 		bool operator<(const B& b) const {
-			return indirection_index < b.indirection_index;
+			return pool.indirection_index < b.pool.indirection_index;
 		}
 	};
 
@@ -65,7 +69,7 @@ namespace augs {
 
 		operator unversioned_id<T>() const {
 			unversioned_id<T> un;
-			un.indirection_index = indirection_index;
+			un.pool.indirection_index = pool.indirection_index;
 			return un;
 		}
 

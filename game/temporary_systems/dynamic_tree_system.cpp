@@ -11,7 +11,7 @@ bool dynamic_tree_system::cache::is_constructed() const {
 
 void dynamic_tree_system::destruct(const_entity_handle handle) {
 	auto id = handle.get_id();
-	size_t index = id.indirection_index;
+	size_t index = id.pool.indirection_index;
 
 	auto& cache = per_entity_cache[index];
 
@@ -33,7 +33,7 @@ void dynamic_tree_system::construct(const_entity_handle handle) {
 	if (!handle.has<components::dynamic_tree_node>()) return;
 
 	auto id = handle.get_id();
-	size_t index = id.indirection_index;
+	size_t index = id.pool.indirection_index;
 
 	auto& cache = per_entity_cache[index];
 

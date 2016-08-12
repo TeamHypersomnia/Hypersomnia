@@ -94,13 +94,13 @@ namespace augs {
 			if (!alive(object))
 				return false;
 
-			int dead_index = indirectors[object.indirection_index].real_index;
+			int dead_index = indirectors[object.pool.indirection_index].real_index;
 
 			// add dead object's indirector to the free indirection list
 			free_indirectors.push_back(slots[dead_index].pointing_indirector);
 
 			// therefore we must increase version of the dead indirector
-			++indirectors[object.indirection_index].version;
+			++indirectors[object.pool.indirection_index].version;
 
 			if (dead_index != size() - 1) {
 				int indirector_of_last_element = slots[size() - 1].pointing_indirector;
@@ -135,8 +135,8 @@ namespace augs {
 			indirector.real_index = new_slot_index;
 
 			id_type allocated_id;
-			allocated_id.version = indirector.version;
-			allocated_id.indirection_index = next_free_indirection;
+			allocated_id.pool.version = indirector.version;
+			allocated_id.pool.indirection_index = next_free_indirection;
 
 			slots.push_back(new_slot);
 			pooled.emplace_back(args...);
@@ -155,8 +155,8 @@ namespace augs {
 
 		id_type make_versioned(unversioned_id_type unv) const {
 			id_type ver;
-			ver.indirection_index = unv.indirection_index;
-			ver.version = indirectors[unv.indirection_index].version;
+			ver.pool.indirection_index = unv.pool.indirection_index;
+			ver.pool.version = indirectors[unv.pool.indirection_index].version;
 			return ver;
 		}
 
@@ -174,8 +174,8 @@ namespace augs {
 
 			for (size_t i = 0; i < size(); ++i) {
 				metadata& s = slots[i];
-				id.indirection_index = s.pointing_indirector;
-				id.version = indirectors[s.pointing_indirector].version;
+				id.pool.indirection_index = s.pointing_indirector;
+				id.pool.version = indirectors[s.pointing_indirector].version;
 
 				f(pooled[i], id);
 			}
@@ -187,8 +187,8 @@ namespace augs {
 
 			for (size_t i = 0; i < size(); ++i) {
 				const metadata& s = slots[i];
-				id.indirection_index = s.pointing_indirector;
-				id.version = indirectors[s.pointing_indirector].version;
+				id.pool.indirection_index = s.pointing_indirector;
+				id.pool.version = indirectors[s.pointing_indirector].version;
 
 				f(pooled[i], id);
 			}
@@ -199,8 +199,8 @@ namespace augs {
 
 			for (size_t i = 0; i < size(); ++i) {
 				metadata& s = slots[i];
-				id.indirection_index = s.pointing_indirector;
-				id.version = indirectors[s.pointing_indirector].version;
+				id.pool.indirection_index = s.pointing_indirector;
+				id.pool.version = indirectors[s.pointing_indirector].version;
 
 				f(id);
 			}
@@ -212,8 +212,8 @@ namespace augs {
 
 			for (size_t i = 0; i < size(); ++i) {
 				const metadata& s = slots[i];
-				id.indirection_index = s.pointing_indirector;
-				id.version = indirectors[s.pointing_indirector].version;
+				id.pool.indirection_index = s.pointing_indirector;
+				id.pool.version = indirectors[s.pointing_indirector].version;
 
 				f(id);
 			}
@@ -231,16 +231,16 @@ namespace augs {
 
 		T& get(id_type object) {
 			ensure(alive(object));
-			return pooled[indirectors[object.indirection_index].real_index];
+			return pooled[indirectors[object.pool.indirection_index].real_index];
 		}
 
 		const T& get(id_type object) const {
 			ensure(alive(object));
-			return pooled[indirectors[object.indirection_index].real_index];
+			return pooled[indirectors[object.pool.indirection_index].real_index];
 		}
 
 		bool alive(id_type object) const {
-			return object.indirection_index >= 0 && indirectors[object.indirection_index].version == object.version;
+			return object.pool.indirection_index >= 0 && indirectors[object.pool.indirection_index].version == object.pool.version;
 		}
 
 		basic_pool& get_pool(id_type) {
@@ -343,13 +343,13 @@ namespace augs {
 		template <typename M>
 		M& get_meta(typename basic_pool<T>::id_type object) {
 			ensure(alive(object));
-			return std::get<M>(metas[basic_pool<T>::indirectors[object.indirection_index].real_index]);
+			return std::get<M>(metas[basic_pool<T>::indirectors[object.pool.indirection_index].real_index]);
 		}
 
 		template <typename M>
 		const M& get_meta(typename basic_pool<T>::id_type object) const {
 			ensure(alive(object));
-			return std::get<M>(metas[basic_pool<T>::indirectors[object.indirection_index].real_index]);
+			return std::get<M>(metas[basic_pool<T>::indirectors[object.pool.indirection_index].real_index]);
 		}
 	};
 

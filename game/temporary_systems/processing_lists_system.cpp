@@ -14,7 +14,7 @@ processing_lists_system::processing_lists_system() {
 
 void processing_lists_system::destruct(const_entity_handle handle) {
 	auto id = handle.get_id();
-	size_t index = id.indirection_index;
+	size_t index = id.pool.indirection_index;
 
 	if (per_entity_cache[index].is_constructed) {
 		for (auto& list : lists)
@@ -28,7 +28,7 @@ void processing_lists_system::construct(const_entity_handle handle) {
 	if (!handle.has<components::processing>()) return;
 
 	auto id = handle.get_id();
-	size_t index = id.indirection_index;
+	size_t index = id.pool.indirection_index;
 	
 	ensure(!per_entity_cache[index].is_constructed);
 
