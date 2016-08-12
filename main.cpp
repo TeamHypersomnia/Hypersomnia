@@ -10,7 +10,6 @@
 #include "game/scene_managers/resource_setups/all.h"
 
 #include "game/transcendental/types_specification/all_component_includes.h"
-#include "game/transcendental/entity_relations.h"
 #include "game/transcendental/viewing_session.h"
 
 #include "augs/filesystem/file.h"
@@ -18,6 +17,8 @@
 int main(int argc, char** argv) {
 	augs::global_libraries::init();
 	augs::global_libraries::run_googletest();
+
+	LOG("%x", sizeof(entity_id));
 
 	game_window window;
 
