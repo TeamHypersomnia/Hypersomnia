@@ -303,7 +303,7 @@ void cosmic_delta::decode(cosmos& deco, RakNet::BitStream& in, const bool resubs
 
 		deco.delete_entity(deco.guid_map_for_transport.at(guid_of_destroyed));
 #else
-		ensure(false);
+		static_assert(false, "Unimplemented");
 #endif
 	}
 
