@@ -57,6 +57,9 @@ struct delted_entity_stream {
 };
 
 void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStream& out) {
+	const auto used_bits = out.GetNumberOfBitsUsed();
+	ensure_eq(0, used_bits);
+
 	enco.profiler.delta_encoding.new_measurement();
 	typedef decltype(base.significant.pool_for_aggregates)::element_type aggregate;
 
@@ -312,14 +315,16 @@ void cosmic_delta::decode(cosmos& deco, RakNet::BitStream& in, const bool resubs
 	}
 
 	in.AlignReadToByteBoundary();
-	ensure(in.GetNumberOfUnreadBits() == 0);
+	
+	const auto unread_bits = in.GetNumberOfUnreadBits();
+	ensure_eq(0, unread_bits);
 
 	deco.profiler.delta_decoding.end_measurement();
 }
 
 TEST(CosmicDelta, CosmicDeltaEmptyAndTwoNew) {
-	cosmos c1;
-	cosmos c2;
+	cosmos c1(2);
+	cosmos c2(2);
 
 	const auto new_ent1 = c2.create_entity("e1");
 	const auto new_ent2 = c2.create_entity("e2");
@@ -382,8 +387,8 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndTwoNew) {
 }
 
 TEST(CosmicDelta, CosmicDeltaEmptyAndCreatedThreeEntitiesWithReferences) {
-	cosmos c1;
-	cosmos c2;
+	cosmos c1(3);
+	cosmos c2(3);
 
 	const auto new_ent1 = c2.create_entity("e1");
 	const auto new_ent2 = c2.create_entity("e2");
@@ -450,7 +455,7 @@ TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
 	unsigned c2_second_guid = 0;
 	unsigned c2_third_guid = 0;
 
-	cosmos c1;
+	cosmos c1(3);
 	{
 		const auto new_ent1 = c1.create_entity("e1");
 		const auto new_ent2 = c1.create_entity("e2");
@@ -467,7 +472,7 @@ TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
 		new_ent1.map_sub_entity(sub_entity_name::CHARACTER_CROSSHAIR, new_ent2);
 	}
 
-	cosmos c2;
+	cosmos c2(3);
 	{
 		const auto new_ent1 = c2.create_entity("e1");
 		const auto new_ent2 = c2.create_entity("e2");

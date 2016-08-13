@@ -94,7 +94,7 @@ public:
 		complete_resubstantiation();
 	}
 
-	cosmos();
+	cosmos(unsigned reserved_entities = 0);
 	cosmos(const cosmos&);
 
 	cosmos& operator=(const cosmos&);

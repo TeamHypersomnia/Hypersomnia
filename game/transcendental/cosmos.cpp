@@ -64,8 +64,8 @@ void cosmos::complete_resubstantiation() {
 	index_in_tuple<std::decay_t<const components::dynamic_tree_node&>, put_all_components_into<std::tuple>::type>::value;
 }
 
-cosmos::cosmos() {
-
+cosmos::cosmos(unsigned reserved_entities) {
+	reserve_storage_for_entities(reserved_entities);
 }
 
 cosmos::cosmos(const cosmos& b) {
@@ -215,6 +215,7 @@ entity_handle cosmos::create_entity_with_specific_guid(std::string debug_name, u
 
 	guid_map_for_transport[specific_guid] = new_entity;
 	new_entity.get<components::guid>().value = specific_guid;
+	return new_entity;
 }
 #endif
 

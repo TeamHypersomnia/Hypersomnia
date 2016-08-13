@@ -67,6 +67,11 @@ namespace augs {
 		ar.Write(storage, args...);
 	}
 
+	template<class... Args>
+	void write_object(RakNet::BitStream& ar, RakNet::BitStream& storage, Args... args) {
+		ar.Write(storage, args...);
+	}
+
 	template<class A, class T, class...>
 	void read_object(A& ar, std::vector<T>& storage) {
 		size_t s;
