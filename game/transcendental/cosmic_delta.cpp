@@ -216,6 +216,8 @@ void cosmic_delta::decode(cosmos& deco, RakNet::BitStream& in, const bool resubs
 	
 	deco.profiler.delta_decoding.new_measurement();
 
+	deco.destroy_substance_completely();
+
 	read_delta(deco.significant.meta, in, true);
 
 	delted_entity_stream dt;
@@ -341,6 +343,8 @@ void cosmic_delta::decode(cosmos& deco, RakNet::BitStream& in, const bool resubs
 	
 	const auto unread_bits = in.GetNumberOfUnreadBits();
 	ensure_eq(0, unread_bits);
+
+	deco.create_substance_completely();
 
 	deco.profiler.delta_decoding.end_measurement();
 }

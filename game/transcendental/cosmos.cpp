@@ -45,7 +45,14 @@
 
 void cosmos::complete_resubstantiation() {
 	profiler.complete_resubstantiation.new_measurement();
+	
+	destroy_substance_completely();
+	create_substance_completely();
 
+	profiler.complete_resubstantiation.end_measurement();
+}
+
+void cosmos::destroy_substance_completely() {
 	temporary_systems.~storage_for_all_temporary_systems();
 	new (&temporary_systems) storage_for_all_temporary_systems;
 
@@ -57,11 +64,29 @@ void cosmos::complete_resubstantiation() {
 
 	for_each_entity_id([this](entity_id id) {
 		auto h = get_handle(id);
-		complete_resubstantiation(h);
+		destroy_substance_for_entity(h);
 	});
+}
 
-	profiler.complete_resubstantiation.end_measurement();
-	index_in_tuple<std::decay_t<const components::dynamic_tree_node&>, put_all_components_into<std::tuple>::type>::value;
+void cosmos::create_substance_completely() {
+	for_each_entity_id([this](entity_id id) {
+		auto h = get_handle(id);
+		create_substance_for_entity(h);
+	});
+}
+
+void cosmos::destroy_substance_for_entity(const_entity_handle h) {
+	temporary_systems.for_each([h](auto& sys) {
+		sys.destruct(h);
+	});
+}
+
+void cosmos::create_substance_for_entity(const_entity_handle h) {
+	if (h.has<components::substance>()) {
+		temporary_systems.for_each([h](auto& sys) {
+			sys.construct(h);
+		});
+	}
 }
 
 cosmos::cosmos(unsigned reserved_entities) {
@@ -129,16 +154,9 @@ cosmos& cosmos::operator=(const significant_state& b) {
 	return *this;
 }
 
-void cosmos::complete_resubstantiation(entity_handle h) {
-	temporary_systems.for_each([h](auto& sys) {
-		sys.destruct(h);
-	});
-
-	if (h.has<components::substance>()) {
-		temporary_systems.for_each([h](auto& sys) {
-			sys.construct(h);
-		});
-	}
+void cosmos::complete_resubstantiation(const_entity_handle h) {
+	destroy_substance_for_entity(h);
+	create_substance_for_entity(h);
 }
 
 void cosmos::reserve_storage_for_entities(size_t n) {

@@ -51,6 +51,11 @@ class cosmos : private storage_for_all_components_and_aggregates, public augs::p
 		significant.pool_for_aggregates.for_each_id(pred);
 	}
 
+	void destroy_substance_completely();
+	void create_substance_completely();
+	void destroy_substance_for_entity(const_entity_handle);
+	void create_substance_for_entity(const_entity_handle);
+
 public:
 	storage_for_all_temporary_systems temporary_systems;
 	cosmic_profiler profiler;
@@ -123,7 +128,7 @@ public:
 	void refresh_for_new_significant_state();
 
 	void complete_resubstantiation();
-	void complete_resubstantiation(entity_handle);
+	void complete_resubstantiation(const_entity_handle);
 
 	template<class System>
 	void partial_resubstantiation(entity_handle handle) {

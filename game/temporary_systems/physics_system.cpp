@@ -80,7 +80,9 @@ void physics_system::destruct(const_entity_handle handle) {
 }
 
 void physics_system::fixtures_construct(const_entity_handle handle) {
-	ensure(!is_constructed_colliders(handle));
+	//ensure(!is_constructed_colliders(handle));
+	if (is_constructed_colliders(handle))
+		return;
 
 	if (handle.has<components::fixtures>()) {
 		auto& colliders = handle.get<components::fixtures>();
@@ -133,8 +135,10 @@ void physics_system::fixtures_construct(const_entity_handle handle) {
 }
 
 void physics_system::construct(const_entity_handle handle) {
-	ensure(!is_constructed_rigid_body(handle));
-	
+	//ensure(!is_constructed_rigid_body(handle));
+	if (is_constructed_rigid_body(handle))
+		return;
+
 	fixtures_construct(handle);
 
 	if (handle.has<components::physics>()) {
