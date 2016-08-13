@@ -406,6 +406,7 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndTwoNew) {
 		cosmic_delta::encode(c1, c2, comparatory);
 
 		ASSERT_EQ(0, comparatory.GetNumberOfBitsUsed());
+		ASSERT_TRUE(c1 == c2);
 	}
 }
 
