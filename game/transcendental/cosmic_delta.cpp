@@ -88,6 +88,8 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 
 		std::array<bool, COMPONENTS_COUNT> overridden_components;
 		std::array<bool, COMPONENTS_COUNT> removed_components;
+		std::fill(overridden_components.begin(), overridden_components.end(), false);
+		std::fill(removed_components.begin(), removed_components.end(), false);
 
 		RakNet::BitStream new_content;
 		
@@ -226,6 +228,7 @@ void cosmic_delta::decode(cosmos& deco, RakNet::BitStream& in, const bool resubs
 
 	for(const auto& new_entity : new_entities) {
 		std::array<bool, COMPONENTS_COUNT> overridden_components;
+		std::fill(overridden_components.begin(), overridden_components.end(), false);
 
 		for (bool& flag : overridden_components)
 			augs::read_object(in, flag);
@@ -359,30 +362,30 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndTwoNew) {
 	// check if components are intact after encode/decode cycle
 
 
-	EXPECT_EQ(2, c1.entities_count());
-	EXPECT_EQ(2, c2.entities_count());
-	EXPECT_EQ(true, ent1.has<components::transform>());
+	ASSERT_EQ(2, c1.entities_count());
+	ASSERT_EQ(2, c2.entities_count());
+	ASSERT_TRUE(ent1.has<components::transform>());
 	bool transform_intact = ent1.get<components::transform>() == first_transform;
-	EXPECT_EQ(true, transform_intact);
-	EXPECT_EQ(true, ent1.has<components::physics>());
-	EXPECT_EQ(true, ent1.has<components::render>());
-	EXPECT_EQ(true, ent1.has<components::sprite>());
-	EXPECT_EQ(false, ent1.has<components::trace>());
+	ASSERT_TRUE(transform_intact);
+	ASSERT_TRUE(ent1.has<components::physics>());
+	ASSERT_TRUE(ent1.has<components::render>());
+	ASSERT_TRUE(ent1.has<components::sprite>());
+	ASSERT_FALSE(ent1.has<components::trace>());
 
-	EXPECT_EQ(true, ent2.has<components::transform>());
+	ASSERT_TRUE(ent2.has<components::transform>());
 	bool default_transform_intact = ent2.get<components::transform>() == components::transform();
-	EXPECT_EQ(true, default_transform_intact);
-	EXPECT_EQ(false, ent2.has<components::physics>());
-	EXPECT_EQ(false, ent2.has<components::render>());
-	EXPECT_EQ(false, ent2.has<components::sprite>());
-	EXPECT_EQ(true, ent2.has<components::trace>());
+	ASSERT_TRUE(default_transform_intact);
+	ASSERT_FALSE(ent2.has<components::physics>());
+	ASSERT_FALSE(ent2.has<components::render>());
+	ASSERT_FALSE(ent2.has<components::sprite>());
+	ASSERT_TRUE(ent2.has<components::trace>());
 
 	{
 		RakNet::BitStream comparatory;
 		
 		cosmic_delta::encode(c1, c2, comparatory);
 
-		EXPECT_EQ(0, comparatory.GetNumberOfBitsUsed());
+		ASSERT_EQ(0, comparatory.GetNumberOfBitsUsed());
 	}
 }
 
@@ -414,35 +417,35 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndCreatedThreeEntitiesWithReferences) {
 		cosmic_delta::decode(c1, s);
 	}
 
-	EXPECT_EQ(3, c1.entities_count());
-	EXPECT_EQ(3, c2.entities_count());
+	ASSERT_EQ(3, c1.entities_count());
+	ASSERT_EQ(3, c2.entities_count());
 
 	const auto ent1 = c1.get_entity_by_guid(first_guid);
 	const auto ent2 = c1.get_entity_by_guid(second_guid);
 	const auto ent3 = c1.get_entity_by_guid(third_guid);
 
-	EXPECT_EQ(true, ent1.has<components::position_copying>());
+	ASSERT_TRUE(ent1.has<components::position_copying>());
 	bool pc1_intact = ent1.get<components::position_copying>().target == ent2.get_id();
-	EXPECT_EQ(true, pc1_intact);
+	ASSERT_TRUE(pc1_intact);
 
-	EXPECT_EQ(true, ent2.has<components::position_copying>());
+	ASSERT_TRUE(ent2.has<components::position_copying>());
 	bool pc2_intact = ent2.get<components::position_copying>().target == ent3.get_id();
-	EXPECT_EQ(true, pc2_intact);
+	ASSERT_TRUE(pc2_intact);
 
-	EXPECT_EQ(true, ent3.has<components::position_copying>());
+	ASSERT_TRUE(ent3.has<components::position_copying>());
 	bool pc3_intact = ent3.get<components::position_copying>().target == ent1.get_id();
-	EXPECT_EQ(true, pc3_intact);
+	ASSERT_TRUE(pc3_intact);
 
-	EXPECT_EQ(true, ent1.has<components::sub_entities>());
+	ASSERT_TRUE(ent1.has<components::sub_entities>());
 	bool sub_entities_intact = ent1.get<components::sub_entities>().sub_entities_by_name[sub_entity_name::CHARACTER_CROSSHAIR] == ent2.get_id();
-	EXPECT_EQ(true, sub_entities_intact);
+	ASSERT_TRUE(sub_entities_intact);
 
 	{
 		RakNet::BitStream comparatory;
 
 		cosmic_delta::encode(c1, c2, comparatory);
 
-		EXPECT_EQ(0, comparatory.GetNumberOfBitsUsed());
+		ASSERT_EQ(0, comparatory.GetNumberOfBitsUsed());
 	}
 }
 
@@ -489,19 +492,19 @@ TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
 		new_ent1.map_sub_entity(sub_entity_name::CHARACTER_CROSSHAIR, new_ent2);
 	}
 
-	EXPECT_EQ(3, c1.entities_count());
-	EXPECT_EQ(3, c2.entities_count());
+	ASSERT_EQ(3, c1.entities_count());
+	ASSERT_EQ(3, c2.entities_count());
 
 	{
 		RakNet::BitStream comparatory;
 
 		cosmic_delta::encode(c1, c2, comparatory);
 
-		EXPECT_EQ(0, comparatory.GetNumberOfBitsUsed());
+		ASSERT_EQ(0, comparatory.GetNumberOfBitsUsed());
 	}
 
 	c2.delete_entity(c2.get_entity_by_guid(c2_first_guid));
-	EXPECT_EQ(2, c2.entities_count());
+	ASSERT_EQ(2, c2.entities_count());
 
 	{
 		RakNet::BitStream s;
@@ -513,21 +516,21 @@ TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
 		cosmic_delta::decode(c1, s);
 	}
 
-	EXPECT_EQ(2, c1.entities_count());
+	ASSERT_EQ(2, c1.entities_count());
 
 	const auto ent1 = c1.get_entity_by_guid(c1_first_guid);
-	EXPECT_EQ(false, c1.entity_exists_with_guid(c1_second_guid));
+	ASSERT_FALSE(c1.entity_exists_with_guid(c1_second_guid));
 	const auto ent3 = c1.get_entity_by_guid(c1_third_guid);
 
-	EXPECT_EQ(true, ent1.has<components::position_copying>());
+	ASSERT_TRUE(ent1.has<components::position_copying>());
 	bool pc1_dead = c1[ent1.get<components::position_copying>().target].dead();
-	EXPECT_EQ(true, pc1_dead);
+	ASSERT_TRUE(pc1_dead);
 
-	EXPECT_EQ(true, ent1.has<components::sub_entities>());
+	ASSERT_TRUE(ent1.has<components::sub_entities>());
 	bool sub_entity_dead = c1[ent1.get<components::sub_entities>().sub_entities_by_name[sub_entity_name::CHARACTER_CROSSHAIR]].dead();
-	EXPECT_EQ(true, sub_entity_dead);
+	ASSERT_TRUE(sub_entity_dead);
 
-	EXPECT_EQ(true, ent3.has<components::position_copying>());
+	ASSERT_TRUE(ent3.has<components::position_copying>());
 	bool pc3_intact = ent3.get<components::position_copying>().target == ent1.get_id();
-	EXPECT_EQ(true, pc3_intact);
+	ASSERT_TRUE(pc3_intact);
 }
