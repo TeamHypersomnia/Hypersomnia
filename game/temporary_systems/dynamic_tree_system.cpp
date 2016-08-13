@@ -18,12 +18,8 @@ void dynamic_tree_system::destruct(const_entity_handle handle) {
 	if (cache.is_constructed()) {
 		remove_element(always_visible_entities, handle.get_id());
 
-		if (cache.tree_proxy_id != -1) {
-			auto* userdata = non_physical_objects_tree.GetUserData(cache.tree_proxy_id);
-			ensure(userdata != nullptr);
-			delete ((unversioned_entity_id*)userdata);
+		if (cache.tree_proxy_id != -1)
 			non_physical_objects_tree.DestroyProxy(cache.tree_proxy_id);
-		}
 
 		per_entity_cache[index] = dynamic_tree_system::cache();
 	}
@@ -51,10 +47,13 @@ void dynamic_tree_system::construct(const_entity_handle handle) {
 			b2AABB input;
 			input.lowerBound = data.aabb.left_top();
 			input.upperBound = data.aabb.right_bottom();
+			
+			unversioned_entity_id node_userdata(handle.get_id());
+			static_assert(sizeof(node_userdata) == sizeof(void*), "Userdata must be of size of void*");
 
-			cache.tree_proxy_id = non_physical_objects_tree.CreateProxy(input, new unversioned_entity_id(handle.get_id()));
+			cache.tree_proxy_id = non_physical_objects_tree.CreateProxy(input, reinterpret_cast<void*>(node_userdata.pool.indirection_index));
 		}
-
+		
 		cache.constructed = true;
 	}
 }
@@ -73,7 +72,11 @@ std::vector<unversioned_entity_id> dynamic_tree_system::determine_visible_entiti
 		const b2DynamicTree* tree;
 		std::vector<unversioned_entity_id>* visible_entities;
 		bool QueryCallback(int32 node) {
-			visible_entities->push_back(*((unversioned_entity_id*)tree->GetUserData(node)));
+			unversioned_entity_id id;
+			id.pool.indirection_index = reinterpret_cast<int>(tree->GetUserData(node));
+			static_assert(std::is_same<decltype(id.pool.indirection_index), int>::value, "Userdata types incompatible");
+
+			visible_entities->push_back(id);
 			return true;
 		}
 	};
