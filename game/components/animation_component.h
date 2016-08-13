@@ -9,7 +9,7 @@ namespace components {
 			PAUSED
 		};
 
-		assets::animation_id current_animation;
+		assets::animation_id current_animation = assets::animation_id::INVALID;
 
 		int priority = 0;
 		unsigned frame_num = 0;

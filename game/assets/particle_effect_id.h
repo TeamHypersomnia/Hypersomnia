@@ -2,7 +2,9 @@
 #include "game/resources/particle_effect.h"
 
 namespace assets {
-	enum particle_effect_id {
+	enum class particle_effect_id {
+		INVALID,
+
 		PIXEL_BURST,
 		PIXEL_PROJECTILE_TRACE,
 		PIXEL_BARREL_LEAVE_EXPLOSION,

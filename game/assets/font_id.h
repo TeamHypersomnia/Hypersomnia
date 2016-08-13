@@ -1,8 +1,9 @@
 #pragma once
 
 namespace assets {
-	enum font_id {
+	enum class font_id {
 		INVALID,
+
 		GUI_FONT
 	};
 }

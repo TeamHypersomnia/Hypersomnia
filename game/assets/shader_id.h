@@ -1,7 +1,9 @@
 #pragma once
 
 namespace assets {
-	enum shader_id {
+	enum class shader_id {
+		INVALID,
+
 		DEFAULT_VERTEX,
 		DEFAULT_FRAGMENT,
 		DEFAULT_HIGHLIGHT_VERTEX,

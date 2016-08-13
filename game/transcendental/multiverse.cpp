@@ -203,7 +203,7 @@ void multiverse::print_summary(augs::renderer& target, const viewing_session& se
 	auto vel = controlled.get<components::physics>().velocity();
 
 	quick_print_format(target.triangles, typesafe_sprintf(L"X: %f2\nY: %f2\nVelX: %x\nVelY: %x\n", coords.x, coords.y, vel.x, vel.y)
-		+ summary(show_profile_details, session), style(assets::GUI_FONT, rgba(255, 255, 255, 150)), vec2i(0, 0), 0);
+		+ summary(show_profile_details, session), style(assets::font_id::GUI_FONT, rgba(255, 255, 255, 150)), vec2i(0, 0), 0);
 
 	target.call_triangles();
 	target.clear_triangles();

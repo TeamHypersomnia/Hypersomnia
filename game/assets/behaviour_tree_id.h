@@ -5,7 +5,9 @@ namespace resources {
 }
 
 namespace assets {
-	enum behaviour_tree_id {
+	enum class behaviour_tree_id {
+		INVALID,
+
 		SOLDIER_MOVEMENT,
 		HOSTILE_TARGET_PRIORITIZATION,
 		ITEM_PICKER,

@@ -2,7 +2,9 @@
 #include "game/resources/animation_response.h"
 
 namespace assets {
-	enum animation_response_id {
+	enum class animation_response_id {
+		INVALID,
+
 		TORSO_SET,
 	};
 }

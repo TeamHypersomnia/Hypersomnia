@@ -1,7 +1,9 @@
 #pragma once
 
 namespace assets {
-	enum animation_id {
+	enum class animation_id {
+		INVALID,
+
 		TORSO_MOVE,
 		TORSO_SHOOT,
 	};

@@ -2,8 +2,9 @@
 #include "augs/math/vec2.h"
 
 namespace assets {
-	enum texture_id {
-		INVALID_TEXTURE,
+	enum class texture_id {
+		INVALID,
+
 		BLANK,
 
 		CRATE,

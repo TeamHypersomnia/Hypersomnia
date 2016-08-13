@@ -148,9 +148,9 @@ namespace resources {
 	}
 
 	void manager::create_sprites_indexed(assets::texture_id first, assets::texture_id last, std::string filename_preffix) {
-		for (assets::texture_id i = first; i < last; i = assets::texture_id(i + 1)) {
+		for (assets::texture_id i = first; i < last; i = assets::texture_id(int(i) + 1)) {
 			std::ostringstream filename;
-			filename << filename_preffix << "_" << int(i - first + 1) << ".png";
+			filename << filename_preffix << "_" << int(int(i) - int(first) + 1) << ".png";
 
 			create(i, filename.str());
 		}
@@ -169,7 +169,7 @@ namespace resources {
 		animation& anim = create(id);
 		anim.loop_mode = loop_mode;
 
-		for (assets::texture_id i = first_frame; i < last_frame; i = assets::texture_id(i+1)) {
+		for (assets::texture_id i = first_frame; i < last_frame; i = assets::texture_id(int(i)+1)) {
 			animation::frame frame;
 			frame.duration_milliseconds = frame_duration_ms;
 			frame.sprite.set(i);
@@ -184,7 +184,7 @@ namespace resources {
 		animation& anim = create(id);
 		anim.loop_mode = animation::loop_type::INVERSE;
 
-		for (assets::texture_id i = first_frame; i < last_frame; i = assets::texture_id(i + 1)) {
+		for (assets::texture_id i = first_frame; i < last_frame; i = assets::texture_id(int(i) + 1)) {
 			animation::frame frame;
 			frame.duration_milliseconds = frame_duration_ms;
 			frame.sprite.set(i);
@@ -199,7 +199,7 @@ namespace resources {
 		animation& anim = create(id);
 		anim.loop_mode = animation::loop_type::REPEAT;
 
-		for (assets::texture_id i = first_frame; i < last_frame; i = assets::texture_id(i + 1)) {
+		for (assets::texture_id i = first_frame; i < last_frame; i = assets::texture_id(int(i) + 1)) {
 			animation::frame frame;
 			frame.duration_milliseconds = frame_duration_ms;
 			frame.sprite.set(i);
@@ -207,7 +207,7 @@ namespace resources {
 			anim.frames.push_back(frame);
 		}
 
-		for (assets::texture_id i = assets::texture_id(last_frame - 1); i >= first_frame; i = assets::texture_id(i - 1)) {
+		for (assets::texture_id i = assets::texture_id(int(last_frame) - 1); i >= first_frame; i = assets::texture_id(int(i) - 1)) {
 			animation::frame frame;
 			frame.duration_milliseconds = frame_duration_ms;
 			frame.sprite.set(i);
@@ -215,7 +215,7 @@ namespace resources {
 			anim.frames.push_back(frame);
 		}
 
-		for (assets::texture_id i = first_frame; i < last_frame; i = assets::texture_id(i + 1)) {
+		for (assets::texture_id i = first_frame; i < last_frame; i = assets::texture_id(int(i) + 1)) {
 			animation::frame frame;
 			frame.duration_milliseconds = frame_duration_ms;
 			frame.sprite.set(i);
@@ -224,7 +224,7 @@ namespace resources {
 			anim.frames.push_back(frame);
 		}
 
-		for (assets::texture_id i = assets::texture_id(last_frame - 1); i >= first_frame; i = assets::texture_id(i - 1)) {
+		for (assets::texture_id i = assets::texture_id(int(last_frame) - 1); i >= first_frame; i = assets::texture_id(int(i) - 1)) {
 			animation::frame frame;
 			frame.duration_milliseconds = frame_duration_ms;
 			frame.sprite.set(i);

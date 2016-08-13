@@ -23,7 +23,7 @@ namespace resource_setups {
 				particle_template.angular_damping = 0;
 				particle_template.linear_damping = 5000;
 				particle_template.should_disappear = true;
-				particle_template.face.set(assets::texture_id(assets::PIXEL_THUNDER_FIRST + i), augs::rgba(255, 255, 255, 255));
+				particle_template.face.set(assets::texture_id(int(assets::texture_id::PIXEL_THUNDER_FIRST) + i), augs::rgba(255, 255, 255, 255));
 				particle_template.alpha_levels = 1;
 
 				em.particle_templates.push_back(particle_template);
@@ -53,7 +53,7 @@ namespace resource_setups {
 				particle_template.angular_damping = 0;
 				particle_template.linear_damping = 5000;
 				particle_template.should_disappear = true;
-				particle_template.face.set(assets::texture_id(assets::PIXEL_THUNDER_FIRST + i), augs::rgba(255, 255, 255, 255));
+				particle_template.face.set(assets::texture_id(int(assets::texture_id::PIXEL_THUNDER_FIRST) + i), augs::rgba(255, 255, 255, 255));
 				particle_template.alpha_levels = 1;
 
 				em.particle_templates.push_back(particle_template);
@@ -84,7 +84,7 @@ namespace resource_setups {
 				particle_template.angular_damping = 0;
 				particle_template.linear_damping = 0;
 				particle_template.should_disappear = true;
-				particle_template.face.set(assets::texture_id(assets::BLANK), augs::rgba(255, 255, 255, 255));
+				particle_template.face.set(assets::texture_id(assets::texture_id::BLANK), augs::rgba(255, 255, 255, 255));
 				particle_template.face.size.set(1, 1);
 				particle_template.alpha_levels = 1;
 
@@ -115,7 +115,7 @@ namespace resource_setups {
 				particle_template.angular_damping = 0;
 				particle_template.linear_damping = 1000;
 				particle_template.should_disappear = true;
-				particle_template.face.set(assets::texture_id(assets::BLANK), augs::rgba(255, 255, 255, 255));
+				particle_template.face.set(assets::texture_id(assets::texture_id::BLANK), augs::rgba(255, 255, 255, 255));
 				particle_template.face.size.set(1, 1);
 				particle_template.alpha_levels = 1;
 
@@ -151,7 +151,7 @@ namespace resource_setups {
 				particle_template.angular_damping = 0;
 				particle_template.linear_damping = 0;
 				particle_template.should_disappear = true;
-				particle_template.face.set(assets::texture_id(assets::BLANK), augs::rgba(255, 255, 255, 255));
+				particle_template.face.set(assets::texture_id(assets::texture_id::BLANK), augs::rgba(255, 255, 255, 255));
 				particle_template.face.size.set(1, 1);
 				particle_template.alpha_levels = 1;
 
@@ -192,7 +192,7 @@ namespace resource_setups {
 				particle_template.angular_damping = 0;
 				particle_template.linear_damping = 10;
 				particle_template.should_disappear = true;
-				particle_template.face.set(assets::texture_id(assets::SMOKE_PARTICLE_FIRST + i), augs::rgba(255, 0, 0, 255));
+				particle_template.face.set(assets::texture_id(int(assets::texture_id::SMOKE_PARTICLE_FIRST) + i), augs::rgba(255, 0, 0, 255));
 				particle_template.face.size_multiplier.set(0.4, 0.4);
 
 				em.particle_templates.push_back(particle_template);

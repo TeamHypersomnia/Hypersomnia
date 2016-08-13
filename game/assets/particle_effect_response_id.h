@@ -2,7 +2,9 @@
 #include "game/resources/particle_effect_response.h"
 
 namespace assets {
-	enum particle_effect_response_id {
+	enum class particle_effect_response_id {
+		INVALID,
+
 		FIREARM_RESPONSE,
 		ELECTRIC_CHARGE_RESPONSE,
 		HEALING_CHARGE_RESPONSE,

@@ -90,7 +90,7 @@ namespace ingredients {
 		auto& force_joint = e += components::force_joint();
 		auto& sentience = e += components::sentience();
 		e += components::position_copying(); // used when it is an astral body
-		auto& particle_response = e += components::particle_effect_response({ assets::particle_effect_response_id::CHARACTER_RESPONSE });
+		auto& particle_response = e += components::particle_effect_response { assets::particle_effect_response_id::CHARACTER_RESPONSE };
 		auto& attitude = e += components::attitude();
 		auto& processing = e += components::processing();
 

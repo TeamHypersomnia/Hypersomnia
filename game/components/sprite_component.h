@@ -26,7 +26,7 @@ namespace components {
 			void setup_from(const state_for_drawing_camera&);
 		};
 
-		assets::texture_id tex = assets::texture_id::INVALID_TEXTURE;
+		assets::texture_id tex = assets::texture_id::INVALID;
 		augs::rgba color;
 		vec2 size;
 		vec2 size_multiplier = vec2(1, 1);

@@ -62,7 +62,7 @@ namespace components {
 
 	void sprite::draw(const drawing_input& in) const {
 		std::array<vec2, 4> v;
-		ensure(tex != assets::texture_id::INVALID_TEXTURE);
+		ensure(tex != assets::texture_id::INVALID);
 
 		vec2i transform_pos = in.renderable_transform.pos;
 

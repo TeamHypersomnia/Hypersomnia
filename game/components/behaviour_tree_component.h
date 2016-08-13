@@ -11,7 +11,7 @@ namespace components {
 	struct behaviour_tree {
 		struct instance {
 			resources::behaviour_tree::state_of_tree_instance state;
-			assets::behaviour_tree_id tree_id;
+			assets::behaviour_tree_id tree_id = assets::behaviour_tree_id::INVALID;
 
 			template <class Archive>
 			void serialize(Archive& ar) {

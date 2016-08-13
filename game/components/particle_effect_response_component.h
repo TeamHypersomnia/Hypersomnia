@@ -10,6 +10,9 @@ namespace components {
 		assets::particle_effect_response_id response;
 		resources::particle_effect_modifier modifier;
 
+		particle_effect_response(assets::particle_effect_response_id resp = assets::particle_effect_response_id::INVALID) : response(resp){
+		}
+
 		template <class Archive>
 		void serialize(Archive& ar) {
 			ar(

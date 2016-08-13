@@ -1,7 +1,9 @@
 #pragma once
 
 namespace assets {
-	enum atlas_id {
+	enum class atlas_id {
+		INVALID,
+
 		GAME_WORLD_ATLAS,
 	};
 }
