@@ -43,9 +43,11 @@ class cosmic_delta {
 	template<class T>
 	static void transform_component_ids_to_guids(T& comp, const cosmos& cosm) {
 		held_id_introspector<T>::for_each_held_id(comp, [&cosm](entity_id& id) {
-			const unsigned guid = cosm[id].get_guid();
+			auto handle = cosm[id];
 			id = entity_id();
-			id.guid = guid;
+
+			if (handle.alive())
+				id.guid = handle.get_guid();
 		});
 	}
 
@@ -53,7 +55,9 @@ class cosmic_delta {
 	static void transform_component_guids_to_ids(T& comp, const cosmos& cosm) {
 		held_id_introspector<T>::for_each_held_id(comp, [&cosm](entity_id& id) {
 			const unsigned guid = id.guid;
-			id = cosm.guid_map_for_transport.at(guid);
+			
+			if(guid != 0)
+				id = cosm.guid_map_for_transport.at(guid);
 		});
 	}
 

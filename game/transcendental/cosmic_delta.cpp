@@ -96,35 +96,42 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 		for_each_in_tuples(base_components, enco_components,
 			[&overridden_components, &removed_components, &entity_changed, &agg, &enco, &base, &new_content](const auto& base_id, const auto& enco_id) {
 			typedef std::decay_t<decltype(enco_id)> encoded_id_type;
+			typedef typename encoded_id_type::element_type component_type;
 
 			constexpr size_t idx = index_in_tuple<encoded_id_type, decltype(agg.component_ids)>::value;
+
 			const auto base_c = base[base_id];
 			const auto enco_c = enco[enco_id];
 
 			if (enco_c.dead() && base_c.dead())
 				return;
-
-			if (enco_c.dead() && base_c.alive()) {
-				removed_components[idx] = true;
+			else if (enco_c.dead() && base_c.alive()) {
 				entity_changed = true;
+				removed_components[idx] = true;
 				return;
 			}
+			else if (enco_c.alive() && base_c.dead()) {
+				component_type base_compo;
+				component_type enco_compo = enco_c.get();
 
-			typedef typename encoded_id_type::element_type component_type;
-			
-			const bool base_component_exists = base_c.alive();
+				transform_component_ids_to_guids(enco_compo, enco);
 
-			component_type base_compo = base_component_exists ? base_c.get() : component_type();
-			component_type enco_compo = enco_c.get();
+				write_delta(base_compo, enco_compo, new_content, true);
 
-			if (base_component_exists)
-				transform_component_ids_to_guids(base_compo, base);
-
-			transform_component_ids_to_guids(enco_compo, enco);
-
-			if (write_delta(base_compo, enco_compo, new_content)) {
 				entity_changed = true;
 				overridden_components[idx] = true;
+			}
+			else {
+				component_type base_compo = base_c.get();
+				component_type enco_compo = enco_c.get();
+
+				transform_component_ids_to_guids(base_compo, base);
+				transform_component_ids_to_guids(enco_compo, enco);
+
+				if (write_delta(base_compo, enco_compo, new_content)) {
+					entity_changed = true;
+					overridden_components[idx] = true;
+				}
 			}
 		}
 		);
@@ -246,7 +253,7 @@ void cosmic_delta::decode(cosmos& deco, RakNet::BitStream& in, const bool resubs
 			if (overridden_components[idx]) {
 				component_type decoded_component;
 
-				read_delta(decoded_component, in);
+				read_delta(decoded_component, in, true);
 				transform_component_guids_to_ids(decoded_component, deco);
 
 				new_entity.add(decoded_component);
@@ -283,21 +290,24 @@ void cosmic_delta::decode(cosmos& deco, RakNet::BitStream& in, const bool resubs
 			if (overridden_components[idx]) {
 				const auto deco_c = deco[deco_id];
 
-				const bool base_component_exists = deco_c.alive();
+				if (deco_c.dead()) {
+					component_type decoded_component;
 
-				component_type decoded_component = base_component_exists ? deco_c.get() : component_type();
-
-				if (base_component_exists)
-					transform_component_ids_to_guids(decoded_component, deco);
-
-				read_delta(decoded_component, in);
-
-				transform_component_guids_to_ids(decoded_component, deco);
-
-				if (changed_entity.has<component_type>()) 
-					changed_entity.allocator::get<component_type>() = decoded_component;
-				else
+					read_delta(decoded_component, in, true);
+					
+					transform_component_guids_to_ids(decoded_component, deco);
+					
 					changed_entity.add(decoded_component);
+				}
+				else {
+					component_type decoded_component = deco_c.get();
+
+					transform_component_ids_to_guids(decoded_component, deco);
+					read_delta(decoded_component, in);
+					transform_component_guids_to_ids(decoded_component, deco);
+
+					changed_entity.allocator::get<component_type>() = decoded_component;
+				}
 			}
 			else if (removed_components[idx]) {
 				changed_entity.remove<component_type>();
@@ -365,7 +375,7 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndTwoNew) {
 	ASSERT_EQ(2, c1.entities_count());
 	ASSERT_EQ(2, c2.entities_count());
 	ASSERT_TRUE(ent1.has<components::transform>());
-	bool transform_intact = ent1.get<components::transform>() == first_transform;
+	const bool transform_intact = ent1.get<components::transform>() == first_transform;
 	ASSERT_TRUE(transform_intact);
 	ASSERT_TRUE(ent1.has<components::physics>());
 	ASSERT_TRUE(ent1.has<components::render>());
@@ -373,7 +383,7 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndTwoNew) {
 	ASSERT_FALSE(ent1.has<components::trace>());
 
 	ASSERT_TRUE(ent2.has<components::transform>());
-	bool default_transform_intact = ent2.get<components::transform>() == components::transform();
+	const bool default_transform_intact = ent2.get<components::transform>() == components::transform();
 	ASSERT_TRUE(default_transform_intact);
 	ASSERT_FALSE(ent2.has<components::physics>());
 	ASSERT_FALSE(ent2.has<components::render>());
@@ -425,19 +435,19 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndCreatedThreeEntitiesWithReferences) {
 	const auto ent3 = c1.get_entity_by_guid(third_guid);
 
 	ASSERT_TRUE(ent1.has<components::position_copying>());
-	bool pc1_intact = ent1.get<components::position_copying>().target == ent2.get_id();
+	const bool pc1_intact = ent1.get<components::position_copying>().target == ent2.get_id();
 	ASSERT_TRUE(pc1_intact);
 
 	ASSERT_TRUE(ent2.has<components::position_copying>());
-	bool pc2_intact = ent2.get<components::position_copying>().target == ent3.get_id();
+	const bool pc2_intact = ent2.get<components::position_copying>().target == ent3.get_id();
 	ASSERT_TRUE(pc2_intact);
 
 	ASSERT_TRUE(ent3.has<components::position_copying>());
-	bool pc3_intact = ent3.get<components::position_copying>().target == ent1.get_id();
+	const bool pc3_intact = ent3.get<components::position_copying>().target == ent1.get_id();
 	ASSERT_TRUE(pc3_intact);
 
 	ASSERT_TRUE(ent1.has<components::sub_entities>());
-	bool sub_entities_intact = ent1.get<components::sub_entities>().sub_entities_by_name[sub_entity_name::CHARACTER_CROSSHAIR] == ent2.get_id();
+	const bool sub_entities_intact = ent1.get<components::sub_entities>().sub_entities_by_name[sub_entity_name::CHARACTER_CROSSHAIR] == ent2.get_id();
 	ASSERT_TRUE(sub_entities_intact);
 
 	{
@@ -523,14 +533,14 @@ TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
 	const auto ent3 = c1.get_entity_by_guid(c1_third_guid);
 
 	ASSERT_TRUE(ent1.has<components::position_copying>());
-	bool pc1_dead = c1[ent1.get<components::position_copying>().target].dead();
+	const bool pc1_dead = c1[ent1.get<components::position_copying>().target].dead();
 	ASSERT_TRUE(pc1_dead);
 
 	ASSERT_TRUE(ent1.has<components::sub_entities>());
-	bool sub_entity_dead = c1[ent1.get<components::sub_entities>().sub_entities_by_name[sub_entity_name::CHARACTER_CROSSHAIR]].dead();
+	const bool sub_entity_dead = c1[ent1.get<components::sub_entities>().sub_entities_by_name[sub_entity_name::CHARACTER_CROSSHAIR]].dead();
 	ASSERT_TRUE(sub_entity_dead);
 
 	ASSERT_TRUE(ent3.has<components::position_copying>());
-	bool pc3_intact = ent3.get<components::position_copying>().target == ent1.get_id();
+	const bool pc3_intact = ent3.get<components::position_copying>().target == ent1.get_id();
 	ASSERT_TRUE(pc3_intact);
 }
