@@ -1,4 +1,5 @@
 #pragma once
+#include "BitStream.h"
 #include "cosmos.h"
 #include "game/scene_managers/testbed.h"
 #include "game/scene_managers/one_entity.h"
@@ -17,6 +18,7 @@ class multiverse {
 
 	cosmos::significant_state stashed_cosmos;
 	augs::fixed_delta_timer stashed_timer;
+	RakNet::BitStream stashed_delta;
 
 	augs::measurements total_load = augs::measurements(L"Total load", true, 1);
 	augs::measurements reading_savefile = augs::measurements(L"Loading savefile", true, 1);
@@ -27,6 +29,8 @@ class multiverse {
 	augs::measurements memory_allocation_pass = augs::measurements(L"Memory allocation pass", true, 1);
 	augs::measurements serialization_pass = augs::measurements(L"Serialization pass", true, 1);
 	augs::measurements writing_savefile = augs::measurements(L"Writing savefile", true, 1);
+	
+	augs::measurements delta_bytes = augs::measurements(L"Delta bytes", false, 1);
 
 	augs::measurements duplication = augs::measurements(L"Duplication");
 

@@ -1,5 +1,5 @@
-#include "game/game_window.h"
 #include "multiverse.h"
+#include "game/game_window.h"
 #include "cosmos.h"
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "augs/gui/text/printer.h"
@@ -8,6 +8,7 @@
 #include "augs/misc/time_utils.h"
 #include "game/transcendental/step.h"
 #include "game/transcendental/viewing_session.h"
+#include "game/transcendental/cosmic_delta.h"
 #include "game/transcendental/types_specification/all_messages_includes.h"
 
 multiverse::multiverse() 
@@ -93,6 +94,18 @@ void multiverse::simulate() {
 
 					save_cosmos_to_file(target_folder + "/" + save_filename);
 				}
+				if (raw_input.key == window::event::keys::F4) {
+					cosmos cosm_with_guids;
+					cosm_with_guids.significant = stashed_cosmos;
+					cosm_with_guids.remap_guids();
+
+					ensure(stashed_delta.GetWriteOffset() == 0);
+					cosmic_delta::encode(cosm_with_guids, main_cosmos, stashed_delta);
+					delta_bytes.measure(stashed_delta.GetNumberOfBitsUsed());
+					stashed_delta.SetReadOffset(0);
+					stashed_delta.SetWriteOffset(0);
+					cosmic_delta::decode(cosm_with_guids, stashed_delta);
+				}
 				if (raw_input.key == window::event::keys::F8) {
 					duplication.new_measurement();
 					stashed_cosmos = main_cosmos.significant;
@@ -171,6 +184,8 @@ std::wstring multiverse::summary(bool detailed, const viewing_session& session) 
 	result += deserialization_pass.summary();
 
 	result += duplication.summary();
+
+	result += delta_bytes.summary();
 
 	return result;
 }
