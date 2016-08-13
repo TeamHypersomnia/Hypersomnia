@@ -98,6 +98,9 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 			typedef std::decay_t<decltype(enco_id)> encoded_id_type;
 			typedef typename encoded_id_type::element_type component_type;
 
+			if (std::is_same<component_type, components::guid>::value)
+				return;
+
 			constexpr size_t idx = index_in_tuple<encoded_id_type, decltype(agg.component_ids)>::value;
 
 			const auto base_c = base[base_id];
@@ -248,6 +251,9 @@ void cosmic_delta::decode(cosmos& deco, RakNet::BitStream& in, const bool resubs
 			typedef std::decay_t<decltype(deco_id)> encoded_id_type;
 			typedef typename encoded_id_type::element_type component_type;
 
+			if (std::is_same<component_type, components::guid>::value)
+				return;
+
 			constexpr size_t idx = index_in_tuple<encoded_id_type, decltype(agg.component_ids)>::value;
 			
 			if (overridden_components[idx]) {
@@ -284,6 +290,9 @@ void cosmic_delta::decode(cosmos& deco, RakNet::BitStream& in, const bool resubs
 			[&overridden_components, &removed_components, &changed_entity, &agg, &deco, &in](const auto& deco_id) {
 			typedef std::decay_t<decltype(deco_id)> encoded_id_type;
 			typedef typename encoded_id_type::element_type component_type;
+
+			if (std::is_same<component_type, components::guid>::value)
+				return;
 
 			constexpr size_t idx = index_in_tuple<encoded_id_type, decltype(agg.component_ids)>::value;
 
