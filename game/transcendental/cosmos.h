@@ -144,6 +144,12 @@ public:
 		return get_pool(id)[id];
 	}
 
+#if COSMOS_TRACKS_GUIDS
+	entity_handle get_entity_by_guid(unsigned);
+	const_entity_handle get_entity_by_guid(unsigned) const;
+	bool entity_exists_with_guid(unsigned) const;
+#endif
+
 	entity_handle get_handle(entity_id);
 	const_entity_handle get_handle(entity_id) const;
 	inventory_slot_handle get_handle(inventory_slot_id);

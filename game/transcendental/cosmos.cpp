@@ -165,6 +165,20 @@ randomization cosmos::get_rng_for(entity_id id) const {
 	return { id.pool.version + std::abs(id.pool.indirection_index) + static_cast<size_t>(significant.meta.delta.get_total_steps_passed()) };
 }
 
+#if COSMOS_TRACKS_GUIDS
+entity_handle cosmos::get_entity_by_guid(unsigned guid) {
+	return get_handle(guid_map_for_transport.at(guid));
+}
+
+const_entity_handle cosmos::get_entity_by_guid(unsigned guid) const {
+	return get_handle(guid_map_for_transport.at(guid));
+}
+
+bool cosmos::entity_exists_with_guid(unsigned guid) const {
+	return guid_map_for_transport.find(guid) != guid_map_for_transport.end();
+}
+#endif
+
 entity_handle cosmos::get_handle(entity_id id) {
 	return entity_handle(*this, id);
 }
