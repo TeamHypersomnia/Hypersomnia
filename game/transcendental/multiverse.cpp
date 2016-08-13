@@ -101,10 +101,13 @@ void multiverse::simulate() {
 
 					ensure(stashed_delta.GetWriteOffset() == 0);
 					cosmic_delta::encode(cosm_with_guids, main_cosmos, stashed_delta);
-					delta_bytes.measure(stashed_delta.GetNumberOfBitsUsed());
-					stashed_delta.SetReadOffset(0);
-					stashed_delta.SetWriteOffset(0);
+					delta_bytes.measure(stashed_delta.GetNumberOfBytesUsed());
+					
+					stashed_delta.ResetReadPointer();
 					cosmic_delta::decode(cosm_with_guids, stashed_delta);
+					stashed_delta.ResetWritePointer();
+
+					main_cosmos = cosm_with_guids;
 				}
 				if (raw_input.key == window::event::keys::F8) {
 					duplication.new_measurement();

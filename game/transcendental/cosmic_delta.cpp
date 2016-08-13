@@ -65,7 +65,7 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 
 	delted_entity_stream dt;
 
-	enco.significant.pool_for_aggregates.for_each_with_id([&base, &enco, &dt](const aggregate& agg, entity_id id) {
+	enco.significant.pool_for_aggregates.for_each_with_id([&base, &enco, &dt](const aggregate& agg, const entity_id id) {
 		const const_entity_handle enco_entity = enco.get_handle(id);
 #if COSMOS_TRACKS_GUIDS
 		const auto stream_written_id = enco_entity.get_guid();
@@ -168,19 +168,21 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 		}
 	});
 
-	base.significant.pool_for_aggregates.for_each_with_id([&base, &enco, &out, &dt](const aggregate&, entity_id id) {
+	base.significant.pool_for_aggregates.for_each_with_id([&base, &enco, &out, &dt](const aggregate&, const entity_id id) {
 		const const_entity_handle base_entity = base.get_handle(id);
 #if COSMOS_TRACKS_GUIDS
-		const auto maybe_enco_entity = enco.guid_map_for_transport.find(base_entity.get_guid());
+		const auto stream_written_id = base_entity.get_guid();
+		const auto maybe_enco_entity = enco.guid_map_for_transport.find(stream_written_id);
 		const bool is_dead = maybe_enco_entity == enco.guid_map_for_transport.end();
 #else
-		const const_entity_handle enco_entity = enco.get_handle(id);
+		const auto stream_written_id = id;
+		const const_entity_handle enco_entity = enco.get_handle(stream_written_id);
 		const bool is_dead = enco_entity.dead();
 #endif
 
 		if (is_dead) {
 			++dt.removed_entities;
-			augs::write_object(dt.stream_for_removed, id);
+			augs::write_object(dt.stream_for_removed, stream_written_id);
 		}
 	});
 
@@ -238,7 +240,6 @@ void cosmic_delta::decode(cosmos& deco, RakNet::BitStream& in, const bool resubs
 
 	for(const auto& new_entity : new_entities) {
 		std::array<bool, COMPONENTS_COUNT> overridden_components;
-		std::fill(overridden_components.begin(), overridden_components.end(), false);
 
 		for (bool& flag : overridden_components)
 			augs::read_object(in, flag);
@@ -262,7 +263,7 @@ void cosmic_delta::decode(cosmos& deco, RakNet::BitStream& in, const bool resubs
 				read_delta(decoded_component, in, true);
 				transform_component_guids_to_ids(decoded_component, deco);
 
-				new_entity.add(decoded_component);
+				new_entity.allocator::add(decoded_component);
 			}
 		}
 		);
@@ -306,7 +307,7 @@ void cosmic_delta::decode(cosmos& deco, RakNet::BitStream& in, const bool resubs
 					
 					transform_component_guids_to_ids(decoded_component, deco);
 					
-					changed_entity.add(decoded_component);
+					changed_entity.allocator::add(decoded_component);
 				}
 				else {
 					component_type decoded_component = deco_c.get();
@@ -522,7 +523,7 @@ TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
 		ASSERT_EQ(0, comparatory.GetNumberOfBitsUsed());
 	}
 
-	c2.delete_entity(c2.get_entity_by_guid(c2_first_guid));
+	c2.delete_entity(c2.get_entity_by_guid(c2_second_guid));
 	ASSERT_EQ(2, c2.entities_count());
 
 	{
@@ -533,6 +534,14 @@ TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
 		s.ResetReadPointer();
 
 		cosmic_delta::decode(c1, s);
+	}
+
+	{
+		RakNet::BitStream comparatory;
+
+		cosmic_delta::encode(c1, c2, comparatory);
+
+		ASSERT_EQ(0, comparatory.GetNumberOfBitsUsed());
 	}
 
 	ASSERT_EQ(2, c1.entities_count());
