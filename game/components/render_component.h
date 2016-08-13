@@ -12,6 +12,7 @@ namespace components {
 		bool interpolate = true;
 		bool absolute_transform = false;
 		bool draw_border = false;
+		padding_byte pad;
 
 		render_layer layer = render_layer::INVALID;
 
