@@ -16,7 +16,7 @@
 
 int main(int argc, char** argv) {
 	augs::global_libraries::init();
-	augs::global_libraries::run_googletest();
+	augs::global_libraries::run_googletest(argc, argv);
 
 	LOG("%x", sizeof(entity_id));
 
