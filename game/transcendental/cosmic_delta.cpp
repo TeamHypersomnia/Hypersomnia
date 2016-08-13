@@ -94,7 +94,7 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 		RakNet::BitStream new_content;
 		
 		for_each_in_tuples(base_components, enco_components,
-			[&overridden_components, &removed_components, &entity_changed, &agg, &enco, &base, &new_content](const auto& enco_id, const auto& base_id) {
+			[&overridden_components, &removed_components, &entity_changed, &agg, &enco, &base, &new_content](const auto& base_id, const auto& enco_id) {
 			typedef std::decay_t<decltype(enco_id)> encoded_id_type;
 
 			constexpr size_t idx = index_in_tuple<encoded_id_type, decltype(agg.component_ids)>::value;
