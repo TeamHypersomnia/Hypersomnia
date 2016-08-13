@@ -16,7 +16,7 @@ namespace components {
 		float chosen_lengthening_duration_ms = -1.f;
 		float lengthening_time_passed_ms = 0.f;
 
-		bool is_it_finishing_trace = false;
+		int is_it_finishing_trace = false;
 
 		template <class Archive>
 		void serialize(Archive& ar) {

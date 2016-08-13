@@ -31,7 +31,7 @@ namespace components {
 		bool track_origin = false;
 
 		bool target_newly_set = true;
-		bool subscribe_to_previous = false;
+		int subscribe_to_previous = false;
 
 	private:
 		friend class position_copying_system;
