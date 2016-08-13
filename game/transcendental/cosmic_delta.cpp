@@ -184,6 +184,8 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 		augs::write_object(out, dt.stream_for_new);
 		augs::write_object(out, dt.stream_for_changed);
 		augs::write_object(out, dt.stream_for_removed);
+
+		out.AlignWriteToByteBoundary();
 	}
 
 	enco.profiler.delta_encoding.end_measurement();
@@ -307,6 +309,7 @@ void cosmic_delta::decode(cosmos& deco, RakNet::BitStream& in, const bool resubs
 #endif
 	}
 
+	in.AlignReadToByteBoundary();
 	ensure(in.GetNumberOfUnreadBits() == 0);
 
 	deco.profiler.delta_decoding.end_measurement();
