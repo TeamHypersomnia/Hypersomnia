@@ -34,8 +34,8 @@ namespace components {
 		vec2 center_offset;
 		float rotation_offset = 0.f;
 
-		bool flip_horizontally = false;
-		bool flip_vertically = false;
+		short flip_horizontally = false;
+		short flip_vertically = false;
 
 		template <class Archive>
 		void serialize(Archive& ar) {
