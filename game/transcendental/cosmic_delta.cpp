@@ -147,20 +147,20 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 #endif
 
 			for (const bool flag : overridden_components)
-				augs::write_object(new_content, flag);
+				augs::write_object(dt.stream_for_new, flag);
 
 			augs::write_object(dt.stream_for_new, new_content);
 
 			++dt.new_entities;
 		}
 		else if (entity_changed) {
-			augs::write_object(new_content, stream_written_id);
+			augs::write_object(dt.stream_for_changed, stream_written_id);
 
 			for (const bool flag : overridden_components)
-				augs::write_object(new_content, flag);
+				augs::write_object(dt.stream_for_changed, flag);
 
 			for (const bool flag : removed_components)
-				augs::write_object(new_content, flag);
+				augs::write_object(dt.stream_for_changed, flag);
 
 			augs::write_object(dt.stream_for_changed, new_content);
 			
