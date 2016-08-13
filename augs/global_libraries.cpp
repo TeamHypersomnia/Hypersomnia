@@ -88,9 +88,8 @@ namespace augs {
 		}
 	}
 
-	void global_libraries::run_googletest() {
-		int argc = 0;
-		::testing::InitGoogleTest(&argc, (wchar_t**)nullptr);
+	void global_libraries::run_googletest(int argc, char** argv) {
+		::testing::InitGoogleTest(&argc, argv);
 
 		::testing::FLAGS_gtest_catch_exceptions = false;
 		::testing::FLAGS_gtest_break_on_failure = false;
