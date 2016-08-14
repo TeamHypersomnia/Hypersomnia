@@ -349,6 +349,83 @@ void cosmic_delta::decode(cosmos& deco, RakNet::BitStream& in, const bool resubs
 	deco.profiler.delta_decoding.end_measurement();
 }
 
+
+
+TEST(CosmicDelta, PaddingSanityCheck1) {
+	struct ok {
+		bool a;
+		int b;
+		bool c;
+
+		ok() : a(false), b(1), c(false) {
+
+		}
+	};
+
+	typedef ok checked_type;
+	constexpr size_t type_size = sizeof(checked_type);
+
+	char buf1[type_size];
+	char buf2[type_size];
+
+	for (int i = 0; i < type_size; ++i) {
+		buf1[i] = 3;
+		buf2[i] = 4;
+	}
+
+	new (buf1) checked_type;
+	new (buf2) checked_type;
+
+	ASSERT_TRUE(memcmp(buf1, buf2, type_size));
+}
+
+TEST(CosmicDelta, PaddingSanityCheck2) {
+	struct ok {
+		bool a = false;
+		int b = 1;
+		bool c = false;
+	};
+
+	typedef ok checked_type;
+	constexpr size_t type_size = sizeof(checked_type);
+
+	char buf1[type_size];
+	char buf2[type_size];
+
+	for (int i = 0; i < type_size; ++i) {
+		buf1[i] = 3;
+		buf2[i] = 4;
+	}
+
+	new (buf1) checked_type;
+	new (buf2) checked_type;
+
+	ASSERT_TRUE(memcmp(buf1, buf2, type_size));
+}
+
+TEST(CosmicDelta, CosmicDeltaPaddingTest) {
+	for_each_in_tuple(typename put_all_components_into<std::tuple>::type(), [](auto c) {			
+		typedef decltype(c) component_type;
+		static_assert(std::is_same<std::decay_t<component_type>, component_type>::value, "Something's wrong with the types");
+	
+		typedef component_type checked_type;
+		constexpr size_t type_size = sizeof(checked_type);
+
+		char buf1[type_size];
+		char buf2[type_size];
+
+		for (int i = 0; i < type_size; ++i) {
+			buf1[i] = 3;
+			buf2[i] = 4;
+		}
+
+		new (buf1) checked_type;
+		new (buf2) checked_type;
+
+		ASSERT_TRUE(!memcmp(buf1, buf2, type_size)) << "Padding is wrong in " << typeid(checked_type).name() << "\nsizeof: " << type_size;
+	});
+}
+
 TEST(CosmicDelta, CosmicDeltaEmptyAndTwoNew) {
 	cosmos c1(2);
 	cosmos c2(2);
