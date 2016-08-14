@@ -279,7 +279,7 @@ namespace prefabs {
 
 		auto& gun = weapon += components::gun();
 
-		gun.action_mode = components::gun::AUTOMATIC;
+		gun.action_mode = components::gun::action_type::AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(4000.f, 4000.f);
 		gun.shot_cooldown = augs::stepped_cooldown(100);
 		gun.bullet_spawn_offset.set(sprite.size.x/2, 0);
@@ -347,7 +347,7 @@ namespace prefabs {
 
 		auto& gun = weapon += components::gun();
 
-		gun.action_mode = components::gun::AUTOMATIC;
+		gun.action_mode = components::gun::action_type::AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(3000.f, 3000.f);
 		gun.shot_cooldown = augs::stepped_cooldown(50);
 		gun.bullet_spawn_offset.set(sprite.size.x/2, 0);
@@ -416,7 +416,7 @@ namespace prefabs {
 
 		auto& gun = weapon += components::gun();
 
-		gun.action_mode = components::gun::SEMI_AUTOMATIC;
+		gun.action_mode = components::gun::action_type::SEMI_AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(2500.f, 2500.f);
 		gun.shot_cooldown = augs::stepped_cooldown(150);
 		gun.bullet_spawn_offset.set(sprite.size.x / 2, 0);

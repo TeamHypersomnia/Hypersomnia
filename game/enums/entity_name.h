@@ -3,6 +3,8 @@
 #include "game/transcendental/entity_handle_declaration.h"
 
 enum class entity_name {
+	INVALID,
+
 	ASSAULT_RIFLE,
 	MAGAZINE,
 	GREEN_CHARGE,

@@ -5,7 +5,7 @@ namespace augs {
 	class fixed_delta;
 
 	struct stepped_timestamp {
-		unsigned long long step = 0;
+		unsigned step = 0;
 
 		template <class Archive>
 		void serialize(Archive& ar) {

@@ -16,7 +16,9 @@ class processing_system;
 
 namespace components {
 	struct gun  {
-		enum action_type {
+		enum class action_type {
+			INVALID,
+
 			SINGLE_SHOT,
 			BOLT_ACTION,
 			SEMI_AUTOMATIC,
@@ -24,7 +26,7 @@ namespace components {
 		};
 
 		augs::stepped_cooldown shot_cooldown = augs::stepped_cooldown(100);
-		action_type action_mode;
+		action_type action_mode = action_type::INVALID;
 
 		augs::minmax<float> muzzle_velocity;
 

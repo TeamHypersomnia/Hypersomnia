@@ -10,7 +10,7 @@
 
 namespace components {
 	struct attitude {
-		double maximum_divergence_angle_before_shooting = 10.0;
+		float maximum_divergence_angle_before_shooting = 10.0;
 
 		unsigned parties = 0;
 		unsigned hostile_parties = 0;

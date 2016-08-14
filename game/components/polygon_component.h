@@ -9,6 +9,8 @@
 #include "game/assets/texture_id.h"
 #include "transform_component.h"
 
+#include "zeroed_pod.h"
+
 namespace augs {
 	class texture;
 }
@@ -38,7 +40,7 @@ namespace components {
 		augs::constant_size_vector<vertex, RENDERING_POLYGON_TRIANGULATED_VERTEX_COUNT> triangulated_polygon;
 
 		/* indices used in glDrawElements */
-		augs::constant_size_vector<int, RENDERING_POLYGON_INDEX_COUNT> indices;
+		augs::constant_size_vector<zeroed_pod<unsigned>, RENDERING_POLYGON_INDEX_COUNT> indices;
 
 		template <class Archive>
 		void serialize(Archive& ar) {

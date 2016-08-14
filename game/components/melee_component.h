@@ -18,9 +18,9 @@ namespace components {
 		};
 
 		struct swing {
-			float duration_ms;
-			float acceleration;
-			float cooldown_ms;
+			float duration_ms = 0.f;
+			float acceleration = 0.f;
+			float cooldown_ms = 0.f;
 
 			template <class Archive>
 			void serialize(Archive& ar) {

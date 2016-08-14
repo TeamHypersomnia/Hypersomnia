@@ -11,7 +11,7 @@
 class cosmos;
 
 struct inventory_slot {
-	unsigned long long category_allowed = 0;
+	unsigned category_allowed = 0;
 
 	bool items_need_mounting = false;
 	bool only_last_inserted_is_movable = false;

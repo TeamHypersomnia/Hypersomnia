@@ -6,12 +6,14 @@
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
+#include "zeroed_pod.h"
+
 namespace components {
 	struct name {
-		typedef augs::constant_size_vector<wchar_t, NICKNAME_LENGTH> nickname_type;
+		typedef augs::constant_size_vector<zeroed_pod<wchar_t>, NICKNAME_LENGTH> nickname_type;
 		static_assert(nickname_type::array_size % 4 == 0, "Wrong nickname padding");
 
-		entity_name id;
+		entity_name id = entity_name::INVALID;
 
 		int custom_nickname = false;
 		nickname_type nickname;
