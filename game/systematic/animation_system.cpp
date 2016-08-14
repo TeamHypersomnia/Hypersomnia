@@ -65,7 +65,7 @@ void animation_system::handle_animation_messages(fixed_step& step) {
 	auto& delta = step.get_delta();
 	auto events = step.messages.get_queue<animation_message>();
 
-	for (auto it : events) {
+	for (auto& it : events) {
 		auto ptr = cosmos[it.subject].find<components::animation>();
 		if (!ptr) continue; auto& animation = *ptr;
 

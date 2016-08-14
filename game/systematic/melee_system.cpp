@@ -32,7 +32,7 @@ void melee_system::consume_melee_intents(fixed_step& step) {
 	auto& events = step.messages.get_queue<messages::intent_message>();
 
 
-	for (auto it : events) {
+	for (const auto& it : events) {
 		/* 
 			we search the whole intent message queue for events of interest;
 			here we can even find gunshot requests for some distant enemy AI,

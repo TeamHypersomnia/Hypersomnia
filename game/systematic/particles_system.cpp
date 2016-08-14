@@ -150,7 +150,7 @@ void particles_system::create_particle_effects(fixed_step& step) const {
 	auto& cosmos = step.cosm;
 	auto& events = step.messages.get_queue<create_particle_effect>();
 
-	for (auto it : events) {
+	for (auto& it : events) {
 		auto emissions = *it.effect;
 		
 		for (auto& e : emissions)

@@ -29,7 +29,7 @@ void damage_system::destroy_colliding_bullets_and_send_damage(fixed_step& step) 
 	auto events = step.messages.get_queue<messages::collision_message>();
 	step.messages.get_queue<messages::damage_message>().clear();
 
-	for (auto it : events) {
+	for (const auto& it : events) {
 		if (it.type != messages::collision_message::event_type::BEGIN_CONTACT || it.one_is_sensor) 
 			continue;
 

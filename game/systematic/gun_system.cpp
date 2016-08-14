@@ -34,7 +34,7 @@ void gun_system::consume_gun_intents(fixed_step& step) {
 	auto& delta = step.get_delta();
 	auto events = step.messages.get_queue<messages::intent_message>();
 
-	for (auto it : events) {
+	for (const auto& it : events) {
 		auto* maybe_gun = cosmos[it.subject].find<components::gun>();
 		if (maybe_gun == nullptr) continue;
 
