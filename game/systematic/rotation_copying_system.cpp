@@ -24,7 +24,7 @@
 
 using namespace augs;
 
-float colinearize_AB(vec2 O_center_of_rotation, vec2 A_rifle_center, vec2 B_barrel, vec2 C_crosshair) {
+float colinearize_AB(const vec2 O_center_of_rotation, vec2 A_rifle_center, vec2 B_barrel, vec2 C_crosshair) {
 	auto crosshair_vector = C_crosshair - O_center_of_rotation;
 	auto barrel_vector = B_barrel - O_center_of_rotation;
 	
@@ -36,18 +36,18 @@ float colinearize_AB(vec2 O_center_of_rotation, vec2 A_rifle_center, vec2 B_barr
 	
 	C_crosshair = O_center_of_rotation + crosshair_vector;
 
-	float oc_radius = crosshair_vector.length();
+	const float oc_radius = crosshair_vector.length();
 	
-	auto intersection = circle_ray_intersection(B_barrel, A_rifle_center, O_center_of_rotation, oc_radius);
-	bool has_intersection = intersection.first;
+	const auto intersection = circle_ray_intersection(B_barrel, A_rifle_center, O_center_of_rotation, oc_radius);
+	const bool has_intersection = intersection.first;
 	
 	ensure(has_intersection);
 
-	auto G = intersection.second;
-	auto CG = C_crosshair - G;
-	auto AG = A_rifle_center - G;
+	const auto G = intersection.second;
+	const auto CG = C_crosshair - G;
+	const auto AG = A_rifle_center - G;
 
-	auto final_angle = 2 * (CG.degrees() - AG.degrees());
+	const auto final_angle = 2 * (CG.degrees() - AG.degrees());
 	
 	if (augs::renderer::get_current().debug_draw_colinearization) {
 		auto& ln = augs::renderer::get_current().logic_lines;
@@ -75,7 +75,7 @@ float colinearize_AB(vec2 O_center_of_rotation, vec2 A_rifle_center, vec2 B_barr
 float rotation_copying_system::resolve_rotation_copying_value(const_entity_handle it) const {
 	auto& rotation_copying = it.get<components::rotation_copying>();
 	auto& cosmos = it.get_cosmos();
-	auto target = cosmos[rotation_copying.target];
+	const auto target = cosmos[rotation_copying.target];
 
 	if (target.dead())
 		return 0.f;
@@ -83,9 +83,9 @@ float rotation_copying_system::resolve_rotation_copying_value(const_entity_handl
 	float new_angle = 0.f;
 
 	if (rotation_copying.look_mode == components::rotation_copying::look_type::POSITION) {
-		auto& target_transform = target.get<components::transform>();
+		const auto& target_transform = target.get<components::transform>();
 		
-		auto diff = target_transform.pos - position(it);
+		const auto diff = target_transform.pos - position(it);
 
 		if (diff.is_epsilon(1.f))
 			new_angle = 0.f;
@@ -96,15 +96,15 @@ float rotation_copying_system::resolve_rotation_copying_value(const_entity_handl
 			auto hand = it.map_primary_action_to_secondary_hand_if_primary_empty(0);
 
 			if (hand.has_items()) {
-				auto subject_item = hand.get_items_inside()[0];
+				const auto subject_item = hand.get_items_inside()[0];
 
-				auto* maybe_gun = subject_item.find<components::gun>();
+				const auto* maybe_gun = subject_item.find<components::gun>();
 
 				if (maybe_gun) {
-					auto rifle_transform = subject_item.get<components::transform>();
+					const auto rifle_transform = subject_item.get<components::transform>();
 					auto rifle_center = rifle_transform.pos;
 					auto barrel = maybe_gun->calculate_barrel_transform(rifle_transform).pos;
-					auto mc = position(it);
+					const auto mc = position(it);
 
 					rifle_center.rotate(-rotation(it), mc);
 					barrel.rotate(-rotation(it), mc);
@@ -118,7 +118,7 @@ float rotation_copying_system::resolve_rotation_copying_value(const_entity_handl
 	}
 	else {
 		if (target.has<components::physics>()) {
-			auto target_physics = target.get<components::physics>();
+			const auto target_physics = target.get<components::physics>();
 
 			vec2 direction;
 
@@ -147,8 +147,8 @@ float rotation_copying_system::resolve_rotation_copying_value(const_entity_handl
 }
 
 void rotation_copying_system::update_physical_motors(cosmos& cosmos) const {
-	for (auto it : cosmos.get(processing_subjects::WITH_ROTATION_COPYING)) {
-		auto& rotation_copying = it.get<components::rotation_copying>();
+	for (const auto it : cosmos.get(processing_subjects::WITH_ROTATION_COPYING)) {
+		const auto& rotation_copying = it.get<components::rotation_copying>();
 
 		if (rotation_copying.update_value) {
 			if (rotation_copying.use_physical_motor && it.has<components::special_physics>()) {
@@ -161,8 +161,8 @@ void rotation_copying_system::update_physical_motors(cosmos& cosmos) const {
 }
 
 void rotation_copying_system::update_rotations(cosmos& cosmos) const {
-	for (auto it : cosmos.get(processing_subjects::WITH_ROTATION_COPYING)) {
-		auto& rotation_copying = it.get<components::rotation_copying>();
+	for (const auto it : cosmos.get(processing_subjects::WITH_ROTATION_COPYING)) {
+		const auto& rotation_copying = it.get<components::rotation_copying>();
 
 		if (rotation_copying.update_value) {
 			if (!rotation_copying.use_physical_motor) {

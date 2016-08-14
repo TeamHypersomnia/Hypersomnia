@@ -92,7 +92,7 @@ namespace rendering_scripts {
 		//
 		//}
 
-		//for (auto it : cosmos.get(processing_subjects::WITH_INPUT_RECEIVER)) {
+		//for (const auto it : cosmos.get(processing_subjects::WITH_INPUT_RECEIVER)) {
 		//	if (it.get<components::input_receiver>().local && it.has<components::gui_element>()) {
 		//		auto& gui = it.get<components::gui_element>();
 		//
