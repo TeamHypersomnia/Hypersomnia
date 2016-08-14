@@ -26,15 +26,17 @@ void intent_contextualization_system::contextualize_use_button_intents(fixed_ste
 	auto& intents = step.messages.get_queue<messages::intent_message>();
 	
 	for (auto& e : intents) {
-		auto* query_detector = cosmos[e.subject].find<components::trigger_query_detector>();
-		auto* collision_detector = cosmos[e.subject].find<components::trigger_collision_detector>();
+		const auto subject = cosmos[e.subject];
+
+		const auto* const query_detector = subject.find<components::trigger_query_detector>();
+		const auto* const collision_detector = subject.find<components::trigger_collision_detector>();
 		
 		if (e.intent == intent_type::USE_BUTTON) {
-			auto* maybe_driver = cosmos[e.subject].find<components::driver>();
+			const auto* const maybe_driver = subject.find<components::driver>();
 
 			if (maybe_driver) {
-				auto car_id = maybe_driver->owned_vehicle;
-				auto car = cosmos[car_id];
+				const auto car_id = maybe_driver->owned_vehicle;
+				const auto car = cosmos[car_id];
 
 				if (car.alive() && car.get<components::car>().current_driver == e.subject) {
 					e.intent = intent_type::RELEASE_CAR;
@@ -64,23 +66,23 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(fix
 	for (auto& it : events) {
 		entity_id callee;
 
-		auto* maybe_container = cosmos[it.subject].find<components::container>();
+		const auto subject = cosmos[it.subject];
 
-		if (maybe_container) {
+		if (subject.has<components::container>()) {
 			if (it.intent == intent_type::CROSSHAIR_PRIMARY_ACTION) {
-				auto hand = cosmos[it.subject][slot_function::PRIMARY_HAND];
+				const auto hand = subject[slot_function::PRIMARY_HAND];
 
 				if (hand.alive() && hand->items_inside.size() > 0)
 					callee = hand.get_items_inside()[0];
 			}
 
 			if (it.intent == intent_type::CROSSHAIR_SECONDARY_ACTION) {
-				auto hand = cosmos[it.subject][slot_function::SECONDARY_HAND];
+				const auto hand = subject[slot_function::SECONDARY_HAND];
 
 				if (hand.alive() && hand->items_inside.size() > 0)
 					callee = hand.get_items_inside()[0];
 				else {
-					auto prim_hand = cosmos[it.subject][slot_function::PRIMARY_HAND];
+					const auto prim_hand = subject[slot_function::PRIMARY_HAND];
 
 					if (prim_hand.alive() && prim_hand->items_inside.size() > 0)
 						callee = prim_hand.get_items_inside()[0];
@@ -88,7 +90,7 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(fix
 			}
 		}
 
-		auto callee_handle = cosmos[callee];
+		const auto callee_handle = cosmos[callee];
 
 		if (callee_handle.alive()) {
 			if (callee_handle.find<components::gun>()) {
@@ -117,8 +119,10 @@ void intent_contextualization_system::contextualize_movement_intents(fixed_step&
 	for (auto& e : intents) {
 		entity_id callee;
 
-		auto* maybe_driver = cosmos[e.subject].find<components::driver>();
-		auto* maybe_container = cosmos[e.subject].find<components::container>();
+		const auto subject = cosmos[e.subject];
+
+		const auto* const maybe_driver = subject.find<components::driver>();
+		const auto* const maybe_container = subject.find<components::container>();
 
 		if (maybe_driver && cosmos[maybe_driver->owned_vehicle].alive()) {
 			if (e.intent == intent_type::MOVE_FORWARD
@@ -133,12 +137,12 @@ void intent_contextualization_system::contextualize_movement_intents(fixed_step&
 			}
 		}
 
-		auto callee_handle = cosmos[callee];
+		const auto callee_handle = cosmos[callee];
 		
 		if (callee_handle.dead()) {
 			if (maybe_container) {
 				if (e.intent == intent_type::SPACE_BUTTON) {
-					auto hand = cosmos[e.subject][slot_function::PRIMARY_HAND];
+					const auto hand = subject[slot_function::PRIMARY_HAND];
 
 					if (hand.alive() && hand->items_inside.size() > 0) {
 						e.intent = intent_type::MELEE_TERTIARY_MOVE;

@@ -59,7 +59,7 @@ void trace_system::spawn_finishing_traces_for_destroyed_objects(fixed_step& step
 	auto& cosmos = step.cosm;
 	auto events = step.messages.get_queue<messages::will_soon_be_deleted>();
 
-	for (auto& it : events) {
+	for (const auto& it : events) {
 		auto e = cosmos[it.subject];
 
 		auto* trace = e.find<components::trace>();

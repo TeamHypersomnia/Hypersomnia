@@ -29,7 +29,7 @@ void crosshair_system::generate_crosshair_intents(fixed_step& step) {
 	step.messages.get_queue<messages::crosshair_intent_message>().clear();
 	auto events = step.messages.get_queue<messages::intent_message>();
 
-	for (auto& it : events) {
+	for (const auto& it : events) {
 		auto subject = cosmos[it.subject];
 		
 		if (!subject.has<components::crosshair>())
@@ -76,7 +76,7 @@ void crosshair_system::apply_crosshair_intents_to_base_offsets(fixed_step& step)
 	auto& delta = step.get_delta();
 	auto& events = step.messages.get_queue<messages::crosshair_intent_message>();
 
-	for (auto& it : events)
+	for (const auto& it : events)
 		cosmos[it.subject].get<components::crosshair>().base_offset = it.crosshair_base_offset;
 }
 
