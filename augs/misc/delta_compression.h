@@ -14,7 +14,7 @@ namespace augs {
 		std::vector<delta_offset_type> changed_offsets;
 	};
 
-	object_delta delta_encode(const delta_unit* base, const delta_unit* encoded, size_t length_bytes);
+	object_delta delta_encode(const delta_unit* const base, const delta_unit* const encoded, size_t length_bytes);
 
 	template <class T>
 	object_delta delta_encode(const T& base_object, const T& encoded_object) {
@@ -26,7 +26,7 @@ namespace augs {
 			sizeof(T));
 	};
 
-	void delta_decode(delta_unit* into, size_t length_bytes, const object_delta& delta);
+	void delta_decode(delta_unit* into, const size_t length_bytes, const object_delta& delta);
 
 	template <class T>
 	void delta_decode(T& decoded, const object_delta& delta) {

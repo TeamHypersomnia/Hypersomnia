@@ -39,7 +39,7 @@ namespace augs {
 		return std::move(output);
 	}
 
-	object_delta delta_encode(const delta_unit* base_object, const delta_unit* encoded_object, const size_t length_bytes) {
+	object_delta delta_encode(const delta_unit* const base_object, const delta_unit* const encoded_object, const size_t length_bytes) {
 		object_delta result;
 
 		ensure_eq(0, length_bytes % sizeof(delta_unit));
