@@ -107,7 +107,10 @@ void damage_system::destroy_outdated_bullets(fixed_step& step) {
 			step.messages.post(messages::queue_destruction(it));
 		}
 
-		damage.distance_travelled += speed(it);
-		damage.lifetime_ms += static_cast<float>(delta.in_milliseconds());
+		if (damage.constrain_distance)
+			damage.distance_travelled += speed(it);
+
+		if (damage.constrain_lifetime)
+			damage.lifetime_ms += static_cast<float>(delta.in_milliseconds());
 	}
 }
