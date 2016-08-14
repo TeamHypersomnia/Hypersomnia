@@ -39,7 +39,56 @@ namespace augs {
 		return std::move(output);
 	}
 
+#if DELTA_ALIGNED_TO_4
+	object_delta delta_encode(const char* _base_object, const char* _encoded_object, const size_t _length) {
+		object_delta result;
 
+		ensure(_length % 4 == 0);
+		const size_t length = _length / 4;
+
+		const int* base_object = reinterpret_cast<const int*>(_base_object);
+		const int* encoded_object = reinterpret_cast<const int*>(_encoded_object);
+
+		std::vector<bool> byte_mask;
+		byte_mask.reserve(length);
+
+		for (size_t i = 0; i < length; ++i) {
+			if (base_object[i] == encoded_object[i])
+				byte_mask.push_back(false);
+			else {
+				byte_mask.push_back(true);
+				result.changed_bytes.push_back(encoded_object[i]);
+			}
+		}
+
+		result.changed_offsets = run_length_encoding(byte_mask);
+
+		return std::move(result);
+	};
+
+	void delta_decode(char* _ptr, const size_t _length, const object_delta& delta) {
+		ensure(_length % 4 == 0);
+		const size_t length = _length / 4;
+
+		int* ptr = reinterpret_cast<int*>(_ptr);
+
+		const int * const original_location = ptr;
+
+		const auto& changed_offsets = delta.changed_offsets;
+		const auto& changed_bytes = delta.changed_bytes;
+
+		size_t previous_vector_pos = 0;
+
+		for (size_t i = 0; i < changed_offsets.size(); i += 2) {
+			ptr += changed_offsets[i];
+			std::copy(changed_bytes.begin() + previous_vector_pos, changed_bytes.begin() + previous_vector_pos + changed_offsets[i + 1], ptr);
+			previous_vector_pos += changed_offsets[i + 1];
+			ptr += changed_offsets[i + 1];
+		}
+
+		ensure(ptr <= original_location + length);
+	};
+#else
 	object_delta delta_encode(const char* base_object, const char* encoded_object, const size_t length) {
 		object_delta result;
 
@@ -77,4 +126,5 @@ namespace augs {
 
 		ensure(ptr <= original_location + length);
 	};
+#endif
 }

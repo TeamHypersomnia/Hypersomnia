@@ -2,13 +2,19 @@
 #include <vector>
 #include "augs/templates.h"
 
+#define DELTA_ALIGNED_TO_4 1
+
 namespace augs {
 	typedef unsigned short delta_offset_type;
 
 	std::vector<delta_offset_type> run_length_encoding(const std::vector<bool>& bit_data);
 
 	struct object_delta {
+#if DELTA_ALIGNED_TO_4
+		std::vector<int> changed_bytes;
+#else
 		std::vector<char> changed_bytes;
+#endif
 		std::vector<delta_offset_type> changed_offsets;
 	};
 
