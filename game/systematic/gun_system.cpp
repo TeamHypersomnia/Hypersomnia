@@ -65,7 +65,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(fixed_step& step) {
 	auto& physics_sys = cosmos.temporary_systems.get<physics_system>();
 
 	auto targets = cosmos.get(processing_subjects::WITH_GUN); //??
-	for (auto it : targets) {
+	for (const auto& it : targets) {
 		const auto& gun_transform = it.get<components::transform>();
 		auto& gun = it.get<components::gun>();
 		auto& container = it.get<components::container>();

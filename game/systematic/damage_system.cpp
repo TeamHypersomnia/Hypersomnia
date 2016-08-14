@@ -98,7 +98,7 @@ void damage_system::destroy_outdated_bullets(fixed_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 	auto targets_copy = cosmos.get(processing_subjects::WITH_DAMAGE);
-	for (auto it : targets_copy) {
+	for (const auto& it : targets_copy) {
 		auto& damage = it.get<components::damage>();
 	
 		if ((damage.constrain_lifetime && damage.lifetime_ms >= damage.max_lifetime_ms) ||

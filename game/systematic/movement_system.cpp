@@ -17,11 +17,11 @@ using namespace augs;
 
 void movement_system::set_movement_flags_from_input(fixed_step& step) {
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
-	auto events = step.messages.get_queue<messages::intent_message>();
+	const auto& delta = step.get_delta();
+	const auto& events = step.messages.get_queue<messages::intent_message>();
 
-	for (auto it : events) {
-		auto* movement = cosmos[it.subject].find<components::movement>();
+	for (const auto& it : events) {
+		auto* const movement = cosmos[it.subject].find<components::movement>();
 		if (movement == nullptr) continue;
 
 		switch (it.intent) {
@@ -47,10 +47,9 @@ void movement_system::set_movement_flags_from_input(fixed_step& step) {
 
 void movement_system::apply_movement_forces(cosmos& cosmos) {
 	auto& physics_sys = cosmos.temporary_systems.get<physics_system>();
-	auto delta = cosmos.significant.meta.delta;
+	const auto& delta = cosmos.significant.meta.delta;
 
-	auto targets = cosmos.get(processing_subjects::WITH_MOVEMENT);
-	for (auto it : targets) {
+	for (const auto& it : cosmos.get(processing_subjects::WITH_MOVEMENT)) {
 		auto& movement = it.get<components::movement>();
 
 		if (!movement.apply_movement_forces) continue;
@@ -65,7 +64,7 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 			continue;
 		}
 
-		auto& physics = it.get<components::physics>();
+		const auto& physics = it.get<components::physics>();
 		
 		if (!physics.is_constructed())
 			continue;
@@ -102,12 +101,11 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 
 void movement_system::generate_movement_responses(fixed_step& step) {
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
+	const auto& delta = step.get_delta();
 	step.messages.get_queue<messages::movement_response>().clear();
 
-	auto targets = cosmos.get(processing_subjects::WITH_MOVEMENT);
-	for (auto it : targets) {
-		auto& movement = it.get<components::movement>();
+	for (const auto& it : cosmos.get(processing_subjects::WITH_MOVEMENT)) {
+		const auto& movement = it.get<components::movement>();
 
 		float32 speed = 0.0f;
 

@@ -26,7 +26,7 @@ size_t cosmic_entropy::length() const {
 void cosmic_entropy::from_input_receivers_distribution(const augs::machine_entropy& machine, cosmos& cosm) {
 	auto targets = cosm.get(processing_subjects::WITH_INPUT_RECEIVER);
 
-	for (auto it : targets) {
+	for (const auto& it : targets) {
 		if (it.get<components::input_receiver>().local) {
 			cosmic_entropy new_entropy;
 			new_entropy.entropy_per_entity[it] = machine.local;

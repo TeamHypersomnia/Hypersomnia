@@ -21,7 +21,7 @@ void position_copying_system::update_transforms(fixed_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 	auto targets = cosmos.get(processing_subjects::WITH_POSITION_COPYING);
-	for (auto it : targets) {
+	for (const auto& it : targets) {
 		auto& transform = it.get<components::transform>();
 		auto& position_copying = it.get<components::position_copying>();
 

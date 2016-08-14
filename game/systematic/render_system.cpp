@@ -33,7 +33,7 @@ std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> render_s
 		layers[layer].push_back(it);
 	}
 
-	std::vector<render_layer> layers_whose_order_determines_friction = { render_layer::CAR_INTERIOR } ;
+	const std::vector<render_layer> layers_whose_order_determines_friction = { render_layer::CAR_INTERIOR } ;
 
 	for (auto& custom_order_layer : layers_whose_order_determines_friction) {
 		if (custom_order_layer < static_cast<render_layer>(layers.size())) {
@@ -52,12 +52,6 @@ std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> render_s
 	return output;
 }
 
-template<class T>
-static inline T tabs(T _a)
-{
-	return _a < 0 ? -_a : _a;
-}
-
 void render_system::set_current_transforms_as_previous_for_interpolation(cosmos& cosm) const {
 	if (cosm.significant.meta.settings.enable_interpolation) {
 		cosm.get_pool(pool_id<components::transform>()).for_each([](components::transform& t) {
@@ -71,11 +65,11 @@ void render_system::draw_entities(augs::vertex_triangle_buffer& output, std::vec
 	for (auto e : entities) {
 		for_each_type<components::polygon, components::sprite, /*components::tile_layer,*/ components::particle_group>([e, interpolation_ratio, &output, &in_camera, only_border_highlights](auto T) {
 			typedef decltype(T) renderable_type;
-			bool interpolation_enabled = e.get_cosmos().significant.meta.settings.enable_interpolation;
+			const bool interpolation_enabled = e.get_cosmos().significant.meta.settings.enable_interpolation;
 
 			if (e.has<renderable_type>()) {
-				auto& render = e.get<components::render>();
-				auto& transform = e.get<components::transform>();
+				const auto& render = e.get<components::render>();
+				const auto& transform = e.get<components::transform>();
 
 				components::transform renderable_transform = transform;
 
@@ -92,7 +86,7 @@ void render_system::draw_entities(augs::vertex_triangle_buffer& output, std::vec
 				components::transform camera_transform;
 				camera_transform = render.absolute_transform ? components::transform() : in_camera.camera_transform;
 
-				auto& renderable = e.get<renderable_type>();
+				const auto& renderable = e.get<renderable_type>();
 
 				typename renderable_type::drawing_input in(output);
 				

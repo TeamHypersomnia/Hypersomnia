@@ -53,7 +53,7 @@ void car_system::apply_movement_forces(fixed_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 	auto targets_copy = cosmos.get(processing_subjects::WITH_CAR);
-	for (auto it : targets_copy) {
+	for (const auto& it : targets_copy) {
 		auto& car = it.get<components::car>();
 		auto& physics = it.get<components::physics>();
 		auto& special_physics = it.get<components::special_physics>();
