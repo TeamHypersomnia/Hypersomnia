@@ -187,7 +187,7 @@ void physics_system::reserve_caches_for_entities(size_t n) {
 
 physics_system::physics_system() : 
 b2world(b2Vec2(0.f, 0.f)), ray_casts_since_last_step(0) {
-	b2world.SetAllowSleeping(false);
+	b2world.SetAllowSleeping(true);
 	b2world.SetAutoClearForces(false);
 }
 
