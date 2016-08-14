@@ -51,7 +51,7 @@ components::sentience::meter::damage_result components::sentience::meter::calcul
 
 void sentience_system::consume_health_event(messages::health_event h, fixed_step& step) const {
 	auto& cosmos = step.cosm;
-	auto subject = cosmos[h.subject];
+	const auto subject = cosmos[h.subject];
 	auto& sentience = subject.get<components::sentience>();
 
 	switch (h.target) {
@@ -59,7 +59,7 @@ void sentience_system::consume_health_event(messages::health_event h, fixed_step
 	case messages::health_event::CONSCIOUSNESS: sentience.consciousness.value -= h.effective_amount; ensure(sentience.health.value >= 0); break;
 	case messages::health_event::SHIELD: ensure(0); break;
 	case messages::health_event::AIM:
-		auto punched = subject;
+		const auto punched = subject;
 
 		if (punched[sub_entity_name::CHARACTER_CROSSHAIR].alive() && punched[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY].alive()) {
 			auto owning_crosshair_recoil = punched[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
@@ -73,14 +73,14 @@ void sentience_system::consume_health_event(messages::health_event h, fixed_step
 	}
 
 	if (h.special_result == messages::health_event::DEATH) {
-		auto* container = subject.find<components::container>();
+		const auto* const container = subject.find<components::container>();
 
 		if (container)
 			drop_from_all_slots(subject, step);
 
-		auto sub_def = subject[sub_entity_name::CORPSE_OF_SENTIENCE];
+		const auto sub_def = subject[sub_entity_name::CORPSE_OF_SENTIENCE];
 
-		auto corpse = cosmos.clone_entity(sub_def);
+		const auto corpse = cosmos.clone_entity(sub_def);
 
 		auto place_of_death = subject.get<components::transform>();
 		place_of_death.rotation = h.impact_velocity.degrees();
@@ -109,7 +109,7 @@ void sentience_system::apply_damage_and_generate_health_events(fixed_step& step)
 	healths.clear();
 
 	for (auto& d : damages) {
-		auto subject = cosmos[d.subject];
+		const auto subject = cosmos[d.subject];
 
 		auto* sentience = subject.find<components::sentience>();
 
@@ -130,7 +130,7 @@ void sentience_system::apply_damage_and_generate_health_events(fixed_step& step)
 			consume_health_event(aimpunch_event, step);
 
 		if (sentience) {
-			auto& s = *sentience;
+			const auto& s = *sentience;
 
 			event.effective_amount = 0;
 			event.objective_amount = d.amount;
@@ -139,7 +139,7 @@ void sentience_system::apply_damage_and_generate_health_events(fixed_step& step)
 			if (s.health.enabled) {
 				event.target = messages::health_event::HEALTH;
 
-				auto damaged = s.health.calculate_damage_result(d.amount);
+				const auto damaged = s.health.calculate_damage_result(d.amount);
 				event.effective_amount = damaged.effective;
 				event.ratio_effective_to_maximum = damaged.ratio_effective_to_maximum;
 
@@ -154,7 +154,7 @@ void sentience_system::apply_damage_and_generate_health_events(fixed_step& step)
 			if (s.consciousness.enabled) {
 				event.target = messages::health_event::CONSCIOUSNESS;
 
-				auto damaged = s.consciousness.calculate_damage_result(d.amount);
+				const auto damaged = s.consciousness.calculate_damage_result(d.amount);
 				event.effective_amount = damaged.effective;
 				event.ratio_effective_to_maximum = damaged.ratio_effective_to_maximum;
 
@@ -170,25 +170,25 @@ void sentience_system::apply_damage_and_generate_health_events(fixed_step& step)
 }
 
 void sentience_system::cooldown_aimpunches(fixed_step& step) const {
-	for (auto& t : step.cosm.get(processing_subjects::WITH_SENTIENCE)) {
+	for (const auto& t : step.cosm.get(processing_subjects::WITH_SENTIENCE)) {
 		t.get<components::sentience>().aimpunch.cooldown(step.get_delta().in_milliseconds());
 	}
 }
 
 void sentience_system::regenerate_values(fixed_step& step) const {
-	for (auto& t : step.cosm.get(processing_subjects::WITH_SENTIENCE)) {
+	for (const auto& t : step.cosm.get(processing_subjects::WITH_SENTIENCE)) {
 		t.get<components::sentience>().aimpunch.cooldown(step.get_delta().in_milliseconds());
 	}
 }
 
 void sentience_system::set_borders(fixed_step& step) const {
-	int timestamp_ms = static_cast<int>(step.get_delta().total_time_passed_in_seconds() * 1000.0);
+	const int timestamp_ms = static_cast<int>(step.get_delta().total_time_passed_in_seconds() * 1000.0);
 
-	for (auto& t : step.cosm.get(processing_subjects::WITH_SENTIENCE)) {
-		auto& sentience = t.get<components::sentience>();
+	for (const auto& t : step.cosm.get(processing_subjects::WITH_SENTIENCE)) {
+		const auto& sentience = t.get<components::sentience>();
 
 		auto hr = sentience.health.ratio();
-		auto one_less_hr = 1 - hr;
+		const auto one_less_hr = 1 - hr;
 
 		int pulse_duration = static_cast<int>(1250 - 1000 * (1 - hr));
 		float time_pulse_ratio = (timestamp_ms % pulse_duration) / float(pulse_duration);

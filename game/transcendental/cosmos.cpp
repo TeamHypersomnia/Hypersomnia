@@ -253,7 +253,7 @@ entity_handle cosmos::clone_entity(const entity_id copied_entity_id) {
 
 	// zero-out non-trivial relational components
 
-	for_each_type<components::child, components::physical_relations, components::sub_entities>([copied_entity, new_entity](const auto c) {
+	for_each_type<components::child, components::physical_relations, components::sub_entities>([copied_entity, new_entity](auto c) {
 		typedef decltype(c) T;
 		
 		if (copied_entity.has<T>())
