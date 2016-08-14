@@ -77,6 +77,6 @@ namespace components {
 			);
 		}
 
-		components::transform calculate_barrel_transform(components::transform gun_transform);
+		components::transform calculate_barrel_transform(components::transform gun_transform) const;
 	};
 }

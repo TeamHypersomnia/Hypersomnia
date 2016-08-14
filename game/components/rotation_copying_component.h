@@ -34,8 +34,6 @@ namespace components {
 
 		unsigned look_mode = look_type::POSITION;
 
-		float last_value = 0.0f;
-
 		template<class F>
 		void for_each_held_id(F f) {
 			f(target);

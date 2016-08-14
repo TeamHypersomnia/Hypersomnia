@@ -50,7 +50,7 @@ void gun_system::consume_gun_intents(fixed_step& step) {
 	}
 }
 
-components::transform components::gun::calculate_barrel_transform(components::transform gun_transform) {
+components::transform components::gun::calculate_barrel_transform(components::transform gun_transform) const {
 	auto barrel_transform = gun_transform;
 	barrel_transform.pos += vec2(bullet_spawn_offset).rotate(gun_transform.rotation, vec2());
 

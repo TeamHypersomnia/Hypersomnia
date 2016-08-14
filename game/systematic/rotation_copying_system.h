@@ -5,7 +5,7 @@ class cosmos;
 class fixed_step;
 
 class rotation_copying_system {
-	void resolve_rotation_copying_value(entity_handle) const;
+	float resolve_rotation_copying_value(const_entity_handle) const;
 public:
 
 	void update_physical_motors(cosmos& cosmos) const;

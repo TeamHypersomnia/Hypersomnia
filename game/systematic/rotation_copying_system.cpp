@@ -72,13 +72,13 @@ float colinearize_AB(vec2 O_center_of_rotation, vec2 A_rifle_center, vec2 B_barr
 	return final_angle;
 }
 
-void rotation_copying_system::resolve_rotation_copying_value(entity_handle it) const {
+float rotation_copying_system::resolve_rotation_copying_value(const_entity_handle it) const {
 	auto& rotation_copying = it.get<components::rotation_copying>();
 	auto& cosmos = it.get_cosmos();
 	auto target = cosmos[rotation_copying.target];
 
 	if (target.dead())
-		return;
+		return 0.f;
 
 	float new_angle = 0.f;
 
@@ -140,8 +140,10 @@ void rotation_copying_system::resolve_rotation_copying_value(entity_handle it) c
 		//rotation_copying.last_value = rotation_copying.last_rotation_interpolant.degrees();
 	}
 	else if (rotation_copying.easing_mode == rotation_copying.NONE) {
-		rotation_copying.last_value = new_angle;
+	
 	}
+
+	return new_angle;
 }
 
 void rotation_copying_system::update_physical_motors(cosmos& cosmos) const {
@@ -150,11 +152,9 @@ void rotation_copying_system::update_physical_motors(cosmos& cosmos) const {
 
 		if (rotation_copying.update_value) {
 			if (rotation_copying.use_physical_motor && it.has<components::special_physics>()) {
-				resolve_rotation_copying_value(it);
-
 				auto& physics = it.get<components::special_physics>();
 				physics.enable_angle_motor = true;
-				physics.target_angle = rotation_copying.last_value;
+				physics.target_angle = resolve_rotation_copying_value(it);
 			}
 		}
 	}
@@ -166,8 +166,7 @@ void rotation_copying_system::update_rotations(cosmos& cosmos) const {
 
 		if (rotation_copying.update_value) {
 			if (!rotation_copying.use_physical_motor) {
-				resolve_rotation_copying_value(it);
-				it.get<components::transform>().rotation = rotation_copying.last_value;
+				it.get<components::transform>().rotation = resolve_rotation_copying_value(it);
 			}
 		}
 	}

@@ -37,12 +37,14 @@ void recoil_player::shoot_and_apply_impulse(entity_handle recoil_body, float add
 }
 
 void recoil_player::cooldown(double amount_ms) {
-	remaining_cooldown_duration -= amount_ms;
+	if (current_offset > 0) {
+		remaining_cooldown_duration -= amount_ms;
 
-	if (remaining_cooldown_duration < 0) {
-		remaining_cooldown_duration = single_cooldown_duration_ms;
+		if (remaining_cooldown_duration < 0) {
+			remaining_cooldown_duration = single_cooldown_duration_ms;
 
-		if(current_offset > 0)
-			--current_offset;
+			if (current_offset > 0)
+				--current_offset;
+		}
 	}
 }
