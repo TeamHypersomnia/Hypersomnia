@@ -7,6 +7,8 @@
 
 namespace components {
 	struct special_physics {
+		augs::stepped_timeout since_dropped;
+
 		entity_id owner_friction_ground;
 
 		struct friction_connection {
@@ -26,9 +28,7 @@ namespace components {
 
 		augs::constant_size_vector<friction_connection, OWNER_FRICTION_GROUNDS_COUNT> owner_friction_grounds;
 
-		augs::stepped_timeout since_dropped;
-
-		bool enable_angle_motor = false;
+		int enable_angle_motor = false;
 
 		float target_angle = 0.f;
 		float angle_motor_force_multiplier = 1.f;

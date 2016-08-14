@@ -21,7 +21,7 @@ namespace augs {
 	struct stepped_timeout {
 		stepped_timestamp when_started;
 
-		bool is_set = false;
+		int is_set = false;
 		float timeout_duration_ms = 1000.f;
 
 		template <class Archive>
@@ -43,7 +43,7 @@ namespace augs {
 	struct stepped_cooldown {
 		stepped_timestamp when_last_fired;
 
-		bool ready_to_fire = true;
+		int ready_to_fire = true;
 		float cooldown_duration_ms = 1000.f;
 
 		template <class Archive>

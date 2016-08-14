@@ -7,7 +7,7 @@ namespace components {
 	struct processing : synchronizable_component {
 		typedef std::bitset<int(processing_subjects::LIST_COUNT)> bitset_type;
 		
-		bool activated = true;
+		int activated = true;
 
 		bitset_type processing_subject_categories = 0;
 		bitset_type disabled_categories = 0;

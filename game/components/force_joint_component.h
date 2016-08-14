@@ -6,6 +6,8 @@
 
 #include "augs/math/vec2.h"
 
+#include "padding_byte.h"
+
 namespace components {
 	struct force_joint {
 		entity_id chased_entity;
@@ -18,6 +20,8 @@ namespace components {
 
 		bool divide_transform_mode = false;
 		bool consider_rotation = true;
+		padding_byte pad[2];
+
 		components::transform chased_entity_offset;
 
 		std::array<vec2, 2> force_offsets;

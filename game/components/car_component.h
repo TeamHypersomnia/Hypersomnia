@@ -1,6 +1,7 @@
 #pragma once
 #include "game/transcendental/entity_id.h"
 #include "augs/math/vec2.h"
+#include "padding_byte.h"
 
 namespace components {
 	struct car {
@@ -13,7 +14,9 @@ namespace components {
 		bool deccelerating = false;
 		bool turning_right = false;
 		bool turning_left = false;
+
 		bool hand_brake = false;
+		padding_byte pad[3];
 		
 		float braking_damping = -1.f;
 		float braking_angular_damping = -1.f;

@@ -8,10 +8,13 @@
 
 namespace components {
 	struct name {
+		typedef augs::constant_size_vector<wchar_t, NICKNAME_LENGTH> nickname_type;
+		static_assert(nickname_type::array_size % 4 == 0, "Wrong nickname padding");
+
 		entity_name id;
 
-		bool custom_nickname = false;
-		augs::constant_size_vector<wchar_t, NICKNAME_LENGTH> nickname;
+		int custom_nickname = false;
+		nickname_type nickname;
 
 		std::wstring get_nickname() const;
 		void set_nickname(std::wstring);

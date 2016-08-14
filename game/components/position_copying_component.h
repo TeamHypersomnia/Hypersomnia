@@ -29,8 +29,8 @@ namespace components {
 		bool relative = false;
 		bool position_copying_rotation = false;
 		bool track_origin = false;
-
 		bool target_newly_set = true;
+		
 		int subscribe_to_previous = false;
 
 	private:

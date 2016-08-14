@@ -9,6 +9,8 @@
 #include "augs/misc/recoil_player.h"
 #include "augs/misc/minmax.h"
 
+#include "padding_byte.h"
+
 class gun_system;
 class processing_system;
 
@@ -19,20 +21,21 @@ namespace components {
 			BOLT_ACTION,
 			SEMI_AUTOMATIC,
 			AUTOMATIC
-		} action_mode;
+		};
+
+		augs::stepped_cooldown shot_cooldown = augs::stepped_cooldown(100);
+		action_type action_mode;
 
 		augs::minmax<float> muzzle_velocity;
 
 		float damage_multiplier = 1.f;
-
-		augs::stepped_cooldown shot_cooldown = augs::stepped_cooldown(100);
 
 		vec2 bullet_spawn_offset;
 
 		float camera_shake_radius = 0.f;
 		float camera_shake_spread_degrees = 0.f;
 
-		bool trigger_pressed = false;
+		int trigger_pressed = false;
 
 		augs::minmax<float> shell_velocity;
 		augs::minmax<float> shell_angular_velocity;

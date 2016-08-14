@@ -5,7 +5,6 @@
 
 namespace components {
 	struct sentience {
-
 		struct meter {
 			struct damage_result {
 				float effective = 0.f;
@@ -13,7 +12,7 @@ namespace components {
 				bool dropped_to_zero = false;
 			};
 
-			bool enabled = false;
+			int enabled = false;
 
 			float value = 100.f;
 			float maximum = 100.f;

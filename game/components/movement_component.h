@@ -5,11 +5,13 @@
 #include "augs/math/vec2.h"
 #include "game/transcendental/entity_id.h"
 
+#include "padding_byte.h"
+
 namespace components {
 	struct movement  {
 		struct subscribtion {
 			entity_id target;
-			bool stop_response_at_zero_speed = false;
+			int stop_response_at_zero_speed = false;
 
 			template <class Archive>
 			void serialize(Archive& ar) {
@@ -20,16 +22,18 @@ namespace components {
 			}
 		};
 
-		bool apply_movement_forces = true;
-
 		augs::constant_size_vector<subscribtion, MOVEMENT_RESPONSE_RECEIVERS_COUNT> response_receivers;
 		
 		bool moving_left = false;
 		bool moving_right = false;
 		bool moving_forward = false;
 		bool moving_backward = false;
+
 		bool walking_enabled = false;
-		
+		bool enable_braking_damping = false;
+		bool enable_animation = true;
+		bool apply_movement_forces = true;
+
 		vec2 input_acceleration_axes;
 		float acceleration_length = -1.f;
 
@@ -39,10 +43,6 @@ namespace components {
 		float braking_damping = 0.f;
 
 		float standard_linear_damping = 0.f;
-		
-		bool enable_braking_damping = false;
-
-		bool enable_animation = true;
 
 		float make_inert_for_ms = 0.f;
 

@@ -2,7 +2,7 @@
 
 namespace components {
 	struct trigger_collision_detector {
-		bool detection_intent_enabled = false;
+		int detection_intent_enabled = false;
 
 		template <class Archive>
 		void serialize(Archive& ar) {

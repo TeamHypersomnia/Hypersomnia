@@ -6,20 +6,17 @@
 
 #include "augs/misc/constant_size_vector.h"
 #include "game/container_sizes.h"
+#include "padding_byte.h"
 
 class cosmos;
 
 struct inventory_slot {
-	bool items_need_mounting = false;
-	float montage_time_multiplier = 1.f;
+	unsigned long long category_allowed = 0;
 
+	bool items_need_mounting = false;
 	bool only_last_inserted_is_movable = false;
 
 	bool for_categorized_items_only = false;
-	unsigned long long category_allowed = 0;
-
-	unsigned space_available = 0;
-
 	/*
 	true means that:
 	- space is disregarded
@@ -28,6 +25,13 @@ struct inventory_slot {
 	*/
 	bool is_physical_attachment_slot = false;
 	bool always_allow_exactly_one_item = false;
+
+	padding_byte pad[3];
+
+	float montage_time_multiplier = 1.f;
+
+	unsigned space_available = 0;
+
 	float attachment_density_multiplier = 1.f;
 
 	augs::rects::sticking attachment_sticking_mode = augs::rects::sticking::LEFT;

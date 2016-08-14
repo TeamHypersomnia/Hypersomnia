@@ -1,7 +1,7 @@
 #pragma once
-
 #include "game/transcendental/entity_id.h"
 #include "augs/math/vec2.h"
+#include "padding_byte.h"
 
 namespace components {
 	struct rotation_copying  {
@@ -19,11 +19,15 @@ namespace components {
 		entity_id target;
 
 		int easing_mode = NONE;
+
 		bool colinearize_item_in_hand = false;
+		bool update_value = true;
+		bool use_physical_motor = false;
+		padding_byte pad;
 		
 		/* for exponential smoothing */
-		double smoothing_average_factor = 0.5;
-		double averages_per_sec = 20.0;
+		float smoothing_average_factor = 0.5f;
+		float averages_per_sec = 20.0f;
 		
 		/* for linear smoothing */
 		vec2 last_rotation_interpolant;
@@ -31,9 +35,6 @@ namespace components {
 		unsigned look_mode = look_type::POSITION;
 
 		float last_value = 0.0f;
-		bool update_value = true;
-
-		bool use_physical_motor = false;
 
 		template<class F>
 		void for_each_held_id(F f) {

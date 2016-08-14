@@ -13,6 +13,7 @@ namespace augs  {
 		typedef typename arr_type::iterator iterator;
 		typedef typename arr_type::const_iterator const_iterator;
 		typedef T value_type;
+		static constexpr size_t array_size = sizeof(T) * const_count;
 		
 		constant_size_vector() : count(0) {
 

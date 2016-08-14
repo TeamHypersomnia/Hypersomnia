@@ -11,12 +11,12 @@ class recoil_player {
 public:
 	augs::constant_size_vector<vec2, RECOIL_PLAYER_OFFSET_COUNT> offsets;
 	unsigned current_offset = 0;
-	bool reversed = false;
+	int reversed = false;
 	unsigned repeat_last_n_offsets = 5;
 
-	double single_cooldown_duration_ms = 50.0;
-	double remaining_cooldown_duration = -1.0;
-	double scale = 1.0;
+	float single_cooldown_duration_ms = 50.0;
+	float remaining_cooldown_duration = -1.0;
+	float scale = 1.0;
 
 	template <class Archive>
 	void serialize(Archive& ar) {

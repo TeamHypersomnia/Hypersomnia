@@ -2,11 +2,13 @@
 #include "game/transcendental/component_synchronizer.h"
 #include "augs/math/vec2.h"
 #include "augs/math/rects.h"
+#include "padding_byte.h"
 
 namespace components {
 	struct dynamic_tree_node : synchronizable_component {
 		bool always_visible = false;
 		bool activated = true;
+		padding_byte pad[2];
 
 		augs::rects::ltrb<float> aabb;
 

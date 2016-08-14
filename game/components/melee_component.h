@@ -5,6 +5,7 @@
 
 #include "game/container_sizes.h"
 #include "augs/misc/constant_size_vector.h"
+#include "padding_byte.h"
 
 namespace components {
 	struct melee {
@@ -41,6 +42,7 @@ namespace components {
 		bool primary_move_flag = false;
 		bool secondary_move_flag = false;
 		bool tertiary_move_flag = false;
+		padding_byte pad;
 
 		melee_state current_state = melee_state::FREE;
 

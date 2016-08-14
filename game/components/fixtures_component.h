@@ -13,6 +13,7 @@
 
 #include "augs/misc/constant_size_vector.h"
 #include "game/container_sizes.h"
+#include "padding_byte.h"
 
 class physics_system;
 struct colliders_cache;
@@ -21,13 +22,14 @@ namespace components {
 	struct fixtures : synchronizable_component {
 		struct convex_partitioned_collider {
 			convex_partitioned_shape shape;
-			b2Filter filter;
 
 			float density = 1.f;
 			float density_multiplier = 1.f;
 			float friction = 0.f;
 			float restitution = 0.f;
-
+			
+			b2Filter filter;
+			padding_byte pad;
 			bool sensor = false;
 
 			template <class Archive>

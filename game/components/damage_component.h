@@ -6,6 +6,7 @@
 
 #include "augs/misc/timer.h"
 #include "augs/graphics/pixel.h"
+#include "padding_byte.h"
 
 namespace components {
 	struct damage {
@@ -14,15 +15,18 @@ namespace components {
 		float impulse_upon_hit = 100.f;
 
 		entity_id sender;
+
 		bool damage_upon_collision = true;
 		bool destroy_upon_damage = true;
+		bool constrain_lifetime = true;
+		bool constrain_distance = false;
+
 		int damage_charges_before_destruction = 1;
 
 		vec2 custom_impact_velocity;
 
-		bool constrain_lifetime = true;
-		bool constrain_distance = false;
 		bool damage_falloff = false;
+		padding_byte pad[3];
 
 		float damage_falloff_starting_distance = 500.f;
 		float minimum_amount_after_falloff = 5.f;

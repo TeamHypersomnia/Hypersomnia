@@ -19,7 +19,7 @@ namespace components {
 
 		int charges = 1;
 		unsigned space_occupied_per_charge = 1;
-		bool stackable = false;
+		int stackable = false;
 
 		unsigned dual_wield_accuracy_loss_percentage = 50;
 		unsigned dual_wield_accuracy_loss_multiplier = 1;
