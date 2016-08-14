@@ -41,23 +41,22 @@ using namespace augs;
 
 void item_system::handle_trigger_confirmations_as_pick_requests(fixed_step& step) {
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
-	auto& confirmations = step.messages.get_queue<messages::trigger_hit_confirmation_message>();
-	auto& physics = cosmos.temporary_systems.get<physics_system>();
+	const auto& delta = step.get_delta();
+	const auto& confirmations = step.messages.get_queue<messages::trigger_hit_confirmation_message>();
 
-	for (auto& e : confirmations) {
-		auto detector = cosmos[e.detector_body];
+	for (const auto& e : confirmations) {
+		const auto detector = cosmos[e.detector_body];
 
-		auto* item_slot_transfers = detector.find<components::item_slot_transfers>();
-		auto item_entity = cosmos[e.trigger].get_owner_body();
+		auto* const item_slot_transfers = detector.find<components::item_slot_transfers>();
+		const auto item_entity = cosmos[e.trigger].get_owner_body();
 
-		auto* item = item_entity.find<components::item>();
+		const auto* const item = item_entity.find<components::item>();
 
 		if (item_slot_transfers && item && item_entity.get_owning_transfer_capability().dead()) {
-			auto& pick_list = item_slot_transfers->only_pick_these_items;
-			bool found_on_subscription_list = found_in(pick_list, item_entity);
+			const auto& pick_list = item_slot_transfers->only_pick_these_items;
+			const bool found_on_subscription_list = found_in(pick_list, item_entity);
 
-			bool item_subscribed = (pick_list.empty() && item_slot_transfers->pick_all_touched_items_if_list_to_pick_empty)
+			const bool item_subscribed = (pick_list.empty() && item_slot_transfers->pick_all_touched_items_if_list_to_pick_empty)
 				|| found_in(item_slot_transfers->only_pick_these_items, item_entity);
 			
 			if (item_subscribed) {
@@ -78,18 +77,18 @@ void item_system::handle_trigger_confirmations_as_pick_requests(fixed_step& step
 
 void item_system::handle_throw_item_intents(fixed_step& step) {
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
-	auto& requests = step.messages.get_queue<messages::intent_message>();
+	const auto& delta = step.get_delta();
+	const auto& requests = step.messages.get_queue<messages::intent_message>();
 
-	for (auto& r : requests) {
+	for (const auto& r : requests) {
 		if (r.pressed_flag &&
 			(r.intent == intent_type::THROW_PRIMARY_ITEM
 				|| r.intent == intent_type::THROW_SECONDARY_ITEM)
 			) {
-			auto subject = cosmos[r.subject];
+			const auto subject = cosmos[r.subject];
 
 			if (subject.find<components::item_slot_transfers>()) {
-				auto hand = subject.map_primary_action_to_secondary_hand_if_primary_empty(intent_type::THROW_SECONDARY_ITEM == r.intent);
+				const auto hand = subject.map_primary_action_to_secondary_hand_if_primary_empty(intent_type::THROW_SECONDARY_ITEM == r.intent);
 
 				if (hand.has_items()) {
 					perform_transfer({ hand.get_items_inside()[0], cosmos[inventory_slot_id()] }, step);
@@ -101,22 +100,22 @@ void item_system::handle_throw_item_intents(fixed_step& step) {
 
 void item_system::handle_holster_item_intents(fixed_step& step) {
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
-	auto& requests = step.messages.get_queue<messages::intent_message>();
+	const auto& delta = step.get_delta();
+	const auto& requests = step.messages.get_queue<messages::intent_message>();
 
-	for (auto& r : requests) {
+	for (const auto& r : requests) {
 		if (r.pressed_flag &&
 			(r.intent == intent_type::HOLSTER_PRIMARY_ITEM
 				|| r.intent == intent_type::HOLSTER_SECONDARY_ITEM)
 			) {
-			auto subject = cosmos[r.subject];
+			const auto subject = cosmos[r.subject];
 
 			if (subject.find<components::item_slot_transfers>()) {
-				auto hand = subject.map_primary_action_to_secondary_hand_if_primary_empty(intent_type::HOLSTER_SECONDARY_ITEM == r.intent);
+				const auto hand = subject.map_primary_action_to_secondary_hand_if_primary_empty(intent_type::HOLSTER_SECONDARY_ITEM == r.intent);
 
 				if (hand.has_items()) {
-					auto item_inside = hand.get_items_inside()[0];
-					item_slot_transfer_request request(item_inside, item_inside.determine_hand_holstering_slot_in(subject));
+					const auto item_inside = hand.get_items_inside()[0];
+					const item_slot_transfer_request request(item_inside, item_inside.determine_hand_holstering_slot_in(subject));
 
 					if (request.target_slot.alive())
 						perform_transfer(request, step);
@@ -134,12 +133,11 @@ void components::item_slot_transfers::interrupt_mounting() {
 void item_system::process_mounting_and_unmounting(fixed_step& step) {
 	ensure(false);
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
-	auto targets = cosmos.get(processing_subjects::WITH_ITEM_SLOT_TRANSFERS);
-	for (auto& e : targets) {
+	const auto& delta = step.get_delta();
+	for (const auto& e : cosmos.get(processing_subjects::WITH_ITEM_SLOT_TRANSFERS)) {
 		auto& item_slot_transfers = e.get<components::item_slot_transfers>();
 
-		auto currently_mounted_item = cosmos[item_slot_transfers.mounting.current_item];
+		const auto currently_mounted_item = cosmos[item_slot_transfers.mounting.current_item];
 
 		if (currently_mounted_item.alive()) {
 			auto& item = currently_mounted_item.get<components::item>();

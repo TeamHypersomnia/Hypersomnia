@@ -137,9 +137,7 @@ void animation_system::progress_animation_states(fixed_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 
-	auto targets_copy = cosmos.get(processing_subjects::WITH_ANIMATION);
-
-	for (const auto& it : targets_copy) {
+	for (const auto& it : cosmos.get(processing_subjects::WITH_ANIMATION)) {
 		auto& animation_state = it.get<components::animation>();
 
 		if (animation_state.state != components::animation::playing_state::PAUSED) {
