@@ -62,20 +62,20 @@ void cosmos::destroy_substance_completely() {
 		sys.reserve_caches_for_entities(n);
 	});
 
-	for_each_entity_id([this](entity_id id) {
+	for_each_entity_id([this](const entity_id id) {
 		auto h = get_handle(id);
 		destroy_substance_for_entity(h);
 	});
 }
 
 void cosmos::create_substance_completely() {
-	for_each_entity_id([this](entity_id id) {
+	for_each_entity_id([this](const entity_id id) {
 		auto h = get_handle(id);
 		create_substance_for_entity(h);
 	});
 }
 
-void cosmos::destroy_substance_for_entity(const_entity_handle h) {
+void cosmos::destroy_substance_for_entity(const const_entity_handle h) {
 	temporary_systems.for_each([h](auto& sys) {
 		sys.destruct(h);
 	});
@@ -89,7 +89,7 @@ void cosmos::create_substance_for_entity(const_entity_handle h) {
 	}
 }
 
-cosmos::cosmos(unsigned reserved_entities) {
+cosmos::cosmos(const unsigned reserved_entities) {
 	reserve_storage_for_entities(reserved_entities);
 }
 
@@ -116,25 +116,25 @@ cosmos& cosmos::operator=(const cosmos& b) {
 
 #if COSMOS_TRACKS_GUIDS
 
-unsigned cosmos::get_guid(const_entity_handle handle) const {
+unsigned cosmos::get_guid(const const_entity_handle handle) const {
 	return handle.get_guid();
 }
 
-void cosmos::assign_next_guid(entity_handle new_entity) {
+void cosmos::assign_next_guid(const entity_handle new_entity) {
 	auto this_guid = significant.meta.next_entity_guid++;
 
 	guid_map_for_transport[this_guid] = new_entity;
 	new_entity.get<components::guid>().value = this_guid;
 }
 
-void cosmos::clear_guid(entity_handle cleared) {
+void cosmos::clear_guid(const entity_handle cleared) {
 	guid_map_for_transport.erase(get_guid(cleared));
 }
 
 void cosmos::remap_guids() {
 	guid_map_for_transport.clear();
 
-	for_each_entity_id([this](entity_id id) {
+	for_each_entity_id([this](const entity_id id) {
 		guid_map_for_transport[get_guid(get_handle(id))] = id;
 	});
 }
@@ -154,12 +154,12 @@ cosmos& cosmos::operator=(const significant_state& b) {
 	return *this;
 }
 
-void cosmos::complete_resubstantiation(const_entity_handle h) {
+void cosmos::complete_resubstantiation(const const_entity_handle h) {
 	destroy_substance_for_entity(h);
 	create_substance_for_entity(h);
 }
 
-void cosmos::reserve_storage_for_entities(size_t n) {
+void cosmos::reserve_storage_for_entities(const size_t n) {
 	reserve_storage_for_aggregates(n);
 
 	temporary_systems.for_each([n](auto& sys) {
@@ -171,24 +171,24 @@ std::wstring cosmos::summary() const {
 	return typesafe_sprintf(L"Entities: %x\n", entities_count());
 }
 
-std::vector<entity_handle> cosmos::get(processing_subjects list) {
+std::vector<entity_handle> cosmos::get(const processing_subjects list) {
 	return temporary_systems.get<processing_lists_system>().get(list, *this);
 }
 
-std::vector<const_entity_handle> cosmos::get(processing_subjects list) const {
+std::vector<const_entity_handle> cosmos::get(const processing_subjects list) const {
 	return temporary_systems.get<processing_lists_system>().get(list, *this);
 }
 
-randomization cosmos::get_rng_for(entity_id id) const {
+randomization cosmos::get_rng_for(const entity_id id) const {
 	return { id.pool.version + std::abs(id.pool.indirection_index) + static_cast<size_t>(significant.meta.delta.get_total_steps_passed()) };
 }
 
 #if COSMOS_TRACKS_GUIDS
-entity_handle cosmos::get_entity_by_guid(unsigned guid) {
+entity_handle cosmos::get_entity_by_guid(const unsigned guid) {
 	return get_handle(guid_map_for_transport.at(guid));
 }
 
-const_entity_handle cosmos::get_entity_by_guid(unsigned guid) const {
+const_entity_handle cosmos::get_entity_by_guid(const unsigned guid) const {
 	return get_handle(guid_map_for_transport.at(guid));
 }
 
@@ -197,25 +197,25 @@ bool cosmos::entity_exists_with_guid(unsigned guid) const {
 }
 #endif
 
-entity_handle cosmos::get_handle(entity_id id) {
+entity_handle cosmos::get_handle(const entity_id id) {
 	return entity_handle(*this, id);
 }
 
-const_entity_handle cosmos::get_handle(entity_id id) const {
+const_entity_handle cosmos::get_handle(const entity_id id) const {
 	return const_entity_handle(*this, id);
 }
 
-inventory_slot_handle cosmos::get_handle(inventory_slot_id id) {
+inventory_slot_handle cosmos::get_handle(const inventory_slot_id id) {
 	return inventory_slot_handle(*this, id);
 }
 
-const_inventory_slot_handle cosmos::get_handle(inventory_slot_id id) const {
+const_inventory_slot_handle cosmos::get_handle(const inventory_slot_id id) const {
 	return const_inventory_slot_handle(*this, id);
 }
 
-entity_handle cosmos::create_entity(std::string debug_name) {
+entity_handle cosmos::create_entity(const std::string debug_name) {
 
-	auto new_entity = get_handle(allocate_aggregate(debug_name));
+	const auto new_entity = get_handle(allocate_aggregate(debug_name));
 	new_entity += components::guid();
 
 #if COSMOS_TRACKS_GUIDS
@@ -227,8 +227,8 @@ entity_handle cosmos::create_entity(std::string debug_name) {
 }
 
 #if COSMOS_TRACKS_GUIDS
-entity_handle cosmos::create_entity_with_specific_guid(std::string debug_name, unsigned specific_guid) {
-	auto new_entity = get_handle(allocate_aggregate(debug_name));
+entity_handle cosmos::create_entity_with_specific_guid(const std::string debug_name, const unsigned specific_guid) {
+	const auto new_entity = get_handle(allocate_aggregate(debug_name));
 	new_entity += components::guid();
 
 	guid_map_for_transport[specific_guid] = new_entity;
@@ -237,13 +237,13 @@ entity_handle cosmos::create_entity_with_specific_guid(std::string debug_name, u
 }
 #endif
 
-entity_handle cosmos::clone_entity(entity_id copied_entity_id) {
-	const_entity_handle copied_entity = get_handle(copied_entity_id);
+entity_handle cosmos::clone_entity(const entity_id copied_entity_id) {
+	const const_entity_handle copied_entity = get_handle(copied_entity_id);
 	
 	if (copied_entity.dead())
 		return get_handle(entity_id());
 
-	auto new_entity = get_handle(clone_aggregate<components::substance>(copied_entity));
+	const auto new_entity = get_handle(clone_aggregate<components::substance>(copied_entity));
 	//ensure(new_entity.get_id().pool.indirection_index != 37046);
 	//ensure(new_entity.get_id().pool.indirection_index != 36985);
 
@@ -253,7 +253,7 @@ entity_handle cosmos::clone_entity(entity_id copied_entity_id) {
 
 	// zero-out non-trivial relational components
 
-	for_each_type<components::child, components::physical_relations, components::sub_entities>([copied_entity, new_entity](auto c) {
+	for_each_type<components::child, components::physical_relations, components::sub_entities>([copied_entity, new_entity](const auto c) {
 		typedef decltype(c) T;
 		
 		if (copied_entity.has<T>())
@@ -273,7 +273,7 @@ entity_handle cosmos::clone_entity(entity_id copied_entity_id) {
 }
 
 void cosmos::delete_entity(entity_id e) {
-	auto handle = get_handle(e);
+	const auto handle = get_handle(e);
 	if (handle.dead()) {
 		LOG("Warning! Attempt to delete a dead entity: %x", e);
 		return;
@@ -281,7 +281,7 @@ void cosmos::delete_entity(entity_id e) {
 
 	//ensure(handle.alive());
 
-	bool should_destruct_now_to_avoid_repeated_resubstantiation = handle.has<components::substance>();
+	const bool should_destruct_now_to_avoid_repeated_resubstantiation = handle.has<components::substance>();
 
 	if (should_destruct_now_to_avoid_repeated_resubstantiation)
 		handle.remove<components::substance>();
@@ -291,9 +291,9 @@ void cosmos::delete_entity(entity_id e) {
 #endif
 	// now manipulation of substanceless entity won't trigger redundant resubstantiation
 
-	auto owner_body = handle.get_owner_body();
+	const auto owner_body = handle.get_owner_body();
 
-	bool should_release_dependency = owner_body != handle;
+	const bool should_release_dependency = owner_body != handle;
 
 	if (should_release_dependency) {
 		handle.set_owner_body(owner_body);
@@ -310,7 +310,7 @@ size_t cosmos::get_maximum_entities() const {
 	return significant.pool_for_aggregates.capacity();
 }
 
-void cosmos::advance_deterministic_schemata(cosmic_entropy input) {
+void cosmos::advance_deterministic_schemata(const cosmic_entropy input) {
 	fixed_step step(*this, input);
 	advance_deterministic_schemata(step);
 }
@@ -319,7 +319,7 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 	auto& performance = profiler;
-	physics_system::contact_listener listener(step.cosm);
+	const physics_system::contact_listener listener(step.cosm);
 
 	profiler.entropy_length.measure(step.entropy.length());
 
@@ -415,7 +415,7 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 
 	trace_system().spawn_finishing_traces_for_destroyed_objects(step);
 
-	bool has_no_destruction_callback_queued_any_additional_destruction = step.messages.get_queue<messages::queue_destruction>().empty();
+	const bool has_no_destruction_callback_queued_any_additional_destruction = step.messages.get_queue<messages::queue_destruction>().empty();
 	ensure(has_no_destruction_callback_queued_any_additional_destruction);
 
 	listener.~contact_listener();

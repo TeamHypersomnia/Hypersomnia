@@ -9,7 +9,7 @@ game_window::game_window() {
 	bind_game_and_augs(lua);
 }
 
-void game_window::call_window_script(std::string filename) {
+void game_window::call_window_script(const std::string filename) {
 	lua.global_ptr("global_gl_window", &window);
 
 	try {
