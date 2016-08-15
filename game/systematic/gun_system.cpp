@@ -31,11 +31,11 @@ using namespace augs;
 
 void gun_system::consume_gun_intents(fixed_step& step) {
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
-	auto events = step.messages.get_queue<messages::intent_message>();
+	const auto& delta = step.get_delta();
+	const auto& events = step.messages.get_queue<messages::intent_message>();
 
 	for (const auto& it : events) {
-		auto* maybe_gun = cosmos[it.subject].find<components::gun>();
+		auto* const maybe_gun = cosmos[it.subject].find<components::gun>();
 		if (maybe_gun == nullptr) continue;
 
 		auto& gun = *maybe_gun;
@@ -50,7 +50,7 @@ void gun_system::consume_gun_intents(fixed_step& step) {
 	}
 }
 
-components::transform components::gun::calculate_barrel_transform(components::transform gun_transform) const {
+components::transform components::gun::calculate_barrel_transform(const components::transform gun_transform) const {
 	auto barrel_transform = gun_transform;
 	barrel_transform.pos += vec2(bullet_spawn_offset).rotate(gun_transform.rotation, vec2());
 
@@ -59,34 +59,32 @@ components::transform components::gun::calculate_barrel_transform(components::tr
 
 void gun_system::launch_shots_due_to_pressed_triggers(fixed_step& step) {
 	auto& cosmos = step.cosm;
-	auto delta = step.get_delta();
+	const auto& delta = step.get_delta();
 	step.messages.get_queue<messages::gunshot_response>().clear();
 
 	auto& physics_sys = cosmos.temporary_systems.get<physics_system>();
 
-	auto targets = cosmos.get(processing_subjects::WITH_GUN); //??
-	for (const auto& it : targets) {
+	for (const auto& it : cosmos.get(processing_subjects::WITH_GUN)) {
 		const auto& gun_transform = it.get<components::transform>();
 		auto& gun = it.get<components::gun>();
-		auto& container = it.get<components::container>();
 
 		if (gun.trigger_pressed && gun.shot_cooldown.try_to_fire_and_reset(delta)) {
 			if (gun.action_mode != components::gun::action_type::AUTOMATIC)
 				gun.trigger_pressed = false;
 
-			auto chamber_slot = it[slot_function::GUN_CHAMBER];
+			const auto chamber_slot = it[slot_function::GUN_CHAMBER];
 
 			if (chamber_slot.get_mounted_items().size() == 1) {
 				messages::gunshot_response response;
 
-				auto barrel_transform = gun.calculate_barrel_transform(gun_transform);
+				const auto barrel_transform = gun.calculate_barrel_transform(gun_transform);
 				
-				auto item_in_chamber = chamber_slot.get_mounted_items()[0];
+				const auto item_in_chamber = chamber_slot.get_mounted_items()[0];
 
 				std::vector<entity_handle> bullet_entities;
 				bullet_entities.clear();
 
-				auto pellets_slot = item_in_chamber[slot_function::ITEM_DEPOSIT];
+				const auto pellets_slot = item_in_chamber[slot_function::ITEM_DEPOSIT];
 
 				bool destroy_pellets_container = false;
 
@@ -99,7 +97,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(fixed_step& step) {
 
 				float total_recoil_multiplier = 1.f;
 
-				for(auto& catridge_or_pellet_stack : bullet_entities) {
+				for(const auto& catridge_or_pellet_stack : bullet_entities) {
 					int charges = catridge_or_pellet_stack.get<components::item>().charges;
 
 					while (charges--) {
@@ -151,8 +149,8 @@ void gun_system::launch_shots_due_to_pressed_triggers(fixed_step& step) {
 				}
 
 				if (total_recoil_multiplier > 0.f) {
-					auto owning_capability = it.get_owning_transfer_capability();
-					auto owning_crosshair_recoil = owning_capability[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
+					const auto owning_capability = it.get_owning_transfer_capability();
+					const auto owning_crosshair_recoil = owning_capability[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
 					gun.recoil.shoot_and_apply_impulse(owning_crosshair_recoil, total_recoil_multiplier/100.f, true);
 				}
 
