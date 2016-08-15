@@ -25,16 +25,16 @@
 
 void driver_system::assign_drivers_from_successful_trigger_hits(fixed_step& step) {
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
-	auto& confirmations = step.messages.get_queue<messages::trigger_hit_confirmation_message>();
+	const auto& delta = step.get_delta();
+	const auto& confirmations = step.messages.get_queue<messages::trigger_hit_confirmation_message>();
 
-	for (auto& e : confirmations) {
-		auto subject_car = cosmos[cosmos[e.trigger].get<components::trigger>().entity_to_be_notified];
+	for (const auto& e : confirmations) {
+		const auto& subject_car = cosmos[cosmos[e.trigger].get<components::trigger>().entity_to_be_notified];
 
 		if (subject_car.dead())
 			continue;
 
-		auto* maybe_car = subject_car.find<components::car>();
+		const auto* const maybe_car = subject_car.find<components::car>();
 
 		if (maybe_car && e.trigger == maybe_car->left_wheel_trigger)
 			assign_car_ownership(cosmos[e.detector_body], subject_car);
@@ -43,16 +43,16 @@ void driver_system::assign_drivers_from_successful_trigger_hits(fixed_step& step
 
 void driver_system::release_drivers_due_to_ending_contact_with_wheel(fixed_step& step) {
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
-	auto& contacts = step.messages.get_queue<messages::collision_message>();
-	auto& physics = cosmos.temporary_systems.get<physics_system>();
+	const auto& delta = step.get_delta();
+	const auto& contacts = step.messages.get_queue<messages::collision_message>();
+	const auto& physics = cosmos.temporary_systems.get<physics_system>();
 
-	for (auto& c : contacts) {
+	for (const auto& c : contacts) {
 		if (c.type == messages::collision_message::event_type::END_CONTACT) {
-			auto driver = cosmos[c.subject];
-			auto car = cosmos[c.collider].get_owner_body();
+			const auto& driver = cosmos[c.subject];
+			const auto& car = cosmos[c.collider].get_owner_body();
 
-			auto* maybe_driver = driver.find<components::driver>();
+			const auto* const maybe_driver = driver.find<components::driver>();
 
 			if (maybe_driver) {
 				if (maybe_driver->owned_vehicle == car) {
@@ -65,29 +65,29 @@ void driver_system::release_drivers_due_to_ending_contact_with_wheel(fixed_step&
 }
 void driver_system::release_drivers_due_to_requests(fixed_step& step) {
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
-	auto& intents = step.messages.get_queue<messages::intent_message>();
+	const auto& delta = step.get_delta();
+	const auto& intents = step.messages.get_queue<messages::intent_message>();
 
-	for (auto& e : intents)
+	for (const auto& e : intents)
 		if (e.intent == intent_type::RELEASE_CAR && e.pressed_flag)
 			release_car_ownership(cosmos[e.subject]);
 }
 
-bool driver_system::release_car_ownership(entity_handle driver) {
+bool driver_system::release_car_ownership(const entity_handle driver) {
 	return change_car_ownership(driver, driver.get_cosmos()[entity_id()], true);
 }
 
-bool driver_system::assign_car_ownership(entity_handle driver, entity_handle car) {
+bool driver_system::assign_car_ownership(const entity_handle driver, const entity_handle car) {
 	return change_car_ownership(driver, car, false);
 }
 
 bool driver_system::change_car_ownership(entity_handle driver_entity, entity_handle car_entity, bool lost_ownership) {
 	auto& driver = driver_entity.get<components::driver>();
 	auto& cosmos = driver_entity.get_cosmos();
-	auto& physics = cosmos.temporary_systems.get<physics_system>();
+	const auto& physics = cosmos.temporary_systems.get<physics_system>();
 
 	auto* maybe_rotation_copying = driver_entity.find<components::rotation_copying>();
-	bool has_physics = driver_entity.has<components::physics>();
+	const bool has_physics = driver_entity.has<components::physics>();
 	auto* maybe_movement = driver_entity.find<components::movement>();
 	auto& force_joint = driver_entity.get<components::force_joint>();
 
