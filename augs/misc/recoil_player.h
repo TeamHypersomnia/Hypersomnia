@@ -39,5 +39,5 @@ public:
 	void shoot_and_apply_impulse(entity_handle recoil_body, float scale, bool angular_impulse = false, float additional_angle = 0.f,
 		bool positional_impulse = false, float positional_rotation = 0.f);
 	
-	void cooldown(double amount_ms);
+	void cooldown(float amount_ms);
 };
