@@ -3884,5 +3884,8 @@
     <ClInclude Include="3rdparty\RakNet\Source\XBox360Includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game\transcendental\simulation_exchange.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
