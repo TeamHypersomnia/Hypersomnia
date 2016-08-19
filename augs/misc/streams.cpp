@@ -3,8 +3,8 @@
 
 namespace augs {
 	void stream::read(char* data, size_t bytes) {
-		memcpy(data, buf.data() + pos, bytes);
-		pos += bytes;
+		memcpy(data, buf.data() + read_pos, bytes);
+		read_pos += bytes;
 	}
 
 	bool stream::operator==(const stream& b) const {
@@ -32,22 +32,22 @@ namespace augs {
 	}
 
 	void stream::write(const char* data, size_t bytes) {
-		memcpy(buf.data() + pos, data, bytes);
-		pos += bytes;
+		memcpy(buf.data() + write_pos, data, bytes);
+		write_pos += bytes;
 	}
 
 	void output_stream_reserver::write(const char*, size_t bytes) {
-		pos += bytes;
+		write_pos += bytes;
 	}
 
 	stream output_stream_reserver::make_stream() {
 		stream reserved;
-		reserved.reserve(pos);
+		reserved.reserve(write_pos);
 		return std::move(reserved);
 	}
 
 	void stream::reserve(size_t bytes) {
-		reset_pos();
+		ensure(write_pos == 0);
 		buf.resize(bytes);
 	};
 	

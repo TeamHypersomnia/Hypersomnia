@@ -41,6 +41,8 @@
 #include "game/transcendental/types_specification/all_messages_includes.h"
 #include "game/transcendental/types_specification/all_component_includes.h"
 
+#include "game/transcendental/cosmic_delta.h"
+
 #include <sstream>
 
 void cosmos::complete_resubstantiation() {
@@ -317,9 +319,11 @@ void cosmos::advance_deterministic_schemata(const cosmic_entropy input) {
 
 void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
+	const auto& delta = step.get_delta();
 	auto& performance = profiler;
 	const physics_system::contact_listener listener(step.cosm);
+
+	cosmic_delta::decode(cosmos, step.entropy.delta_to_apply);
 
 	profiler.entropy_length.measure(step.entropy.length());
 

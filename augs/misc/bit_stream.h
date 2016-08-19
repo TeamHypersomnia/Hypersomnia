@@ -3,6 +3,8 @@
 #include "streams.h"
 
 namespace augs {
+	typedef stream bit_stream;
+	/*
 	class bit_stream : public stream_position {
 	public:
 		std::vector<bool> buf;
@@ -41,5 +43,5 @@ namespace augs {
 
 			pos += I;
 		}
-	};
+	};*/
 }

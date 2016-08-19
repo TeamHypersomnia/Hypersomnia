@@ -60,8 +60,6 @@ void multiverse::load_cosmos_from_file(std::string filename) {
 
 	reading_savefile.end_measurement();
 	
-	stream.reset_pos();
-	
 	deserialization_pass.new_measurement();
 
 	augs::read_object(stream, main_cosmos_timer);
@@ -102,8 +100,6 @@ bool cosmos::significant_state::operator==(const significant_state& second) cons
 			break;
 		}
 	}
-	
-	second_serialized.reset_pos();
 	
 	significant_state resultant;
 	augs::read_object(second_serialized, resultant);

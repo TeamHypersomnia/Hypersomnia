@@ -6,19 +6,28 @@ namespace augs {
 
 	class stream_position {
 	protected:
-		size_t pos = 0;
+		size_t read_pos = 0;
+		size_t write_pos = 0;
 	public:
 
-		size_t get_pos() const {
-			return pos;
+		size_t get_write_pos() const {
+			return write_pos;
 		}
 
-		void reset_pos() {
-			pos = 0;
+		size_t get_read_pos() const {
+			return read_pos;
+		}
+
+		void reset_write_pos() {
+			write_pos = 0;
+		}
+
+		void reset_read_pos() {
+			read_pos = 0;
 		}
 
 		size_t size() const {
-			return pos;
+			return write_pos;
 		}
 	};
 

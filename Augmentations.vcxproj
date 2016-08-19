@@ -399,7 +399,6 @@
     <ClCompile Include="augs\gui\formatted_text.cpp" />
     <ClCompile Include="augs\gui\middlescrolling.cpp" />
     <ClCompile Include="augs\gui\rect_handle.cpp" />
-    <ClCompile Include="augs\misc\bit_stream.cpp" />
     <ClCompile Include="augs\misc\delta_compression.cpp" />
     <ClCompile Include="augs\misc\machine_entropy.cpp" />
     <ClCompile Include="augs\misc\pool_id.cpp" />
@@ -504,6 +503,7 @@
     <ClCompile Include="game\detail\inventory_slot.cpp" />
     <ClCompile Include="game\detail\inventory_utils.cpp" />
     <ClCompile Include="game\transcendental\serialization.cpp" />
+    <ClCompile Include="game\transcendental\simulation_exchange.cpp" />
     <ClCompile Include="game\transcendental\step.cpp" />
     <ClCompile Include="game\systematic\animation_system.cpp" />
     <ClCompile Include="game\systematic\behaviour_tree_system.cpp" />

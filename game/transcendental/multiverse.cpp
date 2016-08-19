@@ -99,13 +99,13 @@ void multiverse::simulate() {
 					cosm_with_guids.significant = stashed_cosmos;
 					cosm_with_guids.remap_guids();
 
-					ensure(stashed_delta.GetWriteOffset() == 0);
+					ensure(stashed_delta.get_write_pos() == 0);
 					cosmic_delta::encode(cosm_with_guids, main_cosmos, stashed_delta);
-					delta_bytes.measure(stashed_delta.GetNumberOfBytesUsed());
+					delta_bytes.measure(stashed_delta.size());
 					
-					stashed_delta.ResetReadPointer();
+					stashed_delta.reset_read_pos();
 					cosmic_delta::decode(cosm_with_guids, stashed_delta);
-					stashed_delta.ResetWritePointer();
+					stashed_delta.reset_write_pos();
 
 					main_cosmos = cosm_with_guids;
 				}

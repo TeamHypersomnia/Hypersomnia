@@ -1,3 +1,5 @@
+#include "augs/templates.h"
+#include "cosmic_delta.h"
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "augs/misc/templated_readwrite.h"
 
@@ -8,7 +10,6 @@
 
 #include "BitStream.h"
 #include "cosmos.h"
-#include "cosmic_delta.h"
 
 #include <gtest/gtest.h>
 
@@ -56,8 +57,10 @@ struct delted_entity_stream {
 	RakNet::BitStream stream_for_removed;
 };
 
-void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStream& out) {
-	const auto used_bits = out.GetNumberOfBitsUsed();
+void cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::bit_stream& final_out) {
+	RakNet::BitStream out;
+	
+	const auto used_bits = final_out.size();
 	ensure_eq(0, used_bits);
 
 	enco.profiler.delta_encoding.new_measurement();
@@ -208,9 +211,15 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, RakNet::BitStr
 	}
 
 	enco.profiler.delta_encoding.end_measurement();
+
+	final_out.reserve(out.GetNumberOfBytesUsed());
+	final_out.write(reinterpret_cast<const char*>(out.GetData()), out.GetNumberOfBytesUsed());
 }
 
-void cosmic_delta::decode(cosmos& deco, RakNet::BitStream& in, const bool resubstantiate_partially) {
+void cosmic_delta::decode(cosmos& deco, augs::bit_stream& final_in, const bool resubstantiate_partially) {
+	RakNet::BitStream in;
+	in.Write(final_in.data(), final_in.size());
+
 	if (in.GetNumberOfUnreadBits() == 0)
 		return;
 	
@@ -448,12 +457,9 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndTwoNew) {
 	new_ent2 += components::position_copying();
 
 	{
-		RakNet::BitStream s;
+		augs::bit_stream s;
 
 		cosmic_delta::encode(c1, c2, s);
-
-		s.ResetReadPointer();
-
 		cosmic_delta::decode(c1, s);
 	}
 
@@ -482,11 +488,11 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndTwoNew) {
 	ASSERT_TRUE(ent2.has<components::trace>());
 
 	{
-		RakNet::BitStream comparatory;
+		augs::bit_stream comparatory;
 		
 		cosmic_delta::encode(c1, c2, comparatory);
 
-		ASSERT_EQ(0, comparatory.GetNumberOfBitsUsed());
+		ASSERT_EQ(0, comparatory.size());
 		ASSERT_TRUE(c1 == c2);
 	}
 }
@@ -510,12 +516,9 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndCreatedThreeEntitiesWithReferences) {
 	new_ent1.map_sub_entity(sub_entity_name::CHARACTER_CROSSHAIR, new_ent2);
 
 	{
-		RakNet::BitStream s;
+		augs::bit_stream s;
 
 		cosmic_delta::encode(c1, c2, s);
-
-		s.ResetReadPointer();
-
 		cosmic_delta::decode(c1, s);
 	}
 
@@ -543,11 +546,11 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndCreatedThreeEntitiesWithReferences) {
 	ASSERT_TRUE(sub_entities_intact);
 
 	{
-		RakNet::BitStream comparatory;
+		augs::bit_stream comparatory;
 
 		cosmic_delta::encode(c1, c2, comparatory);
 
-		ASSERT_EQ(0, comparatory.GetNumberOfBitsUsed());
+		ASSERT_EQ(0, comparatory.size());
 	}
 }
 
@@ -598,32 +601,29 @@ TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
 	ASSERT_EQ(3, c2.entities_count());
 
 	{
-		RakNet::BitStream comparatory;
+		augs::bit_stream comparatory;
 
 		cosmic_delta::encode(c1, c2, comparatory);
 
-		ASSERT_EQ(0, comparatory.GetNumberOfBitsUsed());
+		ASSERT_EQ(0, comparatory.size());
 	}
 
 	c2.delete_entity(c2.get_entity_by_guid(c2_second_guid));
 	ASSERT_EQ(2, c2.entities_count());
 
 	{
-		RakNet::BitStream s;
+		augs::bit_stream s;
 
 		cosmic_delta::encode(c1, c2, s);
-
-		s.ResetReadPointer();
-
 		cosmic_delta::decode(c1, s);
 	}
 
 	{
-		RakNet::BitStream comparatory;
+		augs::bit_stream comparatory;
 
 		cosmic_delta::encode(c1, c2, comparatory);
 
-		ASSERT_EQ(0, comparatory.GetNumberOfBitsUsed());
+		ASSERT_EQ(0, comparatory.size());
 	}
 
 	ASSERT_EQ(2, c1.entities_count());
