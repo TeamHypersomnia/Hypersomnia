@@ -15,6 +15,8 @@ class basic_viewing_step;
 class fixed_step;
 class cosmos;
 class world_camera;
+class viewing_session;
+struct input_context;
 
 namespace scene_managers {
 	class testbed {
@@ -34,8 +36,10 @@ namespace scene_managers {
 			);
 		}
 
+		void configure_view(viewing_session&) const;
+
 		void populate_world_with_entities(fixed_step&);
-		cosmic_entropy make_cosmic_entropy(augs::machine_entropy, cosmos&);
+		cosmic_entropy make_cosmic_entropy(const augs::machine_entropy&, const input_context&, cosmos&);
 		entity_id get_controlled_entity() const;
 
 		void inject_input_to(entity_handle);

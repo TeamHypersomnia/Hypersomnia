@@ -3,7 +3,7 @@
 #include "streams.h"
 
 namespace augs {
-	typedef stream stream;
+	typedef stream bit_stream;
 	/*
 	class stream : public stream_position {
 	public:

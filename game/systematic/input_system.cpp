@@ -26,43 +26,15 @@
 
 using namespace augs::window;
 
-void input_system::make_intents_from_raw_entropy(fixed_step& step) {
+void input_system::make_intent_messages(fixed_step& step) {
 	auto& cosmos = step.cosm;
-	const auto& context = cosmos.significant.meta.settings.input;
 
 	for (const auto& per_entity : step.entropy.entropy_per_entity) {
 		for (const auto& raw : per_entity.second) {
-			messages::intent_message mapped_intent;
-			mapped_intent.subject = per_entity.first;
-			mapped_intent.state = raw;
-
-			intent_type intent;
-
-			bool found_context_entry = false;
-
-			if (raw.key_event == event::NO_CHANGE) {
-				mapped_intent.pressed_flag = true;
-
-				const auto found_intent = context.event_to_intent.find(raw.msg);
-				if (found_intent != context.event_to_intent.end()) {
-					intent = (*found_intent).second;
-					found_context_entry = true;
-				}
-			}
-			else if (raw.key_event == event::PRESSED || raw.key_event == event::RELEASED) {
-				mapped_intent.pressed_flag = raw.key_event == event::PRESSED;
-
-				const auto found_intent = context.key_to_intent.find(raw.key);
-				if (found_intent != context.key_to_intent.end()) {
-					intent = (*found_intent).second;
-					found_context_entry = true;
-				}
-			}
-
-			if (found_context_entry) {
-				mapped_intent.intent = intent;
-				step.messages.post(mapped_intent);
-			}
+			messages::intent_message intent;
+			intent.entity_intent::operator=(raw);
+			intent.subject = per_entity.first;
+			step.messages.post(intent);
 		}
 	}
 }

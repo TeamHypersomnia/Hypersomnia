@@ -338,7 +338,7 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 
 	performance.start(meter_type::LOGIC);
 	
-	input_system().make_intents_from_raw_entropy(step);
+	input_system().make_intent_messages(step);
 
 	intent_contextualization_system().contextualize_crosshair_action_intents(step);
 	intent_contextualization_system().contextualize_use_button_intents(step);

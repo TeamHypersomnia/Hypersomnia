@@ -10,6 +10,8 @@ struct cosmic_entropy;
 class basic_viewing_step;
 class fixed_step;
 class cosmos;
+class viewing_session;
+struct input_context;
 
 namespace scene_managers {
 	class one_entity {
@@ -20,8 +22,10 @@ namespace scene_managers {
 
 	public:
 		void populate_world_with_entities(fixed_step&);
-		cosmic_entropy make_cosmic_entropy(augs::machine_entropy, cosmos&);
+		cosmic_entropy make_cosmic_entropy(augs::machine_entropy, const input_context&, cosmos&);
 		entity_id get_controlled_entity() const;
+
+		void configure_view(viewing_session&) const;
 
 		void pre_solve(fixed_step&);
 		void post_solve(fixed_step&);

@@ -8,6 +8,7 @@
 
 class game_window;
 class viewing_session;
+struct input_context;
 
 namespace augs {
 	class renderer;
@@ -61,7 +62,9 @@ public:
 	cosmos main_cosmos;
 	augs::fixed_delta_timer main_cosmos_timer;
 
+	void configure_view(viewing_session&) const;
+
 	void control(augs::machine_entropy);
-	void simulate();
+	void simulate(const input_context&);
 	void view(game_window&, viewing_session&) const;
 };

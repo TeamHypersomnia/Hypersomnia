@@ -20,6 +20,7 @@
 
 #include "augs/misc/machine_entropy.h"
 #include "game/transcendental/cosmic_entropy.h"
+#include "game/transcendental/viewing_session.h"
 #include "game/transcendental/step.h"
 
 namespace scene_managers {
@@ -126,7 +127,19 @@ namespace scene_managers {
 		auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
 		prefabs::create_sample_backpack(world, vec2(200, -750));
 
-		auto& active_context = world.significant.meta.settings.input;
+		world.significant.meta.settings.visibility.epsilon_ray_distance_variation = 0.001;
+		world.significant.meta.settings.visibility.epsilon_threshold_obstacle_hit = 10;
+		world.significant.meta.settings.visibility.epsilon_distance_vertex_hit = 1;
+
+		world.significant.meta.settings.pathfinding.draw_memorised_walls = 1;
+		world.significant.meta.settings.pathfinding.draw_undiscovered = 1;
+
+		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
+		characters = to_id_vector(new_characters);
+	}
+
+	void one_entity::configure_view(viewing_session& session) const {
+		auto& active_context = session.input;
 
 		active_context.map_key_to_intent(window::event::keys::W, intent_type::MOVE_FORWARD);
 		active_context.map_key_to_intent(window::event::keys::S, intent_type::MOVE_BACKWARD);
@@ -150,26 +163,15 @@ namespace scene_managers {
 
 		active_context.map_key_to_intent(window::event::keys::SPACE, intent_type::SPACE_BUTTON);
 		active_context.map_key_to_intent(window::event::keys::MOUSE4, intent_type::SWITCH_TO_GUI);
-
-		world.significant.meta.settings.visibility.epsilon_ray_distance_variation = 0.001;
-		world.significant.meta.settings.visibility.epsilon_threshold_obstacle_hit = 10;
-		world.significant.meta.settings.visibility.epsilon_distance_vertex_hit = 1;
-
-		world.significant.meta.settings.pathfinding.draw_memorised_walls = 1;
-		world.significant.meta.settings.pathfinding.draw_undiscovered = 1;
-
-		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
-		characters = to_id_vector(new_characters);
 	}
-
 
 	entity_id one_entity::get_controlled_entity() const {
 		return characters[current_character];
 	}
 
-	cosmic_entropy one_entity::make_cosmic_entropy(augs::machine_entropy machine, cosmos& cosm) {
+	cosmic_entropy one_entity::make_cosmic_entropy(augs::machine_entropy machine, const input_context& context, cosmos& cosm) {
 		cosmic_entropy result;
-		result.from_input_receivers_distribution(machine, cosm);
+		result.from_input_receivers_distribution(machine, context, cosm);
 
 		return result;
 	}

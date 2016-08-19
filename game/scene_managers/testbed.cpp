@@ -20,6 +20,7 @@
 
 #include "augs/misc/machine_entropy.h"
 #include "game/transcendental/cosmic_entropy.h"
+#include "game/transcendental/viewing_session.h"
 #include "game/transcendental/step.h"
 
 #include "game/detail/world_camera.h"
@@ -192,31 +193,6 @@ namespace scene_managers {
 			perform_transfer({ new_item, new_characters[5][slot_function::PRIMARY_HAND] }, step);
 		}
 
-		auto& active_context = world.significant.meta.settings.input;
-
-		active_context.map_key_to_intent(window::event::keys::W, intent_type::MOVE_FORWARD);
-		active_context.map_key_to_intent(window::event::keys::S, intent_type::MOVE_BACKWARD);
-		active_context.map_key_to_intent(window::event::keys::A, intent_type::MOVE_LEFT);
-		active_context.map_key_to_intent(window::event::keys::D, intent_type::MOVE_RIGHT);
-
-		active_context.map_event_to_intent(window::event::message::mousemotion, intent_type::MOVE_CROSSHAIR);
-		active_context.map_key_to_intent(window::event::keys::LMOUSE, intent_type::CROSSHAIR_PRIMARY_ACTION);
-		active_context.map_key_to_intent(window::event::keys::RMOUSE, intent_type::CROSSHAIR_SECONDARY_ACTION);
-
-		active_context.map_key_to_intent(window::event::keys::E, intent_type::USE_BUTTON);
-		active_context.map_key_to_intent(window::event::keys::LSHIFT, intent_type::WALK);
-
-		active_context.map_key_to_intent(window::event::keys::G, intent_type::THROW_PRIMARY_ITEM);
-		active_context.map_key_to_intent(window::event::keys::H, intent_type::HOLSTER_PRIMARY_ITEM);
-
-		active_context.map_key_to_intent(window::event::keys::BACKSPACE, intent_type::SWITCH_LOOK);
-
-		active_context.map_key_to_intent(window::event::keys::LCTRL, intent_type::START_PICKING_UP_ITEMS);
-		active_context.map_key_to_intent(window::event::keys::CAPSLOCK, intent_type::SWITCH_CHARACTER);
-
-		active_context.map_key_to_intent(window::event::keys::SPACE, intent_type::SPACE_BUTTON);
-		active_context.map_key_to_intent(window::event::keys::MOUSE4, intent_type::SWITCH_TO_GUI);
-
 		//draw_bodies.push_back(crate2);
 		//draw_bodies.push_back(new_characters[0]);
 		//draw_bodies.push_back(backpack);
@@ -245,9 +221,37 @@ namespace scene_managers {
 		currently_controlled_character = h;
 	}
 
-	cosmic_entropy testbed::make_cosmic_entropy(augs::machine_entropy machine, cosmos& cosm) {
+	void testbed::configure_view(viewing_session& session) const {
+		auto& active_context = session.input;
+
+		active_context.map_key_to_intent(window::event::keys::W, intent_type::MOVE_FORWARD);
+		active_context.map_key_to_intent(window::event::keys::S, intent_type::MOVE_BACKWARD);
+		active_context.map_key_to_intent(window::event::keys::A, intent_type::MOVE_LEFT);
+		active_context.map_key_to_intent(window::event::keys::D, intent_type::MOVE_RIGHT);
+
+		active_context.map_event_to_intent(window::event::message::mousemotion, intent_type::MOVE_CROSSHAIR);
+		active_context.map_key_to_intent(window::event::keys::LMOUSE, intent_type::CROSSHAIR_PRIMARY_ACTION);
+		active_context.map_key_to_intent(window::event::keys::RMOUSE, intent_type::CROSSHAIR_SECONDARY_ACTION);
+
+		active_context.map_key_to_intent(window::event::keys::E, intent_type::USE_BUTTON);
+		active_context.map_key_to_intent(window::event::keys::LSHIFT, intent_type::WALK);
+
+		active_context.map_key_to_intent(window::event::keys::G, intent_type::THROW_PRIMARY_ITEM);
+		active_context.map_key_to_intent(window::event::keys::H, intent_type::HOLSTER_PRIMARY_ITEM);
+
+		active_context.map_key_to_intent(window::event::keys::BACKSPACE, intent_type::SWITCH_LOOK);
+
+		active_context.map_key_to_intent(window::event::keys::LCTRL, intent_type::START_PICKING_UP_ITEMS);
+		active_context.map_key_to_intent(window::event::keys::CAPSLOCK, intent_type::SWITCH_CHARACTER);
+
+		active_context.map_key_to_intent(window::event::keys::SPACE, intent_type::SPACE_BUTTON);
+		active_context.map_key_to_intent(window::event::keys::MOUSE4, intent_type::SWITCH_TO_GUI);
+
+	}
+
+	cosmic_entropy testbed::make_cosmic_entropy(const augs::machine_entropy& machine, const input_context& context, cosmos& cosm) {
 		cosmic_entropy result;
-		result.from_input_receivers_distribution(machine, cosm);
+		result.from_input_receivers_distribution(machine, context, cosm);
 
 		return result;
 	}

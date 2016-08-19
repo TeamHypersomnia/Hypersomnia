@@ -45,6 +45,10 @@ void multiverse::populate_cosmoi() {
 	}, [](fixed_step&){});
 }
 
+void multiverse::configure_view(viewing_session& session) const {
+	main_cosmos_manager.configure_view(session);
+}
+
 void multiverse::control(augs::machine_entropy entropy) {
 	main_cosmos_player.buffer_entropy_for_next_step(entropy);
 
@@ -80,7 +84,7 @@ void multiverse::control(augs::machine_entropy entropy) {
 	main_cosmos_timer.set_stepping_speed_multiplier(stepping_speed);
 }
 
-void multiverse::simulate() {
+void multiverse::simulate(const input_context& context) {
 	auto steps_to_perform = main_cosmos_timer.count_logic_steps_to_perform();
 
 	while (steps_to_perform--) {
@@ -128,7 +132,7 @@ void multiverse::simulate() {
 			}
 		}
 
-		auto cosmic_entropy_for_this_step = main_cosmos_manager.make_cosmic_entropy(machine_entropy_for_this_step, main_cosmos);
+		auto cosmic_entropy_for_this_step = main_cosmos_manager.make_cosmic_entropy(machine_entropy_for_this_step, context, main_cosmos);
 
 		renderer::get_current().clear_logic_lines();
 

@@ -5,12 +5,14 @@
 #include "augs/window_framework/event.h"
 #include "game/enums/intent_type.h"
 
-namespace messages {
-	struct intent_message : public message {
-		intent_type intent;
-		bool pressed_flag = false;
-		bool delete_this_message = false;
+struct entity_intent {
+	intent_type intent;
+	vec2i mouse_rel;
+	bool pressed_flag = false;
+};
 
-		augs::window::event::state state;
+namespace messages {
+	struct intent_message : entity_intent, message {
+
 	};
 }
