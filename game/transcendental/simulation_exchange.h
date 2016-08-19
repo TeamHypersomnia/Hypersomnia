@@ -20,8 +20,13 @@ public:
 class simulation_receiver {
 	std::vector<cosmic_entropy> jitter_buffer;
 	cosmos last_snapshot;
+	bool new_state_to_apply = false;
 
 public:
 	unsigned jitter_buffer_length = 3;
 
+	void acquire_new_entropy(const cosmic_entropy&);
+	void acquire_new_heartbeat(augs::bit_stream& delta);
+
+	void pre_solve(cosmos& into);
 };
