@@ -7,7 +7,7 @@ namespace augs {
 }
 
 class simulation_broadcast {
-	augs::bit_stream delta;
+	augs::stream delta;
 	std::thread delta_production;
 public:
 	unsigned delta_heartbeat_interval_in_steps = 10;
@@ -26,7 +26,7 @@ public:
 	unsigned jitter_buffer_length = 3;
 
 	void acquire_new_entropy(const cosmic_entropy&);
-	void acquire_new_heartbeat(augs::bit_stream& delta);
+	void acquire_new_heartbeat(augs::stream& delta);
 
 	void pre_solve(cosmos& into);
 };

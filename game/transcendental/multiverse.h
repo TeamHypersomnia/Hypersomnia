@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/misc/bit_stream.h"
+#include "augs/misc/streams.h"
 #include "cosmos.h"
 #include "game/scene_managers/testbed.h"
 #include "game/scene_managers/one_entity.h"
@@ -18,7 +18,7 @@ class multiverse {
 
 	cosmos::significant_state stashed_cosmos;
 	augs::fixed_delta_timer stashed_timer;
-	augs::bit_stream stashed_delta;
+	augs::stream stashed_delta;
 
 	augs::measurements total_load = augs::measurements(L"Total load", true, 1);
 	augs::measurements reading_savefile = augs::measurements(L"Loading savefile", true, 1);

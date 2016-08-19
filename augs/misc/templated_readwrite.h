@@ -2,8 +2,8 @@
 #include "augs/templates.h"
 #include "augs/ensure.h"
 
-namespace RakNet {
-	class BitStream;
+namespace augs {
+	class stream;
 }
 
 namespace augs {
@@ -34,15 +34,15 @@ namespace augs {
 	}
 
 	template<class T, class...>
-	void read_bytes(RakNet::BitStream& ar, T* location, size_t count) {
+	void read_bytes(augs::stream& ar, T* location, size_t count) {
 		verify_type<T>();
-		ar.Read(reinterpret_cast<char*>(location), count * sizeof(T));
+		ar.read(reinterpret_cast<char*>(location), count * sizeof(T));
 	}
 
 	template<class T, class...>
-	void write_bytes(RakNet::BitStream& ar, const T* location, size_t count) {
+	void write_bytes(augs::stream& ar, const T* location, size_t count) {
 		verify_type<T>();
-		ar.Write(reinterpret_cast<const char*>(location), count * sizeof(T));
+		ar.write(reinterpret_cast<const char*>(location), count * sizeof(T));
 	}
 
 	template<class A, class T, class...>
@@ -55,21 +55,46 @@ namespace augs {
 		write_bytes(ar, &storage, 1);
 	}
 
-	template<class T, class... Args>
-	void read_object(RakNet::BitStream& ar, T& storage, Args... args) {
-		verify_type<T, std::is_same<T, RakNet::BitStream>::value>();
-		ar.Read(storage, args...);
-	}
-
-	template<class T, class... Args>
-	void write_object(RakNet::BitStream& ar, const T& storage, Args... args) {
-		verify_type<T, std::is_same<T, RakNet::BitStream>::value>();
-		ar.Write(storage, args...);
-	}
+	//template<class T, class... Args>
+	//void read_object(augs::stream& ar, T& storage, Args... args) {
+	//	verify_type<T, std::is_same<T, augs::stream>::value>();
+	//	ar.read(storage, args...);
+	//}
+	//
+	//template<class T, class... Args>
+	//void write_object(augs::stream& ar, const T& storage, Args... args) {
+	//	verify_type<T, std::is_same<T, augs::stream>::value>();
+	//	ar.write(storage, args...);
+	//}
 
 	template<class... Args>
-	void write_object(RakNet::BitStream& ar, RakNet::BitStream& storage, Args... args) {
-		ar.Write(storage, args...);
+	void write_object(augs::stream& ar, augs::stream& storage, Args... args) {
+		ar.write(storage, args...);
+	}
+
+	template<class A, size_t count>
+	void read_flags(A& ar, std::array<bool, count>& storage) {
+		static_assert(count > 0, "Can't read a null array");
+		
+		char compressed_storage[(count - 1) / 8 + 1];
+		read_bytes(ar, compressed_storage, sizeof(compressed_storage));
+
+		for (size_t bit = 0; bit < count; ++bit)
+			storage[bit] = (compressed_storage[bit / 8] >> (bit % 8)) & 1;
+	}
+
+	template<class A, size_t count>
+	void write_flags(A& ar, const std::array<bool, count>& storage) {
+		static_assert(count > 0, "Can't write a null array");
+
+		char compressed_storage[(count - 1) / 8 + 1];
+		std::memset(compressed_storage, 0, sizeof(compressed_storage));
+
+		for (size_t bit = 0; bit < count; ++bit)
+			if(storage[bit])
+				compressed_storage[bit / 8] |= 1 << (bit % 8);
+
+		write_bytes(ar, compressed_storage, sizeof(compressed_storage));
 	}
 
 	template<class A, class T, class...>

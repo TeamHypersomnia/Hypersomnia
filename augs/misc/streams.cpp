@@ -31,9 +31,20 @@ namespace augs {
 		return std::string(data(), data() + size());
 	}
 
+	size_t stream::capacity() const {
+		return buf.size();
+	}
+
 	void stream::write(const char* data, size_t bytes) {
+		if (write_pos + bytes > capacity())
+			reserve((write_pos + bytes) * 2);
+
 		memcpy(buf.data() + write_pos, data, bytes);
 		write_pos += bytes;
+	}
+
+	void stream::write(const augs::stream& s) {
+		write(s.data(), s.size());
 	}
 
 	void output_stream_reserver::write(const char*, size_t bytes) {
@@ -47,7 +58,6 @@ namespace augs {
 	}
 
 	void stream::reserve(size_t bytes) {
-		ensure(write_pos == 0);
 		buf.resize(bytes);
 	};
 	

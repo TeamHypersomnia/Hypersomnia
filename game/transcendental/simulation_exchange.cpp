@@ -5,7 +5,7 @@ void simulation_receiver::acquire_new_entropy(const cosmic_entropy& entropy) {
 	jitter_buffer.push_back(entropy);
 }
 
-void simulation_receiver::acquire_new_heartbeat(augs::bit_stream& delta) {
+void simulation_receiver::acquire_new_heartbeat(augs::stream& delta) {
 	cosmic_delta::decode(last_snapshot, delta);
 
 	new_state_to_apply = true;

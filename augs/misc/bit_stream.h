@@ -3,9 +3,9 @@
 #include "streams.h"
 
 namespace augs {
-	typedef stream bit_stream;
+	typedef stream stream;
 	/*
-	class bit_stream : public stream_position {
+	class stream : public stream_position {
 	public:
 		std::vector<bool> buf;
 

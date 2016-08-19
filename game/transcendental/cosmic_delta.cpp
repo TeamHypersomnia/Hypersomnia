@@ -8,13 +8,12 @@
 
 #include "augs/misc/pool_id.h"
 
-#include "BitStream.h"
 #include "cosmos.h"
 
 #include <gtest/gtest.h>
 
 template <class T>
-bool write_delta(const T& base, const T& enco, RakNet::BitStream& out, const bool write_changed_bit = false) {
+bool write_delta(const T& base, const T& enco, augs::stream& out, const bool write_changed_bit = false) {
 	const auto dt = augs::delta_encode(base, enco);
 	const bool has_changed = dt.changed_bytes.size() > 0;
 
@@ -30,7 +29,7 @@ bool write_delta(const T& base, const T& enco, RakNet::BitStream& out, const boo
 }
 
 template <class T>
-void read_delta(T& deco, RakNet::BitStream& in, const bool read_changed_bit = false) {
+void read_delta(T& deco, augs::stream& in, const bool read_changed_bit = false) {
 	augs::object_delta dt;
 
 	bool has_changed = true;
@@ -51,16 +50,14 @@ struct delted_entity_stream {
 	unsigned changed_entities = 0;
 	unsigned removed_entities = 0;
 
-	RakNet::BitStream stream_of_new_guids;
-	RakNet::BitStream stream_for_new;
-	RakNet::BitStream stream_for_changed;
-	RakNet::BitStream stream_for_removed;
+	augs::stream stream_of_new_guids;
+	augs::stream stream_for_new;
+	augs::stream stream_for_changed;
+	augs::stream stream_for_removed;
 };
 
-void cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::bit_stream& final_out) {
-	RakNet::BitStream out;
-	
-	const auto used_bits = final_out.size();
+void cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& out) {
+	const auto used_bits = out.size();
 	ensure_eq(0, used_bits);
 
 	enco.profiler.delta_encoding.new_measurement();
@@ -94,7 +91,7 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::bit_stre
 		std::fill(overridden_components.begin(), overridden_components.end(), false);
 		std::fill(removed_components.begin(), removed_components.end(), false);
 
-		RakNet::BitStream new_content;
+		augs::stream new_content;
 		
 		for_each_in_tuples(base_components, enco_components,
 			[&overridden_components, &removed_components, &entity_changed, &agg, &enco, &base, &new_content](const auto& base_id, const auto& enco_id) {
@@ -149,9 +146,7 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::bit_stre
 			// otherwise new entity_id assignment needs be deterministic
 #endif
 
-			for (const bool flag : overridden_components)
-				augs::write_object(dt.stream_for_new, flag);
-
+			augs::write_flags(dt.stream_for_new, overridden_components);
 			augs::write_object(dt.stream_for_new, new_content);
 
 			++dt.new_entities;
@@ -159,12 +154,8 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::bit_stre
 		else if (entity_changed) {
 			augs::write_object(dt.stream_for_changed, stream_written_id);
 
-			for (const bool flag : overridden_components)
-				augs::write_object(dt.stream_for_changed, flag);
-
-			for (const bool flag : removed_components)
-				augs::write_object(dt.stream_for_changed, flag);
-
+			augs::write_flags(dt.stream_for_changed, overridden_components);
+			augs::write_flags(dt.stream_for_changed, removed_components);
 			augs::write_object(dt.stream_for_changed, new_content);
 			
 			++dt.changed_entities;
@@ -189,7 +180,7 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::bit_stre
 		}
 	});
 
-	RakNet::BitStream new_meta_content;
+	augs::stream new_meta_content;
 
 	const bool meta_changed = write_delta(base.significant.meta, enco.significant.meta, new_meta_content, true);
 
@@ -206,21 +197,13 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::bit_stre
 		augs::write_object(out, dt.stream_for_new);
 		augs::write_object(out, dt.stream_for_changed);
 		augs::write_object(out, dt.stream_for_removed);
-
-		out.AlignWriteToByteBoundary();
 	}
 
 	enco.profiler.delta_encoding.end_measurement();
-
-	final_out.reserve(out.GetNumberOfBytesUsed());
-	final_out.write(reinterpret_cast<const char*>(out.GetData()), out.GetNumberOfBytesUsed());
 }
 
-void cosmic_delta::decode(cosmos& deco, augs::bit_stream& final_in, const bool resubstantiate_partially) {
-	RakNet::BitStream in;
-	in.Write(final_in.data(), final_in.size());
-
-	if (in.GetNumberOfUnreadBits() == 0)
+void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstantiate_partially) {
+	if (in.get_unread_bytes() == 0)
 		return;
 	
 	deco.profiler.delta_decoding.new_measurement();
@@ -252,8 +235,7 @@ void cosmic_delta::decode(cosmos& deco, augs::bit_stream& final_in, const bool r
 	for(const auto& new_entity : new_entities) {
 		std::array<bool, COMPONENTS_COUNT> overridden_components;
 
-		for (bool& flag : overridden_components)
-			augs::read_object(in, flag);
+		augs::read_flags(in, overridden_components);
 
 		const auto& agg = new_entity.get();
 		const auto& deco_components = agg.component_ids;
@@ -289,11 +271,8 @@ void cosmic_delta::decode(cosmos& deco, augs::bit_stream& final_in, const bool r
 		std::array<bool, COMPONENTS_COUNT> overridden_components;
 		std::array<bool, COMPONENTS_COUNT> removed_components;
 
-		for (bool& flag : overridden_components)
-			augs::read_object(in, flag);
-
-		for (bool& flag : removed_components)
-			augs::read_object(in, flag);
+		augs::read_flags(in, overridden_components);
+		augs::read_flags(in, removed_components);
 
 		const auto& agg = changed_entity.get();
 		const auto& deco_components = agg.component_ids;
@@ -348,17 +327,13 @@ void cosmic_delta::decode(cosmos& deco, augs::bit_stream& final_in, const bool r
 #endif
 	}
 
-	in.AlignReadToByteBoundary();
-	
-	const auto unread_bits = in.GetNumberOfUnreadBits();
+	const auto unread_bits = in.get_unread_bytes();
 	ensure_eq(0, unread_bits);
 
 	deco.create_substance_completely();
 
 	deco.profiler.delta_decoding.end_measurement();
 }
-
-
 
 TEST(CosmicDelta, PaddingSanityCheck1) {
 	struct ok {
@@ -457,7 +432,7 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndTwoNew) {
 	new_ent2 += components::position_copying();
 
 	{
-		augs::bit_stream s;
+		augs::stream s;
 
 		cosmic_delta::encode(c1, c2, s);
 		cosmic_delta::decode(c1, s);
@@ -488,7 +463,7 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndTwoNew) {
 	ASSERT_TRUE(ent2.has<components::trace>());
 
 	{
-		augs::bit_stream comparatory;
+		augs::stream comparatory;
 		
 		cosmic_delta::encode(c1, c2, comparatory);
 
@@ -516,7 +491,7 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndCreatedThreeEntitiesWithReferences) {
 	new_ent1.map_sub_entity(sub_entity_name::CHARACTER_CROSSHAIR, new_ent2);
 
 	{
-		augs::bit_stream s;
+		augs::stream s;
 
 		cosmic_delta::encode(c1, c2, s);
 		cosmic_delta::decode(c1, s);
@@ -546,7 +521,7 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndCreatedThreeEntitiesWithReferences) {
 	ASSERT_TRUE(sub_entities_intact);
 
 	{
-		augs::bit_stream comparatory;
+		augs::stream comparatory;
 
 		cosmic_delta::encode(c1, c2, comparatory);
 
@@ -601,7 +576,7 @@ TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
 	ASSERT_EQ(3, c2.entities_count());
 
 	{
-		augs::bit_stream comparatory;
+		augs::stream comparatory;
 
 		cosmic_delta::encode(c1, c2, comparatory);
 
@@ -612,14 +587,14 @@ TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
 	ASSERT_EQ(2, c2.entities_count());
 
 	{
-		augs::bit_stream s;
+		augs::stream s;
 
 		cosmic_delta::encode(c1, c2, s);
 		cosmic_delta::decode(c1, s);
 	}
 
 	{
-		augs::bit_stream comparatory;
+		augs::stream comparatory;
 
 		cosmic_delta::encode(c1, c2, comparatory);
 
