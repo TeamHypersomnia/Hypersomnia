@@ -1,6 +1,6 @@
 #pragma once
 #include <thread>
-#include "cosmos.h"
+#include "multiverse.h"
 
 namespace augs {
 	class fixed_delta;
@@ -10,6 +10,8 @@ class simulation_broadcast {
 	augs::stream delta;
 	std::thread delta_production;
 public:
+	multiverse realm;
+
 	unsigned delta_heartbeat_interval_in_steps = 10;
 
 	void set_delta_heartbeat_interval(const augs::fixed_delta&, float ms);
@@ -23,6 +25,8 @@ class simulation_receiver {
 	bool new_state_to_apply = false;
 
 public:
+	multiverse realm;
+
 	unsigned jitter_buffer_length = 3;
 
 	void acquire_new_entropy(const cosmic_entropy&);
