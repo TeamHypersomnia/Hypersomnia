@@ -28,13 +28,11 @@ void game_window::call_window_script(const std::string filename) {
 	window.gl.initialize();
 }
 
-machine_entropy game_window::collect_entropy() {
-	machine_entropy result;
-	
-	result.local = window.poll_events();
+decltype(machine_entropy::local) game_window::collect_entropy() {
+	auto result = window.poll_events();
 
 	if (clear_window_inputs_once) {
-		result.local.clear();
+		result.clear();
 		clear_window_inputs_once = false;
 	}
 	
