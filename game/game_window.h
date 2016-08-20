@@ -14,4 +14,7 @@ public:
 	decltype(machine_entropy::local) collect_entropy();
 
 	void call_window_script(std::string filename);
+
+	double get_config_number(std::string field);
+	std::string get_config_string(std::string field);
 };

@@ -28,6 +28,14 @@ void game_window::call_window_script(const std::string filename) {
 	window.gl.initialize();
 }
 
+double game_window::get_config_number(std::string field) {
+	return luabind::object_cast<double>(luabind::globals(lua.raw)["config_table"][field]);
+}
+
+std::string game_window::get_config_string(std::string field) {
+	return luabind::object_cast<std::string>(luabind::globals(lua.raw)["config_table"][field]);
+}
+
 decltype(machine_entropy::local) game_window::collect_entropy() {
 	auto result = window.poll_events();
 
