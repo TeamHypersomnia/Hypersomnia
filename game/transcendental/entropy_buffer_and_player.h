@@ -8,7 +8,7 @@ class entropy_buffer_and_player {
 public:
 	augs::machine_entropy total_buffered_entropy;
 
-	augs::step_player<decltype(augs::machine_entropy::local)> local_entropy_player;
+	augs::step_player<augs::machine_entropy> entropy_player;
 
 	void buffer_entropy_for_next_step(augs::machine_entropy);
 	augs::machine_entropy obtain_machine_entropy_for_next_step();

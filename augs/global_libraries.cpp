@@ -1,3 +1,7 @@
+#include <enet/enet.h>
+#undef min
+#undef max
+
 #ifdef PLATFORM_WINDOWS
 #include <Windows.h>
 #endif
@@ -73,6 +77,10 @@ namespace augs {
 			glewExperimental = FALSE;
 			errs(glewInit() == GLEW_OK, L"Failed to initialize GLEW");
 		}
+
+		if (to_initialize & ENET) {
+			errs(enet_initialize() == 0, L"Failed to initialize enet");
+		}
 #endif
 		initialized |= to_initialize;
 	}
@@ -81,10 +89,17 @@ namespace augs {
 		if (which_augs & GLEW) {
 
 		}
+
 		if (which_augs & FREETYPE) {
 			ensure(initialized & FREETYPE);
 			errs(!FT_Done_FreeType(*freetype_library.get()), "freetype deinitialization");
 			initialized &= ~FREETYPE;
+		}
+
+		if (which_augs & ENET) {
+			ensure(initialized & ENET);
+			enet_deinitialize();
+			initialized &= ~ENET;
 		}
 	}
 

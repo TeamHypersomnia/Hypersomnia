@@ -10,7 +10,8 @@ namespace augs {
 			GLEW = 1 << 1,
 			FREETYPE = 1 << 2,
 			WINDOWS_API = 1 << 3,
-			ALL = GLEW | FREETYPE | WINDOWS_API
+			ENET = 1 << 4,
+			ALL = GLEW | FREETYPE | WINDOWS_API | ENET
 		};
 
 		static unsigned initialized;

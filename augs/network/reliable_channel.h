@@ -8,8 +8,6 @@
 
 namespace augs {
 	namespace network {
-		struct augs::stream;
-
 		struct reliable_sender {
 			struct message {
 				augs::stream* output_bitstream = nullptr;

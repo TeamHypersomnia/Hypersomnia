@@ -15,11 +15,6 @@ namespace augs {
 		struct entry_type {
 			entry_internal_type internal_data;
 			unsigned step_occurred;
-
-			template <class Archive>
-			void serialize(Archive& ar) {
-				ar(CEREAL_NVP(internal_data), CEREAL_NVP(step_occurred));
-			}
 		};
 
 		unsigned player_position = 0;
@@ -59,10 +54,8 @@ namespace augs {
 			while (source.peek() != EOF) {
 				entry_type entry;
 
-				{
-					cereal::PortableBinaryInputArchive ar(source);
-					ar(entry);
-				}
+				augs::read_object(source, entry.internal_data);
+				augs::read_object(source, entry.step_occurred);
 
 				loaded_recording.emplace_back(entry);
 			}
@@ -81,11 +74,9 @@ namespace augs {
 					new_entry.step_occurred = player_position;
 
 					std::ofstream recording_file(live_saving_filename, std::ios::out | std::ios::binary | std::ios::app);
-
-					{
-						cereal::PortableBinaryOutputArchive ar(recording_file);
-						ar(new_entry);
-					}
+					
+					augs::write_object(recording_file, new_entry.internal_data);
+					augs::write_object(recording_file, new_entry.step_occurred);
 				}
 			}
 			else if (current_player_state == player_state::REPLAYING) {
