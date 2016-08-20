@@ -21,7 +21,7 @@ void cosmic_profiler::set_count_of_tracked_measurements(size_t count) {
 	}
 }
 
-std::wstring cosmic_profiler::sorted_summary() const {
+std::wstring cosmic_profiler::sorted_summary(bool detailed) const {
 	std::vector<augs::measurements> sorted_meters;
 
 	for (auto& m : meters)
@@ -41,6 +41,20 @@ std::wstring cosmic_profiler::sorted_summary() const {
 	summary += complete_resubstantiation.summary();
 	summary += delta_encoding.summary();
 	summary += delta_decoding.summary();
+	
+	summary += total_save.summary();
+	summary += size_calculation_pass.summary();
+	summary += memory_allocation_pass.summary();
+	summary += serialization_pass.summary();
+	summary += writing_savefile.summary();
+
+	summary += total_load.summary();
+	summary += reading_savefile.summary();
+	summary += deserialization_pass.summary();
+
+	summary += duplication.summary();
+
+	summary += delta_bytes.summary();
 
 	return summary;
 }

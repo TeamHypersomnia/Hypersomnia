@@ -107,11 +107,23 @@ bool cosmos::operator!=(const cosmos& b) const {
 	return !operator==(b);
 }
 
+cosmos& cosmos::operator=(const significant_state& b) {
+	profiler.duplication.new_measurement();
+	significant = b;
+	profiler.duplication.end_measurement();
+	refresh_for_new_significant_state();
+	return *this;
+}
+
 cosmos& cosmos::operator=(const cosmos& b) {
+	b.profiler.duplication.new_measurement();
+	profiler.duplication.new_measurement();
 	significant = b.significant;
 #if COSMOS_TRACKS_GUIDS
 	guid_map_for_transport = b.guid_map_for_transport;
 #endif
+	profiler.duplication.end_measurement();
+	b.profiler.duplication.end_measurement();
 	complete_resubstantiation();
 	return *this;
 }
@@ -150,12 +162,6 @@ void cosmos::refresh_for_new_significant_state() {
 	complete_resubstantiation();
 }
 
-cosmos& cosmos::operator=(const significant_state& b) {
-	significant = b;
-	refresh_for_new_significant_state();
-	return *this;
-}
-
 void cosmos::complete_resubstantiation(const const_entity_handle h) {
 	destroy_substance_for_entity(h);
 	create_substance_for_entity(h);
@@ -182,7 +188,7 @@ std::vector<const_entity_handle> cosmos::get(const processing_subjects list) con
 }
 
 randomization cosmos::get_rng_for(const entity_id id) const {
-	return { id.pool.version + std::abs(id.pool.indirection_index) + static_cast<size_t>(significant.meta.delta.get_total_steps_passed()) };
+	return { id.pool.version + std::abs(id.pool.indirection_index) + static_cast<size_t>(get_total_steps_passed()) };
 }
 
 #if COSMOS_TRACKS_GUIDS
@@ -213,6 +219,32 @@ inventory_slot_handle cosmos::get_handle(const inventory_slot_id id) {
 
 const_inventory_slot_handle cosmos::get_handle(const inventory_slot_id id) const {
 	return const_inventory_slot_handle(*this, id);
+}
+
+float cosmos::get_total_time_passed_in_seconds(float view_interpolation_ratio) const {
+	return (significant.meta.total_steps_passed + view_interpolation_ratio) * significant.meta.delta.in_seconds();
+}
+
+float cosmos::get_total_time_passed_in_seconds() const {
+	return significant.meta.total_steps_passed * significant.meta.delta.in_seconds();
+}
+
+unsigned cosmos::get_total_steps_passed() const {
+	return significant.meta.total_steps_passed;
+}
+
+const augs::stepped_timestamp& cosmos::get_timestamp() const {
+	stepped_timestamp result;
+	result.step = significant.meta.total_steps_passed;
+	return result;
+}
+
+const augs::fixed_delta& cosmos::get_fixed_delta() const {
+	return significant.meta.delta;
+}
+
+void cosmos::set_fixed_delta(const augs::fixed_delta& dt) {
+	significant.meta.delta = dt;
 }
 
 entity_handle cosmos::create_entity(const std::string debug_name) {
@@ -438,4 +470,6 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 
 	profiler.raycasts.measure(temporary_systems.get<physics_system>().ray_casts_since_last_step);
 	performance.stop(meter_type::LOGIC);
+
+	++significant.meta.total_steps_passed;
 }

@@ -47,7 +47,7 @@ void movement_system::set_movement_flags_from_input(fixed_step& step) {
 
 void movement_system::apply_movement_forces(cosmos& cosmos) {
 	auto& physics_sys = cosmos.temporary_systems.get<physics_system>();
-	const auto& delta = cosmos.significant.meta.delta;
+	const auto& delta = cosmos.get_fixed_delta();
 
 	for (const auto& it : cosmos.get(processing_subjects::WITH_MOVEMENT)) {
 		auto& movement = it.get<components::movement>();

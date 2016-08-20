@@ -345,7 +345,7 @@ void perform_transfer(item_slot_transfer_request r, fixed_step& step) {
 			auto& physics = cosmos[grabbed_item_part].get<components::physics>();
 			physics.apply_force(force, offset, true);
 			auto& special_physics = cosmos[grabbed_item_part].get<components::special_physics>();
-			special_physics.since_dropped.set(200, step.get_delta());
+			special_physics.since_dropped.set(200, cosmos.get_timestamp());
 		}
 	}
 }

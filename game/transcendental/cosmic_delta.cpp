@@ -200,6 +200,9 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 	}
 
 	enco.profiler.delta_encoding.end_measurement();
+
+	enco.profiler.delta_bytes.measure(out.size());
+	base.profiler.delta_bytes.measure(out.size());
 }
 
 void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstantiate_partially) {

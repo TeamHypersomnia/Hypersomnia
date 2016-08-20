@@ -306,7 +306,7 @@
     <ClCompile Include="game\detail\entity\inventory_getters.cpp" />
     <ClCompile Include="game\detail\entity\physics_getters.cpp" />
     <ClCompile Include="game\detail\entity\relations_helpers.cpp" />
-    <ClCompile Include="game\transcendental\entropy_player.cpp" />
+    <ClCompile Include="game\transcendental\entropy_buffer_and_player.cpp" />
     <ClCompile Include="game\game_window.cpp" />
     <ClCompile Include="game\global\input_context.cpp" />
     <ClCompile Include="game\detail\inventory_slot_handle.cpp" />
@@ -422,6 +422,8 @@
     <ClCompile Include="game\temporary_systems\dynamic_tree_system.cpp" />
     <ClCompile Include="game\temporary_systems\physics_system.cpp" />
     <ClCompile Include="game\temporary_systems\processing_lists_system.cpp" />
+    <ClCompile Include="game\transcendental\step_and_entropy_unpacker.cpp" />
+    <ClCompile Include="game\transcendental\viewing_session.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -951,7 +953,7 @@
     <ClInclude Include="game\detail\convex_partitioned_shape.h" />
     <ClInclude Include="game\transcendental\cosmos.h" />
     <ClInclude Include="game\transcendental\entity_id.h" />
-    <ClInclude Include="game\transcendental\entropy_player.h" />
+    <ClInclude Include="game\transcendental\entropy_buffer_and_player.h" />
     <ClInclude Include="game\enums\colliders_offset_type.h" />
     <ClInclude Include="game\game_window.h" />
     <ClInclude Include="game\global\all_settings.h" />
@@ -1010,6 +1012,7 @@
     <ClInclude Include="game\temporary_systems\dynamic_tree_system.h" />
     <ClInclude Include="game\temporary_systems\physics_system.h" />
     <ClInclude Include="game\temporary_systems\processing_lists_system.h" />
+    <ClInclude Include="game\transcendental\step_and_entropy_unpacker.h" />
     <ClInclude Include="game\transcendental\types_specification\all_components_declaration.h" />
     <ClInclude Include="game\transcendental\types_specification\all_component_includes.h" />
     <ClInclude Include="game\transcendental\types_specification\all_messages_declaration.h" />

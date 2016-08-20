@@ -15,8 +15,9 @@ namespace augs {
 	class fixed_delta : public delta {
 		friend class fixed_delta_timer;
 		unsigned steps_per_second = 0;
-		unsigned total_steps_passed = 0;
 	public:
+		fixed_delta(unsigned steps_per_second = 60);
+
 		template <class Archive>
 		void serialize(Archive& ar) {
 			ar(
@@ -27,10 +28,6 @@ namespace augs {
 		}
 
 		unsigned get_steps_per_second() const;
-		double total_time_passed_in_seconds() const;
-		unsigned get_total_steps_passed() const;
-
-		stepped_timestamp get_timestamp() const;
 	};
 
 	class variable_delta : public delta {
@@ -41,6 +38,5 @@ namespace augs {
 		fixed_delta get_fixed() const;
 		
 		float view_interpolation_ratio() const;
-		float total_time_passed_in_seconds() const;
 	};
 }

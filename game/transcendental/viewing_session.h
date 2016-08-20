@@ -13,4 +13,6 @@ public:
 	augs::variable_delta_timer frame_timer;
 	augs::measurements fps_profiler = augs::measurements(L"Frame");
 	augs::measurements triangles = augs::measurements(L"Triangles", false);
+
+	std::wstring summary() const;
 };

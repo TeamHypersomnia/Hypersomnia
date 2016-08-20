@@ -16,7 +16,7 @@
 void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 	auto& sys = get_sys();
 	auto& cosmos = cosm;
-	auto delta = cosm.significant.meta.delta;
+	auto delta = cosm.get_fixed_delta();
 
 	for (int i = 0; i < 2; ++i) {
 		auto fix_a = contact->GetFixtureA();
@@ -67,7 +67,7 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 				if (are_connected_by_friction(collider, subject)) {
 					found_suitable = true;
 				}
-				else if (collider_physics.since_dropped.lasts(delta)) {
+				else if (collider_physics.since_dropped.lasts(cosm.get_timestamp(), delta)) {
 					collider_physics.since_dropped.unset();
 					found_suitable = true;
 				}

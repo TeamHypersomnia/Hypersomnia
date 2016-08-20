@@ -10,22 +10,13 @@ namespace augs {
 		return delta_ms;
 	}
 
-	unsigned fixed_delta::get_steps_per_second() const {
-		return steps_per_second;
-	}
-	
-	double fixed_delta::total_time_passed_in_seconds() const {
-		return total_steps_passed * in_seconds();
-	}
-	
-	unsigned fixed_delta::get_total_steps_passed() const {
-		return total_steps_passed;
+	fixed_delta::fixed_delta(const unsigned steps_per_second) {
+		this->steps_per_second = steps_per_second;
+		delta_ms = 1000.0 / steps_per_second;
 	}
 
-	stepped_timestamp fixed_delta::get_timestamp() const {
-		stepped_timestamp result;
-		result.step = total_steps_passed;
-		return result;
+	unsigned fixed_delta::get_steps_per_second() const {
+		return steps_per_second;
 	}
 	
 	float variable_delta::view_interpolation_ratio() const {
@@ -34,9 +25,5 @@ namespace augs {
 	
 	fixed_delta variable_delta::get_fixed() const {
 		return fixed;
-	}
-
-	float variable_delta::total_time_passed_in_seconds() const {
-		return fixed.total_time_passed_in_seconds() + view_interpolation_ratio() * fixed.in_seconds();
 	}
 }

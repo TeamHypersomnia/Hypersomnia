@@ -6,73 +6,72 @@
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "augs/filesystem/file.h"
 
-void multiverse::save_cosmos_to_file(std::string filename) {
-	total_save.new_measurement();
+void cosmos::save_to_file(std::string filename) {
+	profiler.total_save.new_measurement();
 	
-	size_calculation_pass.new_measurement();
+	profiler.size_calculation_pass.new_measurement();
 
 	augs::output_stream_reserver reserver;
 	
-	augs::write_object(reserver, main_cosmos_timer);
-	augs::write_object(reserver, main_cosmos_manager);
-	augs::write_object(reserver, main_cosmos.significant);
+	augs::write_object(reserver, significant);
 
-	size_calculation_pass.end_measurement();
+	profiler.size_calculation_pass.end_measurement();
 	
-	auto& stream = main_cosmos.reserved_memory_for_serialization;
+	auto& stream = reserved_memory_for_serialization;
 	
-	memory_allocation_pass.new_measurement();
+	profiler.memory_allocation_pass.new_measurement();
 
 	stream.reserve(static_cast<size_t>(reserver.size() * 1.2));
 
-	memory_allocation_pass.end_measurement();
+	profiler.memory_allocation_pass.end_measurement();
 	
-	serialization_pass.new_measurement();
+	profiler.serialization_pass.new_measurement();
 
-	augs::write_object(stream, main_cosmos_timer);
-	augs::write_object(stream, main_cosmos_manager);
-	augs::write_object(stream, main_cosmos.significant);
+	augs::write_object(stream, significant);
 
-	serialization_pass.end_measurement();
+	profiler.serialization_pass.end_measurement();
 	
-	writing_savefile.new_measurement();
+	profiler.writing_savefile.new_measurement();
 
 	write_file_binary(filename, stream.buf);
 
-	writing_savefile.end_measurement();
+	profiler.writing_savefile.end_measurement();
 	
-	total_save.end_measurement();
+	profiler.total_save.end_measurement();
 }
 
-void multiverse::load_cosmos_from_file(std::string filename) {
-	total_load.new_measurement();
+bool cosmos::load_from_file(std::string filename) {
+	if (augs::file_exists(filename)) {
+		profiler.total_load.new_measurement();
 
-	ensure(main_cosmos.significant.pool_for_aggregates.empty());
-	
-	//ensure(cosmos() == cosmos());
-	//ensure(main_cosmos == cosmos());
+		ensure(significant.pool_for_aggregates.empty());
 
-	auto& stream = main_cosmos.reserved_memory_for_serialization;
-	
-	reading_savefile.new_measurement();
+		//ensure(cosmos() == cosmos());
+		//ensure(main_cosmos == cosmos());
 
-	augs::assign_file_contents_binary(filename, stream.buf);
+		auto& stream = reserved_memory_for_serialization;
 
-	reading_savefile.end_measurement();
-	
-	deserialization_pass.new_measurement();
+		profiler.reading_savefile.new_measurement();
 
-	augs::read_object(stream, main_cosmos_timer);
-	augs::read_object(stream, main_cosmos_manager);
-	augs::read_object(stream, main_cosmos.significant);
+		augs::assign_file_contents_binary(filename, stream.buf);
 
-	deserialization_pass.end_measurement();
-	
-	main_cosmos.refresh_for_new_significant_state();
+		profiler.reading_savefile.end_measurement();
 
-	total_load.end_measurement();
+		profiler.deserialization_pass.new_measurement();
+
+		augs::read_object(stream, significant);
+
+		profiler.deserialization_pass.end_measurement();
+
+		refresh_for_new_significant_state();
+
+		profiler.total_load.end_measurement();
+
+		return true;
+	}
+
+	return false;
 }
-
 
 bool cosmos::significant_state::operator==(const significant_state& second) const {
 	augs::output_stream_reserver this_serialized_reserver;

@@ -954,9 +954,6 @@
     <ClCompile Include="game\transcendental\cosmic_profiler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\transcendental\entropy_player.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\transcendental\entity_handle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -988,6 +985,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\transcendental\simulation_exchange.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\transcendental\entropy_buffer_and_player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\transcendental\step_and_entropy_unpacker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\transcendental\viewing_session.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -3002,9 +3008,6 @@
     <ClInclude Include="game\transcendental\cosmic_entropy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\transcendental\entropy_player.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\transcendental\entity_handle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3096,6 +3099,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\transcendental\simulation_exchange.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\transcendental\entropy_buffer_and_player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\transcendental\step_and_entropy_unpacker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -63,7 +63,7 @@ void item_system::handle_trigger_confirmations_as_pick_requests(fixed_step& step
 				item_slot_transfer_request request(item_entity, item_entity.determine_pickup_target_slot_in(detector));
 
 				if (request.target_slot.alive()) {
-					if (item_slot_transfers->pickup_timeout.try_to_fire_and_reset(delta)) {
+					if (item_slot_transfers->pickup_timeout.try_to_fire_and_reset(cosmos.get_timestamp(), delta)) {
 						perform_transfer(request, step);
 					}
 				}

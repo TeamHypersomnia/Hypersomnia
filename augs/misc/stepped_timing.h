@@ -14,8 +14,8 @@ namespace augs {
 
 		stepped_timestamp operator-(stepped_timestamp b) const;
 
-		double in_seconds(fixed_delta) const;
-		double in_milliseconds(fixed_delta) const;
+		float in_seconds(fixed_delta) const;
+		float in_milliseconds(fixed_delta) const;
 	};
 
 	struct stepped_timeout {
@@ -35,9 +35,9 @@ namespace augs {
 		}
 
 		void unset();
-		void set(float timeout_duration_ms, fixed_delta);
-		bool passed(fixed_delta) const;
-		bool lasts(fixed_delta) const;
+		void set(float timeout_duration_ms, stepped_timestamp);
+		bool passed(stepped_timestamp, fixed_delta) const;
+		bool lasts(stepped_timestamp, fixed_delta) const;
 	};
 
 	struct stepped_cooldown {
@@ -58,8 +58,8 @@ namespace augs {
 
 		stepped_cooldown(float cooldown_duration_ms);
 
-		bool is_ready(fixed_delta t) const;
-		bool try_to_fire_and_reset(fixed_delta t);
+		bool is_ready(stepped_timestamp, fixed_delta t) const;
+		bool try_to_fire_and_reset(stepped_timestamp, fixed_delta t);
 	};
 
 }

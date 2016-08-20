@@ -182,7 +182,7 @@ void sentience_system::regenerate_values(fixed_step& step) const {
 }
 
 void sentience_system::set_borders(fixed_step& step) const {
-	const int timestamp_ms = static_cast<int>(step.get_delta().total_time_passed_in_seconds() * 1000.0);
+	const int timestamp_ms = static_cast<int>(step.cosm.get_total_time_passed_in_seconds() * 1000.0);
 
 	for (const auto& t : step.cosm.get(processing_subjects::WITH_SENTIENCE)) {
 		const auto& sentience = t.get<components::sentience>();

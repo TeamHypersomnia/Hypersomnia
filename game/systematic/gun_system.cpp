@@ -68,7 +68,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(fixed_step& step) {
 		const auto& gun_transform = it.get<components::transform>();
 		auto& gun = it.get<components::gun>();
 
-		if (gun.trigger_pressed && gun.shot_cooldown.try_to_fire_and_reset(delta)) {
+		if (gun.trigger_pressed && gun.shot_cooldown.try_to_fire_and_reset(cosmos.get_timestamp(), delta)) {
 			if (gun.action_mode != components::gun::action_type::AUTOMATIC)
 				gun.trigger_pressed = false;
 
@@ -180,7 +180,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(fixed_step& step) {
 				}
 			}
 		}
-		else if (gun.shot_cooldown.is_ready(delta)) {
+		else if (gun.shot_cooldown.is_ready(cosmos.get_timestamp(), delta)) {
 			gun.recoil.cooldown(delta.in_milliseconds());
 		}
 	}

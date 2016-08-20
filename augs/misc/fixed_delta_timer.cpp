@@ -6,13 +6,9 @@
 /* credits goes to http://www.unagames.com/blog/daniele/2010/06/fixed-time-step-implementation-box2d */
 
 namespace augs {
-	fixed_delta_timer::fixed_delta_timer(unsigned steps_per_second, unsigned max_steps_to_perform)
-		: max_steps_to_perform(max_steps_to_perform) {
-		basic_delta.steps_per_second = steps_per_second;
-		basic_delta.delta_ms = 1000.0 / steps_per_second;
-	}
+	fixed_delta_timer::fixed_delta_timer(const unsigned max_steps_to_perform) : max_steps_to_perform(max_steps_to_perform) {}
 
-	unsigned fixed_delta_timer::count_logic_steps_to_perform() {
+	unsigned fixed_delta_timer::count_logic_steps_to_perform(const fixed_delta& basic_delta) {
 		accumulator += ticks.extract<std::chrono::milliseconds>() * time_multiplier;
 
 		const unsigned steps = static_cast<unsigned>(std::floor(accumulator / basic_delta.delta_ms));
@@ -28,23 +24,15 @@ namespace augs {
 		return std::min(steps, max_steps_to_perform);
 	}
 
-	void fixed_delta_timer::increment_total_steps_passed() {
-		++basic_delta.total_steps_passed;
-	}
-
-	double fixed_delta_timer::fraction_of_step_until_next_step() const {
+	double fixed_delta_timer::fraction_of_step_until_next_step(const fixed_delta& basic_delta) const {
 		return accumulator / basic_delta.delta_ms;
 	}
 
-	void fixed_delta_timer::set_stepping_speed_multiplier(double tm) {
+	void fixed_delta_timer::set_stepping_speed_multiplier(const double tm) {
 		time_multiplier = tm;
 	}
 
 	double fixed_delta_timer::get_stepping_speed_multiplier() const {
 		return time_multiplier;
-	}
-
-	fixed_delta fixed_delta_timer::get_fixed_delta() const {
-		return basic_delta;
 	}
 }

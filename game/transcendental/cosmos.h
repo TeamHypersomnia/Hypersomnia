@@ -34,15 +34,15 @@ class cosmos : private storage_for_all_components_and_aggregates, public augs::p
 
 #if COSMOS_TRACKS_GUIDS
 	friend class cosmic_delta;
-	friend class multiverse;
 
 	std::unordered_map<unsigned, entity_id> guid_map_for_transport;
 
 	void assign_next_guid(entity_handle);
 	void clear_guid(entity_handle);
 	unsigned get_guid(const_entity_handle) const;
+public:
 	void remap_guids();
-
+private:
 	entity_handle create_entity_with_specific_guid(std::string debug_name, unsigned specific_guid);
 #endif
 
@@ -58,19 +58,23 @@ class cosmos : private storage_for_all_components_and_aggregates, public augs::p
 
 public:
 	storage_for_all_temporary_systems temporary_systems;
-	cosmic_profiler profiler;
+	mutable cosmic_profiler profiler;
 	augs::stream reserved_memory_for_serialization;
 
 	class significant_state {
 	public:
-		struct metadata {
-			all_settings settings;
+		class metadata {
+			friend class cosmos;
 
 			augs::fixed_delta delta;
+			unsigned total_steps_passed = 0;
 
 #if COSMOS_TRACKS_GUIDS
 			unsigned next_entity_guid = 1;
 #endif
+		public:
+			all_settings settings;
+
 		} meta;
 
 		aggregate_pool_type pool_for_aggregates;
@@ -169,6 +173,18 @@ public:
 	size_t entities_count() const;
 	size_t get_maximum_entities() const;
 	std::wstring summary() const;
+
+	float get_total_time_passed_in_seconds(float view_interpolation_ratio) const;
+	float get_total_time_passed_in_seconds() const;
+	unsigned get_total_steps_passed() const;
+
+	const augs::stepped_timestamp& get_timestamp() const;
+
+	const augs::fixed_delta& get_fixed_delta() const;
+	void set_fixed_delta(const augs::fixed_delta&);
+
+	void save_to_file(std::string);
+	bool load_from_file(std::string);
 
 	template<class T>
 	auto& get_pool(augs::pool_id<T>) {

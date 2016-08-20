@@ -4,7 +4,7 @@
 
 #include "augs/misc/step_player.h"
 
-class entropy_player {
+class entropy_buffer_and_player {
 public:
 	augs::machine_entropy total_buffered_entropy;
 

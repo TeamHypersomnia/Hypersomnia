@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
 #include "game/transcendental/entity_id.h"
+#include "game/transcendental/cosmos.h"
+#include "game/game_window.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
 #include "augs/misc/constant_size_vector.h"
@@ -20,33 +22,35 @@ struct input_context;
 
 namespace scene_managers {
 	class testbed {
+		void populate(fixed_step&);
+
+		void view_cosmos(const cosmos&, basic_viewing_step&, world_camera&) const;
 	public:
 		augs::constant_size_vector<entity_id, TESTBED_CHARACTERS_COUNT> characters;
 		unsigned current_character = 0;
 		entity_id currently_controlled_character;
+		bool show_profile_details = false;
 		augs::constant_size_vector<entity_id, TESTBED_DRAW_BODIES_COUNT> draw_bodies;
 
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(characters),
-				CEREAL_NVP(current_character),
-				CEREAL_NVP(currently_controlled_character),
-				CEREAL_NVP(draw_bodies)
-			);
-		}
+		cosmos::significant_state stashed_cosmos;
+		augs::stream stashed_delta;
 
 		void configure_view(viewing_session&) const;
 
-		void populate_world_with_entities(fixed_step&);
+		void populate_world_with_entities(cosmos&);
+
+		void control(const augs::machine_entropy&, cosmos&);
+		
 		cosmic_entropy make_cosmic_entropy(const augs::machine_entropy&, const input_context&, cosmos&);
 		entity_id get_controlled_entity() const;
 
 		void inject_input_to(entity_handle);
 
+		void step_with_callbacks(const cosmic_entropy&, cosmos&);
+
 		void pre_solve(fixed_step&);
 		void post_solve(fixed_step&);
 		
-		void view_cosmos(basic_viewing_step&, world_camera&) const;
+		void view(const cosmos&, game_window&, viewing_session&, const augs::variable_delta& dt) const;
 	};
 }
