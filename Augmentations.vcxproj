@@ -69,10 +69,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\googletest\googletest\include;$(AUGMENTATIONS)\3rdparty\googletest\googletest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\cereal\include;$(AUGMENTATIONS)\3rdparty\EASTL\test\packages\EABase\include\Common;$(AUGMENTATIONS)\3rdparty\EASTL\include;$(AUGMENTATIONS)\3rdparty\freetype\include;$(AUGMENTATIONS)\3rdparty\luabind-deboostified;$(AUGMENTATIONS)\3rdparty\lua\src;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\googletest\googletest\include;$(AUGMENTATIONS)\3rdparty\googletest\googletest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\cereal\include;$(AUGMENTATIONS)\3rdparty\enet\include;$(AUGMENTATIONS)\3rdparty\EASTL\test\packages\EABase\include\Common;$(AUGMENTATIONS)\3rdparty\EASTL\include;$(AUGMENTATIONS)\3rdparty\freetype\include;$(AUGMENTATIONS)\3rdparty\luabind-deboostified;$(AUGMENTATIONS)\3rdparty\lua\src;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\googletest\googletest\include;$(AUGMENTATIONS)\3rdparty\googletest\googletest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\cereal\include;$(AUGMENTATIONS)\3rdparty\EASTL\test\packages\EABase\include\Common;$(AUGMENTATIONS)\3rdparty\EASTL\include;$(AUGMENTATIONS)\3rdparty\freetype\include;$(AUGMENTATIONS)\3rdparty\luabind-deboostified;$(AUGMENTATIONS)\3rdparty\lua\src;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\googletest\googletest\include;$(AUGMENTATIONS)\3rdparty\googletest\googletest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\cereal\include;$(AUGMENTATIONS)\3rdparty\enet\include;$(AUGMENTATIONS)\3rdparty\EASTL\test\packages\EABase\include\Common;$(AUGMENTATIONS)\3rdparty\EASTL\include;$(AUGMENTATIONS)\3rdparty\freetype\include;$(AUGMENTATIONS)\3rdparty\luabind-deboostified;$(AUGMENTATIONS)\3rdparty\lua\src;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -295,6 +295,8 @@
     <ClCompile Include="augs\misc\pool_id.cpp" />
     <ClCompile Include="augs\misc\streams.cpp" />
     <ClCompile Include="augs\misc\time_utils.cpp" />
+    <ClCompile Include="augs\network\network_interface.cpp" />
+    <ClCompile Include="augs\network\reliable_channel.cpp" />
     <ClCompile Include="game\detail\world_camera.cpp" />
     <ClCompile Include="game\transcendental\cosmic_delta.cpp" />
     <ClCompile Include="game\transcendental\cosmic_entropy.cpp" />
@@ -364,7 +366,6 @@
     <ClCompile Include="game\detail\position_scripts.cpp" />
     <ClCompile Include="game\enums\filters.cpp" />
     <ClCompile Include="game\ingredients\artificial_life.cpp" />
-    <ClCompile Include="game\transcendental\multiverse.cpp" />
     <ClCompile Include="game\resources\behaviour_tree.cpp" />
     <ClCompile Include="game\detail\combat\melee_animation.cpp" />
     <ClCompile Include="game\detail\entity_description.cpp" />
@@ -922,6 +923,9 @@
     <ClInclude Include="augs\misc\streams.h" />
     <ClInclude Include="augs\misc\templated_readwrite.h" />
     <ClInclude Include="augs\misc\time_utils.h" />
+    <ClInclude Include="augs\network\network_interface.h" />
+    <ClInclude Include="augs\network\reliable_channel.h" />
+    <ClInclude Include="augs\network\reliable_channel_tests.h" />
     <ClInclude Include="augs\padding_byte.h" />
     <ClInclude Include="game\components\child_component.h" />
     <ClInclude Include="game\components\guid_component.h" />
@@ -1076,7 +1080,6 @@
     <ClInclude Include="game\detail\entity_scripts.h" />
     <ClInclude Include="game\detail\item_transfer_result.h" />
     <ClInclude Include="game\detail\position_scripts.h" />
-    <ClInclude Include="game\transcendental\multiverse.h" />
     <ClInclude Include="game\resources\behaviour_tree.h" />
     <ClInclude Include="game\detail\combat\melee_animation.h" />
     <ClInclude Include="game\detail\entity_description.h" />

@@ -960,9 +960,6 @@
     <ClCompile Include="game\transcendental\cosmos.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\transcendental\multiverse.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\transcendental\serialization.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -994,6 +991,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\transcendental\viewing_session.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="augs\network\network_interface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="augs\network\reliable_channel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -3020,9 +3023,6 @@
     <ClInclude Include="game\transcendental\step.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\transcendental\multiverse.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\transcendental\cosmos.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3105,6 +3105,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\transcendental\step_and_entropy_unpacker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\network\network_interface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\network\reliable_channel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\network\reliable_channel_tests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
