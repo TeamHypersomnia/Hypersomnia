@@ -1,6 +1,5 @@
 #pragma once
 #include <thread>
-#include "game/transcendental/multiverse.h"
 #include "game/bindings/bind_game_and_augs.h"
 #include "augs/global_libraries.h"
 #include "game/game_window.h"
@@ -18,6 +17,8 @@
 #include "game/transcendental/step_and_entropy_unpacker.h"
 
 #include "augs/filesystem/file.h"
+
+#include "augs/network/network_server.h"
 
 int main(int argc, char** argv) {
 	augs::global_libraries::init();
@@ -63,10 +64,14 @@ int main(int argc, char** argv) {
 		}
 	});
 
+	augs::network::server serv;
+	serv.listen(27016, 32);
+
 	while (!should_quit) {
 		augs::machine_entropy new_entropy;
 
 		new_entropy.local = window.collect_entropy();
+		new_entropy.remote = serv.collect_entropy();
 
 		for (auto& n : new_entropy.local) {
 			if (n.key == augs::window::event::keys::ESC && n.key_event == augs::window::event::key_changed::PRESSED) {
@@ -105,8 +110,6 @@ int main(int argc, char** argv) {
 				}
 			}
 			
-			receiver.pre_solve(hypersomnia);
-
 			testbed.control(s.total_entropy, hypersomnia);
 
 			auto cosmic_entropy_for_this_step = testbed.make_cosmic_entropy(s.total_entropy, session.input, hypersomnia);
