@@ -7,13 +7,13 @@ namespace augs {
 			struct packet {
 				RakNet::Packet* info = nullptr;
 				RakNet::RakPeerInterface* owner = nullptr;
-				bitstream result_bitstream;
+				augs::stream result_bitstream;
 
 				unsigned char byte(int) const;
 				unsigned length() const;
 				RakNet::RakNetGUID guid() const;
 
-				bitstream& get_bitstream();
+				augs::stream& get_bitstream();
 				void destroy();
 				~packet();
 			};
@@ -40,22 +40,11 @@ namespace augs {
 			void set_timeout(unsigned ms, const RakNet::SystemAddress&);
 			void set_timeout_all(unsigned ms);
 
-			unsigned send(bitstream&, int priority, int reliability, int channel, RakNet::RakNetGUID target, bool broadcast);
+			unsigned send(augs::stream&, int priority, int reliability, int channel, RakNet::RakNetGUID target, bool broadcast);
 
 			network_interface(const network_interface&) = delete;
 			network_interface& operator=(const network_interface&) = delete;
 
 		};
-
 	}
-}
-
-namespace std {
-	template <>
-	struct hash<RakNet::RakNetGUID> {
-		std::size_t operator()(const RakNet::RakNetGUID& k) const {
-			return RakNet::RakNetGUID::ToUint32(k);
-		}
-	};
-
 }

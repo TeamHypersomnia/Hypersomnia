@@ -22,9 +22,9 @@ namespace augs {
 	}
 
 	template<class A, class T, class...>
-	void read_bytes(A& ar, T* location, size_t count) {
+	auto read_bytes(A& ar, T* location, size_t count) {
 		verify_type<T>();
-		ar.read(reinterpret_cast<char*>(location), count * sizeof(T));
+		return ar.read(reinterpret_cast<char*>(location), count * sizeof(T));
 	}
 
 	template<class A, class T, class...>
@@ -34,9 +34,9 @@ namespace augs {
 	}
 
 	template<class T, class...>
-	void read_bytes(augs::stream& ar, T* location, size_t count) {
+	auto read_bytes(augs::stream& ar, T* location, size_t count) {
 		verify_type<T>();
-		ar.read(reinterpret_cast<char*>(location), count * sizeof(T));
+		return ar.read(reinterpret_cast<char*>(location), count * sizeof(T));
 	}
 
 	template<class T, class...>
@@ -46,8 +46,8 @@ namespace augs {
 	}
 
 	template<class A, class T, class...>
-	void read_object(A& ar, T& storage) {
-		read_bytes(ar, &storage, 1);
+	auto read_object(A& ar, T& storage) {
+		return read_bytes(ar, &storage, 1);
 	}
 
 	template<class A, class T, class...>
@@ -73,14 +73,16 @@ namespace augs {
 	}
 
 	template<class A, size_t count>
-	void read_flags(A& ar, std::array<bool, count>& storage) {
+	auto read_flags(A& ar, std::array<bool, count>& storage) {
 		static_assert(count > 0, "Can't read a null array");
 		
 		char compressed_storage[(count - 1) / 8 + 1];
-		read_bytes(ar, compressed_storage, sizeof(compressed_storage));
+		auto result = read_bytes(ar, compressed_storage, sizeof(compressed_storage));
 
 		for (size_t bit = 0; bit < count; ++bit)
 			storage[bit] = (compressed_storage[bit / 8] >> (bit % 8)) & 1;
+
+		return result;
 	}
 
 	template<class A, size_t count>
@@ -141,7 +143,6 @@ namespace augs {
 		storage.resize(s);
 
 		read_bytes(ar, storage.data(), storage.size());
-
 	}
 
 	template<class A, class T, class...>
@@ -153,8 +154,8 @@ namespace augs {
 	}
 
 	template<class A, class T, class...>
-	void read_object(A& ar, basic_pool<T>& storage) {
-		storage.read_object(ar);
+	auto read_object(A& ar, basic_pool<T>& storage) {
+		return storage.read_object(ar);
 	}
 
 	template<class A, class T, class...>
@@ -163,8 +164,8 @@ namespace augs {
 	}
 
 	template<class A, class T, class...>
-	void read_object(A& ar, pool<T>& storage) {
-		storage.read_object(ar);
+	auto read_object(A& ar, pool<T>& storage) {
+		return storage.read_object(ar);
 	}
 
 	template<class A, class T, class...>
@@ -173,8 +174,8 @@ namespace augs {
 	}
 
 	template<class A, class T, class... Args>
-	void read_object(A& ar, pool_with_meta<T, Args...>& storage) {
-		storage.read_object(ar);
+	auto read_object(A& ar, pool_with_meta<T, Args...>& storage) {
+		return storage.read_object(ar);
 	}
 
 	template<class A, class T, class... Args>

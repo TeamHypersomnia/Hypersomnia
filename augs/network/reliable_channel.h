@@ -8,16 +8,16 @@
 
 namespace augs {
 	namespace network {
-		struct bitstream;
+		struct augs::stream;
 
 		struct reliable_sender {
 			struct message {
-				bitstream* output_bitstream = nullptr;
+				augs::stream* output_bitstream = nullptr;
 			};
 
 			std::vector<message> reliable_buf;
-			bitstream unreliable_buf;
-			bitstream custom_header;
+			augs::stream unreliable_buf;
+			augs::stream custom_header;
 
 			std::map<unsigned, unsigned> sequence_to_reliable_range;
 
@@ -33,8 +33,8 @@ namespace augs {
 			unsigned last_message = 0u;
 
 			void post_message(message&);
-			bool write_data(bitstream& output);
-			bool read_ack(bitstream& input);
+			bool write_data(augs::stream& output);
+			bool read_ack(augs::stream& input);
 		};
 
 		struct reliable_receiver {
@@ -60,8 +60,8 @@ namespace augs {
 			};
 
 			/* returns result enum or how many messages to skip if message_indexing == true */
-			int read_sequence(bitstream& input);
-			void write_ack(bitstream& input);
+			int read_sequence(augs::stream& input);
+			void write_ack(augs::stream& input);
 
 			std::string last_read_report;
 		};
@@ -79,9 +79,9 @@ namespace augs {
 			void enable_starting_byte(unsigned char);
 			void disable_starting_byte();
 
-			void send(bitstream& out);
+			void send(augs::stream& out);
 			/* returns result enum */
-			int recv(bitstream& in);
+			int recv(augs::stream& in);
 		};
 	}
 }

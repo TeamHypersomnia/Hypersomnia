@@ -53,7 +53,7 @@ namespace augs {
 
 		size_t capacity() const;
 
-		void read(char* data, size_t bytes);
+		bool read(char* data, size_t bytes);
 		void write(const char* data, size_t bytes);
 		void write(const augs::stream&);
 		void reserve(size_t);

@@ -4,11 +4,11 @@ TEST(NetChannelWrapper, SingleTransmissionDeleteAllPending) {
 	a.enable_starting_byte(135);
 	b.enable_starting_byte(135);
 
-	bitstream bs[15];
+	augs::stream bs[15];
 	reliable_sender::message msg[15];
 
 	for (int i = 0; i < 15; ++i) {
-		bs[i].Write(int(i));
+		augs::write_object(bs[i], int(i));
 		msg[i].output_bitstream = &bs[i];
 	}
 
@@ -18,8 +18,8 @@ TEST(NetChannelWrapper, SingleTransmissionDeleteAllPending) {
 	a.sender.post_message(msg[2]);
 	a.sender.post_message(msg[3]);
 
-	bitstream sender_bs;
-	bitstream receiver_bs;
+	augs::stream sender_bs;
+	augs::stream receiver_bs;
 
 	EXPECT_EQ(false, a.receiver.ack_requested);
 	a.send(sender_bs);
@@ -45,16 +45,16 @@ TEST(NetChannelWrapper, SingleTransmissionDeleteAllPending) {
 TEST(NetChannelWrapper, PastAcknowledgementDeletesSeveralPending) {
 	reliable_channel a, b;
 
-	bitstream bs[15];
+	augs::stream bs[15];
 	reliable_sender::message msg[15];
 
 	for (int i = 0; i < 15; ++i) {
-		bs[i].Write(int(i));
+		augs::write_object(bs[i], int(i));
 		msg[i].output_bitstream = &bs[i];
 	}
 
-	bitstream sender_packets[15];
-	bitstream receiver_packet;
+	augs::stream sender_packets[15];
+	augs::stream receiver_packet;
 
 	/* post four messages */
 	a.sender.post_message(msg[0]);
@@ -90,16 +90,16 @@ TEST(NetChannelWrapper, PastAcknowledgementDeletesSeveralPending) {
 TEST(NetChannelWrapper, FlagForDeletionAndAck) {
 	reliable_channel a, b;
 
-	bitstream bs[15];
+	augs::stream bs[15];
 	reliable_sender::message msg[15];
 
 	for (int i = 0; i < 15; ++i) {
-		bs[i].Write(int(i));
+		augs::write_object(bs[i], int(i));
 		msg[i].output_bitstream = &bs[i];
 	}
 
-	bitstream sender_packets[15];
-	bitstream receiver_packet;
+	augs::stream sender_packets[15];
+	augs::stream receiver_packet;
 
 	/* post four messages */
 	a.sender.post_message(msg[0]);
@@ -131,10 +131,10 @@ TEST(NetChannelWrapper, FlagForDeletionAndAck) {
 
 	b.recv(sender_packets[0]);
 	int table[4];
-	sender_packets[0].Read(table[0]);
-	sender_packets[0].Read(table[1]);
-	sender_packets[0].Read(table[2]);
-	sender_packets[0].Read(table[3]);
+	augs::read_object(sender_packets[0], table[0]);
+	augs::read_object(sender_packets[0], table[1]);
+	augs::read_object(sender_packets[0], table[2]);
+	augs::read_object(sender_packets[0], table[3]);
 
 	//EXPECT_EQ(0, table[0]);
 	//EXPECT_EQ(1, table[1]);

@@ -25,7 +25,7 @@ namespace augs {
 			peer->ApplyNetworkSimulator(loss, latency, jitter);
 		}
 
-		bitstream& network_interface::packet::get_bitstream() {
+		augs::stream& network_interface::packet::get_bitstream() {
 			return result_bitstream;
 		}
 
@@ -79,7 +79,7 @@ namespace augs {
 				output.result_bitstream.Reset();
 				RakNet::BitStream my_stream(output.info->data, output.info->length, false);
 
-				/* we're not allocating memory in bitstream so it is safe */
+				/* we're not allocating memory in augs::stream so it is safe */
 				memcpy(&output.result_bitstream.stream, &my_stream, sizeof(RakNet::BitStream));
 				
 
@@ -97,8 +97,8 @@ namespace augs {
 			peer->Shutdown(block_duration, 0, (PacketPriority) disconnection_notification_priority);
 		}
 
-		unsigned network_interface::send(bitstream& bitstream, int priority, int reliability, int channel, RakNet::RakNetGUID target, bool broadcast) {
-			return peer->Send(&bitstream.stream, (PacketPriority) priority, (PacketReliability) reliability, channel, target, broadcast);
+		unsigned network_interface::send(augs::stream& augs::stream, int priority, int reliability, int channel, RakNet::RakNetGUID target, bool broadcast) {
+			return peer->Send(&augs::stream.stream, (PacketPriority) priority, (PacketReliability) reliability, channel, target, broadcast);
 		}
 
 		network_interface::packet::~packet() {

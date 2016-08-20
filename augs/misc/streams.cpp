@@ -2,9 +2,15 @@
 #include "enum_associative_array.h"
 
 namespace augs {
-	void stream::read(char* data, size_t bytes) {
-		memcpy(data, buf.data() + read_pos, bytes);
-		read_pos += bytes;
+	bool stream::read(char* data, size_t bytes) {
+		if (read_pos + bytes <= size()) {
+			memcpy(data, buf.data() + read_pos, bytes);
+			read_pos += bytes;
+
+			return true;
+		}
+
+		return false;
 	}
 
 	bool stream::operator==(const stream& b) const {

@@ -1,3 +1,4 @@
+#include "augs/misc/templated_readwrite.h"
 #include "reliable_channel.h"
 
 namespace augs {
@@ -18,79 +19,79 @@ namespace augs {
 			++last_message;
 		}
 
-		bool reliable_sender::write_data(bitstream& output) {
+		bool reliable_sender::write_data(augs::stream& output) {
 			/* if we have nothing to send */
-			if (reliable_buf.empty() && unreliable_buf.GetNumberOfBitsUsed() <= 0)
+			if (reliable_buf.empty() && unreliable_buf.size() <= 0)
 				return false;
 
 			/* reliable + maybe unreliable */
-			bitstream reliable_bs;
+			augs::stream reliable_bs;
 
 			for (auto& msg : reliable_buf) {
 				if (msg.output_bitstream) {
-					reliable_bs.name_property("reliable message");
-					reliable_bs.WriteBitstream(*msg.output_bitstream);
+					reliable_bs;//name_property("reliable message");
+					augs::write_object(reliable_bs, *msg.output_bitstream);
 				}
 			}
 
-			if (reliable_bs.GetNumberOfBitsUsed() > 0) {
-				output.name_property("has_reliable");
-				output.Write<bool>(1);
-				output.name_property("sequence");
-				output.Write(++sequence);
-				output.name_property("ack_sequence");
-				output.Write(ack_sequence);
+			if (reliable_bs.size() > 0) {
+				output;//name_property("has_reliable");
+				augs::write_object(output, bool(1));
+				output;//name_property("sequence");
+				augs::write_object(output, ++sequence);
+				output;//name_property("ack_sequence");
+				augs::write_object(output, ack_sequence);
 
 				if (message_indexing) {
-					output.name_property("first_message");
-					output.Write(first_message);
-					output.name_property("last_message");
-					output.Write(last_message);
+					output;//name_property("first_message");
+					augs::write_object(output, first_message);
+					output;//name_property("last_message");
+					augs::write_object(output, last_message);
 				}
 
 				sequence_to_reliable_range[sequence] = last_message;
 			}
 			else {
-				output.name_property("has_reliable");
-				output.Write<bool>(0);
+				output;//name_property("has_reliable");
+				augs::write_object(output, bool(0));
 			}
 
 			/* only unreliable */
-			if (unreliable_buf.GetNumberOfBitsUsed() > 0) {
-				output.name_property("has_unreliable");
-				output.Write<bool>(1);
-				output.name_property("unreliable_sequence");
-				output.Write(++unreliable_sequence);
-				output.name_property("request_ack_for_unreliable");
-				output.Write<bool>(request_ack_for_unreliable);
+			if (unreliable_buf.size() > 0) {
+				output;//name_property("has_unreliable");
+				augs::write_object(output, bool(1));
+				output;//name_property("unreliable_sequence");
+				augs::write_object(output, ++unreliable_sequence);
+				output;//name_property("request_ack_for_unreliable");
+				augs::write_object(output, bool(request_ack_for_unreliable));
 
 				request_ack_for_unreliable = false;
 			}
 			else {
-				output.name_property("has_unreliable");
-				output.Write<bool>(0);
+				output;//name_property("has_unreliable");
+				augs::write_object(output, bool(0));
 			}
 			
-			output.name_property("custom_header");
-			output.WriteBitstream(custom_header);
+			output;//name_property("custom_header");
+			augs::write_object(output, custom_header);
 
-			output.name_property("reliable_buffer");
-			output.WriteBitstream(reliable_bs);
+			output;//name_property("reliable_buffer");
+			augs::write_object(output, reliable_bs);
 
-			output.name_property("unreliable_buffer");
-			output.WriteBitstream(unreliable_buf);
+			output;//name_property("unreliable_buffer");
+			augs::write_object(output, unreliable_buf);
 
 			return true;
 		}
 
-		bool reliable_sender::read_ack(bitstream& input) {
+		bool reliable_sender::read_ack(augs::stream& input) {
 			unsigned short reliable_ack = 0u;
 			unsigned short unreliable_ack = 0u;
 
-			input.name_property("reliable_ack");
-			if (!input.Read(reliable_ack)) return false;
-			input.name_property("unreliable_ack");
-			if (!input.Read(unreliable_ack)) return false;
+			input;//name_property("reliable_ack");
+			if (!augs::read_object(input, reliable_ack)) return false;
+			input;//name_property("unreliable_ack");
+			if (!augs::read_object(input, unreliable_ack)) return false;
 			
 			if (sequence_more_recent(reliable_ack, ack_sequence)) {
 				auto last_message_of_acked_sequence = sequence_to_reliable_range.find(reliable_ack);
@@ -115,7 +116,7 @@ namespace augs {
 			return true;
 		}
 		
-		int reliable_receiver::read_sequence(bitstream& input) {
+		int reliable_receiver::read_sequence(augs::stream& input) {
 			std::stringstream report;
 
 			unsigned short update_from_sequence = 0u;
@@ -127,21 +128,21 @@ namespace augs {
 
 			int result = MESSAGES_RECEIVED;
 			
-			input.name_property("has_reliable");
-			if (!input.Read<bool>(has_reliable)) return NOTHING_RECEIVED;
+			input;//name_property("has_reliable");
+			if (!augs::read_object(input, has_reliable)) return NOTHING_RECEIVED;
 
 			/* reliable + maybe unreliable */
 			if (has_reliable) {
-				input.name_property("sequence");
-				if (!input.Read(received_sequence)) return NOTHING_RECEIVED;
-				input.name_property("ack_sequence");
-				if (!input.Read(update_from_sequence)) return NOTHING_RECEIVED;
+				input;//name_property("sequence");
+				if (!augs::read_object(input, received_sequence)) return NOTHING_RECEIVED;
+				input;//name_property("ack_sequence");
+				if (!augs::read_object(input, update_from_sequence)) return NOTHING_RECEIVED;
 
 				if (message_indexing) {
-					input.name_property("first_message");
-					if (!input.Read(received_first_message)) return NOTHING_RECEIVED;
-					input.name_property("last_message");
-					if (!input.Read(received_last_message)) return NOTHING_RECEIVED;
+					input;//name_property("first_message");
+					if (!augs::read_object(input, received_first_message)) return NOTHING_RECEIVED;
+					input;//name_property("last_message");
+					if (!augs::read_object(input, received_last_message)) return NOTHING_RECEIVED;
 				}
 
 				/* if even the reliable sequence is out of date, the unreliable sequence will be out of date too, so it can't be read anyway */
@@ -165,14 +166,14 @@ namespace augs {
 				}
 			}
 
-			input.name_property("has_unreliable");
-			if (!input.Read<bool>(has_unreliable)) return NOTHING_RECEIVED;
+			input;//name_property("has_unreliable");
+			if (!augs::read_object(input, has_unreliable)) return NOTHING_RECEIVED;
 			
 			if (has_unreliable) {
-				input.name_property("unreliable_sequence");
-				if (!input.Read(received_unreliable_sequence)) return NOTHING_RECEIVED;
-				input.name_property("request_ack_for_unreliable");
-				if (!input.Read(request_ack_for_unreliable)) return NOTHING_RECEIVED;
+				input;//name_property("unreliable_sequence");
+				if (!augs::read_object(input, received_unreliable_sequence)) return NOTHING_RECEIVED;
+				input;//name_property("request_ack_for_unreliable");
+				if (!augs::read_object(input, request_ack_for_unreliable)) return NOTHING_RECEIVED;
 
 				if (sequence_more_recent(received_unreliable_sequence, last_unreliable_sequence)) {
 					last_unreliable_sequence = received_unreliable_sequence;
@@ -190,11 +191,11 @@ namespace augs {
 			return result;
 		}
 
-		void reliable_receiver::write_ack(bitstream& output) {
-			output.name_property("reliable_ack");
-			output.Write(last_sequence);
-			output.name_property("unreliable_ack");
-			output.Write(last_unreliable_sequence);
+		void reliable_receiver::write_ack(augs::stream& output) {
+			output;//name_property("reliable_ack");
+			augs::write_object(output, last_sequence);
+			output;//name_property("unreliable_ack");
+			augs::write_object(output, last_unreliable_sequence);
 		}
 
 
@@ -207,11 +208,11 @@ namespace augs {
 			add_starting_byte = false;
 		}
 
-		int reliable_channel::recv(bitstream& in) {
+		int reliable_channel::recv(augs::stream& in) {
 			if (add_starting_byte) {
 				unsigned char byte;
-				in.name_property("Starting byte");
-				in.Read(byte);
+				in;//name_property("Starting byte");
+				augs::read_object(in, byte);
 			}
 
 			sender.read_ack(in);
@@ -219,21 +220,21 @@ namespace augs {
 		}
 
 
-		void reliable_channel::send(bitstream& out) {
-			bitstream output_bs;
+		void reliable_channel::send(augs::stream& out) {
+			augs::stream output_bs;
 
 			if (sender.write_data(output_bs) || receiver.ack_requested) {
 				if (add_starting_byte) {
-					out.name_property(starting_byte_name);
-					out.Write(starting_byte);
+					out;//name_property(starting_byte_name);
+					augs::write_object(out, starting_byte);
 				}
 
 				receiver.write_ack(out);
 				receiver.ack_requested = false;
 
-				if (output_bs.GetNumberOfBitsUsed() > 0) {
-					out.name_property("sender channel");
-					out.WriteBitstream(output_bs);
+				if (output_bs.size() > 0) {
+					out;//name_property("sender channel");
+					augs::write_object(out, output_bs);
 				}
 			}
 		}
@@ -250,11 +251,11 @@ TEST(NetChannel, SingleTransmissionDeleteAllPending) {
 	reliable_sender sender;
 	reliable_receiver receiver;
 
-	bitstream bs[15];
+	augs::stream bs[15];
 	reliable_sender::message msg[15];
 
 	for (int i = 0; i < 15; ++i) {
-		bs[i].Write(int(i));
+		augs::write_object(bs[i], int(i));
 		msg[i].output_bitstream = &bs[i];
 	}
 
@@ -264,8 +265,8 @@ TEST(NetChannel, SingleTransmissionDeleteAllPending) {
 	sender.post_message(msg[2]);
 	sender.post_message(msg[3]);
 
-	bitstream sender_bs;
-	bitstream receiver_bs;
+	augs::stream sender_bs;
+	augs::stream receiver_bs;
 
 	sender.write_data(sender_bs);
 
@@ -288,16 +289,16 @@ TEST(NetChannel, PastAcknowledgementDeletesSeveralPending) {
 	reliable_sender sender;
 	reliable_receiver receiver;
 
-	bitstream bs[15];
+	augs::stream bs[15];
 	reliable_sender::message msg[15];
 
 	for (int i = 0; i < 15; ++i) {
-		bs[i].Write(int(i));
+		augs::write_object(bs[i], int(i));
 		msg[i].output_bitstream = &bs[i];
 	}
 
-	bitstream sender_packets[15];
-	bitstream receiver_packet;
+	augs::stream sender_packets[15];
+	augs::stream receiver_packet;
 
 	/* post four messages */
 	sender.post_message(msg[0]);
@@ -334,16 +335,16 @@ TEST(NetChannel, FlagForDeletionAndAck) {
 	reliable_sender sender;
 	reliable_receiver receiver;
 
-	bitstream bs[15];
+	augs::stream bs[15];
 	reliable_sender::message msg[15];
 
 	for (int i = 0; i < 15; ++i) {
-		bs[i].Write(int(i));
+		augs::write_object(bs[i], int(i));
 		msg[i].output_bitstream = &bs[i];
 	}
 
-	bitstream sender_packets[15];
-	bitstream receiver_packet;
+	augs::stream sender_packets[15];
+	augs::stream receiver_packet;
 
 	/* post four messages */
 	sender.post_message(msg[0]);
@@ -414,16 +415,16 @@ TEST(NetChannel, SequenceNumberOverflowMultipleTries) {
 	receiver.last_sequence = std::numeric_limits<unsigned short>::max();
 
 	for (int k = 0; k < 10; ++k) {
-		bitstream bs[15];
+		augs::stream bs[15];
 		reliable_sender::message msg[15];
 
 		for (int i = 0; i < 15; ++i) {
-			bs[i].Write(int(i));
+			augs::write_object(bs[i], int(i));
 			msg[i].output_bitstream = &bs[i];
 		}
 
-		bitstream sender_packets[15];
-		bitstream receiver_packet;
+		augs::stream sender_packets[15];
+		augs::stream receiver_packet;
 
 		/* post four messages */
 		sender.post_message(msg[0]);
@@ -495,16 +496,16 @@ TEST(NetChannel, OutOfDatePackets) {
 	receiver.last_sequence = std::numeric_limits<unsigned short>::max();
 
 	for (int k = 0; k < 10; ++k) {
-		bitstream bs[15];
+		augs::stream bs[15];
 		reliable_sender::message msg[15];
 
 		for (int i = 0; i < 15; ++i) {
-			bs[i].Write(int(i));
+			augs::write_object(bs[i], int(i));
 			msg[i].output_bitstream = &bs[i];
 		}
 
-		bitstream sender_packets[15];
-		bitstream receiver_packet;
+		augs::stream sender_packets[15];
+		augs::stream receiver_packet;
 
 		/* post four messages */
 		sender.post_message(msg[0]);
