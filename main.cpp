@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
 	resource_manager.destroy_everything();
 	resource_setups::load_standard_everything();
 
-	simulation_receiver client_sim;
+	simulation_receiver receiver;
 
 	cosmos hypersomnia(50000);
 	step_and_entropy_unpacker input_unpacker;
@@ -64,7 +64,9 @@ int main(int argc, char** argv) {
 	});
 
 	while (!should_quit) {
-		auto new_entropy = window.collect_entropy();
+		augs::machine_entropy new_entropy;
+
+		new_entropy.local = window.collect_entropy();
 
 		for (auto& n : new_entropy.local) {
 			if (n.key == augs::window::event::keys::ESC && n.key_event == augs::window::event::key_changed::PRESSED) {
@@ -103,6 +105,8 @@ int main(int argc, char** argv) {
 				}
 			}
 			
+			receiver.pre_solve(hypersomnia);
+
 			testbed.control(s.total_entropy, hypersomnia);
 
 			auto cosmic_entropy_for_this_step = testbed.make_cosmic_entropy(s.total_entropy, session.input, hypersomnia);
