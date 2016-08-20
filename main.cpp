@@ -13,14 +13,11 @@
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "game/transcendental/viewing_session.h"
 #include "game/transcendental/simulation_exchange.h"
+#include "game/transcendental/cosmos.h"
+
+#include "game/transcendental/step_and_entropy_unpacker.h"
 
 #include "augs/filesystem/file.h"
-
-volatile bool should_quit = false;
-
-void server_procedure() {
-
-}
 
 int main(int argc, char** argv) {
 	augs::global_libraries::init();
@@ -35,28 +32,36 @@ int main(int argc, char** argv) {
 	resource_setups::load_standard_everything();
 
 	simulation_receiver client_sim;
-	auto& hypersomnia = client_sim.realm;
 
-	if (!hypersomnia.try_to_load_save()) {
-		hypersomnia.main_cosmos.significant.meta.settings.screen_size = screen_size;
-		hypersomnia.populate_cosmoi();
+	cosmos hypersomnia(50000);
+	step_and_entropy_unpacker input_unpacker;
+	scene_managers::testbed testbed;
+
+	if (!hypersomnia.load_from_file("save.state")) {
+		hypersomnia.significant.meta.settings.screen_size = screen_size;
+		testbed.populate_world_with_entities(hypersomnia);
 	}
 	else 
-		hypersomnia.main_cosmos.significant.meta.settings.screen_size = screen_size;
+		hypersomnia.significant.meta.settings.screen_size = screen_size;
 	
-	hypersomnia.try_to_load_or_save_new_session();
+	input_unpacker.try_to_load_or_save_new_session("sessions/", "recorded.inputs");
 
 	window.window.set_as_current();
 
 	viewing_session session;
 	session.camera.configure_size(screen_size);
 
-	hypersomnia.configure_view(session);
+	testbed.configure_view(session);
 
 	simulation_broadcast server_sim;
-	server_sim.realm.populate_cosmoi();
 
-	std::thread server_thread([&server_sim]() { server_procedure(); });
+	volatile bool should_quit = false;
+
+	std::thread server_thread([&session, &server_sim, &should_quit]() {
+		while (!should_quit) {
+			//server_sim.simulate(session.input);
+		}
+	});
 
 	while (!should_quit) {
 		auto new_entropy = window.collect_entropy();
@@ -67,9 +72,46 @@ int main(int argc, char** argv) {
 			}
 		}
 
-		hypersomnia.control(new_entropy);
-		hypersomnia.simulate(session.input);
-		hypersomnia.view(window, session);
+		input_unpacker.control(new_entropy);
+
+		auto steps = input_unpacker.unpack_steps(hypersomnia.get_fixed_delta());
+
+		for (const auto& s : steps) {
+			for (const auto& raw_input : s.total_entropy.local) {
+				if (raw_input.key_event == augs::window::event::PRESSED) {
+					if (raw_input.key == augs::window::event::keys::_1) {
+						hypersomnia.set_fixed_delta(60);
+					}
+					if (raw_input.key == augs::window::event::keys::_2) {
+						hypersomnia.set_fixed_delta(128);
+					}
+					if (raw_input.key == augs::window::event::keys::_3) {
+						hypersomnia.set_fixed_delta(144);
+					}
+					if (raw_input.key == augs::window::event::keys::_4) {
+						input_unpacker.timer.set_stepping_speed_multiplier(0.1f);
+					}
+					if (raw_input.key == augs::window::event::keys::_5) {
+						input_unpacker.timer.set_stepping_speed_multiplier(1.f);
+					}
+					if (raw_input.key == augs::window::event::keys::_6) {
+						input_unpacker.timer.set_stepping_speed_multiplier(6.f);
+					}
+					if (raw_input.key == augs::window::event::keys::F4) {
+						LOG_COLOR(console_color::YELLOW, "Separator");
+					}
+				}
+			}
+			
+			testbed.control(s.total_entropy, hypersomnia);
+
+			auto cosmic_entropy_for_this_step = testbed.make_cosmic_entropy(s.total_entropy, session.input, hypersomnia);
+			testbed.step_with_callbacks(cosmic_entropy_for_this_step, hypersomnia);
+
+			renderer::get_current().clear_logic_lines();
+		}
+
+		testbed.view(hypersomnia, window, session, session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), input_unpacker.timer));
 	}
 
 	server_thread.join();
