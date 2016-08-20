@@ -20,3 +20,6 @@
 [submodule "3rdparty/rectpack2D"]
 	path = 3rdparty/rectpack2D
 	url = https://github.com/TeamHypersomnia/rectpack2D.git
+[submodule "3rdparty/enet"]
+	path = 3rdparty/enet
+	url = https://github.com/lsalzman/enet.git
