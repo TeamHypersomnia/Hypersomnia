@@ -376,7 +376,7 @@ namespace scene_managers {
 		const auto coords = controlled.get<components::transform>().pos;
 		const auto vel = controlled.get<components::physics>().velocity();
 
-		quick_print_format(target.triangles, typesafe_sprintf(L"X: %f2\nY: %f2\nVelX: %x\nVelY: %x\n", coords.x, coords.y, vel.x, vel.y)
+		quick_print_format(target.triangles, typesafe_sprintf(L"Entities: %x\nX: %f2\nY: %f2\nVelX: %x\nVelY: %x\n", cosmos.entities_count(), coords.x, coords.y, vel.x, vel.y)
 			+ session.summary() + cosmos.profiler.sorted_summary(show_profile_details), style(assets::font_id::GUI_FONT, rgba(255, 255, 255, 150)), vec2i(0, 0), 0);
 
 		target.call_triangles();
