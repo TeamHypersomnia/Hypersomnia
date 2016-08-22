@@ -12,9 +12,7 @@ int main(int argc, char** argv) {
 	augs::global_libraries::run_googletest(argc, argv);
 
 	game_window window;
-
 	window.call_window_script("config.lua");
-	const vec2i screen_size = vec2i(window.window.get_screen_rect());
 
 	resource_manager.destroy_everything();
 	resource_setups::load_standard_everything();

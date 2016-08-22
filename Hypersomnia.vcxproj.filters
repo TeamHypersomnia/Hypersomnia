@@ -35,7 +35,10 @@
     <ClCompile Include="local_setup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="client_server_setup.cpp">
+    <ClCompile Include="server_setup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="client_setup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

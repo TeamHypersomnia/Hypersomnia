@@ -40,7 +40,7 @@ void local_setup::process(game_window& window) {
 
 	testbed.configure_view(session);
 
-	volatile bool should_quit = false;
+	bool should_quit = false;
 
 	while (!should_quit) {
 		augs::machine_entropy new_entropy;

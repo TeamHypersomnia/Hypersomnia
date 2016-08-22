@@ -7,7 +7,12 @@ public:
 	void process(game_window&);
 };
 
-class client_server_setup {
+class server_setup {
+public:
+	void process(game_window&);
+};
+
+class client_setup {
 public:
 	void process(game_window&);
 };

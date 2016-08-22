@@ -21,7 +21,7 @@
 
 #include "setups.h"
 
-void client_server_setup::process(game_window& window) {
+void server_setup::process(game_window& window) {
 	const vec2i screen_size = vec2i(window.window.get_screen_rect());
 
 	simulation_receiver receiver;

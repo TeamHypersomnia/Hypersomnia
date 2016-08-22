@@ -148,7 +148,8 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="client_server_setup.cpp" />
+    <ClCompile Include="client_setup.cpp" />
+    <ClCompile Include="server_setup.cpp" />
     <ClCompile Include="local_setup.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="stdafx.cpp">
