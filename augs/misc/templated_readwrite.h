@@ -74,8 +74,19 @@ namespace augs {
 	//}
 
 	template<class... Args>
-	void write_object(augs::stream& ar, augs::stream& storage, Args... args) {
+	void write_object(augs::stream& ar, const augs::stream& storage, Args... args) {
 		ar.write(storage, args...);
+	}
+
+	template<class A, class... Args>
+	void write_sized_stream(A& ar, const augs::stream& storage, Args... args) {
+		write_object(ar, storage.buf);
+	}
+
+	template<class A, class... Args>
+	void read_sized_stream(A& ar, augs::stream& storage, Args... args) {
+		read_object(ar, storage.buf);
+		storage.set_write_pos(storage.buf.size());
 	}
 
 	template<class A, size_t count>

@@ -12,20 +12,7 @@ namespace augs {
 	class fixed_delta;
 }
 
-class simulation_broadcast {
-	augs::stream delta;
-	std::thread delta_production;
-	unsigned steps_since_last_heartbeat = 0;
-public:
-	unsigned delta_heartbeat_interval_in_steps = 10;
-
-	void set_delta_heartbeat_interval(const augs::fixed_delta&, float ms);
-
-	void start_producing_delta(const cosmos& base, const cosmos& enco);
-};
-
-class simulation_receiver {
-
+class simulation_exchange {
 public:
 	struct command {
 		enum class type {
@@ -38,10 +25,29 @@ public:
 		cosmic_entropy entropy;
 	};
 
-	augs::jitter_buffer<command> jitter_buffer;
+protected:
+	static std::vector<command> read_commands_from_stream(augs::stream&);
+	static void write_commands_to_stream(const cosmic_entropy&, const cosmos& guid_mapper);
+};
 
+class simulation_broadcast : public simulation_exchange {
+	augs::stream delta;
+	std::thread delta_production;
+	unsigned steps_since_last_heartbeat = 0;
+public:
+	unsigned delta_heartbeat_interval_in_steps = 10;
+
+	void set_delta_heartbeat_interval(const augs::fixed_delta&, float ms);
+
+	void start_producing_delta(const cosmos& base, const cosmos& enco);
+};
+
+class simulation_receiver : public simulation_exchange {
 	void acquire_new_entropy(const cosmic_entropy&);
 	void acquire_new_entropy_with_heartbeat(const cosmic_entropy&, const augs::stream&);
+
+public:
+	augs::jitter_buffer<command> jitter_buffer;
 
 	struct unpacked_steps {
 		bool use_extrapolated_cosmos = true;
@@ -49,5 +55,6 @@ public:
 		std::vector<cosmic_entropy> steps_for_proper_cosmos;
 	};
 
+	void read_commands_from_stream(augs::stream&);
 	unpacked_steps unpack_deterministic_steps(cosmos& proper_cosmos, cosmos& extrapolated_cosmos, cosmos& last_delta_unpacked);
 };

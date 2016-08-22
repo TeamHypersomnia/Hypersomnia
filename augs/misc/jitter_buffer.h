@@ -17,6 +17,11 @@ namespace augs {
 		void acquire_new_command(command&& c) {
 			buffer.emplace_back(c);
 		}
+		
+		template <class Iter>
+		void acquire_new_commands(Iter first, Iter last) {
+			buffer.insert(buffer.end(), first, last);
+		}
 
 		std::vector<command> unpack_commands_once() {
 			std::vector<command> next_commands;

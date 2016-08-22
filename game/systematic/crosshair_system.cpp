@@ -40,11 +40,7 @@ void crosshair_system::generate_crosshair_intents(fixed_step& step) {
 		messages::crosshair_intent_message crosshair_intent;
 		crosshair_intent.messages::intent_message::operator=(it);
 
-		if (it.intent == intent_type::MOVE_CROSSHAIR ||
-			it.intent == intent_type::CROSSHAIR_PRIMARY_ACTION ||
-			it.intent == intent_type::CROSSHAIR_SECONDARY_ACTION
-			) {
-
+		if (it.uses_mouse_motion()) {
 			vec2 delta = vec2(vec2(it.mouse_rel) * crosshair.sensitivity).rotate(crosshair.rotation_offset, vec2());
 
 			vec2& base_offset = crosshair.base_offset;

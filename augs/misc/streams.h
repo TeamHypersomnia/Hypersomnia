@@ -24,6 +24,14 @@ namespace augs {
 			return write_pos - read_pos;
 		}
 
+		void set_write_pos(size_t new_pos) {
+			write_pos = new_pos;
+		}
+
+		void set_read_pos(size_t new_pos) {
+			read_pos = new_pos;
+		}
+
 		void reset_write_pos() {
 			write_pos = 0;
 		}

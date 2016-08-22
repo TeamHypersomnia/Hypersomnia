@@ -7,7 +7,7 @@
 
 namespace augs {
 	namespace network {
-		bool client::connect(std::string host_address, unsigned short port, unsigned timeout_ms) {
+		bool client::connect(const std::string host_address, const unsigned short port, const unsigned timeout_ms) {
 			host.init(nullptr /* create a client host */,
 				1 /* only allow 1 outgoing connection */,
 				2 /* allow up 2 channels to be used, 0 and 1 */,
@@ -48,7 +48,7 @@ namespace augs {
 
 		bool client::send_unreliable(const packet& payload) {
 			ENetPacket * const packet = enet_packet_create(payload.data(), payload.size(), ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT);
-			auto result = !enet_peer_send(peer, 0, packet);
+			const auto result = !enet_peer_send(peer, 0, packet);
 			enet_host_flush(host.get());
 
 			return result;
@@ -56,7 +56,7 @@ namespace augs {
 
 		bool client::send_reliable(const packet& payload) {
 			ENetPacket * const packet = enet_packet_create(payload.data(), payload.size(), ENET_PACKET_FLAG_RELIABLE);
-			auto result = !enet_peer_send(peer, 0, packet);
+			const auto result = !enet_peer_send(peer, 0, packet);
 			enet_host_flush(host.get());
 
 			return result;
