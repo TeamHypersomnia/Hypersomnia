@@ -78,13 +78,15 @@ void client_setup::process(game_window& window) {
 
 				testbed.control(s.total_entropy, hypersomnia);
 
-				auto cosmic_entropy_for_this_step = testbed.make_cosmic_entropy(s.total_entropy, session.input, hypersomnia);
+				auto local_cosmic_entropy_for_this_step = testbed.make_cosmic_entropy(s.total_entropy, session.input, hypersomnia);
 
 				auto deterministic_steps = receiver.unpack_deterministic_steps(hypersomnia, extrapolated_hypersomnia, hypersomnia_last_snapshot);
 
-				testbed.step_with_callbacks(cosmic_entropy_for_this_step, hypersomnia);
-
-				renderer::get_current().clear_logic_lines();
+				while (deterministic_steps.has_next_entropy()) {
+					auto cosmic_entropy_for_this_step = deterministic_steps.unpack_next_entropy(hypersomnia);
+					testbed.step_with_callbacks(cosmic_entropy_for_this_step, hypersomnia);
+					renderer::get_current().clear_logic_lines();
+				}
 			}
 
 			testbed.view(hypersomnia, window, session, session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), input_unpacker.timer));
