@@ -19,14 +19,10 @@
 
 #include "augs/network/network_server.h"
 
-void client_server_setup() {
-	game_window window;
+#include "setups.h"
 
-	window.call_window_script("config.lua");
+void client_server_setup::process(game_window& window) {
 	const vec2i screen_size = vec2i(window.window.get_screen_rect());
-
-	resource_manager.destroy_everything();
-	resource_setups::load_standard_everything();
 
 	simulation_receiver receiver;
 
@@ -45,8 +41,6 @@ void client_server_setup() {
 		hypersomnia.significant.meta.settings.screen_size = screen_size;
 
 	input_unpacker.try_to_load_or_save_new_session("sessions/", "recorded.inputs");
-
-	window.window.set_as_current();
 
 	viewing_session session;
 	session.camera.configure_size(screen_size);

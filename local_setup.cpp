@@ -16,15 +16,10 @@
 #include "game/transcendental/step_and_entropy_unpacker.h"
 
 #include "augs/filesystem/file.h"
+#include "setups.h"
 
-void local_setup() {
-	game_window window;
-
-	window.call_window_script("config.lua");
+void local_setup::process(game_window& window) {
 	const vec2i screen_size = vec2i(window.window.get_screen_rect());
-
-	resource_manager.destroy_everything();
-	resource_setups::load_standard_everything();
 
 	cosmos hypersomnia(3000);
 
@@ -39,8 +34,6 @@ void local_setup() {
 		hypersomnia.significant.meta.settings.screen_size = screen_size;
 
 	input_unpacker.try_to_load_or_save_new_session("sessions/", "recorded.inputs");
-
-	window.window.set_as_current();
 
 	viewing_session session;
 	session.camera.configure_size(screen_size);
