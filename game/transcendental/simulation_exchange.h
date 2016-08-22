@@ -43,16 +43,17 @@ public:
 };
 
 class simulation_receiver : public simulation_exchange {
-	void acquire_new_entropy(const cosmic_entropy&);
-	void acquire_new_entropy_with_heartbeat(const cosmic_entropy&, const augs::stream&);
-
 public:
 	augs::jitter_buffer<command> jitter_buffer;
 
-	struct unpacked_steps {
-		bool use_extrapolated_cosmos = true;
-
+	class unpacked_steps {
+		friend class simulation_receiver;
 		std::vector<cosmic_entropy> steps_for_proper_cosmos;
+	public:
+		bool use_extrapolated_cosmos = true;
+		
+		bool has_next_entropy() const;
+		cosmic_entropy unpack_next_entropy(const cosmos& guid_mapper);
 	};
 
 	void read_commands_from_stream(augs::stream&);

@@ -102,6 +102,30 @@ simulation_receiver::unpacked_steps simulation_receiver::unpack_deterministic_st
 	return std::move(result);
 }
 
+bool simulation_receiver::unpacked_steps::has_next_entropy() const {
+	return steps_for_proper_cosmos.size() > 0;
+}
+
+cosmic_entropy simulation_receiver::unpacked_steps::unpack_next_entropy(const cosmos& guid_mapper) {
+	ensure(has_next_entropy());
+
+	cosmic_entropy result;
+
+	std::vector<std::pair<entity_id, std::vector<entity_intent>>> invalids;
+	
+	for (const auto& entry : result.entropy_per_entity)
+		invalids.push_back(entry); 
+
+	result.entropy_per_entity.clear();
+
+	for (auto i : invalids) {
+		i.first = guid_mapper.get_entity_by_guid(i.first.guid);
+		result.entropy_per_entity.emplace(std::move(i));
+	}
+
+	return std::move(result);
+}
+
 void simulation_broadcast::set_delta_heartbeat_interval(const augs::fixed_delta& dt, float ms) {
 	delta_heartbeat_interval_in_steps = static_cast<unsigned>(ms / dt.in_milliseconds());
 }
