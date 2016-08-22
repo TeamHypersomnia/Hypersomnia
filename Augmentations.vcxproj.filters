@@ -3185,5 +3185,8 @@
     <ClInclude Include="3rdparty\enet\include\enet\win32.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="augs\misc\jitter_buffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -53,10 +53,6 @@ simulation_receiver::unpacked_steps simulation_receiver::unpack_deterministic_st
 	return result;
 }
 
-
-void simulation_broadcast::simulate(const input_context& context) {
-}
-
 void simulation_broadcast::set_delta_heartbeat_interval(const augs::fixed_delta& dt, float ms) {
 	delta_heartbeat_interval_in_steps = static_cast<unsigned>(ms / dt.in_milliseconds());
 }

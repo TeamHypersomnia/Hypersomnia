@@ -4,7 +4,7 @@
 namespace augs {
 	template<class command>
 	class jitter_buffer {
-		size_t length = 3;
+		size_t lower_limit = 3;
 		unsigned steps_extrapolated = 0;
 
 		bool locked = false;
@@ -21,7 +21,7 @@ namespace augs {
 		std::vector<command> unpack_commands_once() {
 			std::vector<command> next_commands;
 
-			if (buffer.size() >= length + steps_extrapolated)
+			if (buffer.size() >= lower_limit + steps_extrapolated)
 				locked = false;
 
 			if (!locked) {
@@ -44,12 +44,12 @@ namespace augs {
 			return std::move(next_commands);
 		}
 
-		size_t get_length() const {
-			return length;
+		size_t get_lower_limit() const {
+			return lower_limit;
 		}
 
-		void set_length(size_t new_length) {
-			length = new_length;
+		void set_lower_limit(size_t new_lower_limit) {
+			lower_limit = new_lower_limit;
 		}
 
 		unsigned get_steps_extrapolated() const {

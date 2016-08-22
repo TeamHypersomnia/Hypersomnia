@@ -936,6 +936,7 @@
     <ClInclude Include="augs\misc\bit_stream.h" />
     <ClInclude Include="augs\misc\constant_size_vector.h" />
     <ClInclude Include="augs\misc\delta.h" />
+    <ClInclude Include="augs\misc\jitter_buffer.h" />
     <ClInclude Include="augs\misc\machine_entropy.h" />
     <ClInclude Include="augs\misc\minmax.h" />
     <ClInclude Include="augs\misc\pool_handlizer.h" />

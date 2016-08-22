@@ -15,14 +15,13 @@ namespace augs {
 class simulation_broadcast {
 	augs::stream delta;
 	std::thread delta_production;
+	unsigned steps_since_last_heartbeat = 0;
 public:
 	unsigned delta_heartbeat_interval_in_steps = 10;
 
 	void set_delta_heartbeat_interval(const augs::fixed_delta&, float ms);
 
 	void start_producing_delta(const cosmos& base, const cosmos& enco);
-
-	void simulate(const input_context&);
 };
 
 class simulation_receiver {
