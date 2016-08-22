@@ -15,6 +15,8 @@
 
 #include "game/transcendental/step_and_entropy_unpacker.h"
 
+#include "game/transcendental/network_commands.h"
+
 #include "augs/filesystem/file.h"
 
 #include "augs/network/network_client.h"
@@ -71,9 +73,26 @@ void client_setup::process(game_window& window) {
 
 			for (auto& s : steps) {
 				for (auto& net_event : s.total_entropy.remote) {
-					receiver.read_commands_from_stream(net_event.payload);
+					if (net_event.message_type == augs::network::message::type::RECEIVE) {
+						auto& stream = net_event.payload;
+						
+						while (stream.get_unread_bytes() > 0) {
+							auto command = static_cast<network_command>(stream.peek<unsigned char>());
+							
+							switch (command) {
+							case network_command::ENTROPY_FOR_NEXT_STEP:
+								receiver.read_entropy_for_next_step(stream);
+								break;
 
-					ensure(net_event.payload.get_unread_bytes() == 0);
+							case network_command::ENTROPY_WITH_HEARTBEAT_FOR_NEXT_STEP:
+								receiver.read_entropy_with_heartbeat_for_next_step(stream);
+								break;
+							}
+						}
+
+						ensure(net_event.payload.get_unread_bytes() == 0);
+					}
+
 				}
 
 				testbed.control(s.total_entropy, hypersomnia);
