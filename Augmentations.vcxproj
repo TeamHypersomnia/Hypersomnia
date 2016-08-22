@@ -406,7 +406,9 @@
     <ClCompile Include="game\detail\inventory_slot.cpp" />
     <ClCompile Include="game\detail\inventory_utils.cpp" />
     <ClCompile Include="game\transcendental\serialization.cpp" />
+    <ClCompile Include="game\transcendental\simulation_broadcast.cpp" />
     <ClCompile Include="game\transcendental\simulation_exchange.cpp" />
+    <ClCompile Include="game\transcendental\simulation_receiver.cpp" />
     <ClCompile Include="game\transcendental\step.cpp" />
     <ClCompile Include="game\systematic\animation_system.cpp" />
     <ClCompile Include="game\systematic\behaviour_tree_system.cpp" />
@@ -1013,7 +1015,9 @@
     <ClInclude Include="game\transcendental\cosmic_profiler.h" />
     <ClInclude Include="game\scene_managers\one_entity.h" />
     <ClInclude Include="game\transcendental\network_commands.h" />
+    <ClInclude Include="game\transcendental\simulation_broadcast.h" />
     <ClInclude Include="game\transcendental\simulation_exchange.h" />
+    <ClInclude Include="game\transcendental\simulation_receiver.h" />
     <ClInclude Include="game\transcendental\step.h" />
     <ClInclude Include="game\systematic\animation_system.h" />
     <ClInclude Include="game\systematic\behaviour_tree_system.h" />

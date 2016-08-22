@@ -1032,6 +1032,12 @@
     <ClCompile Include="3rdparty\enet\callbacks.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\transcendental\simulation_receiver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\transcendental\simulation_broadcast.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3189,6 +3195,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\transcendental\network_commands.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\transcendental\simulation_receiver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\transcendental\simulation_broadcast.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
