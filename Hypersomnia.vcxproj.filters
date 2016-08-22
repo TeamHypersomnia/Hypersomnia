@@ -21,12 +21,21 @@
     <ClInclude Include="game\augs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="setups.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="local_setup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="client_server_setup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
