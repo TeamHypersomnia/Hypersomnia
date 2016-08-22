@@ -1012,6 +1012,7 @@
     <ClInclude Include="game\messages\will_soon_be_deleted.h" />
     <ClInclude Include="game\transcendental\cosmic_profiler.h" />
     <ClInclude Include="game\scene_managers\one_entity.h" />
+    <ClInclude Include="game\transcendental\network_commands.h" />
     <ClInclude Include="game\transcendental\simulation_exchange.h" />
     <ClInclude Include="game\transcendental\step.h" />
     <ClInclude Include="game\systematic\animation_system.h" />

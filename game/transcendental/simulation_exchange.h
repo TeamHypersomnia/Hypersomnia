@@ -17,23 +17,31 @@ public:
 	struct command {
 		enum class type {
 			INVALID,
-			NEW_INPUT,
-			NEW_HEARTBEAT
+			NEW_ENTROPY,
+			NEW_ENTROPY_WITH_HEARTBEAT
 		} command_type = type::INVALID;
 
 		augs::stream delta;
 		cosmic_entropy entropy;
 	};
 
+	static command read_entropy(augs::stream&);
+
 protected:
 	static std::vector<command> read_commands_from_stream(augs::stream&);
 	static void write_commands_to_stream(const cosmic_entropy&, const cosmos& guid_mapper);
+
+	static command read_entropy_for_next_step(augs::stream&);
+	static command read_entropy_with_heartbeat_for_next_step(augs::stream&);
 };
 
 class simulation_broadcast : public simulation_exchange {
 	augs::stream delta;
 	std::thread delta_production;
 	unsigned steps_since_last_heartbeat = 0;
+	
+	cosmos::significant_state last_state_snapshot;
+
 public:
 	unsigned delta_heartbeat_interval_in_steps = 10;
 
@@ -56,6 +64,8 @@ public:
 		cosmic_entropy unpack_next_entropy(const cosmos& guid_mapper);
 	};
 
-	void read_commands_from_stream(augs::stream&);
+	void read_entropy_for_next_step(augs::stream&);
+	void read_entropy_with_heartbeat_for_next_step(augs::stream&);
+
 	unpacked_steps unpack_deterministic_steps(cosmos& proper_cosmos, cosmos& extrapolated_cosmos, cosmos& last_delta_unpacked);
 };

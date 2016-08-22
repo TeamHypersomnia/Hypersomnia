@@ -3188,5 +3188,8 @@
     <ClInclude Include="augs\misc\jitter_buffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game\transcendental\network_commands.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

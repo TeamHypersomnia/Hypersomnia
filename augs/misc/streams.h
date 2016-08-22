@@ -61,6 +61,11 @@ namespace augs {
 
 		size_t capacity() const;
 
+		template<class T>
+		T peek() const {
+			return *reinterpret_cast<const T*>(buf.data() + read_pos);
+		}
+
 		bool read(char* data, size_t bytes);
 		void write(const char* data, size_t bytes);
 		void write(const augs::stream&);
