@@ -10,7 +10,7 @@
 
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "game/transcendental/viewing_session.h"
-#include "game/transcendental/simulation_exchange.h"
+#include "game/transcendental/simulation_broadcast.h"
 #include "game/transcendental/cosmos.h"
 
 #include "game/transcendental/step_and_entropy_unpacker.h"
@@ -23,8 +23,6 @@
 
 void server_setup::process(game_window& window) {
 	const vec2i screen_size = vec2i(window.window.get_screen_rect());
-
-	simulation_receiver receiver;
 
 	cosmos hypersomnia(3000);
 	cosmos hypersomnia_last_snapshot(3000);
@@ -106,8 +104,6 @@ void server_setup::process(game_window& window) {
 			testbed.control(s.total_entropy, hypersomnia);
 
 			auto cosmic_entropy_for_this_step = testbed.make_cosmic_entropy(s.total_entropy, session.input, hypersomnia);
-
-			auto deterministic_steps = receiver.unpack_deterministic_steps(hypersomnia, extrapolated_hypersomnia, hypersomnia_last_snapshot);
 
 			testbed.step_with_callbacks(cosmic_entropy_for_this_step, hypersomnia);
 

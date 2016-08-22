@@ -10,7 +10,7 @@
 
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "game/transcendental/viewing_session.h"
-#include "game/transcendental/simulation_exchange.h"
+#include "game/transcendental/simulation_receiver.h"
 #include "game/transcendental/cosmos.h"
 
 #include "game/transcendental/step_and_entropy_unpacker.h"
