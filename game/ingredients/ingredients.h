@@ -35,8 +35,6 @@ namespace ingredients {
 	void wsad_character(entity_handle, entity_handle crosshair_entity);
 	void wsad_character_corpse(entity_handle);
 
-	void inject_window_input_to_character(entity_handle target_character, entity_handle previous_character);
-
 	void make_always_visible(entity_handle);
 
 	void character_inventory(entity_handle);

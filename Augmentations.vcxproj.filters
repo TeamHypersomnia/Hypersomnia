@@ -1379,9 +1379,6 @@
     <ClInclude Include="game\components\gun_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\components\input_receiver_component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\components\item_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>

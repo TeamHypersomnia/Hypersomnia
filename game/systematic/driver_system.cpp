@@ -5,7 +5,7 @@
 
 #include "game/components/trigger_component.h"
 #include "game/components/car_component.h"
-#include "game/components/input_receiver_component.h"
+
 #include "game/components/movement_component.h"
 #include "game/components/rotation_copying_component.h"
 #include "game/components/physics_component.h"

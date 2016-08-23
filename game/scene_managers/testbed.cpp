@@ -231,7 +231,6 @@ namespace scene_managers {
 	}
 	
 	void testbed::inject_input_to(entity_handle h) {
-		ingredients::inject_window_input_to_character(h, h.get_cosmos()[currently_controlled_character]);
 		currently_controlled_character = h;
 	}
 
@@ -306,7 +305,15 @@ namespace scene_managers {
 
 	cosmic_entropy testbed::make_cosmic_entropy(const augs::machine_entropy& machine, const input_context& context, cosmos& cosm) {
 		cosmic_entropy result;
-		result.from_input_receivers_distribution(machine, context, cosm);
+
+		auto& intents = result.entropy_per_entity[get_controlled_entity()];
+		
+		for (const auto& raw : machine.local) {
+			entity_intent mapped;
+		
+			if (result.make_intent(context, raw, mapped))
+				intents.push_back(mapped);
+		}
 
 		return result;
 	}

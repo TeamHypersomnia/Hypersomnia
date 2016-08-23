@@ -12,7 +12,6 @@ namespace components {
 	struct crosshair;
 	struct damage;
 	struct gun;
-	struct input_receiver;
 	struct rotation_copying;
 	struct movement;
 	struct particle_effect_response;
@@ -61,7 +60,6 @@ struct put_all_components_into {
 		components::crosshair,
 		components::damage,
 		components::gun,
-		components::input_receiver,
 		components::rotation_copying,
 		components::movement,
 		components::particle_effect_response,

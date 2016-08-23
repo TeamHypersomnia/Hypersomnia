@@ -1,7 +1,7 @@
 #include "cosmic_entropy.h"
 #include "augs/templates.h"
 #include "game/transcendental/cosmos.h"
-#include "game/components/input_receiver_component.h"
+
 #include "augs/misc/machine_entropy.h"
 #include "game/global/input_context.h"
 
@@ -25,21 +25,7 @@ size_t cosmic_entropy::length() const {
 
 void cosmic_entropy::from_input_receivers_distribution(const augs::machine_entropy& machine, const input_context& input, cosmos& cosm) {
 	ensure(entropy_per_entity.empty());
-	
-	auto targets = cosm.get(processing_subjects::WITH_INPUT_RECEIVER);
-
-	for (const auto& it : targets) {
-		if (it.get<components::input_receiver>().local) {
-			auto& intents = entropy_per_entity[it];
-
-			for (const auto& raw : machine.local) {
-				entity_intent mapped;
-
-				if (make_intent(input, raw, mapped))
-					intents.push_back(mapped);
-			}
-		}
-	}
+	ensure(false);
 }
 
 bool cosmic_entropy::make_intent(const input_context& context, const augs::window::event::state& raw, entity_intent& mapped_intent) {

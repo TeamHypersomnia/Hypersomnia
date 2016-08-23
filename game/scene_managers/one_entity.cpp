@@ -73,9 +73,6 @@ namespace scene_managers {
 
 		name_entity(new_characters[0], entity_name::PERSON, L"Attacker");
 
-		ingredients::inject_window_input_to_character(new_characters[current_character], camera);
-
-
 		prefabs::create_sample_suppressor(world, vec2(300, -500));
 
 		bool many_charges = false;
@@ -171,7 +168,6 @@ namespace scene_managers {
 
 	cosmic_entropy one_entity::make_cosmic_entropy(augs::machine_entropy machine, const input_context& context, cosmos& cosm) {
 		cosmic_entropy result;
-		result.from_input_receivers_distribution(machine, context, cosm);
 
 		return result;
 	}
@@ -187,8 +183,6 @@ namespace scene_managers {
 			if (it.subject == characters[current_character] && it.intent == intent_type::SWITCH_CHARACTER && it.pressed_flag) {
 				++current_character;
 				current_character %= characters.size();
-
-				ingredients::inject_window_input_to_character(cosmos[characters[current_character]], cosmos[world_camera]);
 			}
 		}
 	}

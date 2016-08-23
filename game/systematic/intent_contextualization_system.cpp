@@ -68,6 +68,13 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(fix
 
 		const auto subject = cosmos[it.subject];
 
+		const auto maybe_crosshair = subject[sub_entity_name::CHARACTER_CROSSHAIR];
+
+		if (it.intent == intent_type::MOVE_CROSSHAIR && maybe_crosshair.alive()) {
+			it.subject = maybe_crosshair;
+			continue;
+		}
+
 		if (subject.has<components::container>()) {
 			if (it.intent == intent_type::CROSSHAIR_PRIMARY_ACTION) {
 				const auto hand = subject[slot_function::PRIMARY_HAND];

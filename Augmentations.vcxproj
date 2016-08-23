@@ -1073,7 +1073,6 @@
     <ClInclude Include="game\components\force_joint_component.h" />
     <ClInclude Include="game\components\gui_element_component.h" />
     <ClInclude Include="game\components\item_slot_transfers_component.h" />
-    <ClInclude Include="game\components\input_receiver_component.h" />
     <ClInclude Include="game\components\item_component.h" />
     <ClInclude Include="game\components\melee_component.h" />
     <ClInclude Include="game\components\name_component.h" />

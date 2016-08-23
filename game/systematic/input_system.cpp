@@ -14,7 +14,7 @@
 
 #include "game/components/transform_component.h"
 #include "game/components/gun_component.h"
-#include "game/components/input_receiver_component.h"
+
 #include "game/messages/intent_message.h"
 
 #include "game/messages/gui_intents.h"

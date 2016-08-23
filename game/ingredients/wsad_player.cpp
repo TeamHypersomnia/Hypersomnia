@@ -3,7 +3,7 @@
 #include "game/transcendental/cosmos.h"
 
 #include "game/components/position_copying_component.h"
-#include "game/components/input_receiver_component.h"
+
 #include "game/components/crosshair_component.h"
 #include "game/components/sprite_component.h"
 #include "game/components/movement_component.h"
@@ -95,7 +95,6 @@ namespace ingredients {
 		auto& processing = e += components::processing();
 
 		e += components::gui_element();
-		e += components::input_receiver();
 
 		attitude.parties = party_category::METROPOLIS_CITIZEN;
 		attitude.hostile_parties = party_category::RESISTANCE_CITIZEN;
@@ -169,7 +168,6 @@ namespace ingredients {
 		sentience.health.maximum = 100.0;
 
 		processing.disable_in(processing_subjects::WITH_FORCE_JOINT);
-		processing.disable_in(processing_subjects::WITH_INPUT_RECEIVER);
 
 		detector.spam_trigger_requests_when_detection_intented = true;
 
@@ -222,25 +220,6 @@ namespace ingredients {
 		e += colliders;
 		e.get<components::fixtures>().set_owner_body(e);
 	}
-
-	void inject_window_input_to_character(entity_handle next_character, entity_handle previously_controlled_character) {
-		if (previously_controlled_character.alive()) {
-			previously_controlled_character.get<components::processing>().disable_in(processing_subjects::WITH_INPUT_RECEIVER);
-			previously_controlled_character.get<components::processing>().disable_in(processing_subjects::WITH_GUI_ELEMENT);
-			// previously_controlled_character.get<components::render>().interpolate = true;
-
-			auto crosshair = previously_controlled_character[sub_entity_name::CHARACTER_CROSSHAIR];
-			crosshair.get<components::processing>().disable_in(processing_subjects::WITH_INPUT_RECEIVER);
-		}
-
-		auto crosshair = next_character[sub_entity_name::CHARACTER_CROSSHAIR];
-
-		// next_character.get<components::render>().interpolate = false;
-
-		next_character.get<components::processing>().enable_in(processing_subjects::WITH_INPUT_RECEIVER);
-		next_character.get<components::processing>().enable_in(processing_subjects::WITH_GUI_ELEMENT);
-		crosshair.get<components::processing>().enable_in(processing_subjects::WITH_INPUT_RECEIVER);
-	}
 }
 
 namespace prefabs {
@@ -282,9 +261,7 @@ namespace prefabs {
 			auto& render = root += components::render();
 			auto& transform = root += components::transform();
 			auto& crosshair = root += components::crosshair();
-			root += components::input_receiver();
 			auto& processing = root += components::processing();
-			processing.disable_in(processing_subjects::WITH_INPUT_RECEIVER);
 			
 			sprite.set(assets::texture_id::TEST_CROSSHAIR, rgba(0, 255, 0, 255));
 
