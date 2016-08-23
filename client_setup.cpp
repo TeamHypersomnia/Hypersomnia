@@ -52,6 +52,8 @@ void client_setup::process(game_window& window) {
 
 	bool should_quit = false;
 
+	bool last_stepped_was_extrapolated = false;
+
 	if (client.connect(window.get_config_string("server_address"), static_cast<unsigned short>(window.get_config_number("server_port")), 2000)) {
 		LOG("Connected successfully");
 		
@@ -101,14 +103,26 @@ void client_setup::process(game_window& window) {
 
 				auto deterministic_steps = receiver.unpack_deterministic_steps(hypersomnia, extrapolated_hypersomnia, hypersomnia_last_snapshot);
 
-				while (deterministic_steps.has_next_entropy()) {
-					auto cosmic_entropy_for_this_step = deterministic_steps.unpack_next_entropy(hypersomnia);
-					testbed.step_with_callbacks(cosmic_entropy_for_this_step, hypersomnia);
+				if (deterministic_steps.use_extrapolated_cosmos) {
+					testbed.step_with_callbacks(cosmic_entropy(), extrapolated_hypersomnia);
 					renderer::get_current().clear_logic_lines();
+					last_stepped_was_extrapolated = true;
+				}
+				else {
+					last_stepped_was_extrapolated = false;
+
+					ensure(deterministic_steps.has_next_entropy());
+
+					while (deterministic_steps.has_next_entropy()) {
+						auto cosmic_entropy_for_this_step = deterministic_steps.unpack_next_entropy(hypersomnia);
+						testbed.step_with_callbacks(cosmic_entropy_for_this_step, hypersomnia);
+						renderer::get_current().clear_logic_lines();
+					}
 				}
 			}
 
-			testbed.view(hypersomnia, window, session, session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), input_unpacker.timer));
+			testbed.view(last_stepped_was_extrapolated ? hypersomnia : extrapolated_hypersomnia, 
+				window, session, session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), input_unpacker.timer));
 		}
 	}
 	else {
