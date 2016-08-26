@@ -262,8 +262,8 @@ namespace scene_managers {
 
 	}
 
-	void testbed::control(const augs::machine_entropy& machine, cosmos& main_cosmos) {
-		for (const auto& raw_input : machine.local) {
+	void testbed::control(const augs::machine_entropy::local_type& local, cosmos& main_cosmos) {
+		for (const auto& raw_input : local) {
 			if (raw_input.key_event == augs::window::event::PRESSED) {
 				if (raw_input.key == augs::window::event::keys::F7) {
 					auto target_folder = "saves/" + augs::get_timestamp();
@@ -303,12 +303,12 @@ namespace scene_managers {
 		}
 	}
 
-	cosmic_entropy testbed::make_cosmic_entropy(const augs::machine_entropy& machine, const input_context& context, cosmos& cosm) {
+	cosmic_entropy testbed::make_cosmic_entropy(const augs::machine_entropy::local_type& local, const input_context& context, cosmos& cosm) {
 		cosmic_entropy result;
 
 		auto& intents = result.entropy_per_entity[get_controlled_entity()];
 		
-		for (const auto& raw : machine.local) {
+		for (const auto& raw : local) {
 			entity_intent mapped;
 		
 			if (result.make_intent(context, raw, mapped))

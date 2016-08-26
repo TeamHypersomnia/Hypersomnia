@@ -5,8 +5,11 @@
 
 namespace augs {
 	struct machine_entropy {
-		std::vector<augs::window::event::state> local;
-		std::vector<augs::network::message> remote;
+		typedef std::vector<augs::window::event::state> local_type;
+		typedef std::vector<augs::network::message> remote_type;
+
+		local_type local;
+		remote_type remote;
 		// here will be remote entropy as well
 
 		machine_entropy& operator+=(const machine_entropy&);
