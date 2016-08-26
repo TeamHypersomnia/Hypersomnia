@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
 	resource_manager.destroy_everything();
 	resource_setups::load_standard_everything();
 
-	client_setup setup;
+	local_setup setup;
 	setup.process(window);
 
 	augs::global_libraries::deinit();

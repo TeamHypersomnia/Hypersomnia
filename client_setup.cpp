@@ -94,12 +94,9 @@ void client_setup::process(game_window& window) {
 
 						ensure(net_event.payload.get_unread_bytes() == 0);
 					}
-
 				}
 
-				testbed.control(s.total_entropy, hypersomnia);
-
-				auto local_cosmic_entropy_for_this_step = testbed.make_cosmic_entropy(s.total_entropy, session.input, hypersomnia);
+				auto local_cosmic_entropy_for_this_step = testbed.make_cosmic_entropy(s.total_entropy.local, session.input, hypersomnia);
 
 				auto deterministic_steps = receiver.unpack_deterministic_steps(hypersomnia, extrapolated_hypersomnia, hypersomnia_last_snapshot);
 
@@ -114,7 +111,7 @@ void client_setup::process(game_window& window) {
 					ensure(deterministic_steps.has_next_entropy());
 
 					while (deterministic_steps.has_next_entropy()) {
-						auto cosmic_entropy_for_this_step = deterministic_steps.unpack_next_entropy(hypersomnia);
+						const auto cosmic_entropy_for_this_step = deterministic_steps.unpack_next_entropy(hypersomnia);
 						testbed.step_with_callbacks(cosmic_entropy_for_this_step, hypersomnia);
 						renderer::get_current().clear_logic_lines();
 					}

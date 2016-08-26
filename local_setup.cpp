@@ -84,9 +84,9 @@ void local_setup::process(game_window& window) {
 				}
 			}
 
-			testbed.control(s.total_entropy, hypersomnia);
+			testbed.control(s.total_entropy.local, hypersomnia);
 
-			auto cosmic_entropy_for_this_step = testbed.make_cosmic_entropy(s.total_entropy, session.input, hypersomnia);
+			auto cosmic_entropy_for_this_step = testbed.make_cosmic_entropy(s.total_entropy.local, session.input, hypersomnia);
 
 			testbed.step_with_callbacks(cosmic_entropy_for_this_step, hypersomnia);
 

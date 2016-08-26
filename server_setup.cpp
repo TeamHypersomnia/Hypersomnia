@@ -75,42 +75,14 @@ void server_setup::process(game_window& window) {
 		auto steps = input_unpacker.unpack_steps(hypersomnia.get_fixed_delta());
 
 		for (const auto& s : steps) {
-			for (const auto& raw_input : s.total_entropy.local) {
-				if (raw_input.key_event == augs::window::event::PRESSED) {
-					if (raw_input.key == augs::window::event::keys::_1) {
-						hypersomnia.set_fixed_delta(60);
-					}
-					if (raw_input.key == augs::window::event::keys::_2) {
-						hypersomnia.set_fixed_delta(128);
-					}
-					if (raw_input.key == augs::window::event::keys::_3) {
-						hypersomnia.set_fixed_delta(144);
-					}
-					if (raw_input.key == augs::window::event::keys::_4) {
-						input_unpacker.timer.set_stepping_speed_multiplier(0.1f);
-					}
-					if (raw_input.key == augs::window::event::keys::_5) {
-						input_unpacker.timer.set_stepping_speed_multiplier(1.f);
-					}
-					if (raw_input.key == augs::window::event::keys::_6) {
-						input_unpacker.timer.set_stepping_speed_multiplier(6.f);
-					}
-					if (raw_input.key == augs::window::event::keys::F4) {
-						LOG_COLOR(console_color::YELLOW, "Separator");
-					}
-				}
-			}
+			testbed.control(s.total_entropy.local, hypersomnia);
 
-			testbed.control(s.total_entropy, hypersomnia);
-
-			auto cosmic_entropy_for_this_step = testbed.make_cosmic_entropy(s.total_entropy, session.input, hypersomnia);
+			auto cosmic_entropy_for_this_step = testbed.make_cosmic_entropy(s.total_entropy.local, session.input, hypersomnia);
 
 			testbed.step_with_callbacks(cosmic_entropy_for_this_step, hypersomnia);
 
 			renderer::get_current().clear_logic_lines();
 		}
-
-		testbed.view(hypersomnia, window, session, session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), input_unpacker.timer));
 	}
 
 	server_thread.join();
