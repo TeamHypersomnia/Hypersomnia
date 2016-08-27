@@ -29,7 +29,7 @@ config_table = {
 	
 	nickname = "Daedalus",
 	
-	tickrate = 5,
+	tickrate = 2,
 	
 	simulate_lag = 0,
 	packet_loss = 0.00,

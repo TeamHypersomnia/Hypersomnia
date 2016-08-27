@@ -6,7 +6,7 @@
 
 #include "game/resources/manager.h"
 
-#include "game/scene_managers/testbed.h"
+#include "game/scene_managers/networked_testbed.h"
 #include "game/scene_managers/resource_setups/all.h"
 
 #include "game/transcendental/types_specification/all_component_includes.h"
@@ -32,16 +32,16 @@ void server_setup::process(game_window& window) {
 	cosmos extrapolated_hypersomnia(3000);
 
 	cosmos initial_hypersomnia(3000);
-	scene_managers::testbed().populate_world_with_entities(initial_hypersomnia);
+	scene_managers::networked_testbed_server().populate_world_with_entities(initial_hypersomnia);
 
 	step_and_entropy_unpacker input_unpacker;
-	scene_managers::testbed testbed;
+	scene_managers::networked_testbed_server scene;
 
 	auto config_tickrate = static_cast<unsigned>(window.get_config_number("tickrate"));
 
 	if (!hypersomnia.load_from_file("server_save.state")) {
 		hypersomnia.set_fixed_delta(augs::fixed_delta(config_tickrate));
-		testbed.populate_world_with_entities(hypersomnia);
+		scene.populate_world_with_entities(hypersomnia);
 	}
 
 	input_unpacker.try_to_load_or_save_new_session("server_sessions/", "recorded.inputs");
@@ -86,6 +86,7 @@ void server_setup::process(game_window& window) {
 			LOG("Server step");
 			for (auto& net_event : s.total_entropy.remote) {
 				LOG("Server netevent");
+
 				if (net_event.message_type == augs::network::message::type::CONNECT) {
 					endpoints.push_back({ net_event.address });
 
@@ -93,26 +94,46 @@ void server_setup::process(game_window& window) {
 					stream.reset_write_pos();
 
 					augs::write_object(stream, network_command::COMPLETE_STATE);
+					
 					cosmic_delta::encode(initial_hypersomnia, hypersomnia, stream);
+
+					auto new_char = scene.assign_new_character(net_event.address);
+					augs::write_object(stream, hypersomnia[new_char].get_guid());
 
 					serv.send_reliable(stream, net_event.address);
 				}
 				
 				if (net_event.message_type == augs::network::message::type::DISCONNECT) {
+					scene.free_character(net_event.address);
+
 					remove_element(endpoints, net_event.address);
 				}
 
 				if (net_event.message_type == augs::network::message::type::RECEIVE) {
 					auto& stream = net_event.payload;
 					auto& endpoint = *find_in(endpoints, net_event.address);
+					
+					auto to_skip = net_event.messages_to_skip;
 
 					while (stream.get_unread_bytes() > 0) {
+						bool should_skip = to_skip > 0;
+
+						if (should_skip)
+							--to_skip;
+
 						auto command = static_cast<network_command>(stream.peek<unsigned char>());
 
-						LOG("Server received command: %x", int(command));
+						if (!should_skip)
+							LOG("Server received command: %x", int(command));
+
 						switch (command) {
 						case network_command::ENTROPY_FOR_NEXT_STEP:
-							endpoint.commands.push_back(simulation_exchange::read_entropy_for_next_step(stream));
+						{
+							auto result = simulation_exchange::read_entropy_for_next_step(stream);
+								
+							if(!should_skip)
+								endpoint.commands.push_back(result);
+						}
 							break;
 						default: 
 							LOG("Server received invalid command: %x", int(command)); stream = augs::stream();
@@ -143,14 +164,14 @@ void server_setup::process(game_window& window) {
 			}
 
 			augs::stream new_data;
-			simulation_exchange::write_packaged_step_to_stream(new_data, this_net_step, hypersomnia);
+			simulation_exchange::write_packaged_step_to_stream(new_data, this_net_step);
 
 			for (auto& e : endpoints)
 				serv.post_redundant(new_data, e.addr);
 
 			serv.send_pending_redundant();
 
-			testbed.step_with_callbacks(total_entropy, hypersomnia);
+			scene.step_with_callbacks(cosmic_entropy(total_entropy, hypersomnia), hypersomnia);
 		}
 	}
 }
