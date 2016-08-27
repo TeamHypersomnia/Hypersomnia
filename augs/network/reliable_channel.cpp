@@ -249,11 +249,11 @@ TEST(NetChannel, SingleTransmissionDeleteAllPending) {
 	reliable_sender sender;
 	reliable_receiver receiver;
 
-	augs::stream bs[15];
+	
 	augs::stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
-		augs::write_object(bs[i], int(i));
+		augs::write_object(msg[i], int(i));
 		
 	}
 
@@ -287,11 +287,11 @@ TEST(NetChannel, PastAcknowledgementDeletesSeveralPending) {
 	reliable_sender sender;
 	reliable_receiver receiver;
 
-	augs::stream bs[15];
+	
 	augs::stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
-		augs::write_object(bs[i], int(i));
+		augs::write_object(msg[i], int(i));
 		
 	}
 
@@ -333,11 +333,11 @@ TEST(NetChannel, FlagForDeletionAndAck) {
 	reliable_sender sender;
 	reliable_receiver receiver;
 
-	augs::stream bs[15];
+	
 	augs::stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
-		augs::write_object(bs[i], int(i));
+		augs::write_object(msg[i], int(i));
 		
 	}
 
@@ -394,8 +394,8 @@ TEST(NetChannel, FlagForDeletionAndAck) {
 	//EXPECT_EQ(2, sender.reliable_buf.size());
 
 
-	//EXPECT_EQ(bs+7, sender.reliable_buf[0].output_bitstream);
-	//EXPECT_EQ(bs+8, sender.reliable_buf[1].output_bitstream);
+	//EXPECT_EQ(msg+7, sender.reliable_buf[0].output_bitstream);
+	//EXPECT_EQ(msg+8, sender.reliable_buf[1].output_bitstream);
 
 	EXPECT_EQ(1, receiver.last_sequence);
 }
@@ -413,11 +413,11 @@ TEST(NetChannel, SequenceNumberOverflowMultipleTries) {
 	receiver.last_sequence = std::numeric_limits<unsigned short>::max();
 
 	for (int k = 0; k < 10; ++k) {
-		augs::stream bs[15];
+		
 		augs::stream msg[15];
 
 		for (int i = 0; i < 15; ++i) {
-			augs::write_object(bs[i], int(i));
+			augs::write_object(msg[i], int(i));
 			
 		}
 
@@ -476,8 +476,8 @@ TEST(NetChannel, SequenceNumberOverflowMultipleTries) {
 
 		//EXPECT_EQ(2, sender.reliable_buf.size());
 
-		//EXPECT_EQ(bs + 7, sender.reliable_buf[0].output_bitstream);
-		//EXPECT_EQ(bs + 8, sender.reliable_buf[1].output_bitstream);
+		//EXPECT_EQ(msg + 7, sender.reliable_buf[0].output_bitstream);
+		//EXPECT_EQ(msg + 8, sender.reliable_buf[1].output_bitstream);
 
 		sender.reliable_buf.clear();
 	}
@@ -494,11 +494,11 @@ TEST(NetChannel, OutOfDatePackets) {
 	receiver.last_sequence = std::numeric_limits<unsigned short>::max();
 
 	for (int k = 0; k < 10; ++k) {
-		augs::stream bs[15];
+		
 		augs::stream msg[15];
 
 		for (int i = 0; i < 15; ++i) {
-			augs::write_object(bs[i], int(i));
+			augs::write_object(msg[i], int(i));
 			
 		}
 
@@ -558,8 +558,8 @@ TEST(NetChannel, OutOfDatePackets) {
 
 		//EXPECT_EQ(2, sender.reliable_buf.size());
 
-		//EXPECT_EQ(bs + 7, sender.reliable_buf[0].output_bitstream);
-		//EXPECT_EQ(bs + 8, sender.reliable_buf[1].output_bitstream);
+		//EXPECT_EQ(msg + 7, sender.reliable_buf[0].output_bitstream);
+		//EXPECT_EQ(msg + 8, sender.reliable_buf[1].output_bitstream);
 
 		sender.reliable_buf.clear();
 	}

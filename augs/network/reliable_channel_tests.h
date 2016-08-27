@@ -4,11 +4,11 @@ TEST(NetChannelWrapper, SingleTransmissionDeleteAllPending) {
 	a.enable_starting_byte(135);
 	b.enable_starting_byte(135);
 
-	augs::stream bs[15];
+	
 	augs::stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
-		augs::write_object(bs[i], int(i));
+		augs::write_object(msg[i], int(i));
 		
 	}
 
@@ -45,11 +45,11 @@ TEST(NetChannelWrapper, SingleTransmissionDeleteAllPending) {
 TEST(NetChannelWrapper, PastAcknowledgementDeletesSeveralPending) {
 	reliable_channel a, b;
 
-	augs::stream bs[15];
+	
 	augs::stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
-		augs::write_object(bs[i], int(i));
+		augs::write_object(msg[i], int(i));
 		
 	}
 
@@ -90,11 +90,11 @@ TEST(NetChannelWrapper, PastAcknowledgementDeletesSeveralPending) {
 TEST(NetChannelWrapper, FlagForDeletionAndAck) {
 	reliable_channel a, b;
 
-	augs::stream bs[15];
+	
 	augs::stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
-		augs::write_object(bs[i], int(i));
+		augs::write_object(msg[i], int(i));
 		
 	}
 
@@ -151,8 +151,8 @@ TEST(NetChannelWrapper, FlagForDeletionAndAck) {
 	//EXPECT_EQ(2, a.sender.reliable_buf.size());
 
 
-	//EXPECT_EQ(bs + 7, a.sender.reliable_buf[0].output_bitstream);
-	//EXPECT_EQ(bs + 8, a.sender.reliable_buf[1].output_bitstream);
+	//EXPECT_EQ(msg + 7, a.sender.reliable_buf[0].output_bitstream);
+	//EXPECT_EQ(msg + 8, a.sender.reliable_buf[1].output_bitstream);
 
 	EXPECT_EQ(1, b.receiver.last_sequence);
 }

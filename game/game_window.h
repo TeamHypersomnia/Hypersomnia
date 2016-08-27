@@ -17,4 +17,15 @@ public:
 
 	double get_config_number(std::string field);
 	std::string get_config_string(std::string field);
+
+	enum class launch_mode {
+		INVALID,
+
+		LOCAL,
+
+		ONLY_CLIENT,
+		ONLY_SERVER,
+		
+		CLIENT_AND_SERVER
+	} get_launch_mode();
 };
