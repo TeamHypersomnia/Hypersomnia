@@ -35,9 +35,13 @@ void client_setup::process(game_window& window) {
 
 	step_and_entropy_unpacker input_unpacker;
 	scene_managers::testbed testbed;
+	
+	auto config_tickrate = static_cast<unsigned>(window.get_config_number("tickrate"));
 
-	if (!hypersomnia.load_from_file("save.state"))
+	if (!hypersomnia.load_from_file("save.state")) {
+		hypersomnia.set_fixed_delta(augs::fixed_delta(config_tickrate));
 		testbed.populate_world_with_entities(hypersomnia);
+	}
 
 	input_unpacker.try_to_load_or_save_new_session("sessions/", "recorded.inputs");
 

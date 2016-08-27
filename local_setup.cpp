@@ -26,7 +26,10 @@ void local_setup::process(game_window& window) {
 	step_and_entropy_unpacker input_unpacker;
 	scene_managers::testbed testbed;
 
+	auto config_tickrate = static_cast<unsigned>(window.get_config_number("tickrate"));
+
 	if (!hypersomnia.load_from_file("save.state")) {
+		hypersomnia.set_fixed_delta(augs::fixed_delta(config_tickrate));
 		testbed.populate_world_with_entities(hypersomnia);
 	}
 
@@ -58,7 +61,7 @@ void local_setup::process(game_window& window) {
 			for (const auto& raw_input : s.total_entropy.local) {
 				if (raw_input.key_event == augs::window::event::PRESSED) {
 					if (raw_input.key == augs::window::event::keys::_1) {
-						hypersomnia.set_fixed_delta(60);
+						hypersomnia.set_fixed_delta(config_tickrate);
 					}
 					if (raw_input.key == augs::window::event::keys::_2) {
 						hypersomnia.set_fixed_delta(128);

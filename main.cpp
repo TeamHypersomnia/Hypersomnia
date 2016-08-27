@@ -17,8 +17,27 @@ int main(int argc, char** argv) {
 	resource_manager.destroy_everything();
 	resource_setups::load_standard_everything();
 
-	local_setup setup;
-	setup.process(window);
+	auto mode = window.get_launch_mode();
+	LOG("Launch mode: %x", int(mode));
+
+	switch (mode) {
+	case game_window::launch_mode::LOCAL:
+
+		local_setup setup;
+		setup.process(window);
+
+		break;
+	case game_window::launch_mode::CLIENT_AND_SERVER:
+		
+		
+		break;
+	case game_window::launch_mode::ONLY_CLIENT:  
+
+
+		break;
+	case game_window::launch_mode::ONLY_SERVER: ensure(false);
+	default: ensure(false); break;
+	}
 
 	augs::global_libraries::deinit();
 	return 0;

@@ -1,4 +1,15 @@
+launch_modes = {
+	LOCAL = 0,
+
+	ONLY_CLIENT = 1,
+	ONLY_SERVER = 2,
+
+	CLIENT_AND_SERVER = 3
+}
+
 config_table = {
+	launch_mode = launch_modes.LOCAL,
+
 	window_name = "example",
 	fullscreen = 0,
 	window_border = 0,
@@ -11,13 +22,12 @@ config_table = {
 	
 	sensitivity = vec2(1.5, 1.5),
 	
-	server_address = "127.0.0.1",
+	connect_address = "127.0.0.1",
+	connect_port = 27014,
+
 	server_port = 27014,
 	
 	nickname = "Daedalus",
-	
-	multiple_clients_view = 0,
-	divergence_radius = 1,
 	
 	tickrate = 60,
 	

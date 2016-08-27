@@ -39,7 +39,10 @@ void server_setup::process(game_window& window) {
 	step_and_entropy_unpacker input_unpacker;
 	scene_managers::testbed testbed;
 
+	auto config_tickrate = static_cast<unsigned>(window.get_config_number("tickrate"));
+
 	if (!hypersomnia.load_from_file("save.state")) {
+		hypersomnia.set_fixed_delta(augs::fixed_delta(config_tickrate));
 		testbed.populate_world_with_entities(hypersomnia);
 	}
 
@@ -61,7 +64,7 @@ void server_setup::process(game_window& window) {
 		augs::network::endpoint_address addr;
 		std::vector<simulation_exchange::packaged_step> commands;
 
-		bool operator==(augs::network::endpoint_address b) {
+		bool operator==(augs::network::endpoint_address b) const {
 			return addr == b;
 		}
 	};
