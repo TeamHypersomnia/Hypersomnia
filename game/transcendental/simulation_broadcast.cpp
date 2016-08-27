@@ -15,5 +15,5 @@ void simulation_broadcast::set_state_heartbeat_interval(const augs::fixed_delta&
 //}
 
 cosmic_entropy unpack_commands_from_all_endpoints(const cosmos& guid_mapper) {
-
+	return cosmic_entropy();
 }

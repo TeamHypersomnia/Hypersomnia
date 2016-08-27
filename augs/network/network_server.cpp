@@ -11,7 +11,6 @@ namespace augs {
 			ENetAddress addr;
 
 			addr.host = ENET_HOST_ANY;
-			/* Bind the server to port 1234. */
 			addr.port = port;
 
 			return host.init(&addr /* the address to bind the server host to */,

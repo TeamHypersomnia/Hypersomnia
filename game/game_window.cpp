@@ -10,6 +10,8 @@ game_window::game_window() {
 }
 
 void game_window::call_window_script(const std::string filename) {
+	std::unique_lock<std::mutex> lock(lua_mutex);
+
 	lua.global_ptr("global_gl_window", &window);
 
 	try {
@@ -29,6 +31,8 @@ void game_window::call_window_script(const std::string filename) {
 }
 
 double game_window::get_config_number(std::string field) {
+	std::unique_lock<std::mutex> lock(lua_mutex);
+
 	return luabind::object_cast<double>(luabind::globals(lua.raw)["config_table"][field]);
 }
 
@@ -43,6 +47,8 @@ game_window::launch_mode game_window::get_launch_mode() {
 }
 
 std::string game_window::get_config_string(std::string field) {
+	std::unique_lock<std::mutex> lock(lua_mutex);
+
 	return luabind::object_cast<std::string>(luabind::globals(lua.raw)["config_table"][field]);
 }
 
