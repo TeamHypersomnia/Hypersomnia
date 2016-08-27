@@ -21,18 +21,31 @@ namespace augs {
 				0);
 		}
 
-		bool server::send_unreliable(const packet& payload, const endpoint_address& target) {
-			ENetPacket * const packet = enet_packet_create(payload.data(), payload.size(), ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT);
-			auto result = !enet_peer_send(peer_map[target.get_ip()], 0, packet);
-			enet_host_flush(host.get());
+		bool server::post_redundant(const packet& payload, const endpoint_address& target) {
+			packet stream = payload;
+			peer_map[target.get_ip()].redundancy.sender.post_message(stream);
+			return true;
+		}
+
+		bool server::send_pending_redundant() {
+			bool result = true;
+
+			for (auto& e : peer_map) {
+				augs::stream payload;
+				
+				e.second.redundancy.build_next_packet(payload);
+
+				ENetPacket * const packet = enet_packet_create(payload.data(), payload.size(), ENET_PACKET_FLAG_UNSEQUENCED);
+				result = result && !enet_peer_send(e.second, 0, packet);
+				enet_host_flush(host.get());
+			}
 
 			return result;
-
 		}
 
 		bool server::send_reliable(const packet& payload, const endpoint_address& target) {
 			ENetPacket * const packet = enet_packet_create(payload.data(), payload.size(), ENET_PACKET_FLAG_RELIABLE);
-			auto result = !enet_peer_send(peer_map[target.get_ip()], 0, packet);
+			auto result = !enet_peer_send(peer_map[target.get_ip()], 1, packet);
 			enet_host_flush(host.get());
 
 			return result;

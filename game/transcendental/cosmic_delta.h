@@ -59,6 +59,6 @@ class cosmic_delta {
 	}
 
 public:
-	static void encode(const cosmos& base, const cosmos& encoded, augs::stream& to);
+	static bool encode(const cosmos& base, const cosmos& encoded, augs::stream& to);
 	static void decode(cosmos& into, augs::stream& from, const bool resubstantiate_partially = false);
 };

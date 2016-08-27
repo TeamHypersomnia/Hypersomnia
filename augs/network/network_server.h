@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include "network_types.h"
 #include "enet_raii.h"
+#include "reliable_channel.h"
 
 struct _ENetPeer;
 typedef struct _ENetPeer ENetPeer;
@@ -12,7 +13,23 @@ namespace augs {
 			endpoint_address address;
 			ENetHost_raii host;
 
-			std::unordered_map<unsigned, ENetPeer*> peer_map;
+			struct peer {
+				ENetPeer* ptr;
+				reliable_channel redundancy;
+
+				peer() : ptr(nullptr) {}
+				peer(ENetPeer * const ptr ) : ptr(ptr) {}
+
+				operator ENetPeer*() {
+					return ptr;
+				}
+
+				operator ENetPeer*() const {
+					return ptr;
+				}
+			};
+
+			std::unordered_map<unsigned, peer> peer_map;
 
 		public:
 
@@ -22,7 +39,10 @@ namespace augs {
 
 			// void enable_lag(float loss, unsigned short latency, unsigned short jitter);
 			
-			bool send_unreliable(const packet&, const endpoint_address& target);
+			bool post_redundant(const packet&, const endpoint_address& target);
+			
+			bool send_pending_redundant();
+			
 			bool send_reliable(const packet&, const endpoint_address& target);
 
 			//void close_connection(const RakNet::RakNetGUID&, int disconnection_notification_priority);

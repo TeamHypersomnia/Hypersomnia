@@ -14,7 +14,7 @@ namespace augs {
 				(s2 - s1  > std::numeric_limits<T>::max() / 2);
 		}
 		
-		void reliable_sender::post_message(message& output) {
+		void reliable_sender::post_message(augs::stream& output) {
 			reliable_buf.push_back(output);
 			++last_message;
 		}
@@ -28,10 +28,8 @@ namespace augs {
 			augs::stream reliable_bs;
 
 			for (auto& msg : reliable_buf) {
-				if (msg.output_bitstream) {
-					reliable_bs;//name_property("reliable message");
-					augs::write_object(reliable_bs, *msg.output_bitstream);
-				}
+				reliable_bs;//name_property("reliable message");
+				augs::write_object(reliable_bs, msg);
 			}
 
 			if (reliable_bs.size() > 0) {
@@ -208,7 +206,7 @@ namespace augs {
 			add_starting_byte = false;
 		}
 
-		int reliable_channel::recv(augs::stream& in) {
+		int reliable_channel::handle_incoming_packet(augs::stream& in) {
 			if (add_starting_byte) {
 				unsigned char byte;
 				in;//name_property("Starting byte");
@@ -220,7 +218,7 @@ namespace augs {
 		}
 
 
-		void reliable_channel::send(augs::stream& out) {
+		void reliable_channel::build_next_packet(augs::stream& out) {
 			augs::stream output_bs;
 
 			if (sender.write_data(output_bs) || receiver.ack_requested) {
@@ -252,11 +250,11 @@ TEST(NetChannel, SingleTransmissionDeleteAllPending) {
 	reliable_receiver receiver;
 
 	augs::stream bs[15];
-	reliable_sender::message msg[15];
+	augs::stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
 		augs::write_object(bs[i], int(i));
-		msg[i].output_bitstream = &bs[i];
+		
 	}
 
 	/* post four messages */
@@ -290,11 +288,11 @@ TEST(NetChannel, PastAcknowledgementDeletesSeveralPending) {
 	reliable_receiver receiver;
 
 	augs::stream bs[15];
-	reliable_sender::message msg[15];
+	augs::stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
 		augs::write_object(bs[i], int(i));
-		msg[i].output_bitstream = &bs[i];
+		
 	}
 
 	augs::stream sender_packets[15];
@@ -336,11 +334,11 @@ TEST(NetChannel, FlagForDeletionAndAck) {
 	reliable_receiver receiver;
 
 	augs::stream bs[15];
-	reliable_sender::message msg[15];
+	augs::stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
 		augs::write_object(bs[i], int(i));
-		msg[i].output_bitstream = &bs[i];
+		
 	}
 
 	augs::stream sender_packets[15];
@@ -416,11 +414,11 @@ TEST(NetChannel, SequenceNumberOverflowMultipleTries) {
 
 	for (int k = 0; k < 10; ++k) {
 		augs::stream bs[15];
-		reliable_sender::message msg[15];
+		augs::stream msg[15];
 
 		for (int i = 0; i < 15; ++i) {
 			augs::write_object(bs[i], int(i));
-			msg[i].output_bitstream = &bs[i];
+			
 		}
 
 		augs::stream sender_packets[15];
@@ -497,11 +495,11 @@ TEST(NetChannel, OutOfDatePackets) {
 
 	for (int k = 0; k < 10; ++k) {
 		augs::stream bs[15];
-		reliable_sender::message msg[15];
+		augs::stream msg[15];
 
 		for (int i = 0; i < 15; ++i) {
 			augs::write_object(bs[i], int(i));
-			msg[i].output_bitstream = &bs[i];
+			
 		}
 
 		augs::stream sender_packets[15];

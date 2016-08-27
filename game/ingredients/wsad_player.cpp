@@ -223,12 +223,12 @@ namespace ingredients {
 }
 
 namespace prefabs {
-	entity_handle create_character(cosmos& world, vec2 pos, std::string name) {
+	entity_handle create_character(cosmos& world, vec2 pos, vec2i screen_size, std::string name) {
 		auto character = world.create_entity(name);
 
 		name_entity(character, entity_name::PERSON);
 
-		auto crosshair = create_character_crosshair(world);
+		auto crosshair = create_character_crosshair(world, screen_size);
 		crosshair.get<components::crosshair>().character_entity_to_chase = character;
 
 		ingredients::wsad_character(character, crosshair);
@@ -251,7 +251,7 @@ namespace prefabs {
 		return character;
 	}
 
-	entity_handle create_character_crosshair(cosmos& world) {
+	entity_handle create_character_crosshair(cosmos& world, vec2i screen_size) {
 		auto root = world.create_entity("crosshair");
 		auto recoil = world.create_entity("crosshair_recoil_body");
 		auto zero_target = world.create_entity("zero_target");
@@ -268,7 +268,7 @@ namespace prefabs {
 			render.layer = render_layer::CROSSHAIR;
 
 			crosshair.sensitivity.set(3, 3);
-			crosshair.visible_world_area = world.significant.meta.settings.screen_size;
+			crosshair.visible_world_area = screen_size;
 			crosshair.update_bounds();
 
 			ingredients::make_always_visible(root);

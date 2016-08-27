@@ -6,7 +6,6 @@
 struct all_settings {
 	int enable_interpolation = false;
 
-	vec2i screen_size;
 	visibility_settings visibility;
 	pathfinding_settings pathfinding;
 

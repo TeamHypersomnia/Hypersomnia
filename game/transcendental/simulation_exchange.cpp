@@ -5,13 +5,14 @@
 
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "game/transcendental/network_commands.h"
+#include "game/transcendental/cosmos.h"
 
 //void simulation_receiver::read_commands_from_stream(augs::stream& in) {
 //	auto new_commands = simulation_exchange::read_commands_from_stream(in);
 //	jitter_buffer.acquire_new_commands(new_commands.begin(), new_commands.end());
 //}
 
-void simulation_exchange::write_entropy(augs::stream& output, const command& written, const cosmos& guid_mapper) {
+void simulation_exchange::write_entropy(augs::stream& output, const packaged_step& written, const cosmos& guid_mapper) {
 	ensure(written.entropy.entropy_per_entity.size() < std::numeric_limits<unsigned char>::max());
 
 	unsigned char num_entropied_entities = written.entropy.entropy_per_entity.size();
@@ -26,15 +27,15 @@ void simulation_exchange::write_entropy(augs::stream& output, const command& wri
 	}
 }
 
-void simulation_exchange::write_command_to_stream(augs::stream& output, const command& written, const cosmos& guid_mapper) {
-	if (written.command_type == command::type::NEW_ENTROPY) {
-		augs::write_object(output, static_cast<unsigned char>(network_command::ENTROPY_FOR_NEXT_STEP));
+void simulation_exchange::write_packaged_step_to_stream(augs::stream& output, const packaged_step& written, const cosmos& guid_mapper) {
+	if (written.step_type == packaged_step::type::NEW_ENTROPY) {
+		augs::write_object(output, network_command::ENTROPY_FOR_NEXT_STEP);
 
 		write_entropy(output, written, guid_mapper);
 
 	}
-	else if (written.command_type == command::type::NEW_ENTROPY_WITH_HEARTBEAT) {
-		augs::write_object(output, static_cast<unsigned char>(network_command::ENTROPY_WITH_HEARTBEAT_FOR_NEXT_STEP));
+	else if (written.step_type == packaged_step::type::NEW_ENTROPY_WITH_HEARTBEAT) {
+		augs::write_object(output, network_command::ENTROPY_WITH_HEARTBEAT_FOR_NEXT_STEP);
 
 		write_entropy(output, written, guid_mapper);
 
@@ -44,8 +45,8 @@ void simulation_exchange::write_command_to_stream(augs::stream& output, const co
 		ensure(false);
 }
 
-simulation_exchange::command simulation_exchange::read_entropy(augs::stream& in) {
-	command new_command;
+simulation_exchange::packaged_step simulation_exchange::read_entropy(augs::stream& in) {
+	packaged_step new_command;
 	auto& new_entropy = new_command.entropy;
 
 	unsigned char num_entropied_entities = 0;
@@ -65,28 +66,43 @@ simulation_exchange::command simulation_exchange::read_entropy(augs::stream& in)
 	return std::move(new_command);
 }
 
-simulation_exchange::command simulation_exchange::read_entropy_for_next_step(augs::stream& in) {
-	unsigned char command_byte;
-	augs::read_object(in, command_byte);
+simulation_exchange::packaged_step simulation_exchange::read_entropy_for_next_step(augs::stream& in) {
+	network_command command_type;
+	augs::read_object(in, command_type);
 
-	ensure(command_byte == static_cast<unsigned char>(network_command::ENTROPY_FOR_NEXT_STEP));
+	ensure(command_type == network_command::ENTROPY_FOR_NEXT_STEP);
 	
 	auto new_command = read_entropy(in);
-	new_command.command_type = command::type::NEW_ENTROPY;
+	new_command.step_type = packaged_step::type::NEW_ENTROPY;
 
 	return std::move(new_command);
 }
 
-simulation_exchange::command simulation_exchange::read_entropy_with_heartbeat_for_next_step(augs::stream& in) {
-	unsigned char command_byte;
-	augs::read_object(in, command_byte);
+simulation_exchange::packaged_step simulation_exchange::read_entropy_with_heartbeat_for_next_step(augs::stream& in) {
+	network_command command_type;
+	augs::read_object(in, command_type);
 
-	ensure(command_byte == static_cast<unsigned char>(network_command::ENTROPY_WITH_HEARTBEAT_FOR_NEXT_STEP));
+	ensure(command_type == network_command::ENTROPY_WITH_HEARTBEAT_FOR_NEXT_STEP);
 
 	auto new_command = read_entropy(in);
-	new_command.command_type = command::type::NEW_ENTROPY_WITH_HEARTBEAT;
+	new_command.step_type = packaged_step::type::NEW_ENTROPY_WITH_HEARTBEAT;
 	augs::read_sized_stream(in, new_command.delta);
 
 	return std::move(new_command);
 }
 
+cosmic_entropy simulation_exchange::map_guids_to_ids(const cosmic_entropy& subject, const cosmos& mapper) {
+	std::vector<std::pair<entity_id, std::vector<entity_intent>>> saved_id_entries_to_remap;
+
+	for (const auto& entry : subject.entropy_per_entity)
+		saved_id_entries_to_remap.push_back(entry);
+
+	cosmic_entropy result;
+
+	for (auto i : saved_id_entries_to_remap) {
+		i.first = mapper.get_entity_by_guid(i.first.guid);
+		result.entropy_per_entity.emplace(std::move(i));
+	}
+
+	return std::move(result);
+}

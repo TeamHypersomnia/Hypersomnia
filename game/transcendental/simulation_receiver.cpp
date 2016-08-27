@@ -20,14 +20,14 @@ simulation_receiver::unpacked_steps simulation_receiver::unpack_deterministic_st
 		result.use_extrapolated_cosmos = false;
 
 		for (size_t i = 0; i < new_commands.size(); ++i) {
-			if (new_commands[i].command_type == command::type::NEW_ENTROPY_WITH_HEARTBEAT) {
+			if (new_commands[i].step_type == packaged_step::type::NEW_ENTROPY_WITH_HEARTBEAT) {
 				cosmic_delta::decode(last_delta_unpacked, new_commands[i].delta);
 				properly_stepped_cosmos = last_delta_unpacked;
 
 				result.steps_for_proper_cosmos.clear();
 			}
 			else
-				ensure(new_commands[i].command_type == command::type::NEW_ENTROPY);
+				ensure(new_commands[i].step_type == packaged_step::type::NEW_ENTROPY);
 
 			result.steps_for_proper_cosmos.emplace_back(new_commands[i].entropy);
 		}
@@ -49,19 +49,8 @@ bool simulation_receiver::unpacked_steps::has_next_entropy() const {
 cosmic_entropy simulation_receiver::unpacked_steps::unpack_next_entropy(const cosmos& guid_mapper) {
 	ensure(has_next_entropy());
 
-	cosmic_entropy result;
+	cosmic_entropy next = std::move(steps_for_proper_cosmos.front());
+	steps_for_proper_cosmos.erase(steps_for_proper_cosmos.begin());
 
-	std::vector<std::pair<entity_id, std::vector<entity_intent>>> invalids;
-
-	for (const auto& entry : result.entropy_per_entity)
-		invalids.push_back(entry);
-
-	result.entropy_per_entity.clear();
-
-	for (auto i : invalids) {
-		i.first = guid_mapper.get_entity_by_guid(i.first.guid);
-		result.entropy_per_entity.emplace(std::move(i));
-	}
-
-	return std::move(result);
+	return map_guids_to_ids(next, guid_mapper);
 }

@@ -64,8 +64,8 @@ namespace prefabs {
 
 	entity_handle create_sample_backpack(cosmos&, vec2 pos);
 
-	entity_handle create_character_crosshair(cosmos&);
-	entity_handle create_character(cosmos&, vec2 pos, std::string name = "character_unnamed");
+	entity_handle create_character_crosshair(cosmos&, vec2i screen_size);
+	entity_handle create_character(cosmos&, vec2 pos, vec2i screen_size, std::string name = "character_unnamed");
 	entity_handle create_crate(cosmos&, vec2 pos, vec2 size);
 
 	entity_handle create_cyan_urban_machete(cosmos&, vec2 pos);

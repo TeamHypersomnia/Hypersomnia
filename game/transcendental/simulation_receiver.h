@@ -3,7 +3,7 @@
 
 class simulation_receiver : public simulation_exchange {
 public:
-	augs::jitter_buffer<command> jitter_buffer;
+	augs::jitter_buffer<packaged_step> jitter_buffer;
 
 	class unpacked_steps {
 		friend class simulation_receiver;

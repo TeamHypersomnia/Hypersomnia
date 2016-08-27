@@ -56,7 +56,7 @@ struct delted_entity_stream {
 	augs::stream stream_for_removed;
 };
 
-void cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& out) {
+bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& out) {
 	const auto used_bits = out.size();
 	ensure_eq(0, used_bits);
 
@@ -187,6 +187,8 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 	const bool has_anything_changed = meta_changed || dt.new_entities || dt.changed_entities || dt.removed_entities;
 
 	if (has_anything_changed) {
+		augs::write_object(out, true);
+
 		augs::write_object(out, new_meta_content);
 
 		augs::write_object(out, dt.new_entities);
@@ -198,15 +200,23 @@ void cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 		augs::write_object(out, dt.stream_for_changed);
 		augs::write_object(out, dt.stream_for_removed);
 	}
+	else
+		augs::write_object(out, false);
 
 	enco.profiler.delta_encoding.end_measurement();
 
 	enco.profiler.delta_bytes.measure(out.size());
 	base.profiler.delta_bytes.measure(out.size());
+
+	return has_anything_changed;
 }
 
 void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstantiate_partially) {
-	if (in.get_unread_bytes() == 0)
+	bool has_anything_changed = false;
+
+	augs::read_object(in, has_anything_changed);
+	
+	if (!has_anything_changed)
 		return;
 	
 	deco.profiler.delta_decoding.new_measurement();
@@ -468,9 +478,9 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndTwoNew) {
 	{
 		augs::stream comparatory;
 		
-		cosmic_delta::encode(c1, c2, comparatory);
+		ASSERT_FALSE(cosmic_delta::encode(c1, c2, comparatory));
 
-		ASSERT_EQ(0, comparatory.size());
+		ASSERT_EQ(1, comparatory.size());
 		ASSERT_TRUE(c1 == c2);
 	}
 }
@@ -526,9 +536,9 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndCreatedThreeEntitiesWithReferences) {
 	{
 		augs::stream comparatory;
 
-		cosmic_delta::encode(c1, c2, comparatory);
+		ASSERT_FALSE(cosmic_delta::encode(c1, c2, comparatory));
 
-		ASSERT_EQ(0, comparatory.size());
+		ASSERT_EQ(1, comparatory.size());
 	}
 }
 
@@ -581,9 +591,9 @@ TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
 	{
 		augs::stream comparatory;
 
-		cosmic_delta::encode(c1, c2, comparatory);
+		ASSERT_FALSE(cosmic_delta::encode(c1, c2, comparatory));
 
-		ASSERT_EQ(0, comparatory.size());
+		ASSERT_EQ(1, comparatory.size());
 	}
 
 	c2.delete_entity(c2.get_entity_by_guid(c2_second_guid));
@@ -599,9 +609,9 @@ TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
 	{
 		augs::stream comparatory;
 
-		cosmic_delta::encode(c1, c2, comparatory);
+		ASSERT_FALSE(cosmic_delta::encode(c1, c2, comparatory));
 
-		ASSERT_EQ(0, comparatory.size());
+		ASSERT_EQ(1, comparatory.size());
 	}
 
 	ASSERT_EQ(2, c1.entities_count());

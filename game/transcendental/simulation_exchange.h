@@ -14,23 +14,25 @@ namespace augs {
 
 class simulation_exchange {
 public:
-	struct command {
+	struct packaged_step {
 		enum class type {
 			INVALID,
 			NEW_ENTROPY,
 			NEW_ENTROPY_WITH_HEARTBEAT
-		} command_type = type::INVALID;
+		} step_type = type::INVALID;
 
 		augs::stream delta;
 		cosmic_entropy entropy;
 	};
 
-	static command read_entropy(augs::stream&);
-	static void write_entropy(augs::stream&, const command&, const cosmos& guid_mapper);
+	static packaged_step read_entropy(augs::stream&);
+	static void write_entropy(augs::stream&, const packaged_step&, const cosmos& guid_mapper);
 
-protected:
-	static void write_command_to_stream(augs::stream& output, const command&, const cosmos& guid_mapper);
+public:
+	static void write_packaged_step_to_stream(augs::stream& output, const packaged_step&, const cosmos& guid_mapper);
 
-	static command read_entropy_for_next_step(augs::stream&);
-	static command read_entropy_with_heartbeat_for_next_step(augs::stream&);
+	static packaged_step read_entropy_for_next_step(augs::stream&);
+	static packaged_step read_entropy_with_heartbeat_for_next_step(augs::stream&);
+
+	static cosmic_entropy map_guids_to_ids(const cosmic_entropy&, const cosmos& mapper);
 };

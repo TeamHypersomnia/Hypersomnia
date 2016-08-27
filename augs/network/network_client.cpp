@@ -46,8 +46,18 @@ namespace augs {
 			}
 		}
 
-		bool client::send_unreliable(const packet& payload) {
-			ENetPacket * const packet = enet_packet_create(payload.data(), payload.size(), ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT);
+		bool client::post_redundant(const packet& payload) {
+			packet stream = payload;
+			redundancy.sender.post_message(stream);
+			return true;
+		}
+
+		bool client::send_pending_redundant() {
+			augs::stream payload;
+
+			redundancy.build_next_packet(payload);
+
+			ENetPacket * const packet = enet_packet_create(payload.data(), payload.size(), ENET_PACKET_FLAG_UNSEQUENCED);
 			const auto result = !enet_peer_send(peer, 0, packet);
 			enet_host_flush(host.get());
 
@@ -56,7 +66,7 @@ namespace augs {
 
 		bool client::send_reliable(const packet& payload) {
 			ENetPacket * const packet = enet_packet_create(payload.data(), payload.size(), ENET_PACKET_FLAG_RELIABLE);
-			const auto result = !enet_peer_send(peer, 0, packet);
+			const auto result = !enet_peer_send(peer, 1, packet);
 			enet_host_flush(host.get());
 
 			return result;
@@ -81,6 +91,9 @@ namespace augs {
 					augs::write_bytes(new_event.payload, event.packet->data, event.packet->dataLength);
 					new_event.message_type = message::type::RECEIVE;
 					new_event.address = event.peer->address;
+
+					if (event.channelID == 0)
+						redundancy.handle_incoming_packet(new_event.payload);
 
 					enet_packet_destroy(event.packet);
 

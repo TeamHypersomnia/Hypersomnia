@@ -6,14 +6,12 @@
 
 #include "augs/misc/streams.h"
 
+#include "network_types.h"
+
 namespace augs {
 	namespace network {
 		struct reliable_sender {
-			struct message {
-				augs::stream* output_bitstream = nullptr;
-			};
-
-			std::vector<message> reliable_buf;
+			std::vector<augs::stream> reliable_buf;
 			augs::stream unreliable_buf;
 			augs::stream custom_header;
 
@@ -30,7 +28,7 @@ namespace augs {
 			unsigned first_message = 0u;
 			unsigned last_message = 0u;
 
-			void post_message(message&);
+			void post_message(augs::stream&);
 			bool write_data(augs::stream& output);
 			bool read_ack(augs::stream& input);
 		};
@@ -77,9 +75,9 @@ namespace augs {
 			void enable_starting_byte(unsigned char);
 			void disable_starting_byte();
 
-			void send(augs::stream& out);
+			void build_next_packet(augs::stream& out);
 			/* returns result enum */
-			int recv(augs::stream& in);
+			int handle_incoming_packet(augs::stream& in);
 		};
 	}
 }

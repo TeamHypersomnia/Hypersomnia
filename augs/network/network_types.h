@@ -15,6 +15,10 @@ namespace augs {
 			endpoint_address();
 			endpoint_address(const ENetAddress& addr);
 
+			bool operator==(endpoint_address b) const {
+				return ip == b.ip && port == b.port;
+			}
+
 			unsigned get_ip() const;
 			unsigned short get_port() const;
 		};

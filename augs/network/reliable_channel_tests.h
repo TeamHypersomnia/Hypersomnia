@@ -5,11 +5,11 @@ TEST(NetChannelWrapper, SingleTransmissionDeleteAllPending) {
 	b.enable_starting_byte(135);
 
 	augs::stream bs[15];
-	reliable_sender::message msg[15];
+	augs::stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
 		augs::write_object(bs[i], int(i));
-		msg[i].output_bitstream = &bs[i];
+		
 	}
 
 	/* post four messages */
@@ -22,16 +22,16 @@ TEST(NetChannelWrapper, SingleTransmissionDeleteAllPending) {
 	augs::stream receiver_bs;
 
 	EXPECT_EQ(false, a.receiver.ack_requested);
-	a.send(sender_bs);
+	a.build_next_packet(sender_bs);
 	EXPECT_EQ(false, a.receiver.ack_requested);
 
-	b.recv(sender_bs);
+	b.handle_incoming_packet(sender_bs);
 	EXPECT_EQ(true, b.receiver.ack_requested);
 
-	b.send(receiver_bs);
+	b.build_next_packet(receiver_bs);
 	EXPECT_EQ(false, b.receiver.ack_requested);
 
-	a.recv(receiver_bs);
+	a.handle_incoming_packet(receiver_bs);
 
 	a.sender.post_message(msg[4]);
 
@@ -46,11 +46,11 @@ TEST(NetChannelWrapper, PastAcknowledgementDeletesSeveralPending) {
 	reliable_channel a, b;
 
 	augs::stream bs[15];
-	reliable_sender::message msg[15];
+	augs::stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
 		augs::write_object(bs[i], int(i));
-		msg[i].output_bitstream = &bs[i];
+		
 	}
 
 	augs::stream sender_packets[15];
@@ -62,23 +62,23 @@ TEST(NetChannelWrapper, PastAcknowledgementDeletesSeveralPending) {
 	a.sender.post_message(msg[2]);
 	a.sender.post_message(msg[3]);
 
-	a.send(sender_packets[0]);
+	a.build_next_packet(sender_packets[0]);
 
 	a.sender.post_message(msg[4]);
 	a.sender.post_message(msg[5]);
 
-	a.send(sender_packets[1]);
+	a.build_next_packet(sender_packets[1]);
 
 	a.sender.post_message(msg[6]);
 	a.sender.post_message(msg[7]);
 	a.sender.post_message(msg[8]);
 
-	a.send(sender_packets[2]);
+	a.build_next_packet(sender_packets[2]);
 
-	b.recv(sender_packets[0]);
-	b.send(receiver_packet);
+	b.handle_incoming_packet(sender_packets[0]);
+	b.build_next_packet(receiver_packet);
 
-	a.recv(receiver_packet);
+	a.handle_incoming_packet(receiver_packet);
 
 	EXPECT_EQ(3, a.sender.sequence);
 	EXPECT_EQ(5, a.sender.reliable_buf.size());
@@ -91,11 +91,11 @@ TEST(NetChannelWrapper, FlagForDeletionAndAck) {
 	reliable_channel a, b;
 
 	augs::stream bs[15];
-	reliable_sender::message msg[15];
+	augs::stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
 		augs::write_object(bs[i], int(i));
-		msg[i].output_bitstream = &bs[i];
+		
 	}
 
 	augs::stream sender_packets[15];
@@ -107,13 +107,13 @@ TEST(NetChannelWrapper, FlagForDeletionAndAck) {
 	a.sender.post_message(msg[2]);
 	a.sender.post_message(msg[3]);
 
-	a.send(sender_packets[0]);
+	a.build_next_packet(sender_packets[0]);
 
 	a.sender.post_message(msg[4]);
 	a.sender.post_message(msg[5]);
 	a.sender.post_message(msg[6]);
 
-	a.send(sender_packets[1]);
+	a.build_next_packet(sender_packets[1]);
 
 	//a.sender.reliable_buf[0].flag_for_deletion = true;
 	//a.sender.reliable_buf[2].flag_for_deletion = true;
@@ -124,12 +124,12 @@ TEST(NetChannelWrapper, FlagForDeletionAndAck) {
 	a.sender.post_message(msg[7]);
 	a.sender.post_message(msg[8]);
 
-	a.send(sender_packets[2]);
-	a.send(sender_packets[3]);
-	a.send(sender_packets[4]);
-	a.send(sender_packets[5]);
+	a.build_next_packet(sender_packets[2]);
+	a.build_next_packet(sender_packets[3]);
+	a.build_next_packet(sender_packets[4]);
+	a.build_next_packet(sender_packets[5]);
 
-	b.recv(sender_packets[0]);
+	b.handle_incoming_packet(sender_packets[0]);
 	int table[4];
 	augs::read_object(sender_packets[0], table[0]);
 	augs::read_object(sender_packets[0], table[1]);
@@ -142,9 +142,9 @@ TEST(NetChannelWrapper, FlagForDeletionAndAck) {
 	//EXPECT_EQ(3, table[3]);
 
 
-	b.send(receiver_packet);
+	b.build_next_packet(receiver_packet);
 
-	a.recv(receiver_packet);
+	a.handle_incoming_packet(receiver_packet);
 
 	EXPECT_EQ(6, a.sender.sequence);
 	EXPECT_EQ(1, a.sender.ack_sequence);
