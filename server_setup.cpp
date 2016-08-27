@@ -39,12 +39,12 @@ void server_setup::process(game_window& window) {
 
 	auto config_tickrate = static_cast<unsigned>(window.get_config_number("tickrate"));
 
-	if (!hypersomnia.load_from_file("save.state")) {
+	if (!hypersomnia.load_from_file("server_save.state")) {
 		hypersomnia.set_fixed_delta(augs::fixed_delta(config_tickrate));
 		testbed.populate_world_with_entities(hypersomnia);
 	}
 
-	input_unpacker.try_to_load_or_save_new_session("sessions/", "recorded.inputs");
+	input_unpacker.try_to_load_or_save_new_session("server_sessions/", "recorded.inputs");
 
 	simulation_broadcast server_sim;
 
@@ -83,7 +83,9 @@ void server_setup::process(game_window& window) {
 		auto steps = input_unpacker.unpack_steps(hypersomnia.get_fixed_delta());
 
 		for (auto& s : steps) {
+			LOG("Server step");
 			for (auto& net_event : s.total_entropy.remote) {
+				LOG("Server netevent");
 				if (net_event.message_type == augs::network::message::type::CONNECT) {
 					endpoints.push_back({ net_event.address });
 
@@ -107,14 +109,16 @@ void server_setup::process(game_window& window) {
 					while (stream.get_unread_bytes() > 0) {
 						auto command = static_cast<network_command>(stream.peek<unsigned char>());
 
+						LOG("Server received command: %x", int(command));
 						switch (command) {
 						case network_command::ENTROPY_FOR_NEXT_STEP:
 							endpoint.commands.push_back(simulation_exchange::read_entropy_for_next_step(stream));
 							break;
+						default: 
+							LOG("Server received invalid command: %x", int(command)); stream = augs::stream();
+							break;
 						}
 					}
-
-					ensure(net_event.payload.get_unread_bytes() == 0);
 				}
 			}
 
@@ -123,8 +127,15 @@ void server_setup::process(game_window& window) {
 			auto& total_entropy = this_net_step.entropy;
 			
 			for (auto& e : endpoints) {
-				auto next_command = e.commands.front();
-				e.commands.erase(e.commands.begin());
+				simulation_exchange::packaged_step next_command;
+
+				if (e.commands.empty()) {
+					next_command.step_type = simulation_exchange::packaged_step::type::NEW_ENTROPY;
+				}
+				else {
+					next_command = e.commands.front();
+					e.commands.erase(e.commands.begin());
+				}
 
 				ensure(next_command.step_type == simulation_exchange::packaged_step::type::NEW_ENTROPY);
 				

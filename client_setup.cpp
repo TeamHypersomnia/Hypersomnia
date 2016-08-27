@@ -26,7 +26,7 @@
 #include "setups.h"
 
 void client_setup::process(game_window& window) {
-	const vec2i screen_size = vec2i(window.window.get_screen_rect());
+	const vec2i screen_size = vec2i(window.get_screen_rect());
 
 	cosmos hypersomnia(3000);
 
@@ -58,7 +58,7 @@ void client_setup::process(game_window& window) {
 
 	bool last_stepped_was_extrapolated = false;
 
-	if (client.connect(window.get_config_string("connect_address"), static_cast<unsigned short>(window.get_config_number("connect_port")), 5000)) {
+	if (client.connect(window.get_config_string("connect_address"), static_cast<unsigned short>(window.get_config_number("connect_port")), 15000)) {
 		LOG("Connected successfully");
 		
 		while (!window.should_quit) {
@@ -85,6 +85,8 @@ void client_setup::process(game_window& window) {
 						while (stream.get_unread_bytes() > 0) {
 							const auto command = static_cast<network_command>(stream.peek<unsigned char>());
 							
+							LOG("Client received command: %x", int(stream.peek<unsigned char>()));
+
 							switch (command) {
 							case network_command::COMPLETE_STATE:
 								network_command read_command;
@@ -104,6 +106,9 @@ void client_setup::process(game_window& window) {
 							case network_command::ENTROPY_WITH_HEARTBEAT_FOR_NEXT_STEP:
 								receiver.read_entropy_with_heartbeat_for_next_step(stream);
 								break;
+
+							default: LOG("Client received invalid command: %x", int(command)); stream = augs::stream(); break;
+
 							}
 						}
 					}
