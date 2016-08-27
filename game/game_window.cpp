@@ -9,6 +9,15 @@ game_window::game_window() {
 	bind_game_and_augs(lua);
 }
 
+rects::wh<int> game_window::get_screen_rect() {
+	std::unique_lock<std::mutex> lock(lua_mutex);
+	return window.get_screen_rect();
+}
+
+void game_window::swap_buffers() {
+	window.swap_buffers();
+}
+
 void game_window::call_window_script(const std::string filename) {
 	std::unique_lock<std::mutex> lock(lua_mutex);
 

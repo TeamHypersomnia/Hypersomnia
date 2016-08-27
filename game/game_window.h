@@ -9,11 +9,14 @@
 class game_window {
 	augs::lua_state_wrapper lua;
 	std::mutex lua_mutex;
+	window::glwindow window;
 
 public:
 	game_window();
 
-	window::glwindow window;
+	rects::wh<int> get_screen_rect();
+	void swap_buffers();
+
 	bool clear_window_inputs_once = true;
 
 	volatile bool should_quit = false;

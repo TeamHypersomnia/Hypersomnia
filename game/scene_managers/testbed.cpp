@@ -393,7 +393,7 @@ namespace scene_managers {
 		session.triangles.measure(static_cast<double>(target.triangles_drawn_total));
 		target.triangles_drawn_total = 0;
 
-		window.window.swap_buffers();
+		window.swap_buffers();
 		
 		session.fps_profiler.end_measurement();
 	}

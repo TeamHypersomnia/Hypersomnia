@@ -29,8 +29,6 @@ void cosmic_entropy::from_input_receivers_distribution(const augs::machine_entro
 }
 
 bool cosmic_entropy::make_intent(const input_context& context, const augs::window::event::state& raw, entity_intent& mapped_intent) {
-	intent_type intent;
-
 	bool found_context_entry = false;
 
 	if (raw.key_event == augs::window::event::NO_CHANGE) {
@@ -38,7 +36,7 @@ bool cosmic_entropy::make_intent(const input_context& context, const augs::windo
 
 		const auto found_intent = context.event_to_intent.find(raw.msg);
 		if (found_intent != context.event_to_intent.end()) {
-			intent = (*found_intent).second;
+			mapped_intent.intent = (*found_intent).second;
 			found_context_entry = true;
 		}
 	}
@@ -47,12 +45,11 @@ bool cosmic_entropy::make_intent(const input_context& context, const augs::windo
 
 		const auto found_intent = context.key_to_intent.find(raw.key);
 		if (found_intent != context.key_to_intent.end()) {
-			intent = (*found_intent).second;
+			mapped_intent.intent = (*found_intent).second;
 			found_context_entry = true;
 		}
 	}
 
-	mapped_intent.intent = intent;
 	mapped_intent.mouse_rel = raw.mouse.rel;
 	return found_context_entry;
 }

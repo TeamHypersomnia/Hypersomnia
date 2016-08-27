@@ -8,9 +8,15 @@
 
 
 #include <fstream>
+#include <thread>
+#include <mutex>
+
+std::mutex log_mutex;
 
 template<>
 void LOG(std::string f) {
+	std::unique_lock<std::mutex> lock(log_mutex);
+
 	std::cout << f << std::endl;
 	std::ofstream recording_file("live_debug.txt", std::ios::out | std::ios::app);
 	recording_file << f << std::endl;
@@ -18,12 +24,16 @@ void LOG(std::string f) {
 
 template<>
 void LOG_COLOR(console_color c, std::string f) {
+	std::unique_lock<std::mutex> lock(log_mutex);
+
 	augs::colored_print(c, f.c_str());
 	std::ofstream recording_file("live_debug.txt", std::ios::out | std::ios::app);
 	recording_file << f << std::endl;
 }
 
 void CALL_SHELL(std::string s) {
+	std::unique_lock<std::mutex> lock(log_mutex);
+
 	system(s.c_str());
 }
 

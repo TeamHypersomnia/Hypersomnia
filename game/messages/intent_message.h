@@ -6,7 +6,7 @@
 #include "game/enums/intent_type.h"
 
 struct entity_intent {
-	intent_type intent;
+	intent_type intent = intent_type::NONE;
 	vec2i mouse_rel;
 	bool pressed_flag = false;
 
