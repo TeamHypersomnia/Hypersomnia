@@ -8,7 +8,7 @@ launch_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.LOCAL,
+	launch_mode = launch_modes.CLIENT_AND_SERVER,
 
 	window_name = "example",
 	fullscreen = 0,
@@ -23,13 +23,13 @@ config_table = {
 	sensitivity = vec2(1.5, 1.5),
 	
 	connect_address = "127.0.0.1",
-	connect_port = 27014,
+	connect_port = 13372,
 
-	server_port = 27014,
+	server_port = 13372,
 	
 	nickname = "Daedalus",
 	
-	tickrate = 60,
+	tickrate = 5,
 	
 	simulate_lag = 0,
 	packet_loss = 0.00,

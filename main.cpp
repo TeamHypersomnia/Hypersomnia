@@ -7,6 +7,8 @@
 
 #include "game/scene_managers/resource_setups/all.h"
 
+#include <thread>
+
 int main(int argc, char** argv) {
 	augs::global_libraries::init();
 	augs::global_libraries::run_googletest(argc, argv);
@@ -22,20 +24,39 @@ int main(int argc, char** argv) {
 
 	switch (mode) {
 	case game_window::launch_mode::LOCAL:
-
+	{
 		local_setup setup;
 		setup.process(window);
-
+	}
 		break;
 	case game_window::launch_mode::CLIENT_AND_SERVER:
-		
-		
+
+	{
+		std::thread server_thread([&window]() {
+			server_setup setup;
+			setup.process(window);
+		});
+
+		client_setup setup;
+		setup.process(window);
+
+		server_thread.join();
+	}
 		break;
 	case game_window::launch_mode::ONLY_CLIENT:  
+	{
 
-
+		client_setup setup;
+		setup.process(window);
+	}
 		break;
-	case game_window::launch_mode::ONLY_SERVER: ensure(false);
+	case game_window::launch_mode::ONLY_SERVER: 
+	{
+		server_setup setup;
+		setup.process(window);
+	}
+		break;
+
 	default: ensure(false); break;
 	}
 

@@ -40,16 +40,14 @@ void local_setup::process(game_window& window) {
 
 	testbed.configure_view(session);
 
-	bool should_quit = false;
-
-	while (!should_quit) {
+	while (!window.should_quit) {
 		augs::machine_entropy new_entropy;
 
 		new_entropy.local = window.collect_entropy();
 
 		for (auto& n : new_entropy.local) {
 			if (n.key == augs::window::event::keys::ESC && n.key_event == augs::window::event::key_changed::PRESSED) {
-				should_quit = true;
+				window.should_quit = true;
 			}
 		}
 

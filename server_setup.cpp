@@ -27,8 +27,6 @@
 #include "augs/network/reliable_channel.h"
 
 void server_setup::process(game_window& window) {
-	const vec2i screen_size = vec2i(window.window.get_screen_rect());
-
 	cosmos hypersomnia(3000);
 	cosmos hypersomnia_last_snapshot(3000);
 	cosmos extrapolated_hypersomnia(3000);
@@ -48,17 +46,14 @@ void server_setup::process(game_window& window) {
 
 	input_unpacker.try_to_load_or_save_new_session("sessions/", "recorded.inputs");
 
-	viewing_session session;
-	session.camera.configure_size(screen_size);
-
-	testbed.configure_view(session);
-
 	simulation_broadcast server_sim;
 
-	volatile bool should_quit = false;
-
 	augs::network::server serv;
-	serv.listen(static_cast<unsigned short>(window.get_config_number("server_port")), 32);
+	
+	if (!serv.listen(static_cast<unsigned short>(window.get_config_number("server_port")), 32)) {
+		LOG("Failed to setup a listen server.");
+	}
+		LOG("Listen server setup successful.");
 
 	struct endpoint {
 		augs::network::endpoint_address addr;
@@ -71,7 +66,7 @@ void server_setup::process(game_window& window) {
 
 	std::vector<endpoint> endpoints;
 
-	while (!should_quit) {
+	while (!window.should_quit) {
 		augs::machine_entropy new_entropy;
 
 		new_entropy.local = window.collect_entropy();
@@ -79,7 +74,7 @@ void server_setup::process(game_window& window) {
 
 		for (auto& n : new_entropy.local) {
 			if (n.key == augs::window::event::keys::ESC && n.key_event == augs::window::event::key_changed::PRESSED) {
-				should_quit = true;
+				window.should_quit = true;
 			}
 		}
 

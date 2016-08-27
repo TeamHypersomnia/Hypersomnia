@@ -56,14 +56,12 @@ void client_setup::process(game_window& window) {
 	cosmos hypersomnia_last_snapshot(3000);
 	cosmos extrapolated_hypersomnia(3000);
 
-	bool should_quit = false;
-
 	bool last_stepped_was_extrapolated = false;
 
-	if (client.connect(window.get_config_string("server_address"), static_cast<unsigned short>(window.get_config_number("server_port")), 2000)) {
+	if (client.connect(window.get_config_string("connect_address"), static_cast<unsigned short>(window.get_config_number("connect_port")), 5000)) {
 		LOG("Connected successfully");
 		
-		while (!should_quit) {
+		while (!window.should_quit) {
 			augs::machine_entropy new_entropy;
 
 			new_entropy.local = window.collect_entropy();
@@ -71,7 +69,7 @@ void client_setup::process(game_window& window) {
 
 			for (auto& n : new_entropy.local) {
 				if (n.key == augs::window::event::keys::ESC && n.key_event == augs::window::event::key_changed::PRESSED) {
-					should_quit = true;
+					window.should_quit = true;
 				}
 			}
 
@@ -143,7 +141,7 @@ void client_setup::process(game_window& window) {
 				}
 			}
 
-			testbed.view(last_stepped_was_extrapolated ? hypersomnia : extrapolated_hypersomnia, 
+			testbed.view(last_stepped_was_extrapolated ? extrapolated_hypersomnia : hypersomnia,
 				window, session, session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), input_unpacker.timer));
 		}
 	}
