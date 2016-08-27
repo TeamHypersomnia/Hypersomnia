@@ -16,11 +16,13 @@
 #include "game/transcendental/step_and_entropy_unpacker.h"
 
 #include "game/transcendental/network_commands.h"
+#include "game/transcendental/cosmic_delta.h"
 
 #include "augs/filesystem/file.h"
 
 #include "augs/network/network_client.h"
 
+#include "augs/misc/templated_readwrite.h"
 #include "setups.h"
 
 void client_setup::process(game_window& window) {
@@ -28,15 +30,14 @@ void client_setup::process(game_window& window) {
 
 	cosmos hypersomnia(3000);
 
+	cosmos initial_hypersomnia(3000);
+	scene_managers::testbed().populate_world_with_entities(initial_hypersomnia);
+
 	step_and_entropy_unpacker input_unpacker;
 	scene_managers::testbed testbed;
 
-	if (!hypersomnia.load_from_file("save.state")) {
-		hypersomnia.significant.meta.settings.screen_size = screen_size;
+	if (!hypersomnia.load_from_file("save.state"))
 		testbed.populate_world_with_entities(hypersomnia);
-	}
-	else
-		hypersomnia.significant.meta.settings.screen_size = screen_size;
 
 	input_unpacker.try_to_load_or_save_new_session("sessions/", "recorded.inputs");
 
@@ -47,6 +48,7 @@ void client_setup::process(game_window& window) {
 
 	augs::network::client client;
 	simulation_receiver receiver;
+
 	cosmos hypersomnia_last_snapshot(3000);
 	cosmos extrapolated_hypersomnia(3000);
 
@@ -77,11 +79,22 @@ void client_setup::process(game_window& window) {
 				for (auto& net_event : s.total_entropy.remote) {
 					if (net_event.message_type == augs::network::message::type::RECEIVE) {
 						auto& stream = net_event.payload;
-						
+
 						while (stream.get_unread_bytes() > 0) {
-							auto command = static_cast<network_command>(stream.peek<unsigned char>());
+							const auto command = static_cast<network_command>(stream.peek<unsigned char>());
 							
 							switch (command) {
+							case network_command::COMPLETE_STATE:
+								network_command read_command;
+
+								augs::read_object(stream, read_command);
+								ensure_eq(int(network_command::COMPLETE_STATE), int(read_command));
+
+								cosmic_delta::decode(initial_hypersomnia, stream);
+								hypersomnia = initial_hypersomnia;
+
+								break;
+
 							case network_command::ENTROPY_FOR_NEXT_STEP:
 								receiver.read_entropy_for_next_step(stream);
 								break;
@@ -91,12 +104,20 @@ void client_setup::process(game_window& window) {
 								break;
 							}
 						}
-
-						ensure(net_event.payload.get_unread_bytes() == 0);
 					}
 				}
 
-				auto local_cosmic_entropy_for_this_step = testbed.make_cosmic_entropy(s.total_entropy.local, session.input, hypersomnia);
+				const auto local_cosmic_entropy_for_this_step = testbed.make_cosmic_entropy(s.total_entropy.local, session.input, hypersomnia);
+
+				simulation_exchange::packaged_step net_step;
+				net_step.step_type = simulation_exchange::packaged_step::type::NEW_ENTROPY;
+				net_step.entropy = local_cosmic_entropy_for_this_step;
+
+				augs::stream serialized_step;
+				simulation_exchange::write_packaged_step_to_stream(serialized_step, net_step, hypersomnia);
+
+				client.post_redundant(serialized_step);
+				client.send_pending_redundant();
 
 				auto deterministic_steps = receiver.unpack_deterministic_steps(hypersomnia, extrapolated_hypersomnia, hypersomnia_last_snapshot);
 

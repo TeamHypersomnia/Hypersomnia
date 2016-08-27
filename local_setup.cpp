@@ -27,11 +27,8 @@ void local_setup::process(game_window& window) {
 	scene_managers::testbed testbed;
 
 	if (!hypersomnia.load_from_file("save.state")) {
-		hypersomnia.significant.meta.settings.screen_size = screen_size;
 		testbed.populate_world_with_entities(hypersomnia);
 	}
-	else
-		hypersomnia.significant.meta.settings.screen_size = screen_size;
 
 	input_unpacker.try_to_load_or_save_new_session("sessions/", "recorded.inputs");
 
