@@ -12,37 +12,16 @@
 //	jitter_buffer.acquire_new_commands(new_commands.begin(), new_commands.end());
 //}
 
-void simulation_exchange::write_entropy(augs::stream& output, const packaged_step& written, const cosmos& guid_mapper) {
+void simulation_exchange::write_entropy(augs::stream& output, const packaged_step& written) {
 	ensure(written.entropy.entropy_per_entity.size() < std::numeric_limits<unsigned char>::max());
 
 	unsigned char num_entropied_entities = written.entropy.entropy_per_entity.size();
 	augs::write_object(output, num_entropied_entities);
 
 	for (const auto& per_entity : written.entropy.entropy_per_entity) {
-		unsigned guid = guid_mapper[per_entity.first].get_guid();
-
-		augs::write_object(output, guid);
-
+		augs::write_object(output, per_entity.first);
 		augs::write_vector_of_objects(output, per_entity.second);
 	}
-}
-
-void simulation_exchange::write_packaged_step_to_stream(augs::stream& output, const packaged_step& written, const cosmos& guid_mapper) {
-	if (written.step_type == packaged_step::type::NEW_ENTROPY) {
-		augs::write_object(output, network_command::ENTROPY_FOR_NEXT_STEP);
-
-		write_entropy(output, written, guid_mapper);
-
-	}
-	else if (written.step_type == packaged_step::type::NEW_ENTROPY_WITH_HEARTBEAT) {
-		augs::write_object(output, network_command::ENTROPY_WITH_HEARTBEAT_FOR_NEXT_STEP);
-
-		write_entropy(output, written, guid_mapper);
-
-		augs::write_sized_stream(output, written.delta);
-	}
-	else
-		ensure(false);
 }
 
 simulation_exchange::packaged_step simulation_exchange::read_entropy(augs::stream& in) {
@@ -53,10 +32,10 @@ simulation_exchange::packaged_step simulation_exchange::read_entropy(augs::strea
 	augs::read_object(in, num_entropied_entities);
 
 	while (num_entropied_entities--) {
-		entity_id key;
-		augs::read_object(in, key.guid);
+		unsigned guid;
+		augs::read_object(in, guid);
 
-		auto& new_entity_entropy = new_entropy.entropy_per_entity[key];
+		auto& new_entity_entropy = new_entropy.entropy_per_entity[guid];
 
 		ensure(new_entity_entropy.empty());
 
@@ -64,6 +43,24 @@ simulation_exchange::packaged_step simulation_exchange::read_entropy(augs::strea
 	}
 
 	return std::move(new_command);
+}
+
+void simulation_exchange::write_packaged_step_to_stream(augs::stream& output, const packaged_step& written) {
+	if (written.step_type == packaged_step::type::NEW_ENTROPY) {
+		augs::write_object(output, network_command::ENTROPY_FOR_NEXT_STEP);
+
+		write_entropy(output, written);
+
+	}
+	else if (written.step_type == packaged_step::type::NEW_ENTROPY_WITH_HEARTBEAT) {
+		augs::write_object(output, network_command::ENTROPY_WITH_HEARTBEAT_FOR_NEXT_STEP);
+
+		write_entropy(output, written);
+
+		augs::write_sized_stream(output, written.delta);
+	}
+	else
+		ensure(false);
 }
 
 simulation_exchange::packaged_step simulation_exchange::read_entropy_for_next_step(augs::stream& in) {
@@ -89,20 +86,4 @@ simulation_exchange::packaged_step simulation_exchange::read_entropy_with_heartb
 	augs::read_sized_stream(in, new_command.delta);
 
 	return std::move(new_command);
-}
-
-cosmic_entropy simulation_exchange::map_guids_to_ids(const cosmic_entropy& subject, const cosmos& mapper) {
-	std::vector<std::pair<entity_id, std::vector<entity_intent>>> saved_id_entries_to_remap;
-
-	for (const auto& entry : subject.entropy_per_entity)
-		saved_id_entries_to_remap.push_back(entry);
-
-	cosmic_entropy result;
-
-	for (auto i : saved_id_entries_to_remap) {
-		i.first = mapper.get_entity_by_guid(i.first.guid);
-		result.entropy_per_entity.emplace(std::move(i));
-	}
-
-	return std::move(result);
 }

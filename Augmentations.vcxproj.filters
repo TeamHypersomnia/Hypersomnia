@@ -1038,6 +1038,9 @@
     <ClCompile Include="game\transcendental\simulation_broadcast.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\scene_managers\networked_testbed.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3198,6 +3201,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\transcendental\simulation_broadcast.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\scene_managers\networked_testbed.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

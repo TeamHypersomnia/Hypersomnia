@@ -7,7 +7,7 @@ public:
 
 	class unpacked_steps {
 		friend class simulation_receiver;
-		std::vector<cosmic_entropy> steps_for_proper_cosmos;
+		std::vector<guid_mapped_entropy> steps_for_proper_cosmos;
 	public:
 		bool use_extrapolated_cosmos = true;
 
@@ -15,8 +15,8 @@ public:
 		cosmic_entropy unpack_next_entropy(const cosmos& guid_mapper);
 	};
 
-	void read_entropy_for_next_step(augs::stream&);
-	void read_entropy_with_heartbeat_for_next_step(augs::stream&);
+	void read_entropy_for_next_step(augs::stream&, bool skip_command);
+	void read_entropy_with_heartbeat_for_next_step(augs::stream&, bool skip_command);
 
 	unpacked_steps unpack_deterministic_steps(cosmos& proper_cosmos, cosmos& extrapolated_cosmos, cosmos& last_delta_unpacked);
 };

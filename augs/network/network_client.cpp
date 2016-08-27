@@ -79,6 +79,7 @@ namespace augs {
 
 			while (enet_host_service(host.get(), &event, 0) > 0) {
 				message new_event;
+				bool add_event = true;
 
 				switch (event.type) {
 				case ENET_EVENT_TYPE_CONNECT:
@@ -92,8 +93,16 @@ namespace augs {
 					new_event.message_type = message::type::RECEIVE;
 					new_event.address = event.peer->address;
 
-					if (event.channelID == 0)
-						redundancy.handle_incoming_packet(new_event.payload);
+					if (event.channelID == 0) {
+						auto result = redundancy.handle_incoming_packet(new_event.payload);
+
+						if (result.result_type == result.NOTHING_RECEIVED) {
+							add_event = false;
+						}
+						else {
+							new_event.messages_to_skip = result.messages_to_skip;
+						}
+					}
 
 					enet_packet_destroy(event.packet);
 
@@ -104,7 +113,8 @@ namespace augs {
 					new_event.address = event.peer->address;
 				}
 
-				total.emplace_back(new_event);
+				if(add_event)
+					total.emplace_back(new_event);
 			}
 
 			return std::move(total);

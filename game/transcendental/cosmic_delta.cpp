@@ -58,7 +58,7 @@ struct delted_entity_stream {
 
 bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& out) {
 	const auto used_bits = out.size();
-	should_eq(0, used_bits);
+	//should_eq(0, used_bits);
 
 	enco.profiler.delta_encoding.new_measurement();
 	typedef decltype(base.significant.pool_for_aggregates)::element_type aggregate;
@@ -341,7 +341,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 	}
 
 	const auto unread_bits = in.get_unread_bytes();
-	ensure_eq(0, unread_bits);
+	//should_eq(0, unread_bits);
 
 	deco.create_substance_completely();
 

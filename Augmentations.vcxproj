@@ -309,6 +309,7 @@
     <ClCompile Include="augs\network\enet_raii.cpp" />
     <ClCompile Include="augs\network\reliable_channel.cpp" />
     <ClCompile Include="game\detail\world_camera.cpp" />
+    <ClCompile Include="game\scene_managers\networked_testbed.cpp" />
     <ClCompile Include="game\transcendental\cosmic_delta.cpp" />
     <ClCompile Include="game\transcendental\cosmic_entropy.cpp" />
     <ClCompile Include="game\components\dynamic_tree_node_component.cpp" />
@@ -959,6 +960,7 @@
     <ClInclude Include="game\components\sub_entities_component.h" />
     <ClInclude Include="game\container_sizes.h" />
     <ClInclude Include="game\detail\world_camera.h" />
+    <ClInclude Include="game\scene_managers\networked_testbed.h" />
     <ClInclude Include="game\transcendental\component_synchronizer.h" />
     <ClInclude Include="game\transcendental\cosmic_delta.h" />
     <ClInclude Include="game\transcendental\cosmic_entropy.h" />

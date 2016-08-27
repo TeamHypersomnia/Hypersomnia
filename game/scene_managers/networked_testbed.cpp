@@ -1,4 +1,4 @@
-#include "testbed.h"
+#include "networked_testbed.h"
 #include "game/ingredients/ingredients.h"
 #include "game/transcendental/cosmos.h"
 #include "game/assets/texture_id.h"
@@ -36,11 +36,34 @@
 #include "game/transcendental/cosmic_delta.h"
 
 namespace scene_managers {
-	void testbed::populate_world_with_entities(cosmos& cosm) {
+	entity_id networked_testbed_server::assign_new_character(augs::network::endpoint_address addr) {
+		for (auto& c : characters) {
+			if (!c.occupied) {
+				c.occupied = true;
+				c.endpoint = addr;
+				return c.id;
+			}
+		}
+
+		ensure(false);
+		return entity_id();
+	}
+
+	void networked_testbed_server::free_character(augs::network::endpoint_address addr) {
+		for (auto& c : characters) {
+			if (c.occupied && c.endpoint == addr) {
+				c.occupied = false;
+			}
+		}
+
+		ensure(false);
+	}
+
+	void networked_testbed::populate_world_with_entities(cosmos& cosm) {
 		cosm.advance_deterministic_schemata(cosmic_entropy(), [this](fixed_step& step) { populate(step); }, [](fixed_step&) {});
 	}
 
-	void testbed::populate(fixed_step& step) {
+	void networked_testbed::populate(fixed_step& step) {
 		auto& world = step.cosm;
 		const auto crate = prefabs::create_crate(world, vec2(200, 200 + 300), vec2i(100, 100) / 3);
 		const auto crate2 = prefabs::create_crate(world, vec2(400, 200 + 400), vec2i(300, 300));
@@ -127,8 +150,6 @@ namespace scene_managers {
 		}
 
 		name_entity(new_characters[0], entity_name::PERSON, L"Attacker");
-
-		inject_input_to(new_characters[0]);
 
 		prefabs::create_sample_suppressor(world, vec2(300, -500));
 
@@ -226,15 +247,15 @@ namespace scene_managers {
 	}
 
 
-	entity_id testbed::get_controlled_entity() const {
+	entity_id networked_testbed_client::get_controlled_entity() const {
 		return currently_controlled_character;
 	}
 	
-	void testbed::inject_input_to(entity_handle h) {
+	void networked_testbed_client::inject_input_to(entity_handle h) {
 		currently_controlled_character = h;
 	}
 
-	void testbed::configure_view(viewing_session& session) const {
+	void networked_testbed_client::configure_view(viewing_session& session) const {
 		auto& active_context = session.input;
 
 		active_context.map_key_to_intent(window::event::keys::W, intent_type::MOVE_FORWARD);
@@ -262,7 +283,7 @@ namespace scene_managers {
 
 	}
 
-	void testbed::control(const augs::machine_entropy::local_type& local, cosmos& main_cosmos) {
+	void networked_testbed_client::control(const augs::machine_entropy::local_type& local, cosmos& main_cosmos) {
 		for (const auto& raw_input : local) {
 			if (raw_input.key_event == augs::window::event::PRESSED) {
 				if (raw_input.key == augs::window::event::keys::F7) {
@@ -271,31 +292,6 @@ namespace scene_managers {
 
 					main_cosmos.save_to_file(target_folder + "/" + "save.state");
 				}
-				if (raw_input.key == augs::window::event::keys::F4) {
-					cosmos cosm_with_guids;
-					cosm_with_guids.significant = stashed_cosmos;
-					cosm_with_guids.remap_guids();
-
-					ensure(stashed_delta.get_write_pos() == 0);
-					cosmic_delta::encode(cosm_with_guids, main_cosmos, stashed_delta);
-
-					stashed_delta.reset_read_pos();
-					cosmic_delta::decode(cosm_with_guids, stashed_delta);
-					stashed_delta.reset_write_pos();
-
-					main_cosmos = cosm_with_guids;
-				}
-				if (raw_input.key == augs::window::event::keys::DASH) {
-					show_profile_details = !show_profile_details;
-				}
-				if (raw_input.key == augs::window::event::keys::F8) {
-					main_cosmos.profiler.duplication.new_measurement();
-					stashed_cosmos = main_cosmos.significant;
-					main_cosmos.profiler.duplication.end_measurement();
-				}
-				if (raw_input.key == augs::window::event::keys::F9) {
-					main_cosmos = stashed_cosmos;
-				}
 				if (raw_input.key == augs::window::event::keys::F10) {
 					main_cosmos.significant.meta.settings.enable_interpolation = !main_cosmos.significant.meta.settings.enable_interpolation;
 				}
@@ -303,7 +299,7 @@ namespace scene_managers {
 		}
 	}
 
-	cosmic_entropy testbed::make_cosmic_entropy(const augs::machine_entropy::local_type& local, const input_context& context, cosmos& cosm) {
+	cosmic_entropy networked_testbed_client::make_cosmic_entropy(const augs::machine_entropy::local_type& local, const input_context& context, cosmos& cosm) {
 		cosmic_entropy result;
 
 		auto& intents = result.entropy_per_entity[get_controlled_entity()];
@@ -318,51 +314,26 @@ namespace scene_managers {
 		return result;
 	}
 
-	void testbed::step_with_callbacks(const cosmic_entropy& cosmic_entropy_for_this_step, cosmos& cosm) {
+	void networked_testbed::step_with_callbacks(const cosmic_entropy& cosmic_entropy_for_this_step, cosmos& cosm) {
 		cosm.advance_deterministic_schemata(cosmic_entropy_for_this_step,
 			[this](fixed_step& step) { pre_solve(step); },
 			[this](fixed_step& step) { post_solve(step); }
 		);
 	}
 
-	void testbed::pre_solve(fixed_step& step) {
+	void networked_testbed::pre_solve(fixed_step& step) {
 
 	}
 
-	void testbed::post_solve(fixed_step& step) {
-		auto& cosmos = step.cosm;
+	void networked_testbed::post_solve(fixed_step& step) {
 
-		for (auto& it : step.messages.get_queue<messages::intent_message>()) {
-			if (it.subject == characters[current_character] && it.intent == intent_type::SWITCH_CHARACTER && it.pressed_flag) {
-				++current_character;
-				current_character %= characters.size();
-
-				inject_input_to(cosmos[characters[current_character]]);
-			}
-		}
-
-		//for (auto& tested : draw_bodies) {
-		//	auto& s = tested.get<components::physics_definition>();
-		//
-		//	auto& lines = renderer::get_current().logic_lines;
-		//
-		//	auto vv = s.fixtures[0].debug_original;
-		//
-		//	for (int i = 0; i < vv.size(); ++i) {
-		//		auto& tt = tested.get<components::transform>();
-		//		auto pos = tt.pos;
-		//
-		//		lines.draw_cyan((pos + vv[i]).rotate(tt.rotation, pos), (pos + vv[(i + 1) % vv.size()]).rotate(tt.rotation, pos));
-		//	}
-		//}
-
-		//auto ff = (new_characters[1].get<components::pathfinding>().get_current_navigation_point() - position(new_characters[1])).set_length(15000);
-		//new_characters[1].get<components::physics>().apply_force(ff);
-
-		// LOG("F: %x", ff);
 	}
 
-	void testbed::view(const cosmos& cosmos, game_window& window, viewing_session& session, const augs::variable_delta& dt) const {
+	void networked_testbed_client::view(const cosmos& cosmos, game_window& window, viewing_session& session, const augs::variable_delta& dt) const {
+		const auto controlled = cosmos[get_controlled_entity()];
+		if (controlled.dead()) 
+			return;
+
 		session.fps_profiler.new_measurement();
 
 		auto& target = renderer::get_current();
@@ -377,8 +348,6 @@ namespace scene_managers {
 		auto summary = typesafe_sprintf(L"Entities: %x\n", cosmos.entities_count());
 
 		using namespace augs::gui::text;
-
-		const auto controlled = cosmos[get_controlled_entity()];
 
 		const auto coords = controlled.get<components::transform>().pos;
 		const auto vel = controlled.get<components::physics>().velocity();
@@ -398,7 +367,7 @@ namespace scene_managers {
 		session.fps_profiler.end_measurement();
 	}
 
-	void testbed::view_cosmos(const cosmos& cosm, basic_viewing_step& step, world_camera& camera) const {
+	void networked_testbed_client::view_cosmos(const cosmos& cosm, basic_viewing_step& step, world_camera& camera) const {
 		auto& cosmos = cosm;
 
 		auto character_chased_by_camera = cosmos[currently_controlled_character];

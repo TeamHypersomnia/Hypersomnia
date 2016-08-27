@@ -1,12 +1,18 @@
 #include "simulation_receiver.h"
 #include "game/transcendental/cosmic_delta.h"
 
-void simulation_receiver::read_entropy_for_next_step(augs::stream& in) {
-	jitter_buffer.acquire_new_command(simulation_exchange::read_entropy_for_next_step(in));
+void simulation_receiver::read_entropy_for_next_step(augs::stream& in, bool skip) {
+	auto result = simulation_exchange::read_entropy_for_next_step(in);
+	
+	if(!skip)
+		jitter_buffer.acquire_new_command(result);
 }
 
-void simulation_receiver::read_entropy_with_heartbeat_for_next_step(augs::stream& in) {
-	jitter_buffer.acquire_new_command(simulation_exchange::read_entropy_with_heartbeat_for_next_step(in));
+void simulation_receiver::read_entropy_with_heartbeat_for_next_step(augs::stream& in, bool skip) {
+	auto result = simulation_exchange::read_entropy_with_heartbeat_for_next_step(in);
+
+	if (!skip)
+		jitter_buffer.acquire_new_command(result);
 }
 
 simulation_receiver::unpacked_steps simulation_receiver::unpack_deterministic_steps(cosmos& properly_stepped_cosmos, cosmos& extrapolated_cosmos, cosmos& last_delta_unpacked) {
@@ -49,8 +55,8 @@ bool simulation_receiver::unpacked_steps::has_next_entropy() const {
 cosmic_entropy simulation_receiver::unpacked_steps::unpack_next_entropy(const cosmos& guid_mapper) {
 	ensure(has_next_entropy());
 
-	cosmic_entropy next = std::move(steps_for_proper_cosmos.front());
+	cosmic_entropy result(steps_for_proper_cosmos.front(), guid_mapper);
 	steps_for_proper_cosmos.erase(steps_for_proper_cosmos.begin());
 
-	return map_guids_to_ids(next, guid_mapper);
+	return std::move(result);
 }

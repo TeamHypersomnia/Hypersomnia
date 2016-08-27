@@ -5,30 +5,7 @@
 #include "augs/misc/machine_entropy.h"
 #include "game/global/input_context.h"
 
-cosmic_entropy& cosmic_entropy::operator+=(const cosmic_entropy& b) {
-	for (const auto& ent : b.entropy_per_entity) {
-		auto& vec = entropy_per_entity[ent.first];
-		vec.insert(vec.end(), ent.second.begin(), ent.second.end());
-	}
-
-	return *this;
-}
-
-size_t cosmic_entropy::length() const {
-	size_t total = 0;
-
-	for (const auto& ent : entropy_per_entity)
-		total += ent.second.size();
-
-	return total;
-}
-
-void cosmic_entropy::from_input_receivers_distribution(const augs::machine_entropy& machine, const input_context& input, cosmos& cosm) {
-	ensure(entropy_per_entity.empty());
-	ensure(false);
-}
-
-bool cosmic_entropy::make_intent(const input_context& context, const augs::window::event::state& raw, entity_intent& mapped_intent) {
+bool make_entity_intent(const input_context& context, const augs::window::event::state& raw, entity_intent& mapped_intent) {
 	bool found_context_entry = false;
 
 	if (raw.key_event == augs::window::event::NO_CHANGE) {
@@ -52,4 +29,18 @@ bool cosmic_entropy::make_intent(const input_context& context, const augs::windo
 
 	mapped_intent.mouse_rel = raw.mouse.rel;
 	return found_context_entry;
+}
+
+guid_mapped_entropy::guid_mapped_entropy(const cosmic_entropy& b, const cosmos& mapper) {
+	delta_to_apply = b.delta_to_apply;
+
+	for (const auto& entry : b.entropy_per_entity)
+		entropy_per_entity[mapper[entry.first].get_guid()] = entry.second;
+}
+
+cosmic_entropy::cosmic_entropy(const guid_mapped_entropy& b, const cosmos& mapper) {
+	delta_to_apply = b.delta_to_apply;
+
+	for (const auto& entry : b.entropy_per_entity)
+		entropy_per_entity[mapper.get_entity_by_guid(entry.first).get_id()] = entry.second;
 }

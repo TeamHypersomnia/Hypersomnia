@@ -12,19 +12,12 @@ namespace augs {
 	namespace network {
 		struct reliable_sender {
 			std::vector<augs::stream> reliable_buf;
-			augs::stream unreliable_buf;
-			augs::stream custom_header;
 
 			std::map<unsigned, unsigned> sequence_to_reliable_range;
 
-			unsigned short unreliable_sequence = 0u;
-			unsigned short unreliable_ack_sequence = 0u;
 			unsigned short sequence = 0u;
 			unsigned short ack_sequence = 0u;
 
-			bool request_ack_for_unreliable = false;
-
-			bool message_indexing = false;
 			unsigned first_message = 0u;
 			unsigned last_message = 0u;
 
@@ -34,29 +27,24 @@ namespace augs {
 		};
 
 		struct reliable_receiver {
-			bool message_indexing = false;
 			bool ack_requested = false;
 
-			bool has_reliable = false;
-			bool has_unreliable = false;
-
 			unsigned last_message = 0u;
-			unsigned first_message = 0u;
 
 			unsigned short received_sequence = 0u;
-			unsigned short received_unreliable_sequence = 0u;
-
 			unsigned short last_sequence = 0u;
-			unsigned short last_unreliable_sequence = 0u;
 
-			enum result {
-				NOTHING_RECEIVED = -1,
-				MESSAGES_RECEIVED = 0,
-				UNMATCHING_RELIABLE_RECEIVED = 1
+			struct result_data {
+				enum type {
+					NOTHING_RECEIVED,
+					MESSAGES_RECEIVED
+				} result_type = NOTHING_RECEIVED;
+
+				unsigned messages_to_skip = 0;
 			};
 
-			/* returns result enum or how many messages to skip if message_indexing == true */
-			int read_sequence(augs::stream& input);
+			/* returns how many messages to skip if message_indexing == true */
+			reliable_receiver::result_data read_sequence(augs::stream& input);
 			void write_ack(augs::stream& input);
 
 			std::string last_read_report;
@@ -77,7 +65,7 @@ namespace augs {
 
 			void build_next_packet(augs::stream& out);
 			/* returns result enum */
-			int handle_incoming_packet(augs::stream& in);
+			reliable_receiver::result_data handle_incoming_packet(augs::stream& in);
 		};
 	}
 }

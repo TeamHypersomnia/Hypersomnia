@@ -8,7 +8,7 @@
 struct entity_intent {
 	intent_type intent = intent_type::NONE;
 	vec2i mouse_rel;
-	bool pressed_flag = false;
+	int pressed_flag = 0;
 
 	bool uses_mouse_motion() const {
 		return

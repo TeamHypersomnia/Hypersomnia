@@ -34,6 +34,7 @@ namespace augs {
 			type message_type = type::INVALID;
 			endpoint_address address;
 			packet payload;
+			unsigned messages_to_skip = 0;
 		};
 	}
 

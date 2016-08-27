@@ -12,15 +12,50 @@ namespace augs {
 class cosmos;
 struct input_context;
 
-struct cosmic_entropy {
-	std::map<entity_id, std::vector<entity_intent>> entropy_per_entity;
+bool make_entity_intent(const input_context&, const augs::window::event::state&, entity_intent& mapped_intent);
+
+template <class key>
+struct basic_cosmic_entropy {
+	std::map<key, std::vector<entity_intent>> entropy_per_entity;
 	augs::stream delta_to_apply;
+	
+	size_t length() const {
+		size_t total = 0;
 
-	// here will be remote entropy as well
-	size_t length() const;
+		for (const auto& ent : entropy_per_entity)
+			total += ent.second.size();
 
-	void from_input_receivers_distribution(const augs::machine_entropy&, const input_context&, cosmos&);
-	static bool make_intent(const input_context&, const augs::window::event::state&, entity_intent& mapped_intent);
+		return total;
+	}
 
-	cosmic_entropy& operator+=(const cosmic_entropy&);
+	basic_cosmic_entropy& operator+=(const basic_cosmic_entropy& b) {
+		for (const auto& ent : b.entropy_per_entity) {
+			auto& vec = entropy_per_entity[ent.first];
+			vec.insert(vec.end(), ent.second.begin(), ent.second.end());
+		}
+
+		return *this;
+	}
+};
+
+struct cosmic_entropy;
+
+struct guid_mapped_entropy : basic_cosmic_entropy<unsigned> {
+	guid_mapped_entropy() = default;
+	explicit guid_mapped_entropy(const cosmic_entropy&, const cosmos&);
+	
+	guid_mapped_entropy& operator+=(const guid_mapped_entropy& b) {
+		basic_cosmic_entropy<unsigned>::operator+=(b);
+		return *this;
+	}
+};
+
+struct cosmic_entropy : basic_cosmic_entropy<entity_id> {
+	cosmic_entropy() = default;
+	explicit cosmic_entropy(const guid_mapped_entropy&, const cosmos&);
+
+	cosmic_entropy& operator+=(const cosmic_entropy& b) {
+		basic_cosmic_entropy<entity_id>::operator+=(b);
+		return *this;
+	}
 };

@@ -22,17 +22,15 @@ public:
 		} step_type = type::INVALID;
 
 		augs::stream delta;
-		cosmic_entropy entropy;
+		guid_mapped_entropy entropy;
 	};
 
 	static packaged_step read_entropy(augs::stream&);
-	static void write_entropy(augs::stream&, const packaged_step&, const cosmos& guid_mapper);
+	static void write_entropy(augs::stream&, const packaged_step&);
 
 public:
-	static void write_packaged_step_to_stream(augs::stream& output, const packaged_step&, const cosmos& guid_mapper);
+	static void write_packaged_step_to_stream(augs::stream& output, const packaged_step&);
 
 	static packaged_step read_entropy_for_next_step(augs::stream&);
 	static packaged_step read_entropy_with_heartbeat_for_next_step(augs::stream&);
-
-	static cosmic_entropy map_guids_to_ids(const cosmic_entropy&, const cosmos& mapper);
 };

@@ -21,9 +21,9 @@ namespace augs {
 		return result;
 	}
 
-	template<class A, class T, class...>
+	template<class A>
 	void write_object(A& ar, const network_command& storage) {
-		unsigned char compressed = static_cast<network_command>(storage);
+		auto compressed = static_cast<unsigned char>(storage);
 
 		write_object(ar, compressed);
 	}
