@@ -22,7 +22,7 @@ namespace augs {
 
 		bool server::post_redundant(const packet& payload, const endpoint_address& target) {
 			packet stream = payload;
-			peer_map[target.get_ip()].redundancy.sender.post_message(stream);
+			peer_map[target].redundancy.sender.post_message(stream);
 			return true;
 		}
 
@@ -44,7 +44,7 @@ namespace augs {
 
 		bool server::send_reliable(const packet& payload, const endpoint_address& target) {
 			ENetPacket * const packet = enet_packet_create(payload.data(), payload.size(), ENET_PACKET_FLAG_RELIABLE);
-			auto result = !enet_peer_send(peer_map[target.get_ip()], 1, packet);
+			auto result = !enet_peer_send(peer_map[target], 1, packet);
 			enet_host_flush(host.get());
 
 			return result;
@@ -64,7 +64,7 @@ namespace augs {
 					new_event.message_type = message::type::CONNECT;
 					new_event.address = event.peer->address;
 					
-					peer_map[new_event.address.get_ip()] = event.peer;
+					peer_map[new_event.address] = event.peer;
 
 					break;
 				case ENET_EVENT_TYPE_RECEIVE:
@@ -74,7 +74,7 @@ namespace augs {
 					new_event.address = event.peer->address;
 
 					if (event.channelID == 0) {
-						auto result = peer_map[new_event.address.get_ip()].redundancy.handle_incoming_packet(new_event.payload);
+						auto result = peer_map[new_event.address].redundancy.handle_incoming_packet(new_event.payload);
 
 						if (result.result_type == result.NOTHING_RECEIVED) {
 							add_event = false;
@@ -92,7 +92,7 @@ namespace augs {
 					new_event.message_type = message::type::DISCONNECT;
 					new_event.address = event.peer->address;
 
-					peer_map.erase(new_event.address.get_ip());
+					peer_map.erase(new_event.address);
 				}
 				
 				if(add_event)

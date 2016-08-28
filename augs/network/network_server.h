@@ -29,7 +29,7 @@ namespace augs {
 				}
 			};
 
-			std::unordered_map<unsigned, peer> peer_map;
+			std::unordered_map<endpoint_address, peer> peer_map;
 
 		public:
 

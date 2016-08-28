@@ -53,3 +53,15 @@ namespace augs {
 		write_object(ar, s.payload.buf);
 	}
 }
+
+namespace std {
+	template <>
+	struct hash<augs::network::endpoint_address> {
+		std::size_t operator()(const augs::network::endpoint_address& k) const {
+			using std::hash;
+
+			return ((hash<unsigned>()(k.get_ip())
+				^ (hash<unsigned>()(k.get_port()) << 1)) >> 1);
+		}
+	};
+}
