@@ -1041,6 +1041,9 @@
     <ClCompile Include="game\scene_managers\networked_testbed.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="augs\misc\readable_bytesize.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3204,6 +3207,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\scene_managers\networked_testbed.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\misc\readable_bytesize.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

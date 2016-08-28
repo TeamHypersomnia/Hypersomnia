@@ -329,10 +329,13 @@ namespace scene_managers {
 
 	}
 
-	void networked_testbed_client::view(const cosmos& cosmos, game_window& window, viewing_session& session, const augs::variable_delta& dt) const {
+	void networked_testbed_client::view(const cosmos& cosmos, game_window& window, viewing_session& session, const augs::network::client& details, const augs::variable_delta& dt) const {
 		const auto controlled = cosmos[get_controlled_entity()];
 		if (controlled.dead()) 
 			return;
+
+		auto screen_size = session.camera.visible_world_area;
+		vec2i screen_size_i(static_cast<int>(screen_size.x), static_cast<int>(screen_size.y));
 
 		session.fps_profiler.new_measurement();
 
@@ -340,7 +343,7 @@ namespace scene_managers {
 
 		target.clear_current_fbo();
 
-		target.set_viewport({ 0, 0, static_cast<int>(session.camera.visible_world_area.x), static_cast<int>(session.camera.visible_world_area.y) });
+		target.set_viewport({ 0, 0, screen_size_i.x, screen_size_i.y });
 
 		basic_viewing_step main_cosmos_viewing_step(cosmos, dt, target);
 		view_cosmos(cosmos, main_cosmos_viewing_step, session.camera);
@@ -352,12 +355,16 @@ namespace scene_managers {
 		const auto coords = controlled.get<components::transform>().pos;
 		const auto vel = controlled.get<components::physics>().velocity();
 
-		quick_print_format(target.triangles, typesafe_sprintf(L"Entities: %x\nX: %f2\nY: %f2\nVelX: %x\nVelY: %x\n", cosmos.entities_count(), coords.x, coords.y, vel.x, vel.y)
+		auto bbox = quick_print_format(target.triangles, typesafe_sprintf(L"Entities: %x\nX: %f2\nY: %f2\nVelX: %x\nVelY: %x\n", cosmos.entities_count(), coords.x, coords.y, vel.x, vel.y)
 			+ session.summary() + cosmos.profiler.sorted_summary(show_profile_details), style(assets::font_id::GUI_FONT, rgba(255, 255, 255, 150)), vec2i(0, 0), 0);
+
+		quick_print(target.triangles, multiply_alpha(global_log::format_recent_as_text(assets::font_id::GUI_FONT), 150.f / 255), vec2i(screen_size_i.x - 300, 0), 300);
+		
+		quick_print(target.triangles, multiply_alpha(simple_bbcode(
+			typesafe_sprintf("[color=cyan]Transmission details:[/color]\n%x", details.format_transmission_details()), style(assets::font_id::GUI_FONT, white)), 150.f / 255), vec2i(0, bbox.h), 0);
 
 		target.call_triangles();
 		target.clear_triangles();
-
 
 		session.triangles.measure(static_cast<double>(target.triangles_drawn_total));
 		target.triangles_drawn_total = 0;

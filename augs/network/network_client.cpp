@@ -5,6 +5,8 @@
 #include "augs/misc/templated_readwrite.h"
 #include "network_client.h"
 
+#include "augs/misc/readable_bytesize.h"
+
 namespace augs {
 	namespace network {
 		bool client::connect(const std::string host_address, const unsigned short port, const unsigned timeout_ms) {
@@ -59,6 +61,7 @@ namespace augs {
 
 			ENetPacket * const packet = enet_packet_create(payload.data(), payload.size(), ENET_PACKET_FLAG_UNSEQUENCED);
 			const auto result = !enet_peer_send(peer, 0, packet);
+			sent_size.measure(payload.size());
 			enet_host_flush(host.get());
 
 			return result;
@@ -67,9 +70,34 @@ namespace augs {
 		bool client::send_reliable(const packet& payload) {
 			ENetPacket * const packet = enet_packet_create(payload.data(), payload.size(), ENET_PACKET_FLAG_RELIABLE);
 			const auto result = !enet_peer_send(peer, 1, packet);
+			sent_size.measure(payload.size());
 			enet_host_flush(host.get());
 
 			return result;
+		}
+
+		unsigned client::total_bytes_received() const {
+			return host.get()->totalReceivedData;
+		}
+
+		unsigned client::total_bytes_sent() const {
+			return host.get()->totalSentData;
+		}
+
+		unsigned client::total_packets_sent() const {
+			return host.get()->totalSentPackets;
+		}
+
+		unsigned client::total_packets_received() const {
+			return host.get()->totalReceivedPackets;
+		}
+
+		std::string client::format_transmission_details() const {
+			return typesafe_sprintf("RTT:\nSent : %x (%x)\nReceived : %x (%x)\nLast sent: %x\nLast received: %x",
+				total_packets_sent(), readable_bytesize(total_bytes_sent()), total_packets_received(), readable_bytesize(total_bytes_received()),
+				readable_bytesize(sent_size.get_average_units()),
+				readable_bytesize(recv_size.get_average_units())
+			);
 		}
 
 		std::vector<message> client::collect_entropy() {
@@ -89,6 +117,7 @@ namespace augs {
 					break;
 				case ENET_EVENT_TYPE_RECEIVE:
 					new_event.payload.reserve(event.packet->dataLength);
+					recv_size.measure(event.packet->dataLength);
 					augs::write_bytes(new_event.payload, event.packet->data, event.packet->dataLength);
 					new_event.message_type = message::type::RECEIVE;
 					new_event.address = event.peer->address;

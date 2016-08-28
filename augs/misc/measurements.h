@@ -25,10 +25,10 @@ namespace augs {
 
 		bool operator<(const measurements& b) const;
 
-		double get_average_seconds() const;
-		double get_maximum_seconds() const;
-		double get_minimum_seconds() const;
-		double get_last_measurement_seconds() const;
+		double get_average_units() const;
+		double get_maximum_units() const;
+		double get_minimum_units() const;
+		double get_last_measurement_units() const;
 
 		bool was_measured() const;
 

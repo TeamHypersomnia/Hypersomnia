@@ -41,14 +41,14 @@ namespace augs {
 		double scale = 1000;
 		bool detailed = false;
 
-		auto avg_secs = get_average_seconds();
+		auto avg_secs = get_average_units();
 
 		if(detailed)
 		return typesafe_sprintf(L"%x: %f (%F) (avg: %f min: %f max: %f)\n", title, 
-			get_last_measurement_seconds()*scale,
+			get_last_measurement_units()*scale,
 			avg_secs * scale,
-			get_minimum_seconds() * scale,
-			get_maximum_seconds() * scale);
+			get_minimum_units() * scale,
+			get_maximum_units() * scale);
 		else {
 			scale = 1000;
 			if (measurements_are_time) {
@@ -67,22 +67,22 @@ namespace augs {
 	}
 
 	bool measurements::operator<(const measurements& b) const {
-		return get_average_seconds() < b.get_average_seconds();
+		return get_average_units() < b.get_average_units();
 	}
 
-	double measurements::get_average_seconds() const {
+	double measurements::get_average_units() const {
 		return last_average;
 	}
 
-	double measurements::get_maximum_seconds() const {
+	double measurements::get_maximum_units() const {
 		return last_maximum;
 	}
 
-	double measurements::get_minimum_seconds() const {
+	double measurements::get_minimum_units() const {
 		return last_minimum;
 	}
 
-	double measurements::get_last_measurement_seconds() const {
+	double measurements::get_last_measurement_units() const {
 		return last_measurement;
 	}
 

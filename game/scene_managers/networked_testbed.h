@@ -8,6 +8,8 @@
 #include "augs/misc/constant_size_vector.h"
 #include "game/container_sizes.h"
 
+#include "augs/network/network_client.h"
+
 namespace augs {
 	struct machine_entropy;
 }
@@ -67,6 +69,6 @@ namespace scene_managers {
 		void control(const augs::machine_entropy::local_type&, cosmos&);
 
 		void configure_view(viewing_session&) const;
-		void view(const cosmos&, game_window&, viewing_session&, const augs::variable_delta& dt) const;
+		void view(const cosmos&, game_window&, viewing_session&, const augs::network::client& details, const augs::variable_delta& dt) const;
 	};
 }
