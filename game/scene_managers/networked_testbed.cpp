@@ -302,13 +302,15 @@ namespace scene_managers {
 	cosmic_entropy networked_testbed_client::make_cosmic_entropy(const augs::machine_entropy::local_type& local, const input_context& context, cosmos& cosm) {
 		cosmic_entropy result;
 
-		auto& intents = result.entropy_per_entity[get_controlled_entity()];
-		
-		for (const auto& raw : local) {
-			entity_intent mapped;
-		
-			if (make_entity_intent(context, raw, mapped))
-				intents.push_back(mapped);
+		if (local.size() > 0) {
+			auto& intents = result.entropy_per_entity[get_controlled_entity()];
+			
+			for (const auto& raw : local) {
+				entity_intent mapped;
+			
+				if (make_entity_intent(context, raw, mapped))
+					intents.push_back(mapped);
+			}
 		}
 
 		return result;
