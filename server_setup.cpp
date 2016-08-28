@@ -68,6 +68,8 @@ void server_setup::process(game_window& window) {
 
 	std::vector<endpoint> endpoints;
 
+	bool resubstantiate = false;
+
 	while (!window.should_quit) {
 		augs::machine_entropy new_entropy;
 
@@ -100,6 +102,9 @@ void server_setup::process(game_window& window) {
 					augs::write_object(stream, network_command::COMPLETE_STATE);
 					
 					cosmic_delta::encode(initial_hypersomnia, hypersomnia, stream);
+
+					hypersomnia.complete_resubstantiation();
+					resubstantiate = true;
 
 					auto new_char = scene.assign_new_character(net_event.address);
 					augs::write_object(stream, hypersomnia[new_char].get_guid());
@@ -154,6 +159,8 @@ void server_setup::process(game_window& window) {
 			
 			for (auto& e : endpoints) {
 				simulation_exchange::packaged_step next_command;
+				next_command.shall_resubstantiate = resubstantiate;
+				resubstantiate = false;
 
 				if (e.commands.empty()) {
 					next_command.step_type = simulation_exchange::packaged_step::type::NEW_ENTROPY;

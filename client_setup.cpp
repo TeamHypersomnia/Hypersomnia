@@ -61,7 +61,7 @@ void client_setup::process(game_window& window) {
 	bool last_stepped_was_extrapolated = false;
 	bool complete_state_received = false;
 
-	receiver.jitter_buffer.set_lower_limit(4);
+	receiver.jitter_buffer.set_lower_limit(static_cast<unsigned>(static_cast<float>(window.get_config_number("jitter_buffer_ms")) / hypersomnia.get_fixed_delta().in_milliseconds()));
 
 	if (client.connect(window.get_config_string("connect_address"), static_cast<unsigned short>(window.get_config_number("connect_port")), 15000)) {
 		LOG("Connected successfully");
