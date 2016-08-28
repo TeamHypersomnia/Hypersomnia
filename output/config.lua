@@ -8,7 +8,7 @@ launch_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.LOCAL,
+	launch_mode = launch_modes.CLIENT_AND_SERVER,
 
 	window_name = "example",
 	fullscreen = 0,

@@ -177,7 +177,7 @@ void client_setup::process(game_window& window) {
 
 			if(!still_downloading)
 				scene.view(last_stepped_was_extrapolated ? extrapolated_hypersomnia : hypersomnia,
-					window, session, session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), input_unpacker.timer));
+					window, session, client, session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), input_unpacker.timer));
 		}
 	}
 	else {
