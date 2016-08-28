@@ -76,7 +76,7 @@ void local_setup::process(game_window& window) {
 					if (raw_input.key == augs::window::event::keys::_6) {
 						input_unpacker.timer.set_stepping_speed_multiplier(6.f);
 					}
-					if (raw_input.key == augs::window::event::keys::F4) {
+					if (raw_input.key == augs::window::event::keys::F2) {
 						LOG_COLOR(console_color::YELLOW, "Separator");
 					}
 				}
