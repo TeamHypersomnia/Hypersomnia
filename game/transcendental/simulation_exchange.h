@@ -21,6 +21,7 @@ public:
 			NEW_ENTROPY_WITH_HEARTBEAT
 		} step_type = type::INVALID;
 
+		bool shall_resubstantiate = false;
 		augs::stream delta;
 		guid_mapped_entropy entropy;
 	};

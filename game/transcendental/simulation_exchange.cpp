@@ -15,6 +15,8 @@
 void simulation_exchange::write_entropy(augs::stream& output, const packaged_step& written) {
 	ensure(written.entropy.entropy_per_entity.size() < std::numeric_limits<unsigned char>::max());
 
+	augs::write_object(output, written.shall_resubstantiate);
+
 	unsigned char num_entropied_entities = written.entropy.entropy_per_entity.size();
 	augs::write_object(output, num_entropied_entities);
 
@@ -27,6 +29,8 @@ void simulation_exchange::write_entropy(augs::stream& output, const packaged_ste
 simulation_exchange::packaged_step simulation_exchange::read_entropy(augs::stream& in) {
 	packaged_step new_command;
 	auto& new_entropy = new_command.entropy;
+	
+	augs::read_object(in, new_command.shall_resubstantiate);
 
 	unsigned char num_entropied_entities = 0;
 	augs::read_object(in, num_entropied_entities);
