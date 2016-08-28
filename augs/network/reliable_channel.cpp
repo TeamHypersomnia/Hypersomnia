@@ -39,7 +39,14 @@ namespace augs {
 				output;//name_property("first_message");
 				augs::write_object(output, first_message);
 				output;//name_property("last_message");
-				augs::write_object(output, last_message);
+				
+				if (last_message - first_message > std::numeric_limits<unsigned char>::max()) {
+					ensure(false);
+					return false;
+				}
+
+				unsigned char msg_count = last_message - first_message;
+				augs::write_object(output, msg_count);
 
 				sequence_to_reliable_range[sequence] = last_message;
 			}
@@ -83,7 +90,8 @@ namespace augs {
 			std::stringstream report;
 
 			unsigned short update_from_sequence = 0u;
-			unsigned received_first_message = 0u, received_last_message = 0u;
+			unsigned received_first_message = 0u;
+			unsigned char received_message_count = 0u;
 
 			bool has_reliable = false;
 			bool request_ack_for_unreliable = false;
@@ -103,7 +111,7 @@ namespace augs {
 				input;//name_property("first_message");
 				if (!augs::read_object(input, received_first_message)) return res;
 				input;//name_property("last_message");
-				if (!augs::read_object(input, received_last_message)) return res;
+				if (!augs::read_object(input, received_message_count)) return res;
 
 				if (!sequence_more_recent(received_sequence, last_sequence))
 					return res;
@@ -114,7 +122,7 @@ namespace augs {
 				res.messages_to_skip = last_message - received_first_message;
 				res.result_type = result_data::MESSAGES_RECEIVED;
 
-				last_message = received_last_message;
+				last_message = received_first_message + received_message_count;
 			}
 
 			return res;
