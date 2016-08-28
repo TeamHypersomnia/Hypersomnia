@@ -1,5 +1,7 @@
 #pragma once
 #include <array>
+#include "augs/window_framework/colored_print.h"
+
 namespace augs {
 	typedef unsigned char rgba_channel;
 
@@ -25,8 +27,10 @@ namespace augs {
 			);
 		}
 
+		explicit rgba(console_color);
 		rgba(rgba_channel red = 255, rgba_channel green = 255, rgba_channel blue = 255, rgba_channel alpha = 255);
 		void set(rgba_channel red = 255, rgba_channel green = 255, rgba_channel blue = 255, rgba_channel alpha = 255);
+		void set(const rgba&);
 
 		rgba operator*(float) const;
 		rgba operator+(rgba b) const;

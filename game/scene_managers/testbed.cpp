@@ -150,8 +150,9 @@ namespace scene_managers {
 			prefabs::create_sample_magazine(step, vec2(100, -650), "0.4",
 				prefabs::create_green_charge(world, vec2(0, 0), 40)));
 
-		const auto submachine = prefabs::create_submachine(step, vec2(500, -500 + 50),
-			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
+		const auto submachine = prefabs::create_submachine(step, vec2(500, -500 + 50)
+		
+		);
 
 		prefabs::create_submachine(step, vec2(0, -1000),
 			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
@@ -181,9 +182,9 @@ namespace scene_managers {
 		const auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
 		prefabs::create_sample_backpack(world, vec2(200, -750));
 
-		perform_transfer({ backpack, new_characters[0][slot_function::SHOULDER_SLOT] }, step);
+		//perform_transfer({ backpack, new_characters[0][slot_function::SHOULDER_SLOT] }, step);
 		perform_transfer({ submachine, new_characters[0][slot_function::PRIMARY_HAND] }, step);
-		perform_transfer({ rifle, new_characters[0][slot_function::SECONDARY_HAND] }, step);
+		//perform_transfer({ rifle, new_characters[0][slot_function::SECONDARY_HAND] }, step);
 
 		if (num_characters > 1) {
 			name_entity(new_characters[1], entity_name::PERSON, L"Enemy");
@@ -367,9 +368,12 @@ namespace scene_managers {
 
 		auto& target = renderer::get_current();
 
+		auto screen_size = session.camera.visible_world_area;
+		vec2i screen_size_i(static_cast<int>(screen_size.x), static_cast<int>(screen_size.y));
+
 		target.clear_current_fbo();
 
-		target.set_viewport({ 0, 0, static_cast<int>(session.camera.visible_world_area.x), static_cast<int>(session.camera.visible_world_area.y) });
+		target.set_viewport({ 0, 0, screen_size_i.x, screen_size_i.y });
 
 		basic_viewing_step main_cosmos_viewing_step(cosmos, dt, target);
 		view_cosmos(cosmos, main_cosmos_viewing_step, session.camera);
@@ -385,6 +389,8 @@ namespace scene_managers {
 
 		quick_print_format(target.triangles, typesafe_sprintf(L"Entities: %x\nX: %f2\nY: %f2\nVelX: %x\nVelY: %x\n", cosmos.entities_count(), coords.x, coords.y, vel.x, vel.y)
 			+ session.summary() + cosmos.profiler.sorted_summary(show_profile_details), style(assets::font_id::GUI_FONT, rgba(255, 255, 255, 150)), vec2i(0, 0), 0);
+
+		quick_print(target.triangles, multiply_alpha(global_log::format_recent_as_text(assets::font_id::GUI_FONT), 150.f/255), vec2i(screen_size_i.x - 300, 0), 300);
 
 		target.call_triangles();
 		target.clear_triangles();

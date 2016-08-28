@@ -8,6 +8,7 @@
 #ifdef PLATFORM_WINDOWS
 WORD GetColorAttribute(int color) {
 	switch (color) {
+	case 0:    return FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
 	case 1:    return FOREGROUND_RED;
 	case 2:  return FOREGROUND_GREEN;
 	case 3: return FOREGROUND_RED | FOREGROUND_GREEN;

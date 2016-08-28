@@ -1,5 +1,6 @@
 #include "pixel.h"
 #include <limits>
+#include "augs/ensure.h"
 
 namespace augs {
 	namespace {
@@ -111,6 +112,16 @@ namespace augs {
 		return out;
 	}
 
+	rgba::rgba(console_color c) {
+		switch (c) {
+		case console_color::WHITE: set(white); break;
+		case console_color::RED: set(red); break;
+		case console_color::YELLOW: set(yellow); break;
+		case console_color::GREEN: set(green); break;
+		default: ensure(false); break;
+		}
+	}
+
 	rgba::rgba(rgba_channel red, rgba_channel green, rgba_channel blue, rgba_channel alpha) : r(red), g(green), b(blue), a(alpha) {}
 
 	hsv::hsv(double h, double s, double v) : h(h), s(s), v(v) {}
@@ -125,6 +136,10 @@ namespace augs {
 
 	void rgba::set(rgba_channel red, rgba_channel green, rgba_channel blue, rgba_channel alpha) {
 		*this = rgba(red, green, blue, alpha);
+	}
+
+	void rgba::set(const rgba& col) {
+		*this = col;
 	}
 
 	rgba rgba::operator*(rgba s) const {

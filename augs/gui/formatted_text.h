@@ -24,6 +24,8 @@ namespace augs {
 			};
 
 			typedef std::basic_string<formatted_char> fstr;
+			
+			fstr multiply_alpha(fstr, float);
 
 			std::wstring formatted_string_to_wstring(const fstr& f);
 			fstr simple_bbcode(std::wstring, style);

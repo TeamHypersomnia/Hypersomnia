@@ -15,6 +15,13 @@ namespace augs {
 				return ww;
 			}
 
+			fstr multiply_alpha(fstr f, float m) {
+				for (auto& c : f)
+					c.a *= m;
+				
+				return std::move(f);
+			}
+
 			void format(const wchar_t* _str, style s, fstr& out) {
 				out.clear();
 				formatted_char ch;

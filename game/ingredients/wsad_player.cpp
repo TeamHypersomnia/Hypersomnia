@@ -247,7 +247,7 @@ namespace prefabs {
 
 		character.add_standard_components();
 
-		LOG("Character mass: %x", character.get<components::physics>().get_mass());
+		// LOG("Character mass: %x", character.get<components::physics>().get_mass());
 		return character;
 	}
 
