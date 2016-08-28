@@ -353,7 +353,7 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
 	auto& performance = profiler;
-	const physics_system::contact_listener listener(step.cosm);
+	physics_system::contact_listener listener(step.cosm);
 
 	cosmic_delta::decode(cosmos, step.entropy.delta_to_apply);
 
@@ -397,7 +397,9 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 
 	rotation_copying_system().update_physical_motors(step.cosm);
 	performance.start(meter_type::PHYSICS);
+	listener.during_step = true;
 	temporary_systems.get<physics_system>().step_and_set_new_transforms(step);
+	listener.during_step = false;
 	performance.stop(meter_type::PHYSICS);
 	position_copying_system().update_transforms(step);
 

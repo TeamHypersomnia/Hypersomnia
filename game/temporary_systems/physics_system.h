@@ -146,6 +146,8 @@ private:
 		void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override;
 		void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) override;
 
+		bool during_step = false;
+
 		cosmos& cosm;
 		physics_system& get_sys() const;
 

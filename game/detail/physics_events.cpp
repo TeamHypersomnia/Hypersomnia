@@ -152,7 +152,7 @@ void physics_system::contact_listener::EndContact(b2Contact* contact) {
 
 		auto& collider_physics = collider_fixtures.get_owner_body().get<components::special_physics>();
 
-		if (subject_fixtures.is_friction_ground()) {
+		if (subject_fixtures.is_friction_ground() && during_step) {
 #if FRICTION_FIELDS_COLLIDE
 			if (!collider_fixtures.is_friction_ground)
 #endif
