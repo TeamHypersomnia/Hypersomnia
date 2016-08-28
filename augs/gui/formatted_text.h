@@ -28,6 +28,7 @@ namespace augs {
 			fstr multiply_alpha(fstr, float);
 
 			std::wstring formatted_string_to_wstring(const fstr& f);
+			fstr simple_bbcode(std::string, style);
 			fstr simple_bbcode(std::wstring, style);
 			fstr format(const std::wstring&, style);
 			void format(const std::wstring&, style, fstr&);

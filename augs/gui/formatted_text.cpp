@@ -2,6 +2,8 @@
 #include <algorithm>
 #include <cstring>
 
+#include "augs/templates.h"
+
 namespace augs {
 	namespace gui {
 		namespace text {
@@ -74,6 +76,10 @@ namespace augs {
 				return out;
 			}
 
+			fstr simple_bbcode(std::string str, style s) {
+				return simple_bbcode(to_wstring(str), s);
+			}
+
 			fstr simple_bbcode(std::wstring _str, style s) {
 				fstr out;
 
@@ -108,6 +114,9 @@ namespace augs {
 					}
 					if (argument == L"vscyan") {
 						newstyle.color = vscyan;
+					}
+					if (argument == L"cyan") {
+						newstyle.color = cyan;
 					}
 					if (argument == L"vsgreen") {
 						newstyle.color = vsgreen;
