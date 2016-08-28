@@ -7,15 +7,27 @@ namespace augs {
 		size_t lower_limit = 3;
 		unsigned steps_extrapolated = 0;
 
-		bool locked = false;
+		bool initial_filling = true;
 		std::vector<command> buffer;
 	public:
 		void acquire_new_command(const command& c) {
 			buffer.push_back(c);
+
+			if (initial_filling) {
+				if (buffer.size() >= lower_limit) {
+					initial_filling = false;
+				}
+			}
 		}
 
 		void acquire_new_command(command&& c) {
 			buffer.emplace_back(c);
+
+			if (initial_filling) {
+				if (buffer.size() >= lower_limit) {
+					initial_filling = false;
+				}
+			}
 		}
 		
 		template <class Iter>
@@ -26,27 +38,35 @@ namespace augs {
 		std::vector<command> unpack_commands_once() {
 			std::vector<command> next_commands;
 
-			if (buffer.size() >= lower_limit + steps_extrapolated)
-				locked = false;
+			if (!initial_filling) {
+				const auto steps_to_unpack = steps_extrapolated + 1;
 
-			if (!locked) {
-				if (buffer.empty()) {
-					locked = true;
+				if (buffer.size() >= steps_to_unpack) {
+					next_commands.assign(buffer.begin(), buffer.begin() + steps_to_unpack);
+					buffer		  .erase(buffer.begin(), buffer.begin() + steps_to_unpack);
 				}
-				else {
-					next_commands.assign(buffer.begin(), buffer.begin() + steps_extrapolated + 1);
-					buffer.        erase(buffer.begin(), buffer.begin() + steps_extrapolated + 1);
-				}
+
+				const bool unpacked_successfully = next_commands.size() > 0;
+
+				if (unpacked_successfully)
+					steps_extrapolated = 0;
+				else
+					++steps_extrapolated;
 			}
 
-			bool unpacked_successfully = next_commands.size() > 0;
-
-			if (unpacked_successfully)
-				steps_extrapolated = 0;
-			else
-				++steps_extrapolated;
-
 			return std::move(next_commands);
+		}
+
+		void allow_to_refill() {
+			initial_filling = true;
+		}
+
+		bool is_still_refilling() const {
+			return initial_filling;
+		}
+
+		size_t get_available_command_count() const {
+			return buffer.size();
 		}
 
 		size_t get_lower_limit() const {

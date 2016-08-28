@@ -99,13 +99,14 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 
 					if (found_in(grounds, new_owner)) {
 						auto found = find_in(grounds, new_owner);
-						LOG("Incr: %x", new_owner);
+						// LOG("Incr: %x", new_owner);
 
 						connection.fixtures_connected = (*found).fixtures_connected + 1;
 						grounds.erase(found);
 					}
-					else
-						LOG("Reg: %x", new_owner);
+					else {
+						// LOG("Reg: %x", new_owner);
+					}
 					
 					grounds.push_back(connection);
 
@@ -165,12 +166,13 @@ void physics_system::contact_listener::EndContact(b2Contact* contact) {
 						--fixtures_connected;
 
 						if (fixtures_connected == 0) {
-							LOG("Unreg: %x", subject_fixtures.get_owner_body().get_id());
+							// LOG("Unreg: %x", subject_fixtures.get_owner_body().get_id());
 							collider_physics.owner_friction_grounds.erase(it);
 							sys.rechoose_owner_friction_body(collider_fixtures.get_owner_body());
 						}
-						else
-							LOG("Decr: %x", subject_fixtures.get_owner_body().get_id());
+						else {
+							// LOG("Decr: %x", subject_fixtures.get_owner_body().get_id());
+						}
 
 						break;
 					}
