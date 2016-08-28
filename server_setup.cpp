@@ -39,6 +39,8 @@ void server_setup::process(game_window& window) {
 
 	auto config_tickrate = static_cast<unsigned>(window.get_config_number("tickrate"));
 
+	bool detailed_step_log = config_tickrate <= 2;
+
 	if (!hypersomnia.load_from_file("server_save.state")) {
 		hypersomnia.set_fixed_delta(augs::fixed_delta(config_tickrate));
 		scene.populate_world_with_entities(hypersomnia);
@@ -83,11 +85,13 @@ void server_setup::process(game_window& window) {
 		auto steps = input_unpacker.unpack_steps(hypersomnia.get_fixed_delta());
 
 		for (auto& s : steps) {
-			LOG("Server step");
+			if (detailed_step_log) LOG("Server step");
 			for (auto& net_event : s.total_entropy.remote) {
-				LOG("Server netevent");
+				if(detailed_step_log) LOG("Server netevent");
 
 				if (net_event.message_type == augs::network::message::type::CONNECT) {
+					LOG("Client connected.");
+					
 					endpoints.push_back({ net_event.address });
 
 					auto& stream = initial_hypersomnia.reserved_memory_for_serialization;
@@ -104,6 +108,7 @@ void server_setup::process(game_window& window) {
 				}
 				
 				if (net_event.message_type == augs::network::message::type::DISCONNECT) {
+					LOG("Client disconnected.");
 					scene.free_character(net_event.address);
 
 					remove_element(endpoints, net_event.address);
@@ -123,7 +128,7 @@ void server_setup::process(game_window& window) {
 
 						auto command = static_cast<network_command>(stream.peek<unsigned char>());
 
-						if (!should_skip)
+						if (detailed_step_log && !should_skip)
 							LOG("Server received command: %x", int(command));
 
 						switch (command) {

@@ -16,7 +16,7 @@ config_table = {
 	window_x = 0,
 	window_y = 0,
 	bpp = 24,
-	resolution_w = 1280,
+	resolution_w = 720,
 	resolution_h = 720,
 	doublebuffer = 1,
 	
@@ -29,7 +29,7 @@ config_table = {
 	
 	nickname = "Daedalus",
 	
-	tickrate = 2,
+	tickrate = 60,
 	
 	simulate_lag = 0,
 	packet_loss = 0.00,

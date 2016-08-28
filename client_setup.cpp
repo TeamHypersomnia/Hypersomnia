@@ -37,6 +37,8 @@ void client_setup::process(game_window& window) {
 	scene_managers::networked_testbed_client scene;
 	
 	auto config_tickrate = static_cast<unsigned>(window.get_config_number("tickrate"));
+	
+	bool detailed_step_log = config_tickrate <= 2;
 
 	if (!hypersomnia.load_from_file("save.state")) {
 		hypersomnia.set_fixed_delta(augs::fixed_delta(config_tickrate));
@@ -59,6 +61,8 @@ void client_setup::process(game_window& window) {
 	bool last_stepped_was_extrapolated = false;
 	bool complete_state_received = false;
 
+	receiver.jitter_buffer.set_lower_limit(4);
+
 	if (client.connect(window.get_config_string("connect_address"), static_cast<unsigned short>(window.get_config_number("connect_port")), 15000)) {
 		LOG("Connected successfully");
 		
@@ -73,6 +77,8 @@ void client_setup::process(game_window& window) {
 					window.should_quit = true;
 				}
 			}
+
+			const bool still_downloading = !complete_state_received || receiver.jitter_buffer.is_still_refilling();
 
 			input_unpacker.control(new_entropy);
 
@@ -93,7 +99,7 @@ void client_setup::process(game_window& window) {
 							if (should_skip)
 								--to_skip;
 
-							if(!should_skip)
+							if(detailed_step_log && !should_skip)
 								LOG("Client received command: %x", int(stream.peek<unsigned char>()));
 
 							switch (command) {
@@ -131,7 +137,7 @@ void client_setup::process(game_window& window) {
 					}
 				}
 
-				if (!complete_state_received)
+				if (still_downloading)
 					continue;
 
 				const auto local_cosmic_entropy_for_this_step = scene.make_cosmic_entropy(s.total_entropy.local, session.input, hypersomnia);
@@ -147,8 +153,6 @@ void client_setup::process(game_window& window) {
 				client.send_pending_redundant();
 
 				auto deterministic_steps = receiver.unpack_deterministic_steps(hypersomnia, extrapolated_hypersomnia, hypersomnia_last_snapshot);
-
-				scene.step_with_callbacks(local_cosmic_entropy_for_this_step, hypersomnia);
 
 				if (deterministic_steps.use_extrapolated_cosmos) {
 					scene.step_with_callbacks(cosmic_entropy(), extrapolated_hypersomnia);
@@ -166,10 +170,14 @@ void client_setup::process(game_window& window) {
 						renderer::get_current().clear_logic_lines();
 					}
 				}
+
+				if (detailed_step_log || last_stepped_was_extrapolated)
+					LOG("stepped extrapolated: %x", last_stepped_was_extrapolated);
 			}
 
-			scene.view(last_stepped_was_extrapolated ? extrapolated_hypersomnia : hypersomnia,
-				window, session, session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), input_unpacker.timer));
+			if(!still_downloading)
+				scene.view(last_stepped_was_extrapolated ? extrapolated_hypersomnia : hypersomnia,
+					window, session, session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), input_unpacker.timer));
 		}
 	}
 	else {
