@@ -37,6 +37,9 @@ int main(int argc, char** argv) {
 			setup.process(window);
 		});
 
+		using namespace std::chrono_literals;
+
+		std::this_thread::sleep_for(1000ms);
 		client_setup setup;
 		setup.process(window);
 
