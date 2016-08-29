@@ -51,11 +51,13 @@ void server_setup::process(game_window& window) {
 	simulation_broadcast server_sim;
 
 	augs::network::server serv;
-	
-	if (!serv.listen(static_cast<unsigned short>(window.get_config_number("server_port")), 32)) {
-		LOG("Failed to setup a listen server.");
-	}
+
+	const bool is_replaying = input_unpacker.player.is_replaying();
+
+	if (is_replaying || serv.listen(static_cast<unsigned short>(window.get_config_number("server_port")), 32))
 		LOG("Listen server setup successful.");
+	else 
+		LOG("Failed to setup a listen server.");
 
 	struct endpoint {
 		augs::network::endpoint_address addr;

@@ -74,9 +74,7 @@ void client_setup::process(game_window& window) {
 			augs::machine_entropy new_entropy;
 
 			new_entropy.local = window.collect_entropy();
-
-			if(!is_replaying)
-				new_entropy.remote = client.collect_entropy();
+			new_entropy.remote = client.collect_entropy();
 
 			for (auto& n : new_entropy.local) {
 				if (n.key == augs::window::event::keys::ESC && n.key_event == augs::window::event::key_changed::PRESSED) {
