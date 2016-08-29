@@ -111,6 +111,9 @@ namespace augs {
 
 		std::vector<message> client::collect_entropy() {
 			std::vector<message> total;
+			
+			if (host.get() == nullptr)
+				return total;
 
 			ENetEvent event;
 

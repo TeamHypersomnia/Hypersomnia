@@ -52,7 +52,10 @@ namespace augs {
 
 		std::vector<message> server::collect_entropy() {
 			std::vector<message> total;
-			
+
+			if (host.get() == nullptr)
+				return total;
+
 			ENetEvent event;
 
 			while (enet_host_service(host.get(), &event, 0) > 0) {
