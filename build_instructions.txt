@@ -1,6 +1,6 @@
 1. Download repositories: Augmentations and Hypersomnia and unpack them to some separate folders.
 Links:
-https://github.com/geneotech/Augmentations
-https://github.com/geneotech/Hypersomnia
+https://github.com/TeamHypersomnia/Augmentations.git
+https://github.com/TeamHypersomnia/Hypersomnia.git
 2. In your OS, set environmental variable AUGMENTATIONS to your Augmentations folder.
 3. Open Hypersomnia.sln in Visual Studio and build everything.
