@@ -27,7 +27,7 @@ void determinism_test_setup::process(game_window& window) {
 	std::vector<cosmos> hypersomnias(cosmoi_count, cosmos(3000));
 
 	step_and_entropy_unpacker input_unpacker;
-	scene_managers::testbed testbed;
+	std::vector<scene_managers::testbed> testbeds(cosmoi_count);
 
 	auto config_tickrate = static_cast<unsigned>(window.get_config_number("tickrate"));
 
@@ -37,9 +37,9 @@ void determinism_test_setup::process(game_window& window) {
 		}
 	}
 	else {
-		for (auto& h : hypersomnias) {
-			h.set_fixed_delta(augs::fixed_delta(config_tickrate));
-			testbed.populate_world_with_entities(h);
+		for (size_t i = 0; i < cosmoi_count; ++i) {
+			hypersomnias[i].set_fixed_delta(augs::fixed_delta(config_tickrate));
+			testbeds[i].populate_world_with_entities(hypersomnias[i]);
 		}
 	}
 
@@ -52,7 +52,9 @@ void determinism_test_setup::process(game_window& window) {
 	viewing_session session;
 	session.camera.configure_size(screen_size);
 
-	testbed.configure_view(session);
+	for (size_t i = 0; i < cosmoi_count; ++i) {
+		testbeds[i].configure_view(session);
+	}
 
 	unsigned currently_viewn_cosmos = 0;
 	bool divergence_detected = false;
@@ -68,7 +70,7 @@ void determinism_test_setup::process(game_window& window) {
 				if (n.key == augs::window::event::keys::ESC) {
 					window.should_quit = true;
 				}
-				if (n.key == augs::window::event::keys::CAPSLOCK) {
+				if (n.key == augs::window::event::keys::F3) {
 					++currently_viewn_cosmos;
 					currently_viewn_cosmos %= cosmoi_count;
 				}
@@ -83,10 +85,13 @@ void determinism_test_setup::process(game_window& window) {
 			if (divergence_detected)
 				break;
 
-			for (auto& h : hypersomnias) {
-				auto cosmic_entropy_for_this_step = testbed.make_cosmic_entropy(s.total_entropy.local, session.input, h);
+			for (size_t i = 0; i < cosmoi_count; ++i) {
+				auto& h = hypersomnias[i];
+				testbeds[i].control(s.total_entropy.local, h);
 
-				testbed.step_with_callbacks(cosmic_entropy_for_this_step, h);
+				auto cosmic_entropy_for_this_step = testbeds[i].make_cosmic_entropy(s.total_entropy.local, session.input, h);
+
+				testbeds[i].step_with_callbacks(cosmic_entropy_for_this_step, h);
 
 				renderer::get_current().clear_logic_lines();
 			}
@@ -122,9 +127,9 @@ void determinism_test_setup::process(game_window& window) {
 			logged += typesafe_sprintf("Divergence detected in cosmos: %x (step: %x)\n", which_divergent, hypersomnias[0].get_total_steps_passed());
 		}
 
-		logged += typesafe_sprintf("Currently viewn cosmos: %x (CAPS to switch)\n", currently_viewn_cosmos);
+		logged += typesafe_sprintf("Currently viewn cosmos: %x (F3 to switch)\n", currently_viewn_cosmos);
 
-		testbed.view(hypersomnias[currently_viewn_cosmos], window, session, session.frame_timer.extract_variable_delta(hypersomnias[currently_viewn_cosmos].get_fixed_delta(), input_unpacker.timer),
+		testbeds[currently_viewn_cosmos].view(hypersomnias[currently_viewn_cosmos], window, session, session.frame_timer.extract_variable_delta(hypersomnias[currently_viewn_cosmos].get_fixed_delta(), input_unpacker.timer),
 			logged);
 	}
 }
