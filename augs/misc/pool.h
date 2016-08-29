@@ -65,10 +65,10 @@ namespace augs {
 		}
 
 		template <class Archive>
-		void read_object(Archive& ar) {
-			augs::read_with_capacity(ar, pooled);
-			augs::read_with_capacity(ar, slots);
-			augs::read_with_capacity(ar, indirectors);
+		bool read_object(Archive& ar) {
+			return augs::read_with_capacity(ar, pooled) &&
+			augs::read_with_capacity(ar, slots) &&
+			augs::read_with_capacity(ar, indirectors) &&
 			augs::read_with_capacity(ar, free_indirectors);
 		}
 
@@ -285,8 +285,8 @@ namespace augs {
 		}
 
 		template <class Archive>
-		void read_object(Archive& ar) {
-			augs::read_object(ar, static_cast<basic_pool<T>&>(*this));
+		bool read_object(Archive& ar) {
+			return augs::read_object(ar, static_cast<basic_pool<T>&>(*this));
 		}
 	};
 
@@ -308,8 +308,8 @@ namespace augs {
 		}
 
 		template <class Archive>
-		void read_object(Archive& ar) {
-			augs::read_object(ar, static_cast<basic_pool<T>&>(*this));
+		bool read_object(Archive& ar) {
+			return augs::read_object(ar, static_cast<basic_pool<T>&>(*this)) &&
 			augs::read_with_capacity(ar, metas);
 		}
 

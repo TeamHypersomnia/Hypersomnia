@@ -40,9 +40,9 @@ namespace augs {
 
 
 	template<class A>
-	void read_object(A& ar, network::message& s) {
-		read_object(ar, s.message_type);
-		read_object(ar, s.address);
+	bool read_object(A& ar, network::message& s) {
+		return read_object(ar, s.message_type) &&
+		read_object(ar, s.address) &&
 		read_object(ar, s.payload.buf);
 	}
 

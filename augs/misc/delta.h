@@ -7,6 +7,9 @@ namespace augs {
 	protected:
 		float delta_ms = 0;
 	public:
+		bool operator==(const delta& b) const {
+			return delta_ms == b.delta_ms;
+		}
 
 		float in_milliseconds() const;
 		float in_seconds() const;
@@ -17,6 +20,10 @@ namespace augs {
 		unsigned steps_per_second = 0;
 	public:
 		fixed_delta(unsigned steps_per_second = 60);
+
+		bool operator==(const fixed_delta& b) const {
+			return steps_per_second == b.steps_per_second && delta::operator==(b);
+		}
 
 		template <class Archive>
 		void serialize(Archive& ar) {

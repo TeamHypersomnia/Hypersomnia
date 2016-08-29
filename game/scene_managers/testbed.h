@@ -51,6 +51,6 @@ namespace scene_managers {
 		void pre_solve(fixed_step&);
 		void post_solve(fixed_step&);
 		
-		void view(const cosmos&, game_window&, viewing_session&, const augs::variable_delta& dt) const;
+		void view(const cosmos&, game_window&, viewing_session&, const augs::variable_delta& dt, std::string custom_log = "") const;
 	};
 }

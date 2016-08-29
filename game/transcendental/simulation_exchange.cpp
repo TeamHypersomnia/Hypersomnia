@@ -39,7 +39,7 @@ simulation_exchange::packaged_step simulation_exchange::read_entropy_for_next_st
 	new_command.step_type = packaged_step::type::NEW_ENTROPY;
 
 	augs::read_object(in, new_command.shall_resubstantiate);
-	new_command.entropy = augs::read<guid_mapped_entropy>(in);
+	augs::read_object(in, new_command.entropy);
 
 	return std::move(new_command);
 }
@@ -53,7 +53,7 @@ simulation_exchange::packaged_step simulation_exchange::read_entropy_with_heartb
 	packaged_step new_command;
 	new_command.step_type = packaged_step::type::NEW_ENTROPY_WITH_HEARTBEAT;
 
-	new_command.entropy = augs::read<guid_mapped_entropy>(in);
+	augs::read_object(in, new_command.entropy);
 	augs::read_sized_stream(in, new_command.delta);
 
 	return std::move(new_command);

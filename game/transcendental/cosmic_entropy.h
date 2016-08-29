@@ -63,16 +63,23 @@ struct cosmic_entropy : basic_cosmic_entropy<entity_id> {
 namespace augs {
 	template<class A>
 	auto read_object(A& ar, guid_mapped_entropy& storage) {
-		auto num_entropied_entities = augs::read<unsigned char>(ar);
+		unsigned char num_entropied_entities;
 
+		if(!augs::read_object(ar, num_entropied_entities))
+			return false;
+		
 		while (num_entropied_entities--) {
-			auto guid = augs::read<unsigned>(ar);
+			unsigned guid;
+			
+			if (!augs::read_object(ar, guid))
+				return false;
 
 			auto& new_entity_entropy = storage.entropy_per_entity[guid];
 
 			ensure(new_entity_entropy.empty());
 
-			augs::read_vector_of_objects(ar, new_entity_entropy, unsigned short());
+			if (!augs::read_vector_of_objects(ar, new_entity_entropy, unsigned short()))
+				return false;
 		}
 	}
 

@@ -29,12 +29,14 @@ namespace messages {
 
 namespace augs {
 	template<class A>
-	void read_object(A& ar, entity_intent& intent) {
-		read_object(ar, intent.intent);
-		read_object(ar, intent.pressed_flag);
+	bool read_object(A& ar, entity_intent& intent) {
+		if(!read_object(ar, intent.intent)) return false;
+		if(!read_object(ar, intent.pressed_flag)) return false;
 
 		if (intent.uses_mouse_motion())
-			read_object(ar, intent.mouse_rel);
+			if(!read_object(ar, intent.mouse_rel)) return false;
+
+		return true;
 	}
 
 	template<class A>

@@ -34,9 +34,10 @@ namespace augs {
 	}
 
 	template<class T, class...>
-	void read_bytes(std::ifstream& ar, T* location, size_t count) {
+	bool read_bytes(std::ifstream& ar, T* location, size_t count) {
 		verify_type<T>();
 		ar.read(reinterpret_cast<char*>(location), count * sizeof(T));
+		return !ar.fail();
 	}
 
 	template<class T, class...>
@@ -84,9 +85,11 @@ namespace augs {
 	}
 
 	template<class A, class... Args>
-	void read_sized_stream(A& ar, augs::stream& storage, Args... args) {
-		read_object(ar, storage.buf);
+	auto read_sized_stream(A& ar, augs::stream& storage, Args... args) {
+		auto result = read_object(ar, storage.buf);
 		storage.set_write_pos(storage.buf.size());
+
+		return result;
 	}
 
 	template<class A, size_t count>
@@ -117,12 +120,15 @@ namespace augs {
 	}
 
 	template<class A, class T, class vector_size_type = size_t>
-	void read_object(A& ar, std::vector<T>& storage, vector_size_type = vector_size_type()) {
+	bool read_object(A& ar, std::vector<T>& storage, vector_size_type = vector_size_type()) {
 		vector_size_type s;
-		read_object(ar, s);
+
+		if (!read_object(ar, s))
+			return false;
 
 		storage.resize(s);
-		read_bytes(ar, storage.data(), storage.size()); 
+
+		return read_bytes(ar, storage.data(), storage.size());
 	}
 
 	template<class A, class T, class vector_size_type = size_t>
@@ -134,14 +140,19 @@ namespace augs {
 	}
 
 	template<class A, class T, class vector_size_type = size_t>
-	void read_vector_of_objects(A& ar, std::vector<T>& storage, vector_size_type = vector_size_type()) {
+	bool read_vector_of_objects(A& ar, std::vector<T>& storage, vector_size_type = vector_size_type()) {
 		vector_size_type s;
-		read_object(ar, s);
+
+		if (!read_object(ar, s))
+			return false;
 
 		storage.resize(s);
 		
-		for(auto& obj : storage)
-			read_object(ar, obj);
+		for (auto& obj : storage)
+			if (!read_object(ar, obj))
+				return false;
+
+		return true;
 	}
 
 	template<class A, class T, class vector_size_type = size_t>
@@ -155,17 +166,17 @@ namespace augs {
 	}
 
 	template<class A, class T, class...>
-	void read_with_capacity(A& ar, std::vector<T>& storage) {
+	bool read_with_capacity(A& ar, std::vector<T>& storage) {
 		size_t c;
 		size_t s;
 
-		read_object(ar, c);
-		read_object(ar, s);
+		if(!read_object(ar, c)) return false;
+		if(!read_object(ar, s)) return false;
 
 		storage.reserve(c);
 		storage.resize(s);
 
-		read_bytes(ar, storage.data(), storage.size());
+		return read_bytes(ar, storage.data(), storage.size());
 	}
 
 	template<class A, class T, class...>
@@ -207,10 +218,15 @@ namespace augs {
 	}
 
 	template<class A, class T, class... Args>
-	void read_object(A& ar, std::tuple<T, Args...>& storage) {
-		for_each_in_tuple(storage, [&ar](auto& element) {
-			read_object(ar, element);
+	bool read_object(A& ar, std::tuple<T, Args...>& storage) {
+		bool result = true;
+		
+		for_each_in_tuple(storage, [&ar, &result](auto& element) {
+			if (!result) return;
+			result = result && read_object(ar, element);
 		});
+
+		return result;
 	}
 
 	template<class A, class T, class... Args>
@@ -220,10 +236,11 @@ namespace augs {
 		});
 	}
 
-	template<class T, class A>
-	T read(A& ar) {
-		T obj;
-		read_object(ar, obj);
-		return std::move(obj);
-	}
+	// don't use this - we need to check for the result of reading
+	// template<class T, class A>
+	// T read(A& ar) {
+	// 	T obj;
+	// 	ensure(read_object(ar, obj));
+	// 	return std::move(obj);
+	// }
 }

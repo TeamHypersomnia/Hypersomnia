@@ -19,9 +19,9 @@ namespace augs {
 
 namespace augs {
 	template<class A>
-	void read_object(A& ar, machine_entropy& s) {
-		read_object(ar, s.local);
-		read_vector_of_objects(ar, s.remote);
+	bool read_object(A& ar, machine_entropy& s) {
+		if(!read_object(ar, s.local)) return false;
+		return read_vector_of_objects(ar, s.remote);
 	}
 
 	template<class A>

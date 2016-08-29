@@ -256,7 +256,6 @@ namespace scene_managers {
 		active_context.map_key_to_intent(window::event::keys::BACKSPACE, intent_type::SWITCH_LOOK);
 
 		active_context.map_key_to_intent(window::event::keys::LCTRL, intent_type::START_PICKING_UP_ITEMS);
-		active_context.map_key_to_intent(window::event::keys::CAPSLOCK, intent_type::SWITCH_CHARACTER);
 
 		active_context.map_key_to_intent(window::event::keys::SPACE, intent_type::SPACE_BUTTON);
 		active_context.map_key_to_intent(window::event::keys::MOUSE4, intent_type::SWITCH_TO_GUI);
@@ -300,6 +299,12 @@ namespace scene_managers {
 				if (raw_input.key == augs::window::event::keys::F10) {
 					main_cosmos.significant.meta.settings.enable_interpolation = !main_cosmos.significant.meta.settings.enable_interpolation;
 				}
+				if (raw_input.key == augs::window::event::keys::CAPSLOCK) {
+					++current_character;
+					current_character %= characters.size();
+
+					inject_input_to(main_cosmos[characters[current_character]]);
+				}
 			}
 		}
 	}
@@ -333,14 +338,6 @@ namespace scene_managers {
 	void testbed::post_solve(fixed_step& step) {
 		auto& cosmos = step.cosm;
 
-		for (auto& it : step.messages.get_queue<messages::intent_message>()) {
-			if (it.subject == characters[current_character] && it.intent == intent_type::SWITCH_CHARACTER && it.pressed_flag) {
-				++current_character;
-				current_character %= characters.size();
-
-				inject_input_to(cosmos[characters[current_character]]);
-			}
-		}
 
 		//for (auto& tested : draw_bodies) {
 		//	auto& s = tested.get<components::physics_definition>();
@@ -363,7 +360,7 @@ namespace scene_managers {
 		// LOG("F: %x", ff);
 	}
 
-	void testbed::view(const cosmos& cosmos, game_window& window, viewing_session& session, const augs::variable_delta& dt) const {
+	void testbed::view(const cosmos& cosmos, game_window& window, viewing_session& session, const augs::variable_delta& dt, std::string custom_log) const {
 		session.fps_profiler.new_measurement();
 
 		auto& target = renderer::get_current();
@@ -387,7 +384,7 @@ namespace scene_managers {
 		const auto coords = controlled.get<components::transform>().pos;
 		const auto vel = controlled.get<components::physics>().velocity();
 
-		quick_print_format(target.triangles, typesafe_sprintf(L"Entities: %x\nX: %f2\nY: %f2\nVelX: %x\nVelY: %x\n", cosmos.entities_count(), coords.x, coords.y, vel.x, vel.y)
+		quick_print_format(target.triangles, to_wstring(custom_log) + typesafe_sprintf(L"Entities: %x\nX: %f2\nY: %f2\nVelX: %x\nVelY: %x\n", cosmos.entities_count(), coords.x, coords.y, vel.x, vel.y)
 			+ session.summary() + cosmos.profiler.sorted_summary(show_profile_details), style(assets::font_id::GUI_FONT, rgba(255, 255, 255, 150)), vec2i(0, 0), 0);
 
 		quick_print(target.triangles, multiply_alpha(global_log::format_recent_as_text(assets::font_id::GUI_FONT), 150.f/255), vec2i(screen_size_i.x - 300, 0), 300);

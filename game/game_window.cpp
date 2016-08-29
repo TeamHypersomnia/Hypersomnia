@@ -48,9 +48,10 @@ double game_window::get_config_number(std::string field) {
 game_window::launch_mode game_window::get_launch_mode() {
 	switch (static_cast<int>(get_config_number("launch_mode"))) {
 	case 0: return launch_mode::LOCAL; break;
-	case 1: return launch_mode::ONLY_CLIENT; break;
-	case 2: return launch_mode::ONLY_SERVER; break;
-	case 3: return launch_mode::CLIENT_AND_SERVER; break;
+	case 1: return launch_mode::LOCAL_DETERMINISM_TEST; break;
+	case 2: return launch_mode::ONLY_CLIENT; break;
+	case 3: return launch_mode::ONLY_SERVER; break;
+	case 4: return launch_mode::CLIENT_AND_SERVER; break;
 	default: return launch_mode::INVALID; break;
 	}
 }
