@@ -39,7 +39,7 @@ config_table = {
 	min_latency = 50,
 	jitter = 0,
 
-	determinism_test_cloned_cosmoi_count = 10
+	determinism_test_cloned_cosmoi_count = 2
 }
 
 set_cursor_visible(0)
