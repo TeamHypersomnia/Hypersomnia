@@ -69,21 +69,24 @@ namespace scene_managers {
 
 		const auto bg_size = assets::get_size(assets::texture_id::TEST_BACKGROUND);
 
-		//for (int x = -4 * 10; x < 4 * 10; ++x)
-		//	for (int y = -4 * 10; y < 4 * 10; ++y)
-		//	{
-		//		auto background = world.create_entity("bg[-]");
-		//		ingredients::sprite(background, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 550)), assets::texture_id::TEST_BACKGROUND, augs::white, render_layer::GROUND);
-		//		//ingredients::standard_static_body(background);
-		//
-		//		auto street = world.create_entity("street[-]");
-		//		ingredients::sprite_scalled(street, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 700)) - vec2(1500, 700),
-		//			vec2(3000, 3000),
-		//			assets::texture_id::TEST_BACKGROUND, augs::gray1, render_layer::UNDER_GROUND);
-		//
-		//		background.add_standard_components();
-		//		street.add_standard_components();
-		//	}
+		const int num_floors = 10 * 10;
+		const int side = sqrt(num_floors) / 2;
+
+		for (int x = -side; x < side; ++x)
+			for (int y = -side; y < side; ++y)
+			{
+				auto background = world.create_entity("bg[-]");
+				ingredients::sprite(background, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 550)), assets::texture_id::TEST_BACKGROUND, augs::white, render_layer::GROUND);
+				//ingredients::standard_static_body(background);
+
+				auto street = world.create_entity("street[-]");
+				ingredients::sprite_scalled(street, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 700)) - vec2(1500, 700),
+					vec2(3000, 3000),
+					assets::texture_id::TEST_BACKGROUND, augs::gray1, render_layer::UNDER_GROUND);
+
+				background.add_standard_components();
+				street.add_standard_components();
+			}
 
 		const int num_characters = 6;
 
