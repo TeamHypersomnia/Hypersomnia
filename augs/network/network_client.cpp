@@ -49,12 +49,18 @@ namespace augs {
 		}
 
 		bool client::post_redundant(const packet& payload) {
+			if (peer == nullptr || host.get() == nullptr)
+				return false;
+
 			packet stream = payload;
 			redundancy.sender.post_message(stream);
 			return true;
 		}
 
 		bool client::send_pending_redundant() {
+			if (peer == nullptr || host.get() == nullptr)
+				return false;
+
 			augs::stream payload;
 
 			redundancy.build_next_packet(payload);
@@ -68,6 +74,9 @@ namespace augs {
 		}
 
 		bool client::send_reliable(const packet& payload) {
+			if (peer == nullptr || host.get() == nullptr)
+				return false;
+
 			ENetPacket * const packet = enet_packet_create(payload.data(), payload.size(), ENET_PACKET_FLAG_RELIABLE);
 			const auto result = !enet_peer_send(peer, 1, packet);
 			sent_size.measure(payload.size());
@@ -77,19 +86,19 @@ namespace augs {
 		}
 
 		unsigned client::total_bytes_received() const {
-			return host.get()->totalReceivedData;
+			return host.get() == nullptr ? 0 : host.get()->totalReceivedData;
 		}
 
 		unsigned client::total_bytes_sent() const {
-			return host.get()->totalSentData;
+			return host.get() == nullptr ? 0 : host.get()->totalSentData;
 		}
 
 		unsigned client::total_packets_sent() const {
-			return host.get()->totalSentPackets;
+			return host.get() == nullptr ? 0 : host.get()->totalSentPackets;
 		}
 
 		unsigned client::total_packets_received() const {
-			return host.get()->totalReceivedPackets;
+			return host.get() == nullptr ? 0 : host.get()->totalReceivedPackets;
 		}
 
 		std::string client::format_transmission_details() const {

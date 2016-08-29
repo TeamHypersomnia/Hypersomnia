@@ -80,6 +80,16 @@ namespace augs {
 	}
 
 	template<class A, class... Args>
+	void write_stream_with_properties(A& ar, const augs::stream& storage, Args... args) {
+		storage.write_with_properties(ar);
+	}
+
+	template<class A, class... Args>
+	auto read_stream_with_properties(A& ar, augs::stream& storage, Args... args) {
+		return storage.read_with_properties(ar);
+	}
+
+	template<class A, class... Args>
 	void write_sized_stream(A& ar, const augs::stream& storage, Args... args) {
 		write_object(ar, storage.buf);
 	}

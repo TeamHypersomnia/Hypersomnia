@@ -43,14 +43,16 @@ namespace augs {
 	bool read_object(A& ar, network::message& s) {
 		return read_object(ar, s.message_type) &&
 		read_object(ar, s.address) &&
-		read_object(ar, s.payload.buf);
+		read_stream_with_properties(ar, s.payload) &&
+		read_object(ar, s.messages_to_skip);
 	}
 
 	template<class A>
 	void write_object(A& ar, const network::message& s) {
 		write_object(ar, s.message_type);
 		write_object(ar, s.address);
-		write_object(ar, s.payload.buf);
+		write_stream_with_properties(ar, s.payload);
+		write_object(ar, s.messages_to_skip);
 	}
 }
 

@@ -68,6 +68,20 @@ namespace augs {
 
 		std::string format_as_uchars() const;
 
+		template <class Archive>
+		void write_with_properties(Archive& ar) const {
+			augs::write_object(ar, buf);
+			augs::write_object(ar, write_pos);
+			augs::write_object(ar, read_pos);
+		}
+
+		template <class Archive>
+		bool read_with_properties(Archive& ar) {
+			return augs::read_object(ar, buf) &&
+			augs::read_object(ar, write_pos) &&
+			augs::read_object(ar, read_pos);
+		}
+
 		bool read(char* data, size_t bytes);
 		void write(const char* data, size_t bytes);
 		void write(const augs::stream&);
