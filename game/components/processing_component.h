@@ -3,11 +3,14 @@
 #include "game/enums/processing_subjects.h"
 #include "game/transcendental/component_synchronizer.h"
 
+#include "augs/padding_byte.h"
+
 namespace components {
 	struct processing : synchronizable_component {
 		typedef std::bitset<int(processing_subjects::LIST_COUNT)> bitset_type;
 		
-		int activated = true;
+		bool activated = true;
+		padding_byte pad[3];
 
 		bitset_type processing_subject_categories = 0;
 		bitset_type disabled_categories = 0;

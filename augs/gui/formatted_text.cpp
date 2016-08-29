@@ -19,7 +19,7 @@ namespace augs {
 
 			fstr multiply_alpha(fstr f, float m) {
 				for (auto& c : f)
-					c.a *= m;
+					c.a = static_cast<unsigned char>(c.a * m);
 				
 				return std::move(f);
 			}

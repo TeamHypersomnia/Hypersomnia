@@ -76,7 +76,7 @@ namespace augs {
 			}	
 		}while (!quit);
 #else
-		vertices = { vec2(0, 0), vec2(size.w, 0), vec2(size.w, size.h), vec2(0, size.h) };
+		vertices = { vec2i(0, 0), vec2i(size.w, 0), vec2i(size.w, size.h), vec2i(0, size.h) };
 #endif
 		return vertices;	
 	}	

@@ -2,7 +2,7 @@
 
 namespace augs {
 	variable_delta variable_delta_timer::extract_variable_delta(const fixed_delta& dt, const fixed_delta_timer& timer) {
-		auto extracted = frame_timer.extract<std::chrono::milliseconds>() * timer.get_stepping_speed_multiplier();
+		auto extracted = static_cast<float>(frame_timer.extract<std::chrono::milliseconds>()) * timer.get_stepping_speed_multiplier();
 		
 		variable_delta out;
 		out.fixed = dt;

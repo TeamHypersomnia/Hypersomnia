@@ -93,10 +93,10 @@ namespace augs {
 		}
 
 		std::string client::format_transmission_details() const {
-			return typesafe_sprintf("RTT:\nSent : %x (%x)\nReceived : %x (%x)\nLast sent: %x\nLast received: %x",
+			return typesafe_sprintf("RTT:\nSent: %x (%x)\nReceived: %x (%x)\nLast sent: %x\nLast received: %x",
 				total_packets_sent(), readable_bytesize(total_bytes_sent()), total_packets_received(), readable_bytesize(total_bytes_received()),
-				readable_bytesize(sent_size.get_average_units()),
-				readable_bytesize(recv_size.get_average_units())
+				readable_bytesize(static_cast<unsigned>(sent_size.get_average_units())),
+				readable_bytesize(static_cast<unsigned>(recv_size.get_average_units()))
 			);
 		}
 

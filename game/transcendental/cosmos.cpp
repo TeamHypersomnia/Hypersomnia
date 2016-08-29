@@ -233,7 +233,7 @@ unsigned cosmos::get_total_steps_passed() const {
 	return significant.meta.total_steps_passed;
 }
 
-const augs::stepped_timestamp& cosmos::get_timestamp() const {
+augs::stepped_timestamp cosmos::get_timestamp() const {
 	stepped_timestamp result;
 	result.step = significant.meta.total_steps_passed;
 	return result;

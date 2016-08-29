@@ -12,7 +12,7 @@ namespace augs {
 
 	fixed_delta::fixed_delta(const unsigned steps_per_second) {
 		this->steps_per_second = steps_per_second;
-		delta_ms = 1000.0 / steps_per_second;
+		delta_ms = 1000.0f / steps_per_second;
 	}
 
 	unsigned fixed_delta::get_steps_per_second() const {

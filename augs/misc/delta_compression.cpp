@@ -12,11 +12,11 @@ namespace augs {
 			if (previous_value != bit_data[i]) {
 				if (bit_data[i]) {
 					if (!output.size()) {
-						output.push_back(i);
+						output.push_back(static_cast<delta_offset_type>(i));
 						current_vec_pos += i;
 					}
 					else {
-						output.push_back(i - current_vec_pos);
+						output.push_back(static_cast<delta_offset_type>(i - current_vec_pos));
 						current_vec_pos += i - current_vec_pos;
 					}
 				}
@@ -34,7 +34,7 @@ namespace augs {
 		}
 
 		if (bit_data.back())
-			output.push_back(bit_data.size() - current_vec_pos);
+			output.push_back(static_cast<delta_offset_type>(bit_data.size() - current_vec_pos));
 
 		return std::move(output);
 	}

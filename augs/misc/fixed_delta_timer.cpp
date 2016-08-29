@@ -24,15 +24,15 @@ namespace augs {
 		return std::min(steps, max_steps_to_perform);
 	}
 
-	double fixed_delta_timer::fraction_of_step_until_next_step(const fixed_delta& basic_delta) const {
+	float fixed_delta_timer::fraction_of_step_until_next_step(const fixed_delta& basic_delta) const {
 		return accumulator / basic_delta.delta_ms;
 	}
 
-	void fixed_delta_timer::set_stepping_speed_multiplier(const double tm) {
+	void fixed_delta_timer::set_stepping_speed_multiplier(const float tm) {
 		time_multiplier = tm;
 	}
 
-	double fixed_delta_timer::get_stepping_speed_multiplier() const {
+	float fixed_delta_timer::get_stepping_speed_multiplier() const {
 		return time_multiplier;
 	}
 }

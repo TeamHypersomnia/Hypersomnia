@@ -7,7 +7,7 @@ namespace augs {
 		timer ticks;
 
 		double accumulator = 0.0;
-		double time_multiplier = 1.0;
+		float time_multiplier = 1.0;
 
 		unsigned max_steps_to_perform;
 	public:
@@ -24,9 +24,9 @@ namespace augs {
 		fixed_delta_timer(unsigned max_steps_to_perform);
 
 		unsigned count_logic_steps_to_perform(const fixed_delta&);
-		double fraction_of_step_until_next_step(const fixed_delta&) const;
+		float fraction_of_step_until_next_step(const fixed_delta&) const;
 		
-		void set_stepping_speed_multiplier(double);
-		double get_stepping_speed_multiplier() const;
+		void set_stepping_speed_multiplier(float);
+		float get_stepping_speed_multiplier() const;
 	};
 }

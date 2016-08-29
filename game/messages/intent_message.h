@@ -5,10 +5,13 @@
 #include "augs/window_framework/event.h"
 #include "game/enums/intent_type.h"
 
+#include "augs/padding_byte.h"
+
 struct entity_intent {
 	intent_type intent = intent_type::NONE;
-	vec2i mouse_rel;
-	int pressed_flag = 0;
+	vec2t<short> mouse_rel;
+	bool pressed_flag = false;
+	padding_byte pad[3];
 
 	bool uses_mouse_motion() const {
 		return

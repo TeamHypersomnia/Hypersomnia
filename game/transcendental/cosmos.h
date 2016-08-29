@@ -178,7 +178,7 @@ public:
 	float get_total_time_passed_in_seconds() const;
 	unsigned get_total_steps_passed() const;
 
-	const augs::stepped_timestamp& get_timestamp() const;
+	augs::stepped_timestamp get_timestamp() const;
 
 	const augs::fixed_delta& get_fixed_delta() const;
 	void set_fixed_delta(const augs::fixed_delta&);
