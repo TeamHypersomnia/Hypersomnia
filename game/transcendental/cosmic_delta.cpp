@@ -212,9 +212,7 @@ bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 }
 
 void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstantiate_partially) {
-	bool has_anything_changed = false;
-
-	augs::read_object(in, has_anything_changed);
+	const bool has_anything_changed = augs::read<bool>(in);
 	
 	if (!has_anything_changed)
 		return;
@@ -236,8 +234,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 
 	while (dt.new_entities--) {
 #if COSMOS_TRACKS_GUIDS
-		unsigned new_guid;
-		augs::read_object(in, new_guid);
+		const auto new_guid = augs::read<unsigned>(in);
 		
 		new_entities.emplace_back(deco.create_entity_with_specific_guid("delta_created", new_guid));
 #else
@@ -276,9 +273,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 	}
 
 	while (dt.changed_entities--) {
-		unsigned guid_of_changed;
-		augs::read_object(in, guid_of_changed);
-
+		const auto guid_of_changed = augs::read<unsigned>(in);
 		const auto changed_entity = deco.get_entity_by_guid(guid_of_changed);
 
 		std::array<bool, COMPONENTS_COUNT> overridden_components;
@@ -331,9 +326,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 
 	while (dt.removed_entities--) {
 #if COSMOS_TRACKS_GUIDS
-		unsigned guid_of_destroyed;
-		augs::read_object(in, guid_of_destroyed);
-
+		const auto guid_of_destroyed = augs::read<unsigned>(in);
 		deco.delete_entity(deco.get_entity_by_guid(guid_of_destroyed));
 #else
 		static_assert(false, "Unimplemented");
