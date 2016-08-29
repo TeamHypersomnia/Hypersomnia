@@ -16,3 +16,8 @@ class client_setup {
 public:
 	void process(game_window&);
 };
+
+class determinism_test_setup {
+public:
+	void process(game_window&);
+};

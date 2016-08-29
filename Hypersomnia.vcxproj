@@ -149,6 +149,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="client_setup.cpp" />
+    <ClCompile Include="determinism_test_setup.cpp" />
     <ClCompile Include="server_setup.cpp" />
     <ClCompile Include="local_setup.cpp" />
     <ClCompile Include="main.cpp" />

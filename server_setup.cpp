@@ -139,9 +139,13 @@ void server_setup::process(game_window& window) {
 						switch (command) {
 						case network_command::CLIENT_REQUESTED_ENTROPY:
 						{
-							ensure_eq(int(network_command::CLIENT_REQUESTED_ENTROPY), int(augs::read<network_command>(stream)));
+							network_command com;
+							augs::read_object(stream, com);
 
-							auto result = augs::read<guid_mapped_entropy>(stream);
+							ensure_eq(int(network_command::CLIENT_REQUESTED_ENTROPY), int(com));
+
+							guid_mapped_entropy result;
+							augs::read_object(stream, result);
 								
 							if(!should_skip)
 								endpoint.commands.push_back(result);

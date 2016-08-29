@@ -1,14 +1,15 @@
 launch_modes = {
 	LOCAL = 0,
+	LOCAL_DETERMINISM_TEST = 1,
 
-	ONLY_CLIENT = 1,
-	ONLY_SERVER = 2,
+	ONLY_CLIENT = 2,
+	ONLY_SERVER = 3,
 
-	CLIENT_AND_SERVER = 3
+	CLIENT_AND_SERVER = 4
 }
 
 config_table = {
-	launch_mode = launch_modes.CLIENT_AND_SERVER,
+	launch_mode = launch_modes.LOCAL_DETERMINISM_TEST,
 
 	window_name = "example",
 	fullscreen = 0,
@@ -36,7 +37,9 @@ config_table = {
 	simulate_lag = 0,
 	packet_loss = 0.00,
 	min_latency = 50,
-	jitter = 0
+	jitter = 0,
+
+	determinism_test_cloned_cosmoi_count = 10
 }
 
 set_cursor_visible(0)

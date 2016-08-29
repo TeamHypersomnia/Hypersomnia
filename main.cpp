@@ -29,6 +29,12 @@ int main(int argc, char** argv) {
 		setup.process(window);
 	}
 		break;
+	case game_window::launch_mode::LOCAL_DETERMINISM_TEST:
+	{
+		determinism_test_setup setup;
+		setup.process(window);
+	}
+		break;
 	case game_window::launch_mode::CLIENT_AND_SERVER:
 
 	{
