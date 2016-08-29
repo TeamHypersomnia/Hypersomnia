@@ -59,7 +59,7 @@ void server_setup::process(game_window& window) {
 
 	struct endpoint {
 		augs::network::endpoint_address addr;
-		std::vector<simulation_exchange::packaged_step> commands;
+		std::vector<guid_mapped_entropy> commands;
 
 		bool operator==(augs::network::endpoint_address b) const {
 			return addr == b;
@@ -137,9 +137,11 @@ void server_setup::process(game_window& window) {
 							LOG("Server received command: %x", int(command));
 
 						switch (command) {
-						case network_command::ENTROPY_FOR_NEXT_STEP:
+						case network_command::CLIENT_REQUESTED_ENTROPY:
 						{
-							auto result = simulation_exchange::read_entropy_for_next_step(stream);
+							ensure_eq(int(network_command::CLIENT_REQUESTED_ENTROPY), int(augs::read<network_command>(stream)));
+
+							auto result = augs::read<guid_mapped_entropy>(stream);
 								
 							if(!should_skip)
 								endpoint.commands.push_back(result);
@@ -159,14 +161,12 @@ void server_setup::process(game_window& window) {
 			
 			for (auto& e : endpoints) {
 				simulation_exchange::packaged_step next_command;
+				next_command.step_type = simulation_exchange::packaged_step::type::NEW_ENTROPY;
 				next_command.shall_resubstantiate = resubstantiate;
 				resubstantiate = false;
 
-				if (e.commands.empty()) {
-					next_command.step_type = simulation_exchange::packaged_step::type::NEW_ENTROPY;
-				}
-				else {
-					next_command = e.commands.front();
+				if (e.commands.size() > 0) {
+					next_command.entropy = e.commands.front();
 					e.commands.erase(e.commands.begin());
 				}
 
@@ -183,7 +183,8 @@ void server_setup::process(game_window& window) {
 
 			serv.send_pending_redundant();
 
-			scene.step_with_callbacks(cosmic_entropy(total_entropy, hypersomnia), hypersomnia);
+			cosmic_entropy id_mapped_entropy(total_entropy, hypersomnia);
+			scene.step_with_callbacks(id_mapped_entropy, hypersomnia);
 		}
 	}
 }

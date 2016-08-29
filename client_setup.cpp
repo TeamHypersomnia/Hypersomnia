@@ -142,14 +142,15 @@ void client_setup::process(game_window& window) {
 
 				const auto local_cosmic_entropy_for_this_step = scene.make_cosmic_entropy(s.total_entropy.local, session.input, hypersomnia);
 
-				simulation_exchange::packaged_step net_step;
-				net_step.step_type = simulation_exchange::packaged_step::type::NEW_ENTROPY;
-				net_step.entropy = guid_mapped_entropy(local_cosmic_entropy_for_this_step, hypersomnia);
+				augs::stream client_commands;
+				augs::write_object(client_commands, network_command::CLIENT_REQUESTED_ENTROPY);
+				
+				guid_mapped_entropy guid_mapped(local_cosmic_entropy_for_this_step, hypersomnia);
+				augs::write_object(client_commands, guid_mapped);
 
-				augs::stream serialized_step;
-				simulation_exchange::write_packaged_step_to_stream(serialized_step, net_step);
+				// LOG("num: %x s: %x", net_step.entropy.entropy_per_entity.size(), serialized_step.size());
 
-				client.post_redundant(serialized_step);
+				client.post_redundant(client_commands);
 				client.send_pending_redundant();
 
 				auto deterministic_steps = receiver.unpack_deterministic_steps(hypersomnia, extrapolated_hypersomnia, hypersomnia_last_snapshot);
