@@ -294,7 +294,7 @@ namespace prefabs {
 		gun.damage_multiplier = 2.2f;
 
 		gun.recoil.repeat_last_n_offsets = 20;
-		gun.recoil.scale = 30.0/2;
+		gun.recoil.scale = 30.0f/2;
 
 		gun.recoil.offsets = {
 			{ vec2().set_from_degrees(1.35f*2.f) },
