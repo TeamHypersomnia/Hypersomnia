@@ -91,6 +91,7 @@ namespace augs {
 
 	template<class A, class... Args>
 	void write_sized_stream(A& ar, const augs::stream& storage, Args... args) {
+		ensure(storage.get_read_pos() == 0);
 		write_object(ar, storage.buf);
 	}
 
