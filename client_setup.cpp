@@ -63,14 +63,20 @@ void client_setup::process(game_window& window) {
 
 	receiver.jitter_buffer.set_lower_limit(static_cast<unsigned>(static_cast<float>(window.get_config_number("jitter_buffer_ms")) / hypersomnia.get_fixed_delta().in_milliseconds()));
 
-	if (client.connect(window.get_config_string("connect_address"), static_cast<unsigned short>(window.get_config_number("connect_port")), 15000)) {
+	const bool is_replaying = input_unpacker.player.is_replaying();
+
+	if (is_replaying || client.connect(window.get_config_string("connect_address"), static_cast<unsigned short>(window.get_config_number("connect_port")), 15000)) {
 		LOG("Connected successfully");
+
+		input_unpacker.timer.reset_timer();
 		
 		while (!window.should_quit) {
 			augs::machine_entropy new_entropy;
 
 			new_entropy.local = window.collect_entropy();
-			new_entropy.remote = client.collect_entropy();
+
+			if(!is_replaying)
+				new_entropy.remote = client.collect_entropy();
 
 			for (auto& n : new_entropy.local) {
 				if (n.key == augs::window::event::keys::ESC && n.key_event == augs::window::event::key_changed::PRESSED) {

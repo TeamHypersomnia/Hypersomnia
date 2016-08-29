@@ -46,7 +46,7 @@ void server_setup::process(game_window& window) {
 		scene.populate_world_with_entities(hypersomnia);
 	}
 
-	input_unpacker.try_to_load_or_save_new_session("server_sessions/", "recorded.inputs");
+	input_unpacker.try_to_load_or_save_new_session("server_sessions/", "server_recorded.inputs");
 
 	simulation_broadcast server_sim;
 
@@ -69,6 +69,8 @@ void server_setup::process(game_window& window) {
 	std::vector<endpoint> endpoints;
 
 	bool resubstantiate = false;
+	
+	input_unpacker.timer.reset_timer();
 
 	while (!window.should_quit) {
 		augs::machine_entropy new_entropy;

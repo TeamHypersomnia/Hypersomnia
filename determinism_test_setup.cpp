@@ -60,6 +60,8 @@ void determinism_test_setup::process(game_window& window) {
 	bool divergence_detected = false;
 	unsigned which_divergent = 0;
 
+	input_unpacker.timer.reset_timer();
+
 	while (!window.should_quit) {
 		augs::machine_entropy new_entropy;
 

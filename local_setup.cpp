@@ -40,6 +40,8 @@ void local_setup::process(game_window& window) {
 
 	testbed.configure_view(session);
 
+	input_unpacker.timer.reset_timer();
+
 	while (!window.should_quit) {
 		augs::machine_entropy new_entropy;
 
