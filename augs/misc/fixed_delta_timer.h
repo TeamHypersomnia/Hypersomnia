@@ -23,6 +23,8 @@ namespace augs {
 
 		fixed_delta_timer(unsigned max_steps_to_perform);
 
+		void reset_timer();
+
 		unsigned count_logic_steps_to_perform(const fixed_delta&);
 		float fraction_of_step_until_next_step(const fixed_delta&) const;
 		

@@ -8,6 +8,10 @@
 namespace augs {
 	fixed_delta_timer::fixed_delta_timer(const unsigned max_steps_to_perform) : max_steps_to_perform(max_steps_to_perform) {}
 
+	void fixed_delta_timer::reset_timer() {
+		ticks.reset();
+	}
+
 	unsigned fixed_delta_timer::count_logic_steps_to_perform(const fixed_delta& basic_delta) {
 		accumulator += ticks.extract<std::chrono::milliseconds>() * time_multiplier;
 

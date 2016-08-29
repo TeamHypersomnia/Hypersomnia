@@ -5,7 +5,7 @@
 class step_and_entropy_unpacker {
 public:
 	entropy_buffer_and_player player;
-	augs::fixed_delta_timer timer = augs::fixed_delta_timer(500000);
+	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
 	bool try_to_load_or_save_new_session(std::string sessions_folder, std::string recording_filename);
 
