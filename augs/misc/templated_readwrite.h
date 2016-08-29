@@ -116,24 +116,26 @@ namespace augs {
 		write_bytes(ar, compressed_storage, sizeof(compressed_storage));
 	}
 
-	template<class A, class T, class...>
-	void read_object(A& ar, std::vector<T>& storage) {
-		size_t s;
+	template<class A, class T, class vector_size_type = size_t>
+	void read_object(A& ar, std::vector<T>& storage, vector_size_type = vector_size_type()) {
+		vector_size_type s;
 		read_object(ar, s);
 
 		storage.resize(s);
 		read_bytes(ar, storage.data(), storage.size()); 
 	}
 
-	template<class A, class T, class...>
-	void write_object(A& ar, const std::vector<T>& storage) {
-		write_object(ar, storage.size());
+	template<class A, class T, class vector_size_type = size_t>
+	void write_object(A& ar, const std::vector<T>& storage, vector_size_type = vector_size_type()) {
+		ensure(storage.size() <= std::numeric_limits<vector_size_type>::max());
+
+		write_object(ar, static_cast<vector_size_type>(storage.size()));
 		write_bytes(ar, storage.data(), storage.size());
 	}
 
-	template<class A, class T, class...>
-	void read_vector_of_objects(A& ar, std::vector<T>& storage) {
-		size_t s;
+	template<class A, class T, class vector_size_type = size_t>
+	void read_vector_of_objects(A& ar, std::vector<T>& storage, vector_size_type = vector_size_type()) {
+		vector_size_type s;
 		read_object(ar, s);
 
 		storage.resize(s);
@@ -142,29 +144,14 @@ namespace augs {
 			read_object(ar, obj);
 	}
 
-	template<class A, class T, class...>
-	void write_vector_of_objects(A& ar, const std::vector<T>& storage) {
-		write_object(ar, storage.size());
+	template<class A, class T, class vector_size_type = size_t>
+	void write_vector_of_objects(A& ar, const std::vector<T>& storage, vector_size_type = vector_size_type()) {
+		ensure(storage.size() <= std::numeric_limits<vector_size_type>::max());
+
+		write_object(ar, static_cast<vector_size_type>(storage.size()));
 
 		for (const auto& obj : storage)
 			write_object(ar, obj);
-	}
-
-	template<class A, class T, class...>
-	void read_vector_short(A& ar, std::vector<T>& storage) {
-		unsigned short s;
-		read_object(ar, s);
-
-		storage.resize(s);
-		read_bytes(ar, storage.data(), storage.size());
-	}
-
-	template<class A, class T, class...>
-	void write_vector_short(A& ar, const std::vector<T>& storage) {
-		ensure(storage.size() <= std::numeric_limits<unsigned short>::max());
-
-		write_object(ar, static_cast<unsigned short>(storage.size()));
-		write_bytes(ar, storage.data(), storage.size());
 	}
 
 	template<class A, class T, class...>
@@ -231,5 +218,12 @@ namespace augs {
 		for_each_in_tuple(storage, [&ar](const auto& element) {
 			write_object(ar, element);
 		});
+	}
+
+	template<class T, class A>
+	T read(A& ar) {
+		T obj;
+		read_object(ar, obj);
+		return std::move(obj);
 	}
 }

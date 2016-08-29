@@ -26,9 +26,6 @@ public:
 		guid_mapped_entropy entropy;
 	};
 
-	static packaged_step read_entropy(augs::stream&);
-	static void write_entropy(augs::stream&, const packaged_step&);
-
 public:
 	static void write_packaged_step_to_stream(augs::stream& output, const packaged_step&);
 

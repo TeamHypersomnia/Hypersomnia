@@ -21,8 +21,8 @@ bool write_delta(const T& base, const T& enco, augs::stream& out, const bool wri
 		augs::write_object(out, has_changed);
 
 	if (has_changed) {
-		augs::write_vector_short(out, dt.changed_bytes);
-		augs::write_vector_short(out, dt.changed_offsets);
+		augs::write_object(out, dt.changed_bytes, unsigned short());
+		augs::write_object(out, dt.changed_offsets, unsigned short());
 	}
 
 	return has_changed;
@@ -38,8 +38,8 @@ void read_delta(T& deco, augs::stream& in, const bool read_changed_bit = false) 
 		augs::read_object(in, has_changed);
 
 	if (has_changed) {
-		augs::read_vector_short(in, dt.changed_bytes);
-		augs::read_vector_short(in, dt.changed_offsets);
+		augs::read_object(in, dt.changed_bytes, unsigned short());
+		augs::read_object(in, dt.changed_offsets, unsigned short());
 
 		augs::delta_decode(deco, dt);
 	}

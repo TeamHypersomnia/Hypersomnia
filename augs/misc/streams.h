@@ -66,6 +66,8 @@ namespace augs {
 			return *reinterpret_cast<const T*>(buf.data() + read_pos);
 		}
 
+		std::string format_as_uchars() const;
+
 		bool read(char* data, size_t bytes);
 		void write(const char* data, size_t bytes);
 		void write(const augs::stream&);

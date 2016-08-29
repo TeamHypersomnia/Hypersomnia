@@ -12,6 +12,20 @@ namespace augs {
 
 		return false;
 	}
+	
+	std::string stream::format_as_uchars() const {
+		const unsigned char* first = reinterpret_cast<const unsigned char*>(data());
+
+		std::string output;
+
+		for (size_t i = 0; i < size(); ++i)
+			output += ::to_string(int(first[i])) + " ";
+
+		if(output.size() > 0)
+			output.erase(output.end() - 1);
+
+		return std::move(output);
+	}
 
 	bool stream::operator==(const stream& b) const {
 		return std::equal(data(), data() + size(), b.data(), b.data() + size());

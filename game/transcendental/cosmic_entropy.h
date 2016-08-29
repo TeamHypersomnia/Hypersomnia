@@ -59,3 +59,33 @@ struct cosmic_entropy : basic_cosmic_entropy<entity_id> {
 		return *this;
 	}
 };
+
+namespace augs {
+	template<class A>
+	auto read_object(A& ar, guid_mapped_entropy& storage) {
+		auto num_entropied_entities = augs::read<unsigned char>(ar);
+
+		while (num_entropied_entities--) {
+			auto guid = augs::read<unsigned>(ar);
+
+			auto& new_entity_entropy = storage.entropy_per_entity[guid];
+
+			ensure(new_entity_entropy.empty());
+
+			augs::read_vector_of_objects(ar, new_entity_entropy, unsigned short());
+		}
+	}
+
+	template<class A>
+	void write_object(A& ar, const guid_mapped_entropy& storage) {
+		ensure(storage.entropy_per_entity.size() < std::numeric_limits<unsigned char>::max());
+
+		unsigned char num_entropied_entities = static_cast<unsigned char>(storage.entropy_per_entity.size());
+		augs::write_object(ar, num_entropied_entities);
+
+		for (const auto& per_entity : storage.entropy_per_entity) {
+			augs::write_object(ar, per_entity.first);
+			augs::write_vector_of_objects(ar, per_entity.second, unsigned short());
+		}
+	}
+}
