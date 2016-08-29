@@ -10,6 +10,7 @@ namespace augs {
 			return true;
 		}
 
+		ensure(false);
 		return false;
 	}
 	

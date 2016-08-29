@@ -212,6 +212,9 @@ bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 }
 
 void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstantiate_partially) {
+	if (in.get_unread_bytes() == 0)
+		return;
+
 	bool has_anything_changed = false;
 	
 	if (!augs::read_object(in, has_anything_changed))
