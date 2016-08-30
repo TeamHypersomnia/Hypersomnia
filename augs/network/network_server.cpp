@@ -26,6 +26,10 @@ namespace augs {
 			return true;
 		}
 
+		bool server::has_endpoint(const endpoint_address& target) const {
+			return peer_map.find(target) != peer_map.end();
+		}
+
 		bool server::send_pending_redundant() {
 			bool result = true;
 

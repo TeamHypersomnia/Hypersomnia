@@ -334,7 +334,7 @@ namespace scene_managers {
 
 	}
 
-	void networked_testbed_client::view(const cosmos& cosmos, game_window& window, viewing_session& session, const augs::network::client& details, const augs::variable_delta& dt) const {
+	void networked_testbed_client::view(const cosmos& cosmos, game_window& window, viewing_session& session, const augs::network::client& details, const augs::variable_delta& dt, const bool swap_buffers) const {
 		const auto controlled = cosmos[get_controlled_entity()];
 		if (controlled.dead()) 
 			return;
@@ -346,7 +346,8 @@ namespace scene_managers {
 
 		auto& target = renderer::get_current();
 
-		target.clear_current_fbo();
+		if(swap_buffers)
+			target.clear_current_fbo();
 
 		target.set_viewport({ session.viewport_coordinates.x, session.viewport_coordinates.y, screen_size_i.x, screen_size_i.y });
 
@@ -374,7 +375,8 @@ namespace scene_managers {
 		session.triangles.measure(static_cast<double>(target.triangles_drawn_total));
 		target.triangles_drawn_total = 0;
 
-		window.swap_buffers();
+		if(swap_buffers)
+			window.swap_buffers();
 		
 		session.fps_profiler.end_measurement();
 	}

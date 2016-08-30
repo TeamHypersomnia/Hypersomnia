@@ -42,6 +42,8 @@ namespace augs {
 			bool post_redundant(const packet&, const endpoint_address& target);
 			
 			bool send_pending_redundant();
+
+			bool has_endpoint(const endpoint_address&) const;
 			
 			bool send_reliable(const packet&, const endpoint_address& target);
 
