@@ -62,16 +62,16 @@ void determinism_test_setup::process(game_window& window) {
 
 	input_unpacker.timer.reset_timer();
 
-	while (!window.should_quit) {
+	while (!should_quit) {
 		augs::machine_entropy new_entropy;
 
 		new_entropy.local = window.collect_entropy();
+		
+		if (process_exit_key(new_entropy.local))
+			break;
 
 		for (auto& n : new_entropy.local) {
 			if (n.key_event == augs::window::event::key_changed::PRESSED) {
-				if (n.key == augs::window::event::keys::ESC) {
-					window.should_quit = true;
-				}
 				if (n.key == augs::window::event::keys::F3) {
 					++currently_viewn_cosmos;
 					currently_viewn_cosmos %= cosmoi_count;

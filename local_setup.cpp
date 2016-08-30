@@ -42,16 +42,12 @@ void local_setup::process(game_window& window) {
 
 	input_unpacker.timer.reset_timer();
 
-	while (!window.should_quit) {
+	while (!should_quit) {
 		augs::machine_entropy new_entropy;
 
 		new_entropy.local = window.collect_entropy();
 
-		for (auto& n : new_entropy.local) {
-			if (n.key == augs::window::event::keys::ESC && n.key_event == augs::window::event::key_changed::PRESSED) {
-				window.should_quit = true;
-			}
-		}
+		process_exit_key(new_entropy.local);
 
 		input_unpacker.control(new_entropy);
 
