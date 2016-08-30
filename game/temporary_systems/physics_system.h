@@ -116,7 +116,8 @@ public:
 
 	int ray_casts_since_last_step = 0;
 
-	b2World b2world;
+	// b2world causes a stack overflow due to a large stack allocator, therefore it must be dynamically allocated
+	std::unique_ptr<b2World> b2world;
 private:	
 	/* callback structure used in QueryAABB function to get all shapes near-by */
 	struct query_aabb_input : b2QueryCallback {

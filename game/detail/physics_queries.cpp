@@ -41,7 +41,7 @@ std::vector<physics_system::raycast_output> physics_system::ray_cast_all_interse
 		LOG("Ray casting error: X: %x %x", p1_meters, p2_meters);
 	}
 
-	b2world.RayCast(&callback, p1_meters, p2_meters);
+	b2world->RayCast(&callback, p1_meters, p2_meters);
 	return callback.outputs;
 }
 
@@ -120,7 +120,7 @@ physics_system::raycast_output physics_system::ray_cast(vec2 p1_meters, vec2 p2_
 		return callback.output;
 	}
 
-	b2world.RayCast(&callback, p1_meters, p2_meters);
+	b2world->RayCast(&callback, p1_meters, p2_meters);
 	return callback.output;
 }
 
@@ -161,7 +161,7 @@ physics_system::query_aabb_output physics_system::query_aabb(vec2 p1_meters, vec
 	aabb.lowerBound = p1_meters;
 	aabb.upperBound = p2_meters;
 
-	b2world.QueryAABB(&callback, aabb);
+	b2world->QueryAABB(&callback, aabb);
 
 	return callback.out;
 }
@@ -203,7 +203,7 @@ physics_system::query_output physics_system::query_shape(b2Shape* shape, b2Filte
 
 	b2AABB shape_aabb;
 	shape->ComputeAABB(&shape_aabb, null_transform, 0);
-	b2world.QueryAABB(&callback, shape_aabb);
+	b2world->QueryAABB(&callback, shape_aabb);
 
 	physics_system::query_output out;
 

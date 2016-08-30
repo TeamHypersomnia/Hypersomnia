@@ -81,6 +81,8 @@ namespace augs {
 			if (!augs::read_vector_of_objects(ar, new_entity_entropy, unsigned short()))
 				return false;
 		}
+
+		return true;
 	}
 
 	template<class A>

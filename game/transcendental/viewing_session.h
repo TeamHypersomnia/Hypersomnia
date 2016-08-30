@@ -9,6 +9,7 @@ class viewing_session {
 public:
 	world_camera camera;
 	input_context input;
+	vec2i viewport_coordinates;
 
 	augs::variable_delta_timer frame_timer;
 	augs::measurements fps_profiler = augs::measurements(L"Frame");

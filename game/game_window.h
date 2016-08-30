@@ -19,8 +19,6 @@ public:
 
 	bool clear_window_inputs_once = true;
 
-	volatile bool should_quit = false;
-
 	decltype(machine_entropy::local) collect_entropy();
 
 	void call_window_script(std::string filename);

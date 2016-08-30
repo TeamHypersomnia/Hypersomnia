@@ -57,7 +57,7 @@ void physics_system::destruct(const_entity_handle handle) {
 		for (auto& colliders_cache_id : cache.correspondent_colliders_caches)
 			colliders_caches[colliders_cache_id] = colliders_cache();
 
-		b2world.DestroyBody(cache.body);
+		b2world->DestroyBody(cache.body);
 
 		cache = rigid_body_cache();
 	}
@@ -170,7 +170,7 @@ void physics_system::construct(const_entity_handle handle) {
 			def.linearVelocity = physics_data.velocity * PIXELS_TO_METERSf;
 			def.angularVelocity = physics_data.angular_velocity * DEG_TO_RADf;
 
-			cache.body = b2world.CreateBody(&def);
+			cache.body = b2world->CreateBody(&def);
 			cache.body->SetAngledDampingEnabled(physics_data.angled_damping);
 			
 			/* notice that all fixtures must be unconstructed at this moment since we assert that the rigid body itself is not */
@@ -186,9 +186,9 @@ void physics_system::reserve_caches_for_entities(size_t n) {
 }
 
 physics_system::physics_system() : 
-b2world(b2Vec2(0.f, 0.f)), ray_casts_since_last_step(0) {
-	b2world.SetAllowSleeping(true);
-	b2world.SetAutoClearForces(false);
+b2world(new b2World(b2Vec2(0.f, 0.f))), ray_casts_since_last_step(0) {
+	b2world->SetAllowSleeping(true);
+	b2world->SetAutoClearForces(false);
 }
 
 void physics_system::post_and_clear_accumulated_collision_messages(fixed_step& step) {
@@ -201,11 +201,11 @@ physics_system& physics_system::contact_listener::get_sys() const {
 }
 
 physics_system::contact_listener::contact_listener(cosmos& cosm) : cosm(cosm) {
-	get_sys().b2world.SetContactListener(this);
+	get_sys().b2world->SetContactListener(this);
 }
 
 physics_system::contact_listener::~contact_listener() {
-	get_sys().b2world.SetContactListener(nullptr);
+	get_sys().b2world->SetContactListener(nullptr);
 }
 
 void physics_system::step_and_set_new_transforms(fixed_step& step) {
@@ -215,7 +215,7 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 	int32 velocityIterations = 8;
 	int32 positionIterations = 3;
 
-	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
+	for (b2Body* b = b2world->GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
 
 		entity_handle entity = cosmos[b->GetUserData()];
@@ -254,12 +254,12 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 
 	ray_casts_since_last_step = 0;
 
-	b2world.Step(static_cast<float32>(delta.in_seconds()), velocityIterations, positionIterations);
-	b2world.ClearForces();
+	b2world->Step(static_cast<float32>(delta.in_seconds()), velocityIterations, positionIterations);
+	b2world->ClearForces();
 
 	post_and_clear_accumulated_collision_messages(step);
 
-	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
+	for (b2Body* b = b2world->GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
 		entity_handle entity = cosmos[b->GetUserData()];
 		auto& physics = entity.get<components::physics>();

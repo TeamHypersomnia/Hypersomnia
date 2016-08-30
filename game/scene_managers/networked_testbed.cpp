@@ -348,7 +348,7 @@ namespace scene_managers {
 
 		target.clear_current_fbo();
 
-		target.set_viewport({ 0, 0, screen_size_i.x, screen_size_i.y });
+		target.set_viewport({ session.viewport_coordinates.x, session.viewport_coordinates.y, screen_size_i.x, screen_size_i.y });
 
 		basic_viewing_step main_cosmos_viewing_step(cosmos, dt, target);
 		view_cosmos(cosmos, main_cosmos_viewing_step, session.camera);

@@ -46,11 +46,11 @@ namespace resources {
 		animation& create_inverse(assets::animation_id, assets::texture_id first_frame, assets::texture_id last_frame, float frame_duration_ms);
 		animation& create_inverse_with_flip(assets::animation_id, assets::texture_id first_frame, assets::texture_id last_frame, float frame_duration_ms);
 
-		animation& create(assets::animation_id);
-		resources::animation_response& create(assets::animation_response_id);
+		animation& create(assets::animation_id at);
+		resources::animation_response& create(assets::animation_response_id at);
 
-		particle_effect& create(assets::particle_effect_id);
-		particle_effect_response& create(assets::particle_effect_response_id);
+		particle_effect& create(assets::particle_effect_id at);
+		particle_effect_response& create(assets::particle_effect_response_id at);
 
 		augs::graphics::shader& create(assets::shader_id, std::string filename, augs::graphics::shader::type);
 		augs::graphics::shader_program& create(assets::program_id, assets::shader_id vertex, assets::shader_id fragment);
