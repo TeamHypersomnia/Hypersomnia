@@ -14,7 +14,7 @@
 
 #include "game/resources/animation.h"
 #include "game/resources/animation_response.h"
-#include "game/resources/texture_with_image.h"
+#include "augs/texture_baker/texture_with_image.h"
 #include "game/resources/particle_effect.h"
 #include "game/resources/particle_effect_response.h"
 #include "game/resources/behaviour_tree.h"

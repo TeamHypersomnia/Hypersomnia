@@ -2,16 +2,16 @@
 #include "augs/filesystem/file.h"
 #include "game/build_settings.h"
 
-namespace resources {
-	void texture_with_image::set_from_image(augs::image img) {
-		this->img = img;
-		tex.set(&this->img);
+namespace augs {
+	void texture_with_image::set_from_image(augs::image from) {
+		img = from;
+		tex.set(from);
 	}
 
 	void texture_with_image::set_from_image_file(std::string filename) {
 		img = augs::image();
 		img.from_file(filename);
-		tex.set(&img);
+		tex.set(img);
 
 		filename.resize(filename.size() - 4);
 		filename += "_polygonized.png";

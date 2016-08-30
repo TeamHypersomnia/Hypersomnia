@@ -5,6 +5,8 @@
 
 #include "game/assets/font_id.h"
 
+#include "augs/texture_baker/texture_with_image.h"
+
 struct FT_Glyph_Metrics_;
 typedef FT_Glyph_Metrics_ FT_Glyph_Metrics;
 
@@ -12,8 +14,7 @@ namespace augs {
 	class font {
 	public:
 		struct glyph {
-			image img;
-			texture tex;
+			texture_with_image sprite;
 
 			int adv = 0, bear_x = 0, bear_y = 0;
 			unsigned int index = 0, unicode = 0;

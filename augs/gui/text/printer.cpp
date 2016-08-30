@@ -165,7 +165,7 @@ namespace augs {
 							auto& g = *d.cached[i];
 
 							/* if it's not a whitespace */
-							if (g.tex.get_rect().good()) {
+							if (g.sprite.tex.get_rect().good()) {
 								rgba charcolor = style(colors[i]).color;
 
 								/* if a character is between selection bounds, we change its color to the one specified in selected_text_color
@@ -175,7 +175,7 @@ namespace augs {
 									charcolor = selected_text_color;
 
 								/* add the resulting character taking bearings into account */
-								gui::draw_clipped_rectangle(g.tex, charcolor,
+								gui::draw_clipped_rectangle(g.sprite.tex, charcolor,
 									rects::xywh<float>(sectors[i] + g.bear_x, lines[l].top + lines[l].asc - g.bear_y, g.size.w, g.size.h) + pos, clipper,
 									v);
 							}

@@ -1,8 +1,10 @@
 #pragma once
-#include "augs/texture_baker/texture_baker.h"
+#include "augs/texture_baker/texture.h"
+#include "augs/texture_baker/image.h"
+
 #include "game/components/sprite_component.h"
 
-namespace resources {
+namespace augs {
 	class texture_with_image {
 	public:
 		augs::image img;

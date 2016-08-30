@@ -115,7 +115,7 @@ namespace resources {
 
 		if (atlas_creation_mode_flags & atlas_creation_mode::FROM_ALL_TEXTURES) {
 			for (auto& tex : textures) {
-				atl.textures.push_back(&tex.second.tex);
+				atl.textures.push_back(&tex.second);
 			}
 		}
 

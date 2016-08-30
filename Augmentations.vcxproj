@@ -309,6 +309,8 @@
     <ClCompile Include="augs\network\network_server.cpp" />
     <ClCompile Include="augs\network\enet_raii.cpp" />
     <ClCompile Include="augs\network\reliable_channel.cpp" />
+    <ClCompile Include="augs\texture_baker\texture.cpp" />
+    <ClCompile Include="augs\texture_baker\texture_with_image.cpp" />
     <ClCompile Include="game\detail\world_camera.cpp" />
     <ClCompile Include="game\scene_managers\networked_testbed.cpp" />
     <ClCompile Include="game\transcendental\cosmic_delta.cpp" />
@@ -397,7 +399,6 @@
     <ClCompile Include="game\resources\animation.cpp" />
     <ClCompile Include="game\resources\manager.cpp" />
     <ClCompile Include="game\resources\particle_effect.cpp" />
-    <ClCompile Include="game\resources\texture_with_image.cpp" />
     <ClCompile Include="game\scene_managers\one_entity.cpp" />
     <ClCompile Include="game\scene_managers\rendering_scripts\standard_rendering.cpp" />
     <ClCompile Include="game\scene_managers\resource_setups\standard_atlas.cpp" />
@@ -956,6 +957,8 @@
     <ClInclude Include="augs\network\reliable_channel.h" />
     <ClInclude Include="augs\network\reliable_channel_tests.h" />
     <ClInclude Include="augs\padding_byte.h" />
+    <ClInclude Include="augs\texture_baker\texture.h" />
+    <ClInclude Include="augs\texture_baker\texture_with_image.h" />
     <ClInclude Include="game\components\child_component.h" />
     <ClInclude Include="game\components\guid_component.h" />
     <ClInclude Include="game\components\physical_relations_component.h" />
@@ -1146,7 +1149,6 @@
     <ClInclude Include="game\resources\manager.h" />
     <ClInclude Include="game\resources\particle_effect.h" />
     <ClInclude Include="game\resources\particle_effect_response.h" />
-    <ClInclude Include="game\resources\texture_with_image.h" />
     <ClInclude Include="game\scene_managers\rendering_scripts\all.h" />
     <ClInclude Include="game\scene_managers\resource_setups\all.h" />
     <ClInclude Include="game\scene_managers\testbed.h" />

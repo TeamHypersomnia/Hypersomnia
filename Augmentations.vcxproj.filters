@@ -168,9 +168,6 @@
     <ClCompile Include="game\resources\animation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\resources\texture_with_image.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\ingredients\box_physics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1044,6 +1041,12 @@
     <ClCompile Include="augs\misc\readable_bytesize.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="augs\texture_baker\texture_with_image.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="augs\texture_baker\texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -1239,9 +1242,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\messages\new_entity_message.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\resources\texture_with_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\ingredients\ingredients.h">
@@ -3210,6 +3210,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\readable_bytesize.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\texture_baker\texture_with_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\texture_baker\texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

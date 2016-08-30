@@ -79,7 +79,7 @@ namespace augs {
 					g.unicode = j;
 
 					if (face->glyph->bitmap.width) {
-						g.img.copy(face->glyph->bitmap.buffer, 1, face->glyph->bitmap.pitch, rects::wh<int>(face->glyph->bitmap.width, face->glyph->bitmap.rows));
+						g.sprite.img.copy(face->glyph->bitmap.buffer, 1, face->glyph->bitmap.pitch, rects::wh<int>(face->glyph->bitmap.width, face->glyph->bitmap.rows));
 					}
 
 					unicode[j] = glyphs.size() - 1;
@@ -118,15 +118,15 @@ namespace augs {
 
 	void font::free_images() {
 		for (unsigned i = 0; i < glyphs.size(); ++i)
-			glyphs[i].img.destroy();
+			glyphs[i].sprite.img.destroy();
 	}
 
 	void font::add_to_atlas(atlas& atl) {
 		for (auto& g : glyphs) {
-			if (g.img.get_size().w) {
-				g.tex.set(&g.img);
-				g.tex.luminosity_to_alpha(true);
-				atl.textures.push_back(&g.tex);
+			if (g.sprite.img.get_size().w) {
+				g.sprite.tex.set(g.sprite.img);
+				g.sprite.tex.luminosity_to_alpha(true);
+				atl.textures.push_back(&g.sprite);
 			}
 		}
 	}
