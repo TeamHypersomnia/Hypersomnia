@@ -153,9 +153,8 @@ namespace scene_managers {
 			prefabs::create_sample_magazine(step, vec2(100, -650), "0.4",
 				prefabs::create_green_charge(world, vec2(0, 0), 40)));
 
-		const auto submachine = prefabs::create_submachine(step, vec2(500, -500 + 50)
-		
-		);
+		const auto submachine = prefabs::create_submachine(step, vec2(500, -500 + 50),
+			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
 
 		prefabs::create_submachine(step, vec2(0, -1000),
 			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
@@ -185,9 +184,9 @@ namespace scene_managers {
 		const auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
 		prefabs::create_sample_backpack(world, vec2(200, -750));
 
-		//perform_transfer({ backpack, new_characters[0][slot_function::SHOULDER_SLOT] }, step);
+		perform_transfer({ backpack, new_characters[0][slot_function::SHOULDER_SLOT] }, step);
 		perform_transfer({ submachine, new_characters[0][slot_function::PRIMARY_HAND] }, step);
-		//perform_transfer({ rifle, new_characters[0][slot_function::SECONDARY_HAND] }, step);
+		perform_transfer({ rifle, new_characters[0][slot_function::SECONDARY_HAND] }, step);
 
 		if (num_characters > 1) {
 			name_entity(new_characters[1], entity_name::PERSON, L"Enemy");

@@ -37,6 +37,7 @@ public:
 		ONLY_CLIENT,
 		ONLY_SERVER,
 		
-		CLIENT_AND_SERVER
+		CLIENT_AND_SERVER,
+		TWO_CLIENTS_AND_SERVER
 	} get_launch_mode();
 };
