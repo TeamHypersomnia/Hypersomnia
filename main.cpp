@@ -13,16 +13,6 @@
 int main(int argc, char** argv) {
 	augs::global_libraries::init();
 	augs::global_libraries::run_googletest(argc, argv);
-	
-	//sizeof(cosmos);
-	//sizeof(augs::pool<int>);
-
-	//sizeof(client_setup);
-	//sizeof(server_setup);
-	//sizeof(storage_for_all_temporary_systems);
-	//sizeof(physics_system);
-	//sizeof(b2World);
-	//sizeof(b2StackAllocator);
 
 	game_window window;
 	window.call_window_script("config.lua");

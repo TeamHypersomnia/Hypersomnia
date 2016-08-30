@@ -11,7 +11,7 @@ launch_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.CLIENT_AND_SERVER,
+	launch_mode = launch_modes.TWO_CLIENTS_AND_SERVER,
 
 	window_name = "example",
 	fullscreen = 0,
@@ -19,7 +19,7 @@ config_table = {
 	window_x = 0,
 	window_y = 0,
 	bpp = 24,
-	resolution_w = 800,
+	resolution_w = 1920,
 	resolution_h = 720,
 	doublebuffer = 1,
 	

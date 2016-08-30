@@ -31,7 +31,7 @@ void server_setup::wait_for_listen_server() {
 	while (!server_ready) cv.wait(lck);
 }
 
-void server_setup::process(game_window& window) {
+void server_setup::process(game_window& window, const bool start_alternative_server) {
 	cosmos hypersomnia(3000);
 	cosmos hypersomnia_last_snapshot(3000);
 	cosmos extrapolated_hypersomnia(3000);
@@ -42,7 +42,7 @@ void server_setup::process(game_window& window) {
 	step_and_entropy_unpacker input_unpacker;
 	scene_managers::networked_testbed_server scene;
 
-	auto config_tickrate = static_cast<unsigned>(window.get_config_number("tickrate"));
+	const auto config_tickrate = static_cast<unsigned>(window.get_config_number("tickrate"));
 
 	bool detailed_step_log = config_tickrate <= 2;
 
@@ -56,6 +56,7 @@ void server_setup::process(game_window& window) {
 	simulation_broadcast server_sim;
 
 	augs::network::server serv;
+	augs::network::server alternative_serv;
 
 	const bool is_replaying = input_unpacker.player.is_replaying();
 
@@ -63,6 +64,13 @@ void server_setup::process(game_window& window) {
 		LOG("Listen server setup successful.");
 	else 
 		LOG("Failed to setup a listen server.");
+
+	if (start_alternative_server) {
+		if (is_replaying || alternative_serv.listen(static_cast<unsigned short>(window.get_config_number("alternative_port")), 32))
+			LOG("Alternative listen server setup successful.");
+		else
+			LOG("Failed to setup an alternative listen server.");
+	}
 
 	{
 		std::unique_lock<std::mutex> lck(mtx);
@@ -90,6 +98,13 @@ void server_setup::process(game_window& window) {
 
 		new_entropy.local = window.collect_entropy();
 		new_entropy.remote = serv.collect_entropy();
+
+		if (start_alternative_server) {
+			augs::machine_entropy alt_entropy;
+			alt_entropy.remote = alternative_serv.collect_entropy();
+		
+			new_entropy += alt_entropy;
+		}
 	
 		process_exit_key(new_entropy.local);
 
@@ -193,10 +208,13 @@ void server_setup::process(game_window& window) {
 			augs::stream new_data;
 			simulation_exchange::write_packaged_step_to_stream(new_data, this_net_step);
 
-			for (auto& e : endpoints)
-				serv.post_redundant(new_data, e.addr);
+			for (auto& e : endpoints) {
+				if (serv.has_endpoint(e.addr)) serv.post_redundant(new_data, e.addr);
+				else if (alternative_serv.has_endpoint(e.addr)) alternative_serv.post_redundant(new_data, e.addr);
+			}
 
 			serv.send_pending_redundant();
+			if(start_alternative_server) alternative_serv.send_pending_redundant();
 
 			cosmic_entropy id_mapped_entropy(total_entropy, hypersomnia);
 			scene.step_with_callbacks(id_mapped_entropy, hypersomnia);

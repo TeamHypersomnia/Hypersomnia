@@ -29,7 +29,7 @@ void determinism_test_setup::process(game_window& window) {
 	step_and_entropy_unpacker input_unpacker;
 	std::vector<scene_managers::testbed> testbeds(cosmoi_count);
 
-	auto config_tickrate = static_cast<unsigned>(window.get_config_number("tickrate"));
+	const auto config_tickrate = static_cast<unsigned>(window.get_config_number("tickrate"));
 
 	if (augs::file_exists("save.state")) {
 		for (auto& h : hypersomnias) {

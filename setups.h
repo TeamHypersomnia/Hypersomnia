@@ -33,7 +33,7 @@ class server_setup : public setup_base {
 public:
 	void wait_for_listen_server();
 
-	void process(game_window&);
+	void process(game_window&, bool start_alternative_server = false);
 };
 
 class client_setup : public setup_base {
@@ -59,8 +59,8 @@ public:
 
 	void process(game_window&);
 
-	void init(game_window&, std::string recording_filename = "recorded.inputs");
-	void process_once(game_window&, const augs::machine_entropy::local_type& precollected);
+	void init(game_window&, const std::string recording_filename = "recorded.inputs", const bool use_alternative_port = false);
+	void process_once(game_window&, const augs::machine_entropy::local_type& precollected, const bool swap_buffers = true);
 };
 
 class two_clients_and_server_setup : public setup_base {

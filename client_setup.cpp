@@ -36,12 +36,12 @@ void client_setup::process(game_window& window) {
 	}
 }
 
-void client_setup::init(game_window& window, std::string recording_filename) {
+void client_setup::init(game_window& window, const std::string recording_filename, const bool use_alternative_port) {
 	const vec2i screen_size = vec2i(window.get_screen_rect());
 
 	scene_managers::networked_testbed_client().populate_world_with_entities(initial_hypersomnia);
 
-	auto config_tickrate = static_cast<unsigned>(window.get_config_number("tickrate"));
+	const auto config_tickrate = static_cast<unsigned>(window.get_config_number("tickrate"));
 
 	detailed_step_log = config_tickrate <= 2;
 
@@ -60,7 +60,7 @@ void client_setup::init(game_window& window, std::string recording_filename) {
 
 	const bool is_replaying = input_unpacker.player.is_replaying();
 
-	if (is_replaying || client.connect(window.get_config_string("connect_address"), static_cast<unsigned short>(window.get_config_number("connect_port")), 15000)) {
+	if (is_replaying || client.connect(window.get_config_string("connect_address"), static_cast<unsigned short>(window.get_config_number(use_alternative_port ? "alternative_port" : "connect_port")), 15000)) {
 		LOG("Connected successfully");
 
 		input_unpacker.timer.reset_timer();
@@ -70,7 +70,7 @@ void client_setup::init(game_window& window, std::string recording_filename) {
 	}
 }
 
-void client_setup::process_once(game_window& window, const augs::machine_entropy::local_type& precollected) {
+void client_setup::process_once(game_window& window, const augs::machine_entropy::local_type& precollected, const bool swap_buffers) {
 	augs::machine_entropy new_entropy;
 
 	new_entropy.local = precollected;
@@ -176,5 +176,5 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 
 	if (!still_downloading)
 		scene.view(last_stepped_was_extrapolated ? extrapolated_hypersomnia : hypersomnia,
-			window, session, client, session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), input_unpacker.timer));
+			window, session, client, session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), input_unpacker.timer), swap_buffers);
 }
