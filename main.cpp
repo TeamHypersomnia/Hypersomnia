@@ -38,20 +38,37 @@ int main(int argc, char** argv) {
 	case game_window::launch_mode::CLIENT_AND_SERVER:
 
 	{
-		std::thread server_thread([&window]() {
-			server_setup setup;
-			setup.process(window);
+		server_setup serv_setup;
+		
+		std::thread server_thread([&window, &serv_setup]() {
+			serv_setup.process(window);
 		});
 
-		using namespace std::chrono_literals;
+		serv_setup.wait_for_listen_server();
 
-		std::this_thread::sleep_for(1000ms);
 		client_setup setup;
 		setup.process(window);
 
 		server_thread.join();
 	}
-		break;
+	break;
+	case game_window::launch_mode::TWO_CLIENTS_AND_SERVER:
+
+	{
+		server_setup serv_setup;
+
+		std::thread server_thread([&window, &serv_setup]() {
+			serv_setup.process(window);
+		});
+
+		serv_setup.wait_for_listen_server();
+
+		client_setup setup;
+		setup.process(window);
+
+		server_thread.join();
+	}
+	break;
 	case game_window::launch_mode::ONLY_CLIENT:  
 	{
 

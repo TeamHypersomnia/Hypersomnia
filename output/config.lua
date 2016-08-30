@@ -5,11 +5,13 @@ launch_modes = {
 	ONLY_CLIENT = 2,
 	ONLY_SERVER = 3,
 
-	CLIENT_AND_SERVER = 4
+	CLIENT_AND_SERVER = 4,
+
+	TWO_CLIENTS_AND_SERVER = 5
 }
 
 config_table = {
-	launch_mode = launch_modes.CLIENT_AND_SERVER,
+	launch_mode = launch_modes.TWO_CLIENTS_AND_SERVER,
 
 	window_name = "example",
 	fullscreen = 0,

@@ -26,6 +26,11 @@
 
 #include "augs/network/reliable_channel.h"
 
+void server_setup::wait_for_listen_server() {
+	std::unique_lock<std::mutex> lck(mtx);
+	while (!server_ready) cv.wait(lck);
+}
+
 void server_setup::process(game_window& window) {
 	cosmos hypersomnia(3000);
 	cosmos hypersomnia_last_snapshot(3000);
@@ -58,6 +63,12 @@ void server_setup::process(game_window& window) {
 		LOG("Listen server setup successful.");
 	else 
 		LOG("Failed to setup a listen server.");
+
+	{
+		std::unique_lock<std::mutex> lck(mtx);
+		server_ready = true;
+		cv.notify_all();
+	}
 
 	struct endpoint {
 		augs::network::endpoint_address addr;
