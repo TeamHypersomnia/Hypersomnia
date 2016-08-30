@@ -35,7 +35,7 @@ class cosmos : private storage_for_all_components_and_aggregates, public augs::p
 #if COSMOS_TRACKS_GUIDS
 	friend class cosmic_delta;
 
-	std::unordered_map<unsigned, entity_id> guid_map_for_transport;
+	std::map<unsigned, entity_id> guid_map_for_transport;
 
 	void assign_next_guid(entity_handle);
 	void clear_guid(entity_handle);

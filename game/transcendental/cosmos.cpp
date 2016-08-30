@@ -63,18 +63,12 @@ void cosmos::destroy_substance_completely() {
 	temporary_systems.for_each([n](auto& sys) {
 		sys.reserve_caches_for_entities(n);
 	});
-
-	for_each_entity_id([this](const entity_id id) {
-		auto h = get_handle(id);
-		destroy_substance_for_entity(h);
-	});
 }
 
 void cosmos::create_substance_completely() {
-	for_each_entity_id([this](const entity_id id) {
-		auto h = get_handle(id);
-		create_substance_for_entity(h);
-	});
+	for (auto& ordered_pair : guid_map_for_transport) {
+		create_substance_for_entity(get_handle(ordered_pair.second));
+	}
 }
 
 void cosmos::destroy_substance_for_entity(const const_entity_handle h) {
