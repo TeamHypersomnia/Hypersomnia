@@ -5,14 +5,14 @@ void two_clients_and_server_setup::process(game_window& window) {
 	server_setup serv_setup;
 
 	std::thread server_thread([&window, &serv_setup]() {
-		serv_setup.process(window);
+		serv_setup.process(window, true);
 	});
 
 	serv_setup.wait_for_listen_server();
 
 	client_setup setups[2];
 	setups[0].init(window, "recorded_0.inputs");
-	setups[1].init(window, "recorded_1.inputs");
+	setups[1].init(window, "recorded_1.inputs", true);
 
 	setups[0].session.camera.visible_world_area.x /= 2;
 	setups[1].session.camera.visible_world_area.x /= 2;

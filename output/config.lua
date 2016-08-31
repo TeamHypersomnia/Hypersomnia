@@ -12,6 +12,8 @@ launch_modes = {
 
 config_table = {
 	launch_mode = launch_modes.TWO_CLIENTS_AND_SERVER,
+	
+	determinism_test_cloned_cosmoi_count = 2,
 
 	window_name = "example",
 	fullscreen = 0,
@@ -19,7 +21,7 @@ config_table = {
 	window_x = 0,
 	window_y = 0,
 	bpp = 24,
-	resolution_w = 1920,
+	resolution_w = 1000,
 	resolution_h = 720,
 	doublebuffer = 1,
 	
@@ -36,14 +38,12 @@ config_table = {
 	
 	tickrate = 60,
 
-	jitter_buffer_ms = 120,
+	jitter_buffer_ms = 50,
 	
 	simulate_lag = 0,
 	packet_loss = 0.00,
 	min_latency = 50,
-	jitter = 0,
-
-	determinism_test_cloned_cosmoi_count = 2
+	jitter = 0
 }
 
 set_cursor_visible(0)

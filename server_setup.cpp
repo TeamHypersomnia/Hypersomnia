@@ -135,7 +135,10 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 					auto new_char = scene.assign_new_character(net_event.address);
 					augs::write_object(stream, hypersomnia[new_char].get_guid());
 
-					serv.send_reliable(stream, net_event.address);
+					if(serv.has_endpoint(net_event.address))
+						serv.send_reliable(stream, net_event.address);
+					if (alternative_serv.has_endpoint(net_event.address))
+						alternative_serv.send_reliable(stream, net_event.address);
 				}
 				
 				if (net_event.message_type == augs::network::message::type::DISCONNECT) {

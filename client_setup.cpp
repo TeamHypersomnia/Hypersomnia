@@ -59,8 +59,11 @@ void client_setup::init(game_window& window, const std::string recording_filenam
 	receiver.jitter_buffer.set_lower_limit(static_cast<unsigned>(static_cast<float>(window.get_config_number("jitter_buffer_ms")) / hypersomnia.get_fixed_delta().in_milliseconds()));
 
 	const bool is_replaying = input_unpacker.player.is_replaying();
+	const auto port = static_cast<unsigned short>(window.get_config_number(use_alternative_port ? "alternative_port" : "connect_port"));
 
-	if (is_replaying || client.connect(window.get_config_string("connect_address"), static_cast<unsigned short>(window.get_config_number(use_alternative_port ? "alternative_port" : "connect_port")), 15000)) {
+	LOG("Port: %x", port);
+
+	if (is_replaying || client.connect(window.get_config_string("connect_address"), port, 15000)) {
 		LOG("Connected successfully");
 
 		input_unpacker.timer.reset_timer();
