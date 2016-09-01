@@ -38,6 +38,8 @@ public:
 
 class client_setup : public setup_base {
 public:
+	bool predict_entropy = true;
+
 	cosmos hypersomnia = cosmos(3000);
 	cosmos initial_hypersomnia = cosmos(3000);
 

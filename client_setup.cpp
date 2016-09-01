@@ -12,7 +12,6 @@
 #include "game/transcendental/viewing_session.h"
 #include "game/transcendental/cosmos.h"
 
-
 #include "game/transcendental/network_commands.h"
 #include "game/transcendental/cosmic_delta.h"
 
@@ -85,6 +84,8 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 
 	auto steps = input_unpacker.unpack_steps(hypersomnia.get_fixed_delta());
 
+	std::vector<cosmic_entropy> extrapolated_entropies;
+
 	for (auto& s : steps) {
 		for (auto& net_event : s.total_entropy.remote) {
 			if (net_event.message_type == augs::network::message::type::RECEIVE) {
@@ -154,27 +155,9 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 		client.post_redundant(client_commands);
 		client.send_pending_redundant();
 
-		auto deterministic_steps = receiver.unpack_deterministic_steps(hypersomnia, extrapolated_hypersomnia, hypersomnia_last_snapshot);
-
-		if (deterministic_steps.use_extrapolated_cosmos) {
-			scene.step_with_callbacks(cosmic_entropy(), extrapolated_hypersomnia);
-			renderer::get_current().clear_logic_lines();
-			last_stepped_was_extrapolated = true;
-		}
-		else {
-			last_stepped_was_extrapolated = false;
-
-			ensure(deterministic_steps.has_next_entropy());
-
-			while (deterministic_steps.has_next_entropy()) {
-				const auto cosmic_entropy_for_this_step = deterministic_steps.unpack_next_entropy(hypersomnia);
-				scene.step_with_callbacks(cosmic_entropy_for_this_step, hypersomnia);
-				renderer::get_current().clear_logic_lines();
-			}
-		}
-
-		if (detailed_step_log || last_stepped_was_extrapolated)
-			LOG("stepped extrapolated: %x", last_stepped_was_extrapolated);
+		last_stepped_was_extrapolated = receiver.unpack_deterministic_steps(hypersomnia, hypersomnia_last_snapshot, [this](const cosmic_entropy& entropy, cosmos& cosm) {
+			scene.step_with_callbacks(entropy, cosm);
+		}).use_extrapolated_cosmos;
 	}
 
 	if (!still_downloading)
