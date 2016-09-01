@@ -182,7 +182,7 @@ std::vector<const_entity_handle> cosmos::get(const processing_subjects list) con
 }
 
 randomization cosmos::get_rng_for(const entity_id id) const {
-	return { id.pool.version + std::abs(id.pool.indirection_index) + static_cast<size_t>(get_total_steps_passed()) };
+	return { get_handle(id).get_guid() + static_cast<size_t>(get_total_steps_passed()) };
 }
 
 #if COSMOS_TRACKS_GUIDS
