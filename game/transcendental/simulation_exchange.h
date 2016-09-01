@@ -22,6 +22,7 @@ public:
 		} step_type = type::INVALID;
 
 		bool shall_resubstantiate = false;
+		bool next_client_commands_accepted = false;
 		augs::stream delta;
 		guid_mapped_entropy entropy;
 	};

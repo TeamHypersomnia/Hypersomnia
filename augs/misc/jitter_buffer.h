@@ -8,8 +8,9 @@ namespace augs {
 		unsigned steps_extrapolated = 0;
 
 		bool initial_filling = true;
-		std::vector<command> buffer;
 	public:
+		std::vector<command> buffer;
+		
 		void acquire_new_command(const command& c) {
 			buffer.push_back(c);
 
@@ -55,6 +56,19 @@ namespace augs {
 			}
 
 			return std::move(next_commands);
+		}
+
+		bool unpack_new_command(command& next_command) {
+			if (!initial_filling) {
+				if (buffer.size() > 0) {
+					next_command = buffer.front();
+					buffer.erase(buffer.begin());
+
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		void allow_to_refill() {

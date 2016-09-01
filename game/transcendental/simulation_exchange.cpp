@@ -16,11 +16,13 @@ void simulation_exchange::write_packaged_step_to_stream(augs::stream& output, co
 	if (written.step_type == packaged_step::type::NEW_ENTROPY) {
 		augs::write_object(output, network_command::ENTROPY_FOR_NEXT_STEP);
 		augs::write_object(output, written.shall_resubstantiate);
+		augs::write_object(output, written.next_client_commands_accepted);
 		augs::write_object(output, written.entropy);
 
 	}
 	else if (written.step_type == packaged_step::type::NEW_ENTROPY_WITH_HEARTBEAT) {
 		augs::write_object(output, network_command::ENTROPY_WITH_HEARTBEAT_FOR_NEXT_STEP);
+		augs::write_object(output, written.next_client_commands_accepted);
 		augs::write_object(output, written.entropy);
 
 		augs::write_sized_stream(output, written.delta);
@@ -39,6 +41,7 @@ simulation_exchange::packaged_step simulation_exchange::read_entropy_for_next_st
 	new_command.step_type = packaged_step::type::NEW_ENTROPY;
 
 	augs::read_object(in, new_command.shall_resubstantiate);
+	augs::read_object(in, new_command.next_client_commands_accepted);
 	augs::read_object(in, new_command.entropy);
 
 	return std::move(new_command);
@@ -53,6 +56,7 @@ simulation_exchange::packaged_step simulation_exchange::read_entropy_with_heartb
 	packaged_step new_command;
 	new_command.step_type = packaged_step::type::NEW_ENTROPY_WITH_HEARTBEAT;
 
+	augs::read_object(in, new_command.next_client_commands_accepted);
 	augs::read_object(in, new_command.entropy);
 	augs::read_sized_stream(in, new_command.delta);
 
