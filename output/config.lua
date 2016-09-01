@@ -11,7 +11,7 @@ launch_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.CLIENT_AND_SERVER,
+	launch_mode = launch_modes.TWO_CLIENTS_AND_SERVER,
 	
 	determinism_test_cloned_cosmoi_count = 2,
 

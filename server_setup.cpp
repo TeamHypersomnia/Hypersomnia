@@ -82,6 +82,7 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 		augs::network::endpoint_address addr;
 		//std::vector<guid_mapped_entropy> commands;
 		augs::jitter_buffer<guid_mapped_entropy> commands;
+		simulation_exchange::packaged_step next_command;
 
 		bool operator==(augs::network::endpoint_address b) const {
 			return addr == b;
@@ -192,27 +193,30 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 				}
 			}
 
-			simulation_exchange::packaged_step this_net_step;
-			this_net_step.step_type = simulation_exchange::packaged_step::type::NEW_ENTROPY;
-			auto& total_entropy = this_net_step.entropy;
+			guid_mapped_entropy total_unpacked_entropy;
 			
 			for (auto& e : endpoints) {
-				simulation_exchange::packaged_step next_command;
-				next_command.step_type = simulation_exchange::packaged_step::type::NEW_ENTROPY;
-				next_command.shall_resubstantiate = resubstantiate;
-				resubstantiate = false;
+				guid_mapped_entropy maybe_new_client_commands;
+				auto& next_command = e.next_command;
+				next_command = simulation_exchange::packaged_step();
 
-				next_command.entropy = e.commands.unpack_new_command();
+				if (e.commands.unpack_new_command(maybe_new_client_commands)) {
+					total_unpacked_entropy += maybe_new_client_commands;
 
-				ensure(next_command.step_type == simulation_exchange::packaged_step::type::NEW_ENTROPY);
-				
-				total_entropy += next_command.entropy;
+					e.next_command.next_client_commands_accepted = true;
+				}
 			}
 
-			augs::stream new_data;
-			simulation_exchange::write_packaged_step_to_stream(new_data, this_net_step);
-
 			for (auto& e : endpoints) {
+				auto& next_command = e.next_command;
+
+				next_command.step_type = simulation_exchange::packaged_step::type::NEW_ENTROPY;
+				next_command.shall_resubstantiate = resubstantiate;
+				next_command.entropy = total_unpacked_entropy;
+
+				augs::stream new_data;
+				simulation_exchange::write_packaged_step_to_stream(new_data, next_command);
+
 				if (serv.has_endpoint(e.addr)) serv.post_redundant(new_data, e.addr);
 				else if (alternative_serv.has_endpoint(e.addr)) alternative_serv.post_redundant(new_data, e.addr);
 			}
@@ -220,7 +224,7 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 			serv.send_pending_redundant();
 			if(start_alternative_server) alternative_serv.send_pending_redundant();
 
-			cosmic_entropy id_mapped_entropy(total_entropy, hypersomnia);
+			cosmic_entropy id_mapped_entropy(total_unpacked_entropy, hypersomnia);
 			scene.step_with_callbacks(id_mapped_entropy, hypersomnia);
 		}
 	}
