@@ -80,7 +80,8 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 
 	struct endpoint {
 		augs::network::endpoint_address addr;
-		std::vector<guid_mapped_entropy> commands;
+		//std::vector<guid_mapped_entropy> commands;
+		augs::jitter_buffer<guid_mapped_entropy> commands;
 
 		bool operator==(augs::network::endpoint_address b) const {
 			return addr == b;
@@ -120,7 +121,9 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 				if (net_event.message_type == augs::network::message::type::CONNECT) {
 					LOG("Client connected.");
 					
-					endpoints.push_back({ net_event.address });
+					endpoint new_endpoint = { net_event.address };
+					new_endpoint.commands.set_lower_limit(static_cast<unsigned>(window.get_config_number("client_commands_jitter_buffer_ms")) / hypersomnia.get_fixed_delta().in_milliseconds());
+					endpoints.push_back(new_endpoint);
 
 					auto& stream = initial_hypersomnia.reserved_memory_for_serialization;
 					stream.reset_write_pos();
@@ -176,8 +179,9 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 							guid_mapped_entropy result;
 							augs::read_object(stream, result);
 								
-							if(!should_skip)
-								endpoint.commands.push_back(result);
+							if (!should_skip)
+								//endpoint.commands.push_back(result);
+								endpoint.commands.acquire_new_command(result);
 						}
 							break;
 						default: 
@@ -198,10 +202,7 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 				next_command.shall_resubstantiate = resubstantiate;
 				resubstantiate = false;
 
-				if (e.commands.size() > 0) {
-					next_command.entropy = e.commands.front();
-					e.commands.erase(e.commands.begin());
-				}
+				next_command.entropy = e.commands.unpack_new_command();
 
 				ensure(next_command.step_type == simulation_exchange::packaged_step::type::NEW_ENTROPY);
 				
