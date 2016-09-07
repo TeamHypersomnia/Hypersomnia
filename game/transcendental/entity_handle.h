@@ -38,6 +38,7 @@ namespace augs {
 
 		friend class augs::component_allocators<is_const, basic_entity_handle<is_const>>;
 		friend class cosmic_delta;
+		friend class cosmos;
 
 		template <class T, typename = void>
 		struct component_or_synchronizer_or_disabled {

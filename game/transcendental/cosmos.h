@@ -12,6 +12,7 @@
 #include "game/transcendental/types_specification/all_messages_declaration.h"
 #include "game/transcendental/types_specification/all_systems_declaration.h"
 
+#include "game/insignificant_systems/interpolation_system.h"
 #include "game/temporary_systems/dynamic_tree_system.h"
 #include "game/temporary_systems/physics_system.h"
 #include "game/temporary_systems/processing_lists_system.h"
@@ -46,11 +47,6 @@ private:
 	entity_handle create_entity_with_specific_guid(std::string debug_name, unsigned specific_guid);
 #endif
 
-	template <class D>
-	void for_each_entity_id(D pred) {
-		significant.pool_for_aggregates.for_each_id(pred);
-	}
-
 	void destroy_substance_completely();
 	void create_substance_completely();
 	void destroy_substance_for_entity(const_entity_handle);
@@ -58,6 +54,8 @@ private:
 
 public:
 	storage_for_all_temporary_systems temporary_systems;
+	mutable storage_for_all_insignificant_systems insignificant_systems;
+
 	mutable cosmic_profiler profiler;
 	augs::stream reserved_memory_for_serialization;
 
@@ -121,6 +119,7 @@ public:
 		post_solve(step);
 	}
 
+	void set_current_transforms_as_previous_for_interpolation() const;
 	void advance_deterministic_schemata(cosmic_entropy input);
 
 	void reserve_storage_for_entities(size_t);
@@ -170,6 +169,8 @@ public:
 	std::vector<entity_handle> get(processing_subjects);
 	std::vector<const_entity_handle> get(processing_subjects) const;
 
+	components::transform get_previous_transform(entity_id) const;
+
 	size_t entities_count() const;
 	size_t get_maximum_entities() const;
 	std::wstring summary() const;
@@ -185,6 +186,16 @@ public:
 
 	void save_to_file(std::string);
 	bool load_from_file(std::string);
+
+	template <class D>
+	void for_each_entity_id(D pred) {
+		significant.pool_for_aggregates.for_each_id(pred);
+	}
+
+	template <class D>
+	void for_each_entity_id(D pred) const {
+		significant.pool_for_aggregates.for_each_id(pred);
+	}
 
 	template<class T>
 	auto& get_pool(augs::pool_id<T>) {

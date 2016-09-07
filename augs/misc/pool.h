@@ -28,7 +28,7 @@ namespace augs {
 		};
 
 		struct indirector {
-			int real_index = -1;
+			unsigned real_index = 0;
 			unsigned version = 1;
 
 			template <class Archive>
@@ -94,7 +94,7 @@ namespace augs {
 			if (!alive(object))
 				return false;
 
-			int dead_index = indirectors[object.pool.indirection_index].real_index;
+			int dead_index = get_real_index(object);
 
 			// add dead object's indirector to the free indirection list
 			free_indirectors.push_back(slots[dead_index].pointing_indirector);
@@ -228,27 +228,35 @@ namespace augs {
 		void for_each(Pred f) const {
 			std::for_each(pooled.begin(), pooled.end(), f);
 		}
-
-		T& get(id_type object) {
-			ensure(alive(object));
-			return pooled[indirectors[object.pool.indirection_index].real_index];
+		
+		unsigned get_real_index(const id_type obj) const {
+			return indirectors[obj.pool.indirection_index].real_index;
 		}
 
-		const T& get(id_type object) const {
+		T& get(const id_type object) {
 			ensure(alive(object));
-			return pooled[indirectors[object.pool.indirection_index].real_index];
+			return pooled[get_real_index(object)];
 		}
 
-		bool alive(id_type object) const {
+		const T& get(const id_type object) const {
+			ensure(alive(object));
+			return pooled[get_real_index(object)];
+		}
+
+		bool alive(const id_type object) const {
 			return object.pool.indirection_index >= 0 && indirectors[object.pool.indirection_index].version == object.pool.version;
 		}
 
-		basic_pool& get_pool(id_type) {
+		basic_pool& get_pool(const id_type) {
 			return *this;
 		}
 
-		const basic_pool& get_pool(id_type) const {
+		const basic_pool& get_pool(const id_type) const {
 			return *this;
+		}
+
+		const pooled_container_type& get_pooled() const {
+			return pooled;
 		}
 
 		T* data() {
@@ -343,13 +351,13 @@ namespace augs {
 		template <typename M>
 		M& get_meta(typename basic_pool<T>::id_type object) {
 			ensure(alive(object));
-			return std::get<M>(metas[basic_pool<T>::indirectors[object.pool.indirection_index].real_index]);
+			return std::get<M>(metas[basic_pool<T>::get_real_index(object)]);
 		}
 
 		template <typename M>
 		const M& get_meta(typename basic_pool<T>::id_type object) const {
 			ensure(alive(object));
-			return std::get<M>(metas[basic_pool<T>::indirectors[object.pool.indirection_index].real_index]);
+			return std::get<M>(metas[basic_pool<T>::get_real_index(object)]);
 		}
 	};
 

@@ -30,8 +30,6 @@ namespace components {
 		bool position_copying_rotation = false;
 		bool track_origin = false;
 		bool target_newly_set = true;
-		
-		int subscribe_to_previous = false;
 
 	private:
 		friend class position_copying_system;

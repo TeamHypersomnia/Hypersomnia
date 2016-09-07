@@ -113,10 +113,6 @@ void movement_system::generate_movement_responses(fixed_step& step) {
 			if (it.has<components::physics>()) {
 				speed = it.get<components::physics>().velocity().length();
 			}
-			else {
-				if (it.get<components::transform>().interpolation_direction().non_zero())
-					speed = movement.max_speed_for_movement_response;
-			}
 		}
 
 		messages::movement_response msg;

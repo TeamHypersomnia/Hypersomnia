@@ -52,15 +52,6 @@ std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> render_s
 	return output;
 }
 
-void render_system::set_current_transforms_as_previous_for_interpolation(cosmos& cosm) const {
-	if (cosm.significant.meta.settings.enable_interpolation) {
-		cosm.get_pool(pool_id<components::transform>()).for_each([](components::transform& t) {
-			t.previous.pos = t.pos;
-			t.previous.rotation = t.rotation;
-		});
-	}
-}
-
 void render_system::draw_entities(augs::vertex_triangle_buffer& output, std::vector<const_entity_handle> entities, state_for_drawing_camera in_camera, float interpolation_ratio, bool only_border_highlights) const {
 	for (auto e : entities) {
 		for_each_type<components::polygon, components::sprite, /*components::tile_layer,*/ components::particle_group>([e, interpolation_ratio, &output, &in_camera, only_border_highlights](auto T) {
@@ -74,7 +65,7 @@ void render_system::draw_entities(augs::vertex_triangle_buffer& output, std::vec
 				components::transform renderable_transform = transform;
 
 				if (interpolation_enabled && render.interpolate) {
-					renderable_transform = transform.interpolated(interpolation_ratio);
+					renderable_transform = transform.interpolated(e.get_cosmos().get_previous_transform(e), interpolation_ratio);
 				}
 				//else {
 				//	renderable_transform = transform;

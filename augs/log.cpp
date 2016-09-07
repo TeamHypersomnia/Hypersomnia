@@ -12,6 +12,8 @@
 
 #include "augs/templates.h"
 
+#define ENABLE_LOG 1
+
 std::mutex log_mutex;
 
 unsigned global_log::max_entries = 20;
@@ -37,24 +39,28 @@ void global_log::push_entry(log_entry new_entry) {
 
 template<>
 void LOG(std::string f) {
+#if ENABLE_LOG 
 	std::unique_lock<std::mutex> lock(log_mutex);
 
 	global_log::push_entry({ console_color::WHITE, f });
 
 	//std::cout << f << std::endl;
-	std::ofstream recording_file("live_debug.txt", std::ios::out | std::ios::app);
-	recording_file << f << std::endl;
+	//std::ofstream recording_file("live_debug.txt", std::ios::out | std::ios::app);
+	//recording_file << f << std::endl;
+#endif
 }
 
 template<>
 void LOG_COLOR(console_color c, std::string f) {
+#if ENABLE_LOG 
 	std::unique_lock<std::mutex> lock(log_mutex);
 	
 	global_log::push_entry({ c, f });
 
 	//augs::colored_print(c, f.c_str());
-	std::ofstream recording_file("live_debug.txt", std::ios::out | std::ios::app);
-	recording_file << f << std::endl;
+	//std::ofstream recording_file("live_debug.txt", std::ios::out | std::ios::app);
+	//recording_file << f << std::endl;
+#endif
 }
 
 void CALL_SHELL(std::string s) {

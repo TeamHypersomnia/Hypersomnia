@@ -10,9 +10,14 @@ void world_camera::configure_size(vec2 size) {
 }
 
 void world_camera::tick(augs::variable_delta dt, const_entity_handle entity_to_chase) {
+	const auto& cosm = entity_to_chase.get_cosmos();
+	const auto chased_transform = entity_to_chase.get<components::transform>();
+
+	auto previous = cosm.significant.meta.settings.enable_interpolation ? cosm.get_previous_transform(entity_to_chase) : chased_transform;
+
 	/* we obtain transform as a copy because we'll be now offsetting it by crosshair position */
 	if (entity_to_chase.alive()) {
-		transform = entity_to_chase.get<components::transform>().interpolated(dt.view_interpolation_ratio());
+		transform = chased_transform.interpolated(previous, dt.view_interpolation_ratio());
 		transform.rotation = 0;
 	}
 
@@ -97,7 +102,7 @@ void world_camera::tick(augs::variable_delta dt, const_entity_handle entity_to_c
 			// LOG("%x, %x, %x", *(vec2i*)&player_pos, *(vec2i*)&previous_step_player_position, *(vec2i*)&target_value);
 		}
 		else {
-			target_value = entity_to_chase.get<components::transform>().interpolation_direction();
+			target_value = chased_transform.interpolation_direction(previous);
 			target_value.set_length(100);
 			smoothing_player_pos.averages_per_sec = 5;
 		}

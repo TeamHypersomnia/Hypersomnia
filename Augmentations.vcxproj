@@ -312,6 +312,7 @@
     <ClCompile Include="augs\texture_baker\texture.cpp" />
     <ClCompile Include="augs\texture_baker\texture_with_image.cpp" />
     <ClCompile Include="game\detail\world_camera.cpp" />
+    <ClCompile Include="game\insignificant_systems\interpolation_system.cpp" />
     <ClCompile Include="game\scene_managers\networked_testbed.cpp" />
     <ClCompile Include="game\transcendental\cosmic_delta.cpp" />
     <ClCompile Include="game\transcendental\cosmic_entropy.cpp" />
@@ -965,6 +966,7 @@
     <ClInclude Include="game\components\sub_entities_component.h" />
     <ClInclude Include="game\container_sizes.h" />
     <ClInclude Include="game\detail\world_camera.h" />
+    <ClInclude Include="game\insignificant_systems\interpolation_system.h" />
     <ClInclude Include="game\scene_managers\networked_testbed.h" />
     <ClInclude Include="game\transcendental\component_synchronizer.h" />
     <ClInclude Include="game\transcendental\cosmic_delta.h" />

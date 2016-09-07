@@ -1047,6 +1047,9 @@
     <ClCompile Include="augs\texture_baker\texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\insignificant_systems\interpolation_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3216,6 +3219,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\texture_baker\texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\insignificant_systems\interpolation_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

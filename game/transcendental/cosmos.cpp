@@ -1,7 +1,5 @@
 #include "cosmos.h"
 
-#include "game/temporary_systems/physics_system.h"
-#include "game/temporary_systems/dynamic_tree_system.h"
 #include "game/systematic/movement_system.h"
 #include "game/systematic/visibility_system.h"
 #include "game/systematic/pathfinding_system.h"
@@ -167,6 +165,10 @@ void cosmos::reserve_storage_for_entities(const size_t n) {
 	temporary_systems.for_each([n](auto& sys) {
 		sys.reserve_caches_for_entities(n);
 	});
+
+	insignificant_systems.for_each([n](auto& sys) {
+		sys.reserve_caches_for_entities(n);
+	});
 }
 
 std::wstring cosmos::summary() const {
@@ -179,6 +181,23 @@ std::vector<entity_handle> cosmos::get(const processing_subjects list) {
 
 std::vector<const_entity_handle> cosmos::get(const processing_subjects list) const {
 	return temporary_systems.get<processing_lists_system>().get(list, *this);
+}
+
+components::transform cosmos::get_previous_transform(entity_id id) const {
+	auto handle = get_handle(id);
+
+	ensure(handle.has<components::transform>());
+
+	const auto trans_id = static_cast<unsigned>(
+		get_pool(augs::pool_id<components::transform>()).get_real_index(handle.get().get_id<components::transform>())
+		);
+	
+	const auto& cache = insignificant_systems.get<interpolation_system>().per_entity_cache;
+	
+	if (trans_id < cache.size())
+		return cache[trans_id];
+
+	return handle.get<components::transform>();
 }
 
 randomization cosmos::get_rng_for(const entity_id id) const {
@@ -338,6 +357,12 @@ size_t cosmos::get_maximum_entities() const {
 	return significant.pool_for_aggregates.capacity();
 }
 
+void cosmos::set_current_transforms_as_previous_for_interpolation() const {
+	profiler.start(meter_type::INTERPOLATION);
+	insignificant_systems.get<interpolation_system>().set_current_transforms_as_previous_for_interpolation(*this);
+	profiler.stop(meter_type::INTERPOLATION);
+}
+
 void cosmos::advance_deterministic_schemata(const cosmic_entropy input) {
 	fixed_step step(*this, input);
 	advance_deterministic_schemata(step);
@@ -358,12 +383,8 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	//gui_system().suppress_inputs_meant_for_gui();
 	//gui_system().switch_to_gui_mode_and_back();
 
-	performance.start(meter_type::INTERPOLATION);
-	render_system().set_current_transforms_as_previous_for_interpolation(cosmos);
-	performance.stop(meter_type::INTERPOLATION);
-
 	performance.start(meter_type::LOGIC);
-	
+
 	input_system().make_intent_messages(step);
 
 	intent_contextualization_system().contextualize_crosshair_action_intents(step);

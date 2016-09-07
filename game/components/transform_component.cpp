@@ -8,7 +8,6 @@ namespace components {
 
 	transform::transform(float x, float y, float rotation) : pos(vec2(x, y)), rotation(rotation) {}
 	transform::transform(vec2 pos, float rotation) : pos(pos), rotation(rotation) {}
-	transform::transform(transform::previous_state state) : transform(state.pos, state.rotation) {}
 
 	transform transform::operator+(const transform& b) const {
 		transform out;
@@ -33,9 +32,9 @@ namespace components {
 		return pos == b.pos && rotation == b.rotation;
 	}
 
-	transform transform::interpolated(float ratio, float epsilon) const {
+	transform transform::interpolated(const transform& previous, float ratio, float epsilon) const {
 		auto result = *this;
-		auto interpolated = augs::interp(components::transform(previous), *this, ratio);
+		auto interpolated = augs::interp(previous, *this, ratio);
 
 		if ((pos - interpolated.pos).length_sq() > epsilon)
 			result.pos = interpolated.pos;
@@ -54,7 +53,7 @@ namespace components {
 		rotation = 0.f;
 	}
 
-	vec2 transform::interpolation_direction() const {
+	vec2 transform::interpolation_direction(const transform& previous) const {
 		return pos - previous.pos;
 	}
 }

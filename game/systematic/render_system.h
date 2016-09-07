@@ -13,8 +13,6 @@ struct state_for_drawing_camera;
 
 class render_system {
 public:
-	void set_current_transforms_as_previous_for_interpolation(cosmos&) const;
-
 	void draw_entities(augs::vertex_triangle_buffer& output, std::vector<const_entity_handle>, state_for_drawing_camera in, float interpolation_ratio, bool only_border_highlights = false) const;
 	std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> get_visible_per_layer(std::vector<const_entity_handle>) const;
 };

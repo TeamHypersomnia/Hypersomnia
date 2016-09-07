@@ -8,7 +8,7 @@
 class viewing_session {
 public:
 	world_camera camera;
-	input_context input;
+	input_context context;
 	vec2i viewport_coordinates;
 
 	augs::variable_delta_timer frame_timer;

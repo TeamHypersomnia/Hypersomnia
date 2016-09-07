@@ -238,7 +238,7 @@ namespace scene_managers {
 	}
 
 	void testbed::configure_view(viewing_session& session) const {
-		auto& active_context = session.input;
+		auto& active_context = session.context;
 
 		active_context.map_key_to_intent(window::event::keys::W, intent_type::MOVE_FORWARD);
 		active_context.map_key_to_intent(window::event::keys::S, intent_type::MOVE_BACKWARD);
