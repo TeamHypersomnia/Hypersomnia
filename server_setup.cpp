@@ -220,6 +220,8 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 				if (serv.has_endpoint(e.addr)) serv.post_redundant(new_data, e.addr);
 				else if (alternative_serv.has_endpoint(e.addr)) alternative_serv.post_redundant(new_data, e.addr);
 			}
+			
+			resubstantiate = false;
 
 			serv.send_pending_redundant();
 			if(start_alternative_server) alternative_serv.send_pending_redundant();

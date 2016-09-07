@@ -86,6 +86,10 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 
 	std::vector<cosmic_entropy> extrapolated_entropies;
 
+	const auto& step_pred = [this](const cosmic_entropy& entropy, cosmos& cosm) {
+		scene.step_with_callbacks(entropy, cosm);
+	};
+
 	for (auto& s : steps) {
 		for (auto& net_event : s.total_entropy.remote) {
 			if (net_event.message_type == augs::network::message::type::RECEIVE) {
@@ -115,6 +119,9 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 
 						cosmic_delta::decode(initial_hypersomnia, stream);
 						hypersomnia = initial_hypersomnia;
+						extrapolated_hypersomnia = initial_hypersomnia;
+
+						LOG("Decoded cosm at step: %x", hypersomnia.get_total_steps_passed());
 
 						unsigned controlled_character_guid;
 						augs::read_object(stream, controlled_character_guid);
@@ -142,25 +149,17 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 		if (still_downloading)
 			continue;
 
-		const auto local_cosmic_entropy_for_this_step = scene.make_cosmic_entropy(s.total_entropy.local, session.input, hypersomnia);
+		extrapolated_hypersomnia.set_current_transforms_as_previous_for_interpolation();
 
-		augs::stream client_commands;
-		augs::write_object(client_commands, network_command::CLIENT_REQUESTED_ENTROPY);
+		const auto local_cosmic_entropy_for_this_step = scene.make_cosmic_entropy(s.total_entropy.local, session.context, hypersomnia);
 
-		guid_mapped_entropy guid_mapped(local_cosmic_entropy_for_this_step, hypersomnia);
-		augs::write_object(client_commands, guid_mapped);
+		receiver.send_commands_and_predict(client, local_cosmic_entropy_for_this_step, extrapolated_hypersomnia, step_pred);
+		LOG("Predicting to step: %x; predicted steps: %x", extrapolated_hypersomnia.get_total_steps_passed(), receiver.predicted_steps.size());
 
-		// LOG("num: %x s: %x", net_step.entropy.entropy_per_entity.size(), serialized_step.size());
-
-		client.post_redundant(client_commands);
-		client.send_pending_redundant();
-
-		last_stepped_was_extrapolated = receiver.unpack_deterministic_steps(hypersomnia, hypersomnia_last_snapshot, [this](const cosmic_entropy& entropy, cosmos& cosm) {
-			scene.step_with_callbacks(entropy, cosm);
-		}).use_extrapolated_cosmos;
+		receiver.unpack_deterministic_steps(hypersomnia, hypersomnia_last_snapshot, extrapolated_hypersomnia, step_pred);
 	}
 
 	if (!still_downloading)
-		scene.view(last_stepped_was_extrapolated ? extrapolated_hypersomnia : hypersomnia,
-			window, session, client, session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), input_unpacker.timer), swap_buffers);
+		scene.view(extrapolated_hypersomnia,
+			window, session, client, session.frame_timer.extract_variable_delta(extrapolated_hypersomnia.get_fixed_delta(), input_unpacker.timer), swap_buffers);
 }

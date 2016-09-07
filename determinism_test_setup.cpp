@@ -81,44 +81,47 @@ void determinism_test_setup::process(game_window& window) {
 
 		input_unpacker.control(new_entropy);
 
-		auto steps = input_unpacker.unpack_steps(hypersomnias[0].get_fixed_delta());
+		for (int i = 0; i < 2; ++i) {
+			auto steps = input_unpacker.unpack_steps(hypersomnias[0].get_fixed_delta());
 
-		for (const auto& s : steps) {
-			if (divergence_detected)
-				break;
-
-			for (size_t i = 0; i < cosmoi_count; ++i) {
-				auto& h = hypersomnias[i];
-				testbeds[i].control(s.total_entropy.local, h);
-
-				auto cosmic_entropy_for_this_step = testbeds[i].make_cosmic_entropy(s.total_entropy.local, session.input, h);
-
-				testbeds[i].step_with_callbacks(cosmic_entropy_for_this_step, h);
-
-				renderer::get_current().clear_logic_lines();
-			}
-
-			auto& first_cosm = hypersomnias[0].reserved_memory_for_serialization;
-
-			augs::output_stream_reserver first_cosm_reserver;
-			augs::write_object(first_cosm_reserver, hypersomnias[0].significant);
-			first_cosm.reserve(first_cosm_reserver.get_write_pos());
-			first_cosm.reset_write_pos();
-			augs::write_object(first_cosm, hypersomnias[0].significant);
-
-			for (unsigned i = 1; i < cosmoi_count; ++i) {
-				auto& second_cosm = hypersomnias[i].reserved_memory_for_serialization;
-
-				augs::output_stream_reserver second_cosm_reserver;
-				augs::write_object(second_cosm_reserver, hypersomnias[i].significant);
-				second_cosm.reserve(second_cosm_reserver.get_write_pos());
-				second_cosm.reset_write_pos();
-				augs::write_object(second_cosm, hypersomnias[i].significant);
-
-				if (!(first_cosm == second_cosm)) {
-					divergence_detected = true;
-					which_divergent = i;
+			for (const auto& s : steps) {
+				if (divergence_detected)
 					break;
+
+				for (size_t i = 0; i < cosmoi_count; ++i) {
+					auto& h = hypersomnias[i];
+					testbeds[i].control(s.total_entropy.local, h);
+
+					auto cosmic_entropy_for_this_step = testbeds[i].make_cosmic_entropy(s.total_entropy.local, session.context, h);
+
+					h.set_current_transforms_as_previous_for_interpolation();
+					testbeds[i].step_with_callbacks(cosmic_entropy_for_this_step, h);
+
+					renderer::get_current().clear_logic_lines();
+				}
+
+				auto& first_cosm = hypersomnias[0].reserved_memory_for_serialization;
+
+				augs::output_stream_reserver first_cosm_reserver;
+				augs::write_object(first_cosm_reserver, hypersomnias[0].significant);
+				first_cosm.reserve(first_cosm_reserver.get_write_pos());
+				first_cosm.reset_write_pos();
+				augs::write_object(first_cosm, hypersomnias[0].significant);
+
+				for (unsigned i = 1; i < cosmoi_count; ++i) {
+					auto& second_cosm = hypersomnias[i].reserved_memory_for_serialization;
+
+					augs::output_stream_reserver second_cosm_reserver;
+					augs::write_object(second_cosm_reserver, hypersomnias[i].significant);
+					second_cosm.reserve(second_cosm_reserver.get_write_pos());
+					second_cosm.reset_write_pos();
+					augs::write_object(second_cosm, hypersomnias[i].significant);
+
+					if (!(first_cosm == second_cosm)) {
+						divergence_detected = true;
+						which_divergent = i;
+						break;
+					}
 				}
 			}
 		}
