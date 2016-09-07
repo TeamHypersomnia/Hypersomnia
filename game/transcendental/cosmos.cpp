@@ -201,7 +201,13 @@ components::transform cosmos::get_previous_transform(entity_id id) const {
 }
 
 randomization cosmos::get_rng_for(const entity_id id) const {
-	return { get_handle(id).get_guid() + static_cast<size_t>(get_total_steps_passed()) };
+	int transform_hash = 0;
+	auto tr = get_handle(id).get<components::transform>();
+	transform_hash = static_cast<int>(tr.pos.x*100.0);
+	transform_hash += static_cast<int>(tr.pos.y*100.0);
+	transform_hash += static_cast<int>(tr.rotation*100.0);
+
+	return { get_handle(id).get_guid() + transform_hash };
 }
 
 #if COSMOS_TRACKS_GUIDS

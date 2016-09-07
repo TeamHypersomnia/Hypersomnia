@@ -43,7 +43,12 @@ public:
 
 		result.use_extrapolated_cosmos = true;
 
-		std::vector<guid_mapped_entropy> entropies_to_simulate;
+		struct step_to_simulate {
+			bool resubstantiate = false;
+			guid_mapped_entropy entropy;
+		};
+
+		std::vector<step_to_simulate> entropies_to_simulate;
 
 		for (size_t i = 0; i < new_commands.size(); ++i) {
 			auto& new_command = new_commands[i];
@@ -57,7 +62,11 @@ public:
 			else
 				ensure(new_command.step_type == packaged_step::type::NEW_ENTROPY);
 
-			entropies_to_simulate.emplace_back(new_command.entropy);
+			step_to_simulate sim;
+			sim.resubstantiate = new_command.shall_resubstantiate;
+			sim.entropy = new_command.entropy;
+
+			entropies_to_simulate.emplace_back(sim);
 
 			if (new_command.next_client_commands_accepted) {
 				ensure(predicted_steps.size() > 0);
@@ -69,7 +78,11 @@ public:
 		const unsigned previous_step = referential_cosmos.get_total_steps_passed();
 
 		for (const auto& e : entropies_to_simulate) {
-			const cosmic_entropy cosmic_entropy_for_this_step(e, referential_cosmos);
+			const cosmic_entropy cosmic_entropy_for_this_step(e.entropy, referential_cosmos);
+			
+			if (e.resubstantiate)
+				referential_cosmos.complete_resubstantiation();
+
 			advance(cosmic_entropy_for_this_step, referential_cosmos);
 		}
 		
