@@ -6,6 +6,8 @@
 #include "cosmic_entropy.h"
 #include "cosmos.h"
 
+#include "augs/misc/stepped_timing.h"
+
 struct input_context;
 
 namespace augs {

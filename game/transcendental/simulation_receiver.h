@@ -12,6 +12,8 @@ public:
 	augs::jitter_buffer<packaged_step> jitter_buffer;
 	std::vector<guid_mapped_entropy> predicted_steps;
 
+	float resubstantiate_prediction_every_ms = 1000;
+
 	void read_entropy_for_next_step(augs::stream&, bool skip_command);
 	void read_entropy_with_heartbeat_for_next_step(augs::stream&, bool skip_command);
 
@@ -110,6 +112,10 @@ public:
 				referential_cosmos.complete_resubstantiation();
 
 			advance(cosmic_entropy_for_this_step, referential_cosmos);
+
+			if (0 == referential_cosmos.get_total_steps_passed() % static_cast<int>(resubstantiate_prediction_every_ms / referential_cosmos.get_fixed_delta().in_milliseconds())) {
+				reconciliate_predicted = true;
+			}
 		}
 		
 		// LOG("Unpacking from %x to %x", previous_step, referential_cosmos.get_total_steps_passed());
