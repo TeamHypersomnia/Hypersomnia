@@ -243,7 +243,7 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 
 		if (angular_resistance > 0.f) {
 			//physics.body->ApplyTorque((angular_resistance * sqrt(sqrt(angular_speed * angular_speed)) + 0.2 * angular_speed * angular_speed)* -sgn(angular_speed) * b->GetInertia(), true);
-			b->ApplyTorque((angular_resistance * angular_speed * angular_speed)* -sgn(angular_speed) * b->GetInertia(), true);
+			b->ApplyAngularImpulse(delta.in_seconds() * (angular_resistance * angular_speed * angular_speed)* -sgn(angular_speed) * b->GetInertia(), true);
 		}
 
 		if (special.enable_angle_motor) {
@@ -255,7 +255,6 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 	ray_casts_since_last_step = 0;
 
 	b2world->Step(static_cast<float32>(delta.in_seconds()), velocityIterations, positionIterations);
-	b2world->ClearForces();
 
 	post_and_clear_accumulated_collision_messages(step);
 

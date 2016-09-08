@@ -964,12 +964,6 @@ void b2World::Step(float32 dt, int32 velocityIterations, int32 positionIteration
 
 void b2World::ClearForces()
 {
-	for (b2Body* body = m_bodyList; body; body = body->GetNext())
-	{
-		body->m_last_force = body->m_force;
-		body->m_force.SetZero();
-		body->m_torque = 0.0f;
-	}
 }
 
 struct b2WorldQueryWrapper

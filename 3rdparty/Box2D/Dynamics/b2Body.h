@@ -184,8 +184,6 @@ public:
 	/// Set the linear velocity of the center of mass.
 	/// @param v the new linear velocity of the center of mass.
 	void SetLinearVelocity(const b2Vec2& v);
-	void SetBaseLinearVelocity(const b2Vec2& v);
-	void SetMaximumLinearVelocity(float32 length);
 
 	/// Get the linear velocity of the center of mass.
 	/// @return the linear velocity of the center of mass.
@@ -194,31 +192,9 @@ public:
 	/// Set the angular velocity.
 	/// @param omega the new angular velocity in radians/second.
 	void SetAngularVelocity(float32 omega);
-	void SetBaseAngularVelocity(float32 omega);
-	float32 m_baseAngularVelocity;
 	/// Get the angular velocity.
 	/// @return the angular velocity in radians/second.
 	float32 GetAngularVelocity() const;
-
-	/// Apply a force at a world point. If the force is not
-	/// applied at the center of mass, it will generate a torque and
-	/// affect the angular velocity. This wakes up the body.
-	/// @param force the world force vector, usually in Newtons (N).
-	/// @param point the world position of the point of application.
-	/// @param wake also wake up the body
-	void ApplyForce(const b2Vec2& force, const b2Vec2& point, bool wake);
-
-	/// Apply a force to the center of mass. This wakes up the body.
-	/// @param force the world force vector, usually in Newtons (N).
-	/// @param wake also wake up the body
-	void ApplyForceToCenter(const b2Vec2& force, bool wake);
-
-	/// Apply a torque. This affects the angular velocity
-	/// without affecting the linear velocity of the center of mass.
-	/// This wakes up the body.
-	/// @param torque about the z-axis (out of the screen), usually in N-m.
-	/// @param wake also wake up the body
-	void ApplyTorque(float32 torque, bool wake);
 
 	/// Apply an impulse at a point. This immediately modifies the velocity.
 	/// It also modifies the angular velocity if the point of application
@@ -445,6 +421,7 @@ public:
 	b2BodyType m_type;
 
 	uint16 m_flags;
+	bool enable_angled_damping;
 
 	int32 m_islandIndex;
 
@@ -452,11 +429,7 @@ public:
 	b2Sweep m_sweep;		// the swept motion for CCD
 
 	b2Vec2 m_linearVelocity;
-	b2Vec2 m_baseLinearVelocity;
 	float32 m_angularVelocity;
-
-	b2Vec2 m_force, m_last_force;
-	float32 m_torque, m_max_speed;
 
 	b2World* m_world;
 	b2Body* m_prev;
@@ -475,7 +448,6 @@ public:
 
 	float32 m_linearDamping;
 
-	bool enable_angled_damping;
 	b2Vec2 m_linearDampingVec;
 	float32 m_linearDampingAngle;
 
@@ -532,23 +504,6 @@ inline void b2Body::SetLinearVelocity(const b2Vec2& v)
 	m_linearVelocity = v;
 }
 
-inline void b2Body::SetBaseLinearVelocity(const b2Vec2& v)
-{
-	if (m_type == b2_staticBody)
-	{
-		return;
-	}
-
-	SetAwake(true);
-
-	m_baseLinearVelocity = v;
-}
-
-
-inline void b2Body::SetMaximumLinearVelocity(float32 length) {
-	m_max_speed = length;
-}
-
 inline const b2Vec2& b2Body::GetLinearVelocity() const
 {
 	return m_linearVelocity;
@@ -568,19 +523,6 @@ inline void b2Body::SetAngularVelocity(float32 w)
 
 	m_angularVelocity = w;
 }
-
-inline void b2Body::SetBaseAngularVelocity(float32 w)
-{
-	if (m_type == b2_staticBody)
-	{
-		return;
-	}
-
-		SetAwake(true);
-
-	m_baseAngularVelocity = w;
-}
-
 
 inline float32 b2Body::GetAngularVelocity() const
 {
@@ -707,8 +649,6 @@ inline void b2Body::SetAwake(bool flag)
 		m_sleepTime = 0.0f;
 		m_linearVelocity.SetZero();
 		m_angularVelocity = 0.0f;
-		m_force.SetZero();
-		m_torque = 0.0f;
 	}
 }
 
@@ -793,64 +733,6 @@ inline void b2Body::SetUserData(const Userdata& data)
 inline Userdata b2Body::GetUserData() const
 {
 	return m_userData;
-}
-
-inline void b2Body::ApplyForce(const b2Vec2& force, const b2Vec2& point, bool wake)
-{
-	if (m_type != b2_dynamicBody)
-	{
-		return;
-	}
-
-	if (wake && (m_flags & e_awakeFlag) == 0)
-	{
-		SetAwake(true);
-	}
-
-	// Don't accumulate a force if the body is sleeping.
-	if (m_flags & e_awakeFlag)
-	{
-		m_force += force;
-		m_torque += b2Cross(point - m_sweep.c, force);
-	}
-}
-
-inline void b2Body::ApplyForceToCenter(const b2Vec2& force, bool wake)
-{
-	if (m_type != b2_dynamicBody)
-	{
-		return;
-	}
-
-	if (wake && (m_flags & e_awakeFlag) == 0)
-	{
-		SetAwake(true);
-	}
-
-	// Don't accumulate a force if the body is sleeping
-	if (m_flags & e_awakeFlag)
-	{
-		m_force += force;
-	}
-}
-
-inline void b2Body::ApplyTorque(float32 torque, bool wake)
-{
-	if (m_type != b2_dynamicBody)
-	{
-		return;
-	}
-
-	if (wake && (m_flags & e_awakeFlag) == 0)
-	{
-		SetAwake(true);
-	}
-
-	// Don't accumulate a force if the body is sleeping
-	if (m_flags & e_awakeFlag)
-	{
-		m_torque += torque;
-	}
 }
 
 inline void b2Body::ApplyLinearImpulse(const b2Vec2& impulse, const b2Vec2& point, bool wake)

@@ -82,11 +82,6 @@ b2Body::b2Body(const b2BodyDef* bd, b2World* world)
 	m_angularDamping = bd->angularDamping;
 	m_gravityScale = bd->gravityScale;
 
-	m_last_force.SetZero();
-	m_force.SetZero();
-	m_torque = 0.0f;
-	m_max_speed = -1.f;
-
 	m_sleepTime = 0.0f;
 
 	m_type = bd->type;
@@ -143,9 +138,6 @@ void b2Body::SetType(b2BodyType type)
 	}
 
 	SetAwake(true);
-
-	m_force.SetZero();
-	m_torque = 0.0f;
 
 	// Delete the attached contacts.
 	b2ContactEdge* ce = m_contactList;

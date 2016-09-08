@@ -79,11 +79,9 @@ void component_synchronizer<false, P>::set_linear_damping_vec(vec2 damping) cons
 	get_cache().body->SetLinearDampingVec(damping);
 }
 
-
 void component_synchronizer<false, P>::apply_force(vec2 pixels) const {
 	apply_force(pixels, vec2(0, 0), true);
 }
-
 
 void component_synchronizer<false, P>::apply_force(vec2 pixels, vec2 center_offset, bool wake) const {
 	ensure(is_constructed());
@@ -94,7 +92,11 @@ void component_synchronizer<false, P>::apply_force(vec2 pixels, vec2 center_offs
 	vec2 force = pixels * PIXELS_TO_METERSf;
 	vec2 location = get_cache().body->GetWorldCenter() + (center_offset * PIXELS_TO_METERSf);
 
-	get_cache().body->ApplyForce(force, location, wake);
+	force *= handle.get_cosmos().get_fixed_delta().in_seconds();
+
+	get_cache().body->ApplyLinearImpulse(force, location, wake);
+	component.angular_velocity = get_cache().body->GetAngularVelocity() * RAD_TO_DEGf;
+	component.velocity = METERS_TO_PIXELSf * get_cache().body->GetLinearVelocity();
 
 	if (renderer::get_current().debug_draw_forces && force.non_zero()) {
 		auto& lines = renderer::get_current().logic_lines;
@@ -102,11 +104,9 @@ void component_synchronizer<false, P>::apply_force(vec2 pixels, vec2 center_offs
 	}
 }
 
-
 void component_synchronizer<false, P>::apply_impulse(vec2 pixels) const {
 	apply_impulse(pixels, vec2(0, 0), true);
 }
-
 
 void component_synchronizer<false, P>::apply_impulse(vec2 pixels, vec2 center_offset, bool wake) const {
 	ensure(is_constructed());
@@ -118,6 +118,8 @@ void component_synchronizer<false, P>::apply_impulse(vec2 pixels, vec2 center_of
 	vec2 location = get_cache().body->GetWorldCenter() + (center_offset * PIXELS_TO_METERSf);
 
 	get_cache().body->ApplyLinearImpulse(force, location, true);
+	component.angular_velocity = get_cache().body->GetAngularVelocity() * RAD_TO_DEGf;
+	component.velocity = METERS_TO_PIXELSf * get_cache().body->GetLinearVelocity();
 
 	if (renderer::get_current().debug_draw_forces && force.non_zero()) {
 		auto& lines = renderer::get_current().logic_lines;
@@ -125,10 +127,10 @@ void component_synchronizer<false, P>::apply_impulse(vec2 pixels, vec2 center_of
 	}
 }
 
-
 void component_synchronizer<false, P>::apply_angular_impulse(float imp) const {
 	ensure(is_constructed());
 	get_cache().body->ApplyAngularImpulse(imp, true);
+	component.angular_velocity = get_cache().body->GetAngularVelocity() * RAD_TO_DEGf;
 }
 
 template<bool C>
@@ -144,8 +146,7 @@ float basic_physics_synchronizer<C>::get_angle() const {
 
 template<bool C>
 float basic_physics_synchronizer<C>::get_angular_velocity() const {
-	ensure(is_constructed());
-	return get_cache().body->GetAngularVelocity() * RAD_TO_DEGf;
+	return component.angular_velocity;
 }
 
 template<bool C>

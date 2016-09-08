@@ -202,10 +202,6 @@ void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& g
 
 		if (b->m_type == b2_dynamicBody)
 		{
-			// Integrate velocities.
-			v += h * (b->m_gravityScale * gravity + b->m_invMass * b->m_force);
-			w += h * b->m_invI * b->m_torque;
-
 			// Apply damping.
 			// ODE: dv/dt + c * v = 0
 			// Solution: v(t) = v0 * exp(-c * t)
@@ -232,13 +228,6 @@ void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& g
 
 		m_positions[i].c = c;
 		m_positions[i].a = a;
-
-		if (b->m_max_speed >= 0.f) {
-			float32 speed = v.Normalize();
-			if (speed > b->m_max_speed)
-				v *= b->m_max_speed;
-			else v *= speed;
-		}
 
 		m_velocities[i].v = v;
 		m_velocities[i].w = w;
