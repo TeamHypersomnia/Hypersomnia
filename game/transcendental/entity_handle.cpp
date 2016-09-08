@@ -20,8 +20,13 @@ void augs::basic_handle<C, O, N>::add_standard_components() const {
 	if (has<components::render>() && !is_entity_physical(*this) && !has<components::dynamic_tree_node>())
 		add(components::dynamic_tree_node::get_default(*this));
 
-	if (has<components::physics>() && !has<components::special_physics>())
-		add(components::special_physics());
+	if (has<components::physics>()) {
+
+		if(!has<components::special_physics>())
+			add(components::special_physics());
+
+		get<components::special_physics>().since_dropped.set(200, get_cosmos().get_timestamp());
+	}
 
 	recalculate_basic_processing_categories<false, void>();
 	

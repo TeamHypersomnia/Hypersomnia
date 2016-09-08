@@ -39,6 +39,7 @@ namespace augs {
 	void stepped_timeout::set(float duration_ms, stepped_timestamp s) {
 		timeout_duration_ms = duration_ms;
 		when_started = s;
+		is_set = true;
 	}
 
 	bool stepped_timeout::passed(stepped_timestamp s, fixed_delta t) const {
