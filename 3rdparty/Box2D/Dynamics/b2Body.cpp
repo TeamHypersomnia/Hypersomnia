@@ -24,9 +24,7 @@
 
 b2Body::b2Body(const b2BodyDef* bd, b2World* world)
 {
-	b2Assert(bd->position.IsValid());
 	b2Assert(bd->linearVelocity.IsValid());
-	b2Assert(b2IsValid(bd->angle));
 	b2Assert(b2IsValid(bd->angularVelocity));
 	b2Assert(b2IsValid(bd->angularDamping) && bd->angularDamping >= 0.0f);
 	b2Assert(b2IsValid(bd->linearDamping) && bd->linearDamping >= 0.0f);
@@ -60,15 +58,8 @@ b2Body::b2Body(const b2BodyDef* bd, b2World* world)
 
 	m_world = world;
 
-	m_xf.p = bd->position;
-	m_xf.q.Set(bd->angle);
-
-	m_sweep.localCenter.SetZero();
-	m_sweep.c0 = m_xf.p;
-	m_sweep.c = m_xf.p;
-	m_sweep.a0 = bd->angle;
-	m_sweep.a = bd->angle;
-	m_sweep.alpha0 = 0.0f;
+	m_xf = bd->transform;
+	m_sweep = bd->sweep;
 
 	m_jointList = NULL;
 	m_contactList = NULL;

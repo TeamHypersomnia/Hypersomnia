@@ -378,7 +378,6 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
 	auto& performance = profiler;
-	//complete_resubstantiation();
 
 	physics_system::contact_listener listener(step.cosm);
 

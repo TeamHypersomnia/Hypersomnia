@@ -1,4 +1,5 @@
 #include "transform_component.h"
+#include "Box2D/Common/b2Math.h"
 
 namespace augs {
 
@@ -30,6 +31,18 @@ namespace components {
 
 	bool transform::operator==(const transform& b) const {
 		return pos == b.pos && rotation == b.rotation;
+	}
+
+	void transform::to_box2d_transforms(b2Transform& m_xf, b2Sweep& m_sweep) const {
+		m_xf.p = pos;
+		m_xf.q.Set(rotation);
+
+		m_sweep.localCenter.SetZero();
+		m_sweep.c0 = m_xf.p;
+		m_sweep.c = m_xf.p;
+		m_sweep.a0 = rotation;
+		m_sweep.a = rotation;
+		m_sweep.alpha0 = 0.0f;
 	}
 
 	transform transform::interpolated(const transform& previous, float ratio, float epsilon) const {

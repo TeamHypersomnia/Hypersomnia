@@ -14,6 +14,11 @@
 
 typedef components::physics P;
 
+components::physics::physics() {
+	components::transform null_transform;
+	null_transform.to_box2d_transforms(transform, sweep);
+}
+
 template<bool C>
 bool basic_physics_synchronizer<C>::is_constructed() const {
 	return handle.get_cosmos().temporary_systems.get<physics_system>().is_constructed_rigid_body(handle);
@@ -41,14 +46,22 @@ void component_synchronizer<false, P>::set_activated(bool flag) const {
 
 
 void component_synchronizer<false, P>::set_velocity(vec2 pixels) const {
-	component.velocity = pixels;
+	component.velocity = pixels * PIXELS_TO_METERSf;
 
 	if (!is_constructed())
 		return;
 
-	get_cache().body->SetLinearVelocity(pixels * PIXELS_TO_METERSf);
+	get_cache().body->SetLinearVelocity(component.velocity);
 }
 
+void component_synchronizer<false, P>::set_angular_velocity(float degrees) const {
+	component.angular_velocity = DEG_TO_RADf * degrees;
+
+	if (!is_constructed())
+		return;
+
+	get_cache().body->SetLinearVelocity(component.velocity);
+}
 
 void component_synchronizer<false, P>::set_linear_damping(float damping) const {
 	component.linear_damping = damping;
@@ -95,8 +108,8 @@ void component_synchronizer<false, P>::apply_force(vec2 pixels, vec2 center_offs
 	force *= handle.get_cosmos().get_fixed_delta().in_seconds();
 
 	get_cache().body->ApplyLinearImpulse(force, location, wake);
-	component.angular_velocity = get_cache().body->GetAngularVelocity() * RAD_TO_DEGf;
-	component.velocity = METERS_TO_PIXELSf * get_cache().body->GetLinearVelocity();
+	component.angular_velocity = get_cache().body->GetAngularVelocity();
+	component.velocity = get_cache().body->GetLinearVelocity();
 
 	if (renderer::get_current().debug_draw_forces && force.non_zero()) {
 		auto& lines = renderer::get_current().logic_lines;
@@ -118,8 +131,8 @@ void component_synchronizer<false, P>::apply_impulse(vec2 pixels, vec2 center_of
 	vec2 location = get_cache().body->GetWorldCenter() + (center_offset * PIXELS_TO_METERSf);
 
 	get_cache().body->ApplyLinearImpulse(force, location, true);
-	component.angular_velocity = get_cache().body->GetAngularVelocity() * RAD_TO_DEGf;
-	component.velocity = METERS_TO_PIXELSf * get_cache().body->GetLinearVelocity();
+	component.angular_velocity = get_cache().body->GetAngularVelocity();
+	component.velocity = get_cache().body->GetLinearVelocity();
 
 	if (renderer::get_current().debug_draw_forces && force.non_zero()) {
 		auto& lines = renderer::get_current().logic_lines;
@@ -130,7 +143,7 @@ void component_synchronizer<false, P>::apply_impulse(vec2 pixels, vec2 center_of
 void component_synchronizer<false, P>::apply_angular_impulse(float imp) const {
 	ensure(is_constructed());
 	get_cache().body->ApplyAngularImpulse(imp, true);
-	component.angular_velocity = get_cache().body->GetAngularVelocity() * RAD_TO_DEGf;
+	component.angular_velocity = get_cache().body->GetAngularVelocity();
 }
 
 template<bool C>
@@ -141,12 +154,12 @@ float basic_physics_synchronizer<C>::get_mass() const {
 
 template<bool C>
 float basic_physics_synchronizer<C>::get_angle() const {
-	return component.transform.rotation;
+	return component.sweep.a * RAD_TO_DEGf;
 }
 
 template<bool C>
 float basic_physics_synchronizer<C>::get_angular_velocity() const {
-	return component.angular_velocity;
+	return component.angular_velocity * RAD_TO_DEGf;
 }
 
 template<bool C>
@@ -157,7 +170,7 @@ float basic_physics_synchronizer<C>::get_inertia() const {
 
 template<bool C>
 vec2 basic_physics_synchronizer<C>::get_position() const {
-	return component.transform.pos;
+	return METERS_TO_PIXELSf * component.transform.p;
 }
 
 template<bool C>
@@ -168,7 +181,7 @@ vec2 basic_physics_synchronizer<C>::get_mass_position() const {
 
 template<bool C>
 vec2 basic_physics_synchronizer<C>::velocity() const {
-	return component.velocity;
+	return component.velocity * METERS_TO_PIXELSf;
 }
 
 template<bool C>
@@ -209,12 +222,16 @@ void component_synchronizer<false, P>::set_transform(entity_id id) const {
 }
 
 void component_synchronizer<false, P>::set_transform(components::transform transform) const {
-	component.transform = transform;
+	transform.pos *= PIXELS_TO_METERSf;
+	transform.rotation *= DEG_TO_RADf;
+
+	transform.to_box2d_transforms(component.transform, component.sweep);
 
 	if (!is_constructed())
 		return;
 
-	get_cache().body->SetTransform(transform.pos * PIXELS_TO_METERSf, transform.rotation * DEG_TO_RADf);
+	get_cache().body->m_xf = component.transform;
+	get_cache().body->m_sweep = component.sweep;
 }
 
 template<bool C>

@@ -2,6 +2,9 @@
 #include "augs/math/rects.h"
 #include "augs/math/vec2.h"
 
+struct b2Sweep;
+struct b2Transform;
+
 namespace components {
 	struct transform {
 		vec2 pos;
@@ -22,6 +25,8 @@ namespace components {
 		transform operator-(const transform& b) const;
 		transform& operator+=(const transform& b);
 		bool operator==(const transform& b) const;
+
+		void to_box2d_transforms(b2Transform&, b2Sweep&) const;
 
 		transform interpolated(const transform& previous, float ratio, float epsilon = 1.f) const;
 		void flip_rotation();

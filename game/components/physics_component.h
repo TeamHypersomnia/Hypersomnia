@@ -4,6 +4,8 @@
 #include "game/components/transform_component.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
+#include "Box2D/Common/b2Math.h"
+
 extern double METERS_TO_PIXELS;
 extern double PIXELS_TO_METERS;
 extern float METERS_TO_PIXELSf;
@@ -21,6 +23,8 @@ namespace components {
 			DYNAMIC
 		};
 
+		physics();
+
 		bool fixed_rotation = false;
 		bool bullet = false;
 		bool angled_damping = false;
@@ -33,7 +37,9 @@ namespace components {
 		vec2 linear_damping_vec;
 		float gravity_scale = 0.f;
 
-		components::transform transform;
+		b2Transform transform;
+		b2Sweep sweep;
+
 		vec2 velocity;
 		float angular_velocity = 0.f;
 
@@ -104,6 +110,7 @@ public:
 	void set_body_type(components::physics::type) const;
 	void set_activated(bool) const;
 	void set_velocity(vec2) const;
+	void set_angular_velocity(float) const;
 	void set_transform(components::transform) const;
 	void set_transform(entity_id) const;
 	void set_angular_damping(float) const;

@@ -160,15 +160,15 @@ void physics_system::construct(const_entity_handle handle) {
 
 			def.userData = handle.get_id();
 			def.bullet = physics_data.bullet;
-			def.position = physics_data.transform.pos * PIXELS_TO_METERSf;
-			def.angle = physics_data.transform.rotation * DEG_TO_RADf;
+			def.transform = physics_data.transform;
+			def.sweep = physics_data.sweep;
 			def.angularDamping = physics_data.angular_damping;
 			def.linearDamping = physics_data.linear_damping;
 			def.fixedRotation = physics_data.fixed_rotation;
 			def.gravityScale = physics_data.gravity_scale;
 			def.active = true;
-			def.linearVelocity = physics_data.velocity * PIXELS_TO_METERSf;
-			def.angularVelocity = physics_data.angular_velocity * DEG_TO_RADf;
+			def.linearVelocity = physics_data.velocity;
+			def.angularVelocity = physics_data.angular_velocity;
 
 			cache.body = b2world->CreateBody(&def);
 			cache.body->SetAngledDampingEnabled(physics_data.angled_damping);
@@ -275,9 +275,10 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 		if (!b->IsFixedRotation())
 			transform.rotation = body_angle;
 
-		physics.component.transform = transform;
-		physics.component.velocity = METERS_TO_PIXELSf * b->GetLinearVelocity();
-		physics.component.angular_velocity = RAD_TO_DEGf * b->GetAngularVelocity();
+		physics.component.transform = b->m_xf;
+		physics.component.sweep = b->m_sweep;
+		physics.component.velocity = b->GetLinearVelocity();
+		physics.component.angular_velocity = b->GetAngularVelocity();
 
 		for (const auto& fe : physics.get_fixture_entities()) {
 			auto& fixtures = fe.get<components::fixtures>();
