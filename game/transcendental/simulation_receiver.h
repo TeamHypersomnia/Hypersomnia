@@ -19,6 +19,18 @@ public:
 		bool use_extrapolated_cosmos = true;
 	};
 
+	unsigned current_steps_to_the_future = 0;
+
+	void delay_sent_commands(unsigned steps_to_the_future) {
+
+		current_steps_to_the_future += steps_to_the_future;
+	}
+
+	void catch_up_commands(unsigned steps_to_return) {
+
+		current_steps_to_the_future -= steps_to_return;
+	}
+
 	template<class Step>
 	void send_commands_and_predict(augs::network::client& client, cosmic_entropy new_entropy, cosmos& predicted_cosmos, Step advance) {
 		augs::stream client_commands;
@@ -50,6 +62,8 @@ public:
 
 		std::vector<step_to_simulate> entropies_to_simulate;
 
+		bool reconciliate_predicted = false;
+
 		for (size_t i = 0; i < new_commands.size(); ++i) {
 			auto& new_command = new_commands[i];
 
@@ -58,6 +72,7 @@ public:
 				referential_cosmos = last_delta_unpacked;
 
 				entropies_to_simulate.clear();
+				reconciliate_predicted = true;
 			}
 			else
 				ensure(new_command.step_type == packaged_step::type::NEW_ENTROPY);
@@ -70,8 +85,19 @@ public:
 
 			if (new_command.next_client_commands_accepted) {
 				ensure(predicted_steps.size() > 0);
+				
+				if (!current_steps_to_the_future) {
+					
+				}
+
+				if (sim.resubstantiate || predicted_steps.front() != sim.entropy) {
+					reconciliate_predicted = true;
+				}
 
 				predicted_steps.erase(predicted_steps.begin());
+			}
+			else {
+				reconciliate_predicted = true;
 			}
 		}
 
@@ -86,9 +112,7 @@ public:
 			advance(cosmic_entropy_for_this_step, referential_cosmos);
 		}
 		
-		LOG("Unpacking from %x to %x", previous_step, referential_cosmos.get_total_steps_passed());
-
-		const bool reconciliate_predicted = entropies_to_simulate.size() > 0;
+		// LOG("Unpacking from %x to %x", previous_step, referential_cosmos.get_total_steps_passed());
 
 		if (reconciliate_predicted) {
 			unsigned predicted_was_at_step = predicted_cosmos.get_total_steps_passed();

@@ -38,6 +38,30 @@ guid_mapped_entropy::guid_mapped_entropy(const cosmic_entropy& b, const cosmos& 
 		entropy_per_entity[mapper[entry.first].get_guid()] = entry.second;
 }
 
+bool guid_mapped_entropy::operator!=(const guid_mapped_entropy& b) const {
+	if (delta_to_apply != b.delta_to_apply)
+		return true;
+
+	if (entropy_per_entity.size() != b.entropy_per_entity.size())
+		return true;
+
+	for (const auto& entry : b.entropy_per_entity) {
+		auto found = entropy_per_entity.find(entry.first);
+	
+		if (found == entropy_per_entity.end())
+			return true;
+	
+		if (entry.second.size() != (*found).second.size())
+			return true;
+
+		for (size_t i = 0; i < entry.second.size(); ++i)
+			if (entry.second[i] != (*found).second[i])
+				return true;
+	}
+
+	return false;
+}
+
 cosmic_entropy::cosmic_entropy(const guid_mapped_entropy& b, const cosmos& mapper) {
 	delta_to_apply = b.delta_to_apply;
 

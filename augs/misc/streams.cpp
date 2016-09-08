@@ -32,6 +32,10 @@ namespace augs {
 		return std::equal(data(), data() + size(), b.data(), b.data() + size());
 	}
 
+	bool stream::operator!=(const stream& b) const {
+		return !operator==(b);
+	}
+
 	char* stream::data() {
 		return buf.data();
 	}

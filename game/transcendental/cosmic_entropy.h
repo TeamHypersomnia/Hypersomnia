@@ -48,6 +48,8 @@ struct guid_mapped_entropy : basic_cosmic_entropy<unsigned> {
 		basic_cosmic_entropy<unsigned>::operator+=(b);
 		return *this;
 	}
+
+	bool operator!=(const guid_mapped_entropy&) const;
 };
 
 struct cosmic_entropy : basic_cosmic_entropy<entity_id> {

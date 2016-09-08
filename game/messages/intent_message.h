@@ -19,6 +19,10 @@ struct entity_intent {
 			intent == intent_type::CROSSHAIR_PRIMARY_ACTION ||
 			intent == intent_type::CROSSHAIR_SECONDARY_ACTION;
 	}
+
+	bool operator!=(const entity_intent& b) const {
+		return std::make_tuple(intent, mouse_rel, pressed_flag) != std::make_tuple(b.intent, b.mouse_rel, b.pressed_flag);
+	}
 };
 
 namespace messages {

@@ -50,6 +50,7 @@ namespace augs {
 		std::vector<char> buf;
 
 		bool operator==(const stream&) const;
+		bool operator!=(const stream&) const;
 
 		char* data();
 		const char* data() const;
