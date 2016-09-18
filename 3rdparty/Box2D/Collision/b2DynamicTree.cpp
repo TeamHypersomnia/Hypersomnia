@@ -776,3 +776,24 @@ void b2DynamicTree::ShiftOrigin(const b2Vec2& newOrigin)
 		m_nodes[i].aabb.upperBound -= newOrigin;
 	}
 }
+
+b2DynamicTree& b2DynamicTree::operator=(const b2DynamicTree& b) 
+{
+	this->~b2DynamicTree();
+
+	m_nodes = (b2TreeNode*)b2Alloc(m_nodeCapacity * sizeof(b2TreeNode));
+	memcpy(m_nodes, b.m_nodes, m_nodeCapacity * sizeof(b2TreeNode));
+
+	m_root = b.m_root;
+
+	m_nodeCount = b.m_nodeCount;
+	m_nodeCapacity = b.m_nodeCapacity;
+
+	m_freeList = b.m_freeList;
+
+	m_path = b.m_path;
+
+	m_insertionCount = b.m_insertionCount;
+
+	return *this;
+}
