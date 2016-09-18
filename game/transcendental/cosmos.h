@@ -49,8 +49,6 @@ private:
 
 	void destroy_substance_completely();
 	void create_substance_completely();
-	void destroy_substance_for_entity(const_entity_handle);
-	void create_substance_for_entity(const_entity_handle);
 
 public:
 	storage_for_all_temporary_systems temporary_systems;
@@ -132,6 +130,8 @@ public:
 
 	void complete_resubstantiation();
 	void complete_resubstantiation(const_entity_handle);
+	void destroy_substance_for_entity(const_entity_handle);
+	void create_substance_for_entity(const_entity_handle);
 
 	template<class System>
 	void partial_resubstantiation(entity_handle handle) {
