@@ -33,7 +33,7 @@ namespace scene_managers {
 		int test_var = 0;
 		augs::constant_size_vector<entity_id, TESTBED_DRAW_BODIES_COUNT> draw_bodies;
 
-		cosmos::significant_state stashed_cosmos;
+		cosmos stashed_cosmos;
 		augs::stream stashed_delta;
 
 		void configure_view(viewing_session&) const;

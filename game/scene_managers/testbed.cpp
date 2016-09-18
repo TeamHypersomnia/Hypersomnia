@@ -275,7 +275,7 @@ namespace scene_managers {
 				}
 				if (raw_input.key == augs::window::event::keys::F4) {
 					cosmos cosm_with_guids;
-					cosm_with_guids.significant = stashed_cosmos;
+					cosm_with_guids.significant = stashed_cosmos.significant;
 					cosm_with_guids.remap_guids();
 
 					ensure(stashed_delta.get_write_pos() == 0);
@@ -292,7 +292,7 @@ namespace scene_managers {
 				}
 				if (raw_input.key == augs::window::event::keys::F8) {
 					main_cosmos.profiler.duplication.new_measurement();
-					stashed_cosmos = main_cosmos.significant;
+					stashed_cosmos = main_cosmos;
 					main_cosmos.profiler.duplication.end_measurement();
 				}
 				if (raw_input.key == augs::window::event::keys::F9) {
