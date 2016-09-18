@@ -116,7 +116,10 @@ cosmos& cosmos::operator=(const cosmos& b) {
 #endif
 	profiler.duplication.end_measurement();
 	b.profiler.duplication.end_measurement();
+	
 	complete_resubstantiation();
+
+	temporary_systems = b.temporary_systems;
 	return *this;
 }
 

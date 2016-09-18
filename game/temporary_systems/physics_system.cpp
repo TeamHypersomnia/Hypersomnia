@@ -191,6 +191,16 @@ b2world(new b2World(b2Vec2(0.f, 0.f))), ray_casts_since_last_step(0) {
 	b2world->SetAutoClearForces(false);
 }
 
+physics_system& physics_system::operator=(const physics_system& b) {
+	//ray_casts_since_last_step = b.ray_casts_since_last_step;
+	//colliders_caches = b.colliders_caches;
+	//rigid_body_caches = b.rigid_body_caches;
+	//accumulated_messages = b.accumulated_messages;
+
+	//static_assert(false, "d");
+	return *this;
+}
+
 void physics_system::post_and_clear_accumulated_collision_messages(fixed_step& step) {
 	step.messages.post(accumulated_messages);
 	accumulated_messages.clear();
