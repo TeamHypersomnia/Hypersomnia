@@ -186,6 +186,10 @@ std::vector<const_entity_handle> cosmos::get(const processing_subjects list) con
 components::transform cosmos::get_previous_transform(entity_id id) const {
 	auto handle = get_handle(id);
 
+	if (handle.dead()) {
+		return components::transform();
+	}
+
 	ensure(handle.has<components::transform>());
 
 	const auto trans_id = static_cast<unsigned>(
