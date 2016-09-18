@@ -120,6 +120,9 @@ public:
 	std::unique_ptr<b2World> b2world;
 
 	physics_system& operator=(const physics_system&);
+	physics_system& operator=(physics_system&&) = delete;
+	physics_system(const physics_system&) = delete;
+	physics_system(physics_system&&) = delete;
 private:	
 	/* callback structure used in QueryAABB function to get all shapes near-by */
 	struct query_aabb_input : b2QueryCallback {

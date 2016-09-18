@@ -117,3 +117,25 @@ bool b2BroadPhase::QueryCallback(int32 proxyId)
 
 	return true;
 }
+
+b2BroadPhase& b2BroadPhase::operator=(const b2BroadPhase& b) {
+	m_proxyCount = b.m_proxyCount;
+
+	m_moveCapacity = b.m_moveCapacity;
+	m_moveCount = b.m_moveCount;
+
+	m_pairCapacity = b.m_pairCapacity;
+	m_pairCount = b.m_pairCount;
+
+	m_queryProxyId = b.m_queryProxyId;
+
+	m_pairBuffer = (b2Pair*)b2Alloc(m_pairCapacity * sizeof(b2Pair));
+	m_moveBuffer = (int32*)b2Alloc(m_moveCapacity * sizeof(int32));
+
+	memcpy(m_pairBuffer, b.m_pairBuffer, m_pairCount * sizeof(b2Pair));
+	memcpy(m_moveBuffer, b.m_moveBuffer, m_moveCount * sizeof(int32));
+
+	m_tree = b.m_tree;
+
+	return *this;
+}

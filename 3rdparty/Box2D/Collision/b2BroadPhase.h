@@ -104,6 +104,7 @@ public:
 	/// @param newOrigin the new origin with respect to the old origin
 	void ShiftOrigin(const b2Vec2& newOrigin);
 
+	b2BroadPhase& operator=(const b2BroadPhase&);
 private:
 
 	friend class b2DynamicTree;

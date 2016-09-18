@@ -191,16 +191,6 @@ b2world(new b2World(b2Vec2(0.f, 0.f))), ray_casts_since_last_step(0) {
 	b2world->SetAutoClearForces(false);
 }
 
-physics_system& physics_system::operator=(const physics_system& b) {
-	//ray_casts_since_last_step = b.ray_casts_since_last_step;
-	//colliders_caches = b.colliders_caches;
-	//rigid_body_caches = b.rigid_body_caches;
-	//accumulated_messages = b.accumulated_messages;
-
-	//static_assert(false, "d");
-	return *this;
-}
-
 void physics_system::post_and_clear_accumulated_collision_messages(fixed_step& step) {
 	step.messages.post(accumulated_messages);
 	accumulated_messages.clear();
@@ -306,4 +296,23 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 			fix_transform.pos.rotate(body_angle, body_pos);
 		}
 	}
+}
+
+physics_system& physics_system::operator=(const physics_system& b) {
+	ray_casts_since_last_step = b.ray_casts_since_last_step;
+	colliders_caches = b.colliders_caches;
+	rigid_body_caches = b.rigid_body_caches;
+	accumulated_messages = b.accumulated_messages;
+
+	auto& b2 = *b2world.get();
+	const auto& b2c = *b.b2world.get();
+
+	// do the initial trivial copy
+	b2 = b2c;
+
+	new (&b2.m_blockAllocator) b2BlockAllocator;
+	new (&b2.m_stackAllocator) b2StackAllocator;
+
+	//static_assert(false, "d");
+	return *this;
 }

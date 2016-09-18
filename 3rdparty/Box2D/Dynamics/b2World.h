@@ -209,8 +209,9 @@ public:
 	/// @warning this should be called outside of a time step.
 	void Dump();
 
-private:
-	b2World& operator=(const b2World&) = delete;
+	b2World& operator=(const b2World&) = default;
+
+public:
 	b2World& operator=(b2World&&) = delete;
 	b2World(const b2World&) = delete;
 	b2World(b2World&&) = delete;
