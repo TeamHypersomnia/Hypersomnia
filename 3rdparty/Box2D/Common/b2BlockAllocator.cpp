@@ -34,14 +34,19 @@ b2BlockAllocator::~b2BlockAllocator()
 
 void* b2BlockAllocator::Allocate(int32 size)
 {
+	ensure(size > 0);
+
 	auto new_ptr = b2Alloc(size);
 	allocations.insert(new_ptr);
 
+	ensure(new_ptr != nullptr);
+	
 	return new_ptr;
 }
 
 void b2BlockAllocator::Free(void* p, int32 size)
 {
+	ensure(size > 0);
 	ensure(allocations.find(p) != allocations.end());
 	ensure_eq(size, _msize(p));
 

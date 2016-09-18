@@ -319,6 +319,9 @@ physics_system& physics_system::operator=(const physics_system& b) {
 	// do the initial trivial copy
 	b2 = b2c;
 
+	// reset the allocator to its own
+	b2.m_contactManager.m_allocator = &b2.m_blockAllocator;
+
 	std::unordered_map<void*, void*> pointer_migrations;
 	std::unordered_map<void*, size_t> m_nodeAB_offset;
 
