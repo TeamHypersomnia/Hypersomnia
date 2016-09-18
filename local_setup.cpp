@@ -25,6 +25,7 @@ void local_setup::process(game_window& window) {
 
 	step_and_entropy_unpacker input_unpacker;
 	scene_managers::testbed testbed;
+	testbed.test_var = static_cast<int>(window.get_config_number("test_var"));
 
 	const auto config_tickrate = static_cast<unsigned>(window.get_config_number("tickrate"));
 

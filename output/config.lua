@@ -44,7 +44,8 @@ config_table = {
 	simulate_lag = 0,
 	packet_loss = 0.00,
 	min_latency = 50,
-	jitter = 0
+	jitter = 0,
+	test_var = 0
 }
 
 set_cursor_visible(0)
