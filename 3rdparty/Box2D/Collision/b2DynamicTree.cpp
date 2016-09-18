@@ -777,12 +777,15 @@ void b2DynamicTree::ShiftOrigin(const b2Vec2& newOrigin)
 	}
 }
 
+#include <malloc.h>
+
 b2DynamicTree& b2DynamicTree::operator=(const b2DynamicTree& b) 
 {
 	this->~b2DynamicTree();
 
-	m_nodes = (b2TreeNode*)b2Alloc(m_nodeCapacity * sizeof(b2TreeNode));
-	memcpy(m_nodes, b.m_nodes, m_nodeCapacity * sizeof(b2TreeNode));
+	auto bytes = _msize(b.m_nodes);
+	m_nodes = (b2TreeNode*)b2Alloc(_msize(b.m_nodes));
+	memcpy(m_nodes, b.m_nodes, bytes);
 
 	m_root = b.m_root;
 

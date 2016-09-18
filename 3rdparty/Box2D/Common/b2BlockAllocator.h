@@ -39,6 +39,11 @@ public:
 	b2BlockAllocator();
 	~b2BlockAllocator();
 
+	b2BlockAllocator(const b2BlockAllocator&) = delete;
+	b2BlockAllocator(b2BlockAllocator&&) = delete;
+	b2BlockAllocator& operator=(b2BlockAllocator&&) = delete;
+	b2BlockAllocator& operator=(const b2BlockAllocator&) = default;
+
 	/// Allocate memory. This will use b2Alloc if the size is larger than b2_maxBlockSize.
 	void* Allocate(int32 size);
 

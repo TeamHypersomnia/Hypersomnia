@@ -322,10 +322,16 @@ physics_system& physics_system::operator=(const physics_system& b) {
 	std::unordered_map<void*, void*> pointer_migrations;
 	std::unordered_map<void*, size_t> m_nodeAB_offset;
 
-	b2BlockAllocator migrated_allocator;
-	b2BlockAllocator& dup_allocator = b2.m_blockAllocator;
+	std::unordered_set<void**> already_migrated;
 
-	auto migrate_pointer = [&pointer_migrations, &migrated_allocator, &dup_allocator](auto*& ptr) {
+	b2BlockAllocator& migrated_allocator = b2.m_blockAllocator;
+	auto old_allocations = migrated_allocator.allocations;
+	migrated_allocator.allocations.clear();
+
+	auto migrate_pointer = [&already_migrated, &pointer_migrations, &migrated_allocator, &old_allocations](auto*& ptr) {
+		ensure(already_migrated.find((void**)&ptr) == already_migrated.end());
+		already_migrated.insert((void**)&ptr);
+		
 		if (ptr == nullptr) {
 			return;
 		}
@@ -341,10 +347,8 @@ physics_system& physics_system::operator=(const physics_system& b) {
 			mig_p = migrated_allocator.Allocate(s);
 			memcpy(mig_p, p, s);
 
-			pointer_migrations[p] = mig_p;
+			pointer_migrations.insert(std::make_pair(p, mig_p));
 
-			auto& old_allocations = dup_allocator.allocations;
-			
 			if(old_allocations.find(p) != old_allocations.end())
 				old_allocations.erase(p);
 		}
@@ -352,15 +356,19 @@ physics_system& physics_system::operator=(const physics_system& b) {
 			mig_p = (*maybe_migrated).second;
 		}
 
-		ptr = reinterpret_cast<std::decay_t<decltype(ptr)>>(p);
+		ptr = reinterpret_cast<std::decay_t<decltype(ptr)>>(mig_p);
 	};
 	
-	auto migrate_edge = [&pointer_migrations, &m_nodeAB_offset](b2ContactEdge*& ptr) {
+	auto migrate_edge = [&already_migrated, &pointer_migrations, &m_nodeAB_offset](b2ContactEdge*& ptr) {
+		ensure(already_migrated.find((void**)&ptr) == already_migrated.end());
+		already_migrated.insert((void**)&ptr);
+
 		if (ptr == nullptr) {
 			return;
 		}
 		else {
-			const size_t off = m_nodeAB_offset[ptr];
+			const size_t off = m_nodeAB_offset.at(ptr);
+			ensure(off == offsetof(b2Contact, m_nodeA) || off == offsetof(b2Contact, m_nodeB));
 
 			char* owner_contact = (char*)ptr - off;
 			// here "at" requires that the contacts be already migrated
@@ -372,14 +380,14 @@ physics_system& physics_system::operator=(const physics_system& b) {
 	// migrate proxy tree userdatas
 	auto& proxy_tree = b2.m_contactManager.m_broadPhase.m_tree;
 
-	for (size_t i = 0; i < proxy_tree.m_nodeCount; ++i) {
-		migrate_pointer(proxy_tree.m_nodes[i].userData);
-	}
+	//for (size_t i = 0; i < proxy_tree.m_nodeCount; ++i) {
+	//	migrate_pointer(proxy_tree.m_nodes[i].userData);
+	//}
 
 	// acquire contact edge offsets
 	for (b2Contact* c = b2.m_contactManager.m_contactList; c; c = c->m_next) {
-		m_nodeAB_offset[&c->m_nodeA] = offsetof(b2Contact, m_nodeA);
-		m_nodeAB_offset[&c->m_nodeB] = offsetof(b2Contact, m_nodeB);
+		m_nodeAB_offset.insert(std::make_pair(&c->m_nodeA, offsetof(b2Contact, m_nodeA)));
+		m_nodeAB_offset.insert(std::make_pair(&c->m_nodeB, offsetof(b2Contact, m_nodeB)));
 	}
 
 	// migrate contact pointers
@@ -419,7 +427,7 @@ physics_system& physics_system::operator=(const physics_system& b) {
 		migrate_pointer(b->m_prev);
 		migrate_pointer(b->m_next);
 		migrate_pointer(b->m_jointList);
-		migrate_pointer(b->m_contactList);
+		migrate_edge(b->m_contactList);
 		b->m_world = &b2;
 		
 		for (b2Fixture* f = b->m_fixtureList; f; f = f->m_next) {
@@ -431,6 +439,9 @@ physics_system& physics_system::operator=(const physics_system& b) {
 
 			for (size_t i = 0; i < f->m_proxyCount; ++i) {
 				f->m_proxies[i].fixture = f;
+				
+				void*& ud = proxy_tree.m_nodes[f->m_proxies[i].proxyId].userData;
+				ud = pointer_migrations.at(ud);
 			}
 
 			//auto c_idx = f->collider_index;
@@ -464,10 +475,8 @@ physics_system& physics_system::operator=(const physics_system& b) {
 	}
 
 	// ensure that all allocations have been migrated
-
-	ensure(dup_allocator.allocations.empty());
-
-	dup_allocator = std::move(migrated_allocator);
+	ensure(old_allocations.empty());
+	ensure_eq(b2c.m_blockAllocator.allocations.size(), migrated_allocator.allocations.size());
 
 	return *this;
 }

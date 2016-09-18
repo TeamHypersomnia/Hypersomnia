@@ -44,7 +44,7 @@ void LOG(std::string f) {
 
 	global_log::push_entry({ console_color::WHITE, f });
 
-	//std::cout << f << std::endl;
+	std::cout << f << std::endl;
 	//std::ofstream recording_file("live_debug.txt", std::ios::out | std::ios::app);
 	//recording_file << f << std::endl;
 #endif
@@ -57,7 +57,7 @@ void LOG_COLOR(console_color c, std::string f) {
 	
 	global_log::push_entry({ c, f });
 
-	//augs::colored_print(c, f.c_str());
+	augs::colored_print(c, f.c_str());
 	//std::ofstream recording_file("live_debug.txt", std::ios::out | std::ios::app);
 	//recording_file << f << std::endl;
 #endif

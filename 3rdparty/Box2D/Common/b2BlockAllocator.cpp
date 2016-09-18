@@ -21,6 +21,8 @@
 #include <memory.h>
 #include <stddef.h>
 
+#include "augs/ensure.h"
+
 b2BlockAllocator::b2BlockAllocator()
 {
 }
@@ -40,6 +42,9 @@ void* b2BlockAllocator::Allocate(int32 size)
 
 void b2BlockAllocator::Free(void* p, int32 size)
 {
+	ensure(allocations.find(p) != allocations.end());
+	ensure_eq(size, _msize(p));
+
 	b2Free(p);
 	allocations.erase(p);
 }
