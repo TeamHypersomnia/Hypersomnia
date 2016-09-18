@@ -5,12 +5,12 @@
 #include "game/transcendental/step.h"
 #include "physics_scripts.h"
 
-void physics_system::rechoose_owner_friction_body(entity_handle entity) {
+void physics_system::rechoose_owner_friction_body(const entity_handle entity) {
 	auto& physics = entity.get<components::special_physics>();
 	auto& cosmos = entity.get_cosmos();
 	// purge of dead entities
 
-	erase_remove(physics.owner_friction_grounds, [&cosmos](entity_id subject) {
+	erase_remove(physics.owner_friction_grounds, [&cosmos](const entity_id subject) {
 		return cosmos[subject].dead();
 	});
 
@@ -26,7 +26,7 @@ void physics_system::rechoose_owner_friction_body(entity_handle entity) {
 	}
 
 	if (!feasible_grounds.empty()) {
-		std::stable_sort(feasible_grounds.begin(), feasible_grounds.end(), [this, &cosmos](entity_id a, entity_id b) {
+		std::stable_sort(feasible_grounds.begin(), feasible_grounds.end(), [this, &cosmos](const entity_id a, const entity_id b) {
 			return are_connected_by_friction(cosmos[a], cosmos[b]);
 		});
 
@@ -53,22 +53,21 @@ void physics_system::rechoose_owner_friction_body(entity_handle entity) {
 	}
 }
 
-void physics_system::recurential_friction_handler(fixed_step& step, entity_handle entity, entity_handle friction_owner) {
+void physics_system::recurential_friction_handler(fixed_step& step, const entity_handle entity, const entity_handle friction_owner) {
 	if (friction_owner.dead()) return;
 
-	float dt = static_cast<float>(step.get_delta().in_seconds());
+	const float dt = static_cast<float>(step.get_delta().in_seconds());
 
-	auto& physics = entity.get<components::physics>();
+	const auto& physics = entity.get<components::physics>();
 
-	auto& friction_physics = friction_owner.get<components::fixtures>();
-	auto& friction_entity = friction_physics.get_owner_body();
+	auto& friction_entity = friction_owner.get_owner_body();
 
 	recurential_friction_handler(step, entity, friction_entity.get_owner_friction_ground());
 
-	auto* body = get_rigid_body_cache(entity).body;
+	auto* const body = get_rigid_body_cache(entity).body;
 
-	auto friction_body = get_rigid_body_cache(friction_entity).body;
-	auto fricted_pos = body->GetPosition() + dt* friction_body->GetLinearVelocityFromWorldPoint(body->GetPosition());
+	const auto friction_body = get_rigid_body_cache(friction_entity).body;
+	const auto fricted_pos = body->GetPosition() + dt* friction_body->GetLinearVelocityFromWorldPoint(body->GetPosition());
 
 	body->SetTransform(fricted_pos, body->GetAngle() + dt*friction_body->GetAngularVelocity());
 
