@@ -314,13 +314,15 @@ namespace scene_managers {
 	cosmic_entropy testbed::make_cosmic_entropy(const augs::machine_entropy::local_type& local, const input_context& context, cosmos& cosm) {
 		cosmic_entropy result;
 
-		auto& intents = result.entropy_per_entity[get_controlled_entity()];
-		
-		for (const auto& raw : local) {
-			entity_intent mapped;
-		
-			if (make_entity_intent(context, raw, mapped))
-				intents.push_back(mapped);
+		if (cosm[get_controlled_entity()].alive()) {
+			auto& intents = result.entropy_per_entity[get_controlled_entity()];
+
+			for (const auto& raw : local) {
+				entity_intent mapped;
+
+				if (make_entity_intent(context, raw, mapped))
+					intents.push_back(mapped);
+			}
 		}
 
 		return result;
@@ -383,8 +385,8 @@ namespace scene_managers {
 
 		const auto controlled = cosmos[get_controlled_entity()];
 
-		const auto coords = controlled.get<components::transform>().pos;
-		const auto vel = controlled.get<components::physics>().velocity();
+		const auto coords = controlled.alive() ? controlled.get<components::transform>().pos : vec2();
+		const auto vel = controlled.alive() ? controlled.get<components::physics>().velocity() : vec2();
 
 		quick_print_format(target.triangles, to_wstring(custom_log) + typesafe_sprintf(L"Entities: %x\nX: %f2\nY: %f2\nVelX: %x\nVelY: %x\n", cosmos.entities_count(), coords.x, coords.y, vel.x, vel.y)
 			+ session.summary() + cosmos.profiler.sorted_summary(show_profile_details), style(assets::font_id::GUI_FONT, rgba(255, 255, 255, 150)), vec2i(0, 0), 0);

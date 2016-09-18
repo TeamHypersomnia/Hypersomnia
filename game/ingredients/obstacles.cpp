@@ -3,7 +3,7 @@
 #include "game/components/name_component.h"
 
 namespace prefabs {
-	entity_handle create_crate(cosmos& world, vec2 pos, vec2 size) {
+	entity_handle create_crate(cosmos& world, const components::transform pos, const vec2 size) {
 		auto crate = world.create_entity("crate");
 
 		name_entity(crate, entity_name::CRATE);

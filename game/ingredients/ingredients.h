@@ -21,8 +21,8 @@ namespace ingredients {
 
 	components::item& make_item(entity_handle);
 	
-	components::sprite& sprite(entity_handle, vec2 pos, assets::texture_id = assets::texture_id::BLANK, augs::rgba col = augs::rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
-	components::sprite& sprite_scalled(entity_handle, vec2 pos, vec2i size, assets::texture_id = assets::texture_id::BLANK, augs::rgba col = augs::rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
+	components::sprite& sprite(entity_handle, components::transform pos, assets::texture_id = assets::texture_id::BLANK, augs::rgba col = augs::rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
+	components::sprite& sprite_scalled(entity_handle, components::transform pos, vec2i size, assets::texture_id = assets::texture_id::BLANK, augs::rgba col = augs::rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
 	
 	void bullet_round_physics(entity_handle);
 	void see_through_dynamic_body(entity_handle);
@@ -53,7 +53,7 @@ namespace prefabs {
 
 	entity_handle create_sample_suppressor(cosmos& world, vec2 pos);
 
-	entity_handle create_sample_magazine(fixed_step&, vec2 pos, std::string space = "0.30", entity_id charge_inside = entity_id());
+	entity_handle create_sample_magazine(fixed_step&, components::transform pos, std::string space = "0.30", entity_id charge_inside = entity_id());
 	entity_handle create_sample_rifle(fixed_step&, vec2 pos, entity_id load_mag = entity_id());
 	entity_handle create_pistol(fixed_step&, vec2 pos, entity_id load_mag = entity_id());
 	entity_handle create_submachine(fixed_step&, vec2 pos, entity_id load_mag = entity_id());
@@ -66,7 +66,7 @@ namespace prefabs {
 
 	entity_handle create_character_crosshair(cosmos&, vec2i screen_size);
 	entity_handle create_character(cosmos&, vec2 pos, vec2i screen_size, std::string name = "character_unnamed");
-	entity_handle create_crate(cosmos&, vec2 pos, vec2 size);
+	entity_handle create_crate(cosmos&, components::transform pos, vec2 size);
 
 	entity_handle create_cyan_urban_machete(cosmos&, vec2 pos);
 }

@@ -30,6 +30,7 @@ namespace scene_managers {
 		unsigned current_character = 0;
 		entity_id currently_controlled_character;
 		bool show_profile_details = false;
+		int test_var = 0;
 		augs::constant_size_vector<entity_id, TESTBED_DRAW_BODIES_COUNT> draw_bodies;
 
 		cosmos::significant_state stashed_cosmos;

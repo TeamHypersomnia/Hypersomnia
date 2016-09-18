@@ -11,7 +11,7 @@ void world_camera::configure_size(vec2 size) {
 
 void world_camera::tick(augs::variable_delta dt, const_entity_handle entity_to_chase) {
 	const auto& cosm = entity_to_chase.get_cosmos();
-	const auto chased_transform = entity_to_chase.get<components::transform>();
+	const auto chased_transform = entity_to_chase.alive() ? entity_to_chase.get<components::transform>() : components::transform();
 
 	auto previous = cosm.significant.meta.settings.enable_interpolation ? cosm.get_previous_transform(entity_to_chase) : chased_transform;
 

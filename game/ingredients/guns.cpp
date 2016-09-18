@@ -62,7 +62,7 @@ namespace ingredients {
 }
 
 namespace prefabs {
-	entity_handle create_sample_magazine(fixed_step& step, vec2 pos, std::string space, entity_id charge_inside_id) {
+	entity_handle create_sample_magazine(fixed_step& step, components::transform pos, std::string space, entity_id charge_inside_id) {
 		auto& cosmos = step.cosm;
 		auto charge_inside = cosmos[charge_inside_id];
 

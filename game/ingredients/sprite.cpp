@@ -3,19 +3,18 @@
 #include "game/enums/filters.h"
 
 namespace ingredients {
-	components::sprite& sprite(entity_handle e, vec2 pos, assets::texture_id id, augs::rgba col, render_layer layer) {
+	components::sprite& sprite(const entity_handle e, const components::transform pos, const assets::texture_id id, const augs::rgba col, const render_layer layer) {
 		auto& sprite = e += components::sprite();
 		auto& render = e += components::render();
-		auto& transform = e += components::transform();
+		auto& transform = e += pos;
 
 		render.layer = layer;
-		transform.pos = pos;
 		sprite.set(id, col);
 
 		return sprite;
 	}
 
-	components::sprite&  sprite_scalled(entity_handle e, vec2 pos, vec2i size, assets::texture_id id, augs::rgba col, render_layer layer) {
+	components::sprite&  sprite_scalled(const entity_handle e, const components::transform pos, const vec2i size, const assets::texture_id id, const augs::rgba col, const render_layer layer) {
 		sprite(e, pos, id, col, layer);
 		e.get<components::sprite>().size = size;
 		return e.get<components::sprite>();

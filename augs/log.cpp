@@ -16,7 +16,7 @@
 
 std::mutex log_mutex;
 
-unsigned global_log::max_entries = 20;
+unsigned global_log::max_entries = 40;
 std::vector<log_entry> global_log::recent_entries;
 
 augs::gui::text::fstr global_log::format_recent_as_text(assets::font_id f) {
