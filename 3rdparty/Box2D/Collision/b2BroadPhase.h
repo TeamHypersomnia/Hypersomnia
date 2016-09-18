@@ -107,6 +107,7 @@ public:
 	b2BroadPhase& operator=(const b2BroadPhase&);
 private:
 
+	friend class physics_system;
 	friend class b2DynamicTree;
 
 	void BufferMove(int32 proxyId);

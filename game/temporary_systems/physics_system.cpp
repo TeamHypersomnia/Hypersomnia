@@ -101,7 +101,9 @@ void physics_system::fixtures_construct(const_entity_handle handle) {
 			owner_cache.correspondent_colliders_caches.push_back(this_cache_id);
 			cache.correspondent_rigid_body_cache = owner_cache_id;
 
-			for (const auto& c : colliders_data.colliders) {
+			for (size_t ci = 0; ci < colliders_data.colliders.size(); ++ci) {
+				const auto& c = colliders_data.colliders[ci];
+
 				b2PolygonShape shape;
 
 				b2FixtureDef fixdef;
@@ -125,7 +127,13 @@ void physics_system::fixtures_construct(const_entity_handle handle) {
 						v *= PIXELS_TO_METERSf;
 
 					shape.Set(b2verts.data(), b2verts.size());
-					partitioned_collider.push_back(owner_cache.body->CreateFixture(&fixdef));
+
+					b2Fixture* new_fix = owner_cache.body->CreateFixture(&fixdef);
+					
+					ensure(ci < std::numeric_limits<short>::max());
+					new_fix->collider_index = static_cast<short>(ci);
+
+					partitioned_collider.push_back(new_fix);
 				}
 
 				cache.fixtures_per_collider.push_back(partitioned_collider);
@@ -300,19 +308,166 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 
 physics_system& physics_system::operator=(const physics_system& b) {
 	ray_casts_since_last_step = b.ray_casts_since_last_step;
-	colliders_caches = b.colliders_caches;
-	rigid_body_caches = b.rigid_body_caches;
 	accumulated_messages = b.accumulated_messages;
 
-	auto& b2 = *b2world.get();
-	const auto& b2c = *b.b2world.get();
+	b2World& b2 = *b2world.get();
+	b2.~b2World();
+	new (&b2) b2World(b2Vec2(0.f, 0.f));
+
+	const b2World& b2c = *b.b2world.get();
 
 	// do the initial trivial copy
 	b2 = b2c;
 
-	new (&b2.m_blockAllocator) b2BlockAllocator;
-	new (&b2.m_stackAllocator) b2StackAllocator;
+	std::unordered_map<void*, void*> pointer_migrations;
+	std::unordered_map<void*, size_t> m_nodeAB_offset;
 
-	//static_assert(false, "d");
+	b2BlockAllocator migrated_allocator;
+	b2BlockAllocator& dup_allocator = b2.m_blockAllocator;
+
+	auto migrate_pointer = [&pointer_migrations, &migrated_allocator, &dup_allocator](auto*& ptr) {
+		if (ptr == nullptr) {
+			return;
+		}
+		
+		void* const p = reinterpret_cast<void*>(ptr);
+		void* mig_p = nullptr;
+
+		const size_t s = _msize(p);
+
+		auto maybe_migrated = pointer_migrations.find(p);
+
+		if (maybe_migrated == pointer_migrations.end()) {
+			mig_p = migrated_allocator.Allocate(s);
+			memcpy(mig_p, p, s);
+
+			pointer_migrations[p] = mig_p;
+
+			auto& old_allocations = dup_allocator.allocations;
+			
+			if(old_allocations.find(p) != old_allocations.end())
+				old_allocations.erase(p);
+		}
+		else {
+			mig_p = (*maybe_migrated).second;
+		}
+
+		ptr = reinterpret_cast<std::decay_t<decltype(ptr)>>(p);
+	};
+	
+	auto migrate_edge = [&pointer_migrations, &m_nodeAB_offset](b2ContactEdge*& ptr) {
+		if (ptr == nullptr) {
+			return;
+		}
+		else {
+			const size_t off = m_nodeAB_offset[ptr];
+
+			char* owner_contact = (char*)ptr - off;
+			// here "at" requires that the contacts be already migrated
+			char* remapped_contact = (char*)pointer_migrations.at(owner_contact);
+			ptr = (b2ContactEdge*)(remapped_contact + off);
+		}
+	};
+
+	// migrate proxy tree userdatas
+	auto& proxy_tree = b2.m_contactManager.m_broadPhase.m_tree;
+
+	for (size_t i = 0; i < proxy_tree.m_nodeCount; ++i) {
+		migrate_pointer(proxy_tree.m_nodes[i].userData);
+	}
+
+	// acquire contact edge offsets
+	for (b2Contact* c = b2.m_contactManager.m_contactList; c; c = c->m_next) {
+		m_nodeAB_offset[&c->m_nodeA] = offsetof(b2Contact, m_nodeA);
+		m_nodeAB_offset[&c->m_nodeB] = offsetof(b2Contact, m_nodeB);
+	}
+
+	// migrate contact pointers
+	migrate_pointer(b2.m_contactManager.m_contactList);
+
+	for (b2Contact* c = b2.m_contactManager.m_contactList; c; c = c->m_next) {
+		migrate_pointer(c->m_prev);
+		migrate_pointer(c->m_next);
+		migrate_pointer(c->m_fixtureA);
+		migrate_pointer(c->m_fixtureB);
+		
+		c->m_nodeA.contact = c;
+		migrate_pointer(c->m_nodeA.other);
+
+		c->m_nodeB.contact = c;
+		migrate_pointer(c->m_nodeB.other);
+	}
+
+	// migrate contact edges of contacts
+	for (b2Contact* c = b2.m_contactManager.m_contactList; c; c = c->m_next) {
+		migrate_edge(c->m_nodeA.next);
+		migrate_edge(c->m_nodeA.prev);
+
+		migrate_edge(c->m_nodeB.next);
+		migrate_edge(c->m_nodeB.prev);
+	}
+
+	// migrate bodies and fixtures
+	migrate_pointer(b2.m_bodyList);
+
+	for (b2Body* b = b2.m_bodyList; b; b = b->m_next)
+	{
+		//auto rigid_body_cache_id = b->m_userData.pool.indirection_index;
+		//rigid_body_caches[rigid_body_cache_id].body = b;
+
+		migrate_pointer(b->m_fixtureList);
+		migrate_pointer(b->m_prev);
+		migrate_pointer(b->m_next);
+		migrate_pointer(b->m_jointList);
+		migrate_pointer(b->m_contactList);
+		b->m_world = &b2;
+		
+		for (b2Fixture* f = b->m_fixtureList; f; f = f->m_next) {
+			f->m_body = b;
+			
+			migrate_pointer(f->m_proxies);
+			migrate_pointer(f->m_shape);
+			migrate_pointer(f->m_next);
+
+			for (size_t i = 0; i < f->m_proxyCount; ++i) {
+				f->m_proxies[i].fixture = f;
+			}
+
+			//auto c_idx = f->collider_index;
+			//auto& cache = colliders_caches[f->m_userData.pool.indirection_index];
+			//cache.correspondent_rigid_body_cache = rigid_body_cache_id;
+			//
+			//if (c_idx >= cache.fixtures_per_collider.size()) {
+			//	ensure_eq(c_idx, cache.fixtures_per_collider.size());
+			//	cache.fixtures_per_collider.push_back(std::vector<b2Fixture*>());
+			//}
+			//
+			//cache.fixtures_per_collider[c_idx].push_back(f);
+		}
+	}
+
+	colliders_caches = b.colliders_caches;
+	rigid_body_caches = b.rigid_body_caches;
+
+	for (auto& c : colliders_caches) {
+		for (auto& fv : c.fixtures_per_collider) {
+			for (auto& f : fv) {
+				f = reinterpret_cast<b2Fixture*>(pointer_migrations.at(reinterpret_cast<void*>(f)));
+			}
+		}
+	}
+	
+	for (auto& c : rigid_body_caches) {
+		if (c.body) {
+			c.body = reinterpret_cast<b2Body*>(pointer_migrations.at(reinterpret_cast<void*>(c.body)));
+		}
+	}
+
+	// ensure that all allocations have been migrated
+
+	ensure(dup_allocator.allocations.empty());
+
+	dup_allocator = std::move(migrated_allocator);
+
 	return *this;
 }

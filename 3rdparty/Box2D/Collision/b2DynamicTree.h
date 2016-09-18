@@ -129,6 +129,7 @@ public:
 	b2DynamicTree(b2DynamicTree&&) = delete;
 
 private:
+	friend class physics_system;
 
 	int32 AllocateNode();
 	void FreeNode(int32 node);

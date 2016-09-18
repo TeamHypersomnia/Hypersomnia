@@ -67,6 +67,10 @@ void cosmos::create_substance_completely() {
 	for (auto& ordered_pair : guid_map_for_transport) {
 		create_substance_for_entity(get_handle(ordered_pair.second));
 	}
+
+	//for (auto it = guid_map_for_transport.rbegin(); it != guid_map_for_transport.rend(); ++it) {
+	//	create_substance_for_entity(get_handle((*it).second));
+	//}
 }
 
 void cosmos::destroy_substance_for_entity(const const_entity_handle h) {
@@ -117,7 +121,10 @@ cosmos& cosmos::operator=(const cosmos& b) {
 	profiler.duplication.end_measurement();
 	b.profiler.duplication.end_measurement();
 	
+	//complete_resubstantiation();
+	profiler.complete_resubstantiation.new_measurement();
 	temporary_systems = b.temporary_systems;
+	profiler.complete_resubstantiation.end_measurement();
 	return *this;
 }
 

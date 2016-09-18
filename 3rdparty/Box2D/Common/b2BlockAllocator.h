@@ -20,6 +20,7 @@
 #define B2_BLOCK_ALLOCATOR_H
 
 #include <Box2D/Common/b2Settings.h>
+#include <unordered_set>
 
 const int32 b2_chunkSize = 16 * 1024;
 const int32 b2_maxBlockSize = 640;
@@ -46,17 +47,7 @@ public:
 
 	void Clear();
 
-private:
-
-	b2Chunk* m_chunks;
-	int32 m_chunkCount;
-	int32 m_chunkSpace;
-
-	b2Block* m_freeLists[b2_blockSizes];
-
-	static int32 s_blockSizes[b2_blockSizes];
-	static uint8 s_blockSizeLookup[b2_maxBlockSize + 1];
-	static bool s_blockSizeLookupInitialized;
+	std::unordered_set<void*> allocations;
 };
 
 #endif

@@ -206,8 +206,6 @@ public:
 	/// Dump this fixture to the log file.
 	void Dump(int32 bodyIndex);
 
-protected:
-
 	friend class b2Body;
 	friend class b2World;
 	friend class b2Contact;
@@ -242,6 +240,7 @@ protected:
 	b2Filter m_filter;
 
 	bool m_isSensor;
+	short collider_index;
 
 	FixtureUserdata m_userData;
 };
