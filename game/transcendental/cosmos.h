@@ -169,8 +169,6 @@ public:
 	std::vector<entity_handle> get(processing_subjects);
 	std::vector<const_entity_handle> get(processing_subjects) const;
 
-	components::transform get_previous_transform(entity_id) const;
-
 	size_t entities_count() const;
 	size_t get_maximum_entities() const;
 	std::wstring summary() const;

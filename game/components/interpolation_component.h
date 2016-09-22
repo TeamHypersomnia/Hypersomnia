@@ -4,6 +4,7 @@
 namespace components {
 	struct interpolation : synchronizable_component {
 		float base_exponent = 0.9f;
+		components::transform place_of_birth;
 	};
 }
 

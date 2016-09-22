@@ -196,27 +196,6 @@ std::vector<const_entity_handle> cosmos::get(const processing_subjects list) con
 	return temporary_systems.get<processing_lists_system>().get(list, *this);
 }
 
-components::transform cosmos::get_previous_transform(entity_id id) const {
-	auto handle = get_handle(id);
-
-	if (handle.dead()) {
-		return components::transform();
-	}
-
-	ensure(handle.has<components::transform>());
-
-	const auto trans_id = static_cast<unsigned>(
-		get_pool(augs::pool_id<components::transform>()).get_real_index(handle.get().get_id<components::transform>())
-		);
-	
-	const auto& cache = insignificant_systems.get<interpolation_system>().per_entity_cache;
-	
-	if (trans_id < cache.size())
-		return cache[trans_id];
-
-	return handle.get<components::transform>();
-}
-
 randomization cosmos::get_rng_for(const entity_id id) const {
 	int transform_hash = 0;
 	auto tr = get_handle(id).get<components::transform>();
