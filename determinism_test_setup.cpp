@@ -47,6 +47,10 @@ void determinism_test_setup::process(game_window& window) {
 		ensure(h == hypersomnias[0]);
 	}
 
+	for (auto& h : hypersomnias) {
+		h.significant.meta.settings.enable_interpolation = false;
+	}
+
 	input_unpacker.try_to_load_or_save_new_session("sessions/", "recorded.inputs");
 
 	viewing_session session;
@@ -93,7 +97,6 @@ void determinism_test_setup::process(game_window& window) {
 
 				auto cosmic_entropy_for_this_step = testbeds[i].make_cosmic_entropy(s.total_entropy.local, session.context, h);
 
-				h.set_current_transforms_as_previous_for_interpolation();
 				testbeds[i].step_with_callbacks(cosmic_entropy_for_this_step, h);
 
 				renderer::get_current().clear_logic_lines();

@@ -85,13 +85,15 @@ void local_setup::process(game_window& window) {
 
 			auto cosmic_entropy_for_this_step = testbed.make_cosmic_entropy(s.total_entropy.local, session.context, hypersomnia);
 
-			hypersomnia.set_current_transforms_as_previous_for_interpolation();
-
 			testbed.step_with_callbacks(cosmic_entropy_for_this_step, hypersomnia);
 
 			renderer::get_current().clear_logic_lines();
 		}
 
-		testbed.view(hypersomnia, window, session, session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), input_unpacker.timer));
+		const auto vdt = session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), input_unpacker.timer);
+
+		hypersomnia.integrate_interpolated_transforms(vdt.in_seconds());
+
+		testbed.view(hypersomnia, window, session, vdt);
 	}
 }

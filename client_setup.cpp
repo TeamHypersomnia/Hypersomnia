@@ -149,8 +149,6 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 		if (still_downloading)
 			continue;
 
-		extrapolated_hypersomnia.set_current_transforms_as_previous_for_interpolation();
-
 		const auto local_cosmic_entropy_for_this_step = scene.make_cosmic_entropy(s.total_entropy.local, session.context, hypersomnia);
 
 		receiver.send_commands_and_predict(client, local_cosmic_entropy_for_this_step, extrapolated_hypersomnia, step_pred);
@@ -159,7 +157,11 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 		receiver.unpack_deterministic_steps(hypersomnia, hypersomnia_last_snapshot, extrapolated_hypersomnia, step_pred);
 	}
 
-	if (!still_downloading)
-		scene.view(extrapolated_hypersomnia,
-			window, session, client, session.frame_timer.extract_variable_delta(extrapolated_hypersomnia.get_fixed_delta(), input_unpacker.timer), swap_buffers);
+	if (!still_downloading) {
+		const auto vdt = session.frame_timer.extract_variable_delta(extrapolated_hypersomnia.get_fixed_delta(), input_unpacker.timer);
+
+		extrapolated_hypersomnia.integrate_interpolated_transforms(vdt.in_seconds());
+
+		scene.view(extrapolated_hypersomnia, window, session, client, vdt, swap_buffers);
+	}
 }
