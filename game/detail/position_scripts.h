@@ -16,3 +16,5 @@ float distance(const_entity_handle from, const_entity_handle to);
 float distance_sq(const_entity_handle from, const_entity_handle to);
 
 void set_velocity(entity_handle, vec2);
+
+components::transform viewing_transform(const const_entity_handle, const bool integerize = false);

@@ -279,9 +279,7 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 		auto& transform = entity.get<components::transform>();
 
 		transform.pos = body_pos;
-
-		if (!b->IsFixedRotation())
-			transform.rotation = body_angle;
+		transform.rotation = body_angle;
 
 		physics.component.transform = b->m_xf;
 		physics.component.sweep = b->m_sweep;
@@ -289,19 +287,7 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 		physics.component.angular_velocity = b->GetAngularVelocity();
 
 		for (const auto& fe : physics.get_fixture_entities()) {
-			auto& fixtures = fe.get<components::fixtures>();
-			auto total_offset = fixtures.get_total_offset();
-
-			auto& fix_transform = fe.get<components::transform>();
-			fix_transform.pos = body_pos;
-
-			if (!b->IsFixedRotation())
-				fix_transform.rotation = body_angle;
-
-			fix_transform.pos += total_offset.pos;
-			fix_transform.rotation += total_offset.rotation;
-
-			fix_transform.pos.rotate(body_angle, body_pos);
+			fe.get<components::transform>() = components::fixtures::transform_around_body(fe, transform);
 		}
 	}
 }

@@ -13,12 +13,11 @@ processing_lists_system::processing_lists_system() {
 }
 
 void processing_lists_system::destruct(const_entity_handle handle) {
-	auto id = handle.get_id();
-	size_t index = id.pool.indirection_index;
+	const auto index = make_cache_id(handle);
 
 	if (per_entity_cache[index].is_constructed) {
 		for (auto& list : lists)
-			remove_element(list.second, id);
+			remove_element(list.second, handle.get_id());
 
 		per_entity_cache[index] = cache();
 	}
@@ -27,8 +26,7 @@ void processing_lists_system::destruct(const_entity_handle handle) {
 void processing_lists_system::construct(const_entity_handle handle) {
 	if (!handle.has<components::processing>()) return;
 
-	auto id = handle.get_id();
-	size_t index = id.pool.indirection_index;
+	const auto index = make_cache_id(handle);
 	
 	ensure(!per_entity_cache[index].is_constructed);
 
@@ -37,7 +35,7 @@ void processing_lists_system::construct(const_entity_handle handle) {
 	if (processing.is_activated()) {
 		for (auto& list : lists)
 			if (processing.is_in(list.first))
-				list.second.push_back(id);
+				list.second.push_back(handle.get_id());
 
 		per_entity_cache[index].is_constructed = true;
 	}

@@ -1,6 +1,7 @@
 #include "position_scripts.h"
 #include "game/components/transform_component.h"
 #include "game/components/physics_component.h"
+#include "game/components/interpolation_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/detail/physics_scripts.h"
@@ -63,4 +64,24 @@ float distance(const_entity_handle a, const_entity_handle b) {
 
 void set_velocity(entity_handle h, vec2 v) {
 	h.get<components::physics>().set_velocity(v);
+}
+
+components::transform viewing_transform(const const_entity_handle handle, const bool integerize) {
+	if (handle.get_cosmos().significant.meta.settings.enable_interpolation) {
+		const auto& owner = handle.get_owner_body();
+		
+		if (owner.alive() && owner.has<components::interpolation>() && owner != handle) {
+			auto in = owner.get<components::interpolation>().get_interpolated();
+			
+			if(integerize)
+				in.pos = vec2i(in.pos);
+
+			return components::fixtures::transform_around_body(handle, in);
+		}
+		else if (handle.has<components::interpolation>()) {
+			return handle.get<components::interpolation>().get_interpolated();
+		}
+	}
+	
+	return handle.get<components::transform>();
 }

@@ -204,3 +204,5 @@ template <bool is_const>
 std::vector<entity_id> to_id_vector(std::vector<basic_entity_handle<is_const>> vec) {
 	return std::vector<entity_id>(vec.begin(), vec.end());
 }
+
+size_t make_cache_id(const const_entity_handle handle);

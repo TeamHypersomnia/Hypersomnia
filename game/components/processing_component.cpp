@@ -39,6 +39,9 @@ P P::get_default(const_entity_handle id) {
 	if (id.has<components::item_slot_transfers>()) {
 		matching.push_back(processing_subjects::WITH_ITEM_SLOT_TRANSFERS);
 	}
+	if (id.has<components::interpolation>()) {
+		matching.push_back(processing_subjects::WITH_INTERPOLATION);
+	}
 	if (id.has<components::melee>()) {
 		matching.push_back(processing_subjects::WITH_MELEE);
 	}

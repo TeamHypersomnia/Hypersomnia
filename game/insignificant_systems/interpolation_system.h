@@ -9,6 +9,12 @@ class interpolation_system {
 public:
 	std::vector<components::transform> per_entity_cache;
 
-	void set_current_transforms_as_previous_for_interpolation(const cosmos&);
-	void reserve_caches_for_entities(size_t);
+	void integrate_interpolated_transforms(const cosmos&, float seconds);
+
+	void construct(const const_entity_handle);
+	void destruct(const const_entity_handle);
+
+	components::transform& get_interpolated(const const_entity_handle);
+	void reserve_caches_for_entities(const size_t);
+	void write_current_to_interpolated(const const_entity_handle);
 };

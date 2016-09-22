@@ -73,6 +73,8 @@ namespace components {
 			colliders.push_back(convex_partitioned_collider());
 			return *(colliders.end()-1);
 		}
+
+		static components::transform transform_around_body(const const_entity_handle fixtures_entity, const components::transform& body_transform);
 	};
 }
 

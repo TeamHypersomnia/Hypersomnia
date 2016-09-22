@@ -117,7 +117,7 @@ public:
 		post_solve(step);
 	}
 
-	void set_current_transforms_as_previous_for_interpolation() const;
+	void integrate_interpolated_transforms(const float seconds) const;
 	void advance_deterministic_schemata(cosmic_entropy input);
 
 	void reserve_storage_for_entities(size_t);

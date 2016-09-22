@@ -5,19 +5,16 @@
 #include "game/components/crosshair_component.h"
 #include "augs/misc/delta.h"
 
-void world_camera::configure_size(vec2 size) {
+void world_camera::configure_size(const vec2 size) {
 	visible_world_area = size;
 }
 
-void world_camera::tick(augs::variable_delta dt, const_entity_handle entity_to_chase) {
+void world_camera::tick(const augs::variable_delta dt, const const_entity_handle entity_to_chase) {
 	const auto& cosm = entity_to_chase.get_cosmos();
-	const auto chased_transform = entity_to_chase.alive() ? entity_to_chase.get<components::transform>() : components::transform();
-
-	auto previous = cosm.significant.meta.settings.enable_interpolation ? cosm.get_previous_transform(entity_to_chase) : chased_transform;
 
 	/* we obtain transform as a copy because we'll be now offsetting it by crosshair position */
 	if (entity_to_chase.alive()) {
-		transform = chased_transform.interpolated(previous, dt.view_interpolation_ratio());
+		transform = viewing_transform(entity_to_chase);
 		transform.rotation = 0;
 	}
 
@@ -101,11 +98,11 @@ void world_camera::tick(augs::variable_delta dt, const_entity_handle entity_to_c
 
 			// LOG("%x, %x, %x", *(vec2i*)&player_pos, *(vec2i*)&previous_step_player_position, *(vec2i*)&target_value);
 		}
-		else {
-			target_value = chased_transform.interpolation_direction(previous);
-			target_value.set_length(100);
-			smoothing_player_pos.averages_per_sec = 5;
-		}
+		//else {
+		//	target_value = chased_transform.interpolation_direction(previous);
+		//	target_value.set_length(100);
+		//	smoothing_player_pos.averages_per_sec = 5;
+		//}
 
 		smoothing_player_pos.target_value = target_value * (-1);
 		smoothing_player_pos.tick(dt.in_seconds());
@@ -121,7 +118,7 @@ void world_camera::tick(augs::variable_delta dt, const_entity_handle entity_to_c
 	dont_smooth_once = false;
 }
 
-state_for_drawing_camera world_camera::get_state_for_drawing_camera(const_entity_handle entity_to_chase) {
+state_for_drawing_camera world_camera::get_state_for_drawing_camera(const const_entity_handle entity_to_chase) {
 	state_for_drawing_camera in;
 	in.transformed_visible_world_area_aabb = augs::get_aabb_rotated(smoothed_visible_world_area, smoothed_camera_transform.rotation)
 		+ smoothed_camera_transform.pos - smoothed_visible_world_area / 2;
@@ -132,7 +129,7 @@ state_for_drawing_camera world_camera::get_state_for_drawing_camera(const_entity
 	return in;
 }
 
-vec2i world_camera::get_camera_offset_due_to_character_crosshair(const_entity_handle entity_to_chase) const {
+vec2i world_camera::get_camera_offset_due_to_character_crosshair(const const_entity_handle entity_to_chase) const {
 	vec2 camera_crosshair_offset;
 
 	if (entity_to_chase.dead())

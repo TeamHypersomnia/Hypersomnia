@@ -9,10 +9,9 @@
 
 namespace components {
 	struct render {
-		bool interpolate = true;
 		bool absolute_transform = false;
 		bool draw_border = false;
-		padding_byte pad;
+		padding_byte pad[2];
 
 		render_layer layer = render_layer::INVALID;
 

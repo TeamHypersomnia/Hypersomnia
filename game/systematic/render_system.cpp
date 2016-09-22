@@ -56,17 +56,11 @@ void render_system::draw_entities(augs::vertex_triangle_buffer& output, std::vec
 	for (auto e : entities) {
 		for_each_type<components::polygon, components::sprite, /*components::tile_layer,*/ components::particle_group>([e, interpolation_ratio, &output, &in_camera, only_border_highlights](auto T) {
 			typedef decltype(T) renderable_type;
-			const bool interpolation_enabled = e.get_cosmos().significant.meta.settings.enable_interpolation;
 
 			if (e.has<renderable_type>()) {
 				const auto& render = e.get<components::render>();
-				const auto& transform = e.get<components::transform>();
+				auto renderable_transform = viewing_transform(e, true);
 
-				components::transform renderable_transform = transform;
-
-				if (interpolation_enabled && render.interpolate) {
-					renderable_transform = transform.interpolated(e.get_cosmos().get_previous_transform(e), interpolation_ratio);
-				}
 				//else {
 				//	renderable_transform = transform;
 				//}

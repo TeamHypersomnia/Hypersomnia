@@ -74,16 +74,22 @@ void cosmos::create_substance_completely() {
 }
 
 void cosmos::destroy_substance_for_entity(const const_entity_handle h) {
-	temporary_systems.for_each([h](auto& sys) {
+	auto destructor = [h](auto& sys) {
 		sys.destruct(h);
-	});
+	};
+
+	temporary_systems.for_each(destructor);
+	insignificant_systems.for_each(destructor);
 }
 
 void cosmos::create_substance_for_entity(const_entity_handle h) {
 	if (h.has<components::substance>()) {
-		temporary_systems.for_each([h](auto& sys) {
+		auto constructor = [h](auto& sys) {
 			sys.construct(h);
-		});
+		};
+
+		temporary_systems.for_each(constructor);
+		insignificant_systems.for_each(constructor);
 	}
 }
 
@@ -170,13 +176,12 @@ void cosmos::complete_resubstantiation(const const_entity_handle h) {
 void cosmos::reserve_storage_for_entities(const size_t n) {
 	reserve_storage_for_aggregates(n);
 
-	temporary_systems.for_each([n](auto& sys) {
+	auto reservation_lambda = [n](auto& sys) {
 		sys.reserve_caches_for_entities(n);
-	});
+	};
 
-	insignificant_systems.for_each([n](auto& sys) {
-		sys.reserve_caches_for_entities(n);
-	});
+	temporary_systems.for_each(reservation_lambda);
+	insignificant_systems.for_each(reservation_lambda);
 }
 
 std::wstring cosmos::summary() const {
@@ -375,9 +380,9 @@ size_t cosmos::get_maximum_entities() const {
 	return significant.pool_for_aggregates.capacity();
 }
 
-void cosmos::set_current_transforms_as_previous_for_interpolation() const {
+void cosmos::integrate_interpolated_transforms(const float seconds) const {
 	profiler.start(meter_type::INTERPOLATION);
-	insignificant_systems.get<interpolation_system>().set_current_transforms_as_previous_for_interpolation(*this);
+	insignificant_systems.get<interpolation_system>().integrate_interpolated_transforms(*this, seconds);
 	profiler.stop(meter_type::INTERPOLATION);
 }
 

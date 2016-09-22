@@ -3224,5 +3224,8 @@
     <ClInclude Include="game\insignificant_systems\interpolation_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game\components\interpolation_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

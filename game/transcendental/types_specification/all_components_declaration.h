@@ -45,6 +45,7 @@ namespace components {
 	struct child;
 	struct sub_entities;
 	struct physical_relations;
+	struct interpolation;
 	struct substance;
 }
 
@@ -93,6 +94,7 @@ struct put_all_components_into {
 		components::child,
 		components::sub_entities,
 		components::physical_relations,
+		components::interpolation,
 
 		components::substance
 
