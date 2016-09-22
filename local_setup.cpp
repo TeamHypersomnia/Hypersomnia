@@ -22,6 +22,7 @@ void local_setup::process(game_window& window) {
 	const vec2i screen_size = vec2i(window.get_screen_rect());
 
 	cosmos hypersomnia(3000);
+	hypersomnia.insignificant_systems.get<interpolation_system>().interpolation_speed = static_cast<float>(window.get_config_number("interpolation_speed"));
 
 	step_and_entropy_unpacker input_unpacker;
 	scene_managers::testbed testbed;

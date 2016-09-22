@@ -41,6 +41,7 @@ void client_setup::init(game_window& window, const std::string recording_filenam
 	scene_managers::networked_testbed_client().populate_world_with_entities(initial_hypersomnia);
 
 	const auto config_tickrate = static_cast<unsigned>(window.get_config_number("tickrate"));
+	extrapolated_hypersomnia.insignificant_systems.get<interpolation_system>().interpolation_speed = static_cast<float>(window.get_config_number("interpolation_speed"));
 
 	detailed_step_log = config_tickrate <= 2;
 

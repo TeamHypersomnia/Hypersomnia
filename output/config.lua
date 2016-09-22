@@ -11,7 +11,7 @@ launch_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.LOCAL,
+	launch_mode = launch_modes.TWO_CLIENTS_AND_SERVER,
 	
 	determinism_test_cloned_cosmoi_count = 2,
 
@@ -21,7 +21,7 @@ config_table = {
 	window_x = 0,
 	window_y = 0,
 	bpp = 24,
-	resolution_w = 1000,
+	resolution_w = 1600,
 	resolution_h = 720,
 	doublebuffer = 1,
 	
@@ -39,8 +39,10 @@ config_table = {
 	tickrate = 60,
 
 	jitter_buffer_ms = 50,
-	client_commands_jitter_buffer_ms = 100,
+	client_commands_jitter_buffer_ms = 70,
 	
+	interpolation_speed = 525,
+
 	simulate_lag = 0,
 	packet_loss = 0.00,
 	min_latency = 50,
