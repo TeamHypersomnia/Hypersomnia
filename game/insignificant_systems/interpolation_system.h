@@ -8,6 +8,7 @@
 class interpolation_system {
 public:
 	std::vector<components::transform> per_entity_cache;
+	float interpolation_speed = 525.f;
 
 	void integrate_interpolated_transforms(const cosmos&, float seconds);
 

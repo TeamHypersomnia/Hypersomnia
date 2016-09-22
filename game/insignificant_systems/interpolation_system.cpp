@@ -17,7 +17,7 @@ void interpolation_system::integrate_interpolated_transforms(const cosmos& cosm,
 			const auto& info = e.get<components::interpolation>();
 			auto& integrated = get_interpolated(e);
 
-			const float averaging_constant = 1.0f - static_cast<float>(pow(info.component.base_exponent, 525.f * seconds));
+			const float averaging_constant = 1.0f - static_cast<float>(pow(info.component.base_exponent, interpolation_speed * seconds));
 
 			integrated = actual.interpolated(integrated, averaging_constant);
 		}
