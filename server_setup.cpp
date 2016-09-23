@@ -202,22 +202,26 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 
 			guid_mapped_entropy total_unpacked_entropy;
 			
-			if (test_randomize_entropies_in_client_setup && test_entropy_randomizer.randval(0u, randomize_once_every) == 0u) {
-				const unsigned which = test_entropy_randomizer.randval(0, 4);
+			if (test_randomize_entropies_in_client_setup) {
+				for (size_t i = 1; i < scene.characters.size(); ++i) {
+					if (test_entropy_randomizer.randval(0u, randomize_once_every) == 0u) {
+						const unsigned which = test_entropy_randomizer.randval(0, 4);
 
-				entity_intent new_intent;
+						entity_intent new_intent;
 
-				switch (which) {
-				case 0: new_intent.intent = intent_type::MOVE_BACKWARD; break;
-				case 1: new_intent.intent = intent_type::MOVE_FORWARD; break;
-				case 2: new_intent.intent = intent_type::MOVE_LEFT; break;
-				case 3: new_intent.intent = intent_type::MOVE_RIGHT; break;
-				case 4: new_intent.intent = intent_type::CROSSHAIR_PRIMARY_ACTION; break;
+						switch (which) {
+						case 0: new_intent.intent = intent_type::MOVE_BACKWARD; break;
+						case 1: new_intent.intent = intent_type::MOVE_FORWARD; break;
+						case 2: new_intent.intent = intent_type::MOVE_LEFT; break;
+						case 3: new_intent.intent = intent_type::MOVE_RIGHT; break;
+						case 4: new_intent.intent = intent_type::CROSSHAIR_PRIMARY_ACTION; break;
+						}
+
+						new_intent.pressed_flag = test_entropy_randomizer.randval(0, 1) == 0;
+
+						total_unpacked_entropy.entropy_per_entity[hypersomnia[scene.characters[i].id].get_guid()].push_back(new_intent);
+					}
 				}
-
-				new_intent.pressed_flag = test_entropy_randomizer.randval(0, 1) == 0;
-
-				total_unpacked_entropy.entropy_per_entity[hypersomnia[scene.characters[1].id].get_guid()].push_back(new_intent);
 			}
 
 			for (auto& e : endpoints) {
