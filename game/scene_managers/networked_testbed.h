@@ -34,10 +34,10 @@ namespace scene_managers {
 			bool occupied = false;
 		};
 
-		augs::constant_size_vector<controlled_character, TESTBED_CHARACTERS_COUNT> characters;
 
 		friend class networked_testbed_server;
 	public:
+		augs::constant_size_vector<controlled_character, TESTBED_CHARACTERS_COUNT> characters;
 
 		void populate_world_with_entities(cosmos&);
 
