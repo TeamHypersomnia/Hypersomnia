@@ -28,7 +28,7 @@
 #include "game/enums/party_category.h"
 
 namespace ingredients {
-	void wsad_character_setup_movement(entity_handle e) {
+	void wsad_character_setup_movement(const entity_handle e) {
 		components::movement& movement = e.get<components::movement>();
 
 		movement.add_animation_receiver(e, false);
@@ -45,7 +45,7 @@ namespace ingredients {
 		movement.enable_braking_damping = true;
 	}
 
-	void wsad_character_physics(entity_handle e) {
+	void wsad_character_physics(const entity_handle e) {
 		components::physics body;
 		components::special_physics special;
 		components::fixtures colliders;
@@ -70,14 +70,14 @@ namespace ingredients {
 		e.get<components::fixtures>().set_owner_body(e);
 	}
 
-	void wsad_character_legs(entity_handle legs, entity_handle player) {
+	void wsad_character_legs(const entity_handle legs, const entity_handle player) {
 		components::sprite sprite;
 		components::render render;
 		components::animation animation;
 		components::transform transform;
 	}
 
-	void wsad_character(entity_handle e, entity_handle crosshair_entity) {
+	void wsad_character(const entity_handle e, const entity_handle crosshair_entity) {
 		auto& sprite = e += components::sprite();
 		auto& render = e += components::render();
 		auto& animation = e += components::animation();
@@ -196,7 +196,7 @@ namespace ingredients {
 		wsad_character_setup_movement(e);
 	}
 
-	void wsad_character_corpse(entity_handle e) {
+	void wsad_character_corpse(const entity_handle e) {
 		auto& sprite = e += components::sprite();
 		auto& render = e += components::render();
 		auto& transform = e += components::transform();
@@ -223,7 +223,7 @@ namespace ingredients {
 }
 
 namespace prefabs {
-	entity_handle create_character(cosmos& world, vec2 pos, vec2i screen_size, std::string name) {
+	entity_handle create_character(cosmos& world, const components::transform pos, const vec2i screen_size, const std::string name) {
 		auto character = world.create_entity(name);
 
 		name_entity(character, entity_name::PERSON);
@@ -233,7 +233,7 @@ namespace prefabs {
 
 		ingredients::wsad_character(character, crosshair);
 
-		character.get<components::transform>().pos = pos;
+		character.get<components::transform>() = pos;
 
 		ingredients::wsad_character_physics(character);
 
@@ -251,7 +251,7 @@ namespace prefabs {
 		return character;
 	}
 
-	entity_handle create_character_crosshair(cosmos& world, vec2i screen_size) {
+	entity_handle create_character_crosshair(cosmos& world, const vec2i screen_size) {
 		auto root = world.create_entity("crosshair");
 		auto recoil = world.create_entity("crosshair_recoil_body");
 		auto zero_target = world.create_entity("zero_target");
@@ -267,6 +267,7 @@ namespace prefabs {
 
 			render.layer = render_layer::CROSSHAIR;
 
+			crosshair.base_offset.set(-20, 0);
 			crosshair.sensitivity.set(3, 3);
 			crosshair.visible_world_area = screen_size;
 			crosshair.update_bounds();
