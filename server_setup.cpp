@@ -26,6 +26,8 @@
 
 #include "augs/network/reliable_channel.h"
 
+#include "augs/misc/randomization.h"
+
 void server_setup::wait_for_listen_server() {
 	std::unique_lock<std::mutex> lck(mtx);
 	while (!server_ready) cv.wait(lck);
@@ -44,7 +46,10 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 
 	const auto config_tickrate = static_cast<unsigned>(window.get_config_number("tickrate"));
 
-	bool detailed_step_log = config_tickrate <= 2;
+	const bool detailed_step_log = config_tickrate <= 2;
+
+	const bool test_randomize_entropies_in_client_setup = static_cast<bool>(window.get_config_number("test_randomize_entropies_in_client_setup"));
+	const unsigned randomize_once_every = static_cast<unsigned>(window.get_config_number("test_randomize_entropies_in_client_setup_once_every_steps"));
 
 	if (!hypersomnia.load_from_file("server_save.state")) {
 		hypersomnia.set_fixed_delta(augs::fixed_delta(config_tickrate));
@@ -94,6 +99,8 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 	bool resubstantiate = false;
 	
 	input_unpacker.timer.reset_timer();
+	
+	randomization test_entropy_randomizer;
 
 	while (!should_quit) {
 		augs::machine_entropy new_entropy;
@@ -195,6 +202,24 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 
 			guid_mapped_entropy total_unpacked_entropy;
 			
+			if (test_randomize_entropies_in_client_setup && test_entropy_randomizer.randval(0u, randomize_once_every) == 0u) {
+				const unsigned which = test_entropy_randomizer.randval(0, 4);
+
+				entity_intent new_intent;
+
+				switch (which) {
+				case 0: new_intent.intent = intent_type::MOVE_BACKWARD; break;
+				case 1: new_intent.intent = intent_type::MOVE_FORWARD; break;
+				case 2: new_intent.intent = intent_type::MOVE_LEFT; break;
+				case 3: new_intent.intent = intent_type::MOVE_RIGHT; break;
+				case 4: new_intent.intent = intent_type::CROSSHAIR_PRIMARY_ACTION; break;
+				}
+
+				new_intent.pressed_flag = test_entropy_randomizer.randval(0, 1) == 0;
+
+				total_unpacked_entropy.entropy_per_entity[hypersomnia[scene.characters[1].id].get_guid()].push_back(new_intent);
+			}
+
 			for (auto& e : endpoints) {
 				guid_mapped_entropy maybe_new_client_commands;
 				auto& next_command = e.next_command;

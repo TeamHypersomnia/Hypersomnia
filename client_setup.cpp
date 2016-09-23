@@ -50,7 +50,9 @@ void client_setup::init(game_window& window, const std::string recording_filenam
 		scene.populate_world_with_entities(hypersomnia);
 	}
 
-	input_unpacker.try_to_load_or_save_new_session("sessions/", recording_filename);
+	if (input_unpacker.try_to_load_or_save_new_session("sessions/", recording_filename)) {
+		input_unpacker.timer.set_stepping_speed_multiplier(0.1);
+	}
 
 	session.camera.configure_size(screen_size);
 
@@ -101,7 +103,7 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 				while (stream.get_unread_bytes() > 0) {
 					const auto command = static_cast<network_command>(stream.peek<unsigned char>());
 
-					bool should_skip = to_skip > 0;
+					const bool should_skip = to_skip > 0;
 
 					if (should_skip)
 						--to_skip;
