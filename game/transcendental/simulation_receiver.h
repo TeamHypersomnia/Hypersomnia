@@ -21,18 +21,6 @@ public:
 		bool use_extrapolated_cosmos = true;
 	};
 
-	unsigned current_steps_to_the_future = 0;
-
-	void delay_sent_commands(unsigned steps_to_the_future) {
-
-		current_steps_to_the_future += steps_to_the_future;
-	}
-
-	void catch_up_commands(unsigned steps_to_return) {
-
-		current_steps_to_the_future -= steps_to_return;
-	}
-
 	template<class Step>
 	void send_commands_and_predict(augs::network::client& client, cosmic_entropy new_entropy, cosmos& predicted_cosmos, Step advance) {
 		augs::stream client_commands;
@@ -87,10 +75,6 @@ public:
 
 			if (new_command.next_client_commands_accepted) {
 				ensure(predicted_steps.size() > 0);
-				
-				if (!current_steps_to_the_future) {
-					
-				}
 
 				if (sim.resubstantiate || predicted_steps.front() != sim.entropy) {
 					reconciliate_predicted = true;
@@ -102,8 +86,6 @@ public:
 				reconciliate_predicted = true;
 			}
 		}
-
-		const unsigned previous_step = referential_cosmos.get_total_steps_passed();
 
 		for (const auto& e : entropies_to_simulate) {
 			const cosmic_entropy cosmic_entropy_for_this_step(e.entropy, referential_cosmos);
@@ -121,19 +103,11 @@ public:
 		// LOG("Unpacking from %x to %x", previous_step, referential_cosmos.get_total_steps_passed());
 
 		if (reconciliate_predicted) {
-			unsigned predicted_was_at_step = predicted_cosmos.get_total_steps_passed();
-
 			predicted_cosmos = referential_cosmos;
 
 			for (const auto& s : predicted_steps) {
 				advance(cosmic_entropy(s, predicted_cosmos), predicted_cosmos);
 			}
-
-			//ensure(predicted_cosmos.get_total_steps_passed() == predicted_was_at_step);
-
-			//while (predicted_cosmos.get_total_steps_passed() < predicted_was_at_step) {
-			//
-			//}
 		}
 
 		return std::move(result);
