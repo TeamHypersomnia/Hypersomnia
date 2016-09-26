@@ -73,17 +73,13 @@ public:
 
 			entropies_to_simulate.emplace_back(sim);
 
+			if (sim.resubstantiate || predicted_steps.front() != sim.entropy) {
+				reconciliate_predicted = true;
+			}
+
 			if (new_command.next_client_commands_accepted) {
 				ensure(predicted_steps.size() > 0);
-
-				if (sim.resubstantiate || predicted_steps.front() != sim.entropy) {
-					reconciliate_predicted = true;
-				}
-
 				predicted_steps.erase(predicted_steps.begin());
-			}
-			else {
-				reconciliate_predicted = true;
 			}
 		}
 
