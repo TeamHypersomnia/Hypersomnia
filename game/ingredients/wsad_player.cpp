@@ -58,7 +58,6 @@ namespace ingredients {
 		info.density = 1.0;
 		body.fixed_rotation = false;
 		body.angled_damping = true;
-		special.angle_motor_force_multiplier = 1.0;
 
 		body.linear_damping = 20;
 

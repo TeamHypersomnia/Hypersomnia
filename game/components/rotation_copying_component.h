@@ -4,21 +4,23 @@
 #include "padding_byte.h"
 
 namespace components {
-	struct rotation_copying  {
-		enum look_type {
+	struct rotation_copying {
+		enum class look_type {
 			POSITION,
 			VELOCITY,
+			ROTATION
 		};
 
-		enum rotation_copying_easing {
+		enum class easing_type {
 			NONE,
 			LINEAR,
 			EXPONENTIAL
 		};
 		
 		entity_id target;
+		entity_id stashed_target;
 
-		int easing_mode = NONE;
+		easing_type easing_mode = easing_type::NONE;
 
 		bool colinearize_item_in_hand = false;
 		bool update_value = true;
@@ -32,7 +34,18 @@ namespace components {
 		/* for linear smoothing */
 		vec2 last_rotation_interpolant;
 
-		unsigned look_mode = look_type::POSITION;
+		look_type look_mode = look_type::POSITION;
+		look_type stashed_look_mode = look_type::POSITION;
+
+		void stash() {
+			stashed_look_mode = look_mode;
+			stashed_target = target;
+		}
+
+		void unstash() {
+			look_mode = stashed_look_mode;
+			target = stashed_target;
+		}
 
 		template<class F>
 		void for_each_held_id(F f) {

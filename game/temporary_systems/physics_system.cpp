@@ -223,43 +223,6 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 	int32 velocityIterations = 8;
 	int32 positionIterations = 3;
 
-	for (b2Body* b = b2world->GetBodyList(); b != nullptr; b = b->GetNext()) {
-		if (b->GetType() == b2_staticBody) continue;
-
-		entity_handle entity = cosmos[b->GetUserData()];
-
-		auto& physics = entity.get<components::physics>();
-		auto& special = entity.get<components::special_physics>();
-		special.measured_carried_mass = 0.f;
-
-		b2Vec2 vel(b->GetLinearVelocity());
-		float32 speed = vel.Normalize();
-		float32 angular_speed = b->GetAngularVelocity();
-
-		//if (physics.air_resistance > 0.f) {
-		//	auto force_dir = physics.get_mass() * -vel;
-		//	auto force_components = (physics.air_resistance  * speed * speed);
-		//
-		//	//if (speed > 1.0)
-		//	//	force_components += (0.5f * sqrt(std::abs(speed)));
-		//	
-		//	physics.body->ApplyForce(force_components * force_dir, physics.body->GetWorldCenter(), true);
-		//}
-
-		auto angular_resistance = special.angular_air_resistance;
-		if (angular_resistance < 0.f) angular_resistance = special.air_resistance;
-
-		if (angular_resistance > 0.f) {
-			//physics.body->ApplyTorque((angular_resistance * sqrt(sqrt(angular_speed * angular_speed)) + 0.2 * angular_speed * angular_speed)* -sgn(angular_speed) * b->GetInertia(), true);
-			b->ApplyAngularImpulse(delta.in_seconds() * (angular_resistance * angular_speed * angular_speed)* -sgn(angular_speed) * b->GetInertia(), true);
-		}
-
-		if (special.enable_angle_motor) {
-			b->SetTransform(b->GetPosition(), special.target_angle * DEG_TO_RADf);
-			b->SetAngularVelocity(0);
-		}
-	}
-
 	ray_casts_since_last_step = 0;
 
 	b2world->Step(static_cast<float32>(delta.in_seconds()), velocityIterations, positionIterations);

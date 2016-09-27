@@ -81,7 +81,7 @@ bool driver_system::assign_car_ownership(const entity_handle driver, const entit
 	return change_car_ownership(driver, car, false);
 }
 
-bool driver_system::change_car_ownership(entity_handle driver_entity, entity_handle car_entity, bool lost_ownership) {
+bool driver_system::change_car_ownership(const entity_handle driver_entity, const entity_handle car_entity, const bool lost_ownership) {
 	auto& driver = driver_entity.get<components::driver>();
 	auto& cosmos = driver_entity.get_cosmos();
 	const auto& physics = cosmos.temporary_systems.get<physics_system>();
@@ -109,7 +109,9 @@ bool driver_system::change_car_ownership(entity_handle driver_entity, entity_han
 		}
 
 		if (maybe_rotation_copying && has_physics) {
-			maybe_rotation_copying->update_value = false;
+			maybe_rotation_copying->stash();
+			maybe_rotation_copying->target = car.left_wheel_trigger;
+			maybe_rotation_copying->look_mode = components::rotation_copying::look_type::ROTATION;
 		}
 
 		if (has_physics) {
@@ -140,7 +142,7 @@ bool driver_system::change_car_ownership(entity_handle driver_entity, entity_han
 		car.reset_movement_flags();
 
 		if (maybe_rotation_copying && has_physics) {
-			maybe_rotation_copying->update_value = true;
+			maybe_rotation_copying->unstash();
 		}
 
 		if (has_physics) {

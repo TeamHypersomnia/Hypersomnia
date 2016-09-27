@@ -64,7 +64,6 @@ namespace prefabs {
 
 			body.linear_damping = 0.4f;
 			body.angular_damping = 2.f;
-			special.angular_air_resistance = 0.55f;
 
 			auto& info = colliders.new_collider();
 			info.shape.from_renderable(front);

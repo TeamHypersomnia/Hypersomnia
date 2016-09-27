@@ -28,17 +28,7 @@ namespace components {
 
 		augs::constant_size_vector<friction_connection, OWNER_FRICTION_GROUNDS_COUNT> owner_friction_grounds;
 
-		int enable_angle_motor = false;
-
-		float target_angle = 0.f;
-		float angle_motor_force_multiplier = 1.f;
-
-		float measured_carried_mass = 0.f;
-
-		/* a physically realistic alternative to max_speed variable, the bigger the value is, the lesser the maximum speed */
-		float air_resistance = 2.0f;
-		// -1.f - the same as the air resistance
-		float angular_air_resistance = 0;
+		//float measured_carried_mass = 0.f;
 
 		template<class F>
 		void for_each_held_id(F f) {

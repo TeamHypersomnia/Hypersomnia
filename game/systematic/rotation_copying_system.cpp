@@ -82,7 +82,10 @@ float rotation_copying_system::resolve_rotation_copying_value(const_entity_handl
 
 	float new_angle = 0.f;
 
-	if (rotation_copying.look_mode == components::rotation_copying::look_type::POSITION) {
+	if (rotation_copying.look_mode == components::rotation_copying::look_type::ROTATION) {
+		new_angle = target.get<components::transform>().rotation;
+	}
+	else if (rotation_copying.look_mode == components::rotation_copying::look_type::POSITION) {
 		const auto& target_transform = target.get<components::transform>();
 		
 		const auto diff = target_transform.pos - position(it);
@@ -130,7 +133,7 @@ float rotation_copying_system::resolve_rotation_copying_value(const_entity_handl
 		}
 	}
 
-	if (rotation_copying.easing_mode == rotation_copying.EXPONENTIAL) {
+	if (rotation_copying.easing_mode == components::rotation_copying::easing_type::EXPONENTIAL) {
 		ensure(0);
 		//float averaging_constant = static_cast<float>(
 		//	pow(rotation_copying.smoothing_average_factor, rotation_copying.averages_per_sec * delta_seconds())
@@ -139,7 +142,7 @@ float rotation_copying_system::resolve_rotation_copying_value(const_entity_handl
 		//rotation_copying.last_rotation_interpolant = (rotation_copying.last_rotation_interpolant * averaging_constant + new_rotation * (1.0f - averaging_constant)).normalize();
 		//rotation_copying.last_value = rotation_copying.last_rotation_interpolant.degrees();
 	}
-	else if (rotation_copying.easing_mode == rotation_copying.NONE) {
+	else if (rotation_copying.easing_mode == components::rotation_copying::easing_type::NONE) {
 	
 	}
 
@@ -151,10 +154,12 @@ void rotation_copying_system::update_physical_motors(cosmos& cosmos) const {
 		const auto& rotation_copying = it.get<components::rotation_copying>();
 
 		if (rotation_copying.update_value) {
-			if (rotation_copying.use_physical_motor && it.has<components::special_physics>()) {
-				auto& physics = it.get<components::special_physics>();
-				physics.enable_angle_motor = true;
-				physics.target_angle = resolve_rotation_copying_value(it);
+			if (rotation_copying.use_physical_motor && it.has<components::physics>()) {
+				auto target_angle = resolve_rotation_copying_value(it);
+				auto& phys = it.get<components::physics>();
+
+				phys.set_transform({ phys.get_position(), target_angle });
+				phys.set_angular_velocity(0);
 			}
 		}
 	}

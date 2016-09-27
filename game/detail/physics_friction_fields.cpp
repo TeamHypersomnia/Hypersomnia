@@ -71,5 +71,5 @@ void physics_system::recurential_friction_handler(fixed_step& step, const entity
 
 	body->SetTransform(fricted_pos, body->GetAngle() + dt*friction_body->GetAngularVelocity());
 
-	friction_entity.get<components::special_physics>().measured_carried_mass += physics.get_mass() + entity.get<components::special_physics>().measured_carried_mass;
+	//friction_entity.get<components::special_physics>().measured_carried_mass += physics.get_mass() + entity.get<components::special_physics>().measured_carried_mass;
 }
