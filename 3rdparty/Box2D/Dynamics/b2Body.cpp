@@ -65,6 +65,7 @@ b2Body::b2Body(const b2BodyDef* bd, b2World* world)
 	m_contactList = NULL;
 	m_prev = NULL;
 	m_next = NULL;
+	m_ownerFrictionGround = NULL;
 
 	m_linearVelocity = bd->linearVelocity;
 	m_angularVelocity = bd->angularVelocity;

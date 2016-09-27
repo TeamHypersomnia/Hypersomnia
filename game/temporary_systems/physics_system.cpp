@@ -234,7 +234,7 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 		entity_handle entity = cosmos[b->GetUserData()];
 		auto& physics = entity.get<components::physics>();
 
-		recurential_friction_handler(step, entity, entity.get_owner_friction_ground());
+		recurential_friction_handler(step, b, b->m_ownerFrictionGround);
 
 		physics.component.transform = b->m_xf;
 		physics.component.sweep = b->m_sweep;
@@ -391,6 +391,8 @@ physics_system& physics_system::operator=(const physics_system& b) {
 		migrate_pointer(b->m_prev);
 		migrate_pointer(b->m_next);
 		migrate_pointer(b->m_jointList);
+		migrate_pointer(b->m_ownerFrictionGround);
+
 		migrate_edge(b->m_contactList);
 		b->m_world = &b2;
 		

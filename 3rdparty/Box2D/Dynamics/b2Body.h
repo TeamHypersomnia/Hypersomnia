@@ -430,6 +430,9 @@ public:
 	b2Body* m_prev;
 	b2Body* m_next;
 
+	// pointer for optimization
+	b2Body* m_ownerFrictionGround;
+
 	b2Fixture* m_fixtureList;
 	int32 m_fixtureCount;
 
