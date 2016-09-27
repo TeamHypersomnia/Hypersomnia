@@ -130,7 +130,7 @@ void physics_system::fixtures_construct(const_entity_handle handle) {
 
 					b2Fixture* new_fix = owner_cache.body->CreateFixture(&fixdef);
 					
-					ensure(ci < std::numeric_limits<short>::max());
+					ensure(static_cast<short>(ci) < std::numeric_limits<short>::max());
 					new_fix->collider_index = static_cast<short>(ci);
 
 					partitioned_collider.push_back(new_fix);
@@ -292,6 +292,8 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 	}
 }
 
+#define PROTECT_MIGRATIONS 0
+
 physics_system& physics_system::operator=(const physics_system& b) {
 	ray_casts_since_last_step = b.ray_casts_since_last_step;
 	accumulated_messages = b.accumulated_messages;
@@ -305,22 +307,37 @@ physics_system& physics_system::operator=(const physics_system& b) {
 	// do the initial trivial copy
 	b2 = b2c;
 
-	// reset the allocator to its own
+	// no need to install a new allocator since its operator= is a non-op
+	// new (&b2.m_blockAllocator) b2BlockAllocator;
+
+	// reset the allocator pointer to the new one
 	b2.m_contactManager.m_allocator = &b2.m_blockAllocator;
 
 	std::unordered_map<void*, void*> pointer_migrations;
 	std::unordered_map<void*, size_t> m_nodeAB_offset;
 
-	std::unordered_set<void**> already_migrated;
-
 	b2BlockAllocator& migrated_allocator = b2.m_blockAllocator;
-	auto old_allocations = migrated_allocator.allocations;
-	migrated_allocator.allocations.clear();
 
-	auto migrate_pointer = [&already_migrated, &pointer_migrations, &migrated_allocator, &old_allocations](auto*& ptr) {
+#if PROTECT_MIGRATIONS
+	std::unordered_set<void**> already_migrated;
+	auto old_allocations = migrated_allocator.allocations;
+
+	migrated_allocator.allocations.clear();
+#endif
+
+	auto migrate_pointer = [
+#if PROTECT_MIGRATIONS
+		&already_migrated, 
+		&old_allocations,
+#endif
+		&pointer_migrations, &migrated_allocator](auto*& ptr, const unsigned num = 1) {
+#if PROTECT_MIGRATIONS
 		ensure(already_migrated.find((void**)&ptr) == already_migrated.end());
 		already_migrated.insert((void**)&ptr);
-		
+#endif
+
+		typedef std::remove_pointer<std::decay_t<decltype(ptr)>>::type type;
+
 		if (ptr == nullptr) {
 			return;
 		}
@@ -328,7 +345,7 @@ physics_system& physics_system::operator=(const physics_system& b) {
 		void* const p = reinterpret_cast<void*>(ptr);
 		void* mig_p = nullptr;
 
-		const size_t s = _msize(p);
+		const size_t s = sizeof(type) * num;
 
 		auto maybe_migrated = pointer_migrations.find(p);
 
@@ -338,20 +355,27 @@ physics_system& physics_system::operator=(const physics_system& b) {
 
 			pointer_migrations.insert(std::make_pair(p, mig_p));
 
+#if PROTECT_MIGRATIONS
 			if(old_allocations.find(p) != old_allocations.end())
 				old_allocations.erase(p);
+#endif
 		}
 		else {
 			mig_p = (*maybe_migrated).second;
 		}
 
-		ptr = reinterpret_cast<std::decay_t<decltype(ptr)>>(mig_p);
+		ptr = reinterpret_cast<type*>(mig_p);
 	};
 	
-	auto migrate_edge = [&already_migrated, &pointer_migrations, &m_nodeAB_offset](b2ContactEdge*& ptr) {
+	auto migrate_edge = [
+#if PROTECT_MIGRATIONS
+		&already_migrated,
+#endif
+		&pointer_migrations, &m_nodeAB_offset](b2ContactEdge*& ptr) {
+#if PROTECT_MIGRATIONS
 		ensure(already_migrated.find((void**)&ptr) == already_migrated.end());
 		already_migrated.insert((void**)&ptr);
-
+#endif
 		if (ptr == nullptr) {
 			return;
 		}
@@ -422,8 +446,8 @@ physics_system& physics_system::operator=(const physics_system& b) {
 		for (b2Fixture* f = b->m_fixtureList; f; f = f->m_next) {
 			f->m_body = b;
 			
-			migrate_pointer(f->m_proxies);
-			migrate_pointer(f->m_shape);
+			migrate_pointer(f->m_proxies, f->m_proxyCount);
+			f->m_shape = f->m_shape->Clone(&migrated_allocator);
 			migrate_pointer(f->m_next);
 
 			for (size_t i = 0; i < f->m_proxyCount; ++i) {
@@ -464,8 +488,10 @@ physics_system& physics_system::operator=(const physics_system& b) {
 	}
 
 	// ensure that all allocations have been migrated
+#if PROTECT_MIGRATIONS
 	ensure(old_allocations.empty());
 	ensure_eq(b2c.m_blockAllocator.allocations.size(), migrated_allocator.allocations.size());
+#endif
 
 	return *this;
 }

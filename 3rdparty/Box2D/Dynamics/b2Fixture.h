@@ -234,13 +234,12 @@ public:
 	float32 m_friction;
 	float32 m_restitution;
 
-	b2FixtureProxy* m_proxies;
-	int32 m_proxyCount;
-
-	b2Filter m_filter;
-
 	bool m_isSensor;
 	short collider_index;
+	unsigned char m_proxyCount;
+	b2FixtureProxy* m_proxies;
+
+	b2Filter m_filter;
 
 	FixtureUserdata m_userData;
 };
