@@ -1050,6 +1050,9 @@
     <ClCompile Include="game\insignificant_systems\interpolation_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\detail\entity\spatial_properties_getters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3225,6 +3228,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\components\interpolation_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\entity\spatial_properties_getters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

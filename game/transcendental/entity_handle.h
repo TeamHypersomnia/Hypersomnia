@@ -12,6 +12,7 @@
 #include "game/detail/entity/inventory_getters.h"
 #include "game/detail/entity/physics_getters.h"
 #include "game/detail/entity/relations_helpers.h"
+#include "game/detail/entity/spatial_properties_getters.h"
 
 class cosmos;
 class cosmic_delta;
@@ -28,7 +29,8 @@ namespace augs {
 		public augs::component_setters<is_const, basic_entity_handle<is_const>>,
 		public inventory_getters<is_const, basic_entity_handle<is_const>>,
 		public physics_getters<is_const, basic_entity_handle<is_const>>,
-		public relations_helpers<is_const, basic_entity_handle<is_const>>
+		public relations_helpers<is_const, basic_entity_handle<is_const>>,
+		public spatial_properties_getters<is_const, basic_entity_handle<is_const>>
 	{
 		friend class relations_helpers<is_const, basic_entity_handle<is_const>>;
 		template <bool, class> friend class basic_relations_helpers;

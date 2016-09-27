@@ -198,7 +198,7 @@ std::vector<const_entity_handle> cosmos::get(const processing_subjects list) con
 
 randomization cosmos::get_rng_for(const entity_id id) const {
 	int transform_hash = 0;
-	auto tr = get_handle(id).get<components::transform>();
+	auto tr = get_handle(id).logic_transform();
 	transform_hash = static_cast<int>(tr.pos.x*100.0);
 	transform_hash += static_cast<int>(tr.pos.y*100.0);
 	transform_hash += static_cast<int>(tr.rotation*100.0);

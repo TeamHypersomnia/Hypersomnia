@@ -236,22 +236,10 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 
 		recurential_friction_handler(step, entity, entity.get_owner_friction_ground());
 
-		auto body_pos = METERS_TO_PIXELSf * b->GetPosition();
-		auto body_angle = b->GetAngle() * RAD_TO_DEGf;
-
-		auto& transform = entity.get<components::transform>();
-
-		transform.pos = body_pos;
-		transform.rotation = body_angle;
-
 		physics.component.transform = b->m_xf;
 		physics.component.sweep = b->m_sweep;
 		physics.component.velocity = b->GetLinearVelocity();
 		physics.component.angular_velocity = b->GetAngularVelocity();
-
-		for (const auto& fe : physics.get_fixture_entities()) {
-			fe.get<components::transform>() = components::fixtures::transform_around_body(fe, transform);
-		}
 	}
 }
 

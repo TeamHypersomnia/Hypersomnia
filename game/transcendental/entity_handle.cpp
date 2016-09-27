@@ -6,6 +6,7 @@
 #include "game/components/special_physics_component.h"
 #include "game/components/interpolation_component.h"
 #include "game/components/crosshair_component.h"
+#include "game/components/fixtures_component.h"
 
 #include "game/insignificant_systems/interpolation_system.h"
 
@@ -18,12 +19,15 @@ typedef put_all_components_into<augs::component_aggregate>::type N;
 template <bool C>
 template <bool, class>
 void augs::basic_handle<C, O, N>::add_standard_components() const {
-	if (!has<components::interpolation>() && (has<components::physics>() || has<components::crosshair>())) {
+	const bool has_physics = has<components::physics>();
+	const bool has_transform = has<components::transform>();
+
+	if (!has<components::interpolation>() && (has_physics || has<components::crosshair>())) {
 		add(components::interpolation());
 		get<components::interpolation>().write_current_to_interpolated();
 	}
 	
-	if (has<components::transform>() && has<components::physics>())
+	if (has_transform && has_physics)
 		get<components::physics>().set_transform(get<components::transform>());
 
 	if (has<components::render>() && !is_entity_physical(*this) && !has<components::dynamic_tree_node>())
@@ -40,6 +44,10 @@ void augs::basic_handle<C, O, N>::add_standard_components() const {
 	
 	if (!has<components::substance>())
 		add(components::substance());
+
+	if (has_transform && (has_physics || has<components::fixtures>())) {
+		remove<components::transform>();
+	}
 }
 
 template <bool C>
