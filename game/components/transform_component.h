@@ -29,6 +29,10 @@ namespace components {
 		void to_box2d_transforms(b2Transform&, b2Sweep&) const;
 
 		transform interpolated(const transform& previous, float ratio, float epsilon = 1.f) const;
+
+		transform to_si_space() const;
+		transform to_user_space() const;
+
 		void flip_rotation();
 		void reset();
 		vec2 interpolation_direction(const transform& previous) const;

@@ -413,7 +413,7 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 
 	force_joint_system().apply_forces_towards_target_entities(step);
 
-	rotation_copying_system().update_physical_motors(step.cosm);
+	rotation_copying_system().update_rotations(step.cosm);
 	performance.start(meter_type::PHYSICS);
 	listener.during_step = true;
 	temporary_systems.get<physics_system>().step_and_set_new_transforms(step);

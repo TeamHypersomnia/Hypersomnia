@@ -251,7 +251,7 @@ void perform_transfer(item_slot_transfer_request r, fixed_step& step) {
 		bool whole_item_grabbed = item.charges == result.transferred_charges;
 
 		if (previous_slot.alive()) {
-			previous_container_transform = previous_slot.get_container().get<components::transform>();
+			previous_container_transform = previous_slot.get_container().logic_transform();
 
 			if (whole_item_grabbed)
 				remove_item(previous_slot, r.item);

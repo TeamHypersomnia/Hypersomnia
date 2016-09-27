@@ -24,8 +24,7 @@ namespace components {
 
 		bool colinearize_item_in_hand = false;
 		bool update_value = true;
-		bool use_physical_motor = false;
-		padding_byte pad;
+		padding_byte pad[2];
 		
 		/* for exponential smoothing */
 		float smoothing_average_factor = 0.5f;

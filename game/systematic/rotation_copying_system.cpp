@@ -83,10 +83,10 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 	float new_angle = 0.f;
 
 	if (rotation_copying.look_mode == components::rotation_copying::look_type::ROTATION) {
-		new_angle = target.get<components::transform>().rotation;
+		new_angle = target.logic_transform().rotation;
 	}
 	else if (rotation_copying.look_mode == components::rotation_copying::look_type::POSITION) {
-		const auto& target_transform = target.get<components::transform>();
+		const auto& target_transform = target.logic_transform();
 		
 		const auto diff = target_transform.pos - position(it);
 
@@ -104,7 +104,7 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 				const auto* maybe_gun = subject_item.find<components::gun>();
 
 				if (maybe_gun) {
-					const auto rifle_transform = subject_item.get<components::transform>();
+					const auto rifle_transform = subject_item.logic_transform();
 					auto rifle_center = rifle_transform.pos;
 					auto barrel = maybe_gun->calculate_barrel_transform(rifle_transform).pos;
 					const auto mc = position(it);
@@ -149,28 +149,19 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 	return new_angle;
 }
 
-void rotation_copying_system::update_physical_motors(cosmos& cosmos) const {
+void rotation_copying_system::update_rotations(cosmos& cosmos) const {
 	for (const auto it : cosmos.get(processing_subjects::WITH_ROTATION_COPYING)) {
 		const auto& rotation_copying = it.get<components::rotation_copying>();
 
 		if (rotation_copying.update_value) {
-			if (rotation_copying.use_physical_motor && it.has<components::physics>()) {
+			if (it.has<components::physics>()) {
 				auto target_angle = resolve_rotation_copying_value(it);
 				auto& phys = it.get<components::physics>();
 
 				phys.set_transform({ phys.get_position(), target_angle });
 				phys.set_angular_velocity(0);
 			}
-		}
-	}
-}
-
-void rotation_copying_system::update_rotations(cosmos& cosmos) const {
-	for (const auto it : cosmos.get(processing_subjects::WITH_ROTATION_COPYING)) {
-		const auto& rotation_copying = it.get<components::rotation_copying>();
-
-		if (rotation_copying.update_value) {
-			if (!rotation_copying.use_physical_motor) {
+			else {
 				it.get<components::transform>().rotation = resolve_rotation_copying_value(it);
 			}
 		}

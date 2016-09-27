@@ -19,7 +19,7 @@
 #include "game/enums/filters.h"
 
 namespace prefabs {
-	entity_handle create_motorcycle(cosmos& world, components::transform spawn_transform) {
+	entity_handle create_motorcycle(cosmos& world, const components::transform& spawn_transform) {
 		auto front = world.create_entity("front");
 		auto interior = world.create_entity("interior");
 		auto left_wheel = world.create_entity("left_wheel");
@@ -31,10 +31,9 @@ namespace prefabs {
 		{
 			auto& sprite = front += components::sprite();
 			auto& render = front += components::render();
-			auto& transform = front += spawn_transform;
 			auto& car = front += components::car();
 			auto& special = front += components::special_physics();
-			components::physics body;
+			components::physics body(spawn_transform);
 			components::fixtures colliders;
 
 			car.left_wheel_trigger = left_wheel;
@@ -84,7 +83,6 @@ namespace prefabs {
 		{
 			auto& sprite = interior += components::sprite();
 			auto& render = interior += components::render();
-			auto& transform = interior += spawn_transform;
 			components::fixtures colliders;
 
 			render.layer = render_layer::CAR_WHEEL;
@@ -106,7 +104,6 @@ namespace prefabs {
 		{
 			auto& sprite = left_wheel += components::sprite();
 			auto& render = left_wheel += components::render();
-			auto& transform = left_wheel += spawn_transform;
 			auto& trigger = left_wheel += components::trigger();
 			components::fixtures colliders;
 

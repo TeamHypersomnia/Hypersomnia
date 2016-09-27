@@ -14,9 +14,12 @@
 
 typedef components::physics P;
 
-components::physics::physics() {
-	components::transform null_transform;
-	null_transform.to_box2d_transforms(transform, sweep);
+components::physics::physics(components::transform t) {
+	set_transform(t);
+}
+
+void components::physics::set_transform(const components::transform& t) {
+	t.to_si_space().to_box2d_transforms(transform, sweep);
 }
 
 template<bool C>
@@ -218,14 +221,11 @@ bool basic_physics_synchronizer<C>::is_activated() const {
 }
 
 void component_synchronizer<false, P>::set_transform(entity_id id) const {
-	set_transform(handle.get_cosmos()[id].get<components::transform>());
+	set_transform(handle.get_cosmos()[id].logic_transform());
 }
 
-void component_synchronizer<false, P>::set_transform(components::transform transform) const {
-	transform.pos *= PIXELS_TO_METERSf;
-	transform.rotation *= DEG_TO_RADf;
-
-	transform.to_box2d_transforms(component.transform, component.sweep);
+void component_synchronizer<false, P>::set_transform(const components::transform& transform) const {
+	component.set_transform(transform);
 
 	if (!is_constructed())
 		return;

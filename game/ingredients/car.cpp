@@ -20,7 +20,7 @@
 #include "game/enums/filters.h"
 
 namespace prefabs {
-	entity_handle create_car(cosmos& world, components::transform spawn_transform) {
+	entity_handle create_car(cosmos& world, const components::transform& spawn_transform) {
 		auto front = world.create_entity("front");
 		auto interior = world.create_entity("interior");
 		auto left_wheel = world.create_entity("left_wheel");
@@ -32,15 +32,13 @@ namespace prefabs {
 		{
 			auto& sprite = front += components::sprite();
 			auto& render = front += components::render();
-			auto& transform = front += components::transform();
 			auto& car = front += components::car();
-			components::physics physics_definition;
+			components::physics physics_definition(spawn_transform);
 			components::fixtures colliders;
 
 			car.left_wheel_trigger = left_wheel;
 			car.input_acceleration.set(2500, 4500) /= 3;
 			car.acceleration_length = 4500 / 5;
-			transform = spawn_transform;
 
 			sprite.set(assets::texture_id::TRUCK_FRONT);
 			//sprite.set(assets::texture_id::TRUCK_FRONT, augs::rgba(0, 255, 255));
@@ -67,10 +65,7 @@ namespace prefabs {
 		{
 			auto& sprite = interior += components::sprite();
 			auto& render = interior += components::render();
-			auto& transform = interior += components::transform();
 			components::fixtures colliders;
-
-			transform = spawn_transform;
 
 			render.layer = render_layer::CAR_INTERIOR;
 
@@ -97,11 +92,9 @@ namespace prefabs {
 		{
 			auto& sprite = left_wheel += components::sprite();
 			auto& render = left_wheel += components::render();
-			auto& transform = left_wheel += components::transform();
 			auto& trigger = left_wheel += components::trigger();
 			components::fixtures colliders;
 
-			transform = spawn_transform;
 			trigger.entity_to_be_notified = front;
 			trigger.react_to_collision_detectors = false;
 			trigger.react_to_query_detectors = true;

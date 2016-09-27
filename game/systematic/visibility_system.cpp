@@ -120,7 +120,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 
 	for (const auto it : cosmos.get(processing_subjects::WITH_VISIBILITY)) {
 		auto& visibility = it.get<components::visibility>();
-		auto& transform = it.get<components::transform>();
+		auto& transform = it.logic_transform();
 
 		for (auto& entry : visibility.line_of_sight_layers) {
 			auto& request = entry.second;
@@ -136,7 +136,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 			for (const auto& candidate_id : in_aabb.entities) {
 				auto candidate = cosmos[candidate_id];
 
-				auto target_pos = candidate.get<components::transform>().pos;
+				auto target_pos = candidate.logic_transform().pos;
 				if ((target_pos - transform.pos).length_sq() <= d*d) {
 					static thread_local std::vector<std::set<entity_id>*> target_sets;
 					target_sets.clear();

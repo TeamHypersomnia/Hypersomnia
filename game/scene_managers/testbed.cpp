@@ -102,7 +102,6 @@ namespace scene_managers {
 				new_character.get<components::sentience>().health.maximum = 800;
 			}
 			if (i == 1) {
-				new_character.get<components::transform>().pos.set(2800, 700);
 				new_character.get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
 				new_character.get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
 				new_character.get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
@@ -351,7 +350,7 @@ namespace scene_managers {
 		//	auto vv = s.fixtures[0].debug_original;
 		//
 		//	for (int i = 0; i < vv.size(); ++i) {
-		//		auto& tt = tested.get<components::transform>();
+		//		auto& tt = tested.logic_transform();
 		//		auto pos = tt.pos;
 		//
 		//		lines.draw_cyan((pos + vv[i]).rotate(tt.rotation, pos), (pos + vv[(i + 1) % vv.size()]).rotate(tt.rotation, pos));
@@ -385,7 +384,7 @@ namespace scene_managers {
 
 		const auto controlled = cosmos[get_controlled_entity()];
 
-		const auto coords = controlled.alive() ? controlled.get<components::transform>().pos : vec2();
+		const auto coords = controlled.alive() ? controlled.logic_transform().pos : vec2();
 		const auto vel = controlled.alive() ? controlled.get<components::physics>().velocity() : vec2();
 
 		quick_print_format(target.triangles, to_wstring(custom_log) + typesafe_sprintf(L"Entities: %x\nX: %f2\nY: %f2\nVelX: %x\nVelY: %x\n", cosmos.entities_count(), coords.x, coords.y, vel.x, vel.y)

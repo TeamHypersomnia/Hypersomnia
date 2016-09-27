@@ -125,7 +125,6 @@ namespace scene_managers {
 				new_character.get<components::sentience>().health.maximum = 800;
 			}
 			if (i == 1) {
-				new_character.get<components::transform>().pos.set(2800, 700);
 				new_character.get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
 				new_character.get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
 				new_character.get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
@@ -358,7 +357,7 @@ namespace scene_managers {
 
 		using namespace augs::gui::text;
 
-		const auto coords = controlled.get<components::transform>().pos;
+		const auto coords = controlled.logic_transform().pos;
 		const auto vel = controlled.get<components::physics>().velocity();
 
 		auto bbox = quick_print_format(target.triangles, typesafe_sprintf(L"Entities: %x\nX: %f2\nY: %f2\nVelX: %x\nVelY: %x\n", cosmos.entities_count(), coords.x, coords.y, vel.x, vel.y)

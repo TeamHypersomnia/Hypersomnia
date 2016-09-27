@@ -48,8 +48,8 @@ namespace ingredients {
 }
 
 namespace prefabs {
-	entity_handle create_car(cosmos&, components::transform);
-	entity_handle create_motorcycle(cosmos&, components::transform);
+	entity_handle create_car(cosmos&, const components::transform&);
+	entity_handle create_motorcycle(cosmos&, const components::transform&);
 
 	entity_handle create_sample_suppressor(cosmos& world, vec2 pos);
 

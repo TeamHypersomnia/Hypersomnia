@@ -22,13 +22,13 @@ void position_copying_system::update_transforms(fixed_step& step) {
 	auto& delta = step.get_delta();
 	auto targets = cosmos.get(processing_subjects::WITH_POSITION_COPYING);
 	for (const auto& it : targets) {
-		auto& transform = it.get<components::transform>();
+		components::transform transform = it.logic_transform();
 		auto& position_copying = it.get<components::position_copying>();
 
 		if (cosmos[position_copying.target].dead()) continue;
 		
 		if (position_copying.target_newly_set) {
-			auto target_transform = cosmos[position_copying.target].get<components::transform>();
+			auto target_transform = cosmos[position_copying.target].logic_transform();
 			target_transform.rotation *= position_copying.rotation_multiplier;
 
 			position_copying.previous = target_transform.pos;
@@ -36,7 +36,7 @@ void position_copying_system::update_transforms(fixed_step& step) {
 			position_copying.target_newly_set = false;
 		}
 
-		auto target_transform = cosmos[position_copying.target].get<components::transform>();
+		auto target_transform = cosmos[position_copying.target].logic_transform();
 		target_transform.rotation *= position_copying.rotation_multiplier;
 		target_transform.pos = vec2i(target_transform.pos);
 
@@ -68,6 +68,8 @@ void position_copying_system::update_transforms(fixed_step& step) {
 		else if (position_copying.position_copying_type == components::position_copying::position_copying_type::PARALLAX) {
 			transform.pos = position_copying.reference_position + (target_transform.pos - position_copying.target_reference_position) * position_copying.scrolling_speed;
 		}
+
+		it.set_logic_transform(transform);
 	}
 }
 

@@ -18,7 +18,7 @@ namespace components {
 		//auto* tile_layer = e.find<components::tile_layer>();
 		auto* particle_group = e.find<components::particle_group>();
 
-		auto transform = e.get<components::transform>();
+		auto transform = e.logic_transform();
 
 		if (sprite) result.aabb = sprite->get_aabb(transform);
 		if (polygon) result.aabb = polygon->get_aabb(transform);

@@ -13,7 +13,7 @@ void interpolation_system::reserve_caches_for_entities(const size_t n) {
 void interpolation_system::integrate_interpolated_transforms(const cosmos& cosm, float seconds) {
 	if (cosm.significant.meta.settings.enable_interpolation) {
 		for (const auto e : cosm.get(processing_subjects::WITH_INTERPOLATION)) {
-			const auto& actual = e.get<components::transform>();
+			const auto& actual = e.logic_transform();
 			const auto& info = e.get<components::interpolation>();
 			auto& integrated = get_interpolated(e);
 
@@ -37,7 +37,7 @@ void interpolation_system::integrate_interpolated_transforms(const cosmos& cosm,
 }
 
 void interpolation_system::write_current_to_interpolated(const const_entity_handle handle) {
-	const auto& written_transform = handle.get<components::transform>();
+	const auto& written_transform = handle.logic_transform();
 
 	get_interpolated(handle) = written_transform;
 	per_entity_cache[make_cache_id(handle)].recorded_place_of_birth = written_transform;

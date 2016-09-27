@@ -52,7 +52,7 @@ void crosshair_system::generate_crosshair_intents(fixed_step& step) {
 
 			crosshair_intent.crosshair_base_offset_rel = base_offset - old_base_offset;
 			crosshair_intent.crosshair_base_offset = base_offset;
-			crosshair_intent.crosshair_world_pos = base_offset + cosmos[crosshair.character_entity_to_chase].get<components::transform>().pos;
+			crosshair_intent.crosshair_world_pos = base_offset + cosmos[crosshair.character_entity_to_chase].logic_transform().pos;
 
 			step.messages.post(crosshair_intent);
 		}

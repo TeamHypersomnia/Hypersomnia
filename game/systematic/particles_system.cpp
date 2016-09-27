@@ -110,7 +110,7 @@ void particles_system::game_responses_to_particle_effects(fixed_step& step) cons
 		messages::create_particle_effect burst;
 		burst.subject = h.subject;
 		burst.transform.pos = h.point_of_impact;
-		burst.transform.pos = cosmos[h.subject].get<components::transform>().pos;
+		burst.transform.pos = cosmos[h.subject].logic_transform().pos;
 		burst.transform.rotation = (h.impact_velocity).degrees();
 		burst.modifier = response.modifier;
 
@@ -159,8 +159,8 @@ void particles_system::create_particle_effects(fixed_step& step) const {
 		auto subject = cosmos[it.subject];
 
 		if (it.local_transform && subject.alive()) {
-			it.transform.pos += subject.get<components::transform>().pos;
-			it.transform.rotation += subject.get<components::transform>().rotation;
+			it.transform.pos += subject.logic_transform().pos;
+			it.transform.rotation += subject.logic_transform().rotation;
 		}
 
 		std::vector<resources::emission*> only_streams;
@@ -254,7 +254,7 @@ void particles_system::create_particle_effects(fixed_step& step) const {
 			*target_render = stream->particle_render_template;
 
 			if (target_position_copying) {
-				auto& subject_transform = subject.get<components::transform>();
+				const auto& subject_transform = subject.logic_transform();
 				*target_position_copying = components::position_copying(subject);
 				target_position_copying->position_copying_type = components::position_copying::position_copying_type::ORBIT;
 				target_position_copying->rotation_offset = target_rotation - subject_transform.rotation;
@@ -343,7 +343,7 @@ void particles_system::step_streams_and_particles(fixed_step& step) const {
 
 	for (auto it : step.cosm.get(processing_subjects::WITH_PARTICLE_GROUP)) {
 		auto& group = it.get<components::particle_group>();
-		auto& transform = it.get<components::transform>();
+		const auto& transform = it.get<components::transform>();
 		auto rng = cosmos.get_rng_for(it);
 
 		bool should_destroy = true;

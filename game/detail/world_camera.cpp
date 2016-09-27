@@ -77,7 +77,7 @@ void world_camera::tick(const augs::variable_delta dt, const const_entity_handle
 
 			vec2 player_pos;
 
-			player_pos = physics.get_position();//entity_to_chase.get<components::transform>().interpolated(dt.view_interpolation_ratio());
+			player_pos = physics.get_position();//entity_to_chase.logic_transform().interpolated(dt.view_interpolation_ratio());
 				//physics.get_position();
 
 			if (player_pos != previous_step_player_position) {

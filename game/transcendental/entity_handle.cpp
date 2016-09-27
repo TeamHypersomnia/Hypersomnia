@@ -20,33 +20,34 @@ template <bool C>
 template <bool, class>
 void augs::basic_handle<C, O, N>::add_standard_components() const {
 	const bool has_physics = has<components::physics>();
-	const bool has_transform = has<components::transform>();
+
+	if (has_physics || has<components::fixtures>()) {
+		const bool has_transform = has<components::transform>();
+
+		ensure(!has_transform);
+	}
 
 	if (!has<components::interpolation>() && (has_physics || has<components::crosshair>())) {
 		add(components::interpolation());
 		get<components::interpolation>().write_current_to_interpolated();
 	}
-	
-	if (has_transform && has_physics)
-		get<components::physics>().set_transform(get<components::transform>());
 
-	if (has<components::render>() && !is_entity_physical(*this) && !has<components::dynamic_tree_node>())
+	if (has<components::render>() && !is_entity_physical(*this) && !has<components::dynamic_tree_node>()) {
 		add(components::dynamic_tree_node::get_default(*this));
+	}
 
 	if (has<components::physics>()) {
-		if(!has<components::special_physics>())
+		if (!has<components::special_physics>()) {
 			add(components::special_physics());
+		}
 
 		get<components::special_physics>().since_dropped.set(200, get_cosmos().get_timestamp());
 	}
 
 	recalculate_basic_processing_categories<false, void>();
 	
-	if (!has<components::substance>())
+	if (!has<components::substance>()) {
 		add(components::substance());
-
-	if (has_transform && (has_physics || has<components::fixtures>())) {
-		remove<components::transform>();
 	}
 }
 

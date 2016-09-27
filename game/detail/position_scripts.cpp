@@ -8,7 +8,7 @@
 #include "game/transcendental/cosmos.h"
 
 vec2 position(const_entity_handle e) {
-	return e.get<components::transform>().pos;
+	return e.logic_transform().pos;
 }
 
 vec2 mass_center(const_entity_handle e) {
@@ -27,7 +27,7 @@ vec2 mass_center_or_position(const_entity_handle e) {
 }
 
 float rotation(const_entity_handle e) {
-	return e.get<components::transform>().rotation;
+	return e.logic_transform().rotation;
 }
 
 vec2 orientation(const_entity_handle of) {
@@ -83,5 +83,5 @@ components::transform viewing_transform(const const_entity_handle handle, const 
 		}
 	}
 	
-	return handle.get<components::transform>();
+	return handle.logic_transform();
 }

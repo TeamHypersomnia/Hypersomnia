@@ -29,9 +29,8 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 		/* get necessary components */
 		auto& visibility = it.get<components::visibility>();
 		auto& pathfinding = it.get<components::pathfinding>();
-		auto transform = it.get<components::transform>();
+		const auto& transform = it.logic_transform() + pathfinding.eye_offset;
 		auto& body = it.get<components::physics>();
-		transform.pos += pathfinding.eye_offset;
 
 		if (!body.is_constructed()) {
 			continue;

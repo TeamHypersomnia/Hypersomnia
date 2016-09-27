@@ -25,7 +25,7 @@ namespace ingredients {
 	}
 
 	void make_always_visible(entity_handle e) {
-		components::dynamic_tree_node node = components::dynamic_tree_node::get_default(e);
+		components::dynamic_tree_node node;
 		node.always_visible = true;
 		e += node;
 	}

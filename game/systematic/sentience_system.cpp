@@ -65,7 +65,7 @@ void sentience_system::consume_health_event(messages::health_event h, fixed_step
 			auto owning_crosshair_recoil = punched[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
 
 			sentience.aimpunch.shoot_and_apply_impulse(owning_crosshair_recoil, 1 / 15.f, true,
-				(h.point_of_impact - punched.get<components::transform>().pos).cross(h.impact_velocity) / 100000000.f * 3.f / 25.f
+				(h.point_of_impact - punched.logic_transform().pos).cross(h.impact_velocity) / 100000000.f * 3.f / 25.f
 			);
 		}
 
@@ -82,10 +82,10 @@ void sentience_system::consume_health_event(messages::health_event h, fixed_step
 
 		const auto corpse = cosmos.clone_entity(sub_def);
 
-		auto place_of_death = subject.get<components::transform>();
+		auto place_of_death = subject.logic_transform();
 		place_of_death.rotation = h.impact_velocity.degrees();
 
-		corpse.get<components::transform>() = place_of_death;
+		corpse.set_logic_transform(place_of_death);
 		
 		subject.get<components::physics>().set_activated(false);
 		subject.get<components::position_copying>().set_target(corpse);

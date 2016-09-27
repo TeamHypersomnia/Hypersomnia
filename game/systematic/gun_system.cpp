@@ -65,7 +65,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(fixed_step& step) {
 	auto& physics_sys = cosmos.temporary_systems.get<physics_system>();
 
 	for (const auto& it : cosmos.get(processing_subjects::WITH_GUN)) {
-		const auto& gun_transform = it.get<components::transform>();
+		const auto& gun_transform = it.logic_transform();
 		auto& gun = it.get<components::gun>();
 
 		if (gun.trigger_pressed && gun.shot_cooldown.try_to_fire_and_reset(cosmos.get_timestamp(), delta)) {
@@ -109,7 +109,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(fixed_step& step) {
 							damage.sender = it;
 							total_recoil_multiplier *= damage.recoil_multiplier;
 
-							round_entity.get<components::transform>() = barrel_transform;
+							round_entity.set_logic_transform(barrel_transform);
 							
 							auto rng = cosmos.get_rng_for(round_entity);
 							set_velocity(round_entity, vec2().set_from_degrees(barrel_transform.rotation).set_length(rng.randval(gun.muzzle_velocity)));
@@ -131,7 +131,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(fixed_step& step) {
 							shell_transform.pos += vec2(gun.shell_spawn_offset.pos).rotate(gun_transform.rotation, vec2());
 							shell_transform.rotation += spread_component;
 
-							shell_entity.get<components::transform>() = shell_transform;
+							shell_entity.set_logic_transform(shell_transform);
 
 							set_velocity(shell_entity, vec2().set_from_degrees(barrel_transform.rotation + spread_component).set_length(rng.randval(gun.shell_velocity)));
 							response.spawned_shells.push_back(shell_entity);

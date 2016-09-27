@@ -6,7 +6,7 @@ namespace ingredients {
 	components::sprite& sprite(const entity_handle e, const components::transform pos, const assets::texture_id id, const augs::rgba col, const render_layer layer) {
 		auto& sprite = e += components::sprite();
 		auto& render = e += components::render();
-		auto& transform = e += pos;
+		e += pos;
 
 		render.layer = layer;
 		sprite.set(id, col);

@@ -73,7 +73,6 @@ namespace ingredients {
 		components::sprite sprite;
 		components::render render;
 		components::animation animation;
-		components::transform transform;
 	}
 
 	void wsad_character(const entity_handle e, const entity_handle crosshair_entity) {
@@ -81,7 +80,6 @@ namespace ingredients {
 		auto& render = e += components::render();
 		auto& animation = e += components::animation();
 		auto& animation_response = e += components::animation_response();
-		auto& transform = e += components::transform();
 		auto& movement = e += components::movement();
 		auto& rotation_copying = e += components::rotation_copying();
 		auto& detector = e += components::trigger_query_detector();
@@ -189,7 +187,6 @@ namespace ingredients {
 
 		rotation_copying.target = crosshair_entity;
 		rotation_copying.look_mode = components::rotation_copying::look_type::POSITION;
-		rotation_copying.use_physical_motor = true;
 		rotation_copying.colinearize_item_in_hand = true;
 
 		wsad_character_setup_movement(e);
@@ -198,7 +195,6 @@ namespace ingredients {
 	void wsad_character_corpse(const entity_handle e) {
 		auto& sprite = e += components::sprite();
 		auto& render = e += components::render();
-		auto& transform = e += components::transform();
 
 		sprite.set(assets::texture_id::DEAD_TORSO, rgba(255, 255, 255, 255));
 		render.layer = render_layer::CORPSES;
@@ -232,9 +228,9 @@ namespace prefabs {
 
 		ingredients::wsad_character(character, crosshair);
 
-		character.get<components::transform>() = pos;
-
 		ingredients::wsad_character_physics(character);
+
+		character.get<components::physics>().set_transform(pos);
 
 		ingredients::character_inventory(character);
 
@@ -275,7 +271,6 @@ namespace prefabs {
 		}
 
 		{
-			auto& transform = recoil += components::transform();
 			auto& force_joint = recoil += components::force_joint();
 			zero_target += components::transform();
 			components::physics body;

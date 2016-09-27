@@ -23,7 +23,7 @@ namespace components {
 			DYNAMIC
 		};
 
-		physics();
+		physics(components::transform t = components::transform());
 
 		bool fixed_rotation = false;
 		bool bullet = false;
@@ -42,6 +42,8 @@ namespace components {
 
 		vec2 velocity;
 		float angular_velocity = 0.f;
+
+		void set_transform(const components::transform&);
 
 		template <class Archive>
 		void serialize(Archive& ar) {
@@ -111,7 +113,7 @@ public:
 	void set_activated(bool) const;
 	void set_velocity(vec2) const;
 	void set_angular_velocity(float) const;
-	void set_transform(components::transform) const;
+	void set_transform(const components::transform&) const;
 	void set_transform(entity_id) const;
 	void set_angular_damping(float) const;
 	void set_linear_damping(float) const;

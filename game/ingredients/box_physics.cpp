@@ -9,6 +9,12 @@
 namespace ingredients {
 	void standard_dynamic_body(entity_handle e) {
 		components::physics def;
+
+		if (e.has<components::transform>()) {
+			def.set_transform(e.get<components::transform>());
+			e.remove<components::transform>();
+		}
+
 		def.fixed_rotation = false;
 
 		components::fixtures colliders;
@@ -26,6 +32,12 @@ namespace ingredients {
 
 	void see_through_dynamic_body(entity_handle e) {
 		components::physics def;
+
+		if (e.has<components::transform>()) {
+			def.set_transform(e.get<components::transform>());
+			e.remove<components::transform>();
+		}
+
 		components::fixtures colliders;
 		def.fixed_rotation = false;
 
@@ -42,6 +54,12 @@ namespace ingredients {
 
 	void shell_dynamic_body(entity_handle e) {
 		components::physics def;
+
+		if (e.has<components::transform>()) {
+			def.set_transform(e.get<components::transform>());
+			e.remove<components::transform>();
+		}
+
 		components::fixtures colliders;
 		def.fixed_rotation = false;
 
@@ -60,6 +78,12 @@ namespace ingredients {
 
 	void standard_static_body(entity_handle e) {
 		components::physics def;
+
+		if (e.has<components::transform>()) {
+			def.set_transform(e.get<components::transform>());
+			e.remove<components::transform>();
+		}
+
 		components::fixtures colliders;
 
 		def.fixed_rotation = false;
@@ -78,6 +102,12 @@ namespace ingredients {
 	
 	void bullet_round_physics(entity_handle e) {
 		components::physics body;
+
+		if (e.has<components::transform>()) {
+			body.set_transform(e.get<components::transform>());
+			e.remove<components::transform>();
+		}
+
 		components::fixtures colliders;
 
 		body.bullet = true;

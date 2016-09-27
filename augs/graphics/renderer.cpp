@@ -200,7 +200,7 @@ namespace augs {
 						/* shortcut */
 						auto& request = entry.second;
 						
-						auto origin = it.get<components::transform>().pos;
+						auto origin = it.logic_transform().pos;
 
 						for (int i = 0; i < request.get_num_triangles(); ++i) {
 							auto tri = request.get_triangle(i, origin);

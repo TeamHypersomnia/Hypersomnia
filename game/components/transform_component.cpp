@@ -1,4 +1,5 @@
 #include "transform_component.h"
+#include "physics_component.h"
 #include "Box2D/Common/b2Math.h"
 
 namespace augs {
@@ -15,6 +16,14 @@ namespace components {
 		out.pos = pos + b.pos;
 		out.rotation = rotation + b.rotation;
 		return out;
+	}
+
+	transform transform::to_si_space() const {
+		return{ pos * PIXELS_TO_METERSf, rotation * DEG_TO_RADf };
+	}
+
+	transform transform::to_user_space() const {
+		return{ pos * METERS_TO_PIXELSf, rotation * RAD_TO_DEGf };
 	}
 
 	transform transform::operator-(const transform& b) const {
