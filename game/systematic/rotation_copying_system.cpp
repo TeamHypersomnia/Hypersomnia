@@ -72,7 +72,7 @@ float colinearize_AB(const vec2 O_center_of_rotation, vec2 A_rifle_center, vec2 
 	return final_angle;
 }
 
-float rotation_copying_system::resolve_rotation_copying_value(const_entity_handle it) const {
+float rotation_copying_system::resolve_rotation_copying_value(const const_entity_handle it) const {
 	auto& rotation_copying = it.get<components::rotation_copying>();
 	auto& cosmos = it.get_cosmos();
 	const auto target = cosmos[rotation_copying.target];

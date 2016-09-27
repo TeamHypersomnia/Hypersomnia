@@ -22,7 +22,6 @@ void relations_helpers<false, D>::make_child(entity_id ch_id, sub_entity_name op
 	}
 }
 
-
 template <class D>
 components::child& relations_helpers<false, D>::child_component() const {
 	auto& self = *static_cast<const D*>(this);
