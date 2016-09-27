@@ -12,7 +12,7 @@ components::transform spatial_properties_getters<C, D>::logic_transform() const 
 	const auto& owner = handle.get_owner_body();
 
 	if (owner.alive() && owner != handle) {
-		return components::fixtures::transform_around_body(handle, logic_transform(owner));
+		return components::fixtures::transform_around_body(handle, owner.logic_transform());
 	}
 	else if (handle.has<components::physics>()) {
 		ensure(!handle.has<components::transform>());
@@ -25,5 +25,5 @@ components::transform spatial_properties_getters<C, D>::logic_transform() const 
 }
 
 // explicit instantiation
-template class physics_getters<false, basic_entity_handle<false>>;
-template class physics_getters<true, basic_entity_handle<true>>;
+template class spatial_properties_getters<false, basic_entity_handle<false>>;
+template class spatial_properties_getters<true, basic_entity_handle<true>>;
