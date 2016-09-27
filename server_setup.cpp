@@ -214,7 +214,7 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 						case 1: new_intent.intent = intent_type::MOVE_FORWARD; break;
 						case 2: new_intent.intent = intent_type::MOVE_LEFT; break;
 						case 3: new_intent.intent = intent_type::MOVE_RIGHT; break;
-						case 4: new_intent.intent = intent_type::CROSSHAIR_PRIMARY_ACTION; break;
+						//case 4: new_intent.intent = intent_type::CROSSHAIR_PRIMARY_ACTION; break;
 						}
 
 						new_intent.pressed_flag = test_entropy_randomizer.randval(0, 1) == 0;
