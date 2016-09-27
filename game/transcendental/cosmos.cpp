@@ -421,7 +421,7 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	performance.stop(meter_type::PHYSICS);
 	position_copying_system().update_transforms(step);
 
-	particles_system().create_particle_effects(step);
+	//particles_system().create_particle_effects(step);
 
 	trace_system().lengthen_sprites_of_traces(step);
 
@@ -446,8 +446,8 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	driver_system().assign_drivers_from_successful_trigger_hits(step);
 	driver_system().release_drivers_due_to_ending_contact_with_wheel(step);
 
-	particles_system().game_responses_to_particle_effects(step);
-	particles_system().create_particle_effects(step);
+	//particles_system().game_responses_to_particle_effects(step);
+	//particles_system().create_particle_effects(step);
 
 	// gui_system().translate_game_events_for_hud(step);
 
