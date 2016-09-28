@@ -40,12 +40,12 @@ namespace augs {
 				augs::write_object(output, first_message);
 				output;//name_property("last_message");
 				
-				if (last_message - first_message > std::numeric_limits<unsigned char>::max()) {
-					ensure(false);
-					return false;
-				}
+				//if (last_message - first_message > std::numeric_limits<unsigned char>::max()) {
+				//	ensure(false);
+				//	return false;
+				//}
 
-				unsigned char msg_count = last_message - first_message;
+				unsigned short msg_count = last_message - first_message;
 				augs::write_object(output, msg_count);
 
 				sequence_to_reliable_range[sequence] = last_message;
@@ -91,7 +91,7 @@ namespace augs {
 
 			unsigned short update_from_sequence = 0u;
 			unsigned received_first_message = 0u;
-			unsigned char received_message_count = 0u;
+			unsigned short received_message_count = 0u;
 
 			bool has_reliable = false;
 			bool request_ack_for_unreliable = false;
