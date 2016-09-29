@@ -38,11 +38,11 @@ float comparable_angle(vec2 diff) {
 }
 
 
-int components::visibility::full_visibility_info::get_num_triangles() const {
+size_t components::visibility::full_visibility_info::get_num_triangles() const {
 	return edges.size();
 }
 
-components::visibility::discontinuity* components::visibility::full_visibility_info::get_discontinuity_for_edge(int n) {
+components::visibility::discontinuity* components::visibility::full_visibility_info::get_discontinuity_for_edge(size_t n) {
 	for (auto& disc : discontinuities)
 		if (disc.edge_index == n)
 			return &disc;
@@ -50,11 +50,11 @@ components::visibility::discontinuity* components::visibility::full_visibility_i
 	return nullptr;
 }
 
-components::visibility::discontinuity* components::visibility::full_visibility_info::get_discontinuity(int n) {
+components::visibility::discontinuity* components::visibility::full_visibility_info::get_discontinuity(size_t n) {
 	return &discontinuities[n];
 }
 
-components::visibility::triangle components::visibility::full_visibility_info::get_triangle(int i, vec2 origin) const {
+components::visibility::triangle components::visibility::full_visibility_info::get_triangle(size_t i, vec2 origin) const {
 	components::visibility::triangle tri = { origin + offset, edges[i].first, edges[i].second };
 	return tri;
 }

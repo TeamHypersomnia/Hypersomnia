@@ -60,11 +60,11 @@ namespace components {
 
 		void set_color(rgba col);
 
-		int get_vertex_count() const {
+		size_t get_vertex_count() const {
 			return triangulated_polygon.size();
 		}
 
-		vertex& get_vertex(int i) {
+		vertex& get_vertex(size_t i) {
 			return triangulated_polygon[i];
 		}
 

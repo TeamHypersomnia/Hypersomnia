@@ -94,7 +94,7 @@ namespace augs {
 			if (!alive(object))
 				return false;
 
-			int dead_index = get_real_index(object);
+			unsigned dead_index = get_real_index(object);
 
 			// add dead object's indirector to the free indirection list
 			free_indirectors.push_back(slots[dead_index].pointing_indirector);
@@ -128,7 +128,7 @@ namespace augs {
 			free_indirectors.pop_back();
 			indirector& indirector = indirectors[next_free_indirection];
 
-			int new_slot_index = size();
+			size_t new_slot_index = size();
 
 			metadata new_slot;
 			new_slot.pointing_indirector = next_free_indirection;

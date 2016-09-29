@@ -202,7 +202,7 @@ namespace augs {
 						
 						auto origin = it.logic_transform().pos;
 
-						for (int i = 0; i < request.get_num_triangles(); ++i) {
+						for (size_t i = 0; i < request.get_num_triangles(); ++i) {
 							auto tri = request.get_triangle(i, origin);
 
 							for (auto& p : tri.points) {

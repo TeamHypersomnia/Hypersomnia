@@ -49,7 +49,7 @@ void dynamic_tree_system::construct(const_entity_handle handle) {
 			input.upperBound = data.aabb.right_bottom();
 			
 			unversioned_entity_id node_userdata(handle.get_id());
-			static_assert(sizeof(node_userdata) == sizeof(void*), "Userdata must be of size of void*");
+			static_assert(sizeof(node_userdata) <= sizeof(void*), "Userdata must be less than size of void*");
 
 			cache.tree_proxy_id = non_physical_objects_tree.CreateProxy(input, reinterpret_cast<void*>(node_userdata.pool.indirection_index));
 		}

@@ -88,15 +88,15 @@ namespace components {
 				);
 			}
 
-			discontinuity* get_discontinuity_for_edge(int edge_num);
-			discontinuity* get_discontinuity(int disc_num);
+			discontinuity* get_discontinuity_for_edge(size_t edge_num);
+			discontinuity* get_discontinuity(size_t disc_num);
 			
-			int get_num_discontinuities() const {
+			size_t get_num_discontinuities() const {
 				return discontinuities.size();
 			}
 
-			int get_num_triangles() const;
-			triangle get_triangle(int index, vec2 origin) const;
+			size_t get_num_triangles() const;
+			triangle get_triangle(size_t index, vec2 origin) const;
 			std::vector<vec2> get_polygon(float distance_epsilon, vec2 expand_origin, float expand_mult) const;
 		};
 

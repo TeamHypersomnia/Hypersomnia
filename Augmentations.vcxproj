@@ -74,6 +74,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\googletest\googletest\include;$(AUGMENTATIONS)\3rdparty\googletest\googletest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\cereal\include;$(AUGMENTATIONS)\3rdparty\enet\include;$(AUGMENTATIONS)\3rdparty\EASTL\test\packages\EABase\include\Common;$(AUGMENTATIONS)\3rdparty\EASTL\include;$(AUGMENTATIONS)\3rdparty\freetype\include;$(AUGMENTATIONS)\3rdparty\luabind-deboostified;$(AUGMENTATIONS)\3rdparty\lua\src;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\googletest\googletest;$(AUGMENTATIONS)\3rdparty\googletest\googletest\include;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\lua\src;$(AUGMENTATIONS)\3rdparty\luabind-deboostified;$(AUGMENTATIONS)\3rdparty\freetype\include;$(AUGMENTATIONS)\3rdparty\cereal\include;$(AUGMENTATIONS)\3rdparty\enet\include;$(AUGMENTATIONS)\3rdparty\EASTL\test\packages\EABase\include\Common;$(AUGMENTATIONS)\3rdparty\EASTL\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\googletest\googletest;$(AUGMENTATIONS)\3rdparty\googletest\googletest\include;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\lua\src;$(AUGMENTATIONS)\3rdparty\luabind-deboostified;$(AUGMENTATIONS)\3rdparty\freetype\include;$(AUGMENTATIONS)\3rdparty\cereal\include;$(AUGMENTATIONS)\3rdparty\enet\include;$(AUGMENTATIONS)\3rdparty\EASTL\test\packages\EABase\include\Common;$(AUGMENTATIONS)\3rdparty\EASTL\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -94,6 +100,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>UNICODE;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;SFML_STATIC;_WINSOCK_DEPRECATED_NO_WARNINGS;PLATFORM_WINDOWS;FT2_BUILD_LIBRARY;_SCL_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -125,6 +132,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>UNICODE;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;SFML_STATIC;_WINSOCK_DEPRECATED_NO_WARNINGS;PLATFORM_WINDOWS;FT2_BUILD_LIBRARY;_SCL_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
