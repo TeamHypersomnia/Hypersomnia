@@ -11,7 +11,7 @@ launch_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.LOCAL,
+	launch_mode = launch_modes.CLIENT_AND_SERVER,
 	
 	determinism_test_cloned_cosmoi_count = 2,
 
@@ -27,7 +27,7 @@ config_table = {
 	
 	sensitivity = vec2(1.5, 1.5),
 	
-	connect_address = "127.0.0.1",
+	connect_address = "192.168.1.2",
 	connect_port = 13372,
 
 	server_port = 13372,
@@ -39,7 +39,7 @@ config_table = {
 	tickrate = 60,
 
 	jitter_buffer_ms = 50,
-	client_commands_jitter_buffer_ms = 150,
+	client_commands_jitter_buffer_ms = 30,
 	
 	interpolation_speed = 525,
 
@@ -48,7 +48,7 @@ config_table = {
 	min_latency = 50,
 	jitter = 0,
 	test_var = 0,
-	test_randomize_entropies_in_client_setup = 1,
+	test_randomize_entropies_in_client_setup = 0,
 	test_randomize_entropies_in_client_setup_once_every_steps = 1
 }
 
