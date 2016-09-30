@@ -69,22 +69,22 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\googletest\googletest\include;$(AUGMENTATIONS)\3rdparty\googletest\googletest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\cereal\include;$(AUGMENTATIONS)\3rdparty\enet\include;$(AUGMENTATIONS)\3rdparty\EASTL\test\packages\EABase\include\Common;$(AUGMENTATIONS)\3rdparty\EASTL\include;$(AUGMENTATIONS)\3rdparty\freetype\include;$(AUGMENTATIONS)\3rdparty\luabind-deboostified;$(AUGMENTATIONS)\3rdparty\lua\src;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)\augs;$(SolutionDir)\3rdparty;$(SolutionDir)\3rdparty\googletest\googletest\include;$(SolutionDir)\3rdparty\googletest\googletest;$(SolutionDir)\3rdparty\freetype;$(SolutionDir)\3rdparty\enet\include;$(SolutionDir)\3rdparty\freetype\include;$(SolutionDir)\3rdparty\luabind-deboostified;$(SolutionDir)\3rdparty\lua\src;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <TargetName>$(ProjectName)-$(Configuration)</TargetName>
     <OutDir>$(SolutionDir)output/</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\googletest\googletest\include;$(AUGMENTATIONS)\3rdparty\googletest\googletest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\cereal\include;$(AUGMENTATIONS)\3rdparty\enet\include;$(AUGMENTATIONS)\3rdparty\EASTL\test\packages\EABase\include\Common;$(AUGMENTATIONS)\3rdparty\EASTL\include;$(AUGMENTATIONS)\3rdparty\freetype\include;$(AUGMENTATIONS)\3rdparty\luabind-deboostified;$(AUGMENTATIONS)\3rdparty\lua\src;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)\augs;$(SolutionDir)\3rdparty;$(SolutionDir)\3rdparty\googletest\googletest\include;$(SolutionDir)\3rdparty\googletest\googletest;$(SolutionDir)\3rdparty\freetype;$(SolutionDir)\3rdparty\enet\include;$(SolutionDir)\3rdparty\freetype\include;$(SolutionDir)\3rdparty\luabind-deboostified;$(SolutionDir)\3rdparty\lua\src;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <TargetName>$(ProjectName)-$(Configuration)</TargetName>
     <OutDir>$(SolutionDir)output/</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\googletest\googletest;$(AUGMENTATIONS)\3rdparty\googletest\googletest\include;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\lua\src;$(AUGMENTATIONS)\3rdparty\luabind-deboostified;$(AUGMENTATIONS)\3rdparty\freetype\include;$(AUGMENTATIONS)\3rdparty\cereal\include;$(AUGMENTATIONS)\3rdparty\enet\include;$(AUGMENTATIONS)\3rdparty\EASTL\test\packages\EABase\include\Common;$(AUGMENTATIONS)\3rdparty\EASTL\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)\augs;$(SolutionDir)\3rdparty;$(SolutionDir)\3rdparty\googletest\googletest\include;$(SolutionDir)\3rdparty\googletest\googletest;$(SolutionDir)\3rdparty\freetype;$(SolutionDir)\3rdparty\enet\include;$(SolutionDir)\3rdparty\freetype\include;$(SolutionDir)\3rdparty\luabind-deboostified;$(SolutionDir)\3rdparty\lua\src;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <TargetName>$(ProjectName)-$(Configuration)</TargetName>
     <OutDir>$(SolutionDir)output/</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\googletest\googletest;$(AUGMENTATIONS)\3rdparty\googletest\googletest\include;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\lua\src;$(AUGMENTATIONS)\3rdparty\luabind-deboostified;$(AUGMENTATIONS)\3rdparty\freetype\include;$(AUGMENTATIONS)\3rdparty\cereal\include;$(AUGMENTATIONS)\3rdparty\enet\include;$(AUGMENTATIONS)\3rdparty\EASTL\test\packages\EABase\include\Common;$(AUGMENTATIONS)\3rdparty\EASTL\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)\augs;$(SolutionDir)\3rdparty;$(SolutionDir)\3rdparty\googletest\googletest\include;$(SolutionDir)\3rdparty\googletest\googletest;$(SolutionDir)\3rdparty\freetype;$(SolutionDir)\3rdparty\enet\include;$(SolutionDir)\3rdparty\freetype\include;$(SolutionDir)\3rdparty\luabind-deboostified;$(SolutionDir)\3rdparty\lua\src;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <TargetName>$(ProjectName)-$(Configuration)</TargetName>
     <OutDir>$(SolutionDir)output/</OutDir>
   </PropertyGroup>
