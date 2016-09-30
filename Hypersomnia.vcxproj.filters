@@ -1050,25 +1050,28 @@
     <ClCompile Include="game\detail\entity\spatial_properties_getters.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="client_setup.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="determinism_test_setup.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="local_setup.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="server_setup.cpp">
+    <ClCompile Include="setups\client_setup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="setup_base.cpp">
+    <ClCompile Include="setups\determinism_test_setup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="two_clients_and_server_setup.cpp">
+    <ClCompile Include="setups\local_setup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="setups\server_setup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="setups\setup_base.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="setups\two_clients_and_server_setup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="setups\web\session_report.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -3251,7 +3254,10 @@
     <ClInclude Include="game\detail\entity\spatial_properties_getters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="setups.h">
+    <ClInclude Include="setups\setups.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="setups\web\session_report.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -28,12 +28,16 @@
 
 #include "augs/misc/randomization.h"
 
+#include "setups/web/session_report.h"
+
 void server_setup::wait_for_listen_server() {
 	std::unique_lock<std::mutex> lck(mtx);
 	while (!server_ready) cv.wait(lck);
 }
 
 void server_setup::process(game_window& window, const bool start_alternative_server) {
+	session_report rep;
+
 	cosmos hypersomnia(3000);
 	cosmos hypersomnia_last_snapshot(3000);
 	cosmos extrapolated_hypersomnia(3000);
@@ -48,7 +52,7 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 
 	const bool detailed_step_log = config_tickrate <= 2;
 
-	const bool test_randomize_entropies_in_client_setup = static_cast<bool>(window.get_config_number("test_randomize_entropies_in_client_setup"));
+	const bool test_randomize_entropies_in_client_setup = window.get_flag("test_randomize_entropies_in_client_setup");
 	const unsigned randomize_once_every = static_cast<unsigned>(window.get_config_number("test_randomize_entropies_in_client_setup_once_every_steps"));
 
 	if (!hypersomnia.load_from_file("server_save.state")) {
@@ -64,6 +68,10 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 	augs::network::server alternative_serv;
 
 	const bool is_replaying = input_unpacker.player.is_replaying();
+	const bool launch_webserver = !is_replaying && window.get_flag("server_launch_http_daemon");
+	
+	if (launch_webserver)
+		rep.start_daemon(window.get_config_string("server_http_daemon_html_file_path"), static_cast<unsigned short>(window.get_config_number("server_http_daemon_port")));
 
 	if (is_replaying || serv.listen(static_cast<unsigned short>(window.get_config_number("server_port")), 32))
 		LOG("Listen server setup successful.");
@@ -130,7 +138,7 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 					LOG("Client connected.");
 					
 					endpoint new_endpoint = { net_event.address };
-					new_endpoint.commands.set_lower_limit(static_cast<unsigned>(window.get_config_number("client_commands_jitter_buffer_ms")) / hypersomnia.get_fixed_delta().in_milliseconds());
+					new_endpoint.commands.set_lower_limit(static_cast<size_t>(window.get_config_number("client_commands_jitter_buffer_ms")) / hypersomnia.get_fixed_delta().in_milliseconds());
 					endpoints.push_back(new_endpoint);
 
 					auto& stream = initial_hypersomnia.reserved_memory_for_serialization;
@@ -259,4 +267,7 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 			scene.step_with_callbacks(id_mapped_entropy, hypersomnia);
 		}
 	}
+
+	if (!is_replaying)
+		rep.stop_daemon();
 }

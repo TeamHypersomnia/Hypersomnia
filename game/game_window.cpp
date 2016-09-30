@@ -39,10 +39,14 @@ void game_window::call_window_script(const std::string filename) {
 	window.gl.initialize();
 }
 
-double game_window::get_config_number(std::string field) {
+double game_window::get_config_number(const std::string field) {
 	std::unique_lock<std::mutex> lock(lua_mutex);
 
 	return luabind::object_cast<double>(luabind::globals(lua.raw)["config_table"][field]);
+}
+
+bool game_window::get_flag(const std::string field) {
+	return get_config_number(field) > 0.0;
 }
 
 game_window::launch_mode game_window::get_launch_mode() {
@@ -57,7 +61,7 @@ game_window::launch_mode game_window::get_launch_mode() {
 	}
 }
 
-std::string game_window::get_config_string(std::string field) {
+std::string game_window::get_config_string(const std::string field) {
 	std::unique_lock<std::mutex> lock(lua_mutex);
 
 	return luabind::object_cast<std::string>(luabind::globals(lua.raw)["config_table"][field]);

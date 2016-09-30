@@ -24,6 +24,7 @@ public:
 	void call_window_script(std::string filename);
 
 	double get_config_number(std::string field);
+	bool get_flag(std::string field);
 	std::string get_config_string(std::string field);
 
 	enum class launch_mode {

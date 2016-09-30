@@ -11,7 +11,7 @@ launch_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.CLIENT_AND_SERVER,
+	launch_mode = launch_modes.ONLY_SERVER,
 	
 	determinism_test_cloned_cosmoi_count = 2,
 
@@ -49,7 +49,11 @@ config_table = {
 	jitter = 0,
 	test_var = 0,
 	test_randomize_entropies_in_client_setup = 0,
-	test_randomize_entropies_in_client_setup_once_every_steps = 1
+	test_randomize_entropies_in_client_setup_once_every_steps = 1,
+
+	server_launch_http_daemon = 1,
+	server_http_daemon_port = 80,
+	server_http_daemon_html_file_path = "web/session_report.html"
 }
 
 set_cursor_visible(0)
