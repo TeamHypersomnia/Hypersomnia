@@ -16,7 +16,15 @@ ahc_echo(void *cls,
 	static int aptr;
 
 	session_report& rep = *reinterpret_cast<session_report*>(cls);
-	const auto page = rep.prepend_html + rep.fetched_stats + rep.append_html;
+	std::string page = rep.prepend_html;
+	
+	{
+		std::unique_lock<std::mutex> lock(rep.fetch_stats_mutex);
+		
+		page += rep.fetched_stats;
+	}
+
+	page += rep.append_html;
 
 	struct MHD_Response *response;
 	int ret;
@@ -63,3 +71,10 @@ bool session_report::start_daemon(const std::string session_report_html, const u
 void session_report::stop_daemon() {
 	MHD_stop_daemon(d);
 }
+
+void session_report::fetch_stats(const std::string new_stats) {
+	std::unique_lock<std::mutex> lock(fetch_stats_mutex);
+
+	fetched_stats = new_stats;
+}
+

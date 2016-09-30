@@ -19,6 +19,7 @@ namespace augs {
 				return ip == b.ip && port == b.port;
 			}
 
+			std::string get_readable_ip() const;
 			unsigned get_ip() const;
 			unsigned short get_port() const;
 		};

@@ -322,3 +322,16 @@ template <class A, class B>
 struct is_memcpy_safe<std::pair<A, B>> {
 	static const bool value = is_memcpy_safe<A>::value && is_memcpy_safe<B>::value;
 };
+
+template<class Str, class Repl>
+Str replace_all(Str str, Repl _from, Repl _to) {
+	const Str& from(_from);
+	const Str& to(_to);
+
+	size_t start_pos = 0;
+	while ((start_pos = str.find(from, start_pos)) != Str::npos) {
+		str.replace(start_pos, from.length(), to);
+		start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+	}
+	return str;
+}

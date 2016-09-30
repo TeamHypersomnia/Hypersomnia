@@ -13,6 +13,11 @@ namespace augs {
 			port = addr.port;
 		}
 
+		std::string endpoint_address::get_readable_ip() const {
+			const unsigned char* p = reinterpret_cast<const unsigned char*>(&ip);
+			return typesafe_sprintf("%x.%x.%x.%x", int(p[0]), int(p[1]), int(p[2]), int(p[3]));
+		}
+
 		unsigned endpoint_address::get_ip() const {
 			return ip;
 		}

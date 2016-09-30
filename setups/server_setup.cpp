@@ -30,6 +30,10 @@
 
 #include "setups/web/session_report.h"
 
+#include "augs/templates.h"
+
+#include "game/detail/position_scripts.h"
+
 void server_setup::wait_for_listen_server() {
 	std::unique_lock<std::mutex> lck(mtx);
 	while (!server_ready) cv.wait(lck);
@@ -70,8 +74,10 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 	const bool is_replaying = input_unpacker.player.is_replaying();
 	const bool launch_webserver = !is_replaying && window.get_flag("server_launch_http_daemon");
 	
+	bool daemon_online = false;
+
 	if (launch_webserver)
-		rep.start_daemon(window.get_config_string("server_http_daemon_html_file_path"), static_cast<unsigned short>(window.get_config_number("server_http_daemon_port")));
+		daemon_online = rep.start_daemon(window.get_config_string("server_http_daemon_html_file_path"), static_cast<unsigned short>(window.get_config_number("server_http_daemon_port")));
 
 	if (is_replaying || serv.listen(static_cast<unsigned short>(window.get_config_number("server_port")), 32))
 		LOG("Listen server setup successful.");
@@ -265,6 +271,30 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 
 			cosmic_entropy id_mapped_entropy(total_unpacked_entropy, hypersomnia);
 			scene.step_with_callbacks(id_mapped_entropy, hypersomnia);
+
+			if (daemon_online) {
+				std::string this_step_stats;
+				const char* whb = "<span style=\"color:white\">";
+				const char* whe = "</span>";
+
+				this_step_stats += typesafe_sprintf("Players online: %x%x%x", whb, endpoints.size(), whe);
+
+				if (endpoints.size() > 0) {
+					this_step_stats += "\nEndpoint details:\n\n";
+				}
+
+				for (size_t i = 0; i < endpoints.size(); ++i) {
+					const const_entity_handle character = hypersomnia[scene.get_character(endpoints[i].addr)];
+					auto pos = character.logic_transform().pos;
+					auto vel = velocity(character);
+
+					this_step_stats += typesafe_sprintf("#%x%x%x (%x%x%x)\nPos: %x%x%x\nVel: %x%x%x", whb, i, whe, whb, endpoints[i].addr.get_readable_ip(), whe, whb, pos, whe, whb, vel, whe);
+				}
+
+				this_step_stats = replace_all(this_step_stats, "\n", "\n<br/>");
+
+				rep.fetch_stats(this_step_stats);
+			}
 		}
 	}
 

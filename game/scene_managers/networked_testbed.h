@@ -53,6 +53,7 @@ namespace scene_managers {
 
 		entity_id assign_new_character(augs::network::endpoint_address);
 		void free_character(augs::network::endpoint_address);
+		entity_id get_character(augs::network::endpoint_address);
 	};
 
 	class networked_testbed_client : public networked_testbed {

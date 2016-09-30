@@ -59,6 +59,16 @@ namespace scene_managers {
 		ensure(false);
 	}
 
+	entity_id networked_testbed_server::get_character(augs::network::endpoint_address addr) {
+		for (auto& c : characters) {
+			if (c.occupied && c.endpoint == addr) {
+				return c.id;
+			}
+		}
+
+		ensure(false);
+	}
+
 	void networked_testbed::populate_world_with_entities(cosmos& cosm) {
 		cosm.advance_deterministic_schemata(cosmic_entropy(), [this](fixed_step& step) { populate(step); }, [](fixed_step&) {});
 	}
