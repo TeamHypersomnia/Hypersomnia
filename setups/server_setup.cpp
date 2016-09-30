@@ -277,6 +277,10 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 				const char* whb = "<span style=\"color:white\">";
 				const char* whe = "</span>";
 
+				const char* ipb = "<span class=\"vstype\">";
+				const char* ipe = "</span>";
+
+				this_step_stats += typesafe_sprintf("Uptime: %x%x%x seconds\n", whb, hypersomnia.get_total_time_passed_in_seconds(), whe);
 				this_step_stats += typesafe_sprintf("Players online: %x%x%x", whb, endpoints.size(), whe);
 
 				if (endpoints.size() > 0) {
@@ -288,7 +292,7 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 					auto pos = character.logic_transform().pos;
 					auto vel = velocity(character);
 
-					this_step_stats += typesafe_sprintf("#%x%x%x (%x%x%x)\nPos: %x%x%x\nVel: %x%x%x", whb, i, whe, whb, endpoints[i].addr.get_readable_ip(), whe, whb, pos, whe, whb, vel, whe);
+					this_step_stats += typesafe_sprintf("#%x%x%x (%x%x%x)\nPos: %x%x%x\nVel: %x%x%x", whb, i, whe, ipb, endpoints[i].addr.get_readable_ip(), ipe, whb, pos, whe, whb, vel, whe);
 				}
 
 				this_step_stats = replace_all(this_step_stats, "\n", "\n<br/>");
