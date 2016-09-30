@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/global_libraries.h"
-#include "setups.h"
+#include "setups/setups.h"
 
 #include "game/game_window.h"
 #include "game/resources/manager.h"
