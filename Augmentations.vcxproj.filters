@@ -660,9 +660,6 @@
     <ClCompile Include="3rdparty\lua\src\ltm.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="3rdparty\lua\src\lua.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="3rdparty\lua\src\lundump.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1051,6 +1048,27 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\detail\entity\spatial_properties_getters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="client_setup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="determinism_test_setup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="local_setup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="server_setup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="setup_base.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="two_clients_and_server_setup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -3231,6 +3249,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\detail\entity\spatial_properties_getters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="setups.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

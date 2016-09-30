@@ -8,14 +8,14 @@ namespace augs {
 		}
 
 		void paste_clipboard_formatted(text::fstr& out, text::formatted_char f) {
-			auto w = window::get_data_from_clipboard();
-			size_t len = w.length();
-			out.clear();
-			out.reserve(len);
-			for (size_t i = 0; i < len; ++i) {
-				f.c = w[i];
-				out += f;
-			}
+			//auto w = window::get_data_from_clipboard();
+			//size_t len = w.length();
+			//out.clear();
+			//out.reserve(len);
+			//for (size_t i = 0; i < len; ++i) {
+			//	f.c = w[i];
+			//	out += f;
+			//}
 		}
 
 		void clipboard::copy_clipboard(const text::fstr& s) {

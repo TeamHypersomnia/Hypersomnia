@@ -25,13 +25,13 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -70,15 +70,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\googletest\googletest\include;$(AUGMENTATIONS)\3rdparty\googletest\googletest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\cereal\include;$(AUGMENTATIONS)\3rdparty\enet\include;$(AUGMENTATIONS)\3rdparty\EASTL\test\packages\EABase\include\Common;$(AUGMENTATIONS)\3rdparty\EASTL\include;$(AUGMENTATIONS)\3rdparty\freetype\include;$(AUGMENTATIONS)\3rdparty\luabind-deboostified;$(AUGMENTATIONS)\3rdparty\lua\src;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <TargetName>$(ProjectName)-$(Configuration)</TargetName>
+    <OutDir>$(SolutionDir)output/</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\googletest\googletest\include;$(AUGMENTATIONS)\3rdparty\googletest\googletest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\cereal\include;$(AUGMENTATIONS)\3rdparty\enet\include;$(AUGMENTATIONS)\3rdparty\EASTL\test\packages\EABase\include\Common;$(AUGMENTATIONS)\3rdparty\EASTL\include;$(AUGMENTATIONS)\3rdparty\freetype\include;$(AUGMENTATIONS)\3rdparty\luabind-deboostified;$(AUGMENTATIONS)\3rdparty\lua\src;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <TargetName>$(ProjectName)-$(Configuration)</TargetName>
+    <OutDir>$(SolutionDir)output/</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\googletest\googletest;$(AUGMENTATIONS)\3rdparty\googletest\googletest\include;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\lua\src;$(AUGMENTATIONS)\3rdparty\luabind-deboostified;$(AUGMENTATIONS)\3rdparty\freetype\include;$(AUGMENTATIONS)\3rdparty\cereal\include;$(AUGMENTATIONS)\3rdparty\enet\include;$(AUGMENTATIONS)\3rdparty\EASTL\test\packages\EABase\include\Common;$(AUGMENTATIONS)\3rdparty\EASTL\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <TargetName>$(ProjectName)-$(Configuration)</TargetName>
+    <OutDir>$(SolutionDir)output/</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\googletest\googletest;$(AUGMENTATIONS)\3rdparty\googletest\googletest\include;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\lua\src;$(AUGMENTATIONS)\3rdparty\luabind-deboostified;$(AUGMENTATIONS)\3rdparty\freetype\include;$(AUGMENTATIONS)\3rdparty\cereal\include;$(AUGMENTATIONS)\3rdparty\enet\include;$(AUGMENTATIONS)\3rdparty\EASTL\test\packages\EABase\include\Common;$(AUGMENTATIONS)\3rdparty\EASTL\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <TargetName>$(ProjectName)-$(Configuration)</TargetName>
+    <OutDir>$(SolutionDir)output/</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -93,6 +101,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>OpenGL32.lib;Ws2_32.lib;Gdiplus.lib;winmm.lib;shlwapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -101,9 +110,12 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>UNICODE;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;SFML_STATIC;_WINSOCK_DEPRECATED_NO_WARNINGS;PLATFORM_WINDOWS;FT2_BUILD_LIBRARY;_SCL_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FloatingPointModel>Strict</FloatingPointModel>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>OpenGL32.lib;Ws2_32.lib;Gdiplus.lib;winmm.lib;shlwapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -123,6 +135,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>OpenGL32.lib;Ws2_32.lib;Gdiplus.lib;winmm.lib;shlwapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -133,11 +146,14 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>UNICODE;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;SFML_STATIC;_WINSOCK_DEPRECATED_NO_WARNINGS;PLATFORM_WINDOWS;FT2_BUILD_LIBRARY;_SCL_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FloatingPointModel>Strict</FloatingPointModel>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>OpenGL32.lib;Ws2_32.lib;Gdiplus.lib;winmm.lib;shlwapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -293,7 +309,6 @@
     <ClCompile Include="3rdparty\lua\src\ltable.c" />
     <ClCompile Include="3rdparty\lua\src\ltablib.c" />
     <ClCompile Include="3rdparty\lua\src\ltm.c" />
-    <ClCompile Include="3rdparty\lua\src\lua.c" />
     <ClCompile Include="3rdparty\lua\src\lundump.c" />
     <ClCompile Include="3rdparty\lua\src\lutf8lib.c" />
     <ClCompile Include="3rdparty\lua\src\lvm.c" />
@@ -319,6 +334,8 @@
     <ClCompile Include="augs\network\reliable_channel.cpp" />
     <ClCompile Include="augs\texture_baker\texture.cpp" />
     <ClCompile Include="augs\texture_baker\texture_with_image.cpp" />
+    <ClCompile Include="client_setup.cpp" />
+    <ClCompile Include="determinism_test_setup.cpp" />
     <ClCompile Include="game\detail\entity\spatial_properties_getters.cpp" />
     <ClCompile Include="game\detail\world_camera.cpp" />
     <ClCompile Include="game\insignificant_systems\interpolation_system.cpp" />
@@ -451,6 +468,10 @@
     <ClCompile Include="game\temporary_systems\processing_lists_system.cpp" />
     <ClCompile Include="game\transcendental\step_and_entropy_unpacker.cpp" />
     <ClCompile Include="game\transcendental\viewing_session.cpp" />
+    <ClCompile Include="local_setup.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="server_setup.cpp" />
+    <ClCompile Include="setup_base.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -490,6 +511,7 @@
     <ClCompile Include="augs\texture_baker\texture_baker.cpp" />
     <ClCompile Include="augs\window_framework\event.cpp" />
     <ClCompile Include="augs\window_framework\window.cpp" />
+    <ClCompile Include="two_clients_and_server_setup.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Box2D.h" />
@@ -1172,6 +1194,7 @@
     <ClInclude Include="game\types_specification\all_messages_declaration.h" />
     <ClInclude Include="game\types_specification\all_messages_includes.h" />
     <ClInclude Include="game\types_specification\all_systems_declaration.h" />
+    <ClInclude Include="setups.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="augs\global_libraries.h" />
     <ClInclude Include="augs\filesystem\dirent.h" />
