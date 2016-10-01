@@ -57,7 +57,7 @@ namespace augs {
 
 			void destroy();
 
-			std::vector<event::state> poll_events();
+			std::vector<event::state> poll_events(const bool should_clip_cursor = true);
 
 			bool set_window_rect(const rects::xywh<int>&);
 			rects::wh<int> get_screen_rect() const;

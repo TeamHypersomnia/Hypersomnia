@@ -378,7 +378,7 @@ namespace augs {
 			return false;
 		}
 
-		std::vector<event::state> glwindow::poll_events() {
+		std::vector<event::state> glwindow::poll_events(const bool should_clip_cursor) {
 			UINT msg;
 			std::vector<event::state> output;
 
@@ -389,7 +389,7 @@ namespace augs {
 					output.push_back(state);
 			}
 			
-			if (GetFocus() == hwnd)
+			if (should_clip_cursor && GetFocus() == hwnd)
 				enable_cursor_clipping(get_window_rect());
 			else
 				disable_cursor_clipping();

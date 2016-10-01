@@ -24,6 +24,8 @@ config_table = {
 	resolution_w = 720,
 	resolution_h = 720,
 	doublebuffer = 1,
+
+	debug_disable_cursor_clipping = 1,
 	
 	sensitivity = vec2(1.5, 1.5),
 	
@@ -36,7 +38,7 @@ config_table = {
 	
 	nickname = "Daedalus",
 	
-	tickrate = 128,
+	tickrate = 60,
 
 	jitter_buffer_ms = 50,
 	client_commands_jitter_buffer_ms = 30,

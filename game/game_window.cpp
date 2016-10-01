@@ -19,24 +19,28 @@ void game_window::swap_buffers() {
 }
 
 void game_window::call_window_script(const std::string filename) {
-	std::unique_lock<std::mutex> lock(lua_mutex);
+	{
+		std::unique_lock<std::mutex> lock(lua_mutex);
 
-	lua.global_ptr("global_gl_window", &window);
+		lua.global_ptr("global_gl_window", &window);
 
-	try {
-		if (!lua.dofile(filename))
+		try {
+			if (!lua.dofile(filename))
+				lua.debug_response();
+		}
+		catch (char* e) {
+			LOG("Exception thrown! %x", e);
 			lua.debug_response();
-	}
-	catch (char* e) {
-		LOG("Exception thrown! %x", e);
-		lua.debug_response();
-	}
-	catch (...) {
-		LOG("Exception thrown!");
-		lua.debug_response();
+		}
+		catch (...) {
+			LOG("Exception thrown!");
+			lua.debug_response();
+		}
+
+		window.gl.initialize();
 	}
 
-	window.gl.initialize();
+	should_clip_cursor = !get_flag("debug_disable_cursor_clipping");
 }
 
 double game_window::get_config_number(const std::string field) {
@@ -68,7 +72,7 @@ std::string game_window::get_config_string(const std::string field) {
 }
 
 decltype(machine_entropy::local) game_window::collect_entropy() {
-	auto result = window.poll_events();
+	auto result = window.poll_events(should_clip_cursor);
 
 	if (clear_window_inputs_once) {
 		result.clear();

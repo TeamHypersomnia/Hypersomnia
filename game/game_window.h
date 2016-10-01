@@ -18,6 +18,7 @@ public:
 	void swap_buffers();
 
 	bool clear_window_inputs_once = true;
+	bool should_clip_cursor = true;
 
 	decltype(machine_entropy::local) collect_entropy();
 
