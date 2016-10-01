@@ -75,9 +75,15 @@ namespace augs {
 					reliable_buf.erase(reliable_buf.begin(), reliable_buf.begin() + (old_last-first_message));
 					
 					first_message = old_last;
-					
-					for (auto i = ack_sequence; i != reliable_ack+1; ++i) 
-						sequence_to_reliable_range.erase(i);
+
+					{
+						unsigned short left = ack_sequence;
+						unsigned short right = reliable_ack;
+						++right;
+
+						for (auto i = left; i != right; ++i)
+							sequence_to_reliable_range.erase(i);
+					}
 
 					ack_sequence = reliable_ack;
 				}
