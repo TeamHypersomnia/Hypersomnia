@@ -5,6 +5,17 @@
 
 #include "augs/filesystem/file.h"
 
+int get_origin(void *cls, enum MHD_ValueKind kind,
+	const char *key, const char *value)
+{
+	std::string& target_val = *reinterpret_cast<std::string*>(cls);
+
+	if (!strcmp(key, "Origin"))
+		target_val = value;
+	
+	return MHD_YES;
+}
+
 static int
 ahc_echo(void *cls,
 	struct MHD_Connection *connection,
@@ -41,6 +52,12 @@ ahc_echo(void *cls,
 	response = MHD_create_response_from_buffer(page.length(),
 		(void *)page.c_str(),
 		MHD_RESPMEM_MUST_COPY);
+
+	std::string origin_value;
+	MHD_get_connection_values(connection, MHD_HEADER_KIND, &get_origin, &origin_value);
+
+	MHD_add_response_header(response, MHD_HTTP_HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, origin_value.c_str());
+
 	ret = MHD_queue_response(connection, MHD_HTTP_OK, response);
 	MHD_destroy_response(response);
 	return ret;
