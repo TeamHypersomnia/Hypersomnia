@@ -1,0 +1,31 @@
+<html>
+<head>
+  <link rel="stylesheet" href="http://hypersomnia.pl/css/stylesheet.css">
+  <link rel="icon" href="http://hypersomnia.pl/dove_icon.png">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+  <script src="/comment-system/web/iframeResizer.contentWindow.min.js"></script>
+
+<title>Experimental test server survey</title>
+</head>
+<body id="statistics" style="padding: 0; margin-left:1">
+<span style="color:white">Experimental test server is <span style="color:rgb(34, 177, 76)">Online</span></span><br/>
+Survey <span style="color:white">#1</span> <span class="vsparam">[</span><span style="color:red">&#9679</span><span class="vsparam">]</span><br/>
+
+%stats%
+
+<script>
+function load_stats() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("statistics").innerHTML = this.responseText;
+    }
+  };
+  xhttp.open("GET", "http://hypexperientia.ddns.net", true);
+  xhttp.send();
+}
+
+setInterval(load_stats, 500);
+</script>
+
+</body>

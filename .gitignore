@@ -169,7 +169,9 @@ pip-log.txt
 *.png
 /ReleaseExe
 /RelDeb
-/output
+/output/sessions
+/output/server_sessions
+/output/saves
 
 *.log
 *.tlog
@@ -182,3 +184,5 @@ Makefile
 
 *.db
 *.opendb
+*.iobj
+*.ipdb

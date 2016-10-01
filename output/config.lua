@@ -36,7 +36,7 @@ config_table = {
 	
 	nickname = "Daedalus",
 	
-	tickrate = 60,
+	tickrate = 128,
 
 	jitter_buffer_ms = 50,
 	client_commands_jitter_buffer_ms = 30,

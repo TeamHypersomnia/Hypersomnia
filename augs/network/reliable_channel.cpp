@@ -81,8 +81,8 @@ namespace augs {
 						unsigned short right = reliable_ack;
 						++right;
 
-						for (auto i = left; i != right; ++i)
-							sequence_to_reliable_range.erase(i);
+						while (left != right)
+							sequence_to_reliable_range.erase(left++);
 					}
 
 					ack_sequence = reliable_ack;
