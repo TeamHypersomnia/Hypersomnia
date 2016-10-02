@@ -22,8 +22,7 @@ namespace augs {
 
 		bool server::post_redundant(const packet& payload, const endpoint_address& target) {
 			packet stream = payload;
-			peer_map[target].redundancy.sender.post_message(stream);
-			return true;
+			return peer_map[target].redundancy.sender.post_message(stream);
 		}
 
 		bool server::has_endpoint(const endpoint_address& target) const {

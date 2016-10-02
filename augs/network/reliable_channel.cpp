@@ -14,12 +14,18 @@ namespace augs {
 				(s2 - s1  > std::numeric_limits<T>::max() / 2);
 		}
 		
-		void reliable_sender::post_message(augs::stream& output) {
+		bool reliable_sender::post_message(augs::stream& output) {
+			if (last_message - first_message >= std::numeric_limits<unsigned short>::max()) {
+				return false;
+			}
+
 			reliable_buf.push_back(output);
 			++last_message;
+
+			return true;
 		}
 
-		bool reliable_sender::write_data(augs::stream& output) {
+		void reliable_sender::write_data(augs::stream& output) {
 			/* reliable + maybe unreliable */
 			augs::stream reliable_bs;
 
@@ -57,8 +63,6 @@ namespace augs {
 
 			output;//name_property("reliable_buffer");
 			augs::write_object(output, reliable_bs);
-
-			return true;
 		}
 
 		bool reliable_sender::read_ack(augs::stream& input) {
@@ -139,21 +143,12 @@ namespace augs {
 			augs::write_object(output, last_sequence);
 		}
 
-		void reliable_channel::enable_starting_byte(unsigned char c) {
-			starting_byte = c;
-			add_starting_byte = true;
-		}
-
-		void reliable_channel::disable_starting_byte() {
-			add_starting_byte = false;
+		bool reliable_channel::timed_out(const float ms, const size_t max_pending_reliable_messages) const {
+			return sender.reliable_buf.size() > max_pending_reliable_messages || last_received_packet.get<std::chrono::milliseconds>() >= ms;
 		}
 
 		reliable_receiver::result_data reliable_channel::handle_incoming_packet(augs::stream& in) {
-			if (add_starting_byte) {
-				unsigned char byte;
-				in;//name_property("Starting byte");
-				augs::read_object(in, byte);
-			}
+			last_received_packet.reset();
 
 			if (!sender.read_ack(in))
 				return reliable_receiver::result_data();
@@ -161,16 +156,11 @@ namespace augs {
 			return receiver.read_sequence(in);
 		}
 
-
 		void reliable_channel::build_next_packet(augs::stream& out) {
 			augs::stream output_bs;
+			sender.write_data(output_bs);
 
-			if (sender.write_data(output_bs) || receiver.ack_requested) {
-				if (add_starting_byte) {
-					out;//name_property(starting_byte_name);
-					augs::write_object(out, starting_byte);
-				}
-
+			//if ( || receiver.ack_requested) {
 				receiver.write_ack(out);
 				receiver.ack_requested = false;
 
@@ -178,7 +168,7 @@ namespace augs {
 					out;//name_property("sender channel");
 					augs::write_object(out, output_bs);
 				}
-			}
+			//}
 		}
 	}
 }

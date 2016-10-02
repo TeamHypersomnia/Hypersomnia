@@ -5,6 +5,7 @@
 #include <map>
 
 #include "augs/misc/streams.h"
+#include "augs/misc/timer.h"
 
 #include "network_types.h"
 
@@ -21,8 +22,8 @@ namespace augs {
 			unsigned first_message = 0u;
 			unsigned last_message = 0u;
 
-			void post_message(augs::stream&);
-			bool write_data(augs::stream& output);
+			bool post_message(augs::stream&);
+			void write_data(augs::stream& output);
 			bool read_ack(augs::stream& input);
 		};
 
@@ -46,8 +47,6 @@ namespace augs {
 			/* returns how many messages to skip if message_indexing == true */
 			reliable_receiver::result_data read_sequence(augs::stream& input);
 			void write_ack(augs::stream& input);
-
-			std::string last_read_report;
 		};
 
 
@@ -55,13 +54,9 @@ namespace augs {
 			reliable_receiver receiver;
 			reliable_sender sender;
 
-			bool add_starting_byte = false;
+			augs::timer last_received_packet;
 
-			std::string starting_byte_name = "GAME_TRANSMISSION";
-			unsigned char starting_byte;
-
-			void enable_starting_byte(unsigned char);
-			void disable_starting_byte();
+			bool timed_out(const float ms, const size_t max_pending_reliable_messages = 120) const;
 
 			void build_next_packet(augs::stream& out);
 			/* returns result enum */

@@ -1,9 +1,6 @@
 
 TEST(NetChannelWrapper, SingleTransmissionDeleteAllPending) {
 	reliable_channel a, b;
-	a.enable_starting_byte(135);
-	b.enable_starting_byte(135);
-
 	
 	augs::stream msg[15];
 

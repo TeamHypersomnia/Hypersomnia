@@ -53,8 +53,7 @@ namespace augs {
 				return false;
 
 			packet stream = payload;
-			redundancy.sender.post_message(stream);
-			return true;
+			return redundancy.sender.post_message(stream);
 		}
 
 		bool client::send_pending_redundant() {
