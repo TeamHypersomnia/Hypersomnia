@@ -53,6 +53,7 @@ namespace scene_managers {
 			if (c.id == id) {
 				ensure(c.occupied);
 				c.occupied = false;
+				return;
 			}
 		}
 
