@@ -11,7 +11,7 @@ launch_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.TWO_CLIENTS_AND_SERVER,
+	launch_mode = launch_modes.LOCAL,
 	
 	determinism_test_cloned_cosmoi_count = 2,
 
@@ -19,7 +19,7 @@ config_table = {
 	fullscreen = 0,
 	window_border = 1,
 	window_x = 400,
-	window_y = 30,
+	window_y = 100,
 	bpp = 24,
 	resolution_w = 720,
 	resolution_h = 720,
@@ -54,7 +54,9 @@ config_table = {
 	server_http_daemon_html_file_path = "web/session_report.html"
 }
 
-set_cursor_visible(0)
+if debug_disable_cursor_clipping == 0 then
+	set_cursor_visible(0)
+end
 
 if config_table.fullscreen == 1 then
 	config_table.resolution_w = get_display().w

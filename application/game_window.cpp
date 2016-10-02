@@ -72,7 +72,7 @@ std::string game_window::get_config_string(const std::string field) {
 }
 
 decltype(machine_entropy::local) game_window::collect_entropy() {
-	auto result = window.poll_events(config.debug_disable_cursor_clipping);
+	auto result = window.poll_events(!config.debug_disable_cursor_clipping);
 
 	if (clear_window_inputs_once) {
 		result.clear();

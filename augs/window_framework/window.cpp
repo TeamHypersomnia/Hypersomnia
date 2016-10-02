@@ -46,7 +46,10 @@ namespace augs {
 
 	namespace window {
 		LRESULT CALLBACK wndproc (HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-			static glwindow* wnd; 
+			if(umsg == WM_GETMINMAXINFO || umsg == WM_INPUT)
+				return DefWindowProc(hwnd, umsg, wParam, lParam);
+			
+			static glwindow* wnd;
 			wnd = (glwindow*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
 
 			if(umsg == WM_CREATE)
