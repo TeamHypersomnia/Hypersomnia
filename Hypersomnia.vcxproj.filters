@@ -1053,25 +1053,25 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="setups\client_setup.cpp">
+    <ClCompile Include="application\setups\client_setup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="setups\determinism_test_setup.cpp">
+    <ClCompile Include="application\setups\determinism_test_setup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="setups\local_setup.cpp">
+    <ClCompile Include="application\setups\local_setup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="setups\server_setup.cpp">
+    <ClCompile Include="application\setups\server_setup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="setups\setup_base.cpp">
+    <ClCompile Include="application\setups\setup_base.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="setups\two_clients_and_server_setup.cpp">
+    <ClCompile Include="application\setups\two_clients_and_server_setup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="setups\web_daemon\session_report.cpp">
+    <ClCompile Include="application\web_daemon\session_report.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -3254,10 +3254,10 @@
     <ClInclude Include="game\detail\entity\spatial_properties_getters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="setups\setups.h">
+    <ClInclude Include="application\setups\setups.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="setups\web_daemon\session_report.h">
+    <ClInclude Include="application\web_daemon\session_report.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

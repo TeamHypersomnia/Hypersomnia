@@ -336,8 +336,8 @@
     <ClCompile Include="augs\network\reliable_channel.cpp" />
     <ClCompile Include="augs\texture_baker\texture.cpp" />
     <ClCompile Include="augs\texture_baker\texture_with_image.cpp" />
-    <ClCompile Include="setups\client_setup.cpp" />
-    <ClCompile Include="setups\determinism_test_setup.cpp" />
+    <ClCompile Include="application\setups\client_setup.cpp" />
+    <ClCompile Include="application\setups\determinism_test_setup.cpp" />
     <ClCompile Include="game\detail\entity\spatial_properties_getters.cpp" />
     <ClCompile Include="game\detail\world_camera.cpp" />
     <ClCompile Include="game\insignificant_systems\interpolation_system.cpp" />
@@ -470,11 +470,11 @@
     <ClCompile Include="game\temporary_systems\processing_lists_system.cpp" />
     <ClCompile Include="game\transcendental\step_and_entropy_unpacker.cpp" />
     <ClCompile Include="game\transcendental\viewing_session.cpp" />
-    <ClCompile Include="setups\local_setup.cpp" />
+    <ClCompile Include="application\setups\local_setup.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="setups\server_setup.cpp" />
-    <ClCompile Include="setups\setup_base.cpp" />
-    <ClCompile Include="setups\web_daemon\session_report.cpp" />
+    <ClCompile Include="application\setups\server_setup.cpp" />
+    <ClCompile Include="application\setups\setup_base.cpp" />
+    <ClCompile Include="application\web_daemon\session_report.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -514,7 +514,7 @@
     <ClCompile Include="augs\texture_baker\texture_baker.cpp" />
     <ClCompile Include="augs\window_framework\event.cpp" />
     <ClCompile Include="augs\window_framework\window.cpp" />
-    <ClCompile Include="setups\two_clients_and_server_setup.cpp" />
+    <ClCompile Include="application\setups\two_clients_and_server_setup.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Box2D.h" />
@@ -1197,8 +1197,8 @@
     <ClInclude Include="game\types_specification\all_messages_declaration.h" />
     <ClInclude Include="game\types_specification\all_messages_includes.h" />
     <ClInclude Include="game\types_specification\all_systems_declaration.h" />
-    <ClInclude Include="setups\setups.h" />
-    <ClInclude Include="setups\web_daemon\session_report.h" />
+    <ClInclude Include="application\setups\setups.h" />
+    <ClInclude Include="application\web_daemon\session_report.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="augs\global_libraries.h" />
     <ClInclude Include="augs\filesystem\dirent.h" />
