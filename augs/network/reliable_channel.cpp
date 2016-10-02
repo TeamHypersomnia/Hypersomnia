@@ -52,8 +52,8 @@ namespace augs {
 				augs::write_object(output, bool(1));
 				output;//name_property("sequence");
 				augs::write_object(output, ++sequence);
-				output;//name_property("ack_sequence");
-				augs::write_object(output, ack_sequence);
+				output;//name_property("most_recent_acked_sequence");
+				augs::write_object(output, most_recent_acked_sequence);
 
 				output;//name_property("first_message");
 				augs::write_object(output, first_message);
@@ -84,7 +84,7 @@ namespace augs {
 			input;//name_property("reliable_ack");
 			if (!augs::read_object(input, reliable_ack)) return false;
 			
-			if (sequence_more_recent(reliable_ack, ack_sequence)) {
+			if (sequence_more_recent(reliable_ack, most_recent_acked_sequence)) {
 				auto last_message_of_acked_sequence = sequence_to_reliable_range.find(reliable_ack);
 
 				if (last_message_of_acked_sequence != sequence_to_reliable_range.end()) {
@@ -94,7 +94,7 @@ namespace augs {
 					first_message = old_last;
 
 					{
-						unsigned short left = ack_sequence;
+						unsigned short left = most_recent_acked_sequence;
 						unsigned short right = reliable_ack;
 						++right;
 
@@ -102,7 +102,7 @@ namespace augs {
 							sequence_to_reliable_range.erase(left++);
 					}
 
-					ack_sequence = reliable_ack;
+					most_recent_acked_sequence = reliable_ack;
 				}
 			}
 
@@ -130,7 +130,7 @@ namespace augs {
 			if (has_reliable) {
 				input;//name_property("sequence");
 				if (!augs::read_object(input, received_sequence)) return res;
-				input;//name_property("ack_sequence");
+				input;//name_property("most_recent_acked_sequence");
 				if (!augs::read_object(input, update_from_sequence)) return res;
 
 				input;//name_property("first_message");
@@ -163,7 +163,8 @@ namespace augs {
 		}
 
 		unsigned reliable_channel::get_unacknowledged_sequences_num() const {
-			return sequence_distance(sender.sequence, receiver.last_received_sequence);
+			//LOG("seq: %x last: %x dist: %x", sender.sequence, sender.most_recent_acked_sequence, sequence_distance(sender.sequence, sender.most_recent_acked_sequence));
+			return sequence_distance(sender.sequence, sender.most_recent_acked_sequence);
 		}
 
 		unsigned reliable_channel::get_pending_reliable_messages_num() const {
@@ -261,7 +262,7 @@ TEST(NetChannel, SingleTransmissionDeleteAllPending) {
 
 	EXPECT_EQ(1, sender.reliable_buf.size());
 	EXPECT_EQ(1, sender.sequence);
-	EXPECT_EQ(1, sender.ack_sequence);
+	EXPECT_EQ(1, sender.most_recent_acked_sequence);
 
 	EXPECT_EQ(1, receiver.last_received_sequence);
 }
@@ -307,7 +308,7 @@ TEST(NetChannel, PastAcknowledgementDeletesSeveralPending) {
 
 	EXPECT_EQ(3, sender.sequence);
 	EXPECT_EQ(5, sender.reliable_buf.size());
-	EXPECT_EQ(1, sender.ack_sequence);
+	EXPECT_EQ(1, sender.most_recent_acked_sequence);
 
 	EXPECT_EQ(1, receiver.last_received_sequence);
 }
@@ -373,7 +374,7 @@ TEST(NetChannel, FlagForDeletionAndAck) {
 	sender.read_ack(receiver_packet);
 
 	EXPECT_EQ(6, sender.sequence);
-	EXPECT_EQ(1, sender.ack_sequence);
+	EXPECT_EQ(1, sender.most_recent_acked_sequence);
 	//EXPECT_EQ(2, sender.reliable_buf.size());
 
 
@@ -391,7 +392,7 @@ TEST(NetChannel, SequenceNumberOverflowMultipleTries) {
 	reliable_receiver receiver;
 
 	sender.sequence = std::numeric_limits<unsigned short>::max();
-	sender.ack_sequence = std::numeric_limits<unsigned short>::max();
+	sender.most_recent_acked_sequence = std::numeric_limits<unsigned short>::max();
 
 	receiver.last_received_sequence = std::numeric_limits<unsigned short>::max();
 
@@ -453,7 +454,7 @@ TEST(NetChannel, SequenceNumberOverflowMultipleTries) {
 
 		if (k == 0) {
 			EXPECT_EQ(5, sender.sequence);
-			EXPECT_EQ(0, sender.ack_sequence);
+			EXPECT_EQ(0, sender.most_recent_acked_sequence);
 			EXPECT_EQ(0, receiver.last_received_sequence);
 		}
 
@@ -472,7 +473,7 @@ TEST(NetChannel, OutOfDatePackets) {
 	reliable_receiver receiver;
 
 	sender.sequence = std::numeric_limits<unsigned short>::max();
-	sender.ack_sequence = std::numeric_limits<unsigned short>::max();
+	sender.most_recent_acked_sequence = std::numeric_limits<unsigned short>::max();
 
 	receiver.last_received_sequence = std::numeric_limits<unsigned short>::max();
 
@@ -535,7 +536,7 @@ TEST(NetChannel, OutOfDatePackets) {
 
 		if (k == 0) {
 			EXPECT_EQ(5, sender.sequence);
-			EXPECT_EQ(1, sender.ack_sequence);
+			EXPECT_EQ(1, sender.most_recent_acked_sequence);
 			EXPECT_EQ(1, receiver.last_received_sequence);
 		}
 

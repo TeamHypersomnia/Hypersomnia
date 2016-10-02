@@ -84,6 +84,10 @@ namespace augs {
 			return result;
 		}
 
+		bool client::has_timed_out(const float sequence_interval_ms, const float ms) const {
+			return peer != nullptr && host.get() != nullptr && redundancy.timed_out(static_cast<size_t>(ms / sequence_interval_ms));
+		}
+
 		unsigned client::total_bytes_received() const {
 			return host.get() == nullptr ? 0 : host.get()->totalReceivedData;
 		}
@@ -106,6 +110,14 @@ namespace augs {
 				readable_bytesize(static_cast<unsigned>(sent_size.get_average_units())),
 				readable_bytesize(static_cast<unsigned>(recv_size.get_average_units()))
 			);
+		}
+
+		void client::disconnect() {
+			enet_peer_disconnect(peer, 0);
+		}
+
+		void client::forceful_disconnect() {
+			enet_peer_reset(peer);
 		}
 
 		std::vector<message> client::collect_entropy() {

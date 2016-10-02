@@ -28,6 +28,10 @@ namespace augs {
 			bool send_pending_redundant();
 
 			bool send_reliable(const packet& payload);
+			bool has_timed_out(const float sequence_interval_ms, const float ms) const;
+
+			void disconnect();
+			void forceful_disconnect();
 
 			unsigned total_bytes_sent() const;
 			unsigned total_bytes_received() const;

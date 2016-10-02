@@ -18,8 +18,6 @@
 
 #include "augs/filesystem/file.h"
 
-#include "augs/network/network_server.h"
-
 #include "setups.h"
 #include "game/transcendental/network_commands.h"
 
@@ -38,19 +36,42 @@ void server_setup::wait_for_listen_server() {
 	while (!server_ready) cv.wait(lck);
 }
 
+std::string server_setup::endpoint::nick_and_ip() const {
+	return typesafe_sprintf("%x (%x)", nickname, addr.get_readable_ip());
+}
+
 server_setup::endpoint& server_setup::get_endpoint(const augs::network::endpoint_address addr) {
 	return *find_in(endpoints, addr);
 }
 
-void server_setup::disconnect(const augs::network::endpoint_address addr) {
-	auto& end = get_endpoint(addr);
+void server_setup::deinit_endpoint(endpoint& end, const bool gracefully) {
+	LOG("%x disconnected.", end.nick_and_ip());
 
-	LOG("%x (%x) disconnected.", end.nickname, addr.get_readable_ip());
-
-	if(hypersomnia[end.controlled_entity].alive())
+	if (hypersomnia[end.controlled_entity].alive())
 		scene.free_character(end.controlled_entity);
 
+	if(!gracefully)
+		choose_server(end.addr).forceful_disconnect(end.addr);
+	else
+		choose_server(end.addr).disconnect(end.addr);
+}
+
+void server_setup::deinit_endpoint(const augs::network::endpoint_address addr, const bool gracefully) {
+	deinit_endpoint(get_endpoint(addr), gracefully);
+}
+
+void server_setup::disconnect(const augs::network::endpoint_address addr, const bool gracefully) {
+	deinit_endpoint(addr, gracefully);
 	remove_element(endpoints, addr);
+}
+
+augs::network::server& server_setup::choose_server(augs::network::endpoint_address addr) {
+	if (serv.has_endpoint(addr)) {
+		return serv;
+	}
+
+	ensure(alternative_serv.has_endpoint(addr));
+	return alternative_serv;
 }
 
 void server_setup::process(game_window& window, const bool start_alternative_server) {
@@ -75,9 +96,6 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 	input_unpacker.try_to_load_or_save_new_session("server_sessions/", "server_recorded.inputs");
 
 	simulation_broadcast server_sim;
-
-	augs::network::server serv;
-	augs::network::server alternative_serv;
 
 	const bool is_replaying = input_unpacker.player.is_replaying();
 	const bool launch_webserver = !is_replaying && cfg.server_launch_http_daemon;
@@ -206,13 +224,7 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 										endpoint.controlled_entity = scene.assign_new_character();
 										augs::write_object(complete_state, hypersomnia[endpoint.controlled_entity].get_guid());
 
-										if (serv.has_endpoint(address)) {
-											serv.send_reliable(complete_state, address);
-										}
-
-										if (alternative_serv.has_endpoint(address)) {
-											alternative_serv.send_reliable(complete_state, address);
-										}
+										choose_server(address).send_reliable(complete_state, address);
 									}
 								}
 							}
@@ -270,6 +282,16 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 				}
 			}
 
+			erase_remove(endpoints, [this](endpoint& e) {
+				if (choose_server(e.addr).has_timed_out(e.addr, hypersomnia.get_fixed_delta().in_milliseconds())) {
+					LOG("%x has timed out. Disconnecting.", e.nick_and_ip());
+					deinit_endpoint(e);
+					return true;
+				}
+
+				return false;
+			});
+
 			for (auto& e : endpoints) {
 				guid_mapped_entropy maybe_new_client_commands;
 				auto& next_command = e.next_command;
@@ -292,13 +314,7 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 				augs::stream new_data;
 				simulation_exchange::write_packaged_step_to_stream(new_data, next_command);
 
-				if (serv.has_endpoint(e.addr)) {
-					serv.post_redundant(new_data, e.addr);
-				}
-
-				else if (alternative_serv.has_endpoint(e.addr)) {
-					alternative_serv.post_redundant(new_data, e.addr);
-				}
+				choose_server(e.addr).post_redundant(new_data, e.addr);
 			}
 			
 			resubstantiate = false;

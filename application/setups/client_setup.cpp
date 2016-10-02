@@ -166,6 +166,11 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 			receiver.unpack_deterministic_steps(hypersomnia, hypersomnia_last_snapshot, extrapolated_hypersomnia, step_pred);
 		}
 		
+		if (client.has_timed_out(hypersomnia.get_fixed_delta().in_milliseconds(), 2000)) {
+			LOG("Connection to server timed out.");
+			client.forceful_disconnect();
+		}
+
 		client.send_pending_redundant();
 	}
 

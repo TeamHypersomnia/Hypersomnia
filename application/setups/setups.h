@@ -11,6 +11,8 @@
 #include "game/transcendental/step_and_entropy_unpacker.h"
 #include "game/scene_managers/networked_testbed.h"
 
+#include "augs/network/network_server.h"
+
 class game_window;
 
 class setup_base {
@@ -32,6 +34,10 @@ class server_setup : public setup_base {
 
 	volatile bool server_ready = false;
 
+	augs::network::server serv;
+	augs::network::server alternative_serv;
+	augs::network::server& choose_server(augs::network::endpoint_address addr);
+
 	struct endpoint {
 		augs::network::endpoint_address addr;
 		//std::vector<guid_mapped_entropy> commands;
@@ -40,6 +46,8 @@ class server_setup : public setup_base {
 		entity_id controlled_entity;
 		bool sent_welcome_message = false;
 		std::string nickname;
+
+		std::string nick_and_ip() const;
 
 		bool operator==(augs::network::endpoint_address b) const {
 			return addr == b;
@@ -52,7 +60,9 @@ class server_setup : public setup_base {
 	scene_managers::networked_testbed_server scene;
 
 	endpoint& get_endpoint(const augs::network::endpoint_address);
-	void disconnect(const augs::network::endpoint_address);
+	void disconnect(const augs::network::endpoint_address, const bool gracefully = false);
+	void deinit_endpoint(const augs::network::endpoint_address, const bool gracefully = false);
+	void deinit_endpoint(endpoint&, const bool gracefully = false);
 public:
 	void wait_for_listen_server();
 

@@ -17,7 +17,7 @@ namespace augs {
 			std::map<unsigned, unsigned> sequence_to_reliable_range;
 
 			unsigned short sequence = 0u;
-			unsigned short ack_sequence = 0u;
+			unsigned short most_recent_acked_sequence = 0u;
 
 			unsigned first_message = 0u;
 			unsigned last_message = 0u;
