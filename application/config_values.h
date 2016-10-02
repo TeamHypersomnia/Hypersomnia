@@ -3,7 +3,9 @@
 
 class game_window;
 
-struct config_values {
+class config_values {
+public:
+
 	int launch_mode = 0;
 
 	unsigned determinism_test_cloned_cosmoi_count = 0;

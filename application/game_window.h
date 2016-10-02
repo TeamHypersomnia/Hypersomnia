@@ -9,23 +9,11 @@
 #include <mutex>
 
 class game_window {
+	friend class config_values;
+
 	augs::lua_state_wrapper lua;
 	std::mutex lua_mutex;
 	window::glwindow window;
-
-public:
-	game_window();
-
-	rects::wh<int> get_screen_rect();
-	void swap_buffers();
-
-	bool clear_window_inputs_once = true;
-
-	config_values config;
-
-	decltype(machine_entropy::local) collect_entropy();
-
-	void call_window_script(const std::string filename);
 
 	double get_config_number(const std::string field);
 	bool get_flag(const std::string field);
@@ -43,6 +31,20 @@ public:
 	void get_config_value(bool& into, const std::string field) {
 		into = get_flag(field);
 	}
+
+public:
+	game_window();
+
+	rects::wh<int> get_screen_rect();
+	void swap_buffers();
+
+	bool clear_window_inputs_once = true;
+
+	config_values config;
+
+	decltype(machine_entropy::local) collect_entropy();
+
+	void call_window_script(const std::string filename);
 
 	enum class launch_mode {
 		INVALID,

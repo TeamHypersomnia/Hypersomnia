@@ -37,16 +37,16 @@ void client_setup::process(game_window& window) {
 
 void client_setup::init(game_window& window, const std::string recording_filename, const bool use_alternative_port) {
 	const vec2i screen_size = vec2i(window.get_screen_rect());
+	const auto& cfg = window.config;
 
 	scene_managers::networked_testbed_client().populate_world_with_entities(initial_hypersomnia);
 
-	const auto config_tickrate = static_cast<unsigned>(window.get_config_number("tickrate"));
-	extrapolated_hypersomnia.systems_insignificant.get<interpolation_system>().interpolation_speed = static_cast<float>(window.get_config_number("interpolation_speed"));
+	extrapolated_hypersomnia.systems_insignificant.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
 
-	detailed_step_log = config_tickrate <= 2;
+	detailed_step_log = cfg.tickrate <= 2;
 
 	if (!hypersomnia.load_from_file("save.state")) {
-		hypersomnia.set_fixed_delta(augs::fixed_delta(config_tickrate));
+		hypersomnia.set_fixed_delta(augs::fixed_delta(cfg.tickrate));
 		scene.populate_world_with_entities(hypersomnia);
 	}
 
@@ -58,24 +58,21 @@ void client_setup::init(game_window& window, const std::string recording_filenam
 
 	scene.configure_view(session);
 
-	receiver.jitter_buffer.set_lower_limit(static_cast<unsigned>(static_cast<float>(window.get_config_number("jitter_buffer_ms")) / hypersomnia.get_fixed_delta().in_milliseconds()));
+	receiver.jitter_buffer.set_lower_limit(static_cast<unsigned>(cfg.jitter_buffer_ms / hypersomnia.get_fixed_delta().in_milliseconds()));
 
 	const bool is_replaying = input_unpacker.player.is_replaying();
-	const auto port = static_cast<unsigned short>(window.get_config_number(use_alternative_port ? "alternative_port" : "connect_port"));
+	const auto port = use_alternative_port ? cfg.alternative_port : cfg.connect_port;
 
-	const std::string nickname = window.get_config_string("nickname");
-	const std::string connect_address = window.get_config_string("connect_address");
-
-	const std::string readable_ip = typesafe_sprintf("%x:%x", connect_address, port);
+	const std::string readable_ip = typesafe_sprintf("%x:%x", cfg.connect_address, port);
 
 	LOG("Connecting to: %x", readable_ip);
 
-	if (is_replaying || client.connect(connect_address, port, 15000)) {
+	if (is_replaying || client.connect(cfg.connect_address, port, 15000)) {
 		LOG("Connected successfully to %x", readable_ip);
 		
 		augs::stream welcome;
 		augs::write_object(welcome, network_command::CLIENT_WELCOME_MESSAGE);
-		augs::write_object(welcome, nickname);
+		augs::write_object(welcome, cfg.nickname);
 
 		client.post_redundant(welcome);
 

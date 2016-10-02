@@ -54,6 +54,8 @@ void server_setup::disconnect(const augs::network::endpoint_address addr) {
 }
 
 void server_setup::process(game_window& window, const bool start_alternative_server) {
+	const auto& cfg = window.config;
+	
 	session_report rep;
 
 	cosmos hypersomnia_last_snapshot(3000);
@@ -63,15 +65,10 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 
 	step_and_entropy_unpacker input_unpacker;
 
-	const auto config_tickrate = static_cast<unsigned>(window.get_config_number("tickrate"));
-
-	const bool detailed_step_log = config_tickrate <= 2;
-
-	const bool test_randomize_entropies_in_client_setup = window.get_flag("test_randomize_entropies_in_client_setup");
-	const unsigned randomize_once_every = static_cast<unsigned>(window.get_config_number("test_randomize_entropies_in_client_setup_once_every_steps"));
+	const bool detailed_step_log = cfg.tickrate <= 2;
 
 	if (!hypersomnia.load_from_file("server_save.state")) {
-		hypersomnia.set_fixed_delta(augs::fixed_delta(config_tickrate));
+		hypersomnia.set_fixed_delta(augs::fixed_delta(cfg.tickrate));
 		scene.populate_world_with_entities(hypersomnia);
 	}
 
@@ -83,20 +80,20 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 	augs::network::server alternative_serv;
 
 	const bool is_replaying = input_unpacker.player.is_replaying();
-	const bool launch_webserver = !is_replaying && window.get_flag("server_launch_http_daemon");
+	const bool launch_webserver = !is_replaying && cfg.server_launch_http_daemon;
 	
 	bool daemon_online = false;
 
 	if (launch_webserver)
-		daemon_online = rep.start_daemon(window.get_config_string("server_http_daemon_html_file_path"), static_cast<unsigned short>(window.get_config_number("server_http_daemon_port")));
+		daemon_online = rep.start_daemon(cfg.server_http_daemon_html_file_path, cfg.server_http_daemon_port);
 
-	if (is_replaying || serv.listen(static_cast<unsigned short>(window.get_config_number("server_port")), 32))
+	if (is_replaying || serv.listen(cfg.server_port, 32))
 		LOG("Listen server setup successful.");
 	else 
 		LOG("Failed to setup a listen server.");
 
 	if (start_alternative_server) {
-		if (is_replaying || alternative_serv.listen(static_cast<unsigned short>(window.get_config_number("alternative_port")), 32))
+		if (is_replaying || alternative_serv.listen(cfg.alternative_port, 32))
 			LOG("Alternative listen server setup successful.");
 		else
 			LOG("Failed to setup an alternative listen server.");
@@ -152,7 +149,7 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 					
 					endpoint new_endpoint;
 					new_endpoint.addr = net_event.address;
-					new_endpoint.commands.set_lower_limit(static_cast<size_t>(window.get_config_number("client_commands_jitter_buffer_ms")) / hypersomnia.get_fixed_delta().in_milliseconds());
+					new_endpoint.commands.set_lower_limit(static_cast<size_t>(cfg.client_commands_jitter_buffer_ms) / hypersomnia.get_fixed_delta().in_milliseconds());
 					endpoints.push_back(new_endpoint);
 				}
 				
@@ -251,9 +248,9 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 
 			guid_mapped_entropy total_unpacked_entropy;
 			
-			if (test_randomize_entropies_in_client_setup) {
+			if (cfg.test_randomize_entropies_in_client_setup) {
 				for (size_t i = 1; i < scene.characters.size(); ++i) {
-					if (test_entropy_randomizer.randval(0u, randomize_once_every) == 0u) {
+					if (test_entropy_randomizer.randval(0u, cfg.test_randomize_entropies_in_client_setup_once_every_steps) == 0u) {
 						const unsigned which = test_entropy_randomizer.randval(0, 4);
 
 						entity_intent new_intent;

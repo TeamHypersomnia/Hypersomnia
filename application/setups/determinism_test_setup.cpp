@@ -21,15 +21,14 @@
 #include "augs/misc/templated_readwrite.h"
 
 void determinism_test_setup::process(game_window& window) {
+	const auto& cfg = window.config;
 	const vec2i screen_size = vec2i(window.get_screen_rect());
 
-	const unsigned cosmoi_count = 1 + static_cast<unsigned>(window.get_config_number("determinism_test_cloned_cosmoi_count"));
+	const unsigned cosmoi_count = 1 + cfg.determinism_test_cloned_cosmoi_count;
 	std::vector<cosmos> hypersomnias(cosmoi_count, cosmos(3000));
 
 	step_and_entropy_unpacker input_unpacker;
 	std::vector<scene_managers::testbed> testbeds(cosmoi_count);
-
-	const auto config_tickrate = static_cast<unsigned>(window.get_config_number("tickrate"));
 
 	if (augs::file_exists("save.state")) {
 		for (auto& h : hypersomnias) {
@@ -38,7 +37,7 @@ void determinism_test_setup::process(game_window& window) {
 	}
 	else {
 		for (size_t i = 0; i < cosmoi_count; ++i) {
-			hypersomnias[i].set_fixed_delta(augs::fixed_delta(config_tickrate));
+			hypersomnias[i].set_fixed_delta(augs::fixed_delta(cfg.tickrate));
 			testbeds[i].populate_world_with_entities(hypersomnias[i]);
 		}
 	}
