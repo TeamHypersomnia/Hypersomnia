@@ -11,7 +11,7 @@ launch_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.TWO_CLIENTS_AND_SERVER,
+	launch_mode = launch_modes.LOCAL,
 	
 	determinism_test_cloned_cosmoi_count = 2,
 
@@ -45,10 +45,6 @@ config_table = {
 	
 	interpolation_speed = 525,
 
-	simulate_lag = 0,
-	packet_loss = 0.00,
-	min_latency = 50,
-	jitter = 0,
 	test_var = 0,
 	test_randomize_entropies_in_client_setup = 0,
 	test_randomize_entropies_in_client_setup_once_every_steps = 1,

@@ -40,7 +40,7 @@ void game_window::call_window_script(const std::string filename) {
 		window.gl.initialize();
 	}
 
-	should_clip_cursor = !get_flag("debug_disable_cursor_clipping");
+	config.get_values(*this);
 }
 
 double game_window::get_config_number(const std::string field) {
@@ -72,7 +72,7 @@ std::string game_window::get_config_string(const std::string field) {
 }
 
 decltype(machine_entropy::local) game_window::collect_entropy() {
-	auto result = window.poll_events(should_clip_cursor);
+	auto result = window.poll_events(config.debug_disable_cursor_clipping);
 
 	if (clear_window_inputs_once) {
 		result.clear();

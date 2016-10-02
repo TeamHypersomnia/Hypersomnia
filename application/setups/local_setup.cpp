@@ -20,18 +20,17 @@
 
 void local_setup::process(game_window& window) {
 	const vec2i screen_size = vec2i(window.get_screen_rect());
+	const auto& cfg = window.config;
 
 	cosmos hypersomnia(3000);
-	hypersomnia.systems_insignificant.get<interpolation_system>().interpolation_speed = static_cast<float>(window.get_config_number("interpolation_speed"));
+	hypersomnia.systems_insignificant.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
 
 	step_and_entropy_unpacker input_unpacker;
 	scene_managers::testbed testbed;
-	testbed.test_var = static_cast<int>(window.get_config_number("test_var"));
-
-	const auto config_tickrate = static_cast<unsigned>(window.get_config_number("tickrate"));
+	testbed.test_var = window.config.test_var;
 
 	if (!hypersomnia.load_from_file("save.state")) {
-		hypersomnia.set_fixed_delta(augs::fixed_delta(config_tickrate));
+		hypersomnia.set_fixed_delta(augs::fixed_delta(cfg.tickrate));
 		testbed.populate_world_with_entities(hypersomnia);
 	}
 
@@ -59,7 +58,7 @@ void local_setup::process(game_window& window) {
 			for (const auto& raw_input : s.total_entropy.local) {
 				if (raw_input.key_event == augs::window::event::PRESSED) {
 					if (raw_input.key == augs::window::event::keys::_1) {
-						hypersomnia.set_fixed_delta(config_tickrate);
+						hypersomnia.set_fixed_delta(cfg.tickrate);
 					}
 					if (raw_input.key == augs::window::event::keys::_2) {
 						hypersomnia.set_fixed_delta(128);

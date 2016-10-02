@@ -1074,6 +1074,9 @@
     <ClCompile Include="application\web_daemon\session_report.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="application\config_values.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3258,6 +3261,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="application\web_daemon\session_report.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="application\config_values.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
