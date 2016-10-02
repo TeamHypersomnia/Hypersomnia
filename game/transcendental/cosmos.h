@@ -12,10 +12,10 @@
 #include "game/transcendental/types_specification/all_messages_declaration.h"
 #include "game/transcendental/types_specification/all_systems_declaration.h"
 
-#include "game/insignificant_systems/interpolation_system.h"
-#include "game/temporary_systems/dynamic_tree_system.h"
-#include "game/temporary_systems/physics_system.h"
-#include "game/temporary_systems/processing_lists_system.h"
+#include "game/systems_insignificant/interpolation_system.h"
+#include "game/systems_temporary/dynamic_tree_system.h"
+#include "game/systems_temporary/physics_system.h"
+#include "game/systems_temporary/processing_lists_system.h"
 
 #include "augs/misc/delta.h"
 #include "augs/misc/pool_handlizer.h"
@@ -51,8 +51,8 @@ private:
 	void create_substance_completely();
 
 public:
-	storage_for_all_temporary_systems temporary_systems;
-	mutable storage_for_all_insignificant_systems insignificant_systems;
+	storage_for_all_systems_temporary systems_temporary;
+	mutable storage_for_all_insignificant_systems systems_insignificant;
 
 	mutable cosmic_profiler profiler;
 	augs::stream reserved_memory_for_serialization;
@@ -135,7 +135,7 @@ public:
 
 	template<class System>
 	void partial_resubstantiation(entity_handle handle) {
-		auto& sys = temporary_systems.get<System>();
+		auto& sys = systems_temporary.get<System>();
 
 		sys.destruct(handle);
 

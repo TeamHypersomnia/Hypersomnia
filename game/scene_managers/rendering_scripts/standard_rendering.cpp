@@ -4,11 +4,11 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 
-#include "game/systematic/render_system.h"
-#include "game/systematic/gui_system.h"
+#include "game/systems_stateless/render_system.h"
+#include "game/systems_stateless/gui_system.h"
 
 #include "game/components/gui_element_component.h"
-#include "game/temporary_systems/dynamic_tree_system.h"
+#include "game/systems_temporary/dynamic_tree_system.h"
 #include "game/resources/manager.h"
 #include "augs/graphics/renderer.h"
 #include "game/transcendental/step.h"
@@ -23,8 +23,8 @@ namespace rendering_scripts {
 		auto& renderer = step.renderer;
 		auto& output = renderer.triangles;
 		auto& cosmos = step.cosm;
-		auto& dynamic_tree = cosmos.temporary_systems.get<dynamic_tree_system>();
-		auto& physics = cosmos.temporary_systems.get<physics_system>();
+		auto& dynamic_tree = cosmos.systems_temporary.get<dynamic_tree_system>();
+		auto& physics = cosmos.systems_temporary.get<physics_system>();
 
 		auto interpolation_ratio = step.get_delta().view_interpolation_ratio();
 

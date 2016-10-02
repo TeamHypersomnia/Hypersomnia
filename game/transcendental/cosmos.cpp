@@ -1,29 +1,29 @@
 #include "cosmos.h"
 
-#include "game/systematic/movement_system.h"
-#include "game/systematic/visibility_system.h"
-#include "game/systematic/pathfinding_system.h"
-#include "game/systematic/animation_system.h"
-#include "game/systematic/render_system.h"
-#include "game/systematic/input_system.h"
-#include "game/systematic/gun_system.h"
-#include "game/systematic/crosshair_system.h"
-#include "game/systematic/rotation_copying_system.h"
-#include "game/systematic/position_copying_system.h"
-#include "game/systematic/damage_system.h"
-#include "game/systematic/destroy_system.h"
-#include "game/systematic/particles_system.h"
-#include "game/systematic/behaviour_tree_system.h"
-#include "game/systematic/car_system.h"
-#include "game/systematic/driver_system.h"
-#include "game/systematic/trigger_detector_system.h"
-#include "game/systematic/item_system.h"
-#include "game/systematic/force_joint_system.h"
-#include "game/systematic/intent_contextualization_system.h"
-#include "game/systematic/gui_system.h"
-#include "game/systematic/trace_system.h"
-#include "game/systematic/melee_system.h"
-#include "game/systematic/sentience_system.h"
+#include "game/systems_stateless/movement_system.h"
+#include "game/systems_stateless/visibility_system.h"
+#include "game/systems_stateless/pathfinding_system.h"
+#include "game/systems_stateless/animation_system.h"
+#include "game/systems_stateless/render_system.h"
+#include "game/systems_stateless/input_system.h"
+#include "game/systems_stateless/gun_system.h"
+#include "game/systems_stateless/crosshair_system.h"
+#include "game/systems_stateless/rotation_copying_system.h"
+#include "game/systems_stateless/position_copying_system.h"
+#include "game/systems_stateless/damage_system.h"
+#include "game/systems_stateless/destroy_system.h"
+#include "game/systems_stateless/particles_system.h"
+#include "game/systems_stateless/behaviour_tree_system.h"
+#include "game/systems_stateless/car_system.h"
+#include "game/systems_stateless/driver_system.h"
+#include "game/systems_stateless/trigger_detector_system.h"
+#include "game/systems_stateless/item_system.h"
+#include "game/systems_stateless/force_joint_system.h"
+#include "game/systems_stateless/intent_contextualization_system.h"
+#include "game/systems_stateless/gui_system.h"
+#include "game/systems_stateless/trace_system.h"
+#include "game/systems_stateless/melee_system.h"
+#include "game/systems_stateless/sentience_system.h"
 
 #include "game/enums/render_layer.h"
 
@@ -53,12 +53,12 @@ void cosmos::complete_resubstantiation() {
 }
 
 void cosmos::destroy_substance_completely() {
-	temporary_systems.~storage_for_all_temporary_systems();
-	new (&temporary_systems) storage_for_all_temporary_systems;
+	systems_temporary.~storage_for_all_systems_temporary();
+	new (&systems_temporary) storage_for_all_systems_temporary;
 
 	size_t n = significant.pool_for_aggregates.capacity();
 
-	temporary_systems.for_each([n](auto& sys) {
+	systems_temporary.for_each([n](auto& sys) {
 		sys.reserve_caches_for_entities(n);
 	});
 }
@@ -78,8 +78,8 @@ void cosmos::destroy_substance_for_entity(const const_entity_handle h) {
 		sys.destruct(h);
 	};
 
-	temporary_systems.for_each(destructor);
-	insignificant_systems.for_each(destructor);
+	systems_temporary.for_each(destructor);
+	systems_insignificant.for_each(destructor);
 }
 
 void cosmos::create_substance_for_entity(const_entity_handle h) {
@@ -88,8 +88,8 @@ void cosmos::create_substance_for_entity(const_entity_handle h) {
 			sys.construct(h);
 		};
 
-		temporary_systems.for_each(constructor);
-		insignificant_systems.for_each(constructor);
+		systems_temporary.for_each(constructor);
+		systems_insignificant.for_each(constructor);
 	}
 }
 
@@ -129,7 +129,7 @@ cosmos& cosmos::operator=(const cosmos& b) {
 	
 	//complete_resubstantiation();
 	profiler.complete_resubstantiation.new_measurement();
-	temporary_systems = b.temporary_systems;
+	systems_temporary = b.systems_temporary;
 	profiler.complete_resubstantiation.end_measurement();
 	return *this;
 }
@@ -180,8 +180,8 @@ void cosmos::reserve_storage_for_entities(const size_t n) {
 		sys.reserve_caches_for_entities(n);
 	};
 
-	temporary_systems.for_each(reservation_lambda);
-	insignificant_systems.for_each(reservation_lambda);
+	systems_temporary.for_each(reservation_lambda);
+	systems_insignificant.for_each(reservation_lambda);
 }
 
 std::wstring cosmos::summary() const {
@@ -189,11 +189,11 @@ std::wstring cosmos::summary() const {
 }
 
 std::vector<entity_handle> cosmos::get(const processing_subjects list) {
-	return temporary_systems.get<processing_lists_system>().get(list, *this);
+	return systems_temporary.get<processing_lists_system>().get(list, *this);
 }
 
 std::vector<const_entity_handle> cosmos::get(const processing_subjects list) const {
-	return temporary_systems.get<processing_lists_system>().get(list, *this);
+	return systems_temporary.get<processing_lists_system>().get(list, *this);
 }
 
 randomization cosmos::get_rng_for(const entity_id id) const {
@@ -361,7 +361,7 @@ size_t cosmos::get_maximum_entities() const {
 
 void cosmos::integrate_interpolated_transforms(const float seconds) const {
 	profiler.start(meter_type::INTERPOLATION);
-	insignificant_systems.get<interpolation_system>().integrate_interpolated_transforms(*this, seconds);
+	systems_insignificant.get<interpolation_system>().integrate_interpolated_transforms(*this, seconds);
 	profiler.stop(meter_type::INTERPOLATION);
 }
 
@@ -416,7 +416,7 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	rotation_copying_system().update_rotations(step.cosm);
 	performance.start(meter_type::PHYSICS);
 	listener.during_step = true;
-	temporary_systems.get<physics_system>().step_and_set_new_transforms(step);
+	systems_temporary.get<physics_system>().step_and_set_new_transforms(step);
 	listener.during_step = false;
 	performance.stop(meter_type::PHYSICS);
 	position_copying_system().update_transforms(step);
@@ -440,7 +440,7 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	damage_system().destroy_colliding_bullets_and_send_damage(step);
 
 	sentience_system().apply_damage_and_generate_health_events(step);
-	temporary_systems.get<physics_system>().post_and_clear_accumulated_collision_messages(step);
+	systems_temporary.get<physics_system>().post_and_clear_accumulated_collision_messages(step);
 	sentience_system().cooldown_aimpunches(step);
 
 	driver_system().assign_drivers_from_successful_trigger_hits(step);
@@ -488,7 +488,7 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	position_copying_system().update_transforms(step);
 	rotation_copying_system().update_rotations(step.cosm);
 
-	profiler.raycasts.measure(temporary_systems.get<physics_system>().ray_casts_since_last_step);
+	profiler.raycasts.measure(systems_temporary.get<physics_system>().ray_casts_since_last_step);
 	performance.stop(meter_type::LOGIC);
 
 	++significant.meta.total_steps_passed;

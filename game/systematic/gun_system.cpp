@@ -13,7 +13,7 @@
 #include "game/components/container_component.h"
 #include "game/components/item_component.h"
 
-#include "game/temporary_systems/physics_system.h"
+#include "game/systems_temporary/physics_system.h"
 
 #include "game/detail/inventory_utils.h"
 
@@ -62,7 +62,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(fixed_step& step) {
 	const auto& delta = step.get_delta();
 	step.messages.get_queue<messages::gunshot_response>().clear();
 
-	auto& physics_sys = cosmos.temporary_systems.get<physics_system>();
+	auto& physics_sys = cosmos.systems_temporary.get<physics_system>();
 
 	for (const auto& it : cosmos.get(processing_subjects::WITH_GUN)) {
 		const auto& gun_transform = it.logic_transform();

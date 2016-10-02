@@ -15,10 +15,10 @@ public:
 	using component_synchronizer_base<is_const, components::interpolation>::component;
 
 	void write_current_to_interpolated() const {
-		handle.get_cosmos().insignificant_systems.get<interpolation_system>().write_current_to_interpolated(handle);
+		handle.get_cosmos().systems_insignificant.get<interpolation_system>().write_current_to_interpolated(handle);
 	}
 
 	components::transform& get_interpolated() const {
-		return handle.get_cosmos().insignificant_systems.get<interpolation_system>().get_interpolated(handle);
+		return handle.get_cosmos().systems_insignificant.get<interpolation_system>().get_interpolated(handle);
 	}
 };

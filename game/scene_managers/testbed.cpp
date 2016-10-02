@@ -3,9 +3,9 @@
 #include "game/transcendental/cosmos.h"
 #include "game/assets/texture_id.h"
 
-#include "game/systematic/input_system.h"
-#include "game/systematic/render_system.h"
-#include "game/systematic/gui_system.h"
+#include "game/systems_stateless/input_system.h"
+#include "game/systems_stateless/render_system.h"
+#include "game/systems_stateless/gui_system.h"
 #include "game/components/sentience_component.h"
 #include "game/components/attitude_component.h"
 #include "game/components/name_component.h"

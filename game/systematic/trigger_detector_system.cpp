@@ -9,7 +9,7 @@
 
 #include "game/messages/intent_message.h"
 
-#include "game/temporary_systems/physics_system.h"
+#include "game/systems_temporary/physics_system.h"
 
 #include "game/enums/filters.h"
 
@@ -110,7 +110,7 @@ void trigger_detector_system::send_trigger_confirmations(fixed_step& step) const
 		
 		std::vector<entity_id> found_triggers;
 
-		auto found_physical_triggers = cosmos.temporary_systems.get<physics_system>().query_body(detector_body, filters::trigger());
+		auto found_physical_triggers = cosmos.systems_temporary.get<physics_system>().query_body(detector_body, filters::trigger());
 
 		for (auto found_trigger_id : found_physical_triggers.entities) {
 			auto found_trigger = cosmos[found_trigger_id];

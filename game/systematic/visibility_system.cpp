@@ -4,7 +4,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_id.h"
 
-#include "game/temporary_systems/physics_system.h"
+#include "game/systems_temporary/physics_system.h"
 #include "render_system.h"
 
 #include "game/detail/entity_scripts.h"
@@ -109,7 +109,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 	epsilon_distance_vertex_hit_sq *= epsilon_distance_vertex_hit_sq;
 
 	/* we'll need a reference to physics system for raycasting */
-	physics_system& physics = cosmos.temporary_systems.get<physics_system>();
+	physics_system& physics = cosmos.systems_temporary.get<physics_system>();
 
 	struct ray_input {
 		vec2 targets[2];

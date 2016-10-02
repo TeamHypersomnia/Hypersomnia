@@ -20,7 +20,7 @@ void component_synchronizer<false, F>::set_owner_body(entity_id owner_id) const 
 template<bool C>
 maybe_const_ref_t<C, colliders_cache>& basic_fixtures_synchronizer<C>::get_cache() const {
 	auto& cosmos = handle.get_cosmos();
-	return cosmos.temporary_systems.get<physics_system>().get_colliders_cache(handle);
+	return cosmos.systems_temporary.get<physics_system>().get_colliders_cache(handle);
 }
 
 template<bool C>
@@ -155,7 +155,7 @@ bool basic_fixtures_synchronizer<C>::is_activated() const {
 
 template<bool C>
 bool basic_fixtures_synchronizer<C>::is_constructed() const {
-	return handle.get_cosmos().temporary_systems.get<physics_system>().is_constructed_colliders(handle);
+	return handle.get_cosmos().systems_temporary.get<physics_system>().is_constructed_colliders(handle);
 }
 
 template<bool C>

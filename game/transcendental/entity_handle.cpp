@@ -8,7 +8,7 @@
 #include "game/components/crosshair_component.h"
 #include "game/components/fixtures_component.h"
 
-#include "game/insignificant_systems/interpolation_system.h"
+#include "game/systems_insignificant/interpolation_system.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/detail/physics_scripts.h"

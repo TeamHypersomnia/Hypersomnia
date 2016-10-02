@@ -8,7 +8,7 @@
 
 #include "augs/math/vec2.h"
 #include "game/transcendental/cosmos.h"
-#include "game/temporary_systems/physics_system.h"
+#include "game/systems_temporary/physics_system.h"
 #include "augs/ensure.h"
 #include "game/transcendental/entity_handle.h"
 
@@ -24,12 +24,12 @@ void components::physics::set_transform(const components::transform& t) {
 
 template<bool C>
 bool basic_physics_synchronizer<C>::is_constructed() const {
-	return handle.get_cosmos().temporary_systems.get<physics_system>().is_constructed_rigid_body(handle);
+	return handle.get_cosmos().systems_temporary.get<physics_system>().is_constructed_rigid_body(handle);
 }
 
 template<bool C>
 maybe_const_ref_t<C, rigid_body_cache>& basic_physics_synchronizer<C>::get_cache() const {
-	return handle.get_cosmos().temporary_systems.get<physics_system>().get_rigid_body_cache(handle);
+	return handle.get_cosmos().systems_temporary.get<physics_system>().get_rigid_body_cache(handle);
 }
 
 void component_synchronizer<false, P>::resubstantiation() const {

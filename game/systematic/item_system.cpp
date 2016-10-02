@@ -21,7 +21,7 @@
 #include "game/detail/inventory_slot_handle.h"
 #include "game/detail/entity_scripts.h"
 
-#include "game/temporary_systems/physics_system.h"
+#include "game/systems_temporary/physics_system.h"
 #include "game/transcendental/entity_handle.h"
 
 #include "augs/ensure.h"
