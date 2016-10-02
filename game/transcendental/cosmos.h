@@ -52,7 +52,7 @@ private:
 
 public:
 	storage_for_all_systems_temporary systems_temporary;
-	mutable storage_for_all_insignificant_systems systems_insignificant;
+	mutable storage_for_all_systems_insignificant systems_insignificant;
 
 	mutable cosmic_profiler profiler;
 	augs::stream reserved_memory_for_serialization;

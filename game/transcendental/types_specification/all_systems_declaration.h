@@ -20,4 +20,4 @@ typedef augs::storage_for_systems <
 
 typedef augs::storage_for_systems <
 	interpolation_system
-> storage_for_all_insignificant_systems;
+> storage_for_all_systems_insignificant;
