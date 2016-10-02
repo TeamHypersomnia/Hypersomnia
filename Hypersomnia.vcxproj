@@ -474,7 +474,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="setups\server_setup.cpp" />
     <ClCompile Include="setups\setup_base.cpp" />
-    <ClCompile Include="setups\web\session_report.cpp" />
+    <ClCompile Include="setups\web_daemon\session_report.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -1198,7 +1198,7 @@
     <ClInclude Include="game\types_specification\all_messages_includes.h" />
     <ClInclude Include="game\types_specification\all_systems_declaration.h" />
     <ClInclude Include="setups\setups.h" />
-    <ClInclude Include="setups\web\session_report.h" />
+    <ClInclude Include="setups\web_daemon\session_report.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="augs\global_libraries.h" />
     <ClInclude Include="augs\filesystem\dirent.h" />

@@ -27,7 +27,7 @@
 
 #include "augs/misc/randomization.h"
 
-#include "setups/web/session_report.h"
+#include "setups/web_daemon/session_report.h"
 
 #include "augs/templates.h"
 

@@ -1071,7 +1071,7 @@
     <ClCompile Include="setups\two_clients_and_server_setup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="setups\web\session_report.cpp">
+    <ClCompile Include="setups\web_daemon\session_report.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -3257,7 +3257,7 @@
     <ClInclude Include="setups\setups.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="setups\web\session_report.h">
+    <ClInclude Include="setups\web_daemon\session_report.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
