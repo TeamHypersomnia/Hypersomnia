@@ -2,7 +2,7 @@
 #include "augs/misc/templated_readwrite.h"
 #include "game/bindings/bind_game_and_augs.h"
 #include "augs/global_libraries.h"
-#include "game/game_window.h"
+#include "application/game_window.h"
 
 #include "game/resources/manager.h"
 

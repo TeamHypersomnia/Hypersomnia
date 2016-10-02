@@ -2,7 +2,7 @@
 #include <vector>
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/cosmos.h"
-#include "game/game_window.h"
+#include "application/game_window.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
 #include "augs/misc/constant_size_vector.h"

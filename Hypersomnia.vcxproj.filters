@@ -501,7 +501,7 @@
     <ClCompile Include="game\scene_managers\testbed.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\game_window.cpp">
+    <ClCompile Include="application\game_window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\scene_managers\resource_setups\standard_everything.cpp">
@@ -1772,7 +1772,7 @@
     <ClInclude Include="game\scene_managers\testbed.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\game_window.h">
+    <ClInclude Include="application\game_window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\variable_delta_timer.h">

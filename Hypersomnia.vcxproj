@@ -353,7 +353,7 @@
     <ClCompile Include="game\detail\entity\physics_getters.cpp" />
     <ClCompile Include="game\detail\entity\relations_helpers.cpp" />
     <ClCompile Include="game\transcendental\entropy_buffer_and_player.cpp" />
-    <ClCompile Include="game\game_window.cpp" />
+    <ClCompile Include="application\game_window.cpp" />
     <ClCompile Include="game\global\input_context.cpp" />
     <ClCompile Include="game\detail\inventory_slot_handle.cpp" />
     <ClCompile Include="game\detail\inventory_slot_id.cpp" />
@@ -1030,7 +1030,7 @@
     <ClInclude Include="game\transcendental\entity_id.h" />
     <ClInclude Include="game\transcendental\entropy_buffer_and_player.h" />
     <ClInclude Include="game\enums\colliders_offset_type.h" />
-    <ClInclude Include="game\game_window.h" />
+    <ClInclude Include="application\game_window.h" />
     <ClInclude Include="game\global\all_settings.h" />
     <ClInclude Include="game\global\input_context.h" />
     <ClInclude Include="game\detail\inventory_slot_handle.h" />

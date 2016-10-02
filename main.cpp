@@ -2,7 +2,7 @@
 #include "augs/global_libraries.h"
 #include "application/setups/setups.h"
 
-#include "game/game_window.h"
+#include "application/game_window.h"
 #include "game/resources/manager.h"
 
 #include "game/scene_managers/resource_setups/all.h"

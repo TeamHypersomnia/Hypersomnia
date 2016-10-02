@@ -1,5 +1,5 @@
 #include "setups.h"
-#include "game/game_window.h"
+#include "application/game_window.h"
 
 bool setup_base::process_exit_key(const augs::machine_entropy::local_type& local) {
 	for (auto& n : local) {
