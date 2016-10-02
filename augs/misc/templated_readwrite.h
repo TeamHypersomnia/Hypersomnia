@@ -150,6 +150,26 @@ namespace augs {
 		write_bytes(ar, storage.data(), storage.size());
 	}
 
+	template<class A, class string_size_type = size_t>
+	bool read_object(A& ar, std::string& storage, string_size_type = string_size_type()) {
+		string_size_type s;
+
+		if (!read_object(ar, s))
+			return false;
+
+		storage.resize(s);
+
+		return read_bytes(ar, &storage[0], storage.size());
+	}
+
+	template<class A, class string_size_type = size_t>
+	void write_object(A& ar, const std::string& storage, string_size_type = string_size_type()) {
+		ensure(storage.size() <= std::numeric_limits<string_size_type>::max());
+
+		write_object(ar, static_cast<string_size_type>(storage.size()));
+		write_bytes(ar, storage.data(), storage.size());
+	}
+
 	template<class A, class T, class vector_size_type = size_t>
 	bool read_vector_of_objects(A& ar, std::vector<T>& storage, vector_size_type = vector_size_type()) {
 		vector_size_type s;
