@@ -32,8 +32,7 @@ namespace augs {
 
 			unsigned last_message = 0u;
 
-			unsigned short received_sequence = 0u;
-			unsigned short last_sequence = 0u;
+			unsigned short last_received_sequence = 0u;
 
 			struct result_data {
 				enum type {
@@ -56,7 +55,11 @@ namespace augs {
 
 			augs::timer last_received_packet;
 
-			bool timed_out(const float ms, const size_t max_pending_reliable_messages = 120) const;
+			bool timed_out(const size_t max_unacknowledged_sequences = 120) const;
+
+			unsigned get_unacknowledged_sequences_num() const;
+			unsigned get_pending_reliable_messages_num() const;
+			unsigned get_pending_reliable_bytes_num() const;
 
 			void build_next_packet(augs::stream& out);
 			/* returns result enum */

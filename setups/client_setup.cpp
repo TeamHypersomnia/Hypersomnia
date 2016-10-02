@@ -63,10 +63,21 @@ void client_setup::init(game_window& window, const std::string recording_filenam
 	const bool is_replaying = input_unpacker.player.is_replaying();
 	const auto port = static_cast<unsigned short>(window.get_config_number(use_alternative_port ? "alternative_port" : "connect_port"));
 
-	LOG("Port: %x", port);
+	const std::string nickname = window.get_config_string("nickname");
+	const std::string connect_address = window.get_config_string("connect_address");
 
-	if (is_replaying || client.connect(window.get_config_string("connect_address"), port, 15000)) {
-		LOG("Connected successfully");
+	const std::string readable_ip = typesafe_sprintf("%x:%x", connect_address, port);
+
+	LOG("Connecting to: %x", readable_ip);
+
+	if (is_replaying || client.connect(connect_address, port, 15000)) {
+		LOG("Connected successfully to %x", readable_ip);
+		
+		augs::stream welcome;
+		augs::write_object(welcome, network_command::CLIENT_WELCOME_MESSAGE);
+		augs::write_object(welcome, nickname);
+
+		client.post_redundant(welcome);
 
 		input_unpacker.timer.reset_timer();
 	}
@@ -149,15 +160,16 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 			}
 		}
 
-		if (still_downloading)
-			continue;
+		if (!still_downloading) {
+			const auto local_cosmic_entropy_for_this_step = scene.make_cosmic_entropy(s.total_entropy.local, session.context, hypersomnia);
 
-		const auto local_cosmic_entropy_for_this_step = scene.make_cosmic_entropy(s.total_entropy.local, session.context, hypersomnia);
+			receiver.send_commands_and_predict(client, local_cosmic_entropy_for_this_step, extrapolated_hypersomnia, step_pred);
+			// LOG("Predicting to step: %x; predicted steps: %x", extrapolated_hypersomnia.get_total_steps_passed(), receiver.predicted_steps.size());
 
-		receiver.send_commands_and_predict(client, local_cosmic_entropy_for_this_step, extrapolated_hypersomnia, step_pred);
-		// LOG("Predicting to step: %x; predicted steps: %x", extrapolated_hypersomnia.get_total_steps_passed(), receiver.predicted_steps.size());
-
-		receiver.unpack_deterministic_steps(hypersomnia, hypersomnia_last_snapshot, extrapolated_hypersomnia, step_pred);
+			receiver.unpack_deterministic_steps(hypersomnia, hypersomnia_last_snapshot, extrapolated_hypersomnia, step_pred);
+		}
+		
+		client.send_pending_redundant();
 	}
 
 	if (!still_downloading) {

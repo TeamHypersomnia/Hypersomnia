@@ -30,7 +30,6 @@ public:
 		augs::write_object(client_commands, guid_mapped);
 
 		client.post_redundant(client_commands);
-		client.send_pending_redundant();
 
 		predicted_steps.push_back(guid_mapped);
 		advance(new_entropy, predicted_cosmos);

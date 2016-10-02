@@ -30,10 +30,8 @@ namespace scene_managers {
 			controlled_character(entity_id id = entity_id()) : id(id) {}
 
 			entity_id id;
-			augs::network::endpoint_address endpoint;
 			bool occupied = false;
 		};
-
 
 		friend class networked_testbed_server;
 	public:
@@ -51,9 +49,8 @@ namespace scene_managers {
 	class networked_testbed_server : public networked_testbed {
 	public:
 
-		entity_id assign_new_character(augs::network::endpoint_address);
-		void free_character(augs::network::endpoint_address);
-		entity_id get_character(augs::network::endpoint_address);
+		entity_id assign_new_character();
+		void free_character(const entity_id);
 	};
 
 	class networked_testbed_client : public networked_testbed {

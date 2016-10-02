@@ -44,6 +44,7 @@ namespace augs {
 			bool send_pending_redundant();
 
 			bool has_endpoint(const endpoint_address&) const;
+			bool has_timed_out(const endpoint_address&, const float sequence_interval_ms, const float ms = 2000) const;
 			
 			bool send_reliable(const packet&, const endpoint_address& target);
 

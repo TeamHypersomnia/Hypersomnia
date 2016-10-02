@@ -29,6 +29,10 @@ namespace augs {
 			return peer_map.find(target) != peer_map.end();
 		}
 
+		bool server::has_timed_out(const endpoint_address& target, const float sequence_interval_ms, const float ms) const {
+			return has_endpoint(target) && peer_map.at(target).redundancy.timed_out(static_cast<size_t>(ms / sequence_interval_ms));
+		}
+
 		bool server::send_pending_redundant() {
 			bool result = true;
 
@@ -69,7 +73,7 @@ namespace augs {
 				case ENET_EVENT_TYPE_CONNECT:
 					new_event.message_type = message::type::CONNECT;
 					new_event.address = event.peer->address;
-					
+					LOG("SPort: %x", event.peer->address.port);
 					peer_map[new_event.address] = event.peer;
 
 					break;

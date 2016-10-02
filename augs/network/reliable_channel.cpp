@@ -1,11 +1,11 @@
 #include "augs/misc/templated_readwrite.h"
 #include "reliable_channel.h"
+#include <numeric>
 
 namespace augs {
 	namespace network {
 		template <class T>
-		bool sequence_more_recent(T s1, T s2)
-		{
+		bool sequence_more_recent(T s1, T s2) {
 			return
 				(s1 > s2) &&
 				(s1 - s2 <= std::numeric_limits<T>::max() / 2)
@@ -14,6 +14,19 @@ namespace augs {
 				(s2 - s1  > std::numeric_limits<T>::max() / 2);
 		}
 		
+		template <class T>
+		T sequence_distance(T _s1, T _s2) {
+			T& s1 = _s1 > _s2 ? _s1 : _s2;
+			T& s2 = _s1 > _s2 ? _s2 : _s1;
+
+			if (s1 - s2 <= std::numeric_limits<T>::max() / 2) {
+				return s1 - s2;
+			}
+			else {
+				return (std::numeric_limits<T>::max() + 1) - s1 + s2;
+			}
+		}
+
 		bool reliable_sender::post_message(augs::stream& output) {
 			if (last_message - first_message >= std::numeric_limits<unsigned short>::max()) {
 				return false;
@@ -103,6 +116,8 @@ namespace augs {
 			unsigned received_first_message = 0u;
 			unsigned short received_message_count = 0u;
 
+			unsigned short received_sequence = 0u;
+
 			bool has_reliable = false;
 			bool request_ack_for_unreliable = false;
 
@@ -123,10 +138,10 @@ namespace augs {
 				input;//name_property("last_message");
 				if (!augs::read_object(input, received_message_count)) return res;
 
-				if (!sequence_more_recent(received_sequence, last_sequence))
+				if (!sequence_more_recent(received_sequence, last_received_sequence))
 					return res;
 				
-				last_sequence = received_sequence;
+				last_received_sequence = received_sequence;
 				ack_requested = true;
 
 				res.messages_to_skip = last_message - received_first_message;
@@ -140,11 +155,23 @@ namespace augs {
 
 		void reliable_receiver::write_ack(augs::stream& output) {
 			output;//name_property("reliable_ack");
-			augs::write_object(output, last_sequence);
+			augs::write_object(output, last_received_sequence);
 		}
 
-		bool reliable_channel::timed_out(const float ms, const size_t max_pending_reliable_messages) const {
-			return sender.reliable_buf.size() > max_pending_reliable_messages || last_received_packet.get<std::chrono::milliseconds>() >= ms;
+		bool reliable_channel::timed_out(const size_t max_unacknowledged_sequences) const {
+			return get_unacknowledged_sequences_num() > max_unacknowledged_sequences;
+		}
+
+		unsigned reliable_channel::get_unacknowledged_sequences_num() const {
+			return sequence_distance(sender.sequence, receiver.last_received_sequence);
+		}
+
+		unsigned reliable_channel::get_pending_reliable_messages_num() const {
+			return sender.reliable_buf.size();
+		}
+
+		unsigned reliable_channel::get_pending_reliable_bytes_num() const {
+			return std::accumulate(sender.reliable_buf.begin(), sender.reliable_buf.end(), 0u, [](const size_t& s, const auto& buf) { return s + buf.size(); });
 		}
 
 		reliable_receiver::result_data reliable_channel::handle_incoming_packet(augs::stream& in) {
@@ -178,6 +205,28 @@ namespace augs {
 
 using namespace augs;
 using namespace network;
+
+TEST(NetChannel, SequenceArithmetic) {
+	typedef unsigned short us;
+
+	EXPECT_EQ(1, sequence_distance(us(65535), us(0)));
+	EXPECT_EQ(1, sequence_distance(us(0), us(65535)));
+	EXPECT_EQ(3, sequence_distance(us(65535), us(2)));
+	EXPECT_EQ(3, sequence_distance(us(2), us(65535)));
+	EXPECT_EQ(1, sequence_distance(us(2), us(1)));
+	EXPECT_EQ(1, sequence_distance(us(1), us(2)));
+	EXPECT_EQ(0, sequence_distance(us(0), us(0)));
+	EXPECT_EQ(0, sequence_distance(us(65535), us(65535)));
+
+	EXPECT_TRUE(sequence_more_recent(us(0), us(65535)));
+	EXPECT_TRUE(sequence_more_recent(us(1), us(65535)));
+	EXPECT_TRUE(sequence_more_recent(us(2), us(65535)));
+	EXPECT_TRUE(sequence_more_recent(us(2), us(65534)));
+	EXPECT_FALSE(sequence_more_recent(us(65535), us(0)));
+	EXPECT_FALSE(sequence_more_recent(us(65535), us(0)));
+	EXPECT_FALSE(sequence_more_recent(us(65535), us(1)));
+	EXPECT_FALSE(sequence_more_recent(us(65534), us(2)));
+}
 
 TEST(NetChannel, SingleTransmissionDeleteAllPending) {
 	reliable_sender sender;
@@ -214,7 +263,7 @@ TEST(NetChannel, SingleTransmissionDeleteAllPending) {
 	EXPECT_EQ(1, sender.sequence);
 	EXPECT_EQ(1, sender.ack_sequence);
 
-	EXPECT_EQ(1, receiver.last_sequence);
+	EXPECT_EQ(1, receiver.last_received_sequence);
 }
 
 TEST(NetChannel, PastAcknowledgementDeletesSeveralPending) {
@@ -260,7 +309,7 @@ TEST(NetChannel, PastAcknowledgementDeletesSeveralPending) {
 	EXPECT_EQ(5, sender.reliable_buf.size());
 	EXPECT_EQ(1, sender.ack_sequence);
 
-	EXPECT_EQ(1, receiver.last_sequence);
+	EXPECT_EQ(1, receiver.last_received_sequence);
 }
 
 TEST(NetChannel, FlagForDeletionAndAck) {
@@ -331,7 +380,7 @@ TEST(NetChannel, FlagForDeletionAndAck) {
 	//EXPECT_EQ(msg+7, sender.reliable_buf[0].output_bitstream);
 	//EXPECT_EQ(msg+8, sender.reliable_buf[1].output_bitstream);
 
-	EXPECT_EQ(1, receiver.last_sequence);
+	EXPECT_EQ(1, receiver.last_received_sequence);
 }
 
 
@@ -344,7 +393,7 @@ TEST(NetChannel, SequenceNumberOverflowMultipleTries) {
 	sender.sequence = std::numeric_limits<unsigned short>::max();
 	sender.ack_sequence = std::numeric_limits<unsigned short>::max();
 
-	receiver.last_sequence = std::numeric_limits<unsigned short>::max();
+	receiver.last_received_sequence = std::numeric_limits<unsigned short>::max();
 
 	for (int k = 0; k < 10; ++k) {
 		
@@ -405,7 +454,7 @@ TEST(NetChannel, SequenceNumberOverflowMultipleTries) {
 		if (k == 0) {
 			EXPECT_EQ(5, sender.sequence);
 			EXPECT_EQ(0, sender.ack_sequence);
-			EXPECT_EQ(0, receiver.last_sequence);
+			EXPECT_EQ(0, receiver.last_received_sequence);
 		}
 
 		//EXPECT_EQ(2, sender.reliable_buf.size());
@@ -425,7 +474,7 @@ TEST(NetChannel, OutOfDatePackets) {
 	sender.sequence = std::numeric_limits<unsigned short>::max();
 	sender.ack_sequence = std::numeric_limits<unsigned short>::max();
 
-	receiver.last_sequence = std::numeric_limits<unsigned short>::max();
+	receiver.last_received_sequence = std::numeric_limits<unsigned short>::max();
 
 	for (int k = 0; k < 10; ++k) {
 		
@@ -487,7 +536,7 @@ TEST(NetChannel, OutOfDatePackets) {
 		if (k == 0) {
 			EXPECT_EQ(5, sender.sequence);
 			EXPECT_EQ(1, sender.ack_sequence);
-			EXPECT_EQ(1, receiver.last_sequence);
+			EXPECT_EQ(1, receiver.last_received_sequence);
 		}
 
 		//EXPECT_EQ(2, sender.reliable_buf.size());

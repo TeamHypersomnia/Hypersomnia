@@ -9,6 +9,7 @@
 #include "game/scene_managers/networked_testbed.h"
 #include "augs/network/network_client.h"
 #include "game/transcendental/step_and_entropy_unpacker.h"
+#include "game/scene_managers/networked_testbed.h"
 
 class game_window;
 
@@ -30,6 +31,28 @@ class server_setup : public setup_base {
 	std::condition_variable cv;
 
 	volatile bool server_ready = false;
+
+	struct endpoint {
+		augs::network::endpoint_address addr;
+		//std::vector<guid_mapped_entropy> commands;
+		augs::jitter_buffer<guid_mapped_entropy> commands;
+		simulation_exchange::packaged_step next_command;
+		entity_id controlled_entity;
+		bool sent_welcome_message = false;
+		std::string nickname;
+
+		bool operator==(augs::network::endpoint_address b) const {
+			return addr == b;
+		}
+	};
+	
+	cosmos hypersomnia = cosmos(3000);
+
+	std::vector<endpoint> endpoints;
+	scene_managers::networked_testbed_server scene;
+
+	endpoint& get_endpoint(const augs::network::endpoint_address);
+	void disconnect(const augs::network::endpoint_address);
 public:
 	void wait_for_listen_server();
 

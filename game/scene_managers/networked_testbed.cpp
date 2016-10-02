@@ -36,11 +36,10 @@
 #include "game/transcendental/cosmic_delta.h"
 
 namespace scene_managers {
-	entity_id networked_testbed_server::assign_new_character(augs::network::endpoint_address addr) {
+	entity_id networked_testbed_server::assign_new_character() {
 		for (auto& c : characters) {
 			if (!c.occupied) {
 				c.occupied = true;
-				c.endpoint = addr;
 				return c.id;
 			}
 		}
@@ -49,20 +48,11 @@ namespace scene_managers {
 		return entity_id();
 	}
 
-	void networked_testbed_server::free_character(augs::network::endpoint_address addr) {
+	void networked_testbed_server::free_character(const entity_id id) {
 		for (auto& c : characters) {
-			if (c.occupied && c.endpoint == addr) {
+			if (c.id == id) {
+				ensure(c.occupied);
 				c.occupied = false;
-			}
-		}
-
-		ensure(false);
-	}
-
-	entity_id networked_testbed_server::get_character(augs::network::endpoint_address addr) {
-		for (auto& c : characters) {
-			if (c.occupied && c.endpoint == addr) {
-				return c.id;
 			}
 		}
 

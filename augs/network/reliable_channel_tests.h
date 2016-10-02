@@ -36,7 +36,7 @@ TEST(NetChannelWrapper, SingleTransmissionDeleteAllPending) {
 	EXPECT_EQ(1, a.sender.sequence);
 	EXPECT_EQ(1, a.sender.ack_sequence);
 
-	EXPECT_EQ(1, b.receiver.last_sequence);
+	EXPECT_EQ(1, b.receiver.last_received_sequence);
 }
 
 TEST(NetChannelWrapper, PastAcknowledgementDeletesSeveralPending) {
@@ -81,7 +81,7 @@ TEST(NetChannelWrapper, PastAcknowledgementDeletesSeveralPending) {
 	EXPECT_EQ(5, a.sender.reliable_buf.size());
 	EXPECT_EQ(1, a.sender.ack_sequence);
 
-	EXPECT_EQ(1, b.receiver.last_sequence);
+	EXPECT_EQ(1, b.receiver.last_received_sequence);
 }
 
 TEST(NetChannelWrapper, FlagForDeletionAndAck) {
@@ -151,5 +151,5 @@ TEST(NetChannelWrapper, FlagForDeletionAndAck) {
 	//EXPECT_EQ(msg + 7, a.sender.reliable_buf[0].output_bitstream);
 	//EXPECT_EQ(msg + 8, a.sender.reliable_buf[1].output_bitstream);
 
-	EXPECT_EQ(1, b.receiver.last_sequence);
+	EXPECT_EQ(1, b.receiver.last_received_sequence);
 }
