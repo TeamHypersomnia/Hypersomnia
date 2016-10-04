@@ -18,6 +18,7 @@ void config_values::get_values(game_window& w) {
 	set(NVP(alternative_port));
 
 	set(NVP(nickname));
+	set(NVP(debug_second_nickname));
 
 	set(NVP(tickrate));
 

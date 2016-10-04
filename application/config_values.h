@@ -18,6 +18,7 @@ public:
 	unsigned short alternative_port = 0;
 
 	std::string nickname;
+	std::string debug_second_nickname;
 
 	unsigned tickrate = 0;
 

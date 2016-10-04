@@ -72,7 +72,7 @@ void client_setup::init(game_window& window, const std::string recording_filenam
 		
 		augs::stream welcome;
 		augs::write_object(welcome, network_command::CLIENT_WELCOME_MESSAGE);
-		augs::write_object(welcome, cfg.nickname);
+		augs::write_object(welcome, use_alternative_port ? cfg.debug_second_nickname : cfg.nickname);
 
 		client.post_redundant(welcome);
 
