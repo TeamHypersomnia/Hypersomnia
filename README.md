@@ -32,3 +32,11 @@ You will be added to our TeamHypersomnia organization once we accept at least on
 If you have questions, just ask me via mail: patryk.czachurski@gmail.com
 
 Or if you just can't wait to utter some brilliant suggestions regarding the game, please do so, too!
+
+# Launching
+
+You might want to properly configure config.lua before launching the game.
+
+**Explanation of values:**
+
+*launch_mode*:
