@@ -27,7 +27,7 @@ void local_setup::process(game_window& window) {
 
 	step_and_entropy_unpacker input_unpacker;
 	scene_managers::testbed testbed;
-	testbed.test_var = window.config.test_var;
+	testbed.debug_var = window.config.debug_var;
 
 	if (!hypersomnia.load_from_file("save.state")) {
 		hypersomnia.set_fixed_delta(augs::fixed_delta(cfg.tickrate));

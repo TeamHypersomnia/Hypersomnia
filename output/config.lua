@@ -46,9 +46,9 @@ config_table = {
 	
 	interpolation_speed = 525,
 
-	test_var = 0,
-	test_randomize_entropies_in_client_setup = 1,
-	test_randomize_entropies_in_client_setup_once_every_steps = 1,
+	debug_var = 0,
+	debug_randomize_entropies_in_client_setup = 1,
+	debug_randomize_entropies_in_client_setup_once_every_steps = 1,
 
 	server_launch_http_daemon = 1,
 	server_http_daemon_port = 80,

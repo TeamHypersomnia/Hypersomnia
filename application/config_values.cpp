@@ -32,9 +32,9 @@ void config_values::get_values(game_window& w) {
 
 	set(NVP(interpolation_speed));
 
-	set(NVP(test_var));
-	set(NVP(test_randomize_entropies_in_client_setup));
-	set(NVP(test_randomize_entropies_in_client_setup_once_every_steps));
+	set(NVP(debug_var));
+	set(NVP(debug_randomize_entropies_in_client_setup));
+	set(NVP(debug_randomize_entropies_in_client_setup_once_every_steps));
 
 	set(NVP(server_launch_http_daemon));
 	set(NVP(server_http_daemon_port));

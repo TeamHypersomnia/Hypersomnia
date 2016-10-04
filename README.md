@@ -85,13 +85,13 @@ doublebuffer:*
 *client_commands_jitter_buffer_ms*:
 - Server-side jitter buffer time for client commands. Useful for lag simulation.
 
-*test_var*:
+*debug_var*:
 - Reserved for experimental use, don't touch.
 
-*test_randomize_entropies_in_client_setup*:
+*debug_randomize_entropies_in_client_setup*:
 - Used by the server to inject random inputs to the other players to examine and test lag compensation strategies.
 
-*test_randomize_entropies_in_client_setup_once_every_steps*:
+*debug_randomize_entropies_in_client_setup_once_every_steps*:
 - How often the above input injection happens. The less it is, the more erratic the movements are.
 
 *server_launch_http_daemon*:

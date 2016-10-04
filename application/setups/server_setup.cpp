@@ -260,9 +260,9 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 
 			guid_mapped_entropy total_unpacked_entropy;
 			
-			if (cfg.test_randomize_entropies_in_client_setup) {
+			if (cfg.debug_randomize_entropies_in_client_setup) {
 				for (size_t i = 1; i < scene.characters.size(); ++i) {
-					if (test_entropy_randomizer.randval(0u, cfg.test_randomize_entropies_in_client_setup_once_every_steps) == 0u) {
+					if (test_entropy_randomizer.randval(0u, cfg.debug_randomize_entropies_in_client_setup_once_every_steps) == 0u) {
 						const unsigned which = test_entropy_randomizer.randval(0, 4);
 
 						entity_intent new_intent;
