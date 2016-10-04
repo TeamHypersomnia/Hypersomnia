@@ -40,15 +40,34 @@ You might want to properly configure config.lua before launching the game.
 **Explanation of values:**
 
 *launch_mode*:
-- **LOCAL** - will launch the game locally without networking at all.
-- **LOCAL_DETERMINISM_TEST** - same as **LOCAL**, but will launch *determinism_test_cloned_cosmoi_count* copies of the world running in parallel to whom applied are exactly the same inputs. If the worlds differ at some point, the game will hit an assertion.
-- **ONLY_CLIENT** - will use value *connect_address* and *connect_port* to connect to a remote host and start the multiplayer simulation.
-- **ONLY_SERVER** - will use *server_port* to setup a listenserver without a game client.
+- **LOCAL** - Will launch the game locally without networking at all.
+- **LOCAL_DETERMINISM_TEST** - Same as **LOCAL**, but will launch *determinism_test_cloned_cosmoi_count* copies of the world running in parallel to whom applied are exactly the same inputs. If the worlds differ at some point, the game will hit an assertion.
+- **ONLY_CLIENT** - Will use *connect_address* and *connect_port* to connect to a remote host and start the multiplayer simulation.
+- **ONLY_SERVER** - Will use *server_port* to setup a listenserver without a game client.
 - **CLIENT_AND_SERVER** - **ONLY_SERVER** and **ONLY_CLIENT** in the same process.
 - **TWO_CLIENTS_AND_SERVER** - **ONLY_SERVER** and two clients on split-screen. For debugging purposes. The server will use *alternative_server_port* for the second connection.
+
+*determinism_test_cloned_cosmoi_count*:
+- See **LOCAL_DETERMINISM_TEST**.
+
+*window_name,
+fullscreen,
+window_border,
+window_x,
+window_y,
+bpp,
+resolution_w,
+resolution_h,
+doublebuffer:*
+- Self explanatory.
 
 *debug_disable_cursor_clipping*:
 - Flag. **1** disables the cursor clipping so that it is easier to mark a breakpoint, for example. **0** for normal playing.
 
+*mouse_sensitivity*:
+- vec2. Sensitivity of mouse movement in-game.
+
 *tickrate*:
 - Frequency of the simulation. **1/tickrate** equals the fixed delta time in seconds, so tickrate = 60 means that the logical step advances the simulation about around **16 milliseconds**.
+
+
