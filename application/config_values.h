@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "augs/math/vec2.h"
 
 class game_window;
 
@@ -19,6 +20,8 @@ public:
 
 	std::string nickname;
 	std::string debug_second_nickname;
+
+	vec2 mouse_sensitivity;
 
 	unsigned tickrate = 0;
 

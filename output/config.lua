@@ -27,7 +27,7 @@ config_table = {
 
 	debug_disable_cursor_clipping = 0,
 	
-	sensitivity = vec2(1.5, 1.5),
+	mouse_sensitivity = vec2(1.5, 1.5),
 	
 	connect_address = "192.168.1.2",
 	connect_port = 13372,

@@ -15,22 +15,14 @@ class game_window {
 	std::mutex lua_mutex;
 	window::glwindow window;
 
-	double get_config_number(const std::string& field);
-	bool get_flag(const std::string& field);
-	std::string get_config_string(const std::string& field);
-
 	template<class T>
-	void get_config_value(T& into, const std::string& field) {
-		into = static_cast<T>(get_config_number(field));
+	void get_config_value(const std::string& field, T& into) {
+		std::unique_lock<std::mutex> lock(lua_mutex);
+
+		into = luabind::object_cast<T>(luabind::globals(lua.raw)["config_table"][field]);
 	}
 
-	void get_config_value(std::string& into, const std::string& field) {
-		into = get_config_string(field);
-	}
-
-	void get_config_value(bool& into, const std::string& field) {
-		into = get_flag(field);
-	}
+	void get_config_value(const std::string& field, bool& into);
 
 public:
 	game_window();
