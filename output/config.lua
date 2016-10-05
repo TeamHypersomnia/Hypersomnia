@@ -11,7 +11,7 @@ launch_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.CLIENT_AND_SERVER,
+	launch_mode = launch_modes.LOCAL,
 	
 	determinism_test_cloned_cosmoi_count = 2,
 
@@ -19,15 +19,15 @@ config_table = {
 	fullscreen = 0,
 	window_border = 1,
 	window_x = 400,
-	window_y = 100,
+	window_y = 0,
 	bpp = 24,
-	resolution_w = 720,
-	resolution_h = 720,
+	resolution_w = 1000,
+	resolution_h = 1000,
 	doublebuffer = 1,
 
-	debug_disable_cursor_clipping = 1,
+	debug_disable_cursor_clipping = 0,
 	
-	sensitivity = vec2(1.5, 1.5),
+	mouse_sensitivity = vec2(1.5, 1.5),
 	
 	connect_address = "192.168.1.2",
 	connect_port = 13372,
@@ -36,25 +36,26 @@ config_table = {
 
 	alternative_port = 13373,
 	
-	nickname = "PROLAND## Ra[FFA]ł",
+	nickname = "Pythagoras",
+	debug_second_nickname = "BOT Ferrero Roche",
 	
 	tickrate = 60,
 
 	jitter_buffer_ms = 50,
-	client_commands_jitter_buffer_ms = 30,
+	client_commands_jitter_buffer_ms = 130,
 	
 	interpolation_speed = 525,
 
-	test_var = 0,
-	test_randomize_entropies_in_client_setup = 0,
-	test_randomize_entropies_in_client_setup_once_every_steps = 1,
+	debug_var = 0,
+	debug_randomize_entropies_in_client_setup = 1,
+	debug_randomize_entropies_in_client_setup_once_every_steps = 1,
 
 	server_launch_http_daemon = 1,
 	server_http_daemon_port = 80,
 	server_http_daemon_html_file_path = "web/session_report.html"
 }
 
-if debug_disable_cursor_clipping == 0 then
+if config_table.debug_disable_cursor_clipping == 0 then
 	set_cursor_visible(0)
 end
 

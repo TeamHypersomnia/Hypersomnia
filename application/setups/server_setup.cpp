@@ -260,9 +260,9 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 
 			guid_mapped_entropy total_unpacked_entropy;
 			
-			if (cfg.test_randomize_entropies_in_client_setup) {
+			if (cfg.debug_randomize_entropies_in_client_setup) {
 				for (size_t i = 1; i < scene.characters.size(); ++i) {
-					if (test_entropy_randomizer.randval(0u, cfg.test_randomize_entropies_in_client_setup_once_every_steps) == 0u) {
+					if (test_entropy_randomizer.randval(0u, cfg.debug_randomize_entropies_in_client_setup_once_every_steps) == 0u) {
 						const unsigned which = test_entropy_randomizer.randval(0, 4);
 
 						entity_intent new_intent;
@@ -337,7 +337,7 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 				this_step_stats += typesafe_sprintf("Players online: %x%x%x", whb, endpoints.size(), whe);
 
 				if (endpoints.size() > 0) {
-					this_step_stats += "\nEndpoint details:\n\n";
+					this_step_stats += "\nPlayer list:\n\n";
 				}
 
 				for (size_t i = 0; i < endpoints.size(); ++i) {
@@ -347,7 +347,7 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 						auto pos = character.logic_transform().pos;
 						auto vel = velocity(character);
 
-						this_step_stats += typesafe_sprintf("#%x%x%x %x (%x%x%x)\nPos: %x%x%x\nVel: %x%x%x", whb, i, whe, endpoints[i].nickname, ipb, endpoints[i].addr.get_readable_ip(), ipe, whb, pos, whe, whb, vel, whe);
+						this_step_stats += typesafe_sprintf("#%x%x%x %x (%x%x%x)\nPos: %x%x%x\nVel: %x%x%x", whb, i+1, whe, endpoints[i].nickname, ipb, endpoints[i].addr.get_readable_ip(), ipe, whb, pos, whe, whb, vel, whe);
 					}
 
 					this_step_stats += "\n\n";

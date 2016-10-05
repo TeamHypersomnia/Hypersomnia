@@ -1,10 +1,13 @@
+#include "lua.hpp"
+#include <luabind/luabind.hpp>
+
 #include "config_values.h"
 #include "game_window.h"
 
 #define NVP(x) x, #x
 
 void config_values::get_values(game_window& w) {
-	auto set = [&w](auto& c, const std::string& ss) { w.get_config_value(c, ss); };
+	auto set = [&w](auto& c, const std::string& ss) { w.get_config_value(ss, c); };
 
 	set(NVP(launch_mode));
 
@@ -12,12 +15,15 @@ void config_values::get_values(game_window& w) {
 
 	set(NVP(debug_disable_cursor_clipping));
 
+	set(NVP(mouse_sensitivity));
+
 	set(NVP(connect_address));
 	set(NVP(connect_port));
 	set(NVP(server_port));
 	set(NVP(alternative_port));
 
 	set(NVP(nickname));
+	set(NVP(debug_second_nickname));
 
 	set(NVP(tickrate));
 
@@ -26,9 +32,9 @@ void config_values::get_values(game_window& w) {
 
 	set(NVP(interpolation_speed));
 
-	set(NVP(test_var));
-	set(NVP(test_randomize_entropies_in_client_setup));
-	set(NVP(test_randomize_entropies_in_client_setup_once_every_steps));
+	set(NVP(debug_var));
+	set(NVP(debug_randomize_entropies_in_client_setup));
+	set(NVP(debug_randomize_entropies_in_client_setup_once_every_steps));
 
 	set(NVP(server_launch_http_daemon));
 	set(NVP(server_http_daemon_port));

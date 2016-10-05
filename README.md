@@ -32,3 +32,73 @@ You will be added to our TeamHypersomnia organization once we accept at least on
 If you have questions, just ask me via mail: patryk.czachurski@gmail.com
 
 Or if you just can't wait to utter some brilliant suggestions regarding the game, please do so, too!
+
+# Launching
+
+You might want to properly configure config.lua before launching the game.
+
+**Explanation of values:**
+
+*launch_mode*:
+- **LOCAL** - Will launch the game locally without networking at all.
+- **LOCAL_DETERMINISM_TEST** - Same as **LOCAL**, but will launch *determinism_test_cloned_cosmoi_count* copies of the world running in parallel to whom applied are exactly the same inputs. If the worlds differ at some point, the game will hit an assertion.
+- **ONLY_CLIENT** - Will use *connect_address* and *connect_port* to connect to a remote host and start the multiplayer simulation.
+- **ONLY_SERVER** - Will use *server_port* to setup a listenserver without a game client.
+- **CLIENT_AND_SERVER** - **ONLY_SERVER** and **ONLY_CLIENT** in the same process.
+- **TWO_CLIENTS_AND_SERVER** - **ONLY_SERVER** and two clients on split-screen. For debugging purposes. The server will use *alternative_server_port* for the second connection.
+
+*determinism_test_cloned_cosmoi_count*:
+- See **LOCAL_DETERMINISM_TEST**.
+
+*window_name,
+fullscreen,
+window_border,
+window_x,
+window_y,
+bpp,
+resolution_w,
+resolution_h,
+doublebuffer:*
+- Self explanatory.
+
+*debug_disable_cursor_clipping*:
+- Flag. **1** disables the cursor clipping so that it is easier to mark a breakpoint, for example. **0** is for normal playing.
+
+*mouse_sensitivity*:
+- vec2. Sensitivity of mouse movement in-game.
+
+*connect_address, connect_port, server_port, alternative_port*:
+- Network variables. See *launch_mode* for details.
+
+*nickname*:
+- Client-chosen nickname of the controlled character.
+
+*debug_second_nickname*:
+- Client-chosen nickname of the second controlled character used in **launch_mode.TWO_CLIENTS_AND_SERVER**.
+
+*tickrate*:
+- Frequency of the simulation. **1/tickrate** equals the fixed delta time in seconds, so tickrate = 60 means that the logical step advances the simulation about around **16 milliseconds**.
+
+*jitter_buffer_ms*:
+- Client-side jitter buffer time to preserve smooth display of the past. The bigger the value, the bigger the lag.
+
+*client_commands_jitter_buffer_ms*:
+- Server-side jitter buffer time for client commands. Useful for lag simulation.
+
+*debug_var*:
+- Reserved for experimental use, don't touch.
+
+*debug_randomize_entropies_in_client_setup*:
+- Used by the server to inject random inputs to the other players to examine and test lag compensation strategies.
+
+*debug_randomize_entropies_in_client_setup_once_every_steps*:
+- How often the above input injection happens. The less it is, the more erratic the movements are.
+
+*server_launch_http_daemon*:
+- Flag. **1** will launch a http daemon on the localhost in a separate thread which samples the server statistics. Used as a widget on http://hypersomnia.pl
+
+*server_http_daemon_port*:
+- What port to open the web daemon on. Recommended value: **80**.
+
+*server_http_daemon_html_file_path*:
+- Format of the broadcasted widget.

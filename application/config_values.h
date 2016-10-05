@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "augs/math/vec2.h"
 
 class game_window;
 
@@ -18,6 +19,9 @@ public:
 	unsigned short alternative_port = 0;
 
 	std::string nickname;
+	std::string debug_second_nickname;
+
+	vec2 mouse_sensitivity;
 
 	unsigned tickrate = 0;
 
@@ -26,9 +30,9 @@ public:
 
 	double interpolation_speed = 0;
 
-	int test_var = 0;
-	bool test_randomize_entropies_in_client_setup = 0;
-	unsigned test_randomize_entropies_in_client_setup_once_every_steps = 0;
+	int debug_var = 0;
+	bool debug_randomize_entropies_in_client_setup = 0;
+	unsigned debug_randomize_entropies_in_client_setup_once_every_steps = 0;
 
 	bool server_launch_http_daemon = 0;
 	unsigned short server_http_daemon_port = 0;
