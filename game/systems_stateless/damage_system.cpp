@@ -33,14 +33,14 @@ void damage_system::destroy_colliding_bullets_and_send_damage(fixed_step& step) 
 		if (it.type != messages::collision_message::event_type::BEGIN_CONTACT || it.one_is_sensor) 
 			continue;
 
-		auto subject_handle = cosmos[it.subject];
-		auto collider_handle = cosmos[it.collider];
+		const auto subject_handle = cosmos[it.subject];
+		const auto collider_handle = cosmos[it.collider];
 
 		if (collider_handle.has<components::damage>()) {
 			auto& damage = collider_handle.get<components::damage>();
-			auto sender = cosmos[damage.sender];
+			const auto sender = cosmos[damage.sender];
 
-			bool bullet_colliding_with_sender = sender.get_owner_body() == subject_handle.get_owner_body();
+			const bool bullet_colliding_with_sender = sender.get_owner_body() == subject_handle.get_owner_body();
 			bool bullet_colliding_with_senders_vehicle = false;
 
 			{
@@ -78,9 +78,9 @@ void damage_system::destroy_colliding_bullets_and_send_damage(fixed_step& step) 
 
 				damage.saved_point_of_impact_before_death = it.point;
 
-				auto owning_capability = subject_handle.get_owning_transfer_capability();
+				const auto owning_capability = subject_handle.get_owning_transfer_capability();
 
-				bool is_victim_a_held_item = owning_capability.alive() && owning_capability != it.subject;
+				const bool is_victim_a_held_item = owning_capability.alive() && owning_capability != it.subject;
 
 				if (!is_victim_a_held_item && damage.destroy_upon_damage) {
 					damage.damage_charges_before_destruction--;
@@ -97,8 +97,8 @@ void damage_system::destroy_colliding_bullets_and_send_damage(fixed_step& step) 
 void damage_system::destroy_outdated_bullets(fixed_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
-	auto targets_copy = cosmos.get(processing_subjects::WITH_DAMAGE);
-	for (const auto& it : targets_copy) {
+
+	for (const auto& it : cosmos.get(processing_subjects::WITH_DAMAGE)) {
 		auto& damage = it.get<components::damage>();
 	
 		if ((damage.constrain_lifetime && damage.lifetime_ms >= damage.max_lifetime_ms) ||
