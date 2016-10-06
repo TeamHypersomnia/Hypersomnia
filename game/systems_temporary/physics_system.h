@@ -8,6 +8,8 @@
 
 #include "game/messages/collision_message.h"
 
+#include "game/detail/convex_partitioned_shape.h"
+
 #include <set>
 
 class cosmos;
@@ -26,6 +28,9 @@ struct colliders_cache {
 class physics_system {
 	std::vector<colliders_cache> colliders_caches;
 	std::vector<rigid_body_cache> rigid_body_caches;
+
+	std::pair<size_t, size_t> map_fixture_pointer_to_indices(b2Fixture* f, const const_entity_handle&);
+	convex_partitioned_shape::convex_poly::destruction_data& map_fixture_pointer_to_convex_poly(b2Fixture* f, const entity_handle&);
 
 	void reserve_caches_for_entities(size_t n);
 	void fixtures_construct(const_entity_handle);

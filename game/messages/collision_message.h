@@ -7,6 +7,8 @@ namespace messages {
 		entity_id collider;
 		vec2 collider_impact_velocity, subject_impact_velocity, point;
 
+		std::pair<size_t, size_t> subject_collider_and_convex_indices;
+
 		bool one_is_sensor = false;
 
 		bool operator<(const collision_message& b) const {

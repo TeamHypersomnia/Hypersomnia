@@ -102,7 +102,7 @@ void sentience_system::consume_health_event(messages::health_event h, fixed_step
 }
 
 void sentience_system::apply_damage_and_generate_health_events(fixed_step& step) const {
-	auto& damages = step.messages.get_queue<messages::damage_message>();
+	const auto& damages = step.messages.get_queue<messages::damage_message>();
 	auto& healths = step.messages.get_queue<messages::health_event>();
 	auto& cosmos = step.cosm;
 

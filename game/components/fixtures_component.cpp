@@ -34,7 +34,7 @@ augs::rects::ltrb<float> basic_fixtures_synchronizer<C>::get_aabb_rect() const {
 	
 	for (auto& s : component.colliders) {
 		for (auto& c : s.shape.convex_polys) {
-			for (auto& v : c) {
+			for (auto& v : c.vertices) {
 				all_verts.push_back(v);
 			}
 		}
@@ -47,6 +47,11 @@ template<bool C>
 size_t basic_fixtures_synchronizer<C>::get_num_colliders() const {
 	return component.colliders.size();
 }
+
+template<bool C>
+const components::fixtures::convex_partitioned_collider& basic_fixtures_synchronizer<C>::get_collider_data(const size_t i) {
+	return component.colliders[i];
+;}
 
 template<bool C>
 bool basic_fixtures_synchronizer<C>::is_friction_ground() const {
@@ -92,6 +97,10 @@ void component_synchronizer<false, F>::set_density(float d, size_t index) const 
 		return;
 
 	rebuild_density(index);
+}
+
+convex_partitioned_shape::convex_poly::destruction_data& component_synchronizer<false, F>::get_modifiable_destruction_data(const std::pair<size_t, size_t> indices) {
+	return component.colliders[indices.first].shape.convex_polys[indices.second].destruction;
 }
 
 void component_synchronizer<false, F>::set_density_multiplier(float mult, size_t index) const {

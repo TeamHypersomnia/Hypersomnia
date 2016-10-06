@@ -24,6 +24,7 @@
 #include "game/systems_stateless/trace_system.h"
 #include "game/systems_stateless/melee_system.h"
 #include "game/systems_stateless/sentience_system.h"
+#include "game/systems_stateless/destruction_system.h"
 
 #include "game/enums/render_layer.h"
 
@@ -438,6 +439,9 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 
 	damage_system().destroy_outdated_bullets(step);
 	damage_system().destroy_colliding_bullets_and_send_damage(step);
+
+	destruction_system().generate_damages_from_forceful_collisions(step);
+	destruction_system().apply_damages_and_split_fixtures(step);
 
 	sentience_system().apply_damage_and_generate_health_events(step);
 	systems_temporary.get<physics_system>().post_and_clear_accumulated_collision_messages(step);

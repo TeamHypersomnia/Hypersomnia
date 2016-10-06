@@ -121,7 +121,7 @@ void physics_system::fixtures_construct(const_entity_handle handle) {
 				std::vector<b2Fixture*> partitioned_collider;
 
 				for (auto convex : transformed_shape.convex_polys) {
-					std::vector<b2Vec2> b2verts(convex.begin(), convex.end());
+					std::vector<b2Vec2> b2verts(convex.vertices.begin(), convex.vertices.end());
 
 					for (auto& v : b2verts)
 						v *= PIXELS_TO_METERSf;
@@ -191,6 +191,25 @@ void physics_system::construct(const_entity_handle handle) {
 void physics_system::reserve_caches_for_entities(size_t n) {
 	rigid_body_caches.resize(n);
 	colliders_caches.resize(n);
+}
+
+std::pair<size_t, size_t> physics_system::map_fixture_pointer_to_indices(b2Fixture* f, const const_entity_handle& handle) {
+	const auto this_cache_id = handle.get_id().pool.indirection_index;
+	const auto& cache = colliders_caches[this_cache_id];
+
+	for (size_t collider_index = 0; collider_index < cache.fixtures_per_collider.size(); ++collider_index) {
+		for (size_t convex_index = 0; convex_index < cache.fixtures_per_collider.size(); ++convex_index) {
+			if (cache.fixtures_per_collider[collider_index][convex_index] == f) {
+				return std::make_pair(collider_index, convex_index);
+			}
+		}
+	}
+}
+
+convex_partitioned_shape::convex_poly::destruction_data& physics_system::map_fixture_pointer_to_convex_poly(b2Fixture* f, const entity_handle& handle) {
+	const auto indices = map_fixture_pointer_to_indices(f, handle);
+
+	return handle.get<components::fixtures>().component.colliders[indices.first].shape.convex_polys[indices.second].destruction;
 }
 
 physics_system::physics_system() : 

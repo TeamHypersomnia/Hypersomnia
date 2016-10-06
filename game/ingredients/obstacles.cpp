@@ -8,7 +8,7 @@ namespace prefabs {
 
 		name_entity(crate, entity_name::CRATE);
 		ingredients::sprite_scalled(crate, pos, size, assets::texture_id::CRATE, augs::white, render_layer::DYNAMIC_BODY);
-		ingredients::standard_dynamic_body(crate);
+		ingredients::standard_dynamic_body(crate, true);
 
 		crate.add_standard_components();
 

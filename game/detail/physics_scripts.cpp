@@ -72,7 +72,7 @@ std::vector<b2Vec2> get_world_vertices(const_entity_handle subject, bool meters,
 
 	auto& b = subject.get<components::physics>();
 
-	const auto& verts = subject.get<components::fixtures>().get_data().colliders[0].shape.convex_polys[fixture_num];
+	const auto& verts = subject.get<components::fixtures>().get_data().colliders[0].shape.convex_polys[fixture_num].vertices;
 
 	/* for every vertex in given fixture's shape */
 	for (auto& v : verts) {

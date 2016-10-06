@@ -18,7 +18,7 @@ void convex_partitioned_shape::add_convex_polygon(const convex_poly& verts) {
 
 void convex_partitioned_shape::offset_vertices(components::transform transform) {
 	for (auto& c : convex_polys) {
-		for (auto& v : c) {
+		for (auto& v : c.vertices) {
 			v.rotate(transform.rotation, vec2(0, 0));
 			v += transform.pos;
 		}
@@ -27,11 +27,11 @@ void convex_partitioned_shape::offset_vertices(components::transform transform) 
 
 void convex_partitioned_shape::mult_vertices(vec2 mult) {
 	for (auto& c : convex_polys) {
-		for (auto& v : c) {
+		for (auto& v : c.vertices) {
 			v *= mult;
 		}
 
-		std::reverse(c.begin(), c.end());
+		std::reverse(c.vertices.begin(), c.vertices.end());
 	}
 
 #if ENABLE_POLYGONIZATION
@@ -90,7 +90,7 @@ void convex_partitioned_shape::from_sprite(const components::sprite& sprite, boo
 		convex_poly new_convex_polygon;
 
 		for (int i = 0; i < shape.GetVertexCount(); ++i)
-			new_convex_polygon.push_back(vec2(shape.GetVertex(i))*METERS_TO_PIXELSf);
+			new_convex_polygon.vertices.push_back(vec2(shape.GetVertex(i))*METERS_TO_PIXELSf);
 
 		add_convex_polygon(new_convex_polygon);
 	}
@@ -140,32 +140,35 @@ void convex_partitioned_shape::add_concave_polygon(const std::vector <vec2> &ver
 
 			while (first + max_vertices - 2 < new_convex.size() - 1) {
 				convex_poly new_poly;
-				new_poly.push_back(new_convex[0]);
+				new_poly.vertices.push_back(new_convex[0]);
 				//new_poly.insert(new_poly.end(), new_convex.begin() + first, new_convex.begin() + first + max_vertices - 2 + 1);
 				auto s = new_convex.begin() + first;
 				auto e = new_convex.begin() + first + max_vertices - 2 + 1;
 				
 				while (s != e)
-					new_poly.push_back(*s++);
+					new_poly.vertices.push_back(*s++);
 
 				convex_polys.push_back(new_poly);
 				first += max_vertices - 2;
 			}
 
 			convex_poly last_poly;
-			last_poly.push_back(new_convex[0]);
-			last_poly.push_back(new_convex[first]);
+			last_poly.vertices.push_back(new_convex[0]);
+			last_poly.vertices.push_back(new_convex[first]);
 
 			// last_poly.insert(last_poly.end(), new_convex.begin() + first, new_convex.end());
 			auto s = new_convex.begin() + first;
 			auto e = new_convex.end();
 
 			while (s != e)
-				last_poly.push_back(*s++);
+				last_poly.vertices.push_back(*s++);
 
 			convex_polys.push_back(last_poly);
 		}
-		else
-			convex_polys.push_back(convex_poly(new_convex.begin(), new_convex.end()));
+		else {
+			convex_poly new_poly;
+			new_poly.vertices.assign(new_convex.begin(), new_convex.end());
+			convex_polys.push_back(new_poly);
+		}
 	}
 }

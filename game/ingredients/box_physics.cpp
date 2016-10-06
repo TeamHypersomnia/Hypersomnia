@@ -7,7 +7,7 @@
 #include "game/transcendental/entity_handle.h"
 
 namespace ingredients {
-	void standard_dynamic_body(entity_handle e) {
+	void standard_dynamic_body(const entity_handle e, const bool destructible) {
 		components::physics def;
 
 		if (e.has<components::transform>()) {
@@ -21,6 +21,7 @@ namespace ingredients {
 
 		auto& info = colliders.new_collider();
 		info.shape.from_sprite(e.get<components::sprite>(), true);
+		info.destructible = destructible;
 
 		info.filter = filters::dynamic_object();
 		info.density = 1;

@@ -21,7 +21,21 @@ public:
 		CIRCLE
 	} type = shape_type::POLYGON;
 
-	typedef augs::constant_size_vector<vec2, CONVEX_POLY_VERTEX_COUNT> convex_poly;
+	struct destruction_scar {
+		vec2 first_impact;
+		vec2 depth_point;
+	};
+
+	struct convex_poly {
+		augs::constant_size_vector<vec2, CONVEX_POLY_VERTEX_COUNT> vertices;
+
+		struct destruction_data {
+			augs::constant_size_vector<destruction_scar, DESTRUCTION_SCARS_COUNT> scars;
+		};
+
+		destruction_data destruction;
+	};
+	
 	augs::constant_size_vector<convex_poly, CONVEX_POLYS_COUNT> convex_polys;
 
 #if ENABLE_POLYGONIZATION

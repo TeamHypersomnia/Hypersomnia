@@ -29,7 +29,7 @@ namespace components {
 			float restitution = 0.f;
 			
 			b2Filter filter;
-			padding_byte pad;
+			bool destructible = false;
 			bool sensor = false;
 
 			template <class Archive>
@@ -103,6 +103,7 @@ public:
 	vec2 get_aabb_size() const;
 	augs::rects::ltrb<float> get_aabb_rect() const;
 
+	const components::fixtures::convex_partitioned_collider& get_collider_data(size_t i);
 	size_t get_num_colliders() const;
 
 	bool is_friction_ground() const;
@@ -118,6 +119,8 @@ class component_synchronizer<false, components::fixtures> : public basic_fixture
 
 public:
 	using basic_fixtures_synchronizer<false>::basic_fixtures_synchronizer;
+
+	convex_partitioned_shape::convex_poly::destruction_data& get_modifiable_destruction_data(const std::pair<size_t, size_t>);
 
 	void set_density(float, size_t = 0) const;
 	void set_density_multiplier(float, size_t = 0) const;

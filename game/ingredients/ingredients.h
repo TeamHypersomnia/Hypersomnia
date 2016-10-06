@@ -27,7 +27,7 @@ namespace ingredients {
 	void bullet_round_physics(entity_handle);
 	void see_through_dynamic_body(entity_handle);
 	void shell_dynamic_body(entity_handle);
-	void standard_dynamic_body(entity_handle);
+	void standard_dynamic_body(entity_handle, const bool destructible = false);
 	void standard_static_body(entity_handle);
 
 	void wsad_character_physics(entity_handle);

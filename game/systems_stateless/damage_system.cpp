@@ -26,7 +26,7 @@ using namespace augs;
 void damage_system::destroy_colliding_bullets_and_send_damage(fixed_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
-	auto events = step.messages.get_queue<messages::collision_message>();
+	const auto& events = step.messages.get_queue<messages::collision_message>();
 	step.messages.get_queue<messages::damage_message>().clear();
 
 	for (const auto& it : events) {
