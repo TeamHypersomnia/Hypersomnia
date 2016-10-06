@@ -16,14 +16,11 @@ class convex_partitioned_shape {
 public:
 	float radius = 0.f;
 
-	enum {
-		RECT,
+	enum class shape_type {
 		POLYGON,
 		CIRCLE
-	} type = RECT;
+	} type = shape_type::POLYGON;
 
-	vec2 rect_size;
-	
 	typedef augs::constant_size_vector<vec2, CONVEX_POLY_VERTEX_COUNT> convex_poly;
 	augs::constant_size_vector<convex_poly, CONVEX_POLYS_COUNT> convex_polys;
 
@@ -37,8 +34,6 @@ public:
 			CEREAL_NVP(radius),
 
 			CEREAL_NVP(type),
-
-			CEREAL_NVP(rect_size),
 
 			CEREAL_NVP(convex_polys)
 		);

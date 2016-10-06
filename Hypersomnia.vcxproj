@@ -344,6 +344,7 @@
     <ClCompile Include="game\systems_insignificant\interpolation_system.cpp" />
     <ClCompile Include="game\scene_managers\networked_testbed.cpp" />
     <ClCompile Include="game\systems_insignificant\past_infection_system.cpp" />
+    <ClCompile Include="game\systems_stateless\destruction_system.cpp" />
     <ClCompile Include="game\transcendental\cosmic_delta.cpp" />
     <ClCompile Include="game\transcendental\cosmic_entropy.cpp" />
     <ClCompile Include="game\components\dynamic_tree_node_component.cpp" />
@@ -1009,6 +1010,7 @@
     <ClInclude Include="game\systems_insignificant\interpolation_system.h" />
     <ClInclude Include="game\scene_managers\networked_testbed.h" />
     <ClInclude Include="game\systems_insignificant\past_infection_system.h" />
+    <ClInclude Include="game\systems_stateless\destruction_system.h" />
     <ClInclude Include="game\transcendental\component_synchronizer.h" />
     <ClInclude Include="game\transcendental\cosmic_delta.h" />
     <ClInclude Include="game\transcendental\cosmic_entropy.h" />

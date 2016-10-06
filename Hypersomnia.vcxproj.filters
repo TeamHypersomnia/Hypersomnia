@@ -1080,6 +1080,9 @@
     <ClCompile Include="game\systems_insignificant\past_infection_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\systems_stateless\destruction_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3273,6 +3276,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\systems_insignificant\past_infection_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\systems_stateless\destruction_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

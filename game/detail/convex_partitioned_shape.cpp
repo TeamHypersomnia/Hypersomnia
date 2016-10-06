@@ -52,9 +52,9 @@ void convex_partitioned_shape::from_sprite(const components::sprite& sprite, boo
 	auto& polygonized_sprite_verts = resource_manager.find(sprite.tex)->polygonized;
 	auto& image_to_polygonize = resource_manager.find(sprite.tex)->img;
 
-	if (polygonized_sprite_verts.size() > 0 && polygonize_sprite) {
-		type = POLYGON;
+	type = shape_type::POLYGON;
 
+	if (polygonized_sprite_verts.size() > 0 && polygonize_sprite) {
 		auto image_size = image_to_polygonize.get_size();
 		vec2 polygonized_size = vec2i(image_size.w, image_size.h);
 
@@ -82,8 +82,7 @@ void convex_partitioned_shape::from_sprite(const components::sprite& sprite, boo
 		mult_vertices(vec2(1, -1));
 	}
 	else {
-		type = RECT;
-		rect_size = sprite.size;
+		auto rect_size = sprite.size;
 
 		b2PolygonShape shape;
 		shape.SetAsBox(static_cast<float>(rect_size.x) / 2.f * PIXELS_TO_METERSf, static_cast<float>(rect_size.y) / 2.f * PIXELS_TO_METERSf);
@@ -100,7 +99,7 @@ void convex_partitioned_shape::from_sprite(const components::sprite& sprite, boo
 }
 
 void convex_partitioned_shape::from_polygon(const components::polygon& poly) {
-	type = POLYGON;
+	type = shape_type::POLYGON;
 	std::vector <vec2> vv;
 	vv.assign(poly.original_polygon.begin(), poly.original_polygon.end());
 	add_concave_polygon(vv);
