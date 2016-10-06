@@ -11,6 +11,7 @@ class dynamic_tree_system;
 class processing_lists_system;
 
 class interpolation_system;
+class past_infection_system;
 
 typedef augs::storage_for_systems <
 	physics_system,
@@ -19,5 +20,6 @@ typedef augs::storage_for_systems <
 > storage_for_all_systems_temporary;
 
 typedef augs::storage_for_systems <
-	interpolation_system
+	interpolation_system,
+	past_infection_system
 > storage_for_all_systems_insignificant;

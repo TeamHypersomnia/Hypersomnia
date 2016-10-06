@@ -22,5 +22,7 @@ enum class processing_subjects {
 	WITH_TRACE,
 	WITH_TRIGGER_QUERY_DETECTOR,
 	WITH_VISIBILITY,
+	INFECTED_WITH_PAST,
+
 	LIST_COUNT
 };

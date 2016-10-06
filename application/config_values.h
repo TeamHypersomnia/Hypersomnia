@@ -27,7 +27,7 @@ public:
 	unsigned jitter_buffer_ms = 0;
 	unsigned client_commands_jitter_buffer_ms = 0;
 
-	double interpolation_speed = 0;
+	float interpolation_speed = 0;
 
 	int debug_var = 0;
 	bool debug_randomize_entropies_in_client_setup = 0;

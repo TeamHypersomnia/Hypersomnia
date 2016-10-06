@@ -11,7 +11,8 @@ namespace components {
 	struct movement  {
 		struct subscribtion {
 			entity_id target;
-			int stop_response_at_zero_speed = false;
+			bool stop_response_at_zero_speed = false;
+			padding_byte pad[3];
 
 			template <class Archive>
 			void serialize(Archive& ar) {

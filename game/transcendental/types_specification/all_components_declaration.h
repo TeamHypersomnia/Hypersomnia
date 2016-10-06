@@ -38,6 +38,7 @@ namespace components {
 	struct name;
 	struct trace;
 	struct melee;
+	struct past_contagious;
 	struct sentience;
 	struct attitude;
 	struct processing;
@@ -87,6 +88,7 @@ struct put_all_components_into {
 		components::name,
 		components::trace,
 		components::melee,
+		components::past_contagious,
 		components::sentience,
 		components::attitude,
 		components::processing,
