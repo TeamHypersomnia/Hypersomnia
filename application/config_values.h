@@ -6,7 +6,6 @@ class game_window;
 
 class config_values {
 public:
-
 	int launch_mode = 0;
 
 	unsigned determinism_test_cloned_cosmoi_count = 0;
