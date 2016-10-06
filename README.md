@@ -51,7 +51,11 @@ Or if you just can't wait to utter some brilliant suggestions regarding the game
 
 # Contributing
 
-Please notice us of any intents to contribute, because the project is continuously in a very, very active development and may undergo a revolution when it is the least expected.
+We fondly welcome every pull request, should it even be a typo fix or a missing const guarantee.
+
+If you however plan to add a completely new feature, please notice us in advance, because the project is continuously in a very, very active development and may undergo a revolution when it is the least expected.
+
+[Mail](mailto:patryk.czachurski@gmail.com) or [Steam](http://steamcommunity.com/id/hypersomnialeaddev/).
 
 # Launching
 
