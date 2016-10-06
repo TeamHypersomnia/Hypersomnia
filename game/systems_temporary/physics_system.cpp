@@ -17,6 +17,8 @@
 #include "game/transcendental/step.h"
 #include "game/transcendental/entity_handle.h"
 
+#include "augs/graphics/renderer.h"
+
 double METERS_TO_PIXELS = 100.0;
 double PIXELS_TO_METERS = 1.0 / METERS_TO_PIXELS;
 float METERS_TO_PIXELSf = 100.f;
@@ -204,6 +206,9 @@ std::pair<size_t, size_t> physics_system::map_fixture_pointer_to_indices(b2Fixtu
 			}
 		}
 	}
+
+	ensure(false);
+	return{};
 }
 
 convex_partitioned_shape::convex_poly::destruction_data& physics_system::map_fixture_pointer_to_convex_poly(b2Fixture* f, const entity_handle& handle) {

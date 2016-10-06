@@ -46,9 +46,14 @@ namespace scene_managers {
 		const auto crate2 = prefabs::create_crate(world, vec2(400, 200 + 400), vec2i(300, 300));
 		const auto crate4 = prefabs::create_crate(world, vec2(500, 200 + 0), vec2i(100, 100));
 
+		crates.push_back(crate);
+		crates.push_back(crate2);
+		crates.push_back(crate4);
+
 		for (int x = -4; x < 4; ++x) {
 			for (int y = -4; y < 4; ++y) {
 				auto obstacle = prefabs::create_crate(world, vec2(2000 + x * 300, 2000 + y * 300), vec2i(100, 100));
+				crates.push_back(obstacle);
 			}
 		}
 
@@ -340,7 +345,17 @@ namespace scene_managers {
 
 	void testbed::post_solve(fixed_step& step) {
 		auto& cosmos = step.cosm;
+		auto& ln = augs::renderer::get_current().logic_lines;
 
+		for (auto crate : crates) {
+			auto& fixes = cosmos[crate].get<components::fixtures>();
+			
+			auto& dest = fixes.get_modifiable_destruction_data({ 0, 0 });
+
+			for (auto scar : dest.scars) {
+				ln.draw_cyan(scar.first_impact, scar.depth_point);
+			}
+		}
 
 		//for (auto& tested : draw_bodies) {
 		//	auto& s = tested.get<components::physics_definition>();

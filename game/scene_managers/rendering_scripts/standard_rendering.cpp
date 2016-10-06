@@ -70,13 +70,6 @@ namespace rendering_scripts {
 		renderer.call_triangles();
 		renderer.clear_triangles();
 
-		//renderer.draw_debug_info(
-		//	msg.state.visible_world_area, 
-		//	msg.state.camera_transform, 
-		//	assets::texture_id::BLANK, 
-		//	render.targets, 
-		//	render.view_interpolation_ratio());
-
 		//circular_bars_shader.use();
 		//{
 		//	auto projection_matrix_uniform = glGetUniformLocation(circular_bars_shader.id, "projection_matrix");
@@ -124,5 +117,12 @@ namespace rendering_scripts {
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
+
+		renderer.draw_debug_info(
+			state.visible_world_area,
+			state.camera_transform,
+			assets::texture_id::BLANK,
+			{},
+			interpolation_ratio);
 	}
 }

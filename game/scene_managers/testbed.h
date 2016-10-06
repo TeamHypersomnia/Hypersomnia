@@ -27,6 +27,7 @@ namespace scene_managers {
 		void view_cosmos(const cosmos&, basic_viewing_step&, world_camera&) const;
 	public:
 		augs::constant_size_vector<entity_id, TESTBED_CHARACTERS_COUNT> characters;
+		augs::constant_size_vector<entity_id, 100> crates;
 		unsigned current_character = 0;
 		entity_id currently_controlled_character;
 		bool show_profile_details = false;

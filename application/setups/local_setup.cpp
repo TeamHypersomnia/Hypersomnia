@@ -85,9 +85,9 @@ void local_setup::process(game_window& window) {
 
 			auto cosmic_entropy_for_this_step = testbed.make_cosmic_entropy(s.total_entropy.local, session.context, hypersomnia);
 
-			testbed.step_with_callbacks(cosmic_entropy_for_this_step, hypersomnia);
-
 			renderer::get_current().clear_logic_lines();
+
+			testbed.step_with_callbacks(cosmic_entropy_for_this_step, hypersomnia);
 		}
 
 		const auto vdt = session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), input_unpacker.timer);

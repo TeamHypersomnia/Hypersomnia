@@ -58,7 +58,10 @@ void destruction_system::apply_damages_and_split_fixtures(fixed_step& step) cons
 
 			if (coll.destructible) {
 				auto& dest_data = fixtures.get_modifiable_destruction_data(data_indices);
-				
+				dest_data.scars.resize(1);
+				dest_data.scars[0].first_impact = d.point_of_impact;
+				dest_data.scars[0].depth_point = d.point_of_impact + d.impact_velocity;
+
 				LOG("Destructible fixture has been applied damage to with direction: %x", d.impact_velocity);
 			}
 		}

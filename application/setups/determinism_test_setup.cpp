@@ -96,9 +96,9 @@ void determinism_test_setup::process(game_window& window) {
 
 				auto cosmic_entropy_for_this_step = testbeds[i].make_cosmic_entropy(s.total_entropy.local, session.context, h);
 
-				testbeds[i].step_with_callbacks(cosmic_entropy_for_this_step, h);
-
 				renderer::get_current().clear_logic_lines();
+
+				testbeds[i].step_with_callbacks(cosmic_entropy_for_this_step, h);
 			}
 
 			auto& first_cosm = hypersomnias[0].reserved_memory_for_serialization;
