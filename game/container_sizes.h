@@ -8,6 +8,7 @@
 #define ITEMS_INSIDE_COUNT 20
 
 #define COLLIDERS_COUNT 5
+#define DESTRUCTION_SCARS_COUNT 6
 #define CONVEX_POLYS_COUNT 5 
 #define CONVEX_POLY_VERTEX_COUNT b2_maxPolygonVertices
 
