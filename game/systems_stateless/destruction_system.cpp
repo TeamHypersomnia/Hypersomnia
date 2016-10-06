@@ -25,7 +25,7 @@ void destruction_system::generate_damages_from_forceful_collisions(fixed_step& s
 		const auto& coll = fixtures.get_collider_data(data_indices.first);
 
 		if (coll.destructible) {
-			LOG("Destructible fixture was hit.");
+			//LOG("Destructible fixture was hit.");
 
 			messages::damage_message damage_msg;
 			damage_msg.subject_collider_and_convex_indices = it.subject_collider_and_convex_indices;
@@ -62,7 +62,7 @@ void destruction_system::apply_damages_and_split_fixtures(fixed_step& step) cons
 				dest_data.scars[0].first_impact = d.point_of_impact;
 				dest_data.scars[0].depth_point = d.point_of_impact + d.impact_velocity;
 
-				LOG("Destructible fixture has been applied damage to with direction: %x", d.impact_velocity);
+				//LOG("Destructible fixture has been applied damage to with direction: %x", d.impact_velocity);
 			}
 		}
 	}
