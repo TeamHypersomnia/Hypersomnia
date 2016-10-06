@@ -48,7 +48,10 @@ Or if you just can't wait to utter some brilliant suggestions regarding the game
 
 # Launching
 
-You might want to properly configure config.lua before launching the game.
+You might want to properly configure some variables before launching the game.
+Clone the **config.lua file** and name it **config.local.lua** so that it stays unversioned and unique to your filesystem, if for example you want to preserve your original window resolution and coordinates across further commits.
+
+The game will try to read **config.local.lua** and if there is no such file, it shall try loading **config.lua**.
 
 **Explanation of values:**
 
