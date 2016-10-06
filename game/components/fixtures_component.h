@@ -96,6 +96,7 @@ public:
 	float get_density_multiplier(size_t = 0) const;
 	float get_friction(size_t = 0) const;
 	float get_restitution(size_t = 0) const;
+	float get_base_density(size_t = 0) const;
 	float get_density(size_t = 0) const;
 	
 	basic_entity_handle<is_const> get_owner_body() const;

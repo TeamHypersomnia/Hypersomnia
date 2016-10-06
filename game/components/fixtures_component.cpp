@@ -13,7 +13,7 @@
 
 typedef components::fixtures F;
 
-void component_synchronizer<false, F>::set_owner_body(entity_id owner_id) const {
+void component_synchronizer<false, F>::set_owner_body(const entity_id owner_id) const {
 	handle.set_owner_body(owner_id);
 }
 
@@ -83,14 +83,14 @@ void component_synchronizer<false, F>::resubstantiation() const {
 	handle.get_cosmos().partial_resubstantiation<processing_lists_system>(handle);
 }
 
-void component_synchronizer<false, F>::rebuild_density(size_t index) const {
+void component_synchronizer<false, F>::rebuild_density(const size_t index) const {
 	for (auto f : get_cache().fixtures_per_collider[index])
 		f->SetDensity(component.colliders[index].density * component.colliders[index].density_multiplier);
 
 	get_cache().fixtures_per_collider[0][0]->GetBody()->ResetMassData();
 }
 
-void component_synchronizer<false, F>::set_density(float d, size_t index) const {
+void component_synchronizer<false, F>::set_density(const float d, const size_t index) const {
 	component.colliders[index].density = d;
 
 	if (!is_constructed())
@@ -103,7 +103,7 @@ convex_partitioned_shape::convex_poly::destruction_data& component_synchronizer<
 	return component.colliders[indices.first].shape.convex_polys[indices.second].destruction;
 }
 
-void component_synchronizer<false, F>::set_density_multiplier(float mult, size_t index) const {
+void component_synchronizer<false, F>::set_density_multiplier(const float mult, const size_t index) const {
 	component.colliders[index].density_multiplier = mult;
 
 	if (!is_constructed())
@@ -112,12 +112,12 @@ void component_synchronizer<false, F>::set_density_multiplier(float mult, size_t
 	rebuild_density(index);
 }
 
-void component_synchronizer<false, F>::set_activated(bool flag) const {
+void component_synchronizer<false, F>::set_activated(const bool flag) const {
 	component.activated = flag;
 	resubstantiation();
 }
 
-void component_synchronizer<false, F>::set_friction(float fr, size_t index) const {
+void component_synchronizer<false, F>::set_friction(const float fr, const size_t index) const {
 	component.colliders[index].friction = fr;
 
 	if (!is_constructed())
@@ -127,7 +127,7 @@ void component_synchronizer<false, F>::set_friction(float fr, size_t index) cons
 		f->SetFriction(fr);
 }
 
-void component_synchronizer<false, F>::set_restitution(float r, size_t index) const {
+void component_synchronizer<false, F>::set_restitution(const float r, const size_t index) const {
 	component.colliders[index].restitution = r;
 
 	if (!is_constructed())
@@ -138,22 +138,27 @@ void component_synchronizer<false, F>::set_restitution(float r, size_t index) co
 }
 
 template<bool C>
-float basic_fixtures_synchronizer<C>::get_friction(size_t index) const {
+float basic_fixtures_synchronizer<C>::get_friction(const size_t index) const {
 	return component.colliders[index].friction;
 }
 
 template<bool C>
-float basic_fixtures_synchronizer<C>::get_restitution(size_t index) const {
+float basic_fixtures_synchronizer<C>::get_restitution(const size_t index) const {
 	return component.colliders[index].restitution;
 }
 
 template<bool C>
-float basic_fixtures_synchronizer<C>::get_density(size_t index) const {
+float basic_fixtures_synchronizer<C>::get_density(const size_t index) const {
+	return get_base_density(index) * component.colliders[index].density_multiplier;
+}
+
+template<bool C>
+float basic_fixtures_synchronizer<C>::get_base_density(const size_t index) const {
 	return component.colliders[index].density;
 }
 
 template<bool C>
-float basic_fixtures_synchronizer<C>::get_density_multiplier(size_t index) const {
+float basic_fixtures_synchronizer<C>::get_density_multiplier(const size_t index) const {
 	return component.colliders[index].density_multiplier;
 }
 
@@ -173,7 +178,7 @@ basic_entity_handle<C> basic_fixtures_synchronizer<C>::get_owner_body() const {
 }
 
 template<bool C>
-components::transform basic_fixtures_synchronizer<C>::get_offset(colliders_offset_type t) const {
+components::transform basic_fixtures_synchronizer<C>::get_offset(const colliders_offset_type t) const {
 	return component.offsets_for_created_shapes[static_cast<int>(t)];
 }
 
