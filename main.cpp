@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
 	augs::global_libraries::run_googletest(argc, argv);
 
 	game_window window;
-	window.call_window_script("config.lua");
+	window.call_window_script("config.lua", "config.local.lua");
 
 	resource_manager.destroy_everything();
 	resource_setups::load_standard_everything();

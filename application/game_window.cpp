@@ -4,6 +4,7 @@
 #include "game_window.h"
 #include "game/bindings/bind_game_and_augs.h"
 #include "augs/log.h"
+#include "augs/filesystem/file.h"
 
 game_window::game_window() {
 	bind_game_and_augs(lua);
@@ -18,14 +19,20 @@ void game_window::swap_buffers() {
 	window.swap_buffers();
 }
 
-void game_window::call_window_script(const std::string& filename) {
+void game_window::call_window_script(const std::string& filename, const std::string& alternative_filename) {
+	std::string used_filename = filename;
+
+	if (augs::file_exists(alternative_filename)) {
+		used_filename = alternative_filename;
+	}
+
 	{
 		std::unique_lock<std::mutex> lock(lua_mutex);
 
 		lua.global_ptr("global_gl_window", &window);
 
 		try {
-			if (!lua.dofile(filename))
+			if (!lua.dofile(used_filename))
 				lua.debug_response();
 		}
 		catch (char* e) {
