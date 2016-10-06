@@ -18,6 +18,19 @@ Decide upon your allegiance to one of the three warring factions whose apple of 
   [1]: http://hypersomnia.pl/pics/summary.png
   [2]: http://hypersomnia.pl/pics/13.Green-charge.png
   
+# Opening the to-do list
+
+The official to-do list of this project is located in ToDo/todo.tdl.
+
+To properly view it, you have to download this hierarchical task manager:
+http://www.codeproject.com/Articles/5371/ToDoList-An-effective-and-flexible-way-to-keep-on
+
+Of importance are:
+- Hypersomnia->Doing->Current tasks - tasks in progress.
+- Hypersomnia->Doing->ToDo - tasks that may be undertaken at any moment.
+- Hypersomnia->Doing->Scratchpad - low priority things that will need to be done eventually in some distant future.
+- Hypersomnia->Doing->Done - completed tasks.
+  
 # How to build
 from: http://hypersomnia.pl/join/
 
@@ -45,7 +58,7 @@ You might want to properly configure config.lua before launching the game.
 - **ONLY_CLIENT** - Will use *connect_address* and *connect_port* to connect to a remote host and start the multiplayer simulation.
 - **ONLY_SERVER** - Will use *server_port* to setup a listenserver without a game client.
 - **CLIENT_AND_SERVER** - **ONLY_SERVER** and **ONLY_CLIENT** in the same process.
-- **TWO_CLIENTS_AND_SERVER** - **ONLY_SERVER** and two clients on split-screen. For debugging purposes. The server will use *alternative_server_port* for the second connection.
+- **TWO_CLIENTS_AND_SERVER** - **ONLY_SERVER** and two clients on split-screen. For debugging purposes. The server will use *alternative_port* for the second connection.
 
 *determinism_test_cloned_cosmoi_count*:
 - See **LOCAL_DETERMINISM_TEST**.
