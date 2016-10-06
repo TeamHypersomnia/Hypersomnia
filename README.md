@@ -20,16 +20,19 @@ Decide upon your allegiance to one of the three warring factions whose apple of 
   
 # Opening the to-do list
 
+**As of currently, I advise against modifying the files inside ToDo/. It is because even the smallest change yields a completely different file which makes it impossible to merge, should a conflict arise. 
+We will switch to some other solution soon.** However, feel free to read the list.
+
 The official to-do list of this project is located in ToDo/todo.tdl.
 
 To properly view it, you have to download this hierarchical task manager:
 http://www.codeproject.com/Articles/5371/ToDoList-An-effective-and-flexible-way-to-keep-on
 
 Of importance are:
-- Hypersomnia->Doing->Current tasks - tasks in progress.
-- Hypersomnia->Doing->ToDo - tasks that may be undertaken at any moment.
-- Hypersomnia->Doing->Scratchpad - low priority things that will need to be done eventually in some distant future.
-- Hypersomnia->Doing->Done - completed tasks.
+- **Hypersomnia->Doing->Current tasks** - tasks in progress.
+- **Hypersomnia->Doing->ToDo** - tasks that may be undertaken at any moment.
+- **Hypersomnia->Doing->Scratchpad** - low priority things that will need to be done eventually in some distant future.
+- **Hypersomnia->Doing->Done** - completed tasks.
   
 # How to build
 from: http://hypersomnia.pl/join/
@@ -46,12 +49,15 @@ If you have questions, just ask me via mail: patryk.czachurski@gmail.com
 
 Or if you just can't wait to utter some brilliant suggestions regarding the game, please do so, too!
 
+# Contributing
+
+Please notice us of any intents to contribute, because the project is continuously in a very, very active development and may undergo a revolution when it is the least expected.
+
 # Launching
 
 You might want to properly configure some variables before launching the game.
-Clone the **config.lua file** and name it **config.local.lua** so that it stays unversioned and unique to your filesystem, if for example you want to preserve your original window resolution and coordinates across further commits.
-
-The game will try to read **config.local.lua** and if there is no such file, it shall try loading **config.lua**.
+- Clone the **config.lua file** and name it **config.local.lua** so that it stays unversioned and unique to your filesystem, if for example you want to preserve your original window resolution and coordinates across further commits.
+- The game will try to read **config.local.lua** and if there is no such file, it shall try loading **config.lua**.
 
 **Explanation of values:**
 
