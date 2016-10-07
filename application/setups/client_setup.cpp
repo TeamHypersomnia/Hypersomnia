@@ -139,7 +139,7 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 						break;
 
 					case network_command::PACKAGED_STEP: {
-						simulation_exchange::packaged_step step;
+						step_packaged_for_network step;
 						augs::read_object(stream, step);
 						
 						if (!should_skip)

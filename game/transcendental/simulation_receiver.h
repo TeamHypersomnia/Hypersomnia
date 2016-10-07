@@ -1,5 +1,6 @@
 #pragma once
 #include "simulation_exchange.h"
+#include "augs/misc/jitter_buffer.h"
 
 namespace augs {
 	namespace network {
@@ -7,14 +8,14 @@ namespace augs {
 	}
 }
 
-class simulation_receiver : public simulation_exchange {
+class simulation_receiver {
 public:
-	augs::jitter_buffer<packaged_step> jitter_buffer;
+	augs::jitter_buffer<step_packaged_for_network> jitter_buffer;
 	std::vector<guid_mapped_entropy> predicted_steps;
 
 	float resubstantiate_prediction_every_ms = 1000;
 
-	void acquire_next_packaged_step(const packaged_step&);
+	void acquire_next_packaged_step(const step_packaged_for_network&);
 
 	struct unpacking_result {
 		bool use_extrapolated_cosmos = true;
@@ -55,7 +56,7 @@ public:
 		for (size_t i = 0; i < new_commands.size(); ++i) {
 			auto& new_command = new_commands[i];
 
-			if (new_command.step_type == packaged_step::type::NEW_ENTROPY_WITH_HEARTBEAT) {
+			if (new_command.step_type == step_packaged_for_network::type::NEW_ENTROPY_WITH_HEARTBEAT) {
 				cosmic_delta::decode(last_delta_unpacked, new_command.delta);
 				referential_cosmos = last_delta_unpacked;
 
@@ -63,7 +64,7 @@ public:
 				reconciliate_predicted = true;
 			}
 			else
-				ensure(new_command.step_type == packaged_step::type::NEW_ENTROPY);
+				ensure(new_command.step_type == step_packaged_for_network::type::NEW_ENTROPY);
 
 			step_to_simulate sim;
 			sim.resubstantiate = new_command.shall_resubstantiate;

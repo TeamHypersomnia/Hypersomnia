@@ -42,7 +42,7 @@ class server_setup : public setup_base {
 		augs::network::endpoint_address addr;
 		//std::vector<guid_mapped_entropy> commands;
 		augs::jitter_buffer<guid_mapped_entropy> commands;
-		simulation_exchange::packaged_step next_command;
+		step_packaged_for_network next_command;
 		entity_id controlled_entity;
 		bool sent_welcome_message = false;
 		std::string nickname;

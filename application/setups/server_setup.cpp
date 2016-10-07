@@ -295,7 +295,7 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 			for (auto& e : endpoints) {
 				guid_mapped_entropy maybe_new_client_commands;
 				auto& next_command = e.next_command;
-				next_command = simulation_exchange::packaged_step();
+				next_command = step_packaged_for_network();
 
 				if (e.commands.unpack_new_command(maybe_new_client_commands)) {
 					total_unpacked_entropy += maybe_new_client_commands;
@@ -307,7 +307,7 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 			for (auto& e : endpoints) {
 				auto& next_command = e.next_command;
 
-				next_command.step_type = simulation_exchange::packaged_step::type::NEW_ENTROPY;
+				next_command.step_type = step_packaged_for_network::type::NEW_ENTROPY;
 				next_command.shall_resubstantiate = resubstantiate;
 				next_command.entropy = total_unpacked_entropy;
 				augs::stream new_data;

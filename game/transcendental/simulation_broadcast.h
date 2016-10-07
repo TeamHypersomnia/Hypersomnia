@@ -1,8 +1,10 @@
 #pragma once
-#include "simulation_exchange.h"
+#include "augs/templates.h"
+#include <thread>
+#include "cosmos.h"
 #include "augs/network/reliable_channel.h"
 
-class entropy_accepter : public simulation_exchange {
+class entropy_accepter {
 	augs::network::reliable_channel channel;
 public:
 
@@ -11,7 +13,7 @@ public:
 	cosmic_entropy unpack_entropy_for_next_step(const cosmos& guid_mapper);
 };
 
-class simulation_broadcast : public simulation_exchange {
+class simulation_broadcast {
 	augs::stream delta;
 	std::thread delta_production;
 	unsigned steps_since_last_heartbeat = 0;
