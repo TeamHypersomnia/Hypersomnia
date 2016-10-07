@@ -16,7 +16,7 @@
 #include "game/transcendental/step_and_entropy_unpacker.h"
 
 #include "augs/filesystem/file.h"
-#include "setups.h"
+#include "determinism_test_setup.h"
 
 #include "augs/misc/templated_readwrite.h"
 

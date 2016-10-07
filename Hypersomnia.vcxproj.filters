@@ -3257,9 +3257,6 @@
     <ClInclude Include="game\detail\entity\spatial_properties_getters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="application\setups\setups.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="application\web_daemon\session_report.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3276,6 +3273,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\transcendental\step_packaged_for_network.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="application\setups\client_setup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="application\setups\determinism_test_setup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="application\setups\local_setup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="application\setups\server_setup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="application\setups\setup_base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="application\setups\two_clients_and_server_setup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -16,7 +16,7 @@
 #include "game/transcendental/step_and_entropy_unpacker.h"
 
 #include "augs/filesystem/file.h"
-#include "setups.h"
+#include "local_setup.h"
 
 void local_setup::process(game_window& window) {
 	const vec2i screen_size = vec2i(window.get_screen_rect());

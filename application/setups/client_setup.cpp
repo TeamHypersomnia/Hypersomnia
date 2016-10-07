@@ -20,7 +20,7 @@
 #include "augs/network/network_client.h"
 
 #include "augs/misc/templated_readwrite.h"
-#include "setups.h"
+#include "client_setup.h"
 
 void client_setup::process(game_window& window) {
 	init(window);

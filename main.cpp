@@ -1,6 +1,10 @@
 #pragma once
 #include "augs/global_libraries.h"
-#include "application/setups/setups.h"
+#include "application/setups/local_setup.h"
+#include "application/setups/determinism_test_setup.h"
+#include "application/setups/two_clients_and_server_setup.h"
+#include "application/setups/client_setup.h"
+#include "application/setups/server_setup.h"
 
 #include "application/game_window.h"
 #include "game/resources/manager.h"
