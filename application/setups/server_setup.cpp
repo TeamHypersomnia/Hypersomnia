@@ -310,9 +310,9 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 				next_command.step_type = simulation_exchange::packaged_step::type::NEW_ENTROPY;
 				next_command.shall_resubstantiate = resubstantiate;
 				next_command.entropy = total_unpacked_entropy;
-
 				augs::stream new_data;
-				simulation_exchange::write_packaged_step_to_stream(new_data, next_command);
+				augs::write_object(new_data, network_command::PACKAGED_STEP);
+				augs::write_object(new_data, next_command);
 
 				choose_server(e.addr).post_redundant(new_data, e.addr);
 			}

@@ -14,8 +14,7 @@ public:
 
 	float resubstantiate_prediction_every_ms = 1000;
 
-	void read_entropy_for_next_step(augs::stream&, bool skip_command);
-	void read_entropy_with_heartbeat_for_next_step(augs::stream&, bool skip_command);
+	void acquire_next_packaged_step(const packaged_step&);
 
 	struct unpacking_result {
 		bool use_extrapolated_cosmos = true;

@@ -17,7 +17,7 @@ namespace augs {
 class simulation_exchange {
 public:
 	struct packaged_step {
-		enum class type {
+		enum class type : unsigned char {
 			INVALID,
 			NEW_ENTROPY,
 			NEW_ENTROPY_WITH_HEARTBEAT
@@ -28,10 +28,46 @@ public:
 		augs::stream delta;
 		guid_mapped_entropy entropy;
 	};
-
-public:
-	static void write_packaged_step_to_stream(augs::stream& output, const packaged_step&);
-
-	static packaged_step read_entropy_for_next_step(augs::stream&);
-	static packaged_step read_entropy_with_heartbeat_for_next_step(augs::stream&);
 };
+
+namespace augs {
+	template<class A>
+	bool read_object(A& ar, simulation_exchange::packaged_step& storage) {
+		if(!augs::read_object(ar, storage.step_type)) return false;
+
+		if (storage.step_type == simulation_exchange::packaged_step::type::NEW_ENTROPY) {
+			return augs::read_object(ar, storage.shall_resubstantiate) &&
+			augs::read_object(ar, storage.next_client_commands_accepted) &&
+			augs::read_object(ar, storage.entropy);
+		}
+		else if (storage.step_type == simulation_exchange::packaged_step::type::NEW_ENTROPY_WITH_HEARTBEAT) {
+			return augs::read_object(ar, storage.next_client_commands_accepted) &&
+			augs::read_object(ar, storage.entropy) &&
+
+			augs::read_sized_stream(ar, storage.delta);
+		}
+
+		ensure(false);
+		return false;
+	}
+
+	template<class A>
+	void write_object(A& ar, const simulation_exchange::packaged_step& written) {
+		augs::write_object(ar, written.step_type);
+
+		if (written.step_type == simulation_exchange::packaged_step::type::NEW_ENTROPY) {
+			augs::write_object(ar, written.shall_resubstantiate);
+			augs::write_object(ar, written.next_client_commands_accepted);
+			augs::write_object(ar, written.entropy);
+
+		}
+		else if (written.step_type == simulation_exchange::packaged_step::type::NEW_ENTROPY_WITH_HEARTBEAT) {
+			augs::write_object(ar, written.next_client_commands_accepted);
+			augs::write_object(ar, written.entropy);
+
+			augs::write_sized_stream(ar, written.delta);
+		}
+		else
+			ensure(false);
+	}
+}

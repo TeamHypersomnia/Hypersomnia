@@ -138,12 +138,13 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 						complete_state_received = true;
 						break;
 
-					case network_command::ENTROPY_FOR_NEXT_STEP:
-						receiver.read_entropy_for_next_step(stream, should_skip);
-						break;
-
-					case network_command::ENTROPY_WITH_HEARTBEAT_FOR_NEXT_STEP:
-						receiver.read_entropy_with_heartbeat_for_next_step(stream, should_skip);
+					case network_command::PACKAGED_STEP: {
+						simulation_exchange::packaged_step step;
+						augs::read_object(stream, step);
+						
+						if (!should_skip)
+							receiver.acquire_next_packaged_step(step);
+					}
 						break;
 
 					default: LOG("Client received invalid command: %x", int(command)); stream = augs::stream(); break;
