@@ -1,4 +1,6 @@
-#include "setups.h"
+#include "two_clients_and_server_setup.h"
+#include "server_setup.h"
+#include "client_setup.h"
 #include "game/transcendental/types_specification/all_component_includes.h"
 
 void two_clients_and_server_setup::process(game_window& window) {
