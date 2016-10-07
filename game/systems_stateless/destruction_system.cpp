@@ -54,7 +54,7 @@ void destruction_system::apply_damages_and_split_fixtures(fixed_step& step) cons
 			
 			const auto& data_indices = d.subject_collider_and_convex_indices;
 
-			auto& coll = fixtures.get_collider_data(data_indices.first);
+			const auto& coll = fixtures.get_collider_data(data_indices.first);
 
 			if (coll.destructible) {
 				auto& dest_data = fixtures.get_modifiable_destruction_data(data_indices);

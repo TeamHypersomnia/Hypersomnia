@@ -32,11 +32,6 @@ void simulation_exchange::write_packaged_step_to_stream(augs::stream& output, co
 }
 
 simulation_exchange::packaged_step simulation_exchange::read_entropy_for_next_step(augs::stream& in) {
-	network_command command_type;
-	augs::read_object(in, command_type);
-
-	ensure(command_type == network_command::ENTROPY_FOR_NEXT_STEP);
-	
 	packaged_step new_command;
 	new_command.step_type = packaged_step::type::NEW_ENTROPY;
 
@@ -48,11 +43,6 @@ simulation_exchange::packaged_step simulation_exchange::read_entropy_for_next_st
 }
 
 simulation_exchange::packaged_step simulation_exchange::read_entropy_with_heartbeat_for_next_step(augs::stream& in) {
-	network_command command_type;
-	augs::read_object(in, command_type);
-
-	ensure(command_type == network_command::ENTROPY_WITH_HEARTBEAT_FOR_NEXT_STEP);
-
 	packaged_step new_command;
 	new_command.step_type = packaged_step::type::NEW_ENTROPY_WITH_HEARTBEAT;
 

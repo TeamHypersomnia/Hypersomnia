@@ -73,6 +73,10 @@ P P::get_default(const_entity_handle id) {
 		matching.push_back(processing_subjects::WITH_VISIBILITY);
 	}
 
+	if (id.has<components::past_contagious>()) {
+		matching.push_back(processing_subjects::INFECTED_WITH_PAST);
+	}
+
 	P result;
 
 	for (auto m : matching)

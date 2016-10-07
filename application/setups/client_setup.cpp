@@ -109,7 +109,8 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 				auto to_skip = net_event.messages_to_skip;
 
 				while (stream.get_unread_bytes() > 0) {
-					const auto command = static_cast<network_command>(stream.peek<unsigned char>());
+					network_command command;
+					augs::read_object(stream, command);
 
 					const bool should_skip = to_skip > 0;
 
@@ -122,11 +123,6 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 					switch (command) {
 					case network_command::COMPLETE_STATE:
 						ensure(!should_skip);
-
-						network_command read_command;
-
-						augs::read_object(stream, read_command);
-						ensure_eq(int(network_command::COMPLETE_STATE), int(read_command));
 
 						cosmic_delta::decode(initial_hypersomnia, stream);
 						hypersomnia = initial_hypersomnia;
