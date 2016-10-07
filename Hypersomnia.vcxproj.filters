@@ -975,9 +975,6 @@
     <ClCompile Include="3rdparty\rectpack2D\src\pack.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\transcendental\simulation_exchange.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\transcendental\entropy_buffer_and_player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -3176,9 +3173,6 @@
     <ClInclude Include="game\components\child_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\transcendental\simulation_exchange.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\transcendental\entropy_buffer_and_player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3279,6 +3273,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\systems_stateless\destruction_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\transcendental\step_packaged_for_network.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

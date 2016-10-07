@@ -442,7 +442,6 @@
     <ClCompile Include="game\detail\inventory_utils.cpp" />
     <ClCompile Include="game\transcendental\serialization.cpp" />
     <ClCompile Include="game\transcendental\simulation_broadcast.cpp" />
-    <ClCompile Include="game\transcendental\simulation_exchange.cpp" />
     <ClCompile Include="game\transcendental\simulation_receiver.cpp" />
     <ClCompile Include="game\transcendental\step.cpp" />
     <ClCompile Include="game\systems_stateless\animation_system.cpp" />
@@ -1068,7 +1067,6 @@
     <ClInclude Include="game\scene_managers\one_entity.h" />
     <ClInclude Include="game\transcendental\network_commands.h" />
     <ClInclude Include="game\transcendental\simulation_broadcast.h" />
-    <ClInclude Include="game\transcendental\simulation_exchange.h" />
     <ClInclude Include="game\transcendental\simulation_receiver.h" />
     <ClInclude Include="game\transcendental\step.h" />
     <ClInclude Include="game\systems_stateless\animation_system.h" />
@@ -1098,6 +1096,7 @@
     <ClInclude Include="game\systems_temporary\physics_system.h" />
     <ClInclude Include="game\systems_temporary\processing_lists_system.h" />
     <ClInclude Include="game\transcendental\step_and_entropy_unpacker.h" />
+    <ClInclude Include="game\transcendental\step_packaged_for_network.h" />
     <ClInclude Include="game\transcendental\types_specification\all_components_declaration.h" />
     <ClInclude Include="game\transcendental\types_specification\all_component_includes.h" />
     <ClInclude Include="game\transcendental\types_specification\all_messages_declaration.h" />

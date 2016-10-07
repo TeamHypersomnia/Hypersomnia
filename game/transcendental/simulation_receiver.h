@@ -1,5 +1,5 @@
 #pragma once
-#include "simulation_exchange.h"
+#include "step_packaged_for_network.h"
 #include "augs/misc/jitter_buffer.h"
 
 namespace augs {
