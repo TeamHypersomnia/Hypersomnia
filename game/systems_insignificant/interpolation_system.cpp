@@ -10,17 +10,29 @@ void interpolation_system::reserve_caches_for_entities(const size_t n) {
 	per_entity_cache.resize(n);
 }
 
-void interpolation_system::integrate_interpolated_transforms(const cosmos& cosm, float seconds) {
+void interpolation_system::integrate_interpolated_transforms(const cosmos& cosm, const float seconds, const float fixed_delta_seconds) {
+	const float slowdown_multipliers_decrease = seconds / fixed_delta_seconds;
+
 	if (cosm.significant.meta.settings.enable_interpolation) {
 		for (const auto e : cosm.get(processing_subjects::WITH_INTERPOLATION)) {
 			const auto& actual = e.logic_transform();
 			const auto& info = e.get<components::interpolation>();
 			auto& integrated = get_interpolated(e);
+			auto& cache = per_entity_cache[make_cache_id(e)];
 
-			const float averaging_constant = 1.0f - static_cast<float>(pow(info.component.base_exponent, interpolation_speed * seconds));
-			
-			auto& recorded_pob = per_entity_cache[make_cache_id(e)].recorded_place_of_birth;
-			auto& recorded_ver = per_entity_cache[make_cache_id(e)].recorded_version;
+			const float considered_speed = interpolation_speed / cache.slowdown_multiplier;
+
+			if (cache.slowdown_multiplier > 1.f) {
+				cache.slowdown_multiplier -= slowdown_multipliers_decrease;
+
+				if (cache.slowdown_multiplier < 1.f)
+					cache.slowdown_multiplier = 1.f;
+			}
+
+			const float averaging_constant = 1.0f - static_cast<float>(pow(info.component.base_exponent, considered_speed * seconds));
+
+			auto& recorded_pob = cache.recorded_place_of_birth;
+			auto& recorded_ver = cache.recorded_version;
 			const auto& pob = info.get_data().place_of_birth;
 			const auto& ver = e.get_id().pool.version;
 

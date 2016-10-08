@@ -362,7 +362,7 @@ size_t cosmos::get_maximum_entities() const {
 
 void cosmos::integrate_interpolated_transforms(const float seconds) const {
 	profiler.start(meter_type::INTERPOLATION);
-	systems_insignificant.get<interpolation_system>().integrate_interpolated_transforms(*this, seconds);
+	systems_insignificant.get<interpolation_system>().integrate_interpolated_transforms(*this, seconds, get_fixed_delta().in_seconds());
 	profiler.stop(meter_type::INTERPOLATION);
 }
 
