@@ -18,7 +18,7 @@
 
 #include "augs/filesystem/file.h"
 
-#include "setups.h"
+#include "server_setup.h"
 #include "game/transcendental/network_commands.h"
 
 #include "augs/network/reliable_channel.h"
