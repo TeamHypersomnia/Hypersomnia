@@ -411,10 +411,10 @@ TEST(CosmicDelta, PaddingSanityCheck2) {
 }
 
 TEST(CosmicDelta, CosmicDeltaPaddingTest) {
-	for_each_in_tuple(typename put_all_components_into<std::tuple>::type(), [](auto c) {			
+	auto padding_checker = [](auto c) {
 		typedef decltype(c) component_type;
 		static_assert(std::is_same<std::decay_t<component_type>, component_type>::value, "Something's wrong with the types");
-	
+
 		typedef component_type checked_type;
 		constexpr size_t type_size = sizeof(checked_type);
 
@@ -430,7 +430,10 @@ TEST(CosmicDelta, CosmicDeltaPaddingTest) {
 		new (buf2) checked_type;
 
 		ASSERT_TRUE(!memcmp(buf1, buf2, type_size)) << "Padding is wrong in " << typeid(checked_type).name() << "\nsizeof: " << type_size;
-	});
+	};
+
+	for_each_in_tuple(typename put_all_components_into<std::tuple>::type(), padding_checker);
+	padding_checker(entity_intent());
 }
 
 TEST(CosmicDelta, CosmicDeltaEmptyAndTwoNew) {
