@@ -20,7 +20,7 @@ void two_clients_and_server_setup::process(game_window& window) {
 	setups[1].session.camera.visible_world_area.x /= 2;
 
 	setups[0].session.viewport_coordinates = vec2i(0, 0);
-	setups[1].session.viewport_coordinates = vec2i(setups[1].session.camera.visible_world_area.x, 0);
+	setups[1].session.viewport_coordinates = vec2i(static_cast<int>(setups[1].session.camera.visible_world_area.x), 0);
 
 	unsigned current_window = 0;
 

@@ -11,7 +11,7 @@ launch_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.CLIENT_AND_SERVER,
+	launch_mode = launch_modes.TWO_CLIENTS_AND_SERVER,
 	
 	recording_replay_speed = 1,
 
@@ -49,7 +49,7 @@ config_table = {
 	interpolation_speed = 525,
 
 	debug_var = 0,
-	debug_randomize_entropies_in_client_setup = 1,
+	debug_randomize_entropies_in_client_setup = 0,
 	debug_randomize_entropies_in_client_setup_once_every_steps = 1,
 
 	server_launch_http_daemon = 1,

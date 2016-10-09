@@ -15,9 +15,20 @@ class simulation_receiver {
 		components::transform transform;
 	};
 
+	struct step_to_simulate {
+		bool resubstantiate = false;
+		guid_mapped_entropy entropy;
+	};
+
+	struct unpacking_result {
+		std::vector<step_to_simulate> entropies_to_simulate;
+		bool reconciliate_predicted = false;
+	};
+
 	mismatch_candidate_entry acquire_potential_mismatch(const const_entity_handle&) const;
 	std::vector<mismatch_candidate_entry> acquire_potential_mismatches(const cosmos& predicted_cosmos_before_reconciliation) const;
 
+	unpacking_result unpack_deterministic_steps(cosmos& referential_cosmos, cosmos& last_delta_unpacked);
 	void drag_mismatches_into_past(const cosmos& predicted_cosmos, const std::vector<mismatch_candidate_entry>& mismatches) const;
 public:
 	augs::jitter_buffer<step_packaged_for_network> jitter_buffer;
@@ -26,10 +37,6 @@ public:
 	float resubstantiate_prediction_every_ms = 1000;
 
 	void acquire_next_packaged_step(const step_packaged_for_network&);
-
-	struct unpacking_result {
-		bool use_extrapolated_cosmos = true;
-	};
 
 	template<class Step>
 	void send_commands_and_predict(augs::network::client& client, cosmic_entropy new_entropy, cosmos& predicted_cosmos, Step advance) {
@@ -47,59 +54,10 @@ public:
 
 	template<class Step>
 	unpacking_result unpack_deterministic_steps(cosmos& referential_cosmos, cosmos& last_delta_unpacked, cosmos& predicted_cosmos, Step advance) {
-		unpacking_result result;
+		auto result = unpack_deterministic_steps(referential_cosmos, last_delta_unpacked);
+		auto& reconciliate_predicted = result.reconciliate_predicted;
 
-		auto new_commands = jitter_buffer.buffer;
-		jitter_buffer.buffer.clear();
-
-		result.use_extrapolated_cosmos = true;
-
-		struct step_to_simulate {
-			bool resubstantiate = false;
-			guid_mapped_entropy entropy;
-		};
-
-		std::vector<step_to_simulate> entropies_to_simulate;
-
-		bool reconciliate_predicted = false;
-
-		for (size_t i = 0; i < new_commands.size(); ++i) {
-			auto& new_command = new_commands[i];
-
-			if (new_command.step_type == step_packaged_for_network::type::NEW_ENTROPY_WITH_HEARTBEAT) {
-				cosmic_delta::decode(last_delta_unpacked, new_command.delta);
-				referential_cosmos = last_delta_unpacked;
-
-				entropies_to_simulate.clear();
-				reconciliate_predicted = true;
-			}
-			else
-				ensure(new_command.step_type == step_packaged_for_network::type::NEW_ENTROPY);
-
-			step_to_simulate sim;
-			sim.resubstantiate = new_command.shall_resubstantiate;
-			sim.entropy = new_command.entropy;
-
-			entropies_to_simulate.emplace_back(sim);
-
-			const auto& actual_server_step = sim.entropy;
-			const auto& predicted_server_step = predicted_steps.front();
-			
-			if (actual_server_step != predicted_server_step) {
-				reconciliate_predicted = true;
-			}
-
-			if (sim.resubstantiate) {
-				reconciliate_predicted = true;
-			}
-
-			if (new_command.next_client_commands_accepted) {
-				ensure(predicted_steps.size() > 0);
-				predicted_steps.erase(predicted_steps.begin());
-			}
-		}
-
-		for (const auto& e : entropies_to_simulate) {
+		for (const auto& e : result.entropies_to_simulate) {
 			const cosmic_entropy cosmic_entropy_for_this_step(e.entropy, referential_cosmos);
 			
 			if (e.resubstantiate)

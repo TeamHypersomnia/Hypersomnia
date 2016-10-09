@@ -14,6 +14,49 @@ void simulation_receiver::acquire_next_packaged_step(const step_packaged_for_net
 	jitter_buffer.acquire_new_command(step);
 }
 
+simulation_receiver::unpacking_result simulation_receiver::unpack_deterministic_steps(cosmos& referential_cosmos, cosmos& last_delta_unpacked) {
+	unpacking_result result;
+	auto& reconciliate_predicted = result.reconciliate_predicted;
+	auto& entropies_to_simulate = result.entropies_to_simulate;
+
+	auto new_commands = jitter_buffer.buffer;
+	jitter_buffer.buffer.clear();
+
+	for (size_t i = 0; i < new_commands.size(); ++i) {
+		auto& new_command = new_commands[i];
+
+		if (new_command.step_type == step_packaged_for_network::type::NEW_ENTROPY_WITH_HEARTBEAT) {
+			cosmic_delta::decode(last_delta_unpacked, new_command.delta);
+			referential_cosmos = last_delta_unpacked;
+
+			entropies_to_simulate.clear();
+			reconciliate_predicted = true;
+		}
+		else
+			ensure(new_command.step_type == step_packaged_for_network::type::NEW_ENTROPY);
+
+		step_to_simulate sim;
+		sim.resubstantiate = new_command.shall_resubstantiate;
+		sim.entropy = new_command.entropy;
+
+		entropies_to_simulate.emplace_back(sim);
+
+		const auto& actual_server_step = sim.entropy;
+		const auto& predicted_server_step = predicted_steps.front();
+
+		if (sim.resubstantiate || actual_server_step != predicted_server_step) {
+			reconciliate_predicted = true;
+		}
+
+		if (new_command.next_client_commands_accepted) {
+			ensure(predicted_steps.size() > 0);
+			predicted_steps.erase(predicted_steps.begin());
+		}
+	}
+
+	return std::move(result);
+}
+
 simulation_receiver::mismatch_candidate_entry simulation_receiver::acquire_potential_mismatch(const const_entity_handle& e) const {
 	mismatch_candidate_entry candidate;
 	
@@ -44,7 +87,7 @@ std::vector<simulation_receiver::mismatch_candidate_entry> simulation_receiver::
 		}
 	}
 
-	return potential_mismatches;
+	return std::move(potential_mismatches);
 }
 
 void simulation_receiver::drag_mismatches_into_past(const cosmos& predicted_cosmos, const std::vector<mismatch_candidate_entry>& mismatches) const {
