@@ -57,8 +57,8 @@ simulation_receiver::unpacking_result simulation_receiver::unpack_deterministic_
 	return std::move(result);
 }
 
-simulation_receiver::mismatch_candidate_entry simulation_receiver::acquire_potential_mismatch(const const_entity_handle& e) const {
-	mismatch_candidate_entry candidate;
+simulation_receiver::misprediction_candidate_entry simulation_receiver::acquire_potential_misprediction(const const_entity_handle& e) const {
+	misprediction_candidate_entry candidate;
 	
 	if(e.has_logic_transform())
 		candidate.transform = e.logic_transform();
@@ -68,30 +68,30 @@ simulation_receiver::mismatch_candidate_entry simulation_receiver::acquire_poten
 	return candidate;
 }
 
-std::vector<simulation_receiver::mismatch_candidate_entry> simulation_receiver::acquire_potential_mismatches(const cosmos& predicted_cosmos_before_reconciliation) const {
+std::vector<simulation_receiver::misprediction_candidate_entry> simulation_receiver::acquire_potential_mispredictions(const cosmos& predicted_cosmos_before_reconciliation) const {
 	const auto& cosmos = predicted_cosmos_before_reconciliation;
 
 	const auto& unpredictables_with_past_contagious = cosmos.get(processing_subjects::WITH_PAST_CONTAGIOUS);
 	const auto& unpredictables_infected = cosmos.systems_insignificant.get<past_infection_system>().infected_entities;
 
-	std::vector<mismatch_candidate_entry> potential_mismatches;
-	potential_mismatches.reserve(unpredictables_with_past_contagious.size() + unpredictables_infected.size());
+	std::vector<misprediction_candidate_entry> potential_mispredictions;
+	potential_mispredictions.reserve(unpredictables_with_past_contagious.size() + unpredictables_infected.size());
 
 	for (const auto& e : unpredictables_with_past_contagious) {
-		potential_mismatches.push_back(acquire_potential_mismatch(e));
+		potential_mispredictions.push_back(acquire_potential_misprediction(e));
 	}
 
 	for (const auto& e : unpredictables_infected) {
 		if (cosmos[e].alive()) {
-			potential_mismatches.push_back(acquire_potential_mismatch(cosmos[e]));
+			potential_mispredictions.push_back(acquire_potential_misprediction(cosmos[e]));
 		}
 	}
 
-	return std::move(potential_mismatches);
+	return std::move(potential_mispredictions);
 }
 
-void simulation_receiver::drag_mismatches_into_past(const cosmos& predicted_cosmos, const std::vector<mismatch_candidate_entry>& mismatches) const {
-	for (const auto e : mismatches) {
+void simulation_receiver::drag_mispredictions_into_past(const cosmos& predicted_cosmos, const std::vector<misprediction_candidate_entry>& mispredictions) const {
+	for (const auto e : mispredictions) {
 		const const_entity_handle reconciliated_entity = predicted_cosmos[e.id];
 		
 		const bool identity_matches = reconciliated_entity.alive() && reconciliated_entity.has_logic_transform();
@@ -106,20 +106,20 @@ void simulation_receiver::drag_mismatches_into_past(const cosmos& predicted_cosm
 		auto& interp_data = predicted_cosmos.systems_insignificant.get<interpolation_system>().get_data(reconciliated_entity);
 
 		const bool shouldnt_smooth = reconciliated_entity.has<components::crosshair>();
-		bool mismatch_detected = false;
+		bool misprediction_detected = false;
 
 		if (!shouldnt_smooth && (reconciliated_transform.pos - e.transform.pos).length_sq() > 1.f) {
 			interp_data.positional_slowdown_multiplier = predicted_steps.size();// std::max(10u, predicted_steps.size());
-			mismatch_detected = true;
+			misprediction_detected = true;
 			//.set_slowdown_multiplier(reconciliated_entity, static_cast<float>(predicted_steps.size()));
 		}
 
 		if (!is_contagious_agent && std::abs(reconciliated_transform.rotation - e.transform.rotation) > 1.f) {
 			interp_data.rotational_slowdown_multiplier = predicted_steps.size();
-			mismatch_detected = true;
+			misprediction_detected = true;
 		}
 
-		if (identity_matches || (!mismatch_detected && !is_contagious_agent)) {
+		if (identity_matches || (!misprediction_detected && !is_contagious_agent)) {
 			predicted_cosmos.systems_insignificant.get<past_infection_system>().uninfect(reconciliated_entity);
 		}
 	}

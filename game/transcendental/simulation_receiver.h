@@ -10,7 +10,7 @@ namespace augs {
 }
 
 class simulation_receiver {
-	struct mismatch_candidate_entry {
+	struct misprediction_candidate_entry {
 		entity_id id;
 		components::transform transform;
 	};
@@ -25,11 +25,11 @@ class simulation_receiver {
 		bool reconciliate_predicted = false;
 	};
 
-	mismatch_candidate_entry acquire_potential_mismatch(const const_entity_handle&) const;
-	std::vector<mismatch_candidate_entry> acquire_potential_mismatches(const cosmos& predicted_cosmos_before_reconciliation) const;
+	misprediction_candidate_entry acquire_potential_misprediction(const const_entity_handle&) const;
+	std::vector<misprediction_candidate_entry> acquire_potential_mispredictions(const cosmos& predicted_cosmos_before_reconciliation) const;
 
 	unpacking_result unpack_deterministic_steps(cosmos& referential_cosmos, cosmos& last_delta_unpacked);
-	void drag_mismatches_into_past(const cosmos& predicted_cosmos, const std::vector<mismatch_candidate_entry>& mismatches) const;
+	void drag_mispredictions_into_past(const cosmos& predicted_cosmos, const std::vector<misprediction_candidate_entry>& mispredictions) const;
 public:
 	augs::jitter_buffer<step_packaged_for_network> jitter_buffer;
 	std::vector<guid_mapped_entropy> predicted_steps;
@@ -73,7 +73,7 @@ public:
 		// LOG("Unpacking from %x to %x", previous_step, referential_cosmos.get_total_steps_passed());
 
 		if (reconciliate_predicted) {
-			const auto potential_mismatches = acquire_potential_mismatches(predicted_cosmos);
+			const auto potential_mispredictions = acquire_potential_mispredictions(predicted_cosmos);
 
 			predicted_cosmos = referential_cosmos;
 
@@ -81,7 +81,7 @@ public:
 				advance(cosmic_entropy(s, predicted_cosmos), predicted_cosmos);
 			}
 
-			drag_mismatches_into_past(predicted_cosmos, potential_mismatches);
+			drag_mispredictions_into_past(predicted_cosmos, potential_mispredictions);
 		}
 
 		return std::move(result);
