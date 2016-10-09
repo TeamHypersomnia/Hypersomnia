@@ -6,12 +6,42 @@
 #include "game/components/driver_component.h"
 #include "game/components/flags_component.h"
 #include "game/components/crosshair_component.h"
+#include "game/components/gun_component.h"
+#include "game/components/item_component.h"
 
 #include "game/transcendental/network_commands.h"
 #include "game/transcendental/cosmos.h"
+#include "game/transcendental/entity_handle.h"
+
+#include "game/detail/inventory_slot_handle.h"
 
 void simulation_receiver::acquire_next_packaged_step(const step_packaged_for_network& step) {
 	jitter_buffer.acquire_new_command(step);
+}
+
+void simulation_receiver::remote_entropy_predictions(guid_mapped_entropy& adjusted_entropy, const entity_id& predictable_entity, const cosmos& predicted_cosmos) {
+	entity_intent release_intent;
+	release_intent.pressed_flag = false;
+
+	for (auto e : predicted_cosmos.get(processing_subjects::WITH_PAST_CONTAGIOUS)) {
+		const bool is_locally_controlled_entity = e == predictable_entity;
+		
+		if (is_locally_controlled_entity)
+			continue;
+
+		for (const auto g : e.guns_wielded()) {
+			if (g.get<components::gun>().trigger_pressed) {
+				if (g.get_current_slot().raw_id.type == slot_function::PRIMARY_HAND) {
+					release_intent.intent = intent_type::CROSSHAIR_PRIMARY_ACTION;
+				}
+				else {
+					release_intent.intent = intent_type::CROSSHAIR_SECONDARY_ACTION;
+				}
+
+				adjusted_entropy.entropy_per_entity[e.get_guid()].push_back(release_intent);
+			}
+		}
+	}
 }
 
 simulation_receiver::unpacking_result simulation_receiver::unpack_deterministic_steps(cosmos& referential_cosmos, cosmos& last_delta_unpacked) {

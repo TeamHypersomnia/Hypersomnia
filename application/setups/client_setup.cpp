@@ -160,7 +160,7 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 			receiver.send_commands_and_predict(client, local_cosmic_entropy_for_this_step, extrapolated_hypersomnia, step_pred);
 			// LOG("Predicting to step: %x; predicted steps: %x", extrapolated_hypersomnia.get_total_steps_passed(), receiver.predicted_steps.size());
 
-			receiver.unpack_deterministic_steps(hypersomnia, hypersomnia_last_snapshot, extrapolated_hypersomnia, step_pred);
+			receiver.unpack_deterministic_steps(scene.get_controlled_entity(), hypersomnia, hypersomnia_last_snapshot, extrapolated_hypersomnia, step_pred);
 		}
 		
 		if (client.has_timed_out(hypersomnia.get_fixed_delta().in_milliseconds(), 2000)) {

@@ -30,30 +30,32 @@ class simulation_receiver {
 
 	unpacking_result unpack_deterministic_steps(cosmos& referential_cosmos, cosmos& last_delta_unpacked);
 	void drag_mispredictions_into_past(const cosmos& predicted_cosmos, const std::vector<misprediction_candidate_entry>& mispredictions) const;
+
+	void remote_entropy_predictions(guid_mapped_entropy& adjusted_entropy, const entity_id& predictable_entity, const cosmos& predicted_cosmos);
 public:
 	augs::jitter_buffer<step_packaged_for_network> jitter_buffer;
 	std::vector<guid_mapped_entropy> predicted_steps;
 
-	float resubstantiate_prediction_every_ms = 1000;
+	float resubstantiate_prediction_every_ms = 1000.f;
 
 	void acquire_next_packaged_step(const step_packaged_for_network&);
 
 	template<class Step>
-	void send_commands_and_predict(augs::network::client& client, cosmic_entropy new_entropy, cosmos& predicted_cosmos, Step advance) {
+	void send_commands_and_predict(augs::network::client& client, cosmic_entropy new_local_entropy, cosmos& predicted_cosmos, Step advance) {
+		guid_mapped_entropy guid_mapped(new_local_entropy, predicted_cosmos);
+
 		augs::stream client_commands;
 		augs::write_object(client_commands, network_command::CLIENT_REQUESTED_ENTROPY);
-
-		guid_mapped_entropy guid_mapped(new_entropy, predicted_cosmos);
 		augs::write_object(client_commands, guid_mapped);
 
 		client.post_redundant(client_commands);
 
 		predicted_steps.push_back(guid_mapped);
-		advance(new_entropy, predicted_cosmos);
+		advance(new_local_entropy, predicted_cosmos);
 	}
 
 	template<class Step>
-	unpacking_result unpack_deterministic_steps(cosmos& referential_cosmos, cosmos& last_delta_unpacked, cosmos& predicted_cosmos, Step advance) {
+	unpacking_result unpack_deterministic_steps(const entity_id& predictable_entity, cosmos& referential_cosmos, cosmos& last_delta_unpacked, cosmos& predicted_cosmos, Step advance) {
 		auto result = unpack_deterministic_steps(referential_cosmos, last_delta_unpacked);
 		auto& reconciliate_predicted = result.reconciliate_predicted;
 
@@ -77,7 +79,9 @@ public:
 
 			predicted_cosmos = referential_cosmos;
 
-			for (const auto& s : predicted_steps) {
+			for (auto& s : predicted_steps) {
+				remote_entropy_predictions(s, predictable_entity, predicted_cosmos);
+
 				advance(cosmic_entropy(s, predicted_cosmos), predicted_cosmos);
 			}
 
