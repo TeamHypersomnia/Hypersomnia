@@ -8,6 +8,8 @@ class config_values {
 public:
 	int launch_mode = 0;
 
+	float recording_replay_speed = 1.f;
+
 	unsigned determinism_test_cloned_cosmoi_count = 0;
 
 	bool debug_disable_cursor_clipping = false;

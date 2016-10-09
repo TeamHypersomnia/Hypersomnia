@@ -36,8 +36,9 @@ std::vector<simulation_receiver::mismatch_candidate_entry> simulation_receiver::
 	}
 
 	for (const auto& e : unpredictables_infected) {
-		if(cosmos[e].alive())
+		if (cosmos[e].alive()) {
 			potential_mismatches.push_back(acquire_potential_mismatch(cosmos[e]));
+		}
 	}
 
 	return potential_mismatches;

@@ -11,8 +11,10 @@ launch_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.CLIENT_AND_SERVER,
+	launch_mode = launch_modes.ONLY_CLIENT,
 	
+	recording_replay_speed = 1,
+
 	determinism_test_cloned_cosmoi_count = 2,
 
 	window_name = "example",
@@ -42,12 +44,12 @@ config_table = {
 	tickrate = 60,
 
 	jitter_buffer_ms = 50,
-	client_commands_jitter_buffer_ms = 50,
+	client_commands_jitter_buffer_ms = 100,
 	
 	interpolation_speed = 525,
 
 	debug_var = 0,
-	debug_randomize_entropies_in_client_setup = 1,
+	debug_randomize_entropies_in_client_setup = 0,
 	debug_randomize_entropies_in_client_setup_once_every_steps = 1,
 
 	server_launch_http_daemon = 1,

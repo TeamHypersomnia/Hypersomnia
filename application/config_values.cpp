@@ -11,6 +11,8 @@ void config_values::get_values(game_window& w) {
 
 	set(NVP(launch_mode));
 
+	set(NVP(recording_replay_speed));
+
 	set(NVP(determinism_test_cloned_cosmoi_count));
 
 	set(NVP(debug_disable_cursor_clipping));

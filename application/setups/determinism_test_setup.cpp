@@ -50,7 +50,9 @@ void determinism_test_setup::process(game_window& window) {
 		h.significant.meta.settings.enable_interpolation = false;
 	}
 
-	input_unpacker.try_to_load_or_save_new_session("sessions/", "recorded.inputs");
+	if (input_unpacker.try_to_load_or_save_new_session("sessions/", "recorded.inputs")) {
+		input_unpacker.timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
+	}
 
 	viewing_session session;
 	session.camera.configure_size(screen_size);

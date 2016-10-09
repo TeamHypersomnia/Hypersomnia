@@ -93,7 +93,9 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 		scene.populate_world_with_entities(hypersomnia);
 	}
 
-	input_unpacker.try_to_load_or_save_new_session("server_sessions/", "server_recorded.inputs");
+	if (input_unpacker.try_to_load_or_save_new_session("server_sessions/", "server_recorded.inputs")) {
+		input_unpacker.timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
+	}
 
 	simulation_broadcast server_sim;
 

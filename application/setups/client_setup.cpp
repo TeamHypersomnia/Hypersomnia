@@ -51,7 +51,7 @@ void client_setup::init(game_window& window, const std::string recording_filenam
 	}
 
 	if (input_unpacker.try_to_load_or_save_new_session("sessions/", recording_filename)) {
-		input_unpacker.timer.set_stepping_speed_multiplier(0.1f);
+		input_unpacker.timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
 	}
 
 	session.camera.configure_size(screen_size);

@@ -16,11 +16,19 @@ std::vector<step_and_entropy_unpacker::simulation_step> step_and_entropy_unpacke
 }
 
 bool step_and_entropy_unpacker::try_to_load_or_save_new_session(std::string sessions_folder, std::string recording_filename) {
-	if (!player.try_to_load_and_replay_recording(recording_filename)) {
-		player.record_and_save_this_session(sessions_folder, recording_filename);
+	std::vector<std::string> filenames = { recording_filename };
 
-		return false;
+	if (recording_filename.find(".inputs") != std::string::npos) {
+		filenames.push_back(recording_filename.substr(0, recording_filename.size() - std::string(".inputs").length()) + "_0.inputs");
+		filenames.push_back(recording_filename.substr(0, recording_filename.size() - std::string(".inputs").length()) + "_1.inputs");
 	}
 
-	return true;
+	for (const auto& filename : filenames) {
+		if (player.try_to_load_and_replay_recording(filename)) {
+			return true;
+		}
+	}
+
+	player.record_and_save_this_session(sessions_folder, recording_filename);
+	return false;
 }
