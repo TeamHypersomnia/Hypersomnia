@@ -12,6 +12,7 @@
 #include "game/components/position_copying_component.h"
 #include "game/components/container_component.h"
 #include "game/components/item_component.h"
+#include "game/components/flags_component.h"
 
 #include "game/systems_temporary/physics_system.h"
 
@@ -115,6 +116,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(fixed_step& step) {
 							set_velocity(round_entity, vec2().set_from_degrees(barrel_transform.rotation).set_length(rng.randval(gun.muzzle_velocity)));
 							response.spawned_rounds.push_back(round_entity);
 
+							round_entity.set_flag(entity_flag::IS_IMMUNE_TO_PAST);
 							round_entity.add_standard_components();
 						}
 

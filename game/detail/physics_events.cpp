@@ -3,6 +3,7 @@
 #include "game/messages/collision_message.h"
 #include "game/components/driver_component.h"
 #include "game/components/special_physics_component.h"
+#include "game/components/flags_component.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/step.h"
@@ -238,7 +239,7 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 		const const_entity_handle& collider_owner_body = collider.get_owner_body();
 		auto& past_system = cosm.systems_insignificant.get<past_infection_system>();
 
-		if (past_system.is_infected(subject_owner_body)) {
+		if (past_system.is_infected(subject_owner_body) && !collider_owner_body.get_flag(entity_flag::IS_IMMUNE_TO_PAST)) {
 			past_system.infect(collider_owner_body);
 		}
 

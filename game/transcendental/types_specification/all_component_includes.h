@@ -44,5 +44,4 @@
 #include "game/components/sub_entities_component.h"
 #include "game/components/physical_relations_component.h"
 #include "game/components/interpolation_component.h"
-#include "game/components/past_contagious_component.h"
 #include "game/components/flags_component.h"

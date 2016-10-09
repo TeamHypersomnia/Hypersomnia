@@ -3197,9 +3197,6 @@
     <ClInclude Include="application\config_values.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\components\past_contagious_component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\systems_insignificant\past_infection_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
