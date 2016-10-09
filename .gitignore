@@ -187,3 +187,4 @@ Makefile
 *.iobj
 *.ipdb
 config.local.lua
+*.inputs
