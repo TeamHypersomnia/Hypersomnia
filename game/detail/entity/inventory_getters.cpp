@@ -45,6 +45,15 @@ typename inventory_getters<C, D>::inventory_slot_handle_type inventory_getters<C
 }
 
 template <bool C, class D>
+typename inventory_getters<C, D>::inventory_slot_handle_type inventory_getters<C, D>::get_current_slot() const {
+	auto& self = *static_cast<const D*>(this);
+	auto& cosmos = self.get_cosmos();
+	
+	auto& item = self.get<components::item>();
+	return cosmos[item.current_slot];
+}
+
+template <bool C, class D>
 typename inventory_getters<C, D>::inventory_slot_handle_type inventory_getters<C, D>::determine_hand_holstering_slot_in(D searched_root_container) const {
 	auto& item_entity = *static_cast<const D*>(this);
 	auto& cosmos = item_entity.get_cosmos();
