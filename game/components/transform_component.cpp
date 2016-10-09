@@ -54,9 +54,26 @@ namespace components {
 		m_sweep.alpha0 = 0.0f;
 	}
 
-	transform transform::interpolated(const transform& previous, float ratio, float epsilon) const {
+	transform transform::interpolated(const transform& previous, const float ratio, const float epsilon) const {
 		auto result = *this;
 		auto interpolated = augs::interp(previous, *this, ratio);
+
+		if ((pos - interpolated.pos).length_sq() > epsilon)
+			result.pos = interpolated.pos;
+		if (std::abs(rotation - interpolated.rotation) > epsilon)
+			result.rotation = interpolated.rotation;
+
+		return result;
+	}
+
+	transform transform::interpolated_separate(const transform& previous, const float positional_ratio, const float rotational_ratio, const float epsilon) const {
+		auto result = *this;
+		const auto& a = previous;
+		const auto& b = *this;
+
+		components::transform interpolated;
+		interpolated.pos = augs::interp(a.pos, b.pos, positional_ratio);
+		interpolated.rotation = augs::interp(vec2().set_from_degrees(a.rotation), vec2().set_from_degrees(b.rotation), rotational_ratio).degrees();
 
 		if ((pos - interpolated.pos).length_sq() > epsilon)
 			result.pos = interpolated.pos;

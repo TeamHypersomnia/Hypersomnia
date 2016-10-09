@@ -1,6 +1,7 @@
 #pragma once
 #include "step_packaged_for_network.h"
 #include "augs/misc/jitter_buffer.h"
+#include "game/components/transform_component.h"
 
 namespace augs {
 	namespace network {
@@ -9,6 +10,12 @@ namespace augs {
 }
 
 class simulation_receiver {
+	struct mismatch_candidate_entry {
+		entity_id id;
+		components::transform transform;
+	};
+
+	void drag_mismatches_into_past(cosmos& predicted_cosmos, const std::vector<mismatch_candidate_entry>& mismatches);
 public:
 	augs::jitter_buffer<step_packaged_for_network> jitter_buffer;
 	std::vector<guid_mapped_entropy> predicted_steps;
@@ -72,7 +79,14 @@ public:
 
 			entropies_to_simulate.emplace_back(sim);
 
-			if (sim.resubstantiate || predicted_steps.front() != sim.entropy) {
+			const auto& actual_server_step = sim.entropy;
+			const auto& predicted_server_step = predicted_steps.front();
+			
+			if (actual_server_step != predicted_server_step) {
+				reconciliate_predicted = true;
+			}
+
+			if (sim.resubstantiate) {
 				reconciliate_predicted = true;
 			}
 
@@ -98,11 +112,27 @@ public:
 		// LOG("Unpacking from %x to %x", previous_step, referential_cosmos.get_total_steps_passed());
 
 		if (reconciliate_predicted) {
+
+			const auto& unpredictables = predicted_cosmos.get(processing_subjects::INFECTED_WITH_PAST);
+
+			std::vector<mismatch_candidate_entry> potential_mismatches;
+			potential_mismatches.reserve(unpredictables.size());
+			
+			for (const auto& e : unpredictables) {
+				mismatch_candidate_entry candidate;
+				candidate.transform = e.logic_transform();
+				candidate.id = e.get_id();
+
+				potential_mismatches.push_back(candidate);
+			}
+
 			predicted_cosmos = referential_cosmos;
 
 			for (const auto& s : predicted_steps) {
 				advance(cosmic_entropy(s, predicted_cosmos), predicted_cosmos);
 			}
+
+			drag_mismatches_into_past(predicted_cosmos, potential_mismatches);
 		}
 
 		return std::move(result);

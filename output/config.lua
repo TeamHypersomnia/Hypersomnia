@@ -42,7 +42,7 @@ config_table = {
 	tickrate = 60,
 
 	jitter_buffer_ms = 50,
-	client_commands_jitter_buffer_ms = 130,
+	client_commands_jitter_buffer_ms = 100,
 	
 	interpolation_speed = 525,
 

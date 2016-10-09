@@ -12,7 +12,8 @@ public:
 		components::transform recorded_place_of_birth;
 		components::transform interpolated_transform;
 		unsigned recorded_version = 0;
-		float slowdown_multiplier = 1.f;
+		float rotational_slowdown_multiplier = 1.f;
+		float positional_slowdown_multiplier = 1.f;
 	};
 
 	std::vector<cache> per_entity_cache;
@@ -20,10 +21,12 @@ public:
 
 	void integrate_interpolated_transforms(const cosmos&, const float seconds, const float fixed_delta_seconds);
 
-	void construct(const const_entity_handle);
-	void destruct(const const_entity_handle);
+	void construct(const const_entity_handle&);
+	void destruct(const const_entity_handle&);
 
-	components::transform& get_interpolated(const const_entity_handle);
+	components::transform& get_interpolated(const entity_id&);
 	void reserve_caches_for_entities(const size_t);
-	void write_current_to_interpolated(const const_entity_handle);
+	void write_current_to_interpolated(const const_entity_handle&);
+
+	cache& get_data(const entity_id&);
 };

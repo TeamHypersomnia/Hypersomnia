@@ -5,6 +5,22 @@
 #include "augs/misc/machine_entropy.h"
 #include "game/global/input_context.h"
 
+bool operator==(const std::vector<entity_intent>& a, const std::vector<entity_intent>& b) {
+	return !(a != b);
+}
+
+bool operator!=(const std::vector<entity_intent>& a, const std::vector<entity_intent>& b) {
+	if (a.size() != b.size()) {
+		return true;
+	}
+
+	if (std::memcmp(a.data(), b.data(), sizeof(entity_intent) * a.size())) {
+		return true;
+	}
+
+	return false;
+}
+
 bool make_entity_intent(const input_context& context, const augs::window::event::state& raw, entity_intent& mapped_intent) {
 	bool found_context_entry = false;
 
@@ -51,12 +67,8 @@ bool guid_mapped_entropy::operator!=(const guid_mapped_entropy& b) const {
 		if (found == entropy_per_entity.end())
 			return true;
 	
-		if (entry.second.size() != (*found).second.size())
+		if (entry.second != (*found).second)
 			return true;
-
-		for (size_t i = 0; i < entry.second.size(); ++i)
-			if (entry.second[i] != (*found).second[i])
-				return true;
 	}
 
 	return false;

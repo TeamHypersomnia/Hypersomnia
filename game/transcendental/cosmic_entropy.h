@@ -13,6 +13,8 @@ class cosmos;
 struct input_context;
 
 bool make_entity_intent(const input_context&, const augs::window::event::state&, entity_intent& mapped_intent);
+bool operator==(const std::vector<entity_intent>& a, const std::vector<entity_intent>& b);
+bool operator!=(const std::vector<entity_intent>& a, const std::vector<entity_intent>& b);
 
 template <class key>
 struct basic_cosmic_entropy {
