@@ -74,7 +74,7 @@ P P::get_default(const_entity_handle id) {
 	}
 
 	if (id.has<components::past_contagious>()) {
-		matching.push_back(processing_subjects::INFECTED_WITH_PAST);
+		matching.push_back(processing_subjects::WITH_PAST_CONTAGIOUS);
 	}
 
 	P result;

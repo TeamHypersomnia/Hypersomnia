@@ -86,3 +86,12 @@ namespace augs {
 	template<class T>
 	struct make_pool_id { typedef pool_id<T> type; };
 }
+
+namespace std {
+	template <class T>
+	struct hash<augs::pool_id<T>> {
+		std::size_t operator()(const augs::pool_id<T>& k) const {
+			return std::hash<unsigned long long>()(k.guid);
+		}
+	};
+}

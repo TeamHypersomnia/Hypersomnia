@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <bitset>
 #include <tuple>
+#include <unordered_set>
 
 template <class T, class Tuple>
 struct index_in_tuple;
@@ -34,6 +35,11 @@ void erase_remove(Container& v, const T& l) {
 template<class Container, class T>
 void remove_element(Container& v, const T& l) {
 	v.erase(std::remove(v.begin(), v.end(), l), v.end());
+}
+
+template<class ContainerType, class T>
+void remove_element(std::unordered_set<ContainerType>& v, const T& l) {
+	v.erase(l);
 }
 
 template<class Container, class T>

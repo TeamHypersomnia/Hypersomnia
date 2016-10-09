@@ -15,7 +15,10 @@ class simulation_receiver {
 		components::transform transform;
 	};
 
-	void drag_mismatches_into_past(cosmos& predicted_cosmos, const std::vector<mismatch_candidate_entry>& mismatches);
+	mismatch_candidate_entry acquire_potential_mismatch(const const_entity_handle&) const;
+	std::vector<mismatch_candidate_entry> acquire_potential_mismatches(const cosmos& predicted_cosmos_before_reconciliation) const;
+
+	void drag_mismatches_into_past(const cosmos& predicted_cosmos, const std::vector<mismatch_candidate_entry>& mismatches) const;
 public:
 	augs::jitter_buffer<step_packaged_for_network> jitter_buffer;
 	std::vector<guid_mapped_entropy> predicted_steps;
@@ -112,19 +115,7 @@ public:
 		// LOG("Unpacking from %x to %x", previous_step, referential_cosmos.get_total_steps_passed());
 
 		if (reconciliate_predicted) {
-
-			const auto& unpredictables = predicted_cosmos.get(processing_subjects::INFECTED_WITH_PAST);
-
-			std::vector<mismatch_candidate_entry> potential_mismatches;
-			potential_mismatches.reserve(unpredictables.size());
-			
-			for (const auto& e : unpredictables) {
-				mismatch_candidate_entry candidate;
-				candidate.transform = e.logic_transform();
-				candidate.id = e.get_id();
-
-				potential_mismatches.push_back(candidate);
-			}
+			const auto potential_mismatches = acquire_potential_mismatches(predicted_cosmos);
 
 			predicted_cosmos = referential_cosmos;
 

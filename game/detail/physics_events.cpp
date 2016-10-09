@@ -3,6 +3,7 @@
 #include "game/messages/collision_message.h"
 #include "game/components/driver_component.h"
 #include "game/components/special_physics_component.h"
+#include "game/components/past_contagious_component.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/step.h"
@@ -234,9 +235,17 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 				}
 		}
 
-		auto* driver = subject.get_owner_body().find<components::driver>();
+		const const_entity_handle& subject_owner_body = subject.get_owner_body();
+		const const_entity_handle& collider_owner_body = collider.get_owner_body();
+		auto& past_system = cosm.systems_insignificant.get<past_infection_system>();
 
-		bool colliding_with_owning_car = driver && driver->owned_vehicle == collider.get_owner_body();
+		if (past_system.is_infected(subject_owner_body)) {
+			past_system.infect(collider_owner_body);
+		}
+
+		auto* driver = subject_owner_body.find<components::driver>();
+
+		bool colliding_with_owning_car = driver && driver->owned_vehicle == collider_owner_body;
 
 		if (colliding_with_owning_car) {
 			contact->SetEnabled(false);
