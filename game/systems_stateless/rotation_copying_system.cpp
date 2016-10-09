@@ -96,26 +96,24 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 			new_angle = diff.degrees();
 
 		if (rotation_copying.colinearize_item_in_hand) {
-			auto hand = it.map_primary_action_to_secondary_hand_if_primary_empty(0);
+			auto guns = it.guns_wielded();
 
-			if (hand.has_items()) {
-				const auto subject_item = hand.get_items_inside()[0];
+			if (guns.size() > 0) {
+				const auto subject_item = guns[0];
 
-				const auto* maybe_gun = subject_item.find<components::gun>();
+				const auto& gun = subject_item.get<components::gun>();
 
-				if (maybe_gun) {
-					const auto rifle_transform = subject_item.logic_transform();
-					auto rifle_center = rifle_transform.pos;
-					auto barrel = maybe_gun->calculate_barrel_transform(rifle_transform).pos;
-					const auto mc = position(it);
+				const auto rifle_transform = subject_item.logic_transform();
+				auto rifle_center = rifle_transform.pos;
+				auto barrel = gun.calculate_barrel_transform(rifle_transform).pos;
+				const auto mc = position(it);
 
-					rifle_center.rotate(-rotation(it), mc);
-					barrel.rotate(-rotation(it), mc);
+				rifle_center.rotate(-rotation(it), mc);
+				barrel.rotate(-rotation(it), mc);
 
-					auto crosshair_vector = target_transform.pos - mc;
+				auto crosshair_vector = target_transform.pos - mc;
 
-					new_angle = colinearize_AB(mc, rifle_center, barrel, target_transform.pos);
-				}
+				new_angle = colinearize_AB(mc, rifle_center, barrel, target_transform.pos);
 			}
 		}
 	}
