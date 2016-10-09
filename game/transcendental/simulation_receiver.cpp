@@ -109,13 +109,12 @@ void simulation_receiver::drag_mispredictions_into_past(const cosmos& predicted_
 		bool misprediction_detected = false;
 
 		if (!shouldnt_smooth && (reconciliated_transform.pos - e.transform.pos).length_sq() > 1.f) {
-			interp_data.positional_slowdown_multiplier = predicted_steps.size();// std::max(10u, predicted_steps.size());
+			interp_data.positional_slowdown_multiplier = static_cast<float>(predicted_steps.size());
 			misprediction_detected = true;
-			//.set_slowdown_multiplier(reconciliated_entity, static_cast<float>(predicted_steps.size()));
 		}
 
 		if (!is_contagious_agent && std::abs(reconciliated_transform.rotation - e.transform.rotation) > 1.f) {
-			interp_data.rotational_slowdown_multiplier = predicted_steps.size();
+			interp_data.rotational_slowdown_multiplier = static_cast<float>(predicted_steps.size());
 			misprediction_detected = true;
 		}
 
