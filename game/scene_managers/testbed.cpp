@@ -315,7 +315,7 @@ namespace scene_managers {
 		}
 	}
 
-	cosmic_entropy testbed::make_cosmic_entropy(const augs::machine_entropy::local_type& local, const input_context& context, cosmos& cosm) {
+	cosmic_entropy testbed::make_cosmic_entropy(const augs::machine_entropy::local_type& local, const input_context& context, const cosmos& cosm) {
 		cosmic_entropy result;
 
 		if (cosm[get_controlled_entity()].alive()) {

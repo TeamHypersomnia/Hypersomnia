@@ -166,7 +166,7 @@ namespace scene_managers {
 		return characters[current_character];
 	}
 
-	cosmic_entropy one_entity::make_cosmic_entropy(augs::machine_entropy machine, const input_context& context, cosmos& cosm) {
+	cosmic_entropy one_entity::make_cosmic_entropy(augs::machine_entropy machine, const input_context& context, const cosmos& cosm) {
 		cosmic_entropy result;
 
 		return result;

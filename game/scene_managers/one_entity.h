@@ -22,7 +22,7 @@ namespace scene_managers {
 
 	public:
 		void populate_world_with_entities(fixed_step&);
-		cosmic_entropy make_cosmic_entropy(augs::machine_entropy, const input_context&, cosmos&);
+		cosmic_entropy make_cosmic_entropy(augs::machine_entropy, const input_context&, const cosmos&);
 		entity_id get_controlled_entity() const;
 
 		void configure_view(viewing_session&) const;

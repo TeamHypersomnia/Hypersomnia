@@ -62,7 +62,7 @@ namespace scene_managers {
 		entity_id get_controlled_entity() const;
 		void inject_input_to(entity_handle);
 		
-		cosmic_entropy make_cosmic_entropy(const augs::machine_entropy::local_type&, const input_context&, cosmos&);
+		cosmic_entropy make_cosmic_entropy(const augs::machine_entropy::local_type&, const input_context&, const cosmos&);
 
 		void control(const augs::machine_entropy::local_type&, cosmos&);
 
