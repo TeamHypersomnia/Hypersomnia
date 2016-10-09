@@ -14,6 +14,8 @@
 #include "game/detail/entity/relations_helpers.h"
 #include "game/detail/entity/spatial_properties_getters.h"
 
+#include "game/enums/entity_flag.h"
+
 class cosmos;
 class cosmic_delta;
 
@@ -199,6 +201,34 @@ namespace augs {
 
 		template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 		void recalculate_basic_processing_categories() const;
+
+		bool get_flag(const entity_flag f) const {
+			components::flags from;
+
+			if (has<components::flags>()) {
+				from = get<components::flags>();
+			}
+
+			return from.bit_flags.test(static_cast<unsigned>(f));
+		}
+
+		template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
+		void set_flag(const entity_flag f) const {
+			if (!has<components::flags>()) {
+				add(components::flags());
+			}
+
+			get<components::flags>().bit_flags.set(static_cast<unsigned>(f), true);
+		}
+
+		template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
+		void unset_flag(const entity_flag f) const {
+			if (!has<components::flags>()) {
+				add(components::flags());
+			}
+
+			get<components::flags>().bit_flags.set(static_cast<unsigned>(f), false);
+		}
 	};
 }
 

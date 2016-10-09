@@ -3,7 +3,6 @@
 #include "game/messages/collision_message.h"
 #include "game/components/driver_component.h"
 #include "game/components/special_physics_component.h"
-#include "game/components/past_contagious_component.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/step.h"

@@ -7,7 +7,7 @@
 
 namespace components {
 	struct processing : synchronizable_component {
-		typedef std::bitset<int(processing_subjects::LIST_COUNT)> bitset_type;
+		typedef std::bitset<static_cast<unsigned>(processing_subjects::LIST_COUNT)> bitset_type;
 		
 		bool activated = true;
 		padding_byte pad[3];

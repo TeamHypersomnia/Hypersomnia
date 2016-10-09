@@ -72,8 +72,7 @@ P P::get_default(const_entity_handle id) {
 	if (id.has<components::visibility>()) {
 		matching.push_back(processing_subjects::WITH_VISIBILITY);
 	}
-
-	if (id.has<components::past_contagious>()) {
+	if (id.get_flag(entity_flag::IS_PAST_CONTAGIOUS)) {
 		matching.push_back(processing_subjects::WITH_PAST_CONTAGIOUS);
 	}
 

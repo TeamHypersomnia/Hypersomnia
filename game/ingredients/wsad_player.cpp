@@ -22,7 +22,7 @@
 #include "game/components/particle_effect_response_component.h"
 #include "game/components/attitude_component.h"
 #include "game/components/dynamic_tree_node_component.h"
-#include "game/components/past_contagious_component.h"
+#include "game/components/flags_component.h"
 #include "game/assets/particle_effect_response_id.h"
 
 #include "game/enums/filters.h"
@@ -91,7 +91,7 @@ namespace ingredients {
 		auto& particle_response = e += components::particle_effect_response { assets::particle_effect_response_id::CHARACTER_RESPONSE };
 		auto& attitude = e += components::attitude();
 		auto& processing = e += components::processing();
-		auto& past_contagious = e += components::past_contagious();
+		e.set_flag(entity_flag::IS_PAST_CONTAGIOUS);
 
 		e += components::gui_element();
 

@@ -11,6 +11,7 @@ namespace components {
 	struct position_copying;
 	struct crosshair;
 	struct damage;
+	struct flags;
 	struct gun;
 	struct rotation_copying;
 	struct movement;
@@ -61,6 +62,7 @@ struct put_all_components_into {
 		components::position_copying,
 		components::crosshair,
 		components::damage,
+		components::flags,
 		components::gun,
 		components::rotation_copying,
 		components::movement,

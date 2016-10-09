@@ -11,7 +11,7 @@ launch_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.TWO_CLIENTS_AND_SERVER,
+	launch_mode = launch_modes.CLIENT_AND_SERVER,
 	
 	recording_replay_speed = 1,
 
@@ -44,7 +44,7 @@ config_table = {
 	tickrate = 60,
 
 	jitter_buffer_ms = 50,
-	client_commands_jitter_buffer_ms = 100,
+	client_commands_jitter_buffer_ms = 150,
 	
 	interpolation_speed = 525,
 

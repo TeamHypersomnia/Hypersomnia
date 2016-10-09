@@ -339,6 +339,7 @@
     <ClCompile Include="augs\texture_baker\texture_with_image.cpp" />
     <ClCompile Include="application\setups\client_setup.cpp" />
     <ClCompile Include="application\setups\determinism_test_setup.cpp" />
+    <ClCompile Include="game\components\flags_component.cpp" />
     <ClCompile Include="game\detail\entity\spatial_properties_getters.cpp" />
     <ClCompile Include="game\detail\world_camera.cpp" />
     <ClCompile Include="game\systems_insignificant\interpolation_system.cpp" />
@@ -1004,6 +1005,7 @@
     <ClInclude Include="augs\texture_baker\texture.h" />
     <ClInclude Include="augs\texture_baker\texture_with_image.h" />
     <ClInclude Include="game\components\child_component.h" />
+    <ClInclude Include="game\components\flags_component.h" />
     <ClInclude Include="game\components\guid_component.h" />
     <ClInclude Include="game\components\interpolation_component.h" />
     <ClInclude Include="game\components\past_contagious_component.h" />
@@ -1012,6 +1014,7 @@
     <ClInclude Include="game\container_sizes.h" />
     <ClInclude Include="game\detail\entity\spatial_properties_getters.h" />
     <ClInclude Include="game\detail\world_camera.h" />
+    <ClInclude Include="game\enums\entity_flag.h" />
     <ClInclude Include="game\systems_insignificant\interpolation_system.h" />
     <ClInclude Include="game\scene_managers\networked_testbed.h" />
     <ClInclude Include="game\systems_insignificant\past_infection_system.h" />

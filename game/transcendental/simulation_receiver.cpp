@@ -4,7 +4,7 @@
 #include "augs/network/network_client.h"
 
 #include "game/components/driver_component.h"
-#include "game/components/past_contagious_component.h"
+#include "game/components/flags_component.h"
 #include "game/components/crosshair_component.h"
 
 #include "game/transcendental/network_commands.h"
@@ -57,7 +57,7 @@ void simulation_receiver::drag_mismatches_into_past(const cosmos& predicted_cosm
 			continue;
 
 		const auto& reconciliated_transform = reconciliated_entity.logic_transform();
-		const bool is_contagious_agent = reconciliated_entity.has<components::past_contagious>();
+		const bool is_contagious_agent = reconciliated_entity.get_flag(entity_flag::IS_PAST_CONTAGIOUS);
 		const bool should_smooth_rotation = !is_contagious_agent || predicted_cosmos[reconciliated_entity.get<components::driver>().owned_vehicle].alive();
 
 		auto& interp_data = predicted_cosmos.systems_insignificant.get<interpolation_system>().get_data(reconciliated_entity);
