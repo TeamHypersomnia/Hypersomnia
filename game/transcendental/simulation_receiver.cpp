@@ -16,7 +16,10 @@ void simulation_receiver::acquire_next_packaged_step(const step_packaged_for_net
 
 simulation_receiver::mismatch_candidate_entry simulation_receiver::acquire_potential_mismatch(const const_entity_handle& e) const {
 	mismatch_candidate_entry candidate;
-	candidate.transform = e.logic_transform();
+	
+	if(e.has_logic_transform())
+		candidate.transform = e.logic_transform();
+
 	candidate.id = e.get_id();
 
 	return candidate;
@@ -48,7 +51,9 @@ void simulation_receiver::drag_mismatches_into_past(const cosmos& predicted_cosm
 	for (const auto e : mismatches) {
 		const const_entity_handle reconciliated_entity = predicted_cosmos[e.id];
 		
-		if (reconciliated_entity.dead()) 
+		const bool identity_matches = reconciliated_entity.alive() && reconciliated_entity.has_logic_transform();
+
+		if (!identity_matches)
 			continue;
 
 		const auto& reconciliated_transform = reconciliated_entity.logic_transform();
@@ -71,7 +76,7 @@ void simulation_receiver::drag_mismatches_into_past(const cosmos& predicted_cosm
 			mismatch_detected = true;
 		}
 
-		if (!mismatch_detected && !is_contagious_agent) {
+		if (identity_matches || (!mismatch_detected && !is_contagious_agent)) {
 			predicted_cosmos.systems_insignificant.get<past_infection_system>().uninfect(reconciliated_entity);
 		}
 	}

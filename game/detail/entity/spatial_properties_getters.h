@@ -5,6 +5,7 @@
 template<bool is_const, class entity_handle_type>
 class basic_spatial_properties_getters {
 public:
+	bool has_logic_transform() const;
 	components::transform logic_transform() const;
 };
 

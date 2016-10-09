@@ -6,6 +6,25 @@
 #include "spatial_properties_getters.h"
 
 template <bool C, class D>
+bool basic_spatial_properties_getters<C, D>::has_logic_transform() const {
+	auto& handle = *static_cast<const D*>(this);
+
+	const auto& owner = handle.get_owner_body();
+	
+	if (owner.alive() && owner != handle) {
+		return true;
+	}
+	else if (handle.has<components::physics>()) {
+		return true;
+	}
+	else if (handle.has<components::transform>()) {
+		return true;
+	}
+
+	return false;
+}
+
+template <bool C, class D>
 components::transform basic_spatial_properties_getters<C, D>::logic_transform() const {
 	auto& handle = *static_cast<const D*>(this);
 
