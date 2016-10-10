@@ -143,7 +143,7 @@ void simulation_receiver::drag_mispredictions_into_past(const cosmos& predicted_
 			misprediction_detected = true;
 		}
 
-		if (!is_contagious_agent && std::abs(reconciliated_transform.rotation - e.transform.rotation) > 1.f) {
+		if (should_smooth_rotation && std::abs(reconciliated_transform.rotation - e.transform.rotation) > 1.f) {
 			interp_data.rotational_slowdown_multiplier = static_cast<float>(predicted_steps.size());
 			misprediction_detected = true;
 		}

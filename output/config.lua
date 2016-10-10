@@ -20,10 +20,10 @@ config_table = {
 	window_name = "example",
 	fullscreen = 0,
 	window_border = 1,
-	window_x = 400,
+	window_x = 100,
 	window_y = 0,
 	bpp = 24,
-	resolution_w = 1000,
+	resolution_w = 1800,
 	resolution_h = 1000,
 	doublebuffer = 1,
 
@@ -31,7 +31,7 @@ config_table = {
 	
 	mouse_sensitivity = vec2(1.5, 1.5),
 	
-	connect_address = "192.168.1.2",
+	connect_address = "127.0.0.1",
 	connect_port = 13372,
 
 	server_port = 13372,
@@ -44,7 +44,7 @@ config_table = {
 	tickrate = 60,
 
 	jitter_buffer_ms = 50,
-	client_commands_jitter_buffer_ms = 150,
+	client_commands_jitter_buffer_ms = 0,
 	
 	interpolation_speed = 525,
 
