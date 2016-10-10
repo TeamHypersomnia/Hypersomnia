@@ -24,14 +24,14 @@ config_table = {
 	window_y = 0,
 	bpp = 24,
 	resolution_w = 1800,
-	resolution_h = 1000,
+	resolution_h = 800,
 	doublebuffer = 1,
 
 	debug_disable_cursor_clipping = 0,
 	
 	mouse_sensitivity = vec2(1.5, 1.5),
 	
-	connect_address = "127.0.0.1",
+	connect_address = "192.168.1.2",
 	connect_port = 13372,
 
 	server_port = 13372,

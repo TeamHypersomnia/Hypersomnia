@@ -72,7 +72,7 @@ namespace scene_managers {
 
 		for (int x = -4; x < 4; ++x) {
 			for (int y = -4; y < 4; ++y) {
-				auto obstacle = prefabs::create_crate(world, vec2(2000 + x * 300, 2000 + y * 300), vec2i(100, 100));
+				auto obstacle = prefabs::create_crate(world, vec2(2000 + x * 200, 200 + y * 200), vec2i(100, 100));
 			}
 		}
 
@@ -117,12 +117,12 @@ namespace scene_managers {
 		std::vector<entity_handle> new_characters;
 
 		for (int i = 0; i < num_characters; ++i) {
-			auto new_character = prefabs::create_character(world, { vec2(i * 400 , 0), -180 }, vec2(1920, 1080), typesafe_sprintf("player%x", i));
+			auto new_character = prefabs::create_character(world, { vec2(1200 + i * 200 , 0), -0 }, vec2(1920, 1080), typesafe_sprintf("player%x", i));
 
 			new_characters.push_back(new_character);
 
 			if (i == 0) {
-				new_character.get<components::sentience>().health.value = 800;
+				new_character.get<components::sentience>().health.value = 50;
 				new_character.get<components::sentience>().health.maximum = 800;
 			}
 			if (i == 1) {
@@ -130,21 +130,21 @@ namespace scene_managers {
 				new_character.get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
 				new_character.get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
 				new_character.get<components::sentience>().minimum_danger_amount_to_evade = 20;
-				new_character.get<components::sentience>().health.value = 300;
+				new_character.get<components::sentience>().health.value = 50;
 				new_character.get<components::sentience>().health.maximum = 300;
 				//ingredients::standard_pathfinding_capability(new_character);
 				//ingredients::soldier_intelligence(new_character);
 				new_character.recalculate_basic_processing_categories();
 			}
 			if (i == 2) {
-				new_character.get<components::sentience>().health.value = 38;
+				new_character.get<components::sentience>().health.value = 50;
 			}
 			if (i == 5) {
 				new_character.get<components::attitude>().parties = party_category::METROPOLIS_CITIZEN;
 				new_character.get<components::attitude>().hostile_parties = party_category::RESISTANCE_CITIZEN;
 				new_character.get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
 				new_character.get<components::sentience>().minimum_danger_amount_to_evade = 20;
-				new_character.get<components::sentience>().health.value = 300;
+				new_character.get<components::sentience>().health.value = 50;
 				new_character.get<components::sentience>().health.maximum = 300;
 				//ingredients::standard_pathfinding_capability(new_character);
 				//ingredients::soldier_intelligence(new_character);
