@@ -10,7 +10,7 @@ int get_origin(void *cls, enum MHD_ValueKind kind,
 {
 	std::string& target_val = *reinterpret_cast<std::string*>(cls);
 
-	if (!strcmp(key, "Origin"))
+	if (!strcmp(key, "Origin") || !strcmp(key, "origin"))
 		target_val = value;
 	
 	return MHD_YES;
