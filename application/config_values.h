@@ -39,5 +39,8 @@ public:
 	unsigned short server_http_daemon_port = 0;
 	std::string server_http_daemon_html_file_path;
 
+	std::string db_path;
+	std::string survey_num_file_path;
+
 	void get_values(game_window&);
 };

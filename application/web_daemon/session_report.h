@@ -1,6 +1,8 @@
 #pragma once
 #include <mutex>
 
+class config_values;
+
 struct session_report {
 	struct MHD_Daemon *d = nullptr;
 
@@ -13,7 +15,7 @@ struct session_report {
 
 	void fetch_stats(std::string new_stats);
 
-	bool start_daemon(const std::string session_report_html, const unsigned short port);
+	bool start_daemon(const config_values& cfg);
 	void stop_daemon();
 };
 

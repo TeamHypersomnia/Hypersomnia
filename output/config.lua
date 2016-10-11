@@ -11,9 +11,9 @@ launch_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.TWO_CLIENTS_AND_SERVER,
+	launch_mode = launch_modes.CLIENT_AND_SERVER,
 	
-	recording_replay_speed = 1,
+	recording_replay_speed = 0.5,
 
 	determinism_test_cloned_cosmoi_count = 2,
 
@@ -39,7 +39,7 @@ config_table = {
 	alternative_port = 13373,
 	
 	nickname = "Pythagoras",
-	debug_second_nickname = "BOT Ferrero Roche",
+	debug_second_nickname = "kolega super",
 	
 	tickrate = 60,
 
@@ -54,7 +54,10 @@ config_table = {
 
 	server_launch_http_daemon = 1,
 	server_http_daemon_port = 80,
-	server_http_daemon_html_file_path = "web/session_report.html"
+	server_http_daemon_html_file_path = "web/session_report.html",
+
+	db_path = "P:/Projects/db/",
+	survey_num_file_path = "survey_num.in"
 }
 
 if config_table.debug_disable_cursor_clipping == 0 then

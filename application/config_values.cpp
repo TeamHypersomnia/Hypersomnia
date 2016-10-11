@@ -41,4 +41,7 @@ void config_values::get_values(game_window& w) {
 	set(NVP(server_launch_http_daemon));
 	set(NVP(server_http_daemon_port));
 	set(NVP(server_http_daemon_html_file_path));
+
+	set(NVP(db_path));
+	set(NVP(survey_num_file_path));
 }

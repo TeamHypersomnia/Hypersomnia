@@ -3,7 +3,10 @@
 #include <cstdio>
 #include <string>
 
+#include "augs/ensure.h"
 #include "augs/filesystem/file.h"
+#include "augs/templates.h"
+#include "application/config_values.h"
 
 int get_origin(void *cls, enum MHD_ValueKind kind,
 	const char *key, const char *value)
@@ -63,10 +66,27 @@ ahc_echo(void *cls,
 	return ret;
 }
 
-bool session_report::start_daemon(const std::string session_report_html, const unsigned short port) {
-	std::string contents = augs::get_file_contents(session_report_html);
+bool session_report::start_daemon(const config_values& cfg) {
+	std::string contents = augs::get_file_contents(cfg.server_http_daemon_html_file_path);
 	
+	const std::string survey_num_token = "%survey_num%";
 	const std::string stats_token = "%stats%";
+	const std::string survey_num_path = cfg.db_path + cfg.survey_num_file_path;
+	int survey_num = 0;
+
+	if (augs::file_exists(survey_num_path)) {
+		std::ifstream t(survey_num_path);
+		t >> survey_num;
+	}
+
+	++survey_num;
+
+	{
+		std::ofstream t(survey_num_path);
+		t << survey_num;
+	}
+
+	contents = replace_all(contents, survey_num_token, std::to_string(survey_num));
 
 	auto it = contents.find(stats_token);
 
@@ -77,7 +97,7 @@ bool session_report::start_daemon(const std::string session_report_html, const u
 		MHD_USE_SELECT_INTERNALLY | MHD_USE_DEBUG,
 		// MHD_USE_THREAD_PER_CONNECTION | MHD_USE_DEBUG | MHD_USE_POLL,
 		// MHD_USE_THREAD_PER_CONNECTION | MHD_USE_DEBUG,
-		port,
+		cfg.server_http_daemon_port,
 		NULL, NULL, &ahc_echo, this,
 		MHD_OPTION_CONNECTION_TIMEOUT, (unsigned int)120,
 		MHD_OPTION_END);
