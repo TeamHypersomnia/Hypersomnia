@@ -94,6 +94,9 @@ void determinism_test_setup::process(game_window& window) {
 
 			for (size_t i = 0; i < cosmoi_count; ++i) {
 				auto& h = hypersomnias[i];
+				if (i + 1 < cosmoi_count)
+					hypersomnias[i] = hypersomnias[i + 1];
+
 				testbeds[i].control(s.total_entropy.local, h);
 
 				auto cosmic_entropy_for_this_step = testbeds[i].make_cosmic_entropy(s.total_entropy.local, session.context, h);
