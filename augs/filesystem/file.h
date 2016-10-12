@@ -1,9 +1,12 @@
 #pragma once
 #include <string>
+#include <vector>
 
 namespace augs {
 	bool file_exists(std::string filename);
 	std::string get_file_contents(std::string filename);
+
+	std::vector<std::string> get_file_lines(const std::string& filename);
 
 	template <class T>
 	void write_file_binary(std::string filename, T& target) {

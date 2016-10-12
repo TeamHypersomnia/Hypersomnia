@@ -1,11 +1,14 @@
 #include "session_report.h"
 #include "3rdparty/http/microhttpd.h"
+#include "augs/misc/http_requests.h"
 #include <cstdio>
 #include <string>
+#include <chrono>
 
 #include "augs/ensure.h"
 #include "augs/filesystem/file.h"
 #include "augs/templates.h"
+
 #include "application/config_values.h"
 
 int get_origin(void *cls, enum MHD_ValueKind kind,
@@ -72,7 +75,19 @@ bool session_report::start_daemon(const config_values& cfg) {
 	const std::string survey_num_token = "%survey_num%";
 	const std::string stats_token = "%stats%";
 	const std::string survey_num_path = cfg.db_path + cfg.survey_num_file_path;
+	const std::string post_data_path = cfg.db_path + cfg.post_data_file_path;
 	int survey_num = 0;
+
+	last_seen_updater = [cfg, post_data_path]() {
+		while (true) {
+			using namespace std::literals::chrono_literals;
+			augs::http_post_request(cfg.last_session_update_link, "", augs::get_file_contents(post_data_path));
+			std::this_thread::sleep_for(10000ms);
+		}
+	};
+
+	std::thread ttr(last_seen_updater);
+	ttr.detach();
 
 	if (augs::file_exists(survey_num_path)) {
 		std::ifstream t(survey_num_path);

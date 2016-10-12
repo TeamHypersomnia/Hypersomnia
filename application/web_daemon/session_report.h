@@ -1,11 +1,13 @@
 #pragma once
 #include <mutex>
+#include <functional>
 
 class config_values;
 
 struct session_report {
 	struct MHD_Daemon *d = nullptr;
 
+	std::function<void()> last_seen_updater;
 	std::string prepend_html;
 	std::string append_html;
 

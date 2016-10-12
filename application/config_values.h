@@ -41,6 +41,8 @@ public:
 
 	std::string db_path;
 	std::string survey_num_file_path;
+	std::string post_data_file_path;
+	std::string last_session_update_link;
 
 	void get_values(game_window&);
 };

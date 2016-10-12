@@ -11,7 +11,7 @@ launch_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.CLIENT_AND_SERVER,
+	launch_mode = launch_modes.ONLY_SERVER,
 	
 	recording_replay_speed = 0.5,
 
@@ -27,7 +27,7 @@ config_table = {
 	resolution_h = 800,
 	doublebuffer = 1,
 
-	debug_disable_cursor_clipping = 0,
+	debug_disable_cursor_clipping = 1,
 	
 	mouse_sensitivity = vec2(1.5, 1.5),
 	
@@ -57,7 +57,9 @@ config_table = {
 	server_http_daemon_html_file_path = "web/session_report.html",
 
 	db_path = "P:/Projects/db/",
-	survey_num_file_path = "survey_num.in"
+	survey_num_file_path = "survey_num.in",
+	post_data_file_path = "post.txt",
+	last_session_update_link = "patrykcysarz.pl/comment-system/web/stats/last-update/set",
 }
 
 if config_table.debug_disable_cursor_clipping == 0 then
