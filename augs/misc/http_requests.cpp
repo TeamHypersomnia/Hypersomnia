@@ -71,7 +71,6 @@ namespace augs {
 		get_http += "\r\n\r\n";
 		get_http += post_data;
 		// send GET / HTTP
-		LOG("%x", get_http);
 		send(Socket, get_http.c_str(), strlen(get_http.c_str()), 0);
 
 		// recieve html
