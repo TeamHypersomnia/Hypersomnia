@@ -1083,6 +1083,9 @@
     <ClCompile Include="game\components\flags_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="augs\misc\http_requests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3297,6 +3300,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\enums\entity_flag.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\misc\http_requests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
