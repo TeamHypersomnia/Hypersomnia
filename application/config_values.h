@@ -30,6 +30,7 @@ public:
 	unsigned client_commands_jitter_buffer_ms = 0;
 
 	float interpolation_speed = 0;
+	float misprediction_smoothing_multiplier = 0.5;
 
 	int debug_var = 0;
 	bool debug_randomize_entropies_in_client_setup = 0;

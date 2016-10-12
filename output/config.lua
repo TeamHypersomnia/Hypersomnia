@@ -47,6 +47,7 @@ config_table = {
 	client_commands_jitter_buffer_ms = 0,
 	
 	interpolation_speed = 525,
+	misprediction_smoothing_multiplier = 0.5,
 
 	debug_var = 0,
 	debug_randomize_entropies_in_client_setup = 1,

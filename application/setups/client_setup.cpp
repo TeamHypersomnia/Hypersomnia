@@ -59,6 +59,7 @@ void client_setup::init(game_window& window, const std::string recording_filenam
 	scene.configure_view(session);
 
 	receiver.jitter_buffer.set_lower_limit(static_cast<unsigned>(cfg.jitter_buffer_ms / hypersomnia.get_fixed_delta().in_milliseconds()));
+	receiver.misprediction_smoothing_multiplier = cfg.misprediction_smoothing_multiplier;
 
 	const bool is_replaying = input_unpacker.player.is_replaying();
 	const auto port = use_alternative_port ? cfg.alternative_port : cfg.connect_port;

@@ -33,7 +33,8 @@ void config_values::get_values(game_window& w) {
 	set(NVP(client_commands_jitter_buffer_ms));
 
 	set(NVP(interpolation_speed));
-
+	set(NVP(misprediction_smoothing_multiplier));
+	
 	set(NVP(debug_var));
 	set(NVP(debug_randomize_entropies_in_client_setup));
 	set(NVP(debug_randomize_entropies_in_client_setup_once_every_steps));

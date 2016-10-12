@@ -37,6 +37,7 @@ public:
 	std::vector<guid_mapped_entropy> predicted_steps;
 
 	float resubstantiate_prediction_every_ms = 1000.f;
+	float misprediction_smoothing_multiplier = 0.5f;
 
 	void acquire_next_packaged_step(const step_packaged_for_network&);
 
