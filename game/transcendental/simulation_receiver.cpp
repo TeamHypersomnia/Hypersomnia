@@ -55,14 +55,14 @@ simulation_receiver::unpacking_result simulation_receiver::unpack_deterministic_
 	for (size_t i = 0; i < new_commands.size(); ++i) {
 		auto& new_command = new_commands[i];
 
-		if (new_command.step_type == step_packaged_for_network::type::NEW_ENTROPY_WITH_HEARTBEAT) {
-			cosmic_delta::decode(last_delta_unpacked, new_command.delta);
-			referential_cosmos = last_delta_unpacked;
-
-			entropies_to_simulate.clear();
-			reconciliate_predicted = true;
-		}
-		else
+		//if (new_command.step_type == step_packaged_for_network::type::NEW_ENTROPY_WITH_HEARTBEAT) {
+		//	cosmic_delta::decode(last_delta_unpacked, new_command.delta);
+		//	referential_cosmos = last_delta_unpacked;
+		//
+		//	entropies_to_simulate.clear();
+		//	reconciliate_predicted = true;
+		//}
+		//else
 			ensure(new_command.step_type == step_packaged_for_network::type::NEW_ENTROPY);
 
 		step_to_simulate sim;

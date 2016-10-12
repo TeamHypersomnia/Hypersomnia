@@ -11,7 +11,7 @@ launch_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.ONLY_SERVER,
+	launch_mode = launch_modes.TWO_CLIENTS_AND_SERVER,
 	
 	recording_replay_speed = 0.5,
 
@@ -31,7 +31,7 @@ config_table = {
 	
 	mouse_sensitivity = vec2(1.5, 1.5),
 	
-	connect_address = "192.168.1.2",
+	connect_address = "127.0.0.1",
 	connect_port = 13372,
 
 	server_port = 13372,
@@ -39,7 +39,7 @@ config_table = {
 	alternative_port = 13373,
 	
 	nickname = "Pythagoras",
-	debug_second_nickname = "kolega super",
+	debug_second_nickname = "ArcCha",
 	
 	tickrate = 60,
 

@@ -220,7 +220,6 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 
 										cosmic_delta::encode(initial_hypersomnia, hypersomnia, complete_state);
 
-										hypersomnia.complete_resubstantiation();
 										resubstantiate = true;
 
 										endpoint.controlled_entity = scene.assign_new_character();
@@ -295,36 +294,60 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 			});
 
 			for (auto& e : endpoints) {
+				if (!e.sent_welcome_message) {
+					// start sending commands only when it is estabilished which will be the first step that the client will receive
+					// that is decided by when the welcome message arrives
+					continue;
+				}
+
 				guid_mapped_entropy maybe_new_client_commands;
-				auto& next_command = e.next_command;
-				next_command = step_packaged_for_network();
 
 				if (e.commands.unpack_new_command(maybe_new_client_commands)) {
 					total_unpacked_entropy += maybe_new_client_commands;
 
-					e.next_command.next_client_commands_accepted = true;
+					e.next_commands_accepted = true;
+				}
+				else {
+					e.next_commands_accepted = false;
 				}
 			}
 
 			for (auto& e : endpoints) {
-				auto& next_command = e.next_command;
+				if (!e.sent_welcome_message) {
+					// start sending commands only when it is estabilished which will be the first step that the client will receive
+					// that is decided by when the welcome message arrives
+					continue;
+				}
 
-				next_command.step_type = step_packaged_for_network::type::NEW_ENTROPY;
-				next_command.shall_resubstantiate = resubstantiate;
-				next_command.entropy = total_unpacked_entropy;
+				step_packaged_for_network transported_step;
+
+				if (resubstantiate) {
+					LOG("Ser sends resub request at step: %x", hypersomnia.get_total_steps_passed());
+				}
+
+				transported_step.step_type = step_packaged_for_network::type::NEW_ENTROPY;
+				transported_step.shall_resubstantiate = resubstantiate;
+				transported_step.entropy = total_unpacked_entropy;
+				transported_step.next_client_commands_accepted = e.next_commands_accepted;
+
 				augs::stream new_data;
 				augs::write_object(new_data, network_command::PACKAGED_STEP);
-				augs::write_object(new_data, next_command);
+				augs::write_object(new_data, transported_step);
 
 				choose_server(e.addr).post_redundant(new_data, e.addr);
 			}
 			
-			resubstantiate = false;
-
 			serv.send_pending_redundant();
 			if(start_alternative_server) alternative_serv.send_pending_redundant();
 
 			cosmic_entropy id_mapped_entropy(total_unpacked_entropy, hypersomnia);
+			
+			if (resubstantiate) {
+				LOG("Ser: resubs at step: %x", hypersomnia.get_total_steps_passed());
+				hypersomnia.complete_resubstantiation();
+				resubstantiate = false;
+			}
+
 			scene.step_with_callbacks(id_mapped_entropy, hypersomnia);
 
 			if (daemon_online) {

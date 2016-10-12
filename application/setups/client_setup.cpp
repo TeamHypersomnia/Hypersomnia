@@ -173,9 +173,9 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 
 	if (!still_downloading) {
 		const auto vdt = session.frame_timer.extract_variable_delta(extrapolated_hypersomnia.get_fixed_delta(), input_unpacker.timer);
-
+		
 		extrapolated_hypersomnia.integrate_interpolated_transforms(vdt.in_seconds());
-
+		
 		scene.view(extrapolated_hypersomnia, window, session, client, vdt, swap_buffers);
 	}
 }

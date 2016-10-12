@@ -62,8 +62,10 @@ public:
 		for (const auto& e : result.entropies_to_simulate) {
 			const cosmic_entropy cosmic_entropy_for_this_step(e.entropy, referential_cosmos);
 			
-			if (e.resubstantiate)
+			if (e.resubstantiate) {
+				LOG("Cli: %x resubs at step: %x", predictable_entity, referential_cosmos.get_total_steps_passed());
 				referential_cosmos.complete_resubstantiation();
+			}
 
 			advance(cosmic_entropy_for_this_step, referential_cosmos);
 

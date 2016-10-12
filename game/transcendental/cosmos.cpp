@@ -131,6 +131,7 @@ cosmos& cosmos::operator=(const cosmos& b) {
 	//complete_resubstantiation();
 	profiler.complete_resubstantiation.new_measurement();
 	systems_temporary = b.systems_temporary;
+	//reserve_storage_for_entities(get_maximum_entities());
 	profiler.complete_resubstantiation.end_measurement();
 	return *this;
 }
