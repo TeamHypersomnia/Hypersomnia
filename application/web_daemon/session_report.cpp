@@ -74,6 +74,7 @@ bool session_report::start_daemon(const config_values& cfg) {
 	
 	const std::string survey_num_token = "%survey_num%";
 	const std::string stats_token = "%stats%";
+	const std::string port_token = "%server_port%";
 	const std::string survey_num_path = cfg.db_path + cfg.survey_num_file_path;
 	const std::string post_data_path = cfg.db_path + cfg.post_data_file_path;
 	int survey_num = 0;
@@ -102,6 +103,7 @@ bool session_report::start_daemon(const config_values& cfg) {
 	}
 
 	contents = replace_all(contents, survey_num_token, std::to_string(survey_num));
+	contents = replace_all(contents, port_token, std::to_string(cfg.server_port));
 
 	auto it = contents.find(stats_token);
 
