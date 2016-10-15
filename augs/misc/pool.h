@@ -2,11 +2,11 @@
 #include <vector>
 #include "augs/ensure.h"
 #include "pool_handle.h"
-#include "pool_handlizer.h"
+#include "pool_handle_operators_mixin.h"
 
 namespace augs {
 	template<class T>
-	class basic_pool : public pool_handlizer<basic_pool<T>> {
+	class basic_pool : public pool_handle_operators_mixin<basic_pool<T>> {
 	public:
 		typedef augs::pool_id<T> id_type;
 		typedef augs::unversioned_id<T> unversioned_id_type;

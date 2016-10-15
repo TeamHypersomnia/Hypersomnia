@@ -1877,9 +1877,6 @@
     <ClInclude Include="augs\misc\pool_id.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\misc\pool_handlizer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="augs\gui\gui_event.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3303,6 +3300,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\http_requests.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\misc\pool_handle_operators_mixin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

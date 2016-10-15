@@ -983,6 +983,7 @@
     <ClInclude Include="augs\gui\rect_handle.h" />
     <ClInclude Include="augs\gui\rect_id.h" />
     <ClInclude Include="augs\misc\http_requests.h" />
+    <ClInclude Include="augs\misc\pool_handle_operators_mixin.h" />
     <ClInclude Include="augs\misc\readable_bytesize.h" />
     <ClInclude Include="augs\misc\delta_compression.h" />
     <ClInclude Include="augs\misc\enum_associative_array.h" />
@@ -992,7 +993,6 @@
     <ClInclude Include="augs\misc\jitter_buffer.h" />
     <ClInclude Include="augs\misc\machine_entropy.h" />
     <ClInclude Include="augs\misc\minmax.h" />
-    <ClInclude Include="augs\misc\pool_handlizer.h" />
     <ClInclude Include="augs\misc\stepped_timing.h" />
     <ClInclude Include="augs\misc\streams.h" />
     <ClInclude Include="augs\misc\templated_readwrite.h" />

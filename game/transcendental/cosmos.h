@@ -19,7 +19,7 @@
 #include "game/systems_temporary/processing_lists_system.h"
 
 #include "augs/misc/delta.h"
-#include "augs/misc/pool_handlizer.h"
+#include "augs/misc/pool_handle_operators_mixin.h"
 
 #include "game/transcendental/entity_id.h"
 #include "game/detail/inventory_slot_id.h"
@@ -30,7 +30,7 @@
 
 class cosmic_delta;
 
-class cosmos : private storage_for_all_components_and_aggregates, public augs::pool_handlizer<cosmos>
+class cosmos : private storage_for_all_components_and_aggregates, public augs::pool_handle_operators_mixin<cosmos>
 {
 	void advance_deterministic_schemata(fixed_step& step_state);
 

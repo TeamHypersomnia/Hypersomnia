@@ -11,7 +11,7 @@ launch_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.CLIENT_AND_SERVER,
+	launch_mode = launch_modes.LOCAL,
 	
 	recording_replay_speed = 0.5,
 
@@ -20,10 +20,10 @@ config_table = {
 	window_name = "example",
 	fullscreen = 0,
 	window_border = 1,
-	window_x = 100,
+	window_x = 400,
 	window_y = 0,
 	bpp = 24,
-	resolution_w = 1800,
+	resolution_w = 1000,
 	resolution_h = 800,
 	doublebuffer = 1,
 
@@ -39,7 +39,7 @@ config_table = {
 	alternative_port = 13373,
 	
 	nickname = "Pythagoras",
-	debug_second_nickname = "ArcCha",
+	debug_second_nickname = "Kartezjan",
 	
 	tickrate = 60,
 

@@ -2,7 +2,7 @@
 #include "augs/templates.h"
 #include "augs/misc/pool.h"
 #include "augs/misc/pool_id.h"
-#include "augs/misc/pool_handlizer.h"
+#include "augs/misc/pool_handle_operators_mixin.h"
 #include "rect_id.h"
 #include "rect_world.h"
 #include "element_handle.h"
@@ -18,7 +18,7 @@ namespace augs {
 		struct make_pool_with_element_meta { typedef pool_with_meta<T, element_meta> type; };
 
 		template<class... all_elements>
-		class element_world : public pool_handlizer<element_world<all_elements...>> {
+		class element_world : public pool_handle_operators_mixin<element_world<all_elements...>> {
 			class rect_meta {
 			public:
 				tuple_of_t<make_pool_id, all_elements...> element_ids;
