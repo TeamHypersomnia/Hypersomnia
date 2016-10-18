@@ -3,8 +3,6 @@
 #include "augs/misc/pool.h"
 #include "augs/misc/pool_id.h"
 
-#include "aggregate_mixins.h"
-
 namespace augs {
 	template <class derived, class... components>
 	class storage_for_components_and_aggregates {

@@ -964,8 +964,9 @@
     <ClInclude Include="application\setups\setup_base.h" />
     <ClInclude Include="application\setups\two_clients_and_server_setup.h" />
     <ClInclude Include="augs\build_settings.h" />
-    <ClInclude Include="augs\entity_system\aggregate_mixins.h" />
+    <ClInclude Include="augs\entity_system\component_allocators_mixin.h" />
     <ClInclude Include="augs\entity_system\component_aggregate.h" />
+    <ClInclude Include="augs\entity_system\component_setters_mixin.h" />
     <ClInclude Include="augs\entity_system\ecs_instantiation.h" />
     <ClInclude Include="augs\entity_system\storage_for_components_and_aggregates.h" />
     <ClInclude Include="augs\entity_system\storage_for_message_queues.h" />

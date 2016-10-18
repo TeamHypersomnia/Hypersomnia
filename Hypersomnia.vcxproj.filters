@@ -1814,9 +1814,6 @@
     <ClInclude Include="game\components\special_physics_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\entity_system\aggregate_mixins.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\detail\state_for_drawing_camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3303,6 +3300,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\easier_handle_getters_mixin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\entity_system\component_setters_mixin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\entity_system\component_allocators_mixin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

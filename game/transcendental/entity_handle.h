@@ -5,7 +5,8 @@
 #include "game/transcendental/entity_handle_declaration.h"
 
 #include "augs/entity_system/component_aggregate.h"
-#include "augs/entity_system/aggregate_mixins.h"
+#include "augs/entity_system/component_setters_mixin.h"
+#include "augs/entity_system/component_allocators_mixin.h"
 #include "augs/misc/pool_handle.h"
 #include "game/transcendental/entity_id.h"
 
@@ -27,8 +28,8 @@ namespace augs {
 	class basic_handle<is_const, cosmos, put_all_components_into<component_aggregate>::type> :
 		public basic_handle_base<is_const, cosmos, put_all_components_into<component_aggregate>::type>,
 
-		private augs::component_allocators<is_const, basic_entity_handle<is_const>>,
-		public augs::component_setters<is_const, basic_entity_handle<is_const>>,
+		private augs::component_allocators_mixin<is_const, basic_entity_handle<is_const>>,
+		public augs::component_setters_mixin<is_const, basic_entity_handle<is_const>>,
 		public inventory_getters<is_const, basic_entity_handle<is_const>>,
 		public physics_getters<is_const, basic_entity_handle<is_const>>,
 		public relations_helpers<is_const, basic_entity_handle<is_const>>,
@@ -37,10 +38,10 @@ namespace augs {
 		friend class relations_helpers<is_const, basic_entity_handle<is_const>>;
 		template <bool, class> friend class basic_relations_helpers;
 
-		typedef augs::component_allocators<is_const, basic_entity_handle<is_const>> allocator;
+		typedef augs::component_allocators_mixin<is_const, basic_entity_handle<is_const>> allocator;
 		typedef basic_handle_base<is_const, cosmos, put_all_components_into<component_aggregate>::type> base;
 
-		friend class augs::component_allocators<is_const, basic_entity_handle<is_const>>;
+		friend class augs::component_allocators_mixin<is_const, basic_entity_handle<is_const>>;
 		friend class cosmic_delta;
 		friend class cosmos;
 
