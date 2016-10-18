@@ -10,7 +10,7 @@
 #include "rect_handle.h"
 
 #include "augs/misc/pool.h"
-#include "augs/misc/pool_handle_operators_mixin.h"
+#include "augs/misc/easier_handle_getters_mixin.h"
 
 #include "game/assets/font_id.h"
 

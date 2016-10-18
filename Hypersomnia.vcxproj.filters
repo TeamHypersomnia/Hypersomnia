@@ -3302,7 +3302,7 @@
     <ClInclude Include="augs\misc\http_requests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\misc\pool_handle_operators_mixin.h">
+    <ClInclude Include="augs\misc\easier_handle_getters_mixin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

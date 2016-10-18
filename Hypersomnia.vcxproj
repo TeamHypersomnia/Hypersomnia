@@ -982,8 +982,8 @@
     <ClInclude Include="augs\gui\middlescrolling.h" />
     <ClInclude Include="augs\gui\rect_handle.h" />
     <ClInclude Include="augs\gui\rect_id.h" />
+    <ClInclude Include="augs\misc\easier_handle_getters_mixin.h" />
     <ClInclude Include="augs\misc\http_requests.h" />
-    <ClInclude Include="augs\misc\pool_handle_operators_mixin.h" />
     <ClInclude Include="augs\misc\readable_bytesize.h" />
     <ClInclude Include="augs\misc\delta_compression.h" />
     <ClInclude Include="augs\misc\enum_associative_array.h" />

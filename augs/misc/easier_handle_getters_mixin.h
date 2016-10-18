@@ -5,7 +5,7 @@ struct inventory_slot_id;
 
 namespace augs {
 	template<class derived>
-	class pool_handle_operators_mixin {
+	class easier_handle_getters_mixin {
 	public:
 		template <class container>
 		decltype(auto) to_handle_vector(const container& vec) {
