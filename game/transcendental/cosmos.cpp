@@ -176,7 +176,8 @@ void cosmos::complete_resubstantiation(const const_entity_handle h) {
 }
 
 void cosmos::reserve_storage_for_entities(const size_t n) {
-	reserve_storage_for_aggregates(n);
+	get_aggregate_pool().initialize_space(n);
+	reserve_storage_for_all_components(n);
 
 	auto reservation_lambda = [n](auto& sys) {
 		sys.reserve_caches_for_entities(n);
@@ -230,6 +231,14 @@ const_entity_handle cosmos::get_handle(const entity_id id) const {
 	return const_entity_handle(*this, id);
 }
 
+entity_handle cosmos::get_handle(const unversioned_entity_id id) {
+	return entity_handle(*this, get_aggregate_pool().make_versioned(id));
+}
+
+const_entity_handle cosmos::get_handle(const unversioned_entity_id id) const {
+	return const_entity_handle(*this, get_aggregate_pool().make_versioned(id));
+}
+
 inventory_slot_handle cosmos::get_handle(const inventory_slot_id id) {
 	return inventory_slot_handle(*this, id);
 }
@@ -264,9 +273,15 @@ void cosmos::set_fixed_delta(const augs::fixed_delta& dt) {
 	significant.meta.delta = dt;
 }
 
-entity_handle cosmos::create_entity(const std::string debug_name) {
+entity_handle cosmos::allocate_new_entity() {
+	auto raw_pool_id = get_aggregate_pool().allocate();
 
-	const auto new_entity = get_handle(allocate_aggregate(debug_name));
+	return entity_handle(*this, raw_pool_id);
+}
+
+entity_handle cosmos::create_entity(const std::string debug_name) {
+	auto new_entity = allocate_new_entity();
+	new_entity.set_debug_name(debug_name);
 	new_entity += components::guid();
 
 #if COSMOS_TRACKS_GUIDS
@@ -279,7 +294,7 @@ entity_handle cosmos::create_entity(const std::string debug_name) {
 
 #if COSMOS_TRACKS_GUIDS
 entity_handle cosmos::create_entity_with_specific_guid(const std::string debug_name, const unsigned specific_guid) {
-	const auto new_entity = get_handle(allocate_aggregate(debug_name));
+	const auto new_entity = allocate_new_entity();
 	new_entity += components::guid();
 
 	guid_map_for_transport[specific_guid] = new_entity;
@@ -289,12 +304,15 @@ entity_handle cosmos::create_entity_with_specific_guid(const std::string debug_n
 #endif
 
 entity_handle cosmos::clone_entity(const entity_id copied_entity_id) {
-	const const_entity_handle copied_entity = get_handle(copied_entity_id);
+	entity_handle copied_entity = get_handle(copied_entity_id);
 	
 	if (copied_entity.dead())
 		return get_handle(entity_id());
 
-	const auto new_entity = get_handle(clone_aggregate<components::substance>(copied_entity));
+	auto new_entity = allocate_new_entity();
+	clone_all_components<components::substance>(copied_entity, new_entity);
+	new_entity.set_debug_name("+" + copied_entity.get_debug_name());
+
 	//ensure(new_entity.get_id().pool.indirection_index != 37046);
 	//ensure(new_entity.get_id().pool.indirection_index != 36985);
 
@@ -350,11 +368,12 @@ void cosmos::delete_entity(entity_id e) {
 		handle.set_owner_body(owner_body);
 	}
 
-	free_aggregate(e);
+	remove_all_components(get_handle(e));
+	get_aggregate_pool().free(e);
 }
 
 size_t cosmos::entities_count() const {
-	return aggregates_count();
+	return significant.pool_for_aggregates.size();
 }
 
 size_t cosmos::get_maximum_entities() const {

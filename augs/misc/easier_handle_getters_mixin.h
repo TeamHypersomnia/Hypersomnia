@@ -6,73 +6,56 @@ struct inventory_slot_id;
 namespace augs {
 	template<class derived>
 	class easier_handle_getters_mixin {
+		template <class T, typename = void>
+		class container_or_object_resolution {
+		public:
+			static decltype(auto) handlize(easier_handle_getters_mixin& base, const T& from_id) {
+				auto& self = *static_cast<derived*>(&base);
+				return self.get_handle(from_id);
+			}
+
+			static decltype(auto) handlize(const easier_handle_getters_mixin& base, const T& from_id) {
+				const auto& self = *static_cast<const derived*>(&base);
+				return self.get_handle(from_id);
+			}
+		};
+
+		template <class T>
+		class container_or_object_resolution<T, std::enable_if_t<std::is_same<std::true_type, decltype(std::declval<T>().begin(), std::true_type())>::value>> {
+		public:
+			static decltype(auto) handlize(easier_handle_getters_mixin& base, const T& passed_container) {
+				auto& self = *static_cast<derived*>(&base);
+
+				std::vector<decltype(self.get_handle(*passed_container.begin()))> handles;
+
+				for (auto v : passed_container)
+					handles.emplace_back(self.get_handle(v));
+
+				return handles;
+			}
+
+			static decltype(auto) handlize(const easier_handle_getters_mixin& base, const T& passed_container) {
+				const auto& self = *static_cast<const derived*>(&base);
+
+				std::vector<decltype(self.get_handle(*passed_container.begin()))> handles;
+
+				for (auto v : passed_container)
+					handles.emplace_back(self.get_handle(v));
+
+				return handles;
+			}
+		};
+
 	public:
-		template <class container>
-		decltype(auto) to_handle_vector(const container& vec) {
-			auto& self = *static_cast<derived*>(this);
 
-			std::vector<decltype(operator[](*vec.begin()))> handles;
-
-			for (auto v : vec)
-				handles.emplace_back(operator[](v));
-
-			return handles;
+		template <class passed_type>
+		decltype(auto) operator[](const passed_type passed) {
+			return container_or_object_resolution<passed_type>::handlize(*this, passed);
 		}
 
-		template <class container>
-		decltype(auto) to_handle_vector(const container& vec) const {
-			auto& self = *static_cast<const derived*>(this);
-
-			std::vector<decltype(operator[](*vec.begin()))> handles;
-
-			for (auto v : vec)
-				handles.emplace_back(operator[](v));
-
-			return handles;
-		}
-
-		template <class id_container>
-		decltype(auto) operator [](const id_container& ids) {
-			return to_handle_vector(ids);
-		}
-
-		template <class id_container>
-		decltype(auto) operator [](const id_container& ids) const {
-			return to_handle_vector(ids);
-		}
-
-		template <class object_type>
-		decltype(auto) operator[](pool_id<object_type> from_id) {
-			auto& self = *static_cast<derived*>(this);
-			return self.get_handle(from_id);
-		}
-
-		template <class object_type>
-		decltype(auto) operator[](pool_id<object_type> from_id) const {
-			auto& self = *static_cast<const derived*>(this);
-			return self.get_handle(from_id);
-		}
-
-		template <class object_type>
-		decltype(auto) operator[](unversioned_id<object_type> unv) {
-			auto& self = *static_cast<derived*>(this);
-			return self.get_handle(self.get_pool(pool_id<object_type>()).make_versioned(unv));
-		}
-
-		template <class object_type>
-		decltype(auto) operator[](unversioned_id<object_type> unv) const {
-			auto& self = *static_cast<const derived*>(this);
-			return self.get_handle(self.get_pool(pool_id<object_type>()).make_versioned(unv));
-		}
-
-		decltype(auto) operator[](inventory_slot_id from_id) {
-			auto& self = *static_cast<derived*>(this);
-			return self.get_handle(from_id);
-		}
-
-		decltype(auto) operator[](inventory_slot_id from_id) const {
-			auto& self = *static_cast<const derived*>(this);
-			return self.get_handle(from_id);
+		template <class passed_type>
+		decltype(auto) operator[](const passed_type passed) const {
+			return container_or_object_resolution<passed_type>::handlize(*this, passed);
 		}
 	};
 }

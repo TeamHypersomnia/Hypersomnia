@@ -11,11 +11,11 @@ namespace augs {
 
 			auto& aggregate = self.get();
 
-			auto& component_pool = self.owner.get_pool(pool_id<component>());
-			auto component_handle = component_pool.get_handle(aggregate.template get_id<component>());
+			auto& component_pool = self.owner.get_component_pool<component>();
+			auto component_id = aggregate.template get_id<component>();
 
-			if (component_handle.alive())
-				return &component_handle.get();
+			if (component_pool.alive(component_id))
+				return &component_pool.get(component_id);
 
 			return nullptr;
 		}
@@ -36,7 +36,7 @@ namespace augs {
 		  void add(const component& c) const {
 			auto& self = *static_cast<const derived*>(this);
 			ensure(!has<component>());
-			self.get().template writable_id<component>() = self.owner.get_pool(pool_id<component>()).allocate(c);
+			self.get().template writable_id<component>() = self.get_cosmos().template get_component_pool<component>().allocate(c);
 		}
 
 		template<class component, bool _is_const = is_const,
@@ -44,7 +44,7 @@ namespace augs {
 			void remove() const {
 			ensure(has<component>());
 			auto& self = *static_cast<const derived*>(this);
-			self.owner.get_pool(pool_id<component>()).free(self.get().template get_id<component>());
+			self.get_cosmos().get_component_pool<component>().free(self.get().template get_id<component>());
 		}
 	};
 }

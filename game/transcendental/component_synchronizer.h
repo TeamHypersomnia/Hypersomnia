@@ -8,9 +8,6 @@ struct synchronizable_component {
 
 template <bool is_const, class component_type>
 class component_synchronizer_base {
-	template<bool, class, class>
-	friend class augs::basic_handle;
-
 	typedef maybe_const_ref_t<is_const, component_type> component_reference;
 protected:
 	component_reference component;

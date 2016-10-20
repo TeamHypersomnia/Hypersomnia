@@ -13,12 +13,9 @@
 #include "game/transcendental/cosmos.h"
 #include "game/detail/physics_scripts.h"
 
-typedef cosmos O;
-typedef put_all_components_into<augs::component_aggregate>::type N;
-
 template <bool C>
 template <bool, class>
-void augs::basic_handle<C, O, N>::add_standard_components() const {
+void basic_entity_handle<C>::add_standard_components() const {
 	const bool has_physics = has<components::physics>();
 
 	if (has_physics || has<components::fixtures>()) {
@@ -53,7 +50,7 @@ void augs::basic_handle<C, O, N>::add_standard_components() const {
 
 template <bool C>
 template <bool, class>
-void augs::basic_handle<C, O, N>::recalculate_basic_processing_categories() const {
+void basic_entity_handle<C>::recalculate_basic_processing_categories() const {
 	auto default_processing = components::processing::get_default(*this);
 
 	if (!has<components::processing>()) {
@@ -73,5 +70,5 @@ size_t make_cache_id(const const_entity_handle& handle) {
 }
 
 // explicit instantiation
-template void augs::basic_handle<false, cosmos, put_all_components_into<augs::component_aggregate>::type>::add_standard_components<false, void>() const;
-template void augs::basic_handle<false, cosmos, put_all_components_into<augs::component_aggregate>::type>::recalculate_basic_processing_categories<false, void>() const;
+template void basic_entity_handle<false>::add_standard_components<false, void>() const;
+template void basic_entity_handle<false>::recalculate_basic_processing_categories<false, void>() const;

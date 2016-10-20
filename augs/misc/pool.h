@@ -6,12 +6,12 @@
 
 namespace augs {
 	template<class T>
-	class basic_pool : public easier_handle_getters_mixin<basic_pool<T>> {
+	class pool_base : public easier_handle_getters_mixin<pool_base<T>> {
 	public:
-		typedef augs::pool_id<T> id_type;
-		typedef augs::unversioned_id<T> unversioned_id_type;
-		typedef augs::pool_handle<T> handle_type;
-		typedef augs::const_pool_handle<T> const_handle_type;
+		typedef pool_id<T> id_type;
+		typedef unversioned_id<T> unversioned_id_type;
+		typedef handle_for_pool_container<false, pool_base<T>, T> handle_type;
+		typedef handle_for_pool_container<true, pool_base<T>, T> const_handle_type;
 
 		typedef std::vector<T> pooled_container_type;
 
@@ -141,7 +141,7 @@ namespace augs {
 			slots.push_back(new_slot);
 			pooled.emplace_back(args...);
 
-			return get_handle(allocated_id);
+			return allocated_id;
 		}
 
 		bool free(id_type object) {
@@ -149,7 +149,7 @@ namespace augs {
 		}
 
 	public:
-		basic_pool(int slot_count = 0) {
+		pool_base(int slot_count = 0) {
 			initialize_space(slot_count);
 		}
 
@@ -247,14 +247,6 @@ namespace augs {
 			return object.pool.indirection_index >= 0 && indirectors[object.pool.indirection_index].version == object.pool.version;
 		}
 
-		basic_pool& get_pool(const id_type) {
-			return *this;
-		}
-
-		const basic_pool& get_pool(const id_type) const {
-			return *this;
-		}
-
 		const pooled_container_type& get_pooled() const {
 			return pooled;
 		}
@@ -281,62 +273,65 @@ namespace augs {
 	};
 
 	template<class T>
-	class pool : public basic_pool<T> {
+	class pool : public pool_base<T> {
 	public:
-		using basic_pool<T>::initialize_space;
-		using basic_pool<T>::allocate;
-		using basic_pool<T>::free;
+		using pool_base<T>::initialize_space;
+		using pool_base<T>::allocate;
+		using pool_base<T>::free;
 		
 		template <class Archive>
 		void write_object(Archive& ar) const {
-			augs::write_object(ar, static_cast<const basic_pool<T>&>(*this));
+			augs::write_object(ar, static_cast<const pool_base<T>&>(*this));
 		}
 
 		template <class Archive>
 		bool read_object(Archive& ar) {
-			return augs::read_object(ar, static_cast<basic_pool<T>&>(*this));
+			return augs::read_object(ar, static_cast<pool_base<T>&>(*this));
 		}
 	};
 
 	template<class T, typename... meta>
-	class pool_with_meta : public basic_pool<T> {
+	class pool_with_meta : public pool_base<T> {
 		std::vector<std::tuple<meta...>> metas;
+
+		typedef augs::handle_for_pool_container<false, pool_with_meta, T> handle_type;
+		typedef augs::handle_for_pool_container<true, pool_with_meta, T> const_handle_type;
 	public:
 		template <class Archive>
 		void serialize(Archive& ar) {
-			basic_pool<T>::serialize(ar);
+			pool_base<T>::serialize(ar);
 
 			ar(CEREAL_NVP(metas));
 		}
 
 		template <class Archive>
 		void write_object(Archive& ar) const {
-			augs::write_object(ar, static_cast<const basic_pool<T>&>(*this));
+			augs::write_object(ar, static_cast<const pool_base<T>&>(*this));
 			augs::write_with_capacity(ar, metas);
 		}
 
 		template <class Archive>
 		bool read_object(Archive& ar) {
-			return augs::read_object(ar, static_cast<basic_pool<T>&>(*this)) &&
+			return augs::read_object(ar, static_cast<pool_base<T>&>(*this)) &&
 			augs::read_with_capacity(ar, metas);
 		}
 
 		void initialize_space(int slot_count) {
-			basic_pool<T>::initialize_space(slot_count);
+			pool_base<T>::initialize_space(slot_count);
 
 			metas.clear();
 			metas.reserve(slot_count);
 		}
 
 		template<typename... Args>
-		typename basic_pool<T>::id_type allocate(Args... args) {
-			auto result = basic_pool<T>::allocate(args...);
+		typename pool_base<T>::id_type allocate(Args... args) {
+			auto result = pool_base<T>::allocate(args...);
 			metas.emplace_back(std::tuple<meta...>());
 			return result;
 		}
 
-		bool free(typename basic_pool<T>::id_type object) {
-			auto result = basic_pool<T>::internal_free(object, [this](size_t to, size_t from){
+		bool free(typename pool_base<T>::id_type object) {
+			auto result = pool_base<T>::internal_free(object, [this](size_t to, size_t from){
 				metas[to] = std::move(metas[from]);
 			});
 
@@ -349,15 +344,15 @@ namespace augs {
 		}
 
 		template <typename M>
-		M& get_meta(typename basic_pool<T>::id_type object) {
+		M& get_meta(typename pool_base<T>::id_type object) {
 			ensure(alive(object));
-			return std::get<M>(metas[basic_pool<T>::get_real_index(object)]);
+			return std::get<M>(metas[pool_base<T>::get_real_index(object)]);
 		}
 
 		template <typename M>
-		const M& get_meta(typename basic_pool<T>::id_type object) const {
+		const M& get_meta(typename pool_base<T>::id_type object) const {
 			ensure(alive(object));
-			return std::get<M>(metas[basic_pool<T>::get_real_index(object)]);
+			return std::get<M>(metas[pool_base<T>::get_real_index(object)]);
 		}
 	};
 

@@ -3,87 +3,48 @@
 #include "pool_id.h"
 
 namespace augs {
-	template<bool is_const, class owner_type, class value_type>
-	class basic_handle_base {
+	template<bool is_const, class pool_container, class value_type>
+	class handle_for_pool_container {
 	public:
-		typedef maybe_const_ref_t<is_const, owner_type> owner_reference;
-		typedef maybe_const_ref_t<is_const, value_type> value_reference;
+		typedef maybe_const_ref_t<is_const, pool_container> owner_reference;
 		typedef pool_id<value_type> id_type;
 
 		owner_reference owner;
 		id_type raw_id;
-
-		basic_handle_base(owner_reference owner, id_type raw_id) : owner(owner), raw_id(raw_id) {}
-
-		void unset() {
-			raw_id.unset();
-		}
 		
-		void set_id(id_type id) {
-			raw_id = id;
-		}
+		handle_for_pool_container(owner_reference owner, id_type raw_id) : raw_id(raw_id), owner(owner) {}
 
 		void set_debug_name(std::string s) {
 			raw_id.set_debug_name(s);
 		}
 
-		decltype(auto) get_pool() const {
-			return owner.get_pool(id_type());
-		}
-
 		template<class M>
 		maybe_const_ref_t<is_const, M> get_meta() const {
-			return get_pool().template get_meta<M>(raw_id);
+			return owner.template get_meta<M>(raw_id);
 		}
 
-		value_reference get() const {
-			return get_pool().get(raw_id);
+		decltype(auto) get() const {
+			return owner.get(raw_id);
 		}
 
 		bool alive() const {
-			return get_pool().alive(raw_id);
+			return owner.alive(raw_id);
 		}
 
 		bool dead() const {
 			return !alive();
 		}
 
-		id_type get_id() const {
-			return raw_id;
-		}
-
-		operator id_type() const {
-			return get_id();
-		}
-
 		std::string get_debug_name() const {
 			return raw_id.get_debug_name();
 		}
 
-		bool operator==(const id_type& b) const {
-			return raw_id == b;
+		operator id_type() const {
+			return raw_id;
 		}
 
-		bool operator!=(const id_type& b) const {
-			return raw_id != b;
+		owner_reference get_pool() {
+			return owner;
 		}
 	};
-
-	template<bool is_const, class owner_type, class value_type>
-	class basic_handle : public basic_handle_base<is_const, owner_type, value_type> {
-	public:
-		using basic_handle_base<is_const, owner_type, value_type>::basic_handle_base;
-	};
-
-	template <class T>
-	class basic_pool;
-
-	template<bool is_const, class T>
-	using basic_pool_handle = basic_handle<is_const, basic_pool<T>, T>;
-
-	template<class T>
-	using pool_handle = basic_pool_handle<false, T>;
-	
-	template<class T>
-	using const_pool_handle = basic_pool_handle<true, T>;
 }

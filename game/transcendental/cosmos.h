@@ -4,7 +4,7 @@
 #include "augs/misc/streams.h"
 #include "game/transcendental/cosmic_entropy.h"
 
-#include "augs/entity_system/storage_for_components_and_aggregates.h"
+#include "augs/entity_system/operations_on_all_components_mixin.h"
 #include "augs/entity_system/storage_for_message_queues.h"
 #include "augs/entity_system/storage_for_systems.h"
 
@@ -30,7 +30,9 @@
 
 class cosmic_delta;
 
-class cosmos : private storage_for_all_components_and_aggregates, public augs::easier_handle_getters_mixin<cosmos>
+class cosmos : 
+	private put_all_components_into<augs::operations_on_all_components_mixin, cosmos>::type, 
+	public augs::easier_handle_getters_mixin<cosmos>
 {
 	void advance_deterministic_schemata(fixed_step& step_state);
 
@@ -51,6 +53,7 @@ private:
 	void destroy_substance_completely();
 	void create_substance_completely();
 
+	entity_handle allocate_new_entity();
 public:
 	storage_for_all_systems_temporary systems_temporary;
 	mutable storage_for_all_systems_insignificant systems_insignificant;
@@ -144,16 +147,6 @@ public:
 			sys.construct(handle);
 	}
 
-	template<class element_type>
-	auto get_handle(augs::pool_id<element_type> id) {
-		return get_pool(id)[id];
-	}
-
-	template<class element_type>
-	auto get_handle(augs::pool_id<element_type> id) const {
-		return get_pool(id)[id];
-	}
-
 #if COSMOS_TRACKS_GUIDS
 	entity_handle get_entity_by_guid(unsigned);
 	const_entity_handle get_entity_by_guid(unsigned) const;
@@ -162,6 +155,8 @@ public:
 
 	entity_handle get_handle(entity_id);
 	const_entity_handle get_handle(entity_id) const;
+	entity_handle get_handle(unversioned_entity_id);
+	const_entity_handle get_handle(unversioned_entity_id) const;
 	inventory_slot_handle get_handle(inventory_slot_id);
 	const_inventory_slot_handle get_handle(inventory_slot_id) const;
 
@@ -188,30 +183,30 @@ public:
 
 	template <class D>
 	void for_each_entity_id(D pred) {
-		significant.pool_for_aggregates.for_each_id(pred);
+		get_aggregate_pool().for_each_id(pred);
 	}
 
 	template <class D>
 	void for_each_entity_id(D pred) const {
-		significant.pool_for_aggregates.for_each_id(pred);
+		get_aggregate_pool().for_each_id(pred);
+	}
+
+	auto& get_aggregate_pool() {
+		return significant.pool_for_aggregates;
+	}
+
+	const auto& get_aggregate_pool() const {
+		return significant.pool_for_aggregates;
 	}
 
 	template<class T>
-	auto& get_pool(augs::pool_id<T>) {
+	auto& get_component_pool() {
 		return std::get<augs::pool<T>>(significant.pools_for_components);
 	}
 
 	template<class T>
-	const auto& get_pool(augs::pool_id<T>) const {
+	const auto& get_component_pool() const {
 		return std::get<augs::pool<T>>(significant.pools_for_components);
-	}
-
-	auto& get_pool(entity_id) {
-		return significant.pool_for_aggregates;
-	}
-
-	const auto& get_pool(entity_id) const {
-		return significant.pool_for_aggregates;
 	}
 };
 

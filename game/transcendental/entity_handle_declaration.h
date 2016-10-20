@@ -2,8 +2,8 @@
 #include "game/transcendental/types_specification/all_components_declaration.h"
 
 namespace augs {
-	template <bool, class, class>
-	class basic_handle;
+	template <bool, class>
+	class handle_with_pool_ref;
 
 	template <class... components>
 	class component_aggregate;
@@ -12,7 +12,7 @@ namespace augs {
 class cosmos;
 
 template<bool is_const>
-using basic_entity_handle = augs::basic_handle<is_const, cosmos, put_all_components_into<augs::component_aggregate>::type>;
+class basic_entity_handle;
 
 typedef basic_entity_handle<false> entity_handle;
 typedef basic_entity_handle<true> const_entity_handle;

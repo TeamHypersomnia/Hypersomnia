@@ -103,8 +103,8 @@ bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 
 			constexpr size_t idx = index_in_tuple<encoded_id_type, decltype(agg.component_ids)>::value;
 
-			const auto base_c = base[base_id];
-			const auto enco_c = enco[enco_id];
+			const auto base_c = base.get_component_pool<component_type>()[base_id];
+			const auto enco_c = enco.get_component_pool<component_type>()[enco_id];
 
 			if (enco_c.dead() && base_c.dead())
 				return;
@@ -309,7 +309,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 			constexpr size_t idx = index_in_tuple<encoded_id_type, decltype(agg.component_ids)>::value;
 
 			if (overridden_components[idx]) {
-				const auto deco_c = deco[deco_id];
+				const auto deco_c = deco.get_component_pool<component_type>()[deco_id];
 
 				if (deco_c.dead()) {
 					component_type decoded_component;

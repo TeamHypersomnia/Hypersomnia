@@ -8,7 +8,7 @@ namespace augs {
 
 namespace augs {
 	template<class>
-	class basic_pool;
+	class pool_base;
 
 	template<class>
 	class pool;
@@ -219,12 +219,12 @@ namespace augs {
 	}
 
 	template<class A, class T, class...>
-	auto read_object(A& ar, basic_pool<T>& storage) {
+	auto read_object(A& ar, pool_base<T>& storage) {
 		return storage.read_object(ar);
 	}
 
 	template<class A, class T, class...>
-	void write_object(A& ar, const basic_pool<T>& storage) {
+	void write_object(A& ar, const pool_base<T>& storage) {
 		storage.write_object(ar);
 	}
 
