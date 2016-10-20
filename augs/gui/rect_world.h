@@ -123,8 +123,11 @@ namespace augs {
 					}
 				}
 
-				if (context.alive(rect_in_focus) && rect_in_focus.get().get_flag(rect_leaf::flag::FETCH_WHEEL) && gl.msg == event::wheel) {
-					if (rect_in_focus.get().get_flag(rect_leaf::flag::ENABLE_DRAWING)) {
+				if (context.alive(rect_in_focus) 
+					&& context(rect_in_focus, [](const auto& r) { return r.get_flag(rect_leaf::flag::FETCH_WHEEL); } ) 
+					&& gl.msg == event::message::wheel) {
+
+					if (context(rect_in_focus, [](const auto& r) { return r.get_flag(rect_leaf::flag::ENABLE_DRAWING); })) {
 						consume_raw_input_lambda(rect_in_focus);
 					}
 
@@ -138,16 +141,36 @@ namespace augs {
 
 				pass = false;
 				}*/
-				if (rect_in_focus.alive()) {
+				if (context.alive(rect_in_focus)) {
+					const bool rect_in_focus_drawing_enabled = context(rect_in_focus, [](const auto& r) { return r.get_flag(rect_leaf::flag::ENABLE_DRAWING); });
+
 					switch (gl.msg) {
-					case event::keydown:   if (rect_in_focus.get().get_flag(rect_leaf::flag::ENABLE_DRAWING)) rect_in_focus.consume_gui_event(e = gui_event::keydown, dispatcher); pass = false; break;
-					case event::keyup:	   if (rect_in_focus.get().get_flag(rect_leaf::flag::ENABLE_DRAWING)) rect_in_focus.consume_gui_event(e = gui_event::keyup, dispatcher); pass = false; break;
-					case event::character: if (rect_in_focus.get().get_flag(rect_leaf::flag::ENABLE_DRAWING)) rect_in_focus.consume_gui_event(e = gui_event::character, dispatcher); pass = false; break;
+					case event::message::keydown:   
+						if (rect_in_focus_drawing_enabled) {
+							gui_event_lambda(rect_in_focus, gui_event::keydown);
+						}
+
+						pass = false;
+						break;
+					case event::message::keyup:	    
+						if (rect_in_focus_drawing_enabled) {
+							gui_event_lambda(rect_in_focus, gui_event::keyup);
+						}
+
+						pass = false;
+						break;
+					case event::message::character: 
+						if (rect_in_focus_drawing_enabled) {
+							gui_event_lambda(rect_in_focus, gui_event::character);
+						}
+
+						pass = false;
+						break;
 					default: break;
 					}
 				}
 
-				if (gl.msg == event::clipboard_change) {
+				if (gl.msg == event::message::clipboard_change) {
 					global_clipboard.change_clipboard();
 					pass = false;
 				}
@@ -155,29 +178,26 @@ namespace augs {
 				if (pass) {
 					consume_raw_input_lambda(root);
 
-					if (!was_hovered_rect_visited && rects[rect_hovered].alive()) {
-						rects[rect_hovered].unhover(in, dispatcher);}
+					if (!was_hovered_rect_visited && context.alive(rect_hovered)) {
+						context(rect_hovered, [&context, &in](auto& r) { r.unhover(context, in); });
+					}
 				}
 			}
 
 			template<class C>
 			void perform_logic_step(C context) {
-				auto root_handle = rects[root];
+				context(root, [&context](auto& r) { r.perform_logic_step(context); });
+				context(root, [&context](auto& r) { r.calculate_clipped_rectangle_layout(context); });
 
-				root_handle.perform_logic_step(*this, dispatcher);
-				root_handle.calculate_clipped_rectangle_layout(dispatcher);
-
-				middlescroll.perform_logic_step(rects, delta, state);
+				middlescroll.perform_logic_step(context, delta, state);
 
 				was_hovered_rect_visited = false;
 
-				raw_event_info mousemotion_updater(*this, window::event::mousemotion);
-				root_handle.consume_raw_input_and_generate_gui_events(mousemotion_updater, dispatcher);
+				raw_event_info mousemotion_updater(*this, window::event::message::mousemotion);
+				context(root, [&context, &mousemotion_updater](auto& r) { r.consume_raw_input_and_generate_gui_events(context, mousemotion_updater); });
 
-				auto rect_hovered_handle = rects[rect_hovered];
-
-				if (!was_hovered_rect_visited && rect_hovered_handle.alive()) {
-					rect_hovered_handle.unhover(mousemotion_updater, dispatcher);
+				if (!was_hovered_rect_visited && context.alive(rect_hovered)) {
+					context(rect_hovered, [&context, &mousemotion_updater](auto& r) { r.unhover(context, mousemotion_updater); });
 				}
 			}
 			
@@ -186,8 +206,7 @@ namespace augs {
 				vertex_triangle_buffer buffer;
 				draw_info in(*this, buffer);
 
-				rects[root].draw_children(in, dispatcher);
-
+				context(root, [&context, &in](auto& r) { r.draw_children(context, in); });
 				middlescroll.draw_triangles(context, in);
 
 				return buffer;
