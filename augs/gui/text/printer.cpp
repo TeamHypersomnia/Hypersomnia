@@ -2,12 +2,6 @@
 #include "ui.h"
 #include "drafter.h"
 #include "printer.h"
-#include "augs/gui/rect.h"
-#include "augs/window_framework/window.h"
-#include "augs/gui/rect_handle.h"
-
-#undef min
-#undef max
 
 /* printer's draw needs revising in terms of scrolling */
 
@@ -49,25 +43,6 @@ namespace augs {
 				caret_visible = true;
 			}
 
-			void printer::draw_text(std::vector<augs::vertex_triangle>& out, ui& u, const_rect_handle parent) const {
-				draw_text(out, u.get_draft(), u.get_str(), &u.caret, parent);
-			}
-
-			void printer::draw_text(std::vector<augs::vertex_triangle>& out,
-				const drafter& d,
-				const fstr& colors,
-				const caret_info* caret,
-				const_rect_handle subject
-				) const
-			{
-				/* note that parent's scroll is already taken into account by absolute_xy */
-				if (subject.get_parent().dead()) 
-					draw_text(out, d, colors, caret, subject.get().get_absolute_xy() - subject.get().scroll, rects::ltrb<float>());
-				else {
-					auto clipping_rect = subject.get().clip ? subject.get().get_clipping_rect() : subject.get_parent().get().get_clipping_rect();
-					draw_text(out, d, colors, caret, subject.get().get_absolute_xy() - subject.get().scroll, clipping_rect);
-				}
-			}
 			void printer::draw_text(std::vector<augs::vertex_triangle>& out,
 				const drafter& d,
 				const fstr& colors,

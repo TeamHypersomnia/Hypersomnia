@@ -1,13 +1,11 @@
 #pragma once
 #include "augs/texture_baker/font.h"
-#include "augs/gui/rect_world.h"
 #include "word_separator.h"
 // ui relates on draft object (result) only
 // if bugs viewing the caret, check the viewcaret where "car" variable was changed to caret_rect
 // neither drafter nor printer have their fstr declared as member fields because it is better to pass it around than rewrite each time we want to change string
 namespace augs {
 	namespace gui {
-		struct rect;
 		namespace text {
 			struct drafter {
 				struct line {

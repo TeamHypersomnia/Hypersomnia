@@ -1,10 +1,9 @@
 #pragma once
-#include "rect_id.h"
+#include "gui_element_id.h"
 #include "material.h"
 
 namespace augs {
 	namespace gui {
-		struct rect;
 		struct solid_stroke {
 			struct border {
 				int width;
@@ -21,7 +20,6 @@ namespace augs {
 			void set_material(const material&);
 
 			void draw(std::vector<augs::vertex_triangle>& out, rects::ltrb<float> origin, rects::ltrb<float> clipper = rects::ltrb<float>()) const;
-			void draw(std::vector<augs::vertex_triangle>& out, const_rect_handle) const;
 		};
 	}
 }

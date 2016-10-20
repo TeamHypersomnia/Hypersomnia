@@ -69,7 +69,7 @@ namespace augs {
 				return w <= rc.w && h <= rc.h;
 			}
 
-			bool can_contain(const wh& another_rect, vec2t<T>& offset) const {
+			bool can_contain(const wh& another_rect, const vec2t<T>& offset) const {
 				return offset.x >= 0.f && offset.x <= another_rect.w - w && offset.y >= 0 && offset.y <= another_rect.h - h;
 			}
 

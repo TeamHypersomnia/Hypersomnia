@@ -1,6 +1,8 @@
 #pragma once
-#include "augs/gui/rect_world.h"
 // got to revise gui systems in terms of rectangle update'ing
+#include "augs/misc/timer.h"
+#include "augs/gui/material.h"
+
 namespace augs {
 	namespace gui {
 		namespace text {
@@ -38,17 +40,6 @@ namespace augs {
 					selection_inactive_bg_mat; /* material for line highlighting */
 
 				printer();
-
-				void draw_text(std::vector<augs::vertex_triangle>& out, ui&, const_rect_handle parent) const;
-
-				void draw_text(
-					std::vector<augs::vertex_triangle>& out,
-					const drafter&,
-					const fstr& colors,
-					/* if caret is 0, draw no caret */
-					const caret_info* caret,
-					const_rect_handle parent
-					) const;
 
 				void draw_text(
 					std::vector<augs::vertex_triangle>& out,

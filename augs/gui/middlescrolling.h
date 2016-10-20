@@ -11,12 +11,38 @@ namespace augs {
 			material mat;
 			rects::wh<float> size = rects::wh<float>(25, 25);
 			vec2i pos;
-			rect_id subject;
+			gui_element_id subject;
 			float speed_mult = 1.f;
 
-			void perform_logic_step(rect_pool&, fixed_delta, window::event::state state);
-			bool handle_new_raw_state(rect_pool&, window::event::state);
-			void draw_triangles(const rect_pool&, draw_info) const;
+			template<class C>
+			void perform_logic_step(C context, const fixed_delta dt, const window::event::state& state) {
+				if (context.alive(subject)) {
+					context(subject, [&dt, &state](auto& r) {
+						r.set_scroll(r.get_scroll() + static_cast<vec2>(state.mouse.pos - pos) * float(speed_mult*dt.in_milliseconds()));
+					});
+				}
+			}
+
+			template<class C>
+			bool handle_new_raw_state(C context, const window::event::state& state) {
+				if (context.alive(subject)) {
+					if (state.msg == window::event::message::mdown || state.msg == window::event::message::mdoubleclick)
+						subject = gui_element_id();
+
+					return true;
+				}
+
+				return false;
+			}
+
+			template<class C>
+			void draw_triangles(C context, draw_info in) const {
+				if (context.alive(subject)) {
+					rects::ltrb<float> scroller = rects::wh<float>(size);
+					scroller.center(pos);
+					draw_clipped_rectangle(mat, scroller, context(subject, [](const auto& r) {return static_cast<rect_leaf&>(subject); }), in.v);
+				}
+			}
 		};
 	}
 }

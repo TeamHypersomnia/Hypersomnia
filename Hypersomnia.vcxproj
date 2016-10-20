@@ -322,8 +322,6 @@
     <ClCompile Include="augs\gui\clipboard.cpp" />
     <ClCompile Include="augs\gui\draw_and_event_infos.cpp" />
     <ClCompile Include="augs\gui\formatted_text.cpp" />
-    <ClCompile Include="augs\gui\middlescrolling.cpp" />
-    <ClCompile Include="augs\gui\rect_handle.cpp" />
     <ClCompile Include="augs\misc\http_requests.cpp" />
     <ClCompile Include="augs\misc\delta_compression.cpp" />
     <ClCompile Include="augs\misc\machine_entropy.cpp" />
@@ -968,7 +966,7 @@
     <ClInclude Include="augs\entity_system\component_aggregate.h" />
     <ClInclude Include="augs\entity_system\component_setters_mixin.h" />
     <ClInclude Include="augs\entity_system\ecs_instantiation.h" />
-    <ClInclude Include="augs\entity_system\storage_for_components_and_aggregates.h" />
+    <ClInclude Include="augs\entity_system\operations_on_all_components_mixin.h" />
     <ClInclude Include="augs\entity_system\storage_for_message_queues.h" />
     <ClInclude Include="augs\entity_system\storage_for_systems.h" />
     <ClInclude Include="augs\filesystem\directory.h" />
@@ -981,8 +979,7 @@
     <ClInclude Include="augs\gui\formatted_text.h" />
     <ClInclude Include="augs\gui\gui_event.h" />
     <ClInclude Include="augs\gui\middlescrolling.h" />
-    <ClInclude Include="augs\gui\rect_handle.h" />
-    <ClInclude Include="augs\gui\rect_id.h" />
+    <ClInclude Include="augs\gui\gui_element_id.h" />
     <ClInclude Include="augs\misc\easier_handle_getters_mixin.h" />
     <ClInclude Include="augs\misc\http_requests.h" />
     <ClInclude Include="augs\misc\readable_bytesize.h" />

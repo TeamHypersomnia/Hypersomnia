@@ -1,5 +1,6 @@
 #pragma once
 #include "caret.h"
+#include "augs/gui/clipboard.h"
 #include "draft_interface.h"
 #include "augs/misc/undoredo.h"
 #include "augs/texture_baker/font.h"

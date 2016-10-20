@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/gui/rect_world.h"
+#include "augs/gui/formatted_text.h"
 
 namespace augs {
 	namespace gui {

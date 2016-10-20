@@ -3,7 +3,7 @@
 #include "augs/misc/pool.h"
 #include "augs/misc/pool_id.h"
 #include "augs/misc/easier_handle_getters_mixin.h"
-#include "rect_id.h"
+#include "gui_element_id.h"
 #include "rect_world.h"
 #include "element_handle.h"
 #include "augs/misc/delta.h"
@@ -11,7 +11,7 @@
 namespace augs {
 	namespace gui {
 		struct element_meta {
-			rect_id tree_node;
+			gui_element_id tree_node;
 		};
 
 		template<class T>
@@ -71,7 +71,7 @@ namespace augs {
 
 			public:
 				template <class F>
-				void dispatch(rect_id id, F f) {
+				void dispatch(gui_element_id id, F f) {
 					auto meta = rects.get_meta<rect_meta>(id);
 
 					for_each_type<all_elements...>([this, meta, f](auto c) {
@@ -126,17 +126,17 @@ namespace augs {
 			}
 
 			template<>
-			rect_handle get_handle(rect_id id) {
+			rect_handle get_handle(gui_element_id id) {
 				return rects[id];
 			}
 			
 			template<>
-			const_rect_handle get_handle(rect_id id) const {
+			const_rect_handle get_handle(gui_element_id id) const {
 				return rects[id];
 			}
 
 			template <class F>
-			void dispatch_id(rect_id id, F f) {
+			void dispatch_id(gui_element_id id, F f) {
 				auto meta = rects.get_meta<rect_meta>(id);
 
 				for_each_type<all_elements...>([this, meta, f](auto c) {
@@ -172,7 +172,7 @@ namespace augs {
 				return new_element;
 			}
 
-			void destroy_element(rect_id id) {
+			void destroy_element(gui_element_id id) {
 				dispatch_id(id, [this](auto id) {
 					get_pool(id).free(id);
 				});
