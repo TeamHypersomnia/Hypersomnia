@@ -317,6 +317,10 @@ void immediate_hud::draw_pure_color_highlights(viewing_step& msg) const {
 
 	for (auto& r : recent_pure_color_highlights) {
 		auto subject = cosmos[r.target];
+
+		if (subject.dead())
+			continue;
+
 		auto sprite = cosmos[r.target].get<components::sprite>();
 		auto& col = sprite.color;
 		auto prevcol = col;

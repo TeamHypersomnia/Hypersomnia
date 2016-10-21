@@ -325,6 +325,16 @@ namespace scene_managers {
 			[this](fixed_step& step) { post_solve(step); }
 		);
 	}
+	
+	void networked_testbed::step_with_callbacks(const cosmic_entropy& cosmic_entropy_for_this_step, cosmos& cosm, viewing_session& effects_receiver) {
+		cosm.advance_deterministic_schemata(cosmic_entropy_for_this_step,
+			[this](fixed_step& step) { pre_solve(step); },
+			[this, &effects_receiver](fixed_step& step) { 
+				post_solve(step); 
+				effects_receiver.visual_response_to_game_events(step);
+			}
+		);
+	}
 
 	void networked_testbed::pre_solve(fixed_step& step) {
 

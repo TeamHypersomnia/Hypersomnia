@@ -102,6 +102,10 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 		scene.step_with_callbacks(entropy, cosm);
 	};
 
+	const auto& step_pred_with_effects_response = [this](const cosmic_entropy& entropy, cosmos& cosm) {
+		scene.step_with_callbacks(entropy, cosm, session);
+	};
+
 	for (auto& s : steps) {
 		for (auto& net_event : s.total_entropy.remote) {
 			if (net_event.message_type == augs::network::message::type::RECEIVE) {
@@ -158,7 +162,7 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 		if (!still_downloading) {
 			const auto local_cosmic_entropy_for_this_step = scene.make_cosmic_entropy(s.total_entropy.local, session.context, hypersomnia);
 
-			receiver.send_commands_and_predict(client, local_cosmic_entropy_for_this_step, extrapolated_hypersomnia, step_pred);
+			receiver.send_commands_and_predict(client, local_cosmic_entropy_for_this_step, extrapolated_hypersomnia, step_pred_with_effects_response);
 			// LOG("Predicting to step: %x; predicted steps: %x", extrapolated_hypersomnia.get_total_steps_passed(), receiver.predicted_steps.size());
 
 			receiver.unpack_deterministic_steps(scene.get_controlled_entity(), hypersomnia, hypersomnia_last_snapshot, extrapolated_hypersomnia, step_pred);

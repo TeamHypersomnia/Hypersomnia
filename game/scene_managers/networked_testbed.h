@@ -39,6 +39,7 @@ namespace scene_managers {
 		void populate_world_with_entities(cosmos&);
 
 		void step_with_callbacks(const cosmic_entropy&, cosmos&);
+		void step_with_callbacks(const cosmic_entropy&, cosmos&, viewing_session& effects_receiver);
 
 		void pre_solve(fixed_step&);
 		void post_solve(fixed_step&);
