@@ -37,5 +37,4 @@ public:
 	state_for_drawing_camera get_state_for_drawing_camera(const_entity_handle entity_to_chase);
 
 	vec2i get_camera_offset_due_to_character_crosshair(const_entity_handle) const;
-	static void configure_camera_and_character_with_crosshair(entity_handle camera, entity_handle character, entity_handle crosshair);
 };

@@ -103,7 +103,7 @@ void determinism_test_setup::process(game_window& window) {
 
 				renderer::get_current().clear_logic_lines();
 
-				testbeds[i].step_with_callbacks(cosmic_entropy_for_this_step, h);
+				testbeds[i].step_with_callbacks(cosmic_entropy_for_this_step, h, session);
 			}
 
 			auto& first_cosm = hypersomnias[0].reserved_memory_for_serialization;
@@ -139,7 +139,6 @@ void determinism_test_setup::process(game_window& window) {
 
 		logged += typesafe_sprintf("Currently viewn cosmos: %x (F3 to switch)\n", currently_viewn_cosmos);
 
-		testbeds[currently_viewn_cosmos].view(hypersomnias[currently_viewn_cosmos], window, session, session.frame_timer.extract_variable_delta(hypersomnias[currently_viewn_cosmos].get_fixed_delta(), input_unpacker.timer),
-			logged);
+		session.view(hypersomnias[currently_viewn_cosmos], testbeds[currently_viewn_cosmos].get_controlled_entity(), window, session.frame_timer.extract_variable_delta(hypersomnias[currently_viewn_cosmos].get_fixed_delta(), input_unpacker.timer));
 	}
 }

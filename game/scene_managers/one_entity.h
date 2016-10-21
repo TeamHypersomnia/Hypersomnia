@@ -7,7 +7,6 @@ namespace augs {
 }
 
 struct cosmic_entropy;
-class basic_viewing_step;
 class fixed_step;
 class cosmos;
 class viewing_session;
@@ -29,7 +28,5 @@ namespace scene_managers {
 
 		void pre_solve(fixed_step&);
 		void post_solve(fixed_step&);
-
-		void view_cosmos(basic_viewing_step&) const;
 	};
 }

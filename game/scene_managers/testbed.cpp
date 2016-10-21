@@ -16,8 +16,6 @@
 #include "game/messages/intent_message.h"
 #include "game/detail/inventory_utils.h"
 
-#include "rendering_scripts/all.h"
-
 #include "texture_baker/font.h"
 
 #include "augs/misc/machine_entropy.h"
@@ -291,9 +289,6 @@ namespace scene_managers {
 
 					main_cosmos = cosm_with_guids;
 				}
-				if (raw_input.key == augs::window::event::keys::DASH) {
-					show_profile_details = !show_profile_details;
-				}
 				if (raw_input.key == augs::window::event::keys::F8) {
 					main_cosmos.profiler.duplication.new_measurement();
 					stashed_cosmos = main_cosmos;
@@ -332,10 +327,13 @@ namespace scene_managers {
 		return result;
 	}
 
-	void testbed::step_with_callbacks(const cosmic_entropy& cosmic_entropy_for_this_step, cosmos& cosm) {
+	void testbed::step_with_callbacks(const cosmic_entropy& cosmic_entropy_for_this_step, cosmos& cosm, viewing_session& post_solve_effects_response) {
 		cosm.advance_deterministic_schemata(cosmic_entropy_for_this_step,
 			[this](fixed_step& step) { pre_solve(step); },
-			[this](fixed_step& step) { post_solve(step); }
+			[this, &post_solve_effects_response](fixed_step& step) {
+				post_solve(step);
+				post_solve_effects_response.visual_response_to_game_events(step);
+			}
 		);
 	}
 
@@ -376,57 +374,5 @@ namespace scene_managers {
 		//new_characters[1].get<components::physics>().apply_force(ff);
 
 		// LOG("F: %x", ff);
-	}
-
-	void testbed::view(const cosmos& cosmos, game_window& window, viewing_session& session, const augs::variable_delta& dt, std::string custom_log) const {
-		session.fps_profiler.new_measurement();
-
-		auto& target = renderer::get_current();
-
-		auto screen_size = session.camera.visible_world_area;
-		vec2i screen_size_i(static_cast<int>(screen_size.x), static_cast<int>(screen_size.y));
-
-		target.clear_current_fbo();
-
-		target.set_viewport({ 0, 0, screen_size_i.x, screen_size_i.y });
-
-		basic_viewing_step main_cosmos_viewing_step(cosmos, dt, target);
-		view_cosmos(cosmos, main_cosmos_viewing_step, session.camera);
-
-		auto summary = typesafe_sprintf(L"Entities: %x\n", cosmos.entities_count());
-
-		using namespace augs::gui::text;
-
-		const auto controlled = cosmos[get_controlled_entity()];
-
-		const auto coords = controlled.alive() ? controlled.logic_transform().pos : vec2();
-		const auto vel = controlled.alive() ? controlled.get<components::physics>().velocity() : vec2();
-
-		quick_print_format(target.triangles, to_wstring(custom_log) + typesafe_sprintf(L"Entities: %x\nX: %f2\nY: %f2\nVelX: %x\nVelY: %x\n", cosmos.entities_count(), coords.x, coords.y, vel.x, vel.y)
-			+ session.summary() + cosmos.profiler.sorted_summary(show_profile_details), style(assets::font_id::GUI_FONT, rgba(255, 255, 255, 150)), vec2i(0, 0), 0);
-
-		quick_print(target.triangles, multiply_alpha(global_log::format_recent_as_text(assets::font_id::GUI_FONT), 150.f/255), vec2i(screen_size_i.x - 300, 0), 300);
-
-		target.call_triangles();
-		target.clear_triangles();
-
-
-		session.triangles.measure(static_cast<double>(target.triangles_drawn_total));
-		target.triangles_drawn_total = 0;
-
-		window.swap_buffers();
-		
-		session.fps_profiler.end_measurement();
-	}
-
-	void testbed::view_cosmos(const cosmos& cosm, basic_viewing_step& step, world_camera& camera) const {
-		auto& cosmos = cosm;
-
-		auto character_chased_by_camera = cosmos[currently_controlled_character];
-
-		camera.tick(step.get_delta(), character_chased_by_camera);
-		
-		viewing_step viewing(step, camera.get_state_for_drawing_camera(character_chased_by_camera));
-		rendering_scripts::standard_rendering(viewing);
 	}
 }

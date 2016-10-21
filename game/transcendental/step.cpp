@@ -4,15 +4,15 @@
 
 #include "game/transcendental/types_specification/all_messages_includes.h"
 
-basic_viewing_step::basic_viewing_step(const cosmos& cosm, augs::variable_delta delta, augs::renderer& renderer) : cosm(cosm), delta(delta), renderer(renderer) {}
-
-augs::variable_delta basic_viewing_step::get_delta() const {
+augs::variable_delta viewing_step::get_delta() const {
 	return delta;
 }
 
-viewing_step::viewing_step(basic_viewing_step basic_step, state_for_drawing_camera camera_state) : basic_viewing_step(basic_step), camera_state(camera_state) {
-
-}
+viewing_step::viewing_step(
+	const cosmos& cosm, 
+	const augs::variable_delta& delta,
+	augs::renderer& renderer, 
+	state_for_drawing_camera camera_state) : cosm(cosm), delta(delta), renderer(renderer), camera_state(camera_state) {}
 
 vec2 viewing_step::get_screen_space(vec2 pos) const {
 	return pos - camera_state.transformed_visible_world_area_aabb.get_position();

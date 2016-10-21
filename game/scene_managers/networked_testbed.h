@@ -15,7 +15,6 @@ namespace augs {
 }
 
 struct cosmic_entropy;
-class basic_viewing_step;
 class fixed_step;
 class cosmos;
 class world_camera;
@@ -54,7 +53,6 @@ namespace scene_managers {
 	};
 
 	class networked_testbed_client : public networked_testbed {
-		void view_cosmos(const cosmos&, basic_viewing_step&, world_camera&) const;
 	public:
 		entity_id currently_controlled_character;
 		bool show_profile_details = false;
@@ -67,6 +65,5 @@ namespace scene_managers {
 		void control(const augs::machine_entropy::local_type&, cosmos&);
 
 		void configure_view(viewing_session&) const;
-		void view(const cosmos&, game_window&, viewing_session&, const augs::network::client& details, const augs::variable_delta& dt, const bool swap_buffers = true) const;
 	};
 }

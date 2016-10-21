@@ -13,7 +13,6 @@ namespace augs {
 }
 
 struct cosmic_entropy;
-class basic_viewing_step;
 class fixed_step;
 class cosmos;
 class world_camera;
@@ -23,14 +22,11 @@ struct input_context;
 namespace scene_managers {
 	class testbed {
 		void populate(fixed_step&);
-
-		void view_cosmos(const cosmos&, basic_viewing_step&, world_camera&) const;
 	public:
 		augs::constant_size_vector<entity_id, TESTBED_CHARACTERS_COUNT> characters;
 		augs::constant_size_vector<entity_id, 100> crates;
 		unsigned current_character = 0;
 		entity_id currently_controlled_character;
-		bool show_profile_details = false;
 		int debug_var = 0;
 		augs::constant_size_vector<entity_id, TESTBED_DRAW_BODIES_COUNT> draw_bodies;
 
@@ -48,11 +44,9 @@ namespace scene_managers {
 
 		void inject_input_to(entity_handle);
 
-		void step_with_callbacks(const cosmic_entropy&, cosmos&);
+		void step_with_callbacks(const cosmic_entropy&, cosmos&, viewing_session& post_solve_effects_response);
 
 		void pre_solve(fixed_step&);
 		void post_solve(fixed_step&);
-		
-		void view(const cosmos&, game_window&, viewing_session&, const augs::variable_delta& dt, std::string custom_log = "") const;
 	};
 }

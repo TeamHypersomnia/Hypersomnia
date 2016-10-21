@@ -11,7 +11,7 @@ launch_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.LOCAL,
+	launch_mode = launch_modes.TWO_CLIENTS_AND_SERVER,
 	
 	recording_replay_speed = 0.5,
 

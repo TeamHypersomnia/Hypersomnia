@@ -186,12 +186,4 @@ namespace scene_managers {
 			}
 		}
 	}
-
-
-	void one_entity::view_cosmos(basic_viewing_step& step) const {
-		auto& cosmos = step.cosm;
-
-		//viewing_step viewing(step, cosmos[world_camera].get<components::camera>().how_camera_will_render);
-		//rendering_scripts::standard_rendering(viewing);
-	}
 }

@@ -177,6 +177,6 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 		
 		extrapolated_hypersomnia.integrate_interpolated_transforms(vdt.in_seconds());
 		
-		scene.view(extrapolated_hypersomnia, window, session, client, vdt, swap_buffers);
+		session.view(extrapolated_hypersomnia, scene.get_controlled_entity(), window, vdt, client, swap_buffers);
 	}
 }

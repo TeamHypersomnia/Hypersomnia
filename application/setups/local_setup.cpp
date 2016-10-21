@@ -49,6 +49,7 @@ void local_setup::process(game_window& window) {
 		augs::machine_entropy new_entropy;
 
 		new_entropy.local = window.collect_entropy();
+		session.control(new_entropy);
 
 		process_exit_key(new_entropy.local);
 
@@ -89,13 +90,13 @@ void local_setup::process(game_window& window) {
 
 			renderer::get_current().clear_logic_lines();
 
-			testbed.step_with_callbacks(cosmic_entropy_for_this_step, hypersomnia);
+			testbed.step_with_callbacks(cosmic_entropy_for_this_step, hypersomnia, session);
 		}
 
 		const auto vdt = session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), input_unpacker.timer);
 
 		hypersomnia.integrate_interpolated_transforms(vdt.in_seconds());
 
-		testbed.view(hypersomnia, window, session, vdt);
+		session.view(hypersomnia, testbed.get_controlled_entity(), window, vdt);
 	}
 }
