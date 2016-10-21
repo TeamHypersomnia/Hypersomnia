@@ -221,9 +221,9 @@ namespace augs {
 					if (st.border.active) st.border.value.draw(in.v, get_rect_absolute(), context(parent, [](const auto& p) { return p.get_clipping_rect(); }));
 			}
 
-			template<class C>
-			std::vector<gui_element_id> get_children(C) const {
-				return{};
+			template<class C, class L>
+			void for_each_child(C context, L lambda) {
+
 			}
 
 			template<class C>
@@ -269,8 +269,6 @@ namespace augs {
 			rects::wh<float> content_size; /* content's (children's) bounding box */
 			vec2 scroll; /* scrolls content */
 
-			std::vector<gui_element_id> children;
-			
 			rects::ltrb<float> clipping_rect = rects::ltrb<float>(0.f, 0.f, std::numeric_limits<int>::max() / 2.f, std::numeric_limits<int>::max() / 2.f);
 
 			rects::ltrb<float> get_clipping_rect() const;
@@ -285,20 +283,11 @@ namespace augs {
 			vec2 get_scroll() const;
 			void set_scroll(const vec2);
 
-			template<class C, class L>
-			void for_each_child(C context, L lambda) {
-				const auto& children_all = context(this_id, [](const auto& r) { return r.get_children(context); });
-
-				for (const auto& c : children_all) {
-					context(c, lambda);
-				}
-			}
-
 			template<class C>
 			void calculate_clipped_rectangle_layout(C context) {
 				rect_leaf::calculate_clipped_rectangle_layout(context);
 
-				if (get_flag(flags::CLIP))
+				if (get_flag(flag::CLIP))
 					clipping_rect.clip_by(rc_clipped);
 
 				context(this_id, [](auto& r) {
@@ -306,12 +295,14 @@ namespace augs {
 				});
 
 				/* align scroll only to be positive and not to exceed content size */
-				if (get_flag(flags::SNAP_SCROLL_TO_CONTENT_SIZE))
+				if (get_flag(flag::SNAP_SCROLL_TO_CONTENT_SIZE))
 					clamp_scroll_to_right_down_corner();
 
-				for_each_child([this, &context](auto& r) {
-					r.parent = this_id;
-					r.calculate_clipped_rectangle_layout(context);
+				context(this_id, [this, &context](auto& r) {
+					r.for_each_child([this, &context](auto& r) {
+						r.parent = this_id;
+						r.calculate_clipped_rectangle_layout(context);
+					})
 				});
 			}
 
@@ -321,20 +312,17 @@ namespace augs {
 				auto& gr = inf.owner;
 				auto& m = gr.state.mouse;
 				auto msg = inf.msg;
-				gui::event_info e(gr, gui_event::unknown);
 
 				if (get_flag(rect_leaf::flag::ENABLE_DRAWING)) {
-					if (enable_drawing_of_children) {
-						const auto& children_all = context(this_id, [](const auto& r) { return r.get_children(context); });
-
-						for (const auto& c : children_all) {
-							context(c, [this, &inf, &context](auto& r) {
+					if (get_flag(flag::ENABLE_DRAWING_OF_CHILDREN)) {
+						context(this_id, [this, &inf, &context](auto& r) {
+							r.for_each_child(context, [this, &inf, &context](auto& r) {
 								if (r.get_flag(rect_leaf::flag::ENABLE_DRAWING)) {
 									r.parent = this_id;
-									r.consume_raw_input_and_generate_gui_events(inf, context);
+									r.consume_raw_input_and_generate_gui_events(context, inf);
 								}
-							})
-						}
+							});
+						});
 					}
 				}
 
@@ -350,12 +338,14 @@ namespace augs {
 
 			template<class C>
 			void perform_logic_step(C context, const fixed_delta& delta) {
-				for_each_child([&context, &delta](auto& r) {
-					if (r.get_flag(rect_leaf::flag::ENABLE_DRAWING)) {
-						r.parent = this_id;
-						r.perform_logic_step(context, delta);
-					}
-				})
+				context(this_id, [this, &delta, &context](auto& r) {
+					r.for_each_child(context, [this, &delta, &context](auto& r) {
+						if (r.get_flag(rect_leaf::flag::ENABLE_DRAWING)) {
+							r.parent = this_id;
+							r.perform_logic_step(context, delta);
+						}
+					});
+				});
 			}
 
 			template<class C>
@@ -365,20 +355,17 @@ namespace augs {
 
 			template <class C>
 			void draw_children(C context, draw_info in) const {
-				if (!enable_drawing_of_children)
+				if (!get_flag(flag::ENABLE_DRAWING_OF_CHILDREN))
 					return;
 
-				for_each_child([this, &in, &context](const auto& r) {
-					if (r.get_flag(rect_leaf::flag::ENABLE_DRAWING)) {
-						r.draw(context, in);
-						r.draw_children(context, in);
-					}
-				})
-			}
-
-			template<class C>
-			std::vector<gui_element_id> get_children(C) const {
-				return children;
+				context(this_id, [this, &in, &context](const auto& r) {
+					r.for_each_child(context, [this, &in, &context](const auto& r) {
+						if (r.get_flag(rect_leaf::flag::ENABLE_DRAWING)) {
+							r.draw(context, in);
+							r.draw_children(context, in);
+						}
+					});
+				});
 			}
 
 			template<class C>
@@ -387,10 +374,12 @@ namespace augs {
 				rects::ltrb<float> content = rects::ltrb<float>(0.f, 0.f, 0.f, 0.f);
 
 				/* enlarge the content size by every child */
-				for_each_child([&content](const auto& r) {
-					if (r.get_flag(rect_leaf::flag::ENABLE_DRAWING)) {
-						content.contain_positive(r.rc);
-					}
+				context(this_id, [&content](const auto& r) {
+					r.for_each_child(context, [&content](const auto& r) {
+						if (r.get_flag(rect_leaf::flag::ENABLE_DRAWING)) {
+							content.contain_positive(r.rc);
+						}
+					});
 				});
 
 				content_size = content;
@@ -464,6 +453,19 @@ namespace augs {
 
 						p.scroll_to_view(context);
 					});
+				}
+			}
+		};
+
+		struct rect_composite_vector : rect_composite {
+			std::vector<gui_element_id> children;
+
+			template<class C, class L>
+			void for_each_child(C context, L lambda) {
+				const auto& children_all = children;
+
+				for (const auto& c : children) {
+					context(c, lambda);
 				}
 			}
 		};
