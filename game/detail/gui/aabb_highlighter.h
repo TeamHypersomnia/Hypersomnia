@@ -12,6 +12,6 @@ struct aabb_highlighter {
 	float biggest_length = 16.f;
 	float scale_down_when_aabb_no_bigger_than = 40.f;
 
-	void update(float delta);
+	void update(const float delta_ms);
 	void draw(viewing_step&, const_entity_handle subject) const;
 };

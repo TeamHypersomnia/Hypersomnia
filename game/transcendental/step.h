@@ -11,6 +11,8 @@
 #include "augs/entity_system/storage_for_message_queues.h"
 
 class cosmos;
+struct immediate_hud;
+struct aabb_highlighter;
 
 namespace augs {
 	class renderer;
@@ -18,11 +20,13 @@ namespace augs {
 
 class viewing_step {
 public:
-	viewing_step(const cosmos&, const augs::variable_delta&, augs::renderer&, state_for_drawing_camera camera_state);
+	viewing_step(const cosmos&, const immediate_hud& hud, const aabb_highlighter&, const augs::variable_delta&, augs::renderer&, state_for_drawing_camera camera_state);
 
 	state_for_drawing_camera camera_state;
 
 	const cosmos& cosm;
+	const immediate_hud& hud;
+	const aabb_highlighter& world_hover_highlighter;
 	augs::variable_delta delta;
 	augs::renderer& renderer;
 

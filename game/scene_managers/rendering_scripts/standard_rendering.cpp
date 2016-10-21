@@ -13,6 +13,8 @@
 #include "augs/graphics/renderer.h"
 #include "game/transcendental/step.h"
 
+#include "game/detail/gui/immediate_hud.h"
+
 #include "math/matrix.h"
 
 #include "3rdparty/GL/OpenGL.h"
@@ -87,29 +89,30 @@ namespace rendering_scripts {
 
 		//for (const auto it : cosmos.get(processing_subjects::WITH_INPUT_RECEIVER)) {
 		//	if (it.get<components::input_receiver>().local && it.has<components::gui_element>()) {
-		//		auto& gui = it.get<components::gui_element>();
-		//
-		//		auto textual_infos = gui.hud.draw_circular_bars_and_get_textual_info(step);
-		//
-		//		renderer.call_triangles();
-		//		renderer.clear_triangles();
-		//
-		//		default_shader.use();
-		//
-		//		renderer.call_triangles(textual_infos);
-		//
-		//		default_highlight_shader.use();
-		//
-		//		gui.hud.draw_pure_color_highlights(step);
-		//
-		//		renderer.call_triangles();
-		//		renderer.clear_triangles();
-		//
-		//		default_shader.use();
-		//
-		//		gui.hud.draw_vertically_flying_numbers(step);
-		//
-		//		gui.draw_complete_gui_for_camera_rendering_request(step);
+				//auto& gui = it.get<components::gui_element>();
+				const auto& hud = step.hud;
+
+				auto textual_infos = hud.draw_circular_bars_and_get_textual_info(step);
+		
+				renderer.call_triangles();
+				renderer.clear_triangles();
+		
+				default_shader.use();
+		
+				renderer.call_triangles(textual_infos);
+		
+				default_highlight_shader.use();
+		
+				hud.draw_pure_color_highlights(step);
+		
+				renderer.call_triangles();
+				renderer.clear_triangles();
+		
+				default_shader.use();
+		
+				hud.draw_vertically_flying_numbers(step);
+		
+				//gui.draw_complete_gui_for_camera_rendering_request(step);
 		//	}
 		//}
 

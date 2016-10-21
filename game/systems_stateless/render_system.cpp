@@ -60,42 +60,9 @@ void render_system::draw_entities(augs::vertex_triangle_buffer& output, std::vec
 			if (e.has<renderable_type>()) {
 				const auto& render = e.get<components::render>();
 				auto renderable_transform = viewing_transform(e, true);
-
-				//else {
-				//	renderable_transform = transform;
-				//}
-
-				renderable_transform.pos = vec2i(renderable_transform.pos);
-				renderable_transform.rotation = renderable_transform.rotation;
-
-				components::transform camera_transform;
-				camera_transform = render.absolute_transform ? components::transform() : in_camera.camera_transform;
-
 				const auto& renderable = e.get<renderable_type>();
 
-				typename renderable_type::drawing_input in(output);
-				
-				in.camera_transform = camera_transform;
-				in.renderable_transform = renderable_transform;
-				in.visible_world_area = in_camera.visible_world_area;
-
-				if (only_border_highlights) {
-					if (render.draw_border) {
-						static vec2i offsets[4] = {
-							vec2i(-1, 0), vec2i(1, 0), vec2i(0, 1), vec2i(0, -1)
-						};
-
-						in.colorize = render.border_color;
-
-						for (auto& o : offsets) {
-							in.renderable_transform.pos = renderable_transform.pos + o;
-							renderable.draw(in);
-						}
-					}
-				}
-				else {
-					renderable.draw(in);
-				}
+				render_system().draw_renderable(output, renderable, renderable_transform, render, in_camera, interpolation_ratio, only_border_highlights);
 			}
 		});
 	}

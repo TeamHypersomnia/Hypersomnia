@@ -101,8 +101,8 @@ namespace scene_managers {
 			new_characters.push_back(new_character);
 
 			if (i == 0) {
-				new_character.get<components::sentience>().health.value = 800;
-				new_character.get<components::sentience>().health.maximum = 800;
+				new_character.get<components::sentience>().health.value = 100;
+				new_character.get<components::sentience>().health.maximum = 100;
 			}
 			if (i == 1) {
 				new_character.get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;

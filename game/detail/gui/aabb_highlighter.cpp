@@ -6,8 +6,8 @@
 #include "game/transcendental/cosmos.h"
 #include "augs/graphics/renderer.h"
 
-void aabb_highlighter::update(float delta) {
-	timer += delta;
+void aabb_highlighter::update(const float delta_ms) {
+	timer += delta_ms;
 	timer = fmod(timer, cycle_duration_ms);
 }
 

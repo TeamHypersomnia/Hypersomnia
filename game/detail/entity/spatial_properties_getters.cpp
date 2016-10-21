@@ -43,6 +43,12 @@ components::transform basic_spatial_properties_getters<C, D>::logic_transform() 
 	}
 }
 
+template <bool C, class D>
+components::transform basic_spatial_properties_getters<C, D>::viewing_transform(const bool integerize) const {
+	auto& handle = *static_cast<const D*>(this);
+	return ::viewing_transform(handle, integerize);
+}
+
 template <class D>
 void spatial_properties_getters<false, D>::set_logic_transform(const components::transform t) const {
 	auto& handle = *static_cast<const D*>(this);

@@ -11,7 +11,7 @@ class viewing_step;
 struct immediate_hud {
 	struct game_event_visualization {
 		double maximum_duration_seconds = 0.0;
-		augs::stepped_timestamp time_of_occurence;
+		double time_of_occurence = 0.0;
 	};
 
 	struct vertically_flying_number : game_event_visualization {

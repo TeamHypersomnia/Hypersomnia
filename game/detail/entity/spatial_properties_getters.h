@@ -7,6 +7,7 @@ class basic_spatial_properties_getters {
 public:
 	bool has_logic_transform() const;
 	components::transform logic_transform() const;
+	components::transform viewing_transform(const bool integerize = false) const;
 };
 
 template<bool, class>

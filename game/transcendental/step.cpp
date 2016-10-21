@@ -10,9 +10,11 @@ augs::variable_delta viewing_step::get_delta() const {
 
 viewing_step::viewing_step(
 	const cosmos& cosm, 
+	const immediate_hud& hud,
+	const const aabb_highlighter& world_hover_highlighter,
 	const augs::variable_delta& delta,
 	augs::renderer& renderer, 
-	state_for_drawing_camera camera_state) : cosm(cosm), delta(delta), renderer(renderer), camera_state(camera_state) {}
+	state_for_drawing_camera camera_state) : cosm(cosm), hud(hud), world_hover_highlighter(world_hover_highlighter), delta(delta), renderer(renderer), camera_state(camera_state) {}
 
 vec2 viewing_step::get_screen_space(vec2 pos) const {
 	return pos - camera_state.transformed_visible_world_area_aabb.get_position();

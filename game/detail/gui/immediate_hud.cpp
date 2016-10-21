@@ -96,7 +96,7 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 
 			auto health_col = sentience->calculate_health_color(time_pulse_ratio);
 
-			auto& transform = v.get<components::transform>();
+			auto& transform = v.viewing_transform();
 			
 			components::sprite::drawing_input state(r.renderer.triangles);
 			state.setup_from(r.camera_state);
@@ -107,7 +107,7 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 			circle_hud.set(assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM, health_col);
 			circle_hud.draw(state);
 			
-			auto watched_character_transform = watched_character.get<components::transform>();
+			auto watched_character_transform = watched_character.viewing_transform();
 			float starting_health_angle = 0.f;
 			float ending_health_angle = 0.f;
 
@@ -116,7 +116,7 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 				ending_health_angle = starting_health_angle + sentience->health.ratio() * 90.f;
 			}
 			else {
-				starting_health_angle = (v.get<components::transform>().pos - watched_character_transform.pos).degrees() - 45;
+				starting_health_angle = (v.viewing_transform().pos - watched_character_transform.pos).degrees() - 45;
 				ending_health_angle = starting_health_angle + sentience->health.ratio() * 90.f;
 			}
 
@@ -237,10 +237,11 @@ void immediate_hud::acquire_game_events(const fixed_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 	auto& healths = step.messages.get_queue<messages::health_event>();
+	auto current_time = cosmos.get_total_time_passed_in_seconds();
 
 	for (auto& h : healths) {
 		vertically_flying_number vn;
-		vn.time_of_occurence = cosmos.get_timestamp();
+		vn.time_of_occurence = current_time;
 		vn.value = h.effective_amount;
 		vn.maximum_duration_seconds = 0.7;
 
@@ -250,7 +251,9 @@ void immediate_hud::acquire_game_events(const fixed_step& step) {
 			if (h.effective_amount > 0) {
 				col = red;
 			}
-			else col = green;
+			else {
+				col = green;
+			}
 		}
 		else
 			continue;
@@ -261,7 +264,7 @@ void immediate_hud::acquire_game_events(const fixed_step& step) {
 		recent_vertically_flying_numbers.push_back(vn);
 
 		pure_color_highlight new_highlight;
-		new_highlight.time_of_occurence = cosmos.get_timestamp();
+		new_highlight.time_of_occurence = cosmos.get_total_time_passed_in_seconds();
 		
 		new_highlight.target = h.subject;
 		new_highlight.starting_alpha_ratio = std::min(1.f, h.ratio_effective_to_maximum * 5);
@@ -281,6 +284,13 @@ void immediate_hud::acquire_game_events(const fixed_step& step) {
 
 		recent_pure_color_highlights.push_back(new_highlight);
 	}
+
+	auto timeout_lambda = [current_time](const game_event_visualization& v) {
+		return (current_time - v.time_of_occurence) > v.maximum_duration_seconds;
+	};
+
+	erase_remove(recent_vertically_flying_numbers, timeout_lambda);
+	erase_remove(recent_pure_color_highlights, timeout_lambda);
 }
 
 void immediate_hud::draw_vertically_flying_numbers(viewing_step& msg) const {
@@ -288,7 +298,7 @@ void immediate_hud::draw_vertically_flying_numbers(viewing_step& msg) const {
 	auto& triangles = msg.renderer.triangles;
 
 	for (auto& r : recent_vertically_flying_numbers) { 
-		auto passed = current_time - r.time_of_occurence.in_seconds(msg.get_delta().get_fixed());
+		auto passed = current_time - r.time_of_occurence;
 		auto ratio =  passed / r.maximum_duration_seconds;
 
 		auto text = r.text;
@@ -306,16 +316,17 @@ void immediate_hud::draw_pure_color_highlights(viewing_step& msg) const {
 	auto& triangles = msg.renderer.triangles;
 
 	for (auto& r : recent_pure_color_highlights) {
+		auto subject = cosmos[r.target];
 		auto sprite = cosmos[r.target].get<components::sprite>();
 		auto& col = sprite.color;
 		auto prevcol = col;
 		col = r.color;
 
-		auto passed = current_time - r.time_of_occurence.in_seconds(msg.get_delta().get_fixed());
+		auto passed = current_time - r.time_of_occurence;
 		auto ratio = passed / r.maximum_duration_seconds;
 
 		col.a = 255 * (1-ratio) * r.starting_alpha_ratio;
-		render_system().draw_entities(triangles, { cosmos[r.target] }, msg.camera_state, false);
+		render_system().draw_renderable(triangles, sprite, subject.viewing_transform(true), subject.get<components::render>(), msg.camera_state, msg.get_delta().view_interpolation_ratio(), false);
 		col = prevcol;
 	}
 
