@@ -1,8 +1,9 @@
 #include "aabb_highlighter.h"
 #include "game/components/sprite_component.h"
+#include "game/components/sub_entities_component.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/step.h"
-#include "game/cosmos.h"
+#include "game/transcendental/step.h"
+#include "game/transcendental/cosmos.h"
 #include "augs/graphics/renderer.h"
 
 void aabb_highlighter::update(float delta) {
@@ -68,7 +69,7 @@ void aabb_highlighter::draw(viewing_step& step, const_entity_handle subject) con
 		state.renderable_transform.rotation = 0;
 
 		components::sprite border;
-		border.set(assets::BLANK, cyan);
+		border.set(assets::texture_id::BLANK, cyan);
 
 		auto& pos = state.renderable_transform.pos;
 

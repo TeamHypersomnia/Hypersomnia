@@ -216,12 +216,6 @@
     <ClCompile Include="augs\texture_baker\polygonize_sprite.cpp" />
     <ClCompile Include="augs\window_framework\colored_print.cpp" />
     <ClCompile Include="augs\window_framework\platform_utils.cpp" />
-    <ClCompile Include="game\bindings\classes\glwindow_binding.cpp" />
-    <ClCompile Include="game\bindings\classes\rect_ltrb_binding.cpp" />
-    <ClCompile Include="game\bindings\classes\rect_xywh_binding.cpp" />
-    <ClCompile Include="game\bindings\classes\rgba_binding.cpp" />
-    <ClCompile Include="game\bindings\classes\vec2_binding.cpp" />
-    <ClCompile Include="game\bindings\bind_game_and_augs.cpp" />
     <ClCompile Include="game\components\animation_component.cpp" />
     <ClCompile Include="game\components\car_component.cpp" />
     <ClCompile Include="game\components\container_component.cpp" />
@@ -356,6 +350,17 @@
     <ClCompile Include="augs\window_framework\event.cpp" />
     <ClCompile Include="augs\window_framework\window.cpp" />
     <ClCompile Include="application\setups\two_clients_and_server_setup.cpp" />
+    <ClCompile Include="game\detail\gui\aabb_highlighter.cpp" />
+    <ClCompile Include="augs\gui\text_drawer.cpp" />
+    <ClCompile Include="game\detail\gui\special_drag_and_drop_target.cpp" />
+    <ClCompile Include="game\components\gui_element_component.cpp" />
+    <ClCompile Include="game\bindings\classes\glwindow_binding.cpp" />
+    <ClCompile Include="game\bindings\classes\rect_ltrb_binding.cpp" />
+    <ClCompile Include="game\bindings\classes\rect_xywh_binding.cpp" />
+    <ClCompile Include="game\bindings\classes\rgba_binding.cpp" />
+    <ClCompile Include="game\bindings\classes\vec2_binding.cpp" />
+    <ClCompile Include="game\bindings\bind_game_and_augs.cpp" />
+    <ClCompile Include="game\detail\gui\immediate_hud.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Box2D.h" />
@@ -960,8 +965,6 @@
     <ClInclude Include="game\assets\program_id.h" />
     <ClInclude Include="game\assets\shader_id.h" />
     <ClInclude Include="game\assets\texture_id.h" />
-    <ClInclude Include="game\bindings\bindings.h" />
-    <ClInclude Include="game\bindings\bind_game_and_augs.h" />
     <ClInclude Include="game\build_settings.h" />
     <ClInclude Include="game\components\animation_component.h" />
     <ClInclude Include="game\components\behaviour_tree_component.h" />
@@ -1097,5 +1100,11 @@
     <ClInclude Include="augs\window_framework\event.h" />
     <ClInclude Include="augs\window_framework\window.h" />
     <ClInclude Include="augs\gui\gui_element_id.h" />
+    <ClInclude Include="game\detail\gui\aabb_highlighter.h" />
+    <ClInclude Include="augs\gui\text_drawer.h" />
+    <ClInclude Include="game\detail\gui\special_drag_and_drop_target.h" />
+    <ClInclude Include="game\bindings\bind_game_and_augs.h" />
+    <ClInclude Include="game\bindings\bindings.h" />
+    <ClInclude Include="game\detail\gui\immediate_hud.h" />
   </ItemGroup>
 </Project>

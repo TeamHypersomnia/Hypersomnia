@@ -19,6 +19,7 @@
 #include "augs/misc/delta.h"
 #include "gui_event.h"
 #include "draw_and_event_infos.h"
+#include "augs/padding_byte.h"
 
 namespace augs {
 	namespace gui {
@@ -26,16 +27,14 @@ namespace augs {
 		public:
 			static clipboard global_clipboard;
 
-			fixed_delta delta;
-
 			gui_element_id rect_in_focus;
 
 			middlescrolling middlescroll;
 			
-			window::event::state state;
-
 			bool was_hovered_rect_visited = false;
 			bool held_rect_is_dragged = false;
+			padding_byte pad[2];
+
 			gui_element_id rect_hovered;
 			gui_element_id rect_held_by_lmb;
 			gui_element_id rect_held_by_rmb;
@@ -63,8 +62,7 @@ namespace augs {
 
 			template<class C>
 			void consume_raw_input_and_generate_gui_events(C context, const window::event::state new_state) {
-				state = new_state;
-				auto& gl = state;
+				const auto& gl = new_state;
 				using namespace augs::window;
 				raw_event_info in(*this, gl.msg);
 				bool pass = true;
@@ -185,8 +183,8 @@ namespace augs {
 			}
 
 			template<class C>
-			void perform_logic_step(C context) {
-				context(root, [&context](auto& r) { r.perform_logic_step(context); });
+			void perform_logic_step(C context, const fixed_delta& delta) {
+				context(root, [&context, &delta](auto& r) { r.perform_logic_step(context, delta); });
 				context(root, [&context](auto& r) { r.calculate_clipped_rectangle_layout(context); });
 
 				middlescroll.perform_logic_step(context, delta, state);

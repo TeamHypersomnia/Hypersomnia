@@ -5,6 +5,7 @@
 #include "gui_element_id.h"
 #include "draw_and_event_infos.h"
 #include "augs/window_framework/event.h"
+#include "augs/misc/delta.h"
 
 namespace augs {
 	namespace gui {
@@ -31,8 +32,8 @@ namespace augs {
 
 			rects::ltrb<float> rc; /* actual rectangle */
 
-			rect_leaf(rects::xywh<float> rc = rects::xywh<float>());
-			rect_leaf(assets::texture_id);
+			rect_leaf(const gui_element_id& this_id, const rects::xywh<float>& rc = rects::xywh<float>());
+			rect_leaf(const gui_element_id& this_id, const assets::texture_id&);
 
 			const rects::ltrb<float>& get_clipped_rect() const;
 			rects::ltrb<float> get_rect_absolute() const;
@@ -177,7 +178,7 @@ namespace augs {
 			}
 
 			template<class C>
-			void perform_logic_step(C context) {
+			void perform_logic_step(C context, const fixed_delta& delta) {
 
 			}
 
@@ -348,11 +349,11 @@ namespace augs {
 			}
 
 			template<class C>
-			void perform_logic_step(C context) {
-				for_each_child([&context](auto& r) {
+			void perform_logic_step(C context, const fixed_delta& delta) {
+				for_each_child([&context, &delta](auto& r) {
 					if (r.get_flag(rect_leaf::flag::ENABLE_DRAWING)) {
 						r.parent = this_id;
-						r.perform_logic_step(context);
+						r.perform_logic_step(context, delta);
 					}
 				})
 			}

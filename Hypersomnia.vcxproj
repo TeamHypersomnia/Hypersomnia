@@ -322,6 +322,7 @@
     <ClCompile Include="augs\gui\clipboard.cpp" />
     <ClCompile Include="augs\gui\draw_and_event_infos.cpp" />
     <ClCompile Include="augs\gui\formatted_text.cpp" />
+    <ClCompile Include="augs\gui\text_drawer.cpp" />
     <ClCompile Include="augs\misc\http_requests.cpp" />
     <ClCompile Include="augs\misc\delta_compression.cpp" />
     <ClCompile Include="augs\misc\machine_entropy.cpp" />
@@ -339,7 +340,11 @@
     <ClCompile Include="application\setups\client_setup.cpp" />
     <ClCompile Include="application\setups\determinism_test_setup.cpp" />
     <ClCompile Include="game\components\flags_component.cpp" />
+    <ClCompile Include="game\components\gui_element_component.cpp" />
     <ClCompile Include="game\detail\entity\spatial_properties_getters.cpp" />
+    <ClCompile Include="game\detail\gui\aabb_highlighter.cpp" />
+    <ClCompile Include="game\detail\gui\immediate_hud.cpp" />
+    <ClCompile Include="game\detail\gui\special_drag_and_drop_target.cpp" />
     <ClCompile Include="game\detail\world_camera.cpp" />
     <ClCompile Include="game\systems_insignificant\interpolation_system.cpp" />
     <ClCompile Include="game\scene_managers\networked_testbed.cpp" />
@@ -980,6 +985,7 @@
     <ClInclude Include="augs\gui\gui_event.h" />
     <ClInclude Include="augs\gui\middlescrolling.h" />
     <ClInclude Include="augs\gui\gui_element_id.h" />
+    <ClInclude Include="augs\gui\text_drawer.h" />
     <ClInclude Include="augs\misc\easier_handle_getters_mixin.h" />
     <ClInclude Include="augs\misc\http_requests.h" />
     <ClInclude Include="augs\misc\readable_bytesize.h" />
@@ -1012,6 +1018,9 @@
     <ClInclude Include="game\components\sub_entities_component.h" />
     <ClInclude Include="game\container_sizes.h" />
     <ClInclude Include="game\detail\entity\spatial_properties_getters.h" />
+    <ClInclude Include="game\detail\gui\aabb_highlighter.h" />
+    <ClInclude Include="game\detail\gui\immediate_hud.h" />
+    <ClInclude Include="game\detail\gui\special_drag_and_drop_target.h" />
     <ClInclude Include="game\detail\world_camera.h" />
     <ClInclude Include="game\enums\entity_flag.h" />
     <ClInclude Include="game\systems_insignificant\interpolation_system.h" />

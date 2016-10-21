@@ -2,8 +2,7 @@
 
 namespace augs {
 	namespace gui {
-		void appearance_detector::update_appearance(gui_event m) {
-			
+		void appearance_detector::update_appearance(const gui_event m) {
 			appearance app = appearance::unknown;
 
 			if (!remain_pushed_if_mouse_leaves) {

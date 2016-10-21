@@ -13,14 +13,13 @@ namespace augs {
 
 			print.draw_text(v, draft.get_draft(), coloured_str, nullptr, pos + vec2(-1, 0));
 			print.draw_text(v, draft.get_draft(), coloured_str, nullptr, pos + vec2(1, 0));
-			print.draw_text(v, draft.get_draft(), coloured_str, nullptr, pos + vec2(0, -1), nullptr);
-			print.draw_text(v, draft.get_draft(), coloured_str, nullptr, pos + vec2(0, 1), nullptr);
-
+			print.draw_text(v, draft.get_draft(), coloured_str, nullptr, pos + vec2(0, -1));
+			print.draw_text(v, draft.get_draft(), coloured_str, nullptr, pos + vec2(0, 1));
 		}
 		
 		void text_drawer::draw(buf& v) {
 			draft.guarded_redraw();
-			print.draw_text(v, draft.get_draft(), draft.get_str(), nullptr, pos, nullptr);
+			print.draw_text(v, draft.get_draft(), draft.get_str(), nullptr, pos);
 		}
 
 		void text_drawer::draw(draw_info in) {

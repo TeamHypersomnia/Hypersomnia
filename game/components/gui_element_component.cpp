@@ -1,8 +1,15 @@
 #include "gui_element_component.h"
 
 namespace components {
-	gui_element::gui_element() {
-		drop_item_icon = elements.create_element<special_drag_and_drop_target>(augs::gui::rect(), augs::gui::material(assets::texture_id::DROP_HAND_ICON, red));
+	augs::gui::gui_element_id gui_element::assign_guid() {
+		augs::gui::gui_element_id new_guid;
+		new_guid.guid = element_guid_counter++;
+		return new_guid;
+	}
+
+	gui_element::gui_element() :
+		drop_item_icon(assign_guid(), augs::gui::material(assets::texture_id::DROP_HAND_ICON, red))
+	{
 	}
 
 	rects::xywh<float> gui_element::get_rectangle_for_slot_function(slot_function f) const {

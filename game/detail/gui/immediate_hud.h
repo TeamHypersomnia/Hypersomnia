@@ -34,5 +34,5 @@ struct immediate_hud {
 	void draw_pure_color_highlights(viewing_step&) const;
 	void draw_vertically_flying_numbers(viewing_step&) const;
 
-	void acquire_game_events(fixed_step& step);
+	void acquire_game_events(const fixed_step& step);
 };

@@ -8,14 +8,8 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/resources/manager.h"
 
-struct item_button {
-	template<class all_elements...>
-	item_button(augs::gui::rect_handle rect, augs::gui::element_world<all_elements...>& world) {
-		auto& self = rect.get();
-		self.clip = false;
-		self.scrollable = false;
-		self.focusable = false;
-	}
+struct item_button : augs::gui::rect_leaf {
+	item_button(const augs::gui::gui_element& this_id, const rects::xywh<float>& rc);
 
 	rects::ltrb<float> with_attachments_bbox;
 

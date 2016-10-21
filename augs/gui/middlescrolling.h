@@ -15,7 +15,7 @@ namespace augs {
 			float speed_mult = 1.f;
 
 			template<class C>
-			void perform_logic_step(C context, const fixed_delta dt, const window::event::state& state) {
+			void perform_logic_step(C context, const fixed_delta& dt, const window::event::state& state) {
 				if (context.alive(subject)) {
 					context(subject, [&dt, &state](auto& r) {
 						r.set_scroll(r.get_scroll() + static_cast<vec2>(state.mouse.pos - pos) * float(speed_mult*dt.in_milliseconds()));

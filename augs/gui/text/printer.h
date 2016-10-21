@@ -48,7 +48,7 @@ namespace augs {
 					/* if caret is 0, draw no caret */
 					const caret_info* caret,
 					vec2i pos,
-					rects::ltrb<float> clipper) const;
+					rects::ltrb<float> clipper = rects::ltrb<float>()) const;
 			};
 
 			/*

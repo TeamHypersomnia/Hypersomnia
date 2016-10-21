@@ -35,11 +35,11 @@ namespace augs {
 			flags.set(static_cast<size_t>(f), false);
 		}
 
-		rect_leaf::rect_leaf(rects::xywh<float> rc) : rc(rc) {
+		rect_leaf::rect_leaf(const gui_element_id& this_id, const rects::xywh<float>& rc) : this_id(this_id), rc(rc) {
 			set_default_flags();
 		}
 
-		rect_leaf::rect_leaf(assets::texture_id id) {
+		rect_leaf::rect_leaf(const gui_element_id& this_id, const assets::texture_id& id) : this_id(this_id) {
 			set_default_flags();
 			rc.set_size((*id).get_size());
 		 }

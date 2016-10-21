@@ -5,7 +5,7 @@
 namespace augs {
 	namespace gui {
 		struct appearance_detector {
-			enum class appearance {
+			enum class appearance : unsigned char {
 				unknown,
 				released,
 				pushed

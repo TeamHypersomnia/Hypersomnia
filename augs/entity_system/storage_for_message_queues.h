@@ -33,6 +33,11 @@ namespace augs {
 		}
 
 		template <typename T>
+		const std::vector<T>& get_queue() const {
+			return std::get<std::vector<T>>(queues);
+		}
+
+		template <typename T>
 		void clear_queue() {
 			return get_queue<T>().clear();
 		}

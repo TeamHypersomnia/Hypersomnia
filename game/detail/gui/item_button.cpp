@@ -25,8 +25,10 @@ bool item_button::is_being_wholely_dragged_or_pending_finish(augs::gui::rect_wor
 
 }
 
-item_button::item_button(rects::xywh<float> rc) : rect(rc) {
-
+item_button::item_button(const augs::gui::gui_element& this_id, const rects::xywh<float>& rc) : rect_leaf(this_id, rc) {
+	unset_flag(flag::CLIP);
+	unset_flag(flag::SCROLLABLE);
+	unset_flag(flag::FOCUSABLE);
 }
 
 void item_button::draw_dragged_ghost_inside(draw_info in) {

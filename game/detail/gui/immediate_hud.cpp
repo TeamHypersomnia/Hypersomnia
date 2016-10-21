@@ -1,11 +1,12 @@
 #include "immediate_hud.h"
 #include "game/transcendental/entity_id.h"
-#include "game/cosmos.h"
+#include "game/transcendental/cosmos.h"
 
-#include "game/systems/render_system.h"
-#include "game/stateful_systems/gui_system.h"
+#include "game/systems_stateless/render_system.h"
+#include "game/systems_stateless/gui_system.h"
 #include "game/components/sprite_component.h"
-#include "game/components/camera_component.h"
+#include "game/transcendental/viewing_session.h"
+#include "game/transcendental/step.h"
 #include "game/components/sentience_component.h"
 #include "game/components/render_component.h"
 #include "game/components/physics_component.h"
@@ -72,14 +73,14 @@ vec2 position_caption_around_a_circle(float radius, vec2 r, float alpha) {
 }
 
 vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(viewing_step& r) const {
-	auto& dynamic_tree = r.cosm.temporary_systems.get<dynamic_tree_system>();
+	auto& dynamic_tree = r.cosm.systems_temporary.get<dynamic_tree_system>();
 	const auto& visible_entities = r.visible_entities;
 	auto& target = r.renderer;
 	auto& cosmos = r.cosm;
 
 	auto watched_character = cosmos[r.camera_state.associated_character];
 
-	int timestamp_ms = r.get_delta().total_time_passed_in_seconds() * 1000;
+	int timestamp_ms = cosmos.get_total_time_passed_in_seconds() * 1000;
 
 	vertex_triangle_buffer circular_bars_information;
 
@@ -103,7 +104,7 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 			state.renderable_transform.rotation = 0;
 
 			components::sprite circle_hud;
-			circle_hud.set(assets::HUD_CIRCULAR_BAR_MEDIUM, health_col);
+			circle_hud.set(assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM, health_col);
 			circle_hud.draw(state);
 			
 			auto watched_character_transform = watched_character.get<components::transform>();
@@ -165,7 +166,7 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 							charges += count_charges_inside(chamber_slot);
 
 							total_space_available += chamber_slot->space_available;
-							total_actual_free_space += chamber_slot->calculate_free_space_with_children();
+							total_actual_free_space += chamber_slot.calculate_free_space_with_children();
 						}
 
 						if (total_space_available > 0) {
@@ -204,7 +205,7 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 				examine_item_slot(v[slot_function::PRIMARY_HAND], starting_health_angle - 90 - 22.5, 90, true);
 			}
 
-			int radius = (*assets::HUD_CIRCULAR_BAR_MEDIUM).get_size().x / 2;
+			int radius = (*assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM).get_size().x / 2;
 
 			int empty_health_amount = (1 - sentience->health.ratio()) * 90;
 
@@ -215,7 +216,7 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 				if (in.text.empty()) continue;
 
 				augs::gui::text_drawer health_points;
-				health_points.set_text(augs::gui::text::format(in.text, augs::gui::text::style(assets::GUI_FONT, in.color)));
+				health_points.set_text(augs::gui::text::format(in.text, augs::gui::text::style(assets::font_id::GUI_FONT, in.color)));
 
 				auto circle_displacement_length = health_points.get_bbox().bigger_side() + radius;
 				vec2i screen_space_circle_center = r.get_screen_space(transform.pos);
@@ -232,14 +233,14 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 	return circular_bars_information;
 }
 
-void immediate_hud::acquire_game_events(fixed_step& step) {
+void immediate_hud::acquire_game_events(const fixed_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 	auto& healths = step.messages.get_queue<messages::health_event>();
 
 	for (auto& h : healths) {
 		vertically_flying_number vn;
-		vn.time_of_occurence = delta.get_timestamp();
+		vn.time_of_occurence = cosmos.get_timestamp();
 		vn.value = h.effective_amount;
 		vn.maximum_duration_seconds = 0.7;
 
@@ -254,32 +255,36 @@ void immediate_hud::acquire_game_events(fixed_step& step) {
 		else
 			continue;
 
-		vn.text.set_text(augs::gui::text::format(to_wstring(std::abs(int(vn.value))), augs::gui::text::style(assets::GUI_FONT, col)));
+		vn.text.set_text(augs::gui::text::format(to_wstring(std::abs(int(vn.value))), augs::gui::text::style(assets::font_id::GUI_FONT, col)));
 		vn.transform.pos = h.point_of_impact;
 
 		recent_vertically_flying_numbers.push_back(vn);
 
-		pure_color_highlight ph;
-		ph.time_of_occurence = delta.get_timestamp();
+		pure_color_highlight new_highlight;
+		new_highlight.time_of_occurence = cosmos.get_timestamp();
 		
-		ph.target = h.subject;
-		ph.starting_alpha_ratio = std::min(1.f, h.ratio_effective_to_maximum * 5);
+		new_highlight.target = h.subject;
+		new_highlight.starting_alpha_ratio = std::min(1.f, h.ratio_effective_to_maximum * 5);
 		
 		if (cosmos[h.spawned_remnants].alive()) {
-			ph.target = h.spawned_remnants;
-			ph.starting_alpha_ratio = 0.7;
+			new_highlight.target = h.spawned_remnants;
+			new_highlight.starting_alpha_ratio = 0.7;
 		}
 
-		ph.maximum_duration_seconds = 0.3;
-		ph.color = col;
+		new_highlight.maximum_duration_seconds = 0.3;
+		new_highlight.color = col;
 
-		erase_remove(recent_pure_color_highlights, [&ph, &cosmos](const pure_color_highlight& h) { return h.target == ph.target || h.target == cosmos[ph.target][associated_entity_name::ASTRAL_BODY]; });
-		recent_pure_color_highlights.push_back(ph);
+		erase_remove(recent_pure_color_highlights, [&new_highlight, &cosmos](const pure_color_highlight& existing_highlight) { 
+			return existing_highlight.target == new_highlight.target;
+			//|| existing_highlight.target == cosmos[new_highlight.target][associated_entity_name::ASTRAL_BODY];
+		});
+
+		recent_pure_color_highlights.push_back(new_highlight);
 	}
 }
 
 void immediate_hud::draw_vertically_flying_numbers(viewing_step& msg) const {
-	auto current_time = msg.get_delta().total_time_passed_in_seconds();
+	auto current_time = msg.cosm.get_total_time_passed_in_seconds();
 	auto& triangles = msg.renderer.triangles;
 
 	for (auto& r : recent_vertically_flying_numbers) { 
@@ -297,7 +302,7 @@ void immediate_hud::draw_vertically_flying_numbers(viewing_step& msg) const {
 
 void immediate_hud::draw_pure_color_highlights(viewing_step& msg) const {
 	auto& cosmos = msg.cosm;
-	auto current_time = msg.get_delta().total_time_passed_in_seconds();
+	auto current_time = cosmos.get_total_time_passed_in_seconds();
 	auto& triangles = msg.renderer.triangles;
 
 	for (auto& r : recent_pure_color_highlights) {
