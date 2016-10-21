@@ -27,7 +27,7 @@ config_table = {
 	resolution_h = 800,
 	doublebuffer = 1,
 
-	debug_disable_cursor_clipping = 1,
+	debug_disable_cursor_clipping = 0,
 	
 	mouse_sensitivity = vec2(1.5, 1.5),
 	

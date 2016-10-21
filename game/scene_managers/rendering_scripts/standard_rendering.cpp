@@ -72,20 +72,20 @@ namespace rendering_scripts {
 		renderer.call_triangles();
 		renderer.clear_triangles();
 
-		//circular_bars_shader.use();
-		//{
-		//	auto projection_matrix_uniform = glGetUniformLocation(circular_bars_shader.id, "projection_matrix");
-		//	glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
-		//	
-		//	vec2 upper(0.0f, 0.0f);
-		//	vec2 lower(1.0f, 1.0f);
-		//	(*assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM).get_uv(upper);
-		//	(*assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM).get_uv(lower);
-		//	auto center = (upper + lower) / 2;
-		//
-		//	glUniform2f(glGetUniformLocation(circular_bars_shader.id, "texture_center"), center.x, center.y);
-		//
-		//}
+		circular_bars_shader.use();
+		{
+			auto projection_matrix_uniform = glGetUniformLocation(circular_bars_shader.id, "projection_matrix");
+			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
+			
+			vec2 upper(0.0f, 0.0f);
+			vec2 lower(1.0f, 1.0f);
+			(*assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM).get_uv(upper);
+			(*assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM).get_uv(lower);
+			auto center = (upper + lower) / 2;
+		
+			glUniform2f(glGetUniformLocation(circular_bars_shader.id, "texture_center"), center.x, center.y);
+		
+		}
 
 		//for (const auto it : cosmos.get(processing_subjects::WITH_INPUT_RECEIVER)) {
 		//	if (it.get<components::input_receiver>().local && it.has<components::gui_element>()) {
