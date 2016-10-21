@@ -429,7 +429,17 @@ TEST(CosmicDelta, CosmicDeltaPaddingTest) {
 		new (buf1) checked_type;
 		new (buf2) checked_type;
 
-		ASSERT_TRUE(!memcmp(buf1, buf2, type_size)) << "Padding is wrong in " << typeid(checked_type).name() << "\nsizeof: " << type_size;
+		int iter = 0;
+		bool same = true;
+
+		for (; iter < type_size; ++iter) {
+			if (buf1[iter] != buf2[iter]) {
+				same = false;
+				break;
+			}
+		}
+
+		ASSERT_TRUE(same) << "Padding is wrong in " << typeid(checked_type).name() << "\nsizeof: " << type_size << "\nDivergence position: " << iter;
 	};
 
 	for_each_in_tuple(typename put_all_components_into<std::tuple>::type(), padding_checker);
