@@ -48,4 +48,5 @@ public:
 	cosmic_entropy entropy;
 
 	augs::fixed_delta get_delta() const;
+	cosmos& get_cosmos();
 };

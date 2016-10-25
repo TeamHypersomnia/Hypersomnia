@@ -25,3 +25,7 @@ fixed_step::fixed_step(cosmos& cosm, cosmic_entropy entropy) : cosm(cosm), entro
 augs::fixed_delta fixed_step::get_delta() const {
 	return cosm.get_fixed_delta();
 }
+
+cosmos& fixed_delta::get_cosmos() {
+	return cosm;
+}
