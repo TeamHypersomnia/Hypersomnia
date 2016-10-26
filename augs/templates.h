@@ -329,6 +329,22 @@ struct is_memcpy_safe<std::pair<A, B>> {
 	static const bool value = is_memcpy_safe<A>::value && is_memcpy_safe<B>::value;
 };
 
+template <class... Head>
+struct are_types_memcpy_safe;
+
+template <class Head>
+struct are_types_memcpy_safe<Head> {
+	static constexpr bool value = is_memcpy_safe<Head>::value;
+};
+
+template <class Head, class... Tail>
+struct are_types_memcpy_safe<Head, Tail...> {
+	static constexpr bool value =
+		are_types_memcpy_safe<Head>::value
+		&&
+		are_types_memcpy_safe<Tail...>::value;
+};
+
 template<class Str, class Repl>
 Str replace_all(Str str, Repl _from, Repl _to) {
 	const Str& from(_from);
