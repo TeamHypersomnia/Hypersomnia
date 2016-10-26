@@ -6,17 +6,18 @@ namespace augs {
 	template<class... Types>
 	class trivial_variant {
 		unsigned current_type = sizeof...(Types);
-		char _s[std::max({ sizeof(Types)... })];
+		typename std::aligned_union<0, Types...>::type _s;
 
 		static_assert(are_types_memcpy_safe<Types...>::value, "Types must be memcpy-safe!");
 
 		template<class L, class Head>
 		decltype(auto) call_unroll(L f) {
-			ensure(index_in_pack<Head, Types...>::value == current_type && "Polymorphic call on a null location!");
+			const bool polymorphic_call_target_found = index_in_pack<Head, Types...>::value == current_type;
+			ensure(polymorphic_call_target_found);
 			return f(get<Head>());
 		}
 
-		template<class L, class Head, class Tail...>
+		template<class L, class Head, class... Tail>
 		decltype(auto) call_unroll(L f) {
 			if (index_in_pack<Head, Types...>::value == current_type) {
 				return f(get<Head>());
@@ -54,13 +55,15 @@ namespace augs {
 
 		template<class T>
 		T& get() {
-			ensure(index_in_pack<T, Types...>::value == current_type);
+			const bool polymorphic_get_target_found = index_in_pack<T, Types...>::value == current_type;
+			ensure(polymorphic_get_target_found);
 			return *reinterpret_cast<T*>(_s);
 		}
 
 		template<class T>
 		const T& get() const {
-			ensure(index_in_pack<T, Types...>::value == current_type);
+			const bool polymorphic_get_target_found = index_in_pack<T, Types...>::value == current_type;
+			ensure(polymorphic_get_target_found);
 			return *reinterpret_cast<const T*>(_s);
 		}
 
