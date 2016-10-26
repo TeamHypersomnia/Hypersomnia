@@ -125,6 +125,7 @@ void intent_contextualization_system::contextualize_movement_intents(fixed_step&
 
 	for (auto& e : intents) {
 		entity_id callee;
+		bool callee_resolved = false;
 
 		const auto subject = cosmos[e.subject];
 
@@ -137,16 +138,16 @@ void intent_contextualization_system::contextualize_movement_intents(fixed_step&
 				|| e.intent == intent_type::MOVE_LEFT
 				|| e.intent == intent_type::MOVE_RIGHT) {
 				callee = maybe_driver->owned_vehicle;
+				callee_resolved = true;
 			}
 			else if (e.intent == intent_type::SPACE_BUTTON) {
 				callee = maybe_driver->owned_vehicle;
+				callee_resolved = true;
 				e.intent = intent_type::HAND_BRAKE;
 			}
 		}
-
-		const auto callee_handle = cosmos[callee];
 		
-		if (callee_handle.dead()) {
+		if (!callee_resolved) {
 			if (maybe_container) {
 				if (e.intent == intent_type::SPACE_BUTTON) {
 					const auto hand = subject[slot_function::PRIMARY_HAND];
@@ -154,12 +155,13 @@ void intent_contextualization_system::contextualize_movement_intents(fixed_step&
 					if (hand.alive() && hand->items_inside.size() > 0) {
 						e.intent = intent_type::MELEE_TERTIARY_MOVE;
 						callee = hand.get_items_inside()[0];
+						callee_resolved = true;
 					}
 				}
 			}
 		}
 
-		if(callee_handle.alive())
+		if(callee_resolved)
 			e.subject = callee;
 	}
 }
