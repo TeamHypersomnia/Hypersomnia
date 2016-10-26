@@ -443,6 +443,7 @@ TEST(CosmicDelta, CosmicDeltaPaddingTest) {
 	};
 
 	for_each_in_tuple(typename put_all_components_into<std::tuple>::type(), padding_checker);
+	padding_checker(augs::window::event::state());
 	padding_checker(entity_intent());
 }
 
