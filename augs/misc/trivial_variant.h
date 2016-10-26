@@ -43,6 +43,10 @@ namespace augs {
 		//}
 
 	public:
+		trivial_variant() {
+			std::memset(&_s, 0, sizeof(_s));
+		}
+
 		bool is_set() const {
 			return current_type != sizeof...(Types);
 		}

@@ -81,6 +81,7 @@ void slot_button::draw_triangles(draw_info info) {
 		auto space_available_text = augs::gui::text::format(to_wstring(slot_id.calculate_free_space_with_parent_containers() / long double(SPACE_ATOMS_PER_UNIT), 2, true)
 			, augs::gui::text::style(assets::font_id::GUI_FONT, border_col));
 
+		augs::gui::text_drawer space_caption;
 		space_caption.set_text(space_available_text);
 		space_caption.center(get_rect_absolute());
 		space_caption.draw(info);

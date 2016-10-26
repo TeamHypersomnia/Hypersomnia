@@ -8,15 +8,6 @@ namespace augs {
 
 		material::material(const rgba& color) : tex(assets::texture_id::BLANK), color(color) {}
 
-		rects::ltrb<float> draw_clipped_rectangle(material mat, rects::ltrb<float> origin, const rect_leaf& p, std::vector<augs::vertex_triangle>& v) {
-			/* if p is null, we don't clip at all
-			if p is not null and p->clip is true, we take p->rc_clipped as clipper
-			if p is not null and p->clip is false, we search for the first clipping parent's rc_clipped
-			*/
-
-			return draw_clipped_rectangle(mat, origin, p.get_clipping_rect(), v);
-		}
-
 		rects::ltrb<float> draw_clipped_rectangle(material mat, rects::ltrb<float> origin, rects::ltrb<float> clipper, std::vector<augs::vertex_triangle>& v) {
 			return draw_clipped_rectangle(*mat.tex, mat.color, origin, clipper, v);
 		}

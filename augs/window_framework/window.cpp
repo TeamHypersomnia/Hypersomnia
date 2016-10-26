@@ -97,12 +97,12 @@ namespace augs {
 					if(events.utf16 > 255) {
 						break;
 					}
-					events.utf32 = unsigned(wParam);
+					//events.utf32 = unsigned(wParam);
 					events.repeated = ((lParam & (1 << 30)) != 0);
 					break;
 				case WM_UNICHAR:
-					events.utf32 = unsigned(wParam);
-					events.repeated = ((lParam & (1 << 30)) != 0);
+					//events.utf32 = unsigned(wParam);
+					//events.repeated = ((lParam & (1 << 30)) != 0);
 					break;
 
 				case SC_CLOSE:
@@ -151,7 +151,7 @@ namespace augs {
 					events.key_event = event::PRESSED;
 					events.key = LMOUSE;
 					SetCapture(hwnd);
-					events.mouse.state[0] = events.keys[LMOUSE] = true;
+					events.mouse_keys[0] = events.keys[LMOUSE] = true;
 
 					if (m == WM_LBUTTONDOWN) {
 						if (doubled && triple_timer.extract<std::chrono::milliseconds>() < triple_click_delay) {
@@ -169,12 +169,12 @@ namespace augs {
 				case WM_RBUTTONDOWN:
 					events.key_event = event::PRESSED;
 					events.key = RMOUSE;
-					events.mouse.state[1] = events.keys[RMOUSE] = true;  break;
+					events.mouse_keys[1] = events.keys[RMOUSE] = true;  break;
 				case WM_MBUTTONDBLCLK:
 				case WM_MBUTTONDOWN:
 					events.key_event = event::PRESSED;
 					events.key = MMOUSE;
-					events.mouse.state[2] = events.keys[MMOUSE] = true;  break;
+					events.mouse_keys[2] = events.keys[MMOUSE] = true;  break;
 				case WM_XBUTTONDBLCLK:
 				case WM_XBUTTONDOWN:
 					events.key_event = event::PRESSED;
@@ -191,15 +191,15 @@ namespace augs {
 				case WM_LBUTTONUP:
 					events.key_event = event::RELEASED;
 					events.key = LMOUSE;
-					events.mouse.state[0] = events.keys[LMOUSE] = false; if(GetCapture() == hwnd) ReleaseCapture(); break;
+					events.mouse_keys[0] = events.keys[LMOUSE] = false; if(GetCapture() == hwnd) ReleaseCapture(); break;
 				case WM_RBUTTONUP:
 					events.key_event = event::RELEASED;
 					events.key = RMOUSE;
-					events.mouse.state[1] = events.keys[RMOUSE] = false; break;
+					events.mouse_keys[1] = events.keys[RMOUSE] = false; break;
 				case WM_MBUTTONUP:
 					events.key_event = event::RELEASED;
 					events.key = MMOUSE;
-					events.mouse.state[2] = events.keys[MMOUSE] = false; break;
+					events.mouse_keys[2] = events.keys[MMOUSE] = false; break;
 				case WM_MOUSEMOVE:
 					if (!raw_mouse_input) {
 						p = MAKEPOINTS(lParam);
@@ -209,15 +209,15 @@ namespace augs {
 						events.mouse.pos.x = p.x;
 						events.mouse.pos.y = p.y;
 
-						if (!events.mouse.state[0]) {
-							events.mouse.ldrag.x = events.mouse.pos.x;
-							events.mouse.ldrag.y = events.mouse.pos.y;
-						}
-
-						if (!events.mouse.state[1]) {
-							events.mouse.rdrag.x = events.mouse.pos.x;
-							events.mouse.rdrag.y = events.mouse.pos.y;
-						}
+						//if (!events.mouse_keys[0]) {
+						//	events.mouse.ldrag.x = events.mouse.pos.x;
+						//	events.mouse.ldrag.y = events.mouse.pos.y;
+						//}
+						//
+						//if (!events.mouse_keys[1]) {
+						//	events.mouse.rdrag.x = events.mouse.pos.x;
+						//	events.mouse.rdrag.y = events.mouse.pos.y;
+						//}
 
 						m = WM_MOUSEMOVE;
 					}

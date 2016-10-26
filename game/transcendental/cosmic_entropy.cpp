@@ -5,48 +5,6 @@
 #include "augs/misc/machine_entropy.h"
 #include "game/global/input_context.h"
 
-bool operator==(const std::vector<entity_intent>& a, const std::vector<entity_intent>& b) {
-	return !(a != b);
-}
-
-bool operator!=(const std::vector<entity_intent>& a, const std::vector<entity_intent>& b) {
-	if (a.size() != b.size()) {
-		return true;
-	}
-
-	if (std::memcmp(a.data(), b.data(), sizeof(entity_intent) * a.size())) {
-		return true;
-	}
-
-	return false;
-}
-
-bool make_entity_intent(const input_context& context, const augs::window::event::state& raw, entity_intent& mapped_intent) {
-	bool found_context_entry = false;
-
-	if (raw.key_event == augs::window::event::NO_CHANGE) {
-		mapped_intent.pressed_flag = true;
-
-		const auto found_intent = context.event_to_intent.find(raw.msg);
-		if (found_intent != context.event_to_intent.end()) {
-			mapped_intent.intent = (*found_intent).second;
-			found_context_entry = true;
-		}
-	}
-	else if (raw.key_event == augs::window::event::PRESSED || raw.key_event == augs::window::event::RELEASED) {
-		mapped_intent.pressed_flag = raw.key_event == augs::window::event::PRESSED;
-
-		const auto found_intent = context.key_to_intent.find(raw.key);
-		if (found_intent != context.key_to_intent.end()) {
-			mapped_intent.intent = (*found_intent).second;
-			found_context_entry = true;
-		}
-	}
-
-	mapped_intent.mouse_rel = raw.mouse.rel;
-	return found_context_entry;
-}
-
 guid_mapped_entropy::guid_mapped_entropy(const cosmic_entropy& b, const cosmos& mapper) {
 	delta_to_apply = b.delta_to_apply;
 

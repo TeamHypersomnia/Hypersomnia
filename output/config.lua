@@ -11,7 +11,7 @@ launch_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.LOCAL,
+	launch_mode = launch_modes.LOCAL_DETERMINISM_TEST,
 	
 	recording_replay_speed = 0.5,
 

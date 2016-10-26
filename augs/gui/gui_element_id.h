@@ -8,7 +8,5 @@ namespace augs {
 		struct raw_event_info;
 		struct event_info;
 		struct draw_info;
-
-		typedef augs::raw_pool_id gui_element_id;
 	}
 }

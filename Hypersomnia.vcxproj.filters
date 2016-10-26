@@ -324,7 +324,6 @@
     <ClCompile Include="augs\gui\dragger.cpp" />
     <ClCompile Include="augs\gui\rect_world.cpp" />
     <ClCompile Include="augs\gui\material.cpp" />
-    <ClCompile Include="augs\gui\rect.cpp" />
     <ClCompile Include="augs\gui\stroke.cpp" />
     <ClCompile Include="augs\gui\stylesheet.cpp" />
     <ClCompile Include="augs\gui\text\caret.cpp" />
@@ -353,7 +352,6 @@
     <ClCompile Include="game\detail\gui\aabb_highlighter.cpp" />
     <ClCompile Include="augs\gui\text_drawer.cpp" />
     <ClCompile Include="game\detail\gui\special_drag_and_drop_target.cpp" />
-    <ClCompile Include="game\components\gui_element_component.cpp" />
     <ClCompile Include="game\bindings\classes\glwindow_binding.cpp" />
     <ClCompile Include="game\bindings\classes\rect_ltrb_binding.cpp" />
     <ClCompile Include="game\bindings\classes\rect_xywh_binding.cpp" />
@@ -361,6 +359,9 @@
     <ClCompile Include="game\bindings\classes\vec2_binding.cpp" />
     <ClCompile Include="game\bindings\bind_game_and_augs.cpp" />
     <ClCompile Include="game\detail\gui\immediate_hud.cpp" />
+    <ClCompile Include="game\systems_stateless\gui_system.cpp" />
+    <ClCompile Include="game\transcendental\entity_intent.cpp" />
+    <ClCompile Include="game\components\gui_element_component.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Box2D.h" />
@@ -817,9 +818,6 @@
     <ClInclude Include="augs\gui\appearance_detector.h" />
     <ClInclude Include="augs\gui\clipboard.h" />
     <ClInclude Include="augs\gui\draw_and_event_infos.h" />
-    <ClInclude Include="augs\gui\element_handle.h" />
-    <ClInclude Include="augs\gui\element_id.h" />
-    <ClInclude Include="augs\gui\element_world.h" />
     <ClInclude Include="augs\gui\formatted_text.h" />
     <ClInclude Include="augs\gui\gui_event.h" />
     <ClInclude Include="augs\gui\middlescrolling.h" />
@@ -1106,5 +1104,15 @@
     <ClInclude Include="game\bindings\bind_game_and_augs.h" />
     <ClInclude Include="game\bindings\bindings.h" />
     <ClInclude Include="game\detail\gui\immediate_hud.h" />
+    <ClInclude Include="game\systems_stateless\gui_system.h" />
+    <ClInclude Include="game\transcendental\entity_intent.h" />
+    <ClInclude Include="augs\misc\trivial_pair.h" />
+    <ClInclude Include="game\detail\gui\gui_element_location.h" />
+    <ClInclude Include="augs\misc\trivial_variant.h" />
+    <ClInclude Include="game\detail\gui\locations\slot_button_for_inventory_slot.h" />
+    <ClInclude Include="game\detail\gui\locations\item_button_for_item_component.h" />
+    <ClInclude Include="game\detail\gui\locations\internal_of_gui_element_component.h" />
+    <ClInclude Include="augs\gui\gui_flags.h" />
+    <ClInclude Include="game\detail\gui\slot_button.h" />
   </ItemGroup>
 </Project>

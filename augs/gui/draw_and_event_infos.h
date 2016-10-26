@@ -8,26 +8,22 @@ class rect_world;
 namespace augs {
 	namespace gui {
 		struct draw_info {
-			const rect_world& owner;
 			vertex_triangle_buffer& v;
-
-			draw_info(const rect_world&, vertex_triangle_buffer&);
+			draw_info(vertex_triangle_buffer&);
 		};
 
 		struct raw_event_info {
-			rect_world& owner;
-			const augs::window::event::message msg;
+			const augs::window::event::state state;
 
 			bool mouse_fetched = false;
 			bool scroll_fetched = false;
-			raw_event_info(rect_world&, const augs::window::event::message);
+			raw_event_info(const augs::window::event::state);
 		};
 
 		struct event_info {
-			rect_world& owner;
 			gui_event msg;
 
-			event_info(rect_world&, const gui_event);
+			event_info(const gui_event);
 			operator gui_event() const;
 		};
 	}

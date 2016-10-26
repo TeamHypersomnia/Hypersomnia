@@ -4,12 +4,11 @@
 #include "augs/gui/appearance_detector.h"
 
 #include "game/detail/inventory_slot_id.h"
-#include "augs/gui/element_handle.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/resources/manager.h"
 
-struct item_button : augs::gui::rect_leaf {
-	item_button(const augs::gui::gui_element& this_id, const rects::xywh<float>& rc);
+struct item_button : game_gui_rect_leaf<item_button> {
+	item_button(const rects::xywh<float>& rc);
 
 	rects::ltrb<float> with_attachments_bbox;
 
@@ -25,7 +24,7 @@ struct item_button : augs::gui::rect_leaf {
 
 	vec2i drag_offset_in_item_deposit;
 };
-
+/*
 namespace augs {
 	namespace gui {
 		template<bool is_const, class... all_elements>
@@ -246,3 +245,4 @@ namespace augs {
 		};
 	}
 }
+*/

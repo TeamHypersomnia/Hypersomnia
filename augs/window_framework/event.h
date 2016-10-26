@@ -10,13 +10,13 @@
 namespace augs {
 	namespace window {
 		namespace event {
-			enum key_changed {
+			enum key_changed : unsigned char {
 				NO_CHANGE = 0,
 				PRESSED = 1,
 				RELEASED = 2
 			};
 
-			enum class message {
+			enum class message : unsigned char {
 				unknown,
 				ltripleclick,
 				close,
@@ -299,50 +299,23 @@ namespace augs {
 			}
 
 			struct state {
-				struct mouse_info {
-					vec2i pos;
-					vec2i rel;
-					vec2i ldrag;
-					vec2i rdrag;
-
-					bool state[3] = { false, false, false };
-					int scroll = 0;
-
-					template <class Archive>
-					void serialize(Archive& ar) {
-						ar(
-							CEREAL_NVP(pos),
-							CEREAL_NVP(rel),
-							CEREAL_NVP(ldrag),
-							CEREAL_NVP(rdrag),
-
-							CEREAL_NVP(state),
-							CEREAL_NVP(scroll)
-						);
-					}
-				} mouse;
-
-				message msg;
-				key_changed key_event = key_changed::NO_CHANGE;
-				keys::key key = keys::key::INVALID;
-				bool repeated = false;
-				wchar_t utf16 = 0;
-				unsigned utf32 = 0;
 				std::bitset<256> keys;
 
-				template <class Archive>
-				void serialize(Archive& ar) {
-					ar(
-						CEREAL_NVP(mouse),
-						CEREAL_NVP(msg),
-						CEREAL_NVP(key_event),
-						CEREAL_NVP(key),
-						CEREAL_NVP(repeated),
-						CEREAL_NVP(utf16),
-						CEREAL_NVP(utf32),
-						CEREAL_NVP(keys)
-					);
-				}
+				struct mouse_info {
+					vec2t<short> pos;
+					vec2t<short> rel;
+					int scroll = 0;
+				} mouse;
+
+				keys::key key = keys::key::INVALID;
+				bool mouse_keys[3] = { false, false, false };
+				bool repeated = false;
+				wchar_t utf16 = 0;
+
+				message msg = message::unknown;
+				key_changed key_event = key_changed::NO_CHANGE;
+
+				//unsigned utf32 = 0;
 			};
 		}
 	}

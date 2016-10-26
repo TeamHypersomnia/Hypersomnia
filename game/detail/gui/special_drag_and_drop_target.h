@@ -4,8 +4,10 @@
 #include "augs/gui/appearance_detector.h"
 #include "special_controls.h"
 
-struct special_drag_and_drop_target : augs::gui::rect_leaf {
-	special_drag_and_drop_target(augs::gui::gui_element_id this_id, augs::gui::material new_mat);
+#include "game/detail/gui/gui_element_location.h"
+
+struct special_drag_and_drop_target : game_gui_rect_leaf<special_drag_and_drop_target> {
+	special_drag_and_drop_target(const augs::gui::material new_mat);
 
 	special_control type;
 

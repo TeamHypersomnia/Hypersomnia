@@ -7,10 +7,6 @@
 #undef max
 namespace augs {
 	namespace gui {
-		clipboard rect_world::global_clipboard;
-
-		gui_element_id rect_world::get_rect_in_focus() const {
-			return rect_in_focus;
-		}
+		clipboard global_clipboard;
 	}
 }

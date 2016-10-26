@@ -90,7 +90,7 @@ namespace augs {
 			return clipping_rect;
 		}
 
-		rects::ltrb<float> rect_leaf::get_rect_absolute() const {
+		rects::ltrb<float> rect_leaf::get_absolute_rect() const {
 			return rects::xywh<float>(absolute_xy.x, absolute_xy.y, rc.w(), rc.h());
 		}
 

@@ -8,9 +8,13 @@
 #include "game/container_sizes.h"
 #include "padding_byte.h"
 
+#include "game/detail/gui/slot_button.h"
+
 class cosmos;
 
 struct inventory_slot {
+	slot_button button;
+
 	unsigned category_allowed = 0;
 
 	bool items_need_mounting = false;

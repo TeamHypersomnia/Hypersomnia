@@ -6,96 +6,155 @@
 #include "draw_and_event_infos.h"
 #include "augs/window_framework/event.h"
 #include "augs/misc/delta.h"
+#include "gui_flags.h"
 
 namespace augs {
 	namespace gui {
 		struct stylesheet;
-		class rect_world;
 
+		template <class derived, class gui_element_id>
 		struct rect_leaf {
-			enum class flag {
-				DISABLE_HOVERING,
-				ENABLE_DRAWING,
-				FETCH_WHEEL,
-				PRESERVE_FOCUS,
-				FOCUSABLE,
-				ENABLE_DRAWING_OF_CHILDREN,
-				SNAP_SCROLL_TO_CONTENT_SIZE,
-				SCROLLABLE,
-				CLIP,
-
-				COUNT
-			};
-
 			std::bitset<static_cast<size_t>(flag::COUNT)> flags;
 			vec2i rc_pos_before_dragging;
 
 			rects::ltrb<float> rc; /* actual rectangle */
 
-			rect_leaf(const gui_element_id& this_id, const rects::xywh<float>& rc = rects::xywh<float>());
-			rect_leaf(const gui_element_id& this_id, const assets::texture_id&);
+			rect_leaf(const rects::xywh<float>& rc = rects::xywh<float>()) : rc(rc) {
+				set_default_flags();
+			}
 
-			const rects::ltrb<float>& get_clipped_rect() const;
-			rects::ltrb<float> get_rect_absolute() const;
-			const vec2i& get_absolute_xy() const;
+			rect_leaf(const assets::texture_id& id) {
+				set_default_flags();
+				rc.set_size((*id).get_size());
+			}
 
-			gui_element_id this_id;
-			gui_element_id parent;
+			void set_default_flags() {
+				unset_flag(flag::DISABLE_HOVERING);
+				set_flag(flag::ENABLE_DRAWING);
+				unset_flag(flag::FETCH_WHEEL);
+				unset_flag(flag::PRESERVE_FOCUS);
+				set_flag(flag::FOCUSABLE);
+				set_flag(flag::ENABLE_DRAWING_OF_CHILDREN);
+				set_flag(flag::SNAP_SCROLL_TO_CONTENT_SIZE);
+				set_flag(flag::SCROLLABLE);
+				set_flag(flag::CLIP);
+			}
 
-			rects::ltrb<float> rc_clipped;
+			bool get_flag(const flag f) const {
+				return flags.test(static_cast<size_t>(f));
+			}
 
-			vec2i absolute_xy;
+			bool set_flag(const flag f) {
+				flags.set(static_cast<size_t>(f));
+			}
 
-			void set_default_flags();
+			bool unset_flag(const flag f) {
+				flags.set(static_cast<size_t>(f), false);
+			}
 
-			bool get_flag(const flag) const;
-			bool set_flag(const flag);
-			bool unset_flag(const flag);
+			vec2 get_scroll() const {
+				return vec2();
+			}
 
-			rects::ltrb<float> get_clipping_rect() const;
-			vec2 get_scroll() const;
-			void set_scroll(const vec2);
+			void set_scroll(const vec2) {
+
+			}
+
+			template<class L>
+			decltype(auto) this_call(L lambda) {
+				derived* self = static_cast<derived*>(self);
+				return lambda(*self);
+			}
+
+			template<class L>
+			decltype(auto) this_call(L lambda) const {
+				const derived* self = static_cast<const derived*>(self);
+				return lambda(*self);
+			}
 
 			template<class C>
-			void calculate_clipped_rectangle_layout(C context) {
-				rc_clipped = rc;
-				absolute_xy = vec2i(rc.l, rc.t);
+			void build_tree_data(C context, const gui_element_id& this_id) const {
+				auto& tree_entry = context.get_tree_entry(this_id);
+				const auto parent = tree_entry.get_parent();
+				
+				auto absolute_clipped_rect = rc;
+				auto absolute_pos = vec2i(rc.l, rc.t);
+				auto absolute_clipping_rect = rects::ltrb<float>(0.f, 0.f, std::numeric_limits<int>::max() / 2.f, std::numeric_limits<int>::max() / 2.f);
 
 				/* if we have parent */
 				if (context.alive(parent)) {
-					context(parent, [this](const auto& p) {
+					context(parent, [&](const auto& parent_rect) {
+						auto& p = context.get_tree_entry(parent);
+						const auto scroll = parent_rect.get_scroll();
+
 						/* we have to save our global coordinates in absolute_xy */
-						absolute_xy = p.absolute_xy + vec2i(rc.l, rc.t) - vec2i(int(p.get_scroll().x), int(p.get_scroll().y));
-						rc_clipped = rects::xywh<float>(absolute_xy.x, absolute_xy.y, rc.w(), rc.h());
+						absolute_pos = p.get_absolute_pos() + vec2i(rc.l, rc.t) - vec2i(int(scroll.x), int(scroll.y));
+						absolute_clipped_rect = rects::xywh<float>(absolute_pos.x, absolute_pos.y, rc.w(), rc.h());
 
 						/* and we have to clip by first clipping parent's rc_clipped */
 						//auto* clipping = get_clipping_parent(); 
 						//if(clipping) 
-						rc_clipped.clip_by(p.get_clipping_rect());
+						absolute_clipped_rect.clip_by(p.get_absolute_clipping_rect());
 
-						clipping_rect = p.get_clipping_rect();
+						absolute_clipping_rect = p.get_absolute_clipping_rect();
 					});
 				}
+
+				if (get_flag(flag::CLIP))
+					absolute_clipping_rect.clip_by(absolute_clipped_rect);
+
+				/* align scroll only to be positive and not to exceed content size */
+				//if (get_flag(flag::SNAP_SCROLL_TO_CONTENT_SIZE)) {
+				//	this_call([](auto& r) {
+				//		r.clamp_scroll_to_right_down_corner();
+				//	});
+				//}
+
+				tree_entry.set_absolute_clipped_rect(absolute_clipped_rect);
+				tree_entry.set_absolute_pos(absolute_pos);
+				tree_entry.set_absolute_clipping_rect(absolute_clipping_rect);
+
+				this_call([&](auto& r) {
+					r.for_each_child([&](auto& r, const gui_element_id& child_id) {
+						context.get_tree_entry(child_id).set_parent(this_id);
+						r.build_tree_data(context, child_id);
+					})
+				});
 			}
 
 			template<class C>
-			void consume_raw_input_and_generate_gui_events(C context, gui::raw_event_info& inf) {
+			void consume_raw_input_and_generate_gui_events(C context, const gui_element_id& this_id, gui::raw_event_info& inf) {
 				using namespace augs::window::event;
-				auto& gr = inf.owner;
-				const auto& m = gr.state.mouse;
-				const auto msg = inf.msg;
+				auto& gr = context.get_rect_world();
+				auto& tree_entry = context.get_tree_entry(this_id);
+				const auto& state = inf.state;
+				const auto& m = state.mouse;
+				const auto& msg = inf.state.msg;
 
-				auto gui_event_lambda = [this, &context, &gr](const gui_event ev) {
-					context(this_id, [ev, &context, &gr](auto& r) {
-						r.consume_gui_event(context, gui::event_info(gr, ev));
+				auto gui_event_lambda = [&](const gui_event ev) {
+					this_call([&](auto& r) {
+						r.consume_gui_event(context, this_id, ev);
 					});
 				};
 
-				if (get_flag(rect_leaf::flag::ENABLE_DRAWING)) {
-					if (!get_flag(rect_leaf::flag::DISABLE_HOVERING)) {
-						if (gr.rect_hovered == nullptr) {
-							const bool hover = rc_clipped.good() && rc_clipped.hover(m.pos);
+				if (get_flag(flag::ENABLE_DRAWING)) {
+					if (get_flag(flag::ENABLE_DRAWING_OF_CHILDREN)) {
+						this_call([&](auto& r) {
+							r.for_each_child(context, [&](auto& r, const gui_element_id& child_id) {
+								if (r.get_flag(flag::ENABLE_DRAWING)) {
+									r.consume_raw_input_and_generate_gui_events(context, child_id, inf);
+								}
+							});
+						});
+					}
+				}
 
+				if (get_flag(flag::ENABLE_DRAWING)) {
+					if (!get_flag(flag::DISABLE_HOVERING)) {
+						const auto absolute_clipped_rect = tree_entry.get_absolute_clipped_rect();
+						const bool hover = absolute_clipped_rect.good() && absolute_clipped_rect.hover(m.pos);
+
+						if (context.dead(gr.rect_hovered)) {
 							if (hover) {
 								gui_event_lambda(gui_event::hover);
 								gr.rect_hovered = this_id;
@@ -103,7 +162,7 @@ namespace augs {
 							}
 						}
 						else if (gr.rect_hovered == this_id) {
-							const bool still_hover = rc_clipped.good() && rc_clipped.hover(m.pos);
+							const bool still_hover = hover;
 
 							if (still_hover) {
 								if (msg == message::lup) {
@@ -147,24 +206,24 @@ namespace augs {
 									gui_event_lambda(gui_event::wheel);
 								}
 
-								if (gr.rect_held_by_lmb == this_id && msg == message::mousemotion && m.state[0] && rc_clipped.hover(m.ldrag)) {
+								if (gr.rect_held_by_lmb == this_id && msg == message::mousemotion && state.mouse_keys[0] && absolute_clipped_rect.hover(m.ldrag)) {
 									gui_event_lambda(gui_event::lpressed);
 								}
-								if (gr.rect_held_by_rmb == this_id && msg == message::mousemotion && m.state[1] && rc_clipped.hover(m.rdrag)) {
+								if (gr.rect_held_by_rmb == this_id && msg == message::mousemotion && state.mouse_keys.state[1] && absolute_clipped_rect.hover(m.rdrag)) {
 									gui_event_lambda(gui_event::rpressed);
 								}
 							}
 							else {
 								// ensure(msg == message::mousemotion);
 								gui_event_lambda(gui_event::hout);
-								unhover(inf);
+								unhover(context, this_id, inf);
 							}
 
 							gr.was_hovered_rect_visited = true;
 						}
 					}
 
-					if (gr.rect_held_by_lmb == this && msg == message::mousemotion && m.pos != gr.last_ldown_position) {
+					if (gr.rect_held_by_lmb == this_id && msg == message::mousemotion && m.pos != gr.last_ldown_position) {
 						gr.held_rect_is_dragged = true;
 						gr.current_drag_amount = m.pos - gr.last_ldown_position;
 						gui_event_lambda(gui_event::ldrag);
@@ -173,176 +232,27 @@ namespace augs {
 			}
 
 			template<class C>
-			void consume_gui_event(C context, event_info e) const {
-				try_to_make_this_rect_focused(context, e);
+			void consume_gui_event(C context, const gui_element_id& this_id, const event_info e) const {
+				// try_to_make_this_rect_focused(context, this_id, e);
+				//	scroll_content_with_wheel(context, e);
+				//	try_to_enable_middlescrolling(context, e);
 			}
 
 			template<class C>
-			void perform_logic_step(C context, const fixed_delta& delta) {
-
-			}
-
-			template<class C>
-			void recalculate_content_size(C) {
-
-			}
-
-			template<class C>
-			void draw(C, draw_info) const {
-
-			}
-
-			template<class C>
-			void draw_stretched_texture(C context, gui::draw_info in, const gui::material& mat = gui::material()) const {
-				draw_clipped_rectangle(mat, get_rect_absolute(), context(parent, [](const auto& p) { return static_cast<rect_leaf&>(p); }), in.v).good();
-			}
-
-			template<class C>
-			void draw_centered_texture(C context, gui::draw_info in, const gui::material& = gui::material(), const vec2i offset = vec2i()) const {
-				auto absolute_centered = this->get().get_rect_absolute();
-				const auto tex_size = (*mat.tex).get_size();
-				absolute_centered.l += absolute_centered.w() / 2 - float(tex_size.x) / 2;
-				absolute_centered.t += absolute_centered.h() / 2 - float(tex_size.y) / 2;
-				absolute_centered.l = int(absolute_centered.l) + offset.x;
-				absolute_centered.t = int(absolute_centered.t) + offset.y;
-				absolute_centered.w(tex_size.x);
-				absolute_centered.h(tex_size.y);
-
-				draw_clipped_rectangle(mat, absolute_centered, context(parent, [](const auto& p) { return static_cast<rect_leaf&>(p); }), in.v).good();
-			}
-
-			template<class C>
-			void draw_rectangle_stylesheeted(C context, gui::draw_info in, const gui::stylesheet& styles) const {
-					auto st = styles.get_style();
-
-					if (st.color.active || st.background_image.active)
-						draw_stretched_texture(context, in, material(st));
-
-					if (st.border.active) st.border.value.draw(in.v, get_rect_absolute(), context(parent, [](const auto& p) { return p.get_clipping_rect(); }));
-			}
-
-			template<class C, class L>
-			void for_each_child(C context, L lambda) {
-
-			}
-
-			template<class C>
-			void try_to_make_this_rect_focused(C context, const gui::event_info e) {
-				if (!get_flag(flag::FOCUSABLE)) return;
-				
-				auto& sys = e.owner;
-
-				if (e == gui_event::ldown ||
-					e == gui_event::ldoubleclick ||
-					e == gui_event::ltripleclick ||
-					e == gui_event::rdoubleclick ||
-					e == gui_event::rdown
-					) {
-					if (context.alive(sys.get_rect_in_focus())) {
-						if (get_flag(flag::PRESERVE_FOCUS) || !context(sys.get_rect_in_focus(), [](const auto& r) { return r.get_flag(flag::PRESERVE_FOCUS); }))
-							sys.set_focus(this_id);
-					}
-					else sys.set_focus(this_id);
-				}
-			}
-
-			template <class C>
-			void unhover(C context, gui::raw_event_info& inf) const {
-				auto gui_event_lambda = [this, &context, &inf](const gui_event ev) {
-					context(this_id, [ev, &context, &inf](auto& r) {
-						r.consume_gui_event(context, gui::event_info(inf.owner, ev));
-					});
-				};
-
-				gui_event_lambda(gui_event::hoverlost);
-
-				if (inf.owner.rect_held_by_lmb == this_id)
-					gui_event_lambda(gui_event::loutdrag);
-
-				inf.owner.rect_hovered = gui_element_id();
-			}
-
-			bool is_being_dragged(const gui::rect_world&) const;
-		};
-
-		struct rect_composite : rect_leaf {
-			rects::wh<float> content_size; /* content's (children's) bounding box */
-			vec2 scroll; /* scrolls content */
-
-			rects::ltrb<float> clipping_rect = rects::ltrb<float>(0.f, 0.f, std::numeric_limits<int>::max() / 2.f, std::numeric_limits<int>::max() / 2.f);
-
-			rects::ltrb<float> get_clipping_rect() const;
-			rects::ltrb<float> get_local_clipper() const;
-
-			/*  does scroll not exceed the content */
-			bool is_scroll_clamped_to_right_down_corner() const;
-
-			/* align scroll to not exceed the content */
-			void clamp_scroll_to_right_down_corner();
-			
-			vec2 get_scroll() const;
-			void set_scroll(const vec2);
-
-			template<class C>
-			void calculate_clipped_rectangle_layout(C context) {
-				rect_leaf::calculate_clipped_rectangle_layout(context);
-
-				if (get_flag(flag::CLIP))
-					clipping_rect.clip_by(rc_clipped);
-
-				context(this_id, [](auto& r) {
-					r.recalculate_context_size(context);
-				});
-
-				/* align scroll only to be positive and not to exceed content size */
-				if (get_flag(flag::SNAP_SCROLL_TO_CONTENT_SIZE))
-					clamp_scroll_to_right_down_corner();
-
-				context(this_id, [this, &context](auto& r) {
-					r.for_each_child([this, &context](auto& r) {
-						r.parent = this_id;
-						r.calculate_clipped_rectangle_layout(context);
-					})
-				});
-			}
-
-			template<class C>
-			void consume_raw_input_and_generate_gui_events(C context, gui::raw_event_info& inf) {
-				using namespace augs::window::event;
-				auto& gr = inf.owner;
-				auto& m = gr.state.mouse;
-				auto msg = inf.msg;
-
-				if (get_flag(rect_leaf::flag::ENABLE_DRAWING)) {
-					if (get_flag(flag::ENABLE_DRAWING_OF_CHILDREN)) {
-						context(this_id, [this, &inf, &context](auto& r) {
-							r.for_each_child(context, [this, &inf, &context](auto& r) {
-								if (r.get_flag(rect_leaf::flag::ENABLE_DRAWING)) {
-									r.parent = this_id;
-									r.consume_raw_input_and_generate_gui_events(context, inf);
-								}
-							});
-						});
-					}
+			void perform_logic_step(C context, const gui_element_id& this_id, const fixed_delta& delta) {
+				if (!get_flag(flag::ENABLE_DRAWING_OF_CHILDREN)) {
+					return;
 				}
 
-				rect_leaf::consume_raw_input_and_generate_gui_events(context, inf);
+				perform_logic_step_on_children(context, this_id, delta);
 			}
 
 			template<class C>
-			void consume_gui_event(C context, event_info e) {
-				rect_leaf::gui_event_lambda(e);
-				scroll_content_with_wheel(context, e);
-				try_to_enable_middlescrolling(context, e);
-			}
-
-			template<class C>
-			void perform_logic_step(C context, const fixed_delta& delta) {
-				context(this_id, [this, &delta, &context](auto& r) {
-					r.for_each_child(context, [this, &delta, &context](auto& r) {
-						if (r.get_flag(rect_leaf::flag::ENABLE_DRAWING)) {
-							r.parent = this_id;
-							r.perform_logic_step(context, delta);
+			void perform_logic_step_on_children(C context, const gui_element_id& this_id, const fixed_delta& delta) {
+				this_call([&](const auto& r) {
+					r.for_each_child(context, [&](auto& r, const gui_element_id& child_id) {
+						if (r.get_flag(flag::ENABLE_DRAWING)) {
+							r.perform_logic_step(context, child_id, delta);
 						}
 					});
 				});
@@ -350,17 +260,18 @@ namespace augs {
 
 			template<class C>
 			void draw(C context, draw_info in) const {
+				if (!get_flag(flag::ENABLE_DRAWING_OF_CHILDREN)) {
+					return;
+				}
 
+				draw_children(context, in);
 			}
 
 			template <class C>
 			void draw_children(C context, draw_info in) const {
-				if (!get_flag(flag::ENABLE_DRAWING_OF_CHILDREN))
-					return;
-
-				context(this_id, [this, &in, &context](const auto& r) {
-					r.for_each_child(context, [this, &in, &context](const auto& r) {
-						if (r.get_flag(rect_leaf::flag::ENABLE_DRAWING)) {
+				this_call([&](const auto& r) {
+					r.for_each_child(context, [&](const auto& r, const gui_element_id& id) {
+						if (r.get_flag(flag::ENABLE_DRAWING)) {
 							r.draw(context, in);
 							r.draw_children(context, in);
 						}
@@ -369,105 +280,173 @@ namespace augs {
 			}
 
 			template<class C>
-			void recalculate_content_size(C context) const {
-				/* init on zero */
-				rects::ltrb<float> content = rects::ltrb<float>(0.f, 0.f, 0.f, 0.f);
-
-				/* enlarge the content size by every child */
-				context(this_id, [&content](const auto& r) {
-					r.for_each_child(context, [&content](const auto& r) {
-						if (r.get_flag(rect_leaf::flag::ENABLE_DRAWING)) {
-							content.contain_positive(r.rc);
-						}
-					});
-				});
-
-				content_size = content;
+			static void draw_stretched_texture(C context, const gui_element_id& id, gui::draw_info in, const gui::material& mat = gui::material()) {
+				const auto absolute = context.get_tree_entry(id).get_absolute_rect();
+				draw_clipped_rectangle(mat, absolute, context.get_tree_entry(id).get_parent(), in.v).good();
 			}
 
 			template<class C>
-			void scroll_content_with_wheel(C context, const gui::event_info e) {
-				auto& owner = e.owner;
-				const auto& wnd = owner.state;
-				const bool scrollable = get_flag(flag::SCROLLABLE);
+			static void draw_centered_texture(C context, const gui_element_id& id, gui::draw_info in, const gui::material& = gui::material(), const vec2i offset = vec2i()) {
+				auto absolute_centered = context.get_tree_entry(id).get_absolute_rect();
+				const auto tex_size = (*mat.tex).get_size();
+				absolute_centered.l += absolute_centered.w() / 2 - float(tex_size.x) / 2;
+				absolute_centered.t += absolute_centered.h() / 2 - float(tex_size.y) / 2;
+				absolute_centered.l = int(absolute_centered.l) + offset.x;
+				absolute_centered.t = int(absolute_centered.t) + offset.y;
+				absolute_centered.w(tex_size.x);
+				absolute_centered.h(tex_size.y);
 
-				const bool parent_alive = context.alive(parent);
-				
-				auto call_parent_wheel_callback = [this, &context, &owner]() {
-					context(parent, [&owner, &context](auto& p) { p.consume_gui_event(context, gui::event_info(owner, gui_event::wheel)); });
-				};
-
-				if (e == gui_event::wheel) {
-					if (wnd.keys[augs::window::event::keys::SHIFT]) {
-						int temp = static_cast<int>(scroll.x);
-
-						if (scrollable) {
-							scroll.x -= wnd.mouse.scroll;
-							clamp_scroll_to_right_down_corner();
-						}
-						if ((!scrollable || temp == scroll.x) && parent_alive) {
-							call_parent_wheel_callback();
-						}
-					}
-					else {
-						int temp = static_cast<int>(scroll.x);
-
-						if (scrollable) {
-							scroll.y -= wnd.mouse.scroll;
-							clamp_scroll_to_right_down_corner();
-						}
-						if ((!scrollable || temp == scroll.y) && parent_alive) {
-							call_parent_wheel_callback();
-						}
-					}
-				}
+				draw_clipped_rectangle(mat, absolute_centered, context, context.get_tree_entry(id).get_parent(), in.v).good();
 			}
 
 			template<class C>
-			void try_to_enable_middlescrolling(C context, const gui::event_info e) {
-				auto& owner = e.owner;
-				auto& wnd = owner.state;
+			static void draw_rectangle_stylesheeted(C context, const gui_element_id& id, gui::draw_info in, const gui::stylesheet& styles) {
+				const auto st = styles.get_style();
+				const auto& this_entry = context.get_tree_entry(id);
 
-				if (e == gui_event::mdown || e == gui_event::mdoubleclick) {
-					if (get_flag(flag::SCROLLABLE) && !content_size.inside(rects::wh<float>(rc))) {
-						owner.middlescroll.subject = this_id;
-						owner.middlescroll.pos = wnd.mouse.pos;
-						owner.set_focus(this_id);
-					}
-					else if (context.alive(parent)) {
-						context(parent, [&context, e](auto& p) { p.consume_gui_event(context, e); })
-					}
+				if (st.color.active || st.background_image.active) {
+					draw_stretched_texture(context, in, material(st));
+				}
+
+				if (st.border.active) {
+					st.border.value.draw(in.v, this_entry.get_absolute_rect(), context, context.get_tree_entry(this_entry.get_parent()).get_absolute_clipping_rect());
 				}
 			}
-
-			template<class C>
-			void scroll_to_view(C context) {
-				if (context.alive(parent)) {
-					context(parent, [this, &context](const auto& p) {
-						const rects::ltrb<float> global = get_rect_absolute();
-						const rects::ltrb<float> parent_global = p.get_rect_absolute();
-						const vec2i off1 = vec2i(std::max(0.f, global.r + 2 - parent_global.r), std::max(0.f, global.b + 2 - parent_global.b));
-						const vec2i off2 = vec2i(std::max(0.f, parent_global.l - global.l + 2 + off1.x), std::max(0.f, parent_global.t - global.t + 2 + off1.y));
-						p.scroll += off1;
-						p.scroll -= off2;
-
-						p.scroll_to_view(context);
-					});
-				}
-			}
-		};
-
-		struct rect_composite_vector : rect_composite {
-			std::vector<gui_element_id> children;
 
 			template<class C, class L>
 			void for_each_child(C context, L lambda) {
-				const auto& children_all = children;
 
-				for (const auto& c : children) {
-					context(c, lambda);
-				}
 			}
+
+			template <class C>
+			void unhover(C context, const gui_element_id& this_id, gui::raw_event_info& inf) {
+				auto& world = context.get_rect_world();
+
+				auto gui_event_lambda = [&](const gui_event ev) {
+					this_call([&](auto& r) {
+						r.consume_gui_event(context, this_id, ev);
+					});
+				};
+
+				gui_event_lambda(gui_event::hoverlost);
+
+				if (world.rect_held_by_lmb == this_id)
+					gui_event_lambda(gui_event::loutdrag);
+
+				world.rect_hovered = gui_element_id();
+			}
+
+			//template<class C>
+			//void try_to_make_this_rect_focused(C context, gui_element_id this_id, const gui::event_info e) {
+			//	if (!get_flag(flag::FOCUSABLE)) return;
+			//	
+			//	auto& sys = context.get_rect_world();
+			//
+			//	if (e == gui_event::ldown ||
+			//		e == gui_event::ldoubleclick ||
+			//		e == gui_event::ltripleclick ||
+			//		e == gui_event::rdoubleclick ||
+			//		e == gui_event::rdown
+			//		) {
+			//		if (context.alive(sys.get_rect_in_focus())) {
+			//			if (get_flag(flag::PRESERVE_FOCUS) || !context(sys.get_rect_in_focus(), [](const auto& r) { return r.get_flag(flag::PRESERVE_FOCUS); }))
+			//				sys.set_focus(this_id);
+			//		}
+			//		else sys.set_focus(this_id);
+			//	}
+			//}
+
 		};
+
+			//bool is_scroll_clamped_to_right_down_corner() const;
+			//void clamp_scroll_to_right_down_corner();
+
+			//template<class C>
+			//rects::wh<float> calculate_content_size(C context) const {
+			//	/* init on zero */
+			//	rects::ltrb<float> content = rects::ltrb<float>(0.f, 0.f, 0.f, 0.f);
+			//
+			//	/* enlarge the content size by every child */
+			//	context(this_id, [&content](const auto& r) {
+			//		r.for_each_child(context, [&content](const auto& r) {
+			//			if (r.get_flag(flag::ENABLE_DRAWING)) {
+			//				content.contain_positive(r.rc);
+			//			}
+			//		});
+			//	});
+			//
+			//	return content;
+			//}
+
+			//template<class C>
+			//void scroll_content_with_wheel(C context, const gui::event_info e) {
+			//	auto& owner = e.owner;
+			//	const auto& wnd = owner.state;
+			//	const bool scrollable = get_flag(flag::SCROLLABLE);
+			//
+			//	const bool parent_alive = context.alive(parent);
+			//	
+			//	auto call_parent_wheel_callback = [this, &context, &owner]() {
+			//		context(parent, [&owner, &context](auto& p) { p.consume_gui_event(context, gui::event_info(owner, gui_event::wheel)); });
+			//	};
+			//
+			//	if (e == gui_event::wheel) {
+			//		if (wnd.keys[augs::window::event::keys::SHIFT]) {
+			//			int temp = static_cast<int>(scroll.x);
+			//			if (scrollable) {
+			//
+			//				scroll.x -= wnd.mouse.scroll;
+			//				clamp_scroll_to_right_down_corner();
+			//			}
+			//			if ((!scrollable || temp == scroll.x) && parent_alive) {
+			//				call_parent_wheel_callback();
+			//			}
+			//		}
+			//		else {
+			//			int temp = static_cast<int>(scroll.x);
+			//
+			//			if (scrollable) {
+			//				scroll.y -= wnd.mouse.scroll;
+			//				clamp_scroll_to_right_down_corner();
+			//			}
+			//			if ((!scrollable || temp == scroll.y) && parent_alive) {
+			//				call_parent_wheel_callback();
+			//			}
+			//		}
+			//	}
+			//}
+			//
+			//template<class C>
+			//void try_to_enable_middlescrolling(C context, const gui::event_info e) {
+			//	auto& owner = e.owner;
+			//	auto& wnd = owner.state;
+			//
+			//	if (e == gui_event::mdown || e == gui_event::mdoubleclick) {
+			//		if (get_flag(flag::SCROLLABLE) && !content_size.inside(rects::wh<float>(rc))) {
+			//			owner.middlescroll.subject = this_id;
+			//			owner.middlescroll.pos = wnd.mouse.pos;
+			//			owner.set_focus(this_id);
+			//		}
+			//		else if (context.alive(parent)) {
+			//			context(parent, [&context, e](auto& p) { p.consume_gui_event(context, e); })
+			//		}
+			//	}
+			//}
+			//
+			//template<class C>
+			//void scroll_to_view(C context) {
+			//	if (context.alive(parent)) {
+			//		context(parent, [&](const auto& p) {
+			//			const rects::ltrb<float> global = get_absolute_rect();
+			//			const rects::ltrb<float> parent_global = p.get_absolute_rect();
+			//			const vec2i off1 = vec2i(std::max(0.f, global.r + 2 - parent_global.r), std::max(0.f, global.b + 2 - parent_global.b));
+			//			const vec2i off2 = vec2i(std::max(0.f, parent_global.l - global.l + 2 + off1.x), std::max(0.f, parent_global.t - global.t + 2 + off1.y));
+			//			p.scroll += off1;
+			//			p.scroll -= off2;
+			//
+			//			p.scroll_to_view(context);
+			//		});
+			//	}
+			//}
 	}
 }
