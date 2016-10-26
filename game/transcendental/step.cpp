@@ -11,7 +11,7 @@ augs::variable_delta viewing_step::get_delta() const {
 viewing_step::viewing_step(
 	const cosmos& cosm, 
 	const immediate_hud& hud,
-	const const aabb_highlighter& world_hover_highlighter,
+	const aabb_highlighter& world_hover_highlighter,
 	const augs::variable_delta& delta,
 	augs::renderer& renderer, 
 	state_for_drawing_camera camera_state) : cosm(cosm), hud(hud), world_hover_highlighter(world_hover_highlighter), delta(delta), renderer(renderer), camera_state(camera_state) {}
@@ -26,6 +26,6 @@ augs::fixed_delta fixed_step::get_delta() const {
 	return cosm.get_fixed_delta();
 }
 
-cosmos& fixed_delta::get_cosmos() {
+cosmos& fixed_step::get_cosmos() {
 	return cosm;
 }
