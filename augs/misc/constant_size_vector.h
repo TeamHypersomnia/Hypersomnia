@@ -157,7 +157,7 @@ namespace augs  {
 
 
 	template<class Key, class Value, int const_count>
-	class constant_size_associative_vector : private constant_size_vector<Key, Value, const_count> {
+	class constant_size_associative_vector : private constant_size_vector<trivial_pair<Key, Value>, const_count> {
 		typedef trivial_pair<Key, Value> elem_type;
 		typedef constant_size_vector<trivial_pair<Key, Value>, const_count> base;
 	public:
