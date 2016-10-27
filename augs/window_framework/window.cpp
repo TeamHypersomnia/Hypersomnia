@@ -28,11 +28,14 @@ augs::window::event::message translate_enum(UINT m) {
 	case WM_MOUSEWHEEL:				return augs::window::event::message::wheel; break;
 	case WM_LBUTTONDBLCLK:			return augs::window::event::message::ldoubleclick; break;
 	case WM_MBUTTONDBLCLK:			return augs::window::event::message::mdoubleclick; break;
+	case WM_XBUTTONDBLCLK:			return augs::window::event::message::xdoubleclick; break;
 	case WM_RBUTTONDBLCLK:			return augs::window::event::message::rdoubleclick; break;
 	case WM_LBUTTONDOWN:			return augs::window::event::message::ldown; break;
 	case WM_LBUTTONUP:				return augs::window::event::message::lup; break;
 	case WM_MBUTTONDOWN:			return augs::window::event::message::mdown; break;
 	case WM_MBUTTONUP:				return augs::window::event::message::mup; break;
+	case WM_XBUTTONDOWN:			return augs::window::event::message::xdown; break;
+	case WM_XBUTTONUP:				return augs::window::event::message::xup; break;
 	case WM_RBUTTONDOWN:			return augs::window::event::message::rdown; break;
 	case WM_RBUTTONUP:				return augs::window::event::message::rup; break;
 	default: break;
@@ -87,14 +90,13 @@ namespace augs {
 				static UINT dwSize = 40;
 				static RAWINPUT* raw;
 
-				events.repeated = false;
-				events.mouse.rel.set(0, 0);
-				events.key_event = key_changed::NO_CHANGE;
+				latest_change = change();
+				auto& events = latest_change;
 
 				switch (m) {
 				case WM_CHAR:
-					events.utf16 = wchar_t(wParam);
-					if(events.utf16 > 255) {
+					events.character.utf16 = wchar_t(wParam);
+					if(events.character.utf16 > 255) {
 						break;
 					}
 					//events.utf32 = unsigned(wParam);
@@ -122,9 +124,7 @@ namespace augs {
 						case SHIFT: wParam = (lParam & 0x1000000) ? RSHIFT : LSHIFT; break;
 						case ALT: wParam = (lParam & 0x1000000) ? RALT : LALT; break;
 						}
-						events.keys[wParam] = true;
-						events.key = key(wParam);
-						events.key_event = event::PRESSED;
+						events.key.key = key(wParam);
 						events.repeated = ((lParam & (1 << 30)) != 0);
 					//}
 					break;								
@@ -137,21 +137,17 @@ namespace augs {
 					case ALT: wParam = (lParam & 0x1000000) ? RALT : LALT; break;
 					}
 
-					events.keys[wParam] = false;
-					events.key = key(wParam);
-					events.key_event = event::RELEASED;
+					events.key.key = key(wParam);
 
 					break;
 
 				case WM_MOUSEWHEEL:
-					events.mouse.scroll = GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
+					events.scroll.amount = GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
 					break;
 				case WM_LBUTTONDBLCLK:
 				case WM_LBUTTONDOWN:
-					events.key_event = event::PRESSED;
-					events.key = LMOUSE;
+					events.key.key = LMOUSE;
 					SetCapture(hwnd);
-					events.mouse_keys[0] = events.keys[LMOUSE] = true;
 
 					if (m == WM_LBUTTONDOWN) {
 						if (doubled && triple_timer.extract<std::chrono::milliseconds>() < triple_click_delay) {
@@ -167,39 +163,28 @@ namespace augs {
 					break;
 				case WM_RBUTTONDBLCLK:
 				case WM_RBUTTONDOWN:
-					events.key_event = event::PRESSED;
-					events.key = RMOUSE;
-					events.mouse_keys[1] = events.keys[RMOUSE] = true;  break;
+					events.key.key = RMOUSE;
+					break;
 				case WM_MBUTTONDBLCLK:
 				case WM_MBUTTONDOWN:
-					events.key_event = event::PRESSED;
-					events.key = MMOUSE;
-					events.mouse_keys[2] = events.keys[MMOUSE] = true;  break;
+					events.key.key = MMOUSE;
+					break;
 				case WM_XBUTTONDBLCLK:
 				case WM_XBUTTONDOWN:
-					events.key_event = event::PRESSED;
-					events.key = MOUSE4;
-					events.keys[MOUSE4] = true;
-					m = WM_KEYDOWN;
+					events.key.key = MOUSE4;
 					break;
 				case WM_XBUTTONUP:
-					events.key_event = event::RELEASED;
-					events.key = MOUSE4;
-					events.keys[MOUSE4] = false;
-					m = WM_KEYUP;
+					events.key.key = MOUSE4;
 					break;
 				case WM_LBUTTONUP:
-					events.key_event = event::RELEASED;
-					events.key = LMOUSE;
-					events.mouse_keys[0] = events.keys[LMOUSE] = false; if(GetCapture() == hwnd) ReleaseCapture(); break;
+					events.key.key = LMOUSE;
+					if(GetCapture() == hwnd) ReleaseCapture(); break;
 				case WM_RBUTTONUP:
-					events.key_event = event::RELEASED;
-					events.key = RMOUSE;
-					events.mouse_keys[1] = events.keys[RMOUSE] = false; break;
+					events.key.key = RMOUSE;
+					break;
 				case WM_MBUTTONUP:
-					events.key_event = event::RELEASED;
-					events.key = MMOUSE;
-					events.mouse_keys[2] = events.keys[MMOUSE] = false; break;
+					events.key.key = MMOUSE;
+					break;
 				case WM_MOUSEMOVE:
 					if (!raw_mouse_input) {
 						p = MAKEPOINTS(lParam);
@@ -208,16 +193,6 @@ namespace augs {
 						if (events.mouse.rel.x || events.mouse.rel.y) doubled = false;
 						last_mouse_pos.x = p.x;
 						last_mouse_pos.y = p.y;
-
-						//if (!events.mouse_keys[0]) {
-						//	events.mouse.ldrag.x = events.mouse.pos.x;
-						//	events.mouse.ldrag.y = events.mouse.pos.y;
-						//}
-						//
-						//if (!events.mouse_keys[1]) {
-						//	events.mouse.rdrag.x = events.mouse.pos.x;
-						//	events.mouse.rdrag.y = events.mouse.pos.y;
-						//}
 
 						m = WM_MOUSEMOVE;
 					}
@@ -275,9 +250,6 @@ namespace augs {
 		glwindow* glwindow::context = nullptr;
 		
 		glwindow::glwindow() {
-			for (int i = 0; i < 256; ++i)
-				events.keys[i] = false;
-			
 			triple_click_delay = GetDoubleClickTime();
 		}
 
@@ -381,12 +353,12 @@ namespace augs {
 			return false;
 		}
 
-		std::vector<event::state> glwindow::poll_events(const bool should_clip_cursor) {
+		std::vector<event::change> glwindow::poll_events(const bool should_clip_cursor) {
 			UINT msg;
-			std::vector<event::state> output;
+			std::vector<event::change> output;
 
 			while (poll_event(msg)) {
-				auto& state = glwindow::get_current()->events;
+				auto& state = glwindow::get_current()->latest_change;
 
 				if (!state.repeated)
 					output.push_back(state);

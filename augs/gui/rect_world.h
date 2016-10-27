@@ -35,6 +35,8 @@ namespace augs {
 		template <class gui_element_id>
 		class rect_world {
 		public:
+			window::event::state last_state;
+
 			middlescrolling<gui_element_id> middlescroll;
 			
 			bool held_rect_is_dragged = false;
@@ -71,12 +73,12 @@ namespace augs {
 			}
 
 			template<class C>
-			void consume_raw_input_and_generate_gui_events(C context, const window::event::state new_state) {
+			void consume_raw_input_and_generate_gui_events(C context, const window::event::change new_state) {
 				using namespace augs::window;
 
-				last_mouse_pos += new_state.mouse.rel;
+				last_state.apply(new_state);
 
-				raw_event_info in(new_state);
+				event_traversal_flags in(new_state);
 				bool pass = true;
 
 				if (middlescroll.handle_new_raw_state(context, new_state))
@@ -212,11 +214,11 @@ namespace augs {
 			
 			template<class C>
 			void call_idle_mousemotion_updater(C context) {
-				window::event::state fabricated_state;
+				window::event::change fabricated_state;
 				fabricated_state.msg = window::event::message::mousemotion;
 				fabricated_state.mouse.rel.set(0, 0);
 
-				raw_event_info mousemotion_updater(fabricated_state);
+				event_traversal_flags mousemotion_updater(fabricated_state);
 
 				context(root, [&](auto& r) {
 					r.consume_raw_input_and_generate_gui_events(context, root, mousemotion_updater);

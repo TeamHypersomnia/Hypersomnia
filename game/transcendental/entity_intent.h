@@ -8,7 +8,7 @@
 struct input_context;
 
 struct entity_intent {
-	augs::window::event::state state_for_gui;
+	augs::window::event::change state_for_gui;
 
 	intent_type intent = intent_type::NONE;
 	vec2t<short> mouse_rel;
@@ -18,8 +18,8 @@ struct entity_intent {
 	bool uses_mouse_motion() const;
 	bool operator!=(const entity_intent& b) const;
 
-	bool from_raw_state(const input_context&, const augs::window::event::state&);
-	bool from_raw_state_and_possible_gui_receiver(const input_context&, const augs::window::event::state&, const const_entity_handle& gui_receiver);
+	bool from_raw_state(const input_context&, const augs::window::event::change&);
+	bool from_raw_state_and_possible_gui_receiver(const input_context&, const augs::window::event::change&, const const_entity_handle& gui_receiver);
 };
 
 bool operator==(const std::vector<entity_intent>& a, const std::vector<entity_intent>& b);

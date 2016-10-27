@@ -151,7 +151,7 @@ namespace components {
 		
 		gui_element();
 		//
-		//void consume_raw_input(augs::window::event::state&);
+		//void consume_raw_input(augs::window::event::change&);
 		//void draw_cursor_and_tooltip(viewing_step&) const;
 		//
 		//entity_id get_hovered_world_entity(vec2 camera_pos);

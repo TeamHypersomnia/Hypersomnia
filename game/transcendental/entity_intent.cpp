@@ -32,7 +32,7 @@ bool entity_intent::operator!=(const entity_intent& b) const {
 	return std::make_tuple(intent, mouse_rel, pressed_flag) != std::make_tuple(b.intent, b.mouse_rel, b.pressed_flag);
 }
 
-bool entity_intent::from_raw_state(const input_context& context, const augs::window::event::state& raw) {
+bool entity_intent::from_raw_state(const input_context& context, const augs::window::event::change& raw) {
 	bool found_context_entry = false;
 
 	if (raw.key_event == augs::window::event::NO_CHANGE) {
@@ -58,7 +58,7 @@ bool entity_intent::from_raw_state(const input_context& context, const augs::win
 	return found_context_entry;
 }
 
-bool entity_intent::from_raw_state_and_possible_gui_receiver(const input_context& context, const augs::window::event::state& raw, const const_entity_handle& gui_receiver) {
+bool entity_intent::from_raw_state_and_possible_gui_receiver(const input_context& context, const augs::window::event::change& raw, const const_entity_handle& gui_receiver) {
 	bool should_gui_fetch_this = false;
 
 	if (gui_receiver.alive()) {

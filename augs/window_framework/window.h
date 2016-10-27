@@ -26,7 +26,7 @@ namespace augs {
 			MSG wmsg;
 			RECT srect;
 
-			event::state events;
+			event::change latest_change;
 			vec2i last_mouse_pos;
 
 			int minw, minh, maxw, maxh, cminw, cminh, cmaxw, cmaxh;
@@ -58,7 +58,7 @@ namespace augs {
 
 			void destroy();
 
-			std::vector<event::state> poll_events(const bool should_clip_cursor = true);
+			std::vector<event::change> poll_events(const bool should_clip_cursor = true);
 
 			bool set_window_rect(const rects::xywh<int>&);
 			rects::wh<int> get_screen_rect() const;

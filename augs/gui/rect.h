@@ -101,7 +101,7 @@ namespace augs {
 			}
 
 			template<class C>
-			void consume_raw_input_and_generate_gui_events(C context, const gui_element_id& this_id, gui::raw_event_info& inf) {
+			void consume_raw_input_and_generate_gui_events(C context, const gui_element_id& this_id, gui::event_traversal_flags& inf) {
 				using namespace augs::window::event;
 				auto& gr = context.get_rect_world();
 				auto& tree_entry = context.get_tree_entry(this_id);
@@ -303,7 +303,7 @@ namespace augs {
 			}
 
 			template <class C>
-			void unhover(C context, const gui_element_id& this_id, gui::raw_event_info& inf) {
+			void unhover(C context, const gui_element_id& this_id, gui::event_traversal_flags& inf) {
 				auto& world = context.get_rect_world();
 
 				auto gui_event_lambda = [&](const gui_event ev) {

@@ -5,7 +5,7 @@
 
 namespace augs {
 	namespace gui {
-		struct raw_event_info;
+		struct event_traversal_flags;
 		struct event_info;
 		struct draw_info;
 	}

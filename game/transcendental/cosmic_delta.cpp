@@ -442,7 +442,7 @@ TEST(CosmicDelta, CosmicDeltaPaddingTest) {
 		ASSERT_TRUE(same) << "Padding is wrong in " << typeid(checked_type).name() << "\nsizeof: " << type_size << "\nDivergence position: " << iter;
 	};
 
-	padding_checker(augs::window::event::state());
+	padding_checker(augs::window::event::change());
 	padding_checker(gui_element_location());
 	for_each_in_tuple(typename put_all_components_into<std::tuple>::type(), padding_checker);
 }

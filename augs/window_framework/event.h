@@ -4,18 +4,13 @@
 #include <windows.h>
 #endif
 #include <bitset>
+#include "augs/padding_byte.h"
 
 #undef max
 #undef min
 namespace augs {
 	namespace window {
 		namespace event {
-			enum key_changed : unsigned char {
-				NO_CHANGE = 0,
-				PRESSED = 1,
-				RELEASED = 2
-			};
-
 			enum class message : unsigned char {
 				unknown,
 				ltripleclick,
@@ -34,11 +29,14 @@ namespace augs {
 				wheel,
 				ldoubleclick,
 				mdoubleclick,
+				xdoubleclick,
 				rdoubleclick,
 				ldown,
 				lup,
 				mdown,
 				mup,
+				xdown,
+				xup,
 				rdown,
 				rup,
 				COUNT
@@ -298,23 +296,52 @@ namespace augs {
 				};
 			}
 
+			enum key_change {
+				NO_CHANGE,
+				PRESSED,
+				RELEASED
+			};
+
+			struct change {
+				message msg = message::unknown;
+				bool repeated = false;
+				padding_byte pad[2];
+				
+				union {
+					struct mouse_data {
+						vec2t<short> rel;
+					} mouse;
+
+					struct scroll_data {
+						int amount;
+					} scroll;
+
+					struct key_data {
+						keys::key key;
+					} key;
+
+					struct character_data {
+						wchar_t utf16;
+					} character;
+				};
+
+				change();
+
+				key_change get_key_change() const;
+			};
+
 			struct state {
 				std::bitset<256> keys;
 
 				struct mouse_info {
-					vec2i rel;
-					int scroll = 0;
+					vec2i pos;
+					vec2i ldrag;
+					vec2i rdrag;
 				} mouse;
 
-				keys::key key = keys::key::INVALID;
-				bool mouse_keys[3] = { false, false, false };
-				bool repeated = false;
-				wchar_t utf16 = 0;
-
-				message msg = message::unknown;
-				key_changed key_event = key_changed::NO_CHANGE;
-
-				//unsigned utf32 = 0;
+				void unset_keys();
+				void apply(const change&);
+				bool get_mouse_key(unsigned) const;
 			};
 		}
 	}
