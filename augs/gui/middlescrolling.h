@@ -12,23 +12,20 @@ namespace augs {
 			material mat;
 			rects::wh<float> size = rects::wh<float>(25, 25);
 			vec2i middlescroll_icon_position;
-			vec2i current_mouse_position;
 			gui_element_id subject;
 			float speed_mult = 1.f;
 
 			template<class C>
 			void perform_logic_step(C context, const fixed_delta& dt) {
 				if (context.alive(subject)) {
-					context(subject, [&dt, &state](auto& r) {
-						r.set_scroll(r.get_scroll() + static_cast<vec2>(current_mouse_position - middlescroll_icon_position) * float(speed_mult*dt.in_milliseconds()));
+					context(subject, [&](auto& r) {
+						r.set_scroll(r.get_scroll() + static_cast<vec2>(context.get_rect_world().last_mouse_pos - middlescroll_icon_position) * float(speed_mult*dt.in_milliseconds()));
 					});
 				}
 			}
 
 			template<class C>
 			bool handle_new_raw_state(C context, const window::event::state& state) {
-				current_mouse_position = state.mouse.pos;
-
 				if (context.alive(subject)) {
 					if (state.msg == window::event::message::mdown || state.msg == window::event::message::mdoubleclick)
 						subject = gui_element_id();
@@ -44,7 +41,7 @@ namespace augs {
 				if (context.alive(subject)) {
 					rects::ltrb<float> scroller = rects::wh<float>(size);
 					scroller.center(pos);
-					draw_clipped_rectangle(mat, scroller, context(subject, [](const auto& r) {return static_cast<rect_leaf&>(subject); }), in.v);
+					draw_clipped_rectangle(mat, scroller, context(subject, [](const auto& r) {return static_cast<rect_node&>(subject); }), in.v);
 				}
 			}
 		};

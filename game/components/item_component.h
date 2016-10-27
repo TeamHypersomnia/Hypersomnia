@@ -3,6 +3,7 @@
 #include "container_component.h"
 #include "transform_component.h"
 #include "game/detail/inventory_slot_id.h"
+#include "game/detail/gui/item_button.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
 namespace components {
@@ -11,6 +12,8 @@ namespace components {
 			MOUNTED,
 			UNMOUNTED,
 		};
+
+		item_button button;
 
 		mounting_state current_mounting = UNMOUNTED;
 		mounting_state intended_mounting = UNMOUNTED;

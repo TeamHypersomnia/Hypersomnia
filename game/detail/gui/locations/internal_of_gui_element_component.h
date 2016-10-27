@@ -10,13 +10,15 @@ public:
 	}
 
 	template <class C, class L>
-	decltype(auto) polymorphic_call(C context, L lambda) const {
+	decltype(auto) get_object_at_location_and_call(C context, L polymorphic_call) const {
+		auto& elem = context.get_gui_element_component();
+		
 		switch (offset_of) {
 		case offsetof(components::gui_element, drop_item_icon):
-			return lambda(drop_item_icon);
+			return polymorphic_call(elem.drop_item_icon);
 		default: 
 			ensure(false);
-			return lambda(drop_item_icon);
+			return polymorphic_call(elem.drop_item_icon);
 		}
 	}
 };

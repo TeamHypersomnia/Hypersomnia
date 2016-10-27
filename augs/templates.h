@@ -9,6 +9,14 @@
 #include <tuple>
 #include <unordered_set>
 
+template<unsigned idx, class... Types>
+struct nth_type_in {
+	typedef std::decay_t<decltype(std::get<idx>(std::tuple<Types...>()))> type;
+};
+
+template<unsigned idx, class... Types>
+using nth_type_in_t = typename nth_type_in<idx, Types...>::type;
+
 template <class T, class Tuple>
 struct index_in_tuple;
 
@@ -23,7 +31,7 @@ struct index_in_tuple<T, std::tuple<U, Types...>> {
 };
 
 template<class T, class... Types>
-class index_in_pack {
+struct index_in_pack {
 	static const size_t value = index_in_tuple<T, std::tuple<Types...>>::value;
 };
 

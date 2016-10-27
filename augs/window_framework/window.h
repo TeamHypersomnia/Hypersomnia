@@ -27,6 +27,7 @@ namespace augs {
 			RECT srect;
 
 			event::state events;
+			vec2i last_mouse_pos;
 
 			int minw, minh, maxw, maxh, cminw, cminh, cmaxw, cmaxh;
 			int bpp = 0, style, exstyle, menu = 0, vsyn;

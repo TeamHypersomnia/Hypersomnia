@@ -302,8 +302,7 @@ namespace augs {
 				std::bitset<256> keys;
 
 				struct mouse_info {
-					vec2t<short> pos;
-					vec2t<short> rel;
+					vec2i rel;
 					int scroll = 0;
 				} mouse;
 

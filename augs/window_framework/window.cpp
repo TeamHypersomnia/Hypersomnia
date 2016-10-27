@@ -203,11 +203,11 @@ namespace augs {
 				case WM_MOUSEMOVE:
 					if (!raw_mouse_input) {
 						p = MAKEPOINTS(lParam);
-						events.mouse.rel.x = p.x - events.mouse.pos.x;
-						events.mouse.rel.y = p.y - events.mouse.pos.y;
+						events.mouse.rel.x = p.x - last_mouse_pos.x;
+						events.mouse.rel.y = p.y - last_mouse_pos.y;
 						if (events.mouse.rel.x || events.mouse.rel.y) doubled = false;
-						events.mouse.pos.x = p.x;
-						events.mouse.pos.y = p.y;
+						last_mouse_pos.x = p.x;
+						last_mouse_pos.y = p.y;
 
 						//if (!events.mouse_keys[0]) {
 						//	events.mouse.ldrag.x = events.mouse.pos.x;

@@ -86,4 +86,7 @@ public:
 	inventory_slot_id get_id() const;
 	operator inventory_slot_id() const;
 	operator basic_inventory_slot_handle<true>() const;
+
+	typedef maybe_const_ref_t<is_const, slot_button> slot_button_ref;
+	slot_button_ref get_button() const;
 };

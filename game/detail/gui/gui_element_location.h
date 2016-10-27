@@ -20,4 +20,4 @@ augs::trivial_variant<
 typedef augs::gui::rect_world<gui_element_location> game_gui_rect_world;
 
 template<class derived>
-using game_gui_rect_leaf = augs::gui::rect_leaf<derived, gui_element_location>;
+using game_gui_rect_node = augs::gui::rect_node<derived, gui_element_location>;

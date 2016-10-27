@@ -6,7 +6,7 @@
 
 #include "game/detail/gui/gui_element_location.h"
 
-struct special_drag_and_drop_target : game_gui_rect_leaf<special_drag_and_drop_target> {
+struct special_drag_and_drop_target : game_gui_rect_node<special_drag_and_drop_target> {
 	special_drag_and_drop_target(const augs::gui::material new_mat);
 
 	special_control type;
@@ -31,16 +31,22 @@ struct special_drag_and_drop_target : game_gui_rect_leaf<special_drag_and_drop_t
 	}
 
 	template<class C>
-	void consume_gui_event(C context, const augs::gui::event_info) {
+	void consume_gui_event(C context, const gui_element_location& this_id, const augs::gui::event_info info) {
 		detector.update_appearance(info);
 	}
 
 	template<class C>
-	void perform_logic_step(C context) {
+	void perform_logic_step(C context, const gui_element_location& this_id, const fixed_delta& dt) {
 		auto& world = context.get_rect_world();
 		auto dragged_item = world.rect_held_by_lmb;
 
-		enable_drawing = context.alive(dragged_item) && world.held_rect_is_dragged;
+		if (context.alive(dragged_item) && world.held_rect_is_dragged) {
+			set_flag(augs::gui::flag::ENABLE_DRAWING);
+		}
+		else {
+			unset_flag(augs::gui::flag::ENABLE_DRAWING);
+		}
+
 		rc.set_position(context.get_gui_element_component().get_initial_position_for_special_control(type) - vec2(20, 20));
 		rc.set_size((*mat.tex).get_size() + vec2(40, 40));
 	}

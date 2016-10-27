@@ -11,7 +11,7 @@ public:
 	}
 
 	template <class C, class L>
-	decltype(auto) polymorphic_call(C context, L lambda) const {
-		return lambda(context.get_step().get_cosmos()[item_id].get<components::item>().button);
+	decltype(auto) get_object_at_location_and_call(C context, L polymorphic_call) const {
+		return polymorphic_call(context.get_step().get_cosmos()[item_id].get<components::item>().button);
 	}
 };

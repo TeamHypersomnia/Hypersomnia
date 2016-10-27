@@ -362,6 +362,7 @@
     <ClCompile Include="game\systems_stateless\gui_system.cpp" />
     <ClCompile Include="game\transcendental\entity_intent.cpp" />
     <ClCompile Include="game\components\gui_element_component.cpp" />
+    <ClCompile Include="augs\gui\rect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Box2D.h" />

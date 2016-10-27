@@ -1,4 +1,5 @@
 #pragma once
+#include "game/detail/inventory_slot_id.h"
 
 class slot_button_for_inventory_slot {
 public:
@@ -10,7 +11,9 @@ public:
 	}
 
 	template <class C, class L>
-	decltype(auto) polymorphic_call(C context, L lambda) const {
-		return lambda(context.get_step().get_cosmos()[slot_id]->button);
+	decltype(auto) get_object_at_location_and_call(C context, L polymorphic_call) const {
+		auto& cosm = context.get_step().get_cosmos();
+		//typename decltype(cosm.get_handle(slot_id))::slot_button_ref bb = cosm[slot_id].get_button();
+		return polymorphic_call(cosm[slot_id].get_button());
 	}
 };

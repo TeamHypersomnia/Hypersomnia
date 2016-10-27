@@ -37,9 +37,8 @@ namespace augs {
 		public:
 			middlescrolling<gui_element_id> middlescroll;
 			
-			bool was_hovered_rect_visited = false;
 			bool held_rect_is_dragged = false;
-			padding_byte pad[2];
+			padding_byte pad[3];
 			
 			gui_element_id root;
 
@@ -52,6 +51,7 @@ namespace augs {
 			vec2i ldrag_relative_anchor;
 			vec2i last_ldown_position;
 			vec2i current_drag_amount;
+			vec2i last_mouse_pos;
 
 			template<class C>
 			void set_focus(C context, const gui_element_id new_to_focus) {
@@ -74,17 +74,17 @@ namespace augs {
 			void consume_raw_input_and_generate_gui_events(C context, const window::event::state new_state) {
 				using namespace augs::window;
 
+				last_mouse_pos += new_state.mouse.rel;
+
 				raw_event_info in(new_state);
 				bool pass = true;
-
-				was_hovered_rect_visited = false;
 
 				if (middlescroll.handle_new_raw_state(context, new_state))
 					return;
 
 				auto consume_raw_input_lambda = [&](const gui_element_id& id) {
 					context(id, [&](auto& r) {
-						r.consume_raw_input_and_generate_gui_events(context, in);
+						r.consume_raw_input_and_generate_gui_events(context, id, in);
 					});
 				};
 
@@ -186,7 +186,7 @@ namespace augs {
 				if (pass) {
 					consume_raw_input_lambda(root);
 
-					if (!was_hovered_rect_visited && context.alive(rect_hovered)) {
+					if (!in.was_hovered_rect_visited && context.alive(rect_hovered)) {
 						context(rect_hovered, [&](auto& r) { 
 							r.unhover(context, rect_hovered, in);
 						});
@@ -196,26 +196,37 @@ namespace augs {
 
 			template <class C>
 			void build_tree_data_into_context(C context) const {
-				context(root, [&](const auto& r) { r.build_tree_data(context, root); });
+				context(root, [&](const auto& r) { 
+					r.build_tree_data(context, root); 
+				});
 			}
 
 			template<class C>
 			void perform_logic_step(C context, const fixed_delta& delta) {
-				context(root, [&](auto& r) { r.perform_logic_step(context, delta); });
+				context(root, [&](auto& r) { 
+					r.perform_logic_step(context, root, delta);
+				});
 
 				middlescroll.perform_logic_step(context, delta);
+			}
+			
+			template<class C>
+			void call_idle_mousemotion_updater(C context) {
+				window::event::state fabricated_state;
+				fabricated_state.msg = window::event::message::mousemotion;
+				fabricated_state.mouse.rel.set(0, 0);
 
-				was_hovered_rect_visited = false;
+				raw_event_info mousemotion_updater(fabricated_state);
 
-				raw_event_info mousemotion_updater(window::event::message::mousemotion);
+				context(root, [&](auto& r) {
+					r.consume_raw_input_and_generate_gui_events(context, root, mousemotion_updater);
+				});
 
-				context(root, [&](auto& r) { r.consume_raw_input_and_generate_gui_events(context, mousemotion_updater); });
-
-				if (!was_hovered_rect_visited && context.alive(rect_hovered)) {
+				if (!mousemotion_updater.was_hovered_rect_visited && context.alive(rect_hovered)) {
 					context(rect_hovered, [&](auto& r) { r.unhover(context, rect_hovered, mousemotion_updater); });
 				}
 			}
-			
+
 			template<class C>
 			vertex_triangle_buffer draw_triangles(C context) const {
 				vertex_triangle_buffer buffer;

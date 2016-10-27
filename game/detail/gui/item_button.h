@@ -6,23 +6,45 @@
 #include "game/detail/inventory_slot_id.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/resources/manager.h"
+#include "game/detail/gui/gui_element_location.h"
 
-struct item_button : game_gui_rect_leaf<item_button> {
-	item_button(const rects::xywh<float>& rc);
+#include "augs/padding_byte.h"
+
+struct item_button : game_gui_rect_node<item_button> {
+	typedef game_gui_rect_node<item_button> base;
+
+	item_button(const rects::xywh<float>& rc = rects::xywh<float>()) : base(rc) {
+
+	}
 
 	rects::ltrb<float> with_attachments_bbox;
 
 	augs::gui::text_drawer charges_caption;
-	
 	augs::gui::appearance_detector detector;
 
 	bool is_container_open = false;
-
 	bool started_drag = false;
-
-	entity_id item;
+	padding_byte pad[2];
 
 	vec2i drag_offset_in_item_deposit;
+
+	template <class C, class L>
+	static void for_each_child(C context, const gui_element_location& this_id, L polymorphic_call) {
+		if (this_id.is<item_button_for_item_component>()) {
+			const auto container = context.get_step().get_cosmos()[this_id.get<item_button_for_item_component>().item_id];
+
+			auto* maybe_container = container.find<components::container>();
+
+			if (maybe_container) {
+				for (auto& s : maybe_container->slots) {
+					slot_button_for_inventory_slot this_slot_id;
+					this_slot_id.slot_id = s.first;
+
+					polymorphic_call(s.second, this_slot_id);
+				}
+			}
+		}
+	}
 };
 /*
 namespace augs {

@@ -14,7 +14,8 @@ namespace augs {
 
 		struct raw_event_info {
 			const augs::window::event::state state;
-
+			
+			bool was_hovered_rect_visited = false;
 			bool mouse_fetched = false;
 			bool scroll_fetched = false;
 			raw_event_info(const augs::window::event::state);

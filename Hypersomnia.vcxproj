@@ -322,6 +322,7 @@
     <ClCompile Include="augs\gui\clipboard.cpp" />
     <ClCompile Include="augs\gui\draw_and_event_infos.cpp" />
     <ClCompile Include="augs\gui\formatted_text.cpp" />
+    <ClCompile Include="augs\gui\rect.cpp" />
     <ClCompile Include="augs\gui\text_drawer.cpp" />
     <ClCompile Include="augs\misc\http_requests.cpp" />
     <ClCompile Include="augs\misc\delta_compression.cpp" />

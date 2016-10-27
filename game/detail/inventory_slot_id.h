@@ -22,3 +22,15 @@ struct inventory_slot_id {
 	bool operator==(const inventory_slot_id& b) const;
 	bool operator!=(const inventory_slot_id& b) const;
 };
+
+namespace std {
+	template <>
+	struct hash<inventory_slot_id> {
+		std::size_t operator()(const inventory_slot_id& k) const {
+			using std::hash;
+
+			return ((hash<entity_id>()(k.container_entity)
+				^ (hash<slot_function>()(k.type) << 1)) >> 1);
+		}
+	};
+}
