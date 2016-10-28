@@ -21,3 +21,12 @@ public:
 		return polymorphic_call(cosm[slot_id].get().button);
 	}
 };
+
+namespace std {
+	template <>
+	struct hash<slot_button_for_inventory_slot> {
+		std::size_t operator()(const slot_button_for_inventory_slot& k) const {
+			return std::hash<inventory_slot_id>()(k.slot_id);
+		}
+	};
+}

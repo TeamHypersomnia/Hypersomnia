@@ -19,3 +19,12 @@ public:
 		return polymorphic_call(context.get_step().get_cosmos()[item_id].get<components::item>().button);
 	}
 };
+
+namespace std {
+	template <>
+	struct hash<item_button_for_item_component> {
+		std::size_t operator()(const item_button_for_item_component& k) const {
+			return std::hash<entity_id>()(k.item_id);
+		}
+	};
+}

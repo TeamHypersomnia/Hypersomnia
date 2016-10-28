@@ -55,6 +55,14 @@ namespace augs {
 			vec2i current_drag_amount;
 			vec2i last_mouse_pos;
 
+			bool is_being_dragged(const gui_element_id& id) const {
+				return rect_held_by_lmb == id && held_rect_is_dragged;
+			}
+
+			gui_element_id get_rect_in_focus() const {
+				return rect_in_focus;
+			}
+
 			template<class C>
 			void set_focus(C context, const gui_element_id new_to_focus) {
 				if (new_to_focus == rect_in_focus) {
@@ -238,10 +246,6 @@ namespace augs {
 				middlescroll.draw_triangles(context, in);
 
 				return buffer;
-			}
-
-			gui_element_id get_rect_in_focus() const {
-				return rect_in_focus;
 			}
 		};
 	}

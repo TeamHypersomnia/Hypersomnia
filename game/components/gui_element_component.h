@@ -28,53 +28,51 @@ namespace components {
 	struct gui_element {
 		template <bool is_const>
 		class basic_dispatcher_context {
-			struct gui_tree {
-				class entry {
-					const augs::gui::rect_node_data& node_data;
-					gui_element_location parent;
-					vec2 absolute_position;
-				public:
-					entry(const augs::gui::rect_node_data& node_data) : node_data(node_data) {}
+			class gui_tree_entry {
+				const augs::gui::rect_node_data& node_data;
+				gui_element_location parent;
+				vec2 absolute_position;
+			public:
+				gui_tree_entry(const augs::gui::rect_node_data& node_data) : node_data(node_data) {}
 
-					void set_parent(const gui_element_location& id) {
-						parent = id;
-					}
+				void set_parent(const gui_element_location& id) {
+					parent = id;
+				}
 
-					void set_absolute_clipping_rect(const rects::ltrb<float>&) {
+				void set_absolute_clipping_rect(const rects::ltrb<float>&) {
 
-					}
+				}
 
-					rects::ltrb<float> set_absolute_clipped_rect(const rects::ltrb<float>&) {
+				rects::ltrb<float> set_absolute_clipped_rect(const rects::ltrb<float>&) {
 
-					}
+				}
 
-					void set_absolute_pos(const vec2& v) {
-						absolute_position = v;
-					}
+				void set_absolute_pos(const vec2& v) {
+					absolute_position = v;
+				}
 
-					gui_element_location get_parent() const {
-						return parent;
-					}
+				gui_element_location get_parent() const {
+					return parent;
+				}
 
-					rects::ltrb<float> get_absolute_rect() const {
-						return rects::xywh<float>(absolute_position.x, absolute_position.y, node_data.rc.w(), node_data.rc.h());
-					}
+				rects::ltrb<float> get_absolute_rect() const {
+					return rects::xywh<float>(absolute_position.x, absolute_position.y, node_data.rc.w(), node_data.rc.h());
+				}
 
-					rects::ltrb<float> get_absolute_clipping_rect() const {
-						return rects::ltrb<float>(0.f, 0.f, std::numeric_limits<int>::max() / 2.f, std::numeric_limits<int>::max() / 2.f);
-					}
+				rects::ltrb<float> get_absolute_clipping_rect() const {
+					return rects::ltrb<float>(0.f, 0.f, std::numeric_limits<int>::max() / 2.f, std::numeric_limits<int>::max() / 2.f);
+				}
 
-					rects::ltrb<float> get_absolute_clipped_rect() const {
-						return node_data.rc;
-					}
+				rects::ltrb<float> get_absolute_clipped_rect() const {
+					return node_data.rc;
+				}
 
-					vec2 get_absolute_pos() const {
-						return absolute_position;
-					}
-				};
+				vec2 get_absolute_pos() const {
+					return absolute_position;
+				}
+			};
 
-				std::unordered_map<gui_element_location, entry> entries;
-			} tree;
+			std::unordered_map<gui_element_location, gui_tree_entry> gui_tree;
 
 		public:
 			typedef std::conditional_t<is_const, viewing_step, fixed_step>& step_ref;
@@ -102,12 +100,18 @@ namespace components {
 				return elem.rect_world;
 			}
 
-			typename gui_tree::entry& get_tree_entry(const gui_element_location& id) {
-				return tree.entries[id];
+			gui_tree_entry& get_tree_entry(const gui_element_location& id) {
+				if (gui_tree.find(id) == gui_tree.end()) {
+					gui_tree.emplace(id, gui_tree_entry(operator()(id, [](const auto& resolved_ref) { 
+						return static_cast<const augs::gui::rect_node_data&>(resolved_ref); 
+					})));
+				}
+
+				return gui_tree.at(id);
 			}
 
-			const typename gui_tree::entry& get_tree_entry(const gui_element_location& id) const {
-				return tree.entries.at(id);
+			const gui_tree_entry& get_tree_entry(const gui_element_location& id) const {
+				return gui_tree.at(id);
 			}
 
 			bool alive(const gui_element_location& id) const {

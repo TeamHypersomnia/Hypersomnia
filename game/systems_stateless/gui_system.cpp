@@ -19,6 +19,8 @@
 #include "game/detail/gui/immediate_hud.h"
 #include "game/enums/slot_function.h"
 
+#include "game/detail/inventory_utils.h"
+
 void gui_system::switch_to_gui_mode_and_back(fixed_step& step) {
 	auto& intents = step.messages.get_queue<messages::intent_message>();
 	auto& cosmos = step.cosm;
@@ -59,10 +61,45 @@ void gui_system::advance_gui_elements(fixed_step& step) {
 			const auto& entropies = step.entropy.entropy_per_entity;
 			const auto& inputs_for_this_element = entropies.find(root);
 
+			auto& rect_world = element.rect_world;
+
 			if (inputs_for_this_element != entropies.end()) {
 				for (const auto& e : (*inputs_for_this_element).second) {
-					if (e.has_state_for_gui) {
-						//element.rect_world.consume_raw_input_and_generate_gui_events(context, e.state_for_gui);
+					if (e.has_event_for_gui) {
+						bool fetched = false;
+						const auto& change = e.event_for_gui;
+						const auto& held_rect = rect_world.rect_held_by_lmb;
+
+						if (held_rect.is<item_button_for_item_component>()) {
+							const auto& item_entity = cosmos[held_rect.get<item_button_for_item_component>().item_id];
+							auto& dragged_charges = element.dragged_charges;
+
+							if (change.msg == window::event::message::rdown
+								|| change.msg == window::event::message::rdoubleclick
+								) {
+								if (rect_world.held_rect_is_dragged) {
+									perform_transfer({ item_entity, cosmos[inventory_slot_id()], dragged_charges }, step);
+									fetched = true;
+								}
+							}
+
+							if (change.msg == window::event::message::wheel) {
+								auto& item = item_entity.get<components::item>();
+
+								auto delta = change.scroll.amount;
+
+								dragged_charges += delta;
+
+								if (dragged_charges <= 0)
+									dragged_charges = item.charges + dragged_charges;
+								if (dragged_charges > item.charges)
+									dragged_charges = dragged_charges - item.charges;
+
+							}
+						}
+
+						//if (!fetched)
+						//	element.rect_world.consume_raw_input_and_generate_gui_events(context, e.event_for_gui);
 					}
 				}
 			}

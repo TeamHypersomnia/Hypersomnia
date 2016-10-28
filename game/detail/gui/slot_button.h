@@ -32,10 +32,10 @@ struct slot_button : game_gui_rect_node<slot_button> {
 			const auto& slot_handle = context.get_step().get_cosmos()[this_id.get<slot_button_for_inventory_slot>().slot_id];
 
 			for (const auto& i : slot_handle.get_items_inside()) {
-				item_button_for_item_component this_item_id;
-				this_item_id.item_id = i.get_id();
+				gui_element_location child_location;
+				child_location.set(item_button_for_item_component{ i.get_id() });
 
-				polymorphic_call(i.get<components::item>().button, item_id);
+				polymorphic_call(i.get<components::item>().button, child_location);
 			}
 		}
 	}

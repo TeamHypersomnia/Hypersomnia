@@ -105,10 +105,10 @@ namespace augs {
 				using namespace augs::window::event;
 				auto& gr = context.get_rect_world();
 				auto& tree_entry = context.get_tree_entry(this_id);
-				const auto& state = inf.state;
+				const auto& state = gr.last_state;
 				const auto& m = state.mouse;
-				const auto& msg = inf.state.msg;
-				const auto& mouse_pos = gr.last_mouse_pos;
+				const auto& msg = inf.change.msg;
+				const auto& mouse_pos = m.pos;
 
 				auto gui_event_lambda = [&](const gui_event ev) {
 					this_call([&](auto& r) {
@@ -151,7 +151,7 @@ namespace augs {
 									gr.rect_held_by_lmb = this_id;
 									gr.ldrag_relative_anchor = mouse_pos - rc.get_position();
 									gr.last_ldown_position = mouse_pos;
-									rc_pos_before_dragging = vec2i(rc.l, rc.t);
+									rc_pos_before_dragging = vec2i(rc.get_position());
 									gui_event_lambda(gui_event::ldown);
 								}
 								if (msg == message::mdown) {
@@ -185,10 +185,10 @@ namespace augs {
 									gui_event_lambda(gui_event::wheel);
 								}
 
-								if (gr.rect_held_by_lmb == this_id && msg == message::mousemotion && state.mouse_keys[0] && absolute_clipped_rect.hover(m.ldrag)) {
+								if (gr.rect_held_by_lmb == this_id && msg == message::mousemotion && state.get_mouse_key(0) && absolute_clipped_rect.hover(m.ldrag)) {
 									gui_event_lambda(gui_event::lpressed);
 								}
-								if (gr.rect_held_by_rmb == this_id && msg == message::mousemotion && state.mouse_keys.state[1] && absolute_clipped_rect.hover(m.rdrag)) {
+								if (gr.rect_held_by_rmb == this_id && msg == message::mousemotion && state.get_mouse_key(1) && absolute_clipped_rect.hover(m.rdrag)) {
 									gui_event_lambda(gui_event::rpressed);
 								}
 							}

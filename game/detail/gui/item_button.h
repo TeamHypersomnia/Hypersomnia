@@ -36,10 +36,10 @@ struct item_button : game_gui_rect_node<item_button> {
 
 			if (maybe_container) {
 				for (auto& s : maybe_container->slots) {
-					slot_button_for_inventory_slot this_slot_id;
-					this_slot_id.slot_id = s.first;
+					gui_element_location child_location;
+					child_location.set(slot_button_for_inventory_slot{ s.first });
 
-					polymorphic_call(s.second, this_slot_id);
+					polymorphic_call(s.second.button, child_location);
 				}
 			}
 		}

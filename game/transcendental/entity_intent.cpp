@@ -73,8 +73,8 @@ bool entity_intent::from_raw_state_and_possible_gui_receiver(const input_context
 	}
 
 	if (should_gui_fetch_this) {
-		state_for_gui = raw;
-		has_state_for_gui = true;
+		event_for_gui = raw;
+		has_event_for_gui = true;
 
 		return true;
 	}

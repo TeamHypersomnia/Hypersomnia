@@ -26,3 +26,12 @@ public:
 		}
 	}
 };
+
+namespace std {
+	template <>
+	struct hash<internal_of_gui_element_component> {
+		std::size_t operator()(const internal_of_gui_element_component& k) const {
+			return std::hash<unsigned>()(k.offset_of);
+		}
+	};
+}

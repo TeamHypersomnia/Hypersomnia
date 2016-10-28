@@ -43,9 +43,11 @@ namespace components {
 	}
 
 	void gui_element::draw_complete_gui_for_camera_rendering_request(const const_entity_handle& handle, viewing_step& step) {
+		const auto& element = handle.get<components::gui_element>();
+		
 		//r.renderer.push_triangles(gui.draw_triangles());
 		//
-		//if (is_gui_look_enabled)
-		//	gui.draw_cursor_and_tooltip(r);
+		if (element.is_gui_look_enabled)
+			gui.draw_cursor_and_tooltip(r);
 	}
 }
