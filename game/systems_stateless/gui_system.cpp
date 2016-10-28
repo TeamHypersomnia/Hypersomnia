@@ -98,13 +98,13 @@ void gui_system::advance_gui_elements(fixed_step& step) {
 							}
 						}
 
-						//if (!fetched)
-						//	element.rect_world.consume_raw_input_and_generate_gui_events(context, e.event_for_gui);
+						if (!fetched)
+							element.rect_world.consume_raw_input_and_generate_gui_events(context, e.event_for_gui);
 					}
 				}
 			}
 
-			element.rect_world.call_idle_mousemotion_updater(context);
+			rect_world.call_idle_mousemotion_updater(context);
 		}
 	}
 }

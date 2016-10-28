@@ -32,9 +32,23 @@ namespace augs {
 			});
 		}
 
+		template<class C, class gui_element_id>
+		void polymorphic_consume_raw_input(C context, const gui_element_id& id, event_traversal_flags& in) {
+			context(id, [&](auto& r) {
+				r.consume_raw_input_and_generate_gui_events(context, id, in);
+			});
+		}
+
 		template <class gui_element_id>
 		class rect_world {
 		public:
+			template<class C, class gui_element_id>
+			bool is_hovered(C context, const gui_element_id& id) {
+				return context(id, [&](const auto& p) {
+					return context.get_tree_entry(id).get_absolute_clipped_rect().hover(last_state.mouse.pos);
+				});
+			}
+
 			window::event::state last_state;
 
 			middlescrolling<gui_element_id> middlescroll;
@@ -70,13 +84,13 @@ namespace augs {
 				}
 
 				if (context.alive(rect_in_focus)) {
-					polymorphic_consume_gui_event(rect_in_focus, gui_event::blur);
+					polymorphic_consume_gui_event(context, rect_in_focus, gui_event::blur);
 				}
 
 				rect_in_focus = new_to_focus;
 
 				if (context.alive(new_to_focus)) {
-					polymorphic_consume_gui_event(new_to_focus, gui_event::focus);
+					polymorphic_consume_gui_event(context, new_to_focus, gui_event::focus);
 				}
 			}
 
@@ -92,31 +106,19 @@ namespace augs {
 				if (middlescroll.handle_new_raw_state(context, new_state))
 					return;
 
-				auto consume_raw_input_lambda = [&](const gui_element_id& id) {
-					context(id, [&](auto& r) {
-						r.consume_raw_input_and_generate_gui_events(context, id, in);
-					});
-				};
-
-				auto is_hovered_lambda = [&](const gui_element_id& id) {
-					return context(id, [&](const auto& p) {
-						return context.get_tree_entry(id).get_absolute_clipped_rect().hover(new_state.mouse.pos);
-					});
-				};
-
 				if (new_state.msg == event::message::lup) {
 					if (context.alive(rect_held_by_lmb)) {
-						if (is_hovered_lambda(rect_held_by_lmb)) {
-							polymorphic_consume_gui_event(rect_held_by_lmb, gui_event::lup);
-							polymorphic_consume_gui_event(rect_held_by_lmb, gui_event::lclick);
+						if (is_hovered(context, rect_held_by_lmb)) {
+							polymorphic_consume_gui_event(context, rect_held_by_lmb, gui_event::lup);
+							polymorphic_consume_gui_event(context, rect_held_by_lmb, gui_event::lclick);
 							pass = false;
 						}
 						else {
-							polymorphic_consume_gui_event(rect_held_by_lmb, gui_event::loutup);
+							polymorphic_consume_gui_event(context, rect_held_by_lmb, gui_event::loutup);
 						}
 
 						if (held_rect_is_dragged) {
-							polymorphic_consume_gui_event(rect_held_by_lmb, gui_event::lfinisheddrag);
+							polymorphic_consume_gui_event(context, rect_held_by_lmb, gui_event::lfinisheddrag);
 						}
 
 						current_drag_amount.set(0, 0);
@@ -127,13 +129,13 @@ namespace augs {
 
 				if (new_state.msg == event::message::rup) {
 					if (context.alive(rect_held_by_rmb)) {
-						if (is_hovered_lambda(rect_held_by_rmb)) {
-							polymorphic_consume_gui_event(rect_held_by_rmb, gui_event::rup);
-							polymorphic_consume_gui_event(rect_held_by_rmb, gui_event::rclick);
+						if (is_hovered(context, rect_held_by_rmb)) {
+							polymorphic_consume_gui_event(context, rect_held_by_rmb, gui_event::rup);
+							polymorphic_consume_gui_event(context, rect_held_by_rmb, gui_event::rclick);
 							pass = false;
 						}
 						else {
-							polymorphic_consume_gui_event(rect_held_by_rmb, gui_event::routup);
+							polymorphic_consume_gui_event(context, rect_held_by_rmb, gui_event::routup);
 						}
 
 						current_drag_amount.set(0, 0);
@@ -146,7 +148,7 @@ namespace augs {
 					&& new_state.msg == event::message::wheel) {
 
 					if (context(rect_in_focus, [](const auto& r) { return r.get_flag(flag::ENABLE_DRAWING); })) {
-						consume_raw_input_lambda(rect_in_focus);
+						polymorphic_consume_raw_input(context, rect_in_focus, in);
 					}
 
 					pass = false;
@@ -165,21 +167,21 @@ namespace augs {
 					switch (new_state.msg) {
 					case event::message::keydown:   
 						if (rect_in_focus_drawing_enabled) {
-							polymorphic_consume_gui_event(rect_in_focus, gui_event::keydown);
+							polymorphic_consume_gui_event(context, rect_in_focus, gui_event::keydown);
 						}
 
 						pass = false;
 						break;
 					case event::message::keyup:	    
 						if (rect_in_focus_drawing_enabled) {
-							polymorphic_consume_gui_event(rect_in_focus, gui_event::keyup);
+							polymorphic_consume_gui_event(context, rect_in_focus, gui_event::keyup);
 						}
 
 						pass = false;
 						break;
 					case event::message::character: 
 						if (rect_in_focus_drawing_enabled) {
-							polymorphic_consume_gui_event(rect_in_focus, gui_event::character);
+							polymorphic_consume_gui_event(context, rect_in_focus, gui_event::character);
 						}
 
 						pass = false;
@@ -194,7 +196,7 @@ namespace augs {
 				}
 
 				if (pass) {
-					consume_raw_input_lambda(root);
+					polymorphic_consume_raw_input(context, root, in);
 
 					if (!in.was_hovered_rect_visited && context.alive(rect_hovered)) {
 						context(rect_hovered, [&](auto& r) { 
