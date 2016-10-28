@@ -18,20 +18,20 @@
 item_transfer_result query_transfer_result(const_item_slot_transfer_request r) {
 	item_transfer_result output;
 	auto& predicted_result = output.result;
-	auto& item = r.item.get<components::item>();
-	auto& cosmos = r.item.get_cosmos();
+	auto& item = r.get_item().get<components::item>();
+	auto& cosmos = r.get_item().get_cosmos();
 
 	ensure(r.specified_quantity != 0);
 
-	auto item_owning_capability = r.item.get_owning_transfer_capability();
-	auto target_slot_owning_capability = r.target_slot.get_container().get_owning_transfer_capability();
+	auto item_owning_capability = r.get_item().get_owning_transfer_capability();
+	auto target_slot_owning_capability = r.get_target_slot().get_container().get_owning_transfer_capability();
 
 	//ensure(item_owning_capability.alive() || target_slot_owning_capability.alive());
 
 	if (item_owning_capability.alive() && target_slot_owning_capability.alive() &&
 		item_owning_capability != target_slot_owning_capability)
 		predicted_result = item_transfer_result_type::INVALID_SLOT_OR_UNOWNED_ROOT;
-	else if (r.target_slot.alive())
+	else if (r.get_target_slot().alive())
 		output = containment_result(r);
 	else {
 		output.result = item_transfer_result_type::SUCCESSFUL_TRANSFER;
@@ -66,14 +66,14 @@ item_transfer_result containment_result(const_item_slot_transfer_request r, bool
 	output.transferred_charges = 0;
 	output.result = item_transfer_result_type::NO_SLOT_AVAILABLE;
 
-	auto& item = r.item.get<components::item>();
-	auto& cosmos = r.item.get_cosmos();
-	auto& slot = *r.target_slot;
+	auto& item = r.get_item().get<components::item>();
+	auto& cosmos = r.get_item().get_cosmos();
+	auto& slot = *r.get_target_slot();
 	auto& result = output.result;
 
-	if (item.current_slot == r.target_slot)
+	if (item.current_slot == r.get_target_slot())
 		result = item_transfer_result_type::THE_SAME_SLOT;
-	else if (slot.always_allow_exactly_one_item && slot.items_inside.size() == 1 && !can_merge_entities(cosmos[slot.items_inside[0]], r.item)) {
+	else if (slot.always_allow_exactly_one_item && slot.items_inside.size() == 1 && !can_merge_entities(cosmos[slot.items_inside[0]], r.get_item())) {
 		//if (allow_replacement) {
 		//
 		//}
@@ -91,16 +91,16 @@ item_transfer_result containment_result(const_item_slot_transfer_request r, bool
 
 		result = item_transfer_result_type::NO_SLOT_AVAILABLE;
 	}
-	else if (!slot.is_category_compatible_with(r.item))
+	else if (!slot.is_category_compatible_with(r.get_item()))
 		result = item_transfer_result_type::INCOMPATIBLE_CATEGORIES;
 	else {
-		auto space_available = r.target_slot.calculate_free_space_with_parent_containers();
+		auto space_available = r.get_target_slot().calculate_free_space_with_parent_containers();
 
 		if (space_available > 0) {
 			bool item_indivisible = item.charges == 1 || !item.stackable;
 
 			if (item_indivisible) {
-				if (space_available >= calculate_space_occupied_with_children(r.item)) {
+				if (space_available >= calculate_space_occupied_with_children(r.get_item())) {
 					output.transferred_charges = 1;
 				}
 			}
@@ -113,10 +113,12 @@ item_transfer_result containment_result(const_item_slot_transfer_request r, bool
 			}
 		}
 
-		if (output.transferred_charges == 0)
+		if (output.transferred_charges == 0) {
 			output.result = item_transfer_result_type::INSUFFICIENT_SPACE;
-		else
+		}
+		else {
 			output.result = item_transfer_result_type::SUCCESSFUL_TRANSFER;
+		}
 	}
 		
 	return output;
@@ -216,8 +218,8 @@ void remove_item(inventory_slot_handle handle, entity_handle removed_item) {
 }
 
 void perform_transfer(item_slot_transfer_request r, fixed_step& step) {
-	auto& cosmos = r.item.get_cosmos();
-	auto& item = r.item.get<components::item>();
+	auto& cosmos = r.get_item().get_cosmos();
+	auto& item = r.get_item().get<components::item>();
 	auto previous_slot_id = item.current_slot;
 	auto previous_slot = cosmos[previous_slot_id];
 
@@ -227,13 +229,13 @@ void perform_transfer(item_slot_transfer_request r, fixed_step& step) {
 		ensure(false);
 		ensure(previous_slot.alive());
 
-		//item.request_unmount(r.target_slot);
+		//item.request_unmount(r.get_target_slot());
 		//item.mark_parent_enclosing_containers_for_unmount();
 
 		return;
 	}
 	else if (result.result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
-		bool is_pickup_or_transfer = r.target_slot.alive();
+		bool is_pickup_or_transfer = r.get_target_slot().alive();
 		bool is_drop_request = !is_pickup_or_transfer;
 
 		components::transform previous_container_transform;
@@ -241,8 +243,8 @@ void perform_transfer(item_slot_transfer_request r, fixed_step& step) {
 		entity_id target_item_to_stack_with;
 
 		if (is_pickup_or_transfer) {
-			for (auto& i : cosmos.get_handle(r.target_slot)->items_inside) {
-				if (can_merge_entities(r.item, cosmos[i])) {
+			for (auto& i : cosmos.get_handle(r.get_target_slot())->items_inside) {
+				if (can_merge_entities(r.get_item(), cosmos[i])) {
 					target_item_to_stack_with = i;
 				}
 			}
@@ -254,16 +256,16 @@ void perform_transfer(item_slot_transfer_request r, fixed_step& step) {
 			previous_container_transform = previous_slot.get_container().logic_transform();
 
 			if (whole_item_grabbed)
-				remove_item(previous_slot, r.item);
+				remove_item(previous_slot, r.get_item());
 
 			if (previous_slot.is_input_enabling_slot()) {
-				unset_input_flags_of_orphaned_entity(r.item);
+				unset_input_flags_of_orphaned_entity(r.get_item());
 			}
 		}
 
 		if (cosmos[target_item_to_stack_with].alive()) {
 			if (whole_item_grabbed)
-				step.messages.post(messages::queue_destruction(r.item));
+				step.messages.post(messages::queue_destruction(r.get_item()));
 			else
 				item.charges -= result.transferred_charges;
 
@@ -276,9 +278,9 @@ void perform_transfer(item_slot_transfer_request r, fixed_step& step) {
 		entity_id new_charge_stack;
 
 		if (whole_item_grabbed)
-			grabbed_item_part = r.item;
+			grabbed_item_part = r.get_item();
 		else {
-			new_charge_stack = cosmos.clone_entity(r.item);
+			new_charge_stack = cosmos.clone_entity(r.get_item());
 			item.charges -= result.transferred_charges;
 			cosmos[new_charge_stack].get<components::item>().charges = result.transferred_charges;
 
@@ -286,7 +288,7 @@ void perform_transfer(item_slot_transfer_request r, fixed_step& step) {
 		}
 
 		if (is_pickup_or_transfer)
-			add_item(r.target_slot, cosmos[grabbed_item_part]);
+			add_item(r.get_target_slot(), cosmos[grabbed_item_part]);
 
 		auto physics_updater = [previous_container_transform, new_charge_stack](entity_handle descendant) {
 			auto& cosmos = descendant.get_cosmos();
@@ -329,7 +331,7 @@ void perform_transfer(item_slot_transfer_request r, fixed_step& step) {
 		auto& grabbed_item = cosmos[grabbed_item_part].get<components::item>();
 
 		if (is_pickup_or_transfer) {
-			if (r.target_slot->items_need_mounting) {
+			if (r.get_target_slot()->items_need_mounting) {
 				grabbed_item.intended_mounting = components::item::MOUNTED;
 
 				if (r.force_immediate_mount) {
@@ -340,7 +342,7 @@ void perform_transfer(item_slot_transfer_request r, fixed_step& step) {
 
 		if (is_drop_request) {
 			auto force = vec2().set_from_degrees(previous_container_transform.rotation).set_length(60);
-			auto offset = vec2().random_on_circle(20, cosmos.get_rng_for(r.item));
+			auto offset = vec2().random_on_circle(20, cosmos.get_rng_for(r.get_item()));
 
 			auto& physics = cosmos[grabbed_item_part].get<components::physics>();
 			physics.apply_force(force, offset, true);
