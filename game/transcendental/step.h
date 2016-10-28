@@ -33,6 +33,7 @@ public:
 	augs::variable_delta get_delta() const;
 
 	vec2 get_screen_space(vec2 pos) const;
+	const cosmos& get_cosmos() const;
 
 	std::vector<const_entity_handle> visible_entities;
 	std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> visible_per_layer;
@@ -48,5 +49,5 @@ public:
 	cosmic_entropy entropy;
 
 	augs::fixed_delta get_delta() const;
-	cosmos& get_cosmos();
+	cosmos& get_cosmos() const;
 };
