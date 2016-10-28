@@ -2,10 +2,10 @@
 
 class internal_of_gui_element_component_location {
 public:
-	unsigned offset_of = 0;
+	components::gui_element::internal_element element = components::gui_element::internal_element::INVALID;
 
 	bool operator==(internal_of_gui_element_component_location b) const {
-		return offset_of == b.offset_of;
+		return element == b.element;
 	}
 
 	template <class C>
@@ -14,15 +14,17 @@ public:
 	}
 
 	template <class C, class L>
-	decltype(auto) get_object_at_location_and_call(C context, L polymorphic_call) const {
+	decltype(auto) get_object_at_location_and_call(C context, L generic_call) const {
+		using namespace components;
+
 		auto& elem = context.get_gui_element_component();
 		
-		switch (offset_of) {
-		case offsetof(components::gui_element, drop_item_icon):
-			return polymorphic_call(elem.drop_item_icon);
+		switch (element) {
+			case gui_element::internal_element::DROP_ITEM_ICON:
+			return generic_call(elem.drop_item_icon);
 		default: 
 			ensure(false);
-			return polymorphic_call(elem.drop_item_icon);
+			return generic_call(elem.drop_item_icon);
 		}
 	}
 };
@@ -31,7 +33,7 @@ namespace std {
 	template <>
 	struct hash<internal_of_gui_element_component_location> {
 		std::size_t operator()(const internal_of_gui_element_component_location& k) const {
-			return std::hash<unsigned>()(k.offset_of);
+			return std::hash<decltype(k.element)>()(k.element);
 		}
 	};
 }

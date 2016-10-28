@@ -28,7 +28,7 @@ struct item_button : game_gui_rect_node<item_button> {
 	vec2i drag_offset_in_item_deposit;
 
 	template <class C, class L>
-	static void for_each_child(C context, const gui_element_location& this_id, L polymorphic_call) {
+	static void for_each_child(C context, const gui_element_location& this_id, L generic_call) {
 		if (this_id.is<item_button_for_item_component_location>()) {
 			const auto container = context.get_step().get_cosmos()[this_id.get<item_button_for_item_component_location>().item_id];
 
@@ -39,7 +39,7 @@ struct item_button : game_gui_rect_node<item_button> {
 					gui_element_location child_location;
 					child_location.set(slot_button_for_inventory_slot_location{ s.first });
 
-					polymorphic_call(s.second.button, child_location);
+					generic_call(s.second.button, child_location);
 				}
 			}
 		}

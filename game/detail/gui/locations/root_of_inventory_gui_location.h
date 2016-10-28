@@ -12,9 +12,9 @@ public:
 	}
 
 	template <class C, class L>
-	decltype(auto) get_object_at_location_and_call(C context, L polymorphic_call) const {
+	decltype(auto) get_object_at_location_and_call(C context, L generic_call) const {
 		root_of_inventory_gui node;
-		return polymorphic_call(node);
+		return generic_call(node);
 	}
 };
 

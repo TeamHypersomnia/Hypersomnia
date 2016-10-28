@@ -39,15 +39,15 @@ namespace augs {
 			//using rect_node_data::rect_node_data(const assets::texture_id& id);
 
 			template<class L>
-			decltype(auto) this_call(L polymorphic_call) {
+			decltype(auto) this_call(L generic_call) {
 				derived& self = *static_cast<derived*>(this);
-				return polymorphic_call(self);
+				return generic_call(self);
 			}
 
 			template<class L>
-			decltype(auto) this_call(L polymorphic_call) const {
+			decltype(auto) this_call(L generic_call) const {
 				const derived& self = *static_cast<const derived*>(this);
-				return polymorphic_call(self);
+				return generic_call(self);
 			}
 
 			template<class C>

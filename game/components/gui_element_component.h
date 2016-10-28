@@ -131,9 +131,9 @@ namespace components {
 			}
 
 			template<class L>
-			decltype(auto) operator()(const gui_element_location& id, L polymorphic_call) const {
+			decltype(auto) operator()(const gui_element_location& id, L generic_call) const {
 				return id.call([&](const auto& resolved_location) {
-					return resolved_location.get_object_at_location_and_call(*this, polymorphic_call);
+					return resolved_location.get_object_at_location_and_call(*this, generic_call);
 				});
 			}
 		};
@@ -174,8 +174,13 @@ namespace components {
 		static void draw_complete_gui_for_camera_rendering_request(const const_entity_handle& handle, viewing_step&);
 
 	private:
-		enum reserved_guid : unsigned {
-			PARENT_OF_ALL_CONTROLS = 0
+		friend class root_of_inventory_gui;
+		friend class internal_of_gui_element_component_location;
+
+		enum class internal_element : unsigned {
+			DROP_ITEM_ICON,
+			COUNT,
+			INVALID
 		};
 	};
 }

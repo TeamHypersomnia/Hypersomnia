@@ -93,13 +93,13 @@ namespace augs {
 		}
 
 		template<class L>
-		decltype(auto) call(L polymorphic_call) {
-			return call_unroll<L, Types...>(polymorphic_call);
+		decltype(auto) call(L generic_call) {
+			return call_unroll<L, Types...>(generic_call);
 		}
 
 		template<class L>
-		decltype(auto) call(L polymorphic_call) const {
-			return call_unroll_const<L, Types...>(polymorphic_call);
+		decltype(auto) call(L generic_call) const {
+			return call_unroll_const<L, Types...>(generic_call);
 		}
 
 		bool operator==(const trivial_variant& b) const {
@@ -111,8 +111,8 @@ namespace augs {
 		}
 
 		//template<class L>
-		//decltype(auto) call_or_zero(L polymorphic_call) {
-		//	return call_or_zero_unroll<L, Types...>(polymorphic_call);
+		//decltype(auto) call_or_zero(L generic_call) {
+		//	return call_or_zero_unroll<L, Types...>(generic_call);
 		//}
 	};
 }
