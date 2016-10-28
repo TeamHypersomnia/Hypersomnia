@@ -18,7 +18,7 @@
 
 #include "augs/misc/delta.h"
 #include "gui_event.h"
-#include "draw_and_event_infos.h"
+#include "gui_traversal_structs.h"
 #include "augs/padding_byte.h"
 
 namespace augs {

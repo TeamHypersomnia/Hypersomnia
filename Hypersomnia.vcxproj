@@ -320,7 +320,7 @@
     <ClCompile Include="application\config_values.cpp" />
     <ClCompile Include="augs\ensure.cpp" />
     <ClCompile Include="augs\gui\clipboard.cpp" />
-    <ClCompile Include="augs\gui\draw_and_event_infos.cpp" />
+    <ClCompile Include="augs\gui\gui_traversal_structs.cpp" />
     <ClCompile Include="augs\gui\formatted_text.cpp" />
     <ClCompile Include="augs\gui\rect.cpp" />
     <ClCompile Include="augs\gui\text_drawer.cpp" />
@@ -979,7 +979,7 @@
     <ClInclude Include="augs\filesystem\directory.h" />
     <ClInclude Include="augs\gui\appearance_detector.h" />
     <ClInclude Include="augs\gui\clipboard.h" />
-    <ClInclude Include="augs\gui\draw_and_event_infos.h" />
+    <ClInclude Include="augs\gui\gui_traversal_structs.h" />
     <ClInclude Include="augs\gui\formatted_text.h" />
     <ClInclude Include="augs\gui\gui_event.h" />
     <ClInclude Include="augs\gui\gui_flags.h" />

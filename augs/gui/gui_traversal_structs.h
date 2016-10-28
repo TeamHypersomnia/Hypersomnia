@@ -13,7 +13,7 @@ namespace augs {
 		};
 
 		struct event_traversal_flags {
-			const augs::window::event::change state;
+			const augs::window::event::change change;
 			
 			bool was_hovered_rect_visited = false;
 			bool mouse_fetched = false;

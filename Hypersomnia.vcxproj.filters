@@ -162,7 +162,6 @@
     <ClCompile Include="application\config_values.cpp" />
     <ClCompile Include="augs\ensure.cpp" />
     <ClCompile Include="augs\gui\clipboard.cpp" />
-    <ClCompile Include="augs\gui\draw_and_event_infos.cpp" />
     <ClCompile Include="augs\gui\formatted_text.cpp" />
     <ClCompile Include="augs\misc\http_requests.cpp" />
     <ClCompile Include="augs\misc\delta_compression.cpp" />
@@ -363,6 +362,7 @@
     <ClCompile Include="game\transcendental\entity_intent.cpp" />
     <ClCompile Include="game\components\gui_element_component.cpp" />
     <ClCompile Include="augs\gui\rect.cpp" />
+    <ClCompile Include="augs\gui\gui_traversal_structs.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Box2D.h" />
@@ -818,7 +818,6 @@
     <ClInclude Include="augs\filesystem\directory.h" />
     <ClInclude Include="augs\gui\appearance_detector.h" />
     <ClInclude Include="augs\gui\clipboard.h" />
-    <ClInclude Include="augs\gui\draw_and_event_infos.h" />
     <ClInclude Include="augs\gui\formatted_text.h" />
     <ClInclude Include="augs\gui\gui_event.h" />
     <ClInclude Include="augs\gui\middlescrolling.h" />
@@ -1115,5 +1114,6 @@
     <ClInclude Include="game\detail\gui\locations\internal_of_gui_element_component.h" />
     <ClInclude Include="augs\gui\gui_flags.h" />
     <ClInclude Include="game\detail\gui\slot_button.h" />
+    <ClInclude Include="augs\gui\gui_traversal_structs.h" />
   </ItemGroup>
 </Project>

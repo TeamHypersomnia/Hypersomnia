@@ -3,7 +3,7 @@
 #include <bitset>
 #include "material.h"
 #include "gui_element_id.h"
-#include "draw_and_event_infos.h"
+#include "gui_traversal_structs.h"
 #include "augs/window_framework/event.h"
 #include "augs/misc/delta.h"
 #include "gui_flags.h"
