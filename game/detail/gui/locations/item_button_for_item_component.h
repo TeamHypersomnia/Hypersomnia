@@ -5,6 +5,10 @@ class item_button_for_item_component {
 public:
 	entity_id item_id;
 
+	bool operator==(const item_button_for_item_component& b) const {
+		return item_id == b.item_id;
+	}
+
 	template <class C>
 	bool alive(C context) const {
 		return context.get_step().get_cosmos()[item_id].alive();

@@ -32,6 +32,8 @@
 
 #include "game/transcendental/cosmic_delta.h"
 
+#include "augs/graphics/renderer.h"
+
 namespace scene_managers {
 	void testbed::populate_world_with_entities(cosmos& cosm) {
 		cosm.advance_deterministic_schemata(cosmic_entropy(), [this](fixed_step& step) { populate(step); }, [](fixed_step&) {});

@@ -4,6 +4,10 @@ class internal_of_gui_element_component {
 public:
 	unsigned offset_of = 0;
 
+	bool operator==(internal_of_gui_element_component b) const {
+		return offset_of == b.offset_of;
+	}
+
 	template <class C>
 	bool alive(C context) const {
 		return true;

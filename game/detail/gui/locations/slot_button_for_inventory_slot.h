@@ -5,6 +5,10 @@ class slot_button_for_inventory_slot {
 public:
 	inventory_slot_id slot_id;
 
+	bool operator==(const slot_button_for_inventory_slot& b) const {
+		return slot_id == b.slot_id;
+	}
+
 	template <class C>
 	bool alive(C context) const {
 		return context.get_step().get_cosmos()[slot_id].alive();
