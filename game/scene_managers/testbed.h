@@ -6,10 +6,7 @@
 
 #include "augs/misc/constant_size_vector.h"
 #include "game/container_sizes.h"
-
-namespace augs {
-	struct machine_entropy;
-}
+#include "augs/misc/machine_entropy.h"
 
 struct cosmic_entropy;
 class fixed_step;

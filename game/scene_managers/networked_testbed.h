@@ -8,10 +8,7 @@
 #include "game/container_sizes.h"
 
 #include "augs/network/network_client.h"
-
-namespace augs {
-	struct machine_entropy;
-}
+#include "augs/misc/machine_entropy.h"
 
 struct cosmic_entropy;
 class fixed_step;

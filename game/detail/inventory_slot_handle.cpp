@@ -247,10 +247,10 @@ unsigned basic_inventory_slot_handle<C>::calculate_free_space_with_children() co
 	return space;
 }
 
-template <bool C>
-maybe_const_ref_t<C, slot_button> basic_inventory_slot_handle<C>::get_button() const {
-	return get().button;
-}
+//template <bool C>
+//maybe_const_ref_t<C, slot_button> basic_inventory_slot_handle<C>::get_button() const {
+//	return get().button;
+//}
 
 
 template class basic_inventory_slot_handle<true>;

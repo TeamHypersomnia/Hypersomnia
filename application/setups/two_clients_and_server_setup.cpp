@@ -3,6 +3,8 @@
 #include "client_setup.h"
 #include "game/transcendental/types_specification/all_component_includes.h"
 
+#include "application/game_window.h"
+
 void two_clients_and_server_setup::process(game_window& window) {
 	server_setup serv_setup;
 
@@ -61,7 +63,7 @@ void two_clients_and_server_setup::process(game_window& window) {
 			break;
 		}
 		
-		auto& target = renderer::get_current();
+		auto& target = augs::renderer::get_current();
 		target.clear_current_fbo();
 
 		if (current_window == 0) {
