@@ -61,6 +61,8 @@ namespace augs {
 		//}
 
 	public:
+		typedef std::tuple<Types...> types_tuple;
+
 		trivial_variant() {
 			std::memset(&_s, 0, sizeof(_s));
 		}
@@ -90,6 +92,16 @@ namespace augs {
 		const T& get() const {
 			ensure(is<T>());
 			return *reinterpret_cast<const T*>(&_s);
+		}
+
+		template<class T>
+		T* find() {
+			return is<T>() ? reinterpret_cast<T*>(&_s) : nullptr;
+		}
+
+		template<class T>
+		const T* find() const {
+			return is<T>() ? reinterpret_cast<T*>(&_s) : nullptr;
 		}
 
 		template<class L>
