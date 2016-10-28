@@ -1,8 +1,14 @@
 #pragma once
 
+enum class gui_element_internal : unsigned {
+	DROP_ITEM_ICON,
+	COUNT,
+	INVALID
+};
+
 class internal_of_gui_element_component_location {
 public:
-	components::gui_element::internal_element element = components::gui_element::internal_element::INVALID;
+	gui_element_internal element = gui_element_internal::INVALID;
 
 	bool operator==(internal_of_gui_element_component_location b) const {
 		return element == b.element;
@@ -20,7 +26,7 @@ public:
 		auto& elem = context.get_gui_element_component();
 		
 		switch (element) {
-			case gui_element::internal_element::DROP_ITEM_ICON:
+			case gui_element_internal::DROP_ITEM_ICON:
 			return generic_call(elem.drop_item_icon);
 		default: 
 			ensure(false);

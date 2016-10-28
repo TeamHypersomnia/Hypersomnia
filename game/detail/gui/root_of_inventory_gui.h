@@ -17,11 +17,15 @@ public:
 
 		item_button::for_each_child(context, gui_entity_location, generic_call);
 
-		internal_of_gui_element_component_location internal;
+		for (auto i = gui_element_internal::DROP_ITEM_ICON; i < gui_element_internal::COUNT; i = gui_element_internal(int(i) + 1)) {
+			gui_element_location internal_location;
+			internal_of_gui_element_component_location loc;
+			loc.element = i;
+			internal_location.set(loc);
 
-		for (auto i = components::gui_element::internal_element::DROP_ITEM_ICON; i < components::gui_element::internal_element::COUNT; ++i) {
-			internal.element = i;
-			context(internal, generic_call);
+			context(internal_location, [&](auto& internal_element) {
+				generic_call(internal_element, internal_location);
+			});
 		}
 	}
 };

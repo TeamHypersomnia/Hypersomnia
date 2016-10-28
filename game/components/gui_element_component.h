@@ -172,15 +172,5 @@ namespace components {
 		vec2i get_initial_position_for_special_control(const special_control) const;
 		vec2 initial_inventory_root_position() const;
 		static void draw_complete_gui_for_camera_rendering_request(const const_entity_handle& handle, viewing_step&);
-
-	private:
-		friend class root_of_inventory_gui;
-		friend class internal_of_gui_element_component_location;
-
-		enum class internal_element : unsigned {
-			DROP_ITEM_ICON,
-			COUNT,
-			INVALID
-		};
 	};
 }

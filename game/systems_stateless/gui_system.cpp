@@ -1,4 +1,5 @@
 #include "gui_system.h"
+#include "game/components/gui_element_component.h"
 #include "augs/graphics/renderer.h"
 
 #include "game/components/item_component.h"
@@ -12,7 +13,6 @@
 #include "game/detail/inventory_slot_handle.h"
 #include "game/components/container_component.h"
 #include "game/components/item_slot_transfers_component.h"
-#include "game/components/gui_element_component.h"
 #include "game/components/item_component.h"
 
 #include "augs/gui/rect_world.h"
