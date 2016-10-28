@@ -34,6 +34,7 @@
 #include "game/transcendental/cosmic_profiler.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/detail/inventory_slot_handle.h"
+#include "game/detail/item_slot_transfer_request.h"
 
 #include "game/messages/health_event.h"
 
@@ -74,7 +75,7 @@ void cosmos::create_substance_completely() {
 	//}
 }
 
-void cosmos::destroy_substance_for_entity(const const_entity_handle h) {
+void cosmos::destroy_substance_for_entity(const const_entity_handle& h) {
 	auto destructor = [h](auto& sys) {
 		sys.destruct(h);
 	};
@@ -83,7 +84,7 @@ void cosmos::destroy_substance_for_entity(const const_entity_handle h) {
 	systems_insignificant.for_each(destructor);
 }
 
-void cosmos::create_substance_for_entity(const_entity_handle h) {
+void cosmos::create_substance_for_entity(const const_entity_handle& h) {
 	if (h.has<components::substance>()) {
 		auto constructor = [h](auto& sys) {
 			sys.construct(h);
@@ -138,25 +139,25 @@ cosmos& cosmos::operator=(const cosmos& b) {
 
 #if COSMOS_TRACKS_GUIDS
 
-unsigned cosmos::get_guid(const const_entity_handle handle) const {
+unsigned cosmos::get_guid(const const_entity_handle& handle) const {
 	return handle.get_guid();
 }
 
-void cosmos::assign_next_guid(const entity_handle new_entity) {
+void cosmos::assign_next_guid(const entity_handle& new_entity) {
 	auto this_guid = significant.meta.next_entity_guid++;
 
 	guid_map_for_transport[this_guid] = new_entity;
 	new_entity.get<components::guid>().value = this_guid;
 }
 
-void cosmos::clear_guid(const entity_handle cleared) {
+void cosmos::clear_guid(const entity_handle& cleared) {
 	guid_map_for_transport.erase(get_guid(cleared));
 }
 
 void cosmos::remap_guids() {
 	guid_map_for_transport.clear();
 
-	for_each_entity_id([this](const entity_id id) {
+	for_each_entity_id([this](const entity_id& id) {
 		guid_map_for_transport[get_guid(get_handle(id))] = id;
 	});
 }
@@ -170,7 +171,7 @@ void cosmos::refresh_for_new_significant_state() {
 	complete_resubstantiation();
 }
 
-void cosmos::complete_resubstantiation(const const_entity_handle h) {
+void cosmos::complete_resubstantiation(const const_entity_handle& h) {
 	destroy_substance_for_entity(h);
 	create_substance_for_entity(h);
 }
@@ -199,7 +200,7 @@ std::vector<const_entity_handle> cosmos::get(const processing_subjects list) con
 	return systems_temporary.get<processing_lists_system>().get(list, *this);
 }
 
-randomization cosmos::get_rng_for(const entity_id id) const {
+randomization cosmos::get_rng_for(const entity_id& id) const {
 	int transform_hash = 0;
 	auto tr = get_handle(id).logic_transform();
 	transform_hash = static_cast<int>(tr.pos.x*100.0);
@@ -218,16 +219,16 @@ const_entity_handle cosmos::get_entity_by_guid(const unsigned guid) const {
 	return get_handle(guid_map_for_transport.at(guid));
 }
 
-bool cosmos::entity_exists_with_guid(unsigned guid) const {
+bool cosmos::entity_exists_with_guid(const unsigned guid) const {
 	return guid_map_for_transport.find(guid) != guid_map_for_transport.end();
 }
 #endif
 
-entity_handle cosmos::get_handle(const entity_id id) {
+entity_handle cosmos::get_handle(const entity_id& id) {
 	return entity_handle(*this, id);
 }
 
-const_entity_handle cosmos::get_handle(const entity_id id) const {
+const_entity_handle cosmos::get_handle(const entity_id& id) const {
 	return const_entity_handle(*this, id);
 }
 
@@ -239,15 +240,23 @@ const_entity_handle cosmos::get_handle(const unversioned_entity_id id) const {
 	return const_entity_handle(*this, get_aggregate_pool().make_versioned(id));
 }
 
-inventory_slot_handle cosmos::get_handle(const inventory_slot_id id) {
+inventory_slot_handle cosmos::get_handle(const inventory_slot_id& id) {
 	return inventory_slot_handle(*this, id);
 }
 
-const_inventory_slot_handle cosmos::get_handle(const inventory_slot_id id) const {
+const_inventory_slot_handle cosmos::get_handle(const inventory_slot_id& id) const {
 	return const_inventory_slot_handle(*this, id);
 }
 
-float cosmos::get_total_time_passed_in_seconds(float view_interpolation_ratio) const {
+item_slot_transfer_request cosmos::get_handle(const item_slot_transfer_request_data& data) {
+	return item_slot_transfer_request(get_handle(data.item), get_handle(data.target_slot), data.specified_quantity, data.force_immediate_mount);
+}
+
+const_item_slot_transfer_request cosmos::get_handle(const item_slot_transfer_request_data& data) const {
+	return const_item_slot_transfer_request(get_handle(data.item), get_handle(data.target_slot), data.specified_quantity, data.force_immediate_mount);
+}
+
+float cosmos::get_total_time_passed_in_seconds(const float view_interpolation_ratio) const {
 	return (significant.meta.total_steps_passed + view_interpolation_ratio) * significant.meta.delta.in_seconds();
 }
 
@@ -279,7 +288,7 @@ entity_handle cosmos::allocate_new_entity() {
 	return entity_handle(*this, raw_pool_id);
 }
 
-entity_handle cosmos::create_entity(const std::string debug_name) {
+entity_handle cosmos::create_entity(const std::string& debug_name) {
 	auto new_entity = allocate_new_entity();
 	new_entity.set_debug_name(debug_name);
 	new_entity += components::guid();
@@ -293,7 +302,7 @@ entity_handle cosmos::create_entity(const std::string debug_name) {
 }
 
 #if COSMOS_TRACKS_GUIDS
-entity_handle cosmos::create_entity_with_specific_guid(const std::string debug_name, const unsigned specific_guid) {
+entity_handle cosmos::create_entity_with_specific_guid(const std::string& debug_name, const unsigned specific_guid) {
 	const auto new_entity = allocate_new_entity();
 	new_entity += components::guid();
 
@@ -303,7 +312,7 @@ entity_handle cosmos::create_entity_with_specific_guid(const std::string debug_n
 }
 #endif
 
-entity_handle cosmos::clone_entity(const entity_id copied_entity_id) {
+entity_handle cosmos::clone_entity(const entity_id& copied_entity_id) {
 	entity_handle copied_entity = get_handle(copied_entity_id);
 	
 	if (copied_entity.dead())
@@ -341,7 +350,7 @@ entity_handle cosmos::clone_entity(const entity_id copied_entity_id) {
 	return new_entity;
 }
 
-void cosmos::delete_entity(entity_id e) {
+void cosmos::delete_entity(const entity_id& e) {
 	const auto handle = get_handle(e);
 	if (handle.dead()) {
 		LOG("Warning! Attempt to delete a dead entity: %x", e);
@@ -386,7 +395,7 @@ void cosmos::integrate_interpolated_transforms(const float seconds) const {
 	profiler.stop(meter_type::INTERPOLATION);
 }
 
-void cosmos::advance_deterministic_schemata(const cosmic_entropy input) {
+void cosmos::advance_deterministic_schemata(const cosmic_entropy& input) {
 	fixed_step step(*this, input);
 	advance_deterministic_schemata(step);
 }

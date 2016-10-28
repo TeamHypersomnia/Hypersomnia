@@ -25,6 +25,7 @@
 #include "game/detail/inventory_slot_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/detail/inventory_slot_handle_declaration.h"
+#include "game/detail/item_slot_transfer_request_declaration.h"
 #include "game/global/all_settings.h"
 #include "game/transcendental/cosmic_profiler.h"
 
@@ -41,13 +42,13 @@ class cosmos :
 
 	std::map<unsigned, entity_id> guid_map_for_transport;
 
-	void assign_next_guid(entity_handle);
-	void clear_guid(entity_handle);
-	unsigned get_guid(const_entity_handle) const;
+	void assign_next_guid(const entity_handle&);
+	void clear_guid(const entity_handle&);
+	unsigned get_guid(const const_entity_handle&) const;
 public:
 	void remap_guids();
 private:
-	entity_handle create_entity_with_specific_guid(std::string debug_name, unsigned specific_guid);
+	entity_handle create_entity_with_specific_guid(const std::string& debug_name, const unsigned specific_guid);
 #endif
 
 	void destroy_substance_completely();
@@ -80,18 +81,6 @@ public:
 		aggregate_pool_type pool_for_aggregates;
 		component_pools_type pools_for_components;
 
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(settings),
-
-				CEREAL_NVP(delta),
-
-				CEREAL_NVP(pool_for_aggregates),
-				CEREAL_NVP(pools_for_components)
-			);
-		}
-
 		bool operator==(const significant_state&) const;
 		bool operator!=(const significant_state&) const;
 
@@ -103,7 +92,7 @@ public:
 		complete_resubstantiation();
 	}
 
-	cosmos(unsigned reserved_entities = 0);
+	cosmos(const unsigned reserved_entities = 0);
 	cosmos(const cosmos&);
 
 	cosmos& operator=(const cosmos&);
@@ -113,7 +102,7 @@ public:
 	bool operator!=(const cosmos&) const;
 
 	template<class Pre, class Post>
-	void advance_deterministic_schemata(cosmic_entropy input, Pre pre_solve, Post post_solve) {
+	void advance_deterministic_schemata(const cosmic_entropy& input, Pre pre_solve, Post post_solve) {
 		fixed_step step(*this, input);
 
 		pre_solve(step);
@@ -122,20 +111,20 @@ public:
 	}
 
 	void integrate_interpolated_transforms(const float seconds) const;
-	void advance_deterministic_schemata(cosmic_entropy input);
+	void advance_deterministic_schemata(const cosmic_entropy& input);
 
-	void reserve_storage_for_entities(size_t);
+	void reserve_storage_for_entities(const size_t);
 
-	entity_handle create_entity(std::string debug_name);
-	entity_handle clone_entity(entity_id);
-	void delete_entity(entity_id);
+	entity_handle create_entity(const std::string& debug_name);
+	entity_handle clone_entity(const entity_id&);
+	void delete_entity(const entity_id&);
 
 	void refresh_for_new_significant_state();
 
 	void complete_resubstantiation();
-	void complete_resubstantiation(const_entity_handle);
-	void destroy_substance_for_entity(const_entity_handle);
-	void create_substance_for_entity(const_entity_handle);
+	void complete_resubstantiation(const const_entity_handle&);
+	void destroy_substance_for_entity(const const_entity_handle&);
+	void create_substance_for_entity(const const_entity_handle&);
 
 	template<class System>
 	void partial_resubstantiation(entity_handle handle) {
@@ -153,23 +142,25 @@ public:
 	bool entity_exists_with_guid(unsigned) const;
 #endif
 
-	entity_handle get_handle(entity_id);
-	const_entity_handle get_handle(entity_id) const;
+	entity_handle get_handle(const entity_id&);
+	const_entity_handle get_handle(const entity_id&) const;
 	entity_handle get_handle(unversioned_entity_id);
 	const_entity_handle get_handle(unversioned_entity_id) const;
-	inventory_slot_handle get_handle(inventory_slot_id);
-	const_inventory_slot_handle get_handle(inventory_slot_id) const;
+	inventory_slot_handle get_handle(const inventory_slot_id&);
+	const_inventory_slot_handle get_handle(const inventory_slot_id&) const;
+	item_slot_transfer_request get_handle(const item_slot_transfer_request_data&);
+	const_item_slot_transfer_request get_handle(const item_slot_transfer_request_data&) const;
 
-	randomization get_rng_for(entity_id) const;
+	randomization get_rng_for(const entity_id&) const;
 
-	std::vector<entity_handle> get(processing_subjects);
-	std::vector<const_entity_handle> get(processing_subjects) const;
+	std::vector<entity_handle> get(const processing_subjects);
+	std::vector<const_entity_handle> get(const processing_subjects) const;
 
 	size_t entities_count() const;
 	size_t get_maximum_entities() const;
 	std::wstring summary() const;
 
-	float get_total_time_passed_in_seconds(float view_interpolation_ratio) const;
+	float get_total_time_passed_in_seconds(const float view_interpolation_ratio) const;
 	float get_total_time_passed_in_seconds() const;
 	unsigned get_total_steps_passed() const;
 
@@ -178,8 +169,9 @@ public:
 	const augs::fixed_delta& get_fixed_delta() const;
 	void set_fixed_delta(const augs::fixed_delta&);
 
-	void save_to_file(std::string);
-	bool load_from_file(std::string);
+	/* saving procedure is not const due to possible resubstantiation of the universe */
+	void save_to_file(const std::string&);
+	bool load_from_file(const std::string&);
 
 	template <class D>
 	void for_each_entity_id(D pred) {
