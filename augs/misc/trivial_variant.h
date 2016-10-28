@@ -103,7 +103,7 @@ namespace augs {
 		}
 
 		bool operator==(const trivial_variant& b) const {
-			return b.current_type == b.current_type 
+			return current_type == b.current_type 
 				&& 
 				call([&](const auto& resolved_a) {
 					return resolved_a == b.get<std::decay_t<decltype(resolved_a)>>();

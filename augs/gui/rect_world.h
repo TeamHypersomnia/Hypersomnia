@@ -56,8 +56,6 @@ namespace augs {
 			bool held_rect_is_dragged = false;
 			padding_byte pad[3];
 			
-			gui_element_id root;
-
 			gui_element_id rect_hovered;
 			gui_element_id rect_held_by_lmb;
 			gui_element_id rect_held_by_rmb;
@@ -95,7 +93,7 @@ namespace augs {
 			}
 
 			template<class C>
-			void consume_raw_input_and_generate_gui_events(C context, const window::event::change new_state) {
+			void consume_raw_input_and_generate_gui_events(C context, const gui_element_id& root, const window::event::change new_state) {
 				using namespace augs::window;
 
 				last_state.apply(new_state);
@@ -207,14 +205,14 @@ namespace augs {
 			}
 
 			template <class C>
-			void build_tree_data_into_context(C context) const {
+			void build_tree_data_into_context(C context, const gui_element_id& root) const {
 				context(root, [&](const auto& r) { 
 					r.build_tree_data(context, root); 
 				});
 			}
 
 			template<class C>
-			void perform_logic_step(C context, const fixed_delta& delta) {
+			void perform_logic_step(C context, const gui_element_id& root, const fixed_delta& delta) {
 				context(root, [&](auto& r) { 
 					r.perform_logic_step(context, root, delta);
 				});
@@ -223,7 +221,7 @@ namespace augs {
 			}
 			
 			template<class C>
-			void call_idle_mousemotion_updater(C context) {
+			void call_idle_mousemotion_updater(C context, const gui_element_id& root) {
 				window::event::change fabricated_state;
 				fabricated_state.msg = window::event::message::mousemotion;
 				fabricated_state.mouse.rel.set(0, 0);
@@ -240,7 +238,7 @@ namespace augs {
 			}
 
 			template<class C>
-			vertex_triangle_buffer draw_triangles(C context) const {
+			vertex_triangle_buffer draw_triangles(C context, const gui_element_id& root) const {
 				vertex_triangle_buffer buffer;
 				draw_info in(*this, buffer);
 

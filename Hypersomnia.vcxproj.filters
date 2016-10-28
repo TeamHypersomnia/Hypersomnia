@@ -1109,11 +1109,13 @@
     <ClInclude Include="augs\misc\trivial_pair.h" />
     <ClInclude Include="game\detail\gui\gui_element_location.h" />
     <ClInclude Include="augs\misc\trivial_variant.h" />
-    <ClInclude Include="game\detail\gui\locations\slot_button_for_inventory_slot.h" />
-    <ClInclude Include="game\detail\gui\locations\item_button_for_item_component.h" />
-    <ClInclude Include="game\detail\gui\locations\internal_of_gui_element_component.h" />
     <ClInclude Include="augs\gui\gui_flags.h" />
     <ClInclude Include="game\detail\gui\slot_button.h" />
     <ClInclude Include="augs\gui\gui_traversal_structs.h" />
+    <ClInclude Include="game\detail\gui\locations\item_button_for_item_component_location.h" />
+    <ClInclude Include="game\detail\gui\locations\internal_of_gui_element_component_location.h" />
+    <ClInclude Include="game\detail\gui\locations\slot_button_for_inventory_slot_location.h" />
+    <ClInclude Include="game\detail\gui\locations\root_of_inventory_gui_location.h" />
+    <ClInclude Include="game\detail\gui\root_of_inventory_gui.h" />
   </ItemGroup>
 </Project>

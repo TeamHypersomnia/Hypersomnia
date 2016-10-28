@@ -1,10 +1,10 @@
 #pragma once
 
-class internal_of_gui_element_component {
+class internal_of_gui_element_component_location {
 public:
 	unsigned offset_of = 0;
 
-	bool operator==(internal_of_gui_element_component b) const {
+	bool operator==(internal_of_gui_element_component_location b) const {
 		return offset_of == b.offset_of;
 	}
 
@@ -29,8 +29,8 @@ public:
 
 namespace std {
 	template <>
-	struct hash<internal_of_gui_element_component> {
-		std::size_t operator()(const internal_of_gui_element_component& k) const {
+	struct hash<internal_of_gui_element_component_location> {
+		std::size_t operator()(const internal_of_gui_element_component_location& k) const {
 			return std::hash<unsigned>()(k.offset_of);
 		}
 	};

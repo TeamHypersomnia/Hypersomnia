@@ -79,13 +79,19 @@ namespace components {
 			typedef maybe_const_ref_t<is_const, gui_element> gui_element_ref;
 			typedef maybe_const_ref_t<is_const, game_gui_rect_world> game_gui_rect_world_ref;
 
-			basic_dispatcher_context(step_ref step, gui_element_ref elem) :
+			basic_dispatcher_context(step_ref step, basic_entity_handle<is_const> gui_element_entity, gui_element_ref elem) :
 				step(step), 
+				handle(gui_element_entity),
 				//composite_for_iteration(parent),
 				elem(elem) {}
 
 			step_ref step;
 			gui_element_ref elem;
+			basic_entity_handle<is_const> handle;
+
+			basic_entity_handle<is_const> get_gui_element_entity() const {
+				return handle;
+			}
 			//parent_of_inventory_controls_rect& composite_for_iteration;
 
 			step_ref get_step() const {

@@ -1,11 +1,11 @@
 #pragma once
 #include "game/detail/inventory_slot_id.h"
 
-class slot_button_for_inventory_slot {
+class slot_button_for_inventory_slot_location {
 public:
 	inventory_slot_id slot_id;
 
-	bool operator==(const slot_button_for_inventory_slot& b) const {
+	bool operator==(const slot_button_for_inventory_slot_location& b) const {
 		return slot_id == b.slot_id;
 	}
 
@@ -24,8 +24,8 @@ public:
 
 namespace std {
 	template <>
-	struct hash<slot_button_for_inventory_slot> {
-		std::size_t operator()(const slot_button_for_inventory_slot& k) const {
+	struct hash<slot_button_for_inventory_slot_location> {
+		std::size_t operator()(const slot_button_for_inventory_slot_location& k) const {
 			return std::hash<inventory_slot_id>()(k.slot_id);
 		}
 	};

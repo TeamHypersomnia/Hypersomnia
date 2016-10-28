@@ -18,6 +18,7 @@
 #include "augs/gui/rect_world.h"
 #include "game/detail/gui/immediate_hud.h"
 #include "game/enums/slot_function.h"
+#include "game/detail/gui/root_of_inventory_gui.h"
 
 #include "game/detail/inventory_utils.h"
 
@@ -50,13 +51,13 @@ void gui_system::advance_gui_elements(fixed_step& step) {
 		auto& element = root.get<components::gui_element>();
 
 		if (root.has<components::item_slot_transfers>()) {
-			components::gui_element::dispatcher_context context(step, element);
+			components::gui_element::dispatcher_context context(step, root, element);
 
 			gui_element_location root_location;
-			root_location.set(item_button_for_item_component{ root });
+			root_location.set(root_of_inventory_gui_location());
 
-			element.rect_world.perform_logic_step(context, step.get_delta());
-			element.rect_world.build_tree_data_into_context(context);
+			element.rect_world.perform_logic_step(context, root_location, step.get_delta());
+			element.rect_world.build_tree_data_into_context(context, root_location);
 
 			const auto& entropies = step.entropy.entropy_per_entity;
 			const auto& inputs_for_this_element = entropies.find(root);
@@ -70,8 +71,8 @@ void gui_system::advance_gui_elements(fixed_step& step) {
 						const auto& change = e.event_for_gui;
 						const auto& held_rect = rect_world.rect_held_by_lmb;
 
-						if (held_rect.is<item_button_for_item_component>()) {
-							const auto& item_entity = cosmos[held_rect.get<item_button_for_item_component>().item_id];
+						if (held_rect.is<item_button_for_item_component_location>()) {
+							const auto& item_entity = cosmos[held_rect.get<item_button_for_item_component_location>().item_id];
 							auto& dragged_charges = element.dragged_charges;
 
 							if (change.msg == window::event::message::rdown
@@ -99,12 +100,12 @@ void gui_system::advance_gui_elements(fixed_step& step) {
 						}
 
 						if (!fetched)
-							element.rect_world.consume_raw_input_and_generate_gui_events(context, e.event_for_gui);
+							element.rect_world.consume_raw_input_and_generate_gui_events(context, root_location, e.event_for_gui);
 					}
 				}
 			}
 
-			rect_world.call_idle_mousemotion_updater(context);
+			rect_world.call_idle_mousemotion_updater(context, root_location);
 		}
 	}
 }

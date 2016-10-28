@@ -29,15 +29,15 @@ struct item_button : game_gui_rect_node<item_button> {
 
 	template <class C, class L>
 	static void for_each_child(C context, const gui_element_location& this_id, L polymorphic_call) {
-		if (this_id.is<item_button_for_item_component>()) {
-			const auto container = context.get_step().get_cosmos()[this_id.get<item_button_for_item_component>().item_id];
+		if (this_id.is<item_button_for_item_component_location>()) {
+			const auto container = context.get_step().get_cosmos()[this_id.get<item_button_for_item_component_location>().item_id];
 
 			auto* maybe_container = container.find<components::container>();
 
 			if (maybe_container) {
 				for (auto& s : maybe_container->slots) {
 					gui_element_location child_location;
-					child_location.set(slot_button_for_inventory_slot{ s.first });
+					child_location.set(slot_button_for_inventory_slot_location{ s.first });
 
 					polymorphic_call(s.second.button, child_location);
 				}

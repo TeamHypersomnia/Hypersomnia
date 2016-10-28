@@ -1023,9 +1023,11 @@
     <ClInclude Include="game\detail\gui\aabb_highlighter.h" />
     <ClInclude Include="game\detail\gui\gui_element_location.h" />
     <ClInclude Include="game\detail\gui\immediate_hud.h" />
-    <ClInclude Include="game\detail\gui\locations\internal_of_gui_element_component.h" />
-    <ClInclude Include="game\detail\gui\locations\item_button_for_item_component.h" />
-    <ClInclude Include="game\detail\gui\locations\slot_button_for_inventory_slot.h" />
+    <ClInclude Include="game\detail\gui\locations\internal_of_gui_element_component_location.h" />
+    <ClInclude Include="game\detail\gui\locations\item_button_for_item_component_location.h" />
+    <ClInclude Include="game\detail\gui\locations\root_of_inventory_gui_location.h" />
+    <ClInclude Include="game\detail\gui\locations\slot_button_for_inventory_slot_location.h" />
+    <ClInclude Include="game\detail\gui\root_of_inventory_gui.h" />
     <ClInclude Include="game\detail\gui\slot_button.h" />
     <ClInclude Include="game\detail\gui\special_drag_and_drop_target.h" />
     <ClInclude Include="game\detail\world_camera.h" />
