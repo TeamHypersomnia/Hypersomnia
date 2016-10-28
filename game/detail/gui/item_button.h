@@ -19,7 +19,6 @@ struct item_button : game_gui_rect_node<item_button> {
 
 	rects::ltrb<float> with_attachments_bbox;
 
-	augs::gui::text_drawer charges_caption;
 	augs::gui::appearance_detector detector;
 
 	bool is_container_open = false;

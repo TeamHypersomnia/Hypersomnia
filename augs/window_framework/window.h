@@ -1,6 +1,8 @@
 #pragma once
 #if PLATFORM_WINDOWS
 #include <Windows.h>
+#undef min
+#undef max
 #endif
 #include "augs/math/rects.h"
 #include "event.h"

@@ -166,6 +166,7 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 
 				auto bottom_number = augs::gui::text::format(label_wstr, augs::gui::text::style(assets::font_id::GUI_FONT, label_color));
 
+				augs::gui::text_drawer charges_caption;
 				charges_caption.set_text(bottom_number);
 				charges_caption.bottom_right(get_rect_absolute());
 				charges_caption.draw(in);
