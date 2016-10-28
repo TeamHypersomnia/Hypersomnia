@@ -20,7 +20,7 @@ vec2 viewing_step::get_screen_space(vec2 pos) const {
 	return pos - camera_state.transformed_visible_world_area_aabb.get_position();
 }
 
-cosmos& viewing_step::get_cosmos() const {
+const cosmos& viewing_step::get_cosmos() const {
 	return cosm;
 }
 
