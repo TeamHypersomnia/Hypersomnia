@@ -52,9 +52,9 @@ std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> render_s
 	return output;
 }
 
-void render_system::draw_entities(augs::vertex_triangle_buffer& output, std::vector<const_entity_handle> entities, state_for_drawing_camera in_camera, float interpolation_ratio, bool only_border_highlights) const {
+void render_system::draw_entities(augs::vertex_triangle_buffer& output, std::vector<const_entity_handle> entities, state_for_drawing_camera in_camera, bool only_border_highlights) const {
 	for (auto e : entities) {
-		for_each_type<components::polygon, components::sprite, /*components::tile_layer,*/ components::particle_group>([e, interpolation_ratio, &output, &in_camera, only_border_highlights](auto T) {
+		for_each_type<components::polygon, components::sprite, /*components::tile_layer,*/ components::particle_group>([e, &output, &in_camera, only_border_highlights](auto T) {
 			typedef decltype(T) renderable_type;
 
 			if (e.has<renderable_type>()) {
@@ -62,7 +62,7 @@ void render_system::draw_entities(augs::vertex_triangle_buffer& output, std::vec
 				auto renderable_transform = viewing_transform(e, true);
 				const auto& renderable = e.get<renderable_type>();
 
-				render_system().draw_renderable(output, renderable, renderable_transform, render, in_camera, interpolation_ratio, only_border_highlights);
+				render_system().draw_renderable(output, renderable, renderable_transform, render, in_camera, only_border_highlights);
 			}
 		});
 	}

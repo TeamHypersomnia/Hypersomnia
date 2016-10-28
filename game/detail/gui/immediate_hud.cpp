@@ -218,8 +218,8 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 				augs::gui::text_drawer health_points;
 				health_points.set_text(augs::gui::text::format(in.text, augs::gui::text::style(assets::font_id::GUI_FONT, in.color)));
 
-				auto circle_displacement_length = health_points.get_bbox().bigger_side() + radius;
-				vec2i screen_space_circle_center = r.get_screen_space(transform.pos);
+				//const auto circle_displacement_length = health_points.get_bbox().bigger_side() + radius;
+				const vec2i screen_space_circle_center = r.get_screen_space(transform.pos);
 
 				health_points.pos = screen_space_circle_center + position_caption_around_a_circle(radius+6, health_points.get_bbox(), in.angle) - health_points.get_bbox()/2;
 				//health_points.pos = screen_space_circle_center + vec2().set_from_degrees(in.angle).set_length(circle_displacement_length);
@@ -330,7 +330,7 @@ void immediate_hud::draw_pure_color_highlights(viewing_step& msg) const {
 		auto ratio = passed / r.maximum_duration_seconds;
 
 		col.a = 255 * (1-ratio) * r.starting_alpha_ratio;
-		render_system().draw_renderable(triangles, sprite, subject.viewing_transform(true), subject.get<components::render>(), msg.camera_state, msg.get_delta().view_interpolation_ratio(), false);
+		render_system().draw_renderable(triangles, sprite, subject.viewing_transform(true), subject.get<components::render>(), msg.camera_state, false);
 		col = prevcol;
 	}
 

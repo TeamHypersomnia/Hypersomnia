@@ -21,19 +21,17 @@
 
 namespace rendering_scripts {
 	void standard_rendering(viewing_step& step) {
-		auto& state = step.camera_state;
+		const auto& state = step.camera_state;
 		auto& renderer = step.renderer;
 		auto& output = renderer.triangles;
-		auto& cosmos = step.cosm;
-		auto& dynamic_tree = cosmos.systems_temporary.get<dynamic_tree_system>();
-		auto& physics = cosmos.systems_temporary.get<physics_system>();
-
-		auto interpolation_ratio = step.get_delta().view_interpolation_ratio();
+		const auto& cosmos = step.cosm;
+		const auto& dynamic_tree = cosmos.systems_temporary.get<dynamic_tree_system>();
+		const auto& physics = cosmos.systems_temporary.get<physics_system>();
 
 		step.visible_entities = cosmos[dynamic_tree.determine_visible_entities_from_camera(state, physics)];
 		step.visible_per_layer = render_system().get_visible_per_layer(step.visible_entities);
 
-		auto matrix = augs::orthographic_projection<float>(0, state.visible_world_area.x, state.visible_world_area.y, 0, 0, 1);
+		const auto matrix = augs::orthographic_projection<float>(0, state.visible_world_area.x, state.visible_world_area.y, 0, 0, 1);
 
 		auto& default_shader = *resource_manager.find(assets::program_id::DEFAULT);
 		auto& default_highlight_shader = *resource_manager.find(assets::program_id::DEFAULT_HIGHLIGHT);
@@ -41,12 +39,12 @@ namespace rendering_scripts {
 		
 		default_shader.use();
 		{
-			auto projection_matrix_uniform = glGetUniformLocation(default_shader.id, "projection_matrix");
+			const auto projection_matrix_uniform = glGetUniformLocation(default_shader.id, "projection_matrix");
 			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
 		}
 		
 		for (int i = render_layer::UNDER_GROUND; i > render_layer::DYNAMIC_BODY; --i) {
-			render_system().draw_entities(output, step.visible_per_layer[i], state, interpolation_ratio);
+			render_system().draw_entities(output, step.visible_per_layer[i], state);
 		}
 
 		renderer.call_triangles();
@@ -54,11 +52,11 @@ namespace rendering_scripts {
 
 		default_highlight_shader.use();
 		{
-			auto projection_matrix_uniform = glGetUniformLocation(default_highlight_shader.id, "projection_matrix");
+			const auto projection_matrix_uniform = glGetUniformLocation(default_highlight_shader.id, "projection_matrix");
 			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
 		}
 		
-		render_system().draw_entities(output, step.visible_per_layer[render_layer::DYNAMIC_BODY], state, interpolation_ratio, true);
+		render_system().draw_entities(output, step.visible_per_layer[render_layer::DYNAMIC_BODY], state, true);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
@@ -66,7 +64,7 @@ namespace rendering_scripts {
 		default_shader.use();
 
 		for (int i = render_layer::DYNAMIC_BODY; i >= 0; --i) {
-			render_system().draw_entities(output, step.visible_per_layer[i], state, interpolation_ratio);
+			render_system().draw_entities(output, step.visible_per_layer[i], state);
 		}
 
 		renderer.call_triangles();
@@ -74,14 +72,14 @@ namespace rendering_scripts {
 
 		circular_bars_shader.use();
 		{
-			auto projection_matrix_uniform = glGetUniformLocation(circular_bars_shader.id, "projection_matrix");
+			const auto projection_matrix_uniform = glGetUniformLocation(circular_bars_shader.id, "projection_matrix");
 			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
 			
 			vec2 upper(0.0f, 0.0f);
 			vec2 lower(1.0f, 1.0f);
 			(*assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM).get_uv(upper);
 			(*assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM).get_uv(lower);
-			auto center = (upper + lower) / 2;
+			const auto center = (upper + lower) / 2;
 		
 			glUniform2f(glGetUniformLocation(circular_bars_shader.id, "texture_center"), center.x, center.y);
 		
@@ -92,7 +90,7 @@ namespace rendering_scripts {
 				//auto& gui = it.get<components::gui_element>();
 				const auto& hud = step.hud;
 
-				auto textual_infos = hud.draw_circular_bars_and_get_textual_info(step);
+				const auto& textual_infos = hud.draw_circular_bars_and_get_textual_info(step);
 		
 				renderer.call_triangles();
 				renderer.clear_triangles();
@@ -126,6 +124,6 @@ namespace rendering_scripts {
 			state.camera_transform,
 			assets::texture_id::BLANK,
 			{},
-			interpolation_ratio);
+			step.get_delta().view_interpolation_ratio());
 	}
 }

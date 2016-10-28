@@ -17,7 +17,6 @@ public:
 		augs::vertex_triangle_buffer& output, 
 		std::vector<const_entity_handle>, 
 		state_for_drawing_camera in, 
-		float interpolation_ratio, 
 		bool only_border_highlights = false) const;
 
 
@@ -28,7 +27,6 @@ public:
 		const components::transform& renderable_transform,
 		const components::render& render,
 		state_for_drawing_camera in_camera,
-		float interpolation_ratio,
 		bool only_border_highlights = false) const {
 
 		components::transform camera_transform;
