@@ -35,20 +35,20 @@ bool entity_intent::operator!=(const entity_intent& b) const {
 bool entity_intent::from_raw_state(const input_context& context, const augs::window::event::change& raw) {
 	bool found_context_entry = false;
 
-	if (raw.key_event == augs::window::event::NO_CHANGE) {
-		pressed_flag = true;
+	if (raw.was_key_pressed() || raw.was_key_released()) {
+		pressed_flag = raw.was_key_pressed();
 
-		const auto found_intent = context.event_to_intent.find(raw.msg);
-		if (found_intent != context.event_to_intent.end()) {
+		const auto found_intent = context.key_to_intent.find(raw.key);
+		if (found_intent != context.key_to_intent.end()) {
 			intent = (*found_intent).second;
 			found_context_entry = true;
 		}
 	}
-	else if (raw.key_event == augs::window::event::PRESSED || raw.key_event == augs::window::event::RELEASED) {
-		pressed_flag = raw.key_event == augs::window::event::PRESSED;
+	else {
+		pressed_flag = true;
 
-		const auto found_intent = context.key_to_intent.find(raw.key);
-		if (found_intent != context.key_to_intent.end()) {
+		const auto found_intent = context.event_to_intent.find(raw.msg);
+		if (found_intent != context.event_to_intent.end()) {
 			intent = (*found_intent).second;
 			found_context_entry = true;
 		}

@@ -17,7 +17,7 @@ void viewing_session::visual_response_to_game_events(const fixed_step& step) {
 
 void viewing_session::control(const augs::machine_entropy& entropy) {
 	for (const auto& raw_input : entropy.local) {
-		if (raw_input.key == augs::window::event::keys::DASH) {
+		if (raw_input.key == augs::window::event::keys::key::DASH) {
 			show_profile_details = !show_profile_details;
 		}
 	}

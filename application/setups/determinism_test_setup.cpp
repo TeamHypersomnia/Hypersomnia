@@ -76,8 +76,8 @@ void determinism_test_setup::process(game_window& window) {
 			break;
 
 		for (auto& n : new_entropy.local) {
-			if (n.key_event == augs::window::event::key_changed::PRESSED) {
-				if (n.key == augs::window::event::keys::F3) {
+			if (n.was_key_pressed()) {
+				if (n.key == augs::window::event::keys::key::F3) {
 					++currently_viewn_cosmos;
 					currently_viewn_cosmos %= cosmoi_count;
 				}

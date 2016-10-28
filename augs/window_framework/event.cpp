@@ -26,6 +26,14 @@ namespace augs {
 				}
 			}
 
+			bool change::was_key_pressed() const {
+				return get_key_change() == key_change::PRESSED;
+			}
+
+			bool change::was_key_released() const {
+				return get_key_change() == key_change::RELEASED;
+			}
+
 			void state::apply(const change& dt) {
 				const auto ch = dt.get_key_change();
 
@@ -52,11 +60,11 @@ namespace augs {
 
 			bool state::get_mouse_key(unsigned n) const {
 				switch (n) {
-				case 0: return keys.test(keys::LMOUSE);
-				case 1: return keys.test(keys::RMOUSE);
-				case 2: return keys.test(keys::MMOUSE);
-				case 3: return keys.test(keys::MOUSE4);
-				case 4: return keys.test(keys::MOUSE5);
+				case 0: return keys.test(keys::key::LMOUSE);
+				case 1: return keys.test(keys::key::RMOUSE);
+				case 2: return keys.test(keys::key::MMOUSE);
+				case 3: return keys.test(keys::key::MOUSE4);
+				case 4: return keys.test(keys::key::MOUSE5);
 				default: ensure(false); return false;
 				}
 			}

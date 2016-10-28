@@ -59,26 +59,26 @@ void local_setup::process(game_window& window) {
 
 		for (const auto& s : steps) {
 			for (const auto& raw_input : s.total_entropy.local) {
-				if (raw_input.key_event == augs::window::event::PRESSED) {
-					if (raw_input.key == augs::window::event::keys::_1) {
+				if (raw_input.was_key_pressed()) {
+					if (raw_input.key == augs::window::event::keys::key::_1) {
 						hypersomnia.set_fixed_delta(cfg.tickrate);
 					}
-					if (raw_input.key == augs::window::event::keys::_2) {
+					if (raw_input.key == augs::window::event::keys::key::_2) {
 						hypersomnia.set_fixed_delta(128);
 					}
-					if (raw_input.key == augs::window::event::keys::_3) {
+					if (raw_input.key == augs::window::event::keys::key::_3) {
 						hypersomnia.set_fixed_delta(144);
 					}
-					if (raw_input.key == augs::window::event::keys::_4) {
+					if (raw_input.key == augs::window::event::keys::key::_4) {
 						input_unpacker.timer.set_stepping_speed_multiplier(0.1f);
 					}
-					if (raw_input.key == augs::window::event::keys::_5) {
+					if (raw_input.key == augs::window::event::keys::key::_5) {
 						input_unpacker.timer.set_stepping_speed_multiplier(1.f);
 					}
-					if (raw_input.key == augs::window::event::keys::_6) {
+					if (raw_input.key == augs::window::event::keys::key::_6) {
 						input_unpacker.timer.set_stepping_speed_multiplier(6.f);
 					}
-					if (raw_input.key == augs::window::event::keys::F2) {
+					if (raw_input.key == augs::window::event::keys::key::F2) {
 						LOG_COLOR(console_color::YELLOW, "Separator");
 					}
 				}

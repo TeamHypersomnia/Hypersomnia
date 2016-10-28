@@ -44,7 +44,7 @@ augs::window::event::message translate_enum(UINT m) {
 	return augs::window::event::message::unknown;
 }
 
-augs::window::event::keys::key translate_key(UINT m) {
+augs::window::event::keys::key::key translate_key(UINT m) {
 	switch (m) {
 	case VK_LBUTTON:											return augs::window::event::keys::key::LMOUSE;
 	case VK_RBUTTON:											return augs::window::event::keys::key::RMOUSE;

@@ -241,40 +241,40 @@ namespace scene_managers {
 	void testbed::configure_view(viewing_session& session) const {
 		auto& active_context = session.context;
 
-		active_context.map_key_to_intent(window::event::keys::W, intent_type::MOVE_FORWARD);
-		active_context.map_key_to_intent(window::event::keys::S, intent_type::MOVE_BACKWARD);
-		active_context.map_key_to_intent(window::event::keys::A, intent_type::MOVE_LEFT);
-		active_context.map_key_to_intent(window::event::keys::D, intent_type::MOVE_RIGHT);
+		active_context.map_key_to_intent(window::event::keys::key::W, intent_type::MOVE_FORWARD);
+		active_context.map_key_to_intent(window::event::keys::key::S, intent_type::MOVE_BACKWARD);
+		active_context.map_key_to_intent(window::event::keys::key::A, intent_type::MOVE_LEFT);
+		active_context.map_key_to_intent(window::event::keys::key::D, intent_type::MOVE_RIGHT);
 
 		active_context.map_event_to_intent(window::event::message::mousemotion, intent_type::MOVE_CROSSHAIR);
-		active_context.map_key_to_intent(window::event::keys::LMOUSE, intent_type::CROSSHAIR_PRIMARY_ACTION);
-		active_context.map_key_to_intent(window::event::keys::RMOUSE, intent_type::CROSSHAIR_SECONDARY_ACTION);
+		active_context.map_key_to_intent(window::event::keys::key::LMOUSE, intent_type::CROSSHAIR_PRIMARY_ACTION);
+		active_context.map_key_to_intent(window::event::keys::key::RMOUSE, intent_type::CROSSHAIR_SECONDARY_ACTION);
 
-		active_context.map_key_to_intent(window::event::keys::E, intent_type::USE_BUTTON);
-		active_context.map_key_to_intent(window::event::keys::LSHIFT, intent_type::WALK);
+		active_context.map_key_to_intent(window::event::keys::key::E, intent_type::USE_BUTTON);
+		active_context.map_key_to_intent(window::event::keys::key::LSHIFT, intent_type::WALK);
 
-		active_context.map_key_to_intent(window::event::keys::G, intent_type::THROW_PRIMARY_ITEM);
-		active_context.map_key_to_intent(window::event::keys::H, intent_type::HOLSTER_PRIMARY_ITEM);
+		active_context.map_key_to_intent(window::event::keys::key::G, intent_type::THROW_PRIMARY_ITEM);
+		active_context.map_key_to_intent(window::event::keys::key::H, intent_type::HOLSTER_PRIMARY_ITEM);
 
-		active_context.map_key_to_intent(window::event::keys::BACKSPACE, intent_type::SWITCH_LOOK);
+		active_context.map_key_to_intent(window::event::keys::key::BACKSPACE, intent_type::SWITCH_LOOK);
 
-		active_context.map_key_to_intent(window::event::keys::LCTRL, intent_type::START_PICKING_UP_ITEMS);
+		active_context.map_key_to_intent(window::event::keys::key::LCTRL, intent_type::START_PICKING_UP_ITEMS);
 
-		active_context.map_key_to_intent(window::event::keys::SPACE, intent_type::SPACE_BUTTON);
-		active_context.map_key_to_intent(window::event::keys::MOUSE4, intent_type::SWITCH_TO_GUI);
+		active_context.map_key_to_intent(window::event::keys::key::SPACE, intent_type::SPACE_BUTTON);
+		active_context.map_key_to_intent(window::event::keys::key::MOUSE4, intent_type::SWITCH_TO_GUI);
 
 	}
 
 	void testbed::control(const augs::machine_entropy::local_type& local, cosmos& main_cosmos) {
 		for (const auto& raw_input : local) {
-			if (raw_input.key_event == augs::window::event::PRESSED) {
-				if (raw_input.key == augs::window::event::keys::F7) {
+			if (raw_input.was_key_pressed()) {
+				if (raw_input.key == augs::window::event::keys::key::F7) {
 					auto target_folder = "saves/" + augs::get_timestamp();
 					augs::create_directories(target_folder);
 
 					main_cosmos.save_to_file(target_folder + "/" + "save.state");
 				}
-				if (raw_input.key == augs::window::event::keys::F4) {
+				if (raw_input.key == augs::window::event::keys::key::F4) {
 					cosmos cosm_with_guids;
 					cosm_with_guids.significant = stashed_cosmos.significant;
 					cosm_with_guids.remap_guids();
@@ -288,18 +288,18 @@ namespace scene_managers {
 
 					main_cosmos = cosm_with_guids;
 				}
-				if (raw_input.key == augs::window::event::keys::F8) {
+				if (raw_input.key == augs::window::event::keys::key::F8) {
 					main_cosmos.profiler.duplication.new_measurement();
 					stashed_cosmos = main_cosmos;
 					main_cosmos.profiler.duplication.end_measurement();
 				}
-				if (raw_input.key == augs::window::event::keys::F9) {
+				if (raw_input.key == augs::window::event::keys::key::F9) {
 					main_cosmos = stashed_cosmos;
 				}
-				if (raw_input.key == augs::window::event::keys::F10) {
+				if (raw_input.key == augs::window::event::keys::key::F10) {
 					main_cosmos.significant.meta.settings.enable_interpolation = !main_cosmos.significant.meta.settings.enable_interpolation;
 				}
-				if (raw_input.key == augs::window::event::keys::CAPSLOCK) {
+				if (raw_input.key == augs::window::event::keys::key::CAPSLOCK) {
 					++current_character;
 					current_character %= characters.size();
 

@@ -188,6 +188,10 @@ namespace augs {
 
 					struct key_data {
 						keys::key key;
+
+						operator keys::key() const {
+							return key;
+						}
 					} key;
 
 					struct character_data {
@@ -198,6 +202,8 @@ namespace augs {
 				change();
 
 				key_change get_key_change() const;
+				bool was_key_pressed() const;
+				bool was_key_released() const;
 			};
 
 			struct state {

@@ -6,7 +6,7 @@
 #include "augs/misc/enum_associative_array.h"
 
 struct input_context {
-	augs::enum_associative_array<augs::window::event::keys::key, intent_type> key_to_intent;
+	augs::enum_associative_array<augs::window::event::keys::key::key, intent_type> key_to_intent;
 	augs::enum_associative_array<augs::window::event::message, intent_type> event_to_intent;
 
 	template <class Archive>
@@ -17,6 +17,6 @@ struct input_context {
 		);
 	}
 
-	void map_key_to_intent(augs::window::event::keys::key, intent_type);
+	void map_key_to_intent(augs::window::event::keys::key::key, intent_type);
 	void map_event_to_intent(augs::window::event::message, intent_type);
 };

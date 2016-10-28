@@ -144,9 +144,9 @@ namespace augs {
 					pass = false;
 				}
 				/*
-				if(new_state.msg == down && new_state.key == event::keys::TAB) {
+				if(new_state.msg == down && new_state.key == event::keys::key::TAB) {
 				gui_element_id f;
-				if(f = seek_focusable(focus ? focus : &root, new_state.keys[event::keys::LSHIFT]))
+				if(f = seek_focusable(focus ? focus : &root, new_state.keys[event::keys::key::LSHIFT]))
 				set_focus(f);
 
 				pass = false;

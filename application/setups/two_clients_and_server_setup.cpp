@@ -33,8 +33,8 @@ void two_clients_and_server_setup::process(game_window& window) {
 			break;
 
 		for (const auto& n : precollected) {
-			if (n.key_event == augs::window::event::key_changed::PRESSED) {
-				if (n.key == augs::window::event::keys::CAPSLOCK) {
+			if (n.was_key_pressed()) {
+				if (n.key == augs::window::event::keys::key::CAPSLOCK) {
 					++current_window;
 					current_window %= 2;
 
@@ -44,12 +44,12 @@ void two_clients_and_server_setup::process(game_window& window) {
 					}
 				}
 				
-				if (n.key == augs::window::event::keys::F1) {
+				if (n.key == augs::window::event::keys::key::F1) {
 					alive[0] = false;
 					current_window = 1;
 				}
 
-				if (n.key == augs::window::event::keys::F2) {
+				if (n.key == augs::window::event::keys::key::F2) {
 					alive[1] = false;
 					current_window = 0;
 				}

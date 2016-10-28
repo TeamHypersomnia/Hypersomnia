@@ -375,7 +375,7 @@ namespace augs {
 			//	};
 			//
 			//	if (e == gui_event::wheel) {
-			//		if (wnd.keys[augs::window::event::keys::SHIFT]) {
+			//		if (wnd.keys[augs::window::event::keys::key::SHIFT]) {
 			//			int temp = static_cast<int>(scroll.x);
 			//			if (scrollable) {
 			//
