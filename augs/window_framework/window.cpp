@@ -44,6 +44,133 @@ augs::window::event::message translate_enum(UINT m) {
 	return augs::window::event::message::unknown;
 }
 
+augs::window::event::keys::key translate_key(UINT m) {
+	switch (m) {
+	case VK_LBUTTON:											return augs::window::event::keys::key::LMOUSE;
+	case VK_RBUTTON:											return augs::window::event::keys::key::RMOUSE;
+	case VK_MBUTTON:											return augs::window::event::keys::key::MMOUSE;
+	case VK_XBUTTON1:											return augs::window::event::keys::key::MOUSE4;
+	case VK_XBUTTON2:											return augs::window::event::keys::key::MOUSE5;
+	case VK_CANCEL:											return augs::window::event::keys::key::CANCEL;
+	case VK_BACK:											return augs::window::event::keys::key::BACKSPACE;
+	case VK_TAB:											return augs::window::event::keys::key::TAB;
+	case VK_CLEAR:											return augs::window::event::keys::key::CLEAR;
+	case VK_RETURN:											return augs::window::event::keys::key::ENTER;
+	case VK_SHIFT:											return augs::window::event::keys::key::SHIFT;
+	case VK_CONTROL:											return augs::window::event::keys::key::CTRL;
+	case VK_MENU:											return augs::window::event::keys::key::ALT;
+	case VK_PAUSE:											return augs::window::event::keys::key::PAUSE;
+	case VK_CAPITAL:											return augs::window::event::keys::key::CAPSLOCK;
+	case VK_ESCAPE:											return augs::window::event::keys::key::ESC;
+	case VK_SPACE:											return augs::window::event::keys::key::SPACE;
+	case VK_PRIOR:											return augs::window::event::keys::key::PAGEUP;
+	case VK_NEXT:											return augs::window::event::keys::key::PAGEDOWN;
+	case VK_END:											return augs::window::event::keys::key::END;
+	case VK_HOME:											return augs::window::event::keys::key::HOME;
+	case VK_LEFT:											return augs::window::event::keys::key::LEFT;
+	case VK_UP:											return augs::window::event::keys::key::UP;
+	case VK_RIGHT:											return augs::window::event::keys::key::RIGHT;
+	case VK_DOWN:											return augs::window::event::keys::key::DOWN;
+	case VK_SELECT:											return augs::window::event::keys::key::SELECT;
+	case VK_PRINT:											return augs::window::event::keys::key::PRINT;
+	case VK_EXECUTE:											return augs::window::event::keys::key::EXECUTE;
+	case VK_SNAPSHOT:											return augs::window::event::keys::key::PRINTSCREEN;
+	case VK_INSERT:											return augs::window::event::keys::key::INSERT;
+	case VK_DELETE:											return augs::window::event::keys::key::DEL;
+	case VK_HELP:											return augs::window::event::keys::key::HELP;
+	case VK_LWIN:											return augs::window::event::keys::key::LWIN;
+	case VK_RWIN:											return augs::window::event::keys::key::RWIN;
+	case VK_APPS:											return augs::window::event::keys::key::APPS;
+	case VK_SLEEP:											return augs::window::event::keys::key::SLEEP;
+	case VK_NUMPAD0:											return augs::window::event::keys::key::NUMPAD0;
+	case VK_NUMPAD1:											return augs::window::event::keys::key::NUMPAD1;
+	case VK_NUMPAD2:											return augs::window::event::keys::key::NUMPAD2;
+	case VK_NUMPAD3:											return augs::window::event::keys::key::NUMPAD3;
+	case VK_NUMPAD4:											return augs::window::event::keys::key::NUMPAD4;
+	case VK_NUMPAD5:											return augs::window::event::keys::key::NUMPAD5;
+	case VK_NUMPAD6:											return augs::window::event::keys::key::NUMPAD6;
+	case VK_NUMPAD7:											return augs::window::event::keys::key::NUMPAD7;
+	case VK_NUMPAD8:											return augs::window::event::keys::key::NUMPAD8;
+	case VK_NUMPAD9:											return augs::window::event::keys::key::NUMPAD9;
+	case VK_MULTIPLY:											return augs::window::event::keys::key::MULTIPLY;
+	case VK_ADD:											return augs::window::event::keys::key::ADD;
+	case VK_SEPARATOR:											return augs::window::event::keys::key::SEPARATOR;
+	case VK_SUBTRACT:											return augs::window::event::keys::key::SUBTRACT;
+	case VK_DECIMAL:											return augs::window::event::keys::key::DECIMAL;
+	case VK_DIVIDE:											return augs::window::event::keys::key::DIVIDE;
+	case VK_F1:											return augs::window::event::keys::key::F1;
+	case VK_F2:											return augs::window::event::keys::key::F2;
+	case VK_F3:											return augs::window::event::keys::key::F3;
+	case VK_F4:											return augs::window::event::keys::key::F4;
+	case VK_F5:											return augs::window::event::keys::key::F5;
+	case VK_F6:											return augs::window::event::keys::key::F6;
+	case VK_F7:											return augs::window::event::keys::key::F7;
+	case VK_F8:											return augs::window::event::keys::key::F8;
+	case VK_F9:											return augs::window::event::keys::key::F9;
+	case VK_F10:											return augs::window::event::keys::key::F10;
+	case VK_F11:											return augs::window::event::keys::key::F11;
+	case VK_F12:											return augs::window::event::keys::key::F12;
+	case VK_F13:											return augs::window::event::keys::key::F13;
+	case VK_F14:											return augs::window::event::keys::key::F14;
+	case VK_F15:											return augs::window::event::keys::key::F15;
+	case VK_F16:											return augs::window::event::keys::key::F16;
+	case VK_F17:											return augs::window::event::keys::key::F17;
+	case VK_F18:											return augs::window::event::keys::key::F18;
+	case VK_F19:											return augs::window::event::keys::key::F19;
+	case VK_F20:											return augs::window::event::keys::key::F20;
+	case VK_F21:											return augs::window::event::keys::key::F21;
+	case VK_F22:											return augs::window::event::keys::key::F22;
+	case VK_F23:											return augs::window::event::keys::key::F23;
+	case VK_F24:											return augs::window::event::keys::key::F24;
+	case 'A':											return augs::window::event::keys::key::A;
+	case 'B':											return augs::window::event::keys::key::B;
+	case 'C':											return augs::window::event::keys::key::C;
+	case 'D':											return augs::window::event::keys::key::D;
+	case 'E':											return augs::window::event::keys::key::E;
+	case 'F':											return augs::window::event::keys::key::F;
+	case 'G':											return augs::window::event::keys::key::G;
+	case 'H':											return augs::window::event::keys::key::H;
+	case 'I':											return augs::window::event::keys::key::I;
+	case 'J':											return augs::window::event::keys::key::J;
+	case 'K':											return augs::window::event::keys::key::K;
+	case 'L':											return augs::window::event::keys::key::L;
+	case 'M':											return augs::window::event::keys::key::M;
+	case 'N':											return augs::window::event::keys::key::N;
+	case 'O':											return augs::window::event::keys::key::O;
+	case 'P':											return augs::window::event::keys::key::P;
+	case 'Q':											return augs::window::event::keys::key::Q;
+	case 'R':											return augs::window::event::keys::key::R;
+	case 'S':											return augs::window::event::keys::key::S;
+	case 'T':											return augs::window::event::keys::key::T;
+	case 'U':											return augs::window::event::keys::key::U;
+	case 'V':											return augs::window::event::keys::key::V;
+	case 'W':											return augs::window::event::keys::key::W;
+	case 'X':											return augs::window::event::keys::key::X;
+	case 'Y':											return augs::window::event::keys::key::Y;
+	case 'Z':											return augs::window::event::keys::key::Z;
+	case '0':											return augs::window::event::keys::key::_0;
+	case '1':											return augs::window::event::keys::key::_1;
+	case '2':											return augs::window::event::keys::key::_2;
+	case '3':											return augs::window::event::keys::key::_3;
+	case '4':											return augs::window::event::keys::key::_4;
+	case '5':											return augs::window::event::keys::key::_5;
+	case '6':											return augs::window::event::keys::key::_6;
+	case '7':											return augs::window::event::keys::key::_7;
+	case '8':											return augs::window::event::keys::key::_8;
+	case '9':											return augs::window::event::keys::key::_9;
+	case VK_NUMLOCK:											return augs::window::event::keys::key::NUMLOCK;
+	case VK_SCROLL:											return augs::window::event::keys::key::SCROLL;
+	case VK_LSHIFT:											return augs::window::event::keys::key::LSHIFT;
+	case VK_RSHIFT:											return augs::window::event::keys::key::RSHIFT;
+	case VK_LCONTROL:											return augs::window::event::keys::key::LCTRL;
+	case VK_RCONTROL:											return augs::window::event::keys::key::RCTRL;
+	case VK_LMENU:											return augs::window::event::keys::key::LALT;
+	case VK_RMENU:											return augs::window::event::keys::key::RALT;
+	case VK_OEM_3:											return augs::window::event::keys::key::DASH;
+	default: return augs::window::event::keys::key::INVALID;
+	}
+}
+
 namespace augs {
 	extern HINSTANCE hinst;
 
@@ -117,27 +244,31 @@ namespace augs {
 					m = WM_KEYDOWN;
 					events.repeated = ((lParam & (1 << 30)) != 0);
 				case WM_KEYDOWN:
-					//if (!((lParam & (1 << 30)) != 0)) {
-						// events.keys[wParam] = true;
-						switch(wParam) {
-						case CTRL: wParam = (lParam & 0x1000000) ? RCTRL : LCTRL; break;
-						case SHIFT: wParam = (lParam & 0x1000000) ? RSHIFT : LSHIFT; break;
-						case ALT: wParam = (lParam & 0x1000000) ? RALT : LALT; break;
-						}
-						events.key.key = key(wParam);
-						events.repeated = ((lParam & (1 << 30)) != 0);
-					//}
+				{
+					auto translated_key = translate_key(wParam);
+
+					switch (translated_key) {
+					case key::CTRL: translated_key = (lParam & 0x1000000) ? key::RCTRL : key::LCTRL; break;
+					case key::SHIFT: translated_key = (lParam & 0x1000000) ? key::RSHIFT : key::LSHIFT; break;
+					case key::ALT: translated_key = (lParam & 0x1000000) ? key::RALT : key::LALT; break;
+					}
+
+					events.key.key = translated_key;
+					events.repeated = ((lParam & (1 << 30)) != 0);
+				}
 					break;								
 
 				case WM_KEYUP:
-					//events.keys[wParam] = false;
-					switch (wParam) {
-					case CTRL: wParam = (lParam & 0x1000000) ? RCTRL : LCTRL; break;
-					case SHIFT: wParam = (lParam & 0x1000000) ? RSHIFT : LSHIFT; break;
-					case ALT: wParam = (lParam & 0x1000000) ? RALT : LALT; break;
+				{
+					auto translated_key = translate_key(wParam);
+					switch (translated_key) {
+					case key::CTRL: translated_key = (lParam & 0x1000000) ? key::RCTRL : key::LCTRL; break;
+					case key::SHIFT: translated_key = (lParam & 0x1000000) ? key::RSHIFT : key::LSHIFT; break;
+					case key::ALT: translated_key = (lParam & 0x1000000) ? key::RALT : key::LALT; break;
 					}
 
-					events.key.key = key(wParam);
+					events.key.key = translated_key;
+				}
 
 					break;
 
@@ -146,7 +277,7 @@ namespace augs {
 					break;
 				case WM_LBUTTONDBLCLK:
 				case WM_LBUTTONDOWN:
-					events.key.key = LMOUSE;
+					events.key.key = key::LMOUSE;
 					SetCapture(hwnd);
 
 					if (m == WM_LBUTTONDOWN) {
@@ -163,27 +294,27 @@ namespace augs {
 					break;
 				case WM_RBUTTONDBLCLK:
 				case WM_RBUTTONDOWN:
-					events.key.key = RMOUSE;
+					events.key.key = key::RMOUSE;
 					break;
 				case WM_MBUTTONDBLCLK:
 				case WM_MBUTTONDOWN:
-					events.key.key = MMOUSE;
+					events.key.key = key::MMOUSE;
 					break;
 				case WM_XBUTTONDBLCLK:
 				case WM_XBUTTONDOWN:
-					events.key.key = MOUSE4;
+					events.key.key = key::MOUSE4;
 					break;
 				case WM_XBUTTONUP:
-					events.key.key = MOUSE4;
+					events.key.key = key::MOUSE4;
 					break;
 				case WM_LBUTTONUP:
-					events.key.key = LMOUSE;
+					events.key.key = key::LMOUSE;
 					if(GetCapture() == hwnd) ReleaseCapture(); break;
 				case WM_RBUTTONUP:
-					events.key.key = RMOUSE;
+					events.key.key = key::RMOUSE;
 					break;
 				case WM_MBUTTONUP:
-					events.key.key = MMOUSE;
+					events.key.key = key::MMOUSE;
 					break;
 				case WM_MOUSEMOVE:
 					if (!raw_mouse_input) {
