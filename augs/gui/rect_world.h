@@ -39,7 +39,7 @@ namespace augs {
 			});
 		}
 
-		template <class gui_element_id>
+		template <class gui_element_polymorphic_id>
 		class rect_world {
 		public:
 			template<class C, class gui_element_id>
@@ -51,32 +51,33 @@ namespace augs {
 
 			window::event::state last_state;
 
-			middlescrolling<gui_element_id> middlescroll;
+			middlescrolling<gui_element_polymorphic_id> middlescroll;
 			
 			bool held_rect_is_dragged = false;
 			padding_byte pad[3];
 			
-			gui_element_id rect_hovered;
-			gui_element_id rect_held_by_lmb;
-			gui_element_id rect_held_by_rmb;
+			gui_element_polymorphic_id rect_hovered;
+			gui_element_polymorphic_id rect_held_by_lmb;
+			gui_element_polymorphic_id rect_held_by_rmb;
 
-			gui_element_id rect_in_focus;
+			gui_element_polymorphic_id rect_in_focus;
 			
 			vec2i ldrag_relative_anchor;
 			vec2i last_ldown_position;
 			vec2i current_drag_amount;
 			vec2i last_mouse_pos;
 
+			template <class gui_element_id>
 			bool is_being_dragged(const gui_element_id& id) const {
 				return rect_held_by_lmb == id && held_rect_is_dragged;
 			}
 
-			gui_element_id get_rect_in_focus() const {
+			gui_element_polymorphic_id get_rect_in_focus() const {
 				return rect_in_focus;
 			}
 
-			template<class C>
-			void set_focus(C context, const gui_element_id new_to_focus) {
+			template <class C, class gui_element_id>
+			void set_focus(C context, const gui_element_id& new_to_focus) {
 				if (new_to_focus == rect_in_focus) {
 					return;
 				}
@@ -92,7 +93,7 @@ namespace augs {
 				}
 			}
 
-			template<class C>
+			template <class C, class gui_element_id>
 			void consume_raw_input_and_generate_gui_events(C context, const gui_element_id& root, const window::event::change new_state) {
 				using namespace augs::window;
 
@@ -120,7 +121,7 @@ namespace augs {
 						}
 
 						current_drag_amount.set(0, 0);
-						rect_held_by_lmb = gui_element_id();
+						rect_held_by_lmb.unset();
 						held_rect_is_dragged = false;
 					}
 				}
@@ -137,7 +138,7 @@ namespace augs {
 						}
 
 						current_drag_amount.set(0, 0);
-						rect_held_by_rmb = gui_element_id();
+						rect_held_by_rmb.unset();
 					}
 				}
 
@@ -204,14 +205,14 @@ namespace augs {
 				}
 			}
 
-			template <class C>
+			template <class C, class gui_element_id>
 			void build_tree_data_into_context(C context, const gui_element_id& root) const {
 				context(root, [&](const auto& r) { 
 					r.build_tree_data(context, root); 
 				});
 			}
 
-			template<class C>
+			template <class C, class gui_element_id>
 			void perform_logic_step(C context, const gui_element_id& root, const fixed_delta& delta) {
 				context(root, [&](auto& r) { 
 					r.perform_logic_step(context, root, delta);
@@ -220,7 +221,7 @@ namespace augs {
 				middlescroll.perform_logic_step(context, delta);
 			}
 			
-			template<class C>
+			template <class C, class gui_element_id>
 			void call_idle_mousemotion_updater(C context, const gui_element_id& root) {
 				window::event::change fabricated_state;
 				fabricated_state.msg = window::event::message::mousemotion;
@@ -237,7 +238,7 @@ namespace augs {
 				}
 			}
 
-			template<class C>
+			template <class C, class gui_element_id>
 			vertex_triangle_buffer draw_triangles(C context, const gui_element_id& root) const {
 				vertex_triangle_buffer buffer;
 				draw_info in(*this, buffer);

@@ -7,12 +7,12 @@
 
 namespace augs {
 	namespace gui {
-		template <class gui_element_id>
+		template <class gui_element_polymorphic_id>
 		struct middlescrolling {
 			material mat;
 			rects::wh<float> size = rects::wh<float>(25, 25);
 			vec2i middlescroll_icon_position;
-			gui_element_id subject;
+			gui_element_polymorphic_id subject;
 			float speed_mult = 1.f;
 
 			template<class C>
@@ -28,7 +28,7 @@ namespace augs {
 			bool handle_new_raw_state(C context, const window::event::change& state) {
 				if (context.alive(subject)) {
 					if (state.msg == window::event::message::mdown || state.msg == window::event::message::mdoubleclick)
-						subject = gui_element_id();
+						subject.unset();
 
 					return true;
 				}
@@ -41,7 +41,7 @@ namespace augs {
 				if (context.alive(subject)) {
 					rects::ltrb<float> scroller = rects::wh<float>(size);
 					scroller.center(pos);
-					draw_clipped_rectangle(mat, scroller, context(subject, [](const auto& r) {return static_cast<rect_node&>(subject); }), in.v);
+					draw_clipped_rectangle(mat, scroller, context, subject, in.v);
 				}
 			}
 		};
