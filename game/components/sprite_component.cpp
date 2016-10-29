@@ -21,11 +21,12 @@ namespace components {
 		camera_transform = state.camera_transform;
 	}
 
-	void sprite::make_rect(vec2 pos, vec2 size, float angle, std::array<vec2, 4>& v, bool pos_at_center) {
+	void sprite::make_rect(const vec2 pos, const vec2 size, const float angle, std::array<vec2, 4>& v, const drawing_input::positioning_type positioning) {
 		vec2 origin = pos;
 		
-		if(pos_at_center)
+		if (positioning == drawing_input::positioning_type::CENTER) {
 			origin += size / 2.f;
+		}
 
 		v[0] = pos;
 		v[1] = pos + vec2(size.x, 0.f);
@@ -37,7 +38,7 @@ namespace components {
 		v[2].rotate(angle, origin);
 		v[3].rotate(angle, origin);
 
-		if (pos_at_center) {
+		if (positioning == drawing_input::positioning_type::CENTER) {
 			v[0] -= size / 2.f;
 			v[1] -= size / 2.f;
 			v[2] -= size / 2.f;
@@ -69,7 +70,7 @@ namespace components {
 		float final_rotation = in.renderable_transform.rotation + rotation_offset;
 
 		if (in.screen_space_mode) {
-			make_rect(transform_pos + get_size()/2, get_size(), final_rotation, v, true);
+			make_rect(transform_pos + get_size()/2, get_size(), final_rotation, v, in.positioning);
 		}
 		else {
 			auto center = in.visible_world_area / 2;
@@ -79,7 +80,7 @@ namespace components {
 			if (center_offset.non_zero())
 				target_position -= vec2(center_offset).rotate(final_rotation, vec2(0, 0));
 
-			make_rect(target_position, get_size(), final_rotation, v, !in.position_is_left_top_corner);
+			make_rect(target_position, get_size(), final_rotation, v, in.positioning);
 
 			/* rotate around the center of the screen */
 			if (in.camera_transform.rotation != 0.f)
@@ -143,13 +144,10 @@ namespace components {
 		return std::move(out);
 	}
 	
-	augs::rects::ltrb<float> sprite::get_aabb(components::transform transform, bool screen_space_mode) const {
+	augs::rects::ltrb<float> sprite::get_aabb(const components::transform& transform) const {
 		std::array<vec2, 4> v;		
 		
-		if (screen_space_mode)
-			make_rect(transform.pos + get_size() / 2, get_size(), transform.rotation + rotation_offset, v, true);
-		else
-			make_rect(transform.pos, get_size(), transform.rotation + rotation_offset, v, true);
+		make_rect(transform.pos, get_size(), transform.rotation + rotation_offset, v, drawing_input::positioning_type::CENTER);
 
 		return augs::get_aabb(v);
 	}

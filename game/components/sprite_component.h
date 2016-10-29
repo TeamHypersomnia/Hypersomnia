@@ -19,7 +19,13 @@ namespace components {
 			vec2 visible_world_area;
 
 			bool screen_space_mode = false;
-			bool position_is_left_top_corner = false;
+			
+			enum class positioning_type : unsigned char {
+				LEFT_TOP_CORNER,
+				CENTER
+			};
+
+			positioning_type positioning = positioning_type::CENTER;
 
 			augs::rgba colorize = augs::white;
 
@@ -53,7 +59,7 @@ namespace components {
 			);
 		}
 
-		static void make_rect(vec2 pos, vec2 size, float rotation_degrees, std::array<vec2, 4>& out, bool pos_at_center);
+		static void make_rect(const vec2 pos, const vec2 size, const float rotation_degrees, std::array<vec2, 4>& out, const drawing_input::positioning_type positioning);
 
 		vec2 get_size() const;
 
@@ -63,6 +69,6 @@ namespace components {
 		void draw(const drawing_input&) const;
 
 		std::vector<vec2> get_vertices() const;
-		augs::rects::ltrb<float> get_aabb(components::transform, bool screen_space_mode = false) const;
+		augs::rects::ltrb<float> get_aabb(const components::transform&) const;
 	};
 }
