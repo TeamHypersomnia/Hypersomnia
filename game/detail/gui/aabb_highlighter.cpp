@@ -65,7 +65,7 @@ void aabb_highlighter::draw(viewing_step& step, const_entity_handle subject) con
 	if (aabb.good()) {
 		components::sprite::drawing_input state(step.renderer.triangles);
 		state.setup_from(step.camera_state);
-		state.position_is_left_top_corner = true;
+		state.positioning = components::sprite::drawing_input::positioning_type::LEFT_TOP_CORNER;
 		state.renderable_transform.rotation = 0;
 
 		components::sprite border;
