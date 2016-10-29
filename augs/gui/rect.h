@@ -238,21 +238,20 @@ namespace augs {
 			}
 
 			template<class C>
-			void draw(C context, draw_info in) const {
+			void draw(C context, const gui_element_id& this_id, draw_info in) const {
 				if (!get_flag(flag::ENABLE_DRAWING_OF_CHILDREN)) {
 					return;
 				}
 
-				draw_children(context, in);
+				draw_children(context, this_id, in);
 			}
 
 			template <class C>
-			void draw_children(C context, draw_info in) const {
+			void draw_children(C context, const gui_element_id& this_id, draw_info in) const {
 				this_call([&](const auto& r) {
-					r.for_each_child(context, this_id, [&](const auto& r, const gui_element_id& id) {
+					r.for_each_child(context, this_id, [&](const auto& r, const gui_element_id& child_id) {
 						if (r.get_flag(flag::ENABLE_DRAWING)) {
-							r.draw(context, in);
-							r.draw_children(context, in);
+							r.draw(context, child_id, in);
 						}
 					});
 				});
