@@ -3,6 +3,7 @@
 #include "augs/gui/rect_world.h"
 #include "game/transcendental/entity_id.h"
 #include "game/detail/gui/special_drag_and_drop_target.h"
+#include "game/detail/gui/location_and_pointer.h"
 #include "game/enums/slot_function.h"
 #include "augs/ensure.h"
 
@@ -72,118 +73,6 @@ namespace components {
 
 		typedef std::unordered_map<gui_element_location, gui_tree_entry> gui_element_tree;
 
-		template <bool is_const>
-		class basic_dispatcher_context {
-
-		public:
-			typedef std::conditional_t<is_const, viewing_step, fixed_step>& step_ref;
-			typedef maybe_const_ref_t<is_const, gui_element> gui_element_ref;
-			typedef maybe_const_ref_t<is_const, game_gui_rect_world> game_gui_rect_world_ref;
-
-			basic_dispatcher_context(step_ref step, basic_entity_handle<is_const> handle, gui_element_ref elem, gui_element_tree& tree) :
-				step(step), 
-				handle(handle),
-				//composite_for_iteration(parent),
-				elem(elem),
-				tree(tree)
-				{}
-
-			step_ref step;
-			basic_entity_handle<is_const> handle;
-			gui_element_ref elem;
-			gui_element_tree& tree;
-
-			basic_entity_handle<is_const> get_gui_element_entity() const {
-				return handle;
-			}
-			//parent_of_inventory_controls_rect& composite_for_iteration;
-
-			step_ref get_step() const {
-				return step;
-			}
-
-			gui_element_ref get_gui_element_component() const {
-				return elem;
-			}
-
-			game_gui_rect_world_ref get_rect_world() const {
-				return elem.rect_world;
-			}
-
-			gui_tree_entry& get_tree_entry(const gui_element_location& id) {
-				if (gui_tree.find(id) == gui_tree.end()) {
-					gui_tree.emplace(id, gui_tree_entry(operator()(id, [](const auto& resolved_ref) { 
-						return static_cast<const augs::gui::rect_node_data&>(resolved_ref); 
-					})));
-				}
-
-				return gui_tree.at(id);
-			}
-
-			const gui_tree_entry& get_tree_entry(const gui_element_location& id) const {
-				return gui_tree.at(id);
-			}
-
-			bool alive(const gui_element_location& id) const {
-				return id.is_set() && id.call([this](const auto& resolved) {
-					return resolved.alive(*this);
-				});
-			}
-			
-			bool dead(const gui_element_location& id) const {
-				return !alive(id);
-			}
-
-			operator basic_dispatcher_context<true>() const {
-				return{ step, handle, elem, tree };
-			}
-
-			template<class L>
-			decltype(auto) operator()(const gui_element_location& id, L generic_call) const {
-				return id.call([&](const auto& resolved_location) {
-					return resolved_location.get_object_at_location_and_call(*this, generic_call);
-				});
-			}
-
-			template<class Casted>
-			struct pointer_caster {
-				template <class Candidate>
-				maybe_const_ptr_t<is_const, Casted> operator()(maybe_const_ref_t<is_const, Candidate> object) {
-					if (std::is_same<Casted, Candidate>::value || std::is_base_of<Casted, Candidate>::value) {
-						return reinterpret_cast<Casted*>(&object);
-					}
-
-					return nullptr;
-				}
-			};
-
-			template<class T>
-			maybe_const_ptr_t<is_const, T> get_pointer(const gui_element_location& id) const {
-				if (dead(id)) {
-					return nullptr;
-					//return static_cast<maybe_const_ptr<is_const, T>>(nullptr);
-				}
-
-				return id.call([&](const auto& resolved_location) const {
-					return resolved_location.get_object_at_location_and_call(*this, pointer_caster<T>());
-				});
-			}
-
-			template<class T>
-			maybe_const_ptr_t<is_const, T> get_alive_location_pointer(const gui_element_location& id) const {
-				static_assert(tuple_contains_type<T, typename decltype(id)::types_tuple>::value, "Invalid location type!");
-
-				if (dead(id)) {
-					return nullptr;
-				}
-
-				return &id.get<T>();
-			}
-		};
-
-		typedef basic_dispatcher_context<false> dispatcher_context;
-		typedef basic_dispatcher_context<true> const_dispatcher_context;
-
 		game_gui_rect_world rect_world;
 		vec2 gui_crosshair_position;
 		int dragged_charges = 0;
@@ -206,7 +95,6 @@ namespace components {
 		//
 		//void consume_raw_input(augs::window::event::change&);
 		//
-		//entity_id get_hovered_world_entity(vec2 camera_pos);
 		//drag_and_drop_result prepare_drag_and_drop_result() const;
 		//
 
@@ -215,6 +103,8 @@ namespace components {
 		vec2 initial_inventory_root_position() const;
 		
 		void draw_cursor_and_tooltip(const const_dispatcher_context&) const;
+		
+		static entity_id get_hovered_world_entity(const cosmos& cosm, const vec2& world_cursor_position);
 		static void draw_complete_gui_for_camera_rendering_request(const const_entity_handle& handle, viewing_step&);
 	};
 }

@@ -6,10 +6,22 @@
 #include "game/detail/gui/drag_and_drop.h"
 #include "game/components/container_component.h"
 #include "game/components/item_slot_transfers_component.h"
+#include "game/components/name_component.h"
 #include "game/components/item_component.h"
+#include "game/systems_stateless/render_system.h"
 
 #include "game/detail/gui/drag_and_drop.h"
+#include "game/detail/gui/aabb_highlighter.h"
 #include "augs/graphics/renderer.h"
+#include "game/enums/filters.h"
+
+#include "augs/gui/stroke.h"
+
+#include "game/detail/entity_description.h"
+
+using namespace augs;
+using namespace augs::gui;
+using namespace augs::gui::text;
 
 namespace components {
 	gui_element::gui_element() :
@@ -67,6 +79,7 @@ namespace components {
 	void gui_element::draw_cursor_and_tooltip(const const_dispatcher_context& context) const {
 		auto& drag_result = prepare_drag_and_drop_result(context);
 		auto& step = context.get_step();
+		const auto& cosmos = step.get_cosmos();
 
 		auto& output_buffer = context.get_step().renderer.get_triangle_buffer();
 		components::sprite::drawing_input state(output_buffer);
@@ -76,13 +89,13 @@ namespace components {
 
 		gui::draw_info in(output_buffer);
 
-		const item_button * const dragged_item = context.get_pointer<item_button>(drag_result.dragged_item);
+		const auto& dragged_item = drag_result.dragged_item;
 
 		if (dragged_item) {
-			dragged_item->draw_complete_dragged_ghost(in);
+			dragged_item->draw_complete_dragged_ghost(context, in);
 
 			if (!drag_result.possible_target_hovered)
-				drag_result.dragged_item->draw_grid_border_ghost(in);
+				drag_result.dragged_item->draw_grid_border_ghost(context, in);
 		}
 
 		components::sprite bg_sprite;
@@ -127,58 +140,61 @@ namespace components {
 			bg_sprite.draw(state);
 
 			gui::solid_stroke stroke;
-			stroke.set_material(gui::material(assets::BLANK, slightly_visible_white));
+			stroke.set_material(gui::material(assets::texture_id::BLANK, slightly_visible_white));
 
-			stroke.draw(out, rects::ltrb<float>(gui_crosshair_position, bg_sprite.size));
+			stroke.draw(output_buffer, rects::ltrb<float>(gui_crosshair_position, bg_sprite.size));
 
-			tooltip_drawer.draw_stroke(out, black);
-			tooltip_drawer.draw(out);
+			tooltip_drawer.draw_stroke(output_buffer, black);
+			tooltip_drawer.draw(output_buffer);
 		}
 
 		if (dragged_item != nullptr) {
-			auto& item = dragged_item->item->get<components::item>();
-
-			dragged_charges = std::min(dragged_charges, item.charges);
+			auto& item = cosmos[dragged_item.get_location().item_id]->get<components::item>();
 
 			if (item.charges > 1) {
 				auto charges_text = to_wstring(dragged_charges);
+				
+				augs::gui::text_drawer dragged_charges_drawer;
 
-				dragged_charges_drawer.set_text(text::format(charges_text, text::style()));
+				dragged_charges_drawer.set_text(augs::gui::text::format(charges_text, text::style()));
 				dragged_charges_drawer.pos = gui_crosshair_position + vec2i(0, cursor_sprite.size.y);
 
-				dragged_charges_drawer.draw_stroke(out, black);
-				dragged_charges_drawer.draw(out);
+				dragged_charges_drawer.draw_stroke(output_buffer, black);
+				dragged_charges_drawer.draw(output_buffer);
 			}
 		}
 
 		state.renderable_transform.pos = gui_crosshair_position;
 		cursor_sprite.draw(state);
 
-		auto* maybe_hovered_item = dynamic_cast<item_button*>(rect_hovered);
-		auto* maybe_hovered_slot = dynamic_cast<slot_button*>(rect_hovered);
-		bool is_dragging = rect_held_by_lmb && held_rect_is_dragged;
+		const auto& maybe_hovered_item = context._dynamic_cast<item_button>(rect_world.rect_hovered);
+		const auto& maybe_hovered_slot = context._dynamic_cast<item_button>(rect_world.rect_hovered);
+		
+		bool is_dragging = context.alive(rect_world.rect_held_by_lmb) && rect_world.held_rect_is_dragged;
 
 		if (!is_dragging) {
 			gui::text::fstr tooltip_text;
 
 			if (maybe_hovered_item) {
-				tooltip_text = text::simple_bbcode(describe_entity(maybe_hovered_item->item), text::style(assets::GUI_FONT, vslightgray));
+				tooltip_text = text::simple_bbcode(describe_entity(cosmos[maybe_hovered_item.get_location().item_id]), text::style(assets::font_id::GUI_FONT, vslightgray));
 			}
 			else if (maybe_hovered_slot) {
-				tooltip_text = text::simple_bbcode(describe_slot(maybe_hovered_slot->slot_id), text::style());
+				tooltip_text = text::simple_bbcode(describe_slot(cosmos[maybe_hovered_slot.get_location().slot_id]), text::style());
 			}
 			else {
-				auto hovered = get_hovered_world_entity(r.state.camera_transform.pos);
+				auto hovered = cosmos[get_hovered_world_entity(cosmos, step.camera_state.camera_transform.pos + rect_world.last_state.mouse.pos - step.camera_state.visible_world_area /2)];
 
 				if (hovered.alive()) {
-					step.world_hover_highlighter.update(delta_milliseconds());
-					step.world_hover_highlighter.draw(r.state, hovered);
+					step.world_hover_highlighter.update(step.get_delta().in_milliseconds());
+					step.world_hover_highlighter.draw(step, hovered);
 
-					tooltip_text = text::simple_bbcode(describe_entity(hovered), text::style(assets::GUI_FONT, vslightgray));
+					tooltip_text = text::simple_bbcode(describe_entity(hovered), text::style(assets::font_id::GUI_FONT, vslightgray));
 				}
 			}
 
 			if (tooltip_text.size() > 0) {
+				augs::gui::text_drawer description_drawer;
+
 				state.renderable_transform.pos = bottom_right_corner;
 				bg_sprite.size.set(description_drawer.get_bbox());
 				bg_sprite.draw(state);
@@ -186,8 +202,44 @@ namespace components {
 				description_drawer.set_text(tooltip_text);
 				description_drawer.pos = bottom_right_corner;
 
-				description_drawer.draw(out);
+				description_drawer.draw(output_buffer);
 			}
 		}
+	}
+
+	entity_id gui_element::get_hovered_world_entity(const cosmos& cosm, const vec2& world_cursor_position) {
+		auto& physics = cosm.systems_temporary.get<physics_system>();
+
+		auto cursor_pointing_at = world_cursor_position;
+
+		std::vector<vec2> v{ cursor_pointing_at, cursor_pointing_at + vec2(1, 0), cursor_pointing_at + vec2(1, 1) , cursor_pointing_at + vec2(0, 1) };
+		auto hovered = physics.query_polygon(v, filters::renderable_query());
+
+		if (hovered.entities.size() > 0) {
+			std::vector<entity_id> sorted_by_visibility(hovered.entities.begin(), hovered.entities.end());
+
+			sorted_by_visibility.erase(std::remove_if(sorted_by_visibility.begin(), sorted_by_visibility.end(), [&](entity_id e) {
+				return cosm[e].find<components::render>() == nullptr;
+			}), sorted_by_visibility.end());
+
+			std::sort(sorted_by_visibility.begin(), sorted_by_visibility.end(), [&](entity_id a, entity_id b) {
+				return render_system::render_order_compare(cosm[a], cosm[b]);
+			});
+
+			std::vector<entity_id> hovered_and_named;
+
+			for (auto h : sorted_by_visibility) {
+				auto named = get_first_named_ancestor(cosm[h]);
+
+				if (cosm[named].alive())
+					hovered_and_named.push_back(named);
+			}
+
+			if (hovered_and_named.size() > 0) {
+				return *hovered_and_named.begin();
+			}
+		}
+
+		return entity_id();
 	}
 }
