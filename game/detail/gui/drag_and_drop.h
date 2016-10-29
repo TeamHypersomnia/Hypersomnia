@@ -5,11 +5,11 @@
 
 #include "game/detail/gui/gui_element_location.h"
 
-class item_button;
+struct item_button;
 
 struct drag_and_drop_result {
 	item_slot_transfer_request_data simulated_request;
-	item_button_for_item_component_location dragged_item_location;
+	gui_element_location dragged_item;
 	bool possible_target_hovered = false;
 	bool target_slot_alive = false;
 	item_transfer_result result;
@@ -37,7 +37,7 @@ drag_and_drop_result prepare_drag_and_drop_result(C context) {
 		const auto* dragged_item_location = context.get_alive_location_pointer<item_type>(held_rect_id);
 
 		if (dragged_item_location && context.alive(drop_target_rect_id)) {
-			out.dragged_item_location = *dragged_item_location;
+			out.dragged_item.set(*dragged_item_location);
 			
 			const auto& dragged_item_handle = cosmos[dragged_item_location->item_id];
 

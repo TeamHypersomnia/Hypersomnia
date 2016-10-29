@@ -148,7 +148,7 @@ namespace components {
 			template<class Casted>
 			struct pointer_caster {
 				template <class Candidate>
-				maybe_const_ptr<is_const, Casted> operator()(maybe_const_ref_t<is_const, Candidate> object) {
+				maybe_const_ptr_t<is_const, Casted> operator()(maybe_const_ref_t<is_const, Candidate> object) {
 					if (std::is_same<Casted, Candidate>::value || std::is_base_of<Casted, Candidate>::value) {
 						return reinterpret_cast<Casted*>(&object);
 					}
@@ -158,7 +158,7 @@ namespace components {
 			};
 
 			template<class T>
-			maybe_const_ptr<is_const, T> get_pointer(const gui_element_location& id) {
+			maybe_const_ptr_t<is_const, T> get_pointer(const gui_element_location& id) const {
 				if (dead(id)) {
 					return nullptr;
 					//return static_cast<maybe_const_ptr<is_const, T>>(nullptr);
@@ -170,7 +170,7 @@ namespace components {
 			}
 
 			template<class T>
-			maybe_const_ptr<is_const, T> get_alive_location_pointer(const gui_element_location& id) {
+			maybe_const_ptr_t<is_const, T> get_alive_location_pointer(const gui_element_location& id) const {
 				static_assert(tuple_contains_type<T, typename decltype(id)::types_tuple>::value, "Invalid location type!");
 
 				if (dead(id)) {

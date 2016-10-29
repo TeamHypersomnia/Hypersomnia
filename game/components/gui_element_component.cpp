@@ -43,7 +43,7 @@ namespace components {
 	}
 
 	vec2 gui_element::initial_inventory_root_position() const {
-		return vec2(size.x - 250, size.y - 200);
+		return vec2(size.x - 250.f, size.y - 200.f);
 	}
 
 	void gui_element::draw_complete_gui_for_camera_rendering_request(const const_entity_handle& root, viewing_step& step) {
@@ -68,39 +68,41 @@ namespace components {
 		auto& drag_result = prepare_drag_and_drop_result(context);
 		auto& step = context.get_step();
 
-		components::sprite::drawing_input state(context.get_step().renderer.triangles);
+		auto& output_buffer = context.get_step().renderer.get_triangle_buffer();
+		components::sprite::drawing_input state(output_buffer);
 
 		state.setup_from(step.camera_state);
 		state.screen_space_mode = true;
 
-		auto& out = state.output->get_triangle_buffer();
-		gui::rect::draw_info in(*this, out);
+		gui::draw_info in(output_buffer);
 
-		if (drag_result.dragged_item) {
-			drag_result.dragged_item->draw_complete_dragged_ghost(in);
+		const item_button * const dragged_item = context.get_pointer<item_button>(drag_result.dragged_item);
+
+		if (dragged_item) {
+			dragged_item->draw_complete_dragged_ghost(in);
 
 			if (!drag_result.possible_target_hovered)
 				drag_result.dragged_item->draw_grid_border_ghost(in);
 		}
 
 		components::sprite bg_sprite;
-		bg_sprite.set(assets::BLANK, black);
+		bg_sprite.set(assets::texture_id::BLANK, black);
 		bg_sprite.color.a = 120;
 
-		auto gui_cursor = assets::GUI_CURSOR;
+		auto gui_cursor = assets::texture_id::GUI_CURSOR;
 		auto gui_cursor_color = cyan;
 
 		if (drag_result.possible_target_hovered) {
 			if (drag_result.will_item_be_disposed()) {
-				gui_cursor = assets::GUI_CURSOR_MINUS;
+				gui_cursor = assets::texture_id::GUI_CURSOR_MINUS;
 				gui_cursor_color = red;
 			}
 			else if (drag_result.will_drop_be_successful()) {
-				gui_cursor = assets::GUI_CURSOR_ADD;
+				gui_cursor = assets::texture_id::GUI_CURSOR_ADD;
 				gui_cursor_color = green;
 			}
 			else if (drag_result.result.result != item_transfer_result_type::THE_SAME_SLOT) {
-				gui_cursor = assets::GUI_CURSOR_ERROR;
+				gui_cursor = assets::texture_id::GUI_CURSOR_ERROR;
 				gui_cursor_color = red;
 			}
 		}
@@ -110,10 +112,12 @@ namespace components {
 		vec2i left_top_corner = gui_crosshair_position;
 		vec2i bottom_right_corner = gui_crosshair_position + cursor_sprite.size;
 
-		bool draw_tooltip = drag_result.possible_target_hovered;
+		const bool draw_tooltip = drag_result.possible_target_hovered;
+		
 		if (draw_tooltip) {
+			augs::gui::text_drawer tooltip_drawer;
 
-			tooltip_drawer.set_text(text::format(drag_result.tooltip_text, text::style()));
+			tooltip_drawer.set_text(gui::text::format(drag_result.tooltip_text, gui::text::style()));
 			tooltip_drawer.pos = gui_crosshair_position + vec2i(cursor_sprite.size.x + 2, 0);
 
 			state.renderable_transform.pos = left_top_corner;
@@ -131,8 +135,8 @@ namespace components {
 			tooltip_drawer.draw(out);
 		}
 
-		if (drag_result.dragged_item) {
-			auto& item = drag_result.dragged_item->item->get<components::item>();
+		if (dragged_item != nullptr) {
+			auto& item = dragged_item->item->get<components::item>();
 
 			dragged_charges = std::min(dragged_charges, item.charges);
 
