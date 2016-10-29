@@ -2,7 +2,6 @@
 #include "augs/graphics/pixel.h"
 #include "game/assets/texture_id.h"
 #include "augs/graphics/vertex.h"
-#include "gui_element_id.h"
 
 namespace augs {
 	namespace gui {

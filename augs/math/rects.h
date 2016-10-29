@@ -8,10 +8,6 @@
 struct b2Vec2;
 
 namespace augs {
-	namespace window {
-		class glwindow;
-	}
-
 	/* faciliates operations on rectangles and points */
 	namespace rects {
 		enum sticking {
@@ -453,3 +449,5 @@ namespace augs {
 		extern std::ostream& operator<<(std::ostream&, const vec2t<T>&);
 	}
 }
+
+using namespace augs;
