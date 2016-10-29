@@ -29,7 +29,7 @@ float32 physics_system::raycast_input::ReportFixture(b2Fixture* fixture, const b
 }
 
 std::vector<physics_system::raycast_output> physics_system::ray_cast_all_intersections
-(vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity) {
+(vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity) const {
 	++ray_casts_since_last_step;
 
 	raycast_input callback;
@@ -69,7 +69,7 @@ physics_system::edge_edge_output physics_system::edge_edge_intersection(vec2 p1_
 	return out;
 }
 
-float physics_system::get_closest_wall_intersection(vec2 position, float radius, int ray_amount, b2Filter filter, entity_id ignore_entity) {
+float physics_system::get_closest_wall_intersection(vec2 position, float radius, int ray_amount, b2Filter filter, entity_id ignore_entity) const {
 	float worst_distance = radius;
 
 	for (int i = 0; i < ray_amount; ++i) {
@@ -86,7 +86,7 @@ float physics_system::get_closest_wall_intersection(vec2 position, float radius,
 	return worst_distance;
 }
 
-vec2 physics_system::push_away_from_walls(vec2 position, float radius, int ray_amount, b2Filter filter, entity_id ignore_entity) {
+vec2 physics_system::push_away_from_walls(vec2 position, float radius, int ray_amount, b2Filter filter, entity_id ignore_entity) const {
 	vec2 resultant;
 
 	float worst_distance = radius;
@@ -108,7 +108,7 @@ vec2 physics_system::push_away_from_walls(vec2 position, float radius, int ray_a
 	else return position;
 }
 
-physics_system::raycast_output physics_system::ray_cast(vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity) {
+physics_system::raycast_output physics_system::ray_cast(vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity) const {
 	++ray_casts_since_last_step;
 
 	raycast_input callback;
@@ -124,7 +124,7 @@ physics_system::raycast_output physics_system::ray_cast(vec2 p1_meters, vec2 p2_
 	return callback.output;
 }
 
-physics_system::raycast_output physics_system::ray_cast_px(vec2 p1, vec2 p2, b2Filter filter, entity_id ignore_entity) {
+physics_system::raycast_output physics_system::ray_cast_px(vec2 p1, vec2 p2, b2Filter filter, entity_id ignore_entity) const {
 	auto out = ray_cast(p1 * PIXELS_TO_METERSf, p2 * PIXELS_TO_METERSf, filter, ignore_entity);
 	out.intersection *= METERS_TO_PIXELSf;
 
@@ -142,14 +142,14 @@ bool physics_system::query_aabb_input::ReportFixture(b2Fixture* fixture) {
 	return true;
 }
 
-physics_system::query_aabb_output physics_system::query_square(vec2 p1_meters, float side_meters, b2Filter filter, entity_id ignore_entity) {
+physics_system::query_aabb_output physics_system::query_square(vec2 p1_meters, float side_meters, b2Filter filter, entity_id ignore_entity) const {
 	b2AABB aabb;
 	aabb.lowerBound = p1_meters - side_meters / 2;
 	aabb.upperBound = p1_meters + side_meters / 2;
 	return query_aabb(aabb.lowerBound, aabb.upperBound, filter, ignore_entity);
 }
 
-physics_system::query_aabb_output physics_system::query_square_px(vec2 p1, float side, b2Filter filter, entity_id ignore_entity) {
+physics_system::query_aabb_output physics_system::query_square_px(vec2 p1, float side, b2Filter filter, entity_id ignore_entity) const {
 	return query_square(p1 * PIXELS_TO_METERSf, side * PIXELS_TO_METERSf, filter, ignore_entity);
 }
 
@@ -166,7 +166,7 @@ physics_system::query_aabb_output physics_system::query_aabb(vec2 p1_meters, vec
 	return callback.out;
 }
 
-physics_system::query_output physics_system::query_body(const_entity_handle subject, b2Filter filter, entity_id ignore_entity) {
+physics_system::query_output physics_system::query_body(const_entity_handle subject, b2Filter filter, entity_id ignore_entity) const {
 	query_output total_output;
 
 	auto cache = get_rigid_body_cache(subject);
@@ -183,7 +183,7 @@ physics_system::query_output physics_system::query_body(const_entity_handle subj
 	return total_output;
 }
 
-physics_system::query_output physics_system::query_polygon(const std::vector<vec2>& vertices, b2Filter filter, entity_id ignore_entity) {
+physics_system::query_output physics_system::query_polygon(const std::vector<vec2>& vertices, b2Filter filter, entity_id ignore_entity) const {
 	b2PolygonShape poly_shape;
 	std::vector<b2Vec2> verts;
 
@@ -194,7 +194,7 @@ physics_system::query_output physics_system::query_polygon(const std::vector<vec
 	return query_shape(&poly_shape, filter, ignore_entity);
 }
 
-physics_system::query_output physics_system::query_shape(b2Shape* shape, b2Filter filter, entity_id ignore_entity) {
+physics_system::query_output physics_system::query_shape(b2Shape* shape, b2Filter filter, entity_id ignore_entity) const {
 	b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
 
 	query_aabb_input callback;
