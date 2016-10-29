@@ -26,7 +26,7 @@ public:
 
 	const cosmos& cosm;
 	const immediate_hud& hud;
-	const aabb_highlighter& world_hover_highlighter;
+	aabb_highlighter& world_hover_highlighter;
 	augs::variable_delta delta;
 	augs::renderer& renderer;
 
