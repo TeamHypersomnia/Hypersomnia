@@ -26,68 +26,72 @@ class fixed_step;
 
 namespace components {
 	struct gui_element {
+		class gui_tree_entry {
+			const augs::gui::rect_node_data& node_data;
+			gui_element_location parent;
+			vec2 absolute_position;
+		public:
+			gui_tree_entry(const augs::gui::rect_node_data& node_data) : node_data(node_data) {}
+
+			void set_parent(const gui_element_location& id) {
+				parent = id;
+			}
+
+			void set_absolute_clipping_rect(const rects::ltrb<float>&) {
+
+			}
+
+			rects::ltrb<float> set_absolute_clipped_rect(const rects::ltrb<float>&) {
+
+			}
+
+			void set_absolute_pos(const vec2& v) {
+				absolute_position = v;
+			}
+
+			gui_element_location get_parent() const {
+				return parent;
+			}
+
+			rects::ltrb<float> get_absolute_rect() const {
+				return rects::xywh<float>(absolute_position.x, absolute_position.y, node_data.rc.w(), node_data.rc.h());
+			}
+
+			rects::ltrb<float> get_absolute_clipping_rect() const {
+				return rects::ltrb<float>(0.f, 0.f, std::numeric_limits<int>::max() / 2.f, std::numeric_limits<int>::max() / 2.f);
+			}
+
+			rects::ltrb<float> get_absolute_clipped_rect() const {
+				return node_data.rc;
+			}
+
+			vec2 get_absolute_pos() const {
+				return absolute_position;
+			}
+		};
+
+		typedef std::unordered_map<gui_element_location, gui_tree_entry> gui_element_tree;
+
 		template <bool is_const>
 		class basic_dispatcher_context {
-			class gui_tree_entry {
-				const augs::gui::rect_node_data& node_data;
-				gui_element_location parent;
-				vec2 absolute_position;
-			public:
-				gui_tree_entry(const augs::gui::rect_node_data& node_data) : node_data(node_data) {}
-
-				void set_parent(const gui_element_location& id) {
-					parent = id;
-				}
-
-				void set_absolute_clipping_rect(const rects::ltrb<float>&) {
-
-				}
-
-				rects::ltrb<float> set_absolute_clipped_rect(const rects::ltrb<float>&) {
-
-				}
-
-				void set_absolute_pos(const vec2& v) {
-					absolute_position = v;
-				}
-
-				gui_element_location get_parent() const {
-					return parent;
-				}
-
-				rects::ltrb<float> get_absolute_rect() const {
-					return rects::xywh<float>(absolute_position.x, absolute_position.y, node_data.rc.w(), node_data.rc.h());
-				}
-
-				rects::ltrb<float> get_absolute_clipping_rect() const {
-					return rects::ltrb<float>(0.f, 0.f, std::numeric_limits<int>::max() / 2.f, std::numeric_limits<int>::max() / 2.f);
-				}
-
-				rects::ltrb<float> get_absolute_clipped_rect() const {
-					return node_data.rc;
-				}
-
-				vec2 get_absolute_pos() const {
-					return absolute_position;
-				}
-			};
-
-			std::unordered_map<gui_element_location, gui_tree_entry> gui_tree;
 
 		public:
 			typedef std::conditional_t<is_const, viewing_step, fixed_step>& step_ref;
 			typedef maybe_const_ref_t<is_const, gui_element> gui_element_ref;
 			typedef maybe_const_ref_t<is_const, game_gui_rect_world> game_gui_rect_world_ref;
 
-			basic_dispatcher_context(step_ref step, basic_entity_handle<is_const> gui_element_entity, gui_element_ref elem) :
+			basic_dispatcher_context(step_ref step, basic_entity_handle<is_const> handle, gui_element_ref elem, gui_element_tree& tree) :
 				step(step), 
-				handle(gui_element_entity),
+				handle(handle),
 				//composite_for_iteration(parent),
-				elem(elem) {}
+				elem(elem),
+				tree(tree)
+				{}
 
 			step_ref step;
-			gui_element_ref elem;
 			basic_entity_handle<is_const> handle;
+			gui_element_ref elem;
+			gui_element_tree& tree;
 
 			basic_entity_handle<is_const> get_gui_element_entity() const {
 				return handle;
@@ -130,11 +134,50 @@ namespace components {
 				return !alive(id);
 			}
 
+			operator basic_dispatcher_context<true>() const {
+				return{ step, handle, elem, tree };
+			}
+
 			template<class L>
 			decltype(auto) operator()(const gui_element_location& id, L generic_call) const {
 				return id.call([&](const auto& resolved_location) {
 					return resolved_location.get_object_at_location_and_call(*this, generic_call);
 				});
+			}
+
+			template<class Casted>
+			struct pointer_caster {
+				template <class Candidate>
+				maybe_const_ptr<is_const, Casted> operator()(maybe_const_ref_t<is_const, Candidate> object) {
+					if (std::is_same<Casted, Candidate>::value || std::is_base_of<Casted, Candidate>::value) {
+						return reinterpret_cast<Casted*>(&object);
+					}
+
+					return nullptr;
+				}
+			};
+
+			template<class T>
+			maybe_const_ptr<is_const, T> get_pointer(const gui_element_location& id) {
+				if (dead(id)) {
+					return nullptr;
+					//return static_cast<maybe_const_ptr<is_const, T>>(nullptr);
+				}
+
+				return id.call([&](const auto& resolved_location) const {
+					return resolved_location.get_object_at_location_and_call(*this, pointer_caster<T>());
+				});
+			}
+
+			template<class T>
+			maybe_const_ptr<is_const, T> get_alive_location_pointer(const gui_element_location& id) {
+				static_assert(tuple_contains_type<T, typename decltype(id)::types_tuple>::value, "Invalid location type!");
+
+				if (dead(id)) {
+					return nullptr;
+				}
+
+				return &id.get<T>();
 			}
 		};
 
@@ -162,7 +205,6 @@ namespace components {
 		gui_element();
 		//
 		//void consume_raw_input(augs::window::event::change&);
-		//void draw_cursor_and_tooltip(viewing_step&) const;
 		//
 		//entity_id get_hovered_world_entity(vec2 camera_pos);
 		//drag_and_drop_result prepare_drag_and_drop_result() const;
@@ -171,6 +213,8 @@ namespace components {
 		rects::xywh<float> get_rectangle_for_slot_function(const slot_function) const;
 		vec2i get_initial_position_for_special_control(const special_control) const;
 		vec2 initial_inventory_root_position() const;
+		
+		void draw_cursor_and_tooltip(const const_dispatcher_context&) const;
 		static void draw_complete_gui_for_camera_rendering_request(const const_entity_handle& handle, viewing_step&);
 	};
 }
