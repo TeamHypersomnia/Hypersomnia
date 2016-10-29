@@ -2,8 +2,6 @@
 #include "augs/graphics/pixel.h"
 #include "augs/math/vec2.h"
 
-using namespace augs;
-
 enum class vertex_attribute {
 	position,
 	texcoord,
