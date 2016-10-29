@@ -1,6 +1,6 @@
 #pragma once
 
-enum special_control {
+enum class special_control {
 	DROP_ITEM
 
 };
