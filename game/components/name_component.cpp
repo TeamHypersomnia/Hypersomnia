@@ -7,18 +7,18 @@ namespace components {
 		return { nickname.begin(), nickname.end() };
 	}
 
-	void name::set_nickname(std::wstring s) {
+	void name::set_nickname(const std::wstring& s) {
 		nickname.assign(s.begin(), s.end());
 	}
 }
 
-void name_entity(entity_handle id, entity_name n) {
+void name_entity(const entity_handle& id, const entity_name n) {
 	components::name name;
 	name.id = n;
 	id.set(name);
 }
 
-void name_entity(entity_handle id, entity_name n, std::wstring nick) {
+void name_entity(const entity_handle& id, const entity_name n, const std::wstring& nick) {
 	components::name name;
 	name.id = n;
 	name.custom_nickname = true;
@@ -26,7 +26,7 @@ void name_entity(entity_handle id, entity_name n, std::wstring nick) {
 	id.set(name);
 }
 
-entity_id get_first_named_ancestor(const_entity_handle p) {
+entity_id get_first_named_ancestor(const const_entity_handle& p) {
 	entity_id iterator = p;
 	auto& cosmos = p.get_cosmos();
 

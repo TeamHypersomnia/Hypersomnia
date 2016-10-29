@@ -19,7 +19,7 @@ namespace components {
 		nickname_type nickname;
 
 		std::wstring get_nickname() const;
-		void set_nickname(std::wstring);
+		void set_nickname(const std::wstring&);
 		
 		template <class Archive>
 		void serialize(Archive& ar) {
@@ -33,4 +33,4 @@ namespace components {
 	};
 }
 
-entity_id get_first_named_ancestor(const_entity_handle);
+entity_id get_first_named_ancestor(const const_entity_handle&);
