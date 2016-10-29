@@ -13,11 +13,11 @@ namespace augs {
 			material(const rgba&);
 		};
 
-		extern rects::ltrb<float> draw_clipped_rectangle(augs::texture&, rgba, rects::ltrb<float> origin, rects::ltrb<float> clipper, std::vector<augs::vertex_triangle>& v);
-		extern rects::ltrb<float> draw_clipped_rectangle(material, rects::ltrb<float> origin, rects::ltrb<float> clipper, std::vector<augs::vertex_triangle>& v);
+		extern rects::ltrb<float> draw_clipped_rectangle(const augs::texture&, const rgba, const rects::ltrb<float>& origin, const rects::ltrb<float>& clipper, std::vector<augs::vertex_triangle>& v);
+		extern rects::ltrb<float> draw_clipped_rectangle(const material&, const rects::ltrb<float>& origin, const rects::ltrb<float>& clipper, std::vector<augs::vertex_triangle>& v);
 		
 		template <class C, class gui_element_id>
-		rects::ltrb<float> draw_clipped_rectangle(material, rects::ltrb<float> global, C context, const gui_element_id& clipper, vertex_triangle_buffer& v) {
+		rects::ltrb<float> draw_clipped_rectangle(const material&, const rects::ltrb<float>& global, C context, const gui_element_id& clipper, vertex_triangle_buffer& v) {
 			return draw_clipped_rectangle(mat, origin, context.get_tree_entry(clipper).get_clipping_rect(), v);
 		}
 	}

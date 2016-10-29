@@ -8,13 +8,20 @@ namespace augs {
 
 		material::material(const rgba& color) : tex(assets::texture_id::BLANK), color(color) {}
 
-		rects::ltrb<float> draw_clipped_rectangle(material mat, rects::ltrb<float> origin, rects::ltrb<float> clipper, std::vector<augs::vertex_triangle>& v) {
+		rects::ltrb<float> draw_clipped_rectangle(const material& mat, const rects::ltrb<float>& origin, const rects::ltrb<float>& clipper, std::vector<augs::vertex_triangle>& v) {
 			return draw_clipped_rectangle(*mat.tex, mat.color, origin, clipper, v);
 		}
 
-		rects::ltrb<float> draw_clipped_rectangle(augs::texture& tex, rgba color, rects::ltrb<float> origin, rects::ltrb<float> parent, std::vector<augs::vertex_triangle>& v) {
+		rects::ltrb<float> draw_clipped_rectangle(const augs::texture& tex, const rgba color, const rects::ltrb<float>& origin, const rects::ltrb<float>& parent, std::vector<augs::vertex_triangle>& v) {
 			rects::ltrb<float> rc = origin;
-			if ((parent.good() && !rc.clip_by(parent)) || !rc.good()) return rc;
+			
+			if (!rc.good()) {
+				return rc;
+			}
+
+			if (parent.good() && !rc.clip_by(parent)) {
+				return rc;
+			}
 
 			augs::vertex p[4];
 
