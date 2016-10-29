@@ -18,6 +18,13 @@
 #include "game/detail/physics_scripts.h"
 #include "augs/ensure.h"
 
+bool render_system::render_order_compare(const const_entity_handle& a, const const_entity_handle& b) {
+	auto layer_a = a.get<components::render>().layer;
+	auto layer_b = a.get<components::render>().layer;
+
+	return (layer_a == layer_b && layer_a == render_layer::CAR_INTERIOR) ? are_connected_by_friction(a, b) : layer_a > layer_b;
+}
+
 std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> render_system::get_visible_per_layer(std::vector<const_entity_handle> entities) const {
 	std::array<std::vector<entity_id>, render_layer::LAYER_COUNT> layers;
 	std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> output;
@@ -33,16 +40,12 @@ std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> render_s
 		layers[layer].push_back(it);
 	}
 
-	const std::vector<render_layer> layers_whose_order_determines_friction = { render_layer::CAR_INTERIOR } ;
+	const auto& car_interior_layer = layers[render_layer::CAR_INTERIOR];
 
-	for (auto& custom_order_layer : layers_whose_order_determines_friction) {
-		if (custom_order_layer < static_cast<render_layer>(layers.size())) {
-			if (layers[custom_order_layer].size() > 1) {
-				std::sort(layers[custom_order_layer].begin(), layers[custom_order_layer].end(), [&cosmos](entity_id b, entity_id a) {
-					return are_connected_by_friction(cosmos[a], cosmos[b]);
-				});
-			}
-		}
+	if (car_interior_layer.size() > 1) {
+		std::sort(car_interior_layer.begin(), car_interior_layer.end(), [&cosmos](entity_id b, entity_id a) {
+			return are_connected_by_friction(cosmos[a], cosmos[b]);
+		});
 	}
 
 	for (size_t layer_idx = 0; layer_idx < layers.size(); ++layer_idx) {

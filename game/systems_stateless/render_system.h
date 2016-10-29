@@ -13,6 +13,8 @@ struct state_for_drawing_camera;
 
 class render_system {
 public:
+	static bool render_order_compare(const const_entity_handle& a, const const_entity_handle& b);
+
 	void draw_entities(
 		augs::vertex_triangle_buffer& output, 
 		std::vector<const_entity_handle>, 
