@@ -1,7 +1,11 @@
 #include "pixel_line_connector.h"
 #include "augs/gui/material.h"
 
-std::vector<std::array<vec2i, 2>> get_connecting_pixel_lines(rects::ltrb<float> a, rects::ltrb<float> b) {
+std::vector<std::array<vec2i, 2>> get_connecting_pixel_lines(
+	const rects::ltrb<float>& a,
+	const rects::ltrb<float>& b
+)
+{
 	using namespace augs::gui;
 
 	vec2 ac = a.center();
@@ -121,8 +125,14 @@ std::vector<std::array<vec2i, 2>> get_connecting_pixel_lines(rects::ltrb<float> 
 }
 
 
-void draw_pixel_line_connector(rects::ltrb<float> a, rects::ltrb<float> b, augs::gui::draw_info in, augs::rgba col) {
-	augs::gui::material line_mat(assets::BLANK, col);
+void draw_pixel_line_connector(
+	const rects::ltrb<float>& a,
+	const rects::ltrb<float>& b,
+	const augs::gui::draw_info in,
+	const augs::rgba col
+)
+{
+	augs::gui::material line_mat(assets::texture_id::BLANK, col);
 
 	for (auto& l : get_connecting_pixel_lines(a, b)) {
 		rects::ltrb<float> line;
@@ -148,6 +158,6 @@ void draw_pixel_line_connector(rects::ltrb<float> a, rects::ltrb<float> b, augs:
 			}
 		}
 
-		augs::gui::draw_clipped_rectangle(line_mat, line, (rects::ltrb<float>*)nullptr, in.v);
+		augs::gui::draw_clipped_rectangle(line_mat, line, rects::ltrb<float>(), in.v);
 	}
 }
