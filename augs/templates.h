@@ -9,8 +9,24 @@
 #include <tuple>
 #include <unordered_set>
 
+template <typename T, typename Tuple>
+struct has_type;
+
+template <typename T>
+struct has_type<T, std::tuple<>> : std::false_type {};
+
+template <typename T, typename U, typename... Ts>
+struct has_type<T, std::tuple<U, Ts...>> : has_type<T, std::tuple<Ts...>> {};
+
+template <typename T, typename... Ts>
+struct has_type<T, std::tuple<T, Ts...>> : std::true_type {};
+
+template <typename T, typename Tuple>
+using tuple_contains_type = typename has_type<T, Tuple>::type;
+
 template<unsigned idx, class... Types>
 struct nth_type_in {
+	static_assert(idx < sizeof...(Types), "Type index out of bounds!");
 	typedef std::decay_t<decltype(std::get<idx>(std::tuple<Types...>()))> type;
 };
 
@@ -27,6 +43,8 @@ struct index_in_tuple<T, std::tuple<T, Types...>> {
 
 template <class T, class U, class... Types>
 struct index_in_tuple<T, std::tuple<U, Types...>> {
+	static_assert(tuple_contains_type<T, std::tuple<U, Types...>>::value, "No such type in the tuple or parameter pack!");
+
 	static const std::size_t value = 1 + index_in_tuple<T, std::tuple<Types...>>::value;
 };
 
@@ -172,7 +190,7 @@ template<template<typename...> class List,
 	typename ...Args>
 	struct transform_types {
 	typedef List<typename Mod<Args>::type...> type;
-}; 
+};
 
 template<template<typename> class Mod,
 	typename ...Args>
@@ -291,20 +309,6 @@ namespace std {
 	}
 }
 
-template <typename T, typename Tuple>
-struct has_type;
-
-template <typename T>
-struct has_type<T, std::tuple<>> : std::false_type {};
-
-template <typename T, typename U, typename... Ts>
-struct has_type<T, std::tuple<U, Ts...>> : has_type<T, std::tuple<Ts...>> {};
-
-template <typename T, typename... Ts>
-struct has_type<T, std::tuple<T, Ts...>> : std::true_type {};
-
-template <typename T, typename Tuple>
-using tuple_contains_type = typename has_type<T, Tuple>::type;
 
 
 template <class T>
