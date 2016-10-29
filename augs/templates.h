@@ -24,6 +24,9 @@ struct has_type<T, std::tuple<T, Ts...>> : std::true_type {};
 template <typename T, typename Tuple>
 using tuple_contains_type = typename has_type<T, Tuple>::type;
 
+template <typename T, typename... Types>
+using pack_contains_type = typename has_type<T, std::tuple<Types...>>::type;
+
 template<unsigned idx, class... Types>
 struct nth_type_in {
 	static_assert(idx < sizeof...(Types), "Type index out of bounds!");
