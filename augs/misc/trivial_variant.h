@@ -61,10 +61,24 @@ namespace augs {
 		//}
 
 	public:
+		template<class T>
+		static void assert_correct_type() {
+			static_assert(pack_contains_type<T, Types...>::value, "trivial_variant does not contain the specified type!");
+		}
+
 		typedef std::tuple<Types...> types_tuple;
 
 		trivial_variant() {
 			std::memset(&_s, 0, sizeof(_s));
+		}
+
+		template <class T>
+		trivial_variant(const T& obj) : trivial_variant() {
+			set(obj);
+		}
+
+		void reset() {
+			current_type = sizeof...(Types);
 		}
 
 		bool is_set() const {
@@ -73,34 +87,40 @@ namespace augs {
 
 		template<class T>
 		void set(const T& t) {
+			assert_correct_type<T>();
 			std::memcpy(&_s, &t, sizeof(T));
 			current_type = index_in_pack<T, Types...>::value;
 		}
 
 		template<class T>
 		bool is() const {
+			assert_correct_type<T>();
 			return index_in_pack<T, Types...>::value == current_type;
 		}
 
 		template<class T>
 		T& get() {
+			assert_correct_type<T>();
 			ensure(is<T>());
 			return *reinterpret_cast<T*>(&_s);
 		}
 
 		template<class T>
 		const T& get() const {
+			assert_correct_type<T>();
 			ensure(is<T>());
 			return *reinterpret_cast<const T*>(&_s);
 		}
 
 		template<class T>
 		T* find() {
+			assert_correct_type<T>();
 			return is<T>() ? reinterpret_cast<T*>(&_s) : nullptr;
 		}
 
 		template<class T>
 		const T* find() const {
+			assert_correct_type<T>();
 			return is<T>() ? reinterpret_cast<T*>(&_s) : nullptr;
 		}
 
@@ -112,6 +132,12 @@ namespace augs {
 		template<class L>
 		decltype(auto) call(L generic_call) const {
 			return call_unroll_const<L, Types...>(generic_call);
+		}
+
+		template<class T>
+		bool operator==(const T& b) const {
+			assert_correct_type<T>();
+			return is<T>() && get<T>() == b;
 		}
 
 		bool operator==(const trivial_variant& b) const {
