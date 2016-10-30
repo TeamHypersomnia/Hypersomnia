@@ -19,31 +19,31 @@
 #include "augs/ensure.h"
 
 bool render_system::render_order_compare(const const_entity_handle& a, const const_entity_handle& b) {
-	auto layer_a = a.get<components::render>().layer;
-	auto layer_b = a.get<components::render>().layer;
+	const auto layer_a = a.get<components::render>().layer;
+	const auto layer_b = a.get<components::render>().layer;
 
 	return (layer_a == layer_b && layer_a == render_layer::CAR_INTERIOR) ? are_connected_by_friction(a, b) : layer_a > layer_b;
 }
 
-std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> render_system::get_visible_per_layer(std::vector<const_entity_handle> entities) const {
+std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> render_system::get_visible_per_layer(const std::vector<const_entity_handle>& entities) const {
 	std::array<std::vector<entity_id>, render_layer::LAYER_COUNT> layers;
 	std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> output;
 
 	if (entities.empty())
 		return output;
 
-	auto& cosmos = entities[0].get_cosmos();
+	const auto& cosmos = entities[0].get_cosmos();
 
-	for (auto& it : entities) {
+	for (const auto& it : entities) {
 		auto layer = it.get<components::render>().layer;
 		ensure(layer < static_cast<render_layer>(layers.size()));
 		layers[layer].push_back(it);
 	}
 
-	const auto& car_interior_layer = layers[render_layer::CAR_INTERIOR];
+	auto& car_interior_layer = layers[render_layer::CAR_INTERIOR];
 
 	if (car_interior_layer.size() > 1) {
-		std::sort(car_interior_layer.begin(), car_interior_layer.end(), [&cosmos](entity_id b, entity_id a) {
+		std::sort(car_interior_layer.begin(), car_interior_layer.end(), [&cosmos](const entity_id& b, const entity_id& a) {
 			return are_connected_by_friction(cosmos[a], cosmos[b]);
 		});
 	}

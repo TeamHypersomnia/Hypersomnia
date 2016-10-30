@@ -59,5 +59,5 @@ public:
 		}
 	}
 
-	std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> get_visible_per_layer(std::vector<const_entity_handle>) const;
+	std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> get_visible_per_layer(const std::vector<const_entity_handle>&) const;
 };
