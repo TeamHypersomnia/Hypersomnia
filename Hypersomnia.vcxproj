@@ -345,8 +345,8 @@
     <ClCompile Include="game\detail\entity\spatial_properties_getters.cpp" />
     <ClCompile Include="game\detail\gui\aabb_highlighter.cpp" />
     <ClCompile Include="game\detail\gui\drag_and_drop.cpp" />
+    <ClCompile Include="game\detail\gui\grid.cpp" />
     <ClCompile Include="game\detail\gui\immediate_hud.cpp" />
-    <ClCompile Include="game\detail\gui\item_button.cpp" />
     <ClCompile Include="game\detail\gui\pixel_line_connector.cpp" />
     <ClCompile Include="game\detail\gui\drag_and_drop_target_drop_item.cpp" />
     <ClCompile Include="game\detail\world_camera.cpp" />
@@ -1025,6 +1025,7 @@
     <ClInclude Include="game\detail\gui\aabb_highlighter.h" />
     <ClInclude Include="game\detail\gui\dispatcher_context.h" />
     <ClInclude Include="game\detail\gui\drag_and_drop.h" />
+    <ClInclude Include="game\detail\gui\grid.h" />
     <ClInclude Include="game\detail\gui\gui_element_location.h" />
     <ClInclude Include="game\detail\gui\gui_element_tree.h" />
     <ClInclude Include="game\detail\gui\immediate_hud.h" />
