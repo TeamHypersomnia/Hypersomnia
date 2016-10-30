@@ -3,9 +3,8 @@
 #include "game/detail/item_transfer_result.h"
 #include "game/detail/item_slot_transfer_request.h"
 #include "game/detail/gui/location_and_pointer.h"
+#include "game/detail/gui/item_button.h"
 #include "game/detail/inventory_utils.h"
-
-struct item_button;
 
 struct drag_and_drop_result {
 	item_slot_transfer_request_data simulated_request;

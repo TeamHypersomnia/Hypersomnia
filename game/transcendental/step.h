@@ -20,7 +20,7 @@ namespace augs {
 
 class viewing_step {
 public:
-	viewing_step(const cosmos&, const immediate_hud& hud, const aabb_highlighter&, const augs::variable_delta&, augs::renderer&, state_for_drawing_camera camera_state);
+	viewing_step(const cosmos&, const immediate_hud& hud, aabb_highlighter&, const augs::variable_delta&, augs::renderer&, state_for_drawing_camera camera_state);
 
 	state_for_drawing_camera camera_state;
 

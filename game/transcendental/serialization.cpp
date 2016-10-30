@@ -5,7 +5,7 @@
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "augs/filesystem/file.h"
 
-void cosmos::save_to_file(std::string filename) {
+void cosmos::save_to_file(const std::string& filename) {
 	profiler.total_save.new_measurement();
 	
 	profiler.size_calculation_pass.new_measurement();
@@ -39,7 +39,7 @@ void cosmos::save_to_file(std::string filename) {
 	profiler.total_save.end_measurement();
 }
 
-bool cosmos::load_from_file(std::string filename) {
+bool cosmos::load_from_file(const std::string& filename) {
 	if (augs::file_exists(filename)) {
 		profiler.total_load.new_measurement();
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/templates.h"
 #include "game/detail/gui/location_and_pointer.h"
+#include "gui_element_location.h"
 
 class viewing_step;
 class fixed_step;
