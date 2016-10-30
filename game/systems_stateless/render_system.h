@@ -17,9 +17,9 @@ public:
 
 	void draw_entities(
 		augs::vertex_triangle_buffer& output, 
-		std::vector<const_entity_handle>, 
-		state_for_drawing_camera in, 
-		bool only_border_highlights = false) const;
+		const std::vector<const_entity_handle>&, 
+		const state_for_drawing_camera& in, 
+		const bool only_border_highlights = false) const;
 
 
 	template<class renderable_type>
@@ -28,8 +28,8 @@ public:
 		const renderable_type& renderable,
 		const components::transform& renderable_transform,
 		const components::render& render,
-		state_for_drawing_camera in_camera,
-		bool only_border_highlights = false) const {
+		const state_for_drawing_camera& in_camera,
+		const bool only_border_highlights = false) const {
 
 		components::transform camera_transform;
 		camera_transform = render.absolute_transform ? components::transform() : in_camera.camera_transform;
