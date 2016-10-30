@@ -3,8 +3,34 @@
 #include "augs/ensure.h"
 
 namespace augs {
+	namespace detail {
+		template <class derived, class... Types>
+		struct unrolled_members;
+
+		template <class derived, class Head>
+		struct unrolled_members<derived, Head> {
+			void set(const Head& h) {
+				auto* self = static_cast<derived*>(this);
+				self->set_internal(h);
+			}
+
+			bool operator==(const Head& b) const {
+				const auto* self = static_cast<const derived*>(this);
+				return self->compare_internal(b);
+			}
+		};
+
+		template <class derived, class Head, class... Tail>
+		struct unrolled_members<derived, Head, Tail...> : unrolled_members<derived, Head>, unrolled_members<derived, Tail...> {
+			using unrolled_members<derived, Tail...>::set;
+			using unrolled_members<derived, Head>::set;			
+			using unrolled_members<derived, Tail...>::operator==;
+			using unrolled_members<derived, Head>::operator==;
+		};
+	}
+
 	template<class... Types>
-	class trivial_variant {
+	class trivial_variant : public detail::unrolled_members<trivial_variant<Types...>, Types...> {
 		unsigned current_type = sizeof...(Types);
 		typename std::aligned_union<0, Types...>::type _s;
 
@@ -45,20 +71,22 @@ namespace augs {
 				return call_unroll_const<L, Tail...>(f);
 			}
 		}
-		//template<class L>
-		//decltype(auto) call_or_zero_unroll(L f) {
-		//	return static_cast<decltype(f())>(0);
-		//}
-		//
-		//template<class L, class Head, class Tail...>
-		//decltype(auto) call_or_zero_unroll(L f) {
-		//	if (index_in_pack<Head, Types...>::value == current_type) {
-		//		return f(get<Head>());
-		//	}
-		//	else {
-		//		return call_unroll<L, Tail...>(f);
-		//	}
-		//}
+
+		template<class T>
+		void set_internal(const T& t) {
+			assert_correct_type<T>();
+			std::memcpy(&_s, &t, sizeof(T));
+			current_type = index_in_pack<T, Types...>::value;
+		}
+
+		template<class T>
+		bool compare_internal(const T& b) const {
+			assert_correct_type<T>();
+			return is<T>() && get<T>() == b;
+		}
+
+		template<class, class...>
+		friend struct detail::unrolled_members;
 
 	public:
 		template<class T>
@@ -77,19 +105,12 @@ namespace augs {
 			set(obj);
 		}
 
-		void reset() {
+		void unset() {
 			current_type = sizeof...(Types);
 		}
 
 		bool is_set() const {
 			return current_type != sizeof...(Types);
-		}
-
-		template<class T>
-		void set(const T& t) {
-			assert_correct_type<T>();
-			std::memcpy(&_s, &t, sizeof(T));
-			current_type = index_in_pack<T, Types...>::value;
 		}
 
 		template<class T>
@@ -134,12 +155,6 @@ namespace augs {
 			return call_unroll_const<L, Types...>(generic_call);
 		}
 
-		template<class T>
-		bool operator==(const T& b) const {
-			assert_correct_type<T>();
-			return is<T>() && get<T>() == b;
-		}
-
 		bool operator==(const trivial_variant& b) const {
 			return current_type == b.current_type 
 				&& 
@@ -147,11 +162,6 @@ namespace augs {
 					return resolved_a == b.get<std::decay_t<decltype(resolved_a)>>();
 				});
 		}
-
-		//template<class L>
-		//decltype(auto) call_or_zero(L generic_call) {
-		//	return call_or_zero_unroll<L, Types...>(generic_call);
-		//}
 	};
 }
 
