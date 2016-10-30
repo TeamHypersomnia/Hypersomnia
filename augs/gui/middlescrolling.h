@@ -19,7 +19,7 @@ namespace augs {
 			void perform_logic_step(C context, const fixed_delta& dt) {
 				if (context.alive(subject)) {
 					context(subject, [&](auto& r) {
-						r.set_scroll(r.get_scroll() + static_cast<vec2>(context.get_rect_world().last_state.mouse.pos - middlescroll_icon_position) * float(speed_mult*dt.in_milliseconds()));
+						r->set_scroll(r->get_scroll() + static_cast<vec2>(context.get_rect_world().last_state.mouse.pos - middlescroll_icon_position) * float(speed_mult*dt.in_milliseconds()));
 					});
 				}
 			}
@@ -40,7 +40,7 @@ namespace augs {
 			void draw_triangles(C context, draw_info in) const {
 				if (context.alive(subject)) {
 					rects::ltrb<float> scroller = rects::wh<float>(size);
-					scroller.center(pos);
+					scroller.center(middlescroll_icon_position);
 					draw_clipped_rectangle(mat, scroller, context, subject, in.v);
 				}
 			}

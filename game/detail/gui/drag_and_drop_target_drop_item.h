@@ -2,14 +2,13 @@
 #include "augs/gui/rect.h"
 #include "augs/gui/material.h"
 #include "augs/gui/appearance_detector.h"
-#include "special_controls.h"
 
 #include "game/detail/gui/gui_element_location.h"
 
-struct special_drag_and_drop_target : game_gui_rect_node<special_drag_and_drop_target> {
-	special_drag_and_drop_target(const augs::gui::material new_mat);
+struct drag_and_drop_target_drop_item : game_gui_rect_node {
+	typedef drag_and_drop_target_drop_item_location location;
 
-	special_control type;
+	drag_and_drop_target_drop_item(const augs::gui::material new_mat);
 
 	augs::gui::material mat;
 
@@ -35,19 +34,19 @@ struct special_drag_and_drop_target : game_gui_rect_node<special_drag_and_drop_t
 		detector.update_appearance(info);
 	}
 
-	template<class C>
-	void perform_logic_step(C context, const gui_element_location& this_id, const fixed_delta& dt) {
+	template<class C, class I>
+	static void perform_logic_step(C context, const I& this_id, const fixed_delta& dt) {
 		auto& world = context.get_rect_world();
 		auto dragged_item = world.rect_held_by_lmb;
 
 		if (context.alive(dragged_item) && world.held_rect_is_dragged) {
-			set_flag(augs::gui::flag::ENABLE_DRAWING);
+			this_id->set_flag(augs::gui::flag::ENABLE_DRAWING);
 		}
 		else {
-			unset_flag(augs::gui::flag::ENABLE_DRAWING);
+			this_id->unset_flag(augs::gui::flag::ENABLE_DRAWING);
 		}
 
-		rc.set_position(context.get_gui_element_component().get_initial_position_for_special_control(type) - vec2(20, 20));
-		rc.set_size((*mat.tex).get_size() + vec2(40, 40));
+		this_id->rc.set_position(context.get_gui_element_component().get_initial_position_for(*this_id) - vec2(20, 20));
+		this_id->rc.set_size((*this_id->mat.tex).get_size() + vec2(40, 40));
 	}
 };

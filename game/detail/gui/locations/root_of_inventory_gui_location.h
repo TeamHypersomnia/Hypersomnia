@@ -11,10 +11,9 @@ public:
 		return true;
 	}
 
-	template <class C, class L>
-	decltype(auto) get_object_at_location_and_call(C context, L generic_call) const {
-		root_of_inventory_gui node;
-		return generic_call(node);
+	template <class C>
+	decltype(auto) dereference(C context) const {
+		return &context.get_root_of_inventory_gui();
 	}
 };
 

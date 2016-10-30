@@ -3,12 +3,13 @@
 #include "game/detail/item_transfer_result.h"
 #include "game/detail/item_slot_transfer_request.h"
 #include "game/detail/gui/location_and_pointer.h"
+#include "game/detail/inventory_utils.h"
 
 struct item_button;
 
 struct drag_and_drop_result {
 	item_slot_transfer_request_data simulated_request;
-	location_and_pointer<item_button> dragged_item;
+	location_and_pointer<const item_button> dragged_item;
 	bool possible_target_hovered = false;
 	bool target_slot_alive = false;
 	item_transfer_result result;
@@ -30,16 +31,16 @@ drag_and_drop_result prepare_drag_and_drop_result(C context) {
 		const auto& held_rect_id = rect_world.rect_held_by_lmb;
 		const auto& drop_target_rect_id = rect_world.rect_hovered;
 
-		const auto& dragged_item = context._dynamic_cast<item_button>(held_rect_id);
+		const auto& dragged_item = context._dynamic_cast<const item_button>(held_rect_id);
 
 		if (dragged_item && context.alive(drop_target_rect_id)) {
 			out.dragged_item = dragged_item;
 			
 			const auto& dragged_item_handle = cosmos[dragged_item.get_location().item_id];
 
-			const auto& target_slot = context._dynamic_cast<slot_button>(drop_target_rect_id);
-			const auto& target_item = context._dynamic_cast<item_button>(drop_target_rect_id);
-			const auto& target_special = context._dynamic_cast<special_drag_and_drop_target>(drop_target_rect_id);
+			const auto& target_slot = context._dynamic_cast<const slot_button>(drop_target_rect_id);
+			const auto& target_item = context._dynamic_cast<const item_button>(drop_target_rect_id);
+			const auto& target_drop_item = context._dynamic_cast<const drag_and_drop_target_drop_item>(drop_target_rect_id);
 
 			out.possible_target_hovered = true;
 
@@ -53,7 +54,7 @@ drag_and_drop_result prepare_drag_and_drop_result(C context) {
 			if (target_slot != nullptr && target_slot->houted_after_drag_started) {
 				simulated_request.target_slot = target_slot.get_location().slot_id;
 			}
-			else if (target_item != nullptr && *target_item != *dragged_item) {
+			else if (target_item != nullptr && target_item != dragged_item) {
 				const auto& target_item_handle = cosmos[target_item.get_location().item_id];
 
 				if (target_item_handle.has<components::container>()) {
@@ -74,10 +75,8 @@ drag_and_drop_result prepare_drag_and_drop_result(C context) {
 					no_slot_in_targeted_item = true;
 				}
 			}
-			else if (target_special != nullptr) {
-				if (target_special->type == special_control::DROP_ITEM) {
-					simulated_request.target_slot.unset();
-				}
+			else if (target_drop_item) {
+				simulated_request.target_slot.unset();
 			}
 			else {
 				out.possible_target_hovered = false;
@@ -114,10 +113,8 @@ drag_and_drop_result prepare_drag_and_drop_result(C context) {
 							charges_text = L" " + to_wstring(out.result.transferred_charges);
 					}
 
-					if (target_special != nullptr) {
-						if (target_special->type == special_control::DROP_ITEM) {
-							tooltip_text += L"Drop" + charges_text + L" to ground";
-						}
+					if (target_drop_item) {
+						tooltip_text += L"Drop" + charges_text + L" to ground";
 					}
 					else if (was_pointing_to_a_stack_target) {
 						tooltip_text += L"Stack" + charges_text;
@@ -153,6 +150,6 @@ drag_and_drop_result prepare_drag_and_drop_result(C context) {
 		}
 	}
 
-	out.target_slot_alive = context.get_cosmos()[out.intent.target_slot].alive();
+	out.target_slot_alive = context.get_step().get_cosmos()[out.simulated_request.target_slot].alive();
 	return out;
 }

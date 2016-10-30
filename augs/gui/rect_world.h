@@ -27,15 +27,15 @@ namespace augs {
 
 		template<class C, class gui_element_id>
 		void polymorphic_consume_gui_event(C context, const gui_element_id& id, const gui_event ev) {
-			context(id, [&](auto& r) {
-				r.consume_gui_event(context, id, ev);
+			context(id, [&](const auto& r) {
+				r->consume_gui_event(context, r, ev);
 			});
 		}
 
 		template<class C, class gui_element_id>
 		void polymorphic_consume_raw_input(C context, const gui_element_id& id, event_traversal_flags& in) {
-			context(id, [&](auto& r) {
-				r.consume_raw_input_and_generate_gui_events(context, id, in);
+			context(id, [&](const auto& r) {
+				r->consume_raw_input_and_generate_gui_events(context, r, in);
 			});
 		}
 
@@ -143,10 +143,10 @@ namespace augs {
 				}
 
 				if (context.alive(rect_in_focus) 
-					&& context(rect_in_focus, [](const auto& r) { return r.get_flag(flag::FETCH_WHEEL); } ) 
+					&& context(rect_in_focus, [](const auto& r) { return r->get_flag(flag::FETCH_WHEEL); } ) 
 					&& new_state.msg == event::message::wheel) {
 
-					if (context(rect_in_focus, [](const auto& r) { return r.get_flag(flag::ENABLE_DRAWING); })) {
+					if (context(rect_in_focus, [](const auto& r) { return r->get_flag(flag::ENABLE_DRAWING); })) {
 						polymorphic_consume_raw_input(context, rect_in_focus, in);
 					}
 
@@ -161,7 +161,7 @@ namespace augs {
 				pass = false;
 				}*/
 				if (context.alive(rect_in_focus)) {
-					const bool rect_in_focus_drawing_enabled = context(rect_in_focus, [](const auto& r) { return r.get_flag(flag::ENABLE_DRAWING); });
+					const bool rect_in_focus_drawing_enabled = context(rect_in_focus, [](const auto& r) { return r->get_flag(flag::ENABLE_DRAWING); });
 
 					switch (new_state.msg) {
 					case event::message::keydown:   
@@ -198,8 +198,8 @@ namespace augs {
 					polymorphic_consume_raw_input(context, root, in);
 
 					if (!in.was_hovered_rect_visited && context.alive(rect_hovered)) {
-						context(rect_hovered, [&](auto& r) { 
-							r.unhover(context, rect_hovered, in);
+						context(rect_hovered, [&](const auto& r) { 
+							r->unhover(context, r, in);
 						});
 					}
 				}
@@ -208,14 +208,14 @@ namespace augs {
 			template <class C, class gui_element_id>
 			void build_tree_data_into_context(C context, const gui_element_id& root) const {
 				context(root, [&](const auto& r) { 
-					r.build_tree_data(context, root); 
+					r->build_tree_data(context, r); 
 				});
 			}
 
 			template <class C, class gui_element_id>
 			void perform_logic_step(C context, const gui_element_id& root, const fixed_delta& delta) {
-				context(root, [&](auto& r) { 
-					r.perform_logic_step(context, root, delta);
+				context(root, [&](const auto& r) { 
+					r->perform_logic_step(context, r, delta);
 				});
 
 				middlescroll.perform_logic_step(context, delta);
@@ -229,21 +229,24 @@ namespace augs {
 
 				event_traversal_flags mousemotion_updater(fabricated_state);
 
-				context(root, [&](auto& r) {
-					r.consume_raw_input_and_generate_gui_events(context, root, mousemotion_updater);
+				context(root, [&](const auto& r) {
+					r->consume_raw_input_and_generate_gui_events(context, r, mousemotion_updater);
 				});
 
 				if (!mousemotion_updater.was_hovered_rect_visited && context.alive(rect_hovered)) {
-					context(rect_hovered, [&](auto& r) { r.unhover(context, rect_hovered, mousemotion_updater); });
+					context(rect_hovered, [&](const auto& r) { r->unhover(context, r, mousemotion_updater); });
 				}
 			}
 
 			template <class C, class gui_element_id>
 			vertex_triangle_buffer draw_triangles(C context, const gui_element_id& root) const {
 				vertex_triangle_buffer buffer;
-				draw_info in(*this, buffer);
+				draw_info in(buffer);
 
-				context(root, [&context, &in](auto& r) { r.draw_children(context, in); });
+				context(root, [&](const auto& r) { 
+					r->draw_children(context, r, in);
+				});
+
 				middlescroll.draw_triangles(context, in);
 
 				return buffer;

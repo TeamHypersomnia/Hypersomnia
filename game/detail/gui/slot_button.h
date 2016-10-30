@@ -8,7 +8,9 @@
 
 #include "augs/padding_byte.h"
 
-struct slot_button : game_gui_rect_node<slot_button> {
+struct slot_button : game_gui_rect_node {
+	typedef slot_button_location location;
+
 	slot_button() {
 
 	}
@@ -26,17 +28,12 @@ struct slot_button : game_gui_rect_node<slot_button> {
 	//void draw_triangles(draw_info);
 	//void consume_gui_event(event_info);
 
-	template <class C, class L>
-	static void for_each_child(C context, const gui_element_location& this_id, L generic_call) {
-		if (this_id.is<slot_button_for_inventory_slot_location>()) {
-			const auto& slot_handle = context.get_step().get_cosmos()[this_id.get<slot_button_for_inventory_slot_location>().slot_id];
+	template <class C, template <class> class gui_element_id, class L>
+	static void for_each_child(C context, const gui_element_id<slot_button>& this_id, L generic_call) {
+		const auto& slot_handle = context.get_step().get_cosmos()[this_id.get_location().slot_id];
 
-			for (const auto& i : slot_handle.get_items_inside()) {
-				gui_element_location child_location;
-				child_location.set(item_button_for_item_component_location{ i.get_id() });
-
-				generic_call(i.get<components::item>().button, child_location);
-			}
+		for (const auto& i : slot_handle.get_items_inside()) {
+			generic_call(gui_element_id<item_button>(&i.get<components::item>().button, item_button::location{ i.get_id() }));
 		}
 	}
 };

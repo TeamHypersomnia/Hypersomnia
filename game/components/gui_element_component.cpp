@@ -1,7 +1,13 @@
 #include "gui_element_component.h"
+
 #include "game/transcendental/step.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
+#include "game/detail/gui/root_of_inventory_gui.h"
+#include "game/detail/gui/drag_and_drop_target_drop_item.h"
+#include "game/detail/gui/item_button.h"
+#include "game/detail/gui/slot_button.h"
+#include "game/detail/gui/gui_element_tree.h"
 #include "game/detail/inventory_slot_handle.h"
 #include "game/detail/gui/drag_and_drop.h"
 #include "game/components/container_component.h"
@@ -48,29 +54,25 @@ namespace components {
 		return rects::xywh<float>(0, 0, 0, 0);
 	}
 
-	vec2i gui_element::get_initial_position_for_special_control(const special_control s) const {
-		switch (s) {
-		case special_control::DROP_ITEM: return vec2i(size.x - 150, 30);
-		}
+	vec2i gui_element::get_initial_position_for(const drag_and_drop_target_drop_item&) const {
+		return vec2i(size.x - 150, 30);
 	}
 
 	vec2 gui_element::initial_inventory_root_position() const {
 		return vec2(size.x - 250.f, size.y - 200.f);
 	}
 
-	void gui_element::draw_complete_gui_for_camera_rendering_request(const const_entity_handle& root, viewing_step& step) {
-		const auto& element = root.get<components::gui_element>();
+	void gui_element::draw_complete_gui_for_camera_rendering_request(const const_entity_handle& gui_entity, viewing_step& step) {
+		const auto& element = gui_entity.get<components::gui_element>();
 		const auto& rect_world = element.rect_world;
 
-		gui_element_location root_location;
-		root_location.set(root_of_inventory_gui_location());
-
+		root_of_inventory_gui root_of_gui;
 		gui_element_tree tree;
 
-		const_dispatcher_context context(step, root, element, tree);
+		const_dispatcher_context context(step, gui_entity, tree, root_of_gui);
 
-		rect_world.build_tree_data_into_context(context, root_location);
-		rect_world.draw_triangles(context, root_location);
+		rect_world.build_tree_data_into_context(context, root_of_inventory_gui::location());
+		rect_world.draw_triangles(context, root_of_inventory_gui::location());
 
 		if (element.is_gui_look_enabled)
 			element.draw_cursor_and_tooltip(context);
@@ -149,7 +151,7 @@ namespace components {
 		}
 
 		if (dragged_item != nullptr) {
-			auto& item = cosmos[dragged_item.get_location().item_id]->get<components::item>();
+			auto& item = cosmos[dragged_item.get_location().item_id].get<components::item>();
 
 			if (item.charges > 1) {
 				auto charges_text = to_wstring(dragged_charges);
@@ -167,8 +169,8 @@ namespace components {
 		state.renderable_transform.pos = gui_crosshair_position;
 		cursor_sprite.draw(state);
 
-		const auto& maybe_hovered_item = context._dynamic_cast<item_button>(rect_world.rect_hovered);
-		const auto& maybe_hovered_slot = context._dynamic_cast<item_button>(rect_world.rect_hovered);
+		const auto& maybe_hovered_item = context._dynamic_cast<const item_button>(rect_world.rect_hovered);
+		const auto& maybe_hovered_slot = context._dynamic_cast<const slot_button>(rect_world.rect_hovered);
 		
 		bool is_dragging = context.alive(rect_world.rect_held_by_lmb) && rect_world.held_rect_is_dragged;
 

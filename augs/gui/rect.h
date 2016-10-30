@@ -31,40 +31,28 @@ namespace augs {
 			vec2 get_scroll() const;
 		};
 
-		template <class derived, class gui_element_polymorphic_id>
+		template <class gui_element_polymorphic_id>
 		struct rect_node : rect_node_data {
 			using rect_node_data::rect_node_data;
 
-			template<class L>
-			decltype(auto) this_call(L generic_call) {
-				derived& self = *static_cast<derived*>(this);
-				return generic_call(self);
-			}
-
-			template<class L>
-			decltype(auto) this_call(L generic_call) const {
-				const derived& self = *static_cast<const derived*>(this);
-				return generic_call(self);
-			}
-
 			template <class C, class gui_element_id>
-			void build_tree_data(C context, const gui_element_id& this_id) const {
+			static void build_tree_data(C context, const gui_element_id& this_id) {
 				auto& tree_entry = context.get_tree_entry(this_id);
 				const auto parent = tree_entry.get_parent();
 				
-				auto absolute_clipped_rect = rc;
-				auto absolute_pos = vec2i(rc.get_position());
+				auto absolute_clipped_rect = this_id->rc;
+				auto absolute_pos = vec2i(this_id->rc.get_position());
 				auto absolute_clipping_rect = rects::ltrb<float>(0.f, 0.f, std::numeric_limits<int>::max() / 2.f, std::numeric_limits<int>::max() / 2.f);
 
 				/* if we have parent */
 				if (context.alive(parent)) {
 					context(parent, [&](const auto& parent_rect) {
 						auto& p = context.get_tree_entry(parent);
-						const auto scroll = parent_rect.get_scroll();
+						const auto scroll = parent_rect->get_scroll();
 
 						/* we have to save our global coordinates in absolute_xy */
-						absolute_pos = p.get_absolute_pos() + vec2i(rc.get_position()) - vec2i(int(scroll.x), int(scroll.y));
-						absolute_clipped_rect = rects::xywh<float>(static_cast<float>(absolute_pos.x), static_cast<float>(absolute_pos.y), rc.w(), rc.h());
+						absolute_pos = p.get_absolute_pos() + vec2i(this_id->rc.get_position()) - vec2i(int(scroll.x), int(scroll.y));
+						absolute_clipped_rect = rects::xywh<float>(static_cast<float>(absolute_pos.x), static_cast<float>(absolute_pos.y), this_id->rc.w(), this_id->rc.h());
 
 						/* and we have to clip by first clipping parent's rc_clipped */
 						//auto* clipping = get_clipping_parent(); 
@@ -75,13 +63,13 @@ namespace augs {
 					});
 				}
 
-				if (get_flag(flag::CLIP))
+				if (this_id->get_flag(flag::CLIP))
 					absolute_clipping_rect.clip_by(absolute_clipped_rect);
 
 				/* align scroll only to be positive and not to exceed content size */
 				//if (get_flag(flag::SNAP_SCROLL_TO_CONTENT_SIZE)) {
-				//	this_call([](auto& r) {
-				//		r.clamp_scroll_to_right_down_corner();
+				//	this_call([](const auto& r) {
+				//		r->clamp_scroll_to_right_down_corner();
 				//	});
 				//}
 
@@ -89,16 +77,14 @@ namespace augs {
 				tree_entry.set_absolute_pos(absolute_pos);
 				tree_entry.set_absolute_clipping_rect(absolute_clipping_rect);
 
-				this_call([&](const auto& r) {
-					r.for_each_child(context, this_id, [&](const auto& c, const auto& child_id) {
-						context.get_tree_entry(child_id).set_parent(this_id);
-						c.build_tree_data(context, child_id);
-					});
+				this_id->for_each_child(context, this_id, [&](const auto& child_id) {
+					context.get_tree_entry(child_id).set_parent(this_id);
+					child_id->build_tree_data(context, child_id);
 				});
 			}
 
 			template <class C, class gui_element_id>
-			void consume_raw_input_and_generate_gui_events(C context, const gui_element_id& this_id, gui::event_traversal_flags& inf) {
+			static void consume_raw_input_and_generate_gui_events(C context, const gui_element_id& this_id, gui::event_traversal_flags& inf) {
 				using namespace augs::window::event;
 				auto& gr = context.get_rect_world();
 				auto& tree_entry = context.get_tree_entry(this_id);
@@ -108,25 +94,21 @@ namespace augs {
 				const auto& mouse_pos = m.pos;
 
 				auto gui_event_lambda = [&](const gui_event ev) {
-					this_call([&](auto& r) {
-						r.consume_gui_event(context, this_id, ev);
-					});
+					this_id->consume_gui_event(context, this_id, ev);
 				};
 
-				if (get_flag(flag::ENABLE_DRAWING)) {
-					if (get_flag(flag::ENABLE_DRAWING_OF_CHILDREN)) {
-						this_call([&](auto& r) {
-							r.for_each_child(context, this_id, [&](auto& r, const auto& child_id) {
-								if (r.get_flag(flag::ENABLE_DRAWING)) {
-									r.consume_raw_input_and_generate_gui_events(context, child_id, inf);
-								}
-							});
+				if (this_id->get_flag(flag::ENABLE_DRAWING)) {
+					if (this_id->get_flag(flag::ENABLE_DRAWING_OF_CHILDREN)) {
+						this_id->for_each_child(context, this_id, [&](const auto& child_id) {
+							if (child_id->get_flag(flag::ENABLE_DRAWING)) {
+								child_id->consume_raw_input_and_generate_gui_events(context, child_id, inf);
+							}
 						});
 					}
 				}
 
-				if (get_flag(flag::ENABLE_DRAWING)) {
-					if (!get_flag(flag::DISABLE_HOVERING)) {
+				if (this_id->get_flag(flag::ENABLE_DRAWING)) {
+					if (!this_id->get_flag(flag::DISABLE_HOVERING)) {
 						const auto absolute_clipped_rect = tree_entry.get_absolute_clipped_rect();
 						const bool hover = absolute_clipped_rect.good() && absolute_clipped_rect.hover(mouse_pos);
 
@@ -146,9 +128,9 @@ namespace augs {
 								}
 								if (msg == message::ldown) {
 									gr.rect_held_by_lmb.set(this_id);
-									gr.ldrag_relative_anchor = mouse_pos - rc.get_position();
+									gr.ldrag_relative_anchor = mouse_pos - this_id->rc.get_position();
 									gr.last_ldown_position = mouse_pos;
-									rc_pos_before_dragging = vec2i(rc.get_position());
+									this_id->rc_pos_before_dragging = vec2i(this_id->rc.get_position());
 									gui_event_lambda(gui_event::ldown);
 								}
 								if (msg == message::mdown) {
@@ -159,13 +141,13 @@ namespace augs {
 								}
 								if (msg == message::ldoubleclick) {
 									gr.rect_held_by_lmb.set(this_id);
-									gr.ldrag_relative_anchor = mouse_pos - rc.get_position();
+									gr.ldrag_relative_anchor = mouse_pos - this_id->rc.get_position();
 									gr.last_ldown_position = mouse_pos;
 									gui_event_lambda(gui_event::ldoubleclick);
 								}
 								if (msg == message::ltripleclick) {
 									gr.rect_held_by_lmb.set(this_id);
-									gr.ldrag_relative_anchor = mouse_pos - rc.get_position();
+									gr.ldrag_relative_anchor = mouse_pos - this_id->rc.get_position();
 									gr.last_ldown_position = mouse_pos;
 									gui_event_lambda(gui_event::ltripleclick);
 								}
@@ -208,35 +190,33 @@ namespace augs {
 			}
 
 			template <class C, class gui_element_id>
-			void consume_gui_event(C context, const gui_element_id& this_id, const event_info e) const {
+			static void consume_gui_event(C context, const gui_element_id& this_id, const event_info e) {
 				// try_to_make_this_rect_focused(context, this_id, e);
 				//	scroll_content_with_wheel(context, e);
 				//	try_to_enable_middlescrolling(context, e);
 			}
 
 			template <class C, class gui_element_id>
-			void perform_logic_step(C context, const gui_element_id& this_id, const fixed_delta& delta) {
-				if (!get_flag(flag::ENABLE_DRAWING_OF_CHILDREN)) {
+			static void perform_logic_step(C context, const gui_element_id& this_id, const fixed_delta& delta) {
+				if (!this_id->get_flag(flag::ENABLE_DRAWING_OF_CHILDREN)) {
 					return;
 				}
 
-				perform_logic_step_on_children(context, this_id, delta);
+				this_id->perform_logic_step_on_children(context, this_id, delta);
 			}
 
 			template <class C, class gui_element_id>
-			void perform_logic_step_on_children(C context, const gui_element_id& this_id, const fixed_delta& delta) {
-				this_call([&](const auto& r) {
-					r.for_each_child(context, this_id, [&](auto& r, const auto& child_id) {
-						if (r.get_flag(flag::ENABLE_DRAWING)) {
-							r.perform_logic_step(context, child_id, delta);
-						}
-					});
+			static void perform_logic_step_on_children(C context, const gui_element_id& this_id, const fixed_delta& delta) {
+				this_id->for_each_child(context, this_id, [&](const auto& child_id) {
+					if (child_id->get_flag(flag::ENABLE_DRAWING)) {
+						child_id->perform_logic_step(context, child_id, delta);
+					}
 				});
 			}
 
 			template <class C, class gui_element_id>
-			void draw(C context, const gui_element_id& this_id, draw_info in) const {
-				if (!get_flag(flag::ENABLE_DRAWING_OF_CHILDREN)) {
+			static void draw(C context, const gui_element_id& this_id, draw_info in) {
+				if (!this_id->get_flag(flag::ENABLE_DRAWING_OF_CHILDREN)) {
 					return;
 				}
 
@@ -244,13 +224,11 @@ namespace augs {
 			}
 
 			template <class C, class gui_element_id>
-			void draw_children(C context, const gui_element_id& this_id, draw_info in) const {
-				this_call([&](const auto& r) {
-					r.for_each_child(context, this_id, [&](const auto& r, const auto& child_id) {
-						if (r.get_flag(flag::ENABLE_DRAWING)) {
-							r.draw(context, child_id, in);
-						}
-					});
+			static void draw_children(C context, const gui_element_id& this_id, draw_info in) {
+				this_id->for_each_child(context, this_id, [&](const auto& child_id) {
+					if (child_id->get_flag(flag::ENABLE_DRAWING)) {
+						child_id->draw(context, child_id, in);
+					}
 				});
 			}
 
@@ -289,23 +267,16 @@ namespace augs {
 			}
 
 			template <class C, class gui_element_id, class L>
-			void for_each_child(const C&, const gui_element_id&, L) {
-
-			}
-
-			template <class C, class gui_element_id, class L>
-			void for_each_child(const C&, const gui_element_id&, L) const {
+			static void for_each_child(const C&, const gui_element_id&, L) {
 
 			}
 
 			template <class C, class gui_element_id>
-			void unhover(C context, const gui_element_id& this_id, gui::event_traversal_flags& inf) {
+			static void unhover(C context, const gui_element_id& this_id, gui::event_traversal_flags& inf) {
 				auto& world = context.get_rect_world();
 
 				auto gui_event_lambda = [&](const gui_event ev) {
-					this_call([&](auto& r) {
-						r.consume_gui_event(context, this_id, ev);
-					});
+					this_id->consume_gui_event(context, this_id, ev);
 				};
 
 				gui_event_lambda(gui_event::hoverlost);
@@ -313,7 +284,7 @@ namespace augs {
 				if (world.rect_held_by_lmb == this_id)
 					gui_event_lambda(gui_event::loutdrag);
 
-				world.rect_hovered.reset();
+				world.rect_hovered.unset();
 			}
 
 			//template <class C, class gui_element_id>
@@ -329,7 +300,7 @@ namespace augs {
 			//		e == gui_event::rdown
 			//		) {
 			//		if (context.alive(sys.get_rect_in_focus())) {
-			//			if (get_flag(flag::PRESERVE_FOCUS) || !context(sys.get_rect_in_focus(), [](const auto& r) { return r.get_flag(flag::PRESERVE_FOCUS); }))
+			//			if (get_flag(flag::PRESERVE_FOCUS) || !context(sys.get_rect_in_focus(), [](const auto& r) { return r->get_flag(flag::PRESERVE_FOCUS); }))
 			//				sys.set_focus(this_id);
 			//		}
 			//		else sys.set_focus(this_id);
@@ -348,9 +319,9 @@ namespace augs {
 			//
 			//	/* enlarge the content size by every child */
 			//	context(this_id, [&content](const auto& r) {
-			//		r.for_each_child(context, [&content](const auto& r) {
-			//			if (r.get_flag(flag::ENABLE_DRAWING)) {
-			//				content.contain_positive(r.rc);
+			//		r->for_each_child(context, [&content](const auto& r) {
+			//			if (r->get_flag(flag::ENABLE_DRAWING)) {
+			//				content.contain_positive(r->rc);
 			//			}
 			//		});
 			//	});

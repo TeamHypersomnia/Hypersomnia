@@ -34,7 +34,11 @@ public:
 		return location;
 	}
 
-	location_type& get_location() const {
+	location_type& get_location() {
+		return location;
+	}
+
+	const location_type& get_location() const {
 		return location;
 	}
 };

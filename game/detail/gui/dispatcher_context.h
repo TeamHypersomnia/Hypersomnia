@@ -1,34 +1,45 @@
 #pragma once
 #include "augs/templates.h"
-#include 
+#include "game/detail/gui/location_and_pointer.h"
 
 class viewing_step;
 class fixed_step;
+class root_of_inventory_gui;
 
 namespace component {
 	struct gui_element;
 }
+
+class gui_tree_entry;
+
+typedef std::unordered_map<gui_element_location, gui_tree_entry> gui_element_tree;
 
 template <bool is_const>
 class basic_dispatcher_context {
 
 public:
 	typedef std::conditional_t<is_const, viewing_step, fixed_step>& step_ref;
-	typedef maybe_const_ref_t<is_const, gui_element> gui_element_ref;
+	typedef maybe_const_ref_t<is_const, components::gui_element> gui_element_ref;
 	typedef maybe_const_ref_t<is_const, game_gui_rect_world> game_gui_rect_world_ref;
 
-	basic_dispatcher_context(step_ref step, basic_entity_handle<is_const> handle, gui_element_ref elem, gui_element_tree& tree) :
+	basic_dispatcher_context(step_ref step, basic_entity_handle<is_const> handle, gui_element_tree& tree, root_of_inventory_gui& root) :
 		step(step),
 		handle(handle),
 		//composite_for_iteration(parent),
-		elem(elem),
-		tree(tree)
+		elem(handle.get<components::gui_element>()),
+		tree(tree),
+		root(root)
 	{}
 
 	step_ref step;
 	basic_entity_handle<is_const> handle;
 	gui_element_ref elem;
 	gui_element_tree& tree;
+	root_of_inventory_gui& root;
+
+	root_of_inventory_gui& get_root_of_inventory_gui() const {
+		return root;
+	}
 
 	basic_entity_handle<is_const> get_gui_element_entity() const {
 		return handle;
@@ -48,17 +59,17 @@ public:
 	}
 
 	gui_tree_entry& get_tree_entry(const gui_element_location& id) {
-		if (gui_tree.find(id) == gui_tree.end()) {
-			gui_tree.emplace(id, gui_tree_entry(operator()(id, [](const auto& resolved_ref) {
-				return static_cast<const augs::gui::rect_node_data&>(resolved_ref);
+		if (tree.find(id) == tree.end()) {
+			tree.emplace(id, gui_tree_entry(operator()(id, [](const auto& resolved_ref) {
+				return static_cast<const augs::gui::rect_node_data&>(*resolved_ref);
 			})));
 		}
 
-		return gui_tree.at(id);
+		return tree.at(id);
 	}
 
 	const gui_tree_entry& get_tree_entry(const gui_element_location& id) const {
-		return gui_tree.at(id);
+		return tree.at(id);
 	}
 
 	bool alive(const gui_element_location& id) const {
@@ -72,37 +83,64 @@ public:
 	}
 
 	operator basic_dispatcher_context<true>() const {
-		return{ step, handle, elem, tree };
+		return{ step, handle, elem, tree, root };
 	}
 
 	template <class L>
 	decltype(auto) operator()(const gui_element_location& id, L generic_call) const {
 		return id.call([&](const auto& resolved_location) {
-			return resolved_location.get_object_at_location_and_call(*this, generic_call);
+			location_and_pointer<std::remove_pointer_t<decltype(resolved_location.dereference(*this))>> loc(resolved_location.dereference(*this), resolved_location);
+			return generic_call(loc);
 		});
 	}
 
-	template <class Casted>
-	struct pointer_caster {
-		template <class Candidate>
-		maybe_const_ptr_t<is_const, Casted> operator()(maybe_const_ref_t<is_const, Candidate> object) {
-			if (std::is_same<Casted, Candidate>::value || std::is_base_of<Casted, Candidate>::value) {
-				return reinterpret_cast<Casted*>(&object);
-			}
-
-			return nullptr;
-		}
-	};
+	template <class T, class L>
+	decltype(auto) operator()(const location_and_pointer<T>& loc, L generic_call) const {
+		return generic_call(loc);
+	}
+	//
+	//template <bool C, class Casted>
+	//struct pointer_caster {
+	//	template <class Candidate>
+	//	decltype(auto) operator()(Candidate& object) {
+	//		if (std::is_same<Casted, Candidate>::value || std::is_base_of<Casted, Candidate>::value) {
+	//			return reinterpret_cast<maybe_const_ptr_t<C, Casted>>(&object);
+	//		}
+	//
+	//		return nullptr;
+	//	}
+	//
+	//	template <class Candidate>
+	//	const Casted* operator()(const Candidate& object) {
+	//		if (std::is_same<Casted, Candidate>::value || std::is_base_of<Casted, Candidate>::value) {
+	//			return reinterpret_cast<const Casted*>(&object);
+	//		}
+	//	
+	//		return nullptr;
+	//	}
+	//};
+	//
+	//template <class T>
+	//location_and_pointer<T> make_location_and_pointer(T* p, const typename T::location& l) const {
+	//	return{ p, l };
+	//}
+	//
+	//template <class T>
+	//location_and_pointer<const T> make_location_and_pointer(const T* const p, const typename T::location& l) const {
+	//	return{ p, l };
+	//}
 
 	template <class T>
-	location_and_pointer<T> _dynamic_cast(const gui_element_location& id) const {
-		if (dead(id)) {
+	decltype(auto) _dynamic_cast(const gui_element_location& id) const {
+		if (dead(id) || !id.is<typename T::location>()) {
 			return location_and_pointer<T>();
 		}
 
-		return id.call([&](const auto& resolved_location) const {
-			return{ resolved_location.get_object_at_location_and_call(*this, pointer_caster<T>()), resolved_location };
-		});
+		const auto& location = id.get<typename T::location>();
+
+		location_and_pointer<std::remove_pointer_t<decltype(location.dereference(*this))>> loc(location.dereference(*this), location);
+
+		return loc;
 	}
 };
 

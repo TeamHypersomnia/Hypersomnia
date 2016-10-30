@@ -21,6 +21,7 @@
 #include "game/detail/gui/root_of_inventory_gui.h"
 
 #include "game/detail/inventory_utils.h"
+#include "game/detail/gui/gui_element_tree.h"
 
 void gui_system::switch_to_gui_mode_and_back(fixed_step& step) {
 	auto& intents = step.messages.get_queue<messages::intent_message>();
@@ -51,10 +52,12 @@ void gui_system::advance_gui_elements(fixed_step& step) {
 		auto& element = root.get<components::gui_element>();
 
 		if (root.has<components::item_slot_transfers>()) {
-			components::gui_element::dispatcher_context context(step, root, element);
+			gui_element_tree tree;
+			root_of_inventory_gui root_of_gui;
 
-			gui_element_location root_location;
-			root_location.set(root_of_inventory_gui_location());
+			dispatcher_context context(step, root, tree, root_of_gui);
+
+			root_of_inventory_gui_location root_location;
 
 			element.rect_world.perform_logic_step(context, root_location, step.get_delta());
 			element.rect_world.build_tree_data_into_context(context, root_location);
@@ -69,12 +72,12 @@ void gui_system::advance_gui_elements(fixed_step& step) {
 					if (e.has_event_for_gui) {
 						bool fetched = false;
 						const auto& change = e.event_for_gui;
-						const auto& held_rect = rect_world.rect_held_by_lmb;
-
-						if (held_rect.is<item_button_for_item_component_location>()) {
-							const auto& item_entity = cosmos[held_rect.get<item_button_for_item_component_location>().item_id];
+						const auto& held_rect = context._dynamic_cast<item_button>(rect_world.rect_held_by_lmb);
+			
+						if (held_rect != nullptr) {
+							const auto& item_entity = cosmos[held_rect.get_location().item_id];
 							auto& dragged_charges = element.dragged_charges;
-
+			
 							if (change.msg == window::event::message::rdown
 								|| change.msg == window::event::message::rdoubleclick
 								) {
@@ -83,22 +86,22 @@ void gui_system::advance_gui_elements(fixed_step& step) {
 									fetched = true;
 								}
 							}
-
+			
 							if (change.msg == window::event::message::wheel) {
 								auto& item = item_entity.get<components::item>();
-
+			
 								auto delta = change.scroll.amount;
-
+			
 								dragged_charges += delta;
-
+			
 								if (dragged_charges <= 0)
 									dragged_charges = item.charges + dragged_charges;
 								if (dragged_charges > item.charges)
 									dragged_charges = dragged_charges - item.charges;
-
+			
 							}
 						}
-
+			
 						if (!fetched)
 							element.rect_world.consume_raw_input_and_generate_gui_events(context, root_location, e.event_for_gui);
 					}
