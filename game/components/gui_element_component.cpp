@@ -1,3 +1,4 @@
+#include "game/detail/gui/gui_element_location.h"
 #include "gui_element_component.h"
 
 #include "game/transcendental/step.h"
@@ -133,11 +134,11 @@ namespace components {
 			augs::gui::text_drawer tooltip_drawer;
 
 			tooltip_drawer.set_text(gui::text::format(drag_result.tooltip_text, gui::text::style()));
-			tooltip_drawer.pos = gui_crosshair_position + vec2i(cursor_sprite.size.x + 2, 0);
+			tooltip_drawer.pos = vec2i(gui_crosshair_position) + vec2i(int(cursor_sprite.size.x) + 2, 0);
 
 			state.renderable_transform.pos = left_top_corner;
 			bg_sprite.size.set(tooltip_drawer.get_bbox());
-			bg_sprite.size.y = std::max(int(cursor_sprite.size.y), tooltip_drawer.get_bbox().y);
+			bg_sprite.size.y = float(std::max(int(cursor_sprite.size.y), tooltip_drawer.get_bbox().y));
 			bg_sprite.size.x += cursor_sprite.size.x;
 			bg_sprite.draw(state);
 
@@ -159,7 +160,7 @@ namespace components {
 				augs::gui::text_drawer dragged_charges_drawer;
 
 				dragged_charges_drawer.set_text(augs::gui::text::format(charges_text, text::style()));
-				dragged_charges_drawer.pos = gui_crosshair_position + vec2i(0, cursor_sprite.size.y);
+				dragged_charges_drawer.pos = gui_crosshair_position + vec2i(0, int(cursor_sprite.size.y));
 
 				dragged_charges_drawer.draw_stroke(output_buffer, black);
 				dragged_charges_drawer.draw(output_buffer);
@@ -218,13 +219,13 @@ namespace components {
 		auto hovered = physics.query_polygon(v, filters::renderable_query());
 
 		if (hovered.entities.size() > 0) {
-			std::vector<entity_id> sorted_by_visibility(hovered.entities.begin(), hovered.entities.end());
+			std::vector<unversioned_entity_id> sorted_by_visibility(hovered.entities.begin(), hovered.entities.end());
 
-			sorted_by_visibility.erase(std::remove_if(sorted_by_visibility.begin(), sorted_by_visibility.end(), [&](entity_id e) {
+			sorted_by_visibility.erase(std::remove_if(sorted_by_visibility.begin(), sorted_by_visibility.end(), [&](const unversioned_entity_id e) {
 				return cosm[e].find<components::render>() == nullptr;
 			}), sorted_by_visibility.end());
 
-			std::sort(sorted_by_visibility.begin(), sorted_by_visibility.end(), [&](entity_id a, entity_id b) {
+			std::sort(sorted_by_visibility.begin(), sorted_by_visibility.end(), [&](const unversioned_entity_id a, const unversioned_entity_id b) {
 				return render_system::render_order_compare(cosm[a], cosm[b]);
 			});
 

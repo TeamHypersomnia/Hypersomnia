@@ -239,15 +239,15 @@ namespace augs {
 			}
 
 			template <class C, class gui_element_id>
-			static void draw_centered_texture(C context, const gui_element_id& id, gui::draw_info in, const gui::material& = gui::material(), const vec2i offset = vec2i()) {
+			static void draw_centered_texture(C context, const gui_element_id& id, gui::draw_info in, const gui::material& mat = gui::material(), const vec2i offset = vec2i()) {
 				auto absolute_centered = context.get_tree_entry(id).get_absolute_rect();
 				const auto tex_size = (*mat.tex).get_size();
 				absolute_centered.l += absolute_centered.w() / 2 - float(tex_size.x) / 2;
 				absolute_centered.t += absolute_centered.h() / 2 - float(tex_size.y) / 2;
-				absolute_centered.l = int(absolute_centered.l) + offset.x;
-				absolute_centered.t = int(absolute_centered.t) + offset.y;
-				absolute_centered.w(tex_size.x);
-				absolute_centered.h(tex_size.y);
+				absolute_centered.l = float(int(absolute_centered.l) + offset.x);
+				absolute_centered.t = float(int(absolute_centered.t) + offset.y);
+				absolute_centered.w(float(tex_size.x));
+				absolute_centered.h(float(tex_size.y));
 
 				draw_clipped_rectangle(mat, absolute_centered, context, context.get_tree_entry(id).get_parent(), in.v).good();
 			}

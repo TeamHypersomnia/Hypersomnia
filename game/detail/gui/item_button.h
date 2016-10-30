@@ -6,7 +6,6 @@
 #include "game/detail/inventory_slot_id.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/resources/manager.h"
-#include "game/detail/gui/gui_element_location.h"
 
 #include "augs/padding_byte.h"
 #include "game/resources/manager.h"
@@ -19,15 +18,15 @@ struct item_button : game_gui_rect_node {
 
 	typedef item_button_location location;
 
-	template <class C, template <class> class gui_element_id, class L>
-	static void for_each_child(C context, const gui_element_id<item_button>& this_id, L generic_call) {
+	template <class C, class gui_element_id, class L>
+	static void for_each_child(C context, const gui_element_id& this_id, L generic_call) {
 		const auto container = context.get_step().get_cosmos()[this_id.get_location().item_id];
 
 		auto* maybe_container = container.find<components::container>();
 
 		if (maybe_container) {
 			for (auto& s : maybe_container->slots) {
-				generic_call(gui_element_id<slot_button>(&s.second.button, slot_button::location{ s.first }));
+				generic_call(make_location_and_pointer(&s.second.button, slot_button::location{ s.first }));
 			}
 		}
 	}
@@ -56,10 +55,10 @@ struct item_button : game_gui_rect_node {
 	void draw_dragged_ghost_inside(augs::gui::draw_info in);
 	void draw_complete_with_children(augs::gui::draw_info in);
 
-	template <class C>
+	template <class C, class gui_element_id>
 	rects::ltrb<float> iterate_children_attachments(
 		const C& context, 
-		const gui_element_location& this_id, 
+		const gui_element_id& this_id,
 		const bool draw = false, 
 		std::vector<vertex_triangle>* target = nullptr, 
 		augs::rgba col = augs::white

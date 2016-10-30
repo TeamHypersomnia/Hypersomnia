@@ -10,7 +10,6 @@
 #include "augs/misc/constant_size_vector.h"
 #include "game/container_sizes.h"
 
-#include "game/detail/gui/gui_element_location.h"
 #include "game/detail/gui/dispatcher_context.h"
 //#include <map>
 //

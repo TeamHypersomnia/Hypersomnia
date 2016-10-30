@@ -1,4 +1,5 @@
 #include "gui_system.h"
+#include "game/detail/gui/gui_element_location.h"
 #include "game/components/gui_element_component.h"
 #include "augs/graphics/renderer.h"
 

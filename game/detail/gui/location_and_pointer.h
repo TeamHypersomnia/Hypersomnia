@@ -42,3 +42,13 @@ public:
 		return location;
 	}
 };
+
+template<class T>
+location_and_pointer<T> make_location_and_pointer(T* p, const typename T::location& l) {
+	return location_and_pointer<T>(p, l);
+}
+
+template<class T>
+location_and_pointer<const T> make_location_and_pointer(const T* p, const typename T::location& l) {
+	return location_and_pointer<const T>(p, l);
+}
