@@ -76,7 +76,7 @@ void viewing_session::view(const cosmos& cosmos,
 		+ summary() + cosmos.profiler.sorted_summary(show_profile_details), style(assets::font_id::GUI_FONT, rgba(255, 255, 255, 150)), vec2i(0, 0), 0);
 
 	quick_print(renderer.triangles, multiply_alpha(global_log::format_recent_as_text(assets::font_id::GUI_FONT), 150.f / 255), vec2i(screen_size_i.x - 300, 0), 300);
-	quick_print(renderer.triangles, custom_log, vec2i(0, bbox.h), 0);
+	quick_print(renderer.triangles, custom_log, vec2i(0, static_cast<int>(bbox.h)), 0);
 		
 	renderer.call_triangles();
 	renderer.clear_triangles();

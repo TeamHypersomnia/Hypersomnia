@@ -4,36 +4,36 @@
 
 namespace augs {
 	namespace detail {
-		template <class derived, class... Types>
-		struct unrolled_members;
+		// TEMPLATE CLASS aligned_union
+		template<size_t... _Vals>
+		struct _maximum;
 
-		template <class derived, class Head>
-		struct unrolled_members<derived, Head> {
-			void set(const Head& h) {
-				auto* self = static_cast<derived*>(this);
-				self->set_internal(h);
-			}
-
-			bool operator==(const Head& b) const {
-				const auto* self = static_cast<const derived*>(this);
-				return self->compare_internal(b);
-			}
+		template<>
+		struct _maximum<>
+		{	// maximum of nothing is 0
+			static constexpr size_t value = 0;
 		};
 
-		template <class derived, class Head, class... Tail>
-		struct unrolled_members<derived, Head, Tail...> : unrolled_members<derived, Head>, unrolled_members<derived, Tail...> {
-			using unrolled_members<derived, Tail...>::set;
-			using unrolled_members<derived, Head>::set;			
-			using unrolled_members<derived, Tail...>::operator==;
-			using unrolled_members<derived, Head>::operator==;
+		template<size_t _Val>
+		struct _maximum<_Val>
+		{	// maximum of _Val is _Val
+			static constexpr size_t value = _Val;
 		};
+
+		template<size_t _First,
+			size_t _Second,
+			size_t... _Rest>
+			struct _maximum<_First, _Second, _Rest...>
+			: _maximum<(_First < _Second ? _Second : _First), _Rest...>
+		{	// find maximum value in _First, _Second, _Rest...
+		};
+
 	}
 
 	template<class... Types>
-	class trivial_variant : public detail::unrolled_members<trivial_variant<Types...>, Types...> {
+	class trivial_variant {
 		unsigned current_type = sizeof...(Types);
-		typename std::aligned_union<0, Types...>::type _s;
-
+		char buf[detail::_maximum<0, sizeof(Types)...>::value];
 		static_assert(are_types_memcpy_safe<Types...>::value, "Types must be memcpy-safe!");
 
 		template<class L>
@@ -72,22 +72,6 @@ namespace augs {
 			}
 		}
 
-		template<class T>
-		void set_internal(const T& t) {
-			assert_correct_type<T>();
-			std::memcpy(&_s, &t, sizeof(T));
-			current_type = index_in_pack<T, Types...>::value;
-		}
-
-		template<class T>
-		bool compare_internal(const T& b) const {
-			assert_correct_type<T>();
-			return is<T>() && get<T>() == b;
-		}
-
-		template<class, class...>
-		friend struct detail::unrolled_members;
-
 	public:
 		template<class T>
 		static void assert_correct_type() {
@@ -97,7 +81,7 @@ namespace augs {
 		typedef std::tuple<Types...> types_tuple;
 
 		trivial_variant() {
-			std::memset(&_s, 0, sizeof(_s));
+			std::memset(buf, 0, sizeof(buf));
 		}
 
 		template <class T>
@@ -113,6 +97,20 @@ namespace augs {
 			return current_type != sizeof...(Types);
 		}
 
+		template<class T_convertible>
+		void set(const T_convertible& t) {
+			typedef find_convertible_type<T_convertible, Types...> T;
+
+			std::memcpy(buf, &t, sizeof(T));
+			current_type = index_in_pack<T, Types...>::value;
+		}
+
+		template<class T_convertible>
+		bool operator==(const T_convertible& b) const {
+			typedef find_convertible_type<T_convertible, Types...> T;
+			return is<T>() && get<T>() == b;
+		}
+
 		template<class T>
 		bool is() const {
 			assert_correct_type<T>();
@@ -123,26 +121,26 @@ namespace augs {
 		T& get() {
 			assert_correct_type<T>();
 			ensure(is<T>());
-			return *reinterpret_cast<T*>(&_s);
+			return *reinterpret_cast<T*>(buf);
 		}
 
 		template<class T>
 		const T& get() const {
 			assert_correct_type<T>();
 			ensure(is<T>());
-			return *reinterpret_cast<const T*>(&_s);
+			return *reinterpret_cast<const T*>(buf);
 		}
 
 		template<class T>
 		T* find() {
 			assert_correct_type<T>();
-			return is<T>() ? reinterpret_cast<T*>(&_s) : nullptr;
+			return is<T>() ? reinterpret_cast<T*>(buf) : nullptr;
 		}
 
 		template<class T>
 		const T* find() const {
 			assert_correct_type<T>();
-			return is<T>() ? reinterpret_cast<T*>(&_s) : nullptr;
+			return is<T>() ? reinterpret_cast<T*>(buf) : nullptr;
 		}
 
 		template<class L>
