@@ -161,7 +161,7 @@ namespace augs {
 								}
 
 								if (msg == message::wheel) {
-									gui_event_lambda(gui_event::wheel, inf.scroll.amount);
+									gui_event_lambda(gui_event::wheel, inf.change.scroll.amount);
 								}
 
 								if (gr.rect_held_by_lmb == this_id && msg == message::mousemotion && state.get_mouse_key(0) && absolute_clipped_rect.hover(m.ldrag)) {
