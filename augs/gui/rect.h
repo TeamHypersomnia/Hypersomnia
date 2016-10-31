@@ -235,7 +235,7 @@ namespace augs {
 			template <class C, class gui_element_id>
 			static void draw_stretched_texture(C context, const gui_element_id& id, gui::draw_info in, const gui::material& mat = gui::material()) {
 				const auto absolute = context.get_tree_entry(id).get_absolute_rect();
-				draw_clipped_rectangle(mat, absolute, context.get_tree_entry(id).get_parent(), in.v).good();
+				draw_clipped_rectangle(mat, absolute, context, context.get_tree_entry(id).get_parent(), in.v).good();
 			}
 
 			template <class C, class gui_element_id>
