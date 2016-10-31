@@ -23,8 +23,9 @@ namespace augs {
 
 		struct event_info {
 			gui_event msg;
+			int scroll_amount;
 
-			event_info(const gui_event);
+			event_info(const gui_event, const int scroll_amount = 0);
 			operator gui_event() const;
 		};
 	}

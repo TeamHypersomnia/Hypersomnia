@@ -22,7 +22,7 @@ namespace augs {
 
 			void set_default_flags();
 
-			bool set_flag(const flag f);
+			bool set_flag(const flag f, const bool value = true);
 			bool unset_flag(const flag f);
 			
 			bool get_flag(const flag f) const;
@@ -93,8 +93,8 @@ namespace augs {
 				const auto& msg = inf.change.msg;
 				const auto& mouse_pos = m.pos;
 
-				auto gui_event_lambda = [&](const gui_event ev) {
-					this_id->consume_gui_event(context, this_id, ev);
+				auto gui_event_lambda = [&](const gui_event ev, const int scroll_amount = 0) {
+					this_id->consume_gui_event(context, this_id, event_info(ev, scroll_amount));
 				};
 
 				if (this_id->get_flag(flag::ENABLE_DRAWING)) {
@@ -161,7 +161,7 @@ namespace augs {
 								}
 
 								if (msg == message::wheel) {
-									gui_event_lambda(gui_event::wheel);
+									gui_event_lambda(gui_event::wheel, inf.scroll.amount);
 								}
 
 								if (gr.rect_held_by_lmb == this_id && msg == message::mousemotion && state.get_mouse_key(0) && absolute_clipped_rect.hover(m.ldrag)) {
