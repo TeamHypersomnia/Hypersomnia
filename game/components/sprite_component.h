@@ -17,8 +17,6 @@ namespace components {
 			components::transform renderable_transform;
 			components::transform camera_transform;
 			vec2 visible_world_area;
-
-			bool screen_space_mode = false;
 			
 			enum class positioning_type : unsigned char {
 				LEFT_TOP_CORNER,
@@ -69,6 +67,6 @@ namespace components {
 		void draw(const drawing_input&) const;
 
 		std::vector<vec2> get_vertices() const;
-		augs::rects::ltrb<float> get_aabb(const components::transform&) const;
+		augs::rects::ltrb<float> get_aabb(const components::transform&, const drawing_input::positioning_type positioning = drawing_input::positioning_type::CENTER) const;
 	};
 }

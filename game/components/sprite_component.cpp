@@ -69,24 +69,19 @@ namespace components {
 
 		float final_rotation = in.renderable_transform.rotation + rotation_offset;
 
-		if (in.screen_space_mode) {
-			make_rect(transform_pos + get_size()/2, get_size(), final_rotation, v, in.positioning);
-		}
-		else {
-			auto center = in.visible_world_area / 2;
+		auto center = in.visible_world_area / 2;
 
-			auto target_position = transform_pos - in.camera_transform.pos + center;
-			
-			if (center_offset.non_zero())
-				target_position -= vec2(center_offset).rotate(final_rotation, vec2(0, 0));
+		auto target_position = transform_pos - in.camera_transform.pos + center;
+		
+		if (center_offset.non_zero())
+			target_position -= vec2(center_offset).rotate(final_rotation, vec2(0, 0));
 
-			make_rect(target_position, get_size(), final_rotation, v, in.positioning);
+		make_rect(target_position, get_size(), final_rotation, v, in.positioning);
 
-			/* rotate around the center of the screen */
-			if (in.camera_transform.rotation != 0.f)
-				for (auto& vert : v)
-					vert.rotate(in.camera_transform.rotation, center);
-		}
+		/* rotate around the center of the screen */
+		if (in.camera_transform.rotation != 0.f)
+			for (auto& vert : v)
+				vert.rotate(in.camera_transform.rotation, center);
 
 		vertex_triangle t1, t2;
 
@@ -144,10 +139,10 @@ namespace components {
 		return std::move(out);
 	}
 	
-	augs::rects::ltrb<float> sprite::get_aabb(const components::transform& transform) const {
+	augs::rects::ltrb<float> sprite::get_aabb(const components::transform& transform, const drawing_input::positioning_type positioning) const {
 		std::array<vec2, 4> v;		
 		
-		make_rect(transform.pos, get_size(), transform.rotation + rotation_offset, v, drawing_input::positioning_type::CENTER);
+		make_rect(transform.pos, get_size(), transform.rotation + rotation_offset, v, positioning);
 
 		return augs::get_aabb(v);
 	}
