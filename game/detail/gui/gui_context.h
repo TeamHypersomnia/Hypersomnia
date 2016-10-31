@@ -3,13 +3,6 @@
 #include "game/detail/gui/location_and_pointer.h"
 #include "gui_element_location.h"
 
-class viewing_step;
-class logic_step;
-template<bool is_const>
-class basic_cosmic_step;
-
-typedef basic_cosmic_step<true> const_cosmic_step;
-
 class root_of_inventory_gui;
 
 namespace component {
@@ -123,6 +116,13 @@ public:
 		return location_and_pointer<T>();
 	}
 };
+
+class viewing_step;
+class logic_step;
+template<bool is_const>
+class basic_cosmic_step;
+
+typedef basic_cosmic_step<true> const_cosmic_step;
 
 typedef basic_gui_context<logic_step> logic_gui_context;
 typedef basic_gui_context<const_cosmic_step> const_gui_context;
