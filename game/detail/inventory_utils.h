@@ -6,8 +6,8 @@
 
 #define SPACE_ATOMS_PER_UNIT 1000
 
-class fixed_step;
-void perform_transfer(item_slot_transfer_request, fixed_step& step);
+class logic_step;
+void perform_transfer(item_slot_transfer_request, logic_step& step);
 
 unsigned calculate_space_occupied_with_children(const_entity_handle item);
 
@@ -23,4 +23,4 @@ std::wstring format_space_units(unsigned);
 int count_charges_in_deposit(const_entity_handle item);
 int count_charges_inside(const_inventory_slot_handle);
 
-void drop_from_all_slots(entity_handle container, fixed_step&);
+void drop_from_all_slots(entity_handle container, logic_step&);

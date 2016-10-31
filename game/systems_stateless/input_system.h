@@ -1,6 +1,6 @@
 #pragma once
-class fixed_step;
+class logic_step;
 
 struct input_system {
-	void make_intent_messages(fixed_step&);
+	void make_intent_messages(logic_step&);
 };

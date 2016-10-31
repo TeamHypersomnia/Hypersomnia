@@ -13,7 +13,7 @@
 #include <set>
 
 class cosmos;
-class fixed_step;
+class logic_step;
 
 struct rigid_body_cache {
 	b2Body* body = nullptr;
@@ -116,8 +116,8 @@ public:
 	query_output query_polygon(const std::vector<vec2>& vertices, b2Filter filter, entity_id ignore_entity = entity_id()) const;
 	query_output query_shape(b2Shape*, b2Filter filter, entity_id ignore_entity = entity_id()) const;
 	
-	void step_and_set_new_transforms(fixed_step&);
-	void post_and_clear_accumulated_collision_messages(fixed_step&);
+	void step_and_set_new_transforms(logic_step&);
+	void post_and_clear_accumulated_collision_messages(logic_step&);
 
 	mutable int ray_casts_since_last_step = 0;
 
@@ -173,5 +173,5 @@ private:
 	};
 
 	void rechoose_owner_friction_body(entity_handle);
-	void recurential_friction_handler(fixed_step&, b2Body* const entity, b2Body* const friction_owner);
+	void recurential_friction_handler(logic_step&, b2Body* const entity, b2Body* const friction_owner);
 };

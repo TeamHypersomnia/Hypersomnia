@@ -29,7 +29,7 @@ public:
 
 	bool show_profile_details = false;
 
-	void visual_response_to_game_events(const fixed_step&);
+	void visual_response_to_game_events(const logic_step&);
 
 	augs::variable_delta_timer frame_timer;
 	augs::measurements fps_profiler = augs::measurements(L"Frame");

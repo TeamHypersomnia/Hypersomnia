@@ -2,9 +2,9 @@
 
 class physics_system;
 class cosmos;
-class fixed_step;
+class logic_step;
 
 class behaviour_tree_system {
 public:
-	void evaluate_trees(fixed_step& cosmos);
+	void evaluate_trees(logic_step& cosmos);
 };

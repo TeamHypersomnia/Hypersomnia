@@ -35,7 +35,7 @@ class cosmos :
 	private put_all_components_into<augs::operations_on_all_components_mixin, cosmos>::type, 
 	public augs::easier_handle_getters_mixin<cosmos>
 {
-	void advance_deterministic_schemata(fixed_step& step_state);
+	void advance_deterministic_schemata(logic_step& step_state);
 
 #if COSMOS_TRACKS_GUIDS
 	friend class cosmic_delta;
@@ -104,7 +104,7 @@ public:
 	template<class Pre, class Post>
 	void advance_deterministic_schemata(const cosmic_entropy& input, Pre pre_solve, Post post_solve) {
 		storage_for_all_message_queues queues;
-		fixed_step step(*this, input, queues);
+		logic_step step(*this, input, queues);
 
 		pre_solve(step);
 		advance_deterministic_schemata(step);

@@ -4,14 +4,14 @@ namespace messages {
 	struct health_event;
 }
 
-class fixed_step;
+class logic_step;
 
 class sentience_system {
-	void consume_health_event(messages::health_event, fixed_step&) const;
+	void consume_health_event(messages::health_event, logic_step&) const;
 
 public:
-	void apply_damage_and_generate_health_events(fixed_step&) const;
-	void cooldown_aimpunches(fixed_step&) const;
-	void set_borders(fixed_step&) const;
-	void regenerate_values(fixed_step&) const;
+	void apply_damage_and_generate_health_events(logic_step&) const;
+	void cooldown_aimpunches(logic_step&) const;
+	void set_borders(logic_step&) const;
+	void regenerate_values(logic_step&) const;
 };

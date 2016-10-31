@@ -21,7 +21,7 @@
 #include "game/transcendental/step.h"
 #include "game/transcendental/cosmos.h"
 
-entity_id particles_system::create_refreshable_particle_group(fixed_step& step) const {
+entity_id particles_system::create_refreshable_particle_group(logic_step& step) const {
 	auto ent = step.cosm.create_entity("refreshable_particle_group");
 	
 	ent.add(components::transform());
@@ -33,7 +33,7 @@ entity_id particles_system::create_refreshable_particle_group(fixed_step& step) 
 	return ent;
 }
 
-void particles_system::game_responses_to_particle_effects(fixed_step& step) const {
+void particles_system::game_responses_to_particle_effects(logic_step& step) const {
 	auto& gunshots = step.messages.get_queue<messages::gunshot_response>();
 	auto& damages = step.messages.get_queue<messages::damage_message>();
 	auto& swings = step.messages.get_queue<messages::melee_swing_response>();
@@ -143,7 +143,7 @@ void particles_system::game_responses_to_particle_effects(fixed_step& step) cons
 	}
 }
 
-void particles_system::create_particle_effects(fixed_step& step) const {
+void particles_system::create_particle_effects(logic_step& step) const {
 	using namespace components;
 	using namespace messages;
 
@@ -327,7 +327,7 @@ void integrate_particle(resources::particle& p, float dt) {
 	p.lifetime_ms += dt * 1000.f;
 }
 
-void particles_system::destroy_dead_streams(fixed_step& step) const {
+void particles_system::destroy_dead_streams(logic_step& step) const {
 	for (auto it : step.cosm.get(processing_subjects::WITH_PARTICLE_GROUP)) {
 		auto& group = it.get<components::particle_group>();
 		auto& slots = group.stream_slots;
@@ -337,7 +337,7 @@ void particles_system::destroy_dead_streams(fixed_step& step) const {
 	}
 }
 
-void particles_system::step_streams_and_particles(fixed_step& step) const {
+void particles_system::step_streams_and_particles(logic_step& step) const {
 	auto& cosmos = step.cosm;
 	auto delta = step.get_delta();
 

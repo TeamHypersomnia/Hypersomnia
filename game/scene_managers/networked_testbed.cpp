@@ -60,10 +60,10 @@ namespace scene_managers {
 	}
 
 	void networked_testbed::populate_world_with_entities(cosmos& cosm) {
-		cosm.advance_deterministic_schemata(cosmic_entropy(), [this](fixed_step& step) { populate(step); }, [](fixed_step&) {});
+		cosm.advance_deterministic_schemata(cosmic_entropy(), [this](logic_step& step) { populate(step); }, [](logic_step&) {});
 	}
 
-	void networked_testbed::populate(fixed_step& step) {
+	void networked_testbed::populate(logic_step& step) {
 		auto& world = step.cosm;
 		const auto crate = prefabs::create_crate(world, vec2(200, 200 + 300), vec2i(100, 100) / 3);
 		const auto crate2 = prefabs::create_crate(world, vec2(400, 200 + 400), vec2i(300, 300));
@@ -324,26 +324,26 @@ namespace scene_managers {
 
 	void networked_testbed::step_with_callbacks(const cosmic_entropy& cosmic_entropy_for_this_step, cosmos& cosm) {
 		cosm.advance_deterministic_schemata(cosmic_entropy_for_this_step,
-			[this](fixed_step& step) { pre_solve(step); },
-			[this](fixed_step& step) { post_solve(step); }
+			[this](logic_step& step) { pre_solve(step); },
+			[this](logic_step& step) { post_solve(step); }
 		);
 	}
 	
 	void networked_testbed::step_with_callbacks(const cosmic_entropy& cosmic_entropy_for_this_step, cosmos& cosm, viewing_session& effects_receiver) {
 		cosm.advance_deterministic_schemata(cosmic_entropy_for_this_step,
-			[this](fixed_step& step) { pre_solve(step); },
-			[this, &effects_receiver](fixed_step& step) { 
+			[this](logic_step& step) { pre_solve(step); },
+			[this, &effects_receiver](logic_step& step) { 
 				post_solve(step); 
 				effects_receiver.visual_response_to_game_events(step);
 			}
 		);
 	}
 
-	void networked_testbed::pre_solve(fixed_step& step) {
+	void networked_testbed::pre_solve(logic_step& step) {
 
 	}
 
-	void networked_testbed::post_solve(fixed_step& step) {
+	void networked_testbed::post_solve(logic_step& step) {
 
 	}
 }

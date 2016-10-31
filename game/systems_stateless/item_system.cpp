@@ -39,7 +39,7 @@
 using namespace augs;
 
 
-void item_system::handle_trigger_confirmations_as_pick_requests(fixed_step& step) {
+void item_system::handle_trigger_confirmations_as_pick_requests(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
 	const auto& confirmations = step.messages.get_queue<messages::trigger_hit_confirmation_message>();
@@ -75,7 +75,7 @@ void item_system::handle_trigger_confirmations_as_pick_requests(fixed_step& step
 	}
 }
 
-void item_system::handle_throw_item_intents(fixed_step& step) {
+void item_system::handle_throw_item_intents(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
 	const auto& requests = step.messages.get_queue<messages::intent_message>();
@@ -98,7 +98,7 @@ void item_system::handle_throw_item_intents(fixed_step& step) {
 	}
 }
 
-void item_system::handle_holster_item_intents(fixed_step& step) {
+void item_system::handle_holster_item_intents(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
 	const auto& requests = step.messages.get_queue<messages::intent_message>();
@@ -130,7 +130,7 @@ void components::item_slot_transfers::interrupt_mounting() {
 	mounting.intented_mounting_slot.unset();
 }
 
-void item_system::process_mounting_and_unmounting(fixed_step& step) {
+void item_system::process_mounting_and_unmounting(logic_step& step) {
 	ensure(false);
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();

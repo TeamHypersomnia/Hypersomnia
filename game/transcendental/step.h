@@ -18,6 +18,18 @@ namespace augs {
 	class renderer;
 }
 
+template<bool is_const>
+class basic_cosmic_step {
+	typedef maybe_const_ref_t<is_const, cosmos> cosmos_ref;
+public:
+	cosmos_ref cosm;
+	
+	basic_cosmic_step(cosmos_ref);
+};
+
+typedef basic_cosmic_step<false> cosmic_step;
+typedef basic_cosmic_step<true> const_cosmic_step;
+
 class viewing_step {
 public:
 	viewing_step(const cosmos&, const immediate_hud& hud, aabb_highlighter&, const augs::variable_delta&, augs::renderer&, state_for_drawing_camera camera_state);
@@ -39,9 +51,9 @@ public:
 	std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> visible_per_layer;
 };
 
-class fixed_step {
+class logic_step {
 	friend class cosmos;
-	fixed_step(cosmos&, const cosmic_entropy&, storage_for_all_message_queues&);
+	logic_step(cosmos&, const cosmic_entropy&, storage_for_all_message_queues&);
 
 public:
 	storage_for_all_message_queues& messages;

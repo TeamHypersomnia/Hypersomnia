@@ -223,7 +223,7 @@ b2world(new b2World(b2Vec2(0.f, 0.f))), ray_casts_since_last_step(0) {
 	b2world->SetAutoClearForces(false);
 }
 
-void physics_system::post_and_clear_accumulated_collision_messages(fixed_step& step) {
+void physics_system::post_and_clear_accumulated_collision_messages(logic_step& step) {
 	step.messages.post(accumulated_messages);
 	accumulated_messages.clear();
 }
@@ -240,7 +240,7 @@ physics_system::contact_listener::~contact_listener() {
 	get_sys().b2world->SetContactListener(nullptr);
 }
 
-void physics_system::step_and_set_new_transforms(fixed_step& step) {
+void physics_system::step_and_set_new_transforms(logic_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 

@@ -17,7 +17,7 @@ void components::position_copying::set_target(entity_id new_target) {
 	target = new_target;
 }
 
-void position_copying_system::update_transforms(fixed_step& step) {
+void position_copying_system::update_transforms(logic_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 	auto targets = cosmos.get(processing_subjects::WITH_POSITION_COPYING);

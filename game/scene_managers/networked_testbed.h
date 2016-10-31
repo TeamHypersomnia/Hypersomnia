@@ -11,7 +11,7 @@
 #include "augs/misc/machine_entropy.h"
 
 struct cosmic_entropy;
-class fixed_step;
+class logic_step;
 class cosmos;
 class world_camera;
 class viewing_session;
@@ -19,7 +19,7 @@ struct input_context;
 
 namespace scene_managers {
 	class networked_testbed {
-		void populate(fixed_step&);
+		void populate(logic_step&);
 
 		struct controlled_character {
 			controlled_character(entity_id id = entity_id()) : id(id) {}
@@ -37,8 +37,8 @@ namespace scene_managers {
 		void step_with_callbacks(const cosmic_entropy&, cosmos&);
 		void step_with_callbacks(const cosmic_entropy&, cosmos&, viewing_session& effects_receiver);
 
-		void pre_solve(fixed_step&);
-		void post_solve(fixed_step&);
+		void pre_solve(logic_step&);
+		void post_solve(logic_step&);
 
 	};
 

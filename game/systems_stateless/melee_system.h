@@ -3,7 +3,7 @@
 #include "game/transcendental/entity_handle_declaration.h"
 
 class cosmos;
-class fixed_step;
+class logic_step;
 
 namespace components{
 	struct melee;
@@ -15,9 +15,9 @@ class melee_animation;
 class melee_system {
 public:
 
-	void consume_melee_intents(fixed_step& step);
-	void initiate_and_update_moves(fixed_step& step);
-	melee_state primary_action(fixed_step& step, double dt, entity_handle target, components::melee& melee_component, components::damage& damage);
-	melee_state secondary_action(fixed_step& step, double dt, entity_handle target, components::melee& melee_component, components::damage& damage);
-	melee_state tertiary_action(fixed_step& step, double dt, entity_handle target, components::melee& melee_component, components::damage& damage);
+	void consume_melee_intents(logic_step& step);
+	void initiate_and_update_moves(logic_step& step);
+	melee_state primary_action(logic_step& step, double dt, entity_handle target, components::melee& melee_component, components::damage& damage);
+	melee_state secondary_action(logic_step& step, double dt, entity_handle target, components::melee& melee_component, components::damage& damage);
+	melee_state tertiary_action(logic_step& step, double dt, entity_handle target, components::melee& melee_component, components::damage& damage);
 };

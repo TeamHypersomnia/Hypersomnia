@@ -3,7 +3,7 @@
 #include "game/transcendental/entity_handle.h"
 
 namespace resources {
-	behaviour_tree::state_of_traversal::state_of_traversal(fixed_step& step, entity_handle subject, state_of_tree_instance& in, const behaviour_tree& bt)
+	behaviour_tree::state_of_traversal::state_of_traversal(logic_step& step, entity_handle subject, state_of_tree_instance& in, const behaviour_tree& bt)
 		: step(step), instance(in), original_tree(bt), subject(subject) {
 		std::fill(goals_set.begin(), goals_set.end(), false);
 	}
@@ -23,7 +23,7 @@ namespace resources {
 		});
 	}
 
-	void behaviour_tree::evaluate_instance_of_tree(fixed_step& step, entity_handle handle, state_of_tree_instance& inst) const {
+	void behaviour_tree::evaluate_instance_of_tree(logic_step& step, entity_handle handle, state_of_tree_instance& inst) const {
 		state_of_traversal traversal(step, handle, inst, *this);
 		auto result = root.evaluate_node(traversal);
 

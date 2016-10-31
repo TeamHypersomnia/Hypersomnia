@@ -9,7 +9,7 @@
 #include "game/transcendental/entity_handle.h"
 
 class cosmos;
-class fixed_step;
+class logic_step;
 
 namespace components {
 	struct item;
@@ -53,10 +53,10 @@ namespace prefabs {
 
 	entity_handle create_sample_suppressor(cosmos& world, vec2 pos);
 
-	entity_handle create_sample_magazine(fixed_step&, components::transform pos, std::string space = "0.30", entity_id charge_inside = entity_id());
-	entity_handle create_sample_rifle(fixed_step&, vec2 pos, entity_id load_mag = entity_id());
-	entity_handle create_pistol(fixed_step&, vec2 pos, entity_id load_mag = entity_id());
-	entity_handle create_submachine(fixed_step&, vec2 pos, entity_id load_mag = entity_id());
+	entity_handle create_sample_magazine(logic_step&, components::transform pos, std::string space = "0.30", entity_id charge_inside = entity_id());
+	entity_handle create_sample_rifle(logic_step&, vec2 pos, entity_id load_mag = entity_id());
+	entity_handle create_pistol(logic_step&, vec2 pos, entity_id load_mag = entity_id());
+	entity_handle create_submachine(logic_step&, vec2 pos, entity_id load_mag = entity_id());
 	
 	entity_handle create_pink_charge(cosmos&, vec2 pos, int charges = 23);
 	entity_handle create_cyan_charge(cosmos&, vec2 pos, int charges = 30);

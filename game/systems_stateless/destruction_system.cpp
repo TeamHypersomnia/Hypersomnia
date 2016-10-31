@@ -9,7 +9,7 @@
 
 #include "game/components/fixtures_component.h"
 
-void destruction_system::generate_damages_from_forceful_collisions(fixed_step& step) const {
+void destruction_system::generate_damages_from_forceful_collisions(logic_step& step) const {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 	const auto& events = step.messages.get_queue<messages::collision_message>();
@@ -41,7 +41,7 @@ void destruction_system::generate_damages_from_forceful_collisions(fixed_step& s
 	}
 }
 
-void destruction_system::apply_damages_and_split_fixtures(fixed_step& step) const {
+void destruction_system::apply_damages_and_split_fixtures(logic_step& step) const {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 	const auto& damages = step.messages.get_queue<messages::damage_message>();

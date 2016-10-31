@@ -36,10 +36,10 @@
 
 namespace scene_managers {
 	void testbed::populate_world_with_entities(cosmos& cosm) {
-		cosm.advance_deterministic_schemata(cosmic_entropy(), [this](fixed_step& step) { populate(step); }, [](fixed_step&) {});
+		cosm.advance_deterministic_schemata(cosmic_entropy(), [this](logic_step& step) { populate(step); }, [](logic_step&) {});
 	}
 
-	void testbed::populate(fixed_step& step) {
+	void testbed::populate(logic_step& step) {
 		auto& world = step.cosm;
 		const auto crate = prefabs::create_crate(world, vec2(200, 200 + 300), vec2i(100, 100) / 3);
 		const auto crate2 = prefabs::create_crate(world, vec2(400, 200 + 400), vec2i(300, 300));
@@ -333,19 +333,19 @@ namespace scene_managers {
 
 	void testbed::step_with_callbacks(const cosmic_entropy& cosmic_entropy_for_this_step, cosmos& cosm, viewing_session& post_solve_effects_response) {
 		cosm.advance_deterministic_schemata(cosmic_entropy_for_this_step,
-			[this](fixed_step& step) { pre_solve(step); },
-			[this, &post_solve_effects_response](fixed_step& step) {
+			[this](logic_step& step) { pre_solve(step); },
+			[this, &post_solve_effects_response](logic_step& step) {
 				post_solve(step);
 				post_solve_effects_response.visual_response_to_game_events(step);
 			}
 		);
 	}
 
-	void testbed::pre_solve(fixed_step& step) {
+	void testbed::pre_solve(logic_step& step) {
 
 	}
 
-	void testbed::post_solve(fixed_step& step) {
+	void testbed::post_solve(logic_step& step) {
 		auto& cosmos = step.cosm;
 		auto& ln = augs::renderer::get_current().logic_lines;
 

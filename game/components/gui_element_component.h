@@ -21,7 +21,7 @@
 //
 
 class viewing_step;
-class fixed_step;
+class logic_step;
 
 namespace components {
 	struct gui_element {

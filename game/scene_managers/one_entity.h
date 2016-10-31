@@ -7,7 +7,7 @@ namespace augs {
 }
 
 struct cosmic_entropy;
-class fixed_step;
+class logic_step;
 class cosmos;
 class viewing_session;
 struct input_context;
@@ -20,13 +20,13 @@ namespace scene_managers {
 		entity_id world_camera;
 
 	public:
-		void populate_world_with_entities(fixed_step&);
+		void populate_world_with_entities(logic_step&);
 		cosmic_entropy make_cosmic_entropy(augs::machine_entropy, const input_context&, const cosmos&);
 		entity_id get_controlled_entity() const;
 
 		void configure_view(viewing_session&) const;
 
-		void pre_solve(fixed_step&);
-		void post_solve(fixed_step&);
+		void pre_solve(logic_step&);
+		void post_solve(logic_step&);
 	};
 }

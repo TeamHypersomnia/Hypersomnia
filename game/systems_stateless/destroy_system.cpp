@@ -12,7 +12,7 @@
 
 #include "augs/ensure.h"
 
-void destroy_system::queue_children_of_queued_entities(fixed_step& step) {
+void destroy_system::queue_children_of_queued_entities(logic_step& step) {
 	auto& cosmos = step.cosm;
 	auto& queued = step.messages.get_queue<messages::queue_destruction>();
 	auto& deletions = step.messages.get_queue<messages::will_soon_be_deleted>();
@@ -29,7 +29,7 @@ void destroy_system::queue_children_of_queued_entities(fixed_step& step) {
 	queued.clear();
 }
 
-void destroy_system::perform_deletions(fixed_step& step) {
+void destroy_system::perform_deletions(logic_step& step) {
 	auto& cosmos = step.cosm;
 	auto& deletions = step.messages.get_queue<messages::will_soon_be_deleted>();
 

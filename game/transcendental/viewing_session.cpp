@@ -11,7 +11,7 @@ std::wstring viewing_session::summary() const {
 	return fps_profiler.summary() + triangles.summary();
 }
 
-void viewing_session::visual_response_to_game_events(const fixed_step& step) {
+void viewing_session::visual_response_to_game_events(const logic_step& step) {
 	hud.acquire_game_events(step);
 }
 

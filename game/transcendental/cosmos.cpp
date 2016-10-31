@@ -397,12 +397,12 @@ void cosmos::integrate_interpolated_transforms(const float seconds) const {
 
 void cosmos::advance_deterministic_schemata(const cosmic_entropy& input) {
 	storage_for_all_message_queues queues;
-	fixed_step step(*this, input, queues);
+	logic_step step(*this, input, queues);
 
 	advance_deterministic_schemata(step);
 }
 
-void cosmos::advance_deterministic_schemata(fixed_step& step) {
+void cosmos::advance_deterministic_schemata(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
 	auto& performance = profiler;

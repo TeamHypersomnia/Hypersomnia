@@ -16,7 +16,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/step.h"
 
-void car_system::set_steering_flags_from_intents(fixed_step& step) {
+void car_system::set_steering_flags_from_intents(logic_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 	auto& intents = step.messages.get_queue<messages::intent_message>();
@@ -48,7 +48,7 @@ void car_system::set_steering_flags_from_intents(fixed_step& step) {
 	}
 }
 
-void car_system::apply_movement_forces(fixed_step& step) {
+void car_system::apply_movement_forces(logic_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 	auto targets_copy = cosmos.get(processing_subjects::WITH_CAR);

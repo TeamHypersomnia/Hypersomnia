@@ -23,7 +23,7 @@ void components::crosshair::update_bounds() {
 		bounds_for_base_offset = max_look_expand + visible_world_area / 2;
 }
 
-void crosshair_system::generate_crosshair_intents(fixed_step& step) {
+void crosshair_system::generate_crosshair_intents(logic_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 	step.messages.get_queue<messages::crosshair_intent_message>().clear();
@@ -67,7 +67,7 @@ void crosshair_system::generate_crosshair_intents(fixed_step& step) {
 		}
 	}
 }
-void crosshair_system::apply_crosshair_intents_to_base_offsets(fixed_step& step) {
+void crosshair_system::apply_crosshair_intents_to_base_offsets(logic_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 	auto& events = step.messages.get_queue<messages::crosshair_intent_message>();
@@ -76,7 +76,7 @@ void crosshair_system::apply_crosshair_intents_to_base_offsets(fixed_step& step)
 		cosmos[it.subject].get<components::crosshair>().base_offset = it.crosshair_base_offset;
 }
 
-void crosshair_system::apply_base_offsets_to_crosshair_transforms(fixed_step& step) {
+void crosshair_system::apply_base_offsets_to_crosshair_transforms(logic_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 	for (auto& it : cosmos.get(processing_subjects::WITH_CROSSHAIR)) {

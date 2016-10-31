@@ -9,7 +9,7 @@
 #include "augs/misc/machine_entropy.h"
 
 struct cosmic_entropy;
-class fixed_step;
+class logic_step;
 class cosmos;
 class world_camera;
 class viewing_session;
@@ -17,7 +17,7 @@ struct input_context;
 
 namespace scene_managers {
 	class testbed {
-		void populate(fixed_step&);
+		void populate(logic_step&);
 	public:
 		augs::constant_size_vector<entity_id, TESTBED_CHARACTERS_COUNT> characters;
 		augs::constant_size_vector<entity_id, 100> crates;
@@ -42,7 +42,7 @@ namespace scene_managers {
 
 		void step_with_callbacks(const cosmic_entropy&, cosmos&, viewing_session& post_solve_effects_response);
 
-		void pre_solve(fixed_step&);
-		void post_solve(fixed_step&);
+		void pre_solve(logic_step&);
+		void post_solve(logic_step&);
 	};
 }

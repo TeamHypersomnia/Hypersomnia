@@ -4,7 +4,7 @@
 #include "gui_element_location.h"
 
 class viewing_step;
-class fixed_step;
+class logic_step;
 class root_of_inventory_gui;
 
 namespace component {
@@ -19,7 +19,7 @@ template <bool is_const>
 class basic_dispatcher_context {
 
 public:
-	typedef std::conditional_t<is_const, viewing_step, fixed_step>& step_ref;
+	typedef std::conditional_t<is_const, viewing_step, logic_step>& step_ref;
 	typedef maybe_const_ref_t<is_const, components::gui_element> gui_element_ref;
 	typedef maybe_const_ref_t<is_const, game_gui_rect_world> game_gui_rect_world_ref;
 

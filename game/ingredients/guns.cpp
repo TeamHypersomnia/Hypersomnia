@@ -62,7 +62,7 @@ namespace ingredients {
 }
 
 namespace prefabs {
-	entity_handle create_sample_magazine(fixed_step& step, components::transform pos, std::string space, entity_id charge_inside_id) {
+	entity_handle create_sample_magazine(logic_step& step, components::transform pos, std::string space, entity_id charge_inside_id) {
 		auto& cosmos = step.cosm;
 		auto charge_inside = cosmos[charge_inside_id];
 
@@ -266,7 +266,7 @@ namespace prefabs {
 		return green_charge;
 	}
 
-	entity_handle create_sample_rifle(fixed_step& step, vec2 pos, entity_id load_mag_id) {
+	entity_handle create_sample_rifle(logic_step& step, vec2 pos, entity_id load_mag_id) {
 		auto& cosmos = step.cosm;
 		auto load_mag = cosmos[load_mag_id];
 		
@@ -335,7 +335,7 @@ namespace prefabs {
 		return weapon;
 	}
 
-	entity_handle create_submachine(fixed_step& step, vec2 pos, entity_id load_mag_id) {
+	entity_handle create_submachine(logic_step& step, vec2 pos, entity_id load_mag_id) {
 		auto& cosmos = step.cosm;
 		auto load_mag = cosmos[load_mag_id];
 		auto weapon = cosmos.create_entity("submachine");
@@ -404,7 +404,7 @@ namespace prefabs {
 		return weapon;
 	}
 
-	entity_handle create_pistol(fixed_step& step, vec2 pos, entity_id load_mag_id) {
+	entity_handle create_pistol(logic_step& step, vec2 pos, entity_id load_mag_id) {
 		auto& cosmos = step.cosm;
 		auto load_mag = cosmos[load_mag_id];
 		auto weapon = cosmos.create_entity("pistol");

@@ -23,7 +23,7 @@
 
 using namespace augs;
 
-void damage_system::destroy_colliding_bullets_and_send_damage(fixed_step& step) {
+void damage_system::destroy_colliding_bullets_and_send_damage(logic_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 	const auto& events = step.messages.get_queue<messages::collision_message>();
@@ -94,7 +94,7 @@ void damage_system::destroy_colliding_bullets_and_send_damage(fixed_step& step) 
 	}
 }
 
-void damage_system::destroy_outdated_bullets(fixed_step& step) {
+void damage_system::destroy_outdated_bullets(logic_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 

@@ -13,7 +13,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/step.h"
 
-void force_joint_system::apply_forces_towards_target_entities(fixed_step& step) {
+void force_joint_system::apply_forces_towards_target_entities(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
 	for (const auto& it : cosmos.get(processing_subjects::WITH_FORCE_JOINT)) {

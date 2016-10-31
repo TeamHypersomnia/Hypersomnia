@@ -24,7 +24,7 @@
 #include "game/detail/inventory_utils.h"
 #include "game/detail/gui/gui_element_tree.h"
 
-void gui_system::switch_to_gui_mode_and_back(fixed_step& step) {
+void gui_system::switch_to_gui_mode_and_back(logic_step& step) {
 	auto& intents = step.messages.get_queue<messages::intent_message>();
 	auto& cosmos = step.cosm;
 
@@ -46,7 +46,7 @@ void gui_system::switch_to_gui_mode_and_back(fixed_step& step) {
 	}
 }
 
-void gui_system::advance_gui_elements(fixed_step& step) {
+void gui_system::advance_gui_elements(logic_step& step) {
 	auto& cosmos = step.cosm;
 
 	for (const auto& root : cosmos.get(processing_subjects::WITH_GUI_ELEMENT)) {

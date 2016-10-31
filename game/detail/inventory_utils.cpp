@@ -180,7 +180,7 @@ std::wstring format_space_units(unsigned u) {
 	return to_wstring(u / long double(SPACE_ATOMS_PER_UNIT), 2);
 }
 
-void drop_from_all_slots(entity_handle c, fixed_step& step) {
+void drop_from_all_slots(entity_handle c, logic_step& step) {
 	auto& container = c.get<components::container>();
 
 	for (auto& s : container.slots) {
@@ -217,7 +217,7 @@ void remove_item(inventory_slot_handle handle, entity_handle removed_item) {
 	removed_item.get<components::item>().current_slot.unset();
 }
 
-void perform_transfer(item_slot_transfer_request r, fixed_step& step) {
+void perform_transfer(item_slot_transfer_request r, logic_step& step) {
 	auto& cosmos = r.get_item().get_cosmos();
 	auto& item = r.get_item().get<components::item>();
 	auto previous_slot_id = item.current_slot;

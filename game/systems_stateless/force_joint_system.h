@@ -1,10 +1,10 @@
 #pragma once
 
 class cosmos;
-class fixed_step;
+class logic_step;
 
 class force_joint_system {
 public:
 
-	void apply_forces_towards_target_entities(fixed_step& step);
+	void apply_forces_towards_target_entities(logic_step& step);
 };

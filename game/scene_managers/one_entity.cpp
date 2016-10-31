@@ -24,7 +24,7 @@
 #include "game/transcendental/step.h"
 
 namespace scene_managers {
-	void one_entity::populate_world_with_entities(fixed_step& step) {
+	void one_entity::populate_world_with_entities(logic_step& step) {
 		auto& world = step.cosm;
 
 		auto crate = prefabs::create_crate(world, vec2(300, 300), vec2i(100, 100));
@@ -172,11 +172,11 @@ namespace scene_managers {
 		return result;
 	}
 
-	void one_entity::pre_solve(fixed_step& step) {
+	void one_entity::pre_solve(logic_step& step) {
 
 	}
 
-	void one_entity::post_solve(fixed_step& step) {
+	void one_entity::post_solve(logic_step& step) {
 		auto& cosmos = step.cosm;
 
 		for (auto& it : step.messages.get_queue<messages::intent_message>()) {

@@ -30,7 +30,7 @@
 
 using namespace augs;
 
-void gun_system::consume_gun_intents(fixed_step& step) {
+void gun_system::consume_gun_intents(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
 	const auto& events = step.messages.get_queue<messages::intent_message>();
@@ -58,7 +58,7 @@ components::transform components::gun::calculate_barrel_transform(const componen
 	return barrel_transform;
 }
 
-void gun_system::launch_shots_due_to_pressed_triggers(fixed_step& step) {
+void gun_system::launch_shots_due_to_pressed_triggers(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
 	step.messages.get_queue<messages::gunshot_response>().clear();

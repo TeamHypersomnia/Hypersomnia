@@ -18,7 +18,7 @@ using namespace augs;
 using namespace messages;
 using namespace resources;
 
-void animation_system::game_responses_to_animation_messages(fixed_step& step) {
+void animation_system::game_responses_to_animation_messages(logic_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 	auto& movements = step.messages.get_queue<movement_response>();
@@ -60,7 +60,7 @@ void animation_system::game_responses_to_animation_messages(fixed_step& step) {
 	}
 }
 
-void animation_system::handle_animation_messages(fixed_step& step) {
+void animation_system::handle_animation_messages(logic_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 	auto events = step.messages.get_queue<animation_message>();
@@ -133,7 +133,7 @@ void components::animation::set_current_frame(unsigned number) {
 	frame_num = number;
 }
 
-void animation_system::progress_animation_states(fixed_step& step) {
+void animation_system::progress_animation_states(logic_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 

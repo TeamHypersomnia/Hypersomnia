@@ -58,7 +58,7 @@ void physics_system::rechoose_owner_friction_body(const entity_handle entity) {
 	}
 }
 
-void physics_system::recurential_friction_handler(fixed_step& step, b2Body* const body, b2Body* const friction_entity) {
+void physics_system::recurential_friction_handler(logic_step& step, b2Body* const body, b2Body* const friction_entity) {
 	if (friction_entity == nullptr) return;
 
 	const float dt = static_cast<float>(step.get_delta().in_seconds());
