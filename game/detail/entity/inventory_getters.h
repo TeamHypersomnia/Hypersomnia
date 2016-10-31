@@ -23,13 +23,12 @@ public:
 	template <class F>
 	void for_each_contained_item_recursive(F callback) const {
 		auto& item = *static_cast<const entity_handle_type*>(this);
-		auto& cosmos = item.get_cosmos();
 
 		if (item.has<components::container>()) {
-			for (auto& s : item.get<components::container>().slots) {
-				auto item_handles = cosmos[s.second.items_inside];
+			for (const auto& s : item.get<components::container>().slots) {
+				const auto& item_handles = item.get_cosmos()[s.second.items_inside];
 
-				for (auto it : item_handles) {
+				for (const auto it& : item_handles) {
 					callback(it);
 					it.for_each_contained_item_recursive(callback);
 				}

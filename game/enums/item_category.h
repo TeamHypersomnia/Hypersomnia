@@ -1,6 +1,6 @@
 #pragma once
 
-enum item_category {
+enum class item_category : unsigned {
 	//ITEM = 1 << 0,
 	RAIL_ATTACHMENT = 1 << 1,
 	BARREL_ATTACHMENT = 1 << 2,

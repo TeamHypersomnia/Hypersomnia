@@ -40,15 +40,13 @@ public:
 
 	template <class F>
 	void for_each_descendant(F callback) const {
-		for (auto& i : get().items_inside) {
-			auto handle = make_handle(i);
-
+		for (const auto& handle : get_items_inside()) {
 			callback(handle);
 
-			auto* container = handle.find<components::container>();
+			const auto* container = handle.find<components::container>();
 
 			if (container)
-				for (auto& s : container->slots)
+				for (const auto& s : container->slots)
 					handle[s.first].for_each_descendant(callback);
 		}
 	}

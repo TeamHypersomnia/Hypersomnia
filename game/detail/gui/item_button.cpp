@@ -1,79 +1,194 @@
-#include "item_button.h"
-#include "pixel_line_connector.h"
-#include "grid.h"
+#include "game/detail/gui/item_button.h"
+#include "game/detail/gui/pixel_line_connector.h"
+#include "game/detail/gui/grid.h"
+#include "game/detail/gui/dispatcher_context.h"
+#include "game/detail/gui/gui_element_tree.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
+#include "game/transcendental/step.h"
 #include "augs/graphics/renderer.h"
 #include "augs/templates.h"
 
 #include "augs/gui/stroke.h"
 
-#include "game/globals/item_category.h"
-#include "game/detail/state_for_drawing.h"
+#include "game/enums/item_category.h"
 #include "game/detail/inventory_slot.h"
 #include "game/detail/inventory_utils.h"
 #include "game/components/gui_element_component.h"
 #include "game/components/sprite_component.h"
 #include "game/components/item_component.h"
-#include "game/systems/gui_system.h"
-#include "game/systems/input_system.h"
+#include "game/systems_stateless/gui_system.h"
+#include "game/systems_stateless/input_system.h"
 #include "game/resources/manager.h"
 
 #include "augs/ensure.h"
 
-bool item_button::is_being_wholely_dragged_or_pending_finish(const const_dispatcher_context& context, const gui_element_location& this_id) {
+bool item_button::is_being_wholely_dragged_or_pending_finish(const const_dispatcher_context& context, const const_this_pointer& this_id) {
 	const auto& rect_world = context.get_rect_world();
 	const auto& element = context.get_gui_element_component();
-	const auto& gui_element_entity = context.get_gui_element_entity();
-
-	this_id.get<item_button_for_item_component_location>()
+	const auto& cosmos = context.get_step().get_cosmos();
 
 	if (rect_world.is_being_dragged(this_id)) {
-		const bool is_drag_partial = element.dragged_charges < item.get<components::item>().charges;
+		const bool is_drag_partial = element.dragged_charges < cosmos[this_id.get_location().item_id].get<components::item>().charges;
 		return !is_drag_partial;
 	}
 
 	return false;
 }
 
-item_button::item_button(rects::xywh<float> rc) : rect(rc) {
-	clip = false;
-	scrollable = false;
-	focusable = false;
+item_button::item_button(rects::xywh<float> rc) : base(rc) {
+	unset_flag(augs::gui::flag::CLIP);
+	unset_flag(augs::gui::flag::SCROLLABLE);
+	unset_flag(augs::gui::flag::FOCUSABLE);
 }
 
-void item_button::draw_dragged_ghost_inside(draw_info in) {
-	draw_proc(in, true, false, false, true, false, false, false);
+void item_button::draw_dragged_ghost_inside(const const_dispatcher_context& context, const const_this_pointer& this_id, draw_info in) {
+	drawing_flags f;
+	f.draw_inside = true;
+	f.draw_border = false;
+	f.draw_connector = false;
+	f.decrease_alpha = true;
+	f.decrease_border_alpha = false;
+	f.draw_container_opened_mark = false;
+	f.draw_charges = false;
+	f.absolute_xy_offset = griddify(context.get_rect_world().current_drag_amount);
+
+	draw_proc(context, this_id, in, f);
 }
 
-void item_button::draw_complete_with_children(draw_info in) {
-	draw_children(in);
-	draw_proc(in, true, true, true, false, false, true);
+void item_button::draw_complete_with_children(const const_dispatcher_context& context, const const_this_pointer& this_id, draw_info in) {
+	drawing_flags f;
+	f.draw_inside = true;
+	f.draw_border = true;
+	f.draw_connector = true;
+	f.decrease_alpha = false;
+	f.decrease_border_alpha = false;
+	f.draw_container_opened_mark = true;
+	f.draw_charges = true;
+
+	draw_children(context, this_id, in);
+	draw_proc(context, this_id, in, f);
 }
 
-void item_button::draw_grid_border_ghost(draw_info in) {
-	auto prev_abs = absolute_xy;
-	absolute_xy = prev_abs + griddify(in.owner.current_drag_amount);
-	draw_proc(in, false, true, false, true, true);
-	absolute_xy = prev_abs;
+void item_button::draw_grid_border_ghost(const const_dispatcher_context& context, const const_this_pointer& this_id, draw_info in) {
+	drawing_flags f;
+	f.draw_inside = false;
+	f.draw_border = true;
+	f.draw_connector = false;
+	f.decrease_alpha = true;
+	f.decrease_border_alpha = true;
+	f.draw_container_opened_mark = false;
+	f.draw_charges = true;
+	f.absolute_xy_offset = griddify(context.get_rect_world().current_drag_amount);
+
+	draw_proc(context, this_id, in, f);
 }
 
-void item_button::draw_complete_dragged_ghost(draw_info in) {
-	auto parent_slot = item->get<components::item>().current_slot;
+void item_button::draw_complete_dragged_ghost(const const_dispatcher_context& context, const const_this_pointer& this_id, draw_info in) {
+	const auto& cosmos = context.get_step().get_cosmos();
+	auto parent_slot = cosmos[cosmos[this_id.get_location().item_id].get<components::item>().current_slot];
 	ensure(parent_slot.alive());
-	auto prev_abs = absolute_xy;
-	absolute_xy += in.owner.current_drag_amount;
-	draw_dragged_ghost_inside(in);
 
-	absolute_xy = prev_abs;
+	draw_dragged_ghost_inside(context, this_id, in);
 }
 
-void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bool draw_connector, bool decrease_alpha, bool decrease_border_alpha, bool draw_container_opened_mark, bool draw_charges) {
-	if (is_inventory_root())
+rects::ltrb<float> item_button::iterate_children_attachments(
+	const const_dispatcher_context& context,
+	const const_this_pointer& this_id,
+	const bool draw = false,
+	std::vector<vertex_triangle>* target = nullptr,
+	const augs::rgba border_col = augs::white
+) {
+	const auto& cosmos = context.get_step().get_cosmos();
+	const auto& item_handle = cosmos[this_id.get_location().item_id];
+
+	components::sprite item_sprite = item_handle.get<components::sprite>();
+
+	const auto& gui_def = resource_manager.find(item_sprite.tex)->gui_sprite_def;
+
+	item_sprite.flip_horizontally = gui_def.flip_horizontally;
+	item_sprite.flip_vertically = gui_def.flip_vertically;
+	item_sprite.rotation_offset = gui_def.rotation_offset;
+
+	item_sprite.color.a = border_col.a;
+
+	components::sprite::drawing_input state(*target);
+	state.positioning = components::sprite::drawing_input::positioning_type::LEFT_TOP_CORNER;
+
+	const auto expanded_size = this_id->rc.get_size() - this_id->with_attachments_bbox.get_size();
+
+	state.renderable_transform.pos = context.get_tree_entry(this_id).get_absolute_pos() - this_id->with_attachments_bbox.get_position() + expanded_size / 2 + vec2(1, 1);
+
+	rects::ltrb<float> button_bbox = item_sprite.get_aabb(components::transform(), state.positioning);
+
+	if (!this_id->is_container_open) {
+		auto iteration_lambda = [&](const const_entity_handle& desc) {
+			ensure(desc != item_handle)
+				return;
+
+			const auto& parent_slot = cosmos[desc.get<components::item>().current_slot];
+
+			if (parent_slot.should_item_inside_keep_physical_body(item_handle)) {
+				auto attachment_sprite = desc.get<components::sprite>();
+
+				attachment_sprite.flip_horizontally = item_sprite.flip_horizontally;
+				attachment_sprite.flip_vertically = item_sprite.flip_vertically;
+				attachment_sprite.rotation_offset = item_sprite.rotation_offset;
+
+				attachment_sprite.color.a = item_sprite.color.a;
+
+				components::sprite::drawing_input attachment_state = state;
+				
+				auto offset = parent_slot.sum_attachment_offsets_of_parents(desc) -
+					cosmos[item_handle.get<components::item>().current_slot].sum_attachment_offsets_of_parents(item_handle);
+
+				if (attachment_sprite.flip_horizontally) {
+					offset.pos.x = -offset.pos.x;
+					offset.flip_rotation();
+				}
+
+				if (attachment_sprite.flip_vertically) {
+					offset.pos.y = -offset.pos.y;
+					offset.flip_rotation();
+				}
+
+				offset += item_sprite.size / 2;
+				offset += -attachment_sprite.size / 2;
+
+				attachment_state.renderable_transform += offset;
+
+				if (draw) {
+					attachment_sprite.draw(attachment_state);
+				}
+
+				rects::ltrb<float> attachment_bbox = attachment_sprite.get_aabb(offset, state.positioning);
+				button_bbox.contain(attachment_bbox);
+			}
+		};
+
+		item_handle.for_each_contained_item_recursive(iteration_lambda);
+	}
+
+	if (draw) {
+		item_sprite.draw(state);
+	}
+
+	return button_bbox;
+}
+
+void item_button::draw_proc(const const_dispatcher_context& context, const const_this_pointer& this_id, draw_info in, const drawing_flags& f) {
+	if (is_inventory_root(context, this_id))
 		return;
 
-	auto parent_slot = item->get<components::item>().current_slot;
+	const auto& cosmos = context.get_step().get_cosmos();
+	const auto& item = cosmos[this_id.get_location().item_id];
+	const auto& detector = this_id->detector;
+	const auto& rect_world = context.get_rect_world();
+	const auto& element = context.get_gui_element_component();
+	const auto this_absolute_rect = context.get_tree_entry(this_id).get_absolute_rect();
+
+	auto parent_slot = cosmos[item.get<components::item>().current_slot];
 
 	rgba inside_col = cyan;
 	rgba border_col = cyan;
@@ -91,35 +206,35 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 		border_col.a = 220;
 	}
 
-	if (detector.current_appearance == decltype(detector)::appearance::pushed) {
+	if (detector.current_appearance == augs::gui::appearance_detector::appearance::pushed) {
 		inside_col.a = 60;
 		border_col.a = 255;
 	}
 
-	if (decrease_alpha) {
+	if (f.decrease_alpha) {
 		inside_col.a = 15;
 	}
 
-	if (decrease_border_alpha) {
+	if (f.decrease_border_alpha) {
 		border_col = slightly_visible_white;
 	}
 
-	if (draw_inside) {
-		draw_stretched_texture(in, augs::gui::material(assets::texture_id::BLANK, inside_col));
+	if (f.draw_inside) {
+		draw_stretched_texture(context, this_id, in, augs::gui::material(assets::texture_id::BLANK, inside_col));
 
-		iterate_children_attachments(true, &in.v, border_col);
+		iterate_children_attachments(context, this_id, true, &in.v, border_col);
 
-		if (draw_charges) {
-			auto& item_data = item->get<components::item>();
+		if (f.draw_charges) {
+			auto& item_data = item.get<components::item>();
 
 			int considered_charges = item_data.charges;
 
-			if (is_being_dragged(in.owner)) {
-				considered_charges = item_data.charges - ((game_gui_world&)in.owner).dragged_charges;
+			if (rect_world.is_being_dragged(this_id)) {
+				considered_charges = item_data.charges - element.dragged_charges;
 			}
 
 			long double bottom_number_val = -1.f;
-			auto* container = item->find<components::container>();
+			auto* container = item.find<components::container>();
 			bool printing_charge_count = false;
 			bool trim_zero = false;
 
@@ -129,9 +244,9 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 				bottom_number_val = considered_charges;
 				printing_charge_count = true;
 			}
-			else if (item->get_owner_world().systems.get<gui_system>().draw_free_space_inside_container_icons && item[slot_function::ITEM_DEPOSIT].alive()) {
-				if (item->get<components::item>().categories_for_slot_compatibility & item_category::MAGAZINE) {
-					if (!is_container_open) {
+			else if (element.draw_free_space_inside_container_icons && item[slot_function::ITEM_DEPOSIT].alive()) {
+				if (item.get<components::item>().categories_for_slot_compatibility & static_cast<unsigned>(item_category::MAGAZINE)) {
+					if (!this_id->is_container_open) {
 						printing_charge_count = true;
 					}
 				}
@@ -174,35 +289,35 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 
 				auto bottom_number = augs::gui::text::format(label_wstr, augs::gui::text::style(assets::font_id::GUI_FONT, label_color));
 
+				augs::gui::text_drawer charges_caption;
 				charges_caption.set_text(bottom_number);
-				charges_caption.bottom_right(get_rect_absolute());
+				charges_caption.bottom_right(context.get_tree_entry(this_id).get_absolute_rect());
 				charges_caption.draw(in);
 			}
 		}
 	}
 
-	if (draw_border) {
+	if (f.draw_border) {
 		augs::gui::solid_stroke stroke;
 		stroke.set_material(augs::gui::material(assets::texture_id::BLANK, border_col));
-		stroke.draw(in.v, *this);
+		stroke.draw(in.v, this_absolute_rect);
 	}
 
-	if (draw_connector && get_meta(parent_slot).gui_element_entity != parent_slot.container_entity) {
-		draw_pixel_line_connector(get_rect_absolute(), get_meta(parent_slot.container_entity).get_rect_absolute(), in, border_col);
+	if (f.draw_connector && parent_slot.get_container().get_owning_transfer_capability() != parent_slot.get_container()) {
+		draw_pixel_line_connector(this_absolute_rect, context.get_tree_entry(location{ parent_slot.get_container() }).get_absolute_rect(), in, border_col);
 	}
 
-	if (draw_container_opened_mark) {
-		if (item->find<components::container>()) {
+	if (f.draw_container_opened_mark) {
+		if (item.find<components::container>()) {
 			components::sprite container_status_sprite;
-			if (is_container_open)
-				container_status_sprite.set(assets::CONTAINER_OPEN_ICON, border_col);
+			if (this_id->is_container_open)
+				container_status_sprite.set(assets::texture_id::CONTAINER_OPEN_ICON, border_col);
 			else
-				container_status_sprite.set(assets::CONTAINER_CLOSED_ICON, border_col);
+				container_status_sprite.set(assets::texture_id::CONTAINER_CLOSED_ICON, border_col);
 
-			shared::state_for_drawing_renderable state;
-			state.screen_space_mode = true;
-			state.overridden_target_buffer = &in.v;
-			state.renderable_transform.pos.set(get_rect_absolute().r - container_status_sprite.size.x + 2, get_rect_absolute().t + 1
+			components::sprite::drawing_input state(in.v);
+			state.positioning = components::sprite::drawing_input::positioning_type::LEFT_TOP_CORNER;
+			state.renderable_transform.pos.set(this_absolute_rect.r - container_status_sprite.size.x + 2, this_absolute_rect.t + 1
 				//- container_status_sprite.size.y + 2
 			);
 			container_status_sprite.draw(state);
@@ -210,82 +325,91 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 	}
 }
 
-bool item_button::is_inventory_root() {
-	return item == gui_element_entity;
+bool item_button::is_inventory_root(const const_dispatcher_context& context, const const_this_pointer& this_id) {
+	return this_id.get_location().item_id == context.get_gui_element_entity();
 }
 
-void item_button::perform_logic_step(augs::gui::gui_world& gr) {
-	rect::perform_logic_step(gr);
+void item_button::perform_logic_step(const dispatcher_context& context, const this_pointer& this_id, const fixed_delta& dt) {
+	base::perform_logic_step(context, this_id, dt);
 
-	if (is_inventory_root()) {
-		enable_drawing_of_children = true;
-		disable_hovering = true;
+	const auto& cosmos = context.get_step().get_cosmos();
+	const auto& item = cosmos[this_id.get_location().item_id];
+
+	if (is_inventory_root(context, this_id)) {
+		this_id->set_flag(augs::gui::flag::ENABLE_DRAWING_OF_CHILDREN);
+		this_id->set_flag(augs::gui::flag::DISABLE_HOVERING);
 		return;
 	}
 
-	enable_drawing_of_children = is_container_open && !is_being_wholely_dragged_or_pending_finish(gr);
-	disable_hovering = is_being_wholely_dragged_or_pending_finish(gr);
+	this_id->set_flag(augs::gui::flag::ENABLE_DRAWING_OF_CHILDREN, this_id->is_container_open && !is_being_wholely_dragged_or_pending_finish(context, this_id));
+	this_id->set_flag(augs::gui::flag::DISABLE_HOVERING, is_being_wholely_dragged_or_pending_finish(context, this_id));
 
 	vec2i parent_position;
 
-	auto* sprite = item->find<components::sprite>();
+	auto* sprite = item.find<components::sprite>();
 
 	if (sprite) {
-		with_attachments_bbox = iterate_children_attachments();
-		vec2i rounded_size = with_attachments_bbox.get_size();
+		this_id->with_attachments_bbox = iterate_children_attachments(context, this_id);
+		vec2i rounded_size = this_id->with_attachments_bbox.get_size();
 		rounded_size += 22;
 		rounded_size += resource_manager.find(sprite->tex)->gui_sprite_def.gui_bbox_expander;
 		rounded_size /= 11;
 		rounded_size *= 11;
 		//rounded_size.x = std::max(rounded_size.x, 33);
 		//rounded_size.y = std::max(rounded_size.y, 33);
-		rc.set_size(rounded_size);
+		this_id->rc.set_size(rounded_size);
 	}
 
-	auto parent_slot = item->get<components::item>().current_slot;
+	auto parent_slot = cosmos[item.get<components::item>().current_slot];
 
 	if (parent_slot->always_allow_exactly_one_item) {
-		rc.set_position(get_meta(parent_slot).rc.get_position());
+		const auto& parent_button = context.dereference_location<const slot_button>({parent_slot.get_id()});
+
+		this_id->rc.set_position(parent_button->rc.get_position());
 	}
 	else {
-		rc.set_position(drag_offset_in_item_deposit);
+		this_id->rc.set_position(this_id->drag_offset_in_item_deposit);
 	}
 }
 
-void item_button::consume_gui_event(event_info info) {
-	if (is_inventory_root())
+void item_button::consume_gui_event(const dispatcher_context& context, const this_pointer& this_id, const augs::gui::event_info info) {
+	if (is_inventory_root(context, this_id))
 		return;
 
-	auto& gui = (game_gui_world&)info.owner;
+	const auto& cosmos = context.get_step().get_cosmos();
+	const auto& item = cosmos[this_id.get_location().item_id];
+	auto& element = context.get_gui_element_component();
+	auto& rect_world = context.get_rect_world();
 
-	detector.update_appearance(info);
-	auto parent_slot = item->get<components::item>().current_slot;
+	this_id->detector.update_appearance(info);
+	auto parent_slot = cosmos[item.get<components::item>().current_slot];
+	const auto& parent_button = context.dereference_location<slot_button>({ parent_slot.get_id() });
 
-	if (info == rect::gui_event::ldrag) {
-		if (!started_drag) {
-			started_drag = true;
+	if (info == gui_event::ldrag) {
+		if (!this_id->started_drag) {
+			this_id->started_drag = true;
 
-			gui.dragged_charges = item->get<components::item>().charges;
+			element.dragged_charges = item.get<components::item>().charges;
 
 			if (parent_slot->always_allow_exactly_one_item)
-				if (get_meta(parent_slot).get_rect_absolute().hover(info.owner.state.mouse.pos)) {
-					get_meta(parent_slot).houted_after_drag_started = false;
+				if (context.get_tree_entry(parent_button).get_absolute_rect().hover(rect_world.last_state.mouse.pos)) {
+					parent_button->houted_after_drag_started = false;
 				}
 		}
 	}
 
-	if (info == rect::gui_event::wheel) {
-		LOG("%x", info.owner.state.mouse.scroll);
+	if (info == gui_event::wheel) {
+		LOG("%x", info.scroll_amount);
 	}
 
-	if (info == rect::gui_event::rclick) {
-		is_container_open = !is_container_open;
+	if (info == gui_event::rclick) {
+		this_id->is_container_open = !this_id->is_container_open;
 	}
 
-	if (info == rect::gui_event::lfinisheddrag) {
-		started_drag = false;
+	if (info == gui_event::lfinisheddrag) {
+		this_id->started_drag = false;
 
-		auto& parent_cosmos = item->get_owner_world();
+		auto& parent_cosmos = item.get_owner_world();
 		auto& drag_result = gui.prepare_drag_and_drop_result();
 
 		if (drag_result.possible_target_hovered && drag_result.will_drop_be_successful()) {
@@ -308,17 +432,13 @@ void item_button::consume_gui_event(event_info info) {
 	// if(being_dragged && inf == rect::gui_event::lup)
 }
 
-void item_button::draw_triangles(draw_info in) {
-	if (is_inventory_root()) {
-		draw_children(in);
+void item_button::draw_triangles(const const_dispatcher_context& context, const const_this_pointer& this_id, draw_info in) {
+	if (is_inventory_root(context, this_id)) {
+		draw_children(context, this_id, in);
 		return;
 	}
 
-	if (!is_being_wholely_dragged_or_pending_finish(in.owner)) {
-		draw_complete_with_children(in);
+	if (!is_being_wholely_dragged_or_pending_finish(context, this_id)) {
+		this_id->draw_complete_with_children(context, this_id, in);
 	}
-}
-
-item_button& get_meta(entity_id id) {
-	return get_owning_transfer_capability(id)->get<components::gui_element>().item_metadata[id];
 }

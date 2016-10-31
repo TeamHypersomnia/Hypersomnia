@@ -1,19 +1,18 @@
 #pragma once
+#include "augs/gui/gui_event.h"
 #include "augs/gui/rect.h"
 #include "augs/gui/appearance_detector.h"
 #include "augs/gui/text_drawer.h"
 
 #include "game/detail/inventory_slot_id.h"
-#include "game/detail/gui/gui_element_location.h"
+#include "game/detail/gui/dispatcher_context.h"
 
 #include "augs/padding_byte.h"
 
 struct slot_button : game_gui_rect_node {
 	typedef slot_button_location location;
-
-	slot_button() {
-
-	}
+	typedef location_and_pointer<slot_button> this_pointer;
+	typedef location_and_pointer<const slot_button> const_this_pointer;
 
 	bool houted_after_drag_started = true;
 	padding_byte pad[3];
@@ -22,11 +21,11 @@ struct slot_button : game_gui_rect_node {
 	vec2i user_drag_offset;
 
 	augs::gui::appearance_detector detector;
+
+	static void perform_logic_step(const dispatcher_context&, const this_pointer&, const fixed_delta&);
 	
-	//void perform_logic_step(augs::gui::rect_world&);
-	//
-	//void draw_triangles(draw_info);
-	//void consume_gui_event(event_info);
+	static void draw_triangles(const const_dispatcher_context&, const const_this_pointer&, augs::gui::draw_info);
+	static void consume_gui_event(dispatcher_context&, const this_pointer&, const gui_event);
 
 	template <class C, class gui_element_id, class L>
 	static void for_each_child(C context, const gui_element_id& this_id, L generic_call) {
