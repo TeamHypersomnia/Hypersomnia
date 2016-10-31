@@ -28,7 +28,7 @@ public:
 			for (const auto& s : item.get<components::container>().slots) {
 				const auto& item_handles = item.get_cosmos()[s.second.items_inside];
 
-				for (const auto it& : item_handles) {
+				for (const auto& it : item_handles) {
 					callback(it);
 					it.for_each_contained_item_recursive(callback);
 				}
