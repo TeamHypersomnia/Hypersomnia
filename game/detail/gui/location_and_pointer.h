@@ -41,6 +41,10 @@ public:
 	const location_type& get_location() const {
 		return location;
 	}
+
+	operator location_and_pointer<const T>() const {
+		return{ ptr, location };
+	}
 };
 
 template<class T>
