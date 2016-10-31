@@ -12,16 +12,6 @@ void aabb_highlighter::update(const float delta_ms) {
 }
 
 void aabb_highlighter::draw(viewing_step& step, const_entity_handle subject) const {
-	auto& cosmos = step.cosm;
-	
-	vec2i as;
-	vec2i ap;
-
-	float gap_x = base_gap;
-	float gap_y = base_gap;
-
-	float length_decrease = 0.f;
-
 	rects::ltrb<float> aabb;
 
 	subject.for_each_sub_entity_recursive([&aabb](const_entity_handle e) {
@@ -41,26 +31,29 @@ void aabb_highlighter::draw(viewing_step& step, const_entity_handle subject) con
 		}
 	});
 
-	auto lesser_dimension = std::min(aabb.w(), aabb.h());
+	const auto lesser_dimension = std::min(aabb.w(), aabb.h());
 	
+	float length_decrease = 0.f;
+
 	if (lesser_dimension < scale_down_when_aabb_no_bigger_than)
 		length_decrease = std::min(smallest_length - 4, scale_down_when_aabb_no_bigger_than - lesser_dimension);
 	
-	auto adjusted_biggest_length = biggest_length - length_decrease;
-	auto adjusted_smallest = smallest_length - length_decrease;
+	const auto adjusted_biggest_length = biggest_length - length_decrease;
+	const auto adjusted_smallest = smallest_length - length_decrease;
 
-	int current_length = augs::interp(adjusted_biggest_length, adjusted_smallest, timer / cycle_duration_ms);
-	int gap_animated_expansion = current_length - adjusted_smallest;
-	gap_x += gap_animated_expansion+length_decrease;
-	gap_y += gap_animated_expansion+length_decrease;
+	const int current_length{ static_cast<int>(augs::interp(adjusted_biggest_length, adjusted_smallest, timer / cycle_duration_ms)) };
+	const int gap_animated_expansion{ static_cast<int>(current_length - adjusted_smallest) };
+
+	const float gap_x = base_gap + gap_animated_expansion+length_decrease;
+	const float gap_y = base_gap + gap_animated_expansion+length_decrease;
 	
 	aabb.l -= gap_x;
 	aabb.r += gap_x;
 	aabb.t -= gap_y;
 	aabb.b += gap_y;
 
-	as = aabb.get_size();
-	ap = aabb.get_position();
+	vec2i as = aabb.get_size();
+	vec2i ap = aabb.get_position();
 
 	if (aabb.good()) {
 		components::sprite::drawing_input state(step.renderer.triangles);
