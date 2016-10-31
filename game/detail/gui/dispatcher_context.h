@@ -132,16 +132,23 @@ public:
 	//}
 
 	template <class T>
-	decltype(auto) _dynamic_cast(const gui_element_location& id) const {
-		if (dead(id) || !id.is<typename T::location>()) {
-			return location_and_pointer<T>();
+	decltype(auto) dereference_location(const typename T::location& location) const {
+		typedef typename T::location location_type;
+
+		if (location.alive(*this)) {
+			return location_and_pointer<T>(location.dereference(*this), location);
 		}
 
-		const auto& location = id.get<typename T::location>();
+		return location_and_pointer<T>();
+	}
 
-		location_and_pointer<std::remove_pointer_t<decltype(location.dereference(*this))>> loc(location.dereference(*this), location);
+	template <class T>
+	decltype(auto) _dynamic_cast(const gui_element_location& polymorphic_id) const {
+		if (polymorphic_id.is<typename T::location>()) {
+			return dereference_location<T>(polymorphic_id.get<typename T::location>());
+		}
 
-		return loc;
+		return location_and_pointer<T>();
 	}
 };
 
