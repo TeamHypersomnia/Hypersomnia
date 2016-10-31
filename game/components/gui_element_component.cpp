@@ -85,20 +85,19 @@ namespace components {
 		const auto& cosmos = step.get_cosmos();
 
 		auto& output_buffer = context.get_step().renderer.get_triangle_buffer();
+		
 		components::sprite::drawing_input state(output_buffer);
-
-		state.setup_from(step.camera_state);
-		state.screen_space_mode = true;
+		state.positioning = components::sprite::drawing_input::positioning_type::LEFT_TOP_CORNER;
 
 		gui::draw_info in(output_buffer);
 
 		const auto& dragged_item = drag_result.dragged_item;
 
 		if (dragged_item) {
-			dragged_item->draw_complete_dragged_ghost(context, in);
+			dragged_item->draw_complete_dragged_ghost(context, dragged_item, in);
 
 			if (!drag_result.possible_target_hovered)
-				drag_result.dragged_item->draw_grid_border_ghost(context, in);
+				drag_result.dragged_item->draw_grid_border_ghost(context, dragged_item, in);
 		}
 
 		components::sprite bg_sprite;
