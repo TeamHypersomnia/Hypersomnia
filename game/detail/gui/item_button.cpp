@@ -2,6 +2,7 @@
 #include "game/detail/gui/pixel_line_connector.h"
 #include "game/detail/gui/grid.h"
 #include "game/detail/gui/dispatcher_context.h"
+#include "game/detail/gui/drag_and_drop.h"
 #include "game/detail/gui/gui_element_tree.h"
 
 #include "game/transcendental/cosmos.h"
@@ -96,9 +97,9 @@ void item_button::draw_complete_dragged_ghost(const const_dispatcher_context& co
 rects::ltrb<float> item_button::iterate_children_attachments(
 	const const_dispatcher_context& context,
 	const const_this_pointer& this_id,
-	const bool draw = false,
-	std::vector<vertex_triangle>* target = nullptr,
-	const augs::rgba border_col = augs::white
+	const bool draw,
+	std::vector<vertex_triangle>* target,
+	const augs::rgba border_col
 ) {
 	const auto& cosmos = context.get_step().get_cosmos();
 	const auto& item_handle = cosmos[this_id.get_location().item_id];
@@ -376,7 +377,7 @@ void item_button::consume_gui_event(const dispatcher_context& context, const thi
 	if (is_inventory_root(context, this_id))
 		return;
 
-	const auto& cosmos = context.get_step().get_cosmos();
+	auto& cosmos = context.get_step().get_cosmos();
 	const auto& item = cosmos[this_id.get_location().item_id];
 	auto& element = context.get_gui_element_component();
 	auto& rect_world = context.get_rect_world();
@@ -409,22 +410,21 @@ void item_button::consume_gui_event(const dispatcher_context& context, const thi
 	if (info == gui_event::lfinisheddrag) {
 		this_id->started_drag = false;
 
-		auto& parent_cosmos = item.get_owner_world();
-		auto& drag_result = gui.prepare_drag_and_drop_result();
+		auto& drag_result = prepare_drag_and_drop_result(context);
 
 		if (drag_result.possible_target_hovered && drag_result.will_drop_be_successful()) {
-			parent_cosmos.post_message(drag_result.intent);
+			perform_transfer(cosmos[drag_result.simulated_request], context.get_step());
 		}
 		else if (!drag_result.possible_target_hovered) {
-			vec2i griddified = griddify(info.owner.current_drag_amount);
+			vec2i griddified = griddify(rect_world.current_drag_amount);
 
 			if (parent_slot->always_allow_exactly_one_item) {
-				get_meta(parent_slot).user_drag_offset += griddified;
-				get_meta(parent_slot).houted_after_drag_started = true;
-				get_meta(parent_slot).perform_logic_step(info.owner);
+				parent_button->user_drag_offset += griddified;
+				parent_button->houted_after_drag_started = true;
+				parent_button->perform_logic_step(context, parent_button, fixed_delta());
 			}
 			else {
-				drag_offset_in_item_deposit += griddified;
+				this_id->drag_offset_in_item_deposit += griddified;
 			}
 		}
 	}
