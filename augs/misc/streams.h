@@ -24,11 +24,11 @@ namespace augs {
 			return write_pos - read_pos;
 		}
 
-		void set_write_pos(size_t new_pos) {
+		void set_write_pos(const size_t new_pos) {
 			write_pos = new_pos;
 		}
 
-		void set_read_pos(size_t new_pos) {
+		void set_read_pos(const size_t new_pos) {
 			read_pos = new_pos;
 		}
 
@@ -55,8 +55,8 @@ namespace augs {
 		char* data();
 		const char* data() const;
 
-		char& operator[](size_t);
-		const char& operator[](size_t) const;
+		char& operator[](const size_t);
+		const char& operator[](const size_t) const;
 
 		std::string to_string() const;
 
@@ -83,10 +83,10 @@ namespace augs {
 			augs::read_object(ar, read_pos);
 		}
 
-		bool read(char* data, size_t bytes);
-		void write(const char* data, size_t bytes);
+		bool read(char* const data, const size_t bytes);
+		void write(const char* const data, const size_t bytes);
 		void write(const augs::stream&);
-		void reserve(size_t);
+		void reserve(const size_t);
 		void reserve(const output_stream_reserver&);
 	};
 
@@ -94,6 +94,6 @@ namespace augs {
 	public:
 		stream make_stream();
 
-		void write(const char* data, size_t bytes);
+		void write(const char* const data, const size_t bytes);
 	};
 }

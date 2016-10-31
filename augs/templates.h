@@ -80,19 +80,8 @@ template<class Container, class T>
 auto find_in(Container& v, const T& l) {
 	return std::find(v.begin(), v.end(), l);
 }
-/* number to string conversion */
 
-template <class T>
-std::string to_string(T val) {
-	std::ostringstream ss;
-	ss << val;
-	return ss.str();
-}
-
-template <>
 std::string to_string(std::wstring val);
-
-/* number to wide string conversion */
 
 template <class T>
 std::wstring to_wstring(T val, int precision = -1, bool fixed = false) {
@@ -111,22 +100,6 @@ std::wstring to_wstring(T val, int precision = -1, bool fixed = false) {
 }
 
 std::wstring to_wstring(std::string val);
-
-template <class T>
-T to_value(std::wstring& s) {
-	std::wistringstream ss(s);
-	T v;
-	ss >> v;
-	return v;
-}
-
-template <class T>
-T to_value(std::string& s) {
-	std::istringstream ss(s);
-	T v;
-	ss >> v;
-	return v;
-}
 
 namespace templates_detail
 {
@@ -176,7 +149,6 @@ void for_each_in_tuples(std::tuple<Ts...>& t, std::tuple<Ts...>& b, F f)
 	templates_detail::for_eaches(t, b, f, templates_detail::gen_seq<sizeof...(Ts)>());
 }
 
-
 template<typename... Ts, typename F>
 void for_each_type(F f)
 {
@@ -204,24 +176,6 @@ template<template<typename> class Mod,
 template<template<typename> class Mod,
 	typename ...Args>
 	using tuple_of_t = typename tuple_of<Mod, Args...>::type;
-
-
-template<bool _Test,
-	template<typename> class _Ty1,
-	template<typename> class _Ty2>
-struct conditional_template
-{	// type is _Ty2 for assumed !_Test
-	template <typename T>
-	using type = _Ty2<T>;
-};
-
-template<template<typename> class _Ty1,
-	template<typename> class _Ty2>
-struct conditional_template<true, _Ty1, _Ty2>
-{	// type is _Ty1 for _Test
-	template <typename T>
-	using type = _Ty1<T>;
-};
 
 template<bool is_const, class T>
 struct maybe_const_ref { typedef std::conditional_t<is_const, const T&, T&> type; };
@@ -257,62 +211,10 @@ struct has_held_ids_introspector
 	static const bool value = std::is_same<std::true_type, decltype(test<T, dummy>(nullptr))>::value;
 };
 
-//template <typename Base, typename Tuple, std::size_t I = 0>
-//struct tuple_ref_index;
-//
-//template <typename Base, typename Head, typename... Tail, std::size_t I>
-//struct tuple_ref_index<Base, std::tuple<Head, Tail...>, I>
-//	: std::conditional<std::is_base_of<Base, Head>::value
-//	, std::integral_constant<std::size_t, I>
-//	, tuple_ref_index<Base, std::tuple<Tail...>, I + 1>
-//	>::type
-//{
-//};
-//
-//template <typename Base, typename Tuple>
-//auto tuple_ref_by_inheritance(Tuple&& tuple)
-//-> decltype(std::get<tuple_ref_index<Base, typename std::decay<Tuple>::type>::value>(std::forward<Tuple>(tuple)))
-//{
-//	return std::get<tuple_ref_index<Base, typename std::decay<Tuple>::type>::value>(std::forward<Tuple>(tuple));
-//}
-
 template <class T>
 struct saved_args_base {
 
 };
-
-template <class T, class... Args>
-struct saved_args : saved_args_base<T> {
-	std::tuple<Args...> args;
-};
-
-template <class T>
-struct save_args {
-	template<class... Args>
-	auto operator()(Args... args) {
-		return saved_args<T, Args...>(std::make_tuple(args...));
-	}
-};
-
-namespace detail {
-	template <class F, class Tuple, std::size_t... I>
-	constexpr decltype(auto) apply_impl(F&& f, Tuple&& t, std::index_sequence<I...>)
-	{
-		return std::invoke(std::forward<F>(f), std::get<I>(std::forward<Tuple>(t))...);
-		// Note: std::invoke is a C++17 feature
-	}
-} // namespace detail
-
-namespace std {
-	template <class F, class Tuple>
-	constexpr decltype(auto) apply(F&& f, Tuple&& t)
-	{
-		return detail::apply_impl(std::forward<F>(f), std::forward<Tuple>(t),
-			std::make_index_sequence<std::tuple_size<std::decay_t<Tuple>>::value>{});
-	}
-}
-
-
 
 template <class T>
 struct is_memcpy_safe {

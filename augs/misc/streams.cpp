@@ -2,7 +2,7 @@
 #include "enum_associative_array.h"
 
 namespace augs {
-	bool stream::read(char* data, size_t bytes) {
+	bool stream::read(char* data, const size_t bytes) {
 		if (read_pos + bytes <= size()) {
 			memcpy(data, buf.data() + read_pos, bytes);
 			read_pos += bytes;
@@ -15,12 +15,12 @@ namespace augs {
 	}
 	
 	std::string stream::format_as_uchars() const {
-		const unsigned char* first = reinterpret_cast<const unsigned char*>(data());
+		const unsigned char* const first = reinterpret_cast<const unsigned char*>(data());
 
 		std::string output;
 
 		for (size_t i = 0; i < size(); ++i)
-			output += ::to_string(int(first[i])) + " ";
+			output += std::to_string(static_cast<int>(first[i])) + " ";
 
 		if(output.size() > 0)
 			output.erase(output.end() - 1);
@@ -44,11 +44,11 @@ namespace augs {
 		return buf.data();
 	}
 
-	char& stream::operator[](size_t idx) {
+	char& stream::operator[](const size_t idx) {
 		return data()[idx];
 	}
 
-	const char& stream::operator[](size_t idx) const {
+	const char& stream::operator[](const size_t idx) const {
 		return data()[idx];
 	}
 	
@@ -60,7 +60,7 @@ namespace augs {
 		return buf.size();
 	}
 
-	void stream::write(const char* data, size_t bytes) {
+	void stream::write(const char* const data, const size_t bytes) {
 		if (write_pos + bytes > capacity())
 			reserve((write_pos + bytes) * 2);
 
@@ -72,7 +72,7 @@ namespace augs {
 		write(s.data(), s.size());
 	}
 
-	void output_stream_reserver::write(const char*, size_t bytes) {
+	void output_stream_reserver::write(const char* const, const size_t bytes) {
 		write_pos += bytes;
 	}
 
@@ -82,7 +82,7 @@ namespace augs {
 		return std::move(reserved);
 	}
 
-	void stream::reserve(size_t bytes) {
+	void stream::reserve(const size_t bytes) {
 		buf.resize(bytes);
 	};
 	
