@@ -103,7 +103,8 @@ public:
 
 	template<class Pre, class Post>
 	void advance_deterministic_schemata(const cosmic_entropy& input, Pre pre_solve, Post post_solve) {
-		fixed_step step(*this, input);
+		storage_for_all_message_queues queues;
+		fixed_step step(*this, input, queues);
 
 		pre_solve(step);
 		advance_deterministic_schemata(step);

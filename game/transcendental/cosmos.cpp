@@ -396,7 +396,9 @@ void cosmos::integrate_interpolated_transforms(const float seconds) const {
 }
 
 void cosmos::advance_deterministic_schemata(const cosmic_entropy& input) {
-	fixed_step step(*this, input);
+	storage_for_all_message_queues queues;
+	fixed_step step(*this, input, queues);
+
 	advance_deterministic_schemata(step);
 }
 
@@ -406,9 +408,7 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	auto& performance = profiler;
 
 	physics_system::contact_listener listener(step.cosm);
-
-	cosmic_delta::decode(cosmos, step.entropy.delta_to_apply);
-
+	
 	profiler.entropy_length.measure(step.entropy.length());
 
 	//gui_system().advance_gui_elements();

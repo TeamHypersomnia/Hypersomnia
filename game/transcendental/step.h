@@ -41,12 +41,12 @@ public:
 
 class fixed_step {
 	friend class cosmos;
-	fixed_step(cosmos&, cosmic_entropy);
+	fixed_step(cosmos&, const cosmic_entropy&, storage_for_all_message_queues&);
 
 public:
-	storage_for_all_message_queues messages;
+	storage_for_all_message_queues& messages;
 	cosmos& cosm;
-	cosmic_entropy entropy;
+	const cosmic_entropy& entropy;
 
 	augs::fixed_delta get_delta() const;
 	cosmos& get_cosmos() const;

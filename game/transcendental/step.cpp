@@ -24,7 +24,7 @@ const cosmos& viewing_step::get_cosmos() const {
 	return cosm;
 }
 
-fixed_step::fixed_step(cosmos& cosm, cosmic_entropy entropy) : cosm(cosm), entropy(entropy) {}
+fixed_step::fixed_step(cosmos& cosm, const cosmic_entropy& entropy, storage_for_all_message_queues& messages) : cosm(cosm), entropy(entropy), messages(messages) {}
 
 augs::fixed_delta fixed_step::get_delta() const {
 	return cosm.get_fixed_delta();
