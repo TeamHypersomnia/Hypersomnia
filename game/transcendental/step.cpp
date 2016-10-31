@@ -14,22 +14,20 @@ viewing_step::viewing_step(
 	aabb_highlighter& world_hover_highlighter,
 	const augs::variable_delta& delta,
 	augs::renderer& renderer, 
-	state_for_drawing_camera camera_state) : cosm(cosm), hud(hud), world_hover_highlighter(world_hover_highlighter), delta(delta), renderer(renderer), camera_state(camera_state) {}
+	state_for_drawing_camera camera_state) 
+	: 
+	const_cosmic_step(cosm), 
+	hud(hud), 
+	world_hover_highlighter(world_hover_highlighter), 
+	delta(delta), renderer(renderer), camera_state(camera_state) 
+	{}
 
 vec2 viewing_step::get_screen_space(vec2 pos) const {
 	return pos - camera_state.transformed_visible_world_area_aabb.get_position();
 }
 
-const cosmos& viewing_step::get_cosmos() const {
-	return cosm;
-}
-
-logic_step::logic_step(cosmos& cosm, const cosmic_entropy& entropy, storage_for_all_message_queues& messages) : cosm(cosm), entropy(entropy), messages(messages) {}
+logic_step::logic_step(cosmos& cosm, const cosmic_entropy& entropy, storage_for_all_message_queues& messages) : cosmic_step(cosm), entropy(entropy), messages(messages) {}
 
 augs::fixed_delta logic_step::get_delta() const {
 	return cosm.get_fixed_delta();
-}
-
-cosmos& logic_step::get_cosmos() const {
-	return cosm;
 }
