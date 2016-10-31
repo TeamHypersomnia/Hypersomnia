@@ -9,13 +9,16 @@
 #include "padding_byte.h"
 
 #include "game/detail/gui/slot_button.h"
+#include "game/enums/item_category.h"
 
 class cosmos;
 
 struct inventory_slot {
 	slot_button button;
 
-	unsigned category_allowed = 0;
+	item_category category_allowed = item_category::NONE;
+
+	item_category_bitset get_allowed_categories() const;
 
 	bool items_need_mounting = false;
 	bool only_last_inserted_is_movable = false;

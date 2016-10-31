@@ -5,6 +5,7 @@
 #include "gui_traversal_structs.h"
 #include "augs/window_framework/event.h"
 #include "augs/misc/delta.h"
+#include "augs/misc/enum_bitset.h"
 #include "gui_flags.h"
 
 namespace augs {
@@ -12,7 +13,7 @@ namespace augs {
 		struct stylesheet;
 
 		struct rect_node_data {
-			std::bitset<static_cast<size_t>(flag::COUNT)> flags;
+			augs::enum_bitset<flag> flags;
 			vec2i rc_pos_before_dragging;
 
 			rects::ltrb<float> rc; /* actual rectangle */
@@ -197,19 +198,19 @@ namespace augs {
 			}
 
 			template <class C, class gui_element_id>
-			static void perform_logic_step(C context, const gui_element_id& this_id, const fixed_delta& delta) {
+			static void perform_logic_step(C context, const gui_element_id& this_id) {
 				if (!this_id->get_flag(flag::ENABLE_DRAWING_OF_CHILDREN)) {
 					return;
 				}
 
-				this_id->perform_logic_step_on_children(context, this_id, delta);
+				this_id->perform_logic_step_on_children(context, this_id);
 			}
 
 			template <class C, class gui_element_id>
-			static void perform_logic_step_on_children(C context, const gui_element_id& this_id, const fixed_delta& delta) {
+			static void perform_logic_step_on_children(C context, const gui_element_id& this_id) {
 				this_id->for_each_child(context, this_id, [&](const auto& child_id) {
 					if (child_id->get_flag(flag::ENABLE_DRAWING)) {
-						child_id->perform_logic_step(context, child_id, delta);
+						child_id->perform_logic_step(context, child_id);
 					}
 				});
 			}

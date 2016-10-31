@@ -23,7 +23,7 @@ namespace ingredients {
 		item.dual_wield_accuracy_loss_multiplier = 1;
 		item.dual_wield_accuracy_loss_percentage = 50;
 		item.space_occupied_per_charge = to_space_units("1");
-		item.categories_for_slot_compatibility = item_category::SHOULDER_CONTAINER;
+		item.categories_for_slot_compatibility.set(item_category::SHOULDER_CONTAINER);
 	}
 }
 

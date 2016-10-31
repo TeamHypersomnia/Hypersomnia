@@ -13,7 +13,7 @@
 #include "grid.h"
 
 slot_button::slot_button() {
-	clip = false;
+	unset_flag(augs::gui::flag::CLIP);
 }
 
 void slot_button::draw_triangles(draw_info info) {

@@ -250,7 +250,7 @@ public:
 			from = get<components::flags>();
 		}
 
-		return from.bit_flags.test(static_cast<unsigned>(f));
+		return from.bit_flags.test(f);
 	}
 
 	template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
@@ -259,7 +259,7 @@ public:
 			add(components::flags());
 		}
 
-		get<components::flags>().bit_flags.set(static_cast<unsigned>(f), true);
+		get<components::flags>().bit_flags.set(f, true);
 	}
 
 	template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
@@ -268,7 +268,7 @@ public:
 			add(components::flags());
 		}
 
-		get<components::flags>().bit_flags.set(static_cast<unsigned>(f), false);
+		get<components::flags>().bit_flags.set(f, false);
 	}
 };
 

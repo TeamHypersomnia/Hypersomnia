@@ -4,16 +4,17 @@
 #include "game/transcendental/component_synchronizer.h"
 
 #include "augs/padding_byte.h"
+#include "augs/misc/enum_bitset.h"
 
 namespace components {
 	struct processing : synchronizable_component {
-		typedef std::bitset<static_cast<unsigned>(processing_subjects::LIST_COUNT)> bitset_type;
+		typedef augs::enum_bitset<processing_subjects> bitset_type;
 		
 		bool activated = true;
 		padding_byte pad[3];
 
-		bitset_type processing_subject_categories = 0;
-		bitset_type disabled_categories = 0;
+		bitset_type processing_subject_categories;
+		bitset_type disabled_categories;
 
 		template <class Archive>
 		void serialize(Archive& ar) {
@@ -25,7 +26,7 @@ namespace components {
 			);
 		}
 		
-		static components::processing get_default(const_entity_handle);
+		static components::processing get_default(const const_entity_handle&);
 	};
 }
 
@@ -35,7 +36,7 @@ public:
 	using component_synchronizer_base<is_const, components::processing>::component_synchronizer_base;
 
 	bool is_activated() const;
-	bool is_in(processing_subjects) const;
+	bool is_in(const processing_subjects) const;
 	components::processing::bitset_type get_disabled_categories() const;
 	components::processing::bitset_type get_basic_categories() const;
 };
@@ -46,10 +47,10 @@ class component_synchronizer<false, components::processing> : public basic_proce
 public:
 	using basic_processing_synchronizer<false>::basic_processing_synchronizer;
 
-	void disable_in(processing_subjects) const;
-	void enable_in(processing_subjects) const;
-	void set_disabled_categories(components::processing::bitset_type) const;
-	void set_basic_categories(components::processing::bitset_type) const;
+	void disable_in(const processing_subjects) const;
+	void enable_in(const processing_subjects) const;
+	void set_disabled_categories(const components::processing::bitset_type&) const;
+	void set_basic_categories(const components::processing::bitset_type&) const;
 };
 
 template<>

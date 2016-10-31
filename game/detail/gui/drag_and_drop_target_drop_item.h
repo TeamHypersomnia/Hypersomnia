@@ -21,5 +21,5 @@ struct drag_and_drop_target_drop_item : game_gui_rect_node {
 
 	static void draw(const const_dispatcher_context& context, const const_this_pointer& this_id, augs::gui::draw_info info);
 	static void consume_gui_event(const dispatcher_context& context, const this_pointer& this_id, const augs::gui::event_info info);
-	static void perform_logic_step(const dispatcher_context&, const this_pointer& this_id, const fixed_delta& dt);
+	static void perform_logic_step(const dispatcher_context&, const this_pointer& this_id);
 };

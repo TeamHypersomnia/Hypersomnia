@@ -24,5 +24,5 @@ enum class processing_subjects {
 	WITH_VISIBILITY,
 	WITH_PAST_CONTAGIOUS,
 
-	LIST_COUNT
+	COUNT
 };

@@ -20,17 +20,16 @@ class processing_lists_system {
 	
 	std::unordered_map<processing_subjects, std::vector<entity_id>> lists;
 	std::vector<cache> per_entity_cache;
-
 	
-	void destruct(const_entity_handle);
-	void construct(const_entity_handle);
+	void destruct(const const_entity_handle&);
+	void construct(const const_entity_handle&);
 
-	void reserve_caches_for_entities(size_t n);
+	void reserve_caches_for_entities(const size_t n);
 
 	friend class cosmos;
 public:
 	processing_lists_system();
 
-	std::vector<entity_handle> get(processing_subjects, cosmos&) const;
-	std::vector<const_entity_handle> get(processing_subjects, const cosmos&) const;
+	std::vector<entity_handle> get(const processing_subjects, cosmos&) const;
+	std::vector<const_entity_handle> get(const processing_subjects, const cosmos&) const;
 };

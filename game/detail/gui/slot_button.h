@@ -22,7 +22,7 @@ struct slot_button : game_gui_rect_node {
 
 	augs::gui::appearance_detector detector;
 
-	static void perform_logic_step(const dispatcher_context&, const this_pointer&, const fixed_delta&);
+	static void perform_logic_step(const dispatcher_context&, const this_pointer&);
 	
 	static void draw_triangles(const const_dispatcher_context&, const const_this_pointer&, augs::gui::draw_info);
 	static void consume_gui_event(dispatcher_context&, const this_pointer&, const gui_event);

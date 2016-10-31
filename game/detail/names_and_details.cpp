@@ -94,20 +94,20 @@ textual_description description_by_entity_name(entity_name n) {
 	}
 }
 
-std::wstring describe_item_compatibility_categories(unsigned long long flags) {
+std::wstring describe_item_compatibility_categories(const item_category_bitset& flags) {
 	std::wstring result;
 
-	if (flags & item_category::MAGAZINE) 
+	if (flags.test(item_category::MAGAZINE))
 		result += L"Magazine, ";
-	if (flags & item_category::BARREL_ATTACHMENT) 
+	if (flags.test(item_category::BARREL_ATTACHMENT))
 		result += L"Barrel attachment, ";
-	if (flags & item_category::RAIL_ATTACHMENT) 
+	if (flags.test(item_category::RAIL_ATTACHMENT))
 		result += L"Rail attachment, ";
-	if (flags & item_category::SHOT_CHARGE) 
+	if (flags.test(item_category::SHOT_CHARGE))
 		result += L"Shot charge, ";
-	if (flags & item_category::SHOULDER_CONTAINER) 
+	if (flags.test(item_category::SHOULDER_CONTAINER))
 		result += L"Shoulder container, ";
-	if (flags & item_category::TORSO_ARMOR) 
+	if (flags.test(item_category::TORSO_ARMOR))
 		result += L"Torso armor, ";
 
 	if (!result.empty())

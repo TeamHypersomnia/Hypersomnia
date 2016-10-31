@@ -6,6 +6,8 @@
 #include "game/detail/gui/item_button.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
+#include "game/enums/item_category.h"
+
 namespace components {
 	struct item {
 		enum mounting_state {
@@ -18,7 +20,7 @@ namespace components {
 		mounting_state current_mounting = UNMOUNTED;
 		mounting_state intended_mounting = UNMOUNTED;
 
-		unsigned categories_for_slot_compatibility = 0;
+		item_category_bitset categories_for_slot_compatibility;
 
 		int charges = 1;
 		unsigned space_occupied_per_charge = 1;

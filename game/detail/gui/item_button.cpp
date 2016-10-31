@@ -246,7 +246,7 @@ void item_button::draw_proc(const const_dispatcher_context& context, const const
 				printing_charge_count = true;
 			}
 			else if (element.draw_free_space_inside_container_icons && item[slot_function::ITEM_DEPOSIT].alive()) {
-				if (item.get<components::item>().categories_for_slot_compatibility & static_cast<unsigned>(item_category::MAGAZINE)) {
+				if (item.get<components::item>().categories_for_slot_compatibility.test(item_category::MAGAZINE)) {
 					if (!this_id->is_container_open) {
 						printing_charge_count = true;
 					}
@@ -330,8 +330,8 @@ bool item_button::is_inventory_root(const const_dispatcher_context& context, con
 	return this_id.get_location().item_id == context.get_gui_element_entity();
 }
 
-void item_button::perform_logic_step(const dispatcher_context& context, const this_pointer& this_id, const fixed_delta& dt) {
-	base::perform_logic_step(context, this_id, dt);
+void item_button::perform_logic_step(const dispatcher_context& context, const this_pointer& this_id) {
+	base::perform_logic_step(context, this_id);
 
 	const auto& cosmos = context.get_step().get_cosmos();
 	const auto& item = cosmos[this_id.get_location().item_id];
@@ -421,7 +421,7 @@ void item_button::consume_gui_event(const dispatcher_context& context, const thi
 			if (parent_slot->always_allow_exactly_one_item) {
 				parent_button->user_drag_offset += griddified;
 				parent_button->houted_after_drag_started = true;
-				parent_button->perform_logic_step(context, parent_button, fixed_delta());
+				parent_button->perform_logic_step(context, parent_button);
 			}
 			else {
 				this_id->drag_offset_in_item_deposit += griddified;

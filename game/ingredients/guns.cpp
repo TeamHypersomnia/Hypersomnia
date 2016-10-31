@@ -76,7 +76,7 @@ namespace prefabs {
 			auto& item = ingredients::make_item(sample_magazine);
 			auto& container = sample_magazine += components::container();
 			
-			item.categories_for_slot_compatibility = item_category::MAGAZINE;
+			item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
 			item.space_occupied_per_charge = to_space_units("0.5");
 
 			inventory_slot charge_deposit_def;
@@ -108,7 +108,7 @@ namespace prefabs {
 
 		auto& item = ingredients::make_item(sample_suppressor);
 
-		item.categories_for_slot_compatibility = item_category::BARREL_ATTACHMENT;
+		item.categories_for_slot_compatibility.set(item_category::BARREL_ATTACHMENT);
 		item.space_occupied_per_charge = to_space_units("0.2");
 
 		sample_suppressor.add_standard_components();
@@ -128,7 +128,7 @@ namespace prefabs {
 
 			auto& item = ingredients::make_item(pink_charge);
 			item.space_occupied_per_charge = to_space_units("0.01");
-			item.categories_for_slot_compatibility = item_category::SHOT_CHARGE;
+			item.categories_for_slot_compatibility.set(item_category::SHOT_CHARGE);
 			item.charges = charges;
 			item.stackable = true;
 		}
@@ -179,7 +179,7 @@ namespace prefabs {
 
 			auto& item = ingredients::make_item(cyan_charge);
 			item.space_occupied_per_charge = to_space_units("0.01");
-			item.categories_for_slot_compatibility = item_category::SHOT_CHARGE;
+			item.categories_for_slot_compatibility.set(item_category::SHOT_CHARGE);
 			item.charges = charges;
 			item.stackable = true;
 		}
@@ -227,7 +227,7 @@ namespace prefabs {
 
 			auto& item = ingredients::make_item(green_charge);
 			item.space_occupied_per_charge = to_space_units("0.01");
-			item.categories_for_slot_compatibility = item_category::SHOT_CHARGE;
+			item.categories_for_slot_compatibility.set(item_category::SHOT_CHARGE);
 			item.charges = charges;
 			item.stackable = true;
 		}

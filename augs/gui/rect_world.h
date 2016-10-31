@@ -213,12 +213,12 @@ namespace augs {
 			}
 
 			template <class C, class gui_element_id>
-			void perform_logic_step(C context, const gui_element_id& root, const fixed_delta& delta) {
+			void perform_logic_step(C context, const gui_element_id& root) {
 				context(root, [&](const auto& r) { 
-					r->perform_logic_step(context, r, delta);
+					r->perform_logic_step(context, r);
 				});
 
-				middlescroll.perform_logic_step(context, delta);
+				middlescroll.perform_logic_step(context, context.get_step().get_delta());
 			}
 			
 			template <class C, class gui_element_id>

@@ -60,7 +60,7 @@ void gui_system::advance_gui_elements(fixed_step& step) {
 
 			root_of_inventory_gui_location root_location;
 
-			element.rect_world.perform_logic_step(context, root_location, step.get_delta());
+			element.rect_world.perform_logic_step(context, root_location);
 			element.rect_world.build_tree_data_into_context(context, root_location);
 
 			const auto& entropies = step.entropy.entropy_per_entity;

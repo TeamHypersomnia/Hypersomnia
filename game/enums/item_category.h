@@ -1,11 +1,17 @@
 #pragma once
+#include <bitset>
+#include "augs/misc/enum_bitset.h"
 
-enum class item_category : unsigned {
-	//ITEM = 1 << 0,
-	RAIL_ATTACHMENT = 1 << 1,
-	BARREL_ATTACHMENT = 1 << 2,
-	SHOULDER_CONTAINER = 1 << 3,
-	TORSO_ARMOR = 1 << 4,
-	MAGAZINE = 1 << 5,
-	SHOT_CHARGE = 1 << 6,
+enum class item_category {
+	NONE,
+	RAIL_ATTACHMENT,
+	BARREL_ATTACHMENT,
+	SHOULDER_CONTAINER,
+	TORSO_ARMOR,
+	MAGAZINE,
+	SHOT_CHARGE,
+
+	COUNT
 };
+
+typedef augs::enum_bitset<item_category> item_category_bitset;

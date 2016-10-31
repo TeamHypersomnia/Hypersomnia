@@ -31,7 +31,7 @@ void drag_and_drop_target_drop_item::consume_gui_event(const dispatcher_context&
 	this_id->detector.update_appearance(info);
 }
 
-void drag_and_drop_target_drop_item::perform_logic_step(const dispatcher_context& context, const this_pointer& this_id, const fixed_delta& dt) {
+void drag_and_drop_target_drop_item::perform_logic_step(const dispatcher_context& context, const this_pointer& this_id) {
 	auto& world = context.get_rect_world();
 	auto dragged_item = world.rect_held_by_lmb;
 

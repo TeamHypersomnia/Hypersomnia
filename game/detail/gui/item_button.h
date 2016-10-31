@@ -69,7 +69,7 @@ struct item_button : game_gui_rect_node {
 	static bool is_being_wholely_dragged_or_pending_finish(const const_dispatcher_context&, const const_this_pointer& this_id);
 
 	static void consume_gui_event(const dispatcher_context&, const this_pointer& this_id, const augs::gui::event_info e);
-	static void perform_logic_step(const dispatcher_context&, const this_pointer& this_id, const fixed_delta& delta);
+	static void perform_logic_step(const dispatcher_context&, const this_pointer& this_id);
 
 	static bool is_inventory_root(const const_dispatcher_context&, const const_this_pointer& this_id);
 	static void draw_triangles(const const_dispatcher_context&, const const_this_pointer& this_id, draw_info);

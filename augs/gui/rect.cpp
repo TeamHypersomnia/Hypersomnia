@@ -26,15 +26,15 @@ namespace augs {
 		}
 
 		bool rect_node_data::get_flag(const flag f) const {
-			return flags.test(static_cast<size_t>(f));
+			return flags.test(f);
 		}
 
 		bool rect_node_data::set_flag(const flag f, const bool value) {
-			flags.set(static_cast<size_t>(f), value);
+			flags.set(f, value);
 		}
 
 		bool rect_node_data::unset_flag(const flag f) {
-			flags.set(static_cast<size_t>(f), false);
+			flags.set(f, false);
 		}
 
 		vec2 rect_node_data::get_scroll() const {
