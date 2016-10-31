@@ -1,7 +1,7 @@
 #include "game/detail/gui/item_button.h"
 #include "game/detail/gui/pixel_line_connector.h"
 #include "game/detail/gui/grid.h"
-#include "game/detail/gui/dispatcher_context.h"
+#include "game/detail/gui/gui_context.h"
 #include "game/detail/gui/drag_and_drop.h"
 #include "game/detail/gui/root_of_inventory_gui.h"
 #include "game/detail/gui/gui_element_tree.h"
@@ -26,7 +26,7 @@
 
 #include "augs/ensure.h"
 
-bool item_button::is_being_wholely_dragged_or_pending_finish(const const_dispatcher_context& context, const const_this_pointer& this_id) {
+bool item_button::is_being_wholely_dragged_or_pending_finish(const const_gui_context& context, const const_this_pointer& this_id) {
 	const auto& rect_world = context.get_rect_world();
 	const auto& element = context.get_gui_element_component();
 	const auto& cosmos = context.get_step().get_cosmos();
@@ -45,7 +45,7 @@ item_button::item_button(rects::xywh<float> rc) : base(rc) {
 	unset_flag(augs::gui::flag::FOCUSABLE);
 }
 
-void item_button::draw_dragged_ghost_inside(const viewing_dispatcher_context& context, const const_this_pointer& this_id, draw_info in) {
+void item_button::draw_dragged_ghost_inside(const viewing_gui_context& context, const const_this_pointer& this_id, draw_info in) {
 	drawing_flags f;
 	f.draw_inside = true;
 	f.draw_border = false;
@@ -59,7 +59,7 @@ void item_button::draw_dragged_ghost_inside(const viewing_dispatcher_context& co
 	draw_proc(context, this_id, in, f);
 }
 
-void item_button::draw_complete_with_children(const viewing_dispatcher_context& context, const const_this_pointer& this_id, draw_info in) {
+void item_button::draw_complete_with_children(const viewing_gui_context& context, const const_this_pointer& this_id, draw_info in) {
 	drawing_flags f;
 	f.draw_inside = true;
 	f.draw_border = true;
@@ -73,7 +73,7 @@ void item_button::draw_complete_with_children(const viewing_dispatcher_context& 
 	draw_proc(context, this_id, in, f);
 }
 
-void item_button::draw_grid_border_ghost(const viewing_dispatcher_context& context, const const_this_pointer& this_id, draw_info in) {
+void item_button::draw_grid_border_ghost(const viewing_gui_context& context, const const_this_pointer& this_id, draw_info in) {
 	drawing_flags f;
 	f.draw_inside = false;
 	f.draw_border = true;
@@ -87,7 +87,7 @@ void item_button::draw_grid_border_ghost(const viewing_dispatcher_context& conte
 	draw_proc(context, this_id, in, f);
 }
 
-void item_button::draw_complete_dragged_ghost(const viewing_dispatcher_context& context, const const_this_pointer& this_id, draw_info in) {
+void item_button::draw_complete_dragged_ghost(const viewing_gui_context& context, const const_this_pointer& this_id, draw_info in) {
 	const auto& cosmos = context.get_step().get_cosmos();
 	auto parent_slot = cosmos[cosmos[this_id.get_location().item_id].get<components::item>().current_slot];
 	ensure(parent_slot.alive());
@@ -96,7 +96,7 @@ void item_button::draw_complete_dragged_ghost(const viewing_dispatcher_context& 
 }
 
 rects::ltrb<float> item_button::iterate_children_attachments(
-	const const_dispatcher_context& context,
+	const const_gui_context& context,
 	const const_this_pointer& this_id,
 	const bool draw,
 	std::vector<vertex_triangle>* target,
@@ -179,7 +179,7 @@ rects::ltrb<float> item_button::iterate_children_attachments(
 	return button_bbox;
 }
 
-void item_button::draw_proc(const viewing_dispatcher_context& context, const const_this_pointer& this_id, draw_info in, const drawing_flags& f) {
+void item_button::draw_proc(const viewing_gui_context& context, const const_this_pointer& this_id, draw_info in, const drawing_flags& f) {
 	if (is_inventory_root(context, this_id))
 		return;
 
@@ -327,11 +327,11 @@ void item_button::draw_proc(const viewing_dispatcher_context& context, const con
 	}
 }
 
-bool item_button::is_inventory_root(const const_dispatcher_context& context, const const_this_pointer& this_id) {
+bool item_button::is_inventory_root(const const_gui_context& context, const const_this_pointer& this_id) {
 	return this_id.get_location().item_id == context.get_gui_element_entity();
 }
 
-void item_button::perform_logic_step(const dispatcher_context& context, const this_pointer& this_id) {
+void item_button::perform_logic_step(const logic_gui_context& context, const this_pointer& this_id) {
 	base::perform_logic_step(context, this_id);
 
 	const auto& cosmos = context.get_step().get_cosmos();
@@ -374,7 +374,7 @@ void item_button::perform_logic_step(const dispatcher_context& context, const th
 	}
 }
 
-void item_button::consume_gui_event(const dispatcher_context& context, const this_pointer& this_id, const augs::gui::event_info info) {
+void item_button::consume_gui_event(const logic_gui_context& context, const this_pointer& this_id, const augs::gui::event_info info) {
 	if (is_inventory_root(context, this_id))
 		return;
 
@@ -433,7 +433,7 @@ void item_button::consume_gui_event(const dispatcher_context& context, const thi
 	// if(being_dragged && inf == rect::gui_event::lup)
 }
 
-void item_button::draw_triangles(const viewing_dispatcher_context& context, const const_this_pointer& this_id, draw_info in) {
+void item_button::draw_triangles(const viewing_gui_context& context, const const_this_pointer& this_id, draw_info in) {
 	if (is_inventory_root(context, this_id)) {
 		draw_children(context, this_id, in);
 		return;

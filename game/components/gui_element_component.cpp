@@ -70,7 +70,7 @@ namespace components {
 		root_of_inventory_gui root_of_gui;
 		gui_element_tree tree;
 
-		viewing_dispatcher_context context(step, gui_entity, tree, root_of_gui);
+		viewing_gui_context context(step, gui_entity, tree, root_of_gui);
 
 		rect_world.build_tree_data_into_context(context, root_of_inventory_gui::location());
 		rect_world.draw_triangles(context, root_of_inventory_gui::location());
@@ -79,7 +79,7 @@ namespace components {
 			element.draw_cursor_and_tooltip(context);
 	}
 
-	void gui_element::draw_cursor_and_tooltip(const viewing_dispatcher_context& context) const {
+	void gui_element::draw_cursor_and_tooltip(const viewing_gui_context& context) const {
 		auto& drag_result = prepare_drag_and_drop_result(context);
 		auto& step = context.get_step();
 		const auto& cosmos = step.get_cosmos();

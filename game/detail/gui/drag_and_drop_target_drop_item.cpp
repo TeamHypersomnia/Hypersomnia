@@ -16,7 +16,7 @@ drag_and_drop_target_drop_item::drag_and_drop_target_drop_item(const augs::gui::
 	unset_flag(augs::gui::flag::ENABLE_DRAWING);
 }
 
-void drag_and_drop_target_drop_item::draw(const viewing_dispatcher_context& context, const const_this_pointer& this_id, augs::gui::draw_info info) {
+void drag_and_drop_target_drop_item::draw(const viewing_gui_context& context, const const_this_pointer& this_id, augs::gui::draw_info info) {
 	auto mat_coloured = this_id->mat;
 
 	if (this_id->detector.is_hovered)
@@ -27,11 +27,11 @@ void drag_and_drop_target_drop_item::draw(const viewing_dispatcher_context& cont
 	draw_centered_texture(context, this_id, info, mat_coloured);
 }
 
-void drag_and_drop_target_drop_item::consume_gui_event(const dispatcher_context& context, const this_pointer& this_id, const augs::gui::event_info info) {
+void drag_and_drop_target_drop_item::consume_gui_event(const logic_gui_context& context, const this_pointer& this_id, const augs::gui::event_info info) {
 	this_id->detector.update_appearance(info);
 }
 
-void drag_and_drop_target_drop_item::perform_logic_step(const dispatcher_context& context, const this_pointer& this_id) {
+void drag_and_drop_target_drop_item::perform_logic_step(const logic_gui_context& context, const this_pointer& this_id) {
 	auto& world = context.get_rect_world();
 	auto dragged_item = world.rect_held_by_lmb;
 

@@ -5,7 +5,7 @@
 #include "augs/gui/text_drawer.h"
 
 #include "game/detail/inventory_slot_id.h"
-#include "game/detail/gui/dispatcher_context.h"
+#include "game/detail/gui/gui_context.h"
 
 #include "augs/padding_byte.h"
 
@@ -24,10 +24,10 @@ struct slot_button : game_gui_rect_node {
 	
 	slot_button();
 
-	static void perform_logic_step(const dispatcher_context&, const this_pointer&);
+	static void perform_logic_step(const logic_gui_context&, const this_pointer&);
 	
-	static void draw_triangles(const viewing_dispatcher_context&, const const_this_pointer&, augs::gui::draw_info);
-	static void consume_gui_event(dispatcher_context&, const this_pointer&, const augs::gui::event_info info);
+	static void draw_triangles(const viewing_gui_context&, const const_this_pointer&, augs::gui::draw_info);
+	static void consume_gui_event(logic_gui_context&, const this_pointer&, const augs::gui::event_info info);
 
 	template <class C, class gui_element_id, class L>
 	static void for_each_child(C context, const gui_element_id& this_id, L generic_call) {

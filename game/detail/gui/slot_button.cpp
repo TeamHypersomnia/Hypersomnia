@@ -21,7 +21,7 @@ slot_button::slot_button() {
 	unset_flag(augs::gui::flag::CLIP);
 }
 
-void slot_button::draw_triangles(const viewing_dispatcher_context& context, const const_this_pointer& this_id, augs::gui::draw_info info) {
+void slot_button::draw_triangles(const viewing_gui_context& context, const const_this_pointer& this_id, augs::gui::draw_info info) {
 	const auto& step = context.get_step();
 	const auto& cosmos = step.get_cosmos();
 
@@ -108,7 +108,7 @@ void slot_button::draw_triangles(const viewing_dispatcher_context& context, cons
 	}
 }
 
-void slot_button::perform_logic_step(const dispatcher_context& context, const this_pointer& this_id) {
+void slot_button::perform_logic_step(const logic_gui_context& context, const this_pointer& this_id) {
 	game_gui_rect_node::perform_logic_step(context, this_id);
 	
 	const auto& step = context.get_step();
@@ -142,7 +142,7 @@ void slot_button::perform_logic_step(const dispatcher_context& context, const th
 	this_id->rc.set_position(absolute_pos);
 }
 
-void slot_button::consume_gui_event(dispatcher_context& context, const this_pointer& this_id, const augs::gui::event_info info) {
+void slot_button::consume_gui_event(logic_gui_context& context, const this_pointer& this_id, const augs::gui::event_info info) {
 	this_id->detector.update_appearance(info);
 	
 	if (info == gui_event::lfinisheddrag) {

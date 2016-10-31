@@ -10,7 +10,7 @@
 #include "augs/misc/constant_size_vector.h"
 #include "game/container_sizes.h"
 
-#include "game/detail/gui/dispatcher_context.h"
+#include "game/detail/gui/gui_context.h"
 //#include <map>
 //
 //#include "game/detail/inventory_slot_id.h"
@@ -55,7 +55,7 @@ namespace components {
 		vec2i get_initial_position_for(const drag_and_drop_target_drop_item&) const;
 		vec2 initial_inventory_root_position() const;
 		
-		void draw_cursor_and_tooltip(const viewing_dispatcher_context&) const;
+		void draw_cursor_and_tooltip(const viewing_gui_context&) const;
 		
 		static entity_id get_hovered_world_entity(const cosmos& cosm, const vec2& world_cursor_position);
 		static void draw_complete_gui_for_camera_rendering_request(const const_entity_handle& handle, viewing_step&);

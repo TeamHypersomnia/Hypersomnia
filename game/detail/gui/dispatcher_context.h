@@ -21,7 +21,7 @@ class gui_tree_entry;
 typedef std::unordered_map<gui_element_location, gui_tree_entry> gui_element_tree;
 
 template <class step_type>
-class basic_dispatcher_context {
+class basic_gui_context {
 
 public:
 	typedef std::decay_t<decltype(std::declval<step_type>().get_cosmos().get_handle(entity_id()))> entity_handle_type;
@@ -31,7 +31,7 @@ public:
 	typedef maybe_const_ref_t<is_const, game_gui_rect_world> game_gui_rect_world_ref;
 	typedef maybe_const_ref_t<is_const, root_of_inventory_gui> root_of_inventory_gui_ref;
 
-	basic_dispatcher_context(step_type step, entity_handle_type handle, gui_element_tree& tree, root_of_inventory_gui_ref root) :
+	basic_gui_context(step_type step, entity_handle_type handle, gui_element_tree& tree, root_of_inventory_gui_ref root) :
 		step(step),
 		handle(handle),
 		elem(handle.get<components::gui_element>()),
@@ -124,6 +124,6 @@ public:
 	}
 };
 
-typedef basic_dispatcher_context<logic_step> dispatcher_context;
-typedef basic_dispatcher_context<const_cosmic_step> const_dispatcher_context;
-typedef basic_dispatcher_context<viewing_step> viewing_dispatcher_context;
+typedef basic_gui_context<logic_step> logic_gui_context;
+typedef basic_gui_context<const_cosmic_step> const_gui_context;
+typedef basic_gui_context<viewing_step> viewing_gui_context;

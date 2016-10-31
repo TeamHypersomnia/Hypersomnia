@@ -56,7 +56,7 @@ void gui_system::advance_gui_elements(logic_step& step) {
 			gui_element_tree tree;
 			root_of_inventory_gui root_of_gui;
 
-			dispatcher_context context(step, root, tree, root_of_gui);
+			logic_gui_context context(step, root, tree, root_of_gui);
 
 			root_of_inventory_gui_location root_location;
 
