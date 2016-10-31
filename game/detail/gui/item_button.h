@@ -63,8 +63,8 @@ struct item_button : game_gui_rect_node {
 		}
 	}
 
-	static void draw_dragged_ghost_inside(const const_dispatcher_context& context, const const_this_pointer& this_id, augs::gui::draw_info in);
-	static void draw_complete_with_children(const const_dispatcher_context&, const const_this_pointer& this_id, augs::gui::draw_info in);
+	static void draw_dragged_ghost_inside(const viewing_dispatcher_context& context, const const_this_pointer& this_id, augs::gui::draw_info in);
+	static void draw_complete_with_children(const viewing_dispatcher_context&, const const_this_pointer& this_id, augs::gui::draw_info in);
 
 	static bool is_being_wholely_dragged_or_pending_finish(const const_dispatcher_context&, const const_this_pointer& this_id);
 
@@ -72,9 +72,9 @@ struct item_button : game_gui_rect_node {
 	static void perform_logic_step(const dispatcher_context&, const this_pointer& this_id);
 
 	static bool is_inventory_root(const const_dispatcher_context&, const const_this_pointer& this_id);
-	static void draw_triangles(const const_dispatcher_context&, const const_this_pointer& this_id, draw_info);
-	static void draw_grid_border_ghost(const const_dispatcher_context&, const const_this_pointer&, draw_info in);
-	static void draw_complete_dragged_ghost(const const_dispatcher_context&, const const_this_pointer&, draw_info);
+	static void draw_triangles(const viewing_dispatcher_context&, const const_this_pointer& this_id, draw_info);
+	static void draw_grid_border_ghost(const viewing_dispatcher_context&, const const_this_pointer&, draw_info in);
+	static void draw_complete_dragged_ghost(const viewing_dispatcher_context&, const const_this_pointer&, draw_info);
 
-	static void draw_proc(const const_dispatcher_context&, const const_this_pointer&, draw_info, const drawing_flags&);
+	static void draw_proc(const viewing_dispatcher_context&, const const_this_pointer&, draw_info, const drawing_flags&);
 };

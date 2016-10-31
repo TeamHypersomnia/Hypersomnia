@@ -32,6 +32,10 @@ class basic_entity_handle :
 	public relations_helpers<is_const, basic_entity_handle<is_const>>,
 	public spatial_properties_getters<is_const, basic_entity_handle<is_const>>
 {
+public:
+	static constexpr bool is_const_value = is_const;
+private:
+
 	friend class relations_helpers<is_const, basic_entity_handle<is_const>>;
 	template <bool, class> friend class basic_relations_helpers;
 

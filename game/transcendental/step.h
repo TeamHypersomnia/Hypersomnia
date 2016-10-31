@@ -24,19 +24,26 @@ class basic_cosmic_step {
 public:
 	cosmos_ref cosm;
 	
-	basic_cosmic_step(cosmos_ref);
+	basic_cosmic_step(cosmos_ref cosm) : cosm(cosm) {}
+	
+	cosmos_ref get_cosmos() const {
+		return cosm;
+	}
+
+	operator basic_cosmic_step<true>() const {
+		return{ cosm };
+	}
 };
 
 typedef basic_cosmic_step<false> cosmic_step;
 typedef basic_cosmic_step<true> const_cosmic_step;
 
-class viewing_step {
+class viewing_step : public const_cosmic_step {
 public:
 	viewing_step(const cosmos&, const immediate_hud& hud, aabb_highlighter&, const augs::variable_delta&, augs::renderer&, state_for_drawing_camera camera_state);
 
 	state_for_drawing_camera camera_state;
 
-	const cosmos& cosm;
 	const immediate_hud& hud;
 	aabb_highlighter& world_hover_highlighter;
 	augs::variable_delta delta;
@@ -45,21 +52,18 @@ public:
 	augs::variable_delta get_delta() const;
 
 	vec2 get_screen_space(vec2 pos) const;
-	const cosmos& get_cosmos() const;
 
 	std::vector<const_entity_handle> visible_entities;
 	std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> visible_per_layer;
 };
 
-class logic_step {
+class logic_step : public cosmic_step {
 	friend class cosmos;
+public:
 	logic_step(cosmos&, const cosmic_entropy&, storage_for_all_message_queues&);
 
-public:
 	storage_for_all_message_queues& messages;
-	cosmos& cosm;
 	const cosmic_entropy& entropy;
 
 	augs::fixed_delta get_delta() const;
-	cosmos& get_cosmos() const;
 };

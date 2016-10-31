@@ -16,7 +16,7 @@ drag_and_drop_target_drop_item::drag_and_drop_target_drop_item(const augs::gui::
 	unset_flag(augs::gui::flag::ENABLE_DRAWING);
 }
 
-void drag_and_drop_target_drop_item::draw(const const_dispatcher_context& context, const const_this_pointer& this_id, augs::gui::draw_info info) {
+void drag_and_drop_target_drop_item::draw(const viewing_dispatcher_context& context, const const_this_pointer& this_id, augs::gui::draw_info info) {
 	auto mat_coloured = this_id->mat;
 
 	if (this_id->detector.is_hovered)

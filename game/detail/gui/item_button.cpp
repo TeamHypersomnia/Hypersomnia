@@ -3,6 +3,7 @@
 #include "game/detail/gui/grid.h"
 #include "game/detail/gui/dispatcher_context.h"
 #include "game/detail/gui/drag_and_drop.h"
+#include "game/detail/gui/root_of_inventory_gui.h"
 #include "game/detail/gui/gui_element_tree.h"
 
 #include "game/transcendental/cosmos.h"
@@ -44,7 +45,7 @@ item_button::item_button(rects::xywh<float> rc) : base(rc) {
 	unset_flag(augs::gui::flag::FOCUSABLE);
 }
 
-void item_button::draw_dragged_ghost_inside(const const_dispatcher_context& context, const const_this_pointer& this_id, draw_info in) {
+void item_button::draw_dragged_ghost_inside(const viewing_dispatcher_context& context, const const_this_pointer& this_id, draw_info in) {
 	drawing_flags f;
 	f.draw_inside = true;
 	f.draw_border = false;
@@ -58,7 +59,7 @@ void item_button::draw_dragged_ghost_inside(const const_dispatcher_context& cont
 	draw_proc(context, this_id, in, f);
 }
 
-void item_button::draw_complete_with_children(const const_dispatcher_context& context, const const_this_pointer& this_id, draw_info in) {
+void item_button::draw_complete_with_children(const viewing_dispatcher_context& context, const const_this_pointer& this_id, draw_info in) {
 	drawing_flags f;
 	f.draw_inside = true;
 	f.draw_border = true;
@@ -72,7 +73,7 @@ void item_button::draw_complete_with_children(const const_dispatcher_context& co
 	draw_proc(context, this_id, in, f);
 }
 
-void item_button::draw_grid_border_ghost(const const_dispatcher_context& context, const const_this_pointer& this_id, draw_info in) {
+void item_button::draw_grid_border_ghost(const viewing_dispatcher_context& context, const const_this_pointer& this_id, draw_info in) {
 	drawing_flags f;
 	f.draw_inside = false;
 	f.draw_border = true;
@@ -86,7 +87,7 @@ void item_button::draw_grid_border_ghost(const const_dispatcher_context& context
 	draw_proc(context, this_id, in, f);
 }
 
-void item_button::draw_complete_dragged_ghost(const const_dispatcher_context& context, const const_this_pointer& this_id, draw_info in) {
+void item_button::draw_complete_dragged_ghost(const viewing_dispatcher_context& context, const const_this_pointer& this_id, draw_info in) {
 	const auto& cosmos = context.get_step().get_cosmos();
 	auto parent_slot = cosmos[cosmos[this_id.get_location().item_id].get<components::item>().current_slot];
 	ensure(parent_slot.alive());
@@ -178,7 +179,7 @@ rects::ltrb<float> item_button::iterate_children_attachments(
 	return button_bbox;
 }
 
-void item_button::draw_proc(const const_dispatcher_context& context, const const_this_pointer& this_id, draw_info in, const drawing_flags& f) {
+void item_button::draw_proc(const viewing_dispatcher_context& context, const const_this_pointer& this_id, draw_info in, const drawing_flags& f) {
 	if (is_inventory_root(context, this_id))
 		return;
 
@@ -432,7 +433,7 @@ void item_button::consume_gui_event(const dispatcher_context& context, const thi
 	// if(being_dragged && inf == rect::gui_event::lup)
 }
 
-void item_button::draw_triangles(const const_dispatcher_context& context, const const_this_pointer& this_id, draw_info in) {
+void item_button::draw_triangles(const viewing_dispatcher_context& context, const const_this_pointer& this_id, draw_info in) {
 	if (is_inventory_root(context, this_id)) {
 		draw_children(context, this_id, in);
 		return;

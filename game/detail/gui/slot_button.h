@@ -21,11 +21,13 @@ struct slot_button : game_gui_rect_node {
 	vec2i user_drag_offset;
 
 	augs::gui::appearance_detector detector;
+	
+	slot_button();
 
 	static void perform_logic_step(const dispatcher_context&, const this_pointer&);
 	
-	static void draw_triangles(const const_dispatcher_context&, const const_this_pointer&, augs::gui::draw_info);
-	static void consume_gui_event(dispatcher_context&, const this_pointer&, const gui_event);
+	static void draw_triangles(const viewing_dispatcher_context&, const const_this_pointer&, augs::gui::draw_info);
+	static void consume_gui_event(dispatcher_context&, const this_pointer&, const augs::gui::event_info info);
 
 	template <class C, class gui_element_id, class L>
 	static void for_each_child(C context, const gui_element_id& this_id, L generic_call) {
