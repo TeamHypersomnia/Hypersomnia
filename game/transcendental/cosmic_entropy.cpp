@@ -6,16 +6,11 @@
 #include "game/global/input_context.h"
 
 guid_mapped_entropy::guid_mapped_entropy(const cosmic_entropy& b, const cosmos& mapper) {
-	delta_to_apply = b.delta_to_apply;
-
 	for (const auto& entry : b.entropy_per_entity)
 		entropy_per_entity[mapper[entry.first].get_guid()] = entry.second;
 }
 
 bool guid_mapped_entropy::operator!=(const guid_mapped_entropy& b) const {
-	if (delta_to_apply != b.delta_to_apply)
-		return true;
-
 	if (entropy_per_entity.size() != b.entropy_per_entity.size())
 		return true;
 
@@ -33,8 +28,6 @@ bool guid_mapped_entropy::operator!=(const guid_mapped_entropy& b) const {
 }
 
 cosmic_entropy::cosmic_entropy(const guid_mapped_entropy& b, const cosmos& mapper) {
-	delta_to_apply = b.delta_to_apply;
-
 	for (const auto& entry : b.entropy_per_entity)
 		entropy_per_entity[mapper.get_entity_by_guid(entry.first).get_id()] = entry.second;
 }

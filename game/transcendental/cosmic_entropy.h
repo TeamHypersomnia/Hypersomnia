@@ -15,7 +15,6 @@ struct input_context;
 template <class key>
 struct basic_cosmic_entropy {
 	std::map<key, std::vector<entity_intent>> entropy_per_entity;
-	augs::stream delta_to_apply;
 	
 	size_t length() const {
 		size_t total = 0;
