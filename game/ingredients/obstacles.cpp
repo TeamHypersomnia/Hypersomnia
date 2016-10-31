@@ -11,7 +11,7 @@ namespace prefabs {
 		ingredients::sprite_scalled(crate, pos, size, assets::texture_id::CRATE, augs::white, render_layer::DYNAMIC_BODY);
 		ingredients::standard_dynamic_body(crate, true);
 		crate.get<components::fixtures>().set_restitution(0.8f);
-		crate.get<components::fixtures>().set_density(0.03);
+		crate.get<components::fixtures>().set_density(0.03f);
 		crate.add_standard_components();
 
 		return crate;
