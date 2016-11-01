@@ -16,7 +16,7 @@ public:
 
 	}
 
-	rects::ltrb<float> set_absolute_clipped_rect(const rects::ltrb<float>&) {
+	void set_absolute_clipped_rect(const rects::ltrb<float>&) {
 
 	}
 

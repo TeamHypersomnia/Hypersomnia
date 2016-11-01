@@ -23,8 +23,8 @@ namespace augs {
 
 			void set_default_flags();
 
-			bool set_flag(const flag f, const bool value = true);
-			bool unset_flag(const flag f);
+			void set_flag(const flag f, const bool value = true);
+			void unset_flag(const flag f);
 			
 			bool get_flag(const flag f) const;
 

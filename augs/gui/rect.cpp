@@ -29,11 +29,11 @@ namespace augs {
 			return flags.test(f);
 		}
 
-		bool rect_node_data::set_flag(const flag f, const bool value) {
+		void rect_node_data::set_flag(const flag f, const bool value) {
 			flags.set(f, value);
 		}
 
-		bool rect_node_data::unset_flag(const flag f) {
+		void rect_node_data::unset_flag(const flag f) {
 			flags.set(f, false);
 		}
 

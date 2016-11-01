@@ -3,7 +3,7 @@
 
 namespace augs {
 	namespace gui {
-		void text_drawer::draw_stroke(buf& v, rgba col) {
+		void text_drawer::draw_stroke(buf& v, const rgba col) {
 			draft.guarded_redraw();
 
 			auto coloured_str = draft.get_str();
@@ -39,21 +39,21 @@ namespace augs {
 			return vec2i( bbox.w, bbox.h );
 		}
 
-		void text_drawer::center(rects::ltrb<float> r) {
+		void text_drawer::center(const rects::ltrb<float> r) {
 			auto bbox = get_bbox();
 			pos = vec2i(r.l + r.w() / 2 - bbox.x / 2, r.t + r.h() / 2 - bbox.y / 2);
 		}
 
-		void text_drawer::bottom_right(rects::ltrb<float> r) {
+		void text_drawer::bottom_right(const rects::ltrb<float> r) {
 			auto bbox = get_bbox();
 			pos = vec2i(r.r - bbox.x, r.b - bbox.y);
 		}
 
-		void text_drawer::above_left_to_right(vec2i p) {
+		void text_drawer::above_left_to_right(const vec2i p) {
 			pos = vec2i(p.x, p.y - get_bbox().y);
 		}
 
-		void text_drawer::below_left_to_right(vec2i p) {
+		void text_drawer::below_left_to_right(const vec2i p) {
 			pos = vec2i(p.x, p.y + get_bbox().y);
 		}
 	}

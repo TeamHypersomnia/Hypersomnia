@@ -17,14 +17,14 @@ namespace augs {
 
 			void set_text(const text::fstr&);
 
-			void draw_stroke(buf&, rgba col = black);
+			void draw_stroke(buf&, const rgba col = black);
 			void draw(buf&);
 			void draw(draw_info);
 
-			void center(rects::ltrb<float>);
-			void bottom_right(rects::ltrb<float>);
-			void above_left_to_right(vec2i pos);
-			void below_left_to_right(vec2i pos);
+			void center(const rects::ltrb<float>);
+			void bottom_right(const rects::ltrb<float>);
+			void above_left_to_right(const vec2i pos);
+			void below_left_to_right(const vec2i pos);
 		};
 	}
 }
