@@ -61,7 +61,7 @@ void render_system::draw_entities(
 	const state_for_drawing_camera& in_camera, 
 	const bool only_border_highlights
 ) const {
-	for (auto e : entities) {
+	for (const auto e : entities) {
 		for_each_type<components::polygon, components::sprite, /*components::tile_layer,*/ components::particle_group>([e, &output, &in_camera, only_border_highlights](auto T) {
 			typedef decltype(T) renderable_type;
 

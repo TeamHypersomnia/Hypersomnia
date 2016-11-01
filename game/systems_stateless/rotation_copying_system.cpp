@@ -96,7 +96,7 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 			new_angle = diff.degrees();
 
 		if (rotation_copying.colinearize_item_in_hand) {
-			auto guns = it.guns_wielded();
+			const auto guns = it.guns_wielded();
 
 			if (guns.size() > 0) {
 				const auto subject_item = guns[0];
@@ -153,8 +153,8 @@ void rotation_copying_system::update_rotations(cosmos& cosmos) const {
 
 		if (rotation_copying.update_value) {
 			if (it.has<components::physics>()) {
-				auto target_angle = resolve_rotation_copying_value(it);
-				auto& phys = it.get<components::physics>();
+				const auto target_angle = resolve_rotation_copying_value(it);
+				const auto phys = it.get<components::physics>();
 
 				phys.set_transform({ phys.get_position(), target_angle });
 				phys.set_angular_velocity(0);

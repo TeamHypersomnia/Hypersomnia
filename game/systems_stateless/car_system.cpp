@@ -18,8 +18,8 @@
 
 void car_system::set_steering_flags_from_intents(logic_step& step) {
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
-	auto& intents = step.messages.get_queue<messages::intent_message>();
+	const auto& delta = step.get_delta();
+	const auto& intents = step.messages.get_queue<messages::intent_message>();
 
 	for (auto& it : intents) {
 		auto* maybe_car = cosmos[it.subject].find<components::car>();
@@ -50,8 +50,9 @@ void car_system::set_steering_flags_from_intents(logic_step& step) {
 
 void car_system::apply_movement_forces(logic_step& step) {
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
-	auto targets_copy = cosmos.get(processing_subjects::WITH_CAR);
+	const auto& delta = step.get_delta();
+	const auto targets_copy = cosmos.get(processing_subjects::WITH_CAR);
+
 	for (const auto& it : targets_copy) {
 		auto& car = it.get<components::car>();
 		auto& physics = it.get<components::physics>();

@@ -34,7 +34,7 @@ void processing_lists_system::construct(const const_entity_handle& handle) {
 	
 	ensure(!per_entity_cache[index].is_constructed);
 
-	auto& processing = handle.get<components::processing>();
+	const auto& processing = handle.get<components::processing>();
 	
 	if (processing.is_activated()) {
 		for (auto& list : lists) {

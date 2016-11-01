@@ -20,9 +20,9 @@ using namespace resources;
 
 void animation_system::game_responses_to_animation_messages(logic_step& step) {
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
-	auto& movements = step.messages.get_queue<movement_response>();
-	auto& gunshots = step.messages.get_queue<gunshot_response>();
+	const auto& delta = step.get_delta();
+	const auto& movements = step.messages.get_queue<movement_response>();
+	const auto& gunshots = step.messages.get_queue<gunshot_response>();
 
 	for (auto it : movements) {
 		animation_message msg;
@@ -62,10 +62,10 @@ void animation_system::game_responses_to_animation_messages(logic_step& step) {
 
 void animation_system::handle_animation_messages(logic_step& step) {
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
-	auto events = step.messages.get_queue<animation_message>();
+	const auto& delta = step.get_delta();
+	const auto& events = step.messages.get_queue<animation_message>();
 
-	for (auto& it : events) {
+	for (auto it : events) {
 		auto ptr = cosmos[it.subject].find<components::animation>();
 		if (!ptr) continue; auto& animation = *ptr;
 
@@ -135,7 +135,7 @@ void components::animation::set_current_frame(unsigned number) {
 
 void animation_system::progress_animation_states(logic_step& step) {
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
+	const auto& delta = step.get_delta();
 
 	for (const auto& it : cosmos.get(processing_subjects::WITH_ANIMATION)) {
 		auto& animation_state = it.get<components::animation>();

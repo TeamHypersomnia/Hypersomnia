@@ -16,21 +16,24 @@
 
 void trace_system::lengthen_sprites_of_traces(logic_step& step) const {
 	auto& cosmos = step.cosm;
-	auto delta = step.get_delta();
+	const auto delta = step.get_delta();
 
-	for (auto t : cosmos.get(processing_subjects::WITH_TRACE)) {
+	for (const auto t : cosmos.get(processing_subjects::WITH_TRACE)) {
 		auto& trace = t.get<components::trace>();
 		auto& sprite = t.get<components::sprite>();
 
-		if (trace.chosen_lengthening_duration_ms < 0.f)
+		if (trace.chosen_lengthening_duration_ms < 0.f) {
 			trace.reset(cosmos.get_rng_for(t));
+		}
 
 		vec2 surplus_multiplier;
 		
-		if(!trace.is_it_finishing_trace)
+		if (!trace.is_it_finishing_trace) {
 			surplus_multiplier = trace.chosen_multiplier * trace.lengthening_time_passed_ms / trace.chosen_lengthening_duration_ms;
-		else
-			surplus_multiplier = (trace.chosen_multiplier + vec2(1, 1)) * (1.f-(trace.lengthening_time_passed_ms / trace.chosen_lengthening_duration_ms)) - vec2(1, 1);
+		}
+		else {
+			surplus_multiplier = (trace.chosen_multiplier + vec2(1, 1)) * (1.f - (trace.lengthening_time_passed_ms / trace.chosen_lengthening_duration_ms)) - vec2(1, 1);
+		}
 
 		sprite.size_multiplier = vec2(1, 1) + surplus_multiplier;
 
@@ -43,21 +46,22 @@ void trace_system::lengthen_sprites_of_traces(logic_step& step) const {
 void trace_system::destroy_outdated_traces(logic_step& step) const {
 	auto& cosmos = step.cosm;
 
-	for (auto t : cosmos.get(processing_subjects::WITH_TRACE)) {
+	for (const auto t : cosmos.get(processing_subjects::WITH_TRACE)) {
 		auto& trace = t.get<components::trace>();
 
 		if (trace.lengthening_time_passed_ms > trace.chosen_lengthening_duration_ms - 0.01f) {
 			trace.lengthening_time_passed_ms = trace.chosen_lengthening_duration_ms - 0.01f;
 
-			if (trace.is_it_finishing_trace)
+			if (trace.is_it_finishing_trace) {
 				step.messages.post(messages::queue_destruction(t));
+			}
 		}
 	}
 }
 
 void trace_system::spawn_finishing_traces_for_destroyed_objects(logic_step& step) const {
 	auto& cosmos = step.cosm;
-	auto events = step.messages.get_queue<messages::will_soon_be_deleted>();
+	const auto& events = step.messages.get_queue<messages::will_soon_be_deleted>();
 
 	for (const auto& it : events) {
 		const auto e = cosmos[it.subject];

@@ -29,7 +29,7 @@ void gui_system::switch_to_gui_mode_and_back(logic_step& step) {
 	auto& cosmos = step.cosm;
 
 	for (const auto& i : intents) {
-		auto subject = cosmos[i.subject];
+		const auto subject = cosmos[i.subject];
 
 		if (subject.has<components::gui_element>()) {
 			auto& gui = subject.get<components::gui_element>();
@@ -49,7 +49,7 @@ void gui_system::switch_to_gui_mode_and_back(logic_step& step) {
 void gui_system::advance_gui_elements(logic_step& step) {
 	auto& cosmos = step.cosm;
 
-	for (const auto& root : cosmos.get(processing_subjects::WITH_GUI_ELEMENT)) {
+	for (const auto root : cosmos.get(processing_subjects::WITH_GUI_ELEMENT)) {
 		auto& element = root.get<components::gui_element>();
 
 		if (element.is_gui_look_enabled && root.has<components::item_slot_transfers>()) {
@@ -89,9 +89,9 @@ void gui_system::advance_gui_elements(logic_step& step) {
 							}
 			
 							if (change.msg == window::event::message::wheel) {
-								auto& item = item_entity.get<components::item>();
+								const auto& item = item_entity.get<components::item>();
 			
-								auto delta = change.scroll.amount;
+								const auto delta = change.scroll.amount;
 			
 								dragged_charges += delta;
 			

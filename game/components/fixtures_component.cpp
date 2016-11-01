@@ -49,7 +49,7 @@ size_t basic_fixtures_synchronizer<C>::get_num_colliders() const {
 }
 
 template<bool C>
-const components::fixtures::convex_partitioned_collider& basic_fixtures_synchronizer<C>::get_collider_data(const size_t i) {
+const components::fixtures::convex_partitioned_collider& basic_fixtures_synchronizer<C>::get_collider_data(const size_t i) const {
 	return component.colliders[i];
 ;}
 

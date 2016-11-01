@@ -10,9 +10,9 @@ bool dynamic_tree_system::cache::is_constructed() const {
 	return constructed;
 }
 
-void dynamic_tree_system::destruct(const_entity_handle handle) {
-	auto id = handle.get_id();
-	size_t index = id.pool.indirection_index;
+void dynamic_tree_system::destruct(const const_entity_handle handle) {
+	const auto id = handle.get_id();
+	const size_t index = id.pool.indirection_index;
 
 	auto& cache = per_entity_cache[index];
 
@@ -26,17 +26,17 @@ void dynamic_tree_system::destruct(const_entity_handle handle) {
 	}
 }
 
-void dynamic_tree_system::construct(const_entity_handle handle) {
+void dynamic_tree_system::construct(const const_entity_handle handle) {
 	if (!handle.has<components::dynamic_tree_node>()) return;
 
-	auto id = handle.get_id();
-	size_t index = id.pool.indirection_index;
+	const auto id = handle.get_id();
+	const size_t index = id.pool.indirection_index;
 
 	auto& cache = per_entity_cache[index];
 
 	ensure(!cache.is_constructed());
 
-	auto& dynamic_tree_node = handle.get<components::dynamic_tree_node>();
+	const auto& dynamic_tree_node = handle.get<components::dynamic_tree_node>();
 
 	if (dynamic_tree_node.is_activated()) {
 		auto& data = dynamic_tree_node.get_data();
@@ -59,14 +59,14 @@ void dynamic_tree_system::construct(const_entity_handle handle) {
 	}
 }
 
-void dynamic_tree_system::reserve_caches_for_entities(size_t n) {
+void dynamic_tree_system::reserve_caches_for_entities(const size_t n) {
 	per_entity_cache.resize(n);
 }
 
 std::vector<unversioned_entity_id> dynamic_tree_system::determine_visible_entities_from_camera(state_for_drawing_camera in, const physics_system& physics) const {
 	std::vector<unversioned_entity_id> visible_entities = always_visible_entities;
 
-	auto& result = physics.query_aabb_px(in.transformed_visible_world_area_aabb.left_top(), in.transformed_visible_world_area_aabb.right_bottom(), filters::renderable_query());
+	const auto& result = physics.query_aabb_px(in.transformed_visible_world_area_aabb.left_top(), in.transformed_visible_world_area_aabb.right_bottom(), filters::renderable_query());
 	visible_entities.insert(visible_entities.end(), result.entities.begin(), result.entities.end());
 
 	struct render_listener {

@@ -22,7 +22,10 @@ void movement_system::set_movement_flags_from_input(logic_step& step) {
 
 	for (const auto& it : events) {
 		auto* const movement = cosmos[it.subject].find<components::movement>();
-		if (movement == nullptr) continue;
+		
+		if (movement == nullptr) {
+			continue;
+		}
 
 		switch (it.intent) {
 		case intent_type::MOVE_FORWARD:
@@ -52,7 +55,9 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 	for (const auto& it : cosmos.get(processing_subjects::WITH_MOVEMENT)) {
 		auto& movement = it.get<components::movement>();
 
-		if (!movement.apply_movement_forces) continue;
+		if (!movement.apply_movement_forces) {
+			continue;
+		}
 
 		vec2 resultant;
 
@@ -90,12 +95,14 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 		}
 
 		/* the player feels less like a physical projectile if we brake per-axis */
-		if (movement.enable_braking_damping && !(movement.make_inert_for_ms > 0.f))
+		if (movement.enable_braking_damping && !(movement.make_inert_for_ms > 0.f)) {
 			physics.set_linear_damping_vec(vec2(
 				resultant.x_non_zero() ? 0.f : movement.braking_damping,
 				resultant.y_non_zero() ? 0.f : movement.braking_damping));
-		else
-			physics.set_linear_damping_vec(vec2(0,0));
+		}
+		else {
+			physics.set_linear_damping_vec(vec2(0, 0));
+		}
 	}
 }
 
@@ -120,7 +127,7 @@ void movement_system::generate_movement_responses(logic_step& step) {
 		if (movement.max_speed_for_movement_response == 0.f) msg.speed = 0.f;
 		else msg.speed = speed / movement.max_speed_for_movement_response;
 		
-		for (auto receiver : movement.response_receivers) {
+		for (const auto receiver : movement.response_receivers) {
 			messages::movement_response copy(msg);
 			copy.stop_response_at_zero_speed = receiver.stop_response_at_zero_speed;
 			copy.subject = receiver.target;

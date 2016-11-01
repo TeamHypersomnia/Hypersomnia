@@ -28,8 +28,8 @@ void components::melee::reset_weapon(entity_handle e) {
 
 void melee_system::consume_melee_intents(logic_step& step) {
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
-	auto& events = step.messages.get_queue<messages::intent_message>();
+	const auto& delta = step.get_delta();
+	const auto& events = step.messages.get_queue<messages::intent_message>();
 
 
 	for (const auto& it : events) {
@@ -39,7 +39,7 @@ void melee_system::consume_melee_intents(logic_step& step) {
 			therefore we need to filter out events we're interested in, and that would be
 			melee-related intents and only these applied to an entity with a melee component
 		*/
-		auto* maybe_melee = cosmos[it.subject].find<components::melee>();
+		auto* const maybe_melee = cosmos[it.subject].find<components::melee>();
 		
 		if (maybe_melee == nullptr) 
 			continue;
@@ -62,12 +62,12 @@ void melee_system::consume_melee_intents(logic_step& step) {
 
 void melee_system::initiate_and_update_moves(logic_step& step) {
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
+	const auto& delta = step.get_delta();
 	/* 
 	- fixed delta timestep if it's a logic procedure 
 	- variable frame time if it is a rendering-time procedure 
 	*/
-	auto dt = static_cast<float>(delta.in_milliseconds());
+	const auto dt = static_cast<float>(delta.in_milliseconds());
 
 	/* clear melee swing response queue because this is the only place where we send them */
 	step.messages.get_queue<messages::melee_swing_response>().clear();
@@ -76,9 +76,9 @@ void melee_system::initiate_and_update_moves(logic_step& step) {
 		therefore we use get instead of find
 	*/
 
-	auto targets_copy = cosmos.get(processing_subjects::WITH_MELEE);
+	const auto targets_copy = cosmos.get(processing_subjects::WITH_MELEE);
 
-	for (auto& t : targets_copy) {
+	for (const auto& t : targets_copy) {
 		auto& melee = t.get<components::melee>();
 		auto& damage = t.get<components::damage>();
 
@@ -110,9 +110,9 @@ void melee_system::initiate_and_update_moves(logic_step& step) {
 	}
 }
 
-melee_state melee_system::primary_action(logic_step& step, double dt_d, entity_handle target, components::melee& melee_component, components::damage& damage)
+melee_state melee_system::primary_action(logic_step& step, const double dt_d, const entity_handle target, components::melee& melee_component, components::damage& damage)
 {
-	float dt = static_cast<float>(dt_d);
+	const float dt = static_cast<float>(dt_d);
 
 	damage.damage_upon_collision = true;
 
@@ -180,7 +180,7 @@ melee_state melee_system::primary_action(logic_step& step, double dt_d, entity_h
 
 	//animation.offset_pattern = melee_component.offset_positions[int(melee_component.action_stage)];
 	//m.set_offset(colliders_offset_type::SPECIAL_MOVE_DISPLACEMENT, animation.calculate_intermediate_transform(melee_component.swing_current_time / melee_component.swings[int(melee_component.action_stage)].duration_ms));
-	auto player = target.get_owning_transfer_capability();
+	const auto player = target.get_owning_transfer_capability();
 	damage.custom_impact_velocity = target.logic_transform().pos - player.logic_transform().pos;
 
 	response.subject = target;

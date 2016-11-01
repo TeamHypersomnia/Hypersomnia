@@ -29,13 +29,13 @@ class physics_system {
 	std::vector<colliders_cache> colliders_caches;
 	std::vector<rigid_body_cache> rigid_body_caches;
 
-	std::pair<size_t, size_t> map_fixture_pointer_to_indices(b2Fixture* f, const const_entity_handle&);
-	convex_partitioned_shape::convex_poly::destruction_data& map_fixture_pointer_to_convex_poly(b2Fixture* f, const entity_handle&);
+	std::pair<size_t, size_t> map_fixture_pointer_to_indices(const b2Fixture* const f, const const_entity_handle&);
+	convex_partitioned_shape::convex_poly::destruction_data& map_fixture_pointer_to_convex_poly(const b2Fixture* const f, const entity_handle&);
 
-	void reserve_caches_for_entities(size_t n);
-	void fixtures_construct(const_entity_handle);
-	void construct(const_entity_handle);
-	void destruct(const_entity_handle);
+	void reserve_caches_for_entities(const size_t n);
+	void fixtures_construct(const const_entity_handle);
+	void construct(const const_entity_handle);
+	void destruct(const const_entity_handle);
 
 	friend class cosmos;
 	friend class component_synchronizer<false, components::physics>;
@@ -45,13 +45,13 @@ class physics_system {
 	template<bool> friend class basic_physics_synchronizer;
 	template<bool> friend class basic_fixtures_synchronizer;
 
-	bool is_constructed_rigid_body(const_entity_handle) const;
-	bool is_constructed_colliders(const_entity_handle) const;
+	bool is_constructed_rigid_body(const const_entity_handle) const;
+	bool is_constructed_colliders(const const_entity_handle) const;
 
-	rigid_body_cache& get_rigid_body_cache(entity_id);
-	colliders_cache& get_colliders_cache(entity_id);
-	const rigid_body_cache& get_rigid_body_cache(entity_id) const;
-	const colliders_cache& get_colliders_cache(entity_id) const;
+	rigid_body_cache& get_rigid_body_cache(const entity_id);
+	colliders_cache& get_colliders_cache(const entity_id);
+	const rigid_body_cache& get_rigid_body_cache(const entity_id) const;
+	const colliders_cache& get_colliders_cache(const entity_id) const;
 
 	std::vector<messages::collision_message> accumulated_messages;
 public:

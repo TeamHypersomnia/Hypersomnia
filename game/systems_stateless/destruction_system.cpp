@@ -11,7 +11,6 @@
 
 void destruction_system::generate_damages_from_forceful_collisions(logic_step& step) const {
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
 	const auto& events = step.messages.get_queue<messages::collision_message>();
 
 	for (const auto& it : events) {
@@ -19,7 +18,7 @@ void destruction_system::generate_damages_from_forceful_collisions(logic_step& s
 			continue;
 		
 		const auto subject = cosmos[it.subject];
-		auto& fixtures = subject.get<components::fixtures>();
+		const auto& fixtures = subject.get<components::fixtures>();
 
 		const auto& data_indices = it.subject_collider_and_convex_indices;
 		const auto& coll = fixtures.get_collider_data(data_indices.first);
@@ -43,10 +42,10 @@ void destruction_system::generate_damages_from_forceful_collisions(logic_step& s
 
 void destruction_system::apply_damages_and_split_fixtures(logic_step& step) const {
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
+	const auto delta = step.get_delta();
 	const auto& damages = step.messages.get_queue<messages::damage_message>();
 
-	for (auto& d : damages) {
+	for (const auto& d : damages) {
 		const auto subject = cosmos[d.subject];
 		
 		if (subject.has<components::fixtures>()) {

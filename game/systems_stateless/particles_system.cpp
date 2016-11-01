@@ -22,7 +22,7 @@
 #include "game/transcendental/cosmos.h"
 
 entity_id particles_system::create_refreshable_particle_group(logic_step& step) const {
-	auto ent = step.cosm.create_entity("refreshable_particle_group");
+	const auto ent = step.cosm.create_entity("refreshable_particle_group");
 	
 	ent.add(components::transform());
 	ent.add(components::particle_group()).stream_slots[0].destroy_after_lifetime_passed = false;
@@ -34,13 +34,13 @@ entity_id particles_system::create_refreshable_particle_group(logic_step& step) 
 }
 
 void particles_system::game_responses_to_particle_effects(logic_step& step) const {
-	auto& gunshots = step.messages.get_queue<messages::gunshot_response>();
-	auto& damages = step.messages.get_queue<messages::damage_message>();
-	auto& swings = step.messages.get_queue<messages::melee_swing_response>();
-	auto& healths = step.messages.get_queue<messages::health_event>();
+	const auto& gunshots = step.messages.get_queue<messages::gunshot_response>();
+	const auto& damages = step.messages.get_queue<messages::damage_message>();
+	const auto& swings = step.messages.get_queue<messages::melee_swing_response>();
+	const auto& healths = step.messages.get_queue<messages::health_event>();
 	auto& cosmos = step.cosm;
 
-	for (auto& g : gunshots) {
+	for (const auto& g : gunshots) {
 		for (auto& r : g.spawned_rounds) {
 			const auto& round_response = cosmos[r].get<components::particle_effect_response>();
 			const auto& round_response_map = *round_response.response;
@@ -63,7 +63,7 @@ void particles_system::game_responses_to_particle_effects(logic_step& step) cons
 			step.messages.post(burst);
 		}
 
-		for (auto& s : g.spawned_shells) {
+		for (const auto& s : g.spawned_shells) {
 			const auto& shell_response = cosmos[s].get<components::particle_effect_response>();
 			const auto& shell_response_map = *shell_response.response;
 
@@ -84,7 +84,7 @@ void particles_system::game_responses_to_particle_effects(logic_step& step) cons
 		//step.messages.post(burst);
 	}
 
-	for (auto& d : damages) {
+	for (const auto& d : damages) {
 		const auto& response = cosmos[d.inflictor].get<components::particle_effect_response>();
 		const auto& response_map = *response.response;
 
@@ -103,7 +103,7 @@ void particles_system::game_responses_to_particle_effects(logic_step& step) cons
 		step.messages.post(burst);
 	}
 
-	for (auto& h : healths) {
+	for (const auto& h : healths) {
 		const auto& response = cosmos[h.subject].get<components::particle_effect_response>();
 		const auto& response_map = *response.response;
 
@@ -129,7 +129,7 @@ void particles_system::game_responses_to_particle_effects(logic_step& step) cons
 		}
 	}
 
-	for (auto& s : swings) {
+	for (const auto& s : swings) {
 		const auto& response = cosmos[s.subject].get<components::particle_effect_response>();
 		const auto& response_map = *response.response;
 
@@ -199,7 +199,7 @@ void particles_system::create_particle_effects(logic_step& step) const {
 		components::render* target_render = nullptr;
 		components::transform* target_transform = nullptr;
 
-		auto target_group_to_refresh = cosmos[it.target_group_to_refresh];
+		const auto target_group_to_refresh = cosmos[it.target_group_to_refresh];
 
 		if (target_group_to_refresh.alive()) {
 			target_group = target_group_to_refresh.find<components::particle_group>();
@@ -210,7 +210,7 @@ void particles_system::create_particle_effects(logic_step& step) const {
 			target_group->stream_slots.resize(only_streams.size());
 		}
 
-		for (auto& stream : only_streams) {
+		for (const auto& stream : only_streams) {
 			if (target_group_to_refresh.dead()) {
 				auto new_stream_entity = cosmos.create_entity("particle_stream");
 				target_group = &new_stream_entity.add(components::particle_group());
@@ -223,7 +223,7 @@ void particles_system::create_particle_effects(logic_step& step) const {
 				new_stream_entity.add_standard_components();
 			}
 
-			float target_rotation = it.transform.rotation + rng.randval(stream->angular_offset);
+			const float target_rotation = it.transform.rotation + rng.randval(stream->angular_offset);
 
 			//*target_group = components::particle_group();
 			auto& target_stream = target_group->stream_slots[stream_index];
@@ -276,7 +276,7 @@ void particles_system::create_particle_effects(logic_step& step) const {
 }
 
 void particles_system::spawn_particle(randomization& rng,
-	components::particle_group::stream& group, const vec2& position, float rotation, float spread, const resources::emission& emission) const {
+	components::particle_group::stream& group, const vec2& position, float rotation, const float spread, const resources::emission& emission) const {
 	auto new_particle = emission.particle_templates[rng.randval(0u, emission.particle_templates.size() - 1)];
 	new_particle.vel = vec2().set_from_degrees(
 		rng.randval(rotation - spread, rotation + spread)) *
@@ -293,7 +293,7 @@ void particles_system::spawn_particle(randomization& rng,
 	auto truncated_lifetime = emission.particle_lifetime_ms;
 
 	if (emission.type == emission.STREAM) {
-		float remaining_time = static_cast<float>(group.stream_max_lifetime_ms - group.stream_lifetime_ms);
+		const float remaining_time = static_cast<float>(group.stream_max_lifetime_ms - group.stream_lifetime_ms);
 
 		/* if remaining time is less than fade_when_ms_remaining */
 		if (group.fade_when_ms_remaining > 0.f && remaining_time < group.fade_when_ms_remaining) {
@@ -316,7 +316,7 @@ void particles_system::spawn_particle(randomization& rng,
 	group.particles.push_back(new_particle);
 }
 
-void integrate_particle(resources::particle& p, float dt) {
+void integrate_particle(resources::particle& p, const float dt) {
 	p.vel += p.acc * dt;
 	p.pos += p.vel * dt;
 	p.rotation += p.rotation_speed * dt;
@@ -328,20 +328,21 @@ void integrate_particle(resources::particle& p, float dt) {
 }
 
 void particles_system::destroy_dead_streams(logic_step& step) const {
-	for (auto it : step.cosm.get(processing_subjects::WITH_PARTICLE_GROUP)) {
-		auto& group = it.get<components::particle_group>();
-		auto& slots = group.stream_slots;
+	for (const auto it : step.cosm.get(processing_subjects::WITH_PARTICLE_GROUP)) {
+		const auto& group = it.get<components::particle_group>();
+		const auto& slots = group.stream_slots;
 
-		if (slots.empty())
+		if (slots.empty()) {
 			step.messages.post(messages::queue_destruction(it));
+		}
 	}
 }
 
 void particles_system::step_streams_and_particles(logic_step& step) const {
 	auto& cosmos = step.cosm;
-	auto delta = step.get_delta();
+	const auto delta = step.get_delta();
 
-	for (auto it : step.cosm.get(processing_subjects::WITH_PARTICLE_GROUP)) {
+	for (const auto it : step.cosm.get(processing_subjects::WITH_PARTICLE_GROUP)) {
 		auto& group = it.get<components::particle_group>();
 		const auto& transform = it.get<components::transform>();
 		auto rng = cosmos.get_rng_for(it);
@@ -377,7 +378,7 @@ void particles_system::step_streams_and_particles(logic_step& step) const {
 				if (stream_slot.max_swings_per_sec > 0)
 					augs::clamp(stream_slot.swings_per_sec, stream_slot.min_swings_per_sec, stream_slot.max_swings_per_sec);
 
-				int to_spawn = static_cast<int>(std::floor(stream_slot.stream_particles_to_spawn));
+				const int to_spawn = static_cast<int>(std::floor(stream_slot.stream_particles_to_spawn));
 
 				if (!group.pause_emission) {
 					for (int i = 0; i < to_spawn; ++i) {

@@ -12,16 +12,16 @@
 
 using namespace augs;
 
-void components::position_copying::set_target(entity_id new_target) {
+void components::position_copying::set_target(const entity_id new_target) {
 	target_newly_set = true;
 	target = new_target;
 }
 
 void position_copying_system::update_transforms(logic_step& step) {
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
-	auto targets = cosmos.get(processing_subjects::WITH_POSITION_COPYING);
-	for (const auto& it : targets) {
+	const auto delta = step.get_delta();
+	
+	for (const auto& it : cosmos.get(processing_subjects::WITH_POSITION_COPYING)) {
 		components::transform transform = it.logic_transform();
 		auto& position_copying = it.get<components::position_copying>();
 

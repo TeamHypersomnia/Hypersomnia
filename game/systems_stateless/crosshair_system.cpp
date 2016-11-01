@@ -25,12 +25,12 @@ void components::crosshair::update_bounds() {
 
 void crosshair_system::generate_crosshair_intents(logic_step& step) {
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
+	const auto& delta = step.get_delta();
 	step.messages.get_queue<messages::crosshair_intent_message>().clear();
-	auto events = step.messages.get_queue<messages::intent_message>();
+	const auto& events = step.messages.get_queue<messages::intent_message>();
 
 	for (const auto& it : events) {
-		auto subject = cosmos[it.subject];
+		const auto subject = cosmos[it.subject];
 		
 		if (!subject.has<components::crosshair>())
 			continue;
@@ -41,11 +41,11 @@ void crosshair_system::generate_crosshair_intents(logic_step& step) {
 		crosshair_intent.messages::intent_message::operator=(it);
 
 		if (it.uses_mouse_motion()) {
-			vec2 delta = vec2(vec2(it.mouse_rel) * crosshair.sensitivity).rotate(crosshair.rotation_offset, vec2());
+			const vec2 delta = vec2(vec2(it.mouse_rel) * crosshair.sensitivity).rotate(crosshair.rotation_offset, vec2());
 
 			vec2& base_offset = crosshair.base_offset;
-			vec2 old_base_offset = base_offset;
-			vec2 old_pos = position(subject);
+			const vec2 old_base_offset = base_offset;
+			const vec2 old_pos = position(subject);
 
 			base_offset += delta;
 			base_offset.clamp_rotated(crosshair.bounds_for_base_offset, crosshair.rotation_offset);
@@ -69,8 +69,8 @@ void crosshair_system::generate_crosshair_intents(logic_step& step) {
 }
 void crosshair_system::apply_crosshair_intents_to_base_offsets(logic_step& step) {
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
-	auto& events = step.messages.get_queue<messages::crosshair_intent_message>();
+	const auto& delta = step.get_delta();
+	const auto& events = step.messages.get_queue<messages::crosshair_intent_message>();
 
 	for (const auto& it : events)
 		cosmos[it.subject].get<components::crosshair>().base_offset = it.crosshair_base_offset;
@@ -78,13 +78,14 @@ void crosshair_system::apply_crosshair_intents_to_base_offsets(logic_step& step)
 
 void crosshair_system::apply_base_offsets_to_crosshair_transforms(logic_step& step) {
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
-	for (auto& it : cosmos.get(processing_subjects::WITH_CROSSHAIR)) {
-		auto player_id = cosmos[it.get<components::crosshair>().character_entity_to_chase];
+	const auto& delta = step.get_delta();
+	
+	for (const auto it : cosmos.get(processing_subjects::WITH_CROSSHAIR)) {
+		const auto player_id = cosmos[it.get<components::crosshair>().character_entity_to_chase];
 
 		if (player_id.alive()) {
-			vec2 aiming_displacement = components::crosshair::calculate_aiming_displacement(it, true);
-			vec2 player_center = position(player_id);
+			const vec2 aiming_displacement = components::crosshair::calculate_aiming_displacement(it, true);
+			const vec2 player_center = position(player_id);
 
 			it.get<components::transform>().pos = aiming_displacement + player_center;
 		}

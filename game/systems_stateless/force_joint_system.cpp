@@ -15,7 +15,8 @@
 
 void force_joint_system::apply_forces_towards_target_entities(logic_step& step) {
 	auto& cosmos = step.cosm;
-	const auto& delta = step.get_delta();
+	const auto delta = step.get_delta();
+
 	for (const auto& it : cosmos.get(processing_subjects::WITH_FORCE_JOINT)) {
 		if (!it.has<components::physics>()) continue;
 
@@ -36,8 +37,8 @@ void force_joint_system::apply_forces_towards_target_entities(logic_step& step) 
 		direction.normalize_hint(distance);
 
 		if (force_joint.divide_transform_mode) {
-			auto current_transform = it.logic_transform();
-			auto interpolated = augs::interp(current_transform, chased_transform, 1.0 - 1.0 / (1.0 + delta.in_seconds() * (60.0)));
+			const auto current_transform = it.logic_transform();
+			const auto interpolated = augs::interp(current_transform, chased_transform, 1.0 - 1.0 / (1.0 + delta.in_seconds() * (60.0)));
 			//LOG("Cur: %x,%x, Chas: %x,%x, Inter: %x,%x", current_transform.pos, current_transform.rotation, chased_entity_transform.pos, chased_entity_transform.rotation, interpolated.pos, interpolated.rotation);
 			physics.set_transform(interpolated);
 		}

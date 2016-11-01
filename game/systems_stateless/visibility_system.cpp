@@ -31,7 +31,7 @@ using namespace augs;
 source:
 http://stackoverflow.com/questions/16542042/fastest-way-to-sort-vectors-by-angle-without-actually-computing-that-angle
 */
-float comparable_angle(vec2 diff) {
+float comparable_angle(const vec2 diff) {
 	return sgn(diff.y) * (
 		1 - (diff.x / (std::abs(diff.x) + std::abs(diff.y)))
 		);
@@ -42,7 +42,7 @@ size_t components::visibility::full_visibility_info::get_num_triangles() const {
 	return edges.size();
 }
 
-components::visibility::discontinuity* components::visibility::full_visibility_info::get_discontinuity_for_edge(size_t n) {
+components::visibility::discontinuity* components::visibility::full_visibility_info::get_discontinuity_for_edge(const size_t n) {
 	for (auto& disc : discontinuities)
 		if (disc.edge_index == n)
 			return &disc;
@@ -50,16 +50,16 @@ components::visibility::discontinuity* components::visibility::full_visibility_i
 	return nullptr;
 }
 
-components::visibility::discontinuity* components::visibility::full_visibility_info::get_discontinuity(size_t n) {
+components::visibility::discontinuity* components::visibility::full_visibility_info::get_discontinuity(const size_t n) {
 	return &discontinuities[n];
 }
 
-components::visibility::triangle components::visibility::full_visibility_info::get_triangle(size_t i, vec2 origin) const {
+components::visibility::triangle components::visibility::full_visibility_info::get_triangle(const size_t i, const vec2 origin) const {
 	components::visibility::triangle tri = { origin + offset, edges[i].first, edges[i].second };
 	return tri;
 }
 
-std::vector<vec2> components::visibility::full_visibility_info::get_polygon(float distance_epsilon, vec2 expand_origin, float expand_mult) const {
+std::vector<vec2> components::visibility::full_visibility_info::get_polygon(const float distance_epsilon, const vec2 expand_origin, const float expand_mult) const {
 	std::vector<vec2> output;
 
 	for (size_t i = 0; i < edges.size(); ++i) {
@@ -85,7 +85,7 @@ std::vector<vec2> components::visibility::full_visibility_info::get_polygon(floa
 	return output;
 }
 
-bool components::visibility::line_of_sight_info::sees(entity_id id) const {
+bool components::visibility::line_of_sight_info::sees(const entity_id id) const {
 	return visible_items.find(id) != visible_items.end() 
 		|| visible_sentiences.find(id) != visible_sentiences.end()
 		|| visible_attitudes.find(id) != visible_attitudes.end()
@@ -94,7 +94,7 @@ bool components::visibility::line_of_sight_info::sees(entity_id id) const {
 }
 
 void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos) const {
-	auto& settings = cosmos.significant.meta.settings.visibility;
+	const auto& settings = cosmos.significant.meta.settings.visibility;
 
 	ensure(settings.epsilon_distance_vertex_hit > 0.f);
 	ensure(settings.epsilon_ray_distance_variation > 0.f);
@@ -104,9 +104,11 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 	auto& lines = renderer.logic_lines;
 
 	/* prepare epsilons to be used later, just to make the notation more clear */
-	float epsilon_distance_vertex_hit_sq = settings.epsilon_distance_vertex_hit * PIXELS_TO_METERSf;
-	float epsilon_threshold_obstacle_hit_meters = settings.epsilon_threshold_obstacle_hit * PIXELS_TO_METERSf;
-	epsilon_distance_vertex_hit_sq *= epsilon_distance_vertex_hit_sq;
+	const float epsilon_distance_vertex_hit_sq =
+		(settings.epsilon_distance_vertex_hit * PIXELS_TO_METERSf) *
+		(settings.epsilon_distance_vertex_hit * PIXELS_TO_METERSf);
+	
+	const float epsilon_threshold_obstacle_hit_meters = settings.epsilon_threshold_obstacle_hit * PIXELS_TO_METERSf;
 
 	/* we'll need a reference to physics system for raycasting */
 	physics_system& physics = cosmos.systems_temporary.get<physics_system>();
@@ -120,7 +122,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 
 	for (const auto it : cosmos.get(processing_subjects::WITH_VISIBILITY)) {
 		auto& visibility = it.get<components::visibility>();
-		auto& transform = it.logic_transform();
+		const auto& transform = it.logic_transform();
 
 		for (auto& entry : visibility.line_of_sight_layers) {
 			auto& request = entry.second;
@@ -130,8 +132,8 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 			request.visible_attitudes.clear();
 			request.visible_dangers.clear();
 
-			float d = request.maximum_distance;
-			auto in_aabb = physics.query_aabb_px(transform.pos - vec2(d, d), transform.pos + vec2(d, d), request.candidate_filter, it);
+			const float d = request.maximum_distance;
+			const auto in_aabb = physics.query_aabb_px(transform.pos - vec2(d, d), transform.pos + vec2(d, d), request.candidate_filter, it);
 
 			for (const auto& candidate_id : in_aabb.entities) {
 				auto candidate = cosmos[candidate_id];
@@ -202,10 +204,10 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 			auto& request = entry.second;
 
 			/* transform entity position to Box2D coordinates and take offset into account */
-			vec2 position_meters = (transform.pos + request.offset) * PIXELS_TO_METERSf;
+			const vec2 position_meters = (transform.pos + request.offset) * PIXELS_TO_METERSf;
 
 			/* to Box2D coordinates */
-			float vision_side_meters = request.square_side * PIXELS_TO_METERSf;
+			const float vision_side_meters = request.square_side * PIXELS_TO_METERSf;
 
 			/* prepare maximum visibility square */
 			b2AABB aabb;
@@ -214,7 +216,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 
 			rects::ltrb<float> ltrb(aabb.lowerBound.x, aabb.lowerBound.y, aabb.upperBound.x, aabb.upperBound.y);
 
-			auto& push_vertex = [position_meters, ltrb](vec2 v, bool check_against_aabb){
+			auto push_vertex = [position_meters, ltrb](vec2 v, bool check_against_aabb){
 				/* don't bother if it does not hover the aabb */
 				if (check_against_aabb && !ltrb.hover(vec2(v))) 
 					return;
@@ -238,19 +240,19 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 			};
 
 			/* get list of all fixtures that intersect with the visibility square */
-			auto bodies = physics.query_aabb(aabb.lowerBound, aabb.upperBound, request.filter, it).bodies;
+			const auto bodies = physics.query_aabb(aabb.lowerBound, aabb.upperBound, request.filter, it).bodies;
 
 			/* for every fixture that intersected with the visibility square */
-			for (auto b : bodies) {
+			for (const auto b : bodies) {
 				/* get shape vertices from misc that transforms them to current entity's position and rotation in Box2D space */
-				auto verts = get_world_vertices(cosmos[b->GetUserData()]);
+				const auto verts = get_world_vertices(cosmos[b->GetUserData()]);
 				/* for every vertex in given fixture's shape */
-				for (auto& v : verts) 
+				for (const auto& v : verts)
 					push_vertex(v, true);
 			}
 
 			/* extract the actual vertices from visibility AABB to cast rays to */
-			b2Vec2 whole_vision [] = {
+			const b2Vec2 whole_vision [] = {
 				aabb.lowerBound,
 				aabb.lowerBound + vec2(vision_side_meters, 0),
 				aabb.upperBound,
@@ -261,7 +263,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 			note we lengthen them a bit and add/substract 1.f to avoid undeterministic vertex cases
 			*/
 			b2EdgeShape bounds[4];
-			float moving_epsilon = 1.f * PIXELS_TO_METERSf;
+			const float moving_epsilon = 1.f * PIXELS_TO_METERSf;
 			bounds[0].Set(vec2(whole_vision[0]) + vec2(-moving_epsilon, 0.f), vec2(whole_vision[1]) + vec2(moving_epsilon, 0.f));
 			bounds[1].Set(vec2(whole_vision[1]) + vec2(0.f, -moving_epsilon), vec2(whole_vision[2]) + vec2(0.f, moving_epsilon));
 			bounds[2].Set(vec2(whole_vision[2]) + vec2(moving_epsilon, 0.f), vec2(whole_vision[3]) + vec2(-moving_epsilon, 0.f));
@@ -276,10 +278,10 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 			}
 
 			/* raycast through the bounds to add another vertices where the shapes go beyond visibility square */
-			for (auto& bound : bounds) {
+			for (const auto& bound : bounds) {
 				/* have to raycast both directions because Box2D ignores the second side of the fixture */
-				auto output1 = physics.ray_cast_all_intersections(bound.m_vertex1, bound.m_vertex2, request.filter, it);
-				auto output2 = physics.ray_cast_all_intersections(bound.m_vertex2, bound.m_vertex1, request.filter, it);
+				const auto output1 = physics.ray_cast_all_intersections(bound.m_vertex1, bound.m_vertex2, request.filter, it);
+				const auto output2 = physics.ray_cast_all_intersections(bound.m_vertex2, bound.m_vertex1, request.filter, it);
 
 				/* check for duplicates */
 				std::vector<vec2> output;
@@ -310,7 +312,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 			}
 
 			/* add the visibility square to the vertices that we cast rays to, computing comparable angle in place */
-			for (auto& v : whole_vision)
+			for (const auto& v : whole_vision)
 				push_vertex(v, false);
 
 			/* SORT ALL VERTICES BY ANGLE */
@@ -384,16 +386,16 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 			all_ray_outputs.reserve(all_vertices_transformed.size());
 
 			/* for every vertex to cast the ray to */
-			for (auto& vertex : all_vertices_transformed) {
+			for (const auto& vertex : all_vertices_transformed) {
 				/* create two vectors in direction of vertex with length equal to the half of diagonal of the visibility square
 				(majority of rays will SLIGHTLY go beyond visibility square, but that's not important now)
 				ray_callbacks[0] and ray_callbacks[1] differ ONLY by an epsilon added / substracted to the angle
 				*/
 
 				/* calculate the perpendicular direction to properly apply epsilon_ray_distance_variation */
-				vec2 perpendicular_cw = (vertex.pos - position_meters).normalize().perpendicular_cw();
+				const vec2 perpendicular_cw = (vertex.pos - position_meters).normalize().perpendicular_cw();
 
-				vec2 directions[2] = {
+				const vec2 directions[2] = {
 					((vertex.pos - perpendicular_cw * settings.epsilon_ray_distance_variation * PIXELS_TO_METERSf) - position_meters).normalize(),
 					((vertex.pos + perpendicular_cw * settings.epsilon_ray_distance_variation * PIXELS_TO_METERSf) - position_meters).normalize()
 				};
@@ -404,7 +406,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 				};
 
 				/* clamp the ray to the bound */
-				for (auto& bound : bounds) {
+				for (const auto& bound : bounds) {
 					bool continue_checking = true;
 
 					for (int j = 0; j < 2; ++j) {
@@ -444,10 +446,10 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 				physics_system::raycast_output ray_callbacks[2] = { all_ray_outputs[i].first, all_ray_outputs[i].second };
 				auto& vertex = all_vertices_transformed[i];
 
-				b2Vec2* from_aabb = nullptr;
+				const b2Vec2* from_aabb = nullptr;
 
 				/* if the vertex comes from bounding square, save it and remember about it */
-				for (auto& aabb_vert : whole_vision)
+				for (const auto& aabb_vert : whole_vision)
 					if (vertex.pos == aabb_vert)
 						from_aabb = &aabb_vert;
 
@@ -565,7 +567,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 						for (size_t k = 0; k < 2; ++k) {
 							if (!ray_callbacks[k].hit) {
 								/* for every edge from 4 edges forming visibility square */
-								for (auto& bound : bounds) {
+								for (const auto& bound : bounds) {
 									auto ray_edge_output = physics.edge_edge_intersection(position_meters, all_ray_inputs[i].targets[k], bound.m_vertex1, bound.m_vertex2);
 
 									/* if we hit against boundaries (must happen for at least 1 of them) */
@@ -610,8 +612,8 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 			/* now propagate the output */
 			for (size_t i = 0; i < double_rays.size(); ++i) {
 				/* (i + 1)%double_rays.size() ensures the cycle */
-				auto& ray_a = double_rays[i];
-				auto& ray_b = double_rays[(i + 1)%double_rays.size()];
+				const auto& ray_a = double_rays[i];
+				const auto& ray_b = double_rays[(i + 1)%double_rays.size()];
 
 				/* transform intersection locations to pixels */
 				vec2 p1 = ray_a.second * METERS_TO_PIXELSf;
@@ -641,7 +643,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 			additional processing: delete discontinuities navigation to which will result in collision
 			values less than zero indicate we don't want to perform this calculation */
 			if (request.ignore_discontinuities_shorter_than > 0.f) {
-				int edges_num = request.edges.size();
+				const int edges_num = request.edges.size();
 
 				/* prepare helpful lambda */
 				auto& wrap = [edges_num](int ix){
@@ -662,7 +664,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 						std::vector<vec2> points_too_close;
 
 						/* let's handle both CW and CCW cases in one go, only the sign differs somewhere */
-						int cw = d.winding == d.RIGHT ? 1 : -1;
+						const int cw = d.winding == d.RIGHT ? 1 : -1;
 						
 						/* we check all vertices of edges */
 						for (int j = wrap(d.edge_index + cw), k = 0; k < edges_num-1; j = wrap(j + cw), ++k) {
@@ -681,7 +683,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 						}
 						
 						/* let's also check the discontinuities - we don't know what is behind them */
-						for (auto& old_disc : request.discontinuities) {
+						for (const auto& old_disc : request.discontinuities) {
 							if (old_disc.edge_index != d.edge_index) {
 								/* if a discontinuity is to CW/CCW respectively */
 								if (!(cw * (d.points.first - transform.pos).cross(old_disc.points.first - transform.pos) <= 0)) {
@@ -697,7 +699,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 						/* if there is any threatening close point */
 						if (!points_too_close.empty()) {
 							/* pick the one closest to the entity */
-							vec2 closest_point = *std::min_element(points_too_close.begin(), points_too_close.end(), 
+							const vec2 closest_point = *std::min_element(points_too_close.begin(), points_too_close.end(),
 								[&transform](vec2 a, vec2 b) {
 								return (a - transform.pos).length_sq() < (b - transform.pos).length_sq();
 							});
@@ -727,7 +729,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 				b2RayCastInput input;
 				input.maxFraction = 1.0;
 
-				for (auto& marked : marked_holes) {
+				for (const auto& marked : marked_holes) {
 					/* prepare raycast subject */
 					b2EdgeShape marked_hole;
 					marked_hole.Set(marked.first, marked.second);
@@ -754,7 +756,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 			}
 
 			if (settings.draw_discontinuities)
-				for (auto& disc : request.discontinuities)
+				for (const auto& disc : request.discontinuities)
 					lines.draw(disc.points.first, disc.points.second, rgba(0, 127, 255, 255));
 		}
 	}

@@ -25,11 +25,11 @@ double PIXELS_TO_METERS = 1.0 / METERS_TO_PIXELS;
 float METERS_TO_PIXELSf = 100.f;
 float PIXELS_TO_METERSf = 1.0f / METERS_TO_PIXELSf;
 
-bool physics_system::is_constructed_rigid_body(const_entity_handle handle) const {
+bool physics_system::is_constructed_rigid_body(const const_entity_handle handle) const {
 	return handle.alive() && get_rigid_body_cache(handle).body != nullptr;
 }
 
-bool physics_system::is_constructed_colliders(const_entity_handle handle) const {
+bool physics_system::is_constructed_colliders(const const_entity_handle handle) const {
 	return 
 		handle.alive() // && is_constructed_rigid_body(handle.get<components::fixtures>().get_owner_body())
 		&& 
@@ -37,27 +37,27 @@ bool physics_system::is_constructed_colliders(const_entity_handle handle) const 
 		get_colliders_cache(handle).fixtures_per_collider[0].size() > 0;
 }
 
-rigid_body_cache& physics_system::get_rigid_body_cache(entity_id id) {
+rigid_body_cache& physics_system::get_rigid_body_cache(const entity_id id) {
 	return rigid_body_caches[id.pool.indirection_index];
 }
 
-colliders_cache& physics_system::get_colliders_cache(entity_id id) {
+colliders_cache& physics_system::get_colliders_cache(const entity_id id) {
 	return colliders_caches[id.pool.indirection_index];
 }
 
-const rigid_body_cache& physics_system::get_rigid_body_cache(entity_id id) const {
+const rigid_body_cache& physics_system::get_rigid_body_cache(const entity_id id) const {
 	return rigid_body_caches[id.pool.indirection_index];
 }
 
-const colliders_cache& physics_system::get_colliders_cache(entity_id id) const {
+const colliders_cache& physics_system::get_colliders_cache(const entity_id id) const {
 	return colliders_caches[id.pool.indirection_index];
 }
 
-void physics_system::destruct(const_entity_handle handle) {
+void physics_system::destruct(const const_entity_handle handle) {
 	if (is_constructed_rigid_body(handle)) {
 		auto& cache = get_rigid_body_cache(handle);
 		
-		for (auto& colliders_cache_id : cache.correspondent_colliders_caches)
+		for (const auto& colliders_cache_id : cache.correspondent_colliders_caches)
 			colliders_caches[colliders_cache_id] = colliders_cache();
 
 		b2world->DestroyBody(cache.body);
@@ -66,15 +66,15 @@ void physics_system::destruct(const_entity_handle handle) {
 	}
 	
 	if (is_constructed_colliders(handle)) {
-		auto this_cache_id = handle.get_id().pool.indirection_index;
+		const auto this_cache_id = handle.get_id().pool.indirection_index;
 		auto& cache = colliders_caches[this_cache_id];
 
 		ensure(cache.correspondent_rigid_body_cache != -1);
 
 		auto& owner_body_cache = rigid_body_caches[cache.correspondent_rigid_body_cache];
 
-		for (auto& f_per_c : cache.fixtures_per_collider)
-			for (auto f : f_per_c)
+		for (const auto& f_per_c : cache.fixtures_per_collider)
+			for (const auto f : f_per_c)
 				owner_body_cache.body->DestroyFixture(f);
 
 		remove_element(owner_body_cache.correspondent_colliders_caches, this_cache_id);
@@ -82,24 +82,24 @@ void physics_system::destruct(const_entity_handle handle) {
 	}
 }
 
-void physics_system::fixtures_construct(const_entity_handle handle) {
+void physics_system::fixtures_construct(const const_entity_handle handle) {
 	//ensure(!is_constructed_colliders(handle));
 	if (is_constructed_colliders(handle))
 		return;
 
 	if (handle.has<components::fixtures>()) {
-		auto& colliders = handle.get<components::fixtures>();
+		const auto colliders = handle.get<components::fixtures>();
 
 		if (colliders.is_activated() && is_constructed_rigid_body(colliders.get_owner_body())) {
-			auto& colliders_data = colliders.get_data();
+			const auto& colliders_data = colliders.get_data();
 			auto& cache = get_colliders_cache(handle);
 
-			auto owner_body_entity = colliders.get_owner_body();
+			const auto owner_body_entity = colliders.get_owner_body();
 			ensure(owner_body_entity.alive());
 			auto& owner_cache = get_rigid_body_cache(owner_body_entity);
 
-			auto this_cache_id = handle.get_id().pool.indirection_index;
-			auto owner_cache_id = owner_body_entity.get_id().pool.indirection_index;
+			const auto this_cache_id = handle.get_id().pool.indirection_index;
+			const auto owner_cache_id = owner_body_entity.get_id().pool.indirection_index;
 
 			owner_cache.correspondent_colliders_caches.push_back(this_cache_id);
 			cache.correspondent_rigid_body_cache = owner_cache_id;
@@ -123,7 +123,7 @@ void physics_system::fixtures_construct(const_entity_handle handle) {
 
 				std::vector<b2Fixture*> partitioned_collider;
 
-				for (auto convex : transformed_shape.convex_polys) {
+				for (const auto convex : transformed_shape.convex_polys) {
 					std::vector<b2Vec2> b2verts(convex.vertices.begin(), convex.vertices.end());
 
 					for (auto& v : b2verts)
@@ -131,7 +131,7 @@ void physics_system::fixtures_construct(const_entity_handle handle) {
 
 					shape.Set(b2verts.data(), b2verts.size());
 
-					b2Fixture* new_fix = owner_cache.body->CreateFixture(&fixdef);
+					b2Fixture* const new_fix = owner_cache.body->CreateFixture(&fixdef);
 					
 					ensure(static_cast<short>(ci) < std::numeric_limits<short>::max());
 					new_fix->collider_index = static_cast<short>(ci);
@@ -145,7 +145,7 @@ void physics_system::fixtures_construct(const_entity_handle handle) {
 	}
 }
 
-void physics_system::construct(const_entity_handle handle) {
+void physics_system::construct(const const_entity_handle handle) {
 	//ensure(!is_constructed_rigid_body(handle));
 	if (is_constructed_rigid_body(handle))
 		return;
@@ -157,7 +157,7 @@ void physics_system::construct(const_entity_handle handle) {
 		const auto& fixture_entities = physics.get_fixture_entities();
 
 		if (physics.is_activated() && fixture_entities.size() > 0) {
-			auto& physics_data = physics.get_data();
+			const auto& physics_data = physics.get_data();
 			auto& cache = get_rigid_body_cache(handle);
 
 			b2BodyDef def;
@@ -191,12 +191,12 @@ void physics_system::construct(const_entity_handle handle) {
 	}
 }
 
-void physics_system::reserve_caches_for_entities(size_t n) {
+void physics_system::reserve_caches_for_entities(const size_t n) {
 	rigid_body_caches.resize(n);
 	colliders_caches.resize(n);
 }
 
-std::pair<size_t, size_t> physics_system::map_fixture_pointer_to_indices(b2Fixture* f, const const_entity_handle& handle) {
+std::pair<size_t, size_t> physics_system::map_fixture_pointer_to_indices(const b2Fixture* const f, const const_entity_handle& handle) {
 	const auto this_cache_id = handle.get_id().pool.indirection_index;
 	const auto& cache = colliders_caches[this_cache_id];
 
@@ -212,7 +212,7 @@ std::pair<size_t, size_t> physics_system::map_fixture_pointer_to_indices(b2Fixtu
 	return{};
 }
 
-convex_partitioned_shape::convex_poly::destruction_data& physics_system::map_fixture_pointer_to_convex_poly(b2Fixture* f, const entity_handle& handle) {
+convex_partitioned_shape::convex_poly::destruction_data& physics_system::map_fixture_pointer_to_convex_poly(const b2Fixture* const f, const entity_handle& handle) {
 	const auto indices = map_fixture_pointer_to_indices(f, handle);
 
 	return handle.get<components::fixtures>().component.colliders[indices.first].shape.convex_polys[indices.second].destruction;
@@ -243,7 +243,7 @@ physics_system::contact_listener::~contact_listener() {
 
 void physics_system::step_and_set_new_transforms(logic_step& step) {
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
+	const auto delta = step.get_delta();
 
 	int32 velocityIterations = 8;
 	int32 positionIterations = 3;

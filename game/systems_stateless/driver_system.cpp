@@ -86,9 +86,9 @@ bool driver_system::change_car_ownership(const entity_handle driver_entity, cons
 	auto& cosmos = driver_entity.get_cosmos();
 	const auto& physics = cosmos.systems_temporary.get<physics_system>();
 
-	auto* maybe_rotation_copying = driver_entity.find<components::rotation_copying>();
+	auto* const maybe_rotation_copying = driver_entity.find<components::rotation_copying>();
 	const bool has_physics = driver_entity.has<components::physics>();
-	auto* maybe_movement = driver_entity.find<components::movement>();
+	auto* const maybe_movement = driver_entity.find<components::movement>();
 	auto& force_joint = driver_entity.get<components::force_joint>();
 
 	if (!lost_ownership) {

@@ -104,7 +104,7 @@ public:
 	vec2 get_aabb_size() const;
 	augs::rects::ltrb<float> get_aabb_rect() const;
 
-	const components::fixtures::convex_partitioned_collider& get_collider_data(size_t i);
+	const components::fixtures::convex_partitioned_collider& get_collider_data(size_t i) const;
 	size_t get_num_colliders() const;
 
 	bool is_friction_ground() const;

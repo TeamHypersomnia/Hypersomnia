@@ -14,7 +14,7 @@
 #include "game/detail/physics_scripts.h"
 
 void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
-	auto& settings = cosmos.significant.meta.settings.pathfinding;
+	const auto& settings = cosmos.significant.meta.settings.pathfinding;
 
 	/* prepare epsilons to be used later, just to make the notation more clear */
 	const float epsilon_distance_visible_point_sq = settings.epsilon_distance_visible_point * settings.epsilon_distance_visible_point;
@@ -25,7 +25,7 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 	auto& renderer = augs::renderer::get_current();
 	auto& lines = augs::renderer::get_current().logic_lines;
 
-	for (auto& it : cosmos.get(processing_subjects::WITH_PATHFINDING)) {
+	for (const auto& it : cosmos.get(processing_subjects::WITH_PATHFINDING)) {
 		/* get necessary components */
 		auto& visibility = it.get<components::visibility>();
 		auto& pathfinding = it.get<components::pathfinding>();
@@ -64,7 +64,7 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 				//vision.ignore_discontinuities_shorter_than = pathfinding.session().temporary_ignore_discontinuities_shorter_than;
 
 				/* save all fully visible vertices as discovered */
-				for (auto& visible_vertex : vision.vertex_hits) {
+				for (const auto& visible_vertex : vision.vertex_hits) {
 					bool this_visible_vertex_is_already_memorised = false;
 
 					//auto components::pathfinding::pathfinding_session::* location = 
@@ -93,7 +93,7 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 
 
 				/* save all new discontinuities from visibility */
-				for (auto& disc : vision.discontinuities) {
+				for (const auto& disc : vision.discontinuities) {
 					if (disc.is_boundary) continue;
 
 					bool this_discontinuity_is_already_memorised = false;

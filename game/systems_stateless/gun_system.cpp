@@ -37,7 +37,10 @@ void gun_system::consume_gun_intents(logic_step& step) {
 
 	for (const auto& it : events) {
 		auto* const maybe_gun = cosmos[it.subject].find<components::gun>();
-		if (maybe_gun == nullptr) continue;
+		
+		if (maybe_gun == nullptr) {
+			continue;
+		}
 
 		auto& gun = *maybe_gun;
 
@@ -103,7 +106,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(logic_step& step) {
 
 					while (charges--) {
 						{
-							auto round_entity = cosmos.clone_entity(catridge_or_pellet_stack[sub_entity_name::BULLET_ROUND]); //??
+							const auto round_entity = cosmos.clone_entity(catridge_or_pellet_stack[sub_entity_name::BULLET_ROUND]); //??
 							
 							auto& damage = round_entity.get<components::damage>();
 							damage.amount *= gun.damage_multiplier;
@@ -120,14 +123,14 @@ void gun_system::launch_shots_due_to_pressed_triggers(logic_step& step) {
 							round_entity.add_standard_components();
 						}
 
-						auto shell_definition = catridge_or_pellet_stack[sub_entity_name::BULLET_SHELL];
+						const auto shell_definition = catridge_or_pellet_stack[sub_entity_name::BULLET_SHELL];
 
 						if (shell_definition.alive()) {
-							auto shell_entity = cosmos.clone_entity(shell_definition);
+							const auto shell_entity = cosmos.clone_entity(shell_definition);
 
 							auto rng = cosmos.get_rng_for(shell_entity);
 
-							auto spread_component = rng.randval(gun.shell_spread_degrees) + gun.shell_spawn_offset.rotation;
+							const auto spread_component = rng.randval(gun.shell_spread_degrees) + gun.shell_spawn_offset.rotation;
 
 							auto shell_transform = gun_transform;
 							shell_transform.pos += vec2(gun.shell_spawn_offset.pos).rotate(gun_transform.rotation, vec2());
@@ -164,19 +167,19 @@ void gun_system::launch_shots_due_to_pressed_triggers(logic_step& step) {
 				if (gun.action_mode >= components::gun::action_type::SEMI_AUTOMATIC) {
 					std::vector<entity_handle> source_store_for_chamber;
 
-					auto chamber_magazine_slot = it[slot_function::GUN_CHAMBER_MAGAZINE];
+					const auto chamber_magazine_slot = it[slot_function::GUN_CHAMBER_MAGAZINE];
 
 					if (chamber_magazine_slot.alive())
 						source_store_for_chamber = chamber_magazine_slot.get_items_inside();
 					else {
-						auto detachable_magazine_slot = it[slot_function::GUN_DETACHABLE_MAGAZINE];
+						const auto detachable_magazine_slot = it[slot_function::GUN_DETACHABLE_MAGAZINE];
 
 						if (detachable_magazine_slot.alive() && detachable_magazine_slot.has_items())
 							source_store_for_chamber = detachable_magazine_slot.get_items_inside()[0][slot_function::ITEM_DEPOSIT].get_items_inside();
 					}
 
 					if (source_store_for_chamber.size() > 0) {
-						item_slot_transfer_request into_chamber_transfer (*source_store_for_chamber.rbegin(), chamber_slot, 1, true);
+						const item_slot_transfer_request into_chamber_transfer (*source_store_for_chamber.rbegin(), chamber_slot, 1, true);
 						perform_transfer(into_chamber_transfer, step);
 					}
 				}

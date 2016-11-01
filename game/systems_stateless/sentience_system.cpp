@@ -22,7 +22,7 @@
 
 #include "game/transcendental/step.h"
 
-components::sentience::meter::damage_result components::sentience::meter::calculate_damage_result(float amount) const {
+components::sentience::meter::damage_result components::sentience::meter::calculate_damage_result(const float amount) const {
 	components::sentience::meter::damage_result result;
 
 	if (amount > 0) {
@@ -108,10 +108,10 @@ void sentience_system::apply_damage_and_generate_health_events(logic_step& step)
 
 	healths.clear();
 
-	for (auto& d : damages) {
+	for (const auto& d : damages) {
 		const auto subject = cosmos[d.subject];
 
-		auto* sentience = subject.find<components::sentience>();
+		auto* const sentience = subject.find<components::sentience>();
 
 		messages::health_event event;
 		event.subject = d.subject;
