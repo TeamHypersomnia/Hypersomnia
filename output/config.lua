@@ -23,7 +23,7 @@ config_table = {
 	window_x = 400,
 	window_y = 0,
 	bpp = 24,
-	resolution_w = 1000,
+	resolution_w = 1200,
 	resolution_h = 800,
 	doublebuffer = 1,
 

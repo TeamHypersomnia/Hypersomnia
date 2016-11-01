@@ -5,7 +5,7 @@ namespace augs {
 	namespace window {
 		namespace event {
 			change::change() {
-				memset(this, 0, sizeof(change));
+				std::memset(this, 0, sizeof(change));
 			}
 
 			key_change change::get_key_change() const {
@@ -20,10 +20,16 @@ namespace augs {
 				case message::lup: return key_change::RELEASED;
 				case message::mdown: return key_change::PRESSED;
 				case message::mup: return key_change::RELEASED;
+				case message::xdown: return key_change::PRESSED;
+				case message::xup: return key_change::RELEASED;
 				case message::rdown: return key_change::PRESSED;
 				case message::rup: return key_change::RELEASED;
 				default: return key_change::NO_CHANGE; break;
 				}
+			}
+			
+			bool change::operator==(const change& c) const {
+				return !std::memcmp(this, &c, sizeof(change));
 			}
 
 			bool change::was_key_pressed() const {

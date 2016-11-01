@@ -411,11 +411,6 @@ void cosmos::advance_deterministic_schemata(logic_step& step) {
 	
 	profiler.entropy_length.measure(step.entropy.length());
 
-	//gui_system().advance_gui_elements();
-	//gui_system().translate_raw_window_inputs_to_gui_events();
-	//gui_system().suppress_inputs_meant_for_gui();
-	//gui_system().switch_to_gui_mode_and_back();
-
 	performance.start(meter_type::LOGIC);
 
 	input_system().make_intent_messages(step);
@@ -423,6 +418,9 @@ void cosmos::advance_deterministic_schemata(logic_step& step) {
 	intent_contextualization_system().contextualize_crosshair_action_intents(step);
 	intent_contextualization_system().contextualize_use_button_intents(step);
 	intent_contextualization_system().contextualize_movement_intents(step);
+
+	gui_system().switch_to_gui_mode_and_back(step);
+	gui_system().advance_gui_elements(step);
 
 	driver_system().release_drivers_due_to_requests(step);
 

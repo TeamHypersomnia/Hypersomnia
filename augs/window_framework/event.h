@@ -201,6 +201,8 @@ namespace augs {
 
 				change();
 
+				bool operator==(const change&) const;
+
 				key_change get_key_change() const;
 				bool was_key_pressed() const;
 				bool was_key_released() const;

@@ -93,7 +93,7 @@ namespace ingredients {
 		auto& processing = e += components::processing();
 		e.set_flag(entity_flag::IS_PAST_CONTAGIOUS);
 
-		//e += components::gui_element();
+		e += components::gui_element();
 
 		attitude.parties = party_category::METROPOLIS_CITIZEN;
 		attitude.hostile_parties = party_category::RESISTANCE_CITIZEN;

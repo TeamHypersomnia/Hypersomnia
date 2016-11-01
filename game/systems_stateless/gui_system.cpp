@@ -25,10 +25,10 @@
 #include "game/detail/gui/gui_element_tree.h"
 
 void gui_system::switch_to_gui_mode_and_back(logic_step& step) {
-	auto& intents = step.messages.get_queue<messages::intent_message>();
+	const auto& intents = step.messages.get_queue<messages::intent_message>();
 	auto& cosmos = step.cosm;
 
-	for (auto& i : intents) {
+	for (const auto& i : intents) {
 		auto subject = cosmos[i.subject];
 
 		if (subject.has<components::gui_element>()) {
@@ -52,7 +52,7 @@ void gui_system::advance_gui_elements(logic_step& step) {
 	for (const auto& root : cosmos.get(processing_subjects::WITH_GUI_ELEMENT)) {
 		auto& element = root.get<components::gui_element>();
 
-		if (root.has<components::item_slot_transfers>()) {
+		if (element.is_gui_look_enabled && root.has<components::item_slot_transfers>()) {
 			gui_element_tree tree;
 			root_of_inventory_gui root_of_gui;
 

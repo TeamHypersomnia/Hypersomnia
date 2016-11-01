@@ -21,18 +21,22 @@ bool operator!=(const std::vector<entity_intent>& a, const std::vector<entity_in
 	return false;
 }
 
-bool entity_intent::uses_mouse_motion() const {
+bool key_and_mouse_intent::uses_mouse_motion() const {
 	return
 		intent == intent_type::MOVE_CROSSHAIR ||
 		intent == intent_type::CROSSHAIR_PRIMARY_ACTION ||
 		intent == intent_type::CROSSHAIR_SECONDARY_ACTION;
 }
 
-bool entity_intent::operator!=(const entity_intent& b) const {
-	return std::make_tuple(intent, mouse_rel, pressed_flag) != std::make_tuple(b.intent, b.mouse_rel, b.pressed_flag);
+bool key_and_mouse_intent::operator==(const key_and_mouse_intent& b) const {
+	return std::make_tuple(intent, mouse_rel, pressed_flag) == std::make_tuple(b.intent, b.mouse_rel, b.pressed_flag);
 }
 
-bool entity_intent::from_raw_state(const input_context& context, const augs::window::event::change& raw) {
+bool key_and_mouse_intent::operator!=(const key_and_mouse_intent& b) const {
+	return operator!=(b);
+}
+
+bool key_and_mouse_intent::from_raw_state(const input_context& context, const augs::window::event::change& raw) {
 	bool found_context_entry = false;
 
 	if (raw.was_key_pressed() || raw.was_key_released()) {
@@ -58,7 +62,21 @@ bool entity_intent::from_raw_state(const input_context& context, const augs::win
 	return found_context_entry;
 }
 
+bool entity_intent::operator==(const entity_intent& b) const {
+	return key_and_mouse_intent::operator==(b) && std::make_tuple(has_event_for_gui, event_for_gui) == std::make_tuple(b.has_event_for_gui, b.event_for_gui);
+}
+
+bool entity_intent::operator!=(const entity_intent& b) const {
+	return operator!=(b);
+}
+
 bool entity_intent::from_raw_state_and_possible_gui_receiver(const input_context& context, const augs::window::event::change& raw, const const_entity_handle& gui_receiver) {
+	const auto was_intent_resolved = from_raw_state(context, raw);
+
+	if (was_intent_resolved && intent == intent_type::SWITCH_TO_GUI) {
+		return true;
+	}
+
 	bool should_gui_fetch_this = false;
 
 	if (gui_receiver.alive()) {
@@ -79,6 +97,6 @@ bool entity_intent::from_raw_state_and_possible_gui_receiver(const input_context
 		return true;
 	}
 	else {
-		return from_raw_state(context, raw);
+		return was_intent_resolved;
 	}
 }
