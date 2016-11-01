@@ -100,13 +100,11 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 
 	auto steps = input_unpacker.unpack_steps(hypersomnia.get_fixed_delta());
 
-	std::vector<cosmic_entropy> extrapolated_entropies;
-
-	const auto& step_pred = [this](const cosmic_entropy& entropy, cosmos& cosm) {
+	auto step_pred = [this](const cosmic_entropy& entropy, cosmos& cosm) {
 		scene.step_with_callbacks(entropy, cosm);
 	};
 
-	const auto& step_pred_with_effects_response = [this](const cosmic_entropy& entropy, cosmos& cosm) {
+	auto step_pred_with_effects_response = [this](const cosmic_entropy& entropy, cosmos& cosm) {
 		scene.step_with_callbacks(entropy, cosm, session);
 	};
 
@@ -164,11 +162,11 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 		}
 
 		if (!still_downloading) {
-			session.sending_commands_profiler.new_measurement();
+			session.sending_commands_and_predict_profiler.new_measurement();
 			const auto local_cosmic_entropy_for_this_step = scene.make_cosmic_entropy(s.total_entropy.local, session.context, hypersomnia);
 
 			receiver.send_commands_and_predict(client, local_cosmic_entropy_for_this_step, extrapolated_hypersomnia, step_pred_with_effects_response);
-			session.sending_commands_profiler.end_measurement();
+			session.sending_commands_and_predict_profiler.end_measurement();
 
 			// LOG("Predicting to step: %x; predicted steps: %x", extrapolated_hypersomnia.get_total_steps_passed(), receiver.predicted_steps.size());
 
@@ -182,7 +180,9 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 			client.forceful_disconnect();
 		}
 
+		session.sending_packets_profiler.new_measurement();
 		client.send_pending_redundant();
+		session.sending_packets_profiler.end_measurement();
 	}
 
 	if (!still_downloading) {
