@@ -98,7 +98,9 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 
 	input_unpacker.control(new_entropy);
 
+	session.unpack_local_steps_profiler.new_measurement();
 	auto steps = input_unpacker.unpack_steps(hypersomnia.get_fixed_delta());
+	session.unpack_local_steps_profiler.end_measurement();
 
 	auto step_pred = [this](const cosmic_entropy& entropy, cosmos& cosm) {
 		scene.step_with_callbacks(entropy, cosm);
@@ -170,9 +172,9 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 
 			// LOG("Predicting to step: %x; predicted steps: %x", extrapolated_hypersomnia.get_total_steps_passed(), receiver.predicted_steps.size());
 
-			session.unpack_steps_profiler.new_measurement();
+			session.unpack_remote_steps_profiler.new_measurement();
 			receiver.unpack_deterministic_steps(scene.get_controlled_entity(), hypersomnia, hypersomnia_last_snapshot, extrapolated_hypersomnia, step_pred);
-			session.unpack_steps_profiler.end_measurement();
+			session.unpack_remote_steps_profiler.end_measurement();
 		}
 		
 		if (client.has_timed_out(hypersomnia.get_fixed_delta().in_milliseconds(), 2000)) {

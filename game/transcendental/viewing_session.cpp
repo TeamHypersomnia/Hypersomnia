@@ -14,8 +14,9 @@ std::wstring viewing_session::summary() const {
 		+ triangles.summary()
 		+ local_entropy_profiler.summary()
 		+ remote_entropy_profiler.summary()
+		+ unpack_local_steps_profiler.summary()
 		+ sending_commands_and_predict_profiler.summary()
-		+ unpack_steps_profiler.summary()
+		+ unpack_remote_steps_profiler.summary()
 		+ sending_packets_profiler.summary()
 		;
 }

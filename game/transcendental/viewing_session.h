@@ -35,7 +35,8 @@ public:
 	augs::measurements fps_profiler = augs::measurements(L"FPS");
 	augs::measurements frame_profiler = augs::measurements(L"Frame");
 	augs::measurements local_entropy_profiler = augs::measurements(L"Acquiring local entropy");
-	augs::measurements unpack_steps_profiler = augs::measurements(L"Unpacking steps");
+	augs::measurements unpack_local_steps_profiler = augs::measurements(L"Unpacking local steps");
+	augs::measurements unpack_remote_steps_profiler = augs::measurements(L"Unpacking remote steps");
 	augs::measurements sending_commands_and_predict_profiler = augs::measurements(L"Sending and predicting commands");
 	augs::measurements sending_packets_profiler = augs::measurements(L"Sending packets");
 	augs::measurements remote_entropy_profiler = augs::measurements(L"Acquiring remote entropy");
