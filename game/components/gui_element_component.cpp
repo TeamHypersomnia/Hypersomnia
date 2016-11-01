@@ -126,8 +126,8 @@ namespace components {
 
 		components::sprite cursor_sprite;
 		cursor_sprite.set(gui_cursor, gui_cursor_color);
-		vec2i left_top_corner = gui_crosshair_position;
-		vec2i bottom_right_corner = gui_crosshair_position + cursor_sprite.size;
+		const vec2i left_top_corner = gui_crosshair_position;
+		const vec2i bottom_right_corner = gui_crosshair_position + cursor_sprite.size;
 
 		const bool draw_tooltip = drag_result.possible_target_hovered;
 		
@@ -174,7 +174,7 @@ namespace components {
 		const auto& maybe_hovered_item = context._dynamic_cast<const item_button>(rect_world.rect_hovered);
 		const auto& maybe_hovered_slot = context._dynamic_cast<const slot_button>(rect_world.rect_hovered);
 		
-		bool is_dragging = context.alive(rect_world.rect_held_by_lmb) && rect_world.held_rect_is_dragged;
+		const bool is_dragging = context.alive(rect_world.rect_held_by_lmb) && rect_world.held_rect_is_dragged;
 
 		if (!is_dragging) {
 			gui::text::fstr tooltip_text;
@@ -230,17 +230,12 @@ namespace components {
 				return render_system::render_order_compare(cosm[a], cosm[b]);
 			});
 
-			std::vector<entity_id> hovered_and_named;
-
 			for (auto h : sorted_by_visibility) {
 				auto named = get_first_named_ancestor(cosm[h]);
 
-				if (cosm[named].alive())
-					hovered_and_named.push_back(named);
-			}
-
-			if (hovered_and_named.size() > 0) {
-				return *hovered_and_named.begin();
+				if (cosm[named].alive()) {
+					return named;
+				}
 			}
 		}
 

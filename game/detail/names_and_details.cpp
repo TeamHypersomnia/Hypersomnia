@@ -3,7 +3,7 @@
 #include "game/enums/item_category.h"
 #include "augs/ensure.h"
 
-textual_description description_by_entity_name(entity_name n) {
+textual_description description_by_entity_name(const entity_name n) {
 	switch (n) {
 	case entity_name::ASSAULT_RIFLE:
 		return{
@@ -118,7 +118,7 @@ std::wstring describe_item_compatibility_categories(const item_category_bitset& 
 	return result;
 }
 
-textual_description describe_slot_function(slot_function f) {
+textual_description describe_slot_function(const slot_function f) {
 	switch (f) {
 	case slot_function::GUN_CHAMBER:
 		return{

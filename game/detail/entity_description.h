@@ -11,14 +11,14 @@
 struct textual_description {
 	std::wstring name;
 	std::wstring details;
-} description_by_entity_name(entity_name),
-description_of_entity(const_entity_handle)
+} description_by_entity_name(const entity_name),
+description_of_entity(const const_entity_handle&)
 ;
 
-std::wstring describe_properties(const_entity_handle);
+std::wstring describe_properties(const const_entity_handle&);
 
 std::wstring describe_item_compatibility_categories(const item_category_bitset& flags);
-textual_description describe_slot_function(slot_function);
+textual_description describe_slot_function(const slot_function);
 
-std::wstring describe_slot(const_inventory_slot_handle);
-std::wstring describe_entity(const_entity_handle);
+std::wstring describe_slot(const const_inventory_slot_handle&);
+std::wstring describe_entity(const const_entity_handle&);

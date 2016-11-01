@@ -28,11 +28,11 @@ void name_entity(const entity_handle& id, const entity_name n, const std::wstrin
 
 entity_id get_first_named_ancestor(const const_entity_handle& p) {
 	entity_id iterator = p;
-	auto& cosmos = p.get_cosmos();
+	const auto& cosmos = p.get_cosmos();
 
 	while (cosmos[iterator].alive()) {
 		if (cosmos[iterator].has<components::name>()) {
-			return p;
+			return iterator;
 			break;
 		}
 

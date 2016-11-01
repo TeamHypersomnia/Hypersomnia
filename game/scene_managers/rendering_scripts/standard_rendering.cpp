@@ -27,6 +27,7 @@ namespace rendering_scripts {
 		const auto& cosmos = step.cosm;
 		const auto& dynamic_tree = cosmos.systems_temporary.get<dynamic_tree_system>();
 		const auto& physics = cosmos.systems_temporary.get<physics_system>();
+		const auto& controlled_entity = cosmos[step.camera_state.associated_character];
 
 		step.visible_entities = cosmos[dynamic_tree.determine_visible_entities_from_camera(state, physics)];
 		step.visible_per_layer = render_system().get_visible_per_layer(step.visible_entities);
@@ -110,6 +111,9 @@ namespace rendering_scripts {
 		
 				hud.draw_vertically_flying_numbers(step);
 		
+				if (controlled_entity.has<components::gui_element>()) {
+					components::gui_element::draw_complete_gui_for_camera_rendering_request(controlled_entity, step);
+				}
 				//gui.draw_complete_gui_for_camera_rendering_request(step);
 		//	}
 		//}
