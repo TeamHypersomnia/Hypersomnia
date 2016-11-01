@@ -9,11 +9,14 @@
 
 std::wstring viewing_session::summary() const {
 	return 
-		fps_profiler.summary() +
-		frame_profiler.summary() +
-		local_entropy_profiler.summary() +
-		remote_entropy_profiler.summary() +
-		triangles.summary();
+		fps_profiler.summary()
+		+ frame_profiler.summary()
+		+ triangles.summary()
+		+ local_entropy_profiler.summary()
+		+ remote_entropy_profiler.summary()
+		+ sending_commands_profiler.summary()
+		+ unpack_steps_profiler.summary()
+		;
 }
 
 void viewing_session::visual_response_to_game_events(const logic_step& step) {
