@@ -1015,6 +1015,7 @@
     <ClInclude Include="augs\network\reliable_channel.h" />
     <ClInclude Include="augs\network\reliable_channel_tests.h" />
     <ClInclude Include="augs\padding_byte.h" />
+    <ClInclude Include="augs\templates\memcpy_safety.h" />
     <ClInclude Include="augs\texture_baker\texture.h" />
     <ClInclude Include="augs\texture_baker\texture_with_image.h" />
     <ClInclude Include="game\components\child_component.h" />
