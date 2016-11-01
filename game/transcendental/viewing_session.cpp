@@ -8,7 +8,12 @@
 #include "augs/network/network_client.h"
 
 std::wstring viewing_session::summary() const {
-	return fps_profiler.summary() + triangles.summary();
+	return 
+		fps_profiler.summary() +
+		frame_profiler.summary() +
+		local_entropy_profiler.summary() +
+		remote_entropy_profiler.summary() +
+		triangles.summary();
 }
 
 void viewing_session::visual_response_to_game_events(const logic_step& step) {
@@ -44,8 +49,7 @@ void viewing_session::view(const cosmos& cosmos,
 	const augs::gui::text::fstr& custom_log,
 	const bool clear_current_and_swap_buffers
 	) {
-
-	fps_profiler.new_measurement();
+	frame_profiler.new_measurement();
 
 	auto& renderer = renderer::get_current();
 
@@ -89,4 +93,6 @@ void viewing_session::view(const cosmos& cosmos,
 	}
 
 	fps_profiler.end_measurement();
+	fps_profiler.new_measurement();
+	frame_profiler.end_measurement();
 }

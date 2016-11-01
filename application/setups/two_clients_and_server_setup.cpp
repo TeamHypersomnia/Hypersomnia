@@ -29,7 +29,11 @@ void two_clients_and_server_setup::process(game_window& window) {
 	bool alive[2] = { true, true };
 
 	while (!should_quit) {
+		setups[0].session.local_entropy_profiler.new_measurement();
+		setups[1].session.local_entropy_profiler.new_measurement();
 		auto precollected = window.collect_entropy();
+		setups[0].session.local_entropy_profiler.end_measurement();
+		setups[1].session.local_entropy_profiler.end_measurement();
 
 		if (process_exit_key(precollected))
 			break;

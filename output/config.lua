@@ -11,7 +11,7 @@ launch_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.LOCAL,
+	launch_mode = launch_modes.CLIENT_AND_SERVER,
 	
 	recording_replay_speed = 0.5,
 
@@ -27,7 +27,7 @@ config_table = {
 	resolution_h = 800,
 	doublebuffer = 1,
 
-	debug_disable_cursor_clipping = 0,
+	debug_disable_cursor_clipping = 1,
 	
 	mouse_sensitivity = vec2(1.5, 1.5),
 	

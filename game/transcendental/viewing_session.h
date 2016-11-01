@@ -32,7 +32,10 @@ public:
 	void visual_response_to_game_events(const logic_step&);
 
 	augs::variable_delta_timer frame_timer;
-	augs::measurements fps_profiler = augs::measurements(L"Frame");
+	augs::measurements fps_profiler = augs::measurements(L"FPS");
+	augs::measurements frame_profiler = augs::measurements(L"Frame");
+	augs::measurements local_entropy_profiler = augs::measurements(L"Acquiring local entropy");
+	augs::measurements remote_entropy_profiler = augs::measurements(L"Acquiring remote entropy");
 	augs::measurements triangles = augs::measurements(L"Triangles", false);
 
 	std::wstring summary() const;

@@ -26,7 +26,9 @@ void client_setup::process(game_window& window) {
 	init(window);
 
 	while (!should_quit) {
+		session.local_entropy_profiler.new_measurement();
 		auto precollected = window.collect_entropy();
+		session.local_entropy_profiler.end_measurement();
 
 		if (process_exit_key(precollected))
 			break;
@@ -88,7 +90,9 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 	augs::machine_entropy new_entropy;
 
 	new_entropy.local = precollected;
+	session.remote_entropy_profiler.new_measurement();
 	new_entropy.remote = client.collect_entropy();
+	session.remote_entropy_profiler.end_measurement();
 
 	const bool still_downloading = !complete_state_received || receiver.jitter_buffer.is_still_refilling();
 
