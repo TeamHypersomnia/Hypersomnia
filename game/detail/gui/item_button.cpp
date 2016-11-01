@@ -188,6 +188,10 @@ void item_button::draw_proc(const viewing_gui_context& context, const const_this
 	const auto& detector = this_id->detector;
 	const auto& rect_world = context.get_rect_world();
 	const auto& element = context.get_gui_element_component();
+	auto& this_tree_entry = context.get_tree_entry(this_id);
+
+	const auto former_absolute_pos = this_tree_entry.get_absolute_pos();
+	this_tree_entry.set_absolute_pos(former_absolute_pos + f.absolute_xy_offset);
 	const auto this_absolute_rect = context.get_tree_entry(this_id).get_absolute_rect();
 
 	auto parent_slot = cosmos[item.get<components::item>().current_slot];
@@ -325,6 +329,8 @@ void item_button::draw_proc(const viewing_gui_context& context, const const_this
 			container_status_sprite.draw(state);
 		}
 	}
+
+	this_tree_entry.set_absolute_pos(former_absolute_pos);
 }
 
 bool item_button::is_inventory_root(const const_gui_context& context, const const_this_pointer& this_id) {
