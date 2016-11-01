@@ -113,7 +113,15 @@ typename basic_relations_helpers<C, D>::inventory_slot_handle_type basic_relatio
 template <bool C, class D>
 D basic_relations_helpers<C, D>::operator[](sub_entity_name child) const {
 	auto& self = *static_cast<const D*>(this);
-	return self.get_cosmos()[get_sub_entities_component().sub_entities_by_name.at(child)];
+	const auto& subs = get_sub_entities_component().sub_entities_by_name;
+
+	const auto found = subs.find(child);
+	
+	if (found == subs.end()) {
+		return self.get_cosmos()[entity_id()];
+	}
+
+	return self.get_cosmos()[(*found).second];
 }
 
 template <bool C, class D>

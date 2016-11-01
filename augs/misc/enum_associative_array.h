@@ -24,23 +24,25 @@ namespace augs {
 			friend class enum_associative_array;
 
 		public:
-			basic_iterator(ptr_type ptr, size_t idx) : ptr(ptr), idx(idx) {}
+			basic_iterator(const ptr_type ptr, const size_t idx) : ptr(ptr), idx(idx) {}
 
-			const basic_iterator operator++(int)
-			{
-				iterator temp = *this;
+			const basic_iterator operator++(int) {
+				const iterator temp = *this;
 				++*this;
 				return temp;
 			}
 
-			basic_iterator& operator++()
-			{
+			basic_iterator& operator++() {
 				++idx;
 
-				while (idx < size_t(Enum::COUNT) && !ptr->is_set.test(idx))
+				while (idx < static_cast<size_t>(Enum::COUNT) && !ptr->is_set.test(idx))
 					++idx;
 				
 				return *this;
+			}
+
+			bool operator==(const basic_iterator& b) const {
+				return idx == b.idx;
 			}
 
 			bool operator!=(const basic_iterator& b) const {
@@ -49,7 +51,7 @@ namespace augs {
 
 			ref_type operator*() const {
 				ensure(idx < ptr->capacity());
-				return { Enum(idx), ptr->raw[idx] };
+				return { static_cast<Enum>(idx), ptr->raw[idx] };
 			}
 		};
 
@@ -64,7 +66,7 @@ namespace augs {
 		}
 
 		iterator end() {
-			return iterator(this, size_t(Enum::COUNT));
+			return iterator(this, static_cast<size_t>(Enum::COUNT));
 		}
 
 		const_iterator begin() const {
@@ -72,11 +74,11 @@ namespace augs {
 		}
 
 		const_iterator end() const {
-			return const_iterator(this, size_t(Enum::COUNT));
+			return const_iterator(this, static_cast<size_t>(Enum::COUNT));
 		}
 
-		iterator find(Enum enum_idx) {
-			size_t i = size_t(enum_idx);
+		iterator find(const Enum enum_idx) {
+			const size_t i = static_cast<size_t>(enum_idx);
 			ensure(i < capacity());
 
 			if (is_set.test(i))
@@ -85,8 +87,8 @@ namespace augs {
 			return end();
 		}
 
-		const_iterator find(Enum enum_idx) const {
-			size_t i = size_t(enum_idx);
+		const_iterator find(const Enum enum_idx) const {
+			const size_t i = static_cast<size_t>(enum_idx);
 			ensure(i < capacity());
 
 			if (is_set.test(i))
@@ -95,20 +97,20 @@ namespace augs {
 			return end();
 		}
 
-		T& at(Enum enum_idx) {
-			size_t i = size_t(enum_idx);
+		T& at(const Enum enum_idx) {
+			const size_t i = static_cast<size_t>(enum_idx);
 			ensure(i < capacity() && is_set.test(i));
 			return raw[i];
 		}
 
-		const T& at(Enum enum_idx) const {
-			size_t i = size_t(enum_idx);
+		const T& at(const Enum enum_idx) const {
+			const size_t i = static_cast<size_t>(enum_idx);
 			ensure(i < capacity() && is_set.test(i));
 			return raw[i];
 		}
 
-		T& operator[](Enum enum_idx) {
-			size_t i = size_t(enum_idx);
+		T& operator[](const Enum enum_idx) {
+			const size_t i = static_cast<size_t>(enum_idx);
 
 			if (!is_set.test(i)) {
 				is_set.set(i);
@@ -117,7 +119,7 @@ namespace augs {
 			return raw[i];
 		}
 
-		const T& operator[](Enum enum_idx) const {
+		const T& operator[](const Enum enum_idx) const {
 			return at(enum_idx);
 		}
 
@@ -130,7 +132,7 @@ namespace augs {
 				v.second = T();
 			});
 
-			is_set = std::bitset<size_t(Enum::COUNT)>();
+			is_set = std::bitset<static_cast<size_t>(Enum::COUNT)>();
 		}
 	};
 }

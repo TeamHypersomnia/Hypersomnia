@@ -11,23 +11,26 @@ void aabb_highlighter::update(const float delta_ms) {
 	timer = fmod(timer, cycle_duration_ms);
 }
 
-void aabb_highlighter::draw(viewing_step& step, const_entity_handle subject) const {
+void aabb_highlighter::draw(viewing_step& step, const const_entity_handle& subject) const {
 	rects::ltrb<float> aabb;
 
-	subject.for_each_sub_entity_recursive([&aabb](const_entity_handle e) {
-		auto* sprite = e.find<components::sprite>();
+	subject.for_each_sub_entity_recursive([&aabb](const const_entity_handle e) {
+		const auto* const sprite = e.find<components::sprite>();
 
 		if (e.get_name_as_sub_entity() == sub_entity_name::CHARACTER_CROSSHAIR
-			|| e.get_name_as_sub_entity() == sub_entity_name::CROSSHAIR_RECOIL_BODY)
+			|| e.get_name_as_sub_entity() == sub_entity_name::CROSSHAIR_RECOIL_BODY) {
 			return;
+		}
 
 		if (sprite) {
-			auto new_aabb = sprite->get_aabb(e.get<components::transform>());
+			const auto new_aabb = sprite->get_aabb(e.viewing_transform());
 
-			if (aabb.good())
+			if (aabb.good()) {
 				aabb.contain(new_aabb);
-			else
+			}
+			else {
 				aabb = new_aabb;
+			}
 		}
 	});
 
