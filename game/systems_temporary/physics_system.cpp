@@ -18,6 +18,7 @@
 #include "game/transcendental/entity_handle.h"
 
 #include "augs/graphics/renderer.h"
+#include "augs/templates/container_templates.h"
 
 double METERS_TO_PIXELS = 100.0;
 double PIXELS_TO_METERS = 1.0 / METERS_TO_PIXELS;

@@ -11,6 +11,7 @@
 #include "physics_scripts.h"
 
 #include "augs/graphics/renderer.h"
+#include "augs/templates/container_templates.h"
 
 #define FRICTION_FIELDS_COLLIDE 0
 

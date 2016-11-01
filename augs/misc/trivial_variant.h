@@ -1,6 +1,7 @@
 #pragma once
+#include "augs/templates/type_in_pack.h"
 #include "augs/templates/memcpy_safety.h"
-#include "augs/templates.h"
+#include "augs/templates/find_matching_type.h"
 #include "augs/ensure.h"
 
 namespace augs {

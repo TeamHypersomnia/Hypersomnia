@@ -1,4 +1,3 @@
-#include "augs/templates.h"
 #include "simulation_receiver.h"
 #include "game/transcendental/cosmic_delta.h"
 #include "augs/network/network_client.h"

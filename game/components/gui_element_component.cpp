@@ -26,6 +26,8 @@
 
 #include "game/detail/entity_description.h"
 
+#include "augs/templates/string_templates.h"
+
 using namespace augs;
 using namespace augs::gui;
 using namespace augs::gui::text;

@@ -114,12 +114,6 @@ typedef std::tuple<
 	components::pathfinding
 > disabled_components;
 
-template <typename T, typename Tuple>
-struct has_type;
-
-template <typename T>
-using is_component_disabled = typename has_type<T, disabled_components>::type;
-
 template<class... Types>
 struct type_count {
 	static const unsigned value = sizeof...(Types);

@@ -10,6 +10,8 @@
 
 #include "augs/entity_system/storage_for_message_queues.h"
 
+#include "augs/templates/maybe_const.h"
+
 class cosmos;
 struct immediate_hud;
 struct aabb_highlighter;

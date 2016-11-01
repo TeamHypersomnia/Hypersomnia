@@ -5,8 +5,6 @@
 
 #include "input_system.h"
 
-#include "augs/templates.h"
-
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 #include "augs/misc/time_utils.h"

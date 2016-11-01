@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <cstring>
 
-#include "augs/templates.h"
+#include "augs/templates/string_templates.h"
 
 namespace augs {
 	namespace gui {

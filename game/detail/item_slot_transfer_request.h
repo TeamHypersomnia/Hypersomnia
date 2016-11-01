@@ -2,6 +2,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/detail/inventory_slot_handle.h"
 #include "augs/padding_byte.h"
+#include "augs/templates/maybe_const.h"
 
 struct item_slot_transfer_request_data {
 	entity_id item;

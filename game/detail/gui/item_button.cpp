@@ -10,7 +10,6 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/step.h"
 #include "augs/graphics/renderer.h"
-#include "augs/templates.h"
 
 #include "augs/gui/stroke.h"
 
@@ -24,6 +23,7 @@
 #include "game/systems_stateless/input_system.h"
 #include "game/resources/manager.h"
 
+#include "augs/templates/string_templates.h"
 #include "augs/ensure.h"
 
 bool item_button::is_being_wholely_dragged_or_pending_finish(const const_gui_context& context, const const_this_pointer& this_id) {

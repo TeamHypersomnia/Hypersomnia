@@ -1,7 +1,8 @@
 #pragma once
 #include <tuple>
 #include <vector>
-#include "augs/templates.h"
+#include "augs/templates/tuple_of.h"
+#include "augs/templates/for_each_in_types.h"
 #include "augs/ensure.h"
 
 namespace detail {

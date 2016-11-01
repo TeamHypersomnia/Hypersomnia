@@ -11,9 +11,9 @@
 #include "game/messages/queue_destruction.h"
 #include "game/transcendental/entity_handle.h"
 
-#include "augs/templates.h"
 #include "augs/ensure.h"
 #include "game/transcendental/step.h"
+#include "augs/templates/string_templates.h"
 
 item_transfer_result query_transfer_result(const_item_slot_transfer_request r) {
 	item_transfer_result output;

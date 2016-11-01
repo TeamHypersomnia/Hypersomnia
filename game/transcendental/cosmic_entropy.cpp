@@ -1,5 +1,4 @@
 #include "cosmic_entropy.h"
-#include "augs/templates.h"
 #include "game/transcendental/cosmos.h"
 
 #include "augs/misc/machine_entropy.h"

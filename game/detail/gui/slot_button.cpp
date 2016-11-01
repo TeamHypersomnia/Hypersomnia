@@ -12,8 +12,8 @@
 #include "game/components/gui_element_component.h"
 #include "game/components/item_component.h"
 
-#include "augs/templates.h"
 #include "pixel_line_connector.h"
+#include "augs/templates/string_templates.h"
 
 #include "grid.h"
 

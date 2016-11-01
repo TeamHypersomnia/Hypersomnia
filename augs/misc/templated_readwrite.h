@@ -1,5 +1,4 @@
 #pragma once
-#include "augs/templates.h"
 #include "augs/templates/memcpy_safety.h"
 #include "augs/ensure.h"
 

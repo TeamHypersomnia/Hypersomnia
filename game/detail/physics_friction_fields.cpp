@@ -4,6 +4,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/step.h"
 #include "physics_scripts.h"
+#include "augs/templates/container_templates.h"
 
 void physics_system::rechoose_owner_friction_body(const entity_handle entity) {
 	ensure(entity.get<components::physics>().is_constructed());

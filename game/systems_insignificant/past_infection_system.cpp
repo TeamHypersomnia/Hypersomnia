@@ -2,6 +2,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 #include "game/components/flags_component.h"
+#include "augs/templates/container_templates.h"
 
 void past_infection_system::infect(const const_entity_handle& id) {
 	if (!is_infected(id))
@@ -13,7 +14,7 @@ bool past_infection_system::is_infected(const const_entity_handle& id) const {
 }
 
 void past_infection_system::uninfect(const entity_id& id) {
-	remove_element(infected_entities, id);
+	infected_entities.erase(id);
 }
 
 void past_infection_system::construct(const const_entity_handle e) {

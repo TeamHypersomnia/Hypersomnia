@@ -1,4 +1,5 @@
-#include "augs/templates.h"
+#include "augs/templates/type_in_pack.h"
+#include "augs/templates/for_each_in_types.h"
 #include "cosmic_delta.h"
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "augs/misc/templated_readwrite.h"
@@ -11,6 +12,8 @@
 #include "cosmos.h"
 
 #include <gtest/gtest.h>
+
+#include "augs/templates/held_ids_introspector.h"
 
 template <class T>
 bool write_delta(const T& base, const T& enco, augs::stream& out, const bool write_changed_bit = false) {

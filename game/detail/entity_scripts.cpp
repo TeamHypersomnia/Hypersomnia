@@ -10,6 +10,7 @@
 #include "inventory_slot.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
+#include "augs/templates/container_templates.h"
 
 void unset_input_flags_of_orphaned_entity(entity_handle e) {
 	auto* gun = e.find<components::gun>();

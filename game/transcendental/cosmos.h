@@ -40,6 +40,9 @@ class cosmos :
 #if COSMOS_TRACKS_GUIDS
 	friend class cosmic_delta;
 
+	template<class T>
+	friend void transform_component_guids_to_ids(T&, const cosmos&);
+
 	std::map<unsigned, entity_id> guid_map_for_transport;
 
 	void assign_next_guid(const entity_handle&);

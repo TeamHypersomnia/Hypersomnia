@@ -1,7 +1,7 @@
 #pragma once
 #include <bitset>
 #include "augs/ensure.h"
-#include "augs/templates.h"
+#include "augs/templates/maybe_const.h"
 
 namespace augs {
 	template<class Enum, class T>

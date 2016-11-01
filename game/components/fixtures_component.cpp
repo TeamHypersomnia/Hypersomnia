@@ -189,7 +189,7 @@ components::transform basic_fixtures_synchronizer<C>::get_total_offset() const {
 
 components::transform components::fixtures::transform_around_body(const const_entity_handle fe, const components::transform& body_transform) {
 	const auto& total_offset = fe.get<components::fixtures>().get_total_offset();
-
+	has_type<components::fixtures, disabled_components>;
 	components::transform displaced = body_transform + total_offset;
 	displaced.pos.rotate(body_transform.rotation, body_transform.pos);
 

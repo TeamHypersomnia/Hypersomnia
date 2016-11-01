@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <fstream>
 
 namespace augs {
 	bool file_exists(std::string filename);

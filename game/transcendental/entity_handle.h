@@ -1,5 +1,7 @@
 #pragma once
-#include <type_traits>
+#include "augs/templates/maybe_const.h"
+#include "augs/templates/is_component_synchronized.h"
+#include "augs/templates/type_in_pack.h"
 
 #include "game/detail/inventory_slot_handle_declaration.h"
 #include "game/transcendental/entity_handle_declaration.h"
@@ -9,6 +11,7 @@
 #include "augs/entity_system/component_allocators_mixin.h"
 #include "augs/misc/pool_handle.h"
 #include "game/transcendental/entity_id.h"
+#include "game/transcendental/types_specification/all_components_declaration.h"
 
 #include "game/detail/entity/inventory_getters.h"
 #include "game/detail/entity/physics_getters.h"
@@ -95,7 +98,7 @@ private:
 	};
 
 	template <class T>
-	struct component_or_synchronizer_or_disabled<T, std::enable_if_t<is_component_synchronized<T>::value && !is_component_disabled<T>::value>> {
+	struct component_or_synchronizer_or_disabled<T, std::enable_if_t<is_component_synchronized<T>::value && !has_type<T, disabled_components>::value>> {
 		typedef component_synchronizer<is_const, T> return_type;
 
 		basic_entity_handle<is_const> h;
@@ -120,7 +123,7 @@ private:
 	};
 
 	template <class T>
-	struct component_or_synchronizer_or_disabled<T, std::enable_if_t<is_component_disabled<T>::value>> {
+	struct component_or_synchronizer_or_disabled<T, std::enable_if_t<has_type<T, disabled_components>::value>> {
 		typedef maybe_const_ref_t<is_const, T> return_type;
 		typedef maybe_const_ptr_t<is_const, T> return_ptr;
 

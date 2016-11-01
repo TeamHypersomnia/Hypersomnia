@@ -1,4 +1,4 @@
-#include "augs/templates.h"
+#include "augs/templates/string_templates.h"
 
 std::wstring to_wstring(std::string val) {
 	return std::wstring(val.begin(), val.end());

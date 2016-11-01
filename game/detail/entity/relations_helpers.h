@@ -1,7 +1,7 @@
 #pragma once
+#include <vector>
 #include "game/detail/inventory_slot_handle_declaration.h"
 #include "game/transcendental/entity_handle_declaration.h"
-#include "augs/templates.h"
 
 #include "game/transcendental/entity_id.h"
 

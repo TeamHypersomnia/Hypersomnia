@@ -1,10 +1,6 @@
 #pragma once
 #include "game/transcendental/entity_handle.h"
-#include <type_traits>
-
-struct synchronizable_component {
-
-};
+#include "augs/templates/maybe_const.h"
 
 template <bool is_const, class component_type>
 class component_synchronizer_base {

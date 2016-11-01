@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "augs/templates.h"
+#include "augs/templates/memcpy_safety.h"
 
 namespace augs {
 	typedef unsigned short delta_offset_type;

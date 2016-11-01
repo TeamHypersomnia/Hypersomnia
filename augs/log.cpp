@@ -10,7 +10,7 @@
 #include <thread>
 #include <mutex>
 
-#include "augs/templates.h"
+#include "augs/templates/string_templates.h"
 
 #define ENABLE_LOG 1
 

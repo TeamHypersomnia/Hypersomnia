@@ -21,11 +21,11 @@
 
 #include "augs/graphics/renderer.h"
 #include "augs/graphics/vertex.h"
-#include "augs/templates.h"
-#include "augs/templates.h"
 #include "augs/gui/text_drawer.h"
 
 #include "augs/misc/stepped_timing.h"
+#include "augs/templates/container_templates.h"
+#include "augs/templates/string_templates.h"
 
 vec2 position_caption_around_a_circle(float radius, vec2 r, float alpha) {
 	vec2 top_bounds[2] =  { vec2(-r.x / 2, -radius - r.y / 2), vec2(r.x / 2, -radius - r.y / 2) };

@@ -8,6 +8,7 @@
 #include "game/components/child_component.h"
 #include "game/components/sub_entities_component.h"
 #include "game/components/physical_relations_component.h"
+#include "augs/templates/container_templates.h"
 
 template <class D>
 void relations_helpers<false, D>::make_child(entity_id ch_id, sub_entity_name optional_name) const {

@@ -7,7 +7,9 @@
 
 #include "augs/ensure.h"
 #include "augs/filesystem/file.h"
-#include "augs/templates.h"
+
+#include "augs/templates/string_templates.h"
+#include <fstream>
 
 #include "application/config_values.h"
 

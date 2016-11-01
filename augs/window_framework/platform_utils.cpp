@@ -4,7 +4,7 @@
 #include <Shlwapi.h>
 #elif PLATFORM_LINUX
 #endif
-#include "augs/templates.h"
+#include "augs/templates/string_templates.h"
 
 #ifdef PLATFORM_WINDOWS
 namespace augs {

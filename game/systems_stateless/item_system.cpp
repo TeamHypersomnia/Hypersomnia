@@ -35,6 +35,7 @@
 #include "game/enums/item_transfer_result_type.h"
 
 #include "game/detail/physics_scripts.h"
+#include "augs/templates/container_templates.h"
 
 using namespace augs;
 

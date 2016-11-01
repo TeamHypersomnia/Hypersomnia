@@ -27,9 +27,11 @@
 
 #include "application/web_daemon/session_report.h"
 
-#include "augs/templates.h"
+#include "augs/templates/string_templates.h"
+#include "augs/templates/container_templates.h"
 
 #include "game/detail/position_scripts.h"
+#include "augs/templates/container_templates.h"
 
 void server_setup::wait_for_listen_server() {
 	std::unique_lock<std::mutex> lck(mtx);
