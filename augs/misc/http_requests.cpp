@@ -1,4 +1,7 @@
+#include "augs/build_settings.h"
 #include "http_requests.h"
+
+#if BUILD_HTTP_REQUESTS
 
 #include <winsock2.h>
 #include <windows.h>
@@ -88,3 +91,12 @@ namespace augs {
 		return website_HTML;
 	}
 }
+#else
+
+namespace augs {
+	std::string http_post_request(const std::string& url, const std::string& additional_headers, const std::string& post_data) {
+		return std::string();
+	}
+}
+
+#endif

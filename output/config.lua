@@ -17,7 +17,7 @@ recording_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.LOCAL,
+	launch_mode = launch_modes.CLIENT_AND_SERVER,
 	
 	input_recording_mode = recording_modes.DISABLE,
 	recording_replay_speed = 0.5,
@@ -60,7 +60,7 @@ config_table = {
 	debug_randomize_entropies_in_client_setup = 1,
 	debug_randomize_entropies_in_client_setup_once_every_steps = 1,
 
-	server_launch_http_daemon = 0,
+	server_launch_http_daemon = 1,
 	server_http_daemon_port = 80,
 	server_http_daemon_html_file_path = "web/session_report.html",
 

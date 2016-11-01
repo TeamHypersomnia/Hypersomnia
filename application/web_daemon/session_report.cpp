@@ -1,4 +1,8 @@
+#include "augs/build_settings.h"
 #include "session_report.h"
+
+#if BUILD_HTTP_DAEMON
+
 #include "3rdparty/http/microhttpd.h"
 #include "augs/misc/http_requests.h"
 #include <cstdio>
@@ -134,3 +138,15 @@ void session_report::fetch_stats(const std::string new_stats) {
 	fetched_stats = new_stats;
 }
 
+#else
+bool session_report::start_daemon(const config_values& cfg) {
+	return false;
+}
+
+void session_report::stop_daemon() {
+}
+
+void session_report::fetch_stats(const std::string new_stats) {
+}
+
+#endif
