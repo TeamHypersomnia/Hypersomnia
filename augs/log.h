@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/window_framework/colored_print.h"
 #include "augs/misc/typesafe_sprintf.h"
-#include "build_settings.h"
+#include "augs/build_settings/setting_enable_debug_log.h"
 
 #include "augs/gui/formatted_text.h"
 

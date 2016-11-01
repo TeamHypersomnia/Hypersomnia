@@ -1,6 +1,6 @@
 #include "image.h"
 #include "augs/log.h"
-#include "augs/build_settings.h"
+#include "augs/build_settings/setting_enable_polygonization.h"
 
 #define OFFSET_COUNT 8
 

@@ -1,4 +1,4 @@
-#include "augs/build_settings.h"
+#include "augs/build_settings/setting_build_http_daemon.h"
 #include "session_report.h"
 
 #if BUILD_HTTP_DAEMON

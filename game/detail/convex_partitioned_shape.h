@@ -2,7 +2,7 @@
 #include <vector>
 #include "augs/math/vec2.h"
 #include "game/transcendental/entity_handle_declaration.h"
-#include "augs/build_settings.h"
+#include "augs/build_settings/setting_enable_polygonization.h"
 #include "augs/misc/constant_size_vector.h"
 #include "game/container_sizes.h"
 

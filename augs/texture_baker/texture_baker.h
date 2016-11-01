@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-#include "augs/build_settings.h"
 #include "3rdparty/rectpack2D/src/pack.h"
 
 #include "image.h"

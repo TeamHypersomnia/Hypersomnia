@@ -973,7 +973,11 @@
     <ClInclude Include="application\setups\server_setup.h" />
     <ClInclude Include="application\setups\setup_base.h" />
     <ClInclude Include="application\setups\two_clients_and_server_setup.h" />
-    <ClInclude Include="augs\build_settings.h" />
+    <ClInclude Include="augs\build_settings\setting_build_http_daemon.h" />
+    <ClInclude Include="augs\build_settings\setting_build_http_requests.h" />
+    <ClInclude Include="augs\build_settings\setting_enable_debug_log.h" />
+    <ClInclude Include="augs\build_settings\setting_enable_ensure.h" />
+    <ClInclude Include="augs\build_settings\setting_enable_polygonization.h" />
     <ClInclude Include="augs\entity_system\component_allocators_mixin.h" />
     <ClInclude Include="augs\entity_system\component_aggregate.h" />
     <ClInclude Include="augs\entity_system\component_setters_mixin.h" />
@@ -1027,6 +1031,7 @@
     <ClInclude Include="augs\templates\type_in_pack.h" />
     <ClInclude Include="augs\texture_baker\texture.h" />
     <ClInclude Include="augs\texture_baker\texture_with_image.h" />
+    <ClInclude Include="augs\zeroed_pod.h" />
     <ClInclude Include="game\components\child_component.h" />
     <ClInclude Include="game\components\flags_component.h" />
     <ClInclude Include="game\components\guid_component.h" />

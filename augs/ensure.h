@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/log.h"
-#include "augs/build_settings.h"
+#include "augs/build_settings/setting_enable_ensure.h"
 
 void cleanup_proc();
 
