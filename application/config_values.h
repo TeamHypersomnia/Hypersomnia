@@ -7,6 +7,7 @@ class game_window;
 class config_values {
 public:
 	int launch_mode = 0;
+	int input_recording_mode = 0;
 
 	float recording_replay_speed = 1.f;
 

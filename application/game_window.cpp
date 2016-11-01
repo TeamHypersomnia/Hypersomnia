@@ -62,6 +62,15 @@ game_window::launch_mode game_window::get_launch_mode() {
 	}
 }
 
+input_recording_mode game_window::get_input_recording_mode() {
+	switch (static_cast<int>(config.input_recording_mode)) {
+	case 0: return input_recording_mode::DISABLED; break;
+	case 1: return input_recording_mode::LIVE_WITH_BUFFER; break;
+	case 2: return input_recording_mode::LIVE; break;
+	default: return input_recording_mode::DISABLED; break;
+	}
+}
+
 decltype(machine_entropy::local) game_window::collect_entropy() {
 	auto result = window.poll_events(!config.debug_disable_cursor_clipping);
 

@@ -10,6 +10,7 @@ void config_values::get_values(game_window& w) {
 	auto set = [&w](auto& c, const std::string& ss) { w.get_config_value(ss, c); };
 
 	set(NVP(launch_mode));
+	set(NVP(input_recording_mode));
 
 	set(NVP(recording_replay_speed));
 

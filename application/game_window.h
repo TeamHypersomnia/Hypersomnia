@@ -8,6 +8,8 @@
 #include <thread>
 #include <mutex>
 
+#include "game/enums/input_recording_mode.h"
+
 class game_window {
 	friend class config_values;
 
@@ -50,4 +52,6 @@ public:
 		CLIENT_AND_SERVER,
 		TWO_CLIENTS_AND_SERVER
 	} get_launch_mode();
+
+	input_recording_mode get_input_recording_mode();
 };

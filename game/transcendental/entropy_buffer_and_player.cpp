@@ -28,11 +28,13 @@ bool entropy_buffer_and_player::try_to_load_and_replay_recording(std::string fil
 	return entropy_player.is_recording_available();
 }
 
-void entropy_buffer_and_player::record_and_save_this_session(std::string folder, std::string filename) {
+void entropy_buffer_and_player::record_and_save_this_session(const input_recording_mode mode, std::string folder, std::string filename) {
 	auto target_folder = folder + augs::get_timestamp();
 	augs::create_directories(target_folder);
 
-	entropy_player.record(target_folder + "/" + filename);
+	if (mode != input_recording_mode::DISABLED) {
+		entropy_player.record(target_folder + "/" + filename);
+	}
 }
 
 bool entropy_buffer_and_player::is_replaying() const {

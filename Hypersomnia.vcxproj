@@ -1055,6 +1055,7 @@
     <ClInclude Include="game\detail\item_slot_transfer_request_declaration.h" />
     <ClInclude Include="game\detail\world_camera.h" />
     <ClInclude Include="game\enums\entity_flag.h" />
+    <ClInclude Include="game\enums\input_recording_mode.h" />
     <ClInclude Include="game\systems_insignificant\interpolation_system.h" />
     <ClInclude Include="game\scene_managers\networked_testbed.h" />
     <ClInclude Include="game\systems_insignificant\past_infection_system.h" />

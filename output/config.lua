@@ -10,9 +10,16 @@ launch_modes = {
 	TWO_CLIENTS_AND_SERVER = 5
 }
 
+recording_modes = {
+	DISABLE = 0,
+	LIVE_WITH_BUFFER = 1,
+	LIVE = 2
+}
+
 config_table = {
-	launch_mode = launch_modes.CLIENT_AND_SERVER,
+	launch_mode = launch_modes.LOCAL,
 	
+	input_recording_mode = recording_modes.DISABLE,
 	recording_replay_speed = 0.5,
 
 	determinism_test_cloned_cosmoi_count = 2,

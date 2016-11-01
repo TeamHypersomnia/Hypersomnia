@@ -52,7 +52,7 @@ void client_setup::init(game_window& window, const std::string recording_filenam
 		scene.populate_world_with_entities(hypersomnia);
 	}
 
-	if (input_unpacker.try_to_load_or_save_new_session("sessions/", recording_filename)) {
+	if (input_unpacker.try_to_load_or_save_new_session(window.get_input_recording_mode(), "sessions/", recording_filename)) {
 		input_unpacker.timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
 	}
 
