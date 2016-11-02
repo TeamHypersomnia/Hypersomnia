@@ -196,7 +196,7 @@ namespace components {
 				tooltip_text = text::simple_bbcode(describe_slot(cosmos[maybe_hovered_slot.get_location().slot_id]), text::style());
 			}
 			else {
-				auto hovered = cosmos[get_hovered_world_entity(cosmos, step.camera_state.camera_transform.pos + rect_world.last_state.mouse.pos - step.camera_state.visible_world_area /2)];
+				const auto hovered = cosmos[get_hovered_world_entity(cosmos, step.camera_state.camera_transform.pos + rect_world.last_state.mouse.pos - step.camera_state.visible_world_area /2)];
 
 				if (hovered.alive()) {
 					step.world_hover_highlighter.update(step.get_delta().in_milliseconds());

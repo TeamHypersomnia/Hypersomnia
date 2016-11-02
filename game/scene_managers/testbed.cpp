@@ -62,6 +62,7 @@ namespace scene_managers {
 			auto frog = world.create_entity("frog");
 			ingredients::sprite(frog, vec2(100 + x * 40, 200 + 400), assets::texture_id::TEST_SPRITE, augs::white, render_layer::DYNAMIC_BODY);
 			ingredients::see_through_dynamic_body(frog);
+			name_entity(frog, entity_name::CRATE);
 			frog.add_standard_components();
 		}
 

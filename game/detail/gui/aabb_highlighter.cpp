@@ -13,13 +13,25 @@ void aabb_highlighter::update(const float delta_ms) {
 
 void aabb_highlighter::draw(viewing_step& step, const const_entity_handle& subject) const {
 	rects::ltrb<float> aabb;
-
-	subject.for_each_sub_entity_recursive([&aabb](const const_entity_handle e) {
+	
+	auto aabb_expansion_lambda = [&aabb](const const_entity_handle e) {
 		const auto* const sprite = e.find<components::sprite>();
 
-		if (e.get_name_as_sub_entity() == sub_entity_name::CHARACTER_CROSSHAIR
-			|| e.get_name_as_sub_entity() == sub_entity_name::CROSSHAIR_RECOIL_BODY) {
-			return;
+		static const sub_entity_name dont_expand_aabb_for_sub_entities[] = {
+			sub_entity_name::CHARACTER_CROSSHAIR,
+			sub_entity_name::CROSSHAIR_RECOIL_BODY,
+			sub_entity_name::BARREL_SMOKE,
+			sub_entity_name::BULLET_SHELL,
+			sub_entity_name::BULLET_ROUND,
+			sub_entity_name::CORPSE_OF_SENTIENCE,
+		};
+
+		const auto name_as_sub_entity = e.get_name_as_sub_entity();
+
+		for (const auto forbidden : dont_expand_aabb_for_sub_entities) {
+			if (name_as_sub_entity == forbidden) {
+				return;
+			}
 		}
 
 		if (sprite) {
@@ -32,14 +44,18 @@ void aabb_highlighter::draw(viewing_step& step, const const_entity_handle& subje
 				aabb = new_aabb;
 			}
 		}
-	});
+	};
+
+	aabb_expansion_lambda(subject);
+	subject.for_each_sub_entity_recursive(aabb_expansion_lambda);
 
 	const auto lesser_dimension = std::min(aabb.w(), aabb.h());
 	
 	float length_decrease = 0.f;
 
-	if (lesser_dimension < scale_down_when_aabb_no_bigger_than)
+	if (lesser_dimension < scale_down_when_aabb_no_bigger_than) {
 		length_decrease = std::min(smallest_length - 4, scale_down_when_aabb_no_bigger_than - lesser_dimension);
+	}
 	
 	const auto adjusted_biggest_length = biggest_length - length_decrease;
 	const auto adjusted_smallest = smallest_length - length_decrease;
