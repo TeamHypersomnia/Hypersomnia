@@ -73,7 +73,7 @@ namespace augs {
 		}
 
 		const_iterator begin() const {
-			return const_iterator(this, 0);
+			return const_iterator(this, find_first_set_index(0));
 		}
 
 		const_iterator end() const {
