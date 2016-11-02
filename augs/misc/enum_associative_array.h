@@ -11,6 +11,13 @@ namespace augs {
 		std::bitset<size_t(Enum::COUNT)> is_set;
 		arr_type raw;
 
+		unsigned find_first_set_index(unsigned from) const {
+			while (from < static_cast<size_t>(Enum::COUNT) && !is_set.test(from))
+				++from;
+
+			return from;
+		}
+
 	public:
 		template<bool is_const>
 		class basic_iterator {
@@ -33,11 +40,7 @@ namespace augs {
 			}
 
 			basic_iterator& operator++() {
-				++idx;
-
-				while (idx < static_cast<size_t>(Enum::COUNT) && !ptr->is_set.test(idx))
-					++idx;
-				
+				idx = ptr->find_first_set_index(idx + 1);
 				return *this;
 			}
 
@@ -62,7 +65,7 @@ namespace augs {
 		friend class basic_iterator;
 
 		iterator begin() {
-			return iterator(this, 0);
+			return iterator(this, find_first_set_index(0u));
 		}
 
 		iterator end() {
