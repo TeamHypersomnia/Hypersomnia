@@ -59,7 +59,8 @@ namespace augs {
 				}
 				else if (dt.msg == message::mousemotion) {
 					mouse.pos += dt.mouse.rel;
-					
+					mouse.pos.clamp_from_zero_to(vec2i{ screen_size.x - 1, screen_size.y - 1 });
+
 					if (!get_mouse_key(0)) {
 						mouse.ldrag.x = mouse.pos.x;
 						mouse.ldrag.y = mouse.pos.y;

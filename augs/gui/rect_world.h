@@ -65,7 +65,6 @@ namespace augs {
 			vec2i ldrag_relative_anchor;
 			vec2i last_ldown_position;
 			vec2i current_drag_amount;
-			vec2i last_mouse_pos;
 
 			template <class gui_element_id>
 			bool is_being_dragged(const gui_element_id& id) const {

@@ -219,6 +219,8 @@ namespace augs {
 					vec2i rdrag;
 				} mouse;
 
+				vec2i screen_size;
+
 				void unset_keys();
 				void apply(const change&);
 				bool get_mouse_key(unsigned) const;

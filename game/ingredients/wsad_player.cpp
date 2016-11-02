@@ -229,7 +229,7 @@ namespace prefabs {
 		ingredients::wsad_character(character, crosshair);
 		
 		auto& element = character += components::gui_element();
-		element.size = screen_size;
+		element.rect_world.last_state.screen_size = screen_size;
 
 		ingredients::wsad_character_physics(character);
 

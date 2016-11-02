@@ -57,12 +57,20 @@ namespace components {
 		return rects::xywh<float>(0, 0, 0, 0);
 	}
 
+	vec2 gui_element::get_gui_crosshair_position() const {
+		return rect_world.last_state.mouse.pos;
+	}
+	
+	vec2i gui_element::get_screen_size() const {
+		return rect_world.last_state.screen_size;
+	}
+
 	vec2i gui_element::get_initial_position_for(const drag_and_drop_target_drop_item&) const {
-		return vec2i(size.x - 150, 30);
+		return vec2i(get_screen_size().x - 150, 30);
 	}
 
 	vec2 gui_element::initial_inventory_root_position() const {
-		return vec2(size.x - 250.f, size.y - 200.f);
+		return vec2(get_screen_size().x - 250.f, get_screen_size().y - 200.f);
 	}
 
 	void gui_element::draw_complete_gui_for_camera_rendering_request(const const_entity_handle& gui_entity, viewing_step& step) {
@@ -77,8 +85,9 @@ namespace components {
 		rect_world.build_tree_data_into_context(context, root_of_inventory_gui::location());
 		rect_world.draw_triangles(context, root_of_inventory_gui::location());
 
-		if (element.is_gui_look_enabled)
+		if (element.is_gui_look_enabled) {
 			element.draw_cursor_and_tooltip(context);
+		}
 	}
 
 	void gui_element::draw_cursor_and_tooltip(const viewing_gui_context& context) const {
@@ -98,8 +107,9 @@ namespace components {
 		if (dragged_item) {
 			dragged_item->draw_complete_dragged_ghost(context, dragged_item, in);
 
-			if (!drag_result.possible_target_hovered)
+			if (!drag_result.possible_target_hovered) {
 				drag_result.dragged_item->draw_grid_border_ghost(context, dragged_item, in);
+			}
 		}
 
 		components::sprite bg_sprite;
@@ -126,8 +136,8 @@ namespace components {
 
 		components::sprite cursor_sprite;
 		cursor_sprite.set(gui_cursor, gui_cursor_color);
-		const vec2i left_top_corner = gui_crosshair_position;
-		const vec2i bottom_right_corner = gui_crosshair_position + cursor_sprite.size;
+		const vec2i left_top_corner = get_gui_crosshair_position();
+		const vec2i bottom_right_corner = get_gui_crosshair_position() + cursor_sprite.size;
 
 		const bool draw_tooltip = drag_result.possible_target_hovered;
 		
@@ -135,7 +145,7 @@ namespace components {
 			augs::gui::text_drawer tooltip_drawer;
 
 			tooltip_drawer.set_text(gui::text::format(drag_result.tooltip_text, gui::text::style()));
-			tooltip_drawer.pos = vec2i(gui_crosshair_position) + vec2i(int(cursor_sprite.size.x) + 2, 0);
+			tooltip_drawer.pos = vec2i(get_gui_crosshair_position()) + vec2i(int(cursor_sprite.size.x) + 2, 0);
 
 			state.renderable_transform.pos = left_top_corner;
 			bg_sprite.size.set(tooltip_drawer.get_bbox());
@@ -146,7 +156,7 @@ namespace components {
 			gui::solid_stroke stroke;
 			stroke.set_material(gui::material(assets::texture_id::BLANK, slightly_visible_white));
 
-			stroke.draw(output_buffer, rects::ltrb<float>(gui_crosshair_position, bg_sprite.size));
+			stroke.draw(output_buffer, rects::ltrb<float>(get_gui_crosshair_position(), bg_sprite.size));
 
 			tooltip_drawer.draw_stroke(output_buffer, black);
 			tooltip_drawer.draw(output_buffer);
@@ -161,14 +171,14 @@ namespace components {
 				augs::gui::text_drawer dragged_charges_drawer;
 
 				dragged_charges_drawer.set_text(augs::gui::text::format(charges_text, text::style()));
-				dragged_charges_drawer.pos = gui_crosshair_position + vec2i(0, int(cursor_sprite.size.y));
+				dragged_charges_drawer.pos = get_gui_crosshair_position() + vec2i(0, int(cursor_sprite.size.y));
 
 				dragged_charges_drawer.draw_stroke(output_buffer, black);
 				dragged_charges_drawer.draw(output_buffer);
 			}
 		}
 
-		state.renderable_transform.pos = gui_crosshair_position;
+		state.renderable_transform.pos = get_gui_crosshair_position();
 		cursor_sprite.draw(state);
 
 		const auto& maybe_hovered_item = context._dynamic_cast<const item_button>(rect_world.rect_hovered);
@@ -217,7 +227,7 @@ namespace components {
 		auto cursor_pointing_at = world_cursor_position;
 
 		std::vector<vec2> v{ cursor_pointing_at, cursor_pointing_at + vec2(1, 0), cursor_pointing_at + vec2(1, 1) , cursor_pointing_at + vec2(0, 1) };
-		auto hovered = physics.query_polygon(v, filters::renderable_query());
+		const auto& hovered = physics.query_polygon(v, filters::renderable_query());
 
 		if (hovered.entities.size() > 0) {
 			std::vector<unversioned_entity_id> sorted_by_visibility(hovered.entities.begin(), hovered.entities.end());
@@ -230,8 +240,8 @@ namespace components {
 				return render_system::render_order_compare(cosm[a], cosm[b]);
 			});
 
-			for (auto h : sorted_by_visibility) {
-				auto named = get_first_named_ancestor(cosm[h]);
+			for (const auto h : sorted_by_visibility) {
+				const auto named = get_first_named_ancestor(cosm[h]);
 
 				if (cosm[named].alive()) {
 					return named;

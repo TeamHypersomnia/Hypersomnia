@@ -26,9 +26,7 @@ class logic_step;
 namespace components {
 	struct gui_element {
 		game_gui_rect_world rect_world;
-		vec2 gui_crosshair_position;
 		int dragged_charges = 0;
-		vec2i size;
 
 		bool is_gui_look_enabled = false;
 		bool preview_due_to_item_picking_request = false;
@@ -49,6 +47,9 @@ namespace components {
 		//
 		//drag_and_drop_result prepare_drag_and_drop_result() const;
 		//
+
+		vec2i get_screen_size() const;
+		vec2 get_gui_crosshair_position() const;
 
 		rects::xywh<float> get_rectangle_for_slot_function(const slot_function) const;
 		
