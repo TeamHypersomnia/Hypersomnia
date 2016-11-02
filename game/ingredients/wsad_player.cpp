@@ -93,8 +93,6 @@ namespace ingredients {
 		auto& processing = e += components::processing();
 		e.set_flag(entity_flag::IS_PAST_CONTAGIOUS);
 
-		e += components::gui_element();
-
 		attitude.parties = party_category::METROPOLIS_CITIZEN;
 		attitude.hostile_parties = party_category::RESISTANCE_CITIZEN;
 
@@ -221,14 +219,17 @@ namespace ingredients {
 
 namespace prefabs {
 	entity_handle create_character(cosmos& world, const components::transform pos, const vec2i screen_size, const std::string name) {
-		auto character = world.create_entity(name);
+		const auto character = world.create_entity(name);
 
 		name_entity(character, entity_name::PERSON);
 
-		auto crosshair = create_character_crosshair(world, screen_size);
+		const auto crosshair = create_character_crosshair(world, screen_size);
 		crosshair.get<components::crosshair>().character_entity_to_chase = character;
 
 		ingredients::wsad_character(character, crosshair);
+		
+		auto& element = character += components::gui_element();
+		element.size = screen_size;
 
 		ingredients::wsad_character_physics(character);
 
@@ -236,7 +237,7 @@ namespace prefabs {
 
 		ingredients::character_inventory(character);
 
-		auto corpse_of_sentience = world.create_entity("corpse_of_sentience");
+		const auto corpse_of_sentience = world.create_entity("corpse_of_sentience");
 		name_entity(corpse_of_sentience, entity_name::CORPSE);
 		ingredients::wsad_character_corpse(corpse_of_sentience);
 

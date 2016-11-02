@@ -21,7 +21,7 @@ void cosmic_profiler::set_count_of_tracked_measurements(size_t count) {
 	}
 }
 
-std::wstring cosmic_profiler::sorted_summary(bool detailed) const {
+std::wstring cosmic_profiler::sorted_summary(const bool detailed) const {
 	std::vector<augs::measurements> sorted_meters;
 
 	for (auto& m : meters)

@@ -35,12 +35,13 @@
 #include "augs/graphics/renderer.h"
 
 namespace scene_managers {
-	void testbed::populate_world_with_entities(cosmos& cosm) {
-		cosm.advance_deterministic_schemata(cosmic_entropy(), [this](logic_step& step) { populate(step); }, [](logic_step&) {});
+	void testbed::populate_world_with_entities(cosmos& cosm, const vec2i screen_size) {
+		cosm.advance_deterministic_schemata(cosmic_entropy(), [&](logic_step& step) { populate(step, screen_size); }, [](logic_step&) {});
 	}
 
-	void testbed::populate(logic_step& step) {
+	void testbed::populate(logic_step& step, const vec2i screen_size) {
 		auto& world = step.cosm;
+
 		const auto crate = prefabs::create_crate(world, vec2(200, 200 + 300), vec2i(100, 100) / 3);
 		const auto crate2 = prefabs::create_crate(world, vec2(400, 200 + 400), vec2i(300, 300));
 		const auto crate4 = prefabs::create_crate(world, vec2(500, 200 + 0), vec2i(100, 100));
@@ -97,7 +98,7 @@ namespace scene_managers {
 		std::vector<entity_handle> new_characters;
 
 		for (int i = 0; i < num_characters; ++i) {
-			auto new_character = prefabs::create_character(world, vec2(i * 300 , 0), vec2(1920, 1080), typesafe_sprintf("player%x", i));
+			const auto new_character = prefabs::create_character(world, vec2(i * 300 , 0), screen_size, typesafe_sprintf("player%x", i));
 
 			new_characters.push_back(new_character);
 

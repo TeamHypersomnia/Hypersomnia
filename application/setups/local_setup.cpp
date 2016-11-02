@@ -31,7 +31,7 @@ void local_setup::process(game_window& window) {
 
 	if (!hypersomnia.load_from_file("save.state")) {
 		hypersomnia.set_fixed_delta(augs::fixed_delta(cfg.tickrate));
-		testbed.populate_world_with_entities(hypersomnia);
+		testbed.populate_world_with_entities(hypersomnia, screen_size);
 	}
 
 	if (input_unpacker.try_to_load_or_save_new_session(window.get_input_recording_mode(), "sessions/", "recorded.inputs")) {

@@ -17,7 +17,7 @@ struct input_context;
 
 namespace scene_managers {
 	class testbed {
-		void populate(logic_step&);
+		void populate(logic_step&, const vec2i screen_size);
 	public:
 		augs::constant_size_vector<entity_id, TESTBED_CHARACTERS_COUNT> characters;
 		augs::constant_size_vector<entity_id, 100> crates;
@@ -31,7 +31,7 @@ namespace scene_managers {
 
 		void configure_view(viewing_session&) const;
 
-		void populate_world_with_entities(cosmos&);
+		void populate_world_with_entities(cosmos&, const vec2i screen_size);
 
 		void control(const augs::machine_entropy::local_type&, cosmos&);
 		
