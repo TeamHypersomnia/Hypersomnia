@@ -25,6 +25,8 @@ class basic_inventory_slot_handle {
 
 	entity_handle_type get_handle() const;
 public:
+	static constexpr bool is_const_value = is_const;
+	
 	basic_inventory_slot_handle(owner_reference, inventory_slot_id);
 	
 	std::vector<entity_handle_type> get_mounted_items() const;

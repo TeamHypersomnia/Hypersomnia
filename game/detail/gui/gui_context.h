@@ -65,8 +65,8 @@ public:
 
 	gui_tree_entry& get_tree_entry(const gui_element_location& id) const {
 		if (tree.find(id) == tree.end()) {
-			tree.emplace(id, gui_tree_entry(operator()(id, [](const auto& resolved_ref) {
-				return static_cast<const augs::gui::rect_node_data&>(*resolved_ref);
+			tree.emplace(id, gui_tree_entry(operator()(id, [](const auto resolved_ref) {
+				return resolved_ref->rc;
 			})));
 		}
 
@@ -74,7 +74,7 @@ public:
 	}
 
 	bool alive(const gui_element_location& id) const {
-		return id.is_set() && id.call([this](const auto& resolved) {
+		return id.is_set() && id.call([this](const auto resolved) {
 			return resolved.alive(*this);
 		});
 	}
@@ -85,7 +85,7 @@ public:
 
 	template <class L>
 	decltype(auto) operator()(const gui_element_location& id, L generic_call) const {
-		return id.call([&](const auto& specific_loc) {
+		return id.call([&](const auto specific_loc) {
 			return generic_call(
 				location_and_pointer<std::remove_pointer_t<decltype(specific_loc.dereference(*this))>>(specific_loc.dereference(*this), specific_loc)
 			);
@@ -99,7 +99,7 @@ public:
 
 	template <class T>
 	auto dereference_location(const T& location) const 
-	-> location_and_pointer<std::remove_pointer_t<decltype(std::declval<T>().dereference(*this))>>
+		-> location_and_pointer<std::remove_pointer_t<decltype(std::declval<T>().dereference(*this))>>
 	{
 		if (location.alive(*this)) {
 			return{ location.dereference(*this), location };

@@ -56,7 +56,12 @@ struct item_button : game_gui_rect_node {
 
 		if (container.has<components::container>()) {
 			for (const auto& s : container.get<components::container>().slots) {
-				generic_call(make_location_and_pointer(&s.second.button, slot_button::location{ s.first }));
+				slot_button::location child_location;
+				child_location.slot_id.type = s.first;
+				child_location.slot_id.container_entity = container;
+				ensure(s.first != slot_function::INVALID);
+
+				generic_call(make_location_and_pointer(&s.second.button, child_location));
 			}
 		}
 	}

@@ -16,7 +16,7 @@ public:
 
 	template <class C>
 	decltype(auto) dereference(C context) const {
-		return &context.get_step().get_cosmos()[slot_id].get().button;
+		return &context.get_step().get_cosmos()[slot_id]->button;
 	}
 };
 

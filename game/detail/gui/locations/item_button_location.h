@@ -5,6 +5,10 @@ class item_button_location {
 public:
 	entity_id item_id;
 
+	const item_button_location& get_location() const {
+		return *this;
+	}
+
 	bool operator==(const item_button_location& b) const {
 		return item_id == b.item_id;
 	}

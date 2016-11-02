@@ -3,11 +3,11 @@
 #include "game/transcendental/entity_id.h"
 
 struct inventory_slot_id {
-	inventory_slot_id() = default;
-	inventory_slot_id(const slot_function, const entity_id);
-
-	slot_function type = slot_function::INVALID;
+	slot_function type;
 	entity_id container_entity;
+
+	inventory_slot_id();
+	inventory_slot_id(const slot_function, const entity_id);
 
 	template <class Archive>
 	void serialize(Archive& ar) {

@@ -31,9 +31,9 @@ struct slot_button : game_gui_rect_node {
 
 	template <class C, class gui_element_id, class L>
 	static void for_each_child(C context, const gui_element_id& this_id, L generic_call) {
-		const auto& slot_handle = context.get_step().get_cosmos()[this_id.get_location().slot_id];
+		const auto slot_handle = context.get_step().get_cosmos()[this_id.get_location().slot_id];
 
-		for (const auto& i : slot_handle.get_items_inside()) {
+		for (const auto i : slot_handle.get_items_inside()) {
 			generic_call(make_location_and_pointer(&i.get<components::item>().button, item_button::location{ i.get_id() }));
 		}
 	}

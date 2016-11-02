@@ -13,9 +13,10 @@ public:
 	static void for_each_child(C context, const gui_element_id& this_id, L generic_call) {
 		const auto& handle = context.get_gui_element_entity();
 
-		context(item_button::location{ handle.get_id() }, [&](const auto& dereferenced) {
-			generic_call(dereferenced);
-		}); 
+		// we do not dereference the gui element's entity location because it is possibly not an item;
+		// however it should be a container so we call the callback on the element's children
+		// i.e. the player has a gui element component and container component but not an item component.
+		item_button::for_each_child(context, item_button::location{ handle.get_id() }, generic_call);
 
 		context(drag_and_drop_target_drop_item::location(), [&](const auto& dereferenced) {
 			generic_call(dereferenced);
