@@ -5,6 +5,7 @@ enum class meter_type {
 	LOGIC,
 	RENDERING,
 	CAMERA_QUERY,
+	GUI,
 	INTERPOLATION,
 	VISIBILITY,
 	PHYSICS,

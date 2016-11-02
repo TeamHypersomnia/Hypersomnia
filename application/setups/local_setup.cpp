@@ -48,7 +48,9 @@ void local_setup::process(game_window& window) {
 	while (!should_quit) {
 		augs::machine_entropy new_entropy;
 
+		session.local_entropy_profiler.new_measurement();
 		new_entropy.local = window.collect_entropy();
+		session.local_entropy_profiler.end_measurement();
 		session.control(new_entropy);
 
 		process_exit_key(new_entropy.local);

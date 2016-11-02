@@ -419,8 +419,10 @@ void cosmos::advance_deterministic_schemata(logic_step& step) {
 	intent_contextualization_system().contextualize_use_button_intents(step);
 	intent_contextualization_system().contextualize_movement_intents(step);
 
+	performance.start(meter_type::GUI);
 	gui_system().switch_to_gui_mode_and_back(step);
 	gui_system().advance_gui_elements(step);
+	performance.stop(meter_type::GUI);
 
 	driver_system().release_drivers_due_to_requests(step);
 

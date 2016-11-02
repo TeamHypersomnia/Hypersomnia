@@ -2,6 +2,7 @@
 #include <algorithm>
 
 cosmic_profiler::cosmic_profiler() {
+	meters[(int)meter_type::GUI].title = L"GUI";
 	meters[(int)meter_type::LOGIC].title = L"Logic";
 	meters[(int)meter_type::RENDERING].title = L"Rendering";
 	meters[(int)meter_type::CAMERA_QUERY].title = L"Camera query";

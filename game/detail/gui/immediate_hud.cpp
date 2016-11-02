@@ -84,7 +84,7 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 
 	vertex_triangle_buffer circular_bars_information;
 
-	for (auto v : visible_entities) {
+	for (const auto v : visible_entities) {
 		const auto* const sentience = v.find<components::sentience>();
 
 		if (sentience) {
@@ -238,7 +238,7 @@ void immediate_hud::acquire_game_events(const logic_step& step) {
 	const auto& healths = step.messages.get_queue<messages::health_event>();
 	const auto current_time = cosmos.get_total_time_passed_in_seconds();
 
-	for (auto& h : healths) {
+	for (const auto& h : healths) {
 		vertically_flying_number vn;
 		vn.time_of_occurence = current_time;
 		vn.value = h.effective_amount;
@@ -293,16 +293,16 @@ void immediate_hud::acquire_game_events(const logic_step& step) {
 }
 
 void immediate_hud::draw_vertically_flying_numbers(viewing_step& msg) const {
-	const auto current_time = msg.cosm.get_total_time_passed_in_seconds();
+	const auto current_time = msg.cosm.get_total_time_passed_in_seconds() + msg.get_delta().view_interpolation_ratio() * msg.get_delta().in_seconds();;
 	auto& triangles = msg.renderer.triangles;
 
-	for (auto& r : recent_vertically_flying_numbers) { 
+	for (const auto& r : recent_vertically_flying_numbers) { 
 		auto passed = current_time - r.time_of_occurence;
 		auto ratio =  passed / r.maximum_duration_seconds;
 
 		auto text = r.text;
 
-		text.pos = msg.get_screen_space((r.transform.pos - vec2(0, sqrt(passed) * 150.f)));
+		text.pos = msg.get_screen_space((r.transform.pos - vec2(0, sqrt(passed) * 120.f)));
 		
 		text.draw_stroke(triangles);
 		text.draw(triangles);
@@ -311,10 +311,10 @@ void immediate_hud::draw_vertically_flying_numbers(viewing_step& msg) const {
 
 void immediate_hud::draw_pure_color_highlights(viewing_step& msg) const {
 	const auto& cosmos = msg.cosm;
-	const auto current_time = cosmos.get_total_time_passed_in_seconds();
+	const auto current_time = cosmos.get_total_time_passed_in_seconds() + msg.get_delta().view_interpolation_ratio() * msg.get_delta().in_seconds();;
 	auto& triangles = msg.renderer.triangles;
 
-	for (auto& r : recent_pure_color_highlights) {
+	for (const auto& r : recent_pure_color_highlights) {
 		const auto& subject = cosmos[r.target];
 
 		if (subject.dead())
