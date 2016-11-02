@@ -86,8 +86,8 @@ namespace augs {
 			std::memset(buf, 0, sizeof(buf));
 		}
 
-		template <class T>
-		trivial_variant(const T& obj) : trivial_variant() {
+		template<class T_convertible>
+		trivial_variant(const T_convertible& obj) : trivial_variant() {
 			set(obj);
 		}
 
@@ -103,7 +103,8 @@ namespace augs {
 		void set(const T_convertible& t) {
 			typedef find_convertible_type<T_convertible, Types...> T;
 
-			std::memcpy(buf, &t, sizeof(T));
+			auto converted = T(t);
+			std::memcpy(buf, &converted, sizeof(T));
 			current_type = index_in_pack<T, Types...>::value;
 		}
 
