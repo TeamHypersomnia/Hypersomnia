@@ -59,7 +59,7 @@ void local_setup::process(game_window& window) {
 
 		for (const auto& s : steps) {
 			for (const auto& raw_input : s.total_entropy.local) {
-				if (raw_input.was_key_pressed()) {
+				if (raw_input.was_any_key_pressed()) {
 					if (raw_input.key == augs::window::event::keys::key::_1) {
 						hypersomnia.set_fixed_delta(cfg.tickrate);
 					}

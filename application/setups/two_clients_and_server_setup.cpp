@@ -39,7 +39,7 @@ void two_clients_and_server_setup::process(game_window& window) {
 			break;
 
 		for (const auto& n : precollected) {
-			if (n.was_key_pressed()) {
+			if (n.was_any_key_pressed()) {
 				if (n.key == augs::window::event::keys::key::CAPSLOCK) {
 					++current_window;
 					current_window %= 2;

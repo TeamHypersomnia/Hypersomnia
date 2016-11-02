@@ -32,12 +32,20 @@ namespace augs {
 				return !std::memcmp(this, &c, sizeof(change));
 			}
 
-			bool change::was_key_pressed() const {
+			bool change::was_any_key_pressed() const {
 				return get_key_change() == key_change::PRESSED;
 			}
 
-			bool change::was_key_released() const {
+			bool change::was_any_key_released() const {
 				return get_key_change() == key_change::RELEASED;
+			}
+
+			bool change::was_key_pressed(const keys::key k) const {
+				return was_any_key_pressed() && key.key == k;
+			}
+			
+			bool change::was_key_released(const keys::key k) const {
+				return was_any_key_released() && key.key == k;
 			}
 
 			void state::apply(const change& dt) {

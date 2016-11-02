@@ -27,7 +27,7 @@ public:
 	aabb_highlighter world_hover_highlighter;
 	immediate_hud hud;
 
-	bool show_profile_details = false;
+	bool show_profile_details = true;
 
 	void visual_response_to_game_events(const logic_step&);
 

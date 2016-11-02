@@ -39,8 +39,8 @@ bool key_and_mouse_intent::operator!=(const key_and_mouse_intent& b) const {
 bool key_and_mouse_intent::from_raw_state(const input_context& context, const augs::window::event::change& raw) {
 	bool found_context_entry = false;
 
-	if (raw.was_key_pressed() || raw.was_key_released()) {
-		pressed_flag = raw.was_key_pressed();
+	if (raw.was_any_key_pressed() || raw.was_any_key_released()) {
+		pressed_flag = raw.was_any_key_pressed();
 
 		const auto found_intent = context.key_to_intent.find(raw.key);
 		if (found_intent != context.key_to_intent.end()) {

@@ -270,7 +270,7 @@ namespace scene_managers {
 
 	void testbed::control(const augs::machine_entropy::local_type& local, cosmos& main_cosmos) {
 		for (const auto& raw_input : local) {
-			if (raw_input.was_key_pressed()) {
+			if (raw_input.was_any_key_pressed()) {
 				if (raw_input.key == augs::window::event::keys::key::F7) {
 					auto target_folder = "saves/" + augs::get_timestamp();
 					augs::create_directories(target_folder);

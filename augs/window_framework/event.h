@@ -204,8 +204,10 @@ namespace augs {
 				bool operator==(const change&) const;
 
 				key_change get_key_change() const;
-				bool was_key_pressed() const;
-				bool was_key_released() const;
+				bool was_any_key_pressed() const;
+				bool was_any_key_released() const;
+				bool was_key_pressed(const keys::key) const;
+				bool was_key_released(const keys::key) const;
 			};
 
 			struct state {
