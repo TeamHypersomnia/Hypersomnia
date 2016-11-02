@@ -13,7 +13,9 @@ public:
 	static void for_each_child(C context, const gui_element_id& this_id, L generic_call) {
 		const auto& handle = context.get_gui_element_entity();
 
-		//item_button::for_each_child(context, item_button::location{ handle.get_id() }, generic_call);
+		context(item_button::location{ handle.get_id() }, [&](const auto& dereferenced) {
+			generic_call(dereferenced);
+		}); 
 
 		context(drag_and_drop_target_drop_item::location(), [&](const auto& dereferenced) {
 			generic_call(dereferenced);

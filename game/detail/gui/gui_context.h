@@ -85,9 +85,10 @@ public:
 
 	template <class L>
 	decltype(auto) operator()(const gui_element_location& id, L generic_call) const {
-		return id.call([&](const auto& resolved_location) {
-			location_and_pointer<std::remove_pointer_t<decltype(resolved_location.dereference(*this))>> loc(resolved_location.dereference(*this), resolved_location);
-			return generic_call(loc);
+		return id.call([&](const auto& specific_loc) {
+			return generic_call(
+				location_and_pointer<std::remove_pointer_t<decltype(specific_loc.dereference(*this))>>(specific_loc.dereference(*this), specific_loc)
+			);
 		});
 	}
 
@@ -97,23 +98,25 @@ public:
 	}
 
 	template <class T>
-	location_and_pointer<T> dereference_location(const typename T::location& location) const {
-		typedef typename T::location location_type;
-
+	auto dereference_location(const T& location) const 
+	-> location_and_pointer<std::remove_pointer_t<decltype(std::declval<T>().dereference(*this))>>
+	{
 		if (location.alive(*this)) {
-			return location_and_pointer<T>(location.dereference(*this), location);
+			return{ location.dereference(*this), location };
 		}
 
-		return location_and_pointer<T>();
+		return {};
 	}
 
 	template <class T>
-	location_and_pointer<T> _dynamic_cast(const gui_element_location& polymorphic_id) const {
+	auto _dynamic_cast(const gui_element_location& polymorphic_id) const 
+		-> location_and_pointer<std::remove_pointer_t<decltype(std::declval<typename T::location>().dereference(*this))>>
+	{
 		if (polymorphic_id.is<typename T::location>()) {
-			return dereference_location<T>(polymorphic_id.get<typename T::location>());
+			return dereference_location(polymorphic_id.get<typename T::location>());
 		}
 
-		return location_and_pointer<T>();
+		return{};
 	}
 };
 

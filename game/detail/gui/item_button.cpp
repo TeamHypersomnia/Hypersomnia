@@ -371,7 +371,7 @@ void item_button::perform_logic_step(const logic_gui_context& context, const thi
 	auto parent_slot = cosmos[item.get<components::item>().current_slot];
 
 	if (parent_slot->always_allow_exactly_one_item) {
-		const auto& parent_button = context.dereference_location<const slot_button>({parent_slot.get_id()});
+		location_and_pointer<const slot_button> parent_button = context.dereference_location(slot_button::location{parent_slot.get_id()});
 
 		this_id->rc.set_position(parent_button->rc.get_position());
 	}
@@ -391,7 +391,7 @@ void item_button::consume_gui_event(const logic_gui_context& context, const this
 
 	this_id->detector.update_appearance(info);
 	auto parent_slot = cosmos[item.get<components::item>().current_slot];
-	const auto& parent_button = context.dereference_location<slot_button>({ parent_slot.get_id() });
+	const auto parent_button = context.dereference_location(slot_button::location{ parent_slot.get_id() });
 
 	if (info == gui_event::ldrag) {
 		if (!this_id->started_drag) {
