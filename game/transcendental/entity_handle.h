@@ -213,34 +213,40 @@ public:
 
 	template <class component>
 	bool has() const {
+		ensure(alive());
 		return component_or_synchronizer_or_disabled<component>({ *this }).has();
 	}
 
 	template<class component>
 	decltype(auto) get() const {
+		ensure(alive());
 		return component_or_synchronizer_or_disabled<component>({ *this }).get();
 	}
 
 	template<class component, bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 	decltype(auto) add(const component& c) const {
+		ensure(alive());
 		component_or_synchronizer_or_disabled<component>({ *this }).add(c);
 		return get<component>();
 	}
 
 	template<class component, bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 	decltype(auto) add(const component_synchronizer<is_const, component>& c) const {
+		ensure(alive());
 		component_or_synchronizer_or_disabled<component>({ *this }).add(c.get_data());
 		return get<component>();
 	}
 
 	template<class component>
 	decltype(auto) find() const {
+		ensure(alive());
 		static_assert(!is_component_synchronized<component>::value, "Cannot return a pointer to synchronized component!");
 		return component_or_synchronizer_or_disabled<component>({ *this }).find();
 	}
 
 	template<class component, bool _is_const = is_const, typename = std::enable_if_t<!_is_const>>
 	void remove() const {
+		ensure(alive());
 		return component_or_synchronizer_or_disabled<component>({ *this }).remove();
 	}
 
@@ -251,6 +257,7 @@ public:
 	void recalculate_basic_processing_categories() const;
 
 	bool get_flag(const entity_flag f) const {
+		ensure(alive());
 		components::flags from;
 
 		if (has<components::flags>()) {
@@ -262,6 +269,7 @@ public:
 
 	template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 	void set_flag(const entity_flag f) const {
+		ensure(alive());
 		if (!has<components::flags>()) {
 			add(components::flags());
 		}
@@ -271,6 +279,7 @@ public:
 
 	template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 	void unset_flag(const entity_flag f) const {
+		ensure(alive());
 		if (!has<components::flags>()) {
 			add(components::flags());
 		}

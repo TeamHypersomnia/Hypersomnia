@@ -16,6 +16,7 @@
 template <bool C>
 template <bool, class>
 void basic_entity_handle<C>::add_standard_components() const {
+	ensure(alive());
 	const bool has_physics = has<components::physics>();
 
 	if (has_physics || has<components::fixtures>()) {
@@ -51,6 +52,7 @@ void basic_entity_handle<C>::add_standard_components() const {
 template <bool C>
 template <bool, class>
 void basic_entity_handle<C>::recalculate_basic_processing_categories() const {
+	ensure(alive());
 	auto default_processing = components::processing::get_default(*this);
 
 	if (!has<components::processing>()) {
