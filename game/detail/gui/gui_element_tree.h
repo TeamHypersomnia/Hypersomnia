@@ -2,11 +2,11 @@
 #include "game/detail/gui/gui_element_location.h"
 
 class gui_tree_entry {
-	const augs::gui::rect_node_data& node_data;
+	rects::ltrb<float> rc;
 	gui_element_location parent;
 	vec2 absolute_position;
 public:
-	gui_tree_entry(const augs::gui::rect_node_data& node_data) : node_data(node_data) {}
+	gui_tree_entry(const rects::ltrb<float>& rc) : rc(rc) {}
 
 	void set_parent(const gui_element_location& id) {
 		parent = id;
@@ -29,7 +29,7 @@ public:
 	}
 
 	rects::ltrb<float> get_absolute_rect() const {
-		return rects::xywh<float>(absolute_position.x, absolute_position.y, node_data.rc.w(), node_data.rc.h());
+		return rects::xywh<float>(absolute_position.x, absolute_position.y, rc.w(), rc.h());
 	}
 
 	rects::ltrb<float> get_absolute_clipping_rect() const {
@@ -37,7 +37,7 @@ public:
 	}
 
 	rects::ltrb<float> get_absolute_clipped_rect() const {
-		return node_data.rc;
+		return rc;
 	}
 
 	vec2 get_absolute_pos() const {
