@@ -3,7 +3,8 @@
 #include "game/transcendental/entity_id.h"
 
 struct inventory_slot_id {
-	inventory_slot_id(slot_function = slot_function::INVALID, entity_id = entity_id());
+	inventory_slot_id() = default;
+	inventory_slot_id(const slot_function, const entity_id);
 
 	slot_function type = slot_function::INVALID;
 	entity_id container_entity;
