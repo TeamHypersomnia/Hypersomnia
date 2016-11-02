@@ -208,14 +208,13 @@ namespace components {
 
 			if (tooltip_text.size() > 0) {
 				augs::gui::text_drawer description_drawer;
-
-				state.renderable_transform.pos = bottom_right_corner;
-				bg_sprite.size.set(description_drawer.get_bbox());
-				bg_sprite.draw(state);
-
 				description_drawer.set_text(tooltip_text);
 				description_drawer.pos = bottom_right_corner;
 
+				state.renderable_transform.pos = bottom_right_corner;
+				bg_sprite.size.set(description_drawer.get_bbox());
+
+				bg_sprite.draw(state);
 				description_drawer.draw(output_buffer);
 			}
 		}

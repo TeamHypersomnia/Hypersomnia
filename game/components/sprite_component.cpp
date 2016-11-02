@@ -22,27 +22,29 @@ namespace components {
 	}
 
 	void sprite::make_rect(const vec2 pos, const vec2 size, const float angle, std::array<vec2, 4>& v, const drawing_input::positioning_type positioning) {
-		vec2 origin = pos;
-		
-		if (positioning == drawing_input::positioning_type::CENTER) {
-			origin += size / 2.f;
-		}
-
 		v[0] = pos;
 		v[1] = pos + vec2(size.x, 0.f);
 		v[2] = pos + size;
 		v[3] = pos + vec2(0.f, size.y);
 
-		v[0].rotate(angle, origin);
-		v[1].rotate(angle, origin);
-		v[2].rotate(angle, origin);
-		v[3].rotate(angle, origin);
-
 		if (positioning == drawing_input::positioning_type::CENTER) {
+			const vec2 origin = pos + size / 2.f;
+
+			v[0].rotate(angle, origin);
+			v[1].rotate(angle, origin);
+			v[2].rotate(angle, origin);
+			v[3].rotate(angle, origin);
+
 			v[0] -= size / 2.f;
 			v[1] -= size / 2.f;
 			v[2] -= size / 2.f;
 			v[3] -= size / 2.f;
+		}
+		else {
+			v[0].rotate(angle, pos);
+			v[1].rotate(angle, pos);
+			v[2].rotate(angle, pos);
+			v[3].rotate(angle, pos);
 		}
 	}
 
@@ -114,7 +116,7 @@ namespace components {
 		t1.vertices[1].texcoord = t2.vertices[2].texcoord = texcoords[2];
 		t1.vertices[2].texcoord = texcoords[3];
 
-		auto& texture = resource_manager.find(tex)->tex;
+		const auto& texture = resource_manager.find(tex)->tex;
 
 		for (int i = 0; i < 3; ++i) {
 			texture.get_uv(t1.vertices[i].texcoord);
