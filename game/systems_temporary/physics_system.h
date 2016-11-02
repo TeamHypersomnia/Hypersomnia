@@ -95,26 +95,26 @@ public:
 
 	physics_system();
 
-	std::vector<raycast_output> ray_cast_all_intersections(vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity = entity_id()) const;
+	std::vector<raycast_output> ray_cast_all_intersections(const vec2 p1_meters, const vec2 p2_meters, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
 
-	static edge_edge_output edge_edge_intersection(vec2 p1_meters, vec2 p2_meters, vec2 edge_p1, vec2 edge_p2);
+	static edge_edge_output edge_edge_intersection(const vec2 p1_meters, const vec2 p2_meters, const vec2 edge_p1, const vec2 edge_p2);
 
-	raycast_output ray_cast(vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity = entity_id()) const;
-	raycast_output ray_cast_px(vec2 p1, vec2 p2, b2Filter filter, entity_id ignore_entity = entity_id()) const;
+	raycast_output ray_cast(const vec2 p1_meters, const vec2 p2_meters, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
+	raycast_output ray_cast_px(const vec2 p1, const vec2 p2, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
 	
-	vec2 push_away_from_walls(vec2 position, float radius, int ray_amount, b2Filter filter, entity_id ignore_entity = entity_id()) const;
-	float get_closest_wall_intersection(vec2 position, float radius, int ray_amount, b2Filter filter, entity_id ignore_entity = entity_id()) const;
+	vec2 push_away_from_walls(const vec2 position, const float radius, const int ray_amount, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
+	float get_closest_wall_intersection(const vec2 position, const float radius, const int ray_amount, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
 
-	query_aabb_output query_square(vec2 p1_meters, float side_meters, b2Filter filter, entity_id ignore_entity = entity_id()) const;
-	query_aabb_output query_square_px(vec2 p1, float side, b2Filter filter, entity_id ignore_entity = entity_id()) const;
+	query_aabb_output query_square(const vec2 p1_meters, const float side_meters, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
+	query_aabb_output query_square_px(const vec2 p1, const float side, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
 
-	query_aabb_output query_aabb(vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity = entity_id()) const;
-	query_aabb_output query_aabb_px(vec2 p1, vec2 p2, b2Filter filter, entity_id ignore_entity = entity_id()) const;
+	query_aabb_output query_aabb(const vec2 p1_meters, const vec2 p2_meters, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
+	query_aabb_output query_aabb_px(const vec2 p1, const vec2 p2, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
 
-	query_output query_body(const_entity_handle, b2Filter filter, entity_id ignore_entity = entity_id()) const;
+	query_output query_body(const const_entity_handle, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
 
-	query_output query_polygon(const std::vector<vec2>& vertices, b2Filter filter, entity_id ignore_entity = entity_id()) const;
-	query_output query_shape(b2Shape*, b2Filter filter, entity_id ignore_entity = entity_id()) const;
+	query_output query_polygon(const std::vector<vec2>& vertices, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
+	query_output query_shape(const b2Shape* const, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
 	
 	void step_and_set_new_transforms(logic_step&);
 	void post_and_clear_accumulated_collision_messages(logic_step&);
@@ -147,8 +147,8 @@ private:
 		raycast_output output;
 		std::vector<raycast_output> outputs;
 
-		bool ShouldRaycast(b2Fixture* fixture);
-		float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction);
+		bool ShouldRaycast(b2Fixture* fixture) override;
+		float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction) override;
 	};
 
 	struct contact_listener : public b2ContactListener {

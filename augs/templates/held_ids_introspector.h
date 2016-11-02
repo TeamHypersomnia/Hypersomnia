@@ -15,7 +15,6 @@ struct has_held_ids_introspector
 	static const bool value = std::is_same<std::true_type, decltype(test<T, dummy>(nullptr))>::value;
 };
 
-
 template<class T, class = void>
 struct held_id_introspector {
 	template<class C, class P>
@@ -44,19 +43,21 @@ void for_each_held_id(const H handle, F callback) {
 		typedef typename std::decay_t<decltype(id)>::element_type component_type;
 		const auto component_handle = cosm[id];
 
-		if (component_handle.alive())
+		if (component_handle.alive()) {
 			held_id_introspector<component_type>::for_each_held_id(component_handle.get(), callback);
+		}
 	});
 }
 
 template<class T>
 void transform_component_ids_to_guids(T& comp, const cosmos& cosm) {
 	held_id_introspector<T>::for_each_held_id(comp, [&cosm](entity_id& id) {
-		auto handle = cosm[id];
+		const auto handle = cosm[id];
 		id = entity_id();
 
-		if (handle.alive())
+		if (handle.alive()) {
 			id.guid = handle.get_guid();
+		}
 	});
 }
 
