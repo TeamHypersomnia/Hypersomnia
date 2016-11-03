@@ -70,9 +70,9 @@ void gui_system::advance_gui_elements(logic_step& step) {
 
 			if (inputs_for_this_element != entropies.end()) {
 				for (const auto& e : (*inputs_for_this_element).second) {
-					if (!element.is_gui_look_enabled) {
-						ensure(!e.has_event_for_gui);
-					}
+					//if (!element.is_gui_look_enabled) {
+					//	ensure(!e.has_event_for_gui);
+					//}
 
 					if (e.has_event_for_gui) {
 						bool fetched = false;

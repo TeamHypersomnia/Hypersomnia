@@ -419,11 +419,6 @@ void cosmos::advance_deterministic_schemata(logic_step& step) {
 	intent_contextualization_system().contextualize_use_button_intents(step);
 	intent_contextualization_system().contextualize_movement_intents(step);
 
-	performance.start(meter_type::GUI);
-	gui_system().switch_to_gui_mode_and_back(step);
-	gui_system().advance_gui_elements(step);
-	performance.stop(meter_type::GUI);
-
 	driver_system().release_drivers_due_to_requests(step);
 
 	movement_system().set_movement_flags_from_input(step);
@@ -495,6 +490,11 @@ void cosmos::advance_deterministic_schemata(logic_step& step) {
 	performance.start(meter_type::PATHFINDING);
 	pathfinding_system().advance_pathfinding_sessions(step.cosm);
 	performance.stop(meter_type::PATHFINDING);
+
+	performance.start(meter_type::GUI);
+	gui_system().switch_to_gui_mode_and_back(step);
+	gui_system().advance_gui_elements(step);
+	performance.stop(meter_type::GUI);
 
 	particles_system().step_streams_and_particles(step);
 	particles_system().destroy_dead_streams(step);
