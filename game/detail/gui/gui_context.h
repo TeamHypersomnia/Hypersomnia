@@ -83,6 +83,22 @@ public:
 		return !alive(id);
 	}
 
+	bool alive(gui_element_location& id) const {
+		const auto& const_id = id;
+
+		if (!alive(const_id)) {
+			id.unset();
+
+			return false;
+		}
+
+		return true;
+	}
+
+	bool dead(gui_element_location& id) const {
+		return !alive(id);
+	}
+
 	template <class L>
 	decltype(auto) operator()(const gui_element_location& id, L generic_call) const {
 		return id.call([&](const auto specific_loc) {

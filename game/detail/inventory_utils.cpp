@@ -336,8 +336,8 @@ void perform_transfer(item_slot_transfer_request r, logic_step& step) {
 		grabbed_item_part_handle.for_each_contained_item_recursive(physics_updater);
 
 		if (is_pickup_or_transfer) {
-			reposition_item_button(grabbed_item_part_handle);
-			grabbed_item_part_handle.for_each_contained_slot_and_item_recursive(reposition_slot_button, reposition_item_button);
+			initialize_item_button_for_new_gui_owner(grabbed_item_part_handle);
+			grabbed_item_part_handle.for_each_contained_slot_and_item_recursive(initialize_slot_button_for_new_gui_owner, initialize_item_button_for_new_gui_owner);
 		}
 		
 		auto& grabbed_item = cosmos[grabbed_item_part].get<components::item>();

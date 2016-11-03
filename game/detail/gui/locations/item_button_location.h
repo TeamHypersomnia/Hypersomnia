@@ -1,5 +1,6 @@
 #pragma once
 #include "game/transcendental/entity_id.h"
+#include "augs/ensure.h"
 
 class item_button_location {
 public:
@@ -21,7 +22,9 @@ public:
 
 	template <class C>
 	decltype(auto) dereference(C context) const {
-		return &context.get_step().get_cosmos()[item_id].get<components::item>().button;
+		const auto handle = context.get_step().get_cosmos()[item_id];
+		ensure(context.get_gui_element_entity() == handle.get_owning_transfer_capability());
+		return &handle.get<components::item>().button;
 	}
 };
 

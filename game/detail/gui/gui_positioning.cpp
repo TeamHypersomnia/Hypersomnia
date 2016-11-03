@@ -7,7 +7,7 @@
 #include "game/components/container_component.h"
 #include "game/transcendental/cosmos.h"
 
-void reposition_slot_button(const inventory_slot_handle h) {
+void initialize_slot_button_for_new_gui_owner(const inventory_slot_handle h) {
 	auto& b = h.get().button;
 
 	b.rc = components::gui_element::get_rectangle_for_slot_function(h.get_id().type);
@@ -19,10 +19,12 @@ void reposition_slot_button(const inventory_slot_handle h) {
 	b.set_flag(augs::gui::flag::ENABLE_DRAWING_OF_CHILDREN, !is_item_deposit);
 }
 
-void reposition_item_button(const entity_handle h) {
+void initialize_item_button_for_new_gui_owner(const entity_handle h) {
 	auto& cosmos = h.get_cosmos();
 	auto& item = h.get<components::item>();
 	auto& b = item.button;
+	b.started_drag = false;
+	b.detector = augs::gui::appearance_detector();
 
 	b.rc.set_position(cosmos[item.current_slot].get().button.rc.get_position());
 	b.rc.set_size(64, 64);

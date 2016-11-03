@@ -1,5 +1,6 @@
 #pragma once
 #include "game/detail/inventory_slot_id.h"
+#include "augs/ensure.h"
 
 class slot_button_location {
 public:
@@ -17,7 +18,9 @@ public:
 
 	template <class C>
 	decltype(auto) dereference(C context) const {
-		return &context.get_step().get_cosmos()[slot_id]->button;
+		const auto handle = context.get_step().get_cosmos()[slot_id];
+		ensure(context.get_gui_element_entity() == handle.get_container().get_owning_transfer_capability());
+		return &handle->button;
 	}
 };
 

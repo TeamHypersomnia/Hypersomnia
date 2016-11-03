@@ -6,6 +6,6 @@
 struct item_button;
 struct slot_button;
 
-void reposition_slot_button(const inventory_slot_handle);
-void reposition_item_button(const entity_handle);
+void initialize_slot_button_for_new_gui_owner(const inventory_slot_handle);
+void initialize_item_button_for_new_gui_owner(const entity_handle);
 
