@@ -126,9 +126,6 @@ rects::ltrb<float> item_button::iterate_children_attachments(
 
 	if (!this_id->is_container_open) {
 		auto iteration_lambda = [&](const const_entity_handle& desc) {
-			ensure(desc != item_handle)
-				return;
-
 			const auto& parent_slot = cosmos[desc.get<components::item>().current_slot];
 
 			if (parent_slot.should_item_inside_keep_physical_body(item_handle)) {
