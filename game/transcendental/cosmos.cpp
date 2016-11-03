@@ -315,15 +315,13 @@ entity_handle cosmos::create_entity_with_specific_guid(const std::string& debug_
 entity_handle cosmos::clone_entity(const entity_id& copied_entity_id) {
 	entity_handle copied_entity = get_handle(copied_entity_id);
 	
-	if (copied_entity.dead())
+	if (copied_entity.dead()) {
 		return get_handle(entity_id());
+	}
 
 	auto new_entity = allocate_new_entity();
 	clone_all_components<components::substance>(copied_entity, new_entity);
 	new_entity.set_debug_name("+" + copied_entity.get_debug_name());
-
-	//ensure(new_entity.get_id().pool.indirection_index != 37046);
-	//ensure(new_entity.get_id().pool.indirection_index != 36985);
 
 #if COSMOS_TRACKS_GUIDS
 	assign_next_guid(new_entity);
@@ -334,9 +332,14 @@ entity_handle cosmos::clone_entity(const entity_id& copied_entity_id) {
 	for_each_type<components::child, components::physical_relations, components::sub_entities>([copied_entity, new_entity](auto c) {
 		typedef decltype(c) T;
 		
-		if (copied_entity.has<T>())
+		if (copied_entity.has<T>()) {
 			new_entity.get<T>() = T();
+		}
 	});
+
+	if (new_entity.has<components::item>()) {
+		new_entity.get<components::item>().current_slot.unset();
+	}
 
 	new_entity.make_cloned_sub_entities_recursive(copied_entity_id);
 	
@@ -344,8 +347,9 @@ entity_handle cosmos::clone_entity(const entity_id& copied_entity_id) {
 		new_entity.set_owner_body(new_entity);
 	}
 
-	if (copied_entity.has<components::substance>())
+	if (copied_entity.has<components::substance>()) {
 		new_entity.add(components::substance());
+	}
 
 	return new_entity;
 }

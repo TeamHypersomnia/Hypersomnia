@@ -257,8 +257,9 @@ void perform_transfer(item_slot_transfer_request r, logic_step& step) {
 		if (previous_slot.alive()) {
 			previous_container_transform = previous_slot.get_container().logic_transform();
 
-			if (whole_item_grabbed)
+			if (whole_item_grabbed) {
 				remove_item(previous_slot, r.get_item());
+			}
 
 			if (previous_slot.is_input_enabling_slot()) {
 				unset_input_flags_of_orphaned_entity(r.get_item());
@@ -266,10 +267,12 @@ void perform_transfer(item_slot_transfer_request r, logic_step& step) {
 		}
 
 		if (cosmos[target_item_to_stack_with].alive()) {
-			if (whole_item_grabbed)
+			if (whole_item_grabbed) {
 				step.messages.post(messages::queue_destruction(r.get_item()));
-			else
+			}
+			else {
 				item.charges -= result.transferred_charges;
+			}
 
 			cosmos[target_item_to_stack_with].get<components::item>().charges += result.transferred_charges;
 
@@ -345,7 +348,7 @@ void perform_transfer(item_slot_transfer_request r, logic_step& step) {
 			grabbed_item_part_handle.for_each_contained_slot_and_item_recursive(initialize_slot_button_for_new_gui_owner, initialize_item_button_for_new_gui_owner);
 		}
 		
-		auto& grabbed_item = cosmos[grabbed_item_part].get<components::item>();
+		auto& grabbed_item = grabbed_item_part_handle.get<components::item>();
 
 		if (is_pickup_or_transfer) {
 			if (r.get_target_slot()->items_need_mounting) {
@@ -361,9 +364,9 @@ void perform_transfer(item_slot_transfer_request r, logic_step& step) {
 			auto force = vec2().set_from_degrees(previous_container_transform.rotation).set_length(60);
 			auto offset = vec2().random_on_circle(20, cosmos.get_rng_for(r.get_item()));
 
-			auto& physics = cosmos[grabbed_item_part].get<components::physics>();
+			auto& physics = grabbed_item_part_handle.get<components::physics>();
 			physics.apply_force(force, offset, true);
-			auto& special_physics = cosmos[grabbed_item_part].get<components::special_physics>();
+			auto& special_physics = grabbed_item_part_handle.get<components::special_physics>();
 			special_physics.since_dropped.set(200, cosmos.get_timestamp());
 		}
 	}
