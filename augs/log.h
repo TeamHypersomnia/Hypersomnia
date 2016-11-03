@@ -16,28 +16,28 @@ struct global_log {
 	static std::vector<log_entry> recent_entries;
 	static unsigned max_entries;
 
-	static augs::gui::text::fstr format_recent_as_text(assets::font_id);
+	static augs::gui::text::fstr format_recent_as_text(const assets::font_id);
 
-	static void push_entry(log_entry);
+	static void push_entry(const log_entry);
 };
 
 template < typename... A >
-void LOG(std::string f, A&&... a) {
+void LOG(const std::string& f, A&&... a) {
 	LOG(typesafe_sprintf(f, std::forward<A>(a)...));
 }
 
 template < typename... A >
-void LOG_COLOR(console_color color, std::string f, A&&... a) {
+void LOG_COLOR(const console_color color, const std::string& f, A&&... a) {
 	LOG_COLOR(color, typesafe_sprintf(f, std::forward<A>(a)...));
 }
 
 template <>
-void LOG(std::string f);
+void LOG(const std::string& f);
 
 template <>
-void LOG_COLOR(console_color color, std::string f);
+void LOG_COLOR(const console_color color, const std::string& f);
 
-void CALL_SHELL(std::string);
+void CALL_SHELL(const std::string&);
 
 #define AS_INTV *(vec2i*)&
 #define AS_INT *(int*)&

@@ -19,7 +19,7 @@ std::mutex log_mutex;
 unsigned global_log::max_entries = 40;
 std::vector<log_entry> global_log::recent_entries;
 
-augs::gui::text::fstr global_log::format_recent_as_text(assets::font_id f) {
+augs::gui::text::fstr global_log::format_recent_as_text(const assets::font_id f) {
 	augs::gui::text::fstr result;
 	
 	for (const auto& line : recent_entries) {
@@ -30,15 +30,15 @@ augs::gui::text::fstr global_log::format_recent_as_text(assets::font_id f) {
 	return result;
 }
 
-void global_log::push_entry(log_entry new_entry) {
-	recent_entries.push_back(new_entry);
+void global_log::push_entry(const log_entry new_entry) {
+	//recent_entries.push_back(new_entry);
 
 	if (recent_entries.size() > max_entries)
 		recent_entries.erase(recent_entries.begin());
 }
 
 template<>
-void LOG(std::string f) {
+void LOG(const std::string& f) {
 #if ENABLE_LOG 
 	std::unique_lock<std::mutex> lock(log_mutex);
 
@@ -51,7 +51,7 @@ void LOG(std::string f) {
 }
 
 template<>
-void LOG_COLOR(console_color c, std::string f) {
+void LOG_COLOR(const console_color c, const std::string& f) {
 #if ENABLE_LOG 
 	std::unique_lock<std::mutex> lock(log_mutex);
 	
@@ -63,7 +63,7 @@ void LOG_COLOR(console_color c, std::string f) {
 #endif
 }
 
-void CALL_SHELL(std::string s) {
+void CALL_SHELL(const std::string& s) {
 	std::unique_lock<std::mutex> lock(log_mutex);
 
 	system(s.c_str());
