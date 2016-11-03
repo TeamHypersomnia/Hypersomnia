@@ -8,9 +8,17 @@
 #include "game/transcendental/cosmos.h"
 
 void initialize_slot_button_for_new_gui_owner(const inventory_slot_handle h) {
+	vec2 rc_offset;
+
+	if (h.get_container().get_owning_transfer_capability() == h.get_container()) {
+		const auto& element = h.get_container().get<components::gui_element>();
+
+		rc_offset.set(element.get_screen_size().x - 250, element.get_screen_size().y - 200);
+	}
+
 	auto& b = h.get().button;
 
-	b.rc = components::gui_element::get_rectangle_for_slot_function(h.get_id().type);
+	b.rc = components::gui_element::get_rectangle_for_slot_function(h.get_id().type) + rc_offset;
 	b.slot_relative_pos = b.rc.get_position();
 
 	const bool is_item_deposit = h.get_id().type == slot_function::ITEM_DEPOSIT;
