@@ -106,9 +106,7 @@ namespace augs {
 							}
 						});
 					}
-				}
 
-				if (this_id->get_flag(flag::ENABLE_DRAWING)) {
 					if (!this_id->get_flag(flag::DISABLE_HOVERING)) {
 						const auto absolute_clipped_rect = tree_entry.get_absolute_clipped_rect();
 						const bool hover = absolute_clipped_rect.good() && absolute_clipped_rect.hover(mouse_pos);
@@ -211,7 +209,7 @@ namespace augs {
 
 			template <class C, class gui_element_id>
 			static void draw(C context, const gui_element_id& this_id, draw_info in) {
-				if (!this_id->get_flag(flag::ENABLE_DRAWING_OF_CHILDREN)) {
+				if (!this_id->get_flag(flag::ENABLE_DRAWING)) {
 					return;
 				}
 
@@ -220,10 +218,12 @@ namespace augs {
 
 			template <class C, class gui_element_id>
 			static void draw_children(C context, const gui_element_id& this_id, draw_info in) {
+				if (!this_id->get_flag(flag::ENABLE_DRAWING_OF_CHILDREN)) {
+					return;
+				}
+
 				this_id->for_each_child(context, this_id, [&](const auto& child_id) {
-					if (child_id->get_flag(flag::ENABLE_DRAWING)) {
-						child_id->draw(context, child_id, in);
-					}
+					child_id->draw(context, child_id, in);
 				});
 			}
 

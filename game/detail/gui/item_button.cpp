@@ -445,10 +445,8 @@ void item_button::consume_gui_event(const logic_gui_context& context, const this
 }
 
 void item_button::draw(const viewing_gui_context& context, const const_this_pointer& this_id, draw_info in) {
-	if (is_inventory_root(context, this_id)) {
-		draw_children(context, this_id, in);
+	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING))
 		return;
-	}
 
 	if (!is_being_wholely_dragged_or_pending_finish(context, this_id)) {
 		this_id->draw_complete_with_children(context, this_id, in);

@@ -17,6 +17,9 @@ drag_and_drop_target_drop_item::drag_and_drop_target_drop_item(const augs::gui::
 }
 
 void drag_and_drop_target_drop_item::draw(const viewing_gui_context& context, const const_this_pointer& this_id, augs::gui::draw_info info) {
+	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING))
+		return;
+
 	auto mat_coloured = this_id->mat;
 
 	if (this_id->detector.is_hovered)
@@ -33,9 +36,9 @@ void drag_and_drop_target_drop_item::consume_gui_event(const logic_gui_context& 
 
 void drag_and_drop_target_drop_item::perform_logic_step(const logic_gui_context& context, const this_pointer& this_id) {
 	auto& world = context.get_rect_world();
-	auto dragged_item = world.rect_held_by_lmb;
+	auto dragged_item = context._dynamic_cast<const item_button>(world.rect_held_by_lmb);
 
-	if (context.alive(dragged_item) && world.held_rect_is_dragged) {
+	if (dragged_item != nullptr && world.held_rect_is_dragged) {
 		this_id->set_flag(augs::gui::flag::ENABLE_DRAWING);
 	}
 	else {

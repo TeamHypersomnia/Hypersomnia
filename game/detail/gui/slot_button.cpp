@@ -22,6 +22,9 @@ slot_button::slot_button() {
 }
 
 void slot_button::draw(const viewing_gui_context& context, const const_this_pointer& this_id, augs::gui::draw_info info) {
+	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING))
+		return;
+
 	const auto& step = context.get_step();
 	const auto& cosmos = step.get_cosmos();
 

@@ -33,7 +33,7 @@ bool key_and_mouse_intent::operator==(const key_and_mouse_intent& b) const {
 }
 
 bool key_and_mouse_intent::operator!=(const key_and_mouse_intent& b) const {
-	return operator!=(b);
+	return !operator==(b);
 }
 
 bool key_and_mouse_intent::from_raw_state(const input_context& context, const augs::window::event::change& raw) {
@@ -67,7 +67,7 @@ bool entity_intent::operator==(const entity_intent& b) const {
 }
 
 bool entity_intent::operator!=(const entity_intent& b) const {
-	return operator!=(b);
+	return !operator==(b);
 }
 
 bool entity_intent::from_raw_state_and_possible_gui_receiver(const input_context& context, const augs::window::event::change& raw, const const_entity_handle& gui_receiver) {
