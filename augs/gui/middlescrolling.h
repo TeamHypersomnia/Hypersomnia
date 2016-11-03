@@ -37,7 +37,7 @@ namespace augs {
 			}
 
 			template<class C>
-			void draw_triangles(C context, draw_info in) const {
+			void draw(C context, draw_info in) const {
 				if (context.alive(subject)) {
 					rects::ltrb<float> scroller = rects::wh<float>(size);
 					scroller.center(middlescroll_icon_position);

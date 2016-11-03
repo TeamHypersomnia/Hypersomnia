@@ -112,7 +112,7 @@ namespace rendering_scripts {
 				hud.draw_vertically_flying_numbers(step);
 		
 				if (controlled_entity.has<components::gui_element>()) {
-					components::gui_element::draw_complete_gui_for_camera_rendering_request(controlled_entity, step);
+					components::gui_element::draw_complete_gui_for_camera_rendering_request(output, controlled_entity, step);
 				}
 				//gui.draw_complete_gui_for_camera_rendering_request(step);
 		//	}

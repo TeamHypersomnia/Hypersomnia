@@ -54,7 +54,7 @@ typename inventory_getters<C, D>::inventory_slot_handle_type inventory_getters<C
 }
 
 template <bool C, class D>
-typename inventory_getters<C, D>::inventory_slot_handle_type inventory_getters<C, D>::determine_hand_holstering_slot_in(D searched_root_container) const {
+typename inventory_getters<C, D>::inventory_slot_handle_type inventory_getters<C, D>::determine_hand_holstering_slot_in(const D searched_root_container) const {
 	auto& item_entity = *static_cast<const D*>(this);
 	auto& cosmos = item_entity.get_cosmos();
 
@@ -85,7 +85,7 @@ typename inventory_getters<C, D>::inventory_slot_handle_type inventory_getters<C
 }
 
 template <bool C, class D>
-typename inventory_getters<C, D>::inventory_slot_handle_type inventory_getters<C, D>::determine_pickup_target_slot_in(D searched_root_container) const {
+typename inventory_getters<C, D>::inventory_slot_handle_type inventory_getters<C, D>::determine_pickup_target_slot_in(const D searched_root_container) const {
 	auto& item_entity = *static_cast<const D*>(this);
 	ensure(item_entity.alive());
 	ensure(searched_root_container.alive());
@@ -106,7 +106,7 @@ typename inventory_getters<C, D>::inventory_slot_handle_type inventory_getters<C
 }
 
 template <bool C, class D>
-typename inventory_getters<C, D>::inventory_slot_handle_type inventory_getters<C, D>::map_primary_action_to_secondary_hand_if_primary_empty(int is_action_secondary) const {
+typename inventory_getters<C, D>::inventory_slot_handle_type inventory_getters<C, D>::map_primary_action_to_secondary_hand_if_primary_empty(const bool is_action_secondary) const {
 	auto& root_container = *static_cast<const D*>(this);
 
 	auto primary = root_container[slot_function::PRIMARY_HAND];

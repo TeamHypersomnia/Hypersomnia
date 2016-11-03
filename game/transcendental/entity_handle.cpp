@@ -6,12 +6,16 @@
 #include "game/components/special_physics_component.h"
 #include "game/components/interpolation_component.h"
 #include "game/components/crosshair_component.h"
+#include "game/components/container_component.h"
+#include "game/components/gui_element_component.h"
 #include "game/components/fixtures_component.h"
 
 #include "game/systems_insignificant/interpolation_system.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/detail/physics_scripts.h"
+#include "game/detail/inventory_slot_handle.h"
+#include "game/detail/gui/gui_positioning.h"
 
 template <bool C>
 template <bool, class>
@@ -47,13 +51,21 @@ void basic_entity_handle<C>::add_standard_components() const {
 	if (!has<components::substance>()) {
 		add(components::substance());
 	}
+
+	if (has<components::gui_element>()) {
+		const auto& container = get<components::container>();
+
+		for (const auto& s : container.slots) {
+			reposition_slot_button(get_cosmos()[inventory_slot_id(s.first, get_id())]);
+		}
+	}
 }
 
 template <bool C>
 template <bool, class>
 void basic_entity_handle<C>::recalculate_basic_processing_categories() const {
 	ensure(alive());
-	auto default_processing = components::processing::get_default(*this);
+	const auto default_processing = components::processing::get_default(*this);
 
 	if (!has<components::processing>()) {
 		add(default_processing);

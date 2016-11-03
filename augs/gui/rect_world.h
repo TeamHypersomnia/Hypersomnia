@@ -238,17 +238,14 @@ namespace augs {
 			}
 
 			template <class C, class gui_element_id>
-			vertex_triangle_buffer draw_triangles(C context, const gui_element_id& root) const {
-				vertex_triangle_buffer buffer;
-				draw_info in(buffer);
+			void draw(vertex_triangle_buffer& output_buffer, C context, const gui_element_id& root) const {
+				draw_info in(output_buffer);
 
 				context(root, [&](const auto& r) { 
 					r->draw_children(context, r, in);
 				});
 
-				middlescroll.draw_triangles(context, in);
-
-				return buffer;
+				middlescroll.draw(context, in);
 			}
 		};
 	}

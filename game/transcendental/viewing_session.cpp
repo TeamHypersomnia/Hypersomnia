@@ -58,8 +58,8 @@ void viewing_session::view(const cosmos& cosmos,
 
 	auto& renderer = renderer::get_current();
 
-	auto screen_size = camera.visible_world_area;
-	vec2i screen_size_i(static_cast<int>(screen_size.x), static_cast<int>(screen_size.y));
+	const auto screen_size = camera.visible_world_area;
+	const vec2i screen_size_i(static_cast<int>(screen_size.x), static_cast<int>(screen_size.y));
 
 	if (clear_current_and_swap_buffers) {
 		renderer.clear_current_fbo();
@@ -67,9 +67,10 @@ void viewing_session::view(const cosmos& cosmos,
 
 	renderer.set_viewport({ viewport_coordinates.x, viewport_coordinates.y, screen_size_i.x, screen_size_i.y });
 
-	auto character_chased_by_camera = cosmos[viewed_character];
+	const auto character_chased_by_camera = cosmos[viewed_character];
 
 	camera.tick(dt, character_chased_by_camera);
+	world_hover_highlighter.cycle_duration_ms = 700;
 	world_hover_highlighter.update(dt.in_milliseconds());
 	
 	viewing_step main_cosmos_viewing_step(cosmos, hud, world_hover_highlighter, dt, renderer, camera.get_state_for_drawing_camera(character_chased_by_camera));

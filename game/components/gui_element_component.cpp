@@ -38,7 +38,7 @@ namespace components {
 	{
 	}
 
-	rects::xywh<float> gui_element::get_rectangle_for_slot_function(const slot_function f) const {
+	rects::xywh<float> gui_element::get_rectangle_for_slot_function(const slot_function f) {
 		switch (f) {
 		case slot_function::PRIMARY_HAND: return rects::xywh<float>(100, 0, 33, 33);
 		case slot_function::SHOULDER_SLOT: return rects::xywh<float>(100, -100, 33, 33);
@@ -73,30 +73,28 @@ namespace components {
 		return vec2(get_screen_size().x - 250.f, get_screen_size().y - 200.f);
 	}
 
-	void gui_element::draw_complete_gui_for_camera_rendering_request(const const_entity_handle& gui_entity, viewing_step& step) {
+	void gui_element::draw_complete_gui_for_camera_rendering_request(vertex_triangle_buffer& output_buffer, const const_entity_handle& gui_entity, viewing_step& step) {
 		const auto& element = gui_entity.get<components::gui_element>();
 		const auto& rect_world = element.rect_world;
 
-		root_of_inventory_gui root_of_gui;
+		root_of_inventory_gui root_of_gui(element.get_screen_size());
 		gui_element_tree tree;
 
 		viewing_gui_context context(step, gui_entity, tree, root_of_gui);
 
 		rect_world.build_tree_data_into_context(context, root_of_inventory_gui::location());
-		rect_world.draw_triangles(context, root_of_inventory_gui::location());
+		rect_world.draw(output_buffer, context, root_of_inventory_gui::location());
 
 		if (element.is_gui_look_enabled) {
-			element.draw_cursor_and_tooltip(context);
+			element.draw_cursor_and_tooltip(output_buffer, context);
 		}
 	}
 
-	void gui_element::draw_cursor_and_tooltip(const viewing_gui_context& context) const {
+	void gui_element::draw_cursor_and_tooltip(vertex_triangle_buffer& output_buffer, const viewing_gui_context& context) const {
 		auto& drag_result = prepare_drag_and_drop_result(context);
 		auto& step = context.get_step();
 		const auto& cosmos = step.get_cosmos();
 
-		auto& output_buffer = context.get_step().renderer.get_triangle_buffer();
-		
 		components::sprite::drawing_input state(output_buffer);
 		state.positioning = components::sprite::drawing_input::positioning_type::LEFT_TOP_CORNER;
 

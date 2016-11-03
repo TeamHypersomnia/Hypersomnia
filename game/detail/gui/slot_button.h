@@ -26,17 +26,17 @@ struct slot_button : game_gui_rect_node {
 
 	static void perform_logic_step(const logic_gui_context&, const this_pointer&);
 	
-	static void draw_triangles(const viewing_gui_context&, const const_this_pointer&, augs::gui::draw_info);
+	static void draw(const viewing_gui_context&, const const_this_pointer&, augs::gui::draw_info);
 	static void consume_gui_event(logic_gui_context&, const this_pointer&, const augs::gui::event_info info);
 
-	template <class C, class gui_element_id, class L>
-	static void for_each_child(C context, const gui_element_id& this_id, L generic_call) {
-		const auto slot_handle = context.get_step().get_cosmos()[this_id.get_location().slot_id];
-
-		for (const auto i : slot_handle.get_items_inside()) {
-			generic_call(make_location_and_pointer(&i.get<components::item>().button, item_button::location{ i.get_id() }));
-		}
-	}
+	//template <class C, class gui_element_id, class L>
+	//static void for_each_child(C context, const gui_element_id& this_id, L generic_call) {
+	//	const auto slot_handle = context.get_step().get_cosmos()[this_id.get_location().slot_id];
+	//
+	//	for (const auto i : slot_handle.get_items_inside()) {
+	//		generic_call(make_location_and_pointer(&i.get<components::item>().button, item_button::location{ i.get_id() }));
+	//	}
+	//}
 };
 
 slot_button& get_meta(inventory_slot_id);

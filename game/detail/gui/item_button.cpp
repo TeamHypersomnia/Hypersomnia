@@ -316,10 +316,13 @@ void item_button::draw_proc(const viewing_gui_context& context, const const_this
 	if (f.draw_container_opened_mark) {
 		if (item.find<components::container>()) {
 			components::sprite container_status_sprite;
-			if (this_id->is_container_open)
+
+			if (this_id->is_container_open) {
 				container_status_sprite.set(assets::texture_id::CONTAINER_OPEN_ICON, border_col);
-			else
+			}
+			else {
 				container_status_sprite.set(assets::texture_id::CONTAINER_CLOSED_ICON, border_col);
+			}
 
 			components::sprite::drawing_input state(in.v);
 			state.positioning = components::sprite::drawing_input::positioning_type::LEFT_TOP_CORNER;
@@ -334,7 +337,9 @@ void item_button::draw_proc(const viewing_gui_context& context, const const_this
 }
 
 bool item_button::is_inventory_root(const const_gui_context& context, const const_this_pointer& this_id) {
-	return this_id.get_location().item_id == context.get_gui_element_entity();
+	const bool result = this_id.get_location().item_id == context.get_gui_element_entity();
+	ensure(!result);
+	return result;
 }
 
 void item_button::perform_logic_step(const logic_gui_context& context, const this_pointer& this_id) {
@@ -439,7 +444,7 @@ void item_button::consume_gui_event(const logic_gui_context& context, const this
 	// if(being_dragged && inf == rect::gui_event::lup)
 }
 
-void item_button::draw_triangles(const viewing_gui_context& context, const const_this_pointer& this_id, draw_info in) {
+void item_button::draw(const viewing_gui_context& context, const const_this_pointer& this_id, draw_info in) {
 	if (is_inventory_root(context, this_id)) {
 		draw_children(context, this_id, in);
 		return;

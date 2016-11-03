@@ -56,11 +56,15 @@ struct item_button : game_gui_rect_node {
 
 		if (container.has<components::container>()) {
 			for (const auto& s : container.get<components::container>().slots) {
+				for (const auto& in : s.second.items_inside) {
+					item_button::location child_location;
+					child_location.item_id = in;
+					generic_call(context.dereference_location(child_location));
+				}
+
 				slot_button::location child_location;
 				child_location.slot_id.type = s.first;
 				child_location.slot_id.container_entity = container;
-				ensure(s.first != slot_function::INVALID);
-
 				generic_call(make_location_and_pointer(&s.second.button, child_location));
 			}
 		}
@@ -75,7 +79,7 @@ struct item_button : game_gui_rect_node {
 	static void perform_logic_step(const logic_gui_context&, const this_pointer& this_id);
 
 	static bool is_inventory_root(const const_gui_context&, const const_this_pointer& this_id);
-	static void draw_triangles(const viewing_gui_context&, const const_this_pointer& this_id, draw_info);
+	static void draw(const viewing_gui_context&, const const_this_pointer& this_id, draw_info);
 	static void draw_grid_border_ghost(const viewing_gui_context&, const const_this_pointer&, draw_info in);
 	static void draw_complete_dragged_ghost(const viewing_gui_context&, const const_this_pointer&, draw_info);
 

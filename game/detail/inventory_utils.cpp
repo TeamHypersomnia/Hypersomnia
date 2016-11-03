@@ -14,6 +14,7 @@
 #include "augs/ensure.h"
 #include "game/transcendental/step.h"
 #include "augs/templates/string_templates.h"
+#include "game/detail/gui/gui_positioning.h"
 
 item_transfer_result query_transfer_result(const_item_slot_transfer_request r) {
 	item_transfer_result output;
@@ -220,10 +221,10 @@ void remove_item(inventory_slot_handle handle, entity_handle removed_item) {
 void perform_transfer(item_slot_transfer_request r, logic_step& step) {
 	auto& cosmos = r.get_item().get_cosmos();
 	auto& item = r.get_item().get<components::item>();
-	auto previous_slot_id = item.current_slot;
-	auto previous_slot = cosmos[previous_slot_id];
+	const auto previous_slot_id = item.current_slot;
+	const auto previous_slot = cosmos[previous_slot_id];
 
-	auto result = query_transfer_result(r);
+	const auto result = query_transfer_result(r);
 
 	if (result.result == item_transfer_result_type::UNMOUNT_BEFOREHAND) {
 		ensure(false);
@@ -235,8 +236,8 @@ void perform_transfer(item_slot_transfer_request r, logic_step& step) {
 		return;
 	}
 	else if (result.result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
-		bool is_pickup_or_transfer = r.get_target_slot().alive();
-		bool is_drop_request = !is_pickup_or_transfer;
+		const bool is_pickup_or_transfer = r.get_target_slot().alive();
+		const bool is_drop_request = !is_pickup_or_transfer;
 
 		components::transform previous_container_transform;
 
@@ -250,7 +251,7 @@ void perform_transfer(item_slot_transfer_request r, logic_step& step) {
 			}
 		}
 
-		bool whole_item_grabbed = item.charges == result.transferred_charges;
+		const bool whole_item_grabbed = item.charges == result.transferred_charges;
 
 		if (previous_slot.alive()) {
 			previous_container_transform = previous_slot.get_container().logic_transform();
@@ -277,8 +278,9 @@ void perform_transfer(item_slot_transfer_request r, logic_step& step) {
 		entity_id grabbed_item_part;
 		entity_id new_charge_stack;
 
-		if (whole_item_grabbed)
+		if (whole_item_grabbed) {
 			grabbed_item_part = r.get_item();
+		}
 		else {
 			new_charge_stack = cosmos.clone_entity(r.get_item());
 			item.charges -= result.transferred_charges;
@@ -287,13 +289,16 @@ void perform_transfer(item_slot_transfer_request r, logic_step& step) {
 			grabbed_item_part = new_charge_stack;
 		}
 
-		if (is_pickup_or_transfer)
-			add_item(r.get_target_slot(), cosmos[grabbed_item_part]);
+		const auto grabbed_item_part_handle = cosmos[grabbed_item_part];
 
-		auto physics_updater = [previous_container_transform, new_charge_stack](entity_handle descendant) {
+		if (is_pickup_or_transfer) {
+			add_item(r.get_target_slot(), grabbed_item_part_handle);
+		}
+
+		auto physics_updater = [previous_container_transform, new_charge_stack](const entity_handle descendant) {
 			auto& cosmos = descendant.get_cosmos();
 
-			auto parent_slot = cosmos[descendant.get<components::item>().current_slot];
+			const auto parent_slot = cosmos[descendant.get<components::item>().current_slot];
 			auto def = descendant.get<components::fixtures>().get_data();
 			entity_id owner_body;
 
@@ -306,8 +311,9 @@ void perform_transfer(item_slot_transfer_request r, logic_step& step) {
 					def.offsets_for_created_shapes[colliders_offset_type::ITEM_ATTACHMENT_DISPLACEMENT]
 						= parent_slot.sum_attachment_offsets_of_parents(descendant);
 				}
-				else
+				else {
 					owner_body = descendant;
+				}
 
 				def.offsets_for_created_shapes[colliders_offset_type::SPECIAL_MOVE_DISPLACEMENT].reset();
 			}
@@ -321,13 +327,19 @@ void perform_transfer(item_slot_transfer_request r, logic_step& step) {
 			descendant.get<components::fixtures>() = def;
 			descendant.get<components::fixtures>().set_owner_body(owner_body);
 			
-			if(descendant.has<components::physics>())
+			if (descendant.has<components::physics>()) {
 				descendant.get<components::physics>().set_transform(previous_container_transform);
+			}
 		};
 
-		physics_updater(cosmos[grabbed_item_part]);
-		cosmos[grabbed_item_part].for_each_contained_item_recursive(physics_updater);
+		physics_updater(grabbed_item_part_handle);
+		grabbed_item_part_handle.for_each_contained_item_recursive(physics_updater);
 
+		if (is_pickup_or_transfer) {
+			reposition_item_button(grabbed_item_part_handle);
+			grabbed_item_part_handle.for_each_contained_slot_and_item_recursive(reposition_slot_button, reposition_item_button);
+		}
+		
 		auto& grabbed_item = cosmos[grabbed_item_part].get<components::item>();
 
 		if (is_pickup_or_transfer) {

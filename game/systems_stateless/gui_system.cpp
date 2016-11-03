@@ -52,9 +52,9 @@ void gui_system::advance_gui_elements(logic_step& step) {
 	for (const auto root : cosmos.get(processing_subjects::WITH_GUI_ELEMENT)) {
 		auto& element = root.get<components::gui_element>();
 
-		if (element.is_gui_look_enabled && root.has<components::item_slot_transfers>()) {
+		if (root.has<components::item_slot_transfers>()) {
 			gui_element_tree tree;
-			root_of_inventory_gui root_of_gui;
+			root_of_inventory_gui root_of_gui(element.get_screen_size());
 
 			logic_gui_context context(step, root, tree, root_of_gui);
 
@@ -70,6 +70,10 @@ void gui_system::advance_gui_elements(logic_step& step) {
 
 			if (inputs_for_this_element != entropies.end()) {
 				for (const auto& e : (*inputs_for_this_element).second) {
+					if (!element.is_gui_look_enabled) {
+						ensure(!e.has_event_for_gui);
+					}
+
 					if (e.has_event_for_gui) {
 						bool fetched = false;
 						const auto& change = e.event_for_gui;

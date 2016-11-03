@@ -27,7 +27,7 @@ class basic_inventory_slot_handle {
 public:
 	static constexpr bool is_const_value = is_const;
 	
-	basic_inventory_slot_handle(owner_reference, inventory_slot_id);
+	basic_inventory_slot_handle(owner_reference, const inventory_slot_id);
 	
 	std::vector<entity_handle_type> get_mounted_items() const;
 
@@ -37,8 +37,8 @@ public:
 	inventory_slot_id raw_id;
 
 	void unset();
-	entity_handle_type make_handle(entity_id) const;
-	basic_inventory_slot_handle make_handle(inventory_slot_id) const;
+	entity_handle_type make_handle(const entity_id) const;
+	basic_inventory_slot_handle make_handle(const inventory_slot_id) const;
 
 	template <class F>
 	void for_each_descendant(F callback) const {
@@ -60,7 +60,7 @@ public:
 	bool alive() const;
 	bool dead() const;
 
-	bool can_contain(entity_id) const;
+	bool can_contain(const entity_id) const;
 
 	entity_handle_type try_get_item() const;
 	entity_handle_type get_container() const;
@@ -77,9 +77,9 @@ public:
 	float calculate_density_multiplier_due_to_being_attached() const;
 	unsigned calculate_free_space_with_children() const;
 
-	components::transform sum_attachment_offsets_of_parents(entity_id attached_item) const;
+	components::transform sum_attachment_offsets_of_parents(const entity_id attached_item) const;
 
-	bool should_item_inside_keep_physical_body(entity_id until_parent = entity_id()) const;
+	bool should_item_inside_keep_physical_body(const entity_id until_parent = entity_id()) const;
 
 	unsigned calculate_free_space_with_parent_containers() const;
 

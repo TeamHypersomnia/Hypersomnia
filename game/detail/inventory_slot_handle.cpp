@@ -13,7 +13,7 @@
 #include "game/detail/item_transfer_result.h"
 
 template <bool C>
-basic_inventory_slot_handle<C>::basic_inventory_slot_handle(owner_reference owner, inventory_slot_id raw_id) : owner(owner), raw_id(raw_id) {
+basic_inventory_slot_handle<C>::basic_inventory_slot_handle(owner_reference owner, const inventory_slot_id raw_id) : owner(owner), raw_id(raw_id) {
 
 }
 
@@ -28,12 +28,12 @@ typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot
 }
 
 template <bool C>
-typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot_handle<C>::make_handle(entity_id id) const {
+typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot_handle<C>::make_handle(const entity_id id) const {
 	return owner[id];
 }
 
 template <bool C>
-typename basic_inventory_slot_handle<C> basic_inventory_slot_handle<C>::make_handle(inventory_slot_id id) const {
+typename basic_inventory_slot_handle<C> basic_inventory_slot_handle<C>::make_handle(const inventory_slot_id id) const {
 	return owner[id];
 }
 
@@ -98,7 +98,7 @@ bool basic_inventory_slot_handle<C>::is_empty_slot() const {
 }
 
 template <bool C>
-bool basic_inventory_slot_handle<C>::should_item_inside_keep_physical_body(entity_id until_parent) const {
+bool basic_inventory_slot_handle<C>::should_item_inside_keep_physical_body(const entity_id until_parent) const {
 	bool should_item_here_keep_physical_body = get().is_physical_attachment_slot;
 
 	if (get_handle() == until_parent) {
@@ -140,7 +140,7 @@ float basic_inventory_slot_handle<C>::calculate_density_multiplier_due_to_being_
 }
 
 template <bool C>
-components::transform basic_inventory_slot_handle<C>::sum_attachment_offsets_of_parents(entity_id attached_item) const {
+components::transform basic_inventory_slot_handle<C>::sum_attachment_offsets_of_parents(const entity_id attached_item) const {
 	auto attached_item_handle = make_handle(attached_item);
 
 	auto offset = get().attachment_offset;
@@ -193,7 +193,7 @@ unsigned basic_inventory_slot_handle<C>::calculate_free_space_with_parent_contai
 }
 
 template <bool C>
-bool basic_inventory_slot_handle<C>::can_contain(entity_id id) const {
+bool basic_inventory_slot_handle<C>::can_contain(const entity_id id) const {
 	if (dead())
 		return false;
 
