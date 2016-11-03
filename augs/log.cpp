@@ -31,7 +31,7 @@ augs::gui::text::fstr global_log::format_recent_as_text(const assets::font_id f)
 }
 
 void global_log::push_entry(const log_entry new_entry) {
-	//recent_entries.push_back(new_entry);
+	recent_entries.push_back(new_entry);
 
 	if (recent_entries.size() > max_entries)
 		recent_entries.erase(recent_entries.begin());

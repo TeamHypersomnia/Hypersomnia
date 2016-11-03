@@ -54,7 +54,7 @@ void item_button::draw_dragged_ghost_inside(const viewing_gui_context& context, 
 	f.decrease_border_alpha = false;
 	f.draw_container_opened_mark = false;
 	f.draw_charges = false;
-	f.absolute_xy_offset = griddify(context.get_rect_world().current_drag_amount);
+	f.absolute_xy_offset = context.get_rect_world().current_drag_amount;
 
 	draw_proc(context, this_id, in, f);
 }
