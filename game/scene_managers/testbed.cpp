@@ -103,7 +103,7 @@ namespace scene_managers {
 			return world[new_characters[i]];
 		};
 
-		for (int i = 2; i < 3; ++i) {
+		for (int i = 0; i < 1; ++i) {
 			const auto new_character = prefabs::create_character(world, vec2(i * 300 , 0), screen_size, typesafe_sprintf("player%x", i));
 
 			new_characters[i] = new_character;
@@ -143,7 +143,7 @@ namespace scene_managers {
 			name_entity(character(0), entity_name::PERSON, L"Attacker");
 		}
 
-		inject_input_to(character(2));
+		inject_input_to(character(0));
 
 		prefabs::create_sample_suppressor(world, vec2(300, -500));
 
@@ -196,7 +196,7 @@ namespace scene_managers {
 		const auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
 		prefabs::create_sample_backpack(world, vec2(200, -750));
 
-		perform_transfer({ backpack, character(0)[slot_function::SHOULDER_SLOT] }, step);
+		//perform_transfer({ backpack, character(0)[slot_function::SHOULDER_SLOT] }, step);
 		perform_transfer({ submachine, character(0)[slot_function::PRIMARY_HAND] }, step);
 		perform_transfer({ rifle, character(0)[slot_function::SECONDARY_HAND] }, step);
 

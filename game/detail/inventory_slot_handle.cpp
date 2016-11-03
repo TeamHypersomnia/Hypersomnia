@@ -147,8 +147,8 @@ components::transform basic_inventory_slot_handle<C>::sum_attachment_offsets_of_
 
 	auto sticking = get().attachment_sticking_mode;
 
-	offset.pos += attached_item_handle.get<components::fixtures>().get_aabb_size().get_sticking_offset(sticking);
-	offset.pos += get_handle().get<components::fixtures>().get_aabb_size().get_sticking_offset(sticking);
+	offset.pos += attached_item_handle.get<components::fixtures>().get_local_aabb().get_size().get_sticking_offset(sticking);
+	offset.pos += get_handle().get<components::fixtures>().get_local_aabb().get_size().get_sticking_offset(sticking);
 
 	offset += attached_item_handle.get<components::item>().attachment_offsets_per_sticking_mode[sticking];
 

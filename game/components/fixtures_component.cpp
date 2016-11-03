@@ -24,17 +24,12 @@ maybe_const_ref_t<C, colliders_cache>& basic_fixtures_synchronizer<C>::get_cache
 }
 
 template<bool C>
-vec2 basic_fixtures_synchronizer<C>::get_aabb_size() const {
-	return get_aabb_rect().get_size();
-}
-
-template<bool C>
-augs::rects::ltrb<float> basic_fixtures_synchronizer<C>::get_aabb_rect() const {
+augs::rects::ltrb<float> basic_fixtures_synchronizer<C>::get_local_aabb() const {
 	std::vector<vec2> all_verts;
 	
-	for (auto& s : component.colliders) {
-		for (auto& c : s.shape.convex_polys) {
-			for (auto& v : c.vertices) {
+	for (const auto& s : component.colliders) {
+		for (const auto& c : s.shape.convex_polys) {
+			for (const auto v : c.vertices) {
 				all_verts.push_back(v);
 			}
 		}
