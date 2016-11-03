@@ -6,9 +6,12 @@ class location_and_pointer {
 
 	T* ptr = nullptr;
 	location_type location;
+
+	template <class>
+	friend class location_and_pointer;
 public:
 
-	location_and_pointer(T* p = nullptr, const location_type& loc = location_type()) : ptr(p), location(loc) {}
+	location_and_pointer(T* const p = nullptr, const location_type& loc = location_type()) : ptr(p), location(loc) {}
 
 	T* operator->() const {
 		return ptr;
@@ -22,11 +25,11 @@ public:
 		return ptr != nullptr;
 	}
 
-	bool operator==(T* b) const {
-		return ptr == b;
+	bool operator==(const location_and_pointer<const T> b) const {
+		return ptr == b.ptr;
 	}
 
-	bool operator!=(T* b) const {
+	bool operator!=(const location_and_pointer<const T> b) const {
 		return !operator==(b);
 	}
 
