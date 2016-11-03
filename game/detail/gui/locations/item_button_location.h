@@ -15,7 +15,8 @@ public:
 
 	template <class C>
 	bool alive(C context) const {
-		return context.get_step().get_cosmos()[item_id].alive();
+		const auto handle = context.get_step().get_cosmos()[item_id];
+		return handle.alive() && context.get_gui_element_entity() == handle.get_owning_transfer_capability();
 	}
 
 	template <class C>
