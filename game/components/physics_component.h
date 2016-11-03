@@ -23,7 +23,7 @@ namespace components {
 			DYNAMIC
 		};
 
-		physics(components::transform t = components::transform());
+		physics(const components::transform t = components::transform());
 
 		bool fixed_rotation = false;
 		bool bullet = false;
@@ -94,7 +94,6 @@ public:
 	vec2 get_position() const;
 	vec2 get_mass_position() const;
 	vec2 get_world_center() const;
-	vec2 get_aabb_size() const;
 
 	components::physics::type get_body_type() const;
 
@@ -109,21 +108,21 @@ class component_synchronizer<false, components::physics> : public basic_physics_
 public:
 	using basic_physics_synchronizer<false>::basic_physics_synchronizer;
 
-	void set_body_type(components::physics::type) const;
-	void set_activated(bool) const;
-	void set_velocity(vec2) const;
-	void set_angular_velocity(float) const;
+	void set_body_type(const components::physics::type) const;
+	void set_activated(const bool) const;
+	void set_velocity(const vec2) const;
+	void set_angular_velocity(const float) const;
 	void set_transform(const components::transform&) const;
-	void set_transform(entity_id) const;
-	void set_angular_damping(float) const;
-	void set_linear_damping(float) const;
-	void set_linear_damping_vec(vec2) const;
+	void set_transform(const entity_id) const;
+	void set_angular_damping(const float) const;
+	void set_linear_damping(const float) const;
+	void set_linear_damping_vec(const vec2) const;
 
-	void apply_force(vec2) const;
-	void apply_force(vec2, vec2 center_offset, bool wake = true) const;
-	void apply_impulse(vec2) const;
-	void apply_impulse(vec2, vec2 center_offset, bool wake = true) const;
-	void apply_angular_impulse(float) const;
+	void apply_force(const vec2) const;
+	void apply_force(const vec2, const vec2 center_offset, const bool wake = true) const;
+	void apply_impulse(const vec2) const;
+	void apply_impulse(const vec2, const vec2 center_offset, const bool wake = true) const;
+	void apply_angular_impulse(const float) const;
 };
 
 template<>
