@@ -96,12 +96,17 @@ namespace scene_managers {
 
 		const int num_characters = 6;
 
-		std::vector<entity_handle> new_characters;
+		std::vector<entity_id> new_characters;
+		new_characters.resize(num_characters);
 
-		for (int i = 0; i < num_characters; ++i) {
+		auto character = [&](const size_t i){
+			return world[new_characters[i]];
+		};
+
+		for (int i = 2; i < 3; ++i) {
 			const auto new_character = prefabs::create_character(world, vec2(i * 300 , 0), screen_size, typesafe_sprintf("player%x", i));
 
-			new_characters.push_back(new_character);
+			new_characters[i] = new_character;
 
 			if (i == 0) {
 				new_character.get<components::sentience>().health.value = 100;
@@ -134,9 +139,11 @@ namespace scene_managers {
 			}
 		}
 
-		name_entity(new_characters[0], entity_name::PERSON, L"Attacker");
+		if (character(0).alive()) {
+			name_entity(character(0), entity_name::PERSON, L"Attacker");
+		}
 
-		inject_input_to(new_characters[0]);
+		inject_input_to(character(2));
 
 		prefabs::create_sample_suppressor(world, vec2(300, -500));
 
@@ -189,30 +196,30 @@ namespace scene_managers {
 		const auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
 		prefabs::create_sample_backpack(world, vec2(200, -750));
 
-		perform_transfer({ backpack, new_characters[0][slot_function::SHOULDER_SLOT] }, step);
-		perform_transfer({ submachine, new_characters[0][slot_function::PRIMARY_HAND] }, step);
-		perform_transfer({ rifle, new_characters[0][slot_function::SECONDARY_HAND] }, step);
+		perform_transfer({ backpack, character(0)[slot_function::SHOULDER_SLOT] }, step);
+		perform_transfer({ submachine, character(0)[slot_function::PRIMARY_HAND] }, step);
+		perform_transfer({ rifle, character(0)[slot_function::SECONDARY_HAND] }, step);
 
-		if (num_characters > 1) {
-			name_entity(new_characters[1], entity_name::PERSON, L"Enemy");
-			perform_transfer({ rifle2, new_characters[1][slot_function::PRIMARY_HAND] }, step);
+		if (character(1).alive()) {
+			name_entity(character(1), entity_name::PERSON, L"Enemy");
+			perform_transfer({ rifle2, character(1)[slot_function::PRIMARY_HAND] }, step);
 		}
 
-		if (num_characters > 2) {
-			name_entity(new_characters[2], entity_name::PERSON, L"Swordsman");
-			perform_transfer({ second_machete, new_characters[2][slot_function::PRIMARY_HAND] }, step);
+		if (character(2).alive()) {
+			name_entity(character(2), entity_name::PERSON, L"Swordsman");
+			perform_transfer({ second_machete, character(2)[slot_function::PRIMARY_HAND] }, step);
 		}
 
-		if (num_characters > 3) {
-			name_entity(new_characters[3], entity_name::PERSON, L"Medic");
-			perform_transfer({ pis2, new_characters[3][slot_function::PRIMARY_HAND] }, step);
+		if (character(3).alive()) {
+			name_entity(character(3), entity_name::PERSON, L"Medic");
+			perform_transfer({ pis2, character(3)[slot_function::PRIMARY_HAND] }, step);
 		}
 
-		if (num_characters > 5) {
+		if (character(5).alive()) {
 			const auto new_item = prefabs::create_submachine(step, vec2(0, -1000),
 				prefabs::create_sample_magazine(step, vec2(100 - 50, -650), true ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), true ? 500 : 50)));
 
-			perform_transfer({ new_item, new_characters[5][slot_function::PRIMARY_HAND] }, step);
+			perform_transfer({ new_item, character(5)[slot_function::PRIMARY_HAND] }, step);
 		}
 
 		//draw_bodies.push_back(crate2);
@@ -228,8 +235,7 @@ namespace scene_managers {
 
 		world.significant.meta.settings.enable_interpolation = true;
 
-		const auto& id_vector = to_id_vector(new_characters);
-		characters.assign(id_vector.begin(), id_vector.end());
+		characters.assign(new_characters.begin(), new_characters.end());
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 	}
 
