@@ -37,7 +37,7 @@ public:
 	}
 
 	rects::ltrb<float> get_absolute_clipped_rect() const {
-		return rc;
+		return get_absolute_rect();
 	}
 
 	vec2 get_absolute_pos() const {

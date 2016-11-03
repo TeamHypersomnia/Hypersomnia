@@ -107,12 +107,14 @@ void gui_system::advance_gui_elements(logic_step& step) {
 							}
 						}
 			
-						if (!fetched)
+						if (!fetched) {
 							element.rect_world.consume_raw_input_and_generate_gui_events(context, root_location, e.event_for_gui);
+						}
 					}
 				}
 			}
-
+			
+			element.rect_world.perform_logic_step(context, root_location);
 			rect_world.call_idle_mousemotion_updater(context, root_location);
 		}
 	}
