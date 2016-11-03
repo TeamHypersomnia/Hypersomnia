@@ -6,6 +6,7 @@
 #include "game/components/fixtures_component.h"
 #include "game/components/physics_component.h"
 #include "game/components/special_physics_component.h"
+#include "game/components/interpolation_component.h"
 #include "game/components/item_slot_transfers_component.h"
 #include "game/detail/entity_scripts.h"
 #include "game/messages/queue_destruction.h"
@@ -329,6 +330,10 @@ void perform_transfer(item_slot_transfer_request r, logic_step& step) {
 			
 			if (descendant.has<components::physics>()) {
 				descendant.get<components::physics>().set_transform(previous_container_transform);
+
+				if (descendant.has<components::interpolation>()) {
+					descendant.get<components::interpolation>().write_current_to_interpolated();
+				}
 			}
 		};
 
