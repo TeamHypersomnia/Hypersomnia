@@ -268,7 +268,7 @@ void perform_transfer(item_slot_transfer_request r, logic_step& step) {
 
 		if (cosmos[target_item_to_stack_with].alive()) {
 			if (whole_item_grabbed) {
-				step.messages.post(messages::queue_destruction(r.get_item()));
+				step.transient.messages.post(messages::queue_destruction(r.get_item()));
 			}
 			else {
 				item.charges -= result.transferred_charges;

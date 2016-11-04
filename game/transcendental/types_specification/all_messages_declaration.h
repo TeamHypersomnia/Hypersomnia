@@ -20,6 +20,10 @@ namespace messages {
 	struct new_entity_message;
 	struct melee_swing_response;
 	struct health_event;
+	struct visibility_information_request;
+	struct visibility_information_response;
+	struct line_of_sight_request;
+	struct line_of_sight_response;
 }
 
 typedef augs::storage_for_message_queues <
@@ -37,5 +41,9 @@ typedef augs::storage_for_message_queues <
 	messages::trigger_hit_request_message,
 	messages::new_entity_message,
 	messages::melee_swing_response,
-	messages::health_event
+	messages::health_event,
+	messages::visibility_information_request,
+	messages::visibility_information_response,
+	messages::line_of_sight_request,
+	messages::line_of_sight_response
 > storage_for_all_message_queues;

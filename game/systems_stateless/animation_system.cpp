@@ -21,8 +21,8 @@ using namespace resources;
 void animation_system::game_responses_to_animation_messages(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
-	const auto& movements = step.messages.get_queue<movement_response>();
-	const auto& gunshots = step.messages.get_queue<gunshot_response>();
+	const auto& movements = step.transient.messages.get_queue<movement_response>();
+	const auto& gunshots = step.transient.messages.get_queue<gunshot_response>();
 
 	for (auto it : movements) {
 		animation_message msg;
@@ -42,7 +42,7 @@ void animation_system::game_responses_to_animation_messages(logic_step& step) {
 		msg.set_animation = (*(cosmos[it.subject].get<components::animation_response>().response))[animation_response_type::MOVE];
 		msg.speed_factor = it.speed;
 
-		step.messages.post(msg);
+		step.transient.messages.post(msg);
 	}
 
 	for (auto it : gunshots) {
@@ -56,14 +56,14 @@ void animation_system::game_responses_to_animation_messages(logic_step& step) {
 		// msg.animation_priority = 1;
 		// msg.set_animation = (*(it.subject.get<components::animation_response>().response))[animation_response_type::SHOT];
 		// 
-		// step.messages.post(msg);
+		// step.transient.messages.post(msg);
 	}
 }
 
 void animation_system::handle_animation_messages(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
-	const auto& events = step.messages.get_queue<animation_message>();
+	const auto& events = step.transient.messages.get_queue<animation_message>();
 
 	for (auto it : events) {
 		auto ptr = cosmos[it.subject].find<components::animation>();
@@ -126,7 +126,7 @@ void animation_system::handle_animation_messages(logic_step& step) {
 		}
 	}
 
-	step.messages.get_queue<animation_message>().clear();
+	step.transient.messages.get_queue<animation_message>().clear();
 }
 
 void components::animation::set_current_frame(unsigned number) {

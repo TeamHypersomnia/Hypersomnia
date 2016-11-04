@@ -30,6 +30,7 @@
 #include "game/transcendental/cosmic_profiler.h"
 
 class cosmic_delta;
+struct data_living_one_step;
 
 class cosmos : 
 	private put_all_components_into<augs::operations_on_all_components_mixin, cosmos>::type, 
@@ -106,7 +107,7 @@ public:
 
 	template<class Pre, class Post>
 	void advance_deterministic_schemata(const cosmic_entropy& input, Pre pre_solve, Post post_solve) {
-		storage_for_all_message_queues queues;
+		data_living_one_step queues;
 		logic_step step(*this, input, queues);
 
 		pre_solve(step);

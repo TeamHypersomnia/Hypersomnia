@@ -32,7 +32,7 @@ void input_system::make_intent_messages(logic_step& step) {
 				messages::intent_message intent;
 				intent.key_and_mouse_intent::operator=(raw);
 				intent.subject = per_entity.first;
-				step.messages.post(intent);
+				step.transient.messages.post(intent);
 			}
 		}
 	}

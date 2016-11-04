@@ -26,7 +26,7 @@
 void driver_system::assign_drivers_from_successful_trigger_hits(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
-	const auto& confirmations = step.messages.get_queue<messages::trigger_hit_confirmation_message>();
+	const auto& confirmations = step.transient.messages.get_queue<messages::trigger_hit_confirmation_message>();
 
 	for (const auto& e : confirmations) {
 		const auto& subject_car = cosmos[cosmos[e.trigger].get<components::trigger>().entity_to_be_notified];
@@ -44,7 +44,7 @@ void driver_system::assign_drivers_from_successful_trigger_hits(logic_step& step
 void driver_system::release_drivers_due_to_ending_contact_with_wheel(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
-	const auto& contacts = step.messages.get_queue<messages::collision_message>();
+	const auto& contacts = step.transient.messages.get_queue<messages::collision_message>();
 	const auto& physics = cosmos.systems_temporary.get<physics_system>();
 
 	for (const auto& c : contacts) {
@@ -66,7 +66,7 @@ void driver_system::release_drivers_due_to_ending_contact_with_wheel(logic_step&
 void driver_system::release_drivers_due_to_requests(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
-	const auto& intents = step.messages.get_queue<messages::intent_message>();
+	const auto& intents = step.transient.messages.get_queue<messages::intent_message>();
 
 	for (const auto& e : intents)
 		if (e.intent == intent_type::RELEASE_CAR && e.pressed_flag)

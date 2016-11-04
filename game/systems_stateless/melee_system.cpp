@@ -29,7 +29,7 @@ void components::melee::reset_weapon(entity_handle e) {
 void melee_system::consume_melee_intents(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
-	const auto& events = step.messages.get_queue<messages::intent_message>();
+	const auto& events = step.transient.messages.get_queue<messages::intent_message>();
 
 
 	for (const auto& it : events) {
@@ -70,7 +70,7 @@ void melee_system::initiate_and_update_moves(logic_step& step) {
 	const auto dt = static_cast<float>(delta.in_milliseconds());
 
 	/* clear melee swing response queue because this is the only place where we send them */
-	step.messages.get_queue<messages::melee_swing_response>().clear();
+	step.transient.messages.get_queue<messages::melee_swing_response>().clear();
 
 	/* all entities in the "targets" vector are guaranteed to have both melee and damage components
 		therefore we use get instead of find
@@ -185,10 +185,10 @@ melee_state melee_system::primary_action(logic_step& step, const double dt_d, co
 
 	response.subject = target;
 	response.origin_transform = target.logic_transform();
-	step.messages.post(response);
+	step.transient.messages.post(response);
 
 	//pos_response.new_definition = new_definition;
-	//step.messages.post(pos_response);
+	//step.transient.messages.post(pos_response);
 
 	return melee_state::PRIMARY;
 }

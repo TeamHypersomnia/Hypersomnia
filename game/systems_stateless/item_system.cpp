@@ -43,7 +43,7 @@ using namespace augs;
 void item_system::handle_trigger_confirmations_as_pick_requests(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
-	const auto& confirmations = step.messages.get_queue<messages::trigger_hit_confirmation_message>();
+	const auto& confirmations = step.transient.messages.get_queue<messages::trigger_hit_confirmation_message>();
 
 	for (const auto& e : confirmations) {
 		const auto detector = cosmos[e.detector_body];
@@ -79,7 +79,7 @@ void item_system::handle_trigger_confirmations_as_pick_requests(logic_step& step
 void item_system::handle_throw_item_intents(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
-	const auto& requests = step.messages.get_queue<messages::intent_message>();
+	const auto& requests = step.transient.messages.get_queue<messages::intent_message>();
 
 	for (const auto& r : requests) {
 		if (r.pressed_flag &&
@@ -102,7 +102,7 @@ void item_system::handle_throw_item_intents(logic_step& step) {
 void item_system::handle_holster_item_intents(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
-	const auto& requests = step.messages.get_queue<messages::intent_message>();
+	const auto& requests = step.transient.messages.get_queue<messages::intent_message>();
 
 	for (const auto& r : requests) {
 		if (r.pressed_flag &&

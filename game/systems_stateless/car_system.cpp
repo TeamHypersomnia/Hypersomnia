@@ -19,7 +19,7 @@
 void car_system::set_steering_flags_from_intents(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
-	const auto& intents = step.messages.get_queue<messages::intent_message>();
+	const auto& intents = step.transient.messages.get_queue<messages::intent_message>();
 
 	for (auto& it : intents) {
 		auto* maybe_car = cosmos[it.subject].find<components::car>();

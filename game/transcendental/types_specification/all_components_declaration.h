@@ -21,7 +21,6 @@ namespace components {
 	struct physics;
 	struct render;
 	struct transform;
-	struct visibility;
 	struct sprite;
 	struct polygon;
 	//struct tile_layer;
@@ -71,7 +70,6 @@ struct put_all_components_into {
 		components::physics,
 		components::render,
 		components::transform,
-		//components::visibility,
 		components::sprite,
 		components::polygon,
 		//components::tile_layer,
@@ -110,7 +108,6 @@ namespace std {
 
 typedef std::tuple<
 	components::particle_group,
-	components::visibility,
 	components::pathfinding
 > disabled_components;
 

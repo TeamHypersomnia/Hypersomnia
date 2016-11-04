@@ -42,6 +42,7 @@
 #include "game/transcendental/types_specification/all_component_includes.h"
 
 #include "game/transcendental/cosmic_delta.h"
+#include "game/transcendental/data_living_one_step.h"
 
 #include <sstream>
 
@@ -400,8 +401,8 @@ void cosmos::integrate_interpolated_transforms(const float seconds) const {
 }
 
 void cosmos::advance_deterministic_schemata(const cosmic_entropy& input) {
-	storage_for_all_message_queues queues;
-	logic_step step(*this, input, queues);
+	data_living_one_step transient;
+	logic_step step(*this, input, transient);
 
 	advance_deterministic_schemata(step);
 }
@@ -484,7 +485,7 @@ void cosmos::advance_deterministic_schemata(logic_step& step) {
 	// gui_system().translate_game_events_for_hud(step);
 
 	performance.start(meter_type::VISIBILITY);
-	visibility_system().generate_visibility_and_sight_information(step.cosm);
+	visibility_system().respond_to_visibility_information_requests(step);
 	performance.stop(meter_type::VISIBILITY);
 
 	performance.start(meter_type::AI);
@@ -492,7 +493,7 @@ void cosmos::advance_deterministic_schemata(logic_step& step) {
 	performance.stop(meter_type::AI);
 
 	performance.start(meter_type::PATHFINDING);
-	pathfinding_system().advance_pathfinding_sessions(step.cosm);
+	pathfinding_system().advance_pathfinding_sessions(step);
 	performance.stop(meter_type::PATHFINDING);
 
 	performance.start(meter_type::GUI);
@@ -508,7 +509,7 @@ void cosmos::advance_deterministic_schemata(logic_step& step) {
 
 	trace_system().spawn_finishing_traces_for_destroyed_objects(step);
 
-	const bool has_no_destruction_callback_queued_any_additional_destruction = step.messages.get_queue<messages::queue_destruction>().empty();
+	const bool has_no_destruction_callback_queued_any_additional_destruction = step.transient.messages.get_queue<messages::queue_destruction>().empty();
 	ensure(has_no_destruction_callback_queued_any_additional_destruction);
 
 	listener.~contact_listener();

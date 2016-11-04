@@ -2,7 +2,6 @@
 #include "game/components/dynamic_tree_node_component.h"
 #include "game/components/special_physics_component.h"
 #include "game/components/behaviour_tree_component.h"
-#include "game/components/visibility_component.h"
 #include "game/components/pathfinding_component.h"
 #include "game/components/animation_response_component.h"
 #include "game/components/animation_component.h"

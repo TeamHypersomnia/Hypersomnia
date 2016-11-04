@@ -25,7 +25,7 @@
 #include "game/detail/gui/gui_element_tree.h"
 
 void gui_system::switch_to_gui_mode_and_back(logic_step& step) {
-	const auto& intents = step.messages.get_queue<messages::intent_message>();
+	const auto& intents = step.transient.messages.get_queue<messages::intent_message>();
 	auto& cosmos = step.cosm;
 
 	for (const auto& i : intents) {

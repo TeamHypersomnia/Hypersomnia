@@ -1,6 +1,8 @@
 #pragma once
 #include "augs/math/vec2.h"
 #include "game/transcendental/entity_id.h"
+#include "3rdparty/Box2D/Dynamics/b2Fixture.h"
+#include "augs/padding_byte.h"
 
 class pathfinding_system;
 
@@ -63,12 +65,6 @@ namespace components {
 			}
 		};
 
-		bool enable_backtracking = true;
-
-		/* only in the context of exploration 
-		will pick vertices that are the most parallell with the velocity
-		*/
-		bool favor_velocity_parallellness = false;
 
 		float target_offset = 0.f;
 		float rotate_navpoints = 0.f;
@@ -86,6 +82,15 @@ namespace components {
 
 		bool is_exploring = false;
 		std::vector <pathfinding_session> session_stack;
+
+		b2Filter filter;
+
+		bool enable_backtracking = true;
+
+		/* only in the context of exploration
+		will pick vertices that are the most parallell with the velocity
+		*/
+		bool favor_velocity_parallellness = false;
 
 		template <class Archive>
 		void serialize(Archive& ar) {

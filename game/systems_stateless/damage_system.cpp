@@ -26,8 +26,8 @@ using namespace augs;
 void damage_system::destroy_colliding_bullets_and_send_damage(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
-	const auto& events = step.messages.get_queue<messages::collision_message>();
-	step.messages.get_queue<messages::damage_message>().clear();
+	const auto& events = step.transient.messages.get_queue<messages::collision_message>();
+	step.transient.messages.get_queue<messages::damage_message>().clear();
 
 	for (const auto& it : events) {
 		if (it.type != messages::collision_message::event_type::BEGIN_CONTACT || it.one_is_sensor) 
@@ -74,7 +74,7 @@ void damage_system::destroy_colliding_bullets_and_send_damage(logic_step& step) 
 				damage_msg.amount = damage.amount;
 				damage_msg.impact_velocity = impact_velocity;
 				damage_msg.point_of_impact = it.point;
-				step.messages.post(damage_msg);
+				step.transient.messages.post(damage_msg);
 
 				damage.saved_point_of_impact_before_death = it.point;
 
@@ -87,7 +87,7 @@ void damage_system::destroy_colliding_bullets_and_send_damage(logic_step& step) 
 
 					// delete only once
 					if (damage.damage_charges_before_destruction == 0)
-						step.messages.post(messages::queue_destruction(it.collider));
+						step.transient.messages.post(messages::queue_destruction(it.collider));
 				}
 			}
 		}
@@ -104,7 +104,7 @@ void damage_system::destroy_outdated_bullets(logic_step& step) {
 		if ((damage.constrain_lifetime && damage.lifetime_ms >= damage.max_lifetime_ms) ||
 			(damage.constrain_distance && damage.distance_travelled >= damage.max_distance)) {
 			damage.saved_point_of_impact_before_death = position(it);
-			step.messages.post(messages::queue_destruction(it));
+			step.transient.messages.post(messages::queue_destruction(it));
 		}
 
 		if (damage.constrain_distance)

@@ -23,7 +23,7 @@
 #include "game/transcendental/step.h"
 
 void trigger_detector_system::consume_trigger_detector_presses(logic_step& step) const {
-	const auto& trigger_presses = step.messages.get_queue<messages::intent_message>();
+	const auto& trigger_presses = step.transient.messages.get_queue<messages::intent_message>();
 	auto& cosmos = step.cosm;
 
 	for (const auto& e : trigger_presses) {
@@ -50,7 +50,7 @@ void trigger_detector_system::consume_trigger_detector_presses(logic_step& step)
 
 					messages::trigger_hit_request_message request;
 					request.detector = e.subject;
-					step.messages.post(request);
+					step.transient.messages.post(request);
 				}
 			}
 		}
@@ -76,17 +76,17 @@ void trigger_detector_system::post_trigger_requests_from_continuous_detectors(lo
 		else {
 			messages::trigger_hit_request_message request;
 			request.detector = t;
-			step.messages.post(request);
+			step.transient.messages.post(request);
 		}
 	}
 }
 
 void trigger_detector_system::send_trigger_confirmations(logic_step& step) const {
-	auto& confirmations = step.messages.get_queue<messages::trigger_hit_confirmation_message>();
+	auto& confirmations = step.transient.messages.get_queue<messages::trigger_hit_confirmation_message>();
 	confirmations.clear();
 
 	auto& cosmos = step.cosm;
-	const auto& collisions = step.messages.get_queue<messages::collision_message>();
+	const auto& collisions = step.transient.messages.get_queue<messages::collision_message>();
 
 	for (const auto& c : collisions) {
 		if (c.type != messages::collision_message::event_type::PRE_SOLVE)
@@ -100,11 +100,11 @@ void trigger_detector_system::send_trigger_confirmations(logic_step& step) const
 			messages::trigger_hit_confirmation_message confirmation;
 			confirmation.detector_body = c.subject;
 			confirmation.trigger = c.collider;
-			step.messages.post(confirmation);
+			step.transient.messages.post(confirmation);
 		}
 	}
 
-	auto& requests = step.messages.get_queue<messages::trigger_hit_request_message>();
+	auto& requests = step.transient.messages.get_queue<messages::trigger_hit_request_message>();
 
 	for (auto& e : requests) {
 		auto& trigger_query_detector = cosmos[e.detector].get<components::trigger_query_detector>();
@@ -128,7 +128,7 @@ void trigger_detector_system::send_trigger_confirmations(logic_step& step) const
 			confirmation.trigger = t;
 			confirmation.detector_body = detector_body;
 			trigger_query_detector.detection_intent_enabled = false;
-			step.messages.post(confirmation);
+			step.transient.messages.post(confirmation);
 			break;
 		}
 	}

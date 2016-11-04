@@ -69,9 +69,6 @@ P P::get_default(const const_entity_handle& id) {
 	if (id.has<components::trigger_query_detector>()) {
 		matching.push_back(processing_subjects::WITH_TRIGGER_QUERY_DETECTOR);
 	}
-	if (id.has<components::visibility>()) {
-		matching.push_back(processing_subjects::WITH_VISIBILITY);
-	}
 	if (id.get_flag(entity_flag::IS_PAST_CONTAGIOUS)) {
 		matching.push_back(processing_subjects::WITH_PAST_CONTAGIOUS);
 	}

@@ -4,7 +4,7 @@
 #include <tuple>
 #include "renderer.h"
 
-#include "game/components/visibility_component.h"
+#include "game/messages/visibility_information.h"
 #include "game/components/physics_component.h"
 
 #include "game/transcendental/entity_handle.h"
@@ -194,45 +194,45 @@ namespace augs {
 
 		if (draw_visibility) {
 			for (auto it : target_entities) {
-				auto* visibility = it.find<components::visibility>();
-				if (visibility) {
-					for (auto& entry : visibility->full_visibility_layers) {
-						/* shortcut */
-						auto& request = entry.second;
-						
-						auto origin = it.logic_transform().pos;
-
-						for (size_t i = 0; i < request.get_num_triangles(); ++i) {
-							auto tri = request.get_triangle(i, origin);
-
-							for (auto& p : tri.points) {
-								p -= origin;
-
-								float expansion = 0.f;
-								float distance_from_subject = (p - origin).length();
-
-								expansion = (distance_from_subject / max_visibility_expansion_distance) * visibility_expansion;
-
-								p *= std::min(visibility_expansion, expansion);
-							}
-
-							vertex_triangle verts;
-
-							for (int i = 0; i < 3; ++i) {
-
-								auto pos = tri.points[i] - camera_transform.pos + center + origin;
-
-								pos.rotate(camera_transform.rotation, center);
-								
-								vertex new_vertex;
-								new_vertex.texcoord.set(tex.get_u(i), tex.get_v(i));
-								new_vertex.pos = pos;
-								new_vertex.color = request.color;
-								verts.vertices[i] = new_vertex;
-							}
-						}
-					}
-				}
+				//auto* visibility = it.find<components::visibility>();
+				//if (visibility) {
+				//	for (auto& entry : visibility->full_visibility_layers) {
+				//		/* shortcut */
+				//		auto& request = entry.second;
+				//		
+				//		auto origin = it.logic_transform().pos;
+				//
+				//		for (size_t i = 0; i < request.get_num_triangles(); ++i) {
+				//			auto tri = request.get_triangle(i, origin);
+				//
+				//			for (auto& p : tri.points) {
+				//				p -= origin;
+				//
+				//				float expansion = 0.f;
+				//				float distance_from_subject = (p - origin).length();
+				//
+				//				expansion = (distance_from_subject / max_visibility_expansion_distance) * visibility_expansion;
+				//
+				//				p *= std::min(visibility_expansion, expansion);
+				//			}
+				//
+				//			vertex_triangle verts;
+				//
+				//			for (int i = 0; i < 3; ++i) {
+				//
+				//				auto pos = tri.points[i] - camera_transform.pos + center + origin;
+				//
+				//				pos.rotate(camera_transform.rotation, center);
+				//				
+				//				vertex new_vertex;
+				//				new_vertex.texcoord.set(tex.get_u(i), tex.get_v(i));
+				//				new_vertex.pos = pos;
+				//				new_vertex.color = request.color;
+				//				verts.vertices[i] = new_vertex;
+				//			}
+				//		}
+				//	}
+				//}
 			}
 		}
 

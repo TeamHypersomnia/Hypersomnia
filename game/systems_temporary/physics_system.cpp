@@ -225,7 +225,7 @@ b2world(new b2World(b2Vec2(0.f, 0.f))), ray_casts_since_last_step(0) {
 }
 
 void physics_system::post_and_clear_accumulated_collision_messages(logic_step& step) {
-	step.messages.post(accumulated_messages);
+	step.transient.messages.post(accumulated_messages);
 	accumulated_messages.clear();
 }
 

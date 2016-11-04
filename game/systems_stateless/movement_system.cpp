@@ -18,7 +18,7 @@ using namespace augs;
 void movement_system::set_movement_flags_from_input(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
-	const auto& events = step.messages.get_queue<messages::intent_message>();
+	const auto& events = step.transient.messages.get_queue<messages::intent_message>();
 
 	for (const auto& it : events) {
 		auto* const movement = cosmos[it.subject].find<components::movement>();
@@ -109,7 +109,7 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 void movement_system::generate_movement_responses(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
-	step.messages.get_queue<messages::movement_response>().clear();
+	step.transient.messages.get_queue<messages::movement_response>().clear();
 
 	for (const auto& it : cosmos.get(processing_subjects::WITH_MOVEMENT)) {
 		const auto& movement = it.get<components::movement>();
@@ -131,7 +131,7 @@ void movement_system::generate_movement_responses(logic_step& step) {
 			messages::movement_response copy(msg);
 			copy.stop_response_at_zero_speed = receiver.stop_response_at_zero_speed;
 			copy.subject = receiver.target;
-			step.messages.post(copy);
+			step.transient.messages.post(copy);
 		}
 	}
 }

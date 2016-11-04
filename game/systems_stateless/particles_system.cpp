@@ -34,10 +34,10 @@ entity_id particles_system::create_refreshable_particle_group(logic_step& step) 
 }
 
 void particles_system::game_responses_to_particle_effects(logic_step& step) const {
-	const auto& gunshots = step.messages.get_queue<messages::gunshot_response>();
-	const auto& damages = step.messages.get_queue<messages::damage_message>();
-	const auto& swings = step.messages.get_queue<messages::melee_swing_response>();
-	const auto& healths = step.messages.get_queue<messages::health_event>();
+	const auto& gunshots = step.transient.messages.get_queue<messages::gunshot_response>();
+	const auto& damages = step.transient.messages.get_queue<messages::damage_message>();
+	const auto& swings = step.transient.messages.get_queue<messages::melee_swing_response>();
+	const auto& healths = step.transient.messages.get_queue<messages::health_event>();
 	auto& cosmos = step.cosm;
 
 	for (const auto& g : gunshots) {
@@ -51,7 +51,7 @@ void particles_system::game_responses_to_particle_effects(logic_step& step) cons
 			burst.effect = round_response_map.at(particle_effect_response_type::BARREL_LEAVE_EXPLOSION);
 			burst.modifier = round_response.modifier;
 
-			step.messages.post(burst);
+			step.transient.messages.post(burst);
 
 			burst.transform.reset();
 			burst.transform.rotation = 180;
@@ -60,7 +60,7 @@ void particles_system::game_responses_to_particle_effects(logic_step& step) cons
 			burst.modifier = round_response.modifier;
 			burst.local_transform = true;
 
-			step.messages.post(burst);
+			step.transient.messages.post(burst);
 		}
 
 		for (const auto& s : g.spawned_shells) {
@@ -75,13 +75,13 @@ void particles_system::game_responses_to_particle_effects(logic_step& step) cons
 			burst.modifier = shell_response.modifier;
 			burst.local_transform = true;
 
-			step.messages.post(burst);
+			step.transient.messages.post(burst);
 		}
 		//
 		//if (g.subject.has(sub_entity_name::BARREL_SMOKE))
 		//	burst.target_group_to_refresh = g.subject[sub_entity_name::BARREL_SMOKE];
 		//
-		//step.messages.post(burst);
+		//step.transient.messages.post(burst);
 	}
 
 	for (const auto& d : damages) {
@@ -100,7 +100,7 @@ void particles_system::game_responses_to_particle_effects(logic_step& step) cons
 		burst.effect = response_map.at(particle_effect_response_type::DESTRUCTION_EXPLOSION);
 		burst.modifier = response.modifier;
 
-		step.messages.post(burst);
+		step.transient.messages.post(burst);
 	}
 
 	for (const auto& h : healths) {
@@ -118,13 +118,13 @@ void particles_system::game_responses_to_particle_effects(logic_step& step) cons
 			if (h.effective_amount > 0) {
 				burst.effect = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
 				burst.modifier.scale_amounts += h.ratio_effective_to_maximum;
-				step.messages.post(burst);
+				step.transient.messages.post(burst);
 			}
 			else {
 				// burst.effect = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
 				// burst.modifier.scale_amounts += h.ratio_effective_to_maximum;
 				// burst.modifier.colorize = green;
-				// step.messages.post(burst);
+				// step.transient.messages.post(burst);
 			}
 		}
 	}
@@ -139,7 +139,7 @@ void particles_system::game_responses_to_particle_effects(logic_step& step) cons
 		burst.effect = response_map.at(particle_effect_response_type::PARTICLES_WHILE_SWINGING);
 		burst.modifier = response.modifier;
 
-		step.messages.post(burst);
+		step.transient.messages.post(burst);
 	}
 }
 
@@ -148,7 +148,7 @@ void particles_system::create_particle_effects(logic_step& step) const {
 	using namespace messages;
 
 	auto& cosmos = step.cosm;
-	auto& events = step.messages.get_queue<create_particle_effect>();
+	auto& events = step.transient.messages.get_queue<create_particle_effect>();
 
 	for (auto& it : events) {
 		auto emissions = *it.effect;
@@ -333,7 +333,7 @@ void particles_system::destroy_dead_streams(logic_step& step) const {
 		const auto& slots = group.stream_slots;
 
 		if (slots.empty()) {
-			step.messages.post(messages::queue_destruction(it));
+			step.transient.messages.post(messages::queue_destruction(it));
 		}
 	}
 }

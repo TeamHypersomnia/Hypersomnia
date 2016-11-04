@@ -2,18 +2,21 @@
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_id.h"
+#include "game/transcendental/step.h"
 
 #include "game/systems_temporary/physics_system.h"
 
 #include "game/components/pathfinding_component.h"
-#include "game/components/visibility_component.h"
+#include "game/messages/visibility_information.h"
 
 #include "augs/graphics/renderer.h"
 #include "game/enums/processing_subjects.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/detail/physics_scripts.h"
+#include "game/messages/visibility_information.h"
 
-void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
+void pathfinding_system::advance_pathfinding_sessions(logic_step& step) {
+	auto& cosmos = step.cosm;
 	const auto& settings = cosmos.significant.meta.settings.pathfinding;
 
 	/* prepare epsilons to be used later, just to make the notation more clear */
@@ -27,7 +30,6 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 
 	for (const auto& it : cosmos.get(processing_subjects::WITH_PATHFINDING)) {
 		/* get necessary components */
-		auto& visibility = it.get<components::visibility>();
 		auto& pathfinding = it.get<components::pathfinding>();
 		const auto& transform = it.logic_transform() + pathfinding.eye_offset;
 		auto& body = it.get<components::physics>();
@@ -39,7 +41,7 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 		/* check if we request pathfinding at the moment */
 		if (!pathfinding.session_stack.empty()) {
 			/* get visibility information */
-			auto& vision = visibility.full_visibility_layers[components::visibility::DYNAMIC_PATHFINDING];
+			auto& vision = step.transient.calculated_visibility[it];
 			
 			std::vector<components::pathfinding::pathfinding_session::navigation_vertex> undiscovered_visible;
 
@@ -47,7 +49,7 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 			if (!vision.edges.empty() && !vision.discontinuities.empty()) {
 				if (pathfinding.force_touch_sensors) {
 					for (auto& vertex_hit : vision.vertex_hits) {
-						components::visibility::discontinuity new_discontinuity;
+						messages::visibility_information_response::discontinuity new_discontinuity;
 						new_discontinuity.edge_index = vertex_hit.first;
 						new_discontinuity.points.first = vertex_hit.second;
 						new_discontinuity.is_boundary = false;
@@ -161,10 +163,10 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 								sensor_direction * 10 + vert.location + sensor_direction.perpendicular_cw() * 4
 							};
 
-							auto out = physics.query_polygon(sensor_polygon, vision.filter, it);
+							auto out = physics.query_polygon(sensor_polygon, pathfinding.filter, it);
 
 							if (out.bodies.empty()) {
-								vert.sensor = physics.push_away_from_walls(vert.sensor, pathfinding.target_offset, 50, vision.filter, it);
+								vert.sensor = physics.push_away_from_walls(vert.sensor, pathfinding.target_offset, 50, pathfinding.filter, it);
 								pathfinding.session().undiscovered_vertices.push_back(vert);
 							}
 						}
@@ -251,7 +253,7 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 						continue;
 
 					if (body.test_point((*old_session).target) ||
-						is_point_visible(transform.pos, (*old_session).target, vision.filter)) {
+						is_point_visible(transform.pos, (*old_session).target, pathfinding.filter)) {
 							/* if there is, roll back to this session */
 							pathfinding.session() = (*old_session);
 							
@@ -276,7 +278,7 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 				}
 
 				/* check if there's a line of sight */
-				if (is_point_visible(transform.pos, pathfinding.session().target, vision.filter)) {
+				if (is_point_visible(transform.pos, pathfinding.session().target, pathfinding.filter)) {
 					/* if there is, navigate directly to target */
 
 					pathfinding.session().discovered_vertices.clear();
@@ -419,8 +421,8 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 
 				for (auto& subject_vert : subject_verts) {
 					if (
-						//is_point_visible(subject_vert, current_target.location, vision.filter) ||
-						is_point_visible(subject_vert, current_target.sensor, vision.filter)
+						//is_point_visible(subject_vert, current_target.location, pathfinding.filter) ||
+						is_point_visible(subject_vert, current_target.sensor, pathfinding.filter)
 						) {
 
 						/* assume for now that the rays DID hit the navpoint */

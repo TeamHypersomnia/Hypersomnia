@@ -33,7 +33,7 @@ using namespace augs;
 void gun_system::consume_gun_intents(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
-	const auto& events = step.messages.get_queue<messages::intent_message>();
+	const auto& events = step.transient.messages.get_queue<messages::intent_message>();
 
 	for (const auto& it : events) {
 		auto* const maybe_gun = cosmos[it.subject].find<components::gun>();
@@ -64,7 +64,7 @@ components::transform components::gun::calculate_barrel_transform(const componen
 void gun_system::launch_shots_due_to_pressed_triggers(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
-	step.messages.get_queue<messages::gunshot_response>().clear();
+	step.transient.messages.get_queue<messages::gunshot_response>().clear();
 
 	auto& physics_sys = cosmos.systems_temporary.get<physics_system>();
 
@@ -148,9 +148,9 @@ void gun_system::launch_shots_due_to_pressed_triggers(logic_step& step) {
 					response.barrel_transform = barrel_transform;
 					response.subject = it;
 					
-					step.messages.post(response);
+					step.transient.messages.post(response);
 
-					step.messages.post(messages::queue_destruction(catridge_or_pellet_stack));
+					step.transient.messages.post(messages::queue_destruction(catridge_or_pellet_stack));
 				}
 
 				if (total_recoil_multiplier > 0.f) {
@@ -160,7 +160,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(logic_step& step) {
 				}
 
 				if (destroy_pellets_container)
-					step.messages.post(messages::queue_destruction(chamber_slot.get_items_inside()[0]));
+					step.transient.messages.post(messages::queue_destruction(chamber_slot.get_items_inside()[0]));
 				
 				chamber_slot->items_inside.clear();
 

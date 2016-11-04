@@ -4,7 +4,7 @@
 #include "game/components/sentience_component.h"
 #include "game/components/attitude_component.h"
 #include "game/components/movement_component.h"
-#include "game/components/visibility_component.h"
+#include "game/messages/visibility_information.h"
 #include "game/detail/entity_scripts.h"
 #include "game/detail/position_scripts.h"
 
@@ -14,8 +14,7 @@
 namespace behaviours {
 	tree::goal_availability immediate_evasion::goal_resolution(tree::state_of_traversal& t) const {
 		auto subject = t.subject;
-		auto& visibility = subject.get<components::visibility>();
-		auto& los = visibility.line_of_sight_layers[components::visibility::LINE_OF_SIGHT];
+		auto& los = t.step.transient.calculated_line_of_sight.at(subject);
 		auto& cosmos = t.step.cosm;
 
 		immediate_evasion_goal goal;

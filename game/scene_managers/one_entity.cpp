@@ -179,7 +179,7 @@ namespace scene_managers {
 	void one_entity::post_solve(logic_step& step) {
 		auto& cosmos = step.cosm;
 
-		for (auto& it : step.messages.get_queue<messages::intent_message>()) {
+		for (auto& it : step.transient.messages.get_queue<messages::intent_message>()) {
 			if (it.subject == characters[current_character] && it.intent == intent_type::SWITCH_CHARACTER && it.pressed_flag) {
 				++current_character;
 				current_character %= characters.size();

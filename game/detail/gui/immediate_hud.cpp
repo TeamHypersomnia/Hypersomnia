@@ -7,6 +7,7 @@
 #include "game/components/sprite_component.h"
 #include "game/transcendental/viewing_session.h"
 #include "game/transcendental/step.h"
+#include "game/transcendental/data_living_one_step.h"
 #include "game/components/sentience_component.h"
 #include "game/components/render_component.h"
 #include "game/components/physics_component.h"
@@ -235,7 +236,7 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 void immediate_hud::acquire_game_events(const logic_step& step) {
 	const auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
-	const auto& healths = step.messages.get_queue<messages::health_event>();
+	const auto& healths = step.transient.messages.get_queue<messages::health_event>();
 	const auto current_time = cosmos.get_total_time_passed_in_seconds();
 
 	for (const auto& h : healths) {

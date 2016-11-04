@@ -1,20 +1,18 @@
 #pragma once
 #include <array>
-
-#include "game/transcendental/types_specification/all_messages_declaration.h"
 #include "augs/misc/delta.h"
 #include "game/transcendental/cosmic_entropy.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/detail/state_for_drawing_camera.h"
 #include "game/enums/render_layer.h"
 
-#include "augs/entity_system/storage_for_message_queues.h"
-
 #include "augs/templates/maybe_const.h"
+#include "game/transcendental/data_living_one_step.h"
 
 class cosmos;
 struct immediate_hud;
 struct aabb_highlighter;
+struct data_living_one_step;
 
 namespace augs {
 	class renderer;
@@ -62,9 +60,9 @@ public:
 class logic_step : public cosmic_step {
 	friend class cosmos;
 public:
-	logic_step(cosmos&, const cosmic_entropy&, storage_for_all_message_queues&);
+	logic_step(cosmos&, const cosmic_entropy&, data_living_one_step&);
 
-	storage_for_all_message_queues& messages;
+	data_living_one_step& transient;
 	const cosmic_entropy& entropy;
 
 	augs::fixed_delta get_delta() const;

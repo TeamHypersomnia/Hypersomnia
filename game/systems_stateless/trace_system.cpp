@@ -53,7 +53,7 @@ void trace_system::destroy_outdated_traces(logic_step& step) const {
 			trace.lengthening_time_passed_ms = trace.chosen_lengthening_duration_ms - 0.01f;
 
 			if (trace.is_it_finishing_trace) {
-				step.messages.post(messages::queue_destruction(t));
+				step.transient.messages.post(messages::queue_destruction(t));
 			}
 		}
 	}
@@ -61,7 +61,7 @@ void trace_system::destroy_outdated_traces(logic_step& step) const {
 
 void trace_system::spawn_finishing_traces_for_destroyed_objects(logic_step& step) const {
 	auto& cosmos = step.cosm;
-	const auto& events = step.messages.get_queue<messages::will_soon_be_deleted>();
+	const auto& events = step.transient.messages.get_queue<messages::will_soon_be_deleted>();
 
 	for (const auto& it : events) {
 		const auto e = cosmos[it.subject];

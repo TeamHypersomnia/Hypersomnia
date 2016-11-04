@@ -26,8 +26,8 @@ void components::crosshair::update_bounds() {
 void crosshair_system::generate_crosshair_intents(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
-	step.messages.get_queue<messages::crosshair_intent_message>().clear();
-	const auto& events = step.messages.get_queue<messages::intent_message>();
+	step.transient.messages.get_queue<messages::crosshair_intent_message>().clear();
+	const auto& events = step.transient.messages.get_queue<messages::intent_message>();
 
 	for (const auto& it : events) {
 		const auto subject = cosmos[it.subject];
@@ -54,7 +54,7 @@ void crosshair_system::generate_crosshair_intents(logic_step& step) {
 			crosshair_intent.crosshair_base_offset = base_offset;
 			crosshair_intent.crosshair_world_pos = base_offset + cosmos[crosshair.character_entity_to_chase].logic_transform().pos;
 
-			step.messages.post(crosshair_intent);
+			step.transient.messages.post(crosshair_intent);
 		}
 		else if (it.intent == intent_type::SWITCH_LOOK && it.pressed_flag) {
 			auto& mode = crosshair.orbit_mode;
@@ -70,7 +70,7 @@ void crosshair_system::generate_crosshair_intents(logic_step& step) {
 void crosshair_system::apply_crosshair_intents_to_base_offsets(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
-	const auto& events = step.messages.get_queue<messages::crosshair_intent_message>();
+	const auto& events = step.transient.messages.get_queue<messages::crosshair_intent_message>();
 
 	for (const auto& it : events)
 		cosmos[it.subject].get<components::crosshair>().base_offset = it.crosshair_base_offset;

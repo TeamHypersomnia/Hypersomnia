@@ -3,7 +3,7 @@
 
 #include "game/components/attitude_component.h"
 #include "game/components/crosshair_component.h"
-#include "game/components/visibility_component.h"
+#include "game/messages/visibility_information.h"
 #include "game/components/gun_component.h"
 #include "game/detail/entity_scripts.h"
 #include "game/detail/position_scripts.h"
@@ -25,8 +25,7 @@ namespace behaviours {
 		auto& cosmos = t.step.cosm;
 		auto subject = t.subject;
 		auto pos = position(subject);
-		auto& visibility = subject.get<components::visibility>();
-		auto& los = visibility.line_of_sight_layers[components::visibility::LINE_OF_SIGHT];
+		auto& los = t.step.transient.calculated_line_of_sight.at(subject);
 		auto& attitude = subject.get<components::attitude>();
 
 		entity_id closest_hostile_raw;
