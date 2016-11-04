@@ -22,29 +22,32 @@ namespace components {
 	}
 
 	void sprite::make_rect(const vec2 pos, const vec2 size, const float angle, std::array<vec2, 4>& v, const drawing_input::positioning_type positioning) {
-		v[0] = pos;
-		v[1] = pos + vec2(size.x, 0.f);
-		v[2] = pos + size;
-		v[3] = pos + vec2(0.f, size.y);
-
 		if (positioning == drawing_input::positioning_type::CENTER) {
-			const vec2 origin = pos + size / 2.f;
+			const vec2 origin = pos;
+			const vec2 half_size = size / 2.f;
+
+			v[0] = pos - half_size;
+			v[1] = pos + vec2(size.x, 0.f) - half_size;
+			v[2] = pos + size - half_size;
+			v[3] = pos + vec2(0.f, size.y) - half_size;
 
 			v[0].rotate(angle, origin);
 			v[1].rotate(angle, origin);
 			v[2].rotate(angle, origin);
 			v[3].rotate(angle, origin);
-
-			v[0] -= size / 2.f;
-			v[1] -= size / 2.f;
-			v[2] -= size / 2.f;
-			v[3] -= size / 2.f;
 		}
 		else {
-			v[0].rotate(angle, pos);
-			v[1].rotate(angle, pos);
-			v[2].rotate(angle, pos);
-			v[3].rotate(angle, pos);
+			const vec2 origin = pos + size / 2.f;
+
+			v[0] = pos;
+			v[1] = pos + vec2(size.x, 0.f);
+			v[2] = pos + size;
+			v[3] = pos + vec2(0.f, size.y);
+
+			v[0].rotate(angle, origin);
+			v[1].rotate(angle, origin);
+			v[2].rotate(angle, origin);
+			v[3].rotate(angle, origin);
 		}
 	}
 
@@ -75,8 +78,9 @@ namespace components {
 
 		auto target_position = transform_pos - in.camera_transform.pos + center;
 		
-		if (center_offset.non_zero())
+		if (center_offset.non_zero()) {
 			target_position -= vec2(center_offset).rotate(final_rotation, vec2(0, 0));
+		}
 
 		make_rect(target_position, get_size(), final_rotation, v, in.positioning);
 

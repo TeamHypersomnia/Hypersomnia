@@ -141,21 +141,20 @@ float basic_inventory_slot_handle<C>::calculate_density_multiplier_due_to_being_
 
 template <bool C>
 components::transform basic_inventory_slot_handle<C>::sum_attachment_offsets_of_parents(const entity_id attached_item) const {
-	auto attached_item_handle = make_handle(attached_item);
+	const auto attached_item_handle = make_handle(attached_item);
+	const auto sticking = get().attachment_sticking_mode;
 
 	auto offset = get().attachment_offset;
-
-	auto sticking = get().attachment_sticking_mode;
-
 	offset.pos += attached_item_handle.get<components::fixtures>().get_local_aabb().get_size().get_sticking_offset(sticking);
 	offset.pos += get_handle().get<components::fixtures>().get_local_aabb().get_size().get_sticking_offset(sticking);
 
 	offset += attached_item_handle.get<components::item>().attachment_offsets_per_sticking_mode[sticking];
 
-	auto* maybe_item = get_handle().find<components::item>();
+	const auto* const maybe_item = get_handle().find<components::item>();
 
-	if (maybe_item && make_handle(maybe_item->current_slot).alive())
+	if (maybe_item && make_handle(maybe_item->current_slot).alive()) {
 		return offset + make_handle(maybe_item->current_slot).sum_attachment_offsets_of_parents(get_handle());
+	}
 
 	return offset;
 }
