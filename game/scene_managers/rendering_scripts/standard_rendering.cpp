@@ -35,7 +35,7 @@ namespace rendering_scripts {
 		const auto matrix = augs::orthographic_projection<float>(0, state.visible_world_area.x, state.visible_world_area.y, 0, 0, 1);
 
 		auto& default_shader = *resource_manager.find(assets::program_id::DEFAULT);
-		auto& default_highlight_shader = *resource_manager.find(assets::program_id::DEFAULT_HIGHLIGHT);
+		auto& pure_color_highlight_shader = *resource_manager.find(assets::program_id::PURE_COLOR_HIGHLIGHT);
 		auto& circular_bars_shader = *resource_manager.find(assets::program_id::CIRCULAR_BARS);
 		
 		default_shader.use();
@@ -51,9 +51,9 @@ namespace rendering_scripts {
 		renderer.call_triangles();
 		renderer.clear_triangles();
 
-		default_highlight_shader.use();
+		pure_color_highlight_shader.use();
 		{
-			const auto projection_matrix_uniform = glGetUniformLocation(default_highlight_shader.id, "projection_matrix");
+			const auto projection_matrix_uniform = glGetUniformLocation(pure_color_highlight_shader.id, "projection_matrix");
 			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
 		}
 		
@@ -100,7 +100,7 @@ namespace rendering_scripts {
 		
 				renderer.call_triangles(textual_infos);
 		
-				default_highlight_shader.use();
+				pure_color_highlight_shader.use();
 		
 				hud.draw_pure_color_highlights(step);
 		
