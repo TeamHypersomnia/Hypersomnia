@@ -43,9 +43,10 @@ void game_window::call_window_script(const std::string& filename, const std::str
 			LOG("Exception thrown!");
 			lua.debug_response();
 		}
-
-		window.gl.initialize();
 	}
+
+	window.gl.initialize();
+	window.gl.initialize_fbos(get_screen_rect());
 
 	config.get_values(*this);
 }

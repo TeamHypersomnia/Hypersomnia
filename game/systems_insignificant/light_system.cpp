@@ -89,7 +89,7 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 
 		auto screen_pos = requests[i].eye_transform - camera_transform;
 		screen_pos.pos.x += camera_size.x * 0.5f;
-		screen_pos.pos.y += camera_size.y - (screen_pos.pos.y + camera_size.y * 0.5f);
+		screen_pos.pos.y = camera_size.y - (screen_pos.pos.y + camera_size.y * 0.5f);
 
 		glUniform2f(light_pos_uniform, screen_pos.pos.x, screen_pos.pos.y);
 
@@ -101,23 +101,31 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 			light.quadratic.base_value
 		);
 
+		glUniform3f(light_multiply_color_uniform,
+			1.f,
+			1.f,
+			1.f);
+
 		output.call_triangles();
 		output.clear_triangles();
 
 		glUniform1f(light_max_distance_uniform, light.wall_max_distance.base_value);
-
+		
 		glUniform3f(light_attenuation_uniform,
 			light.wall_constant.base_value,
 			light.wall_linear.base_value,
 			light.wall_quadratic.base_value
 		);
-
+		
 		glUniform3f(light_multiply_color_uniform,
-			light.color.r,
-			light.color.g,
-			light.color.b);
+			light.color.r/255.f,
+			light.color.g/255.f,
+			light.color.b/255.f);
+		
+		render_system().draw_entities(output.triangles, step.visible_per_layer[render_layer::DYNAMIC_BODY], step.camera_state);
 
-		render_system().draw_entities(output.triangles, step.visible_per_layer[render_layer::DYNAMIC_BODY], step.camera_state, true);
+		output.call_triangles();
+		output.clear_triangles();
 
 		glUniform3f(light_multiply_color_uniform,
 			1.f,
@@ -125,9 +133,9 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 			1.f);
 	}
 
+	graphics::fbo::use_default();
+
 	output.set_active_texture(2);
 	output.bind_texture(output.light_fbo);
 	output.set_active_texture(0);
-
-	graphics::fbo::use_default();
 }

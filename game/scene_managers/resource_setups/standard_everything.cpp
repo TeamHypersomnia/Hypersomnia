@@ -32,6 +32,7 @@ namespace resource_setups {
 
 		{
 			auto& illuminated_shader = *resource_manager.find(assets::program_id::DEFAULT_ILLUMINATED);
+			illuminated_shader.use();
 
 			const auto basic_texture_uniform = glGetUniformLocation(illuminated_shader.id, "basic_texture");
 			const auto light_texture_uniform = glGetUniformLocation(illuminated_shader.id, "light_texture");
@@ -42,6 +43,7 @@ namespace resource_setups {
 
 		{
 			auto& default_shader = *resource_manager.find(assets::program_id::DEFAULT);
+			default_shader.use();
 
 			const auto basic_texture_uniform = glGetUniformLocation(default_shader.id, "basic_texture");
 			glUniform1i(basic_texture_uniform, 0);
@@ -49,6 +51,7 @@ namespace resource_setups {
 
 		{
 			auto& pure_color_highlight_shader = *resource_manager.find(assets::program_id::PURE_COLOR_HIGHLIGHT);
+			pure_color_highlight_shader.use();
 
 			const auto basic_texture_uniform = glGetUniformLocation(pure_color_highlight_shader.id, "basic_texture");
 			glUniform1i(basic_texture_uniform, 0);
@@ -56,6 +59,7 @@ namespace resource_setups {
 
 		{
 			auto& circular_bars_shader = *resource_manager.find(assets::program_id::CIRCULAR_BARS);
+			circular_bars_shader.use();
 
 			const auto basic_texture_uniform = glGetUniformLocation(circular_bars_shader.id, "basic_texture");
 			glUniform1i(basic_texture_uniform, 0);

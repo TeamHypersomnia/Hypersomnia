@@ -13,8 +13,8 @@ const int step = 255/levels;
 void main() 
 {
 	vec2 texcoord = gl_FragCoord.xy;
-	texcoord.x /= 1200; 
-	texcoord.y /= 800;
+	texcoord.x /= 1200.0; 
+	texcoord.y /= 800.0;
 
 	vec4 light = texture(light_texture, texcoord);
 	//light.r = float(step * (int(light.r * 255.0) / step)) / 255.0;

@@ -1,5 +1,6 @@
 #include "fbo.h"
 #include "augs/log.h"
+#include "augs/ensure.h"
 
 namespace augs {
 	namespace graphics {
@@ -8,12 +9,14 @@ namespace augs {
 		fbo::fbo() : created(false), fboId(0u), textureId(0u) {
 		}
 
-		fbo::fbo(int width, int height) : created(false) {
+		fbo::fbo(const int width, const int height) : created(false) {
 			create(width, height);
 		}
 
-		void fbo::create(int w, int h) {
-			if (created) return;
+		void fbo::create(const int w, const int h) {
+			ensure(!created);
+			ensure(w > 0);
+			ensure(h > 0);
 
 			created = true;
 			width = w;
@@ -50,6 +53,7 @@ namespace augs {
 		}
 
 		void fbo::use() {
+			ensure(created);
 			glBindFramebuffer(GL_FRAMEBUFFER, fboId); glerr
 			currently_bound_fbo = fboId;
 		}
@@ -67,10 +71,12 @@ namespace augs {
 		}
 
 		int fbo::get_width() const {
+			ensure(created);
 			return width;
 		}
 
 		int fbo::get_height() const {
+			ensure(created);
 			return height;
 		}
 
@@ -92,6 +98,7 @@ namespace augs {
 		}
 
 		GLuint fbo::get_texture_id() const {
+			ensure(created);
 			return textureId;
 		}
 	}
