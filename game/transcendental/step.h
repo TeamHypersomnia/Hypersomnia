@@ -54,7 +54,7 @@ public:
 	vec2 get_screen_space(vec2 pos) const;
 
 	std::vector<const_entity_handle> visible_entities;
-	std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> visible_per_layer;
+	std::array<std::vector<const_entity_handle>, render_layer::COUNT> visible_per_layer;
 };
 
 class logic_step : public cosmic_step {

@@ -50,7 +50,7 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 	for (const auto it : cosmos.get(processing_subjects::WITH_LIGHT)) {
 		messages::visibility_information_request request;
 		request.eye_transform = it.viewing_transform();
-		request.filter = filters::pathfinding_query();
+		request.filter = filters::line_of_sight_query();
 		request.square_side = 1500;
 		request.subject = it;
 

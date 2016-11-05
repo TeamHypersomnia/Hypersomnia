@@ -59,7 +59,7 @@ namespace rendering_scripts {
 			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
 		}
 		
-		render_system().draw_entities(output, step.visible_per_layer[render_layer::DYNAMIC_BODY], state, true);
+		render_system().draw_entities(output, step.visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], state, true);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();

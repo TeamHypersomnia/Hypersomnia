@@ -183,7 +183,7 @@ namespace ingredients {
 
 		sprite.set(assets::texture_id::TEST_PLAYER, rgba(255, 255, 255, 255));
 
-		render.layer = render_layer::DYNAMIC_BODY;
+		render.layer = render_layer::SMALL_DYNAMIC_BODY;
 
 		rotation_copying.target = crosshair_entity;
 		rotation_copying.look_mode = components::rotation_copying::look_type::POSITION;

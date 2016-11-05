@@ -25,9 +25,9 @@ bool render_system::render_order_compare(const const_entity_handle& a, const con
 	return (layer_a == layer_b && layer_a == render_layer::CAR_INTERIOR) ? are_connected_by_friction(a, b) : layer_a > layer_b;
 }
 
-std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> render_system::get_visible_per_layer(const std::vector<const_entity_handle>& entities) const {
-	std::array<std::vector<entity_id>, render_layer::LAYER_COUNT> layers;
-	std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> output;
+std::array<std::vector<const_entity_handle>, render_layer::COUNT> render_system::get_visible_per_layer(const std::vector<const_entity_handle>& entities) const {
+	std::array<std::vector<entity_id>, render_layer::COUNT> layers;
+	std::array<std::vector<const_entity_handle>, render_layer::COUNT> output;
 
 	if (entities.empty())
 		return output;
