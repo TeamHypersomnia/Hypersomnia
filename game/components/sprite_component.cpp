@@ -74,7 +74,7 @@ namespace components {
 
 		float final_rotation = in.renderable_transform.rotation + rotation_offset;
 
-		auto center = in.visible_world_area / 2;
+		const auto center = in.visible_world_area / 2;
 
 		auto target_position = transform_pos - in.camera_transform.pos + center;
 		

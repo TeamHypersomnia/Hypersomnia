@@ -63,6 +63,9 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 		visibility_system().respond_to_visibility_information_requests(cosmos, {}, requests, dummy, responses);
 	}
 
+	const auto camera_transform = step.camera_state.camera_transform;
+	const auto camera_size = step.camera_state.visible_world_area;
+
 	for (size_t i = 0; i < responses.size(); ++i) {
 		const auto& r = responses[i];
 		const auto& light_entity = cosmos[requests[i].subject];
@@ -70,12 +73,12 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 		auto& cache = per_entity_cache[light_entity.get_id().pool.indirection_index];
 
 		for (size_t t = 0; t < r.get_num_triangles(); ++t) {
-			const auto light_tri = r.get_world_triangle(t, requests[i].eye_transform.pos);
+			const auto world_light_tri = r.get_world_triangle(t, requests[i].eye_transform.pos);
 			vertex_triangle renderable_light_tri;
 
-			renderable_light_tri.vertices[0].pos = light_tri.points[0];
-			renderable_light_tri.vertices[1].pos = light_tri.points[1];
-			renderable_light_tri.vertices[2].pos = light_tri.points[2];
+			renderable_light_tri.vertices[0].pos = world_light_tri.points[0] - camera_transform.pos + camera_size/2;
+			renderable_light_tri.vertices[1].pos = world_light_tri.points[1] - camera_transform.pos + camera_size/2;
+			renderable_light_tri.vertices[2].pos = world_light_tri.points[2] - camera_transform.pos + camera_size/2;
 
 			renderable_light_tri.vertices[0].color = light.color;
 			renderable_light_tri.vertices[1].color = light.color;
@@ -84,10 +87,9 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 			output.push_triangle(renderable_light_tri);
 		}
 
-		const auto res = step.camera_state.visible_world_area;
-		auto screen_pos = requests[i].eye_transform - step.camera_state.camera_transform;
-		screen_pos.pos.x += res.x * 0.5f;
-		screen_pos.pos.y += res.y - (screen_pos.pos.y + res.y * 0.5f);
+		auto screen_pos = requests[i].eye_transform - camera_transform;
+		screen_pos.pos.x += camera_size.x * 0.5f;
+		screen_pos.pos.y += camera_size.y - (screen_pos.pos.y + camera_size.y * 0.5f);
 
 		glUniform2f(light_pos_uniform, screen_pos.pos.x, screen_pos.pos.y);
 
