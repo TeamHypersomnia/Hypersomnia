@@ -38,6 +38,7 @@ namespace rendering_scripts {
 
 		auto& default_shader = *resource_manager.find(assets::program_id::DEFAULT);
 		auto& pure_color_highlight_shader = *resource_manager.find(assets::program_id::PURE_COLOR_HIGHLIGHT);
+		auto& border_highlight_shader = pure_color_highlight_shader; // the same
 		auto& circular_bars_shader = *resource_manager.find(assets::program_id::CIRCULAR_BARS);
 		
 		default_shader.use();
@@ -53,9 +54,9 @@ namespace rendering_scripts {
 		renderer.call_triangles();
 		renderer.clear_triangles();
 
-		pure_color_highlight_shader.use();
+		border_highlight_shader.use();
 		{
-			const auto projection_matrix_uniform = glGetUniformLocation(pure_color_highlight_shader.id, "projection_matrix");
+			const auto projection_matrix_uniform = glGetUniformLocation(border_highlight_shader.id, "projection_matrix");
 			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
 		}
 		

@@ -795,5 +795,10 @@ void visibility_system::respond_to_visibility_information_requests(
 				lines.draw(disc.points.first, disc.points.second, rgba(0, 127, 255, 255));
 			}
 		}
+
+		vis_responses.push_back(response);
 	}
+
+	ensure_eq(los_requests.size(), los_responses.size());
+	ensure_eq(vis_requests.size(), vis_responses.size());
 }

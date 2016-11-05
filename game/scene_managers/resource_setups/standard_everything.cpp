@@ -2,6 +2,8 @@
 #include "game/resources/manager.h"
 #include "augs/graphics/shader.h"
 
+#include "3rdparty/GL/OpenGL.h"
+
 namespace resource_setups {
 	void load_standard_everything() {
 		resource_setups::load_standard_atlas();
@@ -27,5 +29,36 @@ namespace resource_setups {
 		resource_manager.create(assets::shader_id::LIGHT_VERTEX, "hypersomnia/shaders/light.vsh", augs::graphics::shader::type::VERTEX);
 		resource_manager.create(assets::shader_id::LIGHT_FRAGMENT, "hypersomnia/shaders/light.fsh", augs::graphics::shader::type::FRAGMENT);
 		resource_manager.create(assets::program_id::LIGHT, assets::shader_id::LIGHT_VERTEX, assets::shader_id::LIGHT_FRAGMENT);
+
+		{
+			auto& illuminated_shader = *resource_manager.find(assets::program_id::DEFAULT_ILLUMINATED);
+
+			const auto basic_texture_uniform = glGetUniformLocation(illuminated_shader.id, "basic_texture");
+			const auto light_texture_uniform = glGetUniformLocation(illuminated_shader.id, "light_texture");
+
+			glUniform1i(basic_texture_uniform, 0);
+			glUniform1i(light_texture_uniform, 2);
+		}
+
+		{
+			auto& default_shader = *resource_manager.find(assets::program_id::DEFAULT);
+
+			const auto basic_texture_uniform = glGetUniformLocation(default_shader.id, "basic_texture");
+			glUniform1i(basic_texture_uniform, 0);
+		}
+
+		{
+			auto& pure_color_highlight_shader = *resource_manager.find(assets::program_id::PURE_COLOR_HIGHLIGHT);
+
+			const auto basic_texture_uniform = glGetUniformLocation(pure_color_highlight_shader.id, "basic_texture");
+			glUniform1i(basic_texture_uniform, 0);
+		}
+
+		{
+			auto& circular_bars_shader = *resource_manager.find(assets::program_id::CIRCULAR_BARS);
+
+			const auto basic_texture_uniform = glGetUniformLocation(circular_bars_shader.id, "basic_texture");
+			glUniform1i(basic_texture_uniform, 0);
+		}
 	}
 }
