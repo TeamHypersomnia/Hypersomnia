@@ -32,7 +32,9 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 	ensure_eq(0, output.get_triangle_count());
 
 	output.light_fbo.use();
+	glClearColor(0.f, 0.1f, 0.1f, 1.0f);
 	output.clear_current_fbo();
+	glClearColor(0.f, 0.f, 0.f, 0.f);
 
 	auto& light_program = *resource_manager.find(assets::program_id::LIGHT);
 	light_program.use();
