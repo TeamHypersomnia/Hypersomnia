@@ -7,6 +7,8 @@
 #include "game/systems_stateless/render_system.h"
 #include "game/systems_stateless/gui_system.h"
 
+#include "game/systems_insignificant/light_system.h"
+
 #include "game/components/gui_element_component.h"
 #include "game/systems_temporary/dynamic_tree_system.h"
 #include "game/resources/manager.h"
@@ -38,6 +40,10 @@ namespace rendering_scripts {
 		auto& pure_color_highlight_shader = *resource_manager.find(assets::program_id::PURE_COLOR_HIGHLIGHT);
 		auto& circular_bars_shader = *resource_manager.find(assets::program_id::CIRCULAR_BARS);
 		
+		auto& light = cosmos.systems_insignificant.get<light_system>();
+
+		light.render_all_lights(step);
+
 		default_shader.use();
 		{
 			const auto projection_matrix_uniform = glGetUniformLocation(default_shader.id, "projection_matrix");

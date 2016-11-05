@@ -103,6 +103,22 @@ namespace scene_managers {
 			return world[new_characters[i]];
 		};
 
+		{
+			const auto green_light = world.create_entity("red_light");
+			{
+				green_light += components::transform();
+				auto& light = green_light += components::light();
+				light.color = green;
+			}
+
+			const auto cyan_light = world.create_entity("red_light");
+			{
+				cyan_light += components::transform(300, 0);
+				auto& light = cyan_light += components::light();
+				light.color = cyan;
+			}
+		}
+
 		for (int i = 0; i < num_characters; ++i) {
 			const auto new_character = prefabs::create_character(world, vec2(i * 300 , 0), screen_size, typesafe_sprintf("player%x", i));
 

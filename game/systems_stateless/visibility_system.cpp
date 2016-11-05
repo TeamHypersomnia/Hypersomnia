@@ -123,7 +123,7 @@ void visibility_system::respond_to_visibility_information_requests(logic_step& s
 		step.transient.calculated_line_of_sight[los_requests[i].subject] = los_responses[i];
 	}
 
-	for (size_t i = 0; i < los_requests.size(); ++i) {
+	for (size_t i = 0; i < vis_requests.size(); ++i) {
 		step.transient.calculated_visibility[vis_requests[i].subject] = vis_responses[i];
 	}
 }
@@ -220,8 +220,8 @@ void visibility_system::respond_to_visibility_information_requests(
 	}
 
 	for (const auto& request : vis_requests) {
-		const auto it = cosmos[request.subject];
-		const auto transform = it.logic_transform();
+		const auto ignored_entity = request.subject;
+		const auto transform = request.eye_transform;
 		visibility_information_response response;
 
 		/* prepare container for all the vertices that we will cast the ray to */
@@ -279,7 +279,7 @@ void visibility_system::respond_to_visibility_information_requests(
 		};
 
 		/* get list of all fixtures that intersect with the visibility square */
-		const auto bodies = physics.query_aabb(aabb.lowerBound, aabb.upperBound, request.filter, it).bodies;
+		const auto bodies = physics.query_aabb(aabb.lowerBound, aabb.upperBound, request.filter, ignored_entity).bodies;
 
 		/* for every fixture that intersected with the visibility square */
 		for (const auto b : bodies) {
@@ -319,8 +319,8 @@ void visibility_system::respond_to_visibility_information_requests(
 		/* raycast through the bounds to add another vertices where the shapes go beyond visibility square */
 		for (const auto& bound : bounds) {
 			/* have to raycast both directions because Box2D ignores the second side of the fixture */
-			const auto output1 = physics.ray_cast_all_intersections(bound.m_vertex1, bound.m_vertex2, request.filter, it);
-			const auto output2 = physics.ray_cast_all_intersections(bound.m_vertex2, bound.m_vertex1, request.filter, it);
+			const auto output1 = physics.ray_cast_all_intersections(bound.m_vertex1, bound.m_vertex2, request.filter, ignored_entity);
+			const auto output2 = physics.ray_cast_all_intersections(bound.m_vertex2, bound.m_vertex1, request.filter, ignored_entity);
 
 			/* check for duplicates */
 			std::vector<vec2> output;
@@ -470,9 +470,9 @@ void visibility_system::respond_to_visibility_information_requests(
 		/* process all raycast inputs at once to improve cache coherency */
 		for (size_t j = 0; j < all_ray_inputs.size(); ++j) {
 			all_ray_outputs.push_back(std::make_pair(
-				physics.ray_cast(position_meters, all_ray_inputs[j].targets[0], request.filter, it),
+				physics.ray_cast(position_meters, all_ray_inputs[j].targets[0], request.filter, ignored_entity),
 				all_vertices_transformed[j].is_on_a_bound ?
-				physics_system::raycast_output() : physics.ray_cast(position_meters, all_ray_inputs[j].targets[1], request.filter, it)
+				physics_system::raycast_output() : physics.ray_cast(position_meters, all_ray_inputs[j].targets[1], request.filter, ignored_entity)
 			));
 		}
 

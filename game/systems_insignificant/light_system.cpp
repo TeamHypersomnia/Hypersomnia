@@ -3,6 +3,8 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 
+#include "game/resources/manager.h"
+
 void light_system::construct(const const_entity_handle) {
 
 }
