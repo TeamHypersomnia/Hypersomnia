@@ -2,8 +2,11 @@
 #include "3rdparty/GL/OpenGL.h"
 
 namespace augs {
+	class renderer;
+
 	namespace graphics {
 		class fbo {
+			friend class ::augs::renderer;
 			GLuint fboId, textureId, width, height;
 			bool created;
 			fbo& operator=(const fbo&) {}

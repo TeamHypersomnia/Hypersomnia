@@ -3,7 +3,7 @@
 #undef max
 #include <tuple>
 #include "renderer.h"
-
+#include "augs/graphics/fbo.h"
 #include "game/messages/visibility_information.h"
 #include "game/components/physics_component.h"
 
@@ -305,11 +305,19 @@ namespace augs {
 		triangles.clear();
 	}
 
+	void renderer::bind_texture(const graphics::fbo& f) {
+		glBindTexture(GL_TEXTURE_2D, f.get_texture_id()); glerr;
+	}
+
+	void renderer::bind_texture(const atlas& atl) {
+		glBindTexture(GL_TEXTURE_2D, atl.id); glerr;
+	}
+
 	void renderer::default_render(vec2 visible_world_area) {
 		graphics::fbo::use_default();
 		glClear(GL_COLOR_BUFFER_BIT); glerr;
 		
-		resource_manager.find(assets::atlas_id::GAME_WORLD_ATLAS)->bind();
+		bind_texture(*resource_manager.find(assets::atlas_id::GAME_WORLD_ATLAS));
 
 		call_triangles();
 

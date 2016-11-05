@@ -34,7 +34,7 @@ namespace components {
 
 		/* the polygon as it was originally, so possibly concave
 		it is later triangulated for rendering and divided into convex polygons for physics */
-		augs::constant_size_vector<vec2, RENDERING_POLYGON_VERTEX_COUNT> original_polygon;
+		//augs::constant_size_vector<vec2, RENDERING_POLYGON_VERTEX_COUNT> original_polygon;
 
 		/* triangulated version of original_polygon, ready to be rendered triangle-by-triangle */
 		augs::constant_size_vector<vertex, RENDERING_POLYGON_TRIANGULATED_VERTEX_COUNT> triangulated_polygon;
@@ -55,8 +55,9 @@ namespace components {
 		
 		void automatically_map_uv(assets::texture_id, unsigned uv_mapping_mode);
 
-		/* construct a set of convex polygons from a potentially concave polygon */
-		void add_polygon_vertices(std::vector<vertex>);
+		/* triangulates input */
+		void add_concave_polygon(std::vector<vertex>);
+		void add_triangle(const vertex_triangle&);
 
 		void set_color(rgba col);
 

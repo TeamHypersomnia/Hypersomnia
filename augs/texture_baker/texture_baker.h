@@ -6,13 +6,15 @@
 #include "texture.h"
 
 namespace augs {
+	class renderer;
 	class texture_with_image;
 
 	class atlas {
-		static unsigned current;
 		unsigned id = 0;
 		bool mipmaps = false, lin = false, rep = true, built = false;
 		std::vector<bin> bins;
+
+		friend class renderer;
 
 	public:
 		~atlas();
@@ -26,7 +28,7 @@ namespace augs {
 			pack(int max_size);
 
 		void create_image(int atlas_channels, bool destroy_images);
-		void build(bool mipmaps = false, bool linear = false, image* raw_texture = 0), bind(), _bind(), nearest(), linear(), clamp(), repeat();
+		void build(bool mipmaps = false, bool linear = false, image* raw_texture = 0), nearest(), linear(), clamp(), repeat();
 
 		void default_build();
 

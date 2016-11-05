@@ -62,12 +62,12 @@ discontinuity* visibility_information_response::get_discontinuity(const size_t n
 	return &discontinuities[n];
 }
 
-triangle visibility_information_response::get_triangle(const size_t i, const vec2 origin) const {
+triangle visibility_information_response::get_world_triangle(const size_t i, const vec2 origin) const {
 	triangle tri = { origin, edges[i].first, edges[i].second };
 	return tri;
 }
 
-std::vector<vec2> visibility_information_response::get_polygon(const float distance_epsilon, const vec2 expand_origin, const float expand_mult) const {
+std::vector<vec2> visibility_information_response::get_world_polygon(const float distance_epsilon, const vec2 expand_origin, const float expand_mult) const {
 	std::vector<vec2> output;
 
 	for (size_t i = 0; i < edges.size(); ++i) {
@@ -239,7 +239,7 @@ void visibility_system::respond_to_visibility_information_requests(
 			}
 		};
 
-		static std::vector <target_vertex> all_vertices_transformed;
+		static thread_local std::vector <target_vertex> all_vertices_transformed;
 		all_vertices_transformed.clear();
 
 		/* transform entity position to Box2D coordinates and take offset into account */
@@ -654,11 +654,11 @@ void visibility_system::respond_to_visibility_information_requests(
 			vec2 p1 = ray_a.second * METERS_TO_PIXELSf;
 			vec2 p2 = ray_b.first * METERS_TO_PIXELSf;
 
-			if (settings.draw_triangle_edges) {
-				draw_line(p1 * PIXELS_TO_METERSf, request.color);
-				draw_line(p2 * PIXELS_TO_METERSf, request.color);
-				lines.draw(p1, p2, request.color);
-			}
+			//if (settings.draw_triangle_edges) {
+			//	draw_line(p1 * PIXELS_TO_METERSf, request.color);
+			//	draw_line(p2 * PIXELS_TO_METERSf, request.color);
+			//	lines.draw(p1, p2, request.color);
+			//}
 
 			response.edges.push_back(std::make_pair(p1, p2));
 		}

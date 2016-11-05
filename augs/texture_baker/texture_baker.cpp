@@ -3,14 +3,13 @@
 
 #include "texture_baker.h"
 #include "augs/texture_baker/texture_with_image.h"
+#include "augs/graphics/renderer.h"
 
 namespace augs {
 
 	atlas::~atlas() {
 		destroy();
 	}
-
-	unsigned atlas::current = 0;
 
 	bool atlas::pack() {
 		GLint tsize;
@@ -87,7 +86,7 @@ namespace augs {
 		image& im = raw_texture ? *raw_texture : img;
 
 		glGenTextures(1, &id); glerr;
-		_bind();
+		augs::renderer::get_current().bind_texture(*this);
 
 		lin = !lin; if (!lin) linear(); else nearest();
 
@@ -117,18 +116,10 @@ namespace augs {
 		img.destroy();
 	}
 
-	void atlas::bind() {
-		_bind();
-	}
-
-	void atlas::_bind() {
-		glBindTexture(GL_TEXTURE_2D, current = id); glerr;
-	}
-
 	void atlas::repeat() {
 		if (!rep) {
 			rep = true;
-			bind();
+			augs::renderer::get_current().bind_texture(*this);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); glerr;
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); glerr;
 		}
@@ -137,21 +128,21 @@ namespace augs {
 	void atlas::clamp() {
 		if (rep) {
 			rep = false;
-			bind();
+			augs::renderer::get_current().bind_texture(*this);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); glerr;
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP); glerr;
 		}
 	}
 
 	void atlas::nearest() {
-		bind();
+		augs::renderer::get_current().bind_texture(*this);
 		lin = false;
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); glerr;
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmaps ? GL_NEAREST : GL_NEAREST); glerr;
 	}
 
 	void atlas::linear() {
-		bind();
+		augs::renderer::get_current().bind_texture(*this);
 		lin = true;
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); glerr;
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmaps ? GL_LINEAR : GL_LINEAR); glerr;

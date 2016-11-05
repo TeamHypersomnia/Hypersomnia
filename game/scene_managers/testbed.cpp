@@ -117,6 +117,9 @@ namespace scene_managers {
 				auto& light = cyan_light += components::light();
 				light.color = cyan;
 			}
+
+			green_light.add_standard_components();
+			cyan_light.add_standard_components();
 		}
 
 		for (int i = 0; i < num_characters; ++i) {
@@ -242,12 +245,8 @@ namespace scene_managers {
 		//draw_bodies.push_back(new_characters[0]);
 		//draw_bodies.push_back(backpack);
 
-		world.significant.meta.settings.visibility.epsilon_ray_distance_variation = 0.001;
-		world.significant.meta.settings.visibility.epsilon_threshold_obstacle_hit = 10;
-		world.significant.meta.settings.visibility.epsilon_distance_vertex_hit = 1;
-
-		world.significant.meta.settings.pathfinding.draw_memorised_walls = 1;
-		world.significant.meta.settings.pathfinding.draw_undiscovered = 1;
+		//world.significant.meta.settings.pathfinding.draw_memorised_walls = 1;
+		//world.significant.meta.settings.pathfinding.draw_undiscovered = 1;
 
 		world.significant.meta.settings.enable_interpolation = true;
 

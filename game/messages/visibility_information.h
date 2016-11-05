@@ -3,6 +3,7 @@
 #include <set>
 #include <vector>
 #include "augs/graphics/pixel.h"
+#include "game/components/transform_component.h"
 #include "3rdparty/Box2D/Dynamics/b2Fixture.h"
 #include "augs/math/vec2.h"
 #include "augs/padding_byte.h"
@@ -12,8 +13,6 @@ enum class visibility_type {
 };
 
 struct visibility_information_request_input {
-	augs::rgba color;
-
 	b2Filter filter;
 	padding_byte pad[2];
 
@@ -24,8 +23,6 @@ struct visibility_information_request_input {
 };
 
 struct line_of_sight_request_input {
-	augs::rgba color;
-
 	b2Filter obstruction_filter;
 	b2Filter candidate_filter;
 	float maximum_distance = 0.f;
@@ -90,8 +87,9 @@ namespace messages {
 		}
 
 		size_t get_num_triangles() const;
-		triangle get_triangle(const size_t index, const vec2 origin) const;
-		std::vector<vec2> get_polygon(const float distance_epsilon, const vec2 expand_origin, const float expand_mult) const;
+
+		triangle get_world_triangle(const size_t index, const vec2 origin) const;
+		std::vector<vec2> get_world_polygon(const float distance_epsilon, const vec2 expand_origin, const float expand_mult) const;
 	};
 
 	struct line_of_sight_response {

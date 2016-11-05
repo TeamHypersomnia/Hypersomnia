@@ -12,6 +12,12 @@
 #include "augs/misc/timer.h"
 
 namespace augs {
+	class atlas;
+
+	namespace graphics {
+		class fbo;
+	}
+
 	class renderer {
 	public:
 		struct debug_line {
@@ -75,6 +81,9 @@ namespace augs {
 
 		void initialize();
 		void initialize_fbos(const vec2i screen_size);
+
+		void bind_texture(const graphics::fbo&);
+		void bind_texture(const augs::atlas&);
 
 		void set_active_texture(const unsigned);
 

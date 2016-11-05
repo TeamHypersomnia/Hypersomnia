@@ -57,12 +57,12 @@ namespace components {
 		}
 	}
 
-	void polygon::add_polygon_vertices(std::vector<vertex> polygon) {
+	void polygon::add_concave_polygon(std::vector<vertex> polygon) {
 		if (polygon.empty()) return;
 		size_t i1, i2;
 
 		float area = 0;
-		auto& vs = polygon;
+		const auto& vs = polygon;
 
 		for (i1 = 0; i1 < vs.size(); i1++) {
 			i2 = i1 + 1;
@@ -71,8 +71,9 @@ namespace components {
 		}
 
 		/* ensure proper winding */
-		if (area > 0) std::reverse(polygon.begin(), polygon.end());
-
+		if (area > 0) {
+			std::reverse(polygon.begin(), polygon.end());
+		}
 
 		TPPLPoly inpoly;
 		std::list<TPPLPoly> out_tris;
@@ -86,7 +87,7 @@ namespace components {
 		int offset = triangulated_polygon.size();
 		for (size_t i = 0; i < polygon.size(); ++i) {
 			triangulated_polygon.push_back(polygon[i]);
-			original_polygon.push_back(polygon[i].pos);
+			//original_polygon.push_back(polygon[i].pos);
 		}
 
 		for (size_t i = 0; i < polygon.size(); ++i) {
@@ -155,6 +156,9 @@ namespace components {
 	}
 	
 	rects::ltrb<float> polygon::get_aabb(components::transform transform) const {
-		return augs::get_aabb(original_polygon);
+		return augs::get_aabb(triangulated_polygon, 
+			[](const vertex p) { return p.pos.x; },
+			[](const vertex p) { return p.pos.y; }
+		);
 	}
 }

@@ -16,7 +16,7 @@ void convex_partitioned_shape::add_convex_polygon(const convex_poly& verts) {
 	convex_polys.push_back(verts);
 }
 
-void convex_partitioned_shape::offset_vertices(components::transform transform) {
+void convex_partitioned_shape::offset_vertices(const components::transform transform) {
 	for (auto& c : convex_polys) {
 		for (auto& v : c.vertices) {
 			v.rotate(transform.rotation, vec2(0, 0));
@@ -25,7 +25,7 @@ void convex_partitioned_shape::offset_vertices(components::transform transform) 
 	}
 }
 
-void convex_partitioned_shape::mult_vertices(vec2 mult) {
+void convex_partitioned_shape::mult_vertices(const vec2 mult) {
 	for (auto& c : convex_polys) {
 		for (auto& v : c.vertices) {
 			v *= mult;
@@ -41,18 +41,18 @@ void convex_partitioned_shape::mult_vertices(vec2 mult) {
 #endif
 }
 
-void convex_partitioned_shape::from_renderable(const_entity_handle handle) {
-	if (handle.has<components::sprite>())
+void convex_partitioned_shape::from_renderable(const const_entity_handle handle) {
+	if (handle.has<components::sprite>()) {
 		from_sprite(handle.get<components::sprite>(), true);
-	if (handle.has<components::polygon>())
-		from_polygon(handle.get<components::polygon>());
+	}
+	if (handle.has<components::polygon>()) {
+		ensure(false);
+	}
 }
 
-void convex_partitioned_shape::from_sprite(const components::sprite& sprite, bool polygonize_sprite) {
+void convex_partitioned_shape::from_sprite(const components::sprite& sprite, const bool polygonize_sprite) {
 	auto& polygonized_sprite_verts = resource_manager.find(sprite.tex)->polygonized;
 	auto& image_to_polygonize = resource_manager.find(sprite.tex)->img;
-
-	type = shape_type::POLYGON;
 
 	if (polygonized_sprite_verts.size() > 0 && polygonize_sprite) {
 		auto image_size = image_to_polygonize.get_size();
@@ -96,13 +96,6 @@ void convex_partitioned_shape::from_sprite(const components::sprite& sprite, boo
 	}
 
 	// TODO: remove the visual components server-side
-}
-
-void convex_partitioned_shape::from_polygon(const components::polygon& poly) {
-	type = shape_type::POLYGON;
-	std::vector <vec2> vv;
-	vv.assign(poly.original_polygon.begin(), poly.original_polygon.end());
-	add_concave_polygon(vv);
 }
 
 void convex_partitioned_shape::add_concave_polygon(const std::vector <vec2> &verts) {

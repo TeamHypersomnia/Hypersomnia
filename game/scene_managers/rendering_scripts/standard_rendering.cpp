@@ -42,7 +42,7 @@ namespace rendering_scripts {
 		
 		auto& light = cosmos.systems_insignificant.get<light_system>();
 
-		light.render_all_lights(step);
+		light.render_all_lights(renderer, matrix, step);
 
 		default_shader.use();
 		{
@@ -92,39 +92,33 @@ namespace rendering_scripts {
 		
 		}
 
-		//for (const auto it : cosmos.get(processing_subjects::WITH_INPUT_RECEIVER)) {
-		//	if (it.get<components::input_receiver>().local && it.has<components::gui_element>()) {
-				//auto& gui = it.get<components::gui_element>();
-				const auto& hud = step.hud;
+		const auto& hud = step.hud;
 
-				const auto& textual_infos = hud.draw_circular_bars_and_get_textual_info(step);
-		
-				renderer.call_triangles();
-				renderer.clear_triangles();
-		
-				default_shader.use();
-		
-				renderer.call_triangles(textual_infos);
-		
-				pure_color_highlight_shader.use();
-		
-				hud.draw_pure_color_highlights(step);
-		
-				renderer.call_triangles();
-				renderer.clear_triangles();
-		
-				default_shader.use();
-		
-				hud.draw_vertically_flying_numbers(step);
-		
-				if (controlled_entity.has<components::gui_element>()) {
-					components::gui_element::draw_complete_gui_for_camera_rendering_request(output, controlled_entity, step);
-				}
-				//gui.draw_complete_gui_for_camera_rendering_request(step);
-		//	}
-		//}
+		const auto& textual_infos = hud.draw_circular_bars_and_get_textual_info(step);
 
-		resource_manager.find(assets::atlas_id::GAME_WORLD_ATLAS)->bind();
+		renderer.call_triangles();
+		renderer.clear_triangles();
+
+		default_shader.use();
+
+		renderer.call_triangles(textual_infos);
+
+		pure_color_highlight_shader.use();
+
+		hud.draw_pure_color_highlights(step);
+
+		renderer.call_triangles();
+		renderer.clear_triangles();
+
+		default_shader.use();
+
+		hud.draw_vertically_flying_numbers(step);
+
+		if (controlled_entity.has<components::gui_element>()) {
+			components::gui_element::draw_complete_gui_for_camera_rendering_request(output, controlled_entity, step);
+		}
+
+		renderer.bind_texture(*resource_manager.find(assets::atlas_id::GAME_WORLD_ATLAS));
 
 		renderer.call_triangles();
 		renderer.clear_triangles();

@@ -14,13 +14,6 @@ namespace components {
 
 class convex_partitioned_shape {
 public:
-	float radius = 0.f;
-
-	enum class shape_type {
-		POLYGON,
-		CIRCLE
-	} type = shape_type::POLYGON;
-
 	struct destruction_scar {
 		vec2 first_impact;
 		vec2 depth_point;
@@ -61,5 +54,4 @@ public:
 
 	void from_renderable(const_entity_handle);
 	void from_sprite(const components::sprite&, bool polygonize);
-	void from_polygon(const components::polygon&);
 };

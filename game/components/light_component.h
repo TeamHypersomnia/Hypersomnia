@@ -18,8 +18,16 @@ namespace components {
 
 		light();
 
-		attenuation attenuations[4];
-		attenuation wall_attenuations[4];
+		attenuation constant;
+		attenuation linear;
+		attenuation quadratic;
+		attenuation max_distance;
+		
+		attenuation wall_constant;
+		attenuation wall_linear;
+		attenuation wall_quadratic;
+		attenuation wall_max_distance;
+
 		value_variation position_variations[2];
 	};
 }

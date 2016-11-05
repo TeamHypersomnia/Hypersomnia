@@ -27,27 +27,22 @@ namespace augs {
 		return a * (static_cast<A>(1.0) - alpha) + b * (alpha);
 	}
 
+	template <class C, class Xp, class Yp>
+	auto get_aabb(const C& v, Xp x_pred, Yp y_pred) {
+		const auto lower_x = x_pred(*std::min_element(v.begin(), v.end(), [&x_pred](const auto a, const auto b) { return x_pred(a) < x_pred(b); }));
+		const auto lower_y = y_pred(*std::min_element(v.begin(), v.end(), [&y_pred](const auto a, const auto b) { return y_pred(a) < y_pred(b); }));
+		const auto upper_x = x_pred(*std::max_element(v.begin(), v.end(), [&x_pred](const auto a, const auto b) { return x_pred(a) < x_pred(b); }));
+		const auto upper_y = y_pred(*std::max_element(v.begin(), v.end(), [&y_pred](const auto a, const auto b) { return y_pred(a) < y_pred(b); }));
+
+		return rects::ltrb<std::remove_const_t<decltype(lower_x)>>(lower_x, lower_y, upper_x, upper_y);
+	}
+
 	template <class C>
 	auto get_aabb(const C& container) {
-		const auto* v = container.data();
-		const unsigned verts = container.size();
-
-		typedef typename std::decay_t<decltype(container[0])>::value_type T;
-
-		auto x_pred = [](vec2t<T> a, vec2t<T> b) { return a.x < b.x; };
-		auto y_pred = [](vec2t<T> a, vec2t<T> b) { return a.y < b.y; };
-
-		vec2t<T> lower(
-			static_cast<T>(std::min_element(v, v + verts, x_pred)->x),
-			static_cast<T>(std::min_element(v, v + verts, y_pred)->y)
+		return get_aabb(container,
+			[](const auto p) { return p.x; },
+			[](const auto p) { return p.y; }
 		);
-
-		vec2t<T> upper(
-			static_cast<T>(std::max_element(v, v + verts, x_pred)->x),
-			static_cast<T>(std::max_element(v, v + verts, y_pred)->y)
-		);
-
-		return rects::ltrb<T>(lower.x, lower.y, upper.x, upper.y);
 	}
 
 	template <class T>
