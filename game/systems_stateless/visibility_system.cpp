@@ -49,9 +49,11 @@ size_t visibility_information_response::get_num_triangles() const {
 }
 
 discontinuity* visibility_information_response::get_discontinuity_for_edge(const size_t n) {
-	for (auto& disc : discontinuities)
-		if (disc.edge_index == n)
+	for (auto& disc : discontinuities) {
+		if (disc.edge_index == n) {
 			return &disc;
+		}
+	}
 
 	return nullptr;
 }

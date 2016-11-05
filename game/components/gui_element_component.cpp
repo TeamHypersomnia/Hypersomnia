@@ -143,11 +143,11 @@ namespace components {
 			augs::gui::text_drawer tooltip_drawer;
 
 			tooltip_drawer.set_text(gui::text::format(drag_result.tooltip_text, gui::text::style()));
-			tooltip_drawer.pos = vec2i(get_gui_crosshair_position()) + vec2i(int(cursor_sprite.size.x) + 2, 0);
+			tooltip_drawer.pos = vec2i(get_gui_crosshair_position()) + vec2i(static_cast<int>(cursor_sprite.size.x) + 2, 0);
 
 			state.renderable_transform.pos = left_top_corner;
 			bg_sprite.size.set(tooltip_drawer.get_bbox());
-			bg_sprite.size.y = float(std::max(int(cursor_sprite.size.y), tooltip_drawer.get_bbox().y));
+			bg_sprite.size.y = static_cast<float>(std::max(static_cast<int>(cursor_sprite.size.y), tooltip_drawer.get_bbox().y));
 			bg_sprite.size.x += cursor_sprite.size.x;
 			bg_sprite.draw(state);
 
