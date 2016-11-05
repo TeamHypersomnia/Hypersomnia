@@ -3,6 +3,9 @@
 #include <gl/glew.h>
 #include <gl/wglew.h>
 #include <GL/GL.h>
+
+#undef min
+#undef max
 #elif PLATFORM_LINUX
 #include <GL/glew.h>
 #include <GL/gl.h>
