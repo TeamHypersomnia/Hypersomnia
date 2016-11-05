@@ -10,6 +10,7 @@
 #include "game/messages/visibility_information.h"
 
 #include "game/systems_stateless/visibility_system.h"
+#include "game/systems_stateless/render_system.h"
 
 #include "game/enums/filters.h"
 
@@ -97,13 +98,23 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 			light.quadratic.base_value
 		);
 
+		output.call_triangles();
+		output.clear_triangles();
+
+		glUniform1f(light_max_distance_uniform, light.wall_max_distance.base_value);
+
+		glUniform3f(light_attenuation_uniform,
+			light.wall_constant.base_value,
+			light.wall_linear.base_value,
+			light.wall_quadratic.base_value
+		);
+
 		glUniform3f(light_multiply_color_uniform,
 			light.color.r,
 			light.color.g,
 			light.color.b);
 
-		output.call_triangles();
-		output.clear_triangles();
+		render_system().draw_entities(output.triangles, step.visible_per_layer[render_layer::DYNAMIC_BODY], step.camera_state, true);
 
 		glUniform3f(light_multiply_color_uniform,
 			1.f,
