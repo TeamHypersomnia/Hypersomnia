@@ -355,6 +355,7 @@
     <ClCompile Include="game\detail\gui\root_of_inventory_gui.cpp" />
     <ClCompile Include="game\detail\gui\slot_button.cpp" />
     <ClCompile Include="game\detail\world_camera.cpp" />
+    <ClCompile Include="game\scene_managers\rendering_scripts\illuminated_rendering.cpp" />
     <ClCompile Include="game\systems_insignificant\interpolation_system.cpp" />
     <ClCompile Include="game\scene_managers\networked_testbed.cpp" />
     <ClCompile Include="game\systems_insignificant\past_infection_system.cpp" />

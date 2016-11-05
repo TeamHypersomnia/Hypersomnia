@@ -22,7 +22,7 @@
 #include "3rdparty/GL/OpenGL.h"
 
 namespace rendering_scripts {
-	void standard_rendering(viewing_step& step) {
+	void illuminated_rendering(viewing_step& step) {
 		const auto& state = step.camera_state;
 		auto& renderer = step.renderer;
 		auto& output = renderer.triangles;
@@ -40,6 +40,10 @@ namespace rendering_scripts {
 		auto& pure_color_highlight_shader = *resource_manager.find(assets::program_id::PURE_COLOR_HIGHLIGHT);
 		auto& circular_bars_shader = *resource_manager.find(assets::program_id::CIRCULAR_BARS);
 		
+		auto& light = cosmos.systems_insignificant.get<light_system>();
+
+		light.render_all_lights(renderer, matrix, step);
+
 		default_shader.use();
 		{
 			const auto projection_matrix_uniform = glGetUniformLocation(default_shader.id, "projection_matrix");

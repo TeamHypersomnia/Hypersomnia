@@ -75,7 +75,7 @@ void viewing_session::view(const cosmos& cosmos,
 	
 	viewing_step main_cosmos_viewing_step(cosmos, hud, world_hover_highlighter, dt, renderer, camera.get_state_for_drawing_camera(character_chased_by_camera));
 
-	rendering_scripts::standard_rendering(main_cosmos_viewing_step);
+	rendering_scripts::illuminated_rendering(main_cosmos_viewing_step);
 
 	using namespace augs::gui::text;
 

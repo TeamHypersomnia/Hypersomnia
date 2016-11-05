@@ -5,4 +5,5 @@ class viewing_step;
 
 namespace rendering_scripts {
 	void standard_rendering(viewing_step& step);
+	void illuminated_rendering(viewing_step& step);
 }
