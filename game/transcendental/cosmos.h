@@ -14,6 +14,7 @@
 
 #include "game/systems_insignificant/interpolation_system.h"
 #include "game/systems_insignificant/past_infection_system.h"
+#include "game/systems_insignificant/light_system.h"
 #include "game/systems_temporary/dynamic_tree_system.h"
 #include "game/systems_temporary/physics_system.h"
 #include "game/systems_temporary/processing_lists_system.h"

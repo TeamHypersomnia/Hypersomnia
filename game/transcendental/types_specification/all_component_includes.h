@@ -44,3 +44,4 @@
 #include "game/components/physical_relations_component.h"
 #include "game/components/interpolation_component.h"
 #include "game/components/flags_component.h"
+#include "game/components/light_component.h"

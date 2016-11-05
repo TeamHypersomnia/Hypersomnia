@@ -5,6 +5,7 @@
 class viewing_step;
 
 class light_system {
+public:
 	struct cache {
 		float all_variation_values[10];
 	};
@@ -16,5 +17,5 @@ class light_system {
 
 	void reserve_caches_for_entities(const size_t);
 
-	void render_all_lights(vertex_triangle_buffer& output);
+	void render_all_lights(viewing_step&);
 };

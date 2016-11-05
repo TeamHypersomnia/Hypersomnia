@@ -22,6 +22,7 @@ enum class processing_subjects {
 	WITH_TRACE,
 	WITH_TRIGGER_QUERY_DETECTOR,
 	WITH_PAST_CONTAGIOUS,
+	WITH_LIGHT,
 
 	COUNT
 };

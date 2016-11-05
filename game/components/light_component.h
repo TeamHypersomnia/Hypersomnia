@@ -10,7 +10,7 @@ namespace components {
 		};
 
 		struct attenuation {
-			float base_value;
+			float base_value = 0.f;
 			value_variation variation;
 		};
 

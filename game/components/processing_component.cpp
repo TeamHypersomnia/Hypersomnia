@@ -3,11 +3,12 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/types_specification/all_component_includes.h"
+#include "augs/misc/constant_size_vector.h"
 
 typedef components::processing P;
 
 P P::get_default(const const_entity_handle& id) {
-	std::vector<processing_subjects> matching;
+	augs::constant_size_vector<processing_subjects, static_cast<size_t>(processing_subjects::COUNT)> matching;
 
 	if (id.has<components::animation>()) {
 		matching.push_back(processing_subjects::WITH_ANIMATION);
@@ -69,13 +70,16 @@ P P::get_default(const const_entity_handle& id) {
 	if (id.has<components::trigger_query_detector>()) {
 		matching.push_back(processing_subjects::WITH_TRIGGER_QUERY_DETECTOR);
 	}
+	if (id.has<components::light>()) {
+		matching.push_back(processing_subjects::WITH_LIGHT);
+	}
 	if (id.get_flag(entity_flag::IS_PAST_CONTAGIOUS)) {
 		matching.push_back(processing_subjects::WITH_PAST_CONTAGIOUS);
 	}
 
 	P result;
 
-	for (auto m : matching)
+	for (const auto m : matching)
 		result.processing_subject_categories.set(m);
 
 	return result;

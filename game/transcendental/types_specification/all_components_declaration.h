@@ -46,6 +46,7 @@ namespace components {
 	struct sub_entities;
 	struct physical_relations;
 	struct interpolation;
+	struct light;
 	struct substance;
 }
 
@@ -95,6 +96,7 @@ struct put_all_components_into {
 		components::sub_entities,
 		components::physical_relations,
 		components::interpolation,
+		components::light,
 
 		components::substance
 
