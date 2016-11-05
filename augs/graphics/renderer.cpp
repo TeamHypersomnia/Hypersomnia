@@ -48,6 +48,11 @@ namespace augs {
 		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id); glerr;
 	}
 
+	void renderer::initialize_fbos(const vec2i screen_size) {
+		smoke_fbo.create(screen_size.x, screen_size.y);
+		light_fbo.create(screen_size.x, screen_size.y);
+	}
+
 	void renderer::enable_special_vertex_attribute() {
 		glEnableVertexAttribArray(int(vertex_attribute::special)); glerr;
 	}

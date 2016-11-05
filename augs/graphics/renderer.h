@@ -3,6 +3,7 @@
 #include "augs/math/vec2.h"
 #include "augs/graphics/pixel.h"
 #include "augs/graphics/vertex.h"
+#include "augs/graphics/fbo.h"
 
 #include "game/components/transform_component.h"
 #include "game/transcendental/entity_id.h"
@@ -31,6 +32,9 @@ namespace augs {
 			void draw_yellow(vec2 a, vec2 b);
 			void draw_cyan(vec2 a, vec2 b);
 		};
+
+		graphics::fbo smoke_fbo;
+		graphics::fbo light_fbo;
 
 		line_channel logic_lines, prev_logic_lines;
 		line_channel frame_lines;
@@ -70,6 +74,7 @@ namespace augs {
 		int draw_weapon_info = 0;
 
 		void initialize();
+		void initialize_fbos(const vec2i screen_size);
 
 		void fullscreen_quad();
 		
