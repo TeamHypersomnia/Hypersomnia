@@ -60,7 +60,7 @@ namespace scene_managers {
 		for (int x = -4 * 1; x < 4 * 1; ++x)
 		{
 			auto frog = world.create_entity("frog");
-			ingredients::sprite(frog, vec2(100 + x * 40, 200 + 400), assets::texture_id::TEST_SPRITE, augs::white, render_layer::DYNAMIC_BODY);
+			ingredients::sprite(frog, vec2(100 + x * 40, 200 + 400), assets::texture_id::TEST_SPRITE, augs::white, render_layer::SMALL_DYNAMIC_BODY);
 			ingredients::see_through_dynamic_body(frog);
 			name_entity(frog, entity_name::CRATE);
 			frog.add_standard_components();
@@ -81,16 +81,15 @@ namespace scene_managers {
 		for (int x = -side; x < side; ++x)
 			for (int y = -side; y < side; ++y)
 			{
-				auto background = world.create_entity("bg[-]");
-				ingredients::sprite(background, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 550)), assets::texture_id::TEST_BACKGROUND, augs::white, render_layer::GROUND);
+				//auto background = world.create_entity("bg[-]");
+				//ingredients::sprite(background, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 550)), assets::texture_id::TEST_BACKGROUND, augs::white, render_layer::GROUND);
 				//ingredients::standard_static_body(background);
 
 				auto street = world.create_entity("street[-]");
-				ingredients::sprite_scalled(street, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 700)) - vec2(1500, 700),
-					vec2(3000, 3000),
-					assets::texture_id::TEST_BACKGROUND, augs::gray1, render_layer::UNDER_GROUND);
+				ingredients::sprite(street, { bg_size * vec2(x, y) },
+					assets::texture_id::TEST_BACKGROUND, augs::gray1, render_layer::GROUND);
 
-				background.add_standard_components();
+				//background.add_standard_components();
 				street.add_standard_components();
 			}
 
