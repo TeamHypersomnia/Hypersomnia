@@ -64,6 +64,10 @@ namespace augs {
 	void renderer::clear_current_fbo() {
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
+	
+	void renderer::set_active_texture(const unsigned n) {
+		glActiveTexture(GL_TEXTURE0 + n);
+	}
 
 	void renderer::call_triangles() {
 		if (triangles.empty()) return;

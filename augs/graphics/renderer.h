@@ -76,6 +76,8 @@ namespace augs {
 		void initialize();
 		void initialize_fbos(const vec2i screen_size);
 
+		void set_active_texture(const unsigned);
+
 		void fullscreen_quad();
 		
 		void clear_logic_lines();
