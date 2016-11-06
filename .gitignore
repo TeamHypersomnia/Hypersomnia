@@ -166,7 +166,6 @@ pip-log.txt
 !*.lua
 /ReleaseDebug
 *.wav
-*.png
 /ReleaseExe
 /RelDeb
 /output/sessions
