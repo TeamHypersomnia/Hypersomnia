@@ -23,6 +23,8 @@
 #include "augs/texture_baker/font.h"
 #include "augs/graphics/shader.h"
 
+#include "augs/misc/enum_associative_array.h"
+
 namespace resources {
 	class manager {
 	public:
@@ -71,16 +73,16 @@ namespace resources {
 
 	private:
 
-		std::unordered_map<assets::particle_effect_id, particle_effect> particle_effects;
-		std::unordered_map<assets::particle_effect_response_id, particle_effect_response> particle_effect_responses;
-		std::unordered_map<assets::animation_response_id, animation_response> animation_responses;
-		std::unordered_map<assets::animation_id, animation> animations;
-		std::unordered_map<assets::texture_id, texture_with_image> textures;
-		std::unordered_map<assets::font_id, augs::font> fonts;
-		std::unordered_map<assets::atlas_id, augs::atlas> atlases;
-		std::unordered_map<assets::shader_id, augs::graphics::shader> shaders;
-		std::unordered_map<assets::program_id, augs::graphics::shader_program> programs;
-		std::unordered_map<assets::behaviour_tree_id, behaviour_tree> behaviour_trees;
+		augs::enum_associative_array<assets::particle_effect_id, particle_effect> particle_effects;
+		augs::enum_associative_array<assets::particle_effect_response_id, particle_effect_response> particle_effect_responses;
+		augs::enum_associative_array<assets::animation_response_id, animation_response> animation_responses;
+		augs::enum_associative_array<assets::animation_id, animation> animations;
+		augs::enum_associative_array<assets::texture_id, texture_with_image> textures;
+		augs::enum_associative_array<assets::font_id, augs::font> fonts;
+		augs::enum_associative_array<assets::atlas_id, augs::atlas> atlases;
+		augs::enum_associative_array<assets::shader_id, augs::graphics::shader> shaders;
+		augs::enum_associative_array<assets::program_id, augs::graphics::shader_program> programs;
+		augs::enum_associative_array<assets::behaviour_tree_id, behaviour_tree> behaviour_trees;
 	};
 }
 

@@ -78,7 +78,7 @@ namespace assets {
 		DETACHABLE_MAGAZINE_ICON,
 		GUN_BARREL_SLOT_ICON,
 
-		CUSTOM = 10000
+		COUNT,
 	};
 	
 	vec2i get_size(texture_id);

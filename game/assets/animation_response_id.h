@@ -6,6 +6,7 @@ namespace assets {
 		INVALID,
 
 		TORSO_SET,
+		COUNT
 	};
 }
 

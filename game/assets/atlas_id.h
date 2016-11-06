@@ -5,5 +5,6 @@ namespace assets {
 		INVALID,
 
 		GAME_WORLD_ATLAS,
+		COUNT
 	};
 }

@@ -131,9 +131,10 @@ namespace augs {
 		}
 
 		void clear() {
-			for_each([](T& v) {
-				v.second = T();
-			});
+			for (auto& v : raw) {
+				v.~T();
+				new (&v) T;
+			}
 
 			is_set = std::bitset<static_cast<size_t>(Enum::COUNT)>();
 		}

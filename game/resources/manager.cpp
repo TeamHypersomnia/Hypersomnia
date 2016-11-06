@@ -109,8 +109,6 @@ namespace resources {
 	}
 
 	atlas& manager::create(assets::atlas_id id, unsigned atlas_creation_mode_flags) {
-		atlases.insert(std::make_pair(id, atlas()));
-
 		atlas& atl = atlases[id];
 
 		if (atlas_creation_mode_flags & atlas_creation_mode::FROM_ALL_TEXTURES) {
@@ -131,16 +129,12 @@ namespace resources {
 	}
 
 	augs::font& manager::create(assets::font_id id) {
-		fonts.insert(std::make_pair(id, augs::font()));
-
 		augs::font& font = fonts[id];
 
 		return font;
 	}
 
 	texture_with_image& manager::create(assets::texture_id id, image img) {
-		textures.insert(std::make_pair(id, texture_with_image()));
-
 		texture_with_image& tex = textures[id];
 		tex.set_from_image(img);
 
@@ -157,8 +151,6 @@ namespace resources {
 	}
 
 	animation& manager::create(assets::animation_id id) {
-		animations.insert(std::make_pair(id, animation()));
-
 		animation& anim = animations[id];
 		return anim;
 	}
@@ -237,30 +229,22 @@ namespace resources {
 	}
 
 	animation_response& manager::create(assets::animation_response_id id) {
-		animation_responses.insert(std::make_pair(id, animation_response()));
-
 		animation_response& resp = animation_responses[id];
 		return resp;
 	}
 
 
 	particle_effect_response& manager::create(assets::particle_effect_response_id id) {
-		particle_effect_responses.insert(std::make_pair(id, particle_effect_response()));
-
 		auto& resp = particle_effect_responses[id];
 		return resp;
 	}
 
 	particle_effect& manager::create(assets::particle_effect_id id) {
-		particle_effects.insert(std::make_pair(id, particle_effect()));
-
 		auto& resp = particle_effects[id];
 		return resp;
 	}
 
 	texture_with_image& manager::create(assets::texture_id id, std::string filename) {
-		textures.insert(std::make_pair(id, texture_with_image()));
-
 		texture_with_image& tex = textures[id];
 		tex.set_from_image_file(filename);
 
@@ -268,8 +252,6 @@ namespace resources {
 	}
 
 	graphics::shader& manager::create(assets::shader_id id, std::string filename, augs::graphics::shader::type type) {
-		shaders.insert(std::make_pair(id, graphics::shader()));
-
 		graphics::shader& sh = shaders[id];
 		sh.create(type, get_file_contents(filename));
 
@@ -277,8 +259,6 @@ namespace resources {
 	}
 
 	graphics::shader_program& manager::create(assets::program_id program_id, assets::shader_id vertex_id, assets::shader_id fragment_id) {
-		programs.insert(std::make_pair(program_id, graphics::shader_program()));
-
 		graphics::shader_program& p = programs[program_id];
 		p.create(); 
 		p.attach(shaders[vertex_id]);
@@ -289,8 +269,6 @@ namespace resources {
 	}
 	
 	behaviour_tree& manager::create(assets::behaviour_tree_id id) {
-		behaviour_trees.insert(std::make_pair(id, behaviour_tree()));
-
 		auto& tree = behaviour_trees[id];
 		return tree;
 	}

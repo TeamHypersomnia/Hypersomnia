@@ -4,7 +4,8 @@ namespace assets {
 	enum class font_id {
 		INVALID,
 
-		GUI_FONT
+		GUI_FONT,
+		COUNT
 	};
 }
 

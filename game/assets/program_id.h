@@ -9,6 +9,7 @@ namespace assets {
 		LIGHT,
 		PURE_COLOR_HIGHLIGHT,
 		CIRCULAR_BARS,
-		FULLSCREEN
+		FULLSCREEN,
+		COUNT
 	};
 }
