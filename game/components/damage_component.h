@@ -81,7 +81,5 @@ namespace components {
 				CEREAL_NVP(saved_point_of_impact_before_death)
 				);
 		}
-
-		static bool can_merge_entities(const_entity_handle a, const_entity_handle b);
 	};
 }

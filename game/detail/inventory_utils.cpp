@@ -8,6 +8,7 @@
 #include "game/components/special_physics_component.h"
 #include "game/components/interpolation_component.h"
 #include "game/components/item_slot_transfers_component.h"
+#include "game/components/name_component.h"
 #include "game/detail/entity_scripts.h"
 #include "game/messages/queue_destruction.h"
 #include "game/transcendental/entity_handle.h"
@@ -16,6 +17,8 @@
 #include "game/transcendental/step.h"
 #include "augs/templates/string_templates.h"
 #include "game/detail/gui/gui_positioning.h"
+
+#include "game/enums/entity_name.h"
 
 item_transfer_result query_transfer_result(const_item_slot_transfer_request r) {
 	item_transfer_result output;
@@ -75,7 +78,7 @@ item_transfer_result containment_result(const_item_slot_transfer_request r, bool
 
 	if (item.current_slot == r.get_target_slot())
 		result = item_transfer_result_type::THE_SAME_SLOT;
-	else if (slot.always_allow_exactly_one_item && slot.items_inside.size() == 1 && !can_merge_entities(cosmos[slot.items_inside[0]], r.get_item())) {
+	else if (slot.always_allow_exactly_one_item && slot.items_inside.size() == 1 && !can_stack_entities(cosmos[slot.items_inside[0]], r.get_item())) {
 		//if (allow_replacement) {
 		//
 		//}
@@ -126,10 +129,22 @@ item_transfer_result containment_result(const_item_slot_transfer_request r, bool
 	return output;
 }
 
-bool can_merge_entities(const_entity_handle a, const_entity_handle b) {
-	return 
-		components::item::can_merge_entities(a, b) &&
-		components::damage::can_merge_entities(a, b);
+bool can_stack_entities(const const_entity_handle a, const const_entity_handle b) {
+	const bool same_names =
+		a.has<components::name>() &&
+		b.has<components::name>() &&
+		a.get<components::name>().id == b.get<components::name>().id;
+
+	if (same_names) {
+		switch (a.get<components::name>().id) {
+		case entity_name::GREEN_CHARGE: return true;
+		case entity_name::PINK_CHARGE: return true;
+		case entity_name::CYAN_CHARGE: return true;
+		default: return false;
+		}
+	}
+
+	return false;
 }
 
 unsigned to_space_units(std::string s) {
@@ -246,7 +261,7 @@ void perform_transfer(item_slot_transfer_request r, logic_step& step) {
 
 		if (is_pickup_or_transfer) {
 			for (auto& i : cosmos.get_handle(r.get_target_slot())->items_inside) {
-				if (can_merge_entities(r.get_item(), cosmos[i])) {
+				if (can_stack_entities(r.get_item(), cosmos[i])) {
 					target_item_to_stack_with = i;
 				}
 			}

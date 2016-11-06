@@ -86,6 +86,5 @@ namespace components {
 		unsigned get_space_occupied() const;
 		bool is_mounted() const;
 		bool are_parents_last_in_lifo_slots() const;
-		static bool can_merge_entities(const_entity_handle e1, const_entity_handle e2);
 	};
 }

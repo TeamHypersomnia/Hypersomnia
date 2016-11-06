@@ -66,7 +66,7 @@ drag_and_drop_result prepare_drag_and_drop_result(C context) {
 						no_slot_in_targeted_item = true;
 					}
 				}
-				else if (can_merge_entities(target_item_handle, dragged_item_handle)) {
+				else if (can_stack_entities(target_item_handle, dragged_item_handle)) {
 					simulated_request.target_slot = target_item_handle.get<components::item>().current_slot;
 					was_pointing_to_a_stack_target = true;
 				}

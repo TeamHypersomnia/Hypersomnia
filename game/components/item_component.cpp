@@ -57,23 +57,6 @@ namespace components {
 	//	current_mounting = MOUNTED;
 	//}
 
-	bool item::can_merge_entities(const_entity_handle e1, const_entity_handle e2) {
-		auto* pa = e1.find<item>();
-		auto* pb = e2.find<item>();
-		if (!pa && !pb) return true;
-		if (!(pa && pb)) return false;
-
-		auto& a = *pa;
-		auto& b = *pb;
-
-		return
-			a.stackable && b.stackable &&
-			std::make_tuple(a.categories_for_slot_compatibility, a.space_occupied_per_charge, a.dual_wield_accuracy_loss_percentage, a.dual_wield_accuracy_loss_multiplier, 
-				a.attachment_offsets_per_sticking_mode, a.montage_time_ms, a.current_mounting) == 
-			std::make_tuple(b.categories_for_slot_compatibility, b.space_occupied_per_charge, b.dual_wield_accuracy_loss_percentage, b.dual_wield_accuracy_loss_multiplier,
-				b.attachment_offsets_per_sticking_mode, b.montage_time_ms, b.current_mounting);
-	}
-
 	bool item::is_mounted() const {
 		return current_mounting == MOUNTED;
 	}

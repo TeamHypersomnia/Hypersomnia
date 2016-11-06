@@ -16,8 +16,9 @@ namespace augs {
 		filename.resize(filename.size() - 4);
 		filename += "_polygonized.png";
 
-		if (augs::file_exists(filename))
+		if (augs::file_exists(filename)) {
 			polygonize_from_file(filename);
+		}
 	}
 	
 	void texture_with_image::polygonize_from_file(std::string filename) {

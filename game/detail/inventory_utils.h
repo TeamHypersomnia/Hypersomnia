@@ -15,7 +15,7 @@ item_transfer_result containment_result(const_item_slot_transfer_request, bool a
 item_transfer_result query_transfer_result(const_item_slot_transfer_request);
 slot_function detect_compatible_slot(const_entity_handle item, const_entity_handle container);
 
-bool can_merge_entities(const_entity_handle, const_entity_handle);
+bool can_stack_entities(const_entity_handle, const_entity_handle);
 
 unsigned to_space_units(std::string s);
 std::wstring format_space_units(unsigned);
