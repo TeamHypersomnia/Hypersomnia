@@ -103,22 +103,41 @@ namespace scene_managers {
 		};
 
 		{
-			const auto green_light = world.create_entity("red_light");
 			{
-				green_light += components::transform();
-				auto& light = green_light += components::light();
+				const auto l = world.create_entity("l");
+				l += components::transform();
+				auto& light = l += components::light();
+				light.color = red;
+				l.add_standard_components();
+			}
+			{
+				const auto l = world.create_entity("l");
+				l += components::transform(300, 0);
+				auto& light = l += components::light();
 				light.color = green;
+				l.add_standard_components();
 			}
-
-			const auto cyan_light = world.create_entity("red_light");
 			{
-				cyan_light += components::transform(300, 0);
-				auto& light = cyan_light += components::light();
-				light.color = cyan;
+				const auto l = world.create_entity("l");
+				l += components::transform(600, 0);
+				auto& light = l += components::light();
+				light.color = blue;
+				l.add_standard_components();
 			}
-
-			green_light.add_standard_components();
-			cyan_light.add_standard_components();
+			{
+				const auto l = world.create_entity("l");
+				l += components::transform(900, 0);
+				auto& light = l += components::light();
+				light.color = cyan;
+				l.add_standard_components();
+			}
+			{
+				const auto l = world.create_entity("l");
+				l += components::transform(1200, 0);
+				auto& light = l += components::light();
+				light.color = orange;
+				l.add_standard_components();
+			}
 		}
 
 		for (int i = 0; i < num_characters; ++i) {
@@ -214,7 +233,7 @@ namespace scene_managers {
 		const auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
 		prefabs::create_sample_backpack(world, vec2(200, -750));
 
-		//perform_transfer({ backpack, character(0)[slot_function::SHOULDER_SLOT] }, step);
+		perform_transfer({ backpack, character(0)[slot_function::SHOULDER_SLOT] }, step);
 		perform_transfer({ submachine, character(0)[slot_function::PRIMARY_HAND] }, step);
 		perform_transfer({ rifle, character(0)[slot_function::SECONDARY_HAND] }, step);
 

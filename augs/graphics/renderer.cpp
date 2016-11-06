@@ -24,6 +24,8 @@ namespace augs {
 	void renderer::initialize() {
 		glEnable(GL_TEXTURE_2D); glerr;
 		glEnable(GL_BLEND); glerr;
+
+		//glBlendFuncSeparate(GL_ONE, GL_ONE, GL_ZERO, GL_ONE);
 		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE); glerr;
 		glClearColor(0.0, 0.0, 0.0, 1.0); glerr;
 

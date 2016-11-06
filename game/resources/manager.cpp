@@ -124,6 +124,10 @@ namespace resources {
 		if (atlas_creation_mode_flags & atlas_creation_mode::FROM_ALL_TEXTURES) {
 			for (const auto& tex : textures) {
 				atl.textures.push_back(&tex.second);
+			}			
+			
+			for (const auto& tex : neon_maps) {
+				atl.textures.push_back(&tex.second);
 			}
 		}
 
@@ -262,7 +266,7 @@ namespace resources {
 		filename += "_neon_map.png";
 
 		if (augs::file_exists(filename)) {
-			texture_with_image& neon_tex = textures[id];
+			texture_with_image& neon_tex = neon_maps[id];
 			neon_tex.set_from_image_file(filename);
 		}
 

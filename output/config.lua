@@ -25,7 +25,7 @@ config_table = {
 	determinism_test_cloned_cosmoi_count = 2,
 
 	window_name = "example",
-	fullscreen = 0,
+	fullscreen = 1,
 	window_border = 1,
 	window_x = 400,
 	window_y = 0,

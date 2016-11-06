@@ -30,6 +30,8 @@ namespace components {
 			vec2 visible_world_area;
 
 			augs::rgba colorize = augs::white;
+
+			bool use_neon_map = false;
 		};
 
 		/* the polygon as it was originally, so possibly concave

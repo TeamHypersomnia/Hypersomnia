@@ -7,14 +7,14 @@ out vec4 outputColor;
 uniform sampler2D basic_texture;
 uniform sampler2D light_texture;
 
-const int levels = 4;
+const int levels = 3;
 const int step = 255/levels;
 
 void main() 
 {
 	vec2 texcoord = gl_FragCoord.xy;
-	texcoord.x /= 1200.0; 
-	texcoord.y /= 800.0;
+	texcoord.x /= 1920.0; 
+	texcoord.y /= 1080.0;
 
 	vec4 light = texture(light_texture, texcoord);
 	//light.r = float(step * (int(light.r * 255.0) / step)) / 255.0;

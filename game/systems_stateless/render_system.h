@@ -47,20 +47,21 @@ public:
 		}
 		else if (renderable_drawing_mode == renderable_drawing_type::BORDER_HIGHLIGHTS) {
 			if (render.draw_border) {
-				static vec2i offsets[4] = {
+				static const vec2i offsets[4] = {
 					vec2i(-1, 0), vec2i(1, 0), vec2i(0, 1), vec2i(0, -1)
 				};
 
 				in.colorize = render.border_color;
 
-				for (auto& o : offsets) {
+				for (const auto o : offsets) {
 					in.renderable_transform.pos = renderable_transform.pos + o;
 					renderable.draw(in);
 				}
 			}
 		}
 		else if (renderable_drawing_mode == renderable_drawing_type::NEON_MAPS) {
-
+			in.use_neon_map = true;
+			renderable.draw(in);
 		}
 	}
 

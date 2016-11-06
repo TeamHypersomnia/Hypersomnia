@@ -25,6 +25,7 @@ namespace components {
 			components::transform camera_transform;
 			vec2 visible_world_area;
 			augs::rgba colorize;
+			bool use_neon_map = false;
 		};
 
 		struct stream {

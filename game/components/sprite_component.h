@@ -26,6 +26,7 @@ namespace components {
 			positioning_type positioning = positioning_type::CENTER;
 
 			augs::rgba colorize = augs::white;
+			bool use_neon_map = false;
 
 			void setup_from(const state_for_drawing_camera&);
 		};

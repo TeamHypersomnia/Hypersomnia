@@ -32,11 +32,12 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 	ensure_eq(0, output.get_triangle_count());
 
 	output.light_fbo.use();
-	glClearColor(0.f, 0.1f, 0.1f, 1.0f);
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	output.clear_current_fbo();
 	glClearColor(0.f, 0.f, 0.f, 0.f);
 
 	auto& light_program = *resource_manager.find(assets::program_id::LIGHT);
+	auto& default_program = *resource_manager.find(assets::program_id::DEFAULT);
 	light_program.use();
 
 	const auto light_pos_uniform = glGetUniformLocation(light_program.id, "light_pos");
@@ -68,6 +69,7 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 	const auto camera_transform = step.camera_state.camera_transform;
 	const auto camera_size = step.camera_state.visible_world_area;
 
+	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_ONE, GL_ONE); glerr;
 	for (size_t i = 0; i < responses.size(); ++i) {
 		const auto& r = responses[i];
 		const auto& light_entity = cosmos[requests[i].subject];
@@ -110,6 +112,8 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 
 		output.call_triangles();
 		output.clear_triangles();
+		
+		light_program.use();
 
 		glUniform1f(light_max_distance_uniform, light.wall_max_distance.base_value);
 		
@@ -134,6 +138,19 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 			1.f,
 			1.f);
 	}
+
+	default_program.use();
+
+	render_system().draw_entities(output.triangles, step.visible_per_layer[render_layer::DYNAMIC_BODY], step.camera_state, renderable_drawing_type::NEON_MAPS);
+	render_system().draw_entities(output.triangles, step.visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], step.camera_state, renderable_drawing_type::NEON_MAPS);
+	render_system().draw_entities(output.triangles, step.visible_per_layer[render_layer::FLYING_BULLETS], step.camera_state, renderable_drawing_type::NEON_MAPS);
+	render_system().draw_entities(output.triangles, step.visible_per_layer[render_layer::CAR_INTERIOR], step.camera_state, renderable_drawing_type::NEON_MAPS);
+	render_system().draw_entities(output.triangles, step.visible_per_layer[render_layer::CAR_WHEEL], step.camera_state, renderable_drawing_type::NEON_MAPS);
+
+	output.call_triangles();
+	output.clear_triangles();
+
+	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE); glerr;
 
 	graphics::fbo::use_default();
 

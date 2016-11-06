@@ -67,12 +67,29 @@ namespace components {
 	}
 
 	void sprite::draw(const drawing_input& in) const {
-		std::array<vec2, 4> v;
 		ensure(tex != assets::texture_id::INVALID);
+
+		const augs::texture* const original_texture = &resource_manager.find(tex)->tex;
+		const augs::texture* considered_texture = original_texture;
+		vec2 neon_size_multiplier = vec2(1.f, 1.f);
+
+		if (in.use_neon_map) {
+			const auto* const maybe_neon_map = resource_manager.find_neon_map(tex);
+
+			if (maybe_neon_map != nullptr) {
+				considered_texture = &maybe_neon_map->tex;
+				neon_size_multiplier = vec2(considered_texture->get_size()) / vec2(original_texture->get_size());
+			}
+			else {
+				return;
+			}
+		}
+		
+		std::array<vec2, 4> v;
 
 		vec2i transform_pos = in.renderable_transform.pos;
 
-		float final_rotation = in.renderable_transform.rotation + rotation_offset;
+		const float final_rotation = in.renderable_transform.rotation + rotation_offset;
 
 		const auto center = in.visible_world_area / 2;
 
@@ -82,7 +99,9 @@ namespace components {
 			target_position -= vec2(center_offset).rotate(final_rotation, vec2(0, 0));
 		}
 
-		make_rect(target_position, get_size(), final_rotation, v, in.positioning);
+		const auto considered_size = get_size() * neon_size_multiplier;
+
+		make_rect(target_position, considered_size, final_rotation, v, in.positioning);
 
 		/* rotate around the center of the screen */
 		if (in.camera_transform.rotation != 0.f)
@@ -120,11 +139,9 @@ namespace components {
 		t1.vertices[1].texcoord = t2.vertices[2].texcoord = texcoords[2];
 		t1.vertices[2].texcoord = texcoords[3];
 
-		const auto& texture = resource_manager.find(tex)->tex;
-
 		for (int i = 0; i < 3; ++i) {
-			texture.get_uv(t1.vertices[i].texcoord);
-			texture.get_uv(t2.vertices[i].texcoord);
+			considered_texture->get_uv(t1.vertices[i].texcoord);
+			considered_texture->get_uv(t2.vertices[i].texcoord);
 		}
 
 		t1.vertices[0].pos = t2.vertices[0].pos = vec2i(v[0]);
