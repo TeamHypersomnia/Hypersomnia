@@ -330,7 +330,7 @@ void immediate_hud::draw_pure_color_highlights(viewing_step& msg) const {
 		auto ratio = passed / r.maximum_duration_seconds;
 
 		col.a = 255 * (1-ratio) * r.starting_alpha_ratio;
-		render_system().draw_renderable(triangles, sprite, subject.viewing_transform(true), subject.get<components::render>(), msg.camera_state, false);
+		render_system().draw_renderable(triangles, sprite, subject.viewing_transform(true), subject.get<components::render>(), msg.camera_state, renderable_drawing_type::NORMAL);
 		col = prevcol;
 	}
 

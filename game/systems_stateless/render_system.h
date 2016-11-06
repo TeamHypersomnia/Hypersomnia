@@ -6,6 +6,7 @@
 
 #include "augs/graphics/vertex.h"
 #include "game/transcendental/entity_handle_declaration.h"
+#include "game/enums/renderable_drawing_type.h"
 
 using namespace augs;
 
@@ -19,8 +20,8 @@ public:
 		augs::vertex_triangle_buffer& output, 
 		const std::vector<const_entity_handle>&, 
 		const state_for_drawing_camera& in, 
-		const bool only_border_highlights = false) const;
-
+		const renderable_drawing_type renderable_drawing_mode
+	) const;
 
 	template<class renderable_type>
 	void draw_renderable(
@@ -29,7 +30,8 @@ public:
 		const components::transform& renderable_transform,
 		const components::render& render,
 		const state_for_drawing_camera& in_camera,
-		const bool only_border_highlights = false) const {
+		const renderable_drawing_type renderable_drawing_mode
+	) const {
 
 		components::transform camera_transform;
 		camera_transform = render.absolute_transform ? components::transform() : in_camera.camera_transform;
@@ -40,7 +42,10 @@ public:
 		in.renderable_transform = renderable_transform;
 		in.visible_world_area = in_camera.visible_world_area;
 
-		if (only_border_highlights) {
+		if (renderable_drawing_mode == renderable_drawing_type::NORMAL) {
+			renderable.draw(in);
+		}
+		else if (renderable_drawing_mode == renderable_drawing_type::BORDER_HIGHLIGHTS) {
 			if (render.draw_border) {
 				static vec2i offsets[4] = {
 					vec2i(-1, 0), vec2i(1, 0), vec2i(0, 1), vec2i(0, -1)
@@ -54,8 +59,8 @@ public:
 				}
 			}
 		}
-		else {
-			renderable.draw(in);
+		else if (renderable_drawing_mode == renderable_drawing_type::NEON_MAPS) {
+
 		}
 	}
 

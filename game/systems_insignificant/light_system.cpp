@@ -124,7 +124,7 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 			light.color.g/255.f,
 			light.color.b/255.f);
 		
-		render_system().draw_entities(output.triangles, step.visible_per_layer[render_layer::DYNAMIC_BODY], step.camera_state);
+		render_system().draw_entities(output.triangles, step.visible_per_layer[render_layer::DYNAMIC_BODY], step.camera_state, renderable_drawing_type::NORMAL);
 
 		output.call_triangles();
 		output.clear_triangles();

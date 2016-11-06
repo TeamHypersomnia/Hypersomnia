@@ -59,10 +59,10 @@ void render_system::draw_entities(
 	augs::vertex_triangle_buffer& output, 
 	const std::vector<const_entity_handle>& entities, 
 	const state_for_drawing_camera& in_camera, 
-	const bool only_border_highlights
+	const renderable_drawing_type renderable_drawing_mode
 ) const {
 	for (const auto e : entities) {
-		for_each_type<components::polygon, components::sprite, /*components::tile_layer,*/ components::particle_group>([e, &output, &in_camera, only_border_highlights](auto T) {
+		for_each_type<components::polygon, components::sprite, /*components::tile_layer,*/ components::particle_group>([&](auto T) {
 			typedef decltype(T) renderable_type;
 
 			if (e.has<renderable_type>()) {
@@ -70,7 +70,7 @@ void render_system::draw_entities(
 				const auto& renderable_transform = viewing_transform(e, true);
 				const auto& renderable = e.get<renderable_type>();
 
-				render_system().draw_renderable(output, renderable, renderable_transform, render, in_camera, only_border_highlights);
+				render_system().draw_renderable(output, renderable, renderable_transform, render, in_camera, renderable_drawing_mode);
 			}
 		});
 	}

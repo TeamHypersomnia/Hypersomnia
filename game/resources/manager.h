@@ -60,6 +60,7 @@ namespace resources {
 		behaviour_tree& create(assets::behaviour_tree_id);
 
 		texture_with_image* find(assets::texture_id);
+		texture_with_image* find_neon_map(assets::texture_id);
 		augs::font* find(assets::font_id);
 		augs::atlas* find(assets::atlas_id);
 		augs::graphics::shader_program* find(assets::program_id);
@@ -78,6 +79,7 @@ namespace resources {
 		augs::enum_associative_array<assets::animation_response_id, animation_response> animation_responses;
 		augs::enum_associative_array<assets::animation_id, animation> animations;
 		augs::enum_associative_array<assets::texture_id, texture_with_image> textures;
+		augs::enum_associative_array<assets::texture_id, texture_with_image> neon_maps;
 		augs::enum_associative_array<assets::font_id, augs::font> fonts;
 		augs::enum_associative_array<assets::atlas_id, augs::atlas> atlases;
 		augs::enum_associative_array<assets::shader_id, augs::graphics::shader> shaders;

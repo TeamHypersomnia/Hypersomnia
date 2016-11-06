@@ -45,12 +45,22 @@ bool operator!(const assets::texture_id& id) {
 }
 
 namespace resources {
-	texture_with_image* manager::find(assets::texture_id id) {
+	texture_with_image* manager::find(const assets::texture_id id) {
 		auto it = textures.find(id);
 		if (it == textures.end()) return nullptr;
 
 		return &(*it).second;
 	}	
+
+	texture_with_image* manager::find_neon_map(const assets::texture_id id) {
+		auto it = neon_maps.find(id);
+		
+		if (it == neon_maps.end()) {
+			return nullptr;
+		}
+
+		return &(*it).second;
+	}
 
 	atlas* manager::find(assets::atlas_id id) {
 		auto it = atlases.find(id);
@@ -108,17 +118,17 @@ namespace resources {
 		return &(*it).second;
 	}
 
-	atlas& manager::create(assets::atlas_id id, unsigned atlas_creation_mode_flags) {
+	atlas& manager::create(const assets::atlas_id id, const unsigned atlas_creation_mode_flags) {
 		atlas& atl = atlases[id];
 
 		if (atlas_creation_mode_flags & atlas_creation_mode::FROM_ALL_TEXTURES) {
-			for (auto& tex : textures) {
+			for (const auto& tex : textures) {
 				atl.textures.push_back(&tex.second);
 			}
 		}
 
 		if (atlas_creation_mode_flags & atlas_creation_mode::FROM_ALL_FONTS) {
-			for (auto& fnt : fonts) {
+			for (const auto& fnt : fonts) {
 				fnt.second.add_to_atlas(atl);
 			}
 		}
@@ -128,13 +138,13 @@ namespace resources {
 		return atl;
 	}
 
-	augs::font& manager::create(assets::font_id id) {
+	augs::font& manager::create(const assets::font_id id) {
 		augs::font& font = fonts[id];
 
 		return font;
 	}
 
-	texture_with_image& manager::create(assets::texture_id id, image img) {
+	texture_with_image& manager::create(const assets::texture_id id, const image img) {
 		texture_with_image& tex = textures[id];
 		tex.set_from_image(img);
 
@@ -247,6 +257,14 @@ namespace resources {
 	texture_with_image& manager::create(assets::texture_id id, std::string filename) {
 		texture_with_image& tex = textures[id];
 		tex.set_from_image_file(filename);
+
+		filename.resize(filename.size() - 4);
+		filename += "_neon_map.png";
+
+		if (augs::file_exists(filename)) {
+			texture_with_image& neon_tex = textures[id];
+			neon_tex.set_from_image_file(filename);
+		}
 
 		return tex;
 	}

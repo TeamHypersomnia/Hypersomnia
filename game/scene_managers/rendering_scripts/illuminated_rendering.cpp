@@ -53,7 +53,7 @@ namespace rendering_scripts {
 		}
 		
 		for (int i = render_layer::UNDER_GROUND; i > render_layer::DYNAMIC_BODY; --i) {
-			render_system().draw_entities(output, step.visible_per_layer[i], state);
+			render_system().draw_entities(output, step.visible_per_layer[i], state, renderable_drawing_type::NORMAL);
 		}
 
 		renderer.call_triangles();
@@ -65,15 +65,15 @@ namespace rendering_scripts {
 			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
 		}
 		
-		render_system().draw_entities(output, step.visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], state, true);
+		render_system().draw_entities(output, step.visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], state, renderable_drawing_type::BORDER_HIGHLIGHTS);
 		
 		renderer.call_triangles();
 		renderer.clear_triangles();
 		
 		illuminated_shader.use();
 		
-		render_system().draw_entities(output, step.visible_per_layer[render_layer::DYNAMIC_BODY], state);
-		render_system().draw_entities(output, step.visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], state);
+		render_system().draw_entities(output, step.visible_per_layer[render_layer::DYNAMIC_BODY], state, renderable_drawing_type::NORMAL);
+		render_system().draw_entities(output, step.visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], state, renderable_drawing_type::NORMAL);
 		
 		renderer.call_triangles();
 		renderer.clear_triangles();
@@ -85,7 +85,7 @@ namespace rendering_scripts {
 		}
 		
 		for (int i = render_layer::FLYING_BULLETS; i >= 0; --i) {
-			render_system().draw_entities(output, step.visible_per_layer[i], state);
+			render_system().draw_entities(output, step.visible_per_layer[i], state, renderable_drawing_type::NORMAL);
 		}
 		
 		renderer.call_triangles();
