@@ -293,15 +293,26 @@ void visibility_system::respond_to_visibility_information_requests(
 		};
 
 		/* get list of all fixtures that intersect with the visibility square */
-		const auto bodies = physics.query_aabb(aabb.lowerBound, aabb.upperBound, request.filter, ignored_entity).bodies;
+		const auto fixtures = physics.query_aabb(aabb.lowerBound, aabb.upperBound, request.filter, ignored_entity).fixtures;
 
 		/* for every fixture that intersected with the visibility square */
-		for (const auto b : bodies) {
+		for (const auto f : fixtures) {
+			auto* const shape = f->m_shape;
 			/* get shape vertices from misc that transforms them to current entity's position and rotation in Box2D space */
-			const auto verts = get_world_vertices(cosmos[b->GetUserData()]);
-			/* for every vertex in given fixture's shape */
-			for (const auto& v : verts)
-				push_vertex(v, true);
+			if (shape->GetType() == b2Shape::e_polygon) {
+				const b2PolygonShape* const poly = static_cast<b2PolygonShape*>(shape);
+				
+				for (size_t vp = 0; vp < poly->GetVertexCount(); ++vp) {
+					auto vv = poly->GetVertex(vp);
+
+					auto position = f->GetBody()->GetPosition();
+					/* transform angle to degrees */
+					auto rotation = f->GetBody()->GetAngle();
+
+					/* transform vertex to current entity's position and rotation */
+					push_vertex(vec2(vv).rotate_radians(rotation, b2Vec2(0, 0)) + position, true);
+				}
+			}
 		}
 
 		/* extract the actual vertices from visibility AABB to cast rays to */

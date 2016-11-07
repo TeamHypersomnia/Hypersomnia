@@ -90,8 +90,12 @@ namespace augs {
 	}
 
 	template <class vec, class d>
-	vec& rotate(vec& v, const vec& origin, d angle) {
-		angle *= static_cast<d>(DEG_TO_RAD);
+	vec& rotate(vec& v, const vec& origin, const d angle) {
+		return rotate_radians(v, origin, angle * static_cast<d>(DEG_TO_RAD));
+	}
+
+	template <class vec, class d>
+	vec& rotate_radians(vec& v, const vec& origin, const d angle) {
 		auto s = sin(angle);
 		auto c = cos(angle);
 		vec rotated;
@@ -296,6 +300,12 @@ struct vec2t {
 	template <typename v>
 	vec2t& rotate(real angle, v origin) {
 		augs::rotate<vec2t, float>(*this, origin, angle);
+		return *this;
+	}
+
+	template <typename v>
+	vec2t& rotate_radians(real angle, v origin) {
+		augs::rotate_radians<vec2t, float>(*this, origin, angle);
 		return *this;
 	}
 
