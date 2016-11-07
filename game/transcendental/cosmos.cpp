@@ -379,7 +379,7 @@ void cosmos::delete_entity(const entity_id& e) {
 	const bool should_release_dependency = owner_body != handle;
 
 	if (should_release_dependency) {
-		handle.set_owner_body(owner_body);
+		handle.set_owner_body(handle);
 	}
 
 	remove_all_components(get_handle(e));
