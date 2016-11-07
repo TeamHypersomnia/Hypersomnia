@@ -297,12 +297,12 @@ void visibility_system::respond_to_visibility_information_requests(
 
 		/* for every fixture that intersected with the visibility square */
 		for (const auto f : fixtures) {
-			auto* const shape = f->m_shape;
+			const auto* const shape = f->m_shape;
 			/* get shape vertices from misc that transforms them to current entity's position and rotation in Box2D space */
 			if (shape->GetType() == b2Shape::e_polygon) {
-				const b2PolygonShape* const poly = static_cast<b2PolygonShape*>(shape);
+				const b2PolygonShape* const poly = static_cast<const b2PolygonShape*>(shape);
 				
-				for (size_t vp = 0; vp < poly->GetVertexCount(); ++vp) {
+				for (int32 vp = 0; vp < poly->GetVertexCount(); ++vp) {
 					auto vv = poly->GetVertex(vp);
 
 					auto position = f->GetBody()->GetPosition();

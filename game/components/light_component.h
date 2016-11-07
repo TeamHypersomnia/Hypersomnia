@@ -1,5 +1,8 @@
 #pragma once
+#include <array>
 #include "augs/graphics/pixel.h"
+
+struct randomization;
 
 namespace components {
 	struct light {
@@ -7,6 +10,8 @@ namespace components {
 			float min_value = 0.f;
 			float max_value = 0.f;
 			float change_speed = 0.f;
+
+			void update_value(randomization&, float& val, const float dt_seconds) const;
 		};
 
 		struct attenuation {

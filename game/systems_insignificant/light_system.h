@@ -3,15 +3,20 @@
 #include "game/transcendental/entity_handle_declaration.h"
 #include "augs/graphics/renderer.h"
 
+#include "augs/misc/randomization.h"
+
 class viewing_step;
 
 class light_system {
 public:
 	struct cache {
-		float all_variation_values[10];
+		std::array<float, 10> all_variation_values;
+		cache();
 	};
 
 	std::vector<cache> per_entity_cache;
+
+	randomization rng;
 
 	void construct(const const_entity_handle);
 	void destruct(const const_entity_handle);
