@@ -201,7 +201,7 @@ std::pair<size_t, size_t> physics_system::map_fixture_pointer_to_indices(const b
 	const auto& cache = colliders_caches[this_cache_id];
 
 	for (size_t collider_index = 0; collider_index < cache.fixtures_per_collider.size(); ++collider_index) {
-		for (size_t convex_index = 0; convex_index < cache.fixtures_per_collider.size(); ++convex_index) {
+		for (size_t convex_index = 0; convex_index < cache.fixtures_per_collider[collider_index].size(); ++convex_index) {
 			if (cache.fixtures_per_collider[collider_index][convex_index] == f) {
 				return std::make_pair(collider_index, convex_index);
 			}

@@ -62,6 +62,20 @@ discontinuity* visibility_information_response::get_discontinuity(const size_t n
 	return &discontinuities[n];
 }
 
+const discontinuity* visibility_information_response::get_discontinuity_for_edge(const size_t n) const {
+	for (auto& disc : discontinuities) {
+		if (disc.edge_index == n) {
+			return &disc;
+		}
+	}
+
+	return nullptr;
+}
+
+const discontinuity* visibility_information_response::get_discontinuity(const size_t n) const {
+	return &discontinuities[n];
+}
+
 triangle visibility_information_response::get_world_triangle(const size_t i, const vec2 origin) const {
 	triangle tri = { origin, edges[i].first, edges[i].second };
 	return tri;

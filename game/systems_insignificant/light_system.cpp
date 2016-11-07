@@ -68,6 +68,7 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 
 	const auto camera_transform = step.camera_state.camera_transform;
 	const auto camera_size = step.camera_state.visible_world_area;
+	const auto camera_offset = -camera_transform.pos + camera_size / 2;
 
 	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_ONE, GL_ONE); glerr;
 	for (size_t i = 0; i < responses.size(); ++i) {
@@ -80,9 +81,9 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 			const auto world_light_tri = r.get_world_triangle(t, requests[i].eye_transform.pos);
 			vertex_triangle renderable_light_tri;
 
-			renderable_light_tri.vertices[0].pos = world_light_tri.points[0] - camera_transform.pos + camera_size/2;
-			renderable_light_tri.vertices[1].pos = world_light_tri.points[1] - camera_transform.pos + camera_size/2;
-			renderable_light_tri.vertices[2].pos = world_light_tri.points[2] - camera_transform.pos + camera_size/2;
+			renderable_light_tri.vertices[0].pos = world_light_tri.points[0] + camera_offset;
+			renderable_light_tri.vertices[1].pos = world_light_tri.points[1] + camera_offset;
+			renderable_light_tri.vertices[2].pos = world_light_tri.points[2] + camera_offset;
 
 			renderable_light_tri.vertices[0].color = light.color;
 			renderable_light_tri.vertices[1].color = light.color;
@@ -90,6 +91,36 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 
 			output.push_triangle(renderable_light_tri);
 		}
+
+		//for (size_t d = 0; d < r.get_num_discontinuities(); ++d) {
+		//	const auto world_discontinuity = *r.get_discontinuity(d);
+		//	
+		//	if (!world_discontinuity.is_boundary) {
+		//		vertex_triangle renderable_light_tri;
+		//
+		//		const float distance_from_light = (requests[i].eye_transform.pos - world_discontinuity.points.first).length();
+		//		const float angle = 80.f / ((distance_from_light+0.1f)/50.f);
+		//		
+		//		//(requests[i].eye_transform.pos - world_discontinuity.points.first).length();
+		//
+		//		if (world_discontinuity.winding == world_discontinuity.RIGHT) {
+		//			renderable_light_tri.vertices[0].pos = world_discontinuity.points.first + camera_offset;
+		//			renderable_light_tri.vertices[1].pos = world_discontinuity.points.second + camera_offset;
+		//			renderable_light_tri.vertices[2].pos = vec2(world_discontinuity.points.second).rotate(-angle, world_discontinuity.points.first) + camera_offset;
+		//		}
+		//		else {
+		//			renderable_light_tri.vertices[0].pos = world_discontinuity.points.first + camera_offset;
+		//			renderable_light_tri.vertices[1].pos = world_discontinuity.points.second + camera_offset;
+		//			renderable_light_tri.vertices[2].pos = vec2(world_discontinuity.points.second).rotate(angle, world_discontinuity.points.first) + camera_offset;
+		//		}
+		//
+		//		renderable_light_tri.vertices[0].color = light.color;
+		//		renderable_light_tri.vertices[1].color = light.color;
+		//		renderable_light_tri.vertices[2].color = light.color;
+		//
+		//		output.push_triangle(renderable_light_tri);
+		//	}
+		//}
 
 		auto screen_pos = requests[i].eye_transform - camera_transform;
 		screen_pos.pos.x += camera_size.x * 0.5f;

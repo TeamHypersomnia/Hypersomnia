@@ -2,7 +2,6 @@
 #include <vector>
 #include "augs/math/vec2.h"
 #include "game/transcendental/entity_handle_declaration.h"
-#include "augs/build_settings/setting_enable_polygonization.h"
 #include "augs/misc/constant_size_vector.h"
 #include "game/container_sizes.h"
 
@@ -30,10 +29,6 @@ public:
 	};
 	
 	augs::constant_size_vector<convex_poly, CONVEX_POLYS_COUNT> convex_polys;
-
-#if ENABLE_POLYGONIZATION
-	std::vector<vec2> debug_original;
-#endif
 
 	template <class Archive>
 	void serialize(Archive& ar) {

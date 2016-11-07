@@ -74,9 +74,6 @@ void convex_partitioned_shape::from_sprite(const components::sprite& sprite, con
 		for (auto& v : new_concave)
 			v -= origin;
 
-#if ENABLE_POLYGONIZATION
-		debug_original = new_concave;
-#endif
 		add_concave_polygon(new_concave);
 
 		mult_vertices(vec2(1, -1));

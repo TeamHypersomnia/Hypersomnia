@@ -81,6 +81,8 @@ namespace messages {
 
 		discontinuity* get_discontinuity_for_edge(const size_t edge_num);
 		discontinuity* get_discontinuity(const size_t disc_num);
+		const discontinuity* get_discontinuity_for_edge(const size_t edge_num) const;
+		const discontinuity* get_discontinuity(const size_t disc_num) const;
 
 		size_t get_num_discontinuities() const {
 			return discontinuities.size();
