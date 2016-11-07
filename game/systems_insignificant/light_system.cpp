@@ -153,9 +153,9 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 		glUniform1f(light_max_distance_uniform, light.max_distance.base_value);
 		
 		glUniform3f(light_attenuation_uniform,
-			light.constant.base_value,
-			light.linear.base_value,
-			light.quadratic.base_value
+			cache.all_variation_values[0] + light.constant.base_value,
+			cache.all_variation_values[1] + light.linear.base_value,
+			cache.all_variation_values[2] + light.quadratic.base_value
 		);
 
 		glUniform3f(light_multiply_color_uniform,
@@ -171,9 +171,9 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 		glUniform1f(light_max_distance_uniform, light.wall_max_distance.base_value);
 		
 		glUniform3f(light_attenuation_uniform,
-			light.wall_constant.base_value,
-			light.wall_linear.base_value,
-			light.wall_quadratic.base_value
+			cache.all_variation_values[3] + light.wall_constant.base_value,
+			cache.all_variation_values[4] + light.wall_linear.base_value,
+			cache.all_variation_values[5] + light.wall_quadratic.base_value
 		);
 		
 		glUniform3f(light_multiply_color_uniform,
