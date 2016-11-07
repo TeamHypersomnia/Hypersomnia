@@ -13,7 +13,6 @@ namespace messages {
 
 		entity_id target_group_to_refresh;
 
-		bool local_transform = false;
 		components::transform transform;
 	};
 }

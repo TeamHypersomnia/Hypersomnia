@@ -53,12 +53,11 @@ void particles_system::game_responses_to_particle_effects(logic_step& step) cons
 
 			step.transient.messages.post(burst);
 
-			burst.transform.reset();
-			burst.transform.rotation = 180;
+			burst.transform = cosmos[r].logic_transform();
+			burst.transform.rotation += 180;
 			burst.subject = r;
 			burst.effect = round_response_map.at(particle_effect_response_type::PROJECTILE_TRACE);
 			burst.modifier = round_response.modifier;
-			burst.local_transform = true;
 
 			step.transient.messages.post(burst);
 		}
@@ -68,12 +67,11 @@ void particles_system::game_responses_to_particle_effects(logic_step& step) cons
 			const auto& shell_response_map = *shell_response.response;
 
 			messages::create_particle_effect burst;
-			burst.transform.reset();
-			burst.transform.rotation = 180;
+			burst.transform = cosmos[s].logic_transform();
+			burst.transform.rotation += 180;
 			burst.subject = s;
 			burst.effect = shell_response_map.at(particle_effect_response_type::PROJECTILE_TRACE);
 			burst.modifier = shell_response.modifier;
-			burst.local_transform = true;
 
 			step.transient.messages.post(burst);
 		}
@@ -157,11 +155,6 @@ void particles_system::create_particle_effects(logic_step& step) const {
 			e.apply_modifier(it.modifier);
 
 		auto subject = cosmos[it.subject];
-
-		if (it.local_transform && subject.alive()) {
-			it.transform.pos += subject.logic_transform().pos;
-			it.transform.rotation += subject.logic_transform().rotation;
-		}
 
 		std::vector<resources::emission*> only_streams;
 		
