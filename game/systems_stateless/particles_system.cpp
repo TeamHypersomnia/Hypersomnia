@@ -90,10 +90,12 @@ void particles_system::game_responses_to_particle_effects(logic_step& step) cons
 		burst.subject = d.subject;
 		burst.transform.pos = d.point_of_impact;
 		
-		if(d.amount > 0)
+		if (d.amount > 0) {
 			burst.transform.rotation = (-d.impact_velocity).degrees();
-		else
+		}
+		else {
 			burst.transform.rotation = (d.impact_velocity).degrees();
+		}
 
 		burst.effect = response_map.at(particle_effect_response_type::DESTRUCTION_EXPLOSION);
 		burst.modifier = response.modifier;
