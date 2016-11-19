@@ -65,21 +65,23 @@ namespace scene_managers {
 
 	void networked_testbed::populate(logic_step& step) {
 		auto& world = step.cosm;
+
 		const auto crate = prefabs::create_crate(world, vec2(200, 200 + 300), vec2i(100, 100) / 3);
 		const auto crate2 = prefabs::create_crate(world, vec2(400, 200 + 400), vec2i(300, 300));
 		const auto crate4 = prefabs::create_crate(world, vec2(500, 200 + 0), vec2i(100, 100));
 
 		for (int x = -4; x < 4; ++x) {
 			for (int y = -4; y < 4; ++y) {
-				auto obstacle = prefabs::create_crate(world, vec2(2000 + x * 200, 200 + y * 200), vec2i(100, 100));
+				auto obstacle = prefabs::create_crate(world, vec2(2000 + x * 300, -1000+2000 + y * 300), vec2i(100, 100));
 			}
 		}
 
 		for (int x = -4 * 1; x < 4 * 1; ++x)
 		{
 			auto frog = world.create_entity("frog");
-			ingredients::sprite(frog, vec2(100 + x * 40, 200 + 400), assets::texture_id::TEST_SPRITE, augs::white, render_layer::DYNAMIC_BODY);
+			ingredients::sprite(frog, vec2(100 + x * 40, 200 + 400), assets::texture_id::TEST_SPRITE, augs::white, render_layer::SMALL_DYNAMIC_BODY);
 			ingredients::see_through_dynamic_body(frog);
+			name_entity(frog, entity_name::CRATE);
 			frog.add_standard_components();
 		}
 
@@ -92,58 +94,100 @@ namespace scene_managers {
 
 		const auto bg_size = assets::get_size(assets::texture_id::TEST_BACKGROUND);
 
-		const int num_floors = 10*10;
+		const int num_floors = 10 * 10;
 		const int side = sqrt(num_floors) / 2;
 
 		for (int x = -side; x < side; ++x)
 			for (int y = -side; y < side; ++y)
 			{
-				auto background = world.create_entity("bg[-]");
-				ingredients::sprite(background, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 550)), assets::texture_id::TEST_BACKGROUND, augs::white, render_layer::GROUND);
+				//auto background = world.create_entity("bg[-]");
+				//ingredients::sprite(background, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 550)), assets::texture_id::TEST_BACKGROUND, augs::white, render_layer::GROUND);
 				//ingredients::standard_static_body(background);
-		
+
 				auto street = world.create_entity("street[-]");
-				ingredients::sprite_scalled(street, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 700)) - vec2(1500, 700),
-					vec2(3000, 3000),
-					assets::texture_id::TEST_BACKGROUND, augs::gray1, render_layer::UNDER_GROUND);
-		
-				background.add_standard_components();
+				ingredients::sprite(street, { bg_size * vec2(x, y) },
+					assets::texture_id::TEST_BACKGROUND, augs::gray1, render_layer::GROUND);
+
+				//background.add_standard_components();
 				street.add_standard_components();
 			}
 
 		const int num_characters = 6;
 
-		std::vector<entity_handle> new_characters;
+		std::vector<entity_id> new_characters;
+		new_characters.resize(num_characters);
+
+		auto character = [&](const size_t i) {
+			return world[new_characters[i]];
+		};
+
+		{
+			{
+				const auto l = world.create_entity("l");
+				l += components::transform();
+				auto& light = l += components::light();
+				light.color = red;
+				l.add_standard_components();
+			}
+			{
+				const auto l = world.create_entity("l");
+				l += components::transform(300, 0);
+				auto& light = l += components::light();
+				light.color = green;
+				l.add_standard_components();
+			}
+			{
+				const auto l = world.create_entity("l");
+				l += components::transform(600, 0);
+				auto& light = l += components::light();
+				light.color = blue;
+				l.add_standard_components();
+			}
+			{
+				const auto l = world.create_entity("l");
+				l += components::transform(900, 0);
+				auto& light = l += components::light();
+				light.color = cyan;
+				l.add_standard_components();
+			}
+			{
+				const auto l = world.create_entity("l");
+				l += components::transform(1200, 0);
+				auto& light = l += components::light();
+				light.color = orange;
+				l.add_standard_components();
+			}
+		}
 
 		for (int i = 0; i < num_characters; ++i) {
-			auto new_character = prefabs::create_character(world, { vec2(1200 + i * 200 , 0), -0 }, vec2(1200, 800), typesafe_sprintf("player%x", i));
+			const auto new_character = prefabs::create_character(world, vec2(i * 300, 0), vec2(1200, 800), typesafe_sprintf("player%x", i));
 
-			new_characters.push_back(new_character);
+			new_characters[i] = new_character;
 
 			if (i == 0) {
-				new_character.get<components::sentience>().health.value = 50;
-				new_character.get<components::sentience>().health.maximum = 800;
+				new_character.get<components::sentience>().health.value = 100;
+				new_character.get<components::sentience>().health.maximum = 100;
 			}
 			if (i == 1) {
 				new_character.get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
 				new_character.get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
 				new_character.get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
 				new_character.get<components::sentience>().minimum_danger_amount_to_evade = 20;
-				new_character.get<components::sentience>().health.value = 50;
+				new_character.get<components::sentience>().health.value = 300;
 				new_character.get<components::sentience>().health.maximum = 300;
 				//ingredients::standard_pathfinding_capability(new_character);
 				//ingredients::soldier_intelligence(new_character);
 				new_character.recalculate_basic_processing_categories();
 			}
 			if (i == 2) {
-				new_character.get<components::sentience>().health.value = 50;
+				new_character.get<components::sentience>().health.value = 38;
 			}
 			if (i == 5) {
 				new_character.get<components::attitude>().parties = party_category::METROPOLIS_CITIZEN;
 				new_character.get<components::attitude>().hostile_parties = party_category::RESISTANCE_CITIZEN;
 				new_character.get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
 				new_character.get<components::sentience>().minimum_danger_amount_to_evade = 20;
-				new_character.get<components::sentience>().health.value = 50;
+				new_character.get<components::sentience>().health.value = 300;
 				new_character.get<components::sentience>().health.maximum = 300;
 				//ingredients::standard_pathfinding_capability(new_character);
 				//ingredients::soldier_intelligence(new_character);
@@ -151,7 +195,9 @@ namespace scene_managers {
 			}
 		}
 
-		name_entity(new_characters[0], entity_name::PERSON, L"Attacker");
+		if (character(0).alive()) {
+			name_entity(character(0), entity_name::PERSON, L"Attacker");
+		}
 
 		prefabs::create_sample_suppressor(world, vec2(300, -500));
 
@@ -204,30 +250,30 @@ namespace scene_managers {
 		const auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
 		prefabs::create_sample_backpack(world, vec2(200, -750));
 
-		perform_transfer({ backpack, new_characters[0][slot_function::SHOULDER_SLOT] }, step);
-		perform_transfer({ submachine, new_characters[0][slot_function::PRIMARY_HAND] }, step);
-		perform_transfer({ rifle, new_characters[0][slot_function::SECONDARY_HAND] }, step);
+		perform_transfer({ backpack, character(0)[slot_function::SHOULDER_SLOT] }, step);
+		perform_transfer({ submachine, character(0)[slot_function::PRIMARY_HAND] }, step);
+		perform_transfer({ rifle, character(0)[slot_function::SECONDARY_HAND] }, step);
 
-		if (num_characters > 1) {
-			name_entity(new_characters[1], entity_name::PERSON, L"Enemy");
-			perform_transfer({ rifle2, new_characters[1][slot_function::PRIMARY_HAND] }, step);
+		if (character(1).alive()) {
+			name_entity(character(1), entity_name::PERSON, L"Enemy");
+			perform_transfer({ rifle2, character(1)[slot_function::PRIMARY_HAND] }, step);
 		}
 
-		if (num_characters > 2) {
-			name_entity(new_characters[2], entity_name::PERSON, L"Swordsman");
-			perform_transfer({ second_machete, new_characters[2][slot_function::PRIMARY_HAND] }, step);
+		if (character(2).alive()) {
+			name_entity(character(2), entity_name::PERSON, L"Swordsman");
+			perform_transfer({ second_machete, character(2)[slot_function::PRIMARY_HAND] }, step);
 		}
 
-		if (num_characters > 3) {
-			name_entity(new_characters[3], entity_name::PERSON, L"Medic");
-			perform_transfer({ pis2, new_characters[3][slot_function::PRIMARY_HAND] }, step);
+		if (character(3).alive()) {
+			name_entity(character(3), entity_name::PERSON, L"Medic");
+			perform_transfer({ pis2, character(3)[slot_function::PRIMARY_HAND] }, step);
 		}
 
-		if (num_characters > 5) {
+		if (character(5).alive()) {
 			const auto new_item = prefabs::create_submachine(step, vec2(0, -1000),
 				prefabs::create_sample_magazine(step, vec2(100 - 50, -650), true ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), true ? 500 : 50)));
 
-			perform_transfer({ new_item, new_characters[5][slot_function::PRIMARY_HAND] }, step);
+			perform_transfer({ new_item, character(5)[slot_function::PRIMARY_HAND] }, step);
 		}
 
 		//draw_bodies.push_back(crate2);
@@ -239,8 +285,7 @@ namespace scene_managers {
 
 		world.significant.meta.settings.enable_interpolation = true;
 
-		const auto& id_vector = to_id_vector(new_characters);
-		characters.assign(id_vector.begin(), id_vector.end());
+		characters.assign(new_characters.begin(), new_characters.end());
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 	}
 

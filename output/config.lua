@@ -17,9 +17,9 @@ recording_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.LOCAL,
+	launch_mode = launch_modes.CLIENT_AND_SERVER,
 	
-	input_recording_mode = recording_modes.LIVE,
+	input_recording_mode = recording_modes.DISABLE,
 	recording_replay_speed = 20.5,
 
 	determinism_test_cloned_cosmoi_count = 2,
@@ -57,8 +57,8 @@ config_table = {
 	misprediction_smoothing_multiplier = 0.5,
 
 	debug_var = 0,
-	debug_randomize_entropies_in_client_setup = 0,
-	debug_randomize_entropies_in_client_setup_once_every_steps = 1,
+	debug_randomize_entropies_in_client_setup = 1,
+	debug_randomize_entropies_in_client_setup_once_every_steps = 2,
 
 	server_launch_http_daemon = 1,
 	server_http_daemon_port = 80,
