@@ -18,7 +18,7 @@
 #include "game/messages/melee_swing_response.h"
 #include "game/messages/health_event.h"
 
-#include "game/systems_insignificant/particles_simulation_system.h"
+#include "game/systems_audiovisual/particles_simulation_system.h"
 
 void particles_existence_system::destroy_dead_streams(logic_step& step) const {
 	const auto& cosmos = step.cosm;
@@ -148,7 +148,7 @@ void particles_existence_system::create_particle_effects(logic_step& step) const
 
 	auto& cosmos = step.cosm;
 	auto& events = step.transient.messages.get_queue<create_particle_effect>();
-	auto& particles_simulation = cosmos.systems_insignificant.get<particles_simulation_system>();
+	auto& particles_simulation = cosmos.systems_audiovisual.get<particles_simulation_system>();
 
 	for (auto& it : events) {
 		auto emissions = *it.effect;

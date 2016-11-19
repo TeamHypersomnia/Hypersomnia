@@ -25,7 +25,7 @@ void local_setup::process(game_window& window) {
 	const auto& cfg = window.config;
 
 	cosmos hypersomnia(3000);
-	hypersomnia.systems_insignificant.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
+	hypersomnia.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
 
 	step_and_entropy_unpacker input_unpacker;
 	scene_managers::testbed testbed;

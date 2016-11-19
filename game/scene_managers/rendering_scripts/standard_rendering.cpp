@@ -7,7 +7,7 @@
 #include "game/systems_stateless/render_system.h"
 #include "game/systems_stateless/gui_system.h"
 
-#include "game/systems_insignificant/light_system.h"
+#include "game/systems_audiovisual/light_system.h"
 
 #include "game/components/gui_element_component.h"
 #include "game/systems_temporary/dynamic_tree_system.h"

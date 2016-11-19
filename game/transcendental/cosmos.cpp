@@ -82,7 +82,7 @@ void cosmos::destroy_substance_for_entity(const const_entity_handle& h) {
 	};
 
 	systems_temporary.for_each(destructor);
-	systems_insignificant.for_each(destructor);
+	systems_audiovisual.for_each(destructor);
 }
 
 void cosmos::create_substance_for_entity(const const_entity_handle& h) {
@@ -92,7 +92,7 @@ void cosmos::create_substance_for_entity(const const_entity_handle& h) {
 		};
 
 		systems_temporary.for_each(constructor);
-		systems_insignificant.for_each(constructor);
+		systems_audiovisual.for_each(constructor);
 	}
 }
 
@@ -186,7 +186,7 @@ void cosmos::reserve_storage_for_entities(const size_t n) {
 	};
 
 	systems_temporary.for_each(reservation_lambda);
-	systems_insignificant.for_each(reservation_lambda);
+	systems_audiovisual.for_each(reservation_lambda);
 }
 
 std::wstring cosmos::summary() const {
@@ -400,7 +400,7 @@ size_t cosmos::get_maximum_entities() const {
 
 void cosmos::integrate_interpolated_transforms(const float seconds) const {
 	profiler.start(meter_type::INTERPOLATION);
-	systems_insignificant.get<interpolation_system>().integrate_interpolated_transforms(*this, seconds, get_fixed_delta().in_seconds());
+	systems_audiovisual.get<interpolation_system>().integrate_interpolated_transforms(*this, seconds, get_fixed_delta().in_seconds());
 	profiler.stop(meter_type::INTERPOLATION);
 }
 

@@ -7,7 +7,7 @@
 #include "game/systems_stateless/render_system.h"
 #include "game/systems_stateless/gui_system.h"
 
-#include "game/systems_insignificant/light_system.h"
+#include "game/systems_audiovisual/light_system.h"
 
 #include "game/components/gui_element_component.h"
 #include "game/systems_temporary/dynamic_tree_system.h"
@@ -42,7 +42,7 @@ namespace rendering_scripts {
 		auto& border_highlight_shader = pure_color_highlight_shader; // the same
 		auto& circular_bars_shader = *resource_manager.find(assets::program_id::CIRCULAR_BARS);
 		
-		auto& light = cosmos.systems_insignificant.get<light_system>();
+		auto& light = cosmos.systems_audiovisual.get<light_system>();
 
 		light.render_all_lights(renderer, matrix, step);
 

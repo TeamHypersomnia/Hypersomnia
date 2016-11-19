@@ -12,10 +12,10 @@
 #include "game/transcendental/types_specification/all_messages_declaration.h"
 #include "game/transcendental/types_specification/all_systems_declaration.h"
 
-#include "game/systems_insignificant/interpolation_system.h"
-#include "game/systems_insignificant/past_infection_system.h"
-#include "game/systems_insignificant/light_system.h"
-#include "game/systems_insignificant/particles_simulation_system.h"
+#include "game/systems_audiovisual/interpolation_system.h"
+#include "game/systems_audiovisual/past_infection_system.h"
+#include "game/systems_audiovisual/light_system.h"
+#include "game/systems_audiovisual/particles_simulation_system.h"
 #include "game/systems_temporary/dynamic_tree_system.h"
 #include "game/systems_temporary/physics_system.h"
 #include "game/systems_temporary/processing_lists_system.h"
@@ -63,7 +63,7 @@ private:
 	entity_handle allocate_new_entity();
 public:
 	storage_for_all_systems_temporary systems_temporary;
-	mutable storage_for_all_systems_insignificant systems_insignificant;
+	mutable storage_for_all_systems_audiovisual systems_audiovisual;
 
 	mutable cosmic_profiler profiler;
 	augs::stream reserved_memory_for_serialization;

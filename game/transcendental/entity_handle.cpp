@@ -10,7 +10,7 @@
 #include "game/components/gui_element_component.h"
 #include "game/components/fixtures_component.h"
 
-#include "game/systems_insignificant/interpolation_system.h"
+#include "game/systems_audiovisual/interpolation_system.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/detail/physics_scripts.h"

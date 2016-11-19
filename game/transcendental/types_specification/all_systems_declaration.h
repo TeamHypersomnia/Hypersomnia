@@ -26,4 +26,4 @@ typedef augs::storage_for_systems <
 	past_infection_system,
 	light_system,
 	particles_simulation_system
-> storage_for_all_systems_insignificant;
+> storage_for_all_systems_audiovisual;

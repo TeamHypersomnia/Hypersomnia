@@ -101,7 +101,7 @@ std::vector<simulation_receiver::misprediction_candidate_entry> simulation_recei
 	const auto& cosmos = predicted_cosmos_before_reconciliation;
 
 	const auto& unpredictables_with_past_contagious = cosmos.get(processing_subjects::WITH_PAST_CONTAGIOUS);
-	const auto& unpredictables_infected = cosmos.systems_insignificant.get<past_infection_system>().infected_entities;
+	const auto& unpredictables_infected = cosmos.systems_audiovisual.get<past_infection_system>().infected_entities;
 
 	std::vector<misprediction_candidate_entry> potential_mispredictions;
 	potential_mispredictions.reserve(unpredictables_with_past_contagious.size() + unpredictables_infected.size());
@@ -132,7 +132,7 @@ void simulation_receiver::drag_mispredictions_into_past(const cosmos& predicted_
 		const bool is_contagious_agent = reconciliated_entity.get_flag(entity_flag::IS_PAST_CONTAGIOUS);
 		const bool should_smooth_rotation = !is_contagious_agent || predicted_cosmos[reconciliated_entity.get<components::driver>().owned_vehicle].alive();
 
-		auto& interp_data = predicted_cosmos.systems_insignificant.get<interpolation_system>().get_data(reconciliated_entity);
+		auto& interp_data = predicted_cosmos.systems_audiovisual.get<interpolation_system>().get_data(reconciliated_entity);
 
 		const bool shouldnt_smooth = reconciliated_entity.has<components::crosshair>();
 		bool misprediction_detected = false;
@@ -150,7 +150,7 @@ void simulation_receiver::drag_mispredictions_into_past(const cosmos& predicted_
 		}
 
 		if (identity_matches || (!misprediction_detected && !is_contagious_agent)) {
-			predicted_cosmos.systems_insignificant.get<past_infection_system>().uninfect(reconciliated_entity);
+			predicted_cosmos.systems_audiovisual.get<past_infection_system>().uninfect(reconciliated_entity);
 		}
 	}
 }

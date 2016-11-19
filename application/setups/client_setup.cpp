@@ -46,7 +46,7 @@ void client_setup::init(game_window& window, const std::string recording_filenam
 
 	scene_managers::networked_testbed_client().populate_world_with_entities(initial_hypersomnia);
 
-	extrapolated_hypersomnia.systems_insignificant.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
+	extrapolated_hypersomnia.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
 
 	detailed_step_log = cfg.tickrate <= 2;
 
