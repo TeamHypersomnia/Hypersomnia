@@ -6,7 +6,7 @@
 
 #define SPACE_ATOMS_PER_UNIT 1000
 
-class logic_step;
+#include "game/transcendental/step_declaration.h"
 void perform_transfer(item_slot_transfer_request, logic_step& step);
 
 unsigned calculate_space_occupied_with_children(const_entity_handle item);

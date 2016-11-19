@@ -10,7 +10,7 @@
 #include "augs/ensure.h"
 #include "game/transcendental/entity_handle.h"
 
-class logic_step;
+#include "game/transcendental/step_declaration.h"
 
 namespace resources {
 	class behaviour_tree {

@@ -12,6 +12,8 @@
 #include "game/transcendental/viewing_session.h"
 #include "game/transcendental/step_packaged_for_network.h"
 #include "game/transcendental/cosmos.h"
+#include "game/transcendental/step.h"
+#include "game/transcendental/types_specification/all_messages_includes.h"
 
 #include "game/transcendental/step_and_entropy_unpacker.h"
 
@@ -92,7 +94,11 @@ void local_setup::process(game_window& window) {
 
 			renderer::get_current().clear_logic_lines();
 
-			testbed.step_with_callbacks(cosmic_entropy_for_this_step, hypersomnia, session);
+			hypersomnia.advance_deterministic_schemata(cosmic_entropy_for_this_step, [](auto){},
+				[this, &session](const const_logic_step& step){
+					session.visual_response_to_game_events(step);
+				}
+			);
 		}
 
 		const auto vdt = session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), input_unpacker.timer);

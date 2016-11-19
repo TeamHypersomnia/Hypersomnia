@@ -14,6 +14,9 @@
 
 #include "game/transcendental/network_commands.h"
 #include "game/transcendental/cosmic_delta.h"
+#include "game/transcendental/step.h"
+
+#include "game/transcendental/types_specification/all_messages_includes.h"
 
 #include "augs/filesystem/file.h"
 
@@ -103,11 +106,19 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 	session.unpack_local_steps_profiler.end_measurement();
 
 	auto step_pred = [this](const cosmic_entropy& entropy, cosmos& cosm) {
-		scene.step_with_callbacks(entropy, cosm);
+		cosm.advance_deterministic_schemata(entropy,
+			[this](logic_step&) {},
+			[this](logic_step&) {}
+		);
 	};
 
 	auto step_pred_with_effects_response = [this](const cosmic_entropy& entropy, cosmos& cosm) {
-		scene.step_with_callbacks(entropy, cosm, session);
+		cosm.advance_deterministic_schemata(entropy,
+			[this](logic_step&) {},
+			[this](logic_step& step) {
+				session.visual_response_to_game_events(step);
+			}
+		);
 	};
 
 	for (auto& s : steps) {

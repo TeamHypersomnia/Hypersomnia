@@ -2,7 +2,7 @@
 #include "game/detail/item_slot_transfer_request.h"
 
 class cosmos;
-class logic_step;
+#include "game/transcendental/step_declaration.h"
 
 class item_system {
 public:

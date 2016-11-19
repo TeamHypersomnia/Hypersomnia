@@ -362,29 +362,4 @@ namespace scene_managers {
 
 		return result;
 	}
-
-	void networked_testbed::step_with_callbacks(const cosmic_entropy& cosmic_entropy_for_this_step, cosmos& cosm) {
-		cosm.advance_deterministic_schemata(cosmic_entropy_for_this_step,
-			[this](logic_step& step) { pre_solve(step); },
-			[this](logic_step& step) { post_solve(step); }
-		);
-	}
-	
-	void networked_testbed::step_with_callbacks(const cosmic_entropy& cosmic_entropy_for_this_step, cosmos& cosm, viewing_session& effects_receiver) {
-		cosm.advance_deterministic_schemata(cosmic_entropy_for_this_step,
-			[this](logic_step& step) { pre_solve(step); },
-			[this, &effects_receiver](logic_step& step) { 
-				post_solve(step); 
-				effects_receiver.visual_response_to_game_events(step);
-			}
-		);
-	}
-
-	void networked_testbed::pre_solve(logic_step& step) {
-
-	}
-
-	void networked_testbed::post_solve(logic_step& step) {
-
-	}
 }

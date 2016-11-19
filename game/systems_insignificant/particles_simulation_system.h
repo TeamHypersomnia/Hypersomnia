@@ -3,7 +3,7 @@
 #include "game/components/particles_existence_component.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
-class logic_step;
+#include "game/transcendental/step_declaration.h"
 class viewing_step;
 struct randomization;
 

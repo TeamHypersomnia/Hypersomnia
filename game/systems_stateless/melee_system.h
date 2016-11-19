@@ -3,7 +3,7 @@
 #include "game/transcendental/entity_handle_declaration.h"
 
 class cosmos;
-class logic_step;
+#include "game/transcendental/step_declaration.h"
 
 namespace components{
 	struct melee;

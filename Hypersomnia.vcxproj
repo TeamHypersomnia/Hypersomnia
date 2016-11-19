@@ -1166,6 +1166,7 @@
     <ClInclude Include="game\systems_temporary\physics_system.h" />
     <ClInclude Include="game\systems_temporary\processing_lists_system.h" />
     <ClInclude Include="game\transcendental\step_and_entropy_unpacker.h" />
+    <ClInclude Include="game\transcendental\step_declaration.h" />
     <ClInclude Include="game\transcendental\step_packaged_for_network.h" />
     <ClInclude Include="game\transcendental\types_specification\all_components_declaration.h" />
     <ClInclude Include="game\transcendental\types_specification\all_component_includes.h" />

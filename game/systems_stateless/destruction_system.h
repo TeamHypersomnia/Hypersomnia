@@ -1,6 +1,6 @@
 #pragma once
 
-class logic_step;
+#include "game/transcendental/step_declaration.h"
 
 class destruction_system {
 public:

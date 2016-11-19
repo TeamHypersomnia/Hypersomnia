@@ -233,7 +233,7 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 	return circular_bars_information;
 }
 
-void immediate_hud::acquire_game_events(const logic_step& step) {
+void immediate_hud::acquire_game_events(const const_logic_step& step) {
 	const auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
 	const auto& healths = step.transient.messages.get_queue<messages::health_event>();

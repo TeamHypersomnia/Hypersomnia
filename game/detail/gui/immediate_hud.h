@@ -5,7 +5,7 @@
 #include "game/transcendental/entity_id.h"
 
 class cosmos;
-class logic_step;
+#include "game/transcendental/step_declaration.h"
 class viewing_step;
 
 struct immediate_hud {
@@ -34,5 +34,5 @@ struct immediate_hud {
 	void draw_pure_color_highlights(viewing_step&) const;
 	void draw_vertically_flying_numbers(viewing_step&) const;
 
-	void acquire_game_events(const logic_step& step);
+	void acquire_game_events(const const_logic_step& step);
 };

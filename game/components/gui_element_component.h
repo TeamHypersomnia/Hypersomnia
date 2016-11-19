@@ -21,7 +21,7 @@
 //
 
 class viewing_step;
-class logic_step;
+#include "game/transcendental/step_declaration.h"
 
 namespace components {
 	struct gui_element {

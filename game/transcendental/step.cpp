@@ -26,9 +26,3 @@ viewing_step::viewing_step(
 vec2 viewing_step::get_screen_space(vec2 pos) const {
 	return pos - camera_state.transformed_visible_world_area_aabb.get_position();
 }
-
-logic_step::logic_step(cosmos& cosm, const cosmic_entropy& entropy, data_living_one_step& transient) : cosmic_step(cosm), entropy(entropy), transient(transient) {}
-
-augs::fixed_delta logic_step::get_delta() const {
-	return cosm.get_fixed_delta();
-}

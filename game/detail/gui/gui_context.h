@@ -137,7 +137,7 @@ public:
 };
 
 class viewing_step;
-class logic_step;
+#include "game/transcendental/step_declaration.h"
 template<bool is_const>
 class basic_cosmic_step;
 

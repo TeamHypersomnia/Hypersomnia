@@ -350,7 +350,7 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 				resubstantiate = false;
 			}
 
-			scene.step_with_callbacks(id_mapped_entropy, hypersomnia);
+			hypersomnia.advance_deterministic_schemata(id_mapped_entropy);
 
 			if (daemon_online) {
 				std::string this_step_stats;

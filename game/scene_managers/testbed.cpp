@@ -372,52 +372,36 @@ namespace scene_managers {
 		return result;
 	}
 
-	void testbed::step_with_callbacks(const cosmic_entropy& cosmic_entropy_for_this_step, cosmos& cosm, viewing_session& post_solve_effects_response) {
-		cosm.advance_deterministic_schemata(cosmic_entropy_for_this_step,
-			[this](logic_step& step) { pre_solve(step); },
-			[this, &post_solve_effects_response](logic_step& step) {
-				post_solve(step);
-				post_solve_effects_response.visual_response_to_game_events(step);
-			}
-		);
-	}
+	//auto& cosmos = cosm;
+	//auto& ln = augs::renderer::get_current().logic_lines;
+	//
+	//for (auto crate : crates) {
+	//	auto& fixes = cosmos[crate].get<components::fixtures>();
+	//
+	//	auto& dest = fixes.get_modifiable_destruction_data({ 0, 0 });
+	//
+	//	for (auto scar : dest.scars) {
+	//		ln.draw_cyan(scar.first_impact, scar.depth_point);
+	//	}
+	//}
 
-	void testbed::pre_solve(logic_step& step) {
+	//for (auto& tested : draw_bodies) {
+	//	auto& s = tested.get<components::physics_definition>();
+	//
+	//	auto& lines = renderer::get_current().logic_lines;
+	//
+	//	auto vv = s.fixtures[0].debug_original;
+	//
+	//	for (int i = 0; i < vv.size(); ++i) {
+	//		auto& tt = tested.logic_transform();
+	//		auto pos = tt.pos;
+	//
+	//		lines.draw_cyan((pos + vv[i]).rotate(tt.rotation, pos), (pos + vv[(i + 1) % vv.size()]).rotate(tt.rotation, pos));
+	//	}
+	//}
 
-	}
+	//auto ff = (new_characters[1].get<components::pathfinding>().get_current_navigation_point() - position(new_characters[1])).set_length(15000);
+	//new_characters[1].get<components::physics>().apply_force(ff);
 
-	void testbed::post_solve(logic_step& step) {
-		auto& cosmos = step.cosm;
-		auto& ln = augs::renderer::get_current().logic_lines;
-
-		for (auto crate : crates) {
-			auto& fixes = cosmos[crate].get<components::fixtures>();
-			
-			auto& dest = fixes.get_modifiable_destruction_data({ 0, 0 });
-
-			for (auto scar : dest.scars) {
-				ln.draw_cyan(scar.first_impact, scar.depth_point);
-			}
-		}
-
-		//for (auto& tested : draw_bodies) {
-		//	auto& s = tested.get<components::physics_definition>();
-		//
-		//	auto& lines = renderer::get_current().logic_lines;
-		//
-		//	auto vv = s.fixtures[0].debug_original;
-		//
-		//	for (int i = 0; i < vv.size(); ++i) {
-		//		auto& tt = tested.logic_transform();
-		//		auto pos = tt.pos;
-		//
-		//		lines.draw_cyan((pos + vv[i]).rotate(tt.rotation, pos), (pos + vv[(i + 1) % vv.size()]).rotate(tt.rotation, pos));
-		//	}
-		//}
-
-		//auto ff = (new_characters[1].get<components::pathfinding>().get_current_navigation_point() - position(new_characters[1])).set_length(15000);
-		//new_characters[1].get<components::physics>().apply_force(ff);
-
-		// LOG("F: %x", ff);
-	}
+	// LOG("F: %x", ff);
 }

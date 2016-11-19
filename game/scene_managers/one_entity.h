@@ -7,7 +7,7 @@ namespace augs {
 }
 
 struct cosmic_entropy;
-class logic_step;
+#include "game/transcendental/step_declaration.h"
 class cosmos;
 class viewing_session;
 struct input_context;
@@ -25,8 +25,5 @@ namespace scene_managers {
 		entity_id get_controlled_entity() const;
 
 		void configure_view(viewing_session&) const;
-
-		void pre_solve(logic_step&);
-		void post_solve(logic_step&);
 	};
 }

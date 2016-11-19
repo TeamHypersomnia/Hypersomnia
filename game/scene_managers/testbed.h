@@ -9,7 +9,7 @@
 #include "augs/misc/machine_entropy.h"
 
 struct cosmic_entropy;
-class logic_step;
+#include "game/transcendental/step_declaration.h"
 class cosmos;
 class world_camera;
 class viewing_session;
@@ -39,10 +39,5 @@ namespace scene_managers {
 		entity_id get_controlled_entity() const;
 
 		void inject_input_to(entity_handle);
-
-		void step_with_callbacks(const cosmic_entropy&, cosmos&, viewing_session& post_solve_effects_response);
-
-		void pre_solve(logic_step&);
-		void post_solve(logic_step&);
 	};
 }

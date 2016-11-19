@@ -2,7 +2,7 @@
 #include "game/transcendental/entity_handle_declaration.h"
 
 class cosmos;
-class logic_step;
+#include "game/transcendental/step_declaration.h"
 
 class driver_system {
 	bool change_car_ownership(entity_handle driver, entity_handle car, bool lost);

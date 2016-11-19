@@ -13,7 +13,7 @@
 #include <set>
 
 class cosmos;
-class logic_step;
+#include "game/transcendental/step_declaration.h"
 
 struct rigid_body_cache {
 	b2Body* body = nullptr;

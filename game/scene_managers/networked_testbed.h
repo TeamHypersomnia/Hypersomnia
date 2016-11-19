@@ -11,7 +11,7 @@
 #include "augs/misc/machine_entropy.h"
 
 struct cosmic_entropy;
-class logic_step;
+#include "game/transcendental/step_declaration.h"
 class cosmos;
 class world_camera;
 class viewing_session;
@@ -33,13 +33,6 @@ namespace scene_managers {
 		augs::constant_size_vector<controlled_character, TESTBED_CHARACTERS_COUNT> characters;
 
 		void populate_world_with_entities(cosmos&);
-
-		void step_with_callbacks(const cosmic_entropy&, cosmos&);
-		void step_with_callbacks(const cosmic_entropy&, cosmos&, viewing_session& effects_receiver);
-
-		void pre_solve(logic_step&);
-		void post_solve(logic_step&);
-
 	};
 
 	class networked_testbed_server : public networked_testbed {

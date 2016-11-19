@@ -1,7 +1,7 @@
 #pragma once
 
 class cosmos;
-class logic_step;
+#include "game/transcendental/step_declaration.h"
 
 class force_joint_system {
 public:

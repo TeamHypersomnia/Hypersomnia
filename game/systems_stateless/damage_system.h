@@ -1,7 +1,7 @@
 #pragma once
 
 class cosmos;
-class logic_step;
+#include "game/transcendental/step_declaration.h"
 
 class damage_system {
 public:

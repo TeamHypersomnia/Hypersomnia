@@ -2,7 +2,7 @@
 
 class physics_system;
 class cosmos;
-class logic_step;
+#include "game/transcendental/step_declaration.h"
 
 class gun_system {
 public:

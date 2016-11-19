@@ -2,7 +2,7 @@
 #include <vector>
 #include "game/messages/visibility_information.h"
 
-class logic_step;
+#include "game/transcendental/step_declaration.h"
 
 class visibility_system {
 public:

@@ -4,7 +4,7 @@ namespace messages {
 	struct health_event;
 }
 
-class logic_step;
+#include "game/transcendental/step_declaration.h"
 
 class sentience_system {
 	void consume_health_event(messages::health_event, logic_step&) const;

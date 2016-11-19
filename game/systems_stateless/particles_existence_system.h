@@ -1,7 +1,7 @@
 #pragma once
 
 
-class logic_step;
+#include "game/transcendental/step_declaration.h"
 
 class particles_existence_system {
 public:

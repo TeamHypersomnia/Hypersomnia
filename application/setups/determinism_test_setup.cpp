@@ -9,11 +9,14 @@
 #include "game/scene_managers/resource_setups/all.h"
 
 #include "game/transcendental/types_specification/all_component_includes.h"
+#include "game/transcendental/types_specification/all_messages_includes.h"
 #include "game/transcendental/viewing_session.h"
 #include "game/transcendental/step_packaged_for_network.h"
 #include "game/transcendental/cosmos.h"
+#include "game/transcendental/data_living_one_step.h"
 
 #include "game/transcendental/step_and_entropy_unpacker.h"
+#include "game/transcendental/step.h"
 
 #include "augs/filesystem/file.h"
 #include "determinism_test_setup.h"
@@ -103,7 +106,11 @@ void determinism_test_setup::process(game_window& window) {
 
 				renderer::get_current().clear_logic_lines();
 
-				testbeds[i].step_with_callbacks(cosmic_entropy_for_this_step, h, session);
+				h.advance_deterministic_schemata(cosmic_entropy_for_this_step, [](auto) {},
+					[this, &session](const const_logic_step& step) {
+						session.visual_response_to_game_events(step);
+					}
+				);
 			}
 
 			auto& first_cosm = hypersomnias[0].reserved_memory_for_serialization;
