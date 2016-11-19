@@ -358,10 +358,12 @@
     <ClCompile Include="game\scene_managers\rendering_scripts\illuminated_rendering.cpp" />
     <ClCompile Include="game\systems_insignificant\interpolation_system.cpp" />
     <ClCompile Include="game\scene_managers\networked_testbed.cpp" />
+    <ClCompile Include="game\systems_insignificant\particles_simulation_system.cpp" />
     <ClCompile Include="game\systems_insignificant\past_infection_system.cpp" />
     <ClCompile Include="game\systems_stateless\destruction_system.cpp" />
     <ClCompile Include="game\systems_stateless\gui_system.cpp" />
     <ClCompile Include="game\systems_insignificant\light_system.cpp" />
+    <ClCompile Include="game\systems_stateless\particles_existence_system.cpp" />
     <ClCompile Include="game\transcendental\cosmic_delta.cpp" />
     <ClCompile Include="game\transcendental\cosmic_entropy.cpp" />
     <ClCompile Include="game\components\dynamic_tree_node_component.cpp" />
@@ -408,7 +410,7 @@
     <ClCompile Include="game\components\item_slot_transfers_component.cpp" />
     <ClCompile Include="game\components\movement_component.cpp" />
     <ClCompile Include="game\components\name_component.cpp" />
-    <ClCompile Include="game\components\particle_group_component.cpp" />
+    <ClCompile Include="game\components\particles_existence_component.cpp" />
     <ClCompile Include="game\components\pathfinding_component.cpp" />
     <ClCompile Include="game\components\physics_component.cpp" />
     <ClCompile Include="game\components\polygon_component.cpp" />
@@ -476,7 +478,6 @@
     <ClCompile Include="game\systems_stateless\item_system.cpp" />
     <ClCompile Include="game\systems_stateless\melee_system.cpp" />
     <ClCompile Include="game\systems_stateless\movement_system.cpp" />
-    <ClCompile Include="game\systems_stateless\particles_system.cpp" />
     <ClCompile Include="game\systems_stateless\pathfinding_system.cpp" />
     <ClCompile Include="game\systems_stateless\position_copying_system.cpp" />
     <ClCompile Include="game\systems_stateless\render_system.cpp" />
@@ -1072,10 +1073,12 @@
     <ClInclude Include="game\messages\visibility_information.h" />
     <ClInclude Include="game\systems_insignificant\interpolation_system.h" />
     <ClInclude Include="game\scene_managers\networked_testbed.h" />
+    <ClInclude Include="game\systems_insignificant\particles_simulation_system.h" />
     <ClInclude Include="game\systems_insignificant\past_infection_system.h" />
     <ClInclude Include="game\systems_stateless\destruction_system.h" />
     <ClInclude Include="game\systems_stateless\gui_system.h" />
     <ClInclude Include="game\systems_insignificant\light_system.h" />
+    <ClInclude Include="game\systems_stateless\particles_existence_system.h" />
     <ClInclude Include="game\transcendental\component_synchronizer.h" />
     <ClInclude Include="game\transcendental\cosmic_delta.h" />
     <ClInclude Include="game\transcendental\cosmic_entropy.h" />
@@ -1151,7 +1154,6 @@
     <ClInclude Include="game\systems_stateless\item_system.h" />
     <ClInclude Include="game\systems_stateless\melee_system.h" />
     <ClInclude Include="game\systems_stateless\movement_system.h" />
-    <ClInclude Include="game\systems_stateless\particles_system.h" />
     <ClInclude Include="game\systems_stateless\pathfinding_system.h" />
     <ClInclude Include="game\systems_stateless\position_copying_system.h" />
     <ClInclude Include="game\systems_stateless\render_system.h" />
@@ -1204,7 +1206,7 @@
     <ClInclude Include="game\components\rotation_copying_component.h" />
     <ClInclude Include="game\components\movement_component.h" />
     <ClInclude Include="game\components\particle_effect_response_component.h" />
-    <ClInclude Include="game\components\particle_group_component.h" />
+    <ClInclude Include="game\components\particles_existence_component.h" />
     <ClInclude Include="game\components\pathfinding_component.h" />
     <ClInclude Include="game\components\physics_component.h" />
     <ClInclude Include="game\components\polygon_component.h" />

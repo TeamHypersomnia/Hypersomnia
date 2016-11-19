@@ -8,7 +8,7 @@
 
 #include "game/components/physics_component.h"
 #include "game/components/damage_component.h"
-#include "game/components/particle_group_component.h"
+#include "game/components/particles_existence_component.h"
 #include "game/components/position_copying_component.h"
 #include "game/components/container_component.h"
 #include "game/components/item_component.h"
@@ -73,8 +73,9 @@ void gun_system::launch_shots_due_to_pressed_triggers(logic_step& step) {
 		auto& gun = it.get<components::gun>();
 
 		if (gun.trigger_pressed && gun.shot_cooldown.try_to_fire_and_reset(cosmos.get_timestamp(), delta)) {
-			if (gun.action_mode != components::gun::action_type::AUTOMATIC)
+			if (gun.action_mode != components::gun::action_type::AUTOMATIC) {
 				gun.trigger_pressed = false;
+			}
 
 			const auto chamber_slot = it[slot_function::GUN_CHAMBER];
 
@@ -96,12 +97,13 @@ void gun_system::launch_shots_due_to_pressed_triggers(logic_step& step) {
 					destroy_pellets_container = true;
 					bullet_entities = pellets_slot.get_mounted_items();
 				}
-				else
+				else {
 					bullet_entities.push_back(item_in_chamber);
+				}
 
 				float total_recoil_multiplier = 1.f;
 
-				for(const auto& catridge_or_pellet_stack : bullet_entities) {
+				for(const auto catridge_or_pellet_stack : bullet_entities) {
 					int charges = catridge_or_pellet_stack.get<components::item>().charges;
 
 					while (charges--) {
@@ -159,8 +161,9 @@ void gun_system::launch_shots_due_to_pressed_triggers(logic_step& step) {
 					gun.recoil.shoot_and_apply_impulse(owning_crosshair_recoil, total_recoil_multiplier/100.f, true);
 				}
 
-				if (destroy_pellets_container)
+				if (destroy_pellets_container) {
 					step.transient.messages.post(messages::queue_destruction(chamber_slot.get_items_inside()[0]));
+				}
 				
 				chamber_slot->items_inside.clear();
 
@@ -169,13 +172,15 @@ void gun_system::launch_shots_due_to_pressed_triggers(logic_step& step) {
 
 					const auto chamber_magazine_slot = it[slot_function::GUN_CHAMBER_MAGAZINE];
 
-					if (chamber_magazine_slot.alive())
+					if (chamber_magazine_slot.alive()) {
 						source_store_for_chamber = chamber_magazine_slot.get_items_inside();
+					}
 					else {
 						const auto detachable_magazine_slot = it[slot_function::GUN_DETACHABLE_MAGAZINE];
 
-						if (detachable_magazine_slot.alive() && detachable_magazine_slot.has_items())
+						if (detachable_magazine_slot.alive() && detachable_magazine_slot.has_items()) {
 							source_store_for_chamber = detachable_magazine_slot.get_items_inside()[0][slot_function::ITEM_DEPOSIT].get_items_inside();
+						}
 					}
 
 					if (source_store_for_chamber.size() > 0) {

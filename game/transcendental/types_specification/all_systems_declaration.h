@@ -13,6 +13,7 @@ class processing_lists_system;
 class interpolation_system;
 class past_infection_system;
 class light_system;
+class particles_simulation_system;
 
 typedef augs::storage_for_systems <
 	physics_system,
@@ -23,5 +24,6 @@ typedef augs::storage_for_systems <
 typedef augs::storage_for_systems <
 	interpolation_system,
 	past_infection_system,
-	light_system
+	light_system,
+	particles_simulation_system
 > storage_for_all_systems_insignificant;

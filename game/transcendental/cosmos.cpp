@@ -12,7 +12,7 @@
 #include "game/systems_stateless/position_copying_system.h"
 #include "game/systems_stateless/damage_system.h"
 #include "game/systems_stateless/destroy_system.h"
-#include "game/systems_stateless/particles_system.h"
+#include "game/systems_stateless/particles_existence_system.h"
 #include "game/systems_stateless/behaviour_tree_system.h"
 #include "game/systems_stateless/car_system.h"
 #include "game/systems_stateless/driver_system.h"
@@ -202,13 +202,17 @@ std::vector<const_entity_handle> cosmos::get(const processing_subjects list) con
 }
 
 randomization cosmos::get_rng_for(const entity_id& id) const {
-	int transform_hash = 0;
-	auto tr = get_handle(id).logic_transform();
-	transform_hash = static_cast<int>(tr.pos.x*100.0);
-	transform_hash += static_cast<int>(tr.pos.y*100.0);
-	transform_hash += static_cast<int>(tr.rotation*100.0);
+	return { get_rng_seed_for(id) };
+}
 
-	return { get_handle(id).get_guid() + transform_hash };
+size_t cosmos::get_rng_seed_for(const entity_id& id) const {
+	size_t transform_hash = 0;
+	const auto tr = get_handle(id).logic_transform();
+	transform_hash = static_cast<size_t>(std::abs(tr.pos.x)*100.0);
+	transform_hash += static_cast<size_t>(std::abs(tr.pos.y)*100.0);
+	transform_hash += static_cast<size_t>(std::abs(tr.rotation)*100.0);
+
+	return get_handle(id).get_guid() + transform_hash;
 }
 
 #if COSMOS_TRACKS_GUIDS
@@ -451,7 +455,7 @@ void cosmos::advance_deterministic_schemata(logic_step& step) {
 	performance.stop(meter_type::PHYSICS);
 	position_copying_system().update_transforms(step);
 
-	//particles_system().create_particle_effects(step);
+	//particles_simulation_system().create_particle_effects(step);
 
 	trace_system().lengthen_sprites_of_traces(step);
 
@@ -480,8 +484,8 @@ void cosmos::advance_deterministic_schemata(logic_step& step) {
 	driver_system().assign_drivers_from_successful_trigger_hits(step);
 	driver_system().release_drivers_due_to_ending_contact_with_wheel(step);
 
-	//particles_system().game_responses_to_particle_effects(step);
-	//particles_system().create_particle_effects(step);
+	//particles_simulation_system().game_responses_to_particle_effects(step);
+	//particles_simulation_system().create_particle_effects(step);
 
 	// gui_system().translate_game_events_for_hud(step);
 
@@ -502,8 +506,7 @@ void cosmos::advance_deterministic_schemata(logic_step& step) {
 	gui_system().advance_gui_elements(step);
 	performance.stop(meter_type::GUI);
 
-	particles_system().step_streams_and_particles(step);
-	particles_system().destroy_dead_streams(step);
+//	particles_existence_system().advance_lifetimes_and_destroy_dead(step);
 	trace_system().destroy_outdated_traces(step);
 
 	destroy_system().queue_children_of_queued_entities(step);

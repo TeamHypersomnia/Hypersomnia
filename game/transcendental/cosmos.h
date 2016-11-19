@@ -15,6 +15,7 @@
 #include "game/systems_insignificant/interpolation_system.h"
 #include "game/systems_insignificant/past_infection_system.h"
 #include "game/systems_insignificant/light_system.h"
+#include "game/systems_insignificant/particles_simulation_system.h"
 #include "game/systems_temporary/dynamic_tree_system.h"
 #include "game/systems_temporary/physics_system.h"
 #include "game/systems_temporary/processing_lists_system.h"
@@ -158,6 +159,7 @@ public:
 	const_item_slot_transfer_request get_handle(const item_slot_transfer_request_data&) const;
 
 	randomization get_rng_for(const entity_id&) const;
+	size_t get_rng_seed_for(const entity_id&) const;
 
 	std::vector<entity_handle> get(const processing_subjects);
 	std::vector<const_entity_handle> get(const processing_subjects) const;

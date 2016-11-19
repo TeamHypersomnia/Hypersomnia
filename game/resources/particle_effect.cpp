@@ -7,9 +7,6 @@ namespace resources {
 		}
 
 		if (m.scale_amounts != 1.f) {
-			particles_per_burst.first *= m.scale_amounts;
-			particles_per_burst.second *= m.scale_amounts;
-
 			particles_per_sec.first *= m.scale_amounts;
 			particles_per_sec.second *= m.scale_amounts;
 

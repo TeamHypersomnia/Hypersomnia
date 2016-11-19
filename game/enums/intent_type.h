@@ -1,6 +1,6 @@
 #pragma once
 
-enum intent_type {
+enum intent_type : unsigned char {
 	NONE,
 
 	THROW_PRIMARY_ITEM,

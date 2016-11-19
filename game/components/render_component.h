@@ -11,9 +11,8 @@ namespace components {
 	struct render {
 		bool absolute_transform = false;
 		bool draw_border = false;
-		padding_byte pad[2];
-
 		render_layer layer = render_layer::INVALID;
+		padding_byte pad;
 
 		augs::rgba border_color;
 

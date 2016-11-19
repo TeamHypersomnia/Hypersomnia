@@ -1,10 +1,11 @@
 #pragma once
 
-enum render_layer {
+enum render_layer : unsigned char {
 	INVALID,
 	OVER_CROSSHAIR,
 	CROSSHAIR,
 	EFFECTS,
+	UNILLUMINATED_SMOKES,
 	FLYING_BULLETS,
 	SMALL_DYNAMIC_BODY,
 	DYNAMIC_BODY,

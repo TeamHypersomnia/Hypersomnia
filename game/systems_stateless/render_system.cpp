@@ -7,7 +7,7 @@
 #include "game/components/polygon_component.h"
 #include "game/components/sprite_component.h"
 #include "game/components/tile_layer_component.h"
-#include "game/components/particle_group_component.h"
+#include "game/components/particles_existence_component.h"
 
 #include "game/messages/new_entity_message.h"
 #include "game/messages/queue_destruction.h"
@@ -62,7 +62,7 @@ void render_system::draw_entities(
 	const renderable_drawing_type renderable_drawing_mode
 ) const {
 	for (const auto e : entities) {
-		for_each_type<components::polygon, components::sprite, /*components::tile_layer,*/ components::particle_group>([&](auto T) {
+		for_each_type<components::polygon, components::sprite, /*components::tile_layer,*/ components::particles_existence>([&](auto T) {
 			typedef decltype(T) renderable_type;
 
 			if (e.has<renderable_type>()) {

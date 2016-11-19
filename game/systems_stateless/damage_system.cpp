@@ -2,7 +2,6 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_id.h"
 
-#include "game/messages/create_particle_effect.h"
 #include "game/messages/collision_message.h"
 #include "game/messages/queue_destruction.h"
 #include "game/messages/damage_message.h"

@@ -4,7 +4,7 @@
 #include "game/components/polygon_component.h"
 #include "game/components/sprite_component.h"
 #include "game/components/tile_layer_component.h"
-#include "game/components/particle_group_component.h"
+#include "game/components/particles_existence_component.h"
 #include "game/components/transform_component.h"
 
 #include "game/transcendental/cosmos.h"
@@ -16,7 +16,7 @@ namespace components {
 		auto* sprite = e.find<components::sprite>();
 		auto* polygon = e.find<components::polygon>();
 		//auto* tile_layer = e.find<components::tile_layer>();
-		auto* particle_group = e.find<components::particle_group>();
+		auto* particles_existence = e.find<components::particles_existence>();
 
 		auto transform = e.logic_transform();
 
@@ -24,7 +24,7 @@ namespace components {
 		if (polygon) result.aabb = polygon->get_aabb(transform);
 		//if (tile_layer) result.aabb = tile_layer->get_aabb(transform);
 
-		if (particle_group) result.always_visible = true;
+		if (particles_existence) result.always_visible = true;
 
 		return result;
 	}

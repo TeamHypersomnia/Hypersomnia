@@ -49,8 +49,8 @@ P P::get_default(const const_entity_handle& id) {
 	if (id.has<components::movement>()) {
 		matching.push_back(processing_subjects::WITH_MOVEMENT);
 	}
-	if (id.has<components::particle_group>()) {
-		matching.push_back(processing_subjects::WITH_PARTICLE_GROUP);
+	if (id.has<components::particles_existence>()) {
+		matching.push_back(processing_subjects::WITH_PARTICLES_EXISTENCE);
 	}
 	if (id.has<components::pathfinding>()) {
 		matching.push_back(processing_subjects::WITH_PATHFINDING);

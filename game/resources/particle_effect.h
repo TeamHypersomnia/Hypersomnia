@@ -2,6 +2,8 @@
 #include "game/components/render_component.h"
 #include "game/components/sprite_component.h"
 
+#include "augs/misc/minmax.h"
+
 namespace resources {
 	struct particle {
 		vec2 pos;
@@ -17,6 +19,8 @@ namespace resources {
 		bool should_disappear = true;
 		bool ignore_rotation = false;
 		int alpha_levels = -1;
+
+		void integrate(const float dt);
 
 		template <class Archive>
 		void serialize(Archive& ar) {
@@ -54,12 +58,7 @@ namespace resources {
 	};
 
 	struct emission {
-		enum type {
-			BURST,
-			STREAM
-		} type;
-
-		std::pair<float, float>
+		augs::minmax<float>
 			spread_degrees = std::make_pair(0.f, 0.f),
 			velocity = std::make_pair(0.f, 0.f),
 			angular_velocity = std::make_pair(0.f, 0.f),
@@ -80,9 +79,7 @@ namespace resources {
 			fade_when_ms_remaining = std::make_pair(0.f, 0.f),
 			num_of_particles_to_spawn_initially = std::make_pair(0.f, 0.f)
 			;
-
-		std::pair<unsigned, unsigned> particles_per_burst = std::make_pair(0u, 0u);
-
+		
 		float initial_rotation_variation = 0.f;
 		bool randomize_acceleration = false;
 
@@ -114,8 +111,6 @@ namespace resources {
 				CEREAL_NVP(swing_speed_change_rate),
 				CEREAL_NVP(fade_when_ms_remaining),
 				CEREAL_NVP(num_of_particles_to_spawn_initially),
-
-				CEREAL_NVP(particles_per_burst),
 
 				CEREAL_NVP(initial_rotation_variation),
 				CEREAL_NVP(randomize_acceleration),

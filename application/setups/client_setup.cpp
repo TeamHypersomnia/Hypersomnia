@@ -123,11 +123,13 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 
 					const bool should_skip = to_skip > 0;
 
-					if (should_skip)
+					if (should_skip) {
 						--to_skip;
+					}
 
-					if (detailed_step_log && !should_skip)
+					if (detailed_step_log && !should_skip) {
 						LOG("Client received command: %x", int(stream.peek<unsigned char>()));
+					}
 
 					switch (command) {
 					case network_command::COMPLETE_STATE:
@@ -151,8 +153,9 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 						step_packaged_for_network step;
 						augs::read_object(stream, step);
 						
-						if (!should_skip)
+						if (!should_skip) {
 							receiver.acquire_next_packaged_step(step);
+						}
 					}
 						break;
 
