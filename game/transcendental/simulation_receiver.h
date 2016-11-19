@@ -2,12 +2,16 @@
 #include "step_packaged_for_network.h"
 #include "augs/misc/jitter_buffer.h"
 #include "game/components/transform_component.h"
+#include <unordered_set>
 
 namespace augs {
 	namespace network {
 		class client;
 	}
 }
+
+class interpolation_system;
+class past_infection_system;
 
 class simulation_receiver {
 	struct misprediction_candidate_entry {
@@ -26,10 +30,10 @@ class simulation_receiver {
 	};
 
 	misprediction_candidate_entry acquire_potential_misprediction(const const_entity_handle&) const;
-	std::vector<misprediction_candidate_entry> acquire_potential_mispredictions(const cosmos& predicted_cosmos_before_reconciliation) const;
+	std::vector<misprediction_candidate_entry> acquire_potential_mispredictions(const std::unordered_set<entity_id>&, const cosmos& predicted_cosmos_before_reconciliation) const;
 
 	unpacking_result unpack_deterministic_steps(cosmos& referential_cosmos, cosmos& last_delta_unpacked);
-	void drag_mispredictions_into_past(const cosmos& predicted_cosmos, const std::vector<misprediction_candidate_entry>& mispredictions) const;
+	void drag_mispredictions_into_past(interpolation_system&, past_infection_system&, const cosmos& predicted_cosmos, const std::vector<misprediction_candidate_entry>& mispredictions) const;
 
 	void remote_entropy_predictions(guid_mapped_entropy& adjusted_entropy, const entity_id& predictable_entity, const cosmos& predicted_cosmos);
 public:
@@ -56,7 +60,9 @@ public:
 	}
 
 	template<class Step>
-	unpacking_result unpack_deterministic_steps(const entity_id& predictable_entity, cosmos& referential_cosmos, cosmos& last_delta_unpacked, cosmos& predicted_cosmos, Step advance) {
+	unpacking_result unpack_deterministic_steps(
+		interpolation_system& interp, past_infection_system& past,
+		const entity_id& predictable_entity, cosmos& referential_cosmos, cosmos& last_delta_unpacked, cosmos& predicted_cosmos, Step advance) {
 		auto result = unpack_deterministic_steps(referential_cosmos, last_delta_unpacked);
 		auto& reconciliate_predicted = result.reconciliate_predicted;
 
@@ -78,7 +84,7 @@ public:
 		// LOG("Unpacking from %x to %x", previous_step, referential_cosmos.get_total_steps_passed());
 
 		if (reconciliate_predicted) {
-			const auto potential_mispredictions = acquire_potential_mispredictions(predicted_cosmos);
+			const auto potential_mispredictions = acquire_potential_mispredictions(past.infected_entities, predicted_cosmos);
 
 			predicted_cosmos = referential_cosmos;
 
@@ -88,7 +94,7 @@ public:
 				advance(cosmic_entropy(s, predicted_cosmos), predicted_cosmos);
 			}
 
-			drag_mispredictions_into_past(predicted_cosmos, potential_mispredictions);
+			drag_mispredictions_into_past(interp, past, predicted_cosmos, potential_mispredictions);
 		}
 
 		return std::move(result);

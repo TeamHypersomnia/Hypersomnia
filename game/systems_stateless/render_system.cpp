@@ -56,6 +56,7 @@ std::array<std::vector<const_entity_handle>, render_layer::COUNT> render_system:
 }
 
 void render_system::draw_entities(
+	const interpolation_system& interp,
 	augs::vertex_triangle_buffer& output, 
 	const std::vector<const_entity_handle>& entities, 
 	const state_for_drawing_camera& in_camera, 
@@ -67,7 +68,7 @@ void render_system::draw_entities(
 
 			if (e.has<renderable_type>()) {
 				const auto& render = e.get<components::render>();
-				const auto& renderable_transform = viewing_transform(e, true);
+				const auto& renderable_transform = e.viewing_transform(interp, true);
 				const auto& renderable = e.get<renderable_type>();
 
 				render_system().draw_renderable(output, renderable, renderable_transform, render, in_camera, renderable_drawing_mode);

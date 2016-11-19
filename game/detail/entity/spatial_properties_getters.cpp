@@ -4,6 +4,7 @@
 #include "game/components/fixtures_component.h"
 #include "game/transcendental/cosmos.h"
 #include "spatial_properties_getters.h"
+#include "game/systems_audiovisual/interpolation_system.h"
 
 template <bool C, class D>
 bool basic_spatial_properties_getters<C, D>::has_logic_transform() const {
@@ -44,9 +45,9 @@ components::transform basic_spatial_properties_getters<C, D>::logic_transform() 
 }
 
 template <bool C, class D>
-components::transform basic_spatial_properties_getters<C, D>::viewing_transform(const bool integerize) const {
+components::transform basic_spatial_properties_getters<C, D>::viewing_transform(const interpolation_system& sys, const bool integerize) const {
 	auto& handle = *static_cast<const D*>(this);
-	return ::viewing_transform(handle, integerize);
+	return ::viewing_transform(sys, handle, integerize);
 }
 
 template <class D>

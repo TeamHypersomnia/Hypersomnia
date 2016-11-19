@@ -3,6 +3,7 @@
 #include "game/transcendental/step.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
+#include "game/transcendental/viewing_session.h"
 #include "game/components/light_component.h"
 #include "game/components/polygon_component.h"
 
@@ -13,14 +14,6 @@
 #include "game/systems_stateless/render_system.h"
 
 #include "game/enums/filters.h"
-
-void light_system::construct(const const_entity_handle) {
-
-}
-
-void light_system::destruct(const const_entity_handle) {
-
-}
 
 void light_system::reserve_caches_for_entities(const size_t n) {
 	per_entity_cache.resize(n);
@@ -50,6 +43,7 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 	const auto light_attenuation_uniform = glGetUniformLocation(light_program.id, "light_attenuation");
 	const auto light_multiply_color_uniform = glGetUniformLocation(light_program.id, "multiply_color");
 	const auto projection_matrix_uniform = glGetUniformLocation(light_program.id, "projection_matrix");
+	const auto& interp = step.session.systems_audiovisual.get<interpolation_system>();
 
 	std::vector<messages::visibility_information_request> requests;
 	std::vector<messages::visibility_information_response> responses;
@@ -58,7 +52,7 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 
 	for (const auto it : cosmos.get(processing_subjects::WITH_LIGHT)) {
 		messages::visibility_information_request request;
-		request.eye_transform = it.viewing_transform();
+		request.eye_transform = it.viewing_transform(interp);
 		request.filter = filters::line_of_sight_query();
 		request.square_side = 1500;
 		request.subject = it;
@@ -181,7 +175,7 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 			light.color.g/255.f,
 			light.color.b/255.f);
 		
-		render_system().draw_entities(output.triangles, step.visible_per_layer[render_layer::DYNAMIC_BODY], step.camera_state, renderable_drawing_type::NORMAL);
+		render_system().draw_entities(interp, output.triangles, step.visible_per_layer[render_layer::DYNAMIC_BODY], step.camera_state, renderable_drawing_type::NORMAL);
 
 		output.call_triangles();
 		output.clear_triangles();
@@ -194,11 +188,11 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 
 	default_program.use();
 
-	render_system().draw_entities(output.triangles, step.visible_per_layer[render_layer::DYNAMIC_BODY], step.camera_state, renderable_drawing_type::NEON_MAPS);
-	render_system().draw_entities(output.triangles, step.visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], step.camera_state, renderable_drawing_type::NEON_MAPS);
-	render_system().draw_entities(output.triangles, step.visible_per_layer[render_layer::FLYING_BULLETS], step.camera_state, renderable_drawing_type::NEON_MAPS);
-	render_system().draw_entities(output.triangles, step.visible_per_layer[render_layer::CAR_INTERIOR], step.camera_state, renderable_drawing_type::NEON_MAPS);
-	render_system().draw_entities(output.triangles, step.visible_per_layer[render_layer::CAR_WHEEL], step.camera_state, renderable_drawing_type::NEON_MAPS);
+	render_system().draw_entities(interp, output.triangles, step.visible_per_layer[render_layer::DYNAMIC_BODY], step.camera_state, renderable_drawing_type::NEON_MAPS);
+	render_system().draw_entities(interp, output.triangles, step.visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], step.camera_state, renderable_drawing_type::NEON_MAPS);
+	render_system().draw_entities(interp, output.triangles, step.visible_per_layer[render_layer::FLYING_BULLETS], step.camera_state, renderable_drawing_type::NEON_MAPS);
+	render_system().draw_entities(interp, output.triangles, step.visible_per_layer[render_layer::CAR_INTERIOR], step.camera_state, renderable_drawing_type::NEON_MAPS);
+	render_system().draw_entities(interp, output.triangles, step.visible_per_layer[render_layer::CAR_WHEEL], step.camera_state, renderable_drawing_type::NEON_MAPS);
 
 	output.call_triangles();
 	output.clear_triangles();

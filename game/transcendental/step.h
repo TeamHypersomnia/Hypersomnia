@@ -42,11 +42,12 @@ typedef basic_cosmic_step<true> const_cosmic_step;
 template <bool is_const>
 class basic_logic_step : public basic_cosmic_step<is_const> {
 	friend class cosmos;
+	typedef maybe_const_ref_t<is_const, data_living_one_step> data_living_one_step_ref;
 public:
-	data_living_one_step& transient;
+	data_living_one_step_ref transient;
 	const cosmic_entropy& entropy;
 
-	basic_logic_step(cosmos_ref cosm, const cosmic_entropy& entropy, data_living_one_step& transient)
+	basic_logic_step(cosmos_ref cosm, const cosmic_entropy& entropy, data_living_one_step_ref transient)
 		: basic_cosmic_step(cosm), entropy(entropy), transient(transient) {
 
 	}
@@ -63,14 +64,15 @@ public:
 typedef basic_logic_step<false> logic_step;
 typedef basic_logic_step<true> const_logic_step;
 
+class viewing_session;
+
 class viewing_step : public const_cosmic_step {
 public:
-	viewing_step(const cosmos&, const immediate_hud& hud, aabb_highlighter&, const augs::variable_delta&, augs::renderer&, state_for_drawing_camera camera_state);
+	viewing_step(const cosmos&, viewing_session&, const augs::variable_delta&, augs::renderer&, state_for_drawing_camera camera_state);
 
 	state_for_drawing_camera camera_state;
 
-	const immediate_hud& hud;
-	aabb_highlighter& world_hover_highlighter;
+	viewing_session& session;
 	augs::variable_delta delta;
 	augs::renderer& renderer;
 

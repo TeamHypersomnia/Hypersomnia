@@ -2,6 +2,8 @@
 #include "augs/math/vec2.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
+class interpolation_system;
+
 float rotation(const_entity_handle of);
 vec2 orientation(const_entity_handle of);
 vec2 position(const_entity_handle of);
@@ -17,4 +19,4 @@ float distance_sq(const_entity_handle from, const_entity_handle to);
 
 void set_velocity(entity_handle, vec2);
 
-components::transform viewing_transform(const const_entity_handle, const bool integerize = false);
+components::transform viewing_transform(const interpolation_system&, const const_entity_handle, const bool integerize = false);

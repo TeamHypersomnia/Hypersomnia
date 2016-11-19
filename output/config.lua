@@ -58,7 +58,7 @@ config_table = {
 
 	debug_var = 0,
 	debug_randomize_entropies_in_client_setup = 1,
-	debug_randomize_entropies_in_client_setup_once_every_steps = 2,
+	debug_randomize_entropies_in_client_setup_once_every_steps = 1,
 
 	server_launch_http_daemon = 1,
 	server_http_daemon_port = 80,

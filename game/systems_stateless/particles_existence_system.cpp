@@ -148,7 +148,6 @@ void particles_existence_system::create_particle_effects(logic_step& step) const
 
 	auto& cosmos = step.cosm;
 	auto& events = step.transient.messages.get_queue<create_particle_effect>();
-	auto& particles_simulation = cosmos.systems_audiovisual.get<particles_simulation_system>();
 
 	for (auto& it : events) {
 		auto emissions = *it.effect;
@@ -158,7 +157,7 @@ void particles_existence_system::create_particle_effects(logic_step& step) const
 		}
 
 		const auto subject = cosmos[it.subject];
-		auto& cache = particles_simulation.get_cache(subject);
+		//auto& cache = particles_simulation.get_cache(subject);
 
 		std::vector<resources::emission*> only_streams;
 

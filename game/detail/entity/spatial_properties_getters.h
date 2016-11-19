@@ -2,12 +2,14 @@
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/components/transform_component.h"
 
+class interpolation_system;
+
 template<bool is_const, class entity_handle_type>
 class basic_spatial_properties_getters {
 public:
 	bool has_logic_transform() const;
 	components::transform logic_transform() const;
-	components::transform viewing_transform(const bool integerize = false) const;
+	components::transform viewing_transform(const interpolation_system& sys, const bool integerize = false) const;
 };
 
 template<bool, class>

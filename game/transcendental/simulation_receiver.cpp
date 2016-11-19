@@ -8,6 +8,9 @@
 #include "game/components/gun_component.h"
 #include "game/components/item_component.h"
 
+#include "game/systems_audiovisual/interpolation_system.h"
+#include "game/systems_audiovisual/past_infection_system.h"
+
 #include "game/transcendental/network_commands.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
@@ -97,11 +100,10 @@ simulation_receiver::misprediction_candidate_entry simulation_receiver::acquire_
 	return candidate;
 }
 
-std::vector<simulation_receiver::misprediction_candidate_entry> simulation_receiver::acquire_potential_mispredictions(const cosmos& predicted_cosmos_before_reconciliation) const {
+std::vector<simulation_receiver::misprediction_candidate_entry> simulation_receiver::acquire_potential_mispredictions(const std::unordered_set<entity_id>& unpredictables_infected, const cosmos& predicted_cosmos_before_reconciliation) const {
 	const auto& cosmos = predicted_cosmos_before_reconciliation;
 
 	const auto& unpredictables_with_past_contagious = cosmos.get(processing_subjects::WITH_PAST_CONTAGIOUS);
-	const auto& unpredictables_infected = cosmos.systems_audiovisual.get<past_infection_system>().infected_entities;
 
 	std::vector<misprediction_candidate_entry> potential_mispredictions;
 	potential_mispredictions.reserve(unpredictables_with_past_contagious.size() + unpredictables_infected.size());
@@ -119,7 +121,7 @@ std::vector<simulation_receiver::misprediction_candidate_entry> simulation_recei
 	return std::move(potential_mispredictions);
 }
 
-void simulation_receiver::drag_mispredictions_into_past(const cosmos& predicted_cosmos, const std::vector<misprediction_candidate_entry>& mispredictions) const {
+void simulation_receiver::drag_mispredictions_into_past(interpolation_system& interp, past_infection_system& past, const cosmos& predicted_cosmos, const std::vector<misprediction_candidate_entry>& mispredictions) const {
 	for (const auto e : mispredictions) {
 		const const_entity_handle reconciliated_entity = predicted_cosmos[e.id];
 		
@@ -132,7 +134,7 @@ void simulation_receiver::drag_mispredictions_into_past(const cosmos& predicted_
 		const bool is_contagious_agent = reconciliated_entity.get_flag(entity_flag::IS_PAST_CONTAGIOUS);
 		const bool should_smooth_rotation = !is_contagious_agent || predicted_cosmos[reconciliated_entity.get<components::driver>().owned_vehicle].alive();
 
-		auto& interp_data = predicted_cosmos.systems_audiovisual.get<interpolation_system>().get_data(reconciliated_entity);
+		auto& interp_data = interp.get_data(reconciliated_entity);
 
 		const bool shouldnt_smooth = reconciliated_entity.has<components::crosshair>();
 		bool misprediction_detected = false;
@@ -150,7 +152,7 @@ void simulation_receiver::drag_mispredictions_into_past(const cosmos& predicted_
 		}
 
 		if (identity_matches || (!misprediction_detected && !is_contagious_agent)) {
-			predicted_cosmos.systems_audiovisual.get<past_infection_system>().uninfect(reconciliated_entity);
+			past.uninfect(reconciliated_entity);
 		}
 	}
 }

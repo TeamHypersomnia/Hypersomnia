@@ -28,6 +28,8 @@
 
 #include "augs/templates/string_templates.h"
 
+#include "game/transcendental/viewing_session.h"
+
 using namespace augs;
 using namespace augs::gui;
 using namespace augs::gui::text;
@@ -197,8 +199,8 @@ namespace components {
 				const auto hovered = cosmos[get_hovered_world_entity(cosmos, step.camera_state.camera_transform.pos + rect_world.last_state.mouse.pos - step.camera_state.visible_world_area /2)];
 
 				if (hovered.alive()) {
-					step.world_hover_highlighter.update(step.get_delta().in_milliseconds());
-					step.world_hover_highlighter.draw(step, hovered);
+					step.session.world_hover_highlighter.update(step.get_delta().in_milliseconds());
+					step.session.world_hover_highlighter.draw(step, hovered);
 
 					tooltip_text = text::simple_bbcode(describe_entity(hovered), text::style(assets::font_id::GUI_FONT, vslightgray));
 				}

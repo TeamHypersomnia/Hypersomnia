@@ -18,9 +18,6 @@ public:
 
 	randomization rng;
 
-	void construct(const const_entity_handle);
-	void destruct(const const_entity_handle);
-
 	void reserve_caches_for_entities(const size_t);
 
 	void render_all_lights(augs::renderer& output, std::array<float, 16> projection_matrix, viewing_step&);

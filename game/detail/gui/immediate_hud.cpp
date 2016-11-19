@@ -78,6 +78,7 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 	const auto& visible_entities = r.visible_entities;
 	auto& target = r.renderer;
 	const auto& cosmos = r.cosm;
+	const auto& interp = r.session.systems_audiovisual.get<interpolation_system>();
 
 	const auto& watched_character = cosmos[r.camera_state.associated_character];
 
@@ -97,7 +98,7 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 
 			const auto health_col = sentience->calculate_health_color(time_pulse_ratio);
 
-			auto& transform = v.viewing_transform();
+			auto& transform = v.viewing_transform(interp);
 			
 			components::sprite::drawing_input state(r.renderer.triangles);
 			state.setup_from(r.camera_state);
@@ -108,7 +109,7 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 			circle_hud.set(assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM, health_col);
 			circle_hud.draw(state);
 			
-			const auto watched_character_transform = watched_character.viewing_transform();
+			const auto watched_character_transform = watched_character.viewing_transform(r.session.systems_audiovisual.get<interpolation_system>());
 			float starting_health_angle = 0.f;
 			float ending_health_angle = 0.f;
 
@@ -117,7 +118,7 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 				ending_health_angle = starting_health_angle + sentience->health.ratio() * 90.f;
 			}
 			else {
-				starting_health_angle = (v.viewing_transform().pos - watched_character_transform.pos).degrees() - 45;
+				starting_health_angle = (v.viewing_transform(interp).pos - watched_character_transform.pos).degrees() - 45;
 				ending_health_angle = starting_health_angle + sentience->health.ratio() * 90.f;
 			}
 
@@ -314,6 +315,7 @@ void immediate_hud::draw_pure_color_highlights(viewing_step& msg) const {
 	const auto& cosmos = msg.cosm;
 	const auto current_time = cosmos.get_total_time_passed_in_seconds() + msg.get_delta().view_interpolation_ratio() * msg.get_delta().in_seconds();;
 	auto& triangles = msg.renderer.triangles;
+	const auto& interp = msg.session.systems_audiovisual.get<interpolation_system>();
 
 	for (const auto& r : recent_pure_color_highlights) {
 		const auto& subject = cosmos[r.target];
@@ -330,7 +332,7 @@ void immediate_hud::draw_pure_color_highlights(viewing_step& msg) const {
 		auto ratio = passed / r.maximum_duration_seconds;
 
 		col.a = 255 * (1-ratio) * r.starting_alpha_ratio;
-		render_system().draw_renderable(triangles, sprite, subject.viewing_transform(true), subject.get<components::render>(), msg.camera_state, renderable_drawing_type::NORMAL);
+		render_system().draw_renderable(triangles, sprite, subject.viewing_transform(interp, true), subject.get<components::render>(), msg.camera_state, renderable_drawing_type::NORMAL);
 		col = prevcol;
 	}
 

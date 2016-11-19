@@ -124,7 +124,9 @@ void particles_simulation_system::advance_streams_and_particles(viewing_step& st
 					float t = (static_cast<float>(i) / to_spawn);
 					float time_elapsed = (1.f - t) * delta.in_seconds();
 
-					const components::transform current_transform = it.viewing_transform();
+					const components::transform current_transform = components::transform();
+					ensure(false);
+						//it.viewing_transform();
 					
 					//(lerp(group.previous_transform.pos, transform.pos, vec2(t, t)),
 					//	lerp(group.previous_transform.rotation, transform.rotation, t));

@@ -3,8 +3,10 @@
 #include "game/components/sub_entities_component.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/step.h"
+#include "game/transcendental/viewing_session.h"
 #include "game/transcendental/cosmos.h"
 #include "augs/graphics/renderer.h"
+#include "game/systems_audiovisual/interpolation_system.h"
 
 void aabb_highlighter::update(const float delta_ms) {
 	timer += delta_ms;
@@ -14,7 +16,7 @@ void aabb_highlighter::update(const float delta_ms) {
 void aabb_highlighter::draw(viewing_step& step, const const_entity_handle& subject) const {
 	rects::ltrb<float> aabb;
 	
-	auto aabb_expansion_lambda = [&aabb](const const_entity_handle e) {
+	auto aabb_expansion_lambda = [&aabb, &step](const const_entity_handle e) {
 		const auto* const sprite = e.find<components::sprite>();
 
 		static const sub_entity_name dont_expand_aabb_for_sub_entities[] = {
@@ -35,7 +37,7 @@ void aabb_highlighter::draw(viewing_step& step, const const_entity_handle& subje
 		}
 
 		if (sprite) {
-			const auto new_aabb = sprite->get_aabb(e.viewing_transform());
+			const auto new_aabb = sprite->get_aabb(e.viewing_transform(step.session.systems_audiovisual.get<interpolation_system>()));
 
 			if (aabb.good()) {
 				aabb.contain(new_aabb);

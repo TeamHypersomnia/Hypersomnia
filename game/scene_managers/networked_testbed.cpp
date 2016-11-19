@@ -60,7 +60,7 @@ namespace scene_managers {
 	}
 
 	void networked_testbed::populate_world_with_entities(cosmos& cosm) {
-		cosm.advance_deterministic_schemata(cosmic_entropy(), [this](logic_step& step) { populate(step); }, [](logic_step&) {});
+		cosm.advance_deterministic_schemata(cosmic_entropy(), [this](logic_step& step) { populate(step); }, [](const_logic_step&) {});
 	}
 
 	void networked_testbed::populate(logic_step& step) {

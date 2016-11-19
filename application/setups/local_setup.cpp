@@ -25,7 +25,6 @@ void local_setup::process(game_window& window) {
 	const auto& cfg = window.config;
 
 	cosmos hypersomnia(3000);
-	hypersomnia.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
 
 	step_and_entropy_unpacker input_unpacker;
 	scene_managers::testbed testbed;
@@ -41,7 +40,9 @@ void local_setup::process(game_window& window) {
 	}
 
 	viewing_session session;
+	session.reserve_caches_for_entities(3000);
 	session.camera.configure_size(screen_size);
+	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
 
 	testbed.configure_view(session);
 
@@ -96,14 +97,14 @@ void local_setup::process(game_window& window) {
 
 			hypersomnia.advance_deterministic_schemata(cosmic_entropy_for_this_step, [](auto){},
 				[this, &session](const const_logic_step& step){
-					session.visual_response_to_game_events(step);
+					session.visual_response_from_game_events(step);
 				}
 			);
 		}
 
 		const auto vdt = session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), input_unpacker.timer);
 
-		hypersomnia.integrate_interpolated_transforms(vdt.in_seconds());
+		session.integrate_interpolated_transforms(hypersomnia, vdt.in_seconds());
 
 		session.view(hypersomnia, testbed.get_controlled_entity(), window, vdt);
 	}

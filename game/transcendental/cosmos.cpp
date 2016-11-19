@@ -82,7 +82,6 @@ void cosmos::destroy_substance_for_entity(const const_entity_handle& h) {
 	};
 
 	systems_temporary.for_each(destructor);
-	systems_audiovisual.for_each(destructor);
 }
 
 void cosmos::create_substance_for_entity(const const_entity_handle& h) {
@@ -92,7 +91,6 @@ void cosmos::create_substance_for_entity(const const_entity_handle& h) {
 		};
 
 		systems_temporary.for_each(constructor);
-		systems_audiovisual.for_each(constructor);
 	}
 }
 
@@ -186,7 +184,6 @@ void cosmos::reserve_storage_for_entities(const size_t n) {
 	};
 
 	systems_temporary.for_each(reservation_lambda);
-	systems_audiovisual.for_each(reservation_lambda);
 }
 
 std::wstring cosmos::summary() const {
@@ -398,20 +395,16 @@ size_t cosmos::get_maximum_entities() const {
 	return significant.pool_for_aggregates.capacity();
 }
 
-void cosmos::integrate_interpolated_transforms(const float seconds) const {
-	profiler.start(meter_type::INTERPOLATION);
-	systems_audiovisual.get<interpolation_system>().integrate_interpolated_transforms(*this, seconds, get_fixed_delta().in_seconds());
-	profiler.stop(meter_type::INTERPOLATION);
-}
 
 void cosmos::advance_deterministic_schemata(const cosmic_entropy& input) {
 	data_living_one_step transient;
 	logic_step step(*this, input, transient);
 
-	advance_deterministic_schemata(step);
+	advance_deterministic_schemata_and_queue_destructions(step);
+	perform_deletions(step);
 }
 
-void cosmos::advance_deterministic_schemata(logic_step& step) {
+void cosmos::advance_deterministic_schemata_and_queue_destructions(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
 	auto& performance = profiler;
@@ -518,8 +511,6 @@ void cosmos::advance_deterministic_schemata(logic_step& step) {
 
 	listener.~contact_listener();
 
-	destroy_system().perform_deletions(step);
-
 	movement_system().generate_movement_responses(step);
 
 	animation_system().game_responses_to_animation_messages(step);
@@ -534,4 +525,8 @@ void cosmos::advance_deterministic_schemata(logic_step& step) {
 	performance.stop(meter_type::LOGIC);
 
 	++significant.meta.total_steps_passed;
+}
+
+void cosmos::perform_deletions(logic_step& step) {
+	destroy_system().perform_deletions(step);
 }

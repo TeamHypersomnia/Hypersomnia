@@ -58,6 +58,7 @@ void determinism_test_setup::process(game_window& window) {
 	}
 
 	viewing_session session;
+	session.reserve_caches_for_entities(3000);
 	session.camera.configure_size(screen_size);
 
 	for (size_t i = 0; i < cosmoi_count; ++i) {
@@ -108,7 +109,7 @@ void determinism_test_setup::process(game_window& window) {
 
 				h.advance_deterministic_schemata(cosmic_entropy_for_this_step, [](auto) {},
 					[this, &session](const const_logic_step& step) {
-						session.visual_response_to_game_events(step);
+						session.visual_response_from_game_events(step);
 					}
 				);
 			}

@@ -350,7 +350,7 @@ void perform_transfer(item_slot_transfer_request r, logic_step& step) {
 				descendant.get<components::physics>().set_transform(previous_container_transform);
 
 				if (descendant.has<components::interpolation>()) {
-					descendant.get<components::interpolation>().write_current_to_interpolated();
+					descendant.get<components::interpolation>().place_of_birth = descendant.logic_transform();
 				}
 			}
 		};

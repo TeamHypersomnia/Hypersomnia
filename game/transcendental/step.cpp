@@ -11,15 +11,13 @@ augs::variable_delta viewing_step::get_delta() const {
 
 viewing_step::viewing_step(
 	const cosmos& cosm, 
-	const immediate_hud& hud,
-	aabb_highlighter& world_hover_highlighter,
+	viewing_session& session,
 	const augs::variable_delta& delta,
 	augs::renderer& renderer, 
 	state_for_drawing_camera camera_state) 
 	: 
 	const_cosmic_step(cosm), 
-	hud(hud), 
-	world_hover_highlighter(world_hover_highlighter), 
+	session(session),
 	delta(delta), renderer(renderer), camera_state(camera_state) 
 	{}
 

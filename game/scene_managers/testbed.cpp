@@ -36,7 +36,7 @@
 
 namespace scene_managers {
 	void testbed::populate_world_with_entities(cosmos& cosm, const vec2i screen_size) {
-		cosm.advance_deterministic_schemata(cosmic_entropy(), [&](logic_step& step) { populate(step, screen_size); }, [](logic_step&) {});
+		cosm.advance_deterministic_schemata(cosmic_entropy(), [&](logic_step& step) { populate(step, screen_size); }, [](const_logic_step&) {});
 	}
 
 	void testbed::populate(logic_step& step, const vec2i screen_size) {

@@ -12,10 +12,6 @@
 #include "game/transcendental/types_specification/all_messages_declaration.h"
 #include "game/transcendental/types_specification/all_systems_declaration.h"
 
-#include "game/systems_audiovisual/interpolation_system.h"
-#include "game/systems_audiovisual/past_infection_system.h"
-#include "game/systems_audiovisual/light_system.h"
-#include "game/systems_audiovisual/particles_simulation_system.h"
 #include "game/systems_temporary/dynamic_tree_system.h"
 #include "game/systems_temporary/physics_system.h"
 #include "game/systems_temporary/processing_lists_system.h"
@@ -38,7 +34,8 @@ class cosmos :
 	private put_all_components_into<augs::operations_on_all_components_mixin, cosmos>::type, 
 	public augs::easier_handle_getters_mixin<cosmos>
 {
-	void advance_deterministic_schemata(logic_step& step_state);
+	void advance_deterministic_schemata_and_queue_destructions(logic_step& step_state);
+	void perform_deletions(logic_step&);
 
 #if COSMOS_TRACKS_GUIDS
 	friend class cosmic_delta;
@@ -63,7 +60,6 @@ private:
 	entity_handle allocate_new_entity();
 public:
 	storage_for_all_systems_temporary systems_temporary;
-	mutable storage_for_all_systems_audiovisual systems_audiovisual;
 
 	mutable cosmic_profiler profiler;
 	augs::stream reserved_memory_for_serialization;
@@ -113,11 +109,12 @@ public:
 		logic_step step(*this, input, queues);
 
 		pre_solve(step);
-		advance_deterministic_schemata(step);
-		post_solve(step);
+		advance_deterministic_schemata_and_queue_destructions(step);
+		post_solve(const_logic_step(step));
+		
+		perform_deletions(step);
 	}
 
-	void integrate_interpolated_transforms(const float seconds) const;
 	void advance_deterministic_schemata(const cosmic_entropy& input);
 
 	void reserve_storage_for_entities(const size_t);

@@ -4,6 +4,7 @@
 #include "game/transcendental/step.h"
 #include "game/scene_managers/rendering_scripts/all.h"
 #include "augs/misc/machine_entropy.h"
+#include "game/components/flags_component.h"
 
 #include "augs/network/network_client.h"
 
@@ -21,8 +22,35 @@ std::wstring viewing_session::summary() const {
 		;
 }
 
-void viewing_session::visual_response_to_game_events(const const_logic_step& step) {
+void viewing_session::visual_response_from_game_events(const const_logic_step& step) {
 	hud.acquire_game_events(step);
+
+	const auto& cosm = step.cosm;
+
+	const auto& events = step.transient.messages.get_queue<messages::collision_message>();
+
+	for (const auto& it : events) {
+		const const_entity_handle subject_owner_body = cosm[it.subject].get_owner_body();
+		const const_entity_handle collider_owner_body = cosm[it.collider].get_owner_body();
+
+		auto& past_system = systems_audiovisual.get<past_infection_system>();
+
+		if (past_system.is_infected(subject_owner_body) && !collider_owner_body.get_flag(entity_flag::IS_IMMUNE_TO_PAST)) {
+			past_system.infect(collider_owner_body);
+		}
+	}
+}
+
+void viewing_session::reserve_caches_for_entities(const size_t n) {
+	systems_audiovisual.for_each([n](auto& sys) {
+		sys.reserve_caches_for_entities(n);
+	});
+}
+
+void viewing_session::integrate_interpolated_transforms(const cosmos& cosm, const float seconds) {
+	cosm.profiler.start(meter_type::INTERPOLATION);
+	systems_audiovisual.get<interpolation_system>().integrate_interpolated_transforms(cosm, seconds, cosm.get_fixed_delta().in_seconds());
+	cosm.profiler.stop(meter_type::INTERPOLATION);
 }
 
 void viewing_session::control(const augs::machine_entropy& entropy) {
@@ -69,11 +97,11 @@ void viewing_session::view(const cosmos& cosmos,
 
 	const auto character_chased_by_camera = cosmos[viewed_character];
 
-	camera.tick(dt, character_chased_by_camera);
+	camera.tick(systems_audiovisual.get<interpolation_system>(), dt, character_chased_by_camera);
 	world_hover_highlighter.cycle_duration_ms = 700;
 	world_hover_highlighter.update(dt.in_milliseconds());
 	
-	viewing_step main_cosmos_viewing_step(cosmos, hud, world_hover_highlighter, dt, renderer, camera.get_state_for_drawing_camera(character_chased_by_camera));
+	viewing_step main_cosmos_viewing_step(cosmos, *this, dt, renderer, camera.get_state_for_drawing_camera(character_chased_by_camera));
 
 #if NDEBUG || _DEBUG
 	rendering_scripts::standard_rendering(main_cosmos_viewing_step);

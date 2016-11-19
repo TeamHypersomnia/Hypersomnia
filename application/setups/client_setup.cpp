@@ -28,6 +28,8 @@
 void client_setup::process(game_window& window) {
 	init(window);
 
+	session.reserve_caches_for_entities(3000);
+
 	while (!should_quit) {
 		session.local_entropy_profiler.new_measurement();
 		auto precollected = window.collect_entropy();
@@ -46,7 +48,7 @@ void client_setup::init(game_window& window, const std::string recording_filenam
 
 	scene_managers::networked_testbed_client().populate_world_with_entities(initial_hypersomnia);
 
-	extrapolated_hypersomnia.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
+	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
 
 	detailed_step_log = cfg.tickrate <= 2;
 
@@ -108,15 +110,15 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 	auto step_pred = [this](const cosmic_entropy& entropy, cosmos& cosm) {
 		cosm.advance_deterministic_schemata(entropy,
 			[this](logic_step&) {},
-			[this](logic_step&) {}
+			[this](const_logic_step&) {}
 		);
 	};
 
 	auto step_pred_with_effects_response = [this](const cosmic_entropy& entropy, cosmos& cosm) {
 		cosm.advance_deterministic_schemata(entropy,
 			[this](logic_step&) {},
-			[this](logic_step& step) {
-				session.visual_response_to_game_events(step);
+			[this](const_logic_step& step) {
+				session.visual_response_from_game_events(step);
 			}
 		);
 	};
@@ -187,7 +189,15 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 			// LOG("Predicting to step: %x; predicted steps: %x", extrapolated_hypersomnia.get_total_steps_passed(), receiver.predicted_steps.size());
 
 			session.unpack_remote_steps_profiler.new_measurement();
-			receiver.unpack_deterministic_steps(scene.get_controlled_entity(), hypersomnia, hypersomnia_last_snapshot, extrapolated_hypersomnia, step_pred);
+			receiver.unpack_deterministic_steps(
+				session.systems_audiovisual.get<interpolation_system>(),
+				session.systems_audiovisual.get<past_infection_system>(),
+				scene.get_controlled_entity(), 
+				hypersomnia, 
+				hypersomnia_last_snapshot, 
+				extrapolated_hypersomnia, 
+				step_pred);
+
 			session.unpack_remote_steps_profiler.end_measurement();
 		}
 		
@@ -204,7 +214,7 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 	if (!still_downloading) {
 		const auto vdt = session.frame_timer.extract_variable_delta(extrapolated_hypersomnia.get_fixed_delta(), input_unpacker.timer);
 		
-		extrapolated_hypersomnia.integrate_interpolated_transforms(vdt.in_seconds());
+		session.integrate_interpolated_transforms(extrapolated_hypersomnia, vdt.in_seconds());
 		
 		session.view(extrapolated_hypersomnia, scene.get_controlled_entity(), window, vdt, client, swap_buffers);
 	}

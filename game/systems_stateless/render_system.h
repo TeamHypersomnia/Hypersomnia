@@ -11,12 +11,14 @@
 using namespace augs;
 
 struct state_for_drawing_camera;
+class interpolation_system;
 
 class render_system {
 public:
 	static bool render_order_compare(const const_entity_handle& a, const const_entity_handle& b);
 
 	void draw_entities(
+		const interpolation_system& interp,
 		augs::vertex_triangle_buffer& output, 
 		const std::vector<const_entity_handle>&, 
 		const state_for_drawing_camera& in, 

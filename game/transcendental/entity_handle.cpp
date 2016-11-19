@@ -10,7 +10,7 @@
 #include "game/components/gui_element_component.h"
 #include "game/components/fixtures_component.h"
 
-#include "game/systems_audiovisual/interpolation_system.h"
+//#include "game/systems_audiovisual/interpolation_system.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/detail/physics_scripts.h"
@@ -31,7 +31,7 @@ void basic_entity_handle<C>::add_standard_components() const {
 
 	if (!has<components::interpolation>() && (has_physics || has<components::crosshair>())) {
 		add(components::interpolation());
-		get<components::interpolation>().write_current_to_interpolated();
+		get<components::interpolation>().place_of_birth = logic_transform();
 	}
 
 	if (has<components::render>() && !is_entity_physical(*this) && !has<components::dynamic_tree_node>()) {

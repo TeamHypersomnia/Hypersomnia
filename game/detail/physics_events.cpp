@@ -236,13 +236,8 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 				}
 		}
 
-		const const_entity_handle& subject_owner_body = subject.get_owner_body();
-		const const_entity_handle& collider_owner_body = collider.get_owner_body();
-		auto& past_system = cosm.systems_audiovisual.get<past_infection_system>();
-
-		if (past_system.is_infected(subject_owner_body) && !collider_owner_body.get_flag(entity_flag::IS_IMMUNE_TO_PAST)) {
-			past_system.infect(collider_owner_body);
-		}
+		const const_entity_handle subject_owner_body = subject.get_owner_body();
+		const const_entity_handle collider_owner_body = collider.get_owner_body();
 
 		auto* driver = subject_owner_body.find<components::driver>();
 

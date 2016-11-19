@@ -9,12 +9,12 @@ void world_camera::configure_size(const vec2 size) {
 	visible_world_area = size;
 }
 
-void world_camera::tick(const augs::variable_delta dt, const const_entity_handle entity_to_chase) {
+void world_camera::tick(const interpolation_system& interp, const augs::variable_delta dt, const const_entity_handle entity_to_chase) {
 	const auto& cosm = entity_to_chase.get_cosmos();
 
 	/* we obtain transform as a copy because we'll be now offsetting it by crosshair position */
 	if (entity_to_chase.alive()) {
-		transform = viewing_transform(entity_to_chase);
+		transform = entity_to_chase.viewing_transform(interp);
 		transform.rotation = 0;
 	}
 

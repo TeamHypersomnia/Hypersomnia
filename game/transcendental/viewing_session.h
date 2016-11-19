@@ -9,6 +9,14 @@
 
 #include "augs/gui/formatted_text.h"
 
+#include "augs/entity_system/storage_for_systems.h"
+#include "game/transcendental/types_specification/all_systems_declaration.h"
+
+#include "game/systems_audiovisual/interpolation_system.h"
+#include "game/systems_audiovisual/past_infection_system.h"
+#include "game/systems_audiovisual/light_system.h"
+#include "game/systems_audiovisual/particles_simulation_system.h"
+
 class game_window;
 
 namespace augs {
@@ -26,10 +34,11 @@ public:
 	vec2i viewport_coordinates;
 	aabb_highlighter world_hover_highlighter;
 	immediate_hud hud;
+	storage_for_all_systems_audiovisual systems_audiovisual;
 
 	bool show_profile_details = true;
 
-	void visual_response_to_game_events(const const_logic_step&);
+	void visual_response_from_game_events(const const_logic_step&);
 
 	augs::variable_delta_timer frame_timer;
 	augs::measurements fps_profiler = augs::measurements(L"FPS");
@@ -43,6 +52,10 @@ public:
 	augs::measurements triangles = augs::measurements(L"Triangles", false);
 
 	std::wstring summary() const;
+	
+	void reserve_caches_for_entities(const size_t);
+
+	void integrate_interpolated_transforms(const cosmos& cosm, const float seconds);
 
 	void control(const augs::machine_entropy&);
 

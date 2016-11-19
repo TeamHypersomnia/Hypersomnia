@@ -2,12 +2,11 @@
 
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle.h"
+#include "game/transcendental/viewing_session.h"
 #include "game/transcendental/cosmos.h"
 
 #include "game/systems_stateless/render_system.h"
 #include "game/systems_stateless/gui_system.h"
-
-#include "game/systems_audiovisual/light_system.h"
 
 #include "game/components/gui_element_component.h"
 #include "game/systems_temporary/dynamic_tree_system.h"
@@ -30,6 +29,7 @@ namespace rendering_scripts {
 		const auto& dynamic_tree = cosmos.systems_temporary.get<dynamic_tree_system>();
 		const auto& physics = cosmos.systems_temporary.get<physics_system>();
 		const auto& controlled_entity = cosmos[step.camera_state.associated_character];
+		const auto& interp = step.session.systems_audiovisual.get<interpolation_system>();
 
 		step.visible_entities = cosmos[dynamic_tree.determine_visible_entities_from_camera(state, physics)];
 		step.visible_per_layer = render_system().get_visible_per_layer(step.visible_entities);
@@ -48,7 +48,7 @@ namespace rendering_scripts {
 		}
 		
 		for (int i = render_layer::UNDER_GROUND; i > render_layer::DYNAMIC_BODY; --i) {
-			render_system().draw_entities(output, step.visible_per_layer[i], state, renderable_drawing_type::NORMAL);
+			render_system().draw_entities(interp, output, step.visible_per_layer[i], state, renderable_drawing_type::NORMAL);
 		}
 
 		renderer.call_triangles();
@@ -60,7 +60,7 @@ namespace rendering_scripts {
 			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
 		}
 		
-		render_system().draw_entities(output, step.visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], state, renderable_drawing_type::BORDER_HIGHLIGHTS);
+		render_system().draw_entities(interp, output, step.visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], state, renderable_drawing_type::BORDER_HIGHLIGHTS);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
@@ -68,7 +68,7 @@ namespace rendering_scripts {
 		default_shader.use();
 
 		for (int i = render_layer::DYNAMIC_BODY; i >= 0; --i) {
-			render_system().draw_entities(output, step.visible_per_layer[i], state, renderable_drawing_type::NORMAL);
+			render_system().draw_entities(interp, output, step.visible_per_layer[i], state, renderable_drawing_type::NORMAL);
 		}
 
 		renderer.call_triangles();
@@ -89,7 +89,7 @@ namespace rendering_scripts {
 		
 		}
 
-		const auto& hud = step.hud;
+		const auto& hud = step.session.hud;
 
 		const auto& textual_infos = hud.draw_circular_bars_and_get_textual_info(step);
 
