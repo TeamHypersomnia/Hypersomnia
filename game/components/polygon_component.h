@@ -39,19 +39,19 @@ namespace components {
 		//augs::constant_size_vector<vec2, RENDERING_POLYGON_VERTEX_COUNT> original_polygon;
 
 		/* triangulated version of original_polygon, ready to be rendered triangle-by-triangle */
-		augs::constant_size_vector<vertex, RENDERING_POLYGON_TRIANGULATED_VERTEX_COUNT> triangulated_polygon;
+		augs::constant_size_vector<vertex, RENDERING_POLYGON_TRIANGULATED_VERTEX_COUNT> vertices;
 
 		/* indices used in glDrawElements */
-		augs::constant_size_vector<zeroed_pod<unsigned>, RENDERING_POLYGON_INDEX_COUNT> indices;
+		augs::constant_size_vector<zeroed_pod<unsigned>, RENDERING_POLYGON_INDEX_COUNT> triangulation_indices;
 
 		template <class Archive>
 		void serialize(Archive& ar) {
 			ar(
 				CEREAL_NVP(original_polygon),
 
-				CEREAL_NVP(triangulated_polygon),
+				CEREAL_NVP(vertices),
 
-				CEREAL_NVP(indices)
+				CEREAL_NVP(triangulation_indices)
 			);
 		}
 		
@@ -64,11 +64,11 @@ namespace components {
 		void set_color(rgba col);
 
 		size_t get_vertex_count() const {
-			return triangulated_polygon.size();
+			return vertices.size();
 		}
 
 		vertex& get_vertex(size_t i) {
-			return triangulated_polygon[i];
+			return vertices[i];
 		}
 
 		void draw(const drawing_input&) const;

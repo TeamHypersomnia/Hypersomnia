@@ -12,33 +12,33 @@ using namespace augs;
 
 namespace components {
 	void polygon::set_color(rgba col) {
-		for (auto& v : triangulated_polygon)
+		for (auto& v : vertices)
 			v.color = col;
 	}
 
 	void polygon::automatically_map_uv(assets::texture_id texture_id_to_map, unsigned uv_mapping_mode) {
-		if (triangulated_polygon.empty()) return;
+		if (vertices.empty()) return;
 
 		auto& texture_to_map = resource_manager.find(texture_id_to_map)->tex;
 
-		auto* v = triangulated_polygon.data();
+		auto* v = vertices.data();
 		typedef const augs::vertex& vc;
 
 		auto x_pred = [](vc a, vc b) { return a.pos.x < b.pos.x; };
 		auto y_pred = [](vc a, vc b) { return a.pos.y < b.pos.y; };
 
 		vec2i lower(
-			static_cast<int>(std::min_element(v, v + triangulated_polygon.size(), x_pred)->pos.x),
-			static_cast<int>(std::min_element(v, v + triangulated_polygon.size(), y_pred)->pos.y)
+			static_cast<int>(std::min_element(v, v + vertices.size(), x_pred)->pos.x),
+			static_cast<int>(std::min_element(v, v + vertices.size(), y_pred)->pos.y)
 			);
 
 		vec2i upper(
-			static_cast<int>(std::max_element(v, v + triangulated_polygon.size(), x_pred)->pos.x),
-			static_cast<int>(std::max_element(v, v + triangulated_polygon.size(), y_pred)->pos.y)
+			static_cast<int>(std::max_element(v, v + vertices.size(), x_pred)->pos.x),
+			static_cast<int>(std::max_element(v, v + vertices.size(), y_pred)->pos.y)
 			);
 
 		if (uv_mapping_mode == uv_mapping_mode::STRETCH) {
-			for (auto& v : triangulated_polygon) {
+			for (auto& v : vertices) {
 				v.set_texcoord(vec2(
 					(v.pos.x - lower.x) / (upper.x - lower.x),
 					(v.pos.y - lower.y) / (upper.y - lower.y)
@@ -48,7 +48,7 @@ namespace components {
 		else if (uv_mapping_mode == uv_mapping_mode::OVERLAY) {
 			auto size = texture_to_map.get_size();
 
-			for (auto& v : triangulated_polygon) {
+			for (auto& v : vertices) {
 				v.set_texcoord(vec2(
 					(v.pos.x - lower.x) / size.x,
 					(v.pos.y - lower.y) / size.y
@@ -82,11 +82,11 @@ namespace components {
 		inpoly.Init(polygon.size());
 		inpoly.SetHole(false);
 
-		triangulated_polygon.reserve(triangulated_polygon.size() + polygon.size());
+		vertices.reserve(vertices.size() + polygon.size());
 
-		int offset = triangulated_polygon.size();
+		int offset = vertices.size();
 		for (size_t i = 0; i < polygon.size(); ++i) {
-			triangulated_polygon.push_back(polygon[i]);
+			vertices.push_back(polygon[i]);
 			//original_polygon.push_back(polygon[i].pos);
 		}
 
@@ -105,7 +105,7 @@ namespace components {
 
 				for (size_t j = offset; j < polygon.size(); ++j) {
 					if (polygon[j].pos.compare(vec2(static_cast<float>(new_tri_point.x), static_cast<float>(-new_tri_point.y)), 1.f)) {
-						indices.push_back(j);
+						triangulation_indices.push_back(j);
 						break;
 					}
 				}
@@ -116,7 +116,7 @@ namespace components {
 	std::vector<vec2> polygon::get_vertices() const {
 		std::vector<vec2> out;
 
-		for (auto& v : triangulated_polygon)
+		for (auto& v : vertices)
 			out.push_back(v.pos);
 
 		return std::move(out);
@@ -126,7 +126,7 @@ namespace components {
 		vertex_triangle new_tri;
 		auto camera_pos = in.camera_transform.pos;
 
-		auto model_transformed = triangulated_polygon;
+		auto model_transformed = vertices;
 
 		/* initial transformation for visibility checks */
 		if (std::abs(in.renderable_transform.rotation) > 0.f)
@@ -146,17 +146,17 @@ namespace components {
 			v.pos.y = static_cast<float>(static_cast<int>(v.pos.y));
 		}
 
-		for (size_t i = 0; i < indices.size(); i += 3) {
-			new_tri.vertices[0] = model_transformed[indices[i]];
-			new_tri.vertices[1] = model_transformed[indices[i + 1]];
-			new_tri.vertices[2] = model_transformed[indices[i + 2]];
+		for (size_t i = 0; i < triangulation_indices.size(); i += 3) {
+			new_tri.vertices[0] = model_transformed[triangulation_indices[i]];
+			new_tri.vertices[1] = model_transformed[triangulation_indices[i + 1]];
+			new_tri.vertices[2] = model_transformed[triangulation_indices[i + 2]];
 
 			in.target_buffer.push_back(new_tri);
 		}
 	}
 	
 	rects::ltrb<float> polygon::get_aabb(components::transform transform) const {
-		return augs::get_aabb(triangulated_polygon, 
+		return augs::get_aabb(vertices, 
 			[](const vertex p) { return p.pos.x; },
 			[](const vertex p) { return p.pos.y; }
 		);
