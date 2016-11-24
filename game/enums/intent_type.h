@@ -26,6 +26,7 @@ enum intent_type : unsigned char {
 	MOVE_LEFT,
 	MOVE_RIGHT,
 	WALK,
+	SPRINT,
 
 	MOVE_CROSSHAIR,
 	CROSSHAIR_PRIMARY_ACTION,

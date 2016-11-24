@@ -60,7 +60,7 @@ namespace ingredients {
 		body.fixed_rotation = false;
 		body.angled_damping = true;
 
-		body.linear_damping = 16;
+		body.linear_damping = 0;
 
 		wsad_character_setup_movement(e);
 

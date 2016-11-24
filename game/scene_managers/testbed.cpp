@@ -294,7 +294,7 @@ namespace scene_managers {
 		active_context.map_key_to_intent(window::event::keys::key::RMOUSE, intent_type::CROSSHAIR_SECONDARY_ACTION);
 
 		active_context.map_key_to_intent(window::event::keys::key::E, intent_type::USE_BUTTON);
-		active_context.map_key_to_intent(window::event::keys::key::LSHIFT, intent_type::WALK);
+		active_context.map_key_to_intent(window::event::keys::key::LSHIFT, intent_type::SPRINT);
 
 		active_context.map_key_to_intent(window::event::keys::key::G, intent_type::THROW_PRIMARY_ITEM);
 		active_context.map_key_to_intent(window::event::keys::key::H, intent_type::HOLSTER_PRIMARY_ITEM);

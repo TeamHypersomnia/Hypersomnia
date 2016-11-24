@@ -43,6 +43,9 @@ void movement_system::set_movement_flags_from_input(logic_step& step) {
 		case intent_type::WALK:
 			movement->walking_enabled = it.pressed_flag;
 			break;
+		case intent_type::SPRINT:
+			movement->sprint_enabled = it.pressed_flag;
+			break;
 		default: break;
 		}
 	}
@@ -78,18 +81,26 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 			movement.make_inert_for_ms -= static_cast<float>(delta.in_milliseconds());
 			physics.set_linear_damping(2);
 		}
-		else
-			physics.set_linear_damping(movement.standard_linear_damping);
+		else {
+			physics.set_linear_damping(movement.sprint_enabled ? (movement.standard_linear_damping / 4.f) : movement.standard_linear_damping);
+		}
 
 		if (resultant.non_zero()) {
-			if (movement.acceleration_length > 0)
+			if (movement.acceleration_length > 0) {
 				resultant.set_length(movement.acceleration_length);
+			}
 			
-			if (movement.make_inert_for_ms > 0.f)
+			if (movement.make_inert_for_ms > 0.f) {
 				resultant /= 10.f;
+			}
 
-			if (movement.walking_enabled)
+			if (movement.sprint_enabled) {
 				resultant /= 2.f;
+			}
+			
+			if (movement.walking_enabled) {
+				resultant /= 2.f;
+			}
 
 			physics.apply_force(resultant * physics.get_mass(), movement.applied_force_offset, true);
 		}

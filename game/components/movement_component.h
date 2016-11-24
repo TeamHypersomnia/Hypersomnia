@@ -35,6 +35,9 @@ namespace components {
 		bool enable_animation = true;
 		bool apply_movement_forces = true;
 
+		bool sprint_enabled = false;
+		padding_byte pad[3];
+
 		vec2 input_acceleration_axes;
 		float acceleration_length = -1.f;
 
