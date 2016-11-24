@@ -162,7 +162,7 @@ void particles_existence_system::create_particle_effects(logic_step& step) const
 		std::vector<resources::emission*> only_streams;
 
 		const auto rng_seed = cosmos.get_rng_seed_for(subject);
-		auto rng = randomization(rng_seed);
+		randomization rng = rng_seed;
 
 		for (auto& emission : emissions) {
 			const float target_rotation = it.place_of_birth.rotation + rng.randval(emission.angular_offset);
@@ -173,7 +173,7 @@ void particles_existence_system::create_particle_effects(logic_step& step) const
 
 		if (only_streams.empty()) continue;
 
-		size_t stream_index = 0;
+		std::size_t stream_index = 0;
 
 		components::particles_existence* target_group = nullptr;
 		components::position_copying* target_position_copying = nullptr;
@@ -192,17 +192,15 @@ void particles_existence_system::create_particle_effects(logic_step& step) const
 		}
 
 		for (const auto& stream : only_streams) {
-			if (target_group_to_refresh.dead()) {
-				auto new_stream_entity = cosmos.create_entity("particle_stream");
-				target_group = &new_stream_entity.add(components::particles_existence());
-				target_transform = &new_stream_entity.add(components::transform());
-				target_render = &new_stream_entity.add(components::render());
+			auto new_stream_entity = cosmos.create_entity("particle_stream");
+			target_group = &new_stream_entity.add(components::particles_existence());
+			target_transform = &new_stream_entity.add(components::transform());
+			target_render = &new_stream_entity.add(components::render());
 
-				if (subject.alive())
-					target_position_copying = &new_stream_entity.add(components::position_copying(it.subject));
+			if (subject.alive())
+				target_position_copying = &new_stream_entity.add(components::position_copying(it.subject));
 
-				new_stream_entity.add_standard_components();
-			}
+			new_stream_entity.add_standard_components();
 
 			const float target_rotation = it.place_of_birth.rotation + rng.randval(stream->angular_offset);
 
