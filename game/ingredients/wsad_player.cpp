@@ -35,13 +35,13 @@ namespace ingredients {
 		movement.add_animation_receiver(e, false);
 
 		movement.input_acceleration_axes.set(1, 1);
-		movement.acceleration_length = 10000;
+		movement.acceleration_length = 8000;
 		
 		//movement.input_acceleration_axes.set(8000, 8000);
 		//movement.acceleration_length = -1;
 
 		movement.max_speed_for_movement_response = 1000;
-		movement.braking_damping = 24.5f;
+		movement.braking_damping = 12.5f;
 		
 		movement.enable_braking_damping = true;
 	}
@@ -60,7 +60,7 @@ namespace ingredients {
 		body.fixed_rotation = false;
 		body.angled_damping = true;
 
-		body.linear_damping = 20;
+		body.linear_damping = 16;
 
 		wsad_character_setup_movement(e);
 

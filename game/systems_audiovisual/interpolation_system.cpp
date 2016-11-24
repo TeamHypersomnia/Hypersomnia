@@ -45,8 +45,8 @@ void interpolation_system::integrate_interpolated_transforms(const cosmos& cosm,
 					cache.rotational_slowdown_multiplier = 1.f;
 			}
 
-			const float positional_averaging_constant = 1.0f - static_cast<float>(pow(info.base_exponent, considered_positional_speed * seconds));
-			const float rotational_averaging_constant = 1.0f - static_cast<float>(pow(info.base_exponent, considered_rotational_speed * seconds));
+			const float positional_averaging_constant = 1.0f - static_cast<float>(pow(info.base_exponent, considered_positional_speed * considered_positional_speed * seconds));
+			const float rotational_averaging_constant = 1.0f - static_cast<float>(pow(info.base_exponent, considered_rotational_speed * considered_rotational_speed * seconds));
 
 			auto& recorded_pob = cache.recorded_place_of_birth;
 			auto& recorded_ver = cache.recorded_version;
