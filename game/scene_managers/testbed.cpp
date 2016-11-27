@@ -138,6 +138,12 @@ namespace scene_managers {
 				light.color = orange;
 				l.add_standard_components();
 			}
+
+			messages::create_particle_effect effect;
+			effect.place_of_birth = components::transform(0, 0, 0);
+			effect.effect = assets::particle_effect_id::WANDERING_SMOKE;
+
+			step.transient.messages.post(effect);
 		}
 
 		for (int i = 0; i < num_characters; ++i) {

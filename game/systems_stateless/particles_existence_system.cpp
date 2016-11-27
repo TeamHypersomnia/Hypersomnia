@@ -152,10 +152,11 @@ void particles_existence_system::create_particle_effects(logic_step& step) const
 	auto& events = step.transient.messages.get_queue<create_particle_effect>();
 
 	for (auto& it : events) {
-		const auto subject = cosmos[it.subject];
-		const auto rng_seed = cosmos.get_rng_seed_for(subject);
-
 		entity_handle new_stream_entity = cosmos.create_entity("particle_stream");
+		auto& target_transform = new_stream_entity += it.place_of_birth;
+
+		const auto rng_seed = cosmos.get_rng_seed_for(new_stream_entity);
+
 		auto& existence = new_stream_entity += components::particles_existence();
 		existence.effect = it.effect;
 		existence.modifier = it.modifier;
@@ -166,7 +167,7 @@ void particles_existence_system::create_particle_effects(logic_step& step) const
 			return a.stream_duration_ms.second < b.stream_duration_ms.second;
 		})).stream_duration_ms.second;
 
-		auto& target_transform = new_stream_entity += it.place_of_birth;
+		const auto subject = cosmos[it.subject];
 
 		if (subject.alive()) {
 			auto& target_position_copying = new_stream_entity += components::position_copying(it.subject);

@@ -7,8 +7,8 @@ out vec4 outputColor;
 uniform sampler2D basic_texture;
 uniform sampler2D light_texture;
 
-const int levels = 3;
-const int step = 255/levels;
+const int light_levels = 3;
+const int light_step = 255/light_levels;
 
 void main() 
 {
@@ -17,15 +17,15 @@ void main()
 	texcoord.y /= textureSize(light_texture, 0).y;
 
 	vec4 light = texture(light_texture, texcoord);
-	//light.r = float(step * (int(light.r * 255.0) / step)) / 255.0;
-	//light.g = float(step * (int(light.g * 255.0) / step)) / 255.0;
-	//light.b = float(step * (int(light.b * 255.0) / step)) / 255.0;
-	//light.a = float(step * (int(light.a * 255.0) / step)) / 255.0;
+	//light.r = float(light_step * (int(light.r * 255.0) / light_step)) / 255.0;
+	//light.g = float(light_step * (int(light.g * 255.0) / light_step)) / 255.0;
+	//light.b = float(light_step * (int(light.b * 255.0) / light_step)) / 255.0;
+	//light.a = float(light_step * (int(light.a * 255.0) / light_step)) / 255.0;
 
 	float intensity = max(max(light.r, light.g), light.b);
 	intensity = float(
 		
-		step * (int(intensity * 255.0) / step + levels)
+		light_step * (int(intensity * 255.0) / light_step + light_levels)
 
 		) / 255.0;
 	light.rgb *= intensity;

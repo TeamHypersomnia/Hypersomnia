@@ -23,20 +23,25 @@ void particles_simulation_system::reserve_caches_for_entities(const size_t n) {
 
 void particles_simulation_system::draw(const render_layer layer, const drawing_input& group_input) const {
 	for (auto it : particles[layer]) {
-		auto temp_alpha = it.face.color.a;
+		const auto temp_alpha = it.face.color.a;
 
 		if (it.should_disappear) {
-			auto alivity_multiplier = (it.max_lifetime_ms - it.lifetime_ms) / it.max_lifetime_ms;
+			const auto alivity_multiplier = (it.max_lifetime_ms - it.lifetime_ms) / it.max_lifetime_ms;
 
-			auto desired_alpha = static_cast<rgba_channel>(alivity_multiplier * static_cast<float>(temp_alpha));
-			if (it.alpha_levels > 0) {
-				it.face.color.a = desired_alpha == 0 ? 0 : ((255 / it.alpha_levels) * (1 + (desired_alpha / (255 / it.alpha_levels))));
-			}
-			else {
-				it.face.color.a = desired_alpha;
+			const auto desired_alpha = static_cast<rgba_channel>(alivity_multiplier * static_cast<float>(temp_alpha));
+
+			if (it.fade_on_disappearance) {
+				if (it.alpha_levels > 0) {
+					it.face.color.a = desired_alpha == 0 ? 0 : ((255 / it.alpha_levels) * (1 + (desired_alpha / (255 / it.alpha_levels))));
+				}
+				else {
+					it.face.color.a = desired_alpha;
+				}
 			}
 
-			// it.face.size_multiplier.set(alivity_multiplier, alivity_multiplier);
+			if (it.shrink_on_disappearance) {
+				it.face.size_multiplier.set(alivity_multiplier, alivity_multiplier);
+			}
 		}
 
 		components::sprite::drawing_input in(group_input.target_buffer);

@@ -7,6 +7,47 @@
 namespace resource_setups {
 	void load_standard_particle_effects() {
 		{
+			auto& effect = resource_manager.create(assets::particle_effect_id::WANDERING_SMOKE);
+
+			resources::emission em;
+			em.min_swing_spread.set(1, 2);
+			em.min_swings_per_sec.set(0.3, 0.5);
+			em.max_swing_spread.set(10, 10);
+			em.max_swings_per_sec.set(0.3, 0.5);
+
+			em.swing_spread.set(5, 5);
+			em.swings_per_sec.set(0.3, 0.5);
+			em.swing_spread_change_rate.set(0.3, 0.5);
+
+			em.spread_degrees = std::make_pair(7, 7);
+			em.particles_per_sec = std::make_pair(40, 50);
+			em.stream_duration_ms = std::make_pair(30000, 30000);
+			em.velocity = std::make_pair(140, 145);
+			em.angular_velocity = std::make_pair(1.6f*RAD_TO_DEGf, 2.3f*RAD_TO_DEGf);
+			em.particle_lifetime_ms = std::make_pair(10000, 10000);
+
+			for (int i = 0; i < 5; ++i) {
+				resources::particle particle_template;
+
+				particle_template.angular_damping = 0;
+				particle_template.linear_damping = 10;
+				particle_template.should_disappear = true;
+				particle_template.face.set(assets::texture_id(int(assets::texture_id::SMOKE_PARTICLE_FIRST) + i), augs::rgba(255, 255, 255, 60));
+				particle_template.face.size_multiplier.set(0.4, 0.4);
+				particle_template.shrink_on_disappearance = true;
+				particle_template.fade_on_disappearance = false;
+
+				em.particle_templates.push_back(particle_template);
+			}
+
+			em.size_multiplier = std::make_pair(1.0, 1.0);
+			em.particle_render_template.layer = render_layer::DIM_SMOKES;
+			em.initial_rotation_variation = 180;
+
+			effect.push_back(em);
+		}
+
+		{
 			auto& effect = resource_manager.create(assets::particle_effect_id::PIXEL_BARREL_LEAVE_EXPLOSION);
 
 			resources::emission em;
@@ -186,14 +227,14 @@ namespace resource_setups {
 				particle_template.angular_damping = 0;
 				particle_template.linear_damping = 10;
 				particle_template.should_disappear = true;
-				particle_template.face.set(assets::texture_id(int(assets::texture_id::SMOKE_PARTICLE_FIRST) + i), augs::rgba(255, 0, 0, 255));
+				particle_template.face.set(assets::texture_id(int(assets::texture_id::SMOKE_PARTICLE_FIRST) + i), augs::rgba(255, 255, 255, 220));
 				particle_template.face.size_multiplier.set(0.4, 0.4);
 
 				em.particle_templates.push_back(particle_template);
 			}
 
 			em.size_multiplier = std::make_pair(0.2, 0.5);
-			em.particle_render_template.layer = render_layer::EFFECTS;
+			em.particle_render_template.layer = render_layer::DIM_SMOKES;
 			em.initial_rotation_variation = 180;
 			//em.fade_when_ms_remaining = std::make_pair(10, 50);
 

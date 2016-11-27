@@ -30,6 +30,10 @@ namespace resource_setups {
 		resource_manager.create(assets::shader_id::LIGHT_FRAGMENT, "hypersomnia/shaders/light.fsh", augs::graphics::shader::type::FRAGMENT);
 		resource_manager.create(assets::program_id::LIGHT, assets::shader_id::LIGHT_VERTEX, assets::shader_id::LIGHT_FRAGMENT);
 
+		resource_manager.create(assets::shader_id::SMOKE_VERTEX, "hypersomnia/shaders/fullscreen.vsh", augs::graphics::shader::type::VERTEX);
+		resource_manager.create(assets::shader_id::SMOKE_FRAGMENT, "hypersomnia/shaders/smoke.fsh", augs::graphics::shader::type::FRAGMENT);
+		resource_manager.create(assets::program_id::SMOKE, assets::shader_id::SMOKE_VERTEX, assets::shader_id::SMOKE_FRAGMENT);
+
 		{
 			auto& illuminated_shader = *resource_manager.find(assets::program_id::DEFAULT_ILLUMINATED);
 			illuminated_shader.use();
@@ -63,6 +67,17 @@ namespace resource_setups {
 
 			const auto basic_texture_uniform = glGetUniformLocation(circular_bars_shader.id, "basic_texture");
 			glUniform1i(basic_texture_uniform, 0);
+		}
+
+		{
+			auto& smoke_shader = *resource_manager.find(assets::program_id::SMOKE);
+			smoke_shader.use();
+
+			const auto light_texture_uniform = glGetUniformLocation(smoke_shader.id, "light_texture");
+			const auto smoke_texture_uniform = glGetUniformLocation(smoke_shader.id, "smoke_texture");
+
+			glUniform1i(smoke_texture_uniform, 1);
+			glUniform1i(light_texture_uniform, 2);
 		}
 	}
 }

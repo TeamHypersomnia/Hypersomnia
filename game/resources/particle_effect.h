@@ -17,6 +17,8 @@ namespace resources {
 		float lifetime_ms = 0.f;
 		float max_lifetime_ms = 0.f;
 		bool should_disappear = true;
+		bool fade_on_disappearance = true;
+		bool shrink_on_disappearance = false;
 		bool ignore_rotation = false;
 		int alpha_levels = -1;
 

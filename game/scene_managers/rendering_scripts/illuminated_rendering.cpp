@@ -42,10 +42,31 @@ namespace rendering_scripts {
 		auto& pure_color_highlight_shader = *resource_manager.find(assets::program_id::PURE_COLOR_HIGHLIGHT);
 		auto& border_highlight_shader = pure_color_highlight_shader; // the same
 		auto& circular_bars_shader = *resource_manager.find(assets::program_id::CIRCULAR_BARS);
+		auto& smoke_shader = *resource_manager.find(assets::program_id::SMOKE);
 
 		particles_simulation_system::drawing_input particles_input(output);
 		particles_input.visible_world_area = state.visible_world_area;
 		particles_input.camera_transform = state.camera_transform;
+
+		default_shader.use();
+		{
+			const auto projection_matrix_uniform = glGetUniformLocation(default_shader.id, "projection_matrix");
+			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
+		}
+
+		renderer.smoke_fbo.use();
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_ONE, GL_ONE); glerr;
+
+		particles.draw(render_layer::DIM_SMOKES, particles_input);
+
+		renderer.call_triangles();
+		renderer.clear_triangles();
+
+		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE); glerr;
+
+		renderer.smoke_fbo.use_default();
 
 		auto& light = step.session.systems_audiovisual.get<light_system>();
 
@@ -80,16 +101,23 @@ namespace rendering_scripts {
 		render_system().draw_entities(interp, output, step.visible_per_layer[render_layer::DYNAMIC_BODY], state, renderable_drawing_type::NORMAL);
 		render_system().draw_entities(interp, output, step.visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], state, renderable_drawing_type::NORMAL);
 		
-		particles.draw(render_layer::DIM_SMOKES, particles_input);
-
 		renderer.call_triangles();
 		renderer.clear_triangles();
-		
+
+		renderer.set_active_texture(1);
+		renderer.bind_texture(renderer.smoke_fbo);
+		renderer.set_active_texture(0);
+
+		smoke_shader.use();
+
+		glBegin(GL_QUADS);
+		glVertexAttrib2f(0.f, 1.f, 1.f);
+		glVertexAttrib2f(0.f, 1.f, 0.f);
+		glVertexAttrib2f(0.f, 0.f, 0.f);
+		glVertexAttrib2f(0.f, 0.f, 1.f);
+		glEnd();
+
 		default_shader.use();
-		{
-			const auto projection_matrix_uniform = glGetUniformLocation(default_shader.id, "projection_matrix");
-			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
-		}
 		
 		for (int i = render_layer::FLYING_BULLETS; i >= 0; --i) {
 			render_system().draw_entities(interp, output, step.visible_per_layer[i], state, renderable_drawing_type::NORMAL);
