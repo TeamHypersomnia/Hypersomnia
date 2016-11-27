@@ -499,7 +499,7 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(logic_step& s
 	gui_system().advance_gui_elements(step);
 	performance.stop(meter_type::GUI);
 
-//	particles_existence_system().advance_lifetimes_and_destroy_dead(step);
+	particles_existence_system().destroy_dead_streams(step);
 	trace_system().destroy_outdated_traces(step);
 
 	destroy_system().queue_children_of_queued_entities(step);

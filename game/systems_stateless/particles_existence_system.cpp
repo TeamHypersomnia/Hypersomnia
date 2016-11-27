@@ -82,24 +82,26 @@ void particles_existence_system::game_responses_to_particle_effects(logic_step& 
 	}
 
 	for (const auto& d : damages) {
-		const auto& response = cosmos[d.inflictor].get<components::particle_effect_response>();
-		const auto& response_map = *response.response;
+		if (d.inflictor_destructed) {
+			const auto& response = cosmos[d.inflictor].get<components::particle_effect_response>();
+			const auto& response_map = *response.response;
 
-		messages::create_particle_effect burst;
-		burst.subject = d.subject;
-		burst.place_of_birth.pos = d.point_of_impact;
+			messages::create_particle_effect burst;
+			burst.subject = d.subject;
+			burst.place_of_birth.pos = d.point_of_impact;
 
-		if (d.amount > 0) {
-			burst.place_of_birth.rotation = (-d.impact_velocity).degrees();
+			if (d.amount > 0) {
+				burst.place_of_birth.rotation = (-d.impact_velocity).degrees();
+			}
+			else {
+				burst.place_of_birth.rotation = (d.impact_velocity).degrees();
+			}
+
+			burst.effect = response_map.at(particle_effect_response_type::DESTRUCTION_EXPLOSION);
+			burst.modifier = response.modifier;
+
+			step.transient.messages.post(burst);
 		}
-		else {
-			burst.place_of_birth.rotation = (d.impact_velocity).degrees();
-		}
-
-		burst.effect = response_map.at(particle_effect_response_type::DESTRUCTION_EXPLOSION);
-		burst.modifier = response.modifier;
-
-		step.transient.messages.post(burst);
 	}
 
 	for (const auto& h : healths) {

@@ -313,17 +313,17 @@ void immediate_hud::draw_vertically_flying_numbers(viewing_step& msg) const {
 
 void immediate_hud::draw_pure_color_highlights(viewing_step& msg) const {
 	const auto& cosmos = msg.cosm;
-	const auto current_time = cosmos.get_total_time_passed_in_seconds() + msg.get_delta().view_interpolation_ratio() * msg.get_delta().in_seconds();;
+	const auto current_time = cosmos.get_total_time_passed_in_seconds() + msg.get_delta().view_interpolation_ratio() * msg.get_delta().in_seconds();
 	auto& triangles = msg.renderer.triangles;
 	const auto& interp = msg.session.systems_audiovisual.get<interpolation_system>();
 
 	for (const auto& r : recent_pure_color_highlights) {
 		const auto& subject = cosmos[r.target];
 
-		if (subject.dead())
+		if (subject.dead() || !subject.has<components::sprite>())
 			continue;
 
-		auto sprite = cosmos[r.target].get<components::sprite>();
+		auto sprite = subject.get<components::sprite>();
 		auto& col = sprite.color;
 		auto prevcol = col;
 		col = r.color;

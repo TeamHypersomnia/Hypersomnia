@@ -24,7 +24,7 @@ namespace augs {
 			second = b;
 		}
 
-		operator pair() {
+		operator pair() const {
 			return{ first, second };
 		}
 
