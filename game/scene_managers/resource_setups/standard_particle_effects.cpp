@@ -73,7 +73,7 @@ namespace resource_setups {
 			em.stream_duration_ms = std::make_pair(300, 500);
 			em.velocity = std::make_pair(30, 250);
 			em.angular_velocity = std::make_pair(0, 0);
-			em.particle_lifetime_ms = std::make_pair(200, 700);
+			em.particle_lifetime_ms = std::make_pair(500, 700);
 
 			for (int i = 0; i < 5; ++i) {
 				resources::particle particle_template;

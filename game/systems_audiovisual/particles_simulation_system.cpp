@@ -167,7 +167,7 @@ void particles_simulation_system::advance_streams_and_particles(const cosmos& co
 		}
 
 		const auto& transform = it.viewing_transform(interp);
-		auto rng = cosmos.get_rng_for(it);
+		randomization rng = cosmos.get_rng_seed_for(it) + cosmos.get_total_steps_passed();
 
 		bool should_destroy = true;
 
