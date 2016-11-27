@@ -44,7 +44,7 @@ void particles_simulation_system::draw(const render_layer layer, const drawing_i
 		}
 		
 		if (it.unshrinking_time_ms > 0.f) {
-			size_mult *= std::min(1.f, it.lifetime_ms / it.unshrinking_time_ms);
+			size_mult *= std::min(1.f, (it.lifetime_ms / it.unshrinking_time_ms)*(it.lifetime_ms / it.unshrinking_time_ms));
 		}
 
 		it.face.size_multiplier.set(size_mult, size_mult);

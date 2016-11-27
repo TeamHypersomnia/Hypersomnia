@@ -32,8 +32,8 @@ namespace resource_setups {
 				particle_template.angular_damping = 0;
 				particle_template.linear_damping = 10;
 				particle_template.face.set(assets::texture_id(int(assets::texture_id::SMOKE_PARTICLE_FIRST) + i), augs::rgba(255, 255, 255, 60));
-				particle_template.unshrinking_time_ms = 500.f;
-				particle_template.shrink_when_ms_remaining = 500.f;
+				particle_template.unshrinking_time_ms = 1000.f;
+				particle_template.shrink_when_ms_remaining = 800.f;
 
 				em.particle_templates.push_back(particle_template);
 			}
