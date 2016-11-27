@@ -16,11 +16,9 @@ namespace resources {
 		float angular_damping = 0.f;
 		float lifetime_ms = 0.f;
 		float max_lifetime_ms = 0.f;
+		float shrink_when_ms_remaining = 0.f;
 		float unshrinking_time_ms = 0.f;
 
-		bool should_disappear = true;
-		bool fade_on_disappearance = true;
-		bool shrink_on_disappearance = false;
 		bool ignore_rotation = false;
 		int alpha_levels = -1;
 

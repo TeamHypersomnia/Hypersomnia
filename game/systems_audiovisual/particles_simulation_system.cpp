@@ -24,31 +24,30 @@ void particles_simulation_system::reserve_caches_for_entities(const size_t n) {
 void particles_simulation_system::draw(const render_layer layer, const drawing_input& group_input) const {
 	for (auto it : particles[layer]) {
 		const auto temp_alpha = it.face.color.a;
+		float size_mult = 1.f;
 
-		if (it.should_disappear) {
-			const auto alivity_multiplier = (it.max_lifetime_ms - it.lifetime_ms) / it.max_lifetime_ms;
+		if (it.shrink_when_ms_remaining > 0.f) {
+			const auto alivity_multiplier = std::min(1.f, (it.max_lifetime_ms - it.lifetime_ms) / it.shrink_when_ms_remaining);
 
-			const auto desired_alpha = static_cast<rgba_channel>(alivity_multiplier * static_cast<float>(temp_alpha));
+			size_mult *= alivity_multiplier;
 
-			if (it.fade_on_disappearance) {
-				if (it.alpha_levels > 0) {
-					it.face.color.a = desired_alpha == 0 ? 0 : ((255 / it.alpha_levels) * (1 + (desired_alpha / (255 / it.alpha_levels))));
-				}
-				else {
-					it.face.color.a = desired_alpha;
-				}
-			}
-
-			if (it.shrink_on_disappearance) {
-				float considered_mult = alivity_multiplier;
-
-				if (it.unshrinking_time_ms > 0.f) {
-					considered_mult *= std::min(1.f, it.lifetime_ms / it.unshrinking_time_ms);
-				}
-
-				it.face.size_multiplier.set(considered_mult, considered_mult);
-			}
+			//const auto desired_alpha = static_cast<rgba_channel>(alivity_multiplier * static_cast<float>(temp_alpha));
+			//
+			//if (it.fade_on_disappearance) {
+			//	if (it.alpha_levels > 0) {
+			//		it.face.color.a = desired_alpha == 0 ? 0 : ((255 / it.alpha_levels) * (1 + (desired_alpha / (255 / it.alpha_levels))));
+			//	}
+			//	else {
+			//		it.face.color.a = desired_alpha;
+			//	}
+			//}
 		}
+		
+		if (it.unshrinking_time_ms > 0.f) {
+			size_mult *= std::min(1.f, it.lifetime_ms / it.unshrinking_time_ms);
+		}
+
+		it.face.size_multiplier.set(size_mult, size_mult);
 
 		components::sprite::drawing_input in(group_input.target_buffer);
 
@@ -135,7 +134,7 @@ void particles_simulation_system::advance_streams_and_particles(const cosmos& co
 			p.integrate(delta.in_seconds());
 		}
 
-		erase_remove(particle_layer, [](const resources::particle& a) { return a.should_disappear && a.lifetime_ms >= a.max_lifetime_ms; });
+		erase_remove(particle_layer, [](const resources::particle& a) { return a.lifetime_ms >= a.max_lifetime_ms; });
 	}
 
 	for (const auto it : cosmos.get(processing_subjects::WITH_PARTICLES_EXISTENCE)) {

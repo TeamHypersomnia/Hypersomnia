@@ -22,26 +22,23 @@ namespace resource_setups {
 			em.spread_degrees = std::make_pair(7, 7);
 			em.particles_per_sec = std::make_pair(40, 50);
 			em.stream_duration_ms = std::make_pair(30000, 30000);
-			em.velocity = std::make_pair(140, 145);
-			em.angular_velocity = std::make_pair(1.6f*RAD_TO_DEGf, 2.3f*RAD_TO_DEGf);
-			em.particle_lifetime_ms = std::make_pair(10000, 10000);
+			em.velocity = std::make_pair(200, 205);
+			em.angular_velocity = std::make_pair(1.6f*RAD_TO_DEGf, 3.3f*RAD_TO_DEGf);
+			em.particle_lifetime_ms = std::make_pair(5000, 5000);
 
 			for (int i = 0; i < 5; ++i) {
 				resources::particle particle_template;
 
 				particle_template.angular_damping = 0;
 				particle_template.linear_damping = 10;
-				particle_template.should_disappear = true;
 				particle_template.face.set(assets::texture_id(int(assets::texture_id::SMOKE_PARTICLE_FIRST) + i), augs::rgba(255, 255, 255, 60));
-				particle_template.face.size_multiplier.set(0.4, 0.4);
-				particle_template.shrink_on_disappearance = true;
-				particle_template.fade_on_disappearance = false;
-				particle_template.unshrinking_time_ms = 300.f;
+				particle_template.unshrinking_time_ms = 500.f;
+				particle_template.shrink_when_ms_remaining = 500.f;
 
 				em.particle_templates.push_back(particle_template);
 			}
 
-			em.size_multiplier = std::make_pair(1.0, 1.0);
+			em.size_multiplier = std::make_pair(2.0, 2.5);
 			em.particle_render_template.layer = render_layer::DIM_SMOKES;
 			em.initial_rotation_variation = 180;
 
@@ -63,7 +60,6 @@ namespace resource_setups {
 
 				particle_template.angular_damping = 0;
 				particle_template.linear_damping = 5000;
-				particle_template.should_disappear = true;
 				particle_template.face.set(assets::texture_id(int(assets::texture_id::PIXEL_THUNDER_FIRST) + i), augs::rgba(255, 255, 255, 255));
 				particle_template.alpha_levels = 1;
 
@@ -92,7 +88,6 @@ namespace resource_setups {
 
 				particle_template.angular_damping = 0;
 				particle_template.linear_damping = 5000;
-				particle_template.should_disappear = true;
 				particle_template.face.set(assets::texture_id(int(assets::texture_id::PIXEL_THUNDER_FIRST) + i), augs::rgba(255, 255, 255, 255));
 				particle_template.alpha_levels = 1;
 
@@ -122,7 +117,6 @@ namespace resource_setups {
 
 				particle_template.angular_damping = 0;
 				particle_template.linear_damping = 0;
-				particle_template.should_disappear = true;
 				particle_template.face.set(assets::texture_id(assets::texture_id::BLANK), augs::rgba(255, 255, 255, 255));
 				particle_template.face.size.set(1, 1);
 				particle_template.alpha_levels = 1;
@@ -152,7 +146,6 @@ namespace resource_setups {
 
 				particle_template.angular_damping = 0;
 				particle_template.linear_damping = 1000;
-				particle_template.should_disappear = true;
 				particle_template.face.set(assets::texture_id(assets::texture_id::BLANK), augs::rgba(255, 255, 255, 255));
 				particle_template.face.size.set(1, 1);
 				particle_template.alpha_levels = 1;
@@ -187,7 +180,6 @@ namespace resource_setups {
 
 				particle_template.angular_damping = 0;
 				particle_template.linear_damping = 0;
-				particle_template.should_disappear = true;
 				particle_template.face.set(assets::texture_id(assets::texture_id::BLANK), augs::rgba(255, 255, 255, 255));
 				particle_template.face.size.set(1, 1);
 				particle_template.alpha_levels = 1;
@@ -227,7 +219,6 @@ namespace resource_setups {
 
 				particle_template.angular_damping = 0;
 				particle_template.linear_damping = 10;
-				particle_template.should_disappear = true;
 				particle_template.face.set(assets::texture_id(int(assets::texture_id::SMOKE_PARTICLE_FIRST) + i), augs::rgba(255, 255, 255, 220));
 				particle_template.face.size_multiplier.set(0.4, 0.4);
 

@@ -5,7 +5,7 @@ out vec4 outputColor;
 uniform sampler2D smoke_texture;
 uniform sampler2D light_texture;
 
-const int smoke_levels = 4;
+const int smoke_levels = 3;
 const int smoke_step = 255/smoke_levels;
 const int light_levels = 3;
 const int light_step = 255/light_levels;
@@ -37,6 +37,8 @@ void main()
 
 	if(smoke_step_number <= 1)
 		discard;
+		//else
+		//smoke_step_number = 2;
 
 	smoke_intensity = float(
 		
@@ -48,7 +50,7 @@ void main()
 		vec3 smoke_hsv = rgb2hsv(smoke.rgb);
 		vec3 colorful_smoke = hsv2rgb(vec3(smoke_hsv.x, smoke_hsv.y, 1.0));
 	
-		smoke.a = smoke_intensity;
+		smoke.a = smoke_intensity * 0.4;
 		smoke.rgb = colorful_smoke;
 	}
 
