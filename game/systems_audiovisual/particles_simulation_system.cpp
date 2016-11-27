@@ -7,6 +7,8 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/components/position_copying_component.h"
 
+#include "augs/templates/container_templates.h"
+
 void particles_simulation_system::construct(const const_entity_handle id) {
 	// get_cache(id).constructed = true;
 }
@@ -16,18 +18,71 @@ void particles_simulation_system::destruct(const const_entity_handle id) {
 }
 
 void particles_simulation_system::reserve_caches_for_entities(const size_t n) {
-	per_entity_cache.resize(n);
+	// per_entity_cache.reserve(n);
+}
+
+void particles_simulation_system::draw(const render_layer layer, const drawing_input& group_input) const {
+	for (auto it : particles[layer]) {
+		auto temp_alpha = it.face.color.a;
+
+		if (it.should_disappear) {
+			auto alivity_multiplier = (it.max_lifetime_ms - it.lifetime_ms) / it.max_lifetime_ms;
+
+			auto desired_alpha = static_cast<rgba_channel>(alivity_multiplier * static_cast<float>(temp_alpha));
+			if (it.alpha_levels > 0) {
+				it.face.color.a = desired_alpha == 0 ? 0 : ((255 / it.alpha_levels) * (1 + (desired_alpha / (255 / it.alpha_levels))));
+			}
+			else {
+				it.face.color.a = desired_alpha;
+			}
+
+			// it.face.size_multiplier.set(alivity_multiplier, alivity_multiplier);
+		}
+
+		components::sprite::drawing_input in(group_input.target_buffer);
+
+		in.renderable_transform = it.ignore_rotation ? components::transform(it.pos, 0) : components::transform({ it.pos, it.rotation });
+		in.camera_transform = group_input.camera_transform;
+		in.visible_world_area = group_input.visible_world_area;
+		//in.renderable_transform += in.renderable_transform;
+		it.face.draw(in);
+		//it.face.color.a = temp_alpha;
+		// it.face.size_multiplier.set(1, 1);
+	}
+}
+
+void particles_simulation_system::resample_state_for_audiovisuals(const cosmos& new_cosmos) {
+	std::vector<entity_id> to_erase;
+
+	for (const auto it : per_entity_cache) {
+		if (new_cosmos[it.first].dead()) {
+			to_erase.push_back(it.first);
+		}
+	}
+
+	for (const auto it : to_erase) {
+		per_entity_cache.erase(it);
+	}
+
+	//for (const auto it : new_cosmos.get(processing_subjects::WITH_PARTICLES_EXISTENCE)) {
+	//	auto& cache = get_cache(it);
+	//	
+	//	if (cache.constructed) {
+	//
+	//	}
+	//}
 }
 
 particles_simulation_system::cache& particles_simulation_system::get_cache(const const_entity_handle id) {
-	return per_entity_cache[id.get_id().pool.indirection_index];
+	return per_entity_cache[id.get_id()];
+	//return per_entity_cache[id.get_id().pool.indirection_index];
 }
 
-void particles_simulation_system::spawn_particle(randomization& rng,
-	stream& group, const vec2& position, float rotation, const float spread, const resources::emission& emission) {
+resources::particle& particles_simulation_system::spawn_particle(randomization& rng,
+	emission_instance& group, const vec2& position, float rotation, const float spread, const resources::emission& emission) {
 	auto new_particle = emission.particle_templates[rng.randval(0u, emission.particle_templates.size() - 1)];
 	new_particle.vel = vec2().set_from_degrees(
-		rng.randval(rotation - spread, rotation + spread)) *
+		group.angular_offset + rng.randval(rotation - spread, rotation + spread)) *
 		rng.randval(emission.velocity);
 
 	rotation = new_particle.vel.degrees();
@@ -38,22 +93,7 @@ void particles_simulation_system::spawn_particle(randomization& rng,
 	new_particle.rotation = rng.randval(rotation - emission.initial_rotation_variation, rotation + emission.initial_rotation_variation);
 	new_particle.rotation_speed = rng.randval(emission.angular_velocity);
 
-	auto truncated_lifetime = emission.particle_lifetime_ms;
-
-	if (1337) {
-		const float remaining_time = static_cast<float>(group.stream_max_lifetime_ms - group.stream_lifetime_ms);
-
-		/* if remaining time is less than fade_when_ms_remaining */
-		if (group.fade_when_ms_remaining > 0.f && remaining_time < group.fade_when_ms_remaining) {
-			/* truncate particle's lifetime to create fading effect */
-			float multiplier = remaining_time / group.fade_when_ms_remaining;
-
-			truncated_lifetime.first *= multiplier;
-			truncated_lifetime.second *= multiplier;
-		}
-	}
-
-	new_particle.max_lifetime_ms = rng.randval(truncated_lifetime);
+	new_particle.max_lifetime_ms = rng.randval(emission.particle_lifetime_ms);
 
 	if (emission.randomize_acceleration) {
 		new_particle.acc += vec2().set_from_degrees(
@@ -61,7 +101,9 @@ void particles_simulation_system::spawn_particle(randomization& rng,
 			rng.randval(emission.acceleration);
 	}
 
-	group.particles.push_back(new_particle);
+	
+	particles[emission.particle_render_template.layer].push_back(new_particle);
+	return *particles[emission.particle_render_template.layer].rbegin();
 }
 
 void resources::particle::integrate(const float dt) {
@@ -75,78 +117,99 @@ void resources::particle::integrate(const float dt) {
 	lifetime_ms += dt * 1000.f;
 }
 
-void particles_simulation_system::advance_streams_and_particles(viewing_step& step) {
-	const auto& cosmos = step.cosm;
-	const auto delta = step.get_delta();
+void particles_simulation_system::advance_streams_and_particles(const cosmos& cosmos, const augs::delta delta, interpolation_system& interp) {
+	for (auto& particle_layer : particles) {
+		for (auto& p : particle_layer) {
+			p.integrate(delta.in_seconds());
+		}
 
-	for (const auto it : step.cosm.get(processing_subjects::WITH_PARTICLES_EXISTENCE)) {
-		auto& group = get_cache(it);
-		const auto& transform = it.get<components::transform>();
+		erase_remove(particle_layer, [](const resources::particle& a) { return a.should_disappear && a.lifetime_ms >= a.max_lifetime_ms; });
+	}
+
+	for (const auto it : cosmos.get(processing_subjects::WITH_PARTICLES_EXISTENCE)) {
+		auto& cache = get_cache(it);
+		const auto& existence = it.get<components::particles_existence>();
+
+		const bool should_rebuild_cache = cache.recorded_existence != existence;
+
+		if (should_rebuild_cache) {
+			randomization rng = existence.rng_seed;
+			cache.recorded_existence = existence;
+			cache.emission_instances.clear();
+			
+			for (auto emission : (*existence.effect)) {
+				emission.apply_modifier(existence.modifier);
+
+				cache.emission_instances.push_back(emission_instance());
+				auto& target_stream = *cache.emission_instances.rbegin();
+
+				target_stream.stream_info = emission;
+				target_stream.enable_streaming = true;
+				target_stream.stream_lifetime_ms = 0.f;
+				target_stream.angular_offset = rng.randval(emission.angular_offset);
+				target_stream.target_spread = rng.randval(emission.spread_degrees);
+				target_stream.target_particles_per_sec = rng.randval(emission.particles_per_sec);
+				target_stream.swing_spread = rng.randval(emission.swing_spread);
+				target_stream.swings_per_sec = rng.randval(emission.swings_per_sec);
+
+				target_stream.min_swing_spread = rng.randval(emission.min_swing_spread);
+				target_stream.min_swings_per_sec = rng.randval(emission.min_swings_per_sec);
+				target_stream.max_swing_spread = rng.randval(emission.max_swing_spread);
+				target_stream.max_swings_per_sec = rng.randval(emission.max_swings_per_sec);
+
+				target_stream.stream_max_lifetime_ms = rng.randval(emission.stream_duration_ms);
+				target_stream.stream_particles_to_spawn = rng.randval(emission.num_of_particles_to_spawn_initially);
+				target_stream.swing_speed_change = rng.randval(emission.swing_speed_change_rate);
+				target_stream.swing_spread_change = rng.randval(emission.swing_spread_change_rate);
+
+				target_stream.fade_when_ms_remaining = rng.randval(emission.fade_when_ms_remaining);
+			}
+		}
+
+		const auto& transform = it.viewing_transform(interp);
 		auto rng = cosmos.get_rng_for(it);
 
 		bool should_destroy = true;
 
-		auto& slots = group.stream_slots;
+		auto& instances = cache.emission_instances;
 
-		for (auto& stream_slot : slots) {
-			auto& particles = stream_slot.particles;
-
-			for (auto& particle : particles) {
-				particle.integrate(delta.in_seconds());
-			}
-
-			if (stream_slot.enable_streaming) {
-				auto& stream_info = stream_slot.stream_info;
-				float stream_delta = std::min(delta.in_milliseconds(), stream_slot.stream_max_lifetime_ms - stream_slot.stream_lifetime_ms);
-				stream_slot.stream_lifetime_ms += stream_delta;
-				stream_slot.stream_lifetime_ms = std::min(stream_slot.stream_lifetime_ms, stream_slot.stream_max_lifetime_ms);
-
-				auto new_particles_to_spawn_by_time = stream_slot.target_particles_per_sec * (stream_delta / 1000.f);
+		for (auto& instance : instances) {
+			if (instance.enable_streaming) {
+				const float stream_delta = std::min(delta.in_milliseconds(), instance.stream_max_lifetime_ms - instance.stream_lifetime_ms);
 				
-				if (stream_slot.stop_spawning_particles_if_chased_entity_dead && cosmos[it.get<components::position_copying>().target].dead())
-					new_particles_to_spawn_by_time = 0;
-
-				stream_slot.stream_particles_to_spawn += new_particles_to_spawn_by_time;
-
-				stream_slot.swings_per_sec += rng.randval(-stream_slot.swing_speed_change, stream_slot.swing_speed_change);
-				stream_slot.swing_spread += rng.randval(-stream_slot.swing_spread_change, stream_slot.swing_spread_change);
-
-				if (stream_slot.max_swing_spread > 0) {
-					augs::clamp(stream_slot.swing_spread, stream_slot.min_swing_spread, stream_slot.max_swing_spread);
-				}
-				if (stream_slot.max_swings_per_sec > 0) {
-					augs::clamp(stream_slot.swings_per_sec, stream_slot.min_swings_per_sec, stream_slot.max_swings_per_sec);
+				instance.stream_lifetime_ms += stream_delta;
+				
+				if (instance.stream_lifetime_ms > instance.stream_max_lifetime_ms) {
+					continue;
 				}
 
-				const int to_spawn = static_cast<int>(std::floor(stream_slot.stream_particles_to_spawn));
+				auto new_particles_to_spawn_by_time = instance.target_particles_per_sec * (stream_delta / 1000.f);
+				
+				instance.stream_particles_to_spawn += new_particles_to_spawn_by_time;
+
+				instance.swings_per_sec += rng.randval(-instance.swing_speed_change, instance.swing_speed_change);
+				instance.swing_spread += rng.randval(-instance.swing_spread_change, instance.swing_spread_change);
+
+				if (instance.max_swing_spread > 0) {
+					augs::clamp(instance.swing_spread, instance.min_swing_spread, instance.max_swing_spread);
+				}
+				if (instance.max_swings_per_sec > 0) {
+					augs::clamp(instance.swings_per_sec, instance.min_swings_per_sec, instance.max_swings_per_sec);
+				}
+
+				const int to_spawn = static_cast<int>(std::floor(instance.stream_particles_to_spawn));
 
 				for (int i = 0; i < to_spawn; ++i) {
-					float t = (static_cast<float>(i) / to_spawn);
-					float time_elapsed = (1.f - t) * delta.in_seconds();
+					const float t = (static_cast<float>(i) / to_spawn);
+					const float time_elapsed = (1.f - t) * delta.in_seconds();
 
-					const components::transform current_transform = components::transform();
-					ensure(false);
-						//it.viewing_transform();
-					
-					//(lerp(group.previous_transform.pos, transform.pos, vec2(t, t)),
-					//	lerp(group.previous_transform.rotation, transform.rotation, t));
+					spawn_particle(rng, instance, transform.pos, transform.rotation +
+						instance.swing_spread * static_cast<float>(sin((instance.stream_lifetime_ms / 1000.f) * 2 * PI_f * instance.swings_per_sec))
+						, instance.target_spread, instance.stream_info).integrate(time_elapsed);
 
-					spawn_particle(rng, stream_slot, current_transform.pos, current_transform.rotation +
-						stream_slot.swing_spread * static_cast<float>(sin((stream_slot.stream_lifetime_ms / 1000.f) * 2 * PI_f * stream_slot.swings_per_sec))
-						, stream_slot.target_spread, stream_info);
-
-					(*stream_slot.particles.rbegin()).integrate(time_elapsed);
-					stream_slot.stream_particles_to_spawn -= 1.f;
+					instance.stream_particles_to_spawn -= 1.f;
 				}
 			}
-
-			particles.erase(std::remove_if(particles.begin(), particles.end(),
-				[](const resources::particle& a) { return a.should_disappear && a.lifetime_ms >= a.max_lifetime_ms;  }
-			), particles.end());
 		}
-
-		slots.erase(std::remove_if(slots.begin(), slots.end(), [](const stream& s) {
-			return s.particles.empty() && s.stream_lifetime_ms >= s.stream_max_lifetime_ms;
-		}), slots.end());
 	}
 }

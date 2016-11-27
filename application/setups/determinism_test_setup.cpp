@@ -114,6 +114,8 @@ void determinism_test_setup::process(game_window& window) {
 				);
 			}
 
+			session.resample_state_for_audiovisuals(hypersomnias[0]);
+
 			auto& first_cosm = hypersomnias[0].reserved_memory_for_serialization;
 
 			augs::output_stream_reserver first_cosm_reserver;

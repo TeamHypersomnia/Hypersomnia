@@ -63,7 +63,7 @@ void render_system::draw_entities(
 	const renderable_drawing_type renderable_drawing_mode
 ) const {
 	for (const auto e : entities) {
-		for_each_type<components::polygon, components::sprite, /*components::tile_layer,*/ components::particles_existence>([&](auto T) {
+		for_each_type<components::polygon, components::sprite>([&](auto T) {
 			typedef decltype(T) renderable_type;
 
 			if (e.has<renderable_type>()) {

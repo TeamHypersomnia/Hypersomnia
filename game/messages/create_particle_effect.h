@@ -11,8 +11,6 @@ namespace messages {
 		assets::particle_effect_id effect = assets::particle_effect_id::INVALID;
 		resources::particle_effect_modifier modifier;
 
-		entity_id target_group_to_refresh;
-
 		components::transform place_of_birth;
 	};
 }

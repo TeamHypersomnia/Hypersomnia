@@ -55,7 +55,8 @@ public:
 	
 	void reserve_caches_for_entities(const size_t);
 
-	void integrate_interpolated_transforms(const cosmos& cosm, const float seconds);
+	void advance_audiovisual_systems(const cosmos& cosm, const augs::delta dt);
+	void resample_state_for_audiovisuals(const cosmos&);
 
 	void control(const augs::machine_entropy&);
 

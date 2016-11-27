@@ -66,7 +66,7 @@ struct put_all_components_into {
 		components::rotation_copying,
 		components::movement,
 		components::particle_effect_response,
-		//components::particles_existence,
+		components::particles_existence,
 		//components::pathfinding,
 		components::physics,
 		components::render,
@@ -109,7 +109,6 @@ namespace std {
 }
 
 typedef std::tuple<
-	components::particles_existence,
 	components::pathfinding
 > disabled_components;
 

@@ -18,8 +18,9 @@ void interpolation_system::reserve_caches_for_entities(const size_t n) {
 	per_entity_cache.resize(n);
 }
 
-void interpolation_system::integrate_interpolated_transforms(const cosmos& cosm, const float seconds, const float fixed_delta_seconds) {
-	const float slowdown_multipliers_decrease = seconds / fixed_delta_seconds;
+void interpolation_system::integrate_interpolated_transforms(const cosmos& cosm, const augs::delta variable_delta, const augs::delta fixed_delta_for_slowdowns) {
+	const auto seconds = variable_delta.in_seconds();
+	const float slowdown_multipliers_decrease = seconds / fixed_delta_for_slowdowns.in_seconds();
 
 	if (cosm.significant.meta.settings.enable_interpolation) {
 		for (const auto e : cosm.get(processing_subjects::WITH_INTERPOLATION)) {
@@ -34,15 +35,17 @@ void interpolation_system::integrate_interpolated_transforms(const cosmos& cosm,
 			if (cache.positional_slowdown_multiplier > 1.f) {
 				cache.positional_slowdown_multiplier -= slowdown_multipliers_decrease / 4;
 
-				if (cache.positional_slowdown_multiplier < 1.f)
+				if (cache.positional_slowdown_multiplier < 1.f) {
 					cache.positional_slowdown_multiplier = 1.f;
+				}
 			}
 
 			if (cache.rotational_slowdown_multiplier > 1.f) {
 				cache.rotational_slowdown_multiplier -= slowdown_multipliers_decrease / 4;
 
-				if (cache.rotational_slowdown_multiplier < 1.f)
+				if (cache.rotational_slowdown_multiplier < 1.f) {
 					cache.rotational_slowdown_multiplier = 1.f;
+				}
 			}
 
 			const float positional_averaging_constant = 1.0f - static_cast<float>(pow(info.base_exponent, considered_positional_speed * seconds));

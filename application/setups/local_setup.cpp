@@ -100,11 +100,13 @@ void local_setup::process(game_window& window) {
 					session.visual_response_from_game_events(step);
 				}
 			);
+
+			session.resample_state_for_audiovisuals(hypersomnia);
 		}
 
 		const auto vdt = session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), input_unpacker.timer);
 
-		session.integrate_interpolated_transforms(hypersomnia, vdt.in_seconds());
+		session.advance_audiovisual_systems(hypersomnia, vdt);
 
 		session.view(hypersomnia, testbed.get_controlled_entity(), window, vdt);
 	}

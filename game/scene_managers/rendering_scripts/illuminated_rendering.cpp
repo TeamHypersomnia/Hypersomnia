@@ -30,7 +30,8 @@ namespace rendering_scripts {
 		const auto& physics = cosmos.systems_temporary.get<physics_system>();
 		const auto& controlled_entity = cosmos[step.camera_state.associated_character];
 		const auto& interp = step.session.systems_audiovisual.get<interpolation_system>();
-
+		const auto& particles = step.session.systems_audiovisual.get<particles_simulation_system>();
+		
 		step.visible_entities = cosmos[dynamic_tree.determine_visible_entities_from_camera(state, physics)];
 		step.visible_per_layer = render_system().get_visible_per_layer(step.visible_entities);
 
@@ -41,7 +42,11 @@ namespace rendering_scripts {
 		auto& pure_color_highlight_shader = *resource_manager.find(assets::program_id::PURE_COLOR_HIGHLIGHT);
 		auto& border_highlight_shader = pure_color_highlight_shader; // the same
 		auto& circular_bars_shader = *resource_manager.find(assets::program_id::CIRCULAR_BARS);
-		
+
+		particles_simulation_system::drawing_input particles_input(output);
+		particles_input.visible_world_area = state.visible_world_area;
+		particles_input.camera_transform = state.camera_transform;
+
 		auto& light = step.session.systems_audiovisual.get<light_system>();
 
 		light.render_all_lights(renderer, matrix, step);
@@ -75,6 +80,8 @@ namespace rendering_scripts {
 		render_system().draw_entities(interp, output, step.visible_per_layer[render_layer::DYNAMIC_BODY], state, renderable_drawing_type::NORMAL);
 		render_system().draw_entities(interp, output, step.visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], state, renderable_drawing_type::NORMAL);
 		
+		particles.draw(render_layer::DIM_SMOKES, particles_input);
+
 		renderer.call_triangles();
 		renderer.clear_triangles();
 		
@@ -88,6 +95,8 @@ namespace rendering_scripts {
 			render_system().draw_entities(interp, output, step.visible_per_layer[i], state, renderable_drawing_type::NORMAL);
 		}
 		
+		particles.draw(render_layer::EFFECTS, particles_input);
+
 		renderer.call_triangles();
 		renderer.clear_triangles();
 

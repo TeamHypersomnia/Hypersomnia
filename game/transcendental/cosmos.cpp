@@ -477,8 +477,8 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(logic_step& s
 	driver_system().assign_drivers_from_successful_trigger_hits(step);
 	driver_system().release_drivers_due_to_ending_contact_with_wheel(step);
 
-	//particles_simulation_system().game_responses_to_particle_effects(step);
-	//particles_simulation_system().create_particle_effects(step);
+	particles_existence_system().game_responses_to_particle_effects(step);
+	particles_existence_system().create_particle_effects(step);
 
 	// gui_system().translate_game_events_for_hud(step);
 

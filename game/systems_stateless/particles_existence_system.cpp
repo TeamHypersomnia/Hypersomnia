@@ -24,9 +24,9 @@ void particles_existence_system::destroy_dead_streams(logic_step& step) const {
 	const auto& cosmos = step.cosm;
 
 	for (const auto it : cosmos.get(processing_subjects::WITH_PARTICLES_EXISTENCE)) {
-		const auto& group = it.get<components::particles_existence>();
+		const auto& existence = it.get<components::particles_existence>();
 
-		if ((cosmos.get_timestamp() - group.time_of_birth).step > group.max_lifetime_in_steps) {
+		if ((cosmos.get_timestamp() - existence.time_of_birth).step > existence.max_lifetime_in_steps) {
 			step.transient.messages.post(messages::queue_destruction(it));
 		}
 	}
@@ -74,11 +74,11 @@ void particles_existence_system::game_responses_to_particle_effects(logic_step& 
 
 			step.transient.messages.post(burst);
 		}
-		//
-		//if (g.subject.has(sub_entity_name::BARREL_SMOKE))
-		//	burst.target_group_to_refresh = g.subject[sub_entity_name::BARREL_SMOKE];
-		//
-		//step.transient.messages.post(burst);
+		
+		if (cosmos[g.subject][sub_entity_name::BARREL_SMOKE].alive()) {
+			messages::queue_destruction msg = { cosmos[g.subject][sub_entity_name::BARREL_SMOKE] };
+			step.transient.messages.post(msg);
+		}
 	}
 
 	for (const auto& d : damages) {
@@ -150,104 +150,33 @@ void particles_existence_system::create_particle_effects(logic_step& step) const
 	auto& events = step.transient.messages.get_queue<create_particle_effect>();
 
 	for (auto& it : events) {
-		auto emissions = *it.effect;
-
-		for (auto& e : emissions) {
-			e.apply_modifier(it.modifier);
-		}
-
 		const auto subject = cosmos[it.subject];
-		//auto& cache = particles_simulation.get_cache(subject);
-
-		std::vector<resources::emission*> only_streams;
-
 		const auto rng_seed = cosmos.get_rng_seed_for(subject);
-		randomization rng = rng_seed;
 
-		for (auto& emission : emissions) {
-			const float target_rotation = it.place_of_birth.rotation + rng.randval(emission.angular_offset);
-			const float target_spread = rng.randval(emission.spread_degrees);
+		entity_handle new_stream_entity = cosmos.create_entity("particle_stream");
+		auto& existence = new_stream_entity += components::particles_existence();
+		existence.effect = it.effect;
+		existence.modifier = it.modifier;
+		existence.rng_seed = rng_seed;
+		existence.time_of_birth = cosmos.get_timestamp();
 
-			only_streams.push_back(&emission);
+		existence.max_lifetime_in_steps = (*std::max_element((*it.effect).begin(), (*it.effect).end(), [](const auto& a, const auto& b){
+			return a.stream_duration_ms.second < b.stream_duration_ms.second;
+		})).stream_duration_ms.second;
+
+		auto& target_transform = new_stream_entity += it.place_of_birth;
+
+		if (subject.alive()) {
+			auto& target_position_copying = new_stream_entity += components::position_copying(it.subject);
+			
+			const auto subject_transform = subject.logic_transform();
+			target_position_copying.position_copying_type = components::position_copying::position_copying_type::ORBIT;
+
+			target_position_copying.rotation_offset = it.place_of_birth.rotation - subject_transform.rotation;
+			target_position_copying.rotation_orbit_offset = (it.place_of_birth.pos - subject_transform.pos).rotate(-subject_transform.rotation, vec2(0.f, 0.f));
 		}
 
-		if (only_streams.empty()) continue;
-
-		std::size_t stream_index = 0;
-
-		components::particles_existence* target_group = nullptr;
-		components::position_copying* target_position_copying = nullptr;
-		components::render* target_render = nullptr;
-		components::transform* target_transform = nullptr;
-
-		const auto target_group_to_refresh = cosmos[it.target_group_to_refresh];
-		/*
-		if (target_group_to_refresh.alive()) {
-			target_group = target_group_to_refresh.find<components::particles_existence>();
-			target_position_copying = target_group_to_refresh.find<components::position_copying>();
-			target_render = target_group_to_refresh.find<components::render>();
-			target_transform = target_group_to_refresh.find<components::transform>();
-
-			target_group->stream_slots.resize(only_streams.size());
-		}
-
-		for (const auto& stream : only_streams) {
-			auto new_stream_entity = cosmos.create_entity("particle_stream");
-			target_group = &new_stream_entity.add(components::particles_existence());
-			target_transform = &new_stream_entity.add(components::transform());
-			target_render = &new_stream_entity.add(components::render());
-
-			if (subject.alive())
-				target_position_copying = &new_stream_entity.add(components::position_copying(it.subject));
-
-			new_stream_entity.add_standard_components();
-
-			const float target_rotation = it.place_of_birth.rotation + rng.randval(stream->angular_offset);
-
-			//*target_group = components::particles_existence();
-			auto& target_stream = target_group->stream_slots[stream_index];
-
-			target_stream.stream_info = *stream;
-			target_stream.enable_streaming = true;
-			target_stream.stream_lifetime_ms = 0.f;
-			target_stream.target_spread = rng.randval(stream->spread_degrees);
-			target_stream.target_particles_per_sec = rng.randval(stream->particles_per_sec);
-			target_stream.swing_spread = rng.randval(stream->swing_spread);
-			target_stream.swings_per_sec = rng.randval(stream->swings_per_sec);
-
-
-			target_stream.min_swing_spread = rng.randval(stream->min_swing_spread);
-			target_stream.min_swings_per_sec = rng.randval(stream->min_swings_per_sec);
-			target_stream.max_swing_spread = rng.randval(stream->max_swing_spread);
-			target_stream.max_swings_per_sec = rng.randval(stream->max_swings_per_sec);
-
-			target_stream.stream_max_lifetime_ms = rng.randval(stream->stream_duration_ms);
-			target_stream.stream_particles_to_spawn = rng.randval(stream->num_of_particles_to_spawn_initially);
-			target_stream.swing_speed_change = rng.randval(stream->swing_speed_change_rate);
-			target_stream.swing_spread_change = rng.randval(stream->swing_spread_change_rate);
-
-			target_stream.fade_when_ms_remaining = rng.randval(stream->fade_when_ms_remaining);
-
-			*target_transform = components::transform(it.place_of_birth.pos, target_rotation);
-			*target_render = stream->particle_render_template;
-
-			if (target_position_copying) {
-				const auto& subject_transform = subject.logic_transform();
-				*target_position_copying = components::position_copying(subject);
-				target_position_copying->position_copying_type = components::position_copying::position_copying_type::ORBIT;
-				target_position_copying->rotation_offset = target_rotation - subject_transform.rotation;
-				target_position_copying->rotation_orbit_offset = (it.place_of_birth.pos - subject_transform.pos).rotate(-subject_transform.rotation, vec2(0.f, 0.f));
-			}
-
-			if (subject.dead()) {
-				target_stream.stop_spawning_particles_if_chased_entity_dead = false;
-			}
-
-			if (target_group_to_refresh.alive()) {
-				++stream_index;
-				target_stream.destroy_after_lifetime_passed = false;
-			}
-		}*/
+		new_stream_entity.add_standard_components();
 	}
 
 	events.clear();

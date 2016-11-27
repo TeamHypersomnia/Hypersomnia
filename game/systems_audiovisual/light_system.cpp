@@ -44,6 +44,7 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 	const auto light_multiply_color_uniform = glGetUniformLocation(light_program.id, "multiply_color");
 	const auto projection_matrix_uniform = glGetUniformLocation(light_program.id, "projection_matrix");
 	const auto& interp = step.session.systems_audiovisual.get<interpolation_system>();
+	const auto& particles = step.session.systems_audiovisual.get<particles_simulation_system>();
 
 	std::vector<messages::visibility_information_request> requests;
 	std::vector<messages::visibility_information_response> responses;
@@ -193,6 +194,14 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 	render_system().draw_entities(interp, output.triangles, step.visible_per_layer[render_layer::FLYING_BULLETS], step.camera_state, renderable_drawing_type::NEON_MAPS);
 	render_system().draw_entities(interp, output.triangles, step.visible_per_layer[render_layer::CAR_INTERIOR], step.camera_state, renderable_drawing_type::NEON_MAPS);
 	render_system().draw_entities(interp, output.triangles, step.visible_per_layer[render_layer::CAR_WHEEL], step.camera_state, renderable_drawing_type::NEON_MAPS);
+
+	{
+		particles_simulation_system::drawing_input in(output.triangles);
+		in.visible_world_area = camera_size;
+		in.camera_transform = camera_transform;
+
+		particles.draw(render_layer::EFFECTS, in);
+	}
 
 	output.call_triangles();
 	output.clear_triangles();

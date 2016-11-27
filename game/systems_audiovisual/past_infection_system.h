@@ -13,4 +13,5 @@ public:
 	void uninfect(const entity_id&);
 
 	void reserve_caches_for_entities(const size_t) const {}
+	void resample_state_for_audiovisuals(const cosmos&) const {}
 };
