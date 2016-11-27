@@ -199,6 +199,7 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 		particles_simulation_system::drawing_input in(output.triangles);
 		in.visible_world_area = camera_size;
 		in.camera_transform = camera_transform;
+		in.use_neon_map = true;
 
 		particles.draw(render_layer::EFFECTS, in);
 	}
