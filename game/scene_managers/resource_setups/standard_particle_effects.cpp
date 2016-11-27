@@ -36,6 +36,7 @@ namespace resource_setups {
 				particle_template.face.size_multiplier.set(0.4, 0.4);
 				particle_template.shrink_on_disappearance = true;
 				particle_template.fade_on_disappearance = false;
+				particle_template.unshrinking_time_ms = 300.f;
 
 				em.particle_templates.push_back(particle_template);
 			}

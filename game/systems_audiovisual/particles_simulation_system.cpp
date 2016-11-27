@@ -40,7 +40,13 @@ void particles_simulation_system::draw(const render_layer layer, const drawing_i
 			}
 
 			if (it.shrink_on_disappearance) {
-				it.face.size_multiplier.set(alivity_multiplier, alivity_multiplier);
+				float considered_mult = alivity_multiplier;
+
+				if (it.unshrinking_time_ms > 0.f) {
+					considered_mult *= std::min(1.f, it.lifetime_ms / it.unshrinking_time_ms);
+				}
+
+				it.face.size_multiplier.set(considered_mult, considered_mult);
 			}
 		}
 
