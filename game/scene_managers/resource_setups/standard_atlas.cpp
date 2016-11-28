@@ -139,7 +139,7 @@ namespace resource_setups {
 
 		resource_manager.create_sprites_indexed(
 			assets::texture_id::SMOKE_PARTICLE_FIRST,
-			assets::texture_id::SMOKE_PARTICLE_LAST,
+			assets::texture_id(int(assets::texture_id::SMOKE_PARTICLE_FIRST) + 3),
 			"hypersomnia/gfx/smoke");
 
 		resource_manager.create_sprites_indexed(

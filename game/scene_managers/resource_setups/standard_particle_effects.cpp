@@ -22,11 +22,11 @@ namespace resource_setups {
 			em.spread_degrees = std::make_pair(7, 7);
 			em.particles_per_sec = std::make_pair(40, 50);
 			em.stream_duration_ms = std::make_pair(30000, 30000);
-			em.velocity = std::make_pair(200, 205);
-			em.angular_velocity = std::make_pair(1.6f*RAD_TO_DEGf, 3.3f*RAD_TO_DEGf);
+			em.velocity = std::make_pair(200, 200);
+			em.angular_velocity = std::make_pair(0.2f*RAD_TO_DEGf, 2.3f*RAD_TO_DEGf);
 			em.particle_lifetime_ms = std::make_pair(5000, 5000);
 
-			for (int i = 0; i < 5; ++i) {
+			for (int i = 0; i < 3; ++i) {
 				resources::particle particle_template;
 
 				particle_template.angular_damping = 0;
@@ -38,7 +38,7 @@ namespace resource_setups {
 				em.particle_templates.push_back(particle_template);
 			}
 
-			em.size_multiplier = std::make_pair(2.0, 2.5);
+			em.size_multiplier = std::make_pair(1.0, 1.0);
 			em.particle_render_template.layer = render_layer::DIM_SMOKES;
 			em.initial_rotation_variation = 180;
 
@@ -214,7 +214,7 @@ namespace resource_setups {
 			em.swing_spread_change_rate = std::make_pair(1, 4);
 			em.angular_offset = std::make_pair(0, 0);
 
-			for (int i = 0; i < 5; ++i) {
+			for (int i = 0; i < 3; ++i) {
 				resources::particle particle_template;
 
 				particle_template.angular_damping = 0;

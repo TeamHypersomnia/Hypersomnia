@@ -50,7 +50,7 @@ void main()
 		vec3 smoke_hsv = rgb2hsv(smoke.rgb);
 		vec3 colorful_smoke = hsv2rgb(vec3(smoke_hsv.x, smoke_hsv.y, 1.0));
 	
-		smoke.a = smoke_intensity * 0.4;
+		smoke.a = smoke_intensity * 0.3;
 		smoke.rgb = colorful_smoke;
 	}
 
