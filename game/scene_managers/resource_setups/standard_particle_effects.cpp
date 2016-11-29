@@ -24,7 +24,7 @@ namespace resource_setups {
 			em.stream_duration_ms = std::make_pair(3000000, 3000000);
 			
 			em.base_velocity = std::make_pair(250, 300);
-			em.base_velocity_variation = std::make_pair(50.f, 400.f);
+			em.base_velocity_variation = std::make_pair(50.f, 300.f);
 
 			em.angular_velocity = std::make_pair(0.2f*RAD_TO_DEGf, 2.3f*RAD_TO_DEGf);
 			em.particle_lifetime_ms = std::make_pair(5000, 5000);
