@@ -21,8 +21,11 @@ namespace resource_setups {
 
 			em.spread_degrees = std::make_pair(7, 7);
 			em.particles_per_sec = std::make_pair(40, 50);
-			em.stream_duration_ms = std::make_pair(30000, 30000);
-			em.velocity = std::make_pair(200, 200);
+			em.stream_duration_ms = std::make_pair(3000000, 3000000);
+			
+			em.base_velocity = std::make_pair(250, 300);
+			em.base_velocity_variation = std::make_pair(50.f, 400.f);
+
 			em.angular_velocity = std::make_pair(0.2f*RAD_TO_DEGf, 2.3f*RAD_TO_DEGf);
 			em.particle_lifetime_ms = std::make_pair(5000, 5000);
 
@@ -51,7 +54,7 @@ namespace resource_setups {
 			resources::emission em;
 			em.spread_degrees = std::make_pair(100, 130);
 			em.num_of_particles_to_spawn_initially = std::make_pair(30, 120);
-			em.velocity = std::make_pair(250, 800);
+			em.base_velocity = std::make_pair(250, 800);
 			em.angular_velocity = std::make_pair(0, 0);
 			em.particle_lifetime_ms = std::make_pair(30, 100);
 
@@ -79,7 +82,7 @@ namespace resource_setups {
 			resources::emission em;
 			em.spread_degrees = std::make_pair(150, 360);
 			em.num_of_particles_to_spawn_initially = std::make_pair(30, 120);
-			em.velocity = std::make_pair(10, 800);
+			em.base_velocity = std::make_pair(10, 800);
 			em.angular_velocity = std::make_pair(0, 0);
 			em.particle_lifetime_ms = std::make_pair(1, 120);
 
@@ -108,7 +111,7 @@ namespace resource_setups {
 			em.spread_degrees = std::make_pair(0, 1);
 			em.particles_per_sec = std::make_pair(70, 80);
 			em.stream_duration_ms = std::make_pair(300, 500);
-			em.velocity = std::make_pair(30, 250);
+			em.base_velocity = std::make_pair(30, 250);
 			em.angular_velocity = std::make_pair(0, 0);
 			em.particle_lifetime_ms = std::make_pair(500, 700);
 
@@ -137,7 +140,7 @@ namespace resource_setups {
 			resources::emission em;
 			em.spread_degrees = std::make_pair(0, 10);
 			em.num_of_particles_to_spawn_initially = std::make_pair(30, 40);
-			em.velocity = std::make_pair(350, 550);
+			em.base_velocity = std::make_pair(350, 550);
 			em.angular_velocity = std::make_pair(0, 0);
 			em.particle_lifetime_ms = std::make_pair(200, 400);
 
@@ -160,7 +163,7 @@ namespace resource_setups {
 			effect.push_back(em);
 			auto wandering = (*assets::particle_effect_id::WANDERING_PIXELS_DIRECTED)[0];
 			wandering.spread_degrees = std::make_pair(10, 30);
-			wandering.velocity = std::make_pair(160, 330);
+			wandering.base_velocity = std::make_pair(160, 330);
 			effect.push_back(wandering);
 		}
 
@@ -171,7 +174,7 @@ namespace resource_setups {
 			em.spread_degrees = std::make_pair(0, 1);
 			em.particles_per_sec = std::make_pair(50, 60);
 			em.stream_duration_ms = std::make_pair(450, 800);
-			em.velocity = std::make_pair(4, 30);
+			em.base_velocity = std::make_pair(4, 30);
 			em.angular_velocity = std::make_pair(0, 0);
 			em.particle_lifetime_ms = std::make_pair(300, 400);
 
@@ -201,7 +204,7 @@ namespace resource_setups {
 			em.particles_per_sec = std::make_pair(5, 5);
 			em.stream_duration_ms = std::make_pair(3000, 3000);
 			em.num_of_particles_to_spawn_initially = std::make_pair(55, 55);
-			em.velocity = std::make_pair(30, 70);
+			em.base_velocity = std::make_pair(30, 70);
 			em.angular_velocity = std::make_pair(1.8, 1.8);
 			em.particle_lifetime_ms = std::make_pair(4000, 4000);
 

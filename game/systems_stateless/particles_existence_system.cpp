@@ -21,12 +21,27 @@
 #include "game/systems_audiovisual/particles_simulation_system.h"
 
 void particles_existence_system::destroy_dead_streams(logic_step& step) const {
-	const auto& cosmos = step.cosm;
+	auto& cosmos = step.cosm;
+	const auto timestamp = cosmos.get_timestamp();
+
 
 	for (const auto it : cosmos.get(processing_subjects::WITH_PARTICLES_EXISTENCE)) {
-		const auto& existence = it.get<components::particles_existence>();
+		auto& existence = it.get<components::particles_existence>();
+		auto& input = existence.input;
 
-		if ((cosmos.get_timestamp() - existence.time_of_birth).step > existence.max_lifetime_in_steps) {
+		if (input.randomize_position_within_radius > 0.f) {
+			if ((timestamp - existence.time_of_last_displacement).in_milliseconds(step.get_delta()) > existence.current_displacement_duration_bound_ms) {
+				const auto new_seed = cosmos.get_rng_seed_for(it) + cosmos.get_total_steps_passed();
+				randomization rng(new_seed);
+
+				existence.time_of_last_displacement = timestamp;
+				existence.current_displacement.set_from_degrees(rng.randval(0.f, 360.f)).set_length(rng.randval(0.f, input.randomize_position_within_radius));
+				existence.current_displacement_duration_bound_ms = rng.randval(input.single_displacement_duration_ms);
+				existence.rng_seed = new_seed;
+			}
+		}
+
+		if ((timestamp - existence.time_of_birth).step > existence.max_lifetime_in_steps) {
 			step.transient.messages.post(messages::queue_destruction(it));
 		}
 	}
@@ -47,16 +62,16 @@ void particles_existence_system::game_responses_to_particle_effects(logic_step& 
 			messages::create_particle_effect burst;
 			burst.place_of_birth = g.barrel_transform;
 			burst.subject = g.subject;
-			burst.effect = round_response_map.at(particle_effect_response_type::BARREL_LEAVE_EXPLOSION);
-			burst.modifier = round_response.modifier;
+			burst.input.effect = round_response_map.at(particle_effect_response_type::BARREL_LEAVE_EXPLOSION);
+			burst.input.modifier = round_response.modifier;
 
 			step.transient.messages.post(burst);
 
 			burst.place_of_birth = cosmos[r].logic_transform();
 			burst.place_of_birth.rotation += 180;
 			burst.subject = r;
-			burst.effect = round_response_map.at(particle_effect_response_type::PROJECTILE_TRACE);
-			burst.modifier = round_response.modifier;
+			burst.input.effect = round_response_map.at(particle_effect_response_type::PROJECTILE_TRACE);
+			burst.input.modifier = round_response.modifier;
 
 			step.transient.messages.post(burst);
 		}
@@ -69,8 +84,8 @@ void particles_existence_system::game_responses_to_particle_effects(logic_step& 
 			burst.place_of_birth = cosmos[s].logic_transform();
 			burst.place_of_birth.rotation += 180;
 			burst.subject = s;
-			burst.effect = shell_response_map.at(particle_effect_response_type::PROJECTILE_TRACE);
-			burst.modifier = shell_response.modifier;
+			burst.input.effect = shell_response_map.at(particle_effect_response_type::PROJECTILE_TRACE);
+			burst.input.modifier = shell_response.modifier;
 
 			step.transient.messages.post(burst);
 		}
@@ -97,8 +112,8 @@ void particles_existence_system::game_responses_to_particle_effects(logic_step& 
 				burst.place_of_birth.rotation = (d.impact_velocity).degrees();
 			}
 
-			burst.effect = response_map.at(particle_effect_response_type::DESTRUCTION_EXPLOSION);
-			burst.modifier = response.modifier;
+			burst.input.effect = response_map.at(particle_effect_response_type::DESTRUCTION_EXPLOSION);
+			burst.input.modifier = response.modifier;
 
 			step.transient.messages.post(burst);
 		}
@@ -113,12 +128,12 @@ void particles_existence_system::game_responses_to_particle_effects(logic_step& 
 		burst.place_of_birth.pos = h.point_of_impact;
 		burst.place_of_birth.pos = cosmos[h.subject].logic_transform().pos;
 		burst.place_of_birth.rotation = (h.impact_velocity).degrees();
-		burst.modifier = response.modifier;
+		burst.input.modifier = response.modifier;
 
 		if (h.target == messages::health_event::HEALTH) {
 			if (h.effective_amount > 0) {
-				burst.effect = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
-				burst.modifier.scale_amounts += h.ratio_effective_to_maximum;
+				burst.input.effect = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
+				burst.input.modifier.scale_amounts += h.ratio_effective_to_maximum;
 				step.transient.messages.post(burst);
 			}
 			else {
@@ -137,8 +152,8 @@ void particles_existence_system::game_responses_to_particle_effects(logic_step& 
 		messages::create_particle_effect burst;
 		burst.subject = s.subject;
 		burst.place_of_birth = s.origin_transform;
-		burst.effect = response_map.at(particle_effect_response_type::PARTICLES_WHILE_SWINGING);
-		burst.modifier = response.modifier;
+		burst.input.effect = response_map.at(particle_effect_response_type::PARTICLES_WHILE_SWINGING);
+		burst.input.modifier = response.modifier;
 
 		step.transient.messages.post(burst);
 	}
@@ -158,12 +173,13 @@ void particles_existence_system::create_particle_effects(logic_step& step) const
 		const auto rng_seed = cosmos.get_rng_seed_for(new_stream_entity);
 
 		auto& existence = new_stream_entity += components::particles_existence();
-		existence.effect = it.effect;
-		existence.modifier = it.modifier;
+		existence.input = it.input;
 		existence.rng_seed = rng_seed;
 		existence.time_of_birth = cosmos.get_timestamp();
+		existence.time_of_last_displacement = cosmos.get_timestamp();
+		existence.current_displacement_duration_bound_ms = 0;
 
-		existence.max_lifetime_in_steps = (*std::max_element((*it.effect).begin(), (*it.effect).end(), [](const auto& a, const auto& b){
+		existence.max_lifetime_in_steps = (*std::max_element((*it.input.effect).begin(), (*it.input.effect).end(), [](const auto& a, const auto& b){
 			return a.stream_duration_ms.second < b.stream_duration_ms.second;
 		})).stream_duration_ms.second;
 

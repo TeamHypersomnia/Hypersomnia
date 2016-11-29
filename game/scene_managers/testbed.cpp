@@ -141,13 +141,15 @@ namespace scene_managers {
 
 			messages::create_particle_effect effect;
 			effect.place_of_birth = components::transform(0, 0, 0);
-			effect.effect = assets::particle_effect_id::WANDERING_SMOKE;
+			effect.input.effect = assets::particle_effect_id::WANDERING_SMOKE;
+			effect.input.randomize_position_within_radius = 800.f;
+			effect.input.single_displacement_duration_ms.set(400.f, 1000.f);
 
 			step.transient.messages.post(effect);
 		}
 
 		for (int i = 0; i < num_characters; ++i) {
-			const auto new_character = prefabs::create_character(world, vec2(i * 300 , 0), screen_size, typesafe_sprintf("player%x", i));
+			const auto new_character = prefabs::create_character(world, vec2(i * 300, 0), screen_size, typesafe_sprintf("player%x", i));
 
 			new_characters[i] = new_character;
 

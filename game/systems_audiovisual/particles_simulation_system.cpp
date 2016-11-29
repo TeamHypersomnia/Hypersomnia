@@ -94,7 +94,7 @@ resources::particle& particles_simulation_system::spawn_particle(randomization& 
 	auto new_particle = emission.particle_templates[rng.randval(0u, emission.particle_templates.size() - 1)];
 	new_particle.vel = vec2().set_from_degrees(
 		group.angular_offset + rng.randval(rotation - spread, rotation + spread)) *
-		rng.randval(emission.velocity);
+		rng.randval(group.velocity);
 
 	rotation = new_particle.vel.degrees();
 
@@ -148,11 +148,16 @@ void particles_simulation_system::advance_streams_and_particles(const cosmos& co
 			cache.recorded_existence = existence;
 			cache.emission_instances.clear();
 			
-			for (auto emission : (*existence.effect)) {
-				emission.apply_modifier(existence.modifier);
+			for (auto emission : (*existence.input.effect)) {
+				emission.apply_modifier(existence.input.modifier);
 
 				cache.emission_instances.push_back(emission_instance());
 				auto& target_stream = *cache.emission_instances.rbegin();
+
+				const auto var_v = rng.randval(emission.base_velocity_variation);
+				//LOG("V: %x", var_v);
+				target_stream.velocity.set(std::max(0.f, emission.base_velocity.first - var_v/2), emission.base_velocity.second + var_v / 2);
+				//LOG("Vl: %x Vu: %x", target_stream.velocity.first, target_stream.velocity.second);
 
 				target_stream.stream_info = emission;
 				target_stream.enable_streaming = true;
@@ -177,14 +182,12 @@ void particles_simulation_system::advance_streams_and_particles(const cosmos& co
 			}
 		}
 
-		const auto& transform = it.viewing_transform(interp);
+		const auto& transform = it.viewing_transform(interp) + existence.current_displacement;
 		randomization rng = cosmos.get_rng_seed_for(it) + cosmos.get_total_steps_passed();
 
 		bool should_destroy = true;
 
-		auto& instances = cache.emission_instances;
-
-		for (auto& instance : instances) {
+		for (auto& instance : cache.emission_instances) {
 			if (instance.enable_streaming) {
 				const float stream_delta = std::min(delta.in_milliseconds(), instance.stream_max_lifetime_ms - instance.stream_lifetime_ms);
 				

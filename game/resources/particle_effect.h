@@ -62,7 +62,8 @@ namespace resources {
 	struct emission {
 		augs::minmax<float>
 			spread_degrees = std::make_pair(0.f, 0.f),
-			velocity = std::make_pair(0.f, 0.f),
+			base_velocity = std::make_pair(0.f, 0.f),
+			base_velocity_variation = std::make_pair(0.f, 0.f),
 			angular_velocity = std::make_pair(0.f, 0.f),
 			particles_per_sec = std::make_pair(0.f, 0.f),
 			stream_duration_ms = std::make_pair(0.f, 0.f),

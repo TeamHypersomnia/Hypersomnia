@@ -61,6 +61,8 @@ public:
 		float swing_spread_change = 0.f;
 		float swing_speed_change = 0.f;
 
+		augs::minmax<float> velocity;
+
 		float fade_when_ms_remaining = 0.f;
 
 		resources::emission stream_info;
