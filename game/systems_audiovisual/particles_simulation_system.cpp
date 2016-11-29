@@ -29,7 +29,7 @@ void particles_simulation_system::draw(const render_layer layer, const drawing_i
 		if (it.shrink_when_ms_remaining > 0.f) {
 			const auto alivity_multiplier = std::min(1.f, (it.max_lifetime_ms - it.lifetime_ms) / it.shrink_when_ms_remaining);
 
-			size_mult *= alivity_multiplier;
+			size_mult *= sqrt(alivity_multiplier);
 
 			//const auto desired_alpha = static_cast<rgba_channel>(alivity_multiplier * static_cast<float>(temp_alpha));
 			//

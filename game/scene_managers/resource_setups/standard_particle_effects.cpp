@@ -10,23 +10,23 @@ namespace resource_setups {
 			auto& effect = resource_manager.create(assets::particle_effect_id::WANDERING_SMOKE);
 
 			resources::emission em;
-			em.min_swing_spread.set(1, 2);
-			em.min_swings_per_sec.set(0.3, 0.5);
-			em.max_swing_spread.set(10, 10);
-			em.max_swings_per_sec.set(0.3, 0.5);
+			em.min_swing_spread.set(0.5, 1);
+			em.min_swings_per_sec.set(0.3/2, 0.5/2);
+			em.max_swing_spread.set(10/2, 10/2);
+			em.max_swings_per_sec.set(0.3/2, 0.5/2);
 
-			em.swing_spread.set(5, 5);
-			em.swings_per_sec.set(0.3, 0.5);
-			em.swing_spread_change_rate.set(0.3, 0.5);
+			em.swing_spread.set(0, 0);
+			em.swings_per_sec.set(0.3/2, 0.5/2);
+			em.swing_spread_change_rate.set(0.3/2, 0.5/2);
 
 			em.spread_degrees = std::make_pair(7, 7);
 			em.particles_per_sec = std::make_pair(40, 50);
 			em.stream_duration_ms = std::make_pair(3000000, 3000000);
 			
-			em.base_velocity = std::make_pair(250, 300);
-			em.base_velocity_variation = std::make_pair(50.f, 300.f);
+			em.base_velocity = std::make_pair(200, 300);
+			em.base_velocity_variation = std::make_pair(5.f, 10.f);
 
-			em.angular_velocity = std::make_pair(0.2f*RAD_TO_DEGf, 2.3f*RAD_TO_DEGf);
+			em.angular_velocity = std::make_pair(1.5f*RAD_TO_DEGf, 2.3f*RAD_TO_DEGf);
 			em.particle_lifetime_ms = std::make_pair(5000, 5000);
 
 			for (int i = 0; i < 3; ++i) {
@@ -36,7 +36,7 @@ namespace resource_setups {
 				particle_template.linear_damping = 10;
 				particle_template.face.set(assets::texture_id(int(assets::texture_id::SMOKE_PARTICLE_FIRST) + i), augs::rgba(255, 255, 255, 60));
 				particle_template.unshrinking_time_ms = 1000.f;
-				particle_template.shrink_when_ms_remaining = 800.f;
+				particle_template.shrink_when_ms_remaining = 1500.f;
 
 				em.particle_templates.push_back(particle_template);
 			}
