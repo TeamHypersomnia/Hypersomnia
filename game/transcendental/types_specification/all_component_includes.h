@@ -19,7 +19,7 @@
 #include "game/components/render_component.h"
 #include "game/components/sprite_component.h"
 #include "game/components/polygon_component.h"
-#include "game/components/tile_layer_component.h"
+#include "game/components/tile_layer_instance_component.h"
 #include "game/components/car_component.h"
 #include "game/components/driver_component.h"
 #include "game/components/trigger_component.h"

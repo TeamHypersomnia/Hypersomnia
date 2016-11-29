@@ -52,8 +52,7 @@ void particles_simulation_system::draw(const render_layer layer, const drawing_i
 		components::sprite::drawing_input in(group_input.target_buffer);
 
 		in.renderable_transform = it.ignore_rotation ? components::transform(it.pos, 0) : components::transform({ it.pos, it.rotation });
-		in.camera_transform = group_input.camera_transform;
-		in.visible_world_area = group_input.visible_world_area;
+		in.camera = group_input.camera;
 		in.use_neon_map = group_input.use_neon_map;
 		//in.renderable_transform += in.renderable_transform;
 		it.face.draw(in);

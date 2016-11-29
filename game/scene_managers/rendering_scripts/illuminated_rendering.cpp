@@ -35,7 +35,7 @@ namespace rendering_scripts {
 		step.visible_entities = cosmos[dynamic_tree.determine_visible_entities_from_camera(state, physics)];
 		step.visible_per_layer = render_system().get_visible_per_layer(step.visible_entities);
 
-		const auto matrix = augs::orthographic_projection<float>(0, state.visible_world_area.x, state.visible_world_area.y, 0, 0, 1);
+		const auto matrix = augs::orthographic_projection<float>(0, state.camera.visible_world_area.x, state.camera.visible_world_area.y, 0, 0, 1);
 
 		auto& default_shader = *resource_manager.find(assets::program_id::DEFAULT);
 		auto& illuminated_shader = *resource_manager.find(assets::program_id::DEFAULT_ILLUMINATED);
@@ -45,8 +45,7 @@ namespace rendering_scripts {
 		auto& smoke_shader = *resource_manager.find(assets::program_id::SMOKE);
 
 		particles_simulation_system::drawing_input particles_input(output);
-		particles_input.visible_world_area = state.visible_world_area;
-		particles_input.camera_transform = state.camera_transform;
+		particles_input.camera = state.camera;
 
 		default_shader.use();
 		{

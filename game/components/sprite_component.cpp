@@ -17,8 +17,7 @@ using namespace augs;
 
 namespace components {
 	void sprite::drawing_input::setup_from(const state_for_drawing_camera& state) {
-		visible_world_area = state.visible_world_area;
-		camera_transform = state.camera_transform;
+		camera = state.camera;
 	}
 
 	void sprite::make_rect(const vec2 pos, const vec2 size, const float angle, std::array<vec2, 4>& v, const drawing_input::positioning_type positioning) {
@@ -91,9 +90,9 @@ namespace components {
 
 		const float final_rotation = in.renderable_transform.rotation + rotation_offset;
 
-		const auto center = in.visible_world_area / 2;
+		const auto center = in.camera.visible_world_area / 2;
 
-		auto target_position = transform_pos - in.camera_transform.pos + center;
+		auto target_position = transform_pos - in.camera.transform.pos + center;
 		
 		if (center_offset.non_zero()) {
 			target_position -= vec2(center_offset).rotate(final_rotation, vec2(0, 0));
@@ -104,9 +103,11 @@ namespace components {
 		make_rect(target_position, considered_size, final_rotation, v, in.positioning);
 
 		/* rotate around the center of the screen */
-		if (in.camera_transform.rotation != 0.f)
-			for (auto& vert : v)
-				vert.rotate(in.camera_transform.rotation, center);
+		if (in.camera.transform.rotation != 0.f) {
+			for (auto& vert : v) {
+				vert.rotate(in.camera.transform.rotation, center);
+			}
+		}
 
 		vertex_triangle t1, t2;
 

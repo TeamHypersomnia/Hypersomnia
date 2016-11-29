@@ -6,7 +6,7 @@
 
 #include "game/components/polygon_component.h"
 #include "game/components/sprite_component.h"
-#include "game/components/tile_layer_component.h"
+#include "game/components/tile_layer_instance_component.h"
 #include "game/components/particles_existence_component.h"
 
 #include "game/messages/new_entity_message.h"

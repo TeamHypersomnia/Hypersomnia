@@ -124,7 +124,7 @@ namespace components {
 	
 	void polygon::draw(const drawing_input& in) const {
 		vertex_triangle new_tri;
-		auto camera_pos = in.camera_transform.pos;
+		const auto camera_pos = in.camera.transform.pos;
 
 		auto model_transformed = vertices;
 
@@ -135,12 +135,12 @@ namespace components {
 
 		/* further rotation of the polygon to fit the camera transform */
 		for (auto& v : model_transformed) {
-			auto center = in.visible_world_area / 2;
+			auto center = in.camera.visible_world_area / 2;
 			v.pos += in.renderable_transform.pos - camera_pos + center;
 
 			/* rotate around the center of the screen */
-			if (std::abs(in.camera_transform.rotation) > 0.f)
-				v.pos.rotate(in.camera_transform.rotation, center);
+			if (std::abs(in.camera.transform.rotation) > 0.f)
+				v.pos.rotate(in.camera.transform.rotation, center);
 
 			v.pos.x = static_cast<float>(static_cast<int>(v.pos.x));
 			v.pos.y = static_cast<float>(static_cast<int>(v.pos.y));

@@ -40,6 +40,14 @@ resources::behaviour_tree& operator*(const assets::behaviour_tree_id& id) {
 	return *resource_manager.find(id);
 }
 
+resources::tile_layer& operator*(const assets::tile_layer_id& id) {
+	return *resource_manager.find(id);
+}
+
+bool operator!(const assets::tile_layer_id& id) {
+	return resource_manager.find(id) == nullptr;
+}
+
 bool operator!(const assets::texture_id& id) {
 	return resource_manager.find(id) == nullptr;
 }
@@ -114,6 +122,13 @@ namespace resources {
 	particle_effect* manager::find(assets::particle_effect_id id) {
 		auto it = particle_effects.find(id);
 		if (it == particle_effects.end()) return nullptr;
+
+		return &(*it).second;
+	}
+
+	tile_layer* manager::find(assets::tile_layer_id id) {
+		auto it = tile_layers.find(id);
+		if (it == tile_layers.end()) return nullptr;
 
 		return &(*it).second;
 	}
@@ -289,10 +304,15 @@ namespace resources {
 
 		return p;
 	}
-	
+
 	behaviour_tree& manager::create(assets::behaviour_tree_id id) {
 		auto& tree = behaviour_trees[id];
 		return tree;
+	}
+
+	tile_layer& manager::create(assets::tile_layer_id id) {
+		auto& layer = tile_layers[id];
+		return layer;
 	}
 
 	void manager::destroy_everything() {

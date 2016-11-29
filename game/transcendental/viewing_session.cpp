@@ -94,7 +94,7 @@ void viewing_session::view(const cosmos& cosmos,
 
 	auto& renderer = renderer::get_current();
 
-	const auto screen_size = camera.visible_world_area;
+	const auto screen_size = camera.camera.visible_world_area;
 	const vec2i screen_size_i(static_cast<int>(screen_size.x), static_cast<int>(screen_size.y));
 
 	if (clear_current_and_swap_buffers) {

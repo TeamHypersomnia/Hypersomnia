@@ -12,8 +12,8 @@ class interpolation_system;
 
 class world_camera {
 public:
-	vec2 visible_world_area;
-	components::transform transform;
+	camera_cone camera;
+	camera_cone smoothed_camera;
 
 	float angled_look_length = 100.f;
 	bool enable_smoothing = true;
@@ -29,9 +29,6 @@ public:
 	vec2 previous_step_player_position;
 
 	augs::smooth_value_field smoothing_player_pos;
-
-	components::transform smoothed_camera_transform;
-	vec2 smoothed_visible_world_area;
 
 	void configure_size(vec2);
 

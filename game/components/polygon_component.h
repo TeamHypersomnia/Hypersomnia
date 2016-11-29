@@ -8,6 +8,7 @@
 #include "augs/graphics/vertex.h"
 #include "game/assets/texture_id.h"
 #include "transform_component.h"
+#include "game/detail/camera_cone.h"
 
 #include "zeroed_pod.h"
 
@@ -26,8 +27,7 @@ namespace components {
 			using vertex_triangle_buffer_reference::vertex_triangle_buffer_reference;
 
 			components::transform renderable_transform;
-			components::transform camera_transform;
-			vec2 visible_world_area;
+			camera_cone camera;
 
 			augs::rgba colorize = augs::white;
 

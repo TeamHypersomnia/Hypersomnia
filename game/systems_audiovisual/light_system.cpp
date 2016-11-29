@@ -66,8 +66,8 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 		visibility_system().respond_to_visibility_information_requests(cosmos, {}, requests, dummy, responses);
 	}
 
-	const auto camera_transform = step.camera_state.camera_transform;
-	const auto camera_size = step.camera_state.visible_world_area;
+	const auto camera_transform = step.camera_state.camera.transform;
+	const auto camera_size = step.camera_state.camera.visible_world_area;
 	const auto camera_offset = -camera_transform.pos + camera_size / 2;
 
 	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_ONE, GL_ONE); glerr;
@@ -197,8 +197,7 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 
 	{
 		particles_simulation_system::drawing_input in(output.triangles);
-		in.visible_world_area = camera_size;
-		in.camera_transform = camera_transform;
+		in.camera = step.camera_state.camera;
 		in.use_neon_map = true;
 
 		particles.draw(render_layer::EFFECTS, in);

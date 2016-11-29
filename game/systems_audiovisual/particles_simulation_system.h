@@ -29,8 +29,7 @@ public:
 		using vertex_triangle_buffer_reference::vertex_triangle_buffer_reference;
 
 		components::transform renderable_transform;
-		components::transform camera_transform;
-		vec2 visible_world_area;
+		camera_cone camera;
 		augs::rgba colorize;
 		bool use_neon_map = false;
 	};

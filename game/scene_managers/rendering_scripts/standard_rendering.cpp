@@ -34,7 +34,7 @@ namespace rendering_scripts {
 		step.visible_entities = cosmos[dynamic_tree.determine_visible_entities_from_camera(state, physics)];
 		step.visible_per_layer = render_system().get_visible_per_layer(step.visible_entities);
 
-		const auto matrix = augs::orthographic_projection<float>(0, state.visible_world_area.x, state.visible_world_area.y, 0, 0, 1);
+		const auto matrix = augs::orthographic_projection<float>(0, state.camera.visible_world_area.x, state.camera.visible_world_area.y, 0, 0, 1);
 
 		auto& default_shader = *resource_manager.find(assets::program_id::DEFAULT);
 		auto& pure_color_highlight_shader = *resource_manager.find(assets::program_id::PURE_COLOR_HIGHLIGHT);
@@ -121,8 +121,8 @@ namespace rendering_scripts {
 		renderer.clear_triangles();
 
 		renderer.draw_debug_info(
-			state.visible_world_area,
-			state.camera_transform,
+			state.camera.visible_world_area,
+			state.camera.transform,
 			assets::texture_id::BLANK,
 			{},
 			step.get_delta().view_interpolation_ratio());

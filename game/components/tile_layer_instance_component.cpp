@@ -1,4 +1,4 @@
-#include "tile_layer_component.h"
+#include "tile_layer_instance_component.h"
 
 #include "sprite_component.h"
 
@@ -6,96 +6,82 @@
 
 #include "augs/graphics/vertex.h"
 #include "augs/ensure.h"
+#include "game/resources/manager.h"
 
 using namespace components;
 using namespace augs;
 
-namespace augs {
-	tileset::tile_type::tile_type(assets::texture_id tile_texture) : tile_texture(tile_texture) {
-
-	}
-}
-
 namespace components {
-	tile_layer_instance::tile_layer_instance(rects::wh<int> size) : size(size) {
-		tiles.reserve(size.area());
-	}
+	tile_layer_instance::tile_layer_instance(const assets::tile_layer_id id) : id(id) {}
 
-	tile_layer_instance::tile::tile(unsigned type) : type_id(type) {}
+	ltrbu tile_layer_instance::get_visible_tiles(const drawing_input & in) const {
+		ltrb visible_tiles;
+		const auto visible_aabb = in.camera.get_transformed_visible_world_area_aabb();
+		const auto& layer = (*id);
+		const float tile_square_size = layer.get_tile_side();
 
+		visible_tiles.l = int((visible_aabb.l - in.renderable_transform.pos.x) / tile_square_size);
+		visible_tiles.t = int((visible_aabb.t - in.renderable_transform.pos.y) / tile_square_size);
+		visible_tiles.r = int((visible_aabb.r - in.renderable_transform.pos.x) / tile_square_size) + 1;
+		visible_tiles.b = int((visible_aabb.b - in.renderable_transform.pos.y) / tile_square_size) + 1;
+		visible_tiles.l = std::max(0.f, visible_tiles.l);
+		visible_tiles.t = std::max(0.f, visible_tiles.t);
+		visible_tiles.r = std::min(float(layer.get_size().x), visible_tiles.r);
+		visible_tiles.b = std::min(float(layer.get_size().y), visible_tiles.b);
 
-	rects::ltrb<int> tile_layer_instance::get_visible_tiles(const drawing_input & in) const {
-		rects::ltrb<int> visible_tiles;
-		
-		//visible_tiles.l = int((in.transformed_visible_world_area_aabb.l - in.renderable_transform.pos.x) / 32.f);
-		//visible_tiles.t = int((in.transformed_visible_world_area_aabb.t - in.renderable_transform.pos.y) / 32.f);
-		//visible_tiles.r = int((in.transformed_visible_world_area_aabb.r - in.renderable_transform.pos.x) / 32.f) + 1;
-		//visible_tiles.b = int((in.transformed_visible_world_area_aabb.b - in.renderable_transform.pos.y) / 32.f) + 1;
-		//visible_tiles.l = std::max(0, visible_tiles.l);
-		//visible_tiles.t = std::max(0, visible_tiles.t);
-		//visible_tiles.r = std::min(size.w, visible_tiles.r);
-		//visible_tiles.b = std::min(size.h, visible_tiles.b);
-
-		return visible_tiles;
+		return ltrbu(visible_tiles.l, visible_tiles.t, visible_tiles.r, visible_tiles.b);
 	}
 
 	void tile_layer_instance::draw(const drawing_input & in) const {
 		/* if it is not visible, return */
-		// abc
-		ensure(false);
-		//if (!in.transformed_visible_world_area_aabb.hover(rects::xywh<float>(in.renderable_transform.pos.x, in.renderable_transform.pos.y, size.w*square_size, size.h*square_size))) return;
-		//
-		//auto visible_tiles = get_visible_tiles(in);
-		//
-		//state_for_drawing_renderable draw_input_copy = in;
-		//
-		//for (int y = visible_tiles.t; y < visible_tiles.b; ++y) {
-		//	for (int x = visible_tiles.l; x < visible_tiles.r; ++x) {
-		//		vertex_triangle t1, t2;
-		//
-		//		auto tile_offset = vec2i(x, y) * square_size;
-		//
-		//		int idx = y * size.w + x;
-		//
-		//		if (tiles[idx].type_id == 0) continue;
-		//
-		//		auto& type = layer_tileset->tile_types[tiles[idx].type_id - 1];
-		//
-		//		static thread_local sprite tile_sprite;
-		//		tile_sprite.tex = type.tile_texture;
-		//
-		//		draw_input_copy.renderable_transform.pos = vec2i(in.renderable_transform.pos) + tile_offset + vec2(square_size / 2, square_size / 2);
-		//
-		//		tile_sprite.draw(draw_input_copy);
-		//	}
-		//}
-	}
+		const auto visible_aabb = in.camera.get_transformed_visible_world_area_aabb();
+		const auto& layer = (*id);
+		const float tile_square_size = layer.get_tile_side();
+		const auto size = layer.get_size();
 
-	void tile_layer_instance::generate_indices_by_type(rects::ltrb<int> visible_tiles) {
-		if (visible_tiles == indices_by_type_visibility)
+		if (!visible_aabb.hover(xywh(
+			in.renderable_transform.pos.x, 
+			in.renderable_transform.pos.y, 
+			size.x*tile_square_size, 
+			size.y*tile_square_size))) {
 			return;
+		}
+		
+		auto visible_tiles = get_visible_tiles(in);
+		
+		sprite::drawing_input sprite_input(in.target_buffer);
+		sprite_input.camera = in.camera;
+		sprite_input.colorize = in.colorize;
+		sprite_input.use_neon_map = in.use_neon_map;
 
-		indices_by_type_visibility = visible_tiles;
+		sprite tile_sprite;
 
-		for (auto& index_vector : indices_by_type)
-			index_vector.clear();
+		for (unsigned y = visible_tiles.t; y < visible_tiles.b; ++y) {
+			for (unsigned x = visible_tiles.l; x < visible_tiles.r; ++x) {
+				vertex_triangle t1, t2;
+		
+				const auto& tile = layer.tile_at({ x, y });
+				if (tile.type_id == 0) continue;
 
-		for (int y = visible_tiles.t; y < visible_tiles.b; ++y) {
-			for (int x = visible_tiles.l; x < visible_tiles.r; ++x) {
-				int i = y * size.w + x;
+				auto tile_offset = vec2i(x, y) * tile_square_size;
 
-				auto type = tiles[i].type_id;
-				if (type == 0) continue;
-
-				if (indices_by_type.size() < type + 1)
-					indices_by_type.resize(type + 1);
-
-				indices_by_type[type].push_back(vec2i(x, y) * square_size);
+				const auto& type = layer.get_tile_type(tile);
+		
+				tile_sprite.tex = type.tile_texture;
+		
+				sprite_input.renderable_transform.pos = vec2i(in.renderable_transform.pos) + tile_offset + vec2(tile_square_size / 2, tile_square_size / 2);
+		
+				tile_sprite.draw(sprite_input);
 			}
 		}
 	}
 
-	rects::ltrb<float> tile_layer_instance::get_aabb(components::transform transform) const {
-		return rects::xywh<float>(transform.pos.x, transform.pos.y, static_cast<float>(size.w*square_size), static_cast<float>(size.h*square_size));
+
+	rects::ltrb<float> tile_layer_instance::get_aabb(const components::transform transform) const {
+		const auto& layer = (*id);
+		const float tile_square_size = layer.get_tile_side();
+		const auto size = layer.get_size();
+
+		return rects::xywh<float>(transform.pos.x, transform.pos.y, static_cast<float>(size.x*tile_square_size), static_cast<float>(size.y*tile_square_size));
 	}
 }

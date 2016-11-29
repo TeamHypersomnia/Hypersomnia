@@ -11,6 +11,7 @@
 #include "game/assets/particle_effect_id.h"
 #include "game/assets/particle_effect_response_id.h"
 #include "game/assets/behaviour_tree_id.h"
+#include "game/assets/tile_layer_id.h"
 
 #include "game/resources/animation.h"
 #include "game/resources/animation_response.h"
@@ -18,6 +19,7 @@
 #include "game/resources/particle_effect.h"
 #include "game/resources/particle_effect_response.h"
 #include "game/resources/behaviour_tree.h"
+#include "game/resources/tile_layer.h"
 
 #include "augs/texture_baker/texture_baker.h"
 #include "augs/texture_baker/font.h"
@@ -58,6 +60,7 @@ namespace resources {
 		augs::graphics::shader_program& create(assets::program_id, assets::shader_id vertex, assets::shader_id fragment);
 
 		behaviour_tree& create(assets::behaviour_tree_id);
+		tile_layer& create(assets::tile_layer_id);
 
 		texture_with_image* find(assets::texture_id);
 		texture_with_image* find_neon_map(assets::texture_id);
@@ -69,6 +72,7 @@ namespace resources {
 		particle_effect* find(assets::particle_effect_id);
 		particle_effect_response* find(assets::particle_effect_response_id);
 		behaviour_tree* find(assets::behaviour_tree_id);
+		tile_layer* find(assets::tile_layer_id);
 
 		void destroy_everything();
 
@@ -85,6 +89,7 @@ namespace resources {
 		augs::enum_associative_array<assets::shader_id, augs::graphics::shader> shaders;
 		augs::enum_associative_array<assets::program_id, augs::graphics::shader_program> programs;
 		augs::enum_associative_array<assets::behaviour_tree_id, behaviour_tree> behaviour_trees;
+		augs::enum_associative_array<assets::tile_layer_id, tile_layer> tile_layers;
 	};
 }
 

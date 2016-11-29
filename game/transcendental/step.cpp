@@ -22,5 +22,5 @@ viewing_step::viewing_step(
 	{}
 
 vec2 viewing_step::get_screen_space(vec2 pos) const {
-	return pos - camera_state.transformed_visible_world_area_aabb.get_position();
+	return pos - camera_state.camera.get_transformed_visible_world_area_aabb().get_position();
 }

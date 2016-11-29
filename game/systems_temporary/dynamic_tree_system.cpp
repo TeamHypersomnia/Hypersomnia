@@ -65,8 +65,9 @@ void dynamic_tree_system::reserve_caches_for_entities(const size_t n) {
 
 std::vector<unversioned_entity_id> dynamic_tree_system::determine_visible_entities_from_camera(state_for_drawing_camera in, const physics_system& physics) const {
 	std::vector<unversioned_entity_id> visible_entities = always_visible_entities;
+	const auto visible_aabb = in.camera.get_transformed_visible_world_area_aabb();
 
-	const auto& result = physics.query_aabb_px(in.transformed_visible_world_area_aabb.left_top(), in.transformed_visible_world_area_aabb.right_bottom(), filters::renderable_query());
+	const auto& result = physics.query_aabb_px(visible_aabb.left_top(), visible_aabb.right_bottom(), filters::renderable_query());
 	visible_entities.insert(visible_entities.end(), result.entities.begin(), result.entities.end());
 
 	struct render_listener {
@@ -88,8 +89,8 @@ std::vector<unversioned_entity_id> dynamic_tree_system::determine_visible_entiti
 	aabb_listener.visible_entities = &visible_entities;
 
 	b2AABB input;
-	input.lowerBound = in.transformed_visible_world_area_aabb.left_top() - vec2(400, 400);
-	input.upperBound = in.transformed_visible_world_area_aabb.right_bottom() + vec2(400, 400);
+	input.lowerBound = visible_aabb.left_top() - vec2(400, 400);
+	input.upperBound = visible_aabb.right_bottom() + vec2(400, 400);
 
 	non_physical_objects_tree.Query(&aabb_listener, input);
 

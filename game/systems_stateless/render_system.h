@@ -31,18 +31,19 @@ public:
 		const renderable_type& renderable,
 		const components::transform& renderable_transform,
 		const components::render& render,
-		const state_for_drawing_camera& in_camera,
+		const state_for_drawing_camera& in_state,
 		const renderable_drawing_type renderable_drawing_mode
 	) const {
-
-		components::transform camera_transform;
-		camera_transform = render.absolute_transform ? components::transform() : in_camera.camera_transform;
+		camera_cone camera = in_state.camera;
+		
+		if (render.absolute_transform) {
+			camera.transform.reset();
+		}
 
 		typename renderable_type::drawing_input in(output);
 
-		in.camera_transform = camera_transform;
+		in.camera = camera;
 		in.renderable_transform = renderable_transform;
-		in.visible_world_area = in_camera.visible_world_area;
 
 		if (renderable_drawing_mode == renderable_drawing_type::NORMAL) {
 			renderable.draw(in);

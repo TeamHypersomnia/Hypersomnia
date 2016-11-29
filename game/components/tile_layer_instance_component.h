@@ -1,21 +1,13 @@
 #pragma once
 #include "augs/math/vec2.h"
-#include "game/assets/texture_id.h"
+#include "game/assets/tile_layer_id.h"
 #include "transform_component.h"
 #include "augs/graphics/pixel.h"
 #include "augs/graphics/vertex.h"
+#include "game/detail/camera_cone.h"
 
 namespace augs {
 	class texture;
-
-	struct tileset {
-		struct tile_type {
-			assets::texture_id tile_texture;
-			tile_type(assets::texture_id = assets::texture_id::BLANK);
-		};
-
-		std::vector<tile_type> tile_types;
-	};
 }
 
 namespace components {
@@ -23,32 +15,17 @@ namespace components {
 		struct drawing_input : vertex_triangle_buffer_reference {
 			using vertex_triangle_buffer_reference::vertex_triangle_buffer_reference;
 			components::transform renderable_transform;
-			components::transform camera_transform;
-			vec2 visible_world_area;
+			camera_cone camera;
 			augs::rgba colorize;
 			bool use_neon_map = false;
 		};
 
-		struct tile {
-			unsigned type_id = 0;
+		assets::tile_layer_id id;
 
-			tile(unsigned type);
-		};
-
-		tile_layer_instance(augs::rects::wh<int> size = augs::rects::wh<int>());
-
-		void generate_indices_by_type(augs::rects::ltrb<int>);
+		tile_layer_instance(const assets::tile_layer_id = assets::tile_layer_id::INVALID);
 
 		void draw(const drawing_input&) const;
-		augs::rects::ltrb<float> get_aabb(components::transform transform) const;
-
-		augs::rects::ltrb<int> get_visible_tiles(const drawing_input&) const;
-
-		augs::rects::ltrb<int> indices_by_type_visibility;
-		std::vector<std::vector<vec2i>> indices_by_type;
-		std::vector<tile> tiles;
-		augs::rects::wh<int> size;
-		int square_size = 32;
-		augs::tileset* layer_tileset = nullptr;
+		ltrb get_aabb(components::transform transform) const;
+		ltrbu get_visible_tiles(const drawing_input&) const;
 	};
 };

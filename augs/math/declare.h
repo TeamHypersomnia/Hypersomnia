@@ -10,13 +10,16 @@ namespace augs {
 }
 
 typedef vec2t<int> vec2i;
+typedef vec2t<unsigned> vec2u;
 typedef vec2t<float> vec2;
 typedef vec2t<double> vec2d;
 
 typedef augs::rects::ltrb<int> ltrbi;
+typedef augs::rects::ltrb<unsigned> ltrbu;
 typedef augs::rects::ltrb<float> ltrb;
 typedef augs::rects::ltrb<double> ltrbd;
 
 typedef augs::rects::xywh<int> xywhi;
+typedef augs::rects::xywh<unsigned> xywhu;
 typedef augs::rects::xywh<float> xywh;
 typedef augs::rects::xywh<double> xywhd;
