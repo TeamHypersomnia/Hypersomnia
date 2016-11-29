@@ -17,14 +17,14 @@ namespace augs {
 }
 
 namespace components {
-	tile_layer::tile_layer(rects::wh<int> size) : size(size) {
+	tile_layer_instance::tile_layer_instance(rects::wh<int> size) : size(size) {
 		tiles.reserve(size.area());
 	}
 
-	tile_layer::tile::tile(unsigned type) : type_id(type) {}
+	tile_layer_instance::tile::tile(unsigned type) : type_id(type) {}
 
 
-	rects::ltrb<int> tile_layer::get_visible_tiles(const drawing_input & in) const {
+	rects::ltrb<int> tile_layer_instance::get_visible_tiles(const drawing_input & in) const {
 		rects::ltrb<int> visible_tiles;
 		
 		//visible_tiles.l = int((in.transformed_visible_world_area_aabb.l - in.renderable_transform.pos.x) / 32.f);
@@ -39,7 +39,7 @@ namespace components {
 		return visible_tiles;
 	}
 
-	void tile_layer::draw(const drawing_input & in) const {
+	void tile_layer_instance::draw(const drawing_input & in) const {
 		/* if it is not visible, return */
 		// abc
 		ensure(false);
@@ -71,7 +71,7 @@ namespace components {
 		//}
 	}
 
-	void tile_layer::generate_indices_by_type(rects::ltrb<int> visible_tiles) {
+	void tile_layer_instance::generate_indices_by_type(rects::ltrb<int> visible_tiles) {
 		if (visible_tiles == indices_by_type_visibility)
 			return;
 
@@ -95,7 +95,7 @@ namespace components {
 		}
 	}
 
-	rects::ltrb<float> tile_layer::get_aabb(components::transform transform) const {
+	rects::ltrb<float> tile_layer_instance::get_aabb(components::transform transform) const {
 		return rects::xywh<float>(transform.pos.x, transform.pos.y, static_cast<float>(size.w*square_size), static_cast<float>(size.h*square_size));
 	}
 }

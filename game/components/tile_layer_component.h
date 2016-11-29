@@ -19,7 +19,7 @@ namespace augs {
 }
 
 namespace components {
-	struct tile_layer {
+	struct tile_layer_instance {
 		struct drawing_input : vertex_triangle_buffer_reference {
 			using vertex_triangle_buffer_reference::vertex_triangle_buffer_reference;
 			components::transform renderable_transform;
@@ -35,7 +35,7 @@ namespace components {
 			tile(unsigned type);
 		};
 
-		tile_layer(augs::rects::wh<int> size = augs::rects::wh<int>());
+		tile_layer_instance(augs::rects::wh<int> size = augs::rects::wh<int>());
 
 		void generate_indices_by_type(augs::rects::ltrb<int>);
 

@@ -23,7 +23,7 @@ namespace components {
 	struct transform;
 	struct sprite;
 	struct polygon;
-	//struct tile_layer;
+	//struct tile_layer_instance;
 	struct car;
 	struct driver;
 	struct trigger;
@@ -73,7 +73,7 @@ struct put_all_components_into {
 		components::transform,
 		components::sprite,
 		components::polygon,
-		//components::tile_layer,
+		//components::tile_layer_instance,
 		components::car,
 		components::driver,
 		components::trigger,
