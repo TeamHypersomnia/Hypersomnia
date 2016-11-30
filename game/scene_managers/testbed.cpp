@@ -150,7 +150,7 @@ namespace scene_managers {
 			{
 				const auto e = world.create_entity("tiled_floor");
 				
-				e += components::transform(0.f, -1700.f);
+				e += components::transform(0.f, -1500.f);
 				auto& tile_layer_instance = e += components::tile_layer_instance();
 				auto& render = e += components::render();
 				
@@ -199,7 +199,7 @@ namespace scene_managers {
 		}
 
 		if (character(0).alive()) {
-			name_entity(character(0), entity_name::PERSON, L"Attacker");
+			name_entity(character(0), entity_name::PERSON, L"Newborn");
 		}
 
 		inject_input_to(character(0));

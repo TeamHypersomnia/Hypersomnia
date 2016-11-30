@@ -22,14 +22,22 @@ namespace resource_setups {
 			gold_floor_filling.rt_corner = nth_tile(7);
 			gold_floor_filling.rb_corner = nth_tile(12);
 			gold_floor_filling.lb_corner = nth_tile(11);
+			
+			metropolis_floor.set_tiles_alternating(xywhu(1 + 0, 0, 10, 30), nth_tile(4), nth_tile(5));
+			metropolis_floor.set_tiles_alternating(xywhu(1 + 30, 0, 10, 30), nth_tile(4), nth_tile(5));
 
-			metropolis_floor.set_tiles_alternating(xywhu(0, 0, 10, 30), nth_tile(4), nth_tile(5));
-			metropolis_floor.set_tiles_alternating(xywhu(30, 0, 10, 30), nth_tile(4), nth_tile(5));
+			metropolis_floor.set_tiles(xywhu(1 + 10 + 0, 20, 5, 20), gold_floor_filling);
+			metropolis_floor.set_tiles(xywhu(1 + 10 + 5, 20, 10, 20), nth_tile(1));
+			metropolis_floor.set_tiles(xywhu(1 + 10 + 15, 20, 5, 20), gold_floor_filling);
+			metropolis_floor.set_tiles(xywhu(1 + 10 + 0, 0, 20, 20), nth_tile(1));
 
-			metropolis_floor.set_tiles(xywhu(10 + 0, 20, 5, 20), gold_floor_filling);
-			metropolis_floor.set_tiles(xywhu(10 + 5, 20, 10, 20), nth_tile(1));
-			metropolis_floor.set_tiles(xywhu(10 + 15, 20, 5, 20), gold_floor_filling);
-			metropolis_floor.set_tiles(xywhu(10 + 0, 0, 20, 20), nth_tile(1));
+			metropolis_floor.set_tiles(xywhu(0, 0, 1, 30), nth_tile(3));
+			metropolis_floor.set_tiles(xywhu(10, 30, 1, 10), nth_tile(3));
+			metropolis_floor.set_tiles(xywhu(0, 30, 10, 1), nth_tile(3));
+
+			metropolis_floor.set_tiles(xywhu(31 + 10, 0, 1, 30), nth_tile(3));
+			metropolis_floor.set_tiles(xywhu(31 + 10 - 10, 30, 1, 10), nth_tile(3));
+			metropolis_floor.set_tiles(xywhu(31 + 1, 30, 10, 1), nth_tile(3));
 		}
 	}
 }
