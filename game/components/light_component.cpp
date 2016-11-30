@@ -13,16 +13,16 @@ namespace components {
 		wall_quadratic.base_value = 0.000037f;
 		wall_max_distance.base_value = 2000.f;
 
-		constant.variation.min_value = -0.3;
+		constant.variation.min_value = -0.05;
 		constant.variation.max_value = 0.0;
-		constant.variation.change_speed = 0.8 / 5;
+		constant.variation.change_speed = 0.8 / 10;
 
-		linear.variation.min_value = -0.00001;
-		linear.variation.max_value = 0.00002;
+		linear.variation.min_value = -0.000005;
+		linear.variation.max_value = 0.00000;
 		linear.variation.change_speed = 0.0002 / 5;
 
-		quadratic.variation.min_value = -0.00005;
-		quadratic.variation.max_value = 0.00030;
+		quadratic.variation.min_value = -0.00001;
+		quadratic.variation.max_value = 0.00000;
 		quadratic.variation.change_speed = 0.0003 / 12;
 
 		wall_constant.variation = constant.variation;
