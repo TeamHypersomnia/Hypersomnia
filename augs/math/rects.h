@@ -118,6 +118,14 @@ namespace augs {
 				return vec2t<T>(r, b);
 			}
 
+			vec2t<T> right_top() const {
+				return vec2t<T>(r, t);
+			}
+
+			vec2t<T> left_bottom() const {
+				return vec2t<T>(l, b);
+			}
+
 			T perimeter() const {
 				return 2 * w() + 2 * h();
 			}

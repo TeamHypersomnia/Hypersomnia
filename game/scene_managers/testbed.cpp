@@ -150,7 +150,7 @@ namespace scene_managers {
 			{
 				const auto e = world.create_entity("tiled_floor");
 				
-				e += components::transform(0.f, 0.f);
+				e += components::transform(0.f, -1700.f);
 				auto& tile_layer_instance = e += components::tile_layer_instance();
 				auto& render = e += components::render();
 				

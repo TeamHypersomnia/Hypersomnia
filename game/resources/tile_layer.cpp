@@ -28,7 +28,7 @@ namespace resources {
 
 	void tile_layer::expand(const vec2u new_area) {
 		std::vector<tile> new_tiles;
-		new_tiles.resize(new_area.x * new_area.y);
+		new_tiles.resize(new_area.area());
 
 		for (size_t x = 0; x < size.x; ++x) {
 			for (size_t y = 0; y < size.y; ++y) {
@@ -61,6 +61,64 @@ namespace resources {
 		for (size_t x = rc.l; x < rc.r; ++x) {
 			for (size_t y = rc.t; y < rc.b; ++y) {
 				tile_at({ x, y }).type_id = id_index;
+			}
+		}
+	}
+
+	void tile_layer::set_tiles_alternating(const ltrbu rc, const assets::texture_id id_1, const assets::texture_id id_2) {
+		expand_to_rect(rc);
+		const auto id_1_index = get_tile_index_for_texture(id_1);
+		const auto id_2_index = get_tile_index_for_texture(id_2);
+
+		for (size_t x = rc.l; x < rc.r; ++x) {
+			if ((x - rc.l) % 2 == 0) {
+				for (size_t y = rc.t; y < rc.b; ++y) {
+					tile_at({ x, y }).type_id = (y - rc.t) % 2 == 0 ? id_1_index : id_2_index;
+				}
+			}
+			else {
+				for (size_t y = rc.t; y < rc.b; ++y) {
+					tile_at({ x, y }).type_id = (y - rc.t) % 2 == 1 ? id_1_index : id_2_index;
+				}
+			}
+		}
+	}
+
+	void tile_layer::set_tiles(const ltrbu rc, const tile_rectangular_filling id) {
+		ensure(rc.w() > 2 && rc.h() > 2)
+		
+		expand_to_rect(rc);
+		
+		const unsigned fill = get_tile_index_for_texture(id.fill);
+
+		const unsigned left_border = get_tile_index_for_texture(id.left_border);
+		const unsigned top_border = get_tile_index_for_texture(id.top_border);
+		const unsigned right_border = get_tile_index_for_texture(id.right_border);
+		const unsigned bottom_border = get_tile_index_for_texture(id.bottom_border);
+
+		const unsigned lt_corner = get_tile_index_for_texture(id.lt_corner);
+		const unsigned rt_corner = get_tile_index_for_texture(id.rt_corner);
+		const unsigned rb_corner = get_tile_index_for_texture(id.rb_corner);
+		const unsigned lb_corner = get_tile_index_for_texture(id.lb_corner);
+
+		tile_at(rc.left_top()).type_id = lt_corner;
+		tile_at(rc.right_top() - vec2u(1, 0)).type_id = rt_corner;
+		tile_at(rc.right_bottom() - vec2u(1, 1)).type_id = rb_corner;
+		tile_at(rc.left_bottom() - vec2u(0, 1)).type_id = lb_corner;
+
+		for (size_t x = rc.l + 1; x < rc.r - 1; ++x) {
+			tile_at({ x, rc.t }).type_id = top_border;
+			tile_at({ x, rc.b - 1 }).type_id = bottom_border;
+		}
+
+		for (size_t y = rc.t + 1; y < rc.b - 1; ++y) {
+			tile_at({ rc.l, y }).type_id = left_border;
+			tile_at({ rc.r - 1, y }).type_id = right_border;
+		}
+
+		for (size_t x = rc.l + 1; x < rc.r - 1; ++x) {
+			for (size_t y = rc.t + 1; y < rc.b - 1; ++y) {
+				tile_at({ x, y }).type_id = fill;
 			}
 		}
 	}

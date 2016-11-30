@@ -135,7 +135,7 @@ namespace resource_setups {
 		resource_manager.create_sprites_indexed(
 			assets::texture_id::TORSO_MOVING_FIRST,
 			assets::texture_id::TORSO_MOVING_LAST,
-			"hypersomnia/gfx/sprite");
+			"hypersomnia/gfx/torso_white_walk_barehands");
 
 		resource_manager.create_sprites_indexed(
 			assets::texture_id::METROPOLIS_TILE_FIRST,

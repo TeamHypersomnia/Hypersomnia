@@ -241,6 +241,14 @@ struct vec2t {
 		return x * v.y - y * v.x;
 	}
 
+	type area() const {
+		return x * y;
+	}
+
+	type perimeter() const {
+		return 2 * x + 2 * y;
+	}
+
 	real length() const {
 		return sqrt(length_sq());
 	}
