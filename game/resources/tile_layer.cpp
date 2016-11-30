@@ -23,7 +23,7 @@ namespace resources {
 	}
 	
 	const tile_layer::tile_type& tile_layer::get_tile_type(const tile& t) const {
-		return tileset[t.type_id];
+		return tileset[t.type_id - 1];
 	}
 
 	void tile_layer::expand(const vec2u new_area) {
@@ -37,6 +37,7 @@ namespace resources {
 		}
 
 		tiles = std::move(new_tiles);
+		size = new_area;
 	}
 
 	void tile_layer::expand_to_position(const vec2u pos) {
@@ -79,6 +80,8 @@ namespace resources {
 
 				ensure(is_same_size);
 			}
+
+			return tileset.size();
 		}
 		else {
 			return (it - tileset.begin()) + 1;

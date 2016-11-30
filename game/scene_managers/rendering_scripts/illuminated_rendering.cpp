@@ -109,12 +109,7 @@ namespace rendering_scripts {
 
 		smoke_shader.use();
 
-		glBegin(GL_QUADS);
-		glVertexAttrib2f(0.f, 1.f, 1.f);
-		glVertexAttrib2f(0.f, 1.f, 0.f);
-		glVertexAttrib2f(0.f, 0.f, 0.f);
-		glVertexAttrib2f(0.f, 0.f, 1.f);
-		glEnd();
+		renderer.fullscreen_quad();
 
 		default_shader.use();
 		

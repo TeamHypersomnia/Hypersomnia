@@ -173,6 +173,13 @@ namespace augs {
 		glVertexAttribPointer(int(vertex_attribute::position), 2, GL_FLOAT, GL_FALSE, sizeof(vertex), 0); glerr;
 		glVertexAttribPointer(int(vertex_attribute::texcoord), 2, GL_FLOAT, GL_FALSE, sizeof(vertex), (char*)(sizeof(float) * 2)); glerr;
 		glVertexAttribPointer(int(vertex_attribute::color), 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(vertex), (char*)(sizeof(float) * 2 + sizeof(float) * 2)); glerr;
+
+		//glBegin(GL_QUADS);
+		//glVertexAttrib2f(0u, 1.f, 1.f);
+		//glVertexAttrib2f(0u, 1.f, 0.f);
+		//glVertexAttrib2f(0u, 0.f, 0.f);
+		//glVertexAttrib2f(0u, 0.f, 1.f);
+		//glEnd();
 	}
 
 	void renderer::clear_logic_lines() {

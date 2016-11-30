@@ -9,6 +9,7 @@ namespace resource_setups {
 		resource_setups::load_standard_atlas();
 		resource_setups::load_standard_particle_effects();
 		resource_setups::load_standard_behaviour_trees();
+		resource_setups::load_standard_tile_layers();
 
 		resource_manager.create(assets::shader_id::DEFAULT_VERTEX, "hypersomnia/shaders/default.vsh", augs::graphics::shader::type::VERTEX);
 		resource_manager.create(assets::shader_id::DEFAULT_FRAGMENT, "hypersomnia/shaders/default.fsh", augs::graphics::shader::type::FRAGMENT);

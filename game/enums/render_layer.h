@@ -12,6 +12,7 @@ enum render_layer : unsigned char {
 	CORPSES,
 	CAR_WHEEL,
 	CAR_INTERIOR,
+	TILED_FLOOR,
 	GROUND,
 	UNDER_GROUND,
 

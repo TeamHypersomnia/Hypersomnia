@@ -146,6 +146,20 @@ namespace scene_managers {
 			effect.input.single_displacement_duration_ms.set(400.f, 1500.f);
 
 			step.transient.messages.post(effect);
+
+			{
+				const auto e = world.create_entity("tiled_floor");
+				
+				e += components::transform(0.f, 0.f);
+				auto& tile_layer_instance = e += components::tile_layer_instance();
+				auto& render = e += components::render();
+				
+				render.layer = render_layer::TILED_FLOOR;
+				tile_layer_instance.id = assets::tile_layer_id::METROPOLIS_FLOOR;
+
+
+				e.add_standard_components();
+			}
 		}
 
 		for (int i = 0; i < num_characters; ++i) {

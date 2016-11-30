@@ -47,7 +47,7 @@ namespace components {
 			return;
 		}
 		
-		auto visible_tiles = get_visible_tiles(in);
+		const auto visible_tiles = get_visible_tiles(in);
 		
 		sprite::drawing_input sprite_input(in.target_buffer);
 		sprite_input.camera = in.camera;
@@ -67,8 +67,8 @@ namespace components {
 
 				const auto& type = layer.get_tile_type(tile);
 		
-				tile_sprite.tex = type.tile_texture;
-		
+				tile_sprite.set(type.tile_texture);
+
 				sprite_input.renderable_transform.pos = vec2i(in.renderable_transform.pos) + tile_offset + vec2(tile_square_size / 2, tile_square_size / 2);
 		
 				tile_sprite.draw(sprite_input);
