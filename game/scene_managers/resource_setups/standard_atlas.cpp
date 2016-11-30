@@ -156,6 +156,8 @@ namespace resource_setups {
 		resource_manager.create(assets::texture_id::AWAKENING, "hypersomnia/gfx/awakening.png");
 		resource_manager.create(assets::texture_id::METROPOLIS, "hypersomnia/gfx/metropolis.png");
 
+		resource_manager.create(assets::texture_id::BRICK_WALL, "hypersomnia/gfx/brick_wall.png");
+
 		resource_manager.create_inverse_with_flip(assets::animation_id::TORSO_MOVE,
 			assets::texture_id::TORSO_MOVING_FIRST,
 			assets::texture_id::TORSO_MOVING_LAST,

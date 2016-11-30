@@ -103,37 +103,51 @@ namespace scene_managers {
 		};
 
 		{
+			//{
+			//	const auto l = world.create_entity("l");
+			//	l += components::transform(0, 300);
+			//	auto& light = l += components::light();
+			//	light.color = red;
+			//	l.add_standard_components();
+			//}
+			//{
+			//	const auto l = world.create_entity("l");
+			//	l += components::transform(300, 300);
+			//	auto& light = l += components::light();
+			//	light.color = green;
+			//	l.add_standard_components();
+			//}
+			//{
+			//	const auto l = world.create_entity("l");
+			//	l += components::transform(600, 300);
+			//	auto& light = l += components::light();
+			//	light.color = blue;
+			//	l.add_standard_components();
+			//}
 			{
 				const auto l = world.create_entity("l");
-				l += components::transform();
-				auto& light = l += components::light();
-				light.color = red;
-				l.add_standard_components();
-			}
-			{
-				const auto l = world.create_entity("l");
-				l += components::transform(300, 0);
-				auto& light = l += components::light();
-				light.color = green;
-				l.add_standard_components();
-			}
-			{
-				const auto l = world.create_entity("l");
-				l += components::transform(600, 0);
-				auto& light = l += components::light();
-				light.color = blue;
-				l.add_standard_components();
-			}
-			{
-				const auto l = world.create_entity("l");
-				l += components::transform(900, 0);
+				l += components::transform(164.f - 8.f, 200);
 				auto& light = l += components::light();
 				light.color = cyan;
 				l.add_standard_components();
 			}
 			{
 				const auto l = world.create_entity("l");
-				l += components::transform(1200, 0);
+				l += components::transform(1164.f + 24.f, 200);
+				auto& light = l += components::light();
+				light.color = orange;
+				l.add_standard_components();
+			}
+			{
+				const auto l = world.create_entity("l");
+				l += components::transform(164.f - 8.f, -600);
+				auto& light = l += components::light();
+				light.color = cyan;
+				l.add_standard_components();
+			}
+			{
+				const auto l = world.create_entity("l");
+				l += components::transform(1164.f + 24.f, -600);
 				auto& light = l += components::light();
 				light.color = orange;
 				l.add_standard_components();
@@ -164,7 +178,7 @@ namespace scene_managers {
 			{
 				const auto e = world.create_entity("have_a_pleasant");
 
-				e += components::transform(164.f, -60.f - 20.f);
+				e += components::transform(164.f - 8.f, -60.f - 20.f);
 				auto& render = e += components::render();
 				auto& sprite = e += components::sprite();
 
@@ -172,13 +186,28 @@ namespace scene_managers {
 				sprite.set(assets::texture_id::HAVE_A_PLEASANT);
 
 				e.add_standard_components();
-			}
 
+				prefabs::create_brick_wall(world, components::transform(3 + 1 + 1100, -32 - 96), { 160, 160 });
+				prefabs::create_brick_wall(world, components::transform(3 + 1 + 1100 + 160, -32 - 96), { 160, 160 });
+				prefabs::create_brick_wall(world, components::transform(3 + 1 + 1100 + 160, -32 - 96 + 160), { 160, 160 });
+				prefabs::create_brick_wall(world, components::transform(3 + 1 + 1100, -32 - 96 + 160), { 160, 160 });
+
+
+				prefabs::create_brick_wall(world, components::transform(-3 -16 + 100, -32 - 96), { 160, 160 });
+				prefabs::create_brick_wall(world, components::transform(-3 -16 + 100 + 160, -32 - 96), { 160, 160 });
+				prefabs::create_brick_wall(world, components::transform(-3 -16 + 100 + 160, -32 - 96 + 160), { 160, 160 });
+				prefabs::create_brick_wall(world, components::transform(-3 -16 + 100, -32 - 96 + 160), { 160, 160 });
+
+				for (int b = 0; b < 8; ++b) {
+					prefabs::create_brick_wall(world, components::transform(3 + 1 + 1100 + 160 + 160, -32 - 96 + 160 - 160*b), { 160, 160 });
+					prefabs::create_brick_wall(world, components::transform(-3 - 16 + 100 - 160, -32 - 96 + 160 - 160*b), { 160, 160 });
+				}
+			}
 
 			{
 				const auto e = world.create_entity("awakening");
 
-				e += components::transform(164.f, -60.f -20.f + 40.f);
+				e += components::transform(164.f - 8.f, -60.f -20.f + 40.f);
 				auto& render = e += components::render();
 				auto& sprite = e += components::sprite();
 
@@ -191,7 +220,7 @@ namespace scene_managers {
 			{
 				const auto e = world.create_entity("metropolis");
 
-				e += components::transform(1164.f, -60.f);
+				e += components::transform(1164.f + 24.f, -60.f);
 				auto& render = e += components::render();
 				auto& sprite = e += components::sprite();
 
@@ -203,7 +232,7 @@ namespace scene_managers {
 		}
 
 		for (int i = 0; i < num_characters; ++i) {
-			const auto new_character = prefabs::create_character(world, vec2(i * 300, 0), screen_size, typesafe_sprintf("player%x", i));
+			const auto new_character = prefabs::create_character(world, vec2(i * 300, 300), screen_size, typesafe_sprintf("player%x", i));
 
 			new_characters[i] = new_character;
 

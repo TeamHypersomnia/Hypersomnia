@@ -67,6 +67,7 @@ namespace prefabs {
 	entity_handle create_character_crosshair(cosmos&, const vec2i screen_size);
 	entity_handle create_character(cosmos&, const components::transform pos, const vec2i screen_size, const std::string name = "character_unnamed");
 	entity_handle create_crate(cosmos&, const components::transform pos, const vec2 size);
+	entity_handle create_brick_wall(cosmos&, const components::transform pos, const vec2 size);
 
 	entity_handle create_cyan_urban_machete(cosmos&, const vec2 pos);
 }

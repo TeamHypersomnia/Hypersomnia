@@ -85,6 +85,8 @@ namespace assets {
 		AWAKENING,
 		METROPOLIS,
 
+		BRICK_WALL,
+
 		COUNT,
 	};
 	

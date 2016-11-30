@@ -16,4 +16,16 @@ namespace prefabs {
 
 		return crate;
 	}
+
+	entity_handle create_brick_wall(cosmos& world, const components::transform pos, const vec2 size) {
+		const auto crate = world.create_entity("brick_wall");
+
+		ingredients::sprite_scalled(crate, pos, size, assets::texture_id::BRICK_WALL, augs::white, render_layer::DYNAMIC_BODY);
+		ingredients::standard_static_body(crate);
+		crate.get<components::fixtures>().set_restitution(0.0f);
+		crate.get<components::fixtures>().set_density(1);
+		crate.add_standard_components();
+
+		return crate;
+	}
 }
