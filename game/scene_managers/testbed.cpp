@@ -260,12 +260,12 @@ namespace scene_managers {
 		perform_transfer({ rifle, character(0)[slot_function::SECONDARY_HAND] }, step);
 
 		if (character(1).alive()) {
-			name_entity(character(1), entity_name::PERSON, L"Enemy");
+			name_entity(character(1), entity_name::PERSON, L"Sentinel");
 			perform_transfer({ rifle2, character(1)[slot_function::PRIMARY_HAND] }, step);
 		}
 
 		if (character(2).alive()) {
-			name_entity(character(2), entity_name::PERSON, L"Swordsman");
+			name_entity(character(2), entity_name::PERSON, L"Sentinel");
 			perform_transfer({ second_machete, character(2)[slot_function::PRIMARY_HAND] }, step);
 		}
 
