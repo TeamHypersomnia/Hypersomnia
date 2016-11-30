@@ -80,8 +80,8 @@ namespace resource_setups {
 		augs::image hud_circular_hud_medium;
 		//hud_circular_hud_medium.paint_circle(60, 10, augs::white, true);
 		//hud_circular_hud_medium.paint_circle_midpoint(58, augs::rgba(0, 0, 0, 0));
-		hud_circular_hud_medium.paint_circle_midpoint(67, 1, augs::cyan, false, false, vec2().set_from_degrees(-45), vec2().set_from_degrees(45));
-		hud_circular_hud_medium.paint_circle_midpoint(65, 5, augs::white, false, false, vec2().set_from_degrees(135), vec2().set_from_degrees(-180 + 30));
+		hud_circular_hud_medium.paint_circle_midpoint(57, 1, augs::cyan, false, false, vec2().set_from_degrees(-45), vec2().set_from_degrees(45));
+		hud_circular_hud_medium.paint_circle_midpoint(55, 5, augs::white, false, false, vec2().set_from_degrees(135), vec2().set_from_degrees(-180 + 30));
 		//hud_circular_hud_medium.paint_circle_midpoint(59, 1, augs::cyan, false, false, vec2().set_from_degrees(-45), vec2().set_from_degrees(45));
 		//hud_circular_hud_medium.paint_circle_midpoint(68, 1, augs::white, true, -45, 45, false);
 		//hud_circular_hud_medium.paint_circle_midpoint(67, 1, augs::white, true, -45, 45, false);
