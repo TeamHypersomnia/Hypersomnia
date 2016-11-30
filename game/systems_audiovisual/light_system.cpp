@@ -194,6 +194,8 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 	render_system().draw_entities(interp, output.triangles, step.visible_per_layer[render_layer::FLYING_BULLETS], step.camera_state, renderable_drawing_type::NEON_MAPS);
 	render_system().draw_entities(interp, output.triangles, step.visible_per_layer[render_layer::CAR_INTERIOR], step.camera_state, renderable_drawing_type::NEON_MAPS);
 	render_system().draw_entities(interp, output.triangles, step.visible_per_layer[render_layer::CAR_WHEEL], step.camera_state, renderable_drawing_type::NEON_MAPS);
+	render_system().draw_entities(interp, output.triangles, step.visible_per_layer[render_layer::EFFECTS], step.camera_state, renderable_drawing_type::NEON_MAPS);
+	render_system().draw_entities(interp, output.triangles, step.visible_per_layer[render_layer::ON_GROUND], step.camera_state, renderable_drawing_type::NEON_MAPS);
 
 	{
 		particles_simulation_system::drawing_input in(output.triangles);

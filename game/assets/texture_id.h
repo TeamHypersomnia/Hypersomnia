@@ -86,6 +86,7 @@ namespace assets {
 		METROPOLIS,
 
 		BRICK_WALL,
+		ROAD,
 
 		COUNT,
 	};

@@ -154,9 +154,9 @@ namespace scene_managers {
 			}
 
 			messages::create_particle_effect effect;
-			effect.place_of_birth = components::transform(0, 0, 0);
+			effect.place_of_birth = components::transform(-164, 500, 0);
 			effect.input.effect = assets::particle_effect_id::WANDERING_SMOKE;
-			effect.input.randomize_position_within_radius = 800.f;
+			effect.input.randomize_position_within_radius = 500.f;
 			effect.input.single_displacement_duration_ms.set(400.f, 1500.f);
 
 			step.transient.messages.post(effect);
@@ -201,6 +201,17 @@ namespace scene_managers {
 				for (int b = 0; b < 8; ++b) {
 					prefabs::create_brick_wall(world, components::transform(3 + 1 + 1100 + 160 + 160, -32 - 96 + 160 - 160*b), { 160, 160 });
 					prefabs::create_brick_wall(world, components::transform(-3 - 16 + 100 - 160, -32 - 96 + 160 - 160*b), { 160, 160 });
+				}
+
+
+				const auto size = assets::get_size(assets::texture_id::ROAD);
+
+				for (int r = 0; r < 18; ++r) {
+					auto road = world.create_entity("road[-]");
+					ingredients::sprite(road, vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 + size.y / 2 + size.y*r),
+						assets::texture_id::ROAD, white, render_layer::ON_GROUND);
+
+					road.add_standard_components();
 				}
 			}
 
