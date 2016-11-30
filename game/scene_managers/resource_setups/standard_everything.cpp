@@ -7,6 +7,11 @@
 namespace resource_setups {
 	void load_standard_everything() {
 		resource_setups::load_standard_atlas();
+
+		resource_manager.create(assets::atlas_id::GAME_WORLD_ATLAS,
+			resources::manager::atlas_creation_mode::FROM_ALL_TEXTURES
+			| resources::manager::atlas_creation_mode::FROM_ALL_FONTS);
+
 		resource_setups::load_standard_particle_effects();
 		resource_setups::load_standard_behaviour_trees();
 		resource_setups::load_standard_tile_layers();

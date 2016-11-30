@@ -152,9 +152,9 @@ namespace resource_setups {
 			assets::texture_id::PIXEL_THUNDER_LAST,
 			"hypersomnia/gfx/pixel_thunder");
 
-		resource_manager.create(assets::atlas_id::GAME_WORLD_ATLAS,
-			resources::manager::atlas_creation_mode::FROM_ALL_TEXTURES
-			| resources::manager::atlas_creation_mode::FROM_ALL_FONTS);
+		resource_manager.create(assets::texture_id::HAVE_A_PLEASANT, "hypersomnia/gfx/have_a_pleasant.png");
+		resource_manager.create(assets::texture_id::AWAKENING, "hypersomnia/gfx/awakening.png");
+		resource_manager.create(assets::texture_id::METROPOLIS, "hypersomnia/gfx/metropolis.png");
 
 		resource_manager.create_inverse_with_flip(assets::animation_id::TORSO_MOVE,
 			assets::texture_id::TORSO_MOVING_FIRST,

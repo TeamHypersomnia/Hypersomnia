@@ -150,13 +150,53 @@ namespace scene_managers {
 			{
 				const auto e = world.create_entity("tiled_floor");
 				
-				e += components::transform(0.f, -1500.f);
+				e += components::transform(0.f, -1200.f);
 				auto& tile_layer_instance = e += components::tile_layer_instance();
 				auto& render = e += components::render();
 				
 				render.layer = render_layer::TILED_FLOOR;
 				tile_layer_instance.id = assets::tile_layer_id::METROPOLIS_FLOOR;
 
+
+				e.add_standard_components();
+			}
+
+			{
+				const auto e = world.create_entity("have_a_pleasant");
+
+				e += components::transform(164.f, -60.f - 20.f);
+				auto& render = e += components::render();
+				auto& sprite = e += components::sprite();
+
+				render.layer = render_layer::EFFECTS;
+				sprite.set(assets::texture_id::HAVE_A_PLEASANT);
+
+				e.add_standard_components();
+			}
+
+
+			{
+				const auto e = world.create_entity("awakening");
+
+				e += components::transform(164.f, -60.f -20.f + 40.f);
+				auto& render = e += components::render();
+				auto& sprite = e += components::sprite();
+
+				render.layer = render_layer::EFFECTS;
+				sprite.set(assets::texture_id::AWAKENING);
+
+				e.add_standard_components();
+			}
+
+			{
+				const auto e = world.create_entity("metropolis");
+
+				e += components::transform(1164.f, -60.f);
+				auto& render = e += components::render();
+				auto& sprite = e += components::sprite();
+
+				render.layer = render_layer::EFFECTS;
+				sprite.set(assets::texture_id::METROPOLIS);
 
 				e.add_standard_components();
 			}
