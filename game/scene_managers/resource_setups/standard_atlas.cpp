@@ -138,6 +138,11 @@ namespace resource_setups {
 			"hypersomnia/gfx/sprite");
 
 		resource_manager.create_sprites_indexed(
+			assets::texture_id::METROPOLIS_TILE_FIRST,
+			assets::texture_id::METROPOLIS_TILE_LAST,
+			"hypersomnia/gfx/tileset/tile");
+
+		resource_manager.create_sprites_indexed(
 			assets::texture_id::SMOKE_PARTICLE_FIRST,
 			assets::texture_id(int(assets::texture_id::SMOKE_PARTICLE_FIRST) + 3),
 			"hypersomnia/gfx/smoke");
