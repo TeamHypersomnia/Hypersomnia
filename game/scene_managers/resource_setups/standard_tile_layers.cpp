@@ -23,7 +23,7 @@ namespace resource_setups {
 				if (
 					assets::texture_id(i) == assets::texture_id(int(assets::texture_id::METROPOLIS_TILE_FIRST) + 0)
 					) {
-					tt.max_specular_blinks = 3;
+					tt.max_specular_blinks = 2;
 				}
 				metropolis_floor.register_tile_type(tt);
 			}

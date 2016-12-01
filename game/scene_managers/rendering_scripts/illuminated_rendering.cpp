@@ -40,6 +40,7 @@ namespace rendering_scripts {
 
 		auto& default_shader = *resource_manager.find(assets::program_id::DEFAULT);
 		auto& illuminated_shader = *resource_manager.find(assets::program_id::DEFAULT_ILLUMINATED);
+		auto& specular_highlights_shader = *resource_manager.find(assets::program_id::SPECULAR_HIGHLIGHTS);
 		auto& pure_color_highlight_shader = *resource_manager.find(assets::program_id::PURE_COLOR_HIGHLIGHT);
 		auto& border_highlight_shader = pure_color_highlight_shader; // the same
 		auto& circular_bars_shader = *resource_manager.find(assets::program_id::CIRCULAR_BARS);
@@ -82,7 +83,23 @@ namespace rendering_scripts {
 		render_system().draw_entities(interp, global_time_seconds, output, step.visible_per_layer[render_layer::GROUND], state, renderable_drawing_type::NORMAL);
 		render_system().draw_entities(interp, global_time_seconds, output, step.visible_per_layer[render_layer::ON_GROUND], state, renderable_drawing_type::NORMAL);
 		render_system().draw_entities(interp, global_time_seconds, output, step.visible_per_layer[render_layer::TILED_FLOOR], state, renderable_drawing_type::NORMAL);
+
+		renderer.call_triangles();
+		renderer.clear_triangles();
+
+		specular_highlights_shader.use();
+		{
+			const auto projection_matrix_uniform = glGetUniformLocation(specular_highlights_shader.id, "projection_matrix");
+			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
+		}
+
 		render_system().draw_entities(interp, global_time_seconds, output, step.visible_per_layer[render_layer::TILED_FLOOR], state, renderable_drawing_type::SPECULAR_HIGHLIGHTS);
+
+		renderer.call_triangles();
+		renderer.clear_triangles();
+
+		illuminated_shader.use();
+
 		render_system().draw_entities(interp, global_time_seconds, output, step.visible_per_layer[render_layer::ON_TILED_FLOOR], state, renderable_drawing_type::NORMAL);
 		render_system().draw_entities(interp, global_time_seconds, output, step.visible_per_layer[render_layer::CAR_INTERIOR], state, renderable_drawing_type::NORMAL);
 		render_system().draw_entities(interp, global_time_seconds, output, step.visible_per_layer[render_layer::CAR_WHEEL], state, renderable_drawing_type::NORMAL);
