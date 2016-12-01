@@ -5,6 +5,7 @@
 #include "augs/graphics/pixel.h"
 #include "augs/graphics/vertex.h"
 #include "game/detail/camera_cone.h"
+#include "game/enums/renderable_drawing_type.h"
 
 namespace augs {
 	class texture;
@@ -17,7 +18,7 @@ namespace components {
 			components::transform renderable_transform;
 			camera_cone camera;
 			augs::rgba colorize;
-			bool use_neon_map = false;
+			renderable_drawing_type drawing_type = renderable_drawing_type::NORMAL;
 			float global_time_seconds = 0.f;
 
 			void set_global_time_seconds(const float);

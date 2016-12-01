@@ -31,7 +31,7 @@ public:
 		components::transform renderable_transform;
 		camera_cone camera;
 		augs::rgba colorize;
-		bool use_neon_map = false;
+		renderable_drawing_type drawing_type = renderable_drawing_type::NORMAL;
 	};
 
 	void draw(const render_layer, const drawing_input&) const;

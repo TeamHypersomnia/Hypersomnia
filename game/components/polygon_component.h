@@ -10,6 +10,8 @@
 #include "transform_component.h"
 #include "game/detail/camera_cone.h"
 
+#include "game/enums/renderable_drawing_type.h"
+
 #include "zeroed_pod.h"
 
 namespace augs {
@@ -34,7 +36,7 @@ namespace components {
 
 			void set_global_time_seconds(const float);
 
-			bool use_neon_map = false;
+			renderable_drawing_type drawing_type = renderable_drawing_type::NORMAL;
 		};
 
 		/* the polygon as it was originally, so possibly concave

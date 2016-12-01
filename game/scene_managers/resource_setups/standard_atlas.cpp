@@ -152,6 +152,11 @@ namespace resource_setups {
 			assets::texture_id::PIXEL_THUNDER_LAST,
 			"hypersomnia/gfx/pixel_thunder");
 
+		resource_manager.create_sprites_indexed(
+			assets::texture_id::BLINK_FIRST,
+			assets::texture_id::BLINK_LAST,
+			"hypersomnia/gfx/blink");
+
 		resource_manager.create(assets::texture_id::HAVE_A_PLEASANT, "hypersomnia/gfx/have_a_pleasant.png");
 		resource_manager.create(assets::texture_id::AWAKENING, "hypersomnia/gfx/awakening.png");
 		resource_manager.create(assets::texture_id::METROPOLIS, "hypersomnia/gfx/metropolis.png");
@@ -164,6 +169,11 @@ namespace resource_setups {
 			assets::texture_id::TORSO_MOVING_FIRST,
 			assets::texture_id::TORSO_MOVING_LAST,
 			20.0f);
+
+		resource_manager.create(assets::animation_id::BLINK_ANIMATION,
+			assets::texture_id::BLINK_FIRST,
+			assets::texture_id::BLINK_LAST,
+			50.0f, resources::animation::loop_type::NONE);
 
 		auto& player_response = resource_manager.create(assets::animation_response_id::TORSO_SET);
 		player_response[animation_response_type::MOVE] = assets::animation_id::TORSO_MOVE;

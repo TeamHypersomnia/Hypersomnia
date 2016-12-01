@@ -56,9 +56,8 @@ namespace components {
 		sprite::drawing_input sprite_input(in.target_buffer);
 		sprite_input.camera = in.camera;
 		sprite_input.colorize = in.colorize;
-		sprite_input.use_neon_map = in.use_neon_map;
-
-		sprite tile_sprite;
+		sprite_input.drawing_type = in.drawing_type;
+		sprite_input.set_global_time_seconds(in.global_time_seconds);
 
 		for (unsigned y = visible_tiles.t; y < visible_tiles.b; ++y) {
 			for (unsigned x = visible_tiles.l; x < visible_tiles.r; ++x) {
@@ -71,11 +70,9 @@ namespace components {
 
 				const auto& type = layer.get_tile_type(tile);
 		
-				tile_sprite.set(type.tile_texture);
-
 				sprite_input.renderable_transform.pos = vec2i(in.renderable_transform.pos) + tile_offset + vec2(tile_square_size / 2, tile_square_size / 2);
 		
-				tile_sprite.draw(sprite_input);
+				type.draw(sprite_input);
 			}
 		}
 	}

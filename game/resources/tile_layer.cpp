@@ -4,10 +4,10 @@
 
 namespace resources {
 	tile_layer::tile::tile(const unsigned type) : type_id(type) {}
-	tile_layer::tile_type::tile_type(const assets::texture_id tile_texture) : tile_texture(tile_texture) {}
+	//tile_layer::tile_type::tile_type(const tile_type_id tile_texture) : tile_texture(tile_texture) {}
 
 	size_t tile_layer::get_tile_side() const {
-		return (*tileset[0].tile_texture).get_size().x;
+		return (*tileset[0].tex).get_size().x;
 	}
 
 	vec2u tile_layer::get_size() const {
@@ -21,7 +21,19 @@ namespace resources {
 	const tile_layer::tile& tile_layer::tile_at(const vec2u p) const {
 		return tiles[p.y * size.x + p.x];
 	}
-	
+
+	tile_layer::tile_type& tile_layer::get_tile_type(const tile_type_id t) {
+		return tileset[t - 1];
+	}
+
+	const tile_layer::tile_type& tile_layer::get_tile_type(const tile_type_id t) const {
+		return tileset[t - 1];
+	}
+
+	tile_layer::tile_type& tile_layer::get_tile_type(const tile& t) {
+		return tileset[t.type_id - 1];
+	}
+
 	const tile_layer::tile_type& tile_layer::get_tile_type(const tile& t) const {
 		return tileset[t.type_id - 1];
 	}
@@ -48,15 +60,15 @@ namespace resources {
 		expand_to_position( rc.right_bottom() );
 	}
 
-	void tile_layer::set_tile(const vec2u pos, const assets::texture_id id) {
+	void tile_layer::set_tile(const vec2u pos, const tile_type_id id) {
 		expand_to_position(pos);
 
-		tile_at(pos).type_id = get_tile_index_for_texture(id);
+		tile_at(pos).type_id = id;
 	}
 
-	void tile_layer::set_tiles(const ltrbu rc, const assets::texture_id id) {
+	void tile_layer::set_tiles(const ltrbu rc, const tile_type_id id) {
 		expand_to_rect(rc);
-		const auto id_index = get_tile_index_for_texture(id);
+		const auto id_index = id;
 
 		for (size_t x = rc.l; x < rc.r; ++x) {
 			for (size_t y = rc.t; y < rc.b; ++y) {
@@ -65,10 +77,10 @@ namespace resources {
 		}
 	}
 
-	void tile_layer::set_tiles_alternating(const ltrbu rc, const assets::texture_id id_1, const assets::texture_id id_2) {
+	void tile_layer::set_tiles_alternating(const ltrbu rc, const tile_type_id id_1, const tile_type_id id_2) {
 		expand_to_rect(rc);
-		const auto id_1_index = get_tile_index_for_texture(id_1);
-		const auto id_2_index = get_tile_index_for_texture(id_2);
+		const auto id_1_index = id_1;
+		const auto id_2_index = id_2;
 
 		for (size_t x = rc.l; x < rc.r; ++x) {
 			if ((x - rc.l) % 2 == 0) {
@@ -89,17 +101,17 @@ namespace resources {
 		
 		expand_to_rect(rc);
 		
-		const unsigned fill = get_tile_index_for_texture(id.fill);
+		const unsigned fill = id.fill;
 
-		const unsigned left_border = get_tile_index_for_texture(id.left_border);
-		const unsigned top_border = get_tile_index_for_texture(id.top_border);
-		const unsigned right_border = get_tile_index_for_texture(id.right_border);
-		const unsigned bottom_border = get_tile_index_for_texture(id.bottom_border);
+		const unsigned left_border = (id.left_border);
+		const unsigned top_border = (id.top_border);
+		const unsigned right_border = (id.right_border);
+		const unsigned bottom_border = (id.bottom_border);
 
-		const unsigned lt_corner = get_tile_index_for_texture(id.lt_corner);
-		const unsigned rt_corner = get_tile_index_for_texture(id.rt_corner);
-		const unsigned rb_corner = get_tile_index_for_texture(id.rb_corner);
-		const unsigned lb_corner = get_tile_index_for_texture(id.lb_corner);
+		const unsigned lt_corner = (id.lt_corner);
+		const unsigned rt_corner = (id.rt_corner);
+		const unsigned rb_corner = (id.rb_corner);
+		const unsigned lb_corner = (id.lb_corner);
 
 		tile_at(rc.left_top()).type_id = lt_corner;
 		tile_at(rc.right_top() - vec2u(1, 0)).type_id = rt_corner;
@@ -123,27 +135,20 @@ namespace resources {
 		}
 	}
 
-	unsigned tile_layer::get_tile_index_for_texture(const assets::texture_id new_id) {
-		const auto it = find_in(tileset, new_id);
-		
-		if (it == tileset.end()) {
-			tileset.push_back(new_id);
+	unsigned tile_layer::register_tile_type(const tile_type new_type) {
+		tileset.push_back(new_type);
 
-			const bool is_square = (*new_id).get_size().x == (*new_id).get_size().y;
-
-			ensure(is_square);
-
-			if (tileset.size() > 1) {
-				const bool is_same_size = (*new_id).get_size() == (*tileset[tileset.size() - 2].tile_texture).get_size();
-
-				ensure(is_same_size);
-			}
-
-			return tileset.size();
+		const bool is_square = (*new_type.tex).get_size().x == (*new_type.tex).get_size().y;
+	
+		ensure(is_square);
+	
+		if (tileset.size() > 1) {
+			const bool is_same_size = (*new_type.tex).get_size() == (*tileset[tileset.size() - 2].tex).get_size();
+	
+			ensure(is_same_size);
 		}
-		else {
-			return (it - tileset.begin()) + 1;
-		}
+	
+		return tileset.size();
 	}
 
 	tile_layer::visible_tiles_by_type tile_layer::get_visible_tiles_by_type(const ltrbu visible_tiles) const {

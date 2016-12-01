@@ -202,7 +202,7 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 	{
 		particles_simulation_system::drawing_input in(output.triangles);
 		in.camera = step.camera_state.camera;
-		in.use_neon_map = true;
+		in.drawing_type = renderable_drawing_type::NEON_MAPS;
 
 		particles.draw(render_layer::EFFECTS, in);
 	}

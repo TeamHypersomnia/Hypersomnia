@@ -6,6 +6,8 @@ namespace assets {
 
 		TORSO_MOVE,
 		TORSO_SHOOT,
+
+		BLINK_ANIMATION,
 		
 		COUNT
 	};

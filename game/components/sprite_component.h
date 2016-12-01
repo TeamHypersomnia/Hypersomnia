@@ -7,6 +7,7 @@
 #include "game/assets/texture_id.h"
 #include "transform_component.h"
 #include "game/detail/camera_cone.h"
+#include "game/enums/renderable_drawing_type.h"
 
 struct state_for_drawing_camera;
 
@@ -26,7 +27,7 @@ namespace components {
 			positioning_type positioning = positioning_type::CENTER;
 
 			augs::rgba colorize = augs::white;
-			bool use_neon_map = false;
+			renderable_drawing_type drawing_type = renderable_drawing_type::NORMAL;
 			float global_time_seconds = 0.f;
 
 			void set_global_time_seconds(const float);
@@ -44,10 +45,13 @@ namespace components {
 		short flip_horizontally = false;
 		short flip_vertically = false;
 
-		enum class special_effect {
+		enum class special_effect : unsigned char {
 			NONE,
 			COLOR_WAVE
 		} effect = special_effect::NONE;
+		unsigned char wave_speed_slowdown = 0u;
+
+		unsigned short max_specular_blinks = 0;
 
 		template <class Archive>
 		void serialize(Archive& ar) {

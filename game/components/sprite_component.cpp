@@ -76,7 +76,7 @@ namespace components {
 		const augs::texture* considered_texture = original_texture;
 		vec2 neon_size_multiplier = vec2(1.f, 1.f);
 
-		if (in.use_neon_map) {
+		if (in.drawing_type == renderable_drawing_type::NEON_MAPS) {
 			const auto* const maybe_neon_map = resource_manager.find_neon_map(tex);
 
 			if (maybe_neon_map != nullptr) {

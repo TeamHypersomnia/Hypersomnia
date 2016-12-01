@@ -89,6 +89,9 @@ namespace assets {
 		ROAD,
 		ROAD_FRONT_DIRT,
 
+		BLINK_FIRST,
+		BLINK_LAST = BLINK_FIRST + 7,
+
 		COUNT,
 	};
 	

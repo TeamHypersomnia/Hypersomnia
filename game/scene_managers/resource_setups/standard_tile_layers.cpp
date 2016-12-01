@@ -4,11 +4,31 @@
 namespace resource_setups {
 	void load_standard_tile_layers() {
 		{
-			auto nth_tile = [](unsigned i) {
-				return assets::texture_id(unsigned(assets::texture_id::METROPOLIS_TILE_FIRST) + i - 1);
+			auto nth_tile = [](const unsigned i) {
+				return i;
+				//return assets::texture_id(unsigned(assets::texture_id::METROPOLIS_TILE_FIRST) + i - 1);
 			};
 
 			auto& metropolis_floor = resource_manager.create(assets::tile_layer_id::METROPOLIS_FLOOR);
+
+			for (int i = int(assets::texture_id::METROPOLIS_TILE_FIRST); i < int(assets::texture_id::METROPOLIS_TILE_LAST); ++i) {
+				components::sprite tt;
+				tt.set(assets::texture_id(i));
+				//if (
+				//	assets::texture_id(i) == assets::texture_id(int(assets::texture_id::METROPOLIS_TILE_FIRST) + 3)
+				//	//|| assets::texture_id(i) == assets::texture_id(int(assets::texture_id::METROPOLIS_TILE_FIRST) + 4)
+				//	) {
+				//	tt.effect = components::sprite::special_effect::COLOR_WAVE;
+				//}		
+				if (
+					assets::texture_id(i) == assets::texture_id(int(assets::texture_id::METROPOLIS_TILE_FIRST) + 0)
+					) {
+					tt.max_specular_blinks = 3;
+				}
+				metropolis_floor.register_tile_type(tt);
+			}
+
+			//metropolis_floor.get_tile_type(nth_tile(1)).max_specular_blinks = 2;
 
 			resources::tile_layer::tile_rectangular_filling gold_floor_filling;
 			gold_floor_filling.fill = nth_tile(49);

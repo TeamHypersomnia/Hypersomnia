@@ -47,11 +47,9 @@ public:
 		in.camera = camera;
 		in.renderable_transform = renderable_transform;
 		in.set_global_time_seconds(global_time_seconds);
+		in.drawing_type = renderable_drawing_mode;
 
-		if (renderable_drawing_mode == renderable_drawing_type::NORMAL) {
-			renderable.draw(in);
-		}
-		else if (renderable_drawing_mode == renderable_drawing_type::BORDER_HIGHLIGHTS) {
+		if (renderable_drawing_mode == renderable_drawing_type::BORDER_HIGHLIGHTS) {
 			if (render.draw_border) {
 				static const vec2i offsets[4] = {
 					vec2i(-1, 0), vec2i(1, 0), vec2i(0, 1), vec2i(0, -1)
@@ -65,8 +63,7 @@ public:
 				}
 			}
 		}
-		else if (renderable_drawing_mode == renderable_drawing_type::NEON_MAPS) {
-			in.use_neon_map = true;
+		else {
 			renderable.draw(in);
 		}
 	}
