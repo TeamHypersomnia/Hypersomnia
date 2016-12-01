@@ -55,7 +55,7 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 		messages::visibility_information_request request;
 		request.eye_transform = it.viewing_transform(interp);
 		request.filter = filters::line_of_sight_query();
-		request.square_side = 1500;
+		request.square_side = it.get<components::light>().max_distance.base_value;
 		request.subject = it;
 
 		requests.push_back(request);
@@ -196,6 +196,7 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 	render_system().draw_entities(interp, output.triangles, step.visible_per_layer[render_layer::CAR_WHEEL], step.camera_state, renderable_drawing_type::NEON_MAPS);
 	render_system().draw_entities(interp, output.triangles, step.visible_per_layer[render_layer::EFFECTS], step.camera_state, renderable_drawing_type::NEON_MAPS);
 	render_system().draw_entities(interp, output.triangles, step.visible_per_layer[render_layer::ON_GROUND], step.camera_state, renderable_drawing_type::NEON_MAPS);
+	render_system().draw_entities(interp, output.triangles, step.visible_per_layer[render_layer::ON_TILED_FLOOR], step.camera_state, renderable_drawing_type::NEON_MAPS);
 
 	{
 		particles_simulation_system::drawing_input in(output.triangles);

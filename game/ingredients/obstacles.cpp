@@ -23,7 +23,7 @@ namespace prefabs {
 		ingredients::sprite_scalled(crate, pos, size, assets::texture_id::BRICK_WALL, augs::white, render_layer::DYNAMIC_BODY);
 		ingredients::standard_static_body(crate);
 		crate.get<components::fixtures>().set_restitution(0.0f);
-		crate.get<components::fixtures>().set_density(1);
+		crate.get<components::fixtures>().set_density(100);
 		crate.add_standard_components();
 
 		return crate;

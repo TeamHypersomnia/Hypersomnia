@@ -87,6 +87,7 @@ namespace assets {
 
 		BRICK_WALL,
 		ROAD,
+		ROAD_FRONT_DIRT,
 
 		COUNT,
 	};

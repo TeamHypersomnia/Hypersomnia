@@ -42,20 +42,20 @@ namespace scene_managers {
 	void testbed::populate(logic_step& step, const vec2i screen_size) {
 		auto& world = step.cosm;
 
-		const auto crate = prefabs::create_crate(world, vec2(200, 200 + 300), vec2i(100, 100) / 3);
-		const auto crate2 = prefabs::create_crate(world, vec2(400, 200 + 400), vec2i(300, 300));
-		const auto crate4 = prefabs::create_crate(world, vec2(500, 200 + 0), vec2i(100, 100));
+		//const auto crate = prefabs::create_crate(world, vec2(200, 200 + 300), vec2i(100, 100) / 3);
+		//const auto crate2 = prefabs::create_crate(world, vec2(400, 200 + 400), vec2i(300, 300));
+		//const auto crate4 = prefabs::create_crate(world, vec2(500, 200 + 0), vec2i(100, 100));
+		//
+		//crates.push_back(crate);
+		//crates.push_back(crate2);
+		//crates.push_back(crate4);
 
-		crates.push_back(crate);
-		crates.push_back(crate2);
-		crates.push_back(crate4);
-
-		for (int x = -4; x < 4; ++x) {
-			for (int y = -4; y < 4; ++y) {
-				auto obstacle = prefabs::create_crate(world, vec2(2000 + x * 300, 2000 + y * 300), vec2i(100, 100));
-				crates.push_back(obstacle);
-			}
-		}
+		//for (int x = -4; x < 4; ++x) {
+		//	for (int y = -4; y < 4; ++y) {
+		//		auto obstacle = prefabs::create_crate(world, vec2(2000 + x * 300, 2000 + y * 300), vec2i(100, 100));
+		//		crates.push_back(obstacle);
+		//	}
+		//}
 
 		for (int x = -4 * 1; x < 4 * 1; ++x)
 		{
@@ -143,6 +143,8 @@ namespace scene_managers {
 				l += components::transform(164.f - 8.f, -600);
 				auto& light = l += components::light();
 				light.color = cyan;
+				light.max_distance.base_value = 3000.f;
+				light.wall_max_distance.base_value = 3000.f;
 				l.add_standard_components();
 			}
 			{
@@ -150,6 +152,8 @@ namespace scene_managers {
 				l += components::transform(1164.f + 24.f, -600);
 				auto& light = l += components::light();
 				light.color = orange;
+				light.max_distance.base_value = 3000.f;
+				light.wall_max_distance.base_value = 3000.f;
 				l.add_standard_components();
 			}
 
@@ -203,10 +207,19 @@ namespace scene_managers {
 					prefabs::create_brick_wall(world, components::transform(-3 - 16 + 100 - 160, -32 - 96 + 160 - 160*b), { 160, 160 });
 				}
 
+				const auto size = assets::get_size(assets::texture_id::ROAD_FRONT_DIRT);
 
-				const auto size = assets::get_size(assets::texture_id::ROAD);
+				{
+					auto road_dirt = world.create_entity("road_dirt[-]");
+					ingredients::sprite(road_dirt, vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 - size.y / 2),
+						assets::texture_id::ROAD_FRONT_DIRT, white, render_layer::ON_TILED_FLOOR);
+
+					road_dirt.add_standard_components();
+				}
 
 				for (int r = 0; r < 18; ++r) {
+					const auto size = assets::get_size(assets::texture_id::ROAD);
+
 					auto road = world.create_entity("road[-]");
 					ingredients::sprite(road, vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 + size.y / 2 + size.y*r),
 						assets::texture_id::ROAD, white, render_layer::ON_GROUND);
