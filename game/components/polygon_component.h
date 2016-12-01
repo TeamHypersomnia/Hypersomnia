@@ -30,6 +30,9 @@ namespace components {
 			camera_cone camera;
 
 			augs::rgba colorize = augs::white;
+			float global_time_seconds = 0.f;
+
+			void set_global_time_seconds(const float);
 
 			bool use_neon_map = false;
 		};

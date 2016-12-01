@@ -18,6 +18,9 @@ namespace components {
 			camera_cone camera;
 			augs::rgba colorize;
 			bool use_neon_map = false;
+			float global_time_seconds = 0.f;
+
+			void set_global_time_seconds(const float);
 		};
 
 		assets::tile_layer_id id;

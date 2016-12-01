@@ -16,6 +16,10 @@ namespace components {
 			v.color = col;
 	}
 
+	void polygon::drawing_input::set_global_time_seconds(const float secs) {
+		global_time_seconds = secs;
+	}
+
 	void polygon::automatically_map_uv(assets::texture_id texture_id_to_map, unsigned uv_mapping_mode) {
 		if (vertices.empty()) return;
 

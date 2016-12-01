@@ -82,7 +82,7 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 
 	const auto& watched_character = cosmos[r.camera_state.associated_character];
 
-	const int timestamp_ms = cosmos.get_total_time_passed_in_seconds() * 1000;
+	const int timestamp_ms = r.get_interpolated_total_time_passed_in_seconds() * 1000;
 
 	vertex_triangle_buffer circular_bars_information;
 
@@ -295,7 +295,7 @@ void immediate_hud::acquire_game_events(const const_logic_step& step) {
 }
 
 void immediate_hud::draw_vertically_flying_numbers(viewing_step& msg) const {
-	const auto current_time = msg.cosm.get_total_time_passed_in_seconds() + msg.get_delta().view_interpolation_ratio() * msg.get_delta().in_seconds();;
+	const auto current_time = msg.get_interpolated_total_time_passed_in_seconds();
 	auto& triangles = msg.renderer.triangles;
 
 	for (const auto& r : recent_vertically_flying_numbers) { 
@@ -313,7 +313,7 @@ void immediate_hud::draw_vertically_flying_numbers(viewing_step& msg) const {
 
 void immediate_hud::draw_pure_color_highlights(viewing_step& msg) const {
 	const auto& cosmos = msg.cosm;
-	const auto current_time = cosmos.get_total_time_passed_in_seconds() + msg.get_delta().view_interpolation_ratio() * msg.get_delta().in_seconds();
+	const auto current_time = msg.get_interpolated_total_time_passed_in_seconds();
 	auto& triangles = msg.renderer.triangles;
 	const auto& interp = msg.session.systems_audiovisual.get<interpolation_system>();
 
@@ -332,7 +332,7 @@ void immediate_hud::draw_pure_color_highlights(viewing_step& msg) const {
 		auto ratio = passed / r.maximum_duration_seconds;
 
 		col.a = 255 * (1-ratio) * r.starting_alpha_ratio;
-		render_system().draw_renderable(triangles, sprite, subject.viewing_transform(interp, true), subject.get<components::render>(), msg.camera_state, renderable_drawing_type::NORMAL);
+		render_system().draw_renderable(triangles, current_time, sprite, subject.viewing_transform(interp, true), subject.get<components::render>(), msg.camera_state, renderable_drawing_type::NORMAL);
 		col = prevcol;
 	}
 

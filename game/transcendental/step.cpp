@@ -9,6 +9,10 @@ augs::variable_delta viewing_step::get_delta() const {
 	return delta;
 }
 
+double viewing_step::get_interpolated_total_time_passed_in_seconds() const {
+	return cosm.get_total_time_passed_in_seconds() + get_delta().view_interpolation_ratio() * get_delta().in_seconds();
+}
+
 viewing_step::viewing_step(
 	const cosmos& cosm, 
 	viewing_session& session,

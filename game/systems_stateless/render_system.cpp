@@ -57,7 +57,8 @@ std::array<std::vector<const_entity_handle>, render_layer::COUNT> render_system:
 
 void render_system::draw_entities(
 	const interpolation_system& interp,
-	augs::vertex_triangle_buffer& output, 
+	const float global_time_seconds,
+	augs::vertex_triangle_buffer& output,
 	const std::vector<const_entity_handle>& entities, 
 	const state_for_drawing_camera& in_camera, 
 	const renderable_drawing_type renderable_drawing_mode
@@ -71,7 +72,7 @@ void render_system::draw_entities(
 				const auto& renderable_transform = e.viewing_transform(interp, true);
 				const auto& renderable = e.get<renderable_type>();
 
-				render_system().draw_renderable(output, renderable, renderable_transform, render, in_camera, renderable_drawing_mode);
+				render_system().draw_renderable(output, global_time_seconds, renderable, renderable_transform, render, in_camera, renderable_drawing_mode);
 			}
 		});
 	}

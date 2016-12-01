@@ -77,6 +77,7 @@ public:
 	augs::renderer& renderer;
 
 	augs::variable_delta get_delta() const;
+	double get_interpolated_total_time_passed_in_seconds() const;
 
 	vec2 get_screen_space(vec2 pos) const;
 

@@ -14,6 +14,10 @@ using namespace augs;
 namespace components {
 	tile_layer_instance::tile_layer_instance(const assets::tile_layer_id id) : id(id) {}
 
+	void tile_layer_instance::drawing_input::set_global_time_seconds(const float secs) {
+		global_time_seconds = secs;
+	}
+
 	ltrbu tile_layer_instance::get_visible_tiles(const drawing_input & in) const {
 		ltrb visible_tiles;
 		const auto visible_aabb = in.camera.get_transformed_visible_world_area_aabb();

@@ -19,6 +19,7 @@ public:
 
 	void draw_entities(
 		const interpolation_system& interp,
+		const float global_time_seconds,
 		augs::vertex_triangle_buffer& output, 
 		const std::vector<const_entity_handle>&, 
 		const state_for_drawing_camera& in, 
@@ -28,6 +29,7 @@ public:
 	template<class renderable_type>
 	void draw_renderable(
 		augs::vertex_triangle_buffer& output,
+		const float global_time_seconds,
 		const renderable_type& renderable,
 		const components::transform& renderable_transform,
 		const components::render& render,
@@ -44,6 +46,7 @@ public:
 
 		in.camera = camera;
 		in.renderable_transform = renderable_transform;
+		in.set_global_time_seconds(global_time_seconds);
 
 		if (renderable_drawing_mode == renderable_drawing_type::NORMAL) {
 			renderable.draw(in);

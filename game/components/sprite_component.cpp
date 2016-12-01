@@ -20,6 +20,10 @@ namespace components {
 		camera = state.camera;
 	}
 
+	void sprite::drawing_input::set_global_time_seconds(const float secs) {
+		global_time_seconds = secs;
+	}
+
 	void sprite::make_rect(const vec2 pos, const vec2 size, const float angle, std::array<vec2, 4>& v, const drawing_input::positioning_type positioning) {
 		if (positioning == drawing_input::positioning_type::CENTER) {
 			const vec2 origin = pos;
@@ -117,9 +121,22 @@ namespace components {
 			target_color *= in.colorize;
 		}
 
-		t1.vertices[0].color = t2.vertices[0].color = target_color;
-		t1.vertices[1].color = t2.vertices[1].color = target_color;
-		t1.vertices[2].color = t2.vertices[2].color = target_color;
+		if (effect == special_effect::COLOR_WAVE) {
+			rgba left_col;
+			rgba right_col;
+			left_col.set_hsv({ fmod(in.global_time_seconds/2.f, 1.f), 1.0, 1.0 });
+			right_col.set_hsv({ fmod(in.global_time_seconds/2.f+0.3f, 1.f), 1.0, 1.0 });
+
+			t1.vertices[0].color = t2.vertices[0].color = left_col;
+			t2.vertices[1].color = right_col;
+			t1.vertices[1].color = t2.vertices[2].color = right_col;
+			t1.vertices[2].color = left_col;
+		}
+		else {
+			t1.vertices[0].color = t2.vertices[0].color = target_color;
+			t1.vertices[1].color = t2.vertices[1].color = target_color;
+			t1.vertices[2].color = t2.vertices[2].color = target_color;
+		}
 
 		vec2 texcoords[] = {
 			vec2(0.f, 0.f),

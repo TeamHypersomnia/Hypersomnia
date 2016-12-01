@@ -241,6 +241,7 @@ namespace scene_managers {
 
 				render.layer = render_layer::EFFECTS;
 				sprite.set(assets::texture_id::AWAKENING);
+				sprite.effect = components::sprite::special_effect::COLOR_WAVE;
 
 				e.add_standard_components();
 			}

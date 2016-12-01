@@ -27,7 +27,9 @@ namespace components {
 
 			augs::rgba colorize = augs::white;
 			bool use_neon_map = false;
+			float global_time_seconds = 0.f;
 
+			void set_global_time_seconds(const float);
 			void setup_from(const state_for_drawing_camera&);
 		};
 
@@ -41,6 +43,11 @@ namespace components {
 
 		short flip_horizontally = false;
 		short flip_vertically = false;
+
+		enum class special_effect {
+			NONE,
+			COLOR_WAVE
+		} effect = special_effect::NONE;
 
 		template <class Archive>
 		void serialize(Archive& ar) {
