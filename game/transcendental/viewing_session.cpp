@@ -121,9 +121,10 @@ void viewing_session::view(const cosmos& cosmos,
 
 	if (show_profile_details) {
 		const auto coords = character_chased_by_camera.alive() ? character_chased_by_camera.logic_transform().pos : vec2();
+		const auto rot = character_chased_by_camera.alive() ? character_chased_by_camera.logic_transform().rotation : 0.f;
 		const auto vel = character_chased_by_camera.alive() ? character_chased_by_camera.get<components::physics>().velocity() : vec2();
 
-		const auto bbox = quick_print_format(renderer.triangles, typesafe_sprintf(L"Entities: %x\nX: %f2\nY: %f2\nVelX: %x\nVelY: %x\n", cosmos.entities_count(), coords.x, coords.y, vel.x, vel.y)
+		const auto bbox = quick_print_format(renderer.triangles, typesafe_sprintf(L"Entities: %x\nX: %f2\nY: %f2\nRot: %f2\nVelX: %x\nVelY: %x\n", cosmos.entities_count(), coords.x, coords.y, rot, vel.x, vel.y)
 			+ summary() + cosmos.profiler.sorted_summary(show_profile_details), style(assets::font_id::GUI_FONT, rgba(255, 255, 255, 150)), vec2i(0, 0), 0);
 
 		quick_print(renderer.triangles, multiply_alpha(global_log::format_recent_as_text(assets::font_id::GUI_FONT), 150.f / 255), vec2i(screen_size_i.x - 300, 0), 300);

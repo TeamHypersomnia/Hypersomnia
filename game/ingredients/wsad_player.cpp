@@ -76,7 +76,7 @@ namespace ingredients {
 		components::animation animation;
 	}
 
-	void wsad_character(const entity_handle e, const entity_handle crosshair_entity) {
+	void wsad_character(const entity_handle e, const entity_handle crosshair_entity, const assets::animation_response_id torso_set) {
 		auto& sprite = e += components::sprite();
 		auto& render = e += components::render();
 		auto& animation = e += components::animation();
@@ -179,7 +179,7 @@ namespace ingredients {
 
 		e.map_sub_entity(sub_entity_name::CHARACTER_CROSSHAIR, crosshair_entity);
 		
-		animation_response.response = assets::animation_response_id::TORSO_SET;
+		animation_response.response = torso_set;
 
 		sprite.set(assets::texture_id::TEST_PLAYER, rgba(255, 255, 255, 255));
 
@@ -218,7 +218,7 @@ namespace ingredients {
 }
 
 namespace prefabs {
-	entity_handle create_character(cosmos& world, const components::transform pos, const vec2i screen_size, const std::string name) {
+	entity_handle create_character(cosmos& world, const components::transform pos, const vec2i screen_size, const std::string name, const assets::animation_response_id torso_set) {
 		const auto character = world.create_entity(name);
 
 		name_entity(character, entity_name::PERSON);
@@ -226,7 +226,7 @@ namespace prefabs {
 		const auto crosshair = create_character_crosshair(world, screen_size);
 		crosshair.get<components::crosshair>().character_entity_to_chase = character;
 
-		ingredients::wsad_character(character, crosshair);
+		ingredients::wsad_character(character, crosshair, torso_set);
 		
 		auto& element = character += components::gui_element();
 		element.rect_world.last_state.screen_size = screen_size;

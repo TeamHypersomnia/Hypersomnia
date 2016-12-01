@@ -138,6 +138,16 @@ namespace resource_setups {
 			"hypersomnia/gfx/torso_white_walk_barehands");
 
 		resource_manager.create_sprites_indexed(
+			assets::texture_id::VIOLET_TORSO_MOVING_FIRST,
+			assets::texture_id::VIOLET_TORSO_MOVING_LAST,
+			"hypersomnia/gfx/sprite");
+
+		resource_manager.create_sprites_indexed(
+			assets::texture_id::BLUE_TORSO_MOVING_FIRST,
+			assets::texture_id::BLUE_TORSO_MOVING_LAST,
+			"hypersomnia/gfx/walk");
+
+		resource_manager.create_sprites_indexed(
 			assets::texture_id::METROPOLIS_TILE_FIRST,
 			assets::texture_id::METROPOLIS_TILE_LAST,
 			"hypersomnia/gfx/tileset/tile");
@@ -170,12 +180,34 @@ namespace resource_setups {
 			assets::texture_id::TORSO_MOVING_LAST,
 			20.0f);
 
+		resource_manager.create_inverse_with_flip(assets::animation_id::BLUE_TORSO_MOVE,
+			assets::texture_id::BLUE_TORSO_MOVING_FIRST,
+			assets::texture_id::BLUE_TORSO_MOVING_LAST,
+			20.0f);
+
+		resource_manager.create_inverse_with_flip(assets::animation_id::VIOLET_TORSO_MOVE,
+			assets::texture_id::VIOLET_TORSO_MOVING_FIRST,
+			assets::texture_id::VIOLET_TORSO_MOVING_LAST,
+			20.0f);
+
 		resource_manager.create(assets::animation_id::BLINK_ANIMATION,
 			assets::texture_id::BLINK_FIRST,
 			assets::texture_id::BLINK_LAST,
 			50.0f, resources::animation::loop_type::NONE);
 
-		auto& player_response = resource_manager.create(assets::animation_response_id::TORSO_SET);
-		player_response[animation_response_type::MOVE] = assets::animation_id::TORSO_MOVE;
+		{
+			auto& player_response = resource_manager.create(assets::animation_response_id::TORSO_SET);
+			player_response[animation_response_type::MOVE] = assets::animation_id::TORSO_MOVE;
+		}
+
+		{
+			auto& player_response = resource_manager.create(assets::animation_response_id::BLUE_TORSO_SET);
+			player_response[animation_response_type::MOVE] = assets::animation_id::BLUE_TORSO_MOVE;
+		}
+
+		{
+			auto& player_response = resource_manager.create(assets::animation_response_id::VIOLET_TORSO_SET);
+			player_response[animation_response_type::MOVE] = assets::animation_id::VIOLET_TORSO_MOVE;
+		}
 	}
 }

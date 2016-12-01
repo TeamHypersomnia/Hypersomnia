@@ -66,9 +66,9 @@ namespace scene_managers {
 			frog.add_standard_components();
 		}
 
-		const auto car = prefabs::create_car(world, components::transform(-300, -600, -90));
-		const auto car2 = prefabs::create_car(world, components::transform(-800, -600, -90));
-		const auto car3 = prefabs::create_car(world, components::transform(-1300, -600, -90));
+		const auto car = prefabs::create_car(world, components::transform(1500, 320, -180));
+		const auto car2 = prefabs::create_car(world, components::transform(1500, 320 + 400, -180));
+		const auto car3 = prefabs::create_car(world, components::transform(1500, 320 + 800, -180));
 
 		const auto motorcycle = prefabs::create_motorcycle(world, components::transform(0, -600, -90));
 		prefabs::create_motorcycle(world, components::transform(100, -600, -90));
@@ -92,15 +92,6 @@ namespace scene_managers {
 				//background.add_standard_components();
 				street.add_standard_components();
 			}
-
-		const int num_characters = 6;
-
-		std::vector<entity_id> new_characters;
-		new_characters.resize(num_characters);
-
-		auto character = [&](const size_t i){
-			return world[new_characters[i]];
-		};
 
 		{
 			//{
@@ -262,8 +253,38 @@ namespace scene_managers {
 			}
 		}
 
+		const int num_characters = 3;
+
+		std::vector<entity_id> new_characters;
+		new_characters.resize(num_characters);
+
+		auto character = [&](const size_t i) {
+			return world[new_characters[i]];
+		};
+
 		for (int i = 0; i < num_characters; ++i) {
-			const auto new_character = prefabs::create_character(world, vec2(i * 300, 300), screen_size, typesafe_sprintf("player%x", i));
+			assets::animation_response_id torso_set;
+			components::transform transform;
+
+			if (i == 0) {
+				transform = { 0, 300, 0 };
+				torso_set = assets::animation_response_id::TORSO_SET;
+			}
+			else if (i == 1 || i == 2) {
+				if (i == 1) {
+					transform = { 254, 211, 68 };
+				}
+				if (i == 2) {
+					transform = { 1102, 213, 110 };
+				}
+
+				torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
+			}
+			else {
+				torso_set = assets::animation_response_id::BLUE_TORSO_SET;
+			}
+
+			const auto new_character = prefabs::create_character(world, transform, screen_size, typesafe_sprintf("player%x", i), torso_set);
 
 			new_characters[i] = new_character;
 

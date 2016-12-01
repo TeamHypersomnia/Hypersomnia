@@ -69,7 +69,7 @@ namespace augs {
 				g_index = FT_Get_Char_Index(face, j);
 
 				if (g_index) {
-					errsf(!FT_Load_Glyph(face, g_index, FT_LOAD_DEFAULT | FT_LOAD_IGNORE_TRANSFORM), L"couldn't load glyph", f);
+					errsf(!FT_Load_Glyph(face, g_index, FT_LOAD_DEFAULT | FT_LOAD_IGNORE_TRANSFORM | FT_LOAD_NO_AUTOHINT), L"couldn't load glyph", f);
 					errsf(!FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL), L"couldn't render glyph", f);
 
 					glyphs.push_back(glyph(face->glyph->metrics));
@@ -80,6 +80,19 @@ namespace augs {
 
 					if (face->glyph->bitmap.width) {
 						g.sprite.img.copy(face->glyph->bitmap.buffer, 1, face->glyph->bitmap.pitch, rects::wh<int>(face->glyph->bitmap.width, face->glyph->bitmap.rows));
+						
+						//const auto sz = g.sprite.img.get_size();
+						//
+						//for (auto x = 0; x < sz.w; ++x) {
+						//	for (auto y = 0; y < sz.h; ++y) {
+						//		if (*g.sprite.img.ptr(x, y, 0) < 150) {
+						//			*g.sprite.img.ptr(x, y, 0) = 0;
+						//		}
+						//		else {
+						//			*g.sprite.img.ptr(x, y, 0) = 255;
+						//		}
+						//	}
+						//}
 					}
 
 					unicode[j] = glyphs.size() - 1;

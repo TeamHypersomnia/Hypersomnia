@@ -6,6 +6,8 @@ namespace assets {
 		INVALID,
 
 		TORSO_SET,
+		VIOLET_TORSO_SET,
+		BLUE_TORSO_SET,
 		COUNT
 	};
 }
