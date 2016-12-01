@@ -77,12 +77,16 @@ namespace rendering_scripts {
 			const auto projection_matrix_uniform = glGetUniformLocation(illuminated_shader.id, "projection_matrix");
 			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
 		}
-		
-		for (int i = render_layer::UNDER_GROUND; i > render_layer::DYNAMIC_BODY; --i) {
-			render_system().draw_entities(interp, global_time_seconds,output, step.visible_per_layer[i], state, renderable_drawing_type::NORMAL);
-		}
 
+		render_system().draw_entities(interp, global_time_seconds, output, step.visible_per_layer[render_layer::UNDER_GROUND], state, renderable_drawing_type::NORMAL);
+		render_system().draw_entities(interp, global_time_seconds, output, step.visible_per_layer[render_layer::GROUND], state, renderable_drawing_type::NORMAL);
+		render_system().draw_entities(interp, global_time_seconds, output, step.visible_per_layer[render_layer::ON_GROUND], state, renderable_drawing_type::NORMAL);
+		render_system().draw_entities(interp, global_time_seconds, output, step.visible_per_layer[render_layer::TILED_FLOOR], state, renderable_drawing_type::NORMAL);
 		render_system().draw_entities(interp, global_time_seconds, output, step.visible_per_layer[render_layer::TILED_FLOOR], state, renderable_drawing_type::SPECULAR_HIGHLIGHTS);
+		render_system().draw_entities(interp, global_time_seconds, output, step.visible_per_layer[render_layer::ON_TILED_FLOOR], state, renderable_drawing_type::NORMAL);
+		render_system().draw_entities(interp, global_time_seconds, output, step.visible_per_layer[render_layer::CAR_INTERIOR], state, renderable_drawing_type::NORMAL);
+		render_system().draw_entities(interp, global_time_seconds, output, step.visible_per_layer[render_layer::CAR_WHEEL], state, renderable_drawing_type::NORMAL);
+		render_system().draw_entities(interp, global_time_seconds, output, step.visible_per_layer[render_layer::CORPSES], state, renderable_drawing_type::NORMAL);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();

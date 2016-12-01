@@ -186,7 +186,7 @@ namespace components {
 				const auto spatial_hash = ((std::hash<float>()(in.renderable_transform.pos.x)
 					^ (std::hash<float>()(in.renderable_transform.pos.y) << 1)) >> 1);
 
-				std::minstd_rand0 generator(spatial_hash + m + total_ms / animation_max_duration);
+				std::minstd_rand0 generator(spatial_hash + m*30 + total_ms / animation_max_duration);
 
 				const unsigned animation_current_ms = total_ms % (animation_max_duration);
 				const auto& target_frame = anim.frames[animation_current_ms / frame_duration_ms];
