@@ -126,7 +126,7 @@ namespace scene_managers {
 			//}
 			{
 				const auto l = world.create_entity("l");
-				l += components::transform(164.f - 8.f + 70.f, 220);
+				l += components::transform(164.f - 8.f + 90.f, 220);
 				auto& light = l += components::light();
 				light.color = cyan;
 				light.max_distance.base_value = 4500.f;
@@ -135,7 +135,7 @@ namespace scene_managers {
 			}
 			{
 				const auto l = world.create_entity("l");
-				l += components::transform(1164.f + 24.f - 70.f, 220);
+				l += components::transform(1164.f + 24.f - 90.f, 220);
 				auto& light = l += components::light();
 				light.color = orange;
 				light.max_distance.base_value = 4500.f;
@@ -147,6 +147,8 @@ namespace scene_managers {
 				l += components::transform(164.f - 8.f, -700);
 				auto& light = l += components::light();
 				light.color = cyan;
+				//light.linear.base_value = 0.000005f;
+				//light.quadratic.base_value = 0.000025f;
 				light.max_distance.base_value = 4500.f;
 				light.wall_max_distance.base_value = 4000.f;
 				l.add_standard_components();

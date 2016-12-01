@@ -31,7 +31,7 @@ void main()
 
 	intensity = float(
 		
-		light_step * (level + 2)
+		light_step * (level + 3)
 
 		) / 255.0;
 	light.rgb *= intensity;

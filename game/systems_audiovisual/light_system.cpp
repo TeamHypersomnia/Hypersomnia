@@ -99,9 +99,15 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 			renderable_light_tri.vertices[1].pos = world_light_tri.points[1] + camera_offset;
 			renderable_light_tri.vertices[2].pos = world_light_tri.points[2] + camera_offset;
 
-			renderable_light_tri.vertices[0].color = light.color;
-			renderable_light_tri.vertices[1].color = light.color;
-			renderable_light_tri.vertices[2].color = light.color;
+			auto considered_color = light.color;
+			
+			if (considered_color == black) {
+				considered_color.set_hsv({ fmod(global_time_seconds / 16.f, 1.f), 1.0, 1.0 });
+			}
+
+			renderable_light_tri.vertices[0].color = considered_color;
+			renderable_light_tri.vertices[1].color = considered_color;
+			renderable_light_tri.vertices[2].color = considered_color;
 
 			output.push_triangle(renderable_light_tri);
 		}
