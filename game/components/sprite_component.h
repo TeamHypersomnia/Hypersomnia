@@ -10,6 +10,9 @@
 #include "game/enums/renderable_drawing_type.h"
 
 struct state_for_drawing_camera;
+namespace augs {
+	class texture_with_image;
+}
 
 namespace components {
 	struct sprite {
@@ -49,7 +52,7 @@ namespace components {
 			NONE,
 			COLOR_WAVE
 		} effect = special_effect::NONE;
-		unsigned char wave_speed_slowdown = 0u;
+		bool has_neon_map = false;
 
 		unsigned short max_specular_blinks = 0;
 
@@ -80,5 +83,13 @@ namespace components {
 
 		std::vector<vec2> get_vertices() const;
 		augs::rects::ltrb<float> get_aabb(const components::transform&, const drawing_input::positioning_type positioning = drawing_input::positioning_type::CENTER) const;
+	
+	private:
+		
+		void draw(const drawing_input&, 
+			const augs::texture_with_image* const considered_texture, 
+			const vec2i target_position,
+			const float target_rotation,
+			const vec2 considered_size) const;
 	};
 }

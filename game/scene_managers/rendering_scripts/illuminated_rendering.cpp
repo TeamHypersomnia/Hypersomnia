@@ -82,6 +82,8 @@ namespace rendering_scripts {
 			render_system().draw_entities(interp, global_time_seconds,output, step.visible_per_layer[i], state, renderable_drawing_type::NORMAL);
 		}
 
+		render_system().draw_entities(interp, global_time_seconds, output, step.visible_per_layer[render_layer::TILED_FLOOR], state, renderable_drawing_type::SPECULAR_HIGHLIGHTS);
+
 		renderer.call_triangles();
 		renderer.clear_triangles();
 

@@ -58,9 +58,10 @@ namespace components {
 		return size * size_multiplier;
 	}
 
-	void sprite::set(assets::texture_id _tex, rgba _color) {
+	void sprite::set(const assets::texture_id _tex, const rgba _color) {
 		tex = _tex;
 		color = _color;
+		has_neon_map = resource_manager.find_neon_map(tex) != nullptr;
 
 		update_size_from_texture_dimensions();
 	}
@@ -69,45 +70,19 @@ namespace components {
 		size = vec2i(resource_manager.find(tex)->tex.get_size());
 	}
 
-	void sprite::draw(const drawing_input& in) const {
-		ensure(tex != assets::texture_id::INVALID);
-
-		const augs::texture* const original_texture = &resource_manager.find(tex)->tex;
-		const augs::texture* considered_texture = original_texture;
-		vec2 neon_size_multiplier = vec2(1.f, 1.f);
-
-		if (in.drawing_type == renderable_drawing_type::NEON_MAPS) {
-			const auto* const maybe_neon_map = resource_manager.find_neon_map(tex);
-
-			if (maybe_neon_map != nullptr) {
-				considered_texture = &maybe_neon_map->tex;
-				neon_size_multiplier = vec2(considered_texture->get_size()) / vec2(original_texture->get_size());
-			}
-			else {
-				return;
-			}
-		}
-		
+	void sprite::draw(const drawing_input& in,
+		const augs::texture_with_image* const considered_texture,
+		const vec2i target_position,
+		const float final_rotation,
+		const vec2 considered_size) const {
 		std::array<vec2, 4> v;
-
-		vec2i transform_pos = in.renderable_transform.pos;
-
-		const float final_rotation = in.renderable_transform.rotation + rotation_offset;
-
-		const auto center = in.camera.visible_world_area / 2;
-
-		auto target_position = transform_pos - in.camera.transform.pos + center;
-		
-		if (center_offset.non_zero()) {
-			target_position -= vec2(center_offset).rotate(final_rotation, vec2(0, 0));
-		}
-
-		const auto considered_size = get_size() * neon_size_multiplier;
 
 		make_rect(target_position, considered_size, final_rotation, v, in.positioning);
 
 		/* rotate around the center of the screen */
 		if (in.camera.transform.rotation != 0.f) {
+			const auto center = in.camera.visible_world_area / 2;
+
 			for (auto& vert : v) {
 				vert.rotate(in.camera.transform.rotation, center);
 			}
@@ -124,8 +99,8 @@ namespace components {
 		if (effect == special_effect::COLOR_WAVE) {
 			rgba left_col;
 			rgba right_col;
-			left_col.set_hsv({ fmod(in.global_time_seconds/2.f, 1.f), 1.0, 1.0 });
-			right_col.set_hsv({ fmod(in.global_time_seconds/2.f+0.3f, 1.f), 1.0, 1.0 });
+			left_col.set_hsv({ fmod(in.global_time_seconds / 2.f, 1.f), 1.0, 1.0 });
+			right_col.set_hsv({ fmod(in.global_time_seconds / 2.f + 0.3f, 1.f), 1.0, 1.0 });
 
 			t1.vertices[0].color = t2.vertices[0].color = left_col;
 			t2.vertices[1].color = right_col;
@@ -158,8 +133,8 @@ namespace components {
 		t1.vertices[2].texcoord = texcoords[3];
 
 		for (int i = 0; i < 3; ++i) {
-			considered_texture->get_uv(t1.vertices[i].texcoord);
-			considered_texture->get_uv(t2.vertices[i].texcoord);
+			considered_texture->tex.get_uv(t1.vertices[i].texcoord);
+			considered_texture->tex.get_uv(t2.vertices[i].texcoord);
 		}
 
 		t1.vertices[0].pos = t2.vertices[0].pos = vec2i(v[0]);
@@ -169,6 +144,62 @@ namespace components {
 
 		in.target_buffer.push_back(t1);
 		in.target_buffer.push_back(t2);
+	}
+
+	void sprite::draw(const drawing_input& in) const {
+		ensure(tex != assets::texture_id::INVALID);
+
+		vec2i transform_pos = in.renderable_transform.pos;
+		const float final_rotation = in.renderable_transform.rotation + rotation_offset;
+
+		const auto center = in.camera.visible_world_area / 2;
+
+		auto target_position = transform_pos - in.camera.transform.pos + center;
+		const auto drawn_size = size*size_multiplier;
+
+		if (center_offset.non_zero()) {
+			target_position -= vec2(center_offset).rotate(final_rotation, vec2(0, 0));
+		}
+
+		if (in.drawing_type == renderable_drawing_type::NEON_MAPS && has_neon_map) {
+			draw(in, resource_manager.find_neon_map(tex), 
+				target_position,
+				final_rotation,
+				vec2(resource_manager.find_neon_map(tex)->tex.get_size())
+				/ vec2(resource_manager.find(tex)->tex.get_size()) * drawn_size);
+		}
+		else if (in.drawing_type == renderable_drawing_type::NORMAL) {
+			draw(in, resource_manager.find(tex),
+				target_position,
+				final_rotation, 
+				drawn_size);
+		}
+		else if (in.drawing_type == renderable_drawing_type::SPECULAR_HIGHLIGHTS) {
+			const auto& anim = *resource_manager.find(assets::animation_id::BLINK_ANIMATION);
+			const unsigned frame_duration_ms = anim.frames[0].duration_milliseconds;
+			const auto frame_count = anim.frames.size();
+			const auto animation_max_duration = frame_duration_ms * frame_count;
+
+			for (unsigned m = 0; m < max_specular_blinks; ++m) {
+				unsigned total_ms = in.global_time_seconds * 1000 + (animation_max_duration / max_specular_blinks) * m;
+
+				const auto spatial_hash = ((std::hash<float>()(in.renderable_transform.pos.x)
+					^ (std::hash<float>()(in.renderable_transform.pos.y) << 1)) >> 1);
+
+				std::minstd_rand0 generator(spatial_hash + m + total_ms / animation_max_duration);
+
+				const unsigned animation_current_ms = total_ms % (animation_max_duration);
+				const auto& target_frame = anim.frames[animation_current_ms / frame_duration_ms];
+				
+				vec2i blink_offset = { int(generator() % unsigned(drawn_size.x)), int(generator() % unsigned(drawn_size.y)) };
+				blink_offset -= drawn_size / 2;
+
+				draw(in, resource_manager.find(target_frame.sprite.tex),
+					target_position + blink_offset,
+					final_rotation,
+					assets::get_size(target_frame.sprite.tex));
+			}
+		}
 	}
 
 	std::vector<vec2> sprite::get_vertices() const {
