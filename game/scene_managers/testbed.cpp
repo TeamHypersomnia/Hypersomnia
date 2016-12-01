@@ -126,34 +126,38 @@ namespace scene_managers {
 			//}
 			{
 				const auto l = world.create_entity("l");
-				l += components::transform(164.f - 8.f, 200);
+				l += components::transform(164.f - 8.f + 70.f, 220);
 				auto& light = l += components::light();
 				light.color = cyan;
+				light.max_distance.base_value = 4500.f;
+				light.wall_max_distance.base_value = 4000.f;
 				l.add_standard_components();
 			}
 			{
 				const auto l = world.create_entity("l");
-				l += components::transform(1164.f + 24.f, 200);
+				l += components::transform(1164.f + 24.f - 70.f, 220);
 				auto& light = l += components::light();
 				light.color = orange;
+				light.max_distance.base_value = 4500.f;
+				light.wall_max_distance.base_value = 4000.f;
 				l.add_standard_components();
 			}
 			{
 				const auto l = world.create_entity("l");
-				l += components::transform(164.f - 8.f, -600);
+				l += components::transform(164.f - 8.f, -700);
 				auto& light = l += components::light();
 				light.color = cyan;
-				light.max_distance.base_value = 3000.f;
-				light.wall_max_distance.base_value = 3000.f;
+				light.max_distance.base_value = 4500.f;
+				light.wall_max_distance.base_value = 4000.f;
 				l.add_standard_components();
 			}
 			{
 				const auto l = world.create_entity("l");
-				l += components::transform(1164.f + 24.f, -600);
+				l += components::transform(1164.f + 24.f, -700);
 				auto& light = l += components::light();
 				light.color = orange;
-				light.max_distance.base_value = 3000.f;
-				light.wall_max_distance.base_value = 3000.f;
+				light.max_distance.base_value = 4500.f;
+				light.wall_max_distance.base_value = 4000.f;
 				l.add_standard_components();
 			}
 
@@ -203,8 +207,8 @@ namespace scene_managers {
 				prefabs::create_brick_wall(world, components::transform(-3 -16 + 100, -32 - 96 + 160), { 160, 160 });
 
 				for (int b = 0; b < 8; ++b) {
-					prefabs::create_brick_wall(world, components::transform(3 + 1 + 1100 + 160 + 160, -32 - 96 + 160 - 160*b), { 160, 160 });
-					prefabs::create_brick_wall(world, components::transform(-3 - 16 + 100 - 160, -32 - 96 + 160 - 160*b), { 160, 160 });
+					prefabs::create_brick_wall(world, components::transform(3 + 1 + 1100 + 160 + 160, -32 - 96 + 160 - 160 * b, 90), { 160, 160 });
+					prefabs::create_brick_wall(world, components::transform(-3 - 16 + 100 - 160, -32 - 96 + 160 - 160*b, 90), { 160, 160 });
 				}
 
 				const auto size = assets::get_size(assets::texture_id::ROAD_FRONT_DIRT);

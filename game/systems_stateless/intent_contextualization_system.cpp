@@ -136,7 +136,10 @@ void intent_contextualization_system::contextualize_movement_intents(logic_step&
 			if (e.intent == intent_type::MOVE_FORWARD
 				|| e.intent == intent_type::MOVE_BACKWARD
 				|| e.intent == intent_type::MOVE_LEFT
-				|| e.intent == intent_type::MOVE_RIGHT) {
+				|| e.intent == intent_type::MOVE_RIGHT
+				|| e.intent == intent_type::WALK
+				|| e.intent == intent_type::SPRINT
+				) {
 				callee = maybe_driver->owned_vehicle;
 				callee_resolved = true;
 			}
