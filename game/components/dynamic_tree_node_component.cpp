@@ -6,6 +6,7 @@
 #include "game/components/tile_layer_instance_component.h"
 #include "game/components/particles_existence_component.h"
 #include "game/components/transform_component.h"
+#include "game/components/wandering_pixels_component.h"
 
 #include "game/transcendental/cosmos.h"
 
@@ -17,23 +18,22 @@ namespace components {
 		const auto* const polygon = e.find<components::polygon>();
 		const auto* const tile_layer_instance = e.find<components::tile_layer_instance>();
 		const auto* const particles_existence = e.find<components::particles_existence>();
-
-		const auto transform = e.logic_transform();
+		const auto* const wandering_pixels = e.find<components::wandering_pixels>();
 
 		if (sprite) {
-			result.aabb = sprite->get_aabb(transform);
+			result.aabb = sprite->get_aabb(e.logic_transform());
 		}
-
-		if (polygon) {
-			result.aabb = polygon->get_aabb(transform);
+		else if (polygon) {
+			result.aabb = polygon->get_aabb(e.logic_transform());
 		}
-		
-		if (tile_layer_instance) {
-			result.aabb = tile_layer_instance->get_aabb(transform);
+		else if (tile_layer_instance) {
+			result.aabb = tile_layer_instance->get_aabb(e.logic_transform());
 		}
-			
-		if (particles_existence) {
+		else if (particles_existence) {
 			result.always_visible = true;
+		}
+		else if (wandering_pixels) {
+			result.aabb = wandering_pixels->reach;
 		}
 
 		return result;

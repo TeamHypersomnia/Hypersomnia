@@ -45,3 +45,4 @@
 #include "game/components/interpolation_component.h"
 #include "game/components/flags_component.h"
 #include "game/components/light_component.h"
+#include "game/components/wandering_pixels_component.h"

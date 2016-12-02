@@ -9,18 +9,6 @@
 
 #include "augs/templates/container_templates.h"
 
-void particles_simulation_system::construct(const const_entity_handle id) {
-	// get_cache(id).constructed = true;
-}
-
-void particles_simulation_system::destruct(const const_entity_handle id) {
-	// get_cache(id).constructed = false;
-}
-
-void particles_simulation_system::reserve_caches_for_entities(const size_t n) {
-	// per_entity_cache.reserve(n);
-}
-
 void particles_simulation_system::draw(const render_layer layer, const drawing_input& group_input) const {
 	for (auto it : particles[layer]) {
 		const auto temp_alpha = it.face.color.a;
@@ -73,19 +61,10 @@ void particles_simulation_system::resample_state_for_audiovisuals(const cosmos& 
 	for (const auto it : to_erase) {
 		per_entity_cache.erase(it);
 	}
-
-	//for (const auto it : new_cosmos.get(processing_subjects::WITH_PARTICLES_EXISTENCE)) {
-	//	auto& cache = get_cache(it);
-	//	
-	//	if (cache.constructed) {
-	//
-	//	}
-	//}
 }
 
 particles_simulation_system::cache& particles_simulation_system::get_cache(const const_entity_handle id) {
 	return per_entity_cache[id.get_id()];
-	//return per_entity_cache[id.get_id().pool.indirection_index];
 }
 
 resources::particle& particles_simulation_system::spawn_particle(randomization& rng,

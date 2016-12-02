@@ -47,6 +47,7 @@ namespace components {
 	struct physical_relations;
 	struct interpolation;
 	struct light;
+	struct wandering_pixels;
 	struct substance;
 }
 
@@ -97,6 +98,7 @@ struct put_all_components_into {
 		components::physical_relations,
 		components::interpolation,
 		components::light,
+		components::wandering_pixels,
 
 		components::substance
 

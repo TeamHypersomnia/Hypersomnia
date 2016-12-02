@@ -116,10 +116,6 @@ public:
 	resources::particle& spawn_particle(randomization&, emission_instance&, const vec2&, float, float spread, const resources::emission&);
 	void advance_streams_and_particles(const cosmos&, const augs::delta dt, interpolation_system&);
 
-	void construct(const const_entity_handle);
-	void destruct(const const_entity_handle);
-
-	void reserve_caches_for_entities(const size_t);
-
+	void reserve_caches_for_entities(const size_t) {}
 	void resample_state_for_audiovisuals(const cosmos&);
 };

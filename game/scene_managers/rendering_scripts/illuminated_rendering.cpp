@@ -31,6 +31,7 @@ namespace rendering_scripts {
 		const auto& controlled_entity = cosmos[step.camera_state.associated_character];
 		const auto& interp = step.session.systems_audiovisual.get<interpolation_system>();
 		const auto& particles = step.session.systems_audiovisual.get<particles_simulation_system>();
+		auto& wandering_pixels = step.session.systems_audiovisual.get<wandering_pixels_system>();
 		const float global_time_seconds = step.get_interpolated_total_time_passed_in_seconds();
 
 		step.visible_entities = cosmos[dynamic_tree.determine_visible_entities_from_camera(state, physics)];
@@ -48,6 +49,9 @@ namespace rendering_scripts {
 
 		particles_simulation_system::drawing_input particles_input(output);
 		particles_input.camera = state.camera;
+		
+		wandering_pixels_system::drawing_input wandering_input(output);
+		wandering_input.camera = state.camera;
 
 		default_shader.use();
 		{
@@ -142,6 +146,11 @@ namespace rendering_scripts {
 		}
 		
 		particles.draw(render_layer::EFFECTS, particles_input);
+
+		for (const auto e : step.visible_per_layer[render_layer::WANDERING_PIXELS_EFFECTS]) {
+			wandering_pixels.advance_wandering_pixels_for(e, step.get_delta());
+			wandering_pixels.draw_wandering_pixels_for(e, wandering_input);
+		}
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
