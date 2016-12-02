@@ -97,6 +97,8 @@ namespace assets {
 
 		BLINK_FIRST,
 		BLINK_LAST = BLINK_FIRST + 7,
+		WANDERING_SQUARE,
+		WANDERING_CROSS,
 
 		COUNT,
 	};

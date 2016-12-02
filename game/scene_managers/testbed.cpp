@@ -133,30 +133,117 @@ namespace scene_managers {
 				light.wall_max_distance.base_value = 4000.f;
 				l.add_standard_components();
 			}
-			
 			{
-				const auto e = world.create_entity("wandering_pixels");
-				auto& w = e += components::wandering_pixels();
-				auto& r = e += components::render();
+				{
+					const auto e = world.create_entity("wandering_pixels");
+					auto& w = e += components::wandering_pixels();
+					auto& r = e += components::render();
 
-				r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
+					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-				w.face.set(assets::texture_id::BLANK, cyan);
-				w.face.size.set(1, 1);
-				w.count = 20;
-				w.reach = xywh(164.f - 8.f + 90.f - 100, 220 - 100, 200, 200);
-				e.add_standard_components();
+					w.face.set(assets::texture_id(int(assets::texture_id::BLINK_FIRST) + 2), cyan);
+					//w.face.size.set(1, 1);
+					w.count = 20;
+					w.reach = xywh(164.f - 8.f + 90.f - 100, 220 - 100, 200, 200);
+					e.add_standard_components();
+				}
+
+				{
+					const auto e = world.create_entity("wandering_pixels");
+					auto& w = e += components::wandering_pixels();
+					auto& r = e += components::render();
+
+					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
+
+					w.face.set(assets::texture_id(int(assets::texture_id::BLINK_FIRST) + 2), orange);
+					//w.face.size.set(1, 1);
+					w.count = 20;
+					w.reach = xywh(1164.f - 8.f + 90.f - 100, 220 - 100, 200, 200);
+					e.add_standard_components();
+				}
+
+				{
+					const auto e = world.create_entity("wandering_pixels");
+					auto& w = e += components::wandering_pixels();
+					auto& r = e += components::render();
+
+					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
+
+					w.face.set(assets::texture_id(int(assets::texture_id::BLANK)), cyan);
+					w.face.size.set(1, 1);
+					w.count = 50;
+					w.reach = xywh(164.f - 8.f + 90.f - 100, 220 - 100, 200, 200);
+					e.add_standard_components();
+				}
+
+				{
+					const auto e = world.create_entity("wandering_pixels");
+					auto& w = e += components::wandering_pixels();
+					auto& r = e += components::render();
+
+					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
+
+					w.face.set(assets::texture_id(int(assets::texture_id::BLANK)), orange);
+					w.face.size.set(1, 1);
+					w.count = 50;
+					w.reach = xywh(1164.f - 8.f + 90.f - 100, 220 - 100, 200, 200);
+					e.add_standard_components();
+				}
+
+				{
+					const auto e = world.create_entity("wandering_pixels");
+					auto& w = e += components::wandering_pixels();
+					auto& r = e += components::render();
+
+					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
+
+					w.face.set(assets::texture_id(int(assets::texture_id::BLANK)), cyan);
+					w.face.size.set(2, 2);
+					w.count = 30;
+					w.reach = xywh(164.f - 8.f + 90.f - 100, 220 - 100, 200, 200);
+					e.add_standard_components();
+				}
+
+				{
+					const auto e = world.create_entity("wandering_pixels");
+					auto& w = e += components::wandering_pixels();
+					auto& r = e += components::render();
+
+					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
+
+					w.face.set(assets::texture_id(int(assets::texture_id::BLANK)), orange);
+					w.face.size.set(2, 2);
+					w.count = 30;
+					w.reach = xywh(1164.f - 8.f + 90.f - 100, 220 - 100, 200, 200);
+					e.add_standard_components();
+				}
+
+				//{
+				//	const auto e = world.create_entity("wandering_pixels");
+				//	auto& w = e += components::wandering_pixels();
+				//	auto& r = e += components::render();
+				//
+				//	r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
+				//
+				//	w.face.set(assets::texture_id(int(assets::texture_id::WANDERING_CROSS)), cyan);
+				//	w.count = 15;
+				//	w.reach = xywh(164.f - 8.f + 90.f - 100, 220 - 100, 200, 200);
+				//	e.add_standard_components();
+				//}
+				//
+				//{
+				//	const auto e = world.create_entity("wandering_pixels");
+				//	auto& w = e += components::wandering_pixels();
+				//	auto& r = e += components::render();
+				//
+				//	r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
+				//
+				//	w.face.set(assets::texture_id(int(assets::texture_id::WANDERING_CROSS)), orange);
+				//	w.count = 15;
+				//	w.reach = xywh(1164.f - 8.f + 90.f - 100, 220 - 100, 200, 200);
+				//	e.add_standard_components();
+				//}
 			}
-			//{
-			//	const auto l = world.create_entity("wandering_pixels");
-			//	l += components::transform(1164.f + 24.f - 90.f, 220);
-			//	auto& light = l += components::light();
-			//	light.color = orange;
-			//	light.max_distance.base_value = 4500.f;
-			//	light.wall_max_distance.base_value = 4000.f;
-			//	l.add_standard_components();
-			//}
-
 
 			{
 				const auto l = world.create_entity("l");

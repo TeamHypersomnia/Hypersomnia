@@ -175,6 +175,8 @@ namespace resource_setups {
 		resource_manager.create(assets::texture_id::ROAD, "hypersomnia/gfx/road.png");
 		resource_manager.create(assets::texture_id::ROAD_FRONT_DIRT, "hypersomnia/gfx/road_front_dirt.png");
 
+		resource_manager.create(assets::texture_id::WANDERING_CROSS, "hypersomnia/gfx/wandering_cross.png");
+
 		resource_manager.create_inverse_with_flip(assets::animation_id::TORSO_MOVE,
 			assets::texture_id::TORSO_MOVING_FIRST,
 			assets::texture_id::TORSO_MOVING_LAST,

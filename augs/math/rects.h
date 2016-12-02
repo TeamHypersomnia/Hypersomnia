@@ -346,7 +346,7 @@ namespace augs {
 
 			void set(T x, T y, T w, T h) { *this = xywh(x, y, w, h); }
 			
-			vec2t<T> center() {
+			vec2t<T> center() const {
 				return{ x + this->w/2, y + this->h/2 };
 			}
 

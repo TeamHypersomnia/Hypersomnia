@@ -148,7 +148,7 @@ namespace rendering_scripts {
 		particles.draw(render_layer::EFFECTS, particles_input);
 
 		for (const auto e : step.visible_per_layer[render_layer::WANDERING_PIXELS_EFFECTS]) {
-			wandering_pixels.advance_wandering_pixels_for(e, step.get_delta());
+			wandering_pixels.advance_wandering_pixels_for(e, global_time_seconds, step.get_delta());
 			wandering_pixels.draw_wandering_pixels_for(e, wandering_input);
 		}
 

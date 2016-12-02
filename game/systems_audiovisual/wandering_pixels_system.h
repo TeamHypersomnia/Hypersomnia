@@ -32,6 +32,8 @@ public:
 
 	struct particle {
 		vec2 pos;
+		vec2 current_direction = vec2(1, 0);
+		float direction_ms_left = 0.f;
 	};
 
 	struct cache {
@@ -48,7 +50,7 @@ public:
 	cache& get_cache(const const_entity_handle);
 	const cache& get_cache(const const_entity_handle) const;
 
-	void advance_wandering_pixels_for(const const_entity_handle, const augs::delta dt);
+	void advance_wandering_pixels_for(const const_entity_handle, const float global_time, const augs::delta dt);
 	void draw_wandering_pixels_for(const const_entity_handle, const drawing_input&) const;
 
 	void reserve_caches_for_entities(const size_t) const {}

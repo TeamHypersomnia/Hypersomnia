@@ -34,6 +34,7 @@ namespace components {
 		}
 		else if (wandering_pixels) {
 			result.aabb = wandering_pixels->reach;
+			result.always_visible = true;
 		}
 
 		return result;
