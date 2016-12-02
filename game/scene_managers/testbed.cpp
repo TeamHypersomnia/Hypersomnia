@@ -134,6 +134,9 @@ namespace scene_managers {
 				l.add_standard_components();
 			}
 			{
+				const auto left_reach = xywh(164.f - 8.f + 90.f - 550, 220 - 250, 1000, 600);
+				const auto right_reach = xywh(1164.f - 8.f + 90.f - 600, 220 - 250, 1000, 600);
+
 				{
 					const auto e = world.create_entity("wandering_pixels");
 					auto& w = e += components::wandering_pixels();
@@ -144,7 +147,7 @@ namespace scene_managers {
 					w.face.set(assets::texture_id(int(assets::texture_id::BLINK_FIRST) + 2), cyan);
 					//w.face.size.set(1, 1);
 					w.count = 20;
-					w.reach = xywh(164.f - 8.f + 90.f - 100, 220 - 100, 200, 200);
+					w.reach = left_reach;
 					e.add_standard_components();
 				}
 
@@ -158,7 +161,7 @@ namespace scene_managers {
 					w.face.set(assets::texture_id(int(assets::texture_id::BLINK_FIRST) + 2), orange);
 					//w.face.size.set(1, 1);
 					w.count = 20;
-					w.reach = xywh(1164.f - 8.f + 90.f - 100, 220 - 100, 200, 200);
+					w.reach = right_reach;
 					e.add_standard_components();
 				}
 
@@ -172,7 +175,7 @@ namespace scene_managers {
 					w.face.set(assets::texture_id(int(assets::texture_id::BLANK)), cyan);
 					w.face.size.set(1, 1);
 					w.count = 50;
-					w.reach = xywh(164.f - 8.f + 90.f - 100, 220 - 100, 200, 200);
+					w.reach = left_reach;
 					e.add_standard_components();
 				}
 
@@ -186,7 +189,7 @@ namespace scene_managers {
 					w.face.set(assets::texture_id(int(assets::texture_id::BLANK)), orange);
 					w.face.size.set(1, 1);
 					w.count = 50;
-					w.reach = xywh(1164.f - 8.f + 90.f - 100, 220 - 100, 200, 200);
+					w.reach = right_reach;
 					e.add_standard_components();
 				}
 
@@ -200,7 +203,7 @@ namespace scene_managers {
 					w.face.set(assets::texture_id(int(assets::texture_id::BLANK)), cyan);
 					w.face.size.set(2, 2);
 					w.count = 30;
-					w.reach = xywh(164.f - 8.f + 90.f - 100, 220 - 100, 200, 200);
+					w.reach = left_reach;
 					e.add_standard_components();
 				}
 
@@ -214,7 +217,7 @@ namespace scene_managers {
 					w.face.set(assets::texture_id(int(assets::texture_id::BLANK)), orange);
 					w.face.size.set(2, 2);
 					w.count = 30;
-					w.reach = xywh(1164.f - 8.f + 90.f - 100, 220 - 100, 200, 200);
+					w.reach = right_reach;
 					e.add_standard_components();
 				}
 

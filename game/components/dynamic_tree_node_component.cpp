@@ -34,7 +34,12 @@ namespace components {
 		}
 		else if (wandering_pixels) {
 			result.aabb = wandering_pixels->reach;
-			result.always_visible = true;
+
+			const auto enlarge = result.aabb.get_size() * 0.3;
+			result.aabb.l -= enlarge.x;
+			result.aabb.t -= enlarge.y;
+			result.aabb.r += enlarge.x;
+			result.aabb.b += enlarge.y;
 		}
 
 		return result;

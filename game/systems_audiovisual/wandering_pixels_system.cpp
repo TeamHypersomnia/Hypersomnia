@@ -38,25 +38,48 @@ void wandering_pixels_system::advance_wandering_pixels_for(const const_entity_ha
 
 	if (!(cache.recorded_component.reach == wandering.reach)) {
 		for (auto& p : cache.particles) {
-			p.pos = wandering.reach.center();
+			p.pos.set(wandering.reach.x + cache.generator() % unsigned(wandering.reach.w) , wandering.reach.y + cache.generator() % unsigned(wandering.reach.h));
 		}
 
 		cache.recorded_component.reach = wandering.reach;
 	}
 
-	for (auto& p : cache.particles) {
-		static const vec2 offsets[4] = {
-			{ 1, 0 },
-			{ 0, 1 },
-			{ -1, 0 },
-			{ 0, -1 }
-		};
+	constexpr unsigned max_direction_time = 4000u;
+	constexpr float interp_time = 700.f;
 
+	for (auto& p : cache.particles) {
 		if (p.direction_ms_left <= 0.f) {
-			p.direction_ms_left = cache.generator() % 4000u + 800;
+			p.direction_ms_left = cache.generator() % max_direction_time + 800;
+
 			p.current_direction = p.current_direction.perpendicular_cw();
-			
-			if (cache.generator() % 2u) {
+
+			const auto dir = p.current_direction;
+			const auto reach = wandering.reach;
+
+			float chance_to_flip = 0.f;
+
+			if (dir.x > 0) {
+				chance_to_flip = (p.pos.x - reach.x) / reach.w;
+			}
+			else if (dir.x < 0) {
+				chance_to_flip = 1.0 - (p.pos.x - reach.x) / reach.w;
+			}
+			if (dir.y > 0) {
+				chance_to_flip = (p.pos.y - reach.y) / reach.h;
+			}
+			else if (dir.y < 0) {
+				chance_to_flip = 1.0 - (p.pos.y - reach.y) / reach.h;
+			}
+
+			if (chance_to_flip < 0) {
+				chance_to_flip = 0;
+			}
+
+			if (chance_to_flip > 1) {
+				chance_to_flip = 1;
+			}
+
+			if (cache.generator() % 100u <= chance_to_flip * 100.f) {
 				p.current_direction = -p.current_direction;
 			}
 		}
@@ -65,13 +88,12 @@ void wandering_pixels_system::advance_wandering_pixels_for(const const_entity_ha
 		}
 
 		vec2 considered_direction;
-		const float interp_time = 700.f;
 
 		if (p.direction_ms_left <= interp_time) {
 			considered_direction = augs::interp(vec2(), p.current_direction, p.direction_ms_left / interp_time);
 		}
-		else if (p.direction_ms_left >= 4000.f - interp_time) {
-			considered_direction = augs::interp(vec2(), p.current_direction, (4000 - p.direction_ms_left) / interp_time);
+		else if (p.direction_ms_left >= max_direction_time - interp_time) {
+			considered_direction = augs::interp(vec2(), p.current_direction, (max_direction_time - p.direction_ms_left) / interp_time);
 		}
 		else
 		{
