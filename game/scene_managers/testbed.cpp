@@ -371,7 +371,7 @@ namespace scene_managers {
 		prefabs::create_cyan_charge(world, vec2(200, -500));
 
 		prefabs::create_cyan_urban_machete(world, vec2(100, 100));
-		const auto second_machete = prefabs::create_cyan_urban_machete(world, vec2(0, 0));
+		const auto second_machete = prefabs::create_cyan_urban_machete(world, vec2(0, 300));
 
 		const auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
 		prefabs::create_sample_backpack(world, vec2(200, -750));
