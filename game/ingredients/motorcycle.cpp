@@ -138,7 +138,7 @@ namespace prefabs {
 		{
 			messages::create_particle_effect effect;
 			effect.place_of_birth = spawn_transform;
-			effect.place_of_birth.pos -= vec2(rear_offset.x - 40.f, 0).rotate(effect.place_of_birth.rotation, vec2());
+			effect.place_of_birth.pos -= vec2(rear_offset.x - 50.f, 0).rotate(effect.place_of_birth.rotation, vec2());
 			effect.place_of_birth.rotation += 180;
 			effect.input.effect = assets::particle_effect_id::ENGINE_PARTICLES;
 			effect.input.randomize_position_within_radius = 10.f;

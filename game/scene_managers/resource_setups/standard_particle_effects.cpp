@@ -93,12 +93,21 @@ namespace resource_setups {
 
 			{
 				resources::emission em;
-				em.spread_degrees = std::make_pair(0, 0);
-				em.particles_per_sec = std::make_pair(450, 450);
+				//em.min_swing_spread.set(0.5, 1);
+				//em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+				//em.max_swing_spread.set(10 / 2, 10 / 2);
+				//em.max_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+				//
+				//em.swing_spread.set(0, 0);
+				//em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
+				//em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
+				//
+				//em.spread_degrees = std::make_pair(6, 6);
+				em.particles_per_sec = std::make_pair(500, 500);
 				em.stream_duration_ms = std::make_pair(3000000, 3000000);
 				em.base_velocity = std::make_pair(10, 100);
 				em.angular_velocity = std::make_pair(0, 0);
-				em.particle_lifetime_ms = std::make_pair(80, 100);
+				em.particle_lifetime_ms = std::make_pair(40, 100);
 
 				//for (int i = 0; i < 6; ++i) {
 					resources::particle particle_template;
