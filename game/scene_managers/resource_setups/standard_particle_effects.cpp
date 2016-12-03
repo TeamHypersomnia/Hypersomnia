@@ -66,11 +66,11 @@ namespace resource_setups {
 				em.particles_per_sec = std::make_pair(80, 80);
 				em.stream_duration_ms = std::make_pair(3000000, 3000000);
 
-				em.base_velocity = std::make_pair(50, 200);
+				em.base_velocity = std::make_pair(100, 110);
 				em.base_velocity_variation = std::make_pair(5.f, 10.f);
 
 				em.angular_velocity = std::make_pair(2.5f*RAD_TO_DEGf, 2.8f*RAD_TO_DEGf);
-				em.particle_lifetime_ms = std::make_pair(4000, 4000);
+				em.particle_lifetime_ms = std::make_pair(2500, 2500);
 
 				for (int i = 0; i < 3; ++i) {
 					resources::particle particle_template;
@@ -79,7 +79,7 @@ namespace resource_setups {
 					particle_template.linear_damping = 10;
 					particle_template.face.set(assets::texture_id(int(assets::texture_id::SMOKE_PARTICLE_FIRST) + i), augs::rgba(255, 255, 255, 60));
 					particle_template.unshrinking_time_ms = 150.f;
-					particle_template.shrink_when_ms_remaining = 1500.f;
+					particle_template.shrink_when_ms_remaining = 1000.f;
 
 					em.particle_templates.push_back(particle_template);
 				}
