@@ -33,6 +33,7 @@ public:
 	struct particle {
 		vec2 pos;
 		vec2 current_direction = vec2(1, 0);
+		float current_velocity = 20.f;
 		float direction_ms_left = 0.f;
 	};
 
