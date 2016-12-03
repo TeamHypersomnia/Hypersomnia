@@ -5,6 +5,7 @@
 
 #include "game/systems_stateless/input_system.h"
 #include "game/systems_stateless/render_system.h"
+#include "game/systems_stateless/particles_existence_system.h"
 #include "game/systems_stateless/gui_system.h"
 #include "game/components/sentience_component.h"
 #include "game/components/attitude_component.h"
@@ -275,7 +276,7 @@ namespace scene_managers {
 			effect.input.randomize_position_within_radius = 500.f;
 			effect.input.single_displacement_duration_ms.set(400.f, 1500.f);
 
-			step.transient.messages.post(effect);
+			particles_existence_system().create_particle_effect_entity(world, effect).add_standard_components();
 
 			{
 				const auto e = world.create_entity("tiled_floor");

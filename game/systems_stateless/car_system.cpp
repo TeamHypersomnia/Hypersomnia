@@ -12,6 +12,9 @@
 #include "game/components/physics_component.h"
 #include "game/components/transform_component.h"
 #include "game/components/special_physics_component.h"
+#include "game/components/sub_entities_component.h"
+#include "game/components/processing_component.h"
+#include "game/components/particles_existence_component.h"
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/step.h"
@@ -148,6 +151,17 @@ void car_system::apply_movement_forces(logic_step& step) {
 			//physics.body->ApplyTorque((angular_resistance * sqrt(sqrt(angular_speed * angular_speed)) + 0.2 * angular_speed * angular_speed)* -sgn(angular_speed) * b->GetInertia(), true);
 			physics.apply_angular_impulse(delta.in_seconds() * (angular_resistance * angular_speed * angular_speed)* -sgn(angular_speed) * physics.get_inertia());
 		}
+
+		it.for_each_sub_entity_recursive([&](const entity_handle h) {
+			if (h.has<components::particles_existence>()) {
+				if (car.accelerating) {
+					h.get<components::processing>().enable_in(processing_subjects::WITH_PARTICLES_EXISTENCE);
+				}
+				else {
+					h.get<components::processing>().disable_in(processing_subjects::WITH_PARTICLES_EXISTENCE);
+				}
+			}
+		});
 
 		//float angle = physics.get_angle();
 		//LOG("F: %x, %x, %x", AS_INTV physics.get_position(), AS_INT angle, AS_INTV physics.velocity());

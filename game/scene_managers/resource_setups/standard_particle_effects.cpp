@@ -49,6 +49,84 @@ namespace resource_setups {
 		}
 
 		{
+			auto& effect = resource_manager.create(assets::particle_effect_id::ENGINE_PARTICLES);
+
+			{
+				resources::emission em;
+				em.min_swing_spread.set(0.5, 1);
+				em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+				em.max_swing_spread.set(10 / 2, 10 / 2);
+				em.max_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+
+				em.swing_spread.set(0, 0);
+				em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
+				em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
+
+				em.spread_degrees = std::make_pair(7, 7);
+				em.particles_per_sec = std::make_pair(80, 80);
+				em.stream_duration_ms = std::make_pair(3000000, 3000000);
+
+				em.base_velocity = std::make_pair(50, 200);
+				em.base_velocity_variation = std::make_pair(5.f, 10.f);
+
+				em.angular_velocity = std::make_pair(2.5f*RAD_TO_DEGf, 2.8f*RAD_TO_DEGf);
+				em.particle_lifetime_ms = std::make_pair(4000, 4000);
+
+				for (int i = 0; i < 3; ++i) {
+					resources::particle particle_template;
+
+					particle_template.angular_damping = 0;
+					particle_template.linear_damping = 10;
+					particle_template.face.set(assets::texture_id(int(assets::texture_id::SMOKE_PARTICLE_FIRST) + i), augs::rgba(255, 255, 255, 60));
+					particle_template.unshrinking_time_ms = 150.f;
+					particle_template.shrink_when_ms_remaining = 1500.f;
+
+					em.particle_templates.push_back(particle_template);
+				}
+
+				em.size_multiplier = std::make_pair(1.0, 1.0);
+				em.particle_render_template.layer = render_layer::DIM_SMOKES;
+				em.initial_rotation_variation = 180;
+
+				effect.push_back(em);
+			}
+
+			{
+				resources::emission em;
+				em.spread_degrees = std::make_pair(0, 0);
+				em.particles_per_sec = std::make_pair(450, 450);
+				em.stream_duration_ms = std::make_pair(3000000, 3000000);
+				em.base_velocity = std::make_pair(10, 100);
+				em.angular_velocity = std::make_pair(0, 0);
+				em.particle_lifetime_ms = std::make_pair(80, 100);
+
+				//for (int i = 0; i < 6; ++i) {
+					resources::particle particle_template;
+
+					particle_template.angular_damping = 0;
+					//if (i == 5) {
+					//	particle_template.face.set(assets::texture_id(int(assets::texture_id::BLINK_FIRST) + 3), augs::rgba(255, 255, 255, 255));
+					//}
+					//else {
+						particle_template.face.set(assets::texture_id(int(assets::texture_id::ROUND_TRACE)), augs::rgba(255, 255, 255, 255));
+					//}
+					//particle_template.face.size_multiplier.set(1, 0.5);					
+					particle_template.unshrinking_time_ms = 30.f;
+					particle_template.shrink_when_ms_remaining = 30.f;
+					particle_template.alpha_levels = 1;
+					
+					em.particle_templates.push_back(particle_template);
+				//}
+
+				em.size_multiplier = std::make_pair(1.0, 1.0);
+				em.particle_render_template.layer = render_layer::EFFECTS;
+				em.initial_rotation_variation = 0;
+
+				effect.push_back(em);
+			}
+		}
+
+		{
 			auto& effect = resource_manager.create(assets::particle_effect_id::PIXEL_BARREL_LEAVE_EXPLOSION);
 
 			resources::emission em;

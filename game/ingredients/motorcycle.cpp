@@ -3,6 +3,8 @@
 #include "game/transcendental/cosmos.h"
 
 #include "game/components/position_copying_component.h"
+#include "game/systems_stateless/particles_existence_system.h"
+#include "game/components/particles_existence_component.h"
 
 #include "game/components/crosshair_component.h"
 #include "game/components/sprite_component.h"
@@ -79,6 +81,8 @@ namespace prefabs {
 			front += colliders;
 			front.get<components::fixtures>().set_owner_body(front);
 		}
+		
+		vec2 rear_offset;
 
 		{
 			auto& sprite = interior += components::sprite();
@@ -96,6 +100,7 @@ namespace prefabs {
 			info.filter = filters::see_through_dynamic_object();
 			vec2 offset((front.get<components::sprite>().size.x / 2 + sprite.size.x / 2 - 1) * -1, 0);
 			colliders.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
+			rear_offset = front.get<components::sprite>().size + sprite.size;
 
 			interior += colliders;
 			interior.get<components::fixtures>().set_owner_body(front);
@@ -128,6 +133,26 @@ namespace prefabs {
 			
 			left_wheel += colliders;
 			left_wheel.get<components::fixtures>().set_owner_body(front);
+		}
+
+		{
+			messages::create_particle_effect effect;
+			effect.place_of_birth = spawn_transform;
+			effect.place_of_birth.pos -= vec2(rear_offset.x - 40.f, 0).rotate(effect.place_of_birth.rotation, vec2());
+			effect.place_of_birth.rotation += 180;
+			effect.input.effect = assets::particle_effect_id::ENGINE_PARTICLES;
+			effect.input.randomize_position_within_radius = 10.f;
+			effect.input.single_displacement_duration_ms.set(400.f, 1500.f);
+			effect.subject = front;
+			effect.input.modifier.colorize = cyan;
+
+			const auto rear_engine = particles_existence_system().create_particle_effect_entity(world, effect);
+
+			auto& existence = rear_engine.get<components::particles_existence>();
+			existence.distribute_within_segment_of_length = interior.get<components::sprite>().size.y;
+
+			rear_engine.add_standard_components();
+			front.add_sub_entity(rear_engine);
 		}
 
 		front.add_standard_components();

@@ -1,5 +1,6 @@
 #include "ingredients.h"
 
+#include "game/systems_stateless/particles_existence_system.h"
 #include "game/components/position_copying_component.h"
 
 #include "game/components/crosshair_component.h"
@@ -15,6 +16,7 @@
 #include "game/components/fixtures_component.h"
 #include "game/components/special_physics_component.h"
 #include "game/components/name_component.h"
+#include "game/components/particles_existence_component.h"
 #include "game/transcendental/cosmos.h"
 
 #include "game/enums/filters.h"
@@ -24,6 +26,7 @@ namespace prefabs {
 		auto front = world.create_entity("front");
 		auto interior = world.create_entity("interior");
 		auto left_wheel = world.create_entity("left_wheel");
+
 
 		front.add_sub_entity(interior);
 		front.add_sub_entity(left_wheel);
@@ -62,6 +65,7 @@ namespace prefabs {
 			//physics.air_resistance = 0.2f;
 		}
 
+		vec2 rear_offset;
 		{
 			auto& sprite = interior += components::sprite();
 			auto& render = interior += components::render();
@@ -80,7 +84,8 @@ namespace prefabs {
 			fixture.filter = filters::friction_ground();
 
 			vec2 offset((front.get<components::sprite>().size.x / 2 + sprite.size.x / 2) * -1, 0);
-			
+			rear_offset = front.get<components::sprite>().size + sprite.size;
+
 			colliders.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
 			colliders.is_friction_ground = true;
 
@@ -117,6 +122,26 @@ namespace prefabs {
 			left_wheel += colliders;
 
 			left_wheel.get<components::fixtures>().set_owner_body(front);
+		}
+
+		{
+			messages::create_particle_effect effect;
+			effect.place_of_birth = spawn_transform;
+			effect.place_of_birth.pos -= vec2(rear_offset.x - 80.f, 0).rotate(effect.place_of_birth.rotation, vec2());
+			effect.place_of_birth.rotation += 180;
+			effect.input.effect = assets::particle_effect_id::ENGINE_PARTICLES;
+			effect.input.randomize_position_within_radius = 15.f;
+			effect.input.single_displacement_duration_ms.set(200.f, 1000.f);
+			effect.subject = front;
+			effect.input.modifier.colorize = cyan;
+
+			const auto rear_engine = particles_existence_system().create_particle_effect_entity(world, effect);
+
+			auto& existence = rear_engine.get<components::particles_existence>();
+			existence.distribute_within_segment_of_length = interior.get<components::sprite>().size.y * 0.8;
+
+			rear_engine.add_standard_components();
+			front.add_sub_entity(rear_engine);
 		}
 
 		front.add_standard_components();

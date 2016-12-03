@@ -30,12 +30,13 @@ void particles_simulation_system::draw(const render_layer layer, const drawing_i
 			//	}
 			//}
 		}
-		
+
 		if (it.unshrinking_time_ms > 0.f) {
 			size_mult *= std::min(1.f, (it.lifetime_ms / it.unshrinking_time_ms)*(it.lifetime_ms / it.unshrinking_time_ms));
 		}
 
-		it.face.size_multiplier.set(size_mult, size_mult);
+		it.face.size_multiplier.x *= size_mult;
+		it.face.size_multiplier.y *= size_mult;
 
 		components::sprite::drawing_input in(group_input.target_buffer);
 
@@ -90,7 +91,7 @@ resources::particle& particles_simulation_system::spawn_particle(randomization& 
 			rng.randval(emission.acceleration);
 	}
 
-	
+
 	particles[emission.particle_render_template.layer].push_back(new_particle);
 	return *particles[emission.particle_render_template.layer].rbegin();
 }
@@ -125,7 +126,7 @@ void particles_simulation_system::advance_streams_and_particles(const cosmos& co
 			randomization rng = existence.rng_seed;
 			cache.recorded_existence = existence;
 			cache.emission_instances.clear();
-			
+
 			for (auto emission : (*existence.input.effect)) {
 				emission.apply_modifier(existence.input.modifier);
 
@@ -134,7 +135,7 @@ void particles_simulation_system::advance_streams_and_particles(const cosmos& co
 
 				const auto var_v = rng.randval(emission.base_velocity_variation);
 				//LOG("V: %x", var_v);
-				target_stream.velocity.set(std::max(0.f, emission.base_velocity.first - var_v/2), emission.base_velocity.second + var_v / 2);
+				target_stream.velocity.set(std::max(0.f, emission.base_velocity.first - var_v / 2), emission.base_velocity.second + var_v / 2);
 				//LOG("Vl: %x Vu: %x", target_stream.velocity.first, target_stream.velocity.second);
 
 				target_stream.stream_info = emission;
@@ -166,41 +167,45 @@ void particles_simulation_system::advance_streams_and_particles(const cosmos& co
 		bool should_destroy = true;
 
 		for (auto& instance : cache.emission_instances) {
-			if (instance.enable_streaming) {
-				const float stream_delta = std::min(delta.in_milliseconds(), instance.stream_max_lifetime_ms - instance.stream_lifetime_ms);
-				
-				instance.stream_lifetime_ms += stream_delta;
-				
-				if (instance.stream_lifetime_ms > instance.stream_max_lifetime_ms) {
-					continue;
-				}
+			const float stream_delta = std::min(delta.in_milliseconds(), instance.stream_max_lifetime_ms - instance.stream_lifetime_ms);
 
-				auto new_particles_to_spawn_by_time = instance.target_particles_per_sec * (stream_delta / 1000.f);
-				
-				instance.stream_particles_to_spawn += new_particles_to_spawn_by_time;
+			instance.stream_lifetime_ms += stream_delta;
 
-				instance.swings_per_sec += rng.randval(-instance.swing_speed_change, instance.swing_speed_change);
-				instance.swing_spread += rng.randval(-instance.swing_spread_change, instance.swing_spread_change);
+			if (instance.stream_lifetime_ms > instance.stream_max_lifetime_ms) {
+				continue;
+			}
 
-				if (instance.max_swing_spread > 0) {
-					augs::clamp(instance.swing_spread, instance.min_swing_spread, instance.max_swing_spread);
-				}
-				if (instance.max_swings_per_sec > 0) {
-					augs::clamp(instance.swings_per_sec, instance.min_swings_per_sec, instance.max_swings_per_sec);
-				}
+			auto new_particles_to_spawn_by_time = instance.target_particles_per_sec * (stream_delta / 1000.f);
 
-				const int to_spawn = static_cast<int>(std::floor(instance.stream_particles_to_spawn));
+			instance.stream_particles_to_spawn += new_particles_to_spawn_by_time;
 
-				for (int i = 0; i < to_spawn; ++i) {
-					const float t = (static_cast<float>(i) / to_spawn);
-					const float time_elapsed = (1.f - t) * delta.in_seconds();
+			instance.swings_per_sec += rng.randval(-instance.swing_speed_change, instance.swing_speed_change);
+			instance.swing_spread += rng.randval(-instance.swing_spread_change, instance.swing_spread_change);
 
-					spawn_particle(rng, instance, transform.pos, transform.rotation +
-						instance.swing_spread * static_cast<float>(sin((instance.stream_lifetime_ms / 1000.f) * 2 * PI_f * instance.swings_per_sec))
-						, instance.target_spread, instance.stream_info).integrate(time_elapsed);
+			if (instance.max_swing_spread > 0) {
+				augs::clamp(instance.swing_spread, instance.min_swing_spread, instance.max_swing_spread);
+			}
+			if (instance.max_swings_per_sec > 0) {
+				augs::clamp(instance.swings_per_sec, instance.min_swings_per_sec, instance.max_swings_per_sec);
+			}
 
-					instance.stream_particles_to_spawn -= 1.f;
-				}
+			const int to_spawn = static_cast<int>(std::floor(instance.stream_particles_to_spawn));
+
+			const auto segment_length = existence.distribute_within_segment_of_length;
+			const vec2 segment_A = transform.pos + vec2().set_from_degrees(transform.rotation + 90).set_length(segment_length / 2);
+			const vec2 segment_B = transform.pos - vec2().set_from_degrees(transform.rotation + 90).set_length(segment_length / 2);
+
+			for (int i = 0; i < to_spawn; ++i) {
+				const float t = (static_cast<float>(i) / to_spawn);
+				const float time_elapsed = (1.f - t) * delta.in_seconds();
+
+				const vec2 segment_position = augs::interp(segment_A, segment_B, rng.randval(0.f, 1.f));
+
+				spawn_particle(rng, instance, segment_position, transform.rotation +
+					instance.swing_spread * static_cast<float>(sin((instance.stream_lifetime_ms / 1000.f) * 2 * PI_f * instance.swings_per_sec))
+					, instance.target_spread, instance.stream_info).integrate(time_elapsed);
+
+				instance.stream_particles_to_spawn -= 1.f;
 			}
 		}
 	}

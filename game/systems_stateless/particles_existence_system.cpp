@@ -159,6 +159,39 @@ void particles_existence_system::game_responses_to_particle_effects(logic_step& 
 	}
 }
 
+entity_handle particles_existence_system::create_particle_effect_entity(cosmos& cosmos, const messages::create_particle_effect it) const {
+	entity_handle new_stream_entity = cosmos.create_entity("particle_stream");
+	auto& target_transform = new_stream_entity += it.place_of_birth;
+
+	const auto rng_seed = cosmos.get_rng_seed_for(new_stream_entity);
+
+	auto& existence = new_stream_entity += components::particles_existence();
+	existence.input = it.input;
+	existence.rng_seed = rng_seed;
+	existence.time_of_birth = cosmos.get_timestamp();
+	existence.time_of_last_displacement = cosmos.get_timestamp();
+	existence.current_displacement_duration_bound_ms = 0;
+
+	existence.max_lifetime_in_steps = (*std::max_element((*it.input.effect).begin(), (*it.input.effect).end(), [](const auto& a, const auto& b) {
+		return a.stream_duration_ms.second < b.stream_duration_ms.second;
+	})).stream_duration_ms.second;
+
+	const auto subject = cosmos[it.subject];
+
+	if (subject.alive()) {
+		auto& target_position_copying = new_stream_entity += components::position_copying(it.subject);
+
+		const auto subject_transform = subject.logic_transform();
+		target_position_copying.position_copying_type = components::position_copying::position_copying_type::ORBIT;
+
+		target_position_copying.position_copying_rotation = true;
+		target_position_copying.rotation_offset = it.place_of_birth.rotation - subject_transform.rotation;
+		target_position_copying.rotation_orbit_offset = (it.place_of_birth.pos - subject_transform.pos).rotate(-subject_transform.rotation, vec2(0.f, 0.f));
+	}
+
+	return new_stream_entity;
+}
+
 void particles_existence_system::create_particle_effects(logic_step& step) const {
 	using namespace components;
 	using namespace messages;
@@ -167,35 +200,7 @@ void particles_existence_system::create_particle_effects(logic_step& step) const
 	auto& events = step.transient.messages.get_queue<create_particle_effect>();
 
 	for (auto& it : events) {
-		entity_handle new_stream_entity = cosmos.create_entity("particle_stream");
-		auto& target_transform = new_stream_entity += it.place_of_birth;
-
-		const auto rng_seed = cosmos.get_rng_seed_for(new_stream_entity);
-
-		auto& existence = new_stream_entity += components::particles_existence();
-		existence.input = it.input;
-		existence.rng_seed = rng_seed;
-		existence.time_of_birth = cosmos.get_timestamp();
-		existence.time_of_last_displacement = cosmos.get_timestamp();
-		existence.current_displacement_duration_bound_ms = 0;
-
-		existence.max_lifetime_in_steps = (*std::max_element((*it.input.effect).begin(), (*it.input.effect).end(), [](const auto& a, const auto& b){
-			return a.stream_duration_ms.second < b.stream_duration_ms.second;
-		})).stream_duration_ms.second;
-
-		const auto subject = cosmos[it.subject];
-
-		if (subject.alive()) {
-			auto& target_position_copying = new_stream_entity += components::position_copying(it.subject);
-			
-			const auto subject_transform = subject.logic_transform();
-			target_position_copying.position_copying_type = components::position_copying::position_copying_type::ORBIT;
-
-			target_position_copying.rotation_offset = it.place_of_birth.rotation - subject_transform.rotation;
-			target_position_copying.rotation_orbit_offset = (it.place_of_birth.pos - subject_transform.pos).rotate(-subject_transform.rotation, vec2(0.f, 0.f));
-		}
-
-		new_stream_entity.add_standard_components();
+		create_particle_effect_entity(cosmos, it).add_standard_components();
 	}
 
 	events.clear();

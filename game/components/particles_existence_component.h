@@ -31,8 +31,6 @@ namespace components {
 		unsigned max_lifetime_in_steps = 0u;
 
 		float distribute_within_segment_of_length = 0.f;
-		bool enable_streaming = false;
-		padding_byte pad[3];
 
 		bool operator==(const particles_existence&) const;
 		bool operator!=(const particles_existence&) const;
