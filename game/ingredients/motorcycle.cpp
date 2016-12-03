@@ -40,7 +40,7 @@ namespace prefabs {
 
 			car.left_wheel_trigger = left_wheel;
 			car.input_acceleration.set(1000, 1000);
-			car.acceleration_length = 3500;
+			car.acceleration_length = 2800;
 			
 			car.wheel_offset = vec2(35, 0);
 			car.maximum_lateral_cancellation_impulse = 50;
