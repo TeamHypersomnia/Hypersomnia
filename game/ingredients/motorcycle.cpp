@@ -138,18 +138,18 @@ namespace prefabs {
 		{
 			messages::create_particle_effect effect;
 			effect.place_of_birth = spawn_transform;
-			effect.place_of_birth.pos -= vec2(rear_offset.x - 50.f, 0).rotate(effect.place_of_birth.rotation, vec2());
+			effect.place_of_birth.pos -= vec2(rear_offset.x - 40.f, 0).rotate(effect.place_of_birth.rotation, vec2());
 			effect.place_of_birth.rotation += 180;
 			effect.input.effect = assets::particle_effect_id::ENGINE_PARTICLES;
-			effect.input.randomize_position_within_radius = 10.f;
-			effect.input.single_displacement_duration_ms.set(400.f, 1500.f);
+			//effect.input.randomize_position_within_radius = 10.f;
+			//effect.input.single_displacement_duration_ms.set(400.f, 1500.f);
 			effect.subject = front;
 			effect.input.modifier.colorize = cyan;
 
 			const auto rear_engine = particles_existence_system().create_particle_effect_entity(world, effect);
 
 			auto& existence = rear_engine.get<components::particles_existence>();
-			existence.distribute_within_segment_of_length = interior.get<components::sprite>().size.y;
+			existence.distribute_within_segment_of_length = interior.get<components::sprite>().size.y * 0.6;
 
 			rear_engine.add_standard_components();
 			front.add_sub_entity(rear_engine);
