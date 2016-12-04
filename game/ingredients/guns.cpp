@@ -32,7 +32,7 @@ namespace ingredients {
 			slot_def.category_allowed = item_category::MAGAZINE;
 			slot_def.attachment_sticking_mode = augs::rects::sticking::TOP;
 			slot_def.attachment_offset.pos.set(10, 5);
-			slot_def.attachment_offset.rotation = -90;
+			//slot_def.attachment_offset.rotation = -90;
 
 			container.slots[slot_function::GUN_DETACHABLE_MAGAZINE] = slot_def;
 		}
@@ -295,6 +295,78 @@ namespace prefabs {
 
 		gun.recoil.repeat_last_n_offsets = 20;
 		gun.recoil.scale = 30.0f/2;
+
+		gun.recoil.offsets = {
+			{ vec2().set_from_degrees(1.35f*2.f) },
+			{ vec2().set_from_degrees(1.35f*2.f) },
+			{ vec2().set_from_degrees(1.35f*2.6f) },
+			{ vec2().set_from_degrees(1.35f*2.8f) },
+			{ vec2().set_from_degrees(1.35f*3.2f) },
+			{ vec2().set_from_degrees(1.35f*3.0f) },
+			{ vec2().set_from_degrees(1.35f*2.7f) },
+			{ vec2().set_from_degrees(1.35f*2.3f) },
+			{ vec2().set_from_degrees(1.35f*2.0f) },
+			{ vec2().set_from_degrees(1.35f*0.3f) },
+			{ vec2().set_from_degrees(1.35f*-0.5f) },
+			{ vec2().set_from_degrees(1.35f*-1.0f) },
+			{ vec2().set_from_degrees(1.35f*-1.5f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-3.2f) },
+			{ vec2().set_from_degrees(1.35f*-4.0f) },
+			{ vec2().set_from_degrees(1.35f*2.3f) },
+			{ vec2().set_from_degrees(1.35f*2.5f) },
+			{ vec2().set_from_degrees(1.35f*1.7f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*3.0f) },
+		};
+
+		weapon.add_standard_components();
+
+		if (load_mag.alive()) {
+			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);
+			perform_transfer({ load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1 }, step);
+		}
+
+		return weapon;
+	}
+
+	entity_handle create_sample_bilmer2000(logic_step& step, vec2 pos, entity_id load_mag_id) {
+		auto& cosmos = step.cosm;
+		auto load_mag = cosmos[load_mag_id];
+
+		auto weapon = cosmos.create_entity("sample_rifle");
+		name_entity(weapon, entity_name::BILMER2000);
+
+		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::BILMER2000, augs::white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::see_through_dynamic_body(weapon);
+		ingredients::default_gun_container(weapon);
+		auto& container = weapon.get<components::container>();
+		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_offset.pos.set(-10, -10);
+		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_sticking_mode = augs::rects::sticking::BOTTOM;
+
+		auto& gun = weapon += components::gun();
+
+		gun.action_mode = components::gun::action_type::AUTOMATIC;
+		gun.muzzle_velocity = std::make_pair(4500.f, 4500.f);
+		gun.shot_cooldown = augs::stepped_cooldown(150);
+		gun.bullet_spawn_offset.set(sprite.size.x / 2, 0);
+		gun.camera_shake_radius = 5.f;
+		gun.camera_shake_spread_degrees = 45.f;
+
+		gun.shell_spawn_offset.pos.set(0, 10);
+		gun.shell_spawn_offset.rotation = 45;
+		gun.shell_angular_velocity = std::make_pair(2.f, 14.f);
+		gun.shell_spread_degrees = 20.f;
+		gun.shell_velocity = std::make_pair(300.f, 1700.f);
+		gun.damage_multiplier = 2.5f;
+
+		gun.recoil.repeat_last_n_offsets = 20;
+		gun.recoil.scale = 30.0f / 2;
 
 		gun.recoil.offsets = {
 			{ vec2().set_from_degrees(1.35f*2.f) },

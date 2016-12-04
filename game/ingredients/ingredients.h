@@ -56,6 +56,7 @@ namespace prefabs {
 
 	entity_handle create_sample_magazine(logic_step&, components::transform pos, std::string space = "0.30", entity_id charge_inside = entity_id());
 	entity_handle create_sample_rifle(logic_step&, vec2 pos, entity_id load_mag = entity_id());
+	entity_handle create_sample_bilmer2000(logic_step&, vec2 pos, entity_id load_mag = entity_id());
 	entity_handle create_pistol(logic_step&, vec2 pos, entity_id load_mag = entity_id());
 	entity_handle create_submachine(logic_step&, vec2 pos, entity_id load_mag = entity_id());
 	

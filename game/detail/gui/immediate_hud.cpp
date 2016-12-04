@@ -203,8 +203,8 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 					}
 				};
 
-				examine_item_slot(v[slot_function::SECONDARY_HAND], starting_health_angle + 90 + 22.5, 90, false);
-				examine_item_slot(v[slot_function::PRIMARY_HAND], starting_health_angle - 90 - 22.5, 90, true);
+				examine_item_slot(v[slot_function::SECONDARY_HAND], starting_health_angle + 90 + 22.5, 45, false);
+				examine_item_slot(v[slot_function::PRIMARY_HAND], starting_health_angle - 22.5 - 45, 45, true);
 			}
 
 			const int radius = (*assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM).get_size().x / 2;

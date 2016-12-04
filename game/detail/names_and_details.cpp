@@ -10,6 +10,11 @@ textual_description description_by_entity_name(const entity_name n) {
 			L"Assault rifle",
 			L"General purpose charge launcher."
 		};
+	case entity_name::BILMER2000:
+		return{
+			L"Bilmer 2000",
+			L"Robi super naclick."
+		};
 	case entity_name::PINK_CHARGE:
 		return{
 			L"Pink charge",

@@ -27,6 +27,12 @@ namespace resource_setups {
 		}
 
 		{
+			auto& gui = resource_manager.create(assets::texture_id::BILMER2000, "hypersomnia/gfx/bilmer2000.png").gui_sprite_def;
+			gui.flip_horizontally = true;
+			gui.flip_vertically = false;
+		}
+
+		{
 			auto& gui = resource_manager.create(assets::texture_id::SHOTGUN, "hypersomnia/gfx/shotgun.png").gui_sprite_def;
 			gui.flip_horizontally = true;
 			gui.flip_vertically = true;

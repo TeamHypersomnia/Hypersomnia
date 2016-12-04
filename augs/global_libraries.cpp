@@ -30,6 +30,9 @@
 
 #include <signal.h>
 
+#include <AL/al.h>
+#include <AL/alc.h>
+
 void SignalHandler(int signal) {
 	augs::window::disable_cursor_clipping();
 	throw "Access violation!";
@@ -81,6 +84,27 @@ namespace augs {
 		if (to_initialize & ENET) {
 			errs(enet_initialize() == 0, L"Failed to initialize enet");
 		}
+
+		if (to_initialize & library::AUDIO) {
+
+			ALCdevice *device;
+			ALCcontext *context;
+
+			device = alcOpenDevice(NULL);
+
+			context = alcCreateContext(device, NULL);
+			if (!context || alcMakeContextCurrent(context) == ALC_FALSE)
+			{
+				if (context)
+					alcDestroyContext(context);
+				alcCloseDevice(device);
+				printf("\n!!! Failed to set a context !!!\n\n");
+			}
+
+			alcMakeContextCurrent(NULL);
+			alcDestroyContext(context);
+			alcCloseDevice(device);
+		}
 #endif
 		initialized |= to_initialize;
 	}
@@ -100,6 +124,11 @@ namespace augs {
 			ensure(initialized & ENET);
 			enet_deinitialize();
 			initialized &= ~ENET;
+		}
+
+		if (which_augs & library::AUDIO) {
+			ensure(initialized & library::AUDIO);
+			initialized &= ~library::AUDIO;
 		}
 	}
 

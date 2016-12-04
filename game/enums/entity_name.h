@@ -6,6 +6,7 @@ enum class entity_name {
 	INVALID,
 
 	ASSAULT_RIFLE,
+	BILMER2000,
 	MAGAZINE,
 	GREEN_CHARGE,
 	PINK_CHARGE,
