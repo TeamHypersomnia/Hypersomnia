@@ -7,4 +7,5 @@ namespace resource_setups {
 	void load_standard_particle_effects();
 	void load_standard_behaviour_trees();
 	void load_standard_tile_layers();
+	void load_standard_sound_buffers();
 }

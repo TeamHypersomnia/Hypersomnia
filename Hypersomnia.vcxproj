@@ -360,6 +360,7 @@
     <ClCompile Include="game\detail\world_camera.cpp" />
     <ClCompile Include="game\resources\tile_layer.cpp" />
     <ClCompile Include="game\scene_managers\rendering_scripts\illuminated_rendering.cpp" />
+    <ClCompile Include="game\scene_managers\resource_setups\standard_sound_buffers.cpp" />
     <ClCompile Include="game\scene_managers\resource_setups\standard_tile_layers.cpp" />
     <ClCompile Include="game\systems_audiovisual\interpolation_system.cpp" />
     <ClCompile Include="game\scene_managers\networked_testbed.cpp" />
