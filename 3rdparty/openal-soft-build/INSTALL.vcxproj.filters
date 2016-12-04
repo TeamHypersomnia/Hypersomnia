@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="P:\Projects\Hypersomnia\3rdparty\openal-soft-build\CMakeFiles\3459d2e72a409754ae4cd780a2b10ca4\INSTALL_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{02748F0A-7637-3065-B2DB-9678C01F6302}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
