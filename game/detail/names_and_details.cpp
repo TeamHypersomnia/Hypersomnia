@@ -104,8 +104,8 @@ std::wstring describe_item_compatibility_categories(const item_category_bitset& 
 
 	if (flags.test(item_category::MAGAZINE))
 		result += L"Magazine, ";
-	if (flags.test(item_category::BARREL_ATTACHMENT))
-		result += L"Barrel attachment, ";
+	if (flags.test(item_category::MUZZLE_ATTACHMENT))
+		result += L"Muzzle attachment, ";
 	if (flags.test(item_category::RAIL_ATTACHMENT))
 		result += L"Rail attachment, ";
 	if (flags.test(item_category::SHOT_CHARGE))
@@ -145,9 +145,9 @@ textual_description describe_slot_function(const slot_function f) {
 			L"Rail",
 			L" "
 		};
-	case slot_function::GUN_BARREL:
+	case slot_function::GUN_MUZZLE:
 		return{
-			L"Barrel",
+			L"Muzzle",
 			L"Various gunshot modifiers go here."
 		};
 	case slot_function::PRIMARY_HAND:

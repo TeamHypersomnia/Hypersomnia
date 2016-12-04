@@ -77,6 +77,7 @@ namespace components {
 			);
 		}
 
-		components::transform calculate_barrel_transform(components::transform gun_transform) const;
+		vec2 calculate_muzzle_position(components::transform gun_transform) const;
+		vec2 calculate_barrel_center(components::transform gun_transform) const;
 	};
 }

@@ -129,7 +129,7 @@ drag_and_drop_result prepare_drag_and_drop_result(C context) {
 						case slot_function::SHOULDER_SLOT: tooltip_text += L"Wear"; break;
 						case slot_function::PRIMARY_HAND: tooltip_text += L"Wield"; break;
 						case slot_function::SECONDARY_HAND: tooltip_text += L"Wield"; break;
-						case slot_function::GUN_BARREL: tooltip_text += L"Install"; break;
+						case slot_function::GUN_MUZZLE: tooltip_text += L"Install"; break;
 						default: ensure(0); break;
 						}
 

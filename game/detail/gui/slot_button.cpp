@@ -81,8 +81,8 @@ void slot_button::draw(const viewing_gui_context& context, const const_this_poin
 			draw_centered_texture(context, this_id, info, augs::gui::material(assets::texture_id::CHAMBER_SLOT_ICON, border_col));
 		}
 
-		if (slot_type == slot_function::GUN_BARREL) {
-			draw_centered_texture(context, this_id, info, augs::gui::material(assets::texture_id::GUN_BARREL_SLOT_ICON, border_col));
+		if (slot_type == slot_function::GUN_MUZZLE) {
+			draw_centered_texture(context, this_id, info, augs::gui::material(assets::texture_id::GUN_MUZZLE_SLOT_ICON, border_col));
 		}
 
 		if (slot_type == slot_function::GUN_DETACHABLE_MAGAZINE) {

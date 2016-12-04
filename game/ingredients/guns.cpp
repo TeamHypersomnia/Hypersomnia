@@ -53,10 +53,10 @@ namespace ingredients {
 			slot_def.is_physical_attachment_slot = true;
 			slot_def.always_allow_exactly_one_item = true;
 			slot_def.for_categorized_items_only = true;
-			slot_def.category_allowed = item_category::BARREL_ATTACHMENT;
+			slot_def.category_allowed = item_category::MUZZLE_ATTACHMENT;
 			slot_def.attachment_sticking_mode = augs::rects::sticking::RIGHT;
 
-			container.slots[slot_function::GUN_BARREL] = slot_def;
+			container.slots[slot_function::GUN_MUZZLE] = slot_def;
 		}
 	}
 }
@@ -145,7 +145,7 @@ namespace prefabs {
 
 		auto& item = ingredients::make_item(sample_suppressor);
 
-		item.categories_for_slot_compatibility.set(item_category::BARREL_ATTACHMENT);
+		item.categories_for_slot_compatibility.set(item_category::MUZZLE_ATTACHMENT);
 		item.space_occupied_per_charge = to_space_units("0.2");
 
 		sample_suppressor.add_standard_components();

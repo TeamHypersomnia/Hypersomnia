@@ -4,7 +4,7 @@
 
 namespace messages {
 	struct gunshot_response : message {
-		components::transform barrel_transform;
+		components::transform muzzle_transform;
 		std::vector<entity_id> spawned_rounds;
 		std::vector<entity_id> spawned_shells;
 	};

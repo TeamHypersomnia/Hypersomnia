@@ -54,11 +54,12 @@ void gun_system::consume_gun_intents(logic_step& step) {
 	}
 }
 
-components::transform components::gun::calculate_barrel_transform(const components::transform gun_transform) const {
-	auto barrel_transform = gun_transform;
-	barrel_transform.pos += vec2(bullet_spawn_offset).rotate(gun_transform.rotation, vec2());
+vec2 components::gun::calculate_muzzle_position(const components::transform gun_transform) const {
+	return gun_transform.pos + vec2(bullet_spawn_offset).rotate(gun_transform.rotation, vec2());
+}
 
-	return barrel_transform;
+vec2  components::gun::calculate_barrel_center(const components::transform gun_transform) const {
+	return gun_transform.pos + vec2(0, bullet_spawn_offset.y).rotate(gun_transform.rotation, vec2());
 }
 
 void gun_system::launch_shots_due_to_pressed_triggers(logic_step& step) {
@@ -82,7 +83,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(logic_step& step) {
 			if (chamber_slot.get_mounted_items().size() == 1) {
 				messages::gunshot_response response;
 
-				const auto barrel_transform = gun.calculate_barrel_transform(gun_transform);
+				const auto muzzle_transform = gun.calculate_muzzle_position(gun_transform);
 				
 				const auto item_in_chamber = chamber_slot.get_mounted_items()[0];
 
@@ -115,10 +116,10 @@ void gun_system::launch_shots_due_to_pressed_triggers(logic_step& step) {
 							damage.sender = it;
 							total_recoil_multiplier *= damage.recoil_multiplier;
 
-							round_entity.set_logic_transform(barrel_transform);
+							round_entity.set_logic_transform(muzzle_transform);
 							
 							auto rng = cosmos.get_rng_for(round_entity);
-							set_velocity(round_entity, vec2().set_from_degrees(barrel_transform.rotation).set_length(rng.randval(gun.muzzle_velocity)));
+							set_velocity(round_entity, vec2().set_from_degrees(muzzle_transform.rotation).set_length(rng.randval(gun.muzzle_velocity)));
 							response.spawned_rounds.push_back(round_entity);
 
 							round_entity.set_flag(entity_flag::IS_IMMUNE_TO_PAST);
@@ -140,14 +141,14 @@ void gun_system::launch_shots_due_to_pressed_triggers(logic_step& step) {
 
 							shell_entity.set_logic_transform(shell_transform);
 
-							set_velocity(shell_entity, vec2().set_from_degrees(barrel_transform.rotation + spread_component).set_length(rng.randval(gun.shell_velocity)));
+							set_velocity(shell_entity, vec2().set_from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun.shell_velocity)));
 							response.spawned_shells.push_back(shell_entity);
 
 							shell_entity.add_standard_components();
 						}
 					}
 
-					response.barrel_transform = barrel_transform;
+					response.muzzle_transform = muzzle_transform;
 					response.subject = it;
 					
 					step.transient.messages.post(response);

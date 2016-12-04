@@ -24,9 +24,9 @@
 
 using namespace augs;
 
-float colinearize_AB(const vec2 O_center_of_rotation, vec2 A_rifle_center, vec2 B_barrel, vec2 C_crosshair) {
+float colinearize_AB(const vec2 O_center_of_rotation, vec2 A_barrel_center, vec2 B_muzzle, vec2 C_crosshair) {
 	auto crosshair_vector = C_crosshair - O_center_of_rotation;
-	auto barrel_vector = B_barrel - O_center_of_rotation;
+	auto barrel_vector = B_muzzle - O_center_of_rotation;
 	
 	if (crosshair_vector.is_epsilon(1.f))
 		crosshair_vector.set(1, 0);
@@ -38,14 +38,14 @@ float colinearize_AB(const vec2 O_center_of_rotation, vec2 A_rifle_center, vec2 
 
 	const float oc_radius = crosshair_vector.length();
 	
-	const auto intersection = circle_ray_intersection(B_barrel, A_rifle_center, O_center_of_rotation, oc_radius);
+	const auto intersection = circle_ray_intersection(B_muzzle, A_barrel_center, O_center_of_rotation, oc_radius);
 	const bool has_intersection = intersection.first;
 	
 	ensure(has_intersection);
 
 	const auto G = intersection.second;
 	const auto CG = C_crosshair - G;
-	const auto AG = A_rifle_center - G;
+	const auto AG = A_barrel_center - G;
 
 	const auto final_angle = 2 * (CG.degrees() - AG.degrees());
 	
@@ -53,20 +53,20 @@ float colinearize_AB(const vec2 O_center_of_rotation, vec2 A_rifle_center, vec2 
 		auto& ln = augs::renderer::get_current().logic_lines;
 
 		ln.draw_cyan(O_center_of_rotation, C_crosshair);
-		ln.draw_red(O_center_of_rotation, A_rifle_center);
-		ln.draw_red(O_center_of_rotation, B_barrel);
+		ln.draw_red(O_center_of_rotation, A_barrel_center);
+		ln.draw_red(O_center_of_rotation, B_muzzle);
 		ln.draw_yellow(O_center_of_rotation, G);
 		
-		ln.draw_green(G, A_rifle_center);
+		ln.draw_green(G, A_barrel_center);
 		ln.draw_green(G, C_crosshair);
 
-		A_rifle_center.rotate(final_angle, O_center_of_rotation);
-		B_barrel.rotate(final_angle, O_center_of_rotation);
+		A_barrel_center.rotate(final_angle, O_center_of_rotation);
+		B_muzzle.rotate(final_angle, O_center_of_rotation);
 
-		ln.draw_red(O_center_of_rotation, A_rifle_center);
-		ln.draw_red(O_center_of_rotation, B_barrel);
+		ln.draw_red(O_center_of_rotation, A_barrel_center);
+		ln.draw_red(O_center_of_rotation, B_muzzle);
 
-		ln.draw(A_rifle_center - (B_barrel - A_rifle_center) * 100, B_barrel + (B_barrel - A_rifle_center)*100);
+		ln.draw(A_barrel_center - (B_muzzle - A_barrel_center) * 100, B_muzzle + (B_muzzle - A_barrel_center)*100);
 	}
 
 	return final_angle;
@@ -104,16 +104,16 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 				const auto& gun = subject_item.get<components::gun>();
 
 				const auto rifle_transform = subject_item.logic_transform();
-				auto rifle_center = rifle_transform.pos;
-				auto barrel = gun.calculate_barrel_transform(rifle_transform).pos;
+				auto barrel_center = gun.calculate_barrel_center(rifle_transform.pos);
+				auto muzzle = gun.calculate_muzzle_position(rifle_transform);
 				const auto mc = position(it);
 
-				rifle_center.rotate(-rotation(it), mc);
-				barrel.rotate(-rotation(it), mc);
+				barrel_center.rotate(-rotation(it), mc);
+				muzzle.rotate(-rotation(it), mc);
 
 				auto crosshair_vector = target_transform.pos - mc;
 
-				new_angle = colinearize_AB(mc, rifle_center, barrel, target_transform.pos);
+				new_angle = colinearize_AB(mc, barrel_center, muzzle, target_transform.pos);
 			}
 		}
 	}

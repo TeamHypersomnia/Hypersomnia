@@ -136,7 +136,7 @@ namespace resource_setups {
 		}
 
 		{
-			auto& effect = get_resource_manager().create(assets::particle_effect_id::PIXEL_BARREL_LEAVE_EXPLOSION);
+			auto& effect = get_resource_manager().create(assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION);
 
 			resources::emission em;
 			em.spread_degrees = std::make_pair(100, 130);
@@ -326,7 +326,7 @@ namespace resource_setups {
 		{
 			auto& response = get_resource_manager().create(assets::particle_effect_response_id::HEALING_CHARGE_RESPONSE);
 
-			response[particle_effect_response_type::BARREL_LEAVE_EXPLOSION] = assets::particle_effect_id::WANDERING_PIXELS_SPREAD;
+			response[particle_effect_response_type::MUZZLE_LEAVE_EXPLOSION] = assets::particle_effect_id::WANDERING_PIXELS_SPREAD;
 			response[particle_effect_response_type::DESTRUCTION_EXPLOSION] = assets::particle_effect_id::WANDERING_PIXELS_SPREAD;
 			response[particle_effect_response_type::PROJECTILE_TRACE] = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
 		}
@@ -334,7 +334,7 @@ namespace resource_setups {
 		{
 			auto& response = get_resource_manager().create(assets::particle_effect_response_id::ELECTRIC_CHARGE_RESPONSE);
 
-			response[particle_effect_response_type::BARREL_LEAVE_EXPLOSION] = assets::particle_effect_id::PIXEL_BARREL_LEAVE_EXPLOSION;
+			response[particle_effect_response_type::MUZZLE_LEAVE_EXPLOSION] = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
 			response[particle_effect_response_type::DESTRUCTION_EXPLOSION] = assets::particle_effect_id::PIXEL_BURST;
 			response[particle_effect_response_type::PROJECTILE_TRACE] = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
 		}

@@ -22,7 +22,7 @@ void aabb_highlighter::draw(viewing_step& step, const const_entity_handle& subje
 		static const sub_entity_name dont_expand_aabb_for_sub_entities[] = {
 			sub_entity_name::CHARACTER_CROSSHAIR,
 			sub_entity_name::CROSSHAIR_RECOIL_BODY,
-			sub_entity_name::BARREL_SMOKE,
+			sub_entity_name::MUZZLE_SMOKE,
 			sub_entity_name::BULLET_SHELL,
 			sub_entity_name::BULLET_ROUND,
 			sub_entity_name::CORPSE_OF_SENTIENCE,

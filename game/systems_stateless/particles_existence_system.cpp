@@ -60,9 +60,9 @@ void particles_existence_system::game_responses_to_particle_effects(logic_step& 
 			const auto& round_response_map = *round_response.response;
 
 			messages::create_particle_effect burst;
-			burst.place_of_birth = g.barrel_transform;
+			burst.place_of_birth = g.muzzle_transform;
 			burst.subject = g.subject;
-			burst.input.effect = round_response_map.at(particle_effect_response_type::BARREL_LEAVE_EXPLOSION);
+			burst.input.effect = round_response_map.at(particle_effect_response_type::MUZZLE_LEAVE_EXPLOSION);
 			burst.input.modifier = round_response.modifier;
 
 			step.transient.messages.post(burst);
@@ -90,8 +90,8 @@ void particles_existence_system::game_responses_to_particle_effects(logic_step& 
 			step.transient.messages.post(burst);
 		}
 		
-		if (cosmos[g.subject][sub_entity_name::BARREL_SMOKE].alive()) {
-			messages::queue_destruction msg = { cosmos[g.subject][sub_entity_name::BARREL_SMOKE] };
+		if (cosmos[g.subject][sub_entity_name::MUZZLE_SMOKE].alive()) {
+			messages::queue_destruction msg = { cosmos[g.subject][sub_entity_name::MUZZLE_SMOKE] };
 			step.transient.messages.post(msg);
 		}
 	}

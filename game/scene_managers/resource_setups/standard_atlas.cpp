@@ -140,7 +140,7 @@ namespace resource_setups {
 		get_resource_manager().create(assets::texture_id::ARMOR_SLOT_ICON, "hypersomnia/gfx/armor_slot_icon.png");
 		get_resource_manager().create(assets::texture_id::CHAMBER_SLOT_ICON, "hypersomnia/gfx/chamber_slot_icon.png");
 		get_resource_manager().create(assets::texture_id::DETACHABLE_MAGAZINE_ICON, "hypersomnia/gfx/detachable_magazine_slot_icon.png");
-		get_resource_manager().create(assets::texture_id::GUN_BARREL_SLOT_ICON, "hypersomnia/gfx/gun_barrel_slot_icon.png");
+		get_resource_manager().create(assets::texture_id::GUN_MUZZLE_SLOT_ICON, "hypersomnia/gfx/gun_muzzle_slot_icon.png");
 		
 		get_resource_manager().create(assets::texture_id::DEAD_TORSO, "hypersomnia/gfx/dead_torso.png");
 
