@@ -99,6 +99,43 @@ namespace prefabs {
 		return sample_magazine;
 	}
 
+	entity_handle create_small_magazine(logic_step& step, components::transform pos, std::string space, entity_id charge_inside_id) {
+		auto& cosmos = step.cosm;
+		auto charge_inside = cosmos[charge_inside_id];
+
+		auto sample_magazine = cosmos.create_entity("sample_magazine");
+		name_entity(sample_magazine, entity_name::MAGAZINE);
+
+		{
+			ingredients::sprite(sample_magazine, pos, assets::texture_id::SMALL_MAGAZINE, augs::white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::see_through_dynamic_body(sample_magazine);
+
+			auto& item = ingredients::make_item(sample_magazine);
+			auto& container = sample_magazine += components::container();
+
+			item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+			item.space_occupied_per_charge = to_space_units("0.5");
+
+			inventory_slot charge_deposit_def;
+			charge_deposit_def.for_categorized_items_only = true;
+			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
+			charge_deposit_def.space_available = to_space_units(space);
+
+			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
+		}
+
+		if (charge_inside.dead()) {
+			charge_inside.set_id(create_cyan_charge(cosmos, vec2(0, 0), 30));
+		}
+
+		sample_magazine.add_standard_components();
+
+		item_slot_transfer_request load_charge(charge_inside, sample_magazine[slot_function::ITEM_DEPOSIT]);
+		perform_transfer(load_charge, step);
+
+		return sample_magazine;
+	}
+
 	entity_handle create_sample_suppressor(cosmos& cosmos, vec2 pos) {
 		auto sample_suppressor = cosmos.create_entity("sample_suppressor");
 		name_entity(sample_suppressor, entity_name::SUPPRESSOR);
@@ -535,6 +572,78 @@ namespace prefabs {
 
 		gun.recoil.scale = 30.0f/2;
 		
+		weapon.add_standard_components();
+
+		if (load_mag.alive()) {
+			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);
+			perform_transfer({ load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1 }, step);
+		}
+
+		return weapon;
+	}
+
+	entity_handle create_kek9(logic_step& step, vec2 pos, entity_id load_mag_id) {
+		auto& cosmos = step.cosm;
+		auto load_mag = cosmos[load_mag_id];
+		auto weapon = cosmos.create_entity("pistol");
+		name_entity(weapon, entity_name::PISTOL);
+
+		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::KEK9, augs::white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::see_through_dynamic_body(weapon);
+		ingredients::default_gun_container(weapon);
+		auto& container = weapon.get<components::container>();
+		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_offset.pos.set(1, -11);
+		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_sticking_mode = augs::rects::sticking::BOTTOM;
+
+		auto& gun = weapon += components::gun();
+
+		gun.action_mode = components::gun::action_type::SEMI_AUTOMATIC;
+		gun.muzzle_velocity = std::make_pair(3000.f, 3000.f);
+		gun.shot_cooldown = augs::stepped_cooldown(100);
+		gun.bullet_spawn_offset.set(sprite.size.x / 2, -7);
+		gun.camera_shake_radius = 5.f;
+		gun.camera_shake_spread_degrees = 45.f;
+
+		gun.shell_spawn_offset.pos.set(0, 10);
+		gun.shell_spawn_offset.rotation = 45;
+		gun.shell_angular_velocity = std::make_pair(2.f, 14.f);
+		gun.shell_spread_degrees = 20.f;
+		gun.shell_velocity = std::make_pair(300.f, 1700.f);
+		gun.damage_multiplier = 1.5f;
+
+		gun.recoil.repeat_last_n_offsets = 20;
+
+		gun.recoil.offsets = {
+			{ vec2().set_from_degrees(1.35f * 2.f) },
+			{ vec2().set_from_degrees(1.35f * 2.f) },
+			{ vec2().set_from_degrees(1.35f*2.6f) },
+			{ vec2().set_from_degrees(1.35f*2.8f) },
+			{ vec2().set_from_degrees(1.35f*3.2f) },
+			{ vec2().set_from_degrees(1.35f*3.0f) },
+			{ vec2().set_from_degrees(1.35f*2.7f) },
+			{ vec2().set_from_degrees(1.35f*2.3f) },
+			{ vec2().set_from_degrees(1.35f*2.0f) },
+			{ vec2().set_from_degrees(1.35f*0.3f) },
+			{ vec2().set_from_degrees(1.35f*-0.5f) },
+			{ vec2().set_from_degrees(1.35f*-1.0f) },
+			{ vec2().set_from_degrees(1.35f*-1.5f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-3.2f) },
+			{ vec2().set_from_degrees(1.35f*-4.0f) },
+			{ vec2().set_from_degrees(1.35f*2.3f) },
+			{ vec2().set_from_degrees(1.35f*2.5f) },
+			{ vec2().set_from_degrees(1.35f*1.7f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*3.0f) },
+		};
+
+		gun.recoil.scale = 30.0f / 2;
+
 		weapon.add_standard_components();
 
 		if (load_mag.alive()) {

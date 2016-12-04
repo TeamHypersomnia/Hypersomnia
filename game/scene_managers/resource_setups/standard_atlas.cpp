@@ -33,6 +33,12 @@ namespace resource_setups {
 		}
 
 		{
+			auto& gui = get_resource_manager().create(assets::texture_id::KEK9, "hypersomnia/gfx/kek9.png").gui_sprite_def;
+			gui.flip_horizontally = true;
+			gui.flip_vertically = false;
+		}
+
+		{
 			auto& gui = get_resource_manager().create(assets::texture_id::SHOTGUN, "hypersomnia/gfx/shotgun.png").gui_sprite_def;
 			gui.flip_horizontally = true;
 			gui.flip_vertically = true;
@@ -58,6 +64,9 @@ namespace resource_setups {
 
 		auto& magazine_gui = get_resource_manager().create(assets::texture_id::SAMPLE_MAGAZINE, "hypersomnia/gfx/magazine.png").gui_sprite_def;
 		magazine_gui.rotation_offset = -270;
+
+		get_resource_manager().create(assets::texture_id::SMALL_MAGAZINE, "hypersomnia/gfx/small_magazine.png");
+
 
 		auto& suppressor_gui = get_resource_manager().create(assets::texture_id::SAMPLE_SUPPRESSOR, "hypersomnia/gfx/suppressor.png").gui_sprite_def;
 		suppressor_gui.flip_horizontally = true;

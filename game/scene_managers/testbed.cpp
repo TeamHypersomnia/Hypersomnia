@@ -455,11 +455,11 @@ namespace scene_managers {
 
 		prefabs::create_sample_rifle(step, vec2(100, -500 + 100));
 
-		prefabs::create_pistol(step, vec2(300, -500 + 50));
+		prefabs::create_kek9(step, vec2(300, -500 + 50));
 
-		const auto pis2 = prefabs::create_pistol(step, vec2(300, 50),
-			prefabs::create_sample_magazine(step, vec2(100, -650), "0.4",
-				prefabs::create_green_charge(world, vec2(0, 0), 40)));
+		const auto pis2 = prefabs::create_kek9(step, vec2(300, 50),
+			prefabs::create_small_magazine(step, vec2(100, -650), "0.4",
+				prefabs::create_cyan_charge(world, vec2(0, 0), 40)));
 
 		const auto submachine = prefabs::create_submachine(step, vec2(500, -500 + 50),
 			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
