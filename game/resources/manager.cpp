@@ -3,6 +3,7 @@
 #include "augs/filesystem/file.h"
 #include <sstream>
 #include "augs/texture_baker/font.h"
+#include "augs/window_framework/window.h"
 
 using namespace augs;
 
@@ -13,47 +14,47 @@ namespace assets {
 }
 
 augs::font& operator*(const assets::font_id& id) {
-	return *resource_manager.find(id);
+	return *get_resource_manager().find(id);
 }
 
 bool operator!(const assets::font_id& id) {
-	return resource_manager.find(id) == nullptr;
+	return get_resource_manager().find(id) == nullptr;
 }
 
 augs::texture& operator*(const assets::texture_id& id) {
-	return resource_manager.find(id)->tex;
+	return get_resource_manager().find(id)->tex;
 }
 
 resources::animation_response& operator*(const assets::animation_response_id& id) {
-	return *resource_manager.find(id);
+	return *get_resource_manager().find(id);
 }
 
 resources::particle_effect_response& operator*(const assets::particle_effect_response_id& id) {
-	return *resource_manager.find(id);
+	return *get_resource_manager().find(id);
 }
 
 resources::particle_effect& operator*(const assets::particle_effect_id& id) {
-	return *resource_manager.find(id);
+	return *get_resource_manager().find(id);
 }
 
 resources::behaviour_tree& operator*(const assets::behaviour_tree_id& id) {
-	return *resource_manager.find(id);
+	return *get_resource_manager().find(id);
 }
 
 resources::tile_layer& operator*(const assets::tile_layer_id& id) {
-	return *resource_manager.find(id);
+	return *get_resource_manager().find(id);
 }
 
 augs::sound_buffer& operator*(const assets::sound_buffer_id id) {
-	return *resource_manager.find(id);
+	return *get_resource_manager().find(id);
 }
 
 bool operator!(const assets::tile_layer_id& id) {
-	return resource_manager.find(id) == nullptr;
+	return get_resource_manager().find(id) == nullptr;
 }
 
 bool operator!(const assets::texture_id& id) {
-	return resource_manager.find(id) == nullptr;
+	return get_resource_manager().find(id) == nullptr;
 }
 
 namespace resources {
@@ -337,10 +338,12 @@ namespace resources {
 	}
 }
 
-resources::manager resource_manager;
+resources::manager& get_resource_manager() {
+	return augs::window::glwindow::get_current()->resources;
+}
 
 //namespace assets {
 //	texture* texture_id::operator->() const {
-//		return &resource_manager.find_texture(id)->tex;
+//		return &get_resource_manager().find_texture(id)->tex;
 //	}
 //}

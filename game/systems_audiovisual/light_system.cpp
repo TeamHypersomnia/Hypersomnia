@@ -35,8 +35,8 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 	output.clear_current_fbo();
 	glClearColor(0.f, 0.f, 0.f, 0.f);
 
-	auto& light_program = *resource_manager.find(assets::program_id::LIGHT);
-	auto& default_program = *resource_manager.find(assets::program_id::DEFAULT);
+	auto& light_program = *get_resource_manager().find(assets::program_id::LIGHT);
+	auto& default_program = *get_resource_manager().find(assets::program_id::DEFAULT);
 	light_program.use();
 
 	const auto light_pos_uniform = glGetUniformLocation(light_program.id, "light_pos");

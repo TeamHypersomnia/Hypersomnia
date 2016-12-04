@@ -9,7 +9,7 @@ namespace resource_setups {
 				//return assets::texture_id(unsigned(assets::texture_id::METROPOLIS_TILE_FIRST) + i - 1);
 			};
 
-			auto& metropolis_floor = resource_manager.create(assets::tile_layer_id::METROPOLIS_FLOOR);
+			auto& metropolis_floor = get_resource_manager().create(assets::tile_layer_id::METROPOLIS_FLOOR);
 
 			for (int i = int(assets::texture_id::METROPOLIS_TILE_FIRST); i < int(assets::texture_id::METROPOLIS_TILE_LAST); ++i) {
 				components::sprite tt;

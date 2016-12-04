@@ -107,7 +107,7 @@ rects::ltrb<float> item_button::iterate_children_attachments(
 
 	components::sprite item_sprite = item_handle.get<components::sprite>();
 
-	const auto& gui_def = resource_manager.find(item_sprite.tex)->gui_sprite_def;
+	const auto& gui_def = get_resource_manager().find(item_sprite.tex)->gui_sprite_def;
 
 	item_sprite.flip_horizontally = gui_def.flip_horizontally;
 	item_sprite.flip_vertically = gui_def.flip_vertically;
@@ -362,7 +362,7 @@ void item_button::perform_logic_step(const logic_gui_context& context, const thi
 		this_id->with_attachments_bbox = iterate_children_attachments(context, this_id);
 		vec2i rounded_size = this_id->with_attachments_bbox.get_size();
 		rounded_size += 22;
-		rounded_size += resource_manager.find(sprite->tex)->gui_sprite_def.gui_bbox_expander;
+		rounded_size += get_resource_manager().find(sprite->tex)->gui_sprite_def.gui_bbox_expander;
 		rounded_size /= 11;
 		rounded_size *= 11;
 		//rounded_size.x = std::max(rounded_size.x, 33);

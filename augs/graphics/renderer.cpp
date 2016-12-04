@@ -204,7 +204,7 @@ namespace augs {
 	void renderer::draw_debug_info(vec2 visible_world_area, components::transform camera_transform, assets::texture_id tex_id, std::vector<const_entity_handle> target_entities, float ratio) {
 		if (!debug_drawing) return;
 		
-		auto& tex = resource_manager.find(tex_id)->tex;
+		auto& tex = get_resource_manager().find(tex_id)->tex;
 		
 		vec2 center = visible_world_area / 2;
 		
@@ -326,7 +326,7 @@ namespace augs {
 		graphics::fbo::use_default();
 		glClear(GL_COLOR_BUFFER_BIT); glerr;
 		
-		bind_texture(*resource_manager.find(assets::atlas_id::GAME_WORLD_ATLAS));
+		bind_texture(*get_resource_manager().find(assets::atlas_id::GAME_WORLD_ATLAS));
 
 		call_triangles();
 

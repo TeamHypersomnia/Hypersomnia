@@ -51,8 +51,8 @@ void convex_partitioned_shape::from_renderable(const const_entity_handle handle)
 }
 
 void convex_partitioned_shape::from_sprite(const components::sprite& sprite, const bool polygonize_sprite) {
-	auto& polygonized_sprite_verts = resource_manager.find(sprite.tex)->polygonized;
-	auto& image_to_polygonize = resource_manager.find(sprite.tex)->img;
+	auto& polygonized_sprite_verts = get_resource_manager().find(sprite.tex)->polygonized;
+	auto& image_to_polygonize = get_resource_manager().find(sprite.tex)->img;
 
 	if (polygonized_sprite_verts.size() > 0 && polygonize_sprite) {
 		auto image_size = image_to_polygonize.get_size();

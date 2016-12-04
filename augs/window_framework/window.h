@@ -13,6 +13,8 @@
 
 #include "augs/audio/audio_manager.h"
 
+#include "game/resources/manager.h"
+
 namespace augs {
 	namespace window {
 #ifdef PLATFORM_WINDOWS
@@ -51,6 +53,7 @@ namespace augs {
 		public:
 			renderer gl;
 			audio_manager audio;
+			resources::manager resources;
 			
 			glwindow();
 			~glwindow();

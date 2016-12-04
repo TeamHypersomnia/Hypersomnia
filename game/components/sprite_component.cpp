@@ -61,13 +61,13 @@ namespace components {
 	void sprite::set(const assets::texture_id _tex, const rgba _color) {
 		tex = _tex;
 		color = _color;
-		has_neon_map = resource_manager.find_neon_map(tex) != nullptr;
+		has_neon_map = get_resource_manager().find_neon_map(tex) != nullptr;
 
 		update_size_from_texture_dimensions();
 	}
 
 	void sprite::update_size_from_texture_dimensions() {
-		size = vec2i(resource_manager.find(tex)->tex.get_size());
+		size = vec2i(get_resource_manager().find(tex)->tex.get_size());
 	}
 
 	void sprite::draw(const drawing_input& in,
@@ -162,20 +162,20 @@ namespace components {
 		}
 
 		if (in.drawing_type == renderable_drawing_type::NEON_MAPS && has_neon_map) {
-			draw(in, resource_manager.find_neon_map(tex), 
+			draw(in, get_resource_manager().find_neon_map(tex), 
 				target_position,
 				final_rotation,
-				vec2(resource_manager.find_neon_map(tex)->tex.get_size())
-				/ vec2(resource_manager.find(tex)->tex.get_size()) * drawn_size);
+				vec2(get_resource_manager().find_neon_map(tex)->tex.get_size())
+				/ vec2(get_resource_manager().find(tex)->tex.get_size()) * drawn_size);
 		}
 		else if (in.drawing_type == renderable_drawing_type::NORMAL) {
-			draw(in, resource_manager.find(tex),
+			draw(in, get_resource_manager().find(tex),
 				target_position,
 				final_rotation, 
 				drawn_size);
 		}
 		else if (in.drawing_type == renderable_drawing_type::SPECULAR_HIGHLIGHTS) {
-			const auto& anim = *resource_manager.find(assets::animation_id::BLINK_ANIMATION);
+			const auto& anim = *get_resource_manager().find(assets::animation_id::BLINK_ANIMATION);
 			const unsigned frame_duration_ms = anim.frames[0].duration_milliseconds;
 			const auto frame_count = anim.frames.size();
 			const auto animation_max_duration = frame_duration_ms * frame_count;
@@ -194,7 +194,7 @@ namespace components {
 				vec2i blink_offset = { int(generator() % unsigned(drawn_size.x)), int(generator() % unsigned(drawn_size.y)) };
 				blink_offset -= drawn_size / 2;
 
-				draw(in, resource_manager.find(target_frame.sprite.tex),
+				draw(in, get_resource_manager().find(target_frame.sprite.tex),
 					target_position + blink_offset,
 					final_rotation,
 					assets::get_size(target_frame.sprite.tex));

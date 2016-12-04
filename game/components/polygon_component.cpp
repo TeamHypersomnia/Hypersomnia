@@ -23,7 +23,7 @@ namespace components {
 	void polygon::automatically_map_uv(assets::texture_id texture_id_to_map, unsigned uv_mapping_mode) {
 		if (vertices.empty()) return;
 
-		auto& texture_to_map = resource_manager.find(texture_id_to_map)->tex;
+		auto& texture_to_map = get_resource_manager().find(texture_id_to_map)->tex;
 
 		auto* v = vertices.data();
 		typedef const augs::vertex& vc;

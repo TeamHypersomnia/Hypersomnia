@@ -7,7 +7,7 @@
 namespace resource_setups {
 	void load_standard_particle_effects() {
 		{
-			auto& effect = resource_manager.create(assets::particle_effect_id::WANDERING_SMOKE);
+			auto& effect = get_resource_manager().create(assets::particle_effect_id::WANDERING_SMOKE);
 
 			resources::emission em;
 			em.min_swing_spread.set(0.5, 1);
@@ -49,7 +49,7 @@ namespace resource_setups {
 		}
 
 		{
-			auto& effect = resource_manager.create(assets::particle_effect_id::ENGINE_PARTICLES);
+			auto& effect = get_resource_manager().create(assets::particle_effect_id::ENGINE_PARTICLES);
 
 			{
 				resources::emission em;
@@ -136,7 +136,7 @@ namespace resource_setups {
 		}
 
 		{
-			auto& effect = resource_manager.create(assets::particle_effect_id::PIXEL_BARREL_LEAVE_EXPLOSION);
+			auto& effect = get_resource_manager().create(assets::particle_effect_id::PIXEL_BARREL_LEAVE_EXPLOSION);
 
 			resources::emission em;
 			em.spread_degrees = std::make_pair(100, 130);
@@ -164,7 +164,7 @@ namespace resource_setups {
 		}
 
 		{
-			auto& effect = resource_manager.create(assets::particle_effect_id::PIXEL_BURST);
+			auto& effect = get_resource_manager().create(assets::particle_effect_id::PIXEL_BURST);
 
 			resources::emission em;
 			em.spread_degrees = std::make_pair(150, 360);
@@ -192,7 +192,7 @@ namespace resource_setups {
 		}
 
 		{
-			auto& effect = resource_manager.create(assets::particle_effect_id::WANDERING_PIXELS_DIRECTED);
+			auto& effect = get_resource_manager().create(assets::particle_effect_id::WANDERING_PIXELS_DIRECTED);
 
 			resources::emission em;
 			em.spread_degrees = std::make_pair(0, 1);
@@ -222,7 +222,7 @@ namespace resource_setups {
 		} 
 		
 		{
-			auto& effect = resource_manager.create(assets::particle_effect_id::WANDERING_PIXELS_SPREAD);
+			auto& effect = get_resource_manager().create(assets::particle_effect_id::WANDERING_PIXELS_SPREAD);
 
 			resources::emission em;
 			em.spread_degrees = std::make_pair(0, 10);
@@ -255,7 +255,7 @@ namespace resource_setups {
 		}
 
 		{
-			auto& effect = resource_manager.create(assets::particle_effect_id::CONCENTRATED_WANDERING_PIXELS);
+			auto& effect = get_resource_manager().create(assets::particle_effect_id::CONCENTRATED_WANDERING_PIXELS);
 
 			resources::emission em;
 			em.spread_degrees = std::make_pair(0, 1);
@@ -284,7 +284,7 @@ namespace resource_setups {
 			effect.push_back(em);
 		}
 		{
-			auto& effect = resource_manager.create(assets::particle_effect_id::ROUND_ROTATING_BLOOD_STREAM);
+			auto& effect = get_resource_manager().create(assets::particle_effect_id::ROUND_ROTATING_BLOOD_STREAM);
 
 			resources::emission em;
 			em.spread_degrees = std::make_pair(180, 180);
@@ -324,7 +324,7 @@ namespace resource_setups {
 		}
 
 		{
-			auto& response = resource_manager.create(assets::particle_effect_response_id::HEALING_CHARGE_RESPONSE);
+			auto& response = get_resource_manager().create(assets::particle_effect_response_id::HEALING_CHARGE_RESPONSE);
 
 			response[particle_effect_response_type::BARREL_LEAVE_EXPLOSION] = assets::particle_effect_id::WANDERING_PIXELS_SPREAD;
 			response[particle_effect_response_type::DESTRUCTION_EXPLOSION] = assets::particle_effect_id::WANDERING_PIXELS_SPREAD;
@@ -332,7 +332,7 @@ namespace resource_setups {
 		}
 
 		{
-			auto& response = resource_manager.create(assets::particle_effect_response_id::ELECTRIC_CHARGE_RESPONSE);
+			auto& response = get_resource_manager().create(assets::particle_effect_response_id::ELECTRIC_CHARGE_RESPONSE);
 
 			response[particle_effect_response_type::BARREL_LEAVE_EXPLOSION] = assets::particle_effect_id::PIXEL_BARREL_LEAVE_EXPLOSION;
 			response[particle_effect_response_type::DESTRUCTION_EXPLOSION] = assets::particle_effect_id::PIXEL_BURST;
@@ -340,20 +340,20 @@ namespace resource_setups {
 		}
 
 		{
-			auto& response = resource_manager.create(assets::particle_effect_response_id::SWINGING_MELEE_WEAPON_RESPONSE);
+			auto& response = get_resource_manager().create(assets::particle_effect_response_id::SWINGING_MELEE_WEAPON_RESPONSE);
 
 			response[particle_effect_response_type::PARTICLES_WHILE_SWINGING] = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
 			response[particle_effect_response_type::DESTRUCTION_EXPLOSION] = assets::particle_effect_id::PIXEL_BURST;
 		}
 
 		{
-			auto& response = resource_manager.create(assets::particle_effect_response_id::SHELL_RESPONSE);
+			auto& response = get_resource_manager().create(assets::particle_effect_response_id::SHELL_RESPONSE);
 
 			response[particle_effect_response_type::PROJECTILE_TRACE] = assets::particle_effect_id::CONCENTRATED_WANDERING_PIXELS;
 		}
 
 		{
-			auto& response = resource_manager.create(assets::particle_effect_response_id::CHARACTER_RESPONSE);
+			auto& response = get_resource_manager().create(assets::particle_effect_response_id::CHARACTER_RESPONSE);
 
 			response[particle_effect_response_type::DAMAGE_RECEIVED] = assets::particle_effect_id::PIXEL_BURST;
 		}

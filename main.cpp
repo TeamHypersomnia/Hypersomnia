@@ -21,7 +21,6 @@ int main(int argc, char** argv) {
 	game_window window;
 	window.call_window_script("config.lua", "config.local.lua");
 
-	resource_manager.destroy_everything();
 	resource_setups::load_standard_everything();
 
 	auto mode = window.get_launch_mode();

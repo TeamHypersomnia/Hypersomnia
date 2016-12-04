@@ -98,4 +98,4 @@ namespace resources {
 	};
 }
 
-extern resources::manager resource_manager;
+resources::manager& get_resource_manager();

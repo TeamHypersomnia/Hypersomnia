@@ -37,10 +37,10 @@ namespace rendering_scripts {
 
 		const auto matrix = augs::orthographic_projection<float>(0, state.camera.visible_world_area.x, state.camera.visible_world_area.y, 0, 0, 1);
 
-		auto& default_shader = *resource_manager.find(assets::program_id::DEFAULT);
-		auto& pure_color_highlight_shader = *resource_manager.find(assets::program_id::PURE_COLOR_HIGHLIGHT);
+		auto& default_shader = *get_resource_manager().find(assets::program_id::DEFAULT);
+		auto& pure_color_highlight_shader = *get_resource_manager().find(assets::program_id::PURE_COLOR_HIGHLIGHT);
 		auto& border_highlight_shader = pure_color_highlight_shader; // the same
-		auto& circular_bars_shader = *resource_manager.find(assets::program_id::CIRCULAR_BARS);
+		auto& circular_bars_shader = *get_resource_manager().find(assets::program_id::CIRCULAR_BARS);
 		
 		default_shader.use();
 		{
@@ -116,7 +116,7 @@ namespace rendering_scripts {
 			components::gui_element::draw_complete_gui_for_camera_rendering_request(output, controlled_entity, step);
 		}
 
-		renderer.bind_texture(*resource_manager.find(assets::atlas_id::GAME_WORLD_ATLAS));
+		renderer.bind_texture(*get_resource_manager().find(assets::atlas_id::GAME_WORLD_ATLAS));
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
