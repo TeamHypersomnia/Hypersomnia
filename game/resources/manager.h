@@ -12,6 +12,7 @@
 #include "game/assets/particle_effect_response_id.h"
 #include "game/assets/behaviour_tree_id.h"
 #include "game/assets/tile_layer_id.h"
+#include "game/assets/sound_buffer_id.h"
 
 #include "game/resources/animation.h"
 #include "game/resources/animation_response.h"
@@ -24,6 +25,7 @@
 #include "augs/texture_baker/texture_baker.h"
 #include "augs/texture_baker/font.h"
 #include "augs/graphics/shader.h"
+#include "augs/audio/sound_buffer.h"
 
 #include "augs/misc/enum_associative_array.h"
 
@@ -36,6 +38,7 @@ namespace resources {
 			FROM_ALL_FONTS = 2
 		};
 
+		augs::sound_buffer& create(const assets::sound_buffer_id);
 		augs::atlas& create(assets::atlas_id, unsigned atlas_creation_mode_flags);
 		augs::font& create(assets::font_id);
 		texture_with_image& create(assets::texture_id, std::string filename);
@@ -73,6 +76,7 @@ namespace resources {
 		particle_effect_response* find(assets::particle_effect_response_id);
 		behaviour_tree* find(assets::behaviour_tree_id);
 		tile_layer* find(assets::tile_layer_id);
+		augs::sound_buffer* manager::find(const assets::sound_buffer_id id);
 
 		void destroy_everything();
 
@@ -90,6 +94,7 @@ namespace resources {
 		augs::enum_associative_array<assets::program_id, augs::graphics::shader_program> programs;
 		augs::enum_associative_array<assets::behaviour_tree_id, behaviour_tree> behaviour_trees;
 		augs::enum_associative_array<assets::tile_layer_id, tile_layer> tile_layers;
+		augs::enum_associative_array<assets::sound_buffer_id, augs::sound_buffer> sound_buffers;
 	};
 }
 

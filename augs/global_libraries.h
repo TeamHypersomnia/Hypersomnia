@@ -11,8 +11,7 @@ namespace augs {
 			FREETYPE = 1 << 2,
 			WINDOWS_API = 1 << 3,
 			ENET = 1 << 4,
-			AUDIO = 1 << 5,
-			ALL = GLEW | FREETYPE | WINDOWS_API | ENET | AUDIO
+			ALL = GLEW | FREETYPE | WINDOWS_API | ENET
 		};
 
 		static unsigned initialized;

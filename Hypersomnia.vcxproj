@@ -318,6 +318,9 @@
     <ClCompile Include="3rdparty\polypartition\src\polypartition.cpp" />
     <ClCompile Include="3rdparty\rectpack2D\src\pack.cpp" />
     <ClCompile Include="application\config_values.cpp" />
+    <ClCompile Include="augs\audio\audio_manager.cpp" />
+    <ClCompile Include="augs\audio\sound_buffer.cpp" />
+    <ClCompile Include="augs\audio\sound_source.cpp" />
     <ClCompile Include="augs\ensure.cpp" />
     <ClCompile Include="augs\gui\clipboard.cpp" />
     <ClCompile Include="augs\gui\gui_traversal_structs.cpp" />
@@ -982,6 +985,9 @@
     <ClInclude Include="application\setups\server_setup.h" />
     <ClInclude Include="application\setups\setup_base.h" />
     <ClInclude Include="application\setups\two_clients_and_server_setup.h" />
+    <ClInclude Include="augs\audio\audio_manager.h" />
+    <ClInclude Include="augs\audio\sound_buffer.h" />
+    <ClInclude Include="augs\audio\sound_source.h" />
     <ClInclude Include="augs\build_settings\setting_build_http_daemon.h" />
     <ClInclude Include="augs\build_settings\setting_build_http_requests.h" />
     <ClInclude Include="augs\build_settings\setting_enable_debug_log.h" />
@@ -1041,6 +1047,7 @@
     <ClInclude Include="augs\texture_baker\texture.h" />
     <ClInclude Include="augs\texture_baker\texture_with_image.h" />
     <ClInclude Include="augs\zeroed_pod.h" />
+    <ClInclude Include="game\assets\sound_buffer_id.h" />
     <ClInclude Include="game\assets\tile_layer_id.h" />
     <ClInclude Include="game\components\child_component.h" />
     <ClInclude Include="game\components\flags_component.h" />

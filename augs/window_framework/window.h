@@ -11,6 +11,8 @@
 #include "augs/graphics/renderer.h"
 #include "colored_print.h"
 
+#include "augs/audio/audio_manager.h"
+
 namespace augs {
 	namespace window {
 #ifdef PLATFORM_WINDOWS
@@ -48,6 +50,7 @@ namespace augs {
 			bool poll_event(UINT& out);
 		public:
 			renderer gl;
+			audio_manager audio;
 			
 			glwindow();
 			~glwindow();

@@ -44,6 +44,10 @@ resources::tile_layer& operator*(const assets::tile_layer_id& id) {
 	return *resource_manager.find(id);
 }
 
+augs::sound_buffer& operator*(const assets::sound_buffer_id id) {
+	return *resource_manager.find(id);
+}
+
 bool operator!(const assets::tile_layer_id& id) {
 	return resource_manager.find(id) == nullptr;
 }
@@ -131,6 +135,18 @@ namespace resources {
 		if (it == tile_layers.end()) return nullptr;
 
 		return &(*it).second;
+	}
+
+	augs::sound_buffer* manager::find(const assets::sound_buffer_id id) {
+		auto it = sound_buffers.find(id);
+		if (it == sound_buffers.end()) return nullptr;
+
+		return &(*it).second;
+	}
+
+	augs::sound_buffer& manager::create(const assets::sound_buffer_id id) {
+		augs::sound_buffer& snd = sound_buffers[id];
+		return snd;
 	}
 
 	atlas& manager::create(const assets::atlas_id id, const unsigned atlas_creation_mode_flags) {
@@ -316,13 +332,8 @@ namespace resources {
 	}
 
 	void manager::destroy_everything() {
-		atlases.clear();
-		textures.clear();
-		programs.clear();
-		shaders.clear();
-		animations.clear();
-		animation_responses.clear();
-		fonts.clear();
+		this->~manager();
+		new (this) manager;
 	}
 }
 
