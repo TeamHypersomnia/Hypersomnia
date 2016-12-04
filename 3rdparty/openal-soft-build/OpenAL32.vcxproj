@@ -85,7 +85,7 @@
     </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>P:\Projects\Hypersomnia\3rdparty\openal-soft\include;P:\Projects\Hypersomnia\3rdparty\openal-soft-build;P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\Include;P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>P:\Projects\Hypersomnia\3rdparty\openal-soft\include;P:\Projects\Hypersomnia\3rdparty\openal-soft-build;P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\Include;P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc;C:\Program Files (x86)\Windows Kits\8.1\Include\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>Debug/</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <CompileAs>CompileAsC</CompileAs>
@@ -103,10 +103,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_WIN32;_WIN32_WINNT=0x0502;AL_BUILD_LIBRARY;AL_ALEXT_PROTOTYPES;_LARGEFILE_SOURCE;_LARGE_FILES;restrict=;HAVE_STRUCT_TIMESPEC;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;strcasecmp=_stricmp;strncasecmp=_strnicmp;CMAKE_INTDIR=\"Debug\";OpenAL32_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>P:\Projects\Hypersomnia\3rdparty\openal-soft\include;P:\Projects\Hypersomnia\3rdparty\openal-soft-build;P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\Include;P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>P:\Projects\Hypersomnia\3rdparty\openal-soft\include;P:\Projects\Hypersomnia\3rdparty\openal-soft-build;P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\Include;P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc;C:\Program Files (x86)\Windows Kits\8.1\Include\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>P:\Projects\Hypersomnia\3rdparty\openal-soft\include;P:\Projects\Hypersomnia\3rdparty\openal-soft-build;P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\Include;P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>P:\Projects\Hypersomnia\3rdparty\openal-soft\include;P:\Projects\Hypersomnia\3rdparty\openal-soft-build;P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\Include;P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc;C:\Program Files (x86)\Windows Kits\8.1\Include\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -130,7 +130,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>P:\Projects\Hypersomnia\3rdparty\openal-soft\include;P:\Projects\Hypersomnia\3rdparty\openal-soft-build;P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\Include;P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>P:\Projects\Hypersomnia\3rdparty\openal-soft\include;P:\Projects\Hypersomnia\3rdparty\openal-soft-build;P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\Include;P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc;C:\Program Files (x86)\Windows Kits\8.1\Include\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>Release/</AssemblerListingLocation>
       <CompileAs>CompileAsC</CompileAs>
       <DisableSpecificWarnings>4098</DisableSpecificWarnings>
@@ -147,10 +147,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_WIN32;_WIN32_WINNT=0x0502;AL_BUILD_LIBRARY;AL_ALEXT_PROTOTYPES;_LARGEFILE_SOURCE;_LARGE_FILES;restrict=;HAVE_STRUCT_TIMESPEC;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;strcasecmp=_stricmp;strncasecmp=_strnicmp;CMAKE_INTDIR=\"Release\";OpenAL32_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>P:\Projects\Hypersomnia\3rdparty\openal-soft\include;P:\Projects\Hypersomnia\3rdparty\openal-soft-build;P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\Include;P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>P:\Projects\Hypersomnia\3rdparty\openal-soft\include;P:\Projects\Hypersomnia\3rdparty\openal-soft-build;P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\Include;P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc;C:\Program Files (x86)\Windows Kits\8.1\Include\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>P:\Projects\Hypersomnia\3rdparty\openal-soft\include;P:\Projects\Hypersomnia\3rdparty\openal-soft-build;P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\Include;P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>P:\Projects\Hypersomnia\3rdparty\openal-soft\include;P:\Projects\Hypersomnia\3rdparty\openal-soft-build;P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\Include;P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc;C:\Program Files (x86)\Windows Kits\8.1\Include\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -174,7 +174,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>P:\Projects\Hypersomnia\3rdparty\openal-soft\include;P:\Projects\Hypersomnia\3rdparty\openal-soft-build;P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\Include;P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>P:\Projects\Hypersomnia\3rdparty\openal-soft\include;P:\Projects\Hypersomnia\3rdparty\openal-soft-build;P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\Include;P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc;C:\Program Files (x86)\Windows Kits\8.1\Include\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>MinSizeRel/</AssemblerListingLocation>
       <CompileAs>CompileAsC</CompileAs>
       <DisableSpecificWarnings>4098</DisableSpecificWarnings>
@@ -191,10 +191,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_WIN32;_WIN32_WINNT=0x0502;AL_BUILD_LIBRARY;AL_ALEXT_PROTOTYPES;_LARGEFILE_SOURCE;_LARGE_FILES;restrict=;HAVE_STRUCT_TIMESPEC;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;strcasecmp=_stricmp;strncasecmp=_strnicmp;CMAKE_INTDIR=\"MinSizeRel\";OpenAL32_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>P:\Projects\Hypersomnia\3rdparty\openal-soft\include;P:\Projects\Hypersomnia\3rdparty\openal-soft-build;P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\Include;P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>P:\Projects\Hypersomnia\3rdparty\openal-soft\include;P:\Projects\Hypersomnia\3rdparty\openal-soft-build;P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\Include;P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc;C:\Program Files (x86)\Windows Kits\8.1\Include\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>P:\Projects\Hypersomnia\3rdparty\openal-soft\include;P:\Projects\Hypersomnia\3rdparty\openal-soft-build;P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\Include;P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>P:\Projects\Hypersomnia\3rdparty\openal-soft\include;P:\Projects\Hypersomnia\3rdparty\openal-soft-build;P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\Include;P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc;C:\Program Files (x86)\Windows Kits\8.1\Include\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -218,7 +218,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>P:\Projects\Hypersomnia\3rdparty\openal-soft\include;P:\Projects\Hypersomnia\3rdparty\openal-soft-build;P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\Include;P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>P:\Projects\Hypersomnia\3rdparty\openal-soft\include;P:\Projects\Hypersomnia\3rdparty\openal-soft-build;P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\Include;P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc;C:\Program Files (x86)\Windows Kits\8.1\Include\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>RelWithDebInfo/</AssemblerListingLocation>
       <CompileAs>CompileAsC</CompileAs>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -235,10 +235,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_WIN32;_WIN32_WINNT=0x0502;AL_BUILD_LIBRARY;AL_ALEXT_PROTOTYPES;_LARGEFILE_SOURCE;_LARGE_FILES;restrict=;HAVE_STRUCT_TIMESPEC;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;strcasecmp=_stricmp;strncasecmp=_strnicmp;CMAKE_INTDIR=\"RelWithDebInfo\";OpenAL32_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>P:\Projects\Hypersomnia\3rdparty\openal-soft\include;P:\Projects\Hypersomnia\3rdparty\openal-soft-build;P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\Include;P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>P:\Projects\Hypersomnia\3rdparty\openal-soft\include;P:\Projects\Hypersomnia\3rdparty\openal-soft-build;P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\Include;P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc;C:\Program Files (x86)\Windows Kits\8.1\Include\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>P:\Projects\Hypersomnia\3rdparty\openal-soft\include;P:\Projects\Hypersomnia\3rdparty\openal-soft-build;P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\Include;P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>P:\Projects\Hypersomnia\3rdparty\openal-soft\include;P:\Projects\Hypersomnia\3rdparty\openal-soft-build;P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\Include;P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc;C:\Program Files (x86)\Windows Kits\8.1\Include\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
