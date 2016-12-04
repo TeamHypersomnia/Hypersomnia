@@ -210,7 +210,7 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 			const int radius = (*assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM).get_size().x / 2;
 			const int empty_health_amount = (1 - sentience->health.ratio()) * 90;
 
-			textual_infos.push_back({ starting_health_angle + 90 - empty_health_amount/2, to_wstring(int(sentience->health.value)), health_col });
+			textual_infos.push_back({ starting_health_angle + 90 - empty_health_amount/2, to_wstring(int(sentience->health.value) == 0 ? 1 : int(sentience->health.value)), health_col });
 			textual_infos.push_back({ starting_health_angle, description_of_entity(v).name, health_col });
 
 			for (auto& in : textual_infos) {
@@ -259,7 +259,7 @@ void immediate_hud::acquire_game_events(const const_logic_step& step) {
 		else
 			continue;
 
-		vn.text.set_text(augs::gui::text::format(to_wstring(std::abs(int(vn.value))), augs::gui::text::style(assets::font_id::GUI_FONT, col)));
+		vn.text.set_text(augs::gui::text::format(to_wstring(std::abs(int(vn.value) == 0 ? 1 : int(vn.value))), augs::gui::text::style(assets::font_id::GUI_FONT, col)));
 		vn.transform.pos = h.point_of_impact;
 
 		recent_vertically_flying_numbers.push_back(vn);
