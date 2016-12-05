@@ -586,7 +586,7 @@ namespace prefabs {
 		auto& cosmos = step.cosm;
 		auto load_mag = cosmos[load_mag_id];
 		auto weapon = cosmos.create_entity("pistol");
-		name_entity(weapon, entity_name::PISTOL);
+		name_entity(weapon, entity_name::KEK9);
 
 		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::KEK9, augs::white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::see_through_dynamic_body(weapon);

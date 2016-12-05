@@ -15,6 +15,11 @@ textual_description description_by_entity_name(const entity_name n) {
 			L"Bilmer 2000",
 			L"Robi super naclick."
 		};
+	case entity_name::KEK9:
+		return{
+			L"KEK9",
+			L"The love to KEK is a fanciful trek."
+		};
 	case entity_name::PINK_CHARGE:
 		return{
 			L"Pink charge",

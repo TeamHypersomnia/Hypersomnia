@@ -83,7 +83,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(logic_step& step) {
 			if (chamber_slot.get_mounted_items().size() == 1) {
 				messages::gunshot_response response;
 
-				const auto muzzle_transform = gun.calculate_muzzle_position(gun_transform);
+				const components::transform muzzle_transform = { gun.calculate_muzzle_position(gun_transform), gun_transform.rotation };
 				
 				const auto item_in_chamber = chamber_slot.get_mounted_items()[0];
 

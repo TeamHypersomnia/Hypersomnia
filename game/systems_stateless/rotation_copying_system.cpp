@@ -104,7 +104,7 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 				const auto& gun = subject_item.get<components::gun>();
 
 				const auto rifle_transform = subject_item.logic_transform();
-				auto barrel_center = gun.calculate_barrel_center(rifle_transform.pos);
+				auto barrel_center = gun.calculate_barrel_center(rifle_transform);
 				auto muzzle = gun.calculate_muzzle_position(rifle_transform);
 				const auto mc = position(it);
 

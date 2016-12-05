@@ -7,6 +7,7 @@ enum class entity_name {
 
 	ASSAULT_RIFLE,
 	BILMER2000,
+	KEK9,
 	MAGAZINE,
 	GREEN_CHARGE,
 	PINK_CHARGE,
