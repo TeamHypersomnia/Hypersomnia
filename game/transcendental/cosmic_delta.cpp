@@ -524,9 +524,13 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndCreatedThreeEntitiesWithReferences) {
 	const auto second_guid = new_ent2.get_guid();
 	const auto third_guid = new_ent3.get_guid();
 
-	new_ent1 += components::position_copying(new_ent2);
-	new_ent2 += components::position_copying(new_ent3);
-	new_ent3 += components::position_copying(new_ent1);
+	new_ent1 += components::position_copying();
+	new_ent2 += components::position_copying();
+	new_ent3 += components::position_copying();
+
+	new_ent1.get<components::position_copying>().set_target(new_ent2);
+	new_ent2.get<components::position_copying>().set_target(new_ent3);
+	new_ent3.get<components::position_copying>().set_target(new_ent1);
 
 	new_ent1.map_sub_entity(sub_entity_name::CHARACTER_CROSSHAIR, new_ent2);
 
@@ -588,9 +592,13 @@ TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
 		c1_second_guid = new_ent2.get_guid();
 		c1_third_guid = new_ent3.get_guid();
 
-		new_ent1 += components::position_copying(new_ent2);
-		new_ent2 += components::position_copying(new_ent3);
-		new_ent3 += components::position_copying(new_ent1);
+		new_ent1 += components::position_copying();
+		new_ent2 += components::position_copying();
+		new_ent3 += components::position_copying();
+
+		new_ent1.get<components::position_copying>().set_target(new_ent2);
+		new_ent2.get<components::position_copying>().set_target(new_ent3);
+		new_ent3.get<components::position_copying>().set_target(new_ent1);
 
 		new_ent1.map_sub_entity(sub_entity_name::CHARACTER_CROSSHAIR, new_ent2);
 	}
@@ -605,9 +613,13 @@ TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
 		c2_second_guid = new_ent2.get_guid();
 		c2_third_guid = new_ent3.get_guid();
 
-		new_ent1 += components::position_copying(new_ent2);
-		new_ent2 += components::position_copying(new_ent3);
-		new_ent3 += components::position_copying(new_ent1);
+		new_ent1 += components::position_copying();
+		new_ent2 += components::position_copying();
+		new_ent3 += components::position_copying();
+
+		new_ent1.get<components::position_copying>().set_target(new_ent2);
+		new_ent2.get<components::position_copying>().set_target(new_ent3);
+		new_ent3.get<components::position_copying>().set_target(new_ent1);
 
 		new_ent1.map_sub_entity(sub_entity_name::CHARACTER_CROSSHAIR, new_ent2);
 	}

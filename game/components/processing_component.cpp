@@ -52,6 +52,9 @@ P P::get_default(const const_entity_handle& id) {
 	if (id.has<components::particles_existence>()) {
 		matching.push_back(processing_subjects::WITH_PARTICLES_EXISTENCE);
 	}
+	if (id.has<components::sound_existence>()) {
+		matching.push_back(processing_subjects::WITH_SOUND_EXISTENCE);
+	}
 	if (id.has<components::pathfinding>()) {
 		matching.push_back(processing_subjects::WITH_PATHFINDING);
 	}

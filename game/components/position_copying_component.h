@@ -78,10 +78,15 @@ namespace components {
 			);
 		}
 
-		position_copying(entity_id id = entity_id()) {
-			set_target(id);
-		}
+		enum class chasing_configuration {
+			NONE,
+			RELATIVE_ORBIT
+		};
 
+		void configure_chasing(
+			const const_entity_handle chased, 
+			const components::transform chaser_place_of_birth,
+			const chasing_configuration);
 		void set_target(entity_id);
 	};
 }

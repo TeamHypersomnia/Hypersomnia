@@ -172,21 +172,17 @@ entity_handle particles_existence_system::create_particle_effect_entity(cosmos& 
 	existence.time_of_last_displacement = cosmos.get_timestamp();
 	existence.current_displacement_duration_bound_ms = 0;
 
-	existence.max_lifetime_in_steps = (*std::max_element((*it.input.effect).begin(), (*it.input.effect).end(), [](const auto& a, const auto& b) {
+	const float duration_ms = (*std::max_element((*it.input.effect).begin(), (*it.input.effect).end(), [](const auto& a, const auto& b) {
 		return a.stream_duration_ms.second < b.stream_duration_ms.second;
 	})).stream_duration_ms.second;
 
+	existence.max_lifetime_in_steps = duration_ms / cosmos.get_fixed_delta().in_milliseconds() + 1;
+	
 	const auto subject = cosmos[it.subject];
 
 	if (subject.alive()) {
-		auto& target_position_copying = new_stream_entity += components::position_copying(it.subject);
-
-		const auto subject_transform = subject.logic_transform();
-		target_position_copying.position_copying_type = components::position_copying::position_copying_type::ORBIT;
-
-		target_position_copying.position_copying_rotation = true;
-		target_position_copying.rotation_offset = it.place_of_birth.rotation - subject_transform.rotation;
-		target_position_copying.rotation_orbit_offset = (it.place_of_birth.pos - subject_transform.pos).rotate(-subject_transform.rotation, vec2(0.f, 0.f));
+		auto& target_position_copying = new_stream_entity += components::position_copying();
+		target_position_copying.configure_chasing(subject, it.place_of_birth, components::position_copying::chasing_configuration::RELATIVE_ORBIT);
 	}
 
 	return new_stream_entity;

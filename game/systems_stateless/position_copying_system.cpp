@@ -17,6 +17,19 @@ void components::position_copying::set_target(const entity_id new_target) {
 	target = new_target;
 }
 
+void components::position_copying::configure_chasing(const const_entity_handle subject, const components::transform chaser_place_of_birth, const chasing_configuration cfg) {
+	set_target(subject.get_id());
+
+	if (cfg == chasing_configuration::RELATIVE_ORBIT) {
+		const auto subject_transform = subject.logic_transform();
+		position_copying_type = components::position_copying::position_copying_type::ORBIT;
+
+		position_copying_rotation = true;
+		rotation_offset = chaser_place_of_birth.rotation - subject_transform.rotation;
+		rotation_orbit_offset = (chaser_place_of_birth.pos - subject_transform.pos).rotate(-subject_transform.rotation, vec2(0.f, 0.f));
+	}
+}
+
 void position_copying_system::update_transforms(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto delta = step.get_delta();
