@@ -17,6 +17,7 @@
 #include "game/systems_audiovisual/light_system.h"
 #include "game/systems_audiovisual/particles_simulation_system.h"
 #include "game/systems_audiovisual/wandering_pixels_system.h"
+#include "game/systems_audiovisual/sound_system.h"
 
 class game_window;
 

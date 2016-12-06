@@ -46,3 +46,4 @@
 #include "game/components/flags_component.h"
 #include "game/components/light_component.h"
 #include "game/components/wandering_pixels_component.h"
+#include "game/components/sound_existence_component.h"

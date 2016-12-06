@@ -15,6 +15,7 @@ class past_infection_system;
 class light_system;
 class particles_simulation_system;
 class wandering_pixels_system;
+class sound_system;
 
 typedef augs::storage_for_systems <
 	physics_system,
@@ -27,5 +28,6 @@ typedef augs::storage_for_systems <
 	past_infection_system,
 	light_system,
 	particles_simulation_system,
-	wandering_pixels_system
+	wandering_pixels_system,
+	sound_system
 > storage_for_all_systems_audiovisual;

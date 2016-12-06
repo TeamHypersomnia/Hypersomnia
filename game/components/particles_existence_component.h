@@ -10,8 +10,6 @@
 
 #include "augs/padding_byte.h"
 
-class particles_simulation_system;
-
 namespace components {
 	struct particles_existence {
 		struct effect_input {
@@ -34,8 +32,5 @@ namespace components {
 
 		bool operator==(const particles_existence&) const;
 		bool operator!=(const particles_existence&) const;
-
-	private:
-		friend class particles_simulation_system;
 	};
 }
