@@ -41,6 +41,7 @@ public:
 	bool show_profile_details = true;
 
 	void spread_past_infection(const const_logic_step&);
+	void acquire_game_events_for_hud(const const_logic_step&);
 
 	augs::variable_delta_timer frame_timer;
 	augs::measurements fps_profiler = augs::measurements(L"FPS");

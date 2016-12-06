@@ -119,6 +119,7 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 			[this](logic_step&) {},
 			[this](const_logic_step& step) {
 				session.spread_past_infection(step);
+				session.acquire_game_events_for_hud(step);
 			}
 		);
 	};

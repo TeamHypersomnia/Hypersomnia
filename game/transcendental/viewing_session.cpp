@@ -22,9 +22,11 @@ std::wstring viewing_session::summary() const {
 		;
 }
 
-void viewing_session::spread_past_infection(const const_logic_step& step) {
+void viewing_session::acquire_game_events_for_hud(const const_logic_step& step) {
 	hud.acquire_game_events(step);
+}
 
+void viewing_session::spread_past_infection(const const_logic_step& step) {
 	const auto& cosm = step.cosm;
 
 	const auto& events = step.transient.messages.get_queue<messages::collision_message>();
