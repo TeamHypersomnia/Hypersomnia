@@ -30,6 +30,10 @@ void components::position_copying::configure_chasing(const const_entity_handle s
 	}
 }
 
+components::transform components::position_copying::get_previous_transform() const {
+	return{ previous, rotation_previous };
+}
+
 void position_copying_system::update_transforms(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto delta = step.get_delta();

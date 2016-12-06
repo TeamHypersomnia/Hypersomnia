@@ -7,6 +7,7 @@
 #include "game/components/particles_existence_component.h"
 #include "game/components/transform_component.h"
 #include "game/components/wandering_pixels_component.h"
+#include "game/components/sound_existence_component.h"
 
 #include "game/transcendental/cosmos.h"
 
@@ -19,6 +20,7 @@ namespace components {
 		const auto* const tile_layer_instance = e.find<components::tile_layer_instance>();
 		const auto* const particles_existence = e.find<components::particles_existence>();
 		const auto* const wandering_pixels = e.find<components::wandering_pixels>();
+		const auto* const sound_existence = e.find<components::sound_existence>();
 
 		if (sprite) {
 			result.aabb = sprite->get_aabb(e.logic_transform());
@@ -30,6 +32,9 @@ namespace components {
 			result.aabb = tile_layer_instance->get_aabb(e.logic_transform());
 		}
 		else if (particles_existence) {
+			result.always_visible = true;
+		}
+		else if (sound_existence) {
 			result.always_visible = true;
 		}
 		else if (wandering_pixels) {

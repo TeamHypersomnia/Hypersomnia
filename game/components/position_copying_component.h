@@ -88,5 +88,6 @@ namespace components {
 			const components::transform chaser_place_of_birth,
 			const chasing_configuration);
 		void set_target(entity_id);
+		components::transform get_previous_transform() const;
 	};
 }
