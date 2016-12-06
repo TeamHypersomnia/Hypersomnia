@@ -10,6 +10,10 @@ bool dynamic_tree_system::cache::is_constructed() const {
 	return constructed;
 }
 
+dynamic_tree_system::tree& dynamic_tree_system::get_tree(const cache& c) {
+	return trees[static_cast<size_t>(c.type)];
+}
+
 void dynamic_tree_system::destruct(const const_entity_handle handle) {
 	const auto id = handle.get_id();
 	const size_t index = id.pool.indirection_index;
@@ -17,17 +21,20 @@ void dynamic_tree_system::destruct(const const_entity_handle handle) {
 	auto& cache = per_entity_cache[index];
 
 	if (cache.is_constructed()) {
-		remove_element(always_visible_entities, handle.get_id());
+		remove_element(get_tree(cache).always_visible, handle.get_id());
 
-		if (cache.tree_proxy_id != -1)
-			non_physical_objects_tree.DestroyProxy(cache.tree_proxy_id);
+		if (cache.tree_proxy_id != -1) {
+			get_tree(cache).nodes.DestroyProxy(cache.tree_proxy_id);
+		}
 
 		per_entity_cache[index] = dynamic_tree_system::cache();
 	}
 }
 
 void dynamic_tree_system::construct(const const_entity_handle handle) {
-	if (!handle.has<components::dynamic_tree_node>()) return;
+	if (!handle.has<components::dynamic_tree_node>()) {
+		return;
+	}
 
 	const auto id = handle.get_id();
 	const size_t index = id.pool.indirection_index;
@@ -41,8 +48,10 @@ void dynamic_tree_system::construct(const const_entity_handle handle) {
 	if (dynamic_tree_node.is_activated()) {
 		auto& data = dynamic_tree_node.get_data();
 
+		cache.type = data.type;
+
 		if (data.always_visible) {
-			always_visible_entities.push_back(handle.get_id());
+			get_tree(cache).always_visible.push_back(handle.get_id());
 		}
 		else {
 			b2AABB input;
@@ -52,7 +61,7 @@ void dynamic_tree_system::construct(const const_entity_handle handle) {
 			unversioned_entity_id node_userdata(handle.get_id());
 			static_assert(sizeof(node_userdata) <= sizeof(void*), "Userdata must be less than size of void*");
 
-			cache.tree_proxy_id = non_physical_objects_tree.CreateProxy(input, reinterpret_cast<void*>(node_userdata.pool.indirection_index));
+			cache.tree_proxy_id = get_tree(cache).nodes.CreateProxy(input, reinterpret_cast<void*>(node_userdata.pool.indirection_index));
 		}
 		
 		cache.constructed = true;
@@ -63,12 +72,15 @@ void dynamic_tree_system::reserve_caches_for_entities(const size_t n) {
 	per_entity_cache.resize(n);
 }
 
-std::vector<unversioned_entity_id> dynamic_tree_system::determine_visible_entities_from_camera(state_for_drawing_camera in, const physics_system& physics) const {
-	std::vector<unversioned_entity_id> visible_entities = always_visible_entities;
-	const auto visible_aabb = in.camera.get_transformed_visible_world_area_aabb();
+std::vector<unversioned_entity_id> dynamic_tree_system::determine_visible_entities_from_camera(
+	const camera_cone in,
+	const components::dynamic_tree_node::tree_type type
+) const {
+	const auto& tree = trees[static_cast<size_t>(type)];
 
-	const auto& result = physics.query_aabb_px(visible_aabb.left_top(), visible_aabb.right_bottom(), filters::renderable_query());
-	visible_entities.insert(visible_entities.end(), result.entities.begin(), result.entities.end());
+	std::vector<unversioned_entity_id> visible_entities = tree.always_visible;
+
+	const auto visible_aabb = in.get_transformed_visible_world_area_aabb();
 
 	struct render_listener {
 		const b2DynamicTree* tree;
@@ -85,14 +97,14 @@ std::vector<unversioned_entity_id> dynamic_tree_system::determine_visible_entiti
 
 	render_listener aabb_listener;
 
-	aabb_listener.tree = &non_physical_objects_tree;
+	aabb_listener.tree = &tree.nodes;
 	aabb_listener.visible_entities = &visible_entities;
 
 	b2AABB input;
 	input.lowerBound = visible_aabb.left_top() - vec2(400, 400);
 	input.upperBound = visible_aabb.right_bottom() + vec2(400, 400);
 
-	non_physical_objects_tree.Query(&aabb_listener, input);
+	tree.nodes.Query(&aabb_listener, input);
 
 	std::sort(visible_entities.begin(), visible_entities.end());
 	visible_entities.erase(std::unique(visible_entities.begin(), visible_entities.end()), visible_entities.end());

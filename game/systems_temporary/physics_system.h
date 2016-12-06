@@ -13,6 +13,7 @@
 #include <set>
 
 class cosmos;
+struct camera_cone;
 #include "game/transcendental/step_declaration.h"
 
 struct rigid_body_cache {
@@ -110,6 +111,7 @@ public:
 
 	query_aabb_output query_aabb(const vec2 p1_meters, const vec2 p2_meters, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
 	query_aabb_output query_aabb_px(const vec2 p1, const vec2 p2, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
+	query_aabb_output query_camera(const camera_cone) const;
 
 	query_output query_body(const const_entity_handle, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
 

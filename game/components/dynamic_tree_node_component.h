@@ -6,9 +6,17 @@
 
 namespace components {
 	struct dynamic_tree_node : synchronizable_component {
+		enum class tree_type : unsigned char {
+			AUDIO,
+			VISUAL,
+			COUNT
+		};
+		
 		bool always_visible = false;
 		bool activated = true;
-		padding_byte pad[2];
+		tree_type type = tree_type::VISUAL;
+
+		padding_byte pad[1];
 
 		augs::rects::ltrb<float> aabb;
 

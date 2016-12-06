@@ -4,6 +4,8 @@
 
 #include "augs/ensure.h"
 #include "game/detail/physics_scripts.h"
+#include "game/detail/camera_cone.h"
+#include "game/enums/filters.h"
 
 bool physics_system::raycast_input::ShouldRaycast(b2Fixture* const fixture) {
 	const auto fixture_entity = fixture->GetBody()->GetUserData();
@@ -154,6 +156,12 @@ physics_system::query_aabb_output physics_system::query_square(const vec2 p1_met
 
 physics_system::query_aabb_output physics_system::query_square_px(const vec2 p1, const float side, const b2Filter filter, const entity_id ignore_entity) const {
 	return query_square(p1 * PIXELS_TO_METERSf, side * PIXELS_TO_METERSf, filter, ignore_entity);
+}
+
+physics_system::query_aabb_output physics_system::query_camera(const camera_cone cam) const {
+	const auto visible_aabb = cam.get_transformed_visible_world_area_aabb();
+
+	return std::move(query_aabb_px(visible_aabb.left_top(), visible_aabb.right_bottom(), filters::renderable_query()));
 }
 
 physics_system::query_aabb_output physics_system::query_aabb(const vec2 p1_meters, const vec2 p2_meters, const b2Filter filter, const entity_id ignore_entity) const {

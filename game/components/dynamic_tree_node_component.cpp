@@ -35,7 +35,9 @@ namespace components {
 			result.always_visible = true;
 		}
 		else if (sound_existence) {
-			result.always_visible = true;
+			result.type = tree_type::AUDIO;
+			result.aabb.set_position(e.logic_transform().pos);
+			result.aabb.set_size({ 2.f, 2.f });
 		}
 		else if (wandering_pixels) {
 			result.aabb = wandering_pixels->reach;
