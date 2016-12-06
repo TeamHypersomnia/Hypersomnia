@@ -118,7 +118,7 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 		cosm.advance_deterministic_schemata(entropy,
 			[this](logic_step&) {},
 			[this](const_logic_step& step) {
-				session.visual_response_from_game_events(step);
+				session.spread_past_infection(step);
 			}
 		);
 	};

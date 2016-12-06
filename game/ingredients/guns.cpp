@@ -5,6 +5,7 @@
 #include "game/components/sprite_component.h"
 #include "game/components/name_component.h"
 #include "game/components/trace_component.h"
+#include "game/components/sound_response_component.h"
 #include "game/components/particle_effect_response_component.h"
 
 #include "game/enums/filters.h"
@@ -385,6 +386,9 @@ namespace prefabs {
 		auto& container = weapon.get<components::container>();
 		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_offset.pos.set(-10, -10);
 		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_sticking_mode = augs::rects::sticking::BOTTOM;
+
+		auto& response = weapon += components::sound_response();
+		response.response = assets::sound_response_id::BILMER2000_RESPONSE;
 
 		auto& gun = weapon += components::gun();
 

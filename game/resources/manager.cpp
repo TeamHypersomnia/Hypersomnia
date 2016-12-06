@@ -145,9 +145,20 @@ namespace resources {
 		return &(*it).second;
 	}
 
+	sound_response* manager::find(const assets::sound_response_id id) {
+		auto it = sound_responses.find(id);
+		if (it == sound_responses.end()) return nullptr;
+
+		return &(*it).second;
+	}
+
 	augs::sound_buffer& manager::create(const assets::sound_buffer_id id) {
 		augs::sound_buffer& snd = sound_buffers[id];
 		return snd;
+	}
+
+	sound_response& manager::create(const assets::sound_response_id id) {
+		return sound_responses[id];
 	}
 
 	atlas& manager::create(const assets::atlas_id id, const unsigned atlas_creation_mode_flags) {

@@ -1,0 +1,17 @@
+#pragma once
+
+namespace assets {
+	enum class sound_response_id {
+		INVALID,
+
+		BILMER2000_RESPONSE,
+		KEK9_RESPONSE,
+		ASSAULT_RIFLE_RESPONSE,
+		SUBMACHINE_RESPONSE,
+		CRATE_RESPONSE,
+		COLORFUL_CHARGE_RESPONSE,
+		SHELL_RESPONSE,
+
+		COUNT
+	};
+}

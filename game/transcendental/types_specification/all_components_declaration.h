@@ -49,6 +49,7 @@ namespace components {
 	struct light;
 	struct wandering_pixels;
 	struct sound_existence;
+	struct sound_response;
 	struct substance;
 }
 
@@ -101,6 +102,7 @@ struct put_all_components_into {
 		components::light,
 		components::wandering_pixels,
 		components::sound_existence,
+		components::sound_response,
 
 		components::substance
 

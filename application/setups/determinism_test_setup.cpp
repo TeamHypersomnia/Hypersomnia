@@ -109,7 +109,7 @@ void determinism_test_setup::process(game_window& window) {
 
 				h.advance_deterministic_schemata(cosmic_entropy_for_this_step, [](auto) {},
 					[this, &session](const const_logic_step& step) {
-						session.visual_response_from_game_events(step);
+						session.spread_past_infection(step);
 					}
 				);
 			}

@@ -22,7 +22,7 @@ std::wstring viewing_session::summary() const {
 		;
 }
 
-void viewing_session::visual_response_from_game_events(const const_logic_step& step) {
+void viewing_session::spread_past_infection(const const_logic_step& step) {
 	hud.acquire_game_events(step);
 
 	const auto& cosm = step.cosm;

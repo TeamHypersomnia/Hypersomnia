@@ -96,9 +96,7 @@ void local_setup::process(game_window& window) {
 			renderer::get_current().clear_logic_lines();
 
 			hypersomnia.advance_deterministic_schemata(cosmic_entropy_for_this_step, [](auto){},
-				[this, &session](const const_logic_step& step){
-					session.visual_response_from_game_events(step);
-				}
+				[this, &session](const const_logic_step& step){}
 			);
 
 			session.resample_state_for_audiovisuals(hypersomnia);

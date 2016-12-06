@@ -1051,6 +1051,7 @@
     <ClInclude Include="augs\texture_baker\texture_with_image.h" />
     <ClInclude Include="augs\zeroed_pod.h" />
     <ClInclude Include="game\assets\sound_buffer_id.h" />
+    <ClInclude Include="game\assets\sound_response_id.h" />
     <ClInclude Include="game\assets\tile_layer_id.h" />
     <ClInclude Include="game\components\child_component.h" />
     <ClInclude Include="game\components\flags_component.h" />
@@ -1059,6 +1060,7 @@
     <ClInclude Include="game\components\light_component.h" />
     <ClInclude Include="game\components\physical_relations_component.h" />
     <ClInclude Include="game\components\sound_existence_component.h" />
+    <ClInclude Include="game\components\sound_response_component.h" />
     <ClInclude Include="game\components\sub_entities_component.h" />
     <ClInclude Include="game\components\wandering_pixels_component.h" />
     <ClInclude Include="game\container_sizes.h" />
@@ -1087,7 +1089,9 @@
     <ClInclude Include="game\enums\entity_flag.h" />
     <ClInclude Include="game\enums\input_recording_mode.h" />
     <ClInclude Include="game\enums\renderable_drawing_type.h" />
+    <ClInclude Include="game\enums\sound_response_type.h" />
     <ClInclude Include="game\messages\visibility_information.h" />
+    <ClInclude Include="game\resources\sound_response.h" />
     <ClInclude Include="game\resources\tile_layer.h" />
     <ClInclude Include="game\systems_audiovisual\interpolation_system.h" />
     <ClInclude Include="game\scene_managers\networked_testbed.h" />
