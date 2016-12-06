@@ -8,7 +8,6 @@
 bin/
 tmp/
 *.tmp
-*.dll
 *.exe
 *.bmp
 *.bak
@@ -165,7 +164,6 @@ pip-log.txt
 .DS_Store
 !*.lua
 /ReleaseDebug
-*.wav
 /ReleaseExe
 /RelDeb
 /output/sessions
