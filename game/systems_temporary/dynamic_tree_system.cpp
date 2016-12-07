@@ -104,8 +104,5 @@ std::vector<unversioned_entity_id> dynamic_tree_system::determine_visible_entiti
 
 	tree.nodes.Query(&aabb_listener, input);
 
-	std::sort(visible_entities.begin(), visible_entities.end());
-	visible_entities.erase(std::unique(visible_entities.begin(), visible_entities.end()), visible_entities.end());
-
 	return visible_entities;
 }
