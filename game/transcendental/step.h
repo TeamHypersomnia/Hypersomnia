@@ -3,7 +3,7 @@
 #include "augs/misc/delta.h"
 #include "game/transcendental/cosmic_entropy.h"
 #include "game/transcendental/entity_handle_declaration.h"
-#include "game/detail/state_for_drawing_camera.h"
+#include "game/detail/camera_cone.h"
 #include "game/enums/render_layer.h"
 
 #include "augs/templates/maybe_const.h"
@@ -68,9 +68,10 @@ class viewing_session;
 
 class viewing_step : public const_cosmic_step {
 public:
-	viewing_step(const cosmos&, viewing_session&, const augs::variable_delta&, augs::renderer&, state_for_drawing_camera camera_state);
+	viewing_step(const cosmos&, viewing_session&, const augs::variable_delta&, augs::renderer&, const camera_cone camera_state, const entity_id viewed_character);
 
-	state_for_drawing_camera camera_state;
+	camera_cone camera;
+	entity_id viewed_character;
 
 	viewing_session& session;
 	augs::variable_delta delta;
@@ -79,7 +80,7 @@ public:
 	augs::variable_delta get_delta() const;
 	double get_interpolated_total_time_passed_in_seconds() const;
 
-	vec2 get_screen_space(vec2 pos) const;
+	vec2 get_screen_space(const vec2 pos) const;
 
 	std::vector<const_entity_handle> visible_entities;
 	std::array<std::vector<const_entity_handle>, render_layer::COUNT> visible_per_layer;

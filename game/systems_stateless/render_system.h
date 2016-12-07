@@ -7,10 +7,10 @@
 #include "augs/graphics/vertex.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/enums/renderable_drawing_type.h"
+#include "game/detail/camera_cone.h"
 
 using namespace augs;
 
-struct state_for_drawing_camera;
 class interpolation_system;
 
 class render_system {
@@ -22,7 +22,7 @@ public:
 		const float global_time_seconds,
 		augs::vertex_triangle_buffer& output, 
 		const std::vector<const_entity_handle>&, 
-		const state_for_drawing_camera& in, 
+		const camera_cone in,
 		const renderable_drawing_type renderable_drawing_mode
 	) const;
 
@@ -33,18 +33,17 @@ public:
 		const renderable_type& renderable,
 		const components::transform& renderable_transform,
 		const components::render& render,
-		const state_for_drawing_camera& in_state,
+		const camera_cone camera,
 		const renderable_drawing_type renderable_drawing_mode
 	) const {
-		camera_cone camera = in_state.camera;
-		
-		if (render.absolute_transform) {
-			camera.transform.reset();
-		}
-
 		typename renderable_type::drawing_input in(output);
 
 		in.camera = camera;
+
+		if (render.absolute_transform) {
+			in.camera.transform.reset();
+		}
+
 		in.renderable_transform = renderable_transform;
 		in.set_global_time_seconds(global_time_seconds);
 		in.drawing_type = renderable_drawing_mode;

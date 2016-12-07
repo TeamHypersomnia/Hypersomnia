@@ -118,14 +118,6 @@ void world_camera::tick(const interpolation_system& interp, const augs::variable
 	dont_smooth_once = false;
 }
 
-state_for_drawing_camera world_camera::get_state_for_drawing_camera(const const_entity_handle entity_to_chase) {
-	state_for_drawing_camera in;
-	in.camera = smoothed_camera;
-	in.associated_character = entity_to_chase;
-
-	return in;
-}
-
 vec2i world_camera::get_camera_offset_due_to_character_crosshair(const const_entity_handle entity_to_chase) const {
 	vec2 camera_crosshair_offset;
 

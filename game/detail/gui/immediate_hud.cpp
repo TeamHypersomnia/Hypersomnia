@@ -80,7 +80,7 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 	const auto& cosmos = r.cosm;
 	const auto& interp = r.session.systems_audiovisual.get<interpolation_system>();
 
-	const auto& watched_character = cosmos[r.camera_state.associated_character];
+	const auto& watched_character = cosmos[r.viewed_character];
 
 	const int timestamp_ms = r.get_interpolated_total_time_passed_in_seconds() * 1000;
 
@@ -101,7 +101,7 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 			auto& transform = v.viewing_transform(interp);
 			
 			components::sprite::drawing_input state(r.renderer.triangles);
-			state.camera = r.camera_state.camera;
+			state.camera = r.camera;
 			state.renderable_transform = transform;
 			state.renderable_transform.rotation = 0;
 
@@ -332,7 +332,7 @@ void immediate_hud::draw_pure_color_highlights(viewing_step& msg) const {
 		auto ratio = passed / r.maximum_duration_seconds;
 
 		col.a = 255 * (1-ratio) * r.starting_alpha_ratio;
-		render_system().draw_renderable(triangles, current_time, sprite, subject.viewing_transform(interp, true), subject.get<components::render>(), msg.camera_state, renderable_drawing_type::NORMAL);
+		render_system().draw_renderable(triangles, current_time, sprite, subject.viewing_transform(interp, true), subject.get<components::render>(), msg.camera, renderable_drawing_type::NORMAL);
 		col = prevcol;
 	}
 

@@ -18,13 +18,18 @@ viewing_step::viewing_step(
 	viewing_session& session,
 	const augs::variable_delta& delta,
 	augs::renderer& renderer, 
-	state_for_drawing_camera camera_state) 
+	const camera_cone camera,
+	const entity_id viewed_character
+	) 
 	: 
 	const_cosmic_step(cosm), 
 	session(session),
-	delta(delta), renderer(renderer), camera_state(camera_state) 
+	delta(delta), 
+	renderer(renderer), 
+	camera(camera),
+	viewed_character(viewed_character)
 	{}
 
-vec2 viewing_step::get_screen_space(vec2 pos) const {
-	return pos - camera_state.camera.get_transformed_visible_world_area_aabb().get_position();
+vec2 viewing_step::get_screen_space(const vec2 pos) const {
+	return pos - camera.get_transformed_visible_world_area_aabb().get_position();
 }

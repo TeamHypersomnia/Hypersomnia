@@ -58,8 +58,7 @@ void viewing_session::advance_audiovisual_systems(
 	systems_audiovisual.get<interpolation_system>().integrate_interpolated_transforms(cosm, dt, cosm.get_fixed_delta());
 	cosm.profiler.stop(meter_type::INTERPOLATION);
 
-	const auto cone = camera.get_state_for_drawing_camera(cosm[viewed_character]).camera;
-	systems_audiovisual.get<particles_simulation_system>().advance_visible_streams_and_all_particles(cone, cosm, dt, systems_audiovisual.get<interpolation_system>());
+	systems_audiovisual.get<particles_simulation_system>().advance_visible_streams_and_all_particles(camera.smoothed_camera, cosm, dt, systems_audiovisual.get<interpolation_system>());
 }
 
 void viewing_session::resample_state_for_audiovisuals(const cosmos& cosm) {
@@ -116,7 +115,7 @@ void viewing_session::view(const cosmos& cosmos,
 	world_hover_highlighter.cycle_duration_ms = 700;
 	world_hover_highlighter.update(dt.in_milliseconds());
 	
-	viewing_step main_cosmos_viewing_step(cosmos, *this, dt, renderer, camera.get_state_for_drawing_camera(character_chased_by_camera));
+	viewing_step main_cosmos_viewing_step(cosmos, *this, dt, renderer, camera.smoothed_camera, character_chased_by_camera);
 
 #if NDEBUG || _DEBUG
 	rendering_scripts::illuminated_rendering(main_cosmos_viewing_step);

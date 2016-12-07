@@ -2,7 +2,6 @@
 
 #include "render_system.h"
 #include "game/transcendental/entity_id.h"
-#include "game/detail/state_for_drawing_camera.h"
 
 #include "game/components/polygon_component.h"
 #include "game/components/sprite_component.h"
@@ -60,7 +59,7 @@ void render_system::draw_entities(
 	const float global_time_seconds,
 	augs::vertex_triangle_buffer& output,
 	const std::vector<const_entity_handle>& entities, 
-	const state_for_drawing_camera& in_camera, 
+	const camera_cone in_camera, 
 	const renderable_drawing_type renderable_drawing_mode
 ) const {
 	for (const auto e : entities) {

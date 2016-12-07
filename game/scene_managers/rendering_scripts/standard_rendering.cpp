@@ -22,25 +22,25 @@
 
 namespace rendering_scripts {
 	void standard_rendering(viewing_step& step) {
-		const auto& state = step.camera_state;
+		const auto& camera = step.camera;
 		auto& renderer = step.renderer;
 		auto& output = renderer.triangles;
 		const auto& cosmos = step.cosm;
 		const auto& dynamic_tree = cosmos.systems_temporary.get<dynamic_tree_system>();
 		const auto& physics = cosmos.systems_temporary.get<physics_system>();
-		const auto& controlled_entity = cosmos[step.camera_state.associated_character];
+		const auto& controlled_entity = cosmos[step.viewed_character];
 		const auto& interp = step.session.systems_audiovisual.get<interpolation_system>();
 		const float global_time_seconds = step.get_interpolated_total_time_passed_in_seconds();
 
-		auto all_visible = dynamic_tree.determine_visible_entities_from_camera(state.camera);
-		const auto visible_from_physics = physics.query_camera(state.camera).entities;
+		auto all_visible = dynamic_tree.determine_visible_entities_from_camera(camera);
+		const auto visible_from_physics = physics.query_camera(camera).entities;
 
 		all_visible.insert(all_visible.end(), visible_from_physics.begin(), visible_from_physics.end());
 
 		step.visible_entities = cosmos[all_visible];
 		step.visible_per_layer = render_system().get_visible_per_layer(step.visible_entities);
 
-		const auto matrix = augs::orthographic_projection<float>(0, state.camera.visible_world_area.x, state.camera.visible_world_area.y, 0, 0, 1);
+		const auto matrix = augs::orthographic_projection<float>(0, camera.visible_world_area.x, camera.visible_world_area.y, 0, 0, 1);
 
 		auto& default_shader = *get_resource_manager().find(assets::program_id::DEFAULT);
 		auto& pure_color_highlight_shader = *get_resource_manager().find(assets::program_id::PURE_COLOR_HIGHLIGHT);
@@ -54,7 +54,7 @@ namespace rendering_scripts {
 		}
 		
 		for (int i = render_layer::UNDER_GROUND; i > render_layer::DYNAMIC_BODY; --i) {
-			render_system().draw_entities(interp, global_time_seconds,output, step.visible_per_layer[i], state, renderable_drawing_type::NORMAL);
+			render_system().draw_entities(interp, global_time_seconds,output, step.visible_per_layer[i], camera, renderable_drawing_type::NORMAL);
 		}
 
 		renderer.call_triangles();
@@ -66,7 +66,7 @@ namespace rendering_scripts {
 			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
 		}
 		
-		render_system().draw_entities(interp, global_time_seconds,output, step.visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], state, renderable_drawing_type::BORDER_HIGHLIGHTS);
+		render_system().draw_entities(interp, global_time_seconds,output, step.visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], camera, renderable_drawing_type::BORDER_HIGHLIGHTS);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
@@ -74,7 +74,7 @@ namespace rendering_scripts {
 		default_shader.use();
 
 		for (int i = render_layer::DYNAMIC_BODY; i >= 0; --i) {
-			render_system().draw_entities(interp, global_time_seconds,output, step.visible_per_layer[i], state, renderable_drawing_type::NORMAL);
+			render_system().draw_entities(interp, global_time_seconds,output, step.visible_per_layer[i], camera, renderable_drawing_type::NORMAL);
 		}
 
 		renderer.call_triangles();
@@ -127,8 +127,8 @@ namespace rendering_scripts {
 		renderer.clear_triangles();
 
 		renderer.draw_debug_info(
-			state.camera.visible_world_area,
-			state.camera.transform,
+			camera.visible_world_area,
+			camera.transform,
 			assets::texture_id::BLANK,
 			{},
 			step.get_delta().view_interpolation_ratio());

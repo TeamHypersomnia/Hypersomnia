@@ -1295,7 +1295,6 @@
     <ClInclude Include="game\detail\inventory_slot.h" />
     <ClInclude Include="game\detail\inventory_slot_id.h" />
     <ClInclude Include="game\detail\inventory_utils.h" />
-    <ClInclude Include="game\detail\state_for_drawing_camera.h" />
     <ClInclude Include="game\types_specification\all_messages_declaration.h" />
     <ClInclude Include="game\types_specification\all_messages_includes.h" />
     <ClInclude Include="game\types_specification\all_systems_declaration.h" />

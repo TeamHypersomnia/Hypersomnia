@@ -2,7 +2,7 @@
 #include "augs/math/vec2.h"
 #include "game/components/transform_component.h"
 #include "augs/misc/smooth_value_field.h"
-#include "game/detail/state_for_drawing_camera.h"
+#include "game/detail/camera_cone.h"
 
 namespace augs {
 	class variable_delta;
@@ -33,7 +33,6 @@ public:
 	void configure_size(vec2);
 
 	void tick(const interpolation_system& interp, augs::variable_delta dt, const_entity_handle entity_to_chase);
-	state_for_drawing_camera get_state_for_drawing_camera(const_entity_handle entity_to_chase);
 
 	vec2i get_camera_offset_due_to_character_crosshair(const_entity_handle) const;
 };

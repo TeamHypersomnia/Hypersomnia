@@ -78,7 +78,7 @@ void aabb_highlighter::draw(viewing_step& step, const const_entity_handle& subje
 
 	if (aabb.good()) {
 		components::sprite::drawing_input state(step.renderer.triangles);
-		state.camera = step.camera_state.camera;
+		state.camera = step.camera;
 		state.positioning = components::sprite::drawing_input::positioning_type::LEFT_TOP_CORNER;
 		state.renderable_transform.rotation = 0;
 
