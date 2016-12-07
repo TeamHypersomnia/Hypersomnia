@@ -12,6 +12,8 @@
 
 #include "game/transcendental/cosmos.h"
 
+#include "augs/ensure.h"
+
 namespace components {
 	dynamic_tree_node dynamic_tree_node::get_default(const_entity_handle e) {
 		dynamic_tree_node result;
@@ -80,12 +82,14 @@ void component_synchronizer<false, D>::update_proxy() const {
 
 	auto& sys = handle.get_cosmos().systems_temporary.get<dynamic_tree_system>();
 	auto& cache = sys.get_cache(handle.get_id());
+	
+	if (cache.is_constructed()) {
+		b2AABB aabb;
+		aabb.lowerBound = component.aabb.left_top();
+		aabb.upperBound = component.aabb.right_bottom();
 
-	b2AABB aabb;
-	aabb.lowerBound = component.aabb.left_top();
-	aabb.upperBound = component.aabb.right_bottom();
-
-	sys.get_tree(cache).nodes.MoveProxy(cache.tree_proxy_id, aabb, displacement);
+		sys.get_tree(cache).nodes.MoveProxy(cache.tree_proxy_id, aabb, displacement);
+	}
 }
 
 void component_synchronizer<false, D>::set_activated(bool flag) const {

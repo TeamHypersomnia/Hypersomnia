@@ -86,6 +86,10 @@ void spatial_properties_getters<false, D>::set_logic_transform(const components:
 	}
 	else {
 		handle.get<components::transform>() = t;
+
+		if (handle.has<components::dynamic_tree_node>()) {
+			handle.get<components::dynamic_tree_node>().update_proxy();
+		}
 	}
 }
 
