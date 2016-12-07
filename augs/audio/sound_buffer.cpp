@@ -6,6 +6,7 @@
 #include <sndfile.h>
 
 #include "augs/log.h"
+#include "augs/ensure.h"
 
 namespace augs {
 	sound_buffer::sound_buffer() {
@@ -40,6 +41,10 @@ namespace augs {
 		else if (channels == 2) {
 			return AL_FORMAT_STEREO16;
 		}
+
+		const bool bad_format = true;
+		ensure(!bad_format);
+		return AL_FORMAT_MONO8;
 	}
 
 	void sound_buffer::from_file(const std::string filename) {

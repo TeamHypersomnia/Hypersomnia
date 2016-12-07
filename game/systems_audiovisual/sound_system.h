@@ -9,6 +9,8 @@
 
 #include "augs/misc/delta.h"
 
+#include "augs/audio/sound_source.h"
+
 class viewing_step;
 
 class sound_system {
@@ -22,6 +24,10 @@ public:
 
 	cache& get_cache(const const_entity_handle);
 	const cache& get_cache(const const_entity_handle) const;
+
+	std::vector<augs::sound_source> sources;
+
+	void initialize_sound_sources(const size_t num_max_sources);
 
 	void reserve_caches_for_entities(const size_t) const {}
 

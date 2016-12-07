@@ -8,6 +8,10 @@
 
 #include "augs/network/network_client.h"
 
+viewing_session::viewing_session() {
+	systems_audiovisual.get<sound_system>().initialize_sound_sources(32u);
+}
+
 std::wstring viewing_session::summary() const {
 	return 
 		fps_profiler.summary()

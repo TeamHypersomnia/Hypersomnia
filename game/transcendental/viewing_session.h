@@ -54,6 +54,8 @@ public:
 	augs::measurements remote_entropy_profiler = augs::measurements(L"Acquiring remote entropy");
 	augs::measurements triangles = augs::measurements(L"Triangles", false);
 
+	viewing_session();
+
 	std::wstring summary() const;
 	
 	void reserve_caches_for_entities(const size_t);
