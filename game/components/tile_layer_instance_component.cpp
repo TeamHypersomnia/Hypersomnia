@@ -2,8 +2,6 @@
 
 #include "sprite_component.h"
 
-#include "game/detail/state_for_drawing_camera.h"
-
 #include "augs/graphics/vertex.h"
 #include "augs/ensure.h"
 #include "game/resources/manager.h"

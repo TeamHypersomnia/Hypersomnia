@@ -3,8 +3,8 @@
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include <vector>
-#include "game/detail/state_for_drawing_camera.h"
 #include "game/components/dynamic_tree_node_component.h"
+#include "game/detail/camera_cone.h"
 
 class viewing_step;
 class physics_system;

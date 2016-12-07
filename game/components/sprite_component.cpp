@@ -1,7 +1,6 @@
 #include "sprite_component.h"
 #include "augs/texture_baker/texture_baker.h"
 
-#include "game/detail/state_for_drawing_camera.h"
 #include "game/components/render_component.h"
 
 #include "game/transcendental/entity_id.h"
@@ -16,10 +15,6 @@
 using namespace augs;
 
 namespace components {
-	void sprite::drawing_input::setup_from(const state_for_drawing_camera& state) {
-		camera = state.camera;
-	}
-
 	void sprite::drawing_input::set_global_time_seconds(const float secs) {
 		global_time_seconds = secs;
 	}

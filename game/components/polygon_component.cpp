@@ -4,7 +4,6 @@
 #include "3rdparty/polypartition/src/polypartition.h"
 
 #include "augs/graphics/renderer.h"
-#include "game/detail/state_for_drawing_camera.h"
 
 #include "game/resources/manager.h"
 

@@ -101,7 +101,7 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 			auto& transform = v.viewing_transform(interp);
 			
 			components::sprite::drawing_input state(r.renderer.triangles);
-			state.setup_from(r.camera_state);
+			state.camera = r.camera_state.camera;
 			state.renderable_transform = transform;
 			state.renderable_transform.rotation = 0;
 

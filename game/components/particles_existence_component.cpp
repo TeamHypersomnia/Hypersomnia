@@ -1,5 +1,4 @@
 #include "particles_existence_component.h"
-#include "game/detail/state_for_drawing_camera.h"
 
 using namespace augs;
 

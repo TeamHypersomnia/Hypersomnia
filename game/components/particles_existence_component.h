@@ -5,7 +5,6 @@
 #include "game/resources/particle_effect.h"
 #include "transform_component.h"
 
-#include "game/detail/state_for_drawing_camera.h"
 #include "augs/misc/stepped_timing.h"
 
 #include "augs/padding_byte.h"

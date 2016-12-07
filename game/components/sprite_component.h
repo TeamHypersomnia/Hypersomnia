@@ -9,7 +9,6 @@
 #include "game/detail/camera_cone.h"
 #include "game/enums/renderable_drawing_type.h"
 
-struct state_for_drawing_camera;
 namespace augs {
 	class texture_with_image;
 }
@@ -34,7 +33,6 @@ namespace components {
 			float global_time_seconds = 0.f;
 
 			void set_global_time_seconds(const float);
-			void setup_from(const state_for_drawing_camera&);
 		};
 
 		assets::texture_id tex = assets::texture_id::INVALID;
