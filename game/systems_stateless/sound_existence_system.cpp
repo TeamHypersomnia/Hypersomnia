@@ -17,6 +17,18 @@
 
 #include "game/resources/manager.h"
 
+void components::sound_existence::activate(const entity_handle h) {
+	auto& existence = h.get<components::particles_existence>();
+	existence.time_of_birth = h.get_cosmos().get_timestamp();
+	h.get<components::dynamic_tree_node>().set_activated(true);
+	h.get<components::processing>().enable_in(processing_subjects::WITH_SOUND_EXISTENCE);
+}
+
+void components::sound_existence::deactivate(const entity_handle h) {
+	h.get<components::dynamic_tree_node>().set_activated(false);
+	h.get<components::processing>().disable_in(processing_subjects::WITH_SOUND_EXISTENCE);
+}
+
 void sound_existence_system::destroy_dead_sounds(logic_step& step) const {
 	auto& cosmos = step.cosm;
 	const auto timestamp = cosmos.get_timestamp();
@@ -25,7 +37,12 @@ void sound_existence_system::destroy_dead_sounds(logic_step& step) const {
 		auto& existence = it.get<components::sound_existence>();
 
 		if ((timestamp - existence.time_of_birth).step > existence.max_lifetime_in_steps) {
-			step.transient.messages.post(messages::queue_destruction(it));
+			if (existence.input.delete_entity_after_effect_lifetime) {
+				step.transient.messages.post(messages::queue_destruction(it));
+			}
+			else {
+				components::sound_existence::deactivate(it);
+			}
 		}
 	}
 }

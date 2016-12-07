@@ -155,10 +155,10 @@ void car_system::apply_movement_forces(logic_step& step) {
 		it.for_each_sub_entity_recursive([&](const entity_handle h) {
 			if (h.has<components::particles_existence>()) {
 				if (car.accelerating) {
-					h.get<components::processing>().enable_in(processing_subjects::WITH_PARTICLES_EXISTENCE);
+					components::particles_existence::activate(h);
 				}
 				else {
-					h.get<components::processing>().disable_in(processing_subjects::WITH_PARTICLES_EXISTENCE);
+					components::particles_existence::deactivate(h);
 				}
 			}
 		});

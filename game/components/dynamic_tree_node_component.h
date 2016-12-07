@@ -7,14 +7,15 @@
 namespace components {
 	struct dynamic_tree_node : synchronizable_component {
 		enum class tree_type : unsigned char {
-			AUDIO,
-			VISUAL,
+			SOUND_EXISTENCES,
+			PARTICLE_EXISTENCES,
+			RENDERABLES,
 			COUNT
 		};
 		
 		bool always_visible = false;
 		bool activated = true;
-		tree_type type = tree_type::VISUAL;
+		tree_type type = tree_type::RENDERABLES;
 
 		padding_byte pad[1];
 
@@ -35,11 +36,26 @@ namespace components {
 }
 
 template<bool is_const>
-class component_synchronizer<is_const, components::dynamic_tree_node> : public component_synchronizer_base<is_const, components::dynamic_tree_node> {
+class basic_dynamic_tree_node_synchronizer : public component_synchronizer_base<is_const, components::dynamic_tree_node> {
+protected:
 public:
 	using component_synchronizer_base<is_const, components::dynamic_tree_node>::component_synchronizer_base;
 
-	bool is_activated() const {
-		return component.activated;
-	}
+	bool is_activated() const;
+};
+
+template<>
+class component_synchronizer<false, components::dynamic_tree_node> : public basic_dynamic_tree_node_synchronizer<false> {
+	void resubstantiation() const;
+public:
+	using basic_dynamic_tree_node_synchronizer<false>::basic_dynamic_tree_node_synchronizer;
+
+	void update_proxy() const;
+	void set_activated(bool) const;
+};
+
+template<>
+class component_synchronizer<true, components::dynamic_tree_node> : public basic_dynamic_tree_node_synchronizer<true> {
+public:
+	using basic_dynamic_tree_node_synchronizer<true>::basic_dynamic_tree_node_synchronizer;
 };

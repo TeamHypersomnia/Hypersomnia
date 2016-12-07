@@ -49,12 +49,17 @@ void viewing_session::reserve_caches_for_entities(const size_t n) {
 	});
 }
 
-void viewing_session::advance_audiovisual_systems(const cosmos& cosm, const augs::delta dt) {
+void viewing_session::advance_audiovisual_systems(
+	const cosmos& cosm, 
+	const entity_id viewed_character,
+	const augs::delta dt
+) {
 	cosm.profiler.start(meter_type::INTERPOLATION);
 	systems_audiovisual.get<interpolation_system>().integrate_interpolated_transforms(cosm, dt, cosm.get_fixed_delta());
 	cosm.profiler.stop(meter_type::INTERPOLATION);
 
-	systems_audiovisual.get<particles_simulation_system>().advance_streams_and_particles(cosm, dt, systems_audiovisual.get<interpolation_system>());
+	const auto cone = camera.get_state_for_drawing_camera(cosm[viewed_character]).camera;
+	systems_audiovisual.get<particles_simulation_system>().advance_visible_streams_and_all_particles(cone, cosm, dt, systems_audiovisual.get<interpolation_system>());
 }
 
 void viewing_session::resample_state_for_audiovisuals(const cosmos& cosm) {

@@ -106,7 +106,7 @@ void local_setup::process(game_window& window) {
 
 		const auto vdt = session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), input_unpacker.timer);
 
-		session.advance_audiovisual_systems(hypersomnia, vdt);
+		session.advance_audiovisual_systems(hypersomnia, testbed.get_controlled_entity(), vdt);
 
 		session.view(hypersomnia, testbed.get_controlled_entity(), window, vdt);
 	}

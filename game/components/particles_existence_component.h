@@ -10,10 +10,15 @@
 
 #include "augs/padding_byte.h"
 
+#include "game/transcendental/entity_handle_declaration.h"
+
 namespace components {
 	struct particles_existence {
 		struct effect_input {
 			assets::particle_effect_id effect = assets::particle_effect_id::INVALID;
+			bool delete_entity_after_effect_lifetime = true;
+			padding_byte pad;
+
 			resources::particle_effect_modifier modifier;
 
 			float randomize_position_within_radius = 0.f;
@@ -29,6 +34,9 @@ namespace components {
 		unsigned max_lifetime_in_steps = 0u;
 
 		float distribute_within_segment_of_length = 0.f;
+
+		static void activate(const entity_handle);
+		static void deactivate(const entity_handle);
 
 		bool operator==(const particles_existence&) const;
 		bool operator!=(const particles_existence&) const;

@@ -2,7 +2,7 @@
 #include "game/resources/particle_effect.h"
 
 namespace assets {
-	enum class particle_effect_id {
+	enum class particle_effect_id : unsigned short {
 		INVALID,
 
 		PIXEL_BURST,

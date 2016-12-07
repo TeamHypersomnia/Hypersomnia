@@ -12,6 +12,8 @@ class physics_system;
 class dynamic_tree_system {
 	friend class cosmos;
 	
+	friend class component_synchronizer<false, components::dynamic_tree_node>;
+
 	struct tree {
 		std::vector<unversioned_entity_id> always_visible;
 		b2DynamicTree nodes;
@@ -34,10 +36,11 @@ class dynamic_tree_system {
 	void destruct(const_entity_handle);
 
 	tree& get_tree(const cache&);
+	cache& get_cache(const unversioned_entity_id);
 
 public:
 
 	std::vector<unversioned_entity_id> determine_visible_entities_from_camera(
 		const camera_cone, 
-		components::dynamic_tree_node::tree_type = components::dynamic_tree_node::tree_type::VISUAL) const;
+		components::dynamic_tree_node::tree_type = components::dynamic_tree_node::tree_type::RENDERABLES) const;
 };

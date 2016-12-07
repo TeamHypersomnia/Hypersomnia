@@ -10,6 +10,9 @@
 #include "game/components/gui_element_component.h"
 #include "game/components/fixtures_component.h"
 
+#include "game/components/sound_existence_component.h"
+#include "game/components/particles_existence_component.h"
+
 //#include "game/systems_audiovisual/interpolation_system.h"
 
 #include "game/transcendental/cosmos.h"
@@ -34,7 +37,10 @@ void basic_entity_handle<C>::add_standard_components() const {
 		get<components::interpolation>().place_of_birth = logic_transform();
 	}
 
-	if (has<components::render>() && !is_entity_physical(*this) && !has<components::dynamic_tree_node>()) {
+	if ((has<components::render>() 
+		|| has<components::particles_existence>()
+		|| has<components::sound_existence>())
+		&& !is_entity_physical(*this) && !has<components::dynamic_tree_node>()) {
 		add(components::dynamic_tree_node::get_default(*this));
 	}
 

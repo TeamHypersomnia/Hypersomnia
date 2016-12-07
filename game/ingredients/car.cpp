@@ -136,6 +136,7 @@ namespace prefabs {
 			effect.input.modifier.colorize = cyan;
 			effect.input.modifier.scale_amounts = 1.5f;
 			effect.input.modifier.scale_lifetimes = 1.2f;
+			effect.input.delete_entity_after_effect_lifetime = false;
 
 			const auto rear_engine = particles_existence_system().create_particle_effect_entity(world, effect);
 

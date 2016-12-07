@@ -4,7 +4,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 
-void sound_system::resample_state_for_audiovisuals(const cosmos&) {
+void sound_system::resample_state_for_audiovisuals(const cosmos& cosmos) {
 
 }
 

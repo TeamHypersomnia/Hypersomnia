@@ -10,15 +10,16 @@ bool dynamic_tree_system::cache::is_constructed() const {
 	return constructed;
 }
 
+dynamic_tree_system::cache& dynamic_tree_system::get_cache(const unversioned_entity_id id) {
+	return per_entity_cache[id.pool.indirection_index];
+}
+
 dynamic_tree_system::tree& dynamic_tree_system::get_tree(const cache& c) {
 	return trees[static_cast<size_t>(c.type)];
 }
 
 void dynamic_tree_system::destruct(const const_entity_handle handle) {
-	const auto id = handle.get_id();
-	const size_t index = id.pool.indirection_index;
-
-	auto& cache = per_entity_cache[index];
+	auto& cache = get_cache(handle.get_id());
 
 	if (cache.is_constructed()) {
 		remove_element(get_tree(cache).always_visible, handle.get_id());
@@ -27,7 +28,7 @@ void dynamic_tree_system::destruct(const const_entity_handle handle) {
 			get_tree(cache).nodes.DestroyProxy(cache.tree_proxy_id);
 		}
 
-		per_entity_cache[index] = dynamic_tree_system::cache();
+		cache = dynamic_tree_system::cache();
 	}
 }
 
@@ -36,10 +37,7 @@ void dynamic_tree_system::construct(const const_entity_handle handle) {
 		return;
 	}
 
-	const auto id = handle.get_id();
-	const size_t index = id.pool.indirection_index;
-
-	auto& cache = per_entity_cache[index];
+	auto& cache = get_cache(handle.get_id());
 
 	ensure(!cache.is_constructed());
 

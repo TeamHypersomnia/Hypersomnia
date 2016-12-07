@@ -107,7 +107,7 @@ void resources::particle::integrate(const float dt) {
 	lifetime_ms += dt * 1000.f;
 }
 
-void particles_simulation_system::advance_streams_and_particles(const cosmos& cosmos, const augs::delta delta, interpolation_system& interp) {
+void particles_simulation_system::advance_visible_streams_and_all_particles(camera_cone cone, const cosmos& cosmos, const augs::delta delta, interpolation_system& interp) {
 	for (auto& particle_layer : particles) {
 		for (auto& p : particle_layer) {
 			p.integrate(delta.in_seconds());
@@ -116,7 +116,12 @@ void particles_simulation_system::advance_streams_and_particles(const cosmos& co
 		erase_remove(particle_layer, [](const resources::particle& a) { return a.lifetime_ms >= a.max_lifetime_ms; });
 	}
 
-	for (const auto it : cosmos.get(processing_subjects::WITH_PARTICLES_EXISTENCE)) {
+	cone.visible_world_area *= 2.5;
+
+	const auto targets = 
+		cosmos[cosmos.systems_temporary.get<dynamic_tree_system>().determine_visible_entities_from_camera(cone, components::dynamic_tree_node::tree_type::PARTICLE_EXISTENCES)];
+
+	for (const auto it : targets) {
 		auto& cache = get_cache(it);
 		const auto& existence = it.get<components::particles_existence>();
 

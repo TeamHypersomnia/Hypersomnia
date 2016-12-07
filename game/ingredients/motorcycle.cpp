@@ -145,6 +145,7 @@ namespace prefabs {
 			//effect.input.single_displacement_duration_ms.set(400.f, 1500.f);
 			effect.subject = front;
 			effect.input.modifier.colorize = cyan;
+			effect.input.delete_entity_after_effect_lifetime = false;
 
 			const auto rear_engine = particles_existence_system().create_particle_effect_entity(world, effect);
 

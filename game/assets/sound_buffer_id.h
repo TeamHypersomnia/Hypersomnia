@@ -5,7 +5,7 @@ namespace augs {
 }
 
 namespace assets {
-	enum class sound_buffer_id {
+	enum class sound_buffer_id : unsigned short {
 		INVALID,
 		BILMER2000_MUZZLE,
 		ASSAULT_RIFLE_MUZZLE,
