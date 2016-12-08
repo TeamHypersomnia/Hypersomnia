@@ -179,9 +179,16 @@ namespace prefabs {
 			auto& damage = round_definition += components::damage();
 			damage.impulse_upon_hit = 1000.f;
 
-			auto& response = round_definition += components::particle_effect_response();
-			response.response = assets::particle_effect_response_id::ELECTRIC_CHARGE_RESPONSE;
-			response.modifier.colorize = pink;
+			{
+				auto& response = round_definition += components::particle_effect_response();
+				response.response = assets::particle_effect_response_id::ELECTRIC_PROJECTILE_RESPONSE;
+				response.modifier.colorize = pink;
+			}
+
+			{
+				auto& response = round_definition += components::sound_response();
+				response.response = assets::sound_response_id::ELECTRIC_PROJECTILE_RESPONSE;
+			}
 
 			auto& trace = round_definition += components::trace();
 			trace.max_multiplier_x = std::make_pair(0.0f, 1.2f);
@@ -227,8 +234,15 @@ namespace prefabs {
 			s.size *= vec2(2, 0.5);
 			ingredients::bullet_round_physics(round_definition);
 
-			auto& response = round_definition += components::particle_effect_response { assets::particle_effect_response_id::ELECTRIC_CHARGE_RESPONSE };
-			response.modifier.colorize = cyan;
+			{
+				auto& response = round_definition += components::particle_effect_response { assets::particle_effect_response_id::ELECTRIC_PROJECTILE_RESPONSE };
+				response.modifier.colorize = cyan;
+			}
+
+			{
+				auto& response = round_definition += components::sound_response();
+				response.response = assets::sound_response_id::ELECTRIC_PROJECTILE_RESPONSE;
+			}
 
 			auto& damage = round_definition += components::damage();
 			auto& trace = round_definition += components::trace();
@@ -275,9 +289,16 @@ namespace prefabs {
 			s.size *= vec2(2.f, 0.5f);
 			ingredients::bullet_round_physics(round_definition);
 
-			auto& response = round_definition += components::particle_effect_response { assets::particle_effect_response_id::HEALING_CHARGE_RESPONSE };
-			response.modifier.colorize = green;
+			{
+				auto& response = round_definition += components::particle_effect_response{ assets::particle_effect_response_id::HEALING_PROJECTILE_RESPONSE };
+				response.modifier.colorize = green;
+			}
 
+			{
+				auto& response = round_definition += components::sound_response();
+				response.response = assets::sound_response_id::ELECTRIC_PROJECTILE_RESPONSE;
+			}
+			
 			auto& damage = round_definition += components::damage();
 			damage.amount *= -1;
 			damage.impulse_upon_hit = 0.f;
@@ -598,6 +619,9 @@ namespace prefabs {
 		auto& container = weapon.get<components::container>();
 		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_offset.pos.set(1, -11);
 		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_sticking_mode = augs::rects::sticking::BOTTOM;
+
+		auto& response = weapon += components::sound_response();
+		response.response = assets::sound_response_id::BILMER2000_RESPONSE;
 
 		auto& gun = weapon += components::gun();
 

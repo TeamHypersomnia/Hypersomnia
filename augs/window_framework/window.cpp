@@ -460,8 +460,6 @@ namespace augs {
 					context = this;
 			}
 
-			audio.make_current();
-
 			return ret;
 		}
 

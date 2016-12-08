@@ -5,16 +5,16 @@
 
 #include <sndfile.h>
 
-#include "augs/log.h"
+#include "augs/al_log.h"
 #include "augs/ensure.h"
 
 namespace augs {
 	sound_buffer::sound_buffer() {
-		alGenBuffers(1, &id);
+		AL_CHECK(alGenBuffers(1, &id));
 	}
 
 	sound_buffer::~sound_buffer() {
-		alDeleteBuffers(1, &id);
+		AL_CHECK(alDeleteBuffers(1, &id));
 	}
 
 	ALuint sound_buffer::get_id() const {
@@ -23,7 +23,13 @@ namespace augs {
 
 	void sound_buffer::set_data(const data_type new_data) {
 		data = new_data;
-		alBufferData(id, new_data.get_format(), new_data.samples.data(), new_data.samples.size(), new_data.frequency);
+		const auto passed_format = new_data.get_format();
+		const auto passed_frequency = new_data.frequency;
+		const auto passed_bytesize = new_data.samples.size() * sizeof(int16_t);
+
+		LOG("Passed format: %x\nPassed frequency: %x\nPassed bytesize: %x", passed_format, passed_frequency, passed_bytesize);
+
+		AL_CHECK(alBufferData(id, passed_format, new_data.samples.data(), passed_bytesize, passed_frequency));
 	}
 
 	sound_buffer::data_type sound_buffer::get_data() const {
@@ -67,7 +73,12 @@ namespace augs {
 
 		set_data(new_data);
 
-		LOG("Sound: %x\nSample rate: %x\nChannels: %x\nLength in seconds: %x", filename, info.samplerate, info.channels, get_length_in_seconds());
+		LOG("Sound: %x\nSample rate: %x\nChannels: %x\nFormat: %x\nLength in seconds: %x", 
+			filename, 
+			info.samplerate, 
+			info.channels, 
+			info.format, 
+			get_length_in_seconds());
 
 		sf_close(file);
 	}

@@ -56,13 +56,30 @@ void viewing_session::reserve_caches_for_entities(const size_t n) {
 void viewing_session::advance_audiovisual_systems(
 	const cosmos& cosm, 
 	const entity_id viewed_character,
-	const augs::delta dt
+	const augs::variable_delta dt
 ) {
+	auto& interp = systems_audiovisual.get<interpolation_system>();
+
 	cosm.profiler.start(meter_type::INTERPOLATION);
-	systems_audiovisual.get<interpolation_system>().integrate_interpolated_transforms(cosm, dt, cosm.get_fixed_delta());
+	interp.integrate_interpolated_transforms(cosm, dt, dt.get_fixed());
 	cosm.profiler.stop(meter_type::INTERPOLATION);
 
-	systems_audiovisual.get<particles_simulation_system>().advance_visible_streams_and_all_particles(camera.smoothed_camera, cosm, dt, systems_audiovisual.get<interpolation_system>());
+	systems_audiovisual.get<particles_simulation_system>().advance_visible_streams_and_all_particles(
+		camera.smoothed_camera, 
+		cosm, 
+		dt, 
+		interp);
+	
+	auto listener_cone = camera.smoothed_camera;
+	listener_cone.transform = cosm[viewed_character].viewing_transform(interp);
+
+	systems_audiovisual.get<sound_system>().play_nearby_sound_existences(
+		listener_cone,
+		viewed_character,
+		cosm,
+		cosm.get_total_time_passed_in_seconds() + dt.seconds_after_last_step(),
+		interp
+	);
 }
 
 void viewing_session::resample_state_for_audiovisuals(const cosmos& cosm) {

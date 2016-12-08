@@ -45,5 +45,6 @@ namespace augs {
 		fixed_delta get_fixed() const;
 		
 		float view_interpolation_ratio() const;
+		float seconds_after_last_step() const;
 	};
 }

@@ -6,7 +6,7 @@
 #include "game/components/damage_component.h"
 #include "game/components/render_component.h"
 #include "game/components/position_copying_component.h"
-#include "game/components/particles_existence_component.h"
+#include "game/components/sound_response_component.h"
 
 #include "game/messages/gunshot_response.h"
 #include "game/messages/create_particle_effect.h"
@@ -48,7 +48,37 @@ void sound_existence_system::destroy_dead_sounds(logic_step& step) const {
 }
 
 void sound_existence_system::game_responses_to_sound_effects(logic_step& step) const {
+	const auto& gunshots = step.transient.messages.get_queue<messages::gunshot_response>();
+	const auto& damages = step.transient.messages.get_queue<messages::damage_message>();
+	const auto& swings = step.transient.messages.get_queue<messages::melee_swing_response>();
+	const auto& healths = step.transient.messages.get_queue<messages::health_event>();
+	auto& cosmos = step.cosm;
 
+	for (const auto& g : gunshots) {
+		for (const auto r : g.spawned_rounds) {
+			const auto subject = cosmos[r];
+			const auto& round_response = subject.get<components::sound_response>();
+			const auto& round_response_map = *get_resource_manager().find(round_response.response);
+
+			components::sound_existence::effect_input in;
+			in.delete_entity_after_effect_lifetime = true;
+			in.effect = round_response_map.at(sound_response_type::PROJECTILE_TRACE);
+
+			create_sound_effect_entity(cosmos, in, subject.logic_transform(), subject).add_standard_components();
+		}
+
+		{
+			const auto subject = cosmos[g.subject];
+			const auto& gun_response = subject.get<components::sound_response>();
+			const auto& gun_response_map = *get_resource_manager().find(gun_response.response);
+
+			components::sound_existence::effect_input in;
+			in.delete_entity_after_effect_lifetime = true;
+			in.effect = gun_response_map.at(sound_response_type::MUZZLE_SHOT);
+
+			create_sound_effect_entity(cosmos, in, subject.logic_transform(), subject).add_standard_components();
+		}
+	}
 }
 //void create_sound_effects(logic_step&) const;
 entity_handle sound_existence_system::create_sound_effect_entity(cosmos& cosmos, 

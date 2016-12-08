@@ -14,6 +14,9 @@ namespace augs {
 
 		stepped_timestamp operator-(stepped_timestamp b) const;
 
+		bool operator==(const stepped_timestamp) const;
+		bool operator!=(const stepped_timestamp) const;
+
 		float in_seconds(fixed_delta) const;
 		float in_milliseconds(fixed_delta) const;
 	};

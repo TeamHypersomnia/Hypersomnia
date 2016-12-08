@@ -18,11 +18,15 @@ namespace augs {
 	unsigned fixed_delta::get_steps_per_second() const {
 		return steps_per_second;
 	}
-	
+
 	float variable_delta::view_interpolation_ratio() const {
 		return interpolation_ratio;
 	}
-	
+
+	float variable_delta::seconds_after_last_step() const {
+		return interpolation_ratio * fixed.in_seconds();
+	}
+
 	fixed_delta variable_delta::get_fixed() const {
 		return fixed;
 	}

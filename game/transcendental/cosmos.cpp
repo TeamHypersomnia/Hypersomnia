@@ -25,6 +25,7 @@
 #include "game/systems_stateless/melee_system.h"
 #include "game/systems_stateless/sentience_system.h"
 #include "game/systems_stateless/destruction_system.h"
+#include "game/systems_stateless/sound_existence_system.h"
 
 #include "game/enums/render_layer.h"
 
@@ -480,6 +481,7 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(logic_step& s
 	particles_existence_system().game_responses_to_particle_effects(step);
 	particles_existence_system().create_particle_effects(step);
 
+	sound_existence_system().game_responses_to_sound_effects(step);
 	// gui_system().translate_game_events_for_hud(step);
 
 	performance.start(meter_type::VISIBILITY);
@@ -500,6 +502,8 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(logic_step& s
 	performance.stop(meter_type::GUI);
 
 	particles_existence_system().destroy_dead_streams(step);
+	sound_existence_system().destroy_dead_sounds(step);
+
 	trace_system().destroy_outdated_traces(step);
 
 	destroy_system().queue_children_of_queued_entities(step);

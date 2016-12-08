@@ -324,7 +324,7 @@ namespace resource_setups {
 		}
 
 		{
-			auto& response = get_resource_manager().create(assets::particle_effect_response_id::HEALING_CHARGE_RESPONSE);
+			auto& response = get_resource_manager().create(assets::particle_effect_response_id::HEALING_PROJECTILE_RESPONSE);
 
 			response[particle_effect_response_type::MUZZLE_LEAVE_EXPLOSION] = assets::particle_effect_id::WANDERING_PIXELS_SPREAD;
 			response[particle_effect_response_type::DESTRUCTION_EXPLOSION] = assets::particle_effect_id::WANDERING_PIXELS_SPREAD;
@@ -332,7 +332,7 @@ namespace resource_setups {
 		}
 
 		{
-			auto& response = get_resource_manager().create(assets::particle_effect_response_id::ELECTRIC_CHARGE_RESPONSE);
+			auto& response = get_resource_manager().create(assets::particle_effect_response_id::ELECTRIC_PROJECTILE_RESPONSE);
 
 			response[particle_effect_response_type::MUZZLE_LEAVE_EXPLOSION] = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
 			response[particle_effect_response_type::DESTRUCTION_EXPLOSION] = assets::particle_effect_id::PIXEL_BURST;

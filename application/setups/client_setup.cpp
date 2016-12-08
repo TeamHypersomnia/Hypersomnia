@@ -217,6 +217,7 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 	if (!still_downloading) {
 		const auto vdt = session.frame_timer.extract_variable_delta(extrapolated_hypersomnia.get_fixed_delta(), input_unpacker.timer);
 		
+
 		session.advance_audiovisual_systems(extrapolated_hypersomnia, scene.get_controlled_entity(), vdt);
 		
 		session.view(extrapolated_hypersomnia, scene.get_controlled_entity(), window, vdt, client, swap_buffers);

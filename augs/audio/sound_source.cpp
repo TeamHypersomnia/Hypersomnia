@@ -3,17 +3,17 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 
-#include <xutility>
+#include "augs/al_log.h"
 
 namespace augs {
 	sound_source::sound_source() {
-		alGenSources(1, &id);
+		AL_CHECK(alGenSources(1, &id));
 		initialized = true;
 	}
 
 	sound_source::~sound_source() {
 		if (initialized) {
-			alDeleteSources(1, &id);
+			AL_CHECK(alDeleteSources(1, &id));
 			initialized = false;
 		}
 	}

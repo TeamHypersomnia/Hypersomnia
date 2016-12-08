@@ -52,7 +52,6 @@ namespace augs {
 			bool poll_event(UINT& out);
 		public:
 			renderer gl;
-			audio_manager audio;
 			resources::manager resources;
 			
 			glwindow();

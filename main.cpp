@@ -17,6 +17,8 @@
 int main(int argc, char** argv) {
 	augs::global_libraries::init();
 	augs::global_libraries::run_googletest(argc, argv);
+	
+	audio_manager audio;
 
 	game_window window;
 	window.call_window_script("config.lua", "config.local.lua");

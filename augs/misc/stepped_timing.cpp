@@ -8,6 +8,15 @@ namespace augs {
 		return stamp;
 	}
 
+
+	bool stepped_timestamp::operator==(const stepped_timestamp b) const {
+		return step == b.step;
+	}
+
+	bool stepped_timestamp::operator!=(const stepped_timestamp b) const {
+		return !operator==(b);
+	}
+
 	float stepped_timestamp::in_seconds(fixed_delta delta) const {
 		return step * delta.in_seconds();
 	}

@@ -63,7 +63,7 @@ public:
 	void advance_audiovisual_systems(
 		const cosmos& cosm, 
 		const entity_id viewed_character,
-		const augs::delta dt);
+		const augs::variable_delta dt);
 	
 	void resample_state_for_audiovisuals(const cosmos&);
 
