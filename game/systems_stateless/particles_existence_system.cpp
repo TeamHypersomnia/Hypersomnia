@@ -90,7 +90,9 @@ void particles_existence_system::game_responses_to_particle_effects(logic_step& 
 			burst.input.effect = round_response_map.at(particle_effect_response_type::PROJECTILE_TRACE);
 			burst.input.modifier = round_response.modifier;
 
-			step.transient.messages.post(burst);
+			const auto trace = create_particle_effect_entity(cosmos, burst);
+			//cosmos[r].add_sub_entity(trace);
+			trace.add_standard_components();
 		}
 
 		for (const auto& s : g.spawned_shells) {

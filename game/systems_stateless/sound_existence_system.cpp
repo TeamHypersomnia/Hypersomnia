@@ -64,7 +64,9 @@ void sound_existence_system::game_responses_to_sound_effects(logic_step& step) c
 			in.delete_entity_after_effect_lifetime = true;
 			in.effect = round_response_map.at(sound_response_type::PROJECTILE_TRACE);
 
-			create_sound_effect_entity(cosmos, in, subject.logic_transform(), subject).add_standard_components();
+			const auto trace = create_sound_effect_entity(cosmos, in, subject.logic_transform(), subject);
+			subject.add_sub_entity(trace);
+			trace.add_standard_components();
 		}
 
 		{
