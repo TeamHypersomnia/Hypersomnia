@@ -59,6 +59,8 @@ void sound_system::play_nearby_sound_existences(
 		cosmos[cosmos.systems_temporary.get<dynamic_tree_system>()
 		.determine_visible_entities_from_camera(cone, components::dynamic_tree_node::tree_type::SOUND_EXISTENCES)];
 
+	decltype(per_entity_cache) new_caches;
+
 	for (const auto it : targets) {
 		auto& cache = get_cache(it);
 		const auto& existence = it.get<components::sound_existence>();
@@ -83,7 +85,11 @@ void sound_system::play_nearby_sound_existences(
 
 		alSource3f(source, AL_POSITION, transform.pos.x, transform.pos.y, 0);
 		alSource3f(source, AL_VELOCITY, vel.x, vel.y, 0);
+
+		new_caches.emplace(it.get_id(), std::move(cache));
 	}
+
+	per_entity_cache = std::move(new_caches);
 
 	const auto subject = cosmos[listening_character];
 	auto transform = subject.viewing_transform(sys);
