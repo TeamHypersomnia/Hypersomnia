@@ -336,6 +336,9 @@ namespace prefabs {
 		ingredients::see_through_dynamic_body(weapon);
 		ingredients::default_gun_container(weapon);
 
+		auto& response = weapon += components::sound_response();
+		response.response = assets::sound_response_id::ASSAULT_RIFLE_RESPONSE;
+
 		auto& gun = weapon += components::gun();
 
 		gun.action_mode = components::gun::action_type::AUTOMATIC;
@@ -479,6 +482,9 @@ namespace prefabs {
 		ingredients::see_through_dynamic_body(weapon);
 		ingredients::default_gun_container(weapon);
 
+		auto& response = weapon += components::sound_response();
+		response.response = assets::sound_response_id::SUBMACHINE_RESPONSE;
+
 		auto& gun = weapon += components::gun();
 
 		gun.action_mode = components::gun::action_type::AUTOMATIC;
@@ -547,6 +553,9 @@ namespace prefabs {
 		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::PISTOL, augs::white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::see_through_dynamic_body(weapon);
 		ingredients::default_gun_container(weapon);
+
+		auto& response = weapon += components::sound_response();
+		response.response = assets::sound_response_id::KEK9_RESPONSE;
 
 		auto& gun = weapon += components::gun();
 
@@ -621,7 +630,7 @@ namespace prefabs {
 		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_sticking_mode = augs::rects::sticking::BOTTOM;
 
 		auto& response = weapon += components::sound_response();
-		response.response = assets::sound_response_id::BILMER2000_RESPONSE;
+		response.response = assets::sound_response_id::KEK9_RESPONSE;
 
 		auto& gun = weapon += components::gun();
 
