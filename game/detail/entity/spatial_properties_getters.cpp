@@ -58,8 +58,7 @@ vec2 basic_spatial_properties_getters<C, D>::get_effective_velocity() const {
 		ensure(handle.has<components::transform>());
 		return handle.get<components::position_copying>().get_previous_transform().pos - handle.get<components::transform>().pos;
 	}
-
-	ensure(false);
+	
 	return{};
 }
 

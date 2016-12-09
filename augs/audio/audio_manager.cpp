@@ -25,7 +25,7 @@ namespace augs {
 	audio_manager::audio_manager() {
 		alGetError();
 
-		device = alcOpenDevice("Generic Software on Speakers (Realtek High Definition Audio)");
+		device = alcOpenDevice(nullptr);
 
 		context = alcCreateContext(device, nullptr);
 
@@ -38,9 +38,9 @@ namespace augs {
 			LOG("\n!!! Failed to set a context !!!\n\n");
 		}
 
-		list_audio_devices(alcGetString(NULL, ALC_ALL_DEVICES_SPECIFIER));
+		list_audio_devices(alcGetString(nullptr, ALC_ALL_DEVICES_SPECIFIER));
 
-		LOG("Default device: %x", alcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER));
+		LOG("Default device: %x", alcGetString(nullptr, ALC_DEFAULT_DEVICE_SPECIFIER));
 	}
 
 	bool audio_manager::make_current() {

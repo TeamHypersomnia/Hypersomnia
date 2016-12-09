@@ -29,9 +29,8 @@ void sound_system::resample_state_for_audiovisuals(const cosmos& new_cosmos) {
 }
 
 void sound_system::initialize_sound_sources(const size_t num_max_sources) {
-	// sources.resize(num_max_sources);
-
-	//alSpeedOfSound();
+	alSpeedOfSound(120.f);
+	alDistanceModel(AL_EXPONENT_DISTANCE);
 	//alDopplerVelocity();
 	//alDopplerFactor()
 }
@@ -54,6 +53,8 @@ void sound_system::play_nearby_sound_existences(
 {
 	cone.visible_world_area *= 2.5;
 
+	const float pixels_to_metersf = PIXELS_TO_METERSf;
+
 	const auto targets =
 		cosmos[cosmos.systems_temporary.get<dynamic_tree_system>()
 		.determine_visible_entities_from_camera(cone, components::dynamic_tree_node::tree_type::SOUND_EXISTENCES)];
@@ -75,28 +76,29 @@ void sound_system::play_nearby_sound_existences(
 			cache.recorded_component = existence;
 		}
 
-		const auto transform = it.viewing_transform(sys);
-		const auto vel = it.get_effective_velocity();
+		auto transform = it.viewing_transform(sys);
+		transform.pos *= pixels_to_metersf;
+
+		const auto vel = it.get_effective_velocity() * pixels_to_metersf;
 
 		alSource3f(source, AL_POSITION, transform.pos.x, transform.pos.y, 0);
 		alSource3f(source, AL_VELOCITY, vel.x, vel.y, 0);
 	}
 
 	const auto subject = cosmos[listening_character];
-	const auto transform = subject.viewing_transform(sys);
-	const auto vel = subject.get_effective_velocity();
+	auto transform = subject.viewing_transform(sys);
+	transform.pos *= pixels_to_metersf;
+	const auto vel = subject.get_effective_velocity()* pixels_to_metersf;
 
 	const float listener_orientation[] = {
-		vec2().set_from_degrees(transform.rotation).x,
-		vec2().set_from_degrees(transform.rotation).y,
+		0.f,//vec2().set_from_degrees(transform.rotation).x,
+		-1.f,//vec2().set_from_degrees(transform.rotation).y,
 		0.f,
 
 		0.f,
 		0.f,
 		-1.f
 	};
-	
-	ALfloat listenerOri[] = { 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
 
 	alListener3f(AL_POSITION, transform.pos.x, transform.pos.y, 0.f);
 	alListener3f(AL_VELOCITY, vel.x, vel.y, 0.f);
