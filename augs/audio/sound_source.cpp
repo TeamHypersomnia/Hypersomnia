@@ -60,6 +60,10 @@ namespace augs {
 		AL_CHECK(alSource3f(id, AL_POSITION, pos.x, pos.y, 0));
 	}
 
+	void sound_source::set_max_distance(const float distance) const {
+		AL_CHECK(alSourcef(id, AL_MAX_DISTANCE, distance * PIXELS_TO_METERSf));
+	}
+
 	void sound_source::attach_buffer(const sound_buffer& buf) const {
 		AL_CHECK(alSourcei(id, AL_BUFFER, buf.get_id()));
 	}

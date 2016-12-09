@@ -28,7 +28,7 @@ void sound_system::resample_state_for_audiovisuals(const cosmos& new_cosmos) {
 
 void sound_system::initialize_sound_sources(const size_t num_max_sources) {
 	AL_CHECK(alSpeedOfSound(120.f));
-	AL_CHECK(alDistanceModel(AL_EXPONENT_DISTANCE));
+	AL_CHECK(alDistanceModel(AL_LINEAR_DISTANCE_CLAMPED));
 	//alDopplerVelocity();
 	//alDopplerFactor()
 }
@@ -49,7 +49,13 @@ void sound_system::play_nearby_sound_existences(
 	interpolation_system& sys
 	) 
 {
-	cone.visible_world_area *= 2.5;
+	auto& queried_size = cone.visible_world_area;
+
+	queried_size.set(1920, 1920);
+	queried_size *= 3.5f;
+
+	const float artifacts_avoidance_epsilon = 20.f;
+	const float audible_radius = queried_size.x / 2.f - artifacts_avoidance_epsilon;
 
 	const float pixels_to_metersf = PIXELS_TO_METERSf;
 
@@ -69,6 +75,7 @@ void sound_system::play_nearby_sound_existences(
 			
 			source.attach_buffer(*get_resource_manager().find(existence.input.effect));
 			source.play();
+			source.set_max_distance(audible_radius);
 
 			cache.recorded_component = existence;
 		}
