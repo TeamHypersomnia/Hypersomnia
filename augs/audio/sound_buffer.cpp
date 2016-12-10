@@ -130,16 +130,24 @@ namespace augs {
 		return stereo;
 	}
 
-	void sound_buffer::variation::set_data(const single_sound_buffer::data_type& data, const bool original) {
-		if (original) {
-			original_channels = data.channels;
-		}
+	void sound_buffer::variation::set_data(const single_sound_buffer::data_type& data, const bool generate_mono) {
+		original_channels = data.channels;
 
 		if (data.channels == 1) {
 			mono.set_data(data);
 		}
 		else if (data.channels == 2) {
 			stereo.set_data(data);
+
+			if (generate_mono) {
+				single_sound_buffer::data_type mono_data;
+				mono_data.channels = 1;
+				mono_data.frequency = data.frequency;
+				mono_data.samples = mix_stereo_to_mono(data.samples);
+
+				mono.set_data(mono_data);
+			}
+
 		}
 		else {
 			const bool bad_format = true;
@@ -155,6 +163,19 @@ namespace augs {
 		return get_id();
 	}
 	
+	std::vector<int16_t> sound_buffer::mix_stereo_to_mono(const std::vector<int16_t>& samples) {
+		ensure(samples.size() % 2 == 0);
+		
+		std::vector<int16_t> output;
+		output.resize(samples.size() / 2);
+
+		for (size_t i = 0; i < samples.size(); i += 2) {
+			output[i/2] = (static_cast<int>(samples[i]) + samples[i+1]) / 2;
+		}
+
+		return std::move(output);
+	}
+
 	single_sound_buffer::data_type sound_buffer::get_data_from_file(const std::string filename) {
 		SF_INFO info;
 		std::memset(&info, 0, sizeof(info));
@@ -187,7 +208,7 @@ namespace augs {
 
 	void sound_buffer::from_file(const std::string filename, const bool generate_mono) {
 		variation new_variation;
-		new_variation.set_data(get_data_from_file(filename), true);
+		new_variation.set_data(get_data_from_file(filename), generate_mono);
 		variations.emplace_back(std::move(new_variation));
 	}
 

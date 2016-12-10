@@ -44,7 +44,7 @@ namespace augs {
 			single_sound_buffer mono;
 			single_sound_buffer stereo;
 
-			void set_data(const single_sound_buffer::data_type&, const bool original = false);
+			void set_data(const single_sound_buffer::data_type&, const bool generate_mono);
 
 			single_sound_buffer& request_original();
 			single_sound_buffer& request_mono();
@@ -57,6 +57,7 @@ namespace augs {
 		std::vector<variation> variations;
 	
 		static single_sound_buffer::data_type get_data_from_file(const std::string);
+		static std::vector<int16_t> mix_stereo_to_mono(const std::vector<int16_t>&);
 	public:
 		void from_file(const std::string filename, const bool generate_mono = true);
 
