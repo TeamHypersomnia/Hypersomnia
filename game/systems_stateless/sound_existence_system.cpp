@@ -29,6 +29,10 @@ void components::sound_existence::deactivate(const entity_handle h) {
 	h.get<components::processing>().disable_in(processing_subjects::WITH_SOUND_EXISTENCE);
 }
 
+size_t components::sound_existence::random_variation_number_from_transform(const components::transform t) const {
+	return time_of_birth.step + std::hash<vec2>()(t.pos);
+}
+
 void sound_existence_system::destroy_dead_sounds(logic_step& step) const {
 	auto& cosmos = step.cosm;
 	const auto timestamp = cosmos.get_timestamp();
@@ -95,7 +99,16 @@ entity_handle sound_existence_system::create_sound_effect_entity(cosmos& cosmos,
 	existence.input = input;
 	existence.time_of_birth = cosmos.get_timestamp();
 
-	existence.max_lifetime_in_steps = get_resource_manager().find(input.effect)->get_length_in_seconds() / cosmos.get_fixed_delta().in_seconds() + 1;
+	const auto* buffer = get_resource_manager().find(input.effect);
+
+	if (existence.input.variation_number == -1) {
+		existence.input.variation_number = existence.random_variation_number_from_transform(place_of_birth) % buffer->get_num_variations();
+	}
+
+	const auto length_in_seconds = buffer->get_variation(existence.input.variation_number).request_original().get_length_in_seconds();
+
+	existence.max_lifetime_in_steps = 
+		length_in_seconds / cosmos.get_fixed_delta().in_seconds() + 1;
 
 	const auto subject = cosmos[chased_subject];
 

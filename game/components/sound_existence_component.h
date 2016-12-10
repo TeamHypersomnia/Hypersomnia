@@ -11,7 +11,7 @@ namespace components {
 		struct effect_input {
 			assets::sound_buffer_id effect = assets::sound_buffer_id::INVALID;
 			bool delete_entity_after_effect_lifetime = true;
-			padding_byte pad;
+			char variation_number = -1;
 			entity_id direct_listener;
 		} input;
 
@@ -20,5 +20,7 @@ namespace components {
 
 		augs::stepped_timestamp time_of_birth;
 		unsigned max_lifetime_in_steps = 0u;
+
+		size_t random_variation_number_from_transform(const components::transform) const;
 	};
 }
