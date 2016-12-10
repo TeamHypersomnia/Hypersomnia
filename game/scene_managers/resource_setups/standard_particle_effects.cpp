@@ -141,9 +141,9 @@ namespace resource_setups {
 			resources::emission em;
 			em.spread_degrees = std::make_pair(100, 130);
 			em.num_of_particles_to_spawn_initially = std::make_pair(30, 120);
-			em.base_velocity = std::make_pair(250, 800);
+			em.base_velocity = std::make_pair(250+200, 800+200);
 			em.angular_velocity = std::make_pair(0, 0);
-			em.particle_lifetime_ms = std::make_pair(30, 100);
+			em.particle_lifetime_ms = std::make_pair(30, 50);
 
 			for (int i = 0; i < 5; ++i) {
 				resources::particle particle_template;
