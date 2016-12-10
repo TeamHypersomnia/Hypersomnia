@@ -264,6 +264,12 @@ void immediate_hud::acquire_game_events(const const_logic_step& step) {
 
 		recent_vertically_flying_numbers.push_back(vn);
 
+		if (cosmos[h.spawned_remnants].alive()) {
+			vn.text.set_text(augs::gui::text::format(L"Death", augs::gui::text::style(assets::font_id::GUI_FONT, col)));
+			vn.transform.pos = cosmos[h.spawned_remnants].logic_transform().pos;
+			recent_vertically_flying_numbers.push_back(vn);
+		}
+
 		pure_color_highlight new_highlight;
 		new_highlight.time_of_occurence = cosmos.get_total_time_passed_in_seconds();
 		
