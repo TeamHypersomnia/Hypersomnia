@@ -7,6 +7,7 @@
 
 #include "augs/al_log.h"
 #include "augs/ensure.h"
+#include "augs/filesystem/file.h"
 
 namespace augs {
 	single_sound_buffer::~single_sound_buffer() {
@@ -207,9 +208,19 @@ namespace augs {
 	}
 
 	void sound_buffer::from_file(const std::string filename, const bool generate_mono) {
-		variation new_variation;
-		new_variation.set_data(get_data_from_file(filename), generate_mono);
-		variations.emplace_back(std::move(new_variation));
+		for (size_t i = 1;;++i) {
+			const auto target_filename = typesafe_sprintf(filename, i);
+
+			const bool no_change_in_filename = target_filename == filename;
+
+			if (!augs::file_exists(target_filename) || (i > 1 && no_change_in_filename)) {
+				break;
+			}
+
+			variation new_variation;
+			new_variation.set_data(get_data_from_file(target_filename), generate_mono);
+			variations.emplace_back(std::move(new_variation));
+		}
 	}
 
 	size_t sound_buffer::get_num_variations() const {
