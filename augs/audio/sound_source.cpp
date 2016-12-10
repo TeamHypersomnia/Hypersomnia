@@ -64,7 +64,7 @@ namespace augs {
 		AL_CHECK(alSourcef(id, AL_MAX_DISTANCE, distance * PIXELS_TO_METERSf));
 	}
 
-	void sound_source::attach_buffer(const sound_buffer& buf) const {
+	void sound_source::attach_buffer(const single_sound_buffer& buf) const {
 		AL_CHECK(alSourcei(id, AL_BUFFER, buf.get_id()));
 	}
 

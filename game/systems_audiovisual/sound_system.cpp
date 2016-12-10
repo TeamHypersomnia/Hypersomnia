@@ -73,7 +73,15 @@ void sound_system::play_nearby_sound_existences(
 		if (cache.recorded_component.time_of_birth != existence.time_of_birth
 			|| cache.recorded_component.input.effect != existence.input.effect) {
 			
-			source.attach_buffer(*get_resource_manager().find(existence.input.effect));
+			const auto& buffer = get_resource_manager().find(existence.input.effect)->get_variation(existence.input.variation_number);
+
+			if (listening_character == existence.input.direct_listener) {
+				source.attach_buffer(buffer.request_stereo());
+			}
+			else {
+				source.attach_buffer(buffer.request_mono());
+			}
+
 			source.play();
 			source.set_max_distance(audible_radius);
 

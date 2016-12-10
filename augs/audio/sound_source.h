@@ -4,7 +4,7 @@
 typedef unsigned int ALuint;
 
 namespace augs {
-	class sound_buffer;
+	class single_sound_buffer;
 
 	void set_listener_velocity(vec2);
 	void set_listener_position(vec2);
@@ -28,7 +28,7 @@ namespace augs {
 		void set_position(vec2) const;
 		void set_max_distance(const float) const;
 
-		void attach_buffer(const sound_buffer&) const;
+		void attach_buffer(const single_sound_buffer&) const;
 
 		ALuint get_id() const;
 		operator ALuint() const;

@@ -81,6 +81,7 @@ void sound_existence_system::game_responses_to_sound_effects(logic_step& step) c
 			components::sound_existence::effect_input in;
 			in.delete_entity_after_effect_lifetime = true;
 			in.effect = gun_response_map.at(sound_response_type::MUZZLE_SHOT);
+			in.direct_listener = subject.get_owning_transfer_capability();
 
 			create_sound_effect_entity(cosmos, in, subject.logic_transform(), entity_id()).add_standard_components();
 		}
