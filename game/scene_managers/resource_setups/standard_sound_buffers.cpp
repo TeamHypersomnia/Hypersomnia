@@ -42,8 +42,18 @@ namespace resource_setups {
 		}
 
 		{
+			auto& buf = get_resource_manager().create(assets::sound_buffer_id::ENGINE);
+			buf.from_file("hypersomnia/sfx/engine_%x.ogg");
+		}
+
+		{
 			auto& buf = get_resource_manager().create(assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION);
 			buf.from_file("hypersomnia/sfx/electric_discharge_explosion_%x.wav");
+		}
+
+		{
+			auto& buf = get_resource_manager().create(assets::sound_buffer_id::WIND);
+			buf.from_file("hypersomnia/sfx/wind_%x.ogg");
 		}
 
 		{

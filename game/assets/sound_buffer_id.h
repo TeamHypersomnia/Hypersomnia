@@ -20,6 +20,9 @@ namespace assets {
 		DEATH,
 		BULLET_PASSES_THROUGH_HELD_ITEM,
 
+		WIND,
+		ENGINE,
+
 		COUNT
 	};
 }
