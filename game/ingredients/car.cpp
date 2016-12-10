@@ -145,6 +145,7 @@ namespace prefabs {
 
 			rear_engine.add_standard_components();
 			front.add_sub_entity(rear_engine);
+			components::particles_existence::deactivate(rear_engine);
 		}
 
 		front.add_standard_components();
