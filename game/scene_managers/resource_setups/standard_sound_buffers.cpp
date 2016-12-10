@@ -43,7 +43,7 @@ namespace resource_setups {
 
 		{
 			auto& buf = get_resource_manager().create(assets::sound_buffer_id::ENGINE);
-			buf.from_file("hypersomnia/sfx/engine_%x.ogg");
+			buf.from_file("hypersomnia/sfx/engine.ogg");
 		}
 
 		{
