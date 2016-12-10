@@ -109,6 +109,21 @@ void sound_existence_system::game_responses_to_sound_effects(logic_step& step) c
 
 		create_sound_effect_entity(cosmos, in, subject.logic_transform(), entity_id()).add_standard_components();
 	}
+
+	for (const auto& d : damages) {
+		if (d.inflictor_destructed) {
+			const auto inflictor = cosmos[d.inflictor];
+			const auto& inflictor_response = inflictor.get<components::sound_response>();
+			const auto& inflictor_response_map = *get_resource_manager().find(inflictor_response.response);
+
+			components::sound_existence::effect_input in;
+			in.delete_entity_after_effect_lifetime = true;
+			in.direct_listener = d.subject;
+			in.effect = inflictor_response_map.at(sound_response_type::DESTRUCTION_EXPLOSION);
+			
+			create_sound_effect_entity(cosmos, in, d.point_of_impact, entity_id()).add_standard_components();
+		}
+	}
 }
 //void create_sound_effects(logic_step&) const;
 entity_handle sound_existence_system::create_sound_effect_entity(cosmos& cosmos, 

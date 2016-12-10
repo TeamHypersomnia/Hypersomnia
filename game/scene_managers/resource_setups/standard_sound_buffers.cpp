@@ -32,6 +32,11 @@ namespace resource_setups {
 		}
 
 		{
+			auto& buf = get_resource_manager().create(assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION);
+			buf.from_file("hypersomnia/sfx/electric_discharge_explosion_%x.wav");
+		}
+
+		{
 			auto& res = get_resource_manager().create(assets::sound_response_id::BILMER2000_RESPONSE);
 			res[sound_response_type::MUZZLE_SHOT] = assets::sound_buffer_id::BILMER2000_MUZZLE;
 		}
@@ -54,6 +59,7 @@ namespace resource_setups {
 		{
 			auto& res = get_resource_manager().create(assets::sound_response_id::ELECTRIC_PROJECTILE_RESPONSE);
 			res[sound_response_type::PROJECTILE_TRACE] = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
+			res[sound_response_type::DESTRUCTION_EXPLOSION] = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
 		}
 
 		{
