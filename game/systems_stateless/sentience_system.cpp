@@ -40,8 +40,9 @@ components::sentience::meter::damage_result components::sentience::meter::calcul
 		if (value - amount > maximum) {
 			result.effective = -(maximum - value);
 		}
-		else
+		else {
 			result.effective = amount;
+		}
 	}
 
 	result.ratio_effective_to_maximum = std::abs(result.effective) / maximum;
@@ -75,8 +76,9 @@ void sentience_system::consume_health_event(messages::health_event h, logic_step
 	if (h.special_result == messages::health_event::DEATH) {
 		const auto* const container = subject.find<components::container>();
 
-		if (container)
+		if (container) {
 			drop_from_all_slots(subject, step);
+		}
 
 		const auto sub_def = subject[sub_entity_name::CORPSE_OF_SENTIENCE];
 
@@ -121,13 +123,16 @@ void sentience_system::apply_damage_and_generate_health_events(logic_step& step)
 		auto aimpunch_event = event;
 		aimpunch_event.target = messages::health_event::AIM;
 
-		if (sentience)
+		if (sentience) {
 			aimpunch_event.subject = subject;
-		else
+		}
+		else {
 			aimpunch_event.subject = subject.get_owning_transfer_capability();
+		}
 
-		if (d.amount > 0 && cosmos[aimpunch_event.subject].alive())
+		if (d.amount > 0 && cosmos[aimpunch_event.subject].alive()) {
 			consume_health_event(aimpunch_event, step);
+		}
 
 		if (sentience) {
 			const auto& s = *sentience;
@@ -147,8 +152,9 @@ void sentience_system::apply_damage_and_generate_health_events(logic_step& step)
 					event.special_result = messages::health_event::DEATH;
 				}
 
-				if (event.effective_amount != 0)
+				if (event.effective_amount != 0) {
 					consume_health_event(event, step);
+				}
 			}
 
 			if (s.consciousness.enabled) {
@@ -162,8 +168,9 @@ void sentience_system::apply_damage_and_generate_health_events(logic_step& step)
 					event.special_result = messages::health_event::LOSS_OF_CONSCIOUSNESS;
 				}
 
-				if (event.effective_amount != 0)
+				if (event.effective_amount != 0) {
 					consume_health_event(event, step);
+				}
 			}
 		}
 	}
@@ -202,8 +209,9 @@ void sentience_system::set_borders(logic_step& step) const {
 				render->draw_border = true;
 				render->border_color = augs::rgba(255, 0, 0, static_cast<augs::rgba_channel>(one_less_hr * one_less_hr * one_less_hr * one_less_hr * 255 * time_pulse_ratio));
 			}
-			else
+			else {
 				render->draw_border = false;
+			}
 		}
 	}
 }
