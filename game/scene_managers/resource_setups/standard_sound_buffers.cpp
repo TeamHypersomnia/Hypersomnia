@@ -55,5 +55,11 @@ namespace resource_setups {
 			auto& res = get_resource_manager().create(assets::sound_response_id::ELECTRIC_PROJECTILE_RESPONSE);
 			res[sound_response_type::PROJECTILE_TRACE] = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
 		}
+
+		{
+			auto& res = get_resource_manager().create(assets::sound_response_id::CHARACTER_RESPONSE);
+			res[sound_response_type::HEALTH_DECREASE] = assets::sound_buffer_id::IMPACT;
+			res[sound_response_type::DEATH] = assets::sound_buffer_id::DEATH;
+		}
 	}
 }

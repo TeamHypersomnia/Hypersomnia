@@ -221,6 +221,8 @@ namespace augs {
 			new_variation.set_data(get_data_from_file(target_filename), generate_mono);
 			variations.emplace_back(std::move(new_variation));
 		}
+
+		ensure(variations.size() > 0);
 	}
 
 	size_t sound_buffer::get_num_variations() const {

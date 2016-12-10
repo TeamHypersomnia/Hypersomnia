@@ -86,6 +86,29 @@ void sound_existence_system::game_responses_to_sound_effects(logic_step& step) c
 			create_sound_effect_entity(cosmos, in, subject.logic_transform(), entity_id()).add_standard_components();
 		}
 	}
+
+	for (const auto& h : healths) {
+		const auto subject = cosmos[h.subject];
+		const auto& subject_response = subject.get<components::sound_response>();
+		const auto& subject_response_map = *get_resource_manager().find(subject_response.response);
+
+		components::sound_existence::effect_input in;
+		in.delete_entity_after_effect_lifetime = true;
+		
+		if (cosmos[h.spawned_remnants].alive()) {
+			in.effect = subject_response_map.at(sound_response_type::DEATH);
+		}
+		else if (h.effective_amount > 0) {
+			in.effect = subject_response_map.at(sound_response_type::HEALTH_DECREASE);
+		}
+		else {
+			continue;
+		}
+
+		in.direct_listener = subject;
+
+		create_sound_effect_entity(cosmos, in, subject.logic_transform(), entity_id()).add_standard_components();
+	}
 }
 //void create_sound_effects(logic_step&) const;
 entity_handle sound_existence_system::create_sound_effect_entity(cosmos& cosmos, 

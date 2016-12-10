@@ -20,6 +20,7 @@
 #include "game/components/name_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/particle_effect_response_component.h"
+#include "game/components/sound_response_component.h"
 #include "game/components/attitude_component.h"
 #include "game/components/dynamic_tree_node_component.h"
 #include "game/components/flags_component.h"
@@ -89,6 +90,12 @@ namespace ingredients {
 		auto& sentience = e += components::sentience();
 		e += components::position_copying(); // used when it is an astral body
 		auto& particle_response = e += components::particle_effect_response { assets::particle_effect_response_id::CHARACTER_RESPONSE };
+		
+		{
+			auto& sound_response = e += components::sound_response();
+			sound_response.response = assets::sound_response_id::CHARACTER_RESPONSE;
+		}
+		
 		auto& attitude = e += components::attitude();
 		auto& processing = e += components::processing();
 		e.set_flag(entity_flag::IS_PAST_CONTAGIOUS);
