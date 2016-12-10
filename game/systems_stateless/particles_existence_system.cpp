@@ -150,16 +150,16 @@ void particles_existence_system::game_responses_to_particle_effects(logic_step& 
 		burst.input.modifier = response.modifier;
 
 		if (h.target == messages::health_event::HEALTH) {
-			if (h.effective_amount > 0) {
+			if (cosmos[h.spawned_remnants].alive()) {
+				burst.input.effect = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
+				burst.input.modifier.scale_amounts += 5.f;
+				burst.input.modifier.scale_lifetimes += 0.5f;
+				step.transient.messages.post(burst);
+			}
+			else if (h.effective_amount > 0) {
 				burst.input.effect = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
 				burst.input.modifier.scale_amounts += h.ratio_effective_to_maximum;
 				step.transient.messages.post(burst);
-			}
-			else {
-				// burst.effect = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
-				// burst.modifier.scale_amounts += h.ratio_effective_to_maximum;
-				// burst.modifier.colorize = green;
-				// step.transient.messages.post(burst);
 			}
 		}
 	}

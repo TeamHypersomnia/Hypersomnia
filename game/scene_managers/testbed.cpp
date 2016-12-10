@@ -420,7 +420,7 @@ namespace scene_managers {
 				new_character.recalculate_basic_processing_categories();
 			}
 			if (i == 2) {
-				new_character.get<components::sentience>().health.value = 38;
+				new_character.get<components::sentience>().health.value = 100;
 			}
 			if (i == 5) {
 				new_character.get<components::attitude>().parties = party_category::METROPOLIS_CITIZEN;
