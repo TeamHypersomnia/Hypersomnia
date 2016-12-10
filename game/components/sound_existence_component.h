@@ -3,6 +3,7 @@
 #include "game/assets/sound_buffer_id.h"
 
 #include "augs/padding_byte.h"
+#include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
 namespace components {
@@ -11,6 +12,7 @@ namespace components {
 			assets::sound_buffer_id effect = assets::sound_buffer_id::INVALID;
 			bool delete_entity_after_effect_lifetime = true;
 			padding_byte pad;
+			entity_id direct_listener;
 		} input;
 
 		static void activate(const entity_handle);

@@ -14,11 +14,16 @@
 #include "game/components/transform_component.h"
 #include "game/components/driver_component.h"
 #include "game/components/fixtures_component.h"
+#include "game/components/sound_existence_component.h"
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/step.h"
 
 #include "game/detail/physics_scripts.h"
+
+#include "game/assets/sound_buffer_id.h"
+
+#include "game/systems_stateless/sound_existence_system.h"
 
 using namespace augs;
 
@@ -62,11 +67,13 @@ void damage_system::destroy_colliding_bullets_and_send_damage(logic_step& step) 
 
 				vec2 impact_velocity = damage.custom_impact_velocity;
 
-				if (impact_velocity.is_zero())
+				if (impact_velocity.is_zero()) {
 					impact_velocity = velocity(collider_handle);
+				}
 
-				if (damage.impulse_upon_hit > 0.f)
+				if (damage.impulse_upon_hit > 0.f) {
 					subject_of_impact.apply_force(vec2(impact_velocity).set_length(damage.impulse_upon_hit), it.point - subject_of_impact.get_mass_position());
+				}
 
 				damage.saved_point_of_impact_before_death = it.point;
 
@@ -75,6 +82,15 @@ void damage_system::destroy_colliding_bullets_and_send_damage(logic_step& step) 
 				const bool is_victim_a_held_item = owning_capability.alive() && owning_capability != it.subject;
 
 				messages::damage_message damage_msg;
+
+				if (is_victim_a_held_item) {
+					components::sound_existence::effect_input in;
+					in.effect = assets::sound_buffer_id::BULLET_PASSES_THROUGH_HELD_ITEM;
+					in.delete_entity_after_effect_lifetime = true;
+					in.direct_listener = owning_capability;
+
+					sound_existence_system().create_sound_effect_entity(cosmos, in, { it.point, 0.f }, entity_id() ).add_standard_components();
+				}
 
 				if (!is_victim_a_held_item && damage.destroy_upon_damage) {
 					damage.damage_charges_before_destruction--;

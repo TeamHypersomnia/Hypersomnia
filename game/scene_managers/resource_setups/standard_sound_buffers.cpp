@@ -17,6 +17,11 @@ namespace resource_setups {
 		}
 
 		{
+			auto& buf = get_resource_manager().create(assets::sound_buffer_id::BULLET_PASSES_THROUGH_HELD_ITEM);
+			buf.from_file("hypersomnia/sfx/bullet_hits_held_item.wav");
+		}
+
+		{
 			auto& res = get_resource_manager().create(assets::sound_response_id::BILMER2000_RESPONSE);
 			res[sound_response_type::MUZZLE_SHOT] = assets::sound_buffer_id::BILMER2000_MUZZLE;
 		}
