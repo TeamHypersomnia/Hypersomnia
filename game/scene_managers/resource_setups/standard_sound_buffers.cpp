@@ -12,6 +12,16 @@ namespace resource_setups {
 		}
 
 		{
+			auto& buf = get_resource_manager().create(assets::sound_buffer_id::ASSAULT_RIFLE_MUZZLE);
+			buf.from_file("hypersomnia/sfx/bilmer2000_muzzle.wav");
+		}
+
+		{
+			auto& buf = get_resource_manager().create(assets::sound_buffer_id::KEK9_MUZZLE);
+			buf.from_file("hypersomnia/sfx/kek9_muzzle.wav");
+		}
+
+		{
 			auto& buf = get_resource_manager().create(assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT);
 			buf.from_file("hypersomnia/sfx/electric_projectile_flight.wav");
 		}
@@ -43,12 +53,12 @@ namespace resource_setups {
 
 		{
 			auto& res = get_resource_manager().create(assets::sound_response_id::KEK9_RESPONSE);
-			res[sound_response_type::MUZZLE_SHOT] = assets::sound_buffer_id::BILMER2000_MUZZLE;
+			res[sound_response_type::MUZZLE_SHOT] = assets::sound_buffer_id::KEK9_MUZZLE;
 		}
 
 		{
 			auto& res = get_resource_manager().create(assets::sound_response_id::ASSAULT_RIFLE_RESPONSE);
-			res[sound_response_type::MUZZLE_SHOT] = assets::sound_buffer_id::BILMER2000_MUZZLE;
+			res[sound_response_type::MUZZLE_SHOT] = assets::sound_buffer_id::ASSAULT_RIFLE_MUZZLE;
 		}
 
 		{
