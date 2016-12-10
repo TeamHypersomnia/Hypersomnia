@@ -178,8 +178,7 @@ namespace components {
 			for (unsigned m = 0; m < max_specular_blinks; ++m) {
 				unsigned total_ms = in.global_time_seconds * 1000 + (animation_max_duration / max_specular_blinks) * m;
 
-				const auto spatial_hash = ((std::hash<float>()(in.renderable_transform.pos.x)
-					^ (std::hash<float>()(in.renderable_transform.pos.y) << 1)) >> 1);
+				const auto spatial_hash = std::hash<vec2>()(in.renderable_transform.pos);
 
 				std::minstd_rand0 generator(spatial_hash + m*30 + total_ms / animation_max_duration);
 

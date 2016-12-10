@@ -492,6 +492,15 @@ struct vec2t {
 	vec2t& operator/=(int d) { x /= d; y /= d; return *this; }
 };
 
+namespace std {
+	template <class T>
+	struct hash<vec2t<T>> {
+		std::size_t operator()(const vec2t<T> v) const {
+			return ((std::hash<T>()(v.x) ^ (std::hash<T>()(v.y) << 1)) >> 1);
+		}
+	};
+}
+
 
 namespace augs {
 	template<class T>
