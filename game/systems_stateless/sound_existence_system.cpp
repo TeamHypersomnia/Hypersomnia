@@ -107,7 +107,7 @@ void sound_existence_system::game_responses_to_sound_effects(logic_step& step) c
 
 		in.direct_listener = subject;
 
-		create_sound_effect_entity(cosmos, in, subject.logic_transform(), entity_id()).add_standard_components();
+		create_sound_effect_entity(cosmos, in, subject.logic_transform(), h.spawned_remnants).add_standard_components();
 	}
 
 	for (const auto& d : damages) {
