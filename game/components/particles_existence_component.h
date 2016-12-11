@@ -34,6 +34,7 @@ namespace components {
 
 		float distribute_within_segment_of_length = 0.f;
 
+		static bool is_activated(const const_entity_handle);
 		static void activate(const entity_handle);
 		static void deactivate(const entity_handle);
 

@@ -1,6 +1,7 @@
 #include "ingredients.h"
 
 #include "game/systems_stateless/particles_existence_system.h"
+#include "game/systems_stateless/sound_existence_system.h"
 #include "game/components/position_copying_component.h"
 
 #include "game/components/crosshair_component.h"
@@ -17,6 +18,7 @@
 #include "game/components/special_physics_component.h"
 #include "game/components/name_component.h"
 #include "game/components/particles_existence_component.h"
+#include "game/components/sound_existence_component.h"
 #include "game/transcendental/cosmos.h"
 
 #include "game/enums/filters.h"
@@ -147,6 +149,16 @@ namespace prefabs {
 			front.add_sub_entity(rear_engine);
 			front.get<components::car>().acceleration_engine = rear_engine;
 			components::particles_existence::deactivate(rear_engine);
+
+			{
+				components::sound_existence::effect_input in;
+				in.effect = assets::sound_buffer_id::ENGINE;
+				in.delete_entity_after_effect_lifetime = false;
+				const auto rear_engine_sound = sound_existence_system().create_sound_effect_entity(world, in, rear_engine.logic_transform(), rear_engine);
+				rear_engine_sound.add_standard_components();
+				rear_engine.add_sub_entity(rear_engine_sound);
+				components::sound_existence::deactivate(rear_engine_sound);
+			}
 		}
 
 		front.add_standard_components();

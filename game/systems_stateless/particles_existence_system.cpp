@@ -20,7 +20,15 @@
 
 #include "game/systems_audiovisual/particles_simulation_system.h"
 
+bool components::particles_existence::is_activated(const const_entity_handle h) {
+	return h.get<components::dynamic_tree_node>().is_activated() && h.get<components::processing>().is_in(processing_subjects::WITH_PARTICLES_EXISTENCE);
+}
+
 void components::particles_existence::activate(const entity_handle h) {
+	if (is_activated(h)) {
+		return;
+	}
+
 	auto& existence = h.get<components::particles_existence>();
 	existence.time_of_birth = h.get_cosmos().get_timestamp();
 	h.get<components::dynamic_tree_node>().set_activated(true);
@@ -28,6 +36,10 @@ void components::particles_existence::activate(const entity_handle h) {
 }
 
 void components::particles_existence::deactivate(const entity_handle h) {
+	if (!is_activated(h)) {
+		return;
+	}
+
 	h.get<components::dynamic_tree_node>().set_activated(false);
 	h.get<components::processing>().disable_in(processing_subjects::WITH_PARTICLES_EXISTENCE);
 }

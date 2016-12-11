@@ -25,6 +25,7 @@ namespace components {
 			f(input.direct_listener);
 		}
 
+		static bool is_activated(const const_entity_handle);
 		static void activate(const entity_handle);
 		static void deactivate(const entity_handle);
 

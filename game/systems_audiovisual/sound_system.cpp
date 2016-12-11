@@ -71,7 +71,9 @@ void sound_system::play_nearby_sound_existences(
 		const auto& source = cache.source;
 
 		if (cache.recorded_component.time_of_birth != existence.time_of_birth
-			|| cache.recorded_component.input.effect != existence.input.effect) {
+			|| cache.recorded_component.input.effect != existence.input.effect
+			|| cache.recorded_component.input.direct_listener != existence.input.direct_listener
+			) {
 			
 			const auto& buffer = get_resource_manager().find(existence.input.effect)->get_variation(existence.input.variation_number);
 

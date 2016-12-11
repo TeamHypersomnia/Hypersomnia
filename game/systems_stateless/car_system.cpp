@@ -15,6 +15,7 @@
 #include "game/components/sub_entities_component.h"
 #include "game/components/processing_component.h"
 #include "game/components/particles_existence_component.h"
+#include "game/components/sound_existence_component.h"
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/step.h"
@@ -159,6 +160,20 @@ void car_system::apply_movement_forces(logic_step& step) {
 				}
 				else {
 					components::particles_existence::deactivate(h);
+				}
+			}
+
+			const auto sound_entity = cosmos[h.get<components::sub_entities>().other_sub_entities[0]];
+
+			if (sound_entity.has<components::sound_existence>()) {
+				if (engine_enabled) {
+					auto& existence = sound_entity.get<components::sound_existence>();
+					existence.input.direct_listener = car.current_driver;
+
+					components::sound_existence::activate(sound_entity);
+				}
+				else {
+					components::sound_existence::deactivate(sound_entity);
 				}
 			}
 		};

@@ -71,7 +71,7 @@ namespace scene_managers {
 		const auto car2 = prefabs::create_car(world, components::transform(1490, 340 + 400, -180));
 		const auto car3 = prefabs::create_car(world, components::transform(1490, 340 + 800, -180));
 
-		const auto motorcycle = prefabs::create_motorcycle(world, components::transform(0, -600, -90));
+		const auto motorcycle = prefabs::create_motorcycle(world, components::transform(0, 600, -90));
 		prefabs::create_motorcycle(world, components::transform(100, -600, -90));
 
 		const auto bg_size = assets::get_size(assets::texture_id::TEST_BACKGROUND);
