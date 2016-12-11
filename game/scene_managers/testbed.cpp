@@ -570,37 +570,37 @@ namespace scene_managers {
 	void testbed::control(const augs::machine_entropy::local_type& local, cosmos& main_cosmos) {
 		for (const auto& raw_input : local) {
 			if (raw_input.was_any_key_pressed()) {
-				if (raw_input.key == augs::window::event::keys::key::F7) {
-					auto target_folder = "saves/" + augs::get_timestamp();
-					augs::create_directories(target_folder);
-
-					main_cosmos.save_to_file(target_folder + "/" + "save.state");
-				}
-				if (raw_input.key == augs::window::event::keys::key::F4) {
-					cosmos cosm_with_guids;
-					cosm_with_guids.significant = stashed_cosmos.significant;
-					cosm_with_guids.remap_guids();
-
-					ensure(stashed_delta.get_write_pos() == 0);
-					cosmic_delta::encode(cosm_with_guids, main_cosmos, stashed_delta);
-
-					stashed_delta.reset_read_pos();
-					cosmic_delta::decode(cosm_with_guids, stashed_delta);
-					stashed_delta.reset_write_pos();
-
-					main_cosmos = cosm_with_guids;
-				}
-				if (raw_input.key == augs::window::event::keys::key::F8) {
-					main_cosmos.profiler.duplication.new_measurement();
-					stashed_cosmos = main_cosmos;
-					main_cosmos.profiler.duplication.end_measurement();
-				}
-				if (raw_input.key == augs::window::event::keys::key::F9) {
-					main_cosmos = stashed_cosmos;
-				}
-				if (raw_input.key == augs::window::event::keys::key::F10) {
-					main_cosmos.significant.meta.settings.enable_interpolation = !main_cosmos.significant.meta.settings.enable_interpolation;
-				}
+				//if (raw_input.key == augs::window::event::keys::key::F7) {
+				//	auto target_folder = "saves/" + augs::get_timestamp();
+				//	augs::create_directories(target_folder);
+				//
+				//	main_cosmos.save_to_file(target_folder + "/" + "save.state");
+				//}
+				//if (raw_input.key == augs::window::event::keys::key::F4) {
+				//	cosmos cosm_with_guids;
+				//	cosm_with_guids.significant = stashed_cosmos.significant;
+				//	cosm_with_guids.remap_guids();
+				//
+				//	ensure(stashed_delta.get_write_pos() == 0);
+				//	cosmic_delta::encode(cosm_with_guids, main_cosmos, stashed_delta);
+				//
+				//	stashed_delta.reset_read_pos();
+				//	cosmic_delta::decode(cosm_with_guids, stashed_delta);
+				//	stashed_delta.reset_write_pos();
+				//
+				//	main_cosmos = cosm_with_guids;
+				//}
+				//if (raw_input.key == augs::window::event::keys::key::F8) {
+				//	main_cosmos.profiler.duplication.new_measurement();
+				//	stashed_cosmos = main_cosmos;
+				//	main_cosmos.profiler.duplication.end_measurement();
+				//}
+				//if (raw_input.key == augs::window::event::keys::key::F9) {
+				//	main_cosmos = stashed_cosmos;
+				//}
+				//if (raw_input.key == augs::window::event::keys::key::F10) {
+				//	main_cosmos.significant.meta.settings.enable_interpolation = !main_cosmos.significant.meta.settings.enable_interpolation;
+				//}
 				if (raw_input.key == augs::window::event::keys::key::CAPSLOCK) {
 					++current_character;
 					current_character %= characters.size();

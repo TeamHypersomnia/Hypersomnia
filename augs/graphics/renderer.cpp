@@ -154,7 +154,10 @@ namespace augs {
 			1.f, 1.f,
 			1.f, 0.f,
 			0.f, 0.f,
-			0.f, 1.f
+
+			0.f, 0.f,
+			0.f, 1.f,
+			1.f, 1.f
 		};
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0); glerr;
@@ -162,7 +165,7 @@ namespace augs {
 		glDisableVertexAttribArray(int(vertex_attribute::color)); glerr;
 		glVertexAttribPointer(int(vertex_attribute::position), 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), vertices); glerr;
 
-		glDrawArrays(GL_QUADS, 0, 4); glerr;
+		glDrawArrays(GL_TRIANGLES, 0, 6); glerr;
 
 		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id); glerr;
 
