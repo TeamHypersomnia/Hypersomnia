@@ -30,8 +30,7 @@ namespace augs {
 		device = alcOpenDevice(nullptr);
 
 		context = alcCreateContext(device, nullptr);
-		ALuint in;
-		alGenEffects(0, &in);
+		
 		if (!context || !make_current()) {
 			if (context) {
 				alcDestroyContext(context);

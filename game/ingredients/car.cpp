@@ -108,7 +108,7 @@ namespace prefabs {
 
 			render.layer = render_layer::CAR_WHEEL;
 
-			sprite.set(assets::texture_id::CAR_INSIDE, augs::rgba(29, 0, 0, 255));
+			sprite.set(assets::texture_id::CAR_INSIDE, augs::rgba(29, 0, 0, 0));
 			sprite.size.set(60, 30);
 
 			auto& fixture = colliders.new_collider();
