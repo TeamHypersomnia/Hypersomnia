@@ -324,9 +324,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\backends\wave.c" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="P:/Projects/Hypersomnia/3rdparty/openal-soft-build/ZERO_CHECK.vcxproj">
-      <Project>C2230974-0D0E-3B47-BBC4-A3F3E9B52ADC</Project>
-    </ProjectReference>
     <ProjectReference Include="P:/Projects/Hypersomnia/3rdparty/openal-soft-build/common.vcxproj">
       <Project>137CB016-2B81-34E0-B389-64CF11007AA7</Project>
     </ProjectReference>

@@ -273,11 +273,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\common\threads.c" />
     <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\common\uintmap.c" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="P:/Projects/Hypersomnia/3rdparty/openal-soft-build/ZERO_CHECK.vcxproj">
-      <Project>C2230974-0D0E-3B47-BBC4-A3F3E9B52ADC</Project>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
