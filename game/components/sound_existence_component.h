@@ -15,6 +15,16 @@ namespace components {
 			entity_id direct_listener;
 		} input;
 
+		template<class F>
+		void for_each_held_id(F f) {
+			f(input.direct_listener);
+		}
+
+		template<class F>
+		void for_each_held_id(F f) const {
+			f(input.direct_listener);
+		}
+
 		static void activate(const entity_handle);
 		static void deactivate(const entity_handle);
 

@@ -35,7 +35,7 @@ void car_system::set_steering_flags_from_intents(logic_step& step) {
 			car.accelerating = it.pressed_flag;
 			break;
 		case intent_type::MOVE_BACKWARD:
-			car.deccelerating = it.pressed_flag;
+			car.decelerating = it.pressed_flag;
 			break;
 		case intent_type::MOVE_LEFT:
 			car.turning_left = it.pressed_flag;
@@ -69,7 +69,7 @@ void car_system::apply_movement_forces(logic_step& step) {
 		forward_dir = forward_dir.set_from_degrees(physics.get_angle());
 		right_normal = forward_dir.perpendicular_cw();
 
-		resultant.x = car.accelerating * car.input_acceleration.x - car.deccelerating * car.input_acceleration.x;
+		resultant.x = car.accelerating * car.input_acceleration.x - car.decelerating * car.input_acceleration.x;
 		resultant.y = car.turning_right * car.input_acceleration.y - car.turning_left * car.input_acceleration.y;
 		
 		if (car.acceleration_length > 0.f) {
@@ -152,16 +152,18 @@ void car_system::apply_movement_forces(logic_step& step) {
 			physics.apply_angular_impulse(delta.in_seconds() * (angular_resistance * angular_speed * angular_speed)* -sgn(angular_speed) * physics.get_inertia());
 		}
 
-		it.for_each_sub_entity_recursive([&](const entity_handle h) {
+		auto engine_handler = [&](const entity_handle h, const bool engine_enabled) {
 			if (h.has<components::particles_existence>()) {
-				if (car.accelerating) {
+				if (engine_enabled) {
 					components::particles_existence::activate(h);
 				}
 				else {
 					components::particles_existence::deactivate(h);
 				}
 			}
-		});
+		};
+		
+		engine_handler(cosmos[car.acceleration_engine], car.accelerating);
 
 		//float angle = physics.get_angle();
 		//LOG("F: %x, %x, %x", AS_INTV physics.get_position(), AS_INT angle, AS_INTV physics.velocity());

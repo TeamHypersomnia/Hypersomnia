@@ -55,14 +55,16 @@ namespace components {
 		
 		template<class F>
 		void for_each_held_id(F f) {
-			for (auto& e : response_receivers)
+			for (auto& e : response_receivers) {
 				f(e.target);
+			}
 		}
 
 		template<class F>
 		void for_each_held_id(F f) const {
-			for (const auto& e : response_receivers)
+			for (const auto& e : response_receivers) {
 				f(e.target);
+			}
 		}
 
 		template <class Archive>

@@ -12,7 +12,5 @@ enum class sub_entity_name {
 	BULLET_ROUND,
 	CORPSE_OF_SENTIENCE,
 
-	VISUAL_ENGINE,
-
 	COUNT
 };

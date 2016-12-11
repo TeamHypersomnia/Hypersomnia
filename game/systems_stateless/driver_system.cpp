@@ -136,7 +136,7 @@ bool driver_system::change_car_ownership(const entity_handle driver_entity, cons
 			maybe_movement->moving_left = car.turning_left;
 			maybe_movement->moving_right = car.turning_right;
 			maybe_movement->moving_forward = car.accelerating;
-			maybe_movement->moving_backward = car.deccelerating;
+			maybe_movement->moving_backward = car.decelerating;
 		}
 		
 		car.reset_movement_flags();

@@ -10,8 +10,13 @@ namespace components {
 		entity_id left_wheel_trigger;
 		entity_id right_wheel_trigger;
 
+		entity_id acceleration_engine;
+		entity_id deceleration_engine;
+		entity_id left_engine;
+		entity_id right_engine;
+
 		bool accelerating = false;
-		bool deccelerating = false;
+		bool decelerating = false;
 		bool turning_right = false;
 		bool turning_left = false;
 
@@ -50,6 +55,11 @@ namespace components {
 		void for_each_held_id(F f) {
 			f(current_driver);
 
+			f(acceleration_engine);
+			f(deceleration_engine);
+			f(left_engine);
+			f(right_engine);
+
 			f(left_wheel_trigger);
 			f(right_wheel_trigger);
 		}
@@ -57,6 +67,11 @@ namespace components {
 		template<class F>
 		void for_each_held_id(F f) const {
 			f(current_driver);
+
+			f(acceleration_engine);
+			f(deceleration_engine);
+			f(left_engine);
+			f(right_engine);
 
 			f(left_wheel_trigger);
 			f(right_wheel_trigger);
@@ -71,7 +86,7 @@ namespace components {
 				CEREAL_NVP(right_wheel_trigger),
 
 				CEREAL_NVP(accelerating),
-				CEREAL_NVP(deccelerating),
+				CEREAL_NVP(decelerating),
 				CEREAL_NVP(turning_right),
 				CEREAL_NVP(turning_left),
 				CEREAL_NVP(hand_brake),
