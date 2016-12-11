@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -56,25 +56,25 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-    <PropertyGroup>
-      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">P:\Projects\Hypersomnia\3rdparty\openal-soft-build\Debug\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">OpenAL32.dir\Debug\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">OpenAL32</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">P:\Projects\Hypersomnia\3rdparty\openal-soft-build\Release\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">OpenAL32.dir\Release\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">OpenAL32</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">P:\Projects\Hypersomnia\3rdparty\openal-soft-build\MinSizeRel\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">OpenAL32.dir\MinSizeRel\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">OpenAL32</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">P:\Projects\Hypersomnia\3rdparty\openal-soft-build\RelWithDebInfo\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">OpenAL32.dir\RelWithDebInfo\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">OpenAL32</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.lib</TargetExt>
-    </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">P:\Projects\Hypersomnia\3rdparty\openal-soft-build\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">OpenAL32.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">OpenAL32</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">P:\Projects\Hypersomnia\3rdparty\openal-soft-build\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">OpenAL32.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">OpenAL32</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">P:\Projects\Hypersomnia\3rdparty\openal-soft-build\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">OpenAL32.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">OpenAL32</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">P:\Projects\Hypersomnia\3rdparty\openal-soft-build\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">OpenAL32.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">OpenAL32</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.lib</TargetExt>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>P:\Projects\Hypersomnia\3rdparty\openal-soft\include;P:\Projects\Hypersomnia\3rdparty\openal-soft-build;P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\Include;P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -88,7 +88,7 @@
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <Optimization>Disabled</Optimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_WIN32;_WIN32_WINNT=0x0502;AL_BUILD_LIBRARY;AL_ALEXT_PROTOTYPES;_LARGEFILE_SOURCE;_LARGE_FILES;restrict=;HAVE_STRUCT_TIMESPEC;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;strcasecmp=_stricmp;strncasecmp=_strnicmp;AL_LIBTYPE_STATIC;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
@@ -120,11 +120,12 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <Optimization>MaxSpeed</Optimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_WIN32;_WIN32_WINNT=0x0502;AL_BUILD_LIBRARY;AL_ALEXT_PROTOTYPES;_LARGEFILE_SOURCE;_LARGE_FILES;restrict=;HAVE_STRUCT_TIMESPEC;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;strcasecmp=_stricmp;strncasecmp=_strnicmp;AL_LIBTYPE_STATIC;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
-      <DebugInformationFormat></DebugInformationFormat>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_WIN32;_WIN32_WINNT=0x0502;AL_BUILD_LIBRARY;AL_ALEXT_PROTOTYPES;_LARGEFILE_SOURCE;_LARGE_FILES;restrict=;HAVE_STRUCT_TIMESPEC;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;strcasecmp=_stricmp;strncasecmp=_strnicmp;AL_LIBTYPE_STATIC;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -157,7 +158,8 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_WIN32;_WIN32_WINNT=0x0502;AL_BUILD_LIBRARY;AL_ALEXT_PROTOTYPES;_LARGEFILE_SOURCE;_LARGE_FILES;restrict=;HAVE_STRUCT_TIMESPEC;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;strcasecmp=_stricmp;strncasecmp=_strnicmp;AL_LIBTYPE_STATIC;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
-      <DebugInformationFormat></DebugInformationFormat>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_WIN32;_WIN32_WINNT=0x0502;AL_BUILD_LIBRARY;AL_ALEXT_PROTOTYPES;_LARGEFILE_SOURCE;_LARGE_FILES;restrict=;HAVE_STRUCT_TIMESPEC;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;strcasecmp=_stricmp;strncasecmp=_strnicmp;AL_LIBTYPE_STATIC;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -265,61 +267,61 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\common\almalloc.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\common\atomic.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\common\rwlock.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\common\threads.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\common\uintmap.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alAuxEffectSlot.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alBuffer.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alEffect.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alError.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alExtension.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alFilter.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alListener.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alSource.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alState.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alThunk.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\sample_cvt.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\ALc.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\ALu.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\alcConfig.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\alcRing.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\bs2b.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\chorus.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\compressor.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\dedicated.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\distortion.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\echo.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\equalizer.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\flanger.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\modulator.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\null.c" >
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\common\almalloc.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\common\atomic.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\common\rwlock.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\common\threads.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\common\uintmap.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alAuxEffectSlot.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alBuffer.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alEffect.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alError.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alExtension.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alFilter.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alListener.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alSource.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alState.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alThunk.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\sample_cvt.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\ALc.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\ALu.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\alcConfig.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\alcRing.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\bs2b.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\chorus.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\compressor.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\dedicated.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\distortion.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\echo.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\equalizer.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\flanger.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\modulator.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\null.c">
       <ObjectFileName>$(IntDir)/Alc/effects/null.c.obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\reverb.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\helpers.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\bsinc.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\hrtf.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\uhjfilter.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\ambdec.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\bformatdec.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\panning.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\mixer.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\mixer_c.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\mixer_sse.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\mixer_sse2.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\mixer_sse3.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\mixer_sse41.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\backends\base.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\backends\loopback.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\backends\null.c" >
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\reverb.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\helpers.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\bsinc.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\hrtf.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\uhjfilter.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\ambdec.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\bformatdec.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\panning.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\mixer.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\mixer_c.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\mixer_sse.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\mixer_sse2.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\mixer_sse3.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\mixer_sse41.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\backends\base.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\backends\loopback.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\backends\null.c">
       <ObjectFileName>$(IntDir)/Alc/backends/null.c.obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\backends\winmm.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\backends\dsound.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\backends\mmdevapi.c"  />
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\backends\wave.c"  />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\backends\winmm.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\backends\dsound.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\backends\mmdevapi.c" />
+    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\backends\wave.c" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="P:/Projects/Hypersomnia/3rdparty/openal-soft-build/ZERO_CHECK.vcxproj">
