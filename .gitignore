@@ -193,3 +193,6 @@ Makefile
 cmake_install.cmake
 install_manifest.txt
 CTestTestfile.cmake
+*.exp
+Hypersomnia.lib
+Hypersomnia-Debug.lib
