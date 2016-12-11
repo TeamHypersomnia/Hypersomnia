@@ -375,7 +375,7 @@ namespace scene_managers {
 		new_characters.resize(num_characters);
 
 		auto character = [&](const size_t i) {
-			return world[new_characters[i]];
+			return i < new_characters.size() ? world[new_characters.at(i)] : world[entity_id()];
 		};
 
 		for (int i = 0; i < num_characters; ++i) {
