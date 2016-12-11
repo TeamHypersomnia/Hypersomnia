@@ -68,20 +68,24 @@ void sound_system::play_nearby_sound_existences(
 	for (const auto it : targets) {
 		auto& cache = get_cache(it);
 		const auto& existence = it.get<components::sound_existence>();
-		const auto& source = cache.source;
+		auto& source = cache.source;
+
+		const auto& buffer = get_resource_manager().find(existence.input.effect)->get_variation(existence.input.variation_number);
+
+		const auto& requested_buf = existence.input.direct_listener == listening_character ? buffer.request_stereo() : buffer.request_mono();
 
 		if (cache.recorded_component.time_of_birth != existence.time_of_birth
 			|| cache.recorded_component.input.effect != existence.input.effect
-			|| cache.recorded_component.input.direct_listener != existence.input.direct_listener
+			|| &requested_buf != source.get_bound_buffer()
 			) {
-			
-			const auto& buffer = get_resource_manager().find(existence.input.effect)->get_variation(existence.input.variation_number);
+
+			source.stop();
 
 			if (listening_character == existence.input.direct_listener) {
-				source.attach_buffer(buffer.request_stereo());
+				source.bind_buffer(buffer.request_stereo());
 			}
 			else {
-				source.attach_buffer(buffer.request_mono());
+				source.bind_buffer(buffer.request_mono());
 			}
 
 			//alSourcef(source, AL_PITCH, 0.6f);

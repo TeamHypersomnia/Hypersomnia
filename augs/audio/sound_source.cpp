@@ -22,6 +22,7 @@ namespace augs {
 		if (initialized) {
 			AL_CHECK(alDeleteSources(1, &id));
 			initialized = false;
+			attached_buffer = nullptr;
 		}
 	}
 
@@ -32,6 +33,7 @@ namespace augs {
 	sound_source& sound_source::operator=(sound_source&& b) {
 		initialized = b.initialized;
 		id = b.id;
+		attached_buffer = b.attached_buffer;
 		b.initialized = false;
 		return *this;
 	}
@@ -46,6 +48,10 @@ namespace augs {
 
 	void sound_source::play() const {
 		AL_CHECK(alSourcePlay(id));
+	}
+
+	void sound_source::stop() const {
+		AL_CHECK(alSourceStop(id));
 	}
 
 	void sound_source::set_velocity(vec2 v) const {
@@ -64,8 +70,18 @@ namespace augs {
 		AL_CHECK(alSourcef(id, AL_MAX_DISTANCE, distance * PIXELS_TO_METERSf));
 	}
 
-	void sound_source::attach_buffer(const single_sound_buffer& buf) const {
+	void sound_source::bind_buffer(const single_sound_buffer& buf) {
+		attached_buffer = &buf;
 		AL_CHECK(alSourcei(id, AL_BUFFER, buf.get_id()));
+	}
+
+	void sound_source::unbind_buffer() {
+		attached_buffer = nullptr;
+		AL_CHECK(alSourcei(id, AL_BUFFER, NULL));
+	}
+	
+	const single_sound_buffer* sound_source::get_bound_buffer() const {
+		return attached_buffer;
 	}
 
 	void set_listener_position(vec2 pos) {

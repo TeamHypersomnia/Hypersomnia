@@ -16,6 +16,7 @@ namespace augs {
 
 		bool initialized = false;
 		ALuint id = 0;
+		const single_sound_buffer* attached_buffer = nullptr;
 	public:
 		sound_source();
 		~sound_source();
@@ -24,11 +25,14 @@ namespace augs {
 		sound_source& operator=(sound_source&&);
 
 		void play() const;
+		void stop() const;
 		void set_velocity(vec2) const;
 		void set_position(vec2) const;
 		void set_max_distance(const float) const;
 
-		void attach_buffer(const single_sound_buffer&) const;
+		void bind_buffer(const single_sound_buffer&);
+		void unbind_buffer();
+		const single_sound_buffer* get_bound_buffer() const;
 
 		ALuint get_id() const;
 		operator ALuint() const;
