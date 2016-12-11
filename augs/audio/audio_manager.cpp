@@ -2,8 +2,10 @@
 
 #include <AL/al.h>
 #include <AL/alc.h>
+#include <AL/efx.h>
 
 #include "augs/al_log.h"
+#include "augs/ensure.h"
 
 static void list_audio_devices(const ALCchar *devices)
 {
@@ -28,7 +30,8 @@ namespace augs {
 		device = alcOpenDevice(nullptr);
 
 		context = alcCreateContext(device, nullptr);
-
+		ALuint in;
+		alGenEffects(0, &in);
 		if (!context || !make_current()) {
 			if (context) {
 				alcDestroyContext(context);
@@ -37,6 +40,8 @@ namespace augs {
 			alcCloseDevice(device);
 			LOG("\n!!! Failed to set a context !!!\n\n");
 		}
+
+		ensure(alcIsExtensionPresent(device, "ALC_EXT_EFX"));
 
 		list_audio_devices(alcGetString(nullptr, ALC_ALL_DEVICES_SPECIFIER));
 
