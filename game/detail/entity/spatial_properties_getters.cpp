@@ -57,7 +57,7 @@ vec2 basic_spatial_properties_getters<C, D>::get_effective_velocity() const {
 	else if (handle.has<components::position_copying>()) {
 		ensure(handle.has<components::transform>());
 		return 
-			(handle.get<components::position_copying>().get_previous_transform().pos - handle.get<components::transform>().pos)
+			(handle.get<components::transform>().pos - handle.get<components::position_copying>().get_previous_transform().pos)
 			* static_cast<float>(handle.get_cosmos().get_fixed_delta().get_steps_per_second());
 	}
 	
