@@ -6,7 +6,6 @@
 struct all_settings {
 	int enable_interpolation = false;
 
-	float listener_maximum_radius = 1920.f * 5.f;
 	visibility_settings visibility;
 	pathfinding_settings pathfinding;
 

@@ -52,8 +52,8 @@ void sound_system::play_nearby_sound_existences(
 {
 	auto& queried_size = cone.visible_world_area;
 
-	const auto radius = cosmos.significant.meta.settings.listener_maximum_radius;
-	queried_size.set(radius, radius);
+	queried_size.set(1920.f, 1920.f);
+	queried_size *= 5.f;
 
 	const float artifacts_avoidance_epsilon = 20.f;
 	const float audible_radius = queried_size.x / 2.f - artifacts_avoidance_epsilon;
