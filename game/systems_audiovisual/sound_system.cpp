@@ -57,6 +57,13 @@ void sound_system::play_nearby_sound_existences(
 		//cosmos[cosmos.systems_temporary.get<dynamic_tree_system>()
 		//.determine_visible_entities_from_camera(cone, components::dynamic_tree_node::tree_type::SOUND_EXISTENCES)];
 
+	const auto subject = cosmos[listening_character];
+
+	const auto listener_pos = subject.viewing_transform(sys).pos;
+
+	augs::set_listener_position(listener_pos);
+	augs::set_listener_velocity(subject.get_effective_velocity());
+	augs::set_listener_orientation({ 0.f, -1.f, 0.f, 0.f, 0.f, -1.f });
 	decltype(per_entity_cache) new_caches;
 
 	for (const auto it : targets) {
@@ -82,6 +89,7 @@ void sound_system::play_nearby_sound_existences(
 				source.bind_buffer(buffer.request_mono());
 			}
 
+
 			source.play();
 			source.set_max_distance(existence.input.modifier.max_distance);
 			source.set_reference_distance(existence.input.modifier.reference_distance);
@@ -90,10 +98,15 @@ void sound_system::play_nearby_sound_existences(
 			cache.recorded_component = existence;
 		}
 
-		
+		const auto source_pos = it.viewing_transform(sys).pos;
+		const auto dist_from_listener = (listener_pos - source_pos).length();
+		const float absorption = std::min(10.f, pow(std::max(0.f, dist_from_listener - 2220.f)/220.f, 3));
+
+		AL_CHECK(alSourcef(source, AL_AIR_ABSORPTION_FACTOR, absorption));
+
 		source.set_pitch(existence.input.modifier.pitch);
 		source.set_gain(existence.input.modifier.gain);
-		source.set_position(it.viewing_transform(sys).pos);
+		source.set_position(source_pos);
 		source.set_velocity(it.get_effective_velocity());
 
 		new_caches.emplace(it.get_id(), std::move(cache));
@@ -101,10 +114,4 @@ void sound_system::play_nearby_sound_existences(
 
 	per_entity_cache = std::move(new_caches);
 
-	const auto subject = cosmos[listening_character];
-
-	augs::set_listener_position(subject.viewing_transform(sys).pos);
-	augs::set_listener_velocity(subject.get_effective_velocity());
-	augs::set_listener_orientation({ 0.f, -1.f, 0.f, 0.f, 0.f, -1.f });
-	//alListenerf(AL_METERS_PER_UNIT, 100.f);
 }
