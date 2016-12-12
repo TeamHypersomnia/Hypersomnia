@@ -10,6 +10,7 @@
 #include "game/resources/manager.h"
 
 #include <AL/al.h>
+#include <AL/efx.h>
 #include "augs/al_log.h"
 
 void sound_system::resample_state_for_audiovisuals(const cosmos& new_cosmos) {
@@ -51,8 +52,8 @@ void sound_system::play_nearby_sound_existences(
 {
 	auto& queried_size = cone.visible_world_area;
 
-	queried_size.set(1920, 1920);
-	queried_size *= 3.5f;
+	const auto radius = cosmos.significant.meta.settings.listener_maximum_radius;
+	queried_size.set(radius, radius);
 
 	const float artifacts_avoidance_epsilon = 20.f;
 	const float audible_radius = queried_size.x / 2.f - artifacts_avoidance_epsilon;
@@ -108,4 +109,5 @@ void sound_system::play_nearby_sound_existences(
 	augs::set_listener_position(subject.viewing_transform(sys).pos);
 	augs::set_listener_velocity(subject.get_effective_velocity());
 	augs::set_listener_orientation({ 0.f, -1.f, 0.f, 0.f, 0.f, -1.f });
+	//alListenerf(AL_METERS_PER_UNIT, 100.f);
 }
