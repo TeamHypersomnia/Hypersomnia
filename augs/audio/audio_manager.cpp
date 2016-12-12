@@ -42,6 +42,9 @@ namespace augs {
 
 		ensure(alcIsExtensionPresent(device, "ALC_EXT_EFX"));
 
+		AL_CHECK(alSpeedOfSound(120.f));
+		AL_CHECK(alDistanceModel(AL_LINEAR_DISTANCE_CLAMPED));
+
 		list_audio_devices(alcGetString(nullptr, ALC_ALL_DEVICES_SPECIFIER));
 
 		LOG("Default device: %x", alcGetString(nullptr, ALC_DEFAULT_DEVICE_SPECIFIER));
