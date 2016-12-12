@@ -993,6 +993,7 @@
     <ClInclude Include="augs\al_log.h" />
     <ClInclude Include="augs\audio\audio_manager.h" />
     <ClInclude Include="augs\audio\sound_buffer.h" />
+    <ClInclude Include="augs\audio\sound_effect_modifier.h" />
     <ClInclude Include="augs\audio\sound_source.h" />
     <ClInclude Include="augs\build_settings\setting_build_http_daemon.h" />
     <ClInclude Include="augs\build_settings\setting_build_http_requests.h" />

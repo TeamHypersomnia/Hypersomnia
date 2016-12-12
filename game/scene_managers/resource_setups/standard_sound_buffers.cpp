@@ -1,6 +1,7 @@
 #include "all.h"
 #include "game/resources/manager.h"
 #include "game/enums/sound_response_type.h"
+#include "augs/audio/sound_effect_modifier.h"
 
 #include <sndfile.h>
 
@@ -78,7 +79,12 @@ namespace resource_setups {
 
 		{
 			auto& res = get_resource_manager().create(assets::sound_response_id::ELECTRIC_PROJECTILE_RESPONSE);
-			res[sound_response_type::PROJECTILE_TRACE] = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
+			
+			augs::sound_effect_modifier trace_modifier;
+			trace_modifier.max_distance = 1020.f;
+			trace_modifier.reference_distance = 100.f;
+			trace_modifier.gain = 1.3f;
+			res[sound_response_type::PROJECTILE_TRACE] = { assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT, trace_modifier };
 			res[sound_response_type::DESTRUCTION_EXPLOSION] = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
 		}
 

@@ -28,10 +28,6 @@ void sound_system::resample_state_for_audiovisuals(const cosmos& new_cosmos) {
 }
 
 void sound_system::initialize_sound_sources(const size_t num_max_sources) {
-	AL_CHECK(alSpeedOfSound(120.f));
-	AL_CHECK(alDistanceModel(AL_LINEAR_DISTANCE_CLAMPED));
-	//alDopplerVelocity();
-	//alDopplerFactor()
 }
 
 sound_system::cache& sound_system::get_cache(const const_entity_handle id) {
@@ -51,18 +47,15 @@ void sound_system::play_nearby_sound_existences(
 	) 
 {
 	auto& queried_size = cone.visible_world_area;
-
-	queried_size.set(1920.f, 1920.f);
-	queried_size *= 5.f;
-
-	const float artifacts_avoidance_epsilon = 20.f;
-	const float audible_radius = queried_size.x / 2.f - artifacts_avoidance_epsilon;
+	queried_size.set(10000.f, 10000.f);
 
 	const float pixels_to_metersf = PIXELS_TO_METERSf;
 
 	const auto targets =
-		cosmos[cosmos.systems_temporary.get<dynamic_tree_system>()
-		.determine_visible_entities_from_camera(cone, components::dynamic_tree_node::tree_type::SOUND_EXISTENCES)];
+		cosmos.get(processing_subjects::WITH_SOUND_EXISTENCE);
+
+		//cosmos[cosmos.systems_temporary.get<dynamic_tree_system>()
+		//.determine_visible_entities_from_camera(cone, components::dynamic_tree_node::tree_type::SOUND_EXISTENCES)];
 
 	decltype(per_entity_cache) new_caches;
 
@@ -91,11 +84,15 @@ void sound_system::play_nearby_sound_existences(
 
 			//alSourcef(source, AL_PITCH, 0.6f);
 			source.play();
-			source.set_max_distance(audible_radius);
+			source.set_max_distance(existence.input.modifier.max_distance);
+			source.set_reference_distance(existence.input.modifier.reference_distance);
 
 			cache.recorded_component = existence;
 		}
 
+		
+		source.set_pitch(existence.input.modifier.pitch);
+		source.set_gain(existence.input.modifier.gain);
 		source.set_position(it.viewing_transform(sys).pos);
 		source.set_velocity(it.get_effective_velocity());
 

@@ -18,7 +18,9 @@
 #include "game/resources/manager.h"
 
 bool components::sound_existence::is_activated(const const_entity_handle h) {
-	return h.get<components::dynamic_tree_node>().is_activated() && h.get<components::processing>().is_in(processing_subjects::WITH_SOUND_EXISTENCE);
+	return
+		//h.get<components::dynamic_tree_node>().is_activated() && 
+		h.get<components::processing>().is_in(processing_subjects::WITH_SOUND_EXISTENCE);
 }
 
 void components::sound_existence::activate(const entity_handle h) {
@@ -28,7 +30,7 @@ void components::sound_existence::activate(const entity_handle h) {
 
 	auto& existence = h.get<components::sound_existence>();
 	existence.time_of_birth = h.get_cosmos().get_timestamp();
-	h.get<components::dynamic_tree_node>().set_activated(true);
+	//h.get<components::dynamic_tree_node>().set_activated(true);
 	h.get<components::processing>().enable_in(processing_subjects::WITH_SOUND_EXISTENCE);
 }
 
@@ -37,12 +39,16 @@ void components::sound_existence::deactivate(const entity_handle h) {
 		return;
 	}
 
-	h.get<components::dynamic_tree_node>().set_activated(false);
+	//h.get<components::dynamic_tree_node>().set_activated(false);
 	h.get<components::processing>().disable_in(processing_subjects::WITH_SOUND_EXISTENCE);
 }
 
 size_t components::sound_existence::random_variation_number_from_transform(const components::transform t) const {
 	return time_of_birth.step + std::hash<vec2>()(t.pos);
+}
+
+float components::sound_existence::calculate_max_audible_distance() const {
+	return input.modifier.max_distance + input.modifier.reference_distance;
 }
 
 void sound_existence_system::destroy_dead_sounds(logic_step& step) const {
@@ -52,7 +58,9 @@ void sound_existence_system::destroy_dead_sounds(logic_step& step) const {
 	for (const auto it : cosmos.get(processing_subjects::WITH_SOUND_EXISTENCE)) {
 		auto& existence = it.get<components::sound_existence>();
 
-		if ((timestamp - existence.time_of_birth).step > existence.max_lifetime_in_steps) {
+		const auto repetitions = existence.input.modifier.repetitions;
+
+		if (repetitions > -1 && (timestamp - existence.time_of_birth).step > existence.max_lifetime_in_steps * repetitions) {
 			if (existence.input.delete_entity_after_effect_lifetime) {
 				step.transient.messages.post(messages::queue_destruction(it));
 			}
@@ -78,7 +86,9 @@ void sound_existence_system::game_responses_to_sound_effects(logic_step& step) c
 
 			components::sound_existence::effect_input in;
 			in.delete_entity_after_effect_lifetime = true;
-			in.effect = round_response_map.at(sound_response_type::PROJECTILE_TRACE);
+			const auto& response_entry = round_response_map.at(sound_response_type::PROJECTILE_TRACE);
+			in.effect = response_entry.id;
+			in.modifier = response_entry.modifier;
 
 			const auto trace = create_sound_effect_entity(cosmos, in, subject.logic_transform(), subject);
 			subject.add_sub_entity(trace);
@@ -92,7 +102,11 @@ void sound_existence_system::game_responses_to_sound_effects(logic_step& step) c
 
 			components::sound_existence::effect_input in;
 			in.delete_entity_after_effect_lifetime = true;
-			in.effect = gun_response_map.at(sound_response_type::MUZZLE_SHOT);
+
+			const auto& response_entry = gun_response_map.at(sound_response_type::MUZZLE_SHOT);
+			in.effect = response_entry.id;
+			in.modifier = response_entry.modifier;
+
 			in.direct_listener = subject.get_owning_transfer_capability();
 
 			create_sound_effect_entity(cosmos, in, subject.logic_transform(), entity_id()).add_standard_components();
@@ -107,15 +121,23 @@ void sound_existence_system::game_responses_to_sound_effects(logic_step& step) c
 		components::sound_existence::effect_input in;
 		in.delete_entity_after_effect_lifetime = true;
 		
+		sound_response_type type;
+
 		if (cosmos[h.spawned_remnants].alive()) {
-			in.effect = subject_response_map.at(sound_response_type::DEATH);
+			type = sound_response_type::DEATH;
+
 		}
 		else if (h.effective_amount > 0) {
-			in.effect = subject_response_map.at(sound_response_type::HEALTH_DECREASE);
+			type = sound_response_type::HEALTH_DECREASE;
 		}
 		else {
 			continue;
 		}
+
+		const auto& response_entry = subject_response_map.at(type);
+		in.effect = response_entry.id;
+		in.modifier = response_entry.modifier;
+
 
 		in.direct_listener = subject;
 
@@ -131,7 +153,10 @@ void sound_existence_system::game_responses_to_sound_effects(logic_step& step) c
 			components::sound_existence::effect_input in;
 			in.delete_entity_after_effect_lifetime = true;
 			in.direct_listener = d.subject;
-			in.effect = inflictor_response_map.at(sound_response_type::DESTRUCTION_EXPLOSION);
+
+			const auto& response_entry = inflictor_response_map.at(sound_response_type::DESTRUCTION_EXPLOSION);
+			in.effect = response_entry.id;
+			in.modifier = response_entry.modifier;
 			
 			create_sound_effect_entity(cosmos, in, d.point_of_impact, entity_id()).add_standard_components();
 		}

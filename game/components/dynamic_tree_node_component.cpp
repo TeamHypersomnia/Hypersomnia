@@ -45,11 +45,15 @@ namespace components {
 			result.aabb.r += enlarge;
 			result.aabb.b += enlarge;
 		}
-		else if (sound_existence) {
-			result.type = tree_type::SOUND_EXISTENCES;
-			result.aabb.set_position(e.logic_transform().pos);
-			result.aabb.set_size({ 2.f, 2.f });
-		}
+		//else if (sound_existence) {
+		//	result.type = tree_type::SOUND_EXISTENCES;
+		//	result.aabb.set_position(e.logic_transform().pos);
+		//
+		//	const float artifacts_avoidance_epsilon = 20.f;
+		//
+		//	const float distance = sound_existence->calculate_max_audible_distance() + artifacts_avoidance_epsilon;
+		//	result.aabb.set_size({ distance*2, distance * 2 });
+		//}
 		else if (wandering_pixels) {
 			result.aabb = wandering_pixels->reach;
 
