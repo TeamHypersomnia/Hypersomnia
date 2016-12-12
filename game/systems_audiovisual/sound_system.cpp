@@ -82,7 +82,6 @@ void sound_system::play_nearby_sound_existences(
 				source.bind_buffer(buffer.request_mono());
 			}
 
-			//alSourcef(source, AL_PITCH, 0.6f);
 			source.play();
 			source.set_max_distance(existence.input.modifier.max_distance);
 			source.set_reference_distance(existence.input.modifier.reference_distance);
