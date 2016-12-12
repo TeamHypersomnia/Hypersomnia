@@ -112,13 +112,14 @@ void car_system::apply_movement_forces(logic_step& step) {
 
 		}
 
+		const float angular_velocity = physics.get_angular_velocity();
 		float base_angular_damping = 0.f;
 
 		if (car.braking_angular_damping >= 0.f) {
-			if (physics.get_angular_velocity() < 0 && resultant.y > 0) {
+			if (angular_velocity < 0 && resultant.y > 0) {
 				base_angular_damping += car.braking_angular_damping;
 			}
-			else if (physics.get_angular_velocity() > 0 && resultant.y < 0) {
+			else if (angular_velocity > 0 && resultant.y < 0) {
 				base_angular_damping += car.braking_angular_damping;
 			}
 			else if (resultant.y == 0) {
@@ -144,11 +145,11 @@ void car_system::apply_movement_forces(logic_step& step) {
 		}
 
 		if(forwardal_speed > car.minimum_speed_for_maneuverability_decrease)
-			physics.apply_angular_impulse(physics.get_inertia() * -physics.get_angular_velocity() * DEG_TO_RADf * 
+			physics.apply_angular_impulse(physics.get_inertia() * -angular_velocity * DEG_TO_RADf *
 				(forwardal_speed-car.minimum_speed_for_maneuverability_decrease)*car.maneuverability_decrease_multiplier);
 
 		if (angular_resistance > 0.f) {
-			auto angular_speed = physics.get_angular_velocity() * DEG_TO_RADf;
+			auto angular_speed = angular_velocity * DEG_TO_RADf;
 			//physics.body->ApplyTorque((angular_resistance * sqrt(sqrt(angular_speed * angular_speed)) + 0.2 * angular_speed * angular_speed)* -sgn(angular_speed) * b->GetInertia(), true);
 			physics.apply_angular_impulse(delta.in_seconds() * (angular_resistance * angular_speed * angular_speed)* -sgn(angular_speed) * physics.get_inertia());
 		}
@@ -179,7 +180,9 @@ void car_system::apply_movement_forces(logic_step& step) {
 			}
 		};
 		
-		engine_handler(cosmos[car.acceleration_engine], car.accelerating, cosmos[car.current_driver].alive(), 0.3f+speed*1.2f/3000.f);
+		engine_handler(cosmos[car.acceleration_engine], car.accelerating, cosmos[car.current_driver].alive(),
+			0.3f + speed*1.2f / 3000.f + std::abs(angular_velocity / 1080.f)*sqrt(physics.get_mass())
+		);
 
 		//float angle = physics.get_angle();
 		//LOG("F: %x, %x, %x", AS_INTV physics.get_position(), AS_INT angle, AS_INTV physics.velocity());
