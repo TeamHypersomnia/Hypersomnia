@@ -100,7 +100,7 @@ void sound_system::play_nearby_sound_existences(
 
 		const auto source_pos = it.viewing_transform(sys).pos;
 		const auto dist_from_listener = (listener_pos - source_pos).length();
-		const float absorption = std::min(10.f, pow(std::max(0.f, dist_from_listener - 2220.f)/220.f, 3));
+		const float absorption = std::min(10.f, pow(std::max(0.f, dist_from_listener - 2220.f)/520.f, 2));
 
 		AL_CHECK(alSourcef(source, AL_AIR_ABSORPTION_FACTOR, absorption));
 
