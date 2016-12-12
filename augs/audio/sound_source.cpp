@@ -54,6 +54,14 @@ namespace augs {
 		AL_CHECK(alSourceStop(id));
 	}
 
+	void sound_source::set_pitch(const float pitch) const {
+		AL_CHECK(alSourcef(id, AL_PITCH, pitch));
+	}
+
+	void sound_source::set_gain(const float gain) const {
+		AL_CHECK(alSourcef(id, AL_GAIN, gain));
+	}
+
 	void sound_source::set_velocity(vec2 v) const {
 		v *= PIXELS_TO_METERSf;
 
@@ -68,6 +76,10 @@ namespace augs {
 
 	void sound_source::set_max_distance(const float distance) const {
 		AL_CHECK(alSourcef(id, AL_MAX_DISTANCE, distance * PIXELS_TO_METERSf));
+	}
+
+	void sound_source::set_reference_distance(const float distance) const {
+		AL_CHECK(alSourcef(id, AL_REFERENCE_DISTANCE, distance * PIXELS_TO_METERSf));
 	}
 
 	void sound_source::bind_buffer(const single_sound_buffer& buf) {

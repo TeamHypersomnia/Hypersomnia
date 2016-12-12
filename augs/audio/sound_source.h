@@ -26,9 +26,12 @@ namespace augs {
 
 		void play() const;
 		void stop() const;
+		void set_pitch(const float) const;
+		void set_gain(const float) const;
 		void set_velocity(vec2) const;
 		void set_position(vec2) const;
 		void set_max_distance(const float) const;
+		void set_reference_distance(const float) const;
 
 		void bind_buffer(const single_sound_buffer&);
 		void unbind_buffer();
