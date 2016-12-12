@@ -70,6 +70,10 @@ components::transform basic_spatial_properties_getters<C, D>::viewing_transform(
 
 template <class D>
 void spatial_properties_getters<false, D>::set_logic_transform(const components::transform t) const {
+	if (logic_transform() == t) {
+		return;
+	}
+	
 	auto& handle = *static_cast<const D*>(this);
 
 	const auto& owner = handle.get_owner_body();

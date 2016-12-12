@@ -59,7 +59,11 @@ namespace resource_setups {
 
 		{
 			auto& res = get_resource_manager().create(assets::sound_response_id::BILMER2000_RESPONSE);
-			res[sound_response_type::MUZZLE_SHOT] = assets::sound_buffer_id::BILMER2000_MUZZLE;
+			augs::sound_effect_modifier mod;
+			mod.max_distance = 1920.f * 3.f;
+			mod.reference_distance = 0.f;
+			mod.gain = 1.3f;
+			res[sound_response_type::MUZZLE_SHOT] = {assets::sound_buffer_id::BILMER2000_MUZZLE, mod};
 		}
 
 		{

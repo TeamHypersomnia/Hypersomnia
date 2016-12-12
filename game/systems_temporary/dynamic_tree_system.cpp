@@ -99,8 +99,8 @@ std::vector<unversioned_entity_id> dynamic_tree_system::determine_visible_entiti
 	aabb_listener.visible_entities = &visible_entities;
 
 	b2AABB input;
-	input.lowerBound = visible_aabb.left_top() - vec2(400, 400);
-	input.upperBound = visible_aabb.right_bottom() + vec2(400, 400);
+	input.lowerBound = visible_aabb.left_top();
+	input.upperBound = visible_aabb.right_bottom();
 
 	tree.nodes.Query(&aabb_listener, input);
 

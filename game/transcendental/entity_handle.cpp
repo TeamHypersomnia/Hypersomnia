@@ -39,7 +39,8 @@ void basic_entity_handle<C>::add_standard_components() const {
 
 	if ((has<components::render>() 
 		|| has<components::particles_existence>()
-		|| has<components::sound_existence>())
+		//|| has<components::sound_existence>()
+		)
 		&& !is_entity_physical(*this) && !has<components::dynamic_tree_node>()) {
 		add(components::dynamic_tree_node::get_default(*this));
 	}
