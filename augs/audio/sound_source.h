@@ -26,6 +26,7 @@ namespace augs {
 
 		void play() const;
 		void stop() const;
+		void set_looping(const bool) const;
 		void set_pitch(const float) const;
 		void set_gain(const float) const;
 		void set_velocity(vec2) const;

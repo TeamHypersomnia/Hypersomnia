@@ -53,6 +53,10 @@ namespace augs {
 	void sound_source::stop() const {
 		AL_CHECK(alSourceStop(id));
 	}
+	
+	void sound_source::set_looping(const bool loop) const {
+		AL_CHECK(alSourcei(id, AL_LOOPING, loop));
+	}
 
 	void sound_source::set_pitch(const float pitch) const {
 		AL_CHECK(alSourcef(id, AL_PITCH, pitch));
