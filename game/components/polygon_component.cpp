@@ -19,8 +19,36 @@ namespace components {
 		global_time_seconds = secs;
 	}
 
-	void polygon::automatically_map_uv(assets::texture_id texture_id_to_map, unsigned uv_mapping_mode) {
-		if (vertices.empty()) return;
+	void polygon::from_polygonized_texture(const assets::texture_id tex) {
+		auto& polygonized_sprite_verts = get_resource_manager().find(tex)->polygonized;
+		auto& image_to_polygonize = get_resource_manager().find(tex)->img;
+
+		ensure(polygonized_sprite_verts.size() > 0);
+		
+		vec2 size = image_to_polygonize.get_size();
+
+		std::vector<vertex> new_concave;
+
+		for (auto v : polygonized_sprite_verts) {
+			vertex new_v;
+			new_v.pos = v;
+			new_v.set_texcoord({ v.x / size.x, v.y / size.y }, *tex);
+			new_concave.push_back(new_v);
+		}
+
+		for (auto& v : new_concave) {
+			v.pos -= size/2;
+		}
+
+		add_concave_polygon(new_concave);
+		center_neon_map = tex;
+		//automatically_map_uv(tex, uv_mapping_mode::OVERLAY);
+	}
+
+	void polygon::automatically_map_uv(const assets::texture_id texture_id_to_map, const uv_mapping_mode mapping_mode) {
+		if (vertices.empty()) {
+			return;
+		}
 
 		auto& texture_to_map = get_resource_manager().find(texture_id_to_map)->tex;
 
@@ -40,7 +68,7 @@ namespace components {
 			static_cast<int>(std::max_element(v, v + vertices.size(), y_pred)->pos.y)
 			);
 
-		if (uv_mapping_mode == uv_mapping_mode::STRETCH) {
+		if (mapping_mode == uv_mapping_mode::STRETCH) {
 			for (auto& v : vertices) {
 				v.set_texcoord(vec2(
 					(v.pos.x - lower.x) / (upper.x - lower.x),
@@ -48,7 +76,7 @@ namespace components {
 					), texture_to_map);
 			}
 		}
-		else if (uv_mapping_mode == uv_mapping_mode::OVERLAY) {
+		else if (mapping_mode == uv_mapping_mode::OVERLAY) {
 			auto size = texture_to_map.get_size();
 
 			for (auto& v : vertices) {
@@ -58,6 +86,8 @@ namespace components {
 					), texture_to_map);
 			}
 		}
+
+		center_neon_map = texture_id_to_map;
 	}
 
 	void polygon::add_concave_polygon(std::vector<vertex> polygon) {
@@ -126,6 +156,22 @@ namespace components {
 	}
 	
 	void polygon::draw(const drawing_input& in) const {
+		if (in.drawing_type == renderable_drawing_type::NEON_MAPS) {
+			components::sprite::drawing_input neon_in(in.target_buffer);
+			components::sprite neon_sprite;
+			neon_sprite.set(center_neon_map);
+
+			neon_in.camera = in.camera;
+			neon_in.colorize = in.colorize;
+			neon_in.drawing_type = in.drawing_type;
+			neon_in.global_time_seconds = in.global_time_seconds;
+			neon_in.renderable_transform = in.renderable_transform;
+			
+			neon_sprite.draw(neon_in);
+
+			return;
+		}
+
 		vertex_triangle new_tri;
 		const auto camera_pos = in.camera.transform.pos;
 

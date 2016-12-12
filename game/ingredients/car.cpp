@@ -19,7 +19,10 @@
 #include "game/components/name_component.h"
 #include "game/components/particles_existence_component.h"
 #include "game/components/sound_existence_component.h"
+#include "game/components/polygon_component.h"
 #include "game/transcendental/cosmos.h"
+
+#include "game/resources/manager.h"
 
 #include "game/enums/filters.h"
 
@@ -34,8 +37,10 @@ namespace prefabs {
 		front.add_sub_entity(left_wheel);
 		name_entity(front, entity_name::TRUCK);
 
+		const vec2 front_size = get_resource_manager().find(assets::texture_id::TRUCK_FRONT)->img.get_size();
+
 		{
-			auto& sprite = front += components::sprite();
+			auto& sprite = front += components::polygon();
 			auto& render = front += components::render();
 			auto& car = front += components::car();
 			components::physics physics_definition(spawn_transform);
@@ -45,7 +50,7 @@ namespace prefabs {
 			car.input_acceleration.set(2500, 4500) /= 3;
 			car.acceleration_length = 4500 / 5;
 
-			sprite.set(assets::texture_id::TRUCK_FRONT);
+			sprite.from_polygonized_texture(assets::texture_id::TRUCK_FRONT);
 			//sprite.set(assets::texture_id::TRUCK_FRONT, augs::rgba(0, 255, 255));
 			//sprite.size.x = 200;
 			//sprite.size.y = 100;
@@ -85,8 +90,8 @@ namespace prefabs {
 			fixture.density = 0.6f;
 			fixture.filter = filters::friction_ground();
 
-			vec2 offset((front.get<components::sprite>().size.x / 2 + sprite.size.x / 2) * -1, 0);
-			rear_offset = front.get<components::sprite>().size + sprite.size;
+			vec2 offset((front_size.x / 2 + sprite.size.x / 2) * -1, 0);
+			rear_offset = front_size + sprite.size;
 
 			colliders.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
 			colliders.is_friction_ground = true;
@@ -118,7 +123,7 @@ namespace prefabs {
 			fixture.filter = filters::trigger();
 			fixture.sensor = true;
 
-			vec2 offset((front.get<components::sprite>().size.x / 2 + sprite.size.x / 2 + 20) * -1, 0);
+			vec2 offset((front_size.x / 2 + sprite.size.x / 2 + 20) * -1, 0);
 			colliders.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
 
 			left_wheel += colliders;

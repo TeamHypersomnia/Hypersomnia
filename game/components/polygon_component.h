@@ -20,7 +20,7 @@ namespace augs {
 
 namespace components {
 	struct polygon {
-		enum uv_mapping_mode {
+		enum class uv_mapping_mode {
 			OVERLAY,
 			STRETCH
 		};
@@ -39,6 +39,8 @@ namespace components {
 			renderable_drawing_type drawing_type = renderable_drawing_type::NORMAL;
 		};
 
+
+		assets::texture_id center_neon_map = assets::texture_id::INVALID;
 		/* the polygon as it was originally, so possibly concave
 		it is later triangulated for rendering and divided into convex polygons for physics */
 		//augs::constant_size_vector<vec2, RENDERING_POLYGON_VERTEX_COUNT> original_polygon;
@@ -60,7 +62,8 @@ namespace components {
 			);
 		}
 		
-		void automatically_map_uv(assets::texture_id, unsigned uv_mapping_mode);
+		void automatically_map_uv(const assets::texture_id, const uv_mapping_mode);
+		void from_polygonized_texture(const assets::texture_id);
 
 		/* triangulates input */
 		void add_concave_polygon(std::vector<vertex>);

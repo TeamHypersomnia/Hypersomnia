@@ -46,7 +46,17 @@ void convex_partitioned_shape::from_renderable(const const_entity_handle handle)
 		from_sprite(handle.get<components::sprite>(), true);
 	}
 	if (handle.has<components::polygon>()) {
-		ensure(false);
+		std::vector<vec2> input;
+
+		const auto& poly = handle.get<components::polygon>();
+		
+		input.reserve(poly.vertices.size());
+
+		for (const auto& v : poly.vertices) {
+			input.push_back(v.pos);
+		}
+		
+		add_concave_polygon(input);
 	}
 }
 
@@ -71,8 +81,9 @@ void convex_partitioned_shape::from_sprite(const components::sprite& sprite, con
 
 		auto origin = augs::get_aabb(new_concave).center();
 
-		for (auto& v : new_concave)
+		for (auto& v : new_concave) {
 			v -= origin;
+		}
 
 		add_concave_polygon(new_concave);
 
@@ -86,8 +97,9 @@ void convex_partitioned_shape::from_sprite(const components::sprite& sprite, con
 
 		convex_poly new_convex_polygon;
 
-		for (int i = 0; i < shape.GetVertexCount(); ++i)
+		for (int i = 0; i < shape.GetVertexCount(); ++i) {
 			new_convex_polygon.vertices.push_back(vec2(shape.GetVertex(i))*METERS_TO_PIXELSf);
+		}
 
 		add_convex_polygon(new_convex_polygon);
 	}

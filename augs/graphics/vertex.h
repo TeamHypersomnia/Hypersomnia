@@ -30,7 +30,7 @@ namespace augs {
 		vertex(vec2 pos) : pos(pos) {}
 		vertex(vec2 pos, vec2 texcoord, rgba color, augs::texture& tex);
 
-		void set_texcoord(vec2, augs::texture& tex);
+		void set_texcoord(vec2, const augs::texture& tex);
 	};
 
 	struct vertex_triangle {

@@ -7,7 +7,7 @@ namespace augs {
 			tex.get_uv(this->texcoord);
 	}
 
-	void vertex::set_texcoord(vec2 coord, augs::texture& tex) {
+	void vertex::set_texcoord(vec2 coord, const augs::texture& tex) {
 		texcoord = coord;
 		tex.get_uv(this->texcoord);
 	}
