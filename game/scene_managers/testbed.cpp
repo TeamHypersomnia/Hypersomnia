@@ -117,8 +117,8 @@ namespace scene_managers {
 					auto& light = l += components::light();
 					light.color = light_cyan;
 					light.max_distance.base_value = 4500.f;
-					light.constant.base_value = 0.25f;
-					light.linear.base_value = 0.000008f;
+					light.constant.base_value = 0.15f;
+					light.linear.base_value = 0.000005f;
 					light.wall_max_distance.base_value = 4000.f;
 					l.add_standard_components();
 				}

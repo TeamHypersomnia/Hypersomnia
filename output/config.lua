@@ -20,7 +20,7 @@ config_table = {
 	launch_mode = launch_modes.LOCAL,
 	
 	input_recording_mode = recording_modes.DISABLE,
-	recording_replay_speed = 20.5,
+	recording_replay_speed = 1,
 
 	determinism_test_cloned_cosmoi_count = 2,
 
