@@ -2,6 +2,7 @@
 #include "game/transcendental/entity_id.h"
 #include "augs/misc/recoil_player.h"
 #include "augs/graphics/pixel.h"
+#include "augs/misc/stepped_timing.h"
 
 namespace components {
 	struct sentience {
@@ -31,6 +32,8 @@ namespace components {
 
 			float ratio() const;
 		};
+
+		augs::stepped_timestamp time_of_last_received_damage;
 
 		meter health;
 		meter consciousness;

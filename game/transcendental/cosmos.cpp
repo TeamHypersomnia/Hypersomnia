@@ -474,6 +474,7 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(logic_step& s
 	systems_temporary.get<physics_system>().post_and_clear_accumulated_collision_messages(step);
 	sentience_system().cooldown_aimpunches(step);
 	sentience_system().set_borders(step);
+	sentience_system().regenerate_values(step);
 
 	driver_system().assign_drivers_from_successful_trigger_hits(step);
 	driver_system().release_drivers_due_to_ending_contact_with_wheel(step);

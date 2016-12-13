@@ -56,7 +56,11 @@ void sentience_system::consume_health_event(messages::health_event h, logic_step
 	auto& sentience = subject.get<components::sentience>();
 
 	switch (h.target) {
-	case messages::health_event::HEALTH: sentience.health.value -= h.effective_amount; ensure(sentience.health.value >= 0); break;
+	case messages::health_event::HEALTH: 
+		sentience.health.value -= h.effective_amount; 
+		ensure(sentience.health.value >= 0); 
+		sentience.time_of_last_received_damage = cosmos.get_timestamp();
+		break;
 	case messages::health_event::CONSCIOUSNESS: sentience.consciousness.value -= h.effective_amount; ensure(sentience.health.value >= 0); break;
 	case messages::health_event::SHIELD: ensure(0); break;
 	case messages::health_event::AIM:
@@ -183,8 +187,17 @@ void sentience_system::cooldown_aimpunches(logic_step& step) const {
 }
 
 void sentience_system::regenerate_values(logic_step& step) const {
+	const auto now = step.cosm.get_timestamp();
+	const unsigned regeneration_frequency_in_steps = step.cosm.get_fixed_delta().get_steps_per_second() * 3;
+	
 	for (const auto& t : step.cosm.get(processing_subjects::WITH_SENTIENCE)) {
-		t.get<components::sentience>().aimpunch.cooldown(step.get_delta().in_milliseconds());
+		auto& sentience = t.get<components::sentience>();
+
+		const auto passed = (now.step - sentience.time_of_last_received_damage.step);
+		
+		if (passed > 0 && passed % regeneration_frequency_in_steps == 0) {
+			sentience.health.value -= sentience.health.calculate_damage_result(-2).effective;
+		}
 	}
 }
 
