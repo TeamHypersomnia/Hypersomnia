@@ -181,7 +181,7 @@ void car_system::apply_movement_forces(logic_step& step) {
 		};
 		
 		engine_handler(cosmos[car.acceleration_engine], car.accelerating, cosmos[car.current_driver].alive(),
-			0.3f + speed*1.2f / 3000.f + std::abs(angular_velocity / 1080.f)*sqrt(physics.get_mass())
+			0.3f + speed*1.2f / 3000.f + std::abs(angular_velocity / 780.f)*sqrt(physics.get_mass())
 		);
 
 		//float angle = physics.get_angle();
