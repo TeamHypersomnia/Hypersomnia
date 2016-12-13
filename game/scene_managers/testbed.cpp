@@ -79,8 +79,8 @@ namespace scene_managers {
 		const int num_floors = 10 * 10;
 		const int side = sqrt(num_floors) / 2;
 
-		for (int x = -side; x < side; ++x)
-			for (int y = -side; y < side; ++y)
+		for (int x = -side; x < side; ++x) {
+			for (int y = -side; y < side*8; ++y)
 			{
 				//auto background = world.create_entity("bg[-]");
 				//ingredients::sprite(background, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 550)), assets::texture_id::TEST_BACKGROUND, augs::white, render_layer::GROUND);
@@ -93,6 +93,80 @@ namespace scene_managers {
 				//background.add_standard_components();
 				street.add_standard_components();
 			}
+		}
+
+		{
+			vec2 coords[] = {
+				{ 1200, 5400 },
+				{ 1200, 10400 },
+				{ 1200, 15400 },
+				{ 1200, 20400 },
+			};
+
+			for (const auto c : coords) {
+				prefabs::create_crate(world, c + vec2(-100, 400) );
+				prefabs::create_crate(world, c + vec2(300, 300) );
+				prefabs::create_crate(world, c + vec2(100, -200) );
+
+				const auto light_pos = c + vec2(0, 100);
+				const auto light_cyan = rgba(30, 255, 255, 255);
+
+				{
+					const auto l = world.create_entity("l");
+					l += components::transform(light_pos);
+					auto& light = l += components::light();
+					light.color = light_cyan;
+					light.max_distance.base_value = 4500.f;
+					light.constant.base_value = 0.25f;
+					light.linear.base_value = 0.000008f;
+					light.wall_max_distance.base_value = 4000.f;
+					l.add_standard_components();
+				}
+
+
+				{
+					const auto e = world.create_entity("wandering_pixels");
+					auto& w = e += components::wandering_pixels();
+					auto& r = e += components::render();
+
+					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
+
+					w.face.set(assets::texture_id(int(assets::texture_id::BLANK)), light_cyan);
+					w.face.size.set(1, 1);
+					w.count = 50;
+					w.reach = xywh(light_pos.x- 250, light_pos.y-250, 500, 500);
+					e.add_standard_components();
+				}
+
+				{
+					const auto e = world.create_entity("wandering_pixels");
+					auto& w = e += components::wandering_pixels();
+					auto& r = e += components::render();
+
+					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
+
+					w.face.set(assets::texture_id(int(assets::texture_id::BLINK_FIRST) + 2), light_cyan);
+					//w.face.size.set(1, 1);
+					w.count = 20;
+					w.reach = xywh(light_pos.x - 150, light_pos.y - 150, 300, 300);
+					e.add_standard_components();
+				}
+
+				{
+					const auto e = world.create_entity("wandering_pixels");
+					auto& w = e += components::wandering_pixels();
+					auto& r = e += components::render();
+
+					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
+
+					w.face.set(assets::texture_id(int(assets::texture_id::BLINK_FIRST) + 2), light_cyan);
+					//w.face.size.set(1, 1);
+					w.count = 20;
+					w.reach = xywh(light_pos.x - 25, light_pos.y - 25, 50, 50);
+					e.add_standard_components();
+				}
+			}
+		}
 
 		{
 			//{

@@ -16,7 +16,11 @@ namespace ingredients {
 
 	components::sprite&  sprite_scalled(const entity_handle e, const components::transform pos, const vec2i size, const assets::texture_id id, const augs::rgba col, const render_layer layer) {
 		sprite(e, pos, id, col, layer);
-		e.get<components::sprite>().size = size;
+		
+		if (size.non_zero()) {
+			e.get<components::sprite>().size = size;
+		}
+
 		return e.get<components::sprite>();
 	}
 }
