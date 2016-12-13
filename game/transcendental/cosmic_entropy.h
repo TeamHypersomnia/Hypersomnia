@@ -70,15 +70,17 @@ namespace augs {
 		while (num_entropied_entities--) {
 			unsigned guid;
 			
-			if (!augs::read_object(ar, guid))
+			if (!augs::read_object(ar, guid)) {
 				return false;
+			}
 
 			auto& new_entity_entropy = storage.entropy_per_entity[guid];
 
 			ensure(new_entity_entropy.empty());
 
-			if (!augs::read_vector_of_objects(ar, new_entity_entropy, unsigned short()))
+			if (!augs::read_vector_of_objects(ar, new_entity_entropy, unsigned short())) {
 				return false;
+			}
 		}
 
 		return true;

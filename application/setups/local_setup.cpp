@@ -13,6 +13,7 @@
 #include "game/transcendental/step_packaged_for_network.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/step.h"
+#include "game/transcendental/cosmic_movie_director.h"
 #include "game/transcendental/types_specification/all_messages_includes.h"
 
 #include "game/transcendental/step_and_entropy_unpacker.h"
@@ -43,6 +44,9 @@ void local_setup::process(game_window& window) {
 	session.reserve_caches_for_entities(3000);
 	session.camera.configure_size(screen_size);
 	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
+
+	cosmic_movie_director dir;
+	dir.load_recordings_from_directory("director/menu");
 
 	testbed.configure_view(session);
 
