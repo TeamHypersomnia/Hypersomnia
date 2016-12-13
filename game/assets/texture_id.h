@@ -103,6 +103,8 @@ namespace assets {
 		WANDERING_SQUARE,
 		WANDERING_CROSS,
 
+		TRUCK_ENGINE,
+
 		COUNT,
 	};
 	

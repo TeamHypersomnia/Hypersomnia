@@ -10,10 +10,13 @@ namespace components {
 		entity_id left_wheel_trigger;
 		entity_id right_wheel_trigger;
 
-		entity_id acceleration_engine;
-		entity_id deceleration_engine;
+		entity_id acceleration_engine[2];
+		entity_id deceleration_engine[2];
+
 		entity_id left_engine;
 		entity_id right_engine;
+
+		entity_id engine_sound;
 
 		bool accelerating = false;
 		bool decelerating = false;
@@ -55,26 +58,42 @@ namespace components {
 		void for_each_held_id(F f) {
 			f(current_driver);
 
-			f(acceleration_engine);
-			f(deceleration_engine);
+			f(left_wheel_trigger);
+			f(right_wheel_trigger);
+
+			for (auto& e : acceleration_engine) {
+				f(e);
+			}
+
+			for (auto& e : deceleration_engine) {
+				f(e);
+			}
+
 			f(left_engine);
 			f(right_engine);
 
-			f(left_wheel_trigger);
-			f(right_wheel_trigger);
+			f(engine_sound);
 		}
 
 		template<class F>
 		void for_each_held_id(F f) const {
 			f(current_driver);
 
-			f(acceleration_engine);
-			f(deceleration_engine);
+			f(left_wheel_trigger);
+			f(right_wheel_trigger);
+
+			for (const auto& e : acceleration_engine) {
+				f(e);
+			}
+
+			for (const auto& e : deceleration_engine) {
+				f(e);
+			}
+
 			f(left_engine);
 			f(right_engine);
 
-			f(left_wheel_trigger);
-			f(right_wheel_trigger);
+			f(engine_sound);
 		}
 
 		template <class Archive>

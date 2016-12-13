@@ -38,6 +38,7 @@ namespace prefabs {
 		name_entity(front, entity_name::TRUCK);
 
 		const vec2 front_size = get_resource_manager().find(assets::texture_id::TRUCK_FRONT)->img.get_size();
+		const vec2 interior_size = get_resource_manager().find(assets::texture_id::TRUCK_INSIDE)->img.get_size();
 
 		{
 			auto& sprite = front += components::polygon();
@@ -71,8 +72,7 @@ namespace prefabs {
 			front.get<components::fixtures>().set_owner_body(front);
 			//physics.air_resistance = 0.2f;
 		}
-
-		vec2 rear_offset;
+		
 		{
 			auto& sprite = interior += components::sprite();
 			auto& render = interior += components::render();
@@ -91,7 +91,6 @@ namespace prefabs {
 			fixture.filter = filters::friction_ground();
 
 			vec2 offset((front_size.x / 2 + sprite.size.x / 2) * -1, 0);
-			rear_offset = front_size + sprite.size;
 
 			colliders.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
 			colliders.is_friction_ground = true;
@@ -132,38 +131,101 @@ namespace prefabs {
 		}
 
 		{
-			messages::create_particle_effect effect;
-			effect.place_of_birth = spawn_transform;
-			effect.place_of_birth.pos -= vec2(rear_offset.x - 80.f, 0).rotate(effect.place_of_birth.rotation, vec2());
-			effect.place_of_birth.rotation += 180;
-			effect.input.effect = assets::particle_effect_id::ENGINE_PARTICLES;
-			effect.input.randomize_position_within_radius = 15.f;
-			effect.input.single_displacement_duration_ms.set(200.f, 1000.f);
-			effect.subject = front;
-			effect.input.modifier.colorize = cyan;
-			effect.input.modifier.scale_amounts = 1.5f;
-			effect.input.modifier.scale_lifetimes = 1.2f;
-			effect.input.delete_entity_after_effect_lifetime = false;
+			for (int i = 0; i < 4; ++i) {
+					const auto engine_physical = world.create_entity("engine_body");
 
-			const auto rear_engine = particles_existence_system().create_particle_effect_entity(world, effect);
+					auto& sprite = engine_physical += components::sprite();
+					auto& render = engine_physical += components::render();
+					components::fixtures colliders;
 
-			auto& existence = rear_engine.get<components::particles_existence>();
-			existence.distribute_within_segment_of_length = interior.get<components::sprite>().size.y * 0.8;
+					render.layer = render_layer::SMALL_DYNAMIC_BODY;
 
-			rear_engine.add_standard_components();
-			front.add_sub_entity(rear_engine);
-			front.get<components::car>().acceleration_engine = rear_engine;
-			components::particles_existence::deactivate(rear_engine);
+					sprite.set(assets::texture_id::TRUCK_ENGINE);
+					//sprite.set(assets::texture_id::TRUCK_INSIDE, augs::rgba(122, 0, 122, 255));
+					//sprite.size.x = 250;
+					//sprite.size.y = 550;
+
+					auto& fixture = colliders.new_collider();
+					fixture.shape.from_renderable(engine_physical);
+					fixture.density = 1.0f;
+					fixture.filter = filters::see_through_dynamic_object();
+
+					components::transform offset;
+
+					if (i == 0) {
+						offset.pos.set((front_size.x / 2 + interior_size.x + sprite.size.x / 2 - 5.f) * -1, (-interior_size.y / 2 + sprite.size.y / 2));
+					}
+					if (i == 1) {
+						offset.pos.set((front_size.x / 2 + interior_size.x + sprite.size.x / 2 - 5.f) * -1, -(-interior_size.y / 2 + sprite.size.y / 2));
+					}
+					if (i == 2) {
+						offset.pos.set(-100, (interior_size.y / 2 + sprite.size.x / 2) * -1);
+						offset.rotation = -90;
+					}
+					if (i == 3) {
+						offset.pos.set(-100, (interior_size.y / 2 + sprite.size.x / 2) *  1);
+						offset.rotation = 90;
+					}
+
+					colliders.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET] = offset;
+
+					engine_physical += colliders;
+
+					engine_physical.get<components::fixtures>().set_owner_body(front);
+					engine_physical.add_standard_components();
+					front.add_sub_entity(engine_physical);
+
+				const vec2 engine_size = get_resource_manager().find(assets::texture_id::TRUCK_ENGINE)->img.get_size();
+
+				{
+					messages::create_particle_effect effect;
+					effect.place_of_birth = engine_physical.logic_transform();
+					
+					if (i == 0 || i == 1) {
+						effect.place_of_birth.rotation += 180;
+					}
+					
+					effect.input.effect = assets::particle_effect_id::ENGINE_PARTICLES;
+					effect.subject = front;
+					effect.input.modifier.colorize = cyan;
+					effect.input.modifier.scale_amounts = 1.4f;
+					effect.input.modifier.scale_lifetimes = 0.8f;
+					effect.input.delete_entity_after_effect_lifetime = false;
+
+					const auto engine = particles_existence_system().create_particle_effect_entity(world, effect);
+
+					auto& existence = engine.get<components::particles_existence>();
+					existence.distribute_within_segment_of_length = engine_size.y;
+
+					engine.add_standard_components();
+					engine_physical.add_sub_entity(engine);		
+					if (i == 0) {
+						front.get<components::car>().acceleration_engine[i] = engine;
+					}
+					if (i == 1) {
+						front.get<components::car>().acceleration_engine[i] = engine;
+					}
+					if (i == 2) {
+						front.get<components::car>().left_engine = engine;
+					}
+					if (i == 3) {
+						front.get<components::car>().right_engine = engine;
+					}
+					components::particles_existence::deactivate(engine);
+				}
+
+			}
 
 			{
 				components::sound_existence::effect_input in;
 				in.effect = assets::sound_buffer_id::ENGINE;
 				in.modifier.repetitions = -1;
 				in.delete_entity_after_effect_lifetime = false;
-				const auto rear_engine_sound = sound_existence_system().create_sound_effect_entity(world, in, rear_engine.logic_transform(), rear_engine);
-				rear_engine_sound.add_standard_components();
-				rear_engine.add_sub_entity(rear_engine_sound);
-				components::sound_existence::deactivate(rear_engine_sound);
+				const auto engine_sound = sound_existence_system().create_sound_effect_entity(world, in, spawn_transform, front);
+				engine_sound.add_standard_components();
+				front.add_sub_entity(engine_sound);
+				front.get<components::car>().engine_sound = engine_sound;
+				components::sound_existence::deactivate(engine_sound);
 			}
 		}
 

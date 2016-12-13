@@ -154,8 +154,8 @@ void car_system::apply_movement_forces(logic_step& step) {
 			physics.apply_angular_impulse(delta.in_seconds() * (angular_resistance * angular_speed * angular_speed)* -sgn(angular_speed) * physics.get_inertia());
 		}
 
-		auto engine_handler = [&](const entity_handle h, const bool particles_enabled, const bool sound_enabled, const float pitch) {
-			if (h.has<components::particles_existence>()) {
+		auto engine_handler = [&](const entity_handle h, const bool particles_enabled) {
+			if (h.alive() && h.has<components::particles_existence>()) {
 				if (particles_enabled) {
 					components::particles_existence::activate(h);
 				}
@@ -163,26 +163,29 @@ void car_system::apply_movement_forces(logic_step& step) {
 					components::particles_existence::deactivate(h);
 				}
 			}
-
-			const auto sound_entity = cosmos[h.get<components::sub_entities>().other_sub_entities[0]];
-
-			if (sound_entity.has<components::sound_existence>()) {
-				if (sound_enabled) {
-					auto& existence = sound_entity.get<components::sound_existence>();
-					existence.input.direct_listener = car.current_driver;
-					existence.input.modifier.pitch = pitch;
-
-					components::sound_existence::activate(sound_entity);
-				}
-				else {
-					components::sound_existence::deactivate(sound_entity);
-				}
-			}
 		};
-		
-		engine_handler(cosmos[car.acceleration_engine], car.accelerating, cosmos[car.current_driver].alive(),
-			0.3f + speed*1.2f / 3000.f + std::abs(angular_velocity / 780.f)*sqrt(physics.get_mass())
-		);
+
+		engine_handler(cosmos[car.acceleration_engine[0]], car.accelerating && !car.decelerating);
+		engine_handler(cosmos[car.acceleration_engine[1]], car.accelerating && !car.decelerating);
+		engine_handler(cosmos[car.right_engine], car.turning_left && !car.turning_right);
+		engine_handler(cosmos[car.left_engine], car.turning_right && !car.turning_left);
+
+		const bool sound_enabled = cosmos[car.current_driver].alive();
+		const auto sound_entity = cosmos[car.engine_sound];
+		const float pitch = 0.3f + speed*1.2f / 3000.f + std::abs(angular_velocity / 780.f)*sqrt(physics.get_mass());
+
+		if (sound_entity.alive() && sound_entity.has<components::sound_existence>()) {
+			if (sound_enabled) {
+				auto& existence = sound_entity.get<components::sound_existence>();
+				existence.input.direct_listener = car.current_driver;
+				existence.input.modifier.pitch = pitch;
+
+				components::sound_existence::activate(sound_entity);
+			}
+			else {
+				components::sound_existence::deactivate(sound_entity);
+			}
+		}
 
 		//float angle = physics.get_angle();
 		//LOG("F: %x, %x, %x", AS_INTV physics.get_position(), AS_INT angle, AS_INTV physics.velocity());

@@ -192,6 +192,8 @@ namespace resource_setups {
 
 		get_resource_manager().create(assets::texture_id::WANDERING_CROSS, "hypersomnia/gfx/wandering_cross.png");
 
+		get_resource_manager().create(assets::texture_id::TRUCK_ENGINE, "hypersomnia/gfx/truck_engine.png");
+
 		get_resource_manager().create_inverse_with_flip(assets::animation_id::TORSO_MOVE,
 			assets::texture_id::TORSO_MOVING_FIRST,
 			assets::texture_id::TORSO_MOVING_LAST,

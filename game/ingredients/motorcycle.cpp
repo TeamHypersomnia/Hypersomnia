@@ -155,7 +155,7 @@ namespace prefabs {
 
 			rear_engine.add_standard_components();
 			front.add_sub_entity(rear_engine);
-			front.get<components::car>().acceleration_engine = rear_engine;
+			front.get<components::car>().acceleration_engine[0] = rear_engine;
 			components::particles_existence::deactivate(rear_engine);
 
 			{
@@ -165,7 +165,8 @@ namespace prefabs {
 				in.delete_entity_after_effect_lifetime = false;
 				const auto rear_engine_sound = sound_existence_system().create_sound_effect_entity(world, in, rear_engine.logic_transform(), rear_engine);
 				rear_engine_sound.add_standard_components();
-				rear_engine.add_sub_entity(rear_engine_sound);
+				front.add_sub_entity(rear_engine_sound);
+				front.get<components::car>().engine_sound = rear_engine_sound;
 				components::sound_existence::deactivate(rear_engine_sound);
 			}
 		}
