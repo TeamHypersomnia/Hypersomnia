@@ -22,7 +22,7 @@ void components::position_copying::configure_chasing(const const_entity_handle s
 
 	if (cfg == chasing_configuration::RELATIVE_ORBIT) {
 		const auto subject_transform = subject.logic_transform();
-		position_copying_type = components::position_copying::position_copying_type::ORBIT;
+		position_copying_mode = components::position_copying::position_copying_type::ORBIT;
 
 		position_copying_rotation = true;
 		rotation_offset = chaser_place_of_birth.rotation - subject_transform.rotation;
@@ -31,7 +31,7 @@ void components::position_copying::configure_chasing(const const_entity_handle s
 }
 
 components::transform components::position_copying::get_previous_transform() const {
-	return{ previous, rotation_previous };
+	return previous;
 }
 
 void position_copying_system::update_transforms(logic_step& step) {
@@ -42,17 +42,14 @@ void position_copying_system::update_transforms(logic_step& step) {
 		components::transform transform = it.logic_transform();
 		auto& position_copying = it.get<components::position_copying>();
 
-		position_copying.previous = transform.pos;
-		position_copying.rotation_previous = transform.rotation;
+		position_copying.previous = transform;
 
 		if (cosmos[position_copying.target].dead()) continue;
 		
 		if (position_copying.target_newly_set) {
 			auto target_transform = cosmos[position_copying.target].logic_transform();
 			target_transform.rotation *= position_copying.rotation_multiplier;
-
-			//position_copying.previous = target_transform.pos;
-			//position_copying.rotation_previous = target_transform.rotation;
+			
 			position_copying.target_newly_set = false;
 		}
 
@@ -60,12 +57,7 @@ void position_copying_system::update_transforms(logic_step& step) {
 		target_transform.rotation *= position_copying.rotation_multiplier;
 		target_transform.pos = vec2i(target_transform.pos);
 
-		if (position_copying.position_copying_type == components::position_copying::position_copying_type::OFFSET) {
-			//if (position_copying.relative) {
-			//	position_copying.offset = transform.pos - position_copying.previous;
-			//	position_copying.rotation_offset = transform.rotation - position_copying.rotation_previous;
-			//}
-
+		if (position_copying.position_copying_mode == components::position_copying::position_copying_type::OFFSET) {
 			transform.pos = target_transform.pos;
 			transform.pos += position_copying.offset;
 
@@ -73,12 +65,8 @@ void position_copying_system::update_transforms(logic_step& step) {
 				transform.rotation = target_transform.rotation;
 				transform.rotation += position_copying.rotation_offset;
 			}
-
-			//transform.previous.pos = transform.pos;
-			//position_copying.previous = target_transform.pos;
-			//position_copying.rotation_previous = target_transform.rotation;
 		}
-		else if (position_copying.position_copying_type == components::position_copying::position_copying_type::ORBIT) {
+		else if (position_copying.position_copying_mode == components::position_copying::position_copying_type::ORBIT) {
 			transform.pos = target_transform.pos + position_copying.rotation_orbit_offset;
 			transform.pos.rotate(target_transform.rotation, target_transform.pos);
 			
@@ -86,7 +74,7 @@ void position_copying_system::update_transforms(logic_step& step) {
 				transform.rotation = target_transform.rotation + position_copying.rotation_offset;
 			}
 		}
-		else if (position_copying.position_copying_type == components::position_copying::position_copying_type::PARALLAX) {
+		else if (position_copying.position_copying_mode == components::position_copying::position_copying_type::PARALLAX) {
 			transform.pos = position_copying.reference_position + (target_transform.pos - position_copying.target_reference_position) * position_copying.scrolling_speed;
 		}
 

@@ -9,11 +9,11 @@ namespace components {
 	struct position_copying {
 		entity_id target;
 		
-		enum position_copying_type {
+		enum position_copying_type : unsigned char {
 			OFFSET,
 			ORBIT,
 			PARALLAX
-		} position_copying_type = position_copying_type::OFFSET;
+		};
 
 		vec2 offset;
 		vec2 rotation_orbit_offset;
@@ -26,7 +26,7 @@ namespace components {
 		float rotation_offset = 0.0f;
 		float rotation_multiplier = 1.0f;
 
-		bool relative = false;
+		position_copying_type position_copying_mode = position_copying_type::OFFSET;
 		bool position_copying_rotation = false;
 		bool track_origin = false;
 		bool target_newly_set = true;
@@ -34,8 +34,7 @@ namespace components {
 	private:
 		friend class position_copying_system;
 
-		vec2 previous;
-		float rotation_previous = 0.0f;
+		components::transform previous;
 
 	public:
 		template<class F>
@@ -74,7 +73,6 @@ namespace components {
 				CEREAL_NVP(subscribe_to_previous),
 
 				CEREAL_NVP(previous),
-				CEREAL_NVP(rotation_previous)
 			);
 		}
 
