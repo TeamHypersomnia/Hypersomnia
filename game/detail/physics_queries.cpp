@@ -159,7 +159,7 @@ physics_system::query_aabb_output physics_system::query_square_px(const vec2 p1,
 }
 
 physics_system::query_aabb_output physics_system::query_camera(const camera_cone cam) const {
-	const auto visible_aabb = cam.get_transformed_visible_world_area_aabb();
+	const auto visible_aabb = cam.get_transformed_visible_world_area_aabb().expand_from_center({100, 100});
 
 	return std::move(query_aabb_px(visible_aabb.left_top(), visible_aabb.right_bottom(), filters::renderable_query()));
 }
