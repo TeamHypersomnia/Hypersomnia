@@ -9,6 +9,7 @@
 #include "game/components/container_component.h"
 #include "game/components/gui_element_component.h"
 #include "game/components/fixtures_component.h"
+#include "game/components/position_copying_component.h"
 
 #include "game/components/sound_existence_component.h"
 #include "game/components/particles_existence_component.h"
@@ -32,7 +33,9 @@ void basic_entity_handle<C>::add_standard_components() const {
 		ensure(!has_transform);
 	}
 
-	if (!has<components::interpolation>() && (has_physics || has<components::crosshair>())) {
+	if (!has<components::interpolation>() && 
+		(has_physics || has<components::crosshair>() || has<components::position_copying>())
+		) {
 		add(components::interpolation());
 		get<components::interpolation>().place_of_birth = logic_transform();
 	}
