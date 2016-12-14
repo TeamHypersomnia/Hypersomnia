@@ -17,7 +17,7 @@ void typesafe_sprintf_detail(size_t starting_pos, std::basic_string<CharType>& t
 	if (starting_pos != std::string::npos) {
 		std::basic_ostringstream<CharType> replacement;
 
-		const auto opcode = target_str[starting_pos + 1];
+		auto opcode = target_str[starting_pos + 1];
 
 		if (opcode == L'f') {
 			replacement << std::fixed;
