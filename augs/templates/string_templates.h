@@ -23,6 +23,15 @@ std::wstring to_wstring(T val, int precision = -1, bool fixed = false) {
 
 std::wstring to_wstring(std::string val);
 
+template <class T, class CharType>
+T to_value(const std::basic_string<CharType> s) {
+	std::basic_istringstream<CharType> ss(s);
+	
+	T val;
+	ss >> val;
+	return std::move(val);
+}
+
 template<class Str, class Repl>
 Str replace_all(Str str, Repl _from, Repl _to) {
 	const Str& from(_from);
