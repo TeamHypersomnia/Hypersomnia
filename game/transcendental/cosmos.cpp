@@ -441,12 +441,12 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(logic_step& s
 
 	force_joint_system().apply_forces_towards_target_entities(step);
 
-	rotation_copying_system().update_rotations(step.cosm);
 	performance.start(meter_type::PHYSICS);
 	listener.during_step = true;
 	systems_temporary.get<physics_system>().step_and_set_new_transforms(step);
 	listener.during_step = false;
 	performance.stop(meter_type::PHYSICS);
+	rotation_copying_system().update_rotations(step.cosm);
 	position_copying_system().update_transforms(step);
 
 	//particles_simulation_system().create_particle_effects(step);
@@ -523,8 +523,8 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(logic_step& s
 	animation_system().handle_animation_messages(step);
 	animation_system().progress_animation_states(step);
 
-	position_copying_system().update_transforms(step);
-	rotation_copying_system().update_rotations(step.cosm);
+	//position_copying_system().update_transforms(step);
+	//rotation_copying_system().update_rotations(step.cosm);
 
 	profiler.raycasts.measure(systems_temporary.get<physics_system>().ray_casts_since_last_step);
 	performance.stop(meter_type::LOGIC);
