@@ -14,7 +14,7 @@ namespace augs {
 	private:
 		struct entry_type {
 			entry_internal_type internal_data;
-			unsigned step_occurred;
+			unsigned step_occurred = 0xdeadbeef;
 		};
 
 		unsigned player_position = 0;
@@ -27,7 +27,7 @@ namespace augs {
 		std::string live_saving_filename;
 
 	public:
-		void record(std::string live_saving_filename) {
+		void record(const std::string live_saving_filename) {
 			stop();
 
 			this->live_saving_filename = live_saving_filename;
@@ -45,7 +45,7 @@ namespace augs {
 			next_entry_to_be_replayed = 0;
 		}
 
-		void load_recording(std::string filename) {
+		void load_recording(const std::string filename) {
 			stop();
 			loaded_recording.clear();
 
@@ -96,8 +96,9 @@ namespace augs {
 				}
 			}
 
-			if(current_player_state != player_state::DISABLED)
+			if (current_player_state != player_state::DISABLED) {
 				++player_position;
+			}
 		}
 
 		player_state get_state() const {
