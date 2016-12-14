@@ -136,10 +136,10 @@ namespace prefabs {
 
 
 		components::transform engine_transforms[4] = {
-			{ vec2(-front.get<components::sprite>().size.x / 2 - 5, 0), 180 },
-			{ vec2(front.get<components::sprite>().size.x / 2 + 5, 0), 0 },
-			{ vec2(15, -(front.get<components::sprite>().size.y / 2 + 13)), 90 },
-			{ vec2(15, front.get<components::sprite>().size.y / 2 + 13), -90 },
+			{ vec2(-front.get<components::sprite>().size.x / 2 + 10, 0), 180 },
+			{ vec2(front.get<components::sprite>().size.x / 2 - 10, 0), 0 },
+			{ vec2(15, -(front.get<components::sprite>().size.y / 2 + 18)), 90 },
+			{ vec2(15, front.get<components::sprite>().size.y / 2 + 18), -90 },
 
 		};
 
@@ -149,8 +149,8 @@ namespace prefabs {
 			effect.place_of_birth = spawn_transform + engine_transforms[ee].pos.rotate(spawn_transform.rotation, vec2());
 			effect.place_of_birth.rotation += engine_transforms[ee].rotation;
 			effect.input.effect = assets::particle_effect_id::ENGINE_PARTICLES;
-			effect.input.modifier.scale_amounts = 1.4f;
-			effect.input.modifier.scale_lifetimes = 0.6f;
+			effect.input.modifier.scale_amounts = 5.7f;
+			effect.input.modifier.scale_lifetimes = 0.45f;
 			//effect.input.randomize_position_within_radius = 10.f;
 			//effect.input.single_displacement_duration_ms.set(400.f, 1500.f);
 			effect.subject = front;
@@ -160,7 +160,7 @@ namespace prefabs {
 			const auto engine = particles_existence_system().create_particle_effect_entity(world, effect);
 
 			auto& existence = engine.get<components::particles_existence>();
-			existence.distribute_within_segment_of_length = 35.f * 0.6;
+			existence.distribute_within_segment_of_length = 35.f * 0.8;
 
 			engine.add_standard_components();
 			front.add_sub_entity(engine);

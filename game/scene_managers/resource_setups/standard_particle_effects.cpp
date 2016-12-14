@@ -63,14 +63,14 @@ namespace resource_setups {
 				em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
 
 				em.spread_degrees = std::make_pair(7, 7);
-				em.particles_per_sec = std::make_pair(80, 80);
+				em.particles_per_sec = std::make_pair(80/4.5, 80/4.5);
 				em.stream_duration_ms = std::make_pair(3000000, 3000000);
 
 				em.base_velocity = std::make_pair(100, 110);
 				em.base_velocity_variation = std::make_pair(5.f, 10.f);
 
 				em.angular_velocity = std::make_pair(2.5f*RAD_TO_DEGf, 2.8f*RAD_TO_DEGf);
-				em.particle_lifetime_ms = std::make_pair(2500, 2500);
+				em.particle_lifetime_ms = std::make_pair(2500*1.5, 2500 * 1.5);
 
 				for (int i = 0; i < 3; ++i) {
 					resources::particle particle_template;

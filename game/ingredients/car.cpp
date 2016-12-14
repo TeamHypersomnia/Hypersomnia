@@ -188,8 +188,8 @@ namespace prefabs {
 					effect.input.effect = assets::particle_effect_id::ENGINE_PARTICLES;
 					effect.subject = front;
 					effect.input.modifier.colorize = cyan;
-					effect.input.modifier.scale_amounts = 1.4f;
-					effect.input.modifier.scale_lifetimes = 0.8f;
+					effect.input.modifier.scale_amounts = 6.7f;
+					effect.input.modifier.scale_lifetimes = 0.45f;
 					effect.input.delete_entity_after_effect_lifetime = false;
 
 					const auto engine = particles_existence_system().create_particle_effect_entity(world, effect);
