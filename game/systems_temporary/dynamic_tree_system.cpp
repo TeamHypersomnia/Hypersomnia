@@ -78,8 +78,6 @@ std::vector<unversioned_entity_id> dynamic_tree_system::determine_visible_entiti
 
 	std::vector<unversioned_entity_id> visible_entities = tree.always_visible;
 
-	const auto visible_aabb = in.get_transformed_visible_world_area_aabb();
-
 	struct render_listener {
 		const b2DynamicTree* tree;
 		std::vector<unversioned_entity_id>* visible_entities;
@@ -97,6 +95,8 @@ std::vector<unversioned_entity_id> dynamic_tree_system::determine_visible_entiti
 
 	aabb_listener.tree = &tree.nodes;
 	aabb_listener.visible_entities = &visible_entities;
+	
+	const auto visible_aabb = in.get_transformed_visible_world_area_aabb().expand_from_center({ 50, 50 });
 
 	b2AABB input;
 	input.lowerBound = visible_aabb.left_top();

@@ -40,10 +40,7 @@ namespace components {
 			result.aabb.set_size({ 2.f, 2.f });
 
 			const auto enlarge = std::max(particles_existence->input.randomize_position_within_radius, particles_existence->distribute_within_segment_of_length);
-			result.aabb.l -= enlarge;
-			result.aabb.t -= enlarge;
-			result.aabb.r += enlarge;
-			result.aabb.b += enlarge;
+			result.aabb.expand_from_center({ enlarge, enlarge });
 		}
 		//else if (sound_existence) {
 		//	result.type = tree_type::SOUND_EXISTENCES;
@@ -58,10 +55,7 @@ namespace components {
 			result.aabb = wandering_pixels->reach;
 
 			const auto enlarge = result.aabb.get_size() * 0.3;
-			result.aabb.l -= enlarge.x;
-			result.aabb.t -= enlarge.y;
-			result.aabb.r += enlarge.x;
-			result.aabb.b += enlarge.y;
+			result.aabb.expand_from_center(enlarge);
 		}
 
 		return result;

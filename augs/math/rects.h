@@ -169,6 +169,15 @@ namespace augs {
 				return l >= rc.l && r <= rc.r && t >= rc.t && b <= rc.b;
 			}
 
+			ltrb& expand_from_center(const vec2 amount) {
+				l -= amount.x;
+				t -= amount.y;
+				r += amount.x;
+				b += amount.y;
+
+				return *this;
+			}
+
 			bool stick_x(const ltrb& rc) {
 				vec2t<T> offset(0, 0);
 				if (l < rc.l) offset.x += rc.l - l;
@@ -389,7 +398,16 @@ namespace augs {
 			void b(T bottom) {
 				this->h = bottom - y;
 			}
-			
+
+			xywh& expand_from_center(const vec2 amount) {
+				x -= amount.x;
+				y -= amount.y;
+				w += amount.x;
+				h += amount.y;
+				
+				return *this;
+			}
+
 			T x, y;
 
 			template <class Archive>
