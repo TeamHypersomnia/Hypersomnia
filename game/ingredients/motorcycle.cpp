@@ -24,12 +24,12 @@
 namespace prefabs {
 	entity_handle create_motorcycle(cosmos& world, const components::transform& spawn_transform) {
 		auto front = world.create_entity("front");
-		auto interior = world.create_entity("interior");
+		//auto interior = world.create_entity("interior");
 		auto left_wheel = world.create_entity("left_wheel");
 
-		front.add_sub_entity(interior);
+		//front.add_sub_entity(interior);
 		front.add_sub_entity(left_wheel);
-		name_entity(front, entity_name::MOTORCYCLE);
+		name_entity(front, entity_name::JMIX114);
 
 		{
 			auto& sprite = front += components::sprite();
@@ -41,7 +41,7 @@ namespace prefabs {
 
 			car.left_wheel_trigger = left_wheel;
 			car.input_acceleration.set(1000, 1000);
-			car.acceleration_length = 2800;
+			car.acceleration_length = 1500;
 			
 			car.wheel_offset = vec2(35, 0);
 			car.maximum_lateral_cancellation_impulse = 50;
@@ -61,8 +61,8 @@ namespace prefabs {
 			car.lateral_impulse_multiplier = 0.3f;
 			car.braking_angular_damping = 16.f;
 
-			sprite.set(assets::texture_id::MOTORCYCLE_FRONT);
-			render.layer = render_layer::CAR_WHEEL;
+			sprite.set(assets::texture_id::JMIX114);
+			render.layer = render_layer::CAR_INTERIOR;
 
 			body.linear_damping = 0.4f;
 			body.angular_damping = 2.f;
@@ -71,7 +71,7 @@ namespace prefabs {
 			info.shape.from_renderable(front);
 
 			info.filter = filters::see_through_dynamic_object();
-			info.density = 0.6f;
+			info.density = 1.5f;
 			info.restitution = 0.3f;
 			colliders.can_driver_shoot_through = true;
 
@@ -82,30 +82,28 @@ namespace prefabs {
 			front += colliders;
 			front.get<components::fixtures>().set_owner_body(front);
 		}
-		
-		vec2 rear_offset;
 
-		{
-			auto& sprite = interior += components::sprite();
-			auto& render = interior += components::render();
-			components::fixtures colliders;
-
-			render.layer = render_layer::CAR_WHEEL;
-
-			sprite.set(assets::texture_id::MOTORCYCLE_INSIDE);
-
-			auto& info = colliders.new_collider();
-			info.shape.from_renderable(interior);
-			info.density = 0.6f;
-			colliders.disable_standard_collision_resolution = true;
-			info.filter = filters::see_through_dynamic_object();
-			vec2 offset((front.get<components::sprite>().size.x / 2 + sprite.size.x / 2 - 1) * -1, 0);
-			colliders.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
-			rear_offset = front.get<components::sprite>().size + sprite.size;
-
-			interior += colliders;
-			interior.get<components::fixtures>().set_owner_body(front);
-		}
+		//{
+		//	auto& sprite = interior += components::sprite();
+		//	auto& render = interior += components::render();
+		//	components::fixtures colliders;
+		//
+		//	render.layer = render_layer::CAR_WHEEL;
+		//
+		//	sprite.set(assets::texture_id::MOTORCYCLE_INSIDE);
+		//
+		//	auto& info = colliders.new_collider();
+		//	info.shape.from_renderable(interior);
+		//	info.density = 0.6f;
+		//	colliders.disable_standard_collision_resolution = true;
+		//	info.filter = filters::see_through_dynamic_object();
+		//	vec2 offset((front.get<components::sprite>().size.x / 2 + sprite.size.x / 2 - 1) * -1, 0);
+		//	colliders.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
+		//	offset = front.get<components::sprite>().size + sprite.size;
+		//
+		//	interior += colliders;
+		//	interior.get<components::fixtures>().set_owner_body(front);
+		//}
 
 		{
 			auto& sprite = left_wheel += components::sprite();
@@ -119,9 +117,8 @@ namespace prefabs {
 
 			render.layer = render_layer::CAR_WHEEL;
 
-			sprite.set(assets::texture_id::CAR_INSIDE, augs::rgba(255, 0, 0, 255));
-			sprite.size.set(20, 10);
-			sprite.color.a = 0;
+			sprite.set(assets::texture_id::CAR_INSIDE, augs::rgba(255, 255,255, 0));
+			sprite.size.set(40, 20);
 
 			auto& info = colliders.new_collider();
 
@@ -129,51 +126,76 @@ namespace prefabs {
 			info.density = 0.6f;
 			info.filter = filters::trigger();
 			info.sensor = true;
-			vec2 offset((front.get<components::sprite>().size.x / 2 + sprite.size.x / 2) *  -1, 0);
+			vec2 offset(0, 0);
+			//((front.get<components::sprite>().size.x / 2 + sprite.size.x / 2) *  -1, 0);
 			colliders.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
 			
 			left_wheel += colliders;
 			left_wheel.get<components::fixtures>().set_owner_body(front);
 		}
 
+
+		components::transform engine_transforms[4] = {
+			{ vec2(-front.get<components::sprite>().size.x / 2 - 5, 0), 180 },
+			{ vec2(front.get<components::sprite>().size.x / 2 + 5, 0), 0 },
+			{ vec2(15, -(front.get<components::sprite>().size.y / 2 + 13)), 90 },
+			{ vec2(15, front.get<components::sprite>().size.y / 2 + 13), -90 },
+
+		};
+
+		for(int ee = 0; ee < 4; ++ee)
 		{
 			messages::create_particle_effect effect;
-			effect.place_of_birth = spawn_transform;
-			effect.place_of_birth.pos -= vec2(rear_offset.x - 40.f, 0).rotate(effect.place_of_birth.rotation, vec2());
-			effect.place_of_birth.rotation += 180;
+			effect.place_of_birth = spawn_transform + engine_transforms[ee].pos.rotate(spawn_transform.rotation, vec2());
+			effect.place_of_birth.rotation += engine_transforms[ee].rotation;
 			effect.input.effect = assets::particle_effect_id::ENGINE_PARTICLES;
+			effect.input.modifier.scale_amounts = 1.4f;
+			effect.input.modifier.scale_lifetimes = 0.6f;
 			//effect.input.randomize_position_within_radius = 10.f;
 			//effect.input.single_displacement_duration_ms.set(400.f, 1500.f);
 			effect.subject = front;
 			effect.input.modifier.colorize = cyan;
 			effect.input.delete_entity_after_effect_lifetime = false;
 
-			const auto rear_engine = particles_existence_system().create_particle_effect_entity(world, effect);
+			const auto engine = particles_existence_system().create_particle_effect_entity(world, effect);
 
-			auto& existence = rear_engine.get<components::particles_existence>();
-			existence.distribute_within_segment_of_length = interior.get<components::sprite>().size.y * 0.6;
+			auto& existence = engine.get<components::particles_existence>();
+			existence.distribute_within_segment_of_length = 35.f * 0.6;
 
-			rear_engine.add_standard_components();
-			front.add_sub_entity(rear_engine);
-			front.get<components::car>().acceleration_engine[0] = rear_engine;
-			components::particles_existence::deactivate(rear_engine);
+			engine.add_standard_components();
+			front.add_sub_entity(engine);
 
-			{
-				components::sound_existence::effect_input in;
-				in.effect = assets::sound_buffer_id::ENGINE;
-				in.modifier.repetitions = -1;
-				in.delete_entity_after_effect_lifetime = false;
-				const auto rear_engine_sound = sound_existence_system().create_sound_effect_entity(world, in, rear_engine.logic_transform(), rear_engine);
-				rear_engine_sound.add_standard_components();
-				front.add_sub_entity(rear_engine_sound);
-				front.get<components::car>().engine_sound = rear_engine_sound;
-				components::sound_existence::deactivate(rear_engine_sound);
+			if (ee == 0) {
+				front.get<components::car>().acceleration_engine[0] = engine;
 			}
+			if (ee == 1) {
+				front.get<components::car>().deceleration_engine[0] = engine;
+			}
+			if (ee == 2) {
+				front.get<components::car>().left_engine = engine;
+			}
+			if (ee == 3) {
+				front.get<components::car>().right_engine = engine;
+			}
+
+			components::particles_existence::deactivate(engine);
+
+		}
+
+		{
+			components::sound_existence::effect_input in;
+			in.effect = assets::sound_buffer_id::ENGINE;
+			in.modifier.repetitions = -1;
+			in.delete_entity_after_effect_lifetime = false;
+			const auto engine_sound = sound_existence_system().create_sound_effect_entity(world, in, spawn_transform, front);
+			engine_sound.add_standard_components();
+			front.add_sub_entity(engine_sound);
+			front.get<components::car>().engine_sound = engine_sound;
+			components::sound_existence::deactivate(engine_sound);
 		}
 
 		front.add_standard_components();
 		left_wheel.add_standard_components();
-		interior.add_standard_components();
 
 		return front;
 	}

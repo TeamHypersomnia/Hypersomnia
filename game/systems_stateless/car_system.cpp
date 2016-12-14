@@ -165,8 +165,12 @@ void car_system::apply_movement_forces(logic_step& step) {
 			}
 		};
 
+		engine_handler(cosmos[car.deceleration_engine[0]], car.decelerating&& !car.accelerating);
+		engine_handler(cosmos[car.deceleration_engine[1]], car.decelerating && !car.accelerating);
+
 		engine_handler(cosmos[car.acceleration_engine[0]], car.accelerating && !car.decelerating);
 		engine_handler(cosmos[car.acceleration_engine[1]], car.accelerating && !car.decelerating);
+
 		engine_handler(cosmos[car.right_engine], car.turning_left && !car.turning_right);
 		engine_handler(cosmos[car.left_engine], car.turning_right && !car.turning_left);
 

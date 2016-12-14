@@ -12,8 +12,7 @@ namespace resource_setups {
 		get_resource_manager().create(assets::texture_id::CAR_INSIDE, "hypersomnia/gfx/crate2.png");
 		get_resource_manager().create(assets::texture_id::CAR_FRONT, "hypersomnia/gfx/crate2.png");
 
-		get_resource_manager().create(assets::texture_id::MOTORCYCLE_FRONT, "hypersomnia/gfx/motorcycle_front.png");
-		get_resource_manager().create(assets::texture_id::MOTORCYCLE_INSIDE, "hypersomnia/gfx/motorcycle_inside.png");
+		get_resource_manager().create(assets::texture_id::JMIX114, "hypersomnia/gfx/jmix114.png");
 
 		get_resource_manager().create(assets::texture_id::TRUCK_FRONT, "hypersomnia/gfx/truck_front.png");
 		get_resource_manager().create(assets::texture_id::TRUCK_INSIDE, "hypersomnia/gfx/truck_inside.png");

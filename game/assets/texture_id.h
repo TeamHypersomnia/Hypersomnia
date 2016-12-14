@@ -15,8 +15,7 @@ namespace assets {
 		TRUCK_INSIDE,
 		TRUCK_FRONT,
 
-		MOTORCYCLE_FRONT,
-		MOTORCYCLE_INSIDE,
+		JMIX114,
 		
 		DEAD_TORSO,
 

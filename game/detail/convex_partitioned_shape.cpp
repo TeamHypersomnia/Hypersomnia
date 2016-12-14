@@ -62,27 +62,26 @@ void convex_partitioned_shape::from_renderable(const const_entity_handle handle)
 
 void convex_partitioned_shape::from_sprite(const components::sprite& sprite, const bool polygonize_sprite) {
 	auto& polygonized_sprite_verts = get_resource_manager().find(sprite.tex)->polygonized;
-	auto& image_to_polygonize = get_resource_manager().find(sprite.tex)->img;
+	const auto& image_to_polygonize = get_resource_manager().find(sprite.tex)->img;
 
 	if (polygonized_sprite_verts.size() > 0 && polygonize_sprite) {
-		auto image_size = image_to_polygonize.get_size();
-		vec2 polygonized_size = vec2i(image_size.w, image_size.h);
+		const vec2 image_size = image_to_polygonize.get_size();
 
 		std::vector<vec2> new_concave;
 
 		for (auto v : polygonized_sprite_verts) {
 			vec2 new_v = v;
-			vec2 scale = sprite.size / polygonized_size;
+			vec2 scale = sprite.size / image_size;
 
 			new_v *= scale;
 			new_v.y = -new_v.y;
 			new_concave.push_back(new_v);
 		}
 
-		auto origin = augs::get_aabb(new_concave).center();
+		const vec2 origin = vec2(-image_size.x/2, image_size.y/2);
 
 		for (auto& v : new_concave) {
-			v -= origin;
+			v += origin;
 		}
 
 		add_concave_polygon(new_concave);
@@ -90,7 +89,7 @@ void convex_partitioned_shape::from_sprite(const components::sprite& sprite, con
 		mult_vertices(vec2(1, -1));
 	}
 	else {
-		auto rect_size = sprite.size;
+		const auto rect_size = sprite.size;
 
 		b2PolygonShape shape;
 		shape.SetAsBox(static_cast<float>(rect_size.x) / 2.f * PIXELS_TO_METERSf, static_cast<float>(rect_size.y) / 2.f * PIXELS_TO_METERSf);

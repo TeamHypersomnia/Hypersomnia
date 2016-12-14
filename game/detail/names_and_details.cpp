@@ -45,10 +45,10 @@ textual_description description_by_entity_name(const entity_name n) {
 			L"Truck",
 			L"Vehicle for multiple persons.\nCan carry objects\non its huge trailer."
 		};
-	case entity_name::MOTORCYCLE:
+	case entity_name::JMIX114:
 		return{
-			L"Motorcycle",
-			L"Vehicle for one person.\nSpeedy and agile."
+			L"j-Mix114",
+			L"A heavily armored motorcycle.\nSpeedy and agile."
 		};
 	case entity_name::VIOLET_BACKPACK:
 		return{
