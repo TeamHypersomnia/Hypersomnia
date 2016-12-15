@@ -46,7 +46,7 @@ public:
 	void acquire_next_packaged_step(const step_packaged_for_network&);
 
 	template<class Step>
-	void send_commands_and_predict(augs::network::client& client, cosmic_entropy new_local_entropy, cosmos& predicted_cosmos, Step advance) {
+	void send_commands_and_predict(augs::network::client& client, const cosmic_entropy& new_local_entropy, cosmos& predicted_cosmos, Step advance) {
 		guid_mapped_entropy guid_mapped(new_local_entropy, predicted_cosmos);
 
 		augs::stream client_commands;

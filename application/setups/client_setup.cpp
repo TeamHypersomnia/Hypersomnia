@@ -69,6 +69,7 @@ void client_setup::init(game_window& window, const std::string recording_filenam
 	receiver.misprediction_smoothing_multiplier = cfg.misprediction_smoothing_multiplier;
 
 	const bool is_replaying = input_unpacker.player.is_replaying();
+	LOG("Is client replaying: %x", is_replaying);
 	const auto port = use_alternative_port ? cfg.alternative_port : cfg.connect_port;
 
 	const std::string readable_ip = typesafe_sprintf("%x:%x", cfg.connect_address, port);

@@ -102,12 +102,15 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 	simulation_broadcast server_sim;
 
 	const bool is_replaying = input_unpacker.player.is_replaying();
+	LOG("Is server replaying: %x", is_replaying);
+	
 	const bool launch_webserver = !is_replaying && cfg.server_launch_http_daemon;
 	
 	bool daemon_online = false;
 
-	if (launch_webserver)
+	if (launch_webserver) {
 		daemon_online = rep.start_daemon(cfg);
+	}
 
 	if (is_replaying || serv.listen(cfg.server_port, 32))
 		LOG("Listen server setup successful.");

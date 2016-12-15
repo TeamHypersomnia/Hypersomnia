@@ -9,8 +9,9 @@ std::vector<step_and_entropy_unpacker::simulation_step> step_and_entropy_unpacke
 	
 	auto steps_to_perform = timer.count_logic_steps_to_perform(dt);
 
-	while (steps_to_perform--)
+	while (steps_to_perform--) {
 		output.push_back({ player.obtain_machine_entropy_for_next_step() });
+	}
 
 	return std::move(output);
 }

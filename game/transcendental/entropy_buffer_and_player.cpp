@@ -19,7 +19,7 @@ augs::machine_entropy entropy_buffer_and_player::obtain_machine_entropy_for_next
 		machine_entropy_player.append_step_to_live_file(total_buffered_entropy);
 	}
 
-	const auto resultant_entropy = std::move(total_buffered_entropy);
+	const augs::machine_entropy resultant_entropy = std::move(total_buffered_entropy);
 	total_buffered_entropy = augs::machine_entropy();
 
 	return std::move(resultant_entropy);
