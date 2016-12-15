@@ -162,13 +162,7 @@ namespace scene_managers {
 		active_context.map_key_to_intent(window::event::keys::key::MOUSE4, intent_type::SWITCH_TO_GUI);
 	}
 
-	entity_id one_entity::get_controlled_entity() const {
-		return characters[current_character];
-	}
-
-	cosmic_entropy one_entity::make_cosmic_entropy(augs::machine_entropy machine, const input_context& context, const cosmos& cosm) {
-		cosmic_entropy result;
-
-		return result;
+	entity_id one_entity::get_selected_character() const {
+		return characters[current_character_index];
 	}
 }

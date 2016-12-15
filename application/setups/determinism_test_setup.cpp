@@ -101,9 +101,9 @@ void determinism_test_setup::process(game_window& window) {
 				if (i + 1 < cosmoi_count)
 					hypersomnias[i] = hypersomnias[i + 1];
 
-				testbeds[i].control(s.total_entropy.local, h);
+				testbeds[i].control_character_selection(s.total_entropy.local);
 
-				auto cosmic_entropy_for_this_step = testbeds[i].make_cosmic_entropy(s.total_entropy.local, session.context, h);
+				auto cosmic_entropy_for_this_step = cosmic_entropy(h[testbeds[i].get_selected_character()], s.total_entropy.local, session.context);
 
 				renderer::get_current().clear_logic_lines();
 
@@ -149,6 +149,6 @@ void determinism_test_setup::process(game_window& window) {
 
 		logged += typesafe_sprintf("Currently viewn cosmos: %x (F3 to switch)\n", currently_viewn_cosmos);
 
-		session.view(hypersomnias[currently_viewn_cosmos], testbeds[currently_viewn_cosmos].get_controlled_entity(), window, session.frame_timer.extract_variable_delta(hypersomnias[currently_viewn_cosmos].get_fixed_delta(), input_unpacker.timer));
+		session.view(hypersomnias[currently_viewn_cosmos], testbeds[currently_viewn_cosmos].get_selected_character(), window, session.frame_timer.extract_variable_delta(hypersomnias[currently_viewn_cosmos].get_fixed_delta(), input_unpacker.timer));
 	}
 }

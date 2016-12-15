@@ -53,49 +53,57 @@ void local_setup::process(game_window& window) {
 	input_unpacker.timer.reset_timer();
 
 	while (!should_quit) {
-		augs::machine_entropy new_entropy;
+		{
+			augs::machine_entropy new_entropy;
 
-		session.local_entropy_profiler.new_measurement();
-		new_entropy.local = window.collect_entropy();
-		session.local_entropy_profiler.end_measurement();
-		session.control(new_entropy);
+			session.local_entropy_profiler.new_measurement();
+			new_entropy.local = window.collect_entropy();
+			session.local_entropy_profiler.end_measurement();
+			
+			session.control(new_entropy);
 
-		for (const auto& raw_input : new_entropy.local) {
-			if (raw_input.was_any_key_pressed()) {
-				if (raw_input.key == augs::window::event::keys::key::_1) {
-					hypersomnia.set_fixed_delta(cfg.tickrate);
-				}
-				if (raw_input.key == augs::window::event::keys::key::_2) {
-					hypersomnia.set_fixed_delta(128);
-				}
-				if (raw_input.key == augs::window::event::keys::key::_3) {
-					hypersomnia.set_fixed_delta(144);
-				}
-				if (raw_input.key == augs::window::event::keys::key::_4) {
-					input_unpacker.timer.set_stepping_speed_multiplier(0.1f);
-				}
-				if (raw_input.key == augs::window::event::keys::key::_5) {
-					input_unpacker.timer.set_stepping_speed_multiplier(1.f);
-				}
-				if (raw_input.key == augs::window::event::keys::key::_6) {
-					input_unpacker.timer.set_stepping_speed_multiplier(6.f);
-				}
-				if (raw_input.key == augs::window::event::keys::key::F2) {
-					LOG_COLOR(console_color::YELLOW, "Separator");
+			process_exit_key(new_entropy.local);
+
+			input_unpacker.control(new_entropy);
+
+			for (const auto& raw_input : new_entropy.local) {
+				if (raw_input.was_any_key_pressed()) {
+					if (raw_input.key == augs::window::event::keys::key::_4) {
+						input_unpacker.timer.set_stepping_speed_multiplier(0.1f);
+					}
+					if (raw_input.key == augs::window::event::keys::key::_5) {
+						input_unpacker.timer.set_stepping_speed_multiplier(1.f);
+					}
+					if (raw_input.key == augs::window::event::keys::key::_6) {
+						input_unpacker.timer.set_stepping_speed_multiplier(6.f);
+					}
+					if (raw_input.key == augs::window::event::keys::key::F2) {
+						LOG_COLOR(console_color::YELLOW, "Separator");
+					}
 				}
 			}
 		}
 
-		process_exit_key(new_entropy.local);
-
-		input_unpacker.control(new_entropy);
-
-		auto steps = input_unpacker.unpack_steps(hypersomnia.get_fixed_delta());
+		const auto steps = input_unpacker.unpack_steps(hypersomnia.get_fixed_delta());
 
 		for (const auto& s : steps) {
-			testbed.control(s.total_entropy.local, hypersomnia);
+			for (const auto& raw_input : s.total_entropy.local) {
+				if (raw_input.was_any_key_pressed()) {
+					if (raw_input.key == augs::window::event::keys::key::_1) {
+						hypersomnia.set_fixed_delta(cfg.tickrate);
+					}
+					if (raw_input.key == augs::window::event::keys::key::_2) {
+						hypersomnia.set_fixed_delta(128);
+					}
+					if (raw_input.key == augs::window::event::keys::key::_3) {
+						hypersomnia.set_fixed_delta(144);
+					}
+				}
+			}
+			
+			testbed.control_character_selection(s.total_entropy.local);
 
-			auto cosmic_entropy_for_this_step = testbed.make_cosmic_entropy(s.total_entropy.local, session.context, hypersomnia);
+			const auto cosmic_entropy_for_this_step = cosmic_entropy(hypersomnia[testbed.get_selected_character()], s.total_entropy.local, session.context);
 
 			renderer::get_current().clear_logic_lines();
 
@@ -110,8 +118,8 @@ void local_setup::process(game_window& window) {
 
 		const auto vdt = session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), input_unpacker.timer);
 
-		session.advance_audiovisual_systems(hypersomnia, testbed.get_controlled_entity(), vdt);
+		session.advance_audiovisual_systems(hypersomnia, testbed.get_selected_character(), vdt);
 
-		session.view(hypersomnia, testbed.get_controlled_entity(), window, vdt);
+		session.view(hypersomnia, testbed.get_selected_character(), window, vdt);
 	}
 }

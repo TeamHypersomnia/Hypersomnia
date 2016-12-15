@@ -5,9 +5,7 @@
 #include "game/transcendental/entity_id.h"
 #include "game/messages/intent_message.h"
 
-namespace augs {
-	struct machine_entropy;
-}
+#include "augs/misc/machine_entropy.h"
 
 class cosmos;
 struct input_context;
@@ -52,6 +50,7 @@ struct guid_mapped_entropy : basic_cosmic_entropy<unsigned> {
 struct cosmic_entropy : basic_cosmic_entropy<entity_id> {
 	cosmic_entropy() = default;
 	explicit cosmic_entropy(const guid_mapped_entropy&, const cosmos&);
+	explicit cosmic_entropy(const const_entity_handle controlled_entity, const augs::machine_entropy::local_type& local, const input_context& context);
 
 	cosmic_entropy& operator+=(const cosmic_entropy& b) {
 		basic_cosmic_entropy<entity_id>::operator+=(b);

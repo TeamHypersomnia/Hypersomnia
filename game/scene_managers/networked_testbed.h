@@ -37,23 +37,17 @@ namespace scene_managers {
 
 	class networked_testbed_server : public networked_testbed {
 	public:
-
 		entity_id assign_new_character();
 		void free_character(const entity_id);
 	};
 
 	class networked_testbed_client : public networked_testbed {
 	public:
-		entity_id currently_controlled_character;
-		bool show_profile_details = false;
+		entity_id selected_character;
 
-		entity_id get_controlled_entity() const;
-		void inject_input_to(entity_handle);
+		entity_id get_selected_character() const;
+		void select_character(const entity_id);
 		
-		cosmic_entropy make_cosmic_entropy(const augs::machine_entropy::local_type&, const input_context&, const cosmos&);
-
-		void control(const augs::machine_entropy::local_type&, cosmos&);
-
 		void configure_view(viewing_session&) const;
 	};
 }

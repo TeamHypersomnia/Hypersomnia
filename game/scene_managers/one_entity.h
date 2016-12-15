@@ -16,13 +16,12 @@ namespace scene_managers {
 	class one_entity {
 		std::vector<entity_id> characters;
 
-		unsigned current_character = 0;
+		unsigned current_character_index = 0;
 		entity_id world_camera;
 
 	public:
 		void populate_world_with_entities(logic_step&);
-		cosmic_entropy make_cosmic_entropy(augs::machine_entropy, const input_context&, const cosmos&);
-		entity_id get_controlled_entity() const;
+		entity_id get_selected_character() const;
 
 		void configure_view(viewing_session&) const;
 	};

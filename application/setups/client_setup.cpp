@@ -158,7 +158,7 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 						unsigned controlled_character_guid;
 						augs::read_object(stream, controlled_character_guid);
 
-						scene.inject_input_to(hypersomnia.get_entity_by_guid(controlled_character_guid));
+						scene.select_character(hypersomnia.get_entity_by_guid(controlled_character_guid));
 
 						complete_state_received = true;
 						break;
@@ -182,7 +182,7 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 
 		if (!still_downloading) {
 			session.sending_commands_and_predict_profiler.new_measurement();
-			const auto local_cosmic_entropy_for_this_step = scene.make_cosmic_entropy(s.total_entropy.local, session.context, hypersomnia);
+			const auto local_cosmic_entropy_for_this_step = cosmic_entropy(hypersomnia[scene.get_selected_character()], s.total_entropy.local, session.context);
 
 			receiver.send_commands_and_predict(client, local_cosmic_entropy_for_this_step, extrapolated_hypersomnia, step_pred_with_effects_response);
 			session.sending_commands_and_predict_profiler.end_measurement();
@@ -193,7 +193,7 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 			receiver.unpack_deterministic_steps(
 				session.systems_audiovisual.get<interpolation_system>(),
 				session.systems_audiovisual.get<past_infection_system>(),
-				scene.get_controlled_entity(), 
+				scene.get_selected_character(), 
 				hypersomnia, 
 				hypersomnia_last_snapshot, 
 				extrapolated_hypersomnia, 
@@ -218,8 +218,8 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 		const auto vdt = session.frame_timer.extract_variable_delta(extrapolated_hypersomnia.get_fixed_delta(), input_unpacker.timer);
 		
 
-		session.advance_audiovisual_systems(extrapolated_hypersomnia, scene.get_controlled_entity(), vdt);
+		session.advance_audiovisual_systems(extrapolated_hypersomnia, scene.get_selected_character(), vdt);
 		
-		session.view(extrapolated_hypersomnia, scene.get_controlled_entity(), window, vdt, client, swap_buffers);
+		session.view(extrapolated_hypersomnia, scene.get_selected_character(), window, vdt, client, swap_buffers);
 	}
 }

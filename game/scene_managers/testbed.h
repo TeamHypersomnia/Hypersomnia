@@ -21,8 +21,8 @@ namespace scene_managers {
 	public:
 		augs::constant_size_vector<entity_id, TESTBED_CHARACTERS_COUNT> characters;
 		augs::constant_size_vector<entity_id, 100> crates;
-		unsigned current_character = 0;
-		entity_id currently_controlled_character;
+		unsigned current_character_index = 0;
+		entity_id selected_character;
 		int debug_var = 0;
 		augs::constant_size_vector<entity_id, TESTBED_DRAW_BODIES_COUNT> draw_bodies;
 
@@ -33,11 +33,10 @@ namespace scene_managers {
 
 		void populate_world_with_entities(cosmos&, const vec2i screen_size);
 
-		void control(const augs::machine_entropy::local_type&, cosmos&);
+		void control_character_selection(const augs::machine_entropy::local_type&);
 		
-		cosmic_entropy make_cosmic_entropy(const augs::machine_entropy::local_type&, const input_context&, const cosmos&);
-		entity_id get_controlled_entity() const;
+		entity_id get_selected_character() const;
 
-		void inject_input_to(entity_handle);
+		void select_character(const entity_id);
 	};
 }

@@ -290,12 +290,12 @@ namespace scene_managers {
 	}
 
 
-	entity_id networked_testbed_client::get_controlled_entity() const {
-		return currently_controlled_character;
+	entity_id networked_testbed_client::get_selected_character() const {
+		return selected_character;
 	}
 	
-	void networked_testbed_client::inject_input_to(entity_handle h) {
-		currently_controlled_character = h;
+	void networked_testbed_client::select_character(const entity_id h) {
+		selected_character = h;
 	}
 
 	void networked_testbed_client::configure_view(viewing_session& session) const {
@@ -323,43 +323,5 @@ namespace scene_managers {
 
 		active_context.map_key_to_intent(window::event::keys::key::SPACE, intent_type::SPACE_BUTTON);
 		active_context.map_key_to_intent(window::event::keys::key::MOUSE4, intent_type::SWITCH_TO_GUI);
-
-	}
-
-	void networked_testbed_client::control(const augs::machine_entropy::local_type& local, cosmos& main_cosmos) {
-		for (const auto& raw_input : local) {
-			if (raw_input.was_any_key_pressed()) {
-				if (raw_input.key == augs::window::event::keys::key::F7) {
-					auto target_folder = "saves/" + augs::get_timestamp();
-					augs::create_directories(target_folder);
-
-					main_cosmos.save_to_file(target_folder + "/" + "save.state");
-				}
-				if (raw_input.key == augs::window::event::keys::key::F10) {
-					main_cosmos.significant.meta.settings.enable_interpolation = !main_cosmos.significant.meta.settings.enable_interpolation;
-				}
-			}
-		}
-	}
-
-	cosmic_entropy networked_testbed_client::make_cosmic_entropy(const augs::machine_entropy::local_type& local, const input_context& context, const cosmos& cosm) {
-		cosmic_entropy result;
-
-		const const_entity_handle controlled_entity = cosm[get_controlled_entity()];
-
-		if (local.size() > 0 && controlled_entity.alive()) {
-			auto& intents = result.entropy_per_entity[controlled_entity];
-
-			for (const auto& raw : local) {
-				entity_intent mapped;
-
-				if (mapped.from_raw_state_and_possible_gui_receiver(context, raw, controlled_entity)) {
-					intents.push_back(mapped);
-				}
-			}
-		}
-
-
-		return result;
 	}
 }

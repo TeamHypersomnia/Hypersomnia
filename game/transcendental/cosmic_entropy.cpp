@@ -30,3 +30,16 @@ cosmic_entropy::cosmic_entropy(const guid_mapped_entropy& b, const cosmos& mappe
 	for (const auto& entry : b.entropy_per_entity)
 		entropy_per_entity[mapper.get_entity_by_guid(entry.first).get_id()] = entry.second;
 }
+
+cosmic_entropy::cosmic_entropy(const const_entity_handle controlled_entity, const augs::machine_entropy::local_type& local, const input_context& context) {
+	if (controlled_entity.alive()) {
+		for (const auto& raw : local) {
+			entity_intent mapped;
+
+			if (mapped.from_raw_state_and_possible_gui_receiver(context, raw, controlled_entity)) {
+				entropy_per_entity[controlled_entity].push_back(mapped);
+			}
+		}
+	}
+}
+

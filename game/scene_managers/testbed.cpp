@@ -513,7 +513,7 @@ namespace scene_managers {
 			name_entity(character(0), entity_name::PERSON, L"Newborn");
 		}
 
-		inject_input_to(character(0));
+		select_character(character(0));
 
 		prefabs::create_sample_suppressor(world, vec2(300, -500));
 
@@ -606,12 +606,12 @@ namespace scene_managers {
 	}
 
 
-	entity_id testbed::get_controlled_entity() const {
-		return currently_controlled_character;
+	entity_id testbed::get_selected_character() const {
+		return selected_character;
 	}
 	
-	void testbed::inject_input_to(entity_handle h) {
-		currently_controlled_character = h;
+	void testbed::select_character(const entity_id h) {
+		selected_character = h;
 	}
 
 	void testbed::configure_view(viewing_session& session) const {
@@ -641,68 +641,49 @@ namespace scene_managers {
 
 	}
 
-	void testbed::control(const augs::machine_entropy::local_type& local, cosmos& main_cosmos) {
+	//if (raw_input.key == augs::window::event::keys::key::F7) {
+	//	auto target_folder = "saves/" + augs::get_timestamp();
+	//	augs::create_directories(target_folder);
+	//
+	//	main_cosmos.save_to_file(target_folder + "/" + "save.state");
+	//}
+	//if (raw_input.key == augs::window::event::keys::key::F4) {
+	//	cosmos cosm_with_guids;
+	//	cosm_with_guids.significant = stashed_cosmos.significant;
+	//	cosm_with_guids.remap_guids();
+	//
+	//	ensure(stashed_delta.get_write_pos() == 0);
+	//	cosmic_delta::encode(cosm_with_guids, main_cosmos, stashed_delta);
+	//
+	//	stashed_delta.reset_read_pos();
+	//	cosmic_delta::decode(cosm_with_guids, stashed_delta);
+	//	stashed_delta.reset_write_pos();
+	//
+	//	main_cosmos = cosm_with_guids;
+	//}
+	//if (raw_input.key == augs::window::event::keys::key::F8) {
+	//	main_cosmos.profiler.duplication.new_measurement();
+	//	stashed_cosmos = main_cosmos;
+	//	main_cosmos.profiler.duplication.end_measurement();
+	//}
+	//if (raw_input.key == augs::window::event::keys::key::F9) {
+	//	main_cosmos = stashed_cosmos;
+	//}
+	//if (raw_input.key == augs::window::event::keys::key::F10) {
+	//	main_cosmos.significant.meta.settings.enable_interpolation = !main_cosmos.significant.meta.settings.enable_interpolation;
+	//}
+
+	void testbed::control_character_selection(const augs::machine_entropy::local_type& local) {
 		for (const auto& raw_input : local) {
 			if (raw_input.was_any_key_pressed()) {
-				//if (raw_input.key == augs::window::event::keys::key::F7) {
-				//	auto target_folder = "saves/" + augs::get_timestamp();
-				//	augs::create_directories(target_folder);
-				//
-				//	main_cosmos.save_to_file(target_folder + "/" + "save.state");
-				//}
-				//if (raw_input.key == augs::window::event::keys::key::F4) {
-				//	cosmos cosm_with_guids;
-				//	cosm_with_guids.significant = stashed_cosmos.significant;
-				//	cosm_with_guids.remap_guids();
-				//
-				//	ensure(stashed_delta.get_write_pos() == 0);
-				//	cosmic_delta::encode(cosm_with_guids, main_cosmos, stashed_delta);
-				//
-				//	stashed_delta.reset_read_pos();
-				//	cosmic_delta::decode(cosm_with_guids, stashed_delta);
-				//	stashed_delta.reset_write_pos();
-				//
-				//	main_cosmos = cosm_with_guids;
-				//}
-				//if (raw_input.key == augs::window::event::keys::key::F8) {
-				//	main_cosmos.profiler.duplication.new_measurement();
-				//	stashed_cosmos = main_cosmos;
-				//	main_cosmos.profiler.duplication.end_measurement();
-				//}
-				//if (raw_input.key == augs::window::event::keys::key::F9) {
-				//	main_cosmos = stashed_cosmos;
-				//}
-				//if (raw_input.key == augs::window::event::keys::key::F10) {
-				//	main_cosmos.significant.meta.settings.enable_interpolation = !main_cosmos.significant.meta.settings.enable_interpolation;
-				//}
 				if (raw_input.key == augs::window::event::keys::key::CAPSLOCK) {
-					++current_character;
-					current_character %= characters.size();
+					++current_character_index;
+					current_character_index %= characters.size();
 
-					inject_input_to(main_cosmos[characters[current_character]]);
+					select_character(characters[current_character_index]);
 				}
 			}
 		}
-	}
-
-	cosmic_entropy testbed::make_cosmic_entropy(const augs::machine_entropy::local_type& local, const input_context& context, const cosmos& cosm) {
-		cosmic_entropy result;
-
-		const const_entity_handle controlled_entity = cosm[get_controlled_entity()];
-
-		if (controlled_entity.alive()) {
-			auto& intents = result.entropy_per_entity[controlled_entity];
-
-			for (const auto& raw : local) {
-				entity_intent mapped;
-
-				if (mapped.from_raw_state_and_possible_gui_receiver(context, raw, controlled_entity)) {
-					intents.push_back(mapped);
-				}
-			}
-		}
-
-		return result;
 	}
 
 	//auto& cosmos = cosm;
