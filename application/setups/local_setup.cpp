@@ -16,7 +16,7 @@
 #include "game/transcendental/cosmic_movie_director.h"
 #include "game/transcendental/types_specification/all_messages_includes.h"
 
-#include "game/transcendental/step_and_entropy_unpacker.h"
+#include "game/transcendental/entropy_buffer_and_player.h"
 
 #include "augs/filesystem/file.h"
 #include "local_setup.h"
@@ -27,7 +27,9 @@ void local_setup::process(game_window& window) {
 
 	cosmos hypersomnia(3000);
 
-	step_and_entropy_unpacker input_unpacker;
+	entropy_buffer_and_player player;
+	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
+
 	scene_managers::testbed testbed;
 	testbed.debug_var = window.config.debug_var;
 
@@ -36,8 +38,10 @@ void local_setup::process(game_window& window) {
 		testbed.populate_world_with_entities(hypersomnia, screen_size);
 	}
 
-	if (input_unpacker.try_to_load_or_save_new_session(window.get_input_recording_mode(), "sessions/", "recorded.inputs")) {
-		input_unpacker.timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
+	if (window.get_input_recording_mode() != input_recording_mode::DISABLED) {
+		if (player.try_to_load_or_save_new_session("sessions/", "recorded.inputs")) {
+			timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
+		}
 	}
 
 	viewing_session session;
@@ -50,7 +54,7 @@ void local_setup::process(game_window& window) {
 
 	testbed.configure_view(session);
 
-	input_unpacker.timer.reset_timer();
+	timer.reset_timer();
 
 	while (!should_quit) {
 		{
@@ -64,18 +68,18 @@ void local_setup::process(game_window& window) {
 
 			process_exit_key(new_entropy.local);
 
-			input_unpacker.control(new_entropy);
+			player.buffer_entropy_for_next_step(new_entropy);
 
 			for (const auto& raw_input : new_entropy.local) {
 				if (raw_input.was_any_key_pressed()) {
 					if (raw_input.key == augs::window::event::keys::key::_4) {
-						input_unpacker.timer.set_stepping_speed_multiplier(0.1f);
+						timer.set_stepping_speed_multiplier(0.1f);
 					}
 					if (raw_input.key == augs::window::event::keys::key::_5) {
-						input_unpacker.timer.set_stepping_speed_multiplier(1.f);
+						timer.set_stepping_speed_multiplier(1.f);
 					}
 					if (raw_input.key == augs::window::event::keys::key::_6) {
-						input_unpacker.timer.set_stepping_speed_multiplier(6.f);
+						timer.set_stepping_speed_multiplier(6.f);
 					}
 					if (raw_input.key == augs::window::event::keys::key::F2) {
 						LOG_COLOR(console_color::YELLOW, "Separator");
@@ -84,10 +88,12 @@ void local_setup::process(game_window& window) {
 			}
 		}
 
-		const auto steps = input_unpacker.unpack_steps(hypersomnia.get_fixed_delta());
+		auto steps = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
 
-		for (const auto& s : steps) {
-			for (const auto& raw_input : s.total_entropy.local) {
+		while (steps--) {
+			const auto total_entropy = player.obtain_machine_entropy_for_next_step();
+
+			for (const auto& raw_input : total_entropy.local) {
 				if (raw_input.was_any_key_pressed()) {
 					if (raw_input.key == augs::window::event::keys::key::_1) {
 						hypersomnia.set_fixed_delta(cfg.tickrate);
@@ -101,9 +107,9 @@ void local_setup::process(game_window& window) {
 				}
 			}
 			
-			testbed.control_character_selection(s.total_entropy.local);
+			testbed.control_character_selection(total_entropy.local);
 
-			const auto cosmic_entropy_for_this_step = cosmic_entropy(hypersomnia[testbed.get_selected_character()], s.total_entropy.local, session.context);
+			const auto cosmic_entropy_for_this_step = cosmic_entropy(hypersomnia[testbed.get_selected_character()], total_entropy.local, session.context);
 
 			renderer::get_current().clear_logic_lines();
 
@@ -116,7 +122,7 @@ void local_setup::process(game_window& window) {
 			session.resample_state_for_audiovisuals(hypersomnia);
 		}
 
-		const auto vdt = session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), input_unpacker.timer);
+		const auto vdt = session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), timer);
 
 		session.advance_audiovisual_systems(hypersomnia, testbed.get_selected_character(), vdt);
 

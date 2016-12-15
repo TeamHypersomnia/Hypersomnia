@@ -28,8 +28,6 @@
 void client_setup::process(game_window& window) {
 	init(window);
 
-	session.reserve_caches_for_entities(3000);
-
 	while (!should_quit) {
 		session.local_entropy_profiler.new_measurement();
 		auto precollected = window.collect_entropy();
@@ -57,8 +55,10 @@ void client_setup::init(game_window& window, const std::string recording_filenam
 		scene.populate_world_with_entities(hypersomnia);
 	}
 
-	if (input_unpacker.try_to_load_or_save_new_session(window.get_input_recording_mode(), "sessions/", recording_filename)) {
-		input_unpacker.timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
+	if (window.get_input_recording_mode() != input_recording_mode::DISABLED) {
+		if (player.try_to_load_or_save_new_session("sessions/", recording_filename)) {
+			timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
+		}
 	}
 
 	session.camera.configure_size(screen_size);
@@ -68,7 +68,7 @@ void client_setup::init(game_window& window, const std::string recording_filenam
 	receiver.jitter_buffer.set_lower_limit(static_cast<unsigned>(cfg.jitter_buffer_ms / hypersomnia.get_fixed_delta().in_milliseconds()));
 	receiver.misprediction_smoothing_multiplier = cfg.misprediction_smoothing_multiplier;
 
-	const bool is_replaying = input_unpacker.player.is_replaying();
+	const bool is_replaying = player.is_replaying();
 	LOG("Is client replaying: %x", is_replaying);
 	const auto port = use_alternative_port ? cfg.alternative_port : cfg.connect_port;
 
@@ -85,29 +85,16 @@ void client_setup::init(game_window& window, const std::string recording_filenam
 
 		client.post_redundant(welcome);
 
-		input_unpacker.timer.reset_timer();
+		timer.reset_timer();
 	}
 	else {
 		LOG("Connection failed.");
 	}
+
+	session.reserve_caches_for_entities(3000);
 }
 
 void client_setup::process_once(game_window& window, const augs::machine_entropy::local_type& precollected, const bool swap_buffers) {
-	augs::machine_entropy new_entropy;
-
-	new_entropy.local = precollected;
-	session.remote_entropy_profiler.new_measurement();
-	new_entropy.remote = client.collect_entropy();
-	session.remote_entropy_profiler.end_measurement();
-
-	const bool still_downloading = !complete_state_received || receiver.jitter_buffer.is_still_refilling();
-
-	input_unpacker.control(new_entropy);
-
-	session.unpack_local_steps_profiler.new_measurement();
-	auto steps = input_unpacker.unpack_steps(hypersomnia.get_fixed_delta());
-	session.unpack_local_steps_profiler.end_measurement();
-
 	auto step_pred = [this](const cosmic_entropy& entropy, cosmos& cosm) {
 		cosm.advance_deterministic_schemata(entropy,
 			[this](logic_step&) {},
@@ -119,14 +106,31 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 		cosm.advance_deterministic_schemata(entropy,
 			[this](logic_step&) {},
 			[this](const_logic_step& step) {
-				session.spread_past_infection(step);
-				session.acquire_game_events_for_hud(step);
-			}
+			session.spread_past_infection(step);
+			session.acquire_game_events_for_hud(step);
+		}
 		);
 	};
 
-	for (auto& s : steps) {
-		for (auto& net_event : s.total_entropy.remote) {
+	augs::machine_entropy new_entropy;
+
+	new_entropy.local = precollected;
+	session.remote_entropy_profiler.new_measurement();
+	new_entropy.remote = client.collect_entropy();
+	session.remote_entropy_profiler.end_measurement();
+
+	const bool still_downloading = !complete_state_received || receiver.jitter_buffer.is_still_refilling();
+
+	player.buffer_entropy_for_next_step(new_entropy);
+
+	auto steps = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
+
+	while (steps--) {
+		session.unpack_local_steps_profiler.new_measurement();
+		auto total_entropy = player.obtain_machine_entropy_for_next_step();
+		session.unpack_local_steps_profiler.end_measurement();
+
+		for (auto& net_event : total_entropy.remote) {
 			if (net_event.message_type == augs::network::message::type::RECEIVE) {
 				auto& stream = net_event.payload;
 
@@ -183,7 +187,7 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 
 		if (!still_downloading) {
 			session.sending_commands_and_predict_profiler.new_measurement();
-			const auto local_cosmic_entropy_for_this_step = cosmic_entropy(hypersomnia[scene.get_selected_character()], s.total_entropy.local, session.context);
+			const auto local_cosmic_entropy_for_this_step = cosmic_entropy(hypersomnia[scene.get_selected_character()], total_entropy.local, session.context);
 
 			receiver.send_commands_and_predict(client, local_cosmic_entropy_for_this_step, extrapolated_hypersomnia, step_pred_with_effects_response);
 			session.sending_commands_and_predict_profiler.end_measurement();
@@ -216,7 +220,7 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 	}
 
 	if (!still_downloading) {
-		const auto vdt = session.frame_timer.extract_variable_delta(extrapolated_hypersomnia.get_fixed_delta(), input_unpacker.timer);
+		const auto vdt = session.frame_timer.extract_variable_delta(extrapolated_hypersomnia.get_fixed_delta(), timer);
 		
 
 		session.advance_audiovisual_systems(extrapolated_hypersomnia, scene.get_selected_character(), vdt);

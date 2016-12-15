@@ -38,7 +38,7 @@ config_table = {
 	
 	mouse_sensitivity = vec2(1.5, 1.5),
 	
-	connect_address = "192.168.1.2",
+	connect_address = "127.0.0.1",
 	connect_port = 13372,
 
 	server_port = 13372,
@@ -60,7 +60,7 @@ config_table = {
 	debug_randomize_entropies_in_client_setup = 1,
 	debug_randomize_entropies_in_client_setup_once_every_steps = 1,
 
-	server_launch_http_daemon = 1,
+	server_launch_http_daemon = 0,
 	server_http_daemon_port = 80,
 	server_http_daemon_html_file_path = "web/session_report.html",
 

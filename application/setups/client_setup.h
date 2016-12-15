@@ -5,7 +5,7 @@
 
 #include "game/transcendental/simulation_receiver.h"
 #include "game/transcendental/viewing_session.h"
-#include "game/transcendental/step_and_entropy_unpacker.h"
+#include "game/transcendental/entropy_buffer_and_player.h"
 #include "game/scene_managers/networked_testbed.h"
 
 class client_setup : public setup_base {
@@ -20,7 +20,8 @@ public:
 
 	viewing_session session;
 
-	step_and_entropy_unpacker input_unpacker;
+	entropy_buffer_and_player player;
+	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 	scene_managers::networked_testbed_client scene;
 
 	bool last_stepped_was_extrapolated = false;

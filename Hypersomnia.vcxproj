@@ -501,7 +501,6 @@
     <ClCompile Include="game\systems_temporary\dynamic_tree_system.cpp" />
     <ClCompile Include="game\systems_temporary\physics_system.cpp" />
     <ClCompile Include="game\systems_temporary\processing_lists_system.cpp" />
-    <ClCompile Include="game\transcendental\step_and_entropy_unpacker.cpp" />
     <ClCompile Include="game\transcendental\viewing_session.cpp" />
     <ClCompile Include="application\setups\local_setup.cpp" />
     <ClCompile Include="main.cpp" />
@@ -1196,7 +1195,6 @@
     <ClInclude Include="game\systems_temporary\dynamic_tree_system.h" />
     <ClInclude Include="game\systems_temporary\physics_system.h" />
     <ClInclude Include="game\systems_temporary\processing_lists_system.h" />
-    <ClInclude Include="game\transcendental\step_and_entropy_unpacker.h" />
     <ClInclude Include="game\transcendental\step_declaration.h" />
     <ClInclude Include="game\transcendental\step_packaged_for_network.h" />
     <ClInclude Include="game\transcendental\types_specification\all_components_declaration.h" />

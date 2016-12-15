@@ -14,7 +14,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/cosmic_delta.h"
 
-#include "game/transcendental/step_and_entropy_unpacker.h"
+#include "game/transcendental/entropy_buffer_and_player.h"
 
 #include "augs/filesystem/file.h"
 
@@ -86,7 +86,8 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 	cosmos initial_hypersomnia(3000);
 	scene_managers::networked_testbed_server().populate_world_with_entities(initial_hypersomnia);
 
-	step_and_entropy_unpacker input_unpacker;
+	entropy_buffer_and_player player;
+	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
 	const bool detailed_step_log = cfg.tickrate <= 2;
 
@@ -95,13 +96,15 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 		scene.populate_world_with_entities(hypersomnia);
 	}
 
-	if (input_unpacker.try_to_load_or_save_new_session(window.get_input_recording_mode(), "server_sessions/", "server_recorded.inputs")) {
-		input_unpacker.timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
+	if (window.get_input_recording_mode() != input_recording_mode::DISABLED) {
+		if (player.try_to_load_or_save_new_session("server_sessions/", "server_recorded.inputs")) {
+			timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
+		}
 	}
 
 	simulation_broadcast server_sim;
 
-	const bool is_replaying = input_unpacker.player.is_replaying();
+	const bool is_replaying = player.is_replaying();
 	LOG("Is server replaying: %x", is_replaying);
 	
 	const bool launch_webserver = !is_replaying && cfg.server_launch_http_daemon;
@@ -132,7 +135,7 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 
 	bool resubstantiate = false;
 	
-	input_unpacker.timer.reset_timer();
+	timer.reset_timer();
 	
 	randomization test_entropy_randomizer;
 	
@@ -151,16 +154,18 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 	
 		process_exit_key(new_entropy.local);
 
-		input_unpacker.control(new_entropy);
+		player.buffer_entropy_for_next_step(new_entropy);
 
-		auto steps = input_unpacker.unpack_steps(hypersomnia.get_fixed_delta());
+		auto steps = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
 
-		for (auto& s : steps) {
+		while (steps--) {
+			auto total_entropy = player.obtain_machine_entropy_for_next_step();
+
 			if (detailed_step_log) {
 				LOG("Server step");
 			}
 
-			for (auto& net_event : s.total_entropy.remote) {
+			for (auto& net_event : total_entropy.remote) {
 				if (detailed_step_log) {
 					LOG("Server netevent");
 				}
