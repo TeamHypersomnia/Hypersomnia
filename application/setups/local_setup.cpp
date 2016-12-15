@@ -46,7 +46,7 @@ void local_setup::process(game_window& window) {
 	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
 
 	cosmic_movie_director dir;
-	dir.load_recordings_from_directory("director/menu");
+	dir.load_recording_from_file("director/menu.ent");
 
 	testbed.configure_view(session);
 

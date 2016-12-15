@@ -1,15 +1,11 @@
 #pragma once
 #include <fstream>
+#include <vector>
 
 namespace augs {
 	template <typename entry_internal_type>
 	class step_player {
 	public:
-		enum class player_state {
-			DISABLED,
-			RECORDING,
-			REPLAYING
-		};
 
 	private:
 		struct entry_type {
@@ -17,37 +13,26 @@ namespace augs {
 			unsigned step_occurred = 0xdeadbeef;
 		};
 
-		unsigned player_position = 0;
+		unsigned player_current_step = 0;
 		unsigned next_entry_to_be_replayed = 0;
 
-		player_state current_player_state = player_state::DISABLED;
-
-		std::vector<entry_type> loaded_recording;
+		std::vector<entry_type> recording;
 
 		std::string live_saving_filename;
 
 	public:
-		void record(const std::string live_saving_filename) {
-			stop();
-
-			this->live_saving_filename = live_saving_filename;
-			current_player_state = player_state::RECORDING;
-		};
-
-		void replay() {
-			stop();
-			current_player_state = player_state::REPLAYING;
-		}
-
-		void stop() {
-			current_player_state = player_state::DISABLED;
-			player_position = 0;
+		void rewind() {
+			player_current_step = 0;
 			next_entry_to_be_replayed = 0;
 		}
 
-		void load_recording(const std::string filename) {
-			stop();
-			loaded_recording.clear();
+		void seek(const size_t step = 0) {
+
+		}
+
+		bool load_recording(const std::string& filename) {
+			rewind();
+			recording.clear();
 
 			std::ifstream source(filename, std::ios::in | std::ios::binary);
 
@@ -57,56 +42,67 @@ namespace augs {
 				augs::read_object(source, entry.internal_data);
 				augs::read_object(source, entry.step_occurred);
 
-				loaded_recording.emplace_back(entry);
+				recording.emplace_back(entry);
 			}
+
+			return is_recording_available();
 		}
 
 		bool is_recording_available() const {
-			return loaded_recording.size() > 0;
+			return recording.size() > 0;
 		}
 
-		void biserialize(entry_internal_type& currently_processed_entry) {
-			if (current_player_state == player_state::RECORDING) {
-				if (!currently_processed_entry.empty()) {
-					entry_type new_entry;
+		void append_step_to_recording(const entry_internal_type& currently_processed_entry) {
+			if (!currently_processed_entry.empty()) {
+				entry_type new_entry;
 
-					new_entry.internal_data = currently_processed_entry;
-					new_entry.step_occurred = player_position;
+				new_entry.internal_data = currently_processed_entry;
+				new_entry.step_occurred = player_current_step;
 
-					std::ofstream recording_file(live_saving_filename, std::ios::out | std::ios::binary | std::ios::app);
-					
-					augs::write_object(recording_file, new_entry.internal_data);
-					augs::write_object(recording_file, new_entry.step_occurred);
-				}
-			}
-			else if (current_player_state == player_state::REPLAYING) {
-				if (next_entry_to_be_replayed >= loaded_recording.size()) {
-					stop();
-					return;
-				}
-
-				auto& next = loaded_recording[next_entry_to_be_replayed];
-				
-				if (next.step_occurred == player_position) {
-					currently_processed_entry = next.internal_data;
-					++next_entry_to_be_replayed;
-				}
-				else {
-					currently_processed_entry = entry_internal_type();
-				}
+				recording.emplace_back(std::move(new_entry));
 			}
 
-			if (current_player_state != player_state::DISABLED) {
-				++player_position;
-			}
+			next_entry_to_be_replayed = recording.size();
+			++player_current_step;
 		}
 
-		player_state get_state() const {
-			return current_player_state;
+		void append_step_to_live_file(const entry_internal_type& currently_processed_entry) {
+			if (!currently_processed_entry.empty()) {
+				entry_type new_entry;
+
+				new_entry.internal_data = currently_processed_entry;
+				new_entry.step_occurred = player_current_step;
+
+				std::ofstream recording_file(live_saving_filename, std::ios::out | std::ios::binary | std::ios::app);
+
+				augs::write_object(recording_file, new_entry.internal_data);
+				augs::write_object(recording_file, new_entry.step_occurred);
+			}
+
+			++player_current_step;
 		}
 
-		bool is_replaying() const {
-			return current_player_state == player_state::REPLAYING;
+		void set_live_filename(const std::string live_saving_filename) {
+			this->live_saving_filename = live_saving_filename;
+		};
+
+		bool replay_next_step(entry_internal_type& currently_processed_entry) {
+			if (next_entry_to_be_replayed >= recording.size()) {
+				return false;
+			}
+
+			auto& next = recording[next_entry_to_be_replayed];
+			
+			if (next.step_occurred == player_current_step) {
+				currently_processed_entry = next.internal_data;
+				++next_entry_to_be_replayed;
+			}
+			else {
+				currently_processed_entry = entry_internal_type();
+			}
+
+			++player_current_step;
+			return true;
 		}
 	};
 }
