@@ -3,6 +3,7 @@
 
 #include <AL/al.h>
 #include <AL/alc.h>
+#include <AL/alext.h>
 
 #include "augs/al_log.h"
 #include "game/components/physics_component.h"
@@ -84,6 +85,10 @@ namespace augs {
 
 	void sound_source::set_reference_distance(const float distance) const {
 		AL_CHECK(alSourcef(id, AL_REFERENCE_DISTANCE, distance * PIXELS_TO_METERSf));
+	}
+
+	void sound_source::set_direct_channels(const bool flag) const {
+		AL_CHECK(alSourcei(id, AL_DIRECT_CHANNELS_SOFT, flag));
 	}
 
 	void sound_source::bind_buffer(const single_sound_buffer& buf) {

@@ -1,5 +1,5 @@
 #include "al_log.h"
-
+#include "ensure.h"
 #include <AL/al.h>
 
 const char * GetOpenALErrorString(int errID) {
@@ -18,5 +18,6 @@ void CheckOpenALError(const char* stmt, const char* fname, int line) {
 
 	if (err != AL_NO_ERROR) {
 		LOG("OpenAL error %x, (%x) at %x:%x - for %x", err, GetOpenALErrorString(err), fname, line, stmt);
+		ensure(false);
 	}
 };

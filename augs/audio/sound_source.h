@@ -33,6 +33,7 @@ namespace augs {
 		void set_position(vec2) const;
 		void set_max_distance(const float) const;
 		void set_reference_distance(const float) const;
+		void set_direct_channels(const bool) const;
 
 		void bind_buffer(const single_sound_buffer&);
 		void unbind_buffer();

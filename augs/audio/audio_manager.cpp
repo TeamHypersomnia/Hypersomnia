@@ -3,6 +3,7 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <AL/efx.h>
+#include <AL/alext.h>
 
 #include "augs/al_log.h"
 #include "augs/ensure.h"
@@ -48,11 +49,15 @@ namespace augs {
 
 		list_audio_devices(alcGetString(nullptr, ALC_ALL_DEVICES_SPECIFIER));
 
+		ALint hrtf_status;
+		alcGetIntegerv(device, ALC_HRTF_STATUS_SOFT, 1, &hrtf_status);
+
 		LOG("Default device: %x", alcGetString(nullptr, ALC_DEFAULT_DEVICE_SPECIFIER));
+		LOG("HRTF status: %x", hrtf_status);
 	}
 
 	bool audio_manager::make_current() {
-		return AL_CHECK(alcMakeContextCurrent(context)) == ALC_TRUE;
+		return (alcMakeContextCurrent(context)) == ALC_TRUE;
 	}
 
 	audio_manager::~audio_manager() {

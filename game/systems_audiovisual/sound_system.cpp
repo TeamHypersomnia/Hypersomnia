@@ -84,9 +84,11 @@ void sound_system::play_nearby_sound_existences(
 
 			if (listening_character == existence.input.direct_listener) {
 				source.bind_buffer(buffer.request_stereo());
+				source.set_direct_channels(true);
 			}
 			else {
 				source.bind_buffer(buffer.request_mono());
+				source.set_direct_channels(false);
 			}
 
 
