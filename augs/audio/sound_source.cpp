@@ -8,6 +8,8 @@
 #include "augs/al_log.h"
 #include "game/components/physics_component.h"
 
+#define Y_IS_Z 1
+
 namespace augs {
 	sound_source::sound_source() {
 		AL_CHECK(alGenSources(1, &id));
@@ -69,14 +71,21 @@ namespace augs {
 
 	void sound_source::set_velocity(vec2 v) const {
 		v *= PIXELS_TO_METERSf;
-
-		AL_CHECK(alSource3f(id, AL_VELOCITY, v.x, v.y, 0));
+#if Y_IS_Z
+		AL_CHECK(alSource3f(id, AL_VELOCITY, v.x, 0.f, v.y));
+#else
+		AL_CHECK(alSource3f(id, AL_VELOCITY, v.x, v.y, 0.f));
+#endif
 	}
 
 	void sound_source::set_position(vec2 pos) const {
 		pos *= PIXELS_TO_METERSf;
 
-		AL_CHECK(alSource3f(id, AL_POSITION, pos.x, pos.y, 0));
+#if Y_IS_Z
+		AL_CHECK(alSource3f(id, AL_POSITION, pos.x, 0.f, pos.y));
+#else
+		AL_CHECK(alSource3f(id, AL_POSITION, pos.x, pos.y, 0.f));
+#endif
 	}
 
 	void sound_source::set_max_distance(const float distance) const {
@@ -108,13 +117,21 @@ namespace augs {
 	void set_listener_position(vec2 pos) {
 		pos *= PIXELS_TO_METERSf;
 
+#if Y_IS_Z
+		AL_CHECK(alListener3f(AL_POSITION, pos.x, 0.f, pos.y));
+#else
 		AL_CHECK(alListener3f(AL_POSITION, pos.x, pos.y, 0.f));
+#endif
 	}
 
 	void set_listener_velocity(vec2 v) {
 		v *= PIXELS_TO_METERSf;
 
+#if Y_IS_Z
+		AL_CHECK(alListener3f(AL_VELOCITY, v.x, 0.f, v.y));
+#else
 		AL_CHECK(alListener3f(AL_VELOCITY, v.x, v.y, 0.f));
+#endif
 	}
 
 	void set_listener_orientation(const std::array<float, 6> data) {
