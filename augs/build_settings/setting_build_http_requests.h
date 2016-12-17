@@ -1,2 +1,2 @@
 #pragma once
-#define BUILD_HTTP_REQUESTS 0
+#define BUILD_HTTP_REQUESTS 1
