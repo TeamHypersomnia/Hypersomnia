@@ -1,13 +1,14 @@
 launch_modes = {
 	LOCAL = 0,
 	LOCAL_DETERMINISM_TEST = 1,
+	DIRECTOR = 2,
 
-	ONLY_CLIENT = 2,
-	ONLY_SERVER = 3,
+	ONLY_CLIENT = 3,
+	ONLY_SERVER = 4,
 
-	CLIENT_AND_SERVER = 4,
+	CLIENT_AND_SERVER = 5,
 
-	TWO_CLIENTS_AND_SERVER = 5
+	TWO_CLIENTS_AND_SERVER = 6
 }
 
 recording_modes = {
@@ -17,7 +18,7 @@ recording_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.CLIENT_AND_SERVER,
+	launch_mode = launch_modes.DIRECTOR,
 	
 	input_recording_mode = recording_modes.DISABLE,
 	recording_replay_speed = 1,
@@ -68,6 +69,8 @@ config_table = {
 	survey_num_file_path = "survey_num.in",
 	post_data_file_path = "post.txt",
 	last_session_update_link = "patrykcysarz.pl/comment-system/web/stats/last-update/set",
+
+	director_scenario_filename = "director/menu.ent"
 }
 
 if config_table.debug_disable_cursor_clipping == 0 then

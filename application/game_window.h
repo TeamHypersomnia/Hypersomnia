@@ -45,12 +45,13 @@ public:
 
 		LOCAL,
 		LOCAL_DETERMINISM_TEST,
+		DIRECTOR,
 
 		ONLY_CLIENT,
 		ONLY_SERVER,
 		
 		CLIENT_AND_SERVER,
-		TWO_CLIENTS_AND_SERVER
+		TWO_CLIENTS_AND_SERVER,
 	} get_launch_mode();
 
 	input_recording_mode get_input_recording_mode();

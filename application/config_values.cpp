@@ -48,4 +48,6 @@ void config_values::get_values(game_window& w) {
 	set(NVP(survey_num_file_path));
 	set(NVP(post_data_file_path));
 	set(NVP(last_session_update_link));
+
+	set(NVP(director_scenario_filename));
 }

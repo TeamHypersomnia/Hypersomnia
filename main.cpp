@@ -5,6 +5,7 @@
 #include "application/setups/two_clients_and_server_setup.h"
 #include "application/setups/client_setup.h"
 #include "application/setups/server_setup.h"
+#include "application/setups/director_setup.h"
 
 #include "application/game_window.h"
 #include "game/resources/manager.h"
@@ -38,6 +39,11 @@ int main(int argc, char** argv) {
 	case game_window::launch_mode::LOCAL_DETERMINISM_TEST:
 	{
 		determinism_test_setup setup;
+		setup.process(window);
+	}
+	case game_window::launch_mode::DIRECTOR:
+	{
+		director_setup setup;
 		setup.process(window);
 	}
 		break;

@@ -318,6 +318,7 @@
     <ClCompile Include="3rdparty\polypartition\src\polypartition.cpp" />
     <ClCompile Include="3rdparty\rectpack2D\src\pack.cpp" />
     <ClCompile Include="application\config_values.cpp" />
+    <ClCompile Include="application\setups\director_setup.cpp" />
     <ClCompile Include="augs\al_log.cpp" />
     <ClCompile Include="augs\audio\audio_manager.cpp" />
     <ClCompile Include="augs\audio\sound_buffer.cpp" />
@@ -986,6 +987,7 @@
     <ClInclude Include="application\config_values.h" />
     <ClInclude Include="application\setups\client_setup.h" />
     <ClInclude Include="application\setups\determinism_test_setup.h" />
+    <ClInclude Include="application\setups\director_setup.h" />
     <ClInclude Include="application\setups\local_setup.h" />
     <ClInclude Include="application\setups\server_setup.h" />
     <ClInclude Include="application\setups\setup_base.h" />

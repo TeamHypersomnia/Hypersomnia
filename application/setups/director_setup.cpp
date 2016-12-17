@@ -19,9 +19,9 @@
 #include "game/transcendental/entropy_buffer_and_player.h"
 
 #include "augs/filesystem/file.h"
-#include "local_setup.h"
+#include "director_setup.h"
 
-void local_setup::process(game_window& window) {
+void director_setup::process(game_window& window) {
 	const vec2i screen_size = vec2i(window.get_screen_rect());
 	const auto& cfg = window.config;
 
@@ -49,6 +49,9 @@ void local_setup::process(game_window& window) {
 	session.camera.configure_size(screen_size);
 	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
 
+	cosmic_movie_director dir;
+	dir.load_recording_from_file("director/menu.ent");
+
 	testbed.configure_view(session);
 
 	timer.reset_timer();
@@ -60,7 +63,7 @@ void local_setup::process(game_window& window) {
 			session.local_entropy_profiler.new_measurement();
 			new_entropy.local = window.collect_entropy();
 			session.local_entropy_profiler.end_measurement();
-			
+
 			session.control(new_entropy);
 
 			process_exit_key(new_entropy.local);
@@ -103,17 +106,17 @@ void local_setup::process(game_window& window) {
 					}
 				}
 			}
-			
+
 			testbed.control_character_selection(total_entropy.local);
 
 			const auto cosmic_entropy_for_this_step = cosmic_entropy(hypersomnia[testbed.get_selected_character()], total_entropy.local, session.context);
 
 			renderer::get_current().clear_logic_lines();
 
-			hypersomnia.advance_deterministic_schemata(cosmic_entropy_for_this_step, [](auto){},
-				[this, &session](const const_logic_step& step){
-					session.acquire_game_events_for_hud(step);
-				}
+			hypersomnia.advance_deterministic_schemata(cosmic_entropy_for_this_step, [](auto) {},
+				[this, &session](const const_logic_step& step) {
+				session.acquire_game_events_for_hud(step);
+			}
 			);
 
 			session.resample_state_for_audiovisuals(hypersomnia);

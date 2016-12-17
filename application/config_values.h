@@ -46,5 +46,7 @@ public:
 	std::string post_data_file_path;
 	std::string last_session_update_link;
 
+	std::string director_scenario_filename;
+
 	void get_values(game_window&);
 };
