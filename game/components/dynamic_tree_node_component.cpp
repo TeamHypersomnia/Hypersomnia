@@ -74,14 +74,14 @@ void component_synchronizer<false, D>::resubstantiation() const {
 }
 
 void component_synchronizer<false, D>::update_proxy() const {
-	const auto new_component = components::dynamic_tree_node::get_default(handle);
-	const vec2 displacement = new_component.aabb.center() - component.aabb.center();
-	component.aabb = new_component.aabb;
+	const auto new_aabb = components::dynamic_tree_node::get_default(handle).aabb;
+	const vec2 displacement = new_aabb.center() - component.aabb.center();
+	component.aabb = new_aabb;
 
 	auto& sys = handle.get_cosmos().systems_temporary.get<dynamic_tree_system>();
 	auto& cache = sys.get_cache(handle.get_id());
 	
-	if (cache.is_constructed()) {
+	if (cache.is_constructed() && !component.always_visible) {
 		b2AABB aabb;
 		aabb.lowerBound = component.aabb.left_top();
 		aabb.upperBound = component.aabb.right_bottom();

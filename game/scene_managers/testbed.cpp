@@ -72,7 +72,8 @@ namespace scene_managers {
 		const auto car3 = prefabs::create_car(world, components::transform(1490, 340 + 800, -180));
 
 		const auto motorcycle = prefabs::create_motorcycle(world, components::transform(0, 400, -90));
-		prefabs::create_motorcycle(world, components::transform(100, -600, -90));
+		//prefabs::create_motorcycle(world, components::transform(100, -600, -90));
+		prefabs::create_motorcycle(world, components::transform(1200, 25600, 0));
 
 		const auto bg_size = assets::get_size(assets::texture_id::TEST_BACKGROUND);
 
@@ -457,7 +458,8 @@ namespace scene_managers {
 			components::transform transform;
 
 			if (i == 0) {
-				transform = { 0, 300, 0 };
+				//transform = { 0, 300, 0 };
+				transform = { 1200, 25400, 0 };
 				torso_set = assets::animation_response_id::TORSO_SET;
 			}
 			else if (i == 1 || i == 2) {

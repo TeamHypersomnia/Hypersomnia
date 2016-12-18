@@ -232,6 +232,7 @@ namespace prefabs {
 
 		const auto crosshair = create_character_crosshair(world, screen_size);
 		crosshair.get<components::crosshair>().character_entity_to_chase = character;
+		crosshair.set_logic_transform(pos);
 
 		ingredients::wsad_character(character, crosshair, torso_set);
 		

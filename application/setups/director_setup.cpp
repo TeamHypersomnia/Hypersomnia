@@ -108,10 +108,6 @@ void director_setup::process(game_window& window) {
 					if (raw_input.key == augs::window::event::keys::key::_6) {
 						requested_playing_speed = 6.f;
 					}
-
-					if (raw_input.key == augs::window::event::keys::key::F2) {
-						LOG_COLOR(console_color::YELLOW, "Separator");
-					}
 				}
 			}
 
