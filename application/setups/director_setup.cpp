@@ -27,6 +27,7 @@ void director_setup::process(game_window& window) {
 
 	cosmos hypersomnia(3000);
 
+	augs::window::event::state events;
 	augs::machine_entropy_buffer_and_player machine_player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
@@ -36,12 +37,6 @@ void director_setup::process(game_window& window) {
 	if (!hypersomnia.load_from_file("save.state")) {
 		hypersomnia.set_fixed_delta(augs::fixed_delta(cfg.tickrate));
 		testbed.populate_world_with_entities(hypersomnia, screen_size);
-	}
-
-	if (window.get_input_recording_mode() != input_recording_mode::DISABLED) {
-		if (machine_player.try_to_load_or_save_new_session("sessions/", "recorded.inputs")) {
-			timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
-		}
 	}
 
 	viewing_session session;
@@ -55,14 +50,15 @@ void director_setup::process(game_window& window) {
 	director.load_recording_from_file(cfg.director_scenario_filename);
 
 	enum class director_state {
-		PAUSED,
 		PLAYING,
 		RECORDING
-	} current_director_state = director_state::PAUSED;
+	} current_director_state = director_state::PLAYING;
 
 	timer.reset_timer();
 
-	bool advance_one_step_forward = false;
+	int advance_steps_forward = 0;
+
+	float requested_playing_speed = 0.f;
 
 	while (!should_quit) {
 		{
@@ -71,7 +67,7 @@ void director_setup::process(game_window& window) {
 			session.local_entropy_profiler.new_measurement();
 			new_entropy.local = window.collect_entropy();
 			session.local_entropy_profiler.end_measurement();
-
+			
 			session.control(new_entropy);
 
 			process_exit_key(new_entropy.local);
@@ -79,16 +75,39 @@ void director_setup::process(game_window& window) {
 			machine_player.accumulate_entropy_for_next_step(new_entropy);
 
 			for (const auto& raw_input : new_entropy.local) {
+				events.apply(raw_input);
+
 				if (raw_input.was_any_key_pressed()) {
+					if (raw_input.key == augs::window::event::keys::key::F2) {
+						current_director_state = director_state::PLAYING;
+					}
+					if (raw_input.key == augs::window::event::keys::key::F3) {
+						current_director_state = director_state::RECORDING;
+					}
+
+					if (raw_input.key == augs::window::event::keys::key::_1) {
+					
+					}
+					if (raw_input.key == augs::window::event::keys::key::_2) {
+						advance_steps_forward = 1;
+
+						if (events.is_set(augs::window::event::keys::key::LCTRL)) {
+							advance_steps_forward *= 10;
+						}
+					}
+					if (raw_input.key == augs::window::event::keys::key::_3) {
+						requested_playing_speed = 0.f;
+					}
 					if (raw_input.key == augs::window::event::keys::key::_4) {
-						timer.set_stepping_speed_multiplier(0.1f);
+						requested_playing_speed = 0.1f;
 					}
 					if (raw_input.key == augs::window::event::keys::key::_5) {
-						timer.set_stepping_speed_multiplier(1.f);
+						requested_playing_speed = 1.f;
 					}
 					if (raw_input.key == augs::window::event::keys::key::_6) {
-						timer.set_stepping_speed_multiplier(6.f);
+						requested_playing_speed = 6.f;
 					}
+
 					if (raw_input.key == augs::window::event::keys::key::F2) {
 						LOG_COLOR(console_color::YELLOW, "Separator");
 					}
@@ -96,20 +115,20 @@ void director_setup::process(game_window& window) {
 			}
 
 			testbed.control_character_selection(new_entropy.local);
+
+			timer.set_stepping_speed_multiplier(requested_playing_speed);
 		}
 
 		auto steps = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
+		
+		steps += advance_steps_forward;
+		advance_steps_forward = 0;
 
 		while (steps--) {
 			const auto total_entropy = machine_player.obtain_machine_entropy_for_next_step();
 			cosmic_entropy cosmic_entropy_for_this_advancement;
 
-			if (current_director_state == director_state::PAUSED && !advance_one_step_forward) {
-				continue;
-			}
-			else if (
-				current_director_state == director_state::PLAYING
-				|| (current_director_state == director_state::PAUSED && advance_one_step_forward)) {
+			if (current_director_state == director_state::PLAYING) {
 				guid_mapped_entropy replayed_entropy;
 				director.player.replay_next_step(replayed_entropy);
 
@@ -131,6 +150,15 @@ void director_setup::process(game_window& window) {
 
 		session.advance_audiovisual_systems(hypersomnia, testbed.get_selected_character(), vdt);
 
-		session.view(hypersomnia, testbed.get_selected_character(), window, vdt);
+		std::wstring director_text = L"Welcome to the director setup";
+		director_text += typesafe_sprintf(L"\nMode: %x", current_director_state == director_state::PLAYING ? "Playing" : "Recording");
+		director_text += typesafe_sprintf(L"\nRequested playing speed: %x", requested_playing_speed);
+		director_text += typesafe_sprintf(L"\nStep number: %x", hypersomnia.get_total_steps_passed());
+		director_text += typesafe_sprintf(L"\nTime: %x", hypersomnia.get_total_time_passed_in_seconds());
+		director_text += typesafe_sprintf(L"\nControlling entity %x of %x", testbed.current_character_index, testbed.characters.size());
+
+		const auto director_log = augs::gui::text::format(director_text, augs::gui::text::style(assets::font_id::GUI_FONT, white));
+
+		session.view(hypersomnia, testbed.get_selected_character(), window, vdt, director_log);
 	}
 }

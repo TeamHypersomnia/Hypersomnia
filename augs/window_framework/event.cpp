@@ -73,7 +73,7 @@ namespace augs {
 				}
 			}
 
-			bool state::get_mouse_key(unsigned n) const {
+			bool state::get_mouse_key(const unsigned n) const {
 				switch (n) {
 				case 0: return keys.test(static_cast<size_t>(keys::key::LMOUSE));
 				case 1: return keys.test(static_cast<size_t>(keys::key::RMOUSE));
@@ -82,6 +82,10 @@ namespace augs {
 				case 4: return keys.test(static_cast<size_t>(keys::key::MOUSE5));
 				default: ensure(false); return false;
 				}
+			}
+			
+			bool state::is_set(const keys::key k) const {
+				return keys.test(static_cast<size_t>(k));
 			}
 
 			void state::unset_keys() {
