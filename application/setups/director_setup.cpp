@@ -27,7 +27,7 @@ void director_setup::process(game_window& window) {
 
 	cosmos hypersomnia(3000);
 
-	augs::machine_entropy_buffer_and_player player;
+	augs::machine_entropy_buffer_and_player machine_player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
 	scene_managers::testbed testbed;
@@ -39,7 +39,7 @@ void director_setup::process(game_window& window) {
 	}
 
 	if (window.get_input_recording_mode() != input_recording_mode::DISABLED) {
-		if (player.try_to_load_or_save_new_session("sessions/", "recorded.inputs")) {
+		if (machine_player.try_to_load_or_save_new_session("sessions/", "recorded.inputs")) {
 			timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
 		}
 	}
@@ -51,15 +51,18 @@ void director_setup::process(game_window& window) {
 	
 	testbed.configure_view(session);
 
-	cosmic_movie_director dir;
-	dir.load_recording_from_file(cfg.director_scenario_filename);
+	cosmic_movie_director director;
+	director.load_recording_from_file(cfg.director_scenario_filename);
 
 	enum class director_state {
 		PAUSED,
-		PLAYING
+		PLAYING,
+		RECORDING
 	} current_director_state = director_state::PAUSED;
 
 	timer.reset_timer();
+
+	bool advance_one_step_forward = false;
 
 	while (!should_quit) {
 		{
@@ -73,7 +76,7 @@ void director_setup::process(game_window& window) {
 
 			process_exit_key(new_entropy.local);
 
-			player.accumulate_entropy_for_next_step(new_entropy);
+			machine_player.accumulate_entropy_for_next_step(new_entropy);
 
 			for (const auto& raw_input : new_entropy.local) {
 				if (raw_input.was_any_key_pressed()) {
@@ -91,37 +94,34 @@ void director_setup::process(game_window& window) {
 					}
 				}
 			}
+
+			testbed.control_character_selection(new_entropy.local);
 		}
 
 		auto steps = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
 
 		while (steps--) {
-			const auto total_entropy = player.obtain_machine_entropy_for_next_step();
+			const auto total_entropy = machine_player.obtain_machine_entropy_for_next_step();
+			cosmic_entropy cosmic_entropy_for_this_advancement;
 
-			for (const auto& raw_input : total_entropy.local) {
-				if (raw_input.was_any_key_pressed()) {
-					if (raw_input.key == augs::window::event::keys::key::_1) {
-						hypersomnia.set_fixed_delta(cfg.tickrate);
-					}
-					if (raw_input.key == augs::window::event::keys::key::_2) {
-						hypersomnia.set_fixed_delta(128);
-					}
-					if (raw_input.key == augs::window::event::keys::key::_3) {
-						hypersomnia.set_fixed_delta(144);
-					}
-				}
+			if (current_director_state == director_state::PAUSED && !advance_one_step_forward) {
+				continue;
 			}
+			else if (
+				current_director_state == director_state::PLAYING
+				|| (current_director_state == director_state::PAUSED && advance_one_step_forward)) {
+				guid_mapped_entropy replayed_entropy;
+				director.player.replay_next_step(replayed_entropy);
 
-			testbed.control_character_selection(total_entropy.local);
-
-			const auto cosmic_entropy_for_this_step = cosmic_entropy(hypersomnia[testbed.get_selected_character()], total_entropy.local, session.context);
+				cosmic_entropy_for_this_advancement = cosmic_entropy(replayed_entropy, hypersomnia);
+			}
 
 			renderer::get_current().clear_logic_lines();
 
-			hypersomnia.advance_deterministic_schemata(cosmic_entropy_for_this_step, [](auto) {},
-				[this, &session](const const_logic_step& step) {
-				session.acquire_game_events_for_hud(step);
-			}
+			hypersomnia.advance_deterministic_schemata(cosmic_entropy_for_this_advancement, [](auto) {},
+					[this, &session](const const_logic_step& step) {
+					session.acquire_game_events_for_hud(step);
+				}
 			);
 
 			session.resample_state_for_audiovisuals(hypersomnia);
