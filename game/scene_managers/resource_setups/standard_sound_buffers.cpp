@@ -88,6 +88,7 @@ namespace resource_setups {
 			trace_modifier.max_distance = 1020.f;
 			trace_modifier.reference_distance = 100.f;
 			trace_modifier.gain = 1.3f;
+			trace_modifier.repetitions = -1;
 			res[sound_response_type::PROJECTILE_TRACE] = { assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT, trace_modifier };
 			res[sound_response_type::DESTRUCTION_EXPLOSION] = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
 		}
