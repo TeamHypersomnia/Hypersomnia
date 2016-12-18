@@ -43,7 +43,8 @@ void director_setup::process(game_window& window) {
 	session.reserve_caches_for_entities(3000);
 	session.camera.configure_size(screen_size);
 	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
-	
+	session.set_interpolation_enabled(false);
+
 	testbed.configure_view(session);
 
 	cosmic_movie_director director;

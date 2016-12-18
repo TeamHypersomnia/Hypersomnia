@@ -30,6 +30,10 @@ void viewing_session::acquire_game_events_for_hud(const const_logic_step& step) 
 	hud.acquire_game_events(step);
 }
 
+void viewing_session::set_interpolation_enabled(const bool flag) {
+	systems_audiovisual.get<interpolation_system>().enabled = flag;
+}
+
 void viewing_session::spread_past_infection(const const_logic_step& step) {
 	const auto& cosm = step.cosm;
 

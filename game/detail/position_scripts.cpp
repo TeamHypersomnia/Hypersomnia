@@ -68,20 +68,18 @@ void set_velocity(entity_handle h, vec2 v) {
 }
 
 components::transform viewing_transform(const interpolation_system& sys, const const_entity_handle handle, const bool integerize) {
-	if (handle.get_cosmos().significant.meta.settings.enable_interpolation) {
-		const auto& owner = handle.get_owner_body();
+	const auto& owner = handle.get_owner_body();
+	
+	if (owner.alive() && owner.has<components::interpolation>() && owner != handle) {
+		auto in = sys.get_interpolated(owner);
 		
-		if (owner.alive() && owner.has<components::interpolation>() && owner != handle) {
-			auto in = sys.get_interpolated(owner);
-			
-			if(integerize)
-				in.pos = vec2i(in.pos);
+		if(integerize)
+			in.pos = vec2i(in.pos);
 
-			return components::fixtures::transform_around_body(handle, in);
-		}
-		else if (handle.has<components::interpolation>()) {
-			return sys.get_interpolated(handle);
-		}
+		return components::fixtures::transform_around_body(handle, in);
+	}
+	else if (handle.has<components::interpolation>()) {
+		return sys.get_interpolated(handle);
 	}
 	
 	return handle.logic_transform();

@@ -283,8 +283,6 @@ namespace scene_managers {
 		//world.significant.meta.settings.pathfinding.draw_memorised_walls = 1;
 		//world.significant.meta.settings.pathfinding.draw_undiscovered = 1;
 
-		world.significant.meta.settings.enable_interpolation = true;
-
 		characters.assign(new_characters.begin(), new_characters.end());
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 	}

@@ -599,8 +599,6 @@ namespace scene_managers {
 		//world.significant.meta.settings.pathfinding.draw_memorised_walls = 1;
 		//world.significant.meta.settings.pathfinding.draw_undiscovered = 1;
 
-		world.significant.meta.settings.enable_interpolation = true;
-
 		characters.assign(new_characters.begin(), new_characters.end());
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 	}
@@ -670,7 +668,6 @@ namespace scene_managers {
 	//	main_cosmos = stashed_cosmos;
 	//}
 	//if (raw_input.key == augs::window::event::keys::key::F10) {
-	//	main_cosmos.significant.meta.settings.enable_interpolation = !main_cosmos.significant.meta.settings.enable_interpolation;
 	//}
 
 	void testbed::control_character_selection(const augs::machine_entropy::local_type& local) {

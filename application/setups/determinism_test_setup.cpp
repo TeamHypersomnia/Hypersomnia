@@ -50,10 +50,6 @@ void determinism_test_setup::process(game_window& window) {
 		ensure(h == hypersomnias[0]);
 	}
 
-	for (auto& h : hypersomnias) {
-		h.significant.meta.settings.enable_interpolation = false;
-	}
-
 	if (window.get_input_recording_mode() != input_recording_mode::DISABLED) {
 		if (player.try_to_load_or_save_new_session("sessions/", "recorded.inputs")) {
 			timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
@@ -63,6 +59,7 @@ void determinism_test_setup::process(game_window& window) {
 	viewing_session session;
 	session.reserve_caches_for_entities(3000);
 	session.camera.configure_size(screen_size);
+	session.set_interpolation_enabled(false);
 
 	for (size_t i = 0; i < cosmoi_count; ++i) {
 		testbeds[i].configure_view(session);

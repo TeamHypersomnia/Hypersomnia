@@ -13,7 +13,9 @@ void sound_system::resample_state_for_audiovisuals(const cosmos& new_cosmos) {
 	std::vector<entity_id> to_erase;
 
 	for (const auto& it : per_entity_cache) {
-		if (new_cosmos[it.first].dead() || !new_cosmos[it.first].get<components::processing>().is_in(processing_subjects::WITH_SOUND_EXISTENCE)) {
+		if (new_cosmos[it.first].dead() 
+			|| !new_cosmos[it.first].has<components::processing>()
+			|| !new_cosmos[it.first].get<components::processing>().is_in(processing_subjects::WITH_SOUND_EXISTENCE)) {
 			to_erase.push_back(it.first);
 		}
 	}

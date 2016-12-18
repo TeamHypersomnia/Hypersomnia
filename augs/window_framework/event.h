@@ -223,7 +223,7 @@ namespace augs {
 
 				void unset_keys();
 				void apply(const change&);
-				bool get_mouse_key(unsigned) const;
+				bool get_mouse_key(const unsigned) const;
 				bool is_set(const keys::key) const;
 			};
 		}

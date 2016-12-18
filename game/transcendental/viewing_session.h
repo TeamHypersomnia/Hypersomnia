@@ -42,6 +42,7 @@ public:
 
 	void spread_past_infection(const const_logic_step&);
 	void acquire_game_events_for_hud(const const_logic_step&);
+	void set_interpolation_enabled(const bool);
 
 	augs::variable_delta_timer frame_timer;
 	augs::measurements fps_profiler = augs::measurements(L"FPS");
