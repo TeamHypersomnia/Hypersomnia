@@ -16,7 +16,7 @@
 #include "game/transcendental/cosmic_movie_director.h"
 #include "game/transcendental/types_specification/all_messages_includes.h"
 
-#include "game/transcendental/entropy_buffer_and_player.h"
+#include "augs/misc/machine_entropy_buffer_and_player.h"
 
 #include "augs/filesystem/file.h"
 #include "director_setup.h"
@@ -27,7 +27,7 @@ void director_setup::process(game_window& window) {
 
 	cosmos hypersomnia(3000);
 
-	entropy_buffer_and_player player;
+	machine_entropy_buffer_and_player player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
 	scene_managers::testbed testbed;
@@ -48,11 +48,16 @@ void director_setup::process(game_window& window) {
 	session.reserve_caches_for_entities(3000);
 	session.camera.configure_size(screen_size);
 	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
+	
+	testbed.configure_view(session);
 
 	cosmic_movie_director dir;
-	dir.load_recording_from_file("director/menu.ent");
+	dir.load_recording_from_file(cfg.director_scenario_filename);
 
-	testbed.configure_view(session);
+	enum class director_state {
+		PAUSED,
+		PLAYING
+	} current_director_state = director_state::PAUSED;
 
 	timer.reset_timer();
 

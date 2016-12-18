@@ -1,15 +1,15 @@
 #include "augs/misc/templated_readwrite.h"
-#include "entropy_buffer_and_player.h"
+#include "machine_entropy_buffer_and_player.h"
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 #include "augs/misc/time_utils.h"
 #include "game/transcendental/cosmos.h"
 
-void entropy_buffer_and_player::buffer_entropy_for_next_step(const augs::machine_entropy& delta) {
+void machine_entropy_buffer_and_player::buffer_entropy_for_next_step(const augs::machine_entropy& delta) {
 	total_buffered_entropy += delta;
 }
 
-augs::machine_entropy entropy_buffer_and_player::obtain_machine_entropy_for_next_step() {
+augs::machine_entropy machine_entropy_buffer_and_player::obtain_machine_entropy_for_next_step() {
 	if (is_replaying()) {
 		machine_entropy_player.replay_next_step(total_buffered_entropy);
 	}
@@ -23,7 +23,7 @@ augs::machine_entropy entropy_buffer_and_player::obtain_machine_entropy_for_next
 	return std::move(resultant_entropy);
 }
 
-bool entropy_buffer_and_player::try_to_load_and_replay_recording(const std::string& filename) {
+bool machine_entropy_buffer_and_player::try_to_load_and_replay_recording(const std::string& filename) {
 	if (augs::file_exists(filename) && machine_entropy_player.load_recording(filename)) {
 		current_player_state = player_state::REPLAYING;
 		return true;
@@ -32,7 +32,7 @@ bool entropy_buffer_and_player::try_to_load_and_replay_recording(const std::stri
 	return false;
 }
 
-void entropy_buffer_and_player::record_and_save_this_session(const std::string& folder, const std::string& filename) {
+void machine_entropy_buffer_and_player::record_and_save_this_session(const std::string& folder, const std::string& filename) {
 	const auto target_folder = folder + augs::get_timestamp();
 	augs::create_directories(target_folder);
 
@@ -40,7 +40,7 @@ void entropy_buffer_and_player::record_and_save_this_session(const std::string& 
 	current_player_state = player_state::RECORDING;
 }
 
-bool entropy_buffer_and_player::try_to_load_or_save_new_session(const std::string& sessions_folder, const std::string& recording_filename) {
+bool machine_entropy_buffer_and_player::try_to_load_or_save_new_session(const std::string& sessions_folder, const std::string& recording_filename) {
 	std::vector<std::string> filenames = { recording_filename };
 
 	if (recording_filename.find(".inputs") != std::string::npos) {
@@ -58,10 +58,10 @@ bool entropy_buffer_and_player::try_to_load_or_save_new_session(const std::strin
 	return false;
 }
 
-bool entropy_buffer_and_player::is_replaying() const {
+bool machine_entropy_buffer_and_player::is_replaying() const {
 	return current_player_state == player_state::REPLAYING;
 }
 
-bool entropy_buffer_and_player::is_recording() const {
+bool machine_entropy_buffer_and_player::is_recording() const {
 	return current_player_state == player_state::RECORDING;
 }

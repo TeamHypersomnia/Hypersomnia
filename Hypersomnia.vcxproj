@@ -332,6 +332,7 @@
     <ClCompile Include="augs\misc\http_requests.cpp" />
     <ClCompile Include="augs\misc\delta_compression.cpp" />
     <ClCompile Include="augs\misc\machine_entropy.cpp" />
+    <ClCompile Include="augs\misc\machine_entropy_buffer_and_player.cpp" />
     <ClCompile Include="augs\misc\pool_id.cpp" />
     <ClCompile Include="augs\misc\readable_bytesize.cpp" />
     <ClCompile Include="augs\misc\streams.cpp" />
@@ -388,7 +389,6 @@
     <ClCompile Include="game\detail\entity\physics_getters.cpp" />
     <ClCompile Include="game\detail\entity\relations_helpers.cpp" />
     <ClCompile Include="game\transcendental\entity_intent.cpp" />
-    <ClCompile Include="game\transcendental\entropy_buffer_and_player.cpp" />
     <ClCompile Include="application\game_window.cpp" />
     <ClCompile Include="game\global\input_context.cpp" />
     <ClCompile Include="game\detail\inventory_slot_handle.cpp" />
@@ -1021,6 +1021,7 @@
     <ClInclude Include="augs\misc\easier_handle_getters_mixin.h" />
     <ClInclude Include="augs\misc\enum_bitset.h" />
     <ClInclude Include="augs\misc\http_requests.h" />
+    <ClInclude Include="augs\misc\machine_entropy_buffer_and_player.h" />
     <ClInclude Include="augs\misc\readable_bytesize.h" />
     <ClInclude Include="augs\misc\delta_compression.h" />
     <ClInclude Include="augs\misc\enum_associative_array.h" />
@@ -1137,7 +1138,6 @@
     <ClInclude Include="game\transcendental\data_living_one_step.h" />
     <ClInclude Include="game\transcendental\entity_id.h" />
     <ClInclude Include="game\transcendental\entity_intent.h" />
-    <ClInclude Include="game\transcendental\entropy_buffer_and_player.h" />
     <ClInclude Include="game\enums\colliders_offset_type.h" />
     <ClInclude Include="application\game_window.h" />
     <ClInclude Include="game\global\all_settings.h" />

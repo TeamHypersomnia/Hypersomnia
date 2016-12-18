@@ -26,8 +26,8 @@ int main(int argc, char** argv) {
 
 	resource_setups::load_standard_everything();
 
-	auto mode = window.get_launch_mode();
-	LOG("Launch mode: %x", int(mode));
+	const auto mode = window.get_launch_mode();
+	LOG("Launch mode: %x", static_cast<int>(mode));
 
 	switch (mode) {
 	case game_window::launch_mode::LOCAL:

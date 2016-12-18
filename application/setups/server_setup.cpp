@@ -14,7 +14,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/cosmic_delta.h"
 
-#include "game/transcendental/entropy_buffer_and_player.h"
+#include "augs/misc/machine_entropy_buffer_and_player.h"
 
 #include "augs/filesystem/file.h"
 
@@ -86,7 +86,7 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 	cosmos initial_hypersomnia(3000);
 	scene_managers::networked_testbed_server().populate_world_with_entities(initial_hypersomnia);
 
-	entropy_buffer_and_player player;
+	machine_entropy_buffer_and_player player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
 	const bool detailed_step_log = cfg.tickrate <= 2;

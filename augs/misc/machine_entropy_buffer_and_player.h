@@ -4,7 +4,7 @@
 
 #include "augs/misc/step_player.h"
 
-class entropy_buffer_and_player {
+class machine_entropy_buffer_and_player {
 	enum class player_state {
 		DISABLED,
 		RECORDING,
