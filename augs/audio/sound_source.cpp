@@ -8,6 +8,7 @@
 #include "augs/al_log.h"
 #include "game/components/physics_component.h"
 
+#define TRACE_PARAMETERS 1
 #define Y_IS_Z 1
 
 namespace augs {
@@ -59,14 +60,23 @@ namespace augs {
 	
 	void sound_source::set_looping(const bool loop) const {
 		AL_CHECK(alSourcei(id, AL_LOOPING, loop));
+#if TRACE_PARAMETERS
+		LOG_NVPS(loop);
+#endif
 	}
 
 	void sound_source::set_pitch(const float pitch) const {
 		AL_CHECK(alSourcef(id, AL_PITCH, pitch));
+#if TRACE_PARAMETERS
+		LOG_NVPS(pitch);
+#endif
 	}
 
 	void sound_source::set_gain(const float gain) const {
 		AL_CHECK(alSourcef(id, AL_GAIN, gain));
+#if TRACE_PARAMETERS
+		LOG_NVPS(gain);
+#endif
 	}
 
 	void sound_source::set_velocity(vec2 v) const {
@@ -75,6 +85,9 @@ namespace augs {
 		AL_CHECK(alSource3f(id, AL_VELOCITY, v.x, 0.f, v.y));
 #else
 		AL_CHECK(alSource3f(id, AL_VELOCITY, v.x, v.y, 0.f));
+#endif
+#if TRACE_PARAMETERS
+		LOG_NVPS(v);
 #endif
 	}
 
@@ -86,23 +99,43 @@ namespace augs {
 #else
 		AL_CHECK(alSource3f(id, AL_POSITION, pos.x, pos.y, 0.f));
 #endif
+#if TRACE_PARAMETERS
+		LOG_NVPS(pos);
+#endif
 	}
 
 	void sound_source::set_max_distance(const float distance) const {
-		AL_CHECK(alSourcef(id, AL_MAX_DISTANCE, distance * PIXELS_TO_METERSf));
+		const auto passed_distance = distance * PIXELS_TO_METERSf;
+
+		AL_CHECK(alSourcef(id, AL_MAX_DISTANCE, passed_distance));
+#if TRACE_PARAMETERS
+		LOG_NVPS(passed_distance);
+#endif
 	}
 
 	void sound_source::set_reference_distance(const float distance) const {
-		AL_CHECK(alSourcef(id, AL_REFERENCE_DISTANCE, distance * PIXELS_TO_METERSf));
+		const auto passed_distance = distance * PIXELS_TO_METERSf;
+
+		AL_CHECK(alSourcef(id, AL_REFERENCE_DISTANCE, passed_distance));
+#if TRACE_PARAMETERS
+		LOG_NVPS(passed_distance);
+#endif
 	}
 
 	void sound_source::set_direct_channels(const bool flag) const {
 		AL_CHECK(alSourcei(id, AL_DIRECT_CHANNELS_SOFT, flag));
+
+#if TRACE_PARAMETERS
+		LOG_NVPS(flag);
+#endif
 	}
 
 	void sound_source::bind_buffer(const single_sound_buffer& buf) {
 		attached_buffer = &buf;
 		AL_CHECK(alSourcei(id, AL_BUFFER, buf.get_id()));
+#if TRACE_PARAMETERS
+		LOG_NVPS(buf.get_id());
+#endif
 	}
 
 	void sound_source::unbind_buffer() {
@@ -122,6 +155,9 @@ namespace augs {
 #else
 		AL_CHECK(alListener3f(AL_POSITION, pos.x, pos.y, 0.f));
 #endif
+#if TRACE_PARAMETERS
+		LOG_NVPS(pos);
+#endif
 	}
 
 	void set_listener_velocity(vec2 v) {
@@ -131,6 +167,10 @@ namespace augs {
 		AL_CHECK(alListener3f(AL_VELOCITY, v.x, 0.f, v.y));
 #else
 		AL_CHECK(alListener3f(AL_VELOCITY, v.x, v.y, 0.f));
+#endif
+
+#if TRACE_PARAMETERS
+		LOG_NVPS(v);
 #endif
 	}
 
