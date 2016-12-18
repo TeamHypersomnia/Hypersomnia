@@ -31,13 +31,15 @@ void driver_system::assign_drivers_from_successful_trigger_hits(logic_step& step
 	for (const auto& e : confirmations) {
 		const auto& subject_car = cosmos[cosmos[e.trigger].get<components::trigger>().entity_to_be_notified];
 
-		if (subject_car.dead())
+		if (subject_car.dead()) {
 			continue;
+		}
 
 		const auto* const maybe_car = subject_car.find<components::car>();
 
-		if (maybe_car && e.trigger == maybe_car->left_wheel_trigger)
+		if (maybe_car && e.trigger == maybe_car->left_wheel_trigger) {
 			assign_car_ownership(cosmos[e.detector_body], subject_car);
+		}
 	}
 }
 
@@ -68,9 +70,11 @@ void driver_system::release_drivers_due_to_requests(logic_step& step) {
 	const auto& delta = step.get_delta();
 	const auto& intents = step.transient.messages.get_queue<messages::intent_message>();
 
-	for (const auto& e : intents)
-		if (e.intent == intent_type::RELEASE_CAR && e.pressed_flag)
+	for (const auto& e : intents) {
+		if (e.intent == intent_type::RELEASE_CAR && e.pressed_flag) {
 			release_car_ownership(cosmos[e.subject]);
+		}
+	}
 }
 
 bool driver_system::release_car_ownership(const entity_handle driver) {
