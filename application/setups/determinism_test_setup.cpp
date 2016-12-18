@@ -30,7 +30,7 @@ void determinism_test_setup::process(game_window& window) {
 	const unsigned cosmoi_count = 1 + cfg.determinism_test_cloned_cosmoi_count;
 	std::vector<cosmos> hypersomnias(cosmoi_count, cosmos(3000));
 
-	machine_entropy_buffer_and_player player;
+	augs::machine_entropy_buffer_and_player player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 	std::vector<scene_managers::testbed> testbeds(cosmoi_count);
 
@@ -91,7 +91,7 @@ void determinism_test_setup::process(game_window& window) {
 			}
 		}
 
-		player.buffer_entropy_for_next_step(new_entropy);
+		player.accumulate_entropy_for_next_step(new_entropy);
 
 		auto steps = timer.count_logic_steps_to_perform(hypersomnias[0].get_fixed_delta());
 

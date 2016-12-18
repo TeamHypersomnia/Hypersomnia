@@ -86,7 +86,7 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 	cosmos initial_hypersomnia(3000);
 	scene_managers::networked_testbed_server().populate_world_with_entities(initial_hypersomnia);
 
-	machine_entropy_buffer_and_player player;
+	augs::machine_entropy_buffer_and_player player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
 	const bool detailed_step_log = cfg.tickrate <= 2;
@@ -154,7 +154,7 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 	
 		process_exit_key(new_entropy.local);
 
-		player.buffer_entropy_for_next_step(new_entropy);
+		player.accumulate_entropy_for_next_step(new_entropy);
 
 		auto steps = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
 

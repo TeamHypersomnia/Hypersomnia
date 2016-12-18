@@ -27,7 +27,7 @@ void local_setup::process(game_window& window) {
 
 	cosmos hypersomnia(3000);
 
-	machine_entropy_buffer_and_player player;
+	augs::machine_entropy_buffer_and_player player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
 	scene_managers::testbed testbed;
@@ -65,7 +65,7 @@ void local_setup::process(game_window& window) {
 
 			process_exit_key(new_entropy.local);
 
-			player.buffer_entropy_for_next_step(new_entropy);
+			player.accumulate_entropy_for_next_step(new_entropy);
 
 			for (const auto& raw_input : new_entropy.local) {
 				if (raw_input.was_any_key_pressed()) {

@@ -20,7 +20,7 @@ public:
 
 	viewing_session session;
 
-	machine_entropy_buffer_and_player player;
+	augs::machine_entropy_buffer_and_player player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 	scene_managers::networked_testbed_client scene;
 

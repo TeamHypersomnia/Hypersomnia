@@ -121,7 +121,7 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 
 	const bool still_downloading = !complete_state_received || receiver.jitter_buffer.is_still_refilling();
 
-	player.buffer_entropy_for_next_step(new_entropy);
+	player.accumulate_entropy_for_next_step(new_entropy);
 
 	auto steps = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
 
