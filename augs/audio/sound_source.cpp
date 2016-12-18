@@ -4,11 +4,12 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <AL/alext.h>
+#include <AL/efx.h>
 
 #include "augs/al_log.h"
 #include "game/components/physics_component.h"
 
-#define TRACE_PARAMETERS 1
+#define TRACE_PARAMETERS 0
 #define Y_IS_Z 1
 
 namespace augs {
@@ -76,6 +77,13 @@ namespace augs {
 		AL_CHECK(alSourcef(id, AL_GAIN, gain));
 #if TRACE_PARAMETERS
 		LOG_NVPS(gain);
+#endif
+	}
+
+	void sound_source::set_air_absorption_factor(const float absorption) const {
+		AL_CHECK(alSourcef(id, AL_AIR_ABSORPTION_FACTOR, absorption));
+#if TRACE_PARAMETERS
+		LOG_NVPS(absorption);
 #endif
 	}
 

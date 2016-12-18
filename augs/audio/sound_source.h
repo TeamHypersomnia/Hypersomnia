@@ -29,6 +29,7 @@ namespace augs {
 		void set_looping(const bool) const;
 		void set_pitch(const float) const;
 		void set_gain(const float) const;
+		void set_air_absorption_factor(const float) const;
 		void set_velocity(vec2) const;
 		void set_position(vec2) const;
 		void set_max_distance(const float) const;
