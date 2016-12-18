@@ -9,10 +9,6 @@
 #include "game/systems_audiovisual/interpolation_system.h"
 #include "game/resources/manager.h"
 
-#include <AL/al.h>
-#include <AL/efx.h>
-#include "augs/al_log.h"
-
 void sound_system::resample_state_for_audiovisuals(const cosmos& new_cosmos) {
 	std::vector<entity_id> to_erase;
 
@@ -64,7 +60,6 @@ void sound_system::play_nearby_sound_existences(
 	augs::set_listener_position(listener_pos);
 	augs::set_listener_velocity(subject.get_effective_velocity());
 	augs::set_listener_orientation({ 0.f, -1.f, 0.f, 0.f, 0.f, -1.f });
-	decltype(per_entity_cache) new_caches;
 
 	for (const auto it : targets) {
 		auto& cache = get_cache(it);
@@ -104,16 +99,10 @@ void sound_system::play_nearby_sound_existences(
 		const auto dist_from_listener = (listener_pos - source_pos).length();
 		const float absorption = std::min(10.f, pow(std::max(0.f, dist_from_listener - 2220.f)/520.f, 2));
 
-		AL_CHECK(alSourcef(source, AL_AIR_ABSORPTION_FACTOR, absorption));
-
+		source.set_air_absorption_factor(absorption);
 		source.set_pitch(existence.input.modifier.pitch);
 		source.set_gain(existence.input.modifier.gain);
 		source.set_position(source_pos);
 		source.set_velocity(it.get_effective_velocity());
-
-		new_caches.emplace(it.get_id(), std::move(cache));
 	}
-
-	per_entity_cache = std::move(new_caches);
-
 }

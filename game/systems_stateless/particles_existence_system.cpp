@@ -209,11 +209,10 @@ entity_handle particles_existence_system::create_particle_effect_entity(cosmos& 
 
 	existence.max_lifetime_in_steps = duration_ms / cosmos.get_fixed_delta().in_milliseconds() + 1;
 	
-	const auto subject = cosmos[it.subject];
+	const auto chased_subject = cosmos[it.subject];
 
-	if (subject.alive()) {
-		auto& target_position_copying = new_stream_entity += components::position_copying();
-		target_position_copying.configure_chasing(subject, it.place_of_birth, components::position_copying::chasing_configuration::RELATIVE_ORBIT);
+	if (chased_subject.alive()) {
+		components::position_copying::configure_chasing(new_stream_entity, chased_subject, it.place_of_birth, components::position_copying::chasing_configuration::RELATIVE_ORBIT);
 	}
 
 	return new_stream_entity;

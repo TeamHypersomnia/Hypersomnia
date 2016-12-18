@@ -12,21 +12,24 @@
 
 using namespace augs;
 
-void components::position_copying::set_target(const entity_id new_target) {
+void components::position_copying::set_target(const const_entity_handle new_target) {
 	target_newly_set = true;
 	target = new_target;
 }
 
-void components::position_copying::configure_chasing(const const_entity_handle subject, const components::transform chaser_place_of_birth, const chasing_configuration cfg) {
-	set_target(subject.get_id());
+void components::position_copying::configure_chasing(const entity_handle subject, const const_entity_handle target, const components::transform chaser_place_of_birth, const chasing_configuration cfg) {
+	auto& copying = subject += components::position_copying();
+	
+	copying.previous = subject.logic_transform();
+	copying.set_target(target);
 
 	if (cfg == chasing_configuration::RELATIVE_ORBIT) {
-		const auto subject_transform = subject.logic_transform();
-		position_copying_mode = components::position_copying::position_copying_type::ORBIT;
+		const auto subject_transform = target.logic_transform();
+		copying.position_copying_mode = components::position_copying::position_copying_type::ORBIT;
 
-		position_copying_rotation = true;
-		rotation_offset = chaser_place_of_birth.rotation - subject_transform.rotation;
-		rotation_orbit_offset = (chaser_place_of_birth.pos - subject_transform.pos).rotate(-subject_transform.rotation, vec2(0.f, 0.f));
+		copying.position_copying_rotation = true;
+		copying.rotation_offset = chaser_place_of_birth.rotation - subject_transform.rotation;
+		copying.rotation_orbit_offset = (chaser_place_of_birth.pos - subject_transform.pos).rotate(-subject_transform.rotation, vec2(0.f, 0.f));
 	}
 }
 
@@ -45,13 +48,6 @@ void position_copying_system::update_transforms(logic_step& step) {
 		position_copying.previous = transform;
 
 		if (cosmos[position_copying.target].dead()) continue;
-		
-		if (position_copying.target_newly_set) {
-			auto target_transform = cosmos[position_copying.target].logic_transform();
-			target_transform.rotation *= position_copying.rotation_multiplier;
-			
-			position_copying.target_newly_set = false;
-		}
 
 		auto target_transform = cosmos[position_copying.target].logic_transform();
 		target_transform.rotation *= position_copying.rotation_multiplier;
@@ -76,6 +72,11 @@ void position_copying_system::update_transforms(logic_step& step) {
 		}
 		else if (position_copying.position_copying_mode == components::position_copying::position_copying_type::PARALLAX) {
 			transform.pos = position_copying.reference_position + (target_transform.pos - position_copying.target_reference_position) * position_copying.scrolling_speed;
+		}
+
+		if (position_copying.target_newly_set) {
+			position_copying.previous = transform;
+			position_copying.target_newly_set = false;
 		}
 
 		it.set_logic_transform(transform);

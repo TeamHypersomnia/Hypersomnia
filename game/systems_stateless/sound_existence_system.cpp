@@ -125,7 +125,6 @@ void sound_existence_system::game_responses_to_sound_effects(logic_step& step) c
 
 		if (cosmos[h.spawned_remnants].alive()) {
 			type = sound_response_type::DEATH;
-
 		}
 		else if (h.effective_amount > 0) {
 			type = sound_response_type::HEALTH_DECREASE;
@@ -137,7 +136,6 @@ void sound_existence_system::game_responses_to_sound_effects(logic_step& step) c
 		const auto& response_entry = subject_response_map.at(type);
 		in.effect = response_entry.id;
 		in.modifier = response_entry.modifier;
-
 
 		in.direct_listener = subject;
 
@@ -166,7 +164,7 @@ void sound_existence_system::game_responses_to_sound_effects(logic_step& step) c
 entity_handle sound_existence_system::create_sound_effect_entity(cosmos& cosmos, 
 	const components::sound_existence::effect_input input,
 	const components::transform place_of_birth,
-	const entity_id chased_subject
+	const entity_id chased_subject_id
 	) const {
 	entity_handle new_sound_entity = cosmos.create_entity("particle_stream");
 	auto& target_transform = new_sound_entity += place_of_birth;
@@ -186,11 +184,10 @@ entity_handle sound_existence_system::create_sound_effect_entity(cosmos& cosmos,
 	existence.max_lifetime_in_steps = 
 		length_in_seconds / cosmos.get_fixed_delta().in_seconds() + 1;
 
-	const auto subject = cosmos[chased_subject];
+	const auto chased_subject = cosmos[chased_subject_id];
 
-	if (subject.alive()) {
-		auto& target_position_copying = new_sound_entity += components::position_copying();
-		target_position_copying.configure_chasing(subject, place_of_birth, components::position_copying::chasing_configuration::RELATIVE_ORBIT);
+	if (chased_subject.alive()) {
+		components::position_copying::configure_chasing(new_sound_entity, chased_subject, place_of_birth, components::position_copying::chasing_configuration::RELATIVE_ORBIT);
 	}
 
 	return new_sound_entity;

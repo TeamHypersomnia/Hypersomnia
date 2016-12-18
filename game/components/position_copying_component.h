@@ -81,11 +81,12 @@ namespace components {
 			RELATIVE_ORBIT
 		};
 
-		void configure_chasing(
-			const const_entity_handle chased, 
+		static void configure_chasing(
+			const entity_handle subject,
+			const const_entity_handle target,
 			const components::transform chaser_place_of_birth,
 			const chasing_configuration);
-		void set_target(entity_id);
+		void set_target(const const_entity_handle);
 		components::transform get_previous_transform() const;
 	};
 }
