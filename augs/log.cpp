@@ -13,6 +13,7 @@
 #include "augs/templates/string_templates.h"
 
 #define ENABLE_LOG 1
+#define LOG_TO_FILE 1
 
 std::mutex log_mutex;
 
@@ -45,8 +46,10 @@ void LOG(const std::string& f) {
 	global_log::push_entry({ console_color::WHITE, f });
 
 	std::cout << f << std::endl;
-	//std::ofstream recording_file("live_debug.txt", std::ios::out | std::ios::app);
-	//recording_file << f << std::endl;
+#if LOG_TO_FILE
+	std::ofstream recording_file("live_debug.txt", std::ios::out | std::ios::app);
+	recording_file << f << std::endl;
+#endif
 #endif
 }
 
@@ -58,8 +61,10 @@ void LOG_COLOR(const console_color c, const std::string& f) {
 	global_log::push_entry({ c, f });
 
 	augs::colored_print(c, f.c_str());
-	//std::ofstream recording_file("live_debug.txt", std::ios::out | std::ios::app);
-	//recording_file << f << std::endl;
+#if LOG_TO_FILE
+	std::ofstream recording_file("live_debug.txt", std::ios::out | std::ios::app);
+	recording_file << f << std::endl;
+#endif
 #endif
 }
 
@@ -82,4 +87,7 @@ TEST(TypesafeSprintf, TypesafeSprintfSeveralTests) {
 	std::string location = "augs::window::glwindow::create";
 
 	EXPECT_EQ("OpenGL error 1282 in augs::window::glwindow::create", typesafe_sprintf("OpenGL error %x in %x", errid, location));
+	
+	int a = 2;
+	LOG_NVPS("Test nvps: ", a, errid, test);
 }
