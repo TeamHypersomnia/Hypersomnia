@@ -36,6 +36,8 @@ namespace augs {
 			endpoint_address address;
 			packet payload;
 			unsigned messages_to_skip = 0;
+
+			bool operator==(const message& b) const;
 		};
 	}
 

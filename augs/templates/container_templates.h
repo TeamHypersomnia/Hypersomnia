@@ -1,5 +1,6 @@
 #pragma once
 #include <algorithm>
+#include <vector>
 
 template<class Container, class T>
 void erase_remove(Container& v, const T& l) {
@@ -19,4 +20,22 @@ bool found_in(Container& v, const T& l) {
 template<class Container, class T>
 auto find_in(Container& v, const T& l) {
 	return std::find(v.begin(), v.end(), l);
+}
+
+template<class A, class B>
+bool compare_containers(const A& a, const B& b);
+
+template<class A, class B>
+bool compare_containers(const std::vector<A>& a, const std::vector<B>& b) {
+	if (a.size() != b.size()) {
+		return false;
+	}
+
+	for (size_t i = 0; i < a.size(); ++i) {
+		if (!(a[i] == b[i])) {
+			return false;
+		}
+	}
+
+	return true;
 }

@@ -13,7 +13,9 @@ namespace augs {
 		// here will be remote entropy as well
 
 		machine_entropy& operator+=(const machine_entropy&);
+		bool operator==(const machine_entropy&) const;
 		bool empty() const;
+		void clear();
 	};
 }
 
