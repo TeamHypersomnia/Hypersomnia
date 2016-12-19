@@ -225,14 +225,14 @@ namespace ingredients {
 }
 
 namespace prefabs {
-	entity_handle create_character(cosmos& world, const components::transform pos, const vec2i screen_size, const std::string name, const assets::animation_response_id torso_set) {
+	entity_handle create_character(cosmos& world, const components::transform spawn_transform, const vec2i screen_size, const std::string name, const assets::animation_response_id torso_set) {
 		const auto character = world.create_entity(name);
 
 		name_entity(character, entity_name::PERSON);
 
 		const auto crosshair = create_character_crosshair(world, screen_size);
 		crosshair.get<components::crosshair>().character_entity_to_chase = character;
-		crosshair.set_logic_transform(pos);
+		crosshair.set_logic_transform(spawn_transform.pos);
 
 		ingredients::wsad_character(character, crosshair, torso_set);
 		
@@ -241,7 +241,7 @@ namespace prefabs {
 
 		ingredients::wsad_character_physics(character);
 
-		character.get<components::physics>().set_transform(pos);
+		character.get<components::physics>().set_transform(spawn_transform);
 
 		ingredients::character_inventory(character);
 
