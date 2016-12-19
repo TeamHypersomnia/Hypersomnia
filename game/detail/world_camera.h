@@ -25,8 +25,8 @@ public:
 	components::transform last_interpolant;
 	vec2 last_ortho_interpolant;
 
-	vec2 previous_seen_player_position;
-	vec2 previous_step_player_position;
+	vec2 player_position_previously_seen;
+	vec2 player_position_at_previous_step;
 
 	augs::smooth_value_field smoothing_player_pos;
 

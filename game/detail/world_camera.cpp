@@ -80,12 +80,12 @@ void world_camera::tick(const interpolation_system& interp, const augs::variable
 			player_pos = physics.get_position();//entity_to_chase.logic_transform().interpolated(dt.view_interpolation_ratio());
 				//physics.get_position();
 
-			if (player_pos != previous_step_player_position) {
-				previous_seen_player_position = previous_step_player_position;
-				previous_step_player_position = player_pos;
+			if (player_pos != player_position_at_previous_step) {
+				player_position_previously_seen = player_position_at_previous_step;
+				player_position_at_previous_step = player_pos;
 			}
 
-			target_value = (player_pos - previous_seen_player_position) * dt.get_fixed().in_milliseconds();
+			target_value = (player_pos - player_position_previously_seen) * dt.get_fixed().in_milliseconds();
 
 			if (target_value.length() < smoothing_player_pos.value.length())
 				// braking
@@ -96,7 +96,7 @@ void world_camera::tick(const interpolation_system& interp, const augs::variable
 			if (target_value.length() > 50)
 				target_value.set_length(50);
 
-			// LOG("%x, %x, %x", *(vec2i*)&player_pos, *(vec2i*)&previous_step_player_position, *(vec2i*)&target_value);
+			// LOG("%x, %x, %x", *(vec2i*)&player_pos, *(vec2i*)&player_position_at_previous_step, *(vec2i*)&target_value);
 		}
 		//else {
 		//	target_value = chased_transform.interpolation_direction(previous);

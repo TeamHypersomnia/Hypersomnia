@@ -17,7 +17,6 @@
 #include "game/messages/gui_intents.h"
 
 #include "augs/window_framework/event.h"
-#include "augs/misc/step_player.h"
 #include "game/transcendental/step.h"
 #include "game/transcendental/entity_handle.h"
 
