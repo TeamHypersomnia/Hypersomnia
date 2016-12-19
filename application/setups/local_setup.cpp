@@ -16,7 +16,7 @@
 #include "game/transcendental/cosmic_movie_director.h"
 #include "game/transcendental/types_specification/all_messages_includes.h"
 
-#include "augs/misc/machine_entropy_buffer_and_player.h"
+#include "augs/misc/machine_entropy_player.h"
 
 #include "augs/filesystem/file.h"
 #include "local_setup.h"
@@ -28,7 +28,7 @@ void local_setup::process(game_window& window) {
 	cosmos hypersomnia(3000);
 
 	augs::machine_entropy total_collected_entropy;
-	augs::machine_entropy_buffer_and_player player;
+	augs::machine_entropy_player player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
 	scene_managers::testbed testbed;

@@ -4,7 +4,7 @@
 #include "game/transcendental/cosmic_entropy.h"
 
 namespace augs {
-	class machine_entropy_buffer_and_player {
+	class machine_entropy_player {
 		enum class player_state {
 			DISABLED,
 			RECORDING,

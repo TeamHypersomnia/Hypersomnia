@@ -1,12 +1,12 @@
 #include "augs/misc/templated_readwrite.h"
-#include "machine_entropy_buffer_and_player.h"
+#include "machine_entropy_player.h"
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 #include "augs/misc/time_utils.h"
 #include "game/transcendental/cosmos.h"
 
 namespace augs {
-	void machine_entropy_buffer_and_player::advance_player_and_biserialize(machine_entropy& total_collected_entropy) {
+	void machine_entropy_player::advance_player_and_biserialize(machine_entropy& total_collected_entropy) {
 		if (is_replaying()) {
 			const auto& recording = step_to_entropy_to_replay;
 			const auto it = recording.find(player_step_position);
@@ -29,7 +29,7 @@ namespace augs {
 		}
 	}
 
-	bool machine_entropy_buffer_and_player::try_to_load_and_replay_recording(const std::string& filename) {
+	bool machine_entropy_player::try_to_load_and_replay_recording(const std::string& filename) {
 		player_step_position = 0;
 		step_to_entropy_to_replay.clear();
 		
@@ -54,7 +54,7 @@ namespace augs {
 		}
 	}
 
-	void machine_entropy_buffer_and_player::record_and_save_this_session(const std::string& folder, const std::string& filename) {
+	void machine_entropy_player::record_and_save_this_session(const std::string& folder, const std::string& filename) {
 		const auto target_folder = folder + augs::get_timestamp();
 		augs::create_directories(target_folder);
 
@@ -62,7 +62,7 @@ namespace augs {
 		current_player_state = player_state::RECORDING;
 	}
 
-	bool machine_entropy_buffer_and_player::try_to_load_or_save_new_session(const std::string& sessions_folder, const std::string& recording_filename) {
+	bool machine_entropy_player::try_to_load_or_save_new_session(const std::string& sessions_folder, const std::string& recording_filename) {
 		std::vector<std::string> filenames = { recording_filename };
 
 		if (recording_filename.find(".inputs") != std::string::npos) {
@@ -80,11 +80,11 @@ namespace augs {
 		return false;
 	}
 
-	bool machine_entropy_buffer_and_player::is_replaying() const {
+	bool machine_entropy_player::is_replaying() const {
 		return current_player_state == player_state::REPLAYING;
 	}
 
-	bool machine_entropy_buffer_and_player::is_recording() const {
+	bool machine_entropy_player::is_recording() const {
 		return current_player_state == player_state::RECORDING;
 	}
 }

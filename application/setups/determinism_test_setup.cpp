@@ -15,7 +15,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/data_living_one_step.h"
 
-#include "augs/misc/machine_entropy_buffer_and_player.h"
+#include "augs/misc/machine_entropy_player.h"
 #include "game/transcendental/step.h"
 
 #include "augs/filesystem/file.h"
@@ -31,7 +31,7 @@ void determinism_test_setup::process(game_window& window) {
 	std::vector<cosmos> hypersomnias(cosmoi_count, cosmos(3000));
 
 	augs::machine_entropy total_collected_entropy;
-	augs::machine_entropy_buffer_and_player player;
+	augs::machine_entropy_player player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 	std::vector<scene_managers::testbed> testbeds(cosmoi_count);
 

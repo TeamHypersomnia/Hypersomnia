@@ -5,7 +5,7 @@
 
 #include "game/transcendental/simulation_receiver.h"
 #include "game/transcendental/viewing_session.h"
-#include "augs/misc/machine_entropy_buffer_and_player.h"
+#include "augs/misc/machine_entropy_player.h"
 #include "game/scene_managers/networked_testbed.h"
 
 class client_setup : public setup_base {
@@ -21,7 +21,7 @@ public:
 	viewing_session session;
 
 	augs::machine_entropy total_collected_entropy;
-	augs::machine_entropy_buffer_and_player player;
+	augs::machine_entropy_player player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 	scene_managers::networked_testbed_client scene;
 

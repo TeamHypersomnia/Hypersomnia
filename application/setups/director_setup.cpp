@@ -16,7 +16,7 @@
 #include "game/transcendental/cosmic_movie_director.h"
 #include "game/transcendental/types_specification/all_messages_includes.h"
 
-#include "augs/misc/machine_entropy_buffer_and_player.h"
+#include "augs/misc/machine_entropy_player.h"
 
 #include "augs/filesystem/file.h"
 #include "director_setup.h"
