@@ -3,11 +3,25 @@
 #include "augs/misc/templated_readwrite.h"
 
 #include "augs/templates/string_templates.h"
+#include <fstream>
 
-void cosmic_movie_director::save_recording_to_file(const std::string) const {
-	//player.record()
+void cosmic_movie_director::save_recording_to_file(const std::string filename) const {
+	//player.record(filename)
 }
 
-void cosmic_movie_director::load_recording_from_file(const std::string path) {
-	//player.load_recording(path);
+bool cosmic_movie_director::load_recording_from_file(const std::string filename) {
+	player_step_position = 0;
+	std::ifstream source(filename, std::ios::in | std::ios::binary);
+
+	while (source.peek() != EOF) {
+		unsigned step;
+		guid_mapped_entropy ent;
+
+		augs::read_object(source, step);
+		augs::read_object(source, ent);
+
+		step_to_entropy.emplace(step, std::move(ent));
+	}
+
+	return step_to_entropy.size() > 0;
 }

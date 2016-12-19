@@ -86,6 +86,7 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 	cosmos initial_hypersomnia(3000);
 	scene_managers::networked_testbed_server().populate_world_with_entities(initial_hypersomnia);
 
+	augs::machine_entropy total_collected_entropy;
 	augs::machine_entropy_buffer_and_player player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
@@ -154,18 +155,18 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 	
 		process_exit_key(new_entropy.local);
 
-		player.accumulate_entropy_for_next_step(new_entropy);
+		total_collected_entropy += new_entropy;
 
 		auto steps = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
 
 		while (steps--) {
-			auto total_entropy = player.obtain_machine_entropy_for_next_step();
+			player.advance_player_and_biserialize(total_collected_entropy);
 
 			if (detailed_step_log) {
 				LOG("Server step");
 			}
 
-			for (auto& net_event : total_entropy.remote) {
+			for (auto& net_event : total_collected_entropy.remote) {
 				if (detailed_step_log) {
 					LOG("Server netevent");
 				}
@@ -392,6 +393,8 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 
 				rep.fetch_stats(this_step_stats);
 			}
+
+			total_collected_entropy.clear();
 		}
 	}
 

@@ -1,16 +1,13 @@
 #pragma once
-#include <map>
-
-#include "augs/misc/step_player.h"
+#include <unordered_map>
 #include "cosmic_entropy.h"
 
 class cosmic_movie_director {
-
 public:
-	std::map<unsigned, guid_mapped_entropy> step_to_entropy;
-	
-	augs::step_player<guid_mapped_entropy> player;
+	unsigned player_step_position = 0u;
 
-	void load_recording_from_file(const std::string);
+	std::unordered_map<unsigned, guid_mapped_entropy> step_to_entropy;
+
+	bool load_recording_from_file(const std::string);
 	void save_recording_to_file(const std::string) const;
 };

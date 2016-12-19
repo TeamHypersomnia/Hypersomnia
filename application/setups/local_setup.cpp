@@ -27,6 +27,7 @@ void local_setup::process(game_window& window) {
 
 	cosmos hypersomnia(3000);
 
+	augs::machine_entropy total_collected_entropy;
 	augs::machine_entropy_buffer_and_player player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
@@ -65,7 +66,7 @@ void local_setup::process(game_window& window) {
 
 			process_exit_key(new_entropy.local);
 
-			player.accumulate_entropy_for_next_step(new_entropy);
+			total_collected_entropy += new_entropy;
 
 			for (const auto& raw_input : new_entropy.local) {
 				if (raw_input.was_any_key_pressed()) {
@@ -88,9 +89,9 @@ void local_setup::process(game_window& window) {
 		auto steps = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
 
 		while (steps--) {
-			const auto total_entropy = player.obtain_machine_entropy_for_next_step();
+			player.advance_player_and_biserialize(total_collected_entropy);
 
-			for (const auto& raw_input : total_entropy.local) {
+			for (const auto& raw_input : total_collected_entropy.local) {
 				if (raw_input.was_any_key_pressed()) {
 					if (raw_input.key == augs::window::event::keys::key::_1) {
 						hypersomnia.set_fixed_delta(cfg.tickrate);
@@ -104,9 +105,9 @@ void local_setup::process(game_window& window) {
 				}
 			}
 			
-			testbed.control_character_selection(total_entropy.local);
+			testbed.control_character_selection(total_collected_entropy.local);
 
-			const auto cosmic_entropy_for_this_step = cosmic_entropy(hypersomnia[testbed.get_selected_character()], total_entropy.local, session.context);
+			const auto cosmic_entropy_for_this_step = cosmic_entropy(hypersomnia[testbed.get_selected_character()], total_collected_entropy.local, session.context);
 
 			renderer::get_current().clear_logic_lines();
 
@@ -117,6 +118,8 @@ void local_setup::process(game_window& window) {
 			);
 
 			session.resample_state_for_audiovisuals(hypersomnia);
+			
+			total_collected_entropy.clear();
 		}
 
 		const auto vdt = session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), timer);

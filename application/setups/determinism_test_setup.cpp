@@ -30,6 +30,7 @@ void determinism_test_setup::process(game_window& window) {
 	const unsigned cosmoi_count = 1 + cfg.determinism_test_cloned_cosmoi_count;
 	std::vector<cosmos> hypersomnias(cosmoi_count, cosmos(3000));
 
+	augs::machine_entropy total_collected_entropy;
 	augs::machine_entropy_buffer_and_player player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 	std::vector<scene_managers::testbed> testbeds(cosmoi_count);
@@ -88,7 +89,7 @@ void determinism_test_setup::process(game_window& window) {
 			}
 		}
 
-		player.accumulate_entropy_for_next_step(new_entropy);
+		total_collected_entropy += new_entropy;
 
 		auto steps = timer.count_logic_steps_to_perform(hypersomnias[0].get_fixed_delta());
 
@@ -97,16 +98,16 @@ void determinism_test_setup::process(game_window& window) {
 				break;
 			}
 
-			const auto total_entropy = player.obtain_machine_entropy_for_next_step();
+			player.advance_player_and_biserialize(total_collected_entropy);
 
 			for (size_t i = 0; i < cosmoi_count; ++i) {
 				auto& h = hypersomnias[i];
 				if (i + 1 < cosmoi_count)
 					hypersomnias[i] = hypersomnias[i + 1];
 
-				testbeds[i].control_character_selection(total_entropy.local);
+				testbeds[i].control_character_selection(total_collected_entropy.local);
 
-				auto cosmic_entropy_for_this_step = cosmic_entropy(h[testbeds[i].get_selected_character()], total_entropy.local, session.context);
+				auto cosmic_entropy_for_this_step = cosmic_entropy(h[testbeds[i].get_selected_character()], total_collected_entropy.local, session.context);
 
 				renderer::get_current().clear_logic_lines();
 
@@ -142,6 +143,8 @@ void determinism_test_setup::process(game_window& window) {
 					break;
 				}
 			}
+
+			total_collected_entropy.clear();
 		}
 
 		std::string logged;

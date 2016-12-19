@@ -1337,7 +1337,6 @@
     <ClInclude Include="augs\misc\pool.h" />
     <ClInclude Include="augs\misc\randomization.h" />
     <ClInclude Include="augs\misc\smooth_value_field.h" />
-    <ClInclude Include="augs\misc\step_player.h" />
     <ClInclude Include="augs\misc\stream.h" />
     <ClInclude Include="augs\misc\timer.h" />
     <ClInclude Include="augs\misc\undoredo.h" />

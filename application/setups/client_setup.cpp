@@ -121,16 +121,16 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 
 	const bool still_downloading = !complete_state_received || receiver.jitter_buffer.is_still_refilling();
 
-	player.accumulate_entropy_for_next_step(new_entropy);
+	total_collected_entropy += new_entropy;
 
 	auto steps = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
 
 	while (steps--) {
 		session.unpack_local_steps_profiler.new_measurement();
-		auto total_entropy = player.obtain_machine_entropy_for_next_step();
+		player.advance_player_and_biserialize(total_collected_entropy);
 		session.unpack_local_steps_profiler.end_measurement();
 
-		for (auto& net_event : total_entropy.remote) {
+		for (auto& net_event : total_collected_entropy.remote) {
 			if (net_event.message_type == augs::network::message::type::RECEIVE) {
 				auto& stream = net_event.payload;
 
@@ -187,7 +187,7 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 
 		if (!still_downloading) {
 			session.sending_commands_and_predict_profiler.new_measurement();
-			const auto local_cosmic_entropy_for_this_step = cosmic_entropy(hypersomnia[scene.get_selected_character()], total_entropy.local, session.context);
+			const auto local_cosmic_entropy_for_this_step = cosmic_entropy(hypersomnia[scene.get_selected_character()], total_collected_entropy.local, session.context);
 
 			receiver.send_commands_and_predict(client, local_cosmic_entropy_for_this_step, extrapolated_hypersomnia, step_pred_with_effects_response);
 			session.sending_commands_and_predict_profiler.end_measurement();
@@ -217,6 +217,8 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 		session.sending_packets_profiler.new_measurement();
 		client.send_pending_redundant();
 		session.sending_packets_profiler.end_measurement();
+
+		total_collected_entropy.clear();
 	}
 
 	if (!still_downloading) {

@@ -18,9 +18,9 @@ recording_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.DIRECTOR,
+	launch_mode = launch_modes.LOCAL,
 	
-	input_recording_mode = recording_modes.DISABLE,
+	input_recording_mode = recording_modes.LIVE,
 	recording_replay_speed = 1,
 
 	determinism_test_cloned_cosmoi_count = 2,

@@ -6,38 +6,59 @@
 #include "game/transcendental/cosmos.h"
 
 namespace augs {
-	void machine_entropy_buffer_and_player::accumulate_entropy_for_next_step(const augs::machine_entropy& delta) {
-		total_buffered_entropy += delta;
-	}
-
-	augs::machine_entropy machine_entropy_buffer_and_player::obtain_machine_entropy_for_next_step() {
+	void machine_entropy_buffer_and_player::advance_player_and_biserialize(machine_entropy& total_collected_entropy) {
 		if (is_replaying()) {
-			machine_entropy_player.replay_next_step(total_buffered_entropy);
+			const auto& recording = step_to_entropy_to_replay;
+			const auto it = recording.find(player_step_position);
+
+			if (it != recording.end()) {
+				total_collected_entropy = (*it).second;
+			}
+
+			++player_step_position;
 		}
 		else if (is_recording()) {
-			machine_entropy_player.append_step_to_live_file(total_buffered_entropy);
+			if (!total_collected_entropy.empty()) {
+				std::ofstream recording_file(live_saving_filename, std::ios::out | std::ios::binary | std::ios::app);
+
+				augs::write_object(recording_file, player_step_position);
+				augs::write_object(recording_file, total_collected_entropy);
+			}
+
+			++player_step_position;
 		}
-
-		const augs::machine_entropy resultant_entropy = std::move(total_buffered_entropy);
-		total_buffered_entropy = augs::machine_entropy();
-
-		return std::move(resultant_entropy);
 	}
 
 	bool machine_entropy_buffer_and_player::try_to_load_and_replay_recording(const std::string& filename) {
-		if (augs::file_exists(filename) && machine_entropy_player.load_recording(filename)) {
+		player_step_position = 0;
+		step_to_entropy_to_replay.clear();
+		
+		std::ifstream source(filename, std::ios::in | std::ios::binary);
+
+		while (source.peek() != EOF) {
+			unsigned step;
+			augs::machine_entropy ent;
+
+			augs::read_object(source, step);
+			augs::read_object(source, ent);
+
+			step_to_entropy_to_replay.emplace(step, std::move(ent));
+		}
+		
+		if (step_to_entropy_to_replay.empty()) {
+			return false;
+		}
+		else {
 			current_player_state = player_state::REPLAYING;
 			return true;
 		}
-
-		return false;
 	}
 
 	void machine_entropy_buffer_and_player::record_and_save_this_session(const std::string& folder, const std::string& filename) {
 		const auto target_folder = folder + augs::get_timestamp();
 		augs::create_directories(target_folder);
 
-		machine_entropy_player.set_live_filename(target_folder + "/" + filename);
+		live_saving_filename = target_folder + "/" + filename;
 		current_player_state = player_state::RECORDING;
 	}
 
