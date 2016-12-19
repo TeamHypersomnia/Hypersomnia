@@ -332,7 +332,7 @@
     <ClCompile Include="augs\misc\http_requests.cpp" />
     <ClCompile Include="augs\misc\delta_compression.cpp" />
     <ClCompile Include="augs\misc\machine_entropy.cpp" />
-    <ClCompile Include="augs\misc\machine_entropy_buffer_and_player.cpp" />
+    <ClCompile Include="augs\misc\machine_entropy_player.cpp" />
     <ClCompile Include="augs\misc\pool_id.cpp" />
     <ClCompile Include="augs\misc\readable_bytesize.cpp" />
     <ClCompile Include="augs\misc\streams.cpp" />
@@ -1021,7 +1021,7 @@
     <ClInclude Include="augs\misc\easier_handle_getters_mixin.h" />
     <ClInclude Include="augs\misc\enum_bitset.h" />
     <ClInclude Include="augs\misc\http_requests.h" />
-    <ClInclude Include="augs\misc\machine_entropy_buffer_and_player.h" />
+    <ClInclude Include="augs\misc\machine_entropy_player.h" />
     <ClInclude Include="augs\misc\readable_bytesize.h" />
     <ClInclude Include="augs\misc\delta_compression.h" />
     <ClInclude Include="augs\misc\enum_associative_array.h" />
