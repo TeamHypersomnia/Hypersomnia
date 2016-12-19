@@ -14,6 +14,9 @@ namespace augs {
 			if (it != recording.end()) {
 				total_collected_entropy = (*it).second;
 			}
+			else {
+				total_collected_entropy.clear();
+			}
 
 			++player_step_position;
 		}
@@ -32,19 +35,9 @@ namespace augs {
 	bool machine_entropy_player::try_to_load_and_replay_recording(const std::string& filename) {
 		player_step_position = 0;
 		step_to_entropy_to_replay.clear();
-		
-		std::ifstream source(filename, std::ios::in | std::ios::binary);
 
-		while (source.peek() != EOF) {
-			unsigned step;
-			augs::machine_entropy ent;
+		read_map_until_eof(filename, step_to_entropy_to_replay);
 
-			augs::read_object(source, step);
-			augs::read_object(source, ent);
-
-			step_to_entropy_to_replay.emplace(step, std::move(ent));
-		}
-		
 		if (step_to_entropy_to_replay.empty()) {
 			return false;
 		}

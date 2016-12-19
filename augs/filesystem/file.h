@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <unordered_map>
 
 namespace augs {
 	bool file_exists(std::string filename);
@@ -16,7 +17,7 @@ namespace augs {
 	}
 
 	template <class T>
-	void assign_file_contents(std::string filename, T& target) {
+	void assign_file_contents(const std::string& filename, T& target) {
 		std::ifstream t(filename);
 
 		t.seekg(0, std::ios::end);
@@ -28,12 +29,27 @@ namespace augs {
 	}
 
 	template <class T>
-	void assign_file_contents_binary(std::string filename, T& target) {
+	void assign_file_contents_binary(const std::string& filename, T& target) {
 		std::ifstream file(filename, std::ios::binary | std::ios::ate);
 		std::streamsize size = file.tellg();
 		file.seekg(0, std::ios::beg);
 
 		target.reserve(static_cast<unsigned>(size));
 		file.read(target.data(), size);
+	}
+
+	template <class Key, class Value>
+	void read_map_until_eof(const std::string& filename, std::unordered_map<Key, Value>& into) {
+		std::ifstream source(filename, std::ios::in | std::ios::binary);
+
+		while (source.peek() != EOF) {
+			Key key;
+			Value value;
+
+			augs::read_object(source, key);
+			augs::read_object(source, value);
+
+			into.emplace(std::move(key), std::move(value));
+		}
 	}
 }
