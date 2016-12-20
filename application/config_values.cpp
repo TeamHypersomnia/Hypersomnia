@@ -50,4 +50,5 @@ void config_values::get_values(game_window& w) {
 	set(NVP(last_session_update_link));
 
 	set(NVP(director_scenario_filename));
+	set(NVP(menu_intro_scenario_filename));
 }

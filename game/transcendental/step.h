@@ -8,6 +8,7 @@
 
 #include "augs/templates/maybe_const.h"
 #include "game/transcendental/data_living_one_step.h"
+#include "game/transcendental/game_drawing_settings.h"
 
 class cosmos;
 struct immediate_hud;
@@ -73,6 +74,7 @@ public:
 	camera_cone camera;
 	entity_id viewed_character;
 
+	game_drawing_settings settings;
 	viewing_session& session;
 	augs::variable_delta delta;
 	augs::renderer& renderer;

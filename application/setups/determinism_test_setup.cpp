@@ -155,6 +155,11 @@ void determinism_test_setup::process(game_window& window) {
 
 		logged += typesafe_sprintf("Currently viewn cosmos: %x (F3 to switch)\n", currently_viewn_cosmos);
 
-		session.view(hypersomnias[currently_viewn_cosmos], testbeds[currently_viewn_cosmos].get_selected_character(), window, session.frame_timer.extract_variable_delta(hypersomnias[currently_viewn_cosmos].get_fixed_delta(), timer));
+		auto& renderer = augs::renderer::get_current();
+		renderer.clear_current_fbo();
+
+		session.view(renderer, hypersomnias[currently_viewn_cosmos], testbeds[currently_viewn_cosmos].get_selected_character(), session.frame_timer.extract_variable_delta(hypersomnias[currently_viewn_cosmos].get_fixed_delta(), timer));
+	
+		window.swap_buffers();
 	}
 }

@@ -1,16 +1,18 @@
 launch_modes = {
-	LOCAL = 0,
-	LOCAL_DETERMINISM_TEST = 1,
+	MAIN_MENU = 0,
+
+	LOCAL = 1,
+	LOCAL_DETERMINISM_TEST = 2,
 	-- Remember that in-game replayed results may look different due to disabled interpolation
 	-- in the director mode and different behaviour of audiovisual response systems.
-	DIRECTOR = 2,
+	DIRECTOR = 3,
 
-	ONLY_CLIENT = 3,
-	ONLY_SERVER = 4,
+	ONLY_CLIENT = 4,
+	ONLY_SERVER = 5,
 
-	CLIENT_AND_SERVER = 5,
+	CLIENT_AND_SERVER = 6,
 
-	TWO_CLIENTS_AND_SERVER = 6
+	TWO_CLIENTS_AND_SERVER = 7
 }
 
 recording_modes = {
@@ -72,7 +74,8 @@ config_table = {
 	post_data_file_path = "post.txt",
 	last_session_update_link = "patrykcysarz.pl/comment-system/web/stats/last-update/set",
 
-	director_scenario_filename = "director/menu.ent"
+	director_scenario_filename = "director/menu_intro.ent",
+	menu_intro_scenario_filename = "director/menu_intro.ent"
 }
 
 if config_table.debug_disable_cursor_clipping == 0 then

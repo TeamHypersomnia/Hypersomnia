@@ -223,10 +223,19 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 
 	if (!still_downloading) {
 		const auto vdt = session.frame_timer.extract_variable_delta(extrapolated_hypersomnia.get_fixed_delta(), timer);
-		
 
 		session.advance_audiovisual_systems(extrapolated_hypersomnia, scene.get_selected_character(), vdt);
+
+		auto& renderer = augs::renderer::get_current();
 		
-		session.view(extrapolated_hypersomnia, scene.get_selected_character(), window, vdt, client, swap_buffers);
+		if (swap_buffers) {
+			renderer.clear_current_fbo();
+		}
+
+		session.view(renderer, extrapolated_hypersomnia, scene.get_selected_character(), vdt, client);
+
+		if (swap_buffers) {
+			window.swap_buffers();
+		}
 	}
 }

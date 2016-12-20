@@ -100,37 +100,33 @@ void viewing_session::control(const augs::machine_entropy& entropy) {
 	}
 }
 
-void viewing_session::view(const cosmos& cosmos,
+void viewing_session::view(
+	augs::renderer& renderer,
+	const cosmos& cosmos,
 	const entity_id viewed_character,
-	game_window& window,
 	const augs::variable_delta& dt,
 	const augs::network::client& details,
-	const bool clear_current_and_swap_buffers
+	const game_drawing_settings settings
 ) {
 	using namespace augs::gui::text;
 	
-	auto custom_log = multiply_alpha(simple_bbcode(typesafe_sprintf("[color=cyan]Transmission details:[/color]\n%x", details.format_transmission_details()), style(assets::font_id::GUI_FONT, white)), 150.f / 255);;
+	const auto custom_log = multiply_alpha(simple_bbcode(typesafe_sprintf("[color=cyan]Transmission details:[/color]\n%x", details.format_transmission_details()), style(assets::font_id::GUI_FONT, white)), 150.f / 255);;
 
-	view(cosmos, viewed_character, window, dt, custom_log, clear_current_and_swap_buffers);
+	view(renderer, cosmos, viewed_character, dt, custom_log);
 }
 
-void viewing_session::view(const cosmos& cosmos,
+void viewing_session::view(
+	augs::renderer& renderer,
+	const cosmos& cosmos,
 	const entity_id viewed_character,
-	game_window& window,
 	const augs::variable_delta& dt,
 	const augs::gui::text::fstr& custom_log,
-	const bool clear_current_and_swap_buffers
+	const game_drawing_settings settings
 	) {
 	frame_profiler.new_measurement();
 
-	auto& renderer = renderer::get_current();
-
 	const auto screen_size = camera.camera.visible_world_area;
 	const vec2i screen_size_i(static_cast<int>(screen_size.x), static_cast<int>(screen_size.y));
-
-	if (clear_current_and_swap_buffers) {
-		renderer.clear_current_fbo();
-	}
 
 	renderer.set_viewport({ viewport_coordinates.x, viewport_coordinates.y, screen_size_i.x, screen_size_i.y });
 
@@ -141,6 +137,7 @@ void viewing_session::view(const cosmos& cosmos,
 	world_hover_highlighter.update(dt.in_milliseconds());
 	
 	viewing_step main_cosmos_viewing_step(cosmos, *this, dt, renderer, camera.smoothed_camera, character_chased_by_camera);
+	main_cosmos_viewing_step.settings = settings;
 
 #if NDEBUG || _DEBUG
 	rendering_scripts::illuminated_rendering(main_cosmos_viewing_step);
@@ -167,10 +164,6 @@ void viewing_session::view(const cosmos& cosmos,
 
 	triangles.measure(static_cast<double>(renderer.triangles_drawn_total));
 	renderer.triangles_drawn_total = 0;
-
-	if (clear_current_and_swap_buffers) {
-		window.swap_buffers();
-	}
 
 	fps_profiler.end_measurement();
 	fps_profiler.new_measurement();

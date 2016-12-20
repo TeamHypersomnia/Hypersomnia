@@ -43,6 +43,8 @@ public:
 	enum class launch_mode {
 		INVALID,
 
+		MAIN_MENU,
+
 		LOCAL,
 		LOCAL_DETERMINISM_TEST,
 		DIRECTOR,

@@ -128,6 +128,11 @@ void local_setup::process(game_window& window) {
 
 		session.advance_audiovisual_systems(hypersomnia, testbed.get_selected_character(), vdt);
 
-		session.view(hypersomnia, testbed.get_selected_character(), window, vdt);
+		auto& renderer = augs::renderer::get_current();
+		renderer.clear_current_fbo();
+
+		session.view(renderer, hypersomnia, testbed.get_selected_character(), vdt);
+
+		window.swap_buffers();
 	}
 }

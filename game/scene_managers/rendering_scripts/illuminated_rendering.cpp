@@ -147,6 +147,10 @@ namespace rendering_scripts {
 		default_shader.use();
 		
 		for (int i = render_layer::FLYING_BULLETS; i >= 0; --i) {
+			if (i == render_layer::CROSSHAIR && !step.settings.draw_crosshairs) {
+				continue;
+			}
+
 			render_system().draw_entities(interp, global_time_seconds,output, step.visible_per_layer[i], camera, renderable_drawing_type::NORMAL);
 		}
 		
@@ -197,7 +201,7 @@ namespace rendering_scripts {
 
 		hud.draw_vertically_flying_numbers(step);
 
-		if (controlled_entity.has<components::gui_element>()) {
+		if (step.settings.draw_gui_overlays && controlled_entity.has<components::gui_element>()) {
 			components::gui_element::draw_complete_gui_for_camera_rendering_request(output, controlled_entity, step);
 		}
 

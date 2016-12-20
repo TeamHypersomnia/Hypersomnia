@@ -19,6 +19,8 @@
 #include "game/systems_audiovisual/wandering_pixels_system.h"
 #include "game/systems_audiovisual/sound_system.h"
 
+#include "game_drawing_settings.h"
+
 class game_window;
 
 namespace augs {
@@ -27,6 +29,8 @@ namespace augs {
 	namespace network {
 		class client;
 	}
+
+	class renderer;
 }
 
 class viewing_session {
@@ -70,19 +74,21 @@ public:
 
 	void control(const augs::machine_entropy&);
 
-	void view(const cosmos& cosmos, 
+	void view(
+		augs::renderer& renderer,
+		const cosmos& cosmos,
 		const entity_id viewed_character,
-		game_window& window, 
-		const augs::variable_delta& dt, 
+		const augs::variable_delta& dt,
 		const augs::gui::text::fstr& custom_log = augs::gui::text::fstr(),
-		const bool clear_current_and_swap_buffers = true
+		const game_drawing_settings = game_drawing_settings()
 		);
 
-	void view(const cosmos& cosmos,
+	void view(
+		augs::renderer& renderer,
+		const cosmos& cosmos,
 		const entity_id viewed_character,
-		game_window& window,
 		const augs::variable_delta& dt,
 		const augs::network::client& details,
-		const bool clear_current_and_swap_buffers = true
+		const game_drawing_settings = game_drawing_settings()
 	);
 };

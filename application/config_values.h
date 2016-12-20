@@ -47,6 +47,7 @@ public:
 	std::string last_session_update_link;
 
 	std::string director_scenario_filename;
+	std::string menu_intro_scenario_filename;
 
 	void get_values(game_window&);
 };

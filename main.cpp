@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/global_libraries.h"
+#include "application/setups/menu_setup.h"
 #include "application/setups/local_setup.h"
 #include "application/setups/determinism_test_setup.h"
 #include "application/setups/two_clients_and_server_setup.h"
@@ -30,6 +31,12 @@ int main(int argc, char** argv) {
 	LOG("Launch mode: %x", static_cast<int>(mode));
 
 	switch (mode) {
+	case game_window::launch_mode::MAIN_MENU:
+	{
+		menu_setup setup;
+		setup.process(window);
+	}
+		break;
 	case game_window::launch_mode::LOCAL:
 	{
 		local_setup setup;

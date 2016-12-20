@@ -256,6 +256,11 @@ void director_setup::process(game_window& window) {
 			director_text += simple_bbcode(L"\n[color=yellow]Press F7 to save pending changes.[/color]", white_font);
 		}
 
-		session.view(hypersomnia, testbed.get_selected_character(), window, vdt, director_text);
+		auto& renderer = augs::renderer::get_current();
+		renderer.clear_current_fbo();
+
+		session.view(renderer, hypersomnia, testbed.get_selected_character(), vdt, director_text);
+
+		window.swap_buffers();
 	}
 }
