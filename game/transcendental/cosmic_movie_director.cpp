@@ -25,11 +25,15 @@ guid_mapped_entropy cosmic_movie_director::get_entropy_for_step(const unsigned s
 	return {};
 }
 
+bool cosmic_movie_director::is_recording_available() const {
+	return step_to_entropy.size() > 0;
+}
+
 bool cosmic_movie_director::load_recording_from_file(const std::string& filename) {
 	player_step_position = 0;
 	step_to_entropy.clear();
 
 	augs::read_map_until_eof(filename, step_to_entropy);
 
-	return step_to_entropy.size() > 0;
+	return is_recording_available();
 }

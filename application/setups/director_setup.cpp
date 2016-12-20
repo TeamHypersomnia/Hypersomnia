@@ -245,7 +245,7 @@ void director_setup::process(game_window& window) {
 
 		const auto white_font = style(assets::font_id::GUI_FONT, white);
 
-		auto director_text = format(L"Welcome to the director setup", white_font);
+		auto director_text = format(L"Welcome to the director setup.", white_font);
 		director_text += simple_bbcode(typesafe_sprintf(L"\nMode: %x", current_director_state == director_state::PLAYING ? "Playing" : "[color=red]Recording[/color]"), white_font);
 		director_text += format(typesafe_sprintf(L"\nRequested playing speed: %x", requested_playing_speed), white_font);
 		director_text += format(typesafe_sprintf(L"\nStep number: %x", get_step_number(hypersomnia)), white_font);

@@ -1,6 +1,8 @@
 launch_modes = {
 	LOCAL = 0,
 	LOCAL_DETERMINISM_TEST = 1,
+	-- Remember that in-game replayed results may look different due to disabled interpolation
+	-- in the director mode and different behaviour of audiovisual response systems.
 	DIRECTOR = 2,
 
 	ONLY_CLIENT = 3,
@@ -18,7 +20,7 @@ recording_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.DIRECTOR,
+	launch_mode = launch_modes.LOCAL,
 	
 	input_recording_mode = recording_modes.LIVE,
 	recording_replay_speed = 1,
