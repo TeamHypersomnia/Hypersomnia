@@ -21,6 +21,8 @@
 #include "augs/filesystem/file.h"
 #include "director_setup.h"
 
+#define LOG_REWINDING 0
+
 using namespace augs::window::event::keys;
 
 void director_setup::process(game_window& window) {
@@ -67,6 +69,22 @@ void director_setup::process(game_window& window) {
 	float requested_playing_speed = 0.f;
 
 	bool unsaved_changes_exist = false;
+
+	std::vector<cosmos> snapshots_for_rewinding;
+	
+	const auto initial_step_number = hypersomnia.get_total_steps_passed();
+
+	const double seconds_between_snapshots = 3.0;
+	const unsigned steps_between_snapshots = seconds_between_snapshots / hypersomnia.get_fixed_delta().in_seconds();
+
+	const auto get_step_number = [initial_step_number](const cosmos& cosm) {
+		ensure(initial_step_number <= cosm.get_total_steps_passed());
+
+		return cosm.get_total_steps_passed() - initial_step_number;
+	};
+
+	LOG("Seconds between rewind snapshots: %x", seconds_between_snapshots);
+	LOG("Steps between rewind snapshots: %x", steps_between_snapshots);
 
 	while (!should_quit) {
 		{
@@ -135,6 +153,43 @@ void director_setup::process(game_window& window) {
 		}
 
 		if (advance_steps_forward < 0) {
+			const auto current_step = get_step_number(hypersomnia);
+			const auto rewound_step = -advance_steps_forward > current_step ? 0 : current_step + advance_steps_forward;
+
+#if LOG_REWINDING
+			LOG("Current step: %x\nRewound step: %x", current_step, rewound_step);
+#endif
+
+			if (rewound_step < current_step) {
+				const size_t resimulated_cosmos_index = rewound_step / steps_between_snapshots;
+				
+#if LOG_REWINDING
+				LOG_NVPS(snapshots_for_rewinding.size());
+				LOG_NVPS(resimulated_cosmos_index);
+#endif
+
+				if (snapshots_for_rewinding.size() > 1 && resimulated_cosmos_index < snapshots_for_rewinding.size() - 1) {
+					snapshots_for_rewinding.erase(snapshots_for_rewinding.begin() + resimulated_cosmos_index + 1, snapshots_for_rewinding.end());
+				}
+
+				hypersomnia = snapshots_for_rewinding.at(resimulated_cosmos_index);
+				
+#if LOG_REWINDING
+				LOG("Resimulated hypersomnia step: %x", get_step_number(hypersomnia));
+#endif
+
+				while (get_step_number(hypersomnia) < rewound_step) {
+					const guid_mapped_entropy replayed_entropy = director.get_entropy_for_step(get_step_number(hypersomnia));
+					const cosmic_entropy cosmic_entropy_for_this_advancement = cosmic_entropy(replayed_entropy, hypersomnia);
+
+					hypersomnia.advance_deterministic_schemata(cosmic_entropy_for_this_advancement, [](auto) {},
+						[this, &session](const const_logic_step& step) {
+							session.acquire_game_events_for_hud(step);
+						}
+					);
+				}
+			}
+
 			advance_steps_forward = 0;
 		}
 
@@ -147,7 +202,11 @@ void director_setup::process(game_window& window) {
 
 		while (steps--) {
 			cosmic_entropy cosmic_entropy_for_this_advancement;
-			const auto current_step = hypersomnia.get_total_steps_passed();
+			const auto current_step = get_step_number(hypersomnia);
+
+			if (current_step % steps_between_snapshots == 0) {
+				snapshots_for_rewinding.push_back(hypersomnia);
+			}
 
 			if (current_director_state == director_state::PLAYING) {
 				guid_mapped_entropy replayed_entropy = director.get_entropy_for_step(current_step);
@@ -189,8 +248,8 @@ void director_setup::process(game_window& window) {
 		auto director_text = format(L"Welcome to the director setup", white_font);
 		director_text += simple_bbcode(typesafe_sprintf(L"\nMode: %x", current_director_state == director_state::PLAYING ? "Playing" : "[color=red]Recording[/color]"), white_font);
 		director_text += format(typesafe_sprintf(L"\nRequested playing speed: %x", requested_playing_speed), white_font);
-		director_text += format(typesafe_sprintf(L"\nStep number: %x", hypersomnia.get_total_steps_passed()), white_font);
-		director_text += format(typesafe_sprintf(L"\nTime: %x", hypersomnia.get_total_time_passed_in_seconds()), white_font);
+		director_text += format(typesafe_sprintf(L"\nStep number: %x", get_step_number(hypersomnia)), white_font);
+		director_text += format(typesafe_sprintf(L"\nTime: %x", get_step_number(hypersomnia)*hypersomnia.get_fixed_delta().in_seconds()), white_font);
 		director_text += format(typesafe_sprintf(L"\nControlling entity %x of %x", testbed.current_character_index, testbed.characters.size()), white_font);
 
 		if (unsaved_changes_exist) {
