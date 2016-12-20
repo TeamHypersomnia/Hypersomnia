@@ -96,13 +96,13 @@ namespace augs {
 				auto opening_bracket_of_first = _str.find(L"[color=");
 
 				while (opening_bracket_of_first != std::wstring::npos) {
-					auto opening_bracket_of_second = _str.find(L"[/color]", opening_bracket_of_first);
-					auto closing_bracket_of_second = opening_bracket_of_second + 8;
+					const auto opening_bracket_of_second = _str.find(L"[/color]", opening_bracket_of_first);
+					const auto closing_bracket_of_second = opening_bracket_of_second + 8;
 
-					auto first_letter_of_argument = opening_bracket_of_first + 7;
-					auto closing_bracket_of_first = _str.find(L']', first_letter_of_argument);
+					const auto first_letter_of_argument = opening_bracket_of_first + 7;
+					const auto closing_bracket_of_first = _str.find(L']', first_letter_of_argument);
 
-					auto argument = _str.substr(first_letter_of_argument, closing_bracket_of_first - first_letter_of_argument);
+					const auto argument = _str.substr(first_letter_of_argument, closing_bracket_of_first - first_letter_of_argument);
 
 					style newstyle = s;
 
@@ -133,12 +133,19 @@ namespace augs {
 					if (argument == L"violet") {
 						newstyle.color = violet;
 					}
+					if (argument == L"red") {
+						newstyle.color = red;
+					}
+					if (argument == L"yellow") {
+						newstyle.color = yellow;
+					}
 					if (argument == L"white") {
 						newstyle.color = white;
 					}
 
-					for (size_t c = closing_bracket_of_first + 1; c < opening_bracket_of_second; ++c)
+					for (size_t c = closing_bracket_of_first + 1; c < opening_bracket_of_second; ++c) {
 						out[c].set(newstyle.f, newstyle.color);
+					}
 
 					opening_bracket_of_first = _str.find(L"[color=", closing_bracket_of_second);
 				}

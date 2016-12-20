@@ -51,7 +51,7 @@ void client_setup::init(game_window& window, const std::string recording_filenam
 	detailed_step_log = cfg.tickrate <= 2;
 
 	if (!hypersomnia.load_from_file("save.state")) {
-		hypersomnia.set_fixed_delta(augs::fixed_delta(cfg.tickrate));
+		hypersomnia.set_fixed_delta(cfg.tickrate);
 		scene.populate_world_with_entities(hypersomnia);
 	}
 

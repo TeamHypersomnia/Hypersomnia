@@ -21,6 +21,8 @@
 #include "augs/filesystem/file.h"
 #include "local_setup.h"
 
+using namespace augs::window::event::keys;
+
 void local_setup::process(game_window& window) {
 	const vec2i screen_size = vec2i(window.get_screen_rect());
 	const auto& cfg = window.config;
@@ -35,7 +37,7 @@ void local_setup::process(game_window& window) {
 	testbed.debug_var = window.config.debug_var;
 
 	if (!hypersomnia.load_from_file("save.state")) {
-		hypersomnia.set_fixed_delta(augs::fixed_delta(cfg.tickrate));
+		hypersomnia.set_fixed_delta(cfg.tickrate);
 		testbed.populate_world_with_entities(hypersomnia, screen_size);
 	}
 
@@ -70,16 +72,16 @@ void local_setup::process(game_window& window) {
 
 			for (const auto& raw_input : new_entropy.local) {
 				if (raw_input.was_any_key_pressed()) {
-					if (raw_input.key == augs::window::event::keys::key::_4) {
+					if (raw_input.key == key::_4) {
 						timer.set_stepping_speed_multiplier(0.1f);
 					}
-					if (raw_input.key == augs::window::event::keys::key::_5) {
+					if (raw_input.key == key::_5) {
 						timer.set_stepping_speed_multiplier(1.f);
 					}
-					if (raw_input.key == augs::window::event::keys::key::_6) {
+					if (raw_input.key == key::_6) {
 						timer.set_stepping_speed_multiplier(6.f);
 					}
-					if (raw_input.key == augs::window::event::keys::key::F2) {
+					if (raw_input.key == key::F2) {
 						LOG_COLOR(console_color::YELLOW, "Separator");
 					}
 				}
@@ -93,13 +95,13 @@ void local_setup::process(game_window& window) {
 
 			for (const auto& raw_input : total_collected_entropy.local) {
 				if (raw_input.was_any_key_pressed()) {
-					if (raw_input.key == augs::window::event::keys::key::_1) {
+					if (raw_input.key == key::_1) {
 						hypersomnia.set_fixed_delta(cfg.tickrate);
 					}
-					if (raw_input.key == augs::window::event::keys::key::_2) {
+					if (raw_input.key == key::_2) {
 						hypersomnia.set_fixed_delta(128);
 					}
-					if (raw_input.key == augs::window::event::keys::key::_3) {
+					if (raw_input.key == key::_3) {
 						hypersomnia.set_fixed_delta(144);
 					}
 				}

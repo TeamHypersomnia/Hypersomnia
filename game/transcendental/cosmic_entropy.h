@@ -10,6 +10,12 @@
 class cosmos;
 struct input_context;
 
+std::vector<entity_intent> make_intents_for_entity(
+	const const_entity_handle controlled_entity,
+	const augs::machine_entropy::local_type& local,
+	const input_context& context
+);
+
 template <class key>
 struct basic_cosmic_entropy {
 	std::map<key, std::vector<entity_intent>> entropy_per_entity;
@@ -50,7 +56,12 @@ struct guid_mapped_entropy : basic_cosmic_entropy<unsigned> {
 struct cosmic_entropy : basic_cosmic_entropy<entity_id> {
 	cosmic_entropy() = default;
 	explicit cosmic_entropy(const guid_mapped_entropy&, const cosmos&);
-	explicit cosmic_entropy(const const_entity_handle controlled_entity, const augs::machine_entropy::local_type& local, const input_context& context);
+	
+	explicit cosmic_entropy(
+		const const_entity_handle controlled_entity, 
+		const augs::machine_entropy::local_type& local, 
+		const input_context& context
+	);
 
 	cosmic_entropy& operator+=(const cosmic_entropy& b) {
 		basic_cosmic_entropy<entity_id>::operator+=(b);

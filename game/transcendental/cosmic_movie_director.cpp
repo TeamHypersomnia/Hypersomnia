@@ -7,7 +7,22 @@
 #include <fstream>
 
 void cosmic_movie_director::save_recording_to_file(const std::string& filename) const {
-	//player.record(filename)
+	std::ofstream f(filename, std::ios::out | std::ios::binary);
+
+	for (const auto& it : step_to_entropy) {
+		augs::write_object(f, it.first);
+		augs::write_object(f, it.second);
+	}
+}
+
+guid_mapped_entropy cosmic_movie_director::get_entropy_for_step(const unsigned step) const {
+	const auto it = step_to_entropy.find(step);
+
+	if (it != step_to_entropy.end()) {
+		return (*it).second;
+	}
+
+	return {};
 }
 
 bool cosmic_movie_director::load_recording_from_file(const std::string& filename) {

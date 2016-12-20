@@ -21,6 +21,8 @@
 #include "augs/filesystem/file.h"
 #include "director_setup.h"
 
+using namespace augs::window::event::keys;
+
 void director_setup::process(game_window& window) {
 	const vec2i screen_size = vec2i(window.get_screen_rect());
 	const auto& cfg = window.config;
@@ -35,7 +37,7 @@ void director_setup::process(game_window& window) {
 	testbed.debug_var = window.config.debug_var;
 
 	if (!hypersomnia.load_from_file("save.state")) {
-		hypersomnia.set_fixed_delta(augs::fixed_delta(cfg.tickrate));
+		hypersomnia.set_fixed_delta(cfg.tickrate);
 		testbed.populate_world_with_entities(hypersomnia, screen_size);
 	}
 
@@ -64,6 +66,8 @@ void director_setup::process(game_window& window) {
 
 	float requested_playing_speed = 0.f;
 
+	bool unsaved_changes_exist = false;
+
 	while (!should_quit) {
 		{
 			augs::machine_entropy new_entropy;
@@ -76,46 +80,50 @@ void director_setup::process(game_window& window) {
 
 			process_exit_key(new_entropy.local);
 
-			total_collected_entropy += new_entropy;
+			if (current_director_state == director_state::RECORDING) {
+				total_collected_entropy += new_entropy;
+			}
 
 			for (const auto& raw_input : new_entropy.local) {
 				events.apply(raw_input);
 
 				if (raw_input.was_any_key_pressed()) {
-					if (raw_input.key == augs::window::event::keys::key::F2) {
+					if (raw_input.key == key::F2) {
 						current_director_state = director_state::PLAYING;
 					}
-					if (raw_input.key == augs::window::event::keys::key::F3) {
+					if (raw_input.key == key::F3) {
 						current_director_state = director_state::RECORDING;
+						total_collected_entropy.clear();
 					}
-					if (raw_input.key == augs::window::event::keys::key::F7) {
+					if (raw_input.key == key::F7) {
 						director.save_recording_to_file(output_director_file);
+						unsaved_changes_exist = false;
 					}
 
-					if (raw_input.key == augs::window::event::keys::key::_1) {
+					if (raw_input.key == key::_1) {
 						advance_steps_forward = -1;
 
-						if (events.is_set(augs::window::event::keys::key::LCTRL)) {
+						if (events.is_set(key::LCTRL)) {
 							advance_steps_forward *= 10;
 						}
 					}
-					if (raw_input.key == augs::window::event::keys::key::_2) {
+					if (raw_input.key == key::_2) {
 						advance_steps_forward = 1;
 
-						if (events.is_set(augs::window::event::keys::key::LCTRL)) {
+						if (events.is_set(key::LCTRL)) {
 							advance_steps_forward *= 10;
 						}
 					}
-					if (raw_input.key == augs::window::event::keys::key::_3) {
+					if (raw_input.key == key::_3) {
 						requested_playing_speed = 0.f;
 					}
-					if (raw_input.key == augs::window::event::keys::key::_4) {
+					if (raw_input.key == key::_4) {
 						requested_playing_speed = 0.1f;
 					}
-					if (raw_input.key == augs::window::event::keys::key::_5) {
+					if (raw_input.key == key::_5) {
 						requested_playing_speed = 1.f;
 					}
-					if (raw_input.key == augs::window::event::keys::key::_6) {
+					if (raw_input.key == key::_6) {
 						requested_playing_speed = 6.f;
 					}
 				}
@@ -135,14 +143,26 @@ void director_setup::process(game_window& window) {
 		steps += advance_steps_forward;
 		advance_steps_forward = 0;
 
+		const auto selected_character = hypersomnia[testbed.get_selected_character()];
+
 		while (steps--) {
 			cosmic_entropy cosmic_entropy_for_this_advancement;
+			const auto current_step = hypersomnia.get_total_steps_passed();
 
 			if (current_director_state == director_state::PLAYING) {
-				guid_mapped_entropy replayed_entropy;
-				//director.player.replay_next_step(replayed_entropy);
+				guid_mapped_entropy replayed_entropy = director.get_entropy_for_step(current_step);
 
 				cosmic_entropy_for_this_advancement = cosmic_entropy(replayed_entropy, hypersomnia);
+			}
+			else if (current_director_state == director_state::RECORDING) {
+				guid_mapped_entropy& recorded_entropy = director.step_to_entropy[current_step];
+
+				recorded_entropy.entropy_per_entity[selected_character.get_guid()]
+					= make_intents_for_entity(selected_character, total_collected_entropy.local, session.context);
+				
+				cosmic_entropy_for_this_advancement = cosmic_entropy(recorded_entropy, hypersomnia);
+
+				unsaved_changes_exist = true;
 			}
 
 			renderer::get_current().clear_logic_lines();
@@ -162,15 +182,21 @@ void director_setup::process(game_window& window) {
 
 		session.advance_audiovisual_systems(hypersomnia, testbed.get_selected_character(), vdt);
 
-		std::wstring director_text = L"Welcome to the director setup";
-		director_text += typesafe_sprintf(L"\nMode: %x", current_director_state == director_state::PLAYING ? "Playing" : "Recording");
-		director_text += typesafe_sprintf(L"\nRequested playing speed: %x", requested_playing_speed);
-		director_text += typesafe_sprintf(L"\nStep number: %x", hypersomnia.get_total_steps_passed());
-		director_text += typesafe_sprintf(L"\nTime: %x", hypersomnia.get_total_time_passed_in_seconds());
-		director_text += typesafe_sprintf(L"\nControlling entity %x of %x", testbed.current_character_index, testbed.characters.size());
+		using namespace augs::gui::text;
 
-		const auto director_log = augs::gui::text::format(director_text, augs::gui::text::style(assets::font_id::GUI_FONT, white));
+		const auto white_font = style(assets::font_id::GUI_FONT, white);
 
-		session.view(hypersomnia, testbed.get_selected_character(), window, vdt, director_log);
+		auto director_text = format(L"Welcome to the director setup", white_font);
+		director_text += simple_bbcode(typesafe_sprintf(L"\nMode: %x", current_director_state == director_state::PLAYING ? "Playing" : "[color=red]Recording[/color]"), white_font);
+		director_text += format(typesafe_sprintf(L"\nRequested playing speed: %x", requested_playing_speed), white_font);
+		director_text += format(typesafe_sprintf(L"\nStep number: %x", hypersomnia.get_total_steps_passed()), white_font);
+		director_text += format(typesafe_sprintf(L"\nTime: %x", hypersomnia.get_total_time_passed_in_seconds()), white_font);
+		director_text += format(typesafe_sprintf(L"\nControlling entity %x of %x", testbed.current_character_index, testbed.characters.size()), white_font);
+
+		if (unsaved_changes_exist) {
+			director_text += simple_bbcode(L"\n[color=yellow]Press F7 to save pending changes.[/color]", white_font);
+		}
+
+		session.view(hypersomnia, testbed.get_selected_character(), window, vdt, director_text);
 	}
 }

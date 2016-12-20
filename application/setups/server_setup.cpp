@@ -93,7 +93,7 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 	const bool detailed_step_log = cfg.tickrate <= 2;
 
 	if (!hypersomnia.load_from_file("server_save.state")) {
-		hypersomnia.set_fixed_delta(augs::fixed_delta(cfg.tickrate));
+		hypersomnia.set_fixed_delta(cfg.tickrate);
 		scene.populate_world_with_entities(hypersomnia);
 	}
 

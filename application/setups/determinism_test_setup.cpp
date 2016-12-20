@@ -42,7 +42,7 @@ void determinism_test_setup::process(game_window& window) {
 	}
 	else {
 		for (size_t i = 0; i < cosmoi_count; ++i) {
-			hypersomnias[i].set_fixed_delta(augs::fixed_delta(cfg.tickrate));
+			hypersomnias[i].set_fixed_delta(cfg.tickrate);
 			testbeds[i].populate_world_with_entities(hypersomnias[i], vec2i(1920, 1080));
 		}
 	}
