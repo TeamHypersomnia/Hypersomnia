@@ -164,7 +164,7 @@ namespace augs {
 		return get_id();
 	}
 	
-	std::vector<int16_t> sound_buffer::mix_stereo_to_mono(const std::vector<int16_t>& samples) {
+	std::vector<int16_t> mix_stereo_to_mono(const std::vector<int16_t>& samples) {
 		ensure(samples.size() % 2 == 0);
 		
 		std::vector<int16_t> output;
@@ -177,7 +177,7 @@ namespace augs {
 		return std::move(output);
 	}
 
-	single_sound_buffer::data_type sound_buffer::get_data_from_file(const std::string filename) {
+	single_sound_buffer::data_type get_sound_samples_from_file(const std::string filename) {
 		SF_INFO info;
 		std::memset(&info, 0, sizeof(info));
 
@@ -218,7 +218,7 @@ namespace augs {
 			}
 
 			variation new_variation;
-			new_variation.set_data(get_data_from_file(target_filename), generate_mono);
+			new_variation.set_data(get_sound_samples_from_file(target_filename), generate_mono);
 			variations.emplace_back(std::move(new_variation));
 		}
 

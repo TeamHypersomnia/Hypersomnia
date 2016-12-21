@@ -19,6 +19,9 @@
 
 #include "augs/misc/machine_entropy_player.h"
 
+#include "augs/audio/sound_buffer.h"
+#include "augs/audio/sound_source.h"
+
 #include "augs/filesystem/file.h"
 #include "menu_setup.h"
 
@@ -29,6 +32,15 @@ void menu_setup::process(game_window& window) {
 	const auto& cfg = window.config;
 
 	cosmos intro_scene(3000);
+	
+	augs::single_sound_buffer menu_theme;
+	menu_theme.set_data(augs::get_sound_samples_from_file("hypersomnia/music/menu_theme.ogg"));
+
+	augs::sound_source menu_theme_source;
+	menu_theme_source.bind_buffer(menu_theme);
+	menu_theme_source.set_direct_channels(true);
+	menu_theme_source.set_gain(cfg.music_volume);
+	menu_theme_source.play();
 
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
@@ -49,7 +61,7 @@ void menu_setup::process(game_window& window) {
 
 	testbed.configure_view(session);
 
-	session.set_master_gain(cfg.sound_effects_volume * 0.5f);
+	session.set_master_gain(cfg.sound_effects_volume * 0.2f);
 
 	timer.reset_timer();
 

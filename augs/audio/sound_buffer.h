@@ -56,8 +56,6 @@ namespace augs {
 
 		std::vector<variation> variations;
 	
-		static single_sound_buffer::data_type get_data_from_file(const std::string);
-		static std::vector<int16_t> mix_stereo_to_mono(const std::vector<int16_t>&);
 	public:
 		void from_file(const std::string filename, const bool generate_mono = true);
 
@@ -68,4 +66,7 @@ namespace augs {
 		ALuint get_id() const;
 		operator ALuint() const;
 	};
+
+	single_sound_buffer::data_type get_sound_samples_from_file(const std::string);
+	std::vector<int16_t> mix_stereo_to_mono(const std::vector<int16_t>&);
 }
