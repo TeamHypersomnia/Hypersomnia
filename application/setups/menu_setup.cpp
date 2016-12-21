@@ -53,7 +53,9 @@ void menu_setup::process(game_window& window) {
 	std::unique_ptr<action> ac(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 0, 3000.f));
 
 	{
-		intro_actions.push_non_blocking(std::unique_ptr<action>(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 70, 5000.f)));
+		intro_actions.push_blocking(std::unique_ptr<action>(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 100, 6000.f)));
+		intro_actions.push_blocking(std::unique_ptr<action>(new augs::delay_action(2000.f)));
+		intro_actions.push_blocking(std::unique_ptr<action>(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 0, 500.f)));
 	}
 
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);

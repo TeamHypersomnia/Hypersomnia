@@ -7,6 +7,11 @@ namespace augs {
 		size_t i = 0;
 		
 		while (i < actions.size()) {
+			if (!actions[i]->has_started) {
+				actions[i]->on_enter();
+				actions[i]->has_started = true;
+			}
+
 			actions[i]->on_update(dt);
 
 			if (actions[i]->is_complete()) {

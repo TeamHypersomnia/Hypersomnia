@@ -337,6 +337,7 @@
     <ClCompile Include="augs\misc\machine_entropy_player.cpp" />
     <ClCompile Include="augs\misc\pool_id.cpp" />
     <ClCompile Include="augs\misc\readable_bytesize.cpp" />
+    <ClCompile Include="augs\misc\standard_actions.cpp" />
     <ClCompile Include="augs\misc\streams.cpp" />
     <ClCompile Include="augs\misc\time_utils.cpp" />
     <ClCompile Include="augs\network\network_client.cpp" />
