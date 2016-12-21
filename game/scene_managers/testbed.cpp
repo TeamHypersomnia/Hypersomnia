@@ -7,6 +7,8 @@
 #include "game/systems_stateless/render_system.h"
 #include "game/systems_stateless/particles_existence_system.h"
 #include "game/systems_stateless/gui_system.h"
+#include "game/systems_stateless/car_system.h"
+#include "game/systems_stateless/driver_system.h"
 #include "game/components/sentience_component.h"
 #include "game/components/attitude_component.h"
 #include "game/components/name_component.h"
@@ -58,14 +60,14 @@ namespace scene_managers {
 		//	}
 		//}
 
-		for (int x = -4 * 1; x < 4 * 1; ++x)
-		{
-			auto frog = world.create_entity("frog");
-			ingredients::sprite(frog, vec2(100 + x * 40, 200 + 400), assets::texture_id::TEST_SPRITE, augs::white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::see_through_dynamic_body(frog);
-			name_entity(frog, entity_name::CRATE);
-			frog.add_standard_components();
-		}
+		//for (int x = -4 * 1; x < 4 * 1; ++x)
+		//{
+		//	auto frog = world.create_entity("frog");
+		//	ingredients::sprite(frog, vec2(100 + x * 40, 200 + 400), assets::texture_id::TEST_SPRITE, augs::white, render_layer::SMALL_DYNAMIC_BODY);
+		//	ingredients::see_through_dynamic_body(frog);
+		//	name_entity(frog, entity_name::CRATE);
+		//	frog.add_standard_components();
+		//}
 
 		const auto car = prefabs::create_car(world, components::transform( 1490, 340, -180));
 		const auto car2 = prefabs::create_car(world, components::transform(1490, 340 + 400, -180));
@@ -73,28 +75,7 @@ namespace scene_managers {
 
 		const auto motorcycle = prefabs::create_motorcycle(world, components::transform(0, 400, -90));
 		//prefabs::create_motorcycle(world, components::transform(100, -600, -90));
-		prefabs::create_motorcycle(world, components::transform(1200, 25600, 0));
-
-		const auto bg_size = assets::get_size(assets::texture_id::TEST_BACKGROUND);
-
-		const int num_floors = 10 * 10;
-		const int side = sqrt(num_floors) / 2;
-
-		for (int x = -side; x < side; ++x) {
-			for (int y = -side; y < side*8; ++y)
-			{
-				//auto background = world.create_entity("bg[-]");
-				//ingredients::sprite(background, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 550)), assets::texture_id::TEST_BACKGROUND, augs::white, render_layer::GROUND);
-				//ingredients::standard_static_body(background);
-
-				auto street = world.create_entity("street[-]");
-				ingredients::sprite(street, { bg_size * vec2(x, y) },
-					assets::texture_id::TEST_BACKGROUND, augs::gray1, render_layer::GROUND);
-
-				//background.add_standard_components();
-				street.add_standard_components();
-			}
-		}
+		const auto main_character_motorcycle = prefabs::create_motorcycle(world, components::transform(900, 35200, -90));
 
 		{
 			vec2 coords[] = {
@@ -102,6 +83,8 @@ namespace scene_managers {
 				{ 1200, 10400 },
 				{ 1200, 15400 },
 				{ 1200, 20400 },
+				{ -1, 25400 },
+				{ 1200, 30400 },
 			};
 
 			for (const auto c : coords) {
@@ -110,7 +93,7 @@ namespace scene_managers {
 				prefabs::create_crate(world, c + vec2(100, -200) );
 
 				const auto light_pos = c + vec2(0, 100);
-				const auto light_cyan = rgba(30, 255, 255, 255);
+				const auto light_cyan = c.x < 0 ? orange : rgba(30, 255, 255, 255);
 
 				{
 					const auto l = world.create_entity("l");
@@ -120,6 +103,13 @@ namespace scene_managers {
 					light.max_distance.base_value = 4500.f;
 					light.constant.base_value = 0.15f;
 					light.linear.base_value = 0.000005f;
+
+					if (light_cyan == orange) {
+						light.max_distance.base_value = 5500.f;
+						light.constant.base_value = 0.10f;
+						light.linear.base_value = 0.000002f;
+					}
+
 					light.wall_max_distance.base_value = 4000.f;
 					l.add_standard_components();
 				}
@@ -395,6 +385,27 @@ namespace scene_managers {
 					prefabs::create_brick_wall(world, components::transform(-3 - 16 + 100 - 160, -32 - 96 + 160 - 160*b, 90), { 160, 160 });
 				}
 
+				const auto bg_size = assets::get_size(assets::texture_id::TEST_BACKGROUND);
+
+				const int num_floors = 10 * 10;
+				const int side = sqrt(num_floors) / 2;
+
+				for (int x = -side; x < side; ++x) {
+					for (int y = -side; y < side * 16; ++y)
+					{
+						//auto background = world.create_entity("bg[-]");
+						//ingredients::sprite(background, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 550)), assets::texture_id::TEST_BACKGROUND, augs::white, render_layer::GROUND);
+						//ingredients::standard_static_body(background);
+
+						auto street = world.create_entity("street[-]");
+						ingredients::sprite(street, { bg_size * vec2(x, y) },
+							assets::texture_id::TEST_BACKGROUND, augs::gray1, render_layer::GROUND);
+
+						//background.add_standard_components();
+						street.add_standard_components();
+					}
+				}
+
 				const auto size = assets::get_size(assets::texture_id::ROAD_FRONT_DIRT);
 
 				{
@@ -405,7 +416,7 @@ namespace scene_managers {
 					road_dirt.add_standard_components();
 				}
 
-				for (int r = 0; r < 18; ++r) {
+				for (int r = 0; r < 28; ++r) {
 					const auto size = assets::get_size(assets::texture_id::ROAD);
 
 					auto road = world.create_entity("road[-]");
@@ -513,6 +524,9 @@ namespace scene_managers {
 
 		if (character(0).alive()) {
 			name_entity(character(0), entity_name::PERSON, L"Newborn");
+
+			driver_system().assign_car_ownership(character(0), main_character_motorcycle);
+			main_character_motorcycle.get<components::car>().accelerating = true;
 		}
 
 		select_character(character(0));
@@ -568,9 +582,9 @@ namespace scene_managers {
 		const auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
 		prefabs::create_sample_backpack(world, vec2(200, -750));
 
-		perform_transfer({ backpack, character(0)[slot_function::SHOULDER_SLOT] }, step);
-		perform_transfer({ submachine, character(0)[slot_function::PRIMARY_HAND] }, step);
-		perform_transfer({ rifle, character(0)[slot_function::SECONDARY_HAND] }, step);
+		//perform_transfer({ backpack, character(0)[slot_function::SHOULDER_SLOT] }, step);
+		//perform_transfer({ submachine, character(0)[slot_function::PRIMARY_HAND] }, step);
+		//perform_transfer({ rifle, character(0)[slot_function::SECONDARY_HAND] }, step);
 
 		if (character(1).alive()) {
 			name_entity(character(1), entity_name::PERSON, L"Sentinel");

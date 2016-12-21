@@ -6,9 +6,10 @@ class cosmos;
 
 class driver_system {
 	bool change_car_ownership(entity_handle driver, entity_handle car, bool lost);
+public:
 	bool release_car_ownership(entity_handle driver);
 	bool assign_car_ownership(entity_handle driver, entity_handle car);
-public:
+
 	void assign_drivers_from_successful_trigger_hits(logic_step& step);
 
 	void release_drivers_due_to_requests(logic_step& step);

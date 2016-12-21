@@ -169,6 +169,7 @@ pip-log.txt
 /output/sessions
 /output/server_sessions
 /output/saves
+/output/hypersomnia/music
 
 *.log
 *.tlog

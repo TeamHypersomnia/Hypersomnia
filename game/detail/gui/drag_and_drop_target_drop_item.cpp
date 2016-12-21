@@ -16,16 +16,19 @@ drag_and_drop_target_drop_item::drag_and_drop_target_drop_item(const augs::gui::
 	unset_flag(augs::gui::flag::ENABLE_DRAWING);
 }
 
-void drag_and_drop_target_drop_item::draw(const viewing_gui_context& context, const const_this_pointer& this_id, augs::gui::draw_info info) {
-	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING))
+void drag_and_drop_target_drop_item::draw(const viewing_gui_context& context, const const_this_pointer& this_id, const augs::gui::draw_info info) {
+	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING)) {
 		return;
+	}
 
 	auto mat_coloured = this_id->mat;
 
-	if (this_id->detector.is_hovered)
+	if (this_id->detector.is_hovered) {
 		mat_coloured.color.a = 255;
-	else
+	}
+	else {
 		mat_coloured.color.a = 120;
+	}
 
 	draw_centered_texture(context, this_id, info, mat_coloured);
 }
