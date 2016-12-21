@@ -23,6 +23,8 @@
 #include "augs/audio/sound_source.h"
 
 #include "augs/filesystem/file.h"
+#include "augs/misc/action_list.h"
+#include "augs/misc/standard_actions.h"
 #include "menu_setup.h"
 
 using namespace augs::window::event::keys;
@@ -44,6 +46,15 @@ void menu_setup::process(game_window& window) {
 		menu_theme_source.play();
 	}
 
+	rgba fade_overlay_color = black;
+
+	augs::action_list intro_actions;
+	std::unique_ptr<action> ac(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 0, 3000.f));
+
+	{
+		intro_actions.push_non_blocking(std::unique_ptr<action>(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 70, 5000.f)));
+	}
+
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
 	scene_managers::testbed testbed;
@@ -56,6 +67,7 @@ void menu_setup::process(game_window& window) {
 	session.reserve_caches_for_entities(3000);
 	session.camera.configure_size(screen_size);
 	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
+	session.show_profile_details = false;
 
 	cosmic_movie_director director;
 	director.load_recording_from_file(cfg.menu_intro_scenario_filename);
@@ -110,6 +122,9 @@ void menu_setup::process(game_window& window) {
 		settings.draw_crosshairs = false;
 
 		session.view(renderer, intro_scene, testbed.get_selected_character(), vdt, augs::gui::text::fstr(), settings);
+		session.draw_color_overlay(renderer, fade_overlay_color);
+
+		intro_actions.update(vdt);
 
 		window.swap_buffers();
 	}

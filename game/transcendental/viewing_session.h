@@ -92,4 +92,6 @@ public:
 		const augs::network::client& details,
 		const game_drawing_settings = game_drawing_settings()
 	);
+
+	void draw_color_overlay(augs::renderer& renderer, const rgba) const;
 };

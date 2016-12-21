@@ -173,3 +173,18 @@ void viewing_session::view(
 	fps_profiler.new_measurement();
 	frame_profiler.end_measurement();
 }
+
+void viewing_session::draw_color_overlay(augs::renderer& renderer, const rgba col) const {
+	components::sprite overlay;
+	overlay.set(assets::texture_id::BLANK, col);
+	overlay.size = camera.smoothed_camera.visible_world_area;
+
+	components::sprite::drawing_input in(renderer.get_triangle_buffer());
+	in.camera = camera.smoothed_camera;
+	in.renderable_transform = camera.smoothed_camera.transform;
+
+	overlay.draw(in);
+
+	renderer.call_triangles();
+	renderer.clear_triangles();
+}
