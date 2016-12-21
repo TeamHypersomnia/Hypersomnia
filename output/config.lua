@@ -22,7 +22,7 @@ recording_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.MAIN_MENU,
+	launch_mode = launch_modes.LOCAL,
 	
 	input_recording_mode = recording_modes.LIVE,
 	recording_replay_speed = 1,
@@ -40,7 +40,7 @@ config_table = {
 	doublebuffer = 1,
 
 	sound_effects_volume = 1,
-	music_volume = 0,
+	music_volume = 1,
 
 	debug_disable_cursor_clipping = 0,
 	

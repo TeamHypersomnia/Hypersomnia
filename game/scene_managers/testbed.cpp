@@ -76,6 +76,54 @@ namespace scene_managers {
 		const auto motorcycle = prefabs::create_motorcycle(world, components::transform(0, 400, -90));
 		//prefabs::create_motorcycle(world, components::transform(100, -600, -90));
 		const auto main_character_motorcycle = prefabs::create_motorcycle(world, components::transform(900, 35200, -90));
+		
+		// street wandering pixels
+		{
+			const auto reach = xywh(0, 0, 1500, 32000);
+
+			{
+				const auto e = world.create_entity("wandering_pixels");
+				auto& w = e += components::wandering_pixels();
+				auto& r = e += components::render();
+
+				r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
+
+				w.face.set(assets::texture_id(int(assets::texture_id::BLANK)), cyan);
+				w.face.size.set(1, 1);
+				w.count = 100;
+				w.reach = reach;
+				e.add_standard_components();
+			}
+
+			{
+				const auto e = world.create_entity("wandering_pixels");
+				auto& w = e += components::wandering_pixels();
+				auto& r = e += components::render();
+
+				r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
+
+				w.face.set(assets::texture_id(int(assets::texture_id::BLINK_FIRST) + 2), cyan);
+				//w.face.size.set(1, 1);
+				w.count = 40;
+				w.reach = reach;
+				e.add_standard_components();
+			}
+
+			{
+				const auto e = world.create_entity("wandering_pixels");
+				auto& w = e += components::wandering_pixels();
+				auto& r = e += components::render();
+
+				r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
+
+				w.face.set(assets::texture_id(int(assets::texture_id::BLINK_FIRST) + 2), cyan);
+				//w.face.size.set(1, 1);
+				w.count = 40;
+				w.reach = reach;
+				e.add_standard_components();
+			}
+		}
+
 
 		{
 			vec2 coords[] = {
