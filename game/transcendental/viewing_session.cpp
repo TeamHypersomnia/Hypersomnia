@@ -34,6 +34,10 @@ void viewing_session::set_interpolation_enabled(const bool flag) {
 	systems_audiovisual.get<interpolation_system>().enabled = flag;
 }
 
+void viewing_session::set_master_gain(const float gain) {
+	systems_audiovisual.get<sound_system>().master_gain = gain;
+}
+
 void viewing_session::spread_past_infection(const const_logic_step& step) {
 	const auto& cosm = step.cosm;
 

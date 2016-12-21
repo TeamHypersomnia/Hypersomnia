@@ -16,6 +16,9 @@ void config_values::get_values(game_window& w) {
 
 	set(NVP(determinism_test_cloned_cosmoi_count));
 
+	set(NVP(sound_effects_volume));
+	set(NVP(music_volume));
+
 	set(NVP(debug_disable_cursor_clipping));
 
 	set(NVP(mouse_sensitivity));

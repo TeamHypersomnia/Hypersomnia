@@ -48,6 +48,7 @@ void director_setup::process(game_window& window) {
 	session.camera.configure_size(screen_size);
 	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
 	session.set_interpolation_enabled(false);
+	session.set_master_gain(cfg.sound_effects_volume);
 
 	testbed.configure_view(session);
 

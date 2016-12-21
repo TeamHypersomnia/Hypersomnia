@@ -62,6 +62,7 @@ void client_setup::init(game_window& window, const std::string recording_filenam
 	}
 
 	session.camera.configure_size(screen_size);
+	session.set_master_gain(cfg.sound_effects_volume);
 
 	scene.configure_view(session);
 

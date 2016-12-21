@@ -49,6 +49,8 @@ void menu_setup::process(game_window& window) {
 
 	testbed.configure_view(session);
 
+	session.set_master_gain(cfg.sound_effects_volume * 0.5f);
+
 	timer.reset_timer();
 
 	const auto initial_step_number = intro_scene.get_total_steps_passed();

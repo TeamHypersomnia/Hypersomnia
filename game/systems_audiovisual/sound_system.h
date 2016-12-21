@@ -25,6 +25,8 @@ public:
 
 	std::unordered_map<entity_id, cache> per_entity_cache;
 
+	float master_gain = 1.f;
+
 	cache& get_cache(const const_entity_handle);
 	const cache& get_cache(const const_entity_handle) const;
 

@@ -103,7 +103,7 @@ void sound_system::play_nearby_sound_existences(
 
 		source.set_air_absorption_factor(absorption);
 		source.set_pitch(existence.input.modifier.pitch);
-		source.set_gain(existence.input.modifier.gain);
+		source.set_gain(existence.input.modifier.gain * master_gain);
 		source.set_position(source_pos);
 		source.set_velocity(it.get_effective_velocity());
 	}

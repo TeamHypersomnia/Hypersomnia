@@ -13,6 +13,9 @@ public:
 
 	unsigned determinism_test_cloned_cosmoi_count = 0;
 
+	float sound_effects_volume = 1.f;
+	float music_volume = 1.f;
+
 	bool debug_disable_cursor_clipping = false;
 
 	std::string connect_address;

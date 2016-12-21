@@ -61,6 +61,7 @@ void determinism_test_setup::process(game_window& window) {
 	session.reserve_caches_for_entities(3000);
 	session.camera.configure_size(screen_size);
 	session.set_interpolation_enabled(false);
+	session.set_master_gain(cfg.sound_effects_volume);
 
 	for (size_t i = 0; i < cosmoi_count; ++i) {
 		testbeds[i].configure_view(session);
