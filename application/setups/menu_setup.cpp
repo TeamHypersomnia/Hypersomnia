@@ -33,14 +33,16 @@ void menu_setup::process(game_window& window) {
 
 	cosmos intro_scene(3000);
 	
-	augs::single_sound_buffer menu_theme;
-	menu_theme.set_data(augs::get_sound_samples_from_file("hypersomnia/music/menu_theme.ogg"));
+	if (cfg.music_volume > 0.f) {
+		augs::single_sound_buffer menu_theme;
+		menu_theme.set_data(augs::get_sound_samples_from_file("hypersomnia/music/menu_theme.ogg"));
 
-	augs::sound_source menu_theme_source;
-	menu_theme_source.bind_buffer(menu_theme);
-	menu_theme_source.set_direct_channels(true);
-	menu_theme_source.set_gain(cfg.music_volume);
-	menu_theme_source.play();
+		augs::sound_source menu_theme_source;
+		menu_theme_source.bind_buffer(menu_theme);
+		menu_theme_source.set_direct_channels(true);
+		menu_theme_source.set_gain(cfg.music_volume);
+		menu_theme_source.play();
+	}
 
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
@@ -61,7 +63,7 @@ void menu_setup::process(game_window& window) {
 
 	testbed.configure_view(session);
 
-	session.set_master_gain(cfg.sound_effects_volume * 0.2f);
+	session.set_master_gain(cfg.sound_effects_volume * 0.1f);
 
 	timer.reset_timer();
 

@@ -41,8 +41,10 @@ namespace prefabs {
 
 			car.left_wheel_trigger = left_wheel;
 			car.input_acceleration.set(1000, 1000);
-			car.acceleration_length = 1500;
-			
+			//car.acceleration_length = 1500;
+			car.acceleration_length = 1100;
+			car.speed_for_pitch_unit = 2000.f;
+
 			car.wheel_offset = vec2(35, 0);
 			car.maximum_lateral_cancellation_impulse = 50;
 			car.static_air_resistance = 0.0006f;
@@ -51,7 +53,8 @@ namespace prefabs {
 			car.dynamic_damping = 0.2f;
 			car.angular_damping_while_hand_braking = 0.0f;
 			car.angular_damping = 0.0f;
-			car.maximum_speed_with_static_air_resistance = 1000;
+			//car.maximum_speed_with_static_air_resistance = 1000;
+			car.maximum_speed_with_static_air_resistance = 800;
 			car.maximum_speed_with_static_damping = 0.f;
 			car.braking_damping = 2.f;
 			

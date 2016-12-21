@@ -40,7 +40,7 @@ config_table = {
 	doublebuffer = 1,
 
 	sound_effects_volume = 1,
-	music_volume = 1,
+	music_volume = 0,
 
 	debug_disable_cursor_clipping = 0,
 	

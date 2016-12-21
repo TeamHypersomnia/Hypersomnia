@@ -52,6 +52,8 @@ namespace components {
 		float angular_air_resistance = 0.f;
 		float angular_air_resistance_while_hand_braking = 0.f;
 
+		float speed_for_pitch_unit = 3000.f;
+
 		vec2 wheel_offset = vec2(200, 125);
 
 		template<class F>

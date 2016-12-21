@@ -176,7 +176,7 @@ void car_system::apply_movement_forces(logic_step& step) {
 
 		const bool sound_enabled = cosmos[car.current_driver].alive();
 		const auto sound_entity = cosmos[car.engine_sound];
-		const float pitch = 0.3f + speed*1.2f / 3000.f + std::abs(angular_velocity / 780.f)*sqrt(physics.get_mass());
+		const float pitch = 0.3f + speed*1.2f / car.speed_for_pitch_unit + std::abs(angular_velocity / 780.f)*sqrt(physics.get_mass());
 
 		if (sound_entity.alive() && sound_entity.has<components::sound_existence>()) {
 			if (sound_enabled) {
