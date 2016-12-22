@@ -77,6 +77,9 @@ namespace scene_managers {
 		//prefabs::create_motorcycle(world, components::transform(100, -600, -90));
 		const auto main_character_motorcycle = prefabs::create_motorcycle(world, components::transform(900, 35200, -90));
 		
+		const auto riding_car = prefabs::create_car(world, components::transform(850, 31200, -90));
+
+
 		// street wandering pixels
 		{
 			const auto reach = xywh(0, 0, 1500, 32000);
@@ -503,7 +506,7 @@ namespace scene_managers {
 			}
 		}
 
-		const int num_characters = 3;
+		const int num_characters = 4;
 
 		std::vector<entity_id> new_characters;
 		new_characters.resize(num_characters);
@@ -518,7 +521,6 @@ namespace scene_managers {
 
 			if (i == 0) {
 				//transform = { 0, 300, 0 };
-				transform = { 1200, 25400, 0 };
 				torso_set = assets::animation_response_id::TORSO_SET;
 			}
 			else if (i == 1 || i == 2) {
@@ -575,6 +577,11 @@ namespace scene_managers {
 
 			driver_system().assign_car_ownership(character(0), main_character_motorcycle);
 			main_character_motorcycle.get<components::car>().accelerating = true;
+		}
+
+		if (character(3).alive()) {
+			driver_system().assign_car_ownership(character(3), riding_car);
+			riding_car.get<components::car>().accelerating = true;
 		}
 
 		select_character(character(0));

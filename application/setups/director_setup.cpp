@@ -264,4 +264,8 @@ void director_setup::process(game_window& window) {
 
 		window.swap_buffers();
 	}
+
+	if (unsaved_changes_exist) {
+		director.save_recording_to_file(output_director_file + ".unsaved.ent");
+	}
 }

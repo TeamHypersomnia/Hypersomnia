@@ -22,7 +22,7 @@ recording_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.LOCAL,
+	launch_mode = launch_modes.MAIN_MENU,
 	
 	input_recording_mode = recording_modes.LIVE,
 	recording_replay_speed = 1,
@@ -30,7 +30,7 @@ config_table = {
 	determinism_test_cloned_cosmoi_count = 2,
 
 	window_name = "example",
-	fullscreen = 0,
+	fullscreen = 1,
 	window_border = 1,
 	window_x = 100,
 	window_y = 0,

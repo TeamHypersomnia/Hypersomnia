@@ -66,7 +66,7 @@ void menu_setup::process(game_window& window) {
 	};
 
 	credits_entry credits_texts[] = {
-		{ format(L"hypernet community\npresents", credits_style) },
+		{ format(L"hypernet community presents", credits_style) },
 		{ format(L"A universe founded by\n", credits_style), format(L"Patryk B. Czachurski", credits_style) }
 	};
 
@@ -76,9 +76,11 @@ void menu_setup::process(game_window& window) {
 	{
 		typedef std::unique_ptr<action> act;
 
+		intro_actions.push_blocking(act(new augs::delay_action(500.f)));
 		intro_actions.push_non_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 100, 6000.f)));
 		intro_actions.push_blocking(act(new augs::delay_action(2000.f)));
 
+		size_t rng = 0;
 		for (const auto& c : credits_texts) {
 			const auto& text = c.text;
 
@@ -87,11 +89,11 @@ void menu_setup::process(game_window& window) {
 			intro_actions.push_blocking(act(new augs::set_value_action<fstr>(credits_text, fstr())));
 			intro_actions.push_blocking(act(new augs::set_value_action<bool>(caret_active, true)));
 
-			intro_actions.push_blocking(act(new augs::populate_with_delays<fstr>(credits_text, text, 150.f * text.length(), 0.4f)));
+			intro_actions.push_blocking(act(new augs::populate_with_delays<fstr>(credits_text, text, 150.f * text.length(), 0.4f, rng++)));
 
 			if (c.next_text.size() > 0) {
 				intro_actions.push_blocking(act(new augs::delay_action(1000.f)));
-				intro_actions.push_blocking(act(new augs::populate_with_delays<fstr>(credits_text, c.next_text, 150.f * c.next_text.length(), 0.4f)));
+				intro_actions.push_blocking(act(new augs::populate_with_delays<fstr>(credits_text, c.next_text, 150.f * c.next_text.length(), 0.4f, rng++)));
 			}
 
 			intro_actions.push_blocking(act(new augs::delay_action(1000.f)));
@@ -118,6 +120,7 @@ void menu_setup::process(game_window& window) {
 	session.camera.configure_size(screen_size);
 	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
 	session.show_profile_details = false;
+	session.camera.averages_per_sec /= 2;
 
 	cosmic_movie_director director;
 	director.load_recording_from_file(cfg.menu_intro_scenario_filename);
