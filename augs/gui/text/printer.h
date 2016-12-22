@@ -57,7 +57,7 @@ namespace augs {
 			 parent = 0 means no clipping/shifting
 			returns text's bounding box (without clipping)
 			*/
-			extern vec2i get_text_bbox(const std::basic_string<formatted_char>& str, unsigned wrapping_width);
+			extern vec2i get_text_bbox(const fstr& str, unsigned wrapping_width);
 
 			extern rects::wh<float> quick_print(std::vector<augs::vertex_triangle>& v,
 				const fstr& str,

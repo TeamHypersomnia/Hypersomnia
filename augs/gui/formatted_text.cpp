@@ -17,10 +17,19 @@ namespace augs {
 				return ww;
 			}
 
-			fstr multiply_alpha(fstr f, float m) {
-				for (auto& c : f)
+			fstr multiply_alpha(fstr f, const float m) {
+				for (auto& c : f) {
 					c.a = static_cast<unsigned char>(c.a * m);
-				
+				}
+
+				return std::move(f);
+			}
+
+			fstr set_alpha(fstr f, const float m) {
+				for (auto& c : f) {
+					c.a = static_cast<unsigned char>(m);
+				}
+
 				return std::move(f);
 			}
 

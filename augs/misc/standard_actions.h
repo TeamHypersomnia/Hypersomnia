@@ -2,6 +2,7 @@
 #include "action.h"
 #include "augs/math/vec2.h"
 #include "augs/misc/delta.h"
+#include "augs/misc/randomization.h"
 
 namespace augs {
 	template <class T>
@@ -64,5 +65,42 @@ namespace augs {
 		void on_enter() final {}
 		void on_update(const delta dt) final;
 		bool is_complete() const final;
+	};
+
+	template <class T>
+	class populate_with_delays : public action {
+	public:
+		float duration_ms;
+		float elapsed_ms;
+		float variation_multiplier;
+		unsigned rng_seed;
+		size_t current_interval = 0;
+
+		std::vector<float> intervals;
+
+		T from_container;
+		T& target_container;
+
+		populate_with_delays(T& target, const T from, const float duration_ms, const float variation_multiplier = 0.1f, const unsigned rng_seed = 0) :
+			target_container(target), from_container(from), duration_ms(duration_ms), rng_seed(rng_seed), elapsed_ms(0.f), variation_multiplier(variation_multiplier) {
+		}
+
+		void on_enter() final {
+			intervals = randomization(rng_seed).make_random_intervals(from_container.size(), duration_ms, variation_multiplier);
+		}
+
+		void on_update(const delta dt) final {
+			elapsed_ms += dt.in_milliseconds();
+
+			while (intervals[current_interval] < elapsed_ms && current_interval < intervals.size()) {
+				target_container.insert(target_container.end(), from_container[current_interval]);
+
+				++current_interval;
+			}
+		}
+
+		bool is_complete() const final {
+			return elapsed_ms >= duration_ms;
+		}
 	};
 }

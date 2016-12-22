@@ -30,7 +30,7 @@ config_table = {
 	determinism_test_cloned_cosmoi_count = 2,
 
 	window_name = "example",
-	fullscreen = 0,
+	fullscreen = 1,
 	window_border = 1,
 	window_x = 100,
 	window_y = 0,
@@ -40,7 +40,7 @@ config_table = {
 	doublebuffer = 1,
 
 	sound_effects_volume = 1,
-	music_volume = 0,
+	music_volume = 1,
 
 	debug_disable_cursor_clipping = 0,
 	

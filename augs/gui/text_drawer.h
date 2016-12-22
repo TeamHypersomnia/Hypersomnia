@@ -6,6 +6,10 @@
 
 namespace augs {
 	namespace gui {
+		namespace text {
+			struct caret_info;
+		}
+
 		struct text_drawer {
 			typedef std::vector<vertex_triangle> buf;
 
@@ -17,8 +21,8 @@ namespace augs {
 
 			void set_text(const text::fstr&);
 
-			void draw_stroke(buf&, const rgba col = black);
-			void draw(buf&);
+			void draw_stroke(buf&, const rgba col = black, const text::caret_info* caret = nullptr);
+			void draw(buf&, const text::caret_info* in = nullptr);
 			void draw(draw_info);
 
 			void center(const rects::ltrb<float>);

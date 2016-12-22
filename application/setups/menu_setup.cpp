@@ -27,6 +27,8 @@
 #include "augs/misc/standard_actions.h"
 #include "menu_setup.h"
 
+#include "augs/gui/text/caret.h"
+
 using namespace augs::window::event::keys;
 
 void menu_setup::process(game_window& window) {
@@ -47,15 +49,60 @@ void menu_setup::process(game_window& window) {
 		menu_theme_source.play();
 	}
 
+	using namespace augs::gui::text;
+
+	augs::gui::text_drawer credits_drawer;
+	const auto credits_style = style(assets::font_id::GUI_FONT, white);
+
+	fstr credits_text;
+	fstr target_credits_text;
+
 	rgba fade_overlay_color = black;
+	rgba credits_text_color;
+
+	struct credits_entry {
+		fstr text;
+		fstr next_text;
+	};
+
+	credits_entry credits_texts[] = {
+		{ format(L"hypernet community\npresents", credits_style) },
+		{ format(L"A universe founded by\n", credits_style), format(L"Patryk B. Czachurski", credits_style) }
+	};
 
 	augs::action_list intro_actions;
-	std::unique_ptr<action> ac(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 0, 3000.f));
+	bool caret_active = false;
 
 	{
-		intro_actions.push_blocking(std::unique_ptr<action>(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 100, 6000.f)));
-		intro_actions.push_blocking(std::unique_ptr<action>(new augs::delay_action(2000.f)));
-		intro_actions.push_blocking(std::unique_ptr<action>(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 0, 500.f)));
+		typedef std::unique_ptr<action> act;
+
+		intro_actions.push_non_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 100, 6000.f)));
+		intro_actions.push_blocking(act(new augs::delay_action(2000.f)));
+
+		for (const auto& c : credits_texts) {
+			const auto& text = c.text;
+
+			intro_actions.push_blocking(act(new augs::set_value_action<rgba_channel>(credits_text_color.a, 255)));
+			intro_actions.push_blocking(act(new augs::set_value_action<fstr>(target_credits_text, text + c.next_text)));
+			intro_actions.push_blocking(act(new augs::set_value_action<fstr>(credits_text, fstr())));
+			intro_actions.push_blocking(act(new augs::set_value_action<bool>(caret_active, true)));
+
+			intro_actions.push_blocking(act(new augs::populate_with_delays<fstr>(credits_text, text, 150.f * text.length(), 0.4f)));
+
+			if (c.next_text.size() > 0) {
+				intro_actions.push_blocking(act(new augs::delay_action(1000.f)));
+				intro_actions.push_blocking(act(new augs::populate_with_delays<fstr>(credits_text, c.next_text, 150.f * c.next_text.length(), 0.4f)));
+			}
+
+			intro_actions.push_blocking(act(new augs::delay_action(1000.f)));
+			intro_actions.push_blocking(act(new augs::set_value_action<bool>(caret_active, false)));
+
+			intro_actions.push_blocking(act(new augs::delay_action(1000.f)));
+			intro_actions.push_blocking(act(new augs::tween_value_action<rgba_channel>(credits_text_color.a, 0, 2000.f)));
+			intro_actions.push_blocking(act(new augs::delay_action(500.f)));
+		}
+
+		intro_actions.push_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 0, 500.f)));
 	}
 
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
@@ -126,6 +173,25 @@ void menu_setup::process(game_window& window) {
 
 		session.view(renderer, intro_scene, testbed.get_selected_character(), vdt, augs::gui::text::fstr(), settings);
 		session.draw_color_overlay(renderer, fade_overlay_color);
+
+		if (credits_text.size() > 0) {
+			credits_text = set_alpha(credits_text, credits_text_color.a);
+
+			credits_drawer.pos = screen_size / 2 - get_text_bbox(target_credits_text, 0)*0.5f;
+			credits_drawer.set_text(credits_text);
+			
+			caret_info in(credits_style);
+			in.pos = credits_text.size();
+
+			auto stroke_color = black;
+			stroke_color.a = credits_text_color.a;
+			credits_drawer.print.active = caret_active;
+			credits_drawer.draw_stroke(renderer.get_triangle_buffer(), stroke_color);
+			credits_drawer.draw(renderer.get_triangle_buffer(), &in);
+
+			renderer.call_triangles();
+			renderer.clear_triangles();
+		}
 
 		intro_actions.update(vdt);
 

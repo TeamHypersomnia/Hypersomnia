@@ -183,20 +183,19 @@ namespace augs {
 				if (blink.caret_visible) gui::draw_clipped_rectangle(caret_mat, caret_rect + pos, clipper, v);
 			}
 
-			vec2i get_text_bbox(const std::basic_string<formatted_char>& str, unsigned wrapping_width)
-			{
+			vec2i get_text_bbox(const fstr& str, const unsigned wrapping_width) {
 				drafter dr;
 				dr.wrap_width = wrapping_width;
 				dr.draw(str);
 				return vec2i(dr.get_bbox().w, dr.get_bbox().h);
 			}
 
-			rects::wh<float> quick_print(std::vector<augs::vertex_triangle>& v,
+			rects::wh<float> quick_print(
+				std::vector<augs::vertex_triangle>& v,
 				const fstr& str,
-				vec2i pos,
-				unsigned wrapping_width,
-				rects::ltrb<float> clipper)
-			{
+				const vec2i pos,
+				const unsigned wrapping_width,
+				const rects::ltrb<float> clipper) {
 				drafter dr;
 				printer pr;
 				dr.wrap_width = wrapping_width;
@@ -205,13 +204,13 @@ namespace augs {
 				return dr.get_bbox();
 			}
 
-			rects::wh<float> quick_print_format(std::vector<augs::vertex_triangle>& v,
+			rects::wh<float> quick_print_format(
+				std::vector<augs::vertex_triangle>& v,
 				const std::wstring& wstr,
-				gui::text::style style,
-				vec2i pos,
-				unsigned wrapping_width,
-				rects::ltrb<float> clipper)
-			{
+				const gui::text::style style,
+				const vec2i pos,
+				const unsigned wrapping_width,
+				const rects::ltrb<float> clipper) {
 				fstr str = format(wstr.c_str(), style);
 				drafter dr;
 				printer pr;
