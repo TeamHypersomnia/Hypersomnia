@@ -52,7 +52,7 @@ void menu_setup::process(game_window& window) {
 	using namespace augs::gui::text;
 
 	augs::gui::text_drawer credits_drawer;
-	const auto credits_style = style(assets::font_id::GUI_FONT, white);
+	const auto credits_style = style(assets::font_id::GUI_FONT, cyan);
 
 	fstr credits_text;
 	fstr target_credits_text;
