@@ -17,7 +17,7 @@ namespace resource_setups {
 		get_resource_manager().create(assets::texture_id::TRUCK_FRONT, "hypersomnia/gfx/truck_front.png");
 		get_resource_manager().create(assets::texture_id::TRUCK_INSIDE, "hypersomnia/gfx/truck_inside.png");
 
-		get_resource_manager().create(assets::texture_id::TEST_SPRITE, "hypersomnia/gfx/frog.png");
+		get_resource_manager().create(assets::texture_id::MENU_GAME_LOGO, "hypersomnia/gfx/menu_game_logo.png");
 
 		{
 			auto& gui = get_resource_manager().create(assets::texture_id::ASSAULT_RIFLE, "hypersomnia/gfx/assault_rifle.png").gui_sprite_def;
@@ -122,6 +122,88 @@ namespace resource_setups {
 		//hud_circular_hud_medium.paint_circle_midpoint(40);
 
 		get_resource_manager().create(assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM, hud_circular_hud_medium);
+		
+		{
+			const rgba border_color = white;
+			const rgba inside_color = { 255, 255, 255, 120 };
+
+			const int lower_side = 20;
+			const int upper_side = 10;
+
+			{
+				augs::image hotbar_l;
+				augs::image hotbar_t;
+				augs::image hotbar_r;
+				augs::image hotbar_b;
+
+				hotbar_l.create(lower_side, 1, 4);
+				hotbar_l.set_pixel({ 0, 0 }, border_color);
+				hotbar_l.paint_line({ 1, 0 }, { lower_side, 0 }, inside_color);
+
+				hotbar_r.create(upper_side, 1, 4);
+				hotbar_r.set_pixel({ upper_side - 1, 0 }, border_color);
+				hotbar_r.paint_line({ upper_side - 2, 0 }, { 0, 0 }, inside_color);
+
+				hotbar_b.create(1, lower_side, 4);
+				hotbar_b.set_pixel({ 0, lower_side - 1 }, border_color);
+				hotbar_b.paint_line({ 0, lower_side - 2 }, { 0, 0 }, inside_color);
+
+				hotbar_t.create(1, upper_side, 4);
+				hotbar_t.set_pixel({ 0, 0 }, border_color);
+				hotbar_t.paint_line({ 0, 1 }, { 0, upper_side }, inside_color);
+
+				get_resource_manager().create(assets::texture_id::HOTBAR_BUTTON_L, hotbar_l);
+				get_resource_manager().create(assets::texture_id::HOTBAR_BUTTON_T, hotbar_t);
+				get_resource_manager().create(assets::texture_id::HOTBAR_BUTTON_R, hotbar_r);
+				get_resource_manager().create(assets::texture_id::HOTBAR_BUTTON_B, hotbar_b);
+			}
+
+			{
+				augs::image hotbar_lt;
+				augs::image hotbar_rt;
+				augs::image hotbar_rb;
+				augs::image hotbar_lb;
+
+				hotbar_lt.create(lower_side, upper_side, 4);
+				hotbar_lt.fill(inside_color);
+				hotbar_lt.paint_line({ 0, 0 }, { 0, upper_side }, border_color);
+				hotbar_lt.paint_line({ 0, 0 }, { lower_side, 0 }, border_color);
+
+				hotbar_rt.create(upper_side, upper_side, 4);
+				hotbar_rt.fill({ 0, 0, 0, 0 });
+
+				hotbar_rt.paint_line({ 0, 0 }, { upper_side, upper_side }, border_color);
+
+				for (int i = 1; i < upper_side; ++i) {
+					hotbar_rt.paint_line({ 0, i }, { upper_side-i, upper_side }, inside_color);
+				}
+
+				hotbar_rb.create(upper_side, lower_side, 4);
+				hotbar_rb.fill(inside_color);
+				hotbar_rb.paint_line({ upper_side-1, lower_side-1 }, { 0, lower_side-1 }, border_color);
+				hotbar_rb.paint_line({ upper_side-1, lower_side-1 }, { upper_side-1, 0 }, border_color);
+
+
+				hotbar_lb.create(lower_side, lower_side, 4);
+				hotbar_lb.fill({ 0, 0, 0, 0 });
+
+				hotbar_lb.paint_line({ 0, 0 }, { lower_side, lower_side }, border_color);
+
+				for (int i = 1; i < lower_side; ++i) {
+					hotbar_lb.paint_line({ i, 0 }, { lower_side, lower_side - i }, inside_color);
+				}
+
+				get_resource_manager().create(assets::texture_id::HOTBAR_BUTTON_LT, hotbar_lt);
+				get_resource_manager().create(assets::texture_id::HOTBAR_BUTTON_RT, hotbar_rt);
+				get_resource_manager().create(assets::texture_id::HOTBAR_BUTTON_RB, hotbar_rb);
+				get_resource_manager().create(assets::texture_id::HOTBAR_BUTTON_LB, hotbar_lb);
+			}
+
+			augs::image hotbar_inside;
+			hotbar_inside.create(100, 100, 4);
+			hotbar_inside.fill(inside_color);
+			get_resource_manager().create(assets::texture_id::HOTBAR_BUTTON_INSIDE, hotbar_inside);
+		}
 
 		get_resource_manager().create(assets::texture_id::CONTAINER_OPEN_ICON, "hypersomnia/gfx/container_open_icon.png");
 		get_resource_manager().create(assets::texture_id::CONTAINER_CLOSED_ICON, "hypersomnia/gfx/container_closed_icon.png");

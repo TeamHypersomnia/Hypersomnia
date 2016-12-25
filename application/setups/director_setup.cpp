@@ -26,7 +26,7 @@
 using namespace augs::window::event::keys;
 
 void director_setup::process(game_window& window) {
-	const vec2i screen_size = vec2i(window.get_screen_rect());
+	const vec2i screen_size = vec2i(window.get_screen_size());
 	const auto& cfg = window.config;
 
 	cosmos hypersomnia(3000);

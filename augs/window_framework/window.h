@@ -68,7 +68,7 @@ namespace augs {
 			std::vector<event::change> poll_events(const bool should_clip_cursor = true);
 
 			bool set_window_rect(const rects::xywh<int>&);
-			rects::wh<int> get_screen_rect() const;
+			vec2i get_screen_size() const;
 			rects::xywh<int> get_window_rect() const;
 
 			bool is_active() const;
@@ -128,7 +128,7 @@ namespace augs {
 			std::vector<event::state> poll_events();
 
 			bool set_window_rect(const rects::xywh<int>&);
-			rects::wh<int> get_screen_rect() const;
+			rects::wh<int> get_screen_size() const;
 			rects::xywh<int> get_window_rect() const;
 
 			bool is_active() const;

@@ -9,10 +9,10 @@ namespace augs {
 		h = float(double(rect.h) * v);
 	}
 
-	texture::texture(const image& img) : rect(rect_xywhf(0, 0, img.get_size().w, img.get_size().h)), ltoa(false) {}
+	texture::texture(const image& img) : rect(rect_xywhf(0, 0, img.get_size().x, img.get_size().y)), ltoa(false) {}
 
 	void texture::set(const image& img) {
-		rect = rect_xywhf(0, 0, img.get_size().w, img.get_size().h);
+		rect = rect_xywhf(0, 0, img.get_size().x, img.get_size().y);
 	}
 
 	void texture::luminosity_to_alpha(bool flag) {

@@ -1006,6 +1006,7 @@
     <ClInclude Include="augs\build_settings\setting_enable_debug_log.h" />
     <ClInclude Include="augs\build_settings\setting_enable_ensure.h" />
     <ClInclude Include="augs\build_settings\setting_enable_polygonization.h" />
+    <ClInclude Include="augs\build_settings\setting_is_production_build.h" />
     <ClInclude Include="augs\entity_system\component_allocators_mixin.h" />
     <ClInclude Include="augs\entity_system\component_aggregate.h" />
     <ClInclude Include="augs\entity_system\component_setters_mixin.h" />

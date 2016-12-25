@@ -151,7 +151,7 @@ namespace augs {
 
 								/* add the resulting character taking bearings into account */
 								gui::draw_clipped_rectangle(g.sprite.tex, charcolor,
-									rects::xywh<float>(sectors[i] + g.bear_x, lines[l].top + lines[l].asc - g.bear_y, g.size.w, g.size.h) + pos, clipper,
+									rects::xywh<float>(sectors[i] + g.bear_x, lines[l].top + lines[l].asc - g.bear_y, g.size.x, g.size.y) + pos, clipper,
 									v);
 							}
 						}

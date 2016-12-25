@@ -19,7 +19,7 @@ namespace augs {
 			int adv = 0, bear_x = 0, bear_y = 0;
 			unsigned int index = 0, unicode = 0;
 
-			rects::wh<int> size = rects::wh<int>(0, 0);
+			vec2i size = vec2i(0, 0);
 
 			std::vector<std::pair<unsigned, int> > kerning;
 

@@ -6,7 +6,7 @@
 namespace augs {
 	class image {
 		std::vector<augs::rgba_channel> v;
-		rects::wh<int> size;
+		vec2i size;
 		int channels;
 
 	public:
@@ -21,6 +21,9 @@ namespace augs {
 
 		void paint_button_with_cuts(int width, int height, int left_bottom_cut_length, int top_right_cut_length, augs::rgba border, augs::rgba filling);
 
+		void paint_line(const vec2i from, const vec2i to, const augs::rgba filling = white);
+		bool in_bounds(const vec2i) const;
+
 		void create(int w, int h, int channels);
 		bool from_file(const std::string& filename, unsigned channels = 0),
 			from_clipboard();
@@ -31,10 +34,11 @@ namespace augs {
 
 		void fill(unsigned char val),
 			fill(unsigned char* channel_vals),
+			fill(const rgba),
 			fill_channel(int channel, unsigned char val);
 
 		void copy(const image&);
-		void copy(unsigned char* ptr, int channels, int pitch, const rects::wh<int>& size);
+		void copy(unsigned char* ptr, int channels, int pitch, const vec2i& size);
 
 		void blit(const image&, int x, int y, const rects::xywhf<int>& src, bool luminance_to_alpha = false, bool add = false);
 		void blit_channel(const image&, int x, int y, const rects::xywhf<int>& src, int channel, int src_channel);
@@ -47,12 +51,13 @@ namespace augs {
 		rgba& pixel(int x, int y);
 		const rgba& pixel(int x, int y) const;
 
+		void set_pixel(const vec2i pos, const rgba);
 		const rgba& pixel(vec2i pos) const;
 
 		std::vector<vec2i> get_polygonized() const;
 
 		int get_channels() const, get_bytes() const, get_num_pixels() const;
-		const rects::wh<int>& get_size() const;
+		vec2i get_size() const;
 
 		void destroy();
 	};

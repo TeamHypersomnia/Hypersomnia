@@ -2,6 +2,52 @@
 #include "lodepng.h"
 #include "augs/ensure.h"
 
+template<class C>
+static void Line(int x1, int y1, int x2, int y2, C callback)
+{
+	// Bresenham's line algorithm
+	const bool steep = (std::abs(y2 - y1) > std::abs(x2 - x1));
+	if (steep)
+	{
+		std::swap(x1, y1);
+		std::swap(x2, y2);
+	}
+
+	if (x1 > x2)
+	{
+		std::swap(x1, x2);
+		std::swap(y1, y2);
+	}
+
+	const int dx = x2 - x1;
+	const int dy = std::abs(y2 - y1);
+
+	float error = dx / 2.0f;
+	const int ystep = (y1 < y2) ? 1 : -1;
+	int y = (int)y1;
+
+	const int maxX = (int)x2;
+
+	for (int x = (int)x1; x<maxX; x++)
+	{
+		if (steep)
+		{
+			callback(y, x);
+		}
+		else
+		{
+			callback(x, y);
+		}
+
+		error -= dy;
+		if (error < 0)
+		{
+			y += ystep;
+			error += dx;
+		}
+	}
+}
+
 namespace augs {
 	image::image() : size(0, 0), channels(0) {}
 
@@ -27,14 +73,14 @@ namespace augs {
 		image new_surface;
 		auto& surface = v.empty() ? *this : new_surface;
 		
-		surface.create(std::max(size.w, side), std::max(size.h, side), 4);
+		surface.create(std::max(size.x, side), std::max(size.y, side), 4);
 
-		ensure(size.w >= side);
-		ensure(size.h >= side);
+		ensure(size.x >= side);
+		ensure(size.y >= side);
 
 		auto pp = [&](int x, int y){
-			int x_center = x - size.w / 2;
-			int y_center = y - size.h / 2;
+			int x_center = x - size.x / 2;
+			int y_center = y - size.y / 2;
 
 			auto angle = vec2(x_center, y_center);// .degrees();
 
@@ -51,8 +97,8 @@ namespace augs {
 			int x = radius - i;
 			int y = 0;
 			int decisionOver2 = 1 - x;   // Decision criterion divided by 2 evaluated at x=r, y=0
-			int x0 = size.w / 2;
-			int y0 = size.h / 2;
+			int x0 = size.x / 2;
+			int y0 = size.y / 2;
 
 			while (y <= x)
 			{
@@ -77,9 +123,9 @@ namespace augs {
 		}
 
 		if (border_width > 1) {
-			for (int x = 0; x < surface.size.w; ++x) {
-				for (int y = 0; y < surface.size.w; ++y) {
-					if (x > 0 && y > 0 && x < surface.size.w - 1 && y < surface.size.h - 1) {
+			for (int x = 0; x < surface.size.x; ++x) {
+				for (int y = 0; y < surface.size.x; ++y) {
+					if (x > 0 && y > 0 && x < surface.size.x - 1 && y < surface.size.y - 1) {
 						if (surface.pixel(x, y).a == 0 &&
 							surface.pixel(x + 1, y).a > 0 &&
 							surface.pixel(x - 1, y).a > 0 &&
@@ -92,7 +138,7 @@ namespace augs {
 		}
 
 		if (&surface != this) {
-			blit(surface, 0, 0, rects::xywhf<int>(0, 0, surface.size.w, surface.size.h, false), false, true);
+			blit(surface, 0, 0, rects::xywhf<int>(0, 0, surface.size.x, surface.size.y, false), false, true);
 		}
 	}
 
@@ -103,15 +149,15 @@ namespace augs {
 			create(side, side, 4);
 		}
 		else {
-			ensure(size.w >= side);
-			ensure(size.h >= side);
+			ensure(size.x >= side);
+			ensure(size.y >= side);
 		}
 
 		if (scale_alpha) {
-			for (int x = 0; x < size.w; ++x) {
-				for (int y = 0; y < size.h; ++y) {
-					int x_center = x - size.w / 2;
-					int y_center = y - size.h / 2;
+			for (int x = 0; x < size.x; ++x) {
+				for (int y = 0; y < size.y; ++y) {
+					int x_center = x - size.x / 2;
+					int y_center = y - size.y / 2;
 
 					auto angle = vec2(x_center, y_center).degrees();
 
@@ -128,10 +174,10 @@ namespace augs {
 		}
 		else {
 
-			for (int x = 0; x < size.w; ++x) {
-				for (int y = 0; y < size.h; ++y) {
-					int x_center = x - size.w / 2;
-					int y_center = y - size.h / 2;
+			for (int x = 0; x < size.x; ++x) {
+				for (int y = 0; y < size.y; ++y) {
+					int x_center = x - size.x / 2;
+					int y_center = y - size.y / 2;
 
 					if (
 						x_center*x_center + y_center*y_center <= radius*radius
@@ -156,14 +202,14 @@ namespace augs {
 			create(side, side, 4);
 		}
 		else {
-			ensure(size.w >= side);
-			ensure(size.h >= side);
+			ensure(size.x >= side);
+			ensure(size.y >= side);
 		}
 
-		for (int x = 0; x < size.w; ++x) {
-			for (int y = 0; y < size.h; ++y) {
-				int x_center = x - size.w / 2;
-				int y_center = y - size.h / 2;
+		for (int x = 0; x < size.x; ++x) {
+			for (int y = 0; y < size.y; ++y) {
+				int x_center = x - size.x / 2;
+				int y_center = y - size.y / 2;
 
 				if (x_center*x_center + y_center*y_center <= radius*radius) {
 					pixel(x, y) = filling;
@@ -180,14 +226,25 @@ namespace augs {
 	void image::paint_button_with_cuts(int width, int height, int left_bottom_cut_length, int top_right_cut_length, augs::rgba border, augs::rgba filling) {
 		create(width, height, 4);
 
-		for (int x = 0; x < size.w; ++x) {
-			for (int y = 0; y < size.h; ++y) {
-				if (!x || !y || x == size.w - 1 || y == size.h - 1)
+		for (int x = 0; x < size.x; ++x) {
+			for (int y = 0; y < size.y; ++y) {
+				if (!x || !y || x == size.x - 1 || y == size.y - 1)
 					pixel(x, y) = border;
 				else
 					pixel(x, y) = filling;
 			}
 		}
+	}
+
+	void image::paint_line(const vec2i from, const vec2i to, const augs::rgba filling) {
+		Line(from.x, from.y, to.x, to.y, [&](const int x, const int y) {
+			ensure(in_bounds({ x, y }));
+			pixel(x, y) = filling;
+		});
+	}
+	
+	bool image::in_bounds(const vec2i v) const {
+		return v.x >= 0 && v.y >= 0 && v.x < size.x && v.y < size.y;
 	}
 
 	bool image::from_file(const std::string& filename, unsigned force_channels) {
@@ -203,8 +260,8 @@ namespace augs {
 			return false;
 		}
 
-		size.w = width;
-		size.h = height;
+		size.x = width;
+		size.y = height;
 
 		return true;
 	}
@@ -217,7 +274,7 @@ namespace augs {
 	void image::save(const std::string& filename) {
 		std::string lodepngfname(filename.begin(), filename.end());
 
-		if (lodepng::encode(lodepngfname, v, size.w, size.h))
+		if (lodepng::encode(lodepngfname, v, size.x, size.y))
 			ensure(0);
 	}
 
@@ -239,18 +296,26 @@ namespace augs {
 		while (i < bytes) v[ch + channels*i++] = val;
 	}
 
+	void image::fill(const rgba col) {
+		for (int i = 0; i < size.x; ++i) {
+			for (int j = 0; j < size.y; ++j) {
+				set_pixel({ i, j }, col);
+			}
+		}
+	}
+
 	void image::copy(const image& img) {
-		create(img.size.w, img.size.h, img.channels);
+		create(img.size.x, img.size.y, img.channels);
 
 		memcpy(v.data(), img.v.data(), get_bytes());
 		channels = img.channels;
 	}
 
-	void image::copy(unsigned char* ptr, int _channels, int pitch, const rects::wh<int>& size) {
-		create(size.w, size.h, _channels);
-		int wbytes = size.w*_channels;
+	void image::copy(unsigned char* ptr, int _channels, int pitch, const vec2i& size) {
+		create(size.x, size.y, _channels);
+		int wbytes = size.x*_channels;
 
-		for (int i = 0; i < size.h; ++i)
+		for (int i = 0; i < size.y; ++i)
 			memcpy(v.data() + wbytes*i, ptr + pitch*i, wbytes);
 
 		channels = _channels;
@@ -349,15 +414,15 @@ namespace augs {
 	}
 
 	unsigned char* image::ptr(int x, int y, int channel) {
-		return v.data() + (static_cast<int>(size.w) * y + x) * channels + channel;
+		return v.data() + (static_cast<int>(size.x) * y + x) * channels + channel;
 	}
 	
 	const unsigned char* image::ptr(int x, int y, int channel) const {
-		return v.data() + (static_cast<int>(size.w) * y + x) * channels + channel;
+		return v.data() + (static_cast<int>(size.x) * y + x) * channels + channel;
 	}
 
 	unsigned char image::pix(int x, int y, int channel) const {
-		return v[(static_cast<int>(size.w) * y + x) * channels + channel];
+		return v[(static_cast<int>(size.x) * y + x) * channels + channel];
 	}
 
 	rgba& image::pixel(int x, int y) {
@@ -368,12 +433,16 @@ namespace augs {
 		return *(rgba*)ptr(x, y, 0);
 	}
 
+	void image::set_pixel(const vec2i pos, const rgba col) {
+		pixel(pos.x, pos.y) = col;
+	}
+
 	const rgba& image::pixel(vec2i p) const {
 		return *(rgba*)ptr(p.x, p.y, 0);
 	}
 
 	int image::get_bytes() const {
-		return sizeof(unsigned char) * static_cast<int>(size.w) * static_cast<int>(size.h) * channels;
+		return sizeof(unsigned char) * static_cast<int>(size.x) * static_cast<int>(size.y) * channels;
 	}
 
 	int image::get_channels() const {
@@ -384,7 +453,7 @@ namespace augs {
 		return get_bytes() / get_channels();
 	}
 
-	const rects::wh<int>& image::get_size() const {
+	vec2i image::get_size() const {
 		return size;
 	}
 

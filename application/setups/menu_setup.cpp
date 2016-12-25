@@ -28,11 +28,12 @@
 #include "menu_setup.h"
 
 #include "augs/gui/text/caret.h"
+#include "augs/build_settings/setting_is_production_build.h"
 
 using namespace augs::window::event::keys;
 
 void menu_setup::process(game_window& window) {
-	const vec2i screen_size = vec2i(window.get_screen_rect());
+	const vec2i screen_size = vec2i(window.get_screen_size());
 	const auto& cfg = window.config;
 
 	cosmos intro_scene(3000);
@@ -64,6 +65,17 @@ void menu_setup::process(game_window& window) {
 		fstr text;
 		fstr next_text;
 	};
+
+	fstr developer_welcome_message;
+
+#if !IS_PRODUCTION_BUILD
+	developer_welcome_message = format(L"Thank you for building Hypersomnia.\n\
+This message is not included in distributed executables.\n\
+All your suggestions and especially contributions are welcomed and sure to be considered.\n\
+We wish you an exciting journey through architecture of our cosmos.\n\
+                             ~hypernet community\
+", credits_style);
+#endif
 
 	credits_entry credits_texts[] = {
 		{ format(L"hypernet community presents", credits_style) },

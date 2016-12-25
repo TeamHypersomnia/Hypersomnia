@@ -41,7 +41,7 @@ void client_setup::process(game_window& window) {
 }
 
 void client_setup::init(game_window& window, const std::string recording_filename, const bool use_alternative_port) {
-	const vec2i screen_size = vec2i(window.get_screen_rect());
+	const vec2i screen_size = vec2i(window.get_screen_size());
 	const auto& cfg = window.config;
 
 	scene_managers::networked_testbed_client().populate_world_with_entities(initial_hypersomnia);

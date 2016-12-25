@@ -29,7 +29,7 @@ class game_window {
 public:
 	game_window();
 
-	rects::wh<int> get_screen_rect();
+	rects::wh<int> get_screen_size();
 	void swap_buffers();
 
 	bool clear_window_inputs_once = true;

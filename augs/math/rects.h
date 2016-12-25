@@ -359,6 +359,10 @@ namespace augs {
 				return{ x + this->w/2, y + this->h/2 };
 			}
 
+			vec2t<T> get_size() const {
+				return{ w, h };
+			}
+
 			bool clip(const xywh& rc) {
 				if (x >= rc.r() || y >= rc.b() || r() <= rc.x || b() <= rc.y) {
 					*this = xywh();

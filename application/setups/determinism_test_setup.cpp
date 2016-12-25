@@ -25,7 +25,7 @@
 
 void determinism_test_setup::process(game_window& window) {
 	const auto& cfg = window.config;
-	const vec2i screen_size = vec2i(window.get_screen_rect());
+	const vec2i screen_size = vec2i(window.get_screen_size());
 
 	const unsigned cosmoi_count = 1 + cfg.determinism_test_cloned_cosmoi_count;
 	std::vector<cosmos> hypersomnias(cosmoi_count, cosmos(3000));

@@ -99,13 +99,13 @@ namespace augs {
 		default: ensure(0);
 		}
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, im.get_size().w, im.get_size().h, 0, format, GL_UNSIGNED_BYTE, im.ptr()); glerr;
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, im.get_size().x, im.get_size().y, 0, format, GL_UNSIGNED_BYTE, im.ptr()); glerr;
 
 		if (mipmaps) glGenerateMipmap(GL_TEXTURE_2D); glerr;
 		built = true;
 
 		atlas_texture.set(im);
-		atlas_texture.set_uv_unit(1.0 / im.get_size().w, 1.0 / im.get_size().h);
+		atlas_texture.set_uv_unit(1.0 / im.get_size().x, 1.0 / im.get_size().y);
 	}
 
 	void atlas::default_build() {

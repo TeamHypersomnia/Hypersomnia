@@ -136,7 +136,7 @@ namespace augs {
 
 	void font::add_to_atlas(atlas& atl) {
 		for (auto& g : glyphs) {
-			if (g.sprite.img.get_size().w) {
+			if (g.sprite.img.get_size().x) {
 				g.sprite.tex.set(g.sprite.img);
 				g.sprite.tex.luminosity_to_alpha(true);
 				atl.textures.push_back(&g.sprite);

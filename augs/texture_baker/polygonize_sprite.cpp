@@ -19,11 +19,11 @@ namespace augs {
 #if ENABLE_POLYGONIZATION
 		std::vector<bool> pixelFields;
 		pixelFields.resize(size.area(), false);
-		for (int i = 0;i < size.h;++i)
+		for (int i = 0;i < size.y;++i)
 		{
-			for (int j = 0;j < size.w;++j)
+			for (int j = 0;j < size.x;++j)
 			{
-				rgba p = pixel(j, i);
+				const rgba p = pixel(j, i);
 				if (p == red)
 				{
 					vertices.push_back(vec2i(j, i));
@@ -37,7 +37,7 @@ namespace augs {
 		{
 			LOG("SMH WRONG FAM");
 		}
-		pixelFields[vertices.back().y * size.w + vertices.back().x] = true;
+		pixelFields[vertices.back().y * size.x + vertices.back().x] = true;
 		vec2i field;
 		field = vertices[0];
 		vec2i offsets[OFFSET_COUNT] = { vec2i(1,0),vec2i(0,1),vec2i(-1,0),vec2i(0,-1),vec2i(1,-1),vec2i(1,1),vec2i(-1,1),vec2i(-1,-1) }; //CLOCKWISE
@@ -48,7 +48,7 @@ namespace augs {
 			{
 				posrgba current;
 				current.pos = field + offsets[i];
-				if (current.pos.x >= size.w || current.pos.x < 0 || current.pos.y >= size.h
+				if (current.pos.x >= size.x || current.pos.x < 0 || current.pos.y >= size.y
 					|| current.pos.y < 0)
 					continue;
 				if (vertices.size() > 1 && current.pos == vertices[0])
@@ -56,27 +56,27 @@ namespace augs {
 					quit = true;
 					break;
 				}
-				if (pixelFields[current.pos.y * size.w + current.pos.x])
+				if (pixelFields[current.pos.y * size.x + current.pos.x])
 					continue;
 				current.col = pixel(current.pos);
 				if (current.col == black)
 				{
 					field = current.pos;
-					pixelFields[current.pos.y * size.w + current.pos.x] = true;
+					pixelFields[current.pos.y * size.x + current.pos.x] = true;
 					break;
 				}	
 				else if (current.col == red)
 				{
 					vertices.push_back(current.pos);
 					field = current.pos;
-					pixelFields[current.pos.y * size.w + current.pos.x] = true;
+					pixelFields[current.pos.y * size.x + current.pos.x] = true;
 					break;
 				}
-				pixelFields[current.pos.y * size.w + current.pos.x] = true;
+				pixelFields[current.pos.y * size.x + current.pos.x] = true;
 			}	
 		}while (!quit);
 #else
-		vertices = { vec2i(0, 0), vec2i(size.w, 0), vec2i(size.w, size.h), vec2i(0, size.h) };
+		vertices = { vec2i(0, 0), vec2i(size.x, 0), vec2i(size.x, size.y), vec2i(0, size.y) };
 #endif
 		return vertices;	
 	}	

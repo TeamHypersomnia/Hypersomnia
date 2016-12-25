@@ -76,15 +76,6 @@ namespace scene_managers {
 			}
 		}
 
-		for (int x = -4 * 1; x < 4 * 1; ++x)
-		{
-			auto frog = world.create_entity("frog");
-			ingredients::sprite(frog, vec2(100 + x * 40, 200 + 400), assets::texture_id::TEST_SPRITE, augs::white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::see_through_dynamic_body(frog);
-			name_entity(frog, entity_name::CRATE);
-			frog.add_standard_components();
-		}
-
 		const auto car = prefabs::create_car(world, components::transform(-300, -600, -90));
 		const auto car2 = prefabs::create_car(world, components::transform(-800, -600, -90));
 		const auto car3 = prefabs::create_car(world, components::transform(-1300, -600, -90));

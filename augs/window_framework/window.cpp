@@ -515,8 +515,8 @@ namespace augs {
 			return f != 0;
 		}
 
-		rects::wh<int> glwindow::get_screen_rect() const {
-			return rects::wh<int>(get_window_rect().w, get_window_rect().h);
+		vec2i glwindow::get_screen_size() const {
+			return get_window_rect().get_size();
 		}
 
 		rects::xywh<int> glwindow::get_window_rect() const {
