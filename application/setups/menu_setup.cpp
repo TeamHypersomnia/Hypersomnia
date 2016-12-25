@@ -60,6 +60,7 @@ void menu_setup::process(game_window& window) {
 
 	rgba fade_overlay_color = black;
 	rgba credits_text_color;
+	rgba title_text_color = { 255, 255, 255, 0 };
 
 	struct credits_entry {
 		fstr text;
@@ -116,6 +117,7 @@ We wish you an exciting journey through architecture of our cosmos.\n\
 			intro_actions.push_blocking(act(new augs::delay_action(500.f)));
 		}
 
+		intro_actions.push_non_blocking(act(new augs::tween_value_action<rgba_channel>(title_text_color.a, 255, 500.f)));
 		intro_actions.push_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 0, 500.f)));
 	}
 
@@ -209,6 +211,8 @@ We wish you an exciting journey through architecture of our cosmos.\n\
 		}
 
 		intro_actions.update(vdt);
+
+		intro_scene[testbed.get_menu_title_entity()].get<components::sprite>().color = title_text_color;
 
 		window.swap_buffers();
 	}

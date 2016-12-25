@@ -18,12 +18,18 @@ namespace components {
 	dynamic_tree_node dynamic_tree_node::get_default(const_entity_handle e) {
 		dynamic_tree_node result;
 
+		const auto* const render = e.find<components::render>();
 		const auto* const sprite = e.find<components::sprite>();
 		const auto* const polygon = e.find<components::polygon>();
 		const auto* const tile_layer_instance = e.find<components::tile_layer_instance>();
 		const auto* const particles_existence = e.find<components::particles_existence>();
 		const auto* const wandering_pixels = e.find<components::wandering_pixels>();
 		const auto* const sound_existence = e.find<components::sound_existence>();
+
+		if (render && render->absolute_transform) {
+			result.always_visible = true;
+			return result;
+		}
 
 		if (sprite) {
 			result.aabb = sprite->get_aabb(e.logic_transform());

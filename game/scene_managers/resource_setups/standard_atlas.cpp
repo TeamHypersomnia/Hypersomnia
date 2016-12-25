@@ -183,7 +183,6 @@ namespace resource_setups {
 				hotbar_rb.paint_line({ upper_side-1, lower_side-1 }, { 0, lower_side-1 }, border_color);
 				hotbar_rb.paint_line({ upper_side-1, lower_side-1 }, { upper_side-1, 0 }, border_color);
 
-
 				hotbar_lb.create(lower_side, lower_side, 4);
 				hotbar_lb.fill({ 0, 0, 0, 0 });
 

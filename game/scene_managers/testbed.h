@@ -26,6 +26,7 @@ namespace scene_managers {
 		int debug_var = 0;
 		augs::constant_size_vector<entity_id, TESTBED_DRAW_BODIES_COUNT> draw_bodies;
 
+		entity_id menu_title_entity;
 		cosmos stashed_cosmos;
 		augs::stream stashed_delta;
 
@@ -36,6 +37,7 @@ namespace scene_managers {
 		void control_character_selection(const augs::machine_entropy::local_type&);
 		
 		entity_id get_selected_character() const;
+		entity_id get_menu_title_entity() const;
 
 		void select_character(const entity_id);
 	};
