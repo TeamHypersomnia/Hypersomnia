@@ -5,7 +5,7 @@
 #include "augs/gui/text_drawer.h"
 
 #include "game/detail/inventory_slot_id.h"
-#include "game/detail/gui/gui_context.h"
+#include "game/detail/gui/game_gui_context.h"
 
 #include "augs/padding_byte.h"
 

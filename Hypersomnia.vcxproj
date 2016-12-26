@@ -1089,9 +1089,9 @@
     <ClInclude Include="game\detail\entity\spatial_properties_getters.h" />
     <ClInclude Include="game\detail\gui\aabb_highlighter.h" />
     <ClInclude Include="game\detail\gui\drag_and_drop.h" />
+    <ClInclude Include="game\detail\gui\game_gui_context.h" />
     <ClInclude Include="game\detail\gui\game_gui_element_location.h" />
     <ClInclude Include="game\detail\gui\grid.h" />
-    <ClInclude Include="game\detail\gui\gui_context.h" />
     <ClInclude Include="augs\gui\rect_tree.h" />
     <ClInclude Include="game\detail\gui\gui_positioning.h" />
     <ClInclude Include="game\detail\gui\immediate_hud.h" />

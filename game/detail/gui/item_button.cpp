@@ -1,7 +1,7 @@
 #include "game/detail/gui/item_button.h"
 #include "game/detail/gui/pixel_line_connector.h"
 #include "game/detail/gui/grid.h"
-#include "game/detail/gui/gui_context.h"
+#include "game/detail/gui/game_gui_context.h"
 #include "game/detail/gui/drag_and_drop.h"
 #include "game/detail/gui/root_of_inventory_gui.h"
 
@@ -25,7 +25,7 @@
 #include "augs/templates/string_templates.h"
 #include "augs/ensure.h"
 
-bool item_button::is_being_wholely_dragged_or_pending_finish(const const_gui_context& context, const const_this_pointer& this_id) {
+bool item_button::is_being_wholely_dragged_or_pending_finish(const const_logic_gui_context& context, const const_this_pointer& this_id) {
 	const auto& rect_world = context.get_rect_world();
 	const auto& element = context.get_gui_element_component();
 	const auto& cosmos = context.get_step().get_cosmos();
@@ -95,7 +95,7 @@ void item_button::draw_complete_dragged_ghost(const viewing_gui_context& context
 }
 
 rects::ltrb<float> item_button::iterate_children_attachments(
-	const const_gui_context& context,
+	const const_logic_gui_context& context,
 	const const_this_pointer& this_id,
 	const bool draw,
 	std::vector<vertex_triangle>* target,
@@ -333,7 +333,7 @@ void item_button::draw_proc(const viewing_gui_context& context, const const_this
 	this_tree_entry.set_absolute_pos(former_absolute_pos);
 }
 
-bool item_button::is_inventory_root(const const_gui_context& context, const const_this_pointer& this_id) {
+bool item_button::is_inventory_root(const const_logic_gui_context& context, const const_this_pointer& this_id) {
 	const bool result = this_id.get_location().item_id == context.get_gui_element_entity();
 	ensure(!result);
 	return result;

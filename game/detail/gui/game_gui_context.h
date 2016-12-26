@@ -16,15 +16,15 @@ class gui_tree_entry;
 typedef augs::gui::rect_tree<game_gui_element_location> game_gui_element_tree;
 
 template <class step_type>
-class basic_gui_context : public augs::gui::basic_context<game_gui_element_location, entity_handle_type_for_step<step_type>::is_const_value, basic_gui_context<step_type>> {
+class basic_game_gui_context : public augs::gui::basic_context<game_gui_element_location, entity_handle_type_for_step<step_type>::is_const_value, basic_game_gui_context<step_type>> {
 public:
 	typedef entity_handle_type_for_step<step_type> entity_handle_type;
-	typedef augs::gui::basic_context<game_gui_element_location, is_const, basic_gui_context<step_type>> base;
+	typedef augs::gui::basic_context<game_gui_element_location, is_const, basic_game_gui_context<step_type>> base;
 	 
 	typedef maybe_const_ref_t<is_const, components::gui_element> gui_element_ref;
 	typedef maybe_const_ref_t<is_const, root_of_inventory_gui> root_of_inventory_gui_ref;
 
-	basic_gui_context(
+	basic_game_gui_context(
 		step_type step, 
 		entity_handle_type handle, 
 		tree_ref tree, 
@@ -62,6 +62,6 @@ public:
 	}
 };
 
-typedef basic_gui_context<logic_step> logic_gui_context;
-typedef basic_gui_context<const_cosmic_step> const_gui_context;
-typedef basic_gui_context<viewing_step> viewing_gui_context;
+typedef basic_game_gui_context<logic_step> logic_gui_context;
+typedef basic_game_gui_context<const_cosmic_step> const_logic_gui_context;
+typedef basic_game_gui_context<viewing_step> viewing_gui_context;
