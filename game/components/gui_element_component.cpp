@@ -1,4 +1,4 @@
-#include "game/detail/gui/gui_element_location.h"
+#include "game/detail/gui/game_gui_element_location.h"
 #include "gui_element_component.h"
 
 #include "game/transcendental/step.h"

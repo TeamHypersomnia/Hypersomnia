@@ -1,5 +1,5 @@
 #pragma once
-#include "game/detail/gui/gui_element_location.h"
+#include "game/detail/gui/game_gui_element_location.h"
 
 class root_of_inventory_gui : public game_gui_rect_node {
 public:

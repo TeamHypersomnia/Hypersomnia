@@ -1,14 +1,14 @@
 #pragma once
-#include "game/detail/gui/gui_element_location.h"
+#include "game/detail/gui/game_gui_element_location.h"
 
 class gui_tree_entry {
 	rects::ltrb<float> rc;
-	gui_element_location parent;
+	game_gui_element_location parent;
 	vec2 absolute_position;
 public:
 	gui_tree_entry(const rects::ltrb<float>& rc) : rc(rc) {}
 
-	void set_parent(const gui_element_location& id) {
+	void set_parent(const game_gui_element_location& id) {
 		parent = id;
 	}
 
@@ -24,7 +24,7 @@ public:
 		absolute_position = v;
 	}
 
-	gui_element_location get_parent() const {
+	game_gui_element_location get_parent() const {
 		return parent;
 	}
 
@@ -45,4 +45,4 @@ public:
 	}
 };
 
-typedef std::unordered_map<gui_element_location, gui_tree_entry> gui_element_tree;
+typedef std::unordered_map<game_gui_element_location, gui_tree_entry> gui_element_tree;

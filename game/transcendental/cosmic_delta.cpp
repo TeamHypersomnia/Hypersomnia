@@ -446,7 +446,7 @@ TEST(CosmicDelta, CosmicDeltaPaddingTest) {
 	};
 
 	padding_checker(augs::window::event::change());
-	padding_checker(gui_element_location());
+	padding_checker(game_gui_element_location());
 	for_each_in_tuple(typename put_all_components_into<std::tuple>::type(), padding_checker);
 }
 

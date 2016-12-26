@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/gui/dereferenced_location.h"
 #include "augs/templates/maybe_const.h"
-#include "gui_element_location.h"
+#include "game_gui_element_location.h"
 
 class root_of_inventory_gui;
 
@@ -11,7 +11,7 @@ namespace component {
 
 class gui_tree_entry;
 
-typedef std::unordered_map<gui_element_location, gui_tree_entry> gui_element_tree;
+typedef std::unordered_map<game_gui_element_location, gui_tree_entry> gui_element_tree;
 
 template <class step_type>
 class basic_gui_context {
@@ -63,7 +63,7 @@ public:
 		return elem.rect_world;
 	}
 
-	gui_tree_entry& get_tree_entry(const gui_element_location& id) const {
+	gui_tree_entry& get_tree_entry(const game_gui_element_location& id) const {
 		if (tree.find(id) == tree.end()) {
 			tree.emplace(id, gui_tree_entry(operator()(id, [](const auto resolved_ref) {
 				return resolved_ref->rc;
@@ -73,17 +73,17 @@ public:
 		return tree.at(id);
 	}
 
-	bool alive(const gui_element_location& id) const {
+	bool alive(const game_gui_element_location& id) const {
 		return id.is_set() && id.call([this](const auto resolved) {
 			return resolved.alive(*this);
 		});
 	}
 
-	bool dead(const gui_element_location& id) const {
+	bool dead(const game_gui_element_location& id) const {
 		return !alive(id);
 	}
 
-	bool alive(gui_element_location& id) const {
+	bool alive(game_gui_element_location& id) const {
 		const auto& const_id = id;
 
 		if (!alive(const_id)) {
@@ -95,12 +95,12 @@ public:
 		return true;
 	}
 
-	bool dead(gui_element_location& id) const {
+	bool dead(game_gui_element_location& id) const {
 		return !alive(id);
 	}
 
 	template <class L>
-	decltype(auto) operator()(const gui_element_location& id, L generic_call) const {
+	decltype(auto) operator()(const game_gui_element_location& id, L generic_call) const {
 		return id.call([&](const auto specific_loc) {
 			return generic_call(
 				dereferenced_location<std::remove_pointer_t<decltype(specific_loc.dereference(*this))>>(specific_loc.dereference(*this), specific_loc)
@@ -125,7 +125,7 @@ public:
 	}
 
 	template <class T>
-	auto _dynamic_cast(const gui_element_location& polymorphic_id) const 
+	auto _dynamic_cast(const game_gui_element_location& polymorphic_id) const 
 		-> dereferenced_location<std::remove_pointer_t<decltype(std::declval<typename T::location>().dereference(*this))>>
 	{
 		if (polymorphic_id.is<typename T::location>()) {

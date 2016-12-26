@@ -13,7 +13,7 @@ augs::trivial_variant<
 	item_button_location, 
 	drag_and_drop_target_drop_item_location,
 	root_of_inventory_gui_location
-> gui_element_location;
+> game_gui_element_location;
 
-typedef augs::gui::rect_world<gui_element_location> game_gui_rect_world;
-typedef augs::gui::rect_node<gui_element_location> game_gui_rect_node;
+typedef augs::gui::rect_world<game_gui_element_location> game_gui_rect_world;
+typedef augs::gui::rect_node<game_gui_element_location> game_gui_rect_node;
