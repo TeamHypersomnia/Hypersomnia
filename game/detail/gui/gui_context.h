@@ -1,6 +1,6 @@
 #pragma once
+#include "augs/gui/dereferenced_location.h"
 #include "augs/templates/maybe_const.h"
-#include "game/detail/gui/dereferenced_location.h"
 #include "gui_element_location.h"
 
 class root_of_inventory_gui;

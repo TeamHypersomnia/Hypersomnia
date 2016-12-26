@@ -1021,6 +1021,7 @@
     <ClInclude Include="augs\filesystem\directory.h" />
     <ClInclude Include="augs\gui\appearance_detector.h" />
     <ClInclude Include="augs\gui\clipboard.h" />
+    <ClInclude Include="augs\gui\dereferenced_location.h" />
     <ClInclude Include="augs\gui\gui_traversal_structs.h" />
     <ClInclude Include="augs\gui\formatted_text.h" />
     <ClInclude Include="augs\gui\gui_event.h" />
@@ -1086,7 +1087,6 @@
     <ClInclude Include="game\detail\camera_cone.h" />
     <ClInclude Include="game\detail\entity\spatial_properties_getters.h" />
     <ClInclude Include="game\detail\gui\aabb_highlighter.h" />
-    <ClInclude Include="game\detail\gui\dereferenced_location.h" />
     <ClInclude Include="game\detail\gui\drag_and_drop.h" />
     <ClInclude Include="game\detail\gui\grid.h" />
     <ClInclude Include="game\detail\gui\gui_context.h" />
