@@ -28,3 +28,10 @@ struct maybe_const_ptr { typedef typename templates_detail::conditional<is_const
 
 template<bool is_const, class T>
 using maybe_const_ptr_t = typename maybe_const_ptr<is_const, T>::type;
+
+
+
+template <class T>
+struct is_const_ref {
+	static constexpr bool value = std::is_const<std::remove_reference<T>>::value;
+};

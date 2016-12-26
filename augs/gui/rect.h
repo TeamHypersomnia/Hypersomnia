@@ -38,7 +38,7 @@ namespace augs {
 
 			template <class C, class gui_element_id>
 			static void build_tree_data(C context, const gui_element_id& this_id) {
-				auto& tree_entry = context.get_tree_entry(this_id);
+				auto& tree_entry = context.make_tree_entry(this_id);
 				const auto parent = tree_entry.get_parent();
 				
 				auto absolute_clipped_rect = this_id->rc;
@@ -52,7 +52,7 @@ namespace augs {
 						const auto scroll = parent_rect->get_scroll();
 
 						/* we have to save our global coordinates in absolute_xy */
-						absolute_pos = p.get_absolute_pos() + vec2i(this_id->rc.get_position()) - vec2i(int(scroll.x), int(scroll.y));
+						absolute_pos = p.get_absolute_pos() + this_id->rc.get_position() - scroll;
 						absolute_clipped_rect = rects::xywh<float>(static_cast<float>(absolute_pos.x), static_cast<float>(absolute_pos.y), this_id->rc.w(), this_id->rc.h());
 
 						/* and we have to clip by first clipping parent's rc_clipped */
@@ -64,8 +64,9 @@ namespace augs {
 					});
 				}
 
-				if (this_id->get_flag(flag::CLIP))
+				if (this_id->get_flag(flag::CLIP)) {
 					absolute_clipping_rect.clip_by(absolute_clipped_rect);
+				}
 
 				/* align scroll only to be positive and not to exceed content size */
 				//if (get_flag(flag::SNAP_SCROLL_TO_CONTENT_SIZE)) {
@@ -79,7 +80,7 @@ namespace augs {
 				tree_entry.set_absolute_clipping_rect(absolute_clipping_rect);
 
 				this_id->for_each_child(context, this_id, [&](const auto& child_id) {
-					context.get_tree_entry(child_id).set_parent(this_id);
+					context.make_tree_entry(child_id).set_parent(this_id);
 					child_id->build_tree_data(context, child_id);
 				});
 			}
@@ -88,7 +89,7 @@ namespace augs {
 			static void consume_raw_input_and_generate_gui_events(C context, const gui_element_id& this_id, gui::event_traversal_flags& inf) {
 				using namespace augs::window::event;
 				auto& gr = context.get_rect_world();
-				auto& tree_entry = context.get_tree_entry(this_id);
+				const auto& tree_entry = context.get_tree_entry(this_id);
 				const auto& state = gr.last_state;
 				const auto& m = state.mouse;
 				const auto& msg = inf.change.msg;

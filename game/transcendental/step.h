@@ -87,3 +87,6 @@ public:
 	std::vector<const_entity_handle> visible_entities;
 	std::array<std::vector<const_entity_handle>, render_layer::COUNT> visible_per_layer;
 };
+
+template <class step_type>
+using entity_handle_type_for_step = std::decay_t<decltype(std::declval<step_type>().get_cosmos().get_handle(entity_id()))>;

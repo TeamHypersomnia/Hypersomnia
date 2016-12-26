@@ -3,7 +3,6 @@
 #include "game/components/gui_element_component.h"
 #include "game/components/item_component.h"
 #include "game/detail/gui/root_of_inventory_gui.h"
-#include "game/detail/gui/gui_element_tree.h"
 #include "game/detail/inventory_slot.h"
 #include "game/detail/inventory_slot_handle.h"
 #include "game/transcendental/entity_handle.h"

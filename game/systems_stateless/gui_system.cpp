@@ -22,7 +22,6 @@
 #include "game/detail/gui/root_of_inventory_gui.h"
 
 #include "game/detail/inventory_utils.h"
-#include "game/detail/gui/gui_element_tree.h"
 
 void gui_system::switch_to_gui_mode_and_back(logic_step& step) {
 	const auto& intents = step.transient.messages.get_queue<messages::intent_message>();
@@ -53,7 +52,7 @@ void gui_system::advance_gui_elements(logic_step& step) {
 		auto& element = root.get<components::gui_element>();
 
 		if (root.has<components::item_slot_transfers>()) {
-			gui_element_tree tree;
+			game_gui_element_tree tree;
 			root_of_inventory_gui root_of_gui(element.get_screen_size());
 
 			logic_gui_context context(step, root, tree, root_of_gui);

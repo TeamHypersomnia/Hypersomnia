@@ -34,7 +34,7 @@ struct slot_button : game_gui_rect_node {
 	//	const auto slot_handle = context.get_step().get_cosmos()[this_id.get_location().slot_id];
 	//
 	//	for (const auto i : slot_handle.get_items_inside()) {
-	//		generic_call(make_location_and_pointer(&i.get<components::item>().button, item_button::location{ i.get_id() }));
+	//		generic_call(make_dereferenced_location(&i.get<components::item>().button, item_button::location{ i.get_id() }));
 	//	}
 	//}
 };

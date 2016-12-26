@@ -51,11 +51,11 @@ public:
 };
 
 template<class T>
-dereferenced_location<T> make_location_and_pointer(T* p, const typename T::location& l) {
+dereferenced_location<T> make_dereferenced_location(T* p, const typename T::location& l) {
 	return dereferenced_location<T>(p, l);
 }
 
 template<class T>
-dereferenced_location<const T> make_location_and_pointer(const T* p, const typename T::location& l) {
+dereferenced_location<const T> make_dereferenced_location(const T* p, const typename T::location& l) {
 	return dereferenced_location<const T>(p, l);
 }

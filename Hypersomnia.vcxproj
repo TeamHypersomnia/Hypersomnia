@@ -1022,6 +1022,7 @@
     <ClInclude Include="augs\gui\appearance_detector.h" />
     <ClInclude Include="augs\gui\clipboard.h" />
     <ClInclude Include="augs\gui\dereferenced_location.h" />
+    <ClInclude Include="augs\gui\basic_gui_context.h" />
     <ClInclude Include="augs\gui\gui_traversal_structs.h" />
     <ClInclude Include="augs\gui\formatted_text.h" />
     <ClInclude Include="augs\gui\gui_event.h" />
@@ -1091,7 +1092,7 @@
     <ClInclude Include="game\detail\gui\game_gui_element_location.h" />
     <ClInclude Include="game\detail\gui\grid.h" />
     <ClInclude Include="game\detail\gui\gui_context.h" />
-    <ClInclude Include="game\detail\gui\gui_element_tree.h" />
+    <ClInclude Include="augs\gui\rect_tree.h" />
     <ClInclude Include="game\detail\gui\gui_positioning.h" />
     <ClInclude Include="game\detail\gui\immediate_hud.h" />
     <ClInclude Include="game\detail\gui\item_button.h" />

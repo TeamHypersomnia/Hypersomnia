@@ -4,7 +4,6 @@
 #include "game/detail/gui/gui_context.h"
 #include "game/detail/gui/drag_and_drop.h"
 #include "game/detail/gui/root_of_inventory_gui.h"
-#include "game/detail/gui/gui_element_tree.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
@@ -120,7 +119,9 @@ rects::ltrb<float> item_button::iterate_children_attachments(
 
 	const auto expanded_size = this_id->rc.get_size() - this_id->with_attachments_bbox.get_size();
 
-	state.renderable_transform.pos = context.get_tree_entry(this_id).get_absolute_pos() - this_id->with_attachments_bbox.get_position() + expanded_size / 2 + vec2(1, 1);
+	if (draw) {
+		state.renderable_transform.pos = context.get_tree_entry(this_id).get_absolute_pos() - this_id->with_attachments_bbox.get_position() + expanded_size / 2 + vec2(1, 1);
+	}
 
 	rects::ltrb<float> button_bbox = item_sprite.get_aabb(components::transform(), state.positioning);
 
@@ -155,9 +156,8 @@ rects::ltrb<float> item_button::iterate_children_attachments(
 				offset += item_sprite.size / 2;
 				offset += -attachment_sprite.size / 2;
 
-				attachment_state.renderable_transform += offset;
-
 				if (draw) {
+					attachment_state.renderable_transform += offset;
 					attachment_sprite.draw(attachment_state);
 				}
 

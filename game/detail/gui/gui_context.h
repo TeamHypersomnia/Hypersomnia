@@ -1,7 +1,9 @@
 #pragma once
 #include "augs/gui/dereferenced_location.h"
+#include "augs/gui/basic_gui_context.h"
 #include "augs/templates/maybe_const.h"
 #include "game_gui_element_location.h"
+#include "game/transcendental/step.h"
 
 class root_of_inventory_gui;
 
@@ -11,31 +13,31 @@ namespace component {
 
 class gui_tree_entry;
 
-typedef std::unordered_map<game_gui_element_location, gui_tree_entry> gui_element_tree;
+typedef augs::gui::rect_tree<game_gui_element_location> game_gui_element_tree;
 
 template <class step_type>
-class basic_gui_context {
-
+class basic_gui_context : public augs::gui::basic_context<game_gui_element_location, entity_handle_type_for_step<step_type>::is_const_value, basic_gui_context<step_type>> {
 public:
-	typedef std::decay_t<decltype(std::declval<step_type>().get_cosmos().get_handle(entity_id()))> entity_handle_type;
-	static constexpr bool is_const = entity_handle_type::is_const_value;
-
+	typedef entity_handle_type_for_step<step_type> entity_handle_type;
+	typedef augs::gui::basic_context<game_gui_element_location, is_const, basic_gui_context<step_type>> base;
+	 
 	typedef maybe_const_ref_t<is_const, components::gui_element> gui_element_ref;
-	typedef maybe_const_ref_t<is_const, game_gui_rect_world> game_gui_rect_world_ref;
 	typedef maybe_const_ref_t<is_const, root_of_inventory_gui> root_of_inventory_gui_ref;
 
-	basic_gui_context(step_type step, entity_handle_type handle, gui_element_tree& tree, root_of_inventory_gui_ref root) :
+	basic_gui_context(
+		step_type step, 
+		entity_handle_type handle, 
+		tree_ref tree, 
+		root_of_inventory_gui_ref root) : base(handle.get<components::gui_element>().rect_world, tree),
 		step(step),
 		handle(handle),
 		elem(handle.get<components::gui_element>()),
-		tree(tree),
 		root(root)
 	{}
 
 	step_type step;
 	entity_handle_type handle;
 	gui_element_ref elem;
-	gui_element_tree& tree;
 	root_of_inventory_gui_ref root;
 
 	template<class other_context>
@@ -58,90 +60,7 @@ public:
 	gui_element_ref get_gui_element_component() const {
 		return elem;
 	}
-
-	game_gui_rect_world_ref get_rect_world() const {
-		return elem.rect_world;
-	}
-
-	gui_tree_entry& get_tree_entry(const game_gui_element_location& id) const {
-		if (tree.find(id) == tree.end()) {
-			tree.emplace(id, gui_tree_entry(operator()(id, [](const auto resolved_ref) {
-				return resolved_ref->rc;
-			})));
-		}
-
-		return tree.at(id);
-	}
-
-	bool alive(const game_gui_element_location& id) const {
-		return id.is_set() && id.call([this](const auto resolved) {
-			return resolved.alive(*this);
-		});
-	}
-
-	bool dead(const game_gui_element_location& id) const {
-		return !alive(id);
-	}
-
-	bool alive(game_gui_element_location& id) const {
-		const auto& const_id = id;
-
-		if (!alive(const_id)) {
-			id.unset();
-
-			return false;
-		}
-
-		return true;
-	}
-
-	bool dead(game_gui_element_location& id) const {
-		return !alive(id);
-	}
-
-	template <class L>
-	decltype(auto) operator()(const game_gui_element_location& id, L generic_call) const {
-		return id.call([&](const auto specific_loc) {
-			return generic_call(
-				dereferenced_location<std::remove_pointer_t<decltype(specific_loc.dereference(*this))>>(specific_loc.dereference(*this), specific_loc)
-			);
-		});
-	}
-
-	template <class T, class L>
-	decltype(auto) operator()(const dereferenced_location<T>& loc, L generic_call) const {
-		return generic_call(loc);
-	}
-
-	template <class T>
-	auto dereference_location(const T& location) const 
-		-> dereferenced_location<std::remove_pointer_t<decltype(std::declval<T>().dereference(*this))>>
-	{
-		if (location.alive(*this)) {
-			return{ location.dereference(*this), location };
-		}
-
-		return {};
-	}
-
-	template <class T>
-	auto _dynamic_cast(const game_gui_element_location& polymorphic_id) const 
-		-> dereferenced_location<std::remove_pointer_t<decltype(std::declval<typename T::location>().dereference(*this))>>
-	{
-		if (polymorphic_id.is<typename T::location>()) {
-			return dereference_location(polymorphic_id.get<typename T::location>());
-		}
-
-		return{};
-	}
 };
-
-class viewing_step;
-#include "game/transcendental/step_declaration.h"
-template<bool is_const>
-class basic_cosmic_step;
-
-typedef basic_cosmic_step<true> const_cosmic_step;
 
 typedef basic_gui_context<logic_step> logic_gui_context;
 typedef basic_gui_context<const_cosmic_step> const_gui_context;

@@ -8,7 +8,6 @@
 #include "game/detail/gui/drag_and_drop_target_drop_item.h"
 #include "game/detail/gui/item_button.h"
 #include "game/detail/gui/slot_button.h"
-#include "game/detail/gui/gui_element_tree.h"
 #include "game/detail/inventory_slot_handle.h"
 #include "game/detail/gui/drag_and_drop.h"
 #include "game/components/container_component.h"
@@ -80,7 +79,7 @@ namespace components {
 		const auto& rect_world = element.rect_world;
 
 		root_of_inventory_gui root_of_gui(element.get_screen_size());
-		gui_element_tree tree;
+		game_gui_element_tree tree;
 
 		viewing_gui_context context(step, gui_entity, tree, root_of_gui);
 
