@@ -105,7 +105,7 @@ void slot_button::draw(const viewing_gui_context& context, const const_this_poin
 	}
 
 	if (slot_id.get_container().get_owning_transfer_capability() != slot_id.get_container()) {
-		location_and_pointer<const item_button> child_item_button = context.dereference_location(item_button::location{ slot_id.get_container().get_id() });
+		dereferenced_location<const item_button> child_item_button = context.dereference_location(item_button::location{ slot_id.get_container().get_id() });
 
 		draw_pixel_line_connector(context.get_tree_entry(this_id).get_absolute_rect(), context.get_tree_entry(child_item_button).get_absolute_rect(), info, border_col);
 	}
@@ -123,7 +123,7 @@ void slot_button::perform_logic_step(const logic_gui_context& context, const thi
 		this_id->set_flag(augs::gui::flag::ENABLE_DRAWING);
 
 		if (slot_id.has_items()) {
-			location_and_pointer<const item_button> child_item_button = context.dereference_location(item_button::location{ slot_id.get_items_inside()[0].get_id() });
+			dereferenced_location<const item_button> child_item_button = context.dereference_location(item_button::location{ slot_id.get_items_inside()[0].get_id() });
 
 			if (child_item_button->is_being_wholely_dragged_or_pending_finish(context, child_item_button)) {
 				this_id->set_flag(augs::gui::flag::ENABLE_DRAWING);

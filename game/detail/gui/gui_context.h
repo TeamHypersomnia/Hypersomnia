@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/templates/maybe_const.h"
-#include "game/detail/gui/location_and_pointer.h"
+#include "game/detail/gui/dereferenced_location.h"
 #include "gui_element_location.h"
 
 class root_of_inventory_gui;
@@ -103,19 +103,19 @@ public:
 	decltype(auto) operator()(const gui_element_location& id, L generic_call) const {
 		return id.call([&](const auto specific_loc) {
 			return generic_call(
-				location_and_pointer<std::remove_pointer_t<decltype(specific_loc.dereference(*this))>>(specific_loc.dereference(*this), specific_loc)
+				dereferenced_location<std::remove_pointer_t<decltype(specific_loc.dereference(*this))>>(specific_loc.dereference(*this), specific_loc)
 			);
 		});
 	}
 
 	template <class T, class L>
-	decltype(auto) operator()(const location_and_pointer<T>& loc, L generic_call) const {
+	decltype(auto) operator()(const dereferenced_location<T>& loc, L generic_call) const {
 		return generic_call(loc);
 	}
 
 	template <class T>
 	auto dereference_location(const T& location) const 
-		-> location_and_pointer<std::remove_pointer_t<decltype(std::declval<T>().dereference(*this))>>
+		-> dereferenced_location<std::remove_pointer_t<decltype(std::declval<T>().dereference(*this))>>
 	{
 		if (location.alive(*this)) {
 			return{ location.dereference(*this), location };
@@ -126,7 +126,7 @@ public:
 
 	template <class T>
 	auto _dynamic_cast(const gui_element_location& polymorphic_id) const 
-		-> location_and_pointer<std::remove_pointer_t<decltype(std::declval<typename T::location>().dereference(*this))>>
+		-> dereferenced_location<std::remove_pointer_t<decltype(std::declval<typename T::location>().dereference(*this))>>
 	{
 		if (polymorphic_id.is<typename T::location>()) {
 			return dereference_location(polymorphic_id.get<typename T::location>());

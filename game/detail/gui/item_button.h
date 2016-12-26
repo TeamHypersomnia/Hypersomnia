@@ -17,8 +17,8 @@ struct item_button : game_gui_rect_node {
 	typedef game_gui_rect_node base;
 
 	typedef item_button_location location;
-	typedef location_and_pointer<item_button> this_pointer;
-	typedef location_and_pointer<const item_button> const_this_pointer;
+	typedef dereferenced_location<item_button> this_pointer;
+	typedef dereferenced_location<const item_button> const_this_pointer;
 
 	augs::gui::appearance_detector detector;
 	rects::ltrb<float> with_attachments_bbox;

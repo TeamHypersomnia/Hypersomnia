@@ -2,13 +2,13 @@
 #include "game/messages/gui_intents.h"
 #include "game/detail/item_transfer_result.h"
 #include "game/detail/item_slot_transfer_request.h"
-#include "game/detail/gui/location_and_pointer.h"
+#include "game/detail/gui/dereferenced_location.h"
 #include "game/detail/gui/item_button.h"
 #include "game/detail/inventory_utils.h"
 
 struct drag_and_drop_result {
 	item_slot_transfer_request_data simulated_request;
-	location_and_pointer<const item_button> dragged_item;
+	dereferenced_location<const item_button> dragged_item;
 	bool possible_target_hovered = false;
 	bool target_slot_alive = false;
 	item_transfer_result result;

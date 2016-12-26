@@ -3,7 +3,7 @@
 #include "augs/gui/rect_world.h"
 #include "game/transcendental/entity_id.h"
 #include "game/detail/gui/drag_and_drop_target_drop_item.h"
-#include "game/detail/gui/location_and_pointer.h"
+#include "game/detail/gui/dereferenced_location.h"
 #include "game/enums/slot_function.h"
 #include "augs/ensure.h"
 

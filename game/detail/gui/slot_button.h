@@ -11,8 +11,8 @@
 
 struct slot_button : game_gui_rect_node {
 	typedef slot_button_location location;
-	typedef location_and_pointer<slot_button> this_pointer;
-	typedef location_and_pointer<const slot_button> const_this_pointer;
+	typedef dereferenced_location<slot_button> this_pointer;
+	typedef dereferenced_location<const slot_button> const_this_pointer;
 
 	bool houted_after_drag_started = true;
 	padding_byte pad[3];
