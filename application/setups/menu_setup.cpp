@@ -30,6 +30,8 @@
 #include "augs/gui/text/caret.h"
 #include "augs/build_settings/setting_is_production_build.h"
 
+#include "application/ui/menu_button.h"
+
 using namespace augs::window::event::keys;
 
 void menu_setup::process(game_window& window) {
