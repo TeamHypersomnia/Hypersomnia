@@ -58,7 +58,7 @@ void menu_setup::process(game_window& window) {
 	fstr credits_text;
 	fstr target_credits_text;
 
-	rgba fade_overlay_color = black;
+	rgba fade_overlay_color = { 0, 2, 2, 255 };
 	rgba credits_text_color;
 	rgba title_text_color = { 255, 255, 255, 0 };
 
@@ -118,7 +118,7 @@ We wish you an exciting journey through architecture of our cosmos.\n\
 		}
 
 		intro_actions.push_non_blocking(act(new augs::tween_value_action<rgba_channel>(title_text_color.a, 255, 500.f)));
-		intro_actions.push_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 0, 500.f)));
+		intro_actions.push_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 20, 500.f)));
 	}
 
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
