@@ -20,9 +20,10 @@ slot_button::slot_button() {
 	unset_flag(augs::gui::flag::CLIP);
 }
 
-void slot_button::draw(const viewing_gui_context& context, const const_this_pointer& this_id, augs::gui::draw_info info) {
-	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING))
+void slot_button::draw(const viewing_gui_context& context, const const_this_in_container& this_id, augs::gui::draw_info info) {
+	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING)) {
 		return;
+	}
 
 	const auto& step = context.get_step();
 	const auto& cosmos = step.get_cosmos();
@@ -36,8 +37,9 @@ void slot_button::draw(const viewing_gui_context& context, const const_this_poin
 	if (slot_id->for_categorized_items_only) {
 		inside_col = violet;
 	}
-	else
+	else {
 		inside_col = cyan;
+	}
 
 	border_col = inside_col;
 	inside_col.a = 4 * 5;
@@ -48,11 +50,11 @@ void slot_button::draw(const viewing_gui_context& context, const const_this_poin
 		border_col.a = 255;
 	}
 
-	auto inside_tex = assets::texture_id::ATTACHMENT_CIRCLE_FILLED;
-	auto border_tex = assets::texture_id::ATTACHMENT_CIRCLE_BORDER;
+	const auto inside_tex = assets::texture_id::ATTACHMENT_CIRCLE_FILLED;
+	const auto border_tex = assets::texture_id::ATTACHMENT_CIRCLE_BORDER;
 
-	augs::gui::material inside_mat(inside_tex, inside_col);
-	augs::gui::material border_mat(border_tex, border_col);
+	const augs::gui::material inside_mat(inside_tex, inside_col);
+	const augs::gui::material border_mat(border_tex, border_col);
 
 	if (slot_id->always_allow_exactly_one_item) {
 		draw_centered_texture(context, this_id, info, inside_mat);
@@ -92,7 +94,7 @@ void slot_button::draw(const viewing_gui_context& context, const const_this_poin
 		draw_centered_texture(context, this_id, info, inside_mat);
 		draw_centered_texture(context, this_id, info, border_mat);
 
-		auto space_available_text = augs::gui::text::format(to_wstring(slot_id.calculate_free_space_with_parent_containers() / long double(SPACE_ATOMS_PER_UNIT), 2, true)
+		const auto space_available_text = augs::gui::text::format(to_wstring(slot_id.calculate_free_space_with_parent_containers() / long double(SPACE_ATOMS_PER_UNIT), 2, true)
 			, augs::gui::text::style(assets::font_id::GUI_FONT, border_col));
 
 		augs::gui::text_drawer space_caption;
@@ -104,13 +106,14 @@ void slot_button::draw(const viewing_gui_context& context, const const_this_poin
 	}
 
 	if (slot_id.get_container().get_owning_transfer_capability() != slot_id.get_container()) {
-		dereferenced_location<const item_button> child_item_button = context.dereference_location(item_button::location{ slot_id.get_container().get_id() });
+		const_dereferenced_location<item_button_in_item> child_item_button 
+			= context.dereference_location(item_button_in_item{ slot_id.get_container().get_id() });
 
 		draw_pixel_line_connector(context.get_tree_entry(this_id).get_absolute_rect(), context.get_tree_entry(child_item_button).get_absolute_rect(), info, border_col);
 	}
 }
 
-void slot_button::perform_logic_step(const logic_gui_context& context, const this_pointer& this_id) {
+void slot_button::perform_logic_step(const logic_gui_context& context, const this_in_container& this_id) {
 	game_gui_rect_node::perform_logic_step(context, this_id);
 	
 	const auto& step = context.get_step();
@@ -122,7 +125,7 @@ void slot_button::perform_logic_step(const logic_gui_context& context, const thi
 		this_id->set_flag(augs::gui::flag::ENABLE_DRAWING);
 
 		if (slot_id.has_items()) {
-			dereferenced_location<const item_button> child_item_button = context.dereference_location(item_button::location{ slot_id.get_items_inside()[0].get_id() });
+			const_dereferenced_location<item_button_in_item> child_item_button = context.dereference_location(item_button_in_item{ slot_id.get_items_inside()[0].get_id() });
 
 			if (child_item_button->is_being_wholely_dragged_or_pending_finish(context, child_item_button)) {
 				this_id->set_flag(augs::gui::flag::ENABLE_DRAWING);
@@ -138,13 +141,14 @@ void slot_button::perform_logic_step(const logic_gui_context& context, const thi
 	
 	vec2i absolute_pos = this_id->slot_relative_pos + this_id->user_drag_offset;
 
-	if (context.get_rect_world().is_being_dragged(this_id))
+	if (context.get_rect_world().is_being_dragged(this_id)) {
 		absolute_pos += griddify(context.get_rect_world().current_drag_amount);
+	}
 	
 	this_id->rc.set_position(absolute_pos);
 }
 
-void slot_button::consume_gui_event(logic_gui_context& context, const this_pointer& this_id, const augs::gui::event_info info) {
+void slot_button::consume_gui_event(logic_gui_context& context, const this_in_container& this_id, const augs::gui::event_info info) {
 	this_id->detector.update_appearance(info);
 	
 	if (info == gui_event::lfinisheddrag) {

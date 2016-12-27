@@ -63,44 +63,38 @@ namespace augs {
 				return !alive(id);
 			}
 
+			template <class T>
+			auto dereference_location(const T& location) const {
+				const auto& self = *static_cast<const derived*>(this);
+				
+				typedef decltype(location.dereference(self)) dereferenced_ptr;
+
+				if (location.alive(self)) {
+					return make_dereferenced_location( location.dereference(self), location );
+				}
+
+				return make_dereferenced_location(static_cast<dereferenced_ptr>(nullptr), location );
+			}
+
 			template <class L>
 			decltype(auto) operator()(const gui_element_polymorphic_id& id, L generic_call) const {
 				return id.call([&](const auto specific_loc) {
-					const auto& self = *static_cast<const derived*>(this);
-
-					return generic_call(
-						dereferenced_location<std::remove_pointer_t<decltype(specific_loc.dereference(self))>>(specific_loc.dereference(self), specific_loc)
-					);
+					return generic_call(dereference_location(specific_loc));
 				});
 			}
 
-			template <class T, class L>
-			decltype(auto) operator()(const dereferenced_location<T>& loc, L generic_call) const {
+			template <bool is_const, class T, class L>
+			decltype(auto) operator()(const basic_dereferenced_location<is_const, T>& loc, L generic_call) const {
 				return generic_call(loc);
 			}
 
 			template <class T>
-			auto dereference_location(const T& location) const
-				-> dereferenced_location<std::remove_pointer_t<decltype(std::declval<T>().dereference(*static_cast<const derived*>(this)))>>
-			{
-				const auto& self = *static_cast<const derived*>(this);
-
-				if (location.alive(self)) {
-					return{ location.dereference(self), location };
+			auto _dynamic_cast(const gui_element_polymorphic_id& polymorphic_id) const {
+				if (polymorphic_id.is<T>()) {
+					return dereference_location(polymorphic_id.get<T>());
 				}
 
-				return{};
-			}
-
-			template <class T>
-			auto _dynamic_cast(const gui_element_polymorphic_id& polymorphic_id) const
-				-> dereferenced_location<std::remove_pointer_t<decltype(std::declval<typename T::location>().dereference(*static_cast<const derived*>(this)))>>
-			{
-				if (polymorphic_id.is<typename T::location>()) {
-					return dereference_location(polymorphic_id.get<typename T::location>());
-				}
-
-				return{};
+				return dereference_location(T());
 			}
 		};
 	}

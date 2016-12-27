@@ -76,7 +76,7 @@ void gui_system::advance_gui_elements(logic_step& step) {
 					if (e.has_event_for_gui) {
 						bool fetched = false;
 						const auto& change = e.event_for_gui;
-						const auto& held_rect = context._dynamic_cast<item_button>(rect_world.rect_held_by_lmb);
+						const auto held_rect = context._dynamic_cast<item_button_in_item>(rect_world.rect_held_by_lmb);
 			
 						if (held_rect != nullptr) {
 							const auto& item_entity = cosmos[held_rect.get_location().item_id];

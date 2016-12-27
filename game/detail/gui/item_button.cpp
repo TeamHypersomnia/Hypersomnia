@@ -25,7 +25,7 @@
 #include "augs/templates/string_templates.h"
 #include "augs/ensure.h"
 
-bool item_button::is_being_wholely_dragged_or_pending_finish(const const_logic_gui_context& context, const const_this_pointer& this_id) {
+bool item_button::is_being_wholely_dragged_or_pending_finish(const const_logic_gui_context& context, const const_this_in_item& this_id) {
 	const auto& rect_world = context.get_rect_world();
 	const auto& element = context.get_gui_element_component();
 	const auto& cosmos = context.get_step().get_cosmos();
@@ -44,7 +44,7 @@ item_button::item_button(rects::xywh<float> rc) : base(rc) {
 	unset_flag(augs::gui::flag::FOCUSABLE);
 }
 
-void item_button::draw_dragged_ghost_inside(const viewing_gui_context& context, const const_this_pointer& this_id, draw_info in) {
+void item_button::draw_dragged_ghost_inside(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in) {
 	drawing_flags f;
 	f.draw_inside = true;
 	f.draw_border = false;
@@ -58,7 +58,7 @@ void item_button::draw_dragged_ghost_inside(const viewing_gui_context& context, 
 	draw_proc(context, this_id, in, f);
 }
 
-void item_button::draw_complete_with_children(const viewing_gui_context& context, const const_this_pointer& this_id, draw_info in) {
+void item_button::draw_complete_with_children(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in) {
 	drawing_flags f;
 	f.draw_inside = true;
 	f.draw_border = true;
@@ -72,7 +72,7 @@ void item_button::draw_complete_with_children(const viewing_gui_context& context
 	draw_proc(context, this_id, in, f);
 }
 
-void item_button::draw_grid_border_ghost(const viewing_gui_context& context, const const_this_pointer& this_id, draw_info in) {
+void item_button::draw_grid_border_ghost(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in) {
 	drawing_flags f;
 	f.draw_inside = false;
 	f.draw_border = true;
@@ -86,7 +86,7 @@ void item_button::draw_grid_border_ghost(const viewing_gui_context& context, con
 	draw_proc(context, this_id, in, f);
 }
 
-void item_button::draw_complete_dragged_ghost(const viewing_gui_context& context, const const_this_pointer& this_id, draw_info in) {
+void item_button::draw_complete_dragged_ghost(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in) {
 	const auto& cosmos = context.get_step().get_cosmos();
 	auto parent_slot = cosmos[cosmos[this_id.get_location().item_id].get<components::item>().current_slot];
 	ensure(parent_slot.alive());
@@ -96,7 +96,7 @@ void item_button::draw_complete_dragged_ghost(const viewing_gui_context& context
 
 rects::ltrb<float> item_button::iterate_children_attachments(
 	const const_logic_gui_context& context,
-	const const_this_pointer& this_id,
+	const const_this_in_item& this_id,
 	const bool draw,
 	std::vector<vertex_triangle>* target,
 	const augs::rgba border_col
@@ -176,7 +176,7 @@ rects::ltrb<float> item_button::iterate_children_attachments(
 	return button_bbox;
 }
 
-void item_button::draw_proc(const viewing_gui_context& context, const const_this_pointer& this_id, draw_info in, const drawing_flags& f) {
+void item_button::draw_proc(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in, const drawing_flags& f) {
 	if (is_inventory_root(context, this_id))
 		return;
 
@@ -307,7 +307,7 @@ void item_button::draw_proc(const viewing_gui_context& context, const const_this
 	}
 
 	if (f.draw_connector && parent_slot.get_container().get_owning_transfer_capability() != parent_slot.get_container()) {
-		draw_pixel_line_connector(this_absolute_rect, context.get_tree_entry(location{ parent_slot.get_container() }).get_absolute_rect(), in, border_col);
+		draw_pixel_line_connector(this_absolute_rect, context.get_tree_entry(item_button_in_item{ parent_slot.get_container() }).get_absolute_rect(), in, border_col);
 	}
 
 	if (f.draw_container_opened_mark) {
@@ -333,13 +333,13 @@ void item_button::draw_proc(const viewing_gui_context& context, const const_this
 	this_tree_entry.set_absolute_pos(former_absolute_pos);
 }
 
-bool item_button::is_inventory_root(const const_logic_gui_context& context, const const_this_pointer& this_id) {
+bool item_button::is_inventory_root(const const_logic_gui_context& context, const const_this_in_item& this_id) {
 	const bool result = this_id.get_location().item_id == context.get_gui_element_entity();
 	ensure(!result);
 	return result;
 }
 
-void item_button::perform_logic_step(const logic_gui_context& context, const this_pointer& this_id) {
+void item_button::perform_logic_step(const logic_gui_context& context, const this_in_item& this_id) {
 	base::perform_logic_step(context, this_id);
 
 	const auto& cosmos = context.get_step().get_cosmos();
@@ -373,7 +373,7 @@ void item_button::perform_logic_step(const logic_gui_context& context, const thi
 	auto parent_slot = cosmos[item.get<components::item>().current_slot];
 
 	if (parent_slot->always_allow_exactly_one_item) {
-		dereferenced_location<const slot_button> parent_button = context.dereference_location(slot_button::location{parent_slot.get_id()});
+		const_dereferenced_location<slot_button_in_container> parent_button = context.dereference_location(slot_button_in_container{parent_slot.get_id()});
 
 		this_id->rc.set_position(parent_button->rc.get_position());
 	}
@@ -382,7 +382,7 @@ void item_button::perform_logic_step(const logic_gui_context& context, const thi
 	}
 }
 
-void item_button::consume_gui_event(const logic_gui_context& context, const this_pointer& this_id, const augs::gui::event_info info) {
+void item_button::consume_gui_event(const logic_gui_context& context, const this_in_item& this_id, const augs::gui::event_info info) {
 	if (is_inventory_root(context, this_id))
 		return;
 
@@ -393,7 +393,7 @@ void item_button::consume_gui_event(const logic_gui_context& context, const this
 
 	this_id->detector.update_appearance(info);
 	auto parent_slot = cosmos[item.get<components::item>().current_slot];
-	const auto parent_button = context.dereference_location(slot_button::location{ parent_slot.get_id() });
+	const auto parent_button = context.dereference_location(slot_button_in_container{ parent_slot.get_id() });
 
 	if (info == gui_event::ldrag) {
 		if (!this_id->started_drag) {
@@ -441,7 +441,7 @@ void item_button::consume_gui_event(const logic_gui_context& context, const this
 	// if(being_dragged && inf == rect::gui_event::lup)
 }
 
-void item_button::draw(const viewing_gui_context& context, const const_this_pointer& this_id, draw_info in) {
+void item_button::draw(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in) {
 	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING))
 		return;
 

@@ -8,7 +8,7 @@
 
 struct drag_and_drop_result {
 	item_slot_transfer_request_data simulated_request;
-	dereferenced_location<const item_button> dragged_item;
+	const_dereferenced_location<item_button_in_item> dragged_item;
 	bool possible_target_hovered = false;
 	bool target_slot_alive = false;
 	item_transfer_result result;
@@ -30,16 +30,16 @@ drag_and_drop_result prepare_drag_and_drop_result(C context) {
 		const auto held_rect_id = rect_world.rect_held_by_lmb;
 		const auto drop_target_rect_id = rect_world.rect_hovered;
 
-		const auto dragged_item = context._dynamic_cast<const item_button>(held_rect_id);
+		const auto dragged_item = context._dynamic_cast<item_button_in_item>(held_rect_id);
 		out.dragged_item = dragged_item;
 
 		if (dragged_item && context.alive(drop_target_rect_id)) {
 			
 			const auto dragged_item_handle = cosmos[dragged_item.get_location().item_id];
 
-			const auto target_slot = context._dynamic_cast<const slot_button>(drop_target_rect_id);
-			const auto target_item = context._dynamic_cast<const item_button>(drop_target_rect_id);
-			const auto target_drop_item = context._dynamic_cast<const drag_and_drop_target_drop_item>(drop_target_rect_id);
+			const auto target_slot = context._dynamic_cast<slot_button_in_container>(drop_target_rect_id);
+			const auto target_item = context._dynamic_cast<item_button_in_item>(drop_target_rect_id);
+			const auto target_drop_item = context._dynamic_cast<drag_and_drop_target_drop_item_in_gui_element>(drop_target_rect_id);
 
 			out.possible_target_hovered = true;
 

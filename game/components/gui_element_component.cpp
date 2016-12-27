@@ -83,8 +83,8 @@ namespace components {
 
 		viewing_gui_context context(step, gui_entity, tree, root_of_gui);
 
-		rect_world.build_tree_data_into_context(context, root_of_inventory_gui::location());
-		rect_world.draw(output_buffer, context, root_of_inventory_gui::location());
+		rect_world.build_tree_data_into_context(context, root_of_inventory_gui_in_context());
+		rect_world.draw(output_buffer, context, root_of_inventory_gui_in_context());
 
 		if (element.is_gui_look_enabled) {
 			element.draw_cursor_and_tooltip(output_buffer, context);
@@ -180,8 +180,8 @@ namespace components {
 		state.renderable_transform.pos = get_gui_crosshair_position();
 		cursor_sprite.draw(state);
 
-		const auto& maybe_hovered_item = context._dynamic_cast<const item_button>(rect_world.rect_hovered);
-		const auto& maybe_hovered_slot = context._dynamic_cast<const slot_button>(rect_world.rect_hovered);
+		const auto maybe_hovered_item = context._dynamic_cast<item_button_in_item>(rect_world.rect_hovered);
+		const auto maybe_hovered_slot = context._dynamic_cast<slot_button_in_container>(rect_world.rect_hovered);
 		
 		const bool is_dragging = context.alive(rect_world.rect_held_by_lmb) && rect_world.held_rect_is_dragged;
 

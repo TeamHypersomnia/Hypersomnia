@@ -2,8 +2,12 @@
 #include "game/transcendental/entity_id.h"
 #include "augs/ensure.h"
 
+struct item_button;
+
 class item_button_in_item {
 public:
+	typedef item_button dereferenced_type;
+
 	entity_id item_id;
 
 	const item_button_in_item& get_location() const {

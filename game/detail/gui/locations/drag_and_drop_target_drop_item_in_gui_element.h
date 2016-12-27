@@ -1,7 +1,11 @@
 #pragma once
 
+struct drag_and_drop_target_drop_item;
+
 struct drag_and_drop_target_drop_item_in_gui_element {
 public:
+	typedef drag_and_drop_target_drop_item dereferenced_type;
+
 	bool operator==(drag_and_drop_target_drop_item_in_gui_element b) const {
 		return true;
 	}
