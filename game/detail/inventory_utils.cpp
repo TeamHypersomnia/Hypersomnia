@@ -20,64 +20,70 @@
 
 #include "game/enums/entity_name.h"
 
-item_transfer_result query_transfer_result(const_item_slot_transfer_request r) {
+item_transfer_result query_transfer_result(const const_item_slot_transfer_request r) {
 	item_transfer_result output;
 	auto& predicted_result = output.result;
-	auto& item = r.get_item().get<components::item>();
-	auto& cosmos = r.get_item().get_cosmos();
+	const auto& item = r.get_item().get<components::item>();
 
 	ensure(r.specified_quantity != 0);
 
-	auto item_owning_capability = r.get_item().get_owning_transfer_capability();
-	auto target_slot_owning_capability = r.get_target_slot().get_container().get_owning_transfer_capability();
+	const auto item_owning_capability = r.get_item().get_owning_transfer_capability();
+	const auto target_slot_owning_capability = r.get_target_slot().get_container().get_owning_transfer_capability();
 
 	//ensure(item_owning_capability.alive() || target_slot_owning_capability.alive());
 
 	if (item_owning_capability.alive() && target_slot_owning_capability.alive() &&
-		item_owning_capability != target_slot_owning_capability)
+		item_owning_capability != target_slot_owning_capability) {
 		predicted_result = item_transfer_result_type::INVALID_SLOT_OR_UNOWNED_ROOT;
-	else if (r.get_target_slot().alive())
+	}
+	else if (r.get_target_slot().alive()) {
 		output = containment_result(r);
+	}
 	else {
 		output.result = item_transfer_result_type::SUCCESSFUL_TRANSFER;
 		output.transferred_charges = r.specified_quantity == -1 ? item.charges : std::min(r.specified_quantity, item.charges);
 	}
 
 	if (predicted_result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
-		if (item.current_mounting == components::item::MOUNTED && !r.force_immediate_mount)
+		if (item.current_mounting == components::item::MOUNTED && !r.force_immediate_mount) {
 			predicted_result = item_transfer_result_type::UNMOUNT_BEFOREHAND;
+		}
 	}
 
 	return output;
 }
 
-slot_function detect_compatible_slot(const_entity_handle item, const_entity_handle container_entity) {
-	auto* container = container_entity.find<components::container>();
+slot_function detect_compatible_slot(const const_entity_handle item, const const_entity_handle container_entity) {
+	const auto* const container = container_entity.find<components::container>();
 
 	if (container) {
-		if (container_entity[slot_function::ITEM_DEPOSIT].alive())
+		if (container_entity[slot_function::ITEM_DEPOSIT].alive()) {
 			return slot_function::ITEM_DEPOSIT;
+		}
 
-		for (auto& s : container->slots)
-			if (s.second.is_category_compatible_with(item))
+		for (const auto& s : container->slots) {
+			if (s.second.is_category_compatible_with(item)) {
 				return s.first;
+			}
+		}
 	}
 
 	return slot_function::INVALID;
 }
 
-item_transfer_result containment_result(const_item_slot_transfer_request r, bool allow_replacement) {
+item_transfer_result containment_result(const const_item_slot_transfer_request r, const bool allow_replacement) {
 	item_transfer_result output;
 	output.transferred_charges = 0;
 	output.result = item_transfer_result_type::NO_SLOT_AVAILABLE;
 
-	auto& item = r.get_item().get<components::item>();
-	auto& cosmos = r.get_item().get_cosmos();
-	auto& slot = *r.get_target_slot();
+	const auto& item = r.get_item().get<components::item>();
+	const auto& cosmos = r.get_item().get_cosmos();
+	const auto& slot = *r.get_target_slot();
 	auto& result = output.result;
 
-	if (item.current_slot == r.get_target_slot())
+	if (item.current_slot == r.get_target_slot()) {
 		result = item_transfer_result_type::THE_SAME_SLOT;
+	}
 	else if (slot.always_allow_exactly_one_item && slot.items_inside.size() == 1 && !can_stack_entities(cosmos[slot.items_inside[0]], r.get_item())) {
 		//if (allow_replacement) {
 		//
@@ -96,13 +102,14 @@ item_transfer_result containment_result(const_item_slot_transfer_request r, bool
 
 		result = item_transfer_result_type::NO_SLOT_AVAILABLE;
 	}
-	else if (!slot.is_category_compatible_with(r.get_item()))
+	else if (!slot.is_category_compatible_with(r.get_item())) {
 		result = item_transfer_result_type::INCOMPATIBLE_CATEGORIES;
+	}
 	else {
-		auto space_available = r.get_target_slot().calculate_free_space_with_parent_containers();
+		const auto space_available = r.get_target_slot().calculate_free_space_with_parent_containers();
 
 		if (space_available > 0) {
-			bool item_indivisible = item.charges == 1 || !item.stackable;
+			const bool item_indivisible = item.charges == 1 || !item.stackable;
 
 			if (item_indivisible) {
 				if (space_available >= calculate_space_occupied_with_children(r.get_item())) {
@@ -110,11 +117,12 @@ item_transfer_result containment_result(const_item_slot_transfer_request r, bool
 				}
 			}
 			else {
-				int maximum_charges_fitting_inside = space_available / item.space_occupied_per_charge;
+				const int maximum_charges_fitting_inside = space_available / item.space_occupied_per_charge;
 				output.transferred_charges = std::min(item.charges, maximum_charges_fitting_inside);
 
-				if (r.specified_quantity > -1)
+				if (r.specified_quantity > -1) {
 					output.transferred_charges = std::min(output.transferred_charges, unsigned(r.specified_quantity));
+				}
 			}
 		}
 
@@ -176,65 +184,68 @@ unsigned to_space_units(std::string s) {
 	return sum;
 }
 
-int count_charges_in_deposit(const_entity_handle item) {
+int count_charges_in_deposit(const const_entity_handle item) {
 	return count_charges_inside(item[slot_function::ITEM_DEPOSIT]);
 }
 
-int count_charges_inside(const_inventory_slot_handle id) {
+int count_charges_inside(const const_inventory_slot_handle id) {
 	int charges = 0;
 
-	for (auto& i : id->items_inside) {
+	for (const auto i : id->items_inside) {
 		charges += id.get_cosmos()[i].get<components::item>().charges;
 	}
 
 	return charges;
 }
 
-std::wstring format_space_units(unsigned u) {
-	if (!u)
+std::wstring format_space_units(const unsigned u) {
+	if (!u) {
 		return L"0";
+	}
 
 	return to_wstring(u / long double(SPACE_ATOMS_PER_UNIT), 2);
 }
 
-void drop_from_all_slots(entity_handle c, logic_step& step) {
-	auto& container = c.get<components::container>();
+void drop_from_all_slots(const entity_handle c, logic_step& step) {
+	const auto& container = c.get<components::container>();
 
-	for (auto& s : container.slots) {
-		auto items_uninvalidated = s.second.items_inside;
+	for (const auto& s : container.slots) {
+		const auto items_uninvalidated = s.second.items_inside;
 
-		for (auto item : items_uninvalidated) {
+		for (const auto item : items_uninvalidated) {
 			perform_transfer({ c.get_cosmos()[item], c.get_cosmos()[inventory_slot_id()] }, step);
 		}
 	}
 }
 
-unsigned calculate_space_occupied_with_children(const_entity_handle item) {
+unsigned calculate_space_occupied_with_children(const const_entity_handle item) {
 	auto space_occupied = item.get<components::item>().get_space_occupied();
 
 	if (item.find<components::container>()) {
 		ensure(item.get<components::item>().charges == 1);
 
-		for (auto& slot : item.get<components::container>().slots)
-			for (auto& entity_in_slot : slot.second.items_inside)
+		for (auto& slot : item.get<components::container>().slots) {
+			for (auto& entity_in_slot : slot.second.items_inside) {
 				space_occupied += calculate_space_occupied_with_children(item.get_cosmos()[entity_in_slot]);
+			}
+		}
 	}
 
 	return space_occupied;
 }
 
-void add_item(inventory_slot_handle handle, entity_handle new_item) {
+void add_item(const inventory_slot_handle handle, const entity_handle new_item) {
 	handle->items_inside.push_back(new_item);
 	new_item.get<components::item>().current_slot = handle;
 }
 
-void remove_item(inventory_slot_handle handle, entity_handle removed_item) {
+void remove_item(const inventory_slot_handle handle, const entity_handle removed_item) {
 	auto& v = handle->items_inside;
 	v.erase(std::remove(v.begin(), v.end(), removed_item), v.end());
 	removed_item.get<components::item>().current_slot.unset();
 }
 
-void perform_transfer(item_slot_transfer_request r, logic_step& step) {
+void perform_transfer(const item_slot_transfer_request r, logic_step& step) {
 	auto& cosmos = r.get_item().get_cosmos();
 	auto& item = r.get_item().get<components::item>();
 	const auto previous_slot_id = item.current_slot;
@@ -295,17 +306,14 @@ void perform_transfer(item_slot_transfer_request r, logic_step& step) {
 		}
 
 		entity_id grabbed_item_part;
-		entity_id new_charge_stack;
 
 		if (whole_item_grabbed) {
 			grabbed_item_part = r.get_item();
 		}
 		else {
-			new_charge_stack = cosmos.clone_entity(r.get_item());
+			grabbed_item_part = cosmos.clone_entity(r.get_item());
 			item.charges -= result.transferred_charges;
-			cosmos[new_charge_stack].get<components::item>().charges = result.transferred_charges;
-
-			grabbed_item_part = new_charge_stack;
+			cosmos[grabbed_item_part].get<components::item>().charges = result.transferred_charges;
 		}
 
 		const auto grabbed_item_part_handle = cosmos[grabbed_item_part];
@@ -314,7 +322,7 @@ void perform_transfer(item_slot_transfer_request r, logic_step& step) {
 			add_item(r.get_target_slot(), grabbed_item_part_handle);
 		}
 
-		auto physics_updater = [previous_container_transform, new_charge_stack](const entity_handle descendant) {
+		auto physics_updater = [previous_container_transform](const entity_handle descendant) {
 			auto& cosmos = descendant.get_cosmos();
 
 			const auto parent_slot = cosmos[descendant.get<components::item>().current_slot];
@@ -376,8 +384,8 @@ void perform_transfer(item_slot_transfer_request r, logic_step& step) {
 		}
 
 		if (is_drop_request) {
-			auto force = vec2().set_from_degrees(previous_container_transform.rotation).set_length(60);
-			auto offset = vec2().random_on_circle(20, cosmos.get_rng_for(r.get_item()));
+			const auto force = vec2().set_from_degrees(previous_container_transform.rotation).set_length(60);
+			const auto offset = vec2().random_on_circle(20, cosmos.get_rng_for(r.get_item()));
 
 			auto& physics = grabbed_item_part_handle.get<components::physics>();
 			physics.apply_force(force, offset, true);
