@@ -90,11 +90,13 @@ namespace augs {
 
 			template <class T>
 			auto _dynamic_cast(const gui_element_polymorphic_id& polymorphic_id) const {
+				typedef decltype(dereference_location(polymorphic_id.get<T>())) dereferenced_location_type;
+				
 				if (polymorphic_id.is<T>()) {
 					return dereference_location(polymorphic_id.get<T>());
 				}
 
-				return dereference_location(T());
+				return dereferenced_location_type();
 			}
 		};
 	}
