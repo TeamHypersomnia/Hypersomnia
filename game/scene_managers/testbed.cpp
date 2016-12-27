@@ -675,7 +675,7 @@ namespace scene_managers {
 
 		const auto menu_title = world.create_entity("menu_title");
 
-		ingredients::sprite(menu_title, vec2(100, 100), assets::texture_id::MENU_GAME_LOGO, augs::white, render_layer::EFFECTS);
+		ingredients::sprite(menu_title, vec2(100, 100), assets::texture_id::MENU_GAME_LOGO, { 255, 255, 255, 0 }, render_layer::EFFECTS);
 		const auto menu_title_size = menu_title.get<components::sprite>().size;
 		menu_title.set_logic_transform(vec2(-screen_size.x / 2, -screen_size.y / 2) + menu_title_size/2 + vec2(100, 100));
 
