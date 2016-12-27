@@ -14,3 +14,4 @@
 #include "game/messages/new_entity_message.h"
 #include "game/messages/melee_swing_response.h"
 #include "game/messages/health_event.h"
+#include "game/detail/item_slot_transfer_request.h"

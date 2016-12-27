@@ -154,8 +154,4 @@ void slot_button::consume_gui_event(logic_gui_context& context, const this_in_co
 	if (info == gui_event::lfinisheddrag) {
 		this_id->user_drag_offset += griddify(context.get_rect_world().current_drag_amount);
 	}
-
-	if (info == gui_event::hout) {
-		this_id->houted_after_drag_started = true;
-	}
 }

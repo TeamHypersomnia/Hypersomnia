@@ -39,7 +39,6 @@
 
 using namespace augs;
 
-
 void item_system::handle_trigger_confirmations_as_pick_requests(logic_step& step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();

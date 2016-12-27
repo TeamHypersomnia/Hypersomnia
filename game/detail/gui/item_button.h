@@ -55,16 +55,18 @@ struct item_button : game_gui_rect_node {
 
 		if (container.has<components::container>()) {
 			for (const auto& s : container.get<components::container>().slots) {
-				for (const auto& in : s.second.items_inside) {
-					item_button_in_item child_location;
-					child_location.item_id = in;
-					generic_call(context.dereference_location(child_location));
+				{
+					slot_button_in_container child_slot_location;
+					child_slot_location.slot_id.type = s.first;
+					child_slot_location.slot_id.container_entity = container;
+					generic_call(make_dereferenced_location(&s.second.button, child_slot_location));
 				}
 
-				slot_button_in_container child_location;
-				child_location.slot_id.type = s.first;
-				child_location.slot_id.container_entity = container;
-				generic_call(make_dereferenced_location(&s.second.button, child_location));
+				for (const auto& in : s.second.items_inside) {
+					item_button_in_item child_item_location;
+					child_item_location.item_id = in;
+					generic_call(context.dereference_location(child_item_location));
+				}
 			}
 		}
 	}

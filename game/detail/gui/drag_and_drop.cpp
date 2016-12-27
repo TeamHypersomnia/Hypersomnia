@@ -7,10 +7,10 @@
 #include "game/transcendental/entity_id.h"
 #include "augs/ensure.h"
 
-bool drag_and_drop_result::will_drop_be_successful() {
+bool drag_and_drop_result::will_drop_be_successful() const {
 	return result.result >= item_transfer_result_type::SUCCESSFUL_TRANSFER;
 }
 
-bool drag_and_drop_result::will_item_be_disposed() {
+bool drag_and_drop_result::will_item_be_disposed() const {
 	return result.result >= item_transfer_result_type::SUCCESSFUL_TRANSFER && !target_slot_alive;
 }

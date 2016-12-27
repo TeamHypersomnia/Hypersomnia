@@ -400,11 +400,6 @@ void item_button::consume_gui_event(const logic_gui_context& context, const this
 			this_id->started_drag = true;
 
 			element.dragged_charges = item.get<components::item>().charges;
-
-			if (parent_slot->always_allow_exactly_one_item)
-				if (context.get_tree_entry(parent_button).get_absolute_rect().hover(rect_world.last_state.mouse.pos)) {
-					parent_button->houted_after_drag_started = false;
-				}
 		}
 	}
 
@@ -419,17 +414,16 @@ void item_button::consume_gui_event(const logic_gui_context& context, const this
 	if (info == gui_event::lfinisheddrag) {
 		this_id->started_drag = false;
 
-		auto& drag_result = prepare_drag_and_drop_result(context);
+		const auto& drag_result = prepare_drag_and_drop_result(context);
 
 		if (drag_result.possible_target_hovered && drag_result.will_drop_be_successful()) {
-			perform_transfer(cosmos[drag_result.simulated_request], context.get_step());
+			context.get_step().transient.messages.post(drag_result.simulated_request);
 		}
 		else if (!drag_result.possible_target_hovered) {
 			vec2i griddified = griddify(rect_world.current_drag_amount);
 
 			if (parent_slot->always_allow_exactly_one_item) {
 				parent_button->user_drag_offset += griddified;
-				parent_button->houted_after_drag_started = true;
 				parent_button->perform_logic_step(context, parent_button);
 			}
 			else {

@@ -50,6 +50,7 @@ void gui_system::advance_gui_elements(logic_step& step) {
 
 	for (const auto root : cosmos.get(processing_subjects::WITH_GUI_ELEMENT)) {
 		auto& element = root.get<components::gui_element>();
+		auto& rect_world = element.rect_world;
 
 		if (root.has<components::item_slot_transfers>()) {
 			game_gui_element_tree tree;
@@ -59,13 +60,12 @@ void gui_system::advance_gui_elements(logic_step& step) {
 
 			root_of_inventory_gui_in_context root_location;
 
-			element.rect_world.perform_logic_step(context, root_location);
-			element.rect_world.build_tree_data_into_context(context, root_location);
+			rect_world.perform_logic_step(context, root_location);
+			rect_world.build_tree_data_into_context(context, root_location);
+			rect_world.call_idle_mousemotion_updater(context, root_location);
 
 			const auto& entropies = step.entropy.entropy_per_entity;
 			const auto& inputs_for_this_element = entropies.find(root);
-
-			auto& rect_world = element.rect_world;
 
 			if (inputs_for_this_element != entropies.end()) {
 				for (const auto& e : (*inputs_for_this_element).second) {
@@ -86,7 +86,7 @@ void gui_system::advance_gui_elements(logic_step& step) {
 								|| change.msg == window::event::message::rdoubleclick
 								) {
 								if (rect_world.held_rect_is_dragged) {
-									perform_transfer({ item_entity, cosmos[inventory_slot_id()], dragged_charges }, step);
+									step.transient.messages.post(item_slot_transfer_request_data{ item_entity, cosmos[inventory_slot_id()], dragged_charges });
 									fetched = true;
 								}
 							}
@@ -98,23 +98,31 @@ void gui_system::advance_gui_elements(logic_step& step) {
 			
 								dragged_charges += delta;
 			
-								if (dragged_charges <= 0)
+								if (dragged_charges <= 0) {
 									dragged_charges = item.charges + dragged_charges;
-								if (dragged_charges > item.charges)
+								}
+								if (dragged_charges > item.charges) {
 									dragged_charges = dragged_charges - item.charges;
-			
+								}
 							}
 						}
 			
 						if (!fetched) {
-							element.rect_world.consume_raw_input_and_generate_gui_events(context, root_location, e.event_for_gui);
+							rect_world.consume_raw_input_and_generate_gui_events(context, root_location, e.event_for_gui);
 						}
 					}
 				}
 			}
+
+			auto& transfers = step.transient.messages.get_queue<item_slot_transfer_request_data>();
+
+			for (const auto& t : transfers) {
+				perform_transfer(cosmos[t], step);
+			}
+
+			transfers.clear();
 			
-			element.rect_world.perform_logic_step(context, root_location);
-			rect_world.call_idle_mousemotion_updater(context, root_location);
+			rect_world.perform_logic_step(context, root_location);
 		}
 	}
 }

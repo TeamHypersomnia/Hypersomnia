@@ -13,8 +13,8 @@ struct drag_and_drop_result {
 	bool target_slot_alive = false;
 	item_transfer_result result;
 
-	bool will_item_be_disposed();
-	bool will_drop_be_successful();
+	bool will_item_be_disposed() const;
+	bool will_drop_be_successful() const;
 	std::wstring tooltip_text;
 };
 
@@ -50,7 +50,7 @@ drag_and_drop_result prepare_drag_and_drop_result(C context) {
 			bool was_pointing_to_a_stack_target = false;
 			bool no_slot_in_targeted_item = false;
 
-			if (target_slot != nullptr && target_slot->houted_after_drag_started) {
+			if (target_slot != nullptr) {
 				simulated_request.target_slot = target_slot.get_location().slot_id;
 			}
 			else if (target_item != nullptr && target_item != dragged_item) {
