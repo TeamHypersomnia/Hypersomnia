@@ -2,15 +2,15 @@
 #include "game/transcendental/entity_id.h"
 #include "augs/ensure.h"
 
-class item_button_location {
+class item_button_in_item {
 public:
 	entity_id item_id;
 
-	const item_button_location& get_location() const {
+	const item_button_in_item& get_location() const {
 		return *this;
 	}
 
-	bool operator==(const item_button_location& b) const {
+	bool operator==(const item_button_in_item& b) const {
 		return item_id == b.item_id;
 	}
 
@@ -30,8 +30,8 @@ public:
 
 namespace std {
 	template <>
-	struct hash<item_button_location> {
-		std::size_t operator()(const item_button_location& k) const {
+	struct hash<item_button_in_item> {
+		std::size_t operator()(const item_button_in_item& k) const {
 			return std::hash<entity_id>()(k.item_id);
 		}
 	};

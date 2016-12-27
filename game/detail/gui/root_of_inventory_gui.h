@@ -3,7 +3,7 @@
 
 class root_of_inventory_gui : public game_gui_rect_node {
 public:
-	typedef root_of_inventory_gui_location location;
+	typedef root_of_inventory_gui_in_context location;
 
 	root_of_inventory_gui(const vec2 screen_size);
 

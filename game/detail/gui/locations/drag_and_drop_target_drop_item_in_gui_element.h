@@ -1,8 +1,8 @@
 #pragma once
 
-struct drag_and_drop_target_drop_item_location {
+struct drag_and_drop_target_drop_item_in_gui_element {
 public:
-	bool operator==(drag_and_drop_target_drop_item_location b) const {
+	bool operator==(drag_and_drop_target_drop_item_in_gui_element b) const {
 		return true;
 	}
 
@@ -20,9 +20,9 @@ public:
 
 namespace std {
 	template <>
-	struct hash<drag_and_drop_target_drop_item_location> {
-		size_t operator()(const drag_and_drop_target_drop_item_location& k) const {
-			return hash<size_t>()(typeid(drag_and_drop_target_drop_item_location).hash_code());
+	struct hash<drag_and_drop_target_drop_item_in_gui_element> {
+		size_t operator()(const drag_and_drop_target_drop_item_in_gui_element& k) const {
+			return hash<size_t>()(typeid(drag_and_drop_target_drop_item_in_gui_element).hash_code());
 		}
 	};
 }

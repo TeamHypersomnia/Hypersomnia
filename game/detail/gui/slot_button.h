@@ -10,7 +10,7 @@
 #include "augs/padding_byte.h"
 
 struct slot_button : game_gui_rect_node {
-	typedef slot_button_location location;
+	typedef slot_button_in_container location;
 	typedef dereferenced_location<slot_button> this_pointer;
 	typedef dereferenced_location<const slot_button> const_this_pointer;
 

@@ -2,11 +2,11 @@
 #include "game/detail/inventory_slot_id.h"
 #include "augs/ensure.h"
 
-class slot_button_location {
+class slot_button_in_container {
 public:
 	inventory_slot_id slot_id;
 
-	bool operator==(const slot_button_location& b) const {
+	bool operator==(const slot_button_in_container& b) const {
 		return slot_id == b.slot_id;
 	}
 
@@ -26,8 +26,8 @@ public:
 
 namespace std {
 	template <>
-	struct hash<slot_button_location> {
-		std::size_t operator()(const slot_button_location& k) const {
+	struct hash<slot_button_in_container> {
+		std::size_t operator()(const slot_button_in_container& k) const {
 			return std::hash<inventory_slot_id>()(k.slot_id);
 		}
 	};

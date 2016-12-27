@@ -6,7 +6,7 @@
 #include "game/detail/gui/game_gui_context.h"
 
 struct drag_and_drop_target_drop_item : game_gui_rect_node {
-	typedef drag_and_drop_target_drop_item_location location;
+	typedef drag_and_drop_target_drop_item_in_gui_element location;
 	typedef dereferenced_location<drag_and_drop_target_drop_item> this_pointer;
 	typedef dereferenced_location<const drag_and_drop_target_drop_item> const_this_pointer;
 

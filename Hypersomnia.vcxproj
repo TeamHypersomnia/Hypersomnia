@@ -1096,10 +1096,10 @@
     <ClInclude Include="game\detail\gui\gui_positioning.h" />
     <ClInclude Include="game\detail\gui\immediate_hud.h" />
     <ClInclude Include="game\detail\gui\item_button.h" />
-    <ClInclude Include="game\detail\gui\locations\drag_and_drop_target_drop_item_location.h" />
-    <ClInclude Include="game\detail\gui\locations\item_button_location.h" />
-    <ClInclude Include="game\detail\gui\locations\root_of_inventory_gui_location.h" />
-    <ClInclude Include="game\detail\gui\locations\slot_button_location.h" />
+    <ClInclude Include="game\detail\gui\locations\drag_and_drop_target_drop_item_in_gui_element.h" />
+    <ClInclude Include="game\detail\gui\locations\item_button_in_item.h" />
+    <ClInclude Include="game\detail\gui\locations\root_of_inventory_gui_in_context.h" />
+    <ClInclude Include="game\detail\gui\locations\slot_button_in_container.h" />
     <ClInclude Include="game\detail\gui\pixel_line_connector.h" />
     <ClInclude Include="game\detail\gui\root_of_inventory_gui.h" />
     <ClInclude Include="game\detail\gui\slot_button.h" />

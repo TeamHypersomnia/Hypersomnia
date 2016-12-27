@@ -57,7 +57,7 @@ void gui_system::advance_gui_elements(logic_step& step) {
 
 			logic_gui_context context(step, root, tree, root_of_gui);
 
-			root_of_inventory_gui_location root_location;
+			root_of_inventory_gui_in_context root_location;
 
 			element.rect_world.perform_logic_step(context, root_location);
 			element.rect_world.build_tree_data_into_context(context, root_location);

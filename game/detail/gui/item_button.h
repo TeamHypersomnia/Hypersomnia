@@ -16,7 +16,7 @@ struct item_button : game_gui_rect_node {
 	typedef augs::gui::draw_info draw_info;
 	typedef game_gui_rect_node base;
 
-	typedef item_button_location location;
+	typedef item_button_in_item location;
 	typedef dereferenced_location<item_button> this_pointer;
 	typedef dereferenced_location<const item_button> const_this_pointer;
 

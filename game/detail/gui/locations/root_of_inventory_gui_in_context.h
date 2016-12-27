@@ -1,8 +1,8 @@
 #pragma once
 
-class root_of_inventory_gui_location {
+class root_of_inventory_gui_in_context {
 public:
-	bool operator==(root_of_inventory_gui_location b) const {
+	bool operator==(root_of_inventory_gui_in_context b) const {
 		return true;
 	}
 
@@ -19,9 +19,9 @@ public:
 
 namespace std {
 	template <>
-	struct hash<root_of_inventory_gui_location> {
-		size_t operator()(const root_of_inventory_gui_location& k) const {
-			return hash<size_t>()(typeid(root_of_inventory_gui_location).hash_code());
+	struct hash<root_of_inventory_gui_in_context> {
+		size_t operator()(const root_of_inventory_gui_in_context& k) const {
+			return hash<size_t>()(typeid(root_of_inventory_gui_in_context).hash_code());
 		}
 	};
 }
