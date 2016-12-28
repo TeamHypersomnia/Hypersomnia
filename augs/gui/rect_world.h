@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+
 #include "augs/math/vec2.h"
 #include "augs/window_framework/event.h"
 #include "augs/misc/timer.h"
@@ -25,23 +26,11 @@ namespace augs {
 	namespace gui {
 		extern clipboard global_clipboard;
 
-		template<class C, class gui_element_id>
-		void polymorphic_consume_gui_event(C context, const gui_element_id& id, const gui_event ev) {
-			context(id, [&](const auto& r) {
-				r->consume_gui_event(context, r, ev);
-			});
-		}
-
-		template<class C, class gui_element_id>
-		void polymorphic_consume_raw_input(C context, const gui_element_id& id, event_traversal_flags& in) {
-			context(id, [&](const auto& r) {
-				r->consume_raw_input_and_generate_gui_events(context, r, in);
-			});
-		}
-
 		template <class gui_element_polymorphic_id>
 		class rect_world {
 		public:
+			typedef augs::gui::gui_entropy<gui_element_polymorphic_id> gui_entropy;
+
 			template<class C, class gui_element_id>
 			bool is_hovered(C context, const gui_element_id& id) {
 				return context(id, [&](const auto& p) {
@@ -75,6 +64,11 @@ namespace augs {
 				return rect_in_focus;
 			}
 
+			template <class gui_element_id>
+			static void generate_gui_event(gui_entropy& entropies, const gui_element_id& id, event_info in) {
+				entropies.post_event(id, in);
+			}
+
 			template <class C, class gui_element_id>
 			void set_focus(C context, const gui_element_id& new_to_focus) {
 				if (new_to_focus == rect_in_focus) {
@@ -82,18 +76,18 @@ namespace augs {
 				}
 
 				if (context.alive(rect_in_focus)) {
-					polymorphic_consume_gui_event(context, rect_in_focus, gui_event::blur);
+					generate_gui_event(entropies, rect_in_focus, gui_event::blur);
 				}
 
 				rect_in_focus = new_to_focus;
 
 				if (context.alive(new_to_focus)) {
-					polymorphic_consume_gui_event(context, new_to_focus, gui_event::focus);
+					generate_gui_event(entropies, new_to_focus, gui_event::focus);
 				}
 			}
 
 			template <class C, class gui_element_id>
-			void consume_raw_input_and_generate_gui_events(C context, const gui_element_id& root, const window::event::change new_state) {
+			void consume_raw_input_and_generate_gui_events(C context, const gui_element_id& root, const window::event::change new_state, gui_entropy& entropies) {
 				using namespace augs::window;
 
 				last_state.apply(new_state);
@@ -101,22 +95,23 @@ namespace augs {
 				event_traversal_flags in(new_state);
 				bool pass = true;
 
-				if (middlescroll.handle_new_raw_state(context, new_state))
+				if (middlescroll.handle_new_raw_state(context, new_state)) {
 					return;
+				}
 
 				if (new_state.msg == event::message::lup) {
 					if (context.alive(rect_held_by_lmb)) {
 						if (is_hovered(context, rect_held_by_lmb)) {
-							polymorphic_consume_gui_event(context, rect_held_by_lmb, gui_event::lup);
-							polymorphic_consume_gui_event(context, rect_held_by_lmb, gui_event::lclick);
+							generate_gui_event(entropies, rect_held_by_lmb, gui_event::lup);
+							generate_gui_event(entropies, rect_held_by_lmb, gui_event::lclick);
 							pass = false;
 						}
 						else {
-							polymorphic_consume_gui_event(context, rect_held_by_lmb, gui_event::loutup);
+							generate_gui_event(entropies, rect_held_by_lmb, gui_event::loutup);
 						}
 
 						if (held_rect_is_dragged) {
-							polymorphic_consume_gui_event(context, rect_held_by_lmb, gui_event::lfinisheddrag);
+							generate_gui_event(entropies, rect_held_by_lmb, { gui_event::lfinisheddrag, 0, current_drag_amount } );
 						}
 
 						current_drag_amount.set(0, 0);
@@ -128,12 +123,12 @@ namespace augs {
 				if (new_state.msg == event::message::rup) {
 					if (context.alive(rect_held_by_rmb)) {
 						if (is_hovered(context, rect_held_by_rmb)) {
-							polymorphic_consume_gui_event(context, rect_held_by_rmb, gui_event::rup);
-							polymorphic_consume_gui_event(context, rect_held_by_rmb, gui_event::rclick);
+							generate_gui_event(entropies, rect_held_by_rmb, gui_event::rup);
+							generate_gui_event(entropies, rect_held_by_rmb, gui_event::rclick);
 							pass = false;
 						}
 						else {
-							polymorphic_consume_gui_event(context, rect_held_by_rmb, gui_event::routup);
+							generate_gui_event(entropies, rect_held_by_rmb, gui_event::routup);
 						}
 
 						current_drag_amount.set(0, 0);
@@ -146,7 +141,9 @@ namespace augs {
 					&& new_state.msg == event::message::wheel) {
 
 					if (context(rect_in_focus, [](const auto& r) { return r->get_flag(flag::ENABLE_DRAWING); })) {
-						polymorphic_consume_raw_input(context, rect_in_focus, in);
+						context(rect_in_focus, [&](const auto& r) {
+							r->consume_raw_input_and_generate_gui_events(context, r, in, entropies);
+						});
 					}
 
 					pass = false;
@@ -165,21 +162,21 @@ namespace augs {
 					switch (new_state.msg) {
 					case event::message::keydown:   
 						if (rect_in_focus_drawing_enabled) {
-							polymorphic_consume_gui_event(context, rect_in_focus, gui_event::keydown);
+							generate_gui_event(entropies, rect_in_focus, gui_event::keydown);
 						}
 
 						pass = false;
 						break;
 					case event::message::keyup:	    
 						if (rect_in_focus_drawing_enabled) {
-							polymorphic_consume_gui_event(context, rect_in_focus, gui_event::keyup);
+							generate_gui_event(entropies, rect_in_focus, gui_event::keyup);
 						}
 
 						pass = false;
 						break;
 					case event::message::character: 
 						if (rect_in_focus_drawing_enabled) {
-							polymorphic_consume_gui_event(context, rect_in_focus, gui_event::character);
+							generate_gui_event(entropies, rect_in_focus, gui_event::character);
 						}
 
 						pass = false;
@@ -194,11 +191,13 @@ namespace augs {
 				}
 
 				if (pass) {
-					polymorphic_consume_raw_input(context, root, in);
+					context(root, [&](const auto& r) {
+						r->consume_raw_input_and_generate_gui_events(context, r, in, entropies);
+					});
 
 					if (!in.was_hovered_rect_visited && context.alive(rect_hovered)) {
 						context(rect_hovered, [&](const auto& r) { 
-							r->unhover(context, r, in);
+							r->unhover(context, r, in, entropies);
 						});
 					}
 				}
@@ -212,16 +211,23 @@ namespace augs {
 			}
 
 			template <class C, class gui_element_id>
-			void perform_logic_step(C context, const gui_element_id& root) {
-				context(root, [&](const auto& r) { 
-					r->perform_logic_step(context, r);
+			void advance_elements(C context, const gui_element_id& root, const gui_entropy& entropies) {
+				context(root, [&](const auto& r) {
+					r->advance_elements(context, r, entropies);
 				});
 
-				middlescroll.perform_logic_step(context, context.get_step().get_delta());
+				middlescroll.advance_elements(context, context.get_step().get_delta());
+			}			
+			
+			template <class C, class gui_element_id>
+			void rebuild_layouts(C context, const gui_element_id& root) {
+				context(root, [&](const auto& r) {
+					r->rebuild_layouts(context, r);
+				});
 			}
 			
 			template <class C, class gui_element_id>
-			void call_idle_mousemotion_updater(C context, const gui_element_id& root) {
+			void call_idle_mousemotion_updater(C context, const gui_element_id& root, gui_entropy& entropy) {
 				window::event::change fabricated_state;
 				fabricated_state.msg = window::event::message::mousemotion;
 				fabricated_state.mouse.rel.set(0, 0);
@@ -229,11 +235,11 @@ namespace augs {
 				event_traversal_flags mousemotion_updater(fabricated_state);
 
 				context(root, [&](const auto& r) {
-					r->consume_raw_input_and_generate_gui_events(context, r, mousemotion_updater);
+					r->consume_raw_input_and_generate_gui_events(context, r, mousemotion_updater, entropy);
 				});
 
 				if (!mousemotion_updater.was_hovered_rect_visited && context.alive(rect_hovered)) {
-					context(rect_hovered, [&](const auto& r) { r->unhover(context, r, mousemotion_updater); });
+					context(rect_hovered, [&](const auto& r) { r->unhover(context, r, mousemotion_updater, entropy); });
 				}
 			}
 

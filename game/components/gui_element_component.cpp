@@ -92,7 +92,13 @@ namespace components {
 	}
 
 	void gui_element::draw_cursor_and_tooltip(vertex_triangle_buffer& output_buffer, const viewing_gui_context& context) const {
-		auto& drag_result = prepare_drag_and_drop_result(context);
+		drag_and_drop_result drag_result;
+		const auto& rect_world = context.get_rect_world();
+
+		if (rect_world.held_rect_is_dragged) {
+			drag_result = prepare_drag_and_drop_result(context, rect_world.rect_held_by_lmb, rect_world.rect_hovered);
+		}
+
 		auto& step = context.get_step();
 		const auto& cosmos = step.get_cosmos();
 

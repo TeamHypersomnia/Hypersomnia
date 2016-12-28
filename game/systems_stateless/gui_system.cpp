@@ -54,15 +54,14 @@ void gui_system::advance_gui_elements(logic_step& step) {
 
 		if (root.has<components::item_slot_transfers>()) {
 			game_gui_element_tree tree;
+			augs::gui::gui_entropy<game_gui_element_location> entropy;
 			root_of_inventory_gui root_of_gui(element.get_screen_size());
 
 			logic_gui_context context(step, root, tree, root_of_gui);
 
 			root_of_inventory_gui_in_context root_location;
 
-			rect_world.perform_logic_step(context, root_location);
 			rect_world.build_tree_data_into_context(context, root_location);
-			rect_world.call_idle_mousemotion_updater(context, root_location);
 
 			const auto& entropies = step.entropy.entropy_per_entity;
 			const auto& inputs_for_this_element = entropies.find(root);
@@ -108,11 +107,14 @@ void gui_system::advance_gui_elements(logic_step& step) {
 						}
 			
 						if (!fetched) {
-							rect_world.consume_raw_input_and_generate_gui_events(context, root_location, e.event_for_gui);
+							rect_world.consume_raw_input_and_generate_gui_events(context, root_location, e.event_for_gui, entropy);
 						}
 					}
 				}
 			}
+			
+			// rect_world.call_idle_mousemotion_updater(context, root_location, entropy);
+			rect_world.advance_elements(context, root_location, entropy);
 
 			auto& transfers = step.transient.messages.get_queue<item_slot_transfer_request_data>();
 
@@ -120,9 +122,9 @@ void gui_system::advance_gui_elements(logic_step& step) {
 				perform_transfer(cosmos[t], step);
 			}
 
-			transfers.clear();
+			rect_world.rebuild_layouts(context, root_location);
 			
-			rect_world.perform_logic_step(context, root_location);
+			transfers.clear();
 		}
 	}
 }

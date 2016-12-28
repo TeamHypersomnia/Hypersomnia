@@ -2,19 +2,18 @@
 #include "augs/gui/dereferenced_location.h"
 #include "augs/gui/rect_tree.h"
 #include "augs/gui/rect_world.h"
+#include "augs/gui/gui_traversal_structs.h"
 #include "augs/templates/maybe_const.h"
 
 namespace augs {
 	namespace gui {
-		template <class gui_element_polymorphic_id, bool is_const_value, class derived>
+		template <class gui_element_polymorphic_id, bool is_const, class derived>
 		class basic_context {
 		public:
-			static constexpr bool is_const = is_const_value;
-			
-			typedef maybe_const_ref_t<is_const_value, rect_world<gui_element_polymorphic_id>> rect_world_ref;
+			typedef maybe_const_ref_t<is_const, rect_world<gui_element_polymorphic_id>> rect_world_ref;
 			typedef maybe_const_ref_t<false, rect_tree<gui_element_polymorphic_id>> tree_ref;
 			typedef maybe_const_ref_t<false, rect_tree_entry<gui_element_polymorphic_id>> rect_tree_entry_ref;
-			
+
 			rect_world_ref world;
 			tree_ref tree;
 			
@@ -99,5 +98,42 @@ namespace augs {
 				return dereferenced_location_type();
 			}
 		};
+
+		//template <class gui_element_polymorphic_id, bool is_const, class derived>
+		//class basic_context;
+		//
+		//template <class gui_element_polymorphic_id, class derived>
+		//class basic_context<gui_element_polymorphic_id, false, derived> : public basic_context_base<gui_element_polymorphic_id, false, derived> {
+		//public:
+		//	typedef std::unordered_map<gui_element_polymorphic_id, std::vector<event_info>> gui_entropy;
+		//	typedef gui_entropy& gui_entropy_ref;
+		//	typedef basic_context_base<gui_element_polymorphic_id, false, derived> base;
+		//
+		//	typedef typename base::rect_world_ref rect_world_ref;
+		//	typedef typename base::tree_ref tree_ref;
+		//
+		//	using base::base;
+		//
+		//	gui_entropy entropy;
+		//
+		//	void generate_gui_event(const gui_element_polymorphic_id& id, const event_info& in) {
+		//		entropy[id].push_back(in);
+		//	}
+		//
+		//	const std::vector<event_info>& get_entropy_for(const gui_element_polymorphic_id& id) const {
+		//		return entropy.at(id);
+		//	}
+		//};
+		//
+		//template <class gui_element_polymorphic_id, class derived>
+		//class basic_context<gui_element_polymorphic_id, true, derived> : public basic_context_base<gui_element_polymorphic_id, true, derived> {
+		//public:
+		//	typedef basic_context_base<gui_element_polymorphic_id, true, derived> base;
+		//	
+		//	using base::base;
+		//
+		//	typedef typename base::rect_world_ref rect_world_ref;
+		//	typedef typename base::tree_ref tree_ref;
+		//};
 	}
 }

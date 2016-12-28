@@ -12,8 +12,9 @@ namespace augs {
 		arr_type raw;
 
 		unsigned find_first_set_index(unsigned from) const {
-			while (from < static_cast<size_t>(Enum::COUNT) && !is_set.test(from))
+			while (from < static_cast<size_t>(Enum::COUNT) && !is_set.test(from)) {
 				++from;
+			}
 
 			return from;
 		}

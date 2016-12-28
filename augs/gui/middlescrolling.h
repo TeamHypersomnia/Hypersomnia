@@ -16,7 +16,7 @@ namespace augs {
 			float speed_mult = 1.f;
 
 			template<class C>
-			void perform_logic_step(C context, const delta& dt) {
+			void advance_elements(C context, const delta& dt) {
 				if (context.alive(subject)) {
 					context(subject, [&](auto& r) {
 						r->set_scroll(r->get_scroll() + static_cast<vec2>(context.get_rect_world().last_state.mouse.pos - middlescroll_icon_position) * float(speed_mult*dt.in_milliseconds()));

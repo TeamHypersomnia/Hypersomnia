@@ -34,6 +34,8 @@ namespace augs {
 
 		template <class gui_element_polymorphic_id>
 		struct rect_node : rect_node_data {
+			typedef augs::gui::gui_entropy<gui_element_polymorphic_id> gui_entropy;
+
 			using rect_node_data::rect_node_data;
 
 			template <class C, class gui_element_id>
@@ -86,7 +88,7 @@ namespace augs {
 			}
 
 			template <class C, class gui_element_id>
-			static void consume_raw_input_and_generate_gui_events(C context, const gui_element_id& this_id, gui::event_traversal_flags& inf) {
+			static void consume_raw_input_and_generate_gui_events(C context, const gui_element_id& this_id, gui::event_traversal_flags& inf, gui_entropy& entropies) {
 				using namespace augs::window::event;
 				auto& gr = context.get_rect_world();
 				const auto& tree_entry = context.get_tree_entry(this_id);
@@ -96,14 +98,14 @@ namespace augs {
 				const auto& mouse_pos = m.pos;
 
 				auto gui_event_lambda = [&](const gui_event ev, const int scroll_amount = 0) {
-					this_id->consume_gui_event(context, this_id, event_info(ev, scroll_amount));
+					entropies.post_event(this_id, { ev, scroll_amount });
 				};
 
 				if (this_id->get_flag(flag::ENABLE_DRAWING)) {
 					if (this_id->get_flag(flag::ENABLE_DRAWING_OF_CHILDREN)) {
 						this_id->for_each_child(context, this_id, [&](const auto& child_id) {
 							if (child_id->get_flag(flag::ENABLE_DRAWING)) {
-								child_id->consume_raw_input_and_generate_gui_events(context, child_id, inf);
+								child_id->consume_raw_input_and_generate_gui_events(context, child_id, inf, entropies);
 							}
 						});
 					}
@@ -174,7 +176,7 @@ namespace augs {
 							else {
 								// ensure(msg == message::mousemotion);
 								gui_event_lambda(gui_event::hout);
-								unhover(context, this_id, inf);
+								unhover(context, this_id, inf, entropies);
 							}
 
 							inf.was_hovered_rect_visited = true;
@@ -189,25 +191,27 @@ namespace augs {
 				}
 			}
 
-			template <class C, class gui_element_id>
-			static void consume_gui_event(C context, const gui_element_id& this_id, const event_info e) {
+			//template <class C, class gui_element_id>
+			//static void consume_gui_event(C context, const gui_element_id& this_id, const event_info e) {
 				// try_to_make_this_rect_focused(context, this_id, e);
 				//	scroll_content_with_wheel(context, e);
 				//	try_to_enable_middlescrolling(context, e);
-			}
+			//}
 
 			template <class C, class gui_element_id>
-			static void perform_logic_step(C context, const gui_element_id& this_id) {
-				this_id->perform_logic_step_on_children(context, this_id);
-			}
-
-			template <class C, class gui_element_id>
-			static void perform_logic_step_on_children(C context, const gui_element_id& this_id) {
+			static void advance_elements(C context, const gui_element_id& this_id, const gui_entropy& entropies) {
 				this_id->for_each_child(context, this_id, [&](const auto& child_id) {
-					child_id->perform_logic_step(context, child_id);
+					child_id->advance_elements(context, child_id, entropies);
 				});
 			}
 
+			template <class C, class gui_element_id>
+			static void rebuild_layouts(C context, const gui_element_id& this_id) {
+				this_id->for_each_child(context, this_id, [&](const auto& child_id) {
+					child_id->rebuild_layouts(context, child_id);
+				});
+			}
+			
 			template <class C, class gui_element_id>
 			static void draw(C context, const gui_element_id& this_id, draw_info in) {
 				if (!this_id->get_flag(flag::ENABLE_DRAWING)) {
@@ -263,22 +267,23 @@ namespace augs {
 			}
 
 			template <class C, class gui_element_id, class L>
-			static void for_each_child(const C&, const gui_element_id&, L) {
+			static void for_each_child(C&, const gui_element_id&, L) {
 
 			}
 
 			template <class C, class gui_element_id>
-			static void unhover(C context, const gui_element_id& this_id, gui::event_traversal_flags& inf) {
+			static void unhover(C context, const gui_element_id& this_id, gui::event_traversal_flags& inf, gui_entropy& entropies) {
 				auto& world = context.get_rect_world();
 
 				auto gui_event_lambda = [&](const gui_event ev) {
-					this_id->consume_gui_event(context, this_id, ev);
+					entropies.post_event(this_id, ev);
 				};
 
 				gui_event_lambda(gui_event::hoverlost);
 
-				if (world.rect_held_by_lmb == this_id)
+				if (world.rect_held_by_lmb == this_id) {
 					gui_event_lambda(gui_event::loutdrag);
+				}
 
 				world.rect_hovered.unset();
 			}

@@ -113,9 +113,25 @@ void slot_button::draw(const viewing_gui_context& context, const const_this_in_c
 	}
 }
 
-void slot_button::perform_logic_step(const logic_gui_context& context, const this_in_container& this_id) {
-	game_gui_rect_node::perform_logic_step(context, this_id);
+void slot_button::advance_elements(const logic_gui_context& context, const this_in_container& this_id, const gui_entropy& gui_entropies) {
+	game_gui_rect_node::advance_elements(context, this_id, gui_entropies);
 	
+	for (const auto& info : gui_entropies.get_events_for(this_id)) {
+		this_id->detector.update_appearance(info);
+
+		if (info == gui_event::lfinisheddrag) {
+			this_id->user_drag_offset += griddify(info.total_dragged_amount);
+		}
+	}
+}
+
+void slot_button::rebuild_layouts(const logic_gui_context& context, const this_in_container& this_id) {
+	game_gui_rect_node::rebuild_layouts(context, this_id);
+
+	update_rc(context, this_id);
+}
+
+void slot_button::update_rc(const logic_gui_context& context, const this_in_container& this_id) {
 	const auto& step = context.get_step();
 	const auto& cosmos = step.get_cosmos();
 
@@ -138,20 +154,12 @@ void slot_button::perform_logic_step(const logic_gui_context& context, const thi
 
 	this_id->slot_relative_pos = griddify(this_id->slot_relative_pos);
 	this_id->user_drag_offset = griddify(this_id->user_drag_offset);
-	
+
 	vec2i absolute_pos = this_id->slot_relative_pos + this_id->user_drag_offset;
 
 	if (context.get_rect_world().is_being_dragged(this_id)) {
 		absolute_pos += griddify(context.get_rect_world().current_drag_amount);
 	}
-	
-	this_id->rc.set_position(absolute_pos);
-}
 
-void slot_button::consume_gui_event(logic_gui_context& context, const this_in_container& this_id, const augs::gui::event_info info) {
-	this_id->detector.update_appearance(info);
-	
-	if (info == gui_event::lfinisheddrag) {
-		this_id->user_drag_offset += griddify(context.get_rect_world().current_drag_amount);
-	}
+	this_id->rc.set_position(absolute_pos);
 }

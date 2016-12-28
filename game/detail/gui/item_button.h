@@ -15,6 +15,7 @@
 struct item_button : game_gui_rect_node {
 	typedef augs::gui::draw_info draw_info;
 	typedef game_gui_rect_node base;
+	typedef base::gui_entropy gui_entropy;
 
 	typedef dereferenced_location<item_button_in_item> this_in_item;
 	typedef const_dereferenced_location<item_button_in_item> const_this_in_item;
@@ -76,8 +77,8 @@ struct item_button : game_gui_rect_node {
 
 	static bool is_being_wholely_dragged_or_pending_finish(const const_logic_gui_context&, const const_this_in_item& this_id);
 
-	static void consume_gui_event(const logic_gui_context&, const this_in_item& this_id, const augs::gui::event_info e);
-	static void perform_logic_step(const logic_gui_context&, const this_in_item& this_id);
+	static void advance_elements(const logic_gui_context&, const this_in_item& this_id, const gui_entropy& entropies);
+	static void rebuild_layouts(const logic_gui_context&, const this_in_item& this_id);
 
 	static bool is_inventory_root(const const_logic_gui_context&, const const_this_in_item& this_id);
 	static void draw(const viewing_gui_context&, const const_this_in_item& this_id, draw_info);

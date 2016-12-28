@@ -8,6 +8,7 @@
 struct drag_and_drop_target_drop_item : game_gui_rect_node {
 	typedef dereferenced_location<drag_and_drop_target_drop_item_in_gui_element> this_pointer;
 	typedef const_dereferenced_location<drag_and_drop_target_drop_item_in_gui_element> const_this_pointer;
+	typedef typename game_gui_rect_node::gui_entropy gui_entropy;
 
 	drag_and_drop_target_drop_item(const augs::gui::material new_mat);
 
@@ -19,6 +20,6 @@ struct drag_and_drop_target_drop_item : game_gui_rect_node {
 	augs::gui::appearance_detector detector;
 
 	static void draw(const viewing_gui_context& context, const const_this_pointer& this_id, augs::gui::draw_info info);
-	static void consume_gui_event(const logic_gui_context& context, const this_pointer& this_id, const augs::gui::event_info info);
-	static void perform_logic_step(const logic_gui_context&, const this_pointer& this_id);
+	static void advance_elements(const logic_gui_context&, const this_pointer& this_id, const gui_entropy& entropies);
+	static void rebuild_layouts(const logic_gui_context&, const this_pointer& this_id);
 };

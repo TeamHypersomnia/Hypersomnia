@@ -12,6 +12,7 @@
 struct slot_button : game_gui_rect_node {
 	typedef dereferenced_location<slot_button_in_container> this_in_container;
 	typedef const_dereferenced_location<slot_button_in_container> const_this_in_container;
+	typedef game_gui_rect_node::gui_entropy gui_entropy;
 
 	vec2i slot_relative_pos;
 	vec2i user_drag_offset;
@@ -20,10 +21,11 @@ struct slot_button : game_gui_rect_node {
 	
 	slot_button();
 
-	static void perform_logic_step(const logic_gui_context&, const this_in_container&);
-	
+	static void advance_elements(const logic_gui_context&, const this_in_container&, const gui_entropy& entropies);
+	static void rebuild_layouts(const logic_gui_context&, const this_in_container& this_id);
 	static void draw(const viewing_gui_context&, const const_this_in_container&, augs::gui::draw_info);
-	static void consume_gui_event(logic_gui_context&, const this_in_container&, const augs::gui::event_info info);
+
+	static void update_rc(const logic_gui_context&, const this_in_container&);
 };
 
 slot_button& get_meta(inventory_slot_id);

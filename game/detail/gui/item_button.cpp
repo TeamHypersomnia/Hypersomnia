@@ -139,7 +139,7 @@ rects::ltrb<float> item_button::iterate_children_attachments(
 				attachment_sprite.color.a = item_sprite.color.a;
 
 				components::sprite::drawing_input attachment_state = state;
-				
+
 				auto offset = parent_slot.sum_attachment_offsets_of_parents(desc) -
 					cosmos[item_handle.get<components::item>().current_slot].sum_attachment_offsets_of_parents(item_handle);
 
@@ -177,8 +177,9 @@ rects::ltrb<float> item_button::iterate_children_attachments(
 }
 
 void item_button::draw_proc(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in, const drawing_flags& f) {
-	if (is_inventory_root(context, this_id))
+	if (is_inventory_root(context, this_id)) {
 		return;
+	}
 
 	const auto& cosmos = context.get_step().get_cosmos();
 	const auto& item = cosmos[this_id.get_location().item_id];
@@ -339,8 +340,8 @@ bool item_button::is_inventory_root(const const_logic_gui_context& context, cons
 	return result;
 }
 
-void item_button::perform_logic_step(const logic_gui_context& context, const this_in_item& this_id) {
-	base::perform_logic_step(context, this_id);
+void item_button::rebuild_layouts(const logic_gui_context& context, const this_in_item& this_id) {
+	base::rebuild_layouts(context, this_id);
 
 	const auto& cosmos = context.get_step().get_cosmos();
 	const auto& item = cosmos[this_id.get_location().item_id];
@@ -373,7 +374,7 @@ void item_button::perform_logic_step(const logic_gui_context& context, const thi
 	auto parent_slot = cosmos[item.get<components::item>().current_slot];
 
 	if (parent_slot->always_allow_exactly_one_item) {
-		const_dereferenced_location<slot_button_in_container> parent_button = context.dereference_location(slot_button_in_container{parent_slot.get_id()});
+		const_dereferenced_location<slot_button_in_container> parent_button = context.dereference_location(slot_button_in_container{ parent_slot.get_id() });
 
 		this_id->rc.set_position(parent_button->rc.get_position());
 	}
@@ -382,62 +383,67 @@ void item_button::perform_logic_step(const logic_gui_context& context, const thi
 	}
 }
 
-void item_button::consume_gui_event(const logic_gui_context& context, const this_in_item& this_id, const augs::gui::event_info info) {
-	if (is_inventory_root(context, this_id))
-		return;
+void item_button::advance_elements(const logic_gui_context& context, const this_in_item& this_id, const gui_entropy& entropies) {
+	base::advance_elements(context, this_id, entropies);
 
-	auto& cosmos = context.get_step().get_cosmos();
+	const auto& cosmos = context.get_step().get_cosmos();
 	const auto& item = cosmos[this_id.get_location().item_id];
+	const auto& rect_world = context.get_rect_world();
 	auto& element = context.get_gui_element_component();
-	auto& rect_world = context.get_rect_world();
 
-	this_id->detector.update_appearance(info);
-	auto parent_slot = cosmos[item.get<components::item>().current_slot];
-	const auto parent_button = context.dereference_location(slot_button_in_container{ parent_slot.get_id() });
+	if (!is_inventory_root(context, this_id)) {
+		for (const auto& info : entropies.get_events_for(this_id)) {
+			this_id->detector.update_appearance(info);
 
-	if (info == gui_event::ldrag) {
-		if (!this_id->started_drag) {
-			this_id->started_drag = true;
+			const auto parent_slot = cosmos[item.get<components::item>().current_slot];
+			const auto parent_button = context.dereference_location(slot_button_in_container{ parent_slot.get_id() });
 
-			element.dragged_charges = item.get<components::item>().charges;
-		}
-	}
+			if (info == gui_event::ldrag) {
+				if (!this_id->started_drag) {
+					this_id->started_drag = true;
 
-	if (info == gui_event::wheel) {
-		LOG("%x", info.scroll_amount);
-	}
-
-	if (info == gui_event::rclick) {
-		this_id->is_container_open = !this_id->is_container_open;
-	}
-
-	if (info == gui_event::lfinisheddrag) {
-		this_id->started_drag = false;
-
-		const auto& drag_result = prepare_drag_and_drop_result(context);
-
-		if (drag_result.possible_target_hovered && drag_result.will_drop_be_successful()) {
-			context.get_step().transient.messages.post(drag_result.simulated_request);
-		}
-		else if (!drag_result.possible_target_hovered) {
-			vec2i griddified = griddify(rect_world.current_drag_amount);
-
-			if (parent_slot->always_allow_exactly_one_item) {
-				parent_button->user_drag_offset += griddified;
-				parent_button->perform_logic_step(context, parent_button);
+					element.dragged_charges = item.get<components::item>().charges;
+				}
 			}
-			else {
-				this_id->drag_offset_in_item_deposit += griddified;
+
+			if (info == gui_event::wheel) {
+				LOG("%x", info.scroll_amount);
 			}
+
+			if (info == gui_event::rclick) {
+				this_id->is_container_open = !this_id->is_container_open;
+			}
+
+			if (info == gui_event::lfinisheddrag) {
+				this_id->started_drag = false;
+
+				const auto& drag_result = prepare_drag_and_drop_result(context, this_id, rect_world.rect_hovered);
+
+				if (drag_result.possible_target_hovered && drag_result.will_drop_be_successful()) {
+					context.get_step().transient.messages.post(drag_result.simulated_request);
+				}
+				else if (!drag_result.possible_target_hovered) {
+					const vec2i griddified = griddify(info.total_dragged_amount);
+
+					if (parent_slot->always_allow_exactly_one_item) {
+						parent_button->user_drag_offset += griddified;
+						parent_button->update_rc(context, parent_button);
+					}
+					else {
+						this_id->drag_offset_in_item_deposit += griddified;
+					}
+				}
+			}
+
+			// if(being_dragged && inf == rect::gui_event::lup)
 		}
 	}
-
-	// if(being_dragged && inf == rect::gui_event::lup)
 }
 
 void item_button::draw(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in) {
-	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING))
+	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING)) {
 		return;
+	}
 
 	if (!is_being_wholely_dragged_or_pending_finish(context, this_id)) {
 		this_id->draw_complete_with_children(context, this_id, in);
