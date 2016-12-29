@@ -31,6 +31,7 @@
 #include "augs/build_settings/setting_is_production_build.h"
 
 #include "application/ui/app_ui_root.h"
+#include "application/ui/app_ui_context.h"
 
 using namespace augs::window::event::keys;
 
@@ -44,12 +45,16 @@ void menu_setup::process(game_window& window) {
 	augs::sound_source menu_theme_source;
 
 	if (cfg.music_volume > 0.f) {
-		menu_theme.set_data(augs::get_sound_samples_from_file("hypersomnia/music/menu_theme.ogg"));
+		const auto menu_theme_path = "hypersomnia/music/menu_theme.ogg";
 
-		menu_theme_source.bind_buffer(menu_theme);
-		menu_theme_source.set_direct_channels(true);
-		menu_theme_source.set_gain(cfg.music_volume);
-		menu_theme_source.play();
+		if (augs::file_exists(menu_theme_path)) {
+			menu_theme.set_data(augs::get_sound_samples_from_file(menu_theme_path));
+
+			menu_theme_source.bind_buffer(menu_theme);
+			menu_theme_source.set_direct_channels(true);
+			menu_theme_source.set_gain(cfg.music_volume);
+			menu_theme_source.play();
+		}
 	}
 
 	using namespace augs::gui::text;
@@ -87,6 +92,14 @@ We wish you an exciting journey through architecture of our cosmos.\n\
 
 	augs::action_list intro_actions;
 	bool caret_active = false;
+
+	vec2i tweened_menu_button_size = vec2i(100, 30);
+
+	app_ui_rect_world menu_ui_rect_world;
+	app_ui_rect_tree menu_ui_tree;
+	app_ui_root menu_ui_root = app_ui_root(screen_size);
+	app_ui_context menu_ui_context(menu_ui_rect_world, menu_ui_tree, menu_ui_root);
+	app_ui_root_in_context menu_ui_root_id;
 
 	{
 		typedef std::unique_ptr<action> act;
@@ -151,9 +164,9 @@ We wish you an exciting journey through architecture of our cosmos.\n\
 	const auto initial_step_number = intro_scene.get_total_steps_passed();
 
 	while (!should_quit) {
-		{
-			augs::machine_entropy new_entropy;
+		augs::machine_entropy new_entropy;
 
+		{
 			session.local_entropy_profiler.new_measurement();
 			new_entropy.local = window.collect_entropy();
 			session.local_entropy_profiler.end_measurement();
@@ -207,6 +220,27 @@ We wish you an exciting journey through architecture of our cosmos.\n\
 			credits_drawer.print.active = caret_active;
 			credits_drawer.draw_stroke(renderer.get_triangle_buffer(), stroke_color);
 			credits_drawer.draw(renderer.get_triangle_buffer(), &in);
+
+			renderer.call_triangles();
+			renderer.clear_triangles();
+		}
+
+		{
+			app_ui_rect_world::gui_entropy gui_entropies;
+
+			menu_ui_rect_world.build_tree_data_into_context(menu_ui_context, menu_ui_root_id);
+
+			for (const auto& ch : new_entropy.local) {
+				menu_ui_rect_world.consume_raw_input_and_generate_gui_events(menu_ui_context, menu_ui_root_id, ch, gui_entropies);
+			}
+
+			menu_ui_rect_world.call_idle_mousemotion_updater(menu_ui_context, menu_ui_root_id, gui_entropies);
+			menu_ui_rect_world.advance_elements(menu_ui_context, menu_ui_root_id, gui_entropies, vdt);
+
+			menu_ui_root.set_menu_buttons_sizes(tweened_menu_button_size);
+			menu_ui_rect_world.rebuild_layouts(menu_ui_context, menu_ui_root_id);
+
+			menu_ui_rect_world.draw(renderer.get_triangle_buffer(), menu_ui_context, menu_ui_root_id);
 
 			renderer.call_triangles();
 			renderer.clear_triangles();

@@ -4,7 +4,7 @@
 #include "augs/templates/maybe_const.h"
 #include "application/ui/app_ui_element_location.h"
 
-typedef augs::gui::rect_tree<app_ui_element_location> app_ui_element_tree;
+typedef augs::gui::rect_tree<app_ui_element_location> app_ui_rect_tree;
 
 class app_ui_root;
 
@@ -13,7 +13,7 @@ class basic_app_ui_context : public augs::gui::basic_context<app_ui_element_loca
 public:
 	typedef augs::gui::basic_context<app_ui_element_location, is_const, basic_app_ui_context<is_const>> base;
 
-	typedef maybe_const_ref_t<is_const, root_of_inventory_gui> app_ui_root_ref;
+	typedef maybe_const_ref_t<is_const, app_ui_root> app_ui_root_ref;
 
 	typedef typename base::rect_world_ref rect_world_ref;
 	typedef typename base::tree_ref tree_ref;

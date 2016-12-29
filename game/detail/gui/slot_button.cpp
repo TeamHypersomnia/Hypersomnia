@@ -113,10 +113,10 @@ void slot_button::draw(const viewing_gui_context& context, const const_this_in_c
 	}
 }
 
-void slot_button::advance_elements(const logic_gui_context& context, const this_in_container& this_id, const gui_entropy& gui_entropies) {
-	game_gui_rect_node::advance_elements(context, this_id, gui_entropies);
+void slot_button::advance_elements(const logic_gui_context& context, const this_in_container& this_id, const gui_entropy& entropies, const augs::delta dt) {
+	game_gui_rect_node::advance_elements(context, this_id, entropies, dt);
 	
-	for (const auto& info : gui_entropies.get_events_for(this_id)) {
+	for (const auto& info : entropies.get_events_for(this_id)) {
 		this_id->detector.update_appearance(info);
 
 		if (info == gui_event::lfinisheddrag) {

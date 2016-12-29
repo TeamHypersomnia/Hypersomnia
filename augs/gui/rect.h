@@ -199,9 +199,9 @@ namespace augs {
 			//}
 
 			template <class C, class gui_element_id>
-			static void advance_elements(C context, const gui_element_id& this_id, const gui_entropy& entropies) {
+			static void advance_elements(C context, const gui_element_id& this_id, const gui_entropy& entropies, const augs::delta dt) {
 				this_id->for_each_child(context, this_id, [&](const auto& child_id) {
-					child_id->advance_elements(context, child_id, entropies);
+					child_id->advance_elements(context, child_id, entropies, dt);
 				});
 			}
 

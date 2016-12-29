@@ -211,12 +211,12 @@ namespace augs {
 			}
 
 			template <class C, class gui_element_id>
-			void advance_elements(C context, const gui_element_id& root, const gui_entropy& entropies) {
+			void advance_elements(C context, const gui_element_id& root, const gui_entropy& entropies, const augs::delta dt) {
 				context(root, [&](const auto& r) {
-					r->advance_elements(context, r, entropies);
+					r->advance_elements(context, r, entropies, dt);
 				});
 
-				middlescroll.advance_elements(context, context.get_step().get_delta());
+				middlescroll.advance_elements(context, dt);
 			}			
 			
 			template <class C, class gui_element_id>

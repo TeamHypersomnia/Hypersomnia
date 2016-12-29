@@ -320,6 +320,7 @@
     <ClCompile Include="application\config_values.cpp" />
     <ClCompile Include="application\setups\director_setup.cpp" />
     <ClCompile Include="application\setups\menu_setup.cpp" />
+    <ClCompile Include="application\ui\app_ui_root.cpp" />
     <ClCompile Include="augs\al_log.cpp" />
     <ClCompile Include="augs\audio\audio_manager.cpp" />
     <ClCompile Include="augs\audio\sound_buffer.cpp" />
@@ -1000,6 +1001,7 @@
     <ClInclude Include="application\ui\app_ui_context.h" />
     <ClInclude Include="application\ui\app_ui_element_location.h" />
     <ClInclude Include="application\ui\app_ui_root.h" />
+    <ClInclude Include="application\ui\locations\app_ui_root_in_context.h" />
     <ClInclude Include="application\ui\locations\dx_button_in_menu.h" />
     <ClInclude Include="application\ui\dx_button.h" />
     <ClInclude Include="augs\al_log.h" />

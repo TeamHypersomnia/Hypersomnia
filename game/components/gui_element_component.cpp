@@ -79,7 +79,7 @@ namespace components {
 		const auto& rect_world = element.rect_world;
 
 		root_of_inventory_gui root_of_gui(element.get_screen_size());
-		game_gui_element_tree tree;
+		game_gui_rect_tree tree;
 
 		viewing_gui_context context(step, gui_entity, tree, root_of_gui);
 

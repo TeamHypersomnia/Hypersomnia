@@ -18,12 +18,12 @@ public:
 	typedef base::gui_entropy gui_entropy;
 
 	template <class C, class D>
-	static void advance_elements(C context, const D& this_id, const gui_entropy& entropies) {
+	static void advance_elements(C context, const D& this_id, const gui_entropy& entropies, const augs::delta) {
 		for (const auto& info : entropies.get_events_for(this_id)) {
-			detector.update_appearance(info);
+			this_id->detector.update_appearance(info);
 			
 			if (info.msg == gui_event::lclick) {
-				click_callback_required = true;
+				this_id->click_callback_required = true;
 			}
 		}
 	}
@@ -38,8 +38,8 @@ public:
 		const auto& rect_world = context.get_rect_world();
 		const auto& this_tree_entry = context.get_tree_entry(this_id);
 
-		const auto inside_mat = augs::gui::material(assets::texture_id::HOTBAR_BUTTON_INSIDE, colorize);
+		const auto inside_mat = augs::gui::material(assets::texture_id::HOTBAR_BUTTON_INSIDE, this_id->colorize);
 
-		augs::gui::draw_clipped_rectangle(inside_mat, rc, {}, in.v);
+		augs::gui::draw_clipped_rectangle(inside_mat, this_id->rc, {}, in.v);
 	}
 };

@@ -383,8 +383,8 @@ void item_button::rebuild_layouts(const logic_gui_context& context, const this_i
 	}
 }
 
-void item_button::advance_elements(const logic_gui_context& context, const this_in_item& this_id, const gui_entropy& entropies) {
-	base::advance_elements(context, this_id, entropies);
+void item_button::advance_elements(const logic_gui_context& context, const this_in_item& this_id, const gui_entropy& entropies, const augs::delta dt) {
+	base::advance_elements(context, this_id, entropies, dt);
 
 	const auto& cosmos = context.get_step().get_cosmos();
 	const auto& item = cosmos[this_id.get_location().item_id];

@@ -11,7 +11,7 @@ namespace component {
 	struct gui_element;
 }
 
-typedef augs::gui::rect_tree<game_gui_element_location> game_gui_element_tree;
+typedef augs::gui::rect_tree<game_gui_element_location> game_gui_rect_tree;
 
 template <class step_type>
 class basic_game_gui_context : public augs::gui::basic_context<game_gui_element_location, entity_handle_type_for_step<step_type>::is_const_value, basic_game_gui_context<step_type>> {

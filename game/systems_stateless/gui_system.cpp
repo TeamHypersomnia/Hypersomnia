@@ -53,7 +53,7 @@ void gui_system::advance_gui_elements(logic_step& step) {
 		auto& rect_world = element.rect_world;
 
 		if (root.has<components::item_slot_transfers>()) {
-			game_gui_element_tree tree;
+			game_gui_rect_tree tree;
 			augs::gui::gui_entropy<game_gui_element_location> entropy;
 			root_of_inventory_gui root_of_gui(element.get_screen_size());
 
@@ -114,7 +114,7 @@ void gui_system::advance_gui_elements(logic_step& step) {
 			}
 			
 			// rect_world.call_idle_mousemotion_updater(context, root_location, entropy);
-			rect_world.advance_elements(context, root_location, entropy);
+			rect_world.advance_elements(context, root_location, entropy, cosmos.get_fixed_delta());
 
 			auto& transfers = step.transient.messages.get_queue<item_slot_transfer_request_data>();
 

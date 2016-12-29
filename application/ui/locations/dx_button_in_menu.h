@@ -2,8 +2,11 @@
 #include "augs/ensure.h"
 #include "application/menu_button_type.h"
 
+class dx_button;
+
 class dx_button_in_menu {
 public:
+	typedef dx_button dereferenced_type;
 	menu_button_type type;
 
 	const dx_button_in_menu& get_location() const {
@@ -21,7 +24,7 @@ public:
 
 	template <class C>
 	decltype(auto) dereference(C context) const {
-		return &context.get_root_of_app_ui().menu_buttons[type];
+		return &context.get_root_of_app_ui().menu_buttons.at(static_cast<size_t>(type));
 	}
 };
 
