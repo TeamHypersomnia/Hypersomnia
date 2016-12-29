@@ -11,8 +11,6 @@ namespace component {
 	struct gui_element;
 }
 
-class gui_tree_entry;
-
 typedef augs::gui::rect_tree<game_gui_element_location> game_gui_element_tree;
 
 template <class step_type>

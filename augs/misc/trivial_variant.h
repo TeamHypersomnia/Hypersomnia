@@ -156,6 +156,10 @@ namespace augs {
 			return call_unroll_const<L, Types...>(generic_call);
 		}
 
+		unsigned get_current_type_index() const {
+			return current_type;
+		}
+
 		bool operator==(const trivial_variant& b) const {
 			return current_type == b.current_type 
 				&& 
@@ -170,8 +174,8 @@ namespace std {
 	template <class... Types>
 	struct hash<augs::trivial_variant<Types...>> {
 		std::size_t operator()(const augs::trivial_variant<Types...>& k) const {
-			return k.call([](auto resolved) {
-				return std::hash<decltype(resolved)>()(resolved);
+			return k.call([&k](auto resolved) {
+				return ((std::hash<unsigned>()(k.get_current_type_index()) ^ (std::hash<decltype(resolved)>()(resolved) << 1)) >> 1);
 			});
 		}
 	};

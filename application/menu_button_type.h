@@ -1,0 +1,13 @@
+#pragma once
+
+enum class menu_button_type {
+	CONNECT_TO_OFFICIAL_UNIVERSE,
+	LOCAL_UNIVERSE,
+	HOST_UNIVERSE,
+	CONNECT_TO_UNIVERSE,
+	OPTIONS,
+	CREDITS,
+	QUIT,
+
+	COUNT
+};
