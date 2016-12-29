@@ -8,11 +8,11 @@ namespace augs {
 
 		material::material(const rgba& color) : tex(assets::texture_id::BLANK), color(color) {}
 
-		rects::ltrb<float> draw_clipped_rectangle(const material& mat, const ltrb origin, ltrb clipper, vertex_triangle_buffer& v) {
-			return draw_clipped_rectangle(*mat.tex, mat.color, origin, clipper, v);
+		rects::ltrb<float> draw_clipped_rectangle(const material& mat, const ltrb origin, ltrb clipper, vertex_triangle_buffer& v, const bool flip) {
+			return draw_clipped_rectangle(*mat.tex, mat.color, origin, clipper, v, flip);
 		}
 
-		rects::ltrb<float> draw_clipped_rectangle(const augs::texture& tex, const rgba color, const ltrb origin, const ltrb parent, vertex_triangle_buffer& v) {
+		rects::ltrb<float> draw_clipped_rectangle(const augs::texture& tex, const rgba color, const ltrb origin, const ltrb parent, vertex_triangle_buffer& v, const bool flip) {
 			rects::ltrb<float> rc = origin;
 			
 			if (!rc.good()) {
@@ -34,6 +34,11 @@ namespace augs {
 				((p[2].pos.y = p[3].pos.y = rc.b) - origin.b) * th + 1.0f);
 
 			p[0].color = p[1].color = p[2].color = p[3].color = color;
+
+			if (flip) {
+				diff.u1 = 1.f - diff.u1;
+				diff.u2 = 1.f - diff.u2;
+			}
 
 			tex.get_uv(diff.u1, diff.v1, p[0].texcoord.x, p[0].texcoord.y);
 			tex.get_uv(diff.u2, diff.v1, p[1].texcoord.x, p[1].texcoord.y);

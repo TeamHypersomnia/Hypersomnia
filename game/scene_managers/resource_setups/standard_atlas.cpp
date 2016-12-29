@@ -125,10 +125,10 @@ namespace resource_setups {
 		
 		{
 			const rgba border_color = white;
-			const rgba inside_color = { 255, 255, 255, 120 };
+			const rgba inside_color = { 255, 255, 255, 50 };
 
-			const int lower_side = 20;
-			const int upper_side = 10;
+			const int lower_side = 10;
+			const int upper_side = 5;
 
 			{
 				augs::image hotbar_l;
@@ -142,11 +142,11 @@ namespace resource_setups {
 
 				hotbar_r.create(upper_side, 1, 4);
 				hotbar_r.set_pixel({ upper_side - 1, 0 }, border_color);
-				hotbar_r.paint_line({ upper_side - 2, 0 }, { 0, 0 }, inside_color);
+				hotbar_r.paint_line({ upper_side - 1, 0 }, { 0, 0 }, inside_color);
 
 				hotbar_b.create(1, lower_side, 4);
 				hotbar_b.set_pixel({ 0, lower_side - 1 }, border_color);
-				hotbar_b.paint_line({ 0, lower_side - 2 }, { 0, 0 }, inside_color);
+				hotbar_b.paint_line({ 0, lower_side - 1 }, { 0, 0 }, inside_color);
 
 				hotbar_t.create(1, upper_side, 4);
 				hotbar_t.set_pixel({ 0, 0 }, border_color);

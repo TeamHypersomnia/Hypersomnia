@@ -7,6 +7,8 @@
 
 #include "game/assets/texture_id.h"
 
+#include "application/ui/button_corners.h"
+
 class dx_button : public app_ui_rect_node {
 public:
 	augs::gui::appearance_detector detector;
@@ -41,5 +43,11 @@ public:
 		const auto inside_mat = augs::gui::material(assets::texture_id::HOTBAR_BUTTON_INSIDE, this_id->colorize);
 
 		augs::gui::draw_clipped_rectangle(inside_mat, this_id->rc, {}, in.v);
+		
+		{
+			for_each_button_corner(this_id->rc, [this_id, in](const assets::texture_id id, ltrb drawn_rc) {
+				augs::gui::draw_clipped_rectangle(augs::gui::material(id, this_id->colorize), drawn_rc, {}, in.v, true);
+			}, true);
+		}
 	}
 };

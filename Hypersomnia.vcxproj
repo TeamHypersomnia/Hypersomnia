@@ -1001,6 +1001,7 @@
     <ClInclude Include="application\ui\app_ui_context.h" />
     <ClInclude Include="application\ui\app_ui_element_location.h" />
     <ClInclude Include="application\ui\app_ui_root.h" />
+    <ClInclude Include="application\ui\button_corners.h" />
     <ClInclude Include="application\ui\locations\app_ui_root_in_context.h" />
     <ClInclude Include="application\ui\locations\dx_button_in_menu.h" />
     <ClInclude Include="application\ui\dx_button.h" />

@@ -17,3 +17,9 @@ void app_ui_root::set_menu_buttons_sizes(const vec2i size) {
 		menu_buttons[i].rc.set_size(size);
 	}
 }
+
+void app_ui_root::set_menu_buttons_colors(const rgba col) {
+	for (size_t i = 0; i < menu_buttons.size(); ++i) {
+		menu_buttons[i].colorize = col;
+	}
+}

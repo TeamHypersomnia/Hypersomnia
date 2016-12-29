@@ -11,6 +11,7 @@ public:
 	std::array<dx_button, static_cast<size_t>(menu_button_type::COUNT)> menu_buttons;
 
 	void set_menu_buttons_sizes(const vec2i size);
+	void set_menu_buttons_colors(const rgba col);
 
 	template <class C, class D, class L>
 	static void for_each_child(C context, const D& this_id, L generic_call) {

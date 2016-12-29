@@ -94,6 +94,7 @@ We wish you an exciting journey through architecture of our cosmos.\n\
 	bool caret_active = false;
 
 	vec2i tweened_menu_button_size = vec2i(100, 30);
+	rgba tweened_menu_button_color = cyan;
 
 	app_ui_rect_world menu_ui_rect_world;
 	app_ui_rect_tree menu_ui_tree;
@@ -238,6 +239,7 @@ We wish you an exciting journey through architecture of our cosmos.\n\
 			menu_ui_rect_world.advance_elements(menu_ui_context, menu_ui_root_id, gui_entropies, vdt);
 
 			menu_ui_root.set_menu_buttons_sizes(tweened_menu_button_size);
+			menu_ui_root.set_menu_buttons_colors(tweened_menu_button_color);
 			menu_ui_rect_world.rebuild_layouts(menu_ui_context, menu_ui_root_id);
 
 			menu_ui_rect_world.draw(renderer.get_triangle_buffer(), menu_ui_context, menu_ui_root_id);

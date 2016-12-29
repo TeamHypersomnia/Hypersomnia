@@ -12,8 +12,8 @@ namespace augs {
 			material(const rgba&);
 		};
 
-		rects::ltrb<float> draw_clipped_rectangle(const texture&, const rgba colorize, ltrb origin, ltrb clipper, vertex_triangle_buffer& v);
-		rects::ltrb<float> draw_clipped_rectangle(const material&, ltrb origin, ltrb clipper, vertex_triangle_buffer& v);
+		rects::ltrb<float> draw_clipped_rectangle(const texture&, const rgba colorize, ltrb origin, ltrb clipper, vertex_triangle_buffer& v, const bool flip = false);
+		rects::ltrb<float> draw_clipped_rectangle(const material&, ltrb origin, ltrb clipper, vertex_triangle_buffer& v, const bool flip = false);
 		
 		template <class C, class gui_element_id>
 		rects::ltrb<float> draw_clipped_rectangle(
