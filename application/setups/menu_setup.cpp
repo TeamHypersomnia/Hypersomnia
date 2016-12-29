@@ -1,4 +1,5 @@
 #include <thread>
+#include <array>
 #include "game/bindings/bind_game_and_augs.h"
 #include "augs/global_libraries.h"
 #include "application/game_window.h"
@@ -34,6 +35,79 @@
 #include "application/ui/app_ui_context.h"
 
 using namespace augs::window::event::keys;
+using namespace augs::gui::text;
+using namespace augs::gui;
+
+typedef std::unique_ptr<action> act;
+
+struct appearing_text {
+	text_drawer drawer;
+	style st = style(assets::font_id::GUI_FONT, cyan);
+	rgba_channel alpha;
+
+	fstr text;
+	
+	std::array<fstr, 2> target_text;
+	
+	fstr get_total_target_text() const {
+		return target_text[0] + target_text[1];
+	}
+
+	bool caret_active = false;
+	bool should_disappear = true;
+	bool blocking = true;
+
+	vec2 target_pos;
+
+	void push_actions(augs::action_list& into, size_t& rng) {
+		auto push = [&](act a){
+			blocking ? into.push_blocking(std::move(a)) : into.push_non_blocking(std::move(a));
+		};
+
+		push(act(new augs::set_value_action<rgba_channel>(alpha, 255)));
+		push(act(new augs::set_value_action<fstr>(text, fstr())));
+		push(act(new augs::set_value_action<bool>(caret_active, true)));
+
+		push(act(new augs::populate_with_delays<fstr>(text, target_text[0], 150.f * target_text[0].length(), 0.4f, rng++)));
+
+		if (target_text[1].size() > 0) {
+			push(act(new augs::delay_action(1000.f)));
+			push(act(new augs::populate_with_delays<fstr>(text, target_text[1], 150.f * target_text[1].length(), 0.4f, rng++)));
+		}
+
+		push(act(new augs::delay_action(1000.f)));
+		push(act(new augs::set_value_action<bool>(caret_active, false)));
+
+		if (should_disappear) {
+			push(act(new augs::delay_action(1000.f)));
+			push(act(new augs::tween_value_action<rgba_channel>(alpha, 0, 2000.f)));
+			push(act(new augs::delay_action(500.f)));
+		}
+	}
+
+	bool should_draw() const {
+		return caret_active || (text.size() > 0 && alpha > 0);
+	}
+
+	void draw(augs::renderer& renderer) {
+		if (!should_draw()) {
+			return;
+		}
+
+		text = set_alpha(text, alpha);
+		drawer.pos = target_pos;
+		drawer.set_text(text);
+
+		caret_info in(st);
+		in.pos = text.size();
+
+		auto stroke_color = black;
+		stroke_color.a = alpha;
+		drawer.print.active = caret_active;
+		drawer.draw_stroke(renderer.get_triangle_buffer(), stroke_color);
+		drawer.draw(renderer.get_triangle_buffer(), &in);
+	}
+};
 
 void menu_setup::process(game_window& window) {
 	const vec2i screen_size = vec2i(window.get_screen_size());
@@ -57,43 +131,43 @@ void menu_setup::process(game_window& window) {
 		}
 	}
 
-	using namespace augs::gui::text;
-
-	augs::gui::text_drawer credits_drawer;
-	const auto credits_style = style(assets::font_id::GUI_FONT, cyan);
-
-	fstr credits_text;
-	fstr target_credits_text;
-
 	rgba fade_overlay_color = { 0, 2, 2, 255 };
-	rgba credits_text_color;
 	rgba title_text_color = { 255, 255, 255, 0 };
 
-	struct credits_entry {
-		fstr text;
-		fstr next_text;
+	const style textes_style = style(assets::font_id::GUI_FONT, cyan);
+
+	std::vector<appearing_text*> texts;
+
+	auto center = [&](auto& t) {
+		t.target_pos = screen_size / 2 - get_text_bbox(t.get_total_target_text(), 0)*0.5f;
 	};
 
-	fstr developer_welcome_message;
+	appearing_text credits1;
+	credits1.target_text[0] = format(L"hypernet community presents", textes_style);
+	center(credits1);
+	texts.push_back(&credits1);
 
-#if !IS_PRODUCTION_BUILD
-	developer_welcome_message = format(L"Thank you for building Hypersomnia.\n\
-This message is not included in distributed executables.\n\
+	appearing_text credits2;
+	credits2.target_text = { format(L"A universe founded by\n", textes_style), format(L"Patryk B. Czachurski", textes_style) };
+	center(credits2);
+	texts.push_back(&credits2);
+
+	appearing_text developer_welcome;
+	developer_welcome.blocking = false;
+	developer_welcome.should_disappear = false;
+	developer_welcome.target_text[0] = format(L"Thank you for building Hypersomnia.\n", textes_style);
+	developer_welcome.target_text[1] = format(L"This message is not included in distributed executables.\n\
 All your suggestions and especially contributions are welcomed and sure to be considered.\n\
 We wish you an exciting journey through architecture of our cosmos.\n\
-                             ~hypernet community\
-", credits_style);
-#endif
+                             ~hypernet community", textes_style);
 
-	credits_entry credits_texts[] = {
-		{ format(L"hypernet community presents", credits_style) },
-		{ format(L"A universe founded by\n", credits_style), format(L"Patryk B. Czachurski", credits_style) }
-	};
+
+	developer_welcome.target_pos += screen_size - get_text_bbox(developer_welcome.get_total_target_text(), 0) - vec2(100, 100);
+	texts.push_back(&developer_welcome);
 
 	augs::action_list intro_actions;
-	bool caret_active = false;
 
-	vec2i tweened_menu_button_size = vec2i(100, 30);
+	vec2i tweened_menu_button_size = vec2i(80, 20);
 	rgba tweened_menu_button_color = cyan;
 
 	app_ui_rect_world menu_ui_rect_world;
@@ -103,38 +177,21 @@ We wish you an exciting journey through architecture of our cosmos.\n\
 	app_ui_root_in_context menu_ui_root_id;
 
 	{
-		typedef std::unique_ptr<action> act;
-
 		intro_actions.push_blocking(act(new augs::delay_action(500.f)));
 		intro_actions.push_non_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 100, 6000.f)));
 		intro_actions.push_blocking(act(new augs::delay_action(2000.f)));
 
 		size_t rng = 0;
-		for (const auto& c : credits_texts) {
-			const auto& text = c.text;
 
-			intro_actions.push_blocking(act(new augs::set_value_action<rgba_channel>(credits_text_color.a, 255)));
-			intro_actions.push_blocking(act(new augs::set_value_action<fstr>(target_credits_text, text + c.next_text)));
-			intro_actions.push_blocking(act(new augs::set_value_action<fstr>(credits_text, fstr())));
-			intro_actions.push_blocking(act(new augs::set_value_action<bool>(caret_active, true)));
-
-			intro_actions.push_blocking(act(new augs::populate_with_delays<fstr>(credits_text, text, 150.f * text.length(), 0.4f, rng++)));
-
-			if (c.next_text.size() > 0) {
-				intro_actions.push_blocking(act(new augs::delay_action(1000.f)));
-				intro_actions.push_blocking(act(new augs::populate_with_delays<fstr>(credits_text, c.next_text, 150.f * c.next_text.length(), 0.4f, rng++)));
-			}
-
-			intro_actions.push_blocking(act(new augs::delay_action(1000.f)));
-			intro_actions.push_blocking(act(new augs::set_value_action<bool>(caret_active, false)));
-
-			intro_actions.push_blocking(act(new augs::delay_action(1000.f)));
-			intro_actions.push_blocking(act(new augs::tween_value_action<rgba_channel>(credits_text_color.a, 0, 2000.f)));
-			intro_actions.push_blocking(act(new augs::delay_action(500.f)));
-		}
+		credits1.push_actions(intro_actions, rng);
+		credits2.push_actions(intro_actions, rng);
 
 		intro_actions.push_non_blocking(act(new augs::tween_value_action<rgba_channel>(title_text_color.a, 255, 500.f)));
 		intro_actions.push_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 20, 500.f)));
+
+#if !IS_PRODUCTION_BUILD
+		developer_welcome.push_actions(intro_actions, rng);
+#endif
 	}
 
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
@@ -144,6 +201,11 @@ We wish you an exciting journey through architecture of our cosmos.\n\
 
 	intro_scene.set_fixed_delta(cfg.tickrate);
 	testbed.populate_world_with_entities(intro_scene, screen_size);
+	const auto menu_title = intro_scene[testbed.get_menu_title_entity()];
+
+	ltrb title_rect;
+	title_rect.set_position(menu_title.logic_transform().pos);
+	title_rect.set_size(menu_title.get<components::sprite>().size);
 
 	viewing_session session;
 	session.reserve_caches_for_entities(3000);
@@ -207,24 +269,12 @@ We wish you an exciting journey through architecture of our cosmos.\n\
 		session.view(renderer, intro_scene, testbed.get_selected_character(), vdt, augs::gui::text::fstr(), settings);
 		session.draw_color_overlay(renderer, fade_overlay_color);
 
-		if (credits_text.size() > 0) {
-			credits_text = set_alpha(credits_text, credits_text_color.a);
-
-			credits_drawer.pos = screen_size / 2 - get_text_bbox(target_credits_text, 0)*0.5f;
-			credits_drawer.set_text(credits_text);
-			
-			caret_info in(credits_style);
-			in.pos = credits_text.size();
-
-			auto stroke_color = black;
-			stroke_color.a = credits_text_color.a;
-			credits_drawer.print.active = caret_active;
-			credits_drawer.draw_stroke(renderer.get_triangle_buffer(), stroke_color);
-			credits_drawer.draw(renderer.get_triangle_buffer(), &in);
-
-			renderer.call_triangles();
-			renderer.clear_triangles();
+		for (auto& t : texts) {
+			t->draw(renderer);
 		}
+
+		renderer.call_triangles();
+		renderer.clear_triangles();
 
 		{
 			app_ui_rect_world::gui_entropy gui_entropies;
@@ -249,8 +299,10 @@ We wish you an exciting journey through architecture of our cosmos.\n\
 		}
 
 		intro_actions.update(vdt);
+		intro_actions.update(vdt);
+		intro_actions.update(vdt);
 
-		intro_scene[testbed.get_menu_title_entity()].get<components::sprite>().color = title_text_color;
+		menu_title.get<components::sprite>().color = title_text_color;
 
 		window.swap_buffers();
 	}

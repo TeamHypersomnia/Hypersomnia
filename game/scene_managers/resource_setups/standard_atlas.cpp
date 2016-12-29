@@ -127,8 +127,8 @@ namespace resource_setups {
 			const rgba border_color = white;
 			const rgba inside_color = { 255, 255, 255, 50 };
 
-			const int lower_side = 10;
-			const int upper_side = 5;
+			const int lower_side = 12;
+			const int upper_side = 8;
 
 			{
 				augs::image hotbar_l;

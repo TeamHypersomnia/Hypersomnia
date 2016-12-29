@@ -12,9 +12,10 @@
 class dx_button : public app_ui_rect_node {
 public:
 	augs::gui::appearance_detector detector;
+	augs::gui::text::fstr caption;
+	rgba colorize;
 	bool click_callback_required = false;
 	padding_byte pad[3];
-	rgba colorize;
 
 	typedef app_ui_rect_node base;
 	typedef base::gui_entropy gui_entropy;
