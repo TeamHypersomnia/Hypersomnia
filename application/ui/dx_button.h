@@ -1,8 +1,11 @@
 #pragma once
 #include "app_ui_element_location.h"
 #include "augs/gui/appearance_detector.h"
+#include "augs/gui/material.h"
 
 #include "augs/padding_byte.h"
+
+#include "game/assets/texture_id.h"
 
 class dx_button : public app_ui_rect_node {
 public:
@@ -35,6 +38,8 @@ public:
 		const auto& rect_world = context.get_rect_world();
 		const auto& this_tree_entry = context.get_tree_entry(this_id);
 
+		const auto inside_mat = augs::gui::material(assets::texture_id::HOTBAR_BUTTON_INSIDE, colorize);
 
+		augs::gui::draw_clipped_rectangle(inside_mat, rc, {}, in.v);
 	}
 };
