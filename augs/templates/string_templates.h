@@ -3,6 +3,8 @@
 #include <sstream>
 #include <iomanip>
 
+#include "container_templates.h"
+
 std::string to_string(std::wstring val);
 
 template <class T>
@@ -42,5 +44,27 @@ Str replace_all(Str str, Repl _from, Repl _to) {
 		str.replace(start_pos, from.length(), to);
 		start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
 	}
+	return str;
+}
+
+template<class Str, class Ch>
+Str strip_tags(Str str, Ch open_bracket, Ch close_bracket) {
+
+	size_t count = 0;
+
+	erase_remove(str, [&](const Ch c) {
+		bool skip = (count > 0) || c == open_bracket;
+
+		if (c == open_bracket) {
+			++count;
+		}
+
+		else if (c == close_bracket && count > 0) {
+			--count;
+		}
+
+		return skip;
+	});
+
 	return str;
 }

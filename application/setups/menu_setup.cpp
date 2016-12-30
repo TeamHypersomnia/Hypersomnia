@@ -36,6 +36,9 @@
 
 #include "application/ui/appearing_text.h"
 
+#include "augs/misc/http_requests.h"
+#include "augs/templates/string_templates.h"
+
 using namespace augs::window::event::keys;
 using namespace augs::gui::text;
 using namespace augs::gui;
@@ -62,6 +65,45 @@ void menu_setup::process(game_window& window) {
 		}
 	}
 
+	const style textes_style = style(assets::font_id::GUI_FONT, cyan);
+
+	std::mutex news_mut;
+
+	bool roll_news = false;
+	text_drawer latest_news_drawer;
+	vec2 news_pos = vec2(screen_size.x, 5);
+
+	std::thread latest_news_query([&latest_news_drawer, &cfg, &textes_style, &news_mut]() {
+		auto result = augs::http_get_request(cfg.latest_news_url);
+		const std::string delim = "newsbegin";
+
+		const auto it = result.find(delim);
+
+		if (it == std::string::npos) {
+			return;
+		}
+
+		result = result.substr(it + delim.length());
+
+		result = replace_all(result, "\n", "");
+		result = replace_all(result, "\r", "");
+
+		result = strip_tags(result, '<', '>');
+
+		const auto date_start = result.find("[");
+		const auto date_end = result.find("]") + 1;
+		
+		result.insert(date_start, "[color=white]");
+		result.insert(date_end + std::string("[color=white]").length(), "[/color]");
+
+		if (result.size() > 0) {
+			const auto wresult = to_wstring(result);
+
+			std::unique_lock<std::mutex> lck(news_mut);
+			latest_news_drawer.set_text(simple_bbcode(L"[color=vslightgray]Latest news[/color] [color=vsdarkgray](hypersomnia.pl)[/color] " + wresult, textes_style));
+		}
+	});
+
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
 	scene_managers::testbed testbed;
@@ -78,7 +120,6 @@ void menu_setup::process(game_window& window) {
 	rgba fade_overlay_color = { 0, 2, 2, 255 };
 	rgba title_text_color = { 255, 255, 255, 0 };
 
-	const style textes_style = style(assets::font_id::GUI_FONT, cyan);
 
 	std::vector<appearing_text*> intro_texts;
 	std::vector<appearing_text*> title_texts;
@@ -163,6 +204,8 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 
 		intro_actions.push_non_blocking(act(new augs::tween_value_action<rgba_channel>(title_text_color.a, 255, 500.f)));
 		intro_actions.push_non_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 20, 500.f)));
+		
+		intro_actions.push_non_blocking(act(new augs::set_value_action<bool>(roll_news, true)));
 
 		for (auto& t : title_texts) {
 			augs::action_list acts;
@@ -251,6 +294,22 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 			t->draw(renderer.get_triangle_buffer());
 		}
 
+		if (roll_news) {
+			news_pos.x -= vdt.in_seconds() * 100.f;
+
+			{
+				std::unique_lock<std::mutex> lck(news_mut);
+
+				if (news_pos.x < -latest_news_drawer.get_bbox().x) {
+					news_pos.x = screen_size.x;
+				}
+
+				latest_news_drawer.pos = news_pos;
+				latest_news_drawer.draw_stroke(renderer.get_triangle_buffer());
+				latest_news_drawer.draw(renderer.get_triangle_buffer());
+			}
+		}
+
 		renderer.call_triangles();
 		renderer.clear_triangles();
 
@@ -282,4 +341,6 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 
 		window.swap_buffers();
 	}
+
+	latest_news_query.detach();
 }

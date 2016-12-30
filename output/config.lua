@@ -33,7 +33,7 @@ config_table = {
 	fullscreen = 0,
 	window_border = 1,
 	window_x = 100,
-	window_y = 0,
+	window_y = 10,
 	bpp = 24,
 	resolution_w = 1400,
 	resolution_h = 1000,
@@ -81,7 +81,7 @@ config_table = {
 	menu_intro_scenario_filename = "director/menu_intro.ent",
 
 	skip_credits = 1,
-	latest_news_url = "http://hypersomnia.pl/latest_post"
+	latest_news_url = "http://hypersomnia.pl/latest_post/"
 }
 
 if config_table.debug_disable_cursor_clipping == 0 then

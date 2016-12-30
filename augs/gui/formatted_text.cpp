@@ -1,6 +1,7 @@
 #include "formatted_text.h"
 #include <algorithm>
 #include <cstring>
+#include <vector>
 
 #include "augs/templates/string_templates.h"
 
@@ -90,6 +91,9 @@ namespace augs {
 			}
 
 			fstr simple_bbcode(std::wstring _str, style s) {
+				std::vector<int> to_skip;
+				to_skip.resize(_str.size());
+
 				fstr out;
 
 				formatted_char ch;
@@ -152,6 +156,14 @@ namespace augs {
 						newstyle.color = white;
 					}
 
+					for (size_t i = opening_bracket_of_first; i < closing_bracket_of_first+1; ++i) {
+						to_skip[i] = 1;
+					}
+
+					for (size_t i = opening_bracket_of_second; i < closing_bracket_of_second; ++i) {
+						to_skip[i] = 1;
+					}
+
 					for (size_t c = closing_bracket_of_first + 1; c < opening_bracket_of_second; ++c) {
 						out[c].set(newstyle.f, newstyle.color);
 					}
@@ -159,25 +171,9 @@ namespace augs {
 					opening_bracket_of_first = _str.find(L"[color=", closing_bracket_of_second);
 				}
 
-				static thread_local size_t count = 0;
+				size_t idx = 0;
 
-				struct SquareBracketStripper
-				{
-					enum { open_bracket = L'[', close_bracket = L']' };
-					bool operator()(formatted_char c)
-					{
-						bool skip = (count > 0) || c.c == open_bracket;
-						if (c.c == open_bracket) {
-							++count;
-						}
-						else if (c.c == close_bracket && count > 0) {
-							--count;
-						}
-						return skip;
-					}
-				}ss;
-
-				out.erase(std::remove_if(out.begin(), out.end(), SquareBracketStripper()), out.end());
+				out.erase(std::remove_if(out.begin(), out.end(), [&to_skip, &idx](auto) {return to_skip[idx++]; }), out.end());
 
 				return out;
 			}
