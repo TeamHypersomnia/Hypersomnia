@@ -3,6 +3,7 @@
 #include "augs/math/vec2.h"
 #include "augs/misc/delta.h"
 #include "augs/misc/randomization.h"
+#include "augs/misc/action_list.h"
 
 namespace augs {
 	template <class T>
@@ -64,6 +65,15 @@ namespace augs {
 		
 		void on_enter() final {}
 		void on_update(const delta dt) final;
+		bool is_complete() const final;
+	};
+
+	class list_action : public action {
+		action_list list;
+
+		void on_enter() final {}
+		void on_update(const delta dt) final;
+
 		bool is_complete() const final;
 	};
 

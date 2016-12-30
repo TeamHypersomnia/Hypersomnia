@@ -55,24 +55,25 @@ struct appearing_text {
 
 	bool caret_active = false;
 	bool should_disappear = true;
-	bool blocking = true;
+	float population_variation = 0.4f;
+	float population_interval = 150.f;
 
 	vec2 target_pos;
 
 	void push_actions(augs::action_list& into, size_t& rng) {
 		auto push = [&](act a){
-			blocking ? into.push_blocking(std::move(a)) : into.push_non_blocking(std::move(a));
+			into.push_blocking(std::move(a));
 		};
 
 		push(act(new augs::set_value_action<rgba_channel>(alpha, 255)));
 		push(act(new augs::set_value_action<fstr>(text, fstr())));
 		push(act(new augs::set_value_action<bool>(caret_active, true)));
 
-		push(act(new augs::populate_with_delays<fstr>(text, target_text[0], 150.f * target_text[0].length(), 0.4f, rng++)));
+		push(act(new augs::populate_with_delays<fstr>(text, target_text[0], population_interval * target_text[0].length(), population_variation, rng++)));
 
 		if (target_text[1].size() > 0) {
 			push(act(new augs::delay_action(1000.f)));
-			push(act(new augs::populate_with_delays<fstr>(text, target_text[1], 150.f * target_text[1].length(), 0.4f, rng++)));
+			push(act(new augs::populate_with_delays<fstr>(text, target_text[1], population_interval * target_text[1].length(), population_variation, rng++)));
 		}
 
 		push(act(new augs::delay_action(1000.f)));
@@ -136,7 +137,8 @@ void menu_setup::process(game_window& window) {
 
 	const style textes_style = style(assets::font_id::GUI_FONT, cyan);
 
-	std::vector<appearing_text*> texts;
+	std::vector<appearing_text*> intro_texts;
+	std::vector<appearing_text*> title_texts;
 
 	auto center = [&](auto& t) {
 		t.target_pos = screen_size / 2 - get_text_bbox(t.get_total_target_text(), 0)*0.5f;
@@ -145,25 +147,25 @@ void menu_setup::process(game_window& window) {
 	appearing_text credits1;
 	credits1.target_text[0] = format(L"hypernet community presents", textes_style);
 	center(credits1);
-	texts.push_back(&credits1);
+	intro_texts.push_back(&credits1);
 
 	appearing_text credits2;
 	credits2.target_text = { format(L"A universe founded by\n", textes_style), format(L"Patryk B. Czachurski", textes_style) };
 	center(credits2);
-	texts.push_back(&credits2);
+	intro_texts.push_back(&credits2);
 
 	appearing_text developer_welcome;
-	developer_welcome.blocking = false;
+	developer_welcome.population_interval = 100.f;
+
 	developer_welcome.should_disappear = false;
 	developer_welcome.target_text[0] = format(L"Thank you for building Hypersomnia.\n", textes_style);
 	developer_welcome.target_text[1] = format(L"This message is not included in distributed executables.\n\
-All your suggestions and especially contributions are welcomed and sure to be considered.\n\
-We wish you an exciting journey through architecture of our cosmos.\n\
-                             ~hypernet community", textes_style);
-
+All your suggestions and contributions are very much welcomed by our collective.\n\
+We wish you an exciting journey through architecture of our cosmos.\n", textes_style) + 
+format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, {0, 180, 255, 255}));
 
 	developer_welcome.target_pos += screen_size - get_text_bbox(developer_welcome.get_total_target_text(), 0) - vec2(100, 100);
-	texts.push_back(&developer_welcome);
+	title_texts.push_back(&developer_welcome);
 
 	augs::action_list intro_actions;
 
@@ -269,7 +271,11 @@ We wish you an exciting journey through architecture of our cosmos.\n\
 		session.view(renderer, intro_scene, testbed.get_selected_character(), vdt, augs::gui::text::fstr(), settings);
 		session.draw_color_overlay(renderer, fade_overlay_color);
 
-		for (auto& t : texts) {
+		for (auto& t : intro_texts) {
+			t->draw(renderer);
+		}
+
+		for (auto& t : title_texts) {
 			t->draw(renderer);
 		}
 

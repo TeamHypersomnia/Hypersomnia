@@ -137,20 +137,20 @@ namespace resource_setups {
 				augs::image hotbar_b;
 
 				hotbar_l.create(lower_side, 1, 4);
+				hotbar_l.paint_line({ 1, 0 }, { lower_side - 1, 0 }, inside_color);
 				hotbar_l.set_pixel({ 0, 0 }, border_color);
-				hotbar_l.paint_line({ 1, 0 }, { lower_side, 0 }, inside_color);
 
 				hotbar_r.create(upper_side, 1, 4);
-				hotbar_r.set_pixel({ upper_side - 1, 0 }, border_color);
 				hotbar_r.paint_line({ upper_side - 1, 0 }, { 0, 0 }, inside_color);
+				hotbar_r.set_pixel({ upper_side - 1, 0 }, border_color);
 
 				hotbar_b.create(1, lower_side, 4);
-				hotbar_b.set_pixel({ 0, lower_side - 1 }, border_color);
 				hotbar_b.paint_line({ 0, lower_side - 1 }, { 0, 0 }, inside_color);
+				hotbar_b.set_pixel({ 0, lower_side - 1 }, border_color);
 
 				hotbar_t.create(1, upper_side, 4);
+				hotbar_t.paint_line({ 0, 1 }, { 0, upper_side - 1 }, inside_color);
 				hotbar_t.set_pixel({ 0, 0 }, border_color);
-				hotbar_t.paint_line({ 0, 1 }, { 0, upper_side }, inside_color);
 
 				get_resource_manager().create(assets::texture_id::HOTBAR_BUTTON_L, hotbar_l);
 				get_resource_manager().create(assets::texture_id::HOTBAR_BUTTON_T, hotbar_t);
@@ -166,16 +166,16 @@ namespace resource_setups {
 
 				hotbar_lt.create(lower_side, upper_side, 4);
 				hotbar_lt.fill(inside_color);
-				hotbar_lt.paint_line({ 0, 0 }, { 0, upper_side }, border_color);
-				hotbar_lt.paint_line({ 0, 0 }, { lower_side, 0 }, border_color);
+				hotbar_lt.paint_line({ 0, 0 }, { 0, upper_side-1 }, border_color);
+				hotbar_lt.paint_line({ 0, 0 }, { lower_side - 1, 0 }, border_color);
 
 				hotbar_rt.create(upper_side, upper_side, 4);
 				hotbar_rt.fill({ 0, 0, 0, 0 });
 
-				hotbar_rt.paint_line({ 0, 0 }, { upper_side, upper_side }, border_color);
+				hotbar_rt.paint_line({ 0, 0 }, { upper_side - 1, upper_side - 1 }, border_color);
 
 				for (int i = 1; i < upper_side; ++i) {
-					hotbar_rt.paint_line({ 0, i }, { upper_side-i, upper_side }, inside_color);
+					hotbar_rt.paint_line({ 0, i }, { upper_side-i - 1, upper_side - 1 }, inside_color);
 				}
 
 				hotbar_rb.create(upper_side, lower_side, 4);
@@ -186,10 +186,10 @@ namespace resource_setups {
 				hotbar_lb.create(lower_side, lower_side, 4);
 				hotbar_lb.fill({ 0, 0, 0, 0 });
 
-				hotbar_lb.paint_line({ 0, 0 }, { lower_side, lower_side }, border_color);
+				hotbar_lb.paint_line({ 0, 0 }, { lower_side - 1, lower_side - 1 }, border_color);
 
 				for (int i = 1; i < lower_side; ++i) {
-					hotbar_lb.paint_line({ i, 0 }, { lower_side, lower_side - i }, inside_color);
+					hotbar_lb.paint_line({ i, 0 }, { lower_side - 1, lower_side - 1 - i }, inside_color);
 				}
 
 				get_resource_manager().create(assets::texture_id::HOTBAR_BUTTON_LT, hotbar_lt);
@@ -225,7 +225,7 @@ namespace resource_setups {
 		get_resource_manager().create(assets::texture_id::DEAD_TORSO, "hypersomnia/gfx/dead_torso.png");
 
 		auto& font = get_resource_manager().create(assets::font_id::GUI_FONT);
-		font.open("hypersomnia/Kubasta.ttf", 16, L" ABCDEFGHIJKLMNOPRSTUVWXYZQabcdefghijklmnoprstuvwxyzq0123456789.!@#$%^&*()_+-=[];'\\,./{}:\"|<>?");
+		font.open("hypersomnia/Kubasta.ttf", 16, L" ABCDEFGHIJKLMNOPRSTUVWXYZQabcdefghijklmnoprstuvwxyzq0123456789.!@#$%^&*()_+-=[];'\\,./{}:\"|<>?~");
 
 		get_resource_manager().create_sprites_indexed(
 			assets::texture_id::TORSO_MOVING_FIRST,

@@ -12,4 +12,12 @@ namespace augs {
 	bool delay_action::is_complete() const {
 		return elapsed_ms >= duration_ms;
 	}
-}
+
+	void list_action::on_update(const delta dt) {
+		list.update(dt);
+	}
+
+	bool list_action::is_complete() const {
+		return list.actions.empty();
+	}
+};

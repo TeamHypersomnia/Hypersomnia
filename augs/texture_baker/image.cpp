@@ -28,7 +28,7 @@ static void Line(int x1, int y1, int x2, int y2, C callback)
 
 	const int maxX = (int)x2;
 
-	for (int x = (int)x1; x<maxX; x++)
+	for (int x = (int)x1; x<=maxX; x++)
 	{
 		if (steep)
 		{
