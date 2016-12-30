@@ -51,6 +51,7 @@ namespace prefabs {
 			car.input_acceleration.set(2500, 4500) /= 3;
 			//car.acceleration_length = 4500 / 5.0;
 			car.acceleration_length = 4500 / 6.2;
+			car.speed_for_pitch_unit = 2000.f;
 
 			sprite.from_polygonized_texture(assets::texture_id::TRUCK_FRONT);
 			//sprite.set(assets::texture_id::TRUCK_FRONT, augs::rgba(0, 255, 255));
