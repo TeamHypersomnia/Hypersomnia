@@ -10,6 +10,7 @@ public:
 
 	std::array<dx_button, static_cast<size_t>(menu_button_type::COUNT)> menu_buttons;
 
+	void set_menu_buttons_positions(const vec2i screen_size);
 	void set_menu_buttons_sizes(const vec2i size);
 	void set_menu_buttons_colors(const rgba col);
 

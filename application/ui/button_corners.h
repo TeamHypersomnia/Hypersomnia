@@ -6,6 +6,11 @@
 
 #include "augs/texture_baker/texture_with_image.h"
 
+ltrb cornered_button_size_to_internal_size(ltrb);
+ltrb internal_size_to_cornered_button_size(ltrb);
+vec2i cornered_button_size_to_internal_size(vec2i);
+vec2i internal_size_to_cornered_button_size(vec2i);
+
 template <class L>
 void for_each_button_corner(const ltrb rc, L callback, const bool flip = false) {
 	auto& manager = get_resource_manager();

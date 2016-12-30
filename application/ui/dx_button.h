@@ -24,15 +24,14 @@ public:
 	typedef base::gui_entropy gui_entropy;
 
 	vec2i get_target_button_size() const {
-		return get_text_bbox(appearing_caption.get_total_target_text(), 0) - vec2i(0, 3);
+		return internal_size_to_cornered_button_size(get_text_bbox(appearing_caption.get_total_target_text(), 0)) - vec2i(0, 3);
 	}
 
-	void set_appearing_caption_and_center(const augs::gui::text::fstr text) {
+	void set_appearing_caption(const augs::gui::text::fstr text) {
 		appearing_caption.population_interval = 100.f;
 
 		appearing_caption.should_disappear = false;
 		appearing_caption.target_text[0] = text;
-		appearing_caption.target_pos = rc.left_top();
 	}
 		
 	template <class C, class D>
@@ -58,14 +57,17 @@ public:
 
 		const auto inside_mat = augs::gui::material(assets::texture_id::HOTBAR_BUTTON_INSIDE, this_id->colorize);
 
-		augs::gui::draw_clipped_rectangle(inside_mat, this_id->rc, {}, in.v);
+		const auto internal_rc = cornered_button_size_to_internal_size(this_id->rc);
+
+		augs::gui::draw_clipped_rectangle(inside_mat, internal_rc, {}, in.v);
 		
 		{
-			for_each_button_corner(this_id->rc, [this_id, in](const assets::texture_id id, const ltrb drawn_rc) {
+			for_each_button_corner(internal_rc, [this_id, in](const assets::texture_id id, const ltrb drawn_rc) {
 				augs::gui::draw_clipped_rectangle(augs::gui::material(id, this_id->colorize), drawn_rc, {}, in.v, true);
 			}, true);
 		}
 
+		this_id->appearing_caption.target_pos = internal_rc.left_top();
 		this_id->appearing_caption.draw(in.v);
 	}
 };

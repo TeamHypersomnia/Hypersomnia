@@ -169,14 +169,16 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 	hypersomnia_description.target_pos = title_rect.right_top() + vec2(20, 20);
 	title_texts.push_back(&hypersomnia_description);
 
-	menu_ui_root.menu_buttons[(int)menu_button_type::CONNECT_TO_OFFICIAL_UNIVERSE].set_appearing_caption_and_center(format(L"Login to\nofficial universe", textes_style));
-	menu_ui_root.menu_buttons[(int)menu_button_type::BROWSE_UNOFFICIAL_UNIVERSES].set_appearing_caption_and_center(format(L"Browse\nunofficial universes", textes_style));
-	menu_ui_root.menu_buttons[(int)menu_button_type::HOST_UNIVERSE].set_appearing_caption_and_center(format(L"Host\nuniverse", textes_style));
-	menu_ui_root.menu_buttons[(int)menu_button_type::CONNECT_TO_UNIVERSE].set_appearing_caption_and_center(format(L"Connect to\nuniverse", textes_style));
-	menu_ui_root.menu_buttons[(int)menu_button_type::LOCAL_UNIVERSE].set_appearing_caption_and_center(format(L"Local\nuniverse", textes_style));
-	menu_ui_root.menu_buttons[(int)menu_button_type::SETTINGS].set_appearing_caption_and_center(format(L"Settings", textes_style));
-	menu_ui_root.menu_buttons[(int)menu_button_type::CREDITS].set_appearing_caption_and_center(format(L"Credits", textes_style));
-	menu_ui_root.menu_buttons[(int)menu_button_type::QUIT].set_appearing_caption_and_center(format(L"Quit", textes_style));
+	menu_ui_root.menu_buttons[(int)menu_button_type::CONNECT_TO_OFFICIAL_UNIVERSE].set_appearing_caption(format(L"Login to\nofficial universe", textes_style));
+	menu_ui_root.menu_buttons[(int)menu_button_type::BROWSE_UNOFFICIAL_UNIVERSES].set_appearing_caption(format(L"Browse\nunofficial universes", textes_style));
+	menu_ui_root.menu_buttons[(int)menu_button_type::HOST_UNIVERSE].set_appearing_caption(format(L"Host\nuniverse", textes_style));
+	menu_ui_root.menu_buttons[(int)menu_button_type::CONNECT_TO_UNIVERSE].set_appearing_caption(format(L"Connect to\nuniverse", textes_style));
+	menu_ui_root.menu_buttons[(int)menu_button_type::LOCAL_UNIVERSE].set_appearing_caption(format(L"Local\nuniverse", textes_style));
+	menu_ui_root.menu_buttons[(int)menu_button_type::SETTINGS].set_appearing_caption(format(L"Settings", textes_style));
+	menu_ui_root.menu_buttons[(int)menu_button_type::CREDITS].set_appearing_caption(format(L"Credits", textes_style));
+	menu_ui_root.menu_buttons[(int)menu_button_type::QUIT].set_appearing_caption(format(L"Quit", textes_style));
+
+	menu_ui_root.set_menu_buttons_positions(screen_size);
 
 	vec2i tweened_menu_button_size;
 	vec2i target_tweened_menu_button_size = menu_ui_root.get_max_menu_button_size();
