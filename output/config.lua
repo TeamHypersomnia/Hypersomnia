@@ -78,7 +78,10 @@ config_table = {
 	last_session_update_link = "patrykcysarz.pl/comment-system/web/stats/last-update/set",
 
 	director_scenario_filename = "director/menu_intro.ent",
-	menu_intro_scenario_filename = "director/menu_intro.ent"
+	menu_intro_scenario_filename = "director/menu_intro.ent",
+
+	skip_credits = 1,
+	latest_news_url = "http://hypersomnia.pl/latest_post"
 }
 
 if config_table.debug_disable_cursor_clipping == 0 then

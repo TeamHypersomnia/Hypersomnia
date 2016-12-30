@@ -52,5 +52,8 @@ public:
 	std::string director_scenario_filename;
 	std::string menu_intro_scenario_filename;
 
+	bool skip_credits = false;
+	std::string latest_news_url;
+
 	void get_values(game_window&);
 };

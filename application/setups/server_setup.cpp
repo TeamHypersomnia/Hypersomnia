@@ -52,10 +52,12 @@ void server_setup::deinit_endpoint(endpoint& end, const bool gracefully) {
 	if (hypersomnia[end.controlled_entity].alive())
 		scene.free_character(end.controlled_entity);
 
-	if(!gracefully)
+	if (!gracefully) {
 		choose_server(end.addr).forceful_disconnect(end.addr);
-	else
+	}
+	else {
 		choose_server(end.addr).disconnect(end.addr);
+	}
 }
 
 void server_setup::deinit_endpoint(const augs::network::endpoint_address addr, const bool gracefully) {
@@ -116,16 +118,20 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 		daemon_online = rep.start_daemon(cfg);
 	}
 
-	if (is_replaying || serv.listen(cfg.server_port, 32))
+	if (is_replaying || serv.listen(cfg.server_port, 32)) {
 		LOG("Listen server setup successful.");
-	else 
+	}
+	else {
 		LOG("Failed to setup a listen server.");
+	}
 
 	if (start_alternative_server) {
-		if (is_replaying || alternative_serv.listen(cfg.alternative_port, 32))
+		if (is_replaying || alternative_serv.listen(cfg.alternative_port, 32)) {
 			LOG("Alternative listen server setup successful.");
-		else
+		}
+		else {
 			LOG("Failed to setup an alternative listen server.");
+		}
 	}
 
 	{

@@ -54,4 +54,7 @@ void config_values::get_values(game_window& w) {
 
 	set(NVP(director_scenario_filename));
 	set(NVP(menu_intro_scenario_filename));
+
+	set(NVP(skip_credits));
+	set(NVP(latest_news_url));
 }

@@ -142,14 +142,19 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 	augs::action_list intro_actions;
 
 	{
-		intro_actions.push_blocking(act(new augs::delay_action(500.f)));
-		intro_actions.push_non_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 100, 6000.f)));
-		intro_actions.push_blocking(act(new augs::delay_action(2000.f)));
-
 		size_t rng = 0;
-		
-		for (auto& t : intro_texts) {
-			t->push_actions(intro_actions, rng);
+
+		if (!cfg.skip_credits) {
+			intro_actions.push_blocking(act(new augs::delay_action(500.f)));
+			intro_actions.push_non_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 100, 6000.f)));
+			intro_actions.push_blocking(act(new augs::delay_action(2000.f)));
+			
+			for (auto& t : intro_texts) {
+				t->push_actions(intro_actions, rng);
+			}
+		}
+		else {
+			fade_overlay_color.a = 100;
 		}
 
 		intro_actions.push_blocking(act(new augs::tween_value_action<rgba_channel>(tweened_menu_button_color.a, 255, 250.f)));
