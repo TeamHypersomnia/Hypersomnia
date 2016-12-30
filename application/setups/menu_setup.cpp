@@ -52,15 +52,16 @@ void menu_setup::process(game_window& window) {
 	augs::single_sound_buffer menu_theme;
 	augs::sound_source menu_theme_source;
 
-	if (cfg.music_volume > 0.f) {
-		const auto menu_theme_path = "hypersomnia/music/menu_theme.ogg";
+	const float start_music_at_secs = 0.f;
 
-		if (augs::file_exists(menu_theme_path)) {
-			menu_theme.set_data(augs::get_sound_samples_from_file(menu_theme_path));
+	if (cfg.music_volume > 0.f) {
+		if (augs::file_exists(cfg.menu_theme_filename)) {
+			menu_theme.set_data(augs::get_sound_samples_from_file(cfg.menu_theme_filename));
 
 			menu_theme_source.bind_buffer(menu_theme);
 			menu_theme_source.set_direct_channels(true);
 			menu_theme_source.set_gain(cfg.music_volume);
+			menu_theme_source.seek_to(start_music_at_secs);
 			menu_theme_source.play();
 		}
 	}
@@ -164,7 +165,7 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 	hypersomnia_description.population_interval = 60.f;
 
 	hypersomnia_description.should_disappear = false;
-	hypersomnia_description.target_text[0] = format(L"- disease of the omnipotent deity wishing to\nforget about infinitude of existence,\nin spite of countless deaths\nexperienced as a consequence.", { assets::font_id::GUI_FONT, {200, 200, 200, 255} });
+	hypersomnia_description.target_text[0] = format(L"- tendency of the omnipotent deity to immerse into inferior simulations,\nin spite of countless deaths experienced as a consequence.", { assets::font_id::GUI_FONT, {200, 200, 200, 255} });
 	hypersomnia_description.target_pos = title_rect.right_top() + vec2(20, 20);
 	title_texts.push_back(&hypersomnia_description);
 

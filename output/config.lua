@@ -40,7 +40,7 @@ config_table = {
 	doublebuffer = 1,
 
 	sound_effects_volume = 1,
-	music_volume = 0,
+	music_volume = 1,
 
 	debug_disable_cursor_clipping = 0,
 	
@@ -80,6 +80,7 @@ config_table = {
 	director_scenario_filename = "director/menu_intro.ent",
 	menu_intro_scenario_filename = "director/menu_intro.ent",
 
+	menu_theme_filename = "hypersomnia/music/menu_theme.flac",
 	skip_credits = 1,
 	latest_news_url = "http://hypersomnia.pl/latest_post/"
 }
