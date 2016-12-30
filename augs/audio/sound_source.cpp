@@ -54,6 +54,10 @@ namespace augs {
 	void sound_source::play() const {
 		AL_CHECK(alSourcePlay(id));
 	}
+	
+	void sound_source::seek_to(const float seconds) const {
+		AL_CHECK(alSourcef(id, AL_SEC_OFFSET, seconds));
+	}
 
 	void sound_source::stop() const {
 		AL_CHECK(alSourceStop(id));

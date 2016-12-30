@@ -25,6 +25,7 @@ namespace augs {
 		sound_source& operator=(sound_source&&);
 
 		void play() const;
+		void seek_to(const float seconds) const;
 		void stop() const;
 		void set_looping(const bool) const;
 		void set_pitch(const float) const;
