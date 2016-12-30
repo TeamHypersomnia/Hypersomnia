@@ -191,8 +191,11 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, {0, 180, 255
 		intro_actions.push_non_blocking(act(new augs::tween_value_action<rgba_channel>(title_text_color.a, 255, 500.f)));
 		intro_actions.push_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 20, 500.f)));
 
+		augs::action_list welcome_act;
+		developer_welcome.push_actions(welcome_act, rng);
+
 #if !IS_PRODUCTION_BUILD
-		developer_welcome.push_actions(intro_actions, rng);
+		intro_actions.push_non_blocking(act(new augs::list_action(std::move(welcome_act))));
 #endif
 	}
 

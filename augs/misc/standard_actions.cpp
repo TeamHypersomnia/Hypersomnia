@@ -13,6 +13,10 @@ namespace augs {
 		return elapsed_ms >= duration_ms;
 	}
 
+	list_action::list_action(action_list&& list) : list(std::move(list)) {
+
+	}
+
 	void list_action::on_update(const delta dt) {
 		list.update(dt);
 	}

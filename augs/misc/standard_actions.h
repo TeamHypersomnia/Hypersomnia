@@ -69,7 +69,10 @@ namespace augs {
 	};
 
 	class list_action : public action {
+	public:
 		action_list list;
+
+		list_action(action_list&&);
 
 		void on_enter() final {}
 		void on_update(const delta dt) final;
