@@ -33,12 +33,12 @@ void gui_system::switch_to_gui_mode_and_back(logic_step& step) {
 		if (subject.has<components::gui_element>()) {
 			auto& gui = subject.get<components::gui_element>();
 
-			if (i.intent == intent_type::SWITCH_TO_GUI && i.pressed_flag) {
+			if (i.intent == intent_type::SWITCH_TO_GUI && i.is_pressed) {
 				gui.is_gui_look_enabled = !gui.is_gui_look_enabled;
 			}
 
 			if (i.intent == intent_type::START_PICKING_UP_ITEMS) {
-				//preview_due_to_item_picking_request = i.pressed_flag;
+				//preview_due_to_item_picking_request = i.is_pressed;
 			}
 		}
 

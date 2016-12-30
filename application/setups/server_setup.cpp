@@ -287,7 +287,7 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 						//case 4: new_intent.intent = intent_type::CROSSHAIR_PRIMARY_ACTION; break;
 						}
 
-						new_intent.pressed_flag = test_entropy_randomizer.randval(0, 1) == 0;
+						new_intent.is_pressed = test_entropy_randomizer.randval(0, 1) == 0;
 
 						total_unpacked_entropy.entropy_per_entity[hypersomnia[scene.characters[i].id].get_guid()].push_back(new_intent);
 					}

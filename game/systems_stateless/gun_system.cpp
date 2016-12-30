@@ -45,10 +45,10 @@ void gun_system::consume_gun_intents(logic_step& step) {
 		auto& gun = *maybe_gun;
 
 		if (it.intent == intent_type::PRESS_GUN_TRIGGER) {
-			gun.trigger_pressed = it.pressed_flag;
+			gun.trigger_pressed = it.is_pressed;
 		}
 
-		if (it.intent == intent_type::RELOAD && it.pressed_flag) {
+		if (it.intent == intent_type::RELOAD && it.is_pressed) {
 			
 		}
 	}

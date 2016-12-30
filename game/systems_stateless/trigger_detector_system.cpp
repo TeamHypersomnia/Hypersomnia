@@ -33,7 +33,7 @@ void trigger_detector_system::consume_trigger_detector_presses(logic_step& step)
 			auto* const trigger_query_detector = subject.find<components::trigger_query_detector>();
 
 			if (trigger_query_detector) {
-				const bool pressed = e.pressed_flag;
+				const bool pressed = e.is_pressed;
 
 				trigger_query_detector->detection_intent_enabled = pressed;
 
@@ -58,7 +58,7 @@ void trigger_detector_system::consume_trigger_detector_presses(logic_step& step)
 			auto* const trigger_collision_detector = subject.find<components::trigger_collision_detector>();
 
 			if (trigger_collision_detector) {
-				trigger_collision_detector->detection_intent_enabled = e.pressed_flag;
+				trigger_collision_detector->detection_intent_enabled = e.is_pressed;
 			}
 		}
 	}

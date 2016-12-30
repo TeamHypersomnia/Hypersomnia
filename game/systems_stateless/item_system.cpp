@@ -81,7 +81,7 @@ void item_system::handle_throw_item_intents(logic_step& step) {
 	const auto& requests = step.transient.messages.get_queue<messages::intent_message>();
 
 	for (const auto& r : requests) {
-		if (r.pressed_flag &&
+		if (r.is_pressed &&
 			(r.intent == intent_type::THROW_PRIMARY_ITEM
 				|| r.intent == intent_type::THROW_SECONDARY_ITEM)
 			) {
@@ -104,7 +104,7 @@ void item_system::handle_holster_item_intents(logic_step& step) {
 	const auto& requests = step.transient.messages.get_queue<messages::intent_message>();
 
 	for (const auto& r : requests) {
-		if (r.pressed_flag &&
+		if (r.is_pressed &&
 			(r.intent == intent_type::HOLSTER_PRIMARY_ITEM
 				|| r.intent == intent_type::HOLSTER_SECONDARY_ITEM)
 			) {

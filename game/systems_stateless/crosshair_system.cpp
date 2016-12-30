@@ -56,7 +56,7 @@ void crosshair_system::generate_crosshair_intents(logic_step& step) {
 
 			step.transient.messages.post(crosshair_intent);
 		}
-		else if (it.intent == intent_type::SWITCH_LOOK && it.pressed_flag) {
+		else if (it.intent == intent_type::SWITCH_LOOK && it.is_pressed) {
 			auto& mode = crosshair.orbit_mode;
 
 			if (mode == components::crosshair::LOOK)

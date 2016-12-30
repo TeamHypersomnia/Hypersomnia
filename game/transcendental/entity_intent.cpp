@@ -29,7 +29,7 @@ bool key_and_mouse_intent::uses_mouse_motion() const {
 }
 
 bool key_and_mouse_intent::operator==(const key_and_mouse_intent& b) const {
-	return std::make_tuple(intent, mouse_rel, pressed_flag) == std::make_tuple(b.intent, b.mouse_rel, b.pressed_flag);
+	return std::make_tuple(intent, mouse_rel, is_pressed) == std::make_tuple(b.intent, b.mouse_rel, b.is_pressed);
 }
 
 bool key_and_mouse_intent::operator!=(const key_and_mouse_intent& b) const {
@@ -40,7 +40,7 @@ bool key_and_mouse_intent::from_raw_state(const input_context& context, const au
 	bool found_context_entry = false;
 
 	if (raw.was_any_key_pressed() || raw.was_any_key_released()) {
-		pressed_flag = raw.was_any_key_pressed();
+		is_pressed = raw.was_any_key_pressed();
 
 		const auto found_intent = context.key_to_intent.find(raw.key);
 		if (found_intent != context.key_to_intent.end()) {
@@ -49,7 +49,7 @@ bool key_and_mouse_intent::from_raw_state(const input_context& context, const au
 		}
 	}
 	else {
-		pressed_flag = true;
+		is_pressed = true;
 
 		const auto found_intent = context.event_to_intent.find(raw.msg);
 		if (found_intent != context.event_to_intent.end()) {

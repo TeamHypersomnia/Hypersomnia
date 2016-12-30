@@ -71,7 +71,7 @@ void driver_system::release_drivers_due_to_requests(logic_step& step) {
 	const auto& intents = step.transient.messages.get_queue<messages::intent_message>();
 
 	for (const auto& e : intents) {
-		if (e.intent == intent_type::RELEASE_CAR && e.pressed_flag) {
+		if (e.intent == intent_type::RELEASE_CAR && e.is_pressed) {
 			release_car_ownership(cosmos[e.subject]);
 		}
 	}

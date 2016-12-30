@@ -47,15 +47,15 @@ void melee_system::consume_melee_intents(logic_step& step) {
 		auto& melee = *maybe_melee;
 
 		if (it.intent == intent_type::MELEE_PRIMARY_MOVE) {
-			melee.primary_move_flag = it.pressed_flag;
+			melee.primary_move_flag = it.is_pressed;
 		}
 
 		if (it.intent == intent_type::MELEE_SECONDARY_MOVE) {
-			melee.secondary_move_flag = it.pressed_flag;
+			melee.secondary_move_flag = it.is_pressed;
 		}
 		
 		if (it.intent == intent_type::MELEE_TERTIARY_MOVE) {
-			melee.tertiary_move_flag = it.pressed_flag;
+			melee.tertiary_move_flag = it.is_pressed;
 		}
 	}
 }

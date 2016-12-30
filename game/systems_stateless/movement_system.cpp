@@ -29,22 +29,22 @@ void movement_system::set_movement_flags_from_input(logic_step& step) {
 
 		switch (it.intent) {
 		case intent_type::MOVE_FORWARD:
-			movement->moving_forward = it.pressed_flag;
+			movement->moving_forward = it.is_pressed;
 			break;
 		case intent_type::MOVE_BACKWARD:
-			movement->moving_backward = it.pressed_flag;
+			movement->moving_backward = it.is_pressed;
 			break;
 		case intent_type::MOVE_LEFT:
-			movement->moving_left = it.pressed_flag;
+			movement->moving_left = it.is_pressed;
 			break;
 		case intent_type::MOVE_RIGHT:
-			movement->moving_right = it.pressed_flag;
+			movement->moving_right = it.is_pressed;
 			break;
 		case intent_type::WALK:
-			movement->walking_enabled = it.pressed_flag;
+			movement->walking_enabled = it.is_pressed;
 			break;
 		case intent_type::SPRINT:
-			movement->sprint_enabled = it.pressed_flag;
+			movement->sprint_enabled = it.is_pressed;
 			break;
 		default: break;
 		}
