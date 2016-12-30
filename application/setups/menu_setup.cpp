@@ -34,81 +34,11 @@
 #include "application/ui/app_ui_root.h"
 #include "application/ui/app_ui_context.h"
 
+#include "application/ui/appearing_text.h"
+
 using namespace augs::window::event::keys;
 using namespace augs::gui::text;
 using namespace augs::gui;
-
-typedef std::unique_ptr<action> act;
-
-struct appearing_text {
-	text_drawer drawer;
-	style st = style(assets::font_id::GUI_FONT, cyan);
-	rgba_channel alpha;
-
-	fstr text;
-	
-	std::array<fstr, 2> target_text;
-	
-	fstr get_total_target_text() const {
-		return target_text[0] + target_text[1];
-	}
-
-	bool caret_active = false;
-	bool should_disappear = true;
-	float population_variation = 0.4f;
-	float population_interval = 150.f;
-
-	vec2 target_pos;
-
-	void push_actions(augs::action_list& into, size_t& rng) {
-		auto push = [&](act a){
-			into.push_blocking(std::move(a));
-		};
-
-		push(act(new augs::set_value_action<rgba_channel>(alpha, 255)));
-		push(act(new augs::set_value_action<fstr>(text, fstr())));
-		push(act(new augs::set_value_action<bool>(caret_active, true)));
-
-		push(act(new augs::populate_with_delays<fstr>(text, target_text[0], population_interval * target_text[0].length(), population_variation, rng++)));
-
-		if (target_text[1].size() > 0) {
-			push(act(new augs::delay_action(1000.f)));
-			push(act(new augs::populate_with_delays<fstr>(text, target_text[1], population_interval * target_text[1].length(), population_variation, rng++)));
-		}
-
-		push(act(new augs::delay_action(1000.f)));
-		push(act(new augs::set_value_action<bool>(caret_active, false)));
-
-		if (should_disappear) {
-			push(act(new augs::delay_action(1000.f)));
-			push(act(new augs::tween_value_action<rgba_channel>(alpha, 0, 2000.f)));
-			push(act(new augs::delay_action(500.f)));
-		}
-	}
-
-	bool should_draw() const {
-		return caret_active || (text.size() > 0 && alpha > 0);
-	}
-
-	void draw(augs::renderer& renderer) {
-		if (!should_draw()) {
-			return;
-		}
-
-		text = set_alpha(text, alpha);
-		drawer.pos = target_pos;
-		drawer.set_text(text);
-
-		caret_info in(st);
-		in.pos = text.size();
-
-		auto stroke_color = black;
-		stroke_color.a = alpha;
-		drawer.print.active = caret_active;
-		drawer.draw_stroke(renderer.get_triangle_buffer(), stroke_color);
-		drawer.draw(renderer.get_triangle_buffer(), &in);
-	}
-};
 
 void menu_setup::process(game_window& window) {
 	const vec2i screen_size = vec2i(window.get_screen_size());
@@ -153,6 +83,15 @@ void menu_setup::process(game_window& window) {
 	std::vector<appearing_text*> intro_texts;
 	std::vector<appearing_text*> title_texts;
 
+	rgba tweened_menu_button_color = cyan;
+	tweened_menu_button_color.a = 0;
+
+	app_ui_rect_world menu_ui_rect_world;
+	app_ui_rect_tree menu_ui_tree;
+	app_ui_root menu_ui_root = app_ui_root(screen_size);
+	app_ui_context menu_ui_context(menu_ui_rect_world, menu_ui_tree, menu_ui_root);
+	app_ui_root_in_context menu_ui_root_id;
+
 	auto center = [&](auto& t) {
 		t.target_pos = screen_size / 2 - get_text_bbox(t.get_total_target_text(), 0)*0.5f;
 	};
@@ -188,18 +127,19 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 	hypersomnia_description.target_pos = title_rect.right_top() + vec2(20, 20);
 	title_texts.push_back(&hypersomnia_description);
 
-	augs::action_list intro_actions;
+	menu_ui_root.menu_buttons[(int)menu_button_type::CONNECT_TO_OFFICIAL_UNIVERSE].set_appearing_caption_and_center(format(L"Login to\nofficial universe", textes_style));
+	menu_ui_root.menu_buttons[(int)menu_button_type::BROWSE_UNOFFICIAL_UNIVERSES].set_appearing_caption_and_center(format(L"Browse\nunofficial universes", textes_style));
+	menu_ui_root.menu_buttons[(int)menu_button_type::HOST_UNIVERSE].set_appearing_caption_and_center(format(L"Host\nuniverse", textes_style));
+	menu_ui_root.menu_buttons[(int)menu_button_type::CONNECT_TO_UNIVERSE].set_appearing_caption_and_center(format(L"Connect to\nuniverse", textes_style));
+	menu_ui_root.menu_buttons[(int)menu_button_type::LOCAL_UNIVERSE].set_appearing_caption_and_center(format(L"Local\nuniverse", textes_style));
+	menu_ui_root.menu_buttons[(int)menu_button_type::SETTINGS].set_appearing_caption_and_center(format(L"Settings", textes_style));
+	menu_ui_root.menu_buttons[(int)menu_button_type::CREDITS].set_appearing_caption_and_center(format(L"Credits", textes_style));
+	menu_ui_root.menu_buttons[(int)menu_button_type::QUIT].set_appearing_caption_and_center(format(L"Quit", textes_style));
 
 	vec2i tweened_menu_button_size;
-	vec2i target_tweened_menu_button_size = vec2i(80, 20);
-	rgba tweened_menu_button_color = cyan;
-	tweened_menu_button_color.a = 0;
+	vec2i target_tweened_menu_button_size = menu_ui_root.get_max_menu_button_size();
 
-	app_ui_rect_world menu_ui_rect_world;
-	app_ui_rect_tree menu_ui_tree;
-	app_ui_root menu_ui_root = app_ui_root(screen_size);
-	app_ui_context menu_ui_context(menu_ui_rect_world, menu_ui_tree, menu_ui_root);
-	app_ui_root_in_context menu_ui_root_id;
+	augs::action_list intro_actions;
 
 	{
 		intro_actions.push_blocking(act(new augs::delay_action(500.f)));
@@ -207,9 +147,10 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 		intro_actions.push_blocking(act(new augs::delay_action(2000.f)));
 
 		size_t rng = 0;
-
-		credits1.push_actions(intro_actions, rng);
-		credits2.push_actions(intro_actions, rng);
+		
+		for (auto& t : intro_texts) {
+			t->push_actions(intro_actions, rng);
+		}
 
 		intro_actions.push_blocking(act(new augs::tween_value_action<rgba_channel>(tweened_menu_button_color.a, 255, 250.f)));
 		intro_actions.push_blocking(act(new augs::tween_value_action<int>(tweened_menu_button_size.x, target_tweened_menu_button_size.x, 500.f)));
@@ -219,12 +160,19 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 		intro_actions.push_non_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 20, 500.f)));
 
 		for (auto& t : title_texts) {
-			augs::action_list welcome_act;
-			t->push_actions(welcome_act, rng);
+			augs::action_list acts;
+			t->push_actions(acts, rng);
 
 #if !IS_PRODUCTION_BUILD
-			intro_actions.push_non_blocking(act(new augs::list_action(std::move(welcome_act))));
+			intro_actions.push_non_blocking(act(new augs::list_action(std::move(acts))));
 #endif
+		}
+
+		for (auto& m : menu_ui_root.menu_buttons) {
+			augs::action_list acts;
+			m.appearing_caption.push_actions(acts, rng);
+
+			intro_actions.push_non_blocking(act(new augs::list_action(std::move(acts))));
 		}
 	}
 
@@ -291,11 +239,11 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 		session.draw_color_overlay(renderer, fade_overlay_color);
 
 		for (auto& t : intro_texts) {
-			t->draw(renderer);
+			t->draw(renderer.get_triangle_buffer());
 		}
 
 		for (auto& t : title_texts) {
-			t->draw(renderer);
+			t->draw(renderer.get_triangle_buffer());
 		}
 
 		renderer.call_triangles();
@@ -323,6 +271,12 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 			renderer.clear_triangles();
 		}
 
+		intro_actions.update(vdt);
+		intro_actions.update(vdt);
+		intro_actions.update(vdt);
+		intro_actions.update(vdt);
+		intro_actions.update(vdt);
+		intro_actions.update(vdt);
 		intro_actions.update(vdt);
 		intro_actions.update(vdt);
 		intro_actions.update(vdt);

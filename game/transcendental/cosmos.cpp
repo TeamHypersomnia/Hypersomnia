@@ -368,8 +368,9 @@ void cosmos::delete_entity(const entity_id& e) {
 
 	const bool should_destruct_now_to_avoid_repeated_resubstantiation = handle.has<components::substance>();
 
-	if (should_destruct_now_to_avoid_repeated_resubstantiation)
+	if (should_destruct_now_to_avoid_repeated_resubstantiation) {
 		handle.remove<components::substance>();
+	}
 
 #if COSMOS_TRACKS_GUIDS
 	clear_guid(handle);

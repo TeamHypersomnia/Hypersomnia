@@ -8,11 +8,14 @@
 #include "game/assets/texture_id.h"
 
 #include "application/ui/button_corners.h"
+#include "application/ui/appearing_text.h"
 
 class dx_button : public app_ui_rect_node {
 public:
 	augs::gui::appearance_detector detector;
 	augs::gui::text::fstr caption;
+	appearing_text appearing_caption;
+
 	rgba colorize;
 	bool click_callback_required = false;
 	padding_byte pad[3];
@@ -20,6 +23,18 @@ public:
 	typedef app_ui_rect_node base;
 	typedef base::gui_entropy gui_entropy;
 
+	vec2i get_target_button_size() const {
+		return get_text_bbox(appearing_caption.get_total_target_text(), 0) - vec2i(0, 4);
+	}
+
+	void set_appearing_caption_and_center(const augs::gui::text::fstr text) {
+		appearing_caption.population_interval = 100.f;
+
+		appearing_caption.should_disappear = false;
+		appearing_caption.target_text[0] = text;
+		appearing_caption.target_pos = rc.left_top();
+	}
+		
 	template <class C, class D>
 	static void advance_elements(C context, const D& this_id, const gui_entropy& entropies, const augs::delta) {
 		for (const auto& info : entropies.get_events_for(this_id)) {
@@ -46,9 +61,11 @@ public:
 		augs::gui::draw_clipped_rectangle(inside_mat, this_id->rc, {}, in.v);
 		
 		{
-			for_each_button_corner(this_id->rc, [this_id, in](const assets::texture_id id, ltrb drawn_rc) {
+			for_each_button_corner(this_id->rc, [this_id, in](const assets::texture_id id, const ltrb drawn_rc) {
 				augs::gui::draw_clipped_rectangle(augs::gui::material(id, this_id->colorize), drawn_rc, {}, in.v, true);
 			}, true);
 		}
+
+		this_id->appearing_caption.draw(in.v);
 	}
 };

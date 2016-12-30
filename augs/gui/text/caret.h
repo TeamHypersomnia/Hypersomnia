@@ -1,3 +1,4 @@
+#pragma once
 #include "augs/gui/formatted_text.h"
 
 namespace augs {

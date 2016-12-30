@@ -13,6 +13,8 @@ public:
 	void set_menu_buttons_sizes(const vec2i size);
 	void set_menu_buttons_colors(const rgba col);
 
+	vec2i get_max_menu_button_size() const;
+
 	template <class C, class D, class L>
 	static void for_each_child(C context, const D& this_id, L generic_call) {
 		// however it should be a container so we call the callback on the element's children
