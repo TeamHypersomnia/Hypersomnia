@@ -9,7 +9,7 @@
 
 namespace components {
 	struct render {
-		bool absolute_transform = false;
+		bool screen_space_transform = false;
 		bool draw_border = false;
 		render_layer layer = render_layer::INVALID;
 		padding_byte pad;
@@ -22,7 +22,7 @@ namespace components {
 		void serialize(Archive& ar) {
 			ar(
 				CEREAL_NVP(interpolate),
-				CEREAL_NVP(absolute_transform),
+				CEREAL_NVP(screen_space_transform),
 				CEREAL_NVP(draw_border),
 
 				CEREAL_NVP(layer),

@@ -7,10 +7,7 @@
 #include "augs/graphics/pixel.h"
 #include "augs/graphics/vertex.h"
 #include "game/assets/texture_id.h"
-#include "transform_component.h"
-#include "game/detail/camera_cone.h"
-
-#include "game/enums/renderable_drawing_type.h"
+#include "game/detail/basic_renderable_drawing_input.h"
 
 #include "zeroed_pod.h"
 
@@ -25,20 +22,12 @@ namespace components {
 			STRETCH
 		};
 
-		struct drawing_input : vertex_triangle_buffer_reference {
-			using vertex_triangle_buffer_reference::vertex_triangle_buffer_reference;
+		struct drawing_input : basic_renderable_drawing_input {
+			using basic_renderable_drawing_input::basic_renderable_drawing_input;
 
-			components::transform renderable_transform;
-			camera_cone camera;
-
-			augs::rgba colorize = augs::white;
 			float global_time_seconds = 0.f;
-
 			void set_global_time_seconds(const float);
-
-			renderable_drawing_type drawing_type = renderable_drawing_type::NORMAL;
 		};
-
 
 		assets::texture_id center_neon_map = assets::texture_id::INVALID;
 		/* the polygon as it was originally, so possibly concave

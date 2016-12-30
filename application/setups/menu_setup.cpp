@@ -132,6 +132,19 @@ void menu_setup::process(game_window& window) {
 		}
 	}
 
+	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
+
+	scene_managers::testbed testbed;
+	testbed.debug_var = window.config.debug_var;
+
+	intro_scene.set_fixed_delta(cfg.tickrate);
+	testbed.populate_world_with_entities(intro_scene, screen_size);
+	const auto menu_title = intro_scene[testbed.get_menu_title_entity()];
+
+	ltrb title_rect;
+	title_rect.set_position(menu_title.logic_transform().pos);
+	title_rect.set_size(menu_title.get<components::sprite>().size);
+
 	rgba fade_overlay_color = { 0, 2, 2, 255 };
 	rgba title_text_color = { 255, 255, 255, 0 };
 
@@ -161,16 +174,26 @@ void menu_setup::process(game_window& window) {
 	developer_welcome.target_text[0] = format(L"Thank you for building Hypersomnia.\n", textes_style);
 	developer_welcome.target_text[1] = format(L"This message is not included in distributed executables.\n\
 All your suggestions and contributions are very much welcomed by our collective.\n\
-We wish you an exciting journey through architecture of our cosmos.\n", textes_style) + 
-format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, {0, 180, 255, 255}));
+We wish you an exciting journey through architecture of our cosmos.\n", textes_style) +
+format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 255, 255 }));
 
 	developer_welcome.target_pos += screen_size - get_text_bbox(developer_welcome.get_total_target_text(), 0) - vec2(100, 100);
 	title_texts.push_back(&developer_welcome);
 
+	appearing_text hypersomnia_description;
+	hypersomnia_description.population_interval = 100.f;
+
+	hypersomnia_description.should_disappear = false;
+	hypersomnia_description.target_text[0] = format(L"- disease of the omnipotent deity\nwishing to forget about infinitude of existence,\nin spite of countless deaths\nexperienced as a consequence.", { assets::font_id::GUI_FONT, {200, 200, 200, 255} });
+	hypersomnia_description.target_pos = title_rect.right_top() + vec2(20, 20);
+	title_texts.push_back(&hypersomnia_description);
+
 	augs::action_list intro_actions;
 
-	vec2i tweened_menu_button_size = vec2i(80, 20);
+	vec2i tweened_menu_button_size;
+	vec2i target_tweened_menu_button_size = vec2i(80, 20);
 	rgba tweened_menu_button_color = cyan;
+	tweened_menu_button_color.a = 0;
 
 	app_ui_rect_world menu_ui_rect_world;
 	app_ui_rect_tree menu_ui_tree;
@@ -188,29 +211,22 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, {0, 180, 255
 		credits1.push_actions(intro_actions, rng);
 		credits2.push_actions(intro_actions, rng);
 
-		intro_actions.push_non_blocking(act(new augs::tween_value_action<rgba_channel>(title_text_color.a, 255, 500.f)));
-		intro_actions.push_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 20, 500.f)));
+		intro_actions.push_blocking(act(new augs::tween_value_action<rgba_channel>(tweened_menu_button_color.a, 255, 250.f)));
+		intro_actions.push_blocking(act(new augs::tween_value_action<int>(tweened_menu_button_size.x, target_tweened_menu_button_size.x, 500.f)));
+		intro_actions.push_blocking(act(new augs::tween_value_action<int>(tweened_menu_button_size.y, target_tweened_menu_button_size.y, 250.f)));
 
-		augs::action_list welcome_act;
-		developer_welcome.push_actions(welcome_act, rng);
+		intro_actions.push_non_blocking(act(new augs::tween_value_action<rgba_channel>(title_text_color.a, 255, 500.f)));
+		intro_actions.push_non_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 20, 500.f)));
+
+		for (auto& t : title_texts) {
+			augs::action_list welcome_act;
+			t->push_actions(welcome_act, rng);
 
 #if !IS_PRODUCTION_BUILD
-		intro_actions.push_non_blocking(act(new augs::list_action(std::move(welcome_act))));
+			intro_actions.push_non_blocking(act(new augs::list_action(std::move(welcome_act))));
 #endif
+		}
 	}
-
-	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
-
-	scene_managers::testbed testbed;
-	testbed.debug_var = window.config.debug_var;
-
-	intro_scene.set_fixed_delta(cfg.tickrate);
-	testbed.populate_world_with_entities(intro_scene, screen_size);
-	const auto menu_title = intro_scene[testbed.get_menu_title_entity()];
-
-	ltrb title_rect;
-	title_rect.set_position(menu_title.logic_transform().pos);
-	title_rect.set_size(menu_title.get<components::sprite>().size);
 
 	viewing_session session;
 	session.reserve_caches_for_entities(3000);
@@ -307,6 +323,9 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, {0, 180, 255
 			renderer.clear_triangles();
 		}
 
+		intro_actions.update(vdt);
+		intro_actions.update(vdt);
+		intro_actions.update(vdt);
 		intro_actions.update(vdt);
 		intro_actions.update(vdt);
 		intro_actions.update(vdt);

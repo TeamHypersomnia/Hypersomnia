@@ -677,9 +677,9 @@ namespace scene_managers {
 
 		ingredients::sprite(menu_title, vec2(100, 100), assets::texture_id::MENU_GAME_LOGO, { 255, 255, 255, 0 }, render_layer::EFFECTS);
 		const auto menu_title_size = menu_title.get<components::sprite>().size;
-		menu_title.set_logic_transform(vec2(-screen_size.x / 2, -screen_size.y / 2) + menu_title_size/2 + vec2(100, 100));
+		menu_title.set_logic_transform(vec2(100, 100));
 
-		menu_title.get<components::render>().absolute_transform = true;
+		menu_title.get<components::render>().screen_space_transform = true;
 		menu_title.add_standard_components();
 
 		menu_title_entity = menu_title;

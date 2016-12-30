@@ -26,7 +26,7 @@ namespace components {
 		const auto* const wandering_pixels = e.find<components::wandering_pixels>();
 		const auto* const sound_existence = e.find<components::sound_existence>();
 
-		if (render && render->absolute_transform) {
+		if (render && render->screen_space_transform) {
 			result.always_visible = true;
 			return result;
 		}

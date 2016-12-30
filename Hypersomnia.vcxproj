@@ -1090,6 +1090,7 @@
     <ClInclude Include="game\components\sub_entities_component.h" />
     <ClInclude Include="game\components\wandering_pixels_component.h" />
     <ClInclude Include="game\container_sizes.h" />
+    <ClInclude Include="game\detail\basic_renderable_drawing_input.h" />
     <ClInclude Include="game\detail\camera_cone.h" />
     <ClInclude Include="game\detail\entity\spatial_properties_getters.h" />
     <ClInclude Include="game\detail\gui\aabb_highlighter.h" />

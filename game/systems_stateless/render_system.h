@@ -36,12 +36,14 @@ public:
 		const camera_cone camera,
 		const renderable_drawing_type renderable_drawing_mode
 	) const {
-		typename renderable_type::drawing_input in(output);
+		typedef typename renderable_type::drawing_input input_type;
+		input_type in(output);
 
 		in.camera = camera;
 
-		if (render.absolute_transform) {
-			in.camera.transform.reset();
+		if (render.screen_space_transform) {
+			in.camera.transform.pos = (in.camera.visible_world_area/2);
+			in.positioning = input_type::positioning_type::LEFT_TOP_CORNER;
 		}
 
 		in.renderable_transform = renderable_transform;
