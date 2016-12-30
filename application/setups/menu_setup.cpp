@@ -107,7 +107,7 @@ void menu_setup::process(game_window& window) {
 	intro_texts.push_back(&credits2);
 
 	appearing_text developer_welcome;
-	developer_welcome.population_interval = 100.f;
+	developer_welcome.population_interval = 60.f;
 
 	developer_welcome.should_disappear = false;
 	developer_welcome.target_text[0] = format(L"Thank you for building Hypersomnia.\n", textes_style);
@@ -120,10 +120,10 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 	title_texts.push_back(&developer_welcome);
 
 	appearing_text hypersomnia_description;
-	hypersomnia_description.population_interval = 100.f;
+	hypersomnia_description.population_interval = 60.f;
 
 	hypersomnia_description.should_disappear = false;
-	hypersomnia_description.target_text[0] = format(L"- disease of the omnipotent deity\nwishing to forget about infinitude of existence,\nin spite of countless deaths\nexperienced as a consequence.", { assets::font_id::GUI_FONT, {200, 200, 200, 255} });
+	hypersomnia_description.target_text[0] = format(L"- disease of the omnipotent deity wishing to\nforget about infinitude of existence,\nin spite of countless deaths\nexperienced as a consequence.", { assets::font_id::GUI_FONT, {200, 200, 200, 255} });
 	hypersomnia_description.target_pos = title_rect.right_top() + vec2(20, 20);
 	title_texts.push_back(&hypersomnia_description);
 
@@ -271,17 +271,6 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 			renderer.clear_triangles();
 		}
 
-		intro_actions.update(vdt);
-		intro_actions.update(vdt);
-		intro_actions.update(vdt);
-		intro_actions.update(vdt);
-		intro_actions.update(vdt);
-		intro_actions.update(vdt);
-		intro_actions.update(vdt);
-		intro_actions.update(vdt);
-		intro_actions.update(vdt);
-		intro_actions.update(vdt);
-		intro_actions.update(vdt);
 		intro_actions.update(vdt);
 
 		menu_title.get<components::sprite>().color = title_text_color;

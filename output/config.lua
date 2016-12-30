@@ -35,8 +35,8 @@ config_table = {
 	window_x = 100,
 	window_y = 0,
 	bpp = 24,
-	resolution_w = 1200,
-	resolution_h = 800,
+	resolution_w = 1400,
+	resolution_h = 1000,
 	doublebuffer = 1,
 
 	sound_effects_volume = 1,

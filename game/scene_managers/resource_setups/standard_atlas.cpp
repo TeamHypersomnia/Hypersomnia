@@ -130,6 +130,8 @@ namespace resource_setups {
 			const int lower_side = 12;
 			const int upper_side = 8;
 
+			const int inside_border_padding = 4;
+
 			{
 				augs::image hotbar_l;
 				augs::image hotbar_t;
@@ -166,31 +168,39 @@ namespace resource_setups {
 
 				hotbar_lt.create(lower_side, upper_side, 4);
 				hotbar_lt.fill(inside_color);
-				hotbar_lt.paint_line({ 0, 0 }, { 0, upper_side-1 }, border_color);
+				hotbar_lt.paint_line({ 0, 0 }, { 0, upper_side - 1 }, border_color);
 				hotbar_lt.paint_line({ 0, 0 }, { lower_side - 1, 0 }, border_color);
+
+				hotbar_lt.paint_line({ inside_border_padding, inside_border_padding }, { inside_border_padding, upper_side - 1 }, border_color);
+				hotbar_lt.paint_line({ inside_border_padding, inside_border_padding }, { lower_side - 1, inside_border_padding }, border_color);
 
 				hotbar_rt.create(upper_side, upper_side, 4);
 				hotbar_rt.fill({ 0, 0, 0, 0 });
-
-				hotbar_rt.paint_line({ 0, 0 }, { upper_side - 1, upper_side - 1 }, border_color);
 
 				for (int i = 1; i < upper_side; ++i) {
 					hotbar_rt.paint_line({ 0, i }, { upper_side-i - 1, upper_side - 1 }, inside_color);
 				}
 
+				hotbar_rt.paint_line({ 0, 0 }, { upper_side - 1, upper_side - 1 }, border_color);
+				hotbar_rt.paint_line({ 0, inside_border_padding }, { upper_side - 1 - inside_border_padding, upper_side - 1 }, border_color);
+
 				hotbar_rb.create(upper_side, lower_side, 4);
 				hotbar_rb.fill(inside_color);
 				hotbar_rb.paint_line({ upper_side-1, lower_side-1 }, { 0, lower_side-1 }, border_color);
-				hotbar_rb.paint_line({ upper_side-1, lower_side-1 }, { upper_side-1, 0 }, border_color);
+				hotbar_rb.paint_line({ upper_side - 1, lower_side - 1 }, { upper_side - 1, 0 }, border_color);
+
+				hotbar_rb.paint_line({ upper_side - 1 - inside_border_padding, lower_side - 1 - inside_border_padding }, { 0, lower_side - 1 - inside_border_padding }, border_color);
+				hotbar_rb.paint_line({ upper_side- 1 - inside_border_padding, lower_side - 1- inside_border_padding }, { upper_side- 1 - inside_border_padding, 0 }, border_color);
 
 				hotbar_lb.create(lower_side, lower_side, 4);
 				hotbar_lb.fill({ 0, 0, 0, 0 });
 
-				hotbar_lb.paint_line({ 0, 0 }, { lower_side - 1, lower_side - 1 }, border_color);
-
 				for (int i = 1; i < lower_side; ++i) {
 					hotbar_lb.paint_line({ i, 0 }, { lower_side - 1, lower_side - 1 - i }, inside_color);
 				}
+
+				hotbar_lb.paint_line({ 0, 0 }, { lower_side - 1, lower_side - 1 }, border_color);
+				hotbar_lb.paint_line({ inside_border_padding, 0 }, { lower_side - 1, lower_side - 1 - inside_border_padding }, border_color);
 
 				get_resource_manager().create(assets::texture_id::HOTBAR_BUTTON_LT, hotbar_lt);
 				get_resource_manager().create(assets::texture_id::HOTBAR_BUTTON_RT, hotbar_rt);

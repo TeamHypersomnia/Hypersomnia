@@ -24,7 +24,7 @@ public:
 	typedef base::gui_entropy gui_entropy;
 
 	vec2i get_target_button_size() const {
-		return get_text_bbox(appearing_caption.get_total_target_text(), 0) - vec2i(0, 4);
+		return get_text_bbox(appearing_caption.get_total_target_text(), 0) - vec2i(0, 3);
 	}
 
 	void set_appearing_caption_and_center(const augs::gui::text::fstr text) {
