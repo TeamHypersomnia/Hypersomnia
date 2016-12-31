@@ -356,10 +356,10 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 				in.renderable_transform.pos = mouse_pos;
 
 				cursor_sprite.draw(in);
-
-				renderer.call_triangles();
-				renderer.clear_triangles();
 			}
+
+			renderer.call_triangles();
+			renderer.clear_triangles();
 		}
 
 		intro_actions.update(vdt);
