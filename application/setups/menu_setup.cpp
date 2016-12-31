@@ -70,6 +70,7 @@ void menu_setup::process(game_window& window) {
 
 	std::mutex news_mut;
 
+	bool draw_cursor = false;
 	bool roll_news = false;
 	text_drawer latest_news_drawer;
 	vec2 news_pos = vec2(screen_size.x, 5);
@@ -129,6 +130,7 @@ void menu_setup::process(game_window& window) {
 	tweened_menu_button_color.a = 0;
 
 	app_ui_rect_world menu_ui_rect_world;
+	menu_ui_rect_world.last_state.screen_size = screen_size;
 	app_ui_rect_tree menu_ui_tree;
 	app_ui_root menu_ui_root = app_ui_root(screen_size);
 	app_ui_context menu_ui_context(menu_ui_rect_world, menu_ui_tree, menu_ui_root);
@@ -203,13 +205,15 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 
 		intro_actions.push_blocking(act(new augs::tween_value_action<rgba_channel>(tweened_menu_button_color.a, 255, 250.f)));
 		intro_actions.push_blocking(act(new augs::tween_value_action<int>(tweened_menu_button_size.x, target_tweened_menu_button_size.x, 500.f)));
-		intro_actions.push_blocking(act(new augs::tween_value_action<int>(tweened_menu_button_size.y, target_tweened_menu_button_size.y, 250.f)));
+		intro_actions.push_blocking(act(new augs::tween_value_action<int>(tweened_menu_button_size.y, target_tweened_menu_button_size.y, 350.f)));
 
 		intro_actions.push_non_blocking(act(new augs::tween_value_action<rgba_channel>(title_text_color.a, 255, 500.f)));
 		intro_actions.push_non_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 20, 500.f)));
 		
 		intro_actions.push_non_blocking(act(new augs::set_value_action<bool>(roll_news, true)));
-
+		intro_actions.push_non_blocking(act(new augs::set_value_action<vec2i>(menu_ui_rect_world.last_state.mouse.pos, vec2i(0, 0))));
+		intro_actions.push_non_blocking(act(new augs::set_value_action<bool>(draw_cursor, true)));
+		
 		for (auto& t : title_texts) {
 			augs::action_list acts;
 			t->push_actions(acts, rng);
@@ -334,8 +338,28 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 
 			menu_ui_rect_world.draw(renderer.get_triangle_buffer(), menu_ui_context, menu_ui_root_id);
 
-			renderer.call_triangles();
-			renderer.clear_triangles();
+			if (draw_cursor) {
+				const auto mouse_pos = menu_ui_rect_world.last_state.mouse.pos;
+				const auto gui_cursor_color = cyan;
+
+				auto gui_cursor = assets::texture_id::GUI_CURSOR;
+
+				if (menu_ui_context.alive(menu_ui_rect_world.rect_hovered)) {
+					gui_cursor = assets::texture_id::GUI_CURSOR_HOVER;
+				}
+
+				components::sprite cursor_sprite;
+				cursor_sprite.set(gui_cursor, gui_cursor_color);
+
+				components::sprite::drawing_input in(renderer.get_triangle_buffer());
+				in.positioning = components::sprite::drawing_input::positioning_type::LEFT_TOP_CORNER;
+				in.renderable_transform.pos = mouse_pos;
+
+				cursor_sprite.draw(in);
+
+				renderer.call_triangles();
+				renderer.clear_triangles();
+			}
 		}
 
 		intro_actions.update(vdt);

@@ -122,6 +122,11 @@ namespace components {
 		bg_sprite.color.a = 120;
 
 		auto gui_cursor = assets::texture_id::GUI_CURSOR;
+		
+		if (!dragged_item && context.alive(rect_world.rect_hovered)) {
+			gui_cursor = assets::texture_id::GUI_CURSOR_HOVER;
+		}
+		
 		auto gui_cursor_color = cyan;
 
 		if (drag_result.possible_target_hovered) {

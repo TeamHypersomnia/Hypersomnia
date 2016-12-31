@@ -218,6 +218,7 @@ namespace resource_setups {
 		get_resource_manager().create(assets::texture_id::CONTAINER_CLOSED_ICON, "hypersomnia/gfx/container_closed_icon.png");
 
 		get_resource_manager().create(assets::texture_id::GUI_CURSOR, "hypersomnia/gfx/gui_cursor.png");
+		get_resource_manager().create(assets::texture_id::GUI_CURSOR_HOVER, "hypersomnia/gfx/gui_cursor_hover.png");
 		get_resource_manager().create(assets::texture_id::GUI_CURSOR_ADD, "hypersomnia/gfx/gui_cursor_add.png");
 		get_resource_manager().create(assets::texture_id::GUI_CURSOR_ERROR, "hypersomnia/gfx/gui_cursor_error.png");
 		get_resource_manager().create(assets::texture_id::GUI_CURSOR_MINUS, "hypersomnia/gfx/gui_cursor_minus.png");
