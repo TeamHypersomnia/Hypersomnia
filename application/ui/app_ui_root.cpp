@@ -25,12 +25,12 @@ void app_ui_root::set_menu_buttons_sizes(const vec2i size) {
 	for (size_t i = 0; i < menu_buttons.size(); ++i) {
 		auto this_size = size;
 		
-		const auto bbox = cornered_button_size_to_internal_size(menu_buttons[i].get_target_button_size()); 
+		const auto bbox = menu_buttons[i].corners.cornered_size_to_internal_size(menu_buttons[i].get_target_button_size());
 		
 		this_size.x = std::min(bbox.x, this_size.x);
 		this_size.y = std::min(bbox.y, this_size.y);
 
-		menu_buttons[i].rc.set_size(internal_size_to_cornered_button_size(this_size));
+		menu_buttons[i].rc.set_size(menu_buttons[i].corners.internal_size_to_cornered_size(this_size));
 	}
 }
 

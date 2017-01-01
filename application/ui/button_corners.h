@@ -6,76 +6,91 @@
 
 #include "augs/texture_baker/texture_with_image.h"
 
-ltrb cornered_button_size_to_internal_size(ltrb);
-ltrb internal_size_to_cornered_button_size(ltrb);
-vec2i cornered_button_size_to_internal_size(vec2i);
-vec2i internal_size_to_cornered_button_size(vec2i);
+enum class button_corner_type {
+	LT,
+	RT,
+	RB,
+	LB,
 
-template <class L>
-void for_each_button_corner(const ltrb rc, L callback, const bool flip = false) {
-	auto& manager = get_resource_manager();
+	L,
+	T,
+	R,
+	B,
 
-	std::array<assets::texture_id, 8> textures = {
-		assets::texture_id::HOTBAR_BUTTON_LT,
-		assets::texture_id::HOTBAR_BUTTON_RT,
-		assets::texture_id::HOTBAR_BUTTON_RB,
-		assets::texture_id::HOTBAR_BUTTON_LB,
-		
-		assets::texture_id::HOTBAR_BUTTON_L,
-		assets::texture_id::HOTBAR_BUTTON_T,
-		assets::texture_id::HOTBAR_BUTTON_R,
-		assets::texture_id::HOTBAR_BUTTON_B,
-	};
+	LB_COMPLEMENT,
+	COUNT
+};
 
-	if (flip) {
-		std::swap(textures[0], textures[1]);
-		std::swap(textures[2], textures[3]);
+struct button_corners_info {
+	assets::texture_id lt_texture = assets::texture_id::HOTBAR_BUTTON_LT;
+	bool flip_horizontally = true;
 
-		std::swap(textures[4], textures[6]);
-	}
+	assets::texture_id get_tex_for_type(button_corner_type) const;
 
-	for(size_t i = 0; i < textures.size(); ++i) {
-		const auto tex_id = textures[i];
-		const auto& tex = manager.find(tex_id)->tex;
-		const vec2 s = tex.get_size();
+	ltrb cornered_rc_to_internal_rc(ltrb) const;
+	ltrb internal_rc_to_cornered_rc(ltrb) const;
+	vec2i cornered_size_to_internal_size(vec2i) const;
+	vec2i internal_size_to_cornered_size(vec2i) const;
 
-		ltrb target_rect;
-		switch (i) {
-		case 0:
-			target_rect.set_size(s);
-			target_rect.set_position(rc.left_top() - s);
-			break;
-		case 1:
-			target_rect.set_size(s);
-			target_rect.set_position(rc.right_top() - vec2(0, s.y));
-			break;
-		case 2:
-			target_rect.set_size(s);
-			target_rect.set_position(rc.right_bottom());
-			break;
-		case 3:
-			target_rect.set_size(s);
-			target_rect.set_position(rc.left_bottom() - vec2(s.x, 0));
-			break;
+	template <class L>
+	void for_each_button_corner(const ltrb rc, L callback) const {
+		auto& manager = get_resource_manager();
 
-		case 4:
-			target_rect.set_size({ s.x, rc.h() });
-			target_rect.set_position(rc.left_top() - vec2(s.x, 0));
-			break;
-		case 5:
-			target_rect.set_size({ rc.w(), s.y });
-			target_rect.set_position(rc.left_top() - vec2(0, s.y));
-			break;
-		case 6:
-			target_rect.set_size({ s.x, rc.h() });
-			target_rect.set_position(rc.right_top());
-			break;
-		case 7:
-			target_rect.set_size({ rc.w(), s.y });
-			target_rect.set_position(rc.left_bottom());
-			break;
+		for (auto i = button_corner_type::LT; i < button_corner_type::LB_COMPLEMENT; i = button_corner_type(static_cast<int>(i) + 1)) {
+			const auto tex_id = get_tex_for_type(i);
+			const auto& tex = manager.find(tex_id)->tex;
+			const vec2 s = tex.get_size();
+
+			ltrb target_rect;
+			switch (i) {
+			case button_corner_type::LT:
+				target_rect.set_size(s);
+				target_rect.set_position(rc.left_top() - s);
+				break;
+			case button_corner_type::RT:
+				target_rect.set_size(s);
+				target_rect.set_position(rc.right_top() - vec2(0, s.y));
+				break;
+			case button_corner_type::RB:
+				target_rect.set_size(s);
+				target_rect.set_position(rc.right_bottom());
+				break;
+			case button_corner_type::LB:
+				target_rect.set_size(s);
+				target_rect.set_position(rc.left_bottom() - vec2(s.x, 0));
+				break;
+
+			case button_corner_type::L:
+				target_rect.set_size({ s.x, rc.h() });
+				target_rect.set_position(rc.left_top() - vec2(s.x, 0));
+				break;
+			case button_corner_type::T:
+				target_rect.set_size({ rc.w(), s.y });
+				target_rect.set_position(rc.left_top() - vec2(0, s.y));
+				break;
+			case button_corner_type::R:
+				target_rect.set_size({ s.x, rc.h() });
+				target_rect.set_position(rc.right_top());
+				break;
+			case button_corner_type::B:
+				target_rect.set_size({ rc.w(), s.y });
+				target_rect.set_position(rc.left_bottom());
+				break;
+
+			case button_corner_type::LB_COMPLEMENT:
+				target_rect.set_size(s);
+
+				if (flip_horizontally) {
+					target_rect.set_position(rc.right_bottom());
+				}
+				else {
+					target_rect.set_position(rc.left_bottom() - vec2(s.x, 0));
+				}
+
+				break;
+			}
+
+			callback(tex_id, target_rect);
 		}
-
-		callback(tex_id, target_rect);
 	}
-}
+};

@@ -15,6 +15,7 @@ public:
 	augs::gui::appearance_detector detector;
 	augs::gui::text::fstr caption;
 	appearing_text appearing_caption;
+	button_corners_info corners;
 
 	rgba colorize;
 	bool click_callback_required = false;
@@ -24,7 +25,7 @@ public:
 	typedef base::gui_entropy gui_entropy;
 
 	vec2i get_target_button_size() const {
-		return internal_size_to_cornered_button_size(get_text_bbox(appearing_caption.get_total_target_text(), 0)) - vec2i(0, 3);
+		return corners.internal_size_to_cornered_size(get_text_bbox(appearing_caption.get_total_target_text(), 0)); - vec2i(0, 3);
 	}
 
 	void set_appearing_caption(const augs::gui::text::fstr text) {
@@ -57,15 +58,15 @@ public:
 
 		const auto inside_mat = augs::gui::material(assets::texture_id::HOTBAR_BUTTON_INSIDE, this_id->colorize);
 
-		const auto internal_rc = cornered_button_size_to_internal_size(this_id->rc);
+		const auto internal_rc = this_id->corners.cornered_rc_to_internal_rc(this_id->rc);
 
 		augs::gui::draw_clipped_rectangle(inside_mat, internal_rc, {}, in.v);
 		
-		{
-			for_each_button_corner(internal_rc, [this_id, in](const assets::texture_id id, const ltrb drawn_rc) {
-				augs::gui::draw_clipped_rectangle(augs::gui::material(id, this_id->colorize), drawn_rc, {}, in.v, true);
-			}, true);
-		}
+		//{
+		//	this_id->corners.for_each_button_corner(internal_rc, [this_id, in](const assets::texture_id id, const ltrb drawn_rc) {
+		//		augs::gui::draw_clipped_rectangle(augs::gui::material(id, this_id->colorize), drawn_rc, {}, in.v, true);
+		//	});
+		//}
 
 		this_id->appearing_caption.target_pos = internal_rc.left_top();
 		this_id->appearing_caption.draw(in.v);

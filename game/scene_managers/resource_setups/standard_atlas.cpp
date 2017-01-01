@@ -166,6 +166,9 @@ namespace resource_setups {
 				augs::image hotbar_rb;
 				augs::image hotbar_lb;
 
+				augs::image hotbar_lb_complement;
+				augs::image hotbar_lb_complement_border;
+
 				hotbar_lt.create(lower_side, upper_side, 4);
 				hotbar_lt.fill(inside_color);
 				hotbar_lt.paint_line({ 0, 0 }, { 0, upper_side - 1 }, border_color);
@@ -202,10 +205,23 @@ namespace resource_setups {
 				hotbar_lb.paint_line({ 0, 0 }, { lower_side - 1, lower_side - 1 }, border_color);
 				hotbar_lb.paint_line({ inside_border_padding, 0 }, { lower_side - 1, lower_side - 1 - inside_border_padding }, border_color);
 
+				hotbar_lb_complement.create(lower_side, lower_side, 4);
+
+				for (int i = 1; i < lower_side; ++i) {
+					hotbar_lb_complement.paint_line({ 0, i }, { lower_side - 1 - i, lower_side - 1 }, inside_color);
+				}				
+				
+				hotbar_lb_complement_border.create(lower_side, lower_side, 4);
+				hotbar_lb_complement_border.paint_line({ 0, lower_side - 1 }, { lower_side - 1, lower_side - 1 }, border_color);
+				hotbar_lb_complement_border.paint_line({ 0, lower_side - 1 }, { 0, lower_side - 1 }, border_color);
+
 				get_resource_manager().create(assets::texture_id::HOTBAR_BUTTON_LT, hotbar_lt);
 				get_resource_manager().create(assets::texture_id::HOTBAR_BUTTON_RT, hotbar_rt);
 				get_resource_manager().create(assets::texture_id::HOTBAR_BUTTON_RB, hotbar_rb);
 				get_resource_manager().create(assets::texture_id::HOTBAR_BUTTON_LB, hotbar_lb);
+
+				get_resource_manager().create(assets::texture_id::HOTBAR_BUTTON_LB_COMPLEMENT, hotbar_lb_complement);
+				get_resource_manager().create(assets::texture_id::HOTBAR_BUTTON_LB_COMPLEMENT_BORDER, hotbar_lb_complement_border);
 			}
 
 			augs::image hotbar_inside;
