@@ -2,6 +2,32 @@
 
 using namespace assets;
 
+bool is_button_corner(const button_corner_type t) {
+	if (
+		t == button_corner_type::LT
+		|| t == button_corner_type::RT
+		|| t == button_corner_type::RB
+		|| t == button_corner_type::LB
+	) {
+		return true;
+	}
+
+	return false;
+}
+
+bool is_button_side(const button_corner_type t) {
+	if (
+		t == button_corner_type::L
+		|| t == button_corner_type::T
+		|| t == button_corner_type::R
+		|| t == button_corner_type::B
+		) {
+		return true;
+	}
+
+	return false;
+}
+
 texture_id button_corners_info::get_tex_for_type(button_corner_type t) const {
 	if (flip_horizontally) {
 		if (t == button_corner_type::LT) {

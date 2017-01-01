@@ -192,6 +192,7 @@ namespace resources {
 	}
 
 	texture_with_image& manager::create(const assets::texture_id id, const image img) {
+		ensure(textures.find(id) == textures.end());
 		texture_with_image& tex = textures[id];
 		tex.set_from_image(img);
 

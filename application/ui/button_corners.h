@@ -21,6 +21,9 @@ enum class button_corner_type {
 	COUNT
 };
 
+bool is_button_corner(const button_corner_type);
+bool is_button_side(const button_corner_type);
+
 struct button_corners_info {
 	assets::texture_id lt_texture = assets::texture_id::HOTBAR_BUTTON_LT;
 	bool flip_horizontally = true;
@@ -36,7 +39,7 @@ struct button_corners_info {
 	void for_each_button_corner(const ltrb rc, L callback) const {
 		auto& manager = get_resource_manager();
 
-		for (auto i = button_corner_type::LT; i < button_corner_type::LB_COMPLEMENT; i = button_corner_type(static_cast<int>(i) + 1)) {
+		for (auto i = button_corner_type::LT; i < button_corner_type::COUNT; i = button_corner_type(static_cast<int>(i) + 1)) {
 			const auto tex_id = get_tex_for_type(i);
 			const auto& tex = manager.find(tex_id)->tex;
 			const vec2 s = tex.get_size();
@@ -90,7 +93,7 @@ struct button_corners_info {
 				break;
 			}
 
-			callback(tex_id, target_rect);
+			callback(i, tex_id, target_rect);
 		}
 	}
 };

@@ -322,6 +322,7 @@
     <ClCompile Include="application\setups\menu_setup.cpp" />
     <ClCompile Include="application\ui\app_ui_root.cpp" />
     <ClCompile Include="application\ui\button_corners.cpp" />
+    <ClCompile Include="application\ui\dx_button.cpp" />
     <ClCompile Include="augs\al_log.cpp" />
     <ClCompile Include="augs\audio\audio_manager.cpp" />
     <ClCompile Include="augs\audio\sound_buffer.cpp" />

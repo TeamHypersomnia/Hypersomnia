@@ -171,6 +171,11 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 	hypersomnia_description.target_pos = title_rect.right_top() + vec2(20, 20);
 	title_texts.push_back(&hypersomnia_description);
 
+	for (auto& m : menu_ui_root.menu_buttons) {
+		m.hover_highlight_maximum_distance = 10.f;
+		m.hover_highlight_duration_ms = 300.f;
+	}
+
 	menu_ui_root.menu_buttons[(int)menu_button_type::CONNECT_TO_OFFICIAL_UNIVERSE].set_appearing_caption(format(L"Login to\nofficial universe", textes_style));
 	menu_ui_root.menu_buttons[(int)menu_button_type::BROWSE_UNOFFICIAL_UNIVERSES].set_appearing_caption(format(L"Browse\nunofficial universes", textes_style));
 	menu_ui_root.menu_buttons[(int)menu_button_type::HOST_UNIVERSE].set_appearing_caption(format(L"Host\nuniverse", textes_style));
@@ -211,7 +216,7 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 		intro_actions.push_non_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 20, 500.f)));
 		
 		intro_actions.push_non_blocking(act(new augs::set_value_action<bool>(roll_news, true)));
-		intro_actions.push_non_blocking(act(new augs::set_value_action<vec2i>(menu_ui_rect_world.last_state.mouse.pos, vec2i(0, 0))));
+		intro_actions.push_non_blocking(act(new augs::set_value_action<vec2i>(menu_ui_rect_world.last_state.mouse.pos, screen_size/2)));
 		intro_actions.push_non_blocking(act(new augs::set_value_action<bool>(draw_cursor, true)));
 		
 		for (auto& t : title_texts) {
