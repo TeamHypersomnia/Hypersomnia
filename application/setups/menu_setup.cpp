@@ -255,6 +255,17 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 
 	const auto initial_step_number = intro_scene.get_total_steps_passed();
 
+	auto menu_callback = [&](const menu_button_type t){
+		switch (t) {
+
+		case menu_button_type::QUIT:
+			should_quit = true;
+			break;
+
+		default: break;
+		}
+	};
+
 	while (!should_quit) {
 		augs::machine_entropy new_entropy;
 
@@ -342,6 +353,13 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 			menu_ui_rect_world.rebuild_layouts(menu_ui_context, menu_ui_root_id);
 
 			menu_ui_rect_world.draw(renderer.get_triangle_buffer(), menu_ui_context, menu_ui_root_id);
+
+			for (size_t i = 0; i < menu_ui_root.menu_buttons.size(); ++i) {
+				if (menu_ui_root.menu_buttons[i].click_callback_required) {
+					menu_callback(static_cast<menu_button_type>(i));
+					menu_ui_root.menu_buttons[i].click_callback_required = false;
+				}
+			}
 
 			if (draw_cursor) {
 				const auto mouse_pos = menu_ui_rect_world.last_state.mouse.pos;
