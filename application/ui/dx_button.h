@@ -62,8 +62,8 @@ public:
 
 		const auto& detector = this_id->detector;
 
-		rgba inside_col = this_id->colorize;
-		rgba border_col = this_id->colorize;
+		rgba inside_col = white;
+		rgba border_col = white;
 
 		inside_col.a = 20;
 		border_col.a = 190;
@@ -81,6 +81,9 @@ public:
 
 			this_id->elapsed_hover_time_ms = this_id->hover_highlight_duration_ms;
 		}
+
+		inside_col *= this_id->colorize;
+		border_col *= this_id->colorize;
 
 		const auto inside_mat = augs::gui::material(assets::texture_id::HOTBAR_BUTTON_INSIDE, inside_col);
 

@@ -122,7 +122,6 @@ void menu_setup::process(game_window& window) {
 	rgba fade_overlay_color = { 0, 2, 2, 255 };
 	rgba title_text_color = { 255, 255, 255, 0 };
 
-
 	std::vector<appearing_text*> intro_texts;
 	std::vector<appearing_text*> title_texts;
 
