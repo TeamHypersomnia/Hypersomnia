@@ -22,6 +22,6 @@ namespace augs {
 	}
 
 	bool list_action::is_complete() const {
-		return list.actions.empty();
+		return list.is_complete();
 	}
 };

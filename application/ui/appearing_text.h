@@ -32,6 +32,16 @@ struct appearing_text {
 
 	vec2 target_pos;
 
+	void push_disappearance(augs::action_list& into, const bool blocking = true) {
+		auto push = [&](act a) {
+			blocking ? into.push_blocking(std::move(a)) : into.push_non_blocking(std::move(a));
+		};
+
+		push(act(new augs::delay_action(1000.f)));
+		push(act(new augs::tween_value_action<rgba_channel>(alpha, 0, 2000.f)));
+		push(act(new augs::delay_action(500.f)));
+	}
+
 	void push_actions(augs::action_list& into, size_t& rng) {
 		auto push = [&](act a) {
 			into.push_blocking(std::move(a));
@@ -52,9 +62,7 @@ struct appearing_text {
 		push(act(new augs::set_value_action<bool>(caret_active, false)));
 
 		if (should_disappear) {
-			push(act(new augs::delay_action(1000.f)));
-			push(act(new augs::tween_value_action<rgba_channel>(alpha, 0, 2000.f)));
-			push(act(new augs::delay_action(500.f)));
+			push_disappearance(into);
 		}
 	}
 

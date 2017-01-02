@@ -38,4 +38,8 @@ namespace augs {
 		act->is_blocking = false;
 		actions.emplace_back(std::move(act));
 	}
+
+	bool action_list::is_complete() const {
+		return actions.empty();
+	}
 }

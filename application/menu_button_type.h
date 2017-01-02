@@ -7,8 +7,17 @@ enum class menu_button_type {
 	CONNECT_TO_UNIVERSE,
 	LOCAL_UNIVERSE,
 	SETTINGS,
-	CREDITS,
+	CREATORS,
 	QUIT,
+
+	COUNT
+};
+
+enum class local_submenu_button_type {
+	SINGLEPLAYER,
+	SCENE_DIRECTOR,
+	DETERMINISM_TEST,
+	BACK,
 
 	COUNT
 };

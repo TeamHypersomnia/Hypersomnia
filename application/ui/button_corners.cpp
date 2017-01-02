@@ -80,6 +80,8 @@ texture_id button_corners_info::get_tex_for_type(button_corner_type t) const {
 	case button_corner_type::LB_COMPLEMENT:
 		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 8);
 		break;
+
+	default: ensure(false); return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 0); break;
 	}
 }
 

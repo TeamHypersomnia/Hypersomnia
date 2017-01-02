@@ -181,7 +181,7 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 	menu_ui_root.menu_buttons[(int)menu_button_type::CONNECT_TO_UNIVERSE].set_appearing_caption(format(L"Connect to\nuniverse", textes_style));
 	menu_ui_root.menu_buttons[(int)menu_button_type::LOCAL_UNIVERSE].set_appearing_caption(format(L"Local\nuniverse", textes_style));
 	menu_ui_root.menu_buttons[(int)menu_button_type::SETTINGS].set_appearing_caption(format(L"Settings", textes_style));
-	menu_ui_root.menu_buttons[(int)menu_button_type::CREDITS].set_appearing_caption(format(L"Credits", textes_style));
+	menu_ui_root.menu_buttons[(int)menu_button_type::CREATORS].set_appearing_caption(format(L"Creators", textes_style));
 	menu_ui_root.menu_buttons[(int)menu_button_type::QUIT].set_appearing_caption(format(L"Quit", textes_style));
 
 	menu_ui_root.set_menu_buttons_positions(screen_size);
@@ -189,7 +189,193 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 	vec2i tweened_menu_button_size;
 	vec2i target_tweened_menu_button_size = menu_ui_root.get_max_menu_button_size();
 
+	struct creators {
+		struct entry {
+			appearing_text task;
+			std::vector<appearing_text> personae;
+
+			void set_task(const fstr f) {
+				task.target_text[0] = f;
+				task.population_interval = 100.f;
+				task.should_disappear = false;
+			}
+
+			void add_person(const fstr f) {
+				appearing_text p;
+
+				p.target_text[0] = f;
+				p.population_interval = 100.f;
+				p.should_disappear = false;
+
+				personae.push_back(p);
+			}
+
+			vec2i get_personae_bbox() const {
+				vec2i result;
+
+				for (const auto& p : personae) {
+					const auto p_bbox = get_text_bbox(p.get_total_target_text(), 0u);
+
+					result.x = std::max(p_bbox.x, result.x);
+					result.y += get_text_bbox(format(L"\n.", p.get_total_target_text()[0]), p_bbox.y).y;
+				}
+
+				return result;
+			}
+		};
+
+		int personae_width = 0;
+		int tasks_width = 0;
+		int column_height = 0;
+
+		std::vector<entry> entries;
+		appearing_text afterword;
+
+		void add_entry(entry e) {
+			e.task.target_pos.set(0.f, column_height);
+
+			const auto t_bbox = get_text_bbox(e.task.get_total_target_text(), 0u);
+
+			tasks_width = std::max(t_bbox.x, tasks_width);
+
+			for (auto& p : e.personae) {
+				p.target_pos.set(0.f, column_height);
+
+				const auto p_bbox = get_text_bbox(p.get_total_target_text(), 0u);
+
+				personae_width = std::max(p_bbox.x, personae_width);
+				column_height += get_text_bbox(format(L"\n.", p.get_total_target_text()[0]), p_bbox.y).y/2;
+			}
+
+			column_height += 20;
+
+			entries.push_back(e);
+		}
+
+		void center_all(const vec2i screen_size) {
+			for (auto& e : entries) {
+				e.task.target_pos.y += screen_size.y / 2 - column_height / 2;
+				e.task.target_pos.x = screen_size.x / 2 - tasks_width - 60;
+
+				for (auto& p : e.personae) {
+					p.target_pos.y += screen_size.y/2 - column_height / 2;
+					p.target_pos.x = screen_size.x / 2 + 60;
+				}
+			}
+		}
+
+		void setup(const style s, const style task_st, const vec2i screen_size) {
+			{
+				entry c;
+
+				c.set_task(format(L"Founder & Lead Programmer", task_st));
+				c.add_person(format(L"Patryk B. Czachurski", s));
+
+				add_entry(c);
+			}
+
+			{
+				entry c;
+
+				c.set_task(format(L"Linux port", task_st));
+				c.add_person(format(L"Adam Piekarczyk", s));
+
+				add_entry(c);
+			}
+
+			{
+				entry c;
+
+				c.set_task(format(L"Pixel art", task_st));
+				c.add_person(format(L"Michal Kawczynski", s));
+				c.add_person(format(L"Patryk B. Czachurski", s));
+
+				add_entry(c);
+			}
+
+			center_all(screen_size);
+
+			afterword.target_text[0] = format(L"\
+What stands before your eyes is an outcome of a man's burning passion,\n\
+a digital inamorata, chef d'oeuvre of a single coder, masterful musicians and a champion at pixel art.\n", s);
+
+			afterword.target_text[1] = format(L"\n\
+Its history of making recounts profound hopes and disillusions,\n\
+it is a tale of crises and divine moments of joy.\n\
+Do not falter, you who are in the process.\n\
+There exist great causes for your commitment to have ever escalated, let alone if it lasts.\n\
+All lives are experimental by nature.\n\
+Conduct thine vision, for in the end you must either conquer that which you've dreamt of,\n\
+or tell a beautiful story of a man devastated by struggle.\n", s)
++ format(L"    ~Founder of the Hypersomnia Universe", task_st);
+
+			afterword.target_pos.set(screen_size.x/2 - get_text_bbox(afterword.get_total_target_text(), 0u).x / 2, screen_size.y / 2 + column_height + 50);
+
+			afterword.should_disappear = false;
+			afterword.population_interval = 50.f;
+			afterword.population_variation = 0.6f;
+		}
+
+		void push_into(augs::action_list& into) {
+			size_t rng = 0;
+
+			for (auto& e : entries) {
+				augs::action_list entry_acts;
+				
+				augs::action_list task_acts;
+				augs::action_list personae_acts;
+
+				e.task.push_actions(task_acts, rng);
+
+				for (auto& p : e.personae) {
+					augs::action_list person_acts;
+
+					p.push_actions(person_acts, rng);
+					
+					personae_acts.push_non_blocking(act(new augs::list_action(std::move(person_acts))));
+				}
+
+				entry_acts.push_non_blocking(act(new augs::list_action(std::move(task_acts))));
+				entry_acts.push_non_blocking(act(new augs::list_action(std::move(personae_acts))));
+
+				into.push_blocking(act(new augs::list_action(std::move(entry_acts))));
+			}
+
+			afterword.push_actions(into, rng);
+
+			augs::action_list disappearance_acts;
+
+			for (auto& e : entries) {
+				e.task.push_disappearance(disappearance_acts, false);
+
+				for (auto& p : e.personae) {
+					p.push_disappearance(disappearance_acts, false);
+				}
+			}
+
+			into.push_blocking(act(new augs::list_action(std::move(disappearance_acts))));
+
+			afterword.push_disappearance(into);
+		}
+
+		void draw(augs::renderer& renderer) {
+			for (auto& e : entries) {
+				e.task.draw(renderer.get_triangle_buffer());
+
+				for (auto& p : e.personae) {
+					p.draw(renderer.get_triangle_buffer());
+				}
+			}
+
+			afterword.draw(renderer.get_triangle_buffer());
+		}
+	};
+
+	creators creators_screen;
+	creators_screen.setup(textes_style, style(assets::font_id::GUI_FONT, { 0, 180, 255, 255 }), screen_size);
+
 	augs::action_list intro_actions;
+	augs::action_list credits_actions;
 
 	{
 		size_t rng = 0;
@@ -261,6 +447,12 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 			should_quit = true;
 			break;
 
+		case menu_button_type::CREATORS:
+			if (credits_actions.is_complete()) {
+				creators_screen.push_into(credits_actions);
+			}
+			break;
+
 		default: break;
 		}
 	};
@@ -315,6 +507,8 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 		for (auto& t : title_texts) {
 			t->draw(renderer.get_triangle_buffer());
 		}
+
+		creators_screen.draw(renderer);
 
 		if (roll_news) {
 			news_pos.x -= vdt.in_seconds() * 100.f;
@@ -385,6 +579,7 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 		}
 
 		intro_actions.update(vdt);
+		credits_actions.update(vdt);
 
 		menu_title.get<components::sprite>().color = title_text_color;
 
