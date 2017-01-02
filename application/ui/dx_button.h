@@ -10,10 +10,16 @@
 #include "application/ui/button_corners.h"
 #include "application/ui/appearing_text.h"
 
+#include "augs/audio/sound_source.h"
+
 class dx_button : public app_ui_rect_node {
 public:
 	augs::gui::appearance_detector detector;
 	augs::gui::text::fstr caption;
+
+	augs::sound_source hover_sound;
+	augs::sound_source click_sound;
+
 	appearing_text appearing_caption;
 	button_corners_info corners;
 	button_corners_info border_corners;
@@ -38,11 +44,17 @@ public:
 		for (const auto& info : entropies.get_events_for(this_id)) {
 			this_id->detector.update_appearance(info);
 
-			if (info.msg == gui_event::lclick) {
+			if (info.is_ldown_or_double_or_triple()) {
 				this_id->click_callback_required = true;
+				this_id->click_sound.stop();
+				this_id->click_sound.set_direct_channels(true);
+				this_id->click_sound.play();
 			}
 			if (info.msg == gui_event::hover) {
 				this_id->elapsed_hover_time_ms = 0.f;
+				this_id->hover_sound.stop();
+				this_id->hover_sound.set_direct_channels(true);
+				this_id->hover_sound.play();
 			}
 		}
 

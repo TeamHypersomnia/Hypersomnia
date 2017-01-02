@@ -75,7 +75,7 @@ namespace scene_managers {
 
 		const auto motorcycle = prefabs::create_motorcycle(world, components::transform(0, 400, -90));
 		//prefabs::create_motorcycle(world, components::transform(100, -600, -90));
-		const auto main_character_motorcycle = prefabs::create_motorcycle(world, components::transform(900, 35200, -90));
+		const auto main_character_motorcycle = prefabs::create_motorcycle(world, components::transform(900, 2200, -90));
 		
 		const auto riding_car = prefabs::create_car(world, components::transform(850, 31200, -90));
 

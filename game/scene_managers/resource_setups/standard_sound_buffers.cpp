@@ -58,6 +58,16 @@ namespace resource_setups {
 		}
 
 		{
+			auto& buf = get_resource_manager().create(assets::sound_buffer_id::BUTTON_HOVER);
+			buf.from_file("hypersomnia/sfx/button_hover.wav");
+		}
+
+		{
+			auto& buf = get_resource_manager().create(assets::sound_buffer_id::BUTTON_CLICK);
+			buf.from_file("hypersomnia/sfx/button_click.wav");
+		}
+
+		{
 			auto& res = get_resource_manager().create(assets::sound_response_id::BILMER2000_RESPONSE);
 			augs::sound_effect_modifier mod;
 			mod.max_distance = 1920.f * 3.f;

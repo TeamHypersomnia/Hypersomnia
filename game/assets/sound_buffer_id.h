@@ -23,6 +23,9 @@ namespace assets {
 		WIND,
 		ENGINE,
 
+		BUTTON_HOVER,
+		BUTTON_CLICK,
+
 		COUNT
 	};
 }

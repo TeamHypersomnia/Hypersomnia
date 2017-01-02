@@ -1,8 +1,14 @@
 #include "dx_button.h"
+#include "game/resources/manager.h"
 
 dx_button::dx_button() {
 	corners.lt_texture = assets::texture_id::HOTBAR_BUTTON_LT;
 	border_corners.lt_texture = assets::texture_id::HOTBAR_BUTTON_LT_BORDER;
+
+	auto& manager = get_resource_manager();
+
+	click_sound.bind_buffer(manager.find(assets::sound_buffer_id::BUTTON_CLICK)->get_variation(0).request_original());
+	hover_sound.bind_buffer(manager.find(assets::sound_buffer_id::BUTTON_HOVER)->get_variation(0).request_original());
 }
 
 vec2i dx_button::get_target_button_size() const {

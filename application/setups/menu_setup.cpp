@@ -173,6 +173,9 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 	for (auto& m : menu_ui_root.menu_buttons) {
 		m.hover_highlight_maximum_distance = 10.f;
 		m.hover_highlight_duration_ms = 300.f;
+
+		m.hover_sound.set_gain(cfg.sound_effects_volume);
+		m.click_sound.set_gain(cfg.sound_effects_volume);
 	}
 
 	menu_ui_root.menu_buttons[(int)menu_button_type::CONNECT_TO_OFFICIAL_UNIVERSE].set_appearing_caption(format(L"Login to\nofficial universe", textes_style));
@@ -305,7 +308,7 @@ it is a tale of crises and divine moments of joy.\n\
 Do not falter, you who are in the process.\n\
 There exist great causes for your commitment to have ever escalated, let alone if it lasts.\n\
 All lives are experimental by nature.\n\
-Conduct thine vision, for in the end you must either conquer that which you've dreamt of,\n\
+Conduct thine vision, for in the end you must either conquer that which you have dreamt of,\n\
 or tell a beautiful story of a man devastated by struggle.\n", s)
 + format(L"    ~Founder of the Hypersomnia Universe", task_st);
 
