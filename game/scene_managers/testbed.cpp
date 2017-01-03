@@ -72,7 +72,7 @@ namespace scene_managers {
 		const auto car2 = prefabs::create_car(world, components::transform(1490, 340 + 400, -180));
 		const auto car3 = prefabs::create_car(world, components::transform(1490, 340 + 800, -180));
 
-		const auto motorcycle = prefabs::create_motorcycle(world, components::transform(0, 400, -90));
+		const auto motorcycle = prefabs::create_motorcycle(world, components::transform(0, 300, -90 + 180));
 		//prefabs::create_motorcycle(world, components::transform(100, -600, -90));
 		const auto main_character_motorcycle = prefabs::create_motorcycle(world, components::transform(900, 48200, -90));
 		
@@ -120,7 +120,7 @@ namespace scene_managers {
 				torso_set = assets::animation_response_id::BLUE_TORSO_SET;
 			}
 			else if (i == 5) {
-				transform = { -200, 20000, 0 };
+				transform = { 1200, 15000, 0 };
 
 				torso_set = assets::animation_response_id::BLUE_TORSO_SET;
 			}

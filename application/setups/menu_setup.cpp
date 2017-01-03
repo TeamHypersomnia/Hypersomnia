@@ -107,6 +107,7 @@ void menu_setup::process(game_window& window) {
 	});
 
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
+	timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
 
 	scene_managers::testbed testbed;
 	testbed.debug_var = window.config.debug_var;
@@ -485,7 +486,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 		while (steps--) {
 			renderer::get_current().clear_logic_lines();
 
-			const auto entropy = cosmic_entropy(director.get_entropy_for_step(intro_scene.get_total_steps_passed() + initial_step_number), intro_scene);
+			const auto entropy = cosmic_entropy(director.get_entropy_for_step(intro_scene.get_total_steps_passed() - initial_step_number), intro_scene);
 
 			intro_scene.advance_deterministic_schemata(entropy, [](auto){},
 				[this, &session](const const_logic_step& step){
