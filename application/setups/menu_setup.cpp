@@ -529,6 +529,13 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 		session.view(renderer, intro_scene, testbed.get_selected_character(), vdt, augs::gui::text::fstr(), settings);
 		session.draw_color_overlay(renderer, fade_overlay_color);
 
+		if (tweened_welcome_message_bg_size.non_zero()) {
+			augs::draw_rect_with_border(renderer.get_triangle_buffer(),
+				ltrb(developer_welcome.target_pos, tweened_welcome_message_bg_size).expand_from_center(vec2(6, 6)),
+				{ 0, 0, 0, 180 },
+				slightly_visible_white);
+		}
+
 		for (auto& t : intro_texts) {
 			t->draw(renderer.get_triangle_buffer());
 		}
