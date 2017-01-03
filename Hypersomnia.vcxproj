@@ -328,6 +328,7 @@
     <ClCompile Include="augs\audio\sound_buffer.cpp" />
     <ClCompile Include="augs\audio\sound_source.cpp" />
     <ClCompile Include="augs\ensure.cpp" />
+    <ClCompile Include="augs\graphics\drawers.cpp" />
     <ClCompile Include="augs\gui\clipboard.cpp" />
     <ClCompile Include="augs\gui\gui_traversal_structs.cpp" />
     <ClCompile Include="augs\gui\formatted_text.cpp" />
@@ -1027,6 +1028,7 @@
     <ClInclude Include="augs\entity_system\storage_for_message_queues.h" />
     <ClInclude Include="augs\entity_system\storage_for_systems.h" />
     <ClInclude Include="augs\filesystem\directory.h" />
+    <ClInclude Include="augs\graphics\drawers.h" />
     <ClInclude Include="augs\gui\appearance_detector.h" />
     <ClInclude Include="augs\gui\clipboard.h" />
     <ClInclude Include="augs\gui\dereferenced_location.h" />

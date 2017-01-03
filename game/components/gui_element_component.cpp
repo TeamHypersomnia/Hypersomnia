@@ -21,13 +21,13 @@
 #include "augs/graphics/renderer.h"
 #include "game/enums/filters.h"
 
-#include "augs/gui/stroke.h"
-
 #include "game/detail/entity_description.h"
 
 #include "augs/templates/string_templates.h"
 
 #include "game/transcendental/viewing_session.h"
+
+#include "augs/graphics/drawers.h"
 
 using namespace augs;
 using namespace augs::gui;
@@ -102,9 +102,6 @@ namespace components {
 		auto& step = context.get_step();
 		const auto& cosmos = step.get_cosmos();
 
-		components::sprite::drawing_input state(output_buffer);
-		state.positioning = components::sprite::drawing_input::positioning_type::LEFT_TOP_CORNER;
-
 		gui::draw_info in(output_buffer);
 
 		const auto& dragged_item = drag_result.dragged_item;
@@ -116,10 +113,6 @@ namespace components {
 				drag_result.dragged_item->draw_grid_border_ghost(context, dragged_item, in);
 			}
 		}
-
-		components::sprite bg_sprite;
-		bg_sprite.set(assets::texture_id::BLANK, black);
-		bg_sprite.color.a = 120;
 
 		auto gui_cursor = assets::texture_id::GUI_CURSOR;
 		
@@ -144,29 +137,26 @@ namespace components {
 			}
 		}
 
-		components::sprite cursor_sprite;
-		cursor_sprite.set(gui_cursor, gui_cursor_color);
+		const auto gui_cursor_size = (*gui_cursor).get_size();
+
 		const vec2i left_top_corner = get_gui_crosshair_position();
-		const vec2i bottom_right_corner = get_gui_crosshair_position() + cursor_sprite.size;
+		const vec2i bottom_right_corner = get_gui_crosshair_position() + gui_cursor_size;
 
 		const bool draw_tooltip = drag_result.possible_target_hovered;
 		
+		vec2 bg_sprite_size;
+
 		if (draw_tooltip) {
 			augs::gui::text_drawer tooltip_drawer;
 
 			tooltip_drawer.set_text(gui::text::format(drag_result.tooltip_text, gui::text::style()));
-			tooltip_drawer.pos = vec2i(get_gui_crosshair_position()) + vec2i(static_cast<int>(cursor_sprite.size.x) + 2, 0);
+			tooltip_drawer.pos = vec2i(get_gui_crosshair_position()) + vec2i(static_cast<int>(gui_cursor_size.x) + 2, 0);
 
-			state.renderable_transform.pos = left_top_corner;
-			bg_sprite.size.set(tooltip_drawer.get_bbox());
-			bg_sprite.size.y = static_cast<float>(std::max(static_cast<int>(cursor_sprite.size.y), tooltip_drawer.get_bbox().y));
-			bg_sprite.size.x += cursor_sprite.size.x;
-			bg_sprite.draw(state);
+			bg_sprite_size.set(tooltip_drawer.get_bbox());
+			bg_sprite_size.y = static_cast<float>(std::max(static_cast<int>(gui_cursor_size.y), tooltip_drawer.get_bbox().y));
+			bg_sprite_size.x += gui_cursor_size.x;
 
-			gui::solid_stroke stroke;
-			stroke.set_material(gui::material(assets::texture_id::BLANK, slightly_visible_white));
-
-			stroke.draw(output_buffer, rects::ltrb<float>(get_gui_crosshair_position(), bg_sprite.size));
+			augs::draw_rect_with_border(output_buffer, ltrb(get_gui_crosshair_position(), bg_sprite_size), { 0, 0, 0, 120 }, slightly_visible_white);
 
 			tooltip_drawer.draw_stroke(output_buffer, black);
 			tooltip_drawer.draw(output_buffer);
@@ -181,15 +171,14 @@ namespace components {
 				augs::gui::text_drawer dragged_charges_drawer;
 
 				dragged_charges_drawer.set_text(augs::gui::text::format(charges_text, text::style()));
-				dragged_charges_drawer.pos = get_gui_crosshair_position() + vec2i(0, int(cursor_sprite.size.y));
+				dragged_charges_drawer.pos = get_gui_crosshair_position() + vec2i(0, int(gui_cursor_size.y));
 
 				dragged_charges_drawer.draw_stroke(output_buffer, black);
 				dragged_charges_drawer.draw(output_buffer);
 			}
 		}
 
-		state.renderable_transform.pos = get_gui_crosshair_position();
-		cursor_sprite.draw(state);
+		augs::draw_rect(output_buffer, get_gui_crosshair_position(), gui_cursor, gui_cursor_color);
 
 		const auto maybe_hovered_item = context._dynamic_cast<item_button_in_item>(rect_world.rect_hovered);
 		const auto maybe_hovered_slot = context._dynamic_cast<slot_button_in_container>(rect_world.rect_hovered);
@@ -221,10 +210,8 @@ namespace components {
 				description_drawer.set_text(tooltip_text);
 				description_drawer.pos = bottom_right_corner;
 
-				state.renderable_transform.pos = bottom_right_corner;
-				bg_sprite.size.set(description_drawer.get_bbox());
+				augs::draw_rect_with_border(output_buffer, ltrb(bottom_right_corner, description_drawer.get_bbox()), { 0, 0, 0, 120 }, slightly_visible_white);
 
-				bg_sprite.draw(state);
 				description_drawer.draw(output_buffer);
 			}
 		}

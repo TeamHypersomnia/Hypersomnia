@@ -2,6 +2,7 @@
 #include "ui.h"
 #include "drafter.h"
 #include "printer.h"
+#include "augs/graphics/drawers.h"
 
 /* printer's draw needs revising in terms of scrolling */
 
@@ -150,9 +151,8 @@ namespace augs {
 									charcolor = selected_text_color;
 
 								/* add the resulting character taking bearings into account */
-								gui::draw_clipped_rect(g.sprite.tex, charcolor,
-									rects::xywh<float>(sectors[i] + g.bear_x, lines[l].top + lines[l].asc - g.bear_y, g.size.x, g.size.y) + pos, clipper,
-									v);
+								augs::draw_clipped_rect(v, xywh(sectors[i] + g.bear_x, lines[l].top + lines[l].asc - g.bear_y, g.size.x, g.size.y) + pos, 
+									g.sprite.tex, charcolor, clipper);
 							}
 						}
 					}
