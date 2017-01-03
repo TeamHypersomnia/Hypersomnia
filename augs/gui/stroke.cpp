@@ -43,10 +43,10 @@ namespace augs {
 				lines[2].b -= top.width;
 			}
 
-			draw_clipped_rectangle(left.mat, lines[0], clipper, out);
-			draw_clipped_rectangle(top.mat, lines[1], clipper, out);
-			draw_clipped_rectangle(right.mat, lines[2], clipper, out);
-			draw_clipped_rectangle(bottom.mat, lines[3], clipper, out);
+			draw_clipped_rect(left.mat, lines[0], clipper, out);
+			draw_clipped_rect(top.mat, lines[1], clipper, out);
+			draw_clipped_rect(right.mat, lines[2], clipper, out);
+			draw_clipped_rect(bottom.mat, lines[3], clipper, out);
 		}
 	}
 }

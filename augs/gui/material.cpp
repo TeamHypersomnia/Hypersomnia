@@ -8,11 +8,11 @@ namespace augs {
 
 		material::material(const rgba& color) : tex(assets::texture_id::BLANK), color(color) {}
 
-		rects::ltrb<float> draw_clipped_rectangle(const material& mat, const ltrb origin, ltrb clipper, vertex_triangle_buffer& v, const bool flip) {
-			return draw_clipped_rectangle(*mat.tex, mat.color, origin, clipper, v, flip);
+		rects::ltrb<float> draw_clipped_rect(const material& mat, const ltrb origin, ltrb clipper, vertex_triangle_buffer& v, const bool flip) {
+			return draw_clipped_rect(*mat.tex, mat.color, origin, clipper, v, flip);
 		}
 
-		rects::ltrb<float> draw_clipped_rectangle(const augs::texture& tex, const rgba color, const ltrb origin, const ltrb parent, vertex_triangle_buffer& v, const bool flip) {
+		rects::ltrb<float> draw_clipped_rect(const augs::texture& tex, const rgba color, const ltrb origin, const ltrb parent, vertex_triangle_buffer& v, const bool flip) {
 			rects::ltrb<float> rc = origin;
 			
 			if (!rc.good()) {

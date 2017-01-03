@@ -101,18 +101,18 @@ public:
 
 		const auto internal_rc = this_id->corners.cornered_rc_to_internal_rc(this_id->rc);
 
-		augs::gui::draw_clipped_rectangle(inside_mat, internal_rc, {}, in.v);
+		augs::gui::draw_clipped_rect(inside_mat, internal_rc, {}, in.v);
 		
 		{
 			this_id->corners.for_each_button_corner(internal_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
 				if (type != button_corner_type::LB_COMPLEMENT) {
-					augs::gui::draw_clipped_rectangle(augs::gui::material(id, inside_col), drawn_rc, {}, in.v, true);
+					augs::gui::draw_clipped_rect(augs::gui::material(id, inside_col), drawn_rc, {}, in.v, true);
 				}
 			});
 
 			this_id->border_corners.for_each_button_corner(internal_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
 				if (type != button_corner_type::LB_COMPLEMENT) {
-					augs::gui::draw_clipped_rectangle(augs::gui::material(id, border_col), drawn_rc, {}, in.v, true);
+					augs::gui::draw_clipped_rect(augs::gui::material(id, border_col), drawn_rc, {}, in.v, true);
 				}
 			});
 
@@ -125,7 +125,7 @@ public:
 
 					this_id->border_corners.for_each_button_corner(hover_effect_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
 						if (type != button_corner_type::LB_COMPLEMENT) {
-							augs::gui::draw_clipped_rectangle(augs::gui::material(id, this_id->colorize), drawn_rc, {}, in.v, true);
+							augs::gui::draw_clipped_rect(augs::gui::material(id, this_id->colorize), drawn_rc, {}, in.v, true);
 						}
 					});
 				}
@@ -138,7 +138,7 @@ public:
 
 					this_id->border_corners.for_each_button_corner(hover_effect_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
 						if (type != button_corner_type::LB_COMPLEMENT && is_button_corner(type)) {
-							augs::gui::draw_clipped_rectangle(augs::gui::material(id, this_id->colorize), drawn_rc, {}, in.v, true);
+							augs::gui::draw_clipped_rect(augs::gui::material(id, this_id->colorize), drawn_rc, {}, in.v, true);
 						}
 					});
 				}

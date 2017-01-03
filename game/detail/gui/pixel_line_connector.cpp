@@ -158,6 +158,6 @@ void draw_pixel_line_connector(
 			}
 		}
 
-		augs::gui::draw_clipped_rectangle(line_mat, line, rects::ltrb<float>(), in.v);
+		augs::gui::draw_clipped_rect(line_mat, line, rects::ltrb<float>(), in.v);
 	}
 }

@@ -41,7 +41,7 @@ namespace augs {
 				if (context.alive(subject)) {
 					rects::ltrb<float> scroller = rects::wh<float>(size);
 					scroller.center(middlescroll_icon_position);
-					draw_clipped_rectangle(mat, scroller, context, subject, in.v);
+					draw_clipped_rect(mat, scroller, context, subject, in.v);
 				}
 			}
 		};

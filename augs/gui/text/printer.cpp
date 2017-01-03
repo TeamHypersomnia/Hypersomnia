@@ -68,7 +68,7 @@ namespace augs {
 				/* here we highlight the line caret is currently on */
 				if (caret && active && highlight_current_line) {
 					drafter::line highlighted = lines.size() ? lines[d.get_line(caret->pos)] : drafter::line();
-					gui::draw_clipped_rectangle(highlight_mat, rects::xywh<float>(0, highlighted.top, clip ? d.get_bbox().w + clipper.w() : d.get_bbox().w,
+					gui::draw_clipped_rect(highlight_mat, rects::xywh<float>(0, highlighted.top, clip ? d.get_bbox().w + clipper.w() : d.get_bbox().w,
 
 						/* snap to default style's height */
 						highlighted.empty() ? (*(caret->default_style.f)).get_height()
@@ -127,7 +127,7 @@ namespace augs {
 								if (i == last_visible_selection && select_right_line <= last_visible_selection)
 									sel_rect.r = d.sectors[select_right];
 
-								gui::draw_clipped_rectangle(active ? selection_bg_mat : selection_inactive_bg_mat, sel_rect + pos, clipper, v);
+								gui::draw_clipped_rect(active ? selection_bg_mat : selection_inactive_bg_mat, sel_rect + pos, clipper, v);
 							}
 						}
 					}
@@ -150,7 +150,7 @@ namespace augs {
 									charcolor = selected_text_color;
 
 								/* add the resulting character taking bearings into account */
-								gui::draw_clipped_rectangle(g.sprite.tex, charcolor,
+								gui::draw_clipped_rect(g.sprite.tex, charcolor,
 									rects::xywh<float>(sectors[i] + g.bear_x, lines[l].top + lines[l].asc - g.bear_y, g.size.x, g.size.y) + pos, clipper,
 									v);
 							}
@@ -180,7 +180,7 @@ namespace augs {
 					caret_rect = rects::xywh<float>(0, 0, caret_width, (*caret->default_style.f).get_height());
 
 				//					this->quad_indices.caret = v.size();
-				if (blink.caret_visible) gui::draw_clipped_rectangle(caret_mat, caret_rect + pos, clipper, v);
+				if (blink.caret_visible) gui::draw_clipped_rect(caret_mat, caret_rect + pos, clipper, v);
 			}
 
 			vec2i get_text_bbox(const fstr& str, const unsigned wrapping_width) {
