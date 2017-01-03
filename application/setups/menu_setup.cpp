@@ -328,7 +328,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 
 			afterword.should_disappear = false;
 			afterword.population_interval = 50.f;
-			afterword.population_variation = 0.6f;
+			afterword.population_variation = 0.7f;
 		}
 
 		void push_into(augs::action_list& into) {

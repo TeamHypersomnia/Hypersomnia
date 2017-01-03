@@ -72,7 +72,16 @@ void director_setup::process(game_window& window) {
 	float requested_playing_speed = 0.f;
 
 	bool unsaved_changes_exist = false;
-	bool additive_recording = false;
+
+	enum class recording_replacement_type {
+		ALL,
+		ONLY_KEYS,
+		ONLY_MOUSE,
+
+		COUNT
+	};
+
+	auto recording_replacement_mode = recording_replacement_type::ALL;
 
 	std::vector<cosmos> snapshots_for_rewinding;
 	
@@ -119,10 +128,11 @@ void director_setup::process(game_window& window) {
 						requested_playing_speed = 0.f;
 
 						if (current_director_state == director_state::RECORDING) {
-							additive_recording = !additive_recording;
+							recording_replacement_mode = 
+								static_cast<recording_replacement_type>((static_cast<int>(recording_replacement_mode) + 1) % static_cast<int>(recording_replacement_type::COUNT));
 						}
 						else {
-							additive_recording = false;
+							recording_replacement_mode = recording_replacement_type::ALL;
 
 							current_director_state = director_state::RECORDING;
 							total_collected_entropy.clear();
@@ -244,13 +254,28 @@ void director_setup::process(game_window& window) {
 				guid_mapped_entropy& recorded_entropy = director.step_to_entropy[current_step];
 
 				auto& target_intents_from_recording = recorded_entropy.entropy_per_entity[selected_character.get_guid()];
-				const auto new_intents = make_intents_for_entity(selected_character, total_collected_entropy.local, session.context);
+				auto new_intents = make_intents_for_entity(selected_character, total_collected_entropy.local, session.context);
 
-				if (additive_recording) {
+				auto mouse_remover = [](const auto& k) { return k.uses_mouse_motion(); };
+				auto key_remover = [](const auto& k) { return !k.uses_mouse_motion(); };
+
+				if (recording_replacement_mode == recording_replacement_type::ALL) {
+					target_intents_from_recording = new_intents;
+				}
+				else if (recording_replacement_mode == recording_replacement_type::ONLY_KEYS) {
+					erase_remove(target_intents_from_recording, key_remover);
+					erase_remove(new_intents, mouse_remover);
+					
+					concatenate(target_intents_from_recording, new_intents);
+				}
+				else if (recording_replacement_mode == recording_replacement_type::ONLY_MOUSE) {
+					erase_remove(target_intents_from_recording, mouse_remover);
+					erase_remove(new_intents, key_remover);
+
 					concatenate(target_intents_from_recording, new_intents);
 				}
 				else {
-					target_intents_from_recording = new_intents;
+					ensure(false);
 				}
 				
 				cosmic_entropy_for_this_advancement = cosmic_entropy(recorded_entropy, hypersomnia);
@@ -286,11 +311,17 @@ void director_setup::process(game_window& window) {
 			director_text += format(L"Playing", white_font);
 		}
 		else {
-			if (additive_recording) {
-				director_text += simple_bbcode(L"[color=red]Recording (additive)[/color]", white_font);
+			if (recording_replacement_mode == recording_replacement_type::ALL) {
+				director_text += simple_bbcode(L"[color=red]Recording (replacing all)[/color]", white_font);
+			}
+			else if (recording_replacement_mode == recording_replacement_type::ONLY_KEYS) {
+				director_text += simple_bbcode(L"[color=red]Recording (replacing keys)[/color]", white_font);
+			}
+			else if (recording_replacement_mode == recording_replacement_type::ONLY_MOUSE) {
+				director_text += simple_bbcode(L"[color=red]Recording (replacing mouse)[/color]", white_font);
 			}
 			else {
-				director_text += simple_bbcode(L"[color=red]Recording (replacing)[/color]", white_font);
+				ensure(false);
 			}
 		}
 
