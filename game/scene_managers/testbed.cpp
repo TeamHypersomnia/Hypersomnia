@@ -75,10 +75,144 @@ namespace scene_managers {
 
 		const auto motorcycle = prefabs::create_motorcycle(world, components::transform(0, 400, -90));
 		//prefabs::create_motorcycle(world, components::transform(100, -600, -90));
-		const auto main_character_motorcycle = prefabs::create_motorcycle(world, components::transform(900, 2200, -90));
+		const auto main_character_motorcycle = prefabs::create_motorcycle(world, components::transform(900, 48200, -90));
 		
-		const auto riding_car = prefabs::create_car(world, components::transform(850, 31200, -90));
+		const auto riding_car = prefabs::create_car(world, components::transform(850, 44200, -90));
 
+		const int num_characters = 4 + 3 + 3 + 2;
+
+		std::vector<entity_id> new_characters;
+		new_characters.resize(num_characters);
+
+		auto character = [&](const size_t i) {
+			return i < new_characters.size() ? world[new_characters.at(i)] : world[entity_id()];
+		};
+
+		for (int i = 0; i < num_characters; ++i) {
+			assets::animation_response_id torso_set;
+			components::transform transform;
+
+			if (i == 0) {
+				//transform = { 0, 300, 0 };
+				torso_set = assets::animation_response_id::TORSO_SET;
+			}
+			else if (i == 1 || i == 2) {
+				if (i == 1) {
+					transform = { 254, 211, 68 };
+				}
+				if (i == 2) {
+					transform = { 1102, 213, 110 };
+				}
+
+				torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
+			}
+			else if (i == 3) {
+				torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
+			}
+
+			// three rebels
+
+			else if (i == 4) {
+				transform = { -100, 20000, 0 };
+
+				torso_set = assets::animation_response_id::BLUE_TORSO_SET;
+			}
+			else if (i == 5) {
+				transform = { -200, 20000, 0 };
+
+				torso_set = assets::animation_response_id::BLUE_TORSO_SET;
+			}
+			else if (i == 6) {
+				transform = { -300, 20000, 0 };
+
+				torso_set = assets::animation_response_id::BLUE_TORSO_SET;
+			}
+
+			// three metropolitan soldiers
+			else if (i == 7) {
+				transform = { -300, -3000, 0 };
+
+				torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
+			}
+			else if (i == 8) {
+				transform = { -400, -3000, 0 };
+
+				torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
+			}
+			else if (i == 9) {
+				transform = { -500, -3000, 0 };
+
+				torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
+			}
+
+
+
+			const auto new_character = prefabs::create_character(world, transform, screen_size, typesafe_sprintf("player%x", i), torso_set);
+
+			new_characters[i] = new_character;
+
+			if (i == 0) {
+				new_character.get<components::sentience>().health.value = 100;
+				new_character.get<components::sentience>().health.maximum = 100;
+			}
+			if (i == 1) {
+				new_character.get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
+				new_character.get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
+				new_character.get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
+				new_character.get<components::sentience>().minimum_danger_amount_to_evade = 20;
+				new_character.get<components::sentience>().health.value = 300;
+				new_character.get<components::sentience>().health.maximum = 300;
+				//ingredients::standard_pathfinding_capability(new_character);
+				//ingredients::soldier_intelligence(new_character);
+				new_character.recalculate_basic_processing_categories();
+			}
+			if (i == 2) {
+				new_character.get<components::sentience>().health.value = 100;
+			}
+			if (i == 5) {
+				new_character.get<components::attitude>().parties = party_category::METROPOLIS_CITIZEN;
+				new_character.get<components::attitude>().hostile_parties = party_category::RESISTANCE_CITIZEN;
+				new_character.get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
+				new_character.get<components::sentience>().minimum_danger_amount_to_evade = 20;
+				new_character.get<components::sentience>().health.value = 300;
+				new_character.get<components::sentience>().health.maximum = 300;
+				//ingredients::standard_pathfinding_capability(new_character);
+				//ingredients::soldier_intelligence(new_character);
+				new_character.recalculate_basic_processing_categories();
+			}
+
+			if (
+				i == 4 || i == 5 || i == 6
+				) {
+				const auto rifle = prefabs::create_sample_rifle(step, vec2(100, -500),
+					prefabs::create_sample_magazine(step, vec2(100, -650), "0.4",
+						(i == 5 ? prefabs::create_pink_charge : prefabs::create_cyan_charge)(world, vec2(0, 0), 30)));
+
+				name_entity(new_character, entity_name::PERSON, L"Rebel");
+				perform_transfer({ rifle, new_character[slot_function::PRIMARY_HAND] }, step);
+			}
+
+			if (
+				i == 7 || i == 8 || i == 9
+				) {
+				const auto rifle = prefabs::create_sample_bilmer2000(step, vec2(100, -500),
+					prefabs::create_sample_magazine(step, vec2(100, -650), "0.4",
+					(i == 5 ? prefabs::create_pink_charge : prefabs::create_cyan_charge)(world, vec2(0, 0), 30)));
+
+				name_entity(new_character, entity_name::PERSON, L"Hunter");
+				
+				if (i == 8) {
+					name_entity(new_character, entity_name::PERSON, L"Commander");
+				}
+
+				perform_transfer({ rifle, new_character[slot_function::PRIMARY_HAND] }, step);
+			}
+		}
+
+		{
+
+
+		}
 
 		// street wandering pixels
 		{
@@ -93,7 +227,7 @@ namespace scene_managers {
 
 				w.face.set(assets::texture_id(int(assets::texture_id::BLANK)), cyan);
 				w.face.size.set(1, 1);
-				w.count = 100;
+				w.count = 200;
 				w.reach = reach;
 				e.add_standard_components();
 			}
@@ -107,7 +241,7 @@ namespace scene_managers {
 
 				w.face.set(assets::texture_id(int(assets::texture_id::BLINK_FIRST) + 2), cyan);
 				//w.face.size.set(1, 1);
-				w.count = 40;
+				w.count = 80;
 				w.reach = reach;
 				e.add_standard_components();
 			}
@@ -121,7 +255,7 @@ namespace scene_managers {
 
 				w.face.set(assets::texture_id(int(assets::texture_id::BLINK_FIRST) + 2), cyan);
 				//w.face.size.set(1, 1);
-				w.count = 40;
+				w.count = 80;
 				w.reach = reach;
 				e.add_standard_components();
 			}
@@ -467,7 +601,7 @@ namespace scene_managers {
 					road_dirt.add_standard_components();
 				}
 
-				for (int r = 0; r < 28; ++r) {
+				for (int r = 0; r < 38; ++r) {
 					const auto size = assets::get_size(assets::texture_id::ROAD);
 
 					auto road = world.create_entity("road[-]");
@@ -503,72 +637,6 @@ namespace scene_managers {
 				sprite.set(assets::texture_id::METROPOLIS);
 
 				e.add_standard_components();
-			}
-		}
-
-		const int num_characters = 4;
-
-		std::vector<entity_id> new_characters;
-		new_characters.resize(num_characters);
-
-		auto character = [&](const size_t i) {
-			return i < new_characters.size() ? world[new_characters.at(i)] : world[entity_id()];
-		};
-
-		for (int i = 0; i < num_characters; ++i) {
-			assets::animation_response_id torso_set;
-			components::transform transform;
-
-			if (i == 0) {
-				//transform = { 0, 300, 0 };
-				torso_set = assets::animation_response_id::TORSO_SET;
-			}
-			else if (i == 1 || i == 2) {
-				if (i == 1) {
-					transform = { 254, 211, 68 };
-				}
-				if (i == 2) {
-					transform = { 1102, 213, 110 };
-				}
-
-				torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
-			}
-			else {
-				torso_set = assets::animation_response_id::BLUE_TORSO_SET;
-			}
-
-			const auto new_character = prefabs::create_character(world, transform, screen_size, typesafe_sprintf("player%x", i), torso_set);
-
-			new_characters[i] = new_character;
-
-			if (i == 0) {
-				new_character.get<components::sentience>().health.value = 100;
-				new_character.get<components::sentience>().health.maximum = 100;
-			}
-			if (i == 1) {
-				new_character.get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
-				new_character.get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
-				new_character.get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
-				new_character.get<components::sentience>().minimum_danger_amount_to_evade = 20;
-				new_character.get<components::sentience>().health.value = 300;
-				new_character.get<components::sentience>().health.maximum = 300;
-				//ingredients::standard_pathfinding_capability(new_character);
-				//ingredients::soldier_intelligence(new_character);
-				new_character.recalculate_basic_processing_categories();
-			}
-			if (i == 2) {
-				new_character.get<components::sentience>().health.value = 100;
-			}
-			if (i == 5) {
-				new_character.get<components::attitude>().parties = party_category::METROPOLIS_CITIZEN;
-				new_character.get<components::attitude>().hostile_parties = party_category::RESISTANCE_CITIZEN;
-				new_character.get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
-				new_character.get<components::sentience>().minimum_danger_amount_to_evade = 20;
-				new_character.get<components::sentience>().health.value = 300;
-				new_character.get<components::sentience>().health.maximum = 300;
-				//ingredients::standard_pathfinding_capability(new_character);
-				//ingredients::soldier_intelligence(new_character);
-				new_character.recalculate_basic_processing_categories();
 			}
 		}
 
@@ -655,20 +723,6 @@ namespace scene_managers {
 			name_entity(character(3), entity_name::PERSON, L"Medic");
 			perform_transfer({ pis2, character(3)[slot_function::PRIMARY_HAND] }, step);
 		}
-
-		if (character(5).alive()) {
-			const auto new_item = prefabs::create_submachine(step, vec2(0, -1000),
-				prefabs::create_sample_magazine(step, vec2(100 - 50, -650), true ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), true ? 500 : 50)));
-
-			perform_transfer({ new_item, character(5)[slot_function::PRIMARY_HAND] }, step);
-		}
-
-		//draw_bodies.push_back(crate2);
-		//draw_bodies.push_back(new_characters[0]);
-		//draw_bodies.push_back(backpack);
-
-		//world.significant.meta.settings.pathfinding.draw_memorised_walls = 1;
-		//world.significant.meta.settings.pathfinding.draw_undiscovered = 1;
 
 		characters.assign(new_characters.begin(), new_characters.end());
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);

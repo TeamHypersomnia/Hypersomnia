@@ -22,7 +22,7 @@ recording_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.MAIN_MENU,
+	launch_mode = launch_modes.LOCAL,
 	
 	input_recording_mode = recording_modes.LIVE,
 	recording_replay_speed = 1,
@@ -30,13 +30,13 @@ config_table = {
 	determinism_test_cloned_cosmoi_count = 2,
 
 	window_name = "example",
-	fullscreen = 0,
+	fullscreen = 1,
 	window_border = 1,
 	window_x = 100,
 	window_y = 10,
 	bpp = 24,
-	resolution_w = 1920,
-	resolution_h = 1050,
+	resolution_w = 1200,
+	resolution_h = 800,
 	doublebuffer = 1,
 
 	sound_effects_volume = 1,
@@ -81,7 +81,7 @@ config_table = {
 	menu_intro_scenario_filename = "director/menu_intro.ent",
 
 	menu_theme_filename = "hypersomnia/music/menu_theme.flac",
-	skip_credits = 1,
+	skip_credits = 0,
 	latest_news_url = "http://hypersomnia.pl/latest_post/"
 }
 

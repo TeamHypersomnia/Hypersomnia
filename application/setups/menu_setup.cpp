@@ -300,11 +300,11 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 
 			afterword.target_text[0] = format(L"\
 What stands before your eyes is an outcome of a man's burning passion,\n\
-a digital inamorata, chef d'oeuvre of a single coder, masterful musicians and a champion at pixel art.\n", s);
+a digital inamorata, chef d'oeuvre of a single coder, masterful musicians and a champion at pixel art.\n\n", s);
 
-			afterword.target_text[1] = format(L"\n\
+			afterword.target_text[1] = format(L"\
 Its history of making recounts profound hopes and disillusions,\n\
-it is a tale of crises and divine moments of joy.\n\
+crises, but also divine moments of joy.\n\
 Do not falter, you who are in the process.\n\
 There exist great causes for your commitment to have ever escalated, let alone if it lasts.\n\
 All lives are experimental by nature.\n\
