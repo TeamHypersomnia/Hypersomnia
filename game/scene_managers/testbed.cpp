@@ -195,9 +195,9 @@ namespace scene_managers {
 			if (
 				i == 7 || i == 8 || i == 9
 				) {
-				const auto rifle = prefabs::create_sample_bilmer2000(step, vec2(100, -500),
-					prefabs::create_sample_magazine(step, vec2(100, -650), "0.4",
-					(i == 5 ? prefabs::create_pink_charge : prefabs::create_cyan_charge)(world, vec2(0, 0), 30)));
+				const auto rifle = (i == 7 ? prefabs::create_submachine : prefabs::create_sample_bilmer2000)(step, vec2(100, -500),
+					prefabs::create_sample_magazine(step, vec2(100, -650), "3.4",
+					prefabs::create_pink_charge(world, vec2(0, 0), 300)));
 
 				name_entity(new_character, entity_name::PERSON, L"Hunter");
 				
@@ -206,6 +206,9 @@ namespace scene_managers {
 				}
 
 				perform_transfer({ rifle, new_character[slot_function::PRIMARY_HAND] }, step);
+
+				const auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
+				perform_transfer({ backpack, new_character[slot_function::SHOULDER_SLOT] }, step);
 			}
 		}
 
