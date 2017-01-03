@@ -44,7 +44,6 @@ namespace scene_managers {
 
 	void testbed::populate(logic_step& step, const vec2i screen_size) {
 		auto& world = step.cosm;
-
 		//const auto crate = prefabs::create_crate(world, vec2(200, 200 + 300), vec2i(100, 100) / 3);
 		//const auto crate2 = prefabs::create_crate(world, vec2(400, 200 + 400), vec2i(300, 300));
 		//const auto crate4 = prefabs::create_crate(world, vec2(500, 200 + 0), vec2i(100, 100));
@@ -78,6 +77,9 @@ namespace scene_managers {
 		const auto main_character_motorcycle = prefabs::create_motorcycle(world, components::transform(900, 48200, -90));
 		
 		const auto riding_car = prefabs::create_car(world, components::transform(850, 44200, -90));
+
+		const auto riding_car2 = prefabs::create_car(world, components::transform(-850 + 1000, -8200, -90 + 180));
+		const auto motorcycle2 = prefabs::create_motorcycle(world, components::transform(-1150 + 1000, -8200, -90 + 180));
 
 		const int num_characters = 4 + 3 + 3 + 2;
 
@@ -195,9 +197,6 @@ namespace scene_managers {
 			if (
 				i == 7 || i == 8 || i == 9
 				) {
-				const auto rifle = (i == 7 ? prefabs::create_submachine : prefabs::create_sample_bilmer2000)(step, vec2(100, -500),
-					prefabs::create_sample_magazine(step, vec2(100, -650), "3.4",
-					prefabs::create_pink_charge(world, vec2(0, 0), 300)));
 
 				name_entity(new_character, entity_name::PERSON, L"Hunter");
 				
@@ -205,10 +204,31 @@ namespace scene_managers {
 					name_entity(new_character, entity_name::PERSON, L"Commander");
 				}
 
-				perform_transfer({ rifle, new_character[slot_function::PRIMARY_HAND] }, step);
+				if (i == 9) {
+					const auto rifle = prefabs::create_kek9(step, vec2(100, -500),
+						prefabs::create_small_magazine(step, vec2(100, -650), "3.4",
+							prefabs::create_pink_charge(world, vec2(0, 0), 300)));
+
+					perform_transfer({ rifle, new_character[slot_function::PRIMARY_HAND] }, step);
+				}
+				else {
+					const auto rifle = (i == 7 ? prefabs::create_submachine : prefabs::create_sample_bilmer2000)(step, vec2(100, -500),
+						prefabs::create_sample_magazine(step, vec2(100, -650), "3.4",
+							prefabs::create_pink_charge(world, vec2(0, 0), 300)));
+
+					perform_transfer({ rifle, new_character[slot_function::PRIMARY_HAND] }, step);
+				}
 
 				const auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
 				perform_transfer({ backpack, new_character[slot_function::SHOULDER_SLOT] }, step);
+			}
+
+			if (i == 10) {
+				driver_system().assign_car_ownership(new_character, riding_car2);
+			}
+
+			if (i == 11) {
+				driver_system().assign_car_ownership(new_character, motorcycle2);
 			}
 		}
 

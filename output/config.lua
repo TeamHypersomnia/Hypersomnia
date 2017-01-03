@@ -22,7 +22,7 @@ recording_modes = {
 }
 
 config_table = {
-	launch_mode = launch_modes.LOCAL,
+	launch_mode = launch_modes.DIRECTOR,
 	
 	input_recording_mode = recording_modes.LIVE,
 	recording_replay_speed = 1,
@@ -81,7 +81,7 @@ config_table = {
 	menu_intro_scenario_filename = "director/menu_intro.ent",
 
 	menu_theme_filename = "hypersomnia/music/menu_theme.flac",
-	skip_credits = 0,
+	skip_credits = 1,
 	latest_news_url = "http://hypersomnia.pl/latest_post/"
 }
 

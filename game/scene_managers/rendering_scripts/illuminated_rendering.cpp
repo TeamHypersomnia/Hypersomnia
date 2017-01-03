@@ -210,11 +210,11 @@ namespace rendering_scripts {
 		renderer.call_triangles();
 		renderer.clear_triangles();
 
-		//renderer.draw_debug_info(
-		//	state.visible_world_area,
-		//	state.camera_transform,
-		//	assets::texture_id::BLANK,
-		//	{},
-		//	step.get_delta().view_interpolation_ratio());
+		renderer.draw_debug_info(
+			camera.visible_world_area,
+			camera.transform,
+			assets::texture_id::BLANK,
+			{},
+			step.get_delta().view_interpolation_ratio());
 	}
 }

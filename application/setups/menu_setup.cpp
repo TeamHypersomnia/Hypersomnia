@@ -250,7 +250,7 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 				column_height += get_text_bbox(format(L"\n.", p.get_total_target_text()[0]), p_bbox.y).y/2;
 			}
 
-			column_height += 20;
+			column_height += 15;
 
 			entries.push_back(e);
 		}
@@ -271,7 +271,7 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 			{
 				entry c;
 
-				c.set_task(format(L"Founder & Lead Programmer", task_st));
+				c.set_task(format(L"Founder & Programmer", task_st));
 				c.add_person(format(L"Patryk B. Czachurski", s));
 
 				add_entry(c);
@@ -296,6 +296,15 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 				add_entry(c);
 			}
 
+			{
+				entry c;
+
+				c.set_task(format(L"Occasional helping hands", task_st));
+				c.add_person(format(L"Bartosz P. Grzelak", s));
+
+				add_entry(c);
+			}
+
 			center_all(screen_size);
 
 			afterword.target_text[0] = format(L"\
@@ -303,12 +312,10 @@ What stands before your eyes is an outcome of a man's burning passion,\n\
 a digital inamorata, chef d'oeuvre of a single coder, masterful musicians and a champion at pixel art.\n\n", s);
 
 			afterword.target_text[1] = format(L"\
-Its history of making recounts profound hopes and disillusions,\n\
-crises, but also divine moments of joy.\n\
-Do not falter, you who are in the process.\n\
-There exist great causes for your commitment to have ever escalated, let alone if it lasts.\n\
-All lives are experimental by nature.\n\
-Conduct thine vision, for in the end you must either conquer that which you have dreamt of,\n\
+Its history of making recounts profound hopes,\n\
+disillusions, crises and divine moments of joy.\n\
+Cherish your ambitions for the immaterial.\n\
+In the end you will either conquer that which you dreamed of,\n\
 or tell a beautiful story of a man devastated by struggle.\n", s)
 + format(L"    ~Founder of the Hypersomnia Universe", task_st);
 
