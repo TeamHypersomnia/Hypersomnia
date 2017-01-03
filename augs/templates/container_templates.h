@@ -23,6 +23,11 @@ auto find_in(Container& v, const T& l) {
 }
 
 template<class A, class B>
+void concatenate(A& a, const B& b) {
+	a.insert(a.end(), b.begin(), b.end());
+}
+
+template<class A, class B>
 bool compare_containers(const A& a, const B& b);
 
 template<class A, class B>

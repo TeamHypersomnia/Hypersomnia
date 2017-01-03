@@ -404,12 +404,13 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 			fade_overlay_color.a = 100;
 		}
 
+		intro_actions.push_non_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 20, 500.f)));
+
 		intro_actions.push_blocking(act(new augs::tween_value_action<rgba_channel>(tweened_menu_button_color.a, 255, 250.f)));
 		intro_actions.push_blocking(act(new augs::tween_value_action<int>(tweened_menu_button_size.x, target_tweened_menu_button_size.x, 500.f)));
 		intro_actions.push_blocking(act(new augs::tween_value_action<int>(tweened_menu_button_size.y, target_tweened_menu_button_size.y, 350.f)));
 
 		intro_actions.push_non_blocking(act(new augs::tween_value_action<rgba_channel>(title_text_color.a, 255, 500.f)));
-		intro_actions.push_non_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 20, 500.f)));
 		
 		intro_actions.push_non_blocking(act(new augs::set_value_action<bool>(roll_news, true)));
 		intro_actions.push_non_blocking(act(new augs::set_value_action<vec2i>(menu_ui_rect_world.last_state.mouse.pos, screen_size/2)));
@@ -460,7 +461,9 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 
 		case menu_button_type::CREATORS:
 			if (credits_actions.is_complete()) {
+				credits_actions.push_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 170, 500.f)));
 				creators_screen.push_into(credits_actions);
+				credits_actions.push_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 20, 500.f)));
 			}
 			break;
 
@@ -545,11 +548,14 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 
 			menu_ui_rect_world.build_tree_data_into_context(menu_ui_context, menu_ui_root_id);
 
-			for (const auto& ch : new_entropy.local) {
-				menu_ui_rect_world.consume_raw_input_and_generate_gui_events(menu_ui_context, menu_ui_root_id, ch, gui_entropies);
+			if (draw_cursor) {
+				for (const auto& ch : new_entropy.local) {
+					menu_ui_rect_world.consume_raw_input_and_generate_gui_events(menu_ui_context, menu_ui_root_id, ch, gui_entropies);
+				}
+
+				menu_ui_rect_world.call_idle_mousemotion_updater(menu_ui_context, menu_ui_root_id, gui_entropies);
 			}
 
-			menu_ui_rect_world.call_idle_mousemotion_updater(menu_ui_context, menu_ui_root_id, gui_entropies);
 			menu_ui_rect_world.advance_elements(menu_ui_context, menu_ui_root_id, gui_entropies, vdt);
 
 			menu_ui_root.set_menu_buttons_sizes(tweened_menu_button_size);
