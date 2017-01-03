@@ -39,6 +39,8 @@
 #include "augs/misc/http_requests.h"
 #include "augs/templates/string_templates.h"
 
+#include "augs/graphics/drawers.h"
+
 using namespace augs::window::event::keys;
 using namespace augs::gui::text;
 using namespace augs::gui;
@@ -128,6 +130,8 @@ void menu_setup::process(game_window& window) {
 
 	rgba tweened_menu_button_color = cyan;
 	tweened_menu_button_color.a = 0;
+
+	vec2i tweened_welcome_message_bg_size;
 
 	app_ui_rect_world menu_ui_rect_world;
 	menu_ui_rect_world.last_state.screen_size = screen_size;
@@ -407,6 +411,17 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 		intro_actions.push_non_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 20, 500.f)));
 
 		intro_actions.push_blocking(act(new augs::tween_value_action<rgba_channel>(tweened_menu_button_color.a, 255, 250.f)));
+		{
+			augs::action_list welcome_tweens;
+
+			const auto bbox = get_text_bbox(developer_welcome.get_total_target_text(), 0);
+			
+			welcome_tweens.push_blocking(act(new augs::tween_value_action<int>(tweened_welcome_message_bg_size.x, bbox.x, 500.f)));
+			welcome_tweens.push_blocking(act(new augs::tween_value_action<int>(tweened_welcome_message_bg_size.y, bbox.y, 350.f)));
+			
+			intro_actions.push_non_blocking(act(new augs::list_action(std::move(welcome_tweens))));
+		}
+
 		intro_actions.push_blocking(act(new augs::tween_value_action<int>(tweened_menu_button_size.x, target_tweened_menu_button_size.x, 500.f)));
 		intro_actions.push_blocking(act(new augs::tween_value_action<int>(tweened_menu_button_size.y, target_tweened_menu_button_size.y, 350.f)));
 
@@ -581,14 +596,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 					gui_cursor = assets::texture_id::GUI_CURSOR_HOVER;
 				}
 
-				components::sprite cursor_sprite;
-				cursor_sprite.set(gui_cursor, gui_cursor_color);
-
-				components::sprite::drawing_input in(renderer.get_triangle_buffer());
-				in.positioning = components::sprite::drawing_input::positioning_type::LEFT_TOP_CORNER;
-				in.renderable_transform.pos = mouse_pos;
-
-				cursor_sprite.draw(in);
+				augs::draw_rect(renderer.get_triangle_buffer(), mouse_pos, gui_cursor, gui_cursor_color);
 			}
 
 			renderer.call_triangles();
