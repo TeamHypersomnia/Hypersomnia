@@ -21,6 +21,8 @@
 #include "augs/filesystem/file.h"
 #include "director_setup.h"
 
+#include "augs/templates/container_templates.h"
+
 #define LOG_REWINDING 0
 
 using namespace augs::window::event::keys;
@@ -70,6 +72,7 @@ void director_setup::process(game_window& window) {
 	float requested_playing_speed = 0.f;
 
 	bool unsaved_changes_exist = false;
+	bool additive_recording = false;
 
 	std::vector<cosmos> snapshots_for_rewinding;
 	
@@ -113,8 +116,17 @@ void director_setup::process(game_window& window) {
 						current_director_state = director_state::PLAYING;
 					}
 					if (raw_input.key == key::F3) {
-						current_director_state = director_state::RECORDING;
-						total_collected_entropy.clear();
+						requested_playing_speed = 0.f;
+
+						if (current_director_state == director_state::RECORDING) {
+							additive_recording = !additive_recording;
+						}
+						else {
+							additive_recording = false;
+
+							current_director_state = director_state::RECORDING;
+							total_collected_entropy.clear();
+						}
 					}
 					if (raw_input.key == key::F7) {
 						director.save_recording_to_file(output_director_file);
@@ -137,21 +149,27 @@ void director_setup::process(game_window& window) {
 					}
 					if (raw_input.key == key::_3) {
 						requested_playing_speed = 0.f;
+						total_collected_entropy.clear();
 					}
 					if (raw_input.key == key::_4) {
 						requested_playing_speed = 0.1f;
+						total_collected_entropy.clear();
 					}
 					if (raw_input.key == key::_5) {
 						requested_playing_speed = 1.f;
+						total_collected_entropy.clear();
 					}
 					if (raw_input.key == key::_6) {
 						requested_playing_speed = 6.f;
+						total_collected_entropy.clear();
 					}
 					if (raw_input.key == key::_9) {
 						bookmarked_step = get_step_number(hypersomnia);
+						total_collected_entropy.clear();
 					}
 					if (raw_input.key == key::_0) {
 						advance_steps_forward = static_cast<long long>(bookmarked_step) - static_cast<long long>(get_step_number(hypersomnia));
+						total_collected_entropy.clear();
 					}
 				}
 			}
@@ -225,8 +243,15 @@ void director_setup::process(game_window& window) {
 			else if (current_director_state == director_state::RECORDING) {
 				guid_mapped_entropy& recorded_entropy = director.step_to_entropy[current_step];
 
-				recorded_entropy.entropy_per_entity[selected_character.get_guid()]
-					= make_intents_for_entity(selected_character, total_collected_entropy.local, session.context);
+				auto& target_intents_from_recording = recorded_entropy.entropy_per_entity[selected_character.get_guid()];
+				const auto new_intents = make_intents_for_entity(selected_character, total_collected_entropy.local, session.context);
+
+				if (additive_recording) {
+					concatenate(target_intents_from_recording, new_intents);
+				}
+				else {
+					target_intents_from_recording = new_intents;
+				}
 				
 				cosmic_entropy_for_this_advancement = cosmic_entropy(recorded_entropy, hypersomnia);
 
@@ -255,7 +280,20 @@ void director_setup::process(game_window& window) {
 		const auto white_font = style(assets::font_id::GUI_FONT, white);
 
 		auto director_text = format(L"Welcome to the director setup.", white_font);
-		director_text += simple_bbcode(typesafe_sprintf(L"\nMode: %x", current_director_state == director_state::PLAYING ? "Playing" : "[color=red]Recording[/color]"), white_font);
+		director_text += format(L"\nMode: ", white_font); 
+		
+		if (current_director_state == director_state::PLAYING) {
+			director_text += format(L"Playing", white_font);
+		}
+		else {
+			if (additive_recording) {
+				director_text += simple_bbcode(L"[color=red]Recording (additive)[/color]", white_font);
+			}
+			else {
+				director_text += simple_bbcode(L"[color=red]Recording (replacing)[/color]", white_font);
+			}
+		}
+
 		director_text += format(typesafe_sprintf(L"\nRequested playing speed: %x", requested_playing_speed), white_font);
 		director_text += format(typesafe_sprintf(L"\nStep number: %x", get_step_number(hypersomnia)), white_font);
 		director_text += format(typesafe_sprintf(L"\nTime: %x", get_step_number(hypersomnia)*hypersomnia.get_fixed_delta().in_seconds()), white_font);
