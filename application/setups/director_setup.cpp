@@ -78,6 +78,8 @@ void director_setup::process(game_window& window) {
 	const double seconds_between_snapshots = 3.0;
 	const unsigned steps_between_snapshots = seconds_between_snapshots / hypersomnia.get_fixed_delta().in_seconds();
 
+	unsigned bookmarked_step = 0;
+
 	const auto get_step_number = [initial_step_number](const cosmos& cosm) {
 		ensure(initial_step_number <= cosm.get_total_steps_passed());
 
@@ -144,6 +146,12 @@ void director_setup::process(game_window& window) {
 					}
 					if (raw_input.key == key::_6) {
 						requested_playing_speed = 6.f;
+					}
+					if (raw_input.key == key::_9) {
+						bookmarked_step = get_step_number(hypersomnia);
+					}
+					if (raw_input.key == key::_0) {
+						advance_steps_forward = static_cast<long long>(bookmarked_step) - static_cast<long long>(get_step_number(hypersomnia));
 					}
 				}
 			}
@@ -252,6 +260,10 @@ void director_setup::process(game_window& window) {
 		director_text += format(typesafe_sprintf(L"\nStep number: %x", get_step_number(hypersomnia)), white_font);
 		director_text += format(typesafe_sprintf(L"\nTime: %x", get_step_number(hypersomnia)*hypersomnia.get_fixed_delta().in_seconds()), white_font);
 		director_text += format(typesafe_sprintf(L"\nControlling entity %x of %x", testbed.current_character_index, testbed.characters.size()), white_font);
+
+		if (bookmarked_step != 0) {
+			director_text += format(typesafe_sprintf(L"\nBookmarked time: %x", bookmarked_step*hypersomnia.get_fixed_delta().in_seconds()), white_font);
+		}
 
 		if (unsaved_changes_exist) {
 			director_text += simple_bbcode(L"\n[color=yellow]Press F7 to save pending changes.[/color]", white_font);
