@@ -163,7 +163,7 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">P:/Projects/Hypersomnia/3rdparty/openal-soft-build/CMakeFiles/afa1c9e16df3d740228c35c5884783b4/INSTALL_force.rule;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)/3rdparty/openal-soft-build/CMakeFiles/afa1c9e16df3d740228c35c5884783b4/INSTALL_force.rule;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\3rdparty\openal-soft-build\utils\alsoft-config\CMakeFiles\INSTALL_force</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> </Message>
@@ -176,7 +176,7 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">P:/Projects/Hypersomnia/3rdparty/openal-soft-build/CMakeFiles/afa1c9e16df3d740228c35c5884783b4/INSTALL_force.rule;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)/3rdparty/openal-soft-build/CMakeFiles/afa1c9e16df3d740228c35c5884783b4/INSTALL_force.rule;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)\3rdparty\openal-soft-build\utils\alsoft-config\CMakeFiles\INSTALL_force</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
       <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'"> </Message>
@@ -189,7 +189,7 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">P:/Projects/Hypersomnia/3rdparty/openal-soft-build/CMakeFiles/afa1c9e16df3d740228c35c5884783b4/INSTALL_force.rule;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">$(SolutionDir)/3rdparty/openal-soft-build/CMakeFiles/afa1c9e16df3d740228c35c5884783b4/INSTALL_force.rule;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">$(SolutionDir)\3rdparty\openal-soft-build\utils\alsoft-config\CMakeFiles\INSTALL_force</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkObjects>
       <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'"> </Message>
@@ -202,16 +202,16 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">P:/Projects/Hypersomnia/3rdparty/openal-soft-build/CMakeFiles/afa1c9e16df3d740228c35c5884783b4/INSTALL_force.rule;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">$(SolutionDir)/3rdparty/openal-soft-build/CMakeFiles/afa1c9e16df3d740228c35c5884783b4/INSTALL_force.rule;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">$(SolutionDir)\3rdparty\openal-soft-build\utils\alsoft-config\CMakeFiles\INSTALL_force</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">false</LinkObjects>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="P:/Projects/Hypersomnia/3rdparty/openal-soft-build/ZERO_CHECK.vcxproj">
+    <ProjectReference Include="$(SolutionDir)/3rdparty/openal-soft-build/ZERO_CHECK.vcxproj">
       <Project>C2230974-0D0E-3B47-BBC4-A3F3E9B52ADC</Project>
     </ProjectReference>
-    <ProjectReference Include="P:/Projects/Hypersomnia/3rdparty/openal-soft-build/utils/alsoft-config/ALL_BUILD.vcxproj">
+    <ProjectReference Include="$(SolutionDir)/3rdparty/openal-soft-build/utils/alsoft-config/ALL_BUILD.vcxproj">
       <Project>ED2FA6FF-2DB5-3B68-9A3F-2E32D89A8B51</Project>
     </ProjectReference>
   </ItemGroup>

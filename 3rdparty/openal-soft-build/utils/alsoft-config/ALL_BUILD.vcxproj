@@ -105,9 +105,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <CustomBuild Include="$(SolutionDir)\3rdparty\openal-soft\utils\alsoft-config\CMakeLists.txt">
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule P:/Projects/Hypersomnia/3rdparty/openal-soft/utils/alsoft-config/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule $(SolutionDir)/3rdparty/openal-soft/utils/alsoft-config/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -HP:/Projects/Hypersomnia/3rdparty/openal-soft -BP:/Projects/Hypersomnia/3rdparty/openal-soft-build --check-stamp-file $(SolutionDir)\3rdparty\openal-soft-build\utils\alsoft-config\CMakeFiles\generate.stamp
+"C:\Program Files\CMake\bin\cmake.exe" -H$(SolutionDir)/3rdparty/openal-soft -B$(SolutionDir)/3rdparty/openal-soft-build --check-stamp-file $(SolutionDir)\3rdparty\openal-soft-build\utils\alsoft-config\CMakeFiles\generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -115,12 +115,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">P:/Projects/Hypersomnia/3rdparty/openal-soft/utils/alsoft-config/CMakeLists.txt;$(SolutionDir)\3rdparty\openal-soft\utils\alsoft-config\CMakeLists.txt;C:\Program Files\CMake\share\cmake-3.7\Modules\FindQt4.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\MacroAddFileDependencies.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakePushCheckState.cmake;$(SolutionDir)\3rdparty\openal-soft\utils\alsoft-config\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)/3rdparty/openal-soft/utils/alsoft-config/CMakeLists.txt;$(SolutionDir)\3rdparty\openal-soft\utils\alsoft-config\CMakeLists.txt;C:\Program Files\CMake\share\cmake-3.7\Modules\FindQt4.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\MacroAddFileDependencies.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakePushCheckState.cmake;$(SolutionDir)\3rdparty\openal-soft\utils\alsoft-config\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\3rdparty\openal-soft-build\utils\alsoft-config\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule P:/Projects/Hypersomnia/3rdparty/openal-soft/utils/alsoft-config/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule $(SolutionDir)/3rdparty/openal-soft/utils/alsoft-config/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -HP:/Projects/Hypersomnia/3rdparty/openal-soft -BP:/Projects/Hypersomnia/3rdparty/openal-soft-build --check-stamp-file $(SolutionDir)\3rdparty\openal-soft-build\utils\alsoft-config\CMakeFiles\generate.stamp
+"C:\Program Files\CMake\bin\cmake.exe" -H$(SolutionDir)/3rdparty/openal-soft -B$(SolutionDir)/3rdparty/openal-soft-build --check-stamp-file $(SolutionDir)\3rdparty\openal-soft-build\utils\alsoft-config\CMakeFiles\generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -128,12 +128,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">P:/Projects/Hypersomnia/3rdparty/openal-soft/utils/alsoft-config/CMakeLists.txt;$(SolutionDir)\3rdparty\openal-soft\utils\alsoft-config\CMakeLists.txt;C:\Program Files\CMake\share\cmake-3.7\Modules\FindQt4.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\MacroAddFileDependencies.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakePushCheckState.cmake;$(SolutionDir)\3rdparty\openal-soft\utils\alsoft-config\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)/3rdparty/openal-soft/utils/alsoft-config/CMakeLists.txt;$(SolutionDir)\3rdparty\openal-soft\utils\alsoft-config\CMakeLists.txt;C:\Program Files\CMake\share\cmake-3.7\Modules\FindQt4.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\MacroAddFileDependencies.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakePushCheckState.cmake;$(SolutionDir)\3rdparty\openal-soft\utils\alsoft-config\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)\3rdparty\openal-soft-build\utils\alsoft-config\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Building Custom Rule P:/Projects/Hypersomnia/3rdparty/openal-soft/utils/alsoft-config/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Building Custom Rule $(SolutionDir)/3rdparty/openal-soft/utils/alsoft-config/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -HP:/Projects/Hypersomnia/3rdparty/openal-soft -BP:/Projects/Hypersomnia/3rdparty/openal-soft-build --check-stamp-file $(SolutionDir)\3rdparty\openal-soft-build\utils\alsoft-config\CMakeFiles\generate.stamp
+"C:\Program Files\CMake\bin\cmake.exe" -H$(SolutionDir)/3rdparty/openal-soft -B$(SolutionDir)/3rdparty/openal-soft-build --check-stamp-file $(SolutionDir)\3rdparty\openal-soft-build\utils\alsoft-config\CMakeFiles\generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -141,12 +141,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">P:/Projects/Hypersomnia/3rdparty/openal-soft/utils/alsoft-config/CMakeLists.txt;$(SolutionDir)\3rdparty\openal-soft\utils\alsoft-config\CMakeLists.txt;C:\Program Files\CMake\share\cmake-3.7\Modules\FindQt4.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\MacroAddFileDependencies.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakePushCheckState.cmake;$(SolutionDir)\3rdparty\openal-soft\utils\alsoft-config\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">$(SolutionDir)/3rdparty/openal-soft/utils/alsoft-config/CMakeLists.txt;$(SolutionDir)\3rdparty\openal-soft\utils\alsoft-config\CMakeLists.txt;C:\Program Files\CMake\share\cmake-3.7\Modules\FindQt4.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\MacroAddFileDependencies.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakePushCheckState.cmake;$(SolutionDir)\3rdparty\openal-soft\utils\alsoft-config\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">$(SolutionDir)\3rdparty\openal-soft-build\utils\alsoft-config\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Building Custom Rule P:/Projects/Hypersomnia/3rdparty/openal-soft/utils/alsoft-config/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Building Custom Rule $(SolutionDir)/3rdparty/openal-soft/utils/alsoft-config/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -HP:/Projects/Hypersomnia/3rdparty/openal-soft -BP:/Projects/Hypersomnia/3rdparty/openal-soft-build --check-stamp-file $(SolutionDir)\3rdparty\openal-soft-build\utils\alsoft-config\CMakeFiles\generate.stamp
+"C:\Program Files\CMake\bin\cmake.exe" -H$(SolutionDir)/3rdparty/openal-soft -B$(SolutionDir)/3rdparty/openal-soft-build --check-stamp-file $(SolutionDir)\3rdparty\openal-soft-build\utils\alsoft-config\CMakeFiles\generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -154,7 +154,7 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">P:/Projects/Hypersomnia/3rdparty/openal-soft/utils/alsoft-config/CMakeLists.txt;$(SolutionDir)\3rdparty\openal-soft\utils\alsoft-config\CMakeLists.txt;C:\Program Files\CMake\share\cmake-3.7\Modules\FindQt4.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\MacroAddFileDependencies.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakePushCheckState.cmake;$(SolutionDir)\3rdparty\openal-soft\utils\alsoft-config\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">$(SolutionDir)/3rdparty/openal-soft/utils/alsoft-config/CMakeLists.txt;$(SolutionDir)\3rdparty\openal-soft\utils\alsoft-config\CMakeLists.txt;C:\Program Files\CMake\share\cmake-3.7\Modules\FindQt4.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\MacroAddFileDependencies.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakePushCheckState.cmake;$(SolutionDir)\3rdparty\openal-soft\utils\alsoft-config\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">$(SolutionDir)\3rdparty\openal-soft-build\utils\alsoft-config\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">false</LinkObjects>
     </CustomBuild>
@@ -162,7 +162,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="P:/Projects/Hypersomnia/3rdparty/openal-soft-build/ZERO_CHECK.vcxproj">
+    <ProjectReference Include="$(SolutionDir)/3rdparty/openal-soft-build/ZERO_CHECK.vcxproj">
       <Project>C2230974-0D0E-3B47-BBC4-A3F3E9B52ADC</Project>
     </ProjectReference>
   </ItemGroup>
