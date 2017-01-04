@@ -37,7 +37,13 @@ Of importance are:
 # How to build
 from: http://hypersomnia.pl/join/
 
-To build on Windows platforms, simply open Hypersomnia.sln file and build with Release x86 configuration.
+Go to the directory where you wish to have your Hypersomnia project downloaded,
+open git bash and paste:
+
+```
+git clone https://github.com/TeamHypersomnia/Hypersomnia.git --recursive
+```
+
 As it currently stands, the project is not ported to any other platform.
 
 If you dream about creating an entirely new mechanic, I recommend that you be familiar with component-based entity architecture beforehand.
