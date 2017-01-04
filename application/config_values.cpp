@@ -1,4 +1,4 @@
-#include "lua.hpp"
+#include <lua/lua.h>
 #include <luabind/luabind.hpp>
 
 #include "config_values.h"
