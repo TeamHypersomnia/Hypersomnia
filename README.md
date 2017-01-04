@@ -44,7 +44,7 @@ open git bash and paste:
 git clone https://github.com/TeamHypersomnia/Hypersomnia.git --recursive
 ```
 
-As it currently stands, the project is not ported to any other platform.
+As it currently stands, the game can only be built in Visual Studio 2015 or higher and can only run on Windows systems.
 
 If you dream about creating an entirely new mechanic, I recommend that you be familiar with component-based entity architecture beforehand.
 Better yet, tell me about your plans! Together we can deal with problems more swiftly.
