@@ -1,4 +1,3 @@
-#include <lua/lua.h>
 #include <lua/lualib.h>
 #include <luabind/luabind.hpp>
 #include "lua_state_wrapper.h"
