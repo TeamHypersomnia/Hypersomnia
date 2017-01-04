@@ -18,7 +18,7 @@ void game_window::swap_buffers() {
 	window.swap_buffers();
 }
 
-void game_window::call_window_script(const std::string& filename, const std::string& alternative_filename) {
+void game_window::call_config_script(const std::string& filename, const std::string& alternative_filename) {
 	std::string used_filename = filename;
 
 	if (augs::file_exists(alternative_filename)) {

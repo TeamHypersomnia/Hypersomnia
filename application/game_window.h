@@ -38,7 +38,7 @@ public:
 
 	decltype(machine_entropy::local) collect_entropy();
 
-	void call_window_script(const std::string& filename, const std::string& alternative_filename);
+	void call_config_script(const std::string& filename, const std::string& alternative_filename);
 
 	enum class launch_mode {
 		INVALID,

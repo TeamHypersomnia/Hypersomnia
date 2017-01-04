@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
 	LOG(argv[0]);
 
 	game_window window;
-	window.call_window_script("config.lua", "config.local.lua");
+	window.call_config_script("config.lua", "config.local.lua");
 
 	audio_manager::generate_alsoft_ini(window.config.enable_hrtf);
 	audio_manager audio;

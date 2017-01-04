@@ -79,7 +79,7 @@ namespace augs {
 		AL_CHECK(alcMakeContextCurrent(nullptr));
 		alcDestroyContext(context);
 		alcCloseDevice(device);
-
+		LOG("Destroyed audio manager");
 		context = nullptr;
 		device = nullptr;
 	}
