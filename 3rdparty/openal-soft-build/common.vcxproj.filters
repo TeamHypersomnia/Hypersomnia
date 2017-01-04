@@ -1,24 +1,24 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\common\almalloc.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\common\almalloc.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\common\atomic.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\common\atomic.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\common\rwlock.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\common\rwlock.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\common\threads.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\common\threads.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\common\uintmap.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\common\uintmap.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\CMakeLists.txt" />
+    <CustomBuild Include="$(SolutionDir)\3rdparty\openal-soft\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">

@@ -1,162 +1,162 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\common\almalloc.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\common\almalloc.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\common\atomic.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\common\atomic.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\common\rwlock.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\common\rwlock.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\common\threads.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\common\threads.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\common\uintmap.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\common\uintmap.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alAuxEffectSlot.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\OpenAL32\alAuxEffectSlot.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alBuffer.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\OpenAL32\alBuffer.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alEffect.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\OpenAL32\alEffect.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alError.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\OpenAL32\alError.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alExtension.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\OpenAL32\alExtension.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alFilter.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\OpenAL32\alFilter.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alListener.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\OpenAL32\alListener.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alSource.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\OpenAL32\alSource.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alState.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\OpenAL32\alState.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\alThunk.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\OpenAL32\alThunk.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\OpenAL32\sample_cvt.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\OpenAL32\sample_cvt.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\ALc.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\ALc.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\ALu.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\ALu.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\alcConfig.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\alcConfig.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\alcRing.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\alcRing.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\bs2b.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\bs2b.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\chorus.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\effects\chorus.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\compressor.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\effects\compressor.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\dedicated.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\effects\dedicated.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\distortion.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\effects\distortion.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\echo.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\effects\echo.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\equalizer.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\effects\equalizer.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\flanger.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\effects\flanger.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\modulator.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\effects\modulator.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\null.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\effects\null.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\effects\reverb.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\effects\reverb.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\helpers.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\helpers.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\bsinc.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\bsinc.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\hrtf.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\hrtf.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\uhjfilter.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\uhjfilter.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\ambdec.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\ambdec.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\bformatdec.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\bformatdec.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\panning.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\panning.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\mixer.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\mixer.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\mixer_c.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\mixer_c.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\mixer_sse.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\mixer_sse.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\mixer_sse2.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\mixer_sse2.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\mixer_sse3.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\mixer_sse3.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\mixer_sse41.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\mixer_sse41.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\backends\base.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\backends\base.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\backends\loopback.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\backends\loopback.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\backends\null.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\backends\null.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\backends\winmm.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\backends\winmm.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\backends\dsound.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\backends\dsound.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\backends\mmdevapi.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\backends\mmdevapi.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\Alc\backends\wave.c">
+    <ClCompile Include="$(SolutionDir)\3rdparty\openal-soft\Alc\backends\wave.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="P:\Projects\Hypersomnia\3rdparty\openal-soft\CMakeLists.txt" />
+    <CustomBuild Include="$(SolutionDir)\3rdparty\openal-soft\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
