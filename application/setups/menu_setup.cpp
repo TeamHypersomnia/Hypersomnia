@@ -94,17 +94,11 @@ void menu_setup::process(game_window& window) {
 
 		result = strip_tags(result, '<', '>');
 
-		const auto date_start = result.find("[");
-		const auto date_end = result.find("]") + 1;
-		
-		result.insert(date_start, "[color=white]");
-		result.insert(date_end + std::string("[color=white]").length(), "[/color]");
-
 		if (result.size() > 0) {
 			const auto wresult = to_wstring(result);
 
 			std::unique_lock<std::mutex> lck(news_mut);
-			latest_news_drawer.set_text(simple_bbcode(L"[color=vslightgray]Latest news[/color] [color=vsdarkgray](hypersomnia.pl)[/color] " + wresult, textes_style));
+			latest_news_drawer.set_text(simple_bbcode(wresult, textes_style));
 		}
 	});
 
