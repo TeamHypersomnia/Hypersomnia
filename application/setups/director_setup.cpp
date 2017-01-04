@@ -27,9 +27,8 @@
 
 using namespace augs::window::event::keys;
 
-void director_setup::process(game_window& window) {
+void director_setup::process(const config_lua_table& cfg, game_window& window) {
 	const vec2i screen_size = vec2i(window.get_screen_size());
-	const auto& cfg = window.config;
 
 	cosmos hypersomnia(3000);
 
@@ -38,7 +37,7 @@ void director_setup::process(game_window& window) {
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
 	scene_managers::testbed testbed;
-	testbed.debug_var = window.config.debug_var;
+	testbed.debug_var = cfg.debug_var;
 
 	if (!hypersomnia.load_from_file("save.state")) {
 		hypersomnia.set_fixed_delta(cfg.tickrate);
@@ -106,7 +105,7 @@ void director_setup::process(game_window& window) {
 			augs::machine_entropy new_entropy;
 
 			session.local_entropy_profiler.new_measurement();
-			new_entropy.local = window.collect_entropy();
+			new_entropy.local = window.collect_entropy(!cfg.debug_disable_cursor_clipping);
 			session.local_entropy_profiler.end_measurement();
 			
 			session.control(new_entropy);

@@ -33,8 +33,8 @@ public:
 	augs::network::client client;
 	simulation_receiver receiver;
 
-	void process(game_window&);
+	void process(const config_lua_table& cfg, game_window&);
 
-	void init(game_window&, const std::string recording_filename = "recorded.inputs", const bool use_alternative_port = false);
+	void init(const config_lua_table& cfg, game_window&, const std::string recording_filename = "recorded.inputs", const bool use_alternative_port = false);
 	void process_once(game_window&, const augs::machine_entropy::local_type& precollected, const bool swap_buffers = true);
 };

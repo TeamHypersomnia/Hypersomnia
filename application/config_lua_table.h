@@ -1,10 +1,27 @@
 #pragma once
 #include <string>
 #include "augs/math/vec2.h"
+#include "game/enums/input_recording_type.h"
+#include "augs/scripting/lua_state_wrapper.h"
+
+#include <thread>
+#include <mutex>
 
 class game_window;
 
-class config_values {
+class config_lua_table {
+	augs::lua_state_wrapper lua;
+	std::mutex lua_mutex;
+
+	template<class T>
+	void get_config_value(const std::string& field, T& into) {
+		std::unique_lock<std::mutex> lock(lua_mutex);
+
+		into = luabind::object_cast<T>(luabind::globals(lua.raw)["config_table"][field]);
+	}
+
+	void get_config_value(const std::string& field, bool& into);
+
 public:
 	int launch_mode = 0;
 	int input_recording_mode = 0;
@@ -62,5 +79,29 @@ public:
 	bool skip_credits = false;
 	std::string latest_news_url;
 
-	void get_values(game_window&);
+	config_lua_table();
+
+	void get_values();
+
+	void call_config_script(const std::string& filename, const std::string& alternative_filename);
+	void call_window_script(game_window&, const std::string& filename);
+
+	enum class launch_type {
+		INVALID,
+
+		MAIN_MENU,
+
+		LOCAL,
+		LOCAL_DETERMINISM_TEST,
+		DIRECTOR,
+
+		ONLY_CLIENT,
+		ONLY_SERVER,
+
+		CLIENT_AND_SERVER,
+		TWO_CLIENTS_AND_SERVER,
+	};
+	
+	launch_type get_launch_mode() const;
+	input_recording_type get_input_recording_mode() const;
 };

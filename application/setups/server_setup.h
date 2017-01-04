@@ -54,5 +54,5 @@ class server_setup : public setup_base {
 public:
 	void wait_for_listen_server();
 
-	void process(game_window&, bool start_alternative_server = false);
+	void process(const config_lua_table& cfg, game_window&, bool start_alternative_server = false);
 };

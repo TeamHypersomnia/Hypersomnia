@@ -23,9 +23,8 @@
 
 using namespace augs::window::event::keys;
 
-void local_setup::process(game_window& window) {
+void local_setup::process(const config_lua_table& cfg, game_window& window) {
 	const vec2i screen_size = vec2i(window.get_screen_size());
-	const auto& cfg = window.config;
 
 	cosmos hypersomnia(3000);
 
@@ -34,14 +33,14 @@ void local_setup::process(game_window& window) {
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
 	scene_managers::testbed testbed;
-	testbed.debug_var = window.config.debug_var;
+	testbed.debug_var = cfg.debug_var;
 
 	if (!hypersomnia.load_from_file("save.state")) {
 		hypersomnia.set_fixed_delta(cfg.tickrate);
 		testbed.populate_world_with_entities(hypersomnia, screen_size);
 	}
 
-	if (window.get_input_recording_mode() != input_recording_mode::DISABLED) {
+	if (cfg.get_input_recording_mode() != input_recording_type::DISABLED) {
 		if (player.try_to_load_or_save_new_session("sessions/", "recorded.inputs")) {
 			timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
 		}
@@ -62,7 +61,7 @@ void local_setup::process(game_window& window) {
 			augs::machine_entropy new_entropy;
 
 			session.local_entropy_profiler.new_measurement();
-			new_entropy.local = window.collect_entropy();
+			new_entropy.local = window.collect_entropy(!cfg.debug_disable_cursor_clipping);
 			session.local_entropy_profiler.end_measurement();
 			
 			session.control(new_entropy);

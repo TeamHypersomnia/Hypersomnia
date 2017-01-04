@@ -15,7 +15,7 @@
 #include "augs/templates/string_templates.h"
 #include <fstream>
 
-#include "application/config_values.h"
+#include "application/config_lua_table.h"
 
 int get_origin(void *cls, enum MHD_ValueKind kind,
 	const char *key, const char *value)
@@ -75,7 +75,7 @@ ahc_echo(void *cls,
 	return ret;
 }
 
-bool session_report::start_daemon(const config_values& cfg) {
+bool session_report::start_daemon(const config_lua_table& cfg) {
 	std::string contents = augs::get_file_contents(cfg.server_http_daemon_html_file_path);
 	
 	const std::string survey_num_token = "%survey_num%";
@@ -85,7 +85,7 @@ bool session_report::start_daemon(const config_values& cfg) {
 	const std::string post_data_path = cfg.db_path + cfg.post_data_file_path;
 	int survey_num = 0;
 
-	last_seen_updater = [cfg, post_data_path]() {
+	last_seen_updater = [&cfg, post_data_path]() {
 		while (true) {
 			using namespace std::literals::chrono_literals;
 			augs::http_post_request(cfg.last_session_update_link, "", augs::get_file_contents(post_data_path));
@@ -139,7 +139,7 @@ void session_report::fetch_stats(const std::string new_stats) {
 }
 
 #else
-bool session_report::start_daemon(const config_values& cfg) {
+bool session_report::start_daemon(const config_lua_table& cfg) {
 	return false;
 }
 

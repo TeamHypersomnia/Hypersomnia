@@ -25,12 +25,12 @@
 #include "augs/misc/templated_readwrite.h"
 #include "client_setup.h"
 
-void client_setup::process(game_window& window) {
-	init(window);
+void client_setup::process(const config_lua_table& cfg, game_window& window) {
+	init(cfg, window);
 
 	while (!should_quit) {
 		session.local_entropy_profiler.new_measurement();
-		auto precollected = window.collect_entropy();
+		auto precollected = window.collect_entropy(!cfg.debug_disable_cursor_clipping);
 		session.local_entropy_profiler.end_measurement();
 
 		if (process_exit_key(precollected))
@@ -40,9 +40,8 @@ void client_setup::process(game_window& window) {
 	}
 }
 
-void client_setup::init(game_window& window, const std::string recording_filename, const bool use_alternative_port) {
+void client_setup::init(const config_lua_table& cfg, game_window& window, const std::string recording_filename, const bool use_alternative_port) {
 	const vec2i screen_size = vec2i(window.get_screen_size());
-	const auto& cfg = window.config;
 
 	scene_managers::networked_testbed_client().populate_world_with_entities(initial_hypersomnia);
 
@@ -55,7 +54,7 @@ void client_setup::init(game_window& window, const std::string recording_filenam
 		scene.populate_world_with_entities(hypersomnia);
 	}
 
-	if (window.get_input_recording_mode() != input_recording_mode::DISABLED) {
+	if (cfg.get_input_recording_mode() != input_recording_type::DISABLED) {
 		if (player.try_to_load_or_save_new_session("sessions/", recording_filename)) {
 			timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
 		}

@@ -5,18 +5,18 @@
 
 #include "application/game_window.h"
 
-void two_clients_and_server_setup::process(game_window& window) {
+void two_clients_and_server_setup::process(const config_lua_table& cfg, game_window& window) {
 	server_setup serv_setup;
 
-	std::thread server_thread([&window, &serv_setup]() {
-		serv_setup.process(window, true);
+	std::thread server_thread([&]() {
+		serv_setup.process(cfg, window, true);
 	});
 
 	serv_setup.wait_for_listen_server();
 
 	client_setup setups[2];
-	setups[0].init(window, "recorded_0.inputs");
-	setups[1].init(window, "recorded_1.inputs", true);
+	setups[0].init(cfg, window, "recorded_0.inputs");
+	setups[1].init(cfg, window, "recorded_1.inputs", true);
 
 	setups[0].session.camera.camera.visible_world_area.x /= 2;
 	setups[1].session.camera.camera.visible_world_area.x /= 2;
@@ -31,7 +31,7 @@ void two_clients_and_server_setup::process(game_window& window) {
 	while (!should_quit) {
 		setups[0].session.local_entropy_profiler.new_measurement();
 		setups[1].session.local_entropy_profiler.new_measurement();
-		auto precollected = window.collect_entropy();
+		auto precollected = window.collect_entropy(!cfg.debug_disable_cursor_clipping);
 		setups[0].session.local_entropy_profiler.end_measurement();
 		setups[1].session.local_entropy_profiler.end_measurement();
 

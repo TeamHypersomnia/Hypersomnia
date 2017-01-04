@@ -23,8 +23,7 @@
 
 #include "augs/misc/templated_readwrite.h"
 
-void determinism_test_setup::process(game_window& window) {
-	const auto& cfg = window.config;
+void determinism_test_setup::process(const config_lua_table& cfg, game_window& window) {
 	const vec2i screen_size = vec2i(window.get_screen_size());
 
 	const unsigned cosmoi_count = 1 + cfg.determinism_test_cloned_cosmoi_count;
@@ -51,7 +50,7 @@ void determinism_test_setup::process(game_window& window) {
 		ensure(h == hypersomnias[0]);
 	}
 
-	if (window.get_input_recording_mode() != input_recording_mode::DISABLED) {
+	if (cfg.get_input_recording_mode() != input_recording_type::DISABLED) {
 		if (player.try_to_load_or_save_new_session("sessions/", "recorded.inputs")) {
 			timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
 		}
@@ -76,7 +75,7 @@ void determinism_test_setup::process(game_window& window) {
 	while (!should_quit) {
 		augs::machine_entropy new_entropy;
 
-		new_entropy.local = window.collect_entropy();
+		new_entropy.local = window.collect_entropy(!cfg.debug_disable_cursor_clipping);
 		
 		if (process_exit_key(new_entropy.local))
 			break;

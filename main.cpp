@@ -23,78 +23,79 @@ int main(int argc, char** argv) {
 	augs::global_libraries::init();
 	augs::global_libraries::run_googletest(argc, argv);
 
-	LOG(argv[0]);
+	config_lua_table cfg;
+	cfg.call_config_script("config.lua", "config.local.lua");
+	
+	audio_manager::generate_alsoft_ini(cfg.enable_hrtf);
+	audio_manager audio;
 
 	game_window window;
-	window.call_config_script("config.lua", "config.local.lua");
-
-	audio_manager::generate_alsoft_ini(window.config.enable_hrtf);
-	audio_manager audio;
+	cfg.call_window_script(window, "window.lua");
 
 	resource_setups::load_standard_everything();
 
-	const auto mode = window.get_launch_mode();
+	const auto mode = cfg.get_launch_mode();
 	LOG("Launch mode: %x", static_cast<int>(mode));
 
 	switch (mode) {
-	case game_window::launch_mode::MAIN_MENU:
+	case config_lua_table::launch_type::MAIN_MENU:
 	{
 		menu_setup setup;
-		setup.process(window);
+		setup.process(cfg, window);
 	}
 		break;
-	case game_window::launch_mode::LOCAL:
+	case config_lua_table::launch_type::LOCAL:
 	{
 		local_setup setup;
-		setup.process(window);
+		setup.process(cfg, window);
 	}
 		break;
-	case game_window::launch_mode::LOCAL_DETERMINISM_TEST:
+	case config_lua_table::launch_type::LOCAL_DETERMINISM_TEST:
 	{
 		determinism_test_setup setup;
-		setup.process(window);
+		setup.process(cfg, window);
 	}
-	case game_window::launch_mode::DIRECTOR:
+	case config_lua_table::launch_type::DIRECTOR:
 	{
 		director_setup setup;
-		setup.process(window);
+		setup.process(cfg, window);
 	}
 		break;
-	case game_window::launch_mode::CLIENT_AND_SERVER:
+	case config_lua_table::launch_type::CLIENT_AND_SERVER:
 	{
 		server_setup serv_setup;
 		
-		std::thread server_thread([&window, &serv_setup]() {
-			serv_setup.process(window);
+		std::thread server_thread([&]() {
+			serv_setup.process(cfg, window);
 		});
 		
 		serv_setup.wait_for_listen_server();
 		
 		client_setup setup;
-		setup.process(window);
+		setup.process(cfg, window);
 		
 		serv_setup.should_quit = true;
 		
 		server_thread.join();
 	}
 	break;
-	case game_window::launch_mode::TWO_CLIENTS_AND_SERVER:
+	case config_lua_table::launch_type::TWO_CLIENTS_AND_SERVER:
 	{
 		two_clients_and_server_setup setup;
-		setup.process(window);
+		setup.process(cfg, window);
 	}
 	break;
-	case game_window::launch_mode::ONLY_CLIENT:  
+	case config_lua_table::launch_type::ONLY_CLIENT:  
 	{
 
 		client_setup setup;
-		setup.process(window);
+		setup.process(cfg, window);
 	}
 		break;
-	case game_window::launch_mode::ONLY_SERVER: 
+	case config_lua_table::launch_type::ONLY_SERVER: 
 	{
 		server_setup setup;
-		setup.process(window);
+		setup.process(cfg, window);
 	}
 		break;
 

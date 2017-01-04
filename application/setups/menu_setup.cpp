@@ -45,9 +45,8 @@ using namespace augs::window::event::keys;
 using namespace augs::gui::text;
 using namespace augs::gui;
 
-void menu_setup::process(game_window& window) {
+void menu_setup::process(const config_lua_table& cfg, game_window& window) {
 	const vec2i screen_size = vec2i(window.get_screen_size());
-	const auto& cfg = window.config;
 
 	cosmos intro_scene(3000);
 	
@@ -106,7 +105,7 @@ void menu_setup::process(game_window& window) {
 	timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
 
 	scene_managers::testbed testbed;
-	testbed.debug_var = window.config.debug_var;
+	testbed.debug_var = cfg.debug_var;
 
 	intro_scene.set_fixed_delta(cfg.tickrate);
 	testbed.populate_world_with_entities(intro_scene, screen_size);
@@ -496,7 +495,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 
 		{
 			session.local_entropy_profiler.new_measurement();
-			new_entropy.local = window.collect_entropy();
+			new_entropy.local = window.collect_entropy(!cfg.debug_disable_cursor_clipping);
 			session.local_entropy_profiler.end_measurement();
 			
 			session.control(new_entropy);

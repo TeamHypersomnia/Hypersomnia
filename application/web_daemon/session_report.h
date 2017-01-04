@@ -2,7 +2,7 @@
 #include <mutex>
 #include <functional>
 
-class config_values;
+class config_lua_table;
 
 struct session_report {
 	struct MHD_Daemon *d = nullptr;
@@ -17,7 +17,7 @@ struct session_report {
 
 	void fetch_stats(std::string new_stats);
 
-	bool start_daemon(const config_values& cfg);
+	bool start_daemon(const config_lua_table& cfg);
 	void stop_daemon();
 };
 

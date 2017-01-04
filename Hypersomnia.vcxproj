@@ -317,7 +317,7 @@
     <ClCompile Include="3rdparty\lua\lzio.c" />
     <ClCompile Include="3rdparty\polypartition\src\polypartition.cpp" />
     <ClCompile Include="3rdparty\rectpack2D\src\pack.cpp" />
-    <ClCompile Include="application\config_values.cpp" />
+    <ClCompile Include="application\config_lua_table.cpp" />
     <ClCompile Include="application\setups\director_setup.cpp" />
     <ClCompile Include="application\setups\menu_setup.cpp" />
     <ClCompile Include="application\ui\app_ui_root.cpp" />
@@ -991,7 +991,7 @@
     <ClInclude Include="3rdparty\lua\lzio.h" />
     <ClInclude Include="3rdparty\polypartition\src\polypartition.h" />
     <ClInclude Include="3rdparty\rectpack2D\src\pack.h" />
-    <ClInclude Include="application\config_values.h" />
+    <ClInclude Include="application\config_lua_table.h" />
     <ClInclude Include="application\menu_button_type.h" />
     <ClInclude Include="application\setups\client_setup.h" />
     <ClInclude Include="application\setups\determinism_test_setup.h" />
@@ -1118,7 +1118,7 @@
     <ClInclude Include="game\detail\item_slot_transfer_request_declaration.h" />
     <ClInclude Include="game\detail\world_camera.h" />
     <ClInclude Include="game\enums\entity_flag.h" />
-    <ClInclude Include="game\enums\input_recording_mode.h" />
+    <ClInclude Include="game\enums\input_recording_type.h" />
     <ClInclude Include="game\enums\renderable_drawing_type.h" />
     <ClInclude Include="game\enums\sound_response_type.h" />
     <ClInclude Include="game\messages\visibility_information.h" />

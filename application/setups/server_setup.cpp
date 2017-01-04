@@ -78,9 +78,7 @@ augs::network::server& server_setup::choose_server(augs::network::endpoint_addre
 	return alternative_serv;
 }
 
-void server_setup::process(game_window& window, const bool start_alternative_server) {
-	const auto& cfg = window.config;
-	
+void server_setup::process(const config_lua_table& cfg, game_window& window, const bool start_alternative_server) {
 	session_report rep;
 
 	cosmos hypersomnia_last_snapshot(3000);
@@ -99,7 +97,7 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 		scene.populate_world_with_entities(hypersomnia);
 	}
 
-	if (window.get_input_recording_mode() != input_recording_mode::DISABLED) {
+	if (cfg.get_input_recording_mode() != input_recording_type::DISABLED) {
 		if (player.try_to_load_or_save_new_session("server_sessions/", "server_recorded.inputs")) {
 			timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
 		}
@@ -149,7 +147,7 @@ void server_setup::process(game_window& window, const bool start_alternative_ser
 	while (!should_quit) {
 		augs::machine_entropy new_entropy;
 
-		new_entropy.local = window.collect_entropy();
+		new_entropy.local = window.collect_entropy(!cfg.debug_disable_cursor_clipping);
 		new_entropy.remote = serv.collect_entropy();
 
 		if (start_alternative_server) {

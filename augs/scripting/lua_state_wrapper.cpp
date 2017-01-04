@@ -36,9 +36,25 @@ namespace augs {
 	bool lua_state_wrapper::dofile(const std::string& filename) {
 		script my_script(*this);
 		my_script.associate_filename(filename);
-		return my_script.call();
-	}
 
+		bool result = false;
+
+		try {
+			if (result = my_script.call()) {
+				debug_response();
+			}
+		}
+		catch (char* e) {
+			LOG("Exception thrown! %x", e);
+			debug_response();
+		}
+		catch (...) {
+			LOG("Exception thrown!");
+			debug_response();
+		}
+
+		return result;
+	}
 
 	std::string lua_state_wrapper::get_error_and_stack() {
 		lua_State* L = raw;
