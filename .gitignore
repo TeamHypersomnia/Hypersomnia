@@ -197,3 +197,4 @@ CTestTestfile.cmake
 *.exp
 Hypersomnia.lib
 Hypersomnia-Debug.lib
+alsoft.ini
