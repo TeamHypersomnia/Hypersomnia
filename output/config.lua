@@ -30,7 +30,7 @@ config_table = {
 	determinism_test_cloned_cosmoi_count = 2,
 
 	window_name = "example",
-	fullscreen = 1,
+	fullscreen = 0,
 	window_border = 1,
 	window_x = 100,
 	window_y = 10,
@@ -38,6 +38,8 @@ config_table = {
 	resolution_w = 1280,
 	resolution_h = 768,
 	doublebuffer = 1,
+
+	enable_hrtf = 1,
 
 	sound_effects_volume = 1,
 	music_volume = 1,
@@ -85,7 +87,7 @@ config_table = {
 	rewind_intro_scene_by_secs = 3.5,
 	start_menu_music_at_secs = 63.5 - 22.5,
 
-	skip_credits = 0,
+	skip_credits = 1,
 	latest_news_url = "http://hypersomnia.pl/latest_post/"
 }
 

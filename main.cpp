@@ -16,14 +16,20 @@
 
 #include <thread>
 
+#include "augs/filesystem/file.h"
+#include "augs/filesystem/directory.h"
+
 int main(int argc, char** argv) {
 	augs::global_libraries::init();
 	augs::global_libraries::run_googletest(argc, argv);
-	
-	audio_manager audio;
+
+	LOG(argv[0]);
 
 	game_window window;
 	window.call_window_script("config.lua", "config.local.lua");
+
+	audio_manager::generate_alsoft_ini(window.config.enable_hrtf);
+	audio_manager audio;
 
 	resource_setups::load_standard_everything();
 

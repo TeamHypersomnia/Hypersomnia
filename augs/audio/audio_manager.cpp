@@ -8,6 +8,9 @@
 #include "augs/al_log.h"
 #include "augs/ensure.h"
 
+#include "augs/filesystem/file.h"
+#include "augs/filesystem/directory.h"
+
 static void list_audio_devices(const ALCchar *devices)
 {
 	const ALCchar *device = devices, *next = devices + 1;
@@ -25,6 +28,18 @@ static void list_audio_devices(const ALCchar *devices)
 }
 
 namespace augs {
+	void audio_manager::generate_alsoft_ini(const bool hrtf_enabled) {
+		std::string alsoft_ini_file;
+		alsoft_ini_file += "# Do not modify.";
+		alsoft_ini_file += "\n# Hypersomnia generates this file every launch to speak with OpenAL.";
+		alsoft_ini_file += "\n# Modification will have no effect.";
+		alsoft_ini_file += "\nhrtf = ";
+		alsoft_ini_file += hrtf_enabled ? "true" : "false";
+		alsoft_ini_file += "\nhrtf-paths = " + augs::get_executable_directory() + "\\hrtf";
+
+		augs::create_text_file(std::string("alsoft.ini"), alsoft_ini_file);
+	}
+
 	audio_manager::audio_manager() {
 		alGetError();
 

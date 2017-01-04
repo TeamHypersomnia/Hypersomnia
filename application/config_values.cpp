@@ -15,7 +15,8 @@ void config_values::get_values(game_window& w) {
 	set(NVP(recording_replay_speed));
 
 	set(NVP(determinism_test_cloned_cosmoi_count));
-
+	
+	set(NVP(enable_hrtf));
 	set(NVP(sound_effects_volume));
 	set(NVP(music_volume));
 

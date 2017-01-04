@@ -11,6 +11,12 @@ namespace augs {
 	std::vector<std::string> get_file_lines(const std::string& filename);
 
 	template <class T>
+	void create_text_file(const T& filename, const T& text) {
+		std::ofstream out(filename, std::ios::out);
+		out << text;
+	}
+
+	template <class T>
 	void write_file_binary(std::string filename, T& target) {
 		std::ofstream out(filename, std::ios::out | std::ios::binary);
 		out.write(target.data(), target.size());

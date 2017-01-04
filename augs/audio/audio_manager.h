@@ -16,6 +16,8 @@ namespace augs {
 		audio_manager& operator=(audio_manager&&) = delete;
 
 	public:
+		static void generate_alsoft_ini(const bool hrtf_enabled);
+
 		audio_manager();
 		~audio_manager();
 

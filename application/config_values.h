@@ -12,6 +12,8 @@ public:
 	float recording_replay_speed = 1.f;
 
 	unsigned determinism_test_cloned_cosmoi_count = 0;
+	
+	bool enable_hrtf = true;
 
 	float sound_effects_volume = 1.f;
 	float music_volume = 1.f;

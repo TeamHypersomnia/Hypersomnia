@@ -2,6 +2,8 @@
 #include <experimental/filesystem>
 #include <string>
 
+#include <windows.h>
+
 namespace fs = std::experimental::filesystem;
 
 namespace augs {
@@ -23,5 +25,14 @@ namespace augs {
 		}
 
 		return std::move(result);
+	}
+
+	std::string get_executable_directory() {
+		HMODULE hModule = GetModuleHandleW(NULL);
+		WCHAR path[MAX_PATH];
+		int chars = GetModuleFileNameW(hModule, path, MAX_PATH);
+
+		std::string s1(path, path + chars);
+		return s1.substr(0, s1.find_last_of("\\/"));
 	}
 }
