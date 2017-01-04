@@ -69,24 +69,24 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir);$(SolutionDir)\augs;$(SolutionDir)\3rdparty;$(SolutionDir)\3rdparty\googletest\googletest\include;$(SolutionDir)\3rdparty\googletest\googletest;$(SolutionDir)\3rdparty\freetype;$(SolutionDir)\3rdparty\enet\include;$(SolutionDir)\3rdparty\freetype\include;$(SolutionDir)\3rdparty\libsndfile\include;$(SolutionDir)\3rdparty\lua;$(SolutionDir)\3rdparty\luabind-deboostified;$(SolutionDir)\3rdparty\openal-soft-build;$(SolutionDir)\3rdparty\openal-soft\include;$(SolutionDir)\3rdparty\lua\src;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)\augs;$(SolutionDir)\3rdparty;$(SolutionDir)\3rdparty\googletest\googletest\include;$(SolutionDir)\3rdparty\googletest\googletest;$(SolutionDir)\3rdparty\freetype;$(SolutionDir)\3rdparty\enet\include;$(SolutionDir)\3rdparty\freetype\include;$(SolutionDir)\3rdparty\libsndfile\include;$(SolutionDir)\3rdparty\lua;$(SolutionDir)\3rdparty\luabind-deboostified;$(SolutionDir)\3rdparty\openal-soft-build;$(SolutionDir)\3rdparty\openal-soft\include;$(SolutionDir)\3rdparty\lua;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <TargetName>$(ProjectName)</TargetName>
     <OutDir>$(SolutionDir)output/</OutDir>
     <LibraryPath>$(SolutionDir)\3rdparty\libsndfile\lib;$(SolutionDir)\3rdparty\http;$(SolutionDir)\3rdparty\openal-soft-build\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir);$(SolutionDir)\augs;$(SolutionDir)\3rdparty;$(SolutionDir)\3rdparty\googletest\googletest\include;$(SolutionDir)\3rdparty\googletest\googletest;$(SolutionDir)\3rdparty\freetype;$(SolutionDir)\3rdparty\enet\include;$(SolutionDir)\3rdparty\freetype\include;$(SolutionDir)\3rdparty\libsndfile\include;$(SolutionDir)\3rdparty\lua;$(SolutionDir)\3rdparty\luabind-deboostified;$(SolutionDir)\3rdparty\lua\src;$(SolutionDir)\3rdparty\openal-soft-build;$(SolutionDir)\3rdparty\openal-soft\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)\augs;$(SolutionDir)\3rdparty;$(SolutionDir)\3rdparty\googletest\googletest\include;$(SolutionDir)\3rdparty\googletest\googletest;$(SolutionDir)\3rdparty\freetype;$(SolutionDir)\3rdparty\enet\include;$(SolutionDir)\3rdparty\freetype\include;$(SolutionDir)\3rdparty\libsndfile\include;$(SolutionDir)\3rdparty\lua;$(SolutionDir)\3rdparty\luabind-deboostified;$(SolutionDir)\3rdparty\lua;$(SolutionDir)\3rdparty\openal-soft-build;$(SolutionDir)\3rdparty\openal-soft\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <TargetName>$(ProjectName)-$(Configuration)</TargetName>
     <OutDir>$(SolutionDir)output/</OutDir>
     <LibraryPath>$(SolutionDir)\3rdparty\libsndfile\lib;$(SolutionDir)\3rdparty\http;$(SolutionDir)\3rdparty\openal-soft-build\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir);$(SolutionDir)\augs;$(SolutionDir)\3rdparty;$(SolutionDir)\3rdparty\googletest\googletest\include;$(SolutionDir)\3rdparty\googletest\googletest;$(SolutionDir)\3rdparty\freetype;$(SolutionDir)\3rdparty\enet\include;$(SolutionDir)\3rdparty\freetype\include;$(SolutionDir)\3rdparty\luabind-deboostified;$(SolutionDir)\3rdparty\lua\src;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)\augs;$(SolutionDir)\3rdparty;$(SolutionDir)\3rdparty\googletest\googletest\include;$(SolutionDir)\3rdparty\googletest\googletest;$(SolutionDir)\3rdparty\freetype;$(SolutionDir)\3rdparty\enet\include;$(SolutionDir)\3rdparty\freetype\include;$(SolutionDir)\3rdparty\luabind-deboostified;$(SolutionDir)\3rdparty\lua;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <TargetName>$(ProjectName)-$(Configuration)</TargetName>
     <OutDir>$(SolutionDir)output/</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir);$(SolutionDir)\augs;$(SolutionDir)\3rdparty;$(SolutionDir)\3rdparty\googletest\googletest\include;$(SolutionDir)\3rdparty\googletest\googletest;$(SolutionDir)\3rdparty\freetype;$(SolutionDir)\3rdparty\enet\include;$(SolutionDir)\3rdparty\freetype\include;$(SolutionDir)\3rdparty\luabind-deboostified;$(SolutionDir)\3rdparty\lua\src;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)\augs;$(SolutionDir)\3rdparty;$(SolutionDir)\3rdparty\googletest\googletest\include;$(SolutionDir)\3rdparty\googletest\googletest;$(SolutionDir)\3rdparty\freetype;$(SolutionDir)\3rdparty\enet\include;$(SolutionDir)\3rdparty\freetype\include;$(SolutionDir)\3rdparty\luabind-deboostified;$(SolutionDir)\3rdparty\lua;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <TargetName>$(ProjectName)-$(Configuration)</TargetName>
     <OutDir>$(SolutionDir)output/</OutDir>
   </PropertyGroup>
@@ -282,39 +282,39 @@
     <ClCompile Include="3rdparty\luabind-deboostified\src\stack_content_by_name.cpp" />
     <ClCompile Include="3rdparty\luabind-deboostified\src\weak_ref.cpp" />
     <ClCompile Include="3rdparty\luabind-deboostified\src\wrapper_base.cpp" />
-    <ClCompile Include="3rdparty\lua\src\lapi.c" />
-    <ClCompile Include="3rdparty\lua\src\lauxlib.c" />
-    <ClCompile Include="3rdparty\lua\src\lbaselib.c" />
-    <ClCompile Include="3rdparty\lua\src\lbitlib.c" />
-    <ClCompile Include="3rdparty\lua\src\lcode.c" />
-    <ClCompile Include="3rdparty\lua\src\lcorolib.c" />
-    <ClCompile Include="3rdparty\lua\src\lctype.c" />
-    <ClCompile Include="3rdparty\lua\src\ldblib.c" />
-    <ClCompile Include="3rdparty\lua\src\ldebug.c" />
-    <ClCompile Include="3rdparty\lua\src\ldo.c" />
-    <ClCompile Include="3rdparty\lua\src\ldump.c" />
-    <ClCompile Include="3rdparty\lua\src\lfunc.c" />
-    <ClCompile Include="3rdparty\lua\src\lgc.c" />
-    <ClCompile Include="3rdparty\lua\src\linit.c" />
-    <ClCompile Include="3rdparty\lua\src\liolib.c" />
-    <ClCompile Include="3rdparty\lua\src\llex.c" />
-    <ClCompile Include="3rdparty\lua\src\lmathlib.c" />
-    <ClCompile Include="3rdparty\lua\src\lmem.c" />
-    <ClCompile Include="3rdparty\lua\src\loadlib.c" />
-    <ClCompile Include="3rdparty\lua\src\lobject.c" />
-    <ClCompile Include="3rdparty\lua\src\lopcodes.c" />
-    <ClCompile Include="3rdparty\lua\src\loslib.c" />
-    <ClCompile Include="3rdparty\lua\src\lparser.c" />
-    <ClCompile Include="3rdparty\lua\src\lstate.c" />
-    <ClCompile Include="3rdparty\lua\src\lstring.c" />
-    <ClCompile Include="3rdparty\lua\src\lstrlib.c" />
-    <ClCompile Include="3rdparty\lua\src\ltable.c" />
-    <ClCompile Include="3rdparty\lua\src\ltablib.c" />
-    <ClCompile Include="3rdparty\lua\src\ltm.c" />
-    <ClCompile Include="3rdparty\lua\src\lundump.c" />
-    <ClCompile Include="3rdparty\lua\src\lutf8lib.c" />
-    <ClCompile Include="3rdparty\lua\src\lvm.c" />
-    <ClCompile Include="3rdparty\lua\src\lzio.c" />
+    <ClCompile Include="3rdparty\lua\lapi.c" />
+    <ClCompile Include="3rdparty\lua\lauxlib.c" />
+    <ClCompile Include="3rdparty\lua\lbaselib.c" />
+    <ClCompile Include="3rdparty\lua\lbitlib.c" />
+    <ClCompile Include="3rdparty\lua\lcode.c" />
+    <ClCompile Include="3rdparty\lua\lcorolib.c" />
+    <ClCompile Include="3rdparty\lua\lctype.c" />
+    <ClCompile Include="3rdparty\lua\ldblib.c" />
+    <ClCompile Include="3rdparty\lua\ldebug.c" />
+    <ClCompile Include="3rdparty\lua\ldo.c" />
+    <ClCompile Include="3rdparty\lua\ldump.c" />
+    <ClCompile Include="3rdparty\lua\lfunc.c" />
+    <ClCompile Include="3rdparty\lua\lgc.c" />
+    <ClCompile Include="3rdparty\lua\linit.c" />
+    <ClCompile Include="3rdparty\lua\liolib.c" />
+    <ClCompile Include="3rdparty\lua\llex.c" />
+    <ClCompile Include="3rdparty\lua\lmathlib.c" />
+    <ClCompile Include="3rdparty\lua\lmem.c" />
+    <ClCompile Include="3rdparty\lua\loadlib.c" />
+    <ClCompile Include="3rdparty\lua\lobject.c" />
+    <ClCompile Include="3rdparty\lua\lopcodes.c" />
+    <ClCompile Include="3rdparty\lua\loslib.c" />
+    <ClCompile Include="3rdparty\lua\lparser.c" />
+    <ClCompile Include="3rdparty\lua\lstate.c" />
+    <ClCompile Include="3rdparty\lua\lstring.c" />
+    <ClCompile Include="3rdparty\lua\lstrlib.c" />
+    <ClCompile Include="3rdparty\lua\ltable.c" />
+    <ClCompile Include="3rdparty\lua\ltablib.c" />
+    <ClCompile Include="3rdparty\lua\ltm.c" />
+    <ClCompile Include="3rdparty\lua\lundump.c" />
+    <ClCompile Include="3rdparty\lua\lutf8lib.c" />
+    <ClCompile Include="3rdparty\lua\lvm.c" />
+    <ClCompile Include="3rdparty\lua\lzio.c" />
     <ClCompile Include="3rdparty\polypartition\src\polypartition.cpp" />
     <ClCompile Include="3rdparty\rectpack2D\src\pack.cpp" />
     <ClCompile Include="application\config_values.cpp" />
@@ -963,32 +963,32 @@
     <ClInclude Include="3rdparty\luabind-deboostified\luabind\weak_ref.hpp" />
     <ClInclude Include="3rdparty\luabind-deboostified\luabind\wrapper_base.hpp" />
     <ClInclude Include="3rdparty\luabind-deboostified\luabind\yield_policy.hpp" />
-    <ClInclude Include="3rdparty\lua\src\lapi.h" />
-    <ClInclude Include="3rdparty\lua\src\lauxlib.h" />
-    <ClInclude Include="3rdparty\lua\src\lcode.h" />
-    <ClInclude Include="3rdparty\lua\src\lctype.h" />
-    <ClInclude Include="3rdparty\lua\src\ldebug.h" />
-    <ClInclude Include="3rdparty\lua\src\ldo.h" />
-    <ClInclude Include="3rdparty\lua\src\lfunc.h" />
-    <ClInclude Include="3rdparty\lua\src\lgc.h" />
-    <ClInclude Include="3rdparty\lua\src\llex.h" />
-    <ClInclude Include="3rdparty\lua\src\llimits.h" />
-    <ClInclude Include="3rdparty\lua\src\lmem.h" />
-    <ClInclude Include="3rdparty\lua\src\lobject.h" />
-    <ClInclude Include="3rdparty\lua\src\lopcodes.h" />
-    <ClInclude Include="3rdparty\lua\src\lparser.h" />
-    <ClInclude Include="3rdparty\lua\src\lprefix.h" />
-    <ClInclude Include="3rdparty\lua\src\lstate.h" />
-    <ClInclude Include="3rdparty\lua\src\lstring.h" />
-    <ClInclude Include="3rdparty\lua\src\ltable.h" />
-    <ClInclude Include="3rdparty\lua\src\ltm.h" />
-    <ClInclude Include="3rdparty\lua\src\lua.h" />
-    <ClInclude Include="3rdparty\lua\src\lua.hpp" />
-    <ClInclude Include="3rdparty\lua\src\luaconf.h" />
-    <ClInclude Include="3rdparty\lua\src\lualib.h" />
-    <ClInclude Include="3rdparty\lua\src\lundump.h" />
-    <ClInclude Include="3rdparty\lua\src\lvm.h" />
-    <ClInclude Include="3rdparty\lua\src\lzio.h" />
+    <ClInclude Include="3rdparty\lua\lapi.h" />
+    <ClInclude Include="3rdparty\lua\lauxlib.h" />
+    <ClInclude Include="3rdparty\lua\lcode.h" />
+    <ClInclude Include="3rdparty\lua\lctype.h" />
+    <ClInclude Include="3rdparty\lua\ldebug.h" />
+    <ClInclude Include="3rdparty\lua\ldo.h" />
+    <ClInclude Include="3rdparty\lua\lfunc.h" />
+    <ClInclude Include="3rdparty\lua\lgc.h" />
+    <ClInclude Include="3rdparty\lua\llex.h" />
+    <ClInclude Include="3rdparty\lua\llimits.h" />
+    <ClInclude Include="3rdparty\lua\lmem.h" />
+    <ClInclude Include="3rdparty\lua\lobject.h" />
+    <ClInclude Include="3rdparty\lua\lopcodes.h" />
+    <ClInclude Include="3rdparty\lua\lparser.h" />
+    <ClInclude Include="3rdparty\lua\lprefix.h" />
+    <ClInclude Include="3rdparty\lua\lstate.h" />
+    <ClInclude Include="3rdparty\lua\lstring.h" />
+    <ClInclude Include="3rdparty\lua\ltable.h" />
+    <ClInclude Include="3rdparty\lua\ltm.h" />
+    <ClInclude Include="3rdparty\lua\lua.h" />
+    <ClInclude Include="3rdparty\lua\lua.hpp" />
+    <ClInclude Include="3rdparty\lua\luaconf.h" />
+    <ClInclude Include="3rdparty\lua\lualib.h" />
+    <ClInclude Include="3rdparty\lua\lundump.h" />
+    <ClInclude Include="3rdparty\lua\lvm.h" />
+    <ClInclude Include="3rdparty\lua\lzio.h" />
     <ClInclude Include="3rdparty\polypartition\src\polypartition.h" />
     <ClInclude Include="3rdparty\rectpack2D\src\pack.h" />
     <ClInclude Include="application\config_values.h" />
