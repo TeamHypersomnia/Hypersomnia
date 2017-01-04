@@ -53,6 +53,10 @@ public:
 	std::string menu_intro_scenario_filename;
 
 	std::string menu_theme_filename;
+
+	float rewind_intro_scene_by_secs = 3.5;
+	float start_menu_music_at_secs = 0.f;
+
 	bool skip_credits = false;
 	std::string latest_news_url;
 

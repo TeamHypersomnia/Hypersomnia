@@ -56,6 +56,10 @@ void config_values::get_values(game_window& w) {
 	set(NVP(menu_intro_scenario_filename));
 
 	set(NVP(menu_theme_filename));
+
+	set(NVP(rewind_intro_scene_by_secs));
+	set(NVP(start_menu_music_at_secs));
+
 	set(NVP(skip_credits));
 	set(NVP(latest_news_url));
 }

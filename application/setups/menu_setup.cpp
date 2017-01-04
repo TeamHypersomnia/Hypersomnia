@@ -54,13 +54,6 @@ void menu_setup::process(game_window& window) {
 	augs::single_sound_buffer menu_theme;
 	augs::sound_source menu_theme_source;
 
-	const float music_climax_at_secs = 63.5f;
-	const float until_climax_secs = 22.5f;
-	const float start_music_at_secs = 0.f;// music_climax_at_secs - until_climax_secs;
-	const float transition_to_climax_at_secs = 16.f;
-	const float rewind_scene_by_secs = 3.5f;
-	bool transition_complete = false;
-
 	float gain_fade_multiplier = 0.f;
 
 	if (cfg.music_volume > 0.f) {
@@ -69,8 +62,8 @@ void menu_setup::process(game_window& window) {
 
 			menu_theme_source.bind_buffer(menu_theme);
 			menu_theme_source.set_direct_channels(true);
-			menu_theme_source.set_gain(cfg.music_volume);
-			menu_theme_source.seek_to(start_music_at_secs);
+			menu_theme_source.seek_to(cfg.start_menu_music_at_secs);
+			menu_theme_source.set_gain(0.f);
 			menu_theme_source.play();
 		}
 	}
@@ -492,7 +485,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 		}
 	};
 
-	while (intro_scene.get_total_time_passed_in_seconds() < rewind_scene_by_secs) {
+	while (intro_scene.get_total_time_passed_in_seconds() < cfg.rewind_intro_scene_by_secs) {
 		const auto entropy = cosmic_entropy(director.get_entropy_for_step(intro_scene.get_total_steps_passed() - initial_step_number), intro_scene);
 
 		intro_scene.advance_deterministic_schemata(entropy, [](auto) {},
@@ -536,6 +529,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 		const auto vdt = session.frame_timer.extract_variable_delta(intro_scene.get_fixed_delta(), timer);
 		
 		session.set_master_gain(cfg.sound_effects_volume * 0.2f * gain_fade_multiplier);
+		menu_theme_source.set_gain(cfg.music_volume * gain_fade_multiplier);
 
 		session.advance_audiovisual_systems(intro_scene, testbed.get_selected_character(), vdt);
 
@@ -635,11 +629,6 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 
 		intro_actions.update(vdt);
 		credits_actions.update(vdt);
-
-		if (!transition_complete && menu_theme_source.get_time_in_seconds() >= transition_to_climax_at_secs) {
-			menu_theme_source.seek_to(music_climax_at_secs - until_climax_secs + transition_to_climax_at_secs);
-			transition_complete = true;
-		}
 
 		menu_title.get<components::sprite>().color = title_text_color;
 
