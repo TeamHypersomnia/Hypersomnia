@@ -1,4 +1,7 @@
-#include <lua/lualib.h>
+extern "C" {
+	#include <lua/lualib.h>
+}
+
 #include <luabind/luabind.hpp>
 #include "lua_state_wrapper.h"
 #include "script.h"

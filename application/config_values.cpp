@@ -1,4 +1,3 @@
-#include <lua/lualib.h>
 #include <luabind/luabind.hpp>
 
 #include "config_values.h"

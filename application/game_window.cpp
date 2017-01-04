@@ -1,4 +1,3 @@
-#include <lua/lualib.h>
 #include <luabind/luabind.hpp>
 
 #include "game_window.h"
