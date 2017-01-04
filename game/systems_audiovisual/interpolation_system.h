@@ -24,7 +24,7 @@ public:
 
 	void integrate_interpolated_transforms(const cosmos&, const augs::delta variable_delta, const augs::delta fixed_delta_for_slowdowns);
 
-	const components::transform& get_interpolated(const const_entity_handle) const;
+	components::transform get_interpolated(const const_entity_handle) const;
 	components::transform& get_interpolated(const const_entity_handle);
 
 	void reserve_caches_for_entities(const size_t);
