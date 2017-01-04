@@ -749,27 +749,12 @@ namespace scene_managers {
 
 		characters.assign(new_characters.begin(), new_characters.end());
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
-
-		const auto menu_title = world.create_entity("menu_title");
-
-		ingredients::sprite(menu_title, vec2(100, 100), assets::texture_id::MENU_GAME_LOGO, { 255, 255, 255, 0 }, render_layer::EFFECTS);
-		const auto menu_title_size = menu_title.get<components::sprite>().size;
-		menu_title.set_logic_transform(vec2(100, 100));
-
-		menu_title.get<components::render>().screen_space_transform = true;
-		menu_title.add_standard_components();
-
-		menu_title_entity = menu_title;
 	}
 
 	entity_id testbed::get_selected_character() const {
 		return selected_character;
 	}
 
-	entity_id testbed::get_menu_title_entity() const {
-		return menu_title_entity;
-	}
-	
 	void testbed::select_character(const entity_id h) {
 		selected_character = h;
 	}

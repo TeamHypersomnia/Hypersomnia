@@ -110,11 +110,10 @@ void menu_setup::process(game_window& window) {
 
 	intro_scene.set_fixed_delta(cfg.tickrate);
 	testbed.populate_world_with_entities(intro_scene, screen_size);
-	const auto menu_title = intro_scene[testbed.get_menu_title_entity()];
 
 	ltrb title_rect;
-	title_rect.set_position(menu_title.logic_transform().pos);
-	title_rect.set_size(menu_title.get<components::sprite>().size);
+	title_rect.set_position({ 100, 100 });
+	title_rect.set_size((*assets::texture_id::MENU_GAME_LOGO).get_size());
 
 	rgba fade_overlay_color = { 0, 2, 2, 255 };
 	rgba title_text_color = { 255, 255, 255, 0 };
@@ -527,7 +526,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 		menu_theme_source.set_gain(cfg.music_volume * gain_fade_multiplier);
 
 		session.advance_audiovisual_systems(intro_scene, testbed.get_selected_character(), vdt);
-
+		
 		auto& renderer = augs::renderer::get_current();
 		renderer.clear_current_fbo();
 
@@ -540,6 +539,11 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 		session.view(renderer, intro_scene, testbed.get_selected_character(), vdt, 
 			augs::gui::text::format(typesafe_sprintf(L"Current time: %x", current_time_seconds), textes_style), settings);
 		session.draw_color_overlay(renderer, fade_overlay_color);
+
+		augs::draw_rect(renderer.get_triangle_buffer(),
+			title_rect,
+			assets::texture_id::MENU_GAME_LOGO,
+			title_text_color);
 
 		if (tweened_welcome_message_bg_size.non_zero()) {
 			augs::draw_rect_with_border(renderer.get_triangle_buffer(),
@@ -624,8 +628,6 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 
 		intro_actions.update(vdt);
 		credits_actions.update(vdt);
-
-		menu_title.get<components::sprite>().color = title_text_color;
 
 		window.swap_buffers();
 	}
