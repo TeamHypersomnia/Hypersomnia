@@ -54,7 +54,14 @@ void menu_setup::process(game_window& window) {
 	augs::single_sound_buffer menu_theme;
 	augs::sound_source menu_theme_source;
 
-	const float start_music_at_secs = 0.f;
+	const float music_climax_at_secs = 63.5f;
+	const float until_climax_secs = 22.5f;
+	const float start_music_at_secs = 0.f;// music_climax_at_secs - until_climax_secs;
+	const float transition_to_climax_at_secs = 16.f;
+	const float rewind_scene_by_secs = 3.5f;
+	bool transition_complete = false;
+
+	float gain_fade_multiplier = 0.f;
 
 	if (cfg.music_volume > 0.f) {
 		if (augs::file_exists(cfg.menu_theme_filename)) {
@@ -398,6 +405,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 		if (!cfg.skip_credits) {
 			intro_actions.push_blocking(act(new augs::delay_action(500.f)));
 			intro_actions.push_non_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 100, 6000.f)));
+			intro_actions.push_non_blocking(act(new augs::tween_value_action<float>(gain_fade_multiplier, 1.f, 6000.f)));
 			intro_actions.push_blocking(act(new augs::delay_action(2000.f)));
 			
 			for (auto& t : intro_texts) {
@@ -461,8 +469,6 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 
 	testbed.configure_view(session);
 
-	session.set_master_gain(cfg.sound_effects_volume * 0.1f);
-
 	timer.reset_timer();
 
 	const auto initial_step_number = intro_scene.get_total_steps_passed();
@@ -485,6 +491,18 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 		default: break;
 		}
 	};
+
+	while (intro_scene.get_total_time_passed_in_seconds() < rewind_scene_by_secs) {
+		const auto entropy = cosmic_entropy(director.get_entropy_for_step(intro_scene.get_total_steps_passed() - initial_step_number), intro_scene);
+
+		intro_scene.advance_deterministic_schemata(entropy, [](auto) {},
+			[this, &session](const const_logic_step& step) {
+			session.acquire_game_events_for_hud(step);
+		}
+		);
+
+		session.resample_state_for_audiovisuals(intro_scene);
+	}
 
 	while (!should_quit) {
 		augs::machine_entropy new_entropy;
@@ -516,6 +534,8 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 		}
 
 		const auto vdt = session.frame_timer.extract_variable_delta(intro_scene.get_fixed_delta(), timer);
+		
+		session.set_master_gain(cfg.sound_effects_volume * 0.2f * gain_fade_multiplier);
 
 		session.advance_audiovisual_systems(intro_scene, testbed.get_selected_character(), vdt);
 
@@ -526,7 +546,10 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 		settings.draw_gui_overlays = false;
 		settings.draw_crosshairs = false;
 
-		session.view(renderer, intro_scene, testbed.get_selected_character(), vdt, augs::gui::text::fstr(), settings);
+		const auto current_time_seconds = intro_scene.get_total_time_passed_in_seconds();
+
+		session.view(renderer, intro_scene, testbed.get_selected_character(), vdt, 
+			augs::gui::text::format(typesafe_sprintf(L"Current time: %x", current_time_seconds), textes_style), settings);
 		session.draw_color_overlay(renderer, fade_overlay_color);
 
 		if (tweened_welcome_message_bg_size.non_zero()) {
@@ -612,6 +635,11 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 
 		intro_actions.update(vdt);
 		credits_actions.update(vdt);
+
+		if (!transition_complete && menu_theme_source.get_time_in_seconds() >= transition_to_climax_at_secs) {
+			menu_theme_source.seek_to(music_climax_at_secs - until_climax_secs + transition_to_climax_at_secs);
+			transition_complete = true;
+		}
 
 		menu_title.get<components::sprite>().color = title_text_color;
 

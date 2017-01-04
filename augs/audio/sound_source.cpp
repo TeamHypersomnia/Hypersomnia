@@ -58,6 +58,12 @@ namespace augs {
 	void sound_source::seek_to(const float seconds) const {
 		AL_CHECK(alSourcef(id, AL_SEC_OFFSET, seconds));
 	}
+	
+	float sound_source::get_time_in_seconds() const {
+		float seconds = 0.f;
+		AL_CHECK(alGetSourcef(id, AL_SEC_OFFSET, &seconds));
+		return seconds;
+	}
 
 	void sound_source::stop() const {
 		AL_CHECK(alSourceStop(id));

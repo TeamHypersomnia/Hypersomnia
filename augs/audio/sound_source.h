@@ -26,6 +26,7 @@ namespace augs {
 
 		void play() const;
 		void seek_to(const float seconds) const;
+		float get_time_in_seconds() const;
 		void stop() const;
 		void set_looping(const bool) const;
 		void set_pitch(const float) const;

@@ -16,6 +16,8 @@ namespace augs {
 		void push_blocking(std::unique_ptr<action>);
 		void push_non_blocking(std::unique_ptr<action>);
 
+		float calculate_duration_ms() const;
+
 		bool is_complete() const;
 	};
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include "action.h"
 #include "augs/math/vec2.h"
 #include "augs/misc/delta.h"
@@ -114,6 +115,22 @@ namespace augs {
 
 		bool is_complete() const final {
 			return elapsed_ms >= duration_ms;
+		}
+	};
+
+	class callback_action : public action {
+		std::function<void()> callback;
+
+		callback_action(std::function<void()> callback) : callback(callback) {}
+
+		void on_enter() final {}
+
+		void on_update(const delta dt) final {
+			callback();
+		}
+
+		bool is_complete() const final {
+			return true;
 		}
 	};
 }
