@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="P:\Projects\Hypersomnia\Hypersomnia\3rdparty\openal-soft\CMakeLists.txt" />
+    <CustomBuild Include="P:\Projects\Hypersomnia\Hypersomnia\3rdparty\openal-soft-build\CMakeFiles\9721e02ddb468be0dbc6136477d65a2d\build_version.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="P:\Projects\Hypersomnia\Hypersomnia\3rdparty\openal-soft-build\CMakeFiles\build_version" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{C450C18E-9928-3576-9213-5CE39091966F}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
