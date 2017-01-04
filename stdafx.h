@@ -1,5 +1,5 @@
 #pragma once
 //#pragma message("Compiling precompiled headers.\n")
 
-#include "lua.hpp"
+#include <lua/lua.h>
 #include <luabind/luabind.hpp>
