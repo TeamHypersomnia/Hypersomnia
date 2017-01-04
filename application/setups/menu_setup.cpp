@@ -406,6 +406,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 			}
 		}
 		else {
+			intro_actions.push_non_blocking(act(new augs::tween_value_action<float>(gain_fade_multiplier, 1.f, 6000.f)));
 			fade_overlay_color.a = 100;
 		}
 
@@ -528,7 +529,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 
 		const auto vdt = session.frame_timer.extract_variable_delta(intro_scene.get_fixed_delta(), timer);
 		
-		session.set_master_gain(cfg.sound_effects_volume * 0.2f * gain_fade_multiplier);
+		session.set_master_gain(cfg.sound_effects_volume * 0.3f * gain_fade_multiplier);
 		menu_theme_source.set_gain(cfg.music_volume * gain_fade_multiplier);
 
 		session.advance_audiovisual_systems(intro_scene, testbed.get_selected_character(), vdt);
