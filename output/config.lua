@@ -42,13 +42,13 @@ config_table = {
 	enable_hrtf = 1,
 
 	sound_effects_volume = 1,
-	music_volume = 1,
+	music_volume = 0,
 
 	debug_disable_cursor_clipping = 0,
 	
 	mouse_sensitivity = vec2(1.5, 1.5),
 	
-	connect_address = "127.0.0.1",
+	connect_address = "192.168.1.8",
 	connect_port = 13372,
 
 	server_port = 13372,
@@ -56,7 +56,7 @@ config_table = {
 	alternative_port = 13373,
 	
 	nickname = "Pythagoras",
-	debug_second_nickname = "Kartezjan",
+	debug_second_nickname = "Billan",
 	
 	tickrate = 60,
 
