@@ -17,10 +17,6 @@ void main()
 	texcoord.y /= textureSize(light_texture, 0).y;
 
 	vec4 light = texture(light_texture, texcoord);
-	//light.r = float(light_step * (int(light.r * 255.0) / light_step)) / 255.0;
-	//light.g = float(light_step * (int(light.g * 255.0) / light_step)) / 255.0;
-	//light.b = float(light_step * (int(light.b * 255.0) / light_step)) / 255.0;
-	//light.a = float(light_step * (int(light.a * 255.0) / light_step)) / 255.0;
 
 	float intensity = max(max(light.r, light.g), light.b);
 	intensity = float(

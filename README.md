@@ -14,9 +14,13 @@ Decide upon your allegiance to one of the three warring factions whose apple of 
 
 ![enter image description here][1]
 ![enter image description here][2]
+![enter image description here][3]
+![enter image description here][4]
 
   [1]: http://hypersomnia.pl/pics/summary.png
-  [2]: http://hypersomnia.pl/pics/13.Green-charge.png
+  [2]: http://gifyu.com/images/19.menu_entering.gif
+  [3]: http://gifyu.com/images/20.passing_cars.gif
+  [4]: http://gifyu.com/images/30.smoke.png
   
 # Opening the to-do list
 
