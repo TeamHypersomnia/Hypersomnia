@@ -22,7 +22,7 @@ recording_type = {
 }
 
 config_table = {
-	launch_mode = launch_type.MAIN_MENU,
+	launch_mode = launch_type.LOCAL,
 	
 	input_recording_mode = recording_type.LIVE,
 	recording_replay_speed = 1,
@@ -30,7 +30,7 @@ config_table = {
 	determinism_test_cloned_cosmoi_count = 2,
 
 	window_name = "example",
-	fullscreen = 0,
+	fullscreen = 1,
 	window_border = 1,
 	window_x = 100,
 	window_y = 10,
@@ -42,7 +42,7 @@ config_table = {
 	enable_hrtf = 1,
 
 	sound_effects_volume = 1,
-	music_volume = 0,
+	music_volume = 1,
 
 	debug_disable_cursor_clipping = 0,
 	

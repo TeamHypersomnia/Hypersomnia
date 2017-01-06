@@ -14,11 +14,14 @@ struct log_entry {
 
 struct global_log {
 	static std::vector<log_entry> recent_entries;
-	static unsigned max_entries;
+	static std::vector<log_entry> all_entries;
+	static unsigned max_recent_entries;
+	static unsigned max_all_entries;
 
 	static augs::gui::text::fstr format_recent_as_text(const assets::font_id);
 
-	static void push_entry(const log_entry);
+	static void push_entry(const log_entry&);
+	static void save_complete_log(const std::string& filename);
 };
 
 template < typename... A >

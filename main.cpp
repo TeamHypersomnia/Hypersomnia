@@ -103,5 +103,7 @@ int main(int argc, char** argv) {
 	}
 
 	augs::global_libraries::deinit();
+	
+	global_log::save_complete_log("logs/successful_exit_debug_log.txt");
 	return 0;
 }

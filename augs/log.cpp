@@ -10,6 +10,7 @@
 #include <thread>
 #include <mutex>
 
+#include "augs/filesystem/file.h"
 #include "augs/templates/string_templates.h"
 
 #define ENABLE_LOG 1
@@ -17,8 +18,10 @@
 
 std::mutex log_mutex;
 
-unsigned global_log::max_entries = 40;
+unsigned global_log::max_recent_entries = 40;
+unsigned global_log::max_all_entries = 10000;
 std::vector<log_entry> global_log::recent_entries;
+std::vector<log_entry> global_log::all_entries;
 
 augs::gui::text::fstr global_log::format_recent_as_text(const assets::font_id f) {
 	augs::gui::text::fstr result;
@@ -31,11 +34,27 @@ augs::gui::text::fstr global_log::format_recent_as_text(const assets::font_id f)
 	return result;
 }
 
-void global_log::push_entry(const log_entry new_entry) {
+void global_log::push_entry(const log_entry& new_entry) {
 	recent_entries.push_back(new_entry);
+	all_entries.push_back(new_entry);
 
-	if (recent_entries.size() > max_entries)
+	if (recent_entries.size() > max_recent_entries) {
 		recent_entries.erase(recent_entries.begin());
+	}
+
+	if (all_entries.size() > max_all_entries) {
+		all_entries.erase(all_entries.begin(), all_entries.begin() + max_all_entries/5);
+	}
+}
+
+void global_log::save_complete_log(const std::string& filename) {
+	std::string complete_log;
+
+	for (const auto& e : all_entries) {
+		complete_log += e.text + '\n';
+	}
+	
+	augs::create_text_file(filename, complete_log);
 }
 
 template<>
@@ -47,7 +66,7 @@ void LOG(const std::string& f) {
 
 	std::cout << f << std::endl;
 #if LOG_TO_FILE
-	std::ofstream recording_file("live_debug.txt", std::ios::out | std::ios::app);
+	std::ofstream recording_file("logs/live_debug.txt", std::ios::out | std::ios::app);
 	recording_file << f << std::endl;
 #endif
 #endif
@@ -62,11 +81,12 @@ void LOG_COLOR(const console_color c, const std::string& f) {
 
 	augs::colored_print(c, f.c_str());
 #if LOG_TO_FILE
-	std::ofstream recording_file("live_debug.txt", std::ios::out | std::ios::app);
+	std::ofstream recording_file("logs/live_debug.txt", std::ios::out | std::ios::app);
 	recording_file << f << std::endl;
 #endif
 #endif
 }
+
 
 void CALL_SHELL(const std::string& s) {
 	std::unique_lock<std::mutex> lock(log_mutex);
