@@ -205,15 +205,12 @@ namespace augs {
 
 		v.push_back(tris[0]);
 		v.push_back(tris[1]);
+	}
 
-		//components::sprite::drawing_input in(output);
-		//in.camera = camera;
-		//in.renderable_transform = controlled_entity.viewing_transform(interp);
-		//
-		//components::sprite line;
-		//line.set(assets::texture_id::BLANK);
-		//line.size.set((controlled_crosshair.viewing_transform(interp).pos - controlled_entity.viewing_transform(interp).pos).length(), 1);
-		//
-		//line.draw(in);
+	void draw_line(vertex_line_buffer& v, const vec2 from, const vec2 to, const texture& tex, const rgba color) {
+		const auto points = make_sprite_points((from + to) / 2, vec2((from - to).length(), 0), (to - from).degrees());
+		const auto tris = make_sprite_triangles(points, tex, color);
+
+		v.push_back({ tris[0].vertices[0], tris[0].vertices[1] });
 	}
 }

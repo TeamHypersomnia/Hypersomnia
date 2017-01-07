@@ -8,7 +8,6 @@
 #include "game/systems_stateless/gui_system.h"
 
 #include "game/components/gui_element_component.h"
-#include "game/components/gun_component.h"
 #include "game/systems_temporary/dynamic_tree_system.h"
 #include "game/resources/manager.h"
 #include "augs/graphics/renderer.h"
@@ -82,8 +81,16 @@ namespace rendering_scripts {
 		renderer.smoke_fbo.use_default();
 
 		auto& light = step.session.systems_audiovisual.get<light_system>();
-
-		light.render_all_lights(renderer, matrix, step);
+		
+		light.render_all_lights(renderer, matrix, step, [&]() {
+				draw_crosshair_lines(
+					[&](const vec2 from, const vec2 to, const rgba col) {
+					augs::draw_line(
+						output, camera[from], camera[to], 63/2, get_resource_manager().find_neon_map(assets::texture_id::LASER)->tex, col);
+				},
+				interp, controlled_crosshair, controlled_entity);
+			}
+		);
 
 		illuminated_shader.use();
 		{
@@ -155,50 +162,20 @@ namespace rendering_scripts {
 			}
 
 			render_system().draw_entities(interp, global_time_seconds,output, step.visible_per_layer[i], camera, renderable_drawing_type::NORMAL);
-
-			if (controlled_crosshair.alive()) {
-				vec2 line_from[2];
-				vec2 line_to[2];
-				rgba cols[2] = { cyan, cyan };
-				cols[0].a = 120;
-				cols[1].a = 120;
-
-				const auto crosshair_pos = controlled_crosshair.viewing_transform(interp).pos;
-
-				const auto guns = controlled_entity.guns_wielded();
-
-				if (guns.size() >= 1) {
-					const auto subject_item = guns[0];
-
-					const auto& gun = subject_item.get<components::gun>();
-
-					const auto rifle_transform = subject_item.viewing_transform(interp);
-					const auto barrel_center = gun.calculate_barrel_center(rifle_transform);
-					const auto muzzle = gun.calculate_muzzle_position(rifle_transform);
-
-					line_from[0] = muzzle;
-					line_to[0] = crosshair_pos.project_onto(muzzle, barrel_center);
-
-					augs::draw_line(output, camera[line_from[0]], camera[line_to[0]], 1, *assets::texture_id::BLANK, cols[0]);
-				}
-
-				if (guns.size() >= 2) {
-					const auto subject_item = guns[1];
-
-					const auto& gun = subject_item.get<components::gun>();
-
-					const auto rifle_transform = subject_item.viewing_transform(interp);
-					const auto barrel_center = gun.calculate_barrel_center(rifle_transform);
-					const auto muzzle = gun.calculate_muzzle_position(rifle_transform);
-
-					line_from[1] = muzzle;
-					line_to[1] = crosshair_pos.project_onto(muzzle, barrel_center);
-
-					augs::draw_line(output, camera[line_from[1]], camera[line_to[1]], 1, *assets::texture_id::BLANK, cols[1]);
-				}
-			}
 		}
 		
+		if (step.settings.draw_crosshairs) {
+			draw_crosshair_lines(
+				[&](const vec2 from, const vec2 to, const rgba col) {
+				augs::draw_line(
+					renderer.lines, camera[from], camera[to], get_resource_manager().find(assets::texture_id::LASER)->tex, col);
+			},
+				interp, controlled_crosshair, controlled_entity);
+
+			renderer.call_lines();
+			renderer.clear_lines();
+		}
+
 		particles.draw(render_layer::EFFECTS, particles_input);
 
 		for (const auto e : step.visible_per_layer[render_layer::WANDERING_PIXELS_EFFECTS]) {

@@ -370,6 +370,7 @@
     <ClCompile Include="game\detail\gui\slot_button.cpp" />
     <ClCompile Include="game\detail\world_camera.cpp" />
     <ClCompile Include="game\resources\tile_layer.cpp" />
+    <ClCompile Include="game\scene_managers\rendering_scripts\draw_crosshair_lines.cpp" />
     <ClCompile Include="game\scene_managers\rendering_scripts\illuminated_rendering.cpp" />
     <ClCompile Include="game\scene_managers\resource_setups\standard_sound_buffers.cpp" />
     <ClCompile Include="game\scene_managers\resource_setups\standard_tile_layers.cpp" />

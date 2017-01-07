@@ -131,6 +131,8 @@ namespace assets {
 		HOTBAR_BUTTON_B_BORDER,
 
 		HOTBAR_BUTTON_LB_COMPLEMENT_BORDER,
+			
+		LASER,
 
 		COUNT,
 	};
