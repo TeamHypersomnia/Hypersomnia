@@ -269,7 +269,7 @@ namespace prefabs {
 			auto& crosshair = root += components::crosshair();
 			auto& processing = root += components::processing();
 			
-			sprite.set(assets::texture_id::TEST_CROSSHAIR, rgba(0, 255, 0, 255));
+			sprite.set(assets::texture_id::TEST_CROSSHAIR, rgba(255, 255, 255, 255));
 
 			render.layer = render_layer::CROSSHAIR;
 

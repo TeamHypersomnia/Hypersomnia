@@ -57,8 +57,6 @@ namespace components {
 			);
 		}
 
-		static void make_rect(const vec2 pos, const vec2 size, const float rotation_degrees, std::array<vec2, 4>& out, const drawing_input::positioning_type positioning);
-
 		vec2 get_size() const;
 
 		void set(assets::texture_id, augs::rgba = augs::rgba());
@@ -66,15 +64,13 @@ namespace components {
 
 		void draw(const drawing_input&) const;
 
-		std::vector<vec2> get_vertices() const;
-		augs::rects::ltrb<float> get_aabb(const components::transform&, const drawing_input::positioning_type positioning = drawing_input::positioning_type::CENTER) const;
-	
-	private:
-		
-		void draw(const drawing_input&, 
-			const augs::texture_with_image* const considered_texture, 
+		void draw(const drawing_input&,
+			const augs::texture& considered_texture,
 			const vec2i target_position,
 			const float target_rotation,
 			const vec2 considered_size) const;
+
+		std::vector<vec2> get_vertices() const;
+		augs::rects::ltrb<float> get_aabb(const components::transform&, const renderable_positioning_type positioning = renderable_positioning_type::CENTER) const;
 	};
 }

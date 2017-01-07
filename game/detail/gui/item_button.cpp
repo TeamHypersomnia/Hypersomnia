@@ -115,7 +115,7 @@ rects::ltrb<float> item_button::iterate_children_attachments(
 	item_sprite.color.a = border_col.a;
 
 	components::sprite::drawing_input state(*target);
-	state.positioning = components::sprite::drawing_input::positioning_type::LEFT_TOP_CORNER;
+	state.positioning = renderable_positioning_type::LEFT_TOP_CORNER;
 
 	const auto expanded_size = this_id->rc.get_size() - this_id->with_attachments_bbox.get_size();
 
@@ -323,7 +323,7 @@ void item_button::draw_proc(const viewing_gui_context& context, const const_this
 			}
 
 			components::sprite::drawing_input state(in.v);
-			state.positioning = components::sprite::drawing_input::positioning_type::LEFT_TOP_CORNER;
+			state.positioning = renderable_positioning_type::LEFT_TOP_CORNER;
 			state.renderable_transform.pos.set(this_absolute_rect.r - container_status_sprite.size.x + 2, this_absolute_rect.t + 1
 				//- container_status_sprite.size.y + 2
 			);

@@ -15,6 +15,7 @@
 #include "game/transcendental/viewing_session.h"
 
 #include "game/detail/gui/immediate_hud.h"
+#include "augs/graphics/drawers.h"
 
 #include "math/matrix.h"
 
@@ -29,6 +30,7 @@ namespace rendering_scripts {
 		const auto& dynamic_tree = cosmos.systems_temporary.get<dynamic_tree_system>();
 		const auto& physics = cosmos.systems_temporary.get<physics_system>();
 		const auto& controlled_entity = cosmos[step.viewed_character];
+		const auto controlled_crosshair = controlled_entity[sub_entity_name::CHARACTER_CROSSHAIR];
 		const auto& interp = step.session.systems_audiovisual.get<interpolation_system>();
 		const auto& particles = step.session.systems_audiovisual.get<particles_simulation_system>();
 		auto& wandering_pixels = step.session.systems_audiovisual.get<wandering_pixels_system>();
@@ -152,6 +154,13 @@ namespace rendering_scripts {
 			}
 
 			render_system().draw_entities(interp, global_time_seconds,output, step.visible_per_layer[i], camera, renderable_drawing_type::NORMAL);
+
+			if (controlled_crosshair.alive()) {
+				const auto line_from = controlled_crosshair.viewing_transform(interp).pos;
+				const auto line_to = controlled_entity.viewing_transform(interp).pos;
+
+				augs::draw_line(output, camera[line_from], camera[line_to], 1, *assets::texture_id::BLANK, white);
+			}
 		}
 		
 		particles.draw(render_layer::EFFECTS, particles_input);

@@ -6,6 +6,8 @@
 
 #include "augs/gui/stroke.h"
 
+#include "game/components/sprite_component.h"
+
 namespace augs {
 	ltrb draw_clipped_rect(vertex_triangle_buffer& v, const ltrb origin, const augs::texture& tex, const rgba color, const ltrb clipper, const bool flip_horizontally) {
 		ltrb rc = origin;
@@ -109,5 +111,109 @@ namespace augs {
 
 		v.push_back(out[0]);
 		v.push_back(out[1]);
+	}
+	
+	std::array<vec2, 4> make_sprite_points(const vec2 pos, const vec2 size, const float rotation_degrees, const renderable_positioning_type positioning) {
+		std::array<vec2, 4> v;
+
+		if (positioning == renderable_positioning_type::CENTER) {
+			const vec2 origin = pos;
+			const vec2 half_size = size / 2.f;
+
+			v[0] = pos - half_size;
+			v[1] = pos + vec2(size.x, 0.f) - half_size;
+			v[2] = pos + size - half_size;
+			v[3] = pos + vec2(0.f, size.y) - half_size;
+
+			v[0].rotate(rotation_degrees, origin);
+			v[1].rotate(rotation_degrees, origin);
+			v[2].rotate(rotation_degrees, origin);
+			v[3].rotate(rotation_degrees, origin);
+		}
+		else {
+			const vec2 origin = pos + size / 2.f;
+
+			v[0] = pos;
+			v[1] = pos + vec2(size.x, 0.f);
+			v[2] = pos + size;
+			v[3] = pos + vec2(0.f, size.y);
+
+			v[0].rotate(rotation_degrees, origin);
+			v[1].rotate(rotation_degrees, origin);
+			v[2].rotate(rotation_degrees, origin);
+			v[3].rotate(rotation_degrees, origin);
+		}
+
+		return v;
+	}
+
+	std::array<vertex_triangle, 2> make_sprite_triangles(
+		const std::array<vec2, 4> v,
+		const augs::texture& considered_texture,
+		const rgba col,
+		const bool flip_horizontally,
+		const bool flip_vertically) {
+
+		std::array<vertex_triangle, 2> tris;
+
+		vertex_triangle& t1 = tris[0];
+		vertex_triangle& t2 = tris[1];
+
+		vec2 texcoords[] = {
+			vec2(0.f, 0.f),
+			vec2(1.f, 0.f),
+			vec2(1.f, 1.f),
+			vec2(0.f, 1.f)
+		};
+
+		if (flip_horizontally) {
+			for (auto& v : texcoords) {
+				v.x = 1.f - v.x;
+			}
+		}
+		if (flip_vertically) {
+			for (auto& v : texcoords) {
+				v.y = 1.f - v.y;
+			}
+		}
+
+		t1.vertices[0].texcoord = t2.vertices[0].texcoord = texcoords[0];
+		t2.vertices[1].texcoord = texcoords[1];
+		t1.vertices[1].texcoord = t2.vertices[2].texcoord = texcoords[2];
+		t1.vertices[2].texcoord = texcoords[3];
+
+		for (int i = 0; i < 3; ++i) {
+			considered_texture.get_uv(t1.vertices[i].texcoord);
+			considered_texture.get_uv(t2.vertices[i].texcoord);
+		}
+
+		t1.vertices[0].pos = t2.vertices[0].pos = static_cast<vec2i>(v[0]);
+		t2.vertices[1].pos = static_cast<vec2i>(v[1]);
+		t1.vertices[1].pos = t2.vertices[2].pos = static_cast<vec2i>(v[2]);
+		t1.vertices[2].pos = static_cast<vec2i>(v[3]);
+
+		t1.vertices[0].color = t2.vertices[0].color = col;
+		t1.vertices[1].color = t2.vertices[1].color = col;
+		t1.vertices[2].color = t2.vertices[2].color = col;
+
+		return tris;
+	}
+
+	void draw_line(vertex_triangle_buffer& v, const vec2 from, const vec2 to, const float line_width, const texture& tex, const rgba color) {
+		const auto points = make_sprite_points((from + to)/2, vec2((from - to).length(), line_width), (to - from).degrees());
+		const auto tris = make_sprite_triangles(points, tex, color);
+
+		v.push_back(tris[0]);
+		v.push_back(tris[1]);
+
+		//components::sprite::drawing_input in(output);
+		//in.camera = camera;
+		//in.renderable_transform = controlled_entity.viewing_transform(interp);
+		//
+		//components::sprite line;
+		//line.set(assets::texture_id::BLANK);
+		//line.size.set((controlled_crosshair.viewing_transform(interp).pos - controlled_entity.viewing_transform(interp).pos).length(), 1);
+		//
+		//line.draw(in);
 	}
 }

@@ -1029,6 +1029,7 @@
     <ClInclude Include="augs\entity_system\storage_for_systems.h" />
     <ClInclude Include="augs\filesystem\directory.h" />
     <ClInclude Include="augs\graphics\drawers.h" />
+    <ClInclude Include="augs\graphics\renderable_positioning_type.h" />
     <ClInclude Include="augs\gui\appearance_detector.h" />
     <ClInclude Include="augs\gui\clipboard.h" />
     <ClInclude Include="augs\gui\dereferenced_location.h" />

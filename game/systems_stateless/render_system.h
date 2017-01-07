@@ -8,6 +8,7 @@
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/enums/renderable_drawing_type.h"
 #include "game/detail/camera_cone.h"
+#include "augs/graphics/renderable_positioning_type.h"
 
 using namespace augs;
 
@@ -43,7 +44,7 @@ public:
 
 		if (render.screen_space_transform) {
 			in.camera.transform.pos = (in.camera.visible_world_area/2);
-			in.positioning = input_type::positioning_type::LEFT_TOP_CORNER;
+			in.positioning = renderable_positioning_type::LEFT_TOP_CORNER;
 		}
 
 		in.renderable_transform = renderable_transform;
