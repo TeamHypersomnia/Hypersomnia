@@ -8,6 +8,7 @@
 #include "game/systems_stateless/gui_system.h"
 
 #include "game/components/gui_element_component.h"
+#include "game/components/gun_component.h"
 #include "game/systems_temporary/dynamic_tree_system.h"
 #include "game/resources/manager.h"
 #include "augs/graphics/renderer.h"
@@ -156,10 +157,45 @@ namespace rendering_scripts {
 			render_system().draw_entities(interp, global_time_seconds,output, step.visible_per_layer[i], camera, renderable_drawing_type::NORMAL);
 
 			if (controlled_crosshair.alive()) {
-				const auto line_from = controlled_crosshair.viewing_transform(interp).pos;
-				const auto line_to = controlled_entity.viewing_transform(interp).pos;
+				vec2 line_from[2];
+				vec2 line_to[2];
+				rgba cols[2] = { cyan, cyan };
+				cols[0].a = 120;
+				cols[1].a = 120;
 
-				augs::draw_line(output, camera[line_from], camera[line_to], 1, *assets::texture_id::BLANK, white);
+				const auto crosshair_pos = controlled_crosshair.viewing_transform(interp).pos;
+
+				const auto guns = controlled_entity.guns_wielded();
+
+				if (guns.size() >= 1) {
+					const auto subject_item = guns[0];
+
+					const auto& gun = subject_item.get<components::gun>();
+
+					const auto rifle_transform = subject_item.viewing_transform(interp);
+					const auto barrel_center = gun.calculate_barrel_center(rifle_transform);
+					const auto muzzle = gun.calculate_muzzle_position(rifle_transform);
+
+					line_from[0] = muzzle;
+					line_to[0] = crosshair_pos.project_onto(muzzle, barrel_center);
+
+					augs::draw_line(output, camera[line_from[0]], camera[line_to[0]], 1, *assets::texture_id::BLANK, cols[0]);
+				}
+
+				if (guns.size() >= 2) {
+					const auto subject_item = guns[1];
+
+					const auto& gun = subject_item.get<components::gun>();
+
+					const auto rifle_transform = subject_item.viewing_transform(interp);
+					const auto barrel_center = gun.calculate_barrel_center(rifle_transform);
+					const auto muzzle = gun.calculate_muzzle_position(rifle_transform);
+
+					line_from[1] = muzzle;
+					line_to[1] = crosshair_pos.project_onto(muzzle, barrel_center);
+
+					augs::draw_line(output, camera[line_from[1]], camera[line_to[1]], 1, *assets::texture_id::BLANK, cols[1]);
+				}
 			}
 		}
 		

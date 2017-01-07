@@ -28,11 +28,13 @@ float colinearize_AB(const vec2 O_center_of_rotation, vec2 A_barrel_center, vec2
 	auto crosshair_vector = C_crosshair - O_center_of_rotation;
 	auto barrel_vector = B_muzzle - O_center_of_rotation;
 	
-	if (crosshair_vector.is_epsilon(1.f))
+	if (crosshair_vector.is_epsilon(1.f)) {
 		crosshair_vector.set(1, 0);
+	}
 
-	if (crosshair_vector.length() < barrel_vector.length() + 1.f)
+	if (crosshair_vector.length() < barrel_vector.length() + 1.f) {
 		return crosshair_vector.degrees();
+	}
 	
 	C_crosshair = O_center_of_rotation + crosshair_vector;
 
@@ -90,10 +92,12 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 		
 		const auto diff = target_transform.pos - position(it);
 
-		if (diff.is_epsilon(1.f))
+		if (diff.is_epsilon(1.f)) {
 			new_angle = 0.f;
-		else
+		}
+		else {
 			new_angle = diff.degrees();
+		}
 
 		if (rotation_copying.colinearize_item_in_hand) {
 			const auto guns = it.guns_wielded();
@@ -123,11 +127,13 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 
 			vec2 direction;
 
-			if (rotation_copying.look_mode == components::rotation_copying::look_type::VELOCITY)
+			if (rotation_copying.look_mode == components::rotation_copying::look_type::VELOCITY) {
 				direction = vec2(target_physics.velocity());
+			}
 
-			if (direction.non_zero())
+			if (direction.non_zero()) {
 				new_angle = direction.degrees();
+			}
 		}
 	}
 
