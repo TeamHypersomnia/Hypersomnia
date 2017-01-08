@@ -133,6 +133,7 @@ namespace assets {
 		HOTBAR_BUTTON_LB_COMPLEMENT_BORDER,
 			
 		LASER,
+		LASER_GLOW_EDGE,
 
 		COUNT,
 	};
