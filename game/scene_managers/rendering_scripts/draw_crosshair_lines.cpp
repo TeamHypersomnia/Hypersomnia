@@ -11,6 +11,7 @@
 namespace rendering_scripts {
 	void draw_crosshair_lines(
 		std::function<void(vec2, vec2, rgba)> callback,
+		std::function<void(vec2, vec2)> dashed_line_callback,
 		const interpolation_system& interp,
 		const const_entity_handle crosshair, 
 		const const_entity_handle character) {
@@ -60,6 +61,8 @@ namespace rendering_scripts {
 					auto col = cyan;
 
 					if (raycast.hit) {
+						dashed_line_callback(raycast.intersection, line_to[0]);
+
 						line_to[0] = raycast.intersection;
 						col = calculate_color(cosmos[raycast.what_entity]);
 					}
@@ -89,6 +92,8 @@ namespace rendering_scripts {
 					auto col = cyan;
 
 					if (raycast.hit) {
+						dashed_line_callback(raycast.intersection, line_to[1]);
+
 						line_to[1] = raycast.intersection;
 						col = calculate_color(cosmos[raycast.what_entity]);
 					}
