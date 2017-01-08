@@ -14,7 +14,7 @@ namespace augs {
 	void draw_rect(vertex_triangle_buffer& v, const vec2 origin, const assets::texture_id, const rgba color = white);
 	
 	void draw_line(vertex_line_buffer& v, const vec2 from, const vec2 to, const texture&, const rgba color);
-	void draw_line(vertex_triangle_buffer& v, const vec2 from, const vec2 to, const float line_width, const texture&, const rgba color);
+	void draw_line(vertex_triangle_buffer& v, const vec2 from, const vec2 to, const float line_width, const texture&, const rgba color, const bool flip_horizontally = false);
 	
 	std::array<vec2, 4> make_sprite_points(
 		const vec2 pos, 

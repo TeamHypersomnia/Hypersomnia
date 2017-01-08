@@ -85,10 +85,20 @@ namespace rendering_scripts {
 		light.render_all_lights(renderer, matrix, step, [&]() {
 				draw_crosshair_lines(
 					[&](const vec2 from, const vec2 to, const rgba col) {
-					augs::draw_line(
-						output, camera[from], camera[to], 63/2, get_resource_manager().find_neon_map(assets::texture_id::LASER)->tex, col);
-				},
-				interp, controlled_crosshair, controlled_entity);
+						augs::draw_line(output, camera[from], camera[to], 63/4, get_resource_manager().find_neon_map(assets::texture_id::LASER)->tex, col);
+
+						const auto& edge_tex = get_resource_manager().find(assets::texture_id::LASER_GLOW_EDGE)->tex;
+						const auto edge_size = edge_tex.get_size();
+
+						const auto edge_offset = (to - from).set_length(edge_size.x);
+
+						augs::draw_line(output, camera[to], camera[to + edge_offset], 63 / 4, get_resource_manager().find(assets::texture_id::LASER_GLOW_EDGE)->tex, col);
+						augs::draw_line(output, camera[from - edge_offset], camera[from], 63 / 4, get_resource_manager().find(assets::texture_id::LASER_GLOW_EDGE)->tex, col, true);
+					},
+					interp, 
+					controlled_crosshair, 
+					controlled_entity
+				);
 			}
 		);
 

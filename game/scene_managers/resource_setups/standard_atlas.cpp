@@ -292,6 +292,7 @@ namespace resource_setups {
 
 		get_resource_manager().create(assets::texture_id::BLANK, "hypersomnia/gfx/blank.png");
 		get_resource_manager().create(assets::texture_id::LASER, "hypersomnia/gfx/laser.png");
+		get_resource_manager().create(assets::texture_id::LASER_GLOW_EDGE, "hypersomnia/gfx/laser_glow_edge.png");
 		get_resource_manager().create(assets::texture_id::DROP_HAND_ICON, "hypersomnia/gfx/drop_hand_icon.png");
 		get_resource_manager().create(assets::texture_id::SECONDARY_HAND_ICON, "hypersomnia/gfx/secondary_hand_icon.png");
 		get_resource_manager().create(assets::texture_id::PRIMARY_HAND_ICON, "hypersomnia/gfx/primary_hand_icon.png");

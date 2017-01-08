@@ -199,9 +199,9 @@ namespace augs {
 		return tris;
 	}
 
-	void draw_line(vertex_triangle_buffer& v, const vec2 from, const vec2 to, const float line_width, const texture& tex, const rgba color) {
+	void draw_line(vertex_triangle_buffer& v, const vec2 from, const vec2 to, const float line_width, const texture& tex, const rgba color, const bool flip_horizontally) {
 		const auto points = make_sprite_points((from + to)/2, vec2((from - to).length(), line_width), (to - from).degrees());
-		const auto tris = make_sprite_triangles(points, tex, color);
+		const auto tris = make_sprite_triangles(points, tex, color, flip_horizontally);
 
 		v.push_back(tris[0]);
 		v.push_back(tris[1]);
