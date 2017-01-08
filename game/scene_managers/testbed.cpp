@@ -156,10 +156,10 @@ namespace scene_managers {
 			if (i == 0) {
 				new_character.get<components::sentience>().health.value = 100;
 				new_character.get<components::sentience>().health.maximum = 100;
-			}
-			if (i == 1) {
 				new_character.get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
 				new_character.get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
+			}
+			if (i == 1) {
 				new_character.get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
 				new_character.get<components::sentience>().minimum_danger_amount_to_evade = 20;
 				new_character.get<components::sentience>().health.value = 300;
@@ -172,8 +172,6 @@ namespace scene_managers {
 				new_character.get<components::sentience>().health.value = 100;
 			}
 			if (i == 5) {
-				new_character.get<components::attitude>().parties = party_category::METROPOLIS_CITIZEN;
-				new_character.get<components::attitude>().hostile_parties = party_category::RESISTANCE_CITIZEN;
 				new_character.get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
 				new_character.get<components::sentience>().minimum_danger_amount_to_evade = 20;
 				new_character.get<components::sentience>().health.value = 300;
@@ -192,6 +190,9 @@ namespace scene_managers {
 
 				name_entity(new_character, entity_name::PERSON, L"Rebel");
 				perform_transfer({ rifle, new_character[slot_function::PRIMARY_HAND] }, step);
+
+				new_character.get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
+				new_character.get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
 			}
 
 			if (

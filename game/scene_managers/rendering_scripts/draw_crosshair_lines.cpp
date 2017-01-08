@@ -6,6 +6,7 @@
 
 #include "game/systems_temporary/physics_system.h"
 #include "game/enums/filters.h"
+#include "game/detail/entity_scripts.h"
 
 namespace rendering_scripts {
 	void draw_crosshair_lines(
@@ -14,15 +15,29 @@ namespace rendering_scripts {
 		const const_entity_handle crosshair, 
 		const const_entity_handle character) {
 		if (crosshair.alive()) {
-			const auto& physics = crosshair.get_cosmos().systems_temporary.get<physics_system>();
+			const auto& cosmos = crosshair.get_cosmos();
+			const auto& physics = cosmos.systems_temporary.get<physics_system>();
 
 			vec2 line_from[2];
 			vec2 line_to[2];
-			rgba cols[2] = { cyan, cyan };
 
 			const auto crosshair_pos = crosshair.viewing_transform(interp).pos;
 
 			const auto guns = character.guns_wielded();
+
+			auto calculate_color = [&](const const_entity_handle target) {
+				const auto att = calculate_attitude(character, target);
+
+				if (att == attitude_type::WANTS_TO_KILL || att == attitude_type::WANTS_TO_KNOCK_UNCONSCIOUS) {
+					return red;
+				}
+				else if (att == attitude_type::WANTS_TO_HEAL) {
+					return green;
+				}
+				else {
+					return cyan;
+				}
+			};
 
 			if (guns.size() >= 1) {
 				const auto subject_item = guns[0];
@@ -42,11 +57,14 @@ namespace rendering_scripts {
 					
 					const auto raycast = physics.ray_cast_px(line_from[0], line_to[0], filters::bullet(), subject_item);
 
+					auto col = cyan;
+
 					if (raycast.hit) {
 						line_to[0] = raycast.intersection;
+						col = calculate_color(cosmos[raycast.what_entity]);
 					}
 
-					callback(line_from[0], line_to[0], cols[0]);
+					callback(line_from[0], line_to[0], col);
 				}
 			}
 
@@ -68,11 +86,14 @@ namespace rendering_scripts {
 					
 					const auto raycast = physics.ray_cast_px(line_from[1], line_to[1], filters::bullet(), subject_item);
 
+					auto col = cyan;
+
 					if (raycast.hit) {
 						line_to[1] = raycast.intersection;
+						col = calculate_color(cosmos[raycast.what_entity]);
 					}
 
-					callback(line_from[1], line_to[1], cols[1]);
+					callback(line_from[1], line_to[1], col);
 				}
 			}
 		}

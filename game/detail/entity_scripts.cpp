@@ -91,13 +91,16 @@ identified_danger assess_danger(const_entity_handle victim, const_entity_handle 
 	return result;
 }
 
-attitude_type calculate_attitude(const_entity_handle targeter, const_entity_handle target) {
+attitude_type calculate_attitude(const const_entity_handle targeter, const const_entity_handle target) {
 	auto& targeter_attitude = targeter.get<components::attitude>();
 	auto* target_attitude = target.find<components::attitude>();
 
 	if (target_attitude) {
 		if (targeter_attitude.hostile_parties & target_attitude->parties) {
 			return attitude_type::WANTS_TO_KILL;
+		}
+		else if (targeter_attitude.parties & target_attitude->parties) {
+			return attitude_type::WANTS_TO_HEAL;
 		}
 	}
 
