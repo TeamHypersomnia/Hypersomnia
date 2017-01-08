@@ -2,6 +2,8 @@
 #include "game/enums/slot_function.h"
 #include "game/transcendental/entity_id.h"
 
+#include "augs/templates/hash_templates.h"
+
 struct inventory_slot_id {
 	slot_function type;
 	entity_id container_entity;
@@ -28,10 +30,7 @@ namespace std {
 	template <>
 	struct hash<inventory_slot_id> {
 		std::size_t operator()(const inventory_slot_id& k) const {
-			using std::hash;
-
-			return ((hash<entity_id>()(k.container_entity)
-				^ (hash<slot_function>()(k.type) << 1)) >> 1);
+			return augs::simple_two_hash(k.container_entity, k.type);
 		}
 	};
 }

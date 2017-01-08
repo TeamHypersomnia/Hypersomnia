@@ -414,7 +414,7 @@ TEST(CosmicDelta, PaddingSanityCheck2) {
 }
 
 TEST(CosmicDelta, CosmicDeltaPaddingTest) {
-	auto padding_checker = [](auto c) {
+	auto padding_checker = [](auto c, auto... args) {
 		typedef decltype(c) component_type;
 		static_assert(std::is_same<std::decay_t<component_type>, component_type>::value, "Something's wrong with the types");
 
@@ -429,8 +429,8 @@ TEST(CosmicDelta, CosmicDeltaPaddingTest) {
 			buf2[i] = 4;
 		}
 
-		new (buf1) checked_type;
-		new (buf2) checked_type;
+		new (buf1) checked_type(args...);
+		new (buf2) checked_type(args...);
 
 		int iter = 0;
 		bool same = true;
@@ -447,6 +447,34 @@ TEST(CosmicDelta, CosmicDeltaPaddingTest) {
 
 	padding_checker(augs::window::event::change());
 	padding_checker(game_gui_element_location());
+	
+	struct dum {
+		game_gui_rect_world rect_world;
+		int dragged_charges = 0;
+
+		bool is_gui_look_enabled = false;
+		bool preview_due_to_item_picking_request = false;
+		bool draw_free_space_inside_container_icons = true;
+		padding_byte pad;
+
+		//hotbar_button hotbar_buttons[9];
+		drag_and_drop_target_drop_item drop_item_icon = augs::gui::material();
+
+		dum() 
+			//:  
+			//drop_item_icon(augs::gui::material(assets::texture_id::DROP_HAND_ICON, red))
+		{
+		}
+	};
+
+	LOG_NVPS(sizeof(dum), sizeof(components::gui_element));
+	sizeof(dum);
+	sizeof(components::gui_element);
+
+	padding_checker(dum());
+	padding_checker(std::array<hotbar_button, 9>());
+	padding_checker(drag_and_drop_target_drop_item(augs::gui::material()), augs::gui::material());
+
 	for_each_in_tuple(typename put_all_components_into<std::tuple>::type(), padding_checker);
 }
 

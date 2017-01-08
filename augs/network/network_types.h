@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/misc/streams.h"
+#include "augs/templates/hash_templates.h"
 
 struct _ENetAddress;
 typedef struct _ENetAddress ENetAddress;
@@ -63,10 +64,7 @@ namespace std {
 	template <>
 	struct hash<augs::network::endpoint_address> {
 		std::size_t operator()(const augs::network::endpoint_address& k) const {
-			using std::hash;
-
-			return ((hash<unsigned>()(k.get_ip())
-				^ (hash<unsigned>()(k.get_port()) << 1)) >> 1);
+			return augs::simple_two_hash(k.get_ip(), k.get_port());
 		}
 	};
 }

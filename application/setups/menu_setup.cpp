@@ -74,7 +74,7 @@ void menu_setup::process(const config_lua_table& cfg, game_window& window) {
 	bool draw_cursor = false;
 	bool roll_news = false;
 	text_drawer latest_news_drawer;
-	vec2 news_pos = vec2(screen_size.x, 5);
+	vec2 news_pos = vec2(static_cast<float>(screen_size.x), 5.f);
 
 	std::thread latest_news_query([&latest_news_drawer, &cfg, &textes_style, &news_mut]() {
 		auto result = augs::http_get_request(cfg.latest_news_url);
@@ -568,7 +568,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 				std::unique_lock<std::mutex> lck(news_mut);
 
 				if (news_pos.x < -latest_news_drawer.get_bbox().x) {
-					news_pos.x = screen_size.x;
+					news_pos.x = static_cast<float>(screen_size.x);
 				}
 
 				latest_news_drawer.pos = news_pos;

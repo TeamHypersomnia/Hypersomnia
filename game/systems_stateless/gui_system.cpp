@@ -51,11 +51,13 @@ void gui_system::advance_gui_elements(logic_step& step) {
 	for (const auto root : cosmos.get(processing_subjects::WITH_GUI_ELEMENT)) {
 		auto& element = root.get<components::gui_element>();
 		auto& rect_world = element.rect_world;
+		const auto screen_size = element.get_screen_size();
 
 		if (root.has<components::item_slot_transfers>()) {
 			game_gui_rect_tree tree;
 			augs::gui::gui_entropy<game_gui_element_location> entropy;
-			root_of_inventory_gui root_of_gui(element.get_screen_size());
+			
+			root_of_inventory_gui root_of_gui(screen_size);
 
 			logic_gui_context context(step, root, tree, root_of_gui);
 
@@ -124,6 +126,10 @@ void gui_system::advance_gui_elements(logic_step& step) {
 
 			rect_world.rebuild_layouts(context, root_location);
 			
+			for (size_t i = 0; i < element.hotbar_buttons.size(); ++i) {
+				element.hotbar_buttons[i].rc = xywh(screen_size.x / 2 + i * 70 - 200, screen_size.y - 150, 50, 50);
+			}
+
 			transfers.clear();
 		}
 	}

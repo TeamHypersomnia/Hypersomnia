@@ -87,7 +87,7 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 	const auto initial_step_number = hypersomnia.get_total_steps_passed();
 
 	const double seconds_between_snapshots = 3.0;
-	const unsigned steps_between_snapshots = seconds_between_snapshots / hypersomnia.get_fixed_delta().in_seconds();
+	const auto steps_between_snapshots = static_cast<unsigned>(seconds_between_snapshots / hypersomnia.get_fixed_delta().in_seconds());
 
 	unsigned bookmarked_step = 0;
 
@@ -190,7 +190,7 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 
 		if (advance_steps_forward < 0) {
 			const auto current_step = get_step_number(hypersomnia);
-			const auto rewound_step = -advance_steps_forward > current_step ? 0 : current_step + advance_steps_forward;
+			const auto rewound_step = static_cast<unsigned>(-advance_steps_forward) > current_step ? 0 : current_step + advance_steps_forward;
 
 #if LOG_REWINDING
 			LOG("Current step: %x\nRewound step: %x", current_step, rewound_step);

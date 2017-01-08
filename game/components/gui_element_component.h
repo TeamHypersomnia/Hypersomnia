@@ -1,8 +1,10 @@
 #pragma once
+#include <array>
 #include "augs/gui/rect.h"
 #include "augs/gui/rect_world.h"
 #include "game/transcendental/entity_id.h"
 #include "game/detail/gui/drag_and_drop_target_drop_item.h"
+#include "game/detail/gui/hotbar_button.h"
 #include "augs/gui/dereferenced_location.h"
 #include "game/enums/slot_function.h"
 #include "augs/ensure.h"
@@ -33,20 +35,9 @@ namespace components {
 		bool draw_free_space_inside_container_icons = true;
 		padding_byte pad;
 
-		drag_and_drop_target_drop_item drop_item_icon;
+		drag_and_drop_target_drop_item drop_item_icon = augs::gui::material(assets::texture_id::DROP_HAND_ICON, red);
 
-		//augs::constant_size_associative_vector<inventory_slot_id, slot_button, GUI_ELEMENT_METADATA_COUNT> slot_metadata;
-		//augs::constant_size_associative_vector<entity_id, item_button, GUI_ELEMENT_METADATA_COUNT> item_metadata;
-		//
-		//decltype(gui_element::slot_metadata) removed_slot_metadata;
-		//decltype(gui_element::item_metadata) removed_item_metadata;
-		
-		gui_element();
-		//
-		//void consume_raw_input(augs::window::event::change&);
-		//
-		//drag_and_drop_result prepare_drag_and_drop_result() const;
-		//
+		std::array<hotbar_button, 10> hotbar_buttons;
 
 		vec2i get_screen_size() const;
 		vec2 get_gui_crosshair_position() const;

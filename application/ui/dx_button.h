@@ -7,7 +7,7 @@
 
 #include "game/assets/texture_id.h"
 
-#include "application/ui/button_corners.h"
+#include "augs/gui/button_corners.h"
 #include "application/ui/appearing_text.h"
 
 #include "augs/audio/sound_source.h"

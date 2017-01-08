@@ -27,7 +27,7 @@ namespace augs {
 		}
 
 		void on_update(const delta dt) final {
-			current = augs::interp(initial, to, elapsed_ms/duration_ms);
+			current = static_cast<T>(augs::interp(initial, to, elapsed_ms/duration_ms));
 			elapsed_ms += dt.in_milliseconds();
 		}
 

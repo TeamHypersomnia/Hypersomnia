@@ -142,10 +142,10 @@ namespace resource_setups {
 				hotbar_l.paint_line({ 1, 0 }, { lower_side - 1, 0 }, inside_color);
 
 				hotbar_r.create(upper_side, 1, 4);
-				hotbar_r.paint_line({ upper_side - 1, 0 }, { 0, 0 }, inside_color);
+				hotbar_r.paint_line({ upper_side - 2, 0 }, { 0, 0 }, inside_color);
 
 				hotbar_b.create(1, lower_side, 4);
-				hotbar_b.paint_line({ 0, lower_side - 1 }, { 0, 0 }, inside_color);
+				hotbar_b.paint_line({ 0, lower_side - 2 }, { 0, 0 }, inside_color);
 
 				hotbar_t.create(1, upper_side, 4);
 				hotbar_t.paint_line({ 0, 1 }, { 0, upper_side - 1 }, inside_color);
@@ -167,6 +167,8 @@ namespace resource_setups {
 
 				hotbar_lt.create(lower_side, upper_side, 4);
 				hotbar_lt.fill(inside_color);
+				hotbar_lt.paint_line({ 0, 0 }, { lower_side - 1, 0 }, { 0, 0, 0, 0 });
+				hotbar_lt.paint_line({ 0, 0 }, { 0, upper_side - 1 },  { 0, 0, 0, 0 });
 
 				hotbar_rt.create(upper_side, upper_side, 4);
 				hotbar_rt.fill({ 0, 0, 0, 0 });
@@ -177,6 +179,8 @@ namespace resource_setups {
 
 				hotbar_rb.create(upper_side, lower_side, 4);
 				hotbar_rb.fill(inside_color);
+				hotbar_rb.paint_line({ upper_side - 1, lower_side - 1 }, { 0, lower_side - 1 }, {0, 0, 0, 0});
+				hotbar_rb.paint_line({ upper_side - 1, lower_side - 1 }, { upper_side - 1, 0 }, {0, 0, 0, 0});
 
 				hotbar_lb.create(lower_side, lower_side, 4);
 				hotbar_lb.fill({ 0, 0, 0, 0 });

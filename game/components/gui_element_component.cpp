@@ -34,11 +34,6 @@ using namespace augs::gui;
 using namespace augs::gui::text;
 
 namespace components {
-	gui_element::gui_element() :
-		drop_item_icon(augs::gui::material(assets::texture_id::DROP_HAND_ICON, red))
-	{
-	}
-
 	rects::xywh<float> gui_element::get_rectangle_for_slot_function(const slot_function f) {
 		switch (f) {
 		case slot_function::PRIMARY_HAND: return rects::xywh<float>(100, 0, 33, 33);

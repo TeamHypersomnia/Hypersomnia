@@ -4,6 +4,7 @@
 #include "rects.h"
 #include "augs/misc/randomization.h"
 #include "declare.h"
+#include "augs/templates/hash_templates.h"
 
 #define AUGS_EPSILON 0.0001f
 #define DEG_TO_RAD 0.01745329251994329576923690768489
@@ -197,7 +198,7 @@ struct vec2t {
 		return *this;
 	}
 
-	vec2t(type x = 0, type y = 0) : x(x), y(y) {}
+	vec2t(const type x = static_cast<type>(0), const type y = static_cast<type>(0)) : x(x), y(y) {}
 
 	/* from http://stackoverflow.com/a/1501725 */
 	real distance_from_segment_sq(vec2t v, vec2t w) const {
@@ -227,7 +228,7 @@ struct vec2t {
 		return start + get_projection_multiplier(start, end) * (end - start);
 	}
 
-	vec2t closest_point_on_segment(vec2t v, vec2t w) const {
+	vec2t closest_point_on_segment(const vec2t v, const vec2t w) const {
 		const real t = ((*this) - v).dot(w - v) / (v - w).length_sq();
 
 		if (t < 0.f) return v;
@@ -236,11 +237,11 @@ struct vec2t {
 		return v + t * (w - v);
 	}
 
-	type dot(vec2t v) const {
+	type dot(const vec2t v) const {
 		return x * v.x + y * v.y;
 	}
 
-	type cross(vec2t v) const {
+	type cross(const vec2t v) const {
 		return x * v.y - y * v.x;
 	}
 
@@ -297,45 +298,45 @@ struct vec2t {
 		return *this;
 	}
 
-	vec2t& set_from_degrees(real degrees) {
-		float radians = degrees * DEG_TO_RADf;
+	vec2t& set_from_degrees(const real degrees) {
+		const auto radians = degrees * DEG_TO_RADf;
 		set(cos(radians), sin(radians));
 		normalize();
 		return *this;
 	}
 
-	vec2t& set_from_radians(real radians) {
+	vec2t& set_from_radians(const real radians) {
 		return set_from_degrees(radians * RAD_TO_DEGf);
 	}
 
 	template <typename v>
-	vec2t& rotate(real angle, v origin) {
+	vec2t& rotate(const real angle, const v origin) {
 		augs::rotate<vec2t, float>(*this, origin, angle);
 		return *this;
 	}
 
 	template <typename v>
-	vec2t& rotate_radians(real angle, v origin) {
+	vec2t& rotate_radians(const real angle, const v origin) {
 		augs::rotate_radians<vec2t, float>(*this, origin, angle);
 		return *this;
 	}
 
-	vec2t lerp(const vec2t& bigger, real ratio) const {
+	vec2t lerp(const vec2t& bigger, const real ratio) const {
 		return (*this) + (bigger - (*this)) * ratio;
 	}
 
-	vec2t& set_length(real len) {
+	vec2t& set_length(const real len) {
 		normalize();
 		return (*this) *= len;
 	}
 
-	vec2t& add_length(real len) {
+	vec2t& add_length(const real len) {
 		real actual_length = length();
 		normalize_hint(actual_length);
 		return (*this) *= (actual_length + len);
 	}
 
-	vec2t& normalize_hint(real suggested_length) {
+	vec2t& normalize_hint(const real suggested_length) {
 		real len = suggested_length;
 		if (std::abs(len) < std::numeric_limits<real>::epsilon())
 			return *this;
@@ -356,7 +357,7 @@ struct vec2t {
 	}
 
 	template<class t>
-	vec2t& damp(t len) {
+	vec2t& damp(const t len) {
 		if (len == static_cast<t>(0)) return *this;
 
 		t current_length = length();
@@ -370,7 +371,7 @@ struct vec2t {
 	}
 
 	template<class t>
-	vec2t& clamp(vec2t<t> rect) {
+	vec2t& clamp(const vec2t<t> rect) {
 		if (x > rect.x) x = rect.x;
 		if (y > rect.y) y = rect.y;
 		if (x < -rect.x) x = -rect.x;
@@ -379,7 +380,7 @@ struct vec2t {
 	}
 
 	template<class t>
-	vec2t& clamp_from_zero_to(vec2t<t> rect) {
+	vec2t& clamp_from_zero_to(const vec2t<t> rect) {
 		if (x > rect.x) x = rect.x;
 		if (y > rect.y) y = rect.y;
 		if (x < static_cast<type>(0)) x = static_cast<type>(0);
@@ -388,7 +389,7 @@ struct vec2t {
 	}
 
 	template<class t>
-	vec2t& clamp_rotated(vec2t<t> rect, t current_angle) {
+	vec2t& clamp_rotated(vec2t<t> rect, const t current_angle) {
 		rect.rotate(-current_angle, vec2(0, 0));
 		auto unrotated_this = vec2(*this).rotate(-current_angle, vec2(0, 0));
 
@@ -403,7 +404,7 @@ struct vec2t {
 		return *this;
 	}
 
-	vec2t& clamp(real max_length) {
+	vec2t& clamp(const real max_length) {
 		if (length_sq() > max_length*max_length) {
 			normalize();
 			(*this) *= max_length;
@@ -411,19 +412,19 @@ struct vec2t {
 		return *this;
 	}
 
-	bool x_non_zero(real eps = AUGS_EPSILON) const {
+	bool x_non_zero(const real eps = AUGS_EPSILON) const {
 		return std::abs(x) > eps;
 	}
 
-	bool y_non_zero(real eps = AUGS_EPSILON) const {
+	bool y_non_zero(const real eps = AUGS_EPSILON) const {
 		return std::abs(y) > eps;
 	}
 
-	bool non_zero(real eps = AUGS_EPSILON) const {
+	bool non_zero(const real eps = AUGS_EPSILON) const {
 		return x_non_zero(eps) || y_non_zero(eps);
 	}
 
-	bool is_zero(real eps = AUGS_EPSILON) const {
+	bool is_zero(const real eps = AUGS_EPSILON) const {
 		return !non_zero(eps);
 	}
 
@@ -499,7 +500,7 @@ namespace std {
 	template <class T>
 	struct hash<vec2t<T>> {
 		std::size_t operator()(const vec2t<T> v) const {
-			return ((std::hash<T>()(v.x) ^ (std::hash<T>()(v.y) << 1)) >> 1);
+			return augs::simple_two_hash(v.x, v.y);
 		}
 	};
 }

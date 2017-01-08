@@ -174,8 +174,8 @@ namespace std {
 	template <class... Types>
 	struct hash<augs::trivial_variant<Types...>> {
 		std::size_t operator()(const augs::trivial_variant<Types...>& k) const {
-			return k.call([&k](auto resolved) {
-				return ((std::hash<unsigned>()(k.get_current_type_index()) ^ (std::hash<decltype(resolved)>()(resolved) << 1)) >> 1);
+			return k.call([&k](const auto& resolved) {
+				return augs::simple_two_hash(k.get_current_type_index(), resolved);
 			});
 		}
 	};

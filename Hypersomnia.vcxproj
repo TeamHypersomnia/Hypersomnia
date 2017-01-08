@@ -321,7 +321,7 @@
     <ClCompile Include="application\setups\director_setup.cpp" />
     <ClCompile Include="application\setups\menu_setup.cpp" />
     <ClCompile Include="application\ui\app_ui_root.cpp" />
-    <ClCompile Include="application\ui\button_corners.cpp" />
+    <ClCompile Include="augs\gui\button_corners.cpp" />
     <ClCompile Include="application\ui\dx_button.cpp" />
     <ClCompile Include="augs\al_log.cpp" />
     <ClCompile Include="augs\audio\audio_manager.cpp" />
@@ -362,6 +362,7 @@
     <ClCompile Include="game\detail\gui\drag_and_drop.cpp" />
     <ClCompile Include="game\detail\gui\grid.cpp" />
     <ClCompile Include="game\detail\gui\gui_positioning.cpp" />
+    <ClCompile Include="game\detail\gui\hotbar_button.cpp" />
     <ClCompile Include="game\detail\gui\immediate_hud.cpp" />
     <ClCompile Include="game\detail\gui\item_button.cpp" />
     <ClCompile Include="game\detail\gui\pixel_line_connector.cpp" />
@@ -1006,7 +1007,7 @@
     <ClInclude Include="application\ui\app_ui_context.h" />
     <ClInclude Include="application\ui\app_ui_element_location.h" />
     <ClInclude Include="application\ui\app_ui_root.h" />
-    <ClInclude Include="application\ui\button_corners.h" />
+    <ClInclude Include="augs\gui\button_corners.h" />
     <ClInclude Include="application\ui\locations\app_ui_root_in_context.h" />
     <ClInclude Include="application\ui\locations\dx_button_in_menu.h" />
     <ClInclude Include="application\ui\dx_button.h" />
@@ -1072,6 +1073,7 @@
     <ClInclude Include="augs\padding_byte.h" />
     <ClInclude Include="augs\templates\find_matching_type.h" />
     <ClInclude Include="augs\templates\for_each_in_types.h" />
+    <ClInclude Include="augs\templates\hash_templates.h" />
     <ClInclude Include="augs\templates\held_ids_introspector.h" />
     <ClInclude Include="augs\templates\is_component_synchronized.h" />
     <ClInclude Include="augs\templates\maybe_const.h" />
@@ -1107,9 +1109,11 @@
     <ClInclude Include="game\detail\gui\grid.h" />
     <ClInclude Include="augs\gui\rect_tree.h" />
     <ClInclude Include="game\detail\gui\gui_positioning.h" />
+    <ClInclude Include="game\detail\gui\hotbar_button.h" />
     <ClInclude Include="game\detail\gui\immediate_hud.h" />
     <ClInclude Include="game\detail\gui\item_button.h" />
     <ClInclude Include="game\detail\gui\locations\drag_and_drop_target_drop_item_in_gui_element.h" />
+    <ClInclude Include="game\detail\gui\locations\hotbar_button_in_gui_element.h" />
     <ClInclude Include="game\detail\gui\locations\item_button_in_item.h" />
     <ClInclude Include="game\detail\gui\locations\root_of_inventory_gui_in_context.h" />
     <ClInclude Include="game\detail\gui\locations\slot_button_in_container.h" />
