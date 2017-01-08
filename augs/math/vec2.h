@@ -219,9 +219,12 @@ struct vec2t {
 		return sqrt(distance_from_segment_sq(v, w));
 	}
 
-	vec2t project_onto(vec2t v, vec2t w) const {
-		const real t = ((*this) - v).dot(w - v) / (v - w).length_sq();
-		return v + t * (w - v);
+	real get_projection_multiplier(const vec2t start, const vec2t end) const {
+		return ((*this) - start).dot(end - start) / (start - end).length_sq();
+	}
+
+	vec2t project_onto(const vec2t start, const vec2t end) const {
+		return start + get_projection_multiplier(start, end) * (end - start);
 	}
 
 	vec2t closest_point_on_segment(vec2t v, vec2t w) const {

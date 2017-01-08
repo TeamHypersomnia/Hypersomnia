@@ -29,9 +29,13 @@ namespace rendering_scripts {
 				const auto muzzle = gun.calculate_muzzle_position(rifle_transform);
 
 				line_from[0] = muzzle;
-				line_to[0] = crosshair_pos.project_onto(muzzle, barrel_center);
+				
+				const auto proj = crosshair_pos.get_projection_multiplier(barrel_center, muzzle);
 
-				callback(line_from[0], line_to[0], cols[0]);
+				if (proj > 1.f) {
+					line_to[0] = barrel_center + (muzzle - barrel_center) * proj;
+					callback(line_from[0], line_to[0], cols[0]);
+				}
 			}
 
 			if (guns.size() >= 2) {
@@ -44,9 +48,14 @@ namespace rendering_scripts {
 				const auto muzzle = gun.calculate_muzzle_position(rifle_transform);
 
 				line_from[1] = muzzle;
-				line_to[1] = crosshair_pos.project_onto(muzzle, barrel_center);
 
-				callback(line_from[1], line_to[1], cols[1]);
+				const auto proj = crosshair_pos.get_projection_multiplier(barrel_center, muzzle);
+
+				if (proj > 1.f) {
+					line_to[1] = barrel_center + (muzzle - barrel_center) * proj;
+
+					callback(line_from[1], line_to[1], cols[1]);
+				}
 			}
 		}
 	}
