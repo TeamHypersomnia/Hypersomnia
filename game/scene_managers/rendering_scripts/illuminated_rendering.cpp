@@ -188,30 +188,16 @@ namespace rendering_scripts {
 				},
 
 				[&](const vec2 from, const vec2 to) {
-					const auto dash_length = 10.f;
-					const auto dash_velocity = 20.f;
-
-					auto dash_end = fmod(global_time_seconds*dash_velocity, dash_length * 2);
-					float dash_begin = dash_end - dash_length;
-					dash_begin = std::max(dash_begin, 0.f);
-
-					auto line_vector = to - from;
-					const auto line_length = line_vector.length();
-					line_vector /= line_length;
-
-					while (dash_begin < line_length) {
-						augs::draw_line(
-							renderer.lines,
-							camera[from + line_vector * dash_begin],
-							camera[from + line_vector * dash_end],
-							get_resource_manager().find(assets::texture_id::LASER)->tex,
-							white
-						);
-
-						dash_begin = dash_end + dash_length;
-						dash_end = dash_begin + dash_length;
-						dash_end = std::min(dash_end, line_length);
-					}
+					augs::draw_dashed_line(
+						renderer.lines,
+						camera[from],
+						camera[to],
+						get_resource_manager().find(assets::texture_id::LASER)->tex,
+						white,
+						10.f,
+						40.f, 
+						global_time_seconds
+					);
 				},
 
 				interp, 
