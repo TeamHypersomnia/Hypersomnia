@@ -4,6 +4,9 @@
 #include "game/components/gun_component.h"
 #include "augs/graphics/drawers.h"
 
+#include "game/systems_temporary/physics_system.h"
+#include "game/enums/filters.h"
+
 namespace rendering_scripts {
 	void draw_crosshair_lines(
 		std::function<void(vec2, vec2, rgba)> callback,
@@ -11,6 +14,8 @@ namespace rendering_scripts {
 		const const_entity_handle crosshair, 
 		const const_entity_handle character) {
 		if (crosshair.alive()) {
+			const auto& physics = crosshair.get_cosmos().systems_temporary.get<physics_system>();
+
 			vec2 line_from[2];
 			vec2 line_to[2];
 			rgba cols[2] = { cyan, cyan };
@@ -34,6 +39,13 @@ namespace rendering_scripts {
 
 				if (proj > 1.f) {
 					line_to[0] = barrel_center + (muzzle - barrel_center) * proj;
+					
+					const auto raycast = physics.ray_cast_px(line_from[0], line_to[0], filters::bullet(), subject_item);
+
+					if (raycast.hit) {
+						line_to[0] = raycast.intersection;
+					}
+
 					callback(line_from[0], line_to[0], cols[0]);
 				}
 			}
@@ -53,6 +65,12 @@ namespace rendering_scripts {
 
 				if (proj > 1.f) {
 					line_to[1] = barrel_center + (muzzle - barrel_center) * proj;
+					
+					const auto raycast = physics.ray_cast_px(line_from[1], line_to[1], filters::bullet(), subject_item);
+
+					if (raycast.hit) {
+						line_to[1] = raycast.intersection;
+					}
 
 					callback(line_from[1], line_to[1], cols[1]);
 				}
