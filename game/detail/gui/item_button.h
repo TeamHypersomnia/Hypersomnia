@@ -37,8 +37,9 @@ struct item_button : game_gui_rect_node {
 		const augs::rgba col = augs::white
 	);
 
-	struct drawing_flags {
-		bool draw_inside = false;
+	struct drawing_settings {
+		bool draw_background = false;
+		bool draw_item = false;
 		bool draw_border = false;
 		bool draw_connector = false;
 		bool decrease_alpha = false;
@@ -85,5 +86,5 @@ struct item_button : game_gui_rect_node {
 	static void draw_grid_border_ghost(const viewing_gui_context&, const const_this_in_item&, draw_info in);
 	static void draw_complete_dragged_ghost(const viewing_gui_context&, const const_this_in_item&, draw_info);
 
-	static void draw_proc(const viewing_gui_context&, const const_this_in_item&, draw_info, const drawing_flags&);
+	static void draw_proc(const viewing_gui_context&, const const_this_in_item&, draw_info, const drawing_settings&);
 };

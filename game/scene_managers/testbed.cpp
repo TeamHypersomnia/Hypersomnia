@@ -91,7 +91,7 @@ namespace scene_managers {
 		};
 
 		for (int i = 0; i < num_characters; ++i) {
-			assets::animation_response_id torso_set;
+			assets::animation_response_id torso_set = assets::animation_response_id::TORSO_SET;
 			components::transform transform;
 
 			if (i == 0) {
@@ -676,7 +676,7 @@ namespace scene_managers {
 			riding_car.get<components::car>().accelerating = true;
 		}
 
-		select_character(character(0));
+		select_character(character(1));
 
 		prefabs::create_sample_suppressor(world, vec2(300, -500));
 

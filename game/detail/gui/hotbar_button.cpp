@@ -1,6 +1,12 @@
 #include "hotbar_button.h"
 #include "augs/gui/button_corners.h"
 #include "game/transcendental/cosmos.h"
+#include "game/detail/gui/item_button.h"
+#include "game/components/item_component.h"
+
+void hotbar_button::associate_entity(const const_entity_handle h) {
+	last_associated_entity = h.get_id();
+}
 
 void hotbar_button::draw(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in) {
 	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING)) {
@@ -91,6 +97,32 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 			}
 		}
 	}
+
+	const auto& cosmos = context.get_step().get_cosmos();
+	const auto associated_entity = cosmos[this_id->last_associated_entity];
+
+	if (associated_entity.alive() && associated_entity.get_owning_transfer_capability() == context.get_gui_element_entity()) {
+		ensure(associated_entity.has<components::item>());
+
+		item_button_in_item location;
+		location.item_id = this_id->last_associated_entity;
+
+		const auto dereferenced = context.dereference_location(location);
+		ensure(dereferenced != nullptr);
+
+		item_button::drawing_settings f;
+		f.draw_background = false;
+		f.draw_item = true;
+		f.draw_border = false;
+		f.draw_connector = false;
+		f.decrease_alpha = false;
+		f.decrease_border_alpha = false;
+		f.draw_container_opened_mark = false;
+		f.draw_charges = true;
+		f.absolute_xy_offset = this_tree_entry.get_absolute_pos() - context.get_tree_entry(location).get_absolute_pos();
+
+		item_button::draw_proc(context, dereferenced, in, f);
+	}
 }
 
 void hotbar_button::advance_elements(const logic_gui_context& context, const this_in_item& this_id, const gui_entropy& entropies, const augs::delta dt) {
@@ -101,6 +133,10 @@ void hotbar_button::advance_elements(const logic_gui_context& context, const thi
 
 		if (info.is_ldown_or_double_or_triple()) {
 
+		}
+
+		if (info.msg == gui_event::hover) {
+			this_id->elapsed_hover_time_ms = 0.f;
 		}
 	}
 

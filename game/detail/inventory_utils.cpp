@@ -9,6 +9,7 @@
 #include "game/components/interpolation_component.h"
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/name_component.h"
+#include "game/components/gui_element_component.h"
 #include "game/detail/entity_scripts.h"
 #include "game/messages/queue_destruction.h"
 #include "game/transcendental/entity_handle.h"
@@ -369,6 +370,15 @@ void perform_transfer(const item_slot_transfer_request r, logic_step& step) {
 		if (is_pickup_or_transfer) {
 			initialize_item_button_for_new_gui_owner(grabbed_item_part_handle);
 			grabbed_item_part_handle.for_each_contained_slot_and_item_recursive(initialize_slot_button_for_new_gui_owner, initialize_item_button_for_new_gui_owner);
+		}
+
+		const auto previous_capability = previous_slot.get_container().get_owning_transfer_capability();
+		const auto target_capability = r.get_target_slot().get_container().get_owning_transfer_capability();
+
+		if (target_capability.alive() && target_capability != previous_capability) {
+			if (target_capability.has<components::gui_element>()) {
+				target_capability.get<components::gui_element>().hotbar_buttons.at(0).associate_entity(grabbed_item_part_handle);
+			}
 		}
 		
 		auto& grabbed_item = grabbed_item_part_handle.get<components::item>();

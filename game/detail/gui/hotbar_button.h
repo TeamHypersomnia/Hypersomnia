@@ -12,12 +12,16 @@ public:
 	typedef dereferenced_location<hotbar_button_in_gui_element> this_in_item;
 	typedef const_dereferenced_location<hotbar_button_in_gui_element> const_this_in_item;
 	
+	entity_id last_associated_entity;
+
 	augs::gui::appearance_detector detector;
 
 	float elapsed_hover_time_ms = 0.f;
 
 	float hover_highlight_maximum_distance = 8.f;
 	float hover_highlight_duration_ms = 400.f;
+
+	void associate_entity(const const_entity_handle);
 
 	static void draw(const viewing_gui_context&, const const_this_in_item& this_id, draw_info);
 

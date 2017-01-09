@@ -45,8 +45,9 @@ item_button::item_button(rects::xywh<float> rc) : base(rc) {
 }
 
 void item_button::draw_dragged_ghost_inside(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in) {
-	drawing_flags f;
-	f.draw_inside = true;
+	drawing_settings f;
+	f.draw_background = true;
+	f.draw_item = true;
 	f.draw_border = false;
 	f.draw_connector = false;
 	f.decrease_alpha = true;
@@ -59,8 +60,9 @@ void item_button::draw_dragged_ghost_inside(const viewing_gui_context& context, 
 }
 
 void item_button::draw_complete_with_children(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in) {
-	drawing_flags f;
-	f.draw_inside = true;
+	drawing_settings f;
+	f.draw_background = true;
+	f.draw_item = true;
 	f.draw_border = true;
 	f.draw_connector = true;
 	f.decrease_alpha = false;
@@ -73,8 +75,9 @@ void item_button::draw_complete_with_children(const viewing_gui_context& context
 }
 
 void item_button::draw_grid_border_ghost(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in) {
-	drawing_flags f;
-	f.draw_inside = false;
+	drawing_settings f;
+	f.draw_background = false;
+	f.draw_item = false;
 	f.draw_border = true;
 	f.draw_connector = false;
 	f.decrease_alpha = true;
@@ -176,7 +179,7 @@ rects::ltrb<float> item_button::iterate_children_attachments(
 	return button_bbox;
 }
 
-void item_button::draw_proc(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in, const drawing_flags& f) {
+void item_button::draw_proc(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in, const drawing_settings& f) {
 	if (is_inventory_root(context, this_id)) {
 		return;
 	}
@@ -223,9 +226,11 @@ void item_button::draw_proc(const viewing_gui_context& context, const const_this
 		border_col = slightly_visible_white;
 	}
 
-	if (f.draw_inside) {
+	if (f.draw_background) {
 		draw_stretched_texture(context, this_id, in, augs::gui::material(assets::texture_id::BLANK, inside_col));
+	}
 
+	if (f.draw_item) {
 		iterate_children_attachments(context, this_id, true, &in.v, border_col);
 
 		if (f.draw_charges) {
