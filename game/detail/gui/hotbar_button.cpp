@@ -136,7 +136,7 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 		f.decrease_alpha = false;
 		f.decrease_border_alpha = false;
 		f.draw_container_opened_mark = false;
-		f.draw_charges = true;
+		f.draw_charges = false;
 		f.absolute_xy_offset = this_tree_entry.get_absolute_pos() - context.get_tree_entry(location).get_absolute_pos();
 
 		item_button::draw_proc(context, dereferenced, in, f);

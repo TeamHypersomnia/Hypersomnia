@@ -25,6 +25,8 @@ namespace ingredients {
 		auto& container = e += components::container();
 		item.space_occupied_per_charge = to_space_units("3.5");
 
+		const auto bbox = e.get_aabb(components::transform()).get_size();
+
 		{
 			inventory_slot slot_def;
 			slot_def.is_physical_attachment_slot = true;
@@ -32,7 +34,7 @@ namespace ingredients {
 			slot_def.for_categorized_items_only = true;
 			slot_def.category_allowed = item_category::MAGAZINE;
 			slot_def.attachment_sticking_mode = augs::rects::sticking::TOP;
-			slot_def.attachment_offset.pos.set(10, 5);
+			slot_def.attachment_offset.pos.set(10, 5 - bbox.y/2 + 2);
 			slot_def.attachment_offset.rotation = mag_rotation;
 
 			container.slots[slot_function::GUN_DETACHABLE_MAGAZINE] = slot_def;
@@ -56,6 +58,7 @@ namespace ingredients {
 			slot_def.for_categorized_items_only = true;
 			slot_def.category_allowed = item_category::MUZZLE_ATTACHMENT;
 			slot_def.attachment_sticking_mode = augs::rects::sticking::RIGHT;
+			slot_def.attachment_offset.pos.x = bbox.x/2 - 1;
 
 			container.slots[slot_function::GUN_MUZZLE] = slot_def;
 		}
@@ -407,8 +410,11 @@ namespace prefabs {
 		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::BILMER2000, augs::white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::see_through_dynamic_body(weapon);
 		ingredients::default_gun_container(weapon);
+		
+		const auto bbox = weapon.get_aabb(components::transform()).get_size();
+
 		auto& container = weapon.get<components::container>();
-		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_offset.pos.set(-10, -10);
+		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_offset.pos.set(-10, -10 + bbox.y/2);
 		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_sticking_mode = augs::rects::sticking::BOTTOM;
 
 		auto& response = weapon += components::sound_response();
@@ -626,7 +632,10 @@ namespace prefabs {
 		ingredients::see_through_dynamic_body(weapon);
 		ingredients::default_gun_container(weapon, 0);
 		auto& container = weapon.get<components::container>();
-		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_offset.pos.set(1, -11);
+		
+		const auto bbox = weapon.get_aabb(components::transform()).get_size();
+		
+		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_offset.pos.set(1, -11 + bbox.y/2);
 		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_sticking_mode = augs::rects::sticking::BOTTOM;
 
 		auto& response = weapon += components::sound_response();
