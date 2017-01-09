@@ -20,23 +20,51 @@ public:
 	
 	std::vector<entity_handle_type> guns_wielded() const;
 
+	inventory_item_address get_address_from_root() const;
+
+private:
 	template <class S, class I>
-	void for_each_contained_slot_and_item_recursive(S slot_callback, I item_callback) const {
+	void for_each_contained_slot_and_item_recursive(S slot_callback, I item_callback, inventory_traversal& trav) const {
 		const auto this_item_handle = *static_cast<const entity_handle_type*>(this);
 		maybe_const_ref_t<is_const, cosmos> cosm = this_item_handle.get_cosmos();
 
 		if (this_item_handle.has<components::container>()) {
+			trav.current_address.directions.push_back(slot_function());
+			const auto this_item_attachment_offset = trav.attachment_offset;
+
 			for (const auto& s : this_item_handle.get<components::container>().slots) {
-				slot_callback(cosm[inventory_slot_id(s.first, this_item_handle.get_id())]);
+				const auto this_slot_id = inventory_slot_id(s.first, this_item_handle.get_id());
+				
+				slot_callback(cosm[this_slot_id]);
+				
+				const bool this_slot_physical = trav.item_remains_physical && s.second.is_physical_attachment_slot;
 
 				for (const auto& id : s.second.items_inside) {
-					const auto child_handle = cosm[id];
+					const auto child_item_handle = cosm[id];
+					trav.parent_slot = this_slot_id;
+					trav.current_address.directions.back() = this_slot_id.type;
+					trav.item_remains_physical = this_slot_physical;
 
-					item_callback(child_handle);
-					child_handle.for_each_contained_slot_and_item_recursive(slot_callback, item_callback);
+					if (trav.item_remains_physical) {
+						trav.attachment_offset = this_item_attachment_offset + get_attachment_offset(s.second, this_item_attachment_offset, child_item_handle);
+					}
+
+					item_callback(child_item_handle, static_cast<const inventory_traversal&>(trav));
+					child_item_handle.for_each_contained_slot_and_item_recursive(slot_callback, item_callback, trav);
 				}
 			}
 		}
+	}
+
+public:
+
+	template <class S, class I>
+	void for_each_contained_slot_and_item_recursive(S slot_callback, I item_callback) const {
+		const auto this_item_handle = *static_cast<const entity_handle_type*>(this);
+
+		inventory_traversal trav;
+		trav.current_address.root_container = this_item_handle.get_id();
+		for_each_contained_slot_and_item_recursive(slot_callback, item_callback, trav);
 	}
 
 	template <class F>

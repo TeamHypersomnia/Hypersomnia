@@ -23,11 +23,6 @@ typename basic_inventory_slot_handle<C>::owner_reference basic_inventory_slot_ha
 }
 
 template <bool C>
-typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot_handle<C>::get_handle() const {
-	return make_handle(raw_id.container_entity);
-}
-
-template <bool C>
 typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot_handle<C>::make_handle(const entity_id id) const {
 	return owner[id];
 }
@@ -39,7 +34,7 @@ typename basic_inventory_slot_handle<C> basic_inventory_slot_handle<C>::make_han
 
 template <bool C>
 typename basic_inventory_slot_handle<C>::slot_pointer basic_inventory_slot_handle<C>::operator->() const {
-	return &get_handle().get<components::container>().slots[raw_id.type];
+	return &get_container().get<components::container>().slots[raw_id.type];
 }
 
 template <bool C>
@@ -54,10 +49,11 @@ typename basic_inventory_slot_handle<C>::slot_reference basic_inventory_slot_han
 
 template <bool C>
 bool basic_inventory_slot_handle<C>::alive() const {
-	if (get_handle().dead())
+	if (get_container().dead()) {
 		return false;
+	}
 
-	const auto* container = get_handle().find<components::container>();
+	const auto* const container = get_container().find<components::container>();
 
 	return container && container->slots.find(raw_id.type) != container->slots.end();
 }
@@ -99,22 +95,23 @@ bool basic_inventory_slot_handle<C>::is_empty_slot() const {
 
 template <bool C>
 bool basic_inventory_slot_handle<C>::should_item_inside_keep_physical_body(const entity_id until_parent) const {
-	bool should_item_here_keep_physical_body = get().is_physical_attachment_slot;
+	const bool should_item_here_keep_physical_body = get().is_physical_attachment_slot;
 
-	if (get_handle() == until_parent) {
+	if (get_container() == until_parent) {
 		return should_item_here_keep_physical_body;
 	}
 
-	auto* maybe_item = get_handle().find<components::item>();
+	const auto* const maybe_item = get_container().find<components::item>();
 
 	if (maybe_item) {
-		//if (maybe_item->current_slot.get_handle().alive() && maybe_item->current_slot.get_handle() == until_parent)
+		//if (maybe_item->current_slot.get_container().alive() && maybe_item->current_slot.get_container() == until_parent)
 		//	return should_item_here_keep_physical_body;
 		//else 
-		auto slot = owner[maybe_item->current_slot];
+		const auto slot = owner[maybe_item->current_slot];
 
-		if (slot.alive())
+		if (slot.alive()) {
 			return std::min(should_item_here_keep_physical_body, slot.should_item_inside_keep_physical_body(until_parent));
+		}
 	}
 
 	return should_item_here_keep_physical_body;
@@ -123,50 +120,31 @@ bool basic_inventory_slot_handle<C>::should_item_inside_keep_physical_body(const
 template <bool C>
 float basic_inventory_slot_handle<C>::calculate_density_multiplier_due_to_being_attached() const {
 	ensure(get().is_physical_attachment_slot);
-	float density_multiplier = get().attachment_density_multiplier;
+	
+	const float density_multiplier = get().attachment_density_multiplier;
 
-	auto* maybe_item = get_handle().find<components::item>();
-
+	const auto* const maybe_item = get_container().find<components::item>();
 	
 	if (maybe_item) {
-		auto slot = owner.get_handle(maybe_item->current_slot);
+		const auto slot = owner.get_handle(maybe_item->current_slot);
 
-		if (slot.alive())
+		if (slot.alive()) {
 			return density_multiplier * slot.calculate_density_multiplier_due_to_being_attached();
+		}
 	}
-
 
 	return density_multiplier;
 }
 
 template <bool C>
-components::transform basic_inventory_slot_handle<C>::sum_attachment_offsets_of_parents(const entity_id attached_item) const {
-	const auto attached_item_handle = make_handle(attached_item);
-	const auto sticking = get().attachment_sticking_mode;
+typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot_handle<C>::get_root_container() const {
+	const auto slot = get_container().get_current_slot();
 
-	auto offset = get().attachment_offset;
-	offset.pos += attached_item_handle.get<components::fixtures>().get_local_aabb().get_size().get_sticking_offset(sticking);
-	offset.pos += get_handle().get<components::fixtures>().get_local_aabb().get_size().get_sticking_offset(sticking);
-
-	offset += attached_item_handle.get<components::item>().attachment_offsets_per_sticking_mode[sticking];
-
-	const auto* const maybe_item = get_handle().find<components::item>();
-
-	if (maybe_item && make_handle(maybe_item->current_slot).alive()) {
-		return offset + make_handle(maybe_item->current_slot).sum_attachment_offsets_of_parents(get_handle());
+	if (slot.alive()) {
+		return slot.get_root_container();
 	}
 
-	return offset;
-}
-
-template <bool C>
-typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot_handle<C>::get_root_container() const {
-	auto* maybe_item = get_handle().find<components::item>();
-
-	if (maybe_item && make_handle(maybe_item->current_slot).alive())
-		return make_handle(maybe_item->current_slot).get_root_container();
-
-	return get_handle();
+	return get_container();
 }
 
 template <bool C>
@@ -181,22 +159,24 @@ typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot
 
 template <bool C>
 unsigned basic_inventory_slot_handle<C>::calculate_free_space_with_parent_containers() const {
-	auto maximum_space = calculate_free_space_with_children();
+	const auto maximum_space = calculate_free_space_with_children();
 
-	auto* maybe_item = get_handle().find<components::item>();
+	const auto* const maybe_item = get_container().find<components::item>();
 
-	if (maybe_item && make_handle(maybe_item->current_slot).alive())
+	if (maybe_item && make_handle(maybe_item->current_slot).alive()) {
 		return std::min(maximum_space, make_handle(maybe_item->current_slot).calculate_free_space_with_parent_containers());
+	}
 
 	return maximum_space;
 }
 
 template <bool C>
 bool basic_inventory_slot_handle<C>::can_contain(const entity_id id) const {
-	if (dead())
+	if (dead()) {
 		return false;
+	}
 
-	basic_item_slot_transfer_request<C> r(get_cosmos()[id], *this);
+	const basic_item_slot_transfer_request<C> r(get_cosmos()[id], *this);
 	return containment_result(r).transferred_charges > 0;
 }
 
@@ -232,13 +212,14 @@ std::vector<typename basic_inventory_slot_handle<C>::entity_handle_type> basic_i
 
 template <bool C>
 unsigned basic_inventory_slot_handle<C>::calculate_free_space_with_children() const {
-	if (get().has_unlimited_space())
+	if (get().has_unlimited_space()) {
 		return 1000000 * SPACE_ATOMS_PER_UNIT;
+	}
 
 	unsigned space = get().space_available;
 
-	for (auto e : get_items_inside()) {
-		auto occupied = calculate_space_occupied_with_children(e);
+	for (const auto e : get_items_inside()) {
+		const auto occupied = calculate_space_occupied_with_children(e);
 		ensure(occupied <= space);
 		space -= occupied;
 	}

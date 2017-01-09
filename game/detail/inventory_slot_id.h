@@ -3,6 +3,9 @@
 #include "game/transcendental/entity_id.h"
 
 #include "augs/templates/hash_templates.h"
+#include "augs/misc/constant_size_vector.h"
+
+#include "game/components/transform_component.h"
 
 struct inventory_slot_id {
 	slot_function type;
@@ -24,6 +27,18 @@ struct inventory_slot_id {
 	bool operator<(const inventory_slot_id& b) const;
 	bool operator==(const inventory_slot_id& b) const;
 	bool operator!=(const inventory_slot_id& b) const;
+};
+
+struct inventory_item_address {
+	entity_id root_container;
+	augs::constant_size_vector<slot_function, 6> directions;
+};
+
+struct inventory_traversal {
+	inventory_slot_id parent_slot;
+	inventory_item_address current_address;
+	components::transform attachment_offset;
+	bool item_remains_physical = true;
 };
 
 namespace std {

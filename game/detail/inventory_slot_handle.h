@@ -23,7 +23,6 @@ class basic_inventory_slot_handle {
 	typedef maybe_const_ref_t<is_const, inventory_slot> slot_reference;
 	typedef maybe_const_ptr_t<is_const, inventory_slot> slot_pointer;
 
-	entity_handle_type get_handle() const;
 public:
 	static constexpr bool is_const_value = is_const;
 	
@@ -76,8 +75,6 @@ public:
 
 	float calculate_density_multiplier_due_to_being_attached() const;
 	unsigned calculate_free_space_with_children() const;
-
-	components::transform sum_attachment_offsets_of_parents(const entity_id attached_item) const;
 
 	bool should_item_inside_keep_physical_body(const entity_id until_parent = entity_id()) const;
 

@@ -357,6 +357,7 @@
     <ClCompile Include="game\components\gui_element_component.cpp" />
     <ClCompile Include="game\components\light_component.cpp" />
     <ClCompile Include="game\components\sound_existence_component.cpp" />
+    <ClCompile Include="game\detail\entity\renderable_helpers.cpp" />
     <ClCompile Include="game\detail\entity\spatial_properties_getters.cpp" />
     <ClCompile Include="game\detail\gui\aabb_highlighter.cpp" />
     <ClCompile Include="game\detail\gui\drag_and_drop.cpp" />
@@ -1101,6 +1102,7 @@
     <ClInclude Include="game\container_sizes.h" />
     <ClInclude Include="game\detail\basic_renderable_drawing_input.h" />
     <ClInclude Include="game\detail\camera_cone.h" />
+    <ClInclude Include="game\detail\entity\renderable_helpers.h" />
     <ClInclude Include="game\detail\entity\spatial_properties_getters.h" />
     <ClInclude Include="game\detail\gui\aabb_highlighter.h" />
     <ClInclude Include="game\detail\gui\drag_and_drop.h" />

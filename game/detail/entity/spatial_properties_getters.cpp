@@ -2,6 +2,7 @@
 #include "game/components/physics_component.h"
 #include "game/components/special_physics_component.h"
 #include "game/components/fixtures_component.h"
+#include "game/components/wandering_pixels_component.h"
 #include "game/components/position_copying_component.h"
 #include "game/transcendental/cosmos.h"
 #include "spatial_properties_getters.h"
@@ -9,9 +10,8 @@
 
 template <bool C, class D>
 bool basic_spatial_properties_getters<C, D>::has_logic_transform() const {
-	auto& handle = *static_cast<const D*>(this);
-
-	const auto& owner = handle.get_owner_body();
+	const auto handle = *static_cast<const D*>(this);
+	const auto owner = handle.get_owner_body();
 	
 	if (owner.alive() && owner != handle) {
 		return true;
@@ -28,9 +28,9 @@ bool basic_spatial_properties_getters<C, D>::has_logic_transform() const {
 
 template <bool C, class D>
 components::transform basic_spatial_properties_getters<C, D>::logic_transform() const {
-	auto& handle = *static_cast<const D*>(this);
+	const auto handle = *static_cast<const D*>(this);
 
-	const auto& owner = handle.get_owner_body();
+	const auto owner = handle.get_owner_body();
 
 	if (owner.alive() && owner != handle) {
 		return components::fixtures::transform_around_body(handle, owner.logic_transform());
@@ -40,16 +40,18 @@ components::transform basic_spatial_properties_getters<C, D>::logic_transform() 
 		const auto& phys = handle.get<components::physics>();
 		return{ phys.get_position(), phys.get_angle() };
 	}
+	else if (handle.has<components::wandering_pixels>()) {
+		return handle.get<components::wandering_pixels>().reach.center();
+	}
 	else {
 		return handle.get<components::transform>();
-	}
+	}	
 }
 
 template <bool C, class D>
 vec2 basic_spatial_properties_getters<C, D>::get_effective_velocity() const {
-	auto& handle = *static_cast<const D*>(this);
-
-	const auto& owner = handle.get_owner_body();
+	const auto handle = *static_cast<const D*>(this);
+	const auto owner = handle.get_owner_body();
 
 	if (owner.alive()) {
 		return owner.get<components::physics>().velocity();
@@ -66,7 +68,7 @@ vec2 basic_spatial_properties_getters<C, D>::get_effective_velocity() const {
 
 template <bool C, class D>
 components::transform basic_spatial_properties_getters<C, D>::viewing_transform(const interpolation_system& sys, const bool integerize) const {
-	auto& handle = *static_cast<const D*>(this);
+	const auto handle = *static_cast<const D*>(this);
 	return ::viewing_transform(sys, handle, integerize);
 }
 
@@ -76,9 +78,8 @@ void spatial_properties_getters<false, D>::set_logic_transform(const components:
 		return;
 	}
 	
-	auto& handle = *static_cast<const D*>(this);
-
-	const auto& owner = handle.get_owner_body();
+	const auto handle = *static_cast<const D*>(this);
+	const auto owner = handle.get_owner_body();
 
 	bool is_only_fixtural = owner.alive() && owner != handle;
 

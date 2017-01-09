@@ -59,6 +59,22 @@ namespace augs  {
 			return raw[i];
 		}
 
+		T& front() {
+			return raw[0];
+		}
+
+		const T& front() const {
+			return raw[0];
+		}
+
+		T& back() {
+			return raw[count - 1];
+		}
+
+		const T& back() const {
+			return raw[count - 1];
+		}
+
 		iterator begin() {
 			return raw.begin();
 		}

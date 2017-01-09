@@ -29,8 +29,6 @@ namespace components {
 		unsigned dual_wield_accuracy_loss_percentage = 50;
 		unsigned dual_wield_accuracy_loss_multiplier = 1;
 
-		std::array<components::transform, 4> attachment_offsets_per_sticking_mode;
-
 		inventory_slot_id current_slot;
 		inventory_slot_id target_slot_after_unmount;
 
@@ -63,8 +61,6 @@ namespace components {
 
 				CEREAL_NVP(dual_wield_accuracy_loss_percentage),
 				CEREAL_NVP(dual_wield_accuracy_loss_multiplier),
-
-				CEREAL_NVP(attachment_offsets_per_sticking_mode),
 
 				CEREAL_NVP(current_slot),
 				CEREAL_NVP(target_slot_after_unmount),

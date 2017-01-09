@@ -156,27 +156,31 @@ bool can_stack_entities(const const_entity_handle a, const const_entity_handle b
 	return false;
 }
 
-unsigned to_space_units(std::string s) {
+unsigned to_space_units(const std::string& s) {
 	unsigned sum = 0;
 	unsigned mult = SPACE_ATOMS_PER_UNIT;
 
 	if (s.find(".") == std::string::npos) {
 		int l = s.length() - 1;
 		
-		while(l--)
+		while (l--) {
 			mult *= 10;
+		}
 	}
 	else {
 		int l = s.find(".") - 1;
 
-		while (l--)
+		while (l--) {
 			mult *= 10;
+		}
 	}
 
 	for (auto& c : s) {
 		ensure(mult > 0);
-		if (c == '.')
+		
+		if (c == '.') {
 			continue;
+		}
 
 		sum += (c - '0') * mult;
 		mult /= 10;
@@ -244,6 +248,48 @@ void remove_item(const inventory_slot_handle handle, const entity_handle removed
 	auto& v = handle->items_inside;
 	v.erase(std::remove(v.begin(), v.end(), removed_item), v.end());
 	removed_item.get<components::item>().current_slot.unset();
+}
+
+components::transform get_attachment_offset(
+	const inventory_slot& slot, 
+	const components::transform container_transform, 
+	const const_entity_handle item
+) {
+	ensure(slot.is_physical_attachment_slot);
+
+	components::transform total;
+
+	const auto sticking = slot.attachment_sticking_mode;
+
+	total = slot.attachment_offset;
+	total.pos += item.get_aabb(components::transform()).get_size().get_sticking_offset(sticking);
+	total.pos.rotate(container_transform.rotation, vec2(0, 0));
+
+	return total;
+}
+
+components::transform sum_attachment_offsets(const cosmos& cosm, const inventory_item_address addr) {
+	components::transform total;
+
+	inventory_slot_id current_slot;
+	current_slot.container_entity = addr.root_container;
+	
+	for (size_t i = 0; i < addr.directions.size(); ++i) {
+		current_slot.type = addr.directions[i];
+
+		const auto slot_handle = cosm[current_slot];
+
+		ensure(slot_handle->is_physical_attachment_slot);
+		ensure(slot_handle->always_allow_exactly_one_item);
+
+		const auto item_in_slot = slot_handle.get_items_inside()[0];
+
+		total += get_attachment_offset(*slot_handle, total, item_in_slot);
+
+		current_slot.container_entity = item_in_slot;
+	}
+
+	return total;
 }
 
 void perform_transfer(const item_slot_transfer_request r, logic_step& step) {
@@ -323,8 +369,8 @@ void perform_transfer(const item_slot_transfer_request r, logic_step& step) {
 			add_item(r.get_target_slot(), grabbed_item_part_handle);
 		}
 
-		auto physics_updater = [previous_container_transform](const entity_handle descendant) {
-			auto& cosmos = descendant.get_cosmos();
+		auto physics_updater = [previous_container_transform](const entity_handle descendant, ...) {
+			const auto& cosmos = descendant.get_cosmos();
 
 			const auto parent_slot = cosmos[descendant.get<components::item>().current_slot];
 			auto def = descendant.get<components::fixtures>().get_data();
@@ -337,7 +383,7 @@ void perform_transfer(const item_slot_transfer_request r, logic_step& step) {
 					owner_body = parent_slot.get_root_container();
 					
 					def.offsets_for_created_shapes[colliders_offset_type::ITEM_ATTACHMENT_DISPLACEMENT]
-						= parent_slot.sum_attachment_offsets_of_parents(descendant);
+						= sum_attachment_offsets(cosmos, descendant.get_address_from_root());
 				}
 				else {
 					owner_body = descendant;
@@ -368,7 +414,7 @@ void perform_transfer(const item_slot_transfer_request r, logic_step& step) {
 		grabbed_item_part_handle.for_each_contained_item_recursive(physics_updater);
 
 		if (is_pickup_or_transfer) {
-			initialize_item_button_for_new_gui_owner(grabbed_item_part_handle);
+			initialize_item_button_for_new_gui_owner(grabbed_item_part_handle, inventory_traversal());
 			grabbed_item_part_handle.for_each_contained_slot_and_item_recursive(initialize_slot_button_for_new_gui_owner, initialize_item_button_for_new_gui_owner);
 		}
 

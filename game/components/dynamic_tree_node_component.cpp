@@ -19,51 +19,18 @@ namespace components {
 		dynamic_tree_node result;
 
 		const auto* const render = e.find<components::render>();
-		const auto* const sprite = e.find<components::sprite>();
-		const auto* const polygon = e.find<components::polygon>();
-		const auto* const tile_layer_instance = e.find<components::tile_layer_instance>();
-		const auto* const particles_existence = e.find<components::particles_existence>();
-		const auto* const wandering_pixels = e.find<components::wandering_pixels>();
-		const auto* const sound_existence = e.find<components::sound_existence>();
 
 		if (render && render->screen_space_transform) {
 			result.always_visible = true;
 			return result;
 		}
 
-		if (sprite) {
-			result.aabb = sprite->get_aabb(e.logic_transform());
-		}
-		else if (polygon) {
-			result.aabb = polygon->get_aabb(e.logic_transform());
-		}
-		else if (tile_layer_instance) {
-			result.aabb = tile_layer_instance->get_aabb(e.logic_transform());
-		}
-		else if (particles_existence) {
+		result.aabb = e.get_aabb();
+
+		if (e.has<components::particles_existence>()) {
 			result.type = tree_type::PARTICLE_EXISTENCES;
-			result.aabb.set_position(e.logic_transform().pos);
-			result.aabb.set_size({ 2.f, 2.f });
-
-			const auto enlarge = std::max(particles_existence->input.randomize_position_within_radius, particles_existence->distribute_within_segment_of_length);
-			result.aabb.expand_from_center({ enlarge, enlarge });
 		}
-		//else if (sound_existence) {
-		//	result.type = tree_type::SOUND_EXISTENCES;
-		//	result.aabb.set_position(e.logic_transform().pos);
-		//
-		//	const float artifacts_avoidance_epsilon = 20.f;
-		//
-		//	const float distance = sound_existence->calculate_max_audible_distance() + artifacts_avoidance_epsilon;
-		//	result.aabb.set_size({ distance*2, distance * 2 });
-		//}
-		else if (wandering_pixels) {
-			result.aabb = wandering_pixels->reach;
-
-			const auto enlarge = result.aabb.get_size() * 0.3;
-			result.aabb.expand_from_center(enlarge);
-		}
-
+		
 		return result;
 	}
 }

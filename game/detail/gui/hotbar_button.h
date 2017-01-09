@@ -21,7 +21,11 @@ public:
 	float hover_highlight_maximum_distance = 8.f;
 	float hover_highlight_duration_ms = 400.f;
 
+	vec2i get_bbox(const cosmos&) const;
 	void associate_entity(const const_entity_handle);
+
+	const_entity_handle get_associated_entity(const cosmos&) const;
+	entity_handle get_associated_entity(cosmos&) const;
 
 	static void draw(const viewing_gui_context&, const const_this_in_item& this_id, draw_info);
 

@@ -62,7 +62,6 @@ namespace resource_setups {
 		}
 
 		auto& magazine_gui = get_resource_manager().create(assets::texture_id::SAMPLE_MAGAZINE, "hypersomnia/gfx/magazine.png").gui_sprite_def;
-		magazine_gui.rotation_offset = -270;
 
 		get_resource_manager().create(assets::texture_id::SMALL_MAGAZINE, "hypersomnia/gfx/small_magazine.png");
 
@@ -79,7 +78,6 @@ namespace resource_setups {
 		get_resource_manager().create(assets::texture_id::GREEN_SHELL, "hypersomnia/gfx/green_shell.png");
 
 		auto& backpack_gui = get_resource_manager().create(assets::texture_id::BACKPACK, "hypersomnia/gfx/backpack.png").gui_sprite_def;
-		backpack_gui.rotation_offset = -90.f;
 		backpack_gui.gui_bbox_expander = vec2(0, 2);
 
 		augs::image attachment_circle_filled;
@@ -127,7 +125,7 @@ namespace resource_setups {
 			const rgba border_color = white;
 			const rgba inside_color = white;
 
-			const int lower_side = 12;
+			const int lower_side = 14;
 			const int upper_side = 8;
 
 			const int inside_border_padding = 4;

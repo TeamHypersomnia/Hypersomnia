@@ -20,7 +20,7 @@
 #include "game/detail/inventory_utils.h"
 
 namespace ingredients {
-	void default_gun_container(entity_handle e) {
+	void default_gun_container(entity_handle e, const int mag_rotation) {
 		auto& item = make_item(e);
 		auto& container = e += components::container();
 		item.space_occupied_per_charge = to_space_units("3.5");
@@ -33,7 +33,7 @@ namespace ingredients {
 			slot_def.category_allowed = item_category::MAGAZINE;
 			slot_def.attachment_sticking_mode = augs::rects::sticking::TOP;
 			slot_def.attachment_offset.pos.set(10, 5);
-			//slot_def.attachment_offset.rotation = -90;
+			slot_def.attachment_offset.rotation = mag_rotation;
 
 			container.slots[slot_function::GUN_DETACHABLE_MAGAZINE] = slot_def;
 		}
@@ -624,7 +624,7 @@ namespace prefabs {
 
 		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::KEK9, augs::white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::see_through_dynamic_body(weapon);
-		ingredients::default_gun_container(weapon);
+		ingredients::default_gun_container(weapon, 0);
 		auto& container = weapon.get<components::container>();
 		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_offset.pos.set(1, -11);
 		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_sticking_mode = augs::rects::sticking::BOTTOM;

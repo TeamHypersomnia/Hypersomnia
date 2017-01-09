@@ -97,86 +97,44 @@ void item_button::draw_complete_dragged_ghost(const viewing_gui_context& context
 	draw_dragged_ghost_inside(context, this_id, in);
 }
 
-rects::ltrb<float> item_button::iterate_children_attachments(
-	const const_logic_gui_context& context,
-	const const_this_in_item& this_id,
-	const bool draw,
-	std::vector<vertex_triangle>* target,
-	const augs::rgba border_col
+item_button::layout_with_attachments item_button::calculate_button_layout(
+	const const_entity_handle component_owner,
+	const bool include_attachments
 ) {
-	const auto& cosmos = context.get_step().get_cosmos();
-	const auto& item_handle = cosmos[this_id.get_location().item_id];
+	const auto& cosmos = component_owner.get_cosmos();
+	
+	layout_with_attachments output;
+	output.push(component_owner.get_aabb(components::transform()));
 
-	components::sprite item_sprite = item_handle.get<components::sprite>();
-
-	const auto& gui_def = get_resource_manager().find(item_sprite.tex)->gui_sprite_def;
-
-	item_sprite.flip_horizontally = gui_def.flip_horizontally;
-	item_sprite.flip_vertically = gui_def.flip_vertically;
-	item_sprite.rotation_offset = gui_def.rotation_offset;
-
-	item_sprite.color.a = border_col.a;
-
-	components::sprite::drawing_input state(*target);
-	state.positioning = renderable_positioning_type::LEFT_TOP_CORNER;
-
-	const auto expanded_size = this_id->rc.get_size() - this_id->with_attachments_bbox.get_size();
-
-	if (draw) {
-		state.renderable_transform.pos = context.get_tree_entry(this_id).get_absolute_pos() - this_id->with_attachments_bbox.get_position() + expanded_size / 2 + vec2(1, 1);
-	}
-
-	rects::ltrb<float> button_bbox = item_sprite.get_aabb(components::transform(), state.positioning);
-
-	if (!this_id->is_container_open) {
-		auto iteration_lambda = [&](const const_entity_handle& desc) {
-			const auto& parent_slot = cosmos[desc.get<components::item>().current_slot];
-
-			if (parent_slot.should_item_inside_keep_physical_body(item_handle)) {
-				auto attachment_sprite = desc.get<components::sprite>();
-
-				attachment_sprite.flip_horizontally = item_sprite.flip_horizontally;
-				attachment_sprite.flip_vertically = item_sprite.flip_vertically;
-				attachment_sprite.rotation_offset = item_sprite.rotation_offset;
-
-				attachment_sprite.color.a = item_sprite.color.a;
-
-				components::sprite::drawing_input attachment_state = state;
-
-				auto offset = parent_slot.sum_attachment_offsets_of_parents(desc) -
-					cosmos[item_handle.get<components::item>().current_slot].sum_attachment_offsets_of_parents(item_handle);
-
-				if (attachment_sprite.flip_horizontally) {
-					offset.pos.x = -offset.pos.x;
-					offset.flip_rotation();
-				}
-
-				if (attachment_sprite.flip_vertically) {
-					offset.pos.y = -offset.pos.y;
-					offset.flip_rotation();
-				}
-
-				offset += item_sprite.size / 2;
-				offset += -attachment_sprite.size / 2;
-
-				if (draw) {
-					attachment_state.renderable_transform += offset;
-					attachment_sprite.draw(attachment_state);
-				}
-
-				rects::ltrb<float> attachment_bbox = attachment_sprite.get_aabb(offset, state.positioning);
-				button_bbox.contain(attachment_bbox);
+	if (include_attachments) {
+		component_owner.for_each_contained_item_recursive([&](const const_entity_handle desc, const inventory_traversal& traversal) {
+			if (traversal.item_remains_physical) {
+				output.push(desc.get_aabb(traversal.attachment_offset));
 			}
-		};
+		});
+	}
+	
+	const auto origin = output.aabb.left_top();
 
-		item_handle.for_each_contained_item_recursive(iteration_lambda);
+	for (auto& b : output.positions) {
+		b += -origin;
 	}
 
-	if (draw) {
-		item_sprite.draw(state);
+	const components::sprite gui_def = get_resource_manager().find(component_owner.get<components::sprite>().tex)->gui_sprite_def;
+
+	if (gui_def.flip_horizontally) {
+		for (auto& b : output.positions) {
+			b.x = output.aabb.w() - b.x;
+		}
 	}
 
-	return button_bbox;
+	if (gui_def.flip_vertically) {
+		for (auto& b : output.positions) {
+			b.y = output.aabb.h() - b.y;
+		}
+	}
+
+	return std::move(output);
 }
 
 void item_button::draw_proc(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in, const drawing_settings& f) {
@@ -231,7 +189,52 @@ void item_button::draw_proc(const viewing_gui_context& context, const const_this
 	}
 
 	if (f.draw_item) {
-		iterate_children_attachments(context, this_id, true, &in.v, border_col);
+		{
+			const auto layout = calculate_button_layout(item, !this_id->is_container_open);
+
+			auto item_sprite = item.get<components::sprite>();
+			const auto gui_def = get_resource_manager().find(item_sprite.tex)->gui_sprite_def;
+
+			const auto flip_horizontally = gui_def.flip_horizontally;
+			const auto flip_vertically = gui_def.flip_vertically;
+
+			item_sprite.color.a = border_col.a;
+
+			components::sprite::drawing_input state(in.v);
+			state.positioning = renderable_positioning_type::LEFT_TOP_CORNER;
+
+			state.renderable_transform.pos = layout.get_base_item_pos() + this_id->rc.get_position();
+
+			if (!this_id->is_container_open) {
+				size_t attachment_index = 1;
+
+				auto iteration_lambda = [&](const const_entity_handle desc, const inventory_traversal&) {
+					const auto parent_slot = cosmos[desc.get<components::item>().current_slot];
+
+					if (parent_slot.should_item_inside_keep_physical_body(item)) {
+						auto attachment_sprite = desc.get<components::sprite>();
+
+						attachment_sprite.flip_horizontally = flip_horizontally;
+						attachment_sprite.flip_vertically = flip_vertically;
+
+						attachment_sprite.color.a = item_sprite.color.a;
+
+						components::sprite::drawing_input attachment_state(in.v);
+						attachment_state.positioning = renderable_positioning_type::LEFT_TOP_CORNER;
+
+						attachment_state.renderable_transform.pos = layout.positions[attachment_index];
+
+						attachment_sprite.draw(attachment_state);
+					}
+
+					++attachment_index;
+				};
+
+				item.for_each_contained_item_recursive(iteration_lambda);
+			}
+
+			item_sprite.draw(state);
+		}
 
 		if (f.draw_charges) {
 			auto& item_data = item.get<components::item>();
@@ -349,7 +352,7 @@ void item_button::rebuild_layouts(const logic_gui_context& context, const this_i
 	base::rebuild_layouts(context, this_id);
 
 	const auto& cosmos = context.get_step().get_cosmos();
-	const auto& item = cosmos[this_id.get_location().item_id];
+	const auto item = cosmos[this_id.get_location().item_id];
 
 	if (is_inventory_root(context, this_id)) {
 		this_id->set_flag(augs::gui::flag::ENABLE_DRAWING_OF_CHILDREN);
@@ -365,10 +368,9 @@ void item_button::rebuild_layouts(const logic_gui_context& context, const this_i
 	auto* sprite = item.find<components::sprite>();
 
 	if (sprite) {
-		this_id->with_attachments_bbox = iterate_children_attachments(context, this_id);
-		vec2i rounded_size = this_id->with_attachments_bbox.get_size();
+		vec2i rounded_size = calculate_button_layout(item, !this_id->is_container_open).aabb.get_size();
 		rounded_size += 22;
-		rounded_size += get_resource_manager().find(sprite->tex)->gui_sprite_def.gui_bbox_expander;
+		// rounded_size += get_resource_manager().find(sprite->tex)->gui_sprite_def.gui_bbox_expander;
 		rounded_size /= 11;
 		rounded_size *= 11;
 		//rounded_size.x = std::max(rounded_size.x, 33);

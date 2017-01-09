@@ -27,7 +27,7 @@ void initialize_slot_button_for_new_gui_owner(const inventory_slot_handle h) {
 	b.set_flag(augs::gui::flag::ENABLE_DRAWING_OF_CHILDREN, !is_item_deposit);
 }
 
-void initialize_item_button_for_new_gui_owner(const entity_handle h) {
+void initialize_item_button_for_new_gui_owner(const entity_handle h, const inventory_traversal&) {
 	auto& cosmos = h.get_cosmos();
 	auto& item = h.get<components::item>();
 	auto& b = item.button;

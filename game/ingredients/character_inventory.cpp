@@ -15,23 +15,25 @@ namespace ingredients {
 		auto& item_slot_transfers = e += components::item_slot_transfers();
 		auto& detector = e += components::trigger_collision_detector();
 
+		const auto bbox = e.get_aabb(components::transform{}).get_size();
+
 		inventory_slot slot_def;
 		slot_def.is_physical_attachment_slot = true;
 		slot_def.always_allow_exactly_one_item = true;
 		slot_def.attachment_sticking_mode = augs::rects::sticking::RIGHT;
-		slot_def.attachment_offset.pos = vec2(0, 20);
+		slot_def.attachment_offset.pos = vec2(bbox.x/2 - 4, 20);
 		slot_def.attachment_density_multiplier = 0.02f;
 
 		container.slots[slot_function::PRIMARY_HAND] = slot_def;
 		
-		slot_def.attachment_offset.pos = vec2(0, -20);
+		slot_def.attachment_offset.pos = vec2(bbox.x / 2 - 4, -20);
 		container.slots[slot_function::SECONDARY_HAND] = slot_def;
 
 		slot_def.for_categorized_items_only = true;
 		slot_def.category_allowed = item_category::SHOULDER_CONTAINER;
 		slot_def.attachment_sticking_mode = augs::rects::sticking::LEFT;
-		slot_def.attachment_offset.pos = vec2(2, 0);
-		slot_def.attachment_offset.rotation = -180;
+		slot_def.attachment_offset.pos = vec2(-bbox.x/2 + 4, 0);
+		slot_def.attachment_offset.rotation = -90;
 		container.slots[slot_function::SHOULDER_SLOT] = slot_def;
 
 		slot_def.attachment_density_multiplier = 1.f;

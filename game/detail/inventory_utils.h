@@ -9,6 +9,14 @@
 #include "game/transcendental/step_declaration.h"
 void perform_transfer(item_slot_transfer_request, logic_step& step);
 
+components::transform get_attachment_offset(
+	const inventory_slot& slot, 
+	const components::transform container_transform, 
+	const const_entity_handle item
+);
+
+components::transform sum_attachment_offsets(const cosmos&, const inventory_item_address addr);
+
 unsigned calculate_space_occupied_with_children(const_entity_handle item);
 
 item_transfer_result containment_result(const_item_slot_transfer_request, bool allow_replacement = true);
@@ -17,7 +25,7 @@ slot_function detect_compatible_slot(const_entity_handle item, const_entity_hand
 
 bool can_stack_entities(const_entity_handle, const_entity_handle);
 
-unsigned to_space_units(std::string s);
+unsigned to_space_units(const std::string& s);
 std::wstring format_space_units(unsigned);
 
 int count_charges_in_deposit(const_entity_handle item);

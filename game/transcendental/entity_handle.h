@@ -17,6 +17,7 @@
 #include "game/detail/entity/physics_getters.h"
 #include "game/detail/entity/relations_helpers.h"
 #include "game/detail/entity/spatial_properties_getters.h"
+#include "game/detail/entity/renderable_helpers.h"
 
 #include "game/enums/entity_flag.h"
 
@@ -33,7 +34,8 @@ class basic_entity_handle :
 	public inventory_getters<is_const, basic_entity_handle<is_const>>,
 	public physics_getters<is_const, basic_entity_handle<is_const>>,
 	public relations_helpers<is_const, basic_entity_handle<is_const>>,
-	public spatial_properties_getters<is_const, basic_entity_handle<is_const>>
+	public spatial_properties_getters<is_const, basic_entity_handle<is_const>>,
+	public renderable_helpers<is_const, basic_entity_handle<is_const>>
 {
 public:
 	static constexpr bool is_const_value = is_const;

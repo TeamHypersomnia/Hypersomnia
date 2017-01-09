@@ -41,7 +41,7 @@ namespace ingredients {
 	void character_inventory(entity_handle);
 	void backpack(entity_handle);
 
-	void default_gun_container(entity_handle);
+	void default_gun_container(entity_handle, const int mag_rotation = -90);
 	void default_gun(entity_handle);
 
 	void standard_pathfinding_capability(entity_handle);

@@ -23,6 +23,8 @@
 
 #include "game/detail/inventory_utils.h"
 
+#include "augs/gui/button_corners.h"
+
 void gui_system::switch_to_gui_mode_and_back(logic_step& step) {
 	const auto& intents = step.transient.messages.get_queue<messages::intent_message>();
 	auto& cosmos = step.cosm;
@@ -125,9 +127,28 @@ void gui_system::advance_gui_elements(logic_step& step) {
 			}
 
 			rect_world.rebuild_layouts(context, root_location);
-			
+
+			int max_height = 0;
+			int total_width = 0;
+
 			for (size_t i = 0; i < element.hotbar_buttons.size(); ++i) {
-				element.hotbar_buttons[i].rc = xywh(screen_size.x / 2 + i * 70 - 200, screen_size.y - 150, 50, 50);
+				const auto& hb = element.hotbar_buttons[i];
+
+				const auto bbox = hb.get_bbox(cosmos);
+				max_height = std::max(max_height, bbox.y);
+
+				total_width += bbox.x;
+			}
+
+			int current_x = screen_size.x / 2 - total_width / 2;
+
+			for (size_t i = 0; i < element.hotbar_buttons.size(); ++i) {
+				auto& hb = element.hotbar_buttons[i];
+				const auto bbox = hb.get_bbox(cosmos);
+				
+				hb.rc =  xywh(current_x, screen_size.y - 150, bbox.x, max_height);
+
+				current_x += bbox.x - 1;
 			}
 
 			transfers.clear();

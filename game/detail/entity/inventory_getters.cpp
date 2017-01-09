@@ -47,10 +47,34 @@ typename inventory_getters<C, D>::inventory_slot_handle_type inventory_getters<C
 template <bool C, class D>
 typename inventory_getters<C, D>::inventory_slot_handle_type inventory_getters<C, D>::get_current_slot() const {
 	auto& self = *static_cast<const D*>(this);
-	auto& cosmos = self.get_cosmos();
 	
-	auto& item = self.get<components::item>();
-	return cosmos[item.current_slot];
+	const auto* const maybe_item = self.find<components::item>();
+
+	if (maybe_item == nullptr) {
+		return self.get_cosmos()[inventory_slot_id()];
+	}
+
+	return self.get_cosmos()[maybe_item->current_slot];
+}
+
+template <bool C, class D>
+inventory_item_address inventory_getters<C, D>::get_address_from_root() const {
+	auto& self = *static_cast<const D*>(this);
+	auto& cosmos = self.get_cosmos();
+
+	inventory_item_address output;
+	inventory_slot_id current_slot = get_current_slot();
+		
+	while (cosmos[current_slot].alive()) {
+		output.root_container = current_slot.container_entity;
+		output.directions.push_back(current_slot.type);
+
+		current_slot = cosmos[current_slot.container_entity].get_current_slot();
+	}
+
+	std::reverse(output.directions.begin(), output.directions.end());
+	
+	return std::move(output);
 }
 
 template <bool C, class D>

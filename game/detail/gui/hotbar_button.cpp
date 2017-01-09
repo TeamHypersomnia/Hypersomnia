@@ -8,6 +8,24 @@ void hotbar_button::associate_entity(const const_entity_handle h) {
 	last_associated_entity = h.get_id();
 }
 
+const_entity_handle hotbar_button::get_associated_entity(const cosmos& cosm) const {
+	return cosm[last_associated_entity];
+}
+
+entity_handle hotbar_button::get_associated_entity(cosmos& cosm) const {
+	return cosm[last_associated_entity];
+}
+
+vec2i hotbar_button::get_bbox(const cosmos& cosm) const {
+	const auto ent = get_associated_entity(cosm);
+
+	if (ent.dead()) {
+		return { 55, 55 };
+	}
+
+	return item_button::calculate_button_layout(ent, true).aabb.get_size();
+}
+
 void hotbar_button::draw(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in) {
 	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING)) {
 		return;
@@ -99,7 +117,7 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 	}
 
 	const auto& cosmos = context.get_step().get_cosmos();
-	const auto associated_entity = cosmos[this_id->last_associated_entity];
+	const auto associated_entity = this_id->get_associated_entity(cosmos);
 
 	if (associated_entity.alive() && associated_entity.get_owning_transfer_capability() == context.get_gui_element_entity()) {
 		ensure(associated_entity.has<components::item>());
