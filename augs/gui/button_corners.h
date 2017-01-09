@@ -49,7 +49,6 @@ struct button_corners_info {
 			case button_corner_type::LT:
 				target_rect.set_size(s);
 				target_rect.set_position(rc.left_top() - s);
-				LOG_NVPS(s);
 				break;
 			case button_corner_type::RT:
 				target_rect.set_size(s);
