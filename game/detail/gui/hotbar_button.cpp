@@ -8,12 +8,26 @@ void hotbar_button::associate_entity(const const_entity_handle h) {
 	last_associated_entity = h.get_id();
 }
 
-const_entity_handle hotbar_button::get_associated_entity(const cosmos& cosm) const {
-	return cosm[last_associated_entity];
+const_entity_handle hotbar_button::get_associated_entity(const const_entity_handle owner_transfer_capability) const {
+	const auto& cosm = owner_transfer_capability.get_cosmos();
+	const auto handle = cosm[last_associated_entity];
+
+	if (handle.get_owning_transfer_capability() == owner_transfer_capability) {
+		return handle;
+	}
+
+	return cosm[entity_id()];
 }
 
-entity_handle hotbar_button::get_associated_entity(cosmos& cosm) const {
-	return cosm[last_associated_entity];
+entity_handle hotbar_button::get_associated_entity(const entity_handle owner_transfer_capability) const {
+	auto& cosm = owner_transfer_capability.get_cosmos();
+	const auto handle = cosm[last_associated_entity];
+
+	if (handle.get_owning_transfer_capability() == owner_transfer_capability) {
+		return handle;
+	}
+
+	return cosm[entity_id()];
 }
 
 button_corners_info hotbar_button::get_internal_corners_info() const {
@@ -32,8 +46,8 @@ button_corners_info hotbar_button::get_border_corners_info() const {
 	return border_corners;
 }
 
-vec2i hotbar_button::get_bbox(const cosmos& cosm) const {
-	const auto ent = get_associated_entity(cosm);
+vec2i hotbar_button::get_bbox(const const_entity_handle owner_transfer_capability) const {
+	const auto ent = get_associated_entity(owner_transfer_capability);
 
 	if (ent.dead()) {
 		return { 55, 55 };
@@ -50,6 +64,7 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 	const auto& rect_world = context.get_rect_world();
 	const auto& this_tree_entry = context.get_tree_entry(this_id);
 	const auto absolute_rc = this_tree_entry.get_absolute_rect();
+	const auto owner_transfer_capability = context.get_gui_element_entity();
 
 	const auto& detector = this_id->detector;
 
@@ -130,9 +145,9 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 	}
 
 	const auto& cosmos = context.get_step().get_cosmos();
-	const auto associated_entity = this_id->get_associated_entity(cosmos);
+	const auto associated_entity = this_id->get_associated_entity(owner_transfer_capability);
 
-	if (associated_entity.alive() && associated_entity.get_owning_transfer_capability() == context.get_gui_element_entity()) {
+	if (associated_entity.alive()) {
 		ensure(associated_entity.has<components::item>());
 
 		item_button_in_item location;
@@ -153,10 +168,11 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 		f.draw_attachments_even_if_open = true;
 		f.expand_size_to_grid = false;
 		
-		const auto height_excess = absolute_rc.h() - this_id->get_bbox(cosmos).y;
+		const auto height_excess = absolute_rc.h() - this_id->get_bbox(owner_transfer_capability).y;
 		
 		f.absolute_xy_offset = internal_rc.get_position() - context.get_tree_entry(location).get_absolute_pos();
 		f.absolute_xy_offset.y += height_excess / 2;
+		f.absolute_xy_offset += vec2(2, 2);
 
 		item_button::draw_proc(context, dereferenced, in, f);
 	}

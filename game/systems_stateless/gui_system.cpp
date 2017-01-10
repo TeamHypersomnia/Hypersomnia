@@ -134,7 +134,7 @@ void gui_system::advance_gui_elements(logic_step& step) {
 			for (size_t i = 0; i < element.hotbar_buttons.size(); ++i) {
 				const auto& hb = element.hotbar_buttons[i];
 
-				const auto bbox = hb.get_bbox(cosmos);
+				const auto bbox = hb.get_bbox(root);
 				max_height = std::max(max_height, bbox.y);
 
 				total_width += bbox.x;
@@ -144,7 +144,7 @@ void gui_system::advance_gui_elements(logic_step& step) {
 
 			for (size_t i = 0; i < element.hotbar_buttons.size(); ++i) {
 				auto& hb = element.hotbar_buttons[i];
-				const auto bbox = hb.get_bbox(cosmos);
+				const auto bbox = hb.get_bbox(root);
 				
 				hb.rc = xywh(current_x, screen_size.y - max_height - 50, bbox.x, max_height);
 
