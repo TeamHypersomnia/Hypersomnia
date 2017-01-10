@@ -25,7 +25,7 @@ bool is_button_corner(const button_corner_type);
 bool is_button_side(const button_corner_type);
 
 struct button_corners_info {
-	assets::texture_id lt_texture = assets::texture_id::HOTBAR_BUTTON_LT;
+	assets::texture_id lt_texture = assets::texture_id::INVALID;
 	bool flip_horizontally = true;
 
 	assets::texture_id get_tex_for_type(button_corner_type) const;
@@ -41,7 +41,13 @@ struct button_corners_info {
 
 		for (auto i = button_corner_type::LT; i < button_corner_type::COUNT; i = button_corner_type(static_cast<int>(i) + 1)) {
 			const auto tex_id = get_tex_for_type(i);
-			const auto& tex = manager.find(tex_id)->tex;
+			const auto* const found_tex = manager.find(tex_id);
+
+			if (found_tex == nullptr) {
+				continue;
+			}
+
+			const auto& tex = found_tex->tex;
 			const vec2 s = tex.get_size();
 
 			ltrb target_rect;
