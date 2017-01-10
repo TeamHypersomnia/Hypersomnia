@@ -116,21 +116,25 @@ item_button::layout_with_attachments item_button::calculate_button_layout(
 	
 	const auto origin = output.aabb.left_top();
 
-	for (auto& b : output.positions) {
+	for (auto& b : output.boxes) {
 		b += -origin;
 	}
 
 	const components::sprite gui_def = get_resource_manager().find(component_owner.get<components::sprite>().tex)->gui_sprite_def;
 
 	if (gui_def.flip_horizontally) {
-		for (auto& b : output.positions) {
-			b.x = output.aabb.w() - b.x;
+		for (auto& b : output.boxes) {
+			const auto old_b = b;
+			b.l = output.aabb.w() - old_b.r;
+			b.r = output.aabb.w() - old_b.l;
 		}
 	}
 
 	if (gui_def.flip_vertically) {
-		for (auto& b : output.positions) {
-			b.y = output.aabb.h() - b.y;
+		for (auto& b : output.boxes) {
+			const auto old_b = b;
+			b.t = output.aabb.h() - old_b.b;
+			b.b = output.aabb.h() - old_b.t;
 		}
 	}
 
@@ -191,19 +195,30 @@ void item_button::draw_proc(const viewing_gui_context& context, const const_this
 	if (f.draw_item) {
 		{
 			const auto layout = calculate_button_layout(item, !this_id->is_container_open);
+			
+			vec2i rounded_size = layout.aabb.get_size();
+
+			rounded_size += 22;
+			// rounded_size += get_resource_manager().find(sprite->tex)->gui_sprite_def.gui_bbox_expander;
+			rounded_size /= 11;
+			rounded_size *= 11;
+
+			vec2 expansion_offset = (rounded_size - layout.aabb.get_size()) / 2;
 
 			auto item_sprite = item.get<components::sprite>();
 			const auto gui_def = get_resource_manager().find(item_sprite.tex)->gui_sprite_def;
 
 			const auto flip_horizontally = gui_def.flip_horizontally;
 			const auto flip_vertically = gui_def.flip_vertically;
+			item_sprite.flip_horizontally = flip_horizontally;
+			item_sprite.flip_vertically = flip_vertically;
 
 			item_sprite.color.a = border_col.a;
 
 			components::sprite::drawing_input state(in.v);
-			state.positioning = renderable_positioning_type::LEFT_TOP_CORNER;
 
-			state.renderable_transform.pos = layout.get_base_item_pos() + this_id->rc.get_position();
+			const auto rc_pos = this_absolute_rect.get_position();
+			state.renderable_transform.pos = layout.get_base_item_pos().center() + rc_pos + expansion_offset;
 
 			if (!this_id->is_container_open) {
 				size_t attachment_index = 1;
@@ -220,14 +235,13 @@ void item_button::draw_proc(const viewing_gui_context& context, const const_this
 						attachment_sprite.color.a = item_sprite.color.a;
 
 						components::sprite::drawing_input attachment_state(in.v);
-						attachment_state.positioning = renderable_positioning_type::LEFT_TOP_CORNER;
 
-						attachment_state.renderable_transform.pos = layout.positions[attachment_index];
+						attachment_state.renderable_transform.pos = rc_pos + layout.boxes[attachment_index].center() + expansion_offset;
 
 						attachment_sprite.draw(attachment_state);
-					}
 
-					++attachment_index;
+						++attachment_index;
+					}
 				};
 
 				item.for_each_contained_item_recursive(iteration_lambda);

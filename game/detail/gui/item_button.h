@@ -29,16 +29,16 @@ struct item_button : game_gui_rect_node {
 	vec2i drag_offset_in_item_deposit;
 
 	struct layout_with_attachments {
-		augs::constant_size_vector<vec2, 10> positions;
+		augs::constant_size_vector<ltrb, 10> boxes;
 		ltrb aabb;
 		
 		auto get_base_item_pos() const {
-			return positions[0];
+			return boxes[0];
 		}
 
 		void push(const ltrb l) {
 			aabb.contain(l);
-			positions.push_back(l.center());
+			boxes.push_back(l);
 		}
 	};
 
