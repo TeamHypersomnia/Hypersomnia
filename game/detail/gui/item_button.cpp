@@ -223,7 +223,7 @@ void item_button::draw_proc(const viewing_gui_context& context, const const_this
 			if (!this_id->is_container_open) {
 				size_t attachment_index = 1;
 
-				auto iteration_lambda = [&](const const_entity_handle desc, const inventory_traversal&) {
+				auto iteration_lambda = [&](const const_entity_handle desc, const inventory_traversal& trav) {
 					const auto parent_slot = cosmos[desc.get<components::item>().current_slot];
 
 					if (parent_slot.should_item_inside_keep_physical_body(item)) {
@@ -237,6 +237,15 @@ void item_button::draw_proc(const viewing_gui_context& context, const const_this
 						components::sprite::drawing_input attachment_state(in.v);
 
 						attachment_state.renderable_transform.pos = rc_pos + layout.boxes[attachment_index].center() + expansion_offset;
+						attachment_state.renderable_transform.rotation = trav.attachment_offset.rotation;
+
+						if (flip_horizontally) {
+							attachment_state.renderable_transform.flip_rotation();
+						}
+
+						if (flip_vertically) {
+							attachment_state.renderable_transform.flip_rotation();
+						}
 
 						attachment_sprite.draw(attachment_state);
 

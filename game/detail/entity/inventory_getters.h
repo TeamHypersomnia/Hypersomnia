@@ -31,13 +31,14 @@ private:
 		if (this_item_handle.has<components::container>()) {
 			trav.current_address.directions.push_back(slot_function());
 			const auto this_item_attachment_offset = trav.attachment_offset;
+			const bool remained_physical = trav.item_remains_physical;
 
 			for (const auto& s : this_item_handle.get<components::container>().slots) {
 				const auto this_slot_id = inventory_slot_id(s.first, this_item_handle.get_id());
 				
 				slot_callback(cosm[this_slot_id]);
 				
-				const bool this_slot_physical = trav.item_remains_physical && s.second.is_physical_attachment_slot;
+				const bool this_slot_physical = remained_physical && s.second.is_physical_attachment_slot;
 
 				for (const auto& id : s.second.items_inside) {
 					const auto child_item_handle = cosm[id];

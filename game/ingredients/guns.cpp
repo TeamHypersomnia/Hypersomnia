@@ -91,14 +91,12 @@ namespace prefabs {
 			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
 		}
 
-		if (charge_inside.dead()) {
-			charge_inside.set_id(create_cyan_charge(cosmos, vec2(0, 0), 30));
-		}
-
 		sample_magazine.add_standard_components();
-
-		item_slot_transfer_request load_charge(charge_inside, sample_magazine[slot_function::ITEM_DEPOSIT]);
-		perform_transfer(load_charge, step);
+		
+		if (charge_inside.alive()) {
+			item_slot_transfer_request load_charge(charge_inside, sample_magazine[slot_function::ITEM_DEPOSIT]);
+			perform_transfer(load_charge, step);
+		}
 
 		return sample_magazine;
 	}
@@ -472,7 +470,10 @@ namespace prefabs {
 
 		if (load_mag.alive()) {
 			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);
-			perform_transfer({ load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1 }, step);
+			
+			if (load_mag[slot_function::ITEM_DEPOSIT].has_items()) {
+				perform_transfer({ load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1 }, step);
+			}
 		}
 
 		return weapon;
