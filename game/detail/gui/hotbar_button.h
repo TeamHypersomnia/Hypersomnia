@@ -2,6 +2,7 @@
 #include "augs/math/vec2.h"
 #include "game_gui_context.h"
 #include "augs/gui/appearance_detector.h"
+#include "augs/gui/button_corners.h"
 
 class hotbar_button : public game_gui_rect_node {
 public:
@@ -23,6 +24,9 @@ public:
 
 	vec2i get_bbox(const cosmos&) const;
 	void associate_entity(const const_entity_handle);
+
+	button_corners_info get_internal_corners_info() const;
+	button_corners_info get_border_corners_info() const;
 
 	const_entity_handle get_associated_entity(const cosmos&) const;
 	entity_handle get_associated_entity(cosmos&) const;

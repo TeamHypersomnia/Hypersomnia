@@ -16,6 +16,22 @@ entity_handle hotbar_button::get_associated_entity(cosmos& cosm) const {
 	return cosm[last_associated_entity];
 }
 
+button_corners_info hotbar_button::get_internal_corners_info() const {
+	button_corners_info corners;
+	corners.lt_texture = assets::texture_id::HOTBAR_BUTTON_LT;
+	corners.flip_horizontally = true;
+
+	return corners;
+}
+
+button_corners_info hotbar_button::get_border_corners_info() const {
+	button_corners_info border_corners;
+	border_corners.lt_texture = assets::texture_id::HOTBAR_BUTTON_LT_BORDER;
+	border_corners.flip_horizontally = true;
+
+	return border_corners;
+}
+
 vec2i hotbar_button::get_bbox(const cosmos& cosm) const {
 	const auto ent = get_associated_entity(cosm);
 
@@ -23,7 +39,7 @@ vec2i hotbar_button::get_bbox(const cosmos& cosm) const {
 		return { 55, 55 };
 	}
 
-	return item_button::calculate_button_layout(ent, true).aabb.get_size();
+	return get_internal_corners_info().internal_size_to_cornered_size(item_button::calculate_button_layout(ent, true).aabb.get_size());
 }
 
 void hotbar_button::draw(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in) {
@@ -33,6 +49,7 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 
 	const auto& rect_world = context.get_rect_world();
 	const auto& this_tree_entry = context.get_tree_entry(this_id);
+	const auto absolute_rc = this_tree_entry.get_absolute_rect();
 
 	const auto& detector = this_id->detector;
 
@@ -61,16 +78,12 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 
 	const auto inside_mat = augs::gui::material(assets::texture_id::HOTBAR_BUTTON_INSIDE, inside_col);
 
-	const bool flip = true;
+	const auto corners = this_id->get_internal_corners_info();
+	const auto border_corners = this_id->get_border_corners_info();
+	
+	const bool flip = corners.flip_horizontally;
 
-	button_corners_info corners;
-	corners.lt_texture = assets::texture_id::HOTBAR_BUTTON_LT;
-	corners.flip_horizontally = flip;
-	button_corners_info border_corners;
-	border_corners.lt_texture = assets::texture_id::HOTBAR_BUTTON_LT_BORDER;
-	border_corners.flip_horizontally = flip;
-
-	const auto internal_rc = corners.cornered_rc_to_internal_rc(this_id->rc);
+	const auto internal_rc = corners.cornered_rc_to_internal_rc(absolute_rc);
 
 	augs::gui::draw_clipped_rect(inside_mat, internal_rc, {}, in.v);
 
@@ -138,7 +151,12 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 		f.draw_container_opened_mark = false;
 		f.draw_charges = false;
 		f.draw_attachments_even_if_open = true;
-		f.absolute_xy_offset = this_tree_entry.get_absolute_pos() - context.get_tree_entry(location).get_absolute_pos();
+		f.expand_size_to_grid = false;
+		
+		const auto height_excess = absolute_rc.h() - this_id->get_bbox(cosmos).y;
+		
+		f.absolute_xy_offset = internal_rc.get_position() - context.get_tree_entry(location).get_absolute_pos();
+		f.absolute_xy_offset.y += height_excess / 2;
 
 		item_button::draw_proc(context, dereferenced, in, f);
 	}

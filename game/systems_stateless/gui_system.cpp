@@ -146,7 +146,7 @@ void gui_system::advance_gui_elements(logic_step& step) {
 				auto& hb = element.hotbar_buttons[i];
 				const auto bbox = hb.get_bbox(cosmos);
 				
-				hb.rc =  xywh(current_x, screen_size.y - 150, bbox.x, max_height);
+				hb.rc = xywh(current_x, screen_size.y - max_height - 50, bbox.x, max_height);
 
 				current_x += bbox.x - 1;
 			}

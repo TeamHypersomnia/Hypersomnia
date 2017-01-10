@@ -141,6 +141,17 @@ item_button::layout_with_attachments item_button::calculate_button_layout(
 	return std::move(output);
 }
 
+vec2 item_button::griddify_size(const vec2 size, const vec2 expander) {
+	vec2i rounded_size = size;
+	rounded_size += expander;
+
+	rounded_size += 22;
+	rounded_size /= 11;
+	rounded_size *= 11;
+
+	return rounded_size;
+}
+
 void item_button::draw_proc(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in, const drawing_settings& f) {
 	if (is_inventory_root(context, this_id)) {
 		return;
@@ -200,16 +211,12 @@ void item_button::draw_proc(const viewing_gui_context& context, const const_this
 
 			const auto layout = calculate_button_layout(item, draw_attachments);
 			
-			vec2i rounded_size = layout.aabb.get_size();
-			rounded_size += gui_def.gui_bbox_expander;
+			vec2 expansion_offset;
 
-			rounded_size += 22;
-			// rounded_size += get_resource_manager().find(sprite->tex)->gui_sprite_def.gui_bbox_expander;
-			rounded_size /= 11;
-			rounded_size *= 11;
-
-			vec2 expansion_offset = (rounded_size - layout.aabb.get_size()) / 2;
-
+			if (f.expand_size_to_grid) {
+				const auto rounded_size = griddify_size(layout.aabb.get_size(), gui_def.gui_bbox_expander);
+				expansion_offset = (rounded_size - layout.aabb.get_size()) / 2;
+			}
 
 			const auto flip_horizontally = gui_def.flip_horizontally;
 			const auto flip_vertically = gui_def.flip_vertically;
@@ -395,13 +402,7 @@ void item_button::rebuild_layouts(const logic_gui_context& context, const this_i
 
 	if (sprite) {
 		vec2i rounded_size = calculate_button_layout(item, !this_id->is_container_open).aabb.get_size();
-		rounded_size += get_resource_manager().find(item.get<components::sprite>().tex)->gui_sprite_def.gui_bbox_expander;
-		rounded_size += 22;
-		// rounded_size += get_resource_manager().find(sprite->tex)->gui_sprite_def.gui_bbox_expander;
-		rounded_size /= 11;
-		rounded_size *= 11;
-		//rounded_size.x = std::max(rounded_size.x, 33);
-		//rounded_size.y = std::max(rounded_size.y, 33);
+		rounded_size = griddify_size(rounded_size, get_resource_manager().find(item.get<components::sprite>().tex)->gui_sprite_def.gui_bbox_expander);
 		this_id->rc.set_size(rounded_size);
 	}
 

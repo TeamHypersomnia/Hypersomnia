@@ -57,6 +57,7 @@ struct item_button : game_gui_rect_node {
 		bool decrease_border_alpha = false;
 		bool draw_container_opened_mark = false;
 		bool draw_charges = true;
+		bool expand_size_to_grid = true;
 		vec2 absolute_xy_offset;
 	};
 
@@ -83,6 +84,8 @@ struct item_button : game_gui_rect_node {
 			}
 		}
 	}
+
+	static vec2 griddify_size(const vec2 size, const vec2 expander);
 
 	static void draw_dragged_ghost_inside(const viewing_gui_context& context, const const_this_in_item& this_id, augs::gui::draw_info in);
 	static void draw_complete_with_children(const viewing_gui_context&, const const_this_in_item& this_id, augs::gui::draw_info in);
