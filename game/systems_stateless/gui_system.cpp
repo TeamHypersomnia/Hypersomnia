@@ -142,14 +142,19 @@ void gui_system::advance_gui_elements(logic_step& step) {
 
 			int current_x = screen_size.x / 2 - total_width / 2;
 
-			for (size_t i = 0; i < element.hotbar_buttons.size(); ++i) {
-				auto& hb = element.hotbar_buttons[i];
+			auto set_rc = [&](auto& hb) {
 				const auto bbox = hb.get_bbox(root);
-				
+
 				hb.rc = xywh(current_x, screen_size.y - max_height - 50, bbox.x, max_height);
 
 				current_x += bbox.x - 1;
+			};
+
+			for (size_t i = 1; i < element.hotbar_buttons.size(); ++i) {
+				set_rc(element.hotbar_buttons[i]);
 			}
+
+			set_rc(element.hotbar_buttons[0]);
 
 			transfers.clear();
 		}
