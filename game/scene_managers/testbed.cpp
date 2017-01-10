@@ -676,7 +676,7 @@ namespace scene_managers {
 			riding_car.get<components::car>().accelerating = true;
 		}
 
-		select_character(character(1));
+		select_character(character(0));
 
 		prefabs::create_sample_suppressor(world, vec2(300, -500));
 

@@ -125,7 +125,7 @@ namespace resource_setups {
 			const rgba border_color = white;
 			const rgba inside_color = white;
 
-			const int lower_side = 14;
+			const int lower_side = 20;
 			const int upper_side = 8;
 
 			const int inside_border_padding = 4;
@@ -260,14 +260,8 @@ namespace resource_setups {
 				hotbar_lb.paint_line({ inside_border_padding, 0 }, { lower_side - 1, lower_side - 1 - inside_border_padding }, border_color);
 
 				hotbar_lb_complement.create(lower_side, lower_side, 4);
-
-				for (int i = 1; i < lower_side; ++i) {
-					hotbar_lb_complement.paint_line({ 0, i }, { lower_side - 1 - i, lower_side - 1 }, inside_color);
-				}
-
-				hotbar_lb_complement.create(lower_side, lower_side, 4);
 				hotbar_lb_complement.paint_line({ 0, lower_side - 1 }, { lower_side - 1, lower_side - 1 }, border_color);
-				hotbar_lb_complement.paint_line({ 0, lower_side - 1 }, { 0, lower_side - 1 }, border_color);
+				hotbar_lb_complement.paint_line({ 0, lower_side - 1 }, { 0, 0 }, border_color);
 
 				get_resource_manager().create(assets::texture_id::HOTBAR_BUTTON_LT_BORDER, hotbar_lt);
 				get_resource_manager().create(assets::texture_id::HOTBAR_BUTTON_RT_BORDER, hotbar_rt);

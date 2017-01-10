@@ -147,7 +147,7 @@ void gui_system::advance_gui_elements(logic_step& step) {
 
 				hb.rc = xywh(current_x, screen_size.y - max_height - 50, bbox.x, max_height);
 
-				current_x += bbox.x - 1;
+				current_x += bbox.x + 3;
 			};
 
 			for (size_t i = 1; i < element.hotbar_buttons.size(); ++i) {

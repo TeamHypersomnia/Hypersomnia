@@ -100,6 +100,8 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 
 	const auto internal_rc = corners.cornered_rc_to_internal_rc(absolute_rc);
 
+	const auto label_style = augs::gui::text::style(assets::font_id::GUI_FONT, cyan);
+
 	augs::gui::draw_clipped_rect(inside_mat, internal_rc, {}, in.v);
 
 	{
@@ -110,9 +112,16 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 		});
 
 		border_corners.for_each_button_corner(internal_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
-			if (type != button_corner_type::LB_COMPLEMENT) {
+			//if (type != button_corner_type::LB_COMPLEMENT) {
 				augs::gui::draw_clipped_rect(augs::gui::material(id, border_col), drawn_rc, {}, in.v, flip);
-			}
+			//}
+				
+				if (type == button_corner_type::LB_COMPLEMENT) {
+					augs::gui::text_drawer number_caption;
+					number_caption.set_text(augs::gui::text::format (typesafe_sprintf(L"%x", this_id.get_location().index), label_style));
+					number_caption.bottom_right(drawn_rc);
+					number_caption.draw(in);
+				}
 		});
 		
 		if (this_id->detector.is_hovered) {
@@ -123,7 +132,7 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 				hover_effect_rc.expand_from_center(vec2(distance, distance));
 		
 				border_corners.for_each_button_corner(hover_effect_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
-					if (type != button_corner_type::LB_COMPLEMENT) {
+					if (type != button_corner_type::RB) {
 						augs::gui::draw_clipped_rect(augs::gui::material(id, colorize), drawn_rc, {}, in.v, true);
 					}
 				});
@@ -136,7 +145,7 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 				hover_effect_rc.expand_from_center(vec2(distance, distance));
 		
 				border_corners.for_each_button_corner(hover_effect_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
-					if (type != button_corner_type::LB_COMPLEMENT && is_button_corner(type)) {
+					if (type != button_corner_type::RB && (is_button_corner(type) || type == button_corner_type::LB_COMPLEMENT)) {
 						augs::gui::draw_clipped_rect(augs::gui::material(id, colorize), drawn_rc, {}, in.v, true);
 					}
 				});
@@ -172,7 +181,7 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 		
 		f.absolute_xy_offset = internal_rc.get_position() - context.get_tree_entry(location).get_absolute_pos();
 		f.absolute_xy_offset.y += height_excess / 2;
-		f.absolute_xy_offset += vec2(2, 2);
+		f.absolute_xy_offset += vec2(4, 4);
 
 		item_button::draw_proc(context, dereferenced, in, f);
 	}
