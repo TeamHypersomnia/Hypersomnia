@@ -127,9 +127,7 @@ void menu_setup::process(const config_lua_table& cfg, game_window& window) {
 
 	app_ui_rect_world menu_ui_rect_world;
 	menu_ui_rect_world.last_state.screen_size = screen_size;
-	app_ui_rect_tree menu_ui_tree;
 	app_ui_root menu_ui_root = app_ui_root(screen_size);
-	app_ui_context menu_ui_context(menu_ui_rect_world, menu_ui_tree, menu_ui_root);
 	app_ui_root_in_context menu_ui_root_id;
 
 	auto center = [&](auto& t) {
@@ -582,6 +580,9 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 
 		{
 			app_ui_rect_world::gui_entropy gui_entropies;
+
+			app_ui_rect_tree menu_ui_tree;
+			app_ui_context menu_ui_context(menu_ui_rect_world, menu_ui_tree, menu_ui_root);
 
 			menu_ui_rect_world.build_tree_data_into_context(menu_ui_context, menu_ui_root_id);
 

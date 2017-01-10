@@ -87,6 +87,6 @@ config_table = {
 	rewind_intro_scene_by_secs = 3.5,
 	start_menu_music_at_secs = 63.5 - 22.5,
 
-	skip_credits = 0,
+	skip_credits = 1,
 	latest_news_url = "http://hypersomnia.pl/latest_post/"
 }
