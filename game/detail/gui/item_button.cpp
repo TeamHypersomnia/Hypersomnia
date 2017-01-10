@@ -194,9 +194,13 @@ void item_button::draw_proc(const viewing_gui_context& context, const const_this
 
 	if (f.draw_item) {
 		{
+			auto item_sprite = item.get<components::sprite>();
+			const auto gui_def = get_resource_manager().find(item_sprite.tex)->gui_sprite_def;
+
 			const auto layout = calculate_button_layout(item, !this_id->is_container_open);
 			
 			vec2i rounded_size = layout.aabb.get_size();
+			rounded_size += gui_def.gui_bbox_expander;
 
 			rounded_size += 22;
 			// rounded_size += get_resource_manager().find(sprite->tex)->gui_sprite_def.gui_bbox_expander;
@@ -205,8 +209,6 @@ void item_button::draw_proc(const viewing_gui_context& context, const const_this
 
 			vec2 expansion_offset = (rounded_size - layout.aabb.get_size()) / 2;
 
-			auto item_sprite = item.get<components::sprite>();
-			const auto gui_def = get_resource_manager().find(item_sprite.tex)->gui_sprite_def;
 
 			const auto flip_horizontally = gui_def.flip_horizontally;
 			const auto flip_vertically = gui_def.flip_vertically;
@@ -392,6 +394,7 @@ void item_button::rebuild_layouts(const logic_gui_context& context, const this_i
 
 	if (sprite) {
 		vec2i rounded_size = calculate_button_layout(item, !this_id->is_container_open).aabb.get_size();
+		rounded_size += get_resource_manager().find(item.get<components::sprite>().tex)->gui_sprite_def.gui_bbox_expander;
 		rounded_size += 22;
 		// rounded_size += get_resource_manager().find(sprite->tex)->gui_sprite_def.gui_bbox_expander;
 		rounded_size /= 11;
