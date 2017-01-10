@@ -194,10 +194,11 @@ void item_button::draw_proc(const viewing_gui_context& context, const const_this
 
 	if (f.draw_item) {
 		{
+			const bool draw_attachments = !this_id->is_container_open || f.draw_attachments_even_if_open;
 			auto item_sprite = item.get<components::sprite>();
 			const auto gui_def = get_resource_manager().find(item_sprite.tex)->gui_sprite_def;
 
-			const auto layout = calculate_button_layout(item, !this_id->is_container_open);
+			const auto layout = calculate_button_layout(item, draw_attachments);
 			
 			vec2i rounded_size = layout.aabb.get_size();
 			rounded_size += gui_def.gui_bbox_expander;
@@ -222,7 +223,7 @@ void item_button::draw_proc(const viewing_gui_context& context, const const_this
 			const auto rc_pos = this_absolute_rect.get_position();
 			state.renderable_transform.pos = layout.get_base_item_pos().center() + rc_pos + expansion_offset;
 
-			if (!this_id->is_container_open) {
+			if (draw_attachments) {
 				size_t attachment_index = 1;
 
 				auto iteration_lambda = [&](const const_entity_handle desc, const inventory_traversal& trav) {

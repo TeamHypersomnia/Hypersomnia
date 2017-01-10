@@ -28,13 +28,14 @@ std::array<std::vector<const_entity_handle>, render_layer::COUNT> render_system:
 	std::array<std::vector<entity_id>, render_layer::COUNT> layers;
 	std::array<std::vector<const_entity_handle>, render_layer::COUNT> output;
 
-	if (entities.empty())
+	if (entities.empty()) {
 		return output;
+	}
 
 	const auto& cosmos = entities[0].get_cosmos();
 
-	for (const auto& it : entities) {
-		auto layer = it.get<components::render>().layer;
+	for (const auto it : entities) {
+		const auto layer = it.get<components::render>().layer;
 		ensure(layer < static_cast<render_layer>(layers.size()));
 		layers[layer].push_back(it);
 	}
@@ -47,8 +48,8 @@ std::array<std::vector<const_entity_handle>, render_layer::COUNT> render_system:
 		});
 	}
 
-	for (size_t layer_idx = 0; layer_idx < layers.size(); ++layer_idx) {
-		output[layer_idx] = cosmos[layers[layer_idx]];
+	for (size_t i = 0; i < layers.size(); ++i) {
+		output[i] = cosmos[layers[i]];
 	}
 
 	return output;
