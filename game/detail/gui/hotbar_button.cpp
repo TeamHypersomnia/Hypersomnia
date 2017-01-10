@@ -5,12 +5,12 @@
 #include "game/components/item_component.h"
 
 void hotbar_button::associate_entity(const const_entity_handle h) {
-	last_associated_entity = h.get_id();
+	last_assigned_entity = h.get_id();
 }
 
-const_entity_handle hotbar_button::get_associated_entity(const const_entity_handle owner_transfer_capability) const {
+const_entity_handle hotbar_button::get_assigned_entity(const const_entity_handle owner_transfer_capability) const {
 	const auto& cosm = owner_transfer_capability.get_cosmos();
-	const auto handle = cosm[last_associated_entity];
+	const auto handle = cosm[last_assigned_entity];
 
 	if (handle.get_owning_transfer_capability() == owner_transfer_capability) {
 		return handle;
@@ -19,9 +19,9 @@ const_entity_handle hotbar_button::get_associated_entity(const const_entity_hand
 	return cosm[entity_id()];
 }
 
-entity_handle hotbar_button::get_associated_entity(const entity_handle owner_transfer_capability) const {
+entity_handle hotbar_button::get_assigned_entity(const entity_handle owner_transfer_capability) const {
 	auto& cosm = owner_transfer_capability.get_cosmos();
-	const auto handle = cosm[last_associated_entity];
+	const auto handle = cosm[last_assigned_entity];
 
 	if (handle.get_owning_transfer_capability() == owner_transfer_capability) {
 		return handle;
@@ -47,7 +47,7 @@ button_corners_info hotbar_button::get_border_corners_info() const {
 }
 
 vec2i hotbar_button::get_bbox(const const_entity_handle owner_transfer_capability) const {
-	const auto ent = get_associated_entity(owner_transfer_capability);
+	const auto ent = get_assigned_entity(owner_transfer_capability);
 
 	if (ent.dead()) {
 		return { 55, 55 };
@@ -104,6 +104,9 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 
 	augs::gui::draw_clipped_rect(inside_mat, internal_rc, {}, in.v);
 
+	const auto assigned_entity = this_id->get_assigned_entity(owner_transfer_capability);
+	const bool has_assigned_entity = assigned_entity.alive();
+	
 	{
 		corners.for_each_button_corner(internal_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
 			if (type != button_corner_type::LB_COMPLEMENT) {
@@ -112,16 +115,21 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 		});
 
 		border_corners.for_each_button_corner(internal_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
-			//if (type != button_corner_type::LB_COMPLEMENT) {
+			if (has_assigned_entity) {
 				augs::gui::draw_clipped_rect(augs::gui::material(id, border_col), drawn_rc, {}, in.v, flip);
-			//}
-				
-				if (type == button_corner_type::LB_COMPLEMENT) {
-					augs::gui::text_drawer number_caption;
-					number_caption.set_text(augs::gui::text::format (typesafe_sprintf(L"%x", this_id.get_location().index), label_style));
-					number_caption.bottom_right(drawn_rc);
-					number_caption.draw(in);
+			}
+			else {
+				if (type == button_corner_type::LB_COMPLEMENT || type == button_corner_type::RB) {
+					augs::gui::draw_clipped_rect(augs::gui::material(id, border_col), drawn_rc, {}, in.v, flip);
 				}
+			}
+				
+			if (type == button_corner_type::LB_COMPLEMENT) {
+				augs::gui::text_drawer number_caption;
+				number_caption.set_text(augs::gui::text::format (typesafe_sprintf(L"%x", this_id.get_location().index), label_style));
+				number_caption.bottom_right(drawn_rc);
+				number_caption.draw(in);
+			}
 		});
 		
 		if (this_id->detector.is_hovered) {
@@ -153,14 +161,12 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 		}
 	}
 
-	const auto& cosmos = context.get_step().get_cosmos();
-	const auto associated_entity = this_id->get_associated_entity(owner_transfer_capability);
 
-	if (associated_entity.alive()) {
-		ensure(associated_entity.has<components::item>());
+	if (has_assigned_entity) {
+		ensure(assigned_entity.has<components::item>());
 
 		item_button_in_item location;
-		location.item_id = this_id->last_associated_entity;
+		location.item_id = this_id->last_assigned_entity;
 
 		const auto dereferenced = context.dereference_location(location);
 		ensure(dereferenced != nullptr);

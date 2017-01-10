@@ -101,7 +101,6 @@ void sentience_system::consume_health_event(messages::health_event h, logic_step
 		corpse.get<components::physics>().apply_force(vec2().set_from_degrees(place_of_death.rotation).set_length(27850 * 2));
 
 		h.spawned_remnants = corpse;
-		// corpse.map_associated_entity(associated_entity_name::ASTRAL_BODY, subject);
 	}
 
 	step.transient.messages.post(h);

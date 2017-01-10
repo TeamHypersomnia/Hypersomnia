@@ -13,7 +13,7 @@ public:
 	typedef dereferenced_location<hotbar_button_in_gui_element> this_in_item;
 	typedef const_dereferenced_location<hotbar_button_in_gui_element> const_this_in_item;
 	
-	entity_id last_associated_entity;
+	entity_id last_assigned_entity;
 
 	augs::gui::appearance_detector detector;
 
@@ -28,8 +28,8 @@ public:
 	button_corners_info get_internal_corners_info() const;
 	button_corners_info get_border_corners_info() const;
 
-	const_entity_handle get_associated_entity(const const_entity_handle owner_transfer_capability) const;
-	entity_handle get_associated_entity(const entity_handle owner_transfer_capability) const;
+	const_entity_handle get_assigned_entity(const const_entity_handle owner_transfer_capability) const;
+	entity_handle get_assigned_entity(const entity_handle owner_transfer_capability) const;
 
 	static void draw(const viewing_gui_context&, const const_this_in_item& this_id, draw_info);
 

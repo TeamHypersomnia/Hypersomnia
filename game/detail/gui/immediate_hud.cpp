@@ -286,7 +286,6 @@ void immediate_hud::acquire_game_events(const const_logic_step& step) {
 
 		erase_remove(recent_pure_color_highlights, [&new_highlight, &cosmos](const pure_color_highlight& existing_highlight) { 
 			return existing_highlight.target == new_highlight.target;
-			//|| existing_highlight.target == cosmos[new_highlight.target][associated_entity_name::ASTRAL_BODY];
 		});
 
 		recent_pure_color_highlights.push_back(new_highlight);
