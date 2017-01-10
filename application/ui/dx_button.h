@@ -99,20 +99,21 @@ public:
 
 		const auto inside_mat = augs::gui::material(assets::texture_id::HOTBAR_BUTTON_INSIDE, inside_col);
 
-		const auto internal_rc = this_id->corners.cornered_rc_to_internal_rc(this_id->rc);
+		const bool flip = this_id->corners.flip_horizontally;
+		const auto internal_rc = this_id->corners.cornered_rc_to_internal_rc(this_tree_entry.get_absolute_rect());
 
 		augs::gui::draw_clipped_rect(inside_mat, internal_rc, {}, in.v);
 		
 		{
 			this_id->corners.for_each_button_corner(internal_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
 				if (type != button_corner_type::LB_COMPLEMENT) {
-					augs::gui::draw_clipped_rect(augs::gui::material(id, inside_col), drawn_rc, {}, in.v, true);
+					augs::gui::draw_clipped_rect(augs::gui::material(id, inside_col), drawn_rc, {}, in.v, flip);
 				}
 			});
 
 			this_id->border_corners.for_each_button_corner(internal_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
 				if (type != button_corner_type::LB_COMPLEMENT) {
-					augs::gui::draw_clipped_rect(augs::gui::material(id, border_col), drawn_rc, {}, in.v, true);
+					augs::gui::draw_clipped_rect(augs::gui::material(id, border_col), drawn_rc, {}, in.v, flip);
 				}
 			});
 
@@ -125,7 +126,7 @@ public:
 
 					this_id->border_corners.for_each_button_corner(hover_effect_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
 						if (type != button_corner_type::LB_COMPLEMENT) {
-							augs::gui::draw_clipped_rect(augs::gui::material(id, this_id->colorize), drawn_rc, {}, in.v, true);
+							augs::gui::draw_clipped_rect(augs::gui::material(id, this_id->colorize), drawn_rc, {}, in.v, flip);
 						}
 					});
 				}
@@ -138,7 +139,7 @@ public:
 
 					this_id->border_corners.for_each_button_corner(hover_effect_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
 						if (type != button_corner_type::LB_COMPLEMENT && is_button_corner(type)) {
-							augs::gui::draw_clipped_rect(augs::gui::material(id, this_id->colorize), drawn_rc, {}, in.v, true);
+							augs::gui::draw_clipped_rect(augs::gui::material(id, this_id->colorize), drawn_rc, {}, in.v, flip);
 						}
 					});
 				}

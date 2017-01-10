@@ -87,45 +87,19 @@ texture_id button_corners_info::get_tex_for_type(button_corner_type t) const {
 
 ltrb button_corners_info::cornered_rc_to_internal_rc(ltrb l) const {
 	auto& manager = get_resource_manager();
-	if (flip_horizontally) {
-		l.l += manager.find(get_tex_for_type(button_corner_type::R))->tex.get_size().x;
-	}
-	else {
-		l.l += manager.find(get_tex_for_type(button_corner_type::L))->tex.get_size().x;
-	}
-
+	l.l += manager.find(get_tex_for_type(button_corner_type::L))->tex.get_size().x;
 	l.t += manager.find(get_tex_for_type(button_corner_type::T))->tex.get_size().y;
-	
-	if (flip_horizontally) {
-		l.r -= manager.find(get_tex_for_type(button_corner_type::L))->tex.get_size().x;
-	}
-	else {
-		l.r -= manager.find(get_tex_for_type(button_corner_type::R))->tex.get_size().x;
-	}
-
+	l.r -= manager.find(get_tex_for_type(button_corner_type::R))->tex.get_size().x;
 	l.b -= manager.find(get_tex_for_type(button_corner_type::B))->tex.get_size().y;
 	return l;
 }
 
 ltrb button_corners_info::internal_rc_to_cornered_rc(ltrb l) const {
 	auto& manager = get_resource_manager();
-	if (flip_horizontally) {
-		l.l -= manager.find(get_tex_for_type(button_corner_type::R))->tex.get_size().x;
-	}
-	else {
-		l.l -= manager.find(get_tex_for_type(button_corner_type::L))->tex.get_size().x;
-	}
-
-	l.t -= manager.find(get_tex_for_type(button_corner_type::T))->tex.get_size().y;
-
-	if (flip_horizontally) {
-		l.r += manager.find(get_tex_for_type(button_corner_type::L))->tex.get_size().x;
-	}
-	else {
-		l.r += manager.find(get_tex_for_type(button_corner_type::R))->tex.get_size().x;
-	}
-
-	l.b += manager.find(get_tex_for_type(button_corner_type::B))->tex.get_size().y;
+	l.l += manager.find(get_tex_for_type(button_corner_type::L))->tex.get_size().x;
+	l.t += manager.find(get_tex_for_type(button_corner_type::T))->tex.get_size().y;
+	l.r -= manager.find(get_tex_for_type(button_corner_type::R))->tex.get_size().x;
+	l.b -= manager.find(get_tex_for_type(button_corner_type::B))->tex.get_size().y;
 	return l;
 }
 
