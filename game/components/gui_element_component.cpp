@@ -53,7 +53,7 @@ namespace components {
 		return rects::xywh<float>(0, 0, 0, 0);
 	}
 
-	vec2 gui_element::get_gui_crosshair_position() const {
+	vec2i gui_element::get_gui_crosshair_position() const {
 		return rect_world.last_state.mouse.pos;
 	}
 	
@@ -89,27 +89,38 @@ namespace components {
 	void gui_element::draw_cursor_with_information(vertex_triangle_buffer& output_buffer, const viewing_gui_context& context) const {
 		auto gui_cursor = assets::texture_id::GUI_CURSOR;
 		auto gui_cursor_color = cyan;
+		auto gui_cursor_position = get_gui_crosshair_position();
 
 		auto get_tooltip_position = [&]() {
 			return get_gui_crosshair_position() + (*gui_cursor).get_size();
 		};
 
-		auto draw_cursor_hint = [&output_buffer](const auto& hint_text, const vec2 cursor_position, const vec2 cursor_size) {
-			vec2 bg_sprite_size;
+		auto draw_cursor_hint = [&output_buffer, this](const auto& hint_text, const vec2i cursor_position, const vec2i cursor_size) {
+			vec2i bg_sprite_size;
 
 			augs::gui::text_drawer drop_hint_drawer;
 
 			drop_hint_drawer.set_text(gui::text::format(std::wstring(hint_text), gui::text::style()));
-			drop_hint_drawer.pos = vec2i(cursor_position) + vec2i(static_cast<int>(cursor_size.x) + 2, 0);
 
 			bg_sprite_size.set(drop_hint_drawer.get_bbox());
-			bg_sprite_size.y = static_cast<float>(std::max(static_cast<int>(cursor_size.y), drop_hint_drawer.get_bbox().y));
+			bg_sprite_size.y = std::max(cursor_size.y, drop_hint_drawer.get_bbox().y);
 			bg_sprite_size.x += cursor_size.x;
 
-			augs::draw_rect_with_border(output_buffer, ltrb(cursor_position, bg_sprite_size), { 0, 0, 0, 120 }, slightly_visible_white);
+			const auto hint_rect = ltrbi(cursor_position, bg_sprite_size).snap_to_bounds(ltrbi(vec2i(0, 0), get_screen_size()));
+
+			augs::draw_rect_with_border(
+				output_buffer, 
+				hint_rect,
+				{ 0, 0, 0, 120 }, 
+				slightly_visible_white
+			);
+			
+			drop_hint_drawer.pos = hint_rect.get_position() + vec2i(cursor_size.x + 2, 0);
 
 			drop_hint_drawer.draw_stroke(output_buffer, black);
 			drop_hint_drawer.draw(output_buffer);
+
+			return hint_rect.get_position();
 		};
 
 		const auto& rect_world = context.get_rect_world();
@@ -157,7 +168,7 @@ namespace components {
 				gui_cursor = assets::texture_id::GUI_CURSOR_ADD;
 				gui_cursor_color = green;
 				
-				draw_cursor_hint(transfer_data.hint_text, get_gui_crosshair_position(), (*gui_cursor).get_size());
+				gui_cursor_position = draw_cursor_hint(transfer_data.hint_text, get_gui_crosshair_position(), (*gui_cursor).get_size());
 			}
 			else if (drag_result.is<drop_for_item_slot_transfer>()) {
 				const auto& transfer_data = drag_result.get<drop_for_item_slot_transfer>();
@@ -180,11 +191,11 @@ namespace components {
 					gui_cursor_color = red;
 				}
 
-				draw_cursor_hint(transfer_data.hint_text, get_gui_crosshair_position(), (*gui_cursor).get_size());
+				gui_cursor_position = draw_cursor_hint(transfer_data.hint_text, get_gui_crosshair_position(), (*gui_cursor).get_size());
 			}
 		}
 
-		augs::draw_rect(output_buffer, get_gui_crosshair_position(), gui_cursor, gui_cursor_color);
+		augs::draw_rect(output_buffer, gui_cursor_position, gui_cursor, gui_cursor_color);
 	}
 	
 	void gui_element::draw_tooltip_from_hover_or_world_highlight(vertex_triangle_buffer& output_buffer, const viewing_gui_context& context, const vec2i tooltip_pos) const {
@@ -230,10 +241,17 @@ namespace components {
 		if (tooltip_text.size() > 0) {
 			augs::gui::text_drawer description_drawer;
 			description_drawer.set_text(tooltip_text);
-			description_drawer.pos = tooltip_pos;
 
-			augs::draw_rect_with_border(output_buffer, ltrb(tooltip_pos, description_drawer.get_bbox()), { 0, 0, 0, 120 }, slightly_visible_white);
+			const auto tooltip_rect = ltrbi(tooltip_pos, description_drawer.get_bbox()).snap_to_bounds(ltrb(vec2(0, 0), get_screen_size()));
 
+			augs::draw_rect_with_border(
+				output_buffer,
+				tooltip_rect,
+				{ 0, 0, 0, 120 }, 
+				slightly_visible_white
+			);
+
+			description_drawer.pos = tooltip_rect.get_position();
 			description_drawer.draw(output_buffer);
 		}
 	}

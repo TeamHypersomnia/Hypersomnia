@@ -40,7 +40,7 @@ namespace components {
 		std::array<hotbar_button, 10> hotbar_buttons;
 
 		vec2i get_screen_size() const;
-		vec2 get_gui_crosshair_position() const;
+		vec2i get_gui_crosshair_position() const;
 
 		static rects::xywh<float> get_rectangle_for_slot_function(const slot_function);
 		

@@ -106,6 +106,10 @@ namespace augs {
 			ltrb() : l(0), t(0), r(0), b(0) {}
 			ltrb(const wh<T>& rr) : l(0), t(0), r(rr.w), b(rr.h) {}
 			ltrb(const xywh<T>& rr) : l(rr.x), t(rr.y), r(rr.x + rr.w), b(rr.y + rr.h) {}
+			
+			template <class B>
+			ltrb(const ltrb<B>& rr) : l(static_cast<T>(rr.l)), t(static_cast<T>(rr.t)), r(static_cast<T>(rr.r)), b(static_cast<T>(rr.b)) {}
+			
 			ltrb(T l, T t, T r, T b) : l(l), t(t), r(r), b(b) {}
 			ltrb(vec2t<T> pos, vec2t<T> size) : l(pos.x), t(pos.y), r(pos.x + size.x), b(pos.y + size.y) {}
 			void set(T l, T t, T r, T b) { *this = ltrb(l, t, r, b); }
@@ -178,22 +182,17 @@ namespace augs {
 				return *this;
 			}
 
-			bool stick_x(const ltrb& rc) {
+			ltrb& snap_to_bounds(const ltrb& rc) {
 				vec2t<T> offset(0, 0);
+
 				if (l < rc.l) offset.x += rc.l - l;
 				if (r > rc.r) offset.x += rc.r - r;
-				operator+=(offset);
-
-				return offset.x == 0;
-			}
-
-			bool stick_y(const ltrb& rc) {
-				vec2t<T> offset(0, 0);
 				if (t < rc.t) offset.y += rc.t - t;
 				if (b > rc.b) offset.y += rc.b - b;
+
 				operator+=(offset);
 
-				return offset.y == 0;
+				return *this;
 			}
 
 			vec2t<T> get_sticking_offset(sticking mode) const {
