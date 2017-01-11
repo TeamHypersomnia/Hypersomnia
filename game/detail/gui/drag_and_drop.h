@@ -19,7 +19,7 @@ struct drop_for_item_slot_transfer {
 
 struct drop_for_hotbar_assignment {
 	entity_id item_id;
-	dereferenced_location<hotbar_button_in_gui_element> assign_to;
+	hotbar_button_in_gui_element assign_to;
 
 	constant_size_wstring<20> hint_text;
 };
@@ -54,10 +54,25 @@ drag_and_drop_result prepare_drag_and_drop_result(C context, const game_gui_elem
 			auto target_item = context._dynamic_cast<item_button_in_item>(drop_target_rect_id);
 
 			if (target_hotbar_button != nullptr) {
-				item_button_in_item assigned_item_location;
-				assigned_item_location.item_id = target_hotbar_button->get_assigned_entity(owning_transfer_capability).get_id();
+				const auto assigned_entity = target_hotbar_button->get_assigned_entity(owning_transfer_capability);
 
-				target_item = context.dereference_location(assigned_item_location);
+				if (assigned_entity.dead()) {
+					const auto hotbar_button_location = target_hotbar_button.get_location();
+
+					drop_for_hotbar_assignment hotbar_drop;
+					hotbar_drop.assign_to = hotbar_button_location;
+					hotbar_drop.hint_text = typesafe_sprintf(L"Assign to %x", hotbar_button_location.index);
+					hotbar_drop.item_id = dragged_item_handle;
+
+					output.set(hotbar_drop);
+					return output;
+				}
+				else {
+					item_button_in_item assigned_item_location;
+					assigned_item_location.item_id = assigned_entity.get_id();
+
+					target_item = context.dereference_location(assigned_item_location);
+				}
 			}
 			
 			drop_for_item_slot_transfer drop;
@@ -154,12 +169,25 @@ drag_and_drop_result prepare_drag_and_drop_result(C context, const game_gui_elem
 					}
 				}
 				else if (predicted_result < item_transfer_result_type::SUCCESSFUL_TRANSFER) {
-					switch (predicted_result) {
-					case item_transfer_result_type::INSUFFICIENT_SPACE: drop.hint_text = L"No space"; break;
-					case item_transfer_result_type::INVALID_SLOT_OR_UNOWNED_ROOT: drop.hint_text = L"Impossible"; break;
-					case item_transfer_result_type::INCOMPATIBLE_CATEGORIES: drop.hint_text = L"Incompatible item"; break;
-					case item_transfer_result_type::NO_SLOT_AVAILABLE: drop.hint_text = L"No slot available"; break;
-					default: ensure(0); break;
+					const bool transfer_drop_was_due_to_hotbar_button = target_hotbar_button != nullptr;
+
+					if (transfer_drop_was_due_to_hotbar_button) {
+						drop_for_hotbar_assignment hotbar_drop;
+						hotbar_drop.assign_to = target_hotbar_button;
+						hotbar_drop.hint_text = typesafe_sprintf(L"Reassign to %x", target_hotbar_button.get_location().index);
+						hotbar_drop.item_id = dragged_item_handle;
+						
+						output.set(hotbar_drop);
+						return output;
+					}
+					else {
+						switch (predicted_result) {
+						case item_transfer_result_type::INSUFFICIENT_SPACE: drop.hint_text = L"No space"; break;
+						case item_transfer_result_type::INVALID_SLOT_OR_UNOWNED_ROOT: drop.hint_text = L"Impossible"; break;
+						case item_transfer_result_type::INCOMPATIBLE_CATEGORIES: drop.hint_text = L"Incompatible item"; break;
+						case item_transfer_result_type::NO_SLOT_AVAILABLE: drop.hint_text = L"No slot available"; break;
+						default: ensure(0); break;
+						}
 					}
 				}
 

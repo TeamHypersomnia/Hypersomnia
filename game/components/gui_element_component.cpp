@@ -94,6 +94,24 @@ namespace components {
 			return get_gui_crosshair_position() + (*gui_cursor).get_size();
 		};
 
+		auto draw_cursor_hint = [&output_buffer](const auto& hint_text, const vec2 cursor_position, const vec2 cursor_size) {
+			vec2 bg_sprite_size;
+
+			augs::gui::text_drawer drop_hint_drawer;
+
+			drop_hint_drawer.set_text(gui::text::format(std::wstring(hint_text), gui::text::style()));
+			drop_hint_drawer.pos = vec2i(cursor_position) + vec2i(static_cast<int>(cursor_size.x) + 2, 0);
+
+			bg_sprite_size.set(drop_hint_drawer.get_bbox());
+			bg_sprite_size.y = static_cast<float>(std::max(static_cast<int>(cursor_size.y), drop_hint_drawer.get_bbox().y));
+			bg_sprite_size.x += cursor_size.x;
+
+			augs::draw_rect_with_border(output_buffer, ltrb(cursor_position, bg_sprite_size), { 0, 0, 0, 120 }, slightly_visible_white);
+
+			drop_hint_drawer.draw_stroke(output_buffer, black);
+			drop_hint_drawer.draw(output_buffer);
+		};
+
 		const auto& rect_world = context.get_rect_world();
 
 		const bool is_dragging = rect_world.is_currently_dragging();
@@ -113,13 +131,41 @@ namespace components {
 				
 				dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer);
 				dragged_item_button->draw_grid_border_ghost(context, dragged_item_button, output_buffer);
+
+				auto& item = context.get_step().get_cosmos()[dragged_item_button.get_location().item_id].get<components::item>();
+
+				if (item.charges > 1) {
+					const auto gui_cursor_size = (*gui_cursor).get_size();
+
+					auto charges_text = to_wstring(dragged_charges);
+
+					augs::gui::text_drawer dragged_charges_drawer;
+
+					dragged_charges_drawer.set_text(augs::gui::text::format(charges_text, text::style()));
+					dragged_charges_drawer.pos = get_gui_crosshair_position() + vec2i(0, int(gui_cursor_size.y));
+
+					dragged_charges_drawer.draw_stroke(output_buffer, black);
+					dragged_charges_drawer.draw(output_buffer);
+				}
+			}
+			else if (drag_result.is<drop_for_hotbar_assignment>()) {
+				const auto& transfer_data = drag_result.get<drop_for_hotbar_assignment>();
+				const auto& dragged_item_button = context.dereference_location(item_button_in_item{ transfer_data.item_id });
+				
+				dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer);
+
+				gui_cursor = assets::texture_id::GUI_CURSOR_ADD;
+				gui_cursor_color = green;
+				
+				draw_cursor_hint(transfer_data.hint_text, get_gui_crosshair_position(), (*gui_cursor).get_size());
 			}
 			else if (drag_result.is<drop_for_item_slot_transfer>()) {
 				const auto& transfer_data = drag_result.get<drop_for_item_slot_transfer>();
 				const auto& dragged_item_button = context.dereference_location(item_button_in_item{ transfer_data.simulated_transfer.item });
-				const auto& transfer_result = transfer_data.result.result;
 
 				dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer);
+
+				const auto& transfer_result = transfer_data.result.result;
 
 				if (transfer_result == item_transfer_result_type::SUCCESSFUL_DROP) {
 					gui_cursor = assets::texture_id::GUI_CURSOR_MINUS;
@@ -134,37 +180,7 @@ namespace components {
 					gui_cursor_color = red;
 				}
 
-				const auto gui_cursor_size = (*gui_cursor).get_size();
-
-				vec2 bg_sprite_size;
-
-				augs::gui::text_drawer drop_hint_drawer;
-
-				drop_hint_drawer.set_text(gui::text::format(std::wstring(transfer_data.hint_text), gui::text::style()));
-				drop_hint_drawer.pos = vec2i(get_gui_crosshair_position()) + vec2i(static_cast<int>(gui_cursor_size.x) + 2, 0);
-
-				bg_sprite_size.set(drop_hint_drawer.get_bbox());
-				bg_sprite_size.y = static_cast<float>(std::max(static_cast<int>(gui_cursor_size.y), drop_hint_drawer.get_bbox().y));
-				bg_sprite_size.x += gui_cursor_size.x;
-
-				augs::draw_rect_with_border(output_buffer, ltrb(get_gui_crosshair_position(), bg_sprite_size), { 0, 0, 0, 120 }, slightly_visible_white);
-
-				drop_hint_drawer.draw_stroke(output_buffer, black);
-				drop_hint_drawer.draw(output_buffer);
-
-				auto& item = context.get_step().get_cosmos()[dragged_item_button.get_location().item_id].get<components::item>();
-
-				if (item.charges > 1) {
-					auto charges_text = to_wstring(dragged_charges);
-
-					augs::gui::text_drawer dragged_charges_drawer;
-
-					dragged_charges_drawer.set_text(augs::gui::text::format(charges_text, text::style()));
-					dragged_charges_drawer.pos = get_gui_crosshair_position() + vec2i(0, int(gui_cursor_size.y));
-
-					dragged_charges_drawer.draw_stroke(output_buffer, black);
-					dragged_charges_drawer.draw(output_buffer);
-				}
+				draw_cursor_hint(transfer_data.hint_text, get_gui_crosshair_position(), (*gui_cursor).get_size());
 			}
 		}
 
@@ -178,14 +194,27 @@ namespace components {
 
 		const auto maybe_hovered_item = context._dynamic_cast<item_button_in_item>(rect_world.rect_hovered);
 		const auto maybe_hovered_slot = context._dynamic_cast<slot_button_in_container>(rect_world.rect_hovered);
+		const auto maybe_hovered_hotbar_button = context._dynamic_cast<hotbar_button_in_gui_element>(rect_world.rect_hovered);
 
 		gui::text::fstr tooltip_text;
 
+		const auto description_style = text::style(assets::font_id::GUI_FONT, vslightgray);
+
 		if (maybe_hovered_item) {
-			tooltip_text = text::simple_bbcode(describe_entity(cosmos[maybe_hovered_item.get_location().item_id]), text::style(assets::font_id::GUI_FONT, vslightgray));
+			tooltip_text = text::simple_bbcode(describe_entity(cosmos[maybe_hovered_item.get_location().item_id]), description_style);
 		}
 		else if (maybe_hovered_slot) {
 			tooltip_text = text::simple_bbcode(describe_slot(cosmos[maybe_hovered_slot.get_location().slot_id]), text::style());
+		}
+		else if (maybe_hovered_hotbar_button) {
+			const auto assigned_entity = maybe_hovered_hotbar_button->get_assigned_entity(context.get_gui_element_entity());
+
+			if (assigned_entity.alive()) {
+				tooltip_text = text::simple_bbcode(describe_entity(assigned_entity), description_style);
+			}
+			else {
+				tooltip_text = text::format(L"Empty slot", description_style);
+			}
 		}
 		else {
 			const auto hovered = cosmos[get_hovered_world_entity(cosmos, step.camera.transform.pos + rect_world.last_state.mouse.pos - step.camera.visible_world_area / 2)];
