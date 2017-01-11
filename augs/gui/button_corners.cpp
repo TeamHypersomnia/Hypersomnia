@@ -8,7 +8,40 @@ bool is_button_corner(const button_corner_type t) {
 		|| t == button_corner_type::RT
 		|| t == button_corner_type::RB
 		|| t == button_corner_type::LB
+
+		|| t == button_corner_type::LT_BORDER
+		|| t == button_corner_type::RT_BORDER
+		|| t == button_corner_type::RB_BORDER
+		|| t == button_corner_type::LB_BORDER
+
+		|| t == button_corner_type::LT_INTERNAL_BORDER
+		|| t == button_corner_type::RT_INTERNAL_BORDER
+		|| t == button_corner_type::RB_INTERNAL_BORDER
+		|| t == button_corner_type::LB_INTERNAL_BORDER
 	) {
+		return true;
+	}
+
+	return false;
+}
+
+bool is_button_border(const button_corner_type t) {
+	if (
+		   t == button_corner_type::L_BORDER
+		|| t == button_corner_type::T_BORDER
+		|| t == button_corner_type::R_BORDER
+		|| t == button_corner_type::B_BORDER
+
+		|| t == button_corner_type::LT_BORDER
+		|| t == button_corner_type::RT_BORDER
+		|| t == button_corner_type::RB_BORDER
+		|| t == button_corner_type::LB_BORDER
+
+		|| t == button_corner_type::LT_INTERNAL_BORDER
+		|| t == button_corner_type::RT_INTERNAL_BORDER
+		|| t == button_corner_type::RB_INTERNAL_BORDER
+		|| t == button_corner_type::LB_INTERNAL_BORDER
+		) {
 		return true;
 	}
 
@@ -21,6 +54,11 @@ bool is_button_side(const button_corner_type t) {
 		|| t == button_corner_type::T
 		|| t == button_corner_type::R
 		|| t == button_corner_type::B
+
+		|| t == button_corner_type::L_BORDER
+		|| t == button_corner_type::T_BORDER
+		|| t == button_corner_type::R_BORDER
+		|| t == button_corner_type::B_BORDER
 		) {
 		return true;
 	}
@@ -47,6 +85,40 @@ texture_id button_corners_info::get_tex_for_type(button_corner_type t) const {
 		}
 		else if (t == button_corner_type::R) {
 			t = button_corner_type::L;
+		}
+
+
+		if (t == button_corner_type::LT_BORDER) {
+			t = button_corner_type::RT_BORDER;
+		}
+		else if (t == button_corner_type::RT_BORDER) {
+			t = button_corner_type::LT_BORDER;
+		}
+		else if (t == button_corner_type::LB_BORDER) {
+			t = button_corner_type::RB_BORDER;
+		}
+		else if (t == button_corner_type::RB_BORDER) {
+			t = button_corner_type::LB_BORDER;
+		}
+		else if (t == button_corner_type::L_BORDER) {
+			t = button_corner_type::R_BORDER;
+		}
+		else if (t == button_corner_type::R_BORDER) {
+			t = button_corner_type::L_BORDER;
+		}
+
+
+		if (t == button_corner_type::LT_INTERNAL_BORDER) {
+			t = button_corner_type::RT_INTERNAL_BORDER;
+		}
+		else if (t == button_corner_type::RT_INTERNAL_BORDER) {
+			t = button_corner_type::LT_INTERNAL_BORDER;
+		}
+		else if (t == button_corner_type::LB_INTERNAL_BORDER) {
+			t = button_corner_type::RB_INTERNAL_BORDER;
+		}
+		else if (t == button_corner_type::RB_INTERNAL_BORDER) {
+			t = button_corner_type::LB_INTERNAL_BORDER;
 		}
 	}
 
@@ -79,6 +151,50 @@ texture_id button_corners_info::get_tex_for_type(button_corner_type t) const {
 
 	case button_corner_type::LB_COMPLEMENT:
 		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 8);
+		break;
+
+	case button_corner_type::LT_BORDER:
+		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 9);
+		break;
+	case button_corner_type::RT_BORDER:
+		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 10);
+		break;
+	case button_corner_type::RB_BORDER:
+		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 11);
+		break;
+	case button_corner_type::LB_BORDER:
+		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 12);
+		break;
+
+
+	case button_corner_type::L_BORDER:
+		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 13);
+		break;
+	case button_corner_type::T_BORDER:
+		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 14);
+		break;
+	case button_corner_type::R_BORDER:
+		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 15);
+		break;
+	case button_corner_type::B_BORDER:
+		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 16);
+		break;
+
+	case button_corner_type::LB_COMPLEMENT_BORDER:
+		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 17);
+		break;
+
+	case button_corner_type::LT_INTERNAL_BORDER:
+		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 18);
+		break;
+	case button_corner_type::RT_INTERNAL_BORDER:
+		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 19);
+		break;
+	case button_corner_type::RB_INTERNAL_BORDER:
+		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 20);
+		break;
+	case button_corner_type::LB_INTERNAL_BORDER:
+		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 21);
 		break;
 
 	default: ensure(false); return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 0); break;

@@ -22,7 +22,6 @@ public:
 
 	appearing_text appearing_caption;
 	button_corners_info corners;
-	button_corners_info border_corners;
 	float elapsed_hover_time_ms = 0.f;
 
 	float hover_highlight_maximum_distance = 8.f;
@@ -107,13 +106,8 @@ public:
 		{
 			this_id->corners.for_each_button_corner(internal_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
 				if (type != button_corner_type::LB_COMPLEMENT) {
-					augs::gui::draw_clipped_rect(augs::gui::material(id, inside_col), drawn_rc, {}, in.v, flip);
-				}
-			});
-
-			this_id->border_corners.for_each_button_corner(internal_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
-				if (type != button_corner_type::LB_COMPLEMENT) {
-					augs::gui::draw_clipped_rect(augs::gui::material(id, border_col), drawn_rc, {}, in.v, flip);
+					const auto col = is_button_border(type) ? border_col : inside_col;
+					augs::gui::draw_clipped_rect(augs::gui::material(id, col), drawn_rc, {}, in.v, flip);
 				}
 			});
 
@@ -124,8 +118,8 @@ public:
 					const auto distance = 4.f;
 					hover_effect_rc.expand_from_center(vec2(distance, distance));
 
-					this_id->border_corners.for_each_button_corner(hover_effect_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
-						if (type != button_corner_type::LB_COMPLEMENT) {
+					this_id->corners.for_each_button_corner(hover_effect_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
+						if (type != button_corner_type::LB_COMPLEMENT && is_button_border(type)) {
 							augs::gui::draw_clipped_rect(augs::gui::material(id, this_id->colorize), drawn_rc, {}, in.v, flip);
 						}
 					});
@@ -137,8 +131,8 @@ public:
 					const auto distance = (1.f - std::min(max_duration, this_id->elapsed_hover_time_ms) / max_duration) * max_distance;
 					hover_effect_rc.expand_from_center(vec2(distance, distance));
 
-					this_id->border_corners.for_each_button_corner(hover_effect_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
-						if (type != button_corner_type::LB_COMPLEMENT && is_button_corner(type)) {
+					this_id->corners.for_each_button_corner(hover_effect_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
+						if (type != button_corner_type::LB_COMPLEMENT && is_button_corner(type) && is_button_border(type)) {
 							augs::gui::draw_clipped_rect(augs::gui::material(id, this_id->colorize), drawn_rc, {}, in.v, flip);
 						}
 					});

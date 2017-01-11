@@ -3,7 +3,6 @@
 
 dx_button::dx_button() {
 	corners.lt_texture = assets::texture_id::MENU_BUTTON_LT;
-	border_corners.lt_texture = assets::texture_id::MENU_BUTTON_LT_BORDER;
 
 	auto& manager = get_resource_manager();
 

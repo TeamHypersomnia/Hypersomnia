@@ -16,11 +16,30 @@ enum class button_corner_type {
 	T,
 	R,
 	B,
-
+	
 	LB_COMPLEMENT,
+
+	LT_BORDER,
+	RT_BORDER,
+	RB_BORDER,
+	LB_BORDER,
+
+	L_BORDER,
+	T_BORDER,
+	R_BORDER,
+	B_BORDER,
+	
+	LB_COMPLEMENT_BORDER,
+
+	LT_INTERNAL_BORDER,
+	RT_INTERNAL_BORDER,
+	RB_INTERNAL_BORDER,
+	LB_INTERNAL_BORDER,
+
 	COUNT
 };
 
+bool is_button_border(const button_corner_type);
 bool is_button_corner(const button_corner_type);
 bool is_button_side(const button_corner_type);
 
@@ -39,7 +58,7 @@ struct button_corners_info {
 	void for_each_button_corner(const ltrb rc, L callback) const {
 		auto& manager = get_resource_manager();
 
-		for (auto i = button_corner_type::LT; i < button_corner_type::COUNT; i = button_corner_type(static_cast<int>(i) + 1)) {
+		for (auto i = button_corner_type::LT; i < button_corner_type::COUNT; i = static_cast<button_corner_type>(static_cast<int>(i) + 1)) {
 			const auto tex_id = get_tex_for_type(i);
 			const auto* const found_tex = manager.find(tex_id);
 
@@ -51,42 +70,50 @@ struct button_corners_info {
 			const vec2 s = tex.get_size();
 
 			ltrb target_rect;
-			switch (i) {
-			case button_corner_type::LT:
+			
+			if (i == button_corner_type::LT || i == button_corner_type::LT_BORDER || i == button_corner_type::LT_INTERNAL_BORDER) {
 				target_rect.set_size(s);
 				target_rect.set_position(rc.left_top() - s);
-				break;
-			case button_corner_type::RT:
+			}
+			
+			else if (i == button_corner_type::RT || i == button_corner_type::RT_BORDER || i == button_corner_type::RT_INTERNAL_BORDER) {
 				target_rect.set_size(s);
 				target_rect.set_position(rc.right_top() - vec2(0, s.y));
-				break;
-			case button_corner_type::RB:
+			}
+
+			else if (i == button_corner_type::RB || i == button_corner_type::RB_BORDER || i == button_corner_type::RB_INTERNAL_BORDER) {
 				target_rect.set_size(s);
 				target_rect.set_position(rc.right_bottom());
-				break;
-			case button_corner_type::LB:
+			}
+			
+			else if (i == button_corner_type::LB || i == button_corner_type::LB_BORDER || i == button_corner_type::LB_INTERNAL_BORDER) {
 				target_rect.set_size(s);
 				target_rect.set_position(rc.left_bottom() - vec2(s.x, 0));
-				break;
+			}
 
-			case button_corner_type::L:
+
+			else if (i == button_corner_type::L || i == button_corner_type::L_BORDER) {
 				target_rect.set_size({ s.x, rc.h() });
 				target_rect.set_position(rc.left_top() - vec2(s.x, 0));
-				break;
-			case button_corner_type::T:
+			}
+
+			else if (i == button_corner_type::T || i == button_corner_type::T_BORDER) {
 				target_rect.set_size({ rc.w(), s.y });
 				target_rect.set_position(rc.left_top() - vec2(0, s.y));
-				break;
-			case button_corner_type::R:
+			}
+
+			else if (i == button_corner_type::R || i == button_corner_type::R_BORDER) {
 				target_rect.set_size({ s.x, rc.h() });
 				target_rect.set_position(rc.right_top());
-				break;
-			case button_corner_type::B:
+			}
+
+			else if (i == button_corner_type::B || i == button_corner_type::B_BORDER) {
 				target_rect.set_size({ rc.w(), s.y });
 				target_rect.set_position(rc.left_bottom());
-				break;
+			}
 
-			case button_corner_type::LB_COMPLEMENT:
+
+			else if (i == button_corner_type::LB_COMPLEMENT || i == button_corner_type::LB_COMPLEMENT_BORDER) {
 				target_rect.set_size(s);
 
 				if (flip_horizontally) {
@@ -95,8 +122,9 @@ struct button_corners_info {
 				else {
 					target_rect.set_position(rc.left_bottom() - vec2(s.x, 0));
 				}
-
-				break;
+			}
+			else {
+				ensure("Unsupported button border type" && false);
 			}
 
 			callback(i, tex_id, target_rect);
