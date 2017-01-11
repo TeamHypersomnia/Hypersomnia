@@ -7,6 +7,8 @@
 #include "game/detail/inventory_utils.h"
 
 struct drag_and_drop_result {
+	dereferenced_location<hotbar_button_in_gui_element> target_hotbar_button_to_assign_to;
+
 	item_slot_transfer_request_data simulated_request;
 	const_dereferenced_location<item_button_in_item> dragged_item;
 	bool possible_target_hovered = false;
@@ -22,6 +24,7 @@ template <class C>
 drag_and_drop_result prepare_drag_and_drop_result(C context, game_gui_element_location held_rect_id, game_gui_element_location drop_target_rect_id) {
 	const auto& cosmos = context.get_step().get_cosmos();
 	const auto& element = context.get_gui_element_component();
+	const auto owning_transfer_capability = context.get_gui_element_entity();
 
 	drag_and_drop_result out;
 
@@ -33,8 +36,17 @@ drag_and_drop_result prepare_drag_and_drop_result(C context, game_gui_element_lo
 		const auto dragged_item_handle = cosmos[dragged_item.get_location().item_id];
 
 		const auto target_slot = context._dynamic_cast<slot_button_in_container>(drop_target_rect_id);
-		const auto target_item = context._dynamic_cast<item_button_in_item>(drop_target_rect_id);
+		auto target_item = context._dynamic_cast<item_button_in_item>(drop_target_rect_id);
 		const auto target_drop_item = context._dynamic_cast<drag_and_drop_target_drop_item_in_gui_element>(drop_target_rect_id);
+		
+		const auto target_hotbar_button = context._dynamic_cast<hotbar_button_in_gui_element>(drop_target_rect_id);
+		
+		if (target_hotbar_button != nullptr) {
+			item_button_in_item assigned_item_location;
+			assigned_item_location.item_id = target_hotbar_button->get_assigned_entity(owning_transfer_capability).get_id();
+
+			target_item = context.dereference_location(assigned_item_location);
+		}
 
 		out.possible_target_hovered = true;
 

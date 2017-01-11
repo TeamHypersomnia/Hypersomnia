@@ -160,7 +160,8 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 				augs::gui::text_drawer number_caption;
 				number_caption.set_text(augs::gui::text::format(typesafe_sprintf(L"%x", this_id.get_location().index), label_style));
 				number_caption.bottom_right(drawn_rc);
-				number_caption.draw(in);
+				number_caption.draw_stroke(in.v);
+				number_caption.draw(in.v);
 			}
 		});
 
