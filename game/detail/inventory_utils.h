@@ -19,9 +19,15 @@ components::transform sum_attachment_offsets(const cosmos&, const inventory_item
 
 unsigned calculate_space_occupied_with_children(const_entity_handle item);
 
-item_transfer_result containment_result(const_item_slot_transfer_request, bool allow_replacement = true);
+item_transfer_result query_containment_result(
+	const const_entity_handle item, 
+	const const_inventory_slot_handle target_slot, 
+	int specified_quantity = -1,
+	bool allow_replacement = true
+);
+
 item_transfer_result query_transfer_result(const_item_slot_transfer_request);
-slot_function detect_compatible_slot(const_entity_handle item, const_entity_handle container);
+slot_function get_slot_with_compatible_category(const_entity_handle item, const_entity_handle container);
 
 bool can_stack_entities(const_entity_handle, const_entity_handle);
 

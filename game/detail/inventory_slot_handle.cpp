@@ -176,8 +176,7 @@ bool basic_inventory_slot_handle<C>::can_contain(const entity_id id) const {
 		return false;
 	}
 
-	const basic_item_slot_transfer_request<C> r(get_cosmos()[id], *this);
-	return containment_result(r).transferred_charges > 0;
+	return query_containment_result(get_cosmos()[id], *this).transferred_charges > 0;
 }
 
 template <bool C>

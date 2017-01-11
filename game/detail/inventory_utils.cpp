@@ -31,18 +31,24 @@ item_transfer_result query_transfer_result(const const_item_slot_transfer_reques
 	const auto item_owning_capability = r.get_item().get_owning_transfer_capability();
 	const auto target_slot_owning_capability = r.get_target_slot().get_container().get_owning_transfer_capability();
 
-	//ensure(item_owning_capability.alive() || target_slot_owning_capability.alive());
+	const bool is_drop_request = r.get_target_slot().dead();
 
 	if (item_owning_capability.alive() && target_slot_owning_capability.alive() &&
 		item_owning_capability != target_slot_owning_capability) {
 		predicted_result = item_transfer_result_type::INVALID_SLOT_OR_UNOWNED_ROOT;
 	}
-	else if (r.get_target_slot().alive()) {
-		output = containment_result(r);
+	else if (is_drop_request) {
+		output.result = item_transfer_result_type::SUCCESSFUL_TRANSFER;
+
+		if (r.specified_quantity == -1) {
+			output.transferred_charges = item.charges;
+		}
+		else {
+			output.transferred_charges = std::min(r.specified_quantity, item.charges);
+		}
 	}
 	else {
-		output.result = item_transfer_result_type::SUCCESSFUL_TRANSFER;
-		output.transferred_charges = r.specified_quantity == -1 ? item.charges : std::min(r.specified_quantity, item.charges);
+		output = query_containment_result(r.get_item(), r.get_target_slot(), r.specified_quantity);
 	}
 
 	if (predicted_result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
@@ -54,7 +60,7 @@ item_transfer_result query_transfer_result(const const_item_slot_transfer_reques
 	return output;
 }
 
-slot_function detect_compatible_slot(const const_entity_handle item, const const_entity_handle container_entity) {
+slot_function get_slot_with_compatible_category(const const_entity_handle item, const const_entity_handle container_entity) {
 	const auto* const container = container_entity.find<components::container>();
 
 	if (container) {
@@ -72,20 +78,24 @@ slot_function detect_compatible_slot(const const_entity_handle item, const const
 	return slot_function::INVALID;
 }
 
-item_transfer_result containment_result(const const_item_slot_transfer_request r, const bool allow_replacement) {
+item_transfer_result query_containment_result(
+	const const_entity_handle item_entity,
+	const const_inventory_slot_handle target_slot,
+	int specified_quantity,
+	bool allow_replacement
+) {
 	item_transfer_result output;
 	output.transferred_charges = 0;
 	output.result = item_transfer_result_type::NO_SLOT_AVAILABLE;
 
-	const auto& item = r.get_item().get<components::item>();
-	const auto& cosmos = r.get_item().get_cosmos();
-	const auto& slot = *r.get_target_slot();
+	const auto& item = item_entity.get<components::item>();
+	const auto& slot = *target_slot;
 	auto& result = output.result;
 
-	if (item.current_slot == r.get_target_slot()) {
+	if (item.current_slot == target_slot) {
 		result = item_transfer_result_type::THE_SAME_SLOT;
 	}
-	else if (slot.always_allow_exactly_one_item && slot.items_inside.size() == 1 && !can_stack_entities(cosmos[slot.items_inside[0]], r.get_item())) {
+	else if (slot.always_allow_exactly_one_item && slot.items_inside.size() == 1 && !can_stack_entities(target_slot.get_items_inside().at(0), item_entity)) {
 		//if (allow_replacement) {
 		//
 		//}
@@ -97,23 +107,23 @@ item_transfer_result containment_result(const const_item_slot_transfer_request r
 		//replace_request.item = slot.items_inside[0];
 		//replace_request.target_slot = current_slot_of_replacer;
 		//
-		//if (containment_result.)
+		//if (query_containment_result.)
 		//
 		//	if (current_slot_of_replacer.alive())
 
 		result = item_transfer_result_type::NO_SLOT_AVAILABLE;
 	}
-	else if (!slot.is_category_compatible_with(r.get_item())) {
+	else if (!slot.is_category_compatible_with(item_entity)) {
 		result = item_transfer_result_type::INCOMPATIBLE_CATEGORIES;
 	}
 	else {
-		const auto space_available = r.get_target_slot().calculate_free_space_with_parent_containers();
+		const auto space_available = target_slot.calculate_free_space_with_parent_containers();
 
 		if (space_available > 0) {
 			const bool item_indivisible = item.charges == 1 || !item.stackable;
 
 			if (item_indivisible) {
-				if (space_available >= calculate_space_occupied_with_children(r.get_item())) {
+				if (space_available >= calculate_space_occupied_with_children(item_entity)) {
 					output.transferred_charges = 1;
 				}
 			}
@@ -121,8 +131,8 @@ item_transfer_result containment_result(const const_item_slot_transfer_request r
 				const int maximum_charges_fitting_inside = space_available / item.space_occupied_per_charge;
 				output.transferred_charges = std::min(item.charges, maximum_charges_fitting_inside);
 
-				if (r.specified_quantity > -1) {
-					output.transferred_charges = std::min(output.transferred_charges, unsigned(r.specified_quantity));
+				if (specified_quantity > -1) {
+					output.transferred_charges = std::min(output.transferred_charges, static_cast<unsigned>(specified_quantity));
 				}
 			}
 		}

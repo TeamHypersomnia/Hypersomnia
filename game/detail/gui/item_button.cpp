@@ -460,7 +460,7 @@ void item_button::advance_elements(const logic_gui_context& context, const this_
 				const auto& drag_result = prepare_drag_and_drop_result(context, this_id, rect_world.rect_hovered);
 
 				if (drag_result.possible_target_hovered && drag_result.will_drop_be_successful()) {
-					context.get_step().transient.messages.post(drag_result.simulated_request);
+					context.get_step().transient.messages.post(drag_result.simulated_transfer);
 				}
 				else if (!drag_result.possible_target_hovered) {
 					const vec2i griddified = griddify(info.total_dragged_amount);

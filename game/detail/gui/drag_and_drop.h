@@ -9,7 +9,7 @@
 struct drag_and_drop_result {
 	dereferenced_location<hotbar_button_in_gui_element> target_hotbar_button_to_assign_to;
 
-	item_slot_transfer_request_data simulated_request;
+	item_slot_transfer_request_data simulated_transfer;
 	const_dereferenced_location<item_button_in_item> dragged_item;
 	bool possible_target_hovered = false;
 	bool target_slot_alive = false;
@@ -32,6 +32,7 @@ drag_and_drop_result prepare_drag_and_drop_result(C context, game_gui_element_lo
 	out.dragged_item = dragged_item;
 
 	if (dragged_item && context.alive(drop_target_rect_id)) {
+		out.possible_target_hovered = true;
 
 		const auto dragged_item_handle = cosmos[dragged_item.get_location().item_id];
 
@@ -48,41 +49,39 @@ drag_and_drop_result prepare_drag_and_drop_result(C context, game_gui_element_lo
 			target_item = context.dereference_location(assigned_item_location);
 		}
 
-		out.possible_target_hovered = true;
-
-		auto& simulated_request = out.simulated_request;
-		simulated_request.item = dragged_item_handle;
-		simulated_request.specified_quantity = element.dragged_charges;
+		auto& simulated_transfer = out.simulated_transfer;
+		simulated_transfer.item = dragged_item_handle;
+		simulated_transfer.specified_quantity = element.dragged_charges;
 
 		bool was_pointing_to_a_stack_target = false;
 		bool no_slot_in_targeted_item = false;
 
 		if (target_slot != nullptr) {
-			simulated_request.target_slot = target_slot.get_location().slot_id;
+			simulated_transfer.target_slot = target_slot.get_location().slot_id;
 		}
 		else if (target_item != nullptr && target_item != dragged_item) {
-			const auto& target_item_handle = cosmos[target_item.get_location().item_id];
+			const auto target_item_handle = cosmos[target_item.get_location().item_id];
 
 			if (target_item_handle.has<components::container>()) {
-				auto compatible_slot = detect_compatible_slot(dragged_item_handle, target_item_handle);
+				const auto compatible_slot = get_slot_with_compatible_category(dragged_item_handle, target_item_handle);
 
 				if (compatible_slot != slot_function::INVALID) {
-					simulated_request.target_slot = target_item_handle[compatible_slot];
+					simulated_transfer.target_slot = target_item_handle[compatible_slot];
 				}
 				else {
 					no_slot_in_targeted_item = true;
 				}
 			}
 			else if (can_stack_entities(target_item_handle, dragged_item_handle)) {
-				simulated_request.target_slot = target_item_handle.get<components::item>().current_slot;
+				simulated_transfer.target_slot = target_item_handle.get<components::item>().current_slot;
 				was_pointing_to_a_stack_target = true;
 			}
 			else {
 				no_slot_in_targeted_item = true;
 			}
 		}
-		else if (target_drop_item) {
-			simulated_request.target_slot.unset();
+		else if (target_drop_item != nullptr) {
+			simulated_transfer.target_slot.unset();
 		}
 		else {
 			out.possible_target_hovered = false;
@@ -96,7 +95,7 @@ drag_and_drop_result prepare_drag_and_drop_result(C context, game_gui_element_lo
 				out.result.transferred_charges = 0;
 			}
 			else {
-				out.result = query_transfer_result(cosmos[simulated_request]);
+				out.result = query_transfer_result(cosmos[simulated_transfer]);
 			}
 
 			auto predicted_result = out.result.result;
@@ -113,7 +112,7 @@ drag_and_drop_result prepare_drag_and_drop_result(C context, game_gui_element_lo
 				auto item_charges = dragged_item_handle.get<components::item>().charges;
 
 				if (item_charges > 1) {
-					if (simulated_request.specified_quantity == out.result.transferred_charges)
+					if (simulated_transfer.specified_quantity == out.result.transferred_charges)
 						charges_text = L" all";
 					else
 						charges_text = L" " + to_wstring(out.result.transferred_charges);
@@ -126,7 +125,7 @@ drag_and_drop_result prepare_drag_and_drop_result(C context, game_gui_element_lo
 					tooltip_text += L"Stack" + charges_text;
 				}
 				else {
-					switch (simulated_request.target_slot.type) {
+					switch (simulated_transfer.target_slot.type) {
 					case slot_function::ITEM_DEPOSIT: tooltip_text += L"Insert"; break;
 					case slot_function::GUN_CHAMBER: tooltip_text += L"Place"; break;
 					case slot_function::GUN_CHAMBER_MAGAZINE: tooltip_text += L"Place"; break;
@@ -155,6 +154,6 @@ drag_and_drop_result prepare_drag_and_drop_result(C context, game_gui_element_lo
 		}
 	}
 
-	out.target_slot_alive = context.get_step().get_cosmos()[out.simulated_request.target_slot].alive();
+	out.target_slot_alive = context.get_step().get_cosmos()[out.simulated_transfer.target_slot].alive();
 	return out;
 }
