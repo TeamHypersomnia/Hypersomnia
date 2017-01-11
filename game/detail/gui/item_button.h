@@ -58,6 +58,7 @@ struct item_button : game_gui_rect_node {
 		bool draw_container_opened_mark = false;
 		bool draw_charges = true;
 		bool expand_size_to_grid = true;
+		bool always_full_item_alpha = false;
 		vec2 absolute_xy_offset;
 	};
 

@@ -59,32 +59,6 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 	const auto absolute_rc = this_tree_entry.get_absolute_rect();
 	const auto owner_transfer_capability = context.get_gui_element_entity();
 
-	const auto& detector = this_id->detector;
-
-	const auto colorize = cyan;
-
-	rgba inside_col = white;
-	rgba border_col = white;
-
-	inside_col.a = 20;
-	border_col.a = 190;
-
-	if (detector.is_hovered) {
-		inside_col.a = 30;
-		border_col.a = 220;
-	}
-
-	const bool pushed = detector.current_appearance == augs::gui::appearance_detector::appearance::pushed;
-
-	if (pushed) {
-		inside_col.a = 60;
-		border_col.a = 255;
-	}
-
-	inside_col *= colorize;
-	border_col *= colorize;
-
-	const auto inside_mat = augs::gui::material(assets::texture_id::HOTBAR_BUTTON_INSIDE, inside_col);
 
 	const auto corners = this_id->get_button_corners_info();
 	
@@ -93,16 +67,52 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 	const auto internal_rc = corners.cornered_rc_to_internal_rc(absolute_rc);
 
 	const auto label_style = augs::gui::text::style(assets::font_id::GUI_FONT, cyan);
-
-	augs::gui::draw_clipped_rect(inside_mat, internal_rc, {}, in.v);
-
+	
 	const auto assigned_entity = this_id->get_assigned_entity(owner_transfer_capability);
 	const bool has_assigned_entity = assigned_entity.alive();
 
 	const bool is_assigned_entity_selected = has_assigned_entity && (
 		owner_transfer_capability.wields_in_primary_hand(assigned_entity) ||
 		owner_transfer_capability.wields_in_secondary_hand(assigned_entity)
-	);
+		);
+
+	const auto& detector = this_id->detector;
+
+	const auto colorize = cyan;
+
+	rgba inside_col = white;
+	rgba border_col = white;
+
+	inside_col.a = 20;
+
+	if (has_assigned_entity) {
+		inside_col.a += 10;
+	}
+
+	if (is_assigned_entity_selected) {
+		inside_col.a += 20;
+	}
+
+	border_col.a = 190;
+
+	if (detector.is_hovered) {
+		inside_col.a += 10;
+		border_col.a = 220;
+	}
+
+	const bool pushed = detector.current_appearance == augs::gui::appearance_detector::appearance::pushed;
+
+	if (pushed) {
+		inside_col.a += 40;
+		border_col.a = 255;
+	}
+
+	inside_col *= colorize;
+	border_col *= colorize;
+
+	const auto inside_mat = augs::gui::material(assets::texture_id::HOTBAR_BUTTON_INSIDE, inside_col);
+
+	augs::gui::draw_clipped_rect(inside_mat, internal_rc, {}, in.v);
 
 	std::array<bool, static_cast<size_t>(button_corner_type::COUNT)> visible_parts;
 	std::fill(visible_parts.begin(), visible_parts.end(), false);
@@ -160,11 +170,6 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 			visible_parts[static_cast<size_t>(button_corner_type::RB_BORDER)] = false;
 			visible_parts[static_cast<size_t>(button_corner_type::RB_INTERNAL_BORDER)] = false;
 
-			visible_parts[static_cast<size_t>(button_corner_type::L_BORDER)] = false;
-			visible_parts[static_cast<size_t>(button_corner_type::T_BORDER)] = false;
-			visible_parts[static_cast<size_t>(button_corner_type::R_BORDER)] = false;
-			visible_parts[static_cast<size_t>(button_corner_type::B_BORDER)] = false;
-
 			if (pushed) {
 				const auto distance = 4.f;
 				hover_effect_rc.expand_from_center(vec2(distance, distance));
@@ -176,6 +181,11 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 				});
 			}
 			else {
+				visible_parts[static_cast<size_t>(button_corner_type::L_BORDER)] = false;
+				visible_parts[static_cast<size_t>(button_corner_type::T_BORDER)] = false;
+				visible_parts[static_cast<size_t>(button_corner_type::R_BORDER)] = false;
+				visible_parts[static_cast<size_t>(button_corner_type::B_BORDER)] = false;
+
 				const auto max_duration = this_id->hover_highlight_duration_ms;
 				const auto max_distance = this_id->hover_highlight_maximum_distance;
 		
@@ -212,7 +222,8 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 		f.draw_charges = false;
 		f.draw_attachments_even_if_open = true;
 		f.expand_size_to_grid = false;
-		
+		f.always_full_item_alpha = true;
+
 		const auto height_excess = absolute_rc.h() - this_id->get_bbox(owner_transfer_capability).y;
 		
 		f.absolute_xy_offset = internal_rc.get_position() - context.get_tree_entry(location).get_absolute_pos();

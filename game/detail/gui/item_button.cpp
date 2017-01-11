@@ -223,7 +223,12 @@ void item_button::draw_proc(const viewing_gui_context& context, const const_this
 			item_sprite.flip_horizontally = flip_horizontally;
 			item_sprite.flip_vertically = flip_vertically;
 
-			item_sprite.color.a = border_col.a;
+			item_sprite.color.a = 255;
+			//item_sprite.color.a = border_col.a;
+
+			if (f.always_full_item_alpha) {
+				item_sprite.color.a = 255;
+			}
 
 			components::sprite::drawing_input state(in.v);
 
