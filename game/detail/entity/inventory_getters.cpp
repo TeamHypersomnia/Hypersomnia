@@ -95,30 +95,34 @@ bool inventory_getters<C, D>::wields_in_secondary_hand(const const_entity_handle
 
 template <bool C, class D>
 typename inventory_getters<C, D>::inventory_slot_handle_type inventory_getters<C, D>::determine_hand_holstering_slot_in(const D searched_root_container) const {
-	auto& item_entity = *static_cast<const D*>(this);
+	const auto& item_entity = *static_cast<const D*>(this);
 	auto& cosmos = item_entity.get_cosmos();
 
 	ensure(item_entity.alive());
 	ensure(searched_root_container.alive());
 
-	auto maybe_shoulder = searched_root_container[slot_function::SHOULDER_SLOT];
+	const auto maybe_shoulder = searched_root_container[slot_function::SHOULDER_SLOT];
 
 	if (maybe_shoulder.alive()) {
-		if (maybe_shoulder.can_contain(item_entity))
+		if (maybe_shoulder.can_contain(item_entity)) {
 			return maybe_shoulder;
+		}
 		else if (maybe_shoulder->items_inside.size() > 0) {
-			auto maybe_item_deposit = maybe_shoulder.get_items_inside()[0][slot_function::ITEM_DEPOSIT];
+			const auto maybe_item_deposit = maybe_shoulder.get_items_inside()[0][slot_function::ITEM_DEPOSIT];
 
-			if (maybe_item_deposit.alive() && maybe_item_deposit.can_contain(item_entity))
+			if (maybe_item_deposit.alive() && maybe_item_deposit.can_contain(item_entity)) {
 				return maybe_item_deposit;
+			}
 		}
 	}
 	else {
-		auto maybe_armor = searched_root_container[slot_function::TORSO_ARMOR_SLOT];
+		const auto maybe_armor = searched_root_container[slot_function::TORSO_ARMOR_SLOT];
 
-		if (maybe_armor.alive())
-			if (maybe_armor.can_contain(item_entity))
+		if (maybe_armor.alive()) {
+			if (maybe_armor.can_contain(item_entity)) {
 				return maybe_armor;
+			}
+		}
 	}
 
 	return cosmos[inventory_slot_id()];
@@ -126,21 +130,24 @@ typename inventory_getters<C, D>::inventory_slot_handle_type inventory_getters<C
 
 template <bool C, class D>
 typename inventory_getters<C, D>::inventory_slot_handle_type inventory_getters<C, D>::determine_pickup_target_slot_in(const D searched_root_container) const {
-	auto& item_entity = *static_cast<const D*>(this);
+	const auto& item_entity = *static_cast<const D*>(this);
 	ensure(item_entity.alive());
 	ensure(searched_root_container.alive());
 	auto& cosmos = item_entity.get_cosmos();
 
-	auto hidden_slot = item_entity.determine_hand_holstering_slot_in(searched_root_container);;
+	const auto hidden_slot = item_entity.determine_hand_holstering_slot_in(searched_root_container);;
 
-	if (hidden_slot.alive())
+	if (hidden_slot.alive()) {
 		return hidden_slot;
+	}
 
-	if (searched_root_container[slot_function::PRIMARY_HAND].can_contain(item_entity))
+	if (searched_root_container[slot_function::PRIMARY_HAND].can_contain(item_entity)) {
 		return searched_root_container[slot_function::PRIMARY_HAND];
+	}
 
-	if (searched_root_container[slot_function::SECONDARY_HAND].can_contain(item_entity))
+	if (searched_root_container[slot_function::SECONDARY_HAND].can_contain(item_entity)) {
 		return searched_root_container[slot_function::SECONDARY_HAND];
+	}
 
 	return cosmos[inventory_slot_id()];
 }
