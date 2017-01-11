@@ -24,7 +24,7 @@ public:
 	float hover_highlight_duration_ms = 400.f;
 
 	vec2i get_bbox(const const_entity_handle owner_transfer_capability) const;
-	void associate_entity(const const_entity_handle);
+	void assign_item(const const_entity_handle);
 
 	button_corners_info get_button_corners_info() const;
 

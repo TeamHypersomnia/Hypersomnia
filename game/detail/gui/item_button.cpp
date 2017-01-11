@@ -477,6 +477,14 @@ void item_button::advance_elements(const logic_gui_context& context, const this_
 						this_id->drag_offset_in_item_deposit += griddified;
 					}
 				}
+				else if (drag_result.is<drop_for_hotbar_assignment>()) {
+					const auto& transfer_data = drag_result.get<drop_for_hotbar_assignment>();
+
+					const auto dereferenced_button = context.dereference_location(transfer_data.assign_to);
+					ensure(dereferenced_button != nullptr);
+					
+					dereferenced_button->assign_item(cosmos[transfer_data.item_id]);
+				}
 			}
 
 			// if(being_dragged && inf == rect::gui_event::lup)
