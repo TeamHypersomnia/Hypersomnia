@@ -34,7 +34,7 @@ namespace rendering_scripts {
 		const auto& interp = step.session.systems_audiovisual.get<interpolation_system>();
 		const auto& particles = step.session.systems_audiovisual.get<particles_simulation_system>();
 		auto& wandering_pixels = step.session.systems_audiovisual.get<wandering_pixels_system>();
-		const float global_time_seconds = step.get_interpolated_total_time_passed_in_seconds();
+		const float global_time_seconds = static_cast<float>(step.get_interpolated_total_time_passed_in_seconds());
 
 		auto all_visible = dynamic_tree.determine_visible_entities_from_camera(camera);
 		const auto visible_from_physics = physics.query_camera(camera).entities;
@@ -86,14 +86,14 @@ namespace rendering_scripts {
 				draw_crosshair_lines(
 					[&](const vec2 from, const vec2 to, const rgba col) {
 						const auto& edge_tex = get_resource_manager().find(assets::texture_id::LASER_GLOW_EDGE)->tex;
-						const auto edge_size = edge_tex.get_size();
+						const vec2 edge_size = static_cast<vec2>(edge_tex.get_size());
 
-						augs::draw_line(output, camera[from], camera[to], edge_size.y/3, get_resource_manager().find_neon_map(assets::texture_id::LASER)->tex, col);
+						augs::draw_line(output, camera[from], camera[to], edge_size.y/3.f, get_resource_manager().find_neon_map(assets::texture_id::LASER)->tex, col);
 
 						const auto edge_offset = (to - from).set_length(edge_size.x);
 
-						augs::draw_line(output, camera[to], camera[to + edge_offset], edge_size.y / 3, get_resource_manager().find(assets::texture_id::LASER_GLOW_EDGE)->tex, col);
-						augs::draw_line(output, camera[from - edge_offset], camera[from], edge_size.y / 3, get_resource_manager().find(assets::texture_id::LASER_GLOW_EDGE)->tex, col, true);
+						augs::draw_line(output, camera[to], camera[to + edge_offset], edge_size.y / 3.f, get_resource_manager().find(assets::texture_id::LASER_GLOW_EDGE)->tex, col);
+						augs::draw_line(output, camera[from - edge_offset], camera[from], edge_size.y / 3.f, get_resource_manager().find(assets::texture_id::LASER_GLOW_EDGE)->tex, col, true);
 					},
 					[](...){},
 					interp, 

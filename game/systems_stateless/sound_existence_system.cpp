@@ -176,13 +176,13 @@ entity_handle sound_existence_system::create_sound_effect_entity(cosmos& cosmos,
 	const auto* buffer = get_resource_manager().find(input.effect);
 
 	if (existence.input.variation_number == -1) {
-		existence.input.variation_number = existence.random_variation_number_from_transform(place_of_birth) % buffer->get_num_variations();
+		existence.input.variation_number = static_cast<char>(existence.random_variation_number_from_transform(place_of_birth) % buffer->get_num_variations());
 	}
 
 	const auto length_in_seconds = buffer->get_variation(existence.input.variation_number).request_original().get_length_in_seconds();
 
 	existence.max_lifetime_in_steps = 
-		length_in_seconds / cosmos.get_fixed_delta().in_seconds() + 1;
+		static_cast<unsigned>(length_in_seconds / cosmos.get_fixed_delta().in_seconds()) + 1;
 
 	const auto chased_subject = cosmos[chased_subject_id];
 

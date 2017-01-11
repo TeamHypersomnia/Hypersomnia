@@ -20,7 +20,7 @@
 #include "game/detail/inventory_utils.h"
 
 namespace ingredients {
-	void default_gun_container(entity_handle e, const int mag_rotation) {
+	void default_gun_container(entity_handle e, const float mag_rotation) {
 		auto& item = make_item(e);
 		auto& container = e += components::container();
 		item.space_occupied_per_charge = to_space_units("3.5");

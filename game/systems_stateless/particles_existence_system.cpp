@@ -207,7 +207,7 @@ entity_handle particles_existence_system::create_particle_effect_entity(cosmos& 
 		return a.stream_duration_ms.second < b.stream_duration_ms.second;
 	})).stream_duration_ms.second;
 
-	existence.max_lifetime_in_steps = duration_ms / cosmos.get_fixed_delta().in_milliseconds() + 1;
+	existence.max_lifetime_in_steps = static_cast<unsigned>(duration_ms / cosmos.get_fixed_delta().in_milliseconds()) + 1u;
 	
 	const auto chased_subject = cosmos[it.subject];
 

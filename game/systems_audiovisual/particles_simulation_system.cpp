@@ -116,7 +116,7 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(came
 		erase_remove(particle_layer, [](const resources::particle& a) { return a.lifetime_ms >= a.max_lifetime_ms; });
 	}
 
-	cone.visible_world_area *= 2.5;
+	cone.visible_world_area *= 2.5f;
 
 	const auto targets = 
 		cosmos[cosmos.systems_temporary.get<dynamic_tree_system>().determine_visible_entities_from_camera(cone, components::dynamic_tree_node::tree_type::PARTICLE_EXISTENCES)];

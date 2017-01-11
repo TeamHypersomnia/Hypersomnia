@@ -26,7 +26,7 @@ light_system::cache::cache() {
 void light_system::render_all_lights(augs::renderer& output, const std::array<float, 16> projection_matrix, viewing_step& step, std::function<void()> neon_callback) {
 	const auto& cosmos = step.cosm;
 	const auto dt = step.get_delta();
-	const float global_time_seconds = step.get_interpolated_total_time_passed_in_seconds();
+	const float global_time_seconds = static_cast<float>(step.get_interpolated_total_time_passed_in_seconds());
 
 	ensure_eq(0, output.get_triangle_count());
 

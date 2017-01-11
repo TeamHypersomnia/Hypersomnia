@@ -38,7 +38,7 @@ item_transfer_result query_transfer_result(const const_item_slot_transfer_reques
 		predicted_result = item_transfer_result_type::INVALID_SLOT_OR_UNOWNED_ROOT;
 	}
 	else if (is_drop_request) {
-		output.result = item_transfer_result_type::SUCCESSFUL_TRANSFER;
+		output.result = item_transfer_result_type::SUCCESSFUL_DROP;
 
 		if (r.specified_quantity == -1) {
 			output.transferred_charges = item.charges;
@@ -84,12 +84,10 @@ item_transfer_result query_containment_result(
 	int specified_quantity,
 	bool allow_replacement
 ) {
-	item_transfer_result output;
-	output.transferred_charges = 0;
-	output.result = item_transfer_result_type::NO_SLOT_AVAILABLE;
-
 	const auto& item = item_entity.get<components::item>();
 	const auto& slot = *target_slot;
+
+	item_transfer_result output;
 	auto& result = output.result;
 
 	if (item.current_slot == target_slot) {
@@ -310,6 +308,9 @@ void perform_transfer(const item_slot_transfer_request r, logic_step& step) {
 
 	const auto result = query_transfer_result(r);
 
+	const bool is_pickup_or_transfer = result.result == item_transfer_result_type::SUCCESSFUL_TRANSFER;
+	const bool is_drop_request = result.result == item_transfer_result_type::SUCCESSFUL_DROP;
+
 	if (result.result == item_transfer_result_type::UNMOUNT_BEFOREHAND) {
 		ensure(false);
 		ensure(previous_slot.alive());
@@ -319,10 +320,7 @@ void perform_transfer(const item_slot_transfer_request r, logic_step& step) {
 
 		return;
 	}
-	else if (result.result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
-		const bool is_pickup_or_transfer = r.get_target_slot().alive();
-		const bool is_drop_request = !is_pickup_or_transfer;
-
+	else if (is_pickup_or_transfer || is_drop_request) {
 		components::transform previous_container_transform;
 
 		entity_id target_item_to_stack_with;

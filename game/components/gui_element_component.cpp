@@ -82,143 +82,139 @@ namespace components {
 		rect_world.draw(output_buffer, context, root_of_inventory_gui_in_context());
 
 		if (element.is_gui_look_enabled) {
-			element.draw_cursor_and_tooltip(output_buffer, context);
+			element.draw_cursor_with_information(output_buffer, context);
 		}
 	}
 
-	void gui_element::draw_cursor_and_tooltip(vertex_triangle_buffer& output_buffer, const viewing_gui_context& context) const {
-		drag_and_drop_result drag_result;
-		const auto& rect_world = context.get_rect_world();
-
-		if (rect_world.held_rect_is_dragged) {
-			drag_result = prepare_drag_and_drop_result(context, rect_world.rect_held_by_lmb, rect_world.rect_hovered);
-		}
-
-		auto& step = context.get_step();
-		const auto& cosmos = step.get_cosmos();
-
-		gui::draw_info in(output_buffer);
-
-		const auto& dragged_item = drag_result.dragged_item;
-
-		if (dragged_item) {
-			dragged_item->draw_complete_dragged_ghost(context, dragged_item, in);
-
-			if (!drag_result.possible_target_hovered) {
-				drag_result.dragged_item->draw_grid_border_ghost(context, dragged_item, in);
-			}
-		}
-
+	void gui_element::draw_cursor_with_information(vertex_triangle_buffer& output_buffer, const viewing_gui_context& context) const {
 		auto gui_cursor = assets::texture_id::GUI_CURSOR;
-		
-		if (!dragged_item && context.alive(rect_world.rect_hovered)) {
-			gui_cursor = assets::texture_id::GUI_CURSOR_HOVER;
-		}
-		
 		auto gui_cursor_color = cyan;
 
-		if (drag_result.possible_target_hovered) {
-			if (drag_result.will_item_be_disposed()) {
-				gui_cursor = assets::texture_id::GUI_CURSOR_MINUS;
-				gui_cursor_color = red;
+		auto get_tooltip_position = [&]() {
+			return get_gui_crosshair_position() + (*gui_cursor).get_size();
+		};
+
+		const auto& rect_world = context.get_rect_world();
+
+		const bool is_dragging = rect_world.is_currently_dragging();
+
+		if (!is_dragging) {
+			if (context.alive(rect_world.rect_hovered)) {
+				gui_cursor = assets::texture_id::GUI_CURSOR_HOVER;
 			}
-			else if (drag_result.will_drop_be_successful()) {
-				gui_cursor = assets::texture_id::GUI_CURSOR_ADD;
-				gui_cursor_color = green;
-			}
-			else if (drag_result.result.result != item_transfer_result_type::THE_SAME_SLOT) {
-				gui_cursor = assets::texture_id::GUI_CURSOR_ERROR;
-				gui_cursor_color = red;
-			}
+
+			draw_tooltip_from_hover_or_world_highlight(output_buffer, context, get_tooltip_position());
 		}
-
-		const auto gui_cursor_size = (*gui_cursor).get_size();
-
-		const vec2i left_top_corner = get_gui_crosshair_position();
-		const vec2i bottom_right_corner = get_gui_crosshair_position() + gui_cursor_size;
-
-		const bool draw_tooltip = drag_result.possible_target_hovered;
-		
-		vec2 bg_sprite_size;
-
-		if (draw_tooltip) {
-			augs::gui::text_drawer tooltip_drawer;
-
-			tooltip_drawer.set_text(gui::text::format(drag_result.tooltip_text, gui::text::style()));
-			tooltip_drawer.pos = vec2i(get_gui_crosshair_position()) + vec2i(static_cast<int>(gui_cursor_size.x) + 2, 0);
-
-			bg_sprite_size.set(tooltip_drawer.get_bbox());
-			bg_sprite_size.y = static_cast<float>(std::max(static_cast<int>(gui_cursor_size.y), tooltip_drawer.get_bbox().y));
-			bg_sprite_size.x += gui_cursor_size.x;
-
-			augs::draw_rect_with_border(output_buffer, ltrb(get_gui_crosshair_position(), bg_sprite_size), { 0, 0, 0, 120 }, slightly_visible_white);
-
-			tooltip_drawer.draw_stroke(output_buffer, black);
-			tooltip_drawer.draw(output_buffer);
-		}
-
-		if (dragged_item != nullptr) {
-			auto& item = cosmos[dragged_item.get_location().item_id].get<components::item>();
-
-			if (item.charges > 1) {
-				auto charges_text = to_wstring(dragged_charges);
+		else {
+			const auto drag_result = prepare_drag_and_drop_result(context, rect_world.rect_held_by_lmb, rect_world.rect_hovered);
+			
+			if (drag_result.is<unfinished_drag_of_item>()) {
+				const auto& dragged_item_button = context.dereference_location(item_button_in_item{ drag_result.get<unfinished_drag_of_item>().item_id });
 				
-				augs::gui::text_drawer dragged_charges_drawer;
+				dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer);
+				dragged_item_button->draw_grid_border_ghost(context, dragged_item_button, output_buffer);
+			}
+			else if (drag_result.is<drop_for_item_slot_transfer>()) {
+				const auto& transfer_data = drag_result.get<drop_for_item_slot_transfer>();
+				const auto& dragged_item_button = context.dereference_location(item_button_in_item{ transfer_data.simulated_transfer.item });
+				const auto& transfer_result = transfer_data.result.result;
 
-				dragged_charges_drawer.set_text(augs::gui::text::format(charges_text, text::style()));
-				dragged_charges_drawer.pos = get_gui_crosshair_position() + vec2i(0, int(gui_cursor_size.y));
+				dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer);
 
-				dragged_charges_drawer.draw_stroke(output_buffer, black);
-				dragged_charges_drawer.draw(output_buffer);
+				if (transfer_result == item_transfer_result_type::SUCCESSFUL_DROP) {
+					gui_cursor = assets::texture_id::GUI_CURSOR_MINUS;
+					gui_cursor_color = red;
+				}
+				else if (transfer_result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
+					gui_cursor = assets::texture_id::GUI_CURSOR_ADD;
+					gui_cursor_color = green;
+				}
+				else if (transfer_result != item_transfer_result_type::THE_SAME_SLOT) {
+					gui_cursor = assets::texture_id::GUI_CURSOR_ERROR;
+					gui_cursor_color = red;
+				}
+
+				const auto gui_cursor_size = (*gui_cursor).get_size();
+
+				vec2 bg_sprite_size;
+
+				augs::gui::text_drawer drop_hint_drawer;
+
+				drop_hint_drawer.set_text(gui::text::format(std::wstring(transfer_data.hint_text), gui::text::style()));
+				drop_hint_drawer.pos = vec2i(get_gui_crosshair_position()) + vec2i(static_cast<int>(gui_cursor_size.x) + 2, 0);
+
+				bg_sprite_size.set(drop_hint_drawer.get_bbox());
+				bg_sprite_size.y = static_cast<float>(std::max(static_cast<int>(gui_cursor_size.y), drop_hint_drawer.get_bbox().y));
+				bg_sprite_size.x += gui_cursor_size.x;
+
+				augs::draw_rect_with_border(output_buffer, ltrb(get_gui_crosshair_position(), bg_sprite_size), { 0, 0, 0, 120 }, slightly_visible_white);
+
+				drop_hint_drawer.draw_stroke(output_buffer, black);
+				drop_hint_drawer.draw(output_buffer);
+
+				auto& item = context.get_step().get_cosmos()[dragged_item_button.get_location().item_id].get<components::item>();
+
+				if (item.charges > 1) {
+					auto charges_text = to_wstring(dragged_charges);
+
+					augs::gui::text_drawer dragged_charges_drawer;
+
+					dragged_charges_drawer.set_text(augs::gui::text::format(charges_text, text::style()));
+					dragged_charges_drawer.pos = get_gui_crosshair_position() + vec2i(0, int(gui_cursor_size.y));
+
+					dragged_charges_drawer.draw_stroke(output_buffer, black);
+					dragged_charges_drawer.draw(output_buffer);
+				}
 			}
 		}
 
 		augs::draw_rect(output_buffer, get_gui_crosshair_position(), gui_cursor, gui_cursor_color);
+	}
+	
+	void gui_element::draw_tooltip_from_hover_or_world_highlight(vertex_triangle_buffer& output_buffer, const viewing_gui_context& context, const vec2i tooltip_pos) const {
+		const auto& rect_world = context.get_rect_world();
+		auto& step = context.get_step();
+		const auto& cosmos = step.get_cosmos();
 
 		const auto maybe_hovered_item = context._dynamic_cast<item_button_in_item>(rect_world.rect_hovered);
 		const auto maybe_hovered_slot = context._dynamic_cast<slot_button_in_container>(rect_world.rect_hovered);
-		
-		const bool is_dragging = context.alive(rect_world.rect_held_by_lmb) && rect_world.held_rect_is_dragged;
 
-		if (!is_dragging) {
-			gui::text::fstr tooltip_text;
+		gui::text::fstr tooltip_text;
 
-			if (maybe_hovered_item) {
-				tooltip_text = text::simple_bbcode(describe_entity(cosmos[maybe_hovered_item.get_location().item_id]), text::style(assets::font_id::GUI_FONT, vslightgray));
+		if (maybe_hovered_item) {
+			tooltip_text = text::simple_bbcode(describe_entity(cosmos[maybe_hovered_item.get_location().item_id]), text::style(assets::font_id::GUI_FONT, vslightgray));
+		}
+		else if (maybe_hovered_slot) {
+			tooltip_text = text::simple_bbcode(describe_slot(cosmos[maybe_hovered_slot.get_location().slot_id]), text::style());
+		}
+		else {
+			const auto hovered = cosmos[get_hovered_world_entity(cosmos, step.camera.transform.pos + rect_world.last_state.mouse.pos - step.camera.visible_world_area / 2)];
+
+			if (hovered.alive()) {
+				step.session.world_hover_highlighter.update(step.get_delta().in_milliseconds());
+				step.session.world_hover_highlighter.draw(step, hovered);
+
+				tooltip_text = text::simple_bbcode(describe_entity(hovered), text::style(assets::font_id::GUI_FONT, vslightgray));
 			}
-			else if (maybe_hovered_slot) {
-				tooltip_text = text::simple_bbcode(describe_slot(cosmos[maybe_hovered_slot.get_location().slot_id]), text::style());
-			}
-			else {
-				const auto hovered = cosmos[get_hovered_world_entity(cosmos, step.camera.transform.pos + rect_world.last_state.mouse.pos - step.camera.visible_world_area /2)];
+		}
 
-				if (hovered.alive()) {
-					step.session.world_hover_highlighter.update(step.get_delta().in_milliseconds());
-					step.session.world_hover_highlighter.draw(step, hovered);
+		if (tooltip_text.size() > 0) {
+			augs::gui::text_drawer description_drawer;
+			description_drawer.set_text(tooltip_text);
+			description_drawer.pos = tooltip_pos;
 
-					tooltip_text = text::simple_bbcode(describe_entity(hovered), text::style(assets::font_id::GUI_FONT, vslightgray));
-				}
-			}
+			augs::draw_rect_with_border(output_buffer, ltrb(tooltip_pos, description_drawer.get_bbox()), { 0, 0, 0, 120 }, slightly_visible_white);
 
-			if (tooltip_text.size() > 0) {
-				augs::gui::text_drawer description_drawer;
-				description_drawer.set_text(tooltip_text);
-				description_drawer.pos = bottom_right_corner;
-
-				augs::draw_rect_with_border(output_buffer, ltrb(bottom_right_corner, description_drawer.get_bbox()), { 0, 0, 0, 120 }, slightly_visible_white);
-
-				description_drawer.draw(output_buffer);
-			}
+			description_drawer.draw(output_buffer);
 		}
 	}
 
-	entity_id gui_element::get_hovered_world_entity(const cosmos& cosm, const vec2& world_cursor_position) {
-		auto& physics = cosm.systems_temporary.get<physics_system>();
-
-		auto cursor_pointing_at = world_cursor_position;
-
-		std::vector<vec2> v{ cursor_pointing_at, cursor_pointing_at + vec2(1, 0), cursor_pointing_at + vec2(1, 1) , cursor_pointing_at + vec2(0, 1) };
-		const auto& hovered = physics.query_polygon(v, filters::renderable_query());
+	entity_id gui_element::get_hovered_world_entity(const cosmos& cosm, const vec2 world_cursor_position) {
+		const auto& physics = cosm.systems_temporary.get<physics_system>();
+		const auto cursor_pointing_at = world_cursor_position;
+		
+		const std::vector<vec2> cursor_world_polygon = { cursor_pointing_at, cursor_pointing_at + vec2(1, 0), cursor_pointing_at + vec2(1, 1) , cursor_pointing_at + vec2(0, 1) };
+		const auto hovered = physics.query_polygon(cursor_world_polygon, filters::renderable_query());
 
 		if (hovered.entities.size() > 0) {
 			std::vector<unversioned_entity_id> sorted_by_visibility(hovered.entities.begin(), hovered.entities.end());

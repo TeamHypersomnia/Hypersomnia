@@ -50,7 +50,7 @@ namespace prefabs {
 			car.left_wheel_trigger = left_wheel;
 			car.input_acceleration.set(2500, 4500) /= 3;
 			//car.acceleration_length = 4500 / 5.0;
-			car.acceleration_length = 4500 / 6.2;
+			car.acceleration_length = 4500 / 6.2f;
 			car.speed_for_pitch_unit = 2000.f;
 
 			sprite.from_polygonized_texture(assets::texture_id::TRUCK_FRONT);

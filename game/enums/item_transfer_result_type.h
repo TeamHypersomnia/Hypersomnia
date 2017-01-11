@@ -1,6 +1,8 @@
 #pragma once
 
 enum item_transfer_result_type {
+	INVALID_RESULT,
+
 	INVALID_SLOT_OR_UNOWNED_ROOT,
 
 	/* returned by query_containment_result */
@@ -11,5 +13,6 @@ enum item_transfer_result_type {
 	THE_SAME_SLOT,
 
 	SUCCESSFUL_TRANSFER,
+	SUCCESSFUL_DROP,
 	UNMOUNT_BEFOREHAND,
 };

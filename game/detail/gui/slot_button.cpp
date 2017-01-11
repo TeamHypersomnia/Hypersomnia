@@ -157,7 +157,7 @@ void slot_button::update_rc(const logic_gui_context& context, const this_in_cont
 
 	vec2i absolute_pos = this_id->slot_relative_pos + this_id->user_drag_offset;
 
-	if (context.get_rect_world().is_being_dragged(this_id)) {
+	if (context.get_rect_world().is_currently_dragging(this_id)) {
 		absolute_pos += griddify(context.get_rect_world().current_drag_amount);
 	}
 

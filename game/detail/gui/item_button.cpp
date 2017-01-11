@@ -30,7 +30,7 @@ bool item_button::is_being_wholely_dragged_or_pending_finish(const const_logic_g
 	const auto& element = context.get_gui_element_component();
 	const auto& cosmos = context.get_step().get_cosmos();
 
-	if (rect_world.is_being_dragged(this_id)) {
+	if (rect_world.is_currently_dragging(this_id)) {
 		const bool is_drag_partial = element.dragged_charges < cosmos[this_id.get_location().item_id].get<components::item>().charges;
 		return !is_drag_partial;
 	}
@@ -279,7 +279,7 @@ void item_button::draw_proc(const viewing_gui_context& context, const const_this
 
 			int considered_charges = item_data.charges;
 
-			if (rect_world.is_being_dragged(this_id)) {
+			if (rect_world.is_currently_dragging(this_id)) {
 				considered_charges = item_data.charges - element.dragged_charges;
 			}
 
@@ -457,12 +457,16 @@ void item_button::advance_elements(const logic_gui_context& context, const this_
 			if (info == gui_event::lfinisheddrag) {
 				this_id->started_drag = false;
 
-				const auto& drag_result = prepare_drag_and_drop_result(context, this_id, rect_world.rect_hovered);
+				const auto drag_result = prepare_drag_and_drop_result(context, this_id, rect_world.rect_hovered);
 
-				if (drag_result.possible_target_hovered && drag_result.will_drop_be_successful()) {
-					context.get_step().transient.messages.post(drag_result.simulated_transfer);
+				if (drag_result.is<drop_for_item_slot_transfer>()) {
+					const auto& transfer_data = drag_result.get<drop_for_item_slot_transfer>();
+
+					if (transfer_data.result.result >= item_transfer_result_type::SUCCESSFUL_TRANSFER) {
+						context.get_step().transient.messages.post(transfer_data.simulated_transfer);
+					}
 				}
-				else if (!drag_result.possible_target_hovered) {
+				else if (drag_result.is<unfinished_drag_of_item>()) {
 					const vec2i griddified = griddify(info.total_dragged_amount);
 
 					if (parent_slot->always_allow_exactly_one_item) {

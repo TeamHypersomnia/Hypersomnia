@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include "augs/ensure.h"
+#include "augs/zeroed_pod.h"
 
 #include "augs/misc/trivial_pair.h"
 template<class ForwardIt, class T, class Compare = std::less<>>
@@ -24,6 +25,8 @@ namespace augs  {
 	public:
 		typedef typename arr_type::iterator iterator;
 		typedef typename arr_type::const_iterator const_iterator;
+		static constexpr bool is_string_type = std::is_same<zeroed_pod_internal_type_t<T>, char>::value || std::is_same<zeroed_pod_internal_type_t<T>, wchar_t>::value;
+		typedef typename std::basic_string<zeroed_pod_internal_type_t<T>> string_type;
 		typedef T value_type;
 		static constexpr size_t array_size = sizeof(T) * const_count;
 		
@@ -38,12 +41,27 @@ namespace augs  {
 
 		constant_size_vector(std::initializer_list<T> l) : constant_size_vector(l.begin(), l.end()) {}
 
-		template <class Iter>
-		void assign(Iter first, Iter last) {
-			clear();
+		template<bool _is_string_type = is_string_type, class = std::enable_if_t<_is_string_type>>
+		constant_size_vector(const std::basic_string<zeroed_pod_internal_type_t<T>>& s) : constant_size_vector(s.begin(), s.end()) {}
 
-			while (first != last)
-				push_back(*first++);
+		constant_size_vector& operator=(const constant_size_vector&) = default;
+
+		template<bool _is_string_type = is_string_type, class = std::enable_if_t<_is_string_type>>
+		constant_size_vector& operator=(const string_type& s) {
+			assign(s.begin(), s.end());
+			return *this;
+		}
+
+		template<bool _is_string_type = is_string_type, class = std::enable_if_t<_is_string_type>>
+		constant_size_vector& operator+=(const string_type& s) {
+			insert(end(), s.begin(), s.end());
+			return *this;
+		}
+
+		template <class Iter>
+		void assign(const Iter first, const Iter last) {
+			clear();
+			insert(end(), first, last);
 		}
 
 		void push_back(const T& obj) {
@@ -51,12 +69,20 @@ namespace augs  {
 			raw[count++] = obj;
 		}
 
-		T& operator[](size_t i) {
+		T& operator[](const size_t i) {
 			return raw[i];
 		}
 
-		const T& operator[](size_t i) const {
+		const T& operator[](const size_t i) const {
 			return raw[i];
+		}
+
+		T& at(const size_t i) {
+			return raw.at(i);
+		}
+
+		const T& at(const size_t i) const {
+			return raw.at(i);
 		}
 
 		T& front() {
@@ -83,29 +109,46 @@ namespace augs  {
 			return raw.begin() + size();
 		}
 
-		iterator erase(iterator first, iterator last) {
+		iterator erase(const iterator first, const iterator last) {
 			ensure(last >= first && first >= begin() && last <= end());
 			std::copy(last, end(), first);
 			resize(size() - (last - first));
 			return first;
 		}
 
-		iterator erase(iterator position) {
+		iterator erase(const iterator position) {
 			ensure(position >= begin() && position <= end());
 			std::copy(position + 1, end(), position);
 			resize(size() - 1);
 			return position;
 		}
 
-		void insert(iterator position, const T& obj) {
-			ensure(position >= begin());
-			ensure(count < capacity());
-			++count;
-			std::copy(position, end()-1, position+1);
-			*position = obj;
+		void insert(const iterator where, const T& obj) {
+			const auto new_elements_count = 1;
+
+			ensure(where >= begin());
+			ensure(count + new_elements_count <= capacity());
+
+			std::copy(where, end(), where + 1);
+			*where = obj;
+
+			count += new_elements_count;
 		}
 
-		void resize(size_t s) {
+		template <class Iter>
+		void insert(const iterator where, const Iter first, const Iter last) {
+			const auto new_elements_count = last - first;
+			
+			ensure(where >= begin());
+			ensure(count + new_elements_count <= capacity());
+
+			std::copy(where, end(), where + (last-first));
+			std::copy(first, last, where);
+
+			count += new_elements_count;
+		}
+
+		void resize(const size_t s) {
 			ensure(s <= capacity());
 			int diff = s;
 			diff -= size();
@@ -152,7 +195,7 @@ namespace augs  {
 			return const_count;
 		}
 
-		void reserve(size_t) {
+		void reserve(const size_t) {
 			// no-op
 		}
 
@@ -169,8 +212,18 @@ namespace augs  {
 
 			count = 0;
 		}
+
+		template<bool _is_string_type = is_string_type, class = std::enable_if_t<_is_string_type>>
+		operator string_type() const {
+			return{ begin(), end() };
+		}
 	};
 
+	template <int const_count>
+	using constant_size_string = constant_size_vector<zeroed_pod<char>, const_count>;
+
+	template <int const_count>
+	using constant_size_wstring = constant_size_vector<zeroed_pod<wchar_t>, const_count>;
 
 	template<class Key, class Value, int const_count>
 	class constant_size_associative_vector : private constant_size_vector<trivial_pair<Key, Value>, const_count> {

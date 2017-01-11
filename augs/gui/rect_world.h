@@ -56,8 +56,12 @@ namespace augs {
 			vec2i current_drag_amount;
 
 			template <class gui_element_id>
-			bool is_being_dragged(const gui_element_id& id) const {
+			bool is_currently_dragging(const gui_element_id& id) const {
 				return rect_held_by_lmb == id && held_rect_is_dragged;
+			}
+
+			bool is_currently_dragging() const {
+				return held_rect_is_dragged;
 			}
 
 			gui_element_polymorphic_id get_rect_in_focus() const {

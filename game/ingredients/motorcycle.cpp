@@ -163,7 +163,7 @@ namespace prefabs {
 			const auto engine = particles_existence_system().create_particle_effect_entity(world, effect);
 
 			auto& existence = engine.get<components::particles_existence>();
-			existence.distribute_within_segment_of_length = 35.f * 0.8;
+			existence.distribute_within_segment_of_length = 35.f * 0.8f;
 
 			engine.add_standard_components();
 			front.add_sub_entity(engine);

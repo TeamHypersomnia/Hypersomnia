@@ -21,7 +21,7 @@ bool render_system::render_order_compare(const const_entity_handle& a, const con
 	const auto layer_a = a.get<components::render>().layer;
 	const auto layer_b = a.get<components::render>().layer;
 
-	return (layer_a == layer_b && layer_a == render_layer::CAR_INTERIOR) ? are_connected_by_friction(a, b) : layer_a > layer_b;
+	return (layer_a == layer_b && layer_a == render_layer::CAR_INTERIOR) ? are_connected_by_friction(a, b) : layer_a < layer_b;
 }
 
 std::array<std::vector<const_entity_handle>, render_layer::COUNT> render_system::get_visible_per_layer(const std::vector<const_entity_handle>& entities) const {

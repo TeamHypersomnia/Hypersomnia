@@ -14,3 +14,17 @@ public:
 		return pod;
 	}
 };
+
+
+template <class T>
+struct zeroed_pod_internal_type {
+	typedef T type;
+};
+
+template <class T>
+struct zeroed_pod_internal_type<zeroed_pod<T>> {
+	typedef T type;
+};
+
+template <class T>
+using zeroed_pod_internal_type_t = typename zeroed_pod_internal_type<T>::type;

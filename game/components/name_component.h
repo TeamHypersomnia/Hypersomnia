@@ -10,7 +10,7 @@
 
 namespace components {
 	struct name {
-		typedef augs::constant_size_vector<zeroed_pod<wchar_t>, NICKNAME_LENGTH> nickname_type;
+		typedef augs::constant_size_wstring<NICKNAME_LENGTH> nickname_type;
 		static_assert(nickname_type::array_size % 4 == 0, "Wrong nickname padding");
 
 		entity_name id = entity_name::INVALID;
