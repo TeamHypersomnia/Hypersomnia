@@ -37,10 +37,13 @@ bool is_button_border(const button_corner_type t) {
 		|| t == button_corner_type::RB_BORDER
 		|| t == button_corner_type::LB_BORDER
 
+		|| t == button_corner_type::LB_COMPLEMENT_BORDER
+
 		|| t == button_corner_type::LT_INTERNAL_BORDER
 		|| t == button_corner_type::RT_INTERNAL_BORDER
 		|| t == button_corner_type::RB_INTERNAL_BORDER
 		|| t == button_corner_type::LB_INTERNAL_BORDER
+
 		) {
 		return true;
 	}

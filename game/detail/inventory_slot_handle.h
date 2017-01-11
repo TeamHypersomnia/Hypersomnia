@@ -61,7 +61,7 @@ public:
 
 	bool can_contain(const entity_id) const;
 
-	entity_handle_type try_get_item() const;
+	entity_handle_type get_item_if_any() const;
 	entity_handle_type get_container() const;
 	entity_handle_type get_root_container() const;
 

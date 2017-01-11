@@ -98,30 +98,59 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 
 	const auto assigned_entity = this_id->get_assigned_entity(owner_transfer_capability);
 	const bool has_assigned_entity = assigned_entity.alive();
+
+	const bool is_assigned_entity_selected = has_assigned_entity && (
+		owner_transfer_capability.wields_in_primary_hand(assigned_entity) ||
+		owner_transfer_capability.wields_in_secondary_hand(assigned_entity)
+	);
+
+	std::array<bool, static_cast<size_t>(button_corner_type::COUNT)> visible_parts;
+	std::fill(visible_parts.begin(), visible_parts.end(), false);
+
+	visible_parts[size_t(button_corner_type::L)] = true;
+	visible_parts[size_t(button_corner_type::T)] = true;
+	visible_parts[size_t(button_corner_type::R)] = true;
+	visible_parts[size_t(button_corner_type::B)] = true;
+
+	visible_parts[size_t(button_corner_type::LT)] = true;
+	visible_parts[size_t(button_corner_type::RT)] = true;
+	visible_parts[size_t(button_corner_type::RB)] = true;
+	visible_parts[size_t(button_corner_type::LB)] = true;
+
+	visible_parts[size_t(button_corner_type::LB_INTERNAL_BORDER)] = true;
+	visible_parts[size_t(button_corner_type::RT_INTERNAL_BORDER)] = true;
+
+	if (has_assigned_entity) {
+		visible_parts[size_t(button_corner_type::LB_COMPLEMENT_BORDER)] = true;
+		visible_parts[size_t(button_corner_type::LT_INTERNAL_BORDER)] = true;
+		visible_parts[size_t(button_corner_type::RB_INTERNAL_BORDER)] = true;
+		visible_parts[size_t(button_corner_type::RT_BORDER)] = true;
+	}
+
+	if (is_assigned_entity_selected) {
+		visible_parts[size_t(button_corner_type::LT_BORDER)] = true;
+		visible_parts[size_t(button_corner_type::RB_BORDER)] = true;
+		visible_parts[size_t(button_corner_type::LB_BORDER)] = true;
+
+		visible_parts[size_t(button_corner_type::L_BORDER)] = true;
+		visible_parts[size_t(button_corner_type::T_BORDER)] = true;
+		visible_parts[size_t(button_corner_type::R_BORDER)] = true;
+		visible_parts[size_t(button_corner_type::B_BORDER)] = true;
+	}
 	
 	{
 		corners.for_each_button_corner(internal_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
-			if (is_button_border(type)) {
-				if (has_assigned_entity) {
-					augs::gui::draw_clipped_rect(augs::gui::material(id, border_col), drawn_rc, {}, in.v, flip);
-				}
-				else {
-					if (type == button_corner_type::LB_COMPLEMENT || type == button_corner_type::RB) {
-						augs::gui::draw_clipped_rect(augs::gui::material(id, border_col), drawn_rc, {}, in.v, flip);
-					}
-				}
-
-				if (type == button_corner_type::LB_COMPLEMENT) {
-					augs::gui::text_drawer number_caption;
-					number_caption.set_text(augs::gui::text::format(typesafe_sprintf(L"%x", this_id.get_location().index), label_style));
-					number_caption.bottom_right(drawn_rc);
-					number_caption.draw(in);
-				}
+			const auto col = is_button_border(type) ? border_col : inside_col;
+			
+			if (visible_parts[size_t(type)]) {
+				augs::gui::draw_clipped_rect(augs::gui::material(id, col), drawn_rc, {}, in.v, flip);
 			}
-			else {
-				if (type != button_corner_type::LB_COMPLEMENT) {
-					augs::gui::draw_clipped_rect(augs::gui::material(id, inside_col), drawn_rc, {}, in.v, flip);
-				}
+			
+			if (type == button_corner_type::LB_COMPLEMENT) {
+				augs::gui::text_drawer number_caption;
+				number_caption.set_text(augs::gui::text::format(typesafe_sprintf(L"%x", this_id.get_location().index), label_style));
+				number_caption.bottom_right(drawn_rc);
+				number_caption.draw(in);
 			}
 		});
 
@@ -133,8 +162,8 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 				hover_effect_rc.expand_from_center(vec2(distance, distance));
 		
 				corners.for_each_button_corner(hover_effect_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
-					if (is_button_border(type) && type != button_corner_type::RB) {
-						augs::gui::draw_clipped_rect(augs::gui::material(id, colorize), drawn_rc, {}, in.v, true);
+					if (visible_parts[size_t(type)] && type != button_corner_type::LB && is_button_border(type)) {
+						augs::gui::draw_clipped_rect(augs::gui::material(id, colorize), drawn_rc, {}, in.v, corners.flip_horizontally);
 					}
 				});
 			}
@@ -146,8 +175,8 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 				hover_effect_rc.expand_from_center(vec2(distance, distance));
 		
 				corners.for_each_button_corner(hover_effect_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
-					if (is_button_border(type) && type != button_corner_type::RB && (is_button_corner(type) || type == button_corner_type::LB_COMPLEMENT)) {
-						augs::gui::draw_clipped_rect(augs::gui::material(id, colorize), drawn_rc, {}, in.v, true);
+					if (visible_parts[size_t(type)] && type != button_corner_type::LB && is_button_border(type) && is_button_corner(type)) {
+						augs::gui::draw_clipped_rect(augs::gui::material(id, colorize), drawn_rc, {}, in.v, corners.flip_horizontally);
 					}
 				});
 			}

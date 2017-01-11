@@ -9,8 +9,8 @@ public:
 
 	entity_handle_type get_owning_transfer_capability() const;
 
-	inventory_slot_handle_type determine_hand_holstering_slot_in(const entity_handle_type searched_root_container) const;
-	inventory_slot_handle_type determine_pickup_target_slot_in(const entity_handle_type searched_root_container) const;
+	inventory_slot_handle_type determine_hand_holstering_slot_in(const const_entity_handle searched_root_container) const;
+	inventory_slot_handle_type determine_pickup_target_slot_in(const const_entity_handle searched_root_container) const;
 	
 	inventory_slot_handle_type get_current_slot() const;
 
@@ -21,6 +21,9 @@ public:
 	std::vector<entity_handle_type> guns_wielded() const;
 
 	inventory_item_address get_address_from_root() const;
+
+	bool wields_in_primary_hand(const const_entity_handle what_item) const;
+	bool wields_in_secondary_hand(const const_entity_handle what_item) const;
 
 private:
 	template <class S, class I>

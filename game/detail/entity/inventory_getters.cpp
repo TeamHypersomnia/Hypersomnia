@@ -78,6 +78,22 @@ inventory_item_address inventory_getters<C, D>::get_address_from_root() const {
 }
 
 template <bool C, class D>
+bool inventory_getters<C, D>::wields_in_primary_hand(const const_entity_handle what_item) const {
+	auto& self = *static_cast<const D*>(this);
+	auto& cosmos = self.get_cosmos();
+
+	return self[slot_function::PRIMARY_HAND].get_item_if_any() == what_item;
+}
+
+template <bool C, class D>
+bool inventory_getters<C, D>::wields_in_secondary_hand(const const_entity_handle what_item) const {
+	auto& self = *static_cast<const D*>(this);
+	auto& cosmos = self.get_cosmos();
+
+	return self[slot_function::SECONDARY_HAND].get_item_if_any() == what_item;
+}
+
+template <bool C, class D>
 typename inventory_getters<C, D>::inventory_slot_handle_type inventory_getters<C, D>::determine_hand_holstering_slot_in(const D searched_root_container) const {
 	auto& item_entity = *static_cast<const D*>(this);
 	auto& cosmos = item_entity.get_cosmos();
