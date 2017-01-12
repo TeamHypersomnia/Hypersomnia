@@ -340,8 +340,8 @@ namespace augs {
 					raw = reinterpret_cast<RAWINPUT*>(lpb);
 
 					if (raw->header.dwType == RIM_TYPEMOUSE) {
-						events.mouse.rel.x = raw->data.mouse.lLastX;
-						events.mouse.rel.y = raw->data.mouse.lLastY;
+						events.mouse.rel.x = static_cast<short>(raw->data.mouse.lLastX);
+						events.mouse.rel.y = static_cast<short>(raw->data.mouse.lLastY);
 
 						m = WM_MOUSEMOVE;
 					}
@@ -398,7 +398,10 @@ namespace augs {
 				ALL_WINDOW_ELEMENTS = CAPTION | MENU
 			};
 
-			menu = enable_window_border ? ALL_WINDOW_ELEMENTS : 0; bpp = _bpp; doublebuf = doublebuffer; name = nn;
+			menu = enable_window_border ? ALL_WINDOW_ELEMENTS : 0; 
+			bpp = _bpp; 
+			doublebuf = doublebuffer != 0; 
+			name = nn;
 
 			style = menu ? (WS_OVERLAPPED | menu) | WS_CLIPSIBLINGS | WS_CLIPCHILDREN : WS_POPUP;
 			exstyle = menu ? WS_EX_WINDOWEDGE : WS_EX_APPWINDOW;

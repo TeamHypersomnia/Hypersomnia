@@ -82,7 +82,7 @@ namespace augs {
 			int x_center = x - size.x / 2;
 			int y_center = y - size.y / 2;
 
-			auto angle = vec2(x_center, y_center);// .degrees();
+			auto angle = vec2i(x_center, y_center);// .degrees();
 
 			if (!constrain_angle || (angle_start.cross(angle) >= 0.f && angle_end.cross(angle) <= 0.f)) {
 				auto col = filling;
@@ -159,7 +159,7 @@ namespace augs {
 					int x_center = x - size.x / 2;
 					int y_center = y - size.y / 2;
 
-					auto angle = vec2(x_center, y_center).degrees();
+					auto angle = vec2i(x_center, y_center).degrees();
 
 					if (angle >= -45 && angle <= 45 &&
 						x_center*x_center + y_center*y_center <= radius*radius
@@ -167,7 +167,7 @@ namespace augs {
 						x_center*x_center + y_center*y_center >= (radius - border_width)*(radius - border_width)
 						) {
 						pixel(x, y) = filling;
-						pixel(x, y).a = (angle + 45) / 90.f * 255;
+						pixel(x, y).a = static_cast<rgba_channel>((angle + 45) / 90.f * 255);
 					}
 				}
 			}

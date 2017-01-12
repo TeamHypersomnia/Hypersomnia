@@ -97,8 +97,8 @@ namespace augs {
 
 	template <class vec, class d>
 	vec& rotate_radians(vec& v, const vec& origin, const d angle) {
-		auto s = sin(angle);
-		auto c = cos(angle);
+		const auto s = sin(angle);
+		const auto c = cos(angle);
 		vec rotated;
 
 		v -= origin;
@@ -276,7 +276,7 @@ struct vec2t {
 	real radians_between(const vec2t& v) const {
 		const auto a_norm = vec2(v).normalize();
 		const auto b_norm = vec2(*this).normalize();
-		const auto dotted = a_norm.dot(b_norm);
+		auto dotted = a_norm.dot(b_norm);
 
 		if (dotted > 1) {
 			dotted = 1;
@@ -354,8 +354,8 @@ struct vec2t {
 
 		const real inv_len = static_cast<real>(1) / len;
 
-		x *= inv_len;
-		y *= inv_len;
+		x = static_cast<type>(static_cast<real>(x) * inv_len);
+		y = static_cast<type>(static_cast<real>(y) * inv_len);
 
 		return *this;
 	}
