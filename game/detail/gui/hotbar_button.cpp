@@ -285,7 +285,10 @@ void hotbar_button::advance_elements(const logic_gui_context& context, const thi
 		this_id->detector.update_appearance(info);
 
 		if (info.is_ldown_or_double_or_triple()) {
+			components::gui_element::hotbar_selection_setup setup;
+			setup.primary_index = this_id.get_location().index;
 
+			components::gui_element::apply_and_save_hotbar_setup(context.get_step(), setup, context.get_gui_element_entity());
 		}
 
 		if (info.msg == gui_event::hover) {

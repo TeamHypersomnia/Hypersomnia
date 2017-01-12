@@ -28,8 +28,12 @@ class viewing_step;
 namespace components {
 	struct gui_element {
 		struct hotbar_selection_setup {
-			char first_index = -1;
-			char second_index = -1;
+			char primary_index = -1;
+			char secondary_index = -1;
+
+			bool operator==(const hotbar_selection_setup b) const {
+				return primary_index == b.primary_index && secondary_index == b.secondary_index;
+			}
 		};
 
 		std::array<hotbar_button, 10> hotbar_buttons;
@@ -75,6 +79,10 @@ namespace components {
 			logic_step&,
 			const hotbar_selection_setup new_setup,
 			const entity_handle element_entity
+		);
+
+		static hotbar_selection_setup get_current_hotbar_setup(
+			const const_entity_handle element_entity
 		);
 
 		static entity_id get_hovered_world_entity(const cosmos& cosm, const vec2 world_cursor_position);

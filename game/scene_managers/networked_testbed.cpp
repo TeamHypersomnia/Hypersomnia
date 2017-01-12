@@ -72,7 +72,7 @@ namespace scene_managers {
 
 		for (int x = -4; x < 4; ++x) {
 			for (int y = -4; y < 4; ++y) {
-				auto obstacle = prefabs::create_crate(world, vec2(2000 + x * 300, -1000+2000 + y * 300), vec2i(100, 100));
+				auto obstacle = prefabs::create_crate(world, vec2(2000.f + x * 300.f, -1000.f +2000.f + y * 300.f), vec2i(100, 100));
 			}
 		}
 
@@ -83,7 +83,7 @@ namespace scene_managers {
 		const auto motorcycle = prefabs::create_motorcycle(world, components::transform(0, -600, -90));
 		prefabs::create_motorcycle(world, components::transform(100, -600, -90));
 
-		const auto bg_size = assets::get_size(assets::texture_id::TEST_BACKGROUND);
+		const vec2 bg_size = assets::get_size(assets::texture_id::TEST_BACKGROUND);
 
 		const int num_floors = 10 * 10;
 		const int side = sqrt(num_floors) / 2;
@@ -151,7 +151,7 @@ namespace scene_managers {
 		}
 
 		for (int i = 0; i < num_characters; ++i) {
-			const auto new_character = prefabs::create_character(world, vec2(i * 300, 0), vec2(1200, 800), typesafe_sprintf("player%x", i));
+			const auto new_character = prefabs::create_character(world, vec2(i * 300.f, 0), vec2(1200, 800), typesafe_sprintf("player%x", i));
 
 			new_characters[i] = new_character;
 

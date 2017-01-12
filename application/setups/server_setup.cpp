@@ -184,7 +184,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 					
 					endpoint new_endpoint;
 					new_endpoint.addr = net_event.address;
-					new_endpoint.commands.set_lower_limit(static_cast<size_t>(cfg.client_commands_jitter_buffer_ms) / hypersomnia.get_fixed_delta().in_milliseconds());
+					new_endpoint.commands.set_lower_limit(static_cast<size_t>(cfg.client_commands_jitter_buffer_ms / hypersomnia.get_fixed_delta().in_milliseconds()));
 					endpoints.push_back(new_endpoint);
 				}
 				

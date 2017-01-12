@@ -314,12 +314,12 @@ namespace components {
 		entity_id first_item;
 		entity_id second_item;
 
-		if (new_setup.first_index != -1) {
-			first_item = element.hotbar_buttons[static_cast<size_t>(new_setup.first_index)].get_assigned_entity(element_entity);
+		if (new_setup.primary_index != -1) {
+			first_item = element.hotbar_buttons[static_cast<size_t>(new_setup.primary_index)].get_assigned_entity(element_entity);
 		}
 
-		if (new_setup.second_index != -1) {
-			second_item = element.hotbar_buttons[static_cast<size_t>(new_setup.second_index)].get_assigned_entity(element_entity);
+		if (new_setup.secondary_index != -1) {
+			second_item = element.hotbar_buttons[static_cast<size_t>(new_setup.secondary_index)].get_assigned_entity(element_entity);
 		}
 
 		return element_entity.wield_in_hands(step, first_item, second_item);
@@ -330,13 +330,49 @@ namespace components {
 		const hotbar_selection_setup new_setup,
 		const entity_handle element_entity
 	) {
-		auto& element = element_entity.get<components::gui_element>();
+		if (new_setup == get_current_hotbar_setup(element_entity)) {
+			return true;
+		}
 
-		auto& current = element.current_hotbar_setup;
-		current = 1 - current;
+		if (apply_hotbar_setup(step, new_setup, element_entity)) {
+			auto& element = element_entity.get<components::gui_element>();
 
-		element.last_setups[current] = new_setup;
+			auto& current = element.current_hotbar_setup;
+			current = 1 - current;
 
-		return apply_hotbar_setup(step, new_setup, element_entity);
+			element.last_setups[current] = new_setup;
+			
+			return true;
+		}
+		
+		return false;
+	}
+
+
+	gui_element::hotbar_selection_setup gui_element::get_current_hotbar_setup(
+		const const_entity_handle element_entity
+	) {
+		hotbar_selection_setup output;
+
+		const auto& element = element_entity.get<components::gui_element>();
+
+		const auto primary_item = element_entity[slot_function::PRIMARY_HAND].get_item_if_any();
+		const auto secondary_item = element_entity[slot_function::SECONDARY_HAND].get_item_if_any();
+
+		for (size_t i = 0; i < element.hotbar_buttons.size(); ++i) {
+			const auto& h = element.hotbar_buttons[i];
+
+			const auto assigned = h.get_assigned_entity(element_entity);
+
+			if (primary_item == assigned) {
+				output.primary_index = static_cast<char>(i);
+			}
+
+			if (secondary_item == assigned) {
+				output.secondary_index = static_cast<char>(i);
+			}
+		}
+
+		return output;
 	}
 }

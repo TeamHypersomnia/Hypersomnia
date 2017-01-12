@@ -252,12 +252,12 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 
 		void center_all(const vec2i screen_size) {
 			for (auto& e : entries) {
-				e.task.target_pos.y += screen_size.y / 2 - column_height / 2;
-				e.task.target_pos.x = screen_size.x / 2 - tasks_width - 60;
+				e.task.target_pos.y += screen_size.y / 2.f - column_height / 2.f;
+				e.task.target_pos.x = screen_size.x / 2.f - tasks_width - 60.f;
 
 				for (auto& p : e.personae) {
-					p.target_pos.y += screen_size.y/2 - column_height / 2;
-					p.target_pos.x = screen_size.x / 2 + 60;
+					p.target_pos.y += screen_size.y/2.f - column_height / 2.f;
+					p.target_pos.x = screen_size.x / 2.f + 60.f;
 				}
 			}
 		}

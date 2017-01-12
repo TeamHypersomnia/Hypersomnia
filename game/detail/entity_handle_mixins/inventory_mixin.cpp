@@ -210,10 +210,7 @@ bool inventory_mixin<false, D>::wield_in_hands(
 	const entity_id second
 ) const {
 	const auto& subject = *static_cast<const D*>(this);
-	const auto& cosmos = subject.get_cosmos();
-
-	const auto first_handle = cosmos[first];
-	const auto second_handle = cosmos[second];
+	auto& cosmos = subject.get_cosmos();
 
 	const auto in_primary = subject[slot_function::PRIMARY_HAND].get_item_if_any();
 	const auto in_secondary = subject[slot_function::SECONDARY_HAND].get_item_if_any();
@@ -236,6 +233,19 @@ bool inventory_mixin<false, D>::wield_in_hands(
 
 	if (secondary_holstering_slot.alive()) {
 		const item_slot_transfer_request request(in_secondary, secondary_holstering_slot);
+		perform_transfer(request, step);
+	}
+
+	const auto first_handle = cosmos[first];
+	const auto second_handle = cosmos[second];
+
+	if (first_handle.alive()) {
+		const item_slot_transfer_request request(first_handle, subject[slot_function::PRIMARY_HAND]);
+		perform_transfer(request, step);
+	}
+
+	if (second_handle.alive()) {
+		const item_slot_transfer_request request(second_handle, subject[slot_function::SECONDARY_HAND]);
 		perform_transfer(request, step);
 	}
 
