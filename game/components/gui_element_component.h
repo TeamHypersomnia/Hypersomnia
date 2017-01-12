@@ -50,7 +50,9 @@ namespace components {
 		void draw_tooltip_from_hover_or_world_highlight(vertex_triangle_buffer& output_buffer, const viewing_gui_context&, const vec2i tooltip_pos) const;
 		void draw_cursor_with_information(vertex_triangle_buffer& output_buffer, const viewing_gui_context&) const;
 		
+		static void assign_item_to_hotbar_button(const size_t button_index, const entity_handle element_entity, const const_entity_handle item_entity);
+
 		static entity_id get_hovered_world_entity(const cosmos& cosm, const vec2 world_cursor_position);
-		static void draw_complete_gui_for_camera_rendering_request(vertex_triangle_buffer& output_buffer, const const_entity_handle& handle, viewing_step&);
+		static void draw_complete_gui_for_camera_rendering_request(vertex_triangle_buffer& output_buffer, const const_entity_handle handle, viewing_step&);
 	};
 }

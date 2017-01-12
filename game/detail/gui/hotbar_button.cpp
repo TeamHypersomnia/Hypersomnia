@@ -5,10 +5,6 @@
 #include "game/components/item_component.h"
 #include "augs/gui/button_corners.h"
 
-void hotbar_button::assign_item(const const_entity_handle h) {
-	last_assigned_entity = h.get_id();
-}
-
 const_entity_handle hotbar_button::get_assigned_entity(const const_entity_handle owner_transfer_capability) const {
 	const auto& cosm = owner_transfer_capability.get_cosmos();
 	const auto handle = cosm[last_assigned_entity];

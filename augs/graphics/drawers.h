@@ -31,8 +31,6 @@ namespace augs {
 		const bool flip_horizontally = false,
 		const bool flip_vertically = false);
 
-	void draw_sprite(vertex_triangle_buffer& v, const renderable_positioning_type);
-
 	void draw_rect(vertex_triangle_buffer& v, const ltrb origin, const texture&, const rgba color);
 	ltrb draw_clipped_rect(vertex_triangle_buffer& v, const ltrb origin, const texture&, const rgba colorize, ltrb clipper, const bool flip_horizontally = false);
 }

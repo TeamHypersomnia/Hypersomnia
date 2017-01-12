@@ -69,7 +69,7 @@ namespace components {
 		return vec2(get_screen_size().x - 250.f, get_screen_size().y - 200.f);
 	}
 
-	void gui_element::draw_complete_gui_for_camera_rendering_request(vertex_triangle_buffer& output_buffer, const const_entity_handle& gui_entity, viewing_step& step) {
+	void gui_element::draw_complete_gui_for_camera_rendering_request(vertex_triangle_buffer& output_buffer, const const_entity_handle gui_entity, viewing_step& step) {
 		const auto& element = gui_entity.get<components::gui_element>();
 		const auto& rect_world = element.rect_world;
 
@@ -284,5 +284,19 @@ namespace components {
 		}
 
 		return entity_id();
+	}
+
+	void gui_element::assign_item_to_hotbar_button(const size_t button_index, const entity_handle element_entity, const const_entity_handle item) {
+		ensure(item.get_owning_transfer_capability() == element_entity);
+
+		auto& element = element_entity.get<components::gui_element>();
+
+		for (auto& h : element.hotbar_buttons) {
+			if (h.last_assigned_entity == item) {
+				h.last_assigned_entity.unset();
+			}
+		}
+
+		element.hotbar_buttons[button_index].last_assigned_entity = item;
 	}
 }

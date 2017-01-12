@@ -59,7 +59,7 @@ namespace components {
 			target_color *= in.colorize;
 		}
 
-		auto tris = augs::make_sprite_triangles(v, considered_texture, target_color, flip_horizontally, flip_vertically);
+		auto tris = augs::make_sprite_triangles(v, considered_texture, target_color, flip_horizontally != 0, flip_vertically != 0);
 
 		if (effect == special_effect::COLOR_WAVE) {
 			vertex_triangle& t1 = tris[0], &t2 = tris[1];
@@ -107,12 +107,12 @@ namespace components {
 		}
 		else if (in.drawing_type == renderable_drawing_type::SPECULAR_HIGHLIGHTS) {
 			const auto& anim = *get_resource_manager().find(assets::animation_id::BLINK_ANIMATION);
-			const unsigned frame_duration_ms = anim.frames[0].duration_milliseconds;
+			const auto frame_duration_ms = static_cast<unsigned>(anim.frames[0].duration_milliseconds);
 			const auto frame_count = anim.frames.size();
 			const auto animation_max_duration = frame_duration_ms * frame_count;
 
 			for (unsigned m = 0; m < max_specular_blinks; ++m) {
-				unsigned total_ms = in.global_time_seconds * 1000 + (animation_max_duration / max_specular_blinks) * m;
+				const auto total_ms = static_cast<unsigned>(in.global_time_seconds * 1000 + (animation_max_duration / max_specular_blinks) * m);
 
 				const auto spatial_hash = std::hash<vec2>()(in.renderable_transform.pos);
 

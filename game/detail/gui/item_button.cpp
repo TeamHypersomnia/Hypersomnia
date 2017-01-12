@@ -21,6 +21,7 @@
 #include "game/systems_stateless/gui_system.h"
 #include "game/systems_stateless/input_system.h"
 #include "game/resources/manager.h"
+#include "augs/graphics/drawers.h"
 
 #include "augs/templates/string_templates.h"
 #include "augs/ensure.h"
@@ -359,21 +360,18 @@ void item_button::draw_proc(const viewing_gui_context& context, const const_this
 
 	if (f.draw_container_opened_mark) {
 		if (item.find<components::container>()) {
-			components::sprite container_status_sprite;
+			assets::texture_id container_icon;
 
 			if (this_id->is_container_open) {
-				container_status_sprite.set(assets::texture_id::CONTAINER_OPEN_ICON, border_col);
+				container_icon = assets::texture_id::CONTAINER_OPEN_ICON;
 			}
 			else {
-				container_status_sprite.set(assets::texture_id::CONTAINER_CLOSED_ICON, border_col);
+				container_icon = assets::texture_id::CONTAINER_CLOSED_ICON;
 			}
 
-			components::sprite::drawing_input state(in.v);
-			state.positioning = renderable_positioning_type::LEFT_TOP_CORNER;
-			state.renderable_transform.pos.set(this_absolute_rect.r - container_status_sprite.size.x + 2, this_absolute_rect.t + 1
-				//- container_status_sprite.size.y + 2
-			);
-			container_status_sprite.draw(state);
+			const auto size = (*container_icon).get_size();
+
+			augs::draw_rect(in.v, vec2(this_absolute_rect.r - size.x + 2, this_absolute_rect.t + 1), container_icon, border_col);
 		}
 	}
 
@@ -481,13 +479,12 @@ void item_button::advance_elements(const logic_gui_context& context, const this_
 					const auto& transfer_data = drag_result.get<drop_for_hotbar_assignment>();
 
 					const auto dereferenced_button = context.dereference_location(transfer_data.assign_to);
+					const auto new_assigned_item = cosmos[transfer_data.item_id];
 					ensure(dereferenced_button != nullptr);
 					
-					dereferenced_button->assign_item(cosmos[transfer_data.item_id]);
+					components::gui_element::assign_item_to_hotbar_button(dereferenced_button.get_location().index, context.get_gui_element_entity(), new_assigned_item);
 				}
 			}
-
-			// if(being_dragged && inf == rect::gui_event::lup)
 		}
 	}
 }

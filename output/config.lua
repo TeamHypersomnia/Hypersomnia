@@ -46,7 +46,7 @@ recording_type = {
 }
 
 config_table = {
-	launch_mode = launch_type.LOCAL,
+	launch_mode = launch_type.MAIN_MENU,
 	
 	input_recording_mode = recording_type.LIVE,
 
@@ -58,7 +58,7 @@ config_table = {
 
 	-- game window settings
 	window_name = "example",
-	fullscreen = 0,
+	fullscreen = 1,
 	window_border = 1,
 	window_x = 100,
 	window_y = 10,
@@ -149,7 +149,7 @@ config_table = {
 	rewind_intro_scene_by_secs = 3.5,
 	start_menu_music_at_secs = 63.5 - 22.5,
 
-	skip_credits = 1,
+	skip_credits = 0,
 	
 	-- Url for the rolling news bar in the main menu
 	latest_news_url = "http://hypersomnia.pl/latest_post/"

@@ -431,7 +431,7 @@ void perform_transfer(const item_slot_transfer_request r, logic_step& step) {
 
 		if (target_capability.alive() && target_capability != previous_capability) {
 			if (target_capability.has<components::gui_element>()) {
-				target_capability.get<components::gui_element>().hotbar_buttons.at(0).assign_item(grabbed_item_part_handle);
+				components::gui_element::assign_item_to_hotbar_button(0, target_capability, grabbed_item_part_handle);
 			}
 		}
 		
