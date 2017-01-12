@@ -3,7 +3,7 @@
 #include "game/transcendental/entity_handle_declaration.h"
 
 template<bool is_const, class entity_handle_type>
-class inventory_getters {
+class basic_inventory_getters {
 	typedef basic_inventory_slot_handle<is_const> inventory_slot_handle_type;
 public:
 
@@ -75,4 +75,18 @@ public:
 	void for_each_contained_item_recursive(F callback) const {
 		for_each_contained_slot_and_item_recursive([](auto){}, callback);
 	}
+};
+
+template<bool, class>
+class inventory_getters;
+
+template<class entity_handle_type>
+class inventory_getters<false, entity_handle_type> : public basic_inventory_getters<false, entity_handle_type> {
+public:
+
+	void wield_in_hands(const entity_id first = entity_id(), const entity_id second = entity_id()) const;
+};
+
+template<class entity_handle_type>
+class inventory_getters<true, entity_handle_type> : public basic_inventory_getters<true, entity_handle_type> {
 };

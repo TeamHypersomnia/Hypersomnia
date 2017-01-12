@@ -27,19 +27,26 @@ class viewing_step;
 
 namespace components {
 	struct gui_element {
-		game_gui_rect_world rect_world;
-		int dragged_charges = 0;
+		struct hotbar_selection_setup {
+			char first_index = -1;
+			char second_index = -1;
+		};
 
+		std::array<hotbar_button, 10> hotbar_buttons;
+
+		hotbar_selection_setup last_setups[2];
+
+		unsigned char current_hotbar_setup = 0;
 		bool is_gui_look_enabled = false;
 		bool preview_due_to_item_picking_request = false;
 		bool draw_free_space_inside_container_icons = true;
-		padding_byte pad;
 
+		game_gui_rect_world rect_world;
+		int dragged_charges = 0;
+		
 		config_lua_table::hotbar_settings hotbar_settings;
 
 		drag_and_drop_target_drop_item drop_item_icon = augs::gui::material(assets::texture_id::DROP_HAND_ICON, red);
-
-		std::array<hotbar_button, 10> hotbar_buttons;
 
 		vec2i get_screen_size() const;
 		vec2i get_gui_crosshair_position() const;
@@ -51,8 +58,22 @@ namespace components {
 		
 		void draw_tooltip_from_hover_or_world_highlight(vertex_triangle_buffer& output_buffer, const viewing_gui_context&, const vec2i tooltip_pos) const;
 		void draw_cursor_with_information(vertex_triangle_buffer& output_buffer, const viewing_gui_context&) const;
-		
-		static void assign_item_to_hotbar_button(const size_t button_index, const entity_handle element_entity, const const_entity_handle item_entity);
+
+		static void assign_item_to_hotbar_button(
+			const size_t button_index, 
+			const entity_handle element_entity, 
+			const const_entity_handle item_entity
+		);
+
+		static void apply_and_save_hotbar_setup(
+			const hotbar_selection_setup new_setup,
+			const entity_handle element_entity
+		);
+
+		static void apply_hotbar_setup(
+			const hotbar_selection_setup new_setup,
+			const entity_handle element_entity
+		);
 
 		static entity_id get_hovered_world_entity(const cosmos& cosm, const vec2 world_cursor_position);
 		static void draw_complete_gui_for_camera_rendering_request(vertex_triangle_buffer& output_buffer, const const_entity_handle handle, viewing_step&);

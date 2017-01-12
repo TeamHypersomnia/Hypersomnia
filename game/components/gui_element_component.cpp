@@ -286,7 +286,11 @@ namespace components {
 		return entity_id();
 	}
 
-	void gui_element::assign_item_to_hotbar_button(const size_t button_index, const entity_handle element_entity, const const_entity_handle item) {
+	void gui_element::assign_item_to_hotbar_button(
+		const size_t button_index, 
+		const entity_handle element_entity, 
+		const const_entity_handle item
+	) {
 		ensure(item.get_owning_transfer_capability() == element_entity);
 
 		auto& element = element_entity.get<components::gui_element>();
@@ -298,5 +302,37 @@ namespace components {
 		}
 
 		element.hotbar_buttons[button_index].last_assigned_entity = item;
+	}
+
+	void gui_element::apply_hotbar_setup(
+		const hotbar_selection_setup new_setup,
+		const entity_handle element_entity
+	) {
+		auto& element = element_entity.get<components::gui_element>();
+
+		entity_id first_item;
+		entity_id second_item;
+
+		if (new_setup.first_index != -1) {
+			first_item = element.hotbar_buttons[static_cast<size_t>(new_setup.first_index)].get_assigned_entity(element_entity);
+		}
+
+		if (new_setup.second_index != -1) {
+			second_item = element.hotbar_buttons[static_cast<size_t>(new_setup.second_index)].get_assigned_entity(element_entity);
+		}
+	}
+
+	void gui_element::apply_and_save_hotbar_setup(
+		const hotbar_selection_setup new_setup,
+		const entity_handle element_entity
+	) {
+		auto& element = element_entity.get<components::gui_element>();
+
+		auto& current = element.current_hotbar_setup;
+		current = 1 - current;
+
+		element.last_setups[current] = new_setup;
+
+		apply_hotbar_setup(new_setup, element_entity);
 	}
 }

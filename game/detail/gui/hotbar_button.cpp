@@ -140,35 +140,39 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 	std::array<bool, static_cast<size_t>(button_corner_type::COUNT)> visible_parts;
 	std::fill(visible_parts.begin(), visible_parts.end(), false);
 
-	visible_parts[static_cast<size_t>(button_corner_type::L)] = true;
-	visible_parts[static_cast<size_t>(button_corner_type::T)] = true;
-	visible_parts[static_cast<size_t>(button_corner_type::R)] = true;
-	visible_parts[static_cast<size_t>(button_corner_type::B)] = true;
+	auto part_visibility_flag = [&visible_parts](const button_corner_type n) -> bool& {
+		return visible_parts[static_cast<size_t>(n)];
+	};
 
-	visible_parts[static_cast<size_t>(button_corner_type::LT)] = true;
-	visible_parts[static_cast<size_t>(button_corner_type::RT)] = true;
-	visible_parts[static_cast<size_t>(button_corner_type::RB)] = true;
-	visible_parts[static_cast<size_t>(button_corner_type::LB)] = true;
+	part_visibility_flag(button_corner_type::L) = true;
+	part_visibility_flag(button_corner_type::T) = true;
+	part_visibility_flag(button_corner_type::R) = true;
+	part_visibility_flag(button_corner_type::B) = true;
 
-	visible_parts[static_cast<size_t>(button_corner_type::LB_INTERNAL_BORDER)] = true;
-	visible_parts[static_cast<size_t>(button_corner_type::RT_INTERNAL_BORDER)] = true;
+	part_visibility_flag(button_corner_type::LT) = true;
+	part_visibility_flag(button_corner_type::RT) = true;
+	part_visibility_flag(button_corner_type::RB) = true;
+	part_visibility_flag(button_corner_type::LB) = true;
+
+	part_visibility_flag(button_corner_type::LB_INTERNAL_BORDER) = true;
+	part_visibility_flag(button_corner_type::RT_INTERNAL_BORDER) = true;
 
 	if (has_assigned_entity) {
-		visible_parts[static_cast<size_t>(button_corner_type::LB_COMPLEMENT_BORDER)] = true;
-		visible_parts[static_cast<size_t>(button_corner_type::LT_INTERNAL_BORDER)] = true;
-		visible_parts[static_cast<size_t>(button_corner_type::RB_INTERNAL_BORDER)] = true;
-		visible_parts[static_cast<size_t>(button_corner_type::RT_BORDER)] = true;
+		part_visibility_flag(button_corner_type::LB_COMPLEMENT_BORDER) = true;
+		part_visibility_flag(button_corner_type::LT_INTERNAL_BORDER) = true;
+		part_visibility_flag(button_corner_type::RT_BORDER) = true;
 	}
 
 	if (is_assigned_entity_selected) {
-		visible_parts[static_cast<size_t>(button_corner_type::LT_BORDER)] = true;
-		visible_parts[static_cast<size_t>(button_corner_type::RB_BORDER)] = true;
-		visible_parts[static_cast<size_t>(button_corner_type::LB_BORDER)] = true;
+		part_visibility_flag(button_corner_type::LT_BORDER) = true;
+		part_visibility_flag(button_corner_type::RB_BORDER) = true;
+		part_visibility_flag(button_corner_type::RB_INTERNAL_BORDER) = true;
+		part_visibility_flag(button_corner_type::LB_BORDER) = true;
 
-		visible_parts[static_cast<size_t>(button_corner_type::L_BORDER)] = true;
-		visible_parts[static_cast<size_t>(button_corner_type::T_BORDER)] = true;
-		visible_parts[static_cast<size_t>(button_corner_type::R_BORDER)] = true;
-		visible_parts[static_cast<size_t>(button_corner_type::B_BORDER)] = true;
+		part_visibility_flag(button_corner_type::L_BORDER) = true;
+		part_visibility_flag(button_corner_type::T_BORDER) = true;
+		part_visibility_flag(button_corner_type::R_BORDER) = true;
+		part_visibility_flag(button_corner_type::B_BORDER) = true;
 	}
 	
 	{
@@ -179,7 +183,7 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 				col = distinguished_border_color;
 			}
 
-			if (visible_parts[static_cast<size_t>(type)]) {
+			if (part_visibility_flag(type)) {
 				augs::gui::draw_clipped_rect(augs::gui::material(id, col), drawn_rc, {}, in.v, flip);
 			}
 			
@@ -195,15 +199,15 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 		if (this_id->detector.is_hovered) {
 			auto hover_effect_rc = internal_rc;
 
-			visible_parts[static_cast<size_t>(button_corner_type::RB_BORDER)] = false;
-			visible_parts[static_cast<size_t>(button_corner_type::RB_INTERNAL_BORDER)] = false;
+			part_visibility_flag(button_corner_type::RB_BORDER) = false;
+			part_visibility_flag(button_corner_type::RB_INTERNAL_BORDER) = false;
 
 			if (pushed) {
 				const auto distance = 4.f;
 				hover_effect_rc.expand_from_center(vec2(distance, distance));
 		
 				corners.for_each_button_corner(hover_effect_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
-					if (visible_parts[static_cast<size_t>(type)] && is_button_border(type)) {
+					if (part_visibility_flag(type) && is_button_border(type)) {
 						auto col = colorize;
 
 						if (distinguished_border_function(type)) {
@@ -215,10 +219,10 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 				});
 			}
 			else {
-				visible_parts[static_cast<size_t>(button_corner_type::L_BORDER)] = false;
-				visible_parts[static_cast<size_t>(button_corner_type::T_BORDER)] = false;
-				visible_parts[static_cast<size_t>(button_corner_type::R_BORDER)] = false;
-				visible_parts[static_cast<size_t>(button_corner_type::B_BORDER)] = false;
+				part_visibility_flag(button_corner_type::L_BORDER) = false;
+				part_visibility_flag(button_corner_type::T_BORDER) = false;
+				part_visibility_flag(button_corner_type::R_BORDER) = false;
+				part_visibility_flag(button_corner_type::B_BORDER) = false;
 
 				const auto max_duration = this_id->hover_highlight_duration_ms;
 				const auto max_distance = this_id->hover_highlight_maximum_distance;
@@ -227,7 +231,7 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 				hover_effect_rc.expand_from_center(vec2(distance, distance));
 		
 				corners.for_each_button_corner(hover_effect_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
-					if (visible_parts[static_cast<size_t>(type)] && is_button_border(type)) {
+					if (part_visibility_flag(type) && is_button_border(type)) {
 						auto col = colorize;
 
 						if (distinguished_border_function(type)) {

@@ -89,8 +89,8 @@ public:
 		bool colorize_inside_when_selected = true;
 		padding_byte pad[2];
 		
-		rgba primary_selected_color;
-		rgba secondary_selected_color; 
+		rgba primary_selected_color = rgba(0, 255, 255, 255);
+		rgba secondary_selected_color = rgba(86, 156, 214, 255); 
 	} hotbar;
 
 	config_lua_table();
