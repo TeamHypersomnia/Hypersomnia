@@ -167,7 +167,7 @@ typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory
 	if (primary.is_empty_slot()) {
 		return secondary;
 	}
-	else {
+	else { 
 		return is_action_secondary ? secondary : primary;
 	}
 }
@@ -197,7 +197,15 @@ std::vector<D> basic_inventory_mixin<C, D>::guns_wielded() const {
 }
 
 template <class D>
-void inventory_mixin<false, D>::wield_in_hands(const entity_id first = entity_id(), const entity_id second = entity_id()) const {
+void inventory_mixin<false, D>::wield_in_hands(const entity_id first, const entity_id second) const {
+	const auto& subject = *static_cast<const D*>(this);
+	const auto& cosmos = subject.get_cosmos();
+
+	const auto first_handle = cosmos[first];
+	const auto second_handle = cosmos[second];
+
+	const auto in_primary = subject[slot_function::PRIMARY_HAND].get_item_if_any();
+	const auto in_secondary = subject[slot_function::PRIMARY_HAND].get_item_if_any();
 
 }
 

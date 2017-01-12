@@ -60,12 +60,12 @@ void item_system::handle_trigger_confirmations_as_pick_requests(logic_step& step
 				|| found_in(item_slot_transfers->only_pick_these_items, item_entity);
 			
 			if (item_subscribed) {
-				item_slot_transfer_request request(item_entity, item_entity.determine_pickup_target_slot_in(detector));
+				const auto pickup_slot = item_entity.determine_pickup_target_slot_in(detector);
+				const bool can_pick_already = item_slot_transfers->pickup_timeout.try_to_fire_and_reset(cosmos.get_timestamp(), delta);
 
-				if (request.get_target_slot().alive()) {
-					if (item_slot_transfers->pickup_timeout.try_to_fire_and_reset(cosmos.get_timestamp(), delta)) {
-						perform_transfer(request, step);
-					}
+				if (pickup_slot.alive() && can_pick_already) {
+					const item_slot_transfer_request request(item_entity, pickup_slot);
+					perform_transfer(request, step);
 				}
 				else {
 					// TODO: post gui message
@@ -89,9 +89,10 @@ void item_system::handle_throw_item_intents(logic_step& step) {
 
 			if (subject.find<components::item_slot_transfers>()) {
 				const auto hand = subject.map_primary_action_to_secondary_hand_if_primary_empty(intent_type::THROW_SECONDARY_ITEM == r.intent);
+				const auto item_inside = hand.get_item_if_any();
 
-				if (hand.has_items()) {
-					perform_transfer({ hand.get_items_inside()[0], cosmos[inventory_slot_id()] }, step);
+				if (item_inside.alive()) {
+					perform_transfer({ item_inside, cosmos[inventory_slot_id()] }, step);
 				}
 			}
 		}
@@ -112,13 +113,15 @@ void item_system::handle_holster_item_intents(logic_step& step) {
 
 			if (subject.find<components::item_slot_transfers>()) {
 				const auto hand = subject.map_primary_action_to_secondary_hand_if_primary_empty(intent_type::HOLSTER_SECONDARY_ITEM == r.intent);
+				const auto item_inside = hand.get_item_if_any();
 
-				if (hand.has_items()) {
-					const auto item_inside = hand.get_items_inside()[0];
-					const item_slot_transfer_request request(item_inside, item_inside.determine_hand_holstering_slot_in(subject));
+				if (item_inside.alive()) {
+					const auto holstering_slot = item_inside.determine_hand_holstering_slot_in(subject);
 
-					if (request.get_target_slot().alive())
+					if (holstering_slot.alive()) {
+						const item_slot_transfer_request request(item_inside, holstering_slot);
 						perform_transfer(request, step);
+					}
 				}
 			}
 		}
