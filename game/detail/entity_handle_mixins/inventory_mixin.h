@@ -1,6 +1,7 @@
 #pragma once
 #include "game/detail/inventory_slot_handle_declaration.h"
 #include "game/transcendental/entity_handle_declaration.h"
+#include "game/transcendental/step_declaration.h"
 
 template<bool is_const, class entity_handle_type>
 class basic_inventory_mixin {
@@ -9,8 +10,8 @@ public:
 
 	entity_handle_type get_owning_transfer_capability() const;
 
-	inventory_slot_handle_type determine_hand_holstering_slot_in(const entity_handle_type searched_root_container) const;
-	inventory_slot_handle_type determine_pickup_target_slot_in(const entity_handle_type searched_root_container) const;
+	inventory_slot_handle_type determine_hand_holstering_slot_for(const entity_handle_type holstered_item) const;
+	inventory_slot_handle_type determine_pickup_target_slot_for(const entity_handle_type picked_item) const;
 	
 	inventory_slot_handle_type get_current_slot() const;
 
@@ -84,7 +85,11 @@ template<class entity_handle_type>
 class inventory_mixin<false, entity_handle_type> : public basic_inventory_mixin<false, entity_handle_type> {
 public:
 
-	void wield_in_hands(const entity_id first = entity_id(), const entity_id second = entity_id()) const;
+	bool wield_in_hands(
+		logic_step& step,
+		const entity_id first = entity_id(), 
+		const entity_id second = entity_id()
+	) const;
 };
 
 template<class entity_handle_type>

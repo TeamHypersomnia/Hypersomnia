@@ -25,8 +25,8 @@ namespace augs {
 			void draw(buf&, const text::caret_info* in = nullptr);
 			void draw(draw_info);
 
-			void center(const rects::ltrb<float>);
-			void bottom_right(const rects::ltrb<float>);
+			void center(const ltrbi);
+			void bottom_right(const ltrbi);
 			void above_left_to_right(const vec2i pos);
 			void below_left_to_right(const vec2i pos);
 		};

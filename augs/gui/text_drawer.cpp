@@ -38,16 +38,15 @@ namespace augs {
 
 		vec2i text_drawer::get_bbox() {
 			draft.guarded_redraw();
-			const auto bbox = draft.get_draft().get_bbox();
-			return vec2i( bbox.w, bbox.h );
+			return draft.get_draft().get_bbox();
 		}
 
-		void text_drawer::center(const rects::ltrb<float> r) {
+		void text_drawer::center(const ltrbi r) {
 			const auto bbox = get_bbox();
 			pos = vec2i(r.l + r.w() / 2 - bbox.x / 2, r.t + r.h() / 2 - bbox.y / 2);
 		}
 
-		void text_drawer::bottom_right(const rects::ltrb<float> r) {
+		void text_drawer::bottom_right(const ltrbi r) {
 			const auto bbox = get_bbox();
 			pos = vec2i(r.r - bbox.x, r.b - bbox.y);
 		}

@@ -69,7 +69,7 @@ namespace augs {
 				/* here we highlight the line caret is currently on */
 				if (caret && active && highlight_current_line) {
 					drafter::line highlighted = lines.size() ? lines[d.get_line(caret->pos)] : drafter::line();
-					gui::draw_clipped_rect(highlight_mat, rects::xywh<float>(0, highlighted.top, clip ? d.get_bbox().w + clipper.w() : d.get_bbox().w,
+					gui::draw_clipped_rect(highlight_mat, rects::xywh<float>(0, highlighted.top, clip ? d.get_bbox().x + clipper.w() : d.get_bbox().x,
 
 						/* snap to default style's height */
 						highlighted.empty() ? (*(caret->default_style.f)).get_height()
@@ -116,7 +116,7 @@ namespace augs {
 								/* init selection rect on line rectangle;
 								its values won't change if selecting between first and the last line
 								*/
-								rects::ltrb<float> sel_rect = d.lines[i].get_rect();
+								ltrbi sel_rect = d.lines[i].get_rect();
 
 								/* if it's the first line to process and we can see it, we have to trim its x coordinate */
 								if (i == first_visible_selection && select_left_line >= first_visible_selection)
@@ -187,7 +187,7 @@ namespace augs {
 				drafter dr;
 				dr.wrap_width = wrapping_width;
 				dr.draw(str);
-				return vec2i(dr.get_bbox().w, dr.get_bbox().h);
+				return dr.get_bbox();
 			}
 
 			rects::wh<float> quick_print(

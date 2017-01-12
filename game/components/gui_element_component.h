@@ -65,12 +65,14 @@ namespace components {
 			const const_entity_handle item_entity
 		);
 
-		static void apply_and_save_hotbar_setup(
+		static bool apply_and_save_hotbar_setup(
+			logic_step&,
 			const hotbar_selection_setup new_setup,
 			const entity_handle element_entity
 		);
 
-		static void apply_hotbar_setup(
+		static bool apply_hotbar_setup(
+			logic_step&,
 			const hotbar_selection_setup new_setup,
 			const entity_handle element_entity
 		);

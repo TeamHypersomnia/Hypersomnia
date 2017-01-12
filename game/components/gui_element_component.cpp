@@ -304,7 +304,8 @@ namespace components {
 		element.hotbar_buttons[button_index].last_assigned_entity = item;
 	}
 
-	void gui_element::apply_hotbar_setup(
+	bool gui_element::apply_hotbar_setup(
+		logic_step& step,
 		const hotbar_selection_setup new_setup,
 		const entity_handle element_entity
 	) {
@@ -320,9 +321,12 @@ namespace components {
 		if (new_setup.second_index != -1) {
 			second_item = element.hotbar_buttons[static_cast<size_t>(new_setup.second_index)].get_assigned_entity(element_entity);
 		}
+
+		return element_entity.wield_in_hands(step, first_item, second_item);
 	}
 
-	void gui_element::apply_and_save_hotbar_setup(
+	bool gui_element::apply_and_save_hotbar_setup(
+		logic_step& step,
 		const hotbar_selection_setup new_setup,
 		const entity_handle element_entity
 	) {
@@ -333,6 +337,6 @@ namespace components {
 
 		element.last_setups[current] = new_setup;
 
-		apply_hotbar_setup(new_setup, element_entity);
+		return apply_hotbar_setup(step, new_setup, element_entity);
 	}
 }

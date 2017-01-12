@@ -60,7 +60,7 @@ void item_system::handle_trigger_confirmations_as_pick_requests(logic_step& step
 				|| found_in(item_slot_transfers->only_pick_these_items, item_entity);
 			
 			if (item_subscribed) {
-				const auto pickup_slot = item_entity.determine_pickup_target_slot_in(detector);
+				const auto pickup_slot = detector.determine_pickup_target_slot_for(item_entity);
 				const bool can_pick_already = item_slot_transfers->pickup_timeout.try_to_fire_and_reset(cosmos.get_timestamp(), delta);
 
 				if (pickup_slot.alive() && can_pick_already) {
@@ -116,7 +116,7 @@ void item_system::handle_holster_item_intents(logic_step& step) {
 				const auto item_inside = hand.get_item_if_any();
 
 				if (item_inside.alive()) {
-					const auto holstering_slot = item_inside.determine_hand_holstering_slot_in(subject);
+					const auto holstering_slot = subject.determine_hand_holstering_slot_for(item_inside);
 
 					if (holstering_slot.alive()) {
 						const item_slot_transfer_request request(item_inside, holstering_slot);

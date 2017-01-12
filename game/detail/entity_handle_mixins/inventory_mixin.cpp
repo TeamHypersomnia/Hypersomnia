@@ -1,6 +1,8 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/detail/inventory_slot_id.h"
 #include "game/detail/inventory_slot_handle.h"
+#include "game/detail/item_slot_transfer_request.h"
+#include "game/detail/inventory_utils.h"
 #include "game/components/item_component.h"
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/gun_component.h"
@@ -99,23 +101,26 @@ bool basic_inventory_mixin<C, D>::wields_in_secondary_hand(const const_entity_ha
 }
 
 template <bool C, class D>
-typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory_mixin<C, D>::determine_hand_holstering_slot_in(const D searched_root_container) const {
-	const auto& item_entity = *static_cast<const D*>(this);
-	auto& cosmos = item_entity.get_cosmos();
+typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory_mixin<C, D>::determine_hand_holstering_slot_for(const D holstered_item) const {
+	const auto& searched_root_container = *static_cast<const D*>(this);
+	auto& cosmos = holstered_item.get_cosmos();
 
-	ensure(item_entity.alive());
+	if (holstered_item.dead()) {
+		return cosmos[inventory_slot_id()];
+	}
+
 	ensure(searched_root_container.alive());
 
 	const auto maybe_shoulder = searched_root_container[slot_function::SHOULDER_SLOT];
 
 	if (maybe_shoulder.alive()) {
-		if (maybe_shoulder.can_contain(item_entity)) {
+		if (maybe_shoulder.can_contain(holstered_item)) {
 			return maybe_shoulder;
 		}
 		else if (maybe_shoulder->items_inside.size() > 0) {
 			const auto maybe_item_deposit = maybe_shoulder.get_items_inside()[0][slot_function::ITEM_DEPOSIT];
 
-			if (maybe_item_deposit.alive() && maybe_item_deposit.can_contain(item_entity)) {
+			if (maybe_item_deposit.alive() && maybe_item_deposit.can_contain(holstered_item)) {
 				return maybe_item_deposit;
 			}
 		}
@@ -124,7 +129,7 @@ typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory
 		const auto maybe_armor = searched_root_container[slot_function::TORSO_ARMOR_SLOT];
 
 		if (maybe_armor.alive()) {
-			if (maybe_armor.can_contain(item_entity)) {
+			if (maybe_armor.can_contain(holstered_item)) {
 				return maybe_armor;
 			}
 		}
@@ -134,23 +139,25 @@ typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory
 }
 
 template <bool C, class D>
-typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory_mixin<C, D>::determine_pickup_target_slot_in(const D searched_root_container) const {
-	const auto& item_entity = *static_cast<const D*>(this);
-	ensure(item_entity.alive());
+typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory_mixin<C, D>::determine_pickup_target_slot_for(const D picked_item) const {
+	const auto& searched_root_container = *static_cast<const D*>(this);
+	
+	ensure(picked_item.alive());
 	ensure(searched_root_container.alive());
-	auto& cosmos = item_entity.get_cosmos();
+	
+	auto& cosmos = picked_item.get_cosmos();
 
-	const auto hidden_slot = item_entity.determine_hand_holstering_slot_in(searched_root_container);;
+	const auto hidden_slot = searched_root_container.determine_hand_holstering_slot_for(picked_item);
 
 	if (hidden_slot.alive()) {
 		return hidden_slot;
 	}
 
-	if (searched_root_container[slot_function::PRIMARY_HAND].can_contain(item_entity)) {
+	if (searched_root_container[slot_function::PRIMARY_HAND].can_contain(picked_item)) {
 		return searched_root_container[slot_function::PRIMARY_HAND];
 	}
 
-	if (searched_root_container[slot_function::SECONDARY_HAND].can_contain(item_entity)) {
+	if (searched_root_container[slot_function::SECONDARY_HAND].can_contain(picked_item)) {
 		return searched_root_container[slot_function::SECONDARY_HAND];
 	}
 
@@ -197,7 +204,11 @@ std::vector<D> basic_inventory_mixin<C, D>::guns_wielded() const {
 }
 
 template <class D>
-void inventory_mixin<false, D>::wield_in_hands(const entity_id first, const entity_id second) const {
+bool inventory_mixin<false, D>::wield_in_hands(
+	logic_step& step,
+	const entity_id first, 
+	const entity_id second
+) const {
 	const auto& subject = *static_cast<const D*>(this);
 	const auto& cosmos = subject.get_cosmos();
 
@@ -205,8 +216,30 @@ void inventory_mixin<false, D>::wield_in_hands(const entity_id first, const enti
 	const auto second_handle = cosmos[second];
 
 	const auto in_primary = subject[slot_function::PRIMARY_HAND].get_item_if_any();
-	const auto in_secondary = subject[slot_function::PRIMARY_HAND].get_item_if_any();
+	const auto in_secondary = subject[slot_function::SECONDARY_HAND].get_item_if_any();
 
+	const auto primary_holstering_slot = subject.determine_hand_holstering_slot_for(in_primary);
+	const auto secondary_holstering_slot = subject.determine_hand_holstering_slot_for(in_secondary);
+
+	const bool something_wont_fit = 
+		(in_primary.alive() && primary_holstering_slot.dead()) ||
+		(in_secondary.alive() && secondary_holstering_slot.dead());
+
+	if (something_wont_fit) {
+		return false;
+	}
+
+	if (primary_holstering_slot.alive()) {
+		const item_slot_transfer_request request(in_primary, primary_holstering_slot);
+		perform_transfer(request, step);
+	}
+
+	if (secondary_holstering_slot.alive()) {
+		const item_slot_transfer_request request(in_secondary, secondary_holstering_slot);
+		perform_transfer(request, step);
+	}
+
+	return true;
 }
 
 // explicit instantiation

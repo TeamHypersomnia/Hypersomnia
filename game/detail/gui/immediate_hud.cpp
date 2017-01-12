@@ -82,7 +82,7 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 
 	const auto& watched_character = cosmos[r.viewed_character];
 
-	const int timestamp_ms = r.get_interpolated_total_time_passed_in_seconds() * 1000;
+	const auto timestamp_ms = static_cast<unsigned>(r.get_interpolated_total_time_passed_in_seconds() * 1000);
 
 	vertex_triangle_buffer circular_bars_information;
 
@@ -93,7 +93,7 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 			const auto hr = sentience->health.ratio();
 			const auto one_less_hr = 1 - hr;
 
-			const int pulse_duration = 1250 - 1000 * (1 - hr);
+			const auto pulse_duration = static_cast<int>(1250 - 1000 * (1 - hr));
 			const float time_pulse_ratio = (timestamp_ms % pulse_duration) / float(pulse_duration);
 
 			const auto health_col = sentience->calculate_health_color(time_pulse_ratio);
@@ -203,12 +203,12 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 					}
 				};
 
-				examine_item_slot(v[slot_function::SECONDARY_HAND], starting_health_angle + 90 + 22.5, 45, false);
-				examine_item_slot(v[slot_function::PRIMARY_HAND], starting_health_angle - 22.5 - 45, 45, true);
+				examine_item_slot(v[slot_function::SECONDARY_HAND], starting_health_angle + 90.f + 22.5f, 45.f, false);
+				examine_item_slot(v[slot_function::PRIMARY_HAND], starting_health_angle - 22.5f - 45.f, 45.f, true);
 			}
 
 			const int radius = (*assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM).get_size().x / 2;
-			const int empty_health_amount = (1 - sentience->health.ratio()) * 90;
+			const auto empty_health_amount = static_cast<int>((1 - sentience->health.ratio()) * 90);
 
 			textual_infos.push_back({ starting_health_angle + 90 - empty_health_amount/2, to_wstring(int(sentience->health.value) == 0 ? 1 : int(sentience->health.value)), health_col });
 			textual_infos.push_back({ starting_health_angle, description_of_entity(v).name, health_col });
@@ -222,7 +222,7 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 				//const auto circle_displacement_length = health_points.get_bbox().bigger_side() + radius;
 				const vec2i screen_space_circle_center = r.get_screen_space(transform.pos);
 
-				health_points.pos = screen_space_circle_center + position_caption_around_a_circle(radius+6, health_points.get_bbox(), in.angle) - health_points.get_bbox()/2;
+				health_points.pos = screen_space_circle_center + position_caption_around_a_circle(radius+6.f, health_points.get_bbox(), in.angle) - health_points.get_bbox()/2;
 				//health_points.pos = screen_space_circle_center + vec2().set_from_degrees(in.angle).set_length(circle_displacement_length);
 
 				health_points.draw_stroke(circular_bars_information);
@@ -256,8 +256,9 @@ void immediate_hud::acquire_game_events(const const_logic_step& step) {
 				col = green;
 			}
 		}
-		else
+		else {
 			continue;
+		}
 
 		vn.text.set_text(augs::gui::text::format(to_wstring(std::abs(int(vn.value) == 0 ? 1 : int(vn.value))), augs::gui::text::style(assets::font_id::GUI_FONT, col)));
 		vn.transform.pos = h.point_of_impact;
@@ -278,7 +279,7 @@ void immediate_hud::acquire_game_events(const const_logic_step& step) {
 		
 		if (cosmos[h.spawned_remnants].alive()) {
 			new_highlight.target = h.spawned_remnants;
-			new_highlight.starting_alpha_ratio = 0.7;
+			new_highlight.starting_alpha_ratio = 0.7f;
 		}
 
 		new_highlight.maximum_duration_seconds = 0.3;
@@ -309,7 +310,7 @@ void immediate_hud::draw_vertically_flying_numbers(viewing_step& msg) const {
 
 		auto text = r.text;
 
-		text.pos = msg.get_screen_space((r.transform.pos - vec2(0, sqrt(passed) * 120.f)));
+		text.pos = msg.get_screen_space((r.transform.pos - vec2(0, static_cast<float>(sqrt(passed)) * 120.f)));
 		
 		text.draw_stroke(triangles);
 		text.draw(triangles);
@@ -318,7 +319,7 @@ void immediate_hud::draw_vertically_flying_numbers(viewing_step& msg) const {
 
 void immediate_hud::draw_pure_color_highlights(viewing_step& msg) const {
 	const auto& cosmos = msg.cosm;
-	const auto current_time = msg.get_interpolated_total_time_passed_in_seconds();
+	const auto current_time = static_cast<float>(msg.get_interpolated_total_time_passed_in_seconds());
 	auto& triangles = msg.renderer.triangles;
 	const auto& interp = msg.session.systems_audiovisual.get<interpolation_system>();
 
@@ -336,7 +337,7 @@ void immediate_hud::draw_pure_color_highlights(viewing_step& msg) const {
 		auto passed = current_time - r.time_of_occurence;
 		auto ratio = passed / r.maximum_duration_seconds;
 
-		col.a = 255 * (1-ratio) * r.starting_alpha_ratio;
+		col.a = static_cast<rgba_channel>(255 * (1-ratio) * r.starting_alpha_ratio);
 		render_system().draw_renderable(triangles, current_time, sprite, subject.viewing_transform(interp, true), subject.get<components::render>(), msg.camera, renderable_drawing_type::NORMAL);
 		col = prevcol;
 	}
