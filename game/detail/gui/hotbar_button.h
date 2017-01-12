@@ -2,6 +2,7 @@
 #include "augs/math/vec2.h"
 #include "game_gui_context.h"
 #include "augs/gui/appearance_detector.h"
+#include "application/config_lua_table.h"
 
 struct button_corners_info;
 

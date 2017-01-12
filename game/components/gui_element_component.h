@@ -35,6 +35,8 @@ namespace components {
 		bool draw_free_space_inside_container_icons = true;
 		padding_byte pad;
 
+		config_lua_table::hotbar_settings hotbar_settings;
+
 		drag_and_drop_target_drop_item drop_item_icon = augs::gui::material(assets::texture_id::DROP_HAND_ICON, red);
 
 		std::array<hotbar_button, 10> hotbar_buttons;

@@ -7,6 +7,11 @@
 #include <thread>
 #include <mutex>
 
+#include "augs/padding_byte.h"
+#include "augs/graphics/pixel.h"
+
+#include "game/transcendental/entity_handle_declaration.h"
+
 class game_window;
 
 class config_lua_table {
@@ -79,6 +84,15 @@ public:
 	bool skip_credits = false;
 	std::string latest_news_url;
 
+	struct hotbar_settings {
+		bool increase_inside_alpha_when_selected = false;
+		bool colorize_inside_when_selected = true;
+		padding_byte pad[2];
+		
+		rgba primary_selected_color;
+		rgba secondary_selected_color; 
+	} hotbar;
+
 	config_lua_table();
 
 	void get_values();
@@ -104,4 +118,6 @@ public:
 	
 	launch_type get_launch_mode() const;
 	input_recording_type get_input_recording_mode() const;
+
+	void update_configuration_for_entity(const entity_handle) const;
 };

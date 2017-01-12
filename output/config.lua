@@ -152,5 +152,11 @@ config_table = {
 	skip_credits = 0,
 	
 	-- Url for the rolling news bar in the main menu
-	latest_news_url = "http://hypersomnia.pl/latest_post/"
+	latest_news_url = "http://hypersomnia.pl/latest_post/",
+
+	-- hotbar appearance settings
+	hotbar_increase_inside_alpha_when_selected = 0,
+	hotbar_colorize_inside_when_selected = 1,
+	hotbar_primary_selected_color = rgba(0, 255, 255, 255),
+	hotbar_secondary_selected_color = rgba(86, 156, 214, 255)
 }

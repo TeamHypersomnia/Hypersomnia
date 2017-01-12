@@ -55,6 +55,8 @@ void local_setup::process(const config_lua_table& cfg, game_window& window) {
 
 	testbed.configure_view(session);
 
+	cfg.update_configuration_for_entity(hypersomnia[testbed.get_selected_character()]);
+
 	timer.reset_timer();
 
 	while (!should_quit) {

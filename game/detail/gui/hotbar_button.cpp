@@ -3,7 +3,10 @@
 #include "game/transcendental/cosmos.h"
 #include "game/detail/gui/item_button.h"
 #include "game/components/item_component.h"
+#include "game/components/gui_element_component.h"
 #include "augs/gui/button_corners.h"
+
+#include "application/config_lua_table.h"
 
 const_entity_handle hotbar_button::get_assigned_entity(const const_entity_handle owner_transfer_capability) const {
 	const auto& cosm = owner_transfer_capability.get_cosmos();
@@ -54,6 +57,7 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 	const auto& this_tree_entry = context.get_tree_entry(this_id);
 	auto absolute_rc = this_tree_entry.get_absolute_rect();
 	const auto owner_transfer_capability = context.get_gui_element_entity();
+	const auto& settings = context.get_gui_element_component().hotbar_settings;
 
 	const int left_rc_spacing = 2;
 	const int right_rc_spacing = 1;
@@ -85,13 +89,13 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 	rgba distinguished_border_color = cyan;
 
 	if (is_in_primary) {
-		distinguished_border_color = pink;
+		distinguished_border_color = settings.primary_selected_color;
 	}
 	else if (is_in_secondary) {
-		distinguished_border_color = vsblue;
+		distinguished_border_color = settings.secondary_selected_color;
 	}
 
-	if (colorize_background_when_selected) {
+	if (settings.colorize_inside_when_selected) {
 		colorize = distinguished_border_color;
 	}
 
@@ -106,7 +110,7 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 		inside_col.a += 10;
 	}
 
-	if (increase_alpha_when_selected && is_assigned_entity_selected) {
+	if (settings.increase_inside_alpha_when_selected && is_assigned_entity_selected) {
 		inside_col.a += 20;
 	}
 

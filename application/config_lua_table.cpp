@@ -6,6 +6,14 @@
 #include "augs/log.h"
 #include "augs/filesystem/file.h"
 
+#include "augs/templates/string_templates.h"
+
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/cosmos.h"
+
+#include "game/components/gui_element_component.h"
+
+
 #define NVP(x) x, #x
 
 config_lua_table::config_lua_table() {
@@ -13,7 +21,9 @@ config_lua_table::config_lua_table() {
 }
 
 void config_lua_table::get_values() {
-	auto set = [this](auto& c, const std::string& ss) { get_config_value(ss, c); };
+	auto set = [this](auto& c, const std::string& ss) { 
+		get_config_value(replace_all(ss, ".", "_"), c); 
+	};
 
 	set(NVP(launch_mode));
 	set(NVP(input_recording_mode));
@@ -69,6 +79,13 @@ void config_lua_table::get_values() {
 
 	set(NVP(skip_credits));
 	set(NVP(latest_news_url));
+	
+	set(NVP(hotbar.increase_inside_alpha_when_selected));
+	set(NVP(hotbar.colorize_inside_when_selected));
+		
+	set(NVP(hotbar.primary_selected_color));
+	set(NVP(hotbar.secondary_selected_color)); 
+
 }
 
 void config_lua_table::call_window_script(game_window& window, const std::string& filename) {
@@ -126,4 +143,10 @@ void config_lua_table::get_config_value(const std::string& field, bool& into) {
 	std::unique_lock<std::mutex> lock(lua_mutex);
 
 	into = luabind::object_cast<double>(luabind::globals(lua.raw)["config_table"][field]) > 0.0;
+}
+
+void config_lua_table::update_configuration_for_entity(const entity_handle h) const {
+	if (h.has<components::gui_element>()) {
+		h.get<components::gui_element>().hotbar_settings = hotbar;
+	}
 }
