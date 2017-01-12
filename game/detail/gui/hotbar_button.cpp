@@ -52,9 +52,14 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 
 	const auto& rect_world = context.get_rect_world();
 	const auto& this_tree_entry = context.get_tree_entry(this_id);
-	const auto absolute_rc = this_tree_entry.get_absolute_rect();
+	auto absolute_rc = this_tree_entry.get_absolute_rect();
 	const auto owner_transfer_capability = context.get_gui_element_entity();
 
+	const int left_rc_spacing = 2;
+	const int right_rc_spacing = 1;
+
+	absolute_rc.l += left_rc_spacing;
+	absolute_rc.r -= right_rc_spacing;
 
 	const auto corners = this_id->get_button_corners_info();
 	
