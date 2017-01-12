@@ -40,6 +40,7 @@ enum class button_corner_type {
 };
 
 bool is_button_border(const button_corner_type);
+bool is_button_outside_border(const button_corner_type);
 bool is_button_corner(const button_corner_type);
 bool is_button_side(const button_corner_type);
 

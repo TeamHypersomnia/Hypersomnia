@@ -66,16 +66,14 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 	const bool flip = corners.flip_horizontally;
 
 	const auto internal_rc = corners.cornered_rc_to_internal_rc(absolute_rc);
-
-	const auto label_style = augs::gui::text::style(assets::font_id::GUI_FONT, cyan);
 	
 	const auto assigned_entity = this_id->get_assigned_entity(owner_transfer_capability);
 	const bool has_assigned_entity = assigned_entity.alive();
 
-	const bool is_assigned_entity_selected = has_assigned_entity && (
-		owner_transfer_capability.wields_in_primary_hand(assigned_entity) ||
-		owner_transfer_capability.wields_in_secondary_hand(assigned_entity)
-		);
+	const bool is_in_primary = has_assigned_entity && owner_transfer_capability.wields_in_primary_hand(assigned_entity);
+	const bool is_in_secondary = has_assigned_entity && owner_transfer_capability.wields_in_secondary_hand(assigned_entity);
+
+	const bool is_assigned_entity_selected = is_in_primary || is_in_secondary;
 
 	const auto& detector = this_id->detector;
 
@@ -110,6 +108,19 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 
 	inside_col *= colorize;
 	border_col *= colorize;
+	
+	rgba distinguished_border_color = border_col;
+
+	if (is_in_primary) {
+		distinguished_border_color = white;
+	}
+	else if (is_in_secondary) {
+		distinguished_border_color = yellow;
+	}
+
+	auto distinguished_border_function = is_button_border;
+
+	const auto label_style = augs::gui::text::style(assets::font_id::GUI_FONT, distinguished_border_color);
 
 	const auto inside_mat = augs::gui::material(assets::texture_id::HOTBAR_BUTTON_INSIDE, inside_col);
 
@@ -151,8 +162,12 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 	
 	{
 		corners.for_each_button_corner(internal_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
-			const auto col = is_button_border(type) ? border_col : inside_col;
+			auto col = is_button_border(type) ? border_col : inside_col;
 			
+			if (distinguished_border_function(type)) {
+				col = distinguished_border_color;
+			}
+
 			if (visible_parts[static_cast<size_t>(type)]) {
 				augs::gui::draw_clipped_rect(augs::gui::material(id, col), drawn_rc, {}, in.v, flip);
 			}
@@ -178,7 +193,13 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 		
 				corners.for_each_button_corner(hover_effect_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
 					if (visible_parts[static_cast<size_t>(type)] && is_button_border(type)) {
-						augs::gui::draw_clipped_rect(augs::gui::material(id, colorize), drawn_rc, {}, in.v, corners.flip_horizontally);
+						auto col = colorize;
+
+						if (distinguished_border_function(type)) {
+							col = distinguished_border_color;
+						}
+
+						augs::gui::draw_clipped_rect(augs::gui::material(id, col), drawn_rc, {}, in.v, corners.flip_horizontally);
 					}
 				});
 			}
@@ -196,7 +217,13 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 		
 				corners.for_each_button_corner(hover_effect_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
 					if (visible_parts[static_cast<size_t>(type)] && is_button_border(type)) {
-						augs::gui::draw_clipped_rect(augs::gui::material(id, colorize), drawn_rc, {}, in.v, corners.flip_horizontally);
+						auto col = colorize;
+
+						if (distinguished_border_function(type)) {
+							col = distinguished_border_color;
+						}
+
+						augs::gui::draw_clipped_rect(augs::gui::material(id, col), drawn_rc, {}, in.v, corners.flip_horizontally);
 					}
 				});
 			}

@@ -25,9 +25,9 @@ bool is_button_corner(const button_corner_type t) {
 	return false;
 }
 
-bool is_button_border(const button_corner_type t) {
+bool is_button_outside_border(const button_corner_type t) {
 	if (
-		   t == button_corner_type::L_BORDER
+		t == button_corner_type::L_BORDER
 		|| t == button_corner_type::T_BORDER
 		|| t == button_corner_type::R_BORDER
 		|| t == button_corner_type::B_BORDER
@@ -38,7 +38,16 @@ bool is_button_border(const button_corner_type t) {
 		|| t == button_corner_type::LB_BORDER
 
 		|| t == button_corner_type::LB_COMPLEMENT_BORDER
+		) {
+		return true;
+	}
 
+	return false;
+}
+
+bool is_button_border(const button_corner_type t) {
+	if (
+		is_button_outside_border(t)
 		|| t == button_corner_type::LT_INTERNAL_BORDER
 		|| t == button_corner_type::RT_INTERNAL_BORDER
 		|| t == button_corner_type::RB_INTERNAL_BORDER
