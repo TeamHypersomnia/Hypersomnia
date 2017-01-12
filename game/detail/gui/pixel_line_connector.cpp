@@ -1,20 +1,19 @@
 #include "pixel_line_connector.h"
 #include "augs/graphics/drawers.h"
 
-std::vector<std::array<vec2i, 2>> get_connecting_pixel_lines(
+augs::constant_size_vector<std::array<vec2i, 2>, 2> get_connecting_pixel_lines(
 	const rects::ltrb<float>& a,
 	const rects::ltrb<float>& b
-)
-{
+) {
 	using namespace augs::gui;
 
-	vec2 ac = a.center();
-	vec2 bc = b.center();
+	const vec2 ac = a.center();
+	const vec2 bc = b.center();
 
-	vec2 aw2(a.w() / 2, 0);
-	vec2 ah2(0, a.h() / 2);
-	vec2 bw2(b.w() / 2, 0);
-	vec2 bh2(0, b.h() / 2);
+	const vec2 aw2(a.w() / 2, 0);
+	const vec2 ah2(0, a.h() / 2);
+	const vec2 bw2(b.w() / 2, 0);
+	const vec2 bh2(0, b.h() / 2);
 
 	if (ac.x >= b.r) {
 		bool can_a_to_b = ac.y >= b.t && ac.y <= b.b;
