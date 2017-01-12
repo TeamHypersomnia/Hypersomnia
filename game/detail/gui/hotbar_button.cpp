@@ -77,7 +77,25 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 
 	const auto& detector = this_id->detector;
 
-	const auto colorize = cyan;
+	auto colorize = cyan;
+
+	const bool colorize_background_when_selected = true;
+	const bool increase_alpha_when_selected = false;
+
+	rgba distinguished_border_color = cyan;
+
+	if (is_in_primary) {
+		distinguished_border_color = pink;
+	}
+	else if (is_in_secondary) {
+		distinguished_border_color = vsblue;
+	}
+
+	if (colorize_background_when_selected) {
+		colorize = distinguished_border_color;
+	}
+
+	auto distinguished_border_function = is_button_border;
 
 	rgba inside_col = white;
 	rgba border_col = white;
@@ -88,7 +106,7 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 		inside_col.a += 10;
 	}
 
-	if (is_assigned_entity_selected) {
+	if (increase_alpha_when_selected && is_assigned_entity_selected) {
 		inside_col.a += 20;
 	}
 
@@ -108,17 +126,6 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 
 	inside_col *= colorize;
 	border_col *= colorize;
-	
-	rgba distinguished_border_color = border_col;
-
-	if (is_in_primary) {
-		distinguished_border_color = white;
-	}
-	else if (is_in_secondary) {
-		distinguished_border_color = yellow;
-	}
-
-	auto distinguished_border_function = is_button_border;
 
 	const auto label_style = augs::gui::text::style(assets::font_id::GUI_FONT, distinguished_border_color);
 
