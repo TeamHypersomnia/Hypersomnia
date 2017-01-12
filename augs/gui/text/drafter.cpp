@@ -9,12 +9,12 @@
 namespace augs {
 	namespace gui {
 		namespace text {
-			font& drafter::getf(const gui::text::fstr& source, unsigned i) const {
+			font& drafter::getf(const gui::text::fstr& source, const unsigned i) const {
 				//return (i < source.length() && source[i].font_used) ? source[i].font_used : target_caret->default_style.f;
 				return *source[i].font_used;
 			}
 
-			int drafter::get_kern(const gui::text::fstr& source, unsigned i, unsigned l) const {
+			int drafter::get_kern(const gui::text::fstr& source, const unsigned i, const unsigned l) const {
 				if (kerning && i > lines[l].begin && &getf(source, i) == &getf(source, i - 1)) {
 					auto& vk = get_cached(i).kerning;
 					for (unsigned k = 0; k < vk.size(); ++k)
@@ -24,11 +24,11 @@ namespace augs {
 				return 0;
 			}
 
-			const font::glyph& drafter::get_cached(int i) const {
+			const font::glyph& drafter::get_cached(const int i) const {
 				return (cached.at(i) == nullptr) ? default_glyph : *cached[i];
 			}
 
-			void drafter::find_ascdesc(const gui::text::fstr& in, int l, int r, int& asc, int& desc) const {
+			void drafter::find_ascdesc(const gui::text::fstr& in, const int l, const int r, int& asc, int& desc) const {
 				if (l == r) {
 					if (l > 0) {
 						asc = getf(in, l - 1).ascender;
@@ -63,13 +63,13 @@ namespace augs {
 				return ltrbi(0, top, right, bottom());
 			}
 
-			void drafter::line::set(int _y, int _asc, int _desc) {
+			void drafter::line::set(const int _y, const int _asc, const int _desc) {
 				top = _y;
 				asc = _asc;
 				desc = _desc;
 			}
 
-			void drafter::line::adjust(font& f) {
+			void drafter::line::adjust(const font& f) {
 				asc = std::max(asc, f.ascender);
 				desc = std::min(desc, f.descender);
 			}
@@ -78,7 +78,7 @@ namespace augs {
 				return begin == end;
 			}
 
-			unsigned drafter::line::hover(int x, const std::vector<int>& sectors) const {
+			unsigned drafter::line::hover(const int x, const std::vector<int>& sectors) const {
 				if (end - begin <= 1)
 					return begin; /* obvious if we have no (or one) sectors */
 
@@ -105,11 +105,11 @@ namespace augs {
 				return iter;
 			}
 
-			unsigned drafter::get_line(unsigned i) const {
+			unsigned drafter::get_line(const unsigned i) const {
 				if (lines.empty()) return 0;
 				line l;
 				l.end = i;
-				auto res = upper_bound(lines.begin(), lines.end(), l, [](const line& x, const line& y) {return x.end < y.end; }) - lines.begin();
+				const auto res = upper_bound(lines.begin(), lines.end(), l, [](const line& x, const line& y) {return x.end < y.end; }) - lines.begin();
 
 				if (res == lines.size())
 					return res - 1;
@@ -124,7 +124,7 @@ namespace augs {
 				lines.push_back(line());
 			}
 
-			vec2i drafter::view_caret(unsigned caret_pos, const ltrbi& clipper) const {
+			vec2i drafter::view_caret(const unsigned caret_pos, const ltrbi& clipper) const {
 				vec2i offset(0, 0);
 
 				if (!clipper.good() || !clipper.hover(ltrbi(vec2i(0, 0), get_bbox())))
@@ -133,7 +133,7 @@ namespace augs {
 				/* we are now sure that both rectangles intersect */
 
 				/* shortcut */
-				auto& l = lines[get_line(caret_pos)];
+				const auto& l = lines[get_line(caret_pos)];
 
 				/* if requested line's top is above or it won't fit at all, snap clipper to it's top */
 				if (clipper.h() < l.height() || l.top < clipper.t)
@@ -142,7 +142,7 @@ namespace augs {
 				else if (l.bottom() > clipper.b)
 					offset.y = l.bottom() - clipper.b;
 
-				int car = sectors[caret_pos];
+				const int car = sectors[caret_pos];
 				if (car <= clipper.l)
 					offset.x = car - clipper.l;
 				else if (car >= clipper.r)

@@ -18,7 +18,7 @@ namespace augs {
 					bool wrapped;
 					line();
 					void set(int y, int asc, int desc);
-					void adjust(augs::font&);
+					void adjust(const augs::font&);
 					bool empty() const;
 				};
 

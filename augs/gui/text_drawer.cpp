@@ -4,7 +4,7 @@
 
 namespace augs {
 	namespace gui {
-		void text_drawer::draw_stroke(buf& v, const rgba col, const text::caret_info* in) {
+		void text_drawer::draw_stroke(buf& v, const rgba col, const text::caret_info* const in) {
 			draft.guarded_redraw();
 
 			auto coloured_str = draft.get_str();
