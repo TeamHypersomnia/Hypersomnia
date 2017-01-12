@@ -105,7 +105,9 @@ namespace augs {
 
 			ltrb() : l(0), t(0), r(0), b(0) {}
 			ltrb(const wh<T>& rr) : l(0), t(0), r(rr.w), b(rr.h) {}
-			ltrb(const xywh<T>& rr) : l(rr.x), t(rr.y), r(rr.x + rr.w), b(rr.y + rr.h) {}
+
+			template <class B>
+			ltrb(const xywh<B>& rr) : l(static_cast<T>(rr.x)), t(static_cast<T>(rr.y)), r(static_cast<T>(rr.x + rr.w)), b(static_cast<T>(rr.y + rr.h)) {}
 			
 			template <class B>
 			ltrb(const ltrb<B>& rr) : l(static_cast<T>(rr.l)), t(static_cast<T>(rr.t)), r(static_cast<T>(rr.r)), b(static_cast<T>(rr.b)) {}

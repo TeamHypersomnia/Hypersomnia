@@ -1,5 +1,5 @@
 #include "pixel_line_connector.h"
-#include "augs/gui/material.h"
+#include "augs/graphics/drawers.h"
 
 std::vector<std::array<vec2i, 2>> get_connecting_pixel_lines(
 	const rects::ltrb<float>& a,
@@ -130,34 +130,8 @@ void draw_pixel_line_connector(
 	const rects::ltrb<float>& b,
 	const augs::gui::draw_info in,
 	const augs::rgba col
-)
-{
-	augs::gui::material line_mat(assets::texture_id::BLANK, col);
-
-	for (auto& l : get_connecting_pixel_lines(a, b)) {
-		rects::ltrb<float> line;
-		
-		if (l[0].x == l[1].x) {
-			if (l[0].y < l[1].y) {
-				line.set_position(l[0]);
-				line.set_size(1, (l[1] - l[0]).y);
-			}
-			else {
-				line.set_position(l[1]);
-				line.set_size(1, (l[0] - l[1]).y);
-			}
-		}
-		if (l[0].y == l[1].y) {
-			if (l[0].x < l[1].x) {
-				line.set_position(l[0]);
-				line.set_size((l[1] - l[0]).x, 1);
-			}
-			else {
-				line.set_position(l[1]);
-				line.set_size((l[0] - l[1]).x, 1);
-			}
-		}
-
-		augs::gui::draw_clipped_rect(line_mat, line, rects::ltrb<float>(), in.v);
+) {
+	for (const auto l : get_connecting_pixel_lines(a, b)) {
+		augs::draw_line(in.v, l[0], l[1], 1, *assets::texture_id::BLANK, col);
 	}
 }

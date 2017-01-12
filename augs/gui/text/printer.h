@@ -7,7 +7,6 @@ namespace augs {
 	namespace gui {
 		namespace text {
 			struct caret_info;
-			class ui;
 			struct drafter;
 			struct printer {
 				/* defines how the caret should blink and whether should blink at all */
@@ -45,32 +44,33 @@ namespace augs {
 					std::vector<augs::vertex_triangle>& out,
 					const drafter&,
 					const fstr& colors,
-					/* if caret is 0, draw no caret */
-					const caret_info* caret,
-					vec2i pos,
-					rects::ltrb<float> clipper = rects::ltrb<float>()) const;
+					const caret_info* const caret,
+					const vec2i pos,
+					const ltrbi clipper = ltrbi()
+				) const;
 			};
 
-			/*
-			parent shifts position and clips the text
-			wrapping_width = 0 means no wrapping
-			 parent = 0 means no clipping/shifting
-			returns text's bounding box (without clipping)
-			*/
-			extern vec2i get_text_bbox(const fstr& str, unsigned wrapping_width);
+			extern vec2i get_text_bbox(
+				const fstr& str, 
+				const unsigned wrapping_width
+			);
 
-			extern rects::wh<float> quick_print(std::vector<augs::vertex_triangle>& v,
+			extern rects::wh<float> quick_print(
+				std::vector<augs::vertex_triangle>& v,
 				const fstr& str,
-				vec2i pos,
-				unsigned wrapping_width = 0,
-				rects::ltrb<float> clipper = rects::ltrb<float>());
+				const vec2i pos,
+				const unsigned wrapping_width = 0,
+				const ltrbi clipper = ltrbi()
+			);
 
-			extern rects::wh<float> quick_print_format(std::vector<augs::vertex_triangle>& v,
+			extern rects::wh<float> quick_print_format(
+				std::vector<augs::vertex_triangle>& v,
 				const std::wstring& wstr,
-				style style,
-				vec2i pos,
-				unsigned wrapping_width = 0,
-				rects::ltrb<float> clipper = rects::ltrb<float>());
+				const style style,
+				const vec2i pos,
+				const unsigned wrapping_width = 0,
+				const ltrbi clipper = ltrbi()
+			);
 		}
 	}
 }

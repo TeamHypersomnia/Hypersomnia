@@ -44,19 +44,19 @@ namespace augs {
 				caret_visible = true;
 			}
 
-			void printer::draw_text(std::vector<augs::vertex_triangle>& out,
+			void printer::draw_text(
+				std::vector<augs::vertex_triangle>& out,
 				const drafter& d,
 				const fstr& colors,
-				const caret_info* caret,
-				vec2i pos,
-				rects::ltrb<float> clipper
-				) const
-			{
+				const caret_info* const caret,
+				const vec2i pos,
+				const ltrbi clipper
+			) const {
 				/* shortcuts */
 				auto& lines = d.lines;
 				auto& sectors = d.sectors;
 				auto& v = out;
-				bool clip = clipper.good();
+				const bool clip = clipper.good();
 
 				//if(clip) 
 				//	pos = vec2i(*parent);
@@ -64,12 +64,12 @@ namespace augs {
 				//vec2i global = scroll;
 
 				/* we'll draw caret at the very end of procedure so we have to declare this variable here */
-				rects::xywh<float> caret_rect(0, 0, 0, 0);
+				xywhi caret_rect(0, 0, 0, 0);
 
 				/* here we highlight the line caret is currently on */
 				if (caret && active && highlight_current_line) {
 					drafter::line highlighted = lines.size() ? lines[d.get_line(caret->pos)] : drafter::line();
-					gui::draw_clipped_rect(highlight_mat, rects::xywh<float>(0, highlighted.top, clip ? d.get_bbox().x + clipper.w() : d.get_bbox().x,
+					gui::draw_clipped_rect(highlight_mat, xywhi(0, highlighted.top, clip ? d.get_bbox().x + clipper.w() : d.get_bbox().x,
 
 						/* snap to default style's height */
 						highlighted.empty() ? (*(caret->default_style.f)).get_height()
@@ -151,7 +151,7 @@ namespace augs {
 									charcolor = selected_text_color;
 
 								/* add the resulting character taking bearings into account */
-								augs::draw_clipped_rect(v, xywh(sectors[i] + g.bear_x, lines[l].top + lines[l].asc - g.bear_y, g.size.x, g.size.y) + pos, 
+								augs::draw_clipped_rect(v, xywhi(sectors[i] + g.bear_x, lines[l].top + lines[l].asc - g.bear_y, g.size.x, g.size.y) + pos, 
 									g.sprite.tex, charcolor, clipper);
 							}
 						}
@@ -161,23 +161,23 @@ namespace augs {
 						/* if we can retrieve some sane values */
 						if (!lines[caret_line].empty()) {
 							if (align_caret_height)
-								caret_rect = rects::xywh<float>(sectors[caret->pos], lines[caret_line].top, caret_width, lines[caret_line].height());
+								caret_rect = xywhi(sectors[caret->pos], lines[caret_line].top, caret_width, lines[caret_line].height());
 							else {
 								int pos = std::max(1u, caret->pos);
 								auto& glyph_font = *colors[pos - 1].font_used;
-								caret_rect = rects::xywh<float>(sectors[caret->pos], lines[caret_line].top + lines[caret_line].asc - glyph_font.ascender,
+								caret_rect = xywhi(sectors[caret->pos], lines[caret_line].top + lines[caret_line].asc - glyph_font.ascender,
 									caret_width, glyph_font.get_height());
 							}
 						}
 						/* otherwise set caret's height to default style's height to avoid strange situations */
 						else
-							caret_rect = rects::xywh<float>(0, d.lines[caret_line].top, caret_width, (*caret->default_style.f).get_height());
+							caret_rect = xywhi(0, d.lines[caret_line].top, caret_width, (*caret->default_style.f).get_height());
 
 					}
 				}
 				/* there is nothing to draw, but we are still active so we want to draw caret anyway */
 				else if (active && caret)
-					caret_rect = rects::xywh<float>(0, 0, caret_width, (*caret->default_style.f).get_height());
+					caret_rect = xywhi(0, 0, caret_width, (*caret->default_style.f).get_height());
 
 				//					this->quad_indices.caret = v.size();
 				if (blink.caret_visible) gui::draw_clipped_rect(caret_mat, caret_rect + pos, clipper, v);
@@ -195,7 +195,8 @@ namespace augs {
 				const fstr& str,
 				const vec2i pos,
 				const unsigned wrapping_width,
-				const rects::ltrb<float> clipper) {
+				const ltrbi clipper
+			) {
 				drafter dr;
 				printer pr;
 				dr.wrap_width = wrapping_width;
@@ -210,7 +211,8 @@ namespace augs {
 				const gui::text::style style,
 				const vec2i pos,
 				const unsigned wrapping_width,
-				const rects::ltrb<float> clipper) {
+				const ltrbi clipper
+			) {
 				fstr str = format(wstr.c_str(), style);
 				drafter dr;
 				printer pr;
