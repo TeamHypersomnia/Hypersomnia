@@ -60,3 +60,5 @@ You might want to properly configure some variables before launching the game.
 - The game will try to read **config.local.lua** and if there is no such file, it shall try loading **config.lua**.
 
 **Explanation of config values is found within config.lua file.**
+
+After that, just go to output/ folder and open Hypersomnia.exe or Hypersomnia-Debug.exe for debugging.
