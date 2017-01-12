@@ -1,6 +1,6 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
-#include "renderable_helpers.h"
+#include "renderable_mixin.h"
 
 #include "game/components/polygon_component.h"
 #include "game/components/sprite_component.h"
@@ -12,14 +12,14 @@
 #include "game/components/sound_existence_component.h"
 
 template <bool C, class D>
-ltrb basic_renderable_helpers<C, D>::get_aabb(const renderable_positioning_type type) const {
+ltrb basic_renderable_mixin<C, D>::get_aabb(const renderable_positioning_type type) const {
 	const auto handle = *static_cast<const D*>(this);
 
 	return get_aabb(handle.logic_transform(), type);
 }
 
 template <bool C, class D>
-ltrb basic_renderable_helpers<C, D>::get_aabb(const components::transform transform, const renderable_positioning_type positioning) const {
+ltrb basic_renderable_mixin<C, D>::get_aabb(const components::transform transform, const renderable_positioning_type positioning) const {
 	const auto handle = *static_cast<const D*>(this);
 
 	const auto* const sprite = handle.find<components::sprite>();
@@ -76,14 +76,14 @@ ltrb basic_renderable_helpers<C, D>::get_aabb(const components::transform transf
 }
 
 template <bool C, class D>
-ltrb basic_renderable_helpers<C, D>::get_aabb(const interpolation_system& interp, const renderable_positioning_type type) const {
+ltrb basic_renderable_mixin<C, D>::get_aabb(const interpolation_system& interp, const renderable_positioning_type type) const {
 	const auto handle = *static_cast<const D*>(this);
 	
 	return get_aabb(handle.viewing_transform(interp, true), type);
 }
 
 // explicit instantiation
-template class renderable_helpers<false, basic_entity_handle<false>>;
-template class renderable_helpers<true, basic_entity_handle<true>>;
-template class basic_renderable_helpers<false, basic_entity_handle<false>>;
-template class basic_renderable_helpers<true, basic_entity_handle<true>>;
+template class renderable_mixin<false, basic_entity_handle<false>>;
+template class renderable_mixin<true, basic_entity_handle<true>>;
+template class basic_renderable_mixin<false, basic_entity_handle<false>>;
+template class basic_renderable_mixin<true, basic_entity_handle<true>>;

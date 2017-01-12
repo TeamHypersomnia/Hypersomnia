@@ -6,7 +6,7 @@
 class interpolation_system;
 
 template<bool is_const, class entity_handle_type>
-class basic_renderable_helpers {
+class basic_renderable_mixin {
 public:
 	ltrb get_aabb(const renderable_positioning_type type = renderable_positioning_type::CENTER) const;
 	ltrb get_aabb(const components::transform transform, const renderable_positioning_type type = renderable_positioning_type::CENTER) const;
@@ -14,13 +14,13 @@ public:
 };
 
 template<bool, class>
-class renderable_helpers;
+class renderable_mixin;
 
 template<class entity_handle_type>
-class renderable_helpers<false, entity_handle_type> : public basic_renderable_helpers<false, entity_handle_type> {
+class renderable_mixin<false, entity_handle_type> : public basic_renderable_mixin<false, entity_handle_type> {
 public:
 };
 
 template<class entity_handle_type>
-class renderable_helpers<true, entity_handle_type> : public basic_renderable_helpers<true, entity_handle_type> {
+class renderable_mixin<true, entity_handle_type> : public basic_renderable_mixin<true, entity_handle_type> {
 };

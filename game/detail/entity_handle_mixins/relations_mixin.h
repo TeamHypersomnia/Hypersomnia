@@ -13,7 +13,7 @@
 struct entity_relations;
 
 template<bool is_const, class entity_handle_type>
-class basic_relations_helpers {
+class basic_relations_mixin {
 protected:
 	typedef basic_inventory_slot_handle<is_const> inventory_slot_handle_type;
 	
@@ -38,10 +38,10 @@ public:
 };
 
 template<bool, class>
-class relations_helpers;
+class relations_mixin;
 
 template<class entity_handle_type>
-class relations_helpers<false, entity_handle_type> : public basic_relations_helpers<false, entity_handle_type> {
+class relations_mixin<false, entity_handle_type> : public basic_relations_mixin<false, entity_handle_type> {
 protected:
 	components::child& child_component() const;
 	components::sub_entities& sub_entities_component() const;
@@ -88,7 +88,7 @@ public:
 };
 
 template<class entity_handle_type>
-class relations_helpers<true, entity_handle_type> : public basic_relations_helpers<true, entity_handle_type> {
+class relations_mixin<true, entity_handle_type> : public basic_relations_mixin<true, entity_handle_type> {
 public:
 
 	template <class F>

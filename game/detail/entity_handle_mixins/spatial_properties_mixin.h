@@ -5,7 +5,7 @@
 class interpolation_system;
 
 template<bool is_const, class entity_handle_type>
-class basic_spatial_properties_getters {
+class basic_spatial_properties_mixin {
 public:
 	bool has_logic_transform() const;
 	components::transform logic_transform() const;
@@ -14,14 +14,14 @@ public:
 };
 
 template<bool, class>
-class spatial_properties_getters;
+class spatial_properties_mixin;
 
 template<class entity_handle_type>
-class spatial_properties_getters<false, entity_handle_type> : public basic_spatial_properties_getters<false, entity_handle_type> {
+class spatial_properties_mixin<false, entity_handle_type> : public basic_spatial_properties_mixin<false, entity_handle_type> {
 public:
 	void set_logic_transform(const components::transform) const;
 };
 
 template<class entity_handle_type>
-class spatial_properties_getters<true, entity_handle_type> : public basic_spatial_properties_getters<true, entity_handle_type> {
+class spatial_properties_mixin<true, entity_handle_type> : public basic_spatial_properties_mixin<true, entity_handle_type> {
 };

@@ -357,8 +357,11 @@
     <ClCompile Include="game\components\gui_element_component.cpp" />
     <ClCompile Include="game\components\light_component.cpp" />
     <ClCompile Include="game\components\sound_existence_component.cpp" />
-    <ClCompile Include="game\detail\entity\renderable_helpers.cpp" />
-    <ClCompile Include="game\detail\entity\spatial_properties_getters.cpp" />
+    <ClCompile Include="game\detail\entity_handle_mixins\inventory_mixin.cpp" />
+    <ClCompile Include="game\detail\entity_handle_mixins\physics_mixin.cpp" />
+    <ClCompile Include="game\detail\entity_handle_mixins\relations_mixin.cpp" />
+    <ClCompile Include="game\detail\entity_handle_mixins\renderable_mixin.cpp" />
+    <ClCompile Include="game\detail\entity_handle_mixins\spatial_properties_mixin.cpp" />
     <ClCompile Include="game\detail\gui\aabb_highlighter.cpp" />
     <ClCompile Include="game\detail\gui\drag_and_drop.cpp" />
     <ClCompile Include="game\detail\gui\grid.cpp" />
@@ -396,9 +399,6 @@
     <ClCompile Include="game\transcendental\cosmic_movie_director.cpp" />
     <ClCompile Include="game\transcendental\cosmic_profiler.cpp" />
     <ClCompile Include="game\detail\convex_partitioned_shape.cpp" />
-    <ClCompile Include="game\detail\entity\inventory_getters.cpp" />
-    <ClCompile Include="game\detail\entity\physics_getters.cpp" />
-    <ClCompile Include="game\detail\entity\relations_helpers.cpp" />
     <ClCompile Include="game\transcendental\entity_intent.cpp" />
     <ClCompile Include="application\game_window.cpp" />
     <ClCompile Include="game\global\input_context.cpp" />
@@ -1103,8 +1103,11 @@
     <ClInclude Include="game\container_sizes.h" />
     <ClInclude Include="game\detail\basic_renderable_drawing_input.h" />
     <ClInclude Include="game\detail\camera_cone.h" />
-    <ClInclude Include="game\detail\entity\renderable_helpers.h" />
-    <ClInclude Include="game\detail\entity\spatial_properties_getters.h" />
+    <ClInclude Include="game\detail\entity_handle_mixins\inventory_mixin.h" />
+    <ClInclude Include="game\detail\entity_handle_mixins\physics_mixin.h" />
+    <ClInclude Include="game\detail\entity_handle_mixins\relations_mixin.h" />
+    <ClInclude Include="game\detail\entity_handle_mixins\renderable_mixin.h" />
+    <ClInclude Include="game\detail\entity_handle_mixins\spatial_properties_mixin.h" />
     <ClInclude Include="game\detail\gui\aabb_highlighter.h" />
     <ClInclude Include="game\detail\gui\drag_and_drop.h" />
     <ClInclude Include="game\detail\gui\game_gui_context.h" />
@@ -1160,9 +1163,6 @@
     <ClInclude Include="game\components\processing_component.h" />
     <ClInclude Include="game\components\special_physics_component.h" />
     <ClInclude Include="game\component_synchronizer.h" />
-    <ClInclude Include="game\detail\entity\inventory_getters.h" />
-    <ClInclude Include="game\detail\entity\physics_getters.h" />
-    <ClInclude Include="game\detail\entity\relations_helpers.h" />
     <ClInclude Include="game\components\meta_component.h" />
     <ClInclude Include="game\components\substance_component.h" />
     <ClInclude Include="game\detail\convex_partitioned_shape.h" />

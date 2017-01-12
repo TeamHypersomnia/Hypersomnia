@@ -6,10 +6,10 @@
 #include "game/components/gun_component.h"
 #include "game/transcendental/cosmos.h"
 
-#include "inventory_getters.h"
+#include "inventory_mixin.h"
 
 template <bool C, class D>
-D basic_inventory_getters<C, D>::get_owning_transfer_capability() const {
+D basic_inventory_mixin<C, D>::get_owning_transfer_capability() const {
 	const auto& self = *static_cast<const D*>(this);
 	auto& cosmos = self.get_cosmos();
 
@@ -31,7 +31,7 @@ D basic_inventory_getters<C, D>::get_owning_transfer_capability() const {
 }
 
 template <bool C, class D>
-typename basic_inventory_getters<C, D>::inventory_slot_handle_type basic_inventory_getters<C, D>::first_free_hand() const {
+typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory_mixin<C, D>::first_free_hand() const {
 	const auto& self = *static_cast<const D*>(this);
 	auto& cosmos = self.get_cosmos();
 
@@ -50,7 +50,7 @@ typename basic_inventory_getters<C, D>::inventory_slot_handle_type basic_invento
 }
 
 template <bool C, class D>
-typename basic_inventory_getters<C, D>::inventory_slot_handle_type basic_inventory_getters<C, D>::get_current_slot() const {
+typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory_mixin<C, D>::get_current_slot() const {
 	const auto& self = *static_cast<const D*>(this);
 	
 	const auto* const maybe_item = self.find<components::item>();
@@ -63,7 +63,7 @@ typename basic_inventory_getters<C, D>::inventory_slot_handle_type basic_invento
 }
 
 template <bool C, class D>
-inventory_item_address basic_inventory_getters<C, D>::get_address_from_root() const {
+inventory_item_address basic_inventory_mixin<C, D>::get_address_from_root() const {
 	const auto& self = *static_cast<const D*>(this);
 	auto& cosmos = self.get_cosmos();
 
@@ -83,7 +83,7 @@ inventory_item_address basic_inventory_getters<C, D>::get_address_from_root() co
 }
 
 template <bool C, class D>
-bool basic_inventory_getters<C, D>::wields_in_primary_hand(const const_entity_handle what_item) const {
+bool basic_inventory_mixin<C, D>::wields_in_primary_hand(const const_entity_handle what_item) const {
 	const auto& self = *static_cast<const D*>(this);
 	auto& cosmos = self.get_cosmos();
 
@@ -91,7 +91,7 @@ bool basic_inventory_getters<C, D>::wields_in_primary_hand(const const_entity_ha
 }
 
 template <bool C, class D>
-bool basic_inventory_getters<C, D>::wields_in_secondary_hand(const const_entity_handle what_item) const {
+bool basic_inventory_mixin<C, D>::wields_in_secondary_hand(const const_entity_handle what_item) const {
 	const auto& self = *static_cast<const D*>(this);
 	auto& cosmos = self.get_cosmos();
 
@@ -99,7 +99,7 @@ bool basic_inventory_getters<C, D>::wields_in_secondary_hand(const const_entity_
 }
 
 template <bool C, class D>
-typename basic_inventory_getters<C, D>::inventory_slot_handle_type basic_inventory_getters<C, D>::determine_hand_holstering_slot_in(const D searched_root_container) const {
+typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory_mixin<C, D>::determine_hand_holstering_slot_in(const D searched_root_container) const {
 	const auto& item_entity = *static_cast<const D*>(this);
 	auto& cosmos = item_entity.get_cosmos();
 
@@ -134,7 +134,7 @@ typename basic_inventory_getters<C, D>::inventory_slot_handle_type basic_invento
 }
 
 template <bool C, class D>
-typename basic_inventory_getters<C, D>::inventory_slot_handle_type basic_inventory_getters<C, D>::determine_pickup_target_slot_in(const D searched_root_container) const {
+typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory_mixin<C, D>::determine_pickup_target_slot_in(const D searched_root_container) const {
 	const auto& item_entity = *static_cast<const D*>(this);
 	ensure(item_entity.alive());
 	ensure(searched_root_container.alive());
@@ -158,7 +158,7 @@ typename basic_inventory_getters<C, D>::inventory_slot_handle_type basic_invento
 }
 
 template <bool C, class D>
-typename basic_inventory_getters<C, D>::inventory_slot_handle_type basic_inventory_getters<C, D>::map_primary_action_to_secondary_hand_if_primary_empty(const bool is_action_secondary) const {
+typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory_mixin<C, D>::map_primary_action_to_secondary_hand_if_primary_empty(const bool is_action_secondary) const {
 	const auto& root_container = *static_cast<const D*>(this);
 
 	const auto primary = root_container[slot_function::PRIMARY_HAND];
@@ -173,7 +173,7 @@ typename basic_inventory_getters<C, D>::inventory_slot_handle_type basic_invento
 }
 
 template <bool C, class D>
-std::vector<D> basic_inventory_getters<C, D>::guns_wielded() const {
+std::vector<D> basic_inventory_mixin<C, D>::guns_wielded() const {
 	const auto& subject = *static_cast<const D*>(this);
 	std::vector<D> result;
 
@@ -197,12 +197,12 @@ std::vector<D> basic_inventory_getters<C, D>::guns_wielded() const {
 }
 
 template <class D>
-void inventory_getters<false, D>::wield_in_hands(const entity_id first = entity_id(), const entity_id second = entity_id()) const {
+void inventory_mixin<false, D>::wield_in_hands(const entity_id first = entity_id(), const entity_id second = entity_id()) const {
 
 }
 
 // explicit instantiation
-template class basic_inventory_getters<false, basic_entity_handle<false>>;
-template class basic_inventory_getters<true, basic_entity_handle<true>>;
-template class inventory_getters<false, basic_entity_handle<false>>;
-template class inventory_getters<true, basic_entity_handle<true>>;
+template class basic_inventory_mixin<false, basic_entity_handle<false>>;
+template class basic_inventory_mixin<true, basic_entity_handle<true>>;
+template class inventory_mixin<false, basic_entity_handle<false>>;
+template class inventory_mixin<true, basic_entity_handle<true>>;

@@ -13,11 +13,11 @@
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/types_specification/all_components_declaration.h"
 
-#include "game/detail/entity/inventory_getters.h"
-#include "game/detail/entity/physics_getters.h"
-#include "game/detail/entity/relations_helpers.h"
-#include "game/detail/entity/spatial_properties_getters.h"
-#include "game/detail/entity/renderable_helpers.h"
+#include "game/detail/entity_handle_mixins/inventory_mixin.h"
+#include "game/detail/entity_handle_mixins/physics_mixin.h"
+#include "game/detail/entity_handle_mixins/relations_mixin.h"
+#include "game/detail/entity_handle_mixins/spatial_properties_mixin.h"
+#include "game/detail/entity_handle_mixins/renderable_mixin.h"
 
 #include "game/enums/entity_flag.h"
 
@@ -31,18 +31,19 @@ template <bool is_const>
 class basic_entity_handle :
 	private augs::component_allocators_mixin<is_const, basic_entity_handle<is_const>>,
 	public augs::component_setters_mixin<is_const, basic_entity_handle<is_const>>,
-	public inventory_getters<is_const, basic_entity_handle<is_const>>,
-	public physics_getters<is_const, basic_entity_handle<is_const>>,
-	public relations_helpers<is_const, basic_entity_handle<is_const>>,
-	public spatial_properties_getters<is_const, basic_entity_handle<is_const>>,
-	public renderable_helpers<is_const, basic_entity_handle<is_const>>
+
+	public inventory_mixin<is_const, basic_entity_handle<is_const>>,
+	public physics_mixin<is_const, basic_entity_handle<is_const>>,
+	public relations_mixin<is_const, basic_entity_handle<is_const>>,
+	public renderable_mixin<is_const, basic_entity_handle<is_const>>,
+	public spatial_properties_mixin<is_const, basic_entity_handle<is_const>>
 {
 public:
 	static constexpr bool is_const_value = is_const;
 private:
 
-	friend class relations_helpers<is_const, basic_entity_handle<is_const>>;
-	template <bool, class> friend class basic_relations_helpers;
+	friend class relations_mixin<is_const, basic_entity_handle<is_const>>;
+	template <bool, class> friend class basic_relations_mixin;
 
 	typedef maybe_const_ref_t<is_const, cosmos> owner_reference;
 

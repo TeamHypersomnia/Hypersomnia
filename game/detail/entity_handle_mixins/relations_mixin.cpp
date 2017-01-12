@@ -1,4 +1,4 @@
-#include "relations_helpers.h"
+#include "relations_mixin.h"
 #include "game/detail/inventory_slot_id.h"
 #include "game/detail/inventory_slot_handle.h"
 #include "game/transcendental/entity_handle.h"
@@ -11,7 +11,7 @@
 #include "augs/templates/container_templates.h"
 
 template <class D>
-void relations_helpers<false, D>::make_child(entity_id ch_id, sub_entity_name optional_name) const {
+void relations_mixin<false, D>::make_child(entity_id ch_id, sub_entity_name optional_name) const {
 	auto& self = *static_cast<const D*>(this);
 	auto& cosmos = self.get_cosmos();
 
@@ -24,7 +24,7 @@ void relations_helpers<false, D>::make_child(entity_id ch_id, sub_entity_name op
 }
 
 template <class D>
-components::child& relations_helpers<false, D>::child_component() const {
+components::child& relations_mixin<false, D>::child_component() const {
 	auto& self = *static_cast<const D*>(this);
 
 	if (!self.has<components::child>())
@@ -34,7 +34,7 @@ components::child& relations_helpers<false, D>::child_component() const {
 }
 
 template <class D>
-components::sub_entities& relations_helpers<false, D>::sub_entities_component() const {
+components::sub_entities& relations_mixin<false, D>::sub_entities_component() const {
 	auto& self = *static_cast<const D*>(this);
 
 	if (!self.has<components::sub_entities>())
@@ -44,7 +44,7 @@ components::sub_entities& relations_helpers<false, D>::sub_entities_component() 
 }
 
 template <class D>
-components::physical_relations& relations_helpers<false, D>::physical_relations_component() const {
+components::physical_relations& relations_mixin<false, D>::physical_relations_component() const {
 	auto& self = *static_cast<const D*>(this);
 
 	if (!self.has<components::physical_relations>())
@@ -54,7 +54,7 @@ components::physical_relations& relations_helpers<false, D>::physical_relations_
 }
 
 template <class D>
-void relations_helpers<false, D>::make_cloned_sub_entities_recursive(entity_id from) const {
+void relations_mixin<false, D>::make_cloned_sub_entities_recursive(entity_id from) const {
 	auto& self = *static_cast<const D*>(this);
 	auto& cosmos = self.get_cosmos();
 	auto from_rels = cosmos[from].get_sub_entities_component();
@@ -67,7 +67,7 @@ void relations_helpers<false, D>::make_cloned_sub_entities_recursive(entity_id f
 }
 
 template <class D>
-void relations_helpers<false, D>::set_owner_body(entity_id owner_id) const {
+void relations_mixin<false, D>::set_owner_body(entity_id owner_id) const {
 	auto& self = *static_cast<const D*>(this);
 
 	auto& cosmos = self.get_cosmos();
@@ -93,25 +93,25 @@ void relations_helpers<false, D>::set_owner_body(entity_id owner_id) const {
 }
 
 template <class D>
-void relations_helpers<false, D>::add_sub_entity(entity_id p, sub_entity_name optional_name = sub_entity_name::INVALID) const {
+void relations_mixin<false, D>::add_sub_entity(entity_id p, sub_entity_name optional_name = sub_entity_name::INVALID) const {
 	make_child(p, optional_name);
 	sub_entities_component().other_sub_entities.push_back(p);
 }
 
 template <class D>
-void relations_helpers<false, D>::map_sub_entity(sub_entity_name n, entity_id p) const {
+void relations_mixin<false, D>::map_sub_entity(sub_entity_name n, entity_id p) const {
 	make_child(p, n);
 	sub_entities_component().sub_entities_by_name[n] = p;
 }
 
 template <bool C, class D>
-typename basic_relations_helpers<C, D>::inventory_slot_handle_type basic_relations_helpers<C, D>::operator[](slot_function func) const {
+typename basic_relations_mixin<C, D>::inventory_slot_handle_type basic_relations_mixin<C, D>::operator[](slot_function func) const {
 	auto& self = *static_cast<const D*>(this);
 	return inventory_slot_handle_type(self.owner, inventory_slot_id(func, self.raw_id));
 }
 
 template <bool C, class D>
-D basic_relations_helpers<C, D>::operator[](sub_entity_name child) const {
+D basic_relations_mixin<C, D>::operator[](sub_entity_name child) const {
 	auto& self = *static_cast<const D*>(this);
 	const auto& subs = get_sub_entities_component().sub_entities_by_name;
 
@@ -125,32 +125,32 @@ D basic_relations_helpers<C, D>::operator[](sub_entity_name child) const {
 }
 
 template <bool C, class D>
-D basic_relations_helpers<C, D>::get_owner_body() const {
+D basic_relations_mixin<C, D>::get_owner_body() const {
 	auto& self = *static_cast<const D*>(this);
 	return self.get_cosmos()[get_physical_relations_component().owner_body];
 }
 
 template <bool C, class D>
-std::vector<D> basic_relations_helpers<C, D>::get_fixture_entities() const {
+std::vector<D> basic_relations_mixin<C, D>::get_fixture_entities() const {
 	auto& self = *static_cast<const D*>(this);
 	return self.get_cosmos()[get_physical_relations_component().fixture_entities];
 }
 
 #if COSMOS_TRACKS_GUIDS
 template <bool C, class D>
-unsigned basic_relations_helpers<C, D>::get_guid() const {
+unsigned basic_relations_mixin<C, D>::get_guid() const {
 	auto& self = *static_cast<const D*>(this);
 	return self.get<components::guid>().value;
 }
 #endif
 
 template <bool C, class D>
-sub_entity_name basic_relations_helpers<C, D>::get_name_as_sub_entity() const {
+sub_entity_name basic_relations_mixin<C, D>::get_name_as_sub_entity() const {
 	return get_child_component().name_as_sub_entity;
 }
 
 template <bool C, class D>
-D basic_relations_helpers<C, D>::get_parent() const {
+D basic_relations_mixin<C, D>::get_parent() const {
 	auto& self = *static_cast<const D*>(this);
 	entity_id parent = get_child_component().parent;
 	return self.get_cosmos()[parent];
@@ -158,7 +158,7 @@ D basic_relations_helpers<C, D>::get_parent() const {
 
 
 template <bool C, class D>
-const components::child& basic_relations_helpers<C, D>::get_child_component() const {
+const components::child& basic_relations_mixin<C, D>::get_child_component() const {
 	static thread_local const components::child original;
 	
 	const auto& self = *static_cast<const D*>(this);
@@ -170,7 +170,7 @@ const components::child& basic_relations_helpers<C, D>::get_child_component() co
 }
 
 template <bool C, class D>
-const components::sub_entities& basic_relations_helpers<C, D>::get_sub_entities_component() const {
+const components::sub_entities& basic_relations_mixin<C, D>::get_sub_entities_component() const {
 	static thread_local const components::sub_entities original;
 	
 	const auto& self = *static_cast<const D*>(this);
@@ -182,7 +182,7 @@ const components::sub_entities& basic_relations_helpers<C, D>::get_sub_entities_
 }
 
 template <bool C, class D>
-const components::physical_relations& basic_relations_helpers<C, D>::get_physical_relations_component() const {
+const components::physical_relations& basic_relations_mixin<C, D>::get_physical_relations_component() const {
 	static thread_local const components::physical_relations original;
 	
 	const auto& self = *static_cast<const D*>(this);
@@ -193,7 +193,7 @@ const components::physical_relations& basic_relations_helpers<C, D>::get_physica
 	return original;
 }
 
-template class basic_relations_helpers<false, basic_entity_handle<false>>;
-template class basic_relations_helpers<true, basic_entity_handle<true>>;
-template class relations_helpers<false, basic_entity_handle<false>>;
-template class relations_helpers<true, basic_entity_handle<true>>;
+template class basic_relations_mixin<false, basic_entity_handle<false>>;
+template class basic_relations_mixin<true, basic_entity_handle<true>>;
+template class relations_mixin<false, basic_entity_handle<false>>;
+template class relations_mixin<true, basic_entity_handle<true>>;

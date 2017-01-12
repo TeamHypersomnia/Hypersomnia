@@ -5,11 +5,11 @@
 #include "game/components/wandering_pixels_component.h"
 #include "game/components/position_copying_component.h"
 #include "game/transcendental/cosmos.h"
-#include "spatial_properties_getters.h"
+#include "spatial_properties_mixin.h"
 #include "game/systems_audiovisual/interpolation_system.h"
 
 template <bool C, class D>
-bool basic_spatial_properties_getters<C, D>::has_logic_transform() const {
+bool basic_spatial_properties_mixin<C, D>::has_logic_transform() const {
 	const auto handle = *static_cast<const D*>(this);
 	const auto owner = handle.get_owner_body();
 	
@@ -27,7 +27,7 @@ bool basic_spatial_properties_getters<C, D>::has_logic_transform() const {
 }
 
 template <bool C, class D>
-components::transform basic_spatial_properties_getters<C, D>::logic_transform() const {
+components::transform basic_spatial_properties_mixin<C, D>::logic_transform() const {
 	const auto handle = *static_cast<const D*>(this);
 
 	const auto owner = handle.get_owner_body();
@@ -49,7 +49,7 @@ components::transform basic_spatial_properties_getters<C, D>::logic_transform() 
 }
 
 template <bool C, class D>
-vec2 basic_spatial_properties_getters<C, D>::get_effective_velocity() const {
+vec2 basic_spatial_properties_mixin<C, D>::get_effective_velocity() const {
 	const auto handle = *static_cast<const D*>(this);
 	const auto owner = handle.get_owner_body();
 
@@ -67,13 +67,13 @@ vec2 basic_spatial_properties_getters<C, D>::get_effective_velocity() const {
 }
 
 template <bool C, class D>
-components::transform basic_spatial_properties_getters<C, D>::viewing_transform(const interpolation_system& sys, const bool integerize) const {
+components::transform basic_spatial_properties_mixin<C, D>::viewing_transform(const interpolation_system& sys, const bool integerize) const {
 	const auto handle = *static_cast<const D*>(this);
 	return ::viewing_transform(sys, handle, integerize);
 }
 
 template <class D>
-void spatial_properties_getters<false, D>::set_logic_transform(const components::transform t) const {
+void spatial_properties_mixin<false, D>::set_logic_transform(const components::transform t) const {
 	if (logic_transform() == t) {
 		return;
 	}
@@ -100,7 +100,7 @@ void spatial_properties_getters<false, D>::set_logic_transform(const components:
 }
 
 // explicit instantiation
-template class spatial_properties_getters<false, basic_entity_handle<false>>;
-template class spatial_properties_getters<true, basic_entity_handle<true>>;
-template class basic_spatial_properties_getters<false, basic_entity_handle<false>>;
-template class basic_spatial_properties_getters<true, basic_entity_handle<true>>;
+template class spatial_properties_mixin<false, basic_entity_handle<false>>;
+template class spatial_properties_mixin<true, basic_entity_handle<true>>;
+template class basic_spatial_properties_mixin<false, basic_entity_handle<false>>;
+template class basic_spatial_properties_mixin<true, basic_entity_handle<true>>;
