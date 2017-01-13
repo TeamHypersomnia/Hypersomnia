@@ -40,7 +40,7 @@ namespace components {
 
 		hotbar_selection_setup last_setups[2];
 
-		unsigned char current_hotbar_setup = 0;
+		unsigned char current_hotbar_selection_setup = 0;
 		bool is_gui_look_enabled = false;
 		bool preview_due_to_item_picking_request = false;
 		bool draw_free_space_inside_container_icons = true;
@@ -64,24 +64,29 @@ namespace components {
 		void draw_cursor_with_information(vertex_triangle_buffer& output_buffer, const viewing_gui_context&) const;
 
 		static void assign_item_to_hotbar_button(
-			const size_t button_index, 
-			const entity_handle element_entity, 
+			const size_t button_index,
+			const entity_handle element_entity,
+			const const_entity_handle item_entity
+		);		
+		
+		static void assign_item_to_first_free_hotbar_button(
+			const entity_handle element_entity,
 			const const_entity_handle item_entity
 		);
 
-		static bool apply_and_save_hotbar_setup(
+		static bool apply_and_save_hotbar_selection_setup(
 			logic_step&,
 			const hotbar_selection_setup new_setup,
 			const entity_handle element_entity
 		);
 
-		static bool apply_hotbar_setup(
+		static bool apply_hotbar_selection_setup(
 			logic_step&,
 			const hotbar_selection_setup new_setup,
 			const entity_handle element_entity
 		);
 
-		static hotbar_selection_setup get_current_hotbar_setup(
+		static hotbar_selection_setup get_current_hotbar_selection_setup(
 			const const_entity_handle element_entity
 		);
 

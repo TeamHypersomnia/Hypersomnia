@@ -112,6 +112,8 @@ void trigger_detector_system::send_trigger_confirmations(logic_step& step) const
 		
 		std::vector<entity_id> found_triggers;
 
+		ensure(detector_body.alive());
+
 		const auto found_physical_triggers = cosmos.systems_temporary.get<physics_system>().query_body(detector_body, filters::trigger());
 
 		for (const auto found_trigger_id : found_physical_triggers.entities) {

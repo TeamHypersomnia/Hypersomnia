@@ -304,7 +304,32 @@ namespace components {
 		element.hotbar_buttons[button_index].last_assigned_entity = item;
 	}
 
-	bool gui_element::apply_hotbar_setup(
+	void gui_element::assign_item_to_first_free_hotbar_button(
+		const entity_handle element_entity,
+		const const_entity_handle item
+	) {
+		auto& element = element_entity.get<components::gui_element>();
+
+		auto try_assign = [&](const size_t i) {
+			if (element.hotbar_buttons[i].get_assigned_entity(element_entity).dead()) {
+				assign_item_to_hotbar_button(i, element_entity, item);
+
+				return true;
+			}
+
+			return false;
+		};
+
+		for (size_t i = 1; i < element.hotbar_buttons.size(); ++i) {
+			if (try_assign(i)) {
+				return;
+			}
+		}
+		
+		try_assign(0);
+	}
+
+	bool gui_element::apply_hotbar_selection_setup(
 		logic_step& step,
 		const hotbar_selection_setup new_setup,
 		const entity_handle element_entity
@@ -325,19 +350,19 @@ namespace components {
 		return element_entity.wield_in_hands(step, first_item, second_item);
 	}
 
-	bool gui_element::apply_and_save_hotbar_setup(
+	bool gui_element::apply_and_save_hotbar_selection_setup(
 		logic_step& step,
 		const hotbar_selection_setup new_setup,
 		const entity_handle element_entity
 	) {
-		if (new_setup == get_current_hotbar_setup(element_entity)) {
+		if (new_setup == get_current_hotbar_selection_setup(element_entity)) {
 			return true;
 		}
 
-		if (apply_hotbar_setup(step, new_setup, element_entity)) {
+		if (apply_hotbar_selection_setup(step, new_setup, element_entity)) {
 			auto& element = element_entity.get<components::gui_element>();
 
-			auto& current = element.current_hotbar_setup;
+			auto& current = element.current_hotbar_selection_setup;
 			current = 1 - current;
 
 			element.last_setups[current] = new_setup;
@@ -349,7 +374,7 @@ namespace components {
 	}
 
 
-	gui_element::hotbar_selection_setup gui_element::get_current_hotbar_setup(
+	gui_element::hotbar_selection_setup gui_element::get_current_hotbar_selection_setup(
 		const const_entity_handle element_entity
 	) {
 		hotbar_selection_setup output;
