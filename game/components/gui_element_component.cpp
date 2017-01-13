@@ -286,33 +286,44 @@ namespace components {
 		return entity_id();
 	}
 
+	void gui_element::clear_hotbar_selection_for_item(
+		const entity_handle element_entity,
+		const const_entity_handle item_entity
+	) {
+		auto& element = element_entity.get<components::gui_element>();
+
+		for (auto& h : element.hotbar_buttons) {
+			if (h.last_assigned_entity == item_entity) {
+				h.last_assigned_entity.unset();
+			}
+		}
+	}
+
 	void gui_element::assign_item_to_hotbar_button(
 		const size_t button_index, 
 		const entity_handle element_entity, 
 		const const_entity_handle item
 	) {
+		clear_hotbar_selection_for_item(element_entity, item);
+
 		ensure(item.get_owning_transfer_capability() == element_entity);
 
 		auto& element = element_entity.get<components::gui_element>();
-
-		for (auto& h : element.hotbar_buttons) {
-			if (h.last_assigned_entity == item) {
-				h.last_assigned_entity.unset();
-			}
-		}
-
 		element.hotbar_buttons[button_index].last_assigned_entity = item;
+		LOG_NVPS(button_index);
 	}
 
 	void gui_element::assign_item_to_first_free_hotbar_button(
 		const entity_handle element_entity,
 		const const_entity_handle item
 	) {
-		auto& element = element_entity.get<components::gui_element>();
+		clear_hotbar_selection_for_item(element_entity, item);
 
-		auto try_assign = [&](const size_t i) {
-			if (element.hotbar_buttons[i].get_assigned_entity(element_entity).dead()) {
-				assign_item_to_hotbar_button(i, element_entity, item);
+		const auto& element = element_entity.get<components::gui_element>();
+
+		auto try_assign = [&](const size_t n) {
+			if (element.hotbar_buttons[n].get_assigned_entity(element_entity).dead()) {
+				assign_item_to_hotbar_button(n, element_entity, item);
 
 				return true;
 			}
@@ -334,7 +345,7 @@ namespace components {
 		const hotbar_selection_setup new_setup,
 		const entity_handle element_entity
 	) {
-		auto& element = element_entity.get<components::gui_element>();
+		const auto& element = element_entity.get<components::gui_element>();
 
 		entity_id first_item;
 		entity_id second_item;

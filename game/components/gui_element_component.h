@@ -62,6 +62,11 @@ namespace components {
 		
 		void draw_tooltip_from_hover_or_world_highlight(vertex_triangle_buffer& output_buffer, const viewing_gui_context&, const vec2i tooltip_pos) const;
 		void draw_cursor_with_information(vertex_triangle_buffer& output_buffer, const viewing_gui_context&) const;
+		
+		static void clear_hotbar_selection_for_item(
+			const entity_handle element_entity,
+			const const_entity_handle item_entity
+		);
 
 		static void assign_item_to_hotbar_button(
 			const size_t button_index,
