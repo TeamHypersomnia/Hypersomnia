@@ -191,7 +191,7 @@ namespace augs {
 		std::array<int16_t, 4096> read_buf;
 		size_t read_size = 0;
 
-		while ((read_size = sf_read_short(file, read_buf.data(), read_buf.size())) != 0) {
+		while ((read_size = static_cast<size_t>(sf_read_short(file, read_buf.data(), read_buf.size()))) != 0) {
 			new_data.samples.insert(new_data.samples.end(), read_buf.begin(), read_buf.begin() + read_size);
 		}
 

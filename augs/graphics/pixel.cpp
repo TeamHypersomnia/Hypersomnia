@@ -11,10 +11,10 @@ namespace augs {
 		} rgb;
 	}
 
-	static hsv      rgb2hsv(rgb in);
-	static rgb      hsv2rgb(hsv in);
+	static hsv      rgb2hsv(const rgb in);
+	static rgb      hsv2rgb(const hsv in);
 
-	hsv rgb2hsv(rgb in)
+	hsv rgb2hsv(const rgb in)
 	{
 		hsv         out;
 		double      min, max, delta;
@@ -54,7 +54,7 @@ namespace augs {
 	}
 
 
-	rgb hsv2rgb(hsv in)
+	rgb hsv2rgb(const hsv in)
 	{
 		double      hh, p, q, t, ff;
 		long        i;
@@ -112,7 +112,7 @@ namespace augs {
 		return out;
 	}
 
-	rgba::rgba(console_color c) {
+	rgba::rgba(const console_color c) {
 		switch (c) {
 		case console_color::WHITE: set(white); break;
 		case console_color::RED: set(red); break;
@@ -122,19 +122,19 @@ namespace augs {
 		}
 	}
 
-	rgba::rgba(rgba_channel red, rgba_channel green, rgba_channel blue, rgba_channel alpha) : r(red), g(green), b(blue), a(alpha) {}
+	rgba::rgba(const rgba_channel red, const rgba_channel green, const rgba_channel blue, const rgba_channel alpha) : r(red), g(green), b(blue), a(alpha) {}
 
-	hsv::hsv(double h, double s, double v) : h(h), s(s), v(v) {}
+	hsv::hsv(const double h, const double s, const double v) : h(h), s(s), v(v) {}
 	
-	hsv hsv::operator*(float x) const {
+	hsv hsv::operator*(const float x) const {
 		return hsv(h * x, s * x, v * x);
 	}
 
-	hsv hsv::operator+(hsv b) const {
+	hsv hsv::operator+(const hsv b) const {
 		return hsv(h + b.h, s + b.s, v + b.v);
 	}
 
-	void rgba::set(rgba_channel red, rgba_channel green, rgba_channel blue, rgba_channel alpha) {
+	void rgba::set(const rgba_channel red, const rgba_channel green, const rgba_channel blue, const rgba_channel alpha) {
 		*this = rgba(red, green, blue, alpha);
 	}
 
@@ -142,23 +142,23 @@ namespace augs {
 		*this = col;
 	}
 
-	rgba rgba::operator*(rgba s) const {
+	rgba rgba::operator*(const rgba s) const {
 		return rgba(
-			(s.r / 255.*r / 255.) * 255,
-			(s.g / 255.*g / 255.) * 255,
-			(s.b / 255.*b / 255.) * 255,
-			(s.a / 255.*a / 255.) * 255);
+			static_cast<rgba_channel>((s.r / 255.*r / 255.) * 255),
+			static_cast<rgba_channel>((s.g / 255.*g / 255.) * 255),
+			static_cast<rgba_channel>((s.b / 255.*b / 255.) * 255),
+			static_cast<rgba_channel>((s.a / 255.*a / 255.) * 255));
 	}
 
-	rgba rgba::operator*(float s) const {
+	rgba rgba::operator*(const float s) const {
 		return rgba(
-			s * r,
-			s * g,
-			s * b,
-			s * a);
+			static_cast<rgba_channel>(s * r),
+			static_cast<rgba_channel>(s * g),
+			static_cast<rgba_channel>(s * b),
+			static_cast<rgba_channel>(s * a));
 	}
 
-	rgba rgba::operator+(rgba s) const {
+	rgba rgba::operator+(const rgba s) const {
 		return rgba(
 			std::min(255u, static_cast<unsigned>(s.r) + r),
 			std::min(255u, static_cast<unsigned>(s.g) + g),
@@ -166,7 +166,7 @@ namespace augs {
 			std::min(255u, static_cast<unsigned>(s.a) + a));
 	}
 
-	rgba& rgba::operator*=(rgba b) {
+	rgba& rgba::operator*=(const rgba b) {
 		return (*this = *this * b);
 	}
 
@@ -191,7 +191,7 @@ namespace augs {
 		return *(std::array<rgba_channel, 3>*)this;
 	}
 
-	rgba& rgba::set_hsv(hsv hsv) {
+	rgba& rgba::set_hsv(const hsv hsv) {
 		auto res = hsv2rgb({ hsv.h * 360, hsv.s, hsv.v });
 		return (*this = rgba{ rgba_channel(res.r * 255), rgba_channel(res.g * 255), rgba_channel(res.b * 255), a });
 	}
