@@ -19,11 +19,11 @@ namespace resource_setups {
 			em.swings_per_sec.set(0.3/2, 0.5/2);
 			em.swing_spread_change_rate.set(0.3/2, 0.5/2);
 
-			em.spread_degrees = std::make_pair(7, 7);
-			em.particles_per_sec = std::make_pair(40, 50);
-			em.stream_duration_ms = std::make_pair(3000000, 3000000);
+			em.spread_degrees.set(7, 7);
+			em.particles_per_sec.set(40, 50);
+			em.stream_duration_ms.set(3000000, 3000000);
 			
-			em.base_velocity = std::make_pair(200, 300);
+			em.base_velocity.set(200, 300);
 			em.base_velocity_variation = std::make_pair(5.f, 10.f);
 
 			em.angular_velocity = std::make_pair(1.5f*RAD_TO_DEGf, 2.3f*RAD_TO_DEGf);
@@ -41,7 +41,7 @@ namespace resource_setups {
 				em.particle_templates.push_back(particle_template);
 			}
 
-			em.size_multiplier = std::make_pair(1.0, 1.0);
+			em.size_multiplier.set(1.0, 1.0);
 			em.particle_render_template.layer = render_layer::DIM_SMOKES;
 			em.initial_rotation_variation = 180;
 
@@ -63,7 +63,7 @@ namespace resource_setups {
 				em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
 
 				em.spread_degrees = std::make_pair(7, 7);
-				em.particles_per_sec = std::make_pair(80/4.5, 80/4.5);
+				em.particles_per_sec.set(80/4.5, 80/4.5);
 				em.stream_duration_ms = std::make_pair(3000000, 3000000);
 
 				em.base_velocity = std::make_pair(100, 110);

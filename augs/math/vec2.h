@@ -47,11 +47,12 @@ namespace augs {
 	}
 
 	template <class T>
-	rects::ltrb<T> get_aabb_rotated(vec2t<T> initial_size, T rotation) {
+	rects::ltrb<T> get_aabb_rotated(const vec2t<T> initial_size, const T rotation) {
 		auto verts = rects::ltrb<T>(0, 0, initial_size.x, initial_size.y).template get_vertices<T>();
 
-		for (auto& v : verts)
+		for (auto& v : verts) {
 			v.rotate(rotation, initial_size / 2);
+		}
 
 		/* expanded aabb that takes rotation into consideration */
 		return get_aabb(verts);
@@ -95,16 +96,16 @@ namespace augs {
 		return rotate_radians(v, origin, angle * static_cast<d>(DEG_TO_RAD));
 	}
 
-	template <class vec, class d>
-	vec& rotate_radians(vec& v, const vec& origin, const d angle) {
-		const auto s = sin(angle);
-		const auto c = cos(angle);
-		vec rotated;
+	template <class T, class d>
+	vec2t<T>& rotate_radians(vec2t<T>& v, const vec2t<T>& origin, const d angle) {
+		const auto s = static_cast<typename vec2t<T>::real>(sin(angle));
+		const auto c = static_cast<typename vec2t<T>::real>(cos(angle));
+		vec2t<T> rotated;
 
 		v -= origin;
 
-		rotated.x = v.x * c - v.y * s;
-		rotated.y = v.x * s + v.y * c;
+		rotated.x = static_cast<T>(v.x * c - v.y * s);
+		rotated.y = static_cast<T>(v.x * s + v.y * c);
 
 		return v = (rotated + origin);
 	}
@@ -320,13 +321,13 @@ struct vec2t {
 
 	template <typename v>
 	vec2t& rotate(const real angle, const v origin) {
-		augs::rotate<vec2t, float>(*this, origin, angle);
+		augs::rotate(*this, origin, angle);
 		return *this;
 	}
 
 	template <typename v>
 	vec2t& rotate_radians(const real angle, const v origin) {
-		augs::rotate_radians<vec2t, float>(*this, origin, angle);
+		augs::rotate_radians(*this, origin, angle);
 		return *this;
 	}
 
@@ -490,6 +491,11 @@ struct vec2t {
 	vec2t operator*(const int d) const { return vec2t(x * static_cast<type>(d), y * static_cast<type>(d)); }
 	vec2t operator/(const int d) const { return vec2t(x / static_cast<type>(d), y / static_cast<type>(d)); }
 
+	vec2t operator-(const unsigned d) const { return vec2t(x - static_cast<type>(d), y - static_cast<type>(d)); }
+	vec2t operator+(const unsigned d) const { return vec2t(x + static_cast<type>(d), y + static_cast<type>(d)); }
+	vec2t operator*(const unsigned d) const { return vec2t(x * static_cast<type>(d), y * static_cast<type>(d)); }
+	vec2t operator/(const unsigned d) const { return vec2t(x / static_cast<type>(d), y / static_cast<type>(d)); }
+
 	template <class v> vec2t& operator-=(const v& p) { x -= static_cast<type>(p.x); y -= static_cast<type>(p.y); return *this; }
 	template <class v> vec2t& operator+=(const v& p) { x += static_cast<type>(p.x); y += static_cast<type>(p.y); return *this; }
 	template <class v> vec2t& operator*=(const v& p) { x *= static_cast<type>(p.x); y *= static_cast<type>(p.y); return *this; }
@@ -509,6 +515,11 @@ struct vec2t {
 	vec2t& operator+=(const int d) { x += static_cast<type>(d); y += static_cast<type>(d); return *this; }
 	vec2t& operator*=(const int d) { x *= static_cast<type>(d); y *= static_cast<type>(d); return *this; }
 	vec2t& operator/=(const int d) { x /= static_cast<type>(d); y /= static_cast<type>(d); return *this; }
+
+	vec2t& operator-=(const unsigned d) { x -= static_cast<type>(d); y -= static_cast<type>(d); return *this; }
+	vec2t& operator+=(const unsigned d) { x += static_cast<type>(d); y += static_cast<type>(d); return *this; }
+	vec2t& operator*=(const unsigned d) { x *= static_cast<type>(d); y *= static_cast<type>(d); return *this; }
+	vec2t& operator/=(const unsigned d) { x /= static_cast<type>(d); y /= static_cast<type>(d); return *this; }
 };
 
 namespace std {

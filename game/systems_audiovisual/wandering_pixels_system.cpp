@@ -49,7 +49,7 @@ void wandering_pixels_system::advance_wandering_pixels_for(const const_entity_ha
 
 	for (auto& p : cache.particles) {
 		if (p.direction_ms_left <= 0.f) {
-			p.direction_ms_left = cache.generator() % max_direction_time + 800;
+			p.direction_ms_left = static_cast<float>(cache.generator() % max_direction_time + 800);
 
 			p.current_direction = p.current_direction.perpendicular_cw();
 
@@ -58,19 +58,19 @@ void wandering_pixels_system::advance_wandering_pixels_for(const const_entity_ha
 
 			float chance_to_flip = 0.f;
 
-			p.current_velocity = cache.generator() % 35 + 3;
+			p.current_velocity = static_cast<float>(cache.generator() % 35 + 3);
 
 			if (dir.x > 0) {
 				chance_to_flip = (p.pos.x - reach.x) / reach.w;
 			}
 			else if (dir.x < 0) {
-				chance_to_flip = 1.0 - (p.pos.x - reach.x) / reach.w;
+				chance_to_flip = 1.f - (p.pos.x - reach.x) / reach.w;
 			}
 			if (dir.y > 0) {
 				chance_to_flip = (p.pos.y - reach.y) / reach.h;
 			}
 			else if (dir.y < 0) {
-				chance_to_flip = 1.0 - (p.pos.y - reach.y) / reach.h;
+				chance_to_flip = 1.f - (p.pos.y - reach.y) / reach.h;
 			}
 
 			if (chance_to_flip < 0) {
@@ -105,16 +105,16 @@ void wandering_pixels_system::advance_wandering_pixels_for(const const_entity_ha
 
 		p.pos += considered_direction * vel * dt.in_seconds();
 		if (considered_direction.x > 0) {
-			p.pos.y += considered_direction.x * sin(global_time) * vel * dt.in_seconds() * 1.2;
+			p.pos.y += considered_direction.x * sin(global_time) * vel * dt.in_seconds() * 1.2f;
 		}
 		else if (considered_direction.x < 0) {
-			p.pos.y -= -considered_direction.x * sin(global_time) * vel * dt.in_seconds() * 1.2;
+			p.pos.y -= -considered_direction.x * sin(global_time) * vel * dt.in_seconds() * 1.2f;
 		}
 		if (considered_direction.y > 0) {
-			p.pos.x += considered_direction.y * cos(global_time) * vel * dt.in_seconds() * 1.2;
+			p.pos.x += considered_direction.y * cos(global_time) * vel * dt.in_seconds() * 1.2f;
 		}
 		else if (considered_direction.y < 0) {
-			p.pos.x -= -considered_direction.y * cos(global_time) * vel * dt.in_seconds() * 1.2;
+			p.pos.x -= -considered_direction.y * cos(global_time) * vel * dt.in_seconds() * 1.2f;
 		}
 
 		//p.pos.x += cos(global_time) * 20 * dt.in_seconds() * 1.2;

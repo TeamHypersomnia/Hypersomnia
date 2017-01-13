@@ -19,9 +19,10 @@ namespace augs {
 			return *this;
 		}
 
-		void set(const A& a, const B& b) {
-			first = a;
-			second = b;
+		template <class A1, class A2>
+		void set(const A1& a, const A2& b) {
+			first = static_cast<A>(a);
+			second = static_cast<B>(b);
 		}
 
 		operator pair() const {

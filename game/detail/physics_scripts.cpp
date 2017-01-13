@@ -81,7 +81,7 @@ std::vector<b2Vec2> get_world_vertices(const_entity_handle subject, bool meters,
 		auto rotation = b.get_angle();
 
 		/* transform vertex to current entity's position and rotation */
-		vec2 out_vert = (vec2(v).rotate(rotation, b2Vec2(0, 0)) + position);
+		vec2 out_vert = (vec2(v).rotate(rotation, vec2(0, 0)) + position);
 
 		if (meters) out_vert *= PIXELS_TO_METERSf;
 

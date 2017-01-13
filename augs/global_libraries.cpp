@@ -50,7 +50,7 @@ namespace augs {
 		// signal(SIGSEGV, SignalHandler);
 
 		if(to_initialize & FREETYPE)
-			errs(!FT_Init_FreeType(freetype_library.get()), "freetype initialization");
+			ensure(!FT_Init_FreeType(freetype_library.get()) && "freetype initialization");
 #ifdef PLATFORM_WINDOWS
     if(to_initialize & WINDOWS_API) {
 			WNDCLASSEX wcl = { 0 };
@@ -67,7 +67,7 @@ namespace augs {
 			wcl.lpszClassName = L"AugmentedWindow";
 			wcl.hIconSm = 0;
 
-			(errs((RegisterClassEx(&wcl) != 0), "class registering") != 0);
+			ensure(RegisterClassEx(&wcl) != 0 && "class registering");
 		}
 
 		
@@ -76,11 +76,11 @@ namespace augs {
 			dummy.create(rects::xywh<int>(10, 10, 200, 200));
 			
 			glewExperimental = FALSE;
-			errs(glewInit() == GLEW_OK, L"Failed to initialize GLEW");
+			ensure(glewInit() == GLEW_OK && L"Failed to initialize GLEW");
 		}
 
 		if (to_initialize & ENET) {
-			errs(enet_initialize() == 0, L"Failed to initialize enet");
+			ensure(enet_initialize() == 0 && L"Failed to initialize enet");
 		}
 #endif
 		initialized |= to_initialize;
@@ -93,7 +93,7 @@ namespace augs {
 
 		if (which_augs & FREETYPE) {
 			ensure(initialized & FREETYPE);
-			errs(!FT_Done_FreeType(*freetype_library.get()), "freetype deinitialization");
+			ensure(!FT_Done_FreeType(*freetype_library.get()) && "freetype deinitialization");
 			initialized &= ~FREETYPE;
 		}
 

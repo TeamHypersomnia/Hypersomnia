@@ -17,35 +17,36 @@ namespace components {
 	}
 
 	ltrbu tile_layer_instance::get_visible_tiles(const drawing_input & in) const {
-		ltrb visible_tiles;
+		ltrbi visible_tiles;
 		const auto visible_aabb = in.camera.get_transformed_visible_world_area_aabb();
 		const auto& layer = (*id);
-		const float tile_square_size = layer.get_tile_side();
+		const auto tile_square_size = layer.get_tile_side();
 
-		visible_tiles.l = int((visible_aabb.l - in.renderable_transform.pos.x) / tile_square_size);
-		visible_tiles.t = int((visible_aabb.t - in.renderable_transform.pos.y) / tile_square_size);
-		visible_tiles.r = int((visible_aabb.r - in.renderable_transform.pos.x) / tile_square_size) + 1;
-		visible_tiles.b = int((visible_aabb.b - in.renderable_transform.pos.y) / tile_square_size) + 1;
-		visible_tiles.l = std::max(0.f, visible_tiles.l);
-		visible_tiles.t = std::max(0.f, visible_tiles.t);
-		visible_tiles.r = std::min(float(layer.get_size().x), visible_tiles.r);
-		visible_tiles.b = std::min(float(layer.get_size().y), visible_tiles.b);
+		visible_tiles.l = static_cast<int>((visible_aabb.l - in.renderable_transform.pos.x) / tile_square_size);
+		visible_tiles.t = static_cast<int>((visible_aabb.t - in.renderable_transform.pos.y) / tile_square_size);
+		visible_tiles.r = static_cast<int>((visible_aabb.r - in.renderable_transform.pos.x) / tile_square_size) + 1;
+		visible_tiles.b = static_cast<int>((visible_aabb.b - in.renderable_transform.pos.y) / tile_square_size) + 1;
 
-		return ltrbu(visible_tiles.l, visible_tiles.t, visible_tiles.r, visible_tiles.b);
+		visible_tiles.l = std::max(0, visible_tiles.l);
+		visible_tiles.t = std::max(0, visible_tiles.t);
+		visible_tiles.r = std::min(static_cast<int>(layer.get_size().x), visible_tiles.r);
+		visible_tiles.b = std::min(static_cast<int>(layer.get_size().y), visible_tiles.b);
+
+		return visible_tiles;
 	}
 
 	void tile_layer_instance::draw(const drawing_input & in) const {
 		/* if it is not visible, return */
 		const auto visible_aabb = in.camera.get_transformed_visible_world_area_aabb();
 		const auto& layer = (*id);
-		const float tile_square_size = layer.get_tile_side();
+		const auto tile_square_size = layer.get_tile_side();
 		const auto size = layer.get_size();
 
 		if (!visible_aabb.hover(xywh(
 			in.renderable_transform.pos.x, 
 			in.renderable_transform.pos.y, 
-			size.x*tile_square_size, 
-			size.y*tile_square_size))) {
+			static_cast<float>(size.x*tile_square_size), 
+			static_cast<float>(size.y*tile_square_size)))) {
 			return;
 		}
 		
@@ -68,7 +69,7 @@ namespace components {
 
 				const auto& type = layer.get_tile_type(tile);
 		
-				sprite_input.renderable_transform.pos = vec2i(in.renderable_transform.pos) + tile_offset + vec2(tile_square_size / 2, tile_square_size / 2);
+				sprite_input.renderable_transform.pos = vec2i(in.renderable_transform.pos) + tile_offset + vec2(tile_square_size / 2.f, tile_square_size / 2.f);
 		
 				type.draw(sprite_input);
 			}
@@ -78,7 +79,7 @@ namespace components {
 
 	rects::ltrb<float> tile_layer_instance::get_aabb(const components::transform transform) const {
 		const auto& layer = (*id);
-		const float tile_square_size = layer.get_tile_side();
+		const auto tile_square_size = layer.get_tile_side();
 		const auto size = layer.get_size();
 
 		return rects::xywh<float>(transform.pos.x, transform.pos.y, static_cast<float>(size.x*tile_square_size), static_cast<float>(size.y*tile_square_size));
