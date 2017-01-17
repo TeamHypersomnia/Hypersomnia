@@ -111,27 +111,45 @@ typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory
 
 	ensure(searched_root_container.alive());
 
-	const auto maybe_shoulder = searched_root_container[slot_function::SHOULDER_SLOT];
+	const auto slot_checker = [&](const slot_function type) {
+		const auto maybe_slot = searched_root_container[type];
 
-	if (maybe_shoulder.alive()) {
-		if (maybe_shoulder.can_contain(holstered_item)) {
-			return maybe_shoulder;
-		}
-		else if (maybe_shoulder->items_inside.size() > 0) {
-			const auto maybe_item_deposit = maybe_shoulder.get_items_inside()[0][slot_function::ITEM_DEPOSIT];
+		if (maybe_slot.alive()) {
+			if (maybe_slot.can_contain(holstered_item)) {
+				return maybe_slot;
+			}
+			else {
+				const auto items_inside = maybe_slot.get_items_inside();
 
-			if (maybe_item_deposit.alive() && maybe_item_deposit.can_contain(holstered_item)) {
-				return maybe_item_deposit;
+				for (const auto potential_container_item : items_inside) {
+					const auto category = get_slot_with_compatible_category(holstered_item, potential_container_item);
+
+					if (category != slot_function::INVALID) {
+						const auto compatible_slot = potential_container_item[category];
+
+						if (compatible_slot.can_contain(holstered_item)) {
+							return compatible_slot;
+						}
+					}
+				}
 			}
 		}
-	}
-	else {
-		const auto maybe_armor = searched_root_container[slot_function::TORSO_ARMOR_SLOT];
 
-		if (maybe_armor.alive()) {
-			if (maybe_armor.can_contain(holstered_item)) {
-				return maybe_armor;
-			}
+		return cosmos[inventory_slot_id()];
+	};
+
+	const slot_function slots_to_check[] = {
+		slot_function::SHOULDER_SLOT,
+		slot_function::PRIMARY_HAND,
+		slot_function::SECONDARY_HAND,
+		slot_function::TORSO_ARMOR_SLOT
+	};
+
+	for(const auto s : slots_to_check) {
+		const auto maybe_slot = slot_checker(s);
+
+		if (maybe_slot.alive()) {
+			return maybe_slot;
 		}
 	}
 
@@ -206,8 +224,8 @@ std::vector<D> basic_inventory_mixin<C, D>::guns_wielded() const {
 template <class D>
 bool inventory_mixin<false, D>::wield_in_hands(
 	logic_step& step,
-	const entity_id first, 
-	const entity_id second
+	entity_id first, 
+	entity_id second
 ) const {
 	const auto& subject = *static_cast<const D*>(this);
 	auto& cosmos = subject.get_cosmos();
@@ -234,6 +252,12 @@ bool inventory_mixin<false, D>::wield_in_hands(
 	if (secondary_holstering_slot.alive()) {
 		const item_slot_transfer_request request(in_secondary, secondary_holstering_slot);
 		perform_transfer(request, step);
+	}
+
+	const bool is_only_secondary_possibly_chosen = cosmos[first].dead();
+
+	if (is_only_secondary_possibly_chosen) {
+		std::swap(first, second);
 	}
 
 	const auto first_handle = cosmos[first];

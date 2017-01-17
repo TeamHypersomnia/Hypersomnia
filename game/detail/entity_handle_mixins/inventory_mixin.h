@@ -87,8 +87,8 @@ public:
 
 	bool wield_in_hands(
 		logic_step& step,
-		const entity_id first = entity_id(), 
-		const entity_id second = entity_id()
+		entity_id first = entity_id(), 
+		entity_id second = entity_id()
 	) const;
 };
 
