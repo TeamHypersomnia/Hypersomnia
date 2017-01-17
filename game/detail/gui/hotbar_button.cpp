@@ -299,7 +299,7 @@ void hotbar_button::advance_elements(const logic_gui_context& context, const thi
 	for (const auto& info : entropies.get_events_for(this_id)) {
 		this_id->detector.update_appearance(info);
 
-		if (info.is_ldown_or_double_or_triple()) {
+		if (info.msg == gui_event::lclick) {
 			const auto assigned_entity = this_id->get_assigned_entity(context.get_gui_element_entity());
 
 			if (assigned_entity.alive()) {

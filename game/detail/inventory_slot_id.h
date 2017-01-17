@@ -31,7 +31,7 @@ struct inventory_slot_id {
 
 struct inventory_item_address {
 	entity_id root_container;
-	augs::constant_size_vector<slot_function, 6> directions;
+	augs::constant_size_vector<slot_function, 12> directions;
 };
 
 struct inventory_traversal {
