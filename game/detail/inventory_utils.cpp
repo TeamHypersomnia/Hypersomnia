@@ -300,6 +300,43 @@ components::transform sum_attachment_offsets(const cosmos& cosm, const inventory
 	return total;
 }
 
+void swap_slots_for_items(
+	const entity_id first,
+	const entity_id second,
+	logic_step& step
+) {
+	const auto drop_slot = step.cosm[inventory_slot_id()];
+
+	const auto first_handle = step.cosm[first];
+	const auto second_handle = step.cosm[second];
+
+	const auto first_slot = first_handle.get_current_slot();
+	const auto second_slot = second_handle.get_current_slot();
+
+	ensure(first_handle.alive());
+	ensure(second_handle.alive());
+
+	{
+		const item_slot_transfer_request request(first_handle, drop_slot);
+		perform_transfer(request, step);
+	}
+
+	{
+		const item_slot_transfer_request request(second_handle, drop_slot);
+		perform_transfer(request, step);
+	}
+
+	{
+		const item_slot_transfer_request request(first_handle, second_slot);
+		perform_transfer(request, step);
+	}
+
+	{
+		const item_slot_transfer_request request(second_handle, first_slot);
+		perform_transfer(request, step);
+	}
+}
+
 void perform_transfer(const item_slot_transfer_request r, logic_step& step) {
 	auto& cosmos = r.get_item().get_cosmos();
 	auto& item = r.get_item().get<components::item>();

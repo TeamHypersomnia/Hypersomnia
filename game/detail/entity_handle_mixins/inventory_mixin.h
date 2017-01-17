@@ -90,6 +90,8 @@ public:
 		entity_id first = entity_id(), 
 		entity_id second = entity_id()
 	) const;
+
+	void swap_wielded_items(logic_step&) const;
 };
 
 template<class entity_handle_type>

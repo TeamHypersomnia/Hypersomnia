@@ -222,6 +222,30 @@ std::vector<D> basic_inventory_mixin<C, D>::guns_wielded() const {
 }
 
 template <class D>
+void inventory_mixin<false, D>::swap_wielded_items(logic_step& step) const {
+	const auto& subject = *static_cast<const D*>(this);
+	auto& cosmos = subject.get_cosmos();
+
+	const auto in_primary = subject[slot_function::PRIMARY_HAND].get_item_if_any();
+	const auto in_secondary = subject[slot_function::SECONDARY_HAND].get_item_if_any();
+
+	if (in_primary.alive() && in_secondary.alive()) {
+		swap_slots_for_items(in_primary, in_secondary, step);
+	}
+	else if (in_primary.alive()) {
+		const item_slot_transfer_request request(in_primary, subject[slot_function::SECONDARY_HAND]);
+		perform_transfer(request, step);
+	}
+	else if (in_secondary.alive()) {
+		const item_slot_transfer_request request(in_secondary, subject[slot_function::PRIMARY_HAND]);
+		perform_transfer(request, step);
+	}
+	else {
+		ensure(false);
+	}
+}
+
+template <class D>
 bool inventory_mixin<false, D>::wield_in_hands(
 	logic_step& step,
 	entity_id first, 

@@ -9,6 +9,12 @@
 #include "game/transcendental/step_declaration.h"
 void perform_transfer(item_slot_transfer_request, logic_step& step);
 
+void swap_slots_for_items(
+	const entity_id first, 
+	const entity_id second, 
+	logic_step&
+);
+
 components::transform get_attachment_offset(
 	const inventory_slot& slot, 
 	const components::transform container_transform, 
