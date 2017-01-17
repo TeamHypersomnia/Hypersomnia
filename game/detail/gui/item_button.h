@@ -88,8 +88,6 @@ struct item_button : game_gui_rect_node {
 
 	static vec2 griddify_size(const vec2 size, const vec2 expander);
 
-	static void draw_dragged_ghost_inside(const viewing_gui_context& context, const const_this_in_item& this_id, augs::gui::draw_info in);
-	static void draw_complete_with_children(const viewing_gui_context&, const const_this_in_item& this_id, augs::gui::draw_info in);
 
 	static bool is_being_wholely_dragged_or_pending_finish(const const_logic_gui_context&, const const_this_in_item& this_id);
 
@@ -97,9 +95,41 @@ struct item_button : game_gui_rect_node {
 	static void rebuild_layouts(const logic_gui_context&, const this_in_item& this_id);
 
 	static bool is_inventory_root(const const_logic_gui_context&, const const_this_in_item& this_id);
-	static void draw(const viewing_gui_context&, const const_this_in_item& this_id, draw_info);
-	static void draw_grid_border_ghost(const viewing_gui_context&, const const_this_in_item&, draw_info in);
-	static void draw_complete_dragged_ghost(const viewing_gui_context&, const const_this_in_item&, draw_info);
+	
+	static void draw(
+		const viewing_gui_context&, 
+		const const_this_in_item& this_id, 
+		draw_info
+	);
 
-	static void draw_proc(const viewing_gui_context&, const const_this_in_item&, draw_info, const drawing_settings&);
+	static void draw_proc(
+		const viewing_gui_context&, 
+		const const_this_in_item&, 
+		draw_info, 
+		const drawing_settings&
+	);
+
+	static void draw_dragged_ghost_inside(
+		const viewing_gui_context& context, 
+		const const_this_in_item& this_id, 
+		draw_info in,
+		const vec2 absolute_xy_offset
+	);
+
+	static void draw_grid_border_ghost(
+		const viewing_gui_context&, 
+		const const_this_in_item&, 
+		draw_info in,
+		const vec2 absolute_xy_offset
+	);
+
+	static void draw_complete_dragged_ghost(
+		const viewing_gui_context&, 
+		const const_this_in_item&, 
+		draw_info,
+		const vec2 absolute_xy_offset
+	);
+
+	static void draw_complete_with_children(const viewing_gui_context&, const const_this_in_item& this_id, augs::gui::draw_info in);
+
 };

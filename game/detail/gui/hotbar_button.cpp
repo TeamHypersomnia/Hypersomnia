@@ -5,6 +5,7 @@
 #include "game/components/item_component.h"
 #include "game/components/gui_element_component.h"
 #include "augs/gui/button_corners.h"
+#include "game/detail/gui/drag_and_drop.h"
 
 #include "application/config_lua_table.h"
 
@@ -292,6 +293,8 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 
 void hotbar_button::advance_elements(const logic_gui_context& context, const this_in_item& this_id, const gui_entropy& entropies, const augs::delta dt) {
 	base::advance_elements(context, this_id, entropies, dt);
+	
+	const auto& rect_world = context.get_rect_world();
 
 	for (const auto& info : entropies.get_events_for(this_id)) {
 		this_id->detector.update_appearance(info);
@@ -309,6 +312,10 @@ void hotbar_button::advance_elements(const logic_gui_context& context, const thi
 
 		if (info.msg == gui_event::hover) {
 			this_id->elapsed_hover_time_ms = 0.f;
+		}
+
+		if (info.msg == gui_event::lfinisheddrag) {
+			drag_and_drop_callback(context, prepare_drag_and_drop_result(context, this_id, rect_world.rect_hovered), info.total_dragged_amount);
 		}
 	}
 

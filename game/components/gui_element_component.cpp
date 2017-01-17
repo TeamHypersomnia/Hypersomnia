@@ -87,6 +87,8 @@ namespace components {
 	}
 
 	void gui_element::draw_cursor_with_information(vertex_triangle_buffer& output_buffer, const viewing_gui_context& context) const {
+		const auto drag_amount = context.get_rect_world().current_drag_amount;
+		
 		auto gui_cursor = assets::texture_id::GUI_CURSOR;
 		auto gui_cursor_color = cyan;
 		auto gui_cursor_position = get_gui_crosshair_position();
@@ -138,17 +140,33 @@ namespace components {
 			const auto drag_result = prepare_drag_and_drop_result(context, rect_world.rect_held_by_lmb, rect_world.rect_hovered);
 			
 			if (drag_result.is<unfinished_drag_of_item>()) {
-				const auto& dragged_item_button = context.dereference_location(item_button_in_item{ drag_result.get<unfinished_drag_of_item>().item_id });
-				
-				dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer);
-				dragged_item_button->draw_grid_border_ghost(context, dragged_item_button, output_buffer);
+				const auto transfer_data = drag_result.get<unfinished_drag_of_item>();
+				const auto& dragged_item_button = context.dereference_location(item_button_in_item{ transfer_data.item_id });
+				const auto hotbar_location = context.dereference_location(transfer_data.source_hotbar_button_id);
 
-				auto& item = context.get_step().get_cosmos()[dragged_item_button.get_location().item_id].get<components::item>();
+				if (hotbar_location != nullptr) {
+					const auto drawn_pos = drag_amount + hotbar_location->rc.get_position() - dragged_item_button->rc.get_position();
+					
+					dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drawn_pos);
+
+					gui_cursor = assets::texture_id::GUI_CURSOR_MINUS;
+					gui_cursor_color = red;
+
+					gui_cursor_position = draw_cursor_hint(L"Clear assignment", get_gui_crosshair_position(), (*gui_cursor).get_size());
+				}
+				else {
+					const auto drawn_pos = drag_amount;
+
+					dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drawn_pos);
+					dragged_item_button->draw_grid_border_ghost(context, dragged_item_button, output_buffer, drawn_pos);
+				}
+
+				const auto& item = context.get_step().get_cosmos()[dragged_item_button.get_location().item_id].get<components::item>();
 
 				if (item.charges > 1) {
 					const auto gui_cursor_size = (*gui_cursor).get_size();
 
-					auto charges_text = to_wstring(dragged_charges);
+					const auto charges_text = to_wstring(dragged_charges);
 
 					augs::gui::text_drawer dragged_charges_drawer;
 
@@ -163,18 +181,39 @@ namespace components {
 				const auto& transfer_data = drag_result.get<drop_for_hotbar_assignment>();
 				const auto& dragged_item_button = context.dereference_location(item_button_in_item{ transfer_data.item_id });
 				
-				dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer);
+				const auto hotbar_location = context.dereference_location(transfer_data.source_hotbar_button_id);
 
-				gui_cursor = assets::texture_id::GUI_CURSOR_ADD;
-				gui_cursor_color = green;
-				
+				if (hotbar_location != nullptr) {
+					const auto drawn_pos = drag_amount + hotbar_location->rc.get_position() - dragged_item_button->rc.get_position();
+					
+					dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drawn_pos);
+				}
+				else {
+					const auto drawn_pos = drag_amount;
+					dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drag_amount);
+				}
+
+				if (!(transfer_data.source_hotbar_button_id == transfer_data.assign_to)) {
+					gui_cursor = assets::texture_id::GUI_CURSOR_ADD;
+					gui_cursor_color = green;
+				}
+
 				gui_cursor_position = draw_cursor_hint(transfer_data.hint_text, get_gui_crosshair_position(), (*gui_cursor).get_size());
 			}
 			else if (drag_result.is<drop_for_item_slot_transfer>()) {
 				const auto& transfer_data = drag_result.get<drop_for_item_slot_transfer>();
 				const auto& dragged_item_button = context.dereference_location(item_button_in_item{ transfer_data.simulated_transfer.item });
 
-				dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer);
+				const auto hotbar_location = context.dereference_location(transfer_data.source_hotbar_button_id);
+
+				if (hotbar_location != nullptr) {
+					dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drag_amount 
+						+ hotbar_location->rc.get_position() - dragged_item_button->rc.get_position()
+					);
+				}
+				else {
+					dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drag_amount);
+				}
 
 				const auto& transfer_result = transfer_data.result.result;
 
@@ -332,6 +371,14 @@ namespace components {
 				h.last_assigned_entity.unset();
 			}
 		}
+	}
+
+	void gui_element::clear_hotbar_button_assignment(
+		const size_t button_index,
+		const entity_handle element_entity
+	) {
+		auto& element = element_entity.get<components::gui_element>();
+		element.hotbar_buttons[button_index].last_assigned_entity.unset();
 	}
 
 	void gui_element::assign_item_to_hotbar_button(

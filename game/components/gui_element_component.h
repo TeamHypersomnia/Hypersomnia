@@ -87,6 +87,11 @@ namespace components {
 			const const_entity_handle item_entity
 		);
 
+		static void clear_hotbar_button_assignment(
+			const size_t button_index,
+			const entity_handle element_entity
+		);
+
 		static void assign_item_to_hotbar_button(
 			const size_t button_index,
 			const entity_handle element_entity,

@@ -45,7 +45,7 @@ item_button::item_button(rects::xywh<float> rc) : base(rc) {
 	unset_flag(augs::gui::flag::FOCUSABLE);
 }
 
-void item_button::draw_dragged_ghost_inside(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in) {
+void item_button::draw_dragged_ghost_inside(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in, vec2 absolute_xy_offset) {
 	drawing_settings f;
 	f.draw_background = true;
 	f.draw_item = true;
@@ -55,7 +55,7 @@ void item_button::draw_dragged_ghost_inside(const viewing_gui_context& context, 
 	f.decrease_border_alpha = false;
 	f.draw_container_opened_mark = false;
 	f.draw_charges = false;
-	f.absolute_xy_offset = context.get_rect_world().current_drag_amount;
+	f.absolute_xy_offset = absolute_xy_offset;
 
 	draw_proc(context, this_id, in, f);
 }
@@ -75,7 +75,7 @@ void item_button::draw_complete_with_children(const viewing_gui_context& context
 	draw_proc(context, this_id, in, f);
 }
 
-void item_button::draw_grid_border_ghost(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in) {
+void item_button::draw_grid_border_ghost(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in, vec2 absolute_xy_offset) {
 	drawing_settings f;
 	f.draw_background = false;
 	f.draw_item = false;
@@ -85,17 +85,13 @@ void item_button::draw_grid_border_ghost(const viewing_gui_context& context, con
 	f.decrease_border_alpha = true;
 	f.draw_container_opened_mark = false;
 	f.draw_charges = true;
-	f.absolute_xy_offset = griddify(context.get_rect_world().current_drag_amount);
+	f.absolute_xy_offset = griddify(absolute_xy_offset);
 
 	draw_proc(context, this_id, in, f);
 }
 
-void item_button::draw_complete_dragged_ghost(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in) {
-	const auto& cosmos = context.get_step().get_cosmos();
-	auto parent_slot = cosmos[cosmos[this_id.get_location().item_id].get<components::item>().current_slot];
-	ensure(parent_slot.alive());
-
-	draw_dragged_ghost_inside(context, this_id, in);
+void item_button::draw_complete_dragged_ghost(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in, vec2 absolute_xy_offset) {
+	draw_dragged_ghost_inside(context, this_id, in, absolute_xy_offset);
 }
 
 item_button::layout_with_attachments item_button::calculate_button_layout(
@@ -433,19 +429,8 @@ void item_button::advance_elements(const logic_gui_context& context, const this_
 		for (const auto& info : entropies.get_events_for(this_id)) {
 			this_id->detector.update_appearance(info);
 
-			const auto parent_slot = cosmos[item.get<components::item>().current_slot];
-			const auto parent_button = context.dereference_location(slot_button_in_container{ parent_slot.get_id() });
-
 			if (info == gui_event::ldrag) {
-				if (!this_id->started_drag) {
-					this_id->started_drag = true;
-
-					element.dragged_charges = item.get<components::item>().charges;
-				}
-			}
-
-			if (info == gui_event::wheel) {
-				LOG("%x", info.scroll_amount);
+				element.dragged_charges = item.get<components::item>().charges;
 			}
 
 			if (info == gui_event::rclick) {
@@ -455,35 +440,7 @@ void item_button::advance_elements(const logic_gui_context& context, const this_
 			if (info == gui_event::lfinisheddrag) {
 				this_id->started_drag = false;
 
-				const auto drag_result = prepare_drag_and_drop_result(context, this_id, rect_world.rect_hovered);
-
-				if (drag_result.is<drop_for_item_slot_transfer>()) {
-					const auto& transfer_data = drag_result.get<drop_for_item_slot_transfer>();
-
-					if (transfer_data.result.result >= item_transfer_result_type::SUCCESSFUL_TRANSFER) {
-						context.get_step().transient.messages.post(transfer_data.simulated_transfer);
-					}
-				}
-				else if (drag_result.is<unfinished_drag_of_item>()) {
-					const vec2i griddified = griddify(info.total_dragged_amount);
-
-					if (parent_slot->always_allow_exactly_one_item) {
-						parent_button->user_drag_offset += griddified;
-						parent_button->update_rc(context, parent_button);
-					}
-					else {
-						this_id->drag_offset_in_item_deposit += griddified;
-					}
-				}
-				else if (drag_result.is<drop_for_hotbar_assignment>()) {
-					const auto& transfer_data = drag_result.get<drop_for_hotbar_assignment>();
-
-					const auto dereferenced_button = context.dereference_location(transfer_data.assign_to);
-					const auto new_assigned_item = cosmos[transfer_data.item_id];
-					ensure(dereferenced_button != nullptr);
-					
-					components::gui_element::assign_item_to_hotbar_button(dereferenced_button.get_location().index, context.get_gui_element_entity(), new_assigned_item);
-				}
+				drag_and_drop_callback(context, prepare_drag_and_drop_result(context, this_id, rect_world.rect_hovered), info.total_dragged_amount);
 			}
 		}
 	}
