@@ -374,15 +374,24 @@ namespace components {
 		try_assign(0);
 	}
 
+	gui_element::hotbar_selection_setup gui_element::hotbar_selection_setup::get_available_entities(const const_entity_handle h) const {
+		return {
+			get_hotbar_assigned_entity_if_available(h, h.get_cosmos()[primary_selection]),
+			get_hotbar_assigned_entity_if_available(h, h.get_cosmos()[secondary_selection]),
+		};
+	}
+
 	bool gui_element::apply_hotbar_selection_setup(
 		logic_step& step,
 		const hotbar_selection_setup new_setup,
 		const entity_handle element_entity
 	) {
+		ensure(new_setup == new_setup.get_available_entities(element_entity));
+
 		return element_entity.wield_in_hands(
 			step, 
-			get_hotbar_assigned_entity_if_available(element_entity, step.cosm[new_setup.primary_selection]),
-			get_hotbar_assigned_entity_if_available(element_entity, step.cosm[new_setup.secondary_selection])
+			new_setup.primary_selection,
+			new_setup.secondary_selection
 		);
 	}
 
@@ -391,13 +400,48 @@ namespace components {
 		const entity_handle element_entity
 	) {
 		auto& element = element_entity.get<components::gui_element>();
-
 		auto& current = element.current_hotbar_selection_setup;
-		current = 1 - current;
 		
-		const auto setup = element.last_setups[current];
+		const auto setup = element.last_setups[1 - current].get_available_entities(element_entity);
 
-		return apply_hotbar_selection_setup(step, setup, element_entity);
+		if (setup == get_actual_selection_setup(element_entity)) {
+			const auto trial = [&](const size_t i) {
+				const auto tried_setup = get_setup_from_button_indices(element_entity, i);
+				const auto candidate_entity = step.cosm[tried_setup.primary_selection];
+				
+				if (candidate_entity.alive()) {
+					if (!is_clothing(candidate_entity.get<components::item>().categories_for_slot_compatibility)) {
+						if (!(tried_setup == setup) && apply_and_save_hotbar_selection_setup(step, tried_setup, element_entity)) {
+							return true;
+						}
+					}
+				}
+
+				return false;
+			};
+
+			for (size_t i = 1; i < element.hotbar_buttons.size(); ++i) {
+				if (trial(i)) {
+					return true;
+				}
+			}
+
+			if (trial(0)) {
+				return true;
+			}
+
+			return false;
+		}
+		
+		if (apply_hotbar_selection_setup(step, setup, element_entity)) {
+			current = 1 - current;
+			return true;
+		}
+		else {
+			element_entity.swap_wielded_items(step);
+		}
+		
+		return false;
 	}
 
 	bool gui_element::apply_and_save_hotbar_selection_setup(

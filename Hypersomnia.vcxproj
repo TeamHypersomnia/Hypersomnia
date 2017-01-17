@@ -374,6 +374,7 @@
     <ClCompile Include="game\detail\gui\root_of_inventory_gui.cpp" />
     <ClCompile Include="game\detail\gui\slot_button.cpp" />
     <ClCompile Include="game\detail\world_camera.cpp" />
+    <ClCompile Include="game\enums\item_category.cpp" />
     <ClCompile Include="game\resources\tile_layer.cpp" />
     <ClCompile Include="game\scene_managers\rendering_scripts\draw_crosshair_lines.cpp" />
     <ClCompile Include="game\scene_managers\rendering_scripts\illuminated_rendering.cpp" />

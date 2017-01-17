@@ -34,6 +34,8 @@ namespace components {
 			bool operator==(const hotbar_selection_setup b) const {
 				return primary_selection == b.primary_selection && secondary_selection == b.secondary_selection;
 			}
+
+			hotbar_selection_setup get_available_entities(const const_entity_handle h) const;
 		};
 
 		std::array<hotbar_button, 10> hotbar_buttons;

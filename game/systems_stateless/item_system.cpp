@@ -121,7 +121,7 @@ void item_system::handle_holster_item_intents(logic_step& step) {
 					new_setup.primary_selection.unset();
 				}
 				else if (hand_type == slot_function::SECONDARY_HAND) {
-					new_setup.primary_selection.unset();
+					new_setup.secondary_selection.unset();
 				}
 
 				components::gui_element::apply_and_save_hotbar_selection_setup(step, new_setup, subject);

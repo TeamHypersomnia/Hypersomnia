@@ -15,3 +15,5 @@ enum class item_category {
 };
 
 typedef augs::enum_bitset<item_category> item_category_bitset;
+
+bool is_clothing(const item_category_bitset& category);
