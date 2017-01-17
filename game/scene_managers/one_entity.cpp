@@ -123,6 +123,18 @@ namespace scene_managers {
 		active_context.map_key_to_intent(window::event::keys::key::SPACE, intent_type::SPACE_BUTTON);
 		active_context.map_key_to_intent(window::event::keys::key::MOUSE4, intent_type::SWITCH_TO_GUI);
 
+		active_context.map_key_to_intent(window::event::keys::key::_0, intent_type::HOTBAR_BUTTON_0);
+		active_context.map_key_to_intent(window::event::keys::key::_1, intent_type::HOTBAR_BUTTON_1);
+		active_context.map_key_to_intent(window::event::keys::key::_2, intent_type::HOTBAR_BUTTON_2);
+		active_context.map_key_to_intent(window::event::keys::key::_3, intent_type::HOTBAR_BUTTON_3);
+		active_context.map_key_to_intent(window::event::keys::key::_4, intent_type::HOTBAR_BUTTON_4);
+		active_context.map_key_to_intent(window::event::keys::key::_5, intent_type::HOTBAR_BUTTON_5);
+		active_context.map_key_to_intent(window::event::keys::key::_6, intent_type::HOTBAR_BUTTON_6);
+		active_context.map_key_to_intent(window::event::keys::key::_7, intent_type::HOTBAR_BUTTON_7);
+		active_context.map_key_to_intent(window::event::keys::key::_8, intent_type::HOTBAR_BUTTON_8);
+		active_context.map_key_to_intent(window::event::keys::key::_9, intent_type::HOTBAR_BUTTON_9);
+
+		active_context.map_key_to_intent(window::event::keys::key::Q, intent_type::PREVIOUS_HOTBAR_SELECTION_SETUP);
 	}
 
 	void one_entity::control_character_selection(const augs::machine_entropy::local_type& local) {
