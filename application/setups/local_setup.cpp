@@ -59,6 +59,8 @@ void local_setup::process(const config_lua_table& cfg, game_window& window) {
 
 	timer.reset_timer();
 
+	const bool debug_control_timing = false;
+
 	while (!should_quit) {
 		{
 			augs::machine_entropy new_entropy;
@@ -73,17 +75,24 @@ void local_setup::process(const config_lua_table& cfg, game_window& window) {
 
 			total_collected_entropy += new_entropy;
 
+			if (debug_control_timing) {
+				for (const auto& raw_input : new_entropy.local) {
+					if (raw_input.was_any_key_pressed()) {
+						if (raw_input.key == key::_4) {
+							timer.set_stepping_speed_multiplier(0.1f);
+						}
+						if (raw_input.key == key::_5) {
+							timer.set_stepping_speed_multiplier(1.f);
+						}
+						if (raw_input.key == key::_6) {
+							timer.set_stepping_speed_multiplier(6.f);
+						}
+					}
+				}
+			}
+
 			for (const auto& raw_input : new_entropy.local) {
 				if (raw_input.was_any_key_pressed()) {
-					if (raw_input.key == key::_4) {
-						timer.set_stepping_speed_multiplier(0.1f);
-					}
-					if (raw_input.key == key::_5) {
-						timer.set_stepping_speed_multiplier(1.f);
-					}
-					if (raw_input.key == key::_6) {
-						timer.set_stepping_speed_multiplier(6.f);
-					}
 					if (raw_input.key == key::F2) {
 						LOG_COLOR(console_color::YELLOW, "Separator");
 					}
@@ -96,16 +105,18 @@ void local_setup::process(const config_lua_table& cfg, game_window& window) {
 		while (steps--) {
 			player.advance_player_and_biserialize(total_collected_entropy);
 
-			for (const auto& raw_input : total_collected_entropy.local) {
-				if (raw_input.was_any_key_pressed()) {
-					if (raw_input.key == key::_1) {
-						hypersomnia.set_fixed_delta(cfg.tickrate);
-					}
-					if (raw_input.key == key::_2) {
-						hypersomnia.set_fixed_delta(128);
-					}
-					if (raw_input.key == key::_3) {
-						hypersomnia.set_fixed_delta(144);
+			if (debug_control_timing) {
+				for (const auto& raw_input : total_collected_entropy.local) {
+					if (raw_input.was_any_key_pressed()) {
+						if (raw_input.key == key::_1) {
+							hypersomnia.set_fixed_delta(cfg.tickrate);
+						}
+						if (raw_input.key == key::_2) {
+							hypersomnia.set_fixed_delta(128);
+						}
+						if (raw_input.key == key::_3) {
+							hypersomnia.set_fixed_delta(144);
+						}
 					}
 				}
 			}
