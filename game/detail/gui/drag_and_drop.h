@@ -10,6 +10,10 @@ struct unfinished_drag_of_item {
 	entity_id item_id;
 };
 
+struct unfinished_drag_of_hotbar_button {
+	hotbar_button_in_gui_element button_id;
+};
+
 struct drop_for_item_slot_transfer {
 	item_slot_transfer_request_data simulated_transfer;
 	item_transfer_result result;
@@ -27,7 +31,8 @@ struct drop_for_hotbar_assignment {
 typedef augs::trivial_variant<
 	drop_for_item_slot_transfer,
 	drop_for_hotbar_assignment,
-	unfinished_drag_of_item
+	unfinished_drag_of_item,
+	unfinished_drag_of_hotbar_button
 > drag_and_drop_result;
 
 template <class C>
@@ -38,7 +43,25 @@ drag_and_drop_result prepare_drag_and_drop_result(C context, const game_gui_elem
 
 	drag_and_drop_result output;
 
-	const auto dragged_item = context._dynamic_cast<item_button_in_item>(held_rect_id);
+	auto dragged_item = context._dynamic_cast<item_button_in_item>(held_rect_id);
+	const auto dragged_hotbar_button = context._dynamic_cast<hotbar_button_in_gui_element>(held_rect_id);
+
+	if (dragged_hotbar_button) {
+		const auto assigned_entity = dragged_hotbar_button->get_assigned_entity(owning_transfer_capability);
+
+		if (assigned_entity.alive()) {
+			if (context.alive(drop_target_rect_id)) {
+				item_button_in_item dragged_item_location;
+				dragged_item_location.item_id = assigned_entity.get_id();
+
+				dragged_item = context.dereference_location(dragged_item_location);
+			}
+			else {
+				output.set(unfinished_drag_of_hotbar_button{ dragged_hotbar_button.get_location() });
+				return output;
+			}
+		}
+	}
 
 	if (dragged_item) {
 		bool possible_target_hovered = false;
@@ -56,30 +79,42 @@ drag_and_drop_result prepare_drag_and_drop_result(C context, const game_gui_elem
 			if (target_hotbar_button != nullptr) {
 				const auto assigned_entity = target_hotbar_button->get_assigned_entity(owning_transfer_capability);
 
-				if (assigned_entity.dead()) {
+				//if (assigned_entity.dead()) {
 					const auto hotbar_button_location = target_hotbar_button.get_location();
 
 					drop_for_hotbar_assignment hotbar_drop;
 					hotbar_drop.assign_to = hotbar_button_location;
-					hotbar_drop.hint_text = typesafe_sprintf(L"Assign to %x", hotbar_button_location.index);
+
+					if (assigned_entity == dragged_item_handle) {
+						hotbar_drop.hint_text = typesafe_sprintf(L"Current assignment");
+					}
+					else {
+						if (assigned_entity.dead()) {
+							hotbar_drop.hint_text = typesafe_sprintf(L"Assign %x", hotbar_button_location.index);
+						}
+						else {
+							hotbar_drop.hint_text = typesafe_sprintf(L"Reassign %x", hotbar_button_location.index);
+						}
+					}
+
 					hotbar_drop.item_id = dragged_item_handle;
 
 					output.set(hotbar_drop);
 					return output;
-				}
-				else {
-					item_button_in_item assigned_item_location;
-					assigned_item_location.item_id = assigned_entity.get_id();
-
-					target_item = context.dereference_location(assigned_item_location);
-				}
+				//}
+				//else {
+				//	item_button_in_item assigned_item_location;
+				//	assigned_item_location.item_id = assigned_entity.get_id();
+				//
+				//	target_item = context.dereference_location(assigned_item_location);
+				//}
 			}
 			
 			drop_for_item_slot_transfer drop;
 
 			auto& simulated_transfer = drop.simulated_transfer;
 			simulated_transfer.item = dragged_item_handle;
-			simulated_transfer.specified_quantity = element.dragged_charges;
+			simulated_transfer.specified_quantity = element.dragged_charges == 0 ? -1 : element.dragged_charges;
 
 			bool was_pointing_to_a_stack_target = false;
 			bool no_slot_in_targeted_item = false;
