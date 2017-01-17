@@ -60,9 +60,24 @@ void drag_and_drop_callback(
 
 		const auto dereferenced_button = context.dereference_location(transfer_data.assign_to);
 		const auto new_assigned_item = cosmos[transfer_data.item_id];
+		const auto owner_transfer_capability = context.get_gui_element_entity();
+
 		ensure(dereferenced_button != nullptr);
 
-		components::gui_element::assign_item_to_hotbar_button(dereferenced_button.get_location().index, context.get_gui_element_entity(), new_assigned_item);
+		const auto source_hotbar_location = context.dereference_location(transfer_data.source_hotbar_button_id);
+		
+		if (source_hotbar_location != nullptr) {
+			const auto item_to_be_swapped = dereferenced_button->get_assigned_entity(owner_transfer_capability);
+
+			components::gui_element::assign_item_to_hotbar_button(dereferenced_button.get_location().index, owner_transfer_capability, new_assigned_item);
+			
+			if (item_to_be_swapped.alive()) {
+				components::gui_element::assign_item_to_hotbar_button(source_hotbar_location.get_location().index, owner_transfer_capability, item_to_be_swapped);
+			}
+		}
+		else {
+			components::gui_element::assign_item_to_hotbar_button(dereferenced_button.get_location().index, owner_transfer_capability, new_assigned_item);
+		}
 	}
 }
 

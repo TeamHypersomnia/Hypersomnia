@@ -77,7 +77,7 @@ namespace scene_managers {
 
 		const auto rifle2 = prefabs::create_sample_bilmer2000(step, vec2(100, -500 + 50),
 			prefabs::create_sample_magazine(step, vec2(100, -650), false ? "10" : "0.3",
-				prefabs::create_cyan_charge(world, vec2(0, 0), false ? 1000 : 30)));
+				prefabs::create_cyan_charge(world, vec2(0, 0), false ? 1000 : 5)));
 		
 		prefabs::create_kek9(step, vec2(300, -500 + 50));
 
@@ -86,7 +86,10 @@ namespace scene_managers {
 				prefabs::create_pink_charge(world, vec2(0, 0), 30)));
 
 		//perform_transfer({ backpack, character(0)[slot_function::SHOULDER_SLOT] }, step);
-		//prefabs::create_sample_suppressor(world, vec2(300, -500));
+
+		const auto rifle = prefabs::create_sample_rifle(step, vec2(100, -500),
+			prefabs::create_sample_magazine(step, vec2(100, -650), false ? "10" : "0.3",
+				prefabs::create_cyan_charge(world, vec2(0, 0), false ? 1000 : 30)));
 
 		characters.assign(new_characters.begin(), new_characters.end());
 
