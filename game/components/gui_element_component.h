@@ -41,7 +41,8 @@ namespace components {
 		std::array<hotbar_button, 10> hotbar_buttons;
 
 		hotbar_selection_setup last_setups[2];
-		int currently_held_hotbar_index = -1;
+		short currently_held_hotbar_index = -1;
+		short push_setup_when_index_released = -1;
 
 		unsigned char current_hotbar_selection_setup = 0;
 		bool is_gui_look_enabled = false;
@@ -66,6 +67,8 @@ namespace components {
 		void draw_tooltip_from_hover_or_world_highlight(vertex_triangle_buffer& output_buffer, const viewing_gui_context&, const vec2i tooltip_pos) const;
 		void draw_cursor_with_information(vertex_triangle_buffer& output_buffer, const viewing_gui_context&) const;
 		
+		void push_setup(const hotbar_selection_setup);
+
 		const hotbar_selection_setup& get_current_hotbar_selection_setup() const;
 		
 		static entity_id get_hotbar_assigned_entity_if_available(

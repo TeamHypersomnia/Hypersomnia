@@ -53,27 +53,42 @@ void gui_system::handle_hotbar_and_action_button_presses(logic_step& step) {
 			auto* const maybe_gui_element = subject.find<components::gui_element>();
 
 			if (maybe_gui_element != nullptr) {
-				auto& currently_held_index = maybe_gui_element->currently_held_hotbar_index;
-				
-				if (i.is_pressed) {
-					components::gui_element::hotbar_selection_setup setup;
-					
-					const bool should_dual_wield = currently_held_index > -1;
+				auto& gui = *maybe_gui_element;
 
-					if (should_dual_wield) {
-						setup = components::gui_element::get_setup_from_button_indices(subject, currently_held_index, hotbar_index);
+				auto& currently_held_index = gui.currently_held_hotbar_index;
+
+				if (gui.hotbar_buttons[currently_held_index].get_assigned_entity(subject).dead()) {
+					currently_held_index = -1;
+				}
+
+				if (gui.hotbar_buttons[hotbar_index].get_assigned_entity(subject).alive()) {
+					if (i.is_pressed) {
+						const bool should_dual_wield = currently_held_index > -1;
+
+						if (should_dual_wield) {
+							const auto setup = components::gui_element::get_setup_from_button_indices(subject, currently_held_index, hotbar_index);
+							components::gui_element::apply_and_save_hotbar_selection_setup(step, setup, subject);
+							gui.push_setup_when_index_released = -1;
+						}
+						else {
+							const auto setup = components::gui_element::get_setup_from_button_indices(subject, hotbar_index);
+							components::gui_element::apply_hotbar_selection_setup(step, setup, subject);
+							gui.push_setup_when_index_released = hotbar_index;
+						}
+
+						currently_held_index = hotbar_index;
 					}
 					else {
-						setup = components::gui_element::get_setup_from_button_indices(subject, hotbar_index);
-					}
+						if (hotbar_index == currently_held_index) {
+							currently_held_index = -1;
+						}
 
-					components::gui_element::apply_and_save_hotbar_selection_setup(step, setup, subject);
+						if (hotbar_index == gui.push_setup_when_index_released) {
+							const auto setup = components::gui_element::get_setup_from_button_indices(subject, hotbar_index);
+							gui.push_setup(setup);
 
-					currently_held_index = hotbar_index;
-				}
-				else {
-					if (hotbar_index == currently_held_index) {
-						currently_held_index = -1;
+							gui.push_setup_when_index_released = -1;
+						}
 					}
 				}
 			}

@@ -444,6 +444,13 @@ namespace components {
 		return false;
 	}
 
+	void gui_element::push_setup(const hotbar_selection_setup new_setup) {
+		auto& current = current_hotbar_selection_setup;
+		current = 1 - current;
+
+		last_setups[current] = new_setup;
+	}
+
 	bool gui_element::apply_and_save_hotbar_selection_setup(
 		logic_step& step,
 		const hotbar_selection_setup new_setup,
@@ -455,11 +462,7 @@ namespace components {
 
 		if (apply_hotbar_selection_setup(step, new_setup, element_entity)) {
 			auto& element = element_entity.get<components::gui_element>();
-
-			auto& current = element.current_hotbar_selection_setup;
-			current = 1 - current;
-
-			element.last_setups[current] = new_setup;
+			element.push_setup(new_setup);
 			
 			return true;
 		}
