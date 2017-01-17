@@ -25,6 +25,69 @@
 
 #include "augs/gui/button_corners.h"
 
+static char intent_to_hotbar_index(const intent_type type) {
+	switch (type) {
+	case intent_type::HOTBAR_BUTTON_1: return 1;
+	case intent_type::HOTBAR_BUTTON_2: return 2;
+	case intent_type::HOTBAR_BUTTON_3: return 3;
+	case intent_type::HOTBAR_BUTTON_4: return 4;
+	case intent_type::HOTBAR_BUTTON_5: return 5;
+	case intent_type::HOTBAR_BUTTON_6: return 6;
+	case intent_type::HOTBAR_BUTTON_7: return 7;
+	case intent_type::HOTBAR_BUTTON_8: return 8;
+	case intent_type::HOTBAR_BUTTON_9: return 9;
+	case intent_type::HOTBAR_BUTTON_0: return 0;
+	default: return -1;
+	}
+}
+
+void gui_system::handle_hotbar_and_action_button_presses(logic_step& step) {
+	const auto& intents = step.transient.messages.get_queue<messages::intent_message>();
+	auto& cosmos = step.cosm;
+
+	for (const auto& i : intents) {
+		const auto hotbar_index = intent_to_hotbar_index(i.intent);
+		
+		if (hotbar_index >= 0) {
+			const auto subject = cosmos[i.subject];
+			auto* const maybe_gui_element = subject.find<components::gui_element>();
+
+			if (maybe_gui_element != nullptr) {
+				auto& currently_held_index = maybe_gui_element->currently_held_hotbar_index;
+				
+				if (i.is_pressed) {
+					components::gui_element::hotbar_selection_setup setup;
+					
+					const bool should_dual_wield = currently_held_index > -1;
+
+					if (should_dual_wield) {
+						setup = components::gui_element::get_setup_from_button_indices(subject, currently_held_index, hotbar_index);
+					}
+					else {
+						setup = components::gui_element::get_setup_from_button_indices(subject, hotbar_index);
+					}
+
+					components::gui_element::apply_and_save_hotbar_selection_setup(step, setup, subject);
+
+					currently_held_index = hotbar_index;
+				}
+				else {
+					if (hotbar_index == currently_held_index) {
+						currently_held_index = -1;
+					}
+				}
+			}
+		}
+		else if (i.intent == intent_type::PREVIOUS_HOTBAR_SELECTION_SETUP && i.is_pressed) {
+			const auto subject = cosmos[i.subject];
+
+			if (subject.has<components::gui_element>()) {
+				components::gui_element::apply_previous_hotbar_selection_setup(step, subject);
+			}
+		}
+	}
+}
+
 void gui_system::switch_to_gui_mode_and_back(logic_step& step) {
 	const auto& intents = step.transient.messages.get_queue<messages::intent_message>();
 	auto& cosmos = step.cosm;
@@ -43,7 +106,6 @@ void gui_system::switch_to_gui_mode_and_back(logic_step& step) {
 				//preview_due_to_item_picking_request = i.is_pressed;
 			}
 		}
-
 	}
 }
 
@@ -148,7 +210,7 @@ void gui_system::advance_gui_elements(logic_step& step) {
 			auto set_rc = [&](auto& hb) {
 				const auto bbox = hb.get_bbox(root);
 
-				hb.rc = xywh(current_x, screen_size.y - max_height - 50, bbox.x + left_rc_spacing + right_rc_spacing, max_height);
+				hb.rc = xywh(xywhi(current_x, screen_size.y - max_height - 50, bbox.x + left_rc_spacing + right_rc_spacing, max_height));
 
 				current_x += bbox.x + left_rc_spacing + right_rc_spacing;
 			};

@@ -499,6 +499,7 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(logic_step& s
 
 	performance.start(meter_type::GUI);
 	gui_system().switch_to_gui_mode_and_back(step);
+	gui_system().handle_hotbar_and_action_button_presses(step);
 	gui_system().advance_gui_elements(step);
 	performance.stop(meter_type::GUI);
 

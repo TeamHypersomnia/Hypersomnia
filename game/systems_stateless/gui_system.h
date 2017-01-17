@@ -9,5 +9,6 @@ class game_gui_world;
 class gui_system {
 public:
 	void advance_gui_elements(logic_step&);
-	void switch_to_gui_mode_and_back(logic_step&);	
+	void switch_to_gui_mode_and_back(logic_step&);
+	void handle_hotbar_and_action_button_presses(logic_step&);
 };

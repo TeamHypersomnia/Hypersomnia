@@ -286,6 +286,41 @@ namespace components {
 		return entity_id();
 	}
 
+	const gui_element::hotbar_selection_setup& gui_element::get_current_hotbar_selection_setup() const {
+		return last_setups[current_hotbar_selection_setup];
+	}
+
+	entity_id gui_element::get_hotbar_assigned_entity_if_available(
+		const const_entity_handle element_entity,
+		const const_entity_handle assigned_entity
+	) {
+		if (assigned_entity.get_owning_transfer_capability() == element_entity.get_owning_transfer_capability()) {
+			return assigned_entity.get_id();
+		}
+
+		return entity_id();
+	}
+
+	const gui_element::hotbar_selection_setup& gui_element::get_setup_from_button_indices(
+		const const_entity_handle element_entity,
+		const int primary_button,
+		const int secondary_button
+	) {
+		auto& element = element_entity.get<components::gui_element>();
+
+		hotbar_selection_setup output;
+
+		if (primary_button != -1) {
+			output.primary_selection = element.hotbar_buttons[static_cast<size_t>(primary_button)].get_assigned_entity(element_entity);
+		}
+
+		if (secondary_button != -1) {
+			output.secondary_selection = element.hotbar_buttons[static_cast<size_t>(secondary_button)].get_assigned_entity(element_entity);
+		}
+
+		return output;
+	}
+
 	void gui_element::clear_hotbar_selection_for_item(
 		const entity_handle element_entity,
 		const const_entity_handle item_entity
@@ -310,7 +345,6 @@ namespace components {
 
 		auto& element = element_entity.get<components::gui_element>();
 		element.hotbar_buttons[button_index].last_assigned_entity = item;
-		LOG_NVPS(button_index);
 	}
 
 	void gui_element::assign_item_to_first_free_hotbar_button(
@@ -345,20 +379,25 @@ namespace components {
 		const hotbar_selection_setup new_setup,
 		const entity_handle element_entity
 	) {
-		const auto& element = element_entity.get<components::gui_element>();
+		return element_entity.wield_in_hands(
+			step, 
+			get_hotbar_assigned_entity_if_available(element_entity, step.cosm[new_setup.primary_selection]),
+			get_hotbar_assigned_entity_if_available(element_entity, step.cosm[new_setup.secondary_selection])
+		);
+	}
 
-		entity_id first_item;
-		entity_id second_item;
+	bool gui_element::apply_previous_hotbar_selection_setup(
+		logic_step& step,
+		const entity_handle element_entity
+	) {
+		auto& element = element_entity.get<components::gui_element>();
 
-		if (new_setup.primary_index != -1) {
-			first_item = element.hotbar_buttons[static_cast<size_t>(new_setup.primary_index)].get_assigned_entity(element_entity);
-		}
+		auto& current = element.current_hotbar_selection_setup;
+		current = 1 - current;
+		
+		const auto setup = element.last_setups[current];
 
-		if (new_setup.secondary_index != -1) {
-			second_item = element.hotbar_buttons[static_cast<size_t>(new_setup.secondary_index)].get_assigned_entity(element_entity);
-		}
-
-		return element_entity.wield_in_hands(step, first_item, second_item);
+		return apply_hotbar_selection_setup(step, setup, element_entity);
 	}
 
 	bool gui_element::apply_and_save_hotbar_selection_setup(
@@ -366,7 +405,7 @@ namespace components {
 		const hotbar_selection_setup new_setup,
 		const entity_handle element_entity
 	) {
-		if (new_setup == get_current_hotbar_selection_setup(element_entity)) {
+		if (new_setup == get_actual_selection_setup(element_entity)) {
 			return true;
 		}
 
@@ -384,30 +423,15 @@ namespace components {
 		return false;
 	}
 
-
-	gui_element::hotbar_selection_setup gui_element::get_current_hotbar_selection_setup(
+	gui_element::hotbar_selection_setup gui_element::get_actual_selection_setup(
 		const const_entity_handle element_entity
 	) {
 		hotbar_selection_setup output;
 
 		const auto& element = element_entity.get<components::gui_element>();
 
-		const auto primary_item = element_entity[slot_function::PRIMARY_HAND].get_item_if_any();
-		const auto secondary_item = element_entity[slot_function::SECONDARY_HAND].get_item_if_any();
-
-		for (size_t i = 0; i < element.hotbar_buttons.size(); ++i) {
-			const auto& h = element.hotbar_buttons[i];
-
-			const auto assigned = h.get_assigned_entity(element_entity);
-
-			if (primary_item == assigned) {
-				output.primary_index = static_cast<char>(i);
-			}
-
-			if (secondary_item == assigned) {
-				output.secondary_index = static_cast<char>(i);
-			}
-		}
+		output.primary_selection = element_entity[slot_function::PRIMARY_HAND].get_item_if_any();
+		output.secondary_selection = element_entity[slot_function::SECONDARY_HAND].get_item_if_any();
 
 		return output;
 	}

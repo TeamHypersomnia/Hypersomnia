@@ -19,6 +19,18 @@ const_entity_handle hotbar_button::get_assigned_entity(const const_entity_handle
 	return cosm[entity_id()];
 }
 
+bool hotbar_button::is_primary_selection(const const_entity_handle owner_transfer_capability) const {
+	const auto assigned_entity = get_assigned_entity(owner_transfer_capability);
+
+	return assigned_entity.alive() && owner_transfer_capability.wields_in_primary_hand(assigned_entity);
+}
+
+bool hotbar_button::is_secondary_selection(const const_entity_handle owner_transfer_capability) const {
+	const auto assigned_entity = get_assigned_entity(owner_transfer_capability);
+
+	return assigned_entity.alive() && owner_transfer_capability.wields_in_secondary_hand(assigned_entity);
+}
+
 entity_handle hotbar_button::get_assigned_entity(const entity_handle owner_transfer_capability) const {
 	auto& cosm = owner_transfer_capability.get_cosmos();
 	const auto handle = cosm[last_assigned_entity];
@@ -74,8 +86,8 @@ void hotbar_button::draw(const viewing_gui_context& context, const const_this_in
 	const auto assigned_entity = this_id->get_assigned_entity(owner_transfer_capability);
 	const bool has_assigned_entity = assigned_entity.alive();
 
-	const bool is_in_primary = has_assigned_entity && owner_transfer_capability.wields_in_primary_hand(assigned_entity);
-	const bool is_in_secondary = has_assigned_entity && owner_transfer_capability.wields_in_secondary_hand(assigned_entity);
+	const bool is_in_primary = this_id->is_primary_selection(owner_transfer_capability);
+	const bool is_in_secondary = this_id->is_secondary_selection(owner_transfer_capability);
 
 	const bool is_assigned_entity_selected = is_in_primary || is_in_secondary;
 
@@ -286,7 +298,7 @@ void hotbar_button::advance_elements(const logic_gui_context& context, const thi
 
 		if (info.is_ldown_or_double_or_triple()) {
 			components::gui_element::hotbar_selection_setup setup;
-			setup.primary_index = this_id.get_location().index;
+			setup.primary_selection = this_id->get_assigned_entity(context.get_gui_element_entity());
 
 			components::gui_element::apply_and_save_hotbar_selection_setup(context.get_step(), setup, context.get_gui_element_entity());
 		}

@@ -15,6 +15,7 @@
 #include "game/components/force_joint_component.h"
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/fixtures_component.h"
+#include "game/components/gui_element_component.h"
 
 #include "game/detail/inventory_utils.h"
 #include "game/detail/inventory_slot.h"
@@ -111,7 +112,21 @@ void item_system::handle_holster_item_intents(logic_step& step) {
 			) {
 			const auto subject = cosmos[r.subject];
 
-			if (subject.find<components::item_slot_transfers>()) {
+			if (subject.has<components::gui_element>() && subject.find<components::item_slot_transfers>()) {
+				const auto hand_type = subject.map_primary_action_to_secondary_hand_if_primary_empty(intent_type::HOLSTER_SECONDARY_ITEM == r.intent).get_id().type;
+
+				auto new_setup = components::gui_element::get_actual_selection_setup(subject);
+
+				if (hand_type == slot_function::PRIMARY_HAND) {
+					new_setup.primary_selection.unset();
+				}
+				else if (hand_type == slot_function::SECONDARY_HAND) {
+					new_setup.primary_selection.unset();
+				}
+
+				components::gui_element::apply_and_save_hotbar_selection_setup(step, new_setup, subject);
+			}
+			else if (subject.has<components::item_slot_transfers>()) {
 				const auto hand = subject.map_primary_action_to_secondary_hand_if_primary_empty(intent_type::HOLSTER_SECONDARY_ITEM == r.intent);
 				const auto item_inside = hand.get_item_if_any();
 

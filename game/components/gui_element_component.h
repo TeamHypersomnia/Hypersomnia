@@ -28,17 +28,18 @@ class viewing_step;
 namespace components {
 	struct gui_element {
 		struct hotbar_selection_setup {
-			char primary_index = -1;
-			char secondary_index = -1;
+			entity_id primary_selection;
+			entity_id secondary_selection;
 
 			bool operator==(const hotbar_selection_setup b) const {
-				return primary_index == b.primary_index && secondary_index == b.secondary_index;
+				return primary_selection == b.primary_selection && secondary_selection == b.secondary_selection;
 			}
 		};
 
 		std::array<hotbar_button, 10> hotbar_buttons;
 
 		hotbar_selection_setup last_setups[2];
+		int currently_held_hotbar_index = -1;
 
 		unsigned char current_hotbar_selection_setup = 0;
 		bool is_gui_look_enabled = false;
@@ -63,6 +64,19 @@ namespace components {
 		void draw_tooltip_from_hover_or_world_highlight(vertex_triangle_buffer& output_buffer, const viewing_gui_context&, const vec2i tooltip_pos) const;
 		void draw_cursor_with_information(vertex_triangle_buffer& output_buffer, const viewing_gui_context&) const;
 		
+		const hotbar_selection_setup& get_current_hotbar_selection_setup() const;
+		
+		static entity_id get_hotbar_assigned_entity_if_available(
+			const const_entity_handle element_entity,
+			const const_entity_handle assigned_entity
+		);
+
+		static const hotbar_selection_setup& get_setup_from_button_indices(
+			const const_entity_handle element_entity,
+			const int primary_button,
+			const int secondary_button = -1
+		);
+
 		static void clear_hotbar_selection_for_item(
 			const entity_handle element_entity,
 			const const_entity_handle item_entity
@@ -91,7 +105,12 @@ namespace components {
 			const entity_handle element_entity
 		);
 
-		static hotbar_selection_setup get_current_hotbar_selection_setup(
+		static bool apply_previous_hotbar_selection_setup(
+			logic_step&,
+			const entity_handle element_entity
+		);
+
+		static hotbar_selection_setup get_actual_selection_setup(
 			const const_entity_handle element_entity
 		);
 
