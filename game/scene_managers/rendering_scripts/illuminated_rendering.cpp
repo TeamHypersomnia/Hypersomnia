@@ -85,6 +85,10 @@ namespace rendering_scripts {
 		light.render_all_lights(renderer, matrix, step, [&]() {
 				draw_crosshair_lines(
 					[&](const vec2 from, const vec2 to, const rgba col) {
+						if (!step.settings.draw_weapon_laser) {
+							return;
+						}
+
 						const auto& edge_tex = get_resource_manager().find(assets::texture_id::LASER_GLOW_EDGE)->tex;
 						const vec2 edge_size = static_cast<vec2>(edge_tex.get_size());
 
@@ -175,7 +179,7 @@ namespace rendering_scripts {
 			render_system().draw_entities(interp, global_time_seconds,output, step.visible_per_layer[i], camera, renderable_drawing_type::NORMAL);
 		}
 		
-		if (step.settings.draw_crosshairs) {
+		if (step.settings.draw_crosshairs && step.settings.draw_weapon_laser) {
 			draw_crosshair_lines(
 				[&](const vec2 from, const vec2 to, const rgba col) {
 					augs::draw_line(
