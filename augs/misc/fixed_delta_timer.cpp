@@ -29,7 +29,7 @@ namespace augs {
 	}
 
 	float fixed_delta_timer::fraction_of_step_until_next_step(const fixed_delta& basic_delta) const {
-		return accumulator / basic_delta.delta_ms;
+		return static_cast<float>(accumulator / basic_delta.delta_ms);
 	}
 
 	void fixed_delta_timer::set_stepping_speed_multiplier(const float tm) {
