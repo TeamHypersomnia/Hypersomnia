@@ -785,6 +785,8 @@ namespace scene_managers {
 		active_context.map_key_to_intent(window::event::keys::key::SPACE, intent_type::SPACE_BUTTON);
 		active_context.map_key_to_intent(window::event::keys::key::MOUSE4, intent_type::SWITCH_TO_GUI);
 		
+		active_context.map_key_to_intent(window::event::keys::key::F, intent_type::SWITCH_WEAPON_LASER);
+
 		active_context.map_key_to_intent(window::event::keys::key::_0, intent_type::HOTBAR_BUTTON_0);
 		active_context.map_key_to_intent(window::event::keys::key::_1, intent_type::HOTBAR_BUTTON_1);
 		active_context.map_key_to_intent(window::event::keys::key::_2, intent_type::HOTBAR_BUTTON_2);

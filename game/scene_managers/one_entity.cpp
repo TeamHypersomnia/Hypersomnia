@@ -76,13 +76,17 @@ namespace scene_managers {
 		const auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
 
 		const auto rifle2 = prefabs::create_sample_bilmer2000(step, vec2(100, -500 + 50),
-			prefabs::create_sample_magazine(step, vec2(100, -650), true ? "10" : "0.3",
-				prefabs::create_cyan_charge(world, vec2(0, 0), true ? 1000 : 30)));
+			prefabs::create_sample_magazine(step, vec2(100, -650), false ? "10" : "0.3",
+				prefabs::create_cyan_charge(world, vec2(0, 0), false ? 1000 : 30)));
 		
 		prefabs::create_kek9(step, vec2(300, -500 + 50));
 
+		prefabs::create_kek9(step, vec2(100, -500),
+			prefabs::create_small_magazine(step, vec2(100, -650), "0.4",
+				prefabs::create_pink_charge(world, vec2(0, 0), 30)));
+
 		//perform_transfer({ backpack, character(0)[slot_function::SHOULDER_SLOT] }, step);
-		prefabs::create_sample_suppressor(world, vec2(300, -500));
+		//prefabs::create_sample_suppressor(world, vec2(300, -500));
 
 		characters.assign(new_characters.begin(), new_characters.end());
 
@@ -122,6 +126,8 @@ namespace scene_managers {
 
 		active_context.map_key_to_intent(window::event::keys::key::SPACE, intent_type::SPACE_BUTTON);
 		active_context.map_key_to_intent(window::event::keys::key::MOUSE4, intent_type::SWITCH_TO_GUI);
+
+		active_context.map_key_to_intent(window::event::keys::key::F, intent_type::SWITCH_WEAPON_LASER);
 
 		active_context.map_key_to_intent(window::event::keys::key::_0, intent_type::HOTBAR_BUTTON_0);
 		active_context.map_key_to_intent(window::event::keys::key::_1, intent_type::HOTBAR_BUTTON_1);
