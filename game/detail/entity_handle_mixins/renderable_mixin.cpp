@@ -70,7 +70,7 @@ ltrb basic_renderable_mixin<C, D>::get_aabb(const components::transform transfor
 	//	result.aabb.set_size({ distance*2, distance * 2 });
 	//}
 
-	ensure(false);
+	//ensure(false);
 
 	return{};
 }

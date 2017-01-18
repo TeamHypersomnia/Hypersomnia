@@ -204,8 +204,15 @@ namespace components {
 		}
 	}
 	
-	rects::ltrb<float> polygon::get_aabb(components::transform transform) const {
-		return augs::get_aabb(vertices, 
+	rects::ltrb<float> polygon::get_aabb(const components::transform transform) const {
+		auto model_transformed = vertices;
+
+		for (auto& v : model_transformed) {
+			v.pos.rotate(transform.rotation, vec2(0, 0));
+			v.pos += transform.pos;
+		}
+
+		return augs::get_aabb(model_transformed,
 			[](const vertex p) { return p.pos.x; },
 			[](const vertex p) { return p.pos.y; }
 		);

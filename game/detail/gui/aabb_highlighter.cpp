@@ -26,6 +26,10 @@ void aabb_highlighter::draw(viewing_step& step, const const_entity_handle& subje
 			sub_entity_name::CORPSE_OF_SENTIENCE,
 		};
 
+		if (e.has<components::particles_existence>()) {
+			return;
+		}
+
 		const auto name_as_sub_entity = e.get_name_as_sub_entity();
 
 		for (const auto forbidden : dont_expand_aabb_for_sub_entities) {
@@ -36,10 +40,10 @@ void aabb_highlighter::draw(viewing_step& step, const const_entity_handle& subje
 
 		const auto new_aabb = e.get_aabb(step.session.systems_audiovisual.get<interpolation_system>());
 
-		if (aabb.good()) {
+		if (aabb.good() && new_aabb.good()) {
 			aabb.contain(new_aabb);
 		}
-		else {
+		else if (new_aabb.good()) {
 			aabb = new_aabb;
 		}
 	};
