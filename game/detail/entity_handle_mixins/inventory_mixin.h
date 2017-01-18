@@ -2,6 +2,7 @@
 #include "game/detail/inventory_slot_handle_declaration.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/step_declaration.h"
+#include "augs/build_settings/setting_empty_bases.h"
 
 template<bool is_const, class entity_handle_type>
 class basic_inventory_mixin {
@@ -82,7 +83,7 @@ template<bool, class>
 class inventory_mixin;
 
 template<class entity_handle_type>
-class inventory_mixin<false, entity_handle_type> : public basic_inventory_mixin<false, entity_handle_type> {
+class EMPTY_BASES inventory_mixin<false, entity_handle_type> : public basic_inventory_mixin<false, entity_handle_type> {
 public:
 
 	bool wield_in_hands(
@@ -95,5 +96,5 @@ public:
 };
 
 template<class entity_handle_type>
-class inventory_mixin<true, entity_handle_type> : public basic_inventory_mixin<true, entity_handle_type> {
+class EMPTY_BASES inventory_mixin<true, entity_handle_type> : public basic_inventory_mixin<true, entity_handle_type> {
 };

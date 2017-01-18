@@ -26,11 +26,12 @@
 #include "game/detail/item_slot_transfer_request_declaration.h"
 #include "game/global/all_settings.h"
 #include "game/transcendental/cosmic_profiler.h"
+#include "augs/build_settings/setting_empty_bases.h"
 
 class cosmic_delta;
 struct data_living_one_step;
 
-class cosmos : 
+class EMPTY_BASES cosmos : 
 	private put_all_components_into<augs::operations_on_all_components_mixin, cosmos>::type, 
 	public augs::easier_handle_getters_mixin<cosmos>
 {

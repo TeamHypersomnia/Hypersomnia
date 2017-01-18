@@ -20,6 +20,7 @@
 #include "game/detail/entity_handle_mixins/renderable_mixin.h"
 
 #include "game/enums/entity_flag.h"
+#include "augs/build_settings/setting_empty_bases.h"
 
 class cosmos;
 class cosmic_delta;
@@ -28,7 +29,7 @@ template <bool, class>
 class component_synchronizer;
 
 template <bool is_const>
-class basic_entity_handle :
+class EMPTY_BASES basic_entity_handle :
 	private augs::component_allocators_mixin<is_const, basic_entity_handle<is_const>>,
 	public augs::component_setters_mixin<is_const, basic_entity_handle<is_const>>,
 

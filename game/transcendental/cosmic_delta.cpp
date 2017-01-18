@@ -470,6 +470,7 @@ TEST(CosmicDelta, CosmicDeltaPaddingTest) {
 	LOG_NVPS(sizeof(dum), sizeof(components::gui_element));
 	sizeof(dum);
 	sizeof(components::gui_element);
+	LOG_NVPS(sizeof(entity_handle));
 
 	padding_checker(dum());
 	padding_checker(std::array<hotbar_button, 9>());

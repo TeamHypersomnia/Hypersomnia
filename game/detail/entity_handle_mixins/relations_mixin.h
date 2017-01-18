@@ -9,6 +9,7 @@
 #include "game/enums/sub_entity_name.h"
 
 #include "game/build_settings.h"
+#include "augs/build_settings/setting_empty_bases.h"
 
 struct entity_relations;
 
@@ -41,7 +42,7 @@ template<bool, class>
 class relations_mixin;
 
 template<class entity_handle_type>
-class relations_mixin<false, entity_handle_type> : public basic_relations_mixin<false, entity_handle_type> {
+class EMPTY_BASES relations_mixin<false, entity_handle_type> : public basic_relations_mixin<false, entity_handle_type> {
 protected:
 	components::child& child_component() const;
 	components::sub_entities& sub_entities_component() const;
@@ -88,7 +89,7 @@ public:
 };
 
 template<class entity_handle_type>
-class relations_mixin<true, entity_handle_type> : public basic_relations_mixin<true, entity_handle_type> {
+class EMPTY_BASES relations_mixin<true, entity_handle_type> : public basic_relations_mixin<true, entity_handle_type> {
 public:
 
 	template <class F>

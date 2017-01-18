@@ -1010,6 +1010,7 @@
     <ClInclude Include="application\ui\app_ui_context.h" />
     <ClInclude Include="application\ui\app_ui_element_location.h" />
     <ClInclude Include="application\ui\app_ui_root.h" />
+    <ClInclude Include="augs\build_settings\setting_empty_bases.h" />
     <ClInclude Include="augs\gui\button_corners.h" />
     <ClInclude Include="application\ui\locations\app_ui_root_in_context.h" />
     <ClInclude Include="application\ui\locations\dx_button_in_menu.h" />
