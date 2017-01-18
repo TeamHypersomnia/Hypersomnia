@@ -125,6 +125,10 @@ namespace components {
 			return hint_rect.get_position();
 		};
 
+		auto get_absolute_pos = [&](const game_gui_element_location l) {
+			return context.get_tree_entry(l).get_absolute_pos();
+		};
+
 		const auto& rect_world = context.get_rect_world();
 
 		const bool is_dragging = rect_world.is_currently_dragging();
@@ -145,7 +149,7 @@ namespace components {
 				const auto hotbar_location = context.dereference_location(transfer_data.source_hotbar_button_id);
 
 				if (hotbar_location != nullptr) {
-					const auto drawn_pos = drag_amount + hotbar_location->rc.get_position() - dragged_item_button->rc.get_position();
+					const auto drawn_pos = drag_amount + get_absolute_pos(hotbar_location) - get_absolute_pos(dragged_item_button);
 					
 					dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drawn_pos);
 
@@ -184,7 +188,7 @@ namespace components {
 				const auto hotbar_location = context.dereference_location(transfer_data.source_hotbar_button_id);
 
 				if (hotbar_location != nullptr) {
-					const auto drawn_pos = drag_amount + hotbar_location->rc.get_position() - dragged_item_button->rc.get_position();
+					const auto drawn_pos = drag_amount + get_absolute_pos(hotbar_location) - get_absolute_pos(dragged_item_button);
 					
 					dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drawn_pos);
 				}
@@ -208,7 +212,7 @@ namespace components {
 
 				if (hotbar_location != nullptr) {
 					dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drag_amount 
-						+ hotbar_location->rc.get_position() - dragged_item_button->rc.get_position()
+						+ get_absolute_pos(hotbar_location) - get_absolute_pos(dragged_item_button)
 					);
 				}
 				else {

@@ -33,7 +33,7 @@ void local_setup::process(const config_lua_table& cfg, game_window& window) {
 	augs::machine_entropy_player player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
-	scene_managers::one_entity testbed;
+	scene_managers::testbed testbed;
 	testbed.debug_var = cfg.debug_var;
 
 	if (!hypersomnia.load_from_file("save.state")) {
@@ -146,7 +146,7 @@ void local_setup::process(const config_lua_table& cfg, game_window& window) {
 		renderer.clear_current_fbo();
 
 		game_drawing_settings settings;
-		settings.draw_weapon_laser = false;
+		settings.draw_weapon_laser = true;
 
 		session.view(renderer, hypersomnia, testbed.get_selected_character(), vdt, augs::gui::text::fstr(), settings);
 
