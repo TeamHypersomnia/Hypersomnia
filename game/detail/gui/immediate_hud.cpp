@@ -301,9 +301,9 @@ void immediate_hud::acquire_game_events(const const_logic_step& step) {
 	erase_remove(recent_pure_color_highlights, timeout_lambda);
 }
 
-void immediate_hud::draw_vertically_flying_numbers(viewing_step& msg) const {
-	const auto current_time = msg.get_interpolated_total_time_passed_in_seconds();
-	auto& triangles = msg.renderer.triangles;
+void immediate_hud::draw_vertically_flying_numbers(viewing_step& step) const {
+	const auto current_time = step.get_interpolated_total_time_passed_in_seconds();
+	auto& triangles = step.renderer.triangles;
 
 	for (const auto& r : recent_vertically_flying_numbers) { 
 		auto passed = current_time - r.time_of_occurence;
@@ -311,18 +311,18 @@ void immediate_hud::draw_vertically_flying_numbers(viewing_step& msg) const {
 
 		auto text = r.text;
 
-		text.pos = msg.get_screen_space((r.transform.pos - vec2(0, static_cast<float>(sqrt(passed)) * 120.f)));
+		text.pos = step.get_screen_space((r.transform.pos - vec2(0, static_cast<float>(sqrt(passed)) * 120.f)));
 		
 		text.draw_stroke(triangles);
 		text.draw(triangles);
 	}
 }
 
-void immediate_hud::draw_pure_color_highlights(viewing_step& msg) const {
-	const auto& cosmos = msg.cosm;
-	const auto current_time = static_cast<float>(msg.get_interpolated_total_time_passed_in_seconds());
-	auto& triangles = msg.renderer.triangles;
-	const auto& interp = msg.session.systems_audiovisual.get<interpolation_system>();
+void immediate_hud::draw_pure_color_highlights(viewing_step& step) const {
+	const auto& cosmos = step.cosm;
+	const auto current_time = static_cast<float>(step.get_interpolated_total_time_passed_in_seconds());
+	auto& triangles = step.renderer.triangles;
+	const auto& interp = step.session.systems_audiovisual.get<interpolation_system>();
 
 	for (const auto& r : recent_pure_color_highlights) {
 		const auto& subject = cosmos[r.target];
@@ -339,9 +339,9 @@ void immediate_hud::draw_pure_color_highlights(viewing_step& msg) const {
 		auto ratio = passed / r.maximum_duration_seconds;
 
 		col.a = static_cast<rgba_channel>(255 * (1-ratio) * r.starting_alpha_ratio);
-		render_system().draw_renderable(triangles, current_time, sprite, subject.viewing_transform(interp, true), subject.get<components::render>(), msg.camera, renderable_drawing_type::NORMAL);
+		render_system().draw_renderable(triangles, current_time, sprite, subject.viewing_transform(interp, true), subject.get<components::render>(), step.camera, renderable_drawing_type::NORMAL);
 		col = prevcol;
 	}
 
-	//msg.state.output->triangles.insert(msg.state.output->triangles.begin(), pure_color_highlights.begin(), pure_color_highlights.end());
+	//step.state.output->triangles.insert(step.state.output->triangles.begin(), pure_color_highlights.begin(), pure_color_highlights.end());
 }
