@@ -114,8 +114,8 @@ void component_synchronizer<false, P>::apply_force(const vec2 pixels, const vec2
 	component.angular_velocity = get_cache().body->GetAngularVelocity();
 	component.velocity = get_cache().body->GetLinearVelocity();
 
-	if (renderer::get_current().debug_draw_forces && force.non_zero()) {
-		auto& lines = renderer::get_current().logic_lines;
+	if (augs::renderer::get_current().debug_draw_forces && force.non_zero()) {
+		auto& lines = augs::renderer::get_current().logic_lines;
 		lines.draw_green(location * METERS_TO_PIXELSf + force * METERS_TO_PIXELSf, location * METERS_TO_PIXELSf);
 	}
 }
@@ -137,8 +137,8 @@ void component_synchronizer<false, P>::apply_impulse(const vec2 pixels, const ve
 	component.angular_velocity = get_cache().body->GetAngularVelocity();
 	component.velocity = get_cache().body->GetLinearVelocity();
 
-	if (renderer::get_current().debug_draw_forces && force.non_zero()) {
-		auto& lines = renderer::get_current().logic_lines;
+	if (augs::renderer::get_current().debug_draw_forces && force.non_zero()) {
+		auto& lines = augs::renderer::get_current().logic_lines;
 		lines.draw_green(location * METERS_TO_PIXELSf + force * METERS_TO_PIXELSf, location * METERS_TO_PIXELSf);
 	}
 }

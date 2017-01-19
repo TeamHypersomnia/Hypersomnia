@@ -18,7 +18,7 @@ struct drop_for_item_slot_transfer {
 	item_slot_transfer_request_data simulated_transfer;
 	item_transfer_result result;
 
-	constant_size_wstring<32> hint_text;
+	augs::constant_size_wstring<32> hint_text;
 };
 
 struct drop_for_hotbar_assignment {
@@ -27,7 +27,7 @@ struct drop_for_hotbar_assignment {
 	entity_id item_id;
 	hotbar_button_in_gui_element assign_to;
 
-	constant_size_wstring<20> hint_text;
+	augs::constant_size_wstring<20> hint_text;
 };
 
 typedef augs::trivial_variant<

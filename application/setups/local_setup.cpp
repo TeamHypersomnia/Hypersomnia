@@ -125,7 +125,7 @@ void local_setup::process(const config_lua_table& cfg, game_window& window) {
 
 			const auto cosmic_entropy_for_this_step = cosmic_entropy(hypersomnia[testbed.get_selected_character()], total_collected_entropy.local, session.context);
 
-			renderer::get_current().clear_logic_lines();
+			augs::renderer::get_current().clear_logic_lines();
 
 			hypersomnia.advance_deterministic_schemata(cosmic_entropy_for_this_step, [](auto){},
 				[this, &session](const const_logic_step& step){

@@ -128,7 +128,7 @@ namespace augs {
 			std::vector<event::state> poll_events();
 
 			bool set_window_rect(const xywhi&);
-			rects::wh<int> get_screen_size() const;
+			vec2i get_screen_size() const;
 			xywhi get_window_rect() const;
 
 			bool is_active() const;

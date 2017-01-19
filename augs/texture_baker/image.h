@@ -5,7 +5,7 @@
 
 namespace augs {
 	class image {
-		std::vector<augs::rgba_channel> v;
+		std::vector<rgba_channel> v;
 		vec2i size;
 		int channels;
 
@@ -14,14 +14,14 @@ namespace augs {
 		image(const image&);
 		image& operator=(const image&);
 
-		void paint_circle(int radius, int border_width = 1, augs::rgba filling = white, bool scale_alpha = false);
-		void paint_circle_midpoint(int radius, int border_width = 1, augs::rgba filling = white, bool scale_alpha = false, bool constrain_angle = false,
+		void paint_circle(int radius, int border_width = 1, rgba filling = white, bool scale_alpha = false);
+		void paint_circle_midpoint(int radius, int border_width = 1, rgba filling = white, bool scale_alpha = false, bool constrain_angle = false,
 			vec2 angle_start = vec2(), vec2 angle_end = vec2());
-		void paint_filled_circle(int radius, augs::rgba filling = white);
+		void paint_filled_circle(int radius, rgba filling = white);
 
-		void paint_button_with_cuts(int width, int height, int left_bottom_cut_length, int top_right_cut_length, augs::rgba border, augs::rgba filling);
+		void paint_button_with_cuts(int width, int height, int left_bottom_cut_length, int top_right_cut_length, rgba border, rgba filling);
 
-		void paint_line(const vec2i from, const vec2i to, const augs::rgba filling = white);
+		void paint_line(const vec2i from, const vec2i to, const rgba filling = white);
 		bool in_bounds(const vec2i) const;
 
 		void create(int w, int h, int channels);

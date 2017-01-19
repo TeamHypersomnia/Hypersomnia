@@ -45,7 +45,7 @@ namespace resources {
 	};
 
 	struct particle_effect_modifier {
-		augs::rgba colorize;
+		rgba colorize;
 		float scale_amounts = 1.f;
 		float scale_lifetimes = 1.f;
 

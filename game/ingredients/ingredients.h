@@ -22,8 +22,8 @@ namespace ingredients {
 
 	components::item& make_item(entity_handle);
 	
-	components::sprite& sprite(entity_handle, components::transform pos, assets::texture_id = assets::texture_id::BLANK, augs::rgba col = augs::rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
-	components::sprite& sprite_scalled(entity_handle, components::transform pos, vec2i size = vec2i(), assets::texture_id = assets::texture_id::BLANK, augs::rgba col = augs::rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
+	components::sprite& sprite(entity_handle, components::transform pos, assets::texture_id = assets::texture_id::BLANK, rgba col = rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
+	components::sprite& sprite_scalled(entity_handle, components::transform pos, vec2i size = vec2i(), assets::texture_id = assets::texture_id::BLANK, rgba col = rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
 	
 	void bullet_round_physics(entity_handle);
 	void see_through_dynamic_body(entity_handle);

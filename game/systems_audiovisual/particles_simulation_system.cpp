@@ -102,7 +102,7 @@ void resources::particle::integrate(const float dt) {
 	rotation += rotation_speed * dt;
 
 	vel.damp(linear_damping * dt);
-	damp(rotation_speed, angular_damping * dt);
+	augs::damp(rotation_speed, angular_damping * dt);
 
 	lifetime_ms += dt * 1000.f;
 }

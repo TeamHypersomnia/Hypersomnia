@@ -10,7 +10,7 @@ namespace augs {
 		template <class gui_element_polymorphic_id>
 		struct middlescrolling {
 			material mat;
-			rects::wh<float> size = rects::wh<float>(25, 25);
+			vec2 size = vec2(25, 25);
 			vec2i middlescroll_icon_position;
 			gui_element_polymorphic_id subject;
 			float speed_mult = 1.f;
@@ -39,7 +39,7 @@ namespace augs {
 			template<class C>
 			void draw(C context, draw_info in) const {
 				if (context.alive(subject)) {
-					ltrb scroller = rects::wh<float>(size);
+					auto scroller = ltrb(vec2(), size);
 					scroller.center(middlescroll_icon_position);
 					draw_clipped_rect(mat, scroller, context, subject, in.v);
 				}

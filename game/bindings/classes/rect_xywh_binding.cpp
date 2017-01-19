@@ -7,20 +7,6 @@
 namespace bindings {
 	luabind::scope _rect_xywh() {
 		return
-			luabind::class_<rects::wh<float>>("rect_wh")
-			.def(luabind::constructor<float, float>())
-			.def(luabind::constructor<const rects::wh<float>&>())
-			.def_readwrite("w", &xywh::w)
-			.def_readwrite("h", &xywh::h)
-			,
-
-			luabind::class_<rects::wh<int>>("rect_wh_i")
-			.def(luabind::constructor<int, int>())
-			.def(luabind::constructor<const rects::wh<int>&>())
-			.def_readwrite("w", &xywhi::w)
-			.def_readwrite("h", &xywhi::h)
-			,
-
 			luabind::class_<xywh>("rect_xywh")
 			.def(luabind::constructor<float, float, float, float>())
 			.def(luabind::constructor<const ltrb&>())
@@ -28,7 +14,7 @@ namespace bindings {
 			.def_readwrite("y", &xywh::y)
 			.def_readwrite("w", &xywh::w)
 			.def_readwrite("h", &xywh::h)
-			.def("hover", (bool (xywh::*)(const vec2& m) const) &xywh::hover)
+			.def("hover", (bool (xywh::*)(const vec2 m) const) &xywh::hover)
 			.property("r", (float (xywh::*)() const)&xywh::r, (void (xywh::*)(float)) &xywh::r)
 			.property("b", (float (xywh::*)() const)&xywh::b, (void (xywh::*)(float)) &xywh::b),
 
@@ -41,8 +27,6 @@ namespace bindings {
 			.def_readwrite("h", &xywhi::h)
 			.property("r", (int (xywhi::*)() const)&xywhi::r, (void (xywhi::*)(int)) &xywhi::r)
 			.property("b", (int (xywhi::*)() const)&xywhi::b, (void (xywhi::*)(int)) &xywhi::b);
-
-			
 			;
 	}
 }

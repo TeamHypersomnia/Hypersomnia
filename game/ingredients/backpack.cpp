@@ -34,7 +34,7 @@ namespace prefabs {
 		name_entity(def, entity_name::VIOLET_BACKPACK);
 		ingredients::backpack(def);
 
-		ingredients::sprite(def, pos, assets::texture_id::BACKPACK, augs::white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::sprite(def, pos, assets::texture_id::BACKPACK, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::see_through_dynamic_body(def);
 		
 		def.add_standard_components();

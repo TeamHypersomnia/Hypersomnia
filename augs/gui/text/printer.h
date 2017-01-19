@@ -55,7 +55,7 @@ namespace augs {
 				const unsigned wrapping_width
 			);
 
-			extern rects::wh<float> quick_print(
+			extern vec2 quick_print(
 				std::vector<augs::vertex_triangle>& v,
 				const fstr& str,
 				const vec2i pos,
@@ -63,7 +63,7 @@ namespace augs {
 				const ltrbi clipper = ltrbi()
 			);
 
-			extern rects::wh<float> quick_print_format(
+			extern vec2 quick_print_format(
 				std::vector<augs::vertex_triangle>& v,
 				const std::wstring& wstr,
 				const style style,

@@ -9,10 +9,10 @@ class game_window {
 	friend class config_lua_table;
 
 public:
-	rects::wh<int> get_screen_size();
+	vec2i get_screen_size();
 	void swap_buffers();
 
 	bool clear_window_inputs_once = true;
 
-	decltype(machine_entropy::local) collect_entropy(const bool enable_cursor_clipping);
+	decltype(augs::machine_entropy::local) collect_entropy(const bool enable_cursor_clipping);
 };

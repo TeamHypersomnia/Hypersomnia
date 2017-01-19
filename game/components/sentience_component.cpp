@@ -9,7 +9,7 @@ namespace components {
 		return value / maximum;
 	}
 	
-	augs::rgba sentience::calculate_health_color(float time_pulse_multiplier) const {
+	rgba sentience::calculate_health_color(float time_pulse_multiplier) const {
 		using namespace augs;
 		auto hr = health.ratio();
 		hr *= 1.f - (0.2f * time_pulse_multiplier);
@@ -23,7 +23,7 @@ namespace components {
 		health_col.g = std::min(int(health_col.g), health_col.b + 45);
 		health_col.r = std::min(255, health_col.r + last_g - health_col.g + 10);
 
-		augs::rgba pulse_target(150, 0, 0, 255);
+		rgba pulse_target(150, 0, 0, 255);
 		auto red_unit = (health_col.r / 255.f);
 		float pulse_redness_multiplier = red_unit * red_unit * red_unit * red_unit * (1 - time_pulse_multiplier);
 

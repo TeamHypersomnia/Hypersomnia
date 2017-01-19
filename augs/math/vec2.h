@@ -194,9 +194,6 @@ struct vec2t {
 	vec2t(const t& v) : x(static_cast<type>(v.x)), y(static_cast<type>(v.y)) {}
 
 	template <class t>
-	vec2t(const augs::rects::wh<t>& v) : x(static_cast<type>(v.w)), y(static_cast<type>(v.h)) {}
-
-	template <class t>
 	vec2t& operator=(const t& v) {
 		x = static_cast<type>(v.x);
 		y = static_cast<type>(v.y);

@@ -35,7 +35,7 @@ namespace components {
 		//augs::constant_size_vector<vec2, RENDERING_POLYGON_VERTEX_COUNT> original_polygon;
 
 		/* triangulated version of original_polygon, ready to be rendered triangle-by-triangle */
-		augs::constant_size_vector<vertex, RENDERING_POLYGON_TRIANGULATED_VERTEX_COUNT> vertices;
+		augs::constant_size_vector<augs::vertex, RENDERING_POLYGON_TRIANGULATED_VERTEX_COUNT> vertices;
 
 		/* indices used in glDrawElements */
 		augs::constant_size_vector<zeroed_pod<unsigned>, RENDERING_POLYGON_INDEX_COUNT> triangulation_indices;
@@ -55,8 +55,8 @@ namespace components {
 		void from_polygonized_texture(const assets::texture_id);
 
 		/* triangulates input */
-		void add_concave_polygon(std::vector<vertex>);
-		void add_triangle(const vertex_triangle&);
+		void add_concave_polygon(std::vector<augs::vertex>);
+		void add_triangle(const augs::vertex_triangle&);
 
 		void set_color(rgba col);
 
@@ -64,7 +64,7 @@ namespace components {
 			return vertices.size();
 		}
 
-		vertex& get_vertex(size_t i) {
+		augs::vertex& get_vertex(size_t i) {
 			return vertices[i];
 		}
 

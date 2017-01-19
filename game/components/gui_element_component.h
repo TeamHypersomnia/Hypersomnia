@@ -64,8 +64,8 @@ namespace components {
 		vec2i get_initial_position_for(const drag_and_drop_target_drop_item&) const;
 		vec2 initial_inventory_root_position() const;
 		
-		void draw_tooltip_from_hover_or_world_highlight(vertex_triangle_buffer& output_buffer, const viewing_gui_context&, const vec2i tooltip_pos) const;
-		void draw_cursor_with_information(vertex_triangle_buffer& output_buffer, const viewing_gui_context&) const;
+		void draw_tooltip_from_hover_or_world_highlight(augs::vertex_triangle_buffer& output_buffer, const viewing_gui_context&, const vec2i tooltip_pos) const;
+		void draw_cursor_with_information(augs::vertex_triangle_buffer& output_buffer, const viewing_gui_context&) const;
 		
 		void push_setup(const hotbar_selection_setup);
 
@@ -125,6 +125,6 @@ namespace components {
 		);
 
 		static entity_id get_hovered_world_entity(const cosmos& cosm, const vec2 world_cursor_position);
-		static void draw_complete_gui_for_camera_rendering_request(vertex_triangle_buffer& output_buffer, const const_entity_handle handle, viewing_step&);
+		static void draw_complete_gui_for_camera_rendering_request(augs::vertex_triangle_buffer& output_buffer, const const_entity_handle handle, viewing_step&);
 	};
 }

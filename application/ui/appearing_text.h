@@ -70,7 +70,7 @@ struct appearing_text {
 		return caret_active || (text.size() > 0 && alpha > 0);
 	}
 
-	void draw(vertex_triangle_buffer& buf) {
+	void draw(augs::vertex_triangle_buffer& buf) {
 		if (!should_draw()) {
 			return;
 		}

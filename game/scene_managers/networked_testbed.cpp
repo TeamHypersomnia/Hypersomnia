@@ -92,12 +92,12 @@ namespace scene_managers {
 			for (int y = -side; y < side; ++y)
 			{
 				//auto background = world.create_entity("bg[-]");
-				//ingredients::sprite(background, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 550)), assets::texture_id::TEST_BACKGROUND, augs::white, render_layer::GROUND);
+				//ingredients::sprite(background, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 550)), assets::texture_id::TEST_BACKGROUND, white, render_layer::GROUND);
 				//ingredients::standard_static_body(background);
 
 				auto street = world.create_entity("street[-]");
 				ingredients::sprite(street, { bg_size * vec2(x, y) },
-					assets::texture_id::TEST_BACKGROUND, augs::gray1, render_layer::GROUND);
+					assets::texture_id::TEST_BACKGROUND, gray1, render_layer::GROUND);
 
 				//background.add_standard_components();
 				street.add_standard_components();

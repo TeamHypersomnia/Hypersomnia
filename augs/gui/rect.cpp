@@ -48,15 +48,23 @@ namespace augs {
 		///* handle focus and passing scroll to parents */
 		//
 		//bool rect_composite::is_scroll_clamped_to_right_down_corner() const {
-		//	return rects::wh<float>(rc).can_contain(content_size, scroll);
+		//	return vec2(rc).can_contain(content_size, scroll);
 		//}
 		//
 		//void rect_composite::clamp_scroll_to_right_down_corner() {
-		//	rects::wh<float>(rc).clamp_offset_to_right_down_corner_of(content_size, scroll);
+
+		//void clamp_offset_to_right_down_corner_of(const wh& bigger, vec2t<T>& offset) const {
+		//	offset.x = std::min(offset.x, T(bigger.w - w));
+		//	offset.x = std::max(offset.x, 0.f);
+		//	offset.y = std::min(offset.y, T(bigger.h - h));
+		//	offset.y = std::max(offset.y, 0.f);
+		//}
+
+		//	vec2(rc).clamp_offset_to_right_down_corner_of(content_size, scroll);
 		//}
 		//
 		//ltrb rect_composite::get_local_clipper() const {
-		//	return ltrb(rects::wh<float>(rc)) + scroll;
+		//	return ltrb(vec2(rc)) + scroll;
 		//}
 		//
 		//ltrb rect_leaf::get_absolute_rect() const {

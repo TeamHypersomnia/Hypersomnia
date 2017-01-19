@@ -14,7 +14,7 @@ namespace components {
 		render_layer layer = render_layer::INVALID;
 		padding_byte pad;
 
-		augs::rgba border_color;
+		rgba border_color;
 
 		unsigned last_step_when_visible = 0;
 

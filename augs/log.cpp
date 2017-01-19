@@ -28,7 +28,7 @@ augs::gui::text::fstr global_log::format_recent_as_text(const assets::font_id f)
 	
 	for (const auto& line : recent_entries) {
 		auto wstr = to_wstring(line.text + "\n");
-		result += augs::gui::text::format(wstr, augs::gui::text::style(f, augs::rgba(line.color)));
+		result += augs::gui::text::format(wstr, augs::gui::text::style(f, rgba(line.color)));
 	}
 
 	return result;

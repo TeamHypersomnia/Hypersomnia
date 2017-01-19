@@ -128,7 +128,7 @@ void draw_pixel_line_connector(
 	const ltrb& a,
 	const ltrb& b,
 	const augs::gui::draw_info in,
-	const augs::rgba col
+	const rgba col
 ) {
 	for (const auto l : get_connecting_pixel_lines(a, b)) {
 		augs::draw_line(in.v, l[0], l[1], 1, *assets::texture_id::BLANK, col);

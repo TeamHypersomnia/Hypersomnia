@@ -26,8 +26,8 @@ int main(int argc, char** argv) {
 	config_lua_table cfg;
 	cfg.call_config_script("config.lua", "config.local.lua");
 	
-	audio_manager::generate_alsoft_ini(cfg.enable_hrtf);
-	audio_manager audio;
+	augs::audio_manager::generate_alsoft_ini(cfg.enable_hrtf);
+	augs::audio_manager audio;
 
 	game_window window;
 	cfg.call_window_script(window, "window.lua");

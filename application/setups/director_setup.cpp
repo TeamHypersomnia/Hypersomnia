@@ -282,7 +282,7 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 				unsaved_changes_exist = true;
 			}
 
-			renderer::get_current().clear_logic_lines();
+			augs::renderer::get_current().clear_logic_lines();
 
 			hypersomnia.advance_deterministic_schemata(cosmic_entropy_for_this_advancement, [](auto) {},
 					[this, &session](const const_logic_step& step) {

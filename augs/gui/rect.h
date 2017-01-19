@@ -314,7 +314,7 @@ namespace augs {
 			//void clamp_scroll_to_right_down_corner();
 
 			//template <class C, class gui_element_id>
-			//rects::wh<float> calculate_content_size(C context) const {
+			//vec2 calculate_content_size(C context) const {
 			//	/* init on zero */
 			//	ltrb content = ltrb(0.f, 0.f, 0.f, 0.f);
 			//
@@ -374,7 +374,7 @@ namespace augs {
 			//	auto& wnd = owner.state;
 			//
 			//	if (e == gui_event::mdown || e == gui_event::mdoubleclick) {
-			//		if (get_flag(flag::SCROLLABLE) && !content_size.inside(rects::wh<float>(rc))) {
+			//		if (get_flag(flag::SCROLLABLE) && !content_size.inside(vec2(rc))) {
 			//			owner.middlescroll.subject.set(this_id);
 			//			owner.middlescroll.pos = wnd.mouse.pos;
 			//			owner.set_focus(this_id);

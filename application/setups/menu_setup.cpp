@@ -504,7 +504,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 		auto steps = timer.count_logic_steps_to_perform(intro_scene.get_fixed_delta());
 
 		while (steps--) {
-			renderer::get_current().clear_logic_lines();
+			augs::renderer::get_current().clear_logic_lines();
 
 			const auto entropy = cosmic_entropy(director.get_entropy_for_step(intro_scene.get_total_steps_passed() - initial_step_number), intro_scene);
 

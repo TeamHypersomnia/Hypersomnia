@@ -14,7 +14,7 @@ namespace augs {
 		}
 
 		stylesheet::style::operator material() const {
-			return material(background_image.active ? (assets::texture_id) background_image : assets::texture_id::BLANK, color.active ? (augs::rgba) color : rgba(255, 255, 255, 255));
+			return material(background_image.active ? (assets::texture_id) background_image : assets::texture_id::BLANK, color.active ? (rgba) color : rgba(255, 255, 255, 255));
 		}
 
 		stylesheet::stylesheet(const style& released, const style& hovered, const style& pushed, const style& focused)

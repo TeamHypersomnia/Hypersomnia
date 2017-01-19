@@ -32,7 +32,7 @@ void cosmos::save_to_file(const std::string& filename) {
 	
 	profiler.writing_savefile.new_measurement();
 
-	write_file_binary(filename, stream.buf);
+	augs::write_file_binary(filename, stream.buf);
 
 	profiler.writing_savefile.end_measurement();
 	

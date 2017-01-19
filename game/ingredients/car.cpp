@@ -54,7 +54,7 @@ namespace prefabs {
 			car.speed_for_pitch_unit = 2000.f;
 
 			sprite.from_polygonized_texture(assets::texture_id::TRUCK_FRONT);
-			//sprite.set(assets::texture_id::TRUCK_FRONT, augs::rgba(0, 255, 255));
+			//sprite.set(assets::texture_id::TRUCK_FRONT, rgba(0, 255, 255));
 			//sprite.size.x = 200;
 			//sprite.size.y = 100;
 
@@ -83,7 +83,7 @@ namespace prefabs {
 			render.layer = render_layer::CAR_INTERIOR;
 
 			sprite.set(assets::texture_id::TRUCK_INSIDE);
-			//sprite.set(assets::texture_id::TRUCK_INSIDE, augs::rgba(122, 0, 122, 255));
+			//sprite.set(assets::texture_id::TRUCK_INSIDE, rgba(122, 0, 122, 255));
 			//sprite.size.x = 250;
 			//sprite.size.y = 550;
 
@@ -114,7 +114,7 @@ namespace prefabs {
 
 			render.layer = render_layer::CAR_WHEEL;
 
-			sprite.set(assets::texture_id::CAR_INSIDE, augs::rgba(29, 0, 0, 0));
+			sprite.set(assets::texture_id::CAR_INSIDE, rgba(29, 0, 0, 0));
 			sprite.size.set(60, 30);
 
 			auto& fixture = colliders.new_collider();
@@ -143,7 +143,7 @@ namespace prefabs {
 					render.layer = render_layer::SMALL_DYNAMIC_BODY;
 
 					sprite.set(assets::texture_id::TRUCK_ENGINE);
-					//sprite.set(assets::texture_id::TRUCK_INSIDE, augs::rgba(122, 0, 122, 255));
+					//sprite.set(assets::texture_id::TRUCK_INSIDE, rgba(122, 0, 122, 255));
 					//sprite.size.x = 250;
 					//sprite.size.y = 550;
 

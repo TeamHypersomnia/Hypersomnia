@@ -162,8 +162,8 @@ void gui_system::advance_gui_elements(logic_step& step) {
 							const auto& item_entity = cosmos[held_rect.get_location().item_id];
 							auto& dragged_charges = element.dragged_charges;
 			
-							if (change.msg == window::event::message::rdown
-								|| change.msg == window::event::message::rdoubleclick
+							if (change.msg == augs::window::event::message::rdown
+								|| change.msg == augs::window::event::message::rdoubleclick
 								) {
 								if (rect_world.held_rect_is_dragged) {
 									step.transient.messages.post(item_slot_transfer_request_data{ item_entity, cosmos[inventory_slot_id()], dragged_charges });
@@ -171,7 +171,7 @@ void gui_system::advance_gui_elements(logic_step& step) {
 								}
 							}
 			
-							if (change.msg == window::event::message::wheel) {
+							if (change.msg == augs::window::event::message::wheel) {
 								const auto& item = item_entity.get<components::item>();
 			
 								const auto delta = change.scroll.amount;

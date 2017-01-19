@@ -62,6 +62,6 @@ namespace components {
 
 		sentience();
 
-		augs::rgba calculate_health_color(float time_pulse_multiplier) const;
+		rgba calculate_health_color(float time_pulse_multiplier) const;
 	};
 }

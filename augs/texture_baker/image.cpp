@@ -67,7 +67,7 @@ namespace augs {
 		//v.shrink_to_fit();
 	}
 
-	void image::paint_circle_midpoint(int radius, int border_width, augs::rgba filling, bool scale_alpha, bool constrain_angle, vec2 angle_start, vec2 angle_end) {
+	void image::paint_circle_midpoint(int radius, int border_width, rgba filling, bool scale_alpha, bool constrain_angle, vec2 angle_start, vec2 angle_end) {
 		auto side = radius * 2 + 1;
 
 		image new_surface;
@@ -142,7 +142,7 @@ namespace augs {
 		}
 	}
 
-	void image::paint_circle(int radius, int border_width, augs::rgba filling, bool scale_alpha) {
+	void image::paint_circle(int radius, int border_width, rgba filling, bool scale_alpha) {
 		auto side = radius * 2 + 1;
 
 		if (v.empty()) {
@@ -195,7 +195,7 @@ namespace augs {
 		//pixel(side - 1, side / 2) = rgba(0, 0, 0, 0);
 	}
 
-	void image::paint_filled_circle(int radius, augs::rgba filling) {
+	void image::paint_filled_circle(int radius, rgba filling) {
 		auto side = radius * 2 + 1;
 
 		if (v.empty()) {
@@ -223,7 +223,7 @@ namespace augs {
 		//pixel(side -1, side /2) = rgba(0, 0, 0, 0);
 	}
 
-	void image::paint_button_with_cuts(int width, int height, int left_bottom_cut_length, int top_right_cut_length, augs::rgba border, augs::rgba filling) {
+	void image::paint_button_with_cuts(int width, int height, int left_bottom_cut_length, int top_right_cut_length, rgba border, rgba filling) {
 		create(width, height, 4);
 
 		for (int x = 0; x < size.x; ++x) {
@@ -236,7 +236,7 @@ namespace augs {
 		}
 	}
 
-	void image::paint_line(const vec2i from, const vec2i to, const augs::rgba filling) {
+	void image::paint_line(const vec2i from, const vec2i to, const rgba filling) {
 		Line(from.x, from.y, to.x, to.y, [&](const int x, const int y) {
 			ensure(in_bounds({ x, y }));
 			pixel(x, y) = filling;

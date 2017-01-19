@@ -103,7 +103,7 @@ namespace ingredients {
 		attitude.parties = party_category::METROPOLIS_CITIZEN;
 		attitude.hostile_parties = party_category::RESISTANCE_CITIZEN;
 
-		particle_response.modifier.colorize = augs::red;
+		particle_response.modifier.colorize = red;
 		particle_response.modifier.scale_lifetimes = 1.5f;
 
 		sentience.aimpunch.offsets = {

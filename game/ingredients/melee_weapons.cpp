@@ -19,7 +19,7 @@ namespace prefabs {
 		auto& machete = world.create_entity("urban_cyan_machete");
 		name_entity(machete, entity_name::URBAN_CYAN_MACHETE);
 
-		auto& sprite = ingredients::sprite(machete, pos, assets::texture_id::URBAN_CYAN_MACHETE, augs::white, render_layer::SMALL_DYNAMIC_BODY);
+		auto& sprite = ingredients::sprite(machete, pos, assets::texture_id::URBAN_CYAN_MACHETE, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::see_through_dynamic_body(machete);
 
 		auto& item = ingredients::make_item(machete);
@@ -87,7 +87,7 @@ namespace prefabs {
 		damage.constrain_lifetime = false;
 
 		auto& response = machete += components::particle_effect_response{ assets::particle_effect_response_id::SWINGING_MELEE_WEAPON_RESPONSE };
-		response.modifier.colorize = augs::cyan;
+		response.modifier.colorize = cyan;
 		
 		machete.add_standard_components();
 

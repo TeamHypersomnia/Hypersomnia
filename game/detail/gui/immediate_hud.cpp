@@ -12,6 +12,7 @@
 #include "game/components/render_component.h"
 #include "game/components/physics_component.h"
 #include "game/components/name_component.h"
+#include "game/components/container_component.h"
 
 #include "game/messages/health_event.h"
 
@@ -174,9 +175,9 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 						if (total_space_available > 0) {
 							ammo_ratio = 1 - (total_actual_free_space / total_space_available);
 
-							auto redviolet = augs::violet;
+							auto redviolet = violet;
 							redviolet.r = 200;
-							circle_hud.color = augs::interp(augs::white, redviolet, (1 - ammo_ratio)* (1 - ammo_ratio));
+							circle_hud.color = augs::interp(white, redviolet, (1 - ammo_ratio)* (1 - ammo_ratio));
 							circle_hud.color.a = 200;
 							circle_hud.draw(state);
 
@@ -246,7 +247,7 @@ void immediate_hud::acquire_game_events(const const_logic_step& step) {
 		vn.value = h.effective_amount;
 		vn.maximum_duration_seconds = 0.7;
 
-		augs::rgba col;
+		rgba col;
 
 		if (h.target == messages::health_event::HEALTH) {
 			if (h.effective_amount > 0) {

@@ -190,7 +190,7 @@ namespace augs {
 				return dr.get_bbox();
 			}
 
-			rects::wh<float> quick_print(
+			vec2 quick_print(
 				std::vector<augs::vertex_triangle>& v,
 				const fstr& str,
 				const vec2i pos,
@@ -205,7 +205,7 @@ namespace augs {
 				return dr.get_bbox();
 			}
 
-			rects::wh<float> quick_print_format(
+			vec2 quick_print_format(
 				std::vector<augs::vertex_triangle>& v,
 				const std::wstring& wstr,
 				const gui::text::style style,

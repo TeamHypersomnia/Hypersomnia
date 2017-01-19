@@ -55,7 +55,7 @@ namespace components {
 
 		auto target_color = color;
 
-		if (in.colorize != augs::white) {
+		if (in.colorize != white) {
 			target_color *= in.colorize;
 		}
 

@@ -13,5 +13,5 @@ void draw_pixel_line_connector(
 	const ltrb& origin, 
 	const ltrb& target,
 	const augs::gui::draw_info,
-	const augs::rgba col
+	const rgba col
 );

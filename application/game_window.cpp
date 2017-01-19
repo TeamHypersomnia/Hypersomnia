@@ -1,6 +1,6 @@
 #include "game_window.h"
 
-rects::wh<int> game_window::get_screen_size() {
+vec2i game_window::get_screen_size() {
 	return window.get_screen_size();
 }
 
@@ -8,7 +8,7 @@ void game_window::swap_buffers() {
 	window.swap_buffers();
 }
 
-decltype(machine_entropy::local) game_window::collect_entropy(const bool enable_cursor_clipping) {
+decltype(augs::machine_entropy::local) game_window::collect_entropy(const bool enable_cursor_clipping) {
 	auto result = window.poll_events(enable_cursor_clipping);
 
 	if (clear_window_inputs_once) {

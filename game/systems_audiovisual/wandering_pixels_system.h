@@ -26,7 +26,7 @@ public:
 		using vertex_triangle_buffer_reference::vertex_triangle_buffer_reference;
 
 		camera_cone camera;
-		augs::rgba colorize;
+		rgba colorize;
 		renderable_drawing_type drawing_type = renderable_drawing_type::NORMAL;
 	};
 

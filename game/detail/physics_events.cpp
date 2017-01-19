@@ -75,19 +75,20 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 				}
 				else {
 					for (int i = 0; i < 1; i++) {
-						b2Vec2 pointVelOther = body_b->GetLinearVelocityFromWorldPoint(worldManifold.points[i]);
-						auto velOtherPixels = vec2(pointVelOther) * METERS_TO_PIXELSf;
+						const b2Vec2 pointVelOther = body_b->GetLinearVelocityFromWorldPoint(worldManifold.points[i]);
+						const auto velOtherPixels = vec2(pointVelOther) * METERS_TO_PIXELSf;
 
 						if (velOtherPixels.length() > 1) {
-							auto angle = vec2(worldManifold.normal).degrees_between(velOtherPixels);
+							const auto angle = vec2(worldManifold.normal).degrees_between(velOtherPixels);
 
-							if (angle > 90)
+							if (angle > 90) {
 								found_suitable = true;
+							}
 						}
 
-						if (renderer::get_current().debug_draw_friction_field_collisions_of_entering) {
-							renderer::get_current().blink_lines.draw_yellow(METERS_TO_PIXELSf*worldManifold.points[i], METERS_TO_PIXELSf* worldManifold.points[i] + vec2(worldManifold.normal).set_length(150));
-							renderer::get_current().blink_lines.draw_red(METERS_TO_PIXELSf*worldManifold.points[i], METERS_TO_PIXELSf* worldManifold.points[i] + velOtherPixels);
+						if (augs::renderer::get_current().debug_draw_friction_field_collisions_of_entering) {
+							augs::renderer::get_current().blink_lines.draw_yellow(METERS_TO_PIXELSf*worldManifold.points[i], METERS_TO_PIXELSf* worldManifold.points[i] + vec2(worldManifold.normal).set_length(150));
+							augs::renderer::get_current().blink_lines.draw_red(METERS_TO_PIXELSf*worldManifold.points[i], METERS_TO_PIXELSf* worldManifold.points[i] + velOtherPixels);
 						}
 					}
 				}

@@ -14,7 +14,7 @@ struct basic_renderable_drawing_input : vertex_triangle_buffer_reference {
 
 	renderable_positioning_type positioning = renderable_positioning_type::CENTER;
 
-	augs::rgba colorize = augs::white;
+	rgba colorize = white;
 	renderable_drawing_type drawing_type = renderable_drawing_type::NORMAL;
 
 	void set_global_time_seconds(const float) {

@@ -5,7 +5,6 @@ namespace augs {
 	namespace rects {
 		template <class type> struct ltrb;
 		template <class type> struct xywh;
-		template <class type> struct wh;
 	}
 }
 

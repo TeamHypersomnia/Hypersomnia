@@ -19,7 +19,7 @@ namespace components {
 			value_variation variation;
 		};
 
-		augs::rgba color;
+		rgba color;
 
 		light();
 

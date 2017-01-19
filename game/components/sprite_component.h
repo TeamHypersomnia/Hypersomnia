@@ -23,7 +23,7 @@ namespace components {
 		};
 
 		assets::texture_id tex = assets::texture_id::INVALID;
-		augs::rgba color;
+		rgba color;
 		vec2 size;
 		vec2 size_multiplier = vec2(1, 1);
 		vec2 gui_bbox_expander;
@@ -59,7 +59,7 @@ namespace components {
 
 		vec2 get_size() const;
 
-		void set(assets::texture_id, augs::rgba = augs::rgba());
+		void set(assets::texture_id, rgba = rgba());
 		void update_size_from_texture_dimensions();
 
 		void draw(const drawing_input&) const;
