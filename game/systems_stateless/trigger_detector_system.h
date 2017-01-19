@@ -5,7 +5,7 @@ class cosmos;
 
 class trigger_detector_system {
 public:
-	void consume_trigger_detector_presses(logic_step&) const;
-	void post_trigger_requests_from_continuous_detectors(logic_step&) const;
-	void send_trigger_confirmations(logic_step&) const;
+	void consume_trigger_detector_presses(const logic_step) const;
+	void post_trigger_requests_from_continuous_detectors(const logic_step) const;
+	void send_trigger_confirmations(const logic_step) const;
 };

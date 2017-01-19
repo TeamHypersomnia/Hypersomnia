@@ -44,8 +44,8 @@ public:
 
 	bool show_profile_details = true;
 
-	void spread_past_infection(const const_logic_step&);
-	void acquire_game_events_for_hud(const const_logic_step&);
+	void spread_past_infection(const const_logic_step);
+	void acquire_game_events_for_hud(const const_logic_step);
 	void set_interpolation_enabled(const bool);
 	void set_master_gain(const float);
 

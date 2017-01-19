@@ -51,7 +51,7 @@ float components::sound_existence::calculate_max_audible_distance() const {
 	return input.modifier.max_distance + input.modifier.reference_distance;
 }
 
-void sound_existence_system::destroy_dead_sounds(logic_step& step) const {
+void sound_existence_system::destroy_dead_sounds(const logic_step step) const {
 	auto& cosmos = step.cosm;
 	const auto timestamp = cosmos.get_timestamp();
 
@@ -71,7 +71,7 @@ void sound_existence_system::destroy_dead_sounds(logic_step& step) const {
 	}
 }
 
-void sound_existence_system::game_responses_to_sound_effects(logic_step& step) const {
+void sound_existence_system::game_responses_to_sound_effects(const logic_step step) const {
 	const auto& gunshots = step.transient.messages.get_queue<messages::gunshot_response>();
 	const auto& damages = step.transient.messages.get_queue<messages::damage_message>();
 	const auto& swings = step.transient.messages.get_queue<messages::melee_swing_response>();
@@ -160,7 +160,7 @@ void sound_existence_system::game_responses_to_sound_effects(logic_step& step) c
 		}
 	}
 }
-//void create_sound_effects(logic_step&) const;
+//void create_sound_effects(const logic_step) const;
 entity_handle sound_existence_system::create_sound_effect_entity(cosmos& cosmos, 
 	const components::sound_existence::effect_input input,
 	const components::transform place_of_birth,

@@ -219,7 +219,7 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 					const cosmic_entropy cosmic_entropy_for_this_advancement = cosmic_entropy(replayed_entropy, hypersomnia);
 
 					hypersomnia.advance_deterministic_schemata(cosmic_entropy_for_this_advancement, [](auto) {},
-						[this, &session](const const_logic_step& step) {
+						[this, &session](const const_logic_step step) {
 							session.acquire_game_events_for_hud(step);
 						}
 					);
@@ -285,7 +285,7 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 			augs::renderer::get_current().clear_logic_lines();
 
 			hypersomnia.advance_deterministic_schemata(cosmic_entropy_for_this_advancement, [](auto) {},
-					[this, &session](const const_logic_step& step) {
+					[this, &session](const const_logic_step step) {
 					session.acquire_game_events_for_hud(step);
 				}
 			);

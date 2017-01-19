@@ -41,7 +41,7 @@ static char intent_to_hotbar_index(const intent_type type) {
 	}
 }
 
-void gui_system::handle_hotbar_and_action_button_presses(logic_step& step) {
+void gui_system::handle_hotbar_and_action_button_presses(const logic_step step) {
 	const auto& intents = step.transient.messages.get_queue<messages::intent_message>();
 	auto& cosmos = step.cosm;
 
@@ -103,7 +103,7 @@ void gui_system::handle_hotbar_and_action_button_presses(logic_step& step) {
 	}
 }
 
-void gui_system::switch_to_gui_mode_and_back(logic_step& step) {
+void gui_system::switch_to_gui_mode_and_back(const logic_step step) {
 	const auto& intents = step.transient.messages.get_queue<messages::intent_message>();
 	auto& cosmos = step.cosm;
 
@@ -124,7 +124,7 @@ void gui_system::switch_to_gui_mode_and_back(logic_step& step) {
 	}
 }
 
-void gui_system::advance_gui_elements(logic_step& step) {
+void gui_system::advance_gui_elements(const logic_step step) {
 	auto& cosmos = step.cosm;
 
 	for (const auto root : cosmos.get(processing_subjects::WITH_GUI_ELEMENT)) {

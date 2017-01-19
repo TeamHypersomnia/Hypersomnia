@@ -38,8 +38,8 @@ class EMPTY_BASES cosmos :
 	private put_all_components_into<augs::operations_on_all_components_mixin, cosmos>::type, 
 	public augs::easier_handle_getters_mixin<cosmos>
 {
-	void advance_deterministic_schemata_and_queue_destructions(logic_step& step_state);
-	void perform_deletions(logic_step&);
+	void advance_deterministic_schemata_and_queue_destructions(const logic_step step_state);
+	void perform_deletions(const logic_step);
 
 #if COSMOS_TRACKS_GUIDS
 	friend class cosmic_delta;

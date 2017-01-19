@@ -7,6 +7,6 @@ class cosmos;
 class gun_system {
 public:
 	
-	void consume_gun_intents(logic_step& step);
-	void launch_shots_due_to_pressed_triggers(logic_step& step);
+	void consume_gun_intents(const logic_step step);
+	void launch_shots_due_to_pressed_triggers(const logic_step step);
 };

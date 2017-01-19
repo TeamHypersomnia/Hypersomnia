@@ -26,7 +26,7 @@ void components::melee::reset_weapon(entity_handle e) {
 	d.damage_upon_collision = false;
 }
 
-void melee_system::consume_melee_intents(logic_step& step) {
+void melee_system::consume_melee_intents(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
 	const auto& events = step.transient.messages.get_queue<messages::intent_message>();
@@ -60,7 +60,7 @@ void melee_system::consume_melee_intents(logic_step& step) {
 	}
 }
 
-void melee_system::initiate_and_update_moves(logic_step& step) {
+void melee_system::initiate_and_update_moves(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
 	/* 
@@ -110,7 +110,7 @@ void melee_system::initiate_and_update_moves(logic_step& step) {
 	}
 }
 
-melee_state melee_system::primary_action(logic_step& step, const double dt_d, const entity_handle target, components::melee& melee_component, components::damage& damage)
+melee_state melee_system::primary_action(const logic_step step, const double dt_d, const entity_handle target, components::melee& melee_component, components::damage& damage)
 {
 	const float dt = static_cast<float>(dt_d);
 

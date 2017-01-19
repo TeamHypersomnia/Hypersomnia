@@ -115,7 +115,7 @@ bool line_of_sight_response::sees(const entity_id id) const {
 		;
 }
 
-void visibility_system::respond_to_visibility_information_requests(logic_step& step) const {
+void visibility_system::respond_to_visibility_information_requests(const logic_step step) const {
 	auto& queues = step.transient.messages;
 
 	const auto& los_requests = queues.get_queue<messages::line_of_sight_request>();

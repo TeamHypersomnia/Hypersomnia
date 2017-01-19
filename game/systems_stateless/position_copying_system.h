@@ -5,5 +5,5 @@ class cosmos;
 
 class position_copying_system {
 public:
-	void update_transforms(logic_step& step);
+	void update_transforms(const logic_step step);
 };

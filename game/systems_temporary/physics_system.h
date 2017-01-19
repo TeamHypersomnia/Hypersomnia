@@ -118,8 +118,8 @@ public:
 	query_output query_polygon(const std::vector<vec2>& vertices, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
 	query_output query_shape(const b2Shape* const, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
 	
-	void step_and_set_new_transforms(logic_step&);
-	void post_and_clear_accumulated_collision_messages(logic_step&);
+	void step_and_set_new_transforms(const logic_step);
+	void post_and_clear_accumulated_collision_messages(const logic_step);
 
 	mutable int ray_casts_since_last_step = 0;
 
@@ -175,5 +175,5 @@ private:
 	};
 
 	void rechoose_owner_friction_body(entity_handle);
-	void recurential_friction_handler(logic_step&, b2Body* const entity, b2Body* const friction_owner);
+	void recurential_friction_handler(const logic_step, b2Body* const entity, b2Body* const friction_owner);
 };

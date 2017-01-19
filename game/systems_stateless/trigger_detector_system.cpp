@@ -22,7 +22,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/step.h"
 
-void trigger_detector_system::consume_trigger_detector_presses(logic_step& step) const {
+void trigger_detector_system::consume_trigger_detector_presses(const logic_step step) const {
 	const auto& trigger_presses = step.transient.messages.get_queue<messages::intent_message>();
 	auto& cosmos = step.cosm;
 
@@ -64,7 +64,7 @@ void trigger_detector_system::consume_trigger_detector_presses(logic_step& step)
 	}
 }
 
-void trigger_detector_system::post_trigger_requests_from_continuous_detectors(logic_step& step) const {
+void trigger_detector_system::post_trigger_requests_from_continuous_detectors(const logic_step step) const {
 	auto& cosmos = step.cosm;
 	const auto delta = step.get_delta();
 	auto targets_copy = cosmos.get(processing_subjects::WITH_TRIGGER_QUERY_DETECTOR);
@@ -81,7 +81,7 @@ void trigger_detector_system::post_trigger_requests_from_continuous_detectors(lo
 	}
 }
 
-void trigger_detector_system::send_trigger_confirmations(logic_step& step) const {
+void trigger_detector_system::send_trigger_confirmations(const logic_step step) const {
 	auto& confirmations = step.transient.messages.get_queue<messages::trigger_hit_confirmation_message>();
 	confirmations.clear();
 

@@ -19,7 +19,7 @@ struct input_context;
 
 namespace scene_managers {
 	class networked_testbed {
-		void populate(logic_step&);
+		void populate(const logic_step);
 
 		struct controlled_character {
 			controlled_character(entity_id id = entity_id()) : id(id) {}

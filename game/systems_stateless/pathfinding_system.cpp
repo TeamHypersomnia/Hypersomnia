@@ -15,7 +15,7 @@
 #include "game/detail/physics_scripts.h"
 #include "game/messages/visibility_information.h"
 
-void pathfinding_system::advance_pathfinding_sessions(logic_step& step) {
+void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto& settings = cosmos.significant.meta.settings.pathfinding;
 

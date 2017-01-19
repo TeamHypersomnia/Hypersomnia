@@ -222,7 +222,7 @@ std::vector<D> basic_inventory_mixin<C, D>::guns_wielded() const {
 }
 
 template <class D>
-void inventory_mixin<false, D>::swap_wielded_items(logic_step& step) const {
+void inventory_mixin<false, D>::swap_wielded_items(const logic_step step) const {
 	const auto& subject = *static_cast<const D*>(this);
 	auto& cosmos = subject.get_cosmos();
 
@@ -247,7 +247,7 @@ void inventory_mixin<false, D>::swap_wielded_items(logic_step& step) const {
 
 template <class D>
 bool inventory_mixin<false, D>::wield_in_hands(
-	logic_step& step,
+	const logic_step step,
 	entity_id first, 
 	entity_id second
 ) const {

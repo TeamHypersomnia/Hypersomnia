@@ -29,8 +29,6 @@
 
 #include "game/enums/render_layer.h"
 
-#include "cosmos.h"
-
 #include "game/transcendental/step.h"
 #include "game/transcendental/cosmic_profiler.h"
 #include "game/transcendental/entity_handle.h"
@@ -44,8 +42,6 @@
 
 #include "game/transcendental/cosmic_delta.h"
 #include "game/transcendental/data_living_one_step.h"
-
-#include <sstream>
 
 void cosmos::complete_resubstantiation() {
 	profiler.complete_resubstantiation.new_measurement();
@@ -343,7 +339,7 @@ void cosmos::advance_deterministic_schemata(const cosmic_entropy& input) {
 	perform_deletions(step);
 }
 
-void cosmos::advance_deterministic_schemata_and_queue_destructions(logic_step& step) {
+void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
 	auto& performance = profiler;
@@ -470,6 +466,6 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(logic_step& s
 	++significant.meta.total_steps_passed;
 }
 
-void cosmos::perform_deletions(logic_step& step) {
+void cosmos::perform_deletions(const logic_step step) {
 	destroy_system().perform_deletions(step);
 }

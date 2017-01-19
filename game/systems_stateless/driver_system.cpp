@@ -23,7 +23,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/step.h"
 
-void driver_system::assign_drivers_from_successful_trigger_hits(logic_step& step) {
+void driver_system::assign_drivers_from_successful_trigger_hits(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
 	const auto& confirmations = step.transient.messages.get_queue<messages::trigger_hit_confirmation_message>();
@@ -43,7 +43,7 @@ void driver_system::assign_drivers_from_successful_trigger_hits(logic_step& step
 	}
 }
 
-void driver_system::release_drivers_due_to_ending_contact_with_wheel(logic_step& step) {
+void driver_system::release_drivers_due_to_ending_contact_with_wheel(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
 	const auto& contacts = step.transient.messages.get_queue<messages::collision_message>();
@@ -65,7 +65,7 @@ void driver_system::release_drivers_due_to_ending_contact_with_wheel(logic_step&
 		}
 	}
 }
-void driver_system::release_drivers_due_to_requests(logic_step& step) {
+void driver_system::release_drivers_due_to_requests(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
 	const auto& intents = step.transient.messages.get_queue<messages::intent_message>();

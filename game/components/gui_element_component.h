@@ -104,19 +104,19 @@ namespace components {
 		);
 
 		static bool apply_and_save_hotbar_selection_setup(
-			logic_step&,
+			const logic_step,
 			const hotbar_selection_setup new_setup,
 			const entity_handle element_entity
 		);
 
 		static bool apply_hotbar_selection_setup(
-			logic_step&,
+			const logic_step,
 			const hotbar_selection_setup new_setup,
 			const entity_handle element_entity
 		);
 
 		static bool apply_previous_hotbar_selection_setup(
-			logic_step&,
+			const logic_step,
 			const entity_handle element_entity
 		);
 

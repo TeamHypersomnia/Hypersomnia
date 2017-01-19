@@ -17,7 +17,7 @@ struct input_context;
 
 namespace scene_managers {
 	class one_entity {
-		void populate(logic_step&, const vec2i screen_size);
+		void populate(const logic_step, const vec2i screen_size);
 	public:
 		augs::constant_size_vector<entity_id, TESTBED_CHARACTERS_COUNT> characters;
 		unsigned current_character_index = 0;

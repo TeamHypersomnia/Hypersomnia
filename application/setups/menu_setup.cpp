@@ -480,7 +480,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 		const auto entropy = cosmic_entropy(director.get_entropy_for_step(intro_scene.get_total_steps_passed() - initial_step_number), intro_scene);
 
 		intro_scene.advance_deterministic_schemata(entropy, [](auto) {},
-			[this, &session](const const_logic_step& step) {
+			[this, &session](const const_logic_step step) {
 			session.acquire_game_events_for_hud(step);
 		}
 		);
@@ -509,7 +509,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 			const auto entropy = cosmic_entropy(director.get_entropy_for_step(intro_scene.get_total_steps_passed() - initial_step_number), intro_scene);
 
 			intro_scene.advance_deterministic_schemata(entropy, [](auto){},
-				[this, &session](const const_logic_step& step){
+				[this, &session](const const_logic_step step){
 					session.acquire_game_events_for_hud(step);
 				}
 			);

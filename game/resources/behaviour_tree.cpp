@@ -3,12 +3,12 @@
 #include "game/transcendental/entity_handle.h"
 
 namespace resources {
-	behaviour_tree::state_of_traversal::state_of_traversal(logic_step& step, entity_handle subject, state_of_tree_instance& in, const behaviour_tree& bt)
+	behaviour_tree::state_of_traversal::state_of_traversal(const logic_step step, const entity_handle subject, state_of_tree_instance& in, const behaviour_tree& bt)
 		: step(step), instance(in), original_tree(bt), subject(subject) {
 		std::fill(goals_set.begin(), goals_set.end(), false);
 	}
 
-	const behaviour_tree::node& behaviour_tree::get_node_by_id(int i) const {
+	const behaviour_tree::node& behaviour_tree::get_node_by_id(const int i) const {
 		return *node_pointers[i];
 	}
 	
@@ -23,7 +23,7 @@ namespace resources {
 		});
 	}
 
-	void behaviour_tree::evaluate_instance_of_tree(logic_step& step, entity_handle handle, state_of_tree_instance& inst) const {
+	void behaviour_tree::evaluate_instance_of_tree(const logic_step step, const entity_handle handle, state_of_tree_instance& inst) const {
 		state_of_traversal traversal(step, handle, inst, *this);
 		auto result = root.evaluate_node(traversal);
 
@@ -44,7 +44,7 @@ namespace resources {
 		return goal_availability::SHOULD_EXECUTE;
 	}
 
-	void behaviour_tree::node::execute_leaf_goal_callback(execution_occurence, state_of_traversal&) const {
+	void behaviour_tree::node::execute_leaf_goal_callback(const execution_occurence, state_of_traversal&) const {
 		// ensure(false && "Undefined action callback! Perhaps root has no children?");
 	}
 

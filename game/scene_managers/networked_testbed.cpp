@@ -60,10 +60,10 @@ namespace scene_managers {
 	}
 
 	void networked_testbed::populate_world_with_entities(cosmos& cosm) {
-		cosm.advance_deterministic_schemata(cosmic_entropy(), [this](logic_step& step) { populate(step); }, [](const_logic_step&) {});
+		cosm.advance_deterministic_schemata(cosmic_entropy(), [this](const logic_step step) { populate(step); }, [](const const_logic_step) {});
 	}
 
-	void networked_testbed::populate(logic_step& step) {
+	void networked_testbed::populate(const logic_step step) {
 		auto& world = step.cosm;
 
 		const auto crate = prefabs::create_crate(world, vec2(200, 200 + 300), vec2i(100, 100) / 3);

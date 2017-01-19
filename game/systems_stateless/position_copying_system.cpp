@@ -37,7 +37,7 @@ components::transform components::position_copying::get_previous_transform() con
 	return previous;
 }
 
-void position_copying_system::update_transforms(logic_step& step) {
+void position_copying_system::update_transforms(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto delta = step.get_delta();
 	

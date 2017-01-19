@@ -4,5 +4,5 @@ class cosmos;
 
 class pathfinding_system {
 public:
-	void advance_pathfinding_sessions(logic_step&);
+	void advance_pathfinding_sessions(const logic_step);
 };

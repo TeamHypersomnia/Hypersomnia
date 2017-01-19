@@ -14,5 +14,5 @@ public:
 		std::vector<messages::visibility_information_response>&
 	) const;
 
-	void respond_to_visibility_information_requests(logic_step&) const;
+	void respond_to_visibility_information_requests(const logic_step) const;
 };

@@ -219,7 +219,7 @@ std::wstring format_space_units(const unsigned u) {
 	return to_wstring(u / long double(SPACE_ATOMS_PER_UNIT), 2);
 }
 
-void drop_from_all_slots(const entity_handle c, logic_step& step) {
+void drop_from_all_slots(const entity_handle c, const logic_step step) {
 	const auto& container = c.get<components::container>();
 
 	for (const auto& s : container.slots) {
@@ -303,7 +303,7 @@ components::transform sum_attachment_offsets(const cosmos& cosm, const inventory
 void swap_slots_for_items(
 	const entity_id first,
 	const entity_id second,
-	logic_step& step
+	const logic_step step
 ) {
 	const auto drop_slot = step.cosm[inventory_slot_id()];
 
@@ -337,7 +337,7 @@ void swap_slots_for_items(
 	}
 }
 
-void perform_transfer(const item_slot_transfer_request r, logic_step& step) {
+void perform_transfer(const item_slot_transfer_request r, const logic_step step) {
 	auto& cosmos = r.get_item().get_cosmos();
 	auto& item = r.get_item().get<components::item>();
 	const auto previous_slot_id = item.current_slot;

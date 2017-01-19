@@ -50,7 +50,7 @@ components::sentience::meter::damage_result components::sentience::meter::calcul
 	return result;
 }
 
-void sentience_system::consume_health_event(messages::health_event h, logic_step& step) const {
+void sentience_system::consume_health_event(messages::health_event h, const logic_step step) const {
 	auto& cosmos = step.cosm;
 	const auto subject = cosmos[h.subject];
 	auto& sentience = subject.get<components::sentience>();
@@ -106,7 +106,7 @@ void sentience_system::consume_health_event(messages::health_event h, logic_step
 	step.transient.messages.post(h);
 }
 
-void sentience_system::apply_damage_and_generate_health_events(logic_step& step) const {
+void sentience_system::apply_damage_and_generate_health_events(const logic_step step) const {
 	const auto& damages = step.transient.messages.get_queue<messages::damage_message>();
 	auto& healths = step.transient.messages.get_queue<messages::health_event>();
 	auto& cosmos = step.cosm;
@@ -179,13 +179,13 @@ void sentience_system::apply_damage_and_generate_health_events(logic_step& step)
 	}
 }
 
-void sentience_system::cooldown_aimpunches(logic_step& step) const {
+void sentience_system::cooldown_aimpunches(const logic_step step) const {
 	for (const auto& t : step.cosm.get(processing_subjects::WITH_SENTIENCE)) {
 		t.get<components::sentience>().aimpunch.cooldown(step.get_delta().in_milliseconds());
 	}
 }
 
-void sentience_system::regenerate_values(logic_step& step) const {
+void sentience_system::regenerate_values(const logic_step step) const {
 	const auto now = step.cosm.get_timestamp();
 	const unsigned regeneration_frequency_in_steps = step.cosm.get_fixed_delta().get_steps_per_second() * 3;
 	
@@ -200,7 +200,7 @@ void sentience_system::regenerate_values(logic_step& step) const {
 	}
 }
 
-void sentience_system::set_borders(logic_step& step) const {
+void sentience_system::set_borders(const logic_step step) const {
 	const int timestamp_ms = static_cast<int>(step.cosm.get_total_time_passed_in_seconds() * 1000.0);
 
 	for (const auto& t : step.cosm.get(processing_subjects::WITH_SENTIENCE)) {

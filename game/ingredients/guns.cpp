@@ -66,7 +66,7 @@ namespace ingredients {
 }
 
 namespace prefabs {
-	entity_handle create_sample_magazine(logic_step& step, components::transform pos, std::string space, entity_id charge_inside_id) {
+	entity_handle create_sample_magazine(const logic_step step, components::transform pos, std::string space, entity_id charge_inside_id) {
 		auto& cosmos = step.cosm;
 		auto charge_inside = cosmos[charge_inside_id];
 
@@ -101,7 +101,7 @@ namespace prefabs {
 		return sample_magazine;
 	}
 
-	entity_handle create_small_magazine(logic_step& step, components::transform pos, std::string space, entity_id charge_inside_id) {
+	entity_handle create_small_magazine(const logic_step step, components::transform pos, std::string space, entity_id charge_inside_id) {
 		auto& cosmos = step.cosm;
 		auto charge_inside = cosmos[charge_inside_id];
 
@@ -326,7 +326,7 @@ namespace prefabs {
 		return green_charge;
 	}
 
-	entity_handle create_sample_rifle(logic_step& step, vec2 pos, entity_id load_mag_id) {
+	entity_handle create_sample_rifle(const logic_step step, vec2 pos, entity_id load_mag_id) {
 		auto& cosmos = step.cosm;
 		auto load_mag = cosmos[load_mag_id];
 		
@@ -398,7 +398,7 @@ namespace prefabs {
 		return weapon;
 	}
 
-	entity_handle create_sample_bilmer2000(logic_step& step, vec2 pos, entity_id load_mag_id) {
+	entity_handle create_sample_bilmer2000(const logic_step step, vec2 pos, entity_id load_mag_id) {
 		auto& cosmos = step.cosm;
 		auto load_mag = cosmos[load_mag_id];
 
@@ -479,7 +479,7 @@ namespace prefabs {
 		return weapon;
 	}
 
-	entity_handle create_submachine(logic_step& step, vec2 pos, entity_id load_mag_id) {
+	entity_handle create_submachine(const logic_step step, vec2 pos, entity_id load_mag_id) {
 		auto& cosmos = step.cosm;
 		auto load_mag = cosmos[load_mag_id];
 		auto weapon = cosmos.create_entity("submachine");
@@ -551,7 +551,7 @@ namespace prefabs {
 		return weapon;
 	}
 
-	entity_handle create_pistol(logic_step& step, vec2 pos, entity_id load_mag_id) {
+	entity_handle create_pistol(const logic_step step, vec2 pos, entity_id load_mag_id) {
 		auto& cosmos = step.cosm;
 		auto load_mag = cosmos[load_mag_id];
 		auto weapon = cosmos.create_entity("pistol");
@@ -623,7 +623,7 @@ namespace prefabs {
 		return weapon;
 	}
 
-	entity_handle create_kek9(logic_step& step, vec2 pos, entity_id load_mag_id) {
+	entity_handle create_kek9(const logic_step step, vec2 pos, entity_id load_mag_id) {
 		auto& cosmos = step.cosm;
 		auto load_mag = cosmos[load_mag_id];
 		auto weapon = cosmos.create_entity("pistol");

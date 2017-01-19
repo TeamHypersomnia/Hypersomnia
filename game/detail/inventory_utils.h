@@ -7,12 +7,12 @@
 #define SPACE_ATOMS_PER_UNIT 1000
 
 #include "game/transcendental/step_declaration.h"
-void perform_transfer(item_slot_transfer_request, logic_step& step);
+void perform_transfer(item_slot_transfer_request, const logic_step step);
 
 void swap_slots_for_items(
 	const entity_id first, 
 	const entity_id second, 
-	logic_step&
+	const logic_step
 );
 
 components::transform get_attachment_offset(
@@ -43,4 +43,4 @@ std::wstring format_space_units(unsigned);
 int count_charges_in_deposit(const_entity_handle item);
 int count_charges_inside(const_inventory_slot_handle);
 
-void drop_from_all_slots(entity_handle container, logic_step&);
+void drop_from_all_slots(entity_handle container, const logic_step);

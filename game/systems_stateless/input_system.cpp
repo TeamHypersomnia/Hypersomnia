@@ -22,7 +22,7 @@
 
 using namespace augs::window;
 
-void input_system::make_intent_messages(logic_step& step) {
+void input_system::make_intent_messages(const logic_step step) {
 	auto& cosmos = step.cosm;
 
 	for (const auto& per_entity : step.entropy.entropy_per_entity) {

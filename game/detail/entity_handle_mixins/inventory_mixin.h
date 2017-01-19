@@ -87,12 +87,12 @@ class EMPTY_BASES inventory_mixin<false, entity_handle_type> : public basic_inve
 public:
 
 	bool wield_in_hands(
-		logic_step& step,
+		const logic_step step,
 		entity_id first = entity_id(), 
 		entity_id second = entity_id()
 	) const;
 
-	void swap_wielded_items(logic_step&) const;
+	void swap_wielded_items(const logic_step) const;
 };
 
 template<class entity_handle_type>

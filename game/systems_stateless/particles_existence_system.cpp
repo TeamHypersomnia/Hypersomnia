@@ -44,7 +44,7 @@ void components::particles_existence::deactivate(const entity_handle h) {
 	h.get<components::processing>().disable_in(processing_subjects::WITH_PARTICLES_EXISTENCE);
 }
 
-void particles_existence_system::destroy_dead_streams(logic_step& step) const {
+void particles_existence_system::destroy_dead_streams(const logic_step step) const {
 	auto& cosmos = step.cosm;
 	const auto timestamp = cosmos.get_timestamp();
 
@@ -76,7 +76,7 @@ void particles_existence_system::destroy_dead_streams(logic_step& step) const {
 	}
 }
 
-void particles_existence_system::game_responses_to_particle_effects(logic_step& step) const {
+void particles_existence_system::game_responses_to_particle_effects(const logic_step step) const {
 	const auto& gunshots = step.transient.messages.get_queue<messages::gunshot_response>();
 	const auto& damages = step.transient.messages.get_queue<messages::damage_message>();
 	const auto& swings = step.transient.messages.get_queue<messages::melee_swing_response>();
@@ -218,7 +218,7 @@ entity_handle particles_existence_system::create_particle_effect_entity(cosmos& 
 	return new_stream_entity;
 }
 
-void particles_existence_system::create_particle_effects(logic_step& step) const {
+void particles_existence_system::create_particle_effects(const logic_step step) const {
 	using namespace components;
 	using namespace messages;
 

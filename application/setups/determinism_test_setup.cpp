@@ -109,7 +109,7 @@ void determinism_test_setup::process(const config_lua_table& cfg, game_window& w
 				augs::renderer::get_current().clear_logic_lines();
 
 				h.advance_deterministic_schemata(cosmic_entropy_for_this_step, [](auto) {},
-					[this, &session](const const_logic_step& step) {
+					[this, &session](const const_logic_step step) {
 						session.spread_past_infection(step);
 					}
 				);

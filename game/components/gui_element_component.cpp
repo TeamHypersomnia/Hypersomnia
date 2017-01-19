@@ -433,7 +433,7 @@ namespace components {
 	}
 
 	bool gui_element::apply_hotbar_selection_setup(
-		logic_step& step,
+		const logic_step step,
 		const hotbar_selection_setup new_setup,
 		const entity_handle element_entity
 	) {
@@ -447,7 +447,7 @@ namespace components {
 	}
 
 	bool gui_element::apply_previous_hotbar_selection_setup(
-		logic_step& step,
+		const logic_step step,
 		const entity_handle element_entity
 	) {
 		auto& element = element_entity.get<components::gui_element>();
@@ -503,7 +503,7 @@ namespace components {
 	}
 
 	bool gui_element::apply_and_save_hotbar_selection_setup(
-		logic_step& step,
+		const logic_step step,
 		const hotbar_selection_setup new_setup,
 		const entity_handle element_entity
 	) {

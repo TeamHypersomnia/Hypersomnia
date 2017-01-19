@@ -14,7 +14,7 @@
 #include "game/messages/queue_destruction.h"
 #include "game/messages/will_soon_be_deleted.h"
 
-void trace_system::lengthen_sprites_of_traces(logic_step& step) const {
+void trace_system::lengthen_sprites_of_traces(const logic_step step) const {
 	auto& cosmos = step.cosm;
 	const auto delta = step.get_delta();
 
@@ -43,7 +43,7 @@ void trace_system::lengthen_sprites_of_traces(logic_step& step) const {
 	}
 }
 
-void trace_system::destroy_outdated_traces(logic_step& step) const {
+void trace_system::destroy_outdated_traces(const logic_step step) const {
 	auto& cosmos = step.cosm;
 
 	for (const auto t : cosmos.get(processing_subjects::WITH_TRACE)) {
@@ -59,7 +59,7 @@ void trace_system::destroy_outdated_traces(logic_step& step) const {
 	}
 }
 
-void trace_system::spawn_finishing_traces_for_destroyed_objects(logic_step& step) const {
+void trace_system::spawn_finishing_traces_for_destroyed_objects(const logic_step step) const {
 	auto& cosmos = step.cosm;
 	const auto& events = step.transient.messages.get_queue<messages::will_soon_be_deleted>();
 

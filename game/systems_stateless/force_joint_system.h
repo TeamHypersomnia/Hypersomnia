@@ -6,5 +6,5 @@ class cosmos;
 class force_joint_system {
 public:
 
-	void apply_forces_towards_target_entities(logic_step& step);
+	void apply_forces_towards_target_entities(const logic_step step);
 };

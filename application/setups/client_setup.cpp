@@ -97,15 +97,15 @@ void client_setup::init(const config_lua_table& cfg, game_window& window, const 
 void client_setup::process_once(game_window& window, const augs::machine_entropy::local_type& precollected, const bool swap_buffers) {
 	auto step_pred = [this](const cosmic_entropy& entropy, cosmos& cosm) {
 		cosm.advance_deterministic_schemata(entropy,
-			[this](logic_step&) {},
-			[this](const_logic_step&) {}
+			[this](const logic_step) {},
+			[this](const const_logic_step) {}
 		);
 	};
 
 	auto step_pred_with_effects_response = [this](const cosmic_entropy& entropy, cosmos& cosm) {
 		cosm.advance_deterministic_schemata(entropy,
-			[this](logic_step&) {},
-			[this](const_logic_step& step) {
+			[this](const logic_step) {},
+			[this](const const_logic_step step) {
 			session.spread_past_infection(step);
 			session.acquire_game_events_for_hud(step);
 		}
