@@ -26,7 +26,7 @@ class basic_inventory_slot_handle {
 public:
 	static constexpr bool is_const_value = is_const;
 	
-	basic_inventory_slot_handle(owner_reference owner, const inventory_slot_id raw_id) : owner(owner), raw_id(raw_id) {}
+	basic_inventory_slot_handle(owner_reference owner, const inventory_slot_id raw_id);
 	
 	std::vector<entity_handle_type> get_mounted_items() const;
 
@@ -36,8 +36,6 @@ public:
 	inventory_slot_id raw_id;
 
 	void unset();
-	entity_handle_type make_handle(const entity_id) const;
-	basic_inventory_slot_handle make_handle(const inventory_slot_id) const;
 
 	template <class F>
 	void for_each_descendant(F callback) const {
@@ -83,7 +81,58 @@ public:
 	inventory_slot_id get_id() const;
 	operator inventory_slot_id() const;
 	operator basic_inventory_slot_handle<true>() const;
-
-	//typedef maybe_const_ref_t<is_const, slot_button> slot_button_ref;
-	//slot_button_ref get_button() const;
 };
+
+template <bool C>
+inline basic_inventory_slot_handle<C>::basic_inventory_slot_handle(owner_reference owner, const inventory_slot_id raw_id) : owner(owner), raw_id(raw_id) {}
+
+template <bool C>
+inline typename basic_inventory_slot_handle<C>::owner_reference basic_inventory_slot_handle<C>::get_cosmos() const {
+	return owner;
+}
+
+template <bool C>
+inline typename basic_inventory_slot_handle<C>::slot_pointer basic_inventory_slot_handle<C>::operator->() const {
+	return &get_container().get<components::container>().slots[raw_id.type];
+}
+
+template <bool C>
+inline typename basic_inventory_slot_handle<C>::slot_reference basic_inventory_slot_handle<C>::operator*() const {
+	return *operator->();
+}
+
+template <bool C>
+inline typename basic_inventory_slot_handle<C>::slot_reference basic_inventory_slot_handle<C>::get() const {
+	return *operator->();
+}
+
+template <bool C>
+inline bool basic_inventory_slot_handle<C>::alive() const {
+	if (get_container().dead()) {
+		return false;
+	}
+
+	const auto* const container = get_container().find<components::container>();
+
+	return container && container->slots.find(raw_id.type) != container->slots.end();
+}
+
+template <bool C>
+inline bool basic_inventory_slot_handle<C>::dead() const {
+	return !alive();
+}
+
+template <bool C>
+inline inventory_slot_id basic_inventory_slot_handle<C>::get_id() const {
+	return raw_id;
+}
+
+template <bool C>
+inline basic_inventory_slot_handle<C>::operator inventory_slot_id() const {
+	return get_id();
+}
+
+template <bool C>
+inline basic_inventory_slot_handle<C>::operator basic_inventory_slot_handle<true>() const {
+	return basic_inventory_slot_handle<true>(owner, raw_id);
+}

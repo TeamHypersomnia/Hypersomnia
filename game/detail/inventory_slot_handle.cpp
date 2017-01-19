@@ -13,52 +13,6 @@
 #include "game/detail/item_transfer_result.h"
 
 template <bool C>
-typename basic_inventory_slot_handle<C>::owner_reference basic_inventory_slot_handle<C>::get_cosmos() const {
-	return owner;
-}
-
-template <bool C>
-typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot_handle<C>::make_handle(const entity_id id) const {
-	return owner[id];
-}
-
-template <bool C>
-typename basic_inventory_slot_handle<C> basic_inventory_slot_handle<C>::make_handle(const inventory_slot_id id) const {
-	return owner[id];
-}
-
-template <bool C>
-typename basic_inventory_slot_handle<C>::slot_pointer basic_inventory_slot_handle<C>::operator->() const {
-	return &get_container().get<components::container>().slots[raw_id.type];
-}
-
-template <bool C>
-typename basic_inventory_slot_handle<C>::slot_reference basic_inventory_slot_handle<C>::operator*() const {
-	return *operator->();
-}
-
-template <bool C>
-typename basic_inventory_slot_handle<C>::slot_reference basic_inventory_slot_handle<C>::get() const {
-	return *operator->();
-}
-
-template <bool C>
-bool basic_inventory_slot_handle<C>::alive() const {
-	if (get_container().dead()) {
-		return false;
-	}
-
-	const auto* const container = get_container().find<components::container>();
-
-	return container && container->slots.find(raw_id.type) != container->slots.end();
-}
-
-template <bool C>
-bool basic_inventory_slot_handle<C>::dead() const {
-	return !alive();
-}
-
-template <bool C>
 void basic_inventory_slot_handle<C>::unset() {
 	raw_id.unset();
 }
@@ -80,7 +34,7 @@ bool basic_inventory_slot_handle<C>::has_items() const {
 
 template <bool C>
 typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot_handle<C>::get_item_if_any() const {
-	return make_handle(has_items() ? (*this).get_items_inside()[0] : entity_id());
+	return get_cosmos()[(has_items() ? (*this).get_items_inside()[0] : entity_id())];
 }
 
 template <bool C>
@@ -149,7 +103,7 @@ std::vector<typename basic_inventory_slot_handle<C>::entity_handle_type> basic_i
 
 template <bool C>
 typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot_handle<C>::get_container() const {
-	return make_handle(raw_id.container_entity);
+	return get_cosmos()[raw_id.container_entity];
 }
 
 template <bool C>
@@ -158,8 +112,8 @@ unsigned basic_inventory_slot_handle<C>::calculate_free_space_with_parent_contai
 
 	const auto* const maybe_item = get_container().find<components::item>();
 
-	if (maybe_item && make_handle(maybe_item->current_slot).alive()) {
-		return std::min(maximum_space, make_handle(maybe_item->current_slot).calculate_free_space_with_parent_containers());
+	if (maybe_item && get_cosmos()[maybe_item->current_slot].alive()) {
+		return std::min(maximum_space, get_cosmos()[maybe_item->current_slot].calculate_free_space_with_parent_containers());
 	}
 
 	return maximum_space;
@@ -172,21 +126,6 @@ bool basic_inventory_slot_handle<C>::can_contain(const entity_id id) const {
 	}
 
 	return query_containment_result(get_cosmos()[id], *this).transferred_charges > 0;
-}
-
-template <bool C>
-inventory_slot_id basic_inventory_slot_handle<C>::get_id() const {
-	return raw_id;
-}
-
-template <bool C>
-basic_inventory_slot_handle<C>::operator inventory_slot_id() const {
-	return get_id();
-}
-
-template <bool C>
-basic_inventory_slot_handle<C>::operator basic_inventory_slot_handle<true>() const {
-	return basic_inventory_slot_handle<true>(owner, raw_id);
 }
 
 template <bool C>
