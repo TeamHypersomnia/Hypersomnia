@@ -21,6 +21,6 @@ public:
 
 	void reserve_caches_for_entities(const size_t);
 
-	void render_all_lights(augs::renderer& output, std::array<float, 16> projection_matrix, viewing_step&, std::function<void()> neon_callback);
+	void render_all_lights(augs::renderer& output, std::array<float, 16> projection_matrix, const viewing_step, std::function<void()> neon_callback);
 	void resample_state_for_audiovisuals(const cosmos&) const {}
 };

@@ -69,7 +69,7 @@ namespace components {
 		return vec2(get_screen_size().x - 250.f, get_screen_size().y - 200.f);
 	}
 
-	void gui_element::draw_complete_gui_for_camera_rendering_request(vertex_triangle_buffer& output_buffer, const const_entity_handle gui_entity, viewing_step& step) {
+	void gui_element::draw_complete_gui_for_camera_rendering_request(vertex_triangle_buffer& output_buffer, const const_entity_handle gui_entity, const viewing_step step) {
 		const auto& element = gui_entity.get<components::gui_element>();
 		const auto& rect_world = element.rect_world;
 

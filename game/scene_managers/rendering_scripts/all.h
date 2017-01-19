@@ -8,8 +8,8 @@ class viewing_step;
 class interpolation_system;
 
 namespace rendering_scripts {
-	void standard_rendering(viewing_step& step);
-	void illuminated_rendering(viewing_step& step);
+	void standard_rendering(const viewing_step step);
+	void illuminated_rendering(const viewing_step step);
 
 	void draw_crosshair_lines(
 		std::function<void(vec2, vec2, rgba)> callback,

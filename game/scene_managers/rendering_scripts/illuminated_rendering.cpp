@@ -21,7 +21,7 @@
 #include "3rdparty/GL/OpenGL.h"
 
 namespace rendering_scripts {
-	void illuminated_rendering(viewing_step& step) {
+	void illuminated_rendering(const viewing_step step) {
 		const auto& camera = step.camera;
 		auto& renderer = step.renderer;
 		auto& output = renderer.triangles;

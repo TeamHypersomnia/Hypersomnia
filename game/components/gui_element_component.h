@@ -125,6 +125,6 @@ namespace components {
 		);
 
 		static entity_id get_hovered_world_entity(const cosmos& cosm, const vec2 world_cursor_position);
-		static void draw_complete_gui_for_camera_rendering_request(augs::vertex_triangle_buffer& output_buffer, const const_entity_handle handle, viewing_step&);
+		static void draw_complete_gui_for_camera_rendering_request(augs::vertex_triangle_buffer& output_buffer, const const_entity_handle handle, const viewing_step);
 	};
 }

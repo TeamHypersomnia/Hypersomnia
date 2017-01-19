@@ -21,13 +21,11 @@
 #include "3rdparty/GL/OpenGL.h"
 
 namespace rendering_scripts {
-	void standard_rendering(viewing_step& step) {
+	void standard_rendering(const viewing_step step) {
 		const auto& camera = step.camera;
 		auto& renderer = step.renderer;
 		auto& output = renderer.triangles;
 		const auto& cosmos = step.cosm;
-		const auto& dynamic_tree = cosmos.systems_temporary.get<dynamic_tree_system>();
-		const auto& physics = cosmos.systems_temporary.get<physics_system>();
 		const auto& controlled_entity = cosmos[step.viewed_character];
 		const auto& interp = step.session.systems_audiovisual.get<interpolation_system>();
 		const float global_time_seconds = static_cast<float>(step.get_interpolated_total_time_passed_in_seconds());

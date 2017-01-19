@@ -74,7 +74,7 @@ vec2 position_caption_around_a_circle(const float radius, const vec2 r, const fl
 	return vec2(0, 0);
 }
 
-augs::vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(viewing_step& r) const {
+augs::vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(const viewing_step r) const {
 	const auto& dynamic_tree = r.cosm.systems_temporary.get<dynamic_tree_system>();
 	const auto& visible_entities = r.visible.all;
 	auto& target = r.renderer;
@@ -301,7 +301,7 @@ void immediate_hud::acquire_game_events(const const_logic_step& step) {
 	erase_remove(recent_pure_color_highlights, timeout_lambda);
 }
 
-void immediate_hud::draw_vertically_flying_numbers(viewing_step& step) const {
+void immediate_hud::draw_vertically_flying_numbers(const viewing_step step) const {
 	const auto current_time = step.get_interpolated_total_time_passed_in_seconds();
 	auto& triangles = step.renderer.triangles;
 
@@ -318,7 +318,7 @@ void immediate_hud::draw_vertically_flying_numbers(viewing_step& step) const {
 	}
 }
 
-void immediate_hud::draw_pure_color_highlights(viewing_step& step) const {
+void immediate_hud::draw_pure_color_highlights(const viewing_step step) const {
 	const auto& cosmos = step.cosm;
 	const auto current_time = static_cast<float>(step.get_interpolated_total_time_passed_in_seconds());
 	auto& triangles = step.renderer.triangles;
