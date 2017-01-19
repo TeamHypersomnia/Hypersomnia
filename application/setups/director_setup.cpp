@@ -51,7 +51,7 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 	session.set_interpolation_enabled(false);
 	session.set_master_gain(cfg.sound_effects_volume);
 
-	testbed.configure_view(session);
+	session.configure_input();
 
 	const std::string input_director_file = cfg.director_scenario_filename;
 	const std::string output_director_file = cfg.director_scenario_filename;

@@ -63,7 +63,7 @@ void client_setup::init(const config_lua_table& cfg, game_window& window, const 
 	session.camera.configure_size(screen_size);
 	session.set_master_gain(cfg.sound_effects_volume);
 
-	scene.configure_view(session);
+	session.configure_input();
 
 	receiver.jitter_buffer.set_lower_limit(static_cast<unsigned>(cfg.jitter_buffer_ms / hypersomnia.get_fixed_delta().in_milliseconds()));
 	receiver.misprediction_smoothing_multiplier = cfg.misprediction_smoothing_multiplier;

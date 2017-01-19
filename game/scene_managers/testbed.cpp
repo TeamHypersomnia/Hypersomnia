@@ -760,47 +760,6 @@ namespace scene_managers {
 		selected_character = h;
 	}
 
-	void testbed::configure_view(viewing_session& session) const {
-		auto& active_context = session.context;
-
-		active_context.map_key_to_intent(window::event::keys::key::W, intent_type::MOVE_FORWARD);
-		active_context.map_key_to_intent(window::event::keys::key::S, intent_type::MOVE_BACKWARD);
-		active_context.map_key_to_intent(window::event::keys::key::A, intent_type::MOVE_LEFT);
-		active_context.map_key_to_intent(window::event::keys::key::D, intent_type::MOVE_RIGHT);
-
-		active_context.map_event_to_intent(window::event::message::mousemotion, intent_type::MOVE_CROSSHAIR);
-		active_context.map_key_to_intent(window::event::keys::key::LMOUSE, intent_type::CROSSHAIR_PRIMARY_ACTION);
-		active_context.map_key_to_intent(window::event::keys::key::RMOUSE, intent_type::CROSSHAIR_SECONDARY_ACTION);
-
-		active_context.map_key_to_intent(window::event::keys::key::E, intent_type::USE_BUTTON);
-		active_context.map_key_to_intent(window::event::keys::key::LSHIFT, intent_type::SPRINT);
-
-		active_context.map_key_to_intent(window::event::keys::key::G, intent_type::THROW_PRIMARY_ITEM);
-		active_context.map_key_to_intent(window::event::keys::key::H, intent_type::HOLSTER_PRIMARY_ITEM);
-
-		active_context.map_key_to_intent(window::event::keys::key::BACKSPACE, intent_type::SWITCH_LOOK);
-
-		active_context.map_key_to_intent(window::event::keys::key::LCTRL, intent_type::START_PICKING_UP_ITEMS);
-
-		active_context.map_key_to_intent(window::event::keys::key::SPACE, intent_type::SPACE_BUTTON);
-		active_context.map_key_to_intent(window::event::keys::key::MOUSE4, intent_type::SWITCH_TO_GUI);
-		
-		active_context.map_key_to_intent(window::event::keys::key::F, intent_type::SWITCH_WEAPON_LASER);
-
-		active_context.map_key_to_intent(window::event::keys::key::_0, intent_type::HOTBAR_BUTTON_0);
-		active_context.map_key_to_intent(window::event::keys::key::_1, intent_type::HOTBAR_BUTTON_1);
-		active_context.map_key_to_intent(window::event::keys::key::_2, intent_type::HOTBAR_BUTTON_2);
-		active_context.map_key_to_intent(window::event::keys::key::_3, intent_type::HOTBAR_BUTTON_3);
-		active_context.map_key_to_intent(window::event::keys::key::_4, intent_type::HOTBAR_BUTTON_4);
-		active_context.map_key_to_intent(window::event::keys::key::_5, intent_type::HOTBAR_BUTTON_5);
-		active_context.map_key_to_intent(window::event::keys::key::_6, intent_type::HOTBAR_BUTTON_6);
-		active_context.map_key_to_intent(window::event::keys::key::_7, intent_type::HOTBAR_BUTTON_7);
-		active_context.map_key_to_intent(window::event::keys::key::_8, intent_type::HOTBAR_BUTTON_8);
-		active_context.map_key_to_intent(window::event::keys::key::_9, intent_type::HOTBAR_BUTTON_9);
-
-		active_context.map_key_to_intent(window::event::keys::key::Q, intent_type::PREVIOUS_HOTBAR_SELECTION_SETUP);
-	}
-
 	//if (raw_input.key == augs::window::event::keys::key::F7) {
 	//	auto target_folder = "saves/" + augs::get_timestamp();
 	//	augs::create_directories(target_folder);

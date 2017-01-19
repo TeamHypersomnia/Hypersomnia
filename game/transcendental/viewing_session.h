@@ -62,6 +62,8 @@ public:
 
 	viewing_session();
 
+	void configure_input();
+
 	std::wstring summary() const;
 	
 	void reserve_caches_for_entities(const size_t);

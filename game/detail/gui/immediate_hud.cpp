@@ -74,7 +74,7 @@ vec2 position_caption_around_a_circle(const float radius, const vec2 r, const fl
 	return vec2(0, 0);
 }
 
-vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(viewing_step& r) const {
+augs::vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(viewing_step& r) const {
 	const auto& dynamic_tree = r.cosm.systems_temporary.get<dynamic_tree_system>();
 	const auto& visible_entities = r.visible_entities;
 	auto& target = r.renderer;
@@ -85,7 +85,7 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 
 	const auto timestamp_ms = static_cast<unsigned>(r.get_interpolated_total_time_passed_in_seconds() * 1000);
 
-	vertex_triangle_buffer circular_bars_information;
+	augs::vertex_triangle_buffer circular_bars_information;
 
 	for (const auto v : visible_entities) {
 		const auto* const sentience = v.find<components::sentience>();
@@ -126,8 +126,8 @@ vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(vi
 			auto push_angles = [&target](const float lower_outside, const float upper_outside, const float lower_inside, const float upper_inside) {
 				augs::special s;
 
-				s.v1.set(normalize_degrees(lower_outside) / 180, normalize_degrees(upper_outside) / 180);
-				s.v2.set(normalize_degrees(lower_inside) / 180, normalize_degrees(upper_inside) / 180);
+				s.v1.set(augs::normalize_degrees(lower_outside) / 180, augs::normalize_degrees(upper_outside) / 180);
+				s.v2.set(augs::normalize_degrees(lower_inside) / 180, augs::normalize_degrees(upper_inside) / 180);
 
 				target.push_special_vertex_triangle(s, s, s);
 				target.push_special_vertex_triangle(s, s, s);

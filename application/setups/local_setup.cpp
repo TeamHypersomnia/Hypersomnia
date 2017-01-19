@@ -53,7 +53,7 @@ void local_setup::process(const config_lua_table& cfg, game_window& window) {
 	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
 	session.set_master_gain(cfg.sound_effects_volume);
 
-	testbed.configure_view(session);
+	session.configure_input();
 
 	cfg.update_configuration_for_entity(hypersomnia[testbed.get_selected_character()]);
 

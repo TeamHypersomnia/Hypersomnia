@@ -47,7 +47,5 @@ namespace scene_managers {
 
 		entity_id get_selected_character() const;
 		void select_character(const entity_id);
-		
-		void configure_view(viewing_session&) const;
 	};
 }

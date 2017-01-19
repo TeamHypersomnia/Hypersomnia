@@ -93,7 +93,7 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 
 		for (size_t t = 0; t < r.get_num_triangles(); ++t) {
 			const auto world_light_tri = r.get_world_triangle(t, requests[i].eye_transform.pos);
-			vertex_triangle renderable_light_tri;
+			augs::vertex_triangle renderable_light_tri;
 
 			renderable_light_tri.vertices[0].pos = world_light_tri.points[0] + camera_offset;
 			renderable_light_tri.vertices[1].pos = world_light_tri.points[1] + camera_offset;
@@ -220,7 +220,7 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 
 	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE); glerr;
 
-	graphics::fbo::use_default();
+	augs::graphics::fbo::use_default();
 
 	output.set_active_texture(2);
 	output.bind_texture(output.light_fbo);

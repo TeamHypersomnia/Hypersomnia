@@ -451,7 +451,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 	director.load_recording_from_file(cfg.menu_intro_scenario_filename);
 	ensure(director.is_recording_available());
 
-	testbed.configure_view(session);
+	session.configure_input();
 
 	timer.reset_timer();
 

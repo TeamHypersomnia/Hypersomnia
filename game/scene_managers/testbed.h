@@ -29,8 +29,6 @@ namespace scene_managers {
 		cosmos stashed_cosmos;
 		augs::stream stashed_delta;
 
-		void configure_view(viewing_session&) const;
-
 		void populate_world_with_entities(cosmos&, const vec2i screen_size);
 
 		void control_character_selection(const augs::machine_entropy::local_type&);

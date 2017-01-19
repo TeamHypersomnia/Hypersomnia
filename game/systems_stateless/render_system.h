@@ -10,8 +10,6 @@
 #include "game/detail/camera_cone.h"
 #include "augs/graphics/renderable_positioning_type.h"
 
-using namespace augs;
-
 class interpolation_system;
 
 class render_system {

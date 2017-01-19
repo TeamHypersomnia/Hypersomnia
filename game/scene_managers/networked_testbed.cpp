@@ -286,31 +286,4 @@ namespace scene_managers {
 	void networked_testbed_client::select_character(const entity_id h) {
 		selected_character = h;
 	}
-
-	void networked_testbed_client::configure_view(viewing_session& session) const {
-		auto& active_context = session.context;
-
-		active_context.map_key_to_intent(window::event::keys::key::W, intent_type::MOVE_FORWARD);
-		active_context.map_key_to_intent(window::event::keys::key::S, intent_type::MOVE_BACKWARD);
-		active_context.map_key_to_intent(window::event::keys::key::A, intent_type::MOVE_LEFT);
-		active_context.map_key_to_intent(window::event::keys::key::D, intent_type::MOVE_RIGHT);
-
-		active_context.map_event_to_intent(window::event::message::mousemotion, intent_type::MOVE_CROSSHAIR);
-		active_context.map_key_to_intent(window::event::keys::key::LMOUSE, intent_type::CROSSHAIR_PRIMARY_ACTION);
-		active_context.map_key_to_intent(window::event::keys::key::RMOUSE, intent_type::CROSSHAIR_SECONDARY_ACTION);
-
-		active_context.map_key_to_intent(window::event::keys::key::E, intent_type::USE_BUTTON);
-		active_context.map_key_to_intent(window::event::keys::key::LSHIFT, intent_type::SPRINT);
-
-		active_context.map_key_to_intent(window::event::keys::key::G, intent_type::THROW_PRIMARY_ITEM);
-		active_context.map_key_to_intent(window::event::keys::key::H, intent_type::HOLSTER_PRIMARY_ITEM);
-
-		active_context.map_key_to_intent(window::event::keys::key::BACKSPACE, intent_type::SWITCH_LOOK);
-
-		active_context.map_key_to_intent(window::event::keys::key::LCTRL, intent_type::START_PICKING_UP_ITEMS);
-		active_context.map_key_to_intent(window::event::keys::key::CAPSLOCK, intent_type::SWITCH_CHARACTER);
-
-		active_context.map_key_to_intent(window::event::keys::key::SPACE, intent_type::SPACE_BUTTON);
-		active_context.map_key_to_intent(window::event::keys::key::MOUSE4, intent_type::SWITCH_TO_GUI);
-	}
 }

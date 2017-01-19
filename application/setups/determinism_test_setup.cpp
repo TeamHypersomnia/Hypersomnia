@@ -61,10 +61,7 @@ void determinism_test_setup::process(const config_lua_table& cfg, game_window& w
 	session.camera.configure_size(screen_size);
 	session.set_interpolation_enabled(false);
 	session.set_master_gain(cfg.sound_effects_volume);
-
-	for (size_t i = 0; i < cosmoi_count; ++i) {
-		testbeds[i].configure_view(session);
-	}
+	session.configure_input();
 
 	unsigned currently_viewn_cosmos = 0;
 	bool divergence_detected = false;
