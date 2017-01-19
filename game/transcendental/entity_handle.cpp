@@ -85,11 +85,11 @@ void basic_entity_handle<C>::recalculate_basic_processing_categories() const {
 	}
 }
 
-size_t make_cache_id(const entity_id& id) {
+size_t make_cache_id(const entity_id id) {
 	return id.pool.indirection_index;
 }
 
-size_t make_cache_id(const const_entity_handle& handle) {
+size_t make_cache_id(const const_entity_handle handle) {
 	return make_cache_id(handle.get_id());
 }
 

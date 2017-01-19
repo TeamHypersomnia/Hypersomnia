@@ -33,4 +33,4 @@ namespace components {
 	};
 }
 
-entity_id get_first_named_ancestor(const const_entity_handle&);
+entity_id get_first_named_ancestor(const const_entity_handle);

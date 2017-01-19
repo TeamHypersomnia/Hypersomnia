@@ -12,13 +12,13 @@ namespace components {
 	}
 }
 
-void name_entity(const entity_handle& id, const entity_name n) {
+void name_entity(const entity_handle id, const entity_name n) {
 	components::name name;
 	name.id = n;
 	id.set(name);
 }
 
-void name_entity(const entity_handle& id, const entity_name n, const std::wstring& nick) {
+void name_entity(const entity_handle id, const entity_name n, const std::wstring& nick) {
 	components::name name;
 	name.id = n;
 	name.custom_nickname = true;
@@ -26,7 +26,7 @@ void name_entity(const entity_handle& id, const entity_name n, const std::wstrin
 	id.set(name);
 }
 
-entity_id get_first_named_ancestor(const const_entity_handle& p) {
+entity_id get_first_named_ancestor(const const_entity_handle p) {
 	entity_id iterator = p;
 	const auto& cosmos = p.get_cosmos();
 

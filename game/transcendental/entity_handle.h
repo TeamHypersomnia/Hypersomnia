@@ -297,5 +297,5 @@ std::vector<entity_id> to_id_vector(std::vector<basic_entity_handle<is_const>> v
 	return std::vector<entity_id>(vec.begin(), vec.end());
 }
 
-size_t make_cache_id(const entity_id& handle);
-size_t make_cache_id(const const_entity_handle& handle);
+size_t make_cache_id(const entity_id handle);
+size_t make_cache_id(const const_entity_handle handle);

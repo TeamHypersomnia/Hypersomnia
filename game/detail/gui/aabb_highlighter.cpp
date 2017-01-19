@@ -13,7 +13,7 @@ void aabb_highlighter::update(const float delta_ms) {
 	timer = fmod(timer, cycle_duration_ms);
 }
 
-void aabb_highlighter::draw(viewing_step& step, const const_entity_handle& subject) const {
+void aabb_highlighter::draw(viewing_step& step, const const_entity_handle subject) const {
 	ltrb aabb;
 	
 	auto aabb_expansion_lambda = [&aabb, &step](const const_entity_handle e) {

@@ -16,7 +16,7 @@ class interpolation_system;
 
 class render_system {
 public:
-	static bool render_order_compare(const const_entity_handle& a, const const_entity_handle& b);
+	static bool render_order_compare(const const_entity_handle a, const const_entity_handle b);
 
 	void draw_entities(
 		const interpolation_system& interp,

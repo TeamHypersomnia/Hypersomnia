@@ -46,9 +46,9 @@ class EMPTY_BASES cosmos :
 
 	std::map<unsigned, entity_id> guid_map_for_transport;
 
-	void assign_next_guid(const entity_handle&);
-	void clear_guid(const entity_handle&);
-	unsigned get_guid(const const_entity_handle&) const;
+	void assign_next_guid(const entity_handle);
+	void clear_guid(const entity_handle);
+	unsigned get_guid(const const_entity_handle) const;
 public:
 	void remap_guids();
 private:
@@ -121,15 +121,15 @@ public:
 	void reserve_storage_for_entities(const size_t);
 
 	entity_handle create_entity(const std::string& debug_name);
-	entity_handle clone_entity(const entity_id&);
-	void delete_entity(const entity_id&);
+	entity_handle clone_entity(const entity_id);
+	void delete_entity(const entity_id);
 
 	void refresh_for_new_significant_state();
 
 	void complete_resubstantiation();
-	void complete_resubstantiation(const const_entity_handle&);
-	void destroy_substance_for_entity(const const_entity_handle&);
-	void create_substance_for_entity(const const_entity_handle&);
+	void complete_resubstantiation(const const_entity_handle);
+	void destroy_substance_for_entity(const const_entity_handle);
+	void create_substance_for_entity(const const_entity_handle);
 
 	template<class System>
 	void partial_resubstantiation(entity_handle handle) {
@@ -147,17 +147,17 @@ public:
 	bool entity_exists_with_guid(unsigned) const;
 #endif
 
-	entity_handle get_handle(const entity_id&);
-	const_entity_handle get_handle(const entity_id&) const;
-	entity_handle get_handle(unversioned_entity_id);
-	const_entity_handle get_handle(unversioned_entity_id) const;
-	inventory_slot_handle get_handle(const inventory_slot_id&);
-	const_inventory_slot_handle get_handle(const inventory_slot_id&) const;
-	item_slot_transfer_request get_handle(const item_slot_transfer_request_data&);
-	const_item_slot_transfer_request get_handle(const item_slot_transfer_request_data&) const;
+	inline entity_handle get_handle(const entity_id);
+	inline const_entity_handle get_handle(const entity_id) const;
+	inline entity_handle get_handle(unversioned_entity_id);
+	inline const_entity_handle get_handle(unversioned_entity_id) const;
+	inline inventory_slot_handle get_handle(const inventory_slot_id);
+	inline const_inventory_slot_handle get_handle(const inventory_slot_id) const;
+	inline item_slot_transfer_request get_handle(const item_slot_transfer_request_data);
+	inline const_item_slot_transfer_request get_handle(const item_slot_transfer_request_data) const;
 
-	randomization get_rng_for(const entity_id&) const;
-	size_t get_rng_seed_for(const entity_id&) const;
+	randomization get_rng_for(const entity_id) const;
+	size_t get_rng_seed_for(const entity_id) const;
 
 	std::vector<entity_handle> get(const processing_subjects);
 	std::vector<const_entity_handle> get(const processing_subjects) const;

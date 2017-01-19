@@ -8,9 +8,9 @@ class past_infection_system {
 public:
 	std::unordered_set<entity_id> infected_entities;
 
-	bool is_infected(const const_entity_handle&) const;
-	void infect(const const_entity_handle&);
-	void uninfect(const entity_id&);
+	bool is_infected(const const_entity_handle) const;
+	void infect(const const_entity_handle);
+	void uninfect(const entity_id);
 
 	void reserve_caches_for_entities(const size_t) const {}
 	void resample_state_for_audiovisuals(const cosmos&) const {}

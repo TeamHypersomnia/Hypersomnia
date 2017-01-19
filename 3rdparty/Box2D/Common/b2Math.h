@@ -57,7 +57,7 @@ struct b2Vec2
 	/// Default constructor does nothing (for performance).
 	b2Vec2() {}
 
-	b2Vec2(const vec2& vec);
+	b2Vec2(const vec2 vec);
 
 	/// Construct using coordinates.
 	b2Vec2(float32 x, float32 y) : x(x), y(y) {}

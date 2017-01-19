@@ -11,7 +11,7 @@ components::transform interpolation_system::get_interpolated(const const_entity_
 	return enabled ? per_entity_cache[make_cache_id(id)].interpolated_transform : id.logic_transform();
 }
 
-interpolation_system::cache& interpolation_system::get_data(const entity_id& id) {
+interpolation_system::cache& interpolation_system::get_data(const entity_id id) {
 	return per_entity_cache[make_cache_id(id)];
 }
 

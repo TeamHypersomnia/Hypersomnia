@@ -27,7 +27,7 @@ namespace augs {
 				absolute_clipped_rect = r;
 			}
 
-			void set_absolute_pos(const vec2& v) {
+			void set_absolute_pos(const vec2 v) {
 				absolute_position = v;
 			}
 

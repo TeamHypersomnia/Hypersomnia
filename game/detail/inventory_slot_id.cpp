@@ -7,17 +7,17 @@ inventory_slot_id::inventory_slot_id() : type(slot_function::INVALID) {
 
 inventory_slot_id::inventory_slot_id(const slot_function f, const entity_id id) : type(f), container_entity(id) {}
 
-bool inventory_slot_id::operator==(const inventory_slot_id& b) const {
+bool inventory_slot_id::operator==(const inventory_slot_id b) const {
 	return type == b.type && container_entity == b.container_entity;
 }
 
-bool inventory_slot_id::operator<(const inventory_slot_id& b) const {
+bool inventory_slot_id::operator<(const inventory_slot_id b) const {
 	return
 		std::make_tuple(container_entity, type) <
 		std::make_tuple(b.container_entity, b.type);
 }
 
-bool inventory_slot_id::operator!=(const inventory_slot_id& b) const {
+bool inventory_slot_id::operator!=(const inventory_slot_id b) const {
 	return !operator==(b);
 }
 

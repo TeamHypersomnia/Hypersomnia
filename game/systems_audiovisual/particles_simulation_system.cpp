@@ -69,7 +69,7 @@ particles_simulation_system::cache& particles_simulation_system::get_cache(const
 }
 
 resources::particle& particles_simulation_system::spawn_particle(randomization& rng,
-	emission_instance& group, const vec2& position, float rotation, const float spread, const resources::emission& emission) {
+	emission_instance& group, const vec2 position, float rotation, const float spread, const resources::emission& emission) {
 	auto new_particle = emission.particle_templates[rng.randval(0u, emission.particle_templates.size() - 1)];
 	new_particle.vel = vec2().set_from_degrees(
 		group.angular_offset + rng.randval(rotation - spread, rotation + spread)) *

@@ -196,7 +196,7 @@ void physics_system::reserve_caches_for_entities(const size_t n) {
 	colliders_caches.resize(n);
 }
 
-std::pair<size_t, size_t> physics_system::map_fixture_pointer_to_indices(const b2Fixture* const f, const const_entity_handle& handle) {
+std::pair<size_t, size_t> physics_system::map_fixture_pointer_to_indices(const b2Fixture* const f, const const_entity_handle handle) {
 	const auto this_cache_id = handle.get_id().pool.indirection_index;
 	const auto& cache = colliders_caches[this_cache_id];
 
@@ -212,7 +212,7 @@ std::pair<size_t, size_t> physics_system::map_fixture_pointer_to_indices(const b
 	return{};
 }
 
-convex_partitioned_shape::convex_poly::destruction_data& physics_system::map_fixture_pointer_to_convex_poly(const b2Fixture* const f, const entity_handle& handle) {
+convex_partitioned_shape::convex_poly::destruction_data& physics_system::map_fixture_pointer_to_convex_poly(const b2Fixture* const f, const entity_handle handle) {
 	const auto indices = map_fixture_pointer_to_indices(f, handle);
 
 	return handle.get<components::fixtures>().component.colliders[indices.first].shape.convex_polys[indices.second].destruction;

@@ -7,7 +7,7 @@
 
 typedef components::processing P;
 
-P P::get_default(const const_entity_handle& id) {
+P P::get_default(const const_entity_handle id) {
 	augs::constant_size_vector<processing_subjects, static_cast<size_t>(processing_subjects::COUNT)> matching;
 
 	if (id.has<components::animation>()) {

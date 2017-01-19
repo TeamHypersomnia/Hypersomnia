@@ -17,7 +17,7 @@
 #include "game/detail/physics_scripts.h"
 #include "augs/ensure.h"
 
-bool render_system::render_order_compare(const const_entity_handle& a, const const_entity_handle& b) {
+bool render_system::render_order_compare(const const_entity_handle a, const const_entity_handle b) {
 	const auto layer_a = a.get<components::render>().layer;
 	const auto layer_b = a.get<components::render>().layer;
 
@@ -43,7 +43,7 @@ std::array<std::vector<const_entity_handle>, render_layer::COUNT> render_system:
 	auto& car_interior_layer = layers[render_layer::CAR_INTERIOR];
 
 	if (car_interior_layer.size() > 1) {
-		std::sort(car_interior_layer.begin(), car_interior_layer.end(), [&cosmos](const entity_id& b, const entity_id& a) {
+		std::sort(car_interior_layer.begin(), car_interior_layer.end(), [&cosmos](const entity_id b, const entity_id a) {
 			return are_connected_by_friction(cosmos[a], cosmos[b]);
 		});
 	}

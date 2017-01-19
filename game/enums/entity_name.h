@@ -25,5 +25,5 @@ enum class entity_name {
 	URBAN_CYAN_MACHETE,
 };
 
-void name_entity(const entity_handle&, const entity_name);
-void name_entity(const entity_handle&, const entity_name, const std::wstring& custom_nickname);
+void name_entity(const entity_handle, const entity_name);
+void name_entity(const entity_handle, const entity_name, const std::wstring& custom_nickname);

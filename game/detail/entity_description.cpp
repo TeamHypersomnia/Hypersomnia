@@ -14,7 +14,7 @@
 #include "augs/log.h"
 #include <iomanip>
 
-textual_description description_of_entity(const const_entity_handle& id) {
+textual_description description_of_entity(const const_entity_handle id) {
 	const auto& name = id.get<components::name>();
 	
 	auto result = description_by_entity_name(name.id);
@@ -26,7 +26,7 @@ textual_description description_of_entity(const const_entity_handle& id) {
 	return result;
 }
 
-std::wstring describe_properties(const const_entity_handle& id) {
+std::wstring describe_properties(const const_entity_handle id) {
 	std::wostringstream result;
 
 	const auto* const melee = id.find<components::melee>();
@@ -117,7 +117,7 @@ std::wstring describe_slot(const const_inventory_slot_handle& id) {
 		text.details + L"[/color]";
 }
 
-std::wstring describe_entity(const const_entity_handle& id) {
+std::wstring describe_entity(const const_entity_handle id) {
 	const auto desc = description_of_entity(id);
 	auto properties = describe_properties(id);
 	

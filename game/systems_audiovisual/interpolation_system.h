@@ -29,6 +29,6 @@ public:
 
 	void reserve_caches_for_entities(const size_t);
 
-	cache& get_data(const entity_id&);
+	cache& get_data(const entity_id);
 	void resample_state_for_audiovisuals(const cosmos&) const {}
 };

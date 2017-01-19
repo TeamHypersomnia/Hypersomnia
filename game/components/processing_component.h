@@ -26,7 +26,7 @@ namespace components {
 			);
 		}
 		
-		static components::processing get_default(const const_entity_handle&);
+		static components::processing get_default(const const_entity_handle);
 	};
 }
 

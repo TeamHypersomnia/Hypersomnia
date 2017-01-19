@@ -21,7 +21,7 @@ void simulation_receiver::acquire_next_packaged_step(const step_packaged_for_net
 	jitter_buffer.acquire_new_command(step);
 }
 
-void simulation_receiver::remote_entropy_predictions(guid_mapped_entropy& adjusted_entropy, const entity_id& predictable_entity, const cosmos& predicted_cosmos) {
+void simulation_receiver::remote_entropy_predictions(guid_mapped_entropy& adjusted_entropy, const entity_id predictable_entity, const cosmos& predicted_cosmos) {
 	entity_intent release_intent;
 	release_intent.is_pressed = false;
 
@@ -89,7 +89,7 @@ simulation_receiver::unpacking_result simulation_receiver::unpack_deterministic_
 	return std::move(result);
 }
 
-simulation_receiver::misprediction_candidate_entry simulation_receiver::acquire_potential_misprediction(const const_entity_handle& e) const {
+simulation_receiver::misprediction_candidate_entry simulation_receiver::acquire_potential_misprediction(const const_entity_handle e) const {
 	misprediction_candidate_entry candidate;
 	
 	if(e.has_logic_transform())

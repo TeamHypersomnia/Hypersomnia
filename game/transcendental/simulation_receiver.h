@@ -29,13 +29,13 @@ class simulation_receiver {
 		bool reconciliate_predicted = false;
 	};
 
-	misprediction_candidate_entry acquire_potential_misprediction(const const_entity_handle&) const;
+	misprediction_candidate_entry acquire_potential_misprediction(const const_entity_handle) const;
 	std::vector<misprediction_candidate_entry> acquire_potential_mispredictions(const std::unordered_set<entity_id>&, const cosmos& predicted_cosmos_before_reconciliation) const;
 
 	unpacking_result unpack_deterministic_steps(cosmos& referential_cosmos, cosmos& last_delta_unpacked);
 	void drag_mispredictions_into_past(interpolation_system&, past_infection_system&, const cosmos& predicted_cosmos, const std::vector<misprediction_candidate_entry>& mispredictions) const;
 
-	void remote_entropy_predictions(guid_mapped_entropy& adjusted_entropy, const entity_id& predictable_entity, const cosmos& predicted_cosmos);
+	void remote_entropy_predictions(guid_mapped_entropy& adjusted_entropy, const entity_id predictable_entity, const cosmos& predicted_cosmos);
 public:
 	augs::jitter_buffer<step_packaged_for_network> jitter_buffer;
 	std::vector<guid_mapped_entropy> predicted_steps;
@@ -62,7 +62,7 @@ public:
 	template<class Step>
 	unpacking_result unpack_deterministic_steps(
 		interpolation_system& interp, past_infection_system& past,
-		const entity_id& predictable_entity, cosmos& referential_cosmos, cosmos& last_delta_unpacked, cosmos& predicted_cosmos, Step advance) {
+		const entity_id predictable_entity, cosmos& referential_cosmos, cosmos& last_delta_unpacked, cosmos& predicted_cosmos, Step advance) {
 		auto result = unpack_deterministic_steps(referential_cosmos, last_delta_unpacked);
 		auto& reconciliate_predicted = result.reconciliate_predicted;
 

@@ -24,9 +24,9 @@ struct inventory_slot_id {
 
 	void unset();
 
-	bool operator<(const inventory_slot_id& b) const;
-	bool operator==(const inventory_slot_id& b) const;
-	bool operator!=(const inventory_slot_id& b) const;
+	bool operator<(const inventory_slot_id b) const;
+	bool operator==(const inventory_slot_id b) const;
+	bool operator!=(const inventory_slot_id b) const;
 };
 
 struct inventory_item_address {
@@ -44,7 +44,7 @@ struct inventory_traversal {
 namespace std {
 	template <>
 	struct hash<inventory_slot_id> {
-		std::size_t operator()(const inventory_slot_id& k) const {
+		std::size_t operator()(const inventory_slot_id k) const {
 			return augs::simple_two_hash(k.container_entity, k.type);
 		}
 	};

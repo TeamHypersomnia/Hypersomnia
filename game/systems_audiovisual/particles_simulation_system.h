@@ -113,7 +113,7 @@ public:
 
 	cache& get_cache(const const_entity_handle);
 
-	resources::particle& spawn_particle(randomization&, emission_instance&, const vec2&, float, float spread, const resources::emission&);
+	resources::particle& spawn_particle(randomization&, emission_instance&, const vec2, float, float spread, const resources::emission&);
 	void advance_visible_streams_and_all_particles(camera_cone, const cosmos&, const augs::delta dt, interpolation_system&);
 
 	void reserve_caches_for_entities(const size_t) {}

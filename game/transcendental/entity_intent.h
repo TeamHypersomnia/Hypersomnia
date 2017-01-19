@@ -23,7 +23,7 @@ struct entity_intent : key_and_mouse_intent {
 	augs::window::event::change event_for_gui;
 	bool has_event_for_gui = false;
 
-	bool from_raw_state_and_possible_gui_receiver(const input_context&, const augs::window::event::change&, const const_entity_handle& gui_receiver);
+	bool from_raw_state_and_possible_gui_receiver(const input_context&, const augs::window::event::change&, const const_entity_handle gui_receiver);
 
 	bool operator==(const entity_intent& b) const;
 	bool operator!=(const entity_intent& b) const;

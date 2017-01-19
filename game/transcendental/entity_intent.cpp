@@ -70,7 +70,7 @@ bool entity_intent::operator!=(const entity_intent& b) const {
 	return !operator==(b);
 }
 
-bool entity_intent::from_raw_state_and_possible_gui_receiver(const input_context& context, const augs::window::event::change& raw, const const_entity_handle& gui_receiver) {
+bool entity_intent::from_raw_state_and_possible_gui_receiver(const input_context& context, const augs::window::event::change& raw, const const_entity_handle gui_receiver) {
 	const auto was_intent_resolved = from_raw_state(context, raw);
 
 	if (was_intent_resolved && intent == intent_type::SWITCH_TO_GUI) {
