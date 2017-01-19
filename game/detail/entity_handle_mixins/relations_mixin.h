@@ -32,10 +32,8 @@ public:
 	unsigned get_guid() const;
 #endif
 
-	inventory_slot_handle_type operator[](slot_function) const;
-	entity_handle_type operator[](sub_entity_name) const;
-
-	sub_entity_name get_name_as_sub_entity() const;
+	inventory_slot_handle_type operator[](const slot_function) const;
+	entity_handle_type operator[](const sub_entity_name) const;
 
 	template <class F>
 	void for_each_sub_entity_recursive(F callback) const {
@@ -81,13 +79,13 @@ protected:
 	components::sub_entities& sub_entities_component() const;
 	components::physical_relations& physical_relations_component() const;
 
-	void make_child(entity_id, sub_entity_name) const;
+	void make_child(const entity_id, const sub_entity_name) const;
 public:
-	void set_owner_body(entity_id) const;
-	void make_cloned_sub_entities_recursive(entity_id copied) const;
+	void set_owner_body(const entity_id) const;
+	void make_cloned_sub_entities_recursive(const entity_id copied) const;
 
-	void add_sub_entity(entity_id p, sub_entity_name optional_name = sub_entity_name::INVALID) const;
-	void map_sub_entity(sub_entity_name n, entity_id p) const;
+	void add_sub_entity(const entity_id p, const sub_entity_name optional_name = sub_entity_name::INVALID) const;
+	void map_sub_entity(const sub_entity_name n, const entity_id p) const;
 };
 
 template<class entity_handle_type>

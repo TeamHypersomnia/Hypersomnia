@@ -11,7 +11,7 @@
 #include "augs/templates/container_templates.h"
 
 template <class D>
-void relations_mixin<false, D>::make_child(entity_id ch_id, sub_entity_name optional_name) const {
+void relations_mixin<false, D>::make_child(const entity_id ch_id, const sub_entity_name optional_name) const {
 	auto& self = *static_cast<const D*>(this);
 	auto& cosmos = self.get_cosmos();
 
@@ -19,7 +19,6 @@ void relations_mixin<false, D>::make_child(entity_id ch_id, sub_entity_name opti
 
 	if (ch.alive()) {
 		ch.child_component().parent = self;
-		ch.child_component().name_as_sub_entity = optional_name;
 	}
 }
 
@@ -54,7 +53,7 @@ components::physical_relations& relations_mixin<false, D>::physical_relations_co
 }
 
 template <class D>
-void relations_mixin<false, D>::make_cloned_sub_entities_recursive(entity_id from) const {
+void relations_mixin<false, D>::make_cloned_sub_entities_recursive(const entity_id from) const {
 	auto& self = *static_cast<const D*>(this);
 	auto& cosmos = self.get_cosmos();
 	auto from_rels = cosmos[from].get_sub_entities_component();
@@ -67,7 +66,7 @@ void relations_mixin<false, D>::make_cloned_sub_entities_recursive(entity_id fro
 }
 
 template <class D>
-void relations_mixin<false, D>::set_owner_body(entity_id owner_id) const {
+void relations_mixin<false, D>::set_owner_body(const entity_id owner_id) const {
 	auto& self = *static_cast<const D*>(this);
 
 	auto& cosmos = self.get_cosmos();
@@ -93,19 +92,19 @@ void relations_mixin<false, D>::set_owner_body(entity_id owner_id) const {
 }
 
 template <class D>
-void relations_mixin<false, D>::add_sub_entity(entity_id p, sub_entity_name optional_name = sub_entity_name::INVALID) const {
+void relations_mixin<false, D>::add_sub_entity(const entity_id p, const sub_entity_name optional_name = sub_entity_name::INVALID) const {
 	make_child(p, optional_name);
 	sub_entities_component().other_sub_entities.push_back(p);
 }
 
 template <class D>
-void relations_mixin<false, D>::map_sub_entity(sub_entity_name n, entity_id p) const {
+void relations_mixin<false, D>::map_sub_entity(const sub_entity_name n, const entity_id p) const {
 	make_child(p, n);
 	sub_entities_component().sub_entities_by_name[n] = p;
 }
 
 template <bool C, class D>
-typename basic_relations_mixin<C, D>::inventory_slot_handle_type basic_relations_mixin<C, D>::operator[](slot_function func) const {
+typename basic_relations_mixin<C, D>::inventory_slot_handle_type basic_relations_mixin<C, D>::operator[](const slot_function func) const {
 	auto& self = *static_cast<const D*>(this);
 	return inventory_slot_handle_type(self.owner, inventory_slot_id(func, self.raw_id));
 }
@@ -143,11 +142,6 @@ unsigned basic_relations_mixin<C, D>::get_guid() const {
 	return self.get<components::guid>().value;
 }
 #endif
-
-template <bool C, class D>
-sub_entity_name basic_relations_mixin<C, D>::get_name_as_sub_entity() const {
-	return get_child_component().name_as_sub_entity;
-}
 
 template <bool C, class D>
 D basic_relations_mixin<C, D>::get_parent() const {

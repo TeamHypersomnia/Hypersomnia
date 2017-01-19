@@ -28,8 +28,6 @@ void aabb_highlighter::draw(const viewing_step step, const const_entity_handle s
 			return false;
 		}
 
-		const auto name_as_sub_entity = e.get_name_as_sub_entity();
-
 		const auto new_aabb = e.get_aabb(step.session.systems_audiovisual.get<interpolation_system>());
 
 		if (aabb.good() && new_aabb.good()) {

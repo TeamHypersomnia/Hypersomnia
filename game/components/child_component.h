@@ -5,7 +5,6 @@
 namespace components {
 	struct child {
 		entity_id parent;
-		sub_entity_name name_as_sub_entity = sub_entity_name::INVALID;
 
 		template <class F>
 		void for_each_held_id(F callback) {
