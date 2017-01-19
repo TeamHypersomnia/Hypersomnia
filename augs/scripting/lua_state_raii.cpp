@@ -200,7 +200,7 @@ namespace augs {
 		}
 		catch (luabind::error e) {
 			output.exception_message = typesafe_sprintf("luabind::error thrown: %x", e.what());
-			output.error_message = get_stack() + get_error();
+			output.error_message = get_stack();
 		}
 
 		return std::move(output);

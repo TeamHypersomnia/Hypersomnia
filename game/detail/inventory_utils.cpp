@@ -417,6 +417,8 @@ void perform_transfer(const item_slot_transfer_request r, const logic_step step)
 		auto physics_updater = [previous_container_transform](const entity_handle descendant, ...) {
 			const auto& cosmos = descendant.get_cosmos();
 
+			const auto previous_descendant_transform = descendant.logic_transform();
+
 			const auto parent_slot = cosmos[descendant.get<components::item>().current_slot];
 			auto def = descendant.get<components::fixtures>().get_data();
 			entity_id owner_body;
@@ -447,7 +449,7 @@ void perform_transfer(const item_slot_transfer_request r, const logic_step step)
 			descendant.get<components::fixtures>().set_owner_body(owner_body);
 			
 			if (descendant.has<components::physics>()) {
-				descendant.get<components::physics>().set_transform(previous_container_transform);
+				descendant.get<components::physics>().set_transform(previous_descendant_transform);
 
 				if (descendant.has<components::interpolation>()) {
 					descendant.get<components::interpolation>().place_of_birth = descendant.logic_transform();
@@ -485,7 +487,7 @@ void perform_transfer(const item_slot_transfer_request r, const logic_step step)
 		}
 
 		if (is_drop_request) {
-			const auto force = vec2().set_from_degrees(previous_container_transform.rotation).set_length(60);
+			const auto force = vec2().set_from_degrees(previous_container_transform.rotation).set_length(120);
 			const auto offset = vec2().random_on_circle(20, cosmos.get_rng_for(r.get_item()));
 
 			auto& physics = grabbed_item_part_handle.get<components::physics>();
