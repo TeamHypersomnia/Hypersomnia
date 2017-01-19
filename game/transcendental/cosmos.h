@@ -142,15 +142,15 @@ public:
 	}
 
 #if COSMOS_TRACKS_GUIDS
-	entity_handle get_entity_by_guid(unsigned);
-	const_entity_handle get_entity_by_guid(unsigned) const;
-	bool entity_exists_with_guid(unsigned) const;
+	entity_handle get_entity_by_guid(const unsigned);
+	const_entity_handle get_entity_by_guid(const unsigned) const;
+	bool entity_exists_with_guid(const unsigned) const;
 #endif
 
 	inline entity_handle get_handle(const entity_id);
 	inline const_entity_handle get_handle(const entity_id) const;
-	inline entity_handle get_handle(unversioned_entity_id);
-	inline const_entity_handle get_handle(unversioned_entity_id) const;
+	inline entity_handle get_handle(const unversioned_entity_id);
+	inline const_entity_handle get_handle(const unversioned_entity_id) const;
 	inline inventory_slot_handle get_handle(const inventory_slot_id);
 	inline const_inventory_slot_handle get_handle(const inventory_slot_id) const;
 	inline item_slot_transfer_request get_handle(const item_slot_transfer_request_data);
