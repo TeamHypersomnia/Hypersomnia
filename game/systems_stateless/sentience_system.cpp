@@ -62,7 +62,7 @@ void sentience_system::consume_health_event(messages::health_event h, logic_step
 		sentience.time_of_last_received_damage = cosmos.get_timestamp();
 		break;
 	case messages::health_event::CONSCIOUSNESS: sentience.consciousness.value -= h.effective_amount; ensure(sentience.health.value >= 0); break;
-	case messages::health_event::SHIELD: ensure(0); break;
+	case messages::health_event::PERSONAL_ELECTRICITY_SHIELD: ensure(0); break;
 	case messages::health_event::AIM:
 		const auto punched = subject;
 

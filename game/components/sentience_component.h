@@ -36,8 +36,8 @@ namespace components {
 		augs::stepped_timestamp time_of_last_received_damage;
 
 		meter health;
+		meter personal_electricity;
 		meter consciousness;
-		meter shield;
 
 		float comfort_zone = 500.f;
 		float minimum_danger_amount_to_evade = 5.f;
@@ -50,7 +50,7 @@ namespace components {
 			ar(
 				CEREAL_NVP(health),
 				CEREAL_NVP(consciousness),
-				CEREAL_NVP(shield),
+				CEREAL_NVP(personal_electricity),
 
 				CEREAL_NVP(comfort_zone),
 				CEREAL_NVP(minimum_danger_amount_to_evade),

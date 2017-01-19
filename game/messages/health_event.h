@@ -5,7 +5,7 @@ namespace messages {
 	struct health_event : message {
 		enum result_type {
 			NONE,
-			SHIELD_DESTRUCTION,
+			PERSONAL_ELECTRICITY_SHIELD_DESTRUCTION,
 			DEATH,
 			LOSS_OF_CONSCIOUSNESS
 		} special_result = result_type::NONE;
@@ -13,7 +13,7 @@ namespace messages {
 		enum target_type {
 			INVALID,
 			AIM,
-			SHIELD,
+			PERSONAL_ELECTRICITY_SHIELD,
 			CONSCIOUSNESS,
 			HEALTH
 		} target = target_type::INVALID;
