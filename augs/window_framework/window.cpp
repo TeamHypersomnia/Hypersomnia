@@ -387,7 +387,7 @@ namespace augs {
 			triple_click_delay = GetDoubleClickTime();
 		}
 
-		int glwindow::create(rects::xywh<int> crect, int enable_window_border, std::string nn,
+		int glwindow::create(xywhi crect, int enable_window_border, std::string nn,
 			int doublebuffer, int _bpp) {
 			int f = 1;
 			std::wstring _name(nn.begin(), nn.end());
@@ -509,7 +509,7 @@ namespace augs {
 			return output;
 		}
 
-		bool glwindow::set_window_rect(const rects::xywh<int>& r) {
+		bool glwindow::set_window_rect(const xywhi& r) {
 			static RECT wr = { 0 };
 			int f = 1;
 			errf(SetRect(&wr, r.x, r.y, r.r(), r.b()), f);
@@ -522,12 +522,12 @@ namespace augs {
 			return get_window_rect().get_size();
 		}
 
-		rects::xywh<int> glwindow::get_window_rect() const {
+		xywhi glwindow::get_window_rect() const {
 			static RECT r;
 			GetClientRect(hwnd, &r);
 			ClientToScreen(hwnd, (POINT*)&r);
 			ClientToScreen(hwnd, (POINT*)&r + 1);
-			return rects::ltrb<int>(r.left, r.top, r.right, r.bottom);
+			return ltrbi(r.left, r.top, r.right, r.bottom);
 		}
 
 		bool glwindow::is_active() const {

@@ -57,7 +57,7 @@ namespace augs {
 			glwindow();
 			~glwindow();
 
-			int create(rects::xywh<int> client_rectangle, int enable_window_border = 0, std::string name = "Window", int doublebuffer = 1, int bitsperpixel = 24);
+			int create(xywhi client_rectangle, int enable_window_border = 0, std::string name = "Window", int doublebuffer = 1, int bitsperpixel = 24);
 			
 			bool swap_buffers(), 
 				set_as_current(),
@@ -67,9 +67,9 @@ namespace augs {
 
 			std::vector<event::change> poll_events(const bool should_clip_cursor = true);
 
-			bool set_window_rect(const rects::xywh<int>&);
+			bool set_window_rect(const xywhi&);
 			vec2i get_screen_size() const;
-			rects::xywh<int> get_window_rect() const;
+			xywhi get_window_rect() const;
 
 			bool is_active() const;
 			
@@ -117,7 +117,7 @@ namespace augs {
 			glwindow();
 			~glwindow();
 
-			int create(rects::xywh<int> client_rectangle, int enable_window_border = 0, std::string name = "Window", int doublebuffer = 1, int bitsperpixel = 24);
+			int create(xywhi client_rectangle, int enable_window_border = 0, std::string name = "Window", int doublebuffer = 1, int bitsperpixel = 24);
 			
 			bool swap_buffers(), 
 				set_as_current(),
@@ -127,9 +127,9 @@ namespace augs {
 
 			std::vector<event::state> poll_events();
 
-			bool set_window_rect(const rects::xywh<int>&);
+			bool set_window_rect(const xywhi&);
 			rects::wh<int> get_screen_size() const;
-			rects::xywh<int> get_window_rect() const;
+			xywhi get_window_rect() const;
 
 			bool is_active() const;
 			

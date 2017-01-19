@@ -85,14 +85,6 @@ void basic_entity_handle<C>::recalculate_basic_processing_categories() const {
 	}
 }
 
-size_t make_cache_id(const entity_id id) {
-	return id.pool.indirection_index;
-}
-
-size_t make_cache_id(const const_entity_handle handle) {
-	return make_cache_id(handle.get_id());
-}
-
 // explicit instantiation
 template void basic_entity_handle<false>::add_standard_components<false, void>() const;
 template void basic_entity_handle<false>::recalculate_basic_processing_categories<false, void>() const;

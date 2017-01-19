@@ -62,7 +62,7 @@ struct item_button : game_gui_rect_node {
 		vec2 absolute_xy_offset;
 	};
 
-	item_button(rects::xywh<float> rc = rects::xywh<float>());
+	item_button(xywh rc = xywh());
 
 	template <class C, class gui_element_id, class L>
 	static void for_each_child(C context, const gui_element_id& this_id, L generic_call) {

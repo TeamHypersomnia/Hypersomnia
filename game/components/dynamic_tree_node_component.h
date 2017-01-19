@@ -19,7 +19,7 @@ namespace components {
 
 		padding_byte pad[1];
 
-		augs::rects::ltrb<float> aabb;
+		ltrb aabb;
 
 		template <class Archive>
 		void serialize(Archive& ar) {

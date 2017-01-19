@@ -24,7 +24,7 @@ maybe_const_ref_t<C, colliders_cache>& basic_fixtures_synchronizer<C>::get_cache
 }
 
 template<bool C>
-augs::rects::ltrb<float> basic_fixtures_synchronizer<C>::get_local_aabb() const {
+ltrb basic_fixtures_synchronizer<C>::get_local_aabb() const {
 	std::vector<vec2> all_verts;
 	
 	for (const auto& s : component.colliders) {

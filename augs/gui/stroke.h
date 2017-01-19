@@ -18,7 +18,7 @@ namespace augs {
 			void set_width(int);
 			void set_material(const material&);
 
-			void draw(std::vector<augs::vertex_triangle>& out, rects::ltrb<float> origin, rects::ltrb<float> clipper = rects::ltrb<float>()) const;
+			void draw(std::vector<augs::vertex_triangle>& out, ltrb origin, ltrb clipper = ltrb()) const;
 		};
 	}
 }

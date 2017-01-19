@@ -204,7 +204,7 @@ namespace components {
 		}
 	}
 	
-	rects::ltrb<float> polygon::get_aabb(const components::transform transform) const {
+	ltrb polygon::get_aabb(const components::transform transform) const {
 		auto model_transformed = vertices;
 
 		for (auto& v : model_transformed) {

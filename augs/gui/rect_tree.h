@@ -36,7 +36,7 @@ namespace augs {
 			}
 
 			ltrb get_absolute_rect() const {
-				return rects::xywh<float>(absolute_position.x, absolute_position.y, rc.w(), rc.h());
+				return xywh(absolute_position.x, absolute_position.y, rc.w(), rc.h());
 			}
 
 			ltrb get_absolute_clipping_rect() const {

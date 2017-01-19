@@ -75,7 +75,7 @@ namespace augs {
 			return to_string(buffer);
 		}
 
-		void enable_cursor_clipping(rects::ltrb<int> lt) {
+		void enable_cursor_clipping(ltrbi lt) {
 			static thread_local RECT r;
 			r.bottom = lt.b;
 			r.left = lt.l;
@@ -100,10 +100,10 @@ namespace augs {
 			return ChangeDisplaySettings(&screen, CDS_FULLSCREEN) == DISP_CHANGE_SUCCESSFUL;
 		}
 
-		rects::xywh<int> get_display() {
+		xywhi get_display() {
 			static RECT rc;
 			GetWindowRect(GetDesktopWindow(), &rc);
-			return rects::xywh<int>(rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top);
+			return xywhi(rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top);
 		}
 
 		void set_cursor_visible(int flag) {

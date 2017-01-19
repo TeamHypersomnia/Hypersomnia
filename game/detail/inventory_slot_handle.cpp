@@ -13,11 +13,6 @@
 #include "game/detail/item_transfer_result.h"
 
 template <bool C>
-basic_inventory_slot_handle<C>::basic_inventory_slot_handle(owner_reference owner, const inventory_slot_id raw_id) : owner(owner), raw_id(raw_id) {
-
-}
-
-template <bool C>
 typename basic_inventory_slot_handle<C>::owner_reference basic_inventory_slot_handle<C>::get_cosmos() const {
 	return owner;
 }

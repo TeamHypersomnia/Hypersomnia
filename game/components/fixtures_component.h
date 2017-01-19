@@ -101,7 +101,7 @@ public:
 	
 	basic_entity_handle<is_const> get_owner_body() const;
 
-	augs::rects::ltrb<float> get_local_aabb() const;
+	ltrb get_local_aabb() const;
 
 	const components::fixtures::convex_partitioned_collider& get_collider_data(size_t i) const;
 	size_t get_num_colliders() const;

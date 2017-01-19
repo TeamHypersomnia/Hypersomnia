@@ -267,7 +267,7 @@ void visibility_system::respond_to_visibility_information_requests(
 		aabb.lowerBound = position_meters - vision_side_meters / 2;
 		aabb.upperBound = position_meters + vision_side_meters / 2;
 
-		rects::ltrb<float> ltrb(aabb.lowerBound.x, aabb.lowerBound.y, aabb.upperBound.x, aabb.upperBound.y);
+		ltrb ltrb(aabb.lowerBound.x, aabb.lowerBound.y, aabb.upperBound.x, aabb.upperBound.y);
 
 		auto push_vertex = [position_meters, ltrb](vec2 v, bool check_against_aabb) {
 			/* don't bother if it does not hover the aabb */

@@ -34,23 +34,23 @@ using namespace augs::gui;
 using namespace augs::gui::text;
 
 namespace components {
-	rects::xywh<float> gui_element::get_rectangle_for_slot_function(const slot_function f) {
+	xywh gui_element::get_rectangle_for_slot_function(const slot_function f) {
 		switch (f) {
-		case slot_function::PRIMARY_HAND: return rects::xywh<float>(100, 0, 33, 33);
-		case slot_function::SHOULDER_SLOT: return rects::xywh<float>(100, -100, 33, 33);
-		case slot_function::SECONDARY_HAND: return rects::xywh<float>(-100, 0, 33, 33);
-		case slot_function::TORSO_ARMOR_SLOT: return rects::xywh<float>(0, 0, 33, 33);
+		case slot_function::PRIMARY_HAND: return xywh(100, 0, 33, 33);
+		case slot_function::SHOULDER_SLOT: return xywh(100, -100, 33, 33);
+		case slot_function::SECONDARY_HAND: return xywh(-100, 0, 33, 33);
+		case slot_function::TORSO_ARMOR_SLOT: return xywh(0, 0, 33, 33);
 
-		case slot_function::ITEM_DEPOSIT: return rects::xywh<float>(0, -100, 33, 33);
+		case slot_function::ITEM_DEPOSIT: return xywh(0, -100, 33, 33);
 
-		case slot_function::GUN_DETACHABLE_MAGAZINE: return rects::xywh<float>(0, 50, 33, 33);
-		case slot_function::GUN_CHAMBER: return rects::xywh<float>(0, -50, 33, 33);
-		case slot_function::GUN_MUZZLE: return rects::xywh<float>(-50, 0, 33, 33);
+		case slot_function::GUN_DETACHABLE_MAGAZINE: return xywh(0, 50, 33, 33);
+		case slot_function::GUN_CHAMBER: return xywh(0, -50, 33, 33);
+		case slot_function::GUN_MUZZLE: return xywh(-50, 0, 33, 33);
 		default: ensure(0);
 		}
 		ensure(0);
 
-		return rects::xywh<float>(0, 0, 0, 0);
+		return xywh(0, 0, 0, 0);
 	}
 
 	vec2i gui_element::get_gui_crosshair_position() const {

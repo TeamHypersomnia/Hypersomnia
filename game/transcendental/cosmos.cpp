@@ -139,10 +139,6 @@ cosmos& cosmos::operator=(const cosmos& b) {
 
 #if COSMOS_TRACKS_GUIDS
 
-unsigned cosmos::get_guid(const const_entity_handle handle) const {
-	return handle.get_guid();
-}
-
 void cosmos::assign_next_guid(const entity_handle new_entity) {
 	auto this_guid = significant.meta.next_entity_guid++;
 
@@ -199,10 +195,6 @@ std::vector<const_entity_handle> cosmos::get(const processing_subjects list) con
 	return systems_temporary.get<processing_lists_system>().get(list, *this);
 }
 
-randomization cosmos::get_rng_for(const entity_id id) const {
-	return { get_rng_seed_for(id) };
-}
-
 size_t cosmos::get_rng_seed_for(const entity_id id) const {
 	size_t transform_hash = 0;
 	const auto tr = get_handle(id).logic_transform();
@@ -211,52 +203,6 @@ size_t cosmos::get_rng_seed_for(const entity_id id) const {
 	transform_hash += static_cast<size_t>(std::abs(tr.rotation)*100.0);
 
 	return get_handle(id).get_guid() + transform_hash;
-}
-
-#if COSMOS_TRACKS_GUIDS
-entity_handle cosmos::get_entity_by_guid(const unsigned guid) {
-	return get_handle(guid_map_for_transport.at(guid));
-}
-
-const_entity_handle cosmos::get_entity_by_guid(const unsigned guid) const {
-	return get_handle(guid_map_for_transport.at(guid));
-}
-
-bool cosmos::entity_exists_with_guid(const unsigned guid) const {
-	return guid_map_for_transport.find(guid) != guid_map_for_transport.end();
-}
-#endif
-
-entity_handle cosmos::get_handle(const entity_id id) {
-	return entity_handle(*this, id);
-}
-
-const_entity_handle cosmos::get_handle(const entity_id id) const {
-	return const_entity_handle(*this, id);
-}
-
-entity_handle cosmos::get_handle(const unversioned_entity_id id) {
-	return entity_handle(*this, get_aggregate_pool().make_versioned(id));
-}
-
-const_entity_handle cosmos::get_handle(const unversioned_entity_id id) const {
-	return const_entity_handle(*this, get_aggregate_pool().make_versioned(id));
-}
-
-inventory_slot_handle cosmos::get_handle(const inventory_slot_id id) {
-	return inventory_slot_handle(*this, id);
-}
-
-const_inventory_slot_handle cosmos::get_handle(const inventory_slot_id id) const {
-	return const_inventory_slot_handle(*this, id);
-}
-
-item_slot_transfer_request cosmos::get_handle(const item_slot_transfer_request_data data) {
-	return item_slot_transfer_request(get_handle(data.item), get_handle(data.target_slot), data.specified_quantity, data.force_immediate_mount);
-}
-
-const_item_slot_transfer_request cosmos::get_handle(const item_slot_transfer_request_data data) const {
-	return const_item_slot_transfer_request(get_handle(data.item), get_handle(data.target_slot), data.specified_quantity, data.force_immediate_mount);
 }
 
 float cosmos::get_total_time_passed_in_seconds(const float view_interpolation_ratio) const {
@@ -388,15 +334,6 @@ void cosmos::delete_entity(const entity_id e) {
 	remove_all_components(get_handle(e));
 	get_aggregate_pool().free(e);
 }
-
-size_t cosmos::entities_count() const {
-	return significant.pool_for_aggregates.size();
-}
-
-size_t cosmos::get_maximum_entities() const {
-	return significant.pool_for_aggregates.capacity();
-}
-
 
 void cosmos::advance_deterministic_schemata(const cosmic_entropy& input) {
 	data_living_one_step transient;

@@ -141,7 +141,7 @@ namespace components {
 		return std::move(out);
 	}
 	
-	augs::rects::ltrb<float> sprite::get_aabb(const components::transform& transform, const renderable_positioning_type positioning) const {
+	ltrb sprite::get_aabb(const components::transform& transform, const renderable_positioning_type positioning) const {
 		return augs::get_aabb(make_sprite_points(transform.pos, get_size(), transform.rotation + rotation_offset, positioning));
 	}
 }

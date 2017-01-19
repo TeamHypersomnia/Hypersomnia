@@ -16,9 +16,9 @@ namespace augs {
 			augs::enum_bitset<flag> flags;
 			vec2i rc_pos_before_dragging;
 
-			rects::ltrb<float> rc; /* actual rectangle */
+			ltrb rc; /* actual rectangle */
 
-			rect_node_data(const rects::xywh<float>& rc = rects::xywh<float>());
+			rect_node_data(const xywh& rc = xywh());
 			rect_node_data(const assets::texture_id& id);
 
 			void set_default_flags();
@@ -45,7 +45,7 @@ namespace augs {
 				
 				auto absolute_clipped_rect = this_id->rc;
 				auto absolute_pos = vec2i(this_id->rc.get_position());
-				auto absolute_clipping_rect = rects::ltrb<float>(0.f, 0.f, std::numeric_limits<int>::max() / 2.f, std::numeric_limits<int>::max() / 2.f);
+				auto absolute_clipping_rect = ltrb(0.f, 0.f, std::numeric_limits<int>::max() / 2.f, std::numeric_limits<int>::max() / 2.f);
 
 				/* if we have parent */
 				if (context.alive(parent)) {
@@ -55,7 +55,7 @@ namespace augs {
 
 						/* we have to save our global coordinates in absolute_xy */
 						absolute_pos = p.get_absolute_pos() + this_id->rc.get_position() - scroll;
-						absolute_clipped_rect = rects::xywh<float>(static_cast<float>(absolute_pos.x), static_cast<float>(absolute_pos.y), this_id->rc.w(), this_id->rc.h());
+						absolute_clipped_rect = xywh(static_cast<float>(absolute_pos.x), static_cast<float>(absolute_pos.y), this_id->rc.w(), this_id->rc.h());
 
 						/* and we have to clip by first clipping parent's rc_clipped */
 						//auto* clipping = get_clipping_parent(); 
@@ -316,7 +316,7 @@ namespace augs {
 			//template <class C, class gui_element_id>
 			//rects::wh<float> calculate_content_size(C context) const {
 			//	/* init on zero */
-			//	rects::ltrb<float> content = rects::ltrb<float>(0.f, 0.f, 0.f, 0.f);
+			//	ltrb content = ltrb(0.f, 0.f, 0.f, 0.f);
 			//
 			//	/* enlarge the content size by every child */
 			//	context(this_id, [&content](const auto& r) {
@@ -389,8 +389,8 @@ namespace augs {
 			//void scroll_to_view(C context) {
 			//	if (context.alive(parent)) {
 			//		context(parent, [&](const auto& p) {
-			//			const rects::ltrb<float> global = get_absolute_rect();
-			//			const rects::ltrb<float> parent_global = p.get_absolute_rect();
+			//			const ltrb global = get_absolute_rect();
+			//			const ltrb parent_global = p.get_absolute_rect();
 			//			const vec2i off1 = vec2i(std::max(0.f, global.r + 2 - parent_global.r), std::max(0.f, global.b + 2 - parent_global.b));
 			//			const vec2i off2 = vec2i(std::max(0.f, parent_global.l - global.l + 2 + off1.x), std::max(0.f, parent_global.t - global.t + 2 + off1.y));
 			//			p.scroll += off1;

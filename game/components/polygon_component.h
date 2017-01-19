@@ -71,6 +71,6 @@ namespace components {
 		void draw(const drawing_input&) const;
 
 		std::vector<vec2> get_vertices() const;
-		rects::ltrb<float> get_aabb(components::transform) const;
+		ltrb get_aabb(components::transform) const;
 	};
 }

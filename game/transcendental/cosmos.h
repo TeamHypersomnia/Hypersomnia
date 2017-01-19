@@ -28,6 +28,9 @@
 #include "game/transcendental/cosmic_profiler.h"
 #include "augs/build_settings/setting_empty_bases.h"
 
+#include "game/detail/inventory_slot_handle.h"
+#include "game/detail/item_slot_transfer_request.h"
+
 class cosmic_delta;
 struct data_living_one_step;
 
@@ -147,14 +150,14 @@ public:
 	bool entity_exists_with_guid(const unsigned) const;
 #endif
 
-	inline entity_handle get_handle(const entity_id);
-	inline const_entity_handle get_handle(const entity_id) const;
-	inline entity_handle get_handle(const unversioned_entity_id);
-	inline const_entity_handle get_handle(const unversioned_entity_id) const;
-	inline inventory_slot_handle get_handle(const inventory_slot_id);
-	inline const_inventory_slot_handle get_handle(const inventory_slot_id) const;
-	inline item_slot_transfer_request get_handle(const item_slot_transfer_request_data);
-	inline const_item_slot_transfer_request get_handle(const item_slot_transfer_request_data) const;
+	entity_handle get_handle(const entity_id);
+	const_entity_handle get_handle(const entity_id) const;
+	entity_handle get_handle(const unversioned_entity_id);
+	const_entity_handle get_handle(const unversioned_entity_id) const;
+	inventory_slot_handle get_handle(const inventory_slot_id);
+	const_inventory_slot_handle get_handle(const inventory_slot_id) const;
+	item_slot_transfer_request get_handle(const item_slot_transfer_request_data);
+	const_item_slot_transfer_request get_handle(const item_slot_transfer_request_data) const;
 
 	randomization get_rng_for(const entity_id) const;
 	size_t get_rng_seed_for(const entity_id) const;
@@ -222,4 +225,66 @@ namespace augs {
 		write_object(ar, significant.pools_for_components);
 		write_object(ar, significant.pool_for_aggregates);
 	}
+}
+
+#if COSMOS_TRACKS_GUIDS
+inline entity_handle cosmos::get_entity_by_guid(const unsigned guid) {
+	return get_handle(guid_map_for_transport.at(guid));
+}
+
+inline const_entity_handle cosmos::get_entity_by_guid(const unsigned guid) const {
+	return get_handle(guid_map_for_transport.at(guid));
+}
+
+inline bool cosmos::entity_exists_with_guid(const unsigned guid) const {
+	return guid_map_for_transport.find(guid) != guid_map_for_transport.end();
+}
+
+inline unsigned cosmos::get_guid(const const_entity_handle handle) const {
+	return handle.get_guid();
+}
+#endif
+
+inline entity_handle cosmos::get_handle(const entity_id id) {
+	return entity_handle(*this, id);
+}
+
+inline const_entity_handle cosmos::get_handle(const entity_id id) const {
+	return const_entity_handle(*this, id);
+}
+
+inline entity_handle cosmos::get_handle(const unversioned_entity_id id) {
+	return entity_handle(*this, get_aggregate_pool().make_versioned(id));
+}
+
+inline const_entity_handle cosmos::get_handle(const unversioned_entity_id id) const {
+	return const_entity_handle(*this, get_aggregate_pool().make_versioned(id));
+}
+
+inline inventory_slot_handle cosmos::get_handle(const inventory_slot_id id) {
+	return inventory_slot_handle(*this, id);
+}
+
+inline const_inventory_slot_handle cosmos::get_handle(const inventory_slot_id id) const {
+	return const_inventory_slot_handle(*this, id);
+}
+
+inline item_slot_transfer_request cosmos::get_handle(const item_slot_transfer_request_data data) {
+	return item_slot_transfer_request(get_handle(data.item), get_handle(data.target_slot), data.specified_quantity, data.force_immediate_mount);
+}
+
+inline const_item_slot_transfer_request cosmos::get_handle(const item_slot_transfer_request_data data) const {
+	return const_item_slot_transfer_request(get_handle(data.item), get_handle(data.target_slot), data.specified_quantity, data.force_immediate_mount);
+}
+
+inline randomization cosmos::get_rng_for(const entity_id id) const {
+	return{ get_rng_seed_for(id) };
+}
+
+inline size_t cosmos::entities_count() const {
+	return significant.pool_for_aggregates.size();
+}
+
+inline size_t cosmos::get_maximum_entities() const {
+	return significant.pool_for_aggregates.capacity();
 }

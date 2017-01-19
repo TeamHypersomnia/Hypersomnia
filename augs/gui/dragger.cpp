@@ -11,7 +11,7 @@ namespace augs {
 			p -= vec2(float(vel[0] * delta), float(vel[1] * delta));
 		}
 
-		void dragger::drag(const vec2i& m, const rects::ltrb<float>& rc) {
+		void dragger::drag(const vec2i& m, const ltrb& rc) {
 			stop();
 			if (m.x < rc.l) vel[0] = float(-(rc.l - m.x));
 			else if (m.x > rc.r) vel[0] = float(m.x - rc.r);

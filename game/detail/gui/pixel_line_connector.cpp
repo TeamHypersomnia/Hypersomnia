@@ -2,8 +2,8 @@
 #include "augs/graphics/drawers.h"
 
 augs::constant_size_vector<std::array<vec2i, 2>, 2> get_connecting_pixel_lines(
-	const rects::ltrb<float>& a,
-	const rects::ltrb<float>& b
+	const ltrb& a,
+	const ltrb& b
 ) {
 	using namespace augs::gui;
 
@@ -125,8 +125,8 @@ augs::constant_size_vector<std::array<vec2i, 2>, 2> get_connecting_pixel_lines(
 
 
 void draw_pixel_line_connector(
-	const rects::ltrb<float>& a,
-	const rects::ltrb<float>& b,
+	const ltrb& a,
+	const ltrb& b,
 	const augs::gui::draw_info in,
 	const augs::rgba col
 ) {

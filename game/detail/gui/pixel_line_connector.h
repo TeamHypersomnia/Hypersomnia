@@ -5,13 +5,13 @@
 #include <array>
 
 augs::constant_size_vector<std::array<vec2i, 2>, 2> get_connecting_pixel_lines(
-	const rects::ltrb<float>& origin, 
-	const rects::ltrb<float>& target
+	const ltrb& origin, 
+	const ltrb& target
 );
 
 void draw_pixel_line_connector(
-	const rects::ltrb<float>& origin, 
-	const rects::ltrb<float>& target,
+	const ltrb& origin, 
+	const ltrb& target,
 	const augs::gui::draw_info,
 	const augs::rgba col
 );

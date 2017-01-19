@@ -77,11 +77,11 @@ namespace components {
 	}
 
 
-	rects::ltrb<float> tile_layer_instance::get_aabb(const components::transform transform) const {
+	ltrb tile_layer_instance::get_aabb(const components::transform transform) const {
 		const auto& layer = (*id);
 		const auto tile_square_size = layer.get_tile_side();
 		const auto size = layer.get_size();
 
-		return rects::xywh<float>(transform.pos.x, transform.pos.y, static_cast<float>(size.x*tile_square_size), static_cast<float>(size.y*tile_square_size));
+		return xywh(transform.pos.x, transform.pos.y, static_cast<float>(size.x*tile_square_size), static_cast<float>(size.y*tile_square_size));
 	}
 }

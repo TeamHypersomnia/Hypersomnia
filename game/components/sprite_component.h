@@ -71,6 +71,6 @@ namespace components {
 			const vec2 considered_size) const;
 
 		std::vector<vec2> get_vertices() const;
-		augs::rects::ltrb<float> get_aabb(const components::transform&, const renderable_positioning_type positioning = renderable_positioning_type::CENTER) const;
+		ltrb get_aabb(const components::transform&, const renderable_positioning_type positioning = renderable_positioning_type::CENTER) const;
 	};
 }

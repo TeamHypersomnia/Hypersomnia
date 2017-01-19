@@ -168,7 +168,7 @@ private:
 	}
 
 public:
-	basic_entity_handle(owner_reference owner, entity_id raw_id) : raw_id(raw_id), owner(owner) {}
+	basic_entity_handle(owner_reference owner, const entity_id raw_id) : raw_id(raw_id), owner(owner) {}
 
 	entity_id get_id() const {
 		return raw_id;
@@ -299,3 +299,11 @@ std::vector<entity_id> to_id_vector(std::vector<basic_entity_handle<is_const>> v
 
 size_t make_cache_id(const entity_id handle);
 size_t make_cache_id(const const_entity_handle handle);
+
+inline size_t make_cache_id(const entity_id id) {
+	return id.pool.indirection_index;
+}
+
+inline size_t make_cache_id(const const_entity_handle handle) {
+	return make_cache_id(handle.get_id());
+}

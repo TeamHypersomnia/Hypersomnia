@@ -59,7 +59,7 @@ namespace components {
 		vec2i get_screen_size() const;
 		vec2i get_gui_crosshair_position() const;
 
-		static rects::xywh<float> get_rectangle_for_slot_function(const slot_function);
+		static xywh get_rectangle_for_slot_function(const slot_function);
 		
 		vec2i get_initial_position_for(const drag_and_drop_target_drop_item&) const;
 		vec2 initial_inventory_root_position() const;

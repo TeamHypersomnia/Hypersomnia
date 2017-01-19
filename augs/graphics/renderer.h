@@ -99,7 +99,7 @@ namespace augs {
 		void call_triangles();
 		void call_triangles(const vertex_triangle_buffer&);
 		void call_lines();
-		void set_viewport(rects::xywh<int>);
+		void set_viewport(xywhi);
 		void push_line(const vertex_line&);
 		void push_triangle(const vertex_triangle&);
 		void push_triangles(const vertex_triangle_buffer&);

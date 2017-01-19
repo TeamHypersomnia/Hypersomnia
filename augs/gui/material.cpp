@@ -9,7 +9,7 @@ namespace augs {
 
 		material::material(const rgba& color) : tex(assets::texture_id::BLANK), color(color) {}
 
-		rects::ltrb<float> draw_clipped_rect(const material& mat, const ltrb origin, ltrb clipper, vertex_triangle_buffer& v, const bool flip) {
+		ltrb draw_clipped_rect(const material& mat, const ltrb origin, ltrb clipper, vertex_triangle_buffer& v, const bool flip) {
 			return draw_clipped_rect(v, origin, *mat.tex, mat.color, clipper, flip);
 		}
 	}

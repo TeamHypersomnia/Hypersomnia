@@ -4,7 +4,7 @@
 
 namespace augs {
 	namespace gui {
-		rect_node_data::rect_node_data(const rects::xywh<float>& rc) : rc(rc) {
+		rect_node_data::rect_node_data(const xywh& rc) : rc(rc) {
 			set_default_flags();
 		}
 
@@ -55,12 +55,12 @@ namespace augs {
 		//	rects::wh<float>(rc).clamp_offset_to_right_down_corner_of(content_size, scroll);
 		//}
 		//
-		//rects::ltrb<float> rect_composite::get_local_clipper() const {
-		//	return rects::ltrb<float>(rects::wh<float>(rc)) + scroll;
+		//ltrb rect_composite::get_local_clipper() const {
+		//	return ltrb(rects::wh<float>(rc)) + scroll;
 		//}
 		//
-		//rects::ltrb<float> rect_leaf::get_absolute_rect() const {
-		//	return rects::xywh<float>(absolute_xy.x, absolute_xy.y, rc.w(), rc.h());
+		//ltrb rect_leaf::get_absolute_rect() const {
+		//	return xywh(absolute_xy.x, absolute_xy.y, rc.w(), rc.h());
 		//}
 	}
 }

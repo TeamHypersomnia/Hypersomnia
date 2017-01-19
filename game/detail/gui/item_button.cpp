@@ -39,7 +39,7 @@ bool item_button::is_being_wholely_dragged_or_pending_finish(const const_logic_g
 	return false;
 }
 
-item_button::item_button(rects::xywh<float> rc) : base(rc) {
+item_button::item_button(xywh rc) : base(rc) {
 	unset_flag(augs::gui::flag::CLIP);
 	unset_flag(augs::gui::flag::SCROLLABLE);
 	unset_flag(augs::gui::flag::FOCUSABLE);
