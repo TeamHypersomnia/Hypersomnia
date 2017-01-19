@@ -4,6 +4,7 @@
 #include <algorithm>
 
 #include "augs/log.h"
+#include "augs/templates/string_templates.h"
 
 #include "augs/error/augs_error.h"
 #include "platform_utils.h"
@@ -355,10 +356,10 @@ namespace augs {
 
 			case WM_GETMINMAXINFO:
 				mi = (MINMAXINFO*)lParam;
-				mi->ptMinTrackSize.x = minw;
-				mi->ptMinTrackSize.y = minh;
-				mi->ptMaxTrackSize.x = maxw;
-				mi->ptMaxTrackSize.y = maxh;
+				mi->ptMinTrackSize.x = min_window_size.x;
+				mi->ptMinTrackSize.y = min_window_size.y;
+				mi->ptMaxTrackSize.x = max_window_size.x;
+				mi->ptMaxTrackSize.y = max_window_size.y;
 				break;
 
 			case WM_SYSCOMMAND:
@@ -387,10 +388,13 @@ namespace augs {
 			triple_click_delay = GetDoubleClickTime();
 		}
 
-		int glwindow::create(xywhi crect, int enable_window_border, std::string nn,
-			int doublebuffer, int _bpp) {
+		int glwindow::create(
+			const xywhi crect, 
+			const int enable_window_border, 
+			const std::string name,
+			const int doublebuffer, 
+			const int bpp) {
 			int f = 1;
-			std::wstring _name(nn.begin(), nn.end());
 
 			enum flag {
 				CAPTION = WS_CAPTION,
@@ -398,14 +402,12 @@ namespace augs {
 				ALL_WINDOW_ELEMENTS = CAPTION | MENU
 			};
 
-			menu = enable_window_border ? ALL_WINDOW_ELEMENTS : 0; 
-			bpp = _bpp; 
-			doublebuf = doublebuffer != 0; 
-			name = nn;
+			const auto menu = enable_window_border ? ALL_WINDOW_ELEMENTS : 0; 
 
 			style = menu ? (WS_OVERLAPPED | menu) | WS_CLIPSIBLINGS | WS_CLIPCHILDREN : WS_POPUP;
 			exstyle = menu ? WS_EX_WINDOWEDGE : WS_EX_APPWINDOW;
-			errf((hwnd = CreateWindowEx(exstyle, L"AugmentedWindow", _name.c_str(), style, 0, 0, 0, 0, 0, 0, GetModuleHandle(NULL), this)), f);
+			
+			errf((hwnd = CreateWindowEx(exstyle, L"AugmentedWindow", to_wstring(name).c_str(), style, 0, 0, 0, 0, 0, 0, GetModuleHandle(NULL), this)), f);
 
 			set_window_rect(crect);
 
@@ -466,13 +468,12 @@ namespace augs {
 			return ret;
 		}
 
-		bool glwindow::set_vsync(int v) {
+		bool glwindow::set_vsync(const int v) {
 			bool ret = WGLEW_EXT_swap_control != NULL;
 			errs(ret, "vsync not supported!");
 			if (ret) {
 				errs(ret = set_as_current(), "error enabling vsync, could not set current context");
 				wglSwapIntervalEXT(v); glerr
-					vsyn = v;
 			}
 			return ret;
 		}

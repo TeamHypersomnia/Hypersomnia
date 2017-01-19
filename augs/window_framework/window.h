@@ -30,23 +30,23 @@ namespace augs {
 			HDC hdc = nullptr;
 			HGLRC hglrc = nullptr;
 			MSG wmsg;
-			RECT srect;
 
 			event::change latest_change;
 			vec2i last_mouse_pos;
 
-			int minw, minh, maxw, maxh, cminw, cminh, cmaxw, cmaxh;
-			int bpp = 0, style, exstyle, menu = 0, vsyn;
+			vec2i min_window_size;
+			vec2i max_window_size;
+
+			int style = 0xdeadbeef;
+			int exstyle = 0xdeadbeef;
 			
-			std::string name;
-			bool active = false, transparent = false, doublebuf;
-			
+			bool active = false;
 			
 			timer triple_timer;
 			bool doubled = false;
 
 			bool raw_mouse_input = true;
-			unsigned triple_click_delay; /* maximum delay time for the next click (after doubleclick) to be considered tripleclick (in milliseconds) */
+			unsigned triple_click_delay = 0xdeadbeef; /* maximum delay time for the next click (after doubleclick) to be considered tripleclick (in milliseconds) */
 			
 			void _poll(UINT&, WPARAM, LPARAM);
 			bool poll_event(UINT& out);
