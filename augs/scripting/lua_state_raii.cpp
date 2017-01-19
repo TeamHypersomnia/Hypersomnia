@@ -41,8 +41,6 @@ namespace augs {
 				str = p;
 			}
 		}
-		
-		lua_pop(L, 1);
 
 		return str.empty() ? "\nFailed to retrieve the lua error!" : ("\n" + str);
 	}
@@ -62,18 +60,12 @@ namespace augs {
 			}
 		}
 
-		lua_pop(L, 1);
-
 		return str.empty() ? "\nFailed to retrieve the lua call stack!" : ("\n" + str);
 	}
 
 	void lua_state_raii::call_debug_traceback(const std::string& method) {
 		lua_State* L = raw;
-		lua_getglobal(L, "debug");
-		lua_getfield(L, -1, method.c_str());
-		lua_pushvalue(L, 1);
-		lua_pushinteger(L, 2);
-		lua_call(L, 2, 1);
+		luaL_traceback(L, L, nullptr, 0);
 	}
 
 	std::string lua_execution_result::open_editor() const {
@@ -188,7 +180,7 @@ namespace augs {
 
 		try {
 			if (lua_load(raw, lua_reader, reinterpret_cast<void*>(&bytecode), "scriptname", "b") != 0) {
-				output.error_message = get_error() + get_stack();
+				output.error_message = get_stack() + get_error();
 			}
 
 			luabind::call_function<void>(luabind::object(luabind::from_stack(raw, -1)));
@@ -196,11 +188,19 @@ namespace augs {
 		}
 		catch (char* e) {
 			output.exception_message = typesafe_sprintf("Exception thrown! %x", e);
-			output.error_message = get_error() + get_stack();
+			output.error_message = get_stack() + get_error();
 		}
-		catch (...) {
-			output.exception_message = typesafe_sprintf("Exception (unknown) thrown!");
-			output.error_message = get_error() + get_stack();
+		catch (std::runtime_error e) {
+			output.exception_message = typesafe_sprintf("std::runtime_error thrown: %x", e.what());
+			output.error_message = get_stack() + get_error();
+		}
+		catch (luabind::cast_failed e) {
+			output.exception_message = typesafe_sprintf("cast_failed thrown: %x (%x)", e.what(), e.info().name());
+			output.error_message = get_stack() + get_error();
+		}
+		catch (luabind::error e) {
+			output.exception_message = typesafe_sprintf("luabind::error thrown: %x", e.what());
+			output.error_message = get_stack() + get_error();
 		}
 
 		return std::move(output);
