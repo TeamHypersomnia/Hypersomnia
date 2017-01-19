@@ -32,13 +32,7 @@ namespace rendering_scripts {
 		const auto& interp = step.session.systems_audiovisual.get<interpolation_system>();
 		const float global_time_seconds = static_cast<float>(step.get_interpolated_total_time_passed_in_seconds());
 
-		auto all_visible = dynamic_tree.determine_visible_entities_from_camera(camera);
-		const auto visible_from_physics = physics.query_camera(camera).entities;
-
-		all_visible.insert(all_visible.end(), visible_from_physics.begin(), visible_from_physics.end());
-
-		step.visible_entities = cosmos[all_visible];
-		step.visible_per_layer = render_system().get_visible_per_layer(step.visible_entities);
+		const auto& visible_per_layer = step.visible.per_layer;
 
 		const auto matrix = augs::orthographic_projection<float>(0, camera.visible_world_area.x, camera.visible_world_area.y, 0, 0, 1);
 
@@ -54,7 +48,7 @@ namespace rendering_scripts {
 		}
 		
 		for (int i = render_layer::UNDER_GROUND; i > render_layer::DYNAMIC_BODY; --i) {
-			render_system().draw_entities(interp, global_time_seconds,output, step.visible_per_layer[i], camera, renderable_drawing_type::NORMAL);
+			render_system().draw_entities(interp, global_time_seconds,output, visible_per_layer[i], camera, renderable_drawing_type::NORMAL);
 		}
 
 		renderer.call_triangles();
@@ -66,7 +60,7 @@ namespace rendering_scripts {
 			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
 		}
 		
-		render_system().draw_entities(interp, global_time_seconds,output, step.visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], camera, renderable_drawing_type::BORDER_HIGHLIGHTS);
+		render_system().draw_entities(interp, global_time_seconds,output, visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], camera, renderable_drawing_type::BORDER_HIGHLIGHTS);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
@@ -74,7 +68,7 @@ namespace rendering_scripts {
 		default_shader.use();
 
 		for (int i = render_layer::DYNAMIC_BODY; i >= 0; --i) {
-			render_system().draw_entities(interp, global_time_seconds,output, step.visible_per_layer[i], camera, renderable_drawing_type::NORMAL);
+			render_system().draw_entities(interp, global_time_seconds,output, visible_per_layer[i], camera, renderable_drawing_type::NORMAL);
 		}
 
 		renderer.call_triangles();

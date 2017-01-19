@@ -3,8 +3,7 @@
 #include "augs/misc/delta.h"
 #include "game/transcendental/cosmic_entropy.h"
 #include "game/transcendental/entity_handle_declaration.h"
-#include "game/detail/camera_cone.h"
-#include "game/enums/render_layer.h"
+#include "game/detail/visible_entities.h"
 
 #include "augs/templates/maybe_const.h"
 #include "game/transcendental/data_living_one_step.h"
@@ -69,10 +68,19 @@ class viewing_session;
 
 class viewing_step : public const_cosmic_step {
 public:
-	viewing_step(const cosmos&, viewing_session&, const augs::variable_delta&, augs::renderer&, const camera_cone camera_state, const entity_id viewed_character);
+	viewing_step(
+		const cosmos&, 
+		viewing_session&, 
+		const augs::variable_delta&, 
+		augs::renderer&, 
+		const camera_cone camera_state, 
+		const entity_id viewed_character,
+		const visible_entities&
+	);
 
 	camera_cone camera;
 	entity_id viewed_character;
+	const visible_entities& visible;
 
 	game_drawing_settings settings;
 	viewing_session& session;
@@ -83,9 +91,6 @@ public:
 	double get_interpolated_total_time_passed_in_seconds() const;
 
 	vec2 get_screen_space(const vec2 pos) const;
-
-	std::vector<const_entity_handle> visible_entities;
-	std::array<std::vector<const_entity_handle>, render_layer::COUNT> visible_per_layer;
 };
 
 template <class step_type>

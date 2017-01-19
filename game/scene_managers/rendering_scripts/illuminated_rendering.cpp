@@ -8,7 +8,6 @@
 #include "game/systems_stateless/gui_system.h"
 
 #include "game/components/gui_element_component.h"
-#include "game/systems_temporary/dynamic_tree_system.h"
 #include "game/resources/manager.h"
 #include "augs/graphics/renderer.h"
 #include "game/transcendental/step.h"
@@ -27,8 +26,6 @@ namespace rendering_scripts {
 		auto& renderer = step.renderer;
 		auto& output = renderer.triangles;
 		const auto& cosmos = step.cosm;
-		const auto& dynamic_tree = cosmos.systems_temporary.get<dynamic_tree_system>();
-		const auto& physics = cosmos.systems_temporary.get<physics_system>();
 		const auto& controlled_entity = cosmos[step.viewed_character];
 		const auto controlled_crosshair = controlled_entity[sub_entity_name::CHARACTER_CROSSHAIR];
 		const auto& interp = step.session.systems_audiovisual.get<interpolation_system>();
@@ -36,15 +33,9 @@ namespace rendering_scripts {
 		auto& wandering_pixels = step.session.systems_audiovisual.get<wandering_pixels_system>();
 		const float global_time_seconds = static_cast<float>(step.get_interpolated_total_time_passed_in_seconds());
 
-		auto all_visible = dynamic_tree.determine_visible_entities_from_camera(camera);
-		const auto visible_from_physics = physics.query_camera(camera).entities;
-		
-		all_visible.insert(all_visible.end(), visible_from_physics.begin(), visible_from_physics.end());
-
-		step.visible_entities = cosmos[all_visible];
-		step.visible_per_layer = render_system().get_visible_per_layer(step.visible_entities);
-
 		const auto matrix = augs::orthographic_projection<float>(0, camera.visible_world_area.x, camera.visible_world_area.y, 0, 0, 1);
+
+		const auto& visible_per_layer = step.visible.per_layer;
 
 		auto& default_shader = *get_resource_manager().find(assets::program_id::DEFAULT);
 		auto& illuminated_shader = *get_resource_manager().find(assets::program_id::DEFAULT_ILLUMINATED);
@@ -113,10 +104,10 @@ namespace rendering_scripts {
 			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
 		}
 
-		render_system().draw_entities(interp, global_time_seconds, output, step.visible_per_layer[render_layer::UNDER_GROUND], camera, renderable_drawing_type::NORMAL);
-		render_system().draw_entities(interp, global_time_seconds, output, step.visible_per_layer[render_layer::GROUND], camera, renderable_drawing_type::NORMAL);
-		render_system().draw_entities(interp, global_time_seconds, output, step.visible_per_layer[render_layer::ON_GROUND], camera, renderable_drawing_type::NORMAL);
-		render_system().draw_entities(interp, global_time_seconds, output, step.visible_per_layer[render_layer::TILED_FLOOR], camera, renderable_drawing_type::NORMAL);
+		render_system().draw_entities(interp, global_time_seconds, output, visible_per_layer[render_layer::UNDER_GROUND], camera, renderable_drawing_type::NORMAL);
+		render_system().draw_entities(interp, global_time_seconds, output, visible_per_layer[render_layer::GROUND], camera, renderable_drawing_type::NORMAL);
+		render_system().draw_entities(interp, global_time_seconds, output, visible_per_layer[render_layer::ON_GROUND], camera, renderable_drawing_type::NORMAL);
+		render_system().draw_entities(interp, global_time_seconds, output, visible_per_layer[render_layer::TILED_FLOOR], camera, renderable_drawing_type::NORMAL);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
@@ -127,17 +118,17 @@ namespace rendering_scripts {
 			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
 		}
 
-		render_system().draw_entities(interp, global_time_seconds, output, step.visible_per_layer[render_layer::TILED_FLOOR], camera, renderable_drawing_type::SPECULAR_HIGHLIGHTS);
+		render_system().draw_entities(interp, global_time_seconds, output, visible_per_layer[render_layer::TILED_FLOOR], camera, renderable_drawing_type::SPECULAR_HIGHLIGHTS);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
 
 		illuminated_shader.use();
 
-		render_system().draw_entities(interp, global_time_seconds, output, step.visible_per_layer[render_layer::ON_TILED_FLOOR], camera, renderable_drawing_type::NORMAL);
-		render_system().draw_entities(interp, global_time_seconds, output, step.visible_per_layer[render_layer::CAR_INTERIOR], camera, renderable_drawing_type::NORMAL);
-		render_system().draw_entities(interp, global_time_seconds, output, step.visible_per_layer[render_layer::CAR_WHEEL], camera, renderable_drawing_type::NORMAL);
-		render_system().draw_entities(interp, global_time_seconds, output, step.visible_per_layer[render_layer::CORPSES], camera, renderable_drawing_type::NORMAL);
+		render_system().draw_entities(interp, global_time_seconds, output, visible_per_layer[render_layer::ON_TILED_FLOOR], camera, renderable_drawing_type::NORMAL);
+		render_system().draw_entities(interp, global_time_seconds, output, visible_per_layer[render_layer::CAR_INTERIOR], camera, renderable_drawing_type::NORMAL);
+		render_system().draw_entities(interp, global_time_seconds, output, visible_per_layer[render_layer::CAR_WHEEL], camera, renderable_drawing_type::NORMAL);
+		render_system().draw_entities(interp, global_time_seconds, output, visible_per_layer[render_layer::CORPSES], camera, renderable_drawing_type::NORMAL);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
@@ -148,15 +139,15 @@ namespace rendering_scripts {
 			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
 		}
 		
-		render_system().draw_entities(interp, global_time_seconds,output, step.visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], camera, renderable_drawing_type::BORDER_HIGHLIGHTS);
+		render_system().draw_entities(interp, global_time_seconds,output, visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], camera, renderable_drawing_type::BORDER_HIGHLIGHTS);
 		
 		renderer.call_triangles();
 		renderer.clear_triangles();
 		
 		illuminated_shader.use();
 		
-		render_system().draw_entities(interp, global_time_seconds,output, step.visible_per_layer[render_layer::DYNAMIC_BODY], camera, renderable_drawing_type::NORMAL);
-		render_system().draw_entities(interp, global_time_seconds,output, step.visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], camera, renderable_drawing_type::NORMAL);
+		render_system().draw_entities(interp, global_time_seconds,output, visible_per_layer[render_layer::DYNAMIC_BODY], camera, renderable_drawing_type::NORMAL);
+		render_system().draw_entities(interp, global_time_seconds,output, visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], camera, renderable_drawing_type::NORMAL);
 		
 		renderer.call_triangles();
 		renderer.clear_triangles();
@@ -176,7 +167,7 @@ namespace rendering_scripts {
 				continue;
 			}
 
-			render_system().draw_entities(interp, global_time_seconds,output, step.visible_per_layer[i], camera, renderable_drawing_type::NORMAL);
+			render_system().draw_entities(interp, global_time_seconds,output, visible_per_layer[i], camera, renderable_drawing_type::NORMAL);
 		}
 		
 		if (step.settings.draw_crosshairs && step.settings.draw_weapon_laser) {
@@ -215,7 +206,7 @@ namespace rendering_scripts {
 
 		particles.draw(render_layer::EFFECTS, particles_input);
 
-		for (const auto e : step.visible_per_layer[render_layer::WANDERING_PIXELS_EFFECTS]) {
+		for (const auto e : visible_per_layer[render_layer::WANDERING_PIXELS_EFFECTS]) {
 			wandering_pixels.advance_wandering_pixels_for(e, global_time_seconds, step.get_delta());
 			wandering_pixels.draw_wandering_pixels_for(e, wandering_input);
 		}

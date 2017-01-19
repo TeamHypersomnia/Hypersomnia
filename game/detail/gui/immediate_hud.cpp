@@ -76,7 +76,7 @@ vec2 position_caption_around_a_circle(const float radius, const vec2 r, const fl
 
 augs::vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(viewing_step& r) const {
 	const auto& dynamic_tree = r.cosm.systems_temporary.get<dynamic_tree_system>();
-	const auto& visible_entities = r.visible_entities;
+	const auto& visible_entities = r.visible.all;
 	auto& target = r.renderer;
 	const auto& cosmos = r.cosm;
 	const auto& interp = r.session.systems_audiovisual.get<interpolation_system>();

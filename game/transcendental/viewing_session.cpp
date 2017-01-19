@@ -173,7 +173,7 @@ void viewing_session::view(
 	) {
 	frame_profiler.new_measurement();
 
-	const auto screen_size = camera.camera.visible_world_area;
+	const auto screen_size = camera.smoothed_camera.visible_world_area;
 	const vec2i screen_size_i(static_cast<int>(screen_size.x), static_cast<int>(screen_size.y));
 
 	renderer.set_viewport({ viewport_coordinates.x, viewport_coordinates.y, screen_size_i.x, screen_size_i.y });
@@ -183,8 +183,19 @@ void viewing_session::view(
 	camera.tick(systems_audiovisual.get<interpolation_system>(), dt, character_chased_by_camera);
 	world_hover_highlighter.cycle_duration_ms = 700;
 	world_hover_highlighter.update(dt.in_milliseconds());
-	
-	viewing_step main_cosmos_viewing_step(cosmos, *this, dt, renderer, camera.smoothed_camera, character_chased_by_camera);
+
+	const auto visible = visible_entities(camera.smoothed_camera, cosmos);
+
+	auto main_cosmos_viewing_step = viewing_step(
+		cosmos, 
+		*this, 
+		dt, 
+		renderer, 
+		camera.smoothed_camera, 
+		character_chased_by_camera,
+		visible
+	);
+
 	main_cosmos_viewing_step.settings = settings;
 
 #if NDEBUG || _DEBUG
