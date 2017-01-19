@@ -1,0 +1,208 @@
+extern "C" {
+	#include <lua/lualib.h>
+}
+
+#include <luabind/luabind.hpp>
+#include "lua_state_raii.h"
+#include "augs/window_framework/platform_utils.h"
+
+#include "augs/log.h"
+#include "augs/ensure.h"
+#include "augs/filesystem/file.h"
+
+namespace augs {
+	lua_state_raii::lua_state_raii(lua_State* state) : raw(state) {
+		owns = false;
+	}
+	
+	lua_state_raii::lua_state_raii() : raw(luaL_newstate()) {
+		luaopen_base(raw);
+		luaL_openlibs(raw);
+	}
+
+	lua_state_raii::~lua_state_raii() { 
+		if(owns) 
+			lua_close(raw);
+	}
+
+	lua_state_raii::operator lua_State*() {
+		return raw;
+	}
+
+	std::string lua_state_raii::get_error() {
+		lua_State* L = raw;
+		
+		std::string str;
+
+		{
+			const auto* p = lua_tostring(L, -1);
+
+			if (p != nullptr) {
+				str = p;
+			}
+		}
+		
+		lua_pop(L, 1);
+
+		return str.empty() ? "\nFailed to retrieve the lua error!" : ("\n" + str);
+	}
+
+	std::string lua_state_raii::get_stack() {
+		call_debug_traceback();
+		
+		lua_State* L = raw;
+
+		std::string str;
+		
+		{
+			const auto* p = lua_tostring(L, -1);
+			
+			if (p != nullptr) {
+				str = p;
+			}
+		}
+
+		lua_pop(L, 1);
+
+		return str.empty() ? "\nFailed to retrieve the lua call stack!" : ("\n" + str);
+	}
+
+	void lua_state_raii::call_debug_traceback(const std::string& method) {
+		lua_State* L = raw;
+		lua_getglobal(L, "debug");
+		lua_getfield(L, -1, method.c_str());
+		lua_pushvalue(L, 1);
+		lua_pushinteger(L, 2);
+		lua_call(L, 2, 1);
+	}
+
+	std::string lua_execution_result::open_editor() const {
+		if (error_message.empty()) {
+			return "";
+		}
+
+		std::stringstream ss(error_message);
+		std::string to;
+
+		std::string full_command = std::string("\"") + 
+		getenv("AUG_SCRIPTEDITOR") + "\" ";
+		std::string lines;
+
+		int lines_found = 0;
+
+		while (std::getline(ss, to, '\n')) {
+			std::stringstream line(to);
+			std::string to2;
+			line >> to2;
+			if (to2.empty()) continue;
+
+			to2.erase(to2.end() - 1);
+			if (to2.find(".lua") != std::string::npos) {
+				auto ws = window::get_executable_path();
+				std::string exe_path(ws.begin(), ws.end());
+				std::string full_file_path = (exe_path + "\\" + to2);
+				
+				lines += full_file_path + "\n";
+				full_command += full_file_path + " ";
+
+				++lines_found;
+			}
+		}
+
+		if (lines_found > 0) {
+			CALL_SHELL(full_command);
+		}
+
+		return lines;
+	}
+
+	int lua_writer(lua_State *L,
+		const void* p,
+		size_t sz,
+		void* ud) {
+		auto* ptr = static_cast<const char*>(p);
+		auto& char_vec = *static_cast<std::vector<char>*>(ud);
+
+		char_vec.resize(char_vec.size() + sz);
+		memcpy(char_vec.data() + char_vec.size() - sz, ptr, sz);
+		return 0;
+	}
+
+	const char* lua_reader(lua_State *L, void *data, size_t *sz) {
+		const auto& bytecode = *static_cast<const std::vector<char>*>(data);
+		
+		*sz = bytecode.size();
+		return bytecode.data();
+	}
+
+	void lua_state_raii::dofile_and_report_errors(const std::string& filename) {
+		LOG("Calling script %x", filename);
+		ensure(augs::file_exists(filename));
+		
+		const auto compiled = compile_file(filename);
+		const bool compilation_failed = compiled.error_message.size() > 0;
+
+		if (compilation_failed) {
+			LOG("Lua compilation error (%x): %x", filename, compiled.error_message);
+			ensure(!compilation_failed);
+			return;
+		}
+		else {
+			const auto executed = execute(compiled.bytecode);
+
+			const bool execution_failed = 
+				executed.error_message.size() > 0
+				|| executed.exception_message.size() > 0;
+
+			if (execution_failed) {
+				LOG("Lua execution error (%x): %x\n%x", filename, executed.error_message, executed.exception_message);
+				executed.open_editor();
+
+				ensure(!execution_failed);
+			}
+		}
+	}
+
+	lua_compilation_result lua_state_raii::compile_file(const std::string& filename) {
+		return compile_script(augs::get_file_contents(filename));
+	}
+	
+	lua_compilation_result lua_state_raii::compile_script(const std::string& script) {
+		lua_compilation_result output;
+		
+		const auto result = luaL_loadstring(raw, script.c_str());
+
+		if (result != 0) {
+			output.error_message = get_error();
+		}
+		else {
+			lua_dump(raw, lua_writer, &output.bytecode, 0);
+			lua_pop(raw, 1);
+		}
+
+		return std::move(output);
+	}
+	
+	lua_execution_result lua_state_raii::execute(std::vector<char> bytecode) {
+		lua_execution_result output;
+
+		try {
+			if (lua_load(raw, lua_reader, reinterpret_cast<void*>(&bytecode), "scriptname", "b") != 0) {
+				output.error_message = get_error() + get_stack();
+			}
+
+			luabind::call_function<void>(luabind::object(luabind::from_stack(raw, -1)));
+			lua_pop(raw, 1);
+		}
+		catch (char* e) {
+			output.exception_message = typesafe_sprintf("Exception thrown! %x", e);
+			output.error_message = get_error() + get_stack();
+		}
+		catch (...) {
+			output.exception_message = typesafe_sprintf("Exception (unknown) thrown!");
+			output.error_message = get_error() + get_stack();
+		}
+
+		return std::move(output);
+	}
+}

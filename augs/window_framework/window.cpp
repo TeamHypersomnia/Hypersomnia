@@ -192,7 +192,7 @@ namespace augs {
 					RemoveClipboardFormatListener(hwnd);
 				}
 				else if (umsg == WM_SYSCOMMAND || umsg == WM_ACTIVATE || umsg == WM_INPUT) {
-					ensure(PostMessage(hwnd, umsg, wParam, lParam));
+					(PostMessage(hwnd, umsg, wParam, lParam));
 					return 0;
 				}
 				else if (umsg == WM_GETMINMAXINFO) {

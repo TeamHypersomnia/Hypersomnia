@@ -2,10 +2,6 @@
 #include <string>
 #include "augs/math/vec2.h"
 #include "game/enums/input_recording_type.h"
-#include "augs/scripting/lua_state_wrapper.h"
-
-#include <thread>
-#include <mutex>
 
 #include "augs/padding_byte.h"
 #include "augs/graphics/pixel.h"
@@ -14,19 +10,11 @@
 
 class game_window;
 
+namespace augs {
+	class lua_state_raii;
+}
+
 class config_lua_table {
-	augs::lua_state_wrapper lua;
-	std::mutex lua_mutex;
-
-	template<class T>
-	void get_config_value(const std::string& field, T& into) {
-		std::unique_lock<std::mutex> lock(lua_mutex);
-
-		into = luabind::object_cast<T>(luabind::globals(lua.raw)["config_table"][field]);
-	}
-
-	void get_config_value(const std::string& field, bool& into);
-
 public:
 	int launch_mode = 0;
 	int input_recording_mode = 0;
@@ -93,12 +81,7 @@ public:
 		rgba secondary_selected_color = rgba(86, 156, 214, 255); 
 	} hotbar;
 
-	config_lua_table();
-
-	void get_values();
-
-	void call_config_script(const std::string& filename, const std::string& alternative_filename);
-	void call_window_script(game_window&, const std::string& filename);
+	void get_values(augs::lua_state_raii&);
 
 	enum class launch_type {
 		INVALID,

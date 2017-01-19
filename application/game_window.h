@@ -5,10 +5,9 @@
 #include "config_lua_table.h"
 
 class game_window {
-	augs::window::glwindow window;
-	friend class config_lua_table;
-
 public:
+	augs::window::glwindow window;
+
 	vec2i get_screen_size();
 	void swap_buffers();
 

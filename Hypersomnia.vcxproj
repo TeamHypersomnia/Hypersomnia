@@ -317,6 +317,7 @@
     <ClCompile Include="3rdparty\lua\lzio.c" />
     <ClCompile Include="3rdparty\polypartition\src\polypartition.cpp" />
     <ClCompile Include="3rdparty\rectpack2D\src\pack.cpp" />
+    <ClCompile Include="application\call_config_script.cpp" />
     <ClCompile Include="application\config_lua_table.cpp" />
     <ClCompile Include="application\setups\director_setup.cpp" />
     <ClCompile Include="application\setups\menu_setup.cpp" />
@@ -543,7 +544,7 @@
     <ClCompile Include="augs\gui\text\printer.cpp" />
     <ClCompile Include="augs\gui\text\ui.cpp" />
     <ClCompile Include="augs\gui\text\word_separator.cpp" />
-    <ClCompile Include="augs\scripting\lua_state_wrapper.cpp" />
+    <ClCompile Include="augs\scripting\lua_state_raii.cpp" />
     <ClCompile Include="augs\math\rects.cpp" />
     <ClCompile Include="augs\math\vec2.cpp" />
     <ClCompile Include="augs\misc\fixed_delta_timer.cpp" />
@@ -552,7 +553,6 @@
     <ClCompile Include="augs\misc\timer.cpp" />
     <ClCompile Include="augs\misc\value_animator.cpp" />
     <ClCompile Include="augs\log.cpp" />
-    <ClCompile Include="augs\scripting\script.cpp" />
     <ClCompile Include="augs\texture_baker\font.cpp" />
     <ClCompile Include="augs\texture_baker\image.cpp" />
     <ClCompile Include="augs\texture_baker\lodepng.cpp" />
@@ -997,6 +997,7 @@
     <ClInclude Include="3rdparty\lua\lzio.h" />
     <ClInclude Include="3rdparty\polypartition\src\polypartition.h" />
     <ClInclude Include="3rdparty\rectpack2D\src\pack.h" />
+    <ClInclude Include="application\call_config_script.h" />
     <ClInclude Include="application\config_lua_table.h" />
     <ClInclude Include="application\menu_button_type.h" />
     <ClInclude Include="application\setups\client_setup.h" />
@@ -1364,7 +1365,7 @@
     <ClInclude Include="augs\gui\text\printer.h" />
     <ClInclude Include="augs\gui\text\ui.h" />
     <ClInclude Include="augs\gui\text\word_separator.h" />
-    <ClInclude Include="augs\scripting\lua_state_wrapper.h" />
+    <ClInclude Include="augs\scripting\lua_state_raii.h" />
     <ClInclude Include="augs\math\matrix.h" />
     <ClInclude Include="augs\math\rects.h" />
     <ClInclude Include="augs\math\vec2.h" />
@@ -1379,7 +1380,6 @@
     <ClInclude Include="augs\misc\undoredo.h" />
     <ClInclude Include="augs\misc\value_animator.h" />
     <ClInclude Include="augs\log.h" />
-    <ClInclude Include="augs\scripting\script.h" />
     <ClInclude Include="augs\texture_baker\font.h" />
     <ClInclude Include="augs\texture_baker\image.h" />
     <ClInclude Include="augs\texture_baker\lodepng.h" />

@@ -2,7 +2,10 @@
 #include "bindings.h"
 
 #include "game/bindings/bind_game_and_augs.h"
-#include "augs/scripting/lua_state_wrapper.h"
+#include "augs/scripting/lua_state_raii.h"
+
+#include "augs/log.h"
+#include <luabind/class_info.hpp>
 
 namespace bindings {
 	extern luabind::scope
@@ -13,8 +16,13 @@ namespace bindings {
 		_glwindow();
 }
 
-void bind_game_and_augs(augs::lua_state_wrapper& wrapper) {
-	auto& raw = wrapper.raw;
+static void LOG_surrogate(const std::string& s) {
+	LOG(s);
+}
+
+void bind_game_and_augs(augs::lua_state_raii& wrapper) {
+	lua_State* raw = wrapper;
+
 	luabind::open(raw);
 
 	luabind::module(raw)[
@@ -23,11 +31,11 @@ void bind_game_and_augs(augs::lua_state_wrapper& wrapper) {
 			bindings::_rect_xywh(),
 			bindings::_glwindow(),
 
-			luabind::def("open_editor", lua_state_wrapper::open_editor),
+			luabind::def("LOG", LOG_surrogate),
 
 			bindings::_vec2()
 	];
 
 	//wrapper.global("THIS_LUA_STATE", wrapper);
-	//luabind::bind_class_info(raw);
+	luabind::bind_class_info(raw);
 }

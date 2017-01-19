@@ -9,12 +9,14 @@
 #include "application/setups/director_setup.h"
 
 #include "application/game_window.h"
+#include "application/call_config_script.h"
 #include "game/resources/manager.h"
 
 #include "game/scene_managers/resource_setups/all.h"
 #include "game/transcendental/types_specification/all_component_includes.h"
+#include "game/bindings/bind_game_and_augs.h"
 
-#include <thread>
+#include "augs/scripting/lua_state_raii.h"
 
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
@@ -23,14 +25,19 @@ int main(int argc, char** argv) {
 	augs::global_libraries::init();
 	augs::global_libraries::run_googletest(argc, argv);
 
+	augs::lua_state_raii lua;
+	bind_game_and_augs(lua);
+
 	config_lua_table cfg;
-	cfg.call_config_script("config.lua", "config.local.lua");
 	
+	call_config_script(lua, "config.lua", "config.local.lua");
+	cfg.get_values(lua);
+
 	augs::audio_manager::generate_alsoft_ini(cfg.enable_hrtf);
 	augs::audio_manager audio;
 
 	game_window window;
-	cfg.call_window_script(window, "window.lua");
+	call_window_script(lua, window, "window.lua");
 
 	resource_setups::load_standard_everything();
 
