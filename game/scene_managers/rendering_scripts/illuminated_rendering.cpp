@@ -33,7 +33,9 @@ namespace rendering_scripts {
 		auto& wandering_pixels = step.session.systems_audiovisual.get<wandering_pixels_system>();
 		const float global_time_seconds = static_cast<float>(step.get_interpolated_total_time_passed_in_seconds());
 
-		const auto matrix = augs::orthographic_projection<float>(0, camera.visible_world_area.x, camera.visible_world_area.y, 0, 0, 1);
+		const vec2i screen_size = camera.visible_world_area;
+
+		const auto matrix = augs::orthographic_projection<float>(0, static_cast<float>(screen_size.x), static_cast<float>(screen_size.y), 0, 0, 1);
 
 		const auto& visible_per_layer = step.visible.per_layer;
 
@@ -251,8 +253,23 @@ namespace rendering_scripts {
 
 		hud.draw_vertically_flying_numbers(step);
 
-		if (step.settings.draw_gui_overlays && controlled_entity.has<components::gui_element>()) {
-			components::gui_element::draw_complete_gui_for_camera_rendering_request(output, controlled_entity, step);
+		if (step.settings.draw_gui_overlays) {
+			if (controlled_entity.has<components::gui_element>()) {
+				components::gui_element::draw_complete_gui_for_camera_rendering_request(output, controlled_entity, step);
+			}
+
+			if (controlled_entity.has<components::sentience>()) {
+				draw_sentience_meters(
+					output,
+					controlled_entity.get<components::sentience>(),
+					vec2i(screen_size.x - 200, 200),
+					195,
+					4,
+					assets::texture_id::HEALTH_ICON,
+					assets::texture_id::PERSONAL_ELECTRICITY_ICON,
+					assets::texture_id::CONSCIOUSNESS_ICON
+				);
+			}
 		}
 
 		renderer.bind_texture(*get_resource_manager().find(assets::atlas_id::GAME_WORLD_ATLAS));
@@ -261,7 +278,7 @@ namespace rendering_scripts {
 		renderer.clear_triangles();
 
 		renderer.draw_debug_info(
-			camera.visible_world_area,
+			screen_size,
 			camera.transform,
 			assets::texture_id::BLANK,
 			{},
