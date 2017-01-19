@@ -82,7 +82,7 @@ void drag_and_drop_callback(
 }
 
 template <class C>
-drag_and_drop_result prepare_drag_and_drop_result(C context, const game_gui_element_location held_rect_id, const game_gui_element_location drop_target_rect_id) {
+drag_and_drop_result prepare_drag_and_drop_result(const C context, const game_gui_element_location held_rect_id, const game_gui_element_location drop_target_rect_id) {
 	const auto& cosmos = context.get_step().get_cosmos();
 	const auto& element = context.get_gui_element_component();
 	const auto owning_transfer_capability = context.get_gui_element_entity();

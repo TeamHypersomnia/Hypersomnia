@@ -20,7 +20,7 @@ slot_button::slot_button() {
 	unset_flag(augs::gui::flag::CLIP);
 }
 
-void slot_button::draw(const viewing_gui_context& context, const const_this_in_container& this_id, augs::gui::draw_info info) {
+void slot_button::draw(const viewing_gui_context context, const const_this_in_container this_id, augs::gui::draw_info info) {
 	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING)) {
 		return;
 	}
@@ -113,7 +113,7 @@ void slot_button::draw(const viewing_gui_context& context, const const_this_in_c
 	}
 }
 
-void slot_button::advance_elements(const logic_gui_context& context, const this_in_container& this_id, const gui_entropy& entropies, const augs::delta dt) {
+void slot_button::advance_elements(const logic_gui_context context, const this_in_container this_id, const gui_entropy& entropies, const augs::delta dt) {
 	game_gui_rect_node::advance_elements(context, this_id, entropies, dt);
 	
 	for (const auto& info : entropies.get_events_for(this_id)) {
@@ -125,13 +125,13 @@ void slot_button::advance_elements(const logic_gui_context& context, const this_
 	}
 }
 
-void slot_button::rebuild_layouts(const logic_gui_context& context, const this_in_container& this_id) {
+void slot_button::rebuild_layouts(const logic_gui_context context, const this_in_container this_id) {
 	game_gui_rect_node::rebuild_layouts(context, this_id);
 
 	update_rc(context, this_id);
 }
 
-void slot_button::update_rc(const logic_gui_context& context, const this_in_container& this_id) {
+void slot_button::update_rc(const logic_gui_context context, const this_in_container this_id) {
 	const auto& step = context.get_step();
 	const auto& cosmos = step.get_cosmos();
 

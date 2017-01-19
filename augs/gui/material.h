@@ -18,7 +18,7 @@ namespace augs {
 		ltrb draw_clipped_rect(
 			const material& mat, 
 			const ltrb origin, 
-			C context, 
+			const C context, 
 			const gui_element_id& clipper, 
 			vertex_triangle_buffer& v
 		) {

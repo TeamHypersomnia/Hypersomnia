@@ -17,7 +17,7 @@ public:
 	vec2i get_max_menu_button_size() const;
 
 	template <class C, class D, class L>
-	static void for_each_child(C context, const D& this_id, L generic_call) {
+	static void for_each_child(const C context, const D this_id, L generic_call) {
 		// however it should be a container so we call the callback on the element's children
 		// i.e. the player has a gui element component and container component but not an item component.
 		dx_button_in_menu loc;

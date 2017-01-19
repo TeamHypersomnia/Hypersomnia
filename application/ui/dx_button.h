@@ -39,7 +39,7 @@ public:
 	void set_appearing_caption(const augs::gui::text::fstr text);
 		
 	template <class C, class D>
-	static void advance_elements(C context, const D& this_id, const gui_entropy& entropies, const augs::delta dt) {
+	static void advance_elements(const C context, const D this_id, const gui_entropy& entropies, const augs::delta dt) {
 		for (const auto& info : entropies.get_events_for(this_id)) {
 			this_id->detector.update_appearance(info);
 
@@ -63,7 +63,7 @@ public:
 	}
 
 	template <class C, class D>
-	static void draw(C context, const D& this_id, augs::gui::draw_info in) {
+	static void draw(const C context, const D this_id, augs::gui::draw_info in) {
 		if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING)) {
 			return;
 		}

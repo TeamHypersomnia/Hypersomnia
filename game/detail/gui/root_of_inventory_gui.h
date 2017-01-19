@@ -6,7 +6,7 @@ public:
 	root_of_inventory_gui(const vec2 screen_size);
 
 	template <class C, class gui_element_id, class L>
-	static void for_each_child(C context, const gui_element_id& this_id, L generic_call) {
+	static void for_each_child(const C context, const gui_element_id this_id, L generic_call) {
 		const auto handle = context.get_gui_element_entity();
 
 		// we do not dereference the gui element's entity location because it is possibly not an item;

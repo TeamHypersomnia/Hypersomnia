@@ -18,12 +18,12 @@ public:
 	}
 
 	template <class C>
-	bool alive(C context) const {
+	bool alive(const C context) const {
 		return true;
 	}
 
 	template <class C>
-	decltype(auto) dereference(C context) const {
+	decltype(auto) dereference(const C context) const {
 		return &context.get_root_of_app_ui().menu_buttons.at(static_cast<size_t>(type));
 	}
 };

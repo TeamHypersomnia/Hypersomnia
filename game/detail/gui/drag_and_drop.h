@@ -38,7 +38,7 @@ typedef augs::trivial_variant<
 
 template <class C>
 drag_and_drop_result prepare_drag_and_drop_result(
-	C context, 
+	const C context, 
 	const game_gui_element_location held_rect_id, 
 	const game_gui_element_location drop_target_rect_id
 );

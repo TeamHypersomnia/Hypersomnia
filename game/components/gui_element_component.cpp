@@ -86,7 +86,7 @@ namespace components {
 		}
 	}
 
-	void gui_element::draw_cursor_with_information(vertex_triangle_buffer& output_buffer, const viewing_gui_context& context) const {
+	void gui_element::draw_cursor_with_information(vertex_triangle_buffer& output_buffer, const viewing_gui_context context) const {
 		const auto drag_amount = context.get_rect_world().current_drag_amount;
 		
 		auto gui_cursor = assets::texture_id::GUI_CURSOR;
@@ -241,7 +241,7 @@ namespace components {
 		augs::draw_rect(output_buffer, gui_cursor_position, gui_cursor, gui_cursor_color);
 	}
 	
-	void gui_element::draw_tooltip_from_hover_or_world_highlight(vertex_triangle_buffer& output_buffer, const viewing_gui_context& context, const vec2i tooltip_pos) const {
+	void gui_element::draw_tooltip_from_hover_or_world_highlight(vertex_triangle_buffer& output_buffer, const viewing_gui_context context, const vec2i tooltip_pos) const {
 		const auto& rect_world = context.get_rect_world();
 		auto& step = context.get_step();
 		const auto& cosmos = step.get_cosmos();

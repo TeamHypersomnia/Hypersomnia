@@ -32,7 +32,7 @@ namespace augs {
 			typedef augs::gui::gui_entropy<gui_element_polymorphic_id> gui_entropy;
 
 			template<class C, class gui_element_id>
-			bool is_hovered(C context, const gui_element_id& id) {
+			bool is_hovered(const C context, const gui_element_id& id) {
 				return context(id, [&](const auto& p) {
 					return context.get_tree_entry(id).get_absolute_clipped_rect().hover(last_state.mouse.pos);
 				});
@@ -74,7 +74,7 @@ namespace augs {
 			}
 
 			template <class C, class gui_element_id>
-			void set_focus(C context, const gui_element_id& new_to_focus) {
+			void set_focus(const C context, const gui_element_id& new_to_focus) {
 				if (new_to_focus == rect_in_focus) {
 					return;
 				}
@@ -91,7 +91,7 @@ namespace augs {
 			}
 
 			template <class C, class gui_element_id>
-			void consume_raw_input_and_generate_gui_events(C context, const gui_element_id& root, const window::event::change new_state, gui_entropy& entropies) {
+			void consume_raw_input_and_generate_gui_events(const C context, const gui_element_id& root, const window::event::change new_state, gui_entropy& entropies) {
 				using namespace augs::window;
 
 				last_state.apply(new_state);
@@ -208,14 +208,14 @@ namespace augs {
 			}
 
 			template <class C, class gui_element_id>
-			void build_tree_data_into_context(C context, const gui_element_id& root) const {
+			void build_tree_data_into_context(const C context, const gui_element_id& root) const {
 				context(root, [&](const auto& r) { 
 					r->build_tree_data(context, r); 
 				});
 			}
 
 			template <class C, class gui_element_id>
-			void advance_elements(C context, const gui_element_id& root, const gui_entropy& entropies, const augs::delta dt) {
+			void advance_elements(const C context, const gui_element_id& root, const gui_entropy& entropies, const augs::delta dt) {
 				context(root, [&](const auto& r) {
 					r->advance_elements(context, r, entropies, dt);
 				});
@@ -224,14 +224,14 @@ namespace augs {
 			}			
 			
 			template <class C, class gui_element_id>
-			void rebuild_layouts(C context, const gui_element_id& root) {
+			void rebuild_layouts(const C context, const gui_element_id& root) {
 				context(root, [&](const auto& r) {
 					r->rebuild_layouts(context, r);
 				});
 			}
 			
 			template <class C, class gui_element_id>
-			void call_idle_mousemotion_updater(C context, const gui_element_id& root, gui_entropy& entropy) {
+			void call_idle_mousemotion_updater(const C context, const gui_element_id& root, gui_entropy& entropy) {
 				window::event::change fabricated_state;
 				fabricated_state.msg = window::event::message::mousemotion;
 				fabricated_state.mouse.rel.set(0, 0);
@@ -248,7 +248,7 @@ namespace augs {
 			}
 
 			template <class C, class gui_element_id>
-			void draw(vertex_triangle_buffer& output_buffer, C context, const gui_element_id& root) const {
+			void draw(vertex_triangle_buffer& output_buffer, const C context, const gui_element_id& root) const {
 				draw_info in(output_buffer);
 
 				context(root, [&](const auto& r) { 

@@ -39,7 +39,7 @@ namespace augs {
 			using rect_node_data::rect_node_data;
 
 			template <class C, class gui_element_id>
-			static void build_tree_data(C context, const gui_element_id& this_id) {
+			static void build_tree_data(const C context, const gui_element_id this_id) {
 				auto& tree_entry = context.make_tree_entry(this_id);
 				const auto parent = tree_entry.get_parent();
 				
@@ -88,7 +88,7 @@ namespace augs {
 			}
 
 			template <class C, class gui_element_id>
-			static void consume_raw_input_and_generate_gui_events(C context, const gui_element_id& this_id, gui::event_traversal_flags& inf, gui_entropy& entropies) {
+			static void consume_raw_input_and_generate_gui_events(const C context, const gui_element_id this_id, gui::event_traversal_flags& inf, gui_entropy& entropies) {
 				using namespace augs::window::event;
 				auto& gr = context.get_rect_world();
 				const auto& tree_entry = context.get_tree_entry(this_id);
@@ -192,28 +192,28 @@ namespace augs {
 			}
 
 			//template <class C, class gui_element_id>
-			//static void consume_gui_event(C context, const gui_element_id& this_id, const event_info e) {
+			//static void consume_gui_event(const C context, const gui_element_id this_id, const event_info e) {
 				// try_to_make_this_rect_focused(context, this_id, e);
 				//	scroll_content_with_wheel(context, e);
 				//	try_to_enable_middlescrolling(context, e);
 			//}
 
 			template <class C, class gui_element_id>
-			static void advance_elements(C context, const gui_element_id& this_id, const gui_entropy& entropies, const augs::delta dt) {
+			static void advance_elements(const C context, const gui_element_id this_id, const gui_entropy& entropies, const augs::delta dt) {
 				this_id->for_each_child(context, this_id, [&](const auto& child_id) {
 					child_id->advance_elements(context, child_id, entropies, dt);
 				});
 			}
 
 			template <class C, class gui_element_id>
-			static void rebuild_layouts(C context, const gui_element_id& this_id) {
+			static void rebuild_layouts(const C context, const gui_element_id this_id) {
 				this_id->for_each_child(context, this_id, [&](const auto& child_id) {
 					child_id->rebuild_layouts(context, child_id);
 				});
 			}
 			
 			template <class C, class gui_element_id>
-			static void draw(C context, const gui_element_id& this_id, draw_info in) {
+			static void draw(const C context, const gui_element_id this_id, draw_info in) {
 				if (!this_id->get_flag(flag::ENABLE_DRAWING)) {
 					return;
 				}
@@ -222,7 +222,7 @@ namespace augs {
 			}
 
 			template <class C, class gui_element_id>
-			static void draw_children(C context, const gui_element_id& this_id, draw_info in) {
+			static void draw_children(const C context, const gui_element_id this_id, draw_info in) {
 				if (!this_id->get_flag(flag::ENABLE_DRAWING_OF_CHILDREN)) {
 					return;
 				}
@@ -233,13 +233,13 @@ namespace augs {
 			}
 
 			template <class C, class gui_element_id>
-			static void draw_stretched_texture(C context, const gui_element_id& id, gui::draw_info in, const gui::material& mat = gui::material()) {
+			static void draw_stretched_texture(const C context, const gui_element_id& id, gui::draw_info in, const gui::material& mat = gui::material()) {
 				const auto absolute = context.get_tree_entry(id).get_absolute_rect();
 				draw_clipped_rect(mat, absolute, context, context.get_tree_entry(id).get_parent(), in.v);
 			}
 
 			template <class C, class gui_element_id>
-			static void draw_centered_texture(C context, const gui_element_id& id, gui::draw_info in, const gui::material& mat = gui::material(), const vec2i offset = vec2i()) {
+			static void draw_centered_texture(const C context, const gui_element_id& id, gui::draw_info in, const gui::material& mat = gui::material(), const vec2i offset = vec2i()) {
 				auto absolute_centered = context.get_tree_entry(id).get_absolute_rect();
 				const auto tex_size = (*mat.tex).get_size();
 				absolute_centered.l += absolute_centered.w() / 2 - float(tex_size.x) / 2;
@@ -253,7 +253,7 @@ namespace augs {
 			}
 
 			template <class C, class gui_element_id>
-			static void draw_rectangle_stylesheeted(C context, const gui_element_id& id, gui::draw_info in, const gui::stylesheet& styles) {
+			static void draw_rectangle_stylesheeted(const C context, const gui_element_id& id, gui::draw_info in, const gui::stylesheet& styles) {
 				const auto st = styles.get_style();
 				const auto& this_entry = context.get_tree_entry(id);
 
@@ -272,7 +272,7 @@ namespace augs {
 			}
 
 			template <class C, class gui_element_id>
-			static void unhover(C context, const gui_element_id& this_id, gui::event_traversal_flags& inf, gui_entropy& entropies) {
+			static void unhover(const C context, const gui_element_id this_id, gui::event_traversal_flags& inf, gui_entropy& entropies) {
 				auto& world = context.get_rect_world();
 
 				auto gui_event_lambda = [&](const gui_event ev) {
@@ -289,7 +289,7 @@ namespace augs {
 			}
 
 			//template <class C, class gui_element_id>
-			//void try_to_make_this_rect_focused(C context, gui_element_id this_id, const gui::event_info e) {
+			//void try_to_make_this_rect_focused(const C context, gui_element_id this_id, const gui::event_info e) {
 			//	if (!get_flag(flag::FOCUSABLE)) return;
 			//	
 			//	auto& sys = context.get_rect_world();
@@ -314,7 +314,7 @@ namespace augs {
 			//void clamp_scroll_to_right_down_corner();
 
 			//template <class C, class gui_element_id>
-			//vec2 calculate_content_size(C context) const {
+			//vec2 calculate_content_size(const C context) const {
 			//	/* init on zero */
 			//	ltrb content = ltrb(0.f, 0.f, 0.f, 0.f);
 			//
@@ -331,7 +331,7 @@ namespace augs {
 			//}
 
 			//template <class C, class gui_element_id>
-			//void scroll_content_with_wheel(C context, const gui::event_info e) {
+			//void scroll_content_with_wheel(const C context, const gui::event_info e) {
 			//	auto& owner = e.owner;
 			//	const auto& wnd = owner.state;
 			//	const bool scrollable = get_flag(flag::SCROLLABLE);
@@ -369,7 +369,7 @@ namespace augs {
 			//}
 			//
 			//template <class C, class gui_element_id>
-			//void try_to_enable_middlescrolling(C context, const gui::event_info e) {
+			//void try_to_enable_middlescrolling(const C context, const gui::event_info e) {
 			//	auto& owner = e.owner;
 			//	auto& wnd = owner.state;
 			//
@@ -386,7 +386,7 @@ namespace augs {
 			//}
 			//
 			//template <class C, class gui_element_id>
-			//void scroll_to_view(C context) {
+			//void scroll_to_view(const C context) {
 			//	if (context.alive(parent)) {
 			//		context(parent, [&](const auto& p) {
 			//			const ltrb global = get_absolute_rect();

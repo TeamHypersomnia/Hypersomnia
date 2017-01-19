@@ -16,7 +16,7 @@ namespace augs {
 			float speed_mult = 1.f;
 
 			template<class C>
-			void advance_elements(C context, const delta& dt) {
+			void advance_elements(const C context, const delta& dt) {
 				if (context.alive(subject)) {
 					context(subject, [&](auto& r) {
 						r->set_scroll(r->get_scroll() + static_cast<vec2>(context.get_rect_world().last_state.mouse.pos - middlescroll_icon_position) * float(speed_mult*dt.in_milliseconds()));
@@ -25,7 +25,7 @@ namespace augs {
 			}
 
 			template<class C>
-			bool handle_new_raw_state(C context, const window::event::change& state) {
+			bool handle_new_raw_state(const C context, const window::event::change& state) {
 				if (context.alive(subject)) {
 					if (state.msg == window::event::message::mdown || state.msg == window::event::message::mdoubleclick)
 						subject.unset();
@@ -37,7 +37,7 @@ namespace augs {
 			}
 
 			template<class C>
-			void draw(C context, draw_info in) const {
+			void draw(const C context, draw_info in) const {
 				if (context.alive(subject)) {
 					auto scroller = ltrb(vec2(), size);
 					scroller.center(middlescroll_icon_position);

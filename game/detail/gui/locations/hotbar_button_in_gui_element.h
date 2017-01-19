@@ -13,12 +13,12 @@ public:
 	}
 
 	template <class C>
-	bool alive(C context) const {
+	bool alive(const C context) const {
 		return index >= 0 && index < static_cast<int>(context.get_gui_element_component().hotbar_buttons.size());
 	}
 
 	template <class C>
-	decltype(auto) dereference(C context) const {
+	decltype(auto) dereference(const C context) const {
 		return &context.get_gui_element_component().hotbar_buttons.at(index);
 	}
 };

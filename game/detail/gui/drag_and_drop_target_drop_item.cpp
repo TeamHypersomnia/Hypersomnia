@@ -15,7 +15,7 @@ drag_and_drop_target_drop_item::drag_and_drop_target_drop_item(const augs::gui::
 	unset_flag(augs::gui::flag::ENABLE_DRAWING);
 }
 
-void drag_and_drop_target_drop_item::draw(const viewing_gui_context& context, const const_this_pointer& this_id, const augs::gui::draw_info info) {
+void drag_and_drop_target_drop_item::draw(const viewing_gui_context context, const const_this_pointer this_id, const augs::gui::draw_info info) {
 	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING)) {
 		return;
 	}
@@ -32,13 +32,13 @@ void drag_and_drop_target_drop_item::draw(const viewing_gui_context& context, co
 	draw_centered_texture(context, this_id, info, mat_coloured);
 }
 
-void drag_and_drop_target_drop_item::advance_elements(const logic_gui_context& context, const this_pointer& this_id, const gui_entropy& entropies, const augs::delta) {
+void drag_and_drop_target_drop_item::advance_elements(const logic_gui_context context, const this_pointer this_id, const gui_entropy& entropies, const augs::delta) {
 	for (const auto& e : entropies.get_events_for(this_id)) {
 		this_id->detector.update_appearance(e);
 	}
 }
 
-void drag_and_drop_target_drop_item::rebuild_layouts(const logic_gui_context& context, const this_pointer& this_id) {
+void drag_and_drop_target_drop_item::rebuild_layouts(const logic_gui_context context, const this_pointer this_id) {
 	const auto& world = context.get_rect_world();
 	const_dereferenced_location<item_button_in_item> dragged_item = context._dynamic_cast<item_button_in_item>(world.rect_held_by_lmb);
 

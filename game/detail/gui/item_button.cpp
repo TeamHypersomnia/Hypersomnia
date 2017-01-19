@@ -26,7 +26,7 @@
 #include "augs/templates/string_templates.h"
 #include "augs/ensure.h"
 
-bool item_button::is_being_wholely_dragged_or_pending_finish(const const_logic_gui_context& context, const const_this_in_item& this_id) {
+bool item_button::is_being_wholely_dragged_or_pending_finish(const const_logic_gui_context context, const const_this_in_item this_id) {
 	const auto& rect_world = context.get_rect_world();
 	const auto& element = context.get_gui_element_component();
 	const auto& cosmos = context.get_step().get_cosmos();
@@ -45,7 +45,7 @@ item_button::item_button(xywh rc) : base(rc) {
 	unset_flag(augs::gui::flag::FOCUSABLE);
 }
 
-void item_button::draw_dragged_ghost_inside(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in, vec2 absolute_xy_offset) {
+void item_button::draw_dragged_ghost_inside(const viewing_gui_context context, const const_this_in_item this_id, draw_info in, vec2 absolute_xy_offset) {
 	drawing_settings f;
 	f.draw_background = true;
 	f.draw_item = true;
@@ -60,7 +60,7 @@ void item_button::draw_dragged_ghost_inside(const viewing_gui_context& context, 
 	draw_proc(context, this_id, in, f);
 }
 
-void item_button::draw_complete_with_children(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in) {
+void item_button::draw_complete_with_children(const viewing_gui_context context, const const_this_in_item this_id, draw_info in) {
 	drawing_settings f;
 	f.draw_background = true;
 	f.draw_item = true;
@@ -75,7 +75,7 @@ void item_button::draw_complete_with_children(const viewing_gui_context& context
 	draw_proc(context, this_id, in, f);
 }
 
-void item_button::draw_grid_border_ghost(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in, vec2 absolute_xy_offset) {
+void item_button::draw_grid_border_ghost(const viewing_gui_context context, const const_this_in_item this_id, const draw_info in, const vec2 absolute_xy_offset) {
 	drawing_settings f;
 	f.draw_background = false;
 	f.draw_item = false;
@@ -90,7 +90,7 @@ void item_button::draw_grid_border_ghost(const viewing_gui_context& context, con
 	draw_proc(context, this_id, in, f);
 }
 
-void item_button::draw_complete_dragged_ghost(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in, vec2 absolute_xy_offset) {
+void item_button::draw_complete_dragged_ghost(const viewing_gui_context context, const const_this_in_item this_id, const draw_info in, const vec2 absolute_xy_offset) {
 	draw_dragged_ghost_inside(context, this_id, in, absolute_xy_offset);
 }
 
@@ -149,7 +149,7 @@ vec2 item_button::griddify_size(const vec2 size, const vec2 expander) {
 	return rounded_size;
 }
 
-void item_button::draw_proc(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in, const drawing_settings& f) {
+void item_button::draw_proc(const viewing_gui_context context, const const_this_in_item this_id, const draw_info in, const drawing_settings& f) {
 	if (is_inventory_root(context, this_id)) {
 		return;
 	}
@@ -374,13 +374,13 @@ void item_button::draw_proc(const viewing_gui_context& context, const const_this
 	this_tree_entry.set_absolute_pos(former_absolute_pos);
 }
 
-bool item_button::is_inventory_root(const const_logic_gui_context& context, const const_this_in_item& this_id) {
+bool item_button::is_inventory_root(const const_logic_gui_context context, const const_this_in_item this_id) {
 	const bool result = this_id.get_location().item_id == context.get_gui_element_entity();
 	ensure(!result);
 	return result;
 }
 
-void item_button::rebuild_layouts(const logic_gui_context& context, const this_in_item& this_id) {
+void item_button::rebuild_layouts(const logic_gui_context context, const this_in_item this_id) {
 	base::rebuild_layouts(context, this_id);
 
 	const auto& cosmos = context.get_step().get_cosmos();
@@ -417,7 +417,7 @@ void item_button::rebuild_layouts(const logic_gui_context& context, const this_i
 	}
 }
 
-void item_button::advance_elements(const logic_gui_context& context, const this_in_item& this_id, const gui_entropy& entropies, const augs::delta dt) {
+void item_button::advance_elements(const logic_gui_context context, const this_in_item this_id, const gui_entropy& entropies, const augs::delta dt) {
 	base::advance_elements(context, this_id, entropies, dt);
 
 	const auto& cosmos = context.get_step().get_cosmos();
@@ -446,7 +446,7 @@ void item_button::advance_elements(const logic_gui_context& context, const this_
 	}
 }
 
-void item_button::draw(const viewing_gui_context& context, const const_this_in_item& this_id, draw_info in) {
+void item_button::draw(const viewing_gui_context context, const const_this_in_item this_id, draw_info in) {
 	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING)) {
 		return;
 	}

@@ -19,7 +19,7 @@ struct drag_and_drop_target_drop_item : game_gui_rect_node {
 
 	augs::gui::appearance_detector detector;
 
-	static void draw(const viewing_gui_context& context, const const_this_pointer& this_id, augs::gui::draw_info info);
-	static void advance_elements(const logic_gui_context&, const this_pointer& this_id, const gui_entropy& entropies, const augs::delta);
-	static void rebuild_layouts(const logic_gui_context&, const this_pointer& this_id);
+	static void draw(const viewing_gui_context context, const const_this_pointer this_id, augs::gui::draw_info info);
+	static void advance_elements(const logic_gui_context, const this_pointer this_id, const gui_entropy& entropies, const augs::delta);
+	static void rebuild_layouts(const logic_gui_context, const this_pointer this_id);
 };
