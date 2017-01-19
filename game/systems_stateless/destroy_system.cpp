@@ -20,6 +20,7 @@ void destroy_system::queue_children_of_queued_entities(const logic_step step) {
 	for (const auto& it : queued) {
 		auto deletion_adder = [&deletions](entity_id descendant) {
 			deletions.push_back(descendant);
+			return true;
 		};
 
 		deletions.push_back(it.subject);

@@ -36,6 +36,39 @@ public:
 	entity_handle_type operator[](sub_entity_name) const;
 
 	sub_entity_name get_name_as_sub_entity() const;
+
+	template <class F>
+	void for_each_sub_entity_recursive(F callback) const {
+		const auto self = *static_cast<const entity_handle_type*>(this);
+
+		{
+			const auto& subs = get_sub_entities_component().other_sub_entities;
+
+			for (const auto& s : subs) {
+				const auto handle = self.get_cosmos()[s];
+
+				if (handle.alive()) {
+					if (callback(handle)) {
+						handle.for_each_sub_entity_recursive(callback);
+					}
+				}
+			}
+		}
+
+		{
+			const auto& subs = get_sub_entities_component().sub_entities_by_name;
+
+			for (const auto& s : subs) {
+				const auto handle = self.get_cosmos()[s.second];
+
+				if (handle.alive()) {
+					if (callback(handle)) {
+						handle.for_each_sub_entity_recursive(callback);
+					}
+				}
+			}
+		}
+	}
 };
 
 template<bool, class>
@@ -55,71 +88,9 @@ public:
 
 	void add_sub_entity(entity_id p, sub_entity_name optional_name = sub_entity_name::INVALID) const;
 	void map_sub_entity(sub_entity_name n, entity_id p) const;
-
-	template <class F>
-	void for_each_sub_entity_recursive(F callback) const {
-		auto& self = *static_cast<const entity_handle_type*>(this);
-
-		{
-			auto& subs = sub_entities_component().other_sub_entities;
-
-			for (auto& s : subs) {
-				auto handle = self.get_cosmos()[s];
-
-				if (handle.alive()) {
-					callback(handle);
-					handle.for_each_sub_entity_recursive(callback);
-				}
-			}
-		}
-
-		{
-			auto& subs = sub_entities_component().sub_entities_by_name;
-
-			for (auto& s : subs) {
-				auto handle = self.get_cosmos()[s.second];
-
-				if (handle.alive()) {
-					callback(handle);
-					handle.for_each_sub_entity_recursive(callback);
-				}
-			}
-		}
-	}
 };
 
 template<class entity_handle_type>
 class EMPTY_BASES relations_mixin<true, entity_handle_type> : public basic_relations_mixin<true, entity_handle_type> {
 public:
-
-	template <class F>
-	void for_each_sub_entity_recursive(F callback) const {
-		auto& self = *static_cast<const entity_handle_type*>(this);
-
-		{
-			auto& subs = get_sub_entities_component().other_sub_entities;
-
-			for (const auto& s : subs) {
-				auto handle = self.get_cosmos()[s];
-
-				if (handle.alive()) {
-					callback(handle);
-					handle.for_each_sub_entity_recursive(callback);
-				}
-			}
-		}
-
-		{
-			auto& subs = get_sub_entities_component().sub_entities_by_name;
-
-			for (const auto& s : subs) {
-				auto handle = self.get_cosmos()[s.second];
-
-				if (handle.alive()) {
-					callback(handle);
-					handle.for_each_sub_entity_recursive(callback);
-				}
-			}
-		}
-	}
 };

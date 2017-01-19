@@ -1,12 +1,15 @@
 #include "aabb_highlighter.h"
 #include "game/components/sprite_component.h"
 #include "game/components/sub_entities_component.h"
+#include "game/components/crosshair_component.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/step.h"
 #include "game/transcendental/viewing_session.h"
 #include "game/transcendental/cosmos.h"
 #include "augs/graphics/renderer.h"
 #include "game/systems_audiovisual/interpolation_system.h"
+
+#include "game/components/substance_component.h"
 
 void aabb_highlighter::update(const float delta_ms) {
 	timer += delta_ms;
@@ -17,26 +20,15 @@ void aabb_highlighter::draw(const viewing_step step, const const_entity_handle s
 	ltrb aabb;
 	
 	auto aabb_expansion_lambda = [&aabb, &step](const const_entity_handle e) {
-		static const sub_entity_name dont_expand_aabb_for_sub_entities[] = {
-			sub_entity_name::CHARACTER_CROSSHAIR,
-			sub_entity_name::CROSSHAIR_RECOIL_BODY,
-			sub_entity_name::MUZZLE_SMOKE,
-			sub_entity_name::BULLET_SHELL,
-			sub_entity_name::BULLET_ROUND,
-			sub_entity_name::CORPSE_OF_SENTIENCE,
-		};
+		if (!e.has<components::substance>()) {
+			return false;
+		}
 
-		if (e.has<components::particles_existence>()) {
-			return;
+		if (e.has<components::particles_existence>() || e.has<components::crosshair>()) {
+			return false;
 		}
 
 		const auto name_as_sub_entity = e.get_name_as_sub_entity();
-
-		for (const auto forbidden : dont_expand_aabb_for_sub_entities) {
-			if (name_as_sub_entity == forbidden) {
-				return;
-			}
-		}
 
 		const auto new_aabb = e.get_aabb(step.session.systems_audiovisual.get<interpolation_system>());
 
@@ -46,6 +38,8 @@ void aabb_highlighter::draw(const viewing_step step, const const_entity_handle s
 		else if (new_aabb.good()) {
 			aabb = new_aabb;
 		}
+		
+		return true;
 	};
 
 	aabb_expansion_lambda(subject);

@@ -218,6 +218,10 @@ namespace resource_setups {
 
 		manager.create(assets::texture_id::TRUCK_ENGINE, "hypersomnia/gfx/truck_engine.png");
 
+		manager.create(assets::texture_id::HEALTH_ICON, "hypersomnia/gfx/health_icon.png");
+		manager.create(assets::texture_id::PERSONAL_ELECTRICITY_ICON, "hypersomnia/gfx/personal_electricity_icon.png");
+		manager.create(assets::texture_id::CONSCIOUSNESS_ICON, "hypersomnia/gfx/consciousness_icon.png");
+
 		manager.create_inverse_with_flip(assets::animation_id::TORSO_MOVE,
 			assets::texture_id::TORSO_MOVING_FIRST,
 			assets::texture_id::TORSO_MOVING_LAST,
