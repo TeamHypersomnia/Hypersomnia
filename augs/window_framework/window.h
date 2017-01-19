@@ -57,7 +57,13 @@ namespace augs {
 			glwindow();
 			~glwindow();
 
-			int create(xywhi client_rectangle, int enable_window_border = 0, std::string name = "Window", int doublebuffer = 1, int bitsperpixel = 24);
+			void create(
+				const xywhi client_rectangle, 
+				const int enable_window_border = 0, 
+				const std::string name = "Window", 
+				const int doublebuffer = 1, 
+				const int bitsperpixel = 24
+			);
 			
 			bool swap_buffers(), 
 				set_as_current(),
@@ -67,7 +73,7 @@ namespace augs {
 
 			std::vector<event::change> poll_events(const bool should_clip_cursor = true);
 
-			bool set_window_rect(const xywhi&);
+			void set_window_rect(const xywhi);
 			vec2i get_screen_size() const;
 			xywhi get_window_rect() const;
 

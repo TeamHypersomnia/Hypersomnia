@@ -24,7 +24,6 @@
 #include "augs/window_framework/platform_utils.h"
 
 #include <gtest/gtest.h>
-#include "error/augs_error.h"
 #include "augs/log.h"
 #include "augs/ensure.h"
 

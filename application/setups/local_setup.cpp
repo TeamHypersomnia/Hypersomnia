@@ -33,7 +33,7 @@ void local_setup::process(const config_lua_table& cfg, game_window& window) {
 	augs::machine_entropy_player player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
-	scene_managers::testbed testbed;
+	scene_managers::one_entity testbed;
 	testbed.debug_var = cfg.debug_var;
 
 	if (!hypersomnia.load_from_file("save.state")) {

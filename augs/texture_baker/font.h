@@ -32,9 +32,9 @@ namespace augs {
 
 		typedef std::vector<std::pair<wchar_t, wchar_t> > charset;
 
-		bool open(const char* filename, unsigned pt, std::pair<wchar_t, wchar_t> range);
-		bool open(const char* filename, unsigned pt, const charset& ranges);
-		bool open(const char* filename, unsigned _pt, const std::wstring& characters);
+		void open(const char* filename, unsigned pt, std::pair<wchar_t, wchar_t> range);
+		void open(const char* filename, unsigned pt, const charset& ranges);
+		void open(const char* filename, unsigned _pt, const std::wstring& characters);
 
 		glyph* get_glyphs(), *get_glyph(unsigned unicode);
 		unsigned get_pt() const, get_height() const;

@@ -1346,7 +1346,6 @@
     <ClInclude Include="augs\global_libraries.h" />
     <ClInclude Include="augs\filesystem\dirent.h" />
     <ClInclude Include="game\entity_id.h" />
-    <ClInclude Include="augs\error\augs_error.h" />
     <ClInclude Include="augs\filesystem\file.h" />
     <ClInclude Include="augs\graphics\fbo.h" />
     <ClInclude Include="augs\graphics\pixel.h" />

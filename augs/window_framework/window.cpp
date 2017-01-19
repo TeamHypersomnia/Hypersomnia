@@ -6,7 +6,6 @@
 #include "augs/log.h"
 #include "augs/templates/string_templates.h"
 
-#include "augs/error/augs_error.h"
 #include "platform_utils.h"
 
 #ifdef PLATFORM_WINDOWS
@@ -193,7 +192,7 @@ namespace augs {
 					RemoveClipboardFormatListener(hwnd);
 				}
 				else if (umsg == WM_SYSCOMMAND || umsg == WM_ACTIVATE || umsg == WM_INPUT) {
-					err(PostMessage(hwnd, umsg, wParam, lParam));
+					ensure(PostMessage(hwnd, umsg, wParam, lParam));
 					return 0;
 				}
 				else if (umsg == WM_GETMINMAXINFO) {
@@ -388,14 +387,13 @@ namespace augs {
 			triple_click_delay = GetDoubleClickTime();
 		}
 
-		int glwindow::create(
+		void glwindow::create(
 			const xywhi crect, 
 			const int enable_window_border, 
 			const std::string name,
 			const int doublebuffer, 
-			const int bpp) {
-			int f = 1;
-
+			const int bpp
+		) {
 			enum flag {
 				CAPTION = WS_CAPTION,
 				MENU = CAPTION | WS_SYSMENU,
@@ -407,7 +405,7 @@ namespace augs {
 			style = menu ? (WS_OVERLAPPED | menu) | WS_CLIPSIBLINGS | WS_CLIPCHILDREN : WS_POPUP;
 			exstyle = menu ? WS_EX_WINDOWEDGE : WS_EX_APPWINDOW;
 			
-			errf((hwnd = CreateWindowEx(exstyle, L"AugmentedWindow", to_wstring(name).c_str(), style, 0, 0, 0, 0, 0, 0, GetModuleHandle(NULL), this)), f);
+			ensure((hwnd = CreateWindowEx(exstyle, L"AugmentedWindow", to_wstring(name).c_str(), style, 0, 0, 0, 0, 0, 0, GetModuleHandle(NULL), this)));
 
 			set_window_rect(crect);
 
@@ -422,13 +420,13 @@ namespace augs {
 			p.cAlphaBits = 8;
 			p.cDepthBits = 16;
 			p.iLayerType = PFD_MAIN_PLANE;
-			errf(hdc = GetDC(hwnd), f);
+			ensure(hdc = GetDC(hwnd));
 
 			GLuint pf;
-			errf(pf = ChoosePixelFormat(hdc, &p), f);
-			errf(SetPixelFormat(hdc, pf, &p), f);
+			ensure(pf = ChoosePixelFormat(hdc, &p));
+			ensure(SetPixelFormat(hdc, pf, &p));
 
-			errf(hglrc = wglCreateContext(hdc), f); glerr
+			ensure(hglrc = wglCreateContext(hdc)); glerr
 
 				set_as_current();
 			ShowWindow(hwnd, SW_SHOW);
@@ -449,19 +447,17 @@ namespace augs {
 			Rid[0].dwFlags = RIDEV_INPUTSINK;
 			Rid[0].hwndTarget = hwnd;
 			RegisterRawInputDevices(Rid, 1, sizeof(Rid[0]));
-
-			return f != 0;
 		}
 
 		bool glwindow::swap_buffers() {
 			if (this != context) set_as_current();
-			return err(SwapBuffers(hdc)) != FALSE;
+			return SwapBuffers(hdc) != FALSE;
 		}
 
 		bool glwindow::set_as_current() {
 			bool ret = true;
 			if (context != this) {
-				ret = err(wglMakeCurrent(hdc, hglrc)) != FALSE; glerr
+				ret = wglMakeCurrent(hdc, hglrc) != FALSE; glerr
 					context = this;
 			}
 
@@ -470,9 +466,9 @@ namespace augs {
 
 		bool glwindow::set_vsync(const int v) {
 			bool ret = WGLEW_EXT_swap_control != NULL;
-			errs(ret, "vsync not supported!");
+			ensure(ret && "vsync not supported!");
 			if (ret) {
-				errs(ret = set_as_current(), "error enabling vsync, could not set current context");
+				ensure(ret = set_as_current() && "error enabling vsync, could not set current context");
 				wglSwapIntervalEXT(v); glerr
 			}
 			return ret;
@@ -510,13 +506,11 @@ namespace augs {
 			return output;
 		}
 
-		bool glwindow::set_window_rect(const xywhi& r) {
+		void glwindow::set_window_rect(const xywhi r) {
 			static RECT wr = { 0 };
-			int f = 1;
-			errf(SetRect(&wr, r.x, r.y, r.r(), r.b()), f);
-			errf(AdjustWindowRectEx(&wr, style, FALSE, exstyle), f);
-			errf(MoveWindow(hwnd, wr.left, wr.top, wr.right - wr.left, wr.bottom - wr.top, TRUE), f);
-			return f != 0;
+			ensure(SetRect(&wr, r.x, r.y, r.r(), r.b()));
+			ensure(AdjustWindowRectEx(&wr, style, FALSE, exstyle));
+			ensure(MoveWindow(hwnd, wr.left, wr.top, wr.right - wr.left, wr.bottom - wr.top, TRUE));
 		}
 
 		vec2i glwindow::get_screen_size() const {

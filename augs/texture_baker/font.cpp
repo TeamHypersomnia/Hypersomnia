@@ -5,7 +5,7 @@
 #include FT_FREETYPE_H
 
 #include "augs/global_libraries.h"
-#include "augs/error/augs_error.h"
+#include "augs/ensure.h"
 
 namespace augs {
 	font::charset font::to_charset(const std::wstring& str) {
@@ -22,35 +22,32 @@ namespace augs {
 		return ranges;
 	}
 
-	bool font::open(const char* filename, unsigned pt, std::pair<wchar_t, wchar_t> range) {
+	void font::open(const char* filename, unsigned pt, std::pair<wchar_t, wchar_t> range) {
 		charset ranges;
 		ranges.push_back(range);
-		return open(filename, pt, ranges);
+		open(filename, pt, ranges);
 	}
 
-	bool font::open(const char* filename, unsigned pt, const std::wstring& str) {
-		return open(filename, pt, to_charset(str));
+	void font::open(const char* filename, unsigned pt, const std::wstring& str) {
+		open(filename, pt, to_charset(str));
 	}
 
 	font::glyph::glyph(const FT_Glyph_Metrics& m)
 		: adv(m.horiAdvance >> 6), bear_x(m.horiBearingX >> 6), bear_y(m.horiBearingY >> 6), size(m.width >> 6, m.height >> 6) {
 	}
 
-	bool font::open(const char* filename, unsigned _pt, const charset& ranges) {
+	void font::open(const char* filename, unsigned _pt, const charset& ranges) {
 		pt = _pt;
 		FT_Face face;
-		int f = 1, error = FT_New_Face(*global_libraries::freetype_library.get(), filename, 0, &face);
+		
+		const auto error = FT_New_Face(*global_libraries::freetype_library.get(), filename, 0, &face);
 
-		errsf(error != FT_Err_Unknown_File_Format, L"font format unsupported", f);
-		errsf(!error, L"coulnd't open font file", f);
-		errsf(!FT_Set_Char_Size(face, 0, pt << 6, 72, 72), L"couldn't set char size", f);
-		errsf(!FT_Select_Charmap(face, FT_ENCODING_UNICODE), L"couldn't set encoding", f);
+		LOG("Loading font %x", filename);
 
-		if (!f) {
-			std::string errstring("Couldn't load ");
-			errstring += filename;
-			throw std::runtime_error(errstring.c_str());
-		}
+		ensure(error != FT_Err_Unknown_File_Format && L"font format unsupported");
+		ensure(!error && L"coulnd't open font file");
+		ensure(!FT_Set_Char_Size(face, 0, pt << 6, 72, 72) && L"couldn't set char size");
+		ensure(!FT_Select_Charmap(face, FT_ENCODING_UNICODE) && L"couldn't set encoding");
 
 		ascender = face->size->metrics.ascender >> 6;
 		descender = face->size->metrics.descender >> 6;
@@ -69,8 +66,8 @@ namespace augs {
 				g_index = FT_Get_Char_Index(face, j);
 
 				if (g_index) {
-					errsf(!FT_Load_Glyph(face, g_index, FT_LOAD_DEFAULT | FT_LOAD_IGNORE_TRANSFORM | FT_LOAD_NO_AUTOHINT), L"couldn't load glyph", f);
-					errsf(!FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL), L"couldn't render glyph", f);
+					ensure(!FT_Load_Glyph(face, g_index, FT_LOAD_DEFAULT | FT_LOAD_IGNORE_TRANSFORM | FT_LOAD_NO_AUTOHINT) && L"couldn't load glyph");
+					ensure(!FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL) && L"couldn't render glyph");
 
 					glyphs.push_back(glyph(face->glyph->metrics));
 					glyph& g = *glyphs.rbegin();
@@ -114,7 +111,6 @@ namespace augs {
 
 		glyphs.shrink_to_fit();
 		FT_Done_Face(face);
-		return f != 0;
 	}
 
 	font::glyph* font::get_glyphs() {
