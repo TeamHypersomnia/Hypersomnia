@@ -22,6 +22,8 @@
 #include "augs/filesystem/directory.h"
 
 int main(int argc, char** argv) {
+	augs::create_directories("logs/");
+
 	augs::global_libraries::init();
 	augs::global_libraries::run_googletest(argc, argv);
 
