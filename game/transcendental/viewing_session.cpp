@@ -40,8 +40,6 @@ void viewing_session::configure_input() {
 	active_context.map_key_to_intent(key::SPACE, intent_type::SPACE_BUTTON);
 	active_context.map_key_to_intent(key::MOUSE4, intent_type::SWITCH_TO_GUI);
 
-	active_context.map_key_to_intent(key::F, intent_type::SWITCH_WEAPON_LASER);
-
 	active_context.map_key_to_intent(key::_0, intent_type::HOTBAR_BUTTON_0);
 	active_context.map_key_to_intent(key::_1, intent_type::HOTBAR_BUTTON_1);
 	active_context.map_key_to_intent(key::_2, intent_type::HOTBAR_BUTTON_2);
@@ -54,6 +52,9 @@ void viewing_session::configure_input() {
 	active_context.map_key_to_intent(key::_9, intent_type::HOTBAR_BUTTON_9);
 
 	active_context.map_key_to_intent(key::Q, intent_type::PREVIOUS_HOTBAR_SELECTION_SETUP);
+
+	active_context.map_key_to_intent(key::F, intent_type::SWITCH_WEAPON_LASER);
+	active_context.map_key_to_intent(key::DASH, intent_type::OPEN_DEVELOPER_CONSOLE);
 }
 
 std::wstring viewing_session::summary() const {
@@ -142,8 +143,15 @@ void viewing_session::resample_state_for_audiovisuals(const cosmos& cosm) {
 
 void viewing_session::control(const augs::machine_entropy& entropy) {
 	for (const auto& raw_input : entropy.local) {
-		if (raw_input.was_key_pressed(augs::window::event::keys::key::DASH)) {
-			show_profile_details = !show_profile_details;
+		key_and_mouse_intent intent;
+
+		if (intent.from_raw_state(context, raw_input) && intent.is_pressed) {
+			if (intent.intent == intent_type::OPEN_DEVELOPER_CONSOLE) {
+				show_profile_details = !show_profile_details;
+			}
+			else if (intent.intent == intent_type::SWITCH_WEAPON_LASER) {
+				drawing_settings.draw_weapon_laser = !drawing_settings.draw_weapon_laser;
+			}
 		}
 	}
 }
@@ -153,8 +161,7 @@ void viewing_session::view(
 	const cosmos& cosmos,
 	const entity_id viewed_character,
 	const augs::variable_delta& dt,
-	const augs::network::client& details,
-	const game_drawing_settings settings
+	const augs::network::client& details
 ) {
 	using namespace augs::gui::text;
 	
@@ -168,9 +175,8 @@ void viewing_session::view(
 	const cosmos& cosmos,
 	const entity_id viewed_character,
 	const augs::variable_delta& dt,
-	const augs::gui::text::fstr& custom_log,
-	const game_drawing_settings settings
-	) {
+	const augs::gui::text::fstr& custom_log
+) {
 	frame_profiler.new_measurement();
 
 	const auto screen_size = camera.smoothed_camera.visible_world_area;
@@ -196,7 +202,7 @@ void viewing_session::view(
 		visible
 	);
 
-	main_cosmos_viewing_step.settings = settings;
+	main_cosmos_viewing_step.settings = drawing_settings;
 
 #if NDEBUG || _DEBUG
 	rendering_scripts::illuminated_rendering(main_cosmos_viewing_step);

@@ -3,6 +3,8 @@
 enum intent_type : unsigned char {
 	NONE,
 
+	OPEN_DEVELOPER_CONSOLE,
+
 	THROW_PRIMARY_ITEM,
 	THROW_SECONDARY_ITEM,
 

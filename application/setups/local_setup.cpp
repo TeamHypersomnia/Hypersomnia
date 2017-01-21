@@ -145,10 +145,7 @@ void local_setup::process(const config_lua_table& cfg, game_window& window) {
 		auto& renderer = augs::renderer::get_current();
 		renderer.clear_current_fbo();
 
-		game_drawing_settings settings;
-		settings.draw_weapon_laser = true;
-
-		session.view(renderer, hypersomnia, testbed.get_selected_character(), vdt, augs::gui::text::fstr(), settings);
+		session.view(renderer, hypersomnia, testbed.get_selected_character(), vdt, augs::gui::text::fstr());
 
 		window.swap_buffers();
 	}

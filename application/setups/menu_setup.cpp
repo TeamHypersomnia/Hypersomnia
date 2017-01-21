@@ -17,7 +17,6 @@
 #include "game/transcendental/step.h"
 #include "game/transcendental/cosmic_movie_director.h"
 #include "game/transcendental/types_specification/all_messages_includes.h"
-#include "game/transcendental/game_drawing_settings.h"
 
 #include "augs/misc/machine_entropy_player.h"
 
@@ -454,6 +453,9 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 
 	session.configure_input();
 
+	session.drawing_settings.draw_gui_overlays = false;
+	session.drawing_settings.draw_crosshairs = false;
+
 	timer.reset_timer();
 
 	const auto initial_step_number = intro_scene.get_total_steps_passed();
@@ -528,14 +530,10 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 		auto& renderer = augs::renderer::get_current();
 		renderer.clear_current_fbo();
 
-		game_drawing_settings settings;
-		settings.draw_gui_overlays = false;
-		settings.draw_crosshairs = false;
-
 		const auto current_time_seconds = intro_scene.get_total_time_passed_in_seconds();
 
 		session.view(renderer, intro_scene, testbed.get_selected_character(), vdt, 
-			augs::gui::text::format(typesafe_sprintf(L"Current time: %x", current_time_seconds), textes_style), settings);
+			augs::gui::text::format(typesafe_sprintf(L"Current time: %x", current_time_seconds), textes_style));
 		session.draw_color_overlay(renderer, fade_overlay_color);
 
 		augs::draw_rect(renderer.get_triangle_buffer(),

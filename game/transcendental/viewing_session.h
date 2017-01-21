@@ -19,7 +19,7 @@
 #include "game/systems_audiovisual/wandering_pixels_system.h"
 #include "game/systems_audiovisual/sound_system.h"
 
-#include "game_drawing_settings.h"
+#include "game/transcendental/game_drawing_settings.h"
 
 class game_window;
 
@@ -41,6 +41,7 @@ public:
 	aabb_highlighter world_hover_highlighter;
 	immediate_hud hud;
 	storage_for_all_systems_audiovisual systems_audiovisual;
+	game_drawing_settings drawing_settings;
 
 	bool show_profile_details = true;
 
@@ -82,17 +83,15 @@ public:
 		const cosmos& cosmos,
 		const entity_id viewed_character,
 		const augs::variable_delta& dt,
-		const augs::gui::text::fstr& custom_log = augs::gui::text::fstr(),
-		const game_drawing_settings = game_drawing_settings()
-		);
+		const augs::gui::text::fstr& custom_log = augs::gui::text::fstr()
+	);
 
 	void view(
 		augs::renderer& renderer,
 		const cosmos& cosmos,
 		const entity_id viewed_character,
 		const augs::variable_delta& dt,
-		const augs::network::client& details,
-		const game_drawing_settings = game_drawing_settings()
+		const augs::network::client& details
 	);
 
 	void draw_color_overlay(augs::renderer& renderer, const rgba) const;
