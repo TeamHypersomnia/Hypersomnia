@@ -6,6 +6,7 @@
 #include "augs/graphics/fbo.h"
 #include "game/messages/visibility_information.h"
 #include "game/components/physics_component.h"
+#include "augs/templates/container_templates.h"
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
@@ -115,7 +116,7 @@ namespace augs {
 	}
 	
 	void renderer::push_triangles(const vertex_triangle_buffer& added) {
-		triangles.insert(triangles.end(), added.begin(), added.end());
+		concatenate(triangles, added);
 	}
 
 	void renderer::push_special_vertex_triangle(augs::special s1, augs::special s2, augs::special s3) {

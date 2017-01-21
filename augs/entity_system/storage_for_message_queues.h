@@ -3,6 +3,7 @@
 #include <vector>
 #include "augs/templates/tuple_of.h"
 #include "augs/templates/for_each_in_types.h"
+#include "augs/templates/container_templates.h"
 #include "augs/ensure.h"
 
 namespace detail {
@@ -25,7 +26,7 @@ namespace augs {
 
 		template <typename T>
 		void post(const std::vector<T>& messages) {
-			get_queue<T>().insert(get_queue<T>().end(), messages.begin(), messages.end());
+			concatenate(get_queue<T>(), messages);
 		}
 
 		template <typename T>

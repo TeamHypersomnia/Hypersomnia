@@ -1,6 +1,7 @@
 #pragma once
 #include <algorithm>
 #include <vector>
+#include <set>
 
 template<class Container, class T>
 void erase_remove(Container& v, const T& l) {
@@ -25,6 +26,11 @@ auto find_in(Container& v, const T& l) {
 template<class A, class B>
 void concatenate(A& a, const B& b) {
 	a.insert(a.end(), b.begin(), b.end());
+}
+
+template<class A, class B>
+void concatenate(std::set<A>& a, const std::set<B>& b) {
+	a.insert(b.begin(), b.end());
 }
 
 template<class A, class B>

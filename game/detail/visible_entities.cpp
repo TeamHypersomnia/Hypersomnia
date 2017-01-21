@@ -13,7 +13,7 @@ visible_entities::visible_entities(const camera_cone camera, const cosmos& cosmo
 	auto all_visible = dynamic_tree.determine_visible_entities_from_camera(camera);
 	const auto visible_from_physics = physics.query_camera(camera).entities;
 
-	all_visible.insert(all_visible.end(), visible_from_physics.begin(), visible_from_physics.end());
+	concatenate(all_visible, visible_from_physics);
 
 	all = cosmos[all_visible];
 	per_layer = render_system().get_visible_per_layer(all);

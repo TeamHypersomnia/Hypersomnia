@@ -164,6 +164,14 @@ physics_system::query_aabb_output physics_system::query_camera(const camera_cone
 	return std::move(query_aabb_px(visible_aabb.left_top(), visible_aabb.right_bottom(), filters::renderable_query()));
 }
 
+physics_system::query_output& physics_system::query_output::operator+=(const query_output& b) {
+	concatenate(bodies, b.bodies);
+	concatenate(entities, b.entities);
+	concatenate(details, b.details);
+
+	return *this;
+}
+
 physics_system::query_aabb_output physics_system::query_aabb(const vec2 p1_meters, const vec2 p2_meters, const b2Filter filter, const entity_id ignore_entity) const {
 	query_aabb_input callback;
 	callback.filter = filter;

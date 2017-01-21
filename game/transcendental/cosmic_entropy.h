@@ -2,8 +2,12 @@
 #include "augs/misc/streams.h"
 #include "augs/window_framework/event.h"
 #include <map>
+#include <vector>
 #include "game/transcendental/entity_id.h"
 #include "game/messages/intent_message.h"
+
+#include "game/detail/item_slot_transfer_request.h"
+#include "augs/templates/container_templates.h"
 
 #include "augs/misc/machine_entropy.h"
 
@@ -19,21 +23,26 @@ std::vector<entity_intent> make_intents_for_entity(
 template <class key>
 struct basic_cosmic_entropy {
 	std::map<key, std::vector<entity_intent>> entropy_per_entity;
+	std::vector<item_slot_transfer_request_data> transfer_requests;
 	
 	size_t length() const {
 		size_t total = 0;
 
-		for (const auto& ent : entropy_per_entity)
+		for (const auto& ent : entropy_per_entity) {
 			total += ent.second.size();
+		}
+
+		total += transfer_requests.size();
 
 		return total;
 	}
 
 	basic_cosmic_entropy& operator+=(const basic_cosmic_entropy& b) {
-		for (const auto& ent : b.entropy_per_entity) {
-			auto& vec = entropy_per_entity[ent.first];
-			vec.insert(vec.end(), ent.second.begin(), ent.second.end());
+		for (const auto& new_entropy : b.entropy_per_entity) {
+			concatenate(entropy_per_entity[new_entropy.first], new_entropy.second);
 		}
+
+		concatenate(transfer_requests, b.transfer_requests);
 
 		return *this;
 	}
@@ -74,8 +83,9 @@ namespace augs {
 	auto read_object(A& ar, guid_mapped_entropy& storage) {
 		unsigned char num_entropied_entities;
 
-		if(!augs::read_object(ar, num_entropied_entities))
+		if (!augs::read_object(ar, num_entropied_entities)) {
 			return false;
+		}
 		
 		while (num_entropied_entities--) {
 			unsigned guid;
@@ -93,6 +103,10 @@ namespace augs {
 			}
 		}
 
+		if (!augs::read_vector_of_objects(ar, storage.transfer_requests, unsigned short())) {
+			return false;
+		}
+
 		return true;
 	}
 
@@ -100,12 +114,14 @@ namespace augs {
 	void write_object(A& ar, const guid_mapped_entropy& storage) {
 		ensure(storage.entropy_per_entity.size() < std::numeric_limits<unsigned char>::max());
 
-		unsigned char num_entropied_entities = static_cast<unsigned char>(storage.entropy_per_entity.size());
+		const auto num_entropied_entities = static_cast<unsigned char>(storage.entropy_per_entity.size());
 		augs::write_object(ar, num_entropied_entities);
 
 		for (const auto& per_entity : storage.entropy_per_entity) {
 			augs::write_object(ar, per_entity.first);
 			augs::write_vector_of_objects(ar, per_entity.second, unsigned short());
 		}
+
+		augs::write_vector_of_objects(ar, storage.transfer_requests, unsigned short());
 	}
 }

@@ -3,8 +3,8 @@
 
 namespace augs {
 	machine_entropy& machine_entropy::operator+=(const machine_entropy& b) {
-		local.insert(local.end(), b.local.begin(), b.local.end());
-		remote.insert(remote.end(), b.remote.begin(), b.remote.end());
+		concatenate(local, b.local);
+		concatenate(remote, b.remote);
 
 		return *this;
 	}

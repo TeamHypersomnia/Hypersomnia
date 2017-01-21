@@ -1,7 +1,7 @@
 #pragma once
 #include "3rdparty/Box2D/Box2D.h"
 #include "game/transcendental/entity_id.h"
-#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/entity_handle_declaration.h"
 
 #include "game/components/physics_component.h"
 #include "game/components/transform_component.h"
@@ -79,13 +79,7 @@ public:
 		std::set<unversioned_entity_id> entities;
 		std::set<queried_result> details;
 
-		query_output& operator+=(const query_output& b) {
-			bodies.insert(b.bodies.begin(), b.bodies.end());
-			entities.insert(b.entities.begin(), b.entities.end());
-			details.insert(b.details.begin(), b.details.end());
-
-			return *this;
-		}
+		query_output& operator+=(const query_output& b);
 	};
 
 	struct query_aabb_output {
