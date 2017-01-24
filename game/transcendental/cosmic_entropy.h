@@ -12,17 +12,10 @@
 #include "augs/misc/machine_entropy.h"
 
 class cosmos;
-struct input_context;
-
-std::vector<entity_intent> make_intents_for_entity(
-	const const_entity_handle controlled_entity,
-	const augs::machine_entropy::local_type& local,
-	const input_context& context
-);
 
 template <class key>
 struct basic_cosmic_entropy {
-	std::map<key, std::vector<entity_intent>> entropy_per_entity;
+	std::map<key, std::vector<key_and_mouse_intent>> entropy_per_entity;
 	std::vector<item_slot_transfer_request_data> transfer_requests;
 	
 	size_t length() const {
@@ -64,12 +57,15 @@ struct guid_mapped_entropy : basic_cosmic_entropy<unsigned> {
 
 struct cosmic_entropy : basic_cosmic_entropy<entity_id> {
 	cosmic_entropy() = default;
-	explicit cosmic_entropy(const guid_mapped_entropy&, const cosmos&);
+	
+	explicit cosmic_entropy(
+		const guid_mapped_entropy&, 
+		const cosmos&
+	);
 	
 	explicit cosmic_entropy(
 		const const_entity_handle controlled_entity, 
-		const augs::machine_entropy::local_type& local, 
-		const input_context& context
+		const std::vector<key_and_mouse_intent>&
 	);
 
 	cosmic_entropy& operator+=(const cosmic_entropy& b) {

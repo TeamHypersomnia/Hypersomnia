@@ -14,7 +14,8 @@ double viewing_step::get_interpolated_total_time_passed_in_seconds() const {
 }
 
 viewing_step::viewing_step(
-	const cosmos& cosm, 
+	const config_lua_table& config,
+	const cosmos& cosm,
 	viewing_session& session,
 	const augs::variable_delta& delta,
 	augs::renderer& renderer, 
@@ -22,15 +23,15 @@ viewing_step::viewing_step(
 	const entity_id viewed_character,
 	const visible_entities& visible
 ) : 
-	const_cosmic_step(cosm), 
+	const_cosmic_step(cosm),
+	config(config),
 	session(session),
 	delta(delta), 
 	renderer(renderer), 
 	camera(camera),
 	viewed_character(viewed_character),
 	visible(visible) 
-{
-}
+{}
 
 vec2 viewing_step::get_screen_space(const vec2 pos) const {
 	return pos - camera.get_transformed_visible_world_area_aabb().get_position();

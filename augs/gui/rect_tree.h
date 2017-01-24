@@ -2,6 +2,7 @@
 #include <unordered_map>
 
 #include "augs/math/rects.h"
+#include "augs/math/vec2.h"
 
 namespace augs {
 	namespace gui {

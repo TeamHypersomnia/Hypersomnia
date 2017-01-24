@@ -31,9 +31,6 @@ P P::get_default(const const_entity_handle id) {
 	if (id.has<components::force_joint>()) {
 		matching.push_back(processing_subjects::WITH_FORCE_JOINT);
 	}
-	if (id.has<components::gui_element>()) {
-		matching.push_back(processing_subjects::WITH_GUI_ELEMENT);
-	}
 	if (id.has<components::gun>()) {
 		matching.push_back(processing_subjects::WITH_GUN);
 	}

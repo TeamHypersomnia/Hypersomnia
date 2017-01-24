@@ -3,7 +3,7 @@
 #include "item_button.h"
 #include "game/detail/item_slot_transfer_request.h"
 #include "game/detail/gui/grid.h"
-#include "game/components/gui_element_component.h"
+#include "game/detail/gui/character_gui.h"
 #include "game/components/item_component.h"
 #include "game/detail/inventory_utils.h"
 #include "game/transcendental/cosmos.h"
@@ -11,19 +11,22 @@
 #include "game/transcendental/step.h"
 #include "augs/ensure.h"
 #include "augs/templates/string_templates.h"
+#include "game/detail/gui/game_gui_context.h"
+#include "game/systems_audiovisual/gui_element_system.h"
 
 void drag_and_drop_callback(
-	logic_gui_context context, 
+	game_gui_context context, 
 	const drag_and_drop_result& drag_result,
 	const vec2i total_dragged_amount
 ) {
-	auto& cosmos = context.get_step().cosm;
+	auto& cosmos = context.get_cosmos();
+	auto& gui = context.get_character_gui();
 
 	if (drag_result.is<drop_for_item_slot_transfer>()) {
 		const auto& transfer_data = drag_result.get<drop_for_item_slot_transfer>();
 
 		if (transfer_data.result.result >= item_transfer_result_type::SUCCESSFUL_TRANSFER) {
-			context.get_step().transient.messages.post(transfer_data.simulated_transfer);
+			context.get_gui_element_system().queue_transfer(transfer_data.simulated_transfer);
 		}
 	}
 	else if (drag_result.is<unfinished_drag_of_item>()) {
@@ -32,7 +35,7 @@ void drag_and_drop_callback(
 		const auto hotbar_location = context.dereference_location(transfer_data.source_hotbar_button_id);
 
 		if (hotbar_location != nullptr) {
-			components::gui_element::clear_hotbar_button_assignment(
+			gui.clear_hotbar_button_assignment(
 				hotbar_location.get_location().index, 
 				context.get_gui_element_entity()
 			);
@@ -69,22 +72,22 @@ void drag_and_drop_callback(
 		if (source_hotbar_location != nullptr) {
 			const auto item_to_be_swapped = dereferenced_button->get_assigned_entity(owner_transfer_capability);
 
-			components::gui_element::assign_item_to_hotbar_button(dereferenced_button.get_location().index, owner_transfer_capability, new_assigned_item);
+			gui.assign_item_to_hotbar_button(dereferenced_button.get_location().index, owner_transfer_capability, new_assigned_item);
 			
 			if (item_to_be_swapped.alive()) {
-				components::gui_element::assign_item_to_hotbar_button(source_hotbar_location.get_location().index, owner_transfer_capability, item_to_be_swapped);
+				gui.assign_item_to_hotbar_button(source_hotbar_location.get_location().index, owner_transfer_capability, item_to_be_swapped);
 			}
 		}
 		else {
-			components::gui_element::assign_item_to_hotbar_button(dereferenced_button.get_location().index, owner_transfer_capability, new_assigned_item);
+			gui.assign_item_to_hotbar_button(dereferenced_button.get_location().index, owner_transfer_capability, new_assigned_item);
 		}
 	}
 }
 
 template <class C>
 drag_and_drop_result prepare_drag_and_drop_result(const C context, const game_gui_element_location held_rect_id, const game_gui_element_location drop_target_rect_id) {
-	const auto& cosmos = context.get_step().get_cosmos();
-	const auto& element = context.get_gui_element_component();
+	const auto& cosmos = context.get_cosmos();
+	const auto& element = context.get_character_gui();
 	const auto owning_transfer_capability = context.get_gui_element_entity();
 
 	drag_and_drop_result output;
@@ -265,5 +268,5 @@ drag_and_drop_result prepare_drag_and_drop_result(const C context, const game_gu
 	return output;
 }
 
-template drag_and_drop_result prepare_drag_and_drop_result(logic_gui_context context, const game_gui_element_location held_rect_id, const game_gui_element_location drop_target_rect_id);
-template drag_and_drop_result prepare_drag_and_drop_result(viewing_gui_context context, const game_gui_element_location held_rect_id, const game_gui_element_location drop_target_rect_id);
+template drag_and_drop_result prepare_drag_and_drop_result(game_gui_context context, const game_gui_element_location held_rect_id, const game_gui_element_location drop_target_rect_id);
+template drag_and_drop_result prepare_drag_and_drop_result(viewing_game_gui_context context, const game_gui_element_location held_rect_id, const game_gui_element_location drop_target_rect_id);

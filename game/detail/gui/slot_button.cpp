@@ -8,8 +8,10 @@
 #include "game/detail/inventory_slot.h"
 #include "game/detail/inventory_utils.h"
 #include "game/detail/gui/root_of_inventory_gui.h"
-#include "game/components/gui_element_component.h"
+#include "game/detail/gui/character_gui.h"
 #include "game/components/item_component.h"
+
+#include "game/systems_audiovisual/gui_element_system.h"
 
 #include "pixel_line_connector.h"
 #include "augs/templates/string_templates.h"
@@ -20,13 +22,12 @@ slot_button::slot_button() {
 	unset_flag(augs::gui::flag::CLIP);
 }
 
-void slot_button::draw(const viewing_gui_context context, const const_this_in_container this_id, augs::gui::draw_info info) {
+void slot_button::draw(const viewing_game_gui_context context, const const_this_in_container this_id, augs::gui::draw_info info) {
 	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING)) {
 		return;
 	}
 
-	const auto& step = context.get_step();
-	const auto& cosmos = step.get_cosmos();
+	const auto& cosmos = context.get_cosmos();
 
 	const auto slot_id = cosmos[this_id.get_location().slot_id];
 	const bool is_hand_slot = slot_id.is_hand_slot();
@@ -113,7 +114,7 @@ void slot_button::draw(const viewing_gui_context context, const const_this_in_co
 	}
 }
 
-void slot_button::advance_elements(const logic_gui_context context, const this_in_container this_id, const gui_entropy& entropies, const augs::delta dt) {
+void slot_button::advance_elements(const game_gui_context context, const this_in_container this_id, const gui_entropy& entropies, const augs::delta dt) {
 	game_gui_rect_node::advance_elements(context, this_id, entropies, dt);
 	
 	for (const auto& info : entropies.get_events_for(this_id)) {
@@ -125,15 +126,14 @@ void slot_button::advance_elements(const logic_gui_context context, const this_i
 	}
 }
 
-void slot_button::rebuild_layouts(const logic_gui_context context, const this_in_container this_id) {
+void slot_button::rebuild_layouts(const game_gui_context context, const this_in_container this_id) {
 	game_gui_rect_node::rebuild_layouts(context, this_id);
 
 	update_rc(context, this_id);
 }
 
-void slot_button::update_rc(const logic_gui_context context, const this_in_container this_id) {
-	const auto& step = context.get_step();
-	const auto& cosmos = step.get_cosmos();
+void slot_button::update_rc(const game_gui_context context, const this_in_container this_id) {
+	const auto& cosmos = context.get_cosmos();
 
 	const auto slot_id = cosmos[this_id.get_location().slot_id];
 

@@ -39,6 +39,8 @@ void viewing_session::configure_input() {
 
 	active_context.map_key_to_intent(key::SPACE, intent_type::SPACE_BUTTON);
 	active_context.map_key_to_intent(key::MOUSE4, intent_type::SWITCH_TO_GUI);
+	
+	active_context.map_key_to_intent(key::CAPSLOCK, intent_type::DEBUG_SWITCH_CHARACTER);
 
 	active_context.map_key_to_intent(key::_0, intent_type::HOTBAR_BUTTON_0);
 	active_context.map_key_to_intent(key::_1, intent_type::HOTBAR_BUTTON_1);
@@ -141,22 +143,46 @@ void viewing_session::resample_state_for_audiovisuals(const cosmos& cosm) {
 	});
 }
 
-void viewing_session::control(const augs::machine_entropy& entropy) {
-	for (const auto& raw_input : entropy.local) {
-		key_and_mouse_intent intent;
-
-		if (intent.from_raw_state(context, raw_input) && intent.is_pressed) {
-			if (intent.intent == intent_type::OPEN_DEVELOPER_CONSOLE) {
-				show_profile_details = !show_profile_details;
-			}
-			else if (intent.intent == intent_type::SWITCH_WEAPON_LASER) {
-				drawing_settings.draw_weapon_laser = !drawing_settings.draw_weapon_laser;
-			}
+void viewing_session::switch_between_gui_and_back(const augs::machine_entropy::local_type& local) {
+	for (const auto& intent : context.to_key_and_mouse_intents(local)) {
+		if(intent.is_pressed && intent.intent == intent_type::SWITCH_TO_GUI) {
+			gui_look_enabled = !gui_look_enabled;
 		}
 	}
 }
 
+void viewing_session::control_gui_and_remove_fetched_events(
+	const const_entity_handle root,
+	augs::machine_entropy::local_type& entropies
+) {
+	systems_audiovisual.get<gui_element_system>().advance_gui_elements(root, entropies);
+}
+
+void viewing_session::control_and_remove_fetched_intents(std::vector<key_and_mouse_intent>& intents) {
+	erase_remove(intents, [&](const key_and_mouse_intent& intent) {
+		bool fetch = false;
+		
+		if (intent.intent == intent_type::OPEN_DEVELOPER_CONSOLE) {
+			fetch = true;
+			
+			if (intent.is_pressed) {
+				show_profile_details = !show_profile_details;
+			}
+		}
+		else if (intent.intent == intent_type::SWITCH_WEAPON_LASER) {
+			fetch = true;
+
+			if (intent.is_pressed) {
+				drawing_settings.draw_weapon_laser = !drawing_settings.draw_weapon_laser;
+			}
+		}
+
+		return fetch;
+	});
+}
+
 void viewing_session::view(
+	const config_lua_table& config,
 	augs::renderer& renderer,
 	const cosmos& cosmos,
 	const entity_id viewed_character,
@@ -167,10 +193,11 @@ void viewing_session::view(
 	
 	const auto custom_log = multiply_alpha(simple_bbcode(typesafe_sprintf("[color=cyan]Transmission details:[/color]\n%x", details.format_transmission_details()), style(assets::font_id::GUI_FONT, white)), 150.f / 255);;
 
-	view(renderer, cosmos, viewed_character, dt, custom_log);
+	view(config, renderer, cosmos, viewed_character, dt, custom_log);
 }
 
 void viewing_session::view(
+	const config_lua_table& config,
 	augs::renderer& renderer,
 	const cosmos& cosmos,
 	const entity_id viewed_character,
@@ -193,6 +220,7 @@ void viewing_session::view(
 	const auto visible = visible_entities(camera.smoothed_camera, cosmos);
 
 	auto main_cosmos_viewing_step = viewing_step(
+		config,
 		cosmos, 
 		*this, 
 		dt, 

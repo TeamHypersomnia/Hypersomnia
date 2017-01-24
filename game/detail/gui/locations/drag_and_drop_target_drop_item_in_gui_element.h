@@ -17,7 +17,7 @@ public:
 
 	template <class C>
 	decltype(auto) dereference(const C context) const {
-		return &context.get_gui_element_component().drop_item_icon;
+		return &context.get_character_gui().drop_item_icon;
 	}
 };
 

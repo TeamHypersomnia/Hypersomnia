@@ -46,7 +46,12 @@ public:
 	void acquire_next_packaged_step(const step_packaged_for_network&);
 
 	template<class Step>
-	void send_commands_and_predict(augs::network::client& client, const cosmic_entropy& new_local_entropy, cosmos& predicted_cosmos, Step advance) {
+	void send_commands_and_predict(
+		augs::network::client& client, 
+		const cosmic_entropy& new_local_entropy, 
+		cosmos& predicted_cosmos, 
+		Step advance
+	) {
 		guid_mapped_entropy guid_mapped(new_local_entropy, predicted_cosmos);
 
 		augs::stream client_commands;
@@ -61,8 +66,14 @@ public:
 
 	template<class Step>
 	unpacking_result unpack_deterministic_steps(
-		interpolation_system& interp, past_infection_system& past,
-		const entity_id predictable_entity, cosmos& referential_cosmos, cosmos& last_delta_unpacked, cosmos& predicted_cosmos, Step advance) {
+		interpolation_system& interp, 
+		past_infection_system& past,
+		const entity_id predictable_entity, 
+		cosmos& referential_cosmos, 
+		cosmos& last_delta_unpacked, 
+		cosmos& predicted_cosmos, 
+		Step advance
+	) {
 		auto result = unpack_deterministic_steps(referential_cosmos, last_delta_unpacked);
 		auto& reconciliate_predicted = result.reconciliate_predicted;
 

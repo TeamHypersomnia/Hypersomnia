@@ -18,6 +18,11 @@
 #include "game/systems_audiovisual/particles_simulation_system.h"
 #include "game/systems_audiovisual/wandering_pixels_system.h"
 #include "game/systems_audiovisual/sound_system.h"
+#include "game/systems_audiovisual/gui_element_system.h"
+
+#include "game/detail/gui/character_gui.h"
+#include "game/detail/gui/item_button.h"
+#include "game/detail/gui/slot_button.h"
 
 #include "game/transcendental/game_drawing_settings.h"
 
@@ -44,6 +49,7 @@ public:
 	game_drawing_settings drawing_settings;
 
 	bool show_profile_details = true;
+	bool gui_look_enabled = false;
 
 	void spread_past_infection(const const_logic_step);
 	void acquire_game_events_for_hud(const const_logic_step);
@@ -76,9 +82,17 @@ public:
 	
 	void resample_state_for_audiovisuals(const cosmos&);
 
-	void control(const augs::machine_entropy&);
+	void switch_between_gui_and_back(const augs::machine_entropy::local_type&);
 
+	void control_gui_and_remove_fetched_events(
+		const const_entity_handle root,
+		augs::machine_entropy::local_type&
+	);
+
+	void control_and_remove_fetched_intents(std::vector<key_and_mouse_intent>&);
+	
 	void view(
+		const config_lua_table& config,
 		augs::renderer& renderer,
 		const cosmos& cosmos,
 		const entity_id viewed_character,
@@ -87,6 +101,7 @@ public:
 	);
 
 	void view(
+		const config_lua_table& config,
 		augs::renderer& renderer,
 		const cosmos& cosmos,
 		const entity_id viewed_character,
@@ -94,5 +109,8 @@ public:
 		const augs::network::client& details
 	);
 
-	void draw_color_overlay(augs::renderer& renderer, const rgba) const;
+	void draw_color_overlay(
+		augs::renderer& renderer, 
+		const rgba
+	) const;
 };

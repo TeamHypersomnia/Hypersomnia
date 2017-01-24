@@ -7,7 +7,6 @@
 #include "game/components/interpolation_component.h"
 #include "game/components/crosshair_component.h"
 #include "game/components/container_component.h"
-#include "game/components/gui_element_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/position_copying_component.h"
 

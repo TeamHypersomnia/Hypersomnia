@@ -14,7 +14,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/cosmic_delta.h"
 
-#include "augs/misc/machine_entropy_player.h"
+#include "augs/misc/debug_entropy_player.h"
 
 #include "augs/filesystem/file.h"
 
@@ -86,8 +86,6 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 	cosmos initial_hypersomnia(3000);
 	scene_managers::networked_testbed_server().populate_world_with_entities(initial_hypersomnia);
 
-	augs::machine_entropy total_collected_entropy;
-	augs::machine_entropy_player player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
 	const bool detailed_step_log = cfg.tickrate <= 2;
@@ -98,14 +96,14 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 	}
 
 	if (cfg.get_input_recording_mode() != input_recording_type::DISABLED) {
-		if (player.try_to_load_or_save_new_session("server_sessions/", "server_recorded.inputs")) {
-			timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
-		}
+		//if (player.try_to_load_or_save_new_session("server_sessions/", "server_recorded.inputs")) {
+		//	timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
+		//}
 	}
 
 	simulation_broadcast server_sim;
 
-	const bool is_replaying = player.is_replaying();
+	const bool is_replaying = false;// player.is_replaying();
 	LOG("Is server replaying: %x", is_replaying);
 	
 	const bool launch_webserver = !is_replaying && cfg.server_launch_http_daemon;
@@ -159,119 +157,116 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 	
 		process_exit_key(new_entropy.local);
 
-		total_collected_entropy += new_entropy;
+		for (auto& net_event : new_entropy.remote) {
+			if (detailed_step_log) {
+				LOG("Server netevent");
+			}
+
+			const auto& address = net_event.address;
+
+			bool should_disconnect = false;
+
+			if (net_event.message_type == augs::network::message::type::CONNECT) {
+				LOG("%x connected to server on port %x.", address.get_readable_ip(), address.get_port());
+
+				endpoint new_endpoint;
+				new_endpoint.addr = net_event.address;
+				new_endpoint.commands.set_lower_limit(static_cast<size_t>(cfg.client_commands_jitter_buffer_ms / hypersomnia.get_fixed_delta().in_milliseconds()));
+				endpoints.push_back(new_endpoint);
+			}
+
+			if (net_event.message_type == augs::network::message::type::DISCONNECT) {
+				LOG("Disconnecting due to net event.");
+				should_disconnect = true;
+			}
+
+			if (net_event.message_type == augs::network::message::type::RECEIVE) {
+				auto& stream = net_event.payload;
+				auto& endpoint = *find_in(endpoints, address);
+
+				auto to_skip = net_event.messages_to_skip;
+
+				while (stream.get_unread_bytes() > 0) {
+					const bool should_skip = to_skip > 0;
+
+					if (should_skip) {
+						--to_skip;
+					}
+
+					network_command command;
+					augs::read_object(stream, command);
+
+					if (detailed_step_log && !should_skip)
+						LOG("Server received command: %x", int(command));
+
+					switch (command) {
+					case network_command::CLIENT_WELCOME_MESSAGE: {
+						std::string read_nickname;
+						augs::read_object(stream, read_nickname);
+
+						if (!should_skip) {
+							if (endpoint.sent_welcome_message) {
+								LOG("Welcome message was resent. Disconnecting.");
+								should_disconnect = true;
+							}
+							else {
+								endpoint.sent_welcome_message = true;
+								endpoint.nickname = read_nickname;
+
+								if (!should_skip) {
+									LOG("%x chose nickname %x.", address.get_readable_ip(), endpoint.nickname);
+
+									auto& complete_state = initial_hypersomnia.reserved_memory_for_serialization;
+									complete_state.reset_write_pos();
+
+									augs::write_object(complete_state, network_command::COMPLETE_STATE);
+
+									cosmic_delta::encode(initial_hypersomnia, hypersomnia, complete_state);
+
+									resubstantiate = true;
+
+									endpoint.controlled_entity = scene.assign_new_character();
+									augs::write_object(complete_state, hypersomnia[endpoint.controlled_entity].get_guid());
+
+									choose_server(address).send_reliable(complete_state, address);
+								}
+							}
+						}
+					}
+
+					break;
+
+					case network_command::CLIENT_REQUESTED_ENTROPY: {
+						if (!endpoint.sent_welcome_message) {
+							should_disconnect = true;
+						}
+						else {
+							guid_mapped_entropy result;
+							augs::read_object(stream, result);
+
+							if (!should_skip)
+								//endpoint.commands.push_back(result);
+								endpoint.commands.acquire_new_command(result);
+						}
+					}
+																	break;
+					default:
+						LOG("Server received invalid command: %x", int(command)); stream = augs::stream();
+						break;
+					}
+				}
+			}
+
+			if (should_disconnect) {
+				disconnect(address);
+			}
+		}
 
 		auto steps = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
 
 		while (steps--) {
-			player.advance_player_and_biserialize(total_collected_entropy);
-
 			if (detailed_step_log) {
 				LOG("Server step");
-			}
-
-			for (auto& net_event : total_collected_entropy.remote) {
-				if (detailed_step_log) {
-					LOG("Server netevent");
-				}
-				
-				const auto& address = net_event.address;
-
-				bool should_disconnect = false;
-
-				if (net_event.message_type == augs::network::message::type::CONNECT) {
-					LOG("%x connected to server on port %x.", address.get_readable_ip(), address.get_port());
-					
-					endpoint new_endpoint;
-					new_endpoint.addr = net_event.address;
-					new_endpoint.commands.set_lower_limit(static_cast<size_t>(cfg.client_commands_jitter_buffer_ms / hypersomnia.get_fixed_delta().in_milliseconds()));
-					endpoints.push_back(new_endpoint);
-				}
-				
-				if (net_event.message_type == augs::network::message::type::DISCONNECT) {
-					LOG("Disconnecting due to net event.");
-					should_disconnect = true;
-				}
-
-				if (net_event.message_type == augs::network::message::type::RECEIVE) {
-					auto& stream = net_event.payload;
-					auto& endpoint = *find_in(endpoints, address);
-					
-					auto to_skip = net_event.messages_to_skip;
-
-					while (stream.get_unread_bytes() > 0) {
-						const bool should_skip = to_skip > 0;
-
-						if (should_skip)
-							--to_skip;
-
-						network_command command;
-						augs::read_object(stream, command);
-
-						if (detailed_step_log && !should_skip)
-							LOG("Server received command: %x", int(command));
-
-						switch (command) {
-						case network_command::CLIENT_WELCOME_MESSAGE: {
-							std::string read_nickname;
-							augs::read_object(stream, read_nickname);
-
-							if (!should_skip) {
-								if (endpoint.sent_welcome_message) {
-									LOG("Welcome message was resent. Disconnecting.");
-									should_disconnect = true;
-								}
-								else {
-									endpoint.sent_welcome_message = true;
-									endpoint.nickname = read_nickname;
-
-									if (!should_skip) {
-										LOG("%x chose nickname %x.", address.get_readable_ip(), endpoint.nickname);
-
-										auto& complete_state = initial_hypersomnia.reserved_memory_for_serialization;
-										complete_state.reset_write_pos();
-
-										augs::write_object(complete_state, network_command::COMPLETE_STATE);
-
-										cosmic_delta::encode(initial_hypersomnia, hypersomnia, complete_state);
-
-										resubstantiate = true;
-
-										endpoint.controlled_entity = scene.assign_new_character();
-										augs::write_object(complete_state, hypersomnia[endpoint.controlled_entity].get_guid());
-
-										choose_server(address).send_reliable(complete_state, address);
-									}
-								}
-							}
-						}
-
-							break;
-
-						case network_command::CLIENT_REQUESTED_ENTROPY: {
-							if (!endpoint.sent_welcome_message) {
-								should_disconnect = true;
-							}
-							else {
-								guid_mapped_entropy result;
-								augs::read_object(stream, result);
-
-								if (!should_skip)
-									//endpoint.commands.push_back(result);
-									endpoint.commands.acquire_new_command(result);
-							}
-						}
-							break;
-						default: 
-							LOG("Server received invalid command: %x", int(command)); stream = augs::stream();
-							break;
-						}
-					}
-				}
-
-				if (should_disconnect) {
-					disconnect(address);
-				}
 			}
 
 			guid_mapped_entropy total_unpacked_entropy;
@@ -281,7 +276,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 					if (test_entropy_randomizer.randval(0u, cfg.debug_randomize_entropies_in_client_setup_once_every_steps) == 0u) {
 						const unsigned which = test_entropy_randomizer.randval(0, 4);
 
-						entity_intent new_intent;
+						key_and_mouse_intent new_intent;
 
 						switch (which) {
 						case 0: new_intent.intent = intent_type::MOVE_BACKWARD; break;
@@ -397,11 +392,10 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 
 				rep.fetch_stats(this_step_stats);
 			}
-
-			total_collected_entropy.clear();
 		}
 	}
 
-	if (!is_replaying)
+	if (!is_replaying) {
 		rep.stop_daemon();
+	}
 }

@@ -18,10 +18,10 @@ public:
 			generic_call(dereferenced);
 		});
 
-		for (size_t i = 0; i < context.get_gui_element_component().hotbar_buttons.size(); ++i) {
+		for (size_t i = 0; i < context.get_character_gui().hotbar_buttons.size(); ++i) {
 			hotbar_button_in_gui_element child_location;
 			child_location.index = static_cast<int>(i);
-			generic_call(make_dereferenced_location(&context.get_gui_element_component().hotbar_buttons[i], child_location));
+			generic_call(make_dereferenced_location(&context.get_character_gui().hotbar_buttons[i], child_location));
 		}
 	}
 };

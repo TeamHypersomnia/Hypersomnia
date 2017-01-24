@@ -4,6 +4,9 @@
 #include "augs/window_framework/event.h"
 
 #include "augs/misc/enum_associative_array.h"
+#include "augs/misc/key_and_mouse_intent.h"
+
+#include "augs/misc/machine_entropy.h"
 
 struct input_context {
 	augs::enum_associative_array<augs::window::event::keys::key, intent_type> key_to_intent;
@@ -19,4 +22,6 @@ struct input_context {
 
 	void map_key_to_intent(augs::window::event::keys::key, intent_type);
 	void map_event_to_intent(augs::window::event::message, intent_type);
+
+	std::vector<key_and_mouse_intent> to_key_and_mouse_intents(const augs::machine_entropy::local_type&) const;
 };

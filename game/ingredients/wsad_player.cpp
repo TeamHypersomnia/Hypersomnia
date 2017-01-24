@@ -16,7 +16,7 @@
 #include "game/components/trigger_query_detector_component.h"
 #include "game/components/driver_component.h"
 #include "game/components/force_joint_component.h"
-#include "game/components/gui_element_component.h"
+#include "game/detail/gui/character_gui.h"
 #include "game/components/name_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/particle_effect_response_component.h"

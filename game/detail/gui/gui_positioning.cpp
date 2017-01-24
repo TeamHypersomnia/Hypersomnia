@@ -2,7 +2,7 @@
 #include "item_button.h"
 #include "slot_button.h"
 #include "game/detail/inventory_slot_handle.h"
-#include "game/components/gui_element_component.h"
+#include "game/detail/gui/character_gui.h"
 #include "game/components/item_component.h"
 #include "game/components/container_component.h"
 #include "game/transcendental/cosmos.h"

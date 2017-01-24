@@ -3,9 +3,10 @@
 #include "game/transcendental/cosmos.h"
 #include "game/detail/gui/item_button.h"
 #include "game/components/item_component.h"
-#include "game/components/gui_element_component.h"
+#include "game/detail/gui/character_gui.h"
 #include "augs/gui/button_corners.h"
 #include "game/detail/gui/drag_and_drop.h"
+#include "game/systems_audiovisual/gui_element_system.h"
 
 #include "application/config_lua_table.h"
 
@@ -61,7 +62,7 @@ vec2i hotbar_button::get_bbox(const const_entity_handle owner_transfer_capabilit
 	return get_button_corners_info().internal_size_to_cornered_size(item_button::calculate_button_layout(ent, true).aabb.get_size());
 }
 
-void hotbar_button::draw(const viewing_gui_context context, const const_this_in_item this_id, draw_info in) {
+void hotbar_button::draw(const viewing_game_gui_context context, const const_this_in_item this_id, draw_info in) {
 	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING)) {
 		return;
 	}
@@ -70,7 +71,7 @@ void hotbar_button::draw(const viewing_gui_context context, const const_this_in_
 	const auto& this_tree_entry = context.get_tree_entry(this_id);
 	auto absolute_rc = this_tree_entry.get_absolute_rect();
 	const auto owner_transfer_capability = context.get_gui_element_entity();
-	const auto& settings = context.get_gui_element_component().hotbar_settings;
+	const auto& settings = context.get_character_gui().hotbar_settings;
 
 	const int left_rc_spacing = 2;
 	const int right_rc_spacing = 1;
@@ -291,10 +292,11 @@ void hotbar_button::draw(const viewing_gui_context context, const const_this_in_
 	}
 }
 
-void hotbar_button::advance_elements(const logic_gui_context context, const this_in_item this_id, const gui_entropy& entropies, const augs::delta dt) {
+void hotbar_button::advance_elements(const game_gui_context context, const this_in_item this_id, const gui_entropy& entropies, const augs::delta dt) {
 	base::advance_elements(context, this_id, entropies, dt);
 	
 	const auto& rect_world = context.get_rect_world();
+	auto& gui = context.get_character_gui();
 
 	for (const auto& info : entropies.get_events_for(this_id)) {
 		this_id->detector.update_appearance(info);
@@ -303,10 +305,12 @@ void hotbar_button::advance_elements(const logic_gui_context context, const this
 			const auto assigned_entity = this_id->get_assigned_entity(context.get_gui_element_entity());
 
 			if (assigned_entity.alive()) {
-				components::gui_element::hotbar_selection_setup setup;
+				character_gui::hotbar_selection_setup setup;
 				setup.primary_selection = assigned_entity;
 
-				components::gui_element::apply_and_save_hotbar_selection_setup(context.get_step(), setup, context.get_gui_element_entity());
+				const auto next_wielding = gui.make_and_save_hotbar_selection_setup(setup, context.get_gui_element_entity());
+
+				context.get_gui_element_system().queue_transfers(next_wielding);
 			}
 		}
 
@@ -328,6 +332,6 @@ void hotbar_button::advance_elements(const logic_gui_context context, const this
 	}
 }
 
-void hotbar_button::rebuild_layouts(const logic_gui_context context, const this_in_item this_id) {
+void hotbar_button::rebuild_layouts(const game_gui_context context, const this_in_item this_id) {
 	base::rebuild_layouts(context, this_id);
 }

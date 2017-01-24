@@ -15,21 +15,24 @@
 #include "game/enums/item_category.h"
 #include "game/detail/inventory_slot.h"
 #include "game/detail/inventory_utils.h"
-#include "game/components/gui_element_component.h"
+#include "game/detail/gui/character_gui.h"
 #include "game/components/sprite_component.h"
 #include "game/components/item_component.h"
 #include "game/systems_stateless/gui_system.h"
 #include "game/systems_stateless/input_system.h"
+#include "game/systems_audiovisual/gui_element_system.h"
 #include "game/resources/manager.h"
 #include "augs/graphics/drawers.h"
+
+#include "game/detail/gui/slot_button.h"
 
 #include "augs/templates/string_templates.h"
 #include "augs/ensure.h"
 
-bool item_button::is_being_wholely_dragged_or_pending_finish(const const_logic_gui_context context, const const_this_in_item this_id) {
+bool item_button::is_being_wholely_dragged_or_pending_finish(const const_game_gui_context context, const const_this_in_item this_id) {
 	const auto& rect_world = context.get_rect_world();
-	const auto& element = context.get_gui_element_component();
-	const auto& cosmos = context.get_step().get_cosmos();
+	const auto& element = context.get_character_gui();
+	const auto& cosmos = context.get_cosmos();
 
 	if (rect_world.is_currently_dragging(this_id)) {
 		const bool is_drag_partial = element.dragged_charges < cosmos[this_id.get_location().item_id].get<components::item>().charges;
@@ -45,7 +48,7 @@ item_button::item_button(xywh rc) : base(rc) {
 	unset_flag(augs::gui::flag::FOCUSABLE);
 }
 
-void item_button::draw_dragged_ghost_inside(const viewing_gui_context context, const const_this_in_item this_id, draw_info in, vec2 absolute_xy_offset) {
+void item_button::draw_dragged_ghost_inside(const viewing_game_gui_context context, const const_this_in_item this_id, draw_info in, vec2 absolute_xy_offset) {
 	drawing_settings f;
 	f.draw_background = true;
 	f.draw_item = true;
@@ -60,7 +63,7 @@ void item_button::draw_dragged_ghost_inside(const viewing_gui_context context, c
 	draw_proc(context, this_id, in, f);
 }
 
-void item_button::draw_complete_with_children(const viewing_gui_context context, const const_this_in_item this_id, draw_info in) {
+void item_button::draw_complete_with_children(const viewing_game_gui_context context, const const_this_in_item this_id, draw_info in) {
 	drawing_settings f;
 	f.draw_background = true;
 	f.draw_item = true;
@@ -75,7 +78,7 @@ void item_button::draw_complete_with_children(const viewing_gui_context context,
 	draw_proc(context, this_id, in, f);
 }
 
-void item_button::draw_grid_border_ghost(const viewing_gui_context context, const const_this_in_item this_id, const draw_info in, const vec2 absolute_xy_offset) {
+void item_button::draw_grid_border_ghost(const viewing_game_gui_context context, const const_this_in_item this_id, const draw_info in, const vec2 absolute_xy_offset) {
 	drawing_settings f;
 	f.draw_background = false;
 	f.draw_item = false;
@@ -90,7 +93,7 @@ void item_button::draw_grid_border_ghost(const viewing_gui_context context, cons
 	draw_proc(context, this_id, in, f);
 }
 
-void item_button::draw_complete_dragged_ghost(const viewing_gui_context context, const const_this_in_item this_id, const draw_info in, const vec2 absolute_xy_offset) {
+void item_button::draw_complete_dragged_ghost(const viewing_game_gui_context context, const const_this_in_item this_id, const draw_info in, const vec2 absolute_xy_offset) {
 	draw_dragged_ghost_inside(context, this_id, in, absolute_xy_offset);
 }
 
@@ -149,16 +152,16 @@ vec2 item_button::griddify_size(const vec2 size, const vec2 expander) {
 	return rounded_size;
 }
 
-void item_button::draw_proc(const viewing_gui_context context, const const_this_in_item this_id, const draw_info in, const drawing_settings& f) {
+void item_button::draw_proc(const viewing_game_gui_context context, const const_this_in_item this_id, const draw_info in, const drawing_settings& f) {
 	if (is_inventory_root(context, this_id)) {
 		return;
 	}
 
-	const auto& cosmos = context.get_step().get_cosmos();
+	const auto& cosmos = context.get_cosmos();
 	const auto& item = cosmos[this_id.get_location().item_id];
 	const auto& detector = this_id->detector;
 	const auto& rect_world = context.get_rect_world();
-	const auto& element = context.get_gui_element_component();
+	const auto& element = context.get_character_gui();
 	auto& this_tree_entry = context.get_tree_entry(this_id);
 
 	const auto former_absolute_pos = this_tree_entry.get_absolute_pos();
@@ -374,16 +377,16 @@ void item_button::draw_proc(const viewing_gui_context context, const const_this_
 	this_tree_entry.set_absolute_pos(former_absolute_pos);
 }
 
-bool item_button::is_inventory_root(const const_logic_gui_context context, const const_this_in_item this_id) {
+bool item_button::is_inventory_root(const const_game_gui_context context, const const_this_in_item this_id) {
 	const bool result = this_id.get_location().item_id == context.get_gui_element_entity();
 	ensure(!result);
 	return result;
 }
 
-void item_button::rebuild_layouts(const logic_gui_context context, const this_in_item this_id) {
+void item_button::rebuild_layouts(const game_gui_context context, const this_in_item this_id) {
 	base::rebuild_layouts(context, this_id);
 
-	const auto& cosmos = context.get_step().get_cosmos();
+	const auto& cosmos = context.get_cosmos();
 	const auto item = cosmos[this_id.get_location().item_id];
 
 	if (is_inventory_root(context, this_id)) {
@@ -417,13 +420,13 @@ void item_button::rebuild_layouts(const logic_gui_context context, const this_in
 	}
 }
 
-void item_button::advance_elements(const logic_gui_context context, const this_in_item this_id, const gui_entropy& entropies, const augs::delta dt) {
+void item_button::advance_elements(const game_gui_context context, const this_in_item this_id, const gui_entropy& entropies, const augs::delta dt) {
 	base::advance_elements(context, this_id, entropies, dt);
 
-	const auto& cosmos = context.get_step().get_cosmos();
+	const auto& cosmos = context.get_cosmos();
 	const auto& item = cosmos[this_id.get_location().item_id];
 	const auto& rect_world = context.get_rect_world();
-	auto& element = context.get_gui_element_component();
+	auto& element = context.get_character_gui();
 
 	if (!is_inventory_root(context, this_id)) {
 		for (const auto& info : entropies.get_events_for(this_id)) {
@@ -446,7 +449,7 @@ void item_button::advance_elements(const logic_gui_context context, const this_i
 	}
 }
 
-void item_button::draw(const viewing_gui_context context, const const_this_in_item this_id, draw_info in) {
+void item_button::draw(const viewing_game_gui_context context, const const_this_in_item this_id, draw_info in) {
 	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING)) {
 		return;
 	}

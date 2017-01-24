@@ -15,7 +15,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/data_living_one_step.h"
 
-#include "augs/misc/machine_entropy_player.h"
+#include "augs/misc/debug_entropy_player.h"
 #include "game/transcendental/step.h"
 
 #include "augs/filesystem/file.h"
@@ -30,7 +30,7 @@ void determinism_test_setup::process(const config_lua_table& cfg, game_window& w
 	std::vector<cosmos> hypersomnias(cosmoi_count, cosmos(3000));
 
 	augs::machine_entropy total_collected_entropy;
-	augs::machine_entropy_player player;
+	augs::debug_entropy_player<cosmic_entropy> player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 	std::vector<scene_managers::testbed> testbeds(cosmoi_count);
 
@@ -95,16 +95,22 @@ void determinism_test_setup::process(const config_lua_table& cfg, game_window& w
 				break;
 			}
 
-			player.advance_player_and_biserialize(total_collected_entropy);
-
 			for (size_t i = 0; i < cosmoi_count; ++i) {
 				auto& h = hypersomnias[i];
-				if (i + 1 < cosmoi_count)
+				
+				if (i + 1 < cosmoi_count) {
 					hypersomnias[i] = hypersomnias[i + 1];
+				}
 
-				testbeds[i].control_character_selection(total_collected_entropy.local);
+				testbeds[i].control_character_selection(session.context.to_key_and_mouse_intents(total_collected_entropy.local));
 
-				auto cosmic_entropy_for_this_step = cosmic_entropy(h[testbeds[i].get_selected_character()], total_collected_entropy.local, session.context);
+				auto cosmic_entropy_for_this_step = cosmic_entropy(
+					h[testbeds[i].get_selected_character()], 
+					total_collected_entropy.local, 
+					session.context
+				);
+
+				player.advance_player_and_biserialize(cosmic_entropy_for_this_step);
 
 				augs::renderer::get_current().clear_logic_lines();
 

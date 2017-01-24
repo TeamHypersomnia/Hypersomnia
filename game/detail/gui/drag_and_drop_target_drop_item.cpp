@@ -1,6 +1,6 @@
 #include "drag_and_drop_target_drop_item.h"
-#include "game/components/gui_element_component.h"
-#include "game/components/gui_element_component.h"
+#include "game/detail/gui/character_gui.h"
+#include "game/detail/gui/character_gui.h"
 #include "game/components/item_component.h"
 #include "game/detail/gui/root_of_inventory_gui.h"
 #include "game/detail/inventory_slot.h"
@@ -15,7 +15,7 @@ drag_and_drop_target_drop_item::drag_and_drop_target_drop_item(const augs::gui::
 	unset_flag(augs::gui::flag::ENABLE_DRAWING);
 }
 
-void drag_and_drop_target_drop_item::draw(const viewing_gui_context context, const const_this_pointer this_id, const augs::gui::draw_info info) {
+void drag_and_drop_target_drop_item::draw(const viewing_game_gui_context context, const const_this_pointer this_id, const augs::gui::draw_info info) {
 	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING)) {
 		return;
 	}
@@ -32,13 +32,13 @@ void drag_and_drop_target_drop_item::draw(const viewing_gui_context context, con
 	draw_centered_texture(context, this_id, info, mat_coloured);
 }
 
-void drag_and_drop_target_drop_item::advance_elements(const logic_gui_context context, const this_pointer this_id, const gui_entropy& entropies, const augs::delta) {
+void drag_and_drop_target_drop_item::advance_elements(const game_gui_context context, const this_pointer this_id, const gui_entropy& entropies, const augs::delta) {
 	for (const auto& e : entropies.get_events_for(this_id)) {
 		this_id->detector.update_appearance(e);
 	}
 }
 
-void drag_and_drop_target_drop_item::rebuild_layouts(const logic_gui_context context, const this_pointer this_id) {
+void drag_and_drop_target_drop_item::rebuild_layouts(const game_gui_context context, const this_pointer this_id) {
 	const auto& world = context.get_rect_world();
 	const_dereferenced_location<item_button_in_item> dragged_item = context._dynamic_cast<item_button_in_item>(world.rect_held_by_lmb);
 
@@ -49,6 +49,6 @@ void drag_and_drop_target_drop_item::rebuild_layouts(const logic_gui_context con
 		this_id->unset_flag(augs::gui::flag::ENABLE_DRAWING);
 	}
 
-	this_id->rc.set_position(context.get_gui_element_component().get_initial_position_for(*this_id) - vec2(20, 20));
+	this_id->rc.set_position(context.get_character_gui().get_initial_position_for(*this_id) - vec2(20, 20));
 	this_id->rc.set_size((*this_id->mat.tex).get_size() + vec2(40, 40));
 }

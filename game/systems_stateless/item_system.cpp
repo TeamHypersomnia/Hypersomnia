@@ -15,7 +15,7 @@
 #include "game/components/force_joint_component.h"
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/fixtures_component.h"
-#include "game/components/gui_element_component.h"
+#include "game/detail/gui/character_gui.h"
 
 #include "game/detail/inventory_utils.h"
 #include "game/detail/inventory_slot.h"
@@ -124,7 +124,7 @@ void item_system::handle_holster_item_intents(const logic_step step) {
 					new_setup.secondary_selection.unset();
 				}
 
-				components::gui_element::apply_and_save_hotbar_selection_setup(step, new_setup, subject);
+				components::gui_element::make_and_save_hotbar_selection_setup(step, new_setup, subject);
 			}
 			else if (subject.has<components::item_slot_transfers>()) {
 				const auto hand = subject.map_primary_action_to_secondary_hand_if_primary_empty(intent_type::HOLSTER_SECONDARY_ITEM == r.intent);

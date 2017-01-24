@@ -14,6 +14,8 @@ struct immediate_hud;
 struct aabb_highlighter;
 struct data_living_one_step;
 
+class config_lua_table;
+
 namespace augs {
 	class renderer;
 }
@@ -69,6 +71,7 @@ class viewing_session;
 class viewing_step : public const_cosmic_step {
 public:
 	viewing_step(
+		const config_lua_table& config,
 		const cosmos&, 
 		viewing_session&, 
 		const augs::variable_delta&, 
@@ -78,6 +81,7 @@ public:
 		const visible_entities&
 	);
 
+	const config_lua_table& config;
 	camera_cone camera;
 	entity_id viewed_character;
 	const visible_entities& visible;

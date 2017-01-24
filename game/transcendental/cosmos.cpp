@@ -20,7 +20,6 @@
 #include "game/systems_stateless/item_system.h"
 #include "game/systems_stateless/force_joint_system.h"
 #include "game/systems_stateless/intent_contextualization_system.h"
-#include "game/systems_stateless/gui_system.h"
 #include "game/systems_stateless/trace_system.h"
 #include "game/systems_stateless/melee_system.h"
 #include "game/systems_stateless/sentience_system.h"
@@ -42,6 +41,8 @@
 
 #include "game/transcendental/cosmic_delta.h"
 #include "game/transcendental/data_living_one_step.h"
+
+#include "game/detail/inventory_utils.h"
 
 void cosmos::complete_resubstantiation() {
 	profiler.complete_resubstantiation.new_measurement();
@@ -346,6 +347,8 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 
 	physics_system::contact_listener listener(step.cosm);
 	
+	perform_transfers(step.entropy.transfer_requests, step);
+	
 	profiler.entropy_length.measure(step.entropy.length());
 
 	performance.start(meter_type::LOGIC);
@@ -431,9 +434,10 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	performance.stop(meter_type::PATHFINDING);
 
 	performance.start(meter_type::GUI);
-	gui_system().switch_to_gui_mode_and_back(step);
-	gui_system().handle_hotbar_and_action_button_presses(step);
-	gui_system().advance_gui_elements(step);
+	
+	auto& transfers = step.transient.messages.get_queue<item_slot_transfer_request_data>();
+	perform_transfers(transfers, step);
+
 	performance.stop(meter_type::GUI);
 
 	particles_existence_system().destroy_dead_streams(step);

@@ -1,0 +1,9 @@
+#include "wielding_result.h"
+#include "game/detail/inventory_utils.h"
+#include "game/transcendental/step.h"
+
+void wielding_result::apply(const logic_step step) {
+	ensure(result == type::SUCCESSFUL);
+
+	perform_transfers(transfers, step);
+}

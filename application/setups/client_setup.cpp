@@ -36,11 +36,16 @@ void client_setup::process(const config_lua_table& cfg, game_window& window) {
 		if (process_exit_key(precollected))
 			break;
 
-		process_once(window, precollected);
+		process_once(cfg, window, precollected);
 	}
 }
 
-void client_setup::init(const config_lua_table& cfg, game_window& window, const std::string recording_filename, const bool use_alternative_port) {
+void client_setup::init(
+	const config_lua_table& cfg, 
+	game_window& window, 
+	const std::string recording_filename, 
+	const bool use_alternative_port
+) {
 	const vec2i screen_size = vec2i(window.get_screen_size());
 
 	scene_managers::networked_testbed_client().populate_world_with_entities(initial_hypersomnia);
@@ -55,9 +60,9 @@ void client_setup::init(const config_lua_table& cfg, game_window& window, const 
 	}
 
 	if (cfg.get_input_recording_mode() != input_recording_type::DISABLED) {
-		if (player.try_to_load_or_save_new_session("sessions/", recording_filename)) {
-			timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
-		}
+		//if (player.try_to_load_or_save_new_session("sessions/", recording_filename)) {
+		//	timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
+		//}
 	}
 
 	session.camera.configure_size(screen_size);
@@ -68,7 +73,8 @@ void client_setup::init(const config_lua_table& cfg, game_window& window, const 
 	receiver.jitter_buffer.set_lower_limit(static_cast<unsigned>(cfg.jitter_buffer_ms / hypersomnia.get_fixed_delta().in_milliseconds()));
 	receiver.misprediction_smoothing_multiplier = cfg.misprediction_smoothing_multiplier;
 
-	const bool is_replaying = player.is_replaying();
+	const bool is_replaying =
+		false;// player.is_replaying();
 	LOG("Is client replaying: %x", is_replaying);
 	const auto port = use_alternative_port ? cfg.alternative_port : cfg.connect_port;
 
@@ -94,7 +100,12 @@ void client_setup::init(const config_lua_table& cfg, game_window& window, const 
 	session.reserve_caches_for_entities(3000);
 }
 
-void client_setup::process_once(game_window& window, const augs::machine_entropy::local_type& precollected, const bool swap_buffers) {
+void client_setup::process_once(
+	const config_lua_table& cfg,
+	game_window& window, 
+	const augs::machine_entropy::local_type& precollected, 
+	const bool swap_buffers
+) {
 	auto step_pred = [this](const cosmic_entropy& entropy, cosmos& cosm) {
 		cosm.advance_deterministic_schemata(entropy,
 			[this](const logic_step) {},
@@ -120,81 +131,101 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 	session.remote_entropy_profiler.end_measurement();
 
 	const bool still_downloading = !complete_state_received || receiver.jitter_buffer.is_still_refilling();
+	
+	session.switch_between_gui_and_back(new_entropy.local);
 
-	total_collected_entropy += new_entropy;
+	session.control_gui_and_remove_fetched_events(
+		hypersomnia[scene.get_selected_character()],
+		new_entropy.local
+	);
+
+	const auto intents = session.context.to_key_and_mouse_intents(new_entropy.local);
+
+	session.control(intents);
+
+	process_exit_key(new_entropy.local);
+
+	concatenate(total_collected_entropy, intents);
+
+	for (auto& net_event : new_entropy.remote) {
+		if (net_event.message_type == augs::network::message::type::RECEIVE) {
+			auto& stream = net_event.payload;
+
+			auto to_skip = net_event.messages_to_skip;
+
+			while (stream.get_unread_bytes() > 0) {
+				network_command command;
+				augs::read_object(stream, command);
+
+				const bool should_skip = to_skip > 0;
+
+				if (should_skip) {
+					--to_skip;
+				}
+
+				if (detailed_step_log && !should_skip) {
+					LOG("Client received command: %x", int(stream.peek<unsigned char>()));
+				}
+
+				switch (command) {
+				case network_command::COMPLETE_STATE:
+					ensure(!should_skip);
+
+					cosmic_delta::decode(initial_hypersomnia, stream);
+					hypersomnia = initial_hypersomnia;
+					extrapolated_hypersomnia = initial_hypersomnia;
+
+					LOG("Decoded cosm at step: %x", hypersomnia.get_total_steps_passed());
+
+					unsigned controlled_character_guid;
+					augs::read_object(stream, controlled_character_guid);
+
+					scene.select_character(hypersomnia.get_entity_by_guid(controlled_character_guid));
+
+					complete_state_received = true;
+					break;
+
+				case network_command::PACKAGED_STEP: {
+					step_packaged_for_network step;
+					augs::read_object(stream, step);
+
+					if (!should_skip) {
+						receiver.acquire_next_packaged_step(step);
+					}
+				}
+													 break;
+
+				default: LOG("Client received invalid command: %x", int(command)); stream = augs::stream(); break;
+
+				}
+			}
+		}
+	}
 
 	auto steps = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
 
 	while (steps--) {
-		session.unpack_local_steps_profiler.new_measurement();
-		player.advance_player_and_biserialize(total_collected_entropy);
-		session.unpack_local_steps_profiler.end_measurement();
-
-		for (auto& net_event : total_collected_entropy.remote) {
-			if (net_event.message_type == augs::network::message::type::RECEIVE) {
-				auto& stream = net_event.payload;
-
-				auto to_skip = net_event.messages_to_skip;
-
-				while (stream.get_unread_bytes() > 0) {
-					network_command command;
-					augs::read_object(stream, command);
-
-					const bool should_skip = to_skip > 0;
-
-					if (should_skip) {
-						--to_skip;
-					}
-
-					if (detailed_step_log && !should_skip) {
-						LOG("Client received command: %x", int(stream.peek<unsigned char>()));
-					}
-
-					switch (command) {
-					case network_command::COMPLETE_STATE:
-						ensure(!should_skip);
-
-						cosmic_delta::decode(initial_hypersomnia, stream);
-						hypersomnia = initial_hypersomnia;
-						extrapolated_hypersomnia = initial_hypersomnia;
-
-						LOG("Decoded cosm at step: %x", hypersomnia.get_total_steps_passed());
-
-						unsigned controlled_character_guid;
-						augs::read_object(stream, controlled_character_guid);
-
-						scene.select_character(hypersomnia.get_entity_by_guid(controlled_character_guid));
-
-						complete_state_received = true;
-						break;
-
-					case network_command::PACKAGED_STEP: {
-						step_packaged_for_network step;
-						augs::read_object(stream, step);
-						
-						if (!should_skip) {
-							receiver.acquire_next_packaged_step(step);
-						}
-					}
-						break;
-
-					default: LOG("Client received invalid command: %x", int(command)); stream = augs::stream(); break;
-
-					}
-				}
-			}
-		}
-
 		if (!still_downloading) {
 			session.sending_commands_and_predict_profiler.new_measurement();
-			const auto local_cosmic_entropy_for_this_step = cosmic_entropy(hypersomnia[scene.get_selected_character()], total_collected_entropy.local, session.context);
+			
+			const auto local_cosmic_entropy_for_this_step = cosmic_entropy(
+				hypersomnia[scene.get_selected_character()], 
+				total_collected_entropy
+			);
 
-			receiver.send_commands_and_predict(client, local_cosmic_entropy_for_this_step, extrapolated_hypersomnia, step_pred_with_effects_response);
+			receiver.send_commands_and_predict(
+				client, 
+				local_cosmic_entropy_for_this_step, 
+				extrapolated_hypersomnia, 
+				step_pred_with_effects_response
+			);
+
 			session.sending_commands_and_predict_profiler.end_measurement();
 
 			// LOG("Predicting to step: %x; predicted steps: %x", extrapolated_hypersomnia.get_total_steps_passed(), receiver.predicted_steps.size());
 
 			session.unpack_remote_steps_profiler.new_measurement();
+			
 			receiver.unpack_deterministic_steps(
 				session.systems_audiovisual.get<interpolation_system>(),
 				session.systems_audiovisual.get<past_infection_system>(),
@@ -202,7 +233,8 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 				hypersomnia, 
 				hypersomnia_last_snapshot, 
 				extrapolated_hypersomnia, 
-				step_pred);
+				step_pred
+			);
 
 			session.unpack_remote_steps_profiler.end_measurement();
 
@@ -232,7 +264,14 @@ void client_setup::process_once(game_window& window, const augs::machine_entropy
 			renderer.clear_current_fbo();
 		}
 
-		session.view(renderer, extrapolated_hypersomnia, scene.get_selected_character(), vdt, client);
+		session.view(
+			cfg,
+			renderer,
+			extrapolated_hypersomnia,
+			scene.get_selected_character(),
+			vdt,
+			client
+		);
 
 		if (swap_buffers) {
 			window.swap_buffers();

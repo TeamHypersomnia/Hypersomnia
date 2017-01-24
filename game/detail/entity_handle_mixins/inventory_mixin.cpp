@@ -221,41 +221,56 @@ std::vector<D> basic_inventory_mixin<C, D>::guns_wielded() const {
 	return result;
 }
 
-template <class D>
-void inventory_mixin<false, D>::swap_wielded_items(const logic_step step) const {
+template <bool C, class D>
+wielding_result basic_inventory_mixin<C, D>::swap_wielded_items() const {
 	const auto& subject = *static_cast<const D*>(this);
 	auto& cosmos = subject.get_cosmos();
+	
+	wielding_result result;
 
 	const auto in_primary = subject[slot_function::PRIMARY_HAND].get_item_if_any();
 	const auto in_secondary = subject[slot_function::SECONDARY_HAND].get_item_if_any();
+	
+	auto& transfers = result.transfers;
 
 	if (in_primary.alive() && in_secondary.alive()) {
-		swap_slots_for_items(in_primary, in_secondary, step);
+		transfers = swap_slots_for_items(in_primary, in_secondary);
 	}
 	else if (in_primary.alive()) {
-		const item_slot_transfer_request request(in_primary, subject[slot_function::SECONDARY_HAND]);
-		perform_transfer(request, step);
+		transfers.push_back({ in_primary, subject[slot_function::SECONDARY_HAND] });
 	}
 	else if (in_secondary.alive()) {
-		const item_slot_transfer_request request(in_secondary, subject[slot_function::PRIMARY_HAND]);
-		perform_transfer(request, step);
+		transfers.push_back({ in_secondary, subject[slot_function::PRIMARY_HAND] });
 	}
-	else {
-		ensure(false);
-	}
+
+	result.result = wielding_result::type::SUCCESSFUL;
+	
+	return result;
 }
 
-template <class D>
-bool inventory_mixin<false, D>::wield_in_hands(
-	const logic_step step,
+template <bool C, class D>
+wielding_result basic_inventory_mixin<C, D>::wield_in_hands(
 	entity_id first, 
 	entity_id second
 ) const {
 	const auto& subject = *static_cast<const D*>(this);
 	auto& cosmos = subject.get_cosmos();
+	
+	wielding_result result;
 
 	const auto in_primary = subject[slot_function::PRIMARY_HAND].get_item_if_any();
 	const auto in_secondary = subject[slot_function::SECONDARY_HAND].get_item_if_any();
+
+	const bool is_only_secondary_possibly_chosen = cosmos[first].dead();
+
+	if (is_only_secondary_possibly_chosen) {
+		std::swap(first, second);
+	}
+
+	if ((in_primary == first && in_secondary == second) || (is_only_secondary_possibly_chosen && (first == in_primary))) {
+		result.result = wielding_result::type::THE_SAME_SETUP;
+		return result;
+	}
 
 	const auto primary_holstering_slot = subject.determine_hand_holstering_slot_for(in_primary);
 	const auto secondary_holstering_slot = subject.determine_hand_holstering_slot_for(in_secondary);
@@ -265,39 +280,33 @@ bool inventory_mixin<false, D>::wield_in_hands(
 		(in_secondary.alive() && secondary_holstering_slot.dead());
 
 	if (something_wont_fit) {
-		return false;
+		result.result = wielding_result::type::SOMETHING_WONT_FIT;
+		return result;
 	}
 
+	auto& transfers = result.transfers;
+
 	if (primary_holstering_slot.alive()) {
-		const item_slot_transfer_request request(in_primary, primary_holstering_slot);
-		perform_transfer(request, step);
+		transfers.push_back({ in_primary, primary_holstering_slot });
 	}
 
 	if (secondary_holstering_slot.alive()) {
-		const item_slot_transfer_request request(in_secondary, secondary_holstering_slot);
-		perform_transfer(request, step);
-	}
-
-	const bool is_only_secondary_possibly_chosen = cosmos[first].dead();
-
-	if (is_only_secondary_possibly_chosen) {
-		std::swap(first, second);
+		transfers.push_back({ in_secondary, secondary_holstering_slot });
 	}
 
 	const auto first_handle = cosmos[first];
 	const auto second_handle = cosmos[second];
 
 	if (first_handle.alive()) {
-		const item_slot_transfer_request request(first_handle, subject[slot_function::PRIMARY_HAND]);
-		perform_transfer(request, step);
+		transfers.push_back({ first_handle, subject[slot_function::PRIMARY_HAND] });
 	}
 
 	if (second_handle.alive()) {
-		const item_slot_transfer_request request(second_handle, subject[slot_function::SECONDARY_HAND]);
-		perform_transfer(request, step);
+		transfers.push_back({ second_handle, subject[slot_function::SECONDARY_HAND] });
 	}
 
-	return true;
+	result.result = wielding_result::type::SUCCESSFUL;
+	return result;
 }
 
 // explicit instantiation

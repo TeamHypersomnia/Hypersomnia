@@ -1,7 +1,9 @@
 #pragma once
 #include "game/transcendental/entity_handle_declaration.h"
+#include "augs/graphics/vertex.h"
 
-class viewing_step;
+struct camera_cone;
+class interpolation_system;
 
 struct aabb_highlighter {
 	float timer = 0.f;
@@ -13,5 +15,11 @@ struct aabb_highlighter {
 	float scale_down_when_aabb_no_bigger_than = 40.f;
 
 	void update(const float delta_ms);
-	void draw(const viewing_step, const const_entity_handle subject) const;
+
+	void draw(
+		augs::vertex_triangle_buffer& output,
+		const const_entity_handle subject,
+		const interpolation_system& interp,
+		const camera_cone camera
+	) const;
 };

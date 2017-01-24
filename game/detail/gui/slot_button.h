@@ -21,11 +21,11 @@ struct slot_button : game_gui_rect_node {
 	
 	slot_button();
 
-	static void advance_elements(const logic_gui_context, const this_in_container, const gui_entropy& entropies, const augs::delta);
-	static void rebuild_layouts(const logic_gui_context, const this_in_container this_id);
-	static void draw(const viewing_gui_context, const const_this_in_container, augs::gui::draw_info);
+	static void advance_elements(const game_gui_context, const this_in_container, const gui_entropy& entropies, const augs::delta);
+	static void rebuild_layouts(const game_gui_context, const this_in_container this_id);
+	static void draw(const viewing_game_gui_context, const const_this_in_container, augs::gui::draw_info);
 
-	static void update_rc(const logic_gui_context, const this_in_container);
+	static void update_rc(const game_gui_context, const this_in_container);
 };
 
 slot_button& get_meta(inventory_slot_id);

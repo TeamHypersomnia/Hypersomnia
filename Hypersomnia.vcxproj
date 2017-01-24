@@ -338,8 +338,9 @@
     <ClCompile Include="augs\misc\action_list.cpp" />
     <ClCompile Include="augs\misc\http_requests.cpp" />
     <ClCompile Include="augs\misc\delta_compression.cpp" />
+    <ClCompile Include="augs\misc\key_and_mouse_intent.cpp" />
     <ClCompile Include="augs\misc\machine_entropy.cpp" />
-    <ClCompile Include="augs\misc\machine_entropy_player.cpp" />
+    <ClCompile Include="augs\misc\debug_entropy_player.cpp" />
     <ClCompile Include="augs\misc\pool_id.cpp" />
     <ClCompile Include="augs\misc\readable_bytesize.cpp" />
     <ClCompile Include="augs\misc\standard_actions.cpp" />
@@ -364,6 +365,7 @@
     <ClCompile Include="game\detail\entity_handle_mixins\renderable_mixin.cpp" />
     <ClCompile Include="game\detail\entity_handle_mixins\spatial_properties_mixin.cpp" />
     <ClCompile Include="game\detail\gui\aabb_highlighter.cpp" />
+    <ClCompile Include="game\detail\gui\character_gui.cpp" />
     <ClCompile Include="game\detail\gui\drag_and_drop.cpp" />
     <ClCompile Include="game\detail\gui\grid.cpp" />
     <ClCompile Include="game\detail\gui\gui_positioning.cpp" />
@@ -375,6 +377,7 @@
     <ClCompile Include="game\detail\gui\root_of_inventory_gui.cpp" />
     <ClCompile Include="game\detail\gui\slot_button.cpp" />
     <ClCompile Include="game\detail\visible_entities.cpp" />
+    <ClCompile Include="game\detail\wielding_result.cpp" />
     <ClCompile Include="game\detail\world_camera.cpp" />
     <ClCompile Include="game\enums\item_category.cpp" />
     <ClCompile Include="game\resources\tile_layer.cpp" />
@@ -384,6 +387,7 @@
     <ClCompile Include="game\scene_managers\resource_setups\make_button_with_corners.cpp" />
     <ClCompile Include="game\scene_managers\resource_setups\standard_sound_buffers.cpp" />
     <ClCompile Include="game\scene_managers\resource_setups\standard_tile_layers.cpp" />
+    <ClCompile Include="game\systems_audiovisual\gui_element_system.cpp" />
     <ClCompile Include="game\systems_audiovisual\interpolation_system.cpp" />
     <ClCompile Include="game\scene_managers\networked_testbed.cpp" />
     <ClCompile Include="game\systems_audiovisual\particles_simulation_system.cpp" />
@@ -403,7 +407,6 @@
     <ClCompile Include="game\transcendental\cosmic_movie_director.cpp" />
     <ClCompile Include="game\transcendental\cosmic_profiler.cpp" />
     <ClCompile Include="game\detail\convex_partitioned_shape.cpp" />
-    <ClCompile Include="game\transcendental\entity_intent.cpp" />
     <ClCompile Include="application\game_window.cpp" />
     <ClCompile Include="game\global\input_context.cpp" />
     <ClCompile Include="game\detail\inventory_slot_handle.cpp" />
@@ -1054,7 +1057,8 @@
     <ClInclude Include="augs\misc\easier_handle_getters_mixin.h" />
     <ClInclude Include="augs\misc\enum_bitset.h" />
     <ClInclude Include="augs\misc\http_requests.h" />
-    <ClInclude Include="augs\misc\machine_entropy_player.h" />
+    <ClInclude Include="augs\misc\key_and_mouse_intent.h" />
+    <ClInclude Include="augs\misc\debug_entropy_player.h" />
     <ClInclude Include="augs\misc\readable_bytesize.h" />
     <ClInclude Include="augs\misc\delta_compression.h" />
     <ClInclude Include="augs\misc\enum_associative_array.h" />
@@ -1114,6 +1118,7 @@
     <ClInclude Include="game\detail\entity_handle_mixins\renderable_mixin.h" />
     <ClInclude Include="game\detail\entity_handle_mixins\spatial_properties_mixin.h" />
     <ClInclude Include="game\detail\gui\aabb_highlighter.h" />
+    <ClInclude Include="game\detail\gui\character_gui.h" />
     <ClInclude Include="game\detail\gui\drag_and_drop.h" />
     <ClInclude Include="game\detail\gui\game_gui_context.h" />
     <ClInclude Include="game\detail\gui\game_gui_element_location.h" />
@@ -1134,6 +1139,7 @@
     <ClInclude Include="game\detail\gui\drag_and_drop_target_drop_item.h" />
     <ClInclude Include="game\detail\item_slot_transfer_request_declaration.h" />
     <ClInclude Include="game\detail\visible_entities.h" />
+    <ClInclude Include="game\detail\wielding_result.h" />
     <ClInclude Include="game\detail\world_camera.h" />
     <ClInclude Include="game\enums\entity_flag.h" />
     <ClInclude Include="game\enums\input_recording_type.h" />
@@ -1142,6 +1148,7 @@
     <ClInclude Include="game\messages\visibility_information.h" />
     <ClInclude Include="game\resources\sound_response.h" />
     <ClInclude Include="game\resources\tile_layer.h" />
+    <ClInclude Include="game\systems_audiovisual\gui_element_system.h" />
     <ClInclude Include="game\systems_audiovisual\interpolation_system.h" />
     <ClInclude Include="game\scene_managers\networked_testbed.h" />
     <ClInclude Include="game\systems_audiovisual\particles_simulation_system.h" />
@@ -1176,7 +1183,6 @@
     <ClInclude Include="game\transcendental\cosmos.h" />
     <ClInclude Include="game\transcendental\data_living_one_step.h" />
     <ClInclude Include="game\transcendental\entity_id.h" />
-    <ClInclude Include="game\transcendental\entity_intent.h" />
     <ClInclude Include="game\enums\colliders_offset_type.h" />
     <ClInclude Include="application\game_window.h" />
     <ClInclude Include="game\global\all_settings.h" />

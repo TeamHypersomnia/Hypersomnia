@@ -20,15 +20,15 @@ public:
 
 	template <class C>
 	bool alive(const C context) const {
-		const auto handle = context.get_step().get_cosmos()[item_id];
+		const auto handle = context.get_cosmos()[item_id];
 		return handle.alive() && context.get_gui_element_entity() == handle.get_owning_transfer_capability();
 	}
 
 	template <class C>
 	decltype(auto) dereference(const C context) const {
-		const auto handle = context.get_step().get_cosmos()[item_id];
+		const auto handle = context.get_cosmos()[item_id];
 		ensure(context.get_gui_element_entity() == handle.get_owning_transfer_capability());
-		return &handle.get<components::item>().button;
+		return &context.get_gui_element_system().get_item_button(item_id);
 	}
 };
 

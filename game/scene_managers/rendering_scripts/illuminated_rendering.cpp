@@ -7,7 +7,7 @@
 #include "game/systems_stateless/render_system.h"
 #include "game/systems_stateless/gui_system.h"
 
-#include "game/components/gui_element_component.h"
+#include "game/detail/gui/character_gui.h"
 #include "game/resources/manager.h"
 #include "augs/graphics/renderer.h"
 #include "game/transcendental/step.h"
@@ -254,8 +254,8 @@ namespace rendering_scripts {
 		hud.draw_vertically_flying_numbers(step);
 
 		if (step.settings.draw_gui_overlays) {
-			if (controlled_entity.has<components::gui_element>()) {
-				components::gui_element::draw_complete_gui_for_camera_rendering_request(output, controlled_entity, step);
+			if (controlled_entity.has<components::item_slot_transfers>()) {
+				step.session.systems_audiovisual.get<gui_element_system>().get_character_gui(controlled_entity).draw(step);
 			}
 
 			if (controlled_entity.has<components::sentience>()) {

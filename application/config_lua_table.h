@@ -78,7 +78,7 @@ public:
 		padding_byte pad[2];
 		
 		rgba primary_selected_color = rgba(0, 255, 255, 255);
-		rgba secondary_selected_color = rgba(86, 156, 214, 255); 
+		rgba secondary_selected_color = rgba(86, 156, 214, 255);
 	} hotbar;
 
 	void get_values(augs::lua_state_raii&);
@@ -101,6 +101,4 @@ public:
 	
 	launch_type get_launch_mode() const;
 	input_recording_type get_input_recording_mode() const;
-
-	void update_configuration_for_entity(const entity_handle) const;
 };

@@ -16,15 +16,15 @@ public:
 
 	template <class C>
 	bool alive(const C context) const {
-		const auto handle = context.get_step().get_cosmos()[slot_id];
+		const auto handle = context.get_cosmos()[slot_id];
 		return handle.alive() && context.get_gui_element_entity() == handle.get_container().get_owning_transfer_capability();
 	}
 
 	template <class C>
 	decltype(auto) dereference(const C context) const {
-		const auto handle = context.get_step().get_cosmos()[slot_id];
+		const auto handle = context.get_cosmos()[slot_id];
 		ensure(context.get_gui_element_entity() == handle.get_container().get_owning_transfer_capability());
-		return &handle->button;
+		return &context.get_gui_element_system().get_slot_button(slot_id);
 	}
 };
 

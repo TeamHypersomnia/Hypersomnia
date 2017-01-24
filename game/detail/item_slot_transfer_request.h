@@ -1,5 +1,5 @@
 #pragma once
-#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/entity_handle_declaration.h"
 #include "game/detail/inventory_slot_handle.h"
 #include "augs/padding_byte.h"
 #include "augs/templates/maybe_const.h"
@@ -12,8 +12,17 @@ struct item_slot_transfer_request_data {
 	bool force_immediate_mount = false;
 	padding_byte pad[3];
 
-	item_slot_transfer_request_data(entity_id item = entity_id(), inventory_slot_id target_slot = inventory_slot_id(), int specified_quantity = -1, bool force_immediate_mount = false) :
-		item(item), target_slot(target_slot), specified_quantity(specified_quantity), force_immediate_mount(force_immediate_mount) {}
+	item_slot_transfer_request_data(
+		const entity_id item = entity_id(), 
+		const inventory_slot_id target_slot = inventory_slot_id(), 
+		const int specified_quantity = -1, 
+		const bool force_immediate_mount = false
+	) :
+		item(item), 
+		target_slot(target_slot), 
+		specified_quantity(specified_quantity), 
+		force_immediate_mount(force_immediate_mount) {
+	}
 };
 
 template <bool C>
@@ -34,13 +43,15 @@ struct basic_item_slot_transfer_request : public item_slot_transfer_request_data
 		basic_entity_handle<C> item_handle,
 		basic_inventory_slot_handle<C> target_slot_handle, 
 		int specified_quantity = -1, 
-		bool force_immediate_mount = false)
-		: 
+		bool force_immediate_mount = false
+	) : 
 		item_slot_transfer_request_data(
 			item_handle.get_id(), 
 			target_slot_handle.get_id(), 
 			specified_quantity, 
-			force_immediate_mount), 
+			force_immediate_mount
+		), 
+
 		owner(item_handle.get_cosmos())
 	{
 		ensure_eq(&item_handle.get_cosmos(), &target_slot_handle.get_cosmos());

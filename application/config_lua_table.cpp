@@ -9,8 +9,9 @@
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
+#include "game/transcendental/viewing_session.h"
 
-#include "game/components/gui_element_component.h"
+#include "game/detail/gui/character_gui.h"
 #include "augs/scripting/lua_state_raii.h"
 
 #define NVP(x) x, #x
@@ -115,8 +116,6 @@ input_recording_type config_lua_table::get_input_recording_mode() const {
 	}
 }
 
-void config_lua_table::update_configuration_for_entity(const entity_handle h) const {
-	if (h.has<components::gui_element>()) {
-		h.get<components::gui_element>().hotbar_settings = hotbar;
-	}
+void config_lua_table::update_configuration_for(viewing_session& session) const {
+	session.systems_audiovisual.get<gui_element_system>().character_guis = hotbar;
 }

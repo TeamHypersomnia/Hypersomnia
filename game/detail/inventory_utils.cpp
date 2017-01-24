@@ -9,7 +9,7 @@
 #include "game/components/interpolation_component.h"
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/name_component.h"
-#include "game/components/gui_element_component.h"
+#include "game/detail/gui/character_gui.h"
 #include "game/detail/entity_scripts.h"
 #include "game/messages/queue_destruction.h"
 #include "game/transcendental/entity_handle.h"
@@ -300,15 +300,11 @@ components::transform sum_attachment_offsets(const cosmos& cosm, const inventory
 	return total;
 }
 
-void swap_slots_for_items(
-	const entity_id first,
-	const entity_id second,
-	const logic_step step
+augs::constant_size_vector<item_slot_transfer_request_data, 4> swap_slots_for_items(
+	const const_entity_handle first_handle,
+	const const_entity_handle second_handle
 ) {
-	const auto drop_slot = step.cosm[inventory_slot_id()];
-
-	const auto first_handle = step.cosm[first];
-	const auto second_handle = step.cosm[second];
+	augs::constant_size_vector<item_slot_transfer_request_data, 4> output;
 
 	const auto first_slot = first_handle.get_current_slot();
 	const auto second_slot = second_handle.get_current_slot();
@@ -316,25 +312,13 @@ void swap_slots_for_items(
 	ensure(first_handle.alive());
 	ensure(second_handle.alive());
 
-	{
-		const item_slot_transfer_request request(first_handle, drop_slot);
-		perform_transfer(request, step);
-	}
+	output.push_back({ first_handle, inventory_slot_id() });
+	output.push_back({ second_handle, inventory_slot_id() });
 
-	{
-		const item_slot_transfer_request request(second_handle, drop_slot);
-		perform_transfer(request, step);
-	}
+	output.push_back({ first_handle, second_slot });
+	output.push_back({ second_handle, first_slot });
 
-	{
-		const item_slot_transfer_request request(first_handle, second_slot);
-		perform_transfer(request, step);
-	}
-
-	{
-		const item_slot_transfer_request request(second_handle, first_slot);
-		perform_transfer(request, step);
-	}
+	return std::move(output);
 }
 
 void perform_transfer(const item_slot_transfer_request r, const logic_step step) {

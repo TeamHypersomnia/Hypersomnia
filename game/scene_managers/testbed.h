@@ -6,7 +6,6 @@
 
 #include "augs/misc/constant_size_vector.h"
 #include "game/container_sizes.h"
-#include "augs/misc/machine_entropy.h"
 
 struct cosmic_entropy;
 #include "game/transcendental/step_declaration.h"
@@ -31,7 +30,7 @@ namespace scene_managers {
 
 		void populate_world_with_entities(cosmos&, const vec2i screen_size);
 
-		void control_character_selection(const augs::machine_entropy::local_type&);
+		void control_character_selection(std::vector<key_and_mouse_intent>&);
 		
 		entity_id get_selected_character() const;
 

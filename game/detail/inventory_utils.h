@@ -7,12 +7,19 @@
 #define SPACE_ATOMS_PER_UNIT 1000
 
 #include "game/transcendental/step_declaration.h"
-void perform_transfer(item_slot_transfer_request, const logic_step step);
 
-void swap_slots_for_items(
-	const entity_id first, 
-	const entity_id second, 
-	const logic_step
+void perform_transfer(const item_slot_transfer_request, const logic_step step);
+
+template<class C>
+void perform_transfers(const C requests, const logic_step step) {
+	for (const auto r : requests) {
+		perform_transfer(step.cosm[r], step);
+	}
+}
+
+augs::constant_size_vector<item_slot_transfer_request_data, 4> swap_slots_for_items(
+	const const_entity_handle first, 
+	const const_entity_handle second 
 );
 
 components::transform get_attachment_offset(

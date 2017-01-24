@@ -42,7 +42,7 @@ public:
 		const cosmos&, 
 		const float global_time_seconds,
 		interpolation_system& sys
-		);
+	);
 
 	void resample_state_for_audiovisuals(const cosmos&);
 };

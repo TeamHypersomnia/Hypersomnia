@@ -3,10 +3,8 @@
 #include "game/components/sub_entities_component.h"
 #include "game/components/crosshair_component.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/transcendental/step.h"
 #include "game/transcendental/viewing_session.h"
 #include "game/transcendental/cosmos.h"
-#include "augs/graphics/renderer.h"
 #include "game/systems_audiovisual/interpolation_system.h"
 
 #include "game/components/substance_component.h"
@@ -16,10 +14,15 @@ void aabb_highlighter::update(const float delta_ms) {
 	timer = fmod(timer, cycle_duration_ms);
 }
 
-void aabb_highlighter::draw(const viewing_step step, const const_entity_handle subject) const {
+void aabb_highlighter::draw(
+	augs::vertex_triangle_buffer& output,
+	const const_entity_handle subject,
+	const interpolation_system& interp,
+	const camera_cone camera
+) const {
 	ltrb aabb;
 	
-	auto aabb_expansion_lambda = [&aabb, &step](const const_entity_handle e) {
+	auto aabb_expansion_lambda = [&](const const_entity_handle e) {
 		if (!e.has<components::substance>()) {
 			return false;
 		}
@@ -28,7 +31,7 @@ void aabb_highlighter::draw(const viewing_step step, const const_entity_handle s
 			return false;
 		}
 
-		const auto new_aabb = e.get_aabb(step.session.systems_audiovisual.get<interpolation_system>());
+		const auto new_aabb = e.get_aabb(interp);
 
 		if (aabb.good() && new_aabb.good()) {
 			aabb.contain(new_aabb);
@@ -69,8 +72,8 @@ void aabb_highlighter::draw(const viewing_step step, const const_entity_handle s
 	vec2i ap = aabb.get_position();
 
 	if (aabb.good()) {
-		components::sprite::drawing_input state(step.renderer.triangles);
-		state.camera = step.camera;
+		components::sprite::drawing_input state(output);
+		state.camera = camera;
 		state.positioning = renderable_positioning_type::LEFT_TOP_CORNER;
 		state.renderable_transform.rotation = 0;
 

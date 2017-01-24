@@ -791,15 +791,13 @@ namespace scene_managers {
 	//if (raw_input.key == augs::window::event::keys::key::F10) {
 	//}
 
-	void testbed::control_character_selection(const augs::machine_entropy::local_type& local) {
-		for (const auto& raw_input : local) {
-			if (raw_input.was_any_key_pressed()) {
-				if (raw_input.key == augs::window::event::keys::key::CAPSLOCK) {
-					++current_character_index;
-					current_character_index %= characters.size();
+	void testbed::control_character_selection(std::vector<key_and_mouse_intent>& intents) {
+		for (const auto& intent : intents) {
+			if (intent.is_pressed && intent.intent == intent_type::DEBUG_SWITCH_CHARACTER) {
+				++current_character_index;
+				current_character_index %= characters.size();
 
-					select_character(characters[current_character_index]);
-				}
+				select_character(characters[current_character_index]);
 			}
 		}
 	}

@@ -10,16 +10,20 @@ namespace components {
 
 		template<class F>
 		void for_each_held_id(F f) {
-			for (auto& s : slots)
-				for (auto& i : s.second.items_inside)
+			for (auto& s : slots) {
+				for (auto& i : s.second.items_inside) {
 					f(i);
+				}
+			}
 		}
 
 		template<class F>
 		void for_each_held_id(F f) const {
-			for (const auto& s : slots)
-				for (const auto& i : s.second.items_inside)
+			for (const auto& s : slots) {
+				for (const auto& i : s.second.items_inside) {
 					f(i);
+				}
+			}
 		}
 
 		template <class Archive>

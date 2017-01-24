@@ -44,7 +44,7 @@ drag_and_drop_result prepare_drag_and_drop_result(
 );
 
 void drag_and_drop_callback(
-	logic_gui_context context, 
+	game_gui_context context, 
 	const drag_and_drop_result&,
 	const vec2i total_dragged_amount
 );

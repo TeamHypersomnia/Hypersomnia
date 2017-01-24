@@ -16,7 +16,7 @@
 #include "game/transcendental/cosmic_movie_director.h"
 #include "game/transcendental/types_specification/all_messages_includes.h"
 
-#include "augs/misc/machine_entropy_player.h"
+#include "augs/misc/debug_entropy_player.h"
 
 #include "augs/filesystem/file.h"
 #include "director_setup.h"
@@ -33,7 +33,7 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 	cosmos hypersomnia(3000);
 
 	augs::window::event::state events;
-	augs::machine_entropy total_collected_entropy;
+	std::vector<key_and_mouse_intent> total_collected_entropy;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
 	scene_managers::testbed testbed;
@@ -108,13 +108,27 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 			new_entropy.local = window.collect_entropy(!cfg.debug_disable_cursor_clipping);
 			session.local_entropy_profiler.end_measurement();
 			
-			session.control(new_entropy);
+			session.switch_between_gui_and_back(new_entropy.local);
+
+			session.control_gui_and_remove_fetched_events(
+				hypersomnia[testbed.get_selected_character()],
+				new_entropy.local
+			);
+
+			const auto intents = session.context.to_key_and_mouse_intents(new_entropy.local);
+
+			session.control(intents);
 
 			process_exit_key(new_entropy.local);
 
 			if (current_director_state == director_state::RECORDING) {
-				total_collected_entropy += new_entropy;
+				concatenate(total_collected_entropy, intents);
 			}
+
+			const auto clear_all_inputs = [&](){
+				total_collected_entropy.clear();
+				session.systems_audiovisual.get<gui_element_system>().clear_all_pending_events();
+			};
 
 			for (const auto& raw_input : new_entropy.local) {
 				events.apply(raw_input);
@@ -134,7 +148,7 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 							recording_replacement_mode = recording_replacement_type::ALL;
 
 							current_director_state = director_state::RECORDING;
-							total_collected_entropy.clear();
+							clear_all_inputs();
 						}
 					}
 					if (raw_input.key == key::F7) {
@@ -158,32 +172,32 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 					}
 					if (raw_input.key == key::_3) {
 						requested_playing_speed = 0.f;
-						total_collected_entropy.clear();
+						clear_all_inputs();
 					}
 					if (raw_input.key == key::_4) {
 						requested_playing_speed = 0.1f;
-						total_collected_entropy.clear();
+						clear_all_inputs();
 					}
 					if (raw_input.key == key::_5) {
 						requested_playing_speed = 1.f;
-						total_collected_entropy.clear();
+						clear_all_inputs();
 					}
 					if (raw_input.key == key::_6) {
 						requested_playing_speed = 6.f;
-						total_collected_entropy.clear();
+						clear_all_inputs();
 					}
 					if (raw_input.key == key::_9) {
 						bookmarked_step = get_step_number(hypersomnia);
-						total_collected_entropy.clear();
+						clear_all_inputs();
 					}
 					if (raw_input.key == key::_0) {
 						advance_steps_forward = static_cast<long long>(bookmarked_step) - static_cast<long long>(get_step_number(hypersomnia));
-						total_collected_entropy.clear();
+						clear_all_inputs();
 					}
 				}
 			}
 
-			testbed.control_character_selection(new_entropy.local);
+			testbed.control_character_selection(intents);
 
 			timer.set_stepping_speed_multiplier(requested_playing_speed);
 		}

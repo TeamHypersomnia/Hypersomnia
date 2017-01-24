@@ -3,6 +3,7 @@
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/step_declaration.h"
 #include "augs/build_settings/setting_empty_bases.h"
+#include "game/detail/wielding_result.h"
 
 template<bool is_const, class entity_handle_type>
 class basic_inventory_mixin {
@@ -26,6 +27,13 @@ public:
 
 	bool wields_in_primary_hand(const const_entity_handle what_item) const;
 	bool wields_in_secondary_hand(const const_entity_handle what_item) const;
+
+	wielding_result wield_in_hands(
+		entity_id first = entity_id(),
+		entity_id second = entity_id()
+	) const;
+
+	wielding_result swap_wielded_items() const;
 
 private:
 	template <class S, class I>
@@ -86,13 +94,6 @@ template<class entity_handle_type>
 class EMPTY_BASES inventory_mixin<false, entity_handle_type> : public basic_inventory_mixin<false, entity_handle_type> {
 public:
 
-	bool wield_in_hands(
-		const logic_step step,
-		entity_id first = entity_id(), 
-		entity_id second = entity_id()
-	) const;
-
-	void swap_wielded_items(const logic_step) const;
 };
 
 template<class entity_handle_type>

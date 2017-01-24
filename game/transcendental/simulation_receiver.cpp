@@ -22,7 +22,7 @@ void simulation_receiver::acquire_next_packaged_step(const step_packaged_for_net
 }
 
 void simulation_receiver::remote_entropy_predictions(guid_mapped_entropy& adjusted_entropy, const entity_id predictable_entity, const cosmos& predicted_cosmos) {
-	entity_intent release_intent;
+	key_and_mouse_intent release_intent;
 	release_intent.is_pressed = false;
 
 	for (auto e : predicted_cosmos.get(processing_subjects::WITH_PAST_CONTAGIOUS)) {

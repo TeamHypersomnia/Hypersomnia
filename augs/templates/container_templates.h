@@ -3,6 +3,14 @@
 #include <vector>
 #include <set>
 
+template< typename ContainerT, typename PredicateT >
+void erase_if(ContainerT& items, const PredicateT& predicate) {
+	for (auto it = items.begin(); it != items.end(); ) {
+		if (predicate(*it)) it = items.erase(it);
+		else ++it;
+	}
+};
+
 template<class Container, class T>
 void erase_remove(Container& v, const T& l) {
 	v.erase(std::remove_if(v.begin(), v.end(), l), v.end());

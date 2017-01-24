@@ -13,9 +13,11 @@ void sound_system::resample_state_for_audiovisuals(const cosmos& new_cosmos) {
 	std::vector<entity_id> to_erase;
 
 	for (const auto& it : per_entity_cache) {
-		if (new_cosmos[it.first].dead() 
+		if (
+			new_cosmos[it.first].dead() 
 			|| !new_cosmos[it.first].has<components::processing>()
-			|| !new_cosmos[it.first].get<components::processing>().is_in(processing_subjects::WITH_SOUND_EXISTENCE)) {
+			|| !new_cosmos[it.first].get<components::processing>().is_in(processing_subjects::WITH_SOUND_EXISTENCE)
+		) {
 			to_erase.push_back(it.first);
 		}
 	}
@@ -72,11 +74,11 @@ void sound_system::play_nearby_sound_existences(
 
 		const auto& requested_buf = existence.input.direct_listener == listening_character ? buffer.request_stereo() : buffer.request_mono();
 
-		if (cache.recorded_component.time_of_birth != existence.time_of_birth
+		if (
+			cache.recorded_component.time_of_birth != existence.time_of_birth
 			|| cache.recorded_component.input.effect != existence.input.effect
 			|| &requested_buf != source.get_bound_buffer()
-			) {
-
+		) {
 			source.stop();
 
 			if (listening_character == existence.input.direct_listener) {
@@ -87,7 +89,6 @@ void sound_system::play_nearby_sound_existences(
 				source.bind_buffer(buffer.request_mono());
 				source.set_direct_channels(false);
 			}
-
 
 			source.play();
 			source.set_max_distance(existence.input.modifier.max_distance);

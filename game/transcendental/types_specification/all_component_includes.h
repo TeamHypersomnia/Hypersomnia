@@ -29,7 +29,6 @@
 #include "game/components/item_component.h"
 #include "game/components/force_joint_component.h"
 #include "game/components/item_slot_transfers_component.h"
-#include "game/components/gui_element_component.h"
 #include "game/components/trigger_collision_detector_component.h"
 #include "game/components/name_component.h"
 #include "game/components/trace_component.h"
