@@ -1,4 +1,5 @@
 #pragma once
+
 #include "game/enums/intent_type.h"
 #include "augs/window_framework/event.h"
 #include "augs/padding_byte.h"
@@ -24,7 +25,6 @@ namespace augs {
 	bool read_object(A& ar, key_and_mouse_intent& intent) {
 		if (!read_object(ar, intent.intent)) return false;
 		if (!read_object(ar, intent.is_pressed)) return false;
-		if (!read_object(ar, intent.has_event_for_gui)) return false;
 
 		if (intent.uses_mouse_motion()) {
 			if (!read_object(ar, intent.mouse_rel)) {
@@ -39,7 +39,6 @@ namespace augs {
 	void write_object(A& ar, const key_and_mouse_intent& intent) {
 		write_object(ar, intent.intent);
 		write_object(ar, intent.is_pressed);
-		write_object(ar, intent.has_event_for_gui);
 
 		if (intent.uses_mouse_motion()) {
 			write_object(ar, intent.mouse_rel);

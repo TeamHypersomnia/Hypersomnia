@@ -123,31 +123,36 @@ void client_setup::process_once(
 		);
 	};
 
-	augs::machine_entropy new_entropy;
+	augs::machine_entropy new_machine_entropy;
 
-	new_entropy.local = precollected;
+	new_machine_entropy.local = precollected;
 	session.remote_entropy_profiler.new_measurement();
-	new_entropy.remote = client.collect_entropy();
+	new_machine_entropy.remote = client.collect_entropy();
 	session.remote_entropy_profiler.end_measurement();
 
 	const bool still_downloading = !complete_state_received || receiver.jitter_buffer.is_still_refilling();
 	
-	session.switch_between_gui_and_back(new_entropy.local);
+	session.switch_between_gui_and_back(new_machine_entropy.local);
 
 	session.control_gui_and_remove_fetched_events(
 		hypersomnia[scene.get_selected_character()],
-		new_entropy.local
+		new_machine_entropy.local
 	);
 
-	const auto intents = session.context.to_key_and_mouse_intents(new_entropy.local);
+	auto new_intents = session.context.to_key_and_mouse_intents(new_machine_entropy.local);
 
-	session.control(intents);
+	session.control_and_remove_fetched_intents(new_intents);
 
-	process_exit_key(new_entropy.local);
+	auto new_cosmic_entropy = cosmic_entropy(
+		hypersomnia[scene.get_selected_character()],
+		new_intents
+	);
 
-	concatenate(total_collected_entropy, intents);
+	new_cosmic_entropy += session.systems_audiovisual.get<gui_element_system>().get_and_clear_pending_events();
 
-	for (auto& net_event : new_entropy.remote) {
+	total_collected_entropy += new_cosmic_entropy;
+
+	for (auto& net_event : new_machine_entropy.remote) {
 		if (net_event.message_type == augs::network::message::type::RECEIVE) {
 			auto& stream = net_event.payload;
 
@@ -208,14 +213,9 @@ void client_setup::process_once(
 		if (!still_downloading) {
 			session.sending_commands_and_predict_profiler.new_measurement();
 			
-			const auto local_cosmic_entropy_for_this_step = cosmic_entropy(
-				hypersomnia[scene.get_selected_character()], 
-				total_collected_entropy
-			);
-
 			receiver.send_commands_and_predict(
 				client, 
-				local_cosmic_entropy_for_this_step, 
+				total_collected_entropy,
 				extrapolated_hypersomnia, 
 				step_pred_with_effects_response
 			);
@@ -250,7 +250,7 @@ void client_setup::process_once(
 		client.send_pending_redundant();
 		session.sending_packets_profiler.end_measurement();
 
-		total_collected_entropy.clear();
+		total_collected_entropy = cosmic_entropy();
 	}
 
 	if (!still_downloading) {

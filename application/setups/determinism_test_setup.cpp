@@ -23,13 +23,16 @@
 
 #include "augs/misc/templated_readwrite.h"
 
-void determinism_test_setup::process(const config_lua_table& cfg, game_window& window) {
+void determinism_test_setup::process(
+	const config_lua_table& cfg, 
+	game_window& window
+) {
 	const vec2i screen_size = vec2i(window.get_screen_size());
 
 	const unsigned cosmoi_count = 1 + cfg.determinism_test_cloned_cosmoi_count;
 	std::vector<cosmos> hypersomnias(cosmoi_count, cosmos(3000));
 
-	augs::machine_entropy total_collected_entropy;
+	cosmic_entropy total_collected_entropy;
 	augs::debug_entropy_player<cosmic_entropy> player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 	std::vector<scene_managers::testbed> testbeds(cosmoi_count);
@@ -70,14 +73,15 @@ void determinism_test_setup::process(const config_lua_table& cfg, game_window& w
 	timer.reset_timer();
 
 	while (!should_quit) {
-		augs::machine_entropy new_entropy;
+		augs::machine_entropy new_machine_entropy;
 
-		new_entropy.local = window.collect_entropy(!cfg.debug_disable_cursor_clipping);
+		new_machine_entropy.local = window.collect_entropy(!cfg.debug_disable_cursor_clipping);
 		
-		if (process_exit_key(new_entropy.local))
+		if (process_exit_key(new_machine_entropy.local)) {
 			break;
+		}
 
-		for (auto& n : new_entropy.local) {
+		for (auto& n : new_machine_entropy.local) {
 			if (n.was_any_key_pressed()) {
 				if (n.key == augs::window::event::keys::key::F3) {
 					++currently_viewn_cosmos;
@@ -86,7 +90,25 @@ void determinism_test_setup::process(const config_lua_table& cfg, game_window& w
 			}
 		}
 
-		total_collected_entropy += new_entropy;
+		session.switch_between_gui_and_back(new_machine_entropy.local);
+
+		session.control_gui_and_remove_fetched_events(
+			hypersomnias[0][testbeds[0].get_selected_character()],
+			new_machine_entropy.local
+		);
+
+		auto new_intents = session.context.to_key_and_mouse_intents(new_machine_entropy.local);
+
+		session.control_and_remove_fetched_intents(new_intents);
+
+		auto new_cosmic_entropy = cosmic_entropy(
+			hypersomnias[0][testbeds[0].get_selected_character()],
+			new_intents
+		);
+
+		new_cosmic_entropy += session.systems_audiovisual.get<gui_element_system>().get_and_clear_pending_events();
+
+		total_collected_entropy += new_cosmic_entropy;
 
 		auto steps = timer.count_logic_steps_to_perform(hypersomnias[0].get_fixed_delta());
 
@@ -102,19 +124,13 @@ void determinism_test_setup::process(const config_lua_table& cfg, game_window& w
 					hypersomnias[i] = hypersomnias[i + 1];
 				}
 
-				testbeds[i].control_character_selection(session.context.to_key_and_mouse_intents(total_collected_entropy.local));
+				testbeds[i].control_character_selection(new_intents);
 
-				auto cosmic_entropy_for_this_step = cosmic_entropy(
-					h[testbeds[i].get_selected_character()], 
-					total_collected_entropy.local, 
-					session.context
-				);
-
-				player.advance_player_and_biserialize(cosmic_entropy_for_this_step);
+				player.advance_player_and_biserialize(total_collected_entropy);
 
 				augs::renderer::get_current().clear_logic_lines();
 
-				h.advance_deterministic_schemata(cosmic_entropy_for_this_step, [](auto) {},
+				h.advance_deterministic_schemata(total_collected_entropy, [](auto) {},
 					[this, &session](const const_logic_step step) {
 						session.spread_past_infection(step);
 					}
@@ -147,7 +163,7 @@ void determinism_test_setup::process(const config_lua_table& cfg, game_window& w
 				}
 			}
 
-			total_collected_entropy.clear();
+			total_collected_entropy = cosmic_entropy();
 		}
 
 		std::string logged;
@@ -161,7 +177,13 @@ void determinism_test_setup::process(const config_lua_table& cfg, game_window& w
 		auto& renderer = augs::renderer::get_current();
 		renderer.clear_current_fbo();
 
-		session.view(renderer, hypersomnias[currently_viewn_cosmos], testbeds[currently_viewn_cosmos].get_selected_character(), session.frame_timer.extract_variable_delta(hypersomnias[currently_viewn_cosmos].get_fixed_delta(), timer));
+		session.view(
+			cfg,
+			renderer, 
+			hypersomnias[currently_viewn_cosmos], 
+			testbeds[currently_viewn_cosmos].get_selected_character(), 
+			session.frame_timer.extract_variable_delta(hypersomnias[currently_viewn_cosmos].get_fixed_delta(), timer)
+		);
 	
 		window.swap_buffers();
 	}

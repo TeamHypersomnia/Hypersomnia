@@ -1,3 +1,4 @@
+#pragma once
 #include "augs/misc/pool_id.h"
 #include "game/transcendental/types_specification/all_components_declaration.h"
 
@@ -6,5 +7,23 @@ namespace augs {
 	class component_aggregate;
 }
 
-typedef augs::pool_id<typename put_all_components_into<augs::component_aggregate>::type> entity_id;
-typedef augs::unversioned_id<typename put_all_components_into<augs::component_aggregate>::type> unversioned_entity_id;
+struct entity_id : public augs::pool_id<typename put_all_components_into<augs::component_aggregate>::type> {
+	typedef augs::pool_id<typename put_all_components_into<augs::component_aggregate>::type> base;
+	
+	entity_id(const base b = base()) : base(b) {}
+};
+
+struct unversioned_entity_id : public augs::unversioned_id<typename put_all_components_into<augs::component_aggregate>::type> {
+	typedef augs::unversioned_id<typename put_all_components_into<augs::component_aggregate>::type> base;
+
+	unversioned_entity_id(const base b = base()) : base(b) {}
+};
+
+namespace std {
+	template <>
+	struct hash<entity_id> {
+		std::size_t operator()(const entity_id v) const {
+			return hash<entity_id::base>()(v);
+		}
+	};
+}

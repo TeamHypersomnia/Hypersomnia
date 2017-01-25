@@ -20,7 +20,7 @@ public:
 
 	viewing_session session;
 
-	std::vector<key_and_mouse_intent> total_collected_entropy;
+	cosmic_entropy total_collected_entropy;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 	scene_managers::networked_testbed_client scene;
 

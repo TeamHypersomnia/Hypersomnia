@@ -39,6 +39,26 @@ item_transfer_result query_containment_result(
 	bool allow_replacement = true
 );
 
+enum class capability_relation {
+	ILLEGAL_BOTH_DEAD,
+	ILLEGAL_UNMATCHING,
+	LEGAL_THE_SAME,
+	LEGAL_PICKUP,
+	LEGAL_DROP
+};
+
+struct capability_comparison {
+	capability_relation relation_type;
+	const_entity_handle authorized_capability;
+
+	bool is_legal() const;
+	bool is_authorized(const const_entity_handle) const;
+};
+
+capability_comparison match_transfer_capabilities(
+	const_item_slot_transfer_request
+);
+
 item_transfer_result query_transfer_result(const_item_slot_transfer_request);
 slot_function get_slot_with_compatible_category(const_entity_handle item, const_entity_handle container);
 

@@ -18,27 +18,14 @@ struct basic_cosmic_entropy {
 	std::map<key, std::vector<key_and_mouse_intent>> entropy_per_entity;
 	std::vector<item_slot_transfer_request_data> transfer_requests;
 	
-	size_t length() const {
-		size_t total = 0;
+	void override_transfers_leaving_other_entities(
+		const cosmos&,
+		std::vector<item_slot_transfer_request_data> new_transfers
+	);
 
-		for (const auto& ent : entropy_per_entity) {
-			total += ent.second.size();
-		}
+	size_t length() const;
 
-		total += transfer_requests.size();
-
-		return total;
-	}
-
-	basic_cosmic_entropy& operator+=(const basic_cosmic_entropy& b) {
-		for (const auto& new_entropy : b.entropy_per_entity) {
-			concatenate(entropy_per_entity[new_entropy.first], new_entropy.second);
-		}
-
-		concatenate(transfer_requests, b.transfer_requests);
-
-		return *this;
-	}
+	basic_cosmic_entropy& operator+=(const basic_cosmic_entropy& b);
 };
 
 struct cosmic_entropy;

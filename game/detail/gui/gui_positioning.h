@@ -6,6 +6,10 @@
 struct item_button;
 struct slot_button;
 
-void initialize_slot_button_for_new_gui_owner(const inventory_slot_handle);
-void initialize_item_button_for_new_gui_owner(const entity_handle, const inventory_traversal&);
+void initialize_slot_button_for_new_character_gui_owner(const const_inventory_slot_handle);
+void initialize_item_button_for_new_character_gui_owner(
+	const const_entity_handle item,
+	const const_entity_handle owner,
+	const inventory_traversal&
+);
 

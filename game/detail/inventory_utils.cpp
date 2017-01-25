@@ -21,6 +21,58 @@
 
 #include "game/enums/entity_name.h"
 
+bool capability_comparison::is_legal() const {
+	return
+		relation_type == capability_relation::LEGAL_DROP
+		|| relation_type == capability_relation::LEGAL_PICKUP
+		|| relation_type == capability_relation::LEGAL_THE_SAME
+	;
+}
+
+bool capability_comparison::is_authorized(const const_entity_handle h) const {
+	return is_legal() && authorized_capability == h;
+}
+
+capability_comparison match_transfer_capabilities(
+	const_item_slot_transfer_request r
+) {
+	const auto& dead_entity = r.get_item().get_cosmos()[entity_id()];
+
+	const auto item_owning_capability = r.get_item().get_owning_transfer_capability();
+	const auto target_slot_owning_capability = r.get_target_slot().get_container().get_owning_transfer_capability();
+
+	if (target_slot_owning_capability.dead() && item_owning_capability.dead()) {
+		return{ capability_relation::ILLEGAL_BOTH_DEAD, dead_entity };
+	}
+
+	if (
+		item_owning_capability.alive()
+		&& target_slot_owning_capability.alive()
+		&& item_owning_capability != target_slot_owning_capability
+		) {
+		return{ capability_relation::ILLEGAL_UNMATCHING, dead_entity };
+	}
+
+	if (
+		item_owning_capability.alive()
+		&& target_slot_owning_capability.alive()
+		&& item_owning_capability == target_slot_owning_capability
+		) {
+		return{ capability_relation::LEGAL_THE_SAME, item_owning_capability };
+	}
+
+	if (target_slot_owning_capability.dead() && item_owning_capability.alive()) {
+		return{ capability_relation::LEGAL_DROP, item_owning_capability };
+	}
+
+	if (target_slot_owning_capability.alive() && item_owning_capability.dead()) {
+		return{ capability_relation::LEGAL_PICKUP, target_slot_owning_capability };
+	}
+
+	ensure(false);
+	return{ capability_relation::LEGAL_PICKUP, target_slot_owning_capability };
+}
+
 item_transfer_result query_transfer_result(const const_item_slot_transfer_request r) {
 	item_transfer_result output;
 	auto& predicted_result = output.result;
@@ -28,16 +80,16 @@ item_transfer_result query_transfer_result(const const_item_slot_transfer_reques
 
 	ensure(r.specified_quantity != 0);
 
-	const auto item_owning_capability = r.get_item().get_owning_transfer_capability();
-	const auto target_slot_owning_capability = r.get_target_slot().get_container().get_owning_transfer_capability();
+	const auto capabilities_compared = match_transfer_capabilities(r);
+	const auto result = capabilities_compared.relation_type;
 
-	const bool is_drop_request = r.get_target_slot().dead();
-
-	if (item_owning_capability.alive() && target_slot_owning_capability.alive() &&
-		item_owning_capability != target_slot_owning_capability) {
+	if (
+		result == capability_relation::ILLEGAL_UNMATCHING
+		|| result == capability_relation::ILLEGAL_BOTH_DEAD
+	) {
 		predicted_result = item_transfer_result_type::INVALID_SLOT_OR_UNOWNED_ROOT;
 	}
-	else if (is_drop_request) {
+	else if (result == capability_relation::LEGAL_DROP) {
 		output.result = item_transfer_result_type::SUCCESSFUL_DROP;
 
 		if (r.specified_quantity == -1) {
@@ -48,6 +100,8 @@ item_transfer_result query_transfer_result(const const_item_slot_transfer_reques
 		}
 	}
 	else {
+		ensure(capabilities_compared.is_legal());
+
 		output = query_containment_result(r.get_item(), r.get_target_slot(), r.specified_quantity);
 	}
 
@@ -445,8 +499,12 @@ void perform_transfer(const item_slot_transfer_request r, const logic_step step)
 		grabbed_item_part_handle.for_each_contained_item_recursive(physics_updater);
 
 		if (is_pickup_or_transfer) {
-			initialize_item_button_for_new_gui_owner(grabbed_item_part_handle, inventory_traversal());
-			grabbed_item_part_handle.for_each_contained_slot_and_item_recursive(initialize_slot_button_for_new_gui_owner, initialize_item_button_for_new_gui_owner);
+			initialize_item_button_for_new_character_gui_owner(grabbed_item_part_handle, inventory_traversal());
+			
+			grabbed_item_part_handle.for_each_contained_slot_and_item_recursive(
+				initialize_slot_button_for_new_character_gui_owner, 
+				initialize_item_button_for_new_character_gui_owner
+			);
 		}
 
 		const auto previous_capability = previous_slot.get_container().get_owning_transfer_capability();

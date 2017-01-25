@@ -27,12 +27,10 @@ void input_system::make_intent_messages(const logic_step step) {
 
 	for (const auto& per_entity : step.entropy.entropy_per_entity) {
 		for (const auto& raw : per_entity.second) {
-			if (!raw.has_event_for_gui) {
-				messages::intent_message intent;
-				intent.key_and_mouse_intent::operator=(raw);
-				intent.subject = per_entity.first;
-				step.transient.messages.post(intent);
-			}
+			messages::intent_message intent;
+			intent.key_and_mouse_intent::operator=(raw);
+			intent.subject = per_entity.first;
+			step.transient.messages.post(intent);
 		}
 	}
 }
