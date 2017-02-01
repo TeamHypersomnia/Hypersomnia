@@ -61,7 +61,7 @@ void determinism_test_setup::process(
 
 	viewing_session session;
 	session.reserve_caches_for_entities(3000);
-	session.camera.configure_size(screen_size);
+	session.set_screen_size(screen_size);
 	session.set_interpolation_enabled(false);
 	session.set_master_gain(cfg.sound_effects_volume);
 	session.configure_input();
@@ -137,8 +137,6 @@ void determinism_test_setup::process(
 				);
 			}
 
-			session.resample_state_for_audiovisuals(hypersomnias[0]);
-
 			auto& first_cosm = hypersomnias[0].reserved_memory_for_serialization;
 
 			augs::output_stream_reserver first_cosm_reserver;
@@ -174,6 +172,16 @@ void determinism_test_setup::process(
 
 		logged += typesafe_sprintf("Currently viewn cosmos: %x (F3 to switch)\n", currently_viewn_cosmos);
 
+		const auto all_visible = session.get_visible_entities(hypersomnias[currently_viewn_cosmos]);
+		const auto vdt = session.frame_timer.extract_variable_delta(hypersomnias[currently_viewn_cosmos].get_fixed_delta(), timer);
+
+		session.advance_audiovisual_systems(
+			hypersomnias[currently_viewn_cosmos],
+			testbeds[currently_viewn_cosmos].get_selected_character(),
+			all_visible,
+			vdt
+		);
+
 		auto& renderer = augs::renderer::get_current();
 		renderer.clear_current_fbo();
 
@@ -181,8 +189,9 @@ void determinism_test_setup::process(
 			cfg,
 			renderer, 
 			hypersomnias[currently_viewn_cosmos], 
-			testbeds[currently_viewn_cosmos].get_selected_character(), 
-			session.frame_timer.extract_variable_delta(hypersomnias[currently_viewn_cosmos].get_fixed_delta(), timer)
+			testbeds[currently_viewn_cosmos].get_selected_character(),
+			all_visible,
+			timer.fraction_of_step_until_next_step(hypersomnias[currently_viewn_cosmos].get_fixed_delta())
 		);
 	
 		window.swap_buffers();

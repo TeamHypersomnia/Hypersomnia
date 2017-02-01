@@ -100,49 +100,6 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 	}
 }
 
-void item_system::handle_holster_item_intents(const logic_step step) {
-	auto& cosmos = step.cosm;
-	const auto& delta = step.get_delta();
-	const auto& requests = step.transient.messages.get_queue<messages::intent_message>();
-
-	for (const auto& r : requests) {
-		if (r.is_pressed &&
-			(r.intent == intent_type::HOLSTER_PRIMARY_ITEM
-				|| r.intent == intent_type::HOLSTER_SECONDARY_ITEM)
-			) {
-			const auto subject = cosmos[r.subject];
-
-			if (subject.has<components::gui_element>() && subject.find<components::item_slot_transfers>()) {
-				const auto hand_type = subject.map_primary_action_to_secondary_hand_if_primary_empty(intent_type::HOLSTER_SECONDARY_ITEM == r.intent).get_id().type;
-
-				auto new_setup = components::gui_element::get_actual_selection_setup(subject);
-
-				if (hand_type == slot_function::PRIMARY_HAND) {
-					new_setup.primary_selection.unset();
-				}
-				else if (hand_type == slot_function::SECONDARY_HAND) {
-					new_setup.secondary_selection.unset();
-				}
-
-				components::gui_element::make_and_save_hotbar_selection_setup(step, new_setup, subject);
-			}
-			else if (subject.has<components::item_slot_transfers>()) {
-				const auto hand = subject.map_primary_action_to_secondary_hand_if_primary_empty(intent_type::HOLSTER_SECONDARY_ITEM == r.intent);
-				const auto item_inside = hand.get_item_if_any();
-
-				if (item_inside.alive()) {
-					const auto holstering_slot = subject.determine_hand_holstering_slot_for(item_inside);
-
-					if (holstering_slot.alive()) {
-						const item_slot_transfer_request request(item_inside, holstering_slot);
-						perform_transfer(request, step);
-					}
-				}
-			}
-		}
-	}
-}
-
 void components::item_slot_transfers::interrupt_mounting() {
 	mounting.current_item.unset();
 	mounting.intented_mounting_slot.unset();

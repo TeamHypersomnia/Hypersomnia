@@ -26,6 +26,6 @@ class simulation_broadcast {
 public:
 	unsigned state_heartbeat_interval_in_steps = 10;
 
-	void set_state_heartbeat_interval(const augs::fixed_delta&, float ms);
+	void set_state_heartbeat_interval(const augs::delta&, float ms);
 
 };

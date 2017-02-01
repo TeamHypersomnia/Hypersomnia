@@ -117,5 +117,5 @@ public:
 	void advance_visible_streams_and_all_particles(camera_cone, const cosmos&, const augs::delta dt, interpolation_system&);
 
 	void reserve_caches_for_entities(const size_t) {}
-	void resample_state_for_audiovisuals(const cosmos&);
+	void erase_caches_for_dead_entities(const cosmos&);
 };

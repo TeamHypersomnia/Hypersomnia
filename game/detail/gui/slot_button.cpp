@@ -10,6 +10,7 @@
 #include "game/detail/gui/root_of_inventory_gui.h"
 #include "game/detail/gui/character_gui.h"
 #include "game/components/item_component.h"
+#include "game/components/item_slot_transfers_component.h"
 
 #include "game/systems_audiovisual/gui_element_system.h"
 
@@ -95,7 +96,7 @@ void slot_button::draw(const viewing_game_gui_context context, const const_this_
 		draw_centered_texture(context, this_id, info, inside_mat);
 		draw_centered_texture(context, this_id, info, border_mat);
 
-		const auto space_available_text = augs::gui::text::format(to_wstring(slot_id.calculate_free_space_with_parent_containers() / long double(SPACE_ATOMS_PER_UNIT), 2, true)
+		const auto space_available_text = augs::gui::text::format(to_wstring(slot_id.calculate_real_free_space() / long double(SPACE_ATOMS_PER_UNIT), 2, true)
 			, augs::gui::text::style(assets::font_id::GUI_FONT, border_col));
 
 		augs::gui::text_drawer space_caption;
@@ -152,10 +153,19 @@ void slot_button::update_rc(const game_gui_context context, const this_in_contai
 		}
 	}
 
-	this_id->slot_relative_pos = griddify(this_id->slot_relative_pos);
 	this_id->user_drag_offset = griddify(this_id->user_drag_offset);
+	
+	vec2 inventory_root_offset;
 
-	vec2i absolute_pos = this_id->slot_relative_pos + this_id->user_drag_offset;
+	if (slot_id.get_container().has<components::item_slot_transfers>()) {
+		inventory_root_offset = context.get_character_gui().get_screen_size();
+		inventory_root_offset.x -= 250;
+		inventory_root_offset.y -= 200;
+	}
+
+	const ltrb standard_relative_pos = character_gui::get_rectangle_for_slot_function(this_id.get_location().slot_id.type);
+
+	vec2i absolute_pos = griddify(standard_relative_pos.get_position()) + this_id->user_drag_offset + inventory_root_offset;
 
 	if (context.get_rect_world().is_currently_dragging(this_id)) {
 		absolute_pos += griddify(context.get_rect_world().current_drag_amount);

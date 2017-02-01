@@ -32,7 +32,7 @@ components::transform sum_attachment_offsets(const cosmos&, const inventory_item
 
 unsigned calculate_space_occupied_with_children(const_entity_handle item);
 
-item_transfer_result query_containment_result(
+containment_result query_containment_result(
 	const const_entity_handle item, 
 	const const_inventory_slot_handle target_slot, 
 	int specified_quantity = -1,
@@ -40,11 +40,11 @@ item_transfer_result query_containment_result(
 );
 
 enum class capability_relation {
-	ILLEGAL_BOTH_DEAD,
-	ILLEGAL_UNMATCHING,
-	LEGAL_THE_SAME,
-	LEGAL_PICKUP,
-	LEGAL_DROP
+	BOTH_DEAD,
+	UNMATCHING,
+	THE_SAME,
+	PICKUP,
+	DROP
 };
 
 struct capability_comparison {

@@ -9,7 +9,7 @@ void world_camera::configure_size(const vec2 size) {
 	camera.visible_world_area = size;
 }
 
-void world_camera::tick(const interpolation_system& interp, const augs::variable_delta dt, const const_entity_handle entity_to_chase) {
+void world_camera::tick(const interpolation_system& interp, const augs::delta dt, const const_entity_handle entity_to_chase) {
 	const auto& cosm = entity_to_chase.get_cosmos();
 
 	/* we obtain transform as a copy because we'll be now offsetting it by crosshair position */
@@ -85,16 +85,19 @@ void world_camera::tick(const interpolation_system& interp, const augs::variable
 				player_position_at_previous_step = player_pos;
 			}
 
-			target_value = (player_pos - player_position_previously_seen) * dt.get_fixed().in_milliseconds();
+			target_value = (player_pos - player_position_previously_seen) * cosm.get_fixed_delta().in_milliseconds();
 
-			if (target_value.length() < smoothing_player_pos.value.length())
+			if (target_value.length() < smoothing_player_pos.value.length()) {
 				// braking
 				smoothing_player_pos.averages_per_sec = 3.5;
-			else
+			}
+			else {
 				smoothing_player_pos.averages_per_sec = 1.5;
+			}
 
-			if (target_value.length() > 50)
+			if (target_value.length() > 50) {
 				target_value.set_length(50);
+			}
 
 			// LOG("%x, %x, %x", *(vec2i*)&player_pos, *(vec2i*)&player_position_at_previous_step, *(vec2i*)&target_value);
 		}
@@ -108,10 +111,12 @@ void world_camera::tick(const interpolation_system& interp, const augs::variable
 		smoothing_player_pos.tick(dt.in_seconds());
 	}
 
-	if (enable_smoothing)
+	if (enable_smoothing) {
 		smoothed_camera.transform.pos = vec2i(smoothed_camera.transform.pos + smoothing_player_pos.value);
-	else
+	}
+	else {
 		smoothed_camera.transform.pos = vec2i(smoothed_camera.transform.pos);
+	}
 
 	smoothed_camera.visible_world_area = vec2i(smoothed_camera.visible_world_area);
 

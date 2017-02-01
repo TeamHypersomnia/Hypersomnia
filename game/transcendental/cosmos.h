@@ -73,7 +73,7 @@ public:
 		class metadata {
 			friend class cosmos;
 
-			augs::fixed_delta delta;
+			augs::delta delta;
 			unsigned total_steps_passed = 0;
 
 #if COSMOS_TRACKS_GUIDS
@@ -175,8 +175,9 @@ public:
 
 	augs::stepped_timestamp get_timestamp() const;
 
-	const augs::fixed_delta& get_fixed_delta() const;
-	void set_fixed_delta(const augs::fixed_delta&);
+	const augs::delta& get_fixed_delta() const;
+	void set_fixed_delta(const augs::delta&);
+	void set_fixed_delta(const unsigned steps_per_second);
 
 	/* saving procedure is not const due to possible resubstantiation of the universe */
 	void save_to_file(const std::string&);

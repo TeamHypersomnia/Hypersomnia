@@ -62,8 +62,8 @@ struct cosmic_entropy : basic_cosmic_entropy<entity_id> {
 };
 
 namespace augs {
-	template<class A>
-	auto read_object(A& ar, guid_mapped_entropy& storage) {
+	template<class A, class K>
+	auto read_object(A& ar, basic_cosmic_entropy<K>& storage) {
 		unsigned char num_entropied_entities;
 
 		if (!augs::read_object(ar, num_entropied_entities)) {
@@ -71,7 +71,7 @@ namespace augs {
 		}
 		
 		while (num_entropied_entities--) {
-			unsigned guid;
+			K guid;
 			
 			if (!augs::read_object(ar, guid)) {
 				return false;
@@ -93,8 +93,8 @@ namespace augs {
 		return true;
 	}
 
-	template<class A>
-	void write_object(A& ar, const guid_mapped_entropy& storage) {
+	template<class A, class K>
+	void write_object(A& ar, const basic_cosmic_entropy<K>& storage) {
 		ensure(storage.entropy_per_entity.size() < std::numeric_limits<unsigned char>::max());
 
 		const auto num_entropied_entities = static_cast<unsigned char>(storage.entropy_per_entity.size());
@@ -106,5 +106,25 @@ namespace augs {
 		}
 
 		augs::write_vector_of_objects(ar, storage.transfer_requests, unsigned short());
+	}
+
+	template<class A>
+	void write_object(A& ar, const guid_mapped_entropy& storage) {
+		return write_object(ar, static_cast<const basic_cosmic_entropy<unsigned>&>(storage));
+	}
+
+	template<class A>
+	bool read_object(A& ar, guid_mapped_entropy& storage) {
+		return read_object(ar, static_cast<basic_cosmic_entropy<unsigned>&>(storage));
+	}
+
+	template<class A>
+	void write_object(A& ar, const cosmic_entropy& storage) {
+		return write_object(ar, static_cast<const basic_cosmic_entropy<entity_id>&>(storage));
+	}
+
+	template<class A>
+	bool read_object(A& ar, cosmic_entropy& storage) {
+		return read_object(ar, static_cast<basic_cosmic_entropy<entity_id>&>(storage));
 	}
 }

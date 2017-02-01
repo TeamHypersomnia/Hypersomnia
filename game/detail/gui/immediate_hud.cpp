@@ -162,14 +162,14 @@ augs::vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_i
 							charges += count_charges_in_deposit(mag);
 
 							total_space_available += ammo_depo->space_available;
-							total_actual_free_space += ammo_depo.calculate_free_space_with_children();
+							total_actual_free_space += ammo_depo.calculate_local_free_space();
 						}
 
 						if (chamber_slot.alive()) {
 							charges += count_charges_inside(chamber_slot);
 
 							total_space_available += chamber_slot->space_available;
-							total_actual_free_space += chamber_slot.calculate_free_space_with_children();
+							total_actual_free_space += chamber_slot.calculate_local_free_space();
 						}
 
 						if (total_space_available > 0) {
@@ -237,7 +237,6 @@ augs::vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_i
 
 void immediate_hud::acquire_game_events(const const_logic_step step) {
 	const auto& cosmos = step.cosm;
-	const auto& delta = step.get_delta();
 	const auto& healths = step.transient.messages.get_queue<messages::health_event>();
 	const auto current_time = cosmos.get_total_time_passed_in_seconds();
 

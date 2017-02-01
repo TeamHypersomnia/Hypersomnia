@@ -37,7 +37,11 @@ public:
 
 private:
 	template <class S, class I>
-	void for_each_contained_slot_and_item_recursive(S slot_callback, I item_callback, inventory_traversal& trav) const {
+	void for_each_contained_slot_and_item_recursive(
+		S slot_callback, 
+		I item_callback, 
+		inventory_traversal& trav
+	) const {
 		const auto this_item_handle = *static_cast<const entity_handle_type*>(this);
 		maybe_const_ref_t<is_const, cosmos> cosm = this_item_handle.get_cosmos();
 
@@ -73,12 +77,20 @@ private:
 public:
 
 	template <class S, class I>
-	void for_each_contained_slot_and_item_recursive(S slot_callback, I item_callback) const {
+	void for_each_contained_slot_and_item_recursive(
+		S slot_callback, 
+		I item_callback
+	) const {
 		const auto this_item_handle = *static_cast<const entity_handle_type*>(this);
 
 		inventory_traversal trav;
 		trav.current_address.root_container = this_item_handle.get_id();
-		for_each_contained_slot_and_item_recursive(slot_callback, item_callback, trav);
+		
+		for_each_contained_slot_and_item_recursive(
+			slot_callback, 
+			item_callback, 
+			trav
+		);
 	}
 
 	template <class F>

@@ -69,7 +69,15 @@ namespace prefabs {
 	entity_handle create_sample_backpack(cosmos&, vec2 pos);
 
 	entity_handle create_character_crosshair(cosmos&, const vec2i screen_size);
-	entity_handle create_character(cosmos&, const components::transform pos, const vec2i screen_size, const std::string name = "character_unnamed", const assets::animation_response_id torso_set = assets::animation_response_id::TORSO_SET);
+	
+	entity_handle create_character(
+		cosmos&, 
+		const components::transform pos, 
+		const vec2i screen_size, 
+		const std::string name = "character_unnamed", 
+		const assets::animation_response_id torso_set = assets::animation_response_id::TORSO_SET
+	);
+	
 	entity_handle create_crate(cosmos&, const components::transform pos, const vec2 size = vec2());
 	entity_handle create_brick_wall(cosmos&, const components::transform pos, const vec2 size = vec2());
 

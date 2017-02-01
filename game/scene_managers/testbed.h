@@ -7,7 +7,7 @@
 #include "augs/misc/constant_size_vector.h"
 #include "game/container_sizes.h"
 
-struct cosmic_entropy;
+#include "game/transcendental/cosmic_entropy.h"
 #include "game/transcendental/step_declaration.h"
 class cosmos;
 class world_camera;

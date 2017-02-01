@@ -19,12 +19,16 @@ void interpolation_system::reserve_caches_for_entities(const size_t n) {
 	per_entity_cache.resize(n);
 }
 
-void interpolation_system::integrate_interpolated_transforms(const cosmos& cosm, const augs::delta variable_delta, const augs::delta fixed_delta_for_slowdowns) {
+void interpolation_system::integrate_interpolated_transforms(
+	const cosmos& cosm, 
+	const augs::delta delta, 
+	const augs::delta fixed_delta_for_slowdowns
+) {
 	if (!enabled) {
 		return;
 	}
 	
-	const auto seconds = variable_delta.in_seconds();
+	const auto seconds = delta.in_seconds();
 	const float slowdown_multipliers_decrease = seconds / fixed_delta_for_slowdowns.in_seconds();
 
 	for (const auto e : cosm.get(processing_subjects::WITH_INTERPOLATION)) {

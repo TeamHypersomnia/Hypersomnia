@@ -37,19 +37,6 @@ public:
 
 	void unset();
 
-	template <class F>
-	void for_each_descendant(F callback) const {
-		for (const auto& handle : get_items_inside()) {
-			callback(handle);
-
-			const auto* container = handle.find<components::container>();
-
-			if (container)
-				for (const auto& s : container->slots)
-					handle[s.first].for_each_descendant(callback);
-		}
-	}
-
 	slot_reference get() const;
 	slot_reference operator*() const;
 	slot_pointer operator->() const;
@@ -72,11 +59,11 @@ public:
 	bool is_input_enabling_slot() const;
 
 	float calculate_density_multiplier_due_to_being_attached() const;
-	unsigned calculate_free_space_with_children() const;
+	unsigned calculate_local_free_space() const;
 
 	bool should_item_inside_keep_physical_body(const entity_id until_parent = entity_id()) const;
 
-	unsigned calculate_free_space_with_parent_containers() const;
+	unsigned calculate_real_free_space() const;
 
 	inventory_slot_id get_id() const;
 	operator inventory_slot_id() const;

@@ -45,7 +45,10 @@ using namespace augs::window::event::keys;
 using namespace augs::gui::text;
 using namespace augs::gui;
 
-void menu_setup::process(const config_lua_table& cfg, game_window& window) {
+void menu_setup::process(
+	const config_lua_table& cfg, 
+	game_window& window
+) {
 	const vec2i screen_size = vec2i(window.get_screen_size());
 
 	cosmos intro_scene(3000);
@@ -442,7 +445,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 
 	viewing_session session;
 	session.reserve_caches_for_entities(3000);
-	session.camera.configure_size(screen_size);
+	session.set_screen_size(screen_size);
 	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
 	session.show_profile_details = false;
 	session.camera.averages_per_sec /= 2;
@@ -484,24 +487,20 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 
 		intro_scene.advance_deterministic_schemata(entropy, [](auto) {},
 			[this, &session](const const_logic_step step) {
-			session.acquire_game_events_for_hud(step);
-		}
+				session.standard_audiovisual_post_solve(step);
+			}
 		);
-
-		session.resample_state_for_audiovisuals(intro_scene);
 	}
 
 	while (!should_quit) {
-		augs::machine_entropy new_entropy;
+		augs::machine_entropy new_machine_entropy;
 
 		{
 			session.local_entropy_profiler.new_measurement();
-			new_entropy.local = window.collect_entropy(!cfg.debug_disable_cursor_clipping);
+			new_machine_entropy.local = window.collect_entropy(!cfg.debug_disable_cursor_clipping);
 			session.local_entropy_profiler.end_measurement();
 			
-			session.control(new_entropy);
-
-			process_exit_key(new_entropy.local);
+			process_exit_key(new_machine_entropy.local);
 		}
 
 		auto steps = timer.count_logic_steps_to_perform(intro_scene.get_fixed_delta());
@@ -513,27 +512,43 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 
 			intro_scene.advance_deterministic_schemata(entropy, [](auto){},
 				[this, &session](const const_logic_step step){
-					session.acquire_game_events_for_hud(step);
+					session.standard_audiovisual_post_solve(step);
 				}
 			);
-
-			session.resample_state_for_audiovisuals(intro_scene);
 		}
 
-		const auto vdt = session.frame_timer.extract_variable_delta(intro_scene.get_fixed_delta(), timer);
-		
 		session.set_master_gain(cfg.sound_effects_volume * 0.3f * gain_fade_multiplier);
 		menu_theme_source.set_gain(cfg.music_volume * gain_fade_multiplier);
 
-		session.advance_audiovisual_systems(intro_scene, testbed.get_selected_character(), vdt);
+		const auto all_visible = session.get_visible_entities(intro_scene);
+
+		const auto vdt = session.frame_timer.extract_variable_delta(
+			intro_scene.get_fixed_delta(), 
+			timer
+		);
+
+		session.advance_audiovisual_systems(
+			intro_scene, 
+			testbed.get_selected_character(), 
+			all_visible,
+			vdt
+		);
 		
 		auto& renderer = augs::renderer::get_current();
 		renderer.clear_current_fbo();
 
 		const auto current_time_seconds = intro_scene.get_total_time_passed_in_seconds();
 
-		session.view(renderer, intro_scene, testbed.get_selected_character(), vdt, 
-			augs::gui::text::format(typesafe_sprintf(L"Current time: %x", current_time_seconds), textes_style));
+		session.view(
+			cfg,
+			renderer, 
+			intro_scene,
+			testbed.get_selected_character(),
+			all_visible,
+			timer.fraction_of_step_until_next_step(intro_scene.get_fixed_delta()), 
+			augs::gui::text::format(typesafe_sprintf(L"Current time: %x", current_time_seconds), textes_style)
+		);
+		
 		session.draw_color_overlay(renderer, fade_overlay_color);
 
 		augs::draw_rect(renderer.get_triangle_buffer(),
@@ -586,7 +601,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 			menu_ui_rect_world.build_tree_data_into_context(menu_ui_context, menu_ui_root_id);
 
 			if (draw_cursor) {
-				for (const auto& ch : new_entropy.local) {
+				for (const auto& ch : new_machine_entropy.local) {
 					menu_ui_rect_world.consume_raw_input_and_generate_gui_events(menu_ui_context, menu_ui_root_id, ch, gui_entropies);
 				}
 

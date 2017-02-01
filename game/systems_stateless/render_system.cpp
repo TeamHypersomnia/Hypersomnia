@@ -24,7 +24,9 @@ bool render_system::render_order_compare(const const_entity_handle a, const cons
 	return (layer_a == layer_b && layer_a == render_layer::CAR_INTERIOR) ? are_connected_by_friction(a, b) : layer_a < layer_b;
 }
 
-std::array<std::vector<const_entity_handle>, render_layer::COUNT> render_system::get_visible_per_layer(const std::vector<const_entity_handle>& entities) const {
+auto render_system::get_visible_per_layer(
+	const std::vector<const_entity_handle>& entities
+) const -> std::array<std::vector<const_entity_handle>, render_layer::COUNT> {
 	std::array<std::vector<entity_id>, render_layer::COUNT> layers;
 	std::array<std::vector<const_entity_handle>, render_layer::COUNT> output;
 
@@ -43,7 +45,7 @@ std::array<std::vector<const_entity_handle>, render_layer::COUNT> render_system:
 	auto& car_interior_layer = layers[render_layer::CAR_INTERIOR];
 
 	if (car_interior_layer.size() > 1) {
-		std::sort(car_interior_layer.begin(), car_interior_layer.end(), [&cosmos](const entity_id b, const entity_id a) {
+		sort_container(car_interior_layer, [&cosmos](const entity_id b, const entity_id a) {
 			return are_connected_by_friction(cosmos[a], cosmos[b]);
 		});
 	}
@@ -72,7 +74,15 @@ void render_system::draw_entities(
 				const auto& renderable_transform = e.viewing_transform(interp, true);
 				const auto& renderable = e.get<renderable_type>();
 
-				render_system().draw_renderable(output, global_time_seconds, renderable, renderable_transform, render, in_camera, renderable_drawing_mode);
+				render_system().draw_renderable(
+					output, 
+					global_time_seconds, 
+					renderable, 
+					renderable_transform, 
+					render, 
+					in_camera, 
+					renderable_drawing_mode
+				);
 			}
 		});
 	}

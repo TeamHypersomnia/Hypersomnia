@@ -51,63 +51,67 @@ public:
 	bool show_profile_details = true;
 	bool gui_look_enabled = false;
 
-	void spread_past_infection(const const_logic_step);
-	void acquire_game_events_for_hud(const const_logic_step);
-	void set_interpolation_enabled(const bool);
-	void set_master_gain(const float);
-
 	augs::variable_delta_timer frame_timer;
-	augs::measurements fps_profiler = augs::measurements(L"FPS");
-	augs::measurements frame_profiler = augs::measurements(L"Frame");
-	augs::measurements local_entropy_profiler = augs::measurements(L"Acquiring local entropy");
-	augs::measurements unpack_local_steps_profiler = augs::measurements(L"Unpacking local steps");
-	augs::measurements unpack_remote_steps_profiler = augs::measurements(L"Unpacking remote steps");
-	augs::measurements sending_commands_and_predict_profiler = augs::measurements(L"Sending and predicting commands");
-	augs::measurements sending_packets_profiler = augs::measurements(L"Sending packets");
-	augs::measurements remote_entropy_profiler = augs::measurements(L"Acquiring remote entropy");
-	augs::measurements triangles = augs::measurements(L"Triangles", false);
+	mutable augs::measurements fps_profiler = augs::measurements(L"FPS");
+	mutable augs::measurements frame_profiler = augs::measurements(L"Frame");
+	mutable augs::measurements local_entropy_profiler = augs::measurements(L"Acquiring local entropy");
+	mutable augs::measurements unpack_local_steps_profiler = augs::measurements(L"Unpacking local steps");
+	mutable augs::measurements unpack_remote_steps_profiler = augs::measurements(L"Unpacking remote steps");
+	mutable augs::measurements sending_commands_and_predict_profiler = augs::measurements(L"Sending and predicting commands");
+	mutable augs::measurements sending_packets_profiler = augs::measurements(L"Sending packets");
+	mutable augs::measurements remote_entropy_profiler = augs::measurements(L"Acquiring remote entropy");
+	mutable augs::measurements triangles = augs::measurements(L"Triangles", false);
 
 	viewing_session();
 
+	void set_screen_size(const vec2i);
+
+	void set_interpolation_enabled(const bool);
+	void set_master_gain(const float);
+
 	void configure_input();
-
-	std::wstring summary() const;
-	
 	void reserve_caches_for_entities(const size_t);
-
-	void advance_audiovisual_systems(
-		const cosmos& cosm, 
-		const entity_id viewed_character,
-		const augs::variable_delta dt);
-	
-	void resample_state_for_audiovisuals(const cosmos&);
-
 	void switch_between_gui_and_back(const augs::machine_entropy::local_type&);
-
+	
 	void control_gui_and_remove_fetched_events(
 		const const_entity_handle root,
 		augs::machine_entropy::local_type&
 	);
 
 	void control_and_remove_fetched_intents(std::vector<key_and_mouse_intent>&);
+	void standard_audiovisual_post_solve(const const_logic_step);
+	void spread_past_infection(const const_logic_step);
+
+	void advance_audiovisual_systems(
+		const cosmos& cosm, 
+		const entity_id viewed_character,
+		const visible_entities&,
+		const augs::delta dt
+	);
 	
 	void view(
 		const config_lua_table& config,
 		augs::renderer& renderer,
 		const cosmos& cosmos,
 		const entity_id viewed_character,
-		const augs::variable_delta& dt,
+		const visible_entities&,
+		const float interpolation_ratio,
 		const augs::gui::text::fstr& custom_log = augs::gui::text::fstr()
-	);
+	) const;
 
 	void view(
 		const config_lua_table& config,
 		augs::renderer& renderer,
 		const cosmos& cosmos,
 		const entity_id viewed_character,
-		const augs::variable_delta& dt,
+		const visible_entities&,
+		const float interpolation_ratio,
 		const augs::network::client& details
-	);
+	) const;
+
+	visible_entities get_visible_entities(const cosmos&);
+	
+	std::wstring summary() const;
 
 	void draw_color_overlay(
 		augs::renderer& renderer, 

@@ -24,6 +24,7 @@ namespace messages {
 	struct visibility_information_response;
 	struct line_of_sight_request;
 	struct line_of_sight_response;
+	struct item_picked_up_message;
 }
 
 struct item_slot_transfer_request_data;
@@ -48,5 +49,6 @@ typedef augs::storage_for_message_queues <
 	messages::visibility_information_response,
 	messages::line_of_sight_request,
 	messages::line_of_sight_response,
+	messages::item_picked_up_message,
 	item_slot_transfer_request_data
 > storage_for_all_message_queues;

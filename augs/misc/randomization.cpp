@@ -1,4 +1,5 @@
 #include "randomization.h"
+#include "augs/templates/container_templates.h"
 #include <algorithm>
 
 randomization::randomization(size_t seed) {
@@ -49,7 +50,7 @@ std::vector<float> randomization::make_random_intervals(const size_t n, const fl
 		result[i] = std::max(0.f, result[i]);
 	}
 
-	std::sort(result.begin(), result.end());
+	sort_container(result);
 
 	return std::move(result);
 }

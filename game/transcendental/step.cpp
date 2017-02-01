@@ -5,19 +5,19 @@
 #include "game/transcendental/types_specification/all_messages_includes.h"
 #include "game/transcendental/data_living_one_step.h"
 
-augs::variable_delta viewing_step::get_delta() const {
-	return delta;
+double viewing_step::get_interpolated_total_time_passed_in_seconds() const {
+	return cosm.get_total_time_passed_in_seconds() + get_interpolation_ratio() * cosm.get_fixed_delta().in_seconds();
 }
 
-double viewing_step::get_interpolated_total_time_passed_in_seconds() const {
-	return cosm.get_total_time_passed_in_seconds() + get_delta().view_interpolation_ratio() * get_delta().in_seconds();
+float viewing_step::get_interpolation_ratio() const {
+	return interpolation_ratio;
 }
 
 viewing_step::viewing_step(
 	const config_lua_table& config,
 	const cosmos& cosm,
-	viewing_session& session,
-	const augs::variable_delta& delta,
+	const viewing_session& session,
+	const float interpolation_ratio,
 	augs::renderer& renderer, 
 	const camera_cone camera,
 	const entity_id viewed_character,
@@ -26,7 +26,7 @@ viewing_step::viewing_step(
 	const_cosmic_step(cosm),
 	config(config),
 	session(session),
-	delta(delta), 
+	interpolation_ratio(interpolation_ratio),
 	renderer(renderer), 
 	camera(camera),
 	viewed_character(viewed_character),

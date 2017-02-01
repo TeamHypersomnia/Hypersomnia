@@ -12,6 +12,7 @@
 #include "game/detail/gui/character_gui.h"
 #include "game/detail/entity_scripts.h"
 #include "game/messages/queue_destruction.h"
+#include "game/messages/item_picked_up_message.h"
 #include "game/transcendental/entity_handle.h"
 
 #include "augs/ensure.h"
@@ -23,9 +24,10 @@
 
 bool capability_comparison::is_legal() const {
 	return
-		relation_type == capability_relation::LEGAL_DROP
-		|| relation_type == capability_relation::LEGAL_PICKUP
-		|| relation_type == capability_relation::LEGAL_THE_SAME
+		relation_type == capability_relation::DROP
+		|| relation_type == capability_relation::PICKUP
+		|| relation_type == capability_relation::THE_SAME
+		|| relation_type == capability_relation::BOTH_DEAD
 	;
 }
 
@@ -42,7 +44,7 @@ capability_comparison match_transfer_capabilities(
 	const auto target_slot_owning_capability = r.get_target_slot().get_container().get_owning_transfer_capability();
 
 	if (target_slot_owning_capability.dead() && item_owning_capability.dead()) {
-		return{ capability_relation::ILLEGAL_BOTH_DEAD, dead_entity };
+		return{ capability_relation::BOTH_DEAD, dead_entity };
 	}
 
 	if (
@@ -50,7 +52,7 @@ capability_comparison match_transfer_capabilities(
 		&& target_slot_owning_capability.alive()
 		&& item_owning_capability != target_slot_owning_capability
 		) {
-		return{ capability_relation::ILLEGAL_UNMATCHING, dead_entity };
+		return{ capability_relation::UNMATCHING, dead_entity };
 	}
 
 	if (
@@ -58,24 +60,23 @@ capability_comparison match_transfer_capabilities(
 		&& target_slot_owning_capability.alive()
 		&& item_owning_capability == target_slot_owning_capability
 		) {
-		return{ capability_relation::LEGAL_THE_SAME, item_owning_capability };
+		return{ capability_relation::THE_SAME, item_owning_capability };
 	}
 
 	if (target_slot_owning_capability.dead() && item_owning_capability.alive()) {
-		return{ capability_relation::LEGAL_DROP, item_owning_capability };
+		return{ capability_relation::DROP, item_owning_capability };
 	}
 
 	if (target_slot_owning_capability.alive() && item_owning_capability.dead()) {
-		return{ capability_relation::LEGAL_PICKUP, target_slot_owning_capability };
+		return{ capability_relation::PICKUP, target_slot_owning_capability };
 	}
 
 	ensure(false);
-	return{ capability_relation::LEGAL_PICKUP, target_slot_owning_capability };
+	return{ capability_relation::PICKUP, target_slot_owning_capability };
 }
 
 item_transfer_result query_transfer_result(const const_item_slot_transfer_request r) {
 	item_transfer_result output;
-	auto& predicted_result = output.result;
 	const auto& item = r.get_item().get<components::item>();
 
 	ensure(r.specified_quantity != 0);
@@ -83,13 +84,10 @@ item_transfer_result query_transfer_result(const const_item_slot_transfer_reques
 	const auto capabilities_compared = match_transfer_capabilities(r);
 	const auto result = capabilities_compared.relation_type;
 
-	if (
-		result == capability_relation::ILLEGAL_UNMATCHING
-		|| result == capability_relation::ILLEGAL_BOTH_DEAD
-	) {
-		predicted_result = item_transfer_result_type::INVALID_SLOT_OR_UNOWNED_ROOT;
+	if (result == capability_relation::UNMATCHING) {
+		output.result = item_transfer_result_type::INVALID_CAPABILITIES;
 	}
-	else if (result == capability_relation::LEGAL_DROP) {
+	else if (result == capability_relation::DROP) {
 		output.result = item_transfer_result_type::SUCCESSFUL_DROP;
 
 		if (r.specified_quantity == -1) {
@@ -102,14 +100,51 @@ item_transfer_result query_transfer_result(const const_item_slot_transfer_reques
 	else {
 		ensure(capabilities_compared.is_legal());
 
-		output = query_containment_result(r.get_item(), r.get_target_slot(), r.specified_quantity);
-	}
+		const auto containment_result = query_containment_result(
+			r.get_item(), 
+			r.get_target_slot(), 
+			r.specified_quantity
+		);
 
-	if (predicted_result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
-		if (item.current_mounting == components::item::MOUNTED && !r.force_immediate_mount) {
-			predicted_result = item_transfer_result_type::UNMOUNT_BEFOREHAND;
+		output.transferred_charges = containment_result.transferred_charges;
+
+		switch (containment_result.result) {
+		case containment_result_type::INCOMPATIBLE_CATEGORIES: 
+			output.result = item_transfer_result_type::INCOMPATIBLE_CATEGORIES; 
+			break;
+
+		case containment_result_type::INSUFFICIENT_SPACE: 
+			output.result = item_transfer_result_type::INSUFFICIENT_SPACE; 
+			break;
+
+		case containment_result_type::THE_SAME_SLOT: 
+			output.result = item_transfer_result_type::THE_SAME_SLOT; 
+			break;
+
+		case containment_result_type::SUCCESSFUL_CONTAINMENT:
+			if (result == capability_relation::PICKUP) {
+				output.result = item_transfer_result_type::SUCCESSFUL_PICKUP;
+			}
+			else {
+				output.result = item_transfer_result_type::SUCCESSFUL_TRANSFER; 
+			}
+			break;
+
+		case containment_result_type::COULD_REPLACE_BUT_NO_SPACE:
+			output.result = item_transfer_result_type::COULD_REPLACE_BUT_NO_SPACE;
+			break;
+
+		default: 
+			output.result = item_transfer_result_type::INVALID_RESULT; 
+			break;
 		}
 	}
+
+	// if (predicted_result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
+	// 	if (item.current_mounting == components::item::MOUNTED && !r.force_immediate_mount) {
+	// 		predicted_result = item_transfer_result_type::UNMOUNT_BEFOREHAND;
+	// 	}
+	// }
 
 	return output;
 }
@@ -132,7 +167,7 @@ slot_function get_slot_with_compatible_category(const const_entity_handle item, 
 	return slot_function::INVALID;
 }
 
-item_transfer_result query_containment_result(
+containment_result query_containment_result(
 	const const_entity_handle item_entity,
 	const const_inventory_slot_handle target_slot,
 	int specified_quantity,
@@ -141,13 +176,20 @@ item_transfer_result query_containment_result(
 	const auto& item = item_entity.get<components::item>();
 	const auto& slot = *target_slot;
 
-	item_transfer_result output;
+	containment_result output;
 	auto& result = output.result;
 
 	if (item.current_slot == target_slot) {
-		result = item_transfer_result_type::THE_SAME_SLOT;
+		result = containment_result_type::THE_SAME_SLOT;
 	}
-	else if (slot.always_allow_exactly_one_item && slot.items_inside.size() == 1 && !can_stack_entities(target_slot.get_items_inside().at(0), item_entity)) {
+	else if (!slot.is_category_compatible_with(item_entity)) {
+		result = containment_result_type::INCOMPATIBLE_CATEGORIES;
+	}
+	else if (
+		slot.always_allow_exactly_one_item 
+		&& slot.items_inside.size() == 1 
+		&& !can_stack_entities(target_slot.get_items_inside().at(0), item_entity)
+	) {
 		//if (allow_replacement) {
 		//
 		//}
@@ -163,13 +205,10 @@ item_transfer_result query_containment_result(
 		//
 		//	if (current_slot_of_replacer.alive())
 
-		result = item_transfer_result_type::NO_SLOT_AVAILABLE;
-	}
-	else if (!slot.is_category_compatible_with(item_entity)) {
-		result = item_transfer_result_type::INCOMPATIBLE_CATEGORIES;
+		result = containment_result_type::COULD_REPLACE_BUT_NO_SPACE;
 	}
 	else {
-		const auto space_available = target_slot.calculate_free_space_with_parent_containers();
+		const auto space_available = target_slot.calculate_real_free_space();
 
 		if (space_available > 0) {
 			const bool item_indivisible = item.charges == 1 || !item.stackable;
@@ -190,10 +229,10 @@ item_transfer_result query_containment_result(
 		}
 
 		if (output.transferred_charges == 0) {
-			output.result = item_transfer_result_type::INSUFFICIENT_SPACE;
+			output.result = containment_result_type::INSUFFICIENT_SPACE;
 		}
 		else {
-			output.result = item_transfer_result_type::SUCCESSFUL_TRANSFER;
+			output.result = containment_result_type::SUCCESSFUL_CONTAINMENT;
 		}
 	}
 		
@@ -277,9 +316,7 @@ void drop_from_all_slots(const entity_handle c, const logic_step step) {
 	const auto& container = c.get<components::container>();
 
 	for (const auto& s : container.slots) {
-		const auto items_uninvalidated = s.second.items_inside;
-
-		for (const auto item : items_uninvalidated) {
+		for (const auto item : s.second.items_inside) {
 			perform_transfer({ c.get_cosmos()[item], c.get_cosmos()[inventory_slot_id()] }, step);
 		}
 	}
@@ -291,8 +328,8 @@ unsigned calculate_space_occupied_with_children(const const_entity_handle item) 
 	if (item.find<components::container>()) {
 		ensure(item.get<components::item>().charges == 1);
 
-		for (auto& slot : item.get<components::container>().slots) {
-			for (auto& entity_in_slot : slot.second.items_inside) {
+		for (const auto& slot : item.get<components::container>().slots) {
+			for (const auto entity_in_slot : slot.second.items_inside) {
 				space_occupied += calculate_space_occupied_with_children(item.get_cosmos()[entity_in_slot]);
 			}
 		}
@@ -383,159 +420,153 @@ void perform_transfer(const item_slot_transfer_request r, const logic_step step)
 
 	const auto result = query_transfer_result(r);
 
-	const bool is_pickup_or_transfer = result.result == item_transfer_result_type::SUCCESSFUL_TRANSFER;
+	ensure(is_successful(result.result));
+
+	const bool is_pickup = result.result == item_transfer_result_type::SUCCESSFUL_PICKUP;
+	const bool is_pickup_or_transfer = result.result == item_transfer_result_type::SUCCESSFUL_TRANSFER || is_pickup;
 	const bool is_drop_request = result.result == item_transfer_result_type::SUCCESSFUL_DROP;
 
-	if (result.result == item_transfer_result_type::UNMOUNT_BEFOREHAND) {
-		ensure(false);
-		ensure(previous_slot.alive());
+	//if (result.result == item_transfer_result_type::UNMOUNT_BEFOREHAND) {
+	//	ensure(false);
+	//	ensure(previous_slot.alive());
+	//
+	//	//item.request_unmount(r.get_target_slot());
+	//	//item.mark_parent_enclosing_containers_for_unmount();
+	//
+	//	return;
+	//}
+	
+	components::transform previous_container_transform;
 
-		//item.request_unmount(r.get_target_slot());
-		//item.mark_parent_enclosing_containers_for_unmount();
+	entity_id target_item_to_stack_with;
+
+	if (is_pickup_or_transfer) {
+		for (auto& i : cosmos.get_handle(r.get_target_slot())->items_inside) {
+			if (can_stack_entities(r.get_item(), cosmos[i])) {
+				target_item_to_stack_with = i;
+			}
+		}
+	}
+
+	const bool whole_item_grabbed = item.charges == result.transferred_charges;
+
+	if (previous_slot.alive()) {
+		previous_container_transform = previous_slot.get_container().logic_transform();
+
+		if (whole_item_grabbed) {
+			remove_item(previous_slot, r.get_item());
+		}
+
+		if (previous_slot.is_input_enabling_slot()) {
+			unset_input_flags_of_orphaned_entity(r.get_item());
+		}
+	}
+
+	if (cosmos[target_item_to_stack_with].alive()) {
+		if (whole_item_grabbed) {
+			step.transient.messages.post(messages::queue_destruction(r.get_item()));
+		}
+		else {
+			item.charges -= result.transferred_charges;
+		}
+
+		cosmos[target_item_to_stack_with].get<components::item>().charges += result.transferred_charges;
 
 		return;
 	}
-	else if (is_pickup_or_transfer || is_drop_request) {
-		components::transform previous_container_transform;
 
-		entity_id target_item_to_stack_with;
+	entity_id grabbed_item_part;
 
-		if (is_pickup_or_transfer) {
-			for (auto& i : cosmos.get_handle(r.get_target_slot())->items_inside) {
-				if (can_stack_entities(r.get_item(), cosmos[i])) {
-					target_item_to_stack_with = i;
-				}
-			}
-		}
+	if (whole_item_grabbed) {
+		grabbed_item_part = r.get_item();
+	}
+	else {
+		grabbed_item_part = cosmos.clone_entity(r.get_item());
+		item.charges -= result.transferred_charges;
+		cosmos[grabbed_item_part].get<components::item>().charges = result.transferred_charges;
+	}
 
-		const bool whole_item_grabbed = item.charges == result.transferred_charges;
+	const auto grabbed_item_part_handle = cosmos[grabbed_item_part];
 
-		if (previous_slot.alive()) {
-			previous_container_transform = previous_slot.get_container().logic_transform();
+	if (is_pickup_or_transfer) {
+		add_item(r.get_target_slot(), grabbed_item_part_handle);
+	}
 
-			if (whole_item_grabbed) {
-				remove_item(previous_slot, r.get_item());
-			}
+	auto physics_updater = [previous_container_transform](const entity_handle descendant, ...) {
+		const auto& cosmos = descendant.get_cosmos();
 
-			if (previous_slot.is_input_enabling_slot()) {
-				unset_input_flags_of_orphaned_entity(r.get_item());
-			}
-		}
+		const auto previous_descendant_transform = descendant.logic_transform();
 
-		if (cosmos[target_item_to_stack_with].alive()) {
-			if (whole_item_grabbed) {
-				step.transient.messages.post(messages::queue_destruction(r.get_item()));
+		const auto parent_slot = cosmos[descendant.get<components::item>().current_slot];
+		auto def = descendant.get<components::fixtures>().get_data();
+		entity_id owner_body;
+
+		if (parent_slot.alive()) {
+			def.activated = parent_slot.should_item_inside_keep_physical_body();
+			
+			if (def.activated) {
+				owner_body = parent_slot.get_root_container();
+				
+				def.offsets_for_created_shapes[colliders_offset_type::ITEM_ATTACHMENT_DISPLACEMENT]
+					= sum_attachment_offsets(cosmos, descendant.get_address_from_root());
 			}
 			else {
-				item.charges -= result.transferred_charges;
+				owner_body = descendant;
 			}
 
-			cosmos[target_item_to_stack_with].get<components::item>().charges += result.transferred_charges;
-
-			return;
-		}
-
-		entity_id grabbed_item_part;
-
-		if (whole_item_grabbed) {
-			grabbed_item_part = r.get_item();
+			def.offsets_for_created_shapes[colliders_offset_type::SPECIAL_MOVE_DISPLACEMENT].reset();
 		}
 		else {
-			grabbed_item_part = cosmos.clone_entity(r.get_item());
-			item.charges -= result.transferred_charges;
-			cosmos[grabbed_item_part].get<components::item>().charges = result.transferred_charges;
+			def.activated = true;
+			owner_body = descendant;
+			def.offsets_for_created_shapes[colliders_offset_type::ITEM_ATTACHMENT_DISPLACEMENT].reset();
+			def.offsets_for_created_shapes[colliders_offset_type::SPECIAL_MOVE_DISPLACEMENT].reset();
 		}
 
-		const auto grabbed_item_part_handle = cosmos[grabbed_item_part];
+		descendant.get<components::fixtures>() = def;
+		descendant.get<components::fixtures>().set_owner_body(owner_body);
+		
+		if (descendant.has<components::physics>()) {
+			descendant.get<components::physics>().set_transform(previous_descendant_transform);
 
-		if (is_pickup_or_transfer) {
-			add_item(r.get_target_slot(), grabbed_item_part_handle);
+			if (descendant.has<components::interpolation>()) {
+				descendant.get<components::interpolation>().place_of_birth = descendant.logic_transform();
+			}
 		}
+	};
 
-		auto physics_updater = [previous_container_transform](const entity_handle descendant, ...) {
-			const auto& cosmos = descendant.get_cosmos();
+	physics_updater(grabbed_item_part_handle);
+	grabbed_item_part_handle.for_each_contained_item_recursive(physics_updater);
 
-			const auto previous_descendant_transform = descendant.logic_transform();
-
-			const auto parent_slot = cosmos[descendant.get<components::item>().current_slot];
-			auto def = descendant.get<components::fixtures>().get_data();
-			entity_id owner_body;
-
-			if (parent_slot.alive()) {
-				def.activated = parent_slot.should_item_inside_keep_physical_body();
-				
-				if (def.activated) {
-					owner_body = parent_slot.get_root_container();
-					
-					def.offsets_for_created_shapes[colliders_offset_type::ITEM_ATTACHMENT_DISPLACEMENT]
-						= sum_attachment_offsets(cosmos, descendant.get_address_from_root());
-				}
-				else {
-					owner_body = descendant;
-				}
-
-				def.offsets_for_created_shapes[colliders_offset_type::SPECIAL_MOVE_DISPLACEMENT].reset();
-			}
-			else {
-				def.activated = true;
-				owner_body = descendant;
-				def.offsets_for_created_shapes[colliders_offset_type::ITEM_ATTACHMENT_DISPLACEMENT].reset();
-				def.offsets_for_created_shapes[colliders_offset_type::SPECIAL_MOVE_DISPLACEMENT].reset();
-			}
-
-			descendant.get<components::fixtures>() = def;
-			descendant.get<components::fixtures>().set_owner_body(owner_body);
-			
-			if (descendant.has<components::physics>()) {
-				descendant.get<components::physics>().set_transform(previous_descendant_transform);
-
-				if (descendant.has<components::interpolation>()) {
-					descendant.get<components::interpolation>().place_of_birth = descendant.logic_transform();
-				}
-			}
-		};
-
-		physics_updater(grabbed_item_part_handle);
-		grabbed_item_part_handle.for_each_contained_item_recursive(physics_updater);
-
-		if (is_pickup_or_transfer) {
-			initialize_item_button_for_new_character_gui_owner(grabbed_item_part_handle, inventory_traversal());
-			
-			grabbed_item_part_handle.for_each_contained_slot_and_item_recursive(
-				initialize_slot_button_for_new_character_gui_owner, 
-				initialize_item_button_for_new_character_gui_owner
-			);
-		}
-
-		const auto previous_capability = previous_slot.get_container().get_owning_transfer_capability();
+	if (is_pickup) {
 		const auto target_capability = r.get_target_slot().get_container().get_owning_transfer_capability();
 
-		if (target_capability.alive() && target_capability != previous_capability) {
-			if (target_capability.has<components::gui_element>()) {
-				components::gui_element::assign_item_to_first_free_hotbar_button(target_capability, grabbed_item_part_handle);
+		messages::item_picked_up_message msg;
+		msg.subject = target_capability;
+		msg.item = grabbed_item_part_handle;
+
+		step.transient.messages.post(msg);
+	}
+	
+	auto& grabbed_item = grabbed_item_part_handle.get<components::item>();
+
+	if (is_pickup_or_transfer) {
+		if (r.get_target_slot()->items_need_mounting) {
+			grabbed_item.intended_mounting = components::item::MOUNTED;
+
+			if (r.force_immediate_mount) {
+				grabbed_item.current_mounting = components::item::MOUNTED;
 			}
 		}
-		
-		auto& grabbed_item = grabbed_item_part_handle.get<components::item>();
+	}
 
-		if (is_pickup_or_transfer) {
-			if (r.get_target_slot()->items_need_mounting) {
-				grabbed_item.intended_mounting = components::item::MOUNTED;
+	if (is_drop_request) {
+		const auto force = vec2().set_from_degrees(previous_container_transform.rotation).set_length(120);
+		const auto offset = vec2().random_on_circle(20, cosmos.get_rng_for(r.get_item()));
 
-				if (r.force_immediate_mount) {
-					grabbed_item.current_mounting = components::item::MOUNTED;
-				}
-			}
-		}
-
-		if (is_drop_request) {
-			const auto force = vec2().set_from_degrees(previous_container_transform.rotation).set_length(120);
-			const auto offset = vec2().random_on_circle(20, cosmos.get_rng_for(r.get_item()));
-
-			auto& physics = grabbed_item_part_handle.get<components::physics>();
-			physics.apply_force(force, offset, true);
-			auto& special_physics = grabbed_item_part_handle.get<components::special_physics>();
-			special_physics.since_dropped.set(200, cosmos.get_timestamp());
-		}
+		auto& physics = grabbed_item_part_handle.get<components::physics>();
+		physics.apply_force(force, offset, true);
+		auto& special_physics = grabbed_item_part_handle.get<components::special_physics>();
+		special_physics.since_dropped.set(200, cosmos.get_timestamp());
 	}
 }

@@ -220,12 +220,16 @@ augs::stepped_timestamp cosmos::get_timestamp() const {
 	return result;
 }
 
-const augs::fixed_delta& cosmos::get_fixed_delta() const {
+const augs::delta& cosmos::get_fixed_delta() const {
 	return significant.meta.delta;
 }
 
-void cosmos::set_fixed_delta(const augs::fixed_delta& dt) {
+void cosmos::set_fixed_delta(const augs::delta& dt) {
 	significant.meta.delta = dt;
+}
+
+void cosmos::set_fixed_delta(const unsigned steps_per_second) {
+	significant.meta.delta = static_cast<float>(1000.f / steps_per_second);
 }
 
 entity_handle cosmos::allocate_new_entity() {
@@ -396,7 +400,6 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 
 //	item_system().translate_gui_intents_to_transfer_requests(step);
 	item_system().handle_trigger_confirmations_as_pick_requests(step);
-	item_system().handle_holster_item_intents(step);
 	item_system().handle_throw_item_intents(step);
 
 	damage_system().destroy_outdated_bullets(step);

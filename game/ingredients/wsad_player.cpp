@@ -225,7 +225,13 @@ namespace ingredients {
 }
 
 namespace prefabs {
-	entity_handle create_character(cosmos& world, const components::transform spawn_transform, const vec2i screen_size, const std::string name, const assets::animation_response_id torso_set) {
+	entity_handle create_character(
+		cosmos& world, 
+		const components::transform spawn_transform, 
+		const vec2i screen_size, 
+		const std::string name, 
+		const assets::animation_response_id torso_set
+	) {
 		const auto character = world.create_entity(name);
 
 		name_entity(character, entity_name::PERSON);
@@ -236,9 +242,6 @@ namespace prefabs {
 
 		ingredients::wsad_character(character, crosshair, torso_set);
 		
-		auto& element = character += components::gui_element();
-		element.rect_world.last_state.screen_size = screen_size;
-
 		ingredients::wsad_character_physics(character);
 
 		character.get<components::physics>().set_transform(spawn_transform);

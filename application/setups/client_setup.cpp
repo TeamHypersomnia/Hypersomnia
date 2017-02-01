@@ -65,7 +65,7 @@ void client_setup::init(
 		//}
 	}
 
-	session.camera.configure_size(screen_size);
+	session.set_screen_size(screen_size);
 	session.set_master_gain(cfg.sound_effects_volume);
 
 	session.configure_input();
@@ -106,20 +106,28 @@ void client_setup::process_once(
 	const augs::machine_entropy::local_type& precollected, 
 	const bool swap_buffers
 ) {
-	auto step_pred = [this](const cosmic_entropy& entropy, cosmos& cosm) {
-		cosm.advance_deterministic_schemata(entropy,
+	auto step_pred = [this](
+		const cosmic_entropy& entropy, 
+		cosmos& cosm
+	) {
+		cosm.advance_deterministic_schemata(
+			entropy,
 			[this](const logic_step) {},
-			[this](const const_logic_step) {}
+			[this](const const_logic_step step) {}
 		);
 	};
 
-	auto step_pred_with_effects_response = [this](const cosmic_entropy& entropy, cosmos& cosm) {
-		cosm.advance_deterministic_schemata(entropy,
+	auto step_pred_with_audiovisual_response = [this](
+		const cosmic_entropy& entropy, 
+		cosmos& cosm
+	) {
+		cosm.advance_deterministic_schemata(
+			entropy,
 			[this](const logic_step) {},
 			[this](const const_logic_step step) {
-			session.spread_past_infection(step);
-			session.acquire_game_events_for_hud(step);
-		}
+				session.spread_past_infection(step);
+				session.standard_audiovisual_post_solve(step);
+			}
 		);
 	};
 
@@ -169,7 +177,7 @@ void client_setup::process_once(
 				}
 
 				if (detailed_step_log && !should_skip) {
-					LOG("Client received command: %x", int(stream.peek<unsigned char>()));
+					LOG("Client received command: %x", static_cast<int>(stream.peek<unsigned char>()));
 				}
 
 				switch (command) {
@@ -217,7 +225,7 @@ void client_setup::process_once(
 				client, 
 				total_collected_entropy,
 				extrapolated_hypersomnia, 
-				step_pred_with_effects_response
+				step_pred_with_audiovisual_response
 			);
 
 			session.sending_commands_and_predict_profiler.end_measurement();
@@ -237,8 +245,6 @@ void client_setup::process_once(
 			);
 
 			session.unpack_remote_steps_profiler.end_measurement();
-
-			session.resample_state_for_audiovisuals(extrapolated_hypersomnia);
 		}
 		
 		if (client.has_timed_out(hypersomnia.get_fixed_delta().in_milliseconds(), 2000)) {
@@ -255,8 +261,15 @@ void client_setup::process_once(
 
 	if (!still_downloading) {
 		const auto vdt = session.frame_timer.extract_variable_delta(extrapolated_hypersomnia.get_fixed_delta(), timer);
+		
+		const auto all_visible = session.get_visible_entities(hypersomnia);
 
-		session.advance_audiovisual_systems(extrapolated_hypersomnia, scene.get_selected_character(), vdt);
+		session.advance_audiovisual_systems(
+			extrapolated_hypersomnia, 
+			scene.get_selected_character(),
+			all_visible,
+			vdt
+		);
 
 		auto& renderer = augs::renderer::get_current();
 		
@@ -269,7 +282,8 @@ void client_setup::process_once(
 			renderer,
 			extrapolated_hypersomnia,
 			scene.get_selected_character(),
-			vdt,
+			all_visible,
+			timer.fraction_of_step_until_next_step(extrapolated_hypersomnia.get_fixed_delta()),
 			client
 		);
 

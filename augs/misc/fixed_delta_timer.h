@@ -25,8 +25,8 @@ namespace augs {
 
 		void reset_timer();
 
-		unsigned count_logic_steps_to_perform(const fixed_delta&);
-		float fraction_of_step_until_next_step(const fixed_delta&) const;
+		unsigned count_logic_steps_to_perform(const delta&);
+		float fraction_of_step_until_next_step(const delta&) const;
 		
 		void set_stepping_speed_multiplier(float);
 		float get_stepping_speed_multiplier() const;

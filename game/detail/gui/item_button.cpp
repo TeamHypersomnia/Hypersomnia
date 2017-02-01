@@ -305,7 +305,7 @@ void item_button::draw_proc(const viewing_game_gui_context context, const const_
 					bottom_number_val = count_charges_in_deposit(item);
 				}
 				else {
-					bottom_number_val = item[slot_function::ITEM_DEPOSIT].calculate_free_space_with_parent_containers() / long double(SPACE_ATOMS_PER_UNIT);
+					bottom_number_val = item[slot_function::ITEM_DEPOSIT].calculate_real_free_space() / long double(SPACE_ATOMS_PER_UNIT);
 
 					if (bottom_number_val < 1.0 && bottom_number_val > 0.0) {
 						trim_zero = true;
@@ -400,7 +400,7 @@ void item_button::rebuild_layouts(const game_gui_context context, const this_in_
 
 	vec2i parent_position;
 
-	auto* sprite = item.find<components::sprite>();
+	const auto* const sprite = item.find<components::sprite>();
 
 	if (sprite) {
 		vec2i rounded_size = calculate_button_layout(item, !this_id->is_container_open).aabb.get_size();

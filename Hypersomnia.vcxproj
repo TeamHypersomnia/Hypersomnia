@@ -380,6 +380,7 @@
     <ClCompile Include="game\detail\wielding_result.cpp" />
     <ClCompile Include="game\detail\world_camera.cpp" />
     <ClCompile Include="game\enums\item_category.cpp" />
+    <ClCompile Include="game\enums\item_transfer_result_type.cpp" />
     <ClCompile Include="game\resources\tile_layer.cpp" />
     <ClCompile Include="game\scene_managers\rendering_scripts\draw_crosshair_lines.cpp" />
     <ClCompile Include="game\scene_managers\rendering_scripts\draw_sentience_meters.cpp" />
@@ -1145,6 +1146,7 @@
     <ClInclude Include="game\enums\input_recording_type.h" />
     <ClInclude Include="game\enums\renderable_drawing_type.h" />
     <ClInclude Include="game\enums\sound_response_type.h" />
+    <ClInclude Include="game\messages\item_picked_up_message.h" />
     <ClInclude Include="game\messages\visibility_information.h" />
     <ClInclude Include="game\resources\sound_response.h" />
     <ClInclude Include="game\resources\tile_layer.h" />

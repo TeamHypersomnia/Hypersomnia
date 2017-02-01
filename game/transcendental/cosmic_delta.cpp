@@ -446,10 +446,10 @@ TEST(CosmicDelta, CosmicDeltaPaddingTest) {
 	};
 
 	padding_checker(augs::window::event::change());
-	padding_checker(game_gui_element_location());
+	//padding_checker(game_gui_element_location());
 	
 	struct dum {
-		game_gui_rect_world rect_world;
+	//	game_gui_rect_world rect_world;
 		int dragged_charges = 0;
 
 		bool is_gui_look_enabled = false;
@@ -458,7 +458,7 @@ TEST(CosmicDelta, CosmicDeltaPaddingTest) {
 		padding_byte pad;
 
 		//hotbar_button hotbar_buttons[9];
-		drag_and_drop_target_drop_item drop_item_icon = augs::gui::material();
+		//drag_and_drop_target_drop_item drop_item_icon = augs::gui::material();
 
 		dum() 
 			//:  
@@ -467,14 +467,13 @@ TEST(CosmicDelta, CosmicDeltaPaddingTest) {
 		}
 	};
 
-	LOG_NVPS(sizeof(dum), sizeof(components::gui_element));
+	LOG_NVPS(sizeof(dum));
 	sizeof(dum);
-	sizeof(components::gui_element);
 	LOG_NVPS(sizeof(entity_handle));
 
 	padding_checker(dum());
-	padding_checker(std::array<hotbar_button, 9>());
-	padding_checker(drag_and_drop_target_drop_item(augs::gui::material()), augs::gui::material());
+	//padding_checker(std::array<hotbar_button, 9>());
+	//padding_checker(drag_and_drop_target_drop_item(augs::gui::material()), augs::gui::material());
 
 	for_each_in_tuple(typename put_all_components_into<std::tuple>::type(), padding_checker);
 }

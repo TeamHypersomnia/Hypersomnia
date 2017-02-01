@@ -21,15 +21,20 @@ void simulation_receiver::acquire_next_packaged_step(const step_packaged_for_net
 	jitter_buffer.acquire_new_command(step);
 }
 
-void simulation_receiver::remote_entropy_predictions(guid_mapped_entropy& adjusted_entropy, const entity_id predictable_entity, const cosmos& predicted_cosmos) {
+void simulation_receiver::remote_entropy_predictions(
+	guid_mapped_entropy& adjusted_entropy, 
+	const entity_id predictable_entity, 
+	const cosmos& predicted_cosmos
+) {
 	key_and_mouse_intent release_intent;
 	release_intent.is_pressed = false;
 
 	for (auto e : predicted_cosmos.get(processing_subjects::WITH_PAST_CONTAGIOUS)) {
 		const bool is_locally_controlled_entity = e == predictable_entity;
 		
-		if (is_locally_controlled_entity)
+		if (is_locally_controlled_entity) {
 			continue;
+		}
 
 		for (const auto g : e.guns_wielded()) {
 			if (g.get<components::gun>().trigger_pressed) {
@@ -46,10 +51,11 @@ void simulation_receiver::remote_entropy_predictions(guid_mapped_entropy& adjust
 	}
 }
 
-simulation_receiver::unpacking_result simulation_receiver::unpack_deterministic_steps(cosmos& referential_cosmos, cosmos& last_delta_unpacked) {
+auto simulation_receiver::unpack_deterministic_steps(
+	cosmos& referential_cosmos, 
+	cosmos& last_delta_unpacked
+) -> unpacking_result {
 	unpacking_result result;
-	auto& reconciliate_predicted = result.reconciliate_predicted;
-	auto& entropies_to_simulate = result.entropies_to_simulate;
 
 	auto new_commands = jitter_buffer.buffer;
 	jitter_buffer.buffer.clear();
@@ -71,13 +77,13 @@ simulation_receiver::unpacking_result simulation_receiver::unpack_deterministic_
 		sim.resubstantiate = new_command.shall_resubstantiate;
 		sim.entropy = new_command.entropy;
 
-		entropies_to_simulate.emplace_back(sim);
+		result.entropies_to_simulate.emplace_back(sim);
 
 		const auto& actual_server_step = sim.entropy;
 		const auto& predicted_server_step = predicted_steps.front();
 
 		if (sim.resubstantiate || actual_server_step != predicted_server_step) {
-			reconciliate_predicted = true;
+			result.reconciliate_predicted = true;
 		}
 
 		if (new_command.next_client_commands_accepted) {
@@ -89,18 +95,24 @@ simulation_receiver::unpacking_result simulation_receiver::unpack_deterministic_
 	return std::move(result);
 }
 
-simulation_receiver::misprediction_candidate_entry simulation_receiver::acquire_potential_misprediction(const const_entity_handle e) const {
+auto simulation_receiver::acquire_potential_misprediction(
+	const const_entity_handle e
+) const -> misprediction_candidate_entry {
 	misprediction_candidate_entry candidate;
 	
-	if(e.has_logic_transform())
+	if (e.has_logic_transform()) {
 		candidate.transform = e.logic_transform();
+	}
 
 	candidate.id = e.get_id();
 
 	return candidate;
 }
 
-std::vector<simulation_receiver::misprediction_candidate_entry> simulation_receiver::acquire_potential_mispredictions(const std::unordered_set<entity_id>& unpredictables_infected, const cosmos& predicted_cosmos_before_reconciliation) const {
+auto simulation_receiver::acquire_potential_mispredictions(
+	const std::unordered_set<entity_id>& unpredictables_infected, 
+	const cosmos& predicted_cosmos_before_reconciliation
+) const -> std::vector<misprediction_candidate_entry> {
 	const auto& cosmos = predicted_cosmos_before_reconciliation;
 
 	const auto& unpredictables_with_past_contagious = cosmos.get(processing_subjects::WITH_PAST_CONTAGIOUS);
@@ -121,7 +133,12 @@ std::vector<simulation_receiver::misprediction_candidate_entry> simulation_recei
 	return std::move(potential_mispredictions);
 }
 
-void simulation_receiver::drag_mispredictions_into_past(interpolation_system& interp, past_infection_system& past, const cosmos& predicted_cosmos, const std::vector<misprediction_candidate_entry>& mispredictions) const {
+void simulation_receiver::drag_mispredictions_into_past(
+	interpolation_system& interp, 
+	past_infection_system& past, 
+	const cosmos& predicted_cosmos, 
+	const std::vector<misprediction_candidate_entry>& mispredictions
+) const {
 	for (const auto e : mispredictions) {
 		const const_entity_handle reconciliated_entity = predicted_cosmos[e.id];
 		

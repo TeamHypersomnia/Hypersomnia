@@ -12,6 +12,7 @@
 #include "augs/graphics/renderer.h"
 #include "game/transcendental/step.h"
 #include "game/transcendental/viewing_session.h"
+#include "game/components/item_slot_transfers_component.h"
 
 #include "game/detail/gui/immediate_hud.h"
 #include "augs/graphics/drawers.h"
@@ -209,7 +210,6 @@ namespace rendering_scripts {
 		particles.draw(render_layer::EFFECTS, particles_input);
 
 		for (const auto e : visible_per_layer[render_layer::WANDERING_PIXELS_EFFECTS]) {
-			wandering_pixels.advance_wandering_pixels_for(e, global_time_seconds, step.get_delta());
 			wandering_pixels.draw_wandering_pixels_for(e, wandering_input);
 		}
 
@@ -255,7 +255,10 @@ namespace rendering_scripts {
 
 		if (step.settings.draw_gui_overlays) {
 			if (controlled_entity.has<components::item_slot_transfers>()) {
-				step.session.systems_audiovisual.get<gui_element_system>().get_character_gui(controlled_entity).draw(step);
+				step.session.systems_audiovisual.get<gui_element_system>().get_character_gui(controlled_entity).draw(
+					step,
+					step.config.hotbar
+				);
 			}
 
 			if (controlled_entity.has<components::sentience>()) {
@@ -282,6 +285,7 @@ namespace rendering_scripts {
 			camera.transform,
 			assets::texture_id::BLANK,
 			{},
-			step.get_delta().view_interpolation_ratio());
+			step.get_interpolation_ratio()
+		);
 	}
 }

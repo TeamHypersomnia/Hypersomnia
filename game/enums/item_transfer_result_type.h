@@ -1,18 +1,31 @@
 #pragma once
 
-enum item_transfer_result_type {
+enum class containment_result_type {
+	INVALID_RESULT,
+	THE_SAME_SLOT,
+	COULD_REPLACE_BUT_NO_SPACE,
+	INCOMPATIBLE_CATEGORIES,
+	INSUFFICIENT_SPACE,
+
+	SUCCESSFUL_REPLACE,
+	SUCCESSFUL_CONTAINMENT
+};
+
+enum class item_transfer_result_type {
 	INVALID_RESULT,
 
-	INVALID_SLOT_OR_UNOWNED_ROOT,
+	INVALID_CAPABILITIES,
 
 	/* returned by query_containment_result */
-	NO_SLOT_AVAILABLE,
+	COULD_REPLACE_BUT_NO_SPACE,
 
 	INCOMPATIBLE_CATEGORIES,
 	INSUFFICIENT_SPACE,
 	THE_SAME_SLOT,
 
 	SUCCESSFUL_TRANSFER,
-	SUCCESSFUL_DROP,
-	UNMOUNT_BEFOREHAND,
+	SUCCESSFUL_PICKUP,
+	SUCCESSFUL_DROP
 };
+
+bool is_successful(const item_transfer_result_type t);

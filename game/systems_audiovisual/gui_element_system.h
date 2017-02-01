@@ -38,6 +38,10 @@ public:
 		const std::vector<augs::window::event::change>& events
 	);
 
+	void rebuild_layouts(
+		const const_entity_handle root_entity
+	);
+
 	void handle_hotbar_and_action_button_presses(
 		const const_entity_handle root_entity,
 		std::vector<key_and_mouse_intent> intents
@@ -45,5 +49,6 @@ public:
 
 	void reserve_caches_for_entities(const size_t) const {}
 
-	void resample_state_for_audiovisuals(const cosmos&);
+	void reposition_picked_up_and_transferred_items(const const_logic_step);
+	void erase_caches_for_dead_entities(const cosmos&);
 };

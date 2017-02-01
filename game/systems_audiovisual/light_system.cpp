@@ -23,9 +23,36 @@ light_system::cache::cache() {
 	std::fill(all_variation_values.begin(), all_variation_values.end(), 0.f);
 }
 
-void light_system::render_all_lights(augs::renderer& output, const std::array<float, 16> projection_matrix, const viewing_step step, std::function<void()> neon_callback) {
+void light_system::advance_attenuation_variations(
+	const cosmos& cosmos,
+	const augs::delta dt
+) {
+	for (const auto it : cosmos.get(processing_subjects::WITH_LIGHT)) {
+		const auto& light = it.get<components::light>();
+		auto& cache = per_entity_cache[it.get_id().pool.indirection_index];
+
+		const auto delta = dt.in_seconds();
+
+		light.constant.variation.update_value(rng, cache.all_variation_values[0], delta);
+		light.linear.variation.update_value(rng, cache.all_variation_values[1], delta);
+		light.quadratic.variation.update_value(rng, cache.all_variation_values[2], delta);
+
+		light.wall_constant.variation.update_value(rng, cache.all_variation_values[3], delta);
+		light.wall_linear.variation.update_value(rng, cache.all_variation_values[4], delta);
+		light.wall_quadratic.variation.update_value(rng, cache.all_variation_values[5], delta);
+
+		light.position_variations[0].update_value(rng, cache.all_variation_values[6], delta);
+		light.position_variations[1].update_value(rng, cache.all_variation_values[7], delta);
+	}
+}
+
+void light_system::render_all_lights(
+	augs::renderer& output, 
+	const std::array<float, 16> projection_matrix, 
+	const viewing_step step, 
+	std::function<void()> neon_callback
+) const {
 	const auto& cosmos = step.cosm;
-	const auto dt = step.get_delta();
 	const float global_time_seconds = static_cast<float>(step.get_interpolated_total_time_passed_in_seconds());
 
 	ensure_eq(0, output.get_triangle_count());
@@ -78,20 +105,6 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 		const auto& r = responses[i];
 		const auto& light_entity = cosmos[requests[i].subject];
 		const auto& light = light_entity.get<components::light>();
-		auto& cache = per_entity_cache[light_entity.get_id().pool.indirection_index];
-
-		const float delta = dt.in_seconds();
-
-		light.constant.variation.update_value(rng, cache.all_variation_values[0], delta);
-		light.linear.variation.update_value(rng, cache.all_variation_values[1], delta);
-		light.quadratic.variation.update_value(rng, cache.all_variation_values[2], delta);
-		
-		light.wall_constant.variation.update_value(rng, cache.all_variation_values[3], delta);
-		light.wall_linear.variation.update_value(rng, cache.all_variation_values[4], delta);
-		light.wall_quadratic.variation.update_value(rng, cache.all_variation_values[5], delta);
-		
-		light.position_variations[0].update_value(rng, cache.all_variation_values[6], delta);
-		light.position_variations[1].update_value(rng, cache.all_variation_values[7], delta);
 
 		for (size_t t = 0; t < r.get_num_triangles(); ++t) {
 			const auto world_light_tri = r.get_world_triangle(t, requests[i].eye_transform.pos);
@@ -144,6 +157,7 @@ void light_system::render_all_lights(augs::renderer& output, const std::array<fl
 		//	}
 		//}
 
+		const auto& cache = per_entity_cache[light_entity.get_id().pool.indirection_index];
 
 		vec2 light_displacement = vec2(cache.all_variation_values[6], cache.all_variation_values[7]);
 

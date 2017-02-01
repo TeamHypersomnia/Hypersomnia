@@ -107,13 +107,13 @@ typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot
 }
 
 template <bool C>
-unsigned basic_inventory_slot_handle<C>::calculate_free_space_with_parent_containers() const {
-	const auto maximum_space = calculate_free_space_with_children();
+unsigned basic_inventory_slot_handle<C>::calculate_real_free_space() const {
+	const auto maximum_space = calculate_local_free_space();
 
 	const auto* const maybe_item = get_container().find<components::item>();
 
-	if (maybe_item && get_cosmos()[maybe_item->current_slot].alive()) {
-		return std::min(maximum_space, get_cosmos()[maybe_item->current_slot].calculate_free_space_with_parent_containers());
+	if (maybe_item != nullptr && get_cosmos()[maybe_item->current_slot].alive()) {
+		return std::min(maximum_space, get_cosmos()[maybe_item->current_slot].calculate_real_free_space());
 	}
 
 	return maximum_space;
@@ -144,7 +144,7 @@ std::vector<typename basic_inventory_slot_handle<C>::entity_handle_type> basic_i
 }
 
 template <bool C>
-unsigned basic_inventory_slot_handle<C>::calculate_free_space_with_children() const {
+unsigned basic_inventory_slot_handle<C>::calculate_local_free_space() const {
 	if (get().has_unlimited_space()) {
 		return 1000000 * SPACE_ATOMS_PER_UNIT;
 	}

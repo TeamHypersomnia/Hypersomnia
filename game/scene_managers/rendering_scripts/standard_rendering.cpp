@@ -109,10 +109,6 @@ namespace rendering_scripts {
 
 		hud.draw_vertically_flying_numbers(step);
 
-		if (controlled_entity.has<components::gui_element>()) {
-			components::gui_element::draw(output, controlled_entity, step);
-		}
-
 		renderer.bind_texture(*get_resource_manager().find(assets::atlas_id::GAME_WORLD_ATLAS));
 
 		renderer.call_triangles();
@@ -123,6 +119,7 @@ namespace rendering_scripts {
 			camera.transform,
 			assets::texture_id::BLANK,
 			{},
-			step.get_delta().view_interpolation_ratio());
+			step.get_interpolation_ratio()
+		);
 	}
 }

@@ -46,7 +46,7 @@ recording_type = {
 }
 
 config_table = {
-	launch_mode = launch_type.MAIN_MENU,
+	launch_mode = launch_type.LOCAL,
 	
 	input_recording_mode = recording_type.LIVE,
 
@@ -58,7 +58,7 @@ config_table = {
 
 	-- game window settings
 	window_name = "example",
-	fullscreen = 1,
+	fullscreen = 0,
 	window_border = 1,
 	window_x = 100,
 	window_y = 10,

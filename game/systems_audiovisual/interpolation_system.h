@@ -22,7 +22,11 @@ public:
 	std::vector<cache> per_entity_cache;
 	float interpolation_speed = 525.f;
 
-	void integrate_interpolated_transforms(const cosmos&, const augs::delta variable_delta, const augs::delta fixed_delta_for_slowdowns);
+	void integrate_interpolated_transforms(
+		const cosmos&, 
+		const augs::delta delta, 
+		const augs::delta fixed_delta_for_slowdowns
+	);
 
 	components::transform get_interpolated(const const_entity_handle) const;
 	components::transform& get_interpolated(const const_entity_handle);
@@ -30,5 +34,4 @@ public:
 	void reserve_caches_for_entities(const size_t);
 
 	cache& get_data(const entity_id);
-	void resample_state_for_audiovisuals(const cosmos&) const {}
 };

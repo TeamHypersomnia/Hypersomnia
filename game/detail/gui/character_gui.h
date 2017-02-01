@@ -13,6 +13,8 @@
 #include "augs/misc/constant_size_vector.h"
 #include "game/container_sizes.h"
 
+#include "application/config_lua_table.h"
+
 struct wielding_result;
 
 struct character_gui {
@@ -43,6 +45,7 @@ struct character_gui {
 
 	drag_and_drop_target_drop_item drop_item_icon = augs::gui::material(assets::texture_id::DROP_HAND_ICON, red);
 
+	void set_screen_size(const vec2i);
 	vec2i get_screen_size() const;
 	vec2i get_gui_crosshair_position() const;
 
@@ -60,7 +63,7 @@ struct character_gui {
 		const const_entity_handle assigned_entity
 	);
 
-	const hotbar_selection_setup& get_setup_from_button_indices(
+	hotbar_selection_setup get_setup_from_button_indices(
 		const const_entity_handle element_entity,
 		const int primary_button,
 		const int secondary_button = -1
@@ -107,7 +110,10 @@ struct character_gui {
 
 	static entity_id get_hovered_world_entity(const cosmos& cosm, const vec2 world_cursor_position);
 	
-	void draw(const viewing_step) const;
+	void draw(
+		const viewing_step,
+		const config_lua_table::hotbar_settings
+	) const;
 
 	void draw_tooltip_from_hover_or_world_highlight(
 		const viewing_game_gui_context context,

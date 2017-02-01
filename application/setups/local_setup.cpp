@@ -36,7 +36,7 @@ void local_setup::process(
 	augs::debug_entropy_player<cosmic_entropy> player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
-	scene_managers::testbed testbed;
+	scene_managers::one_entity testbed;
 	testbed.debug_var = cfg.debug_var;
 
 	if (!hypersomnia.load_from_file("save.state")) {
@@ -52,7 +52,7 @@ void local_setup::process(
 
 	viewing_session session;
 	session.reserve_caches_for_entities(3000);
-	session.camera.configure_size(screen_size);
+	session.set_screen_size(screen_size);
 	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
 	session.set_master_gain(cfg.sound_effects_volume);
 
@@ -106,7 +106,7 @@ void local_setup::process(
 			auto new_intents = session.context.to_key_and_mouse_intents(new_machine_entropy.local);
 
 			session.control_and_remove_fetched_intents(new_intents);
-			testbed.control_character_selection(new_intents);
+			// testbed.control_character_selection(new_intents);
 
 			auto new_cosmic_entropy = cosmic_entropy(
 				hypersomnia[testbed.get_selected_character()],
@@ -125,20 +125,30 @@ void local_setup::process(
 
 			augs::renderer::get_current().clear_logic_lines();
 
-			hypersomnia.advance_deterministic_schemata(total_collected_entropy, [](auto){},
-				[this, &session](const const_logic_step step){
-					session.acquire_game_events_for_hud(step);
+			hypersomnia.advance_deterministic_schemata(
+				total_collected_entropy,
+				[](const auto) {},
+				[&](const const_logic_step step) {
+					session.standard_audiovisual_post_solve(step);
 				}
 			);
 
-			session.resample_state_for_audiovisuals(hypersomnia);
-			
 			total_collected_entropy = cosmic_entropy();
 		}
 
-		const auto vdt = session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), timer);
+		const auto all_visible = session.get_visible_entities(hypersomnia);
 
-		session.advance_audiovisual_systems(hypersomnia, testbed.get_selected_character(), vdt);
+		const auto vdt = session.frame_timer.extract_variable_delta(
+			hypersomnia.get_fixed_delta(), 
+			timer
+		);
+
+		session.advance_audiovisual_systems(
+			hypersomnia, 
+			testbed.get_selected_character(),
+			all_visible,
+			vdt
+		);
 
 		auto& renderer = augs::renderer::get_current();
 		renderer.clear_current_fbo();
@@ -148,7 +158,8 @@ void local_setup::process(
 			renderer, 
 			hypersomnia, 
 			testbed.get_selected_character(), 
-			vdt, 
+			all_visible,
+			timer.fraction_of_step_until_next_step(hypersomnia.get_fixed_delta()),
 			augs::gui::text::fstr()
 		);
 

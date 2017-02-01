@@ -50,7 +50,7 @@ void particles_simulation_system::draw(const render_layer layer, const drawing_i
 	}
 }
 
-void particles_simulation_system::resample_state_for_audiovisuals(const cosmos& new_cosmos) {
+void particles_simulation_system::erase_caches_for_dead_entities(const cosmos& new_cosmos) {
 	std::vector<entity_id> to_erase;
 
 	for (const auto it : per_entity_cache) {

@@ -16,13 +16,13 @@ namespace augs {
 				total_collected_entropy = (*it).second;
 			}
 			else {
-				total_collected_entropy.clear();
+				total_collected_entropy = T();
 			}
 
 			++player_step_position;
 		}
 		else if (is_recording()) {
-			if (!total_collected_entropy.empty()) {
+			if (total_collected_entropy.length() > 0) {
 				std::ofstream recording_file(live_saving_filename, std::ios::out | std::ios::binary | std::ios::app);
 
 				augs::write_object(recording_file, player_step_position);

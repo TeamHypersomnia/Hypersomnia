@@ -1,4 +1,5 @@
 #include "cosmic_profiler.h"
+#include "augs/templates/container_templates.h"
 #include <algorithm>
 
 cosmic_profiler::cosmic_profiler() {
@@ -29,7 +30,7 @@ std::wstring cosmic_profiler::sorted_summary(const bool detailed) const {
 		if (m.was_measured())
 			sorted_meters.push_back(m);
 
-	std::sort(sorted_meters.begin(), sorted_meters.end());
+	sort_container(sorted_meters);
 	std::reverse(sorted_meters.begin(), sorted_meters.end());
 
 	std::wstring summary = raycasts.summary();

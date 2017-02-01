@@ -57,6 +57,10 @@ vec2i character_gui::get_gui_crosshair_position() const {
 	return rect_world.last_state.mouse.pos;
 }
 
+void character_gui::set_screen_size(const vec2i s) {
+	rect_world.last_state.screen_size = s;
+}
+
 vec2i character_gui::get_screen_size() const {
 	return rect_world.last_state.screen_size;
 }
@@ -84,7 +88,7 @@ entity_id character_gui::get_hotbar_assigned_entity_if_available(
 	return entity_id();
 }
 
-const character_gui::hotbar_selection_setup& character_gui::get_setup_from_button_indices(
+character_gui::hotbar_selection_setup character_gui::get_setup_from_button_indices(
 	const const_entity_handle element_entity,
 	const int primary_button,
 	const int secondary_button
@@ -274,19 +278,23 @@ character_gui::hotbar_selection_setup character_gui::get_actual_selection_setup(
 	return output;
 }
 
-void character_gui::draw(const viewing_step step) const {
+void character_gui::draw(
+	const viewing_step step,
+	const config_lua_table::hotbar_settings hotbar
+) const {
 	const auto gui_entity = step.cosm[step.viewed_character];
 
 	root_of_inventory_gui root_of_gui(get_screen_size());
 	game_gui_rect_tree tree;
 
-	viewing_game_gui_context context(
+	const auto context = viewing_game_gui_context(
 		step.session.systems_audiovisual.get<gui_element_system>(),
-		rect_world, 
+		rect_world,
 		*this,
 		gui_entity, 
-		tree, 
+		tree,
 		root_of_gui,
+		hotbar,
 		step.camera,
 		step.session.world_hover_highlighter,
 		step.session.systems_audiovisual.get<interpolation_system>(),
@@ -535,11 +543,11 @@ entity_id character_gui::get_hovered_world_entity(const cosmos& cosm, const vec2
 	if (hovered.entities.size() > 0) {
 		std::vector<unversioned_entity_id> sorted_by_visibility(hovered.entities.begin(), hovered.entities.end());
 
-		sorted_by_visibility.erase(std::remove_if(sorted_by_visibility.begin(), sorted_by_visibility.end(), [&](const unversioned_entity_id e) {
+		erase_remove(sorted_by_visibility, [&](const auto e) {
 			return cosm[e].find<components::render>() == nullptr;
-		}), sorted_by_visibility.end());
+		});
 
-		std::sort(sorted_by_visibility.begin(), sorted_by_visibility.end(), [&](const unversioned_entity_id a, const unversioned_entity_id b) {
+		sort_container(sorted_by_visibility, [&](const auto a, const auto b) {
 			return render_system::render_order_compare(cosm[a], cosm[b]);
 		});
 

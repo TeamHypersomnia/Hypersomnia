@@ -54,7 +54,7 @@ public:
 
 	}
 
-	augs::fixed_delta get_delta() const {
+	augs::delta get_delta() const {
 		return cosm.get_fixed_delta();
 	}
 
@@ -73,8 +73,8 @@ public:
 	viewing_step(
 		const config_lua_table& config,
 		const cosmos&, 
-		viewing_session&, 
-		const augs::variable_delta&, 
+		const viewing_session&, 
+		const float interpolation_ratio, 
 		augs::renderer&, 
 		const camera_cone camera_state, 
 		const entity_id viewed_character,
@@ -85,14 +85,14 @@ public:
 	camera_cone camera;
 	entity_id viewed_character;
 	const visible_entities& visible;
+	const float interpolation_ratio = 0.f;
 
 	game_drawing_settings settings;
-	viewing_session& session;
-	augs::variable_delta delta;
+	const viewing_session& session;
 	augs::renderer& renderer;
 
-	augs::variable_delta get_delta() const;
 	double get_interpolated_total_time_passed_in_seconds() const;
+	float get_interpolation_ratio() const;
 
 	vec2 get_screen_space(const vec2 pos) const;
 };

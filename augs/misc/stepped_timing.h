@@ -2,7 +2,7 @@
 #include "augs/ensure.h"
 
 namespace augs {
-	class fixed_delta;
+	class delta;
 
 	struct stepped_timestamp {
 		unsigned step = 0u;
@@ -17,8 +17,8 @@ namespace augs {
 		bool operator==(const stepped_timestamp) const;
 		bool operator!=(const stepped_timestamp) const;
 
-		float in_seconds(fixed_delta) const;
-		float in_milliseconds(fixed_delta) const;
+		float in_seconds(delta) const;
+		float in_milliseconds(delta) const;
 	};
 
 	struct stepped_timeout {
@@ -39,8 +39,8 @@ namespace augs {
 
 		void unset();
 		void set(float timeout_duration_ms, stepped_timestamp);
-		bool passed(stepped_timestamp, fixed_delta) const;
-		bool lasts(stepped_timestamp, fixed_delta) const;
+		bool passed(stepped_timestamp, delta) const;
+		bool lasts(stepped_timestamp, delta) const;
 	};
 
 	struct stepped_cooldown {
@@ -61,8 +61,8 @@ namespace augs {
 
 		stepped_cooldown(float cooldown_duration_ms);
 
-		bool is_ready(stepped_timestamp, fixed_delta t) const;
-		bool try_to_fire_and_reset(stepped_timestamp, fixed_delta t);
+		bool is_ready(stepped_timestamp, delta t) const;
+		bool try_to_fire_and_reset(stepped_timestamp, delta t);
 	};
 
 }

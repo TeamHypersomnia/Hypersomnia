@@ -9,7 +9,7 @@
 #include "game/systems_audiovisual/interpolation_system.h"
 #include "game/resources/manager.h"
 
-void sound_system::resample_state_for_audiovisuals(const cosmos& new_cosmos) {
+void sound_system::erase_caches_for_dead_entities(const cosmos& new_cosmos) {
 	std::vector<entity_id> to_erase;
 
 	for (const auto& it : per_entity_cache) {
@@ -28,6 +28,7 @@ void sound_system::resample_state_for_audiovisuals(const cosmos& new_cosmos) {
 }
 
 void sound_system::initialize_sound_sources(const size_t num_max_sources) {
+
 }
 
 sound_system::cache& sound_system::get_cache(const const_entity_handle id) {
@@ -42,10 +43,8 @@ void sound_system::play_nearby_sound_existences(
 	camera_cone cone, 
 	const entity_id listening_character, 
 	const cosmos& cosmos, 
-	const float global_time_seconds,
 	interpolation_system& sys
-	) 
-{
+) {
 	auto& queried_size = cone.visible_world_area;
 	queried_size.set(10000.f, 10000.f);
 

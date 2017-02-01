@@ -60,14 +60,6 @@ void basic_entity_handle<C>::add_standard_components() const {
 	if (!has<components::substance>()) {
 		add(components::substance());
 	}
-
-	if (has<components::gui_element>()) {
-		const auto& container = get<components::container>();
-
-		for (const auto& s : container.slots) {
-			initialize_slot_button_for_new_character_gui_owner(get_cosmos()[inventory_slot_id(s.first, get_id())]);
-		}
-	}
 }
 
 template <bool C>

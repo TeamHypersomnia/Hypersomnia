@@ -5,7 +5,7 @@
 #include "game/detail/camera_cone.h"
 
 namespace augs {
-	class variable_delta;
+	class delta;
 }
 
 class interpolation_system;
@@ -32,7 +32,11 @@ public:
 
 	void configure_size(vec2);
 
-	void tick(const interpolation_system& interp, augs::variable_delta dt, const_entity_handle entity_to_chase);
+	void tick(
+		const interpolation_system& interp, 
+		augs::delta dt, 
+		const_entity_handle entity_to_chase
+	);
 
 	vec2i get_camera_offset_due_to_character_crosshair(const_entity_handle) const;
 };

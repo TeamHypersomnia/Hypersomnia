@@ -187,7 +187,7 @@ void sentience_system::cooldown_aimpunches(const logic_step step) const {
 
 void sentience_system::regenerate_values(const logic_step step) const {
 	const auto now = step.cosm.get_timestamp();
-	const unsigned regeneration_frequency_in_steps = step.cosm.get_fixed_delta().get_steps_per_second() * 3;
+	const auto regeneration_frequency_in_steps = static_cast<unsigned>(1/step.cosm.get_fixed_delta().in_seconds() * 3);
 	
 	for (const auto& t : step.cosm.get(processing_subjects::WITH_SENTIENCE)) {
 		auto& sentience = t.get<components::sentience>();

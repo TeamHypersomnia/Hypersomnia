@@ -25,6 +25,9 @@
 
 #include "augs/gui/button_corners.h"
 
+#include "game/detail/gui/slot_button.h"
+#include "game/detail/gui/item_button.h"
+
 static char intent_to_hotbar_index(const intent_type type) {
 	switch (type) {
 	case intent_type::HOTBAR_BUTTON_1: return 1;
@@ -94,6 +97,26 @@ void gui_element_system::handle_hotbar_and_action_button_presses(
 ) {
 	const auto& cosmos = subject.get_cosmos();
 	auto& gui = get_character_gui(subject);
+
+	for (const auto& r : intents) {
+		if (r.is_pressed &&
+			(r.intent == intent_type::HOLSTER_PRIMARY_ITEM
+				|| r.intent == intent_type::HOLSTER_SECONDARY_ITEM)
+			) {
+			const auto hand_type = subject.map_primary_action_to_secondary_hand_if_primary_empty(intent_type::HOLSTER_SECONDARY_ITEM == r.intent).get_id().type;
+
+			auto new_setup = gui.get_actual_selection_setup(subject);
+
+			if (hand_type == slot_function::PRIMARY_HAND) {
+				new_setup.primary_selection.unset();
+			}
+			else if (hand_type == slot_function::SECONDARY_HAND) {
+				new_setup.secondary_selection.unset();
+			}
+
+			queue_transfers(gui.make_and_save_hotbar_selection_setup(new_setup, subject));
+		}
+	}
 
 	for (const auto& i : intents) {
 		const auto hotbar_index = intent_to_hotbar_index(i.intent);
@@ -228,6 +251,32 @@ void gui_element_system::advance_gui_elements(
 	//	cosmos.get_fixed_delta()
 	//);
 
+}
+
+void gui_element_system::rebuild_layouts(
+	const const_entity_handle root_entity
+) {
+	const auto& cosmos = root_entity.get_cosmos();
+
+	auto& element = get_character_gui(root_entity);
+	auto& rect_world = element.rect_world;
+	const auto screen_size = element.get_screen_size();
+
+	ensure(root_entity.has<components::item_slot_transfers>());
+
+	game_gui_rect_tree tree;
+
+	root_of_inventory_gui root_of_gui(screen_size);
+
+	game_gui_context context(
+		*this,
+		element.rect_world,
+		element,
+		root_entity,
+		tree,
+		root_of_gui
+	);
+
 	int max_height = 0;
 	int total_width = 0;
 
@@ -259,10 +308,15 @@ void gui_element_system::advance_gui_elements(
 
 	set_rc(element.hotbar_buttons[0]);
 
+	root_of_inventory_gui_in_context root_location;
 	rect_world.rebuild_layouts(context, root_location);
 }
 
-void gui_element_system::resample_state_for_audiovisuals(const cosmos& new_cosmos) {
+void gui_element_system::reposition_picked_up_and_transferred_items(const const_logic_step step) {
+
+}
+
+void gui_element_system::erase_caches_for_dead_entities(const cosmos& new_cosmos) {
 	const auto eraser = [&](auto& caches) {
 		erase_if(caches, [&](const auto& it) {
 			return new_cosmos[it.first].dead();

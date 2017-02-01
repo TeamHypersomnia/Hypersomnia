@@ -40,9 +40,8 @@ public:
 		camera_cone,
 		const entity_id listening_character,
 		const cosmos&, 
-		const float global_time_seconds,
 		interpolation_system& sys
 	);
 
-	void resample_state_for_audiovisuals(const cosmos&);
+	void erase_caches_for_dead_entities(const cosmos&);
 };

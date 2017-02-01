@@ -10,8 +10,8 @@
 #include "augs/network/network_client.h"
 #include "augs/misc/machine_entropy.h"
 
-struct cosmic_entropy;
 #include "game/transcendental/step_declaration.h"
+#include "game/transcendental/cosmic_entropy.h"
 class cosmos;
 class world_camera;
 class viewing_session;

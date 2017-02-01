@@ -380,7 +380,7 @@ void visibility_system::respond_to_visibility_information_requests(
 			push_vertex(v, false);
 
 		/* SORT ALL VERTICES BY ANGLE */
-		std::sort(all_vertices_transformed.begin(), all_vertices_transformed.end());
+		sort_container(all_vertices_transformed);
 		all_vertices_transformed.erase(std::unique(all_vertices_transformed.begin(), all_vertices_transformed.end()), all_vertices_transformed.end());
 
 		/* by now we have ensured that all_vertices_transformed is non-empty

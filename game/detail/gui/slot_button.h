@@ -14,7 +14,6 @@ struct slot_button : game_gui_rect_node {
 	typedef const_dereferenced_location<slot_button_in_container> const_this_in_container;
 	typedef game_gui_rect_node::gui_entropy gui_entropy;
 
-	vec2i slot_relative_pos;
 	vec2i user_drag_offset;
 
 	augs::gui::appearance_detector detector;

@@ -4,6 +4,8 @@
 #include "augs/misc/machine_entropy.h"
 #include "game/global/input_context.h"
 
+#include "game/detail/inventory_utils.h"
+
 template <class key>
 void basic_cosmic_entropy<key>::override_transfers_leaving_other_entities(
 	const cosmos& cosm,
@@ -18,8 +20,8 @@ void basic_cosmic_entropy<key>::override_transfers_leaving_other_entities(
 			const auto new_transfer = cosm[n];
 			
 			if (
-				match_transfer_capabilities(new_transfer).authorized_entity
-				== overridden_transfer.authorized_entity
+				match_transfer_capabilities(new_transfer).authorized_capability
+				== overridden_transfer.authorized_capability
 			) {
 				return true;
 			}
@@ -45,7 +47,7 @@ size_t basic_cosmic_entropy<key>::length() const {
 }
 
 template <class key>
-basic_cosmic_entropy& basic_cosmic_entropy<key>::operator+=(const basic_cosmic_entropy& b) {
+basic_cosmic_entropy<key>& basic_cosmic_entropy<key>::operator+=(const basic_cosmic_entropy& b) {
 	for (const auto& new_entropy : b.entropy_per_entity) {
 		concatenate(entropy_per_entity[new_entropy.first], new_entropy.second);
 	}
@@ -91,5 +93,5 @@ cosmic_entropy::cosmic_entropy(
 	entropy_per_entity[controlled_entity] = intents;
 }
 
-template class basic_cosmic_entropy<unsigned>;
-template class basic_cosmic_entropy<entity_id>;
+template struct basic_cosmic_entropy<unsigned>;
+template struct basic_cosmic_entropy<entity_id>;

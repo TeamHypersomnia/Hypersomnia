@@ -56,7 +56,7 @@ void dynamic_tree_system::construct(const const_entity_handle handle) {
 			input.lowerBound = data.aabb.left_top();
 			input.upperBound = data.aabb.right_bottom();
 			
-			unversioned_entity_id node_userdata(handle.get_id());
+			auto node_userdata = handle.get_id().operator unversioned_entity_id();
 			static_assert(sizeof(node_userdata) <= sizeof(void*), "Userdata must be less than size of void*");
 
 			cache.tree_proxy_id = get_tree(cache).nodes.CreateProxy(input, reinterpret_cast<void*>(node_userdata.pool.indirection_index));

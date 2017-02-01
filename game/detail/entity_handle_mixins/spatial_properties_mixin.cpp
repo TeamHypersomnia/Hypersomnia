@@ -60,7 +60,7 @@ vec2 basic_spatial_properties_mixin<C, D>::get_effective_velocity() const {
 		ensure(handle.has<components::transform>());
 		return 
 			(handle.get<components::transform>().pos - handle.get<components::position_copying>().get_previous_transform().pos)
-			* static_cast<float>(handle.get_cosmos().get_fixed_delta().get_steps_per_second());
+			/ static_cast<float>(handle.get_cosmos().get_fixed_delta().in_seconds());
 	}
 	
 	return{};

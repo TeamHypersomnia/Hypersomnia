@@ -115,7 +115,3 @@ input_recording_type config_lua_table::get_input_recording_mode() const {
 	default: return input_recording_type::DISABLED; break;
 	}
 }
-
-void config_lua_table::update_configuration_for(viewing_session& session) const {
-	session.systems_audiovisual.get<gui_element_system>().character_guis = hotbar;
-}

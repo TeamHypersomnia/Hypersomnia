@@ -85,7 +85,11 @@ void drag_and_drop_callback(
 }
 
 template <class C>
-drag_and_drop_result prepare_drag_and_drop_result(const C context, const game_gui_element_location held_rect_id, const game_gui_element_location drop_target_rect_id) {
+drag_and_drop_result prepare_drag_and_drop_result(
+	const C context, 
+	const game_gui_element_location held_rect_id, 
+	const game_gui_element_location drop_target_rect_id
+) {
 	const auto& cosmos = context.get_cosmos();
 	const auto& element = context.get_character_gui();
 	const auto owning_transfer_capability = context.get_gui_element_entity();
@@ -158,7 +162,6 @@ drag_and_drop_result prepare_drag_and_drop_result(const C context, const game_gu
 			drop.source_hotbar_button_id = source_hotbar_button_id;
 
 			bool was_pointing_to_a_stack_target = false;
-			bool no_slot_in_targeted_item = false;
 
 			if (target_slot != nullptr) {
 				simulated_transfer.target_slot = target_slot.get_location().slot_id;
@@ -172,16 +175,10 @@ drag_and_drop_result prepare_drag_and_drop_result(const C context, const game_gu
 					if (compatible_slot != slot_function::INVALID) {
 						simulated_transfer.target_slot = target_item_handle[compatible_slot];
 					}
-					else {
-						no_slot_in_targeted_item = true;
-					}
 				}
 				else if (can_stack_entities(target_item_handle, dragged_item_handle)) {
 					simulated_transfer.target_slot = target_item_handle.get<components::item>().current_slot;
 					was_pointing_to_a_stack_target = true;
-				}
-				else {
-					no_slot_in_targeted_item = true;
 				}
 			}
 			else if (target_drop_item != nullptr) {
@@ -192,8 +189,8 @@ drag_and_drop_result prepare_drag_and_drop_result(const C context, const game_gu
 			}
 
 			if (possible_target_hovered) {
-				if (no_slot_in_targeted_item) {
-					drop.result.result = item_transfer_result_type::NO_SLOT_AVAILABLE;
+				if (target_item != nullptr && cosmos[simulated_transfer.target_slot].dead()) {
+					drop.hint_text = L"No compatible slot available";
 					drop.result.transferred_charges = 0;
 				}
 				else {
@@ -205,19 +202,19 @@ drag_and_drop_result prepare_drag_and_drop_result(const C context, const game_gu
 				if (predicted_result == item_transfer_result_type::THE_SAME_SLOT) {
 					drop.hint_text = L"Current slot";
 				}
-				else if (predicted_result >= item_transfer_result_type::SUCCESSFUL_TRANSFER) {
-					if (predicted_result == item_transfer_result_type::UNMOUNT_BEFOREHAND) {
-						drop.hint_text += L"Unmount & ";
-					}
+				else if (predicted_result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
+					// 	drop.hint_text += L"Unmount & ";
 
 					std::wstring charges_text;
-					auto item_charges = dragged_item_handle.get<components::item>().charges;
+					const auto item_charges = dragged_item_handle.get<components::item>().charges;
 
 					if (item_charges > 1) {
-						if (simulated_transfer.specified_quantity == drop.result.transferred_charges)
+						if (simulated_transfer.specified_quantity == drop.result.transferred_charges) {
 							charges_text = L" all";
-						else
+						}
+						else {
 							charges_text = L" " + to_wstring(drop.result.transferred_charges);
+						}
 					}
 
 					if (target_drop_item) {
@@ -238,19 +235,19 @@ drag_and_drop_result prepare_drag_and_drop_result(const C context, const game_gu
 						case slot_function::PRIMARY_HAND: drop.hint_text += L"Wield"; break;
 						case slot_function::SECONDARY_HAND: drop.hint_text += L"Wield"; break;
 						case slot_function::GUN_MUZZLE: drop.hint_text += L"Install"; break;
-						default: ensure(0); break;
+						default: ensure(false); break;
 						}
 
 						drop.hint_text += charges_text;
 					}
 				}
-				else if (predicted_result < item_transfer_result_type::SUCCESSFUL_TRANSFER) {
+				else {
 					switch (predicted_result) {
 					case item_transfer_result_type::INSUFFICIENT_SPACE: drop.hint_text = L"No space"; break;
-					case item_transfer_result_type::INVALID_SLOT_OR_UNOWNED_ROOT: drop.hint_text = L"Impossible"; break;
+					case item_transfer_result_type::INVALID_CAPABILITIES: drop.hint_text = L"Impossible"; break;
 					case item_transfer_result_type::INCOMPATIBLE_CATEGORIES: drop.hint_text = L"Incompatible item"; break;
-					case item_transfer_result_type::NO_SLOT_AVAILABLE: drop.hint_text = L"No slot available"; break;
-					default: ensure(0); break;
+					case item_transfer_result_type::COULD_REPLACE_BUT_NO_SPACE: drop.hint_text = L"Could replace but no space"; break;
+					default: drop.hint_text = L"Unknown problem"; break;
 					}
 				}
 

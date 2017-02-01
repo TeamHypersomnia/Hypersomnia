@@ -5,7 +5,10 @@
 
 #include "application/game_window.h"
 
-void two_clients_and_server_setup::process(const config_lua_table& cfg, game_window& window) {
+void two_clients_and_server_setup::process(
+	const config_lua_table& cfg, 
+	game_window& window
+) {
 	server_setup serv_setup;
 
 	std::thread server_thread([&]() {
@@ -71,13 +74,13 @@ void two_clients_and_server_setup::process(const config_lua_table& cfg, game_win
 		target.clear_current_fbo();
 
 		if (current_window == 0) {
-			if(alive[0]) setups[0].process_once(window, precollected, false);
-			if(alive[1]) setups[1].process_once(window, augs::machine_entropy::local_type(), false);
+			if(alive[0]) setups[0].process_once(cfg, window, precollected, false);
+			if(alive[1]) setups[1].process_once(cfg, window, augs::machine_entropy::local_type(), false);
 		}
 
 		if (current_window == 1) {
-			if(alive[1]) setups[1].process_once(window, precollected, false);
-			if(alive[0]) setups[0].process_once(window, augs::machine_entropy::local_type(), false);
+			if(alive[1]) setups[1].process_once(cfg, window, precollected, false);
+			if(alive[0]) setups[0].process_once(cfg, window, augs::machine_entropy::local_type(), false);
 		}
 
 		window.swap_buffers();

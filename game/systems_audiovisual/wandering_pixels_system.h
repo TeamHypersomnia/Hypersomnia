@@ -12,6 +12,7 @@
 
 class viewing_step;
 struct randomization;
+struct visible_entities;
 
 class interpolation_system;
 
@@ -21,7 +22,6 @@ namespace resources {
 
 class wandering_pixels_system {
 public:
-
 	struct drawing_input : vertex_triangle_buffer_reference {
 		using vertex_triangle_buffer_reference::vertex_triangle_buffer_reference;
 
@@ -45,16 +45,31 @@ public:
 		bool constructed = false;
 	};
 
+	float global_time = 0.f;
+
 	//std::vector<cache> per_entity_cache;
 	std::unordered_map<entity_id, cache> per_entity_cache;
 
 	cache& get_cache(const const_entity_handle);
 	const cache& get_cache(const const_entity_handle) const;
 
-	void advance_wandering_pixels_for(const const_entity_handle, const float global_time, const augs::delta dt);
-	void draw_wandering_pixels_for(const const_entity_handle, const drawing_input&) const;
+	void advance_for_visible(
+		const visible_entities&,
+		const cosmos&,
+		const augs::delta dt
+	);
+
+	void advance_wandering_pixels_for(
+		const const_entity_handle, 
+		const augs::delta dt
+	);
+
+	void draw_wandering_pixels_for(
+		const const_entity_handle, 
+		const drawing_input&
+	) const;
 
 	void reserve_caches_for_entities(const size_t) const {}
 
-	void resample_state_for_audiovisuals(const cosmos&);
+	void erase_caches_for_dead_entities(const cosmos&);
 };

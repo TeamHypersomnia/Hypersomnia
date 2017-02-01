@@ -71,7 +71,7 @@ void hotbar_button::draw(const viewing_game_gui_context context, const const_thi
 	const auto& this_tree_entry = context.get_tree_entry(this_id);
 	auto absolute_rc = this_tree_entry.get_absolute_rect();
 	const auto owner_transfer_capability = context.get_gui_element_entity();
-	const auto& settings = context.get_character_gui().hotbar_settings;
+	const auto& settings = context.hotbar_settings;
 
 	const int left_rc_spacing = 2;
 	const int right_rc_spacing = 1;

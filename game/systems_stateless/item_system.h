@@ -9,7 +9,6 @@ public:
 	void handle_trigger_confirmations_as_pick_requests(const logic_step step);
 	
 	void handle_throw_item_intents(const logic_step step);
-	void handle_holster_item_intents(const logic_step step);
 	
 	void process_mounting_and_unmounting(const logic_step step);
 };

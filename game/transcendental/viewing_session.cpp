@@ -5,11 +5,28 @@
 #include "game/scene_managers/rendering_scripts/all.h"
 #include "augs/misc/machine_entropy.h"
 #include "game/components/flags_component.h"
+#include "game/messages/item_picked_up_message.h"
 
 #include "augs/network/network_client.h"
 
 viewing_session::viewing_session() {
 	systems_audiovisual.get<sound_system>().initialize_sound_sources(32u);
+}
+
+void viewing_session::set_screen_size(const vec2i new_size) {
+	for (auto& c : systems_audiovisual.get<gui_element_system>().character_guis) {
+		c.second.set_screen_size(new_size);
+	}
+
+	camera.configure_size(new_size);
+}
+
+void viewing_session::set_interpolation_enabled(const bool flag) {
+	systems_audiovisual.get<interpolation_system>().enabled = flag;
+}
+
+void viewing_session::set_master_gain(const float gain) {
+	systems_audiovisual.get<sound_system>().master_gain = gain;
 }
 
 void viewing_session::configure_input() {
@@ -59,30 +76,70 @@ void viewing_session::configure_input() {
 	active_context.map_key_to_intent(key::DASH, intent_type::OPEN_DEVELOPER_CONSOLE);
 }
 
-std::wstring viewing_session::summary() const {
-	return 
-		fps_profiler.summary()
-		+ frame_profiler.summary()
-		+ triangles.summary()
-		+ local_entropy_profiler.summary()
-		+ remote_entropy_profiler.summary()
-		+ unpack_local_steps_profiler.summary()
-		+ sending_commands_and_predict_profiler.summary()
-		+ unpack_remote_steps_profiler.summary()
-		+ sending_packets_profiler.summary()
-		;
+void viewing_session::reserve_caches_for_entities(const size_t n) {
+	systems_audiovisual.for_each([n](auto& sys) {
+		sys.reserve_caches_for_entities(n);
+	});
 }
 
-void viewing_session::acquire_game_events_for_hud(const const_logic_step step) {
+void viewing_session::switch_between_gui_and_back(const augs::machine_entropy::local_type& local) {
+	for (const auto& intent : context.to_key_and_mouse_intents(local)) {
+		if (intent.is_pressed && intent.intent == intent_type::SWITCH_TO_GUI) {
+			gui_look_enabled = !gui_look_enabled;
+		}
+	}
+}
+
+void viewing_session::control_gui_and_remove_fetched_events(
+	const const_entity_handle root,
+	augs::machine_entropy::local_type& entropies
+) {
+	systems_audiovisual.get<gui_element_system>().advance_gui_elements(root, entropies);
+}
+
+void viewing_session::control_and_remove_fetched_intents(std::vector<key_and_mouse_intent>& intents) {
+	erase_remove(intents, [&](const key_and_mouse_intent& intent) {
+		bool fetch = false;
+
+		if (intent.intent == intent_type::OPEN_DEVELOPER_CONSOLE) {
+			fetch = true;
+
+			if (intent.is_pressed) {
+				show_profile_details = !show_profile_details;
+			}
+		}
+		else if (intent.intent == intent_type::SWITCH_WEAPON_LASER) {
+			fetch = true;
+
+			if (intent.is_pressed) {
+				drawing_settings.draw_weapon_laser = !drawing_settings.draw_weapon_laser;
+			}
+		}
+
+		return fetch;
+	});
+}
+
+void viewing_session::standard_audiovisual_post_solve(const const_logic_step step) {
 	hud.acquire_game_events(step);
-}
 
-void viewing_session::set_interpolation_enabled(const bool flag) {
-	systems_audiovisual.get<interpolation_system>().enabled = flag;
-}
+	const auto& cosm = step.cosm;
 
-void viewing_session::set_master_gain(const float gain) {
-	systems_audiovisual.get<sound_system>().master_gain = gain;
+	auto& gui = systems_audiovisual.get<gui_element_system>();
+
+	gui.reposition_picked_up_and_transferred_items(step);
+
+	gui.erase_caches_for_dead_entities(step.cosm);
+	systems_audiovisual.get<sound_system>().erase_caches_for_dead_entities(step.cosm);
+	systems_audiovisual.get<particles_simulation_system>().erase_caches_for_dead_entities(step.cosm);
+	systems_audiovisual.get<wandering_pixels_system>().erase_caches_for_dead_entities(step.cosm);
+
+	for (const auto& pickup : step.transient.messages.get_queue<messages::item_picked_up_message>()) {
+		gui.get_character_gui(pickup.subject).assign_item_to_first_free_hotbar_button(
+			cosm[pickup.subject], 
+			cosm[pickup.item]
+		);
+	}
 }
 
 void viewing_session::spread_past_infection(const const_logic_step step) {
@@ -102,29 +159,46 @@ void viewing_session::spread_past_infection(const const_logic_step step) {
 	}
 }
 
-void viewing_session::reserve_caches_for_entities(const size_t n) {
-	systems_audiovisual.for_each([n](auto& sys) {
-		sys.reserve_caches_for_entities(n);
-	});
-}
-
 void viewing_session::advance_audiovisual_systems(
 	const cosmos& cosm, 
 	const entity_id viewed_character,
-	const augs::variable_delta dt
+	const visible_entities& all_visible,
+	const augs::delta dt
 ) {
 	auto& interp = systems_audiovisual.get<interpolation_system>();
 
 	cosm.profiler.start(meter_type::INTERPOLATION);
-	interp.integrate_interpolated_transforms(cosm, dt, dt.get_fixed());
+	interp.integrate_interpolated_transforms(cosm, dt, cosm.get_fixed_delta());
 	cosm.profiler.stop(meter_type::INTERPOLATION);
 
 	systems_audiovisual.get<particles_simulation_system>().advance_visible_streams_and_all_particles(
 		camera.smoothed_camera, 
 		cosm, 
 		dt, 
-		interp);
+		interp
+	);
 	
+	systems_audiovisual.get<light_system>().advance_attenuation_variations(cosm, dt);
+
+	camera.tick(
+		systems_audiovisual.get<interpolation_system>(), 
+		dt, 
+		cosm[viewed_character]
+	);
+	
+	systems_audiovisual.get<wandering_pixels_system>().advance_for_visible(
+		all_visible, 
+		cosm,
+		dt
+	);
+	
+	world_hover_highlighter.cycle_duration_ms = 700;
+	world_hover_highlighter.update(dt.in_milliseconds());
+
+	systems_audiovisual.get<gui_element_system>().rebuild_layouts(
+		cosm[viewed_character]
+	);
+
 	auto listener_cone = camera.smoothed_camera;
 	listener_cone.transform = cosm[viewed_character].viewing_transform(interp);
 
@@ -132,68 +206,24 @@ void viewing_session::advance_audiovisual_systems(
 		listener_cone,
 		viewed_character,
 		cosm,
-		cosm.get_total_time_passed_in_seconds() + dt.seconds_after_last_step(),
 		interp
 	);
 }
 
-void viewing_session::resample_state_for_audiovisuals(const cosmos& cosm) {
-	systems_audiovisual.for_each([&cosm](auto& sys) {
-		sys.resample_state_for_audiovisuals(cosm);
-	});
-}
-
-void viewing_session::switch_between_gui_and_back(const augs::machine_entropy::local_type& local) {
-	for (const auto& intent : context.to_key_and_mouse_intents(local)) {
-		if(intent.is_pressed && intent.intent == intent_type::SWITCH_TO_GUI) {
-			gui_look_enabled = !gui_look_enabled;
-		}
-	}
-}
-
-void viewing_session::control_gui_and_remove_fetched_events(
-	const const_entity_handle root,
-	augs::machine_entropy::local_type& entropies
-) {
-	systems_audiovisual.get<gui_element_system>().advance_gui_elements(root, entropies);
-}
-
-void viewing_session::control_and_remove_fetched_intents(std::vector<key_and_mouse_intent>& intents) {
-	erase_remove(intents, [&](const key_and_mouse_intent& intent) {
-		bool fetch = false;
-		
-		if (intent.intent == intent_type::OPEN_DEVELOPER_CONSOLE) {
-			fetch = true;
-			
-			if (intent.is_pressed) {
-				show_profile_details = !show_profile_details;
-			}
-		}
-		else if (intent.intent == intent_type::SWITCH_WEAPON_LASER) {
-			fetch = true;
-
-			if (intent.is_pressed) {
-				drawing_settings.draw_weapon_laser = !drawing_settings.draw_weapon_laser;
-			}
-		}
-
-		return fetch;
-	});
-}
-
 void viewing_session::view(
 	const config_lua_table& config,
 	augs::renderer& renderer,
 	const cosmos& cosmos,
 	const entity_id viewed_character,
-	const augs::variable_delta& dt,
+	const visible_entities& all_visible,
+	const float interpolation_ratio,
 	const augs::network::client& details
-) {
+) const {
 	using namespace augs::gui::text;
 	
 	const auto custom_log = multiply_alpha(simple_bbcode(typesafe_sprintf("[color=cyan]Transmission details:[/color]\n%x", details.format_transmission_details()), style(assets::font_id::GUI_FONT, white)), 150.f / 255);;
 
-	view(config, renderer, cosmos, viewed_character, dt, custom_log);
+	view(config, renderer, cosmos, viewed_character, all_visible, interpolation_ratio, custom_log);
 }
 
 void viewing_session::view(
@@ -201,9 +231,10 @@ void viewing_session::view(
 	augs::renderer& renderer,
 	const cosmos& cosmos,
 	const entity_id viewed_character,
-	const augs::variable_delta& dt,
+	const visible_entities& all_visible,
+	const float interpolation_ratio,
 	const augs::gui::text::fstr& custom_log
-) {
+) const {
 	frame_profiler.new_measurement();
 
 	const auto screen_size = camera.smoothed_camera.visible_world_area;
@@ -213,21 +244,15 @@ void viewing_session::view(
 
 	const auto character_chased_by_camera = cosmos[viewed_character];
 
-	camera.tick(systems_audiovisual.get<interpolation_system>(), dt, character_chased_by_camera);
-	world_hover_highlighter.cycle_duration_ms = 700;
-	world_hover_highlighter.update(dt.in_milliseconds());
-
-	const auto visible = visible_entities(camera.smoothed_camera, cosmos);
-
 	auto main_cosmos_viewing_step = viewing_step(
 		config,
 		cosmos, 
 		*this, 
-		dt, 
+		interpolation_ratio,
 		renderer, 
 		camera.smoothed_camera, 
 		character_chased_by_camera,
-		visible
+		all_visible
 	);
 
 	main_cosmos_viewing_step.settings = drawing_settings;
@@ -245,8 +270,27 @@ void viewing_session::view(
 		const auto rot = character_chased_by_camera.alive() ? character_chased_by_camera.logic_transform().rotation : 0.f;
 		const auto vel = character_chased_by_camera.alive() ? character_chased_by_camera.get<components::physics>().velocity() : vec2();
 
-		const auto bbox = quick_print_format(renderer.triangles, typesafe_sprintf(L"Entities: %x\nX: %f2\nY: %f2\nRot: %f2\nVelX: %x\nVelY: %x\n", cosmos.entities_count(), coords.x, coords.y, rot, vel.x, vel.y)
-			+ summary() + cosmos.profiler.sorted_summary(show_profile_details), style(assets::font_id::GUI_FONT, rgba(255, 255, 255, 150)), vec2i(0, 0), 0);
+		const auto bbox = quick_print_format(
+			renderer.triangles, 
+
+			typesafe_sprintf(
+				L"Entities: %x\nX: %f2\nY: %f2\nRot: %f2\nVelX: %x\nVelY: %x\n", 
+				cosmos.entities_count(), 
+				coords.x, 
+				coords.y, 
+				rot, 
+				vel.x, 
+				vel.y
+			) + summary() + cosmos.profiler.sorted_summary(show_profile_details), 
+
+			style(
+				assets::font_id::GUI_FONT, 
+				rgba(255, 255, 255, 150)
+			), 
+
+			vec2i(0, 0), 
+			0
+		);
 
 		quick_print(renderer.triangles, multiply_alpha(global_log::format_recent_as_text(assets::font_id::GUI_FONT), 150.f / 255), vec2i(screen_size_i.x - 300, 0), 300);
 		quick_print(renderer.triangles, custom_log, vec2i(0, static_cast<int>(bbox.y)), 0);
@@ -263,6 +307,20 @@ void viewing_session::view(
 	frame_profiler.end_measurement();
 }
 
+std::wstring viewing_session::summary() const {
+	return
+		fps_profiler.summary()
+		+ frame_profiler.summary()
+		+ triangles.summary()
+		+ local_entropy_profiler.summary()
+		+ remote_entropy_profiler.summary()
+		+ unpack_local_steps_profiler.summary()
+		+ sending_commands_and_predict_profiler.summary()
+		+ unpack_remote_steps_profiler.summary()
+		+ sending_packets_profiler.summary()
+		;
+}
+
 void viewing_session::draw_color_overlay(augs::renderer& renderer, const rgba col) const {
 	components::sprite overlay;
 	overlay.set(assets::texture_id::BLANK, col);
@@ -276,4 +334,8 @@ void viewing_session::draw_color_overlay(augs::renderer& renderer, const rgba co
 
 	renderer.call_triangles();
 	renderer.clear_triangles();
+}
+
+visible_entities viewing_session::get_visible_entities(const cosmos& cosm) {
+	return{ camera.smoothed_camera, cosm };
 }

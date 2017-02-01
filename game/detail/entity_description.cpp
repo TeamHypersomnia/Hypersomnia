@@ -84,13 +84,13 @@ std::wstring describe_properties(const const_entity_handle id) {
 	const auto& depo = id[slot_function::ITEM_DEPOSIT];
 
 	if (depo.alive()) {
-		const auto children_space = format_space_units(depo.calculate_free_space_with_children());
-		const auto with_parents_space = format_space_units(depo.calculate_free_space_with_parent_containers());
+		const auto children_space = format_space_units(depo.calculate_local_free_space());
+		const auto with_parents_space = format_space_units(depo.calculate_real_free_space());
 
-		result << L"Deposit space: [color=vsgreen]" << format_space_units(depo.calculate_free_space_with_parent_containers()) << L"[/color]/";
+		result << L"Deposit space: [color=vsgreen]" << format_space_units(depo.calculate_real_free_space()) << L"[/color]/";
 
 		if (children_space != with_parents_space)
-			result << L"[color=vsyellow]" << format_space_units(depo.calculate_free_space_with_children()) << L"[/color]/";
+			result << L"[color=vsyellow]" << format_space_units(depo.calculate_local_free_space()) << L"[/color]/";
 			
 		result << L"[color=vscyan]" << format_space_units(depo->space_available) << L"[/color]\n";
 	}

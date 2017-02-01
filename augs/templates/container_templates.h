@@ -17,6 +17,16 @@ void erase_remove(Container& v, const T& l) {
 }
 
 template<class Container, class T>
+void sort_container(Container& v, const T l) {
+	std::sort(v.begin(), v.end(), l);
+}
+
+template<class Container>
+void sort_container(Container& v) {
+	std::sort(v.begin(), v.end());
+}
+
+template<class Container, class T>
 void remove_element(Container& v, const T& l) {
 	v.erase(std::remove(v.begin(), v.end(), l), v.end());
 }

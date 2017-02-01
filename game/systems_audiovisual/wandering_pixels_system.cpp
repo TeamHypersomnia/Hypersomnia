@@ -4,7 +4,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 
-void wandering_pixels_system::resample_state_for_audiovisuals(const cosmos& new_cosmos) {
+void wandering_pixels_system::erase_caches_for_dead_entities(const cosmos& new_cosmos) {
 	std::vector<entity_id> to_erase;
 
 	for (const auto it : per_entity_cache) {
@@ -26,10 +26,24 @@ const wandering_pixels_system::cache& wandering_pixels_system::get_cache(const c
 	return per_entity_cache.at(id.get_id());
 }
 
-void wandering_pixels_system::advance_wandering_pixels_for(const const_entity_handle it, const float global_time, const augs::delta dt) {
+void wandering_pixels_system::advance_for_visible(
+	const visible_entities& visible,
+	const cosmos& cosm,
+	const augs::delta dt
+) {
+	global_time += dt.in_seconds();
+
+	for (const auto e : visible.per_layer[render_layer::WANDERING_PIXELS_EFFECTS]) {
+		advance_wandering_pixels_for(e, dt);
+	}
+}
+
+void wandering_pixels_system::advance_wandering_pixels_for(
+	const const_entity_handle it, 
+	const augs::delta dt
+) {
 	auto& cache = get_cache(it);
 	const auto& wandering = it.get<components::wandering_pixels>();
-
 
 	if (cache.recorded_component.count != wandering.count) {
 		cache.particles.resize(wandering.count);

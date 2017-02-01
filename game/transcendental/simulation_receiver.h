@@ -30,7 +30,11 @@ class simulation_receiver {
 	};
 
 	misprediction_candidate_entry acquire_potential_misprediction(const const_entity_handle) const;
-	std::vector<misprediction_candidate_entry> acquire_potential_mispredictions(const std::unordered_set<entity_id>&, const cosmos& predicted_cosmos_before_reconciliation) const;
+	
+	std::vector<misprediction_candidate_entry> acquire_potential_mispredictions(
+		const std::unordered_set<entity_id>&, 
+		const cosmos& predicted_cosmos_before_reconciliation
+	) const;
 
 	unpacking_result unpack_deterministic_steps(cosmos& referential_cosmos, cosmos& last_delta_unpacked);
 	void drag_mispredictions_into_past(interpolation_system&, past_infection_system&, const cosmos& predicted_cosmos, const std::vector<misprediction_candidate_entry>& mispredictions) const;
@@ -87,7 +91,10 @@ public:
 
 			advance(cosmic_entropy_for_this_step, referential_cosmos);
 
-			if (0 == referential_cosmos.get_total_steps_passed() % static_cast<int>(resubstantiate_prediction_every_ms / referential_cosmos.get_fixed_delta().in_milliseconds())) {
+			const auto total_steps = referential_cosmos.get_total_steps_passed();
+			const auto resubstantiate_per_steps = static_cast<int>(resubstantiate_prediction_every_ms / referential_cosmos.get_fixed_delta().in_milliseconds());
+
+			if (total_steps % resubstantiate_per_steps == 0) {
 				reconciliate_predicted = true;
 			}
 		}

@@ -46,7 +46,7 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 
 	viewing_session session;
 	session.reserve_caches_for_entities(3000);
-	session.camera.configure_size(screen_size);
+	session.set_screen_size(screen_size);
 	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
 	session.set_interpolation_enabled(false);
 	session.set_master_gain(cfg.sound_effects_volume);
@@ -239,7 +239,7 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 
 					hypersomnia.advance_deterministic_schemata(cosmic_entropy_for_this_advancement, [](auto) {},
 						[this, &session](const const_logic_step step) {
-							session.acquire_game_events_for_hud(step);
+							session.standard_audiovisual_post_solve(step);
 						}
 					);
 				}
@@ -312,19 +312,24 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 			augs::renderer::get_current().clear_logic_lines();
 
 			hypersomnia.advance_deterministic_schemata(cosmic_entropy_for_this_advancement, [](auto) {},
-					[this, &session](const const_logic_step step) {
-					session.acquire_game_events_for_hud(step);
+				[this, &session](const const_logic_step step) {
+					session.standard_audiovisual_post_solve(step);
 				}
 			);
-
-			session.resample_state_for_audiovisuals(hypersomnia);
 			
 			total_collected_entropy = cosmic_entropy();
 		}
 
+		const auto all_visible = session.get_visible_entities(hypersomnia);
+
 		const auto vdt = session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), timer);
 
-		session.advance_audiovisual_systems(hypersomnia, testbed.get_selected_character(), vdt);
+		session.advance_audiovisual_systems(
+			hypersomnia, 
+			testbed.get_selected_character(),
+			all_visible,
+			vdt
+		);
 
 		using namespace augs::gui::text;
 
@@ -372,7 +377,8 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 			renderer, 
 			hypersomnia, 
 			testbed.get_selected_character(), 
-			vdt, 
+			all_visible,
+			timer.fraction_of_step_until_next_step(hypersomnia.get_fixed_delta()), 
 			director_text
 		);
 
