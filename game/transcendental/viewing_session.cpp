@@ -80,9 +80,11 @@ void viewing_session::reserve_caches_for_entities(const size_t n) {
 }
 
 void viewing_session::switch_between_gui_and_back(const augs::machine_entropy::local_type& local) {
+	auto& gui = systems_audiovisual.get<gui_element_system>();
+
 	for (const auto& intent : context.to_key_and_mouse_intents(local)) {
 		if (intent.is_pressed && intent.intent == intent_type::SWITCH_TO_GUI) {
-			gui_look_enabled = !gui_look_enabled;
+			gui.gui_look_enabled = !gui.gui_look_enabled;
 		}
 	}
 }
@@ -91,7 +93,17 @@ void viewing_session::control_gui_and_remove_fetched_events(
 	const const_entity_handle root,
 	augs::machine_entropy::local_type& entropies
 ) {
-	systems_audiovisual.get<gui_element_system>().advance_gui_elements(root, entropies);
+	auto& gui = systems_audiovisual.get<gui_element_system>();
+
+	gui.advance_gui_elements(
+		root, 
+		entropies
+	);
+
+	gui.handle_hotbar_and_action_button_presses(
+		root,
+		context.to_key_and_mouse_intents(entropies)
+	);
 }
 
 void viewing_session::control_and_remove_fetched_intents(std::vector<key_and_mouse_intent>& intents) {

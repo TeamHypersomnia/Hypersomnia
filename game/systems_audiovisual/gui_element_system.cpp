@@ -179,7 +179,7 @@ void gui_element_system::handle_hotbar_and_action_button_presses(
 
 void gui_element_system::advance_gui_elements(
 	const const_entity_handle root_entity,
-	const std::vector<augs::window::event::change>& events
+	std::vector<augs::window::event::change>& events
 ) {
 	const auto& cosmos = root_entity.get_cosmos();
 
@@ -207,48 +207,52 @@ void gui_element_system::advance_gui_elements(
 
 	rect_world.build_tree_data_into_context(context, root_location);
 
-	for (const auto& change : events) {
-		bool fetched = false;
+	if (gui_look_enabled) {
+		erase_remove(events, [&](const augs::window::event::change change) {
+			bool fetched = false;
 
-		const auto held_rect = context._dynamic_cast<item_button_in_item>(rect_world.rect_held_by_lmb);
+			const auto held_rect = context._dynamic_cast<item_button_in_item>(rect_world.rect_held_by_lmb);
 
-		if (held_rect != nullptr) {
-			const auto& item_entity = cosmos[held_rect.get_location().item_id];
-			auto& dragged_charges = element.dragged_charges;
+			if (held_rect != nullptr) {
+				const auto& item_entity = cosmos[held_rect.get_location().item_id];
+				auto& dragged_charges = element.dragged_charges;
 
-			if (change.msg == augs::window::event::message::rdown
-				|| change.msg == augs::window::event::message::rdoubleclick
-				) {
-				if (rect_world.held_rect_is_dragged) {
-					pending_transfers.push_back({ item_entity, cosmos[inventory_slot_id()], dragged_charges });
-					fetched = true;
+				if (change.msg == augs::window::event::message::rdown
+					|| change.msg == augs::window::event::message::rdoubleclick
+					) {
+					if (rect_world.held_rect_is_dragged) {
+						pending_transfers.push_back({ item_entity, cosmos[inventory_slot_id()], dragged_charges });
+						fetched = true;
+					}
+				}
+
+				if (change.msg == augs::window::event::message::wheel) {
+					const auto& item = item_entity.get<components::item>();
+
+					const auto delta = change.scroll.amount;
+
+					dragged_charges += delta;
+
+					if (dragged_charges <= 0) {
+						dragged_charges = item.charges + dragged_charges;
+					}
+					if (dragged_charges > item.charges) {
+						dragged_charges = dragged_charges - item.charges;
+					}
 				}
 			}
 
-			if (change.msg == augs::window::event::message::wheel) {
-				const auto& item = item_entity.get<components::item>();
-
-				const auto delta = change.scroll.amount;
-
-				dragged_charges += delta;
-
-				if (dragged_charges <= 0) {
-					dragged_charges = item.charges + dragged_charges;
-				}
-				if (dragged_charges > item.charges) {
-					dragged_charges = dragged_charges - item.charges;
-				}
+			if (!fetched) {
+				rect_world.consume_raw_input_and_generate_gui_events(
+					context,
+					root_location,
+					change,
+					gui_events
+				);
 			}
-		}
 
-		if (!fetched) {
-			rect_world.consume_raw_input_and_generate_gui_events(
-				context, 
-				root_location, 
-				change, 
-				gui_events
-			);
-		}
+			return change.uses_mouse();
+		});
 	}
 
 	// rect_world.call_idle_mousemotion_updater(context, root_location, entropy);

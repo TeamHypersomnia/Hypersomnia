@@ -18,6 +18,7 @@ public:
 
 	std::vector<item_slot_transfer_request_data> pending_transfers;
 
+	bool gui_look_enabled = false;
 	vec2i screen_size_for_new_characters;
 
 	cosmic_entropy get_and_clear_pending_events();
@@ -37,7 +38,7 @@ public:
 
 	void advance_gui_elements(
 		const const_entity_handle root_entity,
-		const std::vector<augs::window::event::change>& events
+		std::vector<augs::window::event::change>& events
 	);
 
 	void rebuild_layouts(

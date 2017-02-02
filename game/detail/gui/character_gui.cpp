@@ -304,7 +304,9 @@ void character_gui::draw(
 	rect_world.build_tree_data_into_context(context, root_of_inventory_gui_in_context());
 	rect_world.draw(context.get_output_buffer(), context, root_of_inventory_gui_in_context());
 
-	draw_cursor_with_information(context);
+	if (context.get_gui_element_system().gui_look_enabled) {
+		draw_cursor_with_information(context);
+	}
 }
 
 void character_gui::draw_cursor_with_information(const viewing_game_gui_context context) const {

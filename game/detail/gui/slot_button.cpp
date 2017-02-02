@@ -92,26 +92,19 @@ void slot_button::draw(const viewing_game_gui_context context, const const_this_
 			draw_centered_texture(context, this_id, info, augs::gui::material(assets::texture_id::DETACHABLE_MAGAZINE_ICON, border_col));
 		}
 	}
-	else {
-		draw_centered_texture(context, this_id, info, inside_mat);
-		draw_centered_texture(context, this_id, info, border_mat);
 
-		const auto space_available_text = augs::gui::text::format(to_wstring(slot_id.calculate_real_free_space() / long double(SPACE_ATOMS_PER_UNIT), 2, true)
-			, augs::gui::text::style(assets::font_id::GUI_FONT, border_col));
+	const bool is_child_of_root = slot_id.get_container() == context.get_gui_element_entity();
 
-		augs::gui::text_drawer space_caption;
-		space_caption.set_text(space_available_text);
-		space_caption.center(context.get_tree_entry(this_id).get_absolute_rect());
-		space_caption.draw(info);
-
-		draw_children(context, this_id, info);
-	}
-
-	if (slot_id.get_container().get_owning_transfer_capability() != slot_id.get_container()) {
-		const_dereferenced_location<item_button_in_item> child_item_button 
+	if (!is_child_of_root) {
+		const_dereferenced_location<item_button_in_item> child_item_button
 			= context.dereference_location(item_button_in_item{ slot_id.get_container().get_id() });
 
-		draw_pixel_line_connector(context.get_tree_entry(this_id).get_absolute_rect(), context.get_tree_entry(child_item_button).get_absolute_rect(), info, border_col);
+		draw_pixel_line_connector(
+			context.get_tree_entry(this_id).get_absolute_rect(),
+			context.get_tree_entry(child_item_button).get_absolute_rect(),
+			info,
+			border_col
+		);
 	}
 }
 
@@ -152,6 +145,9 @@ void slot_button::update_rc(const game_gui_context context, const this_in_contai
 			}
 		}
 	}
+	else {
+		this_id->unset_flag(augs::gui::flag::ENABLE_DRAWING);
+	}
 
 	this_id->user_drag_offset = griddify(this_id->user_drag_offset);
 	
@@ -172,4 +168,5 @@ void slot_button::update_rc(const game_gui_context context, const this_in_contai
 	}
 
 	this_id->rc.set_position(absolute_pos);
+	this_id->rc.set_size(standard_relative_pos.get_size());
 }
