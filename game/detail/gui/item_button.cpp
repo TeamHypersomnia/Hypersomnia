@@ -29,7 +29,10 @@
 #include "augs/templates/string_templates.h"
 #include "augs/ensure.h"
 
-bool item_button::is_being_wholely_dragged_or_pending_finish(const const_game_gui_context context, const const_this_in_item this_id) {
+bool item_button::is_being_wholely_dragged_or_pending_finish(
+	const const_game_gui_context context, 
+	const const_this_in_item this_id
+) {
 	const auto& rect_world = context.get_rect_world();
 	const auto& element = context.get_character_gui();
 	const auto& cosmos = context.get_cosmos();
@@ -37,6 +40,13 @@ bool item_button::is_being_wholely_dragged_or_pending_finish(const const_game_gu
 	if (rect_world.is_currently_dragging(this_id)) {
 		const bool is_drag_partial = element.dragged_charges < cosmos[this_id.get_location().item_id].get<components::item>().charges;
 		return !is_drag_partial;
+	}
+	else {
+		for (const auto& r : context.get_gui_element_system().pending_transfers) {
+			if (r.item == this_id.get_location().item_id) {
+				return true;
+			}
+		}
 	}
 
 	return false;
@@ -48,7 +58,12 @@ item_button::item_button(xywh rc) : base(rc) {
 	unset_flag(augs::gui::flag::FOCUSABLE);
 }
 
-void item_button::draw_dragged_ghost_inside(const viewing_game_gui_context context, const const_this_in_item this_id, draw_info in, vec2 absolute_xy_offset) {
+void item_button::draw_dragged_ghost_inside(
+	const viewing_game_gui_context context, 
+	const const_this_in_item this_id, 
+	const draw_info in, 
+	const vec2 absolute_xy_offset
+) {
 	drawing_settings f;
 	f.draw_background = true;
 	f.draw_item = true;
@@ -63,7 +78,11 @@ void item_button::draw_dragged_ghost_inside(const viewing_game_gui_context conte
 	draw_proc(context, this_id, in, f);
 }
 
-void item_button::draw_complete_with_children(const viewing_game_gui_context context, const const_this_in_item this_id, draw_info in) {
+void item_button::draw_complete_with_children(
+	const viewing_game_gui_context context, 
+	const const_this_in_item this_id, 
+	draw_info in
+) {
 	drawing_settings f;
 	f.draw_background = true;
 	f.draw_item = true;
@@ -78,7 +97,12 @@ void item_button::draw_complete_with_children(const viewing_game_gui_context con
 	draw_proc(context, this_id, in, f);
 }
 
-void item_button::draw_grid_border_ghost(const viewing_game_gui_context context, const const_this_in_item this_id, const draw_info in, const vec2 absolute_xy_offset) {
+void item_button::draw_grid_border_ghost(
+	const viewing_game_gui_context context, 
+	const const_this_in_item this_id, 
+	const draw_info in, 
+	const vec2 absolute_xy_offset
+) {
 	drawing_settings f;
 	f.draw_background = false;
 	f.draw_item = false;
@@ -93,7 +117,12 @@ void item_button::draw_grid_border_ghost(const viewing_game_gui_context context,
 	draw_proc(context, this_id, in, f);
 }
 
-void item_button::draw_complete_dragged_ghost(const viewing_game_gui_context context, const const_this_in_item this_id, const draw_info in, const vec2 absolute_xy_offset) {
+void item_button::draw_complete_dragged_ghost(
+	const viewing_game_gui_context context, 
+	const const_this_in_item this_id, 
+	const draw_info in, 
+	const vec2 absolute_xy_offset
+) {
 	draw_dragged_ghost_inside(context, this_id, in, absolute_xy_offset);
 }
 
@@ -152,7 +181,12 @@ vec2 item_button::griddify_size(const vec2 size, const vec2 expander) {
 	return rounded_size;
 }
 
-void item_button::draw_proc(const viewing_game_gui_context context, const const_this_in_item this_id, const draw_info in, const drawing_settings& f) {
+void item_button::draw_proc(
+	const viewing_game_gui_context context, 
+	const const_this_in_item this_id, 
+	const draw_info in, 
+	const drawing_settings& f
+) {
 	if (is_inventory_root(context, this_id)) {
 		return;
 	}

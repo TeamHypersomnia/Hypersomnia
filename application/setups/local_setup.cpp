@@ -113,14 +113,14 @@ void local_setup::process(
 				new_intents
 			);
 
-			new_cosmic_entropy += session.systems_audiovisual.get<gui_element_system>().get_and_clear_pending_events();
-
 			total_collected_entropy += new_cosmic_entropy;
 		}
 
 		auto steps = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
 
 		while (steps--) {
+			total_collected_entropy += session.systems_audiovisual.get<gui_element_system>().get_and_clear_pending_events();
+
 			player.advance_player_and_biserialize(total_collected_entropy);
 
 			augs::renderer::get_current().clear_logic_lines();
