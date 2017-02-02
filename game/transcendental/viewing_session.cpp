@@ -14,10 +14,7 @@ viewing_session::viewing_session() {
 }
 
 void viewing_session::set_screen_size(const vec2i new_size) {
-	for (auto& c : systems_audiovisual.get<gui_element_system>().character_guis) {
-		c.second.set_screen_size(new_size);
-	}
-
+	systems_audiovisual.get<gui_element_system>().screen_size_for_new_characters = new_size;
 	camera.configure_size(new_size);
 }
 

@@ -18,6 +18,8 @@ public:
 
 	std::vector<item_slot_transfer_request_data> pending_transfers;
 
+	vec2i screen_size_for_new_characters;
+
 	cosmic_entropy get_and_clear_pending_events();
 	void clear_all_pending_events();
 

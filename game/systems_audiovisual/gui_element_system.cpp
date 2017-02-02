@@ -58,7 +58,15 @@ void gui_element_system::clear_all_pending_events() {
 }
 
 character_gui& gui_element_system::get_character_gui(const entity_id id) {
-	return character_guis[id];
+	const auto it = character_guis.find(id);
+
+	if (it == character_guis.end()) {
+		auto& new_gui = character_guis[id];
+		new_gui.set_screen_size(screen_size_for_new_characters);
+		return new_gui;
+	}
+	
+	return (*it).second;
 }
 
 const character_gui& gui_element_system::get_character_gui(const entity_id id) const {
@@ -234,23 +242,22 @@ void gui_element_system::advance_gui_elements(
 		}
 
 		if (!fetched) {
-			//rect_world.consume_raw_input_and_generate_gui_events(
-			//	context, 
-			//	root_location, 
-			//	change, 
-			//	gui_events
-			//);
+			rect_world.consume_raw_input_and_generate_gui_events(
+				context, 
+				root_location, 
+				change, 
+				gui_events
+			);
 		}
 	}
 
 	// rect_world.call_idle_mousemotion_updater(context, root_location, entropy);
-	//rect_world.advance_elements(
-	//	context, 
-	//	root_location, 
-	//	gui_events,
-	//	cosmos.get_fixed_delta()
-	//);
-
+	rect_world.advance_elements(
+		context, 
+		root_location, 
+		gui_events,
+		cosmos.get_fixed_delta()
+	);
 }
 
 void gui_element_system::rebuild_layouts(
