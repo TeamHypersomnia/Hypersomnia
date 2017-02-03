@@ -95,7 +95,7 @@ void viewing_session::control_gui_and_remove_fetched_events(
 ) {
 	auto& gui = systems_audiovisual.get<gui_element_system>();
 
-	gui.advance_gui_elements(
+	gui.control_gui(
 		root, 
 		entropies
 	);
@@ -204,7 +204,14 @@ void viewing_session::advance_audiovisual_systems(
 	world_hover_highlighter.cycle_duration_ms = 700;
 	world_hover_highlighter.update(dt.in_milliseconds());
 
-	systems_audiovisual.get<gui_element_system>().rebuild_layouts(
+	auto& gui = systems_audiovisual.get<gui_element_system>();
+
+	gui.advance_elements(
+		cosm[viewed_character],
+		dt
+	);
+
+	gui.rebuild_layouts(
 		cosm[viewed_character]
 	);
 

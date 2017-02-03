@@ -108,8 +108,8 @@ void slot_button::draw(const viewing_game_gui_context context, const const_this_
 	}
 }
 
-void slot_button::advance_elements(const game_gui_context context, const this_in_container this_id, const gui_entropy& entropies, const augs::delta dt) {
-	game_gui_rect_node::advance_elements(context, this_id, entropies, dt);
+void slot_button::respond_to_events(const game_gui_context context, const this_in_container this_id, const gui_entropy& entropies) {
+	game_gui_rect_node::respond_to_events(context, this_id, entropies);
 	
 	for (const auto& info : entropies.get_events_for(this_id)) {
 		this_id->detector.update_appearance(info);

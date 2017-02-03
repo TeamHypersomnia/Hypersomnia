@@ -177,7 +177,41 @@ void gui_element_system::handle_hotbar_and_action_button_presses(
 	}
 }
 
-void gui_element_system::advance_gui_elements(
+void gui_element_system::advance_elements(
+	const const_entity_handle root_entity,
+	const augs::delta dt
+) {
+	const auto& cosmos = root_entity.get_cosmos();
+
+	auto& element = get_character_gui(root_entity);
+	auto& rect_world = element.rect_world;
+	const auto screen_size = element.get_screen_size();
+
+	ensure(root_entity.has<components::item_slot_transfers>());
+
+	game_gui_rect_tree tree;
+
+	root_of_inventory_gui root_of_gui(screen_size);
+
+	game_gui_context context(
+		*this,
+		element.rect_world,
+		element,
+		root_entity,
+		tree,
+		root_of_gui
+	);
+
+	root_of_inventory_gui_in_context root_location;
+
+	rect_world.advance_elements(
+		context,
+		root_location,
+		dt
+	);
+}
+	
+void gui_element_system::control_gui(
 	const const_entity_handle root_entity,
 	std::vector<augs::window::event::change>& events
 ) {
@@ -256,11 +290,10 @@ void gui_element_system::advance_gui_elements(
 	}
 
 	// rect_world.call_idle_mousemotion_updater(context, root_location, entropy);
-	rect_world.advance_elements(
+	rect_world.respond_to_events(
 		context, 
 		root_location, 
-		gui_events,
-		cosmos.get_fixed_delta()
+		gui_events
 	);
 }
 

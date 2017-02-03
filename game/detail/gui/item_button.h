@@ -92,7 +92,7 @@ struct item_button : game_gui_rect_node {
 
 	static bool is_being_wholely_dragged_or_pending_finish(const const_game_gui_context, const const_this_in_item this_id);
 
-	static void advance_elements(const game_gui_context, const this_in_item this_id, const gui_entropy& entropies, const augs::delta);
+	static void respond_to_events(const game_gui_context, const this_in_item this_id, const gui_entropy& entropies);
 	static void rebuild_layouts(const game_gui_context, const this_in_item this_id);
 
 	static bool is_inventory_root(const const_game_gui_context, const const_this_in_item this_id);

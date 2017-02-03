@@ -3,6 +3,7 @@
 #include <utility>
 #include <vector>
 #include "minmax.h"
+#include "augs/math/declare.h"
 
 struct randomization {
 	std::mt19937 generator;
@@ -18,6 +19,11 @@ struct randomization {
 
 	unsigned randval(std::pair<unsigned, unsigned>);
 	float randval(std::pair<float, float>);
+
+	template<class T>
+	vec2t<T> randval(const vec2t<T> min_a, vec2t<T> max_a) {
+		return{ randval(min_a.x, max_a.x), randval(min_a.y, max_a.y) };
+	}
 
 	template<class T>
 	T randval(augs::minmax<T> m) {

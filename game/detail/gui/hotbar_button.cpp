@@ -62,7 +62,11 @@ vec2i hotbar_button::get_bbox(const const_entity_handle owner_transfer_capabilit
 	return get_button_corners_info().internal_size_to_cornered_size(item_button::calculate_button_layout(ent, true).aabb.get_size());
 }
 
-void hotbar_button::draw(const viewing_game_gui_context context, const const_this_in_item this_id, draw_info in) {
+void hotbar_button::draw(
+	const viewing_game_gui_context context, 
+	const const_this_in_item this_id, 
+	draw_info in
+) {
 	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING)) {
 		return;
 	}
@@ -292,8 +296,28 @@ void hotbar_button::draw(const viewing_game_gui_context context, const const_thi
 	}
 }
 
-void hotbar_button::advance_elements(const game_gui_context context, const this_in_item this_id, const gui_entropy& entropies, const augs::delta dt) {
-	base::advance_elements(context, this_id, entropies, dt);
+void hotbar_button::advance_elements(
+	const game_gui_context context, 
+	const this_in_item this_id, 
+	const augs::delta dt
+) {
+	base::advance_elements(context, this_id, dt);
+
+	if (this_id->detector.is_hovered) {
+		this_id->elapsed_hover_time_ms += dt.in_milliseconds();
+	}
+
+	if (this_id->detector.current_appearance == augs::gui::appearance_detector::appearance::pushed) {
+		this_id->elapsed_hover_time_ms = this_id->hover_highlight_duration_ms;
+	}
+}
+
+void hotbar_button::respond_to_events(
+	const game_gui_context context, 
+	const this_in_item this_id, 
+	const gui_entropy& entropies
+) {
+	base::respond_to_events(context, this_id, entropies);
 	
 	const auto& rect_world = context.get_rect_world();
 	auto& gui = context.get_character_gui();
@@ -322,16 +346,11 @@ void hotbar_button::advance_elements(const game_gui_context context, const this_
 			drag_and_drop_callback(context, prepare_drag_and_drop_result(context, this_id, rect_world.rect_hovered), info.total_dragged_amount);
 		}
 	}
-
-	if (this_id->detector.is_hovered) {
-		this_id->elapsed_hover_time_ms += dt.in_milliseconds();
-	}
-	
-	if (this_id->detector.current_appearance == augs::gui::appearance_detector::appearance::pushed) {
-		this_id->elapsed_hover_time_ms = this_id->hover_highlight_duration_ms;
-	}
 }
 
-void hotbar_button::rebuild_layouts(const game_gui_context context, const this_in_item this_id) {
+void hotbar_button::rebuild_layouts(
+	const game_gui_context context, 
+	const this_in_item this_id
+) {
 	base::rebuild_layouts(context, this_id);
 }

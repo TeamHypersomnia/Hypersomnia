@@ -20,7 +20,7 @@ struct slot_button : game_gui_rect_node {
 	
 	slot_button();
 
-	static void advance_elements(const game_gui_context, const this_in_container, const gui_entropy& entropies, const augs::delta);
+	static void respond_to_events(const game_gui_context, const this_in_container, const gui_entropy& entropies);
 	static void rebuild_layouts(const game_gui_context, const this_in_container this_id);
 	static void draw(const viewing_game_gui_context, const const_this_in_container, augs::gui::draw_info);
 

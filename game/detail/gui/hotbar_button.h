@@ -36,6 +36,7 @@ public:
 
 	static void draw(const viewing_game_gui_context, const const_this_in_item this_id, draw_info);
 
-	static void advance_elements(const game_gui_context, const this_in_item this_id, const gui_entropy& entropies, const augs::delta);
+	static void respond_to_events(const game_gui_context, const this_in_item this_id, const gui_entropy& entropies);
+	static void advance_elements(const game_gui_context, const this_in_item this_id, const augs::delta);
 	static void rebuild_layouts(const game_gui_context, const this_in_item this_id);
 };

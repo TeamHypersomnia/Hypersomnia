@@ -454,8 +454,8 @@ void item_button::rebuild_layouts(const game_gui_context context, const this_in_
 	}
 }
 
-void item_button::advance_elements(const game_gui_context context, const this_in_item this_id, const gui_entropy& entropies, const augs::delta dt) {
-	base::advance_elements(context, this_id, entropies, dt);
+void item_button::respond_to_events(const game_gui_context context, const this_in_item this_id, const gui_entropy& entropies) {
+	base::respond_to_events(context, this_id, entropies);
 
 	const auto& cosmos = context.get_cosmos();
 	const auto& item = cosmos[this_id.get_location().item_id];

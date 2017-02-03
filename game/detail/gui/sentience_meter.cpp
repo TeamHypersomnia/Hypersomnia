@@ -10,7 +10,7 @@
 #include "game/transcendental/step.h"
 #include "game/systems_audiovisual/gui_element_system.h"
 #include "augs/tweaker.h"
-
+#include "augs/gui/text_drawer.h"
 #include "augs/gui/stroke.h"
 
 sentience_meter::sentience_meter() {
@@ -49,21 +49,18 @@ void sentience_meter::draw(
 		info.v
 	);
 
-	const auto border_width = 1;
-	const auto border_spacing = 1;
-	const auto total_spacing = border_width + border_spacing;
+	const auto total_spacing = this_id->get_total_spacing();
 
 	{
-		auto full_bar_rect = icon_rect;
-		full_bar_rect.set_position(icon_rect.get_position() + vec2i(total_spacing + icon_rect.get_size().x, 0));
-		full_bar_rect.r = absolute.r;
-		full_bar_rect.expand_from_center({ -total_spacing, -total_spacing });
+		const auto full_bar_rect_bordered = this_id->get_full_value_bar_rect_bordered(context, this_id, absolute);
+		const auto full_bar_rect = this_id->get_full_value_bar_rect(context, this_id, absolute);
 
 		auto bar_mat = this_id->get_bar_mat(this_id);
 		bar_mat.color.a = icon_mat.color.a;
 
 		const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
-		const auto ratio = sentience.get(this_id.get_location().type).ratio();
+		const auto& meter = sentience.get(this_id.get_location().type);
+		const auto ratio = meter.ratio();
 		auto actual_bar_rect = full_bar_rect;
 		actual_bar_rect.w(actual_bar_rect.w() * ratio);
 
@@ -77,19 +74,109 @@ void sentience_meter::draw(
 
 		augs::gui::solid_stroke stroke;
 		stroke.set_material(bar_mat);
-		stroke.set_width(border_width);
-		stroke.draw(info.v, full_bar_rect, ltrb(), border_spacing);
+		stroke.set_width(this_id->border_width);
+		stroke.draw(info.v, full_bar_rect, ltrb(), this_id->border_spacing);
+
+		augs::gui::text_drawer drawer;
+
+		drawer.set_text(augs::gui::text::format(typesafe_sprintf(L"%x", static_cast<int>(meter.value)), { assets::font_id::GUI_FONT, white }));
+		drawer.pos.set(full_bar_rect_bordered.r + total_spacing*2, full_bar_rect_bordered.t - total_spacing);
+		drawer.draw_stroke(info.v);
+		drawer.draw(info.v);
+
+		for (const auto& p : this_id->particles) {
+			auto particle_mat = p.mat;
+			particle_mat.color = bar_mat.color + rgba(30, 30, 30, 0);
+		
+			const auto particle_rect = ltrb(full_bar_rect.get_position() - vec2(6, 6) + p.relative_pos, (*particle_mat.tex).get_size());
+
+			draw_clipped_rect(
+				particle_mat,
+				particle_rect,
+				actual_bar_rect,
+				info.v
+			);
+		}
 	}
 }
 
+ltrb sentience_meter::get_full_value_bar_rect_bordered(
+	const const_game_gui_context context,
+	const const_this_pointer this_id,
+	const ltrb absolute
+) const {
+	auto icon_rect = absolute;
+
+	auto icon_mat = this_id->get_icon_mat(this_id);
+	icon_rect.set_size((*icon_mat.tex).get_size());
+	augs::gui::text_drawer drawer;
+	drawer.set_text(augs::gui::text::format(L"99999", assets::font_id::GUI_FONT));
+
+	const auto max_value_caption_size = drawer.get_bbox();
+
+	auto full_bar_rect = icon_rect;
+	full_bar_rect.set_position(icon_rect.get_position() + vec2i(get_total_spacing() + icon_rect.get_size().x, 0));
+	full_bar_rect.r = absolute.r - max_value_caption_size.x;
+
+	return full_bar_rect;
+}
+
+ltrb sentience_meter::get_full_value_bar_rect(
+	const const_game_gui_context context,
+	const const_this_pointer this_id,
+	const ltrb absolute
+) const {
+	return get_full_value_bar_rect_bordered(context, this_id, absolute).expand_from_center({ static_cast<float>(-get_total_spacing()), static_cast<float>(-get_total_spacing()) });
+}
+
+
 void sentience_meter::advance_elements(
+	const game_gui_context context,
+	const this_pointer this_id,
+	const augs::delta dt
+) {
+	this_id->seconds_accumulated += dt.in_seconds();
+
+	if (this_id->particles.size() > 0) {
+		randomization rng(static_cast<int>(this_id.get_location().type) + context.get_cosmos().get_total_time_passed_in_seconds() * 1000);
+
+		const auto bar_size = this_id->get_full_value_bar_rect(context, this_id, this_id->rc).get_size();
+
+		while (this_id->seconds_accumulated > 0.f) {
+			for (auto& p : this_id->particles) {
+				const auto action = rng.randval(0, 8);
+
+				if (action == 0) {
+					const auto y_dir = rng.randval(0, 1);
+
+					if (y_dir == 0) {
+						++p.relative_pos.y;
+					}
+					else {
+						--p.relative_pos.y;
+					}
+				}
+				
+				++p.relative_pos.x;
+
+				p.relative_pos.y = std::max(0, p.relative_pos.y);
+				p.relative_pos.x = std::max(0, p.relative_pos.x);
+
+				p.relative_pos.x %= static_cast<int>(bar_size.x + 12);
+				p.relative_pos.y %= static_cast<int>(bar_size.y + 12);
+			}
+
+			this_id->seconds_accumulated -= 1.f / 15;
+		}
+	}
+}
+
+void sentience_meter::respond_to_events(
 	const game_gui_context context, 
 	const this_pointer this_id, 
-	const gui_entropy& entropies, 
-	const augs::delta
+	const gui_entropy& entropies
 ) {
 	for (const auto& e : entropies.get_events_for(this_id)) {
-		LOG_NVPS(static_cast<int>(e.msg));
 		this_id->detector.update_appearance(e);
 	}
 }
@@ -105,15 +192,15 @@ augs::gui::material sentience_meter::get_icon_mat(const const_this_pointer this_
 
 augs::gui::material sentience_meter::get_bar_mat(const const_this_pointer this_id) const {
 	switch (this_id.get_location().type) {
-	case sentience_meter_type::HEALTH: return{ assets::texture_id::BLANK, red };
-	case sentience_meter_type::CONSCIOUSNESS: return{ assets::texture_id::BLANK, orange };
-	case sentience_meter_type::PERSONAL_ELECTRICITY: return{ assets::texture_id::BLANK, cyan };
+	case sentience_meter_type::HEALTH: return{ assets::texture_id::BLANK, red-rgba(30, 30, 30, 0) };
+	case sentience_meter_type::CONSCIOUSNESS: return{ assets::texture_id::BLANK, orange - rgba(30, 30, 30, 0) };
+	case sentience_meter_type::PERSONAL_ELECTRICITY: return{ assets::texture_id::BLANK, cyan - rgba(30, 30, 30, 0) };
 	default: ensure(false);  return{};
 	}
 }
 
 void sentience_meter::rebuild_layouts(
-	const game_gui_context context, 
+	const game_gui_context context,
 	const this_pointer this_id
 ) {
 	const auto idx = static_cast<int>(this_id.get_location().type);
@@ -125,4 +212,24 @@ void sentience_meter::rebuild_layouts(
 	
 	this_id->rc.set_position(lt);
 	this_id->rc.set_size(with_bar_size);
+
+	if (this_id->particles.empty()) {
+		randomization rng(static_cast<int>(this_id.get_location().type));
+
+		const auto bar_size = this_id->get_full_value_bar_rect(context, this_id, this_id->rc).get_size();
+
+		for (size_t i = 0; i < 40; ++i) {
+			const augs::gui::material mats[3] = {
+				assets::texture_id::WANDERING_CROSS,
+				assets::texture_id::BLINK_FIRST,
+				static_cast<assets::texture_id>(static_cast<int>(assets::texture_id::BLINK_FIRST) + 2),
+			};
+
+			effect_particle new_part;
+			new_part.relative_pos = rng.randval(vec2(0, 0), bar_size);
+			new_part.mat = mats[rng.randval(0, 2)];
+
+			this_id->particles.push_back(new_part);
+		}
+	}
 }

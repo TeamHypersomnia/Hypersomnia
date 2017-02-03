@@ -33,7 +33,7 @@ void drag_and_drop_target_drop_item::draw(const viewing_game_gui_context context
 	draw_centered_texture(context, this_id, info, mat_coloured);
 }
 
-void drag_and_drop_target_drop_item::advance_elements(const game_gui_context context, const this_pointer this_id, const gui_entropy& entropies, const augs::delta) {
+void drag_and_drop_target_drop_item::respond_to_events(const game_gui_context context, const this_pointer this_id, const gui_entropy& entropies) {
 	for (const auto& e : entropies.get_events_for(this_id)) {
 		this_id->detector.update_appearance(e);
 	}

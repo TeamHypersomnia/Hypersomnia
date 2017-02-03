@@ -36,9 +36,14 @@ public:
 	item_button& get_item_button(const entity_id);
 	const item_button& get_item_button(const entity_id) const;
 
-	void advance_gui_elements(
+	void control_gui(
 		const const_entity_handle root_entity,
 		std::vector<augs::window::event::change>& events
+	);
+
+	void advance_elements(
+		const const_entity_handle root_entity,
+		const augs::delta dt
 	);
 
 	void rebuild_layouts(

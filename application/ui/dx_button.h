@@ -37,9 +37,16 @@ public:
 	dx_button();
 	vec2i get_target_button_size() const;
 	void set_appearing_caption(const augs::gui::text::fstr text);
-		
+
 	template <class C, class D>
-	static void advance_elements(const C context, const D this_id, const gui_entropy& entropies, const augs::delta dt) {
+	static void advance_elements(const C context, const D this_id, const augs::delta dt) {
+		if (this_id->detector.is_hovered) {
+			this_id->elapsed_hover_time_ms += dt.in_milliseconds();
+		}
+	}
+
+	template <class C, class D>
+	static void respond_to_events(const C context, const D this_id, const gui_entropy& entropies) {
 		for (const auto& info : entropies.get_events_for(this_id)) {
 			this_id->detector.update_appearance(info);
 
@@ -55,10 +62,6 @@ public:
 				this_id->hover_sound.set_direct_channels(true);
 				this_id->hover_sound.play();
 			}
-		}
-
-		if (this_id->detector.is_hovered) {
-			this_id->elapsed_hover_time_ms += dt.in_milliseconds();
 		}
 	}
 

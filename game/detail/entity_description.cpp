@@ -137,15 +137,15 @@ std::wstring describe_sentience_meter(
 	const auto& meter = sentience.get(type);
 
 	if (type == sentience_meter_type::HEALTH) {
-		return typesafe_sprintf(L"[color=red]Health points:[/color] %x/%x\n[color=vslightgray]Stability of the physical body.[/color]", meter.value, meter.maximum);
+		return typesafe_sprintf(L"[color=red]Health points:[/color] %x/%x\n[color=vsdarkgray]Stability of the physical body.[/color]", meter.value, meter.maximum);
 	}
 
 	if (type == sentience_meter_type::PERSONAL_ELECTRICITY) {
-		return typesafe_sprintf(L"[color=cyan]Personal electricity:[/color] %x/%x\n[color=vslightgray]Mind-programmable matter.[/color]", meter.value, meter.maximum);
+		return typesafe_sprintf(L"[color=cyan]Personal electricity:[/color] %x/%x\n[color=vsdarkgray]Mind-programmable matter.[/color]", meter.value, meter.maximum);
 	}
 
 	if (type == sentience_meter_type::CONSCIOUSNESS) {
-		return typesafe_sprintf(L"[color=orange]Consciousness:[/color] %x/%x\n[color=vslightgray]Attunement of soul with the body.[/color]", meter.value, meter.maximum);
+		return typesafe_sprintf(L"[color=orange]Consciousness:[/color] %x/%x\n[color=vsdarkgray]Attunement of soul with the body.[/color]", meter.value, meter.maximum);
 	}
 
 	else return L"Unknown problem";

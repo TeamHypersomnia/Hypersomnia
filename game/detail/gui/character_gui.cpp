@@ -332,13 +332,13 @@ void character_gui::draw_cursor_with_information(const viewing_game_gui_context 
 		bg_sprite_size.y = std::max(cursor_size.y, drop_hint_drawer.get_bbox().y);
 		bg_sprite_size.x += cursor_size.x;
 
-		const auto hint_rect = ltrbi(cursor_position, bg_sprite_size).snap_to_bounds(ltrbi(vec2i(0, 0), get_screen_size()));
+		const auto hint_rect = ltrbi(cursor_position, bg_sprite_size).snap_to_bounds(ltrbi(vec2i(0, 0), get_screen_size() - vec2i(1, 1)));
 
 		augs::draw_rect_with_border(
 			output_buffer,
 			hint_rect,
-			{ 0, 0, 0, 120 },
-			slightly_visible_white
+			{ 0, 0, 0, 180 },
+			rgba(255, 255, 255, 35)
 		);
 
 		drop_hint_drawer.pos = hint_rect.get_position() + vec2i(cursor_size.x + 2, 0);
@@ -525,13 +525,13 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 		augs::gui::text_drawer description_drawer;
 		description_drawer.set_text(tooltip_text);
 
-		const auto tooltip_rect = ltrbi(tooltip_pos, description_drawer.get_bbox()).snap_to_bounds(ltrb(vec2(0, 0), get_screen_size()));
+		const auto tooltip_rect = ltrbi(tooltip_pos, description_drawer.get_bbox()).snap_to_bounds(ltrb(vec2(0, 0), get_screen_size() - vec2i(1, 1)));
 
 		augs::draw_rect_with_border(
 			output_buffer,
 			tooltip_rect,
-			{ 0, 0, 0, 120 },
-			slightly_visible_white
+			{ 0, 0, 0, 180 },
+			rgba(255, 255, 255, 35)
 		);
 
 		description_drawer.pos = tooltip_rect.get_position();

@@ -32,9 +32,10 @@ struct rgba {
 	void set(const rgba&);
 
 	rgba operator*(float) const;
-	rgba operator+(rgba b) const;
-	rgba operator*(rgba b) const;
-	rgba& operator*=(rgba b);
+	rgba operator+(const rgba b) const;
+	rgba operator-(const rgba b) const;
+	rgba operator*(const rgba b) const;
+	rgba& operator*=(const rgba b);
 
 	bool operator==(const rgba& b) const;
 	bool operator!=(const rgba& b) const;

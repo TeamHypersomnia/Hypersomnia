@@ -608,7 +608,8 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 				menu_ui_rect_world.call_idle_mousemotion_updater(menu_ui_context, menu_ui_root_id, gui_entropies);
 			}
 
-			menu_ui_rect_world.advance_elements(menu_ui_context, menu_ui_root_id, gui_entropies, vdt);
+			menu_ui_rect_world.respond_to_events(menu_ui_context, menu_ui_root_id, gui_entropies);
+			menu_ui_rect_world.advance_elements(menu_ui_context, menu_ui_root_id, vdt);
 
 			menu_ui_root.set_menu_buttons_sizes(tweened_menu_button_size);
 			menu_ui_root.set_menu_buttons_colors(tweened_menu_button_color);

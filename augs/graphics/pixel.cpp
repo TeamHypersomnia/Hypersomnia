@@ -165,6 +165,14 @@ rgba rgba::operator+(const rgba s) const {
 		std::min(255u, static_cast<unsigned>(s.a) + a));
 }
 
+rgba rgba::operator-(const rgba s) const {
+	return rgba(
+		std::max(0, static_cast<int>(r) - static_cast<int>(s.r)),
+		std::max(0, static_cast<int>(g) - static_cast<int>(s.g)),
+		std::max(0, static_cast<int>(b) - static_cast<int>(s.b)),
+		std::max(0, static_cast<int>(a) - static_cast<int>(s.a)));
+}
+
 rgba& rgba::operator*=(const rgba b) {
 	return (*this = *this * b);
 }
