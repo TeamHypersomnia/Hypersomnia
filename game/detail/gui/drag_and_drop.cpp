@@ -97,9 +97,9 @@ drag_and_drop_result prepare_drag_and_drop_result(
 	drag_and_drop_result output;
 
 	auto dragged_item = context._dynamic_cast<item_button_in_item>(held_rect_id);
-	const auto dragged_hotbar_button = context._dynamic_cast<hotbar_button_in_gui_element>(held_rect_id);
+	const auto dragged_hotbar_button = context._dynamic_cast<hotbar_button_in_character_gui>(held_rect_id);
 
-	hotbar_button_in_gui_element source_hotbar_button_id;
+	hotbar_button_in_character_gui source_hotbar_button_id;
 
 	if (dragged_hotbar_button) {
 		source_hotbar_button_id = dragged_hotbar_button.get_location();
@@ -123,8 +123,8 @@ drag_and_drop_result prepare_drag_and_drop_result(
 			const auto dragged_item_handle = cosmos[dragged_item.get_location().item_id];
 
 			const auto target_slot = context._dynamic_cast<slot_button_in_container>(drop_target_rect_id);
-			const auto target_drop_item = context._dynamic_cast<drag_and_drop_target_drop_item_in_gui_element>(drop_target_rect_id);
-			const auto target_hotbar_button = context._dynamic_cast<hotbar_button_in_gui_element>(drop_target_rect_id);
+			const auto target_drop_item = context._dynamic_cast<drag_and_drop_target_drop_item_in_character_gui>(drop_target_rect_id);
+			const auto target_hotbar_button = context._dynamic_cast<hotbar_button_in_character_gui>(drop_target_rect_id);
 			auto target_item = context._dynamic_cast<item_button_in_item>(drop_target_rect_id);
 
 			if (target_hotbar_button != nullptr) {

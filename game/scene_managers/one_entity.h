@@ -35,5 +35,6 @@ namespace scene_managers {
 		entity_id get_selected_character() const;
 
 		void select_character(const entity_id);
+		void control_character_selection(...) const {}
 	};
 }

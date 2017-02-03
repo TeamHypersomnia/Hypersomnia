@@ -12,8 +12,8 @@ public:
 	typedef game_gui_rect_node base;
 	typedef base::gui_entropy gui_entropy;
 
-	typedef dereferenced_location<hotbar_button_in_gui_element> this_in_item;
-	typedef const_dereferenced_location<hotbar_button_in_gui_element> const_this_in_item;
+	typedef dereferenced_location<hotbar_button_in_character_gui> this_in_item;
+	typedef const_dereferenced_location<hotbar_button_in_character_gui> const_this_in_item;
 	
 	entity_id last_assigned_entity;
 

@@ -4,6 +4,8 @@
 #include "augs/graphics/pixel.h"
 #include "augs/misc/stepped_timing.h"
 
+#include "game/enums/sentience_meter_type.h"
+
 namespace components {
 	struct sentience {
 		struct meter {
@@ -45,6 +47,7 @@ namespace components {
 
 		recoil_player aimpunch;
 
+
 		template <class Archive>
 		void serialize(Archive& ar) {
 			ar(
@@ -61,6 +64,9 @@ namespace components {
 		}
 
 		sentience();
+
+		meter& get(const sentience_meter_type);
+		const meter& get(const sentience_meter_type) const;
 
 		rgba calculate_health_color(float time_pulse_multiplier) const;
 	};

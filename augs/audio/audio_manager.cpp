@@ -11,8 +11,7 @@
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 
-static void list_audio_devices(const ALCchar *devices)
-{
+static void list_audio_devices(const ALCchar * const devices) {
 	const ALCchar *device = devices, *next = devices + 1;
 	size_t len = 0;
 

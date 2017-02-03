@@ -106,7 +106,7 @@ void local_setup::process(
 			auto new_intents = session.context.to_key_and_mouse_intents(new_machine_entropy.local);
 
 			session.control_and_remove_fetched_intents(new_intents);
-			// testbed.control_character_selection(new_intents);
+			testbed.control_character_selection(new_intents);
 
 			auto new_cosmic_entropy = cosmic_entropy(
 				hypersomnia[testbed.get_selected_character()],

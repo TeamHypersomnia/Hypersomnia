@@ -7,13 +7,13 @@
 #include "game/detail/inventory_utils.h"
 
 struct unfinished_drag_of_item {
-	hotbar_button_in_gui_element source_hotbar_button_id;
+	hotbar_button_in_character_gui source_hotbar_button_id;
 
 	entity_id item_id;
 };
 
 struct drop_for_item_slot_transfer {
-	hotbar_button_in_gui_element source_hotbar_button_id;
+	hotbar_button_in_character_gui source_hotbar_button_id;
 
 	item_slot_transfer_request_data simulated_transfer;
 	item_transfer_result result;
@@ -22,10 +22,10 @@ struct drop_for_item_slot_transfer {
 };
 
 struct drop_for_hotbar_assignment {
-	hotbar_button_in_gui_element source_hotbar_button_id;
+	hotbar_button_in_character_gui source_hotbar_button_id;
 
 	entity_id item_id;
-	hotbar_button_in_gui_element assign_to;
+	hotbar_button_in_character_gui assign_to;
 
 	augs::constant_size_wstring<20> hint_text;
 };

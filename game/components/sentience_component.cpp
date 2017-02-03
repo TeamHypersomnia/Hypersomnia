@@ -8,7 +8,25 @@ namespace components {
 	float sentience::meter::ratio() const {
 		return value / maximum;
 	}
-	
+
+	sentience::meter& sentience::get(const sentience_meter_type t) {
+		switch (t) {
+		case sentience_meter_type::CONSCIOUSNESS: return consciousness;
+		case sentience_meter_type::HEALTH: return health;
+		case sentience_meter_type::PERSONAL_ELECTRICITY: return personal_electricity;
+		default: ensure(false); return health;
+		}
+	}
+
+	const sentience::meter& sentience::get(const sentience_meter_type t) const {
+		switch (t) {
+		case sentience_meter_type::CONSCIOUSNESS: return consciousness;
+		case sentience_meter_type::HEALTH: return health;
+		case sentience_meter_type::PERSONAL_ELECTRICITY: return personal_electricity;
+		default: ensure(false); return health;
+		}
+	}
+
 	rgba sentience::calculate_health_color(float time_pulse_multiplier) const {
 		using namespace augs;
 		auto hr = health.ratio();

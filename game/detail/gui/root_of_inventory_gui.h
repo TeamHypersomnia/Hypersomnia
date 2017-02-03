@@ -14,12 +14,12 @@ public:
 		// i.e. the player has a gui element component and container component but not an item component.
 		item_button::for_each_child(context, item_button_in_item{ handle.get_id() }, generic_call);
 
-		context(drag_and_drop_target_drop_item_in_gui_element(), [&](const auto& dereferenced) {
+		context(drag_and_drop_target_drop_item_in_character_gui(), [&](const auto& dereferenced) {
 			generic_call(dereferenced);
 		});
 
 		for (size_t i = 0; i < context.get_character_gui().hotbar_buttons.size(); ++i) {
-			hotbar_button_in_gui_element child_location;
+			hotbar_button_in_character_gui child_location;
 			child_location.index = static_cast<int>(i);
 			generic_call(make_dereferenced_location(&context.get_character_gui().hotbar_buttons[i], child_location));
 		}

@@ -475,7 +475,7 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 
 	const auto maybe_hovered_item = context._dynamic_cast<item_button_in_item>(rect_world.rect_hovered);
 	const auto maybe_hovered_slot = context._dynamic_cast<slot_button_in_container>(rect_world.rect_hovered);
-	const auto maybe_hovered_hotbar_button = context._dynamic_cast<hotbar_button_in_gui_element>(rect_world.rect_hovered);
+	const auto maybe_hovered_hotbar_button = context._dynamic_cast<hotbar_button_in_character_gui>(rect_world.rect_hovered);
 
 	gui::text::fstr tooltip_text;
 
