@@ -16,16 +16,23 @@ namespace augs {
 			left.mat = top.mat = right.mat = bottom.mat = mat;
 		}
 
-		void solid_stroke::draw(std::vector<augs::vertex_triangle>& out, ltrb g, ltrb clipper) const {
+		void solid_stroke::draw(
+			std::vector<augs::vertex_triangle>& out, 
+			ltrb g, 
+			const ltrb clipper,
+			const int border_spacing
+		) const {
 			if (_type == OUTSIDE) {
-				g.l -= left.width;
-				g.t -= top.width;
-				g.r += right.width;
-				g.b += bottom.width;
+				g.l -= left.width + border_spacing;
+				g.t -= top.width + border_spacing;
+				g.r += right.width + border_spacing;
+				g.b += bottom.width + border_spacing;
 			}
 
-			g.l++;
-			g.t++;
+			if (border_spacing == 0) {
+				g.l++;
+				g.t++;
+			}
 
 			ltrb lines[4] = { g, g, g, g };
 

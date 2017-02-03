@@ -15,6 +15,7 @@ struct sentience_meter : game_gui_rect_node {
 	sentience_meter();
 
 	augs::gui::material get_icon_mat(const const_this_pointer this_id) const;
+	augs::gui::material get_bar_mat(const const_this_pointer this_id) const;
 
 	static void draw(
 		const viewing_game_gui_context context, 

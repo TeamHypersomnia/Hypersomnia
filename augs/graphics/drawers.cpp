@@ -57,17 +57,17 @@ namespace augs {
 		return rc;
 	}
 	
-	void draw_rect_with_border(vertex_triangle_buffer& v, const ltrb origin, const rgba inside_color, const rgba border_color) {
-		draw_rect_with_border(v, origin, assets::texture_id::BLANK, inside_color, border_color);
+	void draw_rect_with_border(vertex_triangle_buffer& v, const ltrb origin, const rgba inside_color, const rgba border_color, const int border_spacing) {
+		draw_rect_with_border(v, origin, assets::texture_id::BLANK, inside_color, border_color, border_spacing);
 	}
 
-	void draw_rect_with_border(vertex_triangle_buffer& v, const ltrb origin, const assets::texture_id tex, const rgba inside_color, const rgba border_color) {
+	void draw_rect_with_border(vertex_triangle_buffer& v, const ltrb origin, const assets::texture_id tex, const rgba inside_color, const rgba border_color, const int border_spacing) {
 		draw_rect(v, origin, tex, inside_color);
 
 		augs::gui::solid_stroke stroke;
 		stroke.set_material(augs::gui::material( tex, border_color ));
 		stroke.set_width(1);
-		stroke.draw(v, origin);
+		stroke.draw(v, origin, ltrb(), border_spacing);
 	}
 
 	void draw_rect(vertex_triangle_buffer& v, const ltrb origin, const rgba color) {

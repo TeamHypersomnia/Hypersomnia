@@ -7,15 +7,15 @@ struct sentience_meter_in_character_gui {
 public:
 	typedef sentience_meter dereferenced_type;
 
-	sentience_meter_type type;
+	sentience_meter_type type = sentience_meter_type::COUNT;
 
 	bool operator==(const sentience_meter_in_character_gui b) const {
-		return true;
+		return type == b.type;
 	}
 
 	template <class C>
 	bool alive(const C context) const {
-		return true;
+		return static_cast<int>(type) < static_cast<int>(sentience_meter_type::COUNT);
 	}
 
 	template <class C>
