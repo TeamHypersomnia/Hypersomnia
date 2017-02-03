@@ -45,8 +45,25 @@ augs::window::event::message translate_enum(UINT m) {
 	return augs::window::event::message::unknown;
 }
 
-augs::window::event::keys::key translate_key(UINT m) {
+augs::window::event::keys::key translate_key(const UINT lParam, UINT m) {
 	using namespace augs::window::event::keys;
+
+	UINT scancode = (lParam & 0x00ff0000) >> 16;
+	int extended = (lParam & 0x01000000) != 0;
+
+	switch (m) {
+	case VK_SHIFT:
+		m = MapVirtualKey(scancode, MAPVK_VSC_TO_VK_EX);
+		break;
+	case VK_CONTROL:
+		m = extended ? VK_RCONTROL : VK_LCONTROL;
+		break;
+	case VK_MENU:
+		m = extended ? VK_RMENU : VK_LMENU;
+		break;
+	default:
+		break;
+	}
 
 	switch (m) {
 	case VK_LBUTTON:										return key::LMOUSE;
@@ -248,29 +265,14 @@ namespace augs {
 				events.repeated = ((lParam & (1 << 30)) != 0);
 			case WM_KEYDOWN:
 			{
-				auto translated_key = translate_key(wParam);
-
-				switch (translated_key) {
-				case key::CTRL: translated_key = (lParam & 0x1000000) ? key::RCTRL : key::LCTRL; break;
-				case key::SHIFT: translated_key = (lParam & 0x1000000) ? key::RSHIFT : key::LSHIFT; break;
-				case key::ALT: translated_key = (lParam & 0x1000000) ? key::RALT : key::LALT; break;
-				}
-
-				events.key.key = translated_key;
+				events.key.key = translate_key(lParam, wParam);
 				events.repeated = ((lParam & (1 << 30)) != 0);
 			}
 			break;
 
 			case WM_KEYUP:
 			{
-				auto translated_key = translate_key(wParam);
-				switch (translated_key) {
-				case key::CTRL: translated_key = (lParam & 0x1000000) ? key::RCTRL : key::LCTRL; break;
-				case key::SHIFT: translated_key = (lParam & 0x1000000) ? key::RSHIFT : key::LSHIFT; break;
-				case key::ALT: translated_key = (lParam & 0x1000000) ? key::RALT : key::LALT; break;
-				}
-
-				events.key.key = translated_key;
+				events.key.key = translate_key(lParam, wParam);
 			}
 
 			break;
