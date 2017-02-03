@@ -6,6 +6,7 @@
 #include "game/components/gun_component.h"
 #include "game/components/damage_component.h"
 #include "game/components/container_component.h"
+#include "game/components/sentience_component.h"
 #include "game/components/item_component.h"
 #include "game/detail/inventory_utils.h"
 #include "game/detail/inventory_slot.h"
@@ -126,4 +127,26 @@ std::wstring describe_entity(const const_entity_handle id) {
 	}
 
 	return L"[color=white]" + desc.name + L"[/color]\n" + properties + L"[color=vsdarkgray]" + desc.details + L"[/color]";
+}
+
+std::wstring describe_sentience_meter(
+	const const_entity_handle subject,
+	const sentience_meter_type type
+) {
+	const auto& sentience = subject.get<components::sentience>();
+	const auto& meter = sentience.get(type);
+
+	if (type == sentience_meter_type::HEALTH) {
+		return typesafe_sprintf(L"[color=red]Health points:[/color] %x/%x\n[color=vslightgray]Stability of the physical body.[/color]", meter.value, meter.maximum);
+	}
+
+	if (type == sentience_meter_type::PERSONAL_ELECTRICITY) {
+		return typesafe_sprintf(L"[color=cyan]Personal electricity:[/color] %x/%x\n[color=vslightgray]Mind-programmable matter.[/color]", meter.value, meter.maximum);
+	}
+
+	if (type == sentience_meter_type::CONSCIOUSNESS) {
+		return typesafe_sprintf(L"[color=orange]Consciousness:[/color] %x/%x\n[color=vslightgray]Attunement of soul with the body.[/color]", meter.value, meter.maximum);
+	}
+
+	else return L"Unknown problem";
 }

@@ -121,7 +121,7 @@ void sentience_meter::rebuild_layouts(
 	const auto icon_size = (*this_id->get_icon_mat(this_id).tex).get_size();
 	const auto with_bar_size = vec2i(icon_size.x + 4 + 180, icon_size.y);
 
-	const auto lt = vec2i(screen_size.x - 200, 250 + idx * (icon_size.y + 4));
+	const auto lt = vec2i(screen_size.x - 220, 220 + idx * (icon_size.y + 4));
 	
 	this_id->rc.set_position(lt);
 	this_id->rc.set_size(with_bar_size);
