@@ -355,6 +355,7 @@
     <ClCompile Include="augs\texture_baker\texture_with_image.cpp" />
     <ClCompile Include="application\setups\client_setup.cpp" />
     <ClCompile Include="application\setups\determinism_test_setup.cpp" />
+    <ClCompile Include="augs\tweaker.cpp" />
     <ClCompile Include="game\components\flags_component.cpp" />
     <ClCompile Include="game\components\gui_element_component.cpp" />
     <ClCompile Include="game\components\light_component.cpp" />
@@ -375,6 +376,7 @@
     <ClCompile Include="game\detail\gui\pixel_line_connector.cpp" />
     <ClCompile Include="game\detail\gui\drag_and_drop_target_drop_item.cpp" />
     <ClCompile Include="game\detail\gui\root_of_inventory_gui.cpp" />
+    <ClCompile Include="game\detail\gui\sentience_meter.cpp" />
     <ClCompile Include="game\detail\gui\slot_button.cpp" />
     <ClCompile Include="game\detail\visible_entities.cpp" />
     <ClCompile Include="game\detail\wielding_result.cpp" />
@@ -1096,6 +1098,7 @@
     <ClInclude Include="augs\templates\type_in_pack.h" />
     <ClInclude Include="augs\texture_baker\texture.h" />
     <ClInclude Include="augs\texture_baker\texture_with_image.h" />
+    <ClInclude Include="augs\tweaker.h" />
     <ClInclude Include="augs\zeroed_pod.h" />
     <ClInclude Include="game\assets\sound_buffer_id.h" />
     <ClInclude Include="game\assets\sound_response_id.h" />

@@ -6,6 +6,7 @@
 #include "game/transcendental/entity_id.h"
 #include "game/detail/gui/drag_and_drop_target_drop_item.h"
 #include "game/detail/gui/hotbar_button.h"
+#include "game/detail/gui/sentience_meter.h"
 #include "augs/gui/dereferenced_location.h"
 #include "game/enums/slot_function.h"
 #include "augs/ensure.h"
@@ -30,6 +31,7 @@ struct character_gui {
 	};
 	
 	std::array<hotbar_button, 10> hotbar_buttons;
+	std::array<sentience_meter, static_cast<size_t>(sentience_meter_type::COUNT)> sentience_meters;
 
 	hotbar_selection_setup last_setups[2];
 	short currently_held_hotbar_index = -1;

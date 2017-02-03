@@ -266,5 +266,14 @@ drag_and_drop_result prepare_drag_and_drop_result(
 	return output;
 }
 
-template drag_and_drop_result prepare_drag_and_drop_result(game_gui_context context, const game_gui_element_location held_rect_id, const game_gui_element_location drop_target_rect_id);
-template drag_and_drop_result prepare_drag_and_drop_result(viewing_game_gui_context context, const game_gui_element_location held_rect_id, const game_gui_element_location drop_target_rect_id);
+template drag_and_drop_result prepare_drag_and_drop_result(
+	game_gui_context context,
+	const game_gui_element_location held_rect_id,
+	const game_gui_element_location drop_target_rect_id
+);
+
+template drag_and_drop_result prepare_drag_and_drop_result(
+	viewing_game_gui_context context,
+	const game_gui_element_location held_rect_id,
+	const game_gui_element_location drop_target_rect_id
+);

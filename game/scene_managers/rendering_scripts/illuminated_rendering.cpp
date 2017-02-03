@@ -260,19 +260,6 @@ namespace rendering_scripts {
 					step.config.hotbar
 				);
 			}
-
-			if (controlled_entity.has<components::sentience>()) {
-				draw_sentience_meters(
-					output,
-					controlled_entity.get<components::sentience>(),
-					vec2i(screen_size.x - 200, 200),
-					195,
-					4,
-					assets::texture_id::HEALTH_ICON,
-					assets::texture_id::PERSONAL_ELECTRICITY_ICON,
-					assets::texture_id::CONSCIOUSNESS_ICON
-				);
-			}
 		}
 
 		renderer.bind_texture(*get_resource_manager().find(assets::atlas_id::GAME_WORLD_ATLAS));
