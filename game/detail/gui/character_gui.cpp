@@ -525,7 +525,7 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 		augs::gui::text_drawer description_drawer;
 		description_drawer.set_text(tooltip_text);
 
-		const auto tooltip_rect = ltrbi(tooltip_pos, description_drawer.get_bbox()).snap_to_bounds(ltrb(vec2(0, 0), get_screen_size() - vec2i(1, 1)));
+		const auto tooltip_rect = ltrbi(tooltip_pos, description_drawer.get_bbox() + vec2i(10, 8)).snap_to_bounds(ltrb(vec2(0, 0), get_screen_size() - vec2i(1, 1)));
 
 		augs::draw_rect_with_border(
 			output_buffer,
@@ -534,7 +534,7 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 			rgba(255, 255, 255, 35)
 		);
 
-		description_drawer.pos = tooltip_rect.get_position();
+		description_drawer.pos = tooltip_rect.get_position() + vec2i(5, 4);
 		description_drawer.draw(output_buffer);
 	}
 }
