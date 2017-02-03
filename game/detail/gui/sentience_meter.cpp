@@ -62,7 +62,25 @@ void sentience_meter::draw(
 		const auto& meter = sentience.get(this_id.get_location().type);
 		const auto ratio = meter.ratio();
 		auto actual_bar_rect = full_bar_rect;
-		actual_bar_rect.w(actual_bar_rect.w() * ratio);
+		const auto bar_width = static_cast<int>(actual_bar_rect.w() * ratio);
+		actual_bar_rect.w(bar_width);
+
+		//{
+		//	auto black_mat = bar_mat;
+		//	black_mat.color = black;
+		//	black_mat.color.a = bar_mat.color.a/2;
+		//
+		//	auto black_rect = full_bar_rect_bordered;
+		//	black_rect.expand_from_center({ 1, 1 });
+		//
+		//	draw_clipped_rect(
+		//		black_mat,
+		//		black_rect,
+		//		context,
+		//		context.get_tree_entry(this_id).get_parent(),
+		//		info.v
+		//	);
+		//}
 
 		draw_clipped_rect(
 			bar_mat,
@@ -84,18 +102,20 @@ void sentience_meter::draw(
 		drawer.draw_stroke(info.v);
 		drawer.draw(info.v);
 
-		for (const auto& p : this_id->particles) {
-			auto particle_mat = p.mat;
-			particle_mat.color = bar_mat.color + rgba(30, 30, 30, 0);
-		
-			const auto particle_rect = ltrb(full_bar_rect.get_position() - vec2(6, 6) + p.relative_pos, (*particle_mat.tex).get_size());
+		if (bar_width >= 1) {
+			for (const auto& p : this_id->particles) {
+				auto particle_mat = p.mat;
+				particle_mat.color = bar_mat.color + rgba(30, 30, 30, 0);
+			
+				const auto particle_rect = ltrb(full_bar_rect.get_position() - vec2(6, 6) + p.relative_pos, (*particle_mat.tex).get_size());
 
-			draw_clipped_rect(
-				particle_mat,
-				particle_rect,
-				actual_bar_rect,
-				info.v
-			);
+				draw_clipped_rect(
+					particle_mat,
+					particle_rect,
+					actual_bar_rect,
+					info.v
+				);
+			}
 		}
 	}
 }
@@ -208,7 +228,7 @@ void sentience_meter::rebuild_layouts(
 	const auto icon_size = (*this_id->get_icon_mat(this_id).tex).get_size();
 	const auto with_bar_size = vec2i(icon_size.x + 4 + 180, icon_size.y);
 
-	const auto lt = vec2i(screen_size.x - 220, 220 + idx * (icon_size.y + 4));
+	const auto lt = vec2i(screen_size.x - 220, 20 + idx * (icon_size.y + 4));
 	
 	this_id->rc.set_position(lt);
 	this_id->rc.set_size(with_bar_size);

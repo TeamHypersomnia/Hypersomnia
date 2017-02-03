@@ -101,6 +101,7 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		corpse.get<components::physics>().apply_force(vec2().set_from_degrees(place_of_death.rotation).set_length(27850 * 2));
 
 		h.spawned_remnants = corpse;
+		sentience.health.enabled = false;
 	}
 
 	step.transient.messages.post(h);
@@ -192,10 +193,12 @@ void sentience_system::regenerate_values(const logic_step step) const {
 	for (const auto& t : step.cosm.get(processing_subjects::WITH_SENTIENCE)) {
 		auto& sentience = t.get<components::sentience>();
 
-		const auto passed = (now.step - sentience.time_of_last_received_damage.step);
-		
-		if (passed > 0 && passed % regeneration_frequency_in_steps == 0) {
-			sentience.health.value -= sentience.health.calculate_damage_result(-2).effective;
+		if (sentience.health.enabled) {
+			const auto passed = (now.step - sentience.time_of_last_received_damage.step);
+			
+			if (passed > 0 && passed % regeneration_frequency_in_steps == 0) {
+				sentience.health.value -= sentience.health.calculate_damage_result(-2).effective;
+			}
 		}
 	}
 }
