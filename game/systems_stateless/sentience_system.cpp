@@ -212,7 +212,10 @@ void sentience_system::regenerate_values(const logic_step step) const {
 				sentience.consciousness.value -= sentience.consciousness.calculate_damage_result(-2).effective;
 			}
 
-			sentience.consciousness.value = std::min(sentience.health.value, sentience.consciousness.value);
+			const auto consciousness_ratio = sentience.consciousness.ratio();
+			const auto health_ratio = sentience.health.ratio();
+
+			sentience.consciousness.value = std::min(consciousness_ratio, health_ratio) * sentience.consciousness.maximum;
 		}
 
 		if (sentience.personal_electricity.enabled) {

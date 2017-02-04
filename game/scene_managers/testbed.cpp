@@ -232,6 +232,9 @@ namespace scene_managers {
 			if (i == 11) {
 				driver_system().assign_car_ownership(new_character, motorcycle2);
 			}
+
+			new_character.get<components::sentience>().consciousness.maximum = 200;
+			new_character.get<components::sentience>().consciousness.value = 200;
 		}
 
 		{

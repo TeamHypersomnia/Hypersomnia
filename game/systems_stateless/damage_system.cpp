@@ -143,8 +143,8 @@ void damage_system::destroy_outdated_bullets(const logic_step step) {
 			auto& physics = cosmos.systems_temporary.get<physics_system>();
 
 			const auto queried = physics.query_aabb_px(
-				it.logic_transform().pos - vec2(300, 300), 
-				it.logic_transform().pos + vec2(300, 300), 
+				it.logic_transform().pos - vec2(250, 250), 
+				it.logic_transform().pos + vec2(250, 250), 
 				filters::bullet(), 
 				it
 			);

@@ -105,14 +105,14 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 			response.muzzle_transform = muzzle_transform;
 			response.subject = it;
 
-			float total_recoil_multiplier = 1.f;
+			float total_recoil_amount = 0.f;
 
 			if (is_magic_launcher) {
 				const auto round_entity = cosmos.clone_entity(magic_missile_def); //??
 
 				auto& damage = round_entity.get<components::damage>();
 				damage.sender = it;
-				total_recoil_multiplier *= damage.recoil_multiplier;
+				total_recoil_amount += damage.recoil_multiplier;
 
 				round_entity.set_logic_transform(muzzle_transform);
 
@@ -160,7 +160,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 								auto& damage = round_entity.get<components::damage>();
 								damage.amount *= gun.damage_multiplier;
 								damage.sender = it;
-								total_recoil_multiplier *= damage.recoil_multiplier;
+								total_recoil_amount += damage.recoil_multiplier;
 
 								round_entity.set_logic_transform(muzzle_transform);
 								
@@ -229,10 +229,10 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				}
 			}
 
-			if (total_recoil_multiplier > 0.f) {
+			if (total_recoil_amount > 0.f) {
 				const auto owning_capability = it.get_owning_transfer_capability();
 				const auto owning_crosshair_recoil = owning_capability[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
-				gun.recoil.shoot_and_apply_impulse(owning_crosshair_recoil, total_recoil_multiplier / 100.f, true);
+				gun.recoil.shoot_and_apply_impulse(owning_crosshair_recoil, total_recoil_amount / 100.f, true);
 			}
 		}
 		else if (gun.shot_cooldown.is_ready(cosmos.get_timestamp(), delta)) {
