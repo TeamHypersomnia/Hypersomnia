@@ -69,18 +69,21 @@ namespace behaviours {
 			if (vel > 1.0 && closest_hostile.alive()) {
 				vec2 leaded;
 
-				if (velocity(closest_hostile).length_sq() > 1)
+				if (velocity(closest_hostile).length_sq() > 1) {
 					leaded = position(closest_hostile) + velocity(closest_hostile) * distance(closest_hostile, subject) / vel;// direct_solution(position(closest_hostile), velocity(closest_hostile), vel);
-				else
+				}
+				else {
 					leaded = position(closest_hostile);
+				}
 
 				crosshair_offset = leaded - position(subject);
 			}
 			else if (is_entity_physical(subject)) {
 				crosshair_offset = velocity(subject).length() > 3.0 ? velocity(subject) : vec2(10, 0);
 			}
-			else
+			else {
 				crosshair_offset = vec2(10, 0);
+			}
 		}
 	}
 }

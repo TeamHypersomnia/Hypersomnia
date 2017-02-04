@@ -180,8 +180,7 @@ void damage_system::destroy_outdated_bullets(const logic_step step) {
 
 			if (closest_hostile.alive()) {
 				it.get<components::physics>().apply_force(
-					(closest_hostile.logic_transform().pos - it.logic_transform().pos) * damage.homing_towards_hostile_strength,
-					vec2().set_from_degrees(it.logic_transform().rotation) * 5
+					(closest_hostile.logic_transform().pos - it.logic_transform().pos) * damage.homing_towards_hostile_strength
 				);
 			}
 		}
