@@ -201,7 +201,7 @@ void viewing_session::advance_audiovisual_systems(
 		dt
 	);
 	
-	world_hover_highlighter.cycle_duration_ms = 700;
+	world_hover_highlighter.cycle_duration_ms = 400;
 	world_hover_highlighter.update(dt.in_milliseconds());
 
 	auto& gui = systems_audiovisual.get<gui_element_system>();
