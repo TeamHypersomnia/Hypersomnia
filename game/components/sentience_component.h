@@ -36,6 +36,7 @@ namespace components {
 		};
 
 		augs::stepped_timestamp time_of_last_received_damage;
+		augs::stepped_timestamp time_of_last_exertion;
 
 		meter health;
 		meter personal_electricity;

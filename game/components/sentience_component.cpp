@@ -3,6 +3,8 @@
 namespace components {
 	sentience::sentience() {
 		health.enabled = true;
+		consciousness.enabled = true;
+		personal_electricity.enabled = true;
 	}
 
 	float sentience::meter::ratio() const {

@@ -9,9 +9,12 @@
 
 #include "game/components/physics_component.h"
 #include "game/components/movement_component.h"
+#include "game/components/sentience_component.h"
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/step.h"
+
+#include "game/systems_stateless/sentience_system.h"
 
 using namespace augs;
 
@@ -72,6 +75,12 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 			continue;
 		}
 
+		bool is_sprint_effective = movement.sprint_enabled;
+
+		if (it.has<components::sentience>()) {
+			is_sprint_effective = is_sprint_effective && it.get<components::sentience>().consciousness.value > 0.f;
+		}
+
 		const auto& physics = it.get<components::physics>();
 		
 		if (!physics.is_constructed())
@@ -82,10 +91,15 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 			physics.set_linear_damping(2);
 		}
 		else {
-			physics.set_linear_damping(movement.sprint_enabled ? (movement.standard_linear_damping / 4.f) : movement.standard_linear_damping);
+			physics.set_linear_damping(is_sprint_effective ? (movement.standard_linear_damping / 4.f) : movement.standard_linear_damping);
 		}
 
 		if (resultant.non_zero()) {
+			if (it.has<components::sentience>()) {
+				auto& sentience = it.get<components::sentience>();
+				sentience.time_of_last_exertion = cosmos.get_timestamp();
+			}
+
 			if (movement.acceleration_length > 0) {
 				resultant.set_length(movement.acceleration_length);
 			}
@@ -94,8 +108,13 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 				resultant /= 10.f;
 			}
 
-			if (movement.sprint_enabled) {
+			if (is_sprint_effective) {
 				resultant /= 2.f;
+
+				if (it.has<components::sentience>()) {
+					auto& sentience = it.get<components::sentience>();
+					sentience.consciousness.value -= sentience.consciousness.calculate_damage_result(2 * delta.in_seconds()).effective;
+				}
 			}
 			
 			if (movement.walking_enabled) {

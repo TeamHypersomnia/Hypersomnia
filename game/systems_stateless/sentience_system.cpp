@@ -161,21 +161,23 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 				}
 			}
 
-			if (s.consciousness.enabled) {
-				event.target = messages::health_event::CONSCIOUSNESS;
+			/*
+				if (s.consciousness.enabled) {
+					event.target = messages::health_event::CONSCIOUSNESS;
 
-				const auto damaged = s.consciousness.calculate_damage_result(d.amount);
-				event.effective_amount = damaged.effective;
-				event.ratio_effective_to_maximum = damaged.ratio_effective_to_maximum;
+					const auto damaged = s.consciousness.calculate_damage_result(d.amount);
+					event.effective_amount = damaged.effective;
+					event.ratio_effective_to_maximum = damaged.ratio_effective_to_maximum;
 
-				if (damaged.dropped_to_zero) {
-					event.special_result = messages::health_event::LOSS_OF_CONSCIOUSNESS;
+					if (damaged.dropped_to_zero) {
+						event.special_result = messages::health_event::LOSS_OF_CONSCIOUSNESS;
+					}
+
+					if (event.effective_amount != 0) {
+						consume_health_event(event, step);
+					}
 				}
-
-				if (event.effective_amount != 0) {
-					consume_health_event(event, step);
-				}
-			}
+			*/
 		}
 	}
 }
@@ -188,17 +190,28 @@ void sentience_system::cooldown_aimpunches(const logic_step step) const {
 
 void sentience_system::regenerate_values(const logic_step step) const {
 	const auto now = step.cosm.get_timestamp();
-	const auto regeneration_frequency_in_steps = static_cast<unsigned>(1/step.cosm.get_fixed_delta().in_seconds() * 3);
+	const auto regeneration_frequency_in_steps = static_cast<unsigned>(1 / step.cosm.get_fixed_delta().in_seconds() * 3);
+	const auto consciousness_regeneration_frequency_in_steps = static_cast<unsigned>(1/step.cosm.get_fixed_delta().in_seconds() * 2);
 	
 	for (const auto& t : step.cosm.get(processing_subjects::WITH_SENTIENCE)) {
 		auto& sentience = t.get<components::sentience>();
 
 		if (sentience.health.enabled) {
 			const auto passed = (now.step - sentience.time_of_last_received_damage.step);
-			
+
 			if (passed > 0 && passed % regeneration_frequency_in_steps == 0) {
 				sentience.health.value -= sentience.health.calculate_damage_result(-2).effective;
 			}
+		}
+
+		if (sentience.consciousness.enabled) {
+			const auto passed = (now.step - sentience.time_of_last_exertion.step);
+
+			if (passed > 0 && passed % consciousness_regeneration_frequency_in_steps == 0) {
+				sentience.consciousness.value -= sentience.consciousness.calculate_damage_result(-2).effective;
+			}
+
+			sentience.consciousness.value = std::min(sentience.health.value, sentience.consciousness.value);
 		}
 	}
 }
