@@ -157,7 +157,7 @@ void damage_system::destroy_outdated_bullets(const logic_step step) {
 
 			if (sender_attitude.alive()) {
 				for (auto s_raw : queried.entities) {
-					auto s = cosmos[s_raw];
+					const auto s = cosmos[s_raw];
 
 					if (s.has<components::attitude>()) {
 						const auto att = calculate_attitude(s, sender_attitude);
@@ -175,12 +175,21 @@ void damage_system::destroy_outdated_bullets(const logic_step step) {
 			}
 
 			const auto closest_hostile = cosmos[closest_hostile_raw];
-			
-			it.set_logic_transform({ it.logic_transform().pos, it.get<components::physics>().velocity().degrees() });
+			const auto current_velocity = it.get<components::physics>().velocity();
+
+			it.set_logic_transform({ it.logic_transform().pos, current_velocity.degrees() });
 
 			if (closest_hostile.alive()) {
+				vec2 dirs[] = { current_velocity.perpendicular_cw(), -current_velocity.perpendicular_cw() };
+
+				auto homing_vector = closest_hostile.logic_transform().pos - it.logic_transform().pos;
+
+				if (dirs[0].radians_between(homing_vector) > dirs[1].radians_between(homing_vector)) {
+					std::swap(dirs[0], dirs[1]);
+				}
+
 				it.get<components::physics>().apply_force(
-					(closest_hostile.logic_transform().pos - it.logic_transform().pos) * damage.homing_towards_hostile_strength
+					dirs[0].set_length(homing_vector.length()) * damage.homing_towards_hostile_strength
 				);
 			}
 		}

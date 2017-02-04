@@ -37,7 +37,7 @@ void local_setup::process(
 	augs::debug_entropy_player<cosmic_entropy> player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
-	scene_managers::testbed testbed;
+	scene_managers::one_entity testbed;
 	testbed.debug_var = cfg.debug_var;
 
 	if (!hypersomnia.load_from_file("save.state")) {
@@ -61,7 +61,7 @@ void local_setup::process(
 
 	timer.reset_timer();
 
-	const bool debug_control_timing = false;
+	const bool debug_control_timing = true;
 
 	while (!should_quit) {
 		{

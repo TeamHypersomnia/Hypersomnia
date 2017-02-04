@@ -10,7 +10,7 @@
 #include "game/components/physics_component.h"
 
 #define TRACE_PARAMETERS 0
-#define TRACE_CONSTRUCTORS_DESTRUCTORS 1
+#define TRACE_CONSTRUCTORS_DESTRUCTORS 0
 #define Y_IS_Z 1
 
 #if TRACE_CONSTRUCTORS_DESTRUCTORS

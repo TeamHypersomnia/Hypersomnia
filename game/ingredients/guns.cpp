@@ -631,7 +631,7 @@ namespace prefabs {
 			}
 
 			auto& damage = round_definition += components::damage();
-			damage.homing_towards_hostile_strength = 1.5f;
+			damage.homing_towards_hostile_strength = 1.0f;
 			damage.amount = 42;
 
 			gun.magic_missile_definition = round_definition;
