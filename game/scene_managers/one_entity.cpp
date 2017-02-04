@@ -45,7 +45,7 @@ namespace scene_managers {
 	void one_entity::populate(const logic_step step, const vec2i screen_size) {
 		auto& world = step.cosm;
 
-		const int num_characters = 1;
+		const int num_characters = 2;
 
 		std::vector<entity_id> new_characters;
 		new_characters.resize(num_characters);
@@ -61,6 +61,11 @@ namespace scene_managers {
 			if (i == 0) {
 				torso_set = assets::animation_response_id::TORSO_SET;
 			}
+			else if (i == 1) {
+				torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
+				transform.pos.x += 200;
+			}
+
 			const auto new_character = prefabs::create_character(world, transform, screen_size, typesafe_sprintf("player%x", i), torso_set);
 
 			new_characters[i] = new_character;
@@ -71,7 +76,15 @@ namespace scene_managers {
 				new_character.get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
 				new_character.get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
 			}
+			else if (i == 1) {
+				new_character.get<components::sentience>().health.value = 100;
+				new_character.get<components::sentience>().health.maximum = 100;
+				new_character.get<components::attitude>().parties = party_category::METROPOLIS_CITIZEN;
+				new_character.get<components::attitude>().hostile_parties = party_category::RESISTANCE_CITIZEN;
+			}
 		}
+
+		const auto amplifier = prefabs::create_amplifier_arm(step.cosm, vec2(-300, -500 + 50));
 
 		const auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
 
