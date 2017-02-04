@@ -85,7 +85,11 @@ bool driver_system::assign_car_ownership(const entity_handle driver, const entit
 	return change_car_ownership(driver, car, false);
 }
 
-bool driver_system::change_car_ownership(const entity_handle driver_entity, const entity_handle car_entity, const bool lost_ownership) {
+bool driver_system::change_car_ownership(
+	const entity_handle driver_entity, 
+	const entity_handle car_entity, 
+	const bool lost_ownership
+) {
 	auto& driver = driver_entity.get<components::driver>();
 	auto& cosmos = driver_entity.get_cosmos();
 	const auto& physics = cosmos.systems_temporary.get<physics_system>();
@@ -97,12 +101,16 @@ bool driver_system::change_car_ownership(const entity_handle driver_entity, cons
 
 	if (!lost_ownership) {
 		auto& car = car_entity.get<components::car>();
-
-		if (cosmos[car.current_driver].alive())
+		
+		if (cosmos[car.current_driver].alive()) {
 			return false;
+		}
 
 		driver.owned_vehicle = car_entity;
 		car.current_driver = driver_entity;
+		
+		car.last_turned_on = cosmos.get_timestamp();
+
 		force_joint.chased_entity = car.left_wheel_trigger;
 		driver_entity.get<components::processing>().enable_in(processing_subjects::WITH_FORCE_JOINT);
 
@@ -127,6 +135,8 @@ bool driver_system::change_car_ownership(const entity_handle driver_entity, cons
 	}
 	else {
 		auto& car = cosmos[driver.owned_vehicle].get<components::car>();
+
+		car.last_turned_off = cosmos.get_timestamp();
 
 		driver.owned_vehicle.unset();
 		car.current_driver.unset();

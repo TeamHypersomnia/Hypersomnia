@@ -2,6 +2,7 @@
 #include "game/transcendental/entity_id.h"
 #include "augs/math/vec2.h"
 #include "padding_byte.h"
+#include "augs/misc/stepped_timing.h"
 
 namespace components {
 	struct car {
@@ -55,6 +56,9 @@ namespace components {
 		float speed_for_pitch_unit = 3000.f;
 
 		vec2 wheel_offset = vec2(200, 125);
+
+		augs::stepped_timestamp last_turned_on;
+		augs::stepped_timestamp last_turned_off;
 
 		template<class F>
 		void for_each_held_id(F f) {

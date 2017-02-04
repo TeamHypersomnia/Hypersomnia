@@ -129,8 +129,9 @@ void car_system::apply_movement_forces(const logic_step step) {
 
 		physics.set_linear_damping(base_damping);
 
-		if (lateral.length() > car.maximum_lateral_cancellation_impulse)
+		if (lateral.length() > car.maximum_lateral_cancellation_impulse) {
 			lateral.set_length(car.maximum_lateral_cancellation_impulse);
+		}
 			
 		float angular_resistance = 0;
 
@@ -165,7 +166,7 @@ void car_system::apply_movement_forces(const logic_step step) {
 			}
 		};
 
-		engine_handler(cosmos[car.deceleration_engine[0]], car.decelerating&& !car.accelerating);
+		engine_handler(cosmos[car.deceleration_engine[0]], car.decelerating && !car.accelerating);
 		engine_handler(cosmos[car.deceleration_engine[1]], car.decelerating && !car.accelerating);
 
 		engine_handler(cosmos[car.acceleration_engine[0]], car.accelerating && !car.decelerating);
@@ -179,15 +180,30 @@ void car_system::apply_movement_forces(const logic_step step) {
 		const float pitch = 0.3f + speed*1.2f / car.speed_for_pitch_unit + std::abs(angular_velocity / 780.f)*sqrt(physics.get_mass());
 
 		if (sound_entity.alive() && sound_entity.has<components::sound_existence>()) {
-			if (sound_enabled) {
-				auto& existence = sound_entity.get<components::sound_existence>();
+			auto& existence = sound_entity.get<components::sound_existence>();
+
+			if (cosmos[car.current_driver].alive()) {
+				const auto since_last_turn_on = (cosmos.get_timestamp() - car.last_turned_on).in_seconds(cosmos.get_fixed_delta());
+
 				existence.input.direct_listener = car.current_driver;
-				existence.input.modifier.pitch = pitch;
+				existence.input.modifier.pitch = std::min(since_last_turn_on / 1.5f, pitch);
+				existence.input.modifier.gain = 1.f;// std::min(since_last_turn_on / 1.0f, 1.f);
 
 				components::sound_existence::activate(sound_entity);
 			}
 			else {
-				components::sound_existence::deactivate(sound_entity);
+				const auto since_last_turn_off = (cosmos.get_timestamp() - car.last_turned_off).in_seconds(cosmos.get_fixed_delta());
+
+				existence.input.direct_listener.unset();
+				existence.input.modifier.gain = std::max(0.f, 1.f - since_last_turn_off / 1.5f);
+				existence.input.modifier.pitch = pitch - std::min(0.2f, 0.2f * since_last_turn_off/1.5f);
+
+				if (existence.input.modifier.gain > 0.f) {
+					components::sound_existence::activate(sound_entity);
+				}
+				else {
+					components::sound_existence::deactivate(sound_entity);
+				}
 			}
 		}
 
