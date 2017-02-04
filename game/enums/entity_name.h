@@ -23,6 +23,7 @@ enum class entity_name {
 	SUBMACHINE,
 	CORPSE,
 	URBAN_CYAN_MACHETE,
+	AMPLIFIER_ARM
 };
 
 void name_entity(const entity_handle, const entity_name);

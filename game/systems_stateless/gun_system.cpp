@@ -13,6 +13,7 @@
 #include "game/components/container_component.h"
 #include "game/components/item_component.h"
 #include "game/components/flags_component.h"
+#include "game/components/sentience_component.h"
 
 #include "game/systems_temporary/physics_system.h"
 
@@ -71,124 +72,167 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 	for (const auto& it : cosmos.get(processing_subjects::WITH_GUN)) {
 		const auto& gun_transform = it.logic_transform();
+		const auto owning_capability = it.get_owning_transfer_capability();
+		
+		const auto owning_sentience = 
+			(owning_capability.alive() && owning_capability.has<components::sentience>()) ? owning_capability : cosmos[entity_id()];
+
 		auto& gun = it.get<components::gun>();
 
-		if (gun.trigger_pressed && gun.shot_cooldown.try_to_fire_and_reset(cosmos.get_timestamp(), delta)) {
+		const auto magic_missile_def = cosmos[gun.magic_missile_definition];
+		const auto is_magic_launcher = magic_missile_def.alive();
+		const auto mana_needed = is_magic_launcher ? magic_missile_def.get<components::damage>().amount / 4 : 0;
+		
+		const bool has_enough_mana = 
+			(is_magic_launcher 
+			&& owning_sentience.alive() 
+			&& owning_sentience.get<components::sentience>().personal_electricity.value >= mana_needed)
+			|| !is_magic_launcher;
+
+		if (
+			gun.trigger_pressed 
+			&& has_enough_mana
+			&& gun.shot_cooldown.try_to_fire_and_reset(cosmos.get_timestamp(), delta)
+		) {
 			if (gun.action_mode != components::gun::action_type::AUTOMATIC) {
 				gun.trigger_pressed = false;
 			}
 
-			const auto chamber_slot = it[slot_function::GUN_CHAMBER];
+			const components::transform muzzle_transform = { gun.calculate_muzzle_position(gun_transform), gun_transform.rotation };
+			
+			messages::gunshot_response response;
 
-			if (chamber_slot.get_mounted_items().size() == 1) {
-				messages::gunshot_response response;
+			response.muzzle_transform = muzzle_transform;
+			response.subject = it;
 
-				const components::transform muzzle_transform = { gun.calculate_muzzle_position(gun_transform), gun_transform.rotation };
+			float total_recoil_multiplier = 1.f;
+
+			if (is_magic_launcher) {
+				const auto round_entity = cosmos.clone_entity(magic_missile_def); //??
+
+				auto& damage = round_entity.get<components::damage>();
+				damage.sender = it;
+				total_recoil_multiplier *= damage.recoil_multiplier;
+
+				round_entity.set_logic_transform(muzzle_transform);
+
+				auto rng = cosmos.get_rng_for(round_entity);
+				set_velocity(round_entity, vec2().set_from_degrees(muzzle_transform.rotation).set_length(rng.randval(gun.muzzle_velocity)));
+				response.spawned_rounds.push_back(round_entity);
+
+				auto& sentience = owning_sentience.get<components::sentience>();
+				sentience.personal_electricity.value -= sentience.consciousness.calculate_damage_result(mana_needed).effective;
+
+				round_entity.set_flag(entity_flag::IS_IMMUNE_TO_PAST);
+				round_entity.add_standard_components();
 				
-				const auto item_in_chamber = chamber_slot.get_mounted_items()[0];
+				step.transient.messages.post(response);
+			}
+			else {
+				const auto chamber_slot = it[slot_function::GUN_CHAMBER];
 
-				std::vector<entity_handle> bullet_entities;
-				bullet_entities.clear();
+				if (chamber_slot.get_mounted_items().size() == 1) {
 
-				const auto pellets_slot = item_in_chamber[slot_function::ITEM_DEPOSIT];
+					const auto item_in_chamber = chamber_slot.get_mounted_items()[0];
 
-				bool destroy_pellets_container = false;
+					std::vector<entity_handle> bullet_entities;
+					bullet_entities.clear();
 
-				if (pellets_slot.alive()) {
-					destroy_pellets_container = true;
-					bullet_entities = pellets_slot.get_mounted_items();
-				}
-				else {
-					bullet_entities.push_back(item_in_chamber);
-				}
+					const auto pellets_slot = item_in_chamber[slot_function::ITEM_DEPOSIT];
 
-				float total_recoil_multiplier = 1.f;
+					bool destroy_pellets_container = false;
 
-				for(const auto catridge_or_pellet_stack : bullet_entities) {
-					int charges = catridge_or_pellet_stack.get<components::item>().charges;
-
-					while (charges--) {
-						{
-							const auto round_entity = cosmos.clone_entity(catridge_or_pellet_stack[sub_entity_name::BULLET_ROUND]); //??
-							
-							auto& damage = round_entity.get<components::damage>();
-							damage.amount *= gun.damage_multiplier;
-							damage.sender = it;
-							total_recoil_multiplier *= damage.recoil_multiplier;
-
-							round_entity.set_logic_transform(muzzle_transform);
-							
-							auto rng = cosmos.get_rng_for(round_entity);
-							set_velocity(round_entity, vec2().set_from_degrees(muzzle_transform.rotation).set_length(rng.randval(gun.muzzle_velocity)));
-							response.spawned_rounds.push_back(round_entity);
-
-							round_entity.set_flag(entity_flag::IS_IMMUNE_TO_PAST);
-							round_entity.add_standard_components();
-						}
-
-						const auto shell_definition = catridge_or_pellet_stack[sub_entity_name::BULLET_SHELL];
-
-						if (shell_definition.alive()) {
-							const auto shell_entity = cosmos.clone_entity(shell_definition);
-
-							auto rng = cosmos.get_rng_for(shell_entity);
-
-							const auto spread_component = rng.randval(gun.shell_spread_degrees) + gun.shell_spawn_offset.rotation;
-
-							auto shell_transform = gun_transform;
-							shell_transform.pos += vec2(gun.shell_spawn_offset.pos).rotate(gun_transform.rotation, vec2());
-							shell_transform.rotation += spread_component;
-
-							shell_entity.set_logic_transform(shell_transform);
-
-							set_velocity(shell_entity, vec2().set_from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun.shell_velocity)));
-							response.spawned_shells.push_back(shell_entity);
-
-							shell_entity.add_standard_components();
-						}
-					}
-
-					response.muzzle_transform = muzzle_transform;
-					response.subject = it;
-					
-					step.transient.messages.post(response);
-
-					step.transient.messages.post(messages::queue_destruction(catridge_or_pellet_stack));
-				}
-
-				if (total_recoil_multiplier > 0.f) {
-					const auto owning_capability = it.get_owning_transfer_capability();
-					const auto owning_crosshair_recoil = owning_capability[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
-					gun.recoil.shoot_and_apply_impulse(owning_crosshair_recoil, total_recoil_multiplier/100.f, true);
-				}
-
-				if (destroy_pellets_container) {
-					step.transient.messages.post(messages::queue_destruction(chamber_slot.get_items_inside()[0]));
-				}
-				
-				chamber_slot->items_inside.clear();
-
-				if (gun.action_mode >= components::gun::action_type::SEMI_AUTOMATIC) {
-					std::vector<entity_handle> source_store_for_chamber;
-
-					const auto chamber_magazine_slot = it[slot_function::GUN_CHAMBER_MAGAZINE];
-
-					if (chamber_magazine_slot.alive()) {
-						source_store_for_chamber = chamber_magazine_slot.get_items_inside();
+					if (pellets_slot.alive()) {
+						destroy_pellets_container = true;
+						bullet_entities = pellets_slot.get_mounted_items();
 					}
 					else {
-						const auto detachable_magazine_slot = it[slot_function::GUN_DETACHABLE_MAGAZINE];
+						bullet_entities.push_back(item_in_chamber);
+					}
 
-						if (detachable_magazine_slot.alive() && detachable_magazine_slot.has_items()) {
-							source_store_for_chamber = detachable_magazine_slot.get_items_inside()[0][slot_function::ITEM_DEPOSIT].get_items_inside();
+					for(const auto catridge_or_pellet_stack : bullet_entities) {
+						int charges = catridge_or_pellet_stack.get<components::item>().charges;
+
+						while (charges--) {
+							{
+								const auto round_entity = cosmos.clone_entity(catridge_or_pellet_stack[sub_entity_name::BULLET_ROUND]); //??
+								
+								auto& damage = round_entity.get<components::damage>();
+								damage.amount *= gun.damage_multiplier;
+								damage.sender = it;
+								total_recoil_multiplier *= damage.recoil_multiplier;
+
+								round_entity.set_logic_transform(muzzle_transform);
+								
+								auto rng = cosmos.get_rng_for(round_entity);
+								set_velocity(round_entity, vec2().set_from_degrees(muzzle_transform.rotation).set_length(rng.randval(gun.muzzle_velocity)));
+								response.spawned_rounds.push_back(round_entity);
+
+								round_entity.set_flag(entity_flag::IS_IMMUNE_TO_PAST);
+								round_entity.add_standard_components();
+							}
+
+							const auto shell_definition = catridge_or_pellet_stack[sub_entity_name::BULLET_SHELL];
+
+							if (shell_definition.alive()) {
+								const auto shell_entity = cosmos.clone_entity(shell_definition);
+
+								auto rng = cosmos.get_rng_for(shell_entity);
+
+								const auto spread_component = rng.randval(gun.shell_spread_degrees) + gun.shell_spawn_offset.rotation;
+
+								auto shell_transform = gun_transform;
+								shell_transform.pos += vec2(gun.shell_spawn_offset.pos).rotate(gun_transform.rotation, vec2());
+								shell_transform.rotation += spread_component;
+
+								shell_entity.set_logic_transform(shell_transform);
+
+								set_velocity(shell_entity, vec2().set_from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun.shell_velocity)));
+								response.spawned_shells.push_back(shell_entity);
+
+								shell_entity.add_standard_components();
+							}
+						}
+						
+						step.transient.messages.post(response);
+
+						step.transient.messages.post(messages::queue_destruction(catridge_or_pellet_stack));
+					}
+
+					if (destroy_pellets_container) {
+						step.transient.messages.post(messages::queue_destruction(chamber_slot.get_items_inside()[0]));
+					}
+					
+					chamber_slot->items_inside.clear();
+
+					if (gun.action_mode >= components::gun::action_type::SEMI_AUTOMATIC) {
+						std::vector<entity_handle> source_store_for_chamber;
+
+						const auto chamber_magazine_slot = it[slot_function::GUN_CHAMBER_MAGAZINE];
+
+						if (chamber_magazine_slot.alive()) {
+							source_store_for_chamber = chamber_magazine_slot.get_items_inside();
+						}
+						else {
+							const auto detachable_magazine_slot = it[slot_function::GUN_DETACHABLE_MAGAZINE];
+
+							if (detachable_magazine_slot.alive() && detachable_magazine_slot.has_items()) {
+								source_store_for_chamber = detachable_magazine_slot.get_items_inside()[0][slot_function::ITEM_DEPOSIT].get_items_inside();
+							}
+						}
+
+						if (source_store_for_chamber.size() > 0) {
+							const item_slot_transfer_request into_chamber_transfer (*source_store_for_chamber.rbegin(), chamber_slot, 1, true);
+							perform_transfer(into_chamber_transfer, step);
 						}
 					}
-
-					if (source_store_for_chamber.size() > 0) {
-						const item_slot_transfer_request into_chamber_transfer (*source_store_for_chamber.rbegin(), chamber_slot, 1, true);
-						perform_transfer(into_chamber_transfer, step);
-					}
 				}
+			}
+
+			if (total_recoil_multiplier > 0.f) {
+				const auto owning_capability = it.get_owning_transfer_capability();
+				const auto owning_crosshair_recoil = owning_capability[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
+				gun.recoil.shoot_and_apply_impulse(owning_crosshair_recoil, total_recoil_multiplier / 100.f, true);
 			}
 		}
 		else if (gun.shot_cooldown.is_ready(cosmos.get_timestamp(), delta)) {

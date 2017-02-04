@@ -21,12 +21,12 @@ namespace ingredients {
 		slot_def.is_physical_attachment_slot = true;
 		slot_def.always_allow_exactly_one_item = true;
 		slot_def.attachment_sticking_mode = augs::rects::sticking::RIGHT;
-		slot_def.attachment_offset.pos = vec2(bbox.x/2 - 0, 20);
+		slot_def.attachment_offset.pos = vec2(bbox.x/2 - 3, 20);
 		slot_def.attachment_density_multiplier = 0.02f;
 
 		container.slots[slot_function::PRIMARY_HAND] = slot_def;
 		
-		slot_def.attachment_offset.pos = vec2(bbox.x / 2 - 0, -20);
+		slot_def.attachment_offset.pos = vec2(bbox.x / 2 - 3, -20);
 		container.slots[slot_function::SECONDARY_HAND] = slot_def;
 
 		slot_def.for_categorized_items_only = true;

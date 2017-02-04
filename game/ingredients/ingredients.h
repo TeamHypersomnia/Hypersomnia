@@ -61,7 +61,12 @@ namespace prefabs {
 	entity_handle create_pistol(const logic_step, vec2 pos, entity_id load_mag = entity_id());
 	entity_handle create_kek9(const logic_step, vec2 pos, entity_id load_mag = entity_id());
 	entity_handle create_submachine(const logic_step, vec2 pos, entity_id load_mag = entity_id());
-	
+
+	entity_handle create_amplifier_arm(
+		cosmos&, 
+		vec2 pos 
+	);
+
 	entity_handle create_pink_charge(cosmos&, vec2 pos, int charges = 23);
 	entity_handle create_cyan_charge(cosmos&, vec2 pos, int charges = 30);
 	entity_handle create_green_charge(cosmos& world, vec2 pos, int charges = 23);

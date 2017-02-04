@@ -126,10 +126,16 @@ void damage_system::destroy_outdated_bullets(const logic_step step) {
 			step.transient.messages.post(messages::queue_destruction(it));
 		}
 
-		if (damage.constrain_distance)
+		if (damage.constrain_distance) {
 			damage.distance_travelled += speed(it);
+		}
 
-		if (damage.constrain_lifetime)
+		if (damage.constrain_lifetime) {
 			damage.lifetime_ms += static_cast<float>(delta.in_milliseconds());
+		}
+
+		if (damage.homing_towards_hostile_strength > 0.f) {
+
+		}
 	}
 }

@@ -38,6 +38,8 @@ namespace components {
 
 		float lifetime_ms = 0.f;
 
+		float homing_towards_hostile_strength = 0.f;
+
 		vec2 saved_point_of_impact_before_death;
 
 		template<class F>

@@ -551,6 +551,95 @@ namespace prefabs {
 		return weapon;
 	}
 
+	entity_handle create_amplifier_arm(
+		cosmos& cosmos,
+		vec2 pos
+	) {
+		auto weapon = cosmos.create_entity("amplifier_arm");
+		name_entity(weapon, entity_name::AMPLIFIER_ARM);
+
+		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::AMPLIFIER_ARM, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::see_through_dynamic_body(weapon);
+
+		auto& response = weapon += components::sound_response();
+		response.response = assets::sound_response_id::SUBMACHINE_RESPONSE;
+		
+		auto& item = ingredients::make_item(weapon);
+		item.space_occupied_per_charge = to_space_units("3.0");
+
+		auto& gun = weapon += components::gun();
+
+		gun.action_mode = components::gun::action_type::AUTOMATIC;
+		gun.muzzle_velocity = std::make_pair(2000.f, 2000.f);
+		gun.shot_cooldown = augs::stepped_cooldown(500);
+		gun.bullet_spawn_offset.set(sprite.size.x / 2, 0);
+		gun.camera_shake_radius = 5.f;
+		gun.camera_shake_spread_degrees = 45.f;
+
+		gun.damage_multiplier = 1.f;
+
+		gun.recoil.repeat_last_n_offsets = 20;
+
+		gun.recoil.offsets = {
+			{ vec2().set_from_degrees(1.35f * 2.f) },
+			{ vec2().set_from_degrees(1.35f * 2.f) },
+			{ vec2().set_from_degrees(1.35f*2.6f) },
+			{ vec2().set_from_degrees(1.35f*2.8f) },
+			{ vec2().set_from_degrees(1.35f*3.2f) },
+			{ vec2().set_from_degrees(1.35f*3.0f) },
+			{ vec2().set_from_degrees(1.35f*2.7f) },
+			{ vec2().set_from_degrees(1.35f*2.3f) },
+			{ vec2().set_from_degrees(1.35f*2.0f) },
+			{ vec2().set_from_degrees(1.35f*0.3f) },
+			{ vec2().set_from_degrees(1.35f*-0.5f) },
+			{ vec2().set_from_degrees(1.35f*-1.0f) },
+			{ vec2().set_from_degrees(1.35f*-1.5f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-3.2f) },
+			{ vec2().set_from_degrees(1.35f*-4.0f) },
+			{ vec2().set_from_degrees(1.35f*2.3f) },
+			{ vec2().set_from_degrees(1.35f*2.5f) },
+			{ vec2().set_from_degrees(1.35f*1.7f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*3.0f) },
+		};
+
+		gun.recoil.scale = 30.0f / 2;
+
+		weapon.add_standard_components();
+
+		{
+			const auto round_definition = cosmos.create_entity("round_definition");
+
+			auto& s = ingredients::sprite(round_definition, pos, assets::texture_id::ROUND_TRACE, cyan, render_layer::FLYING_BULLETS);
+			s.size *= vec2(2, 2);
+			ingredients::bullet_round_physics(round_definition);
+
+			{
+				auto& response = round_definition += components::particle_effect_response{ assets::particle_effect_response_id::ELECTRIC_PROJECTILE_RESPONSE };
+				response.modifier.colorize = cyan;
+			}
+
+			{
+				auto& response = round_definition += components::sound_response();
+				response.response = assets::sound_response_id::ELECTRIC_PROJECTILE_RESPONSE;
+			}
+
+			auto& damage = round_definition += components::damage();
+			damage.homing_towards_hostile_strength = 1.f;
+			damage.amount = 42;
+
+			gun.magic_missile_definition = round_definition;
+		}
+
+		return weapon;
+	}
+
 	entity_handle create_pistol(const logic_step step, vec2 pos, entity_id load_mag_id) {
 		auto& cosmos = step.cosm;
 		auto load_mag = cosmos[load_mag_id];

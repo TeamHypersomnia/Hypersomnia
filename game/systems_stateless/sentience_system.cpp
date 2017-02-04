@@ -191,7 +191,8 @@ void sentience_system::cooldown_aimpunches(const logic_step step) const {
 void sentience_system::regenerate_values(const logic_step step) const {
 	const auto now = step.cosm.get_timestamp();
 	const auto regeneration_frequency_in_steps = static_cast<unsigned>(1 / step.cosm.get_fixed_delta().in_seconds() * 3);
-	const auto consciousness_regeneration_frequency_in_steps = static_cast<unsigned>(1/step.cosm.get_fixed_delta().in_seconds() * 2);
+	const auto consciousness_regeneration_frequency_in_steps = static_cast<unsigned>(1 / step.cosm.get_fixed_delta().in_seconds() * 2);
+	const auto pe_regeneration_frequency_in_steps = static_cast<unsigned>(1/step.cosm.get_fixed_delta().in_seconds() * 3);
 	
 	for (const auto& t : step.cosm.get(processing_subjects::WITH_SENTIENCE)) {
 		auto& sentience = t.get<components::sentience>();
@@ -212,6 +213,14 @@ void sentience_system::regenerate_values(const logic_step step) const {
 			}
 
 			sentience.consciousness.value = std::min(sentience.health.value, sentience.consciousness.value);
+		}
+
+		if (sentience.personal_electricity.enabled) {
+			const auto passed = now.step;
+
+			if (passed > 0 && passed % pe_regeneration_frequency_in_steps == 0) {
+				sentience.personal_electricity.value -= sentience.personal_electricity.calculate_damage_result(-4).effective;
+			}
 		}
 	}
 }

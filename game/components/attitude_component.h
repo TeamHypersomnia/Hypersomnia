@@ -31,16 +31,18 @@ namespace components {
 		void for_each_held_id(F f) {
 			f(currently_attacked_visible_entity);
 
-			for (auto& e : specific_hostile_entities)
+			for (auto& e : specific_hostile_entities) {
 				f(e);
+			}
 		}
 
 		template<class F>
 		void for_each_held_id(F f) const {
 			f(currently_attacked_visible_entity);
 
-			for (const auto& e : specific_hostile_entities)
+			for (const auto& e : specific_hostile_entities) {
 				f(e);
+			}
 		}
 
 		template <class Archive>

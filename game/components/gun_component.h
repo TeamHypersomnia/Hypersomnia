@@ -48,6 +48,18 @@ namespace components {
 
 		components::transform shell_spawn_offset;
 
+		entity_id magic_missile_definition;
+
+		template<class F>
+		void for_each_held_id(F f) {
+			f(magic_missile_definition);
+		}
+
+		template<class F>
+		void for_each_held_id(F f) const {
+			f(magic_missile_definition);
+		}
+
 		template <class Archive>
 		void serialize(Archive& ar) {
 			ar(

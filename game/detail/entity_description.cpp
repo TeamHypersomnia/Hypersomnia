@@ -30,6 +30,8 @@ textual_description description_of_entity(const const_entity_handle id) {
 std::wstring describe_properties(const const_entity_handle id) {
 	std::wostringstream result;
 
+	const auto& cosmos = id.get_cosmos();
+
 	const auto* const melee = id.find<components::melee>();
 	const auto* const gun = id.find<components::gun>();
 	const auto* const damage = id.find<components::damage>();
@@ -57,8 +59,14 @@ std::wstring describe_properties(const const_entity_handle id) {
 	}
 
 	if (gun) {
-		result << L"Muzzle velocity: [color=vscyan]" << (gun->muzzle_velocity.first + gun->muzzle_velocity.second) / 2 
-			<< L"[/color]\nDamage multiplier: [color=vscyan]" << std::fixed << std::setprecision(1) << gun->damage_multiplier << L"[/color]\n";
+		if (cosmos[gun->magic_missile_definition].alive()) {
+			result << typesafe_sprintf(L"Muzzle velocity: [color=vscyan]%x[/color]\nAmplification multiplier: [color=vscyan]%x[/color]\n", 
+				(gun->muzzle_velocity.first + gun->muzzle_velocity.second) / 2, gun->damage_multiplier);
+		}
+		else {
+			result << typesafe_sprintf(L"Muzzle velocity: [color=vscyan]%x[/color]\nDamage multiplier: [color=vscyan]%x[/color]\n",
+				(gun->muzzle_velocity.first + gun->muzzle_velocity.second) / 2, gun->damage_multiplier);
+		}
 	}
 
 	if (damage) {

@@ -63,6 +63,12 @@ namespace resource_setups {
 			gui.flip_vertically = true;
 		}
 
+		{
+			auto& gui = manager.create(assets::texture_id::AMPLIFIER_ARM, "hypersomnia/gfx/amplifier_arm.png").gui_sprite_def;
+			gui.flip_horizontally = true;
+			gui.flip_vertically = false;
+		}
+
 		auto& magazine_gui = manager.create(assets::texture_id::SAMPLE_MAGAZINE, "hypersomnia/gfx/magazine.png").gui_sprite_def;
 
 		manager.create(assets::texture_id::SMALL_MAGAZINE, "hypersomnia/gfx/small_magazine.png");
