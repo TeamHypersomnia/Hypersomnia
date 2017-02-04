@@ -175,6 +175,8 @@ namespace assets {
 		PERSONAL_ELECTRICITY_ICON,
 		CONSCIOUSNESS_ICON,
 
+		AMPLIFIER_ARM,
+
 		COUNT,
 	};
 	

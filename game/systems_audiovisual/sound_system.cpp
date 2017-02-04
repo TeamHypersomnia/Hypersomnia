@@ -23,7 +23,10 @@ void sound_system::erase_caches_for_dead_entities(const cosmos& new_cosmos) {
 	}
 
 	for (const auto it : to_erase) {
-		fading_sources.emplace_back(std::move(per_entity_cache[it].source));
+		if (per_entity_cache[it].recorded_component.input.modifier.fade_on_exit) {
+			fading_sources.emplace_back(std::move(per_entity_cache[it].source));
+		}
+
 		per_entity_cache.erase(it);
 	}
 }
@@ -80,7 +83,7 @@ void sound_system::play_nearby_sound_existences(
 			|| cache.recorded_component.input.effect != existence.input.effect
 			|| &requested_buf != source.get_bound_buffer()
 		) {
-			if (source.is_playing()) {
+			if (source.is_playing() && cache.recorded_component.input.modifier.fade_on_exit) {
 				fading_sources.emplace_back(std::move(source));
 
 				source = augs::sound_source();

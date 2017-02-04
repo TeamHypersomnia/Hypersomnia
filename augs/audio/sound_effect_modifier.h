@@ -8,5 +8,7 @@ namespace augs {
 		float pitch = 1.f;
 		float max_distance = 1920.f * 3.f;
 		float reference_distance = 0.f;
+		bool fade_on_exit = true;
+		padding_byte pad[3];
 	};
 }
