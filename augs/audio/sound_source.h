@@ -17,6 +17,8 @@ namespace augs {
 		bool initialized = false;
 		ALuint id = 0;
 		const single_sound_buffer* attached_buffer = nullptr;
+
+		void destroy();
 	public:
 		sound_source();
 		~sound_source();
@@ -26,7 +28,6 @@ namespace augs {
 
 		void play() const;
 		void seek_to(const float seconds) const;
-		float get_time_in_seconds() const;
 		void stop() const;
 		void set_looping(const bool) const;
 		void set_pitch(const float) const;
@@ -37,6 +38,11 @@ namespace augs {
 		void set_max_distance(const float) const;
 		void set_reference_distance(const float) const;
 		void set_direct_channels(const bool) const;
+
+		float get_time_in_seconds() const;
+		float get_gain() const;
+		float get_pitch() const;
+		bool is_playing() const;
 
 		void bind_buffer(const single_sound_buffer&);
 		void unbind_buffer();

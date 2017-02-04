@@ -222,7 +222,8 @@ void viewing_session::advance_audiovisual_systems(
 		listener_cone,
 		viewed_character,
 		cosm,
-		interp
+		interp,
+		dt
 	);
 }
 

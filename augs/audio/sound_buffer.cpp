@@ -18,10 +18,9 @@ namespace augs {
 	}
 
 	single_sound_buffer& single_sound_buffer::operator=(single_sound_buffer&& b) {
-		initialized = b.initialized;
-		computed_length_in_seconds = b.computed_length_in_seconds;
-		id = b.id;
-		b.initialized = false;
+		std::swap(initialized, b.initialized);
+		std::swap(computed_length_in_seconds, b.computed_length_in_seconds);
+		std::swap(id, b.id);
 		return *this;
 	}
 	

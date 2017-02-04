@@ -10,12 +10,20 @@
 #include "game/components/physics_component.h"
 
 #define TRACE_PARAMETERS 0
+#define TRACE_CONSTRUCTORS_DESTRUCTORS 1
 #define Y_IS_Z 1
+
+#if TRACE_CONSTRUCTORS_DESTRUCTORS
+int g_num_sources = 0;
+#endif
 
 namespace augs {
 	sound_source::sound_source() {
 		AL_CHECK(alGenSources(1, &id));
-
+#if TRACE_CONSTRUCTORS_DESTRUCTORS
+		++g_num_sources;
+		LOG("alGenSources: %x (now %x sources)", id, g_num_sources);
+#endif
 		AL_CHECK(alSourcef(id, AL_PITCH, 1));
 		AL_CHECK(alSourcef(id, AL_GAIN, 1));
 		AL_CHECK(alSourcei(id, AL_LOOPING, AL_FALSE));
@@ -23,12 +31,20 @@ namespace augs {
 		initialized = true;
 	}
 
-	sound_source::~sound_source() {
+	void sound_source::destroy() {
 		if (initialized) {
+#if TRACE_CONSTRUCTORS_DESTRUCTORS
+			--g_num_sources;
+			LOG("alDeleteSources: %x (now %x sources)", id, g_num_sources);
+#endif
 			AL_CHECK(alDeleteSources(1, &id));
 			initialized = false;
 			attached_buffer = nullptr;
 		}
+	}
+
+	sound_source::~sound_source() {
+		destroy();
 	}
 
 	sound_source::sound_source(sound_source&& b) {
@@ -36,10 +52,9 @@ namespace augs {
 	}
 
 	sound_source& sound_source::operator=(sound_source&& b) {
-		initialized = b.initialized;
-		id = b.id;
-		attached_buffer = b.attached_buffer;
-		b.initialized = false;
+		std::swap(initialized, b.initialized);
+		std::swap(id, b.id);
+		std::swap(attached_buffer, b.attached_buffer);
 		return *this;
 	}
 
@@ -146,6 +161,24 @@ namespace augs {
 #if TRACE_PARAMETERS
 		LOG_NVPS(flag);
 #endif
+	}
+
+	float sound_source::get_gain() const {
+		float gain = 0.f;
+		AL_CHECK(alGetSourcef(id, AL_GAIN, &gain));
+		return gain;
+	}
+
+	float sound_source::get_pitch() const {
+		float pitch = 0.f;
+		AL_CHECK(alGetSourcef(id, AL_PITCH, &pitch));
+		return pitch;
+	}
+
+	bool sound_source::is_playing() const {
+		ALenum state = 0xdeadbeef;
+		AL_CHECK(alGetSourcei(id, AL_SOURCE_STATE, &state));
+		return state == AL_PLAYING;
 	}
 
 	void sound_source::bind_buffer(const single_sound_buffer& buf) {

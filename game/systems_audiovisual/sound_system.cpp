@@ -23,6 +23,7 @@ void sound_system::erase_caches_for_dead_entities(const cosmos& new_cosmos) {
 	}
 
 	for (const auto it : to_erase) {
+		fading_sources.emplace_back(std::move(per_entity_cache[it].source));
 		per_entity_cache.erase(it);
 	}
 }
@@ -40,12 +41,13 @@ const sound_system::cache& sound_system::get_cache(const const_entity_handle id)
 }
 
 void sound_system::play_nearby_sound_existences(
-	camera_cone cone, 
+	const camera_cone cone, 
 	const entity_id listening_character, 
 	const cosmos& cosmos, 
-	interpolation_system& sys
+	const interpolation_system& sys,
+	const augs::delta dt
 ) {
-	auto& queried_size = cone.visible_world_area;
+	auto queried_size = cone.visible_world_area;
 	queried_size.set(10000.f, 10000.f);
 
 	const float pixels_to_metersf = PIXELS_TO_METERSf;
@@ -78,7 +80,11 @@ void sound_system::play_nearby_sound_existences(
 			|| cache.recorded_component.input.effect != existence.input.effect
 			|| &requested_buf != source.get_bound_buffer()
 		) {
-			source.stop();
+			if (source.is_playing()) {
+				fading_sources.emplace_back(std::move(source));
+
+				source = augs::sound_source();
+			}
 
 			if (listening_character == existence.input.direct_listener) {
 				source.bind_buffer(buffer.request_stereo());
@@ -107,4 +113,25 @@ void sound_system::play_nearby_sound_existences(
 		source.set_position(source_pos);
 		source.set_velocity(it.get_effective_velocity());
 	}
+
+	erase_remove(fading_sources, [dt](augs::sound_source& source) {
+		const auto new_gain = source.get_gain() - dt.in_seconds()*3.f;
+		const auto new_pitch = source.get_pitch() - dt.in_seconds()/3.f;
+
+		if (new_pitch > 0.1f) {
+			source.set_pitch(new_pitch);
+		}
+
+		if (new_gain > 0.f) {
+			source.set_gain(new_gain);
+			return false;
+		}
+		else {
+			source.set_gain(1.f);
+		}
+
+		return true;
+	});
+
+	fading_sources.shrink_to_fit();
 }

@@ -30,17 +30,18 @@ public:
 	cache& get_cache(const const_entity_handle);
 	const cache& get_cache(const const_entity_handle) const;
 
-	std::vector<augs::sound_source> sources;
+	std::vector<augs::sound_source> fading_sources;
 
 	void initialize_sound_sources(const size_t num_max_sources);
 
 	void reserve_caches_for_entities(const size_t) const {}
 
 	void play_nearby_sound_existences(
-		camera_cone,
+		const camera_cone,
 		const entity_id listening_character,
 		const cosmos&, 
-		interpolation_system& sys
+		const interpolation_system& sys,
+		const augs::delta dt
 	);
 
 	void erase_caches_for_dead_entities(const cosmos&);
