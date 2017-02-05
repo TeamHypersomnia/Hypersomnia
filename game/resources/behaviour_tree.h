@@ -14,10 +14,7 @@
 
 namespace resources {
 	class behaviour_tree {
-	
 	public:
-		typedef entity_handle user_callback_input;
-
 		enum class goal_availability {
 			ALREADY_ACHIEVED,
 			CANT_EXECUTE,
@@ -40,7 +37,12 @@ namespace resources {
 		};
 
 		struct state_of_traversal {
-			state_of_traversal(const logic_step, const entity_handle, state_of_tree_instance&, const behaviour_tree&);
+			state_of_traversal(
+				const logic_step, 
+				const entity_handle, 
+				state_of_tree_instance&, 
+				const behaviour_tree&
+			);
 
 			const logic_step step;
 			const entity_handle subject;

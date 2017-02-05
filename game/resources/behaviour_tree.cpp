@@ -6,13 +6,13 @@ namespace resources {
 	behaviour_tree::state_of_traversal::state_of_traversal(
 		const logic_step step, 
 		const entity_handle subject, 
-		state_of_tree_instance& in, 
-		const behaviour_tree& bt
+		state_of_tree_instance& instance, 
+		const behaviour_tree& original_tree
 	) : 
 		step(step), 
 		subject(subject),
-		instance(in),
-		original_tree(bt)
+		instance(instance),
+		original_tree(original_tree)
 	{
 		std::fill(goals_set.begin(), goals_set.end(), false);
 	}
