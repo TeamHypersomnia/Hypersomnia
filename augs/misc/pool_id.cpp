@@ -6,9 +6,6 @@
 namespace augs {
 	std::ostream& operator<<(std::ostream& out, const augs::raw_pool_id &x) {
 		out << "(" << x.pool.indirection_index << ";" << x.pool.version;
-#if USE_NAMES_FOR_IDS
-		out << ";" << x.get_debug_name();
-#endif
 		out << ")";
 		return out;
 	}
@@ -16,27 +13,10 @@ namespace augs {
 	raw_pool_id::raw_pool_id() {
 		pool.version = 0;
 		pool.indirection_index = -1;
-#if USE_NAMES_FOR_IDS
-		set_debug_name("unset");
-#endif
 	}
 
 	void raw_pool_id::unset() {
 		*this = raw_pool_id();
-	}
-
-	void raw_pool_id::set_debug_name(std::string s) {
-#if USE_NAMES_FOR_IDS
-		debug_name.assign(s.begin(), s.end());
-#endif
-	}
-
-	std::string raw_pool_id::get_debug_name() const {
-#if USE_NAMES_FOR_IDS
-		return std::string(debug_name.begin(), debug_name.end());
-#else
-		return std::string();
-#endif
 	}
 
 	bool raw_pool_id::operator==(const raw_pool_id& b) const {

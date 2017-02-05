@@ -21,6 +21,7 @@
 
 #include "game/enums/entity_flag.h"
 #include "augs/build_settings/setting_empty_bases.h"
+#include "augs/build_settings/setting_entity_handle_has_debug_name_reference.h"
 
 class cosmos;
 class cosmic_delta;
@@ -50,6 +51,9 @@ private:
 
 	owner_reference owner;
 	entity_id raw_id;
+#if ENTITY_HANDLE_HAS_DEBUG_NAME_REFERENCE
+	const std::string& debug_name;
+#endif
 
 	entity_id get_id_for_handle_operations() const {
 		return raw_id;
@@ -168,7 +172,18 @@ private:
 	}
 
 public:
-	basic_entity_handle(owner_reference owner, const entity_id raw_id) : raw_id(raw_id), owner(owner) {}
+	basic_entity_handle(
+		owner_reference owner, 
+		const entity_id raw_id
+	) : 
+		raw_id(raw_id), 
+		owner(owner) 
+#if ENTITY_HANDLE_HAS_DEBUG_NAME_REFERENCE
+		, debug_name(owner.get_debug_name(raw_id))
+#endif
+	{
+
+	}
 
 	entity_id get_id() const {
 		return raw_id;
@@ -176,10 +191,6 @@ public:
 
 	void set_id(const entity_id id) {
 		raw_id = id;
-	}
-
-	void set_debug_name(std::string s) {
-		raw_id.set_debug_name(s);
 	}
 
 	bool alive() const {
@@ -191,7 +202,7 @@ public:
 	}
 
 	std::string get_debug_name() const {
-		return raw_id.get_debug_name();
+		return get_cosmos().get_debug_name(raw_id);
 	}
 
 	typename owner_reference get_cosmos() const {

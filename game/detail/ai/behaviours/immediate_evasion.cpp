@@ -38,7 +38,7 @@ namespace behaviours {
 		}
 	}
 
-	void immediate_evasion::execute_leaf_goal_callback(tree::execution_occurence o, tree::state_of_traversal& t) const {
+	void immediate_evasion::execute_leaf_goal_callback(const tree::execution_occurence o, tree::state_of_traversal& t) const {
 		const auto subject = t.subject;
 		auto& movement = subject.get<components::movement>();
 
@@ -47,7 +47,7 @@ namespace behaviours {
 			return;
 		}
 
-		auto& goal = t.get_goal<immediate_evasion_goal>();
+		const auto& goal = t.get_goal<immediate_evasion_goal>();
 
 		vec2 resultant_evasion;
 

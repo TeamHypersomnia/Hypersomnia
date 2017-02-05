@@ -12,11 +12,7 @@ namespace augs {
 		owner_reference owner;
 		id_type raw_id;
 		
-		handle_for_pool_container(owner_reference owner, id_type raw_id) : raw_id(raw_id), owner(owner) {}
-
-		void set_debug_name(std::string s) {
-			raw_id.set_debug_name(s);
-		}
+		handle_for_pool_container(owner_reference owner, const id_type raw_id) : raw_id(raw_id), owner(owner) {}
 
 		template<class M>
 		maybe_const_ref_t<is_const, M> get_meta() const {
@@ -33,10 +29,6 @@ namespace augs {
 
 		bool dead() const {
 			return !alive();
-		}
-
-		std::string get_debug_name() const {
-			return raw_id.get_debug_name();
 		}
 
 		operator id_type() const {

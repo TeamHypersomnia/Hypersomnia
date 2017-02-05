@@ -92,8 +92,17 @@ void cosmos::create_substance_for_entity(const const_entity_handle h) {
 	}
 }
 
+const std::string& cosmos::get_debug_name(entity_id id) const {
+	if(entity_debug_names.find(id) == entity_debug_names.end()) {
+		id = entity_id();
+	}
+
+	return entity_debug_names.at(id);
+}
+
 cosmos::cosmos(const unsigned reserved_entities) {
 	reserve_storage_for_entities(reserved_entities);
+	entity_debug_names[entity_id()] = "dead entity";
 }
 
 cosmos::cosmos(const cosmos& b) {
@@ -238,9 +247,13 @@ entity_handle cosmos::allocate_new_entity() {
 	return entity_handle(*this, raw_pool_id);
 }
 
+void cosmos::set_debug_name(const entity_id id, const std::string& new_debug_name) {
+	entity_debug_names[id] = new_debug_name;
+}
+
 entity_handle cosmos::create_entity(const std::string& debug_name) {
 	auto new_entity = allocate_new_entity();
-	new_entity.set_debug_name(debug_name);
+	set_debug_name(new_entity, debug_name);
 	new_entity += components::guid();
 
 #if COSMOS_TRACKS_GUIDS
@@ -271,7 +284,7 @@ entity_handle cosmos::clone_entity(const entity_id copied_entity_id) {
 
 	auto new_entity = allocate_new_entity();
 	clone_all_components<components::substance>(copied_entity, new_entity);
-	new_entity.set_debug_name("+" + copied_entity.get_debug_name());
+	set_debug_name(new_entity, "+" + copied_entity.get_debug_name());
 
 #if COSMOS_TRACKS_GUIDS
 	assign_next_guid(new_entity);
@@ -279,7 +292,11 @@ entity_handle cosmos::clone_entity(const entity_id copied_entity_id) {
 
 	// zero-out non-trivial relational components
 
-	for_each_type<components::child, components::physical_relations, components::sub_entities>([copied_entity, new_entity](auto c) {
+	for_each_type<
+		components::child, 
+		components::physical_relations, 
+		components::sub_entities
+	>([copied_entity, new_entity](auto c) {
 		typedef decltype(c) T;
 		
 		if (copied_entity.has<T>()) {
@@ -334,6 +351,7 @@ void cosmos::delete_entity(const entity_id e) {
 
 	remove_all_components(get_handle(e));
 	get_aggregate_pool().free(e);
+	entity_debug_names.erase(e);
 }
 
 void cosmos::advance_deterministic_schemata(const cosmic_entropy& input) {

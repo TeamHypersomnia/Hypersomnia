@@ -1,17 +1,9 @@
 #pragma once
-#define USE_NAMES_FOR_IDS 0
+#include <sstream>
 
-#if USE_NAMES_FOR_IDS
-#include "augs/misc/constant_size_vector.h"
-#endif
-
-#include <string>
 namespace augs {
 	class raw_pool_id {
 	public:
-#if USE_NAMES_FOR_IDS
-		constant_size_vector<char, 40> debug_name;
-#endif
 		union {
 			struct pool_data {
 				unsigned version;
@@ -25,10 +17,6 @@ namespace augs {
 
 		void unset();
 
-		void set_debug_name(std::string s);
-
-		std::string get_debug_name() const;
-
 		bool operator==(const raw_pool_id& b) const;
 		bool operator!=(const raw_pool_id& b) const;
 		bool operator<(const raw_pool_id& b) const;
@@ -37,9 +25,6 @@ namespace augs {
 
 		template <class Archive>
 		void serialize(Archive& ar) {
-#if USE_NAMES_FOR_IDS
-			ar(CEREAL_NVP(debug_name));
-#endif
 			ar(CEREAL_NVP(version), CEREAL_NVP(indirection_index));
 		}
 	};

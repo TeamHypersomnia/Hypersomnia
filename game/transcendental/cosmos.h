@@ -48,6 +48,7 @@ class EMPTY_BASES cosmos :
 	friend void transform_component_guids_to_ids(T&, const cosmos&);
 
 	std::map<unsigned, entity_id> guid_map_for_transport;
+	std::unordered_map<entity_id, std::string> entity_debug_names;
 
 	void assign_next_guid(const entity_handle);
 	void clear_guid(const entity_handle);
@@ -133,15 +134,19 @@ public:
 	void complete_resubstantiation(const const_entity_handle);
 	void destroy_substance_for_entity(const const_entity_handle);
 	void create_substance_for_entity(const const_entity_handle);
+	
+	const std::string& get_debug_name(entity_id) const;
+	void set_debug_name(const entity_id, const std::string& new_debug_name);
 
 	template<class System>
-	void partial_resubstantiation(entity_handle handle) {
+	void partial_resubstantiation(const entity_handle handle) {
 		auto& sys = systems_temporary.get<System>();
 
 		sys.destruct(handle);
 
-		if (handle.has<components::substance>())
+		if (handle.has<components::substance>()) {
 			sys.construct(handle);
+		}
 	}
 
 #if COSMOS_TRACKS_GUIDS
