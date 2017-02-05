@@ -366,6 +366,7 @@
     <ClCompile Include="game\detail\entity_handle_mixins\renderable_mixin.cpp" />
     <ClCompile Include="game\detail\entity_handle_mixins\spatial_properties_mixin.cpp" />
     <ClCompile Include="game\detail\gui\aabb_highlighter.cpp" />
+    <ClCompile Include="game\detail\gui\action_button.cpp" />
     <ClCompile Include="game\detail\gui\character_gui.cpp" />
     <ClCompile Include="game\detail\gui\drag_and_drop.cpp" />
     <ClCompile Include="game\detail\gui\grid.cpp" />
@@ -1122,6 +1123,7 @@
     <ClInclude Include="game\detail\entity_handle_mixins\renderable_mixin.h" />
     <ClInclude Include="game\detail\entity_handle_mixins\spatial_properties_mixin.h" />
     <ClInclude Include="game\detail\gui\aabb_highlighter.h" />
+    <ClInclude Include="game\detail\gui\action_button.h" />
     <ClInclude Include="game\detail\gui\character_gui.h" />
     <ClInclude Include="game\detail\gui\drag_and_drop.h" />
     <ClInclude Include="game\detail\gui\game_gui_context.h" />
@@ -1132,6 +1134,7 @@
     <ClInclude Include="game\detail\gui\hotbar_button.h" />
     <ClInclude Include="game\detail\gui\immediate_hud.h" />
     <ClInclude Include="game\detail\gui\item_button.h" />
+    <ClInclude Include="game\detail\gui\locations\action_button_in_character_gui.h" />
     <ClInclude Include="game\detail\gui\locations\drag_and_drop_target_drop_item_in_character_gui.h" />
     <ClInclude Include="game\detail\gui\locations\hotbar_button_in_character_gui.h" />
     <ClInclude Include="game\detail\gui\locations\item_button_in_item.h" />

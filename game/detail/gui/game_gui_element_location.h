@@ -6,6 +6,7 @@
 #include "game/detail/gui/locations/item_button_in_item.h"
 #include "game/detail/gui/locations/drag_and_drop_target_drop_item_in_character_gui.h"
 #include "game/detail/gui/locations/hotbar_button_in_character_gui.h"
+#include "game/detail/gui/locations/action_button_in_character_gui.h"
 #include "game/detail/gui/locations/root_of_inventory_gui_in_context.h"
 #include "game/detail/gui/locations/sentience_meter_in_character_gui.h"
 
@@ -15,6 +16,7 @@ augs::trivial_variant<
 	item_button_in_item, 
 	drag_and_drop_target_drop_item_in_character_gui,
 	hotbar_button_in_character_gui,
+	action_button_in_character_gui,
 	root_of_inventory_gui_in_context,
 	sentience_meter_in_character_gui
 > game_gui_element_location;

@@ -420,7 +420,10 @@ void perform_transfer(const item_slot_transfer_request r, const logic_step step)
 
 	const auto result = query_transfer_result(r);
 
-	ensure(is_successful(result.result));
+	if (!is_successful(result.result)) {
+		LOG("Warning: an item slot transfer did was not successful.");
+		return;
+	}
 
 	const bool is_pickup = result.result == item_transfer_result_type::SUCCESSFUL_PICKUP;
 	const bool is_pickup_or_transfer = result.result == item_transfer_result_type::SUCCESSFUL_TRANSFER || is_pickup;

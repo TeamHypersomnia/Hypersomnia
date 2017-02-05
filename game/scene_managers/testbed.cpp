@@ -695,6 +695,7 @@ namespace scene_managers {
 				prefabs::create_cyan_charge(world, vec2(0, 0), true ? 1000 : 30)));
 
 		const auto amplifier = prefabs::create_amplifier_arm(step.cosm, vec2(-300, -500 + 50));
+		prefabs::create_amplifier_arm(step.cosm, vec2(-370, + 50));
 
 		prefabs::create_sample_rifle(step, vec2(100, -500 + 100));
 

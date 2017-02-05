@@ -96,7 +96,9 @@ void gui_element_system::queue_transfer(const item_slot_transfer_request_data re
 void gui_element_system::queue_transfers(const wielding_result res) {
 	// ensure(res.successful());
 
-	concatenate(pending_transfers, res.transfers);
+	if (res.successful()) {
+		concatenate(pending_transfers, res.transfers);
+	}
 }
 
 void gui_element_system::handle_hotbar_and_action_button_presses(
@@ -132,7 +134,7 @@ void gui_element_system::handle_hotbar_and_action_button_presses(
 		if (hotbar_index >= 0) {
 			auto& currently_held_index = gui.currently_held_hotbar_index;
 
-			if (gui.hotbar_buttons[currently_held_index].get_assigned_entity(subject).dead()) {
+			if (currently_held_index > -1 && gui.hotbar_buttons[currently_held_index].get_assigned_entity(subject).dead()) {
 				currently_held_index = -1;
 			}
 
