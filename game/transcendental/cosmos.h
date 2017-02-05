@@ -48,7 +48,9 @@ class EMPTY_BASES cosmos :
 	friend void transform_component_guids_to_ids(T&, const cosmos&);
 
 	std::map<unsigned, entity_id> guid_map_for_transport;
-	std::unordered_map<entity_id, std::string> entity_debug_names;
+	std::vector<std::string> entity_debug_names;
+
+	void delete_debug_name(const entity_id);
 
 	void assign_next_guid(const entity_handle);
 	void clear_guid(const entity_handle);

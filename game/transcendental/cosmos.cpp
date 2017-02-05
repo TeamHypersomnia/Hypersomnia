@@ -92,17 +92,21 @@ void cosmos::create_substance_for_entity(const const_entity_handle h) {
 	}
 }
 
-const std::string& cosmos::get_debug_name(entity_id id) const {
-	if(entity_debug_names.find(id) == entity_debug_names.end()) {
-		id = entity_id();
-	}
-
-	return entity_debug_names.at(id);
-}
-
 cosmos::cosmos(const unsigned reserved_entities) {
 	reserve_storage_for_entities(reserved_entities);
-	entity_debug_names[entity_id()] = "dead entity";
+	entity_debug_names[0] = "dead entity";
+}
+
+const std::string& cosmos::get_debug_name(entity_id id) const {
+	return entity_debug_names[id.pool.indirection_index + 1];
+}
+
+void cosmos::set_debug_name(const entity_id id, const std::string& new_debug_name) {
+	entity_debug_names[id.pool.indirection_index + 1] = new_debug_name;
+}
+
+void cosmos::delete_debug_name(const entity_id id) {
+	entity_debug_names[id.pool.indirection_index + 1] = "dead entity";
 }
 
 cosmos::cosmos(const cosmos& b) {
@@ -181,6 +185,7 @@ void cosmos::complete_resubstantiation(const const_entity_handle h) {
 void cosmos::reserve_storage_for_entities(const size_t n) {
 	get_aggregate_pool().initialize_space(n);
 	reserve_storage_for_all_components(n);
+	entity_debug_names.resize(n + 1);
 
 	auto reservation_lambda = [n](auto& sys) {
 		sys.reserve_caches_for_entities(n);
@@ -245,10 +250,6 @@ entity_handle cosmos::allocate_new_entity() {
 	auto raw_pool_id = get_aggregate_pool().allocate();
 
 	return entity_handle(*this, raw_pool_id);
-}
-
-void cosmos::set_debug_name(const entity_id id, const std::string& new_debug_name) {
-	entity_debug_names[id] = new_debug_name;
 }
 
 entity_handle cosmos::create_entity(const std::string& debug_name) {
@@ -351,7 +352,7 @@ void cosmos::delete_entity(const entity_id e) {
 
 	remove_all_components(get_handle(e));
 	get_aggregate_pool().free(e);
-	entity_debug_names.erase(e);
+	delete_debug_name(e);
 }
 
 void cosmos::advance_deterministic_schemata(const cosmic_entropy& input) {
@@ -366,14 +367,14 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
 	auto& performance = profiler;
+	
+	performance.start(meter_type::LOGIC);
 
 	physics_system::contact_listener listener(step.cosm);
 	
 	perform_transfers(step.entropy.transfer_requests, step);
 	
-	profiler.entropy_length.measure(step.entropy.length());
-
-	performance.start(meter_type::LOGIC);
+	performance.entropy_length.measure(step.entropy.length());
 
 	input_system().make_intent_messages(step);
 
@@ -454,12 +455,8 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	pathfinding_system().advance_pathfinding_sessions(step);
 	performance.stop(meter_type::PATHFINDING);
 
-	performance.start(meter_type::GUI);
-	
 	auto& transfers = step.transient.messages.get_queue<item_slot_transfer_request_data>();
 	perform_transfers(transfers, step);
-
-	performance.stop(meter_type::GUI);
 
 	particles_existence_system().destroy_dead_streams(step);
 	sound_existence_system().destroy_dead_sounds(step);
@@ -486,9 +483,10 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	//rotation_copying_system().update_rotations(step.cosm);
 
 	profiler.raycasts.measure(systems_temporary.get<physics_system>().ray_casts_since_last_step);
-	performance.stop(meter_type::LOGIC);
 
 	++significant.meta.total_steps_passed;
+
+	performance.stop(meter_type::LOGIC);
 }
 
 void cosmos::perform_deletions(const logic_step step) {
