@@ -302,7 +302,7 @@ namespace prefabs {
 
 			info.shape.from_renderable(recoil);
 
-			info.filter = filters::renderable();
+			info.filter = b2Filter();
 			//info.filter.categoryBits = 0;
 			info.density = 0.1f;
 			info.sensor = true;

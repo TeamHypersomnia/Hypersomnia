@@ -551,7 +551,8 @@ entity_id character_gui::get_hovered_world_entity(const cosmos& cosm, const vec2
 		});
 
 		for (const auto h : sorted_by_visibility) {
-			const auto named = cosm[get_first_named_ancestor(cosm[h])];
+			const auto hovered = cosm[h];
+			const auto named = cosm[get_first_named_ancestor(hovered)];
 
 			if (named.alive()) {
 				return named;
