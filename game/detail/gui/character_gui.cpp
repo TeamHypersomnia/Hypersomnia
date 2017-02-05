@@ -152,13 +152,11 @@ void character_gui::assign_item_to_first_free_hotbar_button(
 		return false;
 	};
 
-	for (size_t i = 1; i < hotbar_buttons.size(); ++i) {
+	for (size_t i = 0; i < hotbar_buttons.size(); ++i) {
 		if (try_assign(i)) {
 			return;
 		}
 	}
-
-	try_assign(0);
 }
 
 character_gui::hotbar_selection_setup character_gui::hotbar_selection_setup::get_available_entities(const const_entity_handle h) const {
@@ -209,18 +207,12 @@ wielding_result character_gui::make_previous_hotbar_selection_setup(
 			return{};
 		};
 
-		for (size_t i = 1; i < hotbar_buttons.size(); ++i) {
+		for (size_t i = 0; i < hotbar_buttons.size(); ++i) {
 			const auto t = trial(i);
 
 			if (t.successful()) {
 				return t;
 			}
-		}
-
-		const auto t = trial(0);
-		
-		if (t.successful()) {
-			return t;
 		}
 
 		return{};
@@ -298,6 +290,7 @@ void character_gui::draw(
 		step.camera,
 		step.session.world_hover_highlighter,
 		step.session.systems_audiovisual.get<interpolation_system>(),
+		step.session.context,
 		step.renderer.get_triangle_buffer()
 	);
 

@@ -13,6 +13,7 @@ class root_of_inventory_gui;
 struct character_gui;
 struct aabb_highlighter;
 class gui_element_system;
+struct input_context;
 
 typedef augs::gui::rect_tree<game_gui_element_location> game_gui_rect_tree;
 
@@ -110,6 +111,7 @@ public:
 		camera_cone camera,
 		const aabb_highlighter& highlighter,
 		const interpolation_system& interp,
+		const input_context& input_information,
 		augs::vertex_triangle_buffer& output
 	) :
 		base(sys, rect_world, char_gui, handle, tree, root),
@@ -117,7 +119,8 @@ public:
 		camera(camera),
 		output(output),
 		interp(interp),
-		highlighter(highlighter)
+		highlighter(highlighter),
+		input_information(input_information)
 	{}
 
 	const config_lua_table::hotbar_settings& hotbar_settings;
@@ -125,6 +128,7 @@ public:
 	augs::vertex_triangle_buffer& output;
 	const aabb_highlighter& highlighter;
 	const interpolation_system& interp;
+	const input_context& input_information;
 
 	augs::vertex_triangle_buffer& get_output_buffer() const {
 		return output;

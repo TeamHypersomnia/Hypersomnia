@@ -2,6 +2,7 @@
 #include <bitset>
 #include "augs/math/vec2.h"
 #include "augs/padding_byte.h"
+#include <string>
 
 namespace augs {
 	namespace window {
@@ -38,7 +39,6 @@ namespace augs {
 			};
 
 			namespace keys {
-				extern bool is_numpad_key(int);
 				enum class key {
 					INVALID,
 					LMOUSE,
@@ -164,6 +164,9 @@ namespace augs {
 					DASH,
 					COUNT = 256,
 				};
+
+				bool is_numpad_key(const key);
+				std::wstring get_key_wstring(const key);
 			}
 
 			enum class key_change {

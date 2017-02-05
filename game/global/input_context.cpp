@@ -1,11 +1,24 @@
 #include "input_context.h"
 #include "augs/misc/machine_entropy.h"
 
-void input_context::map_key_to_intent(augs::window::event::keys::key id, intent_type intent) {
+using namespace augs::window::event;
+using namespace keys;
+
+key input_context::get_bound_key_if_any(const intent_type intent) const {
+	for (const auto& k : key_to_intent) {
+		if (k.second == intent) {
+			return k.first;
+		}
+	}
+
+	return key::INVALID;
+}
+
+void input_context::map_key_to_intent(const key id, const intent_type intent) {
 	key_to_intent[id] = intent;
 }
 
-void input_context::map_event_to_intent(augs::window::event::message id, intent_type intent) {
+void input_context::map_event_to_intent(const message id, const intent_type intent) {
 	event_to_intent[id] = intent;
 }
 

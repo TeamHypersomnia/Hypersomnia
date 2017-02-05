@@ -348,11 +348,9 @@ void gui_element_system::rebuild_layouts(
 		current_x += bbox.x + left_rc_spacing + right_rc_spacing;
 	};
 
-	for (size_t i = 1; i < element.hotbar_buttons.size(); ++i) {
+	for (size_t i = 0; i < element.hotbar_buttons.size(); ++i) {
 		set_rc(element.hotbar_buttons[i]);
 	}
-
-	set_rc(element.hotbar_buttons[0]);
 
 	root_of_inventory_gui_in_context root_location;
 	rect_world.rebuild_layouts(context, root_location);

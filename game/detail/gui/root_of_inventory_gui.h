@@ -24,6 +24,12 @@ public:
 			generic_call(make_dereferenced_location(&context.get_character_gui().hotbar_buttons[i], child_location));
 		}
 
+		for (size_t i = 0; i < context.get_character_gui().action_buttons.size(); ++i) {
+			action_button_in_character_gui child_location;
+			child_location.index = static_cast<int>(i);
+			generic_call(make_dereferenced_location(&context.get_character_gui().action_buttons[i], child_location));
+		}
+
 		for (size_t i = 0; i < context.get_character_gui().sentience_meters.size(); ++i) {
 			sentience_meter_in_character_gui child_location;
 			child_location.type = static_cast<sentience_meter_type>(i);

@@ -207,10 +207,21 @@ void hotbar_button::draw(
 			
 			if (type == button_corner_type::LB_COMPLEMENT) {
 				augs::gui::text_drawer number_caption;
-				number_caption.set_text(augs::gui::text::format(typesafe_sprintf(L"%x", this_id.get_location().index), label_style));
-				number_caption.bottom_right(drawn_rc);
-				number_caption.draw_stroke(in.v);
-				number_caption.draw(in.v);
+				const auto intent_for_this = static_cast<intent_type>(static_cast<int>(intent_type::HOTBAR_BUTTON_0) + this_id.get_location().index);
+				const auto bound_key = context.input_information.get_bound_key_if_any(intent_for_this);
+
+				if (bound_key != augs::window::event::keys::key::INVALID) {
+					number_caption.set_text(
+						augs::gui::text::format(
+							get_key_wstring(bound_key).substr(0, 1), 
+							label_style
+						)
+					);
+
+					number_caption.bottom_right(drawn_rc);
+					number_caption.draw_stroke(in.v);
+					number_caption.draw(in.v);
+				}
 			}
 		});
 

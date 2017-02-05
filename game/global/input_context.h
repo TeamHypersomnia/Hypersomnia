@@ -20,8 +20,10 @@ struct input_context {
 		);
 	}
 
-	void map_key_to_intent(augs::window::event::keys::key, intent_type);
-	void map_event_to_intent(augs::window::event::message, intent_type);
+	void map_key_to_intent(const augs::window::event::keys::key, const intent_type);
+	void map_event_to_intent(const augs::window::event::message, const intent_type);
+
+	augs::window::event::keys::key get_bound_key_if_any(const intent_type) const;
 
 	std::vector<key_and_mouse_intent> to_key_and_mouse_intents(const augs::machine_entropy::local_type&) const;
 };
