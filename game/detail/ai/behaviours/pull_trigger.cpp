@@ -11,9 +11,9 @@
 
 namespace behaviours {
 	tree::goal_availability pull_trigger::goal_resolution(tree::state_of_traversal& t) const {
-		auto subject = t.subject;
-		auto& attitude = subject.get<components::attitude>();
-		auto currently_attacked_visible_entity = t.step.cosm[attitude.currently_attacked_visible_entity];
+		const auto subject = t.subject;
+		const auto& attitude = subject.get<components::attitude>();
+		const auto currently_attacked_visible_entity = t.step.cosm[attitude.currently_attacked_visible_entity];
 
 		if (currently_attacked_visible_entity.alive() && subject.guns_wielded().size() > 0) {
 			//if (crosshair_offset.degrees_between(orientation(subject)) < attitude.maximum_divergence_angle_before_shooting) {
@@ -25,10 +25,10 @@ namespace behaviours {
 	}
 
 	void pull_trigger::execute_leaf_goal_callback(tree::execution_occurence o, tree::state_of_traversal& t) const {
-		auto subject = t.subject;
-		auto wielded = subject.guns_wielded();
+		const auto subject = t.subject;
+		const auto wielded = subject.guns_wielded();
 
-		for (auto& w : wielded) {
+		for (const auto w : wielded) {
 			if (o == tree::execution_occurence::LAST) {
 				w.get<components::gun>().trigger_pressed = false;
 			}

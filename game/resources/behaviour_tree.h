@@ -64,7 +64,7 @@ namespace resources {
 		};
 
 		class node {
-			int id_in_tree = -1;
+			int this_id_in_tree = -1;
 			friend class behaviour_tree;
 
 			goal_availability evaluate_node(state_of_traversal&) const;
@@ -76,12 +76,12 @@ namespace resources {
 
 			std::vector<std::unique_ptr<node>> children;
 
-			node* branch();
+			node* create_branches();
 
 			template<typename Branch, typename... Branches>
-			node* branch(Branch b, Branches... branches) {
+			node* create_branches(Branch b, Branches... branches) {
 				children.emplace_back(b);
-				return branch(branches...);
+				return create_branches(branches...);
 			}
 
 			virtual goal_availability goal_resolution(state_of_traversal&) const;
@@ -90,23 +90,25 @@ namespace resources {
 
 		node root;
 		void build_tree();
-		void evaluate_instance_of_tree(const logic_step, entity_handle, state_of_tree_instance&) const;
+		
+		void evaluate_instance_of_tree(
+			const logic_step, 
+			const entity_handle, 
+			state_of_tree_instance&
+		) const;
 
-		const node& get_node_by_id(int) const;
+		const node& get_node_by_id(const int) const;
+
 	private:
-		std::vector<const node*> node_pointers;
+		std::vector<const node*> tree_nodes;
 
 		template<class F>
-		void dfs(node& p, F f) {
+		void call_on_node_recursively(node& p, const F f) {
 			f(p);
 
-			for (auto& c : p.children)
-				dfs(*c, f);
-		}
-
-		template<class F>
-		void dfs_all(F f) {
-			dfs(root, f);
+			for (auto& child : p.children) {
+				call_on_node_recursively(*child, f);
+			}
 		}
 	};
 }

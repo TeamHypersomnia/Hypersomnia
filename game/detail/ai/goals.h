@@ -14,6 +14,6 @@ namespace behaviours {
 
 	typedef std::tuple<
 		behaviours::immediate_evasion_goal,
-	behaviours::minimize_recoil_through_movement_goal
+		behaviours::minimize_recoil_through_movement_goal
 	> goal_tuple;
 }

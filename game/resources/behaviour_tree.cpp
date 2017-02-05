@@ -3,40 +3,55 @@
 #include "game/transcendental/entity_handle.h"
 
 namespace resources {
-	behaviour_tree::state_of_traversal::state_of_traversal(const logic_step step, const entity_handle subject, state_of_tree_instance& in, const behaviour_tree& bt)
-		: step(step), instance(in), original_tree(bt), subject(subject) {
+	behaviour_tree::state_of_traversal::state_of_traversal(
+		const logic_step step, 
+		const entity_handle subject, 
+		state_of_tree_instance& in, 
+		const behaviour_tree& bt
+	) : 
+		step(step), 
+		subject(subject),
+		instance(in),
+		original_tree(bt)
+	{
 		std::fill(goals_set.begin(), goals_set.end(), false);
 	}
 
 	const behaviour_tree::node& behaviour_tree::get_node_by_id(const int i) const {
-		return *node_pointers[i];
+		return *tree_nodes[i];
 	}
 	
 	void behaviour_tree::build_tree() {
 		int id_counter = 0;
 
-		node_pointers.clear();
+		tree_nodes.clear();
 		
-		dfs_all([&id_counter, this](node& n){
-			node_pointers.push_back(&n);
-			n.id_in_tree = id_counter++;
+		call_on_node_recursively(root, [&id_counter, this](node& n){
+			tree_nodes.push_back(&n);
+			n.this_id_in_tree = id_counter++;
 		});
 	}
 
-	void behaviour_tree::evaluate_instance_of_tree(const logic_step step, const entity_handle handle, state_of_tree_instance& inst) const {
+	void behaviour_tree::evaluate_instance_of_tree(
+		const logic_step step, 
+		const entity_handle handle, 
+		state_of_tree_instance& inst
+	) const {
 		state_of_traversal traversal(step, handle, inst, *this);
-		auto result = root.evaluate_node(traversal);
+		
+		const auto tree_evaluation_result = root.evaluate_node(traversal);
 
-		int previous_id = inst.previously_executed_leaf_id;
-		bool terminate_maybe_previously_running_node = (result != goal_availability::SHOULD_EXECUTE) && previous_id != -1;
+		const auto previous_id = inst.previously_executed_leaf_id;
+		const bool previously_executed_node_exists = previous_id != -1;
+		const bool terminate_previously_running_node = previously_executed_node_exists && tree_evaluation_result != goal_availability::SHOULD_EXECUTE;
 
-		if (terminate_maybe_previously_running_node) {
-			auto& previously_executed = traversal.original_tree.get_node_by_id(previous_id);
-			previously_executed.execute_leaf_goal_callback(execution_occurence::LAST, traversal);
+		if (terminate_previously_running_node) {
+			const auto& previously_executed_node = traversal.original_tree.get_node_by_id(previous_id);
+			previously_executed_node.execute_leaf_goal_callback(execution_occurence::LAST, traversal);
 		}
 	}
 
-	behaviour_tree::node* behaviour_tree::node::branch() {
+	behaviour_tree::node* behaviour_tree::node::create_branches() {
 		return this;
 	}
 
@@ -49,70 +64,75 @@ namespace resources {
 	}
 
 	behaviour_tree::goal_availability behaviour_tree::node::evaluate_node(state_of_traversal& traversal) const {
-		ensure(id_in_tree != -1);
+		ensure(this_id_in_tree != -1);
 
-		auto availability = goal_resolution(traversal);
+		const auto this_availability = goal_resolution(traversal);
 
-		if (availability == goal_availability::SHOULD_EXECUTE) {
-			bool traverse_further_to_determine_status = !children.empty();
+		if (this_availability == goal_availability::SHOULD_EXECUTE) {
+			const bool is_leaf = children.empty();
 
-			if (traverse_further_to_determine_status) {
+			if (is_leaf) {
+				const int previously_executed_id = traversal.instance.previously_executed_leaf_id;
+				const bool is_execution_repeated = previously_executed_id == this_id_in_tree;
+
+				if (is_execution_repeated) {
+					execute_leaf_goal_callback(execution_occurence::REPEATED, traversal);
+				}
+				else {
+					const bool previous_exists_and_must_be_terminated = previously_executed_id != -1;
+
+					if (previous_exists_and_must_be_terminated) {
+						auto& previously_executed_node = traversal.original_tree.get_node_by_id(previously_executed_id);
+						previously_executed_node.execute_leaf_goal_callback(execution_occurence::LAST, traversal);
+					}
+
+					execute_leaf_goal_callback(execution_occurence::FIRST, traversal);
+				}
+
+				traversal.instance.previously_executed_leaf_id = this_id_in_tree;
+			}
+			else {
 				if (mode == type::SEQUENCER) {
-					for (auto& child : children) {
-						auto availability = child->evaluate_node(traversal);
+					for (const auto& child : children) {
+						const auto child_availability = child->evaluate_node(traversal);
 
-						if (availability == goal_availability::ALREADY_ACHIEVED)
+						if (child_availability == goal_availability::ALREADY_ACHIEVED) {
 							continue;
-						else if (availability == goal_availability::CANT_EXECUTE) 
+						}
+						else if (child_availability == goal_availability::CANT_EXECUTE) {
 							return goal_availability::CANT_EXECUTE;
-						else if (availability == goal_availability::SHOULD_EXECUTE) 
+						}
+						else if (child_availability == goal_availability::SHOULD_EXECUTE) {
 							return goal_availability::SHOULD_EXECUTE;
+						}
 					}
 
 					return goal_availability::ALREADY_ACHIEVED;
 				}
 				else if (mode == type::SELECTOR) {
-					for (auto& child : children) {
-						auto availability = child->evaluate_node(traversal);
+					for (const auto& child : children) {
+						const auto child_availability = child->evaluate_node(traversal);
 
-						if (availability == goal_availability::ALREADY_ACHIEVED) 
+						if (child_availability == goal_availability::ALREADY_ACHIEVED) {
 							continue;
-						else if (availability == goal_availability::CANT_EXECUTE) 
+						}
+						else if (child_availability == goal_availability::CANT_EXECUTE) {
 							continue;
-						else if (availability == goal_availability::SHOULD_EXECUTE) 
+						}
+						else if (child_availability == goal_availability::SHOULD_EXECUTE) {
 							return goal_availability::SHOULD_EXECUTE;
+						}
 					}
 
 					return goal_availability::CANT_EXECUTE;
 				}
-				else
-					ensure(false);
-			} 
-			else {
-				int previously_executed_id = traversal.instance.previously_executed_leaf_id;
-
-				bool is_execution_repeated = previously_executed_id == id_in_tree;
-				bool notify_previous_and_perform_first_occurence = !is_execution_repeated;
-
-				auto& next_executed = traversal.original_tree.get_node_by_id(id_in_tree);
-
-				if (notify_previous_and_perform_first_occurence) {
-					if (previously_executed_id != -1) {
-						auto& previously_executed = traversal.original_tree.get_node_by_id(previously_executed_id);
-						previously_executed.execute_leaf_goal_callback(execution_occurence::LAST, traversal);
-					}
-
-					next_executed.execute_leaf_goal_callback(execution_occurence::FIRST, traversal);
-				}
 				else {
-					next_executed.execute_leaf_goal_callback(execution_occurence::REPEATED, traversal);
+					ensure(false);
 				}
-				
-				traversal.instance.previously_executed_leaf_id = id_in_tree;
-			}
+			} 
 		}
 
-		return availability;
+		return this_availability;
 	}
 }
 

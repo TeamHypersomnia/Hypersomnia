@@ -67,6 +67,18 @@ void viewing_session::configure_input() {
 	active_context.map_key_to_intent(key::_9, intent_type::HOTBAR_BUTTON_8);
 	active_context.map_key_to_intent(key::_0, intent_type::HOTBAR_BUTTON_9);
 
+	active_context.map_key_to_intent(key::Z, intent_type::SPECIAL_ACTION_BUTTON_1);
+	active_context.map_key_to_intent(key::X, intent_type::SPECIAL_ACTION_BUTTON_2);
+	active_context.map_key_to_intent(key::C, intent_type::SPECIAL_ACTION_BUTTON_3);
+	active_context.map_key_to_intent(key::V, intent_type::SPECIAL_ACTION_BUTTON_4);
+	active_context.map_key_to_intent(key::B, intent_type::SPECIAL_ACTION_BUTTON_5);
+	active_context.map_key_to_intent(key::N, intent_type::SPECIAL_ACTION_BUTTON_6);
+	active_context.map_key_to_intent(key::M, intent_type::SPECIAL_ACTION_BUTTON_8);
+	active_context.map_key_to_intent(key::F9, intent_type::SPECIAL_ACTION_BUTTON_9);
+	active_context.map_key_to_intent(key::F10, intent_type::SPECIAL_ACTION_BUTTON_10);
+	active_context.map_key_to_intent(key::F11, intent_type::SPECIAL_ACTION_BUTTON_11);
+	active_context.map_key_to_intent(key::F12, intent_type::SPECIAL_ACTION_BUTTON_12);
+
 	active_context.map_key_to_intent(key::Q, intent_type::PREVIOUS_HOTBAR_SELECTION_SETUP);
 
 	active_context.map_key_to_intent(key::F, intent_type::SWITCH_WEAPON_LASER);

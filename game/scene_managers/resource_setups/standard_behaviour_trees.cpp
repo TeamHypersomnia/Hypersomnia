@@ -11,7 +11,7 @@ namespace resource_setups {
 
 		soldier_movement.root.mode = resources::behaviour_tree::node::type::SELECTOR;
 
-		soldier_movement.root.branch(
+		soldier_movement.root.create_branches(
 			new behaviours::immediate_evasion,
 			new behaviours::minimize_recoil_through_movement,
 			new behaviours::navigate_to_last_seen_position_of_target,
@@ -23,7 +23,7 @@ namespace resource_setups {
 
 		auto& hands_actor = get_resource_manager().create(assets::behaviour_tree_id::HANDS_ACTOR);
 
-		hands_actor.root.branch(new behaviours::pull_trigger);
+		hands_actor.root.create_branches(new behaviours::pull_trigger);
 
 		hands_actor.root;
 		hands_actor.build_tree();
@@ -44,7 +44,7 @@ namespace resource_setups {
 
 		auto& hostile_target_prioritization = get_resource_manager().create(assets::behaviour_tree_id::HOSTILE_TARGET_PRIORITIZATION);
 
-		hostile_target_prioritization.root.branch(new behaviours::target_closest_enemy);
+		hostile_target_prioritization.root.create_branches(new behaviours::target_closest_enemy);
 		hostile_target_prioritization.build_tree();
 	}
 }
