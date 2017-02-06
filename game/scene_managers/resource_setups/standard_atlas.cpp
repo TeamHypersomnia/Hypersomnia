@@ -88,14 +88,27 @@ namespace resource_setups {
 		auto& backpack_gui = manager.create(assets::texture_id::BACKPACK, "hypersomnia/gfx/backpack.png").gui_sprite_def;
 		backpack_gui.gui_bbox_expander = vec2(0, 2);
 
-		augs::image attachment_circle_filled;
-		attachment_circle_filled.paint_filled_circle(16);
+		{
+			augs::image attachment_circle_filled;
+			attachment_circle_filled.paint_filled_circle(16);
 
-		augs::image attachment_circle_border;
-		attachment_circle_border.paint_circle_midpoint(16);
+			augs::image attachment_circle_border;
+			attachment_circle_border.paint_circle_midpoint(16);
 
-		manager.create(assets::texture_id::ATTACHMENT_CIRCLE_FILLED, attachment_circle_filled);
-		manager.create(assets::texture_id::ATTACHMENT_CIRCLE_BORDER, attachment_circle_border);
+			manager.create(assets::texture_id::ATTACHMENT_CIRCLE_FILLED, attachment_circle_filled);
+			manager.create(assets::texture_id::ATTACHMENT_CIRCLE_BORDER, attachment_circle_border);
+		}
+
+		{
+			augs::image action_circle_filled;
+			action_circle_filled.paint_filled_circle(19);
+
+			augs::image action_circle_border;
+			action_circle_border.paint_circle_midpoint(19);
+
+			manager.create(assets::texture_id::ACTION_BUTTON_FILLED, action_circle_filled);
+			manager.create(assets::texture_id::ACTION_BUTTON_BORDER, action_circle_border);
+		}
 
 		augs::image hud_circular_hud_medium;
 		//hud_circular_hud_medium.paint_circle(60, 10, white, true);

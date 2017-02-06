@@ -323,33 +323,62 @@ void gui_element_system::rebuild_layouts(
 		root_of_gui
 	);
 
-	int max_height = 0;
-	int total_width = 0;
+	int max_hotbar_height = 0;
 
-	for (size_t i = 0; i < element.hotbar_buttons.size(); ++i) {
-		const auto& hb = element.hotbar_buttons[i];
+	{
+		int total_width = 0;
 
-		const auto bbox = hb.get_bbox(root_entity);
-		max_height = std::max(max_height, bbox.y);
+		for (size_t i = 0; i < element.hotbar_buttons.size(); ++i) {
+			const auto& hb = element.hotbar_buttons[i];
 
-		total_width += bbox.x;
+			const auto bbox = hb.get_bbox(root_entity);
+			max_hotbar_height = std::max(max_hotbar_height, bbox.y);
+
+			total_width += bbox.x;
+		}
+
+		const int left_rc_spacing = 2;
+		const int right_rc_spacing = 1;
+
+		int current_x = screen_size.x / 2 - total_width / 2 - left_rc_spacing;
+
+		const auto set_rc = [&](auto& hb) {
+			const auto bbox = hb.get_bbox(root_entity);
+
+			hb.rc = xywh(xywhi(current_x, screen_size.y - max_hotbar_height - 50, bbox.x + left_rc_spacing + right_rc_spacing, max_hotbar_height));
+
+			current_x += bbox.x + left_rc_spacing + right_rc_spacing;
+		};
+
+		for (size_t i = 0; i < element.hotbar_buttons.size(); ++i) {
+			set_rc(element.hotbar_buttons[i]);
+		}
 	}
 
-	const int left_rc_spacing = 2;
-	const int right_rc_spacing = 1;
+	{
+		const auto action_button_size = get_resource_manager().find(assets::texture_id::ACTION_BUTTON_BORDER)->tex.get_size();
 
-	int current_x = screen_size.x / 2 - total_width / 2 - left_rc_spacing;
+		int total_width = element.action_buttons.size() * action_button_size.x;
 
-	auto set_rc = [&](auto& hb) {
-		const auto bbox = hb.get_bbox(root_entity);
+		const int left_rc_spacing = 2;
+		const int right_rc_spacing = 1;
 
-		hb.rc = xywh(xywhi(current_x, screen_size.y - max_height - 50, bbox.x + left_rc_spacing + right_rc_spacing, max_height));
+		int current_x = screen_size.x / 2 - total_width / 2 - left_rc_spacing;
 
-		current_x += bbox.x + left_rc_spacing + right_rc_spacing;
-	};
+		const auto set_rc = [&](auto& hb) {
+			const auto bbox = action_button_size;
 
-	for (size_t i = 0; i < element.hotbar_buttons.size(); ++i) {
-		set_rc(element.hotbar_buttons[i]);
+			hb.rc = xywh(xywhi(
+				current_x, screen_size.y - action_button_size.y - 4 - max_hotbar_height - 50, 
+				bbox.x + left_rc_spacing + right_rc_spacing, 
+				action_button_size.y));
+
+			current_x += bbox.x + left_rc_spacing + right_rc_spacing;
+		};
+
+		for (size_t i = 0; i < element.action_buttons.size(); ++i) {
+			set_rc(element.action_buttons[i]);
+		}
 	}
 
 	root_of_inventory_gui_in_context root_location;

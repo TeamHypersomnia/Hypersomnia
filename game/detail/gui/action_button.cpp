@@ -1,11 +1,53 @@
 #include "action_button.h"
+#include "augs/gui/text_drawer.h"
+#include "game/detail/gui/game_gui_context.h"
+#include "game/transcendental/cosmos.h"
 
 void action_button::draw(
 	const viewing_game_gui_context context,
 	const const_this_in_item this_id,
-	draw_info in
+	draw_info info
 ) {
+	rgba inside_col, border_col;
 
+	inside_col = cyan;
+
+	border_col = inside_col;
+	inside_col.a = 4 * 5;
+	border_col.a = 220;
+
+	if (this_id->detector.is_hovered || this_id->detector.current_appearance == augs::gui::appearance_detector::appearance::pushed) {
+		inside_col.a = 12 * 5;
+		border_col.a = 255;
+	}
+
+	const auto inside_tex = assets::texture_id::ACTION_BUTTON_FILLED;
+	const auto border_tex = assets::texture_id::ACTION_BUTTON_BORDER;
+
+	const augs::gui::material inside_mat(inside_tex, inside_col);
+	const augs::gui::material border_mat(border_tex, border_col);
+
+	draw_centered_texture(context, this_id, info, inside_mat);
+	draw_centered_texture(context, this_id, info, border_mat);
+
+	augs::gui::text_drawer number_caption;
+	const auto intent_for_this = static_cast<intent_type>(static_cast<int>(intent_type::SPECIAL_ACTION_BUTTON_1) + this_id.get_location().index);
+	const auto bound_key = context.input_information.get_bound_key_if_any(intent_for_this);
+	
+	const auto label_style = augs::gui::text::style(assets::font_id::GUI_FONT, border_col);
+
+	if (bound_key != augs::window::event::keys::key::INVALID) {
+		number_caption.set_text(
+			augs::gui::text::format(
+				get_key_wstring(bound_key),
+				label_style
+			)
+		);
+
+		number_caption.center(context.get_tree_entry(this_id).get_absolute_rect());
+		number_caption.draw_stroke(info.v);
+		number_caption.draw(info.v);
+	}
 }
 
 void action_button::advance_elements(
