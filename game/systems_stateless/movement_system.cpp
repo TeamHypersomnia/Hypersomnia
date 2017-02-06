@@ -75,51 +75,70 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 			continue;
 		}
 
+		const auto& physics = it.get<components::physics>();
+
+		if (!physics.is_constructed()) {
+			continue;
+		}
+
+		auto movement_force_mult = 1.f;
+		auto considered_damping = 0.f;
+
 		bool is_sprint_effective = movement.sprint_enabled;
 
-		if (it.has<components::sentience>()) {
-			is_sprint_effective = is_sprint_effective && it.get<components::sentience>().consciousness.value > 0.f;
+		auto* const sentience = it.find<components::sentience>();
+		const bool is_sentient = sentience != nullptr;
+
+		if (is_sentient) {
+			is_sprint_effective = is_sprint_effective && sentience->consciousness.value > 0.f;
+
+			if (sentience->haste.is_enabled()) {
+				movement_force_mult *= 1.2f;
+			}
 		}
 
-		const auto& physics = it.get<components::physics>();
-		
-		if (!physics.is_constructed())
-			continue;
+		const bool is_inert = movement.make_inert_for_ms > 0.f;
 
-		if (movement.make_inert_for_ms > 0.f) {
+		if (is_inert) {
 			movement.make_inert_for_ms -= static_cast<float>(delta.in_milliseconds());
-			physics.set_linear_damping(2);
+			considered_damping = 2;
 		}
 		else {
-			physics.set_linear_damping(is_sprint_effective ? (movement.standard_linear_damping / 4.f) : movement.standard_linear_damping);
+			considered_damping = movement.standard_linear_damping;
 		}
 
+		if (is_sprint_effective) {
+			if (!is_inert) {
+				considered_damping /= 4;
+			}
+
+			movement_force_mult /= 2.f;
+
+			if (is_sentient) {
+				sentience->consciousness.value -= sentience->consciousness.calculate_damage_result(2 * delta.in_seconds()).effective;
+			}
+		}
+
+		if (movement.walking_enabled) {
+			movement_force_mult /= 2.f;
+		}
+
+		if (is_inert) {
+			movement_force_mult /= 10.f;
+		}
+
+		physics.set_linear_damping(considered_damping);
+
 		if (resultant.non_zero()) {
-			if (it.has<components::sentience>()) {
-				auto& sentience = it.get<components::sentience>();
-				sentience.time_of_last_exertion = cosmos.get_timestamp();
+			if (is_sentient) {
+				sentience->time_of_last_exertion = cosmos.get_timestamp();
 			}
 
 			if (movement.acceleration_length > 0) {
 				resultant.set_length(movement.acceleration_length);
 			}
-			
-			if (movement.make_inert_for_ms > 0.f) {
-				resultant /= 10.f;
-			}
 
-			if (is_sprint_effective) {
-				resultant /= 2.f;
-
-				if (it.has<components::sentience>()) {
-					auto& sentience = it.get<components::sentience>();
-					sentience.consciousness.value -= sentience.consciousness.calculate_damage_result(2 * delta.in_seconds()).effective;
-				}
-			}
-			
-			if (movement.walking_enabled) {
-				resultant /= 2.f;
-			}
+			resultant *= movement_force_mult;
 
 			physics.apply_force(resultant * physics.get_mass(), movement.applied_force_offset, true);
 		}

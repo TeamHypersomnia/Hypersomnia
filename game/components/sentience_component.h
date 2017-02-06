@@ -4,7 +4,13 @@
 #include "augs/graphics/pixel.h"
 #include "augs/misc/stepped_timing.h"
 
+#include "augs/misc/enum_associative_array.h"
+
 #include "game/enums/sentience_meter_type.h"
+
+#include "game/detail/spells/haste_spell.h"
+
+#include "game/detail/perks/haste_perk.h"
 
 namespace components {
 	struct sentience {
@@ -42,12 +48,13 @@ namespace components {
 		meter personal_electricity;
 		meter consciousness;
 
+		haste_perk haste;
+
 		float comfort_zone = 500.f;
 		float minimum_danger_amount_to_evade = 5.f;
 		float danger_amount_from_hostile_attitude = 100.f;
 
 		recoil_player aimpunch;
-
 
 		template <class Archive>
 		void serialize(Archive& ar) {

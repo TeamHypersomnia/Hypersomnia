@@ -1148,6 +1148,10 @@
     <ClInclude Include="game\detail\gui\slot_button.h" />
     <ClInclude Include="game\detail\gui\drag_and_drop_target_drop_item.h" />
     <ClInclude Include="game\detail\item_slot_transfer_request_declaration.h" />
+    <ClInclude Include="game\detail\perks\bleeding_perk.h" />
+    <ClInclude Include="game\detail\perks\haste_perk.h" />
+    <ClInclude Include="game\detail\perks\timed_perk.h" />
+    <ClInclude Include="game\detail\spells\haste_spell.h" />
     <ClInclude Include="game\detail\visible_entities.h" />
     <ClInclude Include="game\detail\wielding_result.h" />
     <ClInclude Include="game\detail\world_camera.h" />
