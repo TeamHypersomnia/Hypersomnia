@@ -241,25 +241,41 @@ namespace resource_setups {
 		manager.create(assets::texture_id::PERSONAL_ELECTRICITY_ICON, "hypersomnia/gfx/personal_electricity_icon.png");
 		manager.create(assets::texture_id::CONSCIOUSNESS_ICON, "hypersomnia/gfx/consciousness_icon.png");
 
-		manager.create_inverse_with_flip(assets::animation_id::TORSO_MOVE,
+		manager.create(assets::texture_id::PERK_HASTE_ICON, "hypersomnia/gfx/perk_haste_icon.png");
+		manager.create(assets::texture_id::SPELL_HASTE_ICON, "hypersomnia/gfx/spell_haste_icon.png");
+		
+		manager.create(assets::texture_id::SPELL_FURY_OF_THE_AEONS_ICON, "hypersomnia/gfx/spell_fury_of_the_aeons_icon.png");
+		manager.create(assets::texture_id::SPELL_ULTIMATE_WRATH_OF_THE_AEONS_ICON, "hypersomnia/gfx/spell_ultimate_wrath_of_the_aeons_icon.png");
+
+		manager.create(assets::texture_id::SPELL_ELECTRIC_TRIAD_ICON, "hypersomnia/gfx/spell_electric_triad_icon.png");
+
+		manager.create_inverse_with_flip(
+			assets::animation_id::TORSO_MOVE,
 			assets::texture_id::TORSO_MOVING_FIRST,
 			assets::texture_id::TORSO_MOVING_LAST,
-			20.0f);
+			20.0f
+		);
 
-		manager.create_inverse_with_flip(assets::animation_id::BLUE_TORSO_MOVE,
+		manager.create_inverse_with_flip(
+			assets::animation_id::BLUE_TORSO_MOVE,
 			assets::texture_id::BLUE_TORSO_MOVING_FIRST,
 			assets::texture_id::BLUE_TORSO_MOVING_LAST,
-			20.0f);
+			20.0f
+		);
 
-		manager.create_inverse_with_flip(assets::animation_id::VIOLET_TORSO_MOVE,
+		manager.create_inverse_with_flip(
+			assets::animation_id::VIOLET_TORSO_MOVE,
 			assets::texture_id::VIOLET_TORSO_MOVING_FIRST,
 			assets::texture_id::VIOLET_TORSO_MOVING_LAST,
-			20.0f);
+			20.0f
+		);
 
-		manager.create(assets::animation_id::BLINK_ANIMATION,
+		manager.create(
+			assets::animation_id::BLINK_ANIMATION,
 			assets::texture_id::BLINK_FIRST,
 			assets::texture_id::BLINK_LAST,
-			50.0f, resources::animation::loop_type::NONE);
+			50.0f, resources::animation::loop_type::NONE
+		);
 
 		{
 			auto& player_response = manager.create(assets::animation_response_id::TORSO_SET);

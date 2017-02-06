@@ -4,6 +4,8 @@
 #include "augs/gui/appearance_detector.h"
 #include "application/config_lua_table.h"
 
+#include "game/enums/spell_type.h"
+
 class action_button : public game_gui_rect_node {
 public:
 	typedef augs::gui::draw_info draw_info;
@@ -14,6 +16,8 @@ public:
 	typedef const_dereferenced_location<action_button_in_character_gui> const_this_in_item;
 
 	augs::gui::appearance_detector detector;
+
+	spell_type bound_spell = spell_type::COUNT;
 
 	float elapsed_hover_time_ms = 0.f;
 

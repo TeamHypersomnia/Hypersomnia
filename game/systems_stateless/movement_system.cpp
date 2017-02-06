@@ -90,10 +90,17 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 		const bool is_sentient = sentience != nullptr;
 
 		if (is_sentient) {
-			is_sprint_effective = is_sprint_effective && sentience->consciousness.value > 0.f;
+			if (sentience->consciousness.value <= 0.f) {
+				is_sprint_effective = false;
+			}
 
 			if (sentience->haste.is_enabled()) {
-				movement_force_mult *= 1.2f;
+				if (sentience->haste.is_greater) {
+					movement_force_mult *= 1.4f;
+				}
+				else {
+					movement_force_mult *= 1.2f;
+				}
 			}
 		}
 

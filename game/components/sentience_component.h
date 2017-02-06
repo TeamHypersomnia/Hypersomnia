@@ -7,8 +7,9 @@
 #include "augs/misc/enum_associative_array.h"
 
 #include "game/enums/sentience_meter_type.h"
+#include "game/enums/spell_type.h"
 
-#include "game/detail/spells/haste_spell.h"
+#include "game/detail/spell_data.h"
 
 #include "game/detail/perks/haste_perk.h"
 
@@ -47,6 +48,8 @@ namespace components {
 		meter health;
 		meter personal_electricity;
 		meter consciousness;
+
+		augs::enum_associative_array<spell_type, spell_data> spells;
 
 		haste_perk haste;
 

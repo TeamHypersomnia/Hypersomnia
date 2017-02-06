@@ -63,6 +63,12 @@ character_gui& gui_element_system::get_character_gui(const entity_id id) {
 	if (it == character_guis.end()) {
 		auto& new_gui = character_guis[id];
 		new_gui.set_screen_size(screen_size_for_new_characters);
+		
+		new_gui.action_buttons[0].bound_spell = spell_type::HASTE;
+		new_gui.action_buttons[1].bound_spell = spell_type::FURY_OF_THE_AEONS;
+		new_gui.action_buttons[2].bound_spell = spell_type::ULTIMATE_WRATH_OF_THE_AEONS;
+		new_gui.action_buttons[3].bound_spell = spell_type::ELECTRIC_TRIAD;
+		
 		return new_gui;
 	}
 	
