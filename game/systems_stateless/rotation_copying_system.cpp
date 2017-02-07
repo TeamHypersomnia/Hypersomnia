@@ -138,7 +138,7 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 	}
 
 	if (rotation_copying.easing_mode == components::rotation_copying::easing_type::EXPONENTIAL) {
-		ensure(0);
+		ensure(false);
 		//float averaging_constant = static_cast<float>(
 		//	pow(rotation_copying.smoothing_average_factor, rotation_copying.averages_per_sec * delta_seconds())
 		//	);

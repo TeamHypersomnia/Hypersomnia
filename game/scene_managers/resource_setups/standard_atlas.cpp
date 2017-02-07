@@ -249,6 +249,8 @@ namespace resource_setups {
 
 		manager.create(assets::texture_id::SPELL_ELECTRIC_TRIAD_ICON, "hypersomnia/gfx/spell_electric_triad_icon.png");
 
+		manager.create(assets::texture_id::SPELL_BORDER, "hypersomnia/gfx/spell_border.png");
+
 		manager.create_inverse_with_flip(
 			assets::animation_id::TORSO_MOVE,
 			assets::texture_id::TORSO_MOVING_FIRST,

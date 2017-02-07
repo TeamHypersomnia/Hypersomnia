@@ -302,7 +302,7 @@ namespace resources {
 		return resp;
 	}
 
-	texture_with_image& manager::create(assets::texture_id id, std::string filename) {
+	texture_with_image& manager::create(const assets::texture_id id, std::string filename) {
 		texture_with_image& tex = textures[id];
 		tex.set_from_image_file(filename);
 

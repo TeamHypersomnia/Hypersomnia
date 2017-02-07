@@ -247,16 +247,15 @@ namespace augs {
 		return v.x >= 0 && v.y >= 0 && v.x < size.x && v.y < size.y;
 	}
 
-	bool image::from_file(const std::string& filename, unsigned force_channels) {
+	bool image::from_file(const std::string& filename, const unsigned force_channels) {
 		channels = 4;
-
-		std::string lodepngfname(filename.begin(), filename.end());
 
 		unsigned width;
 		unsigned height;
 
-		if (lodepng::decode(v, width, height, lodepngfname)) {
-			ensure(0);
+		if (lodepng::decode(v, width, height, filename)) {
+			LOG("Failed to open %x! Ensure that the file exists and has correct format.", filename);
+			ensure(false);
 			return false;
 		}
 
@@ -267,15 +266,15 @@ namespace augs {
 	}
 
 	void image::swap_red_and_blue() {
-		for (int i = 0; i < size.area(); ++i)
+		for (int i = 0; i < size.area(); ++i) {
 			std::swap(v[i * 4 + 0], v[i * 4 + 2]);
+		}
 	}
 
 	void image::save(const std::string& filename) {
-		std::string lodepngfname(filename.begin(), filename.end());
-
-		if (lodepng::encode(lodepngfname, v, size.x, size.y))
-			ensure(0);
+		if (lodepng::encode(filename, v, size.x, size.y)) {
+			LOG("Could not encode %x! Ensure that the target directory exists.", filename);
+		}
 	}
 
 	void image::fill(unsigned char val) {

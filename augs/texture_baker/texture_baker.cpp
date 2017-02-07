@@ -96,7 +96,7 @@ namespace augs {
 		case 2: format = GL_LUMINANCE_ALPHA; break;
 		case 3: format = GL_BGR; break;
 		case 4: format = GL_BGRA; break;
-		default: ensure(0);
+		default: ensure(false);
 		}
 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, im.get_size().x, im.get_size().y, 0, format, GL_UNSIGNED_BYTE, im.ptr()); glerr;

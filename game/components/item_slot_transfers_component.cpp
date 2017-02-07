@@ -5,7 +5,7 @@
 
 namespace components {
 	item_slot_transfers::mounting_operation item_slot_transfers::find_suitable_montage_operation(const_entity_handle parent_container) {
-		ensure(0);
+		ensure(false);
 		item_slot_transfers::mounting_operation operation;
 
 		return operation;

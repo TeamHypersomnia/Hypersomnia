@@ -40,7 +40,7 @@ namespace behaviours {
 		}
 		else {
 			if (pathfinding.has_exploring_finished()) {
-				ensure(0);
+				ensure(false);
 			}
 			else
 				movement.set_flags_from_closest_direction(pathfinding.get_current_navigation_point() - position(subject));

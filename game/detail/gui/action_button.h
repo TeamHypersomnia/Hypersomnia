@@ -5,6 +5,8 @@
 #include "application/config_lua_table.h"
 
 #include "game/enums/spell_type.h"
+#include "augs/audio/sound_source.h"
+
 
 class action_button : public game_gui_rect_node {
 public:
@@ -16,6 +18,9 @@ public:
 	typedef const_dereferenced_location<action_button_in_character_gui> const_this_in_item;
 
 	augs::gui::appearance_detector detector;
+
+	augs::sound_source hover_sound;
+	augs::sound_source click_sound;
 
 	spell_type bound_spell = spell_type::COUNT;
 

@@ -17,7 +17,7 @@ namespace augs {
 				glGetShaderInfoLog(obj, infologLength, &charsWritten, infoLog); glerr
 				printf("---------------------------------\n Source code: %s ---------------------------------\n%s\n", source_code.c_str(), infoLog);
 				free(infoLog);
-				ensure(0);
+				ensure(false);
 			}
 		}
 
@@ -33,7 +33,7 @@ namespace augs {
 				glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog); glerr
 				printf("---------------------------------\n%s\n", infoLog);
 				free(infoLog);
-				ensure(0);
+				ensure(false);
 			}
 		}
 

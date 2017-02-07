@@ -46,9 +46,9 @@ xywh character_gui::get_rectangle_for_slot_function(const slot_function f) {
 	case slot_function::GUN_DETACHABLE_MAGAZINE: return xywh(0, 50, 33, 33);
 	case slot_function::GUN_CHAMBER: return xywh(0, -50, 33, 33);
 	case slot_function::GUN_MUZZLE: return xywh(-50, 0, 33, 33);
-	default: ensure(0);
+	default: ensure(false);
 	}
-	ensure(0);
+	ensure(false);
 
 	return xywh(0, 0, 0, 0);
 }

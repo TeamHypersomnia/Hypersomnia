@@ -366,8 +366,8 @@ void gui_element_system::rebuild_layouts(
 
 		int total_width = element.action_buttons.size() * action_button_size.x;
 
-		const int left_rc_spacing = 2;
-		const int right_rc_spacing = 1;
+		const int left_rc_spacing = 4;
+		const int right_rc_spacing = 3;
 
 		int current_x = screen_size.x / 2 - total_width / 2 - left_rc_spacing;
 
