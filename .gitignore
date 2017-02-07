@@ -199,3 +199,5 @@ CTestTestfile.cmake
 Hypersomnia.lib
 Hypersomnia-Debug.lib
 alsoft.ini
+*.db-shm
+*.db-wal
