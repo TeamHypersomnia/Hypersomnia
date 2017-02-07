@@ -33,6 +33,19 @@ void local_setup::process(
 
 	cosmos hypersomnia(3000);
 
+	viewing_session session;
+
+	session.reserve_caches_for_entities(3000);
+	session.set_screen_size(screen_size);
+	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
+	session.set_master_gain(cfg.sound_effects_volume);
+
+	session.configure_input();
+
+	const auto standard_post_solve = [&session](const const_logic_step step) {
+		session.standard_audiovisual_post_solve(step);
+	};
+
 	cosmic_entropy total_collected_entropy;
 	augs::debug_entropy_player<cosmic_entropy> player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
@@ -42,7 +55,12 @@ void local_setup::process(
 
 	if (!hypersomnia.load_from_file("save.state")) {
 		hypersomnia.set_fixed_delta(cfg.tickrate);
-		testbed.populate_world_with_entities(hypersomnia, screen_size);
+		
+		testbed.populate_world_with_entities(
+			hypersomnia, 
+			screen_size,
+			standard_post_solve
+		);
 	}
 
 	if (cfg.get_input_recording_mode() != input_recording_type::DISABLED) {
@@ -50,14 +68,6 @@ void local_setup::process(
 			timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
 		}
 	}
-
-	viewing_session session;
-	session.reserve_caches_for_entities(3000);
-	session.set_screen_size(screen_size);
-	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
-	session.set_master_gain(cfg.sound_effects_volume);
-
-	session.configure_input();
 
 	timer.reset_timer();
 
@@ -130,9 +140,7 @@ void local_setup::process(
 			hypersomnia.advance_deterministic_schemata(
 				total_collected_entropy,
 				[](const auto) {},
-				[&](const const_logic_step step) {
-					session.standard_audiovisual_post_solve(step);
-				}
+				standard_post_solve
 			);
 
 			total_collected_entropy = cosmic_entropy();

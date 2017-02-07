@@ -28,7 +28,18 @@ namespace scene_managers {
 		cosmos stashed_cosmos;
 		augs::stream stashed_delta;
 
-		void populate_world_with_entities(cosmos&, const vec2i screen_size);
+		template <class T>
+		void populate_world_with_entities(
+			cosmos& cosm, 
+			const vec2i screen_size,
+			const T post_solve
+		) {
+			cosm.advance_deterministic_schemata(
+				cosmic_entropy(), 
+				[&](const logic_step step) { populate(step, screen_size); }, 
+				post_solve
+			);
+		}
 
 		void control_character_selection(std::vector<key_and_mouse_intent>&);
 		

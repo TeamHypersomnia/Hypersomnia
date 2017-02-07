@@ -38,10 +38,6 @@
 #include "augs/graphics/renderer.h"
 
 namespace scene_managers {
-	void testbed::populate_world_with_entities(cosmos& cosm, const vec2i screen_size) {
-		cosm.advance_deterministic_schemata(cosmic_entropy(), [&](const logic_step step) { populate(step, screen_size); }, [](const const_logic_step) {});
-	}
-
 	void testbed::populate(const logic_step step, const vec2i screen_size) {
 		auto& world = step.cosm;
 		//const auto crate = prefabs::create_crate(world, vec2(200, 200 + 300), vec2i(100, 100) / 3);

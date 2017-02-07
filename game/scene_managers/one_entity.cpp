@@ -38,10 +38,6 @@
 #include "augs/graphics/renderer.h"
 
 namespace scene_managers {
-	void one_entity::populate_world_with_entities(cosmos& cosm, const vec2i screen_size) {
-		cosm.advance_deterministic_schemata(cosmic_entropy(), [&](const logic_step step) { populate(step, screen_size); }, [](const const_logic_step) {});
-	}
-
 	void one_entity::populate(const logic_step step, const vec2i screen_size) {
 		auto& world = step.cosm;
 

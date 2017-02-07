@@ -52,6 +52,11 @@ void client_setup::init(
 
 	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
 
+	session.set_screen_size(screen_size);
+	session.set_master_gain(cfg.sound_effects_volume);
+
+	session.configure_input();
+
 	detailed_step_log = cfg.tickrate <= 2;
 
 	if (!hypersomnia.load_from_file("save.state")) {
@@ -65,10 +70,6 @@ void client_setup::init(
 		//}
 	}
 
-	session.set_screen_size(screen_size);
-	session.set_master_gain(cfg.sound_effects_volume);
-
-	session.configure_input();
 
 	receiver.jitter_buffer.set_lower_limit(static_cast<unsigned>(cfg.jitter_buffer_ms / hypersomnia.get_fixed_delta().in_milliseconds()));
 	receiver.misprediction_smoothing_multiplier = cfg.misprediction_smoothing_multiplier;

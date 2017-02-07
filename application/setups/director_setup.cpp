@@ -39,12 +39,8 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 	scene_managers::testbed testbed;
 	testbed.debug_var = cfg.debug_var;
 
-	if (!hypersomnia.load_from_file("save.state")) {
-		hypersomnia.set_fixed_delta(cfg.tickrate);
-		testbed.populate_world_with_entities(hypersomnia, screen_size);
-	}
-
 	viewing_session session;
+
 	session.reserve_caches_for_entities(3000);
 	session.set_screen_size(screen_size);
 	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
@@ -52,6 +48,20 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 	session.set_master_gain(cfg.sound_effects_volume);
 
 	session.configure_input();
+
+	const auto standard_post_solve = [&session](const const_logic_step step) {
+		session.standard_audiovisual_post_solve(step);
+	};
+
+	if (!hypersomnia.load_from_file("save.state")) {
+		hypersomnia.set_fixed_delta(cfg.tickrate);
+		
+		testbed.populate_world_with_entities(
+			hypersomnia, 
+			screen_size, 
+			standard_post_solve
+		);
+	}
 
 	const std::string input_director_file = cfg.director_scenario_filename;
 	const std::string output_director_file = cfg.director_scenario_filename;
@@ -237,10 +247,10 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 					const guid_mapped_entropy replayed_entropy = director.get_entropy_for_step(get_step_number(hypersomnia));
 					const cosmic_entropy cosmic_entropy_for_this_advancement = cosmic_entropy(replayed_entropy, hypersomnia);
 
-					hypersomnia.advance_deterministic_schemata(cosmic_entropy_for_this_advancement, [](auto) {},
-						[this, &session](const const_logic_step step) {
-							session.standard_audiovisual_post_solve(step);
-						}
+					hypersomnia.advance_deterministic_schemata(
+						cosmic_entropy_for_this_advancement, 
+						[](auto){},
+						standard_post_solve
 					);
 				}
 			}

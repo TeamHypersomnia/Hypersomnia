@@ -15,7 +15,7 @@ namespace augs {
 			if (infologLength > 1) {
 				infoLog = (char *) malloc(infologLength);
 				glGetShaderInfoLog(obj, infologLength, &charsWritten, infoLog); glerr
-				printf("---------------------------------\n Source code: %s ---------------------------------\n%s\n", source_code.c_str(), infoLog);
+				LOG("---------------------------------\n Source code: %x ---------------------------------\n%x\n", source_code.c_str(), infoLog);
 				free(infoLog);
 				ensure(false);
 			}
@@ -31,7 +31,7 @@ namespace augs {
 			if (infologLength > 1) {
 				infoLog = (char *) malloc(infologLength);
 				glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog); glerr
-				printf("---------------------------------\n%s\n", infoLog);
+				LOG("---------------------------------\n%x\n", infoLog);
 				free(infoLog);
 				ensure(false);
 			}

@@ -52,7 +52,23 @@ void menu_setup::process(
 	const vec2i screen_size = vec2i(window.get_screen_size());
 
 	cosmos intro_scene(3000);
-	
+
+	viewing_session session;
+	session.reserve_caches_for_entities(3000);
+	session.set_screen_size(screen_size);
+	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
+	session.show_profile_details = false;
+	session.camera.averages_per_sec /= 2;
+
+	session.configure_input();
+
+	session.drawing_settings.draw_gui_overlays = false;
+	session.drawing_settings.draw_crosshairs = false;
+
+	const auto standard_post_solve = [&session](const const_logic_step step) {
+		session.standard_audiovisual_post_solve(step);
+	};
+
 	augs::single_sound_buffer menu_theme;
 	augs::sound_source menu_theme_source;
 
@@ -111,7 +127,12 @@ void menu_setup::process(
 	testbed.debug_var = cfg.debug_var;
 
 	intro_scene.set_fixed_delta(cfg.tickrate);
-	testbed.populate_world_with_entities(intro_scene, screen_size);
+	
+	testbed.populate_world_with_entities(
+		intro_scene, 
+		screen_size,
+		standard_post_solve
+	);
 
 	ltrb title_rect;
 	title_rect.set_position({ 100, 100 });
@@ -443,21 +464,9 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 		}
 	}
 
-	viewing_session session;
-	session.reserve_caches_for_entities(3000);
-	session.set_screen_size(screen_size);
-	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
-	session.show_profile_details = false;
-	session.camera.averages_per_sec /= 2;
-
 	cosmic_movie_director director;
 	director.load_recording_from_file(cfg.menu_intro_scenario_filename);
 	ensure(director.is_recording_available());
-
-	session.configure_input();
-
-	session.drawing_settings.draw_gui_overlays = false;
-	session.drawing_settings.draw_crosshairs = false;
 
 	timer.reset_timer();
 
