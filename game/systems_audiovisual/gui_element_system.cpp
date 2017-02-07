@@ -375,7 +375,7 @@ void gui_element_system::rebuild_layouts(
 			const auto bbox = action_button_size;
 
 			hb.rc = xywh(xywhi(
-				current_x, screen_size.y - action_button_size.y - 4 - max_hotbar_height - 50, 
+				current_x, screen_size.y - action_button_size.y - 9 - max_hotbar_height - 50, 
 				bbox.x + left_rc_spacing + right_rc_spacing, 
 				action_button_size.y));
 
