@@ -35,6 +35,7 @@ namespace augs {
 		alsoft_ini_file += "\nhrtf = ";
 		alsoft_ini_file += hrtf_enabled ? "true" : "false";
 		alsoft_ini_file += "\nhrtf-paths = " + augs::get_executable_directory() + "\\hrtf";
+		alsoft_ini_file += "\nsources = 2048";
 
 		augs::create_text_file(std::string("alsoft.ini"), alsoft_ini_file);
 	}
