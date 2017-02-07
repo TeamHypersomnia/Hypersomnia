@@ -144,12 +144,17 @@ augs::vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_i
 			std::vector<circle_info> textual_infos;
 
 			if (v == watched_character) {
-				auto examine_item_slot = [&textual_infos, &push_angles, &circle_hud, &state](const_inventory_slot_handle id, float lower_outside, float max_angular_length, bool ccw) {
+				auto examine_item_slot = [&textual_infos, &push_angles, &circle_hud, &state](
+					const const_inventory_slot_handle id, 
+					const float lower_outside, 
+					const float max_angular_length, 
+					const bool ccw
+				) {
 					if (id.alive() && id.has_items()) {
-						const auto& item = id.get_items_inside()[0];
+						const auto item = id.get_items_inside()[0];
 
-						const auto& maybe_magazine_slot = item[slot_function::GUN_DETACHABLE_MAGAZINE];
-						const auto& chamber_slot = item[slot_function::GUN_CHAMBER];
+						const auto maybe_magazine_slot = item[slot_function::GUN_DETACHABLE_MAGAZINE];
+						const auto chamber_slot = item[slot_function::GUN_CHAMBER];
 
 						float ammo_ratio = 0.f;
 						int charges = 0;
