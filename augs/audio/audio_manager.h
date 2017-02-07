@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 /** Opaque device handle */
 typedef struct ALCdevice_struct ALCdevice;
@@ -18,7 +19,7 @@ namespace augs {
 	public:
 		static void generate_alsoft_ini(const bool hrtf_enabled);
 
-		audio_manager();
+		audio_manager(const std::string output_device_name = "");
 		~audio_manager();
 
 		bool make_current();

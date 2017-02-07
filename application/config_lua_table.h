@@ -25,6 +25,8 @@ public:
 	
 	bool enable_hrtf = true;
 
+	std::string audio_output_device;
+
 	float sound_effects_volume = 1.f;
 	float music_volume = 1.f;
 

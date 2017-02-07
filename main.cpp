@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
 	cfg.get_values(lua);
 
 	augs::audio_manager::generate_alsoft_ini(cfg.enable_hrtf);
-	augs::audio_manager audio;
+	augs::audio_manager audio(cfg.audio_output_device);
 
 	game_window window;
 	call_window_script(lua, window, "window.lua");

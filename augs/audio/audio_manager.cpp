@@ -11,19 +11,22 @@
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 
-static void list_audio_devices(const ALCchar * const devices) {
+static std::string list_audio_devices(const ALCchar * const devices) {
 	const ALCchar *device = devices, *next = devices + 1;
 	size_t len = 0;
 
-	LOG("Devices list:\n");
-	LOG("----------\n");
+	std::string devices_list;
+
+	devices_list += "Devices list:\n";
+
 	while (device && *device != '\0' && next && *next != '\0') {
-		LOG("%s\n", device);
+		devices_list += typesafe_sprintf("%s\n", device);
 		len = strlen(device);
 		device += (len + 1);
 		next += (len + 2);
 	}
-	LOG("----------\n");
+
+	return std::move(devices_list);
 }
 
 namespace augs {
@@ -40,10 +43,10 @@ namespace augs {
 		augs::create_text_file(std::string("alsoft.ini"), alsoft_ini_file);
 	}
 
-	audio_manager::audio_manager() {
+	audio_manager::audio_manager(const std::string output_device_name) {
 		alGetError();
 
-		device = alcOpenDevice(nullptr);
+		device = alcOpenDevice(output_device_name.size() > 0 ? output_device_name.c_str() : nullptr);
 
 		context = alcCreateContext(device, nullptr);
 		
@@ -62,7 +65,11 @@ namespace augs {
 		AL_CHECK(alDistanceModel(AL_LINEAR_DISTANCE_CLAMPED));
 		AL_CHECK(alListenerf(AL_METERS_PER_UNIT, 1.3f));
 
-		list_audio_devices(alcGetString(nullptr, ALC_ALL_DEVICES_SPECIFIER));
+		const auto devices = list_audio_devices(alcGetString(nullptr, ALC_ALL_DEVICES_SPECIFIER));
+
+		LOG(devices);
+
+		augs::create_text_file(std::string("logs/audio_devices.txt"), devices);
 
 		ALint hrtf_status;
 		alcGetIntegerv(device, ALC_HRTF_STATUS_SOFT, 1, &hrtf_status);

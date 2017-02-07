@@ -70,6 +70,8 @@ config_table = {
 	-- should enable head-related transfer function for OpenAL?
 	enable_hrtf = 1,
 
+	audio_output_device = "",
+
 	-- volume settings
 	sound_effects_volume = 1,
 	music_volume = 1,
