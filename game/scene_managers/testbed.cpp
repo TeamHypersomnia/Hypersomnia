@@ -668,7 +668,7 @@ namespace scene_managers {
 			name_entity(character(0), entity_name::PERSON, L"Newborn");
 
 			driver_system().assign_car_ownership(character(0), main_character_motorcycle);
-			main_character_motorcycle.get<components::car>().accelerating = true;
+			//main_character_motorcycle.get<components::car>().accelerating = true;
 		}
 
 		if (character(3).alive()) {

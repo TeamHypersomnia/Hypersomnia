@@ -100,6 +100,11 @@ namespace scene_managers {
 			prefabs::create_sample_magazine(step, vec2(100, -650), false ? "10" : "0.3",
 				prefabs::create_cyan_charge(world, vec2(0, 0), false ? 1000 : 30)));
 
+
+		prefabs::create_submachine(step, vec2(100, -700),
+			prefabs::create_sample_magazine(step, vec2(100, -650), true ? "10" : "0.3",
+				prefabs::create_cyan_charge(world, vec2(0, 0), true ? 1000 : 30)));
+
 		characters.assign(new_characters.begin(), new_characters.end());
 
 		select_character(character(0));

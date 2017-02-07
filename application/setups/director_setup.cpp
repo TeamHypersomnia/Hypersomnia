@@ -284,11 +284,11 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 					total_collected_entropy.transfer_requests
 				);
 
-				for (const auto& newly_entropied : total_collected_entropy.entropy_per_entity) {
+				for (const auto& newly_entropied : total_collected_entropy.intents_per_entity) {
 					const auto newly_entropied_entity = hypersomnia[newly_entropied.first];
 
 					auto new_intents = newly_entropied.second;
-					auto& intents_written_to = entropy_for_this_advancement.entropy_per_entity[newly_entropied_entity.get_guid()];
+					auto& intents_written_to = entropy_for_this_advancement.intents_per_entity[newly_entropied_entity.get_guid()];
 
 					auto mouse_remover = [](const auto& k) { return k.uses_mouse_motion(); };
 					auto key_remover = [](const auto& k) { return !k.uses_mouse_motion(); };

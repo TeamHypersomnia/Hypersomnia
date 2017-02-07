@@ -49,9 +49,15 @@ public:
 	data_living_one_step_ref transient;
 	const cosmic_entropy& entropy;
 
-	basic_logic_step(cosmos_ref cosm, const cosmic_entropy& entropy, data_living_one_step_ref transient)
-		: basic_cosmic_step(cosm), entropy(entropy), transient(transient) {
-
+	basic_logic_step(
+		cosmos_ref cosm, 
+		const cosmic_entropy& entropy, 
+		data_living_one_step_ref transient
+	) : 
+		basic_cosmic_step(cosm), 
+		entropy(entropy), 
+		transient(transient) 
+	{
 	}
 
 	augs::delta get_delta() const {

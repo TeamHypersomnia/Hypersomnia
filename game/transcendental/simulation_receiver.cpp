@@ -45,7 +45,7 @@ void simulation_receiver::remote_entropy_predictions(
 					release_intent.intent = intent_type::CROSSHAIR_SECONDARY_ACTION;
 				}
 
-				adjusted_entropy.entropy_per_entity[e.get_guid()].push_back(release_intent);
+				adjusted_entropy.intents_per_entity[e.get_guid()].push_back(release_intent);
 			}
 		}
 	}

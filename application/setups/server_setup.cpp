@@ -288,7 +288,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 
 						new_intent.is_pressed = test_entropy_randomizer.randval(0, 1) == 0;
 
-						total_unpacked_entropy.entropy_per_entity[hypersomnia[scene.characters[i].id].get_guid()].push_back(new_intent);
+						total_unpacked_entropy.intents_per_entity[hypersomnia[scene.characters[i].id].get_guid()].push_back(new_intent);
 					}
 				}
 			}
