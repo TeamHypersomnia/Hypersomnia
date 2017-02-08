@@ -85,8 +85,9 @@ namespace augs {
 			const size_t i = static_cast<size_t>(enum_idx);
 			ensure(i < capacity());
 
-			if (is_set.test(i))
+			if (is_set.test(i)) {
 				return iterator(this, i);
+			}
 
 			return end();
 		}
@@ -95,8 +96,9 @@ namespace augs {
 			const size_t i = static_cast<size_t>(enum_idx);
 			ensure(i < capacity());
 
-			if (is_set.test(i))
+			if (is_set.test(i)) {
 				return const_iterator(this, i);
+			}
 
 			return end();
 		}

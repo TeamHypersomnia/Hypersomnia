@@ -30,6 +30,7 @@
 
 static char intent_to_hotbar_index(const intent_type type) {
 	switch (type) {
+	case intent_type::HOTBAR_BUTTON_0: return 0;
 	case intent_type::HOTBAR_BUTTON_1: return 1;
 	case intent_type::HOTBAR_BUTTON_2: return 2;
 	case intent_type::HOTBAR_BUTTON_3: return 3;
@@ -39,7 +40,24 @@ static char intent_to_hotbar_index(const intent_type type) {
 	case intent_type::HOTBAR_BUTTON_7: return 7;
 	case intent_type::HOTBAR_BUTTON_8: return 8;
 	case intent_type::HOTBAR_BUTTON_9: return 9;
-	case intent_type::HOTBAR_BUTTON_0: return 0;
+	default: return -1;
+	}
+}
+
+static char intent_to_special_action_index(const intent_type type) {
+	switch (type) {
+	case intent_type::SPECIAL_ACTION_BUTTON_1: return 0;
+	case intent_type::SPECIAL_ACTION_BUTTON_2: return 1;
+	case intent_type::SPECIAL_ACTION_BUTTON_3: return 2;
+	case intent_type::SPECIAL_ACTION_BUTTON_4: return 3;
+	case intent_type::SPECIAL_ACTION_BUTTON_5: return 4;
+	case intent_type::SPECIAL_ACTION_BUTTON_6: return 5;
+	case intent_type::SPECIAL_ACTION_BUTTON_7: return 6;
+	case intent_type::SPECIAL_ACTION_BUTTON_8: return 7;
+	case intent_type::SPECIAL_ACTION_BUTTON_9: return 8;
+	case intent_type::SPECIAL_ACTION_BUTTON_10: return 9;
+	case intent_type::SPECIAL_ACTION_BUTTON_11: return 10;
+	case intent_type::SPECIAL_ACTION_BUTTON_12: return 11;
 	default: return -1;
 	}
 }
@@ -48,13 +66,17 @@ cosmic_entropy gui_element_system::get_and_clear_pending_events() {
 	cosmic_entropy out;
 
 	out.transfer_requests = pending_transfers;
+	out.cast_spells = spell_requests;
+
 	pending_transfers.clear();
+	spell_requests.clear();
 
 	return std::move(out);
 }
 
 void gui_element_system::clear_all_pending_events() {
 	pending_transfers.clear();
+	spell_requests.clear();
 }
 
 character_gui& gui_element_system::get_character_gui(const entity_id id) {
@@ -136,6 +158,7 @@ void gui_element_system::handle_hotbar_and_action_button_presses(
 
 	for (const auto& i : intents) {
 		const auto hotbar_index = intent_to_hotbar_index(i.intent);
+		const auto special_action_index = intent_to_special_action_index(i.intent);
 
 		if (hotbar_index >= 0) {
 			auto& currently_held_index = gui.currently_held_hotbar_index;
@@ -174,6 +197,9 @@ void gui_element_system::handle_hotbar_and_action_button_presses(
 					}
 				}
 			}
+		}
+		else if (special_action_index > -1) {
+			spell_requests[subject] = gui.action_buttons[special_action_index].bound_spell;
 		}
 		else if (i.intent == intent_type::PREVIOUS_HOTBAR_SELECTION_SETUP && i.is_pressed) {
 			const auto wielding = gui.make_previous_hotbar_selection_setup(subject);

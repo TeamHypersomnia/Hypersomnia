@@ -51,8 +51,28 @@ components::sentience::meter::damage_result components::sentience::meter::calcul
 }
 
 void sentience_system::cast_spells(const logic_step step) const {
-	for (const auto& cast : step.entropy.cast_spells) {
+	auto& cosmos = step.cosm;
+	const auto now = cosmos.get_timestamp();
+	const auto delta = cosmos.get_fixed_delta();
 
+	for (const auto& cast : step.entropy.cast_spells) {
+		const auto subject = cosmos[cast.first];
+		const auto spell = cast.second;
+
+		auto& sentience = subject.get<components::sentience>();
+
+		const auto found_spell = sentience.spells.find(spell);
+
+		if (found_spell != sentience.spells.end()) {
+			auto& spell_data = (*found_spell).second;
+			
+			if (spell_data.cooldown.is_ready(now, delta)) {
+				switch (spell) {
+					case spell_type::HASTE: sentience.haste.set_for_duration(22000); break;
+					default: LOG("Unknown spell: %x", static_cast<int>(spell)); break;
+				}
+			}
+		}
 	}
 }
 

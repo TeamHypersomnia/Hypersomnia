@@ -96,10 +96,10 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 
 			if (sentience->haste.is_enabled()) {
 				if (sentience->haste.is_greater) {
-					movement_force_mult *= 1.4f;
+					movement_force_mult *= 1.45f;
 				}
 				else {
-					movement_force_mult *= 1.2f;
+					movement_force_mult *= 1.3f;
 				}
 			}
 		}

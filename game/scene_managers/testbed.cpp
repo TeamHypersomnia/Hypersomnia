@@ -229,8 +229,12 @@ namespace scene_managers {
 				driver_system().assign_car_ownership(new_character, motorcycle2);
 			}
 
-			new_character.get<components::sentience>().consciousness.maximum = 200;
-			new_character.get<components::sentience>().consciousness.value = 200;
+			auto& sentience = new_character.get<components::sentience>();
+
+			sentience.consciousness.maximum = 200;
+			sentience.consciousness.value = 200;
+
+			sentience.spells[spell_type::HASTE] = spell_data();
 		}
 
 		{

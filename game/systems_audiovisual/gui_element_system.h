@@ -1,5 +1,6 @@
 #pragma once
 #include <unordered_map>
+#include <map>
 #include <array>
 
 #include "game/detail/gui/game_gui_context.h"
@@ -17,6 +18,7 @@ public:
 	std::unordered_map<entity_id, character_gui> character_guis;
 
 	std::vector<item_slot_transfer_request_data> pending_transfers;
+	std::map<entity_id, spell_type> spell_requests;
 
 	bool gui_look_enabled = false;
 	vec2i screen_size_for_new_characters;
