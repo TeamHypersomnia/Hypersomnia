@@ -464,12 +464,14 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 ) const {
 	const auto& rect_world = context.get_rect_world();
 	const auto& cosmos = context.get_cosmos();
+	const auto gui_entity = context.get_gui_element_entity();
 	auto& output_buffer = context.get_output_buffer();
 
 	const auto maybe_hovered_item = context._dynamic_cast<item_button_in_item>(rect_world.rect_hovered);
 	const auto maybe_hovered_slot = context._dynamic_cast<slot_button_in_container>(rect_world.rect_hovered);
 	const auto maybe_hovered_hotbar_button = context._dynamic_cast<hotbar_button_in_character_gui>(rect_world.rect_hovered);
 	const auto maybe_hovered_sentience_meter = context._dynamic_cast<sentience_meter_in_character_gui>(rect_world.rect_hovered);
+	const auto maybe_hovered_perk_meter = context._dynamic_cast<perk_meter_in_character_gui>(rect_world.rect_hovered);
 
 	gui::text::fstr tooltip_text;
 
@@ -482,10 +484,25 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 		tooltip_text = text::simple_bbcode(describe_slot(cosmos[maybe_hovered_slot.get_location().slot_id]), text::style());
 	}
 	else if (maybe_hovered_sentience_meter) {
-		tooltip_text = text::simple_bbcode(describe_sentience_meter(context.get_gui_element_entity(), maybe_hovered_sentience_meter.get_location().type), description_style);
+		tooltip_text = text::simple_bbcode(
+			describe_sentience_meter(
+				gui_entity, 
+				maybe_hovered_sentience_meter.get_location().type
+			), 
+			description_style
+		);
+	}
+	else if (maybe_hovered_perk_meter) {
+		tooltip_text = text::simple_bbcode(
+			describe_perk_meter(
+				gui_entity,
+				maybe_hovered_perk_meter.get_location().type
+			), 
+			description_style
+		);
 	}
 	else if (maybe_hovered_hotbar_button) {
-		const auto assigned_entity = maybe_hovered_hotbar_button->get_assigned_entity(context.get_gui_element_entity());
+		const auto assigned_entity = maybe_hovered_hotbar_button->get_assigned_entity(gui_entity);
 
 		if (assigned_entity.alive()) {
 			tooltip_text = text::simple_bbcode(describe_entity(assigned_entity), description_style);

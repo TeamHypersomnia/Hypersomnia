@@ -249,8 +249,8 @@ void sentience_system::regenerate_values(const logic_step step) const {
 				sentience.consciousness.value -= sentience.consciousness.calculate_damage_result(-2).effective;
 			}
 
-			const auto consciousness_ratio = sentience.consciousness.ratio();
-			const auto health_ratio = sentience.health.ratio();
+			const auto consciousness_ratio = sentience.consciousness.get_ratio();
+			const auto health_ratio = sentience.health.get_ratio();
 
 			sentience.consciousness.value = std::min(consciousness_ratio, health_ratio) * sentience.consciousness.maximum;
 		}
@@ -271,7 +271,7 @@ void sentience_system::set_borders(const logic_step step) const {
 	for (const auto& t : step.cosm.get(processing_subjects::WITH_SENTIENCE)) {
 		const auto& sentience = t.get<components::sentience>();
 
-		auto hr = sentience.health.ratio();
+		auto hr = sentience.health.get_ratio();
 		const auto one_less_hr = 1 - hr;
 
 		int pulse_duration = static_cast<int>(1250 - 1000 * (1 - hr));

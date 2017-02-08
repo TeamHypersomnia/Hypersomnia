@@ -12,6 +12,13 @@ struct timed_perk {
 		duration.set(ms, now);
 	}
 
+	float get_ratio(
+		const augs::stepped_timestamp now,
+		const augs::delta dt
+	) const {
+		return duration.get_ratio_of_remaining_time(now, dt);
+	}
+
 	bool is_enabled(
 		const augs::stepped_timestamp now,
 		const augs::delta dt

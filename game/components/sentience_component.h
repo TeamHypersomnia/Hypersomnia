@@ -6,12 +6,14 @@
 
 #include "augs/misc/enum_associative_array.h"
 
+#include "game/enums/perk_meter_type.h"
 #include "game/enums/sentience_meter_type.h"
 #include "game/enums/spell_type.h"
 
 #include "game/detail/spell_data.h"
 
 #include "game/detail/perks/haste_perk.h"
+#include "game/detail/perks/electric_shield_perk.h"
 
 namespace components {
 	struct sentience {
@@ -22,7 +24,8 @@ namespace components {
 				bool dropped_to_zero = false;
 			};
 
-			int enabled = false;
+			bool enabled = false;
+			padding_byte pad[3];
 
 			float value = 100.f;
 			float maximum = 100.f;
@@ -39,7 +42,10 @@ namespace components {
 
 			damage_result calculate_damage_result(float amount) const;
 
-			float ratio() const;
+			bool is_enabled() const;
+			float get_maximum_value() const;
+			float get_value() const;
+			float get_ratio() const;
 		};
 
 		augs::stepped_timestamp time_of_last_received_damage;
@@ -49,9 +55,35 @@ namespace components {
 		meter personal_electricity;
 		meter consciousness;
 
-		augs::enum_associative_array<spell_type, spell_data> spells;
-
 		haste_perk haste;
+		electric_shield_perk electric_shield;
+
+		template <class F>
+		decltype(auto) call_on(
+			const sentience_meter_type s,
+			const F callback
+		) const {
+			switch (s) {
+			case sentience_meter_type::HEALTH: return callback(health);
+			case sentience_meter_type::PERSONAL_ELECTRICITY: return callback(personal_electricity);
+			case sentience_meter_type::CONSCIOUSNESS: return callback(consciousness);
+			default: ensure(false); return callback(health);
+			}
+		}
+
+		template <class F>
+		decltype(auto) call_on(
+			const perk_meter_type s,
+			const F callback
+		) const {
+			switch (s) {
+			case perk_meter_type::HASTE: return callback(haste);
+			case perk_meter_type::ELECTRIC_SHIELD: return callback(electric_shield);
+			default: ensure(false); return callback(haste);
+			}
+		}
+
+		augs::enum_associative_array<spell_type, spell_data> spells;
 
 		float comfort_zone = 500.f;
 		float minimum_danger_amount_to_evade = 5.f;
@@ -75,9 +107,6 @@ namespace components {
 		}
 
 		sentience();
-
-		meter& get(const sentience_meter_type);
-		const meter& get(const sentience_meter_type) const;
 
 		rgba calculate_health_color(float time_pulse_multiplier) const;
 	};

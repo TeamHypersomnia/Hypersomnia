@@ -379,6 +379,7 @@
     <ClCompile Include="game\detail\gui\root_of_inventory_gui.cpp" />
     <ClCompile Include="game\detail\gui\sentience_meter.cpp" />
     <ClCompile Include="game\detail\gui\slot_button.cpp" />
+    <ClCompile Include="game\detail\gui\perk_meter.cpp" />
     <ClCompile Include="game\detail\visible_entities.cpp" />
     <ClCompile Include="game\detail\wielding_result.cpp" />
     <ClCompile Include="game\detail\world_camera.cpp" />
@@ -1139,9 +1140,11 @@
     <ClInclude Include="game\detail\gui\locations\drag_and_drop_target_drop_item_in_character_gui.h" />
     <ClInclude Include="game\detail\gui\locations\hotbar_button_in_character_gui.h" />
     <ClInclude Include="game\detail\gui\locations\item_button_in_item.h" />
+    <ClInclude Include="game\detail\gui\locations\perk_meter_in_character_gui.h" />
     <ClInclude Include="game\detail\gui\locations\root_of_inventory_gui_in_context.h" />
     <ClInclude Include="game\detail\gui\locations\sentience_meter_in_character_gui.h" />
     <ClInclude Include="game\detail\gui\locations\slot_button_in_container.h" />
+    <ClInclude Include="game\detail\gui\perk_meter.h" />
     <ClInclude Include="game\detail\gui\pixel_line_connector.h" />
     <ClInclude Include="game\detail\gui\root_of_inventory_gui.h" />
     <ClInclude Include="game\detail\gui\sentience_meter.h" />
@@ -1150,6 +1153,7 @@
     <ClInclude Include="game\detail\item_slot_transfer_request_declaration.h" />
     <ClInclude Include="game\detail\perks\bleeding_perk.h" />
     <ClInclude Include="game\detail\perks\haste_perk.h" />
+    <ClInclude Include="game\detail\perks\electric_shield_perk.h" />
     <ClInclude Include="game\detail\perks\timed_perk.h" />
     <ClInclude Include="game\detail\spells\haste_spell.h" />
     <ClInclude Include="game\detail\spell_data.h" />
@@ -1158,6 +1162,7 @@
     <ClInclude Include="game\detail\world_camera.h" />
     <ClInclude Include="game\enums\entity_flag.h" />
     <ClInclude Include="game\enums\input_recording_type.h" />
+    <ClInclude Include="game\enums\perk_meter_type.h" />
     <ClInclude Include="game\enums\renderable_drawing_type.h" />
     <ClInclude Include="game\enums\sentience_meter_type.h" />
     <ClInclude Include="game\enums\sound_response_type.h" />

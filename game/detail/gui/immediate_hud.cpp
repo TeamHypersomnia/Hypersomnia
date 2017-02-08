@@ -91,7 +91,7 @@ augs::vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_i
 		const auto* const sentience = v.find<components::sentience>();
 
 		if (sentience) {
-			const auto hr = sentience->health.ratio();
+			const auto hr = sentience->health.get_ratio();
 			const auto one_less_hr = 1 - hr;
 
 			const auto pulse_duration = static_cast<int>(1250 - 1000 * (1 - hr));
@@ -116,11 +116,11 @@ augs::vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_i
 
 			if (v == watched_character) {
 				starting_health_angle = watched_character_transform.rotation + 135;
-				ending_health_angle = starting_health_angle + sentience->health.ratio() * 90.f;
+				ending_health_angle = starting_health_angle + sentience->health.get_ratio() * 90.f;
 			}
 			else {
 				starting_health_angle = (v.viewing_transform(interp).pos - watched_character_transform.pos).degrees() - 45;
-				ending_health_angle = starting_health_angle + sentience->health.ratio() * 90.f;
+				ending_health_angle = starting_health_angle + sentience->health.get_ratio() * 90.f;
 			}
 
 			auto push_angles = [&target](const float lower_outside, const float upper_outside, const float lower_inside, const float upper_inside) {
@@ -214,7 +214,7 @@ augs::vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_i
 			}
 
 			const int radius = (*assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM).get_size().x / 2;
-			const auto empty_health_amount = static_cast<int>((1 - sentience->health.ratio()) * 90);
+			const auto empty_health_amount = static_cast<int>((1 - sentience->health.get_ratio()) * 90);
 
 			textual_infos.push_back({ starting_health_angle + 90 - empty_health_amount/2, to_wstring(int(sentience->health.value) == 0 ? 1 : int(sentience->health.value)), health_col });
 			textual_infos.push_back({ starting_health_angle, description_of_entity(v).name, health_col });

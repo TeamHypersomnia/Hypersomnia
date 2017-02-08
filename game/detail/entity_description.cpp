@@ -142,18 +142,36 @@ std::wstring describe_sentience_meter(
 	const sentience_meter_type type
 ) {
 	const auto& sentience = subject.get<components::sentience>();
-	const auto& meter = sentience.get(type);
+	const auto value = sentience.call_on(type, [](const auto& m) { return m.get_value(); } );
+	const auto maximum = sentience.call_on(type, [](const auto& m) { return m.get_maximum_value(); } );
 
 	if (type == sentience_meter_type::HEALTH) {
-		return typesafe_sprintf(L"[color=red]Health points:[/color] %x/%x\n[color=vsdarkgray]Stability of the physical body.[/color]", meter.value, meter.maximum);
+		return typesafe_sprintf(L"[color=red]Health points:[/color] %x/%x\n[color=vsdarkgray]Stability of the physical body.[/color]", value, maximum);
 	}
 
 	if (type == sentience_meter_type::PERSONAL_ELECTRICITY) {
-		return typesafe_sprintf(L"[color=cyan]Personal electricity:[/color] %x/%x\n[color=vsdarkgray]Mind-programmable matter.[/color]", meter.value, meter.maximum);
+		return typesafe_sprintf(L"[color=cyan]Personal electricity:[/color] %x/%x\n[color=vsdarkgray]Mind-programmable matter.[/color]", value, maximum);
 	}
 
 	if (type == sentience_meter_type::CONSCIOUSNESS) {
-		return typesafe_sprintf(L"[color=orange]Consciousness:[/color] %x/%x\n[color=vsdarkgray]Attunement of soul with the body.[/color]", meter.value, meter.maximum);
+		return typesafe_sprintf(L"[color=orange]Consciousness:[/color] %x/%x\n[color=vsdarkgray]Attunement of soul with the body.[/color]", value, maximum);
+	}
+
+	else return L"Unknown problem";
+}
+
+std::wstring describe_perk_meter(
+	const const_entity_handle subject,
+	const perk_meter_type type
+) {
+	const auto& sentience = subject.get<components::sentience>();
+
+	if (type == perk_meter_type::HASTE) {
+		return typesafe_sprintf(L"[color=green]Haste[/color]\n[color=vsdarkgray]You move faster.[/color]");
+	}
+
+	if (type == perk_meter_type::ELECTRIC_SHIELD) {
+		return typesafe_sprintf(L"[color=green]Electric shield[/color]\n[color=vsdarkgray]Damage is absorbed by Personal Electricity\nrather than Health.[/color]");
 	}
 
 	else return L"Unknown problem";

@@ -70,10 +70,11 @@ config_table = {
 	-- should enable head-related transfer function for OpenAL?
 	enable_hrtf = 1,
 
+	-- value of "" means the default audio device will be used
 	audio_output_device = "",
 
 	-- volume settings
-	sound_effects_volume = 1,
+	sound_effects_volume = 0.1,
 	music_volume = 1,
 
 	-- Flag. 1 disables the cursor clipping so that it is easier to mark a breakpoint, for example. 0 is for normal playing.

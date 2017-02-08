@@ -13,19 +13,22 @@
 #include "augs/gui/text_drawer.h"
 #include "augs/gui/stroke.h"
 
-sentience_meter::sentience_meter() {
+perk_meter::perk_meter() {
 	unset_flag(augs::gui::flag::CLIP);
 	set_flag(augs::gui::flag::ENABLE_DRAWING);
 }
 
-void sentience_meter::draw(
-	const viewing_game_gui_context context, 
-	const const_this_pointer this_id, 
+void perk_meter::draw(
+	const viewing_game_gui_context context,
+	const const_this_pointer this_id,
 	const augs::gui::draw_info info
 ) {
 	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING)) {
 		return;
 	}
+
+	const auto gui_element_entity = context.get_gui_element_entity();
+	const auto& cosmos = context.get_cosmos();
 
 	auto icon_mat = this_id->get_icon_mat(this_id);
 
@@ -42,10 +45,10 @@ void sentience_meter::draw(
 	icon_rect.set_size((*icon_mat.tex).get_size());
 
 	draw_clipped_rect(
-		icon_mat, 
-		icon_rect, 
-		context, 
-		context.get_tree_entry(this_id).get_parent(), 
+		icon_mat,
+		icon_rect,
+		context,
+		context.get_tree_entry(this_id).get_parent(),
 		info.v
 	);
 
@@ -60,13 +63,11 @@ void sentience_meter::draw(
 
 		const auto this_type = this_id.get_location().type;
 
-		const bool should_draw_value_number =
-			this_type == sentience_meter_type::HEALTH
-			|| this_type == sentience_meter_type::PERSONAL_ELECTRICITY
-			|| this_type == sentience_meter_type::CONSCIOUSNESS;
-			
-		const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
-		const auto ratio = sentience.call_on(this_type, [](const auto& m) { return m.get_ratio(); });
+		const auto& sentience = gui_element_entity.get<components::sentience>();
+		const auto dt = cosmos.get_fixed_delta();
+		const auto now = cosmos.get_timestamp();
+
+		const auto ratio = sentience.call_on(this_type, [&](const auto& m) { return m.get_ratio(now, dt); });
 		auto actual_bar_rect = full_bar_rect;
 		const auto bar_width = static_cast<int>(actual_bar_rect.w() * ratio);
 		actual_bar_rect.w(bar_width);
@@ -84,22 +85,11 @@ void sentience_meter::draw(
 		stroke.set_width(this_id->border_width);
 		stroke.draw(info.v, full_bar_rect, ltrb(), this_id->border_spacing);
 
-		if (should_draw_value_number) {
-			const auto value = sentience.call_on(this_type, [](const auto& m) { return m.get_value(); });
-
-			augs::gui::text_drawer drawer;
-
-			drawer.set_text(augs::gui::text::format(typesafe_sprintf(L"%x", static_cast<int>(value)), { assets::font_id::GUI_FONT, white }));
-			drawer.pos.set(full_bar_rect_bordered.r + total_spacing*2, full_bar_rect_bordered.t - total_spacing);
-			drawer.draw_stroke(info.v);
-			drawer.draw(info.v);
-		}
-
 		if (bar_width >= 1) {
 			for (const auto& p : this_id->particles) {
 				auto particle_mat = p.mat;
 				particle_mat.color = bar_mat.color + rgba(30, 30, 30, 0);
-			
+
 				const auto particle_rect = ltrb(full_bar_rect.get_position() - vec2(6, 6) + p.relative_pos, (*particle_mat.tex).get_size());
 
 				draw_clipped_rect(
@@ -113,7 +103,7 @@ void sentience_meter::draw(
 	}
 }
 
-ltrb sentience_meter::get_full_value_bar_rect_bordered(
+ltrb perk_meter::get_full_value_bar_rect_bordered(
 	const const_game_gui_context context,
 	const const_this_pointer this_id,
 	const ltrb absolute
@@ -134,7 +124,7 @@ ltrb sentience_meter::get_full_value_bar_rect_bordered(
 	return full_bar_rect;
 }
 
-ltrb sentience_meter::get_full_value_bar_rect(
+ltrb perk_meter::get_full_value_bar_rect(
 	const const_game_gui_context context,
 	const const_this_pointer this_id,
 	const ltrb absolute
@@ -143,11 +133,15 @@ ltrb sentience_meter::get_full_value_bar_rect(
 }
 
 
-void sentience_meter::advance_elements(
+void perk_meter::advance_elements(
 	const game_gui_context context,
 	const this_pointer this_id,
 	const augs::delta dt
 ) {
+	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING)) {
+		return;
+	}
+
 	this_id->seconds_accumulated += dt.in_seconds();
 
 	if (this_id->particles.size() > 0) {
@@ -169,7 +163,7 @@ void sentience_meter::advance_elements(
 						--p.relative_pos.y;
 					}
 				}
-				
+
 				++p.relative_pos.x;
 
 				p.relative_pos.y = std::max(0, p.relative_pos.y);
@@ -184,9 +178,9 @@ void sentience_meter::advance_elements(
 	}
 }
 
-void sentience_meter::respond_to_events(
-	const game_gui_context context, 
-	const this_pointer this_id, 
+void perk_meter::respond_to_events(
+	const game_gui_context context,
+	const this_pointer this_id,
 	const gui_entropy& entropies
 ) {
 	for (const auto& e : entropies.get_events_for(this_id)) {
@@ -194,43 +188,67 @@ void sentience_meter::respond_to_events(
 	}
 }
 
-augs::gui::material sentience_meter::get_icon_mat(const const_this_pointer this_id) const {
+augs::gui::material perk_meter::get_icon_mat(const const_this_pointer this_id) const {
 	switch (this_id.get_location().type) {
-	case sentience_meter_type::HEALTH: return{ assets::texture_id::HEALTH_ICON, white };
-	case sentience_meter_type::CONSCIOUSNESS: return{ assets::texture_id::CONSCIOUSNESS_ICON, white };
-	case sentience_meter_type::PERSONAL_ELECTRICITY: return{ assets::texture_id::PERSONAL_ELECTRICITY_ICON, white };
+	case perk_meter_type::HASTE: return{ assets::texture_id::PERK_HASTE_ICON, white };
+	case perk_meter_type::ELECTRIC_SHIELD: return{ assets::texture_id::PERK_HASTE_ICON, white };
 	default: ensure(false);  return{};
 	}
 }
 
-augs::gui::material sentience_meter::get_bar_mat(const const_this_pointer this_id) const {
+augs::gui::material perk_meter::get_bar_mat(const const_this_pointer this_id) const {
 	switch (this_id.get_location().type) {
-	case sentience_meter_type::HEALTH: return{ assets::texture_id::BLANK, red-rgba(30, 30, 30, 0) };
-	case sentience_meter_type::CONSCIOUSNESS: return{ assets::texture_id::BLANK, orange - rgba(30, 30, 30, 0) };
-	case sentience_meter_type::PERSONAL_ELECTRICITY: return{ assets::texture_id::BLANK, cyan - rgba(30, 30, 30, 0) };
+	case perk_meter_type::HASTE: return{ assets::texture_id::BLANK, green - rgba(30, 30, 30, 0) };
+	case perk_meter_type::ELECTRIC_SHIELD: return{ assets::texture_id::BLANK, vsblue - rgba(30, 30, 30, 0) };
 	default: ensure(false);  return{};
 	}
 }
 
-void sentience_meter::rebuild_layouts(
+void perk_meter::rebuild_layouts(
 	const game_gui_context context,
 	const this_pointer this_id
 ) {
 	const auto this_type = this_id.get_location().type;
-	const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
 
-	const auto vertical_index = static_cast<unsigned>(this_type);
+	const auto gui_element_entity = context.get_gui_element_entity();
+	const auto& cosmos = context.get_cosmos();
+
+	const auto& sentience = gui_element_entity.get<components::sentience>();
+
+	const auto dt = cosmos.get_fixed_delta();
+	const auto now = cosmos.get_timestamp();
+
+	if (!sentience.call_on(this_type, [&](const auto& m) {
+		return m.is_enabled(now, dt);
+	})) {
+		this_id->unset_flag(augs::gui::flag::ENABLE_DRAWING);
+		return;
+	}
+	else {
+		this_id->set_flag(augs::gui::flag::ENABLE_DRAWING);
+	}
+
+	unsigned vertical_index = 3;
+
+	for (unsigned i = 0; i < static_cast<unsigned>(this_type); ++i) {
+		if (sentience.call_on(static_cast<perk_meter_type>(i), [&](const auto& m) {
+			return m.is_enabled(now, dt);
+		})) {
+			++vertical_index;
+		}
+	}
+
 	const auto screen_size = context.get_character_gui().get_screen_size();
 	const auto icon_size = (*this_id->get_icon_mat(this_id).tex).get_size();
 	const auto with_bar_size = vec2i(icon_size.x + 4 + 180, icon_size.y);
 
 	const auto lt = vec2i(screen_size.x - 220, 20 + vertical_index * (icon_size.y + 4));
-	
+
 	this_id->rc.set_position(lt);
 	this_id->rc.set_size(with_bar_size);
 
 	if (this_id->particles.empty()) {
-		randomization rng(static_cast<int>(this_id.get_location().type));
+		randomization rng(static_cast<int>(this_id.get_location().type) + 3);
 
 		const auto bar_size = this_id->get_full_value_bar_rect(context, this_id, this_id->rc).get_size();
 
