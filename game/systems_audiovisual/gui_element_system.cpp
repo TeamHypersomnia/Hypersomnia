@@ -198,7 +198,7 @@ void gui_element_system::handle_hotbar_and_action_button_presses(
 				}
 			}
 		}
-		else if (special_action_index > -1) {
+		else if (special_action_index > -1 && i.is_pressed) {
 			spell_requests[subject] = gui.action_buttons[special_action_index].bound_spell;
 		}
 		else if (i.intent == intent_type::PREVIOUS_HOTBAR_SELECTION_SETUP && i.is_pressed) {

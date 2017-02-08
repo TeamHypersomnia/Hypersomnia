@@ -69,8 +69,8 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 				if (are_connected_by_friction(collider, subject)) {
 					found_suitable = true;
 				}
-				else if (collider_physics.since_dropped.lasts(cosm.get_timestamp(), delta)) {
-					collider_physics.since_dropped.unset();
+				else if (collider_physics.dropped_collision_cooldown.lasts(cosm.get_timestamp(), delta)) {
+					collider_physics.dropped_collision_cooldown = augs::stepped_cooldown();
 					found_suitable = true;
 				}
 				else {

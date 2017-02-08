@@ -7,7 +7,7 @@
 
 namespace components {
 	struct special_physics {
-		augs::stepped_timeout since_dropped;
+		augs::stepped_cooldown dropped_collision_cooldown;
 
 		entity_id owner_friction_ground;
 
@@ -52,7 +52,7 @@ namespace components {
 				CEREAL_NVP(owner_friction_ground),
 				CEREAL_NVP(owner_friction_grounds),
 
-				CEREAL_NVP(since_dropped),
+				CEREAL_NVP(dropped_collision_cooldown),
 
 				CEREAL_NVP(enable_angle_motor),
 

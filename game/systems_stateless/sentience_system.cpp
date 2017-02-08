@@ -66,11 +66,22 @@ void sentience_system::cast_spells(const logic_step step) const {
 		if (found_spell != sentience.spells.end()) {
 			auto& spell_data = (*found_spell).second;
 			
-			if (spell_data.cooldown.is_ready(now, delta)) {
+			unsigned required_mana = 0;
+
+			switch (spell) {
+			case spell_type::HASTE: required_mana = 40; break;
+			default: LOG("Unknown spell: %x", static_cast<int>(spell)); break;
+			}
+
+			const bool can_cast_already = sentience.personal_electricity.value >= required_mana && spell_data.cast_cooldown.is_ready(now, delta);
+			
+			if (can_cast_already) {
 				switch (spell) {
-					case spell_type::HASTE: sentience.haste.set_for_duration(22000); break;
-					default: LOG("Unknown spell: %x", static_cast<int>(spell)); break;
+				case spell_type::HASTE: sentience.haste.set_for_duration(22000, now); break;
+				default: LOG("Unknown spell: %x", static_cast<int>(spell)); break;
 				}
+				
+				sentience.personal_electricity.value -= required_mana;
 			}
 		}
 	}

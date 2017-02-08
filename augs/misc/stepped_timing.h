@@ -21,44 +21,22 @@ namespace augs {
 		float in_milliseconds(const delta) const;
 	};
 
-	struct stepped_timeout {
-		stepped_timestamp when_started;
-
-		int is_set = false;
-		float timeout_duration_ms = 1000.f;
-
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(when_started),
-
-				CEREAL_NVP(is_set),
-				CEREAL_NVP(timeout_duration_ms)
-				);
-		}
-
-		void unset();
-		void set(const float timeout_duration_ms, const stepped_timestamp);
-		bool passed(const stepped_timestamp, const delta) const;
-		bool lasts(const stepped_timestamp, const delta) const;
-	};
-
 	struct stepped_cooldown {
 		stepped_timestamp when_last_fired;
-		float cooldown_duration_ms;
+		float cooldown_duration_ms = 1000.f;
 
 		template <class Archive>
 		void serialize(Archive& ar) {
 			ar(
 				CEREAL_NVP(when_last_fired),
-
-				CEREAL_NVP(ready_to_fire),
 				CEREAL_NVP(cooldown_duration_ms)
 			);
 		}
 
 		stepped_cooldown(const float cooldown_duration_ms = 1000.f);
+		void set(const float cooldown_duration_ms, const stepped_timestamp now);
 
+		bool lasts(const stepped_timestamp, const delta t) const;
 		bool is_ready(const stepped_timestamp, const delta t) const;
 		bool try_to_fire_and_reset(const stepped_timestamp, const delta t);
 	};

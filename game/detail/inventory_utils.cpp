@@ -570,6 +570,6 @@ void perform_transfer(const item_slot_transfer_request r, const logic_step step)
 		auto& physics = grabbed_item_part_handle.get<components::physics>();
 		physics.apply_force(force, offset, true);
 		auto& special_physics = grabbed_item_part_handle.get<components::special_physics>();
-		special_physics.since_dropped.set(200, cosmos.get_timestamp());
+		special_physics.dropped_collision_cooldown.set(200, cosmos.get_timestamp());
 	}
 }

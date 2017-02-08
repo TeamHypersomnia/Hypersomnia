@@ -27,11 +27,23 @@ namespace augs {
 
 	stepped_cooldown::stepped_cooldown(const float cooldown_duration_ms) : cooldown_duration_ms(cooldown_duration_ms) {}
 
+	void stepped_cooldown::set(const float ms, const stepped_timestamp now) {
+		cooldown_duration_ms = ms;
+		when_last_fired = now;
+	}
+
 	bool stepped_cooldown::is_ready(
-		const stepped_timestamp s, 
+		const stepped_timestamp s,
 		const delta t
 	) const {
 		return !when_last_fired.step || (s - when_last_fired).in_milliseconds(t) > cooldown_duration_ms;
+	}
+
+	bool stepped_cooldown::lasts(
+		const stepped_timestamp s,
+		const delta t
+	) const {
+		return !is_ready(s, t);
 	}
 
 	bool stepped_cooldown::try_to_fire_and_reset(
@@ -44,23 +56,5 @@ namespace augs {
 		}
 
 		return false;
-	}
-
-	void stepped_timeout::unset() {
-		is_set = false;
-	}
-
-	void stepped_timeout::set(const float duration_ms, const stepped_timestamp s) {
-		timeout_duration_ms = duration_ms;
-		when_started = s;
-		is_set = true;
-	}
-
-	bool stepped_timeout::passed(const stepped_timestamp s, const delta t) const {
-		return !is_set || (s - when_started).in_milliseconds(t) > timeout_duration_ms;
-	}
-
-	bool stepped_timeout::lasts(const stepped_timestamp s, const delta t) const {
-		return !passed(s, t);
 	}
 }

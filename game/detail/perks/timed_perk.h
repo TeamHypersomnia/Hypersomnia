@@ -1,14 +1,21 @@
 #pragma once
+#include "augs/misc/stepped_timing.h"
+#include "augs/misc/delta.h"
 
 struct timed_perk {
-	float remaining_time_ms = 0.f;
-	float current_maximum_time_ms = 0.f;
+	augs::stepped_cooldown duration;
 
-	void set_for_duration(const float ms) {
-		remaining_time_ms = current_maximum_time_ms = ms;
+	void set_for_duration(
+		const float ms,
+		const augs::stepped_timestamp now
+	) {
+		duration.set(ms, now);
 	}
 
-	bool is_enabled() const {
-		return remaining_time_ms > 0.f;
+	bool is_enabled(
+		const augs::stepped_timestamp now,
+		const augs::delta dt
+	) const {
+		return duration.lasts(now, dt);
 	}
 };
