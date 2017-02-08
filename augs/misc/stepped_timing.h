@@ -36,7 +36,9 @@ namespace augs {
 		stepped_cooldown(const float cooldown_duration_ms = 1000.f);
 		void set(const float cooldown_duration_ms, const stepped_timestamp now);
 		
+		float get_remaining_time_ms(const stepped_timestamp, const delta t) const;
 		float get_ratio_of_remaining_time(const stepped_timestamp, const delta t) const;
+
 		bool lasts(const stepped_timestamp, const delta t) const;
 		bool is_ready(const stepped_timestamp, const delta t) const;
 		bool try_to_fire_and_reset(const stepped_timestamp, const delta t);

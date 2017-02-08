@@ -50,6 +50,14 @@ components::sentience::meter::damage_result components::sentience::meter::calcul
 	return result;
 }
 
+static spell_data get_spell_data(const spell_type spell) {
+	switch (spell) {
+	case spell_type::HASTE: return { 60, 5000 };
+	case spell_type::ULTIMATE_WRATH_OF_THE_AEONS: return { 260, 2000 };
+	default: LOG("Unknown spell: %x", static_cast<int>(spell)); return {};
+	}
+}
+
 void sentience_system::cast_spells(const logic_step step) const {
 	auto& cosmos = step.cosm;
 	const auto now = cosmos.get_timestamp();
@@ -64,16 +72,14 @@ void sentience_system::cast_spells(const logic_step step) const {
 		const auto found_spell = sentience.spells.find(spell);
 
 		if (found_spell != sentience.spells.end()) {
-			auto& spell_data = (*found_spell).second;
+			auto& spell_instance_data = (*found_spell).second;
 			
-			unsigned required_mana = 0;
+			const auto spell_data = get_spell_data(spell);
 
-			switch (spell) {
-			case spell_type::HASTE: required_mana = 40; break;
-			default: LOG("Unknown spell: %x", static_cast<int>(spell)); break;
-			}
-
-			const bool can_cast_already = sentience.personal_electricity.value >= required_mana && spell_data.cast_cooldown.is_ready(now, delta);
+			const bool can_cast_already =
+				sentience.personal_electricity.value >= spell_data.personal_electricity_required
+				&& spell_instance_data.cast_cooldown.is_ready(now, delta)
+				&& sentience.all_spells_cast_cooldown.is_ready(now, delta);
 			
 			if (can_cast_already) {
 				switch (spell) {
@@ -81,7 +87,10 @@ void sentience_system::cast_spells(const logic_step step) const {
 				default: LOG("Unknown spell: %x", static_cast<int>(spell)); break;
 				}
 				
-				sentience.personal_electricity.value -= required_mana;
+				sentience.personal_electricity.value -= spell_data.personal_electricity_required;
+				
+				spell_instance_data.cast_cooldown.set(spell_data.cooldown_ms, now);
+				sentience.all_spells_cast_cooldown.set(2000, now);
 			}
 		}
 	}

@@ -43,8 +43,16 @@ namespace augs {
 		const augs::texture& considered_texture,
 		const rgba col = white,
 		const bool flip_horizontally = false,
-		const bool flip_vertically = false);
+		const bool flip_vertically = false
+	);
 
 	void draw_rect(vertex_triangle_buffer& v, const ltrb origin, const texture&, const rgba color);
 	ltrb draw_clipped_rect(vertex_triangle_buffer& v, const ltrb origin, const texture&, const rgba colorize, ltrb clipper, const bool flip_horizontally = false);
+
+	void draw_rectangle_clock(
+		vertex_triangle_buffer& v,
+		const float ratio,
+		const ltrb origin, 
+		const rgba color = white
+	);
 }

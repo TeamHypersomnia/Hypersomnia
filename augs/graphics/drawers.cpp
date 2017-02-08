@@ -7,6 +7,7 @@
 #include "augs/gui/stroke.h"
 
 #include "game/components/sprite_component.h"
+#include "game/components/polygon_component.h"
 
 namespace augs {
 	ltrb draw_clipped_rect(vertex_triangle_buffer& v, const ltrb origin, const augs::texture& tex, const rgba color, const ltrb clipper, const bool flip_horizontally) {
@@ -235,6 +236,81 @@ namespace augs {
 			dash_begin = dash_end + dash_length;
 			dash_end = dash_begin + dash_length;
 			dash_end = std::min(dash_end, line_length);
+		}
+	}
+
+	void draw_rectangle_clock(
+		vertex_triangle_buffer& v,
+		const float ratio,
+		const ltrb origin,
+		const rgba color
+	) {
+		if (ratio > 0.f) {
+			if (ratio > 1.f) {
+				draw_rect(v, origin, color);
+			}
+			else {
+				const auto twelve_o_clock = (origin.right_top() + origin.left_top()) / 2;
+				
+				augs::constant_size_vector<vec2, 7> verts;
+				verts.push_back(origin.center());
+
+				const auto intersection = rectangle_ray_intersection(
+					origin.center() + vec2().set_from_degrees(-90 + 360 * (1 - ratio)) * (origin.w() + origin.h()),
+					origin.center(),
+					origin
+				);
+
+				ensure(intersection.first);
+
+				verts.push_back(intersection.second);
+
+				if (ratio > 0.875f) {
+					verts.push_back(origin.right_top());
+					verts.push_back(origin.right_bottom());
+					verts.push_back(origin.left_bottom());
+					verts.push_back(origin.left_top());
+					verts.push_back(twelve_o_clock);
+				}
+				else if (ratio > 0.625f) {
+					verts.push_back(origin.right_bottom());
+					verts.push_back(origin.left_bottom());
+					verts.push_back(origin.left_top());
+					verts.push_back(twelve_o_clock);
+				}
+				else if (ratio > 0.375f) {
+					verts.push_back(origin.left_bottom());
+					verts.push_back(origin.left_top());
+					verts.push_back(twelve_o_clock);
+				}
+				else if (ratio > 0.125f) {
+					verts.push_back(origin.left_top());
+					verts.push_back(twelve_o_clock);
+				}
+				else {
+					verts.push_back(twelve_o_clock);
+				}
+
+				augs::constant_size_vector<augs::vertex, 7> concave;
+
+				for (const auto& v : verts) {
+					augs::vertex vv;
+					vv.color = color;
+					vv.pos = v;
+					concave.push_back(vv);
+				}
+
+				components::polygon poly;
+				poly.add_concave_polygon({ concave.begin(), concave.end() } );
+				
+				poly.automatically_map_uv(
+					assets::texture_id::BLANK, 
+					components::polygon::uv_mapping_mode::STRETCH
+				);
+
+				components::polygon::drawing_input in(v);
+				poly.draw(in);
+			}
 		}
 	}
 }

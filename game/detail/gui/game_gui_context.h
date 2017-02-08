@@ -111,6 +111,7 @@ public:
 		camera_cone camera,
 		const aabb_highlighter& highlighter,
 		const interpolation_system& interp,
+		const float interpolation_ratio,
 		const input_context& input_information,
 		augs::vertex_triangle_buffer& output
 	) :
@@ -119,6 +120,7 @@ public:
 		camera(camera),
 		output(output),
 		interp(interp),
+		interpolation_ratio(interpolation_ratio),
 		highlighter(highlighter),
 		input_information(input_information)
 	{}
@@ -129,6 +131,7 @@ public:
 	const aabb_highlighter& highlighter;
 	const interpolation_system& interp;
 	const input_context& input_information;
+	const float interpolation_ratio;
 
 	augs::vertex_triangle_buffer& get_output_buffer() const {
 		return output;

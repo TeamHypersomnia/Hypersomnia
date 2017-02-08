@@ -290,6 +290,7 @@ void character_gui::draw(
 		step.camera,
 		step.session.world_hover_highlighter,
 		step.session.systems_audiovisual.get<interpolation_system>(),
+		step.get_interpolation_ratio(),
 		step.session.context,
 		step.renderer.get_triangle_buffer()
 	);

@@ -3,6 +3,10 @@
 #include "augs/gui/stroke.h"
 #include "game/detail/gui/game_gui_context.h"
 #include "game/transcendental/cosmos.h"
+#include "game/systems_audiovisual/gui_element_system.h"
+#include "game/components/sentience_component.h"
+
+#include "augs/graphics/drawers.h"
 
 void action_button::draw(
 	const viewing_game_gui_context context,
@@ -12,10 +16,18 @@ void action_button::draw(
 	const auto intent_for_this = static_cast<intent_type>(static_cast<int>(intent_type::SPECIAL_ACTION_BUTTON_1) + this_id.get_location().index);
 	const auto bound_key = context.input_information.get_bound_key_if_any(intent_for_this);
 
+	const auto& cosmos = context.get_cosmos();
+	
+	const auto now = cosmos.get_timestamp();
+	const auto dt = cosmos.get_fixed_delta();
+
+	const auto absolute_rect = context.get_tree_entry(this_id).get_absolute_rect();
+
 	if (bound_key != augs::window::event::keys::key::INVALID) {
+		const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
 		const auto bound_spell = this_id->bound_spell;
 
-		if (bound_spell != spell_type::COUNT) {
+		if (bound_spell != spell_type::COUNT && sentience.spells.find(bound_spell) != sentience.spells.end()) {
 			rgba inside_col, border_col;
 
 			inside_col = cyan;
@@ -63,14 +75,31 @@ void action_button::draw(
 				ensure(border_tex != assets::texture_id::INVALID);
 
 				const augs::gui::material inside_mat(inside_tex, inside_col);
-				const augs::gui::material border_mat(border_tex, border_col);
 
 				draw_centered_texture(context, this_id, info, inside_mat);
+
+				bool is_still_cooled_down = false;
+
+				{
+					const auto all_cooldown = sentience.all_spells_cast_cooldown;
+					const auto this_cooldown = sentience.spells[bound_spell].cast_cooldown;
+
+					const auto effective_cooldown_ratio =
+						all_cooldown.get_remaining_time_ms(now, dt) > this_cooldown.get_remaining_time_ms(now, dt)
+						?
+						all_cooldown.get_ratio_of_remaining_time(now, dt) : this_cooldown.get_ratio_of_remaining_time(now, dt);
+
+					if (effective_cooldown_ratio > 0.f) {
+						augs::draw_rectangle_clock(info.v, effective_cooldown_ratio, absolute_rect, { 0, 0, 0, 200 });
+						is_still_cooled_down = true;
+					}
+				}
 				
-				//augs::gui::solid_stroke stroke;
-				//stroke.set_material(border_mat);
-				//stroke.set_width(1);
-				//stroke.draw(info.v, context.get_tree_entry(this_id).get_absolute_rect());
+				if (is_still_cooled_down) {
+					border_col.a -= 150;
+				}
+				
+				const augs::gui::material border_mat(border_tex, border_col);
 
 				draw_centered_texture(context, this_id, info, border_mat);
 
@@ -87,7 +116,7 @@ void action_button::draw(
 					)
 				);
 
-				bound_key_caption.bottom_right(context.get_tree_entry(this_id).get_absolute_rect());
+				bound_key_caption.bottom_right(absolute_rect);
 				bound_key_caption.pos.x -= 3;
 				bound_key_caption.draw_stroke(info.v);
 				bound_key_caption.draw(info.v);
@@ -127,7 +156,7 @@ void action_button::draw(
 				)
 			);
 
-			bound_key_caption.center(context.get_tree_entry(this_id).get_absolute_rect());
+			bound_key_caption.center(absolute_rect);
 			bound_key_caption.draw_stroke(info.v);
 			bound_key_caption.draw(info.v);
 		}
@@ -164,6 +193,7 @@ void action_button::respond_to_events(
 		this_id->detector.update_appearance(info);
 
 		if (info.msg == gui_event::lclick) {
+			context.get_gui_element_system().spell_requests[context.get_gui_element_entity()] = this_id->bound_spell;
 		}
 
 		if (info.msg == gui_event::hover) {

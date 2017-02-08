@@ -234,7 +234,13 @@ namespace scene_managers {
 			sentience.consciousness.maximum = 200;
 			sentience.consciousness.value = 200;
 
-			sentience.spells[spell_type::HASTE] = spell_data();
+			sentience.personal_electricity.maximum = 400;
+			sentience.personal_electricity.value = 400;
+
+			sentience.spells[spell_type::HASTE] = spell_instance_data();
+			sentience.spells[spell_type::ELECTRIC_TRIAD] = spell_instance_data();
+			sentience.spells[spell_type::FURY_OF_THE_AEONS] = spell_instance_data();
+			sentience.spells[spell_type::ULTIMATE_WRATH_OF_THE_AEONS] = spell_instance_data();
 		}
 
 		{

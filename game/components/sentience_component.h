@@ -51,6 +51,8 @@ namespace components {
 		augs::stepped_timestamp time_of_last_received_damage;
 		augs::stepped_timestamp time_of_last_exertion;
 
+		augs::stepped_cooldown all_spells_cast_cooldown;
+
 		meter health;
 		meter personal_electricity;
 		meter consciousness;
@@ -83,7 +85,7 @@ namespace components {
 			}
 		}
 
-		augs::enum_associative_array<spell_type, spell_data> spells;
+		augs::enum_associative_array<spell_type, spell_instance_data> spells;
 
 		float comfort_zone = 500.f;
 		float minimum_danger_amount_to_evade = 5.f;

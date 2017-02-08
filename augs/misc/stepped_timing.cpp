@@ -47,6 +47,17 @@ namespace augs {
 		return !when_last_fired.step || (s - when_last_fired).in_milliseconds(t) > cooldown_duration_ms;
 	}
 
+	float stepped_cooldown::get_remaining_time_ms(
+		const stepped_timestamp s, 
+		const delta t
+	) const {
+		if (!when_last_fired.step) {
+			return 0.f;
+		}
+
+		return cooldown_duration_ms - (s - when_last_fired).in_milliseconds(t);
+	}
+
 	float stepped_cooldown::get_ratio_of_remaining_time(
 		const stepped_timestamp s, 
 		const delta t

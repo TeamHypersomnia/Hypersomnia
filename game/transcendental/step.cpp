@@ -6,7 +6,7 @@
 #include "game/transcendental/data_living_one_step.h"
 
 double viewing_step::get_interpolated_total_time_passed_in_seconds() const {
-	return cosm.get_total_time_passed_in_seconds() + get_interpolation_ratio() * cosm.get_fixed_delta().in_seconds();
+	return cosm.get_total_time_passed_in_seconds(get_interpolation_ratio());
 }
 
 float viewing_step::get_interpolation_ratio() const {
