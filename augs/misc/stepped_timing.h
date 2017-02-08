@@ -12,13 +12,13 @@ namespace augs {
 			ar(CEREAL_NVP(step));
 		}
 
-		stepped_timestamp operator-(stepped_timestamp b) const;
+		stepped_timestamp operator-(const stepped_timestamp b) const;
 
 		bool operator==(const stepped_timestamp) const;
 		bool operator!=(const stepped_timestamp) const;
 
-		float in_seconds(delta) const;
-		float in_milliseconds(delta) const;
+		float in_seconds(const delta) const;
+		float in_milliseconds(const delta) const;
 	};
 
 	struct stepped_timeout {
@@ -38,16 +38,14 @@ namespace augs {
 		}
 
 		void unset();
-		void set(float timeout_duration_ms, stepped_timestamp);
-		bool passed(stepped_timestamp, delta) const;
-		bool lasts(stepped_timestamp, delta) const;
+		void set(const float timeout_duration_ms, const stepped_timestamp);
+		bool passed(const stepped_timestamp, const delta) const;
+		bool lasts(const stepped_timestamp, const delta) const;
 	};
 
 	struct stepped_cooldown {
 		stepped_timestamp when_last_fired;
-
-		int ready_to_fire = true;
-		float cooldown_duration_ms = 1000.f;
+		float cooldown_duration_ms;
 
 		template <class Archive>
 		void serialize(Archive& ar) {
@@ -59,10 +57,10 @@ namespace augs {
 			);
 		}
 
-		stepped_cooldown(float cooldown_duration_ms);
+		stepped_cooldown(const float cooldown_duration_ms = 1000.f);
 
-		bool is_ready(stepped_timestamp, delta t) const;
-		bool try_to_fire_and_reset(stepped_timestamp, delta t);
+		bool is_ready(const stepped_timestamp, const delta t) const;
+		bool try_to_fire_and_reset(const stepped_timestamp, const delta t);
 	};
 
 }

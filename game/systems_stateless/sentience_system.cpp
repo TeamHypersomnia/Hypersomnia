@@ -50,6 +50,12 @@ components::sentience::meter::damage_result components::sentience::meter::calcul
 	return result;
 }
 
+void sentience_system::cast_spells(const logic_step step) const {
+	for (const auto& cast : step.entropy.cast_spells) {
+
+	}
+}
+
 void sentience_system::consume_health_event(messages::health_event h, const logic_step step) const {
 	auto& cosmos = step.cosm;
 	const auto subject = cosmos[h.subject];

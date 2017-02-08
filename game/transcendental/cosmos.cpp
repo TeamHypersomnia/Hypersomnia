@@ -376,6 +376,8 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	
 	performance.entropy_length.measure(step.entropy.length());
 
+	sentience_system().cast_spells(step);
+
 	input_system().make_intent_messages(step);
 
 	intent_contextualization_system().contextualize_crosshair_action_intents(step);
