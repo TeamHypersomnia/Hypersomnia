@@ -42,17 +42,24 @@ size_t basic_cosmic_entropy<key>::length() const {
 	}
 
 	total += transfer_requests.size();
+	total += cast_spells.size();
 
 	return total;
 }
 
 template <class key>
 basic_cosmic_entropy<key>& basic_cosmic_entropy<key>::operator+=(const basic_cosmic_entropy& b) {
-	for (const auto& new_entropy : b.intents_per_entity) {
-		concatenate(intents_per_entity[new_entropy.first], new_entropy.second);
+	for (const auto& intents : b.intents_per_entity) {
+		concatenate(intents_per_entity[intents.first], intents.second);
 	}
 
 	concatenate(transfer_requests, b.transfer_requests);
+
+	for (const auto& spell : b.cast_spells) {
+		if (cast_spells.find(spell.first) == cast_spells.end()) {
+			cast_spells[spell.first] = spell.second;
+		}
+	}
 
 	return *this;
 }
@@ -64,20 +71,11 @@ guid_mapped_entropy::guid_mapped_entropy(const cosmic_entropy& b, const cosmos& 
 }
 
 bool guid_mapped_entropy::operator!=(const guid_mapped_entropy& b) const {
-	if (intents_per_entity.size() != b.intents_per_entity.size())
-		return true;
-
-	for (const auto& entry : b.intents_per_entity) {
-		auto found = intents_per_entity.find(entry.first);
-	
-		if (found == intents_per_entity.end())
-			return true;
-	
-		if (entry.second != (*found).second)
-			return true;
-	}
-
-	return false;
+	return !(
+		compare_containers(intents_per_entity, b.intents_per_entity)
+		&& compare_containers(cast_spells, b.cast_spells)
+		&& compare_containers(transfer_requests, b.transfer_requests)
+	);
 }
 
 cosmic_entropy::cosmic_entropy(const guid_mapped_entropy& b, const cosmos& mapper) {

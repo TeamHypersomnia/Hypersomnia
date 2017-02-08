@@ -114,29 +114,27 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 			considered_damping = movement.standard_linear_damping;
 		}
 
-		if (is_sprint_effective) {
-			if (!is_inert) {
-				considered_damping /= 4;
-			}
-
-			movement_force_mult /= 2.f;
-
-			if (is_sentient) {
-				sentience->consciousness.value -= sentience->consciousness.calculate_damage_result(2 * delta.in_seconds()).effective;
-			}
-		}
-
-		if (movement.walking_enabled) {
-			movement_force_mult /= 2.f;
-		}
-
-		if (is_inert) {
-			movement_force_mult /= 10.f;
-		}
-
-		physics.set_linear_damping(considered_damping);
-
 		if (resultant.non_zero()) {
+			if (is_sprint_effective) {
+				if (!is_inert) {
+					considered_damping /= 4;
+				}
+
+				movement_force_mult /= 2.f;
+
+				if (is_sentient) {
+					sentience->consciousness.value -= sentience->consciousness.calculate_damage_result(2 * delta.in_seconds()).effective;
+				}
+			}
+
+			if (movement.walking_enabled) {
+				movement_force_mult /= 2.f;
+			}
+
+			if (is_inert) {
+				movement_force_mult /= 10.f;
+			}
+
 			if (is_sentient) {
 				sentience->time_of_last_exertion = cosmos.get_timestamp();
 			}
@@ -149,6 +147,8 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 
 			physics.apply_force(resultant * physics.get_mass(), movement.applied_force_offset, true);
 		}
+		
+		physics.set_linear_damping(considered_damping);
 
 		/* the player feels less like a physical projectile if we brake per-axis */
 		if (movement.enable_braking_damping && !(movement.make_inert_for_ms > 0.f)) {

@@ -3,6 +3,7 @@
 #include "game/detail/inventory_slot_handle.h"
 #include "augs/padding_byte.h"
 #include "augs/templates/maybe_const.h"
+#include "augs/templates/memcpy_safety.h"
 
 struct item_slot_transfer_request_data {
 	entity_id item;
@@ -22,6 +23,10 @@ struct item_slot_transfer_request_data {
 		target_slot(target_slot), 
 		specified_quantity(specified_quantity), 
 		force_immediate_mount(force_immediate_mount) {
+	}
+
+	bool operator==(const item_slot_transfer_request_data& b) const {
+		return trivial_compare(*this, b);
 	}
 };
 

@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <vector>
 #include <set>
+#include <map>
 
 template< typename ContainerT, typename PredicateT >
 void erase_if(ContainerT& items, const PredicateT& predicate) {
@@ -62,6 +63,27 @@ bool compare_containers(const std::vector<A>& a, const std::vector<B>& b) {
 
 	for (size_t i = 0; i < a.size(); ++i) {
 		if (!(a[i] == b[i])) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+template<class A, class B, class C, class D>
+bool compare_containers(const std::map<A, B>& a, const std::map<C, D>& b) {
+	if (a.size() != b.size()) {
+		return false;
+	}
+
+	for (const auto& b_element : b) {
+		const auto a_element = a.find(b_element.first);
+
+		if (a_element == a.end()) {
+			return false;
+		}
+
+		if (!(b_element.second == (*a_element).second)) {
 			return false;
 		}
 	}

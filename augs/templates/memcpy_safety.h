@@ -55,3 +55,9 @@ struct are_types_memcpy_safe<Head, Tail...> {
 		&&
 		are_types_memcpy_safe<Tail...>::value;
 };
+
+template <class A>
+bool trivial_compare(const A& a, const A& b) {
+	static_assert(is_memcpy_safe<A>::value, "Type can't be trivially compared!");
+	return !std::memcmp(&a, &b, sizeof(A));
+}

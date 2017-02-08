@@ -67,25 +67,49 @@ struct cosmic_entropy : basic_cosmic_entropy<entity_id> {
 namespace augs {
 	template<class A, class K>
 	auto read_object(A& ar, basic_cosmic_entropy<K>& storage) {
-		unsigned char num_entropied_entities;
+		{
+			unsigned char num_entropied_entities = 0;
 
-		if (!augs::read_object(ar, num_entropied_entities)) {
-			return false;
-		}
-		
-		while (num_entropied_entities--) {
-			K guid;
+			if (!augs::read_object(ar, num_entropied_entities)) {
+				return false;
+			}
 			
-			if (!augs::read_object(ar, guid)) {
+			while (num_entropied_entities--) {
+				K guid;
+				
+				if (!augs::read_object(ar, guid)) {
+					return false;
+				}
+
+				auto& new_entity_entropy = storage.intents_per_entity[guid];
+
+				ensure(new_entity_entropy.empty());
+
+				if (!augs::read_vector_of_objects(ar, new_entity_entropy, unsigned short())) {
+					return false;
+				}
+			}
+		}
+
+		{
+			unsigned char num_cast_spells = 0;
+
+			if (!augs::read_object(ar, num_cast_spells)) {
 				return false;
 			}
 
-			auto& new_entity_entropy = storage.intents_per_entity[guid];
+			while (num_cast_spells--) {
+				K guid;
 
-			ensure(new_entity_entropy.empty());
+				if (!augs::read_object(ar, guid)) {
+					return false;
+				}
 
-			if (!augs::read_vector_of_objects(ar, new_entity_entropy, unsigned short())) {
-				return false;
+				auto& new_spell = storage.cast_spells[guid];
+
+				if (!augs::read_object(ar, new_spell)) {
+					return false;
+				}
 			}
 		}
 
@@ -100,12 +124,24 @@ namespace augs {
 	void write_object(A& ar, const basic_cosmic_entropy<K>& storage) {
 		ensure(storage.intents_per_entity.size() < std::numeric_limits<unsigned char>::max());
 
-		const auto num_entropied_entities = static_cast<unsigned char>(storage.intents_per_entity.size());
-		augs::write_object(ar, num_entropied_entities);
+		{
+			const auto num_entropied_entities = static_cast<unsigned char>(storage.intents_per_entity.size());
+			augs::write_object(ar, num_entropied_entities);
 
-		for (const auto& per_entity : storage.intents_per_entity) {
-			augs::write_object(ar, per_entity.first);
-			augs::write_vector_of_objects(ar, per_entity.second, unsigned short());
+			for (const auto& per_entity : storage.intents_per_entity) {
+				augs::write_object(ar, per_entity.first);
+				augs::write_vector_of_objects(ar, per_entity.second, unsigned short());
+			}
+		}
+
+		{
+			const auto num_cast_spells = static_cast<unsigned char>(storage.cast_spells.size());
+			augs::write_object(ar, num_cast_spells);
+
+			for (const auto& per_entity : storage.cast_spells) {
+				augs::write_object(ar, per_entity.first);
+				augs::write_object(ar, per_entity.second);
+			}
 		}
 
 		augs::write_vector_of_objects(ar, storage.transfer_requests, unsigned short());
