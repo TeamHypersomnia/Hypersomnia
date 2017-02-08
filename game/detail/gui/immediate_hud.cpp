@@ -280,14 +280,14 @@ void immediate_hud::acquire_game_events(const const_logic_step step) {
 		new_highlight.time_of_occurence = cosmos.get_total_time_passed_in_seconds();
 		
 		new_highlight.target = h.subject;
-		new_highlight.starting_alpha_ratio = std::min(1.f, h.ratio_effective_to_maximum * 5);
+		new_highlight.starting_alpha_ratio = 1.f;// std::min(1.f, h.ratio_effective_to_maximum * 5);
 		
 		if (cosmos[h.spawned_remnants].alive()) {
 			new_highlight.target = h.spawned_remnants;
-			new_highlight.starting_alpha_ratio = 0.7f;
+			new_highlight.starting_alpha_ratio = 1.f;
 		}
 
-		new_highlight.maximum_duration_seconds = 0.3;
+		new_highlight.maximum_duration_seconds = 0.25;
 		new_highlight.color = col;
 
 		erase_remove(recent_pure_color_highlights, [&new_highlight, &cosmos](const pure_color_highlight& existing_highlight) { 
@@ -331,8 +331,9 @@ void immediate_hud::draw_pure_color_highlights(const viewing_step step) const {
 	for (const auto& r : recent_pure_color_highlights) {
 		const auto& subject = cosmos[r.target];
 
-		if (subject.dead() || !subject.has<components::sprite>())
+		if (subject.dead() || !subject.has<components::sprite>()) {
 			continue;
+		}
 
 		auto sprite = subject.get<components::sprite>();
 		auto& col = sprite.color;
@@ -340,9 +341,9 @@ void immediate_hud::draw_pure_color_highlights(const viewing_step step) const {
 		col = r.color;
 
 		auto passed = current_time - r.time_of_occurence;
-		auto ratio = passed / r.maximum_duration_seconds;
+		auto ratio = std::max(0.f, 1.f - static_cast<float>(passed / r.maximum_duration_seconds));
 
-		col.a = static_cast<rgba_channel>(255 * (1-ratio) * r.starting_alpha_ratio);
+		col.a = static_cast<rgba_channel>(255.f * ratio * ratio * r.starting_alpha_ratio);
 		render_system().draw_renderable(triangles, current_time, sprite, subject.viewing_transform(interp, true), subject.get<components::render>(), step.camera, renderable_drawing_type::NORMAL);
 		col = prevcol;
 	}
