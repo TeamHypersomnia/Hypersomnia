@@ -198,8 +198,17 @@ void gui_element_system::handle_hotbar_and_action_button_presses(
 				}
 			}
 		}
-		else if (special_action_index > -1 && i.is_pressed) {
-			spell_requests[subject] = gui.action_buttons[special_action_index].bound_spell;
+		else if (special_action_index > -1) {
+			auto& action_b = gui.action_buttons[special_action_index];
+			action_b.detector.update_appearance(i.is_pressed ? gui_event::ldown : gui_event::lup);
+
+			if (i.is_pressed) {
+				const auto bound_spell = action_b.bound_spell;
+
+				if (bound_spell != spell_type::COUNT) {
+					spell_requests[subject] = bound_spell;
+				}
+			}
 		}
 		else if (i.intent == intent_type::PREVIOUS_HOTBAR_SELECTION_SETUP && i.is_pressed) {
 			const auto wielding = gui.make_previous_hotbar_selection_setup(subject);

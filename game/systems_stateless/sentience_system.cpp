@@ -53,6 +53,8 @@ components::sentience::meter::damage_result components::sentience::meter::calcul
 static spell_data get_spell_data(const spell_type spell) {
 	switch (spell) {
 	case spell_type::HASTE: return { 60, 5000 };
+	case spell_type::FURY_OF_THE_AEONS: return { 100, 2000 };
+	case spell_type::ELECTRIC_TRIAD: return { 120, 3000 };
 	case spell_type::ULTIMATE_WRATH_OF_THE_AEONS: return { 260, 2000 };
 	default: LOG("Unknown spell: %x", static_cast<int>(spell)); return {};
 	}

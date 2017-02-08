@@ -28,24 +28,25 @@ void action_button::draw(
 		const auto bound_spell = this_id->bound_spell;
 
 		if (bound_spell != spell_type::COUNT && sentience.spells.find(bound_spell) != sentience.spells.end()) {
-			rgba inside_col, border_col;
+			rgba inside_col;
 
 			inside_col = cyan;
 
-			border_col = gray4;
 			inside_col.a = 220;
-			border_col.a = 220;
 
-			if (this_id->detector.is_hovered || this_id->detector.current_appearance == augs::gui::appearance_detector::appearance::pushed) {
+			const bool is_pushed = this_id->detector.current_appearance == augs::gui::appearance_detector::appearance::pushed;
+
+			if (this_id->detector.is_hovered) {
 				inside_col.a = 255;
-				border_col.a = 255;
 			}
 
 			assets::texture_id inside_tex = assets::texture_id::INVALID;
 			assets::texture_id border_tex = assets::texture_id::SPELL_BORDER;
 			
-			const rgba blue_spell_border = { 0, 68, 179, 255 };
+			const rgba blue_spell_border = { 0, 128, 209, 255 };
 			const rgba green_spell_color = { 0, 200, 0, 255 };
+
+			rgba border_col;
 
 			switch (bound_spell) {
 			case spell_type::HASTE: 
@@ -70,7 +71,7 @@ void action_button::draw(
 
 			default: break;
 			}
-
+			
 			if (inside_tex != assets::texture_id::INVALID) {
 				ensure(border_tex != assets::texture_id::INVALID);
 
@@ -98,7 +99,15 @@ void action_button::draw(
 				if (is_still_cooled_down) {
 					border_col.a -= 150;
 				}
-				
+
+				if (this_id->detector.is_hovered) {
+					border_col = rgba(180, 180, 180, 255);
+				}
+
+				if (is_pushed) {
+					border_col = rgba(220, 220, 220, 255);
+				}
+
 				const augs::gui::material border_mat(border_tex, border_col);
 
 				draw_centered_texture(context, this_id, info, border_mat);
@@ -185,9 +194,6 @@ void action_button::respond_to_events(
 	const gui_entropy& entropies
 ) {
 	base::respond_to_events(context, this_id, entropies);
-
-	const auto& rect_world = context.get_rect_world();
-	auto& gui = context.get_character_gui();
 
 	for (const auto& info : entropies.get_events_for(this_id)) {
 		this_id->detector.update_appearance(info);
