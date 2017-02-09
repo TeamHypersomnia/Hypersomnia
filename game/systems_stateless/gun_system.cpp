@@ -250,12 +250,12 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 			gun.current_heat = std::max(0.f, gun.current_heat - delta.in_seconds()/gun.maximum_heat);
 		}
 
-		const auto sound_entity = cosmos[gun.firing_engine];
-		const bool sound_enabled = gun.current_heat > 0.20f && sound_entity.alive();
+		const auto firing_engine_sound = cosmos[gun.firing_engine_sound];
+		const bool sound_enabled = gun.current_heat > 0.20f && firing_engine_sound.alive();
 		const float pitch = gun.current_heat / gun.maximum_heat;
 
-		if (sound_entity.alive() && sound_entity.has<components::sound_existence>()) {
-			auto& existence = sound_entity.get<components::sound_existence>();
+		if (firing_engine_sound.alive() && firing_engine_sound.has<components::sound_existence>()) {
+			auto& existence = firing_engine_sound.get<components::sound_existence>();
 
 			if (sound_enabled) {
 				existence.input.direct_listener = owning_capability;
@@ -265,10 +265,21 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				existence.input.modifier.pitch = pow(existence.input.modifier.pitch, 2) * gun.engine_sound_strength;
 				existence.input.modifier.gain = pow(existence.input.modifier.gain, 2)* gun.engine_sound_strength;
 
-				components::sound_existence::activate(sound_entity);
+				components::sound_existence::activate(firing_engine_sound);
 			}
 			else {
-				components::sound_existence::deactivate(sound_entity);
+				components::sound_existence::deactivate(firing_engine_sound);
+			}
+		}
+		
+		const auto muzzle_particles = cosmos[gun.muzzle_particles];
+
+		if (muzzle_particles.alive() && muzzle_particles.has<components::particles_existence>()) {
+			if (pitch > 0.2f && !components::particles_existence::is_activated(muzzle_particles)) {
+				components::particles_existence::activate(muzzle_particles);
+			}
+			else if (pitch < 0.1f && components::particles_existence::is_activated(muzzle_particles)) {
+				components::particles_existence::deactivate(muzzle_particles);
 			}
 		}
 	}

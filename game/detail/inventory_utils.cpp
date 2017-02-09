@@ -439,8 +439,6 @@ void perform_transfer(const item_slot_transfer_request r, const logic_step step)
 	//	return;
 	//}
 	
-	components::transform previous_container_transform;
-
 	entity_id target_item_to_stack_with;
 
 	if (is_pickup_or_transfer) {
@@ -452,6 +450,8 @@ void perform_transfer(const item_slot_transfer_request r, const logic_step step)
 	}
 
 	const bool whole_item_grabbed = item.charges == result.transferred_charges;
+
+	components::transform previous_container_transform;
 
 	if (previous_slot.alive()) {
 		previous_container_transform = previous_slot.get_container().logic_transform();

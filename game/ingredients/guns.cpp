@@ -9,7 +9,10 @@
 #include "game/components/sound_existence_component.h"
 #include "game/components/particle_effect_response_component.h"
 
+#include "game/messages/create_particle_effect.h"
+
 #include "game/systems_stateless/sound_existence_system.h"
+#include "game/systems_stateless/particles_existence_system.h"
 
 #include "game/enums/filters.h"
 #include "game/enums/item_category.h"
@@ -21,6 +24,28 @@
 
 #include "ingredients.h"
 #include "game/detail/inventory_utils.h"
+
+void add_muzzle_particles(
+	const entity_handle weapon, 
+	components::gun& gun, 
+	cosmos& cosmos
+) {
+	messages::create_particle_effect effect;
+	effect.place_of_birth = gun.calculate_muzzle_position(weapon.logic_transform());
+
+	effect.input.effect = assets::particle_effect_id::MUZZLE_SMOKE;
+	effect.subject = weapon;
+	effect.input.delete_entity_after_effect_lifetime = false;
+
+	const auto engine = particles_existence_system().create_particle_effect_entity(cosmos, effect);
+
+	engine.add_standard_components();
+	weapon.add_sub_entity(engine);
+
+	components::particles_existence::deactivate(engine);
+
+	gun.muzzle_particles = engine;
+}
 
 namespace ingredients {
 	void default_gun_container(entity_handle e, const float mag_rotation) {
@@ -400,13 +425,15 @@ namespace prefabs {
 			const auto engine_sound = sound_existence_system().create_sound_effect_entity(cosmos, in, gun.calculate_muzzle_position(weapon.logic_transform()), weapon);
 			engine_sound.add_standard_components();
 			weapon.add_sub_entity(engine_sound);
-			gun.firing_engine = engine_sound;
+			gun.firing_engine_sound = engine_sound;
 			components::sound_existence::deactivate(engine_sound);
 
 			gun.maximum_heat = 2.1f;
 			gun.gunshot_adds_heat = 0.052f;
 			gun.engine_sound_strength = 0.5f;
 		}
+		
+		add_muzzle_particles(weapon, gun, cosmos);
 
 		weapon.add_standard_components();
 
@@ -495,13 +522,16 @@ namespace prefabs {
 			const auto engine_sound = sound_existence_system().create_sound_effect_entity(cosmos, in, gun.calculate_muzzle_position(weapon.logic_transform()), weapon);
 			engine_sound.add_standard_components();
 			weapon.add_sub_entity(engine_sound);
-			gun.firing_engine = engine_sound;
+			gun.firing_engine_sound = engine_sound;
 			components::sound_existence::deactivate(engine_sound);
 
 			gun.maximum_heat = 2.1f;
 			gun.gunshot_adds_heat = 0.055f;
 			gun.engine_sound_strength = 0.5f;
 		}
+
+		add_muzzle_particles(weapon, gun, cosmos);
+
 		weapon.add_standard_components();
 
 		if (load_mag.alive()) {
@@ -555,11 +585,11 @@ namespace prefabs {
 			const auto engine_sound = sound_existence_system().create_sound_effect_entity(cosmos, in, gun.calculate_muzzle_position(weapon.logic_transform()), weapon);
 			engine_sound.add_standard_components();
 			weapon.add_sub_entity(engine_sound);
-			gun.firing_engine = engine_sound;
+			gun.firing_engine_sound = engine_sound;
 			components::sound_existence::deactivate(engine_sound);
 
 			gun.maximum_heat = 2.1f;
-			gun.gunshot_adds_heat = 0.025f;
+			gun.gunshot_adds_heat = 0.030f;
 			gun.engine_sound_strength = 0.5f;
 		}
 
@@ -593,7 +623,9 @@ namespace prefabs {
 		};
 
 		gun.recoil.scale = 30.0f/2;
-		
+	
+		add_muzzle_particles(weapon, gun, cosmos);
+
 		weapon.add_standard_components();
 
 		if (load_mag.alive()) {
@@ -756,6 +788,8 @@ namespace prefabs {
 
 		gun.recoil.scale = 30.0f/2;
 		
+		add_muzzle_particles(weapon, gun, cosmos);
+
 		weapon.add_standard_components();
 
 		if (load_mag.alive()) {
@@ -834,6 +868,24 @@ namespace prefabs {
 		};
 
 		gun.recoil.scale = 30.0f / 2;
+
+		{
+			components::sound_existence::effect_input in;
+			in.effect = assets::sound_buffer_id::FIREARM_ENGINE;
+			in.modifier.repetitions = -1;
+			in.delete_entity_after_effect_lifetime = false;
+			const auto engine_sound = sound_existence_system().create_sound_effect_entity(cosmos, in, gun.calculate_muzzle_position(weapon.logic_transform()), weapon);
+			engine_sound.add_standard_components();
+			weapon.add_sub_entity(engine_sound);
+			gun.firing_engine_sound = engine_sound;
+			components::sound_existence::deactivate(engine_sound);
+
+			gun.maximum_heat = 2.1f;
+			gun.gunshot_adds_heat = 0.042f;
+			gun.engine_sound_strength = 0.5f;
+		}
+
+		add_muzzle_particles(weapon, gun, cosmos);
 
 		weapon.add_standard_components();
 

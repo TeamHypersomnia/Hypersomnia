@@ -57,18 +57,21 @@ namespace components {
 		float maximum_heat = 1.f;
 		float engine_sound_strength = 1.f;
 
-		entity_id firing_engine;
+		entity_id firing_engine_sound;
+		entity_id muzzle_particles;
 
 		template<class F>
 		void for_each_held_id(F f) {
 			f(magic_missile_definition);
-			f(firing_engine);
+			f(firing_engine_sound);
+			f(muzzle_particles);
 		}
 
 		template<class F>
 		void for_each_held_id(F f) const {
 			f(magic_missile_definition);
-			f(firing_engine);
+			f(firing_engine_sound);
+			f(muzzle_particles);
 		}
 
 		template <class Archive>
