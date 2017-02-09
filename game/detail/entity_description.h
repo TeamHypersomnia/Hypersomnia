@@ -9,6 +9,7 @@
 #include "game/enums/item_category.h"
 #include "game/enums/sentience_meter_type.h"
 #include "game/enums/perk_meter_type.h"
+#include "game/enums/spell_type.h"
 
 struct textual_description {
 	std::wstring name;
@@ -33,4 +34,9 @@ std::wstring describe_sentience_meter(
 std::wstring describe_perk_meter(
 	const const_entity_handle,
 	const perk_meter_type
+);
+
+std::wstring describe_spell(
+	const const_entity_handle,
+	const spell_type
 );

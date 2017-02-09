@@ -50,16 +50,6 @@ components::sentience::meter::damage_result components::sentience::meter::calcul
 	return result;
 }
 
-static spell_data get_spell_data(const spell_type spell) {
-	switch (spell) {
-	case spell_type::HASTE: return { 60, 5000 };
-	case spell_type::FURY_OF_THE_AEONS: return { 100, 2000 };
-	case spell_type::ELECTRIC_TRIAD: return { 120, 3000 };
-	case spell_type::ULTIMATE_WRATH_OF_THE_AEONS: return { 260, 2000 };
-	default: LOG("Unknown spell: %x", static_cast<int>(spell)); return {};
-	}
-}
-
 void sentience_system::cast_spells(const logic_step step) const {
 	auto& cosmos = step.cosm;
 	const auto now = cosmos.get_timestamp();
@@ -91,7 +81,7 @@ void sentience_system::cast_spells(const logic_step step) const {
 				
 				sentience.personal_electricity.value -= spell_data.personal_electricity_required;
 				
-				spell_instance_data.cast_cooldown.set(spell_data.cooldown_ms, now);
+				spell_instance_data.cast_cooldown.set(static_cast<float>(spell_data.cooldown_ms), now);
 				sentience.all_spells_cast_cooldown.set(2000, now);
 			}
 		}

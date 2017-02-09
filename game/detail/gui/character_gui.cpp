@@ -473,6 +473,7 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 	const auto maybe_hovered_hotbar_button = context._dynamic_cast<hotbar_button_in_character_gui>(rect_world.rect_hovered);
 	const auto maybe_hovered_sentience_meter = context._dynamic_cast<sentience_meter_in_character_gui>(rect_world.rect_hovered);
 	const auto maybe_hovered_perk_meter = context._dynamic_cast<perk_meter_in_character_gui>(rect_world.rect_hovered);
+	const auto maybe_hovered_action_button = context._dynamic_cast<action_button_in_character_gui>(rect_world.rect_hovered);
 
 	gui::text::fstr tooltip_text;
 
@@ -483,6 +484,19 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 	}
 	else if (maybe_hovered_slot) {
 		tooltip_text = text::simple_bbcode(describe_slot(cosmos[maybe_hovered_slot.get_location().slot_id]), text::style());
+	}
+	else if (maybe_hovered_action_button) {
+		const auto bound_spell = maybe_hovered_action_button->bound_spell;
+
+		if (bound_spell != spell_type::COUNT) {
+			tooltip_text = text::simple_bbcode(
+				describe_spell(
+					gui_entity,
+					bound_spell
+				),
+				description_style
+			);
+		}
 	}
 	else if (maybe_hovered_sentience_meter) {
 		tooltip_text = text::simple_bbcode(

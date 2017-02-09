@@ -380,6 +380,7 @@
     <ClCompile Include="game\detail\gui\sentience_meter.cpp" />
     <ClCompile Include="game\detail\gui\slot_button.cpp" />
     <ClCompile Include="game\detail\gui\perk_meter.cpp" />
+    <ClCompile Include="game\detail\spell_data.cpp" />
     <ClCompile Include="game\detail\visible_entities.cpp" />
     <ClCompile Include="game\detail\wielding_result.cpp" />
     <ClCompile Include="game\detail\world_camera.cpp" />
