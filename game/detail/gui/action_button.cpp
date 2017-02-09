@@ -28,9 +28,7 @@ void action_button::draw(
 		const auto bound_spell = this_id->bound_spell;
 
 		if (bound_spell != spell_type::COUNT && sentience.spells.find(bound_spell) != sentience.spells.end()) {
-			rgba inside_col;
-
-			inside_col = cyan;
+			rgba inside_col = white;
 
 			inside_col.a = 220;
 
@@ -43,6 +41,7 @@ void action_button::draw(
 			assets::texture_id inside_tex = assets::texture_id::INVALID;
 			assets::texture_id border_tex = assets::texture_id::SPELL_BORDER;
 			
+			const rgba turqoise_spell_color = turquoise;
 			const rgba blue_spell_border = { 0, 128, 209, 255 };
 			const rgba green_spell_color = { 0, 200, 0, 255 };
 
@@ -64,9 +63,14 @@ void action_button::draw(
 				border_col = blue_spell_border;
 				break;
 
-			case spell_type::ULTIMATE_WRATH_OF_THE_AEONS: 
-				inside_tex = assets::texture_id::SPELL_ULTIMATE_WRATH_OF_THE_AEONS_ICON; 
+			case spell_type::ULTIMATE_WRATH_OF_THE_AEONS:
+				inside_tex = assets::texture_id::SPELL_ULTIMATE_WRATH_OF_THE_AEONS_ICON;
 				border_col = blue_spell_border;
+				break;
+
+			case spell_type::ELECTRIC_SHIELD:
+				inside_tex = assets::texture_id::SPELL_ELECTRIC_SHIELD_ICON;
+				border_col = turqoise_spell_color;
 				break;
 
 			default: break;

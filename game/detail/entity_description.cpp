@@ -171,7 +171,7 @@ std::wstring describe_perk_meter(
 	}
 
 	if (type == perk_meter_type::ELECTRIC_SHIELD) {
-		return typesafe_sprintf(L"[color=green]Electric shield[/color]\n[color=vsdarkgray]Damage is absorbed by Personal Electricity\nrather than Health.[/color]");
+		return typesafe_sprintf(L"[color=turquoise]Electric shield[/color]\n[color=vsdarkgray]Damage is absorbed by [/color][color=cyan]Personal Electricity[/color][color=vsdarkgray] instead of [/color][color=red]Health[/color][color=vsdarkgray].[/color]");
 	}
 
 	else return L"Unknown problem";
@@ -201,6 +201,10 @@ std::wstring describe_spell(
 
 	if (type == spell_type::ELECTRIC_TRIAD) {
 		return typesafe_sprintf(L"[color=cyan]Electric Triad[/color]\n%x\n[color=vsdarkgray]Spawns three electric missiles\nhoming towards hostile entities.[/color]", properties);
+	}
+
+	if (type == spell_type::ELECTRIC_SHIELD) {
+		return typesafe_sprintf(L"[color=turquoise]Electric Shield[/color]\n%x\n[color=vsdarkgray]For 60 seconds, damage is absorbed\nby [/color][color=cyan]Personal Electricity[/color][color=vsdarkgray] instead of [/color][color=red]Health[/color][color=vsdarkgray].[/color]", properties);
 	}
 
 	else return L"Unknown problem";

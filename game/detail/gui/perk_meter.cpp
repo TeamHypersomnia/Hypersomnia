@@ -191,7 +191,7 @@ void perk_meter::respond_to_events(
 augs::gui::material perk_meter::get_icon_mat(const const_this_pointer this_id) const {
 	switch (this_id.get_location().type) {
 	case perk_meter_type::HASTE: return{ assets::texture_id::PERK_HASTE_ICON, white };
-	case perk_meter_type::ELECTRIC_SHIELD: return{ assets::texture_id::PERK_HASTE_ICON, white };
+	case perk_meter_type::ELECTRIC_SHIELD: return{ assets::texture_id::PERK_ELECTRIC_SHIELD_ICON, white };
 	default: ensure(false);  return{};
 	}
 }
@@ -199,7 +199,7 @@ augs::gui::material perk_meter::get_icon_mat(const const_this_pointer this_id) c
 augs::gui::material perk_meter::get_bar_mat(const const_this_pointer this_id) const {
 	switch (this_id.get_location().type) {
 	case perk_meter_type::HASTE: return{ assets::texture_id::BLANK, green - rgba(30, 30, 30, 0) };
-	case perk_meter_type::ELECTRIC_SHIELD: return{ assets::texture_id::BLANK, vsblue - rgba(30, 30, 30, 0) };
+	case perk_meter_type::ELECTRIC_SHIELD: return{ assets::texture_id::BLANK, turquoise - rgba(30, 30, 30, 0) };
 	default: ensure(false);  return{};
 	}
 }

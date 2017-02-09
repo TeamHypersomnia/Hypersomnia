@@ -241,6 +241,7 @@ namespace scene_managers {
 			sentience.spells[spell_type::ELECTRIC_TRIAD] = spell_instance_data();
 			sentience.spells[spell_type::FURY_OF_THE_AEONS] = spell_instance_data();
 			sentience.spells[spell_type::ULTIMATE_WRATH_OF_THE_AEONS] = spell_instance_data();
+			sentience.spells[spell_type::ELECTRIC_SHIELD] = spell_instance_data();
 		}
 
 		{

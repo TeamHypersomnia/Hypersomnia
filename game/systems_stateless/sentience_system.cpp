@@ -76,6 +76,7 @@ void sentience_system::cast_spells(const logic_step step) const {
 			if (can_cast_already) {
 				switch (spell) {
 				case spell_type::HASTE: sentience.haste.set_for_duration(22000, now); break;
+				case spell_type::ELECTRIC_SHIELD: sentience.electric_shield.set_for_duration(60000, now); break;
 				default: LOG("Unknown spell: %x", static_cast<int>(spell)); break;
 				}
 				

@@ -90,6 +90,7 @@ character_gui& gui_element_system::get_character_gui(const entity_id id) {
 		new_gui.action_buttons[1].bound_spell = spell_type::FURY_OF_THE_AEONS;
 		new_gui.action_buttons[2].bound_spell = spell_type::ULTIMATE_WRATH_OF_THE_AEONS;
 		new_gui.action_buttons[3].bound_spell = spell_type::ELECTRIC_TRIAD;
+		new_gui.action_buttons[4].bound_spell = spell_type::ELECTRIC_SHIELD;
 		
 		return new_gui;
 	}

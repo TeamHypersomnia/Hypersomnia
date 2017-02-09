@@ -158,6 +158,9 @@ namespace augs {
 					if (argument == L"orange") {
 						newstyle.color = orange;
 					}
+					if (argument == L"turquoise") {
+						newstyle.color = turquoise;
+					}
 
 					for (size_t i = opening_bracket_of_first; i < closing_bracket_of_first+1; ++i) {
 						to_skip[i] = 1;

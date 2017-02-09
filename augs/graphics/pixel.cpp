@@ -233,3 +233,5 @@ const rgba vsblue(86, 156, 214, 255);
 const rgba vsyellow(181, 206, 168, 255);
 const rgba vslightgray(220, 220, 220, 255);
 const rgba vsdarkgray(127, 127, 127, 255);
+
+const rgba turquoise(0, 146, 222, 255);

@@ -76,3 +76,5 @@ extern const rgba vsdarkgreen;
 extern const rgba vsyellow;
 extern const rgba vslightgray;
 extern const rgba vsdarkgray;
+
+extern const rgba turquoise;
