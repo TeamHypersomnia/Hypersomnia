@@ -129,7 +129,7 @@ void sound_existence_system::game_responses_to_sound_effects(const logic_step st
 						in.effect = assets::sound_buffer_id::LOW_AMMO_CUE;
 
 						if (ammo_info.total_charges == cued_count - 1) {
-							in.modifier.gain = 0.6;
+							in.modifier.gain = 0.65;
 						}
 
 						in.direct_listener = subject.get_owning_transfer_capability();

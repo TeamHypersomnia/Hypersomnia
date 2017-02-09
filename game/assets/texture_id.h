@@ -191,6 +191,7 @@ namespace assets {
 		SPELL_BORDER,
 
 		PERK_HASTE_ICON,
+		PERK_ELECTRIC_SHIELD_ICON,
 
 		COUNT,
 	};

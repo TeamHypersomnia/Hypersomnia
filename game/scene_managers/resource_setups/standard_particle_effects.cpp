@@ -138,29 +138,71 @@ namespace resource_setups {
 		{
 			auto& effect = get_resource_manager().create(assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION);
 
-			resources::emission em;
-			em.spread_degrees = std::make_pair(100, 130);
-			em.num_of_particles_to_spawn_initially = std::make_pair(30, 120);
-			em.base_velocity = std::make_pair(250+200, 800+200);
-			em.angular_velocity = std::make_pair(0, 0);
-			em.particle_lifetime_ms = std::make_pair(30, 50);
+			{
+				resources::emission em;
+				em.min_swing_spread.set(0.5, 1);
+				em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+				em.max_swing_spread.set(10 / 2, 10 / 2);
+				em.max_swings_per_sec.set(0.3 / 2, 0.5 / 2);
 
-			for (int i = 0; i < 5; ++i) {
-				resources::particle particle_template;
+				em.swing_spread.set(0, 0);
+				em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
+				em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
 
-				particle_template.angular_damping = 0;
-				particle_template.linear_damping = 5000;
-				particle_template.face.set(assets::texture_id(int(assets::texture_id::PIXEL_THUNDER_FIRST) + i), rgba(255, 255, 255, 255));
-				particle_template.alpha_levels = 1;
+				em.spread_degrees = std::make_pair(360, 360);
+				em.num_of_particles_to_spawn_initially.set(30, 45);
+				em.stream_duration_ms = std::make_pair(0, 0);
 
-				em.particle_templates.push_back(particle_template);
+				em.base_velocity = std::make_pair(150, 200);
+				em.base_velocity_variation = std::make_pair(100.f, 120.f);
+
+				em.angular_velocity = std::make_pair(2.5f*RAD_TO_DEGf, 2.8f*RAD_TO_DEGf);
+				em.particle_lifetime_ms = std::make_pair(900, 900);
+
+				for (int i = 0; i < 3; ++i) {
+					resources::particle particle_template;
+
+					particle_template.angular_damping = 0;
+					particle_template.linear_damping = 400;
+					particle_template.face.set(assets::texture_id(int(assets::texture_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 15));
+					particle_template.unshrinking_time_ms = 100.f;
+					particle_template.shrink_when_ms_remaining = 200.f;
+
+					em.particle_templates.push_back(particle_template);
+				}
+
+				em.size_multiplier = std::make_pair(0.25, 0.25);
+				em.particle_render_template.layer = render_layer::DIM_SMOKES;
+				em.initial_rotation_variation = 180;
+
+				effect.push_back(em);
 			}
 
-			em.size_multiplier = std::make_pair(0.5, 1);
-			em.particle_render_template.layer = render_layer::EFFECTS;
-			em.initial_rotation_variation = 0;
+			{
+				resources::emission em;
+				em.spread_degrees = std::make_pair(100, 130);
+				em.num_of_particles_to_spawn_initially = std::make_pair(30, 120);
+				em.base_velocity = std::make_pair(250+200, 800+200);
+				em.angular_velocity = std::make_pair(0, 0);
+				em.particle_lifetime_ms = std::make_pair(30, 50);
 
-			effect.push_back(em);
+				for (int i = 0; i < 5; ++i) {
+					resources::particle particle_template;
+
+					particle_template.angular_damping = 0;
+					particle_template.linear_damping = 5000;
+					particle_template.face.set(assets::texture_id(int(assets::texture_id::PIXEL_THUNDER_FIRST) + i), rgba(255, 255, 255, 255));
+					particle_template.alpha_levels = 1;
+
+					em.particle_templates.push_back(particle_template);
+				}
+
+				em.size_multiplier = std::make_pair(0.5, 1);
+				em.particle_render_template.layer = render_layer::EFFECTS;
+				em.initial_rotation_variation = 0;
+
+				effect.push_back(em);
+			}
 		}
 
 		{
