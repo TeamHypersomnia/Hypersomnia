@@ -73,6 +73,11 @@ namespace resource_setups {
 		}
 
 		{
+			auto& buf = get_resource_manager().create(assets::sound_buffer_id::FIREARM_ENGINE);
+			buf.from_file("hypersomnia/sfx/firearm_engine.wav");
+		}
+
+		{
 			auto& res = get_resource_manager().create(assets::sound_response_id::BILMER2000_RESPONSE);
 			augs::sound_effect_modifier mod;
 			mod.max_distance = 1920.f * 3.f;

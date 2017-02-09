@@ -27,6 +27,7 @@ namespace assets {
 		BUTTON_CLICK,
 
 		LOW_AMMO_CUE,
+		FIREARM_ENGINE,
 
 		COUNT
 	};

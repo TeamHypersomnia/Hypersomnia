@@ -6,7 +6,10 @@
 #include "game/components/name_component.h"
 #include "game/components/trace_component.h"
 #include "game/components/sound_response_component.h"
+#include "game/components/sound_existence_component.h"
 #include "game/components/particle_effect_response_component.h"
+
+#include "game/systems_stateless/sound_existence_system.h"
 
 #include "game/enums/filters.h"
 #include "game/enums/item_category.h"
@@ -389,6 +392,22 @@ namespace prefabs {
 			{ vec2().set_from_degrees(1.35f*3.0f) },
 		};
 
+		{
+			components::sound_existence::effect_input in;
+			in.effect = assets::sound_buffer_id::FIREARM_ENGINE;
+			in.modifier.repetitions = -1;
+			in.delete_entity_after_effect_lifetime = false;
+			const auto engine_sound = sound_existence_system().create_sound_effect_entity(cosmos, in, gun.calculate_muzzle_position(weapon.logic_transform()), weapon);
+			engine_sound.add_standard_components();
+			weapon.add_sub_entity(engine_sound);
+			gun.firing_engine = engine_sound;
+			components::sound_existence::deactivate(engine_sound);
+
+			gun.maximum_heat = 2.1f;
+			gun.gunshot_adds_heat = 0.052f;
+			gun.engine_sound_strength = 0.5f;
+		}
+
 		weapon.add_standard_components();
 
 		if (load_mag.alive()) {
@@ -468,6 +487,21 @@ namespace prefabs {
 			{ vec2().set_from_degrees(1.35f*3.0f) },
 		};
 
+		{
+			components::sound_existence::effect_input in;
+			in.effect = assets::sound_buffer_id::FIREARM_ENGINE;
+			in.modifier.repetitions = -1;
+			in.delete_entity_after_effect_lifetime = false;
+			const auto engine_sound = sound_existence_system().create_sound_effect_entity(cosmos, in, gun.calculate_muzzle_position(weapon.logic_transform()), weapon);
+			engine_sound.add_standard_components();
+			weapon.add_sub_entity(engine_sound);
+			gun.firing_engine = engine_sound;
+			components::sound_existence::deactivate(engine_sound);
+
+			gun.maximum_heat = 2.1f;
+			gun.gunshot_adds_heat = 0.055f;
+			gun.engine_sound_strength = 0.5f;
+		}
 		weapon.add_standard_components();
 
 		if (load_mag.alive()) {
@@ -512,6 +546,22 @@ namespace prefabs {
 		gun.damage_multiplier = 1.f;
 		
 		gun.recoil.repeat_last_n_offsets = 20;
+
+		{
+			components::sound_existence::effect_input in;
+			in.effect = assets::sound_buffer_id::FIREARM_ENGINE;
+			in.modifier.repetitions = -1;
+			in.delete_entity_after_effect_lifetime = false;
+			const auto engine_sound = sound_existence_system().create_sound_effect_entity(cosmos, in, gun.calculate_muzzle_position(weapon.logic_transform()), weapon);
+			engine_sound.add_standard_components();
+			weapon.add_sub_entity(engine_sound);
+			gun.firing_engine = engine_sound;
+			components::sound_existence::deactivate(engine_sound);
+
+			gun.maximum_heat = 2.1f;
+			gun.gunshot_adds_heat = 0.025f;
+			gun.engine_sound_strength = 0.5f;
+		}
 
 		gun.recoil.offsets = {
 			{ vec2().set_from_degrees(1.35f * 2.f) },
