@@ -415,18 +415,19 @@ augs::constant_size_vector<item_slot_transfer_request_data, 4> swap_slots_for_it
 void perform_transfer(const item_slot_transfer_request r, const logic_step step) {
 	auto& cosmos = r.get_item().get_cosmos();
 	auto& item = r.get_item().get<components::item>();
-	const auto previous_slot_id = item.current_slot;
-	const auto previous_slot = cosmos[previous_slot_id];
 
 	const auto result = query_transfer_result(r);
 
 	if (!is_successful(result.result)) {
-		LOG("Warning: an item slot transfer did was not successful.");
+		LOG("Warning: an item-slot transfer was not successful.");
 		return;
 	}
 
+	const auto previous_slot = cosmos[item.current_slot];
+	const auto target_slot = r.get_target_slot();
+
 	const bool is_pickup = result.result == item_transfer_result_type::SUCCESSFUL_PICKUP;
-	const bool is_pickup_or_transfer = result.result == item_transfer_result_type::SUCCESSFUL_TRANSFER || is_pickup;
+	const bool target_slot_exists = result.result == item_transfer_result_type::SUCCESSFUL_TRANSFER || is_pickup;
 	const bool is_drop_request = result.result == item_transfer_result_type::SUCCESSFUL_DROP;
 
 	//if (result.result == item_transfer_result_type::UNMOUNT_BEFOREHAND) {
@@ -441,10 +442,10 @@ void perform_transfer(const item_slot_transfer_request r, const logic_step step)
 	
 	entity_id target_item_to_stack_with;
 
-	if (is_pickup_or_transfer) {
-		for (auto& i : cosmos.get_handle(r.get_target_slot())->items_inside) {
-			if (can_stack_entities(r.get_item(), cosmos[i])) {
-				target_item_to_stack_with = i;
+	if (target_slot_exists) {
+		for (const auto potential_stack_target : target_slot.get_items_inside()) {
+			if (can_stack_entities(r.get_item(), potential_stack_target)) {
+				target_item_to_stack_with = potential_stack_target;
 			}
 		}
 	}
@@ -491,7 +492,7 @@ void perform_transfer(const item_slot_transfer_request r, const logic_step step)
 
 	const auto grabbed_item_part_handle = cosmos[grabbed_item_part];
 
-	if (is_pickup_or_transfer) {
+	if (target_slot_exists) {
 		add_item(r.get_target_slot(), grabbed_item_part_handle);
 	}
 
@@ -553,8 +554,8 @@ void perform_transfer(const item_slot_transfer_request r, const logic_step step)
 	
 	auto& grabbed_item = grabbed_item_part_handle.get<components::item>();
 
-	if (is_pickup_or_transfer) {
-		if (r.get_target_slot()->items_need_mounting) {
+	if (target_slot_exists) {
+		if (target_slot->items_need_mounting) {
 			grabbed_item.intended_mounting = components::item::MOUNTED;
 
 			if (r.force_immediate_mount) {

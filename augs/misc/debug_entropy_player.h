@@ -14,7 +14,7 @@ namespace augs {
 
 		player_state current_player_state = player_state::DISABLED;
 
-		std::unordered_map<unsigned, entropy_type> step_to_entropy_to_replay;
+		std::map<unsigned, entropy_type> step_to_entropy_to_replay;
 		unsigned player_step_position = 0u;
 
 		std::string live_saving_filename;

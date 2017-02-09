@@ -131,7 +131,9 @@ void character_gui::assign_item_to_hotbar_button(
 ) {
 	clear_hotbar_selection_for_item(element_entity, item);
 
-	ensure(item.get_owning_transfer_capability() == element_entity);
+	if (item.get_owning_transfer_capability() != element_entity) {
+		LOG("Warning! Assigned entity's owning capability is not the gui subject!");
+	}
 
 	hotbar_buttons[button_index].last_assigned_entity = item;
 }

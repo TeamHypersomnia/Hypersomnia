@@ -1,4 +1,5 @@
 #include "augs/misc/templated_readwrite.h"
+#include "game/transcendental/cosmic_entropy.h"
 #include "debug_entropy_player.h"
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
@@ -9,6 +10,10 @@ namespace augs {
 	template <class T>
 	void debug_entropy_player<T>::advance_player_and_biserialize(T& total_collected_entropy) {
 		if (is_replaying()) {
+			if (player_step_position > (*step_to_entropy_to_replay.rbegin()).first) {
+				current_player_state = player_state::DISABLED;
+			}
+
 			const auto& recording = step_to_entropy_to_replay;
 			const auto it = recording.find(player_step_position);
 

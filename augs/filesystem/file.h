@@ -44,13 +44,13 @@ namespace augs {
 		file.read(target.data(), size);
 	}
 
-	template <class Key, class Value>
-	void read_map_until_eof(const std::string& filename, std::unordered_map<Key, Value>& into) {
+	template <class ContainerType>
+	void read_map_until_eof(const std::string& filename, ContainerType& into) {
 		std::ifstream source(filename, std::ios::in | std::ios::binary);
 
 		while (source.peek() != EOF) {
-			Key key;
-			Value value;
+			typename ContainerType::key_type key;
+			typename ContainerType::mapped_type value;
 
 			augs::read_object(source, key);
 			augs::read_object(source, value);

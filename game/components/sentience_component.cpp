@@ -8,7 +8,7 @@ namespace components {
 	}
 
 	bool sentience::meter::is_enabled() const {
-
+		return enabled;
 	}
 
 	float sentience::meter::get_maximum_value() const {
