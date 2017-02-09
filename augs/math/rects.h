@@ -55,7 +55,7 @@ namespace augs {
 				*this = ltrb(l, t, r, b);
 			}
 
-			void set_position(const vec2t<T> v) {
+			ltrb& set_position(const vec2t<T> v) {
 				const auto old_w = w();
 				const auto old_h = h();
 
@@ -63,27 +63,37 @@ namespace augs {
 				t = v.y;
 				w(old_w);
 				h(old_h);
+
+				return *this;
 			}
 
-			void set_size(const vec2t<T> v) {
+			ltrb& set_size(const vec2t<T> v) {
 				w(v.x);
 				h(v.y);
+
+				return *this;
 			}
 
-			void set_size(const T x, const T y) {
+			ltrb& set_size(const T x, const T y) {
 				w(x);
 				h(y);
+
+				return *this;
 			}
 
-			void contain(const ltrb rc) {
+			ltrb& contain(const ltrb rc) {
 				l = std::min(l, rc.l);
 				t = std::min(t, rc.t);
 				contain_positive(rc);
+				
+				return *this;
 			}
 
-			void contain_positive(const ltrb rc) {
+			ltrb& contain_positive(const ltrb rc) {
 				r = std::max(r, rc.r);
 				b = std::max(b, rc.b);
+
+				return *this;
 			}
 
 			bool clip_by(const ltrb rc) {
@@ -120,21 +130,37 @@ namespace augs {
 				return *this;
 			}
 
-			void center_x(const T c) {
+			ltrb& place_in_center_of(ltrb bigger) {
+				bigger.l += static_cast<T>(bigger.w() / 2.f - w() / 2.f);
+				bigger.t += static_cast<T>(bigger.h() / 2.f - h() / 2.f);
+				bigger.w(w());
+				bigger.h(h());
+
+				*this = bigger;
+				return *this;
+			}
+
+			ltrb& center_x(const T c) {
 				const T _w = w();
 				l = c - _w / 2;
 				r = l + _w;
+
+				return *this;
 			}
 
-			void center_y(const T c) {
+			ltrb& center_y(const T c) {
 				const T _h = h();
 				t = c - _h / 2;
 				b = t + _h;
+
+				return *this;
 			}
 
-			void center(const vec2t<T> c) {
+			ltrb& center(const vec2t<T> c) {
 				center_x(c.x);
 				center_y(c.y);
+
+				return *this;
 			}
 
 			T w() const {

@@ -256,23 +256,31 @@ namespace augs {
 			}
 
 			template <class C, class gui_element_id>
-			static void draw_stretched_texture(const C context, const gui_element_id& id, gui::draw_info in, const gui::material& mat = gui::material()) {
+			static void draw_stretched_texture(
+				const C context, 
+				const gui_element_id& id, 
+				gui::draw_info in, 
+				const gui::material& mat = gui::material()
+			) {
 				const auto absolute = context.get_tree_entry(id).get_absolute_rect();
 				draw_clipped_rect(mat, absolute, context, context.get_tree_entry(id).get_parent(), in.v);
 			}
 
 			template <class C, class gui_element_id>
-			static void draw_centered_texture(const C context, const gui_element_id& id, gui::draw_info in, const gui::material& mat = gui::material(), const vec2i offset = vec2i()) {
-				auto absolute_centered = context.get_tree_entry(id).get_absolute_rect();
+			static void draw_centered_texture(
+				const C context, 
+				const gui_element_id& id, 
+				gui::draw_info in, 
+				const gui::material& mat = gui::material(), 
+				const vec2i offset = vec2i()
+			) {
+				const auto absolute = context.get_tree_entry(id).get_absolute_rect();
 				const auto tex_size = (*mat.tex).get_size();
-				absolute_centered.l += absolute_centered.w() / 2 - float(tex_size.x) / 2;
-				absolute_centered.t += absolute_centered.h() / 2 - float(tex_size.y) / 2;
-				absolute_centered.l = float(int(absolute_centered.l) + offset.x);
-				absolute_centered.t = float(int(absolute_centered.t) + offset.y);
-				absolute_centered.w(float(tex_size.x));
-				absolute_centered.h(float(tex_size.y));
+				
+				auto tex_rc = ltrbi(vec2i(0, 0), tex_size).place_in_center_of(absolute);
+				tex_rc.set_position(tex_rc.get_position() + offset);
 
-				draw_clipped_rect(mat, absolute_centered, context, context.get_tree_entry(id).get_parent(), in.v);
+				draw_clipped_rect(mat, tex_rc, context, context.get_tree_entry(id).get_parent(), in.v);
 			}
 
 			template <class C, class gui_element_id>

@@ -77,7 +77,15 @@ void action_button::draw(
 
 				const augs::gui::material inside_mat(inside_tex, inside_col);
 
-				draw_centered_texture(context, this_id, info, inside_mat);
+				const auto absolute_icon_rect = ltrbi(vec2i(0, 0), (*inside_tex).get_size()).place_in_center_of(absolute_rect);
+
+				draw_clipped_rect(
+					inside_mat, 
+					absolute_icon_rect, 
+					context, 
+					context.get_tree_entry(this_id).get_parent(), 
+					info.v
+				);
 
 				bool is_still_cooled_down = false;
 
@@ -91,7 +99,7 @@ void action_button::draw(
 						all_cooldown.get_ratio_of_remaining_time(now, dt) : this_cooldown.get_ratio_of_remaining_time(now, dt);
 
 					if (effective_cooldown_ratio > 0.f) {
-						augs::draw_rectangle_clock(info.v, effective_cooldown_ratio, absolute_rect, { 0, 0, 0, 200 });
+						augs::draw_rectangle_clock(info.v, effective_cooldown_ratio, absolute_icon_rect, { 0, 0, 0, 200 });
 						is_still_cooled_down = true;
 					}
 				}

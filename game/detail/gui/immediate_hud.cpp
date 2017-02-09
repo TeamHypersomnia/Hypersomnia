@@ -216,8 +216,17 @@ augs::vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_i
 			const int radius = (*assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM).get_size().x / 2;
 			const auto empty_health_amount = static_cast<int>((1 - sentience->health.get_ratio()) * 90);
 
-			textual_infos.push_back({ starting_health_angle + 90 - empty_health_amount/2, to_wstring(int(sentience->health.value) == 0 ? 1 : int(sentience->health.value)), health_col });
-			textual_infos.push_back({ starting_health_angle, description_of_entity(v).name, health_col });
+			textual_infos.push_back({ 
+				starting_health_angle + 90 - empty_health_amount/2, 
+				to_wstring(int(sentience->health.value) == 0 ? 1 : int(sentience->health.value)), 
+				health_col 
+			});
+
+			textual_infos.push_back({ 
+				starting_health_angle, 
+				description_of_entity(v).name, 
+				health_col 
+			});
 
 			for (auto& in : textual_infos) {
 				if (in.text.empty()) continue;
@@ -344,7 +353,17 @@ void immediate_hud::draw_pure_color_highlights(const viewing_step step) const {
 		auto ratio = std::max(0.f, 1.f - static_cast<float>(passed / r.maximum_duration_seconds));
 
 		col.a = static_cast<rgba_channel>(255.f * ratio * ratio * r.starting_alpha_ratio);
-		render_system().draw_renderable(triangles, current_time, sprite, subject.viewing_transform(interp, true), subject.get<components::render>(), step.camera, renderable_drawing_type::NORMAL);
+		
+		render_system().draw_renderable(
+			triangles, 
+			current_time, 
+			sprite, 
+			subject.viewing_transform(interp, true), 
+			subject.get<components::render>(), 
+			step.camera, 
+			renderable_drawing_type::NORMAL
+		);
+
 		col = prevcol;
 	}
 

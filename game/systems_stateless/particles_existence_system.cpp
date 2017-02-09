@@ -166,12 +166,12 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 				burst.input.effect = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
 				burst.input.modifier.scale_amounts += 5.f;
 				burst.input.modifier.scale_lifetimes += 0.5f;
-				step.transient.messages.post(burst);
+				//step.transient.messages.post(burst);
 			}
 			else if (h.effective_amount > 0) {
 				burst.input.effect = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
 				burst.input.modifier.scale_amounts += h.ratio_effective_to_maximum;
-				step.transient.messages.post(burst);
+				//step.transient.messages.post(burst);
 			}
 		}
 	}
