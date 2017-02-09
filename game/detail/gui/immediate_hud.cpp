@@ -153,32 +153,10 @@ augs::vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_i
 					if (id.alive() && id.has_items()) {
 						const auto item = id.get_items_inside()[0];
 
-						const auto maybe_magazine_slot = item[slot_function::GUN_DETACHABLE_MAGAZINE];
-						const auto chamber_slot = item[slot_function::GUN_CHAMBER];
+						const auto ammo_info = get_ammunition_information(item);
 
-						float ammo_ratio = 0.f;
-						int charges = 0;
-						float total_space_available = 0.f;
-						float total_actual_free_space = 0.f;
-
-						if (maybe_magazine_slot.alive() && maybe_magazine_slot.has_items()) {
-							auto mag = maybe_magazine_slot.get_items_inside()[0];
-							auto ammo_depo = mag[slot_function::ITEM_DEPOSIT];
-							charges += count_charges_in_deposit(mag);
-
-							total_space_available += ammo_depo->space_available;
-							total_actual_free_space += ammo_depo.calculate_local_free_space();
-						}
-
-						if (chamber_slot.alive()) {
-							charges += count_charges_inside(chamber_slot);
-
-							total_space_available += chamber_slot->space_available;
-							total_actual_free_space += chamber_slot.calculate_local_free_space();
-						}
-
-						if (total_space_available > 0) {
-							ammo_ratio = 1 - (total_actual_free_space / total_space_available);
+						if (ammo_info.total_ammunition_space_available > 0) {
+							const auto ammo_ratio = 1 - (ammo_info.total_actual_free_space / ammo_info.total_ammunition_space_available);
 
 							auto redviolet = violet;
 							redviolet.r = 200;
@@ -201,7 +179,7 @@ augs::vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_i
 								new_info.angle = lower_outside + empty_amount / 2;
 							}
 
-							new_info.text = to_wstring(charges);
+							new_info.text = to_wstring(ammo_info.total_charges);
 							new_info.color = circle_hud.color;
 
 							textual_infos.push_back(new_info);

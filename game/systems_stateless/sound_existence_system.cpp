@@ -7,6 +7,7 @@
 #include "game/components/render_component.h"
 #include "game/components/position_copying_component.h"
 #include "game/components/sound_response_component.h"
+#include "game/components/gun_component.h"
 
 #include "game/messages/gunshot_response.h"
 #include "game/messages/create_particle_effect.h"
@@ -97,19 +98,46 @@ void sound_existence_system::game_responses_to_sound_effects(const logic_step st
 
 		{
 			const auto subject = cosmos[g.subject];
-			const auto& gun_response = subject.get<components::sound_response>();
-			const auto& gun_response_map = *get_resource_manager().find(gun_response.response);
 
-			components::sound_existence::effect_input in;
-			in.delete_entity_after_effect_lifetime = true;
+			{
+				const auto& gun_response = subject.get<components::sound_response>();
+				const auto& gun_response_map = *get_resource_manager().find(gun_response.response);
 
-			const auto& response_entry = gun_response_map.at(sound_response_type::MUZZLE_SHOT);
-			in.effect = response_entry.id;
-			in.modifier = response_entry.modifier;
+				components::sound_existence::effect_input in;
+				in.delete_entity_after_effect_lifetime = true;
 
-			in.direct_listener = subject.get_owning_transfer_capability();
+				const auto& response_entry = gun_response_map.at(sound_response_type::MUZZLE_SHOT);
+				in.effect = response_entry.id;
+				in.modifier = response_entry.modifier;
 
-			create_sound_effect_entity(cosmos, in, subject.logic_transform(), entity_id()).add_standard_components();
+				in.direct_listener = subject.get_owning_transfer_capability();
+
+				create_sound_effect_entity(cosmos, in, subject.logic_transform(), entity_id()).add_standard_components();
+			}
+
+			{
+				const auto& gun = subject.get<components::gun>();
+
+				const auto cued_count = gun.num_last_bullets_to_trigger_low_ammo_cue;
+
+				if (cued_count > 0) {
+					const auto ammo_info = get_ammunition_information(subject);
+
+					if (ammo_info.total_charges < cued_count) {
+						components::sound_existence::effect_input in;
+						in.delete_entity_after_effect_lifetime = true;
+						in.effect = assets::sound_buffer_id::LOW_AMMO_CUE;
+
+						if (ammo_info.total_charges == cued_count - 1) {
+							in.modifier.gain = 0.6;
+						}
+
+						in.direct_listener = subject.get_owning_transfer_capability();
+
+						create_sound_effect_entity(cosmos, in, subject.logic_transform(), entity_id()).add_standard_components();
+					}
+				}
+			}
 		}
 	}
 

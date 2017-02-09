@@ -26,6 +26,8 @@ namespace assets {
 		BUTTON_HOVER,
 		BUTTON_CLICK,
 
+		LOW_AMMO_CUE,
+
 		COUNT
 	};
 }

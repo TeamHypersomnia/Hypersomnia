@@ -6,6 +6,7 @@
 #include "game/components/sentience_component.h"
 #include "game/components/damage_component.h"
 #include "game/components/attitude_component.h"
+#include "game/components/container_component.h"
 #include "inventory_utils.h"
 #include "inventory_slot.h"
 #include "game/transcendental/entity_handle.h"
@@ -129,4 +130,30 @@ float assess_projectile_velocity_of_weapon(const_entity_handle weapon) {
 	}
 
 	return 0.f;
+}
+
+ammunition_information get_ammunition_information(const const_entity_handle item) {
+	ammunition_information out;
+
+	const auto maybe_magazine_slot = item[slot_function::GUN_DETACHABLE_MAGAZINE];
+
+	if (maybe_magazine_slot.alive() && maybe_magazine_slot.has_items()) {
+		auto mag = maybe_magazine_slot.get_items_inside()[0];
+		auto ammo_depo = mag[slot_function::ITEM_DEPOSIT];
+		out.total_charges += count_charges_in_deposit(mag);
+
+		out.total_ammunition_space_available += ammo_depo->space_available;
+		out.total_actual_free_space += ammo_depo.calculate_local_free_space();
+	}
+
+	const auto chamber_slot = item[slot_function::GUN_CHAMBER];
+
+	if (chamber_slot.alive()) {
+		out.total_charges += count_charges_inside(chamber_slot);
+
+		out.total_ammunition_space_available += chamber_slot->space_available;
+		out.total_actual_free_space += chamber_slot.calculate_local_free_space();
+	}
+
+	return std::move(out);
 }

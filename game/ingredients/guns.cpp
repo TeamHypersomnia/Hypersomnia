@@ -355,6 +355,7 @@ namespace prefabs {
 		gun.shell_spread_degrees = 20.f;
 		gun.shell_velocity = std::make_pair(300.f, 1700.f);
 		gun.damage_multiplier = 2.2f;
+		gun.num_last_bullets_to_trigger_low_ammo_cue = 5;
 
 		gun.recoil.repeat_last_n_offsets = 20;
 		gun.recoil.scale = 30.0f/2;
@@ -426,6 +427,7 @@ namespace prefabs {
 		gun.bullet_spawn_offset.set(sprite.size.x / 2, 0);
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
+		gun.num_last_bullets_to_trigger_low_ammo_cue = 5;
 
 		gun.shell_spawn_offset.pos.set(0, 10);
 		gun.shell_spawn_offset.rotation = 45;
@@ -500,6 +502,7 @@ namespace prefabs {
 		gun.bullet_spawn_offset.set(sprite.size.x/2, 0);
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
+		gun.num_last_bullets_to_trigger_low_ammo_cue = 7;
 
 		gun.shell_spawn_offset.pos.set(0, 10);
 		gun.shell_spawn_offset.rotation = 45;
@@ -661,6 +664,7 @@ namespace prefabs {
 		gun.bullet_spawn_offset.set(sprite.size.x / 2, 0);
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
+		gun.num_last_bullets_to_trigger_low_ammo_cue = 5;
 
 		gun.shell_spawn_offset.pos.set(0, 10);
 		gun.shell_spawn_offset.rotation = 45;
@@ -739,6 +743,7 @@ namespace prefabs {
 		gun.bullet_spawn_offset.set(sprite.size.x / 2, -7);
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
+		gun.num_last_bullets_to_trigger_low_ammo_cue = 5;
 
 		gun.shell_spawn_offset.pos.set(0, 10);
 		gun.shell_spawn_offset.rotation = 45;

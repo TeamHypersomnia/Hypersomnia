@@ -16,7 +16,7 @@ class processing_system;
 
 namespace components {
 	struct gun  {
-		enum class action_type {
+		enum class action_type : unsigned char {
 			INVALID,
 
 			SINGLE_SHOT,
@@ -27,6 +27,8 @@ namespace components {
 
 		augs::stepped_cooldown shot_cooldown = augs::stepped_cooldown(100);
 		action_type action_mode = action_type::INVALID;
+		unsigned short num_last_bullets_to_trigger_low_ammo_cue = 0;
+		padding_byte pad;
 
 		augs::minmax<float> muzzle_velocity;
 
@@ -64,6 +66,7 @@ namespace components {
 		void serialize(Archive& ar) {
 			ar(
 				CEREAL_NVP(action_mode),
+				CEREAL_NVP(num_last_bullets_to_trigger_low_ammo_cue),
 
 				CEREAL_NVP(muzzle_velocity),
 
@@ -85,8 +88,9 @@ namespace components {
 
 				CEREAL_NVP(recoil),
 
-				CEREAL_NVP(shell_spawn_offset)
-			);
+				CEREAL_NVP(shell_spawn_offset),
+				CEREAL_NVP(magic_missile_definition)
+				);
 		}
 
 		vec2 calculate_muzzle_position(components::transform gun_transform) const;
