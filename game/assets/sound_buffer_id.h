@@ -29,6 +29,9 @@ namespace assets {
 		LOW_AMMO_CUE,
 		FIREARM_ENGINE,
 
+		CAST_SUCCESSFUL,
+		CAST_UNSUCCESSFUL,
+
 		COUNT
 	};
 }

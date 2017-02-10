@@ -1156,7 +1156,6 @@
     <ClInclude Include="game\detail\perks\haste_perk.h" />
     <ClInclude Include="game\detail\perks\electric_shield_perk.h" />
     <ClInclude Include="game\detail\perks\timed_perk.h" />
-    <ClInclude Include="game\detail\spells\haste_spell.h" />
     <ClInclude Include="game\detail\spell_data.h" />
     <ClInclude Include="game\detail\visible_entities.h" />
     <ClInclude Include="game\detail\wielding_result.h" />

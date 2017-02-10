@@ -29,6 +29,7 @@
 
 #include "augs/graphics/drawers.h"
 #include "game/detail/wielding_result.h"
+#include "game/detail/spell_data.h"
 
 using namespace augs;
 using namespace augs::gui;

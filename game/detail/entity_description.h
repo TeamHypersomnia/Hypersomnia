@@ -35,8 +35,3 @@ std::wstring describe_perk_meter(
 	const const_entity_handle,
 	const perk_meter_type
 );
-
-std::wstring describe_spell(
-	const const_entity_handle,
-	const spell_type
-);

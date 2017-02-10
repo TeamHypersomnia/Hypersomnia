@@ -40,42 +40,13 @@ void action_button::draw(
 
 			assets::texture_id inside_tex = assets::texture_id::INVALID;
 			assets::texture_id border_tex = assets::texture_id::SPELL_BORDER;
-			
-			const rgba turqoise_spell_color = turquoise;
-			const rgba blue_spell_border = { 0, 128, 209, 255 };
-			const rgba green_spell_color = { 0, 200, 0, 255 };
 
 			rgba border_col;
 
-			switch (bound_spell) {
-			case spell_type::HASTE: 
-				inside_tex = assets::texture_id::SPELL_HASTE_ICON; 
-				border_col = green_spell_color;
-				break;
+			const auto appearance = get_spell_appearance(bound_spell);
+			inside_tex = appearance.icon;
+			border_col = appearance.border_col;
 
-			case spell_type::FURY_OF_THE_AEONS: 
-				inside_tex = assets::texture_id::SPELL_FURY_OF_THE_AEONS_ICON; 
-				border_col = blue_spell_border;
-				break;
-
-			case spell_type::ELECTRIC_TRIAD: 
-				inside_tex = assets::texture_id::SPELL_ELECTRIC_TRIAD_ICON;
-				border_col = blue_spell_border;
-				break;
-
-			case spell_type::ULTIMATE_WRATH_OF_THE_AEONS:
-				inside_tex = assets::texture_id::SPELL_ULTIMATE_WRATH_OF_THE_AEONS_ICON;
-				border_col = blue_spell_border;
-				break;
-
-			case spell_type::ELECTRIC_SHIELD:
-				inside_tex = assets::texture_id::SPELL_ELECTRIC_SHIELD_ICON;
-				border_col = turqoise_spell_color;
-				break;
-
-			default: break;
-			}
-			
 			if (inside_tex != assets::texture_id::INVALID) {
 				ensure(border_tex != assets::texture_id::INVALID);
 

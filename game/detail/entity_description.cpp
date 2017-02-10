@@ -176,36 +176,3 @@ std::wstring describe_perk_meter(
 
 	else return L"Unknown problem";
 }
-
-std::wstring describe_spell(
-	const const_entity_handle subject,
-	const spell_type type
-) {
-	const auto& sentience = subject.get<components::sentience>();
-	const auto spell_data = get_spell_data(type);
-
-	const auto properties = typesafe_sprintf(L"Incantation: [color=yellow]%x[/color]\nPE to cast: [color=vscyan]%x[/color]\nCooldown: [color=vscyan]%x[/color]", 
-		std::wstring(spell_data.incantation), spell_data.personal_electricity_required, spell_data.cooldown_ms);
-
-	if (type == spell_type::HASTE) {
-		return typesafe_sprintf(L"[color=green]Haste[/color]\n%x\n[color=vsdarkgray]Increases movement speed for 33 seconds.[/color]", properties);
-	}
-
-	if (type == spell_type::FURY_OF_THE_AEONS) {
-		return typesafe_sprintf(L"[color=cyan]Fury of the Aeons[/color]\n%x\n[color=vsdarkgray]Causes instant damage around the caster.[/color]", properties);
-	}
-
-	if (type == spell_type::ULTIMATE_WRATH_OF_THE_AEONS) {
-		return typesafe_sprintf(L"[color=cyan]Ultimate Wrath of the Aeons[/color]\n%x\n[color=vsdarkgray]Causes massive damage around the caster.\nRequires delay to initiate.[/color]", properties);
-	}
-
-	if (type == spell_type::ELECTRIC_TRIAD) {
-		return typesafe_sprintf(L"[color=cyan]Electric Triad[/color]\n%x\n[color=vsdarkgray]Spawns three electric missiles\nhoming towards hostile entities.[/color]", properties);
-	}
-
-	if (type == spell_type::ELECTRIC_SHIELD) {
-		return typesafe_sprintf(L"[color=turquoise]Electric Shield[/color]\n%x\n[color=vsdarkgray]For 60 seconds, damage is absorbed\nby [/color][color=cyan]Personal Electricity[/color][color=vsdarkgray] instead of [/color][color=red]Health[/color][color=vsdarkgray].[/color]", properties);
-	}
-
-	else return L"Unknown problem";
-}
