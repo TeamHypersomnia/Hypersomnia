@@ -59,6 +59,8 @@ namespace augs {
 		int get_channels() const, get_bytes() const, get_num_pixels() const;
 		vec2i get_size() const;
 
+		image get_desaturated() const;
+
 		void destroy();
 	};
 }

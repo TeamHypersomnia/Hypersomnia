@@ -190,6 +190,12 @@ hsv rgba::get_hsv() const {
 	return{ res.h / 360.0, res.s, res.v };
 }
 
+rgba rgba::get_desaturated() const {
+	const auto avg = static_cast<rgba_channel>((static_cast<unsigned>(r) + g + b) / 3u);
+
+	return { avg, avg, avg, a };
+}
+
 std::array<rgba_channel, 3>& rgba::rgb() {
 	return *(std::array<rgba_channel, 3>*)this;
 }
@@ -199,7 +205,7 @@ const std::array<rgba_channel, 3>& rgba::rgb() const {
 }
 
 rgba& rgba::set_hsv(const hsv hsv) {
-	auto res = hsv2rgb({ hsv.h * 360, hsv.s, hsv.v });
+	const auto res = hsv2rgb({ hsv.h * 360, hsv.s, hsv.v });
 	return (*this = rgba{ rgba_channel(res.r * 255), rgba_channel(res.g * 255), rgba_channel(res.b * 255), a });
 }
 

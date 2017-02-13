@@ -40,6 +40,7 @@ struct rgba {
 	bool operator==(const rgba& b) const;
 	bool operator!=(const rgba& b) const;
 	hsv get_hsv() const;
+	rgba get_desaturated() const;
 	std::array<rgba_channel, 3>& rgb();
 	const std::array<rgba_channel, 3>& rgb() const;
 	rgba& set_hsv(hsv);

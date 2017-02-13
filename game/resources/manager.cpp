@@ -67,8 +67,18 @@ namespace resources {
 
 	texture_with_image* manager::find_neon_map(const assets::texture_id id) {
 		auto it = neon_maps.find(id);
-		
+
 		if (it == neon_maps.end()) {
+			return nullptr;
+		}
+
+		return &(*it).second;
+	}
+
+	texture_with_image* manager::find_desaturated(const assets::texture_id id) {
+		auto it = desaturated_textures.find(id);
+
+		if (it == desaturated_textures.end()) {
 			return nullptr;
 		}
 
@@ -168,8 +178,12 @@ namespace resources {
 			for (const auto& tex : textures) {
 				atl.textures.push_back(&tex.second);
 			}			
-			
+
 			for (const auto& tex : neon_maps) {
+				atl.textures.push_back(&tex.second);
+			}
+
+			for (const auto& tex : desaturated_textures) {
 				atl.textures.push_back(&tex.second);
 			}
 		}
@@ -302,16 +316,27 @@ namespace resources {
 		return resp;
 	}
 
-	texture_with_image& manager::create(const assets::texture_id id, std::string filename) {
+	texture_with_image& manager::create(
+		const assets::texture_id id, 
+		std::string filename,
+		const bool generate_desaturated
+	) {
 		texture_with_image& tex = textures[id];
 		tex.set_from_image_file(filename);
 
 		filename.resize(filename.size() - 4);
-		filename += "_neon_map.png";
+		
+		const auto filename_root = filename;
+		const auto neon_map_filename = filename + "_neon_map.png";
 
-		if (augs::file_exists(filename)) {
+		if (augs::file_exists(neon_map_filename)) {
 			texture_with_image& neon_tex = neon_maps[id];
-			neon_tex.set_from_image_file(filename);
+			neon_tex.set_from_image_file(neon_map_filename);
+		}
+
+		if (generate_desaturated) {
+			texture_with_image& neon_tex = desaturated_textures[id];
+			neon_tex.set_from_image(tex.img.get_desaturated());
 		}
 
 		return tex;

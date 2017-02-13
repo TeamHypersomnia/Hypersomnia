@@ -456,6 +456,19 @@ namespace augs {
 		return size;
 	}
 
+	image image::get_desaturated() const {
+		image desaturated;
+		desaturated.create(size.x, size.y, 4);
+
+		for (int x = 0; x < size.x; ++x) {
+			for (int y = 0; y < size.y; ++y) {
+				desaturated.set_pixel({ x, y }, pixel({ x, y }).get_desaturated());
+			}
+		}
+
+		return std::move(desaturated);
+	}
+
 	void image::destroy() {
 		v.clear();
 		v.shrink_to_fit();

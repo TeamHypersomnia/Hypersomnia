@@ -44,8 +44,14 @@ namespace resources {
 		augs::sound_buffer& create(const assets::sound_buffer_id);
 		augs::atlas& create(assets::atlas_id, unsigned atlas_creation_mode_flags);
 		augs::font& create(assets::font_id);
-		augs::texture_with_image& create(assets::texture_id, std::string filename);
-		augs::texture_with_image& create(assets::texture_id, augs::image img);
+		
+		augs::texture_with_image& create(
+			const assets::texture_id, 
+			std::string filename,
+			const bool generate_desaturated = false
+		);
+
+		augs::texture_with_image& create(const assets::texture_id, augs::image img);
 
 		void create_sprites_indexed(assets::texture_id first, assets::texture_id last, std::string filename_preffix);
 
@@ -68,8 +74,9 @@ namespace resources {
 		behaviour_tree& create(assets::behaviour_tree_id);
 		tile_layer& create(assets::tile_layer_id);
 
-		augs::texture_with_image* find(assets::texture_id);
-		augs::texture_with_image* find_neon_map(assets::texture_id);
+		augs::texture_with_image* find(const assets::texture_id);
+		augs::texture_with_image* find_neon_map(const assets::texture_id);
+		augs::texture_with_image* find_desaturated(const assets::texture_id);
 		augs::font* find(assets::font_id);
 		augs::atlas* find(assets::atlas_id);
 		augs::graphics::shader_program* find(assets::program_id);
@@ -92,6 +99,7 @@ namespace resources {
 		augs::enum_associative_array<assets::animation_id, animation> animations;
 		augs::enum_associative_array<assets::texture_id, augs::texture_with_image> textures;
 		augs::enum_associative_array<assets::texture_id, augs::texture_with_image> neon_maps;
+		augs::enum_associative_array<assets::texture_id, augs::texture_with_image> desaturated_textures;
 		augs::enum_associative_array<assets::font_id, augs::font> fonts;
 		augs::enum_associative_array<assets::atlas_id, augs::atlas> atlases;
 		augs::enum_associative_array<assets::shader_id, augs::graphics::shader> shaders;

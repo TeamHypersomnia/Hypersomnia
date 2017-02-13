@@ -5,6 +5,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/systems_audiovisual/gui_element_system.h"
 #include "game/components/sentience_component.h"
+#include "game/resources/manager.h"
 
 #include "augs/graphics/drawers.h"
 
@@ -28,6 +29,10 @@ void action_button::draw(
 		const auto bound_spell = this_id->bound_spell;
 
 		if (bound_spell != spell_type::COUNT && sentience.spells.find(bound_spell) != sentience.spells.end()) {
+			const auto spell_data = get_spell_data(bound_spell);
+			const bool has_enough_mana = sentience.personal_electricity.value >= spell_data.personal_electricity_required;
+			const float required_mana_ratio = std::min(1.f, sentience.personal_electricity.value / spell_data.personal_electricity_required);
+
 			rgba inside_col = white;
 
 			inside_col.a = 220;
@@ -47,6 +52,10 @@ void action_button::draw(
 			inside_tex = appearance.icon;
 			border_col = appearance.border_col;
 
+			if (!has_enough_mana) {
+				border_col = border_col.get_desaturated();
+			}
+
 			if (inside_tex != assets::texture_id::INVALID) {
 				ensure(border_tex != assets::texture_id::INVALID);
 
@@ -54,13 +63,39 @@ void action_button::draw(
 
 				const auto absolute_icon_rect = ltrbi(vec2i(0, 0), (*inside_tex).get_size()).place_in_center_of(absolute_rect);
 
-				draw_clipped_rect(
-					inside_mat, 
-					absolute_icon_rect, 
-					context, 
-					context.get_tree_entry(this_id).get_parent(), 
-					info.v
-				);
+				if (has_enough_mana) {
+					draw_clipped_rect(
+						inside_mat,
+						absolute_icon_rect,
+						context,
+						context.get_tree_entry(this_id).get_parent(),
+						info.v
+					);
+				}
+				else {
+					augs::draw_clipped_rect(
+						info.v,
+						absolute_icon_rect,
+						get_resource_manager().find_desaturated(inside_mat.tex)->tex,
+						inside_mat.color,
+						ltrbi()
+					);
+
+					/*
+					auto colorful_rect = absolute_icon_rect;
+					const auto colorful_height = absolute_icon_rect.h() * required_mana_ratio;
+					colorful_rect.t = absolute_icon_rect.b - colorful_height;
+					colorful_rect.b = colorful_rect.t + colorful_height;
+
+					augs::draw_clipped_rect(
+						info.v,
+						absolute_icon_rect,
+						get_resource_manager().find(inside_mat.tex)->tex,
+						inside_mat.color,
+						colorful_rect
+					);
+					*/
+				}
 
 				bool is_still_cooled_down = false;
 
@@ -95,7 +130,7 @@ void action_button::draw(
 
 				draw_centered_texture(context, this_id, info, border_mat);
 
-				auto label_col = cyan;
+				auto label_col = has_enough_mana ? cyan : white;
 				label_col.a = 255;
 				const auto label_style = augs::gui::text::style(assets::font_id::GUI_FONT, label_col );
 
