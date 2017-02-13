@@ -87,8 +87,9 @@ void relations_mixin<false, D>::set_owner_body(const entity_id owner_id) const {
 		new_owner.physical_relations_component().fixture_entities.push_back(this_id);
 		cosmos.partial_resubstantiation<physics_system>(new_owner);
 	}
-	else
+	else {
 		cosmos.partial_resubstantiation<physics_system>(self);
+	}
 }
 
 template <class D>

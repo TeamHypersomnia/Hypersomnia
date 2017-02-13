@@ -11,6 +11,7 @@
 
 #include "game/components/physics_component.h"
 #include "game/components/container_component.h"
+#include "game/components/fixtures_component.h"
 #include "game/components/position_copying_component.h"
 
 #include "game/components/animation_component.h"
@@ -88,7 +89,7 @@ void sentience_system::cast_spells(const logic_step step) const {
 				sentience.personal_electricity.value -= spell_data.personal_electricity_required;
 				
 				spell_instance_data.cast_cooldown.set(static_cast<float>(spell_data.cooldown_ms), now);
-				sentience.all_spells_cast_cooldown.set(2000 + spell_data.casting_time_ms, now);
+				sentience.all_spells_cast_cooldown.set(static_cast<float>(2000 + spell_data.casting_time_ms), now);
 			}
 		}
 	}
@@ -178,24 +179,24 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 			drop_from_all_slots(subject, step);
 		}
 
-		const auto sub_def = subject[sub_entity_name::CORPSE_OF_SENTIENCE];
-
-		const auto corpse = cosmos.clone_entity(sub_def);
-
-		auto place_of_death = subject.logic_transform();
-		place_of_death.rotation = h.impact_velocity.degrees();
-
-		corpse.set_logic_transform(place_of_death);
-		
-		subject.get<components::physics>().set_activated(false);
-		subject.get<components::position_copying>().set_target(corpse);
-
-		corpse.add_standard_components();
-	
-		corpse.get<components::physics>().apply_force(vec2().set_from_degrees(place_of_death.rotation).set_length(27850 * 2));
-
-		h.spawned_remnants = corpse;
-		sentience.health.enabled = false;
+		//const auto sub_def = subject[sub_entity_name::CORPSE_OF_SENTIENCE];
+		//
+		//const auto corpse = cosmos.clone_entity(sub_def);
+		//
+		//auto place_of_death = subject.logic_transform();
+		//place_of_death.rotation = h.impact_velocity.degrees();
+		//
+		//corpse.set_logic_transform(place_of_death);
+		//
+		//subject.get<components::fixtures>().set_activated(false);
+		//subject.get<components::position_copying>().set_target(corpse);
+		//
+		//corpse.add_standard_components();
+		//
+		//corpse.get<components::physics>().apply_force(vec2().set_from_degrees(place_of_death.rotation).set_length(27850 * 2));
+		//
+		h.spawned_remnants = subject;
+		//sentience.health.enabled = false;
 	}
 
 	step.transient.messages.post(h);

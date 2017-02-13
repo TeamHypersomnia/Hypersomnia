@@ -182,9 +182,12 @@ components::transform basic_fixtures_synchronizer<C>::get_total_offset() const {
 	return std::accumulate(component.offsets_for_created_shapes.begin(), component.offsets_for_created_shapes.end(), components::transform());
 }
 
-components::transform components::fixtures::transform_around_body(const const_entity_handle fe, const components::transform& body_transform) {
-	const auto& total_offset = fe.get<components::fixtures>().get_total_offset();
-	has_type<components::fixtures, disabled_components>;
+components::transform components::fixtures::transform_around_body(
+	const const_entity_handle fe, 
+	const components::transform& body_transform
+) {
+	const auto total_offset = fe.get<components::fixtures>().get_total_offset();
+	
 	components::transform displaced = body_transform + total_offset;
 	displaced.pos.rotate(body_transform.rotation, body_transform.pos);
 

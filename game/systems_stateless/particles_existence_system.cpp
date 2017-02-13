@@ -212,7 +212,12 @@ entity_handle particles_existence_system::create_particle_effect_entity(cosmos& 
 	const auto chased_subject = cosmos[it.subject];
 
 	if (chased_subject.alive()) {
-		components::position_copying::configure_chasing(new_stream_entity, chased_subject, it.place_of_birth, components::position_copying::chasing_configuration::RELATIVE_ORBIT);
+		components::position_copying::configure_chasing(
+			new_stream_entity, 
+			chased_subject, 
+			it.place_of_birth, 
+			components::position_copying::chasing_configuration::RELATIVE_ORBIT
+		);
 	}
 
 	return new_stream_entity;

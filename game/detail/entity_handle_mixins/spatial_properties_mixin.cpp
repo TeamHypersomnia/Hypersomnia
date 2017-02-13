@@ -4,6 +4,7 @@
 #include "game/components/fixtures_component.h"
 #include "game/components/wandering_pixels_component.h"
 #include "game/components/position_copying_component.h"
+#include "game/components/item_component.h"
 #include "game/transcendental/cosmos.h"
 #include "spatial_properties_mixin.h"
 #include "game/systems_audiovisual/interpolation_system.h"
@@ -22,6 +23,9 @@ bool basic_spatial_properties_mixin<C, D>::has_logic_transform() const {
 	else if (handle.has<components::transform>()) {
 		return true;
 	}
+	else if (handle.has<components::wandering_pixels>()) {
+		return true;
+	}
 
 	return false;
 }
@@ -32,13 +36,33 @@ components::transform basic_spatial_properties_mixin<C, D>::logic_transform() co
 
 	const auto owner = handle.get_owner_body();
 
-	if (owner.alive() && owner != handle) {
-		return components::fixtures::transform_around_body(handle, owner.logic_transform());
-	}
-	else if (handle.has<components::physics>()) {
+	if (owner.alive()) {
 		ensure(!handle.has<components::transform>());
-		const auto& phys = handle.get<components::physics>();
-		return{ phys.get_position(), phys.get_angle() };
+
+		const auto& phys = owner.get<components::physics>();
+
+		if (owner != handle) {
+			const auto& fixtures = handle.get<components::fixtures>();
+
+			if (fixtures.is_activated() && phys.is_activated()) {
+				return components::fixtures::transform_around_body(handle, owner.logic_transform());
+			}
+			else {
+				ensure(handle.has<components::item>());
+
+				return handle.get_current_slot().get_container().logic_transform();
+			}
+		}
+		else {
+			if (phys.is_activated()) {
+				return{ phys.get_position(), phys.get_angle() };
+			}
+			else {
+				ensure(handle.has<components::item>());
+
+				return handle.get_current_slot().get_container().logic_transform();
+			}
+		}
 	}
 	else if (handle.has<components::wandering_pixels>()) {
 		return handle.get<components::wandering_pixels>().reach.center();

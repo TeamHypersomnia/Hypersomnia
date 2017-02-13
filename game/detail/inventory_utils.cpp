@@ -531,6 +531,7 @@ void perform_transfer(const item_slot_transfer_request r, const logic_step step)
 		descendant.get<components::fixtures>().set_owner_body(owner_body);
 		
 		if (descendant.has<components::physics>()) {
+			descendant.get<components::physics>().set_activated(def.activated);
 			descendant.get<components::physics>().set_transform(previous_descendant_transform);
 
 			if (descendant.has<components::interpolation>()) {

@@ -8,6 +8,7 @@
 #include "augs/al_log.h"
 #include "augs/ensure.h"
 #include "augs/filesystem/file.h"
+#include "augs/build_settings/setting_log_audio_files.h"
 
 namespace augs {
 	single_sound_buffer::~single_sound_buffer() {
@@ -47,7 +48,9 @@ namespace augs {
 		const auto passed_bytesize = new_data.samples.size() * sizeof(int16_t);
 		computed_length_in_seconds = new_data.compute_length_in_seconds();
 
+#if LOG_AUDIO_BUFFERS
 		LOG("Passed format: %x\nPassed frequency: %x\nPassed bytesize: %x", passed_format, passed_frequency, passed_bytesize);
+#endif
 
 		AL_CHECK(alBufferData(id, passed_format, new_data.samples.data(), passed_bytesize, passed_frequency));
 	}
@@ -104,7 +107,6 @@ namespace augs {
 		ensure(stereo.is_set());
 		return stereo;
 	}
-
 
 	const single_sound_buffer& sound_buffer::variation::request_original() const {
 		if (original_channels == 1) {
@@ -196,12 +198,14 @@ namespace augs {
 
 		sf_close(file);
 
+#if LOG_AUDIO_BUFFERS
 		LOG("Sound: %x\nSample rate: %x\nChannels: %x\nFormat: %x\nLength in seconds: %x",
 			filename,
 			info.samplerate,
 			info.channels,
 			info.format,
 			new_data.compute_length_in_seconds());
+#endif
 
 		return std::move(new_data);
 	}

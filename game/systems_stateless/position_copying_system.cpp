@@ -17,7 +17,12 @@ void components::position_copying::set_target(const const_entity_handle new_targ
 	target = new_target;
 }
 
-void components::position_copying::configure_chasing(const entity_handle subject, const const_entity_handle target, const components::transform chaser_place_of_birth, const chasing_configuration cfg) {
+void components::position_copying::configure_chasing(
+	const entity_handle subject, 
+	const const_entity_handle target, 
+	const components::transform chaser_place_of_birth, 
+	const chasing_configuration cfg
+) {
 	auto& copying = subject += components::position_copying();
 	
 	copying.previous = subject.logic_transform();

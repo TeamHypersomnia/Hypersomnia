@@ -18,29 +18,32 @@
 
 std::mutex log_mutex;
 
-unsigned global_log::max_recent_entries = 40;
 unsigned global_log::max_all_entries = 10000;
-std::vector<log_entry> global_log::recent_entries;
 std::vector<log_entry> global_log::all_entries;
 
-augs::gui::text::fstr global_log::format_recent_as_text(const assets::font_id f) {
+augs::gui::text::fstr global_log::format_recent_as_text(
+	const assets::font_id f,
+	unsigned lines_remaining
+) {
 	augs::gui::text::fstr result;
 	
-	for (const auto& line : recent_entries) {
-		auto wstr = to_wstring(line.text + "\n");
-		result += augs::gui::text::format(wstr, augs::gui::text::style(f, rgba(line.color)));
+	lines_remaining = std::min(lines_remaining, all_entries.size());
+
+	for (auto it = all_entries.end() - lines_remaining; it != all_entries.end(); ++it) {
+		std::stringstream ss((*it).text);
+		std::string line;
+
+		auto wstr = to_wstring((*it).text + "\n");
+		result += augs::gui::text::format(wstr, augs::gui::text::style(f, rgba((*it).color)));
+
+		--lines_remaining;
 	}
 
 	return result;
 }
 
 void global_log::push_entry(const log_entry& new_entry) {
-	recent_entries.push_back(new_entry);
 	all_entries.push_back(new_entry);
-
-	if (recent_entries.size() > max_recent_entries) {
-		recent_entries.erase(recent_entries.begin());
-	}
 
 	if (all_entries.size() > max_all_entries) {
 		all_entries.erase(all_entries.begin(), all_entries.begin() + max_all_entries/5);
