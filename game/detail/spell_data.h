@@ -10,9 +10,10 @@
 #include "game/transcendental/entity_handle_declaration.h"
 
 struct spell_data {
-	unsigned personal_electricity_required = 40;
-	unsigned cooldown_ms = 5000;
-	unsigned perk_seconds = 0;
+	unsigned personal_electricity_required = 40u;
+	unsigned cooldown_ms = 5000u;
+	unsigned casting_time_ms = 0u;
+	unsigned perk_seconds = 0u;
 	augs::constant_size_wstring<32> incantation;
 };
 
@@ -31,6 +32,7 @@ spell_appearance get_spell_appearance(const spell_type);
 void do_spell_callback(
 	const spell_type,
 	const entity_handle subject,
+	components::sentience& subject_sentience,
 	const augs::stepped_timestamp when_casted,
 	const augs::stepped_timestamp now
 );

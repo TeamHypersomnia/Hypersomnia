@@ -182,7 +182,11 @@ void action_button::respond_to_events(
 		this_id->detector.update_appearance(info);
 
 		if (info.msg == gui_event::lclick) {
-			context.get_gui_element_system().spell_requests[context.get_gui_element_entity()] = this_id->bound_spell;
+			const auto bound_spell = this_id->bound_spell;
+
+			if (bound_spell != spell_type::COUNT) {
+				context.get_gui_element_system().spell_requests[context.get_gui_element_entity()] = bound_spell;
+			}
 		}
 
 		if (info.msg == gui_event::hover) {

@@ -74,17 +74,72 @@ void sentience_system::cast_spells(const logic_step step) const {
 				&& sentience.all_spells_cast_cooldown.is_ready(now, delta);
 			
 			if (can_cast_already) {
-				switch (spell) {
-				case spell_type::HASTE: sentience.haste.set_for_duration(22000, now); break;
-				case spell_type::ELECTRIC_SHIELD: sentience.electric_shield.set_for_duration(60000, now); break;
-				default: LOG("Unknown spell: %x", static_cast<int>(spell)); break;
-				}
-				
+				sentience.currently_casted_spell = spell;
+				sentience.time_of_last_spell_cast = now;
+
+				do_spell_callback(
+					sentience.currently_casted_spell, 
+					subject, 
+					sentience, 
+					sentience.time_of_last_spell_cast, 
+					now
+				);
+
 				sentience.personal_electricity.value -= spell_data.personal_electricity_required;
 				
 				spell_instance_data.cast_cooldown.set(static_cast<float>(spell_data.cooldown_ms), now);
-				sentience.all_spells_cast_cooldown.set(2000, now);
+				sentience.all_spells_cast_cooldown.set(2000 + spell_data.casting_time_ms, now);
 			}
+		}
+	}
+}
+
+void sentience_system::regenerate_values_and_advance_spell_logic(const logic_step step) const {
+	const auto now = step.cosm.get_timestamp();
+	const auto regeneration_frequency_in_steps = static_cast<unsigned>(1 / step.cosm.get_fixed_delta().in_seconds() * 3);
+	const auto consciousness_regeneration_frequency_in_steps = static_cast<unsigned>(1 / step.cosm.get_fixed_delta().in_seconds() * 2);
+	const auto pe_regeneration_frequency_in_steps = static_cast<unsigned>(1 / step.cosm.get_fixed_delta().in_seconds() * 3);
+
+	for (const auto subject : step.cosm.get(processing_subjects::WITH_SENTIENCE)) {
+		auto& sentience = subject.get<components::sentience>();
+
+		if (sentience.health.enabled) {
+			const auto passed = (now.step - sentience.time_of_last_received_damage.step);
+
+			if (passed > 0 && passed % regeneration_frequency_in_steps == 0) {
+				sentience.health.value -= sentience.health.calculate_damage_result(-2).effective;
+			}
+		}
+
+		if (sentience.consciousness.enabled) {
+			const auto passed = (now.step - sentience.time_of_last_exertion.step);
+
+			if (passed > 0 && passed % consciousness_regeneration_frequency_in_steps == 0) {
+				sentience.consciousness.value -= sentience.consciousness.calculate_damage_result(-2).effective;
+			}
+
+			const auto consciousness_ratio = sentience.consciousness.get_ratio();
+			const auto health_ratio = sentience.health.get_ratio();
+
+			sentience.consciousness.value = std::min(consciousness_ratio, health_ratio) * sentience.consciousness.maximum;
+		}
+
+		if (sentience.personal_electricity.enabled) {
+			const auto passed = now.step;
+
+			if (passed > 0 && passed % pe_regeneration_frequency_in_steps == 0) {
+				sentience.personal_electricity.value -= sentience.personal_electricity.calculate_damage_result(-4).effective;
+			}
+		}
+
+		if (sentience.currently_casted_spell != spell_type::COUNT) {
+			do_spell_callback(
+				sentience.currently_casted_spell,
+				subject,
+				sentience,
+				sentience.time_of_last_spell_cast, 
+				now
+			);
 		}
 	}
 }
@@ -224,46 +279,6 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 void sentience_system::cooldown_aimpunches(const logic_step step) const {
 	for (const auto& t : step.cosm.get(processing_subjects::WITH_SENTIENCE)) {
 		t.get<components::sentience>().aimpunch.cooldown(step.get_delta().in_milliseconds());
-	}
-}
-
-void sentience_system::regenerate_values(const logic_step step) const {
-	const auto now = step.cosm.get_timestamp();
-	const auto regeneration_frequency_in_steps = static_cast<unsigned>(1 / step.cosm.get_fixed_delta().in_seconds() * 3);
-	const auto consciousness_regeneration_frequency_in_steps = static_cast<unsigned>(1 / step.cosm.get_fixed_delta().in_seconds() * 2);
-	const auto pe_regeneration_frequency_in_steps = static_cast<unsigned>(1/step.cosm.get_fixed_delta().in_seconds() * 3);
-	
-	for (const auto& t : step.cosm.get(processing_subjects::WITH_SENTIENCE)) {
-		auto& sentience = t.get<components::sentience>();
-
-		if (sentience.health.enabled) {
-			const auto passed = (now.step - sentience.time_of_last_received_damage.step);
-
-			if (passed > 0 && passed % regeneration_frequency_in_steps == 0) {
-				sentience.health.value -= sentience.health.calculate_damage_result(-2).effective;
-			}
-		}
-
-		if (sentience.consciousness.enabled) {
-			const auto passed = (now.step - sentience.time_of_last_exertion.step);
-
-			if (passed > 0 && passed % consciousness_regeneration_frequency_in_steps == 0) {
-				sentience.consciousness.value -= sentience.consciousness.calculate_damage_result(-2).effective;
-			}
-
-			const auto consciousness_ratio = sentience.consciousness.get_ratio();
-			const auto health_ratio = sentience.health.get_ratio();
-
-			sentience.consciousness.value = std::min(consciousness_ratio, health_ratio) * sentience.consciousness.maximum;
-		}
-
-		if (sentience.personal_electricity.enabled) {
-			const auto passed = now.step;
-
-			if (passed > 0 && passed % pe_regeneration_frequency_in_steps == 0) {
-				sentience.personal_electricity.value -= sentience.personal_electricity.calculate_damage_result(-4).effective;
-			}
-		}
 	}
 }
 

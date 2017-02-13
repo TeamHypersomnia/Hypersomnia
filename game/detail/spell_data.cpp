@@ -28,6 +28,7 @@ spell_data get_spell_data(const spell_type spell) {
 
 	case spell_type::ULTIMATE_WRATH_OF_THE_AEONS:
 		d.cooldown_ms = 2000;
+		d.casting_time_ms = 3000;
 		d.incantation = L"megalyteri aiones via";
 		d.personal_electricity_required = 260;
 		break;
@@ -95,8 +96,12 @@ std::wstring describe_spell(
 	const auto& sentience = subject.get<components::sentience>();
 	const auto spell_data = get_spell_data(spell);
 
-	const auto properties = typesafe_sprintf(L"Incantation: [color=yellow]%x[/color]\nPE to cast: [color=vscyan]%x[/color]\nCooldown: [color=vscyan]%x[/color]",
-		std::wstring(spell_data.incantation), spell_data.personal_electricity_required, spell_data.cooldown_ms);
+	const auto properties = typesafe_sprintf(
+		L"Incantation: [color=yellow]%x[/color]\nPE to cast: [color=vscyan]%x[/color]\nCooldown: [color=vscyan]%x[/color]",
+		std::wstring(spell_data.incantation), 
+		spell_data.personal_electricity_required, 
+		spell_data.cooldown_ms
+	);
 
 	std::wstring d;
 
@@ -128,3 +133,34 @@ std::wstring describe_spell(
 
 	return std::move(d);
 }
+
+void do_spell_callback(
+	const spell_type spell,
+	const entity_handle subject,
+	components::sentience& sentience,
+	const augs::stepped_timestamp when_casted,
+	const augs::stepped_timestamp now
+) {
+	const auto spell_data = get_spell_data(spell);
+	const auto& cosm = subject.get_cosmos();
+	const auto dt = cosm.get_fixed_delta();
+
+	switch (spell) {
+	case spell_type::HASTE: 
+		sentience.haste.set_for_duration(spell_data.perk_seconds * 1000, now); 
+		break;
+
+	case spell_type::ELECTRIC_SHIELD: 
+		sentience.electric_shield.set_for_duration(spell_data.perk_seconds * 1000, now); 
+		break;
+
+	default: 
+		LOG("Unknown spell: %x", static_cast<int>(spell)); 
+		break;
+	}
+
+	if (!spell_data.casting_time_ms || (now - when_casted).in_milliseconds(dt) > spell_data.casting_time_ms) {
+		sentience.currently_casted_spell = spell_type::COUNT;
+	}
+}
+

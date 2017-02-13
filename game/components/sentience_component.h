@@ -87,6 +87,9 @@ namespace components {
 
 		augs::enum_associative_array<spell_type, spell_instance_data> spells;
 
+		spell_type currently_casted_spell = spell_type::COUNT;
+		augs::stepped_timestamp time_of_last_spell_cast;
+
 		float comfort_zone = 500.f;
 		float minimum_danger_amount_to_evade = 5.f;
 		float danger_amount_from_hostile_attitude = 100.f;
