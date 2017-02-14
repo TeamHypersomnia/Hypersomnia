@@ -63,7 +63,7 @@ void sound_system::play_nearby_sound_existences(
 
 	const auto subject = cosmos[listening_character];
 
-	const auto listener_pos = subject.viewing_transform(sys).pos;
+	const auto listener_pos = subject.get_viewing_transform(sys).pos;
 
 	augs::set_listener_position(listener_pos);
 	augs::set_listener_velocity(subject.get_effective_velocity());
@@ -106,7 +106,7 @@ void sound_system::play_nearby_sound_existences(
 			cache.recorded_component = existence;
 		}
 
-		const auto source_pos = it.viewing_transform(sys).pos;
+		const auto source_pos = it.get_viewing_transform(sys).pos;
 		const auto dist_from_listener = (listener_pos - source_pos).length();
 		const float absorption = std::min(10.f, pow(std::max(0.f, dist_from_listener - 2220.f)/520.f, 2));
 

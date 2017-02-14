@@ -93,7 +93,7 @@ void sound_existence_system::game_responses_to_sound_effects(const logic_step st
 			in.effect = response_entry.id;
 			in.modifier = response_entry.modifier;
 
-			const auto trace = create_sound_effect_entity(cosmos, in, subject.logic_transform(), subject);
+			const auto trace = create_sound_effect_entity(cosmos, in, subject.get_logic_transform(), subject);
 			subject.add_sub_entity(trace);
 			trace.add_standard_components();
 		}
@@ -114,7 +114,7 @@ void sound_existence_system::game_responses_to_sound_effects(const logic_step st
 
 				in.direct_listener = subject.get_owning_transfer_capability();
 
-				create_sound_effect_entity(cosmos, in, subject.logic_transform(), entity_id()).add_standard_components();
+				create_sound_effect_entity(cosmos, in, subject.get_logic_transform(), entity_id()).add_standard_components();
 			}
 
 			{
@@ -136,7 +136,7 @@ void sound_existence_system::game_responses_to_sound_effects(const logic_step st
 
 						in.direct_listener = subject.get_owning_transfer_capability();
 
-						create_sound_effect_entity(cosmos, in, subject.logic_transform(), entity_id()).add_standard_components();
+						create_sound_effect_entity(cosmos, in, subject.get_logic_transform(), entity_id()).add_standard_components();
 					}
 				}
 			}
@@ -169,7 +169,7 @@ void sound_existence_system::game_responses_to_sound_effects(const logic_step st
 
 		in.direct_listener = subject;
 
-		create_sound_effect_entity(cosmos, in, subject.logic_transform(), h.spawned_remnants).add_standard_components();
+		create_sound_effect_entity(cosmos, in, subject.get_logic_transform(), h.spawned_remnants).add_standard_components();
 	}
 
 	for (const auto& d : damages) {

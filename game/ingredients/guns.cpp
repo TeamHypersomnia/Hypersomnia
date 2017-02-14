@@ -31,7 +31,7 @@ void add_muzzle_particles(
 	cosmos& cosmos
 ) {
 	messages::create_particle_effect effect;
-	effect.place_of_birth = gun.calculate_muzzle_position(weapon.logic_transform());
+	effect.place_of_birth = gun.calculate_muzzle_position(weapon.get_logic_transform());
 
 	effect.input.effect = assets::particle_effect_id::MUZZLE_SMOKE;
 	effect.subject = weapon;
@@ -422,7 +422,7 @@ namespace prefabs {
 			in.effect = assets::sound_buffer_id::FIREARM_ENGINE;
 			in.modifier.repetitions = -1;
 			in.delete_entity_after_effect_lifetime = false;
-			const auto engine_sound = sound_existence_system().create_sound_effect_entity(cosmos, in, gun.calculate_muzzle_position(weapon.logic_transform()), weapon);
+			const auto engine_sound = sound_existence_system().create_sound_effect_entity(cosmos, in, gun.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
 			engine_sound.add_standard_components();
 			weapon.add_sub_entity(engine_sound);
 			gun.firing_engine_sound = engine_sound;
@@ -519,7 +519,7 @@ namespace prefabs {
 			in.effect = assets::sound_buffer_id::FIREARM_ENGINE;
 			in.modifier.repetitions = -1;
 			in.delete_entity_after_effect_lifetime = false;
-			const auto engine_sound = sound_existence_system().create_sound_effect_entity(cosmos, in, gun.calculate_muzzle_position(weapon.logic_transform()), weapon);
+			const auto engine_sound = sound_existence_system().create_sound_effect_entity(cosmos, in, gun.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
 			engine_sound.add_standard_components();
 			weapon.add_sub_entity(engine_sound);
 			gun.firing_engine_sound = engine_sound;
@@ -582,7 +582,7 @@ namespace prefabs {
 			in.effect = assets::sound_buffer_id::FIREARM_ENGINE;
 			in.modifier.repetitions = -1;
 			in.delete_entity_after_effect_lifetime = false;
-			const auto engine_sound = sound_existence_system().create_sound_effect_entity(cosmos, in, gun.calculate_muzzle_position(weapon.logic_transform()), weapon);
+			const auto engine_sound = sound_existence_system().create_sound_effect_entity(cosmos, in, gun.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
 			engine_sound.add_standard_components();
 			weapon.add_sub_entity(engine_sound);
 			gun.firing_engine_sound = engine_sound;
@@ -873,7 +873,7 @@ namespace prefabs {
 			in.effect = assets::sound_buffer_id::FIREARM_ENGINE;
 			in.modifier.repetitions = -1;
 			in.delete_entity_after_effect_lifetime = false;
-			const auto engine_sound = sound_existence_system().create_sound_effect_entity(cosmos, in, gun.calculate_muzzle_position(weapon.logic_transform()), weapon);
+			const auto engine_sound = sound_existence_system().create_sound_effect_entity(cosmos, in, gun.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
 			engine_sound.add_standard_components();
 			weapon.add_sub_entity(engine_sound);
 			gun.firing_engine_sound = engine_sound;

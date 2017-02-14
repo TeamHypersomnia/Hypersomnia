@@ -208,7 +208,7 @@ std::vector<const_entity_handle> cosmos::get(const processing_subjects list) con
 
 size_t cosmos::get_rng_seed_for(const entity_id id) const {
 	size_t transform_hash = 0;
-	const auto tr = get_handle(id).logic_transform();
+	const auto tr = get_handle(id).get_logic_transform();
 	transform_hash = static_cast<size_t>(std::abs(tr.pos.x)*100.0);
 	transform_hash += static_cast<size_t>(std::abs(tr.pos.y)*100.0);
 	transform_hash += static_cast<size_t>(std::abs(tr.rotation)*100.0);

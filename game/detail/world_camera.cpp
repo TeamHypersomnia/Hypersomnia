@@ -14,7 +14,7 @@ void world_camera::tick(const interpolation_system& interp, const augs::delta dt
 
 	/* we obtain transform as a copy because we'll be now offsetting it by crosshair position */
 	if (entity_to_chase.alive()) {
-		camera.transform = entity_to_chase.viewing_transform(interp);
+		camera.transform = entity_to_chase.get_viewing_transform(interp);
 		camera.transform.rotation = 0;
 	}
 
@@ -77,7 +77,7 @@ void world_camera::tick(const interpolation_system& interp, const augs::delta dt
 
 			vec2 player_pos;
 
-			player_pos = physics.get_position();//entity_to_chase.logic_transform().interpolated(dt.view_interpolation_ratio());
+			player_pos = physics.get_position();//entity_to_chase.get_logic_transform().interpolated(dt.view_interpolation_ratio());
 				//physics.get_position();
 
 			if (player_pos != player_position_at_previous_step) {

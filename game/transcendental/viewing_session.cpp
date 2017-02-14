@@ -229,7 +229,7 @@ void viewing_session::advance_audiovisual_systems(
 	);
 
 	auto listener_cone = camera.smoothed_camera;
-	listener_cone.transform = cosm[viewed_character].viewing_transform(interp);
+	listener_cone.transform = cosm[viewed_character].get_viewing_transform(interp);
 
 	systems_audiovisual.get<sound_system>().play_nearby_sound_existences(
 		listener_cone,
@@ -296,8 +296,8 @@ void viewing_session::view(
 	using namespace augs::gui::text;
 
 	if (show_profile_details) {
-		const auto coords = character_chased_by_camera.alive() ? character_chased_by_camera.logic_transform().pos : vec2();
-		const auto rot = character_chased_by_camera.alive() ? character_chased_by_camera.logic_transform().rotation : 0.f;
+		const auto coords = character_chased_by_camera.alive() ? character_chased_by_camera.get_logic_transform().pos : vec2();
+		const auto rot = character_chased_by_camera.alive() ? character_chased_by_camera.get_logic_transform().rotation : 0.f;
 		const auto vel = character_chased_by_camera.alive() ? character_chased_by_camera.get<components::physics>().velocity() : vec2();
 
 		const auto bbox = quick_print_format(

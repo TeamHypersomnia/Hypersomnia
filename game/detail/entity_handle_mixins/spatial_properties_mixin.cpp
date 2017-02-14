@@ -31,7 +31,7 @@ bool basic_spatial_properties_mixin<C, D>::has_logic_transform() const {
 }
 
 template <bool C, class D>
-components::transform basic_spatial_properties_mixin<C, D>::logic_transform() const {
+components::transform basic_spatial_properties_mixin<C, D>::get_logic_transform() const {
 	const auto handle = *static_cast<const D*>(this);
 
 	const auto owner = handle.get_owner_body();
@@ -45,12 +45,12 @@ components::transform basic_spatial_properties_mixin<C, D>::logic_transform() co
 			const auto& fixtures = handle.get<components::fixtures>();
 
 			if (fixtures.is_activated() && phys.is_activated()) {
-				return components::fixtures::transform_around_body(handle, owner.logic_transform());
+				return components::fixtures::transform_around_body(handle, owner.get_logic_transform());
 			}
 			else {
 				ensure(handle.has<components::item>());
 
-				return handle.get_current_slot().get_container().logic_transform();
+				return handle.get_current_slot().get_container().get_logic_transform();
 			}
 		}
 		else {
@@ -60,7 +60,7 @@ components::transform basic_spatial_properties_mixin<C, D>::logic_transform() co
 			else {
 				ensure(handle.has<components::item>());
 
-				return handle.get_current_slot().get_container().logic_transform();
+				return handle.get_current_slot().get_container().get_logic_transform();
 			}
 		}
 	}
@@ -91,14 +91,14 @@ vec2 basic_spatial_properties_mixin<C, D>::get_effective_velocity() const {
 }
 
 template <bool C, class D>
-components::transform basic_spatial_properties_mixin<C, D>::viewing_transform(const interpolation_system& sys, const bool integerize) const {
+components::transform basic_spatial_properties_mixin<C, D>::get_viewing_transform(const interpolation_system& sys, const bool integerize) const {
 	const auto handle = *static_cast<const D*>(this);
-	return ::viewing_transform(sys, handle, integerize);
+	return ::get_viewing_transform(sys, handle, integerize);
 }
 
 template <class D>
 void spatial_properties_mixin<false, D>::set_logic_transform(const components::transform t) const {
-	if (logic_transform() == t) {
+	if (get_logic_transform() == t) {
 		return;
 	}
 	

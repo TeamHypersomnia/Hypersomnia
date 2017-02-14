@@ -77,7 +77,7 @@ void trace_system::spawn_finishing_traces_for_destroyed_objects(const logic_step
 			copied_trace.is_it_finishing_trace = true;
 			finishing_trace += copied_trace;
 			finishing_trace += e.get<components::sprite>();
-			finishing_trace += e.logic_transform();
+			finishing_trace += e.get_logic_transform();
 			finishing_trace += e.get<components::render>();
 
 			//finishing_trace.get<components::transform>().rotation = 90;// e.get<components::physics>().velocity().degrees();

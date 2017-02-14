@@ -85,10 +85,10 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 	float new_angle = 0.f;
 
 	if (rotation_copying.look_mode == components::rotation_copying::look_type::ROTATION) {
-		new_angle = target.logic_transform().rotation;
+		new_angle = target.get_logic_transform().rotation;
 	}
 	else if (rotation_copying.look_mode == components::rotation_copying::look_type::POSITION) {
-		const auto& target_transform = target.logic_transform();
+		const auto& target_transform = target.get_logic_transform();
 		
 		const auto diff = target_transform.pos - position(it);
 
@@ -107,7 +107,7 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 
 				const auto& gun = subject_item.get<components::gun>();
 
-				const auto rifle_transform = subject_item.logic_transform();
+				const auto rifle_transform = subject_item.get_logic_transform();
 				auto barrel_center = gun.calculate_barrel_center(rifle_transform);
 				auto muzzle = gun.calculate_muzzle_position(rifle_transform);
 				const auto mc = position(it);

@@ -25,11 +25,11 @@ void components::position_copying::configure_chasing(
 ) {
 	auto& copying = subject += components::position_copying();
 	
-	copying.previous = subject.logic_transform();
+	copying.previous = subject.get_logic_transform();
 	copying.set_target(target);
 
 	if (cfg == chasing_configuration::RELATIVE_ORBIT) {
-		const auto subject_transform = target.logic_transform();
+		const auto subject_transform = target.get_logic_transform();
 		copying.position_copying_mode = components::position_copying::position_copying_type::ORBIT;
 
 		copying.position_copying_rotation = true;
@@ -47,14 +47,14 @@ void position_copying_system::update_transforms(const logic_step step) {
 	const auto delta = step.get_delta();
 	
 	for (const auto& it : cosmos.get(processing_subjects::WITH_POSITION_COPYING)) {
-		components::transform transform = it.logic_transform();
+		components::transform transform = it.get_logic_transform();
 		auto& position_copying = it.get<components::position_copying>();
 
 		position_copying.previous = transform;
 
 		if (cosmos[position_copying.target].dead()) continue;
 
-		auto target_transform = cosmos[position_copying.target].logic_transform();
+		auto target_transform = cosmos[position_copying.target].get_logic_transform();
 		target_transform.rotation *= position_copying.rotation_multiplier;
 		target_transform.pos = vec2i(target_transform.pos);
 

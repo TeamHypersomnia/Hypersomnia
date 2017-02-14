@@ -99,7 +99,7 @@ void sentience_system::cast_spells(const logic_step step) const {
 				if ((now - sentience.time_of_last_exhausted_cast).in_milliseconds(delta) >= 150.f) {
 					messages::exhausted_cast msg;
 					msg.subject = subject;
-					msg.transform = subject.logic_transform();
+					msg.transform = subject.get_logic_transform();
 
 					step.transient.messages.post(msg);
 					
@@ -187,7 +187,7 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 			auto owning_crosshair_recoil = punched[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
 
 			sentience.aimpunch.shoot_and_apply_impulse(owning_crosshair_recoil, 1 / 15.f, true,
-				(h.point_of_impact - punched.logic_transform().pos).cross(h.impact_velocity) / 100000000.f * 3.f / 25.f
+				(h.point_of_impact - punched.get_logic_transform().pos).cross(h.impact_velocity) / 100000000.f * 3.f / 25.f
 			);
 		}
 
@@ -205,7 +205,7 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		//
 		//const auto corpse = cosmos.clone_entity(sub_def);
 		//
-		//auto place_of_death = subject.logic_transform();
+		//auto place_of_death = subject.get_logic_transform();
 		//place_of_death.rotation = h.impact_velocity.degrees();
 		//
 		//corpse.set_logic_transform(place_of_death);

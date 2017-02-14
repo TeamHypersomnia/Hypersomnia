@@ -8,7 +8,7 @@ components::transform& interpolation_system::get_interpolated(const const_entity
 }
 
 components::transform interpolation_system::get_interpolated(const const_entity_handle id) const {
-	return enabled ? per_entity_cache[make_cache_id(id)].interpolated_transform : id.logic_transform();
+	return enabled ? per_entity_cache[make_cache_id(id)].interpolated_transform : id.get_logic_transform();
 }
 
 interpolation_system::cache& interpolation_system::get_data(const entity_id id) {
@@ -32,7 +32,7 @@ void interpolation_system::integrate_interpolated_transforms(
 	const float slowdown_multipliers_decrease = seconds / fixed_delta_for_slowdowns.in_seconds();
 
 	for (const auto e : cosm.get(processing_subjects::WITH_INTERPOLATION)) {
-		const auto& actual = e.logic_transform();
+		const auto& actual = e.get_logic_transform();
 		const auto& info = e.get<components::interpolation>();
 		auto& integrated = get_interpolated(e);
 		auto& cache = per_entity_cache[make_cache_id(e)];

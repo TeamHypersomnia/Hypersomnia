@@ -166,7 +166,7 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(came
 			}
 		}
 
-		const auto& transform = it.viewing_transform(interp) + existence.current_displacement;
+		const auto transform = it.get_viewing_transform(interp) + existence.current_displacement;
 		randomization rng = cosmos.get_rng_seed_for(it) + cosmos.get_total_steps_passed();
 
 		bool should_destroy = true;

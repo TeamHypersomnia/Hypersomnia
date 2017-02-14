@@ -31,7 +31,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 	for (const auto& it : cosmos.get(processing_subjects::WITH_PATHFINDING)) {
 		/* get necessary components */
 		auto& pathfinding = it.get<components::pathfinding>();
-		const auto& transform = it.logic_transform() + pathfinding.eye_offset;
+		const auto& transform = it.get_logic_transform() + pathfinding.eye_offset;
 		auto& body = it.get<components::physics>();
 
 		if (!body.is_constructed()) {

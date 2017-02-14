@@ -181,10 +181,10 @@ melee_state melee_system::primary_action(const logic_step step, const double dt_
 	//animation.offset_pattern = melee_component.offset_positions[int(melee_component.action_stage)];
 	//m.set_offset(colliders_offset_type::SPECIAL_MOVE_DISPLACEMENT, animation.calculate_intermediate_transform(melee_component.swing_current_time / melee_component.swings[int(melee_component.action_stage)].duration_ms));
 	const auto player = target.get_owning_transfer_capability();
-	damage.custom_impact_velocity = target.logic_transform().pos - player.logic_transform().pos;
+	damage.custom_impact_velocity = target.get_logic_transform().pos - player.get_logic_transform().pos;
 
 	response.subject = target;
-	response.origin_transform = target.logic_transform();
+	response.origin_transform = target.get_logic_transform();
 	step.transient.messages.post(response);
 
 	//pos_response.new_definition = new_definition;

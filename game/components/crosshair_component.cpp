@@ -13,7 +13,7 @@ namespace components {
 		if (snap_epsilon_base_offset && considered_base_offset.is_epsilon(4))
 			considered_base_offset.set(4, 0);
 
-		considered_base_offset.rotate(recoil_body.logic_transform().rotation, vec2());
+		considered_base_offset.rotate(recoil_body.get_logic_transform().rotation, vec2());
 
 		return considered_base_offset;
 	}

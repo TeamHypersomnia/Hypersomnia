@@ -177,7 +177,7 @@ void visibility_system::respond_to_visibility_information_requests(
 
 	for (const auto& request : los_requests) {
 		const auto it = cosmos[request.subject];
-		const auto transform = it.logic_transform();
+		const auto transform = it.get_logic_transform();
 
 		line_of_sight_response response;
 
@@ -187,7 +187,7 @@ void visibility_system::respond_to_visibility_information_requests(
 		for (const auto& candidate_id : in_aabb.entities) {
 			const auto candidate = cosmos[candidate_id];
 
-			const auto target_pos = candidate.logic_transform().pos;
+			const auto target_pos = candidate.get_logic_transform().pos;
 
 			if ((target_pos - transform.pos).length_sq() <= d*d) {
 				static thread_local std::vector<std::set<entity_id>*> target_sets;

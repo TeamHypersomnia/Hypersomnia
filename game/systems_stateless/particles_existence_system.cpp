@@ -98,7 +98,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 
 			step.transient.messages.post(burst);
 
-			burst.place_of_birth = cosmos[r].logic_transform();
+			burst.place_of_birth = cosmos[r].get_logic_transform();
 			burst.place_of_birth.rotation += 180;
 			burst.subject = r;
 			burst.input.effect = round_response_map.at(particle_effect_response_type::PROJECTILE_TRACE);
@@ -114,7 +114,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 			const auto& shell_response_map = *shell_response.response;
 
 			messages::create_particle_effect burst;
-			burst.place_of_birth = cosmos[s].logic_transform();
+			burst.place_of_birth = cosmos[s].get_logic_transform();
 			burst.place_of_birth.rotation += 180;
 			burst.subject = s;
 			burst.input.effect = shell_response_map.at(particle_effect_response_type::PROJECTILE_TRACE);
@@ -159,7 +159,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 		messages::create_particle_effect burst;
 		burst.subject = h.subject;
 		burst.place_of_birth.pos = h.point_of_impact;
-		burst.place_of_birth.pos = cosmos[h.subject].logic_transform().pos;
+		burst.place_of_birth.pos = cosmos[h.subject].get_logic_transform().pos;
 		burst.place_of_birth.rotation = (h.impact_velocity).degrees();
 		burst.input.modifier = response.modifier;
 

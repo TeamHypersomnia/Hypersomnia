@@ -9,8 +9,8 @@ template<bool is_const, class entity_handle_type>
 class basic_spatial_properties_mixin {
 public:
 	bool has_logic_transform() const;
-	components::transform logic_transform() const;
-	components::transform viewing_transform(const interpolation_system& sys, const bool integerize = false) const;
+	components::transform get_logic_transform() const;
+	components::transform get_viewing_transform(const interpolation_system& sys, const bool integerize = false) const;
 	vec2 get_effective_velocity() const;
 };
 

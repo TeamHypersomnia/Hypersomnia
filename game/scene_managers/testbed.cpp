@@ -837,7 +837,7 @@ namespace scene_managers {
 	//	auto vv = s.fixtures[0].debug_original;
 	//
 	//	for (int i = 0; i < vv.size(); ++i) {
-	//		auto& tt = tested.logic_transform();
+	//		auto& tt = tested.get_logic_transform();
 	//		auto pos = tt.pos;
 	//
 	//		lines.draw_cyan((pos + vv[i]).rotate(tt.rotation, pos), (pos + vv[(i + 1) % vv.size()]).rotate(tt.rotation, pos));

@@ -83,7 +83,7 @@ void light_system::render_all_lights(
 
 	for (const auto it : cosmos.get(processing_subjects::WITH_LIGHT)) {
 		messages::visibility_information_request request;
-		request.eye_transform = it.viewing_transform(interp);
+		request.eye_transform = it.get_viewing_transform(interp);
 		request.filter = filters::line_of_sight_query();
 		request.square_side = it.get<components::light>().max_distance.base_value;
 		request.subject = it;

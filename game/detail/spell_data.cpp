@@ -106,7 +106,6 @@ std::wstring describe_spell(
 	const const_entity_handle caster,
 	const spell_type spell
 ) {
-	const auto& sentience = caster.get<components::sentience>();
 	const auto spell_data = get_spell_data(spell);
 
 	const auto properties = typesafe_sprintf(
@@ -171,10 +170,12 @@ bool are_additional_conditions_for_casting_fulfilled(
 	switch (spell) {
 	case spell_type::ELECTRIC_TRIAD:
 	{
+		constexpr float standard_triad_radius = 800.f;
+
 		const bool is_any_hostile_in_proximity = get_closest_hostiles(
 			caster,
 			caster,
-			800,
+			standard_triad_radius,
 			filters::bullet()
 		).size() > 0;
 
@@ -194,82 +195,84 @@ void perform_spell_logic(
 	const augs::stepped_timestamp now
 ) {
 	const auto spell_data = get_spell_data(spell);
-	auto& cosm = caster.get_cosmos();
-	const auto dt = cosm.get_fixed_delta();
-	const auto caster_transform = caster.logic_transform();
+	auto& cosmos = caster.get_cosmos();
+	const auto dt = cosmos.get_fixed_delta();
+	const auto caster_transform = caster.get_logic_transform();
 	const auto appearance = get_spell_appearance(spell);
 	
-	const auto ignite_sparkles = [&]() {
+	const auto ignite_sparkle_particles = [&]() {
 		messages::create_particle_effect burst;
 		burst.subject = caster;
 		burst.place_of_birth = caster_transform;
 		burst.input.effect = assets::particle_effect_id::CAST_SPARKLES;
 		burst.input.modifier.colorize = appearance.border_col;
 
-		particles_existence_system().create_particle_effect_entity(cosm, burst).add_standard_components();
+		particles_existence_system().create_particle_effect_entity(cosmos, burst).add_standard_components();
 	};
 
-	const auto standard_sparkles_sound = [&]() {
+	const auto play_standard_sparkles_sound = [&]() {
 		components::sound_existence::effect_input in;
 		in.delete_entity_after_effect_lifetime = true;
 		in.direct_listener = caster;
 		in.effect = assets::sound_buffer_id::CAST_SUCCESSFUL;
 
-		sound_existence_system().create_sound_effect_entity(cosm, in, caster_transform, entity_id()).add_standard_components();
+		sound_existence_system().create_sound_effect_entity(cosmos, in, caster_transform, entity_id()).add_standard_components();
 	};
 
 	switch (spell) {
 	case spell_type::HASTE:
-		ignite_sparkles();
-		standard_sparkles_sound();
+		ignite_sparkle_particles();
+		play_standard_sparkles_sound();
 
 		sentience.haste.set_for_duration(static_cast<float>(spell_data.perk_duration_seconds * 1000), now); 
 
 		break;
 
 	case spell_type::ELECTRIC_SHIELD:
-		ignite_sparkles();
-		standard_sparkles_sound();
+		ignite_sparkle_particles();
+		play_standard_sparkles_sound();
 
 		sentience.electric_shield.set_for_duration(static_cast<float>(spell_data.perk_duration_seconds * 1000), now); 
 
 		break;
 
 	case spell_type::FURY_OF_THE_AEONS:
-		ignite_sparkles();
-		standard_sparkles_sound();
+		ignite_sparkle_particles();
+		play_standard_sparkles_sound();
 
 		break;
 
 	case spell_type::ULTIMATE_WRATH_OF_THE_AEONS:
 		if (now == when_casted) {
-			ignite_sparkles();
-			standard_sparkles_sound();
+			ignite_sparkle_particles();
+			play_standard_sparkles_sound();
 		}
 
 		break;
 
 	case spell_type::ELECTRIC_TRIAD:
-		ignite_sparkles();
-		standard_sparkles_sound();
+		ignite_sparkle_particles();
+		play_standard_sparkles_sound();
 
 		{
+			constexpr float standard_triad_radius = 800.f;
+
 			const auto hostiles = get_closest_hostiles(
 				caster,
 				caster,
-				800,
+				standard_triad_radius,
 				filters::bullet()
 			);
 
-			for (size_t i = 0; i < hostiles.size() && i < 3; ++i) {
-				const auto next_hostile = cosm[hostiles[i]];
+			for (size_t i = 0; i < 3 && i < hostiles.size(); ++i) {
+				const auto next_hostile = cosmos[hostiles[i]];
 
-				const auto energy_ball = cosm.create_entity("energy_ball");
+				const auto energy_ball = cosmos.create_entity("energy_ball");
 
 				auto new_energy_ball_transform = caster_transform;
 				
 				new_energy_ball_transform.rotation = 
-					(next_hostile.logic_transform().pos - caster_transform.pos).degrees();
+					(next_hostile.get_logic_transform().pos - caster_transform.pos).degrees();
 
 				ingredients::sprite(
 					energy_ball, 
@@ -287,8 +290,7 @@ void perform_spell_logic(
 				}
 
 				{
-					auto& response = energy_ball += components::sound_response();
-					response.response = assets::sound_response_id::ELECTRIC_PROJECTILE_RESPONSE;
+					energy_ball += components::sound_response{ assets::sound_response_id::ELECTRIC_PROJECTILE_RESPONSE };
 				}
 
 				auto& damage = energy_ball += components::damage();
@@ -297,7 +299,7 @@ void perform_spell_logic(
 				damage.amount = 42;
 				damage.sender = caster;
 
-				const auto energy_ball_velocity = vec2().set_from_degrees(new_energy_ball_transform.rotation).set_length(2000);
+				const auto energy_ball_velocity = vec2().set_from_degrees(new_energy_ball_transform.rotation) * 2000;
 				energy_ball.get<components::physics>().set_velocity(energy_ball_velocity);
 
 				energy_ball.add_standard_components();

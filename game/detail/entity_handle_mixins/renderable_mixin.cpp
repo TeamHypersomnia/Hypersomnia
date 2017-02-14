@@ -15,7 +15,7 @@ template <bool C, class D>
 ltrb basic_renderable_mixin<C, D>::get_aabb(const renderable_positioning_type type) const {
 	const auto handle = *static_cast<const D*>(this);
 
-	return get_aabb(handle.logic_transform(), type);
+	return get_aabb(handle.get_logic_transform(), type);
 }
 
 template <bool C, class D>
@@ -62,7 +62,7 @@ ltrb basic_renderable_mixin<C, D>::get_aabb(const components::transform transfor
 	//const auto* const sound_existence = e.find<components::sound_existence>();
 	//if (sound_existence) {
 	//	result.type = tree_type::SOUND_EXISTENCES;
-	//	result.aabb.set_position(e.logic_transform().pos);
+	//	result.aabb.set_position(e.get_logic_transform().pos);
 	//
 	//	const float artifacts_avoidance_epsilon = 20.f;
 	//
@@ -79,7 +79,7 @@ template <bool C, class D>
 ltrb basic_renderable_mixin<C, D>::get_aabb(const interpolation_system& interp, const renderable_positioning_type type) const {
 	const auto handle = *static_cast<const D*>(this);
 	
-	return get_aabb(handle.viewing_transform(interp, true), type);
+	return get_aabb(handle.get_viewing_transform(interp, true), type);
 }
 
 // explicit instantiation

@@ -99,7 +99,7 @@ augs::vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_i
 
 			const auto health_col = sentience->calculate_health_color(time_pulse_ratio);
 
-			auto& transform = v.viewing_transform(interp);
+			const auto transform = v.get_viewing_transform(interp);
 			
 			components::sprite::drawing_input state(r.renderer.triangles);
 			state.camera = r.camera;
@@ -110,7 +110,7 @@ augs::vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_i
 			circle_hud.set(assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM, health_col);
 			circle_hud.draw(state);
 			
-			const auto watched_character_transform = watched_character.viewing_transform(r.session.systems_audiovisual.get<interpolation_system>());
+			const auto watched_character_transform = watched_character.get_viewing_transform(r.session.systems_audiovisual.get<interpolation_system>());
 			float starting_health_angle = 0.f;
 			float ending_health_angle = 0.f;
 
@@ -119,7 +119,7 @@ augs::vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_i
 				ending_health_angle = starting_health_angle + sentience->health.get_ratio() * 90.f;
 			}
 			else {
-				starting_health_angle = (v.viewing_transform(interp).pos - watched_character_transform.pos).degrees() - 45;
+				starting_health_angle = (v.get_viewing_transform(interp).pos - watched_character_transform.pos).degrees() - 45;
 				ending_health_angle = starting_health_angle + sentience->health.get_ratio() * 90.f;
 			}
 
@@ -259,7 +259,7 @@ void immediate_hud::acquire_game_events(const const_logic_step step) {
 
 		if (cosmos[h.spawned_remnants].alive()) {
 			vn.text.set_text(augs::gui::text::format(L"Death", augs::gui::text::style(assets::font_id::GUI_FONT, col)));
-			vn.transform.pos = cosmos[h.spawned_remnants].logic_transform().pos;
+			vn.transform.pos = cosmos[h.spawned_remnants].get_logic_transform().pos;
 			recent_vertically_flying_numbers.push_back(vn);
 		}
 
@@ -336,7 +336,7 @@ void immediate_hud::draw_pure_color_highlights(const viewing_step step) const {
 			triangles, 
 			current_time, 
 			sprite, 
-			subject.viewing_transform(interp, true), 
+			subject.get_viewing_transform(interp, true), 
 			subject.get<components::render>(), 
 			step.camera, 
 			renderable_drawing_type::NORMAL

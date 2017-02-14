@@ -455,7 +455,7 @@ void perform_transfer(const item_slot_transfer_request r, const logic_step step)
 	components::transform previous_container_transform;
 
 	if (previous_slot.alive()) {
-		previous_container_transform = previous_slot.get_container().logic_transform();
+		previous_container_transform = previous_slot.get_container().get_logic_transform();
 
 		if (whole_item_grabbed) {
 			remove_item(previous_slot, r.get_item());
@@ -499,7 +499,7 @@ void perform_transfer(const item_slot_transfer_request r, const logic_step step)
 	auto physics_updater = [previous_container_transform](const entity_handle descendant, ...) {
 		const auto& cosmos = descendant.get_cosmos();
 
-		const auto previous_descendant_transform = descendant.logic_transform();
+		const auto previous_descendant_transform = descendant.get_logic_transform();
 
 		const auto parent_slot = cosmos[descendant.get<components::item>().current_slot];
 		auto def = descendant.get<components::fixtures>().get_data();
@@ -535,7 +535,7 @@ void perform_transfer(const item_slot_transfer_request r, const logic_step step)
 			descendant.get<components::physics>().set_transform(previous_descendant_transform);
 
 			if (descendant.has<components::interpolation>()) {
-				descendant.get<components::interpolation>().place_of_birth = descendant.logic_transform();
+				descendant.get<components::interpolation>().place_of_birth = descendant.get_logic_transform();
 			}
 		}
 	};

@@ -19,4 +19,4 @@ float distance_sq(const_entity_handle from, const_entity_handle to);
 
 void set_velocity(entity_handle, vec2);
 
-components::transform viewing_transform(const interpolation_system&, const const_entity_handle, const bool integerize = false);
+components::transform get_viewing_transform(const interpolation_system&, const const_entity_handle, const bool integerize = false);

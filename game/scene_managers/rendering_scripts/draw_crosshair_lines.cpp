@@ -22,7 +22,7 @@ namespace rendering_scripts {
 			vec2 line_from[2];
 			vec2 line_to[2];
 
-			const auto crosshair_pos = crosshair.viewing_transform(interp).pos;
+			const auto crosshair_pos = crosshair.get_viewing_transform(interp).pos;
 
 			const auto guns = character.guns_wielded();
 
@@ -45,7 +45,7 @@ namespace rendering_scripts {
 
 				const auto& gun = subject_item.get<components::gun>();
 
-				const auto rifle_transform = subject_item.viewing_transform(interp);
+				const auto rifle_transform = subject_item.get_viewing_transform(interp);
 				const auto barrel_center = gun.calculate_barrel_center(rifle_transform);
 				const auto muzzle = gun.calculate_muzzle_position(rifle_transform);
 
@@ -76,7 +76,7 @@ namespace rendering_scripts {
 
 				const auto& gun = subject_item.get<components::gun>();
 
-				const auto rifle_transform = subject_item.viewing_transform(interp);
+				const auto rifle_transform = subject_item.get_viewing_transform(interp);
 				const auto barrel_center = gun.calculate_barrel_center(rifle_transform);
 				const auto muzzle = gun.calculate_muzzle_position(rifle_transform);
 

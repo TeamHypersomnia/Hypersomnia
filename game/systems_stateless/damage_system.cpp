@@ -150,12 +150,12 @@ void damage_system::destroy_outdated_bullets(const logic_step step) {
 
 			const auto current_velocity = it.get<components::physics>().velocity();
 
-			it.set_logic_transform({ it.logic_transform().pos, current_velocity.degrees() });
+			it.set_logic_transform({ it.get_logic_transform().pos, current_velocity.degrees() });
 
 			if (closest_hostile.alive()) {
 				vec2 dirs[] = { current_velocity.perpendicular_cw(), -current_velocity.perpendicular_cw() };
 
-				auto homing_vector = closest_hostile.logic_transform().pos - it.logic_transform().pos;
+				auto homing_vector = closest_hostile.get_logic_transform().pos - it.get_logic_transform().pos;
 
 				if (dirs[0].radians_between(homing_vector) > dirs[1].radians_between(homing_vector)) {
 					std::swap(dirs[0], dirs[1]);

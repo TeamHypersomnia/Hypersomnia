@@ -9,7 +9,7 @@
 #include "game/systems_audiovisual/interpolation_system.h"
 
 vec2 position(const_entity_handle e) {
-	return e.logic_transform().pos;
+	return e.get_logic_transform().pos;
 }
 
 vec2 mass_center(const_entity_handle e) {
@@ -28,7 +28,7 @@ vec2 mass_center_or_position(const_entity_handle e) {
 }
 
 float rotation(const_entity_handle e) {
-	return e.logic_transform().rotation;
+	return e.get_logic_transform().rotation;
 }
 
 vec2 orientation(const_entity_handle of) {
@@ -67,7 +67,7 @@ void set_velocity(entity_handle h, vec2 v) {
 	h.get<components::physics>().set_velocity(v);
 }
 
-components::transform viewing_transform(const interpolation_system& sys, const const_entity_handle handle, const bool integerize) {
+components::transform get_viewing_transform(const interpolation_system& sys, const const_entity_handle handle, const bool integerize) {
 	const auto& owner = handle.get_owner_body();
 	
 	if (owner.alive() && owner.has<components::interpolation>() && owner != handle) {
@@ -82,5 +82,5 @@ components::transform viewing_transform(const interpolation_system& sys, const c
 		return sys.get_interpolated(handle);
 	}
 	
-	return handle.logic_transform();
+	return handle.get_logic_transform();
 }

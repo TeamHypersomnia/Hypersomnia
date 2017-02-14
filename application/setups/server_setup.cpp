@@ -379,7 +379,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 					const const_entity_handle character = hypersomnia[endpoints[i].controlled_entity];
 
 					if (character.alive()) {
-						auto pos = character.logic_transform().pos;
+						auto pos = character.get_logic_transform().pos;
 						auto vel = velocity(character);
 
 						this_step_stats += typesafe_sprintf("\n#%x%x%x %x (%x%x%x)\nPos: %x%x%x\nVel: %x%x%x", whb, i+1, whe, endpoints[i].nickname, ipb, endpoints[i].addr.get_readable_ip(), ipe, whb, pos, whe, whb, vel, whe);

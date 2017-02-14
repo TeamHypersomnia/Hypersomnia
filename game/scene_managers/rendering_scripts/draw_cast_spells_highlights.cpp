@@ -25,7 +25,7 @@ namespace rendering_scripts {
 
 					components::sprite::drawing_input highlight(in);
 					highlight.camera = cam;
-					highlight.renderable_transform.pos = it.viewing_transform(sys).pos;
+					highlight.renderable_transform.pos = it.get_viewing_transform(sys).pos;
 
 					auto highlight_col = appearance.border_col;
 					highlight_col.a = 255 * highlight_amount;

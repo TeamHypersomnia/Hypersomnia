@@ -181,7 +181,7 @@ namespace prefabs {
 
 				{
 					messages::create_particle_effect effect;
-					effect.place_of_birth = engine_physical.logic_transform();
+					effect.place_of_birth = engine_physical.get_logic_transform();
 					
 					if (i == 0 || i == 1) {
 						effect.place_of_birth.rotation += 180;

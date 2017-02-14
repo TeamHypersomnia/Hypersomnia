@@ -101,7 +101,7 @@ auto simulation_receiver::acquire_potential_misprediction(
 	misprediction_candidate_entry candidate;
 	
 	if (e.has_logic_transform()) {
-		candidate.transform = e.logic_transform();
+		candidate.transform = e.get_logic_transform();
 	}
 
 	candidate.id = e.get_id();
@@ -147,7 +147,7 @@ void simulation_receiver::drag_mispredictions_into_past(
 		if (!identity_matches)
 			continue;
 
-		const auto& reconciliated_transform = reconciliated_entity.logic_transform();
+		const auto& reconciliated_transform = reconciliated_entity.get_logic_transform();
 		const bool is_contagious_agent = reconciliated_entity.get_flag(entity_flag::IS_PAST_CONTAGIOUS);
 		const bool should_smooth_rotation = !is_contagious_agent || predicted_cosmos[reconciliated_entity.get<components::driver>().owned_vehicle].alive();
 

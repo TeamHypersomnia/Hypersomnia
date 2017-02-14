@@ -36,7 +36,7 @@ void basic_entity_handle<C>::add_standard_components() const {
 		(has_physics || has<components::crosshair>() || has<components::position_copying>())
 		) {
 		add(components::interpolation());
-		get<components::interpolation>().place_of_birth = logic_transform();
+		get<components::interpolation>().place_of_birth = get_logic_transform();
 	}
 
 	if ((has<components::render>() 

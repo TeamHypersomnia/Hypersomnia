@@ -179,7 +179,7 @@ entity_id get_closest_hostile(
 	const auto& cosmos = subject.get_cosmos();
 
 	const auto& physics = cosmos.systems_temporary.get<physics_system>();
-	const auto transform = subject.logic_transform();
+	const auto transform = subject.get_logic_transform();
 
 	const auto queried = physics.query_aabb_px(
 		transform.pos - vec2(radius, radius),
@@ -223,7 +223,7 @@ std::vector<entity_id> get_closest_hostiles(
 	const auto& cosmos = subject.get_cosmos();
 
 	const auto& physics = cosmos.systems_temporary.get<physics_system>();
-	const auto transform = subject.logic_transform();
+	const auto transform = subject.get_logic_transform();
 
 	const auto queried = physics.query_aabb_px(
 		transform.pos - vec2(radius, radius),

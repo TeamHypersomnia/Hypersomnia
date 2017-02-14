@@ -204,7 +204,7 @@ bool basic_physics_synchronizer<C>::is_activated() const {
 }
 
 void component_synchronizer<false, P>::set_transform(const entity_id id) const {
-	set_transform(handle.get_cosmos()[id].logic_transform());
+	set_transform(handle.get_cosmos()[id].get_logic_transform());
 }
 
 void component_synchronizer<false, P>::set_transform(const components::transform& transform) const {

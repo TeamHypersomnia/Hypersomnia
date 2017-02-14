@@ -71,7 +71,7 @@ void render_system::draw_entities(
 
 			if (e.has<renderable_type>()) {
 				const auto& render = e.get<components::render>();
-				const auto& renderable_transform = e.viewing_transform(interp, true);
+				const auto& renderable_transform = e.get_viewing_transform(interp, true);
 				const auto& renderable = e.get<renderable_type>();
 
 				render_system().draw_renderable(

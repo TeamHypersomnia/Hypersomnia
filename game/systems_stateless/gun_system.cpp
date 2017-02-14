@@ -72,7 +72,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 	auto& physics_sys = cosmos.systems_temporary.get<physics_system>();
 
 	for (const auto it : cosmos.get(processing_subjects::WITH_GUN)) {
-		const auto gun_transform = it.logic_transform();
+		const auto gun_transform = it.get_logic_transform();
 		const auto owning_capability = it.get_owning_transfer_capability();
 		
 		const auto owning_sentience = 
