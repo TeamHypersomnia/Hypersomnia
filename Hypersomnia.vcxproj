@@ -388,7 +388,7 @@
     <ClCompile Include="game\enums\item_transfer_result_type.cpp" />
     <ClCompile Include="game\resources\tile_layer.cpp" />
     <ClCompile Include="game\scene_managers\rendering_scripts\draw_crosshair_lines.cpp" />
-    <ClCompile Include="game\scene_managers\rendering_scripts\draw_sentience_meters.cpp" />
+    <ClCompile Include="game\scene_managers\rendering_scripts\draw_cast_spells_highlights.cpp" />
     <ClCompile Include="game\scene_managers\rendering_scripts\illuminated_rendering.cpp" />
     <ClCompile Include="game\scene_managers\resource_setups\make_button_with_corners.cpp" />
     <ClCompile Include="game\scene_managers\resource_setups\standard_sound_buffers.cpp" />

@@ -112,8 +112,10 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 	const auto regeneration_frequency_in_steps = static_cast<unsigned>(1 / step.cosm.get_fixed_delta().in_seconds() * 3);
 	const auto consciousness_regeneration_frequency_in_steps = static_cast<unsigned>(1 / step.cosm.get_fixed_delta().in_seconds() * 2);
 	const auto pe_regeneration_frequency_in_steps = static_cast<unsigned>(1 / step.cosm.get_fixed_delta().in_seconds() * 3);
+	auto& cosmos = step.cosm;
+	const auto delta = cosmos.get_fixed_delta();
 
-	for (const auto subject : step.cosm.get(processing_subjects::WITH_SENTIENCE)) {
+	for (const auto subject : cosmos.get(processing_subjects::WITH_SENTIENCE)) {
 		auto& sentience = subject.get<components::sentience>();
 
 		if (sentience.health.enabled) {
@@ -146,13 +148,18 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 		}
 
 		if (sentience.currently_casted_spell != spell_type::COUNT) {
-			do_spell_callback(
-				sentience.currently_casted_spell,
-				subject,
-				sentience,
-				sentience.time_of_last_spell_cast, 
-				now
-			);
+			const auto spell_data = get_spell_data(sentience.currently_casted_spell);
+			const auto when_casted = sentience.time_of_last_spell_cast;
+
+			if (spell_data.casting_time_ms && (now - when_casted).in_milliseconds(delta) <= spell_data.casting_time_ms) {
+				do_spell_callback(
+					sentience.currently_casted_spell,
+					subject,
+					sentience,
+					when_casted,
+					now
+				);
+			}
 		}
 	}
 }

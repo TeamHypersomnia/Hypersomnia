@@ -64,7 +64,11 @@ void local_setup::process(
 		);
 	}
 
-	hypersomnia[testbed.get_selected_character()].get<components::name>().nickname = ::to_wstring(cfg.nickname);
+	hypersomnia[testbed.characters[0]].get<components::name>().nickname = ::to_wstring(cfg.nickname);
+
+	if (testbed.characters.size() > 1) {
+		hypersomnia[testbed.characters[1]].get<components::name>().nickname = ::to_wstring(cfg.debug_second_nickname);
+	}
 
 	if (cfg.get_input_recording_mode() != input_recording_type::DISABLED) {
 		if (player.try_to_load_or_save_new_session("sessions/", "recorded.inputs")) {

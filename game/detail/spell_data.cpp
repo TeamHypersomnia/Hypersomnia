@@ -210,9 +210,5 @@ void do_spell_callback(
 		LOG("Unknown spell: %x", static_cast<int>(spell)); 
 		break;
 	}
-
-	if (!spell_data.casting_time_ms || (now - when_casted).in_milliseconds(dt) > spell_data.casting_time_ms) {
-		sentience.currently_casted_spell = spell_type::COUNT;
-	}
 }
 

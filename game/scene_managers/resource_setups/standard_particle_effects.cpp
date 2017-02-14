@@ -285,7 +285,7 @@ namespace resource_setups {
 				em.base_velocity_variation = std::make_pair(100.f, 120.f);
 
 				em.angular_velocity = std::make_pair(0, 0);
-				em.particle_lifetime_ms = std::make_pair(200, 400);
+				em.particle_lifetime_ms = std::make_pair(100, 500);
 
 				{
 					resources::particle particle_template;

@@ -31,14 +31,11 @@ namespace rendering_scripts {
 		const const_entity_handle character
 	);
 
-	void draw_sentience_meters(
+	void draw_cast_spells_highlights(
 		augs::vertex_triangle_buffer&,
-		const components::sentience&,
-		const vec2i left_top_position,
-		const unsigned total_width,
-		const unsigned vertical_bar_padding,
-		const assets::texture_id health_icon,
-		const assets::texture_id personal_electricity_icon,
-		const assets::texture_id consciousness_icon
+		const interpolation_system& sys,
+		const camera_cone cam,
+		const cosmos& cosm,
+		const float global_time_seconds
 	);
 }

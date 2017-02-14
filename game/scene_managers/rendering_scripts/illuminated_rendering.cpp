@@ -98,6 +98,14 @@ namespace rendering_scripts {
 					controlled_crosshair, 
 					controlled_entity
 				);
+
+				draw_cast_spells_highlights(
+					output,
+					interp,
+					camera,
+					cosmos,
+					global_time_seconds
+				);
 			}
 		);
 
