@@ -19,6 +19,7 @@
 
 #include "augs/misc/debug_entropy_player.h"
 
+#include "augs/templates/string_templates.h"
 #include "augs/filesystem/file.h"
 #include "local_setup.h"
 #include "augs/tweaker.h"
@@ -62,6 +63,8 @@ void local_setup::process(
 			standard_post_solve
 		);
 	}
+
+	hypersomnia[testbed.get_selected_character()].get<components::name>().nickname = ::to_wstring(cfg.nickname);
 
 	if (cfg.get_input_recording_mode() != input_recording_type::DISABLED) {
 		if (player.try_to_load_or_save_new_session("sessions/", "recorded.inputs")) {
