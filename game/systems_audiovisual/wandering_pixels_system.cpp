@@ -42,6 +42,7 @@ void wandering_pixels_system::advance_wandering_pixels_for(
 	const const_entity_handle it, 
 	const augs::delta dt
 ) {
+	const auto& cosmos = it.get_cosmos();
 	auto& cache = get_cache(it);
 	const auto& wandering = it.get<components::wandering_pixels>();
 
@@ -51,8 +52,13 @@ void wandering_pixels_system::advance_wandering_pixels_for(
 	}
 
 	if (!(cache.recorded_component.reach == wandering.reach)) {
+		cache.generator.seed(cosmos.get_rng_seed_for(it));
+
 		for (auto& p : cache.particles) {
-			p.pos.set(wandering.reach.x + cache.generator() % unsigned(wandering.reach.w) , wandering.reach.y + cache.generator() % unsigned(wandering.reach.h));
+			p.pos.set(
+				wandering.reach.x + cache.generator() % static_cast<unsigned>(wandering.reach.w), 
+				wandering.reach.y + cache.generator() % static_cast<unsigned>(wandering.reach.h)
+			);
 		}
 
 		cache.recorded_component.reach = wandering.reach;
@@ -111,10 +117,10 @@ void wandering_pixels_system::advance_wandering_pixels_for(
 		else if (p.direction_ms_left >= max_direction_time - interp_time) {
 			considered_direction = augs::interp(vec2(), p.current_direction, (max_direction_time - p.direction_ms_left) / interp_time);
 		}
-		else
-		{
+		else {
 			considered_direction = p.current_direction;
 		}
+
 		const auto vel = p.current_velocity;
 
 		p.pos += considered_direction * vel * dt.in_seconds();
