@@ -1,6 +1,5 @@
 #pragma once
 #include "augs/gui/dereferenced_location.h"
-#include "game/messages/gui_intents.h"
 #include "game/detail/item_transfer_result.h"
 #include "game/detail/item_slot_transfer_request.h"
 #include "game/detail/gui/item_button.h"

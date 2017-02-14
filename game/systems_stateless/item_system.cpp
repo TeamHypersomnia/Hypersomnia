@@ -6,7 +6,6 @@
 
 #include "game/detail/item_slot_transfer_request.h"
 #include "game/messages/queue_destruction.h"
-#include "game/messages/gui_intents.h"
 
 #include "game/transcendental/cosmos.h"
 
