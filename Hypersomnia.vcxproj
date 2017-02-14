@@ -1170,6 +1170,7 @@
     <ClInclude Include="game\enums\sound_response_type.h" />
     <ClInclude Include="game\enums\spell_type.h" />
     <ClInclude Include="game\messages\exhausted_cast_message.h" />
+    <ClInclude Include="game\messages\exploding_ring.h" />
     <ClInclude Include="game\messages\item_picked_up_message.h" />
     <ClInclude Include="game\messages\visibility_information.h" />
     <ClInclude Include="game\resources\sound_response.h" />

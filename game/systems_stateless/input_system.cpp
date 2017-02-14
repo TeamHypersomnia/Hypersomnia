@@ -21,8 +21,6 @@
 using namespace augs::window;
 
 void input_system::make_intent_messages(const logic_step step) {
-	auto& cosmos = step.cosm;
-
 	for (const auto& per_entity : step.entropy.intents_per_entity) {
 		for (const auto& raw : per_entity.second) {
 			messages::intent_message intent;
