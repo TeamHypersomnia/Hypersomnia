@@ -57,6 +57,8 @@ void sentience_system::cast_spells(const logic_step step) const {
 	const auto now = cosmos.get_timestamp();
 	const auto delta = cosmos.get_fixed_delta();
 
+	constexpr float standard_cooldown_for_all_spells_ms = 2000.f;
+
 	for (const auto& cast : step.entropy.cast_spells) {
 		const auto subject = cosmos[cast.first];
 		const auto spell = cast.second;
@@ -73,7 +75,7 @@ void sentience_system::cast_spells(const logic_step step) const {
 			const bool can_cast_already =
 				sentience.personal_electricity.value >= spell_data.personal_electricity_required
 				&& spell_instance_data.cast_cooldown.is_ready(now, delta)
-				&& sentience.all_spells_cast_cooldown.is_ready(now, delta)
+				&& sentience.cast_cooldown_for_all_spells.is_ready(now, delta)
 				&& are_additional_conditions_for_casting_fulfilled(spell, subject)
 			;
 			
@@ -83,8 +85,15 @@ void sentience_system::cast_spells(const logic_step step) const {
 
 				sentience.personal_electricity.value -= spell_data.personal_electricity_required;
 				
-				spell_instance_data.cast_cooldown.set(static_cast<float>(spell_data.cooldown_ms), now);
-				sentience.all_spells_cast_cooldown.set(static_cast<float>(2000 + spell_data.casting_time_ms), now);
+				spell_instance_data.cast_cooldown.set(
+					static_cast<float>(spell_data.cooldown_ms), 
+					now
+				);
+
+				sentience.cast_cooldown_for_all_spells.set(
+					static_cast<float>(standard_cooldown_for_all_spells_ms + spell_data.casting_time_ms), 
+					now
+				);
 			}
 			else {
 				if ((now - sentience.time_of_last_exhausted_cast).in_milliseconds(delta) >= 150.f) {
@@ -146,7 +155,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 			const auto when_casted = sentience.time_of_last_spell_cast;
 
 			if ((now - when_casted).in_milliseconds(delta) <= spell_data.casting_time_ms) {
-				do_spell_callback(
+				perform_spell_logic(
 					sentience.currently_casted_spell,
 					subject,
 					sentience,

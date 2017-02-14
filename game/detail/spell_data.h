@@ -13,7 +13,7 @@ struct spell_data {
 	unsigned personal_electricity_required = 40u;
 	unsigned cooldown_ms = 5000u;
 	unsigned casting_time_ms = 0u;
-	unsigned perk_seconds = 0u;
+	unsigned perk_duration_seconds = 0u;
 	augs::constant_size_wstring<32> incantation;
 };
 
@@ -34,7 +34,7 @@ bool are_additional_conditions_for_casting_fulfilled(
 	const const_entity_handle subject
 );
 
-void do_spell_callback(
+void perform_spell_logic(
 	const spell_type,
 	const entity_handle subject,
 	components::sentience& subject_sentience,

@@ -23,7 +23,7 @@ spell_data get_spell_data(const spell_type spell) {
 	case spell_type::HASTE:
 		d.cooldown_ms = 5000;
 		d.incantation = L"treximo";
-		d.perk_seconds = 33;
+		d.perk_duration_seconds = 33;
 		d.personal_electricity_required = 60;
 		break;
 
@@ -49,7 +49,7 @@ spell_data get_spell_data(const spell_type spell) {
 	case spell_type::ELECTRIC_SHIELD:
 		d.cooldown_ms = 5000;
 		d.incantation = L"energeia aspida";
-		d.perk_seconds = 60;
+		d.perk_duration_seconds = 60;
 		d.personal_electricity_required = 50;
 		break;
 	
@@ -116,27 +116,44 @@ std::wstring describe_spell(
 		spell_data.cooldown_ms
 	);
 
-	std::wstring d;
+	std::wstring description;
 
 	switch (spell) {
 	case spell_type::HASTE:
-		d = typesafe_sprintf(L"[color=green]Haste[/color]\n%x\n[color=vsdarkgray]Increases movement speed for %x seconds.[/color]", properties, spell_data.perk_seconds);
+		description = typesafe_sprintf(
+			L"[color=green]Haste[/color]\n%x\n[color=vsdarkgray]Increases movement speed for %x seconds.[/color]", 
+			properties, 
+			spell_data.perk_duration_seconds
+		);
 		break;
 
 	case spell_type::FURY_OF_THE_AEONS:
-		d = typesafe_sprintf(L"[color=cyan]Fury of the Aeons[/color]\n%x\n[color=vsdarkgray]Causes instant damage around the caster.[/color]", properties);
+		description = typesafe_sprintf(
+			L"[color=cyan]Fury of the Aeons[/color]\n%x\n[color=vsdarkgray]Causes instant damage around the caster.[/color]", 
+			properties
+		);
 		break;
 
 	case spell_type::ELECTRIC_TRIAD:
-		d = typesafe_sprintf(L"[color=cyan]Electric Triad[/color]\n%x\n[color=vsdarkgray]Spawns three electric missiles\nhoming towards hostile entities.[/color]", properties);
+		description = typesafe_sprintf(
+			L"[color=cyan]Electric Triad[/color]\n%x\n[color=vsdarkgray]Spawns three electric missiles\nhoming towards hostile entities.[/color]", 
+			properties
+		);
 		break;
 
 	case spell_type::ULTIMATE_WRATH_OF_THE_AEONS:
-		d = typesafe_sprintf(L"[color=cyan]Ultimate Wrath of the Aeons[/color]\n%x\n[color=vsdarkgray]Causes massive damage around the caster.\nRequires delay to initiate.[/color]", properties);
+		description = typesafe_sprintf(
+			L"[color=cyan]Ultimate Wrath of the Aeons[/color]\n%x\n[color=vsdarkgray]Causes massive damage around the caster.\nRequires delay to initiate.[/color]", 
+			properties
+		);
 		break;
 
 	case spell_type::ELECTRIC_SHIELD:
-		d = typesafe_sprintf(L"[color=turquoise]Electric Shield[/color]\n%x\n[color=vsdarkgray]For %x seconds, damage is absorbed\nby [/color][color=cyan]Personal Electricity[/color][color=vsdarkgray] instead of [/color][color=red]Health[/color][color=vsdarkgray].[/color]", properties, spell_data.perk_seconds);
+		description = typesafe_sprintf(
+			L"[color=turquoise]Electric Shield[/color]\n%x\n[color=vsdarkgray]For %x seconds, damage is absorbed\nby [/color][color=cyan]Personal Electricity[/color][color=vsdarkgray] instead of [/color][color=red]Health[/color][color=vsdarkgray].[/color]", 
+			properties, 
+			spell_data.perk_duration_seconds
+		);
 		break;
 
 	default: 
@@ -144,7 +161,7 @@ std::wstring describe_spell(
 		break;
 	}
 
-	return std::move(d);
+	return std::move(description);
 }
 
 bool are_additional_conditions_for_casting_fulfilled(
@@ -169,7 +186,7 @@ bool are_additional_conditions_for_casting_fulfilled(
 	}
 }
 
-void do_spell_callback(
+void perform_spell_logic(
 	const spell_type spell,
 	const entity_handle caster,
 	components::sentience& sentience,
@@ -202,17 +219,19 @@ void do_spell_callback(
 	};
 
 	switch (spell) {
-	case spell_type::HASTE: 
-		sentience.haste.set_for_duration(static_cast<float>(spell_data.perk_seconds * 1000), now); 
+	case spell_type::HASTE:
 		ignite_sparkles();
 		standard_sparkles_sound();
+
+		sentience.haste.set_for_duration(static_cast<float>(spell_data.perk_duration_seconds * 1000), now); 
 
 		break;
 
-	case spell_type::ELECTRIC_SHIELD: 
-		sentience.electric_shield.set_for_duration(static_cast<float>(spell_data.perk_seconds * 1000), now); 
+	case spell_type::ELECTRIC_SHIELD:
 		ignite_sparkles();
 		standard_sparkles_sound();
+
+		sentience.electric_shield.set_for_duration(static_cast<float>(spell_data.perk_duration_seconds * 1000), now); 
 
 		break;
 
@@ -248,9 +267,18 @@ void do_spell_callback(
 				const auto energy_ball = cosm.create_entity("energy_ball");
 
 				auto new_energy_ball_transform = caster_transform;
-				new_energy_ball_transform.rotation = (next_hostile.logic_transform().pos - caster_transform.pos).degrees();
+				
+				new_energy_ball_transform.rotation = 
+					(next_hostile.logic_transform().pos - caster_transform.pos).degrees();
 
-				ingredients::sprite(energy_ball, new_energy_ball_transform, assets::texture_id::ENERGY_BALL, cyan, render_layer::FLYING_BULLETS);
+				ingredients::sprite(
+					energy_ball, 
+					new_energy_ball_transform, 
+					assets::texture_id::ENERGY_BALL, 
+					cyan, 
+					render_layer::FLYING_BULLETS
+				);
+
 				ingredients::bullet_round_physics(energy_ball);
 
 				{
@@ -269,7 +297,8 @@ void do_spell_callback(
 				damage.amount = 42;
 				damage.sender = caster;
 
-				energy_ball.get<components::physics>().set_velocity(vec2().set_from_degrees(new_energy_ball_transform.rotation).set_length(2000));
+				const auto energy_ball_velocity = vec2().set_from_degrees(new_energy_ball_transform.rotation).set_length(2000);
+				energy_ball.get<components::physics>().set_velocity(energy_ball_velocity);
 
 				energy_ball.add_standard_components();
 			}

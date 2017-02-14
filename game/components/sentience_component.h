@@ -51,7 +51,7 @@ namespace components {
 		augs::stepped_timestamp time_of_last_received_damage;
 		augs::stepped_timestamp time_of_last_exertion;
 
-		augs::stepped_cooldown all_spells_cast_cooldown;
+		augs::stepped_cooldown cast_cooldown_for_all_spells;
 
 		meter health;
 		meter personal_electricity;

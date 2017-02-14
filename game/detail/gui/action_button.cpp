@@ -101,7 +101,7 @@ void action_button::draw(
 				bool is_still_cooled_down = false;
 
 				{
-					const auto all_cooldown = sentience.all_spells_cast_cooldown;
+					const auto all_cooldown = sentience.cast_cooldown_for_all_spells;
 					const auto this_cooldown = sentience.spells[bound_spell].cast_cooldown;
 
 					const auto effective_cooldown_ratio =
