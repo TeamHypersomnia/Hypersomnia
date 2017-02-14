@@ -2,6 +2,11 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/components/sentience_component.h"
+#include "game/components/render_component.h"
+#include "game/components/wandering_pixels_component.h"
+#include "game/messages/create_particle_effect.h"
+#include "game/systems_stateless/particles_existence_system.h"
+#include "game/systems_stateless/sound_existence_system.h"
 
 spell_data get_spell_data(const spell_type spell) {
 	spell_data d;
@@ -52,7 +57,7 @@ spell_appearance get_spell_appearance(const spell_type spell) {
 	spell_appearance a;
 
 	const rgba turqoise_spell_color = turquoise;
-	const rgba blue_spell_border = { 0, 128, 209, 255 };
+	const rgba blue_spell_border = cyan; //{ 0, 128, 209, 255 };
 	const rgba green_spell_color = { 0, 200, 0, 255 };
 
 	switch (spell) {
@@ -142,16 +147,63 @@ void do_spell_callback(
 	const augs::stepped_timestamp now
 ) {
 	const auto spell_data = get_spell_data(spell);
-	const auto& cosm = subject.get_cosmos();
+	auto& cosm = subject.get_cosmos();
 	const auto dt = cosm.get_fixed_delta();
+	const auto transform = subject.logic_transform();
+	const auto appearance = get_spell_appearance(spell);
+	
+	const auto ignite_sparkles = [&]() {
+		messages::create_particle_effect burst;
+		burst.subject = subject;
+		burst.place_of_birth = transform;
+		burst.input.effect = assets::particle_effect_id::CAST_SPARKLES;
+		burst.input.modifier.colorize = appearance.border_col;
+
+		particles_existence_system().create_particle_effect_entity(cosm, burst).add_standard_components();
+	};
+
+	const auto standard_sparkles_sound = [&]() {
+		components::sound_existence::effect_input in;
+		in.delete_entity_after_effect_lifetime = true;
+		in.direct_listener = subject;
+		in.effect = assets::sound_buffer_id::CAST_SUCCESSFUL;
+
+		sound_existence_system().create_sound_effect_entity(cosm, in, transform, entity_id()).add_standard_components();
+	};
 
 	switch (spell) {
 	case spell_type::HASTE: 
 		sentience.haste.set_for_duration(spell_data.perk_seconds * 1000, now); 
+		ignite_sparkles();
+		standard_sparkles_sound();
+
 		break;
 
 	case spell_type::ELECTRIC_SHIELD: 
 		sentience.electric_shield.set_for_duration(spell_data.perk_seconds * 1000, now); 
+		ignite_sparkles();
+		standard_sparkles_sound();
+
+		break;
+
+	case spell_type::FURY_OF_THE_AEONS:
+		ignite_sparkles();
+		standard_sparkles_sound();
+
+		break;
+
+	case spell_type::ULTIMATE_WRATH_OF_THE_AEONS:
+		if (now == when_casted) {
+			ignite_sparkles();
+			standard_sparkles_sound();
+		}
+
+		break;
+
+	case spell_type::ELECTRIC_TRIAD:
+		ignite_sparkles();
+		standard_sparkles_sound();
+
 		break;
 
 	default: 

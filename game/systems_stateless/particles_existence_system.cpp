@@ -17,6 +17,7 @@
 #include "game/messages/damage_message.h"
 #include "game/messages/melee_swing_response.h"
 #include "game/messages/health_event.h"
+#include "game/messages/exhausted_cast_message.h"
 
 #include "game/systems_audiovisual/particles_simulation_system.h"
 
@@ -81,6 +82,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 	const auto& damages = step.transient.messages.get_queue<messages::damage_message>();
 	const auto& swings = step.transient.messages.get_queue<messages::melee_swing_response>();
 	const auto& healths = step.transient.messages.get_queue<messages::health_event>();
+	const auto& exhausted_casts = step.transient.messages.get_queue<messages::exhausted_cast>();
 	auto& cosmos = step.cosm;
 
 	for (const auto& g : gunshots) {
@@ -185,6 +187,15 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 		burst.place_of_birth = s.origin_transform;
 		burst.input.effect = response_map.at(particle_effect_response_type::PARTICLES_WHILE_SWINGING);
 		burst.input.modifier = response.modifier;
+
+		step.transient.messages.post(burst);
+	}
+
+	for (const auto& e : exhausted_casts) {
+		messages::create_particle_effect burst;
+		burst.subject = e.subject;
+		burst.place_of_birth = e.transform;
+		burst.input.effect = assets::particle_effect_id::EXHAUSTED_SMOKE;
 
 		step.transient.messages.post(burst);
 	}
