@@ -68,14 +68,25 @@ particles_simulation_system::cache& particles_simulation_system::get_cache(const
 	return per_entity_cache[id.get_id()];
 }
 
-resources::particle& particles_simulation_system::spawn_particle(randomization& rng,
-	emission_instance& group, const vec2 position, float rotation, const float spread, const resources::emission& emission) {
+resources::particle& particles_simulation_system::spawn_particle(
+	randomization& rng,
+	emission_instance& group, 
+	const vec2 position, 
+	float rotation, 
+	const float spread, 
+	const resources::emission& emission
+) {
 	auto new_particle = emission.particle_templates[rng.randval(0u, emission.particle_templates.size() - 1)];
 	new_particle.vel = vec2().set_from_degrees(
 		group.angular_offset + rng.randval(rotation - spread, rotation + spread)) *
 		rng.randval(group.velocity);
 
-	rotation = new_particle.vel.degrees();
+	if (emission.should_particles_look_towards_velocity) {
+		rotation = new_particle.vel.degrees();
+	}
+	else {
+		rotation = 0;
+	}
 
 	new_particle.pos = position + emission.offset;
 	new_particle.lifetime_ms = 0.f;

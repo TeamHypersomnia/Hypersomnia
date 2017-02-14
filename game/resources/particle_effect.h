@@ -85,6 +85,7 @@ namespace resources {
 		
 		float initial_rotation_variation = 0.f;
 		bool randomize_acceleration = false;
+		bool should_particles_look_towards_velocity = true;
 
 		vec2 offset;
 

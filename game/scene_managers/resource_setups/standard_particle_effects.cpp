@@ -326,6 +326,7 @@ namespace resource_setups {
 				em.size_multiplier = std::make_pair(1, 1);
 				em.particle_render_template.layer = render_layer::EFFECTS;
 				em.initial_rotation_variation = 0;
+				em.should_particles_look_towards_velocity = false;
 
 				effect.push_back(em);
 			}

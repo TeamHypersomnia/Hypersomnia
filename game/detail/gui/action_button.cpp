@@ -84,7 +84,7 @@ void action_button::draw(
 
 					if (draw_partial_colorful_rect) {
 						auto colorful_rect = absolute_icon_rect;
-						const auto colorful_height = absolute_icon_rect.h() * required_mana_ratio;
+						const auto colorful_height = static_cast<int>(absolute_icon_rect.h() * required_mana_ratio);
 						colorful_rect.t = absolute_icon_rect.b - colorful_height;
 						colorful_rect.b = colorful_rect.t + colorful_height;
 

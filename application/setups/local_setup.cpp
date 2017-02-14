@@ -78,7 +78,7 @@ void local_setup::process(
 
 	timer.reset_timer();
 
-	const bool debug_control_timing = player.is_replaying();
+	const bool debug_control_timing = true;// player.is_replaying();
 
 	while (!should_quit) {
 		{
