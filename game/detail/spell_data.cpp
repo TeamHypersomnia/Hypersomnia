@@ -103,10 +103,10 @@ spell_appearance get_spell_appearance(const spell_type spell) {
 }
 
 std::wstring describe_spell(
-	const const_entity_handle subject,
+	const const_entity_handle caster,
 	const spell_type spell
 ) {
-	const auto& sentience = subject.get<components::sentience>();
+	const auto& sentience = caster.get<components::sentience>();
 	const auto spell_data = get_spell_data(spell);
 
 	const auto properties = typesafe_sprintf(
@@ -149,14 +149,14 @@ std::wstring describe_spell(
 
 bool are_additional_conditions_for_casting_fulfilled(
 	const spell_type spell,
-	const const_entity_handle subject
+	const const_entity_handle caster
 ) {
 	switch (spell) {
 	case spell_type::ELECTRIC_TRIAD:
 	{
 		const bool is_any_hostile_in_proximity = get_closest_hostiles(
-			subject,
-			subject,
+			caster,
+			caster,
 			800,
 			filters::bullet()
 		).size() > 0;
@@ -171,21 +171,21 @@ bool are_additional_conditions_for_casting_fulfilled(
 
 void do_spell_callback(
 	const spell_type spell,
-	const entity_handle subject,
+	const entity_handle caster,
 	components::sentience& sentience,
 	const augs::stepped_timestamp when_casted,
 	const augs::stepped_timestamp now
 ) {
 	const auto spell_data = get_spell_data(spell);
-	auto& cosm = subject.get_cosmos();
+	auto& cosm = caster.get_cosmos();
 	const auto dt = cosm.get_fixed_delta();
-	const auto transform = subject.logic_transform();
+	const auto caster_transform = caster.logic_transform();
 	const auto appearance = get_spell_appearance(spell);
 	
 	const auto ignite_sparkles = [&]() {
 		messages::create_particle_effect burst;
-		burst.subject = subject;
-		burst.place_of_birth = transform;
+		burst.subject = caster;
+		burst.place_of_birth = caster_transform;
 		burst.input.effect = assets::particle_effect_id::CAST_SPARKLES;
 		burst.input.modifier.colorize = appearance.border_col;
 
@@ -195,10 +195,10 @@ void do_spell_callback(
 	const auto standard_sparkles_sound = [&]() {
 		components::sound_existence::effect_input in;
 		in.delete_entity_after_effect_lifetime = true;
-		in.direct_listener = subject;
+		in.direct_listener = caster;
 		in.effect = assets::sound_buffer_id::CAST_SUCCESSFUL;
 
-		sound_existence_system().create_sound_effect_entity(cosm, in, transform, entity_id()).add_standard_components();
+		sound_existence_system().create_sound_effect_entity(cosm, in, caster_transform, entity_id()).add_standard_components();
 	};
 
 	switch (spell) {
@@ -236,8 +236,8 @@ void do_spell_callback(
 
 		{
 			const auto hostiles = get_closest_hostiles(
-				subject,
-				subject,
+				caster,
+				caster,
 				800,
 				filters::bullet()
 			);
@@ -245,32 +245,33 @@ void do_spell_callback(
 			for (size_t i = 0; i < hostiles.size() && i < 3; ++i) {
 				const auto next_hostile = cosm[hostiles[i]];
 
-				const auto round_definition = cosm.create_entity("round_definition");
-				auto new_energy_ball_transform = transform;
-				new_energy_ball_transform.rotation = (next_hostile.logic_transform().pos - transform.pos).degrees();
+				const auto energy_ball = cosm.create_entity("energy_ball");
 
-				auto& s = ingredients::sprite(round_definition, new_energy_ball_transform, assets::texture_id::ENERGY_BALL, cyan, render_layer::FLYING_BULLETS);
-				ingredients::bullet_round_physics(round_definition);
+				auto new_energy_ball_transform = caster_transform;
+				new_energy_ball_transform.rotation = (next_hostile.logic_transform().pos - caster_transform.pos).degrees();
+
+				ingredients::sprite(energy_ball, new_energy_ball_transform, assets::texture_id::ENERGY_BALL, cyan, render_layer::FLYING_BULLETS);
+				ingredients::bullet_round_physics(energy_ball);
 
 				{
-					auto& response = round_definition += components::particle_effect_response{ assets::particle_effect_response_id::ELECTRIC_PROJECTILE_RESPONSE };
+					auto& response = energy_ball += components::particle_effect_response{ assets::particle_effect_response_id::ELECTRIC_PROJECTILE_RESPONSE };
 					response.modifier.colorize = cyan;
 				}
 
 				{
-					auto& response = round_definition += components::sound_response();
+					auto& response = energy_ball += components::sound_response();
 					response.response = assets::sound_response_id::ELECTRIC_PROJECTILE_RESPONSE;
 				}
 
-				auto& damage = round_definition += components::damage();
+				auto& damage = energy_ball += components::damage();
 				damage.homing_towards_hostile_strength = 1.0f;
-				damage.amount = 42;
-				damage.sender = subject;
 				damage.particular_homing_target = next_hostile;
+				damage.amount = 42;
+				damage.sender = caster;
 
-				round_definition.get<components::physics>().set_velocity(vec2().set_from_degrees(new_energy_ball_transform.rotation).set_length(2000));
+				energy_ball.get<components::physics>().set_velocity(vec2().set_from_degrees(new_energy_ball_transform.rotation).set_length(2000));
 
-				round_definition.add_standard_components();
+				energy_ball.add_standard_components();
 			}
 		}
 
