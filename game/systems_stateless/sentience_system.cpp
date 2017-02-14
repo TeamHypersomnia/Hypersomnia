@@ -5,6 +5,7 @@
 #include "game/components/sentience_component.h"
 #include "game/components/render_component.h"
 #include "game/messages/health_event.h"
+#include "game/messages/exhausted_cast_message.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_id.h"
@@ -90,6 +91,17 @@ void sentience_system::cast_spells(const logic_step step) const {
 				
 				spell_instance_data.cast_cooldown.set(static_cast<float>(spell_data.cooldown_ms), now);
 				sentience.all_spells_cast_cooldown.set(static_cast<float>(2000 + spell_data.casting_time_ms), now);
+			}
+			else {
+				if ((now - sentience.time_of_last_exhausted_cast).in_milliseconds(delta) >= 150.f) {
+					messages::exhausted_cast msg;
+					msg.subject = subject;
+					msg.transform = subject.logic_transform();
+
+					step.transient.messages.post(msg);
+					
+					sentience.time_of_last_exhausted_cast = now;
+				}
 			}
 		}
 	}

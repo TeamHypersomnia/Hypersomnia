@@ -62,6 +62,7 @@ void action_button::draw(
 				const augs::gui::material inside_mat(inside_tex, inside_col);
 
 				const auto absolute_icon_rect = ltrbi(vec2i(0, 0), (*inside_tex).get_size()).place_in_center_of(absolute_rect);
+				const bool draw_partial_colorful_rect = false;
 
 				if (has_enough_mana) {
 					draw_clipped_rect(
@@ -81,20 +82,20 @@ void action_button::draw(
 						ltrbi()
 					);
 
-					/*
-					auto colorful_rect = absolute_icon_rect;
-					const auto colorful_height = absolute_icon_rect.h() * required_mana_ratio;
-					colorful_rect.t = absolute_icon_rect.b - colorful_height;
-					colorful_rect.b = colorful_rect.t + colorful_height;
+					if (draw_partial_colorful_rect) {
+						auto colorful_rect = absolute_icon_rect;
+						const auto colorful_height = absolute_icon_rect.h() * required_mana_ratio;
+						colorful_rect.t = absolute_icon_rect.b - colorful_height;
+						colorful_rect.b = colorful_rect.t + colorful_height;
 
-					augs::draw_clipped_rect(
-						info.v,
-						absolute_icon_rect,
-						get_resource_manager().find(inside_mat.tex)->tex,
-						inside_mat.color,
-						colorful_rect
-					);
-					*/
+						augs::draw_clipped_rect(
+							info.v,
+							absolute_icon_rect,
+							get_resource_manager().find(inside_mat.tex)->tex,
+							inside_mat.color,
+							colorful_rect
+						);
+					}
 				}
 
 				bool is_still_cooled_down = false;

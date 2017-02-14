@@ -15,6 +15,7 @@
 #include "game/messages/damage_message.h"
 #include "game/messages/melee_swing_response.h"
 #include "game/messages/health_event.h"
+#include "game/messages/exhausted_cast_message.h"
 
 #include "game/resources/manager.h"
 
@@ -77,6 +78,7 @@ void sound_existence_system::game_responses_to_sound_effects(const logic_step st
 	const auto& damages = step.transient.messages.get_queue<messages::damage_message>();
 	const auto& swings = step.transient.messages.get_queue<messages::melee_swing_response>();
 	const auto& healths = step.transient.messages.get_queue<messages::health_event>();
+	const auto& exhausted_casts = step.transient.messages.get_queue<messages::exhausted_cast>();
 	auto& cosmos = step.cosm;
 
 	for (const auto& g : gunshots) {
@@ -186,6 +188,17 @@ void sound_existence_system::game_responses_to_sound_effects(const logic_step st
 			
 			create_sound_effect_entity(cosmos, in, d.point_of_impact, entity_id()).add_standard_components();
 		}
+	}
+
+	for (const auto& e : exhausted_casts) {
+		const auto subject = cosmos[e.subject];
+
+		components::sound_existence::effect_input in;
+		in.delete_entity_after_effect_lifetime = true;
+		in.direct_listener = e.subject;
+		in.effect = assets::sound_buffer_id::CAST_UNSUCCESSFUL;
+
+		create_sound_effect_entity(cosmos, in, e.transform, entity_id()).add_standard_components();
 	}
 }
 //void create_sound_effects(const logic_step) const;

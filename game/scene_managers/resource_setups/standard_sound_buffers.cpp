@@ -78,6 +78,16 @@ namespace resource_setups {
 		}
 
 		{
+			auto& buf = get_resource_manager().create(assets::sound_buffer_id::CAST_SUCCESSFUL);
+			buf.from_file("hypersomnia/sfx/cast_successful.wav");
+		}
+
+		{
+			auto& buf = get_resource_manager().create(assets::sound_buffer_id::CAST_UNSUCCESSFUL);
+			buf.from_file("hypersomnia/sfx/cast_unsuccessful.wav");
+		}
+
+		{
 			auto& res = get_resource_manager().create(assets::sound_response_id::BILMER2000_RESPONSE);
 			augs::sound_effect_modifier mod;
 			mod.max_distance = 1920.f * 3.f;
