@@ -73,7 +73,9 @@ void sentience_system::cast_spells(const logic_step step) const {
 			const bool can_cast_already =
 				sentience.personal_electricity.value >= spell_data.personal_electricity_required
 				&& spell_instance_data.cast_cooldown.is_ready(now, delta)
-				&& sentience.all_spells_cast_cooldown.is_ready(now, delta);
+				&& sentience.all_spells_cast_cooldown.is_ready(now, delta)
+				&& are_additional_conditions_for_casting_fulfilled(spell, subject)
+			;
 			
 			if (can_cast_already) {
 				sentience.currently_casted_spell = spell;

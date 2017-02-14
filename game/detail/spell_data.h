@@ -29,6 +29,11 @@ struct spell_appearance {
 spell_data get_spell_data(const spell_type);
 spell_appearance get_spell_appearance(const spell_type);
 
+bool are_additional_conditions_for_casting_fulfilled(
+	const spell_type,
+	const const_entity_handle subject
+);
+
 void do_spell_callback(
 	const spell_type,
 	const entity_handle subject,

@@ -147,6 +147,28 @@ std::wstring describe_spell(
 	return std::move(d);
 }
 
+bool are_additional_conditions_for_casting_fulfilled(
+	const spell_type spell,
+	const const_entity_handle subject
+) {
+	switch (spell) {
+	case spell_type::ELECTRIC_TRIAD:
+	{
+		const bool is_any_hostile_in_proximity = get_closest_hostiles(
+			subject,
+			subject,
+			800,
+			filters::bullet()
+		).size() > 0;
+
+		return is_any_hostile_in_proximity;
+	}
+
+	default:
+		return true;
+	}
+}
+
 void do_spell_callback(
 	const spell_type spell,
 	const entity_handle subject,
@@ -181,14 +203,14 @@ void do_spell_callback(
 
 	switch (spell) {
 	case spell_type::HASTE: 
-		sentience.haste.set_for_duration(spell_data.perk_seconds * 1000, now); 
+		sentience.haste.set_for_duration(static_cast<float>(spell_data.perk_seconds * 1000), now); 
 		ignite_sparkles();
 		standard_sparkles_sound();
 
 		break;
 
 	case spell_type::ELECTRIC_SHIELD: 
-		sentience.electric_shield.set_for_duration(spell_data.perk_seconds * 1000, now); 
+		sentience.electric_shield.set_for_duration(static_cast<float>(spell_data.perk_seconds * 1000), now); 
 		ignite_sparkles();
 		standard_sparkles_sound();
 
