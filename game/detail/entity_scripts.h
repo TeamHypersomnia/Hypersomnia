@@ -31,3 +31,19 @@ struct ammunition_information {
 };
 
 ammunition_information get_ammunition_information(const const_entity_handle handle);
+
+struct b2Filter;
+
+entity_id get_closest_hostile(
+	const const_entity_handle subject,
+	const const_entity_handle subject_attitude,
+	const float radius,
+	const b2Filter filter
+);
+
+std::vector<entity_id> get_closest_hostiles(
+	const const_entity_handle subject,
+	const const_entity_handle subject_attitude,
+	const float radius,
+	const b2Filter filter
+);

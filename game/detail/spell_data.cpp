@@ -13,6 +13,9 @@
 #include "game/ingredients/ingredients.h"
 #include "game/assets/sound_response_id.h"
 
+#include "game/detail/entity_scripts.h"
+#include "game/enums/filters.h"
+
 spell_data get_spell_data(const spell_type spell) {
 	spell_data d;
 	
@@ -210,29 +213,43 @@ void do_spell_callback(
 		standard_sparkles_sound();
 
 		{
-			const auto round_definition = cosm.create_entity("round_definition");
+			const auto hostiles = get_closest_hostiles(
+				subject,
+				subject,
+				800,
+				filters::bullet()
+			);
 
-			auto& s = ingredients::sprite(round_definition, transform, assets::texture_id::ENERGY_BALL, cyan, render_layer::FLYING_BULLETS);
-			ingredients::bullet_round_physics(round_definition);
+			for (size_t i = 0; i < hostiles.size() && i < 3; ++i) {
+				const auto next_hostile = cosm[hostiles[i]];
 
-			{
-				auto& response = round_definition += components::particle_effect_response{ assets::particle_effect_response_id::ELECTRIC_PROJECTILE_RESPONSE };
-				response.modifier.colorize = cyan;
+				const auto round_definition = cosm.create_entity("round_definition");
+				auto new_energy_ball_transform = transform;
+				new_energy_ball_transform.rotation = (next_hostile.logic_transform().pos - transform.pos).degrees();
+
+				auto& s = ingredients::sprite(round_definition, new_energy_ball_transform, assets::texture_id::ENERGY_BALL, cyan, render_layer::FLYING_BULLETS);
+				ingredients::bullet_round_physics(round_definition);
+
+				{
+					auto& response = round_definition += components::particle_effect_response{ assets::particle_effect_response_id::ELECTRIC_PROJECTILE_RESPONSE };
+					response.modifier.colorize = cyan;
+				}
+
+				{
+					auto& response = round_definition += components::sound_response();
+					response.response = assets::sound_response_id::ELECTRIC_PROJECTILE_RESPONSE;
+				}
+
+				auto& damage = round_definition += components::damage();
+				damage.homing_towards_hostile_strength = 1.0f;
+				damage.amount = 42;
+				damage.sender = subject;
+				damage.particular_homing_target = next_hostile;
+
+				round_definition.get<components::physics>().set_velocity(vec2().set_from_degrees(new_energy_ball_transform.rotation).set_length(2000));
+
+				round_definition.add_standard_components();
 			}
-
-			{
-				auto& response = round_definition += components::sound_response();
-				response.response = assets::sound_response_id::ELECTRIC_PROJECTILE_RESPONSE;
-			}
-
-			auto& damage = round_definition += components::damage();
-			damage.homing_towards_hostile_strength = 1.0f;
-			damage.amount = 42;
-			damage.sender = subject;
-
-			round_definition.get<components::physics>().set_velocity(vec2().set_from_degrees(transform.rotation).set_length(2000));
-
-			round_definition.add_standard_components();
 		}
 
 		break;

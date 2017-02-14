@@ -201,20 +201,20 @@ void sound_existence_system::game_responses_to_sound_effects(const logic_step st
 		create_sound_effect_entity(cosmos, in, e.transform, entity_id()).add_standard_components();
 	}
 }
-//void create_sound_effects(const logic_step) const;
+
 entity_handle sound_existence_system::create_sound_effect_entity(cosmos& cosmos, 
 	const components::sound_existence::effect_input input,
 	const components::transform place_of_birth,
 	const entity_id chased_subject_id
-	) const {
-	entity_handle new_sound_entity = cosmos.create_entity("particle_stream");
-	auto& target_transform = new_sound_entity += place_of_birth;
+) const {
+	const auto new_sound_entity = cosmos.create_entity("particle_stream");
+	new_sound_entity += place_of_birth;
 
 	auto& existence = new_sound_entity += components::sound_existence();
 	existence.input = input;
 	existence.time_of_birth = cosmos.get_timestamp();
 
-	const auto* buffer = get_resource_manager().find(input.effect);
+	const auto* const buffer = get_resource_manager().find(input.effect);
 
 	if (existence.input.variation_number == -1) {
 		existence.input.variation_number = static_cast<char>(existence.random_variation_number_from_transform(place_of_birth) % buffer->get_num_variations());

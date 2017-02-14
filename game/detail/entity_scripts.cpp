@@ -13,69 +13,80 @@
 #include "game/transcendental/cosmos.h"
 #include "augs/templates/container_templates.h"
 
+#include <Box2D\Dynamics\b2WorldCallbacks.h>
+
 void unset_input_flags_of_orphaned_entity(entity_handle e) {
-	auto* gun = e.find<components::gun>();
-	auto* melee = e.find<components::melee>();
-	auto* car = e.find<components::car>();
-	auto* movement = e.find<components::movement>();
-	auto* damage = e.find<components::damage>();
+	auto* const gun = e.find<components::gun>();
+	auto* const melee = e.find<components::melee>();
+	auto* const car = e.find<components::car>();
+	auto* const movement = e.find<components::movement>();
+	auto* const damage = e.find<components::damage>();
 
-	if (car)
+	if (car) {
 		car->reset_movement_flags();
+	}
 
-	if (movement)
+	if (movement) {
 		movement->reset_movement_flags();
+	}
 
-	if (gun)
+	if (gun) {
 		gun->trigger_pressed = false;
+	}
 
 	if (melee) {
 		melee->reset_weapon(e);
 	}
 }
 
-bool isLeft(vec2 a, vec2 b, vec2 c) {
+bool isLeft(const vec2 a, const vec2 b, const vec2 c) {
 	return ((b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)) > 0;
 }
 
-identified_danger assess_danger(const_entity_handle victim, const_entity_handle danger) {
+identified_danger assess_danger(
+	const const_entity_handle victim, 
+	const const_entity_handle danger
+) {
 	identified_danger result;
-	auto& cosmos = victim.get_cosmos();
+	const auto& cosmos = victim.get_cosmos();
 
-	auto* sentience = victim.find<components::sentience>();
+	const auto* const sentience = victim.find<components::sentience>();
 	if (!sentience) return result;
 
-	auto& s = *sentience;
+	const auto& s = *sentience;
 
 	result.danger = danger;
 
-	auto* damage = danger.find<components::damage>();
-	auto* attitude = danger.find<components::attitude>();
+	const auto* const damage = danger.find<components::damage>();
+	const auto* const attitude = danger.find<components::attitude>();
 
-	if ((!damage && !attitude) || (damage && cosmos[damage->sender].get_owning_transfer_capability() == victim))
+	if ((!damage && !attitude) || (damage && cosmos[damage->sender].get_owning_transfer_capability() == victim)) {
 		return result;
+	}
 
-	auto victim_pos = position(victim);
-	auto danger_pos = position(danger);
-	auto danger_vel = velocity(danger.get_owner_body());
-	auto danger_speed = danger_vel.length();
-	auto danger_dir = (danger_pos - victim_pos);
-	float danger_distance = danger_dir.length();
+	const auto victim_pos = position(victim);
+	const auto danger_pos = position(danger);
+	const auto danger_vel = velocity(danger.get_owner_body());
+	const auto danger_speed = danger_vel.length();
+	const auto danger_dir = (danger_pos - victim_pos);
+	const float danger_distance = danger_dir.length();
 
 	if (danger_speed > 10) {
 		result.recommended_evasion = isLeft(danger_pos, danger_pos + danger_vel, victim_pos) ? danger_vel.perpendicular_cw() : -danger_vel.perpendicular_cw();
 	}
-	else
+	else {
 		result.recommended_evasion = -danger_dir;
+	}
 
 	result.recommended_evasion.normalize();
 
 	//-danger_dir / danger_distance;
 
-	float comfort_zone_disturbance_ratio = (s.comfort_zone - danger_distance)/s.comfort_zone;
+	const float comfort_zone_disturbance_ratio = (s.comfort_zone - danger_distance)/s.comfort_zone;
 
-	if (comfort_zone_disturbance_ratio < 0)
+	if (comfort_zone_disturbance_ratio < 0) {
 		return result;
+	}
 
 	if (damage) {
 		result.amount += comfort_zone_disturbance_ratio * damage->amount*4;
@@ -93,8 +104,8 @@ identified_danger assess_danger(const_entity_handle victim, const_entity_handle 
 }
 
 attitude_type calculate_attitude(const const_entity_handle targeter, const const_entity_handle target) {
-	auto& targeter_attitude = targeter.get<components::attitude>();
-	auto* target_attitude = target.find<components::attitude>();
+	const auto& targeter_attitude = targeter.get<components::attitude>();
+	const auto* const target_attitude = target.find<components::attitude>();
 
 	if (target_attitude) {
 		if (targeter_attitude.hostile_parties & target_attitude->parties) {
@@ -113,9 +124,10 @@ attitude_type calculate_attitude(const const_entity_handle targeter, const const
 }
 
 
-float assess_projectile_velocity_of_weapon(const_entity_handle weapon) {
-	if (weapon.dead())
+float assess_projectile_velocity_of_weapon(const const_entity_handle weapon) {
+	if (weapon.dead()) {
 		return 0.f;
+	}
 
 	// auto ch = weapon[slot_function::GUN_CHAMBER];
 	// 
@@ -123,7 +135,7 @@ float assess_projectile_velocity_of_weapon(const_entity_handle weapon) {
 	// 	ch.get_items_inside()[0][sub_entity_name::BULLET_ROUND].get<components::damage>();
 	// }
 
-	auto* maybe_gun = weapon.find<components::gun>();
+	const auto* const maybe_gun = weapon.find<components::gun>();
 
 	if (maybe_gun) {
 		return (maybe_gun->muzzle_velocity.first + maybe_gun->muzzle_velocity.second) / 2;
@@ -156,4 +168,104 @@ ammunition_information get_ammunition_information(const const_entity_handle item
 	}
 
 	return std::move(out);
+}
+
+entity_id get_closest_hostile(
+	const const_entity_handle subject,
+	const const_entity_handle subject_attitude,
+	const float radius,
+	const b2Filter filter
+) {
+	const auto& cosmos = subject.get_cosmos();
+
+	const auto& physics = cosmos.systems_temporary.get<physics_system>();
+	const auto transform = subject.logic_transform();
+
+	const auto queried = physics.query_aabb_px(
+		transform.pos - vec2(radius, radius),
+		transform.pos + vec2(radius, radius),
+		filter,
+		subject
+	);
+
+	entity_id closest_hostile;
+
+	float min_distance = std::numeric_limits<float>::max();
+
+	if (subject_attitude.alive()) {
+		for (auto s_raw : queried.entities) {
+			const auto s = cosmos[s_raw];
+
+			if (s.has<components::attitude>()) {
+				const auto calculated_attitude = calculate_attitude(s, subject_attitude);
+
+				if (is_hostile(calculated_attitude)) {
+					auto dist = distance_sq(s, subject_attitude);
+
+					if (dist < min_distance) {
+						closest_hostile = s;
+						min_distance = dist;
+					}
+				}
+			}
+		}
+	}
+
+	return closest_hostile;
+}
+
+std::vector<entity_id> get_closest_hostiles(
+	const const_entity_handle subject,
+	const const_entity_handle subject_attitude,
+	const float radius,
+	const b2Filter filter
+) {
+	const auto& cosmos = subject.get_cosmos();
+
+	const auto& physics = cosmos.systems_temporary.get<physics_system>();
+	const auto transform = subject.logic_transform();
+
+	const auto queried = physics.query_aabb_px(
+		transform.pos - vec2(radius, radius),
+		transform.pos + vec2(radius, radius),
+		filter,
+		subject
+	);
+
+	struct hostile_entry {
+		entity_id s;
+		float dist = 0.f;
+
+		bool operator<(const hostile_entry& b) const {
+			return dist < b.dist;
+		}
+
+		operator entity_id() const {
+			return s;
+		}
+	};
+
+	std::vector<hostile_entry> hostiles;
+
+	float min_distance = std::numeric_limits<float>::max();
+
+	if (subject_attitude.alive()) {
+		for (auto s_raw : queried.entities) {
+			const auto s = cosmos[s_raw];
+
+			if (s.has<components::attitude>()) {
+				const auto calculated_attitude = calculate_attitude(s, subject_attitude);
+
+				if (is_hostile(calculated_attitude)) {
+					auto dist = distance_sq(s, subject_attitude);
+					
+					hostiles.push_back({ s, dist });
+				}
+			}
+		}
+	}
+
+	sort_container(hostiles);
+
+	return { hostiles.begin(), hostiles.end() };
 }

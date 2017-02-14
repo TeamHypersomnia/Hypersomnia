@@ -140,41 +140,14 @@ void damage_system::destroy_outdated_bullets(const logic_step step) {
 		}
 
 		if (damage.homing_towards_hostile_strength > 0.f) {
-			auto& physics = cosmos.systems_temporary.get<physics_system>();
-
-			const auto queried = physics.query_aabb_px(
-				it.logic_transform().pos - vec2(250, 250), 
-				it.logic_transform().pos + vec2(250, 250), 
-				filters::bullet(), 
-				it
-			);
-
-			entity_id closest_hostile_raw;
-
-			float min_distance = std::numeric_limits<float>::max();
 			const auto sender_capability = cosmos[damage.sender].get_owning_transfer_capability();
 			const auto sender_attitude = sender_capability.alive() && sender_capability.has<components::attitude>() ? sender_capability : cosmos[entity_id()];
 
-			if (sender_attitude.alive()) {
-				for (auto s_raw : queried.entities) {
-					const auto s = cosmos[s_raw];
+			const auto particular_homing_target = cosmos[damage.particular_homing_target];
 
-					if (s.has<components::attitude>()) {
-						const auto calculated_attitude = calculate_attitude(s, sender_attitude);
+			const auto closest_hostile = 
+				particular_homing_target.alive() ? particular_homing_target : cosmos[get_closest_hostile(it, sender_attitude, 250, filters::bullet())];
 
-						if (is_hostile(calculated_attitude)) {
-							auto dist = distance_sq(s, sender_attitude);
-
-							if (dist < min_distance) {
-								closest_hostile_raw = s;
-								min_distance = dist;
-							}
-						}
-					}
-				}
-			}
-
-			const auto closest_hostile = cosmos[closest_hostile_raw];
 			const auto current_velocity = it.get<components::physics>().velocity();
 
 			it.set_logic_transform({ it.logic_transform().pos, current_velocity.degrees() });
