@@ -82,9 +82,9 @@ identified_danger assess_danger(const_entity_handle victim, const_entity_handle 
 	}
 
 	if (attitude) {
-		auto att = calculate_attitude(danger, victim);
+		const auto att = calculate_attitude(danger, victim);
 		
-		if (att == attitude_type::WANTS_TO_KILL || att == attitude_type::WANTS_TO_KNOCK_UNCONSCIOUS) {
+		if (is_hostile(att)) {
 			result.amount += comfort_zone_disturbance_ratio * sentience->danger_amount_from_hostile_attitude;
 		}
 	}

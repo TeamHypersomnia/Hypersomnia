@@ -78,6 +78,7 @@ namespace resource_setups {
 		suppressor_gui.flip_horizontally = true;
 
 		manager.create(assets::texture_id::ROUND_TRACE, "hypersomnia/gfx/round_trace.png");
+		manager.create(assets::texture_id::ENERGY_BALL, "hypersomnia/gfx/energy_ball.png");
 		manager.create(assets::texture_id::PINK_CHARGE, "hypersomnia/gfx/pink_charge.png");
 		manager.create(assets::texture_id::PINK_SHELL, "hypersomnia/gfx/pink_shell.png");
 		manager.create(assets::texture_id::CYAN_CHARGE, "hypersomnia/gfx/cyan_charge.png");

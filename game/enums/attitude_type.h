@@ -6,3 +6,5 @@ enum class attitude_type {
 	WANTS_TO_KILL,
 	WANTS_TO_KNOCK_UNCONSCIOUS
 };
+
+bool is_hostile(const attitude_type);

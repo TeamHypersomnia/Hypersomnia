@@ -34,9 +34,9 @@ namespace behaviours {
 
 		for (auto s_raw : los.visible_sentiences) {
 			auto s = cosmos[s_raw];
-			auto att = calculate_attitude(s, subject);
+			const auto calculated_attitude = calculate_attitude(s, subject);
 
-			if (att == attitude_type::WANTS_TO_KILL || att == attitude_type::WANTS_TO_KNOCK_UNCONSCIOUS) {
+			if (is_hostile(calculated_attitude)) {
 				auto dist = distance_sq(s, subject);
 
 				if (dist < min_distance) {

@@ -4,9 +4,14 @@
 #include "game/components/sentience_component.h"
 #include "game/components/render_component.h"
 #include "game/components/wandering_pixels_component.h"
+#include "game/components/damage_component.h"
+#include "game/components/sound_response_component.h"
 #include "game/messages/create_particle_effect.h"
 #include "game/systems_stateless/particles_existence_system.h"
 #include "game/systems_stateless/sound_existence_system.h"
+
+#include "game/ingredients/ingredients.h"
+#include "game/assets/sound_response_id.h"
 
 spell_data get_spell_data(const spell_type spell) {
 	spell_data d;
@@ -203,6 +208,32 @@ void do_spell_callback(
 	case spell_type::ELECTRIC_TRIAD:
 		ignite_sparkles();
 		standard_sparkles_sound();
+
+		{
+			const auto round_definition = cosm.create_entity("round_definition");
+
+			auto& s = ingredients::sprite(round_definition, transform, assets::texture_id::ENERGY_BALL, cyan, render_layer::FLYING_BULLETS);
+			ingredients::bullet_round_physics(round_definition);
+
+			{
+				auto& response = round_definition += components::particle_effect_response{ assets::particle_effect_response_id::ELECTRIC_PROJECTILE_RESPONSE };
+				response.modifier.colorize = cyan;
+			}
+
+			{
+				auto& response = round_definition += components::sound_response();
+				response.response = assets::sound_response_id::ELECTRIC_PROJECTILE_RESPONSE;
+			}
+
+			auto& damage = round_definition += components::damage();
+			damage.homing_towards_hostile_strength = 1.0f;
+			damage.amount = 42;
+			damage.sender = subject;
+
+			round_definition.get<components::physics>().set_velocity(vec2().set_from_degrees(transform.rotation).set_length(2000));
+
+			round_definition.add_standard_components();
+		}
 
 		break;
 

@@ -79,14 +79,6 @@ void sentience_system::cast_spells(const logic_step step) const {
 				sentience.currently_casted_spell = spell;
 				sentience.time_of_last_spell_cast = now;
 
-				do_spell_callback(
-					sentience.currently_casted_spell, 
-					subject, 
-					sentience, 
-					sentience.time_of_last_spell_cast, 
-					now
-				);
-
 				sentience.personal_electricity.value -= spell_data.personal_electricity_required;
 				
 				spell_instance_data.cast_cooldown.set(static_cast<float>(spell_data.cooldown_ms), now);
@@ -151,7 +143,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 			const auto spell_data = get_spell_data(sentience.currently_casted_spell);
 			const auto when_casted = sentience.time_of_last_spell_cast;
 
-			if (spell_data.casting_time_ms && (now - when_casted).in_milliseconds(delta) <= spell_data.casting_time_ms) {
+			if ((now - when_casted).in_milliseconds(delta) <= spell_data.casting_time_ms) {
 				do_spell_callback(
 					sentience.currently_casted_spell,
 					subject,

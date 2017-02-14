@@ -24,7 +24,7 @@ namespace behaviours {
 		return tree::goal_availability::CANT_EXECUTE;
 	}
 
-	void pull_trigger::execute_leaf_goal_callback(tree::execution_occurence o, tree::state_of_traversal& t) const {
+	void pull_trigger::execute_leaf_goal_callback(const tree::execution_occurence o, tree::state_of_traversal& t) const {
 		const auto subject = t.subject;
 		const auto wielded = subject.guns_wielded();
 

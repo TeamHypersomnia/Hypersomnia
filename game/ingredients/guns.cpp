@@ -701,8 +701,7 @@ namespace prefabs {
 		{
 			const auto round_definition = cosmos.create_entity("round_definition");
 
-			auto& s = ingredients::sprite(round_definition, pos, assets::texture_id::ROUND_TRACE, cyan, render_layer::FLYING_BULLETS);
-			s.size *= vec2(2, 2);
+			auto& s = ingredients::sprite(round_definition, pos, assets::texture_id::ENERGY_BALL, cyan, render_layer::FLYING_BULLETS);
 			ingredients::bullet_round_physics(round_definition);
 
 			{

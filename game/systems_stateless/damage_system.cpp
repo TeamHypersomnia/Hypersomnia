@@ -160,9 +160,9 @@ void damage_system::destroy_outdated_bullets(const logic_step step) {
 					const auto s = cosmos[s_raw];
 
 					if (s.has<components::attitude>()) {
-						const auto att = calculate_attitude(s, sender_attitude);
+						const auto calculated_attitude = calculate_attitude(s, sender_attitude);
 
-						if (att == attitude_type::WANTS_TO_KILL || att == attitude_type::WANTS_TO_KNOCK_UNCONSCIOUS) {
+						if (is_hostile(calculated_attitude)) {
 							auto dist = distance_sq(s, sender_attitude);
 
 							if (dist < min_distance) {
