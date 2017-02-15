@@ -30,7 +30,7 @@
 #include "game/enums/party_category.h"
 
 namespace ingredients {
-	void wsad_character_setup_movement(const entity_handle e) {
+	void add_wsad_character_setup_movement(const entity_handle e) {
 		components::movement& movement = e.get<components::movement>();
 
 		movement.add_animation_receiver(e, false);
@@ -47,7 +47,7 @@ namespace ingredients {
 		movement.enable_braking_damping = true;
 	}
 
-	void wsad_character_physics(const entity_handle e) {
+	void add_wsad_character_physics(const entity_handle e) {
 		components::physics body;
 		components::special_physics special;
 		components::fixtures colliders;
@@ -63,7 +63,7 @@ namespace ingredients {
 
 		body.linear_damping = 0;
 
-		wsad_character_setup_movement(e);
+		add_wsad_character_setup_movement(e);
 
 		e += body;
 		e += special;
@@ -71,13 +71,13 @@ namespace ingredients {
 		e.get<components::fixtures>().set_owner_body(e);
 	}
 
-	void wsad_character_legs(const entity_handle legs, const entity_handle player) {
+	void add_wsad_character_legs(const entity_handle legs, const entity_handle player) {
 		components::sprite sprite;
 		components::render render;
 		components::animation animation;
 	}
 
-	void wsad_character(const entity_handle e, const entity_handle crosshair_entity, const assets::animation_response_id torso_set) {
+	void add_wsad_character(const entity_handle e, const entity_handle crosshair_entity, const assets::animation_response_id torso_set) {
 		auto& sprite = e += components::sprite();
 		auto& render = e += components::render();
 		auto& animation = e += components::animation();
@@ -196,10 +196,10 @@ namespace ingredients {
 		rotation_copying.look_mode = components::rotation_copying::look_type::POSITION;
 		rotation_copying.colinearize_item_in_hand = true;
 
-		wsad_character_setup_movement(e);
+		add_wsad_character_setup_movement(e);
 	}
 
-	void wsad_character_corpse(const entity_handle e) {
+	void add_wsad_character_corpse(const entity_handle e) {
 		auto& sprite = e += components::sprite();
 		auto& render = e += components::render();
 
@@ -240,17 +240,16 @@ namespace prefabs {
 		crosshair.get<components::crosshair>().character_entity_to_chase = character;
 		crosshair.set_logic_transform(spawn_transform.pos);
 
-		ingredients::wsad_character(character, crosshair, torso_set);
+		ingredients::add_wsad_character(character, crosshair, torso_set);
 		
-		ingredients::wsad_character_physics(character);
+		ingredients::add_wsad_character_physics(character);
 
 		character.get<components::physics>().set_transform(spawn_transform);
 
-		ingredients::character_inventory(character);
+		ingredients::add_character_inventory(character);
 
 		const auto corpse_of_sentience = world.create_entity("corpse_of_sentience");
 		name_entity(corpse_of_sentience, entity_name::CORPSE);
-		ingredients::wsad_character_corpse(corpse_of_sentience);
 
 		character.map_sub_entity(sub_entity_name::CORPSE_OF_SENTIENCE, corpse_of_sentience);
 

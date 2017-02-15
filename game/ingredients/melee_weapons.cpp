@@ -19,8 +19,8 @@ namespace prefabs {
 		auto& machete = world.create_entity("urban_cyan_machete");
 		name_entity(machete, entity_name::URBAN_CYAN_MACHETE);
 
-		auto& sprite = ingredients::sprite(machete, pos, assets::texture_id::URBAN_CYAN_MACHETE, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::see_through_dynamic_body(machete);
+		auto& sprite = ingredients::add_sprite(machete, pos, assets::texture_id::URBAN_CYAN_MACHETE, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(machete);
 
 		auto& item = ingredients::make_item(machete);
 		item.space_occupied_per_charge = to_space_units("2.5");

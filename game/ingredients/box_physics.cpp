@@ -7,7 +7,7 @@
 #include "game/transcendental/entity_handle.h"
 
 namespace ingredients {
-	void standard_dynamic_body(const entity_handle e, const bool destructible) {
+	void add_standard_dynamic_body(const entity_handle e, const bool destructible) {
 		components::physics def;
 
 		if (e.has<components::transform>()) {
@@ -31,7 +31,7 @@ namespace ingredients {
 		e.get<components::fixtures>().set_owner_body(e);
 	}
 
-	void see_through_dynamic_body(entity_handle e) {
+	void add_see_through_dynamic_body(entity_handle e) {
 		components::physics def;
 
 		if (e.has<components::transform>()) {
@@ -53,7 +53,7 @@ namespace ingredients {
 		e.get<components::fixtures>().set_owner_body(e);
 	}
 
-	void shell_dynamic_body(entity_handle e) {
+	void add_shell_dynamic_body(entity_handle e) {
 		components::physics def;
 
 		if (e.has<components::transform>()) {
@@ -77,7 +77,7 @@ namespace ingredients {
 		e.get<components::fixtures>().set_owner_body(e);
 	}
 
-	void standard_static_body(entity_handle e) {
+	void add_standard_static_body(entity_handle e) {
 		components::physics def;
 
 		if (e.has<components::transform>()) {
@@ -101,7 +101,7 @@ namespace ingredients {
 		e.get<components::fixtures>().set_owner_body(e);
 	}
 	
-	void bullet_round_physics(entity_handle e) {
+	void add_bullet_round_physics(entity_handle e) {
 		components::physics body;
 
 		if (e.has<components::transform>()) {

@@ -10,7 +10,7 @@
 #include "game/detail/gui/character_gui.h"
 
 namespace ingredients {
-	void character_inventory(entity_handle e) {
+	void add_character_inventory(entity_handle e) {
 		auto& container = e += components::container();
 		auto& item_slot_transfers = e += components::item_slot_transfers();
 		auto& detector = e += components::trigger_collision_detector();

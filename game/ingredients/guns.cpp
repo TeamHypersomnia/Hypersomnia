@@ -48,7 +48,7 @@ void add_muzzle_particles(
 }
 
 namespace ingredients {
-	void default_gun_container(entity_handle e, const float mag_rotation) {
+	void add_default_gun_container(entity_handle e, const float mag_rotation) {
 		auto& item = make_item(e);
 		auto& container = e += components::container();
 		item.space_occupied_per_charge = to_space_units("3.5");
@@ -102,8 +102,8 @@ namespace prefabs {
 		name_entity(sample_magazine, entity_name::MAGAZINE);
 
 		{
-			ingredients::sprite(sample_magazine, pos, assets::texture_id::SAMPLE_MAGAZINE, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::see_through_dynamic_body(sample_magazine);
+			ingredients::add_sprite(sample_magazine, pos, assets::texture_id::SAMPLE_MAGAZINE, white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::add_see_through_dynamic_body(sample_magazine);
 
 			auto& item = ingredients::make_item(sample_magazine);
 			auto& container = sample_magazine += components::container();
@@ -137,8 +137,8 @@ namespace prefabs {
 		name_entity(sample_magazine, entity_name::MAGAZINE);
 
 		{
-			ingredients::sprite(sample_magazine, pos, assets::texture_id::SMALL_MAGAZINE, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::see_through_dynamic_body(sample_magazine);
+			ingredients::add_sprite(sample_magazine, pos, assets::texture_id::SMALL_MAGAZINE, white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::add_see_through_dynamic_body(sample_magazine);
 
 			auto& item = ingredients::make_item(sample_magazine);
 			auto& container = sample_magazine += components::container();
@@ -170,8 +170,8 @@ namespace prefabs {
 		auto sample_suppressor = cosmos.create_entity("sample_suppressor");
 		name_entity(sample_suppressor, entity_name::SUPPRESSOR);
 
-		ingredients::sprite(sample_suppressor, pos, assets::texture_id::SAMPLE_SUPPRESSOR, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::see_through_dynamic_body(sample_suppressor);
+		ingredients::add_sprite(sample_suppressor, pos, assets::texture_id::SAMPLE_SUPPRESSOR, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(sample_suppressor);
 
 		auto& item = ingredients::make_item(sample_suppressor);
 
@@ -190,8 +190,8 @@ namespace prefabs {
 		name_entity(pink_charge, entity_name::PINK_CHARGE);
 
 		{
-			ingredients::sprite(pink_charge, pos, assets::texture_id::PINK_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::see_through_dynamic_body(pink_charge);
+			ingredients::add_sprite(pink_charge, pos, assets::texture_id::PINK_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::add_see_through_dynamic_body(pink_charge);
 
 			auto& item = ingredients::make_item(pink_charge);
 			item.space_occupied_per_charge = to_space_units("0.01");
@@ -201,9 +201,9 @@ namespace prefabs {
 		}
 
 		{
-			auto& s = ingredients::sprite(round_definition, pos, assets::texture_id::ROUND_TRACE, pink, render_layer::FLYING_BULLETS);
+			auto& s = ingredients::add_sprite(round_definition, pos, assets::texture_id::ROUND_TRACE, pink, render_layer::FLYING_BULLETS);
 			s.size *= vec2(2, 0.5);
-			ingredients::bullet_round_physics(round_definition);
+			ingredients::add_bullet_round_physics(round_definition);
 			
 			auto& damage = round_definition += components::damage();
 			damage.impulse_upon_hit = 1000.f;
@@ -226,8 +226,8 @@ namespace prefabs {
 		}
 
 		{
-			ingredients::sprite(shell_definition, pos, assets::texture_id::PINK_SHELL, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::shell_dynamic_body(shell_definition);
+			ingredients::add_sprite(shell_definition, pos, assets::texture_id::PINK_SHELL, white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::add_shell_dynamic_body(shell_definition);
 
 			auto& response = shell_definition += components::particle_effect_response{ assets::particle_effect_response_id::SHELL_RESPONSE };
 			response.modifier.colorize = pink;
@@ -248,8 +248,8 @@ namespace prefabs {
 		name_entity(cyan_charge, entity_name::CYAN_CHARGE);
 
 		{
-			ingredients::sprite(cyan_charge, pos, assets::texture_id::CYAN_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::see_through_dynamic_body(cyan_charge);
+			ingredients::add_sprite(cyan_charge, pos, assets::texture_id::CYAN_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::add_see_through_dynamic_body(cyan_charge);
 
 			auto& item = ingredients::make_item(cyan_charge);
 			item.space_occupied_per_charge = to_space_units("0.01");
@@ -259,9 +259,9 @@ namespace prefabs {
 		}
 
 		{
-			auto& s = ingredients::sprite(round_definition, pos, assets::texture_id::ROUND_TRACE, cyan, render_layer::FLYING_BULLETS);
+			auto& s = ingredients::add_sprite(round_definition, pos, assets::texture_id::ROUND_TRACE, cyan, render_layer::FLYING_BULLETS);
 			s.size *= vec2(2, 0.5);
-			ingredients::bullet_round_physics(round_definition);
+			ingredients::add_bullet_round_physics(round_definition);
 
 			{
 				auto& response = round_definition += components::particle_effect_response { assets::particle_effect_response_id::ELECTRIC_PROJECTILE_RESPONSE };
@@ -281,8 +281,8 @@ namespace prefabs {
 		}
 
 		{
-			ingredients::sprite(shell_definition, pos, assets::texture_id::CYAN_SHELL, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::shell_dynamic_body(shell_definition);
+			ingredients::add_sprite(shell_definition, pos, assets::texture_id::CYAN_SHELL, white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::add_shell_dynamic_body(shell_definition);
 			
 			auto& response = shell_definition += components::particle_effect_response{ assets::particle_effect_response_id::SHELL_RESPONSE };
 			response.modifier.colorize = cyan;
@@ -303,8 +303,8 @@ namespace prefabs {
 		name_entity(green_charge, entity_name::GREEN_CHARGE);
 
 		{
-			ingredients::sprite(green_charge, pos, assets::texture_id::GREEN_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::see_through_dynamic_body(green_charge);
+			ingredients::add_sprite(green_charge, pos, assets::texture_id::GREEN_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::add_see_through_dynamic_body(green_charge);
 
 			auto& item = ingredients::make_item(green_charge);
 			item.space_occupied_per_charge = to_space_units("0.01");
@@ -314,9 +314,9 @@ namespace prefabs {
 		}
 
 		{
-			auto& s = ingredients::sprite(round_definition, pos, assets::texture_id::ROUND_TRACE, green, render_layer::FLYING_BULLETS);
+			auto& s = ingredients::add_sprite(round_definition, pos, assets::texture_id::ROUND_TRACE, green, render_layer::FLYING_BULLETS);
 			s.size *= vec2(2.f, 0.5f);
-			ingredients::bullet_round_physics(round_definition);
+			ingredients::add_bullet_round_physics(round_definition);
 
 			{
 				auto& response = round_definition += components::particle_effect_response{ assets::particle_effect_response_id::HEALING_PROJECTILE_RESPONSE };
@@ -339,8 +339,8 @@ namespace prefabs {
 		}
 
 		{
-			ingredients::sprite(shell_definition, pos, assets::texture_id::GREEN_SHELL, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::shell_dynamic_body(shell_definition);
+			ingredients::add_sprite(shell_definition, pos, assets::texture_id::GREEN_SHELL, white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::add_shell_dynamic_body(shell_definition);
 
 			auto& response = shell_definition += components::particle_effect_response{ assets::particle_effect_response_id::SHELL_RESPONSE };
 			response.modifier.colorize = green;
@@ -361,9 +361,9 @@ namespace prefabs {
 		auto weapon = cosmos.create_entity("sample_rifle");
 		name_entity(weapon, entity_name::ASSAULT_RIFLE);
 
-		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::ASSAULT_RIFLE, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::see_through_dynamic_body(weapon);
-		ingredients::default_gun_container(weapon);
+		auto& sprite = ingredients::add_sprite(weapon, pos, assets::texture_id::ASSAULT_RIFLE, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(weapon);
+		ingredients::add_default_gun_container(weapon);
 
 		auto& response = weapon += components::sound_response();
 		response.response = assets::sound_response_id::ASSAULT_RIFLE_RESPONSE;
@@ -452,9 +452,9 @@ namespace prefabs {
 		auto weapon = cosmos.create_entity("sample_rifle");
 		name_entity(weapon, entity_name::BILMER2000);
 
-		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::BILMER2000, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::see_through_dynamic_body(weapon);
-		ingredients::default_gun_container(weapon);
+		auto& sprite = ingredients::add_sprite(weapon, pos, assets::texture_id::BILMER2000, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(weapon);
+		ingredients::add_default_gun_container(weapon);
 		
 		const auto bbox = weapon.get_aabb(components::transform()).get_size();
 
@@ -551,9 +551,9 @@ namespace prefabs {
 		auto weapon = cosmos.create_entity("submachine");
 		name_entity(weapon, entity_name::SUBMACHINE);
 
-		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::SUBMACHINE, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::see_through_dynamic_body(weapon);
-		ingredients::default_gun_container(weapon);
+		auto& sprite = ingredients::add_sprite(weapon, pos, assets::texture_id::SUBMACHINE, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(weapon);
+		ingredients::add_default_gun_container(weapon);
 
 		auto& response = weapon += components::sound_response();
 		response.response = assets::sound_response_id::SUBMACHINE_RESPONSE;
@@ -643,8 +643,8 @@ namespace prefabs {
 		auto weapon = cosmos.create_entity("amplifier_arm");
 		name_entity(weapon, entity_name::AMPLIFIER_ARM);
 
-		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::AMPLIFIER_ARM, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::see_through_dynamic_body(weapon);
+		auto& sprite = ingredients::add_sprite(weapon, pos, assets::texture_id::AMPLIFIER_ARM, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(weapon);
 
 		auto& response = weapon += components::sound_response();
 		response.response = assets::sound_response_id::SUBMACHINE_RESPONSE;
@@ -701,8 +701,8 @@ namespace prefabs {
 		{
 			const auto round_definition = cosmos.create_entity("round_definition");
 
-			auto& s = ingredients::sprite(round_definition, pos, assets::texture_id::ENERGY_BALL, cyan, render_layer::FLYING_BULLETS);
-			ingredients::bullet_round_physics(round_definition);
+			auto& s = ingredients::add_sprite(round_definition, pos, assets::texture_id::ENERGY_BALL, cyan, render_layer::FLYING_BULLETS);
+			ingredients::add_bullet_round_physics(round_definition);
 
 			{
 				auto& response = round_definition += components::particle_effect_response{ assets::particle_effect_response_id::ELECTRIC_PROJECTILE_RESPONSE };
@@ -730,9 +730,9 @@ namespace prefabs {
 		auto weapon = cosmos.create_entity("pistol");
 		name_entity(weapon, entity_name::PISTOL);
 
-		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::PISTOL, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::see_through_dynamic_body(weapon);
-		ingredients::default_gun_container(weapon);
+		auto& sprite = ingredients::add_sprite(weapon, pos, assets::texture_id::PISTOL, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(weapon);
+		ingredients::add_default_gun_container(weapon);
 
 		auto& response = weapon += components::sound_response();
 		response.response = assets::sound_response_id::KEK9_RESPONSE;
@@ -805,9 +805,9 @@ namespace prefabs {
 		auto weapon = cosmos.create_entity("pistol");
 		name_entity(weapon, entity_name::KEK9);
 
-		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::KEK9, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::see_through_dynamic_body(weapon);
-		ingredients::default_gun_container(weapon, 0);
+		auto& sprite = ingredients::add_sprite(weapon, pos, assets::texture_id::KEK9, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(weapon);
+		ingredients::add_default_gun_container(weapon, 0);
 		auto& container = weapon.get<components::container>();
 		
 		const auto bbox = weapon.get_aabb(components::transform()).get_size();

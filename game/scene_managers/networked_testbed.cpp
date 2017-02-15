@@ -92,11 +92,11 @@ namespace scene_managers {
 			for (int y = -side; y < side; ++y)
 			{
 				//auto background = world.create_entity("bg[-]");
-				//ingredients::sprite(background, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 550)), assets::texture_id::TEST_BACKGROUND, white, render_layer::GROUND);
-				//ingredients::standard_static_body(background);
+				//ingredients::add_sprite(background, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 550)), assets::texture_id::TEST_BACKGROUND, white, render_layer::GROUND);
+				//ingredients::add_standard_static_body(background);
 
 				auto street = world.create_entity("street[-]");
-				ingredients::sprite(street, { bg_size * vec2(x, y) },
+				ingredients::add_sprite(street, { bg_size * vec2(x, y) },
 					assets::texture_id::TEST_BACKGROUND, gray1, render_layer::GROUND);
 
 				//background.add_standard_components();
@@ -166,8 +166,8 @@ namespace scene_managers {
 				new_character.get<components::sentience>().minimum_danger_amount_to_evade = 20;
 				new_character.get<components::sentience>().health.value = 300;
 				new_character.get<components::sentience>().health.maximum = 300;
-				//ingredients::standard_pathfinding_capability(new_character);
-				//ingredients::soldier_intelligence(new_character);
+				//ingredients::add_standard_pathfinding_capability(new_character);
+				//ingredients::add_soldier_intelligence(new_character);
 				new_character.recalculate_basic_processing_categories();
 			}
 			if (i == 2) {
@@ -180,8 +180,8 @@ namespace scene_managers {
 				new_character.get<components::sentience>().minimum_danger_amount_to_evade = 20;
 				new_character.get<components::sentience>().health.value = 300;
 				new_character.get<components::sentience>().health.maximum = 300;
-				//ingredients::standard_pathfinding_capability(new_character);
-				//ingredients::soldier_intelligence(new_character);
+				//ingredients::add_standard_pathfinding_capability(new_character);
+				//ingredients::add_soldier_intelligence(new_character);
 				new_character.recalculate_basic_processing_categories();
 			}
 		}

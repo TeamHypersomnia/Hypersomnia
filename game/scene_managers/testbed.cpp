@@ -58,8 +58,8 @@ namespace scene_managers {
 		//for (int x = -4 * 1; x < 4 * 1; ++x)
 		//{
 		//	auto frog = world.create_entity("frog");
-		//	ingredients::sprite(frog, vec2(100 + x * 40, 200 + 400), assets::texture_id::TEST_SPRITE, white, render_layer::SMALL_DYNAMIC_BODY);
-		//	ingredients::see_through_dynamic_body(frog);
+		//	ingredients::add_sprite(frog, vec2(100 + x * 40, 200 + 400), assets::texture_id::TEST_SPRITE, white, render_layer::SMALL_DYNAMIC_BODY);
+		//	ingredients::add_see_through_dynamic_body(frog);
 		//	name_entity(frog, entity_name::CRATE);
 		//	frog.add_standard_components();
 		//}
@@ -161,8 +161,8 @@ namespace scene_managers {
 				new_character.get<components::sentience>().minimum_danger_amount_to_evade = 20;
 				new_character.get<components::sentience>().health.value = 300;
 				new_character.get<components::sentience>().health.maximum = 300;
-				//ingredients::standard_pathfinding_capability(new_character);
-				//ingredients::soldier_intelligence(new_character);
+				//ingredients::add_standard_pathfinding_capability(new_character);
+				//ingredients::add_soldier_intelligence(new_character);
 				new_character.recalculate_basic_processing_categories();
 			}
 			if (i == 2) {
@@ -173,8 +173,8 @@ namespace scene_managers {
 				new_character.get<components::sentience>().minimum_danger_amount_to_evade = 20;
 				new_character.get<components::sentience>().health.value = 300;
 				new_character.get<components::sentience>().health.maximum = 300;
-				//ingredients::standard_pathfinding_capability(new_character);
-				//ingredients::soldier_intelligence(new_character);
+				//ingredients::add_standard_pathfinding_capability(new_character);
+				//ingredients::add_soldier_intelligence(new_character);
 				new_character.recalculate_basic_processing_categories();
 			}
 
@@ -614,11 +614,11 @@ namespace scene_managers {
 					for (int y = -side; y < side * 16; ++y)
 					{
 						//auto background = world.create_entity("bg[-]");
-						//ingredients::sprite(background, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 550)), assets::texture_id::TEST_BACKGROUND, white, render_layer::GROUND);
-						//ingredients::standard_static_body(background);
+						//ingredients::add_sprite(background, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 550)), assets::texture_id::TEST_BACKGROUND, white, render_layer::GROUND);
+						//ingredients::add_standard_static_body(background);
 
 						auto street = world.create_entity("street[-]");
-						ingredients::sprite(street, { bg_size * vec2(x, y) },
+						ingredients::add_sprite(street, { bg_size * vec2(x, y) },
 							assets::texture_id::TEST_BACKGROUND, gray1, render_layer::GROUND);
 
 						//background.add_standard_components();
@@ -630,7 +630,7 @@ namespace scene_managers {
 
 				{
 					auto road_dirt = world.create_entity("road_dirt[-]");
-					ingredients::sprite(road_dirt, vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 - size.y / 2),
+					ingredients::add_sprite(road_dirt, vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 - size.y / 2),
 						assets::texture_id::ROAD_FRONT_DIRT, white, render_layer::ON_TILED_FLOOR);
 
 					road_dirt.add_standard_components();
@@ -640,7 +640,7 @@ namespace scene_managers {
 					const auto size = assets::get_size(assets::texture_id::ROAD);
 
 					auto road = world.create_entity("road[-]");
-					ingredients::sprite(road, vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 + size.y / 2 + size.y*r),
+					ingredients::add_sprite(road, vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 + size.y / 2 + size.y*r),
 						assets::texture_id::ROAD, white, render_layer::ON_GROUND);
 
 					road.add_standard_components();

@@ -274,7 +274,7 @@ void perform_spell_logic(
 				new_energy_ball_transform.rotation = 
 					(next_hostile.get_logic_transform().pos - caster_transform.pos).degrees();
 
-				ingredients::sprite(
+				ingredients::add_sprite(
 					energy_ball, 
 					new_energy_ball_transform, 
 					assets::texture_id::ENERGY_BALL, 
@@ -282,7 +282,7 @@ void perform_spell_logic(
 					render_layer::FLYING_BULLETS
 				);
 
-				ingredients::bullet_round_physics(energy_ball);
+				ingredients::add_bullet_round_physics(energy_ball);
 
 				{
 					auto& response = energy_ball += components::particle_effect_response{ assets::particle_effect_response_id::ELECTRIC_PROJECTILE_RESPONSE };

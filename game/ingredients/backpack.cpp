@@ -11,7 +11,7 @@
 #include "game/transcendental/entity_handle.h"
 
 namespace ingredients {
-	void backpack(entity_handle e) {
+	void add_backpack(entity_handle e) {
 		auto& container = e += components::container();
 		auto& item = make_item(e);
 		
@@ -32,10 +32,10 @@ namespace prefabs {
 		auto def = world.create_entity("sample_backpack");
 
 		name_entity(def, entity_name::VIOLET_BACKPACK);
-		ingredients::backpack(def);
+		ingredients::add_backpack(def);
 
-		ingredients::sprite(def, pos, assets::texture_id::BACKPACK, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::see_through_dynamic_body(def);
+		ingredients::add_sprite(def, pos, assets::texture_id::BACKPACK, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(def);
 		
 		def.add_standard_components();
 		return def;

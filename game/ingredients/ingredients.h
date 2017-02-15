@@ -18,34 +18,31 @@ namespace components {
 }
 
 namespace ingredients {
-	void camera(entity_handle, int w, int h);
+	void add_camera(entity_handle, int w, int h);
 
 	components::item& make_item(entity_handle);
-	
-	components::sprite& sprite(entity_handle, components::transform pos, assets::texture_id = assets::texture_id::BLANK, rgba col = rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
-	components::sprite& sprite_scalled(entity_handle, components::transform pos, vec2i size = vec2i(), assets::texture_id = assets::texture_id::BLANK, rgba col = rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
-	
-	void bullet_round_physics(entity_handle);
-	void see_through_dynamic_body(entity_handle);
-	void shell_dynamic_body(entity_handle);
-	void standard_dynamic_body(entity_handle, const bool destructible = false);
-	void standard_static_body(entity_handle);
-
-	void wsad_character_physics(entity_handle);
-	void wsad_character_legs(entity_handle legs, entity_handle player);
-	void wsad_character(entity_handle, entity_handle crosshair_entity, const assets::animation_response_id torso_set = assets::animation_response_id::TORSO_SET);
-	void wsad_character_corpse(entity_handle);
-
 	void make_always_visible(entity_handle);
 
-	void character_inventory(entity_handle);
-	void backpack(entity_handle);
+	components::sprite& add_sprite(entity_handle, components::transform pos, assets::texture_id = assets::texture_id::BLANK, rgba col = rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
+	components::sprite& add_sprite_scalled(entity_handle, components::transform pos, vec2i size = vec2i(), assets::texture_id = assets::texture_id::BLANK, rgba col = rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
+	
+	void add_bullet_round_physics(entity_handle);
+	void add_see_through_dynamic_body(entity_handle);
+	void add_shell_dynamic_body(entity_handle);
+	void add_standard_dynamic_body(entity_handle, const bool destructible = false);
+	void add_standard_static_body(entity_handle);
 
-	void default_gun_container(entity_handle, const float mag_rotation = -90.f);
-	void default_gun(entity_handle);
+	void add_wsad_character_physics(entity_handle);
+	void add_wsad_character_legs(entity_handle legs, entity_handle player);
+	void add_wsad_character(entity_handle, entity_handle crosshair_entity, const assets::animation_response_id torso_set = assets::animation_response_id::TORSO_SET);
 
-	void standard_pathfinding_capability(entity_handle);
-	void soldier_intelligence(entity_handle);
+	void add_character_inventory(entity_handle);
+	void add_backpack(entity_handle);
+
+	void add_default_gun_container(entity_handle, const float mag_rotation = -90.f);
+
+	void add_standard_pathfinding_capability(entity_handle);
+	void add_soldier_intelligence(entity_handle);
 }
 
 namespace prefabs {
