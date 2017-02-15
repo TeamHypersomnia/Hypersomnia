@@ -81,12 +81,16 @@ void light_system::render_all_lights(
 
 	glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, projection_matrix.data());
 
-	for (const auto it : cosmos.get(processing_subjects::WITH_LIGHT)) {
+	for (const auto light_entity : cosmos.get(processing_subjects::WITH_LIGHT)) {
+		const auto& cache = per_entity_cache[light_entity.get_id().pool.indirection_index];
+		const auto light_displacement = vec2(cache.all_variation_values[6], cache.all_variation_values[7]);
+
 		messages::visibility_information_request request;
-		request.eye_transform = it.get_viewing_transform(interp);
+		request.eye_transform = light_entity.get_viewing_transform(interp);
+		request.eye_transform.pos += light_displacement;
 		request.filter = filters::line_of_sight_query();
-		request.square_side = it.get<components::light>().max_distance.base_value;
-		request.subject = it;
+		request.square_side = light_entity.get<components::light>().max_distance.base_value;
+		request.subject = light_entity;
 
 		requests.push_back(request);
 	}
@@ -159,7 +163,7 @@ void light_system::render_all_lights(
 
 		const auto& cache = per_entity_cache[light_entity.get_id().pool.indirection_index];
 
-		vec2 light_displacement = vec2(cache.all_variation_values[6], cache.all_variation_values[7]);
+		const auto light_displacement = vec2(cache.all_variation_values[6], cache.all_variation_values[7]);
 
 		auto screen_pos = requests[i].eye_transform - camera_transform;
 		screen_pos.pos.x += camera_size.x * 0.5f;
