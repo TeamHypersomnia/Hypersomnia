@@ -9,6 +9,7 @@
 #include "game/messages/create_particle_effect.h"
 #include "game/systems_stateless/particles_existence_system.h"
 #include "game/systems_stateless/sound_existence_system.h"
+#include "game/systems_stateless/visibility_system.h"
 
 #include "game/ingredients/ingredients.h"
 #include "game/assets/sound_response_id.h"
