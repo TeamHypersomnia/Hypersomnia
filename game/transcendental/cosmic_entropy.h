@@ -17,13 +17,15 @@ class cosmos;
 
 template <class key>
 struct basic_cosmic_entropy {
+	typedef key key_type;
+
 	std::map<key, spell_type> cast_spells;
 	std::map<key, std::vector<key_and_mouse_intent>> intents_per_entity;
-	std::vector<item_slot_transfer_request_data> transfer_requests;
+	std::vector<basic_item_slot_transfer_request_data<key>> transfer_requests;
 	
 	void override_transfers_leaving_other_entities(
 		const cosmos&,
-		std::vector<item_slot_transfer_request_data> new_transfers
+		std::vector<basic_item_slot_transfer_request_data<key>> new_transfers
 	);
 
 	size_t length() const;
@@ -33,12 +35,14 @@ struct basic_cosmic_entropy {
 
 struct cosmic_entropy;
 
-struct guid_mapped_entropy : basic_cosmic_entropy<unsigned> {
+struct guid_mapped_entropy : basic_cosmic_entropy<entity_guid> {
+	typedef basic_cosmic_entropy<entity_guid> base;
+
 	guid_mapped_entropy() = default;
 	explicit guid_mapped_entropy(const cosmic_entropy&, const cosmos&);
 	
 	guid_mapped_entropy& operator+=(const guid_mapped_entropy& b) {
-		basic_cosmic_entropy<unsigned>::operator+=(b);
+		base::operator+=(b);
 		return *this;
 	}
 
@@ -46,6 +50,8 @@ struct guid_mapped_entropy : basic_cosmic_entropy<unsigned> {
 };
 
 struct cosmic_entropy : basic_cosmic_entropy<entity_id> {
+	typedef basic_cosmic_entropy<entity_id> base;
+
 	cosmic_entropy() = default;
 	
 	explicit cosmic_entropy(
@@ -59,7 +65,7 @@ struct cosmic_entropy : basic_cosmic_entropy<entity_id> {
 	);
 
 	cosmic_entropy& operator+=(const cosmic_entropy& b) {
-		basic_cosmic_entropy<entity_id>::operator+=(b);
+		base::operator+=(b);
 		return *this;
 	}
 };
@@ -149,21 +155,21 @@ namespace augs {
 
 	template<class A>
 	void write_object(A& ar, const guid_mapped_entropy& storage) {
-		return write_object(ar, static_cast<const basic_cosmic_entropy<unsigned>&>(storage));
+		return write_object(ar, static_cast<const typename std::decay_t<decltype(storage)>::base&>(storage));
 	}
 
 	template<class A>
 	bool read_object(A& ar, guid_mapped_entropy& storage) {
-		return read_object(ar, static_cast<basic_cosmic_entropy<unsigned>&>(storage));
+		return read_object(ar, static_cast<typename std::decay_t<decltype(storage)>::base&>(storage));
 	}
 
 	template<class A>
 	void write_object(A& ar, const cosmic_entropy& storage) {
-		return write_object(ar, static_cast<const basic_cosmic_entropy<entity_id>&>(storage));
+		return write_object(ar, static_cast<const typename std::decay_t<decltype(storage)>::base&>(storage));
 	}
 
 	template<class A>
 	bool read_object(A& ar, cosmic_entropy& storage) {
-		return read_object(ar, static_cast<basic_cosmic_entropy<entity_id>&>(storage));
+		return read_object(ar, static_cast<typename std::decay_t<decltype(storage)>::base&>(storage));
 	}
 }

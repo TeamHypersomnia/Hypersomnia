@@ -64,7 +64,7 @@ void transform_component_ids_to_guids(T& comp, const cosmos& cosm) {
 template<class T>
 void transform_component_guids_to_ids(T& comp, const cosmos& cosm) {
 	held_id_introspector<T>::for_each_held_id(comp, [&cosm](entity_id& id) {
-		const unsigned guid = id.guid;
+		const entity_guid guid = id.guid;
 
 		if (guid != 0)
 			id = cosm.guid_map_for_transport.at(guid);

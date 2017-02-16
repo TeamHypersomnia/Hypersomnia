@@ -1,26 +1,41 @@
 #include "inventory_slot_id.h"
 #include <tuple>
 
-inventory_slot_id::inventory_slot_id() : type(slot_function::INVALID) {
+template <class T>
+basic_inventory_slot_id<T>::basic_inventory_slot_id() : type(slot_function::INVALID) {
 
 }
 
-inventory_slot_id::inventory_slot_id(const slot_function f, const entity_id id) : type(f), container_entity(id) {}
+template <class T>
+basic_inventory_slot_id<T>::basic_inventory_slot_id(
+	const slot_function f, 
+	const T id
+) : 
+	type(f), 
+	container_entity(id) 
+{}
 
-bool inventory_slot_id::operator==(const inventory_slot_id b) const {
+template <class T>
+bool basic_inventory_slot_id<T>::operator==(const basic_inventory_slot_id b) const {
 	return type == b.type && container_entity == b.container_entity;
 }
 
-bool inventory_slot_id::operator<(const inventory_slot_id b) const {
+template <class T>
+bool basic_inventory_slot_id<T>::operator<(const basic_inventory_slot_id b) const {
 	return
 		std::make_tuple(container_entity, type) <
 		std::make_tuple(b.container_entity, b.type);
 }
 
-bool inventory_slot_id::operator!=(const inventory_slot_id b) const {
+template <class T>
+bool basic_inventory_slot_id<T>::operator!=(const basic_inventory_slot_id b) const {
 	return !operator==(b);
 }
 
-void inventory_slot_id::unset() {
-	*this = inventory_slot_id();
+template <class T>
+void basic_inventory_slot_id<T>::unset() {
+	*this = basic_inventory_slot_id();
 }
+
+template struct basic_inventory_slot_id<entity_id>;
+template struct basic_inventory_slot_id<entity_guid>;

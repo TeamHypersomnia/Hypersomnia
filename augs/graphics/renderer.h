@@ -44,7 +44,7 @@ namespace augs {
 
 		line_channel logic_lines, prev_logic_lines;
 		line_channel frame_lines;
-		line_channel blink_lines;
+		line_channel persistent_lines;
 		
 		timer line_timer;
 

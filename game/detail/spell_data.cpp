@@ -21,6 +21,8 @@
 
 #include "game/messages/damage_message.h"
 
+#include "augs/graphics/renderer.h"
+
 spell_data get_spell_data(const spell_type spell) {
 	spell_data d;
 	
@@ -298,9 +300,29 @@ void perform_spell_logic(
 								
 								const auto impact = (point_b - caster_transform.pos).set_length(60);
 
-								affected_physics.apply_impulse(
-									impact, point_b
-								);
+								//if ((caster_transform.pos - point_b).length_sq() <= 50*50) {
+								//	affected_physics.apply_impulse(
+								//		impact
+								//	);
+								//
+								//	LOG("Close impact: %x", impact);
+								//}
+								//else 
+								{
+									auto& r = augs::renderer::get_current();
+									
+									affected_physics.apply_impulse(
+										impact, point_b
+									);
+
+									r.persistent_lines.draw_cyan(
+										point_b,
+										point_b + impact
+									);
+
+									LOG("Impact %x dealt to: %x", impact, body_entity.get_debug_name());
+									//LOG("Long impact: %x, %x", impact, point_b - affected_physics.get_mass_position());
+								}
 
 								messages::damage_message damage_msg;
 

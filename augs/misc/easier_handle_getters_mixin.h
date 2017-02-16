@@ -1,8 +1,6 @@
 #pragma once
 #include <vector>
 
-struct inventory_slot_id;
-
 namespace augs {
 	template<class derived>
 	class easier_handle_getters_mixin {

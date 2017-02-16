@@ -243,10 +243,11 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 
 	while (dt.new_entities--) {
 #if COSMOS_TRACKS_GUIDS
-		unsigned new_guid;
+		entity_guid new_guid;
 
-		if (!augs::read_object(in, new_guid))
+		if (!augs::read_object(in, new_guid)) {
 			return;
+		}
 		
 		new_entities.emplace_back(deco.create_entity_with_specific_guid("delta_created", new_guid));
 #else
@@ -285,10 +286,11 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 	}
 
 	while (dt.changed_entities--) {
-		unsigned guid_of_changed;
+		entity_guid guid_of_changed;
 		
-		if (!augs::read_object(in, guid_of_changed))
+		if (!augs::read_object(in, guid_of_changed)) {
 			return;
+		}
 
 		const auto changed_entity = deco.get_entity_by_guid(guid_of_changed);
 
@@ -342,10 +344,11 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 
 	while (dt.removed_entities--) {
 #if COSMOS_TRACKS_GUIDS
-		unsigned guid_of_destroyed;
+		entity_guid guid_of_destroyed;
 
-		if (!augs::read_object(in, guid_of_destroyed))
+		if (!augs::read_object(in, guid_of_destroyed)) {
 			return;
+		}
 
 		deco.delete_entity(deco.get_entity_by_guid(guid_of_destroyed));
 #else
@@ -603,12 +606,12 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndCreatedThreeEntitiesWithReferences) {
 
 
 TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
-	unsigned c1_first_guid = 0;
-	unsigned c1_second_guid = 0;
-	unsigned c1_third_guid = 0;
-	unsigned c2_first_guid = 0;
-	unsigned c2_second_guid = 0;
-	unsigned c2_third_guid = 0;
+	entity_guid c1_first_guid = 0;
+	entity_guid c1_second_guid = 0;
+	entity_guid c1_third_guid = 0;
+	entity_guid c2_first_guid = 0;
+	entity_guid c2_second_guid = 0;
+	entity_guid c2_third_guid = 0;
 
 	cosmos c1(3);
 	{

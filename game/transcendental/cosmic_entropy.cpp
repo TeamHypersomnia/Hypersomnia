@@ -9,9 +9,9 @@
 template <class key>
 void basic_cosmic_entropy<key>::override_transfers_leaving_other_entities(
 	const cosmos& cosm,
-	std::vector<item_slot_transfer_request_data> new_transfers
+	std::vector<basic_item_slot_transfer_request_data<key>> new_transfers
 ) {
-	erase_remove(transfer_requests, [&](const item_slot_transfer_request_data o) {
+	erase_remove(transfer_requests, [&](const basic_item_slot_transfer_request_data<key> o) {
 		const auto overridden_transfer = match_transfer_capabilities(cosm[o]);
 		
 		ensure(overridden_transfer.is_legal());
@@ -64,12 +64,6 @@ basic_cosmic_entropy<key>& basic_cosmic_entropy<key>::operator+=(const basic_cos
 	return *this;
 }
 
-guid_mapped_entropy::guid_mapped_entropy(const cosmic_entropy& b, const cosmos& mapper) {
-	for (const auto& entry : b.intents_per_entity) {
-		intents_per_entity[mapper[entry.first].get_guid()] = entry.second;
-	}
-}
-
 bool guid_mapped_entropy::operator!=(const guid_mapped_entropy& b) const {
 	return !(
 		compare_containers(intents_per_entity, b.intents_per_entity)
@@ -78,9 +72,37 @@ bool guid_mapped_entropy::operator!=(const guid_mapped_entropy& b) const {
 	);
 }
 
-cosmic_entropy::cosmic_entropy(const guid_mapped_entropy& b, const cosmos& mapper) {
+guid_mapped_entropy::guid_mapped_entropy(
+	const cosmic_entropy& b,
+	const cosmos& mapper
+) {
+	for (const auto& entry : b.intents_per_entity) {
+		intents_per_entity[mapper[entry.first].get_guid()] = entry.second;
+	}
+
+	for (const auto& entry : b.cast_spells) {
+		cast_spells[mapper[entry.first].get_guid()] = entry.second;
+	}
+
+	for (const auto& entry : b.transfer_requests) {
+		transfer_requests.push_back(mapper.guidize(entry));
+	}
+}
+
+cosmic_entropy::cosmic_entropy(
+	const guid_mapped_entropy& b, 
+	const cosmos& mapper
+) {
 	for (const auto& entry : b.intents_per_entity) {
 		intents_per_entity[mapper.get_entity_by_guid(entry.first).get_id()] = entry.second;
+	}
+
+	for (const auto& entry : b.cast_spells) {
+		cast_spells[mapper.get_entity_by_guid(entry.first).get_id()] = entry.second;
+	}
+
+	for (const auto& entry : b.transfer_requests) {
+		transfer_requests.push_back(mapper[entry]);
 	}
 }
 
@@ -91,5 +113,5 @@ cosmic_entropy::cosmic_entropy(
 	intents_per_entity[controlled_entity] = intents;
 }
 
-template struct basic_cosmic_entropy<unsigned>;
 template struct basic_cosmic_entropy<entity_id>;
+template struct basic_cosmic_entropy<entity_guid>;

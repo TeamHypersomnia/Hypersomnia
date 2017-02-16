@@ -28,7 +28,7 @@ void typesafe_sprintf_detail(size_t starting_pos, std::basic_string<CharType>& t
 			replacement.precision(opcode - L'0');
 		}
 		else if (opcode == L'*') {
-			replacement.precision(std::numeric_limits<typename std::decay<T>::type>::digits10);
+			replacement.precision(std::numeric_limits<std::decay_t<T>>::digits10);
 		}
 
 		replacement << val;

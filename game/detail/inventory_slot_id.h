@@ -7,12 +7,13 @@
 
 #include "game/components/transform_component.h"
 
-struct inventory_slot_id {
+template <class id_type>
+struct basic_inventory_slot_id {
 	slot_function type;
-	entity_id container_entity;
+	id_type container_entity;
 
-	inventory_slot_id();
-	inventory_slot_id(const slot_function, const entity_id);
+	basic_inventory_slot_id();
+	basic_inventory_slot_id(const slot_function, const id_type);
 
 	template <class Archive>
 	void serialize(Archive& ar) {
@@ -24,10 +25,12 @@ struct inventory_slot_id {
 
 	void unset();
 
-	bool operator<(const inventory_slot_id b) const;
-	bool operator==(const inventory_slot_id b) const;
-	bool operator!=(const inventory_slot_id b) const;
+	bool operator<(const basic_inventory_slot_id b) const;
+	bool operator==(const basic_inventory_slot_id b) const;
+	bool operator!=(const basic_inventory_slot_id b) const;
 };
+
+typedef basic_inventory_slot_id<entity_id> inventory_slot_id;
 
 struct inventory_item_address {
 	entity_id root_container;

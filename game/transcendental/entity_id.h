@@ -2,6 +2,8 @@
 #include "augs/misc/pool_id.h"
 #include "game/transcendental/types_specification/all_components_declaration.h"
 
+typedef unsigned entity_guid;
+
 namespace augs {
 	template<class...>
 	class component_aggregate;

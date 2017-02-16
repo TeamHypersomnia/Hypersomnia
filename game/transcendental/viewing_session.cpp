@@ -123,6 +123,10 @@ void viewing_session::control_and_remove_fetched_intents(std::vector<key_and_mou
 	erase_remove(intents, [&](const key_and_mouse_intent& intent) {
 		bool fetch = false;
 
+		if (intent.intent == intent_type::SWITCH_LOOK) {
+			augs::renderer::get_current().persistent_lines.lines.clear();
+		}
+
 		if (intent.intent == intent_type::OPEN_DEVELOPER_CONSOLE) {
 			fetch = true;
 

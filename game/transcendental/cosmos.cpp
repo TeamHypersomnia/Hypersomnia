@@ -266,7 +266,7 @@ entity_handle cosmos::create_entity(const std::string& debug_name) {
 }
 
 #if COSMOS_TRACKS_GUIDS
-entity_handle cosmos::create_entity_with_specific_guid(const std::string& debug_name, const unsigned specific_guid) {
+entity_handle cosmos::create_entity_with_specific_guid(const std::string& debug_name, const entity_guid specific_guid) {
 	const auto new_entity = allocate_new_entity();
 	new_entity += components::guid();
 

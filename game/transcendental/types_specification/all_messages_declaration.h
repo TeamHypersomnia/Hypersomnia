@@ -1,4 +1,6 @@
 #pragma once
+#include "game/detail/item_slot_transfer_request_declaration.h"
+
 namespace augs {
 	template <class...>
 	class storage_for_message_queues;
@@ -27,8 +29,6 @@ namespace messages {
 	struct exhausted_cast;
 	struct exploding_ring;
 }
-
-struct item_slot_transfer_request_data;
 
 typedef augs::storage_for_message_queues <
 	messages::intent_message,

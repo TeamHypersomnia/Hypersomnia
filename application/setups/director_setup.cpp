@@ -277,18 +277,24 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 				cosmic_entropy_for_this_advancement = cosmic_entropy(replayed_entropy, hypersomnia);
 			}
 			else if (current_director_state == director_state::RECORDING) {
+				const auto total_collected_guid_entropy = guid_mapped_entropy(total_collected_entropy, hypersomnia);
+
 				guid_mapped_entropy& entropy_for_this_advancement = director.step_to_entropy[current_step];
 
 				entropy_for_this_advancement.override_transfers_leaving_other_entities(
 					hypersomnia, 
-					total_collected_entropy.transfer_requests
+					total_collected_guid_entropy.transfer_requests
 				);
 
-				for (const auto& newly_entropied : total_collected_entropy.intents_per_entity) {
-					const auto newly_entropied_entity = hypersomnia[newly_entropied.first];
+				if (recording_replacement_mode != recording_replacement_type::ONLY_MOUSE) {
+					for (const auto new_spell_requested : total_collected_guid_entropy.cast_spells) {
+						entropy_for_this_advancement.cast_spells[new_spell_requested.first] = new_spell_requested.second;
+					}
+				}
 
-					auto new_intents = newly_entropied.second;
-					auto& intents_written_to = entropy_for_this_advancement.intents_per_entity[newly_entropied_entity.get_guid()];
+				for (const auto& new_intents_requested : total_collected_guid_entropy.intents_per_entity) {
+					auto new_intents = new_intents_requested.second;
+					auto& intents_written_to = entropy_for_this_advancement.intents_per_entity[new_intents_requested.first];
 
 					auto mouse_remover = [](const auto& k) { return k.uses_mouse_motion(); };
 					auto key_remover = [](const auto& k) { return !k.uses_mouse_motion(); };

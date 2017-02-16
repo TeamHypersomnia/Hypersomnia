@@ -206,7 +206,9 @@ namespace augs {
 	void renderer::line_channel::draw_cyan(vec2 a, vec2 b) { draw(a, b, cyan); }
 
 	void renderer::draw_debug_info(vec2 visible_world_area, components::transform camera_transform, assets::texture_id tex_id, std::vector<const_entity_handle> target_entities, float ratio) {
-		if (!debug_drawing) return;
+		if (!debug_drawing) {
+			return;
+		}
 		
 		auto& tex = get_resource_manager().find(tex_id)->tex;
 		
@@ -298,13 +300,13 @@ namespace augs {
 			std::for_each(logic_lines.lines.begin(), logic_lines.lines.end(), line_lambda);
 
 		std::for_each(frame_lines.lines.begin(), frame_lines.lines.end(), line_lambda);
-		std::for_each(blink_lines.lines.begin(), blink_lines.lines.end(), line_lambda);
+		std::for_each(persistent_lines.lines.begin(), persistent_lines.lines.end(), line_lambda);
 		
-		if (blink_lines.lines.empty()) {
+		if (persistent_lines.lines.empty()) {
 			line_timer.reset();
 		}
 		else if(line_timer.get<std::chrono::seconds>() > 0.4) {
-			blink_lines.lines.erase(blink_lines.lines.begin());
+			//persistent_lines.lines.erase(persistent_lines.lines.begin());
 			line_timer.reset();
 		}
 
