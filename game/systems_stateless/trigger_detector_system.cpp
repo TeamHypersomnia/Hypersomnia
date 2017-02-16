@@ -86,6 +86,7 @@ void trigger_detector_system::send_trigger_confirmations(const logic_step step) 
 	confirmations.clear();
 
 	auto& cosmos = step.cosm;
+	const auto& physics = cosmos.systems_temporary.get<physics_system>();
 	const auto& collisions = step.transient.messages.get_queue<messages::collision_message>();
 
 	for (const auto& c : collisions) {
@@ -110,24 +111,30 @@ void trigger_detector_system::send_trigger_confirmations(const logic_step step) 
 		auto& trigger_query_detector = cosmos[e.detector].get<components::trigger_query_detector>();
 		const auto detector_body = cosmos[e.detector];
 		
-		std::vector<entity_id> found_triggers;
+		std::unordered_set<unversioned_entity_id> found_triggers;
 
 		ensure(detector_body.alive());
 
-		const auto found_physical_triggers = cosmos.systems_temporary.get<physics_system>().query_body(detector_body, filters::trigger());
+		physics.for_each_intersection_with_body(
+			detector_body, 
+			filters::trigger(),
+			([&](const auto fixture, ...) {
+				const auto found_trigger_id = get_id_of_entity_of_fixture(fixture);
 
-		for (const auto found_trigger_id : found_physical_triggers.entities) {
-			const auto found_trigger = cosmos[found_trigger_id];
-			const auto* const maybe_trigger = found_trigger.find<components::trigger>();
-			
-			if (maybe_trigger && maybe_trigger->react_to_query_detectors) {
-				found_triggers.push_back(found_trigger);
-			}
-		}
+				const auto found_trigger = cosmos[found_trigger_id];
+				const auto* const maybe_trigger = found_trigger.find<components::trigger>();
 
+				if (maybe_trigger && maybe_trigger->react_to_query_detectors) {
+					found_triggers.insert(found_trigger_id);
+				}
+
+				return query_callback_result::CONTINUE;
+			})
+		);
+		
 		for (const auto t : found_triggers) {
 			messages::trigger_hit_confirmation_message confirmation;
-			confirmation.trigger = t;
+			confirmation.trigger = cosmos[t];
 			confirmation.detector_body = detector_body;
 			trigger_query_detector.detection_intent_enabled = false;
 			step.transient.messages.post(confirmation);

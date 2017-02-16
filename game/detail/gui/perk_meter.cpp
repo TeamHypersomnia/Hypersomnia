@@ -69,7 +69,7 @@ void perk_meter::draw(
 
 		const auto ratio = sentience.call_on(this_type, [&](const auto& m) { return m.get_ratio(now, dt); });
 		auto actual_bar_rect = full_bar_rect;
-		const auto bar_width = static_cast<int>(actual_bar_rect.w() * ratio);
+		const auto bar_width = (actual_bar_rect.w() * ratio);
 		actual_bar_rect.w(bar_width);
 
 		draw_clipped_rect(
@@ -106,9 +106,9 @@ void perk_meter::draw(
 ltrb perk_meter::get_full_value_bar_rect_bordered(
 	const const_game_gui_context context,
 	const const_this_pointer this_id,
-	const ltrb absolute
+	const ltrbi absolute
 ) const {
-	auto icon_rect = absolute;
+	ltrbi icon_rect = absolute;
 
 	auto icon_mat = this_id->get_icon_mat(this_id);
 	icon_rect.set_size((*icon_mat.tex).get_size());
@@ -145,7 +145,7 @@ void perk_meter::advance_elements(
 	this_id->seconds_accumulated += dt.in_seconds();
 
 	if (this_id->particles.size() > 0) {
-		randomization rng(static_cast<int>(this_id.get_location().type) + context.get_cosmos().get_total_time_passed_in_seconds() * 1000);
+		randomization rng(static_cast<size_t>(static_cast<int>(this_id.get_location().type) + context.get_cosmos().get_total_time_passed_in_seconds() * 1000));
 
 		const auto bar_size = this_id->get_full_value_bar_rect(context, this_id, this_id->rc).get_size();
 

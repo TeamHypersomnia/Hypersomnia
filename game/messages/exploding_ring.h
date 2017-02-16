@@ -6,10 +6,9 @@
 
 namespace messages {
 	struct exploding_ring {
-		float min_radius = 0.f;
-		float max_radius = 0.f;
-
+		float radius = 0.f;
 		vec2 center;
+		
 		messages::visibility_information_response visibility;
 		rgba color;
 	};

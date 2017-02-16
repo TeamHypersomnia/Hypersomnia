@@ -40,7 +40,9 @@ class dynamic_tree_system {
 
 public:
 
-	std::vector<unversioned_entity_id> determine_visible_entities_from_camera(
-		const camera_cone, 
-		components::dynamic_tree_node::tree_type = components::dynamic_tree_node::tree_type::RENDERABLES) const;
+	void determine_visible_entities_from_camera(
+		std::vector<unversioned_entity_id>& into,
+		const camera_cone,
+		components::dynamic_tree_node::tree_type = components::dynamic_tree_node::tree_type::RENDERABLES
+	) const;
 };

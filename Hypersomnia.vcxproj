@@ -1158,6 +1158,7 @@
     <ClInclude Include="game\detail\perks\haste_perk.h" />
     <ClInclude Include="game\detail\perks\electric_shield_perk.h" />
     <ClInclude Include="game\detail\perks\timed_perk.h" />
+    <ClInclude Include="game\detail\physics_queries.h" />
     <ClInclude Include="game\detail\spell_data.h" />
     <ClInclude Include="game\detail\visible_entities.h" />
     <ClInclude Include="game\detail\wielding_result.h" />
@@ -1353,7 +1354,6 @@
     <ClInclude Include="game\detail\item_slot_transfer_request.h" />
     <ClInclude Include="game\messages\melee_swing_response.h" />
     <ClInclude Include="game\messages\movement_response.h" />
-    <ClInclude Include="game\messages\new_entity_message.h" />
     <ClInclude Include="game\messages\crosshair_intent_message.h" />
     <ClInclude Include="game\messages\damage_message.h" />
     <ClInclude Include="game\messages\queue_destruction.h" />

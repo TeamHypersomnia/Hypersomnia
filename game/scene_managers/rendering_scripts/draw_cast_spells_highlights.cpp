@@ -28,7 +28,7 @@ namespace rendering_scripts {
 					highlight.renderable_transform.pos = it.get_viewing_transform(sys).pos;
 
 					auto highlight_col = appearance.border_col;
-					highlight_col.a = 255 * highlight_amount;
+					highlight_col.a = static_cast<rgba_channel>(255 * highlight_amount);
 
 					components::sprite spr;
 					spr.set(assets::texture_id::CAST_HIGHLIGHT, highlight_col);

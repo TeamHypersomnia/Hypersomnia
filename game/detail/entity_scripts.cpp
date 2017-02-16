@@ -181,34 +181,34 @@ entity_id get_closest_hostile(
 	const auto& physics = cosmos.systems_temporary.get<physics_system>();
 	const auto transform = subject.get_logic_transform();
 
-	const auto queried = physics.query_aabb_px(
-		transform.pos - vec2(radius, radius),
-		transform.pos + vec2(radius, radius),
-		filter,
-		subject
-	);
-
 	entity_id closest_hostile;
 
 	float min_distance = std::numeric_limits<float>::max();
 
 	if (subject_attitude.alive()) {
-		for (auto s_raw : queried.entities) {
-			const auto s = cosmos[s_raw];
+		physics.for_each_in_aabb(
+			transform.pos - vec2(radius, radius),
+			transform.pos + vec2(radius, radius),
+			filter,
+			[&](const auto fix) {
+				const auto s = cosmos[get_id_of_entity_of_body(fix)];
 
-			if (s.has<components::attitude>()) {
-				const auto calculated_attitude = calculate_attitude(s, subject_attitude);
+				if (s != subject && s.has<components::attitude>()) {
+					const auto calculated_attitude = calculate_attitude(s, subject_attitude);
 
-				if (is_hostile(calculated_attitude)) {
-					auto dist = distance_sq(s, subject_attitude);
+					if (is_hostile(calculated_attitude)) {
+						auto dist = distance_sq(s, subject_attitude);
 
-					if (dist < min_distance) {
-						closest_hostile = s;
-						min_distance = dist;
+						if (dist < min_distance) {
+							closest_hostile = s;
+							min_distance = dist;
+						}
 					}
 				}
+
+				return query_callback_result::CONTINUE;
 			}
-		}
+		);
 	}
 
 	return closest_hostile;
@@ -224,13 +224,6 @@ std::vector<entity_id> get_closest_hostiles(
 
 	const auto& physics = cosmos.systems_temporary.get<physics_system>();
 	const auto transform = subject.get_logic_transform();
-
-	const auto queried = physics.query_aabb_px(
-		transform.pos - vec2(radius, radius),
-		transform.pos + vec2(radius, radius),
-		filter,
-		subject
-	);
 
 	struct hostile_entry {
 		entity_id s;
@@ -250,19 +243,26 @@ std::vector<entity_id> get_closest_hostiles(
 	float min_distance = std::numeric_limits<float>::max();
 
 	if (subject_attitude.alive()) {
-		for (auto s_raw : queried.entities) {
-			const auto s = cosmos[s_raw];
+		physics.for_each_in_aabb(
+			transform.pos - vec2(radius, radius),
+			transform.pos + vec2(radius, radius),
+			filter,
+			[&](const auto fix) {
+				const auto s = cosmos[get_id_of_entity_of_body(fix)];
 
-			if (s.has<components::attitude>()) {
-				const auto calculated_attitude = calculate_attitude(s, subject_attitude);
+				if (s != subject && s.has<components::attitude>()) {
+					const auto calculated_attitude = calculate_attitude(s, subject_attitude);
 
-				if (is_hostile(calculated_attitude)) {
-					auto dist = distance_sq(s, subject_attitude);
-					
-					hostiles.push_back({ s, dist });
+					if (is_hostile(calculated_attitude)) {
+						const auto dist = distance_sq(s, subject_attitude);
+
+						hostiles.push_back({ s, dist });
+					}
 				}
+
+				return query_callback_result::CONTINUE;
 			}
-		}
+		);
 	}
 
 	sort_container(hostiles);

@@ -330,7 +330,8 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 			total_collected_entropy = cosmic_entropy();
 		}
 
-		const auto all_visible = session.get_visible_entities(hypersomnia);
+		static thread_local visible_entities all_visible;
+		session.get_visible_entities(all_visible, hypersomnia);
 
 		const auto vdt = session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), timer);
 

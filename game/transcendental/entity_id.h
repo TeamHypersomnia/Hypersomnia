@@ -30,4 +30,11 @@ namespace std {
 			return hash<entity_id::base>()(v);
 		}
 	};
+
+	template <>
+	struct hash<unversioned_entity_id> {
+		std::size_t operator()(const unversioned_entity_id v) const {
+			return hash<unversioned_entity_id::base>()(v);
+		}
+	};
 }

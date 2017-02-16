@@ -77,8 +77,7 @@ const discontinuity* visibility_information_response::get_discontinuity(const si
 }
 
 triangle visibility_information_response::get_world_triangle(const size_t i, const vec2 origin) const {
-	triangle tri = { origin, edges[i].first, edges[i].second };
-	return tri;
+	return { origin, edges[i].first, edges[i].second };
 }
 
 std::vector<vec2> visibility_information_response::get_world_polygon(const float distance_epsilon, const vec2 expand_origin, const float expand_mult) const {
@@ -142,13 +141,31 @@ void visibility_system::respond_to_visibility_information_requests(const logic_s
 	}
 }
 
+visibility_system::visibility_responses visibility_system::respond_to_visibility_information_requests(
+	const cosmos& cosmos,
+	const std::vector<messages::line_of_sight_request>& los_requests,
+	const std::vector<messages::visibility_information_request>& vis_requests
+) {
+	visibility_system::visibility_responses output;
+
+	respond_to_visibility_information_requests(
+		cosmos,
+		los_requests,
+		vis_requests,
+		output.los,
+		output.vis
+	);
+	
+	return std::move(output);
+}
+
 void visibility_system::respond_to_visibility_information_requests(
 	const cosmos& cosmos,
 	const std::vector<messages::line_of_sight_request>& los_requests,
 	const std::vector<messages::visibility_information_request>& vis_requests,
 	std::vector<messages::line_of_sight_response>& los_responses,
-	std::vector<messages::visibility_information_response>& vis_responses) const {
-
+	std::vector<messages::visibility_information_response>& vis_responses
+) const {
 	const auto& settings = cosmos.significant.meta.settings.visibility;
 
 	ensure(settings.epsilon_distance_vertex_hit > 0.f);
@@ -182,53 +199,63 @@ void visibility_system::respond_to_visibility_information_requests(
 		line_of_sight_response response;
 
 		const float d = request.maximum_distance;
-		const auto in_aabb = physics.query_aabb_px(transform.pos - vec2(d, d), transform.pos + vec2(d, d), request.candidate_filter, it);
-
-		for (const auto& candidate_id : in_aabb.entities) {
-			const auto candidate = cosmos[candidate_id];
-
-			const auto target_pos = candidate.get_logic_transform().pos;
-
-			if ((target_pos - transform.pos).length_sq() <= d*d) {
-				static thread_local std::vector<std::set<entity_id>*> target_sets;
-				target_sets.clear();
-
-				if (request.test_items) {
-					if (candidate.has<components::item>()) {
-						target_sets.push_back(&response.visible_items);
-					}
+		
+		physics.for_each_in_aabb(
+			transform.pos - vec2(d, d), 
+			transform.pos + vec2(d, d), 
+			request.candidate_filter, 
+			[&](const auto fix) {
+				const auto candidate = cosmos[get_id_of_entity_of_fixture(fix)];
+				
+				if (candidate.get_owner_body() == it) {
+					return query_callback_result::CONTINUE;
 				}
 
-				if (request.test_sentiences) {
-					if (candidate.has<components::sentience>()) {
-						target_sets.push_back(&response.visible_sentiences);
+				const auto target_pos = candidate.get_logic_transform().pos;
+
+				if ((target_pos - transform.pos).length_sq() <= d*d) {
+					static thread_local std::vector<std::unordered_set<entity_id>*> target_sets;
+					target_sets.clear();
+
+					if (request.test_items) {
+						if (candidate.has<components::item>()) {
+							target_sets.push_back(&response.visible_items);
+						}
 					}
-				}
 
-				if (request.test_attitudes) {
-					if (candidate.has<components::attitude>()) {
-						target_sets.push_back(&response.visible_attitudes);
+					if (request.test_sentiences) {
+						if (candidate.has<components::sentience>()) {
+							target_sets.push_back(&response.visible_sentiences);
+						}
 					}
-				}
 
-				if (request.test_dangers) {
-					if (assess_danger(it, candidate).amount > 0) {
-						target_sets.push_back(&response.visible_dangers);
+					if (request.test_attitudes) {
+						if (candidate.has<components::attitude>()) {
+							target_sets.push_back(&response.visible_attitudes);
+						}
 					}
-				}
 
-				if (target_sets.size() > 0) {
-					const auto out = physics.ray_cast_px(transform.pos, target_pos, request.obstruction_filter, it);
-					const auto line_of_sight_unobstructed = !out.hit;
+					if (request.test_dangers) {
+						if (assess_danger(it, candidate).amount > 0) {
+							target_sets.push_back(&response.visible_dangers);
+						}
+					}
 
-					if (line_of_sight_unobstructed) {
-						for (const auto& t : target_sets) {
-							t->insert(candidate);
+					if (target_sets.size() > 0) {
+						const auto out = physics.ray_cast_px(transform.pos, target_pos, request.obstruction_filter, it);
+						const auto line_of_sight_unobstructed = !out.hit;
+
+						if (line_of_sight_unobstructed) {
+							for (const auto& t : target_sets) {
+								t->insert(candidate);
+							}
 						}
 					}
 				}
+
+				return query_callback_result::CONTINUE;
 			}
-		}
+		);
 
 		los_responses.emplace_back(std::move(response));
 	}
@@ -269,10 +296,14 @@ void visibility_system::respond_to_visibility_information_requests(
 
 		ltrb ltrb(aabb.lowerBound.x, aabb.lowerBound.y, aabb.upperBound.x, aabb.upperBound.y);
 
-		auto push_vertex = [position_meters, ltrb](vec2 v, bool check_against_aabb) {
+		const auto push_vertex = [position_meters, ltrb](
+			const vec2 v, 
+			const bool check_against_aabb
+		) {
 			/* don't bother if it does not hover the aabb */
-			if (check_against_aabb && !ltrb.hover(vec2(v)))
+			if (check_against_aabb && !ltrb.hover(vec2(v))) {
 				return;
+			}
 
 			target_vertex new_vertex;
 			new_vertex.pos = v;
@@ -292,28 +323,33 @@ void visibility_system::respond_to_visibility_information_requests(
 			all_vertices_transformed.push_back(new_vertex);
 		};
 
-		/* get list of all fixtures that intersect with the visibility square */
-		const auto fixtures = physics.query_aabb(aabb.lowerBound, aabb.upperBound, request.filter, ignored_entity).fixtures;
-
 		/* for every fixture that intersected with the visibility square */
-		for (const auto f : fixtures) {
-			const auto* const shape = f->m_shape;
-			/* get shape vertices from misc that transforms them to current entity's position and rotation in Box2D space */
-			if (shape->GetType() == b2Shape::e_polygon) {
-				const b2PolygonShape* const poly = static_cast<const b2PolygonShape*>(shape);
-				
-				for (int32 vp = 0; vp < poly->GetVertexCount(); ++vp) {
-					auto vv = poly->GetVertex(vp);
-
-					auto position = f->GetBody()->GetPosition();
-					/* transform angle to degrees */
-					auto rotation = f->GetBody()->GetAngle();
-
-					/* transform vertex to current entity's position and rotation */
-					push_vertex(vec2(vv).rotate_radians(rotation, vec2(0, 0)) + position, true);
+		physics.for_each_in_aabb_meters(
+			aabb, 
+			request.filter,
+			[&](const b2Fixture* const f) {
+				if (get_id_of_entity_of_body(f) == ignored_entity) {
+					return query_callback_result::CONTINUE;
 				}
+
+				const auto* const shape = f->m_shape;
+				/* get shape vertices from misc that transforms them to current entity's position and rotation in Box2D space */
+				if (shape->GetType() == b2Shape::e_polygon) {
+					const auto* const poly = static_cast<const b2PolygonShape*>(shape);
+
+					for (int32 vp = 0; vp < poly->GetVertexCount(); ++vp) {
+						const auto vv = poly->GetVertex(vp);
+						const auto position = f->GetBody()->GetPosition();
+						const auto rotation = f->GetBody()->GetAngle();
+
+						/* transform vertex to current entity's position and rotation */
+						push_vertex(vec2(vv).rotate_radians(rotation, vec2(0, 0)) + position, true);
+					}
+				}
+
+				return query_callback_result::CONTINUE;
 			}
-		}
+		);
 
 		/* extract the actual vertices from visibility AABB to cast rays to */
 		const b2Vec2 whole_vision[] = {
@@ -350,11 +386,11 @@ void visibility_system::respond_to_visibility_information_requests(
 			/* check for duplicates */
 			std::vector<vec2> output;
 
-			for (auto& inter : output1) {
+			for (const auto& inter : output1) {
 				output.push_back(inter.intersection);
 			}
 
-			for (auto& v : output2) {
+			for (const auto& v : output2) {
 				bool duplicate_found = false;
 
 				for (auto& duplicate : output1) {
@@ -364,24 +400,28 @@ void visibility_system::respond_to_visibility_information_requests(
 					}
 				}
 
-				if (!duplicate_found)
+				if (!duplicate_found) {
 					output.push_back(v.intersection);
+				}
 			}
 
-			if (settings.draw_cast_rays)
+			if (settings.draw_cast_rays) {
 				lines.draw(METERS_TO_PIXELSf * bound.m_vertex1, METERS_TO_PIXELSf * bound.m_vertex2, rgba(255, 0, 0, 255));
+			}
 
-			for (auto& v : output)
+			for (const auto v : output) {
 				push_vertex(v, false);
+			}
 		}
 
 		/* add the visibility square to the vertices that we cast rays to, computing comparable angle in place */
-		for (const auto& v : whole_vision)
+		for (const auto v : whole_vision) {
 			push_vertex(v, false);
+		}
 
 		/* SORT ALL VERTICES BY ANGLE */
 		sort_container(all_vertices_transformed);
-		all_vertices_transformed.erase(std::unique(all_vertices_transformed.begin(), all_vertices_transformed.end()), all_vertices_transformed.end());
+		remove_duplicates_from_sorted(all_vertices_transformed);
 
 		/* by now we have ensured that all_vertices_transformed is non-empty
 
@@ -394,37 +434,49 @@ void visibility_system::respond_to_visibility_information_requests(
 
 		/* double_ray pair for holding both left-epsilon and right-epsilon rays */
 		struct double_ray {
-			vec2 first, second;
-			bool first_reached_destination, second_reached_destination;
+			vec2 first;
+			vec2 second;
+			bool first_reached_destination = false;
+			bool second_reached_destination = false;
 
-			double_ray() : first_reached_destination(false), second_reached_destination(false) {}
-			double_ray(vec2 first, vec2 second, bool a, bool b)
-				: first(first), second(second), first_reached_destination(a), second_reached_destination(b) {
+			double_ray() = default;
+
+			double_ray(
+				const vec2 first,
+				const vec2 second, 
+				const bool a, 
+				const bool b
+			) : 
+				first(first), 
+				second(second), 
+				first_reached_destination(a), 
+				second_reached_destination(b) 
+			{
 			}
 		};
 
 		/* container for these */
 		std::vector<double_ray> double_rays;
 
-		auto push_double_ray = [&double_rays](const double_ray& ray_b) -> bool {
+		const auto push_double_ray = [&double_rays](const double_ray& ray_b) -> bool {
 			bool is_same_as_previous = false;
-			vec2 p2 = ray_b.first * METERS_TO_PIXELSf;
+			const vec2 p2 = ray_b.first * METERS_TO_PIXELSf;
 
 			if (!double_rays.empty()) {
-				auto& ray_a = *double_rays.rbegin();
-
-				vec2 p1 = ray_a.second * METERS_TO_PIXELSf;
+				const auto& ray_a = *double_rays.rbegin();
+				const vec2 p1 = ray_a.second * METERS_TO_PIXELSf;
 
 				is_same_as_previous = p1.compare(p2);
 			}
 
 			/* save new double_ray if it is not degenerate */
-			if (!is_same_as_previous
+			if (
+				!is_same_as_previous
 				&& (std::fpclassify(p2.x) == FP_NORMAL || std::fpclassify(p2.x) == FP_ZERO)
 				&& (std::fpclassify(p2.y) == FP_NORMAL || std::fpclassify(p2.y) == FP_ZERO)
 				&& p2.x == p2.x
-				&& p2.y == p2.y)
-			{
+				&& p2.y == p2.y
+			) {
 				double_rays.push_back(ray_b);
 				return true;
 			}
@@ -434,7 +486,7 @@ void visibility_system::respond_to_visibility_information_requests(
 
 
 		/* helper debugging lambda */
-		auto draw_line = [&position_meters, &lines](vec2 point, rgba col) {
+		const auto draw_line = [&position_meters, &lines](const vec2 point, const rgba col) {
 			lines.draw(position_meters * METERS_TO_PIXELSf, point * METERS_TO_PIXELSf, col);
 		};
 
@@ -469,7 +521,13 @@ void visibility_system::respond_to_visibility_information_requests(
 				bool continue_checking = true;
 
 				for (int j = 0; j < 2; ++j) {
-					auto edge_ray_output = physics.edge_edge_intersection(position_meters, targets[j], bound.m_vertex1, bound.m_vertex2);
+					const auto edge_ray_output = segment_segment_intersection(
+						position_meters, 
+						targets[j], 
+						bound.m_vertex1, 
+						bound.m_vertex2
+					);
+
 					if (edge_ray_output.hit) {
 						/* move the target further by epsilon */
 						targets[j] = edge_ray_output.intersection + directions[j] * 1.f * PIXELS_TO_METERSf;
@@ -480,7 +538,9 @@ void visibility_system::respond_to_visibility_information_requests(
 					}
 				}
 
-				if (!continue_checking) break;
+				if (!continue_checking) {
+					break;
+				}
 			}
 
 			/* cast both rays starting from the player position and ending in targets[x].target,
@@ -628,7 +688,12 @@ void visibility_system::respond_to_visibility_information_requests(
 						if (!ray_callbacks[k].hit) {
 							/* for every edge from 4 edges forming visibility square */
 							for (const auto& bound : bounds) {
-								auto ray_edge_output = physics.edge_edge_intersection(position_meters, all_ray_inputs[i].targets[k], bound.m_vertex1, bound.m_vertex2);
+								const auto ray_edge_output = segment_segment_intersection(
+									position_meters, 
+									all_ray_inputs[i].targets[k], 
+									bound.m_vertex1, 
+									bound.m_vertex2
+								);
 
 								/* if we hit against boundaries (must happen for at least 1 of them) */
 								if (ray_edge_output.hit) {

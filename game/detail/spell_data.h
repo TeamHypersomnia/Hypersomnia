@@ -8,6 +8,7 @@
 
 #include "game/assets/texture_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
+#include "game/transcendental/step_declaration.h"
 
 struct spell_data {
 	unsigned personal_electricity_required = 40u;
@@ -35,6 +36,7 @@ bool are_additional_conditions_for_casting_fulfilled(
 );
 
 void perform_spell_logic(
+	const logic_step step,
 	const spell_type,
 	const entity_handle subject,
 	components::sentience& subject_sentience,

@@ -74,11 +74,11 @@ void viewing_session::configure_input() {
 	active_context.map_key_to_intent(key::B, intent_type::SPECIAL_ACTION_BUTTON_5);
 	active_context.map_key_to_intent(key::N, intent_type::SPECIAL_ACTION_BUTTON_6);
 	active_context.map_key_to_intent(key::M, intent_type::SPECIAL_ACTION_BUTTON_7);
-	active_context.map_key_to_intent(key::F8, intent_type::SPECIAL_ACTION_BUTTON_8);
-	active_context.map_key_to_intent(key::F9, intent_type::SPECIAL_ACTION_BUTTON_9);
-	active_context.map_key_to_intent(key::F10, intent_type::SPECIAL_ACTION_BUTTON_10);
-	active_context.map_key_to_intent(key::F11, intent_type::SPECIAL_ACTION_BUTTON_11);
-	active_context.map_key_to_intent(key::F12, intent_type::SPECIAL_ACTION_BUTTON_12);
+	active_context.map_key_to_intent(key::F2, intent_type::SPECIAL_ACTION_BUTTON_8);
+	active_context.map_key_to_intent(key::F3, intent_type::SPECIAL_ACTION_BUTTON_9);
+	active_context.map_key_to_intent(key::F4, intent_type::SPECIAL_ACTION_BUTTON_10);
+	active_context.map_key_to_intent(key::F5, intent_type::SPECIAL_ACTION_BUTTON_11);
+	active_context.map_key_to_intent(key::F6, intent_type::SPECIAL_ACTION_BUTTON_12);
 
 	active_context.map_key_to_intent(key::Q, intent_type::PREVIOUS_HOTBAR_SELECTION_SETUP);
 
@@ -366,6 +366,9 @@ void viewing_session::draw_color_overlay(augs::renderer& renderer, const rgba co
 	renderer.clear_triangles();
 }
 
-visible_entities viewing_session::get_visible_entities(const cosmos& cosm) {
-	return{ camera.smoothed_camera, cosm };
+void viewing_session::get_visible_entities(
+	visible_entities& into,
+	const cosmos& cosm
+) {
+	into.from_camera(camera.smoothed_camera, cosm);
 }

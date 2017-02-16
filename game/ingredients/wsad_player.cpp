@@ -198,30 +198,6 @@ namespace ingredients {
 
 		add_wsad_character_setup_movement(e);
 	}
-
-	void add_wsad_character_corpse(const entity_handle e) {
-		auto& sprite = e += components::sprite();
-		auto& render = e += components::render();
-
-		sprite.set(assets::texture_id::DEAD_TORSO, rgba(255, 255, 255, 255));
-		render.layer = render_layer::CORPSES;
-
-		components::physics body;
-		components::fixtures colliders;
-
-		auto& info = colliders.new_collider();
-
-		info.shape.from_renderable(e);
-
-		info.filter = filters::corpse();
-		info.density = 1.0;
-
-		body.linear_damping = 6.5;
-
-		e += body;
-		e += colliders;
-		e.get<components::fixtures>().set_owner_body(e);
-	}
 }
 
 namespace prefabs {

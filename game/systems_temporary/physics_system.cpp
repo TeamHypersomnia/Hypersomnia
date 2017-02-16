@@ -10,7 +10,6 @@
 
 #include "game/messages/collision_message.h"
 #include "game/messages/queue_destruction.h"
-#include "game/messages/new_entity_message.h"
 #include "game/messages/will_soon_be_deleted.h"
 
 #include "game/transcendental/cosmos.h"
@@ -84,8 +83,9 @@ void physics_system::destruct(const const_entity_handle handle) {
 
 void physics_system::fixtures_construct(const const_entity_handle handle) {
 	//ensure(!is_constructed_colliders(handle));
-	if (is_constructed_colliders(handle))
+	if (is_constructed_colliders(handle)) {
 		return;
+	}
 
 	if (handle.has<components::fixtures>()) {
 		const auto colliders = handle.get<components::fixtures>();
@@ -147,8 +147,9 @@ void physics_system::fixtures_construct(const const_entity_handle handle) {
 
 void physics_system::construct(const const_entity_handle handle) {
 	//ensure(!is_constructed_rigid_body(handle));
-	if (is_constructed_rigid_body(handle))
+	if (is_constructed_rigid_body(handle)) {
 		return;
+	}
 
 	fixtures_construct(handle);
 
@@ -209,7 +210,7 @@ std::pair<size_t, size_t> physics_system::map_fixture_pointer_to_indices(const b
 	}
 
 	ensure(false);
-	return{};
+	return{ 0xdeadbeef, 0xdeadbeef };
 }
 
 convex_partitioned_shape::convex_poly::destruction_data& physics_system::map_fixture_pointer_to_convex_poly(const b2Fixture* const f, const entity_handle handle) {

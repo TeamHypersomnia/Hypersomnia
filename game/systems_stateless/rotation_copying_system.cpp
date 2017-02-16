@@ -41,11 +41,11 @@ float colinearize_AB(const vec2 O_center_of_rotation, vec2 A_barrel_center, vec2
 	const float oc_radius = crosshair_vector.length();
 	
 	const auto intersection = circle_ray_intersection(B_muzzle, A_barrel_center, O_center_of_rotation, oc_radius);
-	const bool has_intersection = intersection.first;
+	const bool has_intersection = intersection.hit;
 	
 	ensure(has_intersection);
 
-	const auto G = intersection.second;
+	const auto G = intersection.intersection;
 	const auto CG = C_crosshair - G;
 	const auto AG = A_barrel_center - G;
 

@@ -181,7 +181,9 @@ void determinism_test_setup::process(
 
 		logged += typesafe_sprintf("Currently viewn cosmos: %x (F3 to switch)\n", currently_viewn_cosmos);
 
-		const auto all_visible = session.get_visible_entities(hypersomnias[currently_viewn_cosmos]);
+		static thread_local visible_entities all_visible;
+		session.get_visible_entities(all_visible, hypersomnias[currently_viewn_cosmos]);
+
 		const auto vdt = session.frame_timer.extract_variable_delta(hypersomnias[currently_viewn_cosmos].get_fixed_delta(), timer);
 
 		session.advance_audiovisual_systems(

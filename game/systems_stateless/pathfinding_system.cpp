@@ -163,10 +163,33 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 								sensor_direction * 10 + vert.location + sensor_direction.perpendicular_cw() * 4
 							};
 
-							auto out = physics.query_polygon(sensor_polygon, pathfinding.filter, it);
+							bool was_hit = false;
 
-							if (out.bodies.empty()) {
-								vert.sensor = physics.push_away_from_walls(vert.sensor, pathfinding.target_offset, 50, pathfinding.filter, it);
+							physics.for_each_intersection_with_polygon(
+								sensor_polygon, 
+								pathfinding.filter, 
+								([&](const auto fix, ...) {
+									if (cosmos[get_id_of_entity_of_body(fix)] != it) {
+										was_hit = true;
+										return query_callback_result::ABORT;
+									}
+									else {
+										return query_callback_result::CONTINUE;
+									}
+								})
+							);
+
+							if (was_hit) {
+								constexpr auto rays_count = 50;
+
+								vert.sensor = physics.push_away_from_walls(
+									vert.sensor, 
+									pathfinding.target_offset, 
+									rays_count,
+									pathfinding.filter, 
+									it
+								);
+
 								pathfinding.session().undiscovered_vertices.push_back(vert);
 							}
 						}

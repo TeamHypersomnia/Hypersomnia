@@ -42,7 +42,7 @@ struct perk_meter : game_gui_rect_node {
 	ltrb get_full_value_bar_rect_bordered(
 		const const_game_gui_context context,
 		const const_this_pointer this_id,
-		const ltrb absolute
+		const ltrbi absolute
 	) const;
 
 	static void draw(

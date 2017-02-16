@@ -13,7 +13,6 @@ namespace filters {
 		RENDERABLE = 1 << 9,
 		RENDERABLE_QUERY = 1 << 10,
 		SHELL = 1 << 11,
-		CORPSE = 1 << 12,
 		PATHFINDING_OBSTRUCTION = 1 << 13,
 		PATHFINDING_QUERY = 1 << 14,
 		SIGHT_QUERY = 1 << 14,
@@ -22,7 +21,6 @@ namespace filters {
 	b2Filter renderable_query();
 	b2Filter renderable();
 	b2Filter controlled_character();
-	b2Filter corpse();
 	b2Filter friction_ground();
 	b2Filter dynamic_object();
 	b2Filter see_through_dynamic_object();

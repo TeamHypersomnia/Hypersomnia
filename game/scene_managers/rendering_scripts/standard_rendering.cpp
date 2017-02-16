@@ -46,7 +46,7 @@ namespace rendering_scripts {
 		}
 		
 		for (int i = render_layer::UNDER_GROUND; i > render_layer::DYNAMIC_BODY; --i) {
-			render_system().draw_entities(interp, global_time_seconds,output, visible_per_layer[i], camera, renderable_drawing_type::NORMAL);
+			render_system().draw_entities(interp, global_time_seconds,output, cosmos, visible_per_layer[i], camera, renderable_drawing_type::NORMAL);
 		}
 
 		renderer.call_triangles();
@@ -58,7 +58,7 @@ namespace rendering_scripts {
 			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
 		}
 		
-		render_system().draw_entities(interp, global_time_seconds,output, visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], camera, renderable_drawing_type::BORDER_HIGHLIGHTS);
+		render_system().draw_entities(interp, global_time_seconds,output, cosmos, visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], camera, renderable_drawing_type::BORDER_HIGHLIGHTS);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
@@ -66,7 +66,7 @@ namespace rendering_scripts {
 		default_shader.use();
 
 		for (int i = render_layer::DYNAMIC_BODY; i >= 0; --i) {
-			render_system().draw_entities(interp, global_time_seconds,output, visible_per_layer[i], camera, renderable_drawing_type::NORMAL);
+			render_system().draw_entities(interp, global_time_seconds,output, cosmos, visible_per_layer[i], camera, renderable_drawing_type::NORMAL);
 		}
 
 		renderer.call_triangles();

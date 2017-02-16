@@ -156,6 +156,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 
 			if ((now - when_casted).in_milliseconds(delta) <= spell_data.casting_time_ms) {
 				perform_spell_logic(
+					step,
 					sentience.currently_casted_spell,
 					subject,
 					sentience,

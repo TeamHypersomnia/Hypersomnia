@@ -129,10 +129,18 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(came
 
 	cone.visible_world_area *= 2.5f;
 
-	const auto targets = 
-		cosmos[cosmos.systems_temporary.get<dynamic_tree_system>().determine_visible_entities_from_camera(cone, components::dynamic_tree_node::tree_type::PARTICLE_EXISTENCES)];
+	static thread_local std::vector<unversioned_entity_id> targets;
+	targets.clear();
 
-	for (const auto it : targets) {
+	cosmos.systems_temporary.get<dynamic_tree_system>().determine_visible_entities_from_camera(
+		targets,
+		cone, 
+		components::dynamic_tree_node::tree_type::PARTICLE_EXISTENCES
+	);
+
+	for (const auto it_id : targets) {
+		const auto it = cosmos[it_id];
+
 		auto& cache = get_cache(it);
 		const auto& existence = it.get<components::particles_existence>();
 

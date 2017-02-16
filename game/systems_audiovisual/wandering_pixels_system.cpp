@@ -34,7 +34,7 @@ void wandering_pixels_system::advance_for_visible(
 	global_time += dt.in_seconds();
 
 	for (const auto e : visible.per_layer[render_layer::WANDERING_PIXELS_EFFECTS]) {
-		advance_wandering_pixels_for(e, dt);
+		advance_wandering_pixels_for(cosm[e], dt);
 	}
 }
 

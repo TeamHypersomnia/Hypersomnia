@@ -1,4 +1,5 @@
 #include "spell_data.h"
+#include "game/transcendental/step.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/components/sentience_component.h"
@@ -7,6 +8,7 @@
 #include "game/components/damage_component.h"
 #include "game/components/sound_response_component.h"
 #include "game/messages/create_particle_effect.h"
+#include "game/messages/exploding_ring.h"
 #include "game/systems_stateless/particles_existence_system.h"
 #include "game/systems_stateless/sound_existence_system.h"
 #include "game/systems_stateless/visibility_system.h"
@@ -189,6 +191,7 @@ bool are_additional_conditions_for_casting_fulfilled(
 }
 
 void perform_spell_logic(
+	const logic_step step,
 	const spell_type spell,
 	const entity_handle caster,
 	components::sentience& sentience,
@@ -196,7 +199,7 @@ void perform_spell_logic(
 	const augs::stepped_timestamp now
 ) {
 	const auto spell_data = get_spell_data(spell);
-	auto& cosmos = caster.get_cosmos();
+	auto& cosmos = step.cosm;
 	const auto dt = cosmos.get_fixed_delta();
 	const auto caster_transform = caster.get_logic_transform();
 	const auto appearance = get_spell_appearance(spell);
@@ -240,6 +243,52 @@ void perform_spell_logic(
 	case spell_type::FURY_OF_THE_AEONS:
 		ignite_sparkle_particles();
 		play_standard_sparkles_sound();
+
+		{
+			const auto transform = caster.get_logic_transform();
+
+			constexpr auto effective_radius = 500.f;
+			constexpr auto effective_radius_sq = effective_radius*effective_radius;
+
+			messages::visibility_information_request request;
+			request.eye_transform = transform;
+			request.filter = filters::line_of_sight_query();
+			request.square_side = effective_radius;
+			request.subject = caster;
+
+			const auto response = visibility_system().respond_to_visibility_information_requests(
+				cosmos,
+				{},
+				{ request }
+			);
+
+			const auto& physics = cosmos.systems_temporary.get<physics_system>();
+
+			for (auto i = 0u; i < response.vis[0].get_num_triangles(); ++i) {
+				auto tri = response.vis[0].get_world_triangle(i, request.eye_transform.pos);
+				tri[1] += (tri[1] - tri[0]).set_length(5);
+				tri[2] += (tri[2] - tri[0]).set_length(5);
+
+				//physics.for_each_in_triangle(
+				//	tri, 
+				//	filters::dynamic_object(), 
+				//	caster
+				//);
+				//
+				//for (const auto d : queried.details) {
+				//	if ((vec2(d.location) - transform.pos).length_sq() <= effective_radius_sq) {
+				//	}
+				//}
+			}
+
+			messages::exploding_ring ring;
+			ring.radius = effective_radius;
+			ring.color = appearance.border_col;
+			ring.center = transform.pos;
+			ring.visibility = std::move(response.vis[0]);
+
+			step.transient.messages.post(ring);
+		}
 
 		break;
 

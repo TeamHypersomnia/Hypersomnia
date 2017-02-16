@@ -79,4 +79,11 @@ namespace std {
 			return std::hash<unsigned long long>()(k.guid);
 		}
 	};
+
+	template <class T>
+	struct hash<augs::unversioned_id<T>> {
+		std::size_t operator()(const augs::unversioned_id<T> k) const {
+			return std::hash<int>()(k.pool.indirection_index);
+		}
+	};
 }

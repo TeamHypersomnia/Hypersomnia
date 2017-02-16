@@ -1,6 +1,7 @@
 #pragma once
 #include "message.h"
 #include <set>
+#include <unordered_set>
 #include <vector>
 #include "augs/graphics/pixel.h"
 #include "game/components/transform_component.h"
@@ -45,10 +46,7 @@ namespace messages {
 
 	struct visibility_information_response {
 		typedef std::pair<vec2, vec2> edge;
-
-		struct triangle {
-			vec2 points[3];
-		};
+		typedef std::array<vec2, 3> triangle;
 
 		struct discontinuity {
 			int edge_index;
@@ -95,10 +93,10 @@ namespace messages {
 	};
 
 	struct line_of_sight_response {
-		std::set<entity_id> visible_items;
-		std::set<entity_id> visible_sentiences;
-		std::set<entity_id> visible_attitudes;
-		std::set<entity_id> visible_dangers;
+		std::unordered_set<entity_id> visible_items;
+		std::unordered_set<entity_id> visible_sentiences;
+		std::unordered_set<entity_id> visible_attitudes;
+		std::unordered_set<entity_id> visible_dangers;
 
 		bool sees(const entity_id) const;
 	};

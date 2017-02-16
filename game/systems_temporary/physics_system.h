@@ -9,8 +9,11 @@
 #include "game/messages/collision_message.h"
 
 #include "game/detail/convex_partitioned_shape.h"
+#include "game/detail/physics_queries.h"
+#include "augs/build_settings/setting_empty_bases.h"
 
 #include <set>
+#include <unordered_set>
 
 class cosmos;
 struct camera_cone;
@@ -26,7 +29,7 @@ struct colliders_cache {
 	int correspondent_rigid_body_cache = -1;
 };
 
-class physics_system {
+class EMPTY_BASES physics_system : public physics_queries<physics_system> {
 	std::vector<colliders_cache> colliders_caches;
 	std::vector<rigid_body_cache> rigid_body_caches;
 
@@ -39,6 +42,7 @@ class physics_system {
 	void destruct(const const_entity_handle);
 
 	friend class cosmos;
+	friend class physics_queries<physics_system>;
 	friend class component_synchronizer<false, components::physics>;
 	friend class component_synchronizer<true, components::physics>;
 	friend class component_synchronizer<false, components::fixtures>;
@@ -57,42 +61,20 @@ class physics_system {
 	std::vector<messages::collision_message> accumulated_messages;
 public:
 	struct raycast_output {
-		vec2 intersection, normal;
 		bool hit = false;
-		unversioned_entity_id what_entity;
-	};
-
-	struct edge_edge_output {
 		vec2 intersection;
-		bool hit;
-	};
-
-	struct query_output {
-		struct queried_result {
-			b2Fixture* fixture;
-			b2Vec2 location;
-
-			bool operator<(const queried_result& b) const { return fixture < b.fixture; }
-		};
-
-		std::set<b2Body*> bodies;
-		std::set<unversioned_entity_id> entities;
-		std::set<queried_result> details;
-
-		query_output& operator+=(const query_output& b);
-	};
-
-	struct query_aabb_output {
-		std::set<b2Body*> bodies;
-		std::set<unversioned_entity_id> entities;
-		std::vector<b2Fixture*> fixtures;
+		vec2 normal;
+		unversioned_entity_id what_entity;
 	};
 
 	physics_system();
 
-	std::vector<raycast_output> ray_cast_all_intersections(const vec2 p1_meters, const vec2 p2_meters, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
-
-	static edge_edge_output edge_edge_intersection(const vec2 p1_meters, const vec2 p2_meters, const vec2 edge_p1, const vec2 edge_p2);
+	std::vector<raycast_output> ray_cast_all_intersections(
+		const vec2 p1_meters, 
+		const vec2 p2_meters, 
+		const b2Filter filter, 
+		const entity_id ignore_entity = entity_id()
+	) const;
 
 	raycast_output ray_cast(const vec2 p1_meters, const vec2 p2_meters, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
 	raycast_output ray_cast_px(const vec2 p1, const vec2 p2, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
@@ -100,22 +82,18 @@ public:
 	vec2 push_away_from_walls(const vec2 position, const float radius, const int ray_amount, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
 	float get_closest_wall_intersection(const vec2 position, const float radius, const int ray_amount, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
 
-	query_aabb_output query_square(const vec2 p1_meters, const float side_meters, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
-	query_aabb_output query_square_px(const vec2 p1, const float side, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
-
-	query_aabb_output query_aabb(const vec2 p1_meters, const vec2 p2_meters, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
-	query_aabb_output query_aabb_px(const vec2 p1, const vec2 p2, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
-	query_aabb_output query_camera(const camera_cone) const;
-
-	query_output query_body(const const_entity_handle, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
-
-	query_output query_polygon(const std::vector<vec2>& vertices, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
-	query_output query_shape(const b2Shape* const, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
-	
 	void step_and_set_new_transforms(const logic_step);
 	void post_and_clear_accumulated_collision_messages(const logic_step);
 
 	mutable int ray_casts_since_last_step = 0;
+
+	b2World& get_b2world() {
+		return *b2world.get();
+	}
+
+	const b2World& get_b2world() const {
+		return *b2world.get();
+	}
 
 	// b2world causes a stack overflow due to a large stack allocator, therefore it must be dynamically allocated
 	std::unique_ptr<b2World> b2world;
@@ -125,16 +103,6 @@ public:
 	physics_system(const physics_system&) = delete;
 	physics_system(physics_system&&) = delete;
 private:	
-	/* callback structure used in QueryAABB function to get all shapes near-by */
-	struct query_aabb_input : b2QueryCallback {
-		entity_id ignore_entity;
-		b2Filter filter;
-
-		query_aabb_output out;
-
-		bool ReportFixture(b2Fixture* fixture) override;
-	};
-
 	struct raycast_input : public b2RayCastCallback {
 		entity_id subject;
 		b2Filter subject_filter;

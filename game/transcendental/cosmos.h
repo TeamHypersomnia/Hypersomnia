@@ -157,6 +157,16 @@ public:
 	bool entity_exists_with_guid(const unsigned) const;
 #endif
 
+	template <class T>
+	decltype(auto) get_handle(const T t) {
+		return t;
+	}
+
+	template <class T>
+	decltype(auto) get_handle(const T t) const {
+		return t;
+	}
+
 	entity_handle get_handle(const entity_id);
 	const_entity_handle get_handle(const entity_id) const;
 	entity_handle get_handle(const unversioned_entity_id);

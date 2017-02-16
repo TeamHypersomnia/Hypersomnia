@@ -226,6 +226,10 @@ public:
 		return raw_id;
 	}
 
+	operator unversioned_entity_id() const {
+		return raw_id;
+	}
+
 	template <class component>
 	bool has() const {
 		ensure(alive());

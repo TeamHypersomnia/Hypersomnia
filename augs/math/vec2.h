@@ -19,26 +19,6 @@ template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
 }
 
-std::pair<bool, vec2> rectangle_ray_intersection(
-	const vec2 a,
-	const vec2 b,
-	const ltrb rectangle
-);
-
-std::pair<bool, vec2> circle_ray_intersection(
-	const vec2 a, 
-	const vec2 b, 
-	const vec2 circle_center, 
-	const float circle_radius
-);
-
-std::vector<vec2> generate_circle_points(
-	const float radius, 
-	const float last_angle_in_degrees, 
-	const float starting_angle_in_degrees, 
-	const unsigned int number_of_points
-);
-
 namespace augs {
 	template <class T, class A>
 	T interp(const T a, const T b, const A alpha) {
@@ -558,3 +538,35 @@ std::ostream& operator<<(std::ostream& out, const vec2t<T>& x) {
 	out << "(" << x.x << ";" << x.y << ")";
 	return out;
 }
+
+struct intersection_output {
+	bool hit = false;
+	vec2 intersection;
+};
+
+intersection_output rectangle_ray_intersection(
+	const vec2 a,
+	const vec2 b,
+	const ltrb rectangle
+);
+
+intersection_output circle_ray_intersection(
+	const vec2 a,
+	const vec2 b,
+	const vec2 circle_center,
+	const float circle_radius
+);
+
+intersection_output segment_segment_intersection(
+	const vec2 a1,
+	const vec2 a2,
+	const vec2 b1,
+	const vec2 b2
+);
+
+std::vector<vec2> generate_circle_points(
+	const float radius,
+	const float last_angle_in_degrees,
+	const float starting_angle_in_degrees,
+	const unsigned int number_of_points
+);

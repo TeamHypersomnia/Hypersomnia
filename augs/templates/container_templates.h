@@ -27,6 +27,11 @@ void sort_container(Container& v) {
 	std::sort(v.begin(), v.end());
 }
 
+template<class Container>
+void remove_duplicates_from_sorted(Container& v) {
+	v.erase(std::unique(v.begin(), v.end()), v.end());
+}
+
 template<class Container, class T>
 void remove_element(Container& v, const T& l) {
 	v.erase(std::remove(v.begin(), v.end(), l), v.end());

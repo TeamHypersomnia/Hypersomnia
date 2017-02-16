@@ -529,7 +529,8 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 		session.set_master_gain(cfg.sound_effects_volume * 0.3f * gain_fade_multiplier);
 		menu_theme_source.set_gain(cfg.music_volume * gain_fade_multiplier);
 
-		const auto all_visible = session.get_visible_entities(intro_scene);
+		static thread_local visible_entities all_visible;
+		session.get_visible_entities(all_visible, intro_scene);
 
 		const auto vdt = session.frame_timer.extract_variable_delta(
 			intro_scene.get_fixed_delta(), 

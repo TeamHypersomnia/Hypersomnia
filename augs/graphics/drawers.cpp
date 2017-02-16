@@ -261,9 +261,9 @@ namespace augs {
 					origin
 				);
 
-				ensure(intersection.first);
+				ensure(intersection.hit);
 
-				verts.push_back(intersection.second);
+				verts.push_back(intersection.intersection);
 
 				if (ratio > 0.875f) {
 					verts.push_back(origin.right_top());

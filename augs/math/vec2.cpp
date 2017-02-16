@@ -1,9 +1,10 @@
 #include "vec2.h"
 #include <3rdparty/Box2D/Collision/Shapes/b2CircleShape.h>
 #include <3rdparty/Box2D/Collision/Shapes/b2PolygonShape.h>
+#include <3rdparty/Box2D/Collision/Shapes/b2EdgeShape.h>
 #include "augs/ensure.h"
 
-std::pair<bool, vec2> circle_ray_intersection(
+intersection_output circle_ray_intersection(
 	const vec2 a, 
 	const vec2 b, 
 	const vec2 circle_center, 
@@ -30,7 +31,7 @@ std::pair<bool, vec2> circle_ray_intersection(
 	return{ false, vec2(0, 0) };
 }
 
-std::pair<bool, vec2> rectangle_ray_intersection(
+intersection_output rectangle_ray_intersection(
 	const vec2 a,
 	const vec2 b,
 	const ltrb rectangle
@@ -71,4 +72,33 @@ std::vector<vec2> generate_circle_points(
 	}
 
 	return result;
+}
+
+intersection_output segment_segment_intersection(
+	const vec2 a1,
+	const vec2 a2,
+	const vec2 b1,
+	const vec2 b2
+) {
+	/* prepare b2RayCastOutput/b2RayCastInput data for raw b2EdgeShape::RayCast call */
+	b2RayCastOutput output;
+	b2RayCastInput input;
+	output.fraction = 0.f;
+	input.maxFraction = 1.0;
+	input.p1 = a1;
+	input.p2 = a2;
+
+	/* we don't need to transform edge or ray since they are in the same space
+	but we have to prepare dummy b2Transform as argument for b2EdgeShape::RayCast
+	*/
+	b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
+
+	b2EdgeShape b2edge;
+	b2edge.Set(b2Vec2(b1), b2Vec2(b2));
+
+	intersection_output out;
+	out.hit = b2edge.RayCast(&output, input, null_transform, 0);
+	out.intersection = input.p1 + output.fraction * (input.p2 - input.p1);
+
+	return out;
 }

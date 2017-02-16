@@ -571,21 +571,29 @@ entity_id character_gui::get_hovered_world_entity(const cosmos& cosm, const vec2
 	const auto& physics = cosm.systems_temporary.get<physics_system>();
 	const auto cursor_pointing_at = world_cursor_position;
 
-	const std::vector<vec2> cursor_world_polygon = { cursor_pointing_at, cursor_pointing_at + vec2(1, 0), cursor_pointing_at + vec2(1, 1) , cursor_pointing_at + vec2(0, 1) };
-	const auto hovered = physics.query_polygon(cursor_world_polygon, filters::renderable_query());
+	std::vector<unversioned_entity_id> hovered_entities;
 
-	if (hovered.entities.size() > 0) {
-		std::vector<unversioned_entity_id> sorted_by_visibility(hovered.entities.begin(), hovered.entities.end());
+	physics.for_each_in_aabb(
+		cursor_pointing_at, 
+		cursor_pointing_at + vec2(1, 1), 
+		filters::renderable_query(),
+		[&](const auto fix) {
+		const auto id = get_id_of_entity_of_fixture(fix);
 
-		erase_remove(sorted_by_visibility, [&](const auto e) {
-			return cosm[e].find<components::render>() == nullptr;
-		});
+			if (cosm[id].has<components::render>()) {
+				hovered_entities.push_back(id);
+			}
 
-		sort_container(sorted_by_visibility, [&](const auto a, const auto b) {
+			return query_callback_result::CONTINUE;
+		}
+	);
+
+	if (hovered_entities.size() > 0) {
+		sort_container(hovered_entities, [&](const auto a, const auto b) {
 			return render_system::render_order_compare(cosm[a], cosm[b]);
 		});
 
-		for (const auto h : sorted_by_visibility) {
+		for (const auto h : hovered_entities) {
 			const auto hovered = cosm[h];
 			const auto named = cosm[get_first_named_ancestor(hovered)];
 

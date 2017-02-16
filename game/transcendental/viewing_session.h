@@ -109,7 +109,10 @@ public:
 		const augs::network::client& details
 	) const;
 
-	visible_entities get_visible_entities(const cosmos&);
+	void get_visible_entities(
+		visible_entities& into,
+		const cosmos&
+	);
 	
 	std::wstring summary() const;
 

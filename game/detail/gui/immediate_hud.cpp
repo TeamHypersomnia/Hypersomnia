@@ -87,7 +87,8 @@ augs::vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_i
 
 	augs::vertex_triangle_buffer circular_bars_information;
 
-	for (const auto v : visible_entities) {
+	for (const auto v_id : visible_entities) {
+		const auto v = cosmos[v_id];
 		const auto* const sentience = v.find<components::sentience>();
 
 		if (sentience) {
