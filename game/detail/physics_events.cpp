@@ -86,9 +86,11 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 							}
 						}
 
-						if (augs::renderer::get_current().debug_draw_friction_field_collisions_of_entering) {
-							augs::renderer::get_current().persistent_lines.draw_yellow(METERS_TO_PIXELSf*worldManifold.points[i], METERS_TO_PIXELSf* worldManifold.points[i] + vec2(worldManifold.normal).set_length(150));
-							augs::renderer::get_current().persistent_lines.draw_red(METERS_TO_PIXELSf*worldManifold.points[i], METERS_TO_PIXELSf* worldManifold.points[i] + velOtherPixels);
+						auto& renderer = augs::renderer::get_current();
+
+						if (renderer.debug_draw_friction_field_collisions_of_entering) {
+							renderer.persistent_lines.draw_yellow(METERS_TO_PIXELSf*worldManifold.points[i], METERS_TO_PIXELSf* worldManifold.points[i] + vec2(worldManifold.normal).set_length(150));
+							renderer.persistent_lines.draw_red(METERS_TO_PIXELSf*worldManifold.points[i], METERS_TO_PIXELSf* worldManifold.points[i] + velOtherPixels);
 						}
 					}
 				}

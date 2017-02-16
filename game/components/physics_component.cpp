@@ -99,18 +99,26 @@ void component_synchronizer<false, P>::apply_force(const vec2 pixels) const {
 	apply_force(pixels, vec2(0, 0), true);
 }
 
-void component_synchronizer<false, P>::apply_force(const vec2 pixels, const vec2 center_offset, const bool wake) const {
+void component_synchronizer<false, P>::apply_force(
+	const vec2 pixels, 
+	const vec2 center_offset, 
+	const bool wake
+) const {
 	ensure(is_constructed());
 
-	if (pixels.is_epsilon(2.f))
+	if (pixels.is_epsilon(2.f)) {
 		return;
+	}
 
-	vec2 force = pixels * PIXELS_TO_METERSf;
-	vec2 location = get_cache().body->GetWorldCenter() + (center_offset * PIXELS_TO_METERSf);
+	const auto force = pixels * PIXELS_TO_METERSf * handle.get_cosmos().get_fixed_delta().in_seconds();
+	const auto location = vec2(get_cache().body->GetWorldCenter() + (center_offset * PIXELS_TO_METERSf));
 
-	force *= handle.get_cosmos().get_fixed_delta().in_seconds();
+	get_cache().body->ApplyLinearImpulse(
+		force, 
+		location, 
+		wake
+	);
 
-	get_cache().body->ApplyLinearImpulse(force, location, wake);
 	component.angular_velocity = get_cache().body->GetAngularVelocity();
 	component.velocity = get_cache().body->GetLinearVelocity();
 

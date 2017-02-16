@@ -63,6 +63,7 @@ namespace augs {
 		bool debug_draw_colinearization = false;
 		bool debug_draw_forces = false;
 		bool debug_draw_friction_field_collisions_of_entering = false;
+		bool debug_draw_explosion_forces = false;
 
 		float visibility_expansion = 1.0f;
 		float max_visibility_expansion_distance = 1000.0f;

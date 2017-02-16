@@ -298,30 +298,24 @@ void perform_spell_logic(
 								const auto body_entity = cosmos[body_entity_id];
 								const auto& affected_physics = body_entity.get<components::physics>();
 								
-								const auto impact = (point_b - caster_transform.pos).set_length(60);
+								const auto impact = (point_b - caster_transform.pos).set_length(150);
+								const auto center_offset = (point_b - affected_physics.get_mass_position()) * 0.8f;
 
-								//if ((caster_transform.pos - point_b).length_sq() <= 50*50) {
-								//	affected_physics.apply_impulse(
-								//		impact
-								//	);
-								//
-								//	LOG("Close impact: %x", impact);
-								//}
-								//else 
 								{
-									auto& r = augs::renderer::get_current();
-									
 									affected_physics.apply_impulse(
-										impact, point_b
+										impact, center_offset
 									);
+									
+									auto& r = augs::renderer::get_current();
 
-									r.persistent_lines.draw_cyan(
-										point_b,
-										point_b + impact
-									);
+									if (r.debug_draw_explosion_forces) {
+										r.persistent_lines.draw_cyan(
+											affected_physics.get_mass_position() + center_offset,
+											affected_physics.get_mass_position() + center_offset + impact
+										);
+									}
 
-									LOG("Impact %x dealt to: %x", impact, body_entity.get_debug_name());
-									//LOG("Long impact: %x, %x", impact, point_b - affected_physics.get_mass_position());
+									// LOG("Impact %x dealt to: %x. Resultant angular: %x", impact, body_entity.get_debug_name(), affected_physics.get_angular_velocity());
 								}
 
 								messages::damage_message damage_msg;
