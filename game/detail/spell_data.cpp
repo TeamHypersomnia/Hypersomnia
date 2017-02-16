@@ -19,6 +19,8 @@
 #include "game/detail/entity_scripts.h"
 #include "game/enums/filters.h"
 
+#include "game/messages/damage_message.h"
+
 spell_data get_spell_data(const spell_type spell) {
 	spell_data d;
 	
@@ -264,12 +266,12 @@ void perform_spell_logic(
 
 			const auto& physics = cosmos.systems_temporary.get<physics_system>();
 
+			std::unordered_set<unversioned_entity_id> affected_entities_of_bodies;
+
 			for (auto i = 0u; i < response.vis[0].get_num_triangles(); ++i) {
 				auto damaging_triangle = response.vis[0].get_world_triangle(i, request.eye_transform.pos);
 				damaging_triangle[1] += (damaging_triangle[1] - damaging_triangle[0]).set_length(5);
 				damaging_triangle[2] += (damaging_triangle[2] - damaging_triangle[0]).set_length(5);
-
-				std::unordered_set<unversioned_entity_id> affected_entities_of_bodies;
 
 				physics.for_each_intersection_with_triangle(
 					damaging_triangle,
@@ -279,7 +281,7 @@ void perform_spell_logic(
 						const vec2 point_a, 
 						const vec2 point_b
 					) {
-					const auto body_entity_id = get_id_of_entity_of_body(fix);
+						const auto body_entity_id = get_id_of_entity_of_body(fix);
 						
 						if (
 							body_entity_id != caster.get_id()
@@ -291,11 +293,23 @@ void perform_spell_logic(
 							const bool is_yet_unaffected = it.second;
 
 							if (is_yet_unaffected) {
-								const auto& affected_physics = cosmos[body_entity_id].get<components::physics>();
+								const auto body_entity = cosmos[body_entity_id];
+								const auto& affected_physics = body_entity.get<components::physics>();
 								
+								const auto impact = (point_b - caster_transform.pos).set_length(60);
+
 								affected_physics.apply_impulse(
-									(point_b - caster_transform.pos).set_length(60), point_b
+									impact, point_b
 								);
+
+								messages::damage_message damage_msg;
+
+								damage_msg.inflictor = caster;
+								damage_msg.subject = body_entity;
+								damage_msg.amount = 88;
+								damage_msg.impact_velocity = impact;
+								damage_msg.point_of_impact = point_b;
+								step.transient.messages.post(damage_msg);
 							}
 						}
 

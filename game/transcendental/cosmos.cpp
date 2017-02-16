@@ -429,11 +429,11 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	destruction_system().generate_damages_from_forceful_collisions(step);
 	destruction_system().apply_damages_and_split_fixtures(step);
 
+	sentience_system().regenerate_values_and_advance_spell_logic(step);
 	sentience_system().apply_damage_and_generate_health_events(step);
 	systems_temporary.get<physics_system>().post_and_clear_accumulated_collision_messages(step);
 	sentience_system().cooldown_aimpunches(step);
 	sentience_system().set_borders(step);
-	sentience_system().regenerate_values_and_advance_spell_logic(step);
 
 	driver_system().release_drivers_due_to_requests(step);
 	driver_system().assign_drivers_from_successful_trigger_hits(step);
