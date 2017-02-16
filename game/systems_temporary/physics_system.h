@@ -1,7 +1,12 @@
 #pragma once
+#include <set>
+#include <unordered_set>
+
 #include "3rdparty/Box2D/Box2D.h"
+
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
+#include "game/transcendental/step_declaration.h"
 
 #include "game/components/physics_component.h"
 #include "game/components/transform_component.h"
@@ -10,14 +15,10 @@
 
 #include "game/detail/convex_partitioned_shape.h"
 #include "game/detail/physics_queries.h"
+
 #include "augs/build_settings/setting_empty_bases.h"
 
-#include <set>
-#include <unordered_set>
-
 class cosmos;
-struct camera_cone;
-#include "game/transcendental/step_declaration.h"
 
 struct rigid_body_cache {
 	b2Body* body = nullptr;

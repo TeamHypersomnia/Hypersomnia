@@ -4,6 +4,7 @@
 #include "game/components/fixtures_component.h"
 #include "game/components/wandering_pixels_component.h"
 #include "game/components/position_copying_component.h"
+#include "game/components/interpolation_component.h"
 #include "game/components/item_component.h"
 #include "game/transcendental/cosmos.h"
 #include "spatial_properties_mixin.h"
@@ -93,7 +94,22 @@ vec2 basic_spatial_properties_mixin<C, D>::get_effective_velocity() const {
 template <bool C, class D>
 components::transform basic_spatial_properties_mixin<C, D>::get_viewing_transform(const interpolation_system& sys, const bool integerize) const {
 	const auto handle = *static_cast<const D*>(this);
-	return ::get_viewing_transform(sys, handle, integerize);
+
+	const auto& owner = handle.get_owner_body();
+
+	if (owner.alive() && owner.has<components::interpolation>() && owner != handle) {
+		auto in = sys.get_interpolated(owner);
+
+		if (integerize)
+			in.pos = vec2i(in.pos);
+
+		return components::fixtures::transform_around_body(handle, in);
+	}
+	else if (handle.has<components::interpolation>()) {
+		return sys.get_interpolated(handle);
+	}
+
+	return handle.get_logic_transform();
 }
 
 template <class D>

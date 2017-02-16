@@ -32,8 +32,9 @@ void crosshair_system::generate_crosshair_intents(const logic_step step) {
 	for (const auto& it : events) {
 		const auto subject = cosmos[it.subject];
 		
-		if (!subject.has<components::crosshair>())
+		if (!subject.has<components::crosshair>()) {
 			continue;
+		}
 
 		auto& crosshair = subject.get<components::crosshair>();
 
@@ -59,9 +60,12 @@ void crosshair_system::generate_crosshair_intents(const logic_step step) {
 		else if (it.intent == intent_type::SWITCH_LOOK && it.is_pressed) {
 			auto& mode = crosshair.orbit_mode;
 
-			if (mode == components::crosshair::LOOK)
+			if (mode == components::crosshair::LOOK) {
 				mode = components::crosshair::ANGLED;
-			else mode = components::crosshair::LOOK;
+			}
+			else {
+				mode = components::crosshair::LOOK;
+			}
 
 			crosshair.update_bounds();
 		}
@@ -72,8 +76,9 @@ void crosshair_system::apply_crosshair_intents_to_base_offsets(const logic_step 
 	const auto& delta = step.get_delta();
 	const auto& events = step.transient.messages.get_queue<messages::crosshair_intent_message>();
 
-	for (const auto& it : events)
+	for (const auto& it : events) {
 		cosmos[it.subject].get<components::crosshair>().base_offset = it.crosshair_base_offset;
+	}
 }
 
 void crosshair_system::apply_base_offsets_to_crosshair_transforms(const logic_step step) {
