@@ -32,6 +32,9 @@ namespace assets {
 		CAST_SUCCESSFUL,
 		CAST_UNSUCCESSFUL,
 
+		EXPLOSION,
+		GREAT_EXPLOSION,
+
 		COUNT
 	};
 }

@@ -217,14 +217,19 @@ void perform_spell_logic(
 
 		particles_existence_system().create_particle_effect_entity(cosmos, burst).add_standard_components();
 	};
-
-	const auto play_standard_sparkles_sound = [&]() {
+	
+	const auto play_sound = [&](const assets::sound_buffer_id effect, const float gain = 1.f) {
 		components::sound_existence::effect_input in;
 		in.delete_entity_after_effect_lifetime = true;
 		in.direct_listener = caster;
-		in.effect = assets::sound_buffer_id::CAST_SUCCESSFUL;
+		in.effect = effect;
+		in.modifier.gain = gain;
 
 		sound_existence_system().create_sound_effect_entity(cosmos, in, caster_transform, entity_id()).add_standard_components();
+	};
+
+	const auto play_standard_sparkles_sound = [&]() {
+		play_sound(assets::sound_buffer_id::CAST_SUCCESSFUL);
 	};
 
 	switch (spell) {
@@ -247,6 +252,7 @@ void perform_spell_logic(
 	case spell_type::FURY_OF_THE_AEONS:
 		ignite_sparkle_particles();
 		play_standard_sparkles_sound();
+		play_sound(assets::sound_buffer_id::EXPLOSION, 1.2f);
 
 		{
 			const auto transform = caster.get_logic_transform();
