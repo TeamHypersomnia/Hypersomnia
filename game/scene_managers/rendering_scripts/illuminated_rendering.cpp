@@ -23,20 +23,27 @@
 
 namespace rendering_scripts {
 	void illuminated_rendering(const viewing_step step) {
-		const auto& camera = step.camera;
 		auto& renderer = step.renderer;
 		auto& output = renderer.triangles;
 		const auto& cosmos = step.cosm;
-		const auto& controlled_entity = cosmos[step.viewed_character];
+		const auto camera = step.camera;
+		const auto controlled_entity = cosmos[step.viewed_character];
 		const auto controlled_crosshair = controlled_entity[sub_entity_name::CHARACTER_CROSSHAIR];
 		const auto& interp = step.session.systems_audiovisual.get<interpolation_system>();
 		const auto& particles = step.session.systems_audiovisual.get<particles_simulation_system>();
-		auto& wandering_pixels = step.session.systems_audiovisual.get<wandering_pixels_system>();
-		const float global_time_seconds = static_cast<float>(step.get_interpolated_total_time_passed_in_seconds());
+		const auto& wandering_pixels = step.session.systems_audiovisual.get<wandering_pixels_system>();
+		const auto global_time_seconds = static_cast<float>(step.get_interpolated_total_time_passed_in_seconds());
 
-		const vec2i screen_size = camera.visible_world_area;
+		const auto screen_size = vec2i(camera.visible_world_area);
 
-		const auto matrix = augs::orthographic_projection<float>(0, static_cast<float>(screen_size.x), static_cast<float>(screen_size.y), 0, 0, 1);
+		const auto matrix = augs::orthographic_projection<float>(
+			0.f, 
+			camera.visible_world_area.x, 
+			camera.visible_world_area.y, 
+			0.f, 
+			0.f, 
+			1.f
+		);
 
 		const auto& visible_per_layer = step.visible.per_layer;
 
@@ -74,7 +81,7 @@ namespace rendering_scripts {
 
 		renderer.smoke_fbo.use_default();
 
-		auto& light = step.session.systems_audiovisual.get<light_system>();
+		const auto& light = step.session.systems_audiovisual.get<light_system>();
 		
 		light.render_all_lights(renderer, matrix, step, [&]() {
 				draw_crosshair_lines(

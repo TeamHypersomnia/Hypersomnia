@@ -265,20 +265,43 @@ void perform_spell_logic(
 			const auto& physics = cosmos.systems_temporary.get<physics_system>();
 
 			for (auto i = 0u; i < response.vis[0].get_num_triangles(); ++i) {
-				auto tri = response.vis[0].get_world_triangle(i, request.eye_transform.pos);
-				tri[1] += (tri[1] - tri[0]).set_length(5);
-				tri[2] += (tri[2] - tri[0]).set_length(5);
+				auto damaging_triangle = response.vis[0].get_world_triangle(i, request.eye_transform.pos);
+				damaging_triangle[1] += (damaging_triangle[1] - damaging_triangle[0]).set_length(5);
+				damaging_triangle[2] += (damaging_triangle[2] - damaging_triangle[0]).set_length(5);
 
-				//physics.for_each_in_triangle(
-				//	tri, 
-				//	filters::dynamic_object(), 
-				//	caster
-				//);
-				//
-				//for (const auto d : queried.details) {
-				//	if ((vec2(d.location) - transform.pos).length_sq() <= effective_radius_sq) {
-				//	}
-				//}
+				std::unordered_set<unversioned_entity_id> affected_entities_of_bodies;
+
+				physics.for_each_intersection_with_triangle(
+					damaging_triangle,
+					filters::dynamic_object(), 
+					[&](
+						const b2Fixture* const fix, 
+						const vec2 point_a, 
+						const vec2 point_b
+					) {
+					const auto body_entity_id = get_id_of_entity_of_body(fix);
+						
+						if (
+							body_entity_id != caster.get_id()
+							&& ((caster_transform.pos - point_a).length_sq() <= effective_radius_sq
+							|| (caster_transform.pos - point_b).length_sq() <= effective_radius_sq)
+						) {
+
+							const auto it = affected_entities_of_bodies.insert(body_entity_id);
+							const bool is_yet_unaffected = it.second;
+
+							if (is_yet_unaffected) {
+								const auto& affected_physics = cosmos[body_entity_id].get<components::physics>();
+								
+								affected_physics.apply_impulse(
+									(point_b - caster_transform.pos).set_length(60), point_b
+								);
+							}
+						}
+
+						return query_callback_result::CONTINUE;
+					}
+				);
 			}
 
 			messages::exploding_ring ring;
