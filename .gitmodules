@@ -22,3 +22,6 @@
 [submodule "3rdparty/openal-soft"]
 	path = 3rdparty/openal-soft
 	url = https://github.com/kcat/openal-soft.git
+[submodule "3rdparty/lodepng"]
+	path = 3rdparty/lodepng
+	url = https://github.com/lvandeve/lodepng.git

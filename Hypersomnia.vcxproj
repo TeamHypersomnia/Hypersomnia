@@ -261,6 +261,7 @@
     <ClCompile Include="3rdparty\googletest\googletest\src\gtest-test-part.cc" />
     <ClCompile Include="3rdparty\googletest\googletest\src\gtest-typed-test.cc" />
     <ClCompile Include="3rdparty\googletest\googletest\src\gtest.cc" />
+    <ClCompile Include="3rdparty\lodepng\lodepng.cpp" />
     <ClCompile Include="3rdparty\luabind-deboostified\src\class.cpp" />
     <ClCompile Include="3rdparty\luabind-deboostified\src\class_info.cpp" />
     <ClCompile Include="3rdparty\luabind-deboostified\src\class_registry.cpp" />
@@ -566,7 +567,6 @@
     <ClCompile Include="augs\log.cpp" />
     <ClCompile Include="augs\texture_baker\font.cpp" />
     <ClCompile Include="augs\texture_baker\image.cpp" />
-    <ClCompile Include="augs\texture_baker\lodepng.cpp" />
     <ClCompile Include="augs\texture_baker\texture_baker.cpp" />
     <ClCompile Include="augs\window_framework\event.cpp" />
     <ClCompile Include="augs\window_framework\window.cpp" />
@@ -884,6 +884,7 @@
     <ClInclude Include="3rdparty\GL\OpenGL.h" />
     <ClInclude Include="3rdparty\GL\wglew.h" />
     <ClInclude Include="3rdparty\googletest\googletest\src\gtest-internal-inl.h" />
+    <ClInclude Include="3rdparty\lodepng\lodepng.h" />
     <ClInclude Include="3rdparty\luabind-deboostified\luabind\adopt_policy.hpp" />
     <ClInclude Include="3rdparty\luabind-deboostified\luabind\back_reference.hpp" />
     <ClInclude Include="3rdparty\luabind-deboostified\luabind\back_reference_fwd.hpp" />
@@ -1416,7 +1417,6 @@
     <ClInclude Include="augs\log.h" />
     <ClInclude Include="augs\texture_baker\font.h" />
     <ClInclude Include="augs\texture_baker\image.h" />
-    <ClInclude Include="augs\texture_baker\lodepng.h" />
     <ClInclude Include="augs\texture_baker\texture_baker.h" />
     <ClInclude Include="augs\window_framework\event.h" />
     <ClInclude Include="augs\window_framework\window.h" />

@@ -1,5 +1,5 @@
 #include "image.h"
-#include "lodepng.h"
+#include "3rdparty/lodepng/lodepng.h"
 #include "augs/ensure.h"
 
 template<class C>
