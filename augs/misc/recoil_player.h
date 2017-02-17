@@ -36,8 +36,14 @@ public:
 
 	vec2 shoot_and_get_offset();
 	
-	void shoot_and_apply_impulse(entity_handle recoil_body, float scale, bool angular_impulse = false, float additional_angle = 0.f,
-		bool positional_impulse = false, float positional_rotation = 0.f);
+	void shoot_and_apply_impulse(
+		const entity_handle recoil_body, 
+		const float scale, 
+		const bool angular_impulse = false, 
+		const float additional_angle = 0.f,
+		const bool positional_impulse = false, 
+		const float positional_rotation = 0.f
+	);
 	
-	void cooldown(float amount_ms);
+	void cooldown(const float amount_ms);
 };

@@ -92,7 +92,7 @@ void sentience_system::cast_spells(const logic_step step) const {
 				);
 
 				sentience.cast_cooldown_for_all_spells.set(
-					static_cast<float>(standard_cooldown_for_all_spells_ms + spell_data.casting_time_ms), 
+					std::max(standard_cooldown_for_all_spells_ms, static_cast<float>(spell_data.casting_time_ms)),
 					now
 				);
 			}
@@ -151,6 +151,16 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 			}
 		}
 
+		const auto shake_mult = 1.f - (now - sentience.time_of_last_shake).in_milliseconds(delta) / sentience.shake_for_ms;
+
+		if (shake_mult > 0.f) {
+			const auto owning_crosshair_recoil = subject[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
+			auto rng = cosmos.get_rng_for(subject);
+
+			owning_crosshair_recoil.get<components::physics>().apply_impulse(
+				shake_mult *shake_mult * 100 * vec2{ rng.randval(-1.f, 1.f), rng.randval(-1.f, 1.f) });
+		}
+
 		if (sentience.currently_casted_spell != spell_type::COUNT) {
 			const auto spell_data = get_spell_data(sentience.currently_casted_spell);
 			const auto when_casted = sentience.time_of_last_spell_cast;
@@ -188,7 +198,10 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		if (punched[sub_entity_name::CHARACTER_CROSSHAIR].alive() && punched[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY].alive()) {
 			auto owning_crosshair_recoil = punched[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
 
-			sentience.aimpunch.shoot_and_apply_impulse(owning_crosshair_recoil, 1 / 15.f, true,
+			sentience.aimpunch.shoot_and_apply_impulse(
+				owning_crosshair_recoil, 
+				1 / 15.f, 
+				true,
 				(h.point_of_impact - punched.get_logic_transform().pos).cross(h.impact_velocity) / 100000000.f * 3.f / 25.f
 			);
 		}

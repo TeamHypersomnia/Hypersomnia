@@ -93,6 +93,9 @@ namespace components {
 		augs::stepped_timestamp time_of_last_spell_cast;
 		augs::stepped_timestamp time_of_last_exhausted_cast;
 
+		augs::stepped_timestamp time_of_last_shake;
+		float shake_for_ms = 0.f;
+
 		float comfort_zone = 500.f;
 		float minimum_danger_amount_to_evade = 5.f;
 		float danger_amount_from_hostile_attitude = 100.f;

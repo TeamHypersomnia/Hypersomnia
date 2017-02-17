@@ -21,11 +21,17 @@ vec2 recoil_player::shoot_and_get_offset() {
 	return offsets[current_offset++] * scale;
 }
 
-void recoil_player::shoot_and_apply_impulse(entity_handle recoil_body, float additional_scale, bool angular_impulse,
-	float additional_angle, bool positional_impulse, float positional_rotation) {
-	auto recoil_physics = recoil_body.get<components::physics>();
+void recoil_player::shoot_and_apply_impulse(
+	const entity_handle recoil_body, 
+	const float additional_scale, 
+	const bool angular_impulse,
+	const float additional_angle, 
+	const bool positional_impulse, 
+	const float positional_rotation
+) {
+	auto& recoil_physics = recoil_body.get<components::physics>();
 
-	auto offset = shoot_and_get_offset();
+	const auto offset = shoot_and_get_offset();
 
 	if (angular_impulse) {
 		recoil_physics.apply_angular_impulse(offset.radians() * additional_scale + additional_angle);
@@ -36,7 +42,7 @@ void recoil_player::shoot_and_apply_impulse(entity_handle recoil_body, float add
 	}
 }
 
-void recoil_player::cooldown(float amount_ms) {
+void recoil_player::cooldown(const float amount_ms) {
 	if (current_offset > 0) {
 		remaining_cooldown_duration -= amount_ms;
 
