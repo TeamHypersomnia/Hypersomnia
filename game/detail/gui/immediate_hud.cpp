@@ -393,7 +393,7 @@ void immediate_hud::draw_exploding_rings(const viewing_step step) const {
 			renderable_tri.vertices[2].pos = step.camera[world_light_tri[2]];
 
 			auto considered_color = r.color;
-			considered_color.a *= ratio;
+			considered_color.a *= 1.f - ratio;
 
 			if (considered_color == black) {
 				considered_color.set_hsv({ fmod(current_time / 16.f, 1.f), 1.0, 1.0 });

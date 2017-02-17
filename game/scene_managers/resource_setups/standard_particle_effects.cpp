@@ -281,8 +281,8 @@ namespace resource_setups {
 				em.num_of_particles_to_spawn_initially.set(300, 340);
 				em.stream_duration_ms = std::make_pair(0, 0);
 
-				em.base_velocity = std::make_pair(450, 500);
-				em.base_velocity_variation = std::make_pair(100.f, 120.f);
+				em.base_velocity = std::make_pair(120, 600);
+				em.base_velocity_variation = std::make_pair(10.f, 20.f);
 
 				em.angular_velocity = std::make_pair(0, 0);
 				em.particle_lifetime_ms = std::make_pair(100, 500);

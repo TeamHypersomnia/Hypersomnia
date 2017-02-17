@@ -8,20 +8,16 @@
 #include "game/components/damage_component.h"
 #include "game/components/sound_response_component.h"
 #include "game/messages/create_particle_effect.h"
-#include "game/messages/exploding_ring.h"
 #include "game/systems_stateless/particles_existence_system.h"
 #include "game/systems_stateless/sound_existence_system.h"
-#include "game/systems_stateless/visibility_system.h"
 
 #include "game/ingredients/ingredients.h"
-#include "game/assets/sound_response_id.h"
+#include "game/assets/sound_buffer_id.h"
 
 #include "game/detail/entity_scripts.h"
 #include "game/enums/filters.h"
 
-#include "game/messages/damage_message.h"
-
-#include "augs/graphics/renderer.h"
+#include "game/detail/explosions.h"
 
 spell_data get_spell_data(const spell_type spell) {
 	spell_data d;
@@ -258,141 +254,16 @@ void perform_spell_logic(
 			sentience.shake_for_ms = 400.f;
 			sentience.time_of_last_shake = now;
 
-			{
-				const auto transform = caster.get_logic_transform();
-
-				constexpr auto effective_radius = 250.f;
-				constexpr auto effective_radius_sq = effective_radius*effective_radius;
-
-				messages::visibility_information_request request;
-				request.eye_transform = transform;
-				request.filter = filters::line_of_sight_query();
-				request.square_side = effective_radius*2;
-				request.subject = caster;
-
-				const auto response = visibility_system().respond_to_visibility_information_requests(
-					cosmos,
-					{},
-					{ request }
-				);
-
-				const auto& physics = cosmos.systems_temporary.get<physics_system>();
-
-				std::unordered_set<unversioned_entity_id> affected_entities_of_bodies;
-
-				for (auto i = 0u; i < response.vis[0].get_num_triangles(); ++i) {
-					auto damaging_triangle = response.vis[0].get_world_triangle(i, request.eye_transform.pos);
-					damaging_triangle[1] += (damaging_triangle[1] - damaging_triangle[0]).set_length(5);
-					damaging_triangle[2] += (damaging_triangle[2] - damaging_triangle[0]).set_length(5);
-
-					physics.for_each_intersection_with_triangle(
-						damaging_triangle,
-						filters::dynamic_object(), 
-						[&](
-							const b2Fixture* const fix, 
-							const vec2 point_a, 
-							const vec2 point_b
-						) {
-							const auto body_entity_id = get_id_of_entity_of_body(fix);
-							
-							if (
-								body_entity_id != caster.get_id()
-								&& ((caster_transform.pos - point_a).length_sq() <= effective_radius_sq
-								|| (caster_transform.pos - point_b).length_sq() <= effective_radius_sq)
-							) {
-
-								const auto it = affected_entities_of_bodies.insert(body_entity_id);
-								const bool is_yet_unaffected = it.second;
-
-								if (is_yet_unaffected) {
-									const auto body_entity = cosmos[body_entity_id];
-									const auto& affected_physics = body_entity.get<components::physics>();
-									
-									const auto impact = (point_b - caster_transform.pos).set_length(150);
-									const auto center_offset = (point_b - affected_physics.get_mass_position()) * 0.8f;
-
-									{
-										affected_physics.apply_impulse(
-											impact, center_offset
-										);
-										
-										auto& r = augs::renderer::get_current();
-
-										if (r.debug_draw_explosion_forces) {
-											r.persistent_lines.draw_cyan(
-												affected_physics.get_mass_position() + center_offset,
-												affected_physics.get_mass_position() + center_offset + impact
-											);
-										}
-
-										// LOG("Impact %x dealt to: %x. Resultant angular: %x", impact, body_entity.get_debug_name(), affected_physics.get_angular_velocity());
-									}
-
-									auto* const maybe_sentience = body_entity.find<components::sentience>();
-
-									if (maybe_sentience != nullptr) {
-										maybe_sentience->shake_for_ms = 400.f;
-										maybe_sentience->time_of_last_shake = now;
-									}
-
-									messages::damage_message damage_msg;
-
-									damage_msg.inflictor = caster;
-									damage_msg.subject = body_entity;
-									damage_msg.amount = 88;
-									damage_msg.impact_velocity = impact;
-									damage_msg.point_of_impact = point_b;
-									step.transient.messages.post(damage_msg);
-								}
-							}
-
-							return query_callback_result::CONTINUE;
-						}
-					);
-				}
-
-				{
-					messages::exploding_ring ring;
-
-					ring.color = appearance.border_col;
-
-					ring.outer_radius_start_value = effective_radius / 2;
-					ring.outer_radius_end_value = effective_radius;
-
-					ring.inner_radius_start_value = 0.f;
-					ring.inner_radius_end_value = effective_radius;
-
-					ring.time_of_occurence = now.in_seconds(dt);
-					ring.maximum_duration_seconds = 0.20f;
-
-					ring.color = cyan;
-					ring.center = request.eye_transform.pos;
-					ring.visibility = std::move(response.vis[0]);
-
-					step.transient.messages.post(ring);
-				}
-
-				{
-					messages::exploding_ring ring;
-
-					ring.color = appearance.border_col;
-
-					ring.outer_radius_start_value = effective_radius;
-					ring.outer_radius_end_value = effective_radius/2;
-
-					ring.inner_radius_start_value = effective_radius/1.5;
-					ring.inner_radius_end_value = effective_radius / 2;
-
-					ring.time_of_occurence = now.in_seconds(dt);
-					ring.maximum_duration_seconds = 0.20f;
-
-					ring.color = white;
-					ring.center = request.eye_transform.pos;
-					ring.visibility = std::move(response.vis[0]);
-
-					step.transient.messages.post(ring);
-				}
-			}
+			standard_explosion(
+				step,
+				caster.get_logic_transform(),
+				caster,
+				250.f,
+				cyan,
+				white,
+				assets::sound_buffer_id::EXPLOSION,
+				1.2f
+			);
 		}
 
 		break;
