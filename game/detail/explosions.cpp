@@ -144,7 +144,7 @@ void standard_explosion(
 		ring.time_of_occurence = now.in_seconds(delta);
 		ring.maximum_duration_seconds = 0.20f;
 
-		ring.color = cyan;
+		ring.color = inner_ring_color;
 		ring.center = request.eye_transform.pos;
 		ring.visibility = std::move(response.vis[0]);
 
@@ -163,7 +163,7 @@ void standard_explosion(
 		ring.time_of_occurence = now.in_seconds(delta);
 		ring.maximum_duration_seconds = 0.20f;
 
-		ring.color = white;
+		ring.color = outer_ring_color;
 		ring.center = request.eye_transform.pos;
 		ring.visibility = std::move(response.vis[0]);
 

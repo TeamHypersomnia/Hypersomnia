@@ -33,11 +33,6 @@ namespace rendering_scripts {
 					components::sprite spr;
 					spr.set(assets::texture_id::CAST_HIGHLIGHT, highlight_col);
 
-					if (spell == spell_type::FURY_OF_THE_AEONS) {
-						spr.size_multiplier.set(2.5, 2.5);
-						highlight.renderable_transform = sentience.transform_when_spell_casted;
-					}
-
 					spr.draw(highlight);
 				}
 			}

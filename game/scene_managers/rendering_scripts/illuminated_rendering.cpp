@@ -46,6 +46,7 @@ namespace rendering_scripts {
 		);
 
 		const auto& visible_per_layer = step.visible.per_layer;
+		const auto& hud = step.session.hud;
 
 		auto& default_shader = *get_resource_manager().find(assets::program_id::DEFAULT);
 		auto& illuminated_shader = *get_resource_manager().find(assets::program_id::DEFAULT_ILLUMINATED);
@@ -113,6 +114,8 @@ namespace rendering_scripts {
 					cosmos,
 					global_time_seconds
 				);
+				
+				hud.draw_neon_highlights_of_exploding_rings(step);
 			}
 		);
 
@@ -255,8 +258,6 @@ namespace rendering_scripts {
 			glUniform2f(glGetUniformLocation(circular_bars_shader.id, "texture_center"), center.x, center.y);
 		
 		}
-
-		const auto& hud = step.session.hud;
 
 		const auto& textual_infos = hud.draw_circular_bars_and_get_textual_info(step);
 

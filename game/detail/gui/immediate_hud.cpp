@@ -364,7 +364,6 @@ void immediate_hud::draw_exploding_rings(const viewing_step step) const {
 	const auto& cosmos = step.cosm;
 	const auto current_time = static_cast<float>(step.get_interpolated_total_time_passed_in_seconds());
 	auto& triangles = step.renderer.triangles;
-	const auto& interp = step.session.systems_audiovisual.get<interpolation_system>();
 
 	for (const auto& r : exploding_rings) {
 		const auto passed = current_time - r.time_of_occurence;
@@ -405,6 +404,36 @@ void immediate_hud::draw_exploding_rings(const viewing_step step) const {
 
 			step.renderer.push_triangle(renderable_tri);
 			step.renderer.push_special_vertex_triangle(sp, sp, sp);
+		}
+	}
+}
+
+void immediate_hud::draw_neon_highlights_of_exploding_rings(const viewing_step step) const {
+	const auto& cosmos = step.cosm;
+	const auto current_time = static_cast<float>(step.get_interpolated_total_time_passed_in_seconds());
+	auto& triangles = step.renderer.triangles;
+
+	for (const auto& r : exploding_rings) {
+		const auto passed = current_time - r.time_of_occurence;
+		auto ratio = passed / r.maximum_duration_seconds;
+
+		const auto radius = std::max(r.outer_radius_end_value, r.outer_radius_start_value);
+		auto highlight_col = r.color;
+
+		const auto highlight_amount = 1.f - ratio;
+
+		if (highlight_amount > 0.f) {
+			components::sprite::drawing_input highlight(triangles);
+			highlight.camera = step.camera;
+			highlight.renderable_transform.pos = r.center;
+
+			highlight_col.a = static_cast<rgba_channel>(255 * highlight_amount);
+
+			components::sprite spr;
+			spr.set(assets::texture_id::CAST_HIGHLIGHT, highlight_col);
+			spr.size.set(radius, radius);
+
+			spr.draw(highlight);
 		}
 	}
 }
