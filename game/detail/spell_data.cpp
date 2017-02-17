@@ -256,9 +256,11 @@ void perform_spell_logic(
 
 			standard_explosion(
 				step,
-				caster.get_logic_transform(),
+				caster_transform,
 				caster,
 				250.f,
+				88.f,
+				150.f,
 				cyan,
 				white,
 				assets::sound_buffer_id::EXPLOSION,
@@ -269,13 +271,71 @@ void perform_spell_logic(
 		break;
 
 	case spell_type::ULTIMATE_WRATH_OF_THE_AEONS:
+	{
+		const auto seconds_passed = (now - when_casted).in_seconds(dt);
+		const auto first_at = augs::stepped_timestamp{ when_casted.step + static_cast<unsigned>(1.3f / dt.in_seconds()) };
+		const auto second_at = augs::stepped_timestamp{ when_casted.step + static_cast<unsigned>(1.8f / dt.in_seconds()) };
+		const auto third_at = augs::stepped_timestamp{ when_casted.step + static_cast<unsigned>(2.3f / dt.in_seconds()) };
+
 		if (now == when_casted) {
 			ignite_sparkle_particles();
 			play_standard_sparkles_sound();
+			play_sound(assets::sound_buffer_id::CAST_CHARGING);
+		}
+		else if (now == first_at) {
+			sentience.shake_for_ms = 400.f;
+			sentience.time_of_last_shake = now;
+
+			standard_explosion(
+				step,
+				caster_transform,
+				caster,
+				200.f,
+				88.f,
+				150.f,
+				cyan,
+				white,
+				assets::sound_buffer_id::EXPLOSION,
+				1.2f
+			);
+		}
+		else if (now == second_at) {
+			sentience.shake_for_ms = 500.f;
+			sentience.time_of_last_shake = now;
+
+			standard_explosion(
+				step,
+				caster_transform,
+				caster,
+				400.f,
+				88.f,
+				200.f,
+				cyan,
+				white,
+				assets::sound_buffer_id::GREAT_EXPLOSION,
+				1.0f
+			);
+		}
+		else if (now == third_at) {
+			sentience.shake_for_ms = 600.f;
+			sentience.time_of_last_shake = now;
+
+			standard_explosion(
+				step,
+				caster_transform,
+				caster,
+				600.f,
+				88.f,
+				250.f,
+				cyan,
+				white,
+				assets::sound_buffer_id::GREAT_EXPLOSION,
+				1.2f
+			);
 		}
 
 		break;
-
+	}
 	case spell_type::ELECTRIC_TRIAD:
 		ignite_sparkle_particles();
 		play_standard_sparkles_sound();

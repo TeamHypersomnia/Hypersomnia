@@ -12,6 +12,8 @@ void standard_explosion(
 	components::transform location,
 	const entity_id subject_if_any,
 	const float effective_radius,
+	const float damage,
+	const float impact_force,
 	const rgba inner_ring_color,
 	const rgba outer_ring_color,
 	const assets::sound_buffer_id sound_effect, 

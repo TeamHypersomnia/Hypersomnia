@@ -17,6 +17,8 @@ void standard_explosion(
 	components::transform explosion_location,
 	const entity_id subject_if_any,
 	const float effective_radius,
+	const float damage,
+	const float impact_force,
 	const rgba inner_ring_color,
 	const rgba outer_ring_color,
 	const assets::sound_buffer_id sound_effect,
@@ -87,7 +89,7 @@ void standard_explosion(
 					const auto body_entity = cosmos[body_entity_id];
 					const auto& affected_physics = body_entity.get<components::physics>();
 
-					const auto impact = (point_b - explosion_location.pos).set_length(150);
+					const auto impact = (point_b - explosion_location.pos).set_length(impact_force);
 					const auto center_offset = (point_b - affected_physics.get_mass_position()) * 0.8f;
 
 					{
@@ -118,7 +120,7 @@ void standard_explosion(
 
 					damage_msg.inflictor = subject;
 					damage_msg.subject = body_entity;
-					damage_msg.amount = 88;
+					damage_msg.amount = damage;
 					damage_msg.impact_velocity = impact;
 					damage_msg.point_of_impact = point_b;
 					step.transient.messages.post(damage_msg);
