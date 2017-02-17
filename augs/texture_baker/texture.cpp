@@ -27,7 +27,7 @@ namespace augs {
 		return !rect.flipped ? vec2i(rect.w, rect.h) : vec2i(rect.h, rect.w);
 	}
 
-	void texture::get_uv(float u, float v, float& u_out, float& v_out) const {
+	void texture::get_atlas_space_uv(float u, float v, float& u_out, float& v_out) const {
 		if (!rect.flipped) {
 			u_out = x + w * u;
 			v_out = y + h * v;
@@ -38,9 +38,9 @@ namespace augs {
 		}
 	}
 
-	void texture::get_uv(vec2& texture_space) const {
+	void texture::get_atlas_space_uv(vec2& texture_space) const {
 		auto temp = texture_space;
-		get_uv(temp.x, temp.y, texture_space.x, texture_space.y);
+		get_atlas_space_uv(temp.x, temp.y, texture_space.x, texture_space.y);
 	}
 
 	float texture::get_u(int vertex_num_from_cw_rect) const {
@@ -73,20 +73,9 @@ namespace augs {
 		return y + h * v;
 	}
 
-	void texture::translate_uv(vec2 uv) {
-		uv *= vec2(w / rect.w, h / rect.h);
-		x += uv.x;
-		y += uv.y;
-	}
-
-	void texture::scale_uv(float u_scalar, float v_scalar) {
-		w *= u_scalar;
-		h *= v_scalar;
-	}
-
-	void texture::get_uv(const rects::texture<float> &uv, rects::texture<float>& out) const {
-		get_uv(uv.u1, uv.v1, out.u1, out.v1);
-		get_uv(uv.u2, uv.v2, out.u2, out.v2);
+	void texture::get_atlas_space_uv(const rects::texture<float> &uv, rects::texture<float>& out) const {
+		get_atlas_space_uv(uv.u1, uv.v1, out.u1, out.v1);
+		get_atlas_space_uv(uv.u2, uv.v2, out.u2, out.v2);
 	}
 
 	float texture::get_u_unit() const {

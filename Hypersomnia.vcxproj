@@ -361,6 +361,7 @@
     <ClCompile Include="game\components\gui_element_component.cpp" />
     <ClCompile Include="game\components\light_component.cpp" />
     <ClCompile Include="game\components\sound_existence_component.cpp" />
+    <ClCompile Include="game\detail\camera_cone.cpp" />
     <ClCompile Include="game\detail\entity_handle_mixins\inventory_mixin.cpp" />
     <ClCompile Include="game\detail\entity_handle_mixins\physics_mixin.cpp" />
     <ClCompile Include="game\detail\entity_handle_mixins\relations_mixin.cpp" />

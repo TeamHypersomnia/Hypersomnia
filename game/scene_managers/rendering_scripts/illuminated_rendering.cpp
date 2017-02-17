@@ -54,13 +54,8 @@ namespace rendering_scripts {
 		auto& border_highlight_shader = pure_color_highlight_shader; // the same
 		auto& circular_bars_shader = *get_resource_manager().find(assets::program_id::CIRCULAR_BARS);
 		auto& smoke_shader = *get_resource_manager().find(assets::program_id::SMOKE);
-
-		particles_simulation_system::drawing_input particles_input(output);
-		particles_input.camera = camera;
+		auto& exploding_rings_shader = *get_resource_manager().find(assets::program_id::EXPLODING_RING);
 		
-		wandering_pixels_system::drawing_input wandering_input(output);
-		wandering_input.camera = camera;
-
 		default_shader.use();
 		{
 			const auto projection_matrix_uniform = glGetUniformLocation(default_shader.id, "projection_matrix");
@@ -71,8 +66,13 @@ namespace rendering_scripts {
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_ONE, GL_ONE); glerr;
+		
+		{
+			particles_simulation_system::drawing_input particles_input(output);
+			particles_input.camera = camera;
 
-		particles.draw(render_layer::DIM_SMOKES, particles_input);
+			particles.draw(render_layer::DIM_SMOKES, particles_input);
+		}
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
@@ -222,10 +222,20 @@ namespace rendering_scripts {
 			renderer.clear_lines();
 		}
 
-		particles.draw(render_layer::EFFECTS, particles_input);
+		{
+			particles_simulation_system::drawing_input particles_input(output);
+			particles_input.camera = camera;
 
-		for (const auto e : visible_per_layer[render_layer::WANDERING_PIXELS_EFFECTS]) {
-			wandering_pixels.draw_wandering_pixels_for(cosmos[e], wandering_input);
+			particles.draw(render_layer::EFFECTS, particles_input);
+		}
+
+		{
+			wandering_pixels_system::drawing_input wandering_input(output);
+			wandering_input.camera = camera;
+
+			for (const auto e : visible_per_layer[render_layer::WANDERING_PIXELS_EFFECTS]) {
+				wandering_pixels.draw_wandering_pixels_for(cosmos[e], wandering_input);
+			}
 		}
 
 		renderer.call_triangles();
@@ -238,8 +248,8 @@ namespace rendering_scripts {
 			
 			vec2 upper(0.0f, 0.0f);
 			vec2 lower(1.0f, 1.0f);
-			(*assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM).get_uv(upper);
-			(*assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM).get_uv(lower);
+			(*assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM).get_atlas_space_uv(upper);
+			(*assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM).get_atlas_space_uv(lower);
 			const auto center = (upper + lower) / 2;
 		
 			glUniform2f(glGetUniformLocation(circular_bars_shader.id, "texture_center"), center.x, center.y);
@@ -260,6 +270,17 @@ namespace rendering_scripts {
 		pure_color_highlight_shader.use();
 
 		hud.draw_pure_color_highlights(step);
+
+		renderer.call_triangles();
+		renderer.clear_triangles();
+
+		exploding_rings_shader.use();
+		{
+			const auto projection_matrix_uniform = glGetUniformLocation(exploding_rings_shader.id, "projection_matrix");
+			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
+		}
+
+		hud.draw_exploding_rings(step);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();

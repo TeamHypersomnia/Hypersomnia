@@ -6,7 +6,14 @@
 
 namespace messages {
 	struct exploding_ring {
-		float radius = 0.f;
+		float outer_radius_start_value = 0.f;
+		float outer_radius_end_value = 0.f;
+		float inner_radius_start_value = 0.f;
+		float inner_radius_end_value = 0.f;
+
+		float maximum_duration_seconds = 0.f;
+		float time_of_occurence = 0.f;
+
 		vec2 center;
 		
 		messages::visibility_information_response visibility;

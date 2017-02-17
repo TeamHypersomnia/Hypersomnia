@@ -33,6 +33,10 @@ namespace resource_setups {
 		get_resource_manager().create(assets::shader_id::CIRCULAR_BARS_FRAGMENT, "hypersomnia/shaders/circular_bars.fsh", augs::graphics::shader::type::FRAGMENT);
 		get_resource_manager().create(assets::program_id::CIRCULAR_BARS, assets::shader_id::CIRCULAR_BARS_VERTEX, assets::shader_id::CIRCULAR_BARS_FRAGMENT);
 
+		get_resource_manager().create(assets::shader_id::EXPLODING_RING_VERTEX, "hypersomnia/shaders/exploding_ring.vsh", augs::graphics::shader::type::VERTEX);
+		get_resource_manager().create(assets::shader_id::EXPLODING_RING_FRAGMENT, "hypersomnia/shaders/exploding_ring.fsh", augs::graphics::shader::type::FRAGMENT);
+		get_resource_manager().create(assets::program_id::EXPLODING_RING, assets::shader_id::EXPLODING_RING_VERTEX, assets::shader_id::EXPLODING_RING_FRAGMENT);
+
 		get_resource_manager().create(assets::shader_id::LIGHT_VERTEX, "hypersomnia/shaders/light.vsh", augs::graphics::shader::type::VERTEX);
 		get_resource_manager().create(assets::shader_id::LIGHT_FRAGMENT, "hypersomnia/shaders/light.fsh", augs::graphics::shader::type::FRAGMENT);
 		get_resource_manager().create(assets::program_id::LIGHT, assets::shader_id::LIGHT_VERTEX, assets::shader_id::LIGHT_FRAGMENT);

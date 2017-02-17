@@ -38,10 +38,10 @@ namespace augs {
 			diff.u2 = 1.f - diff.u2;
 		}
 
-		tex.get_uv(diff.u1, diff.v1, p[0].texcoord.x, p[0].texcoord.y);
-		tex.get_uv(diff.u2, diff.v1, p[1].texcoord.x, p[1].texcoord.y);
-		tex.get_uv(diff.u2, diff.v2, p[2].texcoord.x, p[2].texcoord.y);
-		tex.get_uv(diff.u1, diff.v2, p[3].texcoord.x, p[3].texcoord.y);
+		tex.get_atlas_space_uv(diff.u1, diff.v1, p[0].texcoord.x, p[0].texcoord.y);
+		tex.get_atlas_space_uv(diff.u2, diff.v1, p[1].texcoord.x, p[1].texcoord.y);
+		tex.get_atlas_space_uv(diff.u2, diff.v2, p[2].texcoord.x, p[2].texcoord.y);
+		tex.get_atlas_space_uv(diff.u1, diff.v2, p[3].texcoord.x, p[3].texcoord.y);
 
 		augs::vertex_triangle out[2];
 		out[0].vertices[0] = p[0];
@@ -95,10 +95,10 @@ namespace augs {
 
 		p[0].color = p[1].color = p[2].color = p[3].color = color;
 
-		tex.get_uv(diff.u1, diff.v1, p[0].texcoord.x, p[0].texcoord.y);
-		tex.get_uv(diff.u2, diff.v1, p[1].texcoord.x, p[1].texcoord.y);
-		tex.get_uv(diff.u2, diff.v2, p[2].texcoord.x, p[2].texcoord.y);
-		tex.get_uv(diff.u1, diff.v2, p[3].texcoord.x, p[3].texcoord.y);
+		tex.get_atlas_space_uv(diff.u1, diff.v1, p[0].texcoord.x, p[0].texcoord.y);
+		tex.get_atlas_space_uv(diff.u2, diff.v1, p[1].texcoord.x, p[1].texcoord.y);
+		tex.get_atlas_space_uv(diff.u2, diff.v2, p[2].texcoord.x, p[2].texcoord.y);
+		tex.get_atlas_space_uv(diff.u1, diff.v2, p[3].texcoord.x, p[3].texcoord.y);
 
 		augs::vertex_triangle out[2];
 
@@ -184,8 +184,8 @@ namespace augs {
 		t1.vertices[2].texcoord = texcoords[3];
 
 		for (int i = 0; i < 3; ++i) {
-			considered_texture.get_uv(t1.vertices[i].texcoord);
-			considered_texture.get_uv(t2.vertices[i].texcoord);
+			considered_texture.get_atlas_space_uv(t1.vertices[i].texcoord);
+			considered_texture.get_atlas_space_uv(t2.vertices[i].texcoord);
 		}
 
 		t1.vertices[0].pos = t2.vertices[0].pos = static_cast<vec2i>(v[0]);

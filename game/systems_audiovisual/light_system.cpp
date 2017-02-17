@@ -100,23 +100,20 @@ void light_system::render_all_lights(
 		visibility_system().respond_to_visibility_information_requests(cosmos, {}, requests, dummy, responses);
 	}
 
-	const auto camera_transform = step.camera.transform;
-	const auto camera_size = step.camera.visible_world_area;
-	const auto camera_offset = -camera_transform.pos + camera_size / 2;
-
 	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_ONE, GL_ONE); glerr;
 	for (size_t i = 0; i < responses.size(); ++i) {
 		const auto& r = responses[i];
 		const auto& light_entity = cosmos[requests[i].subject];
 		const auto& light = light_entity.get<components::light>();
+		const auto world_light_pos = requests[i].eye_transform.pos;
 
 		for (size_t t = 0; t < r.get_num_triangles(); ++t) {
-			const auto world_light_tri = r.get_world_triangle(t, requests[i].eye_transform.pos);
+			const auto world_light_tri = r.get_world_triangle(t, world_light_pos);
 			augs::vertex_triangle renderable_light_tri;
 
-			renderable_light_tri.vertices[0].pos = world_light_tri[0] + camera_offset;
-			renderable_light_tri.vertices[1].pos = world_light_tri[1] + camera_offset;
-			renderable_light_tri.vertices[2].pos = world_light_tri[2] + camera_offset;
+			renderable_light_tri.vertices[0].pos = step.camera[world_light_tri[0]];
+			renderable_light_tri.vertices[1].pos = step.camera[world_light_tri[1]];
+			renderable_light_tri.vertices[2].pos = step.camera[world_light_tri[2]];
 
 			auto considered_color = light.color;
 			
@@ -163,14 +160,9 @@ void light_system::render_all_lights(
 
 		const auto& cache = per_entity_cache[light_entity.get_id().pool.indirection_index];
 
-		const auto light_displacement = vec2(cache.all_variation_values[6], cache.all_variation_values[7]);
+		const auto light_frag_pos = step.camera.get_screen_space_revert_y(world_light_pos);
 
-		auto screen_pos = requests[i].eye_transform - camera_transform;
-		screen_pos.pos.x += camera_size.x * 0.5f;
-		screen_pos.pos.y = camera_size.y - (screen_pos.pos.y + camera_size.y * 0.5f);
-		screen_pos += light_displacement;
-
-		glUniform2f(light_pos_uniform, screen_pos.pos.x, screen_pos.pos.y);
+		glUniform2f(light_pos_uniform, light_frag_pos.x, light_frag_pos.y);
 
 		glUniform1f(light_max_distance_uniform, light.max_distance.base_value);
 		

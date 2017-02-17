@@ -67,8 +67,16 @@ namespace augs {
 		//v.shrink_to_fit();
 	}
 
-	void image::paint_circle_midpoint(int radius, int border_width, rgba filling, bool scale_alpha, bool constrain_angle, vec2 angle_start, vec2 angle_end) {
-		auto side = radius * 2 + 1;
+	void image::paint_circle_midpoint(
+		const int radius, 
+		const int border_width, 
+		const rgba filling, 
+		const bool scale_alpha, 
+		const bool constrain_angle, 
+		const vec2 angle_start, 
+		const vec2 angle_end
+	) {
+		const auto side = radius * 2 + 1;
 
 		image new_surface;
 		auto& surface = v.empty() ? *this : new_surface;
@@ -78,7 +86,7 @@ namespace augs {
 		ensure(size.x >= side);
 		ensure(size.y >= side);
 
-		auto pp = [&](int x, int y){
+		const auto pp = [&](int x, int y){
 			int x_center = x - size.x / 2;
 			int y_center = y - size.y / 2;
 
@@ -123,8 +131,8 @@ namespace augs {
 		}
 
 		if (border_width > 1) {
-			for (int x = 0; x < surface.size.x; ++x) {
-				for (int y = 0; y < surface.size.x; ++y) {
+			for (int y = 0; y < surface.size.x; ++y) {
+				for (int x = 0; x < surface.size.x; ++x) {
 					if (x > 0 && y > 0 && x < surface.size.x - 1 && y < surface.size.y - 1) {
 						if (surface.pixel(x, y).a == 0 &&
 							surface.pixel(x + 1, y).a > 0 &&
@@ -142,8 +150,13 @@ namespace augs {
 		}
 	}
 
-	void image::paint_circle(int radius, int border_width, rgba filling, bool scale_alpha) {
-		auto side = radius * 2 + 1;
+	void image::paint_circle(
+		const int radius, 
+		const int border_width, 
+		const rgba filling, 
+		const bool scale_alpha
+	) {
+		const auto side = radius * 2 + 1;
 
 		if (v.empty()) {
 			create(side, side, 4);
@@ -154,8 +167,8 @@ namespace augs {
 		}
 
 		if (scale_alpha) {
-			for (int x = 0; x < size.x; ++x) {
-				for (int y = 0; y < size.y; ++y) {
+			for (int y = 0; y < size.y; ++y) {
+				for (int x = 0; x < size.x; ++x) {
 					int x_center = x - size.x / 2;
 					int y_center = y - size.y / 2;
 
@@ -174,8 +187,8 @@ namespace augs {
 		}
 		else {
 
-			for (int x = 0; x < size.x; ++x) {
-				for (int y = 0; y < size.y; ++y) {
+			for (int y = 0; y < size.y; ++y) {
+				for (int x = 0; x < size.x; ++x) {
 					int x_center = x - size.x / 2;
 					int y_center = y - size.y / 2;
 
@@ -195,7 +208,10 @@ namespace augs {
 		//pixel(side - 1, side / 2) = rgba(0, 0, 0, 0);
 	}
 
-	void image::paint_filled_circle(int radius, rgba filling) {
+	void image::paint_filled_circle(
+		const int radius, 
+		const rgba filling
+	) {
 		auto side = radius * 2 + 1;
 
 		if (v.empty()) {
@@ -206,8 +222,8 @@ namespace augs {
 			ensure(size.y >= side);
 		}
 
-		for (int x = 0; x < size.x; ++x) {
-			for (int y = 0; y < size.y; ++y) {
+		for (int y = 0; y < size.y; ++y) {
+			for (int x = 0; x < size.x; ++x) {
 				int x_center = x - size.x / 2;
 				int y_center = y - size.y / 2;
 
@@ -221,19 +237,6 @@ namespace augs {
 		//pixel(side / 2, side -1) = rgba(0, 0, 0, 0);
 		//pixel(0, side /2) = rgba(0, 0, 0, 0);
 		//pixel(side -1, side /2) = rgba(0, 0, 0, 0);
-	}
-
-	void image::paint_button_with_cuts(int width, int height, int left_bottom_cut_length, int top_right_cut_length, rgba border, rgba filling) {
-		create(width, height, 4);
-
-		for (int x = 0; x < size.x; ++x) {
-			for (int y = 0; y < size.y; ++y) {
-				if (!x || !y || x == size.x - 1 || y == size.y - 1)
-					pixel(x, y) = border;
-				else
-					pixel(x, y) = filling;
-			}
-		}
 	}
 
 	void image::paint_line(const vec2i from, const vec2i to, const rgba filling) {
@@ -296,8 +299,8 @@ namespace augs {
 	}
 
 	void image::fill(const rgba col) {
-		for (int i = 0; i < size.x; ++i) {
-			for (int j = 0; j < size.y; ++j) {
+		for (int j = 0; j < size.y; ++j) {
+			for (int i = 0; i < size.x; ++i) {
 				set_pixel({ i, j }, col);
 			}
 		}
@@ -460,8 +463,8 @@ namespace augs {
 		image desaturated;
 		desaturated.create(size.x, size.y, 4);
 
-		for (int x = 0; x < size.x; ++x) {
-			for (int y = 0; y < size.y; ++y) {
+		for (int y = 0; y < size.y; ++y) {
+			for (int x = 0; x < size.x; ++x) {
 				desaturated.set_pixel({ x, y }, pixel({ x, y }).get_desaturated());
 			}
 		}

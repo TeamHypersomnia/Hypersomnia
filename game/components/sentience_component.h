@@ -14,6 +14,7 @@
 
 #include "game/detail/perks/haste_perk.h"
 #include "game/detail/perks/electric_shield_perk.h"
+#include "game/components/transform_component.h"
 
 namespace components {
 	struct sentience {
@@ -88,6 +89,7 @@ namespace components {
 		augs::enum_associative_array<spell_type, spell_instance_data> spells;
 
 		spell_type currently_casted_spell = spell_type::COUNT;
+		components::transform transform_when_spell_casted;
 		augs::stepped_timestamp time_of_last_spell_cast;
 		augs::stepped_timestamp time_of_last_exhausted_cast;
 

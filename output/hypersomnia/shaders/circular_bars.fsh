@@ -21,6 +21,8 @@ void main()
 	vec4 pixel = texture(basic_texture, theTexcoord);
     
     vec2 v = theTexcoord - texture_center;
+    float aspect = textureSize(basic_texture, 0).x / textureSize(basic_texture, 0).y;
+    v.y *= aspect;
     normalize(v);
 
     vec2 lowerBound = startingAngleVec;

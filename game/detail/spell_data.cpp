@@ -257,13 +257,13 @@ void perform_spell_logic(
 		{
 			const auto transform = caster.get_logic_transform();
 
-			constexpr auto effective_radius = 500.f;
+			constexpr auto effective_radius = 250.f;
 			constexpr auto effective_radius_sq = effective_radius*effective_radius;
 
 			messages::visibility_information_request request;
 			request.eye_transform = transform;
 			request.filter = filters::line_of_sight_query();
-			request.square_side = effective_radius;
+			request.square_side = effective_radius*2;
 			request.subject = caster;
 
 			const auto response = visibility_system().respond_to_visibility_information_requests(
@@ -340,13 +340,47 @@ void perform_spell_logic(
 				);
 			}
 
-			messages::exploding_ring ring;
-			ring.radius = effective_radius;
-			ring.color = appearance.border_col;
-			ring.center = transform.pos;
-			ring.visibility = std::move(response.vis[0]);
+			{
+				messages::exploding_ring ring;
 
-			step.transient.messages.post(ring);
+				ring.color = appearance.border_col;
+
+				ring.outer_radius_start_value = effective_radius / 2;
+				ring.outer_radius_end_value = effective_radius;
+
+				ring.inner_radius_start_value = 0.f;
+				ring.inner_radius_end_value = effective_radius;
+
+				ring.time_of_occurence = now.in_seconds(dt);
+				ring.maximum_duration_seconds = 0.20f;
+
+				ring.color = cyan;
+				ring.center = request.eye_transform.pos;
+				ring.visibility = std::move(response.vis[0]);
+
+				step.transient.messages.post(ring);
+			}
+
+			{
+				messages::exploding_ring ring;
+
+				ring.color = appearance.border_col;
+
+				ring.outer_radius_start_value = effective_radius;
+				ring.outer_radius_end_value = effective_radius/2;
+
+				ring.inner_radius_start_value = effective_radius/1.5;
+				ring.inner_radius_end_value = effective_radius / 2;
+
+				ring.time_of_occurence = now.in_seconds(dt);
+				ring.maximum_duration_seconds = 0.20f;
+
+				ring.color = white;
+				ring.center = request.eye_transform.pos;
+				ring.visibility = std::move(response.vis[0]);
+
+				step.transient.messages.post(ring);
+			}
 		}
 
 		break;

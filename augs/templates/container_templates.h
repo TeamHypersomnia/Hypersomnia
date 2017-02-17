@@ -37,16 +37,6 @@ void remove_element(Container& v, const T& l) {
 	v.erase(std::remove(v.begin(), v.end(), l), v.end());
 }
 
-template<class Container, class T>
-bool found_in(Container& v, const T& l) {
-	return std::find(v.begin(), v.end(), l) != v.end();
-}
-
-template<class Container, class T>
-auto find_in(Container& v, const T& l) {
-	return std::find(v.begin(), v.end(), l);
-}
-
 template<class A, class B>
 void concatenate(A& a, const B& b) {
 	a.insert(a.end(), b.begin(), b.end());
@@ -55,6 +45,16 @@ void concatenate(A& a, const B& b) {
 template<class A, class B>
 void concatenate(std::set<A>& a, const std::set<B>& b) {
 	a.insert(b.begin(), b.end());
+}
+
+template<class Container, class T>
+bool found_in(Container& v, const T& l) {
+	return std::find(v.begin(), v.end(), l) != v.end();
+}
+
+template<class Container, class T>
+auto find_in(Container& v, const T& l) {
+	return std::find(v.begin(), v.end(), l);
 }
 
 template<class A, class B>

@@ -1,12 +1,12 @@
 #pragma once
 
 namespace augs {
-	struct stepped_timestamp;
-
 	class delta {
-		float delta_ms = 0;
+		float delta_ms;
 	public:
-		delta(const float dt = 0.f) : delta_ms(dt) { }
+		delta(const float delta_ms = 0.f) 
+			: delta_ms(delta_ms)
+		{}
 
 		bool operator==(const delta& b) const {
 			return delta_ms == b.delta_ms;

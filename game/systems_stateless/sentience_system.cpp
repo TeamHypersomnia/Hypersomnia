@@ -84,7 +84,8 @@ void sentience_system::cast_spells(const logic_step step) const {
 				sentience.time_of_last_spell_cast = now;
 
 				sentience.personal_electricity.value -= spell_data.personal_electricity_required;
-				
+				sentience.transform_when_spell_casted = subject.get_logic_transform();
+
 				spell_instance_data.cast_cooldown.set(
 					static_cast<float>(spell_data.cooldown_ms), 
 					now

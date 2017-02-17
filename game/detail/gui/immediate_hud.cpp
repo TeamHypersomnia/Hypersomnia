@@ -21,6 +21,7 @@
 #include "game/detail/inventory_slot_id.h"
 #include "game/detail/entity_description.h"
 
+#include "augs/graphics/drawers.h"
 #include "augs/graphics/renderer.h"
 #include "augs/graphics/vertex.h"
 #include "augs/gui/text_drawer.h"
@@ -29,9 +30,13 @@
 #include "augs/templates/container_templates.h"
 #include "augs/templates/string_templates.h"
 
-vec2 position_caption_around_a_circle(const float radius, const vec2 r, const float alpha) {
-	const vec2 top_bounds[2] =  { vec2(-r.x / 2, -radius - r.y / 2), vec2(r.x / 2, -radius - r.y / 2) };
-	const vec2 left_bounds[2] = { vec2(-radius - r.x / 2, r.y / 2), vec2(-radius - r.x / 2, -r.y / 2) };
+vec2 position_caption_around_a_circle(
+	const float circle_radius, 
+	const vec2 caption_size, 
+	const float position_at_degrees
+) {
+	const vec2 top_bounds[2] =  { vec2(-caption_size.x / 2, -circle_radius - caption_size.y / 2), vec2(caption_size.x / 2, -circle_radius - caption_size.y / 2) };
+	const vec2 left_bounds[2] = { vec2(-circle_radius - caption_size.x / 2, caption_size.y / 2), vec2(-circle_radius - caption_size.x / 2, -caption_size.y / 2) };
 	const vec2 bottom_bounds[2] = { top_bounds[1] * vec2(1, -1), top_bounds[0] * vec2(1, -1) };
 	const vec2 right_bounds[2] = { left_bounds[1] * vec2(-1, 1), left_bounds[0] * vec2(-1, 1) };
 
@@ -42,17 +47,17 @@ vec2 position_caption_around_a_circle(const float radius, const vec2 r, const fl
 		{ bottom_bounds[0], bottom_bounds[1] }  
 	};
 
-	const vec2 angle_norm = vec2().set_from_degrees(alpha);
-	const vec2 angle = angle_norm * radius;
+	const vec2 angle_norm = vec2().set_from_degrees(position_at_degrees);
+	const vec2 angle = angle_norm * circle_radius;
 
 	static const vec2 quadrant_multipliers[4] = { vec2(-1, -1), vec2(1, -1), vec2(1, 1), vec2(-1, 1), };
 	static const vec2 quadrants_on_circle[4] = { vec2(-1, 0), vec2(0, -1), vec2(1, 0), vec2(0, 1), };
 
 	for (int i = 0; i < 4; ++i) {
-		const vec2 a = vec2(all_bounds[i][0]).normalize(),
-			b = vec2(all_bounds[i][1]).normalize(),
-			c = vec2(all_bounds[(i+1)%4][0]).normalize(),
-			v = angle_norm;
+		const auto a = vec2(all_bounds[i][0]).normalize();
+		const auto b = vec2(all_bounds[i][1]).normalize();
+		const auto c = vec2(all_bounds[(i + 1) % 4][0]).normalize();
+		const auto v = angle_norm;
 
 		float bound_angular_distance = a.cross(b);
 		float target_angular_distance = a.cross(v);
@@ -65,7 +70,7 @@ vec2 position_caption_around_a_circle(const float radius, const vec2 r, const fl
 			target_angular_distance = b.cross(v);
 
 			if (target_angular_distance >= 0.0 && c.cross(v) <= 0.0) {
-				return vec2(quadrants_on_circle[i]).rotate((target_angular_distance / bound_angular_distance) * 90, vec2(0, 0)) * radius + quadrant_multipliers[i] * r / 2;
+				return vec2(quadrants_on_circle[i]).rotate((target_angular_distance / bound_angular_distance) * 90, vec2(0, 0)) * circle_radius + quadrant_multipliers[i] * caption_size / 2;
 			}
 		}
 	}
@@ -207,8 +212,10 @@ augs::vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_i
 				health_col 
 			});
 
-			for (auto& in : textual_infos) {
-				if (in.text.empty()) continue;
+			for (const auto& in : textual_infos) {
+				if (in.text.empty()) {
+					continue;
+				}
 
 				augs::gui::text_drawer health_points;
 				health_points.set_text(augs::gui::text::format(in.text, augs::gui::text::style(assets::font_id::GUI_FONT, in.color)));
@@ -231,13 +238,16 @@ augs::vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_i
 void immediate_hud::acquire_game_events(const const_logic_step step) {
 	const auto& cosmos = step.cosm;
 	const auto& healths = step.transient.messages.get_queue<messages::health_event>();
+	const auto& new_rings = step.transient.messages.get_queue<messages::exploding_ring>();
 	const auto current_time = cosmos.get_total_time_passed_in_seconds();
+
+	concatenate(exploding_rings, new_rings);
 
 	for (const auto& h : healths) {
 		vertically_flying_number vn;
+		vn.maximum_duration_seconds = 0.7f;
 		vn.time_of_occurence = current_time;
 		vn.value = h.effective_amount;
-		vn.maximum_duration_seconds = 0.7;
 
 		rgba col;
 
@@ -285,12 +295,13 @@ void immediate_hud::acquire_game_events(const const_logic_step step) {
 		recent_pure_color_highlights.push_back(new_highlight);
 	}
 
-	auto timeout_lambda = [current_time](const game_event_visualization& v) {
+	auto timeout_lambda = [current_time](const auto& v) {
 		return (current_time - v.time_of_occurence) > v.maximum_duration_seconds;
 	};
 
 	erase_remove(recent_vertically_flying_numbers, timeout_lambda);
 	erase_remove(recent_pure_color_highlights, timeout_lambda);
+	erase_remove(exploding_rings, timeout_lambda);
 }
 
 void immediate_hud::draw_vertically_flying_numbers(const viewing_step step) const {
@@ -298,8 +309,8 @@ void immediate_hud::draw_vertically_flying_numbers(const viewing_step step) cons
 	auto& triangles = step.renderer.triangles;
 
 	for (const auto& r : recent_vertically_flying_numbers) { 
-		auto passed = current_time - r.time_of_occurence;
-		auto ratio =  passed / r.maximum_duration_seconds;
+		const auto passed = current_time - r.time_of_occurence;
+		const auto ratio =  passed / r.maximum_duration_seconds;
 
 		auto text = r.text;
 
@@ -347,4 +358,53 @@ void immediate_hud::draw_pure_color_highlights(const viewing_step step) const {
 	}
 
 	//step.state.output->triangles.insert(step.state.output->triangles.begin(), pure_color_highlights.begin(), pure_color_highlights.end());
+}
+
+void immediate_hud::draw_exploding_rings(const viewing_step step) const {
+	const auto& cosmos = step.cosm;
+	const auto current_time = static_cast<float>(step.get_interpolated_total_time_passed_in_seconds());
+	auto& triangles = step.renderer.triangles;
+	const auto& interp = step.session.systems_audiovisual.get<interpolation_system>();
+
+	for (const auto& r : exploding_rings) {
+		const auto passed = current_time - r.time_of_occurence;
+		auto ratio = passed / r.maximum_duration_seconds;
+
+		const auto inner_radius_now = augs::interp(r.inner_radius_start_value, r.inner_radius_end_value, ratio);
+		const auto outer_radius_now = augs::interp(r.outer_radius_start_value, r.outer_radius_end_value, ratio);
+
+		const auto screen_space_center = step.camera.get_screen_space_revert_y(r.center);
+		
+		augs::special sp;
+		sp.v1 = screen_space_center;
+		sp.v2.x = inner_radius_now;
+		sp.v2.y = outer_radius_now;
+
+		const auto world_explosion_center = r.center;
+
+		const auto& vis = r.visibility;
+
+		for (size_t t = 0; t < vis.get_num_triangles(); ++t) {
+			const auto world_light_tri = vis.get_world_triangle(t, world_explosion_center);
+			augs::vertex_triangle renderable_tri;
+
+			renderable_tri.vertices[0].pos = step.camera[world_light_tri[0]];
+			renderable_tri.vertices[1].pos = step.camera[world_light_tri[1]];
+			renderable_tri.vertices[2].pos = step.camera[world_light_tri[2]];
+
+			auto considered_color = r.color;
+			considered_color.a *= ratio;
+
+			if (considered_color == black) {
+				considered_color.set_hsv({ fmod(current_time / 16.f, 1.f), 1.0, 1.0 });
+			}
+
+			renderable_tri.vertices[0].color = considered_color;
+			renderable_tri.vertices[1].color = considered_color;
+			renderable_tri.vertices[2].color = considered_color;
+
+			step.renderer.push_triangle(renderable_tri);
+			step.renderer.push_special_vertex_triangle(sp, sp, sp);
+		}
+	}
 }

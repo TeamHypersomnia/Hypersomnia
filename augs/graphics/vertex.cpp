@@ -4,12 +4,12 @@
 namespace augs {
 	vertex::vertex(vec2 pos, vec2 texcoord, rgba color, augs::texture& tex) :
 		pos(pos), texcoord(texcoord), color(color) {
-			tex.get_uv(this->texcoord);
+			tex.get_atlas_space_uv(this->texcoord);
 	}
 
 	void vertex::set_texcoord(vec2 coord, const augs::texture& tex) {
 		texcoord = coord;
-		tex.get_uv(this->texcoord);
+		tex.get_atlas_space_uv(this->texcoord);
 	}
 }
 

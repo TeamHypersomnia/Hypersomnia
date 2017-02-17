@@ -19,8 +19,6 @@ namespace augs {
 			vec2 angle_start = vec2(), vec2 angle_end = vec2());
 		void paint_filled_circle(int radius, rgba filling = white);
 
-		void paint_button_with_cuts(int width, int height, int left_bottom_cut_length, int top_right_cut_length, rgba border, rgba filling);
-
 		void paint_line(const vec2i from, const vec2i to, const rgba filling = white);
 		bool in_bounds(const vec2i) const;
 

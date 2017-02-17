@@ -10,3 +10,5 @@ class basic_logic_step;
 
 typedef basic_logic_step<false> logic_step;
 typedef basic_logic_step<true> const_logic_step;
+
+class viewing_step;
