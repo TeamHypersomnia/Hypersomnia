@@ -4,17 +4,13 @@
 #include "augs/templates/tuple_of.h"
 #include "augs/templates/for_each_in_types.h"
 #include "augs/templates/container_templates.h"
+#include "augs/templates/type_mod_templates.h"
 #include "augs/ensure.h"
-
-namespace detail {
-	template<class T>
-	struct make_vector { typedef std::vector<T> type; };
-}
 
 namespace augs {
 	template<class... Queues>
 	class storage_for_message_queues {
-		typedef tuple_of_t<::detail::make_vector, Queues...> tuple_type;
+		typedef tuple_of_t<make_vector, Queues...> tuple_type;
 		tuple_type queues;
 
 	public:

@@ -3,6 +3,10 @@
 #include "game/components/sprite_component.h"
 
 #include "augs/misc/minmax.h"
+#include "augs/zeroed_pod.h"
+
+#include "augs/templates/type_mod_templates.h"
+#include "game/detail/particle_types_declaration.h"
 
 struct general_particle;
 
@@ -23,28 +27,28 @@ namespace resources {
 	};
 
 	struct emission {
-		augs::minmax<float>
-			spread_degrees = std::make_pair(0.f, 0.f),
-			base_speed = std::make_pair(0.f, 0.f),
-			base_speed_variation = std::make_pair(0.f, 0.f),
-			angular_velocity = std::make_pair(0.f, 0.f),
-			particles_per_sec = std::make_pair(0.f, 0.f),
-			stream_duration_ms = std::make_pair(0.f, 0.f),
-			particle_lifetime_ms = std::make_pair(0.f, 0.f),
-			size_multiplier = std::make_pair(0.f, 0.f),
-			acceleration = std::make_pair(0.f, 0.f),
-			angular_offset = std::make_pair(0.f, 0.f),
-			swing_spread = std::make_pair(0.f, 0.f),
-			swings_per_sec = std::make_pair(0.f, 0.f),
-			min_swing_spread = std::make_pair(0.f, 0.f),
-			max_swing_spread = std::make_pair(0.f, 0.f),
-			min_swings_per_sec = std::make_pair(0.f, 0.f),
-			max_swings_per_sec = std::make_pair(0.f, 0.f),
-			swing_spread_change_rate = std::make_pair(0.f, 0.f),
-			swing_speed_change_rate = std::make_pair(0.f, 0.f),
-			fade_when_ms_remaining = std::make_pair(0.f, 0.f),
-			num_of_particles_to_spawn_initially = std::make_pair(0.f, 0.f)
-			;
+		typedef augs::minmax<float> minmax;
+
+		minmax spread_degrees = minmax(0.f, 0.f);
+		minmax base_speed = minmax(0.f, 0.f);
+		minmax base_speed_variation = minmax(0.f, 0.f);
+		minmax angular_velocity = minmax(0.f, 0.f);
+		minmax particles_per_sec = minmax(0.f, 0.f);
+		minmax stream_duration_ms = minmax(0.f, 0.f);
+		minmax particle_lifetime_ms = minmax(0.f, 0.f);
+		minmax size_multiplier = minmax(0.f, 0.f);
+		minmax acceleration = minmax(0.f, 0.f);
+		minmax angular_offset = minmax(0.f, 0.f);
+		minmax swing_spread = minmax(0.f, 0.f);
+		minmax swings_per_sec = minmax(0.f, 0.f);
+		minmax min_swing_spread = minmax(0.f, 0.f);
+		minmax max_swing_spread = minmax(0.f, 0.f);
+		minmax min_swings_per_sec = minmax(0.f, 0.f);
+		minmax max_swings_per_sec = minmax(0.f, 0.f);
+		minmax swing_spread_change_rate = minmax(0.f, 0.f);
+		minmax swing_speed_change_rate = minmax(0.f, 0.f);
+		minmax fade_when_ms_remaining = minmax(0.f, 0.f);
+		minmax num_of_particles_to_spawn_initially = minmax(0.f, 0.f);
 		
 		float initial_rotation_variation = 0.f;
 		bool randomize_acceleration = false;
@@ -52,7 +56,23 @@ namespace resources {
 
 		vec2 offset;
 
-		std::vector<general_particle> particle_templates;
+		put_all_particle_types_into_t<make_vector> particle_templates;
+
+		template <class T>
+		auto& get_templates() {
+			return std::get<std::vector<T>>(particle_templates);
+		}
+
+		template <class T>
+		const auto& get_templates() const {
+			return std::get<std::vector<T>>(particle_templates);
+		}
+
+		template <class T>
+		void add_particle_template(const T& t) {
+			get_templates<T>().push_back(t);
+		}
+
 		components::render particle_render_template;
 
 		template <class Archive>

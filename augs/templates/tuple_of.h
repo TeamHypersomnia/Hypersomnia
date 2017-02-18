@@ -1,6 +1,11 @@
 #pragma once
 #include <tuple>
 
+template<class T>
+struct empty_mod {
+	typedef T type;
+};
+
 template<template<typename> class Mod,
 	typename ...Args>
 	struct tuple_of {

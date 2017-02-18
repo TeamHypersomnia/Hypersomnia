@@ -19,8 +19,12 @@ void particles_simulation_system::draw(
 	components::sprite::drawing_input general_input(target_buffer);
 	general_input.camera = camera;
 	general_input.drawing_type = drawing_type;
-	
-	for (const auto& it : particles[layer]) {
+
+	for (const auto& it : get_particles<general_particle>()[layer]) {
+		it.draw(general_input);
+	}
+
+	for (const auto& it : get_particles<animated_particle>()[layer]) {
 		it.draw(general_input);
 	}
 }
@@ -49,12 +53,24 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 	const augs::delta delta, 
 	const interpolation_system& interp
 ) {
-	for (auto& particle_layer : particles) {
+	const auto dead_particles_remover = [](auto& container) {
+		erase_remove(container, [](const auto& a) { return a.is_dead(); });
+	};
+
+	for (auto& particle_layer : get_particles<general_particle>()) {
 		for (auto& p : particle_layer) {
 			p.integrate(delta.in_seconds());
 		}
 
-		erase_remove(particle_layer, [](const general_particle& a) { return a.lifetime_ms >= a.max_lifetime_ms; });
+		dead_particles_remover(particle_layer);
+	}
+
+	for (auto& particle_layer : get_particles<animated_particle>()) {
+		for (auto& p : particle_layer) {
+			p.integrate(delta.in_seconds());
+		}
+
+		dead_particles_remover(particle_layer);
 	}
 
 	cone.visible_world_area *= 2.5f;
@@ -149,24 +165,30 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 			const vec2 segment_A = transform.pos + vec2().set_from_degrees(transform.rotation + 90).set_length(segment_length / 2);
 			const vec2 segment_B = transform.pos - vec2().set_from_degrees(transform.rotation + 90).set_length(segment_length / 2);
 
-			for (int i = 0; i < to_spawn; ++i) {
-				const float t = (static_cast<float>(i) / to_spawn);
-				const float time_elapsed = (1.f - t) * delta.in_seconds();
+			for_each_particle_type([&](auto dummy) {
+				typedef decltype(dummy) spawned_particle_type;
 
-				const vec2 segment_position = augs::interp(segment_A, segment_B, rng.randval(0.f, 1.f));
+				if (instance.stream_info.get_templates<spawned_particle_type>().size() > 0) {
+					for (int i = 0; i < to_spawn; ++i) {
+						const float t = (static_cast<float>(i) / to_spawn);
+						const float time_elapsed = (1.f - t) * delta.in_seconds();
 
-				spawn_particle(
-					rng, 
-					instance.angular_offset,
-					instance.particle_speed,
-					segment_position, 
-					transform.rotation + instance.swing_spread * static_cast<float>(sin((instance.stream_lifetime_ms / 1000.f) * 2 * PI_f * instance.swings_per_sec)),
-					instance.target_spread, 
-					instance.stream_info
-				).integrate(time_elapsed);
+						const vec2 segment_position = augs::interp(segment_A, segment_B, rng.randval(0.f, 1.f));
 
-				instance.stream_particles_to_spawn -= 1.f;
-			}
+						spawn_particle<spawned_particle_type>(
+							rng,
+							instance.angular_offset,
+							instance.particle_speed,
+							segment_position,
+							transform.rotation + instance.swing_spread * static_cast<float>(sin((instance.stream_lifetime_ms / 1000.f) * 2 * PI_f * instance.swings_per_sec)),
+							instance.target_spread,
+							instance.stream_info
+							).integrate(time_elapsed);
+
+						instance.stream_particles_to_spawn -= 1.f;
+					}
+				}
+			});
 		}
 	}
 }

@@ -10,6 +10,7 @@
 
 #include "augs/misc/delta.h"
 #include "augs/misc/randomization.h"
+#include "game/detail/particle_types_declaration.h"
 
 struct general_particle;
 
@@ -93,8 +94,18 @@ public:
 		bool constructed = false;
 	};
 
-	std::array<std::vector<general_particle>, static_cast<size_t>(render_layer::COUNT)> particles;
+	put_all_particle_types_into_t<make_array_of_vectors_per_layer> particles;
 
+	template <class T>
+	auto& get_particles() {
+		return std::get<make_array_of_vectors_per_layer_t<T>>(particles);
+	}
+
+	template <class T>
+	const auto& get_particles() const {
+		return std::get<make_array_of_vectors_per_layer_t<T>>(particles);
+	}
+	
 	//std::vector<cache> per_entity_cache;
 	std::unordered_map<entity_id, cache> per_entity_cache;
 
@@ -103,43 +114,45 @@ public:
 
 	cache& get_cache(const const_entity_handle);
 
-	template <class rng_type>
-	general_particle& spawn_particle(
+	template <class particle_type, class rng_type>
+	particle_type& spawn_particle(
 		rng_type& rng,
 		const float angular_offset,
 		const augs::minmax<float> speed,
 		const vec2 position,
-		float rotation,
+		const float basic_velocity_degrees,
 		const float spread,
 		const resources::emission& emission
 	) {
-		auto new_particle = emission.particle_templates[rng.randval(0u, emission.particle_templates.size() - 1)];
-
-		new_particle.vel = vec2().set_from_degrees(
-			angular_offset + rng.randval(spread) + rotation
-		) * rng.randval(speed);
-
+		const auto& templates = emission.get_templates<particle_type>();
+		auto new_particle = templates[rng.randval(0u, templates.size() - 1)];
+		
+		const auto velocity_degrees = basic_velocity_degrees + angular_offset + rng.randval(spread);
+		const auto new_velocity = vec2().set_from_degrees(velocity_degrees) * rng.randval(speed);
+		
+		new_particle.set_velocity(new_velocity);
+		new_particle.set_position(position + emission.offset);
+		new_particle.multiply_size(rng.randval(emission.size_multiplier));
+		
 		if (emission.should_particles_look_towards_velocity) {
-			rotation = new_particle.vel.degrees();
+			new_particle.set_rotation(rng.randval(emission.initial_rotation_variation) + velocity_degrees);
 		}
 		else {
-			rotation = 0;
+			new_particle.set_rotation(rng.randval(emission.initial_rotation_variation));
 		}
 
-		new_particle.pos = position + emission.offset;
-		new_particle.lifetime_ms = 0.f;
-		new_particle.face.size *= rng.randval(emission.size_multiplier);
-		new_particle.rotation = rng.randval(emission.initial_rotation_variation) + rotation;
-		new_particle.rotation_speed = rng.randval(emission.angular_velocity);
-
-		new_particle.max_lifetime_ms = rng.randval(emission.particle_lifetime_ms);
+		new_particle.set_rotation_speed(rng.randval(emission.angular_velocity));
+		new_particle.set_max_lifetime_ms(rng.randval(emission.particle_lifetime_ms));
 
 		if (emission.randomize_acceleration) {
-			new_particle.acc += vec2().set_from_degrees(
-				rng.randval(spread) + rotation
-			) * rng.randval(emission.acceleration);
+			new_particle.set_acceleration(
+				vec2().set_from_degrees(
+					rng.randval(spread) + basic_velocity_degrees
+				) * rng.randval(emission.acceleration)
+			);
 		}
 
+		auto& particles = get_particles<particle_type>();
 
 		particles[emission.particle_render_template.layer].push_back(new_particle);
 		return *particles[emission.particle_render_template.layer].rbegin();

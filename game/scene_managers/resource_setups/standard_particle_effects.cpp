@@ -40,7 +40,7 @@ namespace resource_setups {
 				particle_template.unshrinking_time_ms = 2000.f;
 				particle_template.shrink_when_ms_remaining = 1500.f;
 
-				em.particle_templates.push_back(particle_template);
+				em.add_particle_template(particle_template);
 			}
 
 			em.size_multiplier.set(1.0, 1.0);
@@ -83,7 +83,7 @@ namespace resource_setups {
 					particle_template.unshrinking_time_ms = 250.f;
 					particle_template.shrink_when_ms_remaining = 1000.f;
 
-					em.particle_templates.push_back(particle_template);
+					em.add_particle_template(particle_template);
 				}
 
 				em.size_multiplier = std::make_pair(1.0, 1.0);
@@ -126,7 +126,7 @@ namespace resource_setups {
 				particle_template.shrink_when_ms_remaining = 30.f;
 				particle_template.alpha_levels = 1;
 
-				em.particle_templates.push_back(particle_template);
+				em.add_particle_template(particle_template);
 				//}
 
 				em.size_multiplier = std::make_pair(1.0, 1.0);
@@ -169,7 +169,7 @@ namespace resource_setups {
 					particle_template.unshrinking_time_ms = 0.f;
 					particle_template.shrink_when_ms_remaining = 400.f;
 
-					em.particle_templates.push_back(particle_template);
+					em.add_particle_template(particle_template);
 				}
 
 				em.size_multiplier = std::make_pair(0.25, 0.55);
@@ -213,7 +213,7 @@ namespace resource_setups {
 					particle_template.unshrinking_time_ms = 100.f;
 					particle_template.shrink_when_ms_remaining = 200.f;
 
-					em.particle_templates.push_back(particle_template);
+					em.add_particle_template(particle_template);
 				}
 
 				em.size_multiplier = std::make_pair(0.35, 0.35);
@@ -258,7 +258,7 @@ namespace resource_setups {
 					particle_template.unshrinking_time_ms = 100.f;
 					particle_template.shrink_when_ms_remaining = 200.f;
 
-					em.particle_templates.push_back(particle_template);
+					em.add_particle_template(particle_template);
 				}
 
 				em.size_multiplier = std::make_pair(0.40, 0.40);
@@ -288,17 +288,22 @@ namespace resource_setups {
 
 				em.angular_velocity = std::make_pair(0, 0);
 				em.particle_lifetime_ms = std::make_pair(100, 500);
+				
+				const auto& anim = *get_resource_manager().find(assets::animation_id::BLINK_ANIMATION);
+				const auto frame_duration = anim.frames[0].duration_milliseconds;
 
+				for(int i = 0; i < 4; ++i)
 				{
-					general_particle particle_template;
+					animated_particle particle_template;
 
-					particle_template.angular_damping = 0;
 					particle_template.linear_damping = 1000;
-					particle_template.face.set(assets::texture_id(int(assets::texture_id::BLINK_FIRST) + 2), white);
+					particle_template.first_face = static_cast<assets::texture_id>(static_cast<int>(anim.frames[0].sprite.tex) + i);
+					particle_template.frame_count = anim.frames.size() - i;
+					particle_template.frame_duration_ms = frame_duration;
 					particle_template.acc.set(900, -900);
-					particle_template.alpha_levels = 1;
+					particle_template.color = white;
 
-					em.particle_templates.push_back(particle_template);
+					em.add_particle_template(particle_template);
 				}
 
 				//{
@@ -310,20 +315,20 @@ namespace resource_setups {
 				//	particle_template.acc.set(400, -400);
 				//	particle_template.alpha_levels = 1;
 				//
-				//	em.particle_templates.push_back(particle_template);
+				//	em.add_particle_template(particle_template);
 				//}
 
-				{
-					general_particle particle_template;
-
-					particle_template.angular_damping = 0;
-					particle_template.linear_damping = 700;
-					particle_template.acc.set(1200, -1200);
-					particle_template.face.set(assets::texture_id(int(assets::texture_id::BLANK)), white);
-					particle_template.face.size.set(1, 1);
-
-					em.particle_templates.push_back(particle_template);
-				}
+				//{
+				//	general_particle particle_template;
+				//
+				//	particle_template.angular_damping = 0;
+				//	particle_template.linear_damping = 700;
+				//	particle_template.acc.set(1200, -1200);
+				//	particle_template.face.set(assets::texture_id(int(assets::texture_id::BLANK)), white);
+				//	particle_template.face.size.set(1, 1);
+				//
+				//	em.add_particle_template(particle_template);
+				//}
 
 				em.size_multiplier = std::make_pair(1, 1);
 				em.particle_render_template.layer = render_layer::EFFECTS;
@@ -367,7 +372,7 @@ namespace resource_setups {
 					particle_template.unshrinking_time_ms = 100.f;
 					particle_template.shrink_when_ms_remaining = 200.f;
 
-					em.particle_templates.push_back(particle_template);
+					em.add_particle_template(particle_template);
 				}
 
 				em.size_multiplier = std::make_pair(0.25, 0.25);
@@ -393,7 +398,7 @@ namespace resource_setups {
 					particle_template.face.set(assets::texture_id(int(assets::texture_id::PIXEL_THUNDER_FIRST) + i), rgba(255, 255, 255, 255));
 					particle_template.alpha_levels = 1;
 
-					em.particle_templates.push_back(particle_template);
+					em.add_particle_template(particle_template);
 				}
 
 				em.size_multiplier = std::make_pair(0.5, 1);
@@ -422,7 +427,7 @@ namespace resource_setups {
 				particle_template.face.set(assets::texture_id(int(assets::texture_id::PIXEL_THUNDER_FIRST) + i), rgba(255, 255, 255, 255));
 				particle_template.alpha_levels = 1;
 
-				em.particle_templates.push_back(particle_template);
+				em.add_particle_template(particle_template);
 			}
 
 			em.size_multiplier = std::make_pair(0.5, 1);
@@ -452,7 +457,7 @@ namespace resource_setups {
 				particle_template.face.size.set(1, 1);
 				particle_template.alpha_levels = 1;
 
-				em.particle_templates.push_back(particle_template);
+				em.add_particle_template(particle_template);
 			}
 
 			em.size_multiplier = std::make_pair(1, 1.5);
@@ -481,7 +486,7 @@ namespace resource_setups {
 				particle_template.face.size.set(1, 1);
 				particle_template.alpha_levels = 1;
 
-				em.particle_templates.push_back(particle_template);
+				em.add_particle_template(particle_template);
 			}
 
 			em.size_multiplier = std::make_pair(1, 1.5);
@@ -515,7 +520,7 @@ namespace resource_setups {
 				particle_template.face.size.set(1, 1);
 				particle_template.alpha_levels = 1;
 
-				em.particle_templates.push_back(particle_template);
+				em.add_particle_template(particle_template);
 			}
 
 			em.size_multiplier = std::make_pair(1, 2.0);
@@ -553,7 +558,7 @@ namespace resource_setups {
 				particle_template.face.set(assets::texture_id(int(assets::texture_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 220));
 				particle_template.face.size_multiplier.set(0.4, 0.4);
 
-				em.particle_templates.push_back(particle_template);
+				em.add_particle_template(particle_template);
 			}
 
 			em.size_multiplier = std::make_pair(0.2, 0.5);

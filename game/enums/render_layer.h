@@ -1,4 +1,6 @@
 #pragma once
+#include <array>
+#include <vector>
 
 enum render_layer : unsigned char {
 	INVALID,
@@ -21,3 +23,11 @@ enum render_layer : unsigned char {
 
 	COUNT
 };
+
+template <class T>
+struct make_array_of_vectors_per_layer {
+	typedef typename std::array<std::vector<T>, static_cast<size_t>(render_layer::COUNT)> type;
+};
+
+template<class T>
+using make_array_of_vectors_per_layer_t = typename make_array_of_vectors_per_layer<T>::type;

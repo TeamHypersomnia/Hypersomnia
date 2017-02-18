@@ -340,10 +340,8 @@ void immediate_hud::acquire_game_events(
 						const auto spawn_particle_along_line = (tri[1] + along_edge * along_edge_length * angular_translation_multiplier) - r.center;
 						const auto circle_radius = std::min(spawn_particle_along_line.length(), vis.source_square_side/2);
 
-						general_particle new_particle;
-
 						{
-							auto& new_p = particles.spawn_particle(
+							auto& new_p = particles.spawn_particle<animated_particle>(
 								rng,
 								0.f,
 								{ 200.f, 220.f },
@@ -355,7 +353,7 @@ void immediate_hud::acquire_game_events(
 								sparkles_emission
 							);
 
-							new_p.face.color.rgb() = r.color.rgb();
+							new_p.color.rgb() = r.color.rgb();
 							new_p.acc /= 2;
 							new_p.linear_damping /= 2;
 							new_p.acc.rotate(rng.randval(0.f, 360.f), vec2{ 0, 0 });
@@ -363,7 +361,7 @@ void immediate_hud::acquire_game_events(
 						}
 
 						{
-							auto& new_p = particles.spawn_particle(
+							auto& new_p = particles.spawn_particle<general_particle>(
 								rng,
 								0.f,
 								{ 100.f, 120.f },
