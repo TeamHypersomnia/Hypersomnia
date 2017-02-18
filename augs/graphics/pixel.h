@@ -33,6 +33,11 @@ struct rgba {
 	explicit rgba(const console_color);
 	
 	rgba(
+		const rgb_type, 
+		const rgba_channel alpha = 255
+	);
+
+	rgba(
 		const rgba_channel red = 255, 
 		const rgba_channel green = 255, 
 		const rgba_channel blue = 255, 

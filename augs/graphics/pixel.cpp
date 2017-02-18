@@ -121,9 +121,37 @@ rgba::rgba(const console_color c) {
 	}
 }
 
-rgba::rgba(const rgba_channel red, const rgba_channel green, const rgba_channel blue, const rgba_channel alpha) : r(red), g(green), b(blue), a(alpha) {}
+rgba::rgba(
+	const rgba_channel red, 
+	const rgba_channel green, 
+	const rgba_channel blue, 
+	const rgba_channel alpha
+) : 
+	r(red), 
+	g(green), 
+	b(blue), 
+	a(alpha) 
+{}
 
-hsv::hsv(const double h, const double s, const double v) : h(h), s(s), v(v) {}
+rgba::rgba(
+	const rgb_type rgb,
+	const rgba_channel alpha
+) :
+	r(rgb.r),
+	g(rgb.g),
+	b(rgb.b),
+	a(alpha) 
+{}
+
+hsv::hsv(
+	const double h, 
+	const double s, 
+	const double v
+) : 
+	h(h), 
+	s(s), 
+	v(v) 
+{}
 
 hsv hsv::operator*(const float x) const {
 	return hsv(h * x, s * x, v * x);
@@ -133,8 +161,18 @@ hsv hsv::operator+(const hsv b) const {
 	return hsv(h + b.h, s + b.s, v + b.v);
 }
 
-void rgba::set(const rgba_channel red, const rgba_channel green, const rgba_channel blue, const rgba_channel alpha) {
-	*this = rgba(red, green, blue, alpha);
+void rgba::set(
+	const rgba_channel red, 
+	const rgba_channel green, 
+	const rgba_channel blue, 
+	const rgba_channel alpha
+) {
+	*this = rgba(
+		red, 
+		green, 
+		blue, 
+		alpha
+	);
 }
 
 void rgba::set(const rgba col) {
@@ -146,7 +184,8 @@ rgba rgba::operator*(const rgba s) const {
 		static_cast<rgba_channel>((s.r / 255.*r / 255.) * 255),
 		static_cast<rgba_channel>((s.g / 255.*g / 255.) * 255),
 		static_cast<rgba_channel>((s.b / 255.*b / 255.) * 255),
-		static_cast<rgba_channel>((s.a / 255.*a / 255.) * 255));
+		static_cast<rgba_channel>((s.a / 255.*a / 255.) * 255)
+	);
 }
 
 rgba rgba::operator*(const float s) const {
@@ -154,7 +193,8 @@ rgba rgba::operator*(const float s) const {
 		static_cast<rgba_channel>(s * r),
 		static_cast<rgba_channel>(s * g),
 		static_cast<rgba_channel>(s * b),
-		static_cast<rgba_channel>(s * a));
+		static_cast<rgba_channel>(s * a)
+	);
 }
 
 rgba rgba::operator+(const rgba s) const {
@@ -162,7 +202,8 @@ rgba rgba::operator+(const rgba s) const {
 		std::min(255u, static_cast<unsigned>(s.r) + r),
 		std::min(255u, static_cast<unsigned>(s.g) + g),
 		std::min(255u, static_cast<unsigned>(s.b) + b),
-		std::min(255u, static_cast<unsigned>(s.a) + a));
+		std::min(255u, static_cast<unsigned>(s.a) + a)
+	);
 }
 
 rgba rgba::operator-(const rgba s) const {
@@ -170,7 +211,8 @@ rgba rgba::operator-(const rgba s) const {
 		std::max(0, static_cast<int>(r) - static_cast<int>(s.r)),
 		std::max(0, static_cast<int>(g) - static_cast<int>(s.g)),
 		std::max(0, static_cast<int>(b) - static_cast<int>(s.b)),
-		std::max(0, static_cast<int>(a) - static_cast<int>(s.a)));
+		std::max(0, static_cast<int>(a) - static_cast<int>(s.a))
+	);
 }
 
 rgba& rgba::operator*=(const rgba b) {

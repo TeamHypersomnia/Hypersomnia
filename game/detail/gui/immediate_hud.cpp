@@ -341,23 +341,28 @@ void immediate_hud::acquire_game_events(
 						const auto circle_radius = std::min(spawn_particle_along_line.length(), vis.source_square_side/2);
 
 						{
-							auto& new_p = particles.spawn_particle<animated_particle>(
-								rng,
-								0.f,
-								{ 200.f, 220.f },
-								r.center + vec2(spawn_particle_along_line).set_length(
-									std::max(1.f, circle_radius - rng.randval(0.f, spawn_radius_width))
-								),
-								0.f,
-								360.f,
-								sparkles_emission
-							);
+							const auto spawner = [&](auto dummy) {
+								auto& new_p = particles.spawn_particle<decltype(dummy)>(
+									rng,
+									0.f,
+									{ 200.f, 220.f },
+									r.center + vec2(spawn_particle_along_line).set_length(
+										std::max(1.f, circle_radius - rng.randval(0.f, spawn_radius_width))
+									),
+									0.f,
+									360.f,
+									sparkles_emission
+								);
 
-							new_p.color.rgb() = r.color.rgb();
-							new_p.acc /= 2;
-							new_p.linear_damping /= 2;
-							new_p.acc.rotate(rng.randval(0.f, 360.f), vec2{ 0, 0 });
-							//new_p.max_lifetime_ms *= 1.4f;
+								new_p.colorize(r.color.rgb());
+								new_p.acc /= 2;
+								new_p.linear_damping /= 2;
+								new_p.acc.rotate(rng.randval(0.f, 360.f), vec2{ 0, 0 });
+								//new_p.max_lifetime_ms *= 1.4f;
+							};
+
+							spawner(animated_particle());
+							spawner(general_particle());
 						}
 
 						{

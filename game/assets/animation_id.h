@@ -10,6 +10,7 @@ namespace assets {
 		TORSO_SHOOT,
 
 		BLINK_ANIMATION,
+		CAST_BLINK_ANIMATION,
 		
 		COUNT
 	};

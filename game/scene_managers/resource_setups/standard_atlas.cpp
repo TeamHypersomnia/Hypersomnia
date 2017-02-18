@@ -226,6 +226,11 @@ namespace resource_setups {
 			assets::texture_id::BLINK_LAST,
 			"hypersomnia/gfx/blink");
 
+		manager.create_sprites_indexed(
+			assets::texture_id::CAST_BLINK_FIRST,
+			assets::texture_id::CAST_BLINK_LAST,
+			"hypersomnia/gfx/cast_blink");
+
 		manager.create(assets::texture_id::HAVE_A_PLEASANT, "hypersomnia/gfx/have_a_pleasant.png");
 		manager.create(assets::texture_id::AWAKENING, "hypersomnia/gfx/awakening.png");
 		manager.create(assets::texture_id::METROPOLIS, "hypersomnia/gfx/metropolis.png");
@@ -282,6 +287,13 @@ namespace resource_setups {
 			assets::animation_id::BLINK_ANIMATION,
 			assets::texture_id::BLINK_FIRST,
 			assets::texture_id::BLINK_LAST,
+			50.0f, resources::animation::loop_type::NONE
+		);
+
+		manager.create(
+			assets::animation_id::CAST_BLINK_ANIMATION,
+			assets::texture_id::CAST_BLINK_FIRST,
+			assets::texture_id::CAST_BLINK_LAST,
 			50.0f, resources::animation::loop_type::NONE
 		);
 

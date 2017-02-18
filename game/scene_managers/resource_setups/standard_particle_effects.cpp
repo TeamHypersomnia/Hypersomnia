@@ -289,10 +289,10 @@ namespace resource_setups {
 				em.angular_velocity = std::make_pair(0, 0);
 				em.particle_lifetime_ms = std::make_pair(100, 500);
 				
-				const auto& anim = *get_resource_manager().find(assets::animation_id::BLINK_ANIMATION);
-				const auto frame_duration = anim.frames[0].duration_milliseconds;
+				const auto& anim = *get_resource_manager().find(assets::animation_id::CAST_BLINK_ANIMATION);
+				const auto frame_duration = anim.frames[0].duration_milliseconds / 1.85f;
 
-				for(int i = 0; i < 4; ++i)
+				for(int i = 0; i < anim.frames.size() - 1; ++i)
 				{
 					animated_particle particle_template;
 
@@ -306,6 +306,18 @@ namespace resource_setups {
 					em.add_particle_template(particle_template);
 				}
 
+				{
+					general_particle particle_template;
+
+					particle_template.angular_damping = 0;
+					particle_template.linear_damping = 1000;
+					particle_template.face.set(assets::texture_id(int(assets::texture_id::BLINK_FIRST) + 2), white);
+					particle_template.acc.set(900, -900);
+					particle_template.alpha_levels = 1;
+
+					em.add_particle_template(particle_template);
+				}
+
 				//{
 				//	resources::particle particle_template;
 				//
@@ -315,20 +327,20 @@ namespace resource_setups {
 				//	particle_template.acc.set(400, -400);
 				//	particle_template.alpha_levels = 1;
 				//
-				//	em.add_particle_template(particle_template);
+				//	em.particle_templates.push_back(particle_template);
 				//}
 
-				//{
-				//	general_particle particle_template;
-				//
-				//	particle_template.angular_damping = 0;
-				//	particle_template.linear_damping = 700;
-				//	particle_template.acc.set(1200, -1200);
-				//	particle_template.face.set(assets::texture_id(int(assets::texture_id::BLANK)), white);
-				//	particle_template.face.size.set(1, 1);
-				//
-				//	em.add_particle_template(particle_template);
-				//}
+				{
+					general_particle particle_template;
+
+					particle_template.angular_damping = 0;
+					particle_template.linear_damping = 700;
+					particle_template.acc.set(1200, -1200);
+					particle_template.face.set(assets::texture_id(int(assets::texture_id::BLANK)), white);
+					particle_template.face.size.set(1, 1);
+
+					em.add_particle_template(particle_template);
+				}
 
 				em.size_multiplier = std::make_pair(1, 1);
 				em.particle_render_template.layer = render_layer::EFFECTS;
