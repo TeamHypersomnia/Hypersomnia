@@ -58,7 +58,7 @@ config_table = {
 
 	-- game window settings
 	window_name = "example",
-	fullscreen = 1,
+	fullscreen = 0,
 	window_border = 1,
 	window_x = 100,
 	window_y = 10,

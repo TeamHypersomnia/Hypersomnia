@@ -60,7 +60,7 @@ public:
 		float swing_spread_change = 0.f;
 		float swing_speed_change = 0.f;
 
-		augs::minmax<float> velocity;
+		augs::minmax<float> particle_speed;
 
 		float fade_when_ms_remaining = 0.f;
 
@@ -117,7 +117,7 @@ public:
 	resources::particle& spawn_particle(
 		rng_type& rng,
 		const float angular_offset,
-		const augs::minmax<float> velocity_length,
+		const augs::minmax<float> speed,
 		const vec2 position,
 		float rotation,
 		const float spread,
@@ -127,7 +127,7 @@ public:
 
 		new_particle.vel = vec2().set_from_degrees(
 			angular_offset + rng.randval(spread) + rotation
-		) * rng.randval(velocity_length);
+		) * rng.randval(speed);
 
 		if (emission.should_particles_look_towards_velocity) {
 			rotation = new_particle.vel.degrees();
@@ -155,7 +155,12 @@ public:
 		return *particles[emission.particle_render_template.layer].rbegin();
 	}
 
-	void advance_visible_streams_and_all_particles(camera_cone, const cosmos&, const augs::delta dt, interpolation_system&);
+	void advance_visible_streams_and_all_particles(
+		camera_cone, 
+		const cosmos&, 
+		const augs::delta dt, 
+		const interpolation_system&
+	);
 
 	void reserve_caches_for_entities(const size_t) {}
 	void erase_caches_for_dead_entities(const cosmos&);

@@ -62,8 +62,8 @@ namespace resources {
 	struct emission {
 		augs::minmax<float>
 			spread_degrees = std::make_pair(0.f, 0.f),
-			base_velocity = std::make_pair(0.f, 0.f),
-			base_velocity_variation = std::make_pair(0.f, 0.f),
+			base_speed = std::make_pair(0.f, 0.f),
+			base_speed_variation = std::make_pair(0.f, 0.f),
 			angular_velocity = std::make_pair(0.f, 0.f),
 			particles_per_sec = std::make_pair(0.f, 0.f),
 			stream_duration_ms = std::make_pair(0.f, 0.f),
@@ -126,7 +126,7 @@ namespace resources {
 			);
 		}
 
-		void apply_modifier(particle_effect_modifier m);
+		void apply_modifier(const particle_effect_modifier m);
 	};
 
 	typedef std::vector<emission> particle_effect;

@@ -79,7 +79,12 @@ void resources::particle::integrate(const float dt) {
 	lifetime_ms += dt * 1000.f;
 }
 
-void particles_simulation_system::advance_visible_streams_and_all_particles(camera_cone cone, const cosmos& cosmos, const augs::delta delta, interpolation_system& interp) {
+void particles_simulation_system::advance_visible_streams_and_all_particles(
+	camera_cone cone, 
+	const cosmos& cosmos, 
+	const augs::delta delta, 
+	const interpolation_system& interp
+) {
 	for (auto& particle_layer : particles) {
 		for (auto& p : particle_layer) {
 			p.integrate(delta.in_seconds());
@@ -118,9 +123,9 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(came
 				cache.emission_instances.push_back(emission_instance());
 				auto& target_stream = *cache.emission_instances.rbegin();
 
-				const auto var_v = rng.randval(emission.base_velocity_variation);
+				const auto var_v = rng.randval(emission.base_speed_variation);
 				//LOG("V: %x", var_v);
-				target_stream.velocity.set(std::max(0.f, emission.base_velocity.first - var_v / 2), emission.base_velocity.second + var_v / 2);
+				target_stream.particle_speed.set(std::max(0.f, emission.base_speed.first - var_v / 2), emission.base_speed.second + var_v / 2);
 				//LOG("Vl: %x Vu: %x", target_stream.velocity.first, target_stream.velocity.second);
 
 				target_stream.stream_info = emission;
@@ -189,7 +194,7 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(came
 				spawn_particle(
 					rng, 
 					instance.angular_offset,
-					instance.velocity,
+					instance.particle_speed,
 					segment_position, 
 					transform.rotation + instance.swing_spread * static_cast<float>(sin((instance.stream_lifetime_ms / 1000.f) * 2 * PI_f * instance.swings_per_sec)),
 					instance.target_spread, 
