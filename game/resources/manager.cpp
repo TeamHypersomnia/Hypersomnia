@@ -4,6 +4,7 @@
 #include <sstream>
 #include "augs/texture_baker/font.h"
 #include "augs/window_framework/window.h"
+#include "game/detail/particle_types.h"
 
 using namespace augs;
 

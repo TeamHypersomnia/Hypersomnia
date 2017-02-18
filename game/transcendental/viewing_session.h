@@ -24,6 +24,8 @@
 #include "game/detail/gui/item_button.h"
 #include "game/detail/gui/slot_button.h"
 
+#include "game/detail/particle_types.h"
+
 #include "game/transcendental/game_drawing_settings.h"
 
 class game_window;

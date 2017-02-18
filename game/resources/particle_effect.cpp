@@ -1,4 +1,5 @@
 #include "particle_effect.h"
+#include "game/detail/particle_types.h"
 
 namespace resources {
 	void emission::apply_modifier(const particle_effect_modifier m) {

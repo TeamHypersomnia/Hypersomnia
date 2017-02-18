@@ -4,6 +4,8 @@
 #include "game/assets/particle_effect_id.h"
 #include "augs/graphics/shader.h"
 
+#include "game/detail/particle_types.h"
+
 namespace resource_setups {
 	void load_standard_particle_effects() {
 		{
@@ -30,7 +32,7 @@ namespace resource_setups {
 			em.particle_lifetime_ms = std::make_pair(5000, 5000);
 
 			for (int i = 0; i < 3; ++i) {
-				resources::particle particle_template;
+				general_particle particle_template;
 
 				particle_template.angular_damping = 0;
 				particle_template.linear_damping = 10;
@@ -73,7 +75,7 @@ namespace resource_setups {
 				em.particle_lifetime_ms = std::make_pair(2500 * 1.5, 2500 * 1.5);
 
 				for (int i = 0; i < 3; ++i) {
-					resources::particle particle_template;
+					general_particle particle_template;
 
 					particle_template.angular_damping = 0;
 					particle_template.linear_damping = 10;
@@ -110,7 +112,7 @@ namespace resource_setups {
 				em.particle_lifetime_ms = std::make_pair(40, 100);
 
 				//for (int i = 0; i < 6; ++i) {
-				resources::particle particle_template;
+				general_particle particle_template;
 
 				particle_template.angular_damping = 0;
 				//if (i == 5) {
@@ -159,7 +161,7 @@ namespace resource_setups {
 				em.particle_lifetime_ms = std::make_pair(1500, 1500);
 
 				for (int i = 0; i < 3; ++i) {
-					resources::particle particle_template;
+					general_particle particle_template;
 
 					particle_template.angular_damping = 0;
 					particle_template.linear_damping = 100;
@@ -203,7 +205,7 @@ namespace resource_setups {
 				em.particle_lifetime_ms = std::make_pair(900, 900);
 
 				for (int i = 0; i < 3; ++i) {
-					resources::particle particle_template;
+					general_particle particle_template;
 
 					particle_template.angular_damping = 0;
 					particle_template.linear_damping = 400;
@@ -247,7 +249,7 @@ namespace resource_setups {
 				em.particle_lifetime_ms = std::make_pair(900, 900);
 
 				for (int i = 0; i < 3; ++i) {
-					resources::particle particle_template;
+					general_particle particle_template;
 
 					particle_template.angular_damping = 0;
 					particle_template.linear_damping = 400;
@@ -288,7 +290,7 @@ namespace resource_setups {
 				em.particle_lifetime_ms = std::make_pair(100, 500);
 
 				{
-					resources::particle particle_template;
+					general_particle particle_template;
 
 					particle_template.angular_damping = 0;
 					particle_template.linear_damping = 1000;
@@ -312,7 +314,7 @@ namespace resource_setups {
 				//}
 
 				{
-					resources::particle particle_template;
+					general_particle particle_template;
 
 					particle_template.angular_damping = 0;
 					particle_template.linear_damping = 700;
@@ -357,7 +359,7 @@ namespace resource_setups {
 				em.particle_lifetime_ms = std::make_pair(900, 900);
 
 				for (int i = 0; i < 3; ++i) {
-					resources::particle particle_template;
+					general_particle particle_template;
 
 					particle_template.angular_damping = 0;
 					particle_template.linear_damping = 400;
@@ -384,7 +386,7 @@ namespace resource_setups {
 				em.particle_lifetime_ms = std::make_pair(30, 50);
 
 				for (int i = 0; i < 5; ++i) {
-					resources::particle particle_template;
+					general_particle particle_template;
 
 					particle_template.angular_damping = 0;
 					particle_template.linear_damping = 5000;
@@ -413,7 +415,7 @@ namespace resource_setups {
 			em.particle_lifetime_ms = std::make_pair(1, 120);
 
 			for (int i = 0; i < 5; ++i) {
-				resources::particle particle_template;
+				general_particle particle_template;
 
 				particle_template.angular_damping = 0;
 				particle_template.linear_damping = 5000;
@@ -442,7 +444,7 @@ namespace resource_setups {
 			em.particle_lifetime_ms = std::make_pair(500, 700);
 
 			for (int i = 0; i < 5; ++i) {
-				resources::particle particle_template;
+				general_particle particle_template;
 
 				particle_template.angular_damping = 0;
 				particle_template.linear_damping = 0;
@@ -471,7 +473,7 @@ namespace resource_setups {
 			em.particle_lifetime_ms = std::make_pair(200, 400);
 
 			for (int i = 0; i < 5; ++i) {
-				resources::particle particle_template;
+				general_particle particle_template;
 
 				particle_template.angular_damping = 0;
 				particle_template.linear_damping = 1000;
@@ -505,7 +507,7 @@ namespace resource_setups {
 			em.particle_lifetime_ms = std::make_pair(300, 400);
 
 			for (int i = 0; i < 5; ++i) {
-				resources::particle particle_template;
+				general_particle particle_template;
 
 				particle_template.angular_damping = 0;
 				particle_template.linear_damping = 0;
@@ -544,7 +546,7 @@ namespace resource_setups {
 			em.angular_offset = std::make_pair(0, 0);
 
 			for (int i = 0; i < 3; ++i) {
-				resources::particle particle_template;
+				general_particle particle_template;
 
 				particle_template.angular_damping = 0;
 				particle_template.linear_damping = 10;

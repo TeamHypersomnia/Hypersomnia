@@ -8,6 +8,7 @@
 #include "game/components/position_copying_component.h"
 
 #include "augs/templates/container_templates.h"
+#include "game/detail/particle_types.h"
 
 void particles_simulation_system::draw(const render_layer layer, const drawing_input& group_input) const {
 	for (auto it : particles[layer]) {
@@ -68,17 +69,6 @@ particles_simulation_system::cache& particles_simulation_system::get_cache(const
 	return per_entity_cache[id.get_id()];
 }
 
-void resources::particle::integrate(const float dt) {
-	vel += acc * dt;
-	pos += vel * dt;
-	rotation += rotation_speed * dt;
-
-	vel.damp(linear_damping * dt);
-	augs::damp(rotation_speed, angular_damping * dt);
-
-	lifetime_ms += dt * 1000.f;
-}
-
 void particles_simulation_system::advance_visible_streams_and_all_particles(
 	camera_cone cone, 
 	const cosmos& cosmos, 
@@ -90,7 +80,7 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 			p.integrate(delta.in_seconds());
 		}
 
-		erase_remove(particle_layer, [](const resources::particle& a) { return a.lifetime_ms >= a.max_lifetime_ms; });
+		erase_remove(particle_layer, [](const general_particle& a) { return a.lifetime_ms >= a.max_lifetime_ms; });
 	}
 
 	cone.visible_world_area *= 2.5f;

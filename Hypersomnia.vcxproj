@@ -383,6 +383,7 @@
     <ClCompile Include="game\detail\gui\sentience_meter.cpp" />
     <ClCompile Include="game\detail\gui\slot_button.cpp" />
     <ClCompile Include="game\detail\gui\perk_meter.cpp" />
+    <ClCompile Include="game\detail\particle_types.cpp" />
     <ClCompile Include="game\detail\spell_data.cpp" />
     <ClCompile Include="game\detail\visible_entities.cpp" />
     <ClCompile Include="game\detail\wielding_result.cpp" />
@@ -1158,6 +1159,7 @@
     <ClInclude Include="game\detail\gui\slot_button.h" />
     <ClInclude Include="game\detail\gui\drag_and_drop_target_drop_item.h" />
     <ClInclude Include="game\detail\item_slot_transfer_request_declaration.h" />
+    <ClInclude Include="game\detail\particle_types.h" />
     <ClInclude Include="game\detail\perks\bleeding_perk.h" />
     <ClInclude Include="game\detail\perks\haste_perk.h" />
     <ClInclude Include="game\detail\perks\electric_shield_perk.h" />

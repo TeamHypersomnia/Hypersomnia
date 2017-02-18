@@ -11,6 +11,8 @@
 #include "augs/misc/delta.h"
 #include "augs/misc/randomization.h"
 
+struct general_particle;
+
 class viewing_step;
 
 class interpolation_system;
@@ -36,7 +38,7 @@ public:
 
 	void draw(const render_layer, const drawing_input&) const;
 
-	std::array<std::vector<resources::particle>, static_cast<size_t>(render_layer::COUNT)> particles;
+	std::array<std::vector<general_particle>, static_cast<size_t>(render_layer::COUNT)> particles;
 
 	struct emission_instance {
 		bool enable_streaming = false;
@@ -114,7 +116,7 @@ public:
 	cache& get_cache(const const_entity_handle);
 
 	template <class rng_type>
-	resources::particle& spawn_particle(
+	general_particle& spawn_particle(
 		rng_type& rng,
 		const float angular_offset,
 		const augs::minmax<float> speed,

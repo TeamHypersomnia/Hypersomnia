@@ -340,7 +340,7 @@ void immediate_hud::acquire_game_events(
 						const auto spawn_particle_along_line = (tri[1] + along_edge * along_edge_length * angular_translation_multiplier) - r.center;
 						const auto circle_radius = std::min(spawn_particle_along_line.length(), vis.source_square_side/2);
 
-						resources::particle new_particle;
+						general_particle new_particle;
 
 						{
 							auto& new_p = particles.spawn_particle(
