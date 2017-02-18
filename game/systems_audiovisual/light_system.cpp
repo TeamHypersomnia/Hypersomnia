@@ -218,11 +218,12 @@ void light_system::render_all_lights(
 	render_system().draw_entities(interp, global_time_seconds,output.triangles, cosmos, visible_per_layer[render_layer::ON_TILED_FLOOR], step.camera, renderable_drawing_type::NEON_MAPS);
 
 	{
-		particles_simulation_system::drawing_input in(output.triangles);
-		in.camera = step.camera;
-		in.drawing_type = renderable_drawing_type::NEON_MAPS;
-
-		particles.draw(render_layer::EFFECTS, in);
+		particles.draw(
+			output.triangles,
+			render_layer::EFFECTS,
+			step.camera,
+			renderable_drawing_type::NEON_MAPS
+		);
 	}
 
 	neon_callback();

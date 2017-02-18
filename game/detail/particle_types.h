@@ -16,10 +16,10 @@ struct general_particle {
 	float shrink_when_ms_remaining = 0.f;
 	float unshrinking_time_ms = 0.f;
 
-	bool ignore_rotation = false;
 	int alpha_levels = -1;
 
 	void integrate(const float dt);
+	void draw(components::sprite::drawing_input basic_input) const;
 
 	template <class Archive>
 	void serialize(Archive& ar) {

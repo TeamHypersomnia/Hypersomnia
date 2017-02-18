@@ -10,44 +10,18 @@
 #include "augs/templates/container_templates.h"
 #include "game/detail/particle_types.h"
 
-void particles_simulation_system::draw(const render_layer layer, const drawing_input& group_input) const {
-	for (auto it : particles[layer]) {
-		const auto temp_alpha = it.face.color.a;
-		float size_mult = 1.f;
-
-		if (it.shrink_when_ms_remaining > 0.f) {
-			const auto alivity_multiplier = std::min(1.f, (it.max_lifetime_ms - it.lifetime_ms) / it.shrink_when_ms_remaining);
-
-			size_mult *= sqrt(alivity_multiplier);
-
-			//const auto desired_alpha = static_cast<rgba_channel>(alivity_multiplier * static_cast<float>(temp_alpha));
-			//
-			//if (it.fade_on_disappearance) {
-			//	if (it.alpha_levels > 0) {
-			//		it.face.color.a = desired_alpha == 0 ? 0 : ((255 / it.alpha_levels) * (1 + (desired_alpha / (255 / it.alpha_levels))));
-			//	}
-			//	else {
-			//		it.face.color.a = desired_alpha;
-			//	}
-			//}
-		}
-
-		if (it.unshrinking_time_ms > 0.f) {
-			size_mult *= std::min(1.f, (it.lifetime_ms / it.unshrinking_time_ms)*(it.lifetime_ms / it.unshrinking_time_ms));
-		}
-
-		it.face.size_multiplier.x *= size_mult;
-		it.face.size_multiplier.y *= size_mult;
-
-		components::sprite::drawing_input in(group_input.target_buffer);
-
-		in.renderable_transform = it.ignore_rotation ? components::transform(it.pos, 0) : components::transform({ it.pos, it.rotation });
-		in.camera = group_input.camera;
-		in.drawing_type = group_input.drawing_type;
-		//in.renderable_transform += in.renderable_transform;
-		it.face.draw(in);
-		//it.face.color.a = temp_alpha;
-		// it.face.size_multiplier.set(1, 1);
+void particles_simulation_system::draw(
+	augs::vertex_triangle_buffer& target_buffer,
+	const render_layer layer,
+	const camera_cone camera,
+	const renderable_drawing_type drawing_type
+) const {
+	components::sprite::drawing_input general_input(target_buffer);
+	general_input.camera = camera;
+	general_input.drawing_type = drawing_type;
+	
+	for (const auto& it : particles[layer]) {
+		it.draw(general_input);
 	}
 }
 

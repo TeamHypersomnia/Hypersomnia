@@ -23,23 +23,6 @@ namespace resources {
 
 class particles_simulation_system {
 public:
-	struct particles_cluster {
-
-	};
-
-	struct drawing_input : vertex_triangle_buffer_reference {
-		using vertex_triangle_buffer_reference::vertex_triangle_buffer_reference;
-
-		components::transform renderable_transform;
-		camera_cone camera;
-		rgba colorize;
-		renderable_drawing_type drawing_type = renderable_drawing_type::NORMAL;
-	};
-
-	void draw(const render_layer, const drawing_input&) const;
-
-	std::array<std::vector<general_particle>, static_cast<size_t>(render_layer::COUNT)> particles;
-
 	struct emission_instance {
 		bool enable_streaming = false;
 		padding_byte pad[2];
@@ -110,8 +93,13 @@ public:
 		bool constructed = false;
 	};
 
+	std::array<std::vector<general_particle>, static_cast<size_t>(render_layer::COUNT)> particles;
+
 	//std::vector<cache> per_entity_cache;
 	std::unordered_map<entity_id, cache> per_entity_cache;
+
+	void reserve_caches_for_entities(const size_t) {}
+	void erase_caches_for_dead_entities(const cosmos&);
 
 	cache& get_cache(const const_entity_handle);
 
@@ -164,6 +152,10 @@ public:
 		const interpolation_system&
 	);
 
-	void reserve_caches_for_entities(const size_t) {}
-	void erase_caches_for_dead_entities(const cosmos&);
+	void draw(
+		augs::vertex_triangle_buffer& output,
+		const render_layer,
+		const camera_cone,
+		const renderable_drawing_type = renderable_drawing_type::NORMAL
+	) const;
 };

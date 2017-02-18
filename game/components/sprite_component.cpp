@@ -110,24 +110,21 @@ namespace components {
 			const auto frame_duration_ms = static_cast<unsigned>(anim.frames[0].duration_milliseconds);
 			const auto frame_count = anim.frames.size();
 			const auto animation_max_duration = frame_duration_ms * frame_count;
-
+			
 			for (unsigned m = 0; m < max_specular_blinks; ++m) {
 				const auto total_ms = static_cast<unsigned>(in.global_time_seconds * 1000 + (animation_max_duration / max_specular_blinks) * m);
 
 				const auto spatial_hash = std::hash<vec2>()(in.renderable_transform.pos);
 
-				fast_randomization rng(spatial_hash + m*30 + total_ms / animation_max_duration);
+				fast_randomization generator(spatial_hash + m * 30 + total_ms / animation_max_duration);
 
 				const unsigned animation_current_ms = total_ms % (animation_max_duration);
 				const auto& target_frame = anim.frames[animation_current_ms / frame_duration_ms];
-				
-				const auto blink_offset = vec2u {
-					rng.randval(0u, static_cast<unsigned>(drawn_size.x)),
-					rng.randval(0u, static_cast<unsigned>(drawn_size.y))
-				} - drawn_size / 2;
-				
-				draw(
-					in, 
+
+				const auto blink_offset = 
+					vec2i { generator.randval(0, int(drawn_size.x)), generator.randval(0, int(drawn_size.y)) } - drawn_size / 2;
+
+				draw(in, 
 					get_resource_manager().find(target_frame.sprite.tex)->tex,
 					screen_space_pos + blink_offset,
 					final_rotation,

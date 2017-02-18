@@ -69,10 +69,11 @@ namespace rendering_scripts {
 		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_ONE, GL_ONE); glerr;
 		
 		{
-			particles_simulation_system::drawing_input particles_input(output);
-			particles_input.camera = camera;
-
-			particles.draw(render_layer::DIM_SMOKES, particles_input);
+			particles.draw(
+				output,
+				render_layer::DIM_SMOKES,
+				camera
+			);
 		}
 
 		renderer.call_triangles();
@@ -226,10 +227,11 @@ namespace rendering_scripts {
 		}
 
 		{
-			particles_simulation_system::drawing_input particles_input(output);
-			particles_input.camera = camera;
-
-			particles.draw(render_layer::EFFECTS, particles_input);
+			particles.draw(
+				output,
+				render_layer::EFFECTS,
+				camera
+			);
 		}
 
 		{
