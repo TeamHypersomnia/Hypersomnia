@@ -14,6 +14,10 @@ struct hsv {
 };
 
 struct rgba {
+	struct rgb_type {
+		rgba_channel r, g, b;
+	};
+
 	rgba_channel r, g, b, a;
 
 	template <class Archive>
@@ -26,12 +30,25 @@ struct rgba {
 		);
 	}
 
-	explicit rgba(console_color);
-	rgba(rgba_channel red = 255, rgba_channel green = 255, rgba_channel blue = 255, rgba_channel alpha = 255);
-	void set(rgba_channel red = 255, rgba_channel green = 255, rgba_channel blue = 255, rgba_channel alpha = 255);
-	void set(const rgba&);
+	explicit rgba(const console_color);
+	
+	rgba(
+		const rgba_channel red = 255, 
+		const rgba_channel green = 255, 
+		const rgba_channel blue = 255, 
+		const rgba_channel alpha = 255
+	);
 
-	rgba operator*(float) const;
+	void set(
+		const rgba_channel red = 255, 
+		const rgba_channel green = 255, 
+		const rgba_channel blue = 255, 
+		const rgba_channel alpha = 255
+	);
+
+	void set(const rgba);
+
+	rgba operator*(const float) const;
 	rgba operator+(const rgba b) const;
 	rgba operator-(const rgba b) const;
 	rgba operator*(const rgba b) const;
@@ -41,8 +58,10 @@ struct rgba {
 	bool operator!=(const rgba& b) const;
 	hsv get_hsv() const;
 	rgba get_desaturated() const;
-	std::array<rgba_channel, 3>& rgb();
-	const std::array<rgba_channel, 3>& rgb() const;
+
+	rgb_type& rgb();
+	const rgb_type& rgb() const;
+
 	rgba& set_hsv(hsv);
 };
 

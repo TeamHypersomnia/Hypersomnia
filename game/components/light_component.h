@@ -2,7 +2,7 @@
 #include <array>
 #include "augs/graphics/pixel.h"
 
-struct randomization;
+#include "augs/misc/randomization.h"
 
 namespace components {
 	struct light {

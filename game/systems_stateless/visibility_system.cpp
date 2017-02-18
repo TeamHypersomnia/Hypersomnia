@@ -265,6 +265,8 @@ void visibility_system::respond_to_visibility_information_requests(
 		const auto transform = request.eye_transform;
 		visibility_information_response response;
 
+		response.source_square_side = request.square_side;
+
 		/* prepare container for all the vertices that we will cast the ray to */
 		struct target_vertex {
 			bool is_on_a_bound;

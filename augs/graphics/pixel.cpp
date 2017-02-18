@@ -137,7 +137,7 @@ void rgba::set(const rgba_channel red, const rgba_channel green, const rgba_chan
 	*this = rgba(red, green, blue, alpha);
 }
 
-void rgba::set(const rgba& col) {
+void rgba::set(const rgba col) {
 	*this = col;
 }
 
@@ -196,12 +196,12 @@ rgba rgba::get_desaturated() const {
 	return { avg, avg, avg, a };
 }
 
-std::array<rgba_channel, 3>& rgba::rgb() {
-	return *(std::array<rgba_channel, 3>*)this;
+rgba::rgb_type& rgba::rgb() {
+	return *(rgb_type*)this;
 }
 
-const std::array<rgba_channel, 3>& rgba::rgb() const {
-	return *(std::array<rgba_channel, 3>*)this;
+const rgba::rgb_type& rgba::rgb() const {
+	return *(rgb_type*)this;
 }
 
 rgba& rgba::set_hsv(const hsv hsv) {

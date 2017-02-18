@@ -3,10 +3,6 @@
 #include "game/components/transform_component.h"
 #include "game/transcendental/step.h"
 
-class cosmos;
-struct rgba;
-struct entity_id;
-
 struct standard_explosion_input {
 	const logic_step step;
 	

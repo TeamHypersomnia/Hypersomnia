@@ -147,7 +147,10 @@ void viewing_session::control_and_remove_fetched_intents(std::vector<key_and_mou
 }
 
 void viewing_session::standard_audiovisual_post_solve(const const_logic_step step) {
-	hud.acquire_game_events(step);
+	hud.acquire_game_events(
+		step,
+		systems_audiovisual.get<particles_simulation_system>()
+	);
 
 	const auto& cosm = step.cosm;
 

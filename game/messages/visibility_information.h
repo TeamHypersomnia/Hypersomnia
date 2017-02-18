@@ -67,6 +67,8 @@ namespace messages {
 				last_undiscovered_wall(last_undiscovered_wall), edge_index(0), is_boundary(false) {}
 		};
 
+		float source_square_side = 0.f;
+
 		/* output */
 		std::vector<edge> edges;
 

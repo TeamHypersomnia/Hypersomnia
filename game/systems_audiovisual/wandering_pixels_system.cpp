@@ -52,12 +52,12 @@ void wandering_pixels_system::advance_wandering_pixels_for(
 	}
 
 	if (!(cache.recorded_component.reach == wandering.reach)) {
-		cache.generator.seed(cosmos.get_rng_seed_for(it));
+		cache.rng = fast_randomization(cosmos.get_rng_seed_for(it));
 
 		for (auto& p : cache.particles) {
 			p.pos.set(
-				wandering.reach.x + cache.generator() % static_cast<unsigned>(wandering.reach.w), 
-				wandering.reach.y + cache.generator() % static_cast<unsigned>(wandering.reach.h)
+				wandering.reach.x + cache.rng.randval(0u, static_cast<unsigned>(wandering.reach.w)), 
+				wandering.reach.y + cache.rng.randval(0u, static_cast<unsigned>(wandering.reach.h))
 			);
 		}
 
@@ -69,7 +69,7 @@ void wandering_pixels_system::advance_wandering_pixels_for(
 
 	for (auto& p : cache.particles) {
 		if (p.direction_ms_left <= 0.f) {
-			p.direction_ms_left = static_cast<float>(cache.generator() % max_direction_time + 800);
+			p.direction_ms_left = static_cast<float>(cache.rng.randval(max_direction_time, max_direction_time + 800u));
 
 			p.current_direction = p.current_direction.perpendicular_cw();
 
@@ -78,7 +78,7 @@ void wandering_pixels_system::advance_wandering_pixels_for(
 
 			float chance_to_flip = 0.f;
 
-			p.current_velocity = static_cast<float>(cache.generator() % 35 + 3);
+			p.current_velocity = static_cast<float>(cache.rng.randval(3, 3 + 35));
 
 			if (dir.x > 0) {
 				chance_to_flip = (p.pos.x - reach.x) / reach.w;
@@ -101,7 +101,7 @@ void wandering_pixels_system::advance_wandering_pixels_for(
 				chance_to_flip = 1;
 			}
 
-			if (cache.generator() % 100u <= chance_to_flip * 100.f) {
+			if (cache.rng.randval(0u, 100u) <= chance_to_flip * 100.f) {
 				p.current_direction = -p.current_direction;
 			}
 		}

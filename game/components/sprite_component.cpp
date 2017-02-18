@@ -116,18 +116,23 @@ namespace components {
 
 				const auto spatial_hash = std::hash<vec2>()(in.renderable_transform.pos);
 
-				std::minstd_rand0 generator(spatial_hash + m*30 + total_ms / animation_max_duration);
+				fast_randomization rng(spatial_hash + m*30 + total_ms / animation_max_duration);
 
 				const unsigned animation_current_ms = total_ms % (animation_max_duration);
 				const auto& target_frame = anim.frames[animation_current_ms / frame_duration_ms];
 				
-				vec2i blink_offset = { int(generator() % unsigned(drawn_size.x)), int(generator() % unsigned(drawn_size.y)) };
-				blink_offset -= drawn_size / 2;
-
-				draw(in, get_resource_manager().find(target_frame.sprite.tex)->tex,
+				const auto blink_offset = vec2u {
+					rng.randval(0u, static_cast<unsigned>(drawn_size.x)),
+					rng.randval(0u, static_cast<unsigned>(drawn_size.y))
+				} - drawn_size / 2;
+				
+				draw(
+					in, 
+					get_resource_manager().find(target_frame.sprite.tex)->tex,
 					screen_space_pos + blink_offset,
 					final_rotation,
-					assets::get_size(target_frame.sprite.tex));
+					assets::get_size(target_frame.sprite.tex)
+				);
 			}
 		}
 	}

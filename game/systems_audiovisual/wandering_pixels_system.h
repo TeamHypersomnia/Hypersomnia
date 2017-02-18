@@ -9,9 +9,9 @@
 #include "game/transcendental/step_declaration.h"
 
 #include "augs/misc/delta.h"
+#include "augs/misc/randomization.h"
 
 class viewing_step;
-struct randomization;
 struct visible_entities;
 
 class interpolation_system;
@@ -39,7 +39,7 @@ public:
 
 	struct cache {
 		components::wandering_pixels recorded_component;
-		std::minstd_rand0 generator;
+		fast_randomization rng;
 
 		std::vector<particle> particles;
 		bool constructed = false;

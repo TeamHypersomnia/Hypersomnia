@@ -58,7 +58,7 @@ config_table = {
 
 	-- game window settings
 	window_name = "example",
-	fullscreen = 0,
+	fullscreen = 1,
 	window_border = 1,
 	window_x = 100,
 	window_y = 10,
@@ -72,7 +72,8 @@ config_table = {
 
 	-- value of "" means the default audio device will be used
 	audio_output_device = "",
-
+	-- OpenAL Soft on Line 1 (Virtual Audio Cable)
+	
 	-- volume settings
 	sound_effects_volume = 1,
 	music_volume = 1,

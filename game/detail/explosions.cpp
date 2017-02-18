@@ -127,10 +127,10 @@ void standard_explosion(const standard_explosion_input in) {
 		ring.outer_radius_start_value = in.effective_radius / 2;
 		ring.outer_radius_end_value = in.effective_radius;
 
-		ring.emit_particles_on_ring = true;
-
 		ring.inner_radius_start_value = 0.f;
 		ring.inner_radius_end_value = in.effective_radius;
+		
+		ring.emit_particles_on_ring = true;
 
 		ring.time_of_occurence = now.in_seconds(delta);
 		ring.maximum_duration_seconds = 0.20f;
@@ -150,6 +150,8 @@ void standard_explosion(const standard_explosion_input in) {
 
 		ring.inner_radius_start_value = in.effective_radius / 1.5f;
 		ring.inner_radius_end_value = in.effective_radius / 2;
+		
+		ring.emit_particles_on_ring = true;
 
 		ring.time_of_occurence = now.in_seconds(delta);
 		ring.maximum_duration_seconds = 0.20f;

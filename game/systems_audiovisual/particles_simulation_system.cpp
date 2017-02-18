@@ -68,45 +68,6 @@ particles_simulation_system::cache& particles_simulation_system::get_cache(const
 	return per_entity_cache[id.get_id()];
 }
 
-resources::particle& particles_simulation_system::spawn_particle(
-	randomization& rng,
-	emission_instance& group, 
-	const vec2 position, 
-	float rotation, 
-	const float spread, 
-	const resources::emission& emission
-) {
-	auto new_particle = emission.particle_templates[rng.randval(0u, emission.particle_templates.size() - 1)];
-	new_particle.vel = vec2().set_from_degrees(
-		group.angular_offset + rng.randval(rotation - spread, rotation + spread)) *
-		rng.randval(group.velocity);
-
-	if (emission.should_particles_look_towards_velocity) {
-		rotation = new_particle.vel.degrees();
-	}
-	else {
-		rotation = 0;
-	}
-
-	new_particle.pos = position + emission.offset;
-	new_particle.lifetime_ms = 0.f;
-	new_particle.face.size *= rng.randval(emission.size_multiplier);
-	new_particle.rotation = rng.randval(rotation - emission.initial_rotation_variation, rotation + emission.initial_rotation_variation);
-	new_particle.rotation_speed = rng.randval(emission.angular_velocity);
-
-	new_particle.max_lifetime_ms = rng.randval(emission.particle_lifetime_ms);
-
-	if (emission.randomize_acceleration) {
-		new_particle.acc += vec2().set_from_degrees(
-			rng.randval(rotation - spread, rotation + spread)) *
-			rng.randval(emission.acceleration);
-	}
-
-
-	particles[emission.particle_render_template.layer].push_back(new_particle);
-	return *particles[emission.particle_render_template.layer].rbegin();
-}
-
 void resources::particle::integrate(const float dt) {
 	vel += acc * dt;
 	pos += vel * dt;
@@ -225,9 +186,15 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(came
 
 				const vec2 segment_position = augs::interp(segment_A, segment_B, rng.randval(0.f, 1.f));
 
-				spawn_particle(rng, instance, segment_position, transform.rotation +
-					instance.swing_spread * static_cast<float>(sin((instance.stream_lifetime_ms / 1000.f) * 2 * PI_f * instance.swings_per_sec))
-					, instance.target_spread, instance.stream_info).integrate(time_elapsed);
+				spawn_particle(
+					rng, 
+					instance.angular_offset,
+					instance.velocity,
+					segment_position, 
+					transform.rotation + instance.swing_spread * static_cast<float>(sin((instance.stream_lifetime_ms / 1000.f) * 2 * PI_f * instance.swings_per_sec)),
+					instance.target_spread, 
+					instance.stream_info
+				).integrate(time_elapsed);
 
 				instance.stream_particles_to_spawn -= 1.f;
 			}

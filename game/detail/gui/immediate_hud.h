@@ -7,6 +7,8 @@
 #include "game/messages/exploding_ring.h"
 #include "augs/graphics/vertex.h"
 
+class particles_simulation_system;
+
 struct immediate_hud {
 	struct vertically_flying_number {
 		float maximum_duration_seconds = 0.f;
@@ -37,5 +39,8 @@ struct immediate_hud {
 	void draw_exploding_rings(const viewing_step) const;
 	void draw_neon_highlights_of_exploding_rings(const viewing_step) const;
 
-	void acquire_game_events(const const_logic_step step);
+	void acquire_game_events(
+		const const_logic_step step,
+		particles_simulation_system& particles
+	);
 };

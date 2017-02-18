@@ -9,9 +9,9 @@
 #include "game/transcendental/step_declaration.h"
 
 #include "augs/misc/delta.h"
+#include "augs/misc/randomization.h"
 
 class viewing_step;
-struct randomization;
 
 class interpolation_system;
 
@@ -113,7 +113,48 @@ public:
 
 	cache& get_cache(const const_entity_handle);
 
-	resources::particle& spawn_particle(randomization&, emission_instance&, const vec2, float, float spread, const resources::emission&);
+	template <class rng_type>
+	resources::particle& spawn_particle(
+		rng_type& rng,
+		const float angular_offset,
+		const augs::minmax<float> velocity_length,
+		const vec2 position,
+		float rotation,
+		const float spread,
+		const resources::emission& emission
+	) {
+		auto new_particle = emission.particle_templates[rng.randval(0u, emission.particle_templates.size() - 1)];
+
+		new_particle.vel = vec2().set_from_degrees(
+			angular_offset + rng.randval(spread) + rotation
+		) * rng.randval(velocity_length);
+
+		if (emission.should_particles_look_towards_velocity) {
+			rotation = new_particle.vel.degrees();
+		}
+		else {
+			rotation = 0;
+		}
+
+		new_particle.pos = position + emission.offset;
+		new_particle.lifetime_ms = 0.f;
+		new_particle.face.size *= rng.randval(emission.size_multiplier);
+		new_particle.rotation = rng.randval(emission.initial_rotation_variation) + rotation;
+		new_particle.rotation_speed = rng.randval(emission.angular_velocity);
+
+		new_particle.max_lifetime_ms = rng.randval(emission.particle_lifetime_ms);
+
+		if (emission.randomize_acceleration) {
+			new_particle.acc += vec2().set_from_degrees(
+				rng.randval(spread) + rotation
+			) * rng.randval(emission.acceleration);
+		}
+
+
+		particles[emission.particle_render_template.layer].push_back(new_particle);
+		return *particles[emission.particle_render_template.layer].rbegin();
+	}
+
 	void advance_visible_streams_and_all_particles(camera_cone, const cosmos&, const augs::delta dt, interpolation_system&);
 
 	void reserve_caches_for_entities(const size_t) {}
