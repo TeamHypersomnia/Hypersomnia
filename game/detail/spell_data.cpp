@@ -254,18 +254,18 @@ void perform_spell_logic(
 			sentience.shake_for_ms = 400.f;
 			sentience.time_of_last_shake = now;
 
-			standard_explosion(
-				step,
-				caster_transform,
-				caster,
-				250.f,
-				88.f,
-				150.f,
-				cyan,
-				white,
-				assets::sound_buffer_id::EXPLOSION,
-				1.2f
-			);
+			standard_explosion_input in(step);
+			in.explosion_location = caster_transform;
+			in.subject_if_any = caster;
+			in.effective_radius = 250.f;
+			in.damage = 88.f;
+			in.impact_force = 150.f;
+			in.inner_ring_color = cyan;
+			in.outer_ring_color = white;
+			in.sound_effect = assets::sound_buffer_id::EXPLOSION;
+			in.sound_gain = 1.2f;
+
+			standard_explosion(in);
 		}
 
 		break;
@@ -276,6 +276,13 @@ void perform_spell_logic(
 		const auto first_at = augs::stepped_timestamp{ when_casted.step + static_cast<unsigned>(1.3f / dt.in_seconds()) };
 		const auto second_at = augs::stepped_timestamp{ when_casted.step + static_cast<unsigned>(1.8f / dt.in_seconds()) };
 		const auto third_at = augs::stepped_timestamp{ when_casted.step + static_cast<unsigned>(2.3f / dt.in_seconds()) };
+		
+		standard_explosion_input in(step);
+		in.explosion_location = caster_transform;
+		in.subject_if_any = caster;
+		in.damage = 88.f;
+		in.inner_ring_color = cyan;
+		in.outer_ring_color = white;
 
 		if (now == when_casted) {
 			ignite_sparkle_particles();
@@ -285,53 +292,35 @@ void perform_spell_logic(
 		else if (now == first_at) {
 			sentience.shake_for_ms = 400.f;
 			sentience.time_of_last_shake = now;
+			
+			in.effective_radius = 200.f;
+			in.impact_force = 150.f;
+			in.sound_gain = 1.2f;
+			in.sound_effect = assets::sound_buffer_id::EXPLOSION;
 
-			standard_explosion(
-				step,
-				caster_transform,
-				caster,
-				200.f,
-				88.f,
-				150.f,
-				cyan,
-				white,
-				assets::sound_buffer_id::EXPLOSION,
-				1.2f
-			);
+			standard_explosion(in);
 		}
 		else if (now == second_at) {
 			sentience.shake_for_ms = 500.f;
 			sentience.time_of_last_shake = now;
 
-			standard_explosion(
-				step,
-				caster_transform,
-				caster,
-				400.f,
-				88.f,
-				200.f,
-				cyan,
-				white,
-				assets::sound_buffer_id::GREAT_EXPLOSION,
-				1.0f
-			);
+			in.effective_radius = 400.f;
+			in.impact_force = 200.f;
+			in.sound_gain = 1.0f;
+			in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
+
+			standard_explosion(in);
 		}
 		else if (now == third_at) {
 			sentience.shake_for_ms = 600.f;
 			sentience.time_of_last_shake = now;
 
-			standard_explosion(
-				step,
-				caster_transform,
-				caster,
-				600.f,
-				88.f,
-				250.f,
-				cyan,
-				white,
-				assets::sound_buffer_id::GREAT_EXPLOSION,
-				1.2f
-			);
+			in.effective_radius = 600.f;
+			in.impact_force = 250.f;
+			in.sound_gain = 1.2f;
+			in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
+
+			standard_explosion(in);
 		}
 
 		break;

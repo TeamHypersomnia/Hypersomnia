@@ -14,6 +14,8 @@ namespace messages {
 		float maximum_duration_seconds = 0.f;
 		float time_of_occurence = 0.f;
 
+		bool emit_particles_on_ring = false;
+
 		vec2 center;
 		
 		messages::visibility_information_response visibility;

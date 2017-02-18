@@ -1,21 +1,29 @@
 #pragma once
 #include "game/assets/sound_buffer_id.h"
 #include "game/components/transform_component.h"
-#include "game/transcendental/step_declaration.h"
+#include "game/transcendental/step.h"
 
 class cosmos;
 struct rgba;
 struct entity_id;
 
-void standard_explosion(
-	const logic_step step,
-	components::transform location,
-	const entity_id subject_if_any,
-	const float effective_radius,
-	const float damage,
-	const float impact_force,
-	const rgba inner_ring_color,
-	const rgba outer_ring_color,
-	const assets::sound_buffer_id sound_effect, 
-	const float sound_gain = 1.f
-);
+struct standard_explosion_input {
+	const logic_step step;
+	
+	standard_explosion_input(const logic_step step)
+		: step(step)
+	{
+	}
+	
+	components::transform explosion_location;
+	entity_id subject_if_any = entity_id();
+	float effective_radius = 250.f;
+	float damage = 88.f;
+	float impact_force = 150.f;
+	rgba inner_ring_color = cyan;
+	rgba outer_ring_color = white;
+	assets::sound_buffer_id sound_effect = assets::sound_buffer_id::EXPLOSION;
+	float sound_gain = 1.f;
+};
+
+void standard_explosion(const standard_explosion_input);

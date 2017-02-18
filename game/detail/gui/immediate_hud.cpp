@@ -150,7 +150,7 @@ augs::vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_i
 			std::vector<circle_info> textual_infos;
 
 			if (v == watched_character) {
-				auto examine_item_slot = [&textual_infos, &push_angles, &circle_hud, &state](
+				const auto examine_item_slot = [&textual_infos, &push_angles, &circle_hud, &state](
 					const const_inventory_slot_handle id, 
 					const float lower_outside, 
 					const float max_angular_length, 
@@ -285,7 +285,7 @@ void immediate_hud::acquire_game_events(const const_logic_step step) {
 			new_highlight.starting_alpha_ratio = 1.f;
 		}
 
-		new_highlight.maximum_duration_seconds = 0.25;
+		new_highlight.maximum_duration_seconds = 0.25f;
 		new_highlight.color = col;
 
 		erase_remove(recent_pure_color_highlights, [&new_highlight, &cosmos](const pure_color_highlight& existing_highlight) { 
@@ -295,7 +295,7 @@ void immediate_hud::acquire_game_events(const const_logic_step step) {
 		recent_pure_color_highlights.push_back(new_highlight);
 	}
 
-	auto timeout_lambda = [current_time](const auto& v) {
+	const auto timeout_lambda = [current_time](const auto& v) {
 		return (current_time - v.time_of_occurence) > v.maximum_duration_seconds;
 	};
 
@@ -392,7 +392,7 @@ void immediate_hud::draw_exploding_rings(const viewing_step step) const {
 			renderable_tri.vertices[2].pos = step.camera[world_light_tri[2]];
 
 			auto considered_color = r.color;
-			considered_color.a *= 1.f - ratio;
+			considered_color.a = static_cast<rgba_channel>(considered_color.a * (1.f - ratio));
 
 			if (considered_color == black) {
 				considered_color.set_hsv({ fmod(current_time / 16.f, 1.f), 1.0, 1.0 });
