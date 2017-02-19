@@ -210,17 +210,18 @@ void perform_spell_logic(
 		burst.place_of_birth = caster_transform;
 		burst.input.effect = assets::particle_effect_id::CAST_SPARKLES;
 		burst.input.modifier.colorize = appearance.border_col;
-
+		
 		particles_existence_system().create_particle_effect_entity(cosmos, burst).add_standard_components();
 	};
 
-	const auto ignite_charging_particles = [&]() {
+	const auto ignite_charging_particles = [&](const rgba col) {
 		messages::create_particle_effect burst;
 		burst.subject = caster;
 		burst.place_of_birth = caster_transform;
 		burst.input.effect = assets::particle_effect_id::CAST_CHARGING;
-		burst.input.modifier.colorize = appearance.border_col;
+		burst.input.modifier.colorize = col;
 		burst.input.modifier.scale_lifetimes = 1.3f;
+		burst.input.modifier.homing_target = caster;
 
 		particles_existence_system().create_particle_effect_entity(cosmos, burst).add_standard_components();
 	};
@@ -297,6 +298,8 @@ void perform_spell_logic(
 
 		if (now == when_casted) {
 			ignite_sparkle_particles();
+			ignite_charging_particles(cyan);
+			ignite_charging_particles(white);
 			play_standard_sparkles_sound();
 			play_sound(assets::sound_buffer_id::CAST_CHARGING);
 		}

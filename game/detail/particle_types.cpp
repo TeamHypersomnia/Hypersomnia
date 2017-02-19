@@ -136,7 +136,19 @@ void animated_particle::colorize(const rgba mult) {
 	color *= mult;
 }
 
-void homing_animated_particle::integrate(const float dt) {
+void homing_animated_particle::integrate(const float dt, const vec2 homing_target) {
+	vel += (homing_target - pos) * 10 * dt;
+	
+	vec2 dirs[] = { vel.perpendicular_cw(), -vel.perpendicular_cw() };
+
+	const auto homing_vector = homing_target - pos;
+
+	if (dirs[0].radians_between(homing_vector) > dirs[1].radians_between(homing_vector)) {
+		std::swap(dirs[0], dirs[1]);
+	}
+
+	vel += dirs[0].set_length(sqrt(sqrt(homing_vector.length()))) * dt * 4000;
+
 	integrate_pos_vel_acc_damp_life(*this, dt);
 }
 
@@ -144,7 +156,8 @@ void homing_animated_particle::draw(components::sprite::drawing_input basic_inpu
 	static thread_local components::sprite face;
 	const auto frame_num = std::min(static_cast<unsigned>(lifetime_ms / frame_duration_ms), frame_count);
 
-	face.set(static_cast<assets::texture_id>(static_cast<int>(last_face) - frame_num));
+	//face.set(static_cast<assets::texture_id>(static_cast<int>(first_face) + frame_count - frame_num - 1));
+	face.set(static_cast<assets::texture_id>(static_cast<int>(first_face) + frame_num));
 
 	basic_input.renderable_transform = { pos, 0 };
 	face.color = color;

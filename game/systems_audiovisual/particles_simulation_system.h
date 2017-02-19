@@ -46,13 +46,14 @@ public:
 		float swing_spread_change = 0.f;
 		float swing_speed_change = 0.f;
 
-		float randomize_spawn_point_within_circle_of_radius = 0.f;
+		float randomize_spawn_point_within_circle_of_outer_radius = 0.f;
+		float randomize_spawn_point_within_circle_of_inner_radius = 0.f;
 
 		augs::minmax<float> particle_speed;
 
 		float fade_when_ms_remaining = 0.f;
 
-		resources::emission stream_info;
+		resources::emission source_emission;
 
 		template <class Archive>
 		void serialize(Archive& ar) {
@@ -79,7 +80,7 @@ public:
 
 				CEREAL_NVP(fade_when_ms_remaining),
 
-				CEREAL_NVP(stream_info),
+				CEREAL_NVP(source_emission),
 				CEREAL_NVP(enable_streaming)
 			);
 		}
@@ -96,18 +97,10 @@ public:
 		bool constructed = false;
 	};
 
-	put_all_particle_types_into_t<make_array_of_vectors_per_layer> particles;
+	make_array_per_layer_t<std::vector<general_particle>> general_particles;
+	make_array_per_layer_t<std::vector<animated_particle>> animated_particles;
+	make_array_per_layer_t<std::unordered_map<entity_id, std::vector<homing_animated_particle>>> homing_animated_particles;
 
-	template <class T>
-	auto& get_particles() {
-		return std::get<make_array_of_vectors_per_layer_t<T>>(particles);
-	}
-
-	template <class T>
-	const auto& get_particles() const {
-		return std::get<make_array_of_vectors_per_layer_t<T>>(particles);
-	}
-	
 	//std::vector<cache> per_entity_cache;
 	std::unordered_map<entity_id, cache> per_entity_cache;
 
@@ -116,8 +109,12 @@ public:
 
 	cache& get_cache(const const_entity_handle);
 
+	void add_particle(const render_layer, const general_particle&);
+	void add_particle(const render_layer, const animated_particle&);
+	void add_particle(const render_layer, const entity_id, const homing_animated_particle&);
+
 	template <class particle_type, class rng_type>
-	particle_type& spawn_particle(
+	auto spawn_particle(
 		rng_type& rng,
 		const float angular_offset,
 		const augs::minmax<float> speed,
@@ -154,10 +151,7 @@ public:
 			);
 		}
 
-		auto& particles = get_particles<particle_type>();
-
-		particles[emission.particle_render_template.layer].push_back(new_particle);
-		return *particles[emission.particle_render_template.layer].rbegin();
+		return std::move(new_particle);
 	}
 
 	void advance_visible_streams_and_all_particles(

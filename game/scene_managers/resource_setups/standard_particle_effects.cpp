@@ -240,30 +240,79 @@ namespace resource_setups {
 
 			em.spread_degrees = std::make_pair(360, 360);
 			em.num_of_particles_to_spawn_initially.set(0, 0);
+			em.particles_per_sec = std::make_pair(250, 250);
 			em.stream_lifetime_ms = std::make_pair(1000, 1000);
 
-			em.base_speed = std::make_pair(120, 600);
-			em.base_speed_variation = std::make_pair(10.f, 20.f);
+			em.base_speed = std::make_pair(20, 300);
+			em.base_speed_variation = std::make_pair(0.f, 0.f);
 
 			em.rotation_speed = std::make_pair(0, 0);
 			em.particle_lifetime_ms = std::make_pair(1000, 1000);
+
+			em.randomize_spawn_point_within_circle_of_inner_radius = std::make_pair(30.f, 30.f);
+			em.randomize_spawn_point_within_circle_of_outer_radius = std::make_pair(200.f, 200.f);
 
 			const auto& anim = *get_resource_manager().find(assets::animation_id::CAST_BLINK_ANIMATION);
 			const auto frame_duration = anim.frames[0].duration_milliseconds / 2.f;
 
 			for (int i = 0; i < anim.frames.size() - 1; ++i)
 			{
-				animated_particle particle_template;
+				homing_animated_particle particle_template;
 
-				particle_template.linear_damping = 1000;
-				particle_template.first_face = static_cast<assets::texture_id>(static_cast<int>((*anim.frames.rbegin()).sprite.tex) - i);
+				particle_template.linear_damping = 0;
+				particle_template.first_face = static_cast<assets::texture_id>(static_cast<int>(anim.frames[0].sprite.tex) + i);
 				particle_template.frame_count = anim.frames.size() - i;
 				particle_template.frame_duration_ms = frame_duration;
-				particle_template.acc.set(900, -900);
 				particle_template.color = white;
 
 				em.add_particle_template(particle_template);
 			}
+			{
+
+			homing_animated_particle particle_template;
+
+			particle_template.linear_damping = 0;
+			particle_template.first_face = assets::texture_id::BLINK_FIRST;
+			particle_template.frame_count = 1;
+			particle_template.frame_duration_ms = 700.f;
+			particle_template.color = white;
+
+			em.add_particle_template(particle_template);
+			}
+			{
+
+			homing_animated_particle particle_template;
+
+			particle_template.linear_damping = 0;
+			particle_template.first_face = static_cast<assets::texture_id>(static_cast<int>(assets::texture_id::BLINK_FIRST) + 1);
+			particle_template.frame_count = 1;
+			particle_template.frame_duration_ms = 700.f;
+			particle_template.color = white;
+
+			em.add_particle_template(particle_template);
+			}
+
+			//for (int i = 0; i < anim.frames.size() - 1; ++i)
+			//{
+			//	animated_particle particle_template;
+			//
+			//	particle_template.linear_damping = 1000;
+			//	particle_template.first_face = static_cast<assets::texture_id>(static_cast<int>(anim.frames[0].sprite.tex) + i);
+			//	particle_template.frame_count = anim.frames.size() - i;
+			//	particle_template.frame_duration_ms = frame_duration;
+			//	particle_template.acc.set(900, -900);
+			//	particle_template.color = white;
+			//
+			//	em.add_particle_template(particle_template);
+			//}
+
+			em.size_multiplier = std::make_pair(1, 1);
+			em.particle_render_template.layer = render_layer::EFFECTS;
+			em.initial_rotation_variation = 0;
+			em.should_particles_look_towards_velocity = false;
+			em.randomize_acceleration = true;
+
+			effect.push_back(em);
 		}
 
 		{

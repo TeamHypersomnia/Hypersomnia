@@ -497,7 +497,7 @@ void perform_transfer(const item_slot_transfer_request r, const logic_step step)
 		add_item(r.get_target_slot(), grabbed_item_part_handle);
 	}
 
-	auto physics_updater = [previous_container_transform](const entity_handle descendant, ...) {
+	const auto physics_updater = [previous_container_transform](const entity_handle descendant, auto... args) {
 		const auto& cosmos = descendant.get_cosmos();
 
 		const auto previous_descendant_transform = descendant.get_logic_transform();

@@ -54,13 +54,13 @@ void particles_existence_system::destroy_dead_streams(const logic_step step) con
 		auto& existence = it.get<components::particles_existence>();
 		auto& input = existence.input;
 
-		if (input.randomize_position_within_radius > 0.f) {
+		if (input.displace_source_position_within_radius > 0.f) {
 			if ((timestamp - existence.time_of_last_displacement).in_milliseconds(step.get_delta()) > existence.current_displacement_duration_bound_ms) {
 				const auto new_seed = cosmos.get_rng_seed_for(it) + cosmos.get_total_steps_passed();
 				randomization rng(new_seed);
 
 				existence.time_of_last_displacement = timestamp;
-				existence.current_displacement.set_from_degrees(rng.randval(0.f, 360.f)).set_length(rng.randval(0.f, input.randomize_position_within_radius));
+				existence.current_displacement.set_from_degrees(rng.randval(0.f, 360.f)).set_length(rng.randval(0.f, input.displace_source_position_within_radius));
 				existence.current_displacement_duration_bound_ms = rng.randval(input.single_displacement_duration_ms);
 				existence.rng_seed = new_seed;
 			}

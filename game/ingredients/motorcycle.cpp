@@ -154,7 +154,7 @@ namespace prefabs {
 			effect.input.effect = assets::particle_effect_id::ENGINE_PARTICLES;
 			effect.input.modifier.scale_amounts = 5.7f;
 			effect.input.modifier.scale_lifetimes = 0.45f;
-			//effect.input.randomize_position_within_radius = 10.f;
+			//effect.input.displace_source_position_within_radius = 10.f;
 			//effect.input.single_displacement_duration_ms.set(400.f, 1500.f);
 			effect.subject = front;
 			effect.input.modifier.colorize = cyan;

@@ -53,7 +53,7 @@ ltrb basic_renderable_mixin<C, D>::get_aabb(const components::transform transfor
 		aabb.set_position(transform.pos);
 		aabb.set_size({ 2.f, 2.f });
 
-		const auto enlarge = std::max(particles_existence->input.randomize_position_within_radius, particles_existence->distribute_within_segment_of_length);
+		const auto enlarge = std::max(particles_existence->input.displace_source_position_within_radius, particles_existence->distribute_within_segment_of_length);
 		aabb.expand_from_center({ enlarge, enlarge });
 
 		return aabb;

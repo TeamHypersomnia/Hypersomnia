@@ -118,7 +118,7 @@ void trigger_detector_system::send_trigger_confirmations(const logic_step step) 
 		physics.for_each_intersection_with_body(
 			detector_body, 
 			filters::trigger(),
-			([&](const auto fixture, ...) {
+			([&](const auto fixture, auto, auto) {
 				const auto found_trigger_id = get_id_of_entity_of_fixture(fixture);
 
 				const auto found_trigger = cosmos[found_trigger_id];

@@ -25,5 +25,7 @@ namespace resources {
 			stream_lifetime_ms.first *= m.scale_lifetimes;
 			stream_lifetime_ms.second *= m.scale_lifetimes;
 		}
+
+		homing_target = m.homing_target;
 	}
 }

@@ -358,6 +358,8 @@ void immediate_hud::acquire_game_events(
 								new_p.acc /= 2;
 								new_p.linear_damping /= 2;
 								new_p.acc.rotate(rng.randval(0.f, 360.f), vec2{ 0, 0 });
+
+								particles.add_particle(sparkles_emission.particle_render_template.layer, new_p);
 								//new_p.max_lifetime_ms *= 1.4f;
 							};
 
@@ -366,7 +368,7 @@ void immediate_hud::acquire_game_events(
 						}
 
 						{
-							auto& new_p = particles.spawn_particle<general_particle>(
+							auto new_p = particles.spawn_particle<general_particle>(
 								rng,
 								0.f,
 								{ 100.f, 120.f },
@@ -380,6 +382,9 @@ void immediate_hud::acquire_game_events(
 
 							new_p.face.color.rgb() = r.color.rgb();
 							new_p.face.color.a *= 2;
+							
+							particles.add_particle(smokes_emission.particle_render_template.layer, new_p);
+							
 							//new_p.acc /= 2;
 							//new_p.acc.rotate(rng.randval(0.f, 360.f), vec2{ 0, 0 });
 							//new_p.max_lifetime_ms *= 1.4f;

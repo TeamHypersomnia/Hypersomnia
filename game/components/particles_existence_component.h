@@ -20,7 +20,7 @@ namespace components {
 
 			resources::particle_effect_modifier modifier;
 
-			float randomize_position_within_radius = 0.f;
+			float displace_source_position_within_radius = 0.f;
 			augs::minmax<float> single_displacement_duration_ms = augs::minmax<float>(0.f, 0.f);
 		} input;
 

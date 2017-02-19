@@ -168,7 +168,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 							physics.for_each_intersection_with_polygon(
 								sensor_polygon, 
 								pathfinding.filter, 
-								([&](const auto fix, ...) {
+								([&](const auto fix, auto, auto) {
 									if (cosmos[get_id_of_entity_of_body(fix)] != it) {
 										was_hit = true;
 										return query_callback_result::ABORT;

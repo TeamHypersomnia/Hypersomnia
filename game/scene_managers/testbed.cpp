@@ -558,7 +558,7 @@ namespace scene_managers {
 			messages::create_particle_effect effect;
 			effect.place_of_birth = components::transform(-164, 500, 0);
 			effect.input.effect = assets::particle_effect_id::WANDERING_SMOKE;
-			effect.input.randomize_position_within_radius = 500.f;
+			effect.input.displace_source_position_within_radius = 500.f;
 			effect.input.single_displacement_duration_ms.set(400.f, 1500.f);
 
 			particles_existence_system().create_particle_effect_entity(world, effect).add_standard_components();

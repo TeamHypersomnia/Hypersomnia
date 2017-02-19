@@ -20,12 +20,18 @@ void particles_simulation_system::draw(
 	general_input.camera = camera;
 	general_input.drawing_type = drawing_type;
 
-	for (const auto& it : get_particles<general_particle>()[layer]) {
+	for (const auto& it : general_particles[layer]) {
 		it.draw(general_input);
 	}
 
-	for (const auto& it : get_particles<animated_particle>()[layer]) {
+	for (const auto& it : animated_particles[layer]) {
 		it.draw(general_input);
+	}
+
+	for (const auto& cluster : homing_animated_particles[layer]) {
+		for (const auto& it : cluster.second) {
+			it.draw(general_input);
+		}
 	}
 }
 
@@ -47,17 +53,31 @@ particles_simulation_system::cache& particles_simulation_system::get_cache(const
 	return per_entity_cache[id.get_id()];
 }
 
+void particles_simulation_system::add_particle(const render_layer l, const general_particle& p) {
+	general_particles[l].push_back(p);
+}
+
+void particles_simulation_system::add_particle(const render_layer l, const animated_particle& p) {
+	animated_particles[l].push_back(p);
+}
+
+void particles_simulation_system::add_particle(const render_layer l, const entity_id id, const homing_animated_particle& p) {
+	homing_animated_particles[l][id].push_back(p);
+}
+
 void particles_simulation_system::advance_visible_streams_and_all_particles(
 	camera_cone cone, 
 	const cosmos& cosmos, 
 	const augs::delta delta, 
 	const interpolation_system& interp
 ) {
+	static thread_local randomization rng;
+
 	const auto dead_particles_remover = [](auto& container) {
 		erase_remove(container, [](const auto& a) { return a.is_dead(); });
 	};
 
-	for (auto& particle_layer : get_particles<general_particle>()) {
+	for (auto& particle_layer : general_particles) {
 		for (auto& p : particle_layer) {
 			p.integrate(delta.in_seconds());
 		}
@@ -65,12 +85,32 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 		dead_particles_remover(particle_layer);
 	}
 
-	for (auto& particle_layer : get_particles<animated_particle>()) {
+	for (auto& particle_layer : animated_particles) {
 		for (auto& p : particle_layer) {
 			p.integrate(delta.in_seconds());
 		}
 
 		dead_particles_remover(particle_layer);
+	}
+
+	for (auto& particle_layer : homing_animated_particles) {
+		erase_if(particle_layer, [&](auto& cluster) {
+			const auto homing_target = cosmos[cluster.first];
+
+			if (homing_target.alive()) {
+				const auto homing_transform = cosmos[cluster.first].get_viewing_transform(interp);
+
+				for (auto& p : cluster.second) {
+					p.integrate(delta.in_seconds(), homing_transform.pos);
+				}
+
+				dead_particles_remover(cluster.second);
+
+				return false;
+			}
+			
+			return true;
+		});
 	}
 
 	cone.visible_world_area *= 2.5f;
@@ -93,7 +133,6 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 		const bool should_rebuild_cache = cache.recorded_existence != existence;
 
 		if (should_rebuild_cache) {
-			randomization rng = existence.rng_seed;
 			cache.recorded_existence = existence;
 			cache.emission_instances.clear();
 
@@ -108,7 +147,7 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 				new_emission_instance.particle_speed.set(std::max(0.f, emission.base_speed.first - var_v / 2), emission.base_speed.second + var_v / 2);
 				//LOG("Vl: %x Vu: %x", new_emission_instance.velocity.first, new_emission_instance.velocity.second);
 
-				new_emission_instance.stream_info = emission;
+				new_emission_instance.source_emission = emission;
 				new_emission_instance.enable_streaming = true;
 				new_emission_instance.stream_lifetime_ms = 0.f;
 				new_emission_instance.angular_offset = rng.randval(emission.angular_offset);
@@ -128,17 +167,18 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 				new_emission_instance.swing_spread_change = rng.randval(emission.swing_spread_change_rate);
 
 				new_emission_instance.fade_when_ms_remaining = rng.randval(emission.fade_when_ms_remaining);
-				new_emission_instance.randomize_spawn_point_within_circle_of_radius = rng.randval(emission.randomize_spawn_point_within_circle_of_radius);
+				new_emission_instance.randomize_spawn_point_within_circle_of_inner_radius = rng.randval(emission.randomize_spawn_point_within_circle_of_inner_radius);
+				new_emission_instance.randomize_spawn_point_within_circle_of_outer_radius = rng.randval(emission.randomize_spawn_point_within_circle_of_outer_radius);
 			}
 		}
 
 		const auto transform = it.get_viewing_transform(interp) + existence.current_displacement;
-		randomization rng = cosmos.get_rng_seed_for(it) + cosmos.get_total_steps_passed();
 
 		bool should_destroy = true;
 
 		for (auto& instance : cache.emission_instances) {
 			const float stream_delta = std::min(delta.in_milliseconds(), instance.stream_max_lifetime_ms - instance.stream_lifetime_ms);
+			const auto& emission = instance.source_emission;
 
 			instance.stream_lifetime_ms += stream_delta;
 
@@ -165,32 +205,62 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 			const auto segment_length = existence.distribute_within_segment_of_length;
 			const vec2 segment_A = transform.pos + vec2().set_from_degrees(transform.rotation + 90).set_length(segment_length / 2);
 			const vec2 segment_B = transform.pos - vec2().set_from_degrees(transform.rotation + 90).set_length(segment_length / 2);
+			
+			const auto homing_target_pos = cosmos[emission.homing_target].alive() ? cosmos[emission.homing_target].get_viewing_transform(interp).pos : vec2();
 
-			for_each_particle_type([&](auto dummy) {
-				typedef decltype(dummy) spawned_particle_type;
+			for (int i = 0; i < to_spawn; ++i) {
+				const float t = (static_cast<float>(i) / to_spawn);
+				const float time_elapsed = (1.f - t) * delta.in_seconds();
 
-				if (instance.stream_info.get_templates<spawned_particle_type>().size() > 0) {
-					for (int i = 0; i < to_spawn; ++i) {
-						const float t = (static_cast<float>(i) / to_spawn);
-						const float time_elapsed = (1.f - t) * delta.in_seconds();
-
-						const vec2 segment_position = augs::interp(segment_A, segment_B, rng.randval(0.f, 1.f));
-						const vec2 circle_offset = rng.random_point_in_circle(instance.randomize_spawn_point_within_circle_of_radius);
-
-						spawn_particle<spawned_particle_type>(
-							rng,
-							instance.angular_offset,
-							instance.particle_speed,
-							segment_position + circle_offset,
-							transform.rotation + instance.swing_spread * static_cast<float>(sin((instance.stream_lifetime_ms / 1000.f) * 2 * PI_f * instance.swings_per_sec)),
-							instance.target_spread,
-							instance.stream_info
-							).integrate(time_elapsed);
-
-						instance.stream_particles_to_spawn -= 1.f;
-					}
+				vec2 final_particle_position = augs::interp(segment_A, segment_B, rng.randval(0.f, 1.f));
+				
+				if (
+					instance.randomize_spawn_point_within_circle_of_inner_radius > 0.f
+					|| instance.randomize_spawn_point_within_circle_of_outer_radius > 0.f
+					) {
+					final_particle_position += rng.random_point_in_ring(
+						instance.randomize_spawn_point_within_circle_of_inner_radius,
+						instance.randomize_spawn_point_within_circle_of_outer_radius
+					);
 				}
-			});
+
+				const auto spawner = [&](auto dummy) {
+					typedef decltype(dummy) spawned_particle_type;
+
+					return spawn_particle<spawned_particle_type>(
+						rng,
+						instance.angular_offset,
+						instance.particle_speed,
+						final_particle_position,
+						transform.rotation + instance.swing_spread * static_cast<float>(sin((instance.stream_lifetime_ms / 1000.f) * 2 * PI_f * instance.swings_per_sec)),
+						instance.target_spread,
+						emission
+					);
+				};
+
+				if (emission.get_templates<general_particle>().size() > 0)
+				{
+					auto new_general = spawner(general_particle());
+					new_general.integrate(time_elapsed);
+					add_particle(emission.particle_render_template.layer, new_general);
+				}
+
+				if (emission.get_templates<animated_particle>().size() > 0)
+				{
+					auto new_animated = spawner(animated_particle());
+					new_animated.integrate(time_elapsed);
+					add_particle(emission.particle_render_template.layer, new_animated);
+				}
+
+				if (emission.get_templates<homing_animated_particle>().size() > 0)
+				{
+					auto new_homing_animated = spawner(homing_animated_particle());
+					new_homing_animated.integrate(time_elapsed, homing_target_pos);
+					add_particle(emission.particle_render_template.layer, emission.homing_target, new_homing_animated);
+				}
+
+				instance.stream_particles_to_spawn -= 1.f;
+			}
 		}
 	}
 }

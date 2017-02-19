@@ -8,6 +8,8 @@
 #include "augs/templates/type_mod_templates.h"
 #include "game/detail/particle_types_declaration.h"
 
+#include "game/transcendental/entity_id.h"
+
 struct general_particle;
 
 namespace resources {
@@ -15,6 +17,7 @@ namespace resources {
 		rgba colorize;
 		float scale_amounts = 1.f;
 		float scale_lifetimes = 1.f;
+		entity_id homing_target;
 
 		template <class Archive>
 		void serialize(Archive& ar) {
@@ -49,8 +52,11 @@ namespace resources {
 		minmax swing_speed_change_rate = minmax(0.f, 0.f);
 		minmax fade_when_ms_remaining = minmax(0.f, 0.f);
 		minmax num_of_particles_to_spawn_initially = minmax(0.f, 0.f);
-		minmax randomize_spawn_point_within_circle_of_radius = minmax(0.f, 0.f);
+		minmax randomize_spawn_point_within_circle_of_outer_radius = minmax(0.f, 0.f);
+		minmax randomize_spawn_point_within_circle_of_inner_radius = minmax(0.f, 0.f);
 		
+		entity_id homing_target;
+
 		float initial_rotation_variation = 0.f;
 		bool randomize_acceleration = false;
 		bool should_particles_look_towards_velocity = true;

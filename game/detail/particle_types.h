@@ -89,14 +89,12 @@ struct homing_animated_particle {
 	float linear_damping = 0.f;
 	float lifetime_ms = 0.f;
 
-	assets::texture_id last_face = assets::texture_id::INVALID;
+	assets::texture_id first_face = assets::texture_id::INVALID;
 	rgba color;
 	float frame_duration_ms;
 	unsigned frame_count = 0;
-	
-	entity_id target;
 
-	void integrate(const float dt);
+	void integrate(const float dt, const vec2 homing_target);
 	void draw(components::sprite::drawing_input basic_input) const;
 	bool is_dead() const;
 
