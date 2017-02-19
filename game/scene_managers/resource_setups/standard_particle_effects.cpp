@@ -287,10 +287,10 @@ namespace resource_setups {
 				em.base_speed_variation = std::make_pair(10.f, 20.f);
 
 				em.angular_velocity = std::make_pair(0, 0);
-				em.particle_lifetime_ms = std::make_pair(100, 500);
+				em.particle_lifetime_ms = std::make_pair(200, 600);
 				
 				const auto& anim = *get_resource_manager().find(assets::animation_id::CAST_BLINK_ANIMATION);
-				const auto frame_duration = anim.frames[0].duration_milliseconds / 1.85f;
+				const auto frame_duration = anim.frames[0].duration_milliseconds / 2.f;
 
 				for(int i = 0; i < anim.frames.size() - 1; ++i)
 				{

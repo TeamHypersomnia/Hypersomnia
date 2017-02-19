@@ -317,7 +317,7 @@ void immediate_hud::acquire_game_events(
 				r.emit_particles_on_ring = false;
 				const auto minimum_spawn_radius = std::min(r.outer_radius_start_value, r.outer_radius_end_value);
 				const auto maximum_spawn_radius = std::max(r.outer_radius_start_value, r.outer_radius_end_value);
-				const auto spawn_radius_width = (maximum_spawn_radius - minimum_spawn_radius)/2;
+				const auto spawn_radius_width = (maximum_spawn_radius - minimum_spawn_radius)/2.4;
 
 				const unsigned max_particles_to_spawn = 160;
 				const auto& smokes_emission = get_resource_manager().find(assets::particle_effect_id::CAST_SPARKLES)->at(0);

@@ -1,4 +1,6 @@
 #pragma once
+#include <iosfwd>
+
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/is_component_synchronized.h"
 #include "augs/templates/type_in_pack.h"
@@ -184,6 +186,8 @@ public:
 	{
 
 	}
+
+	friend std::ostream& operator<<(std::ostream& out, const basic_entity_handle &x);
 
 	entity_id get_id() const {
 		return raw_id;

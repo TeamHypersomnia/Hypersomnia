@@ -20,6 +20,14 @@
 #include "game/detail/inventory_slot_handle.h"
 #include "game/detail/gui/gui_positioning.h"
 
+std::ostream& operator<<(std::ostream& out, const entity_handle &x) {
+	return out << typesafe_sprintf("%x %x", x.get_debug_name(), x.get_id());
+}
+
+std::ostream& operator<<(std::ostream& out, const const_entity_handle &x) {
+	return out << typesafe_sprintf("%x %x", x.get_debug_name(), x.get_id());
+}
+
 template <bool C>
 template <bool, class>
 void basic_entity_handle<C>::add_standard_components() const {

@@ -325,7 +325,7 @@ entity_handle cosmos::clone_entity(const entity_id copied_entity_id) {
 void cosmos::delete_entity(const entity_id e) {
 	const auto handle = get_handle(e);
 	if (handle.dead()) {
-		LOG("Warning! Attempt to delete a dead entity: %x", e);
+		LOG("Warning! Attempt to delete a dead entity: %x", handle);
 		return;
 	}
 

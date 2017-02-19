@@ -1,5 +1,5 @@
 #pragma once
-#include <sstream>
+#include <iosfwd>
 
 namespace augs {
 	class raw_pool_id {

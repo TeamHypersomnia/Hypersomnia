@@ -2,6 +2,7 @@
 #include "pool_id.h"
 #include "augs/ensure.h"
 #include <cstring>
+#include <sstream>
 
 namespace augs {
 	std::ostream& operator<<(std::ostream& out, const augs::raw_pool_id &x) {
