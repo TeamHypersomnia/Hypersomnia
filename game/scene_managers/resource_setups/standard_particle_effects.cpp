@@ -249,11 +249,11 @@ namespace resource_setups {
 			em.rotation_speed = std::make_pair(0, 0);
 			em.particle_lifetime_ms = std::make_pair(1000, 1000);
 
-			em.randomize_spawn_point_within_circle_of_inner_radius = std::make_pair(30.f, 30.f);
-			em.randomize_spawn_point_within_circle_of_outer_radius = std::make_pair(200.f, 200.f);
+			em.randomize_spawn_point_within_circle_of_inner_radius = std::make_pair(180.f, 180.f);
+			em.randomize_spawn_point_within_circle_of_outer_radius = std::make_pair(220.f, 220.f);
 
 			const auto& anim = *get_resource_manager().find(assets::animation_id::CAST_BLINK_ANIMATION);
-			const auto frame_duration = anim.frames[0].duration_milliseconds / 2.f;
+			const auto frame_duration = anim.frames[0].duration_milliseconds / 4.f;
 
 			for (int i = 0; i < anim.frames.size() - 1; ++i)
 			{
@@ -267,24 +267,26 @@ namespace resource_setups {
 
 				em.add_particle_template(particle_template);
 			}
+
+			for (int i = 0; i < 7 - 1; ++i)
 			{
+				homing_animated_particle particle_template;
 
-			homing_animated_particle particle_template;
+				particle_template.linear_damping = 0;
+				particle_template.first_face = static_cast<assets::texture_id>(static_cast<int>(assets::texture_id::BLINK_FIRST) + i);
+				particle_template.frame_count = 7 - i;
+				particle_template.frame_duration_ms = frame_duration;
+				particle_template.color = white;
 
-			particle_template.linear_damping = 0;
-			particle_template.first_face = assets::texture_id::BLINK_FIRST;
-			particle_template.frame_count = 1;
-			particle_template.frame_duration_ms = 700.f;
-			particle_template.color = white;
-
-			em.add_particle_template(particle_template);
+				em.add_particle_template(particle_template);
 			}
+
 			{
 
 			homing_animated_particle particle_template;
 
 			particle_template.linear_damping = 0;
-			particle_template.first_face = static_cast<assets::texture_id>(static_cast<int>(assets::texture_id::BLINK_FIRST) + 1);
+			particle_template.first_face = static_cast<assets::texture_id>(static_cast<int>(assets::texture_id::BLINK_FIRST) + 2);
 			particle_template.frame_count = 1;
 			particle_template.frame_duration_ms = 700.f;
 			particle_template.color = white;

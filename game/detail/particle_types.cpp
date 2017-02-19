@@ -147,7 +147,7 @@ void homing_animated_particle::integrate(const float dt, const vec2 homing_targe
 		std::swap(dirs[0], dirs[1]);
 	}
 
-	vel += dirs[0].set_length(sqrt(sqrt(homing_vector.length()))) * dt * 4000;
+	vel += dirs[0].set_length(sqrt(sqrt(homing_vector.length()))) * dt * 3000;
 
 	integrate_pos_vel_acc_damp_life(*this, dt);
 }

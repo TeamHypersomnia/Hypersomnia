@@ -37,6 +37,9 @@ namespace assets {
 		EXPLOSION,
 		GREAT_EXPLOSION,
 
+		COLLISION_METAL_WOOD,
+		COLLISION_METAL_METAL,
+
 		COUNT
 	};
 }
