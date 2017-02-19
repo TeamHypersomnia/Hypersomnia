@@ -21,6 +21,9 @@ namespace resources {
 		if (m.scale_lifetimes != 1.f) {
 			particle_lifetime_ms.first *= m.scale_lifetimes;
 			particle_lifetime_ms.second *= m.scale_lifetimes;
+
+			stream_lifetime_ms.first *= m.scale_lifetimes;
+			stream_lifetime_ms.second *= m.scale_lifetimes;
 		}
 	}
 }

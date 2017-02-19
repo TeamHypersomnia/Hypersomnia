@@ -213,6 +213,17 @@ void perform_spell_logic(
 
 		particles_existence_system().create_particle_effect_entity(cosmos, burst).add_standard_components();
 	};
+
+	const auto ignite_charging_particles = [&]() {
+		messages::create_particle_effect burst;
+		burst.subject = caster;
+		burst.place_of_birth = caster_transform;
+		burst.input.effect = assets::particle_effect_id::CAST_CHARGING;
+		burst.input.modifier.colorize = appearance.border_col;
+		burst.input.modifier.scale_lifetimes = 1.3f;
+
+		particles_existence_system().create_particle_effect_entity(cosmos, burst).add_standard_components();
+	};
 	
 	const auto play_sound = [&](const assets::sound_buffer_id effect, const float gain = 1.f) {
 		components::sound_existence::effect_input in;

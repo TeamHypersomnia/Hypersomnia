@@ -1,5 +1,8 @@
 #pragma once
-#include <tuple>
+namespace std {
+	template <class...>
+	class tuple;
+}
 
 namespace templates_detail
 {
@@ -25,26 +28,42 @@ namespace templates_detail
 	}
 }
 
-template<typename... Ts, typename F>
-void for_each_in_tuple(const std::tuple<Ts...>& t, F f)
+template<
+	template<typename...> class List,
+	typename... Ts, 
+	typename F
+>
+void for_each_in_tuple(const List<Ts...>& t, F f)
 {
 	templates_detail::for_each(t, f, templates_detail::gen_seq<sizeof...(Ts)>());
 }
 
-template<typename... Ts, typename F>
-void for_each_in_tuple(std::tuple<Ts...>& t, F f)
+template<
+	template<typename...> class List,
+	typename... Ts,
+	typename F
+>
+void for_each_in_tuple(List<Ts...>& t, F f)
 {
 	templates_detail::for_each(t, f, templates_detail::gen_seq<sizeof...(Ts)>());
 }
 
-template<typename... Ts, typename F>
-void for_each_in_tuples(const std::tuple<Ts...>& t, const std::tuple<Ts...>& b, F f)
+template<
+	template<typename...> class List,
+	typename... Ts,
+	typename F
+>
+void for_each_in_tuples(const List<Ts...>& t, const List<Ts...>& b, F f)
 {
 	templates_detail::for_eaches(t, b, f, templates_detail::gen_seq<sizeof...(Ts)>());
 }
 
-template<typename... Ts, typename F>
-void for_each_in_tuples(std::tuple<Ts...>& t, std::tuple<Ts...>& b, F f)
+template<
+	template<typename...> class List,
+	typename... Ts,
+	typename F
+>
+void for_each_in_tuples(List<Ts...>& t, List<Ts...>& b, F f)
 {
 	templates_detail::for_eaches(t, b, f, templates_detail::gen_seq<sizeof...(Ts)>());
 }

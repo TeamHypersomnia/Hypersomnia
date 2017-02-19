@@ -1,3 +1,4 @@
+#include <tuple>
 #include "root_of_inventory_gui.h"
 
 root_of_inventory_gui::root_of_inventory_gui(const vec2 screen_size) {

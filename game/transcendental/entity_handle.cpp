@@ -40,18 +40,25 @@ void basic_entity_handle<C>::add_standard_components() const {
 		ensure(!has_transform);
 	}
 
-	if (!has<components::interpolation>() && 
-		(has_physics || has<components::crosshair>() || has<components::position_copying>())
-		) {
+	if (!has<components::interpolation>() 
+		&& (
+			has_physics 
+			|| has<components::crosshair>() 
+			|| has<components::position_copying>()
+		)
+	) {
 		add(components::interpolation());
 		get<components::interpolation>().place_of_birth = get_logic_transform();
 	}
 
-	if ((has<components::render>() 
+	if ((
+		has<components::render>() 
 		|| has<components::particles_existence>()
 		//|| has<components::sound_existence>()
 		)
-		&& !is_entity_physical(*this) && !has<components::dynamic_tree_node>()) {
+		&& !is_entity_physical(*this) 
+		&& !has<components::dynamic_tree_node>()
+	) {
 		add(components::dynamic_tree_node::get_default(*this));
 	}
 

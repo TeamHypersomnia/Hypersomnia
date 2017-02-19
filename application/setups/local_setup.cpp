@@ -16,6 +16,7 @@
 #include "game/transcendental/step.h"
 #include "game/transcendental/cosmic_movie_director.h"
 #include "game/transcendental/types_specification/all_messages_includes.h"
+#include "game/transcendental/data_living_one_step.h"
 
 #include "augs/misc/debug_entropy_player.h"
 

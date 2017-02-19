@@ -6,7 +6,7 @@ namespace augs {
 	template <class... components>
 	class component_aggregate {
 	public:
-		typedef tuple_of_t<make_pool_id, components...> component_id_tuple;
+		typedef trivial_tuple_of_t<make_pool_id, components...> component_id_tuple;
 
 		component_id_tuple component_ids;
 

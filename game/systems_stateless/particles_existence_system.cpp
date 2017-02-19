@@ -215,8 +215,8 @@ entity_handle particles_existence_system::create_particle_effect_entity(cosmos& 
 	existence.current_displacement_duration_bound_ms = 0;
 
 	const float duration_ms = (*std::max_element((*it.input.effect).begin(), (*it.input.effect).end(), [](const auto& a, const auto& b) {
-		return a.stream_duration_ms.second < b.stream_duration_ms.second;
-	})).stream_duration_ms.second;
+		return a.stream_lifetime_ms.second < b.stream_lifetime_ms.second;
+	})).stream_lifetime_ms.second;
 
 	existence.max_lifetime_in_steps = static_cast<unsigned>(duration_ms / cosmos.get_fixed_delta().in_milliseconds()) + 1u;
 	

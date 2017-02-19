@@ -32,9 +32,9 @@ namespace resources {
 		minmax spread_degrees = minmax(0.f, 0.f);
 		minmax base_speed = minmax(0.f, 0.f);
 		minmax base_speed_variation = minmax(0.f, 0.f);
-		minmax angular_velocity = minmax(0.f, 0.f);
+		minmax rotation_speed = minmax(0.f, 0.f);
 		minmax particles_per_sec = minmax(0.f, 0.f);
-		minmax stream_duration_ms = minmax(0.f, 0.f);
+		minmax stream_lifetime_ms = minmax(0.f, 0.f);
 		minmax particle_lifetime_ms = minmax(0.f, 0.f);
 		minmax size_multiplier = minmax(0.f, 0.f);
 		minmax acceleration = minmax(0.f, 0.f);
@@ -49,12 +49,11 @@ namespace resources {
 		minmax swing_speed_change_rate = minmax(0.f, 0.f);
 		minmax fade_when_ms_remaining = minmax(0.f, 0.f);
 		minmax num_of_particles_to_spawn_initially = minmax(0.f, 0.f);
+		minmax randomize_spawn_point_within_circle_of_radius = minmax(0.f, 0.f);
 		
 		float initial_rotation_variation = 0.f;
 		bool randomize_acceleration = false;
 		bool should_particles_look_towards_velocity = true;
-
-		vec2 offset;
 
 		put_all_particle_types_into_t<make_vector> particle_templates;
 
@@ -81,9 +80,9 @@ namespace resources {
 				CEREAL_NVP(type),
 				CEREAL_NVP(spread_degrees),
 				CEREAL_NVP(velocity),
-				CEREAL_NVP(angular_velocity),
+				CEREAL_NVP(rotation_speed),
 				CEREAL_NVP(particles_per_sec),
-				CEREAL_NVP(stream_duration_ms),
+				CEREAL_NVP(stream_lifetime_ms),
 				CEREAL_NVP(particle_lifetime_ms),
 				CEREAL_NVP(size_multiplier),
 				CEREAL_NVP(acceleration),
@@ -101,8 +100,6 @@ namespace resources {
 
 				CEREAL_NVP(initial_rotation_variation),
 				CEREAL_NVP(randomize_acceleration),
-
-				CEREAL_NVP(offset),
 
 				CEREAL_NVP(particle_templates),
 				CEREAL_NVP(particle_render_template)

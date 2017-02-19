@@ -7,6 +7,7 @@
 #include "game/messages/visibility_information.h"
 #include "game/detail/entity_scripts.h"
 #include "game/detail/position_scripts.h"
+#include "game/transcendental/data_living_one_step.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/step.h"

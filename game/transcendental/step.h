@@ -6,7 +6,6 @@
 #include "game/detail/visible_entities.h"
 
 #include "augs/templates/maybe_const.h"
-#include "game/transcendental/data_living_one_step.h"
 #include "game/transcendental/game_drawing_settings.h"
 
 class cosmos;

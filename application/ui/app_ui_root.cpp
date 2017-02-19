@@ -1,3 +1,4 @@
+#include <tuple>
 #include "app_ui_root.h"
 
 app_ui_root::app_ui_root(const vec2i screen_size) {

@@ -3,6 +3,7 @@
 #include "game/components/sprite_component.h"
 #include "game/detail/particle_types_declaration.h"
 #include "augs/graphics/pixel.h"
+#include "game/transcendental/entity_id.h"
 
 struct general_particle {
 	vec2 pos;
@@ -65,6 +66,35 @@ struct animated_particle {
 	rgba color;
 	float frame_duration_ms;
 	unsigned frame_count = 0;
+
+	void integrate(const float dt);
+	void draw(components::sprite::drawing_input basic_input) const;
+	bool is_dead() const;
+
+	void set_position(const vec2);
+	void set_velocity(const vec2);
+	void set_acceleration(const vec2);
+	void multiply_size(const float);
+	void set_rotation(const float);
+	void set_rotation_speed(const float);
+	void set_max_lifetime_ms(const float);
+	void colorize(const rgba);
+};
+
+struct homing_animated_particle {
+	vec2 pos;
+	vec2 vel;
+	vec2 acc;
+
+	float linear_damping = 0.f;
+	float lifetime_ms = 0.f;
+
+	assets::texture_id last_face = assets::texture_id::INVALID;
+	rgba color;
+	float frame_duration_ms;
+	unsigned frame_count = 0;
+	
+	entity_id target;
 
 	void integrate(const float dt);
 	void draw(components::sprite::drawing_input basic_input) const;

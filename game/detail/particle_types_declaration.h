@@ -3,12 +3,14 @@
 
 struct general_particle;
 struct animated_particle;
+struct homing_animated_particle;
 
 template<template<typename> class Mod>
 struct put_all_particle_types_into {
 	typedef tuple_of_t<Mod,
 		general_particle,
-		animated_particle
+		animated_particle,
+		homing_animated_particle
 	> type;
 };
 

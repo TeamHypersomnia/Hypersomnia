@@ -43,7 +43,7 @@ namespace augs {
 			const bool failed_to_find_polymorphic_candidate = true;
 			ensure(!failed_to_find_polymorphic_candidate);
 
-			return f(get<nth_type_in_t<0, Types...>>());
+			return f(get<nth_type_in_pack_t<0, Types...>>());
 		}
 
 		template<class L>
@@ -51,7 +51,7 @@ namespace augs {
 			const bool failed_to_find_polymorphic_candidate = true;
 			ensure(!failed_to_find_polymorphic_candidate);
 
-			return f(get<nth_type_in_t<0, Types...>>());
+			return f(get<nth_type_in_pack_t<0, Types...>>());
 		}
 
 		template<class L, class Head, class... Tail>

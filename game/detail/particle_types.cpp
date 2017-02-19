@@ -1,14 +1,20 @@
 #include "particle_types.h"
 
+template <class T>
+inline void integrate_pos_vel_acc_damp_life(T& p, const float dt) {
+	p.vel += p.acc * dt;
+	p.pos += p.vel * dt;
+	
+	p.vel.damp(p.linear_damping * dt);
+
+	p.lifetime_ms += dt * 1000.f;
+}
+
 void general_particle::integrate(const float dt) {
-	vel += acc * dt;
-	pos += vel * dt;
+	integrate_pos_vel_acc_damp_life(*this, dt);
 	rotation += rotation_speed * dt;
 
-	vel.damp(linear_damping * dt);
 	augs::damp(rotation_speed, angular_damping * dt);
-
-	lifetime_ms += dt * 1000.f;
 }
 
 bool general_particle::is_dead() const {
@@ -80,12 +86,7 @@ void general_particle::colorize(const rgba mult) {
 }
 
 void animated_particle::integrate(const float dt) {
-	vel += acc * dt;
-	pos += vel * dt;
-
-	vel.damp(linear_damping * dt);
-
-	lifetime_ms += dt * 1000.f;
+	integrate_pos_vel_acc_damp_life(*this, dt);
 }
 
 void animated_particle::draw(components::sprite::drawing_input basic_input) const {
@@ -132,5 +133,56 @@ void animated_particle::set_max_lifetime_ms(const float new_max_lifetime_ms) {
 }
 
 void animated_particle::colorize(const rgba mult) {
+	color *= mult;
+}
+
+void homing_animated_particle::integrate(const float dt) {
+	integrate_pos_vel_acc_damp_life(*this, dt);
+}
+
+void homing_animated_particle::draw(components::sprite::drawing_input basic_input) const {
+	static thread_local components::sprite face;
+	const auto frame_num = std::min(static_cast<unsigned>(lifetime_ms / frame_duration_ms), frame_count);
+
+	face.set(static_cast<assets::texture_id>(static_cast<int>(last_face) - frame_num));
+
+	basic_input.renderable_transform = { pos, 0 };
+	face.color = color;
+	face.draw(basic_input);
+}
+
+bool homing_animated_particle::is_dead() const {
+	return lifetime_ms >= frame_duration_ms * frame_count;
+}
+
+void homing_animated_particle::set_position(const vec2 new_pos) {
+	pos = new_pos;
+}
+
+void homing_animated_particle::set_velocity(const vec2 new_vel) {
+	vel = new_vel;
+}
+
+void homing_animated_particle::set_acceleration(const vec2 new_acc) {
+	acc = new_acc;
+}
+
+void homing_animated_particle::multiply_size(const float mult) {
+
+}
+
+void homing_animated_particle::set_rotation(const float new_rotation) {
+
+}
+
+void homing_animated_particle::set_rotation_speed(const float new_rotation_speed) {
+
+}
+
+void homing_animated_particle::set_max_lifetime_ms(const float new_max_lifetime_ms) {
+
+}
+
+void homing_animated_particle::colorize(const rgba mult) {
 	color *= mult;
 }

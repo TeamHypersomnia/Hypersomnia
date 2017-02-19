@@ -46,6 +46,8 @@ public:
 		float swing_spread_change = 0.f;
 		float swing_speed_change = 0.f;
 
+		float randomize_spawn_point_within_circle_of_radius = 0.f;
+
 		augs::minmax<float> particle_speed;
 
 		float fade_when_ms_remaining = 0.f;
@@ -131,7 +133,7 @@ public:
 		const auto new_velocity = vec2().set_from_degrees(velocity_degrees) * rng.randval(speed);
 		
 		new_particle.set_velocity(new_velocity);
-		new_particle.set_position(position + emission.offset);
+		new_particle.set_position(position);
 		new_particle.multiply_size(rng.randval(emission.size_multiplier));
 		
 		if (emission.should_particles_look_towards_velocity) {
@@ -141,7 +143,7 @@ public:
 			new_particle.set_rotation(rng.randval(emission.initial_rotation_variation));
 		}
 
-		new_particle.set_rotation_speed(rng.randval(emission.angular_velocity));
+		new_particle.set_rotation_speed(rng.randval(emission.rotation_speed));
 		new_particle.set_max_lifetime_ms(rng.randval(emission.particle_lifetime_ms));
 
 		if (emission.randomize_acceleration) {

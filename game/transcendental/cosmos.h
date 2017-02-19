@@ -5,7 +5,6 @@
 #include "game/transcendental/cosmic_entropy.h"
 
 #include "augs/entity_system/operations_on_all_components_mixin.h"
-#include "augs/entity_system/storage_for_message_queues.h"
 #include "augs/entity_system/storage_for_systems.h"
 
 #include "game/transcendental/types_specification/all_components_declaration.h"
@@ -22,6 +21,7 @@
 #include "game/transcendental/entity_id.h"
 #include "game/detail/inventory_slot_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
+#include "game/transcendental/data_living_one_step.h"
 #include "game/detail/inventory_slot_handle_declaration.h"
 #include "game/detail/item_slot_transfer_request_declaration.h"
 #include "game/global/all_settings.h"

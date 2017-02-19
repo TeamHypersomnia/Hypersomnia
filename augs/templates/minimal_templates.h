@@ -10,12 +10,12 @@ namespace templates_detail {
 		typedef _Ty value_type;
 		typedef integral_constant<_Ty, _Val> type;
 
-		constexpr operator value_type() const _NOEXCEPT
+		constexpr operator value_type() const
 		{	// return stored value
 			return (value);
 		}
 
-		constexpr value_type operator()() const _NOEXCEPT
+		constexpr value_type operator()() const
 		{	// return stored value
 			return (value);
 		}

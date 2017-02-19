@@ -1,3 +1,4 @@
+#include <tuple>
 #include "augs/templates/type_in_pack.h"
 #include "augs/templates/for_each_in_types.h"
 #include "cosmic_delta.h"
@@ -104,7 +105,7 @@ bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 			if (std::is_same<component_type, components::guid>::value)
 				return;
 
-			constexpr size_t idx = index_in_tuple<encoded_id_type, decltype(agg.component_ids)>::value;
+			constexpr size_t idx = index_in_list<encoded_id_type, decltype(agg.component_ids)>::value;
 
 			const auto base_c = base.get_component_pool<component_type>()[base_id];
 			const auto enco_c = enco.get_component_pool<component_type>()[enco_id];
@@ -271,7 +272,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 			if (std::is_same<component_type, components::guid>::value)
 				return;
 
-			constexpr size_t idx = index_in_tuple<encoded_id_type, decltype(agg.component_ids)>::value;
+			constexpr size_t idx = index_in_list<encoded_id_type, decltype(agg.component_ids)>::value;
 			
 			if (overridden_components[idx]) {
 				component_type decoded_component;
@@ -311,7 +312,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 			if (std::is_same<component_type, components::guid>::value)
 				return;
 
-			constexpr size_t idx = index_in_tuple<encoded_id_type, decltype(agg.component_ids)>::value;
+			constexpr size_t idx = index_in_list<encoded_id_type, decltype(agg.component_ids)>::value;
 
 			if (overridden_components[idx]) {
 				const auto deco_c = deco.get_component_pool<component_type>()[deco_id];

@@ -20,26 +20,6 @@ struct is_memcpy_safe<std::tuple<>> {
 	static const bool value = true;
 };
 
-namespace augs {
-	template <class... Args>
-	class component_aggregate;
-}
-
-template <class... Args>
-struct is_memcpy_safe<augs::component_aggregate<Args...>> {
-	static const bool value = true;
-};
-
-template <class T, class... Args>
-struct is_memcpy_safe<std::tuple<T, Args...>> {
-	static const bool value = is_memcpy_safe<T>::value && is_memcpy_safe<std::tuple<Args...>>::value;
-};
-
-template <class A, class B>
-struct is_memcpy_safe<std::pair<A, B>> {
-	static const bool value = is_memcpy_safe<A>::value && is_memcpy_safe<B>::value;
-};
-
 template <class... Head>
 struct are_types_memcpy_safe;
 

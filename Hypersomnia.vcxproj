@@ -1089,6 +1089,7 @@
     <ClInclude Include="augs\misc\templated_readwrite.h" />
     <ClInclude Include="augs\misc\time_utils.h" />
     <ClInclude Include="augs\misc\trivial_pair.h" />
+    <ClInclude Include="augs\misc\trivial_tuple.h" />
     <ClInclude Include="augs\misc\trivial_variant.h" />
     <ClInclude Include="augs\network\network_client.h" />
     <ClInclude Include="augs\network\network_types.h" />

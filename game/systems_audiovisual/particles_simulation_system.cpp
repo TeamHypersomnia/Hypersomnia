@@ -101,33 +101,34 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 				emission.apply_modifier(existence.input.modifier);
 
 				cache.emission_instances.push_back(emission_instance());
-				auto& target_stream = *cache.emission_instances.rbegin();
+				auto& new_emission_instance = *cache.emission_instances.rbegin();
 
 				const auto var_v = rng.randval(emission.base_speed_variation);
 				//LOG("V: %x", var_v);
-				target_stream.particle_speed.set(std::max(0.f, emission.base_speed.first - var_v / 2), emission.base_speed.second + var_v / 2);
-				//LOG("Vl: %x Vu: %x", target_stream.velocity.first, target_stream.velocity.second);
+				new_emission_instance.particle_speed.set(std::max(0.f, emission.base_speed.first - var_v / 2), emission.base_speed.second + var_v / 2);
+				//LOG("Vl: %x Vu: %x", new_emission_instance.velocity.first, new_emission_instance.velocity.second);
 
-				target_stream.stream_info = emission;
-				target_stream.enable_streaming = true;
-				target_stream.stream_lifetime_ms = 0.f;
-				target_stream.angular_offset = rng.randval(emission.angular_offset);
-				target_stream.target_spread = rng.randval(emission.spread_degrees);
-				target_stream.target_particles_per_sec = rng.randval(emission.particles_per_sec);
-				target_stream.swing_spread = rng.randval(emission.swing_spread);
-				target_stream.swings_per_sec = rng.randval(emission.swings_per_sec);
+				new_emission_instance.stream_info = emission;
+				new_emission_instance.enable_streaming = true;
+				new_emission_instance.stream_lifetime_ms = 0.f;
+				new_emission_instance.angular_offset = rng.randval(emission.angular_offset);
+				new_emission_instance.target_spread = rng.randval(emission.spread_degrees);
+				new_emission_instance.target_particles_per_sec = rng.randval(emission.particles_per_sec);
+				new_emission_instance.swing_spread = rng.randval(emission.swing_spread);
+				new_emission_instance.swings_per_sec = rng.randval(emission.swings_per_sec);
 
-				target_stream.min_swing_spread = rng.randval(emission.min_swing_spread);
-				target_stream.min_swings_per_sec = rng.randval(emission.min_swings_per_sec);
-				target_stream.max_swing_spread = rng.randval(emission.max_swing_spread);
-				target_stream.max_swings_per_sec = rng.randval(emission.max_swings_per_sec);
+				new_emission_instance.min_swing_spread = rng.randval(emission.min_swing_spread);
+				new_emission_instance.min_swings_per_sec = rng.randval(emission.min_swings_per_sec);
+				new_emission_instance.max_swing_spread = rng.randval(emission.max_swing_spread);
+				new_emission_instance.max_swings_per_sec = rng.randval(emission.max_swings_per_sec);
 
-				target_stream.stream_max_lifetime_ms = rng.randval(emission.stream_duration_ms);
-				target_stream.stream_particles_to_spawn = rng.randval(emission.num_of_particles_to_spawn_initially);
-				target_stream.swing_speed_change = rng.randval(emission.swing_speed_change_rate);
-				target_stream.swing_spread_change = rng.randval(emission.swing_spread_change_rate);
+				new_emission_instance.stream_max_lifetime_ms = rng.randval(emission.stream_lifetime_ms);
+				new_emission_instance.stream_particles_to_spawn = rng.randval(emission.num_of_particles_to_spawn_initially);
+				new_emission_instance.swing_speed_change = rng.randval(emission.swing_speed_change_rate);
+				new_emission_instance.swing_spread_change = rng.randval(emission.swing_spread_change_rate);
 
-				target_stream.fade_when_ms_remaining = rng.randval(emission.fade_when_ms_remaining);
+				new_emission_instance.fade_when_ms_remaining = rng.randval(emission.fade_when_ms_remaining);
+				new_emission_instance.randomize_spawn_point_within_circle_of_radius = rng.randval(emission.randomize_spawn_point_within_circle_of_radius);
 			}
 		}
 
@@ -174,12 +175,13 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 						const float time_elapsed = (1.f - t) * delta.in_seconds();
 
 						const vec2 segment_position = augs::interp(segment_A, segment_B, rng.randval(0.f, 1.f));
+						const vec2 circle_offset = rng.random_point_in_circle(instance.randomize_spawn_point_within_circle_of_radius);
 
 						spawn_particle<spawned_particle_type>(
 							rng,
 							instance.angular_offset,
 							instance.particle_speed,
-							segment_position,
+							segment_position + circle_offset,
 							transform.rotation + instance.swing_spread * static_cast<float>(sin((instance.stream_lifetime_ms / 1000.f) * 2 * PI_f * instance.swings_per_sec)),
 							instance.target_spread,
 							instance.stream_info

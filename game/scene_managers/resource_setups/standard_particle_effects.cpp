@@ -23,12 +23,12 @@ namespace resource_setups {
 
 			em.spread_degrees.set(7, 7);
 			em.particles_per_sec.set(40, 50);
-			em.stream_duration_ms.set(3000000, 3000000);
+			em.stream_lifetime_ms.set(3000000, 3000000);
 			
 			em.base_speed.set(200, 300);
 			em.base_speed_variation = std::make_pair(5.f, 10.f);
 
-			em.angular_velocity = std::make_pair(1.5f*RAD_TO_DEGf, 2.3f*RAD_TO_DEGf);
+			em.rotation_speed = std::make_pair(1.5f*RAD_TO_DEGf, 2.3f*RAD_TO_DEGf);
 			em.particle_lifetime_ms = std::make_pair(5000, 5000);
 
 			for (int i = 0; i < 3; ++i) {
@@ -66,12 +66,12 @@ namespace resource_setups {
 
 				em.spread_degrees = std::make_pair(7, 7);
 				em.particles_per_sec.set(80 / 4.5, 80 / 4.5);
-				em.stream_duration_ms = std::make_pair(3000000, 3000000);
+				em.stream_lifetime_ms = std::make_pair(3000000, 3000000);
 
 				em.base_speed = std::make_pair(100, 110);
 				em.base_speed_variation = std::make_pair(5.f, 10.f);
 
-				em.angular_velocity = std::make_pair(2.5f*RAD_TO_DEGf, 2.8f*RAD_TO_DEGf);
+				em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEGf, 2.8f*RAD_TO_DEGf);
 				em.particle_lifetime_ms = std::make_pair(2500 * 1.5, 2500 * 1.5);
 
 				for (int i = 0; i < 3; ++i) {
@@ -106,9 +106,9 @@ namespace resource_setups {
 				//
 				//em.spread_degrees = std::make_pair(6, 6);
 				em.particles_per_sec = std::make_pair(500, 500);
-				em.stream_duration_ms = std::make_pair(3000000, 3000000);
+				em.stream_lifetime_ms = std::make_pair(3000000, 3000000);
 				em.base_speed = std::make_pair(10, 100);
-				em.angular_velocity = std::make_pair(0, 0);
+				em.rotation_speed = std::make_pair(0, 0);
 				em.particle_lifetime_ms = std::make_pair(40, 100);
 
 				//for (int i = 0; i < 6; ++i) {
@@ -153,11 +153,11 @@ namespace resource_setups {
 
 				em.spread_degrees = std::make_pair(7, 7);
 				em.particles_per_sec.set(40, 40);
-				em.stream_duration_ms = std::make_pair(3000000, 3000000);
+				em.stream_lifetime_ms = std::make_pair(3000000, 3000000);
 
 				em.base_speed = std::make_pair(20, 820);
 
-				em.angular_velocity = std::make_pair(2.5f*RAD_TO_DEGf, 2.8f*RAD_TO_DEGf);
+				em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEGf, 2.8f*RAD_TO_DEGf);
 				em.particle_lifetime_ms = std::make_pair(1500, 1500);
 
 				for (int i = 0; i < 3; ++i) {
@@ -196,12 +196,12 @@ namespace resource_setups {
 
 				em.spread_degrees = std::make_pair(360, 360);
 				em.num_of_particles_to_spawn_initially.set(150, 170);
-				em.stream_duration_ms = std::make_pair(0, 0);
+				em.stream_lifetime_ms = std::make_pair(0, 0);
 
 				em.base_speed = std::make_pair(350, 400);
 				em.base_speed_variation = std::make_pair(100.f, 120.f);
 
-				em.angular_velocity = std::make_pair(2.5f*RAD_TO_DEGf, 2.8f*RAD_TO_DEGf);
+				em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEGf, 2.8f*RAD_TO_DEGf);
 				em.particle_lifetime_ms = std::make_pair(900, 900);
 
 				for (int i = 0; i < 3; ++i) {
@@ -224,6 +224,48 @@ namespace resource_setups {
 			}
 		}
 
+
+		{
+			auto& effect = get_resource_manager().create(assets::particle_effect_id::CAST_CHARGING);
+
+			resources::emission em;
+			em.min_swing_spread.set(0.5, 1);
+			em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+			em.max_swing_spread.set(10 / 2, 10 / 2);
+			em.max_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+
+			em.swing_spread.set(0, 0);
+			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
+			em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
+
+			em.spread_degrees = std::make_pair(360, 360);
+			em.num_of_particles_to_spawn_initially.set(0, 0);
+			em.stream_lifetime_ms = std::make_pair(1000, 1000);
+
+			em.base_speed = std::make_pair(120, 600);
+			em.base_speed_variation = std::make_pair(10.f, 20.f);
+
+			em.rotation_speed = std::make_pair(0, 0);
+			em.particle_lifetime_ms = std::make_pair(1000, 1000);
+
+			const auto& anim = *get_resource_manager().find(assets::animation_id::CAST_BLINK_ANIMATION);
+			const auto frame_duration = anim.frames[0].duration_milliseconds / 2.f;
+
+			for (int i = 0; i < anim.frames.size() - 1; ++i)
+			{
+				animated_particle particle_template;
+
+				particle_template.linear_damping = 1000;
+				particle_template.first_face = static_cast<assets::texture_id>(static_cast<int>((*anim.frames.rbegin()).sprite.tex) - i);
+				particle_template.frame_count = anim.frames.size() - i;
+				particle_template.frame_duration_ms = frame_duration;
+				particle_template.acc.set(900, -900);
+				particle_template.color = white;
+
+				em.add_particle_template(particle_template);
+			}
+		}
+
 		{
 			auto& effect = get_resource_manager().create(assets::particle_effect_id::CAST_SPARKLES);
 
@@ -240,12 +282,12 @@ namespace resource_setups {
 
 				em.spread_degrees = std::make_pair(360, 360);
 				em.num_of_particles_to_spawn_initially.set(150, 170);
-				em.stream_duration_ms = std::make_pair(0, 0);
+				em.stream_lifetime_ms = std::make_pair(0, 0);
 
 				em.base_speed = std::make_pair(350, 400);
 				em.base_speed_variation = std::make_pair(100.f, 120.f);
 
-				em.angular_velocity = std::make_pair(2.5f*RAD_TO_DEGf, 2.8f*RAD_TO_DEGf);
+				em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEGf, 2.8f*RAD_TO_DEGf);
 				em.particle_lifetime_ms = std::make_pair(900, 900);
 
 				for (int i = 0; i < 3; ++i) {
@@ -281,12 +323,12 @@ namespace resource_setups {
 
 				em.spread_degrees = std::make_pair(360, 360);
 				em.num_of_particles_to_spawn_initially.set(300, 340);
-				em.stream_duration_ms = std::make_pair(0, 0);
+				em.stream_lifetime_ms = std::make_pair(0, 0);
 
 				em.base_speed = std::make_pair(120, 600);
 				em.base_speed_variation = std::make_pair(10.f, 20.f);
 
-				em.angular_velocity = std::make_pair(0, 0);
+				em.rotation_speed = std::make_pair(0, 0);
 				em.particle_lifetime_ms = std::make_pair(200, 600);
 				
 				const auto& anim = *get_resource_manager().find(assets::animation_id::CAST_BLINK_ANIMATION);
@@ -367,12 +409,12 @@ namespace resource_setups {
 
 				em.spread_degrees = std::make_pair(360, 360);
 				em.num_of_particles_to_spawn_initially.set(30, 45);
-				em.stream_duration_ms = std::make_pair(0, 0);
+				em.stream_lifetime_ms = std::make_pair(0, 0);
 
 				em.base_speed = std::make_pair(150, 200);
 				em.base_speed_variation = std::make_pair(100.f, 120.f);
 
-				em.angular_velocity = std::make_pair(2.5f*RAD_TO_DEGf, 2.8f*RAD_TO_DEGf);
+				em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEGf, 2.8f*RAD_TO_DEGf);
 				em.particle_lifetime_ms = std::make_pair(900, 900);
 
 				for (int i = 0; i < 3; ++i) {
@@ -399,7 +441,7 @@ namespace resource_setups {
 				em.spread_degrees = std::make_pair(100, 130);
 				em.num_of_particles_to_spawn_initially = std::make_pair(30, 120);
 				em.base_speed = std::make_pair(250+200, 800+200);
-				em.angular_velocity = std::make_pair(0, 0);
+				em.rotation_speed = std::make_pair(0, 0);
 				em.particle_lifetime_ms = std::make_pair(30, 50);
 
 				for (int i = 0; i < 5; ++i) {
@@ -428,7 +470,7 @@ namespace resource_setups {
 			em.spread_degrees = std::make_pair(150, 360);
 			em.num_of_particles_to_spawn_initially = std::make_pair(30, 120);
 			em.base_speed = std::make_pair(10, 800);
-			em.angular_velocity = std::make_pair(0, 0);
+			em.rotation_speed = std::make_pair(0, 0);
 			em.particle_lifetime_ms = std::make_pair(1, 120);
 
 			for (int i = 0; i < 5; ++i) {
@@ -455,9 +497,9 @@ namespace resource_setups {
 			resources::emission em;
 			em.spread_degrees = std::make_pair(0, 1);
 			em.particles_per_sec = std::make_pair(70, 80);
-			em.stream_duration_ms = std::make_pair(300, 500);
+			em.stream_lifetime_ms = std::make_pair(300, 500);
 			em.base_speed = std::make_pair(30, 250);
-			em.angular_velocity = std::make_pair(0, 0);
+			em.rotation_speed = std::make_pair(0, 0);
 			em.particle_lifetime_ms = std::make_pair(500, 700);
 
 			for (int i = 0; i < 5; ++i) {
@@ -486,7 +528,7 @@ namespace resource_setups {
 			em.spread_degrees = std::make_pair(0, 10);
 			em.num_of_particles_to_spawn_initially = std::make_pair(30, 40);
 			em.base_speed = std::make_pair(350, 550);
-			em.angular_velocity = std::make_pair(0, 0);
+			em.rotation_speed = std::make_pair(0, 0);
 			em.particle_lifetime_ms = std::make_pair(200, 400);
 
 			for (int i = 0; i < 5; ++i) {
@@ -518,9 +560,9 @@ namespace resource_setups {
 			resources::emission em;
 			em.spread_degrees = std::make_pair(0, 1);
 			em.particles_per_sec = std::make_pair(50, 60);
-			em.stream_duration_ms = std::make_pair(450, 800);
+			em.stream_lifetime_ms = std::make_pair(450, 800);
 			em.base_speed = std::make_pair(4, 30);
-			em.angular_velocity = std::make_pair(0, 0);
+			em.rotation_speed = std::make_pair(0, 0);
 			em.particle_lifetime_ms = std::make_pair(300, 400);
 
 			for (int i = 0; i < 5; ++i) {
@@ -547,10 +589,10 @@ namespace resource_setups {
 			resources::emission em;
 			em.spread_degrees = std::make_pair(180, 180);
 			em.particles_per_sec = std::make_pair(5, 5);
-			em.stream_duration_ms = std::make_pair(3000, 3000);
+			em.stream_lifetime_ms = std::make_pair(3000, 3000);
 			em.num_of_particles_to_spawn_initially = std::make_pair(55, 55);
 			em.base_speed = std::make_pair(30, 70);
-			em.angular_velocity = std::make_pair(1.8, 1.8);
+			em.rotation_speed = std::make_pair(1.8, 1.8);
 			em.particle_lifetime_ms = std::make_pair(4000, 4000);
 
 			em.min_swing_spread = std::make_pair(2, 5);

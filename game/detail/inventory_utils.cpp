@@ -21,6 +21,7 @@
 #include "game/detail/gui/gui_positioning.h"
 
 #include "game/enums/entity_name.h"
+#include "game/transcendental/data_living_one_step.h"
 
 bool capability_comparison::is_legal() const {
 	return
