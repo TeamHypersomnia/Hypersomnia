@@ -394,9 +394,6 @@
     <ClCompile Include="game\enums\item_category.cpp" />
     <ClCompile Include="game\enums\item_transfer_result_type.cpp" />
     <ClCompile Include="game\resources\tile_layer.cpp" />
-    <ClCompile Include="game\scene_managers\rendering_scripts\draw_crosshair_lines.cpp" />
-    <ClCompile Include="game\scene_managers\rendering_scripts\draw_cast_spells_highlights.cpp" />
-    <ClCompile Include="game\scene_managers\rendering_scripts\illuminated_rendering.cpp" />
     <ClCompile Include="game\scene_managers\resource_setups\make_button_with_corners.cpp" />
     <ClCompile Include="game\scene_managers\resource_setups\standard_sound_buffers.cpp" />
     <ClCompile Include="game\scene_managers\resource_setups\standard_tile_layers.cpp" />
@@ -496,7 +493,6 @@
     <ClCompile Include="game\resources\manager.cpp" />
     <ClCompile Include="game\resources\particle_effect.cpp" />
     <ClCompile Include="game\scene_managers\one_entity.cpp" />
-    <ClCompile Include="game\scene_managers\rendering_scripts\standard_rendering.cpp" />
     <ClCompile Include="game\scene_managers\resource_setups\standard_atlas.cpp" />
     <ClCompile Include="game\scene_managers\resource_setups\standard_behaviour_trees.cpp" />
     <ClCompile Include="game\scene_managers\resource_setups\standard_everything.cpp" />
@@ -534,6 +530,10 @@
     <ClCompile Include="game\systems_temporary\physics_system.cpp" />
     <ClCompile Include="game\systems_temporary\processing_lists_system.cpp" />
     <ClCompile Include="application\setups\local_setup.cpp" />
+    <ClCompile Include="game\view\rendering_scripts\draw_cast_spells_highlights.cpp" />
+    <ClCompile Include="game\view\rendering_scripts\draw_crosshair_lines.cpp" />
+    <ClCompile Include="game\view\rendering_scripts\illuminated_rendering.cpp" />
+    <ClCompile Include="game\view\rendering_scripts\standard_rendering.cpp" />
     <ClCompile Include="game\view\viewing_session.cpp" />
     <ClCompile Include="game\view\viewing_step.cpp" />
     <ClCompile Include="game\view\world_camera.cpp" />
@@ -1380,7 +1380,6 @@
     <ClInclude Include="game\resources\manager.h" />
     <ClInclude Include="game\resources\particle_effect.h" />
     <ClInclude Include="game\resources\particle_effect_response.h" />
-    <ClInclude Include="game\scene_managers\rendering_scripts\all.h" />
     <ClInclude Include="game\scene_managers\resource_setups\all.h" />
     <ClInclude Include="game\scene_managers\testbed.h" />
     <ClInclude Include="game\detail\inventory_slot.h" />
@@ -1391,6 +1390,7 @@
     <ClInclude Include="game\types_specification\all_systems_declaration.h" />
     <ClInclude Include="application\web_daemon\session_report.h" />
     <ClInclude Include="game\view\game_drawing_settings.h" />
+    <ClInclude Include="game\view\rendering_scripts\all.h" />
     <ClInclude Include="game\view\viewing_session.h" />
     <ClInclude Include="game\view\viewing_step.h" />
     <ClInclude Include="game\view\world_camera.h" />
