@@ -24,6 +24,7 @@
 #include "augs/filesystem/file.h"
 #include "local_setup.h"
 #include "augs/tweaker.h"
+#include "game/detail/visible_entities.h"
 
 using namespace augs::window::event::keys;
 

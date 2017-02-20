@@ -10,7 +10,7 @@
 #include "game/detail/gui/character_gui.h"
 #include "game/resources/manager.h"
 #include "augs/graphics/renderer.h"
-#include "game/transcendental/step.h"
+#include "game/view/viewing_step.h"
 #include "game/transcendental/viewing_session.h"
 #include "game/components/item_slot_transfers_component.h"
 

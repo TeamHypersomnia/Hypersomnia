@@ -25,6 +25,7 @@
 
 #include "augs/misc/templated_readwrite.h"
 #include "client_setup.h"
+#include "game/detail/visible_entities.h"
 
 void client_setup::process(const config_lua_table& cfg, game_window& window) {
 	init(cfg, window);

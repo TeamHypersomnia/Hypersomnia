@@ -6,7 +6,7 @@
 #include "game/systems_stateless/gui_system.h"
 #include "game/components/sprite_component.h"
 #include "game/transcendental/viewing_session.h"
-#include "game/transcendental/step.h"
+#include "game/view/viewing_step.h"
 #include "game/transcendental/data_living_one_step.h"
 #include "game/components/sentience_component.h"
 #include "game/components/render_component.h"

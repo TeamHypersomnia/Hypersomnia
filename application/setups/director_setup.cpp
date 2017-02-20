@@ -18,6 +18,7 @@
 #include "game/transcendental/data_living_one_step.h"
 
 #include "augs/misc/debug_entropy_player.h"
+#include "game/detail/visible_entities.h"
 
 #include "augs/filesystem/file.h"
 #include "director_setup.h"

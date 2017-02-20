@@ -2,7 +2,7 @@
 #include "game/detail/gui/game_gui_element_location.h"
 #include "character_gui.h"
 
-#include "game/transcendental/step.h"
+#include "game/view/viewing_step.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/detail/gui/root_of_inventory_gui.h"

@@ -5,34 +5,45 @@
 #include "game/transcendental/types_specification/all_messages_includes.h"
 #include "game/transcendental/data_living_one_step.h"
 
-double viewing_step::get_interpolated_total_time_passed_in_seconds() const {
-	return cosm.get_total_time_passed_in_seconds(get_interpolation_ratio());
+template<bool C>
+basic_cosmic_step<C>::basic_cosmic_step(cosmos_ref cosm) 
+	: cosm(cosm)
+{
 }
 
-float viewing_step::get_interpolation_ratio() const {
-	return interpolation_ratio;
+template<bool C>
+typename basic_cosmic_step<C>::cosmos_ref basic_cosmic_step<C>::get_cosmos() const {
+	return cosm;
 }
 
-viewing_step::viewing_step(
-	const config_lua_table& config,
-	const cosmos& cosm,
-	const viewing_session& session,
-	const float interpolation_ratio,
-	augs::renderer& renderer, 
-	const camera_cone camera,
-	const entity_id viewed_character,
-	const visible_entities& visible
-) : 
-	const_cosmic_step(cosm),
-	config(config),
-	session(session),
-	interpolation_ratio(interpolation_ratio),
-	renderer(renderer), 
-	camera(camera),
-	viewed_character(viewed_character),
-	visible(visible) 
-{}
-
-vec2 viewing_step::get_screen_space(const vec2 pos) const {
-	return pos - camera.get_transformed_visible_world_area_aabb().get_position();
+template<bool C>
+basic_cosmic_step<C>::operator basic_cosmic_step<true>() const {
+	return{ cosm };
 }
+
+template<bool C>
+basic_logic_step<C>::basic_logic_step(
+	cosmos_ref cosm,
+	const cosmic_entropy& entropy,
+	data_living_one_step_ref transient
+) :
+	basic_cosmic_step(cosm),
+	entropy(entropy),
+	transient(transient)
+{
+}
+
+template<bool C>
+augs::delta basic_logic_step<C>::get_delta() const {
+	return cosm.get_fixed_delta();
+}
+
+template<bool C>
+basic_logic_step<C>::operator basic_logic_step<true>() const {
+	return { cosm, entropy, transient };
+}
+
+template class basic_cosmic_step<false>;
+template class basic_cosmic_step<true>;
+template class basic_logic_step<false>;
+template class basic_logic_step<true>;

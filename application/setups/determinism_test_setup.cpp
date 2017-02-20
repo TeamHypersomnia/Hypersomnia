@@ -22,6 +22,7 @@
 #include "determinism_test_setup.h"
 
 #include "augs/misc/templated_readwrite.h"
+#include "game/detail/visible_entities.h"
 
 void determinism_test_setup::process(
 	const config_lua_table& cfg, 

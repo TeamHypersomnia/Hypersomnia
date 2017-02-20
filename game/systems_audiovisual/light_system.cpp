@@ -1,6 +1,6 @@
 #include <array>
 #include "light_system.h"
-#include "game/transcendental/step.h"
+#include "game/view/viewing_step.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/viewing_session.h"

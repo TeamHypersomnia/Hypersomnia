@@ -41,6 +41,7 @@
 #include "augs/templates/string_templates.h"
 
 #include "augs/graphics/drawers.h"
+#include "game/detail/visible_entities.h"
 
 using namespace augs::window::event::keys;
 using namespace augs::gui::text;

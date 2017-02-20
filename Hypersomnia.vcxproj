@@ -535,6 +535,7 @@
     <ClCompile Include="game\systems_temporary\processing_lists_system.cpp" />
     <ClCompile Include="game\transcendental\viewing_session.cpp" />
     <ClCompile Include="application\setups\local_setup.cpp" />
+    <ClCompile Include="game\view\viewing_step.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="application\setups\server_setup.cpp" />
     <ClCompile Include="application\setups\setup_base.cpp" />
@@ -1389,6 +1390,7 @@
     <ClInclude Include="game\types_specification\all_messages_includes.h" />
     <ClInclude Include="game\types_specification\all_systems_declaration.h" />
     <ClInclude Include="application\web_daemon\session_report.h" />
+    <ClInclude Include="game\view\viewing_step.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="augs\global_libraries.h" />
     <ClInclude Include="augs\filesystem\dirent.h" />

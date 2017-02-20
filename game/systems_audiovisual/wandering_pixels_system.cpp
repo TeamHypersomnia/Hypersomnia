@@ -1,6 +1,6 @@
 #include "wandering_pixels_system.h"
 
-#include "game/transcendental/step.h"
+#include "game/detail/visible_entities.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 

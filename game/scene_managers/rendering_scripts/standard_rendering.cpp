@@ -12,7 +12,7 @@
 #include "game/systems_temporary/dynamic_tree_system.h"
 #include "game/resources/manager.h"
 #include "augs/graphics/renderer.h"
-#include "game/transcendental/step.h"
+#include "game/view/viewing_step.h"
 
 #include "game/detail/gui/immediate_hud.h"
 
