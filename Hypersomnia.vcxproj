@@ -401,9 +401,11 @@
     <ClCompile Include="game\resource_setups\standard_particle_effects.cpp" />
     <ClCompile Include="game\resource_setups\standard_sound_buffers.cpp" />
     <ClCompile Include="game\resource_setups\standard_tile_layers.cpp" />
+    <ClCompile Include="game\scene_builders\networked_testbed.cpp" />
+    <ClCompile Include="game\scene_builders\one_entity.cpp" />
+    <ClCompile Include="game\scene_builders\testbed.cpp" />
     <ClCompile Include="game\systems_audiovisual\gui_element_system.cpp" />
     <ClCompile Include="game\systems_audiovisual\interpolation_system.cpp" />
-    <ClCompile Include="game\scene_managers\networked_testbed.cpp" />
     <ClCompile Include="game\systems_audiovisual\particles_simulation_system.cpp" />
     <ClCompile Include="game\systems_audiovisual\past_infection_system.cpp" />
     <ClCompile Include="game\systems_audiovisual\sound_system.cpp" />
@@ -496,8 +498,6 @@
     <ClCompile Include="game\resources\animation.cpp" />
     <ClCompile Include="game\resources\manager.cpp" />
     <ClCompile Include="game\resources\particle_effect.cpp" />
-    <ClCompile Include="game\scene_managers\one_entity.cpp" />
-    <ClCompile Include="game\scene_managers\testbed.cpp" />
     <ClCompile Include="game\detail\inventory_slot.cpp" />
     <ClCompile Include="game\detail\inventory_utils.cpp" />
     <ClCompile Include="game\transcendental\logic_step.cpp" />
@@ -1191,10 +1191,12 @@
     <ClInclude Include="game\resources\sound_response.h" />
     <ClInclude Include="game\resources\tile_layer.h" />
     <ClInclude Include="game\resource_setups\all.h" />
+    <ClInclude Include="game\scene_builders\networked_testbed.h" />
+    <ClInclude Include="game\scene_builders\one_entity.h" />
+    <ClInclude Include="game\scene_builders\testbed.h" />
     <ClInclude Include="game\simulation_settings\si_scaling.h" />
     <ClInclude Include="game\systems_audiovisual\gui_element_system.h" />
     <ClInclude Include="game\systems_audiovisual\interpolation_system.h" />
-    <ClInclude Include="game\scene_managers\networked_testbed.h" />
     <ClInclude Include="game\systems_audiovisual\particles_simulation_system.h" />
     <ClInclude Include="game\systems_audiovisual\past_infection_system.h" />
     <ClInclude Include="game\systems_audiovisual\wandering_pixels_system.h" />
@@ -1256,7 +1258,6 @@
     <ClInclude Include="game\simulation_settings\visibility_settings.h" />
     <ClInclude Include="game\messages\will_soon_be_deleted.h" />
     <ClInclude Include="game\transcendental\cosmic_profiler.h" />
-    <ClInclude Include="game\scene_managers\one_entity.h" />
     <ClInclude Include="game\transcendental\logic_step.h" />
     <ClInclude Include="game\transcendental\network_commands.h" />
     <ClInclude Include="game\transcendental\simulation_broadcast.h" />
@@ -1381,7 +1382,6 @@
     <ClInclude Include="game\resources\manager.h" />
     <ClInclude Include="game\resources\particle_effect.h" />
     <ClInclude Include="game\resources\particle_effect_response.h" />
-    <ClInclude Include="game\scene_managers\testbed.h" />
     <ClInclude Include="game\detail\inventory_slot.h" />
     <ClInclude Include="game\detail\inventory_slot_id.h" />
     <ClInclude Include="game\detail\inventory_utils.h" />
