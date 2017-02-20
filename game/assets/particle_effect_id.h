@@ -5,6 +5,7 @@ namespace assets {
 	enum class particle_effect_id : unsigned short {
 		INVALID,
 
+		HEALTH_DAMAGE_SPARKLES,
 		PIXEL_BURST,
 		PIXEL_PROJECTILE_TRACE,
 		PIXEL_MUZZLE_LEAVE_EXPLOSION,

@@ -55,6 +55,7 @@ namespace rendering_scripts {
 		auto& border_highlight_shader = pure_color_highlight_shader; // the same
 		auto& circular_bars_shader = *get_resource_manager().find(assets::program_id::CIRCULAR_BARS);
 		auto& smoke_shader = *get_resource_manager().find(assets::program_id::SMOKE);
+		auto& illuminating_smoke_shader = *get_resource_manager().find(assets::program_id::ILLUMINATING_SMOKE);
 		auto& exploding_rings_shader = *get_resource_manager().find(assets::program_id::EXPLODING_RING);
 		
 		default_shader.use();
@@ -74,6 +75,26 @@ namespace rendering_scripts {
 				render_layer::DIM_SMOKES,
 				camera
 			);
+
+			particles.draw(
+				output,
+				render_layer::ILLUMINATING_SMOKES,
+				camera
+			);
+		}
+
+		renderer.call_triangles();
+		renderer.clear_triangles();
+
+		renderer.illuminating_smoke_fbo.use();
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		{
+			particles.draw(
+				output,
+				render_layer::ILLUMINATING_SMOKES,
+				camera
+			);
 		}
 
 		renderer.call_triangles();
@@ -81,7 +102,7 @@ namespace rendering_scripts {
 
 		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE); glerr;
 
-		renderer.smoke_fbo.use_default();
+		renderer.illuminating_smoke_fbo.use_default();
 
 		const auto& light = step.session.systems_audiovisual.get<light_system>();
 		
@@ -115,7 +136,17 @@ namespace rendering_scripts {
 					cosmos,
 					global_time_seconds
 				);
+
+				renderer.set_active_texture(3);
+				renderer.bind_texture(renderer.illuminating_smoke_fbo);
+				renderer.set_active_texture(0);
 				
+				illuminating_smoke_shader.use();
+				
+				renderer.fullscreen_quad();
+				
+				default_shader.use();
+
 				hud.draw_neon_highlights_of_exploding_rings(step);
 			}
 		);

@@ -324,6 +324,125 @@ namespace resource_setups {
 		}
 
 		{
+			auto& effect = get_resource_manager().create(assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES);
+
+			{
+				resources::emission em;
+				em.min_swing_spread.set(0.5, 1);
+				em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+				em.max_swing_spread.set(10 / 2, 10 / 2);
+				em.max_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+
+				em.swing_spread.set(0, 0);
+				em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
+				em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
+
+				em.spread_degrees = std::make_pair(45, 60);
+				em.stream_lifetime_ms = std::make_pair(150.f, 200.f);
+				em.particles_per_sec = std::make_pair(80.f, 100.f);
+
+				em.base_speed = std::make_pair(120, 300);
+				em.base_speed_variation = std::make_pair(10.f, 20.f);
+
+				em.randomize_spawn_point_within_circle_of_inner_radius = std::make_pair(90.f, 90.f);
+				em.randomize_spawn_point_within_circle_of_outer_radius = std::make_pair(115.f, 115.f);
+
+				em.starting_homing_force = std::make_pair(20.f, 20.f);
+				em.ending_homing_force = std::make_pair(300.f, 300.f);
+
+				em.rotation_speed = std::make_pair(0, 0);
+				em.particle_lifetime_ms = std::make_pair(100, 200);
+
+				{
+					const auto& anim = *get_resource_manager().find(assets::animation_id::CAST_BLINK_ANIMATION);
+					const auto frame_duration = anim.frames[0].duration_milliseconds / 2.f;
+
+					for (int i = 0; i < anim.frames.size() - 1; ++i)
+					{
+						homing_animated_particle particle_template;
+
+						particle_template.linear_damping = 300;
+						particle_template.first_face = static_cast<assets::texture_id>(static_cast<int>(anim.frames[0].sprite.tex) + i);
+						particle_template.frame_count = anim.frames.size() - i;
+						particle_template.frame_duration_ms = frame_duration;
+						particle_template.color = white;
+
+						em.add_particle_template(particle_template);
+					}
+				}
+
+				{
+					const auto& anim = *get_resource_manager().find(assets::animation_id::BLINK_ANIMATION);
+					const auto frame_duration = anim.frames[0].duration_milliseconds / 2.f;
+
+					for (int i = 0; i < anim.frames.size() - 1; ++i)
+					{
+						homing_animated_particle particle_template;
+
+						particle_template.linear_damping = 300;
+						particle_template.first_face = static_cast<assets::texture_id>(static_cast<int>(anim.frames[0].sprite.tex) + i);
+						particle_template.frame_count = anim.frames.size() - i;
+						particle_template.frame_duration_ms = frame_duration;
+						particle_template.color = white;
+
+						em.add_particle_template(particle_template);
+					}
+				}
+
+				em.size_multiplier = std::make_pair(1, 1);
+				em.particle_render_template.layer = render_layer::EFFECTS;
+				em.initial_rotation_variation = 0;
+				em.should_particles_look_towards_velocity = false;
+				em.randomize_acceleration = true;
+
+				effect.push_back(em);
+			}
+
+			{
+				resources::emission em;
+				em.min_swing_spread.set(0.5, 1);
+				em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+				em.max_swing_spread.set(10 / 2, 10 / 2);
+				em.max_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+
+				em.swing_spread.set(0, 0);
+				em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
+				em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
+
+				em.spread_degrees = std::make_pair(100, 120);
+				em.num_of_particles_to_spawn_initially.set(80, 100);
+
+				em.base_speed = std::make_pair(260, 290);
+				em.base_speed_variation = std::make_pair(10.f, 20.f);
+
+				em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEGf, 2.8f*RAD_TO_DEGf);
+				em.particle_lifetime_ms = std::make_pair(1400, 1400);
+
+				em.randomize_spawn_point_within_circle_of_inner_radius = std::make_pair(50.f, 50.f);
+				em.randomize_spawn_point_within_circle_of_outer_radius = std::make_pair(75.f, 75.f);
+
+				for (int i = 0; i < 3; ++i) {
+					general_particle particle_template;
+
+					particle_template.angular_damping = 0;
+					particle_template.linear_damping = 50;
+					particle_template.face.set(assets::texture_id(int(assets::texture_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 15));
+					particle_template.unshrinking_time_ms = 100.f;
+					particle_template.shrink_when_ms_remaining = 750.f;
+
+					em.add_particle_template(particle_template);
+				}
+
+				em.size_multiplier = std::make_pair(0.35, 0.35);
+				em.particle_render_template.layer = render_layer::ILLUMINATING_SMOKES;
+				em.initial_rotation_variation = 180;
+				em.randomize_acceleration = true;
+
+				effect.push_back(em);
+			}
+		}
+
+		{
 			auto& effect = get_resource_manager().create(assets::particle_effect_id::CAST_SPARKLES);
 
 			{
@@ -361,7 +480,7 @@ namespace resource_setups {
 				}
 
 				em.size_multiplier = std::make_pair(0.40, 0.40);
-				em.particle_render_template.layer = render_layer::DIM_SMOKES;
+				em.particle_render_template.layer = render_layer::ILLUMINATING_SMOKES;
 				em.initial_rotation_variation = 180;
 
 				effect.push_back(em);
@@ -712,7 +831,7 @@ namespace resource_setups {
 		{
 			auto& response = get_resource_manager().create(assets::particle_effect_response_id::CHARACTER_RESPONSE);
 
-			response[particle_effect_response_type::DAMAGE_RECEIVED] = assets::particle_effect_id::PIXEL_BURST;
+			response[particle_effect_response_type::DAMAGE_RECEIVED] = assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES;
 		}
 	}
 }

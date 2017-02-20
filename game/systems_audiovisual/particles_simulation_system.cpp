@@ -183,6 +183,9 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 		bool should_destroy = true;
 
 		for (auto& instance : cache.emission_instances) {
+			const auto stream_alivity_mult = 
+				instance.stream_max_lifetime_ms == 0.f ? 1.f : instance.stream_lifetime_ms / instance.stream_max_lifetime_ms;
+
 			const float stream_delta = std::min(delta.in_milliseconds(), instance.stream_max_lifetime_ms - instance.stream_lifetime_ms);
 			const auto& emission = instance.source_emission;
 
@@ -224,11 +227,12 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 					instance.randomize_spawn_point_within_circle_of_inner_radius > 0.f
 					|| instance.randomize_spawn_point_within_circle_of_outer_radius > 0.f
 					) {
+
 					const auto size_mult = augs::interp(
 						instance.starting_spawn_circle_size_multiplier,
 						instance.ending_spawn_circle_size_multiplier,
-						instance.stream_lifetime_ms / instance.stream_max_lifetime_ms
-					); 
+						stream_alivity_mult
+					);
 					
 					final_particle_position += rng.random_point_in_ring(
 						size_mult * instance.randomize_spawn_point_within_circle_of_inner_radius,
@@ -271,7 +275,7 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 					new_homing_animated.homing_force = augs::interp(
 						instance.starting_homing_force,
 						instance.ending_homing_force,
-						instance.stream_lifetime_ms / instance.stream_max_lifetime_ms
+						stream_alivity_mult
 					);
 
 					new_homing_animated.integrate(time_elapsed, homing_target_pos);

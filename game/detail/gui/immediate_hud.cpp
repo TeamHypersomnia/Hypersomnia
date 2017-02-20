@@ -256,7 +256,7 @@ void immediate_hud::acquire_game_events(
 
 		if (h.target == messages::health_event::HEALTH) {
 			if (h.effective_amount > 0) {
-				col = red;
+				col = { 255, 100, 100, 255 };
 			}
 			else {
 				col = green;
@@ -283,12 +283,12 @@ void immediate_hud::acquire_game_events(
 		new_highlight.target = h.subject;
 		new_highlight.starting_alpha_ratio = 1.f;// std::min(1.f, h.ratio_effective_to_maximum * 5);
 		
-		if (cosmos[h.spawned_remnants].alive()) {
-			new_highlight.target = h.spawned_remnants;
-			new_highlight.starting_alpha_ratio = 1.f;
-		}
+		//if (cosmos[h.spawned_remnants].alive()) {
+		//	new_highlight.target = h.spawned_remnants;
+		//	new_highlight.starting_alpha_ratio = 1.f;
+		//}
 
-		new_highlight.maximum_duration_seconds = 0.25f;
+		new_highlight.maximum_duration_seconds = 0.15f;
 		new_highlight.color = col;
 
 		erase_remove(recent_pure_color_highlights, [&new_highlight, &cosmos](const pure_color_highlight& existing_highlight) { 
@@ -320,7 +320,8 @@ void immediate_hud::acquire_game_events(
 				const auto spawn_radius_width = (maximum_spawn_radius - minimum_spawn_radius)/2.4;
 
 				const unsigned max_particles_to_spawn = 160;
-				const auto& smokes_emission = get_resource_manager().find(assets::particle_effect_id::CAST_SPARKLES)->at(0);
+				auto smokes_emission = get_resource_manager().find(assets::particle_effect_id::CAST_SPARKLES)->at(0);
+				smokes_emission.particle_render_template.layer = render_layer::DIM_SMOKES;
 				const auto& sparkles_emission = get_resource_manager().find(assets::particle_effect_id::CAST_SPARKLES)->at(1);
 
 				for (auto i = 0u; i < vis.get_num_triangles(); ++i) {
@@ -436,7 +437,7 @@ void immediate_hud::draw_pure_color_highlights(const viewing_step step) const {
 		auto passed = current_time - r.time_of_occurence;
 		auto ratio = std::max(0.f, 1.f - static_cast<float>(passed / r.maximum_duration_seconds));
 
-		col.a = static_cast<rgba_channel>(255.f * ratio * ratio * r.starting_alpha_ratio);
+		col.a = static_cast<rgba_channel>(255.f * sqrt(ratio) * r.starting_alpha_ratio);
 		
 		render_system().draw_renderable(
 			triangles, 

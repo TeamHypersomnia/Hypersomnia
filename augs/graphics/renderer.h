@@ -39,6 +39,7 @@ namespace augs {
 			void draw_cyan(vec2 a, vec2 b);
 		};
 
+		graphics::fbo illuminating_smoke_fbo;
 		graphics::fbo smoke_fbo;
 		graphics::fbo light_fbo;
 

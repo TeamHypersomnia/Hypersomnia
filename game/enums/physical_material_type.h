@@ -2,5 +2,7 @@
 
 enum class physical_material_type {
 	WOOD,
-	METAL
+	METAL,
+
+	COUNT
 };

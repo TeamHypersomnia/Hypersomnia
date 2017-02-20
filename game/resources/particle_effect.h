@@ -39,7 +39,7 @@ namespace resources {
 		minmax particles_per_sec = minmax(0.f, 0.f);
 		minmax stream_lifetime_ms = minmax(0.f, 0.f);
 		minmax particle_lifetime_ms = minmax(0.f, 0.f);
-		minmax size_multiplier = minmax(0.f, 0.f);
+		minmax size_multiplier = minmax(1.f, 1.f);
 		minmax acceleration = minmax(0.f, 0.f);
 		minmax angular_offset = minmax(0.f, 0.f);
 		minmax swing_spread = minmax(0.f, 0.f);
@@ -56,8 +56,8 @@ namespace resources {
 		minmax randomize_spawn_point_within_circle_of_outer_radius = minmax(0.f, 0.f);
 		minmax randomize_spawn_point_within_circle_of_inner_radius = minmax(0.f, 0.f);
 
-		minmax starting_spawn_circle_size_multiplier = minmax(0.f, 0.f);
-		minmax ending_spawn_circle_size_multiplier = minmax(0.f, 0.f);
+		minmax starting_spawn_circle_size_multiplier = minmax(1.f, 1.f);
+		minmax ending_spawn_circle_size_multiplier = minmax(1.f, 1.f);
 
 		minmax starting_homing_force = minmax(0.f, 0.f);
 		minmax ending_homing_force = minmax(0.f, 0.f);
