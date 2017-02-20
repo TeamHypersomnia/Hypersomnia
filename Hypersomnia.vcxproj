@@ -504,10 +504,10 @@
     <ClCompile Include="game\scene_managers\testbed.cpp" />
     <ClCompile Include="game\detail\inventory_slot.cpp" />
     <ClCompile Include="game\detail\inventory_utils.cpp" />
+    <ClCompile Include="game\transcendental\logic_step.cpp" />
     <ClCompile Include="game\transcendental\serialization.cpp" />
     <ClCompile Include="game\transcendental\simulation_broadcast.cpp" />
     <ClCompile Include="game\transcendental\simulation_receiver.cpp" />
-    <ClCompile Include="game\transcendental\step.cpp" />
     <ClCompile Include="game\systems_stateless\animation_system.cpp" />
     <ClCompile Include="game\systems_stateless\behaviour_tree_system.cpp" />
     <ClCompile Include="game\systems_stateless\car_system.cpp" />
@@ -1255,10 +1255,10 @@
     <ClInclude Include="game\transcendental\cosmic_profiler.h" />
     <ClInclude Include="game\scene_managers\one_entity.h" />
     <ClInclude Include="game\transcendental\game_drawing_settings.h" />
+    <ClInclude Include="game\transcendental\logic_step.h" />
     <ClInclude Include="game\transcendental\network_commands.h" />
     <ClInclude Include="game\transcendental\simulation_broadcast.h" />
     <ClInclude Include="game\transcendental\simulation_receiver.h" />
-    <ClInclude Include="game\transcendental\step.h" />
     <ClInclude Include="game\systems_stateless\animation_system.h" />
     <ClInclude Include="game\systems_stateless\behaviour_tree_system.h" />
     <ClInclude Include="game\systems_stateless\car_system.h" />
