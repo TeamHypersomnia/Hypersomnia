@@ -9,7 +9,7 @@
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
-#include "game/transcendental/viewing_session.h"
+#include "game/view/viewing_session.h"
 
 #include "game/detail/gui/character_gui.h"
 #include "augs/scripting/lua_state_raii.h"

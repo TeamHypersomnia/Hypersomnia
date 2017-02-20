@@ -26,7 +26,7 @@
 
 #include "augs/templates/string_templates.h"
 
-#include "game/transcendental/viewing_session.h"
+#include "game/view/viewing_session.h"
 
 #include "augs/graphics/drawers.h"
 #include "game/detail/wielding_result.h"

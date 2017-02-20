@@ -2,7 +2,7 @@
 #include "game/transcendental/cosmic_step.h"
 
 #include "game/detail/visible_entities.h"
-#include "game/transcendental/game_drawing_settings.h"
+#include "game/view/game_drawing_settings.h"
 
 struct aabb_highlighter;
 class viewing_session;

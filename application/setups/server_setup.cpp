@@ -9,7 +9,7 @@
 #include "game/scene_managers/resource_setups/all.h"
 
 #include "game/transcendental/types_specification/all_component_includes.h"
-#include "game/transcendental/viewing_session.h"
+#include "game/view/viewing_session.h"
 #include "game/transcendental/simulation_broadcast.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/cosmic_delta.h"

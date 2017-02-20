@@ -3,7 +3,7 @@
 #include "game/view/viewing_step.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
-#include "game/transcendental/viewing_session.h"
+#include "game/view/viewing_session.h"
 #include "game/components/light_component.h"
 #include "game/components/polygon_component.h"
 

@@ -2,7 +2,7 @@
 
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/transcendental/viewing_session.h"
+#include "game/view/viewing_session.h"
 #include "game/transcendental/cosmos.h"
 
 #include "game/systems_stateless/render_system.h"

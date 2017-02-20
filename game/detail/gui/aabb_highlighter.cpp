@@ -3,7 +3,7 @@
 #include "game/components/sub_entities_component.h"
 #include "game/components/crosshair_component.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/transcendental/viewing_session.h"
+#include "game/view/viewing_session.h"
 #include "game/transcendental/cosmos.h"
 #include "game/systems_audiovisual/interpolation_system.h"
 

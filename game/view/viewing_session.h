@@ -26,7 +26,7 @@
 
 #include "game/detail/particle_types.h"
 
-#include "game/transcendental/game_drawing_settings.h"
+#include "game/view/game_drawing_settings.h"
 
 class game_window;
 

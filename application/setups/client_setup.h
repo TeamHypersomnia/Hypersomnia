@@ -4,7 +4,7 @@
 #include "game/transcendental/cosmos.h"
 
 #include "game/transcendental/simulation_receiver.h"
-#include "game/transcendental/viewing_session.h"
+#include "game/view/viewing_session.h"
 #include "augs/misc/debug_entropy_player.h"
 #include "game/scene_managers/networked_testbed.h"
 
