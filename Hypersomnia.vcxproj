@@ -341,6 +341,7 @@
     <ClCompile Include="augs\misc\action_list.cpp" />
     <ClCompile Include="augs\misc\http_requests.cpp" />
     <ClCompile Include="augs\misc\delta_compression.cpp" />
+    <ClCompile Include="augs\misc\input_context.cpp" />
     <ClCompile Include="augs\misc\key_and_mouse_intent.cpp" />
     <ClCompile Include="augs\misc\machine_entropy.cpp" />
     <ClCompile Include="augs\misc\debug_entropy_player.cpp" />
@@ -421,7 +422,6 @@
     <ClCompile Include="game\transcendental\cosmic_profiler.cpp" />
     <ClCompile Include="game\detail\convex_partitioned_shape.cpp" />
     <ClCompile Include="application\game_window.cpp" />
-    <ClCompile Include="game\global\input_context.cpp" />
     <ClCompile Include="game\detail\inventory_slot_handle.cpp" />
     <ClCompile Include="game\detail\inventory_slot_id.cpp" />
     <ClCompile Include="game\detail\physics_scripts.cpp" />
@@ -1072,6 +1072,7 @@
     <ClInclude Include="augs\misc\easier_handle_getters_mixin.h" />
     <ClInclude Include="augs\misc\enum_bitset.h" />
     <ClInclude Include="augs\misc\http_requests.h" />
+    <ClInclude Include="augs\misc\input_context.h" />
     <ClInclude Include="augs\misc\key_and_mouse_intent.h" />
     <ClInclude Include="augs\misc\debug_entropy_player.h" />
     <ClInclude Include="augs\misc\readable_bytesize.h" />
@@ -1226,7 +1227,6 @@
     <ClInclude Include="game\enums\colliders_offset_type.h" />
     <ClInclude Include="application\game_window.h" />
     <ClInclude Include="game\global\all_settings.h" />
-    <ClInclude Include="game\global\input_context.h" />
     <ClInclude Include="game\detail\inventory_slot_handle.h" />
     <ClInclude Include="game\detail\inventory_slot_handle_declaration.h" />
     <ClInclude Include="game\detail\physics_scripts.h" />
