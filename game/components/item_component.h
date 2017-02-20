@@ -2,7 +2,7 @@
 #include <array>
 #include "container_component.h"
 #include "transform_component.h"
-#include "game/detail/inventory_slot_id.h"
+#include "game/detail/inventory/inventory_slot_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
 #include "game/enums/item_category.h"

@@ -1,8 +1,8 @@
 #pragma once
 #include "game/transcendental/entity_handle.h"
 #include "game/enums/slot_function.h"
-#include "game/detail/item_slot_transfer_request.h"
-#include "game/detail/item_transfer_result.h"
+#include "game/detail/inventory/item_slot_transfer_request.h"
+#include "game/detail/inventory/item_transfer_result.h"
 
 #define SPACE_ATOMS_PER_UNIT 1000
 

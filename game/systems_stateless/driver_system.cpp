@@ -18,7 +18,7 @@
 #include "game/components/physics_component.h"
 #include "game/components/transform_component.h"
 
-#include "game/detail/physics_scripts.h"
+#include "game/detail/physics/physics_scripts.h"
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"

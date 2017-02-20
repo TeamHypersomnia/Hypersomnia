@@ -4,7 +4,7 @@
 #include "augs/gui/appearance_detector.h"
 #include "augs/gui/text_drawer.h"
 
-#include "game/detail/inventory_slot_id.h"
+#include "game/detail/inventory/inventory_slot_id.h"
 #include "game/detail/gui/game_gui_context.h"
 
 #include "augs/padding_byte.h"

@@ -16,8 +16,8 @@
 //#include "game/systems_audiovisual/interpolation_system.h"
 
 #include "game/transcendental/cosmos.h"
-#include "game/detail/physics_scripts.h"
-#include "game/detail/inventory_slot_handle.h"
+#include "game/detail/physics/physics_scripts.h"
+#include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/detail/gui/gui_positioning.h"
 
 std::ostream& operator<<(std::ostream& out, const entity_handle &x) {

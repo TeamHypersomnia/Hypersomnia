@@ -4,7 +4,7 @@
 #include "game/messages/trigger_hit_confirmation_message.h"
 #include "game/messages/trigger_hit_request_message.h"
 
-#include "game/detail/item_slot_transfer_request.h"
+#include "game/detail/inventory/item_slot_transfer_request.h"
 #include "game/messages/queue_destruction.h"
 
 #include "game/transcendental/cosmos.h"
@@ -16,9 +16,9 @@
 #include "game/components/fixtures_component.h"
 #include "game/detail/gui/character_gui.h"
 
-#include "game/detail/inventory_utils.h"
-#include "game/detail/inventory_slot.h"
-#include "game/detail/inventory_slot_handle.h"
+#include "game/detail/inventory/inventory_utils.h"
+#include "game/detail/inventory/inventory_slot.h"
+#include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/detail/entity_scripts.h"
 
 #include "game/systems_temporary/physics_system.h"
@@ -34,7 +34,7 @@
 #include "game/transcendental/logic_step.h"
 #include "game/enums/item_transfer_result_type.h"
 
-#include "game/detail/physics_scripts.h"
+#include "game/detail/physics/physics_scripts.h"
 #include "augs/templates/container_templates.h"
 
 using namespace augs;

@@ -3,7 +3,7 @@
 #include "game/enums/entity_name.h"
 #include "game/transcendental/entity_id.h"
 
-#include "game/detail/inventory_slot_handle_declaration.h"
+#include "game/detail/inventory/inventory_slot_handle_declaration.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/enums/slot_function.h"
 #include "game/enums/item_category.h"

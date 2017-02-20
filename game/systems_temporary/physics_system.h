@@ -14,7 +14,7 @@
 #include "game/messages/collision_message.h"
 
 #include "game/detail/convex_partitioned_shape.h"
-#include "game/detail/physics_queries.h"
+#include "game/detail/physics/physics_queries.h"
 
 #include "augs/build_settings/setting_empty_bases.h"
 

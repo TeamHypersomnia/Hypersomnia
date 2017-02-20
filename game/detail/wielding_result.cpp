@@ -1,5 +1,5 @@
 #include "wielding_result.h"
-#include "game/detail/inventory_utils.h"
+#include "game/detail/inventory/inventory_utils.h"
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/cosmos.h"
 

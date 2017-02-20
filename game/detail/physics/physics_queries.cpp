@@ -3,7 +3,7 @@
 #include "game/transcendental/entity_handle.h"
 
 #include "augs/ensure.h"
-#include "game/detail/physics_scripts.h"
+#include "game/detail/physics/physics_scripts.h"
 #include "game/detail/camera_cone.h"
 #include "game/enums/filters.h"
 

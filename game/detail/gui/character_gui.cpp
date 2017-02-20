@@ -9,7 +9,7 @@
 #include "game/detail/gui/drag_and_drop_target_drop_item.h"
 #include "game/detail/gui/item_button.h"
 #include "game/detail/gui/slot_button.h"
-#include "game/detail/inventory_slot_handle.h"
+#include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/detail/gui/drag_and_drop.h"
 #include "game/components/container_component.h"
 #include "game/components/item_slot_transfers_component.h"

@@ -5,7 +5,7 @@
 #include "augs/templates/is_component_synchronized.h"
 #include "augs/templates/type_in_pack.h"
 
-#include "game/detail/inventory_slot_handle_declaration.h"
+#include "game/detail/inventory/inventory_slot_handle_declaration.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
 #include "augs/entity_system/component_aggregate.h"

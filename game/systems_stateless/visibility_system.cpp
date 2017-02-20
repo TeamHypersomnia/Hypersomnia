@@ -21,7 +21,7 @@
 
 #include "game/enums/processing_subjects.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/detail/physics_scripts.h"
+#include "game/detail/physics/physics_scripts.h"
 
 #include "augs/graphics/renderer.h"
 

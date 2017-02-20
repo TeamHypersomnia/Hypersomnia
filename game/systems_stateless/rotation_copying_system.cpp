@@ -7,9 +7,9 @@
 #include "game/components/physics_component.h"
 #include "game/components/special_physics_component.h"
 #include "game/components/gun_component.h"
-#include "game/detail/inventory_slot_id.h"
-#include "game/detail/inventory_slot.h"
-#include "game/detail/inventory_utils.h"
+#include "game/detail/inventory/inventory_slot_id.h"
+#include "game/detail/inventory/inventory_slot.h"
+#include "game/detail/inventory/inventory_utils.h"
 
 #include "augs/ensure.h"
 

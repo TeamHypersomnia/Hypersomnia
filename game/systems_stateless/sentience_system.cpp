@@ -18,9 +18,9 @@
 #include "game/components/animation_component.h"
 #include "game/components/movement_component.h"
 
-#include "game/detail/inventory_slot.h"
-#include "game/detail/inventory_slot_id.h"
-#include "game/detail/inventory_utils.h"
+#include "game/detail/inventory/inventory_slot.h"
+#include "game/detail/inventory/inventory_slot_id.h"
+#include "game/detail/inventory/inventory_utils.h"
 
 #include "game/transcendental/logic_step.h"
 

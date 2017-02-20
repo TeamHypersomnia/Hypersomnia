@@ -20,7 +20,7 @@
 #include "game/enums/filters.h"
 
 #include "augs/ensure.h"
-#include "game/detail/physics_scripts.h"
+#include "game/detail/physics/physics_scripts.h"
 
 class interpolation_system;
 

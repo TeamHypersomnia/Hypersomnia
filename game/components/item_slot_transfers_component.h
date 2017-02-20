@@ -3,7 +3,7 @@
 #include "augs/misc/constant_size_vector.h"
 
 #include "game/transcendental/entity_id.h"
-#include "game/detail/inventory_slot_id.h"
+#include "game/detail/inventory/inventory_slot_id.h"
 
 #include "game/transcendental/entity_handle_declaration.h"
 #include "augs/misc/stepped_timing.h"

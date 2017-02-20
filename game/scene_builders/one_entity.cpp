@@ -17,7 +17,7 @@
 #include "game/enums/party_category.h"
 
 #include "game/messages/intent_message.h"
-#include "game/detail/inventory_utils.h"
+#include "game/detail/inventory/inventory_utils.h"
 
 #include "texture_baker/font.h"
 

@@ -20,10 +20,10 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
 
-#include "game/detail/item_slot_transfer_request.h"
+#include "game/detail/inventory/item_slot_transfer_request.h"
 
 #include "ingredients.h"
-#include "game/detail/inventory_utils.h"
+#include "game/detail/inventory/inventory_utils.h"
 
 void add_muzzle_particles(
 	const entity_handle weapon, 

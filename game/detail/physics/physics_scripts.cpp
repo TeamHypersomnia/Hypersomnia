@@ -5,8 +5,8 @@
 #include "game/components/driver_component.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
-#include "game/detail/inventory_slot_handle.h"
-#include "position_scripts.h"
+#include "game/detail/inventory/inventory_slot_handle.h"
+#include "game/detail/position_scripts.h"
 
 void resolve_density_of_associated_fixtures(entity_handle id) {
 	auto& cosmos = id.get_cosmos();

@@ -3,7 +3,7 @@
 #include "augs/gui/text_drawer.h"
 #include "augs/gui/appearance_detector.h"
 
-#include "game/detail/inventory_slot_id.h"
+#include "game/detail/inventory/inventory_slot_id.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/resources/manager.h"
 

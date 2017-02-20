@@ -1,5 +1,5 @@
 #pragma once
-#include "game/detail/item_slot_transfer_request.h"
+#include "game/detail/inventory/item_slot_transfer_request.h"
 
 class cosmos;
 #include "game/transcendental/step_declaration.h"

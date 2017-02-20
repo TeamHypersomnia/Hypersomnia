@@ -10,7 +10,7 @@
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/detail/inventory_slot_handle.h"
+#include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/components/container_component.h"
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/item_component.h"
@@ -20,7 +20,7 @@
 #include "game/enums/slot_function.h"
 #include "game/detail/gui/root_of_inventory_gui.h"
 
-#include "game/detail/inventory_utils.h"
+#include "game/detail/inventory/inventory_utils.h"
 
 #include "augs/gui/button_corners.h"
 

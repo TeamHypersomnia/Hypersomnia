@@ -1,5 +1,5 @@
 #pragma once
-#include "game/detail/item_slot_transfer_request_declaration.h"
+#include "game/detail/inventory/item_slot_transfer_request_declaration.h"
 
 namespace augs {
 	template <class...>

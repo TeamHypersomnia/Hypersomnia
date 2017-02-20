@@ -4,7 +4,7 @@
 #include "augs/misc/machine_entropy.h"
 #include "augs/misc/input_context.h"
 
-#include "game/detail/inventory_utils.h"
+#include "game/detail/inventory/inventory_utils.h"
 
 template <class key>
 void basic_cosmic_entropy<key>::override_transfers_leaving_other_entities(

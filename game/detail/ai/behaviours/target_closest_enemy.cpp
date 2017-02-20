@@ -8,7 +8,7 @@
 #include "game/detail/entity_scripts.h"
 #include "game/detail/position_scripts.h"
 
-#include "game/detail/inventory_utils.h"
+#include "game/detail/inventory/inventory_utils.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/data_living_one_step.h"

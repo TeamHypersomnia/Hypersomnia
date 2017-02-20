@@ -3,7 +3,7 @@
 #include "game/components/physics_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/detail/physics_scripts.h"
+#include "game/detail/physics/physics_scripts.h"
 #include "game/transcendental/cosmos.h"
 
 vec2 position(const_entity_handle e) {

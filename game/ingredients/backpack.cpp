@@ -4,7 +4,7 @@
 
 #include "game/enums/item_category.h"
 #include "game/enums/entity_name.h"
-#include "game/detail/inventory_utils.h"
+#include "game/detail/inventory/inventory_utils.h"
 #include "game/components/container_component.h"
 #include "game/components/item_component.h"
 

@@ -1,6 +1,6 @@
 #include "relations_mixin.h"
-#include "game/detail/inventory_slot_id.h"
-#include "game/detail/inventory_slot_handle.h"
+#include "game/detail/inventory/inventory_slot_id.h"
+#include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 #include "game/components/substance_component.h"

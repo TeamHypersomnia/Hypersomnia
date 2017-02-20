@@ -19,17 +19,17 @@
 #include "augs/misc/easier_handle_getters_mixin.h"
 
 #include "game/transcendental/entity_id.h"
-#include "game/detail/inventory_slot_id.h"
+#include "game/detail/inventory/inventory_slot_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/data_living_one_step.h"
-#include "game/detail/inventory_slot_handle_declaration.h"
-#include "game/detail/item_slot_transfer_request_declaration.h"
+#include "game/detail/inventory/inventory_slot_handle_declaration.h"
+#include "game/detail/inventory/item_slot_transfer_request_declaration.h"
 #include "game/simulation_settings/all_simulation_settings.h"
 #include "game/transcendental/cosmic_profiler.h"
 #include "augs/build_settings/setting_empty_bases.h"
 
-#include "game/detail/inventory_slot_handle.h"
-#include "game/detail/item_slot_transfer_request.h"
+#include "game/detail/inventory/inventory_slot_handle.h"
+#include "game/detail/inventory/item_slot_transfer_request.h"
 
 class cosmic_delta;
 struct data_living_one_step;

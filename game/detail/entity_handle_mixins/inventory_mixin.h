@@ -1,5 +1,5 @@
 #pragma once
-#include "game/detail/inventory_slot_handle_declaration.h"
+#include "game/detail/inventory/inventory_slot_handle_declaration.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/step_declaration.h"
 #include "augs/build_settings/setting_empty_bases.h"

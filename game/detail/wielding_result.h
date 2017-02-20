@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/misc/constant_size_vector.h"
-#include "game/detail/item_slot_transfer_request.h"
+#include "game/detail/inventory/item_slot_transfer_request.h"
 #include "game/transcendental/step_declaration.h"
 
 struct wielding_result {

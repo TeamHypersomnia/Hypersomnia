@@ -12,7 +12,7 @@
 
 #include "game/enums/entity_name.h"
 
-#include "game/detail/inventory_utils.h"
+#include "game/detail/inventory/inventory_utils.h"
 
 namespace prefabs {
 	entity_handle create_cyan_urban_machete(cosmos& world, vec2 pos) {

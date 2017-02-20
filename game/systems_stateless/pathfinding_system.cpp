@@ -12,7 +12,7 @@
 #include "augs/graphics/renderer.h"
 #include "game/enums/processing_subjects.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/detail/physics_scripts.h"
+#include "game/detail/physics/physics_scripts.h"
 #include "game/messages/visibility_information.h"
 
 std::vector<b2Vec2> get_world_vertices() {

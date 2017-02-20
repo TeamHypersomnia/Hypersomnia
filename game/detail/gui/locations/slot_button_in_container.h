@@ -1,5 +1,5 @@
 #pragma once
-#include "game/detail/inventory_slot_id.h"
+#include "game/detail/inventory/inventory_slot_id.h"
 #include "augs/ensure.h"
 
 struct slot_button;

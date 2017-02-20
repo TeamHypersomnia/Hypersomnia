@@ -31,8 +31,8 @@
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/cosmic_profiler.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/detail/inventory_slot_handle.h"
-#include "game/detail/item_slot_transfer_request.h"
+#include "game/detail/inventory/inventory_slot_handle.h"
+#include "game/detail/inventory/item_slot_transfer_request.h"
 
 #include "game/messages/health_event.h"
 
@@ -42,7 +42,7 @@
 #include "game/transcendental/cosmic_delta.h"
 #include "game/transcendental/data_living_one_step.h"
 
-#include "game/detail/inventory_utils.h"
+#include "game/detail/inventory/inventory_utils.h"
 
 void cosmos::complete_resubstantiation() {
 	profiler.complete_resubstantiation.new_measurement();

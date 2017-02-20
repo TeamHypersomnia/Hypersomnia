@@ -15,7 +15,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 
-#include "game/detail/inventory_slot_handle.h"
+#include "game/detail/inventory/inventory_slot_handle.h"
 
 void simulation_receiver::acquire_next_packaged_step(const step_packaged_for_network& step) {
 	jitter_buffer.acquire_new_command(step);

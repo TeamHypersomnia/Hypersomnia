@@ -6,7 +6,7 @@
 #include "game/transcendental/entity_id.h"
 #include "game/messages/intent_message.h"
 
-#include "game/detail/item_slot_transfer_request.h"
+#include "game/detail/inventory/item_slot_transfer_request.h"
 #include "augs/templates/container_templates.h"
 
 #include "augs/misc/machine_entropy.h"

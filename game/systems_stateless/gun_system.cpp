@@ -4,7 +4,7 @@
 #include "game/messages/damage_message.h"
 #include "game/messages/queue_destruction.h"
 #include "game/messages/gunshot_response.h"
-#include "game/detail/item_slot_transfer_request.h"
+#include "game/detail/inventory/item_slot_transfer_request.h"
 
 #include "game/components/physics_component.h"
 #include "game/components/damage_component.h"
@@ -18,7 +18,7 @@
 
 #include "game/systems_temporary/physics_system.h"
 
-#include "game/detail/inventory_utils.h"
+#include "game/detail/inventory/inventory_utils.h"
 
 #include "game/components/transform_component.h"
 #include "game/components/gun_component.h"

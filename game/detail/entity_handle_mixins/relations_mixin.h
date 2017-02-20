@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "game/detail/inventory_slot_handle_declaration.h"
+#include "game/detail/inventory/inventory_slot_handle_declaration.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
 #include "game/transcendental/entity_id.h"
