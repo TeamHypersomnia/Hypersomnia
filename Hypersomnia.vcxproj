@@ -534,8 +534,8 @@
     <ClCompile Include="game\systems_temporary\dynamic_tree_system.cpp" />
     <ClCompile Include="game\systems_temporary\physics_system.cpp" />
     <ClCompile Include="game\systems_temporary\processing_lists_system.cpp" />
-    <ClCompile Include="game\transcendental\viewing_session.cpp" />
     <ClCompile Include="application\setups\local_setup.cpp" />
+    <ClCompile Include="game\view\viewing_session.cpp" />
     <ClCompile Include="game\view\viewing_step.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="application\setups\server_setup.cpp" />
@@ -1256,7 +1256,6 @@
     <ClInclude Include="game\messages\will_soon_be_deleted.h" />
     <ClInclude Include="game\transcendental\cosmic_profiler.h" />
     <ClInclude Include="game\scene_managers\one_entity.h" />
-    <ClInclude Include="game\transcendental\game_drawing_settings.h" />
     <ClInclude Include="game\transcendental\logic_step.h" />
     <ClInclude Include="game\transcendental\network_commands.h" />
     <ClInclude Include="game\transcendental\simulation_broadcast.h" />
@@ -1293,7 +1292,6 @@
     <ClInclude Include="game\transcendental\types_specification\all_messages_declaration.h" />
     <ClInclude Include="game\transcendental\types_specification\all_messages_includes.h" />
     <ClInclude Include="game\transcendental\types_specification\all_systems_declaration.h" />
-    <ClInclude Include="game\transcendental\viewing_session.h" />
     <ClInclude Include="game\types_specification\all_component_includes.h" />
     <ClInclude Include="game\assets\animation_id.h" />
     <ClInclude Include="game\assets\animation_response_id.h" />
@@ -1392,6 +1390,8 @@
     <ClInclude Include="game\types_specification\all_messages_includes.h" />
     <ClInclude Include="game\types_specification\all_systems_declaration.h" />
     <ClInclude Include="application\web_daemon\session_report.h" />
+    <ClInclude Include="game\view\game_drawing_settings.h" />
+    <ClInclude Include="game\view\viewing_session.h" />
     <ClInclude Include="game\view\viewing_step.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="augs\global_libraries.h" />
