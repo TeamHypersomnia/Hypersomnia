@@ -244,9 +244,10 @@ public:
 namespace augs {
 	template<class A>
 	bool read_object(A& ar, cosmos::significant_state& significant) {
-		return read_object(ar, significant.meta) &&
-		read_object(ar, significant.pools_for_components) &&
-		read_object(ar, significant.pool_for_aggregates);
+		return 
+			read_object(ar, significant.meta)
+			&& read_object(ar, significant.pools_for_components)
+			&& read_object(ar, significant.pool_for_aggregates);
 	}
 
 	template<class A>

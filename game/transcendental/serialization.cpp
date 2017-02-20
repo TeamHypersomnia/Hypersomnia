@@ -8,34 +8,35 @@
 void cosmos::save_to_file(const std::string& filename) {
 	profiler.total_save.new_measurement();
 	
-	profiler.size_calculation_pass.new_measurement();
+	auto& reserved_memory = reserved_memory_for_serialization;
 
-	augs::output_stream_reserver reserver;
-	
-	augs::write_object(reserver, significant);
+	// memory reservation stage
+	{
+		profiler.size_calculation_pass.new_measurement();
+		augs::output_stream_reserver reserver;
 
-	profiler.size_calculation_pass.end_measurement();
-	
-	auto& stream = reserved_memory_for_serialization;
-	
-	profiler.memory_allocation_pass.new_measurement();
+		augs::write_object(reserver, significant);
+		
+		profiler.size_calculation_pass.end_measurement();
+		profiler.memory_allocation_pass.new_measurement();
 
-	stream.reserve(static_cast<size_t>(reserver.size() * 1.2));
+		reserved_memory.reserve(static_cast<size_t>(reserver.size() * 1.2));
 
-	profiler.memory_allocation_pass.end_measurement();
-	
+		profiler.memory_allocation_pass.end_measurement();
+	}
+
+	// writing stage
+
 	profiler.serialization_pass.new_measurement();
 
-	augs::write_object(stream, significant);
+	augs::write_object(reserved_memory, significant);
 
 	profiler.serialization_pass.end_measurement();
-	
 	profiler.writing_savefile.new_measurement();
 
-	augs::write_file_binary(filename, stream.buf);
+	augs::write_file_binary(filename, reserved_memory.buf);
 
 	profiler.writing_savefile.end_measurement();
-	
 	profiler.total_save.end_measurement();
 }
 
