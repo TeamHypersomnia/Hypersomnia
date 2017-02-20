@@ -394,9 +394,13 @@
     <ClCompile Include="game\enums\item_category.cpp" />
     <ClCompile Include="game\enums\item_transfer_result_type.cpp" />
     <ClCompile Include="game\resources\tile_layer.cpp" />
-    <ClCompile Include="game\scene_managers\resource_setups\make_button_with_corners.cpp" />
-    <ClCompile Include="game\scene_managers\resource_setups\standard_sound_buffers.cpp" />
-    <ClCompile Include="game\scene_managers\resource_setups\standard_tile_layers.cpp" />
+    <ClCompile Include="game\resource_setups\make_button_with_corners.cpp" />
+    <ClCompile Include="game\resource_setups\standard_atlas.cpp" />
+    <ClCompile Include="game\resource_setups\standard_behaviour_trees.cpp" />
+    <ClCompile Include="game\resource_setups\standard_everything.cpp" />
+    <ClCompile Include="game\resource_setups\standard_particle_effects.cpp" />
+    <ClCompile Include="game\resource_setups\standard_sound_buffers.cpp" />
+    <ClCompile Include="game\resource_setups\standard_tile_layers.cpp" />
     <ClCompile Include="game\systems_audiovisual\gui_element_system.cpp" />
     <ClCompile Include="game\systems_audiovisual\interpolation_system.cpp" />
     <ClCompile Include="game\scene_managers\networked_testbed.cpp" />
@@ -493,10 +497,6 @@
     <ClCompile Include="game\resources\manager.cpp" />
     <ClCompile Include="game\resources\particle_effect.cpp" />
     <ClCompile Include="game\scene_managers\one_entity.cpp" />
-    <ClCompile Include="game\scene_managers\resource_setups\standard_atlas.cpp" />
-    <ClCompile Include="game\scene_managers\resource_setups\standard_behaviour_trees.cpp" />
-    <ClCompile Include="game\scene_managers\resource_setups\standard_everything.cpp" />
-    <ClCompile Include="game\scene_managers\resource_setups\standard_particle_effects.cpp" />
     <ClCompile Include="game\scene_managers\testbed.cpp" />
     <ClCompile Include="game\detail\inventory_slot.cpp" />
     <ClCompile Include="game\detail\inventory_utils.cpp" />
@@ -1190,6 +1190,7 @@
     <ClInclude Include="game\messages\visibility_information.h" />
     <ClInclude Include="game\resources\sound_response.h" />
     <ClInclude Include="game\resources\tile_layer.h" />
+    <ClInclude Include="game\resource_setups\all.h" />
     <ClInclude Include="game\simulation_settings\si_scaling.h" />
     <ClInclude Include="game\systems_audiovisual\gui_element_system.h" />
     <ClInclude Include="game\systems_audiovisual\interpolation_system.h" />
@@ -1380,7 +1381,6 @@
     <ClInclude Include="game\resources\manager.h" />
     <ClInclude Include="game\resources\particle_effect.h" />
     <ClInclude Include="game\resources\particle_effect_response.h" />
-    <ClInclude Include="game\scene_managers\resource_setups\all.h" />
     <ClInclude Include="game\scene_managers\testbed.h" />
     <ClInclude Include="game\detail\inventory_slot.h" />
     <ClInclude Include="game\detail\inventory_slot_id.h" />
