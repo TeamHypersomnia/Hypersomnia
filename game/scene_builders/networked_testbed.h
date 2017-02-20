@@ -16,7 +16,7 @@ class cosmos;
 class world_camera;
 class viewing_session;
 
-namespace scene_managers {
+namespace scene_builders {
 	class networked_testbed {
 		void populate(const logic_step);
 

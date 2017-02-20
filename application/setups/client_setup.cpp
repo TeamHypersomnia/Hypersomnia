@@ -5,8 +5,8 @@
 
 #include "game/resources/manager.h"
 
-#include "game/scene_managers/networked_testbed.h"
-#include "game/scene_managers/resource_setups/all.h"
+#include "game/scene_builders/networked_testbed.h"
+#include "game/resource_setups/all.h"
 
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "game/view/viewing_session.h"
@@ -50,7 +50,7 @@ void client_setup::init(
 ) {
 	const vec2i screen_size = vec2i(window.get_screen_size());
 
-	scene_managers::networked_testbed_client().populate_world_with_entities(initial_hypersomnia);
+	scene_builders::networked_testbed_client().populate_world_with_entities(initial_hypersomnia);
 
 	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
 

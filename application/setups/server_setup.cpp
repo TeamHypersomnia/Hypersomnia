@@ -6,7 +6,7 @@
 
 #include "game/resources/manager.h"
 
-#include "game/scene_managers/resource_setups/all.h"
+#include "game/resource_setups/all.h"
 
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "game/view/viewing_session.h"
@@ -84,7 +84,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 	cosmos hypersomnia_last_snapshot(3000);
 
 	cosmos initial_hypersomnia(3000);
-	scene_managers::networked_testbed_server().populate_world_with_entities(initial_hypersomnia);
+	scene_builders::networked_testbed_server().populate_world_with_entities(initial_hypersomnia);
 
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 

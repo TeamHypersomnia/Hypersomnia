@@ -13,7 +13,7 @@ class cosmos;
 class world_camera;
 class viewing_session;
 
-namespace scene_managers {
+namespace scene_builders {
 	class testbed {
 		void populate(const logic_step, const vec2i screen_size);
 	public:

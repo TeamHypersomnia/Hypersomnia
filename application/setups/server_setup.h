@@ -9,7 +9,7 @@
 #include "game/transcendental/step_packaged_for_network.h"
 #include "game/transcendental/cosmos.h"
 
-#include "game/scene_managers/networked_testbed.h"
+#include "game/scene_builders/networked_testbed.h"
 
 #include "setup_base.h"
 
@@ -45,7 +45,7 @@ class server_setup : public setup_base {
 	cosmos hypersomnia = cosmos(3000);
 
 	std::vector<endpoint> endpoints;
-	scene_managers::networked_testbed_server scene;
+	scene_builders::networked_testbed_server scene;
 
 	endpoint& get_endpoint(const augs::network::endpoint_address);
 	void disconnect(const augs::network::endpoint_address, const bool gracefully = false);

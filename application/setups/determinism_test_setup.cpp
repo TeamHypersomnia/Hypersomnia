@@ -5,8 +5,8 @@
 
 #include "game/resources/manager.h"
 
-#include "game/scene_managers/testbed.h"
-#include "game/scene_managers/resource_setups/all.h"
+#include "game/scene_builders/testbed.h"
+#include "game/resource_setups/all.h"
 
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "game/transcendental/types_specification/all_messages_includes.h"
@@ -36,7 +36,7 @@ void determinism_test_setup::process(
 	cosmic_entropy total_collected_entropy;
 	augs::debug_entropy_player<cosmic_entropy> player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
-	std::vector<scene_managers::testbed> testbeds(cosmoi_count);
+	std::vector<scene_builders::testbed> testbeds(cosmoi_count);
 
 	viewing_session session;
 	session.reserve_caches_for_entities(3000);

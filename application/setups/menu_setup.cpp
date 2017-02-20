@@ -7,8 +7,8 @@
 
 #include "game/resources/manager.h"
 
-#include "game/scene_managers/testbed.h"
-#include "game/scene_managers/resource_setups/all.h"
+#include "game/scene_builders/testbed.h"
+#include "game/resource_setups/all.h"
 
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "game/view/viewing_session.h"
@@ -125,7 +125,7 @@ void menu_setup::process(
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 	timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
 
-	scene_managers::testbed testbed;
+	scene_builders::testbed testbed;
 	testbed.debug_var = cfg.debug_var;
 
 	intro_scene.set_fixed_delta(cfg.tickrate);

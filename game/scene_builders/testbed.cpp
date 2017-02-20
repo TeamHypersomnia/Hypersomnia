@@ -37,7 +37,7 @@
 
 #include "augs/graphics/renderer.h"
 
-namespace scene_managers {
+namespace scene_builders {
 	void testbed::populate(const logic_step step, const vec2i screen_size) {
 		auto& world = step.cosm;
 		//const auto crate = prefabs::create_crate(world, vec2(200, 200 + 300), vec2i(100, 100) / 3);

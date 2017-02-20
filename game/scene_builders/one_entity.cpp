@@ -37,7 +37,7 @@
 
 #include "augs/graphics/renderer.h"
 
-namespace scene_managers {
+namespace scene_builders {
 	void one_entity::populate(const logic_step step, const vec2i screen_size) {
 		auto& world = step.cosm;
 
