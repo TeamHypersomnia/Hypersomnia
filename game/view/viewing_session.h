@@ -1,5 +1,5 @@
 #pragma once
-#include "game/detail/world_camera.h"
+#include "game/view/world_camera.h"
 #include "augs/misc/variable_delta_timer.h"
 #include "augs/misc/measurements.h"
 

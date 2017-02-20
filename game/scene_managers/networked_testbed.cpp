@@ -25,7 +25,7 @@
 #include "game/view/viewing_session.h"
 #include "game/transcendental/logic_step.h"
 
-#include "game/detail/world_camera.h"
+#include "game/view/world_camera.h"
 #include "augs/gui/text/printer.h"
 
 #include "augs/filesystem/file.h"
