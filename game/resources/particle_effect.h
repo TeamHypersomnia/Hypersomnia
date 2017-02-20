@@ -52,9 +52,16 @@ namespace resources {
 		minmax swing_speed_change_rate = minmax(0.f, 0.f);
 		minmax fade_when_ms_remaining = minmax(0.f, 0.f);
 		minmax num_of_particles_to_spawn_initially = minmax(0.f, 0.f);
+
 		minmax randomize_spawn_point_within_circle_of_outer_radius = minmax(0.f, 0.f);
 		minmax randomize_spawn_point_within_circle_of_inner_radius = minmax(0.f, 0.f);
-		
+
+		minmax starting_spawn_circle_size_multiplier = minmax(0.f, 0.f);
+		minmax ending_spawn_circle_size_multiplier = minmax(0.f, 0.f);
+
+		minmax starting_homing_force = minmax(0.f, 0.f);
+		minmax ending_homing_force = minmax(0.f, 0.f);
+
 		entity_id homing_target;
 
 		float initial_rotation_variation = 0.f;

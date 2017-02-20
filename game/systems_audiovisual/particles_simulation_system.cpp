@@ -167,8 +167,15 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 				new_emission_instance.swing_spread_change = rng.randval(emission.swing_spread_change_rate);
 
 				new_emission_instance.fade_when_ms_remaining = rng.randval(emission.fade_when_ms_remaining);
+
 				new_emission_instance.randomize_spawn_point_within_circle_of_inner_radius = rng.randval(emission.randomize_spawn_point_within_circle_of_inner_radius);
 				new_emission_instance.randomize_spawn_point_within_circle_of_outer_radius = rng.randval(emission.randomize_spawn_point_within_circle_of_outer_radius);
+
+				new_emission_instance.starting_homing_force = rng.randval(emission.starting_homing_force);
+				new_emission_instance.ending_homing_force = rng.randval(emission.ending_homing_force);
+
+				new_emission_instance.starting_spawn_circle_size_multiplier = rng.randval(emission.starting_spawn_circle_size_multiplier);
+				new_emission_instance.ending_spawn_circle_size_multiplier = rng.randval(emission.ending_spawn_circle_size_multiplier);
 			}
 		}
 
@@ -218,9 +225,15 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 					instance.randomize_spawn_point_within_circle_of_inner_radius > 0.f
 					|| instance.randomize_spawn_point_within_circle_of_outer_radius > 0.f
 					) {
+					const auto size_mult = augs::interp(
+						instance.starting_spawn_circle_size_multiplier,
+						instance.ending_spawn_circle_size_multiplier,
+						instance.stream_lifetime_ms / instance.stream_max_lifetime_ms
+					); 
+					
 					final_particle_position += rng.random_point_in_ring(
-						instance.randomize_spawn_point_within_circle_of_inner_radius,
-						instance.randomize_spawn_point_within_circle_of_outer_radius
+						size_mult * instance.randomize_spawn_point_within_circle_of_inner_radius,
+						size_mult * instance.randomize_spawn_point_within_circle_of_outer_radius
 					);
 				}
 
@@ -255,6 +268,13 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 				if (emission.get_templates<homing_animated_particle>().size() > 0)
 				{
 					auto new_homing_animated = spawner(homing_animated_particle());
+
+					new_homing_animated.homing_force = augs::interp(
+						instance.starting_homing_force,
+						instance.ending_homing_force,
+						instance.stream_lifetime_ms / instance.stream_max_lifetime_ms
+					);
+
 					new_homing_animated.integrate(time_elapsed, homing_target_pos);
 					add_particle(emission.particle_render_template.layer, emission.homing_target, new_homing_animated);
 				}

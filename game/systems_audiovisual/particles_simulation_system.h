@@ -49,6 +49,12 @@ public:
 		float randomize_spawn_point_within_circle_of_outer_radius = 0.f;
 		float randomize_spawn_point_within_circle_of_inner_radius = 0.f;
 
+		float starting_homing_force = 0.f;
+		float ending_homing_force = 0.f;
+
+		float starting_spawn_circle_size_multiplier = 0.f;
+		float ending_spawn_circle_size_multiplier = 0.f;
+
 		augs::minmax<float> particle_speed;
 
 		float fade_when_ms_remaining = 0.f;

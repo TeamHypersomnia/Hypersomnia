@@ -249,8 +249,14 @@ namespace resource_setups {
 			em.rotation_speed = std::make_pair(0, 0);
 			em.particle_lifetime_ms = std::make_pair(1000, 1000);
 
-			em.randomize_spawn_point_within_circle_of_inner_radius = std::make_pair(180.f, 180.f);
-			em.randomize_spawn_point_within_circle_of_outer_radius = std::make_pair(220.f, 220.f);
+			em.randomize_spawn_point_within_circle_of_inner_radius = std::make_pair(200.f, 200.f);
+			em.randomize_spawn_point_within_circle_of_outer_radius = std::make_pair(250.f, 250.f);
+
+			em.starting_spawn_circle_size_multiplier = std::make_pair(1.f, 1.f);
+			em.ending_spawn_circle_size_multiplier = std::make_pair(0.35f, 0.35f);
+
+			em.starting_homing_force = std::make_pair(100.f, 100.f);
+			em.ending_homing_force = std::make_pair(10000.f, 10000.f);
 
 			const auto& anim = *get_resource_manager().find(assets::animation_id::CAST_BLINK_ANIMATION);
 			const auto frame_duration = anim.frames[0].duration_milliseconds / 4.f;
@@ -376,7 +382,7 @@ namespace resource_setups {
 				em.num_of_particles_to_spawn_initially.set(300, 340);
 				em.stream_lifetime_ms = std::make_pair(0, 0);
 
-				em.base_speed = std::make_pair(120, 600);
+				em.base_speed = std::make_pair(320, 600);
 				em.base_speed_variation = std::make_pair(10.f, 20.f);
 
 				em.rotation_speed = std::make_pair(0, 0);
