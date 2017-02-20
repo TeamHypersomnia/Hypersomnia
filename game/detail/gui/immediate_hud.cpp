@@ -256,7 +256,7 @@ void immediate_hud::acquire_game_events(
 
 		if (h.target == messages::health_event::HEALTH) {
 			if (h.effective_amount > 0) {
-				col = { 255, 100, 100, 255 };
+				col = { 255, 20, 20, 255 };
 			}
 			else {
 				col = green;

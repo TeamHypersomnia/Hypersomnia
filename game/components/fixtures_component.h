@@ -13,15 +13,18 @@
 
 #include "augs/misc/constant_size_vector.h"
 #include "game/container_sizes.h"
+#include "game/enums/physical_material_type.h"
 #include "padding_byte.h"
 
 class physics_system;
 struct colliders_cache;
+struct b2Fixture_index_in_component;
 
 namespace components {
 	struct fixtures : synchronizable_component {
 		struct convex_partitioned_collider {
 			convex_partitioned_shape shape;
+			physical_material_type material = physical_material_type::METAL;
 
 			float density = 1.f;
 			float density_multiplier = 1.f;
@@ -120,7 +123,7 @@ class component_synchronizer<false, components::fixtures> : public basic_fixture
 public:
 	using basic_fixtures_synchronizer<false>::basic_fixtures_synchronizer;
 
-	convex_partitioned_shape::convex_poly::destruction_data& get_modifiable_destruction_data(const std::pair<size_t, size_t>);
+	convex_partitioned_shape::convex_poly::destruction_data& get_modifiable_destruction_data(const b2Fixture_index_in_component);
 
 	void set_density(float, size_t = 0) const;
 	void set_density_multiplier(float, size_t = 0) const;

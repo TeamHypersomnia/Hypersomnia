@@ -33,6 +33,7 @@
 #include "game/detail/inventory/item_slot_transfer_request.h"
 
 #include "game/flyweights/spell_data.h"
+#include "game/flyweights/physical_material.h"
 
 class cosmic_delta;
 struct data_living_one_step;
@@ -93,6 +94,8 @@ public:
 
 			struct flyweights_state {
 				augs::enum_associative_array<spell_type, spell_data> spells;
+				collision_sound_matrix_type collision_sound_matrix;
+
 			} flyweights;
 
 		} meta;
@@ -204,6 +207,11 @@ public:
 	std::vector<const_entity_handle> get(const processing_subjects) const;
 
 	const spell_data& get(const spell_type) const;
+	
+	assets::sound_buffer_id get_collision_sound(
+		const physical_material_type a, 
+		const physical_material_type b
+	) const;
 
 	size_t entities_count() const;
 	size_t get_maximum_entities() const;

@@ -25,6 +25,7 @@
 #include "game/components/dynamic_tree_node_component.h"
 #include "game/components/flags_component.h"
 #include "game/assets/particle_effect_response_id.h"
+#include "game/systems_stateless/particles_existence_system.h"
 
 #include "game/enums/filters.h"
 #include "game/enums/party_category.h"
@@ -185,7 +186,7 @@ namespace ingredients {
 		// driver.linear_damping_while_driving = 4.f;
 
 		e.map_sub_entity(sub_entity_name::CHARACTER_CROSSHAIR, crosshair_entity);
-		
+
 		animation_response.response = torso_set;
 
 		sprite.set(assets::texture_id::TEST_PLAYER, rgba(255, 255, 255, 255));
@@ -228,6 +229,22 @@ namespace prefabs {
 		name_entity(corpse_of_sentience, entity_name::CORPSE);
 
 		character.map_sub_entity(sub_entity_name::CORPSE_OF_SENTIENCE, corpse_of_sentience);
+
+		{
+			messages::create_particle_effect effect;
+			effect.place_of_birth = character.get_logic_transform();
+
+			effect.input.effect = assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES;
+			effect.subject = character;
+			effect.input.delete_entity_after_effect_lifetime = false;
+
+			const auto particles = particles_existence_system().create_particle_effect_entity(character.get_cosmos(), effect);
+
+			particles.add_standard_components();
+			character.add_sub_entity(particles);
+			character.get<components::sentience>().health_damage_particles = particles;
+			components::particles_existence::deactivate(particles);
+		}
 
 		character.add_standard_components();
 

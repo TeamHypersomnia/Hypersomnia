@@ -8,7 +8,9 @@
 #include "game/components/position_copying_component.h"
 #include "game/components/sound_response_component.h"
 #include "game/components/gun_component.h"
+#include "game/components/fixtures_component.h"
 
+#include "game/messages/collision_message.h"
 #include "game/messages/gunshot_response.h"
 #include "game/messages/create_particle_effect.h"
 #include "game/messages/queue_destruction.h"
@@ -74,12 +76,26 @@ void sound_existence_system::destroy_dead_sounds(const logic_step step) const {
 }
 
 void sound_existence_system::game_responses_to_sound_effects(const logic_step step) const {
+	const auto& collisions = step.transient.messages.get_queue<messages::collision_message>();
 	const auto& gunshots = step.transient.messages.get_queue<messages::gunshot_response>();
 	const auto& damages = step.transient.messages.get_queue<messages::damage_message>();
 	const auto& swings = step.transient.messages.get_queue<messages::melee_swing_response>();
 	const auto& healths = step.transient.messages.get_queue<messages::health_event>();
 	const auto& exhausted_casts = step.transient.messages.get_queue<messages::exhausted_cast>();
 	auto& cosmos = step.cosm;
+
+	for (const auto& c : collisions) {
+		if (c.type == messages::collision_message::event_type::PRE_SOLVE) {
+			const auto subject = cosmos[c.subject];
+			const auto collider = cosmos[c.collider];
+
+			const auto& subject_fix = subject.get<components::fixtures>();
+			const auto& collider_fix = collider.get<components::fixtures>();
+
+			const auto& subject_coll = subject_fix.get_collider_data(c.subject_b2Fixture_index.collider_index);
+			const auto& collider_coll = subject_fix.get_collider_data(c.collider_b2Fixture_index.collider_index);
+		}
+	}
 
 	for (const auto& g : gunshots) {
 		for (const auto r : g.spawned_rounds) {
@@ -228,7 +244,11 @@ entity_handle sound_existence_system::create_sound_effect_entity(cosmos& cosmos,
 	const auto chased_subject = cosmos[chased_subject_id];
 
 	if (chased_subject.alive()) {
-		components::position_copying::configure_chasing(new_sound_entity, chased_subject, place_of_birth, components::position_copying::chasing_configuration::RELATIVE_ORBIT);
+		new_sound_entity += components::position_copying::configure_chasing(
+			chased_subject, 
+			place_of_birth, 
+			components::position_copying::chasing_configuration::RELATIVE_ORBIT
+		);
 	}
 
 	return new_sound_entity;

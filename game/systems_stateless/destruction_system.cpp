@@ -14,28 +14,33 @@ void destruction_system::generate_damages_from_forceful_collisions(const logic_s
 	const auto& events = step.transient.messages.get_queue<messages::collision_message>();
 
 	for (const auto& it : events) {
-		if (it.type != messages::collision_message::event_type::PRE_SOLVE || it.one_is_sensor)
+		if (it.type != messages::collision_message::event_type::PRE_SOLVE || it.one_is_sensor) {
 			continue;
+		}
 		
 		const auto subject = cosmos[it.subject];
 		const auto& fixtures = subject.get<components::fixtures>();
 
-		const auto& data_indices = it.subject_collider_and_convex_indices;
-		const auto& coll = fixtures.get_collider_data(data_indices.first);
+		const auto& data_indices = it.subject_b2Fixture_index;
 
-		if (coll.destructible) {
-			//LOG("Destructible fixture was hit.");
+		if (data_indices.is_set()) {
+			const auto& coll = fixtures.get_collider_data(data_indices.collider_index);
 
-			messages::damage_message damage_msg;
-			damage_msg.subject_collider_and_convex_indices = it.subject_collider_and_convex_indices;
+			if (coll.destructible) {
+				//LOG("Destructible fixture was hit.");
 
-			damage_msg.inflictor = it.collider;
-			damage_msg.subject = it.subject;
-			damage_msg.amount = 0.f;
-			damage_msg.impact_velocity = it.collider_impact_velocity;
-			damage_msg.point_of_impact = it.point;
+				messages::damage_message damage_msg;
+				damage_msg.subject_b2Fixture_index = it.subject_b2Fixture_index;
+				damage_msg.collider_b2Fixture_index = it.collider_b2Fixture_index;
 
-			step.transient.messages.post(damage_msg);
+				damage_msg.inflictor = it.collider;
+				damage_msg.subject = it.subject;
+				damage_msg.amount = 0.f;
+				damage_msg.impact_velocity = it.collider_impact_velocity;
+				damage_msg.point_of_impact = it.point;
+
+				step.transient.messages.post(damage_msg);
+			}
 		}
 	}
 }
@@ -51,17 +56,19 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 		if (subject.has<components::fixtures>()) {
 			auto& fixtures = subject.get<components::fixtures>();
 			
-			const auto& data_indices = d.subject_collider_and_convex_indices;
+			const auto& data_indices = d.subject_b2Fixture_index;
 
-			const auto& coll = fixtures.get_collider_data(data_indices.first);
+			if (data_indices.is_set()) {
+				const auto& coll = fixtures.get_collider_data(data_indices.collider_index);
 
-			if (coll.destructible) {
-				auto& dest_data = fixtures.get_modifiable_destruction_data(data_indices);
-				dest_data.scars.resize(1);
-				dest_data.scars[0].first_impact = d.point_of_impact;
-				dest_data.scars[0].depth_point = d.point_of_impact + d.impact_velocity;
+				if (coll.destructible) {
+					auto& dest_data = fixtures.get_modifiable_destruction_data(data_indices);
+					dest_data.scars.resize(1);
+					dest_data.scars[0].first_impact = d.point_of_impact;
+					dest_data.scars[0].depth_point = d.point_of_impact + d.impact_velocity;
 
-				//LOG("Destructible fixture has been applied damage to with direction: %x", d.impact_velocity);
+					//LOG("Destructible fixture has been applied damage to with direction: %x", d.impact_velocity);
+				}
 			}
 		}
 	}

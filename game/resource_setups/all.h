@@ -2,6 +2,8 @@
 #include "game/resources/manager.h"
 #include "game/assets/texture_id.h"
 #include "augs/graphics/pixel.h"
+#include "game/flyweights/spell_data.h"
+#include "game/flyweights/physical_material.h"
 
 namespace resource_setups {
 	void load_standard_everything();
@@ -26,3 +28,6 @@ namespace resource_setups {
 		const bool make_lb_complement
 	);
 }
+
+void set_standard_collision_sound_matrix(collision_sound_matrix_type&);
+void set_standard_spell_properties(augs::enum_associative_array<spell_type, spell_data>&);

@@ -10,6 +10,7 @@
 #include "game/components/render_component.h"
 #include "game/components/position_copying_component.h"
 #include "game/components/particles_existence_component.h"
+#include "game/components/sentience_component.h"
 
 #include "game/messages/gunshot_response.h"
 #include "game/messages/create_particle_effect.h"
@@ -62,7 +63,6 @@ void particles_existence_system::destroy_dead_streams(const logic_step step) con
 				existence.time_of_last_displacement = timestamp;
 				existence.current_displacement.set_from_degrees(rng.randval(0.f, 360.f)).set_length(rng.randval(0.f, input.displace_source_position_within_radius));
 				existence.current_displacement_duration_bound_ms = rng.randval(input.single_displacement_duration_ms);
-				existence.rng_seed = new_seed;
 			}
 		}
 
@@ -156,28 +156,44 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 		const auto& response = cosmos[h.subject].get<components::particle_effect_response>();
 		const auto& response_map = *response.response;
 
+		const auto subject = cosmos[h.subject];
+		const auto& sentience = subject.get<components::sentience>();
+		const auto particles_entity = cosmos[sentience.health_damage_particles];
+		auto& existence = particles_entity.get<components::particles_existence>();
+
 		messages::create_particle_effect burst;
 		burst.subject = h.subject;
 		burst.place_of_birth.pos = h.point_of_impact;
 		burst.place_of_birth.pos = cosmos[h.subject].get_logic_transform().pos;
 		burst.place_of_birth.rotation = (h.impact_velocity).degrees();
+		burst.input = existence.input;
 		burst.input.modifier = response.modifier;
 
 		if (h.target == messages::health_event::HEALTH) {
 			if (cosmos[h.spawned_remnants].alive()) {
 				burst.input.effect = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
-				burst.input.modifier.scale_amounts = 2.5f;
+				burst.input.modifier.scale_amounts = 3.f;
+				burst.input.modifier.scale_lifetimes = 2.5f;
 				burst.input.modifier.colorize = red;
 				burst.input.modifier.homing_target = h.subject;
-				step.transient.messages.post(burst);
 			}
 			else if (h.effective_amount > 0) {
 				burst.input.effect = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
 				burst.input.modifier.colorize = red;
-				burst.input.modifier.scale_amounts = (0.85f + h.ratio_effective_to_maximum)*(0.85f + h.ratio_effective_to_maximum);
+				burst.input.modifier.scale_amounts = (1.25f + h.ratio_effective_to_maximum)*(1.25f + h.ratio_effective_to_maximum);
+				burst.input.modifier.scale_lifetimes = 1.25f + h.ratio_effective_to_maximum;
 				burst.input.modifier.homing_target = h.subject;
-				step.transient.messages.post(burst);
 			}
+
+			particles_existence_system().create_particle_effect_components(
+				particles_entity.get<components::transform>(),
+				existence,
+				particles_entity.get<components::position_copying>(),
+				cosmos,
+				burst
+			);
+
+			components::particles_existence::activate(particles_entity);
 		}
 	}
 
@@ -204,35 +220,50 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 	}
 }
 
-entity_handle particles_existence_system::create_particle_effect_entity(cosmos& cosmos, const messages::create_particle_effect it) const {
-	entity_handle new_stream_entity = cosmos.create_entity("particle_stream");
-	auto& target_transform = new_stream_entity += it.place_of_birth;
+void particles_existence_system::create_particle_effect_components(
+	components::transform& out_transform,
+	components::particles_existence& out_existence,
+	components::position_copying& out_copying,
+	cosmos& cosmos,
+	const messages::create_particle_effect it
+) const {
+	out_transform = it.place_of_birth;
 
-	const auto rng_seed = cosmos.get_rng_seed_for(new_stream_entity);
-
-	auto& existence = new_stream_entity += components::particles_existence();
-	existence.input = it.input;
-	existence.rng_seed = rng_seed;
-	existence.time_of_birth = cosmos.get_timestamp();
-	existence.time_of_last_displacement = cosmos.get_timestamp();
-	existence.current_displacement_duration_bound_ms = 0;
+	out_existence.input = it.input;
+	out_existence.time_of_birth = cosmos.get_timestamp();
+	out_existence.time_of_last_displacement = cosmos.get_timestamp();
+	out_existence.current_displacement_duration_bound_ms = 0;
 
 	const float duration_ms = (*std::max_element((*it.input.effect).begin(), (*it.input.effect).end(), [](const auto& a, const auto& b) {
 		return a.stream_lifetime_ms.second < b.stream_lifetime_ms.second;
 	})).stream_lifetime_ms.second;
 
-	existence.max_lifetime_in_steps = static_cast<unsigned>(duration_ms / cosmos.get_fixed_delta().in_milliseconds()) + 1u;
-	
+	out_existence.max_lifetime_in_steps = static_cast<unsigned>(duration_ms / cosmos.get_fixed_delta().in_milliseconds()) + 1u;
+
 	const auto chased_subject = cosmos[it.subject];
 
 	if (chased_subject.alive()) {
-		components::position_copying::configure_chasing(
-			new_stream_entity, 
-			chased_subject, 
-			it.place_of_birth, 
+		out_copying = components::position_copying::configure_chasing(
+			chased_subject,
+			it.place_of_birth,
 			components::position_copying::chasing_configuration::RELATIVE_ORBIT
 		);
 	}
+}
+
+entity_handle particles_existence_system::create_particle_effect_entity(
+	cosmos& cosmos, 
+	const messages::create_particle_effect it
+) const {
+	const entity_handle new_stream_entity = cosmos.create_entity("particle_stream");
+	
+	create_particle_effect_components(
+		new_stream_entity += components::transform(),
+		new_stream_entity += components::particles_existence(),
+		new_stream_entity += components::position_copying(),
+		cosmos,
+		it
+	);
 
 	return new_stream_entity;
 }

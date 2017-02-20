@@ -194,26 +194,20 @@ void physics_system::reserve_caches_for_entities(const size_t n) {
 	colliders_caches.resize(n);
 }
 
-std::pair<size_t, size_t> physics_system::map_fixture_pointer_to_indices(const b2Fixture* const f, const const_entity_handle handle) {
+b2Fixture_index_in_component physics_system::get_index_in_component(const b2Fixture* const f, const const_entity_handle handle) {
 	const auto this_cache_id = handle.get_id().pool.indirection_index;
 	const auto& cache = colliders_caches[this_cache_id];
 
 	for (size_t collider_index = 0; collider_index < cache.fixtures_per_collider.size(); ++collider_index) {
 		for (size_t convex_index = 0; convex_index < cache.fixtures_per_collider[collider_index].size(); ++convex_index) {
 			if (cache.fixtures_per_collider[collider_index][convex_index] == f) {
-				return std::make_pair(collider_index, convex_index);
+				return { collider_index, convex_index };
 			}
 		}
 	}
 
 	ensure(false);
 	return{ 0xdeadbeef, 0xdeadbeef };
-}
-
-convex_partitioned_shape::convex_poly::destruction_data& physics_system::map_fixture_pointer_to_convex_poly(const b2Fixture* const f, const entity_handle handle) {
-	const auto indices = map_fixture_pointer_to_indices(f, handle);
-
-	return handle.get<components::fixtures>().component.colliders[indices.first].shape.convex_polys[indices.second].destruction;
 }
 
 physics_system::physics_system() : 

@@ -87,6 +87,8 @@ void damage_system::destroy_colliding_bullets_and_send_damage(const logic_step s
 				const bool is_victim_a_held_item = owning_capability.alive() && owning_capability != it.subject;
 
 				messages::damage_message damage_msg;
+				damage_msg.subject_b2Fixture_index = it.subject_b2Fixture_index;
+				damage_msg.collider_b2Fixture_index = it.collider_b2Fixture_index;
 
 				if (is_victim_a_held_item) {
 					components::sound_existence::effect_input in;

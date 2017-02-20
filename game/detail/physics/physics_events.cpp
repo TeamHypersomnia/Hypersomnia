@@ -265,7 +265,8 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 			contact->SetEnabled(false);
 		}
 
-		msg.subject_collider_and_convex_indices = sys.map_fixture_pointer_to_indices(fix_a, subject);
+		msg.subject_b2Fixture_index = sys.get_index_in_component(fix_a, subject);
+		msg.collider_b2Fixture_index = sys.get_index_in_component(fix_b, collider);
 
 		msg.point = manifold.points[0];
 		msg.point = si.get_pixels(msg.point);

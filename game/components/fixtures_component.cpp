@@ -10,6 +10,7 @@
 #include <string>
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
+#include "game/detail/physics/b2Fixture_index_in_component.h"
 
 typedef components::fixtures F;
 
@@ -94,8 +95,8 @@ void component_synchronizer<false, F>::set_density(const float d, const size_t i
 	rebuild_density(index);
 }
 
-convex_partitioned_shape::convex_poly::destruction_data& component_synchronizer<false, F>::get_modifiable_destruction_data(const std::pair<size_t, size_t> indices) {
-	return component.colliders[indices.first].shape.convex_polys[indices.second].destruction;
+convex_partitioned_shape::convex_poly::destruction_data& component_synchronizer<false, F>::get_modifiable_destruction_data(const b2Fixture_index_in_component indices) {
+	return component.colliders[indices.collider_index].shape.convex_polys[indices.convex_shape_index].destruction;
 }
 
 void component_synchronizer<false, F>::set_density_multiplier(const float mult, const size_t index) const {

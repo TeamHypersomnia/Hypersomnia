@@ -44,6 +44,7 @@
 #include "game/transcendental/data_living_one_step.h"
 
 #include "game/detail/inventory/inventory_utils.h"
+#include "game/resource_setups/all.h"
 
 void cosmos::complete_resubstantiation() {
 	profiler.complete_resubstantiation.new_measurement();
@@ -99,6 +100,7 @@ cosmos::cosmos(const unsigned reserved_entities) {
 	entity_debug_names[0] = "dead entity";
 
 	set_standard_spell_properties(significant.meta.flyweights.spells);
+	set_standard_collision_sound_matrix(significant.meta.flyweights.collision_sound_matrix);
 }
 
 const std::string& cosmos::get_debug_name(entity_id id) const {
@@ -212,6 +214,13 @@ std::vector<const_entity_handle> cosmos::get(const processing_subjects list) con
 
 const spell_data& cosmos::get(const spell_type s) const {
 	return significant.meta.flyweights.spells[s];
+}
+
+assets::sound_buffer_id cosmos::get_collision_sound(
+	const physical_material_type a, 
+	const physical_material_type b
+) const {
+	return significant.meta.flyweights.collision_sound_matrix[a][b];
 }
 
 size_t cosmos::get_rng_seed_for(const entity_id id) const {

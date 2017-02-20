@@ -410,16 +410,22 @@ namespace resource_setups {
 				em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
 
 				em.spread_degrees = std::make_pair(100, 120);
-				em.num_of_particles_to_spawn_initially.set(80, 100);
+				em.num_of_particles_to_spawn_initially.set(40, 60);
+				
+				em.stream_lifetime_ms.set(700, 900);
+				em.particles_per_sec.set(290, 320);
 
 				em.base_speed = std::make_pair(260, 290);
 				em.base_speed_variation = std::make_pair(10.f, 20.f);
 
 				em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEGf, 2.8f*RAD_TO_DEGf);
-				em.particle_lifetime_ms = std::make_pair(1400, 1400);
+				em.particle_lifetime_ms = std::make_pair(700, 800);
 
-				em.randomize_spawn_point_within_circle_of_inner_radius = std::make_pair(50.f, 50.f);
-				em.randomize_spawn_point_within_circle_of_outer_radius = std::make_pair(75.f, 75.f);
+				em.randomize_spawn_point_within_circle_of_inner_radius = std::make_pair(120.f, 120.f);
+				em.randomize_spawn_point_within_circle_of_outer_radius = std::make_pair(145.f, 145.f);
+
+				em.starting_spawn_circle_size_multiplier = std::make_pair(0.6f, 0.6f);
+				em.starting_spawn_circle_size_multiplier = std::make_pair(1.0f, 1.0f);
 
 				for (int i = 0; i < 3; ++i) {
 					general_particle particle_template;

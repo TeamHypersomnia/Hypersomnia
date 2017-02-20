@@ -29,7 +29,6 @@ namespace components {
 		float current_displacement_duration_bound_ms = 0.f;
 
 		augs::stepped_timestamp time_of_birth;
-		unsigned rng_seed = 0u;
 		unsigned max_lifetime_in_steps = 0u;
 
 		float distribute_within_segment_of_length = 0.f;

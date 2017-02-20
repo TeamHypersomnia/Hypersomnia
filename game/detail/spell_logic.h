@@ -21,8 +21,6 @@ struct spell_appearance {
 	rgba border_col;
 };
 
-void set_standard_spell_properties(augs::enum_associative_array<spell_type, spell_data>&);
-
 spell_appearance get_spell_appearance(const spell_type);
 
 bool are_additional_conditions_for_casting_fulfilled(

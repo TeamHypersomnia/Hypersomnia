@@ -91,7 +91,7 @@ void animated_particle::integrate(const float dt) {
 
 void animated_particle::draw(components::sprite::drawing_input basic_input) const {
 	static thread_local components::sprite face;
-	const auto frame_num = std::min(static_cast<unsigned>(lifetime_ms / frame_duration_ms), frame_count);
+	const auto frame_num = std::min(static_cast<unsigned>(lifetime_ms / frame_duration_ms), frame_count - 1);
 
 	face.set(static_cast<assets::texture_id>(static_cast<int>(first_face) + frame_num));
 	
@@ -157,7 +157,7 @@ void homing_animated_particle::integrate(
 
 void homing_animated_particle::draw(components::sprite::drawing_input basic_input) const {
 	static thread_local components::sprite face;
-	const auto frame_num = std::min(static_cast<unsigned>(lifetime_ms / frame_duration_ms), frame_count);
+	const auto frame_num = std::min(static_cast<unsigned>(lifetime_ms / frame_duration_ms), frame_count-1);
 
 	//face.set(static_cast<assets::texture_id>(static_cast<int>(first_face) + frame_count - frame_num - 1));
 	face.set(static_cast<assets::texture_id>(static_cast<int>(first_face) + frame_num));

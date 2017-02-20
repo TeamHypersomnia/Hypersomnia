@@ -1,23 +1,19 @@
 #pragma once
 #include "message.h"
 #include "augs/math/vec2.h"
+#include "game/detail/physics/b2Fixture_index_in_component.h"
 
 namespace messages {
 	struct collision_message : public message {
 		entity_id collider;
-		vec2 collider_impact_velocity, subject_impact_velocity, point;
+		vec2 collider_impact_velocity;
+		vec2 subject_impact_velocity;
+		vec2 point;
 
-		std::pair<size_t, size_t> subject_collider_and_convex_indices;
+		b2Fixture_index_in_component collider_b2Fixture_index;
+		b2Fixture_index_in_component subject_b2Fixture_index;
 
 		bool one_is_sensor = false;
-
-		bool operator<(const collision_message& b) const {
-			return std::make_pair(subject, collider) < std::make_pair(b.subject, b.collider);
-		}
-
-		bool operator==(const collision_message& b) const {
-			return std::make_pair(subject, collider) == std::make_pair(b.subject, b.collider);
-		}
 
 		enum class event_type {
 			BEGIN_CONTACT,

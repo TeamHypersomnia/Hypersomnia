@@ -17,25 +17,26 @@ void components::position_copying::set_target(const const_entity_handle new_targ
 	target = new_target;
 }
 
-void components::position_copying::configure_chasing(
-	const entity_handle subject, 
+components::position_copying components::position_copying::configure_chasing(
 	const const_entity_handle target, 
 	const components::transform chaser_place_of_birth, 
 	const chasing_configuration cfg
 ) {
-	auto& copying = subject += components::position_copying();
+	components::position_copying copying;
 	
-	copying.previous = subject.get_logic_transform();
+	copying.previous = chaser_place_of_birth;
 	copying.set_target(target);
 
 	if (cfg == chasing_configuration::RELATIVE_ORBIT) {
-		const auto subject_transform = target.get_logic_transform();
+		const auto target_transform = target.get_logic_transform();
 		copying.position_copying_mode = components::position_copying::position_copying_type::ORBIT;
 
 		copying.position_copying_rotation = true;
-		copying.rotation_offset = chaser_place_of_birth.rotation - subject_transform.rotation;
-		copying.rotation_orbit_offset = (chaser_place_of_birth.pos - subject_transform.pos).rotate(-subject_transform.rotation, vec2(0.f, 0.f));
+		copying.rotation_offset = chaser_place_of_birth.rotation - target_transform.rotation;
+		copying.rotation_orbit_offset = (chaser_place_of_birth.pos - target_transform.pos).rotate(-target_transform.rotation, vec2(0.f, 0.f));
 	}
+
+	return copying;
 }
 
 components::transform components::position_copying::get_previous_transform() const {

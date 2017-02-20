@@ -401,13 +401,16 @@
     <ClCompile Include="game\enums\attitude_type.cpp" />
     <ClCompile Include="game\enums\item_category.cpp" />
     <ClCompile Include="game\enums\item_transfer_result_type.cpp" />
+    <ClCompile Include="game\flyweights\physical_material.cpp" />
     <ClCompile Include="game\resources\tile_layer.cpp" />
     <ClCompile Include="game\resource_setups\make_button_with_corners.cpp" />
     <ClCompile Include="game\resource_setups\standard_atlas.cpp" />
     <ClCompile Include="game\resource_setups\standard_behaviour_trees.cpp" />
     <ClCompile Include="game\resource_setups\standard_everything.cpp" />
     <ClCompile Include="game\resource_setups\standard_particle_effects.cpp" />
+    <ClCompile Include="game\resource_setups\standard_physical_materials.cpp" />
     <ClCompile Include="game\resource_setups\standard_sound_buffers.cpp" />
+    <ClCompile Include="game\resource_setups\standard_spell_datas.cpp" />
     <ClCompile Include="game\resource_setups\standard_tile_layers.cpp" />
     <ClCompile Include="game\scene_builders\networked_testbed.cpp" />
     <ClCompile Include="game\scene_builders\one_entity.cpp" />
@@ -1179,6 +1182,7 @@
     <ClInclude Include="game\detail\perks\haste_perk.h" />
     <ClInclude Include="game\detail\perks\electric_shield_perk.h" />
     <ClInclude Include="game\detail\perks\timed_perk.h" />
+    <ClInclude Include="game\detail\physics\b2Fixture_index_in_component.h" />
     <ClInclude Include="game\detail\physics\physics_queries.h" />
     <ClInclude Include="game\detail\physics\physics_scripts.h" />
     <ClInclude Include="game\detail\spell_logic.h" />
@@ -1192,6 +1196,7 @@
     <ClInclude Include="game\enums\sentience_meter_type.h" />
     <ClInclude Include="game\enums\sound_response_type.h" />
     <ClInclude Include="game\enums\spell_type.h" />
+    <ClInclude Include="game\flyweights\physical_material.h" />
     <ClInclude Include="game\flyweights\spell_data.h" />
     <ClInclude Include="game\messages\exhausted_cast_message.h" />
     <ClInclude Include="game\messages\exploding_ring.h" />
