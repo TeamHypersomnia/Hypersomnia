@@ -16,7 +16,7 @@
 #include "game/messages/intent_message.h"
 #include "game/detail/inventory_utils.h"
 
-#include "rendering_scripts/all.h"
+#include "game/view/rendering_scripts/all.h"
 
 #include "texture_baker/font.h"
 

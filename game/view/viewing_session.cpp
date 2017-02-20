@@ -2,7 +2,7 @@
 #include "application/game_window.h"
 #include "game/transcendental/cosmos.h"
 #include "game/view/viewing_step.h"
-#include "game/scene_managers/rendering_scripts/all.h"
+#include "game/view/rendering_scripts/all.h"
 #include "augs/misc/machine_entropy.h"
 #include "game/components/flags_component.h"
 #include "game/messages/item_picked_up_message.h"
