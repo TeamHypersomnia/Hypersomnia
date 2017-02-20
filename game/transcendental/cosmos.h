@@ -24,7 +24,7 @@
 #include "game/transcendental/data_living_one_step.h"
 #include "game/detail/inventory_slot_handle_declaration.h"
 #include "game/detail/item_slot_transfer_request_declaration.h"
-#include "game/global/all_settings.h"
+#include "game/simulation_settings/all_simulation_settings.h"
 #include "game/transcendental/cosmic_profiler.h"
 #include "augs/build_settings/setting_empty_bases.h"
 
@@ -86,7 +86,7 @@ public:
 			entity_guid next_entity_guid = 1;
 #endif
 		public:
-			all_settings settings;
+			all_simulation_settings settings;
 
 		} meta;
 

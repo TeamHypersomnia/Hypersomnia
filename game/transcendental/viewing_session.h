@@ -3,7 +3,7 @@
 #include "augs/misc/variable_delta_timer.h"
 #include "augs/misc/measurements.h"
 
-#include "game/global/input_context.h"
+#include "augs/misc/input_context.h"
 #include "game/detail/gui/aabb_highlighter.h"
 #include "game/detail/gui/immediate_hud.h"
 

@@ -1,5 +1,5 @@
 #include "key_and_mouse_intent.h"
-#include "game/global/input_context.h"
+#include "augs/misc/input_context.h"
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"

@@ -1226,7 +1226,7 @@
     <ClInclude Include="game\transcendental\entity_id.h" />
     <ClInclude Include="game\enums\colliders_offset_type.h" />
     <ClInclude Include="application\game_window.h" />
-    <ClInclude Include="game\global\all_settings.h" />
+    <ClInclude Include="game\simulation_settings\all_simulation_settings.h" />
     <ClInclude Include="game\detail\inventory_slot_handle.h" />
     <ClInclude Include="game\detail\inventory_slot_handle_declaration.h" />
     <ClInclude Include="game\detail\physics_scripts.h" />
@@ -1248,8 +1248,8 @@
     <ClInclude Include="game\enums\render_layer.h" />
     <ClInclude Include="game\enums\slot_function.h" />
     <ClInclude Include="game\enums\sub_entity_name.h" />
-    <ClInclude Include="game\global\pathfinding_settings.h" />
-    <ClInclude Include="game\global\visibility_settings.h" />
+    <ClInclude Include="game\simulation_settings\pathfinding_settings.h" />
+    <ClInclude Include="game\simulation_settings\visibility_settings.h" />
     <ClInclude Include="game\messages\will_soon_be_deleted.h" />
     <ClInclude Include="game\transcendental\cosmic_profiler.h" />
     <ClInclude Include="game\scene_managers\one_entity.h" />

@@ -1,10 +1,7 @@
 #pragma once
-
 #include "game/enums/intent_type.h"
 #include "augs/window_framework/event.h"
 #include "augs/padding_byte.h"
-
-struct input_context;
 
 struct key_and_mouse_intent {
 	intent_type intent = intent_type::NONE;

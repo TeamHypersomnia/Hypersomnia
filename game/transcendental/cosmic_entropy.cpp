@@ -2,7 +2,7 @@
 #include "game/transcendental/cosmos.h"
 
 #include "augs/misc/machine_entropy.h"
-#include "game/global/input_context.h"
+#include "augs/misc/input_context.h"
 
 #include "game/detail/inventory_utils.h"
 

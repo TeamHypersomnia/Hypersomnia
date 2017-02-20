@@ -8,12 +8,12 @@
 #include "augs/graphics/vertex.h"
 
 #include "application/config_lua_table.h"
+#include "augs/misc/input_context.h"
 
 class root_of_inventory_gui;
 struct character_gui;
 struct aabb_highlighter;
 class gui_element_system;
-struct input_context;
 
 typedef augs::gui::rect_tree<game_gui_element_location> game_gui_rect_tree;
 

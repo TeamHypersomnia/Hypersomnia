@@ -10,10 +10,10 @@
 #include "game/transcendental/cosmic_entropy.h"
 
 #include "game/transcendental/step_declaration.h"
+
 class cosmos;
 class world_camera;
 class viewing_session;
-struct input_context;
 
 namespace scene_managers {
 	class one_entity {

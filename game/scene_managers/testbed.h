@@ -12,7 +12,6 @@
 class cosmos;
 class world_camera;
 class viewing_session;
-struct input_context;
 
 namespace scene_managers {
 	class testbed {

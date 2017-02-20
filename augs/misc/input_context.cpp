@@ -4,7 +4,8 @@
 using namespace augs::window::event;
 using namespace keys;
 
-key input_context::get_bound_key_if_any(const intent_type intent) const {
+template <class T>
+key basic_input_context<T>::get_bound_key_if_any(const T intent) const {
 	for (const auto& k : key_to_intent) {
 		if (k.second == intent) {
 			return k.first;
@@ -14,15 +15,18 @@ key input_context::get_bound_key_if_any(const intent_type intent) const {
 	return key::INVALID;
 }
 
-void input_context::map_key_to_intent(const key id, const intent_type intent) {
+template <class T>
+void basic_input_context<T>::map_key_to_intent(const key id, const T intent) {
 	key_to_intent[id] = intent;
 }
 
-void input_context::map_event_to_intent(const message id, const intent_type intent) {
+template <class T>
+void basic_input_context<T>::map_event_to_intent(const message id, const T intent) {
 	event_to_intent[id] = intent;
 }
 
-std::vector<key_and_mouse_intent> input_context::to_key_and_mouse_intents(const augs::machine_entropy::local_type& local) const {
+template <class T>
+std::vector<key_and_mouse_intent> basic_input_context<T>::to_key_and_mouse_intents(const augs::machine_entropy::local_type& local) const {
 	std::vector<key_and_mouse_intent> output;
 
 	for (const auto& raw : local) {
@@ -58,3 +62,5 @@ std::vector<key_and_mouse_intent> input_context::to_key_and_mouse_intents(const 
 
 	return std::move(output);
 }
+
+template class basic_input_context<intent_type>;
