@@ -10,7 +10,7 @@
 #include "game/enums/sentience_meter_type.h"
 #include "game/enums/spell_type.h"
 
-#include "game/detail/spell_data.h"
+#include "game/detail/spell_logic.h"
 
 #include "game/detail/perks/haste_perk.h"
 #include "game/detail/perks/electric_shield_perk.h"

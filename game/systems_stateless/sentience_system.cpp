@@ -70,7 +70,7 @@ void sentience_system::cast_spells(const logic_step step) const {
 		if (found_spell != sentience.spells.end()) {
 			auto& spell_instance_data = (*found_spell).second;
 			
-			const auto spell_data = get_spell_data(spell);
+			const auto spell_data = cosmos.get(spell);
 
 			const bool can_cast_already =
 				sentience.personal_electricity.value >= spell_data.personal_electricity_required
@@ -162,7 +162,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 		}
 
 		if (sentience.currently_casted_spell != spell_type::COUNT) {
-			const auto spell_data = get_spell_data(sentience.currently_casted_spell);
+			const auto spell_data = cosmos.get(sentience.currently_casted_spell);
 			const auto when_casted = sentience.time_of_last_spell_cast;
 
 			if ((now - when_casted).in_milliseconds(delta) <= spell_data.casting_time_ms) {

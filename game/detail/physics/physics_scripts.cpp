@@ -8,15 +8,16 @@
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/detail/position_scripts.h"
 
-void resolve_density_of_associated_fixtures(entity_handle id) {
+void resolve_density_of_associated_fixtures(const entity_handle id) {
 	auto& cosmos = id.get_cosmos();
 
 	if (id.has<components::physics>()) {
 		const auto& entities = id.get<components::physics>().get_fixture_entities();
 
-		for (auto& f : entities) {
-			if (f != id)
+		for (const auto f : entities) {
+			if (f != id) {
 				resolve_density_of_associated_fixtures(f);
+			}
 		}
 	}
 
@@ -24,13 +25,14 @@ void resolve_density_of_associated_fixtures(entity_handle id) {
 
 	float density_multiplier = 1.f;
 
-	auto* item = id.find<components::item>();
+	const auto* const item = id.find<components::item>();
 
-	if (item != nullptr && cosmos[item->current_slot].alive() && cosmos[item->current_slot].should_item_inside_keep_physical_body())
+	if (item != nullptr && cosmos[item->current_slot].alive() && cosmos[item->current_slot].should_item_inside_keep_physical_body()) {
 		density_multiplier *= cosmos[item->current_slot].calculate_density_multiplier_due_to_being_attached();
+	}
 
-	auto owner_body = id.get_owner_body();
-	auto* driver = owner_body.find<components::driver>();
+	const auto owner_body = id.get_owner_body();
+	const auto* const driver = owner_body.find<components::driver>();
 
 	if (driver) {
 		if (cosmos[driver->owned_vehicle].alive()) {
@@ -38,17 +40,21 @@ void resolve_density_of_associated_fixtures(entity_handle id) {
 		}
 	}
 
-	for (size_t i = 0; i < fixtures.get_num_colliders(); ++i)
+	for (size_t i = 0; i < fixtures.get_num_colliders(); ++i) {
 		fixtures.set_density_multiplier(density_multiplier, i);
+	}
 }
 
-bool are_connected_by_friction(const_entity_handle child, const_entity_handle parent) {
-	auto& cosmos = child.get_cosmos();
+bool are_connected_by_friction(
+	const const_entity_handle child, 
+	const const_entity_handle parent
+) {
+	const auto& cosmos = child.get_cosmos();
 
 	if (is_entity_physical(child) && is_entity_physical(parent)) {
 		bool matched_ancestor = false;
 
-		entity_id parent_body_entity = parent.get_owner_body();
+		const auto parent_body_entity = parent.get_owner_body();
 		entity_id childs_ancestor_entity = child.get_owner_body().get_owner_friction_ground();
 
 		while (cosmos[childs_ancestor_entity].alive()) {
@@ -60,8 +66,9 @@ bool are_connected_by_friction(const_entity_handle child, const_entity_handle pa
 			childs_ancestor_entity = cosmos[childs_ancestor_entity].get_owner_friction_ground();
 		}
 
-		if (matched_ancestor)
+		if (matched_ancestor) {
 			return true;
+		}
 	}
 
 	return false;

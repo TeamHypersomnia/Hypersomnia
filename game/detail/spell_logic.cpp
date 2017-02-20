@@ -1,4 +1,4 @@
-#include "spell_data.h"
+#include "spell_logic.h"
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
@@ -18,50 +18,46 @@
 #include "game/enums/filters.h"
 
 #include "game/detail/explosions.h"
+#include "game/flyweights/spell_data.h"
 
-spell_data get_spell_data(const spell_type spell) {
-	spell_data d;
-	
-	switch (spell) {
-	case spell_type::HASTE:
+void set_standard_spell_properties(augs::enum_associative_array<spell_type, spell_data>& spells) {
+	{
+		auto& d = spells[spell_type::HASTE];
 		d.cooldown_ms = 5000;
 		d.incantation = L"treximo";
 		d.perk_duration_seconds = 33;
 		d.personal_electricity_required = 60;
-		break;
+	}
 
-	case spell_type::FURY_OF_THE_AEONS:
+	{
+		auto& d = spells[spell_type::FURY_OF_THE_AEONS];
 		d.cooldown_ms = 2000;
 		d.incantation = L"mania aiones";
 		d.personal_electricity_required = 100;
-		break;
+	}
 
-	case spell_type::ELECTRIC_TRIAD:
+	{
+		auto& d = spells[spell_type::ELECTRIC_TRIAD];
 		d.cooldown_ms = 3000;
 		d.incantation = L"energeia triada";
 		d.personal_electricity_required = 120;
-		break;
+	}
 
-	case spell_type::ULTIMATE_WRATH_OF_THE_AEONS:
+	{
+		auto& d = spells[spell_type::ULTIMATE_WRATH_OF_THE_AEONS];
 		d.cooldown_ms = 2000;
 		d.casting_time_ms = 3000;
 		d.incantation = L"megalyteri aiones via";
 		d.personal_electricity_required = 260;
-		break;
+	}
 
-	case spell_type::ELECTRIC_SHIELD:
+	{
+		auto& d = spells[spell_type::ELECTRIC_SHIELD];
 		d.cooldown_ms = 5000;
 		d.incantation = L"energeia aspida";
 		d.perk_duration_seconds = 60;
 		d.personal_electricity_required = 50;
-		break;
-	
-	default: 
-		LOG("Unknown spell: %x", static_cast<int>(spell)); 
-		break;
 	}
-
-	return std::move(d);
 }
 
 spell_appearance get_spell_appearance(const spell_type spell) {
@@ -109,7 +105,7 @@ std::wstring describe_spell(
 	const const_entity_handle caster,
 	const spell_type spell
 ) {
-	const auto spell_data = get_spell_data(spell);
+	const auto spell_data = caster.get_cosmos().get(spell);
 
 	const auto properties = typesafe_sprintf(
 		L"Incantation: [color=yellow]%x[/color]\nPE to cast: [color=vscyan]%x[/color]\nCooldown: [color=vscyan]%x[/color]",
@@ -198,8 +194,8 @@ void perform_spell_logic(
 	const augs::stepped_timestamp when_casted,
 	const augs::stepped_timestamp now
 ) {
-	const auto spell_data = get_spell_data(spell);
 	auto& cosmos = step.cosm;
+	const auto spell_data = cosmos.get(spell);
 	const auto dt = cosmos.get_fixed_delta();
 	const auto caster_transform = caster.get_logic_transform();
 	const auto appearance = get_spell_appearance(spell);

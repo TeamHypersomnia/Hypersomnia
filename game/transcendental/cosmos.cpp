@@ -33,6 +33,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/detail/inventory/item_slot_transfer_request.h"
+#include "game/detail/spell_logic.h"
 
 #include "game/messages/health_event.h"
 
@@ -96,6 +97,8 @@ cosmos::cosmos(const unsigned reserved_entities) {
 	reserve_storage_for_entities(reserved_entities);
 	significant.meta.settings.si.set_pixels_per_meter(100.f);
 	entity_debug_names[0] = "dead entity";
+
+	set_standard_spell_properties(significant.meta.flyweights.spells);
 }
 
 const std::string& cosmos::get_debug_name(entity_id id) const {
@@ -205,6 +208,10 @@ std::vector<entity_handle> cosmos::get(const processing_subjects list) {
 
 std::vector<const_entity_handle> cosmos::get(const processing_subjects list) const {
 	return systems_temporary.get<processing_lists_system>().get(list, *this);
+}
+
+const spell_data& cosmos::get(const spell_type s) const {
+	return significant.meta.flyweights.spells[s];
 }
 
 size_t cosmos::get_rng_seed_for(const entity_id id) const {

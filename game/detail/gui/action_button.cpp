@@ -29,7 +29,7 @@ void action_button::draw(
 		const auto bound_spell = this_id->bound_spell;
 
 		if (bound_spell != spell_type::COUNT && sentience.spells.find(bound_spell) != sentience.spells.end()) {
-			const auto spell_data = get_spell_data(bound_spell);
+			const auto spell_data = cosmos.get(bound_spell);
 			const bool has_enough_mana = sentience.personal_electricity.value >= spell_data.personal_electricity_required;
 			const float required_mana_ratio = std::min(1.f, sentience.personal_electricity.value / spell_data.personal_electricity_required);
 

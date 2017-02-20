@@ -17,6 +17,7 @@
 
 #include "augs/misc/delta.h"
 #include "augs/misc/easier_handle_getters_mixin.h"
+#include "augs/misc/enum_associative_array.h"
 
 #include "game/transcendental/entity_id.h"
 #include "game/detail/inventory/inventory_slot_id.h"
@@ -30,6 +31,8 @@
 
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/detail/inventory/item_slot_transfer_request.h"
+
+#include "game/flyweights/spell_data.h"
 
 class cosmic_delta;
 struct data_living_one_step;
@@ -87,6 +90,10 @@ public:
 #endif
 		public:
 			all_simulation_settings settings;
+
+			struct flyweights_state {
+				augs::enum_associative_array<spell_type, spell_data> spells;
+			} flyweights;
 
 		} meta;
 
@@ -195,6 +202,8 @@ public:
 
 	std::vector<entity_handle> get(const processing_subjects);
 	std::vector<const_entity_handle> get(const processing_subjects) const;
+
+	const spell_data& get(const spell_type) const;
 
 	size_t entities_count() const;
 	size_t get_maximum_entities() const;

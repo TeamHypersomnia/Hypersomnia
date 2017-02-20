@@ -3,20 +3,14 @@
 #include "augs/misc/stepped_timing.h"
 #include "game/enums/spell_type.h"
 
-#include "augs/misc/constant_size_vector.h"
 #include "augs/misc/stepped_timing.h"
 
 #include "game/assets/texture_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/step_declaration.h"
+#include "augs/misc/enum_associative_array.h"
 
-struct spell_data {
-	unsigned personal_electricity_required = 40u;
-	unsigned cooldown_ms = 5000u;
-	unsigned casting_time_ms = 0u;
-	unsigned perk_duration_seconds = 0u;
-	augs::constant_size_wstring<32> incantation;
-};
+struct spell_data;
 
 struct spell_instance_data {
 	augs::stepped_cooldown cast_cooldown;
@@ -27,7 +21,8 @@ struct spell_appearance {
 	rgba border_col;
 };
 
-spell_data get_spell_data(const spell_type);
+void set_standard_spell_properties(augs::enum_associative_array<spell_type, spell_data>&);
+
 spell_appearance get_spell_appearance(const spell_type);
 
 bool are_additional_conditions_for_casting_fulfilled(

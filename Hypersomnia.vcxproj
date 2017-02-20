@@ -395,7 +395,7 @@
     <ClCompile Include="game\detail\physics\physics_friction_fields.cpp" />
     <ClCompile Include="game\detail\physics\physics_queries.cpp" />
     <ClCompile Include="game\detail\physics\physics_scripts.cpp" />
-    <ClCompile Include="game\detail\spell_data.cpp" />
+    <ClCompile Include="game\detail\spell_logic.cpp" />
     <ClCompile Include="game\detail\visible_entities.cpp" />
     <ClCompile Include="game\detail\wielding_result.cpp" />
     <ClCompile Include="game\enums\attitude_type.cpp" />
@@ -1181,7 +1181,7 @@
     <ClInclude Include="game\detail\perks\timed_perk.h" />
     <ClInclude Include="game\detail\physics\physics_queries.h" />
     <ClInclude Include="game\detail\physics\physics_scripts.h" />
-    <ClInclude Include="game\detail\spell_data.h" />
+    <ClInclude Include="game\detail\spell_logic.h" />
     <ClInclude Include="game\detail\visible_entities.h" />
     <ClInclude Include="game\detail\wielding_result.h" />
     <ClInclude Include="game\enums\entity_flag.h" />
@@ -1192,6 +1192,7 @@
     <ClInclude Include="game\enums\sentience_meter_type.h" />
     <ClInclude Include="game\enums\sound_response_type.h" />
     <ClInclude Include="game\enums\spell_type.h" />
+    <ClInclude Include="game\flyweights\spell_data.h" />
     <ClInclude Include="game\messages\exhausted_cast_message.h" />
     <ClInclude Include="game\messages\exploding_ring.h" />
     <ClInclude Include="game\messages\item_picked_up_message.h" />
