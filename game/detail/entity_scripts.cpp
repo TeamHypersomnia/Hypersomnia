@@ -177,6 +177,7 @@ entity_id get_closest_hostile(
 	const b2Filter filter
 ) {
 	const auto& cosmos = subject.get_cosmos();
+	const auto si = cosmos.get_si();
 
 	const auto& physics = cosmos.systems_temporary.get<physics_system>();
 	const auto transform = subject.get_logic_transform();
@@ -187,6 +188,7 @@ entity_id get_closest_hostile(
 
 	if (subject_attitude.alive()) {
 		physics.for_each_in_aabb(
+			si,
 			transform.pos - vec2(radius, radius),
 			transform.pos + vec2(radius, radius),
 			filter,
@@ -221,6 +223,7 @@ std::vector<entity_id> get_closest_hostiles(
 	const b2Filter filter
 ) {
 	const auto& cosmos = subject.get_cosmos();
+	const auto si = cosmos.get_si();
 
 	const auto& physics = cosmos.systems_temporary.get<physics_system>();
 	const auto transform = subject.get_logic_transform();
@@ -244,6 +247,7 @@ std::vector<entity_id> get_closest_hostiles(
 
 	if (subject_attitude.alive()) {
 		physics.for_each_in_aabb(
+			si,
 			transform.pos - vec2(radius, radius),
 			transform.pos + vec2(radius, radius),
 			filter,

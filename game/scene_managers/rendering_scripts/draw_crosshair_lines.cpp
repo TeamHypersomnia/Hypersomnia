@@ -56,7 +56,13 @@ namespace rendering_scripts {
 				if (proj > 1.f) {
 					line_to[0] = barrel_center + (muzzle - barrel_center) * proj;
 					
-					const auto raycast = physics.ray_cast_px(line_from[0], line_to[0], filters::bullet(), subject_item);
+					const auto raycast = physics.ray_cast_px(
+						cosmos.get_si(),
+						line_from[0], 
+						line_to[0], 
+						filters::bullet(), 
+						subject_item
+					);
 
 					auto col = cyan;
 
@@ -87,7 +93,13 @@ namespace rendering_scripts {
 				if (proj > 1.f) {
 					line_to[1] = barrel_center + (muzzle - barrel_center) * proj;
 					
-					const auto raycast = physics.ray_cast_px(line_from[1], line_to[1], filters::bullet(), subject_item);
+					const auto raycast = physics.ray_cast_px(
+						cosmos.get_si(),
+						line_from[1], 
+						line_to[1], 
+						filters::bullet(), 
+						subject_item
+					);
 
 					auto col = cyan;
 

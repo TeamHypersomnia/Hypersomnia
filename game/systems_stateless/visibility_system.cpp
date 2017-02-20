@@ -167,6 +167,7 @@ void visibility_system::respond_to_visibility_information_requests(
 	std::vector<messages::visibility_information_response>& vis_responses
 ) const {
 	const auto& settings = cosmos.significant.meta.settings.visibility;
+	const auto si = cosmos.get_si();
 
 	ensure(settings.epsilon_distance_vertex_hit > 0.f);
 	ensure(settings.epsilon_ray_distance_variation > 0.f);
@@ -177,10 +178,10 @@ void visibility_system::respond_to_visibility_information_requests(
 
 	/* prepare epsilons to be used later, just to make the notation more clear */
 	const float epsilon_distance_vertex_hit_sq =
-		(settings.epsilon_distance_vertex_hit * PIXELS_TO_METERSf) *
-		(settings.epsilon_distance_vertex_hit * PIXELS_TO_METERSf);
+		si.get_meters(settings.epsilon_distance_vertex_hit) *
+		si.get_meters(settings.epsilon_distance_vertex_hit);
 
-	const float epsilon_threshold_obstacle_hit_meters = settings.epsilon_threshold_obstacle_hit * PIXELS_TO_METERSf;
+	const float epsilon_threshold_obstacle_hit_meters = si.get_meters(settings.epsilon_threshold_obstacle_hit);
 
 	/* we'll need a reference to physics system for raycasting */
 	const physics_system& physics = cosmos.systems_temporary.get<physics_system>();
@@ -201,6 +202,7 @@ void visibility_system::respond_to_visibility_information_requests(
 		const float d = request.maximum_distance;
 		
 		physics.for_each_in_aabb(
+			si,
 			transform.pos - vec2(d, d), 
 			transform.pos + vec2(d, d), 
 			request.candidate_filter, 
@@ -242,7 +244,14 @@ void visibility_system::respond_to_visibility_information_requests(
 					}
 
 					if (target_sets.size() > 0) {
-						const auto out = physics.ray_cast_px(transform.pos, target_pos, request.obstruction_filter, it);
+						const auto out = physics.ray_cast_px(
+							cosmos.get_si(), 
+							transform.pos, 
+							target_pos, 
+							request.obstruction_filter, 
+							it
+						);
+
 						const auto line_of_sight_unobstructed = !out.hit;
 
 						if (line_of_sight_unobstructed) {
@@ -286,10 +295,10 @@ void visibility_system::respond_to_visibility_information_requests(
 		all_vertices_transformed.clear();
 
 		/* transform entity position to Box2D coordinates and take offset into account */
-		const vec2 position_meters = (transform.pos + request.offset) * PIXELS_TO_METERSf;
+		const vec2 position_meters = si.get_meters(transform.pos + request.offset);
 
 		/* to Box2D coordinates */
-		const float vision_side_meters = request.square_side * PIXELS_TO_METERSf;
+		const float vision_side_meters = si.get_meters(request.square_side);
 
 		/* prepare maximum visibility square */
 		b2AABB aabb;
@@ -365,7 +374,7 @@ void visibility_system::respond_to_visibility_information_requests(
 		note we lengthen them a bit and add/substract 1.f to avoid undeterministic vertex cases
 		*/
 		b2EdgeShape bounds[4];
-		const float moving_epsilon = 1.f * PIXELS_TO_METERSf;
+		const float moving_epsilon = si.get_meters(1.f);
 		bounds[0].Set(vec2(whole_vision[0]) + vec2(-moving_epsilon, 0.f), vec2(whole_vision[1]) + vec2(moving_epsilon, 0.f));
 		bounds[1].Set(vec2(whole_vision[1]) + vec2(0.f, -moving_epsilon), vec2(whole_vision[2]) + vec2(0.f, moving_epsilon));
 		bounds[2].Set(vec2(whole_vision[2]) + vec2(moving_epsilon, 0.f), vec2(whole_vision[3]) + vec2(-moving_epsilon, 0.f));
@@ -373,10 +382,10 @@ void visibility_system::respond_to_visibility_information_requests(
 
 		/* debug drawing of the visibility square */
 		if (settings.draw_cast_rays || settings.draw_triangle_edges) {
-			lines.draw((vec2(whole_vision[0]) + vec2(-moving_epsilon, 0.f))*METERS_TO_PIXELSf, (vec2(whole_vision[1]) + vec2(moving_epsilon, 0.f))*METERS_TO_PIXELSf);
-			lines.draw((vec2(whole_vision[1]) + vec2(0.f, -moving_epsilon))*METERS_TO_PIXELSf, (vec2(whole_vision[2]) + vec2(0.f, moving_epsilon))*METERS_TO_PIXELSf);
-			lines.draw((vec2(whole_vision[2]) + vec2(moving_epsilon, 0.f))*METERS_TO_PIXELSf, (vec2(whole_vision[3]) + vec2(-moving_epsilon, 0.f))*METERS_TO_PIXELSf);
-			lines.draw((vec2(whole_vision[3]) + vec2(0.f, moving_epsilon))*METERS_TO_PIXELSf, (vec2(whole_vision[0]) + vec2(0.f, -moving_epsilon))*METERS_TO_PIXELSf);
+			lines.draw(si.get_pixels(vec2(whole_vision[0]) + vec2(-moving_epsilon, 0.f)), si.get_pixels(vec2(whole_vision[1]) + vec2(moving_epsilon, 0.f)));
+			lines.draw(si.get_pixels(vec2(whole_vision[1]) + vec2(0.f, -moving_epsilon)), si.get_pixels(vec2(whole_vision[2]) + vec2(0.f, moving_epsilon)));
+			lines.draw(si.get_pixels(vec2(whole_vision[2]) + vec2(moving_epsilon, 0.f)),  si.get_pixels(vec2(whole_vision[3]) + vec2(-moving_epsilon, 0.f)));
+			lines.draw(si.get_pixels(vec2(whole_vision[3]) + vec2(0.f, moving_epsilon)),  si.get_pixels(vec2(whole_vision[0]) + vec2(0.f, -moving_epsilon)));
 		}
 
 		/* raycast through the bounds to add another vertices where the shapes go beyond visibility square */
@@ -408,7 +417,7 @@ void visibility_system::respond_to_visibility_information_requests(
 			}
 
 			if (settings.draw_cast_rays) {
-				lines.draw(METERS_TO_PIXELSf * bound.m_vertex1, METERS_TO_PIXELSf * bound.m_vertex2, rgba(255, 0, 0, 255));
+				lines.draw(si.get_pixels(bound.m_vertex1), si.get_pixels(bound.m_vertex2), rgba(255, 0, 0, 255));
 			}
 
 			for (const auto v : output) {
@@ -460,13 +469,13 @@ void visibility_system::respond_to_visibility_information_requests(
 		/* container for these */
 		std::vector<double_ray> double_rays;
 
-		const auto push_double_ray = [&double_rays](const double_ray& ray_b) -> bool {
+		const auto push_double_ray = [&](const double_ray& ray_b) -> bool {
 			bool is_same_as_previous = false;
-			const vec2 p2 = ray_b.first * METERS_TO_PIXELSf;
+			const vec2 p2 = si.get_pixels(ray_b.first);
 
 			if (!double_rays.empty()) {
 				const auto& ray_a = *double_rays.rbegin();
-				const vec2 p1 = ray_a.second * METERS_TO_PIXELSf;
+				const vec2 p1 = si.get_pixels(ray_a.second);
 
 				is_same_as_previous = p1.compare(p2);
 			}
@@ -488,8 +497,8 @@ void visibility_system::respond_to_visibility_information_requests(
 
 
 		/* helper debugging lambda */
-		const auto draw_line = [&position_meters, &lines](const vec2 point, const rgba col) {
-			lines.draw(position_meters * METERS_TO_PIXELSf, point * METERS_TO_PIXELSf, col);
+		const auto draw_line = [&](const vec2 point, const rgba col) {
+			lines.draw(si.get_pixels(position_meters), si.get_pixels(point), col);
 		};
 
 		all_ray_inputs.clear();
@@ -509,8 +518,8 @@ void visibility_system::respond_to_visibility_information_requests(
 			const vec2 perpendicular_cw = (vertex.pos - position_meters).normalize().perpendicular_cw();
 
 			const vec2 directions[2] = {
-				((vertex.pos - perpendicular_cw * settings.epsilon_ray_distance_variation * PIXELS_TO_METERSf) - position_meters).normalize(),
-				((vertex.pos + perpendicular_cw * settings.epsilon_ray_distance_variation * PIXELS_TO_METERSf) - position_meters).normalize()
+				((vertex.pos - perpendicular_cw * si.get_meters(settings.epsilon_ray_distance_variation)) - position_meters).normalize(),
+				((vertex.pos + perpendicular_cw * si.get_meters(settings.epsilon_ray_distance_variation)) - position_meters).normalize()
 			};
 
 			vec2 targets[2] = {
@@ -532,7 +541,7 @@ void visibility_system::respond_to_visibility_information_requests(
 
 					if (edge_ray_output.hit) {
 						/* move the target further by epsilon */
-						targets[j] = edge_ray_output.intersection + directions[j] * 1.f * PIXELS_TO_METERSf;
+						targets[j] = edge_ray_output.intersection + directions[j] * si.get_meters(1.f);
 						continue_checking = false;
 					}
 					else {
@@ -627,7 +636,7 @@ void visibility_system::respond_to_visibility_information_requests(
 						for maximum accuracy, push the vertex coordinates instead of the actual intersections */
 
 						if (push_double_ray(double_ray(vertex.pos, vertex.pos, true, true))) {
-							response.vertex_hits.push_back(std::make_pair(double_rays.size() - 1, vertex.pos * METERS_TO_PIXELSf));
+							response.vertex_hits.push_back(std::make_pair(double_rays.size() - 1, si.get_pixels(vertex.pos)));
 							if (settings.draw_cast_rays) draw_line(vertex.pos, rgba(255, 255, 0, 255));
 						}
 					}
@@ -743,12 +752,12 @@ void visibility_system::respond_to_visibility_information_requests(
 			const auto& ray_b = double_rays[(i + 1) % double_rays.size()];
 
 			/* transform intersection locations to pixels */
-			vec2 p1 = ray_a.second * METERS_TO_PIXELSf;
-			vec2 p2 = ray_b.first * METERS_TO_PIXELSf;
+			vec2 p1 = si.get_pixels(ray_a.second);
+			vec2 p2 = si.get_pixels(ray_b.first);
 
 			//if (settings.draw_triangle_edges) {
-			//	draw_line(p1 * PIXELS_TO_METERSf, request.color);
-			//	draw_line(p2 * PIXELS_TO_METERSf, request.color);
+			//	draw_line(si.get_pixels(p1), request.color);
+			//	draw_line(si.get_pixels(p2), request.color);
 			//	lines.draw(p1, p2, request.color);
 			//}
 
@@ -758,12 +767,13 @@ void visibility_system::respond_to_visibility_information_requests(
 		/* a little processing on discontinuities, we'll need them in a moment */
 		for (auto& disc : response.discontinuities) {
 			/* transform all discontinuities from Box2D coordinates to pixels */
-			disc.points.first *= METERS_TO_PIXELSf;
-			disc.points.second *= METERS_TO_PIXELSf;
+			disc.points.first = si.get_pixels(disc.points.first);
+			disc.points.second = si.get_pixels(disc.points.second);
 
 			/* wrap the indices, some may be negative */
-			if (disc.edge_index < 0)
+			if (disc.edge_index < 0) {
 				disc.edge_index = double_rays.size() - 1;
+			}
 		}
 
 		/*

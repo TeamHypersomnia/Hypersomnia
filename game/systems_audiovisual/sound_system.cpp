@@ -52,8 +52,6 @@ void sound_system::play_nearby_sound_existences(
 	auto queried_size = cone.visible_world_area;
 	queried_size.set(10000.f, 10000.f);
 
-	const float pixels_to_metersf = PIXELS_TO_METERSf;
-
 	const auto targets =
 		cosmos.get(processing_subjects::WITH_SOUND_EXISTENCE);
 
@@ -61,11 +59,12 @@ void sound_system::play_nearby_sound_existences(
 		//.determine_visible_entities_from_camera(cone, components::dynamic_tree_node::tree_type::SOUND_EXISTENCES)];
 
 	const auto subject = cosmos[listening_character];
+	const auto si = cosmos.get_si();
 
 	const auto listener_pos = subject.get_viewing_transform(sys).pos;
 
-	augs::set_listener_position(listener_pos);
-	augs::set_listener_velocity(subject.get_effective_velocity());
+	augs::set_listener_position(si, listener_pos);
+	augs::set_listener_velocity(si, subject.get_effective_velocity());
 	augs::set_listener_orientation({ 0.f, -1.f, 0.f, 0.f, 0.f, -1.f });
 
 	for (const auto it : targets) {
@@ -98,8 +97,8 @@ void sound_system::play_nearby_sound_existences(
 			}
 
 			source.play();
-			source.set_max_distance(existence.input.modifier.max_distance);
-			source.set_reference_distance(existence.input.modifier.reference_distance);
+			source.set_max_distance(si, existence.input.modifier.max_distance);
+			source.set_reference_distance(si, existence.input.modifier.reference_distance);
 			source.set_looping(existence.input.modifier.repetitions == -1);
 
 			cache.recorded_component = existence;
@@ -112,8 +111,8 @@ void sound_system::play_nearby_sound_existences(
 		source.set_air_absorption_factor(absorption);
 		source.set_pitch(existence.input.modifier.pitch);
 		source.set_gain(existence.input.modifier.gain * master_gain);
-		source.set_position(source_pos);
-		source.set_velocity(it.get_effective_velocity());
+		source.set_position(si, source_pos);
+		source.set_velocity(si, it.get_effective_velocity());
 	}
 
 	erase_remove(fading_sources, [dt](augs::sound_source& source) {

@@ -188,6 +188,8 @@ public:
 	basic_item_slot_transfer_request_data<entity_guid> guidize(const item_slot_transfer_request_data) const;
 #endif
 
+	si_scaling get_si() const;
+
 	randomization get_rng_for(const entity_id) const;
 	size_t get_rng_seed_for(const entity_id) const;
 
@@ -256,6 +258,10 @@ namespace augs {
 		write_object(ar, significant.pools_for_components);
 		write_object(ar, significant.pool_for_aggregates);
 	}
+}
+
+inline si_scaling cosmos::get_si() const {
+	return significant.meta.settings.si;
 }
 
 #if COSMOS_TRACKS_GUIDS

@@ -4,6 +4,7 @@
 
 struct b2Sweep;
 struct b2Transform;
+struct si_scaling;
 
 namespace components {
 	struct transform {
@@ -31,8 +32,8 @@ namespace components {
 		transform interpolated(const transform& previous, float ratio, float epsilon = 1.f) const;
 		transform interpolated_separate(const transform& previous, float positional_ratio, float rotational_ratio, float epsilon = 1.f) const;
 
-		transform to_si_space() const;
-		transform to_user_space() const;
+		transform to_si_space(const si_scaling) const;
+		transform to_user_space(const si_scaling) const;
 
 		void flip_rotation();
 		void reset();

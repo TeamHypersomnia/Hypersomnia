@@ -571,11 +571,13 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 entity_id character_gui::get_hovered_world_entity(const cosmos& cosm, const vec2 world_cursor_position) {
 	const auto& physics = cosm.systems_temporary.get<physics_system>();
 	const auto cursor_pointing_at = world_cursor_position;
+	const auto si = cosm.get_si();
 
 	std::vector<unversioned_entity_id> hovered_entities;
 
 	physics.for_each_in_aabb(
-		cursor_pointing_at, 
+		si,
+		cursor_pointing_at,
 		cursor_pointing_at + vec2(1, 1), 
 		filters::renderable_query(),
 		[&](const auto fix) {

@@ -5,11 +5,7 @@
 #include "game/transcendental/entity_handle_declaration.h"
 
 #include "Box2D/Common/b2Math.h"
-
-extern double METERS_TO_PIXELS;
-extern double PIXELS_TO_METERS;
-extern float METERS_TO_PIXELSf;
-extern float PIXELS_TO_METERSf;
+#include "game/simulation_settings/si_scaling.h"
 
 template<bool> class basic_physics_synchronizer;
 class physics_system;
@@ -23,7 +19,10 @@ namespace components {
 			DYNAMIC
 		};
 
-		physics(const components::transform t = components::transform());
+		physics(
+			const si_scaling = si_scaling(),
+			const components::transform t = components::transform()
+		);
 
 		bool fixed_rotation = false;
 		bool bullet = false;
@@ -43,7 +42,10 @@ namespace components {
 		vec2 velocity;
 		float angular_velocity = 0.f;
 
-		void set_transform(const components::transform&);
+		void set_transform(
+			const si_scaling,
+			const components::transform&
+		);
 
 		template <class Archive>
 		void serialize(Archive& ar) {
@@ -80,6 +82,17 @@ protected:
 	template<bool> friend class basic_fixtures_synchronizer;
 
 	maybe_const_ref_t<is_const, rigid_body_cache>& get_cache() const;
+
+	template <class T>
+	auto to_pixels(const T meters) const {
+		return handle.get_cosmos().get_si().get_pixels(meters);
+	}
+
+	template <class T>
+	auto to_meters(const T pixels) const {
+		return handle.get_cosmos().get_si().get_meters(pixels);
+	}
+
 public:
 	using component_synchronizer_base<is_const, components::physics>::component_synchronizer_base;
 

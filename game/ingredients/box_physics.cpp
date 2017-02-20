@@ -9,9 +9,10 @@
 namespace ingredients {
 	void add_standard_dynamic_body(const entity_handle e, const bool destructible) {
 		components::physics def;
+		const auto si = e.get_cosmos().get_si();
 
 		if (e.has<components::transform>()) {
-			def.set_transform(e.get<components::transform>());
+			def.set_transform(si, e.get<components::transform>());
 			e.remove<components::transform>();
 		}
 
@@ -33,9 +34,10 @@ namespace ingredients {
 
 	void add_see_through_dynamic_body(entity_handle e) {
 		components::physics def;
+		const auto si = e.get_cosmos().get_si();
 
 		if (e.has<components::transform>()) {
-			def.set_transform(e.get<components::transform>());
+			def.set_transform(si, e.get<components::transform>());
 			e.remove<components::transform>();
 		}
 
@@ -55,9 +57,10 @@ namespace ingredients {
 
 	void add_shell_dynamic_body(entity_handle e) {
 		components::physics def;
+		const auto si = e.get_cosmos().get_si();
 
 		if (e.has<components::transform>()) {
-			def.set_transform(e.get<components::transform>());
+			def.set_transform(si, e.get<components::transform>());
 			e.remove<components::transform>();
 		}
 
@@ -79,9 +82,10 @@ namespace ingredients {
 
 	void add_standard_static_body(entity_handle e) {
 		components::physics def;
+		const auto si = e.get_cosmos().get_si();
 
 		if (e.has<components::transform>()) {
-			def.set_transform(e.get<components::transform>());
+			def.set_transform(si, e.get<components::transform>());
 			e.remove<components::transform>();
 		}
 
@@ -103,9 +107,10 @@ namespace ingredients {
 	
 	void add_bullet_round_physics(entity_handle e) {
 		components::physics body;
+		const auto si = e.get_cosmos().get_si();
 
 		if (e.has<components::transform>()) {
-			body.set_transform(e.get<components::transform>());
+			body.set_transform(si, e.get<components::transform>());
 			e.remove<components::transform>();
 		}
 

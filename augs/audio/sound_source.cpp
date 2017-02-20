@@ -7,7 +7,8 @@
 #include <AL/efx.h>
 
 #include "augs/al_log.h"
-#include "game/components/physics_component.h"
+#include "augs/math/vec2.h"
+#include "game/simulation_settings/si_scaling.h"
 
 #define TRACE_PARAMETERS 0
 #define TRACE_CONSTRUCTORS_DESTRUCTORS 0
@@ -112,8 +113,8 @@ namespace augs {
 #endif
 	}
 
-	void sound_source::set_velocity(vec2 v) const {
-		v *= PIXELS_TO_METERSf;
+	void sound_source::set_velocity(const si_scaling si, vec2 v) const {
+		v = si.get_meters(v);
 #if Y_IS_Z
 		AL_CHECK(alSource3f(id, AL_VELOCITY, v.x, 0.f, v.y));
 #else
@@ -124,8 +125,8 @@ namespace augs {
 #endif
 	}
 
-	void sound_source::set_position(vec2 pos) const {
-		pos *= PIXELS_TO_METERSf;
+	void sound_source::set_position(const si_scaling si, vec2 pos) const {
+		pos = si.get_meters(pos);
 
 #if Y_IS_Z
 		AL_CHECK(alSource3f(id, AL_POSITION, pos.x, 0.f, pos.y));
@@ -137,8 +138,8 @@ namespace augs {
 #endif
 	}
 
-	void sound_source::set_max_distance(const float distance) const {
-		const auto passed_distance = distance * PIXELS_TO_METERSf;
+	void sound_source::set_max_distance(const si_scaling si, const float distance) const {
+		const auto passed_distance = si.get_meters(distance);
 
 		AL_CHECK(alSourcef(id, AL_MAX_DISTANCE, passed_distance));
 #if TRACE_PARAMETERS
@@ -146,8 +147,8 @@ namespace augs {
 #endif
 	}
 
-	void sound_source::set_reference_distance(const float distance) const {
-		const auto passed_distance = distance * PIXELS_TO_METERSf;
+	void sound_source::set_reference_distance(const si_scaling si, const float distance) const {
+		const auto passed_distance = si.get_meters(distance);
 
 		AL_CHECK(alSourcef(id, AL_REFERENCE_DISTANCE, passed_distance));
 #if TRACE_PARAMETERS
@@ -198,8 +199,8 @@ namespace augs {
 		return attached_buffer;
 	}
 
-	void set_listener_position(vec2 pos) {
-		pos *= PIXELS_TO_METERSf;
+	void set_listener_position(const si_scaling si, vec2 pos) {
+		pos = si.get_meters(pos);
 
 #if Y_IS_Z
 		AL_CHECK(alListener3f(AL_POSITION, pos.x, 0.f, pos.y));
@@ -211,8 +212,8 @@ namespace augs {
 #endif
 	}
 
-	void set_listener_velocity(vec2 v) {
-		v *= PIXELS_TO_METERSf;
+	void set_listener_velocity(const si_scaling si, vec2 v) {
+		v = si.get_meters(v);
 
 #if Y_IS_Z
 		AL_CHECK(alListener3f(AL_VELOCITY, v.x, 0.f, v.y));

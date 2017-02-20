@@ -116,6 +116,7 @@ void trigger_detector_system::send_trigger_confirmations(const logic_step step) 
 		ensure(detector_body.alive());
 
 		physics.for_each_intersection_with_body(
+			cosmos.get_si(),
 			detector_body, 
 			filters::trigger(),
 			([&](const auto fixture, auto, auto) {

@@ -63,4 +63,4 @@ std::vector<key_and_mouse_intent> basic_input_context<T>::to_key_and_mouse_inten
 	return std::move(output);
 }
 
-template class basic_input_context<intent_type>;
+template struct basic_input_context<intent_type>;

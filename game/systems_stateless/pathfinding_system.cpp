@@ -1,12 +1,12 @@
 #include "pathfinding_system.h"
 
 #include "game/transcendental/cosmos.h"
-#include "game/transcendental/entity_id.h"
 #include "game/transcendental/logic_step.h"
 
 #include "game/systems_temporary/physics_system.h"
 
 #include "game/components/pathfinding_component.h"
+#include "game/components/fixtures_component.h"
 #include "game/messages/visibility_information.h"
 
 #include "augs/graphics/renderer.h"
@@ -15,9 +15,44 @@
 #include "game/detail/physics_scripts.h"
 #include "game/messages/visibility_information.h"
 
+std::vector<b2Vec2> get_world_vertices() {
+
+}
+
 void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 	auto& cosmos = step.cosm;
+	const auto si = cosmos.get_si();
 	const auto& settings = cosmos.significant.meta.settings.pathfinding;
+
+	const auto get_world_vertices = [&](
+		const const_entity_handle subject, 
+		const bool meters = true,
+		const int fixture_num = 0
+	) {
+		std::vector<b2Vec2> output;
+
+		auto& b = subject.get<components::physics>();
+
+		const auto& verts = subject.get<components::fixtures>().get_data().colliders[0].shape.convex_polys[fixture_num].vertices;
+
+		/* for every vertex in given fixture's shape */
+		for (auto& v : verts) {
+			auto position = b.get_position();
+			/* transform angle to degrees */
+			auto rotation = b.get_angle();
+
+			/* transform vertex to current entity's position and rotation */
+			vec2 out_vert = (vec2(v).rotate(rotation, vec2(0, 0)) + position);
+
+			if (meters) {
+				out_vert = si.get_meters(out_vert);
+			}
+
+			output.push_back(out_vert);
+		}
+
+		return output;
+	};
 
 	/* prepare epsilons to be used later, just to make the notation more clear */
 	const float epsilon_distance_visible_point_sq = settings.epsilon_distance_visible_point * settings.epsilon_distance_visible_point;
@@ -166,6 +201,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 							bool was_hit = false;
 
 							physics.for_each_intersection_with_polygon(
+								cosmos.get_si(),
 								sensor_polygon, 
 								pathfinding.filter, 
 								([&](const auto fix, auto, auto) {
@@ -183,6 +219,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 								constexpr auto rays_count = 50;
 
 								vert.sensor = physics.push_away_from_walls(
+									si,
 									vert.sensor, 
 									pathfinding.target_offset, 
 									rays_count,
@@ -213,7 +250,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 
 			/* for every undiscovered navigation point */
 			auto& undiscs = pathfinding.session().undiscovered_vertices;
-			undiscs.erase(std::remove_if(undiscs.begin(), undiscs.end(), [&body, &pathfinding, &body_poly, &settings](const components::pathfinding::pathfinding_session::navigation_vertex& nav){
+			undiscs.erase(std::remove_if(undiscs.begin(), undiscs.end(), [&](const components::pathfinding::pathfinding_session::navigation_vertex& nav){
 
 				/* if we want to force the entity to touch the sensors, we can't discard undiscovered vertices only by 
 					saying that there exists a discovered vertex (which is discovered only because it is fully visible)
@@ -229,13 +266,13 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 				if (pathfinding.mark_touched_as_discovered) {
 					/* prepare edge shape for sensor to test for overlaps */
 					b2EdgeShape sensor_edge;
-					sensor_edge.Set(nav.location * PIXELS_TO_METERSf, nav.sensor * PIXELS_TO_METERSf);
+					sensor_edge.Set(si.get_meters(nav.location), si.get_meters(nav.sensor));
 
 					/* prepare null transform, both bodies are already in the same frame of reference */
 					b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
 
 					/* if shortest distance between body and sensor fits in distance_navpoint_hit */
-					if (b2TestOverlap(&sensor_edge, 0, &body_poly, 0, null_transform, null_transform, pathfinding.distance_navpoint_hit * PIXELS_TO_METERSf)) {
+					if (b2TestOverlap(&sensor_edge, 0, &body_poly, 0, null_transform, null_transform, si.get_meters(pathfinding.distance_navpoint_hit))) {
 						/* save this sensor in discovered ones and return true to remove it from the undiscovered */
 						pathfinding.session().discovered_vertices.push_back(nav);
 						return true;
@@ -248,14 +285,20 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 			/* now for the actual pathfinding routine */
 
 			/* helpful lambda */
-			auto& is_point_visible = [&physics, epsilon_distance_visible_point_sq, &pathfinding, it](vec2 from, vec2 point, b2Filter& filter){
+			auto& is_point_visible = [&](vec2 from, vec2 point, b2Filter& filter){
 				bool visibility_condition_fulfilled = true;
 				
 				//if (pathfinding.target_visibility_condition)
 				//	visibility_condition_fulfilled = pathfinding.target_visibility_condition(it, from, point);
 
 				if (visibility_condition_fulfilled) {
-					auto line_of_sight = physics.ray_cast_px(from, point, filter);
+					const auto line_of_sight = physics.ray_cast_px(
+						cosmos.get_si(), 
+						from, 
+						point, 
+						filter
+					);
+
 					return (!line_of_sight.hit || (line_of_sight.intersection - point).length_sq() < epsilon_distance_visible_point_sq);
 				}
 				else return false;

@@ -32,6 +32,7 @@ namespace prefabs {
 		auto interior = world.create_entity("interior");
 		auto left_wheel = world.create_entity("left_wheel");
 
+		const auto si = world.get_si();
 
 		front.add_sub_entity(interior);
 		front.add_sub_entity(left_wheel);
@@ -44,7 +45,7 @@ namespace prefabs {
 			auto& sprite = front += components::polygon();
 			auto& render = front += components::render();
 			auto& car = front += components::car();
-			components::physics physics_definition(spawn_transform);
+			components::physics physics_definition(si, spawn_transform);
 			components::fixtures colliders;
 
 			car.left_wheel_trigger = left_wheel;

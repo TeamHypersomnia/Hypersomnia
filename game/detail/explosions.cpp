@@ -57,6 +57,7 @@ void standard_explosion(const standard_explosion_input in) {
 		damaging_triangle[2] += (damaging_triangle[2] - damaging_triangle[0]).set_length(5);
 
 		physics.for_each_intersection_with_triangle(
+			cosmos.get_si(),
 			damaging_triangle,
 			filters::dynamic_object(),
 			[&](

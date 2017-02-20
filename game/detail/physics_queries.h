@@ -1,4 +1,5 @@
 #pragma once
+#include "game/simulation_settings/si_scaling.h"
 
 struct camera_cone;
 struct b2AABB;
@@ -48,6 +49,7 @@ public:
 
 	template<class F>
 	void for_each_intersection_with_shape_meters(
+		const si_scaling si,
 		const b2Shape* const shape,
 		const b2Transform queried_shape_transform,
 		const b2Filter filter,
@@ -82,8 +84,8 @@ public:
 				if (result.overlap) {
 					return callback(
 						fixture,
-						METERS_TO_PIXELSf * result.pointA,
-						METERS_TO_PIXELSf * result.pointB
+						si.get_pixels(result.pointA),
+						si.get_pixels(result.pointB)
 					);
 				}
 				else {
@@ -95,26 +97,29 @@ public:
 
 	template<class F>
 	void for_each_in_aabb(
+		const si_scaling si,
 		const vec2 p1,
 		const vec2 p2,
 		const b2Filter filter,
 		F callback
 	) const {
 		b2AABB aabb;
-		aabb.lowerBound = p1 * PIXELS_TO_METERSf;
-		aabb.upperBound = p2 * PIXELS_TO_METERSf;
+		aabb.lowerBound = si.get_meters(p1);
+		aabb.upperBound = si.get_meters(p2);
 
 		for_each_in_aabb_meters(aabb, filter, callback);
 	}
 
 	template<class F>
 	void for_each_in_camera(
+		const si_scaling si,
 		const camera_cone camera,
 		F callback
 	) const {
 		const auto visible_aabb = camera.get_transformed_visible_world_area_aabb().expand_from_center({ 100, 100 });
 
 		for_each_in_aabb(
+			si,
 			visible_aabb.left_top(),
 			visible_aabb.right_bottom(),
 			filters::renderable_query(),
@@ -124,6 +129,7 @@ public:
 
 	template<class F>
 	void for_each_intersection_with_body(
+		const si_scaling si,
 		const const_entity_handle subject,
 		const b2Filter filter,
 		F callback
@@ -133,6 +139,7 @@ public:
 
 		for (const b2Fixture* f = cache.body->GetFixtureList(); f != nullptr; f = f->GetNext()) {
 			for_each_intersection_with_shape_meters(
+				si,
 				f->GetShape(),
 				cache.body->GetTransform(),
 				filter, 
@@ -143,6 +150,7 @@ public:
 
 	template<class F>
 	void for_each_intersection_with_triangle(
+		const si_scaling si,
 		const std::array<vec2, 3> vertices,
 		const b2Filter filter,
 		F callback
@@ -152,13 +160,14 @@ public:
 
 		std::array<b2Vec2, 3> verts;
 
-		verts[0] = vertices[0] * PIXELS_TO_METERSf;
-		verts[1] = vertices[1] * PIXELS_TO_METERSf;
-		verts[2] = vertices[2] * PIXELS_TO_METERSf;
+		verts[0] = si.get_meters(vertices[0]);
+		verts[1] = si.get_meters(vertices[1]);
+		verts[2] = si.get_meters(vertices[2]);
 
 		poly_shape.Set(verts.data(), verts.size());
 
 		for_each_intersection_with_shape_meters(
+			si,
 			&poly_shape,
 			null_transform,
 			filter, 
@@ -168,6 +177,7 @@ public:
 
 	template<class F>
 	void for_each_intersection_with_polygon(
+		const si_scaling si,
 		const std::vector<vec2>& vertices,
 		const b2Filter filter,
 		F callback
@@ -177,12 +187,13 @@ public:
 		std::vector<b2Vec2> verts;
 
 		for (const auto v : vertices) {
-			verts.push_back(PIXELS_TO_METERSf * b2Vec2(v.x, v.y));
+			verts.push_back(si.get_meters(b2Vec2(v.x, v.y)));
 		}
 
 		poly_shape.Set(verts.data(), verts.size());
 		
 		for_each_intersection_with_shape_meters(
+			si,
 			&poly_shape,
 			null_transform,
 			filter, 

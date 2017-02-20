@@ -2,12 +2,13 @@
 #include "augs/math/vec2.h"
 
 typedef unsigned int ALuint;
+struct si_scaling;
 
 namespace augs {
 	class single_sound_buffer;
 
-	void set_listener_velocity(vec2);
-	void set_listener_position(vec2);
+	void set_listener_velocity(const si_scaling, vec2);
+	void set_listener_position(const si_scaling, vec2);
 	void set_listener_orientation(const std::array<float, 6>);
 
 	class sound_source {
@@ -33,10 +34,10 @@ namespace augs {
 		void set_pitch(const float) const;
 		void set_gain(const float) const;
 		void set_air_absorption_factor(const float) const;
-		void set_velocity(vec2) const;
-		void set_position(vec2) const;
-		void set_max_distance(const float) const;
-		void set_reference_distance(const float) const;
+		void set_velocity(const si_scaling, vec2) const;
+		void set_position(const si_scaling, vec2) const;
+		void set_max_distance(const si_scaling, const float) const;
+		void set_reference_distance(const si_scaling, const float) const;
 		void set_direct_channels(const bool) const;
 
 		float get_time_in_seconds() const;

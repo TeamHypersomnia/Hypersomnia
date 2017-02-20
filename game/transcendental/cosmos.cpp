@@ -94,6 +94,7 @@ void cosmos::create_substance_for_entity(const const_entity_handle h) {
 
 cosmos::cosmos(const unsigned reserved_entities) {
 	reserve_storage_for_entities(reserved_entities);
+	significant.meta.settings.si.set_pixels_per_meter(100.f);
 	entity_debug_names[0] = "dead entity";
 }
 

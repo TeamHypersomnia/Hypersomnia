@@ -1190,6 +1190,7 @@
     <ClInclude Include="game\messages\visibility_information.h" />
     <ClInclude Include="game\resources\sound_response.h" />
     <ClInclude Include="game\resources\tile_layer.h" />
+    <ClInclude Include="game\simulation_settings\si_scaling.h" />
     <ClInclude Include="game\systems_audiovisual\gui_element_system.h" />
     <ClInclude Include="game\systems_audiovisual\interpolation_system.h" />
     <ClInclude Include="game\scene_managers\networked_testbed.h" />

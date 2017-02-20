@@ -14,12 +14,18 @@
 
 typedef components::physics P;
 
-components::physics::physics(const components::transform t) {
-	set_transform(t);
+components::physics::physics(
+	const si_scaling si,
+	const components::transform t
+) {
+	set_transform(si, t);
 }
 
-void components::physics::set_transform(const components::transform& t) {
-	t.to_si_space().to_box2d_transforms(transform, sweep);
+void components::physics::set_transform(
+	const si_scaling si,
+	const components::transform& t
+) {
+	t.to_si_space(si).to_box2d_transforms(transform, sweep);
 }
 
 template<bool C>
@@ -47,9 +53,8 @@ void component_synchronizer<false, P>::set_activated(const bool flag) const {
 	resubstantiation();
 }
 
-
 void component_synchronizer<false, P>::set_velocity(const vec2 pixels) const {
-	component.velocity = pixels * PIXELS_TO_METERSf;
+	component.velocity = to_meters(pixels);
 
 	if (!is_constructed())
 		return;
@@ -110,8 +115,8 @@ void component_synchronizer<false, P>::apply_force(
 		return;
 	}
 
-	const auto force = pixels * PIXELS_TO_METERSf * handle.get_cosmos().get_fixed_delta().in_seconds();
-	const auto location = vec2(get_cache().body->GetWorldCenter() + (center_offset * PIXELS_TO_METERSf));
+	const auto force = handle.get_cosmos().get_fixed_delta().in_seconds() * to_meters(pixels);
+	const auto location = vec2(get_cache().body->GetWorldCenter() + to_meters(center_offset));
 
 	get_cache().body->ApplyLinearImpulse(
 		force, 
@@ -124,7 +129,7 @@ void component_synchronizer<false, P>::apply_force(
 
 	if (augs::renderer::get_current().debug_draw_forces && force.non_zero()) {
 		auto& lines = augs::renderer::get_current().logic_lines;
-		lines.draw_green(location * METERS_TO_PIXELSf + force * METERS_TO_PIXELSf, location * METERS_TO_PIXELSf);
+		lines.draw_green(to_pixels(location) + to_pixels(force), to_pixels(location));
 	}
 }
 
@@ -138,8 +143,8 @@ void component_synchronizer<false, P>::apply_impulse(const vec2 pixels, const ve
 	if (pixels.is_epsilon(2.f))
 		return;
 
-	vec2 force = pixels * PIXELS_TO_METERSf;
-	vec2 location = get_cache().body->GetWorldCenter() + (center_offset * PIXELS_TO_METERSf);
+	const vec2 force = to_meters(pixels);
+	const vec2 location = get_cache().body->GetWorldCenter() + to_meters(center_offset);
 
 	get_cache().body->ApplyLinearImpulse(force, location, true);
 	component.angular_velocity = get_cache().body->GetAngularVelocity();
@@ -147,7 +152,7 @@ void component_synchronizer<false, P>::apply_impulse(const vec2 pixels, const ve
 
 	if (augs::renderer::get_current().debug_draw_forces && force.non_zero()) {
 		auto& lines = augs::renderer::get_current().logic_lines;
-		lines.draw_green(location * METERS_TO_PIXELSf + force * METERS_TO_PIXELSf, location * METERS_TO_PIXELSf);
+		lines.draw_green(to_pixels(location) + to_pixels(force), to_pixels(location));
 	}
 }
 
@@ -181,24 +186,24 @@ float basic_physics_synchronizer<C>::get_inertia() const {
 
 template<bool C>
 vec2 basic_physics_synchronizer<C>::get_position() const {
-	return METERS_TO_PIXELSf * component.transform.p;
+	return to_pixels(component.transform.p);
 }
 
 template<bool C>
 vec2 basic_physics_synchronizer<C>::get_mass_position() const {
 	ensure(is_constructed());
-	return METERS_TO_PIXELSf * get_cache().body->GetWorldCenter();
+	return to_pixels(get_cache().body->GetWorldCenter());
 }
 
 template<bool C>
 vec2 basic_physics_synchronizer<C>::velocity() const {
-	return component.velocity * METERS_TO_PIXELSf;
+	return to_pixels(component.velocity);
 }
 
 template<bool C>
 vec2 basic_physics_synchronizer<C>::get_world_center() const {
 	ensure(is_constructed());
-	return METERS_TO_PIXELSf * get_cache().body->GetWorldCenter();
+	return to_pixels(get_cache().body->GetWorldCenter());
 }
 
 template<bool C>
@@ -216,10 +221,14 @@ void component_synchronizer<false, P>::set_transform(const entity_id id) const {
 }
 
 void component_synchronizer<false, P>::set_transform(const components::transform& transform) const {
-	component.set_transform(transform);
+	component.set_transform(
+		handle.get_cosmos().significant.meta.settings.si,
+		transform
+	);
 
-	if (!is_constructed())
+	if (!is_constructed()) {
 		return;
+	}
 
 	get_cache().body->m_xf = component.transform;
 	get_cache().body->m_sweep = component.sweep;
@@ -233,7 +242,7 @@ std::vector<basic_entity_handle<C>> basic_physics_synchronizer<C>::get_fixture_e
 template<bool C>
 bool basic_physics_synchronizer<C>::test_point(const vec2 v) const {
 	ensure(is_constructed());
-	return get_cache().body->TestPoint(v * PIXELS_TO_METERSf);
+	return get_cache().body->TestPoint(to_meters(v));
 }
 
 template class basic_physics_synchronizer<false>;

@@ -66,27 +66,3 @@ bool are_connected_by_friction(const_entity_handle child, const_entity_handle pa
 
 	return false;
 }
-
-std::vector<b2Vec2> get_world_vertices(const_entity_handle subject, bool meters, int fixture_num) {
-	std::vector<b2Vec2> output;
-
-	auto& b = subject.get<components::physics>();
-
-	const auto& verts = subject.get<components::fixtures>().get_data().colliders[0].shape.convex_polys[fixture_num].vertices;
-
-	/* for every vertex in given fixture's shape */
-	for (auto& v : verts) {
-		auto position = b.get_position();
-		/* transform angle to degrees */
-		auto rotation = b.get_angle();
-
-		/* transform vertex to current entity's position and rotation */
-		vec2 out_vert = (vec2(v).rotate(rotation, vec2(0, 0)) + position);
-
-		if (meters) out_vert *= PIXELS_TO_METERSf;
-
-		output.push_back(out_vert);
-	}
-
-	return output;
-}

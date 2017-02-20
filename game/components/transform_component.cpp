@@ -1,13 +1,9 @@
 #include "transform_component.h"
 #include "physics_component.h"
 #include "Box2D/Common/b2Math.h"
-
-namespace augs {
-
-}
+#include "game/simulation_settings/si_scaling.h"
 
 namespace components {
-
 	transform::transform(float x, float y, float rotation) : pos(vec2(x, y)), rotation(rotation) {}
 	transform::transform(vec2 pos, float rotation) : pos(pos), rotation(rotation) {}
 
@@ -18,12 +14,12 @@ namespace components {
 		return out;
 	}
 
-	transform transform::to_si_space() const {
-		return{ pos * PIXELS_TO_METERSf, rotation * DEG_TO_RADf };
+	transform transform::to_si_space(const si_scaling si) const {
+		return{ si.get_meters(pos), rotation * DEG_TO_RADf };
 	}
 
-	transform transform::to_user_space() const {
-		return{ pos * METERS_TO_PIXELSf, rotation * RAD_TO_DEGf };
+	transform transform::to_user_space(const si_scaling si) const {
+		return{ si.get_pixels(pos), rotation * RAD_TO_DEGf };
 	}
 
 	transform transform::operator-(const transform& b) const {

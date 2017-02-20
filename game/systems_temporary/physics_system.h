@@ -71,17 +71,44 @@ public:
 	physics_system();
 
 	std::vector<raycast_output> ray_cast_all_intersections(
+		const vec2 p1_meters,
+		const vec2 p2_meters, 
+		const b2Filter filter, 
+		const entity_id ignore_entity = entity_id()
+	) const;
+
+	raycast_output ray_cast(
 		const vec2 p1_meters, 
 		const vec2 p2_meters, 
 		const b2Filter filter, 
 		const entity_id ignore_entity = entity_id()
 	) const;
 
-	raycast_output ray_cast(const vec2 p1_meters, const vec2 p2_meters, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
-	raycast_output ray_cast_px(const vec2 p1, const vec2 p2, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
+	raycast_output ray_cast_px(
+		const si_scaling si,
+		const vec2 p1, 
+		const vec2 p2, 
+		const b2Filter filter, 
+		const entity_id ignore_entity = entity_id()
+	) const;
 	
-	vec2 push_away_from_walls(const vec2 position, const float radius, const int ray_amount, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
-	float get_closest_wall_intersection(const vec2 position, const float radius, const int ray_amount, const b2Filter filter, const entity_id ignore_entity = entity_id()) const;
+	vec2 push_away_from_walls(
+		const si_scaling, 
+		const vec2 position, 
+		const float radius, 
+		const int ray_amount, 
+		const b2Filter filter, 
+		const entity_id ignore_entity = entity_id()
+	) const;
+
+	float get_closest_wall_intersection(
+		const si_scaling, 
+		const vec2 position, 
+		const float radius, 
+		const int ray_amount, 
+		const b2Filter filter, 
+		const entity_id ignore_entity = entity_id()
+	) const;
 
 	void step_and_set_new_transforms(const logic_step);
 	void post_and_clear_accumulated_collision_messages(const logic_step);

@@ -34,6 +34,7 @@ void visible_entities::from_camera(
 	unique_from_physics.clear();
 
 	physics.for_each_in_camera(
+		cosmos.get_si(),
 		camera,
 		[&](const auto fix) {
 			unique_from_physics.insert(get_id_of_entity_of_fixture(fix));

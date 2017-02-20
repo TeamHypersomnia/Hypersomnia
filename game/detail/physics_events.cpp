@@ -19,6 +19,7 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 	auto& sys = get_sys();
 	auto& cosmos = cosm;
 	auto delta = cosm.get_fixed_delta();
+	const auto si = cosmos.get_si();
 
 	for (int i = 0; i < 2; ++i) {
 		auto fix_a = contact->GetFixtureA();
@@ -76,7 +77,7 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 				else {
 					for (int i = 0; i < 1; i++) {
 						const b2Vec2 pointVelOther = body_b->GetLinearVelocityFromWorldPoint(worldManifold.points[i]);
-						const auto velOtherPixels = vec2(pointVelOther) * METERS_TO_PIXELSf;
+						const auto velOtherPixels = si.get_pixels(vec2(pointVelOther));
 
 						if (velOtherPixels.length() > 1) {
 							const auto angle = vec2(worldManifold.normal).degrees_between(velOtherPixels);
@@ -89,8 +90,15 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 						auto& renderer = augs::renderer::get_current();
 
 						if (renderer.debug_draw_friction_field_collisions_of_entering) {
-							renderer.persistent_lines.draw_yellow(METERS_TO_PIXELSf*worldManifold.points[i], METERS_TO_PIXELSf* worldManifold.points[i] + vec2(worldManifold.normal).set_length(150));
-							renderer.persistent_lines.draw_red(METERS_TO_PIXELSf*worldManifold.points[i], METERS_TO_PIXELSf* worldManifold.points[i] + velOtherPixels);
+							renderer.persistent_lines.draw_yellow(
+								si.get_pixels(worldManifold.points[i]), 
+								si.get_pixels(worldManifold.points[i]) + vec2(worldManifold.normal).set_length(150)
+							);
+
+							renderer.persistent_lines.draw_red(
+								si.get_pixels(worldManifold.points[i]), 
+								si.get_pixels(worldManifold.points[i]) + velOtherPixels
+							);
 						}
 					}
 				}
@@ -121,7 +129,7 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 		}
 
 		msg.point = worldManifold.points[0];
-		msg.point *= METERS_TO_PIXELSf;
+		msg.point = si.get_pixels(msg.point);
 
 		msg.subject_impact_velocity = body_a->GetLinearVelocityFromWorldPoint(worldManifold.points[0]);
 		msg.collider_impact_velocity = body_b->GetLinearVelocityFromWorldPoint(worldManifold.points[0]);
@@ -132,6 +140,7 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 void physics_system::contact_listener::EndContact(b2Contact* contact) {
 	auto& sys = get_sys();
 	auto& cosmos = cosm;
+	const auto si = cosmos.get_si();
 
 	for (int i = 0; i < 2; ++i) {
 		auto fix_a = contact->GetFixtureA();
@@ -193,6 +202,7 @@ void physics_system::contact_listener::EndContact(b2Contact* contact) {
 void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold) {
 	auto& sys = get_sys();
 	auto& cosmos = cosm;
+	const auto si = cosmos.get_si();
 
 	messages::collision_message msgs[2];
 
@@ -258,7 +268,7 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 		msg.subject_collider_and_convex_indices = sys.map_fixture_pointer_to_indices(fix_a, subject);
 
 		msg.point = manifold.points[0];
-		msg.point *= METERS_TO_PIXELSf;
+		msg.point = si.get_pixels(msg.point);
 
 		msg.subject_impact_velocity = body_a->GetLinearVelocityFromWorldPoint(manifold.points[0]);
 		msg.collider_impact_velocity = body_b->GetLinearVelocityFromWorldPoint(manifold.points[0]);

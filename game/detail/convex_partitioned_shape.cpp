@@ -4,7 +4,6 @@
 #include "3rdparty/polypartition/src/polypartition.h"
 
 #include "game/components/polygon_component.h"
-#include "game/components/physics_component.h"
 #include "game/components/sprite_component.h"
 
 #include "game/resources/manager.h"
@@ -92,12 +91,12 @@ void convex_partitioned_shape::from_sprite(const components::sprite& sprite, con
 		const auto rect_size = sprite.size;
 
 		b2PolygonShape shape;
-		shape.SetAsBox(static_cast<float>(rect_size.x) / 2.f * PIXELS_TO_METERSf, static_cast<float>(rect_size.y) / 2.f * PIXELS_TO_METERSf);
+		shape.SetAsBox(static_cast<float>(rect_size.x) / 2.f, static_cast<float>(rect_size.y) / 2.f);
 
 		convex_poly new_convex_polygon;
 
 		for (int i = 0; i < shape.GetVertexCount(); ++i) {
-			new_convex_polygon.vertices.push_back(vec2(shape.GetVertex(i))*METERS_TO_PIXELSf);
+			new_convex_polygon.vertices.push_back(vec2(shape.GetVertex(i)));
 		}
 
 		add_convex_polygon(new_convex_polygon);

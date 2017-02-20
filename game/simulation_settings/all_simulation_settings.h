@@ -1,11 +1,12 @@
 #pragma once
-#include "augs/misc/input_context.h"
 #include "visibility_settings.h"
 #include "pathfinding_settings.h"
+#include "si_scaling.h"
 
 struct all_simulation_settings {
 	visibility_settings visibility;
 	pathfinding_settings pathfinding;
+	si_scaling si;
 
 	template <class Archive>
 	void serialize(Archive& ar) {

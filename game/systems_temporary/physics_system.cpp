@@ -19,11 +19,6 @@
 #include "augs/graphics/renderer.h"
 #include "augs/templates/container_templates.h"
 
-double METERS_TO_PIXELS = 100.0;
-double PIXELS_TO_METERS = 1.0 / METERS_TO_PIXELS;
-float METERS_TO_PIXELSf = 100.f;
-float PIXELS_TO_METERSf = 1.0f / METERS_TO_PIXELSf;
-
 bool physics_system::is_constructed_rigid_body(const const_entity_handle handle) const {
 	return handle.alive() && get_rigid_body_cache(handle).body != nullptr;
 }
@@ -91,6 +86,7 @@ void physics_system::fixtures_construct(const const_entity_handle handle) {
 		const auto colliders = handle.get<components::fixtures>();
 
 		if (colliders.is_activated() && is_constructed_rigid_body(colliders.get_owner_body())) {
+			const auto si = handle.get_cosmos().get_si();
 			const auto& colliders_data = colliders.get_data();
 			auto& cache = get_colliders_cache(handle);
 
@@ -126,8 +122,9 @@ void physics_system::fixtures_construct(const const_entity_handle handle) {
 				for (const auto convex : transformed_shape.convex_polys) {
 					std::vector<b2Vec2> b2verts(convex.vertices.begin(), convex.vertices.end());
 
-					for (auto& v : b2verts)
-						v *= PIXELS_TO_METERSf;
+					for (auto& v : b2verts) {
+						v = si.get_meters(v);
+					}
 
 					shape.Set(b2verts.data(), b2verts.size());
 
