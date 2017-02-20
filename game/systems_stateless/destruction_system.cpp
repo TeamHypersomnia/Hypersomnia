@@ -2,7 +2,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 
 #include "game/messages/collision_message.h"
 #include "game/messages/damage_message.h"

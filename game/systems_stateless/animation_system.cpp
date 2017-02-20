@@ -11,7 +11,7 @@
 #include "game/components/render_component.h"
 
 #include "game/transcendental/entity_handle.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 
 using namespace augs;
 

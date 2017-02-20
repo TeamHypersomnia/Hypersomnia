@@ -8,7 +8,7 @@
 #include "game/detail/inventory_utils.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 #include "augs/ensure.h"
 #include "augs/templates/string_templates.h"
 #include "game/detail/gui/game_gui_context.h"

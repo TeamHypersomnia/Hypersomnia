@@ -7,7 +7,6 @@
 #include "game/detail/inventory_slot_handle.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
-#include "game/transcendental/step.h"
 #include "game/systems_audiovisual/gui_element_system.h"
 #include "augs/tweaker.h"
 #include "augs/gui/text_drawer.h"

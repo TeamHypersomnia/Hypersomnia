@@ -6,7 +6,7 @@
 #include "game/components/flags_component.h"
 
 #include "game/transcendental/cosmos.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 
 #include "physics_scripts.h"
 

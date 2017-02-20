@@ -6,7 +6,7 @@
 #include "game/components/pathfinding_component.h"
 #include "game/detail/entity_scripts.h"
 #include "game/transcendental/cosmos.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 
 namespace behaviours {
 	tree::goal_availability navigate_to_last_seen_position_of_target::goal_resolution(tree::state_of_traversal& t) const {

@@ -10,7 +10,7 @@
 #include "game/enums/filters.h"
 #include "augs/graphics/renderer.h"
 #include "game/components/sentience_component.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 #include "game/transcendental/data_living_one_step.h"
 
 void standard_explosion(const standard_explosion_input in) {

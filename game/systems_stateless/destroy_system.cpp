@@ -8,7 +8,7 @@
 #include "game/messages/will_soon_be_deleted.h"
 
 #include "game/transcendental/entity_handle.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 
 #include "augs/ensure.h"
 

@@ -27,7 +27,7 @@
 #include "augs/log.h"
 
 #include "game/transcendental/entity_handle.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 #include "game/detail/position_scripts.h"
 
 using namespace augs;

@@ -1,7 +1,7 @@
 #include "trace_system.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 
 #include "game/components/trace_component.h"
 #include "game/components/render_component.h"

@@ -7,7 +7,6 @@
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/transcendental/step.h"
 #include "augs/graphics/renderer.h"
 
 #include "augs/gui/stroke.h"

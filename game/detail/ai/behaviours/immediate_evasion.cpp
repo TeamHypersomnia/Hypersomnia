@@ -10,7 +10,7 @@
 #include "game/transcendental/data_living_one_step.h"
 
 #include "game/transcendental/cosmos.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 
 namespace behaviours {
 	tree::goal_availability immediate_evasion::goal_resolution(tree::state_of_traversal& t) const {

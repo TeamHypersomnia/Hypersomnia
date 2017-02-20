@@ -10,7 +10,7 @@
 
 #include "game/detail/inventory_utils.h"
 #include "game/transcendental/cosmos.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 #include "game/transcendental/data_living_one_step.h"
 
 namespace behaviours {

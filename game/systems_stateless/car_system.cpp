@@ -18,7 +18,7 @@
 #include "game/components/sound_existence_component.h"
 
 #include "game/transcendental/entity_handle.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 
 void car_system::set_steering_flags_from_intents(const logic_step step) {
 	auto& cosmos = step.cosm;

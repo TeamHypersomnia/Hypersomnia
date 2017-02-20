@@ -7,7 +7,7 @@
 #include "game/detail/entity_scripts.h"
 
 #include "game/transcendental/cosmos.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 
 namespace behaviours {
 	tree::goal_availability explore_in_search_for_last_seen_target::goal_resolution(tree::state_of_traversal& t) const {

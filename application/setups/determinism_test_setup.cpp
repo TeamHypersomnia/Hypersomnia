@@ -16,7 +16,7 @@
 #include "game/transcendental/data_living_one_step.h"
 
 #include "augs/misc/debug_entropy_player.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 
 #include "augs/filesystem/file.h"
 #include "determinism_test_setup.h"

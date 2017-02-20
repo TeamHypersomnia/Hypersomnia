@@ -21,7 +21,7 @@
 #include "game/detail/physics_scripts.h"
 
 #include "game/transcendental/entity_handle.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 
 void driver_system::assign_drivers_from_successful_trigger_hits(const logic_step step) {
 	auto& cosmos = step.cosm;

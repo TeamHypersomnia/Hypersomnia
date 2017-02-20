@@ -22,7 +22,7 @@
 #include "game/detail/inventory_slot_id.h"
 #include "game/detail/inventory_utils.h"
 
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 
 components::sentience::meter::damage_result components::sentience::meter::calculate_damage_result(const float amount) const {
 	components::sentience::meter::damage_result result;

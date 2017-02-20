@@ -20,7 +20,7 @@
 #include "game/components/attitude_component.h"
 
 #include "game/transcendental/entity_handle.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 
 #include "game/detail/physics_scripts.h"
 

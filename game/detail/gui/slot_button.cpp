@@ -1,7 +1,6 @@
 #include "slot_button.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
-#include "game/transcendental/step.h"
 
 #include "augs/gui/stroke.h"
 #include "item_button.h"

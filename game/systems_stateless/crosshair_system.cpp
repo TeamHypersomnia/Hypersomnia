@@ -12,7 +12,7 @@
 
 #include "augs/texture_baker/texture_baker.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 
 void components::crosshair::update_bounds() {
 	max_look_expand = visible_world_area / 2;

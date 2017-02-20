@@ -31,7 +31,7 @@
 #include "game/components/item_slot_transfers_component.h"
 
 #include "game/transcendental/entity_handle.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 #include "game/enums/item_transfer_result_type.h"
 
 #include "game/detail/physics_scripts.h"

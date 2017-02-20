@@ -16,7 +16,7 @@
 #include "game/transcendental/entity_handle.h"
 
 #include "augs/ensure.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 #include "augs/templates/string_templates.h"
 #include "game/detail/gui/gui_positioning.h"
 

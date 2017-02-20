@@ -1,7 +1,7 @@
 #pragma once
 #include "game/assets/sound_buffer_id.h"
 #include "game/components/transform_component.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 
 struct standard_explosion_input {
 	const logic_step step;

@@ -1,27 +1,10 @@
 #pragma once
 #include "augs/misc/delta.h"
+
+#include "game/transcendental/cosmic_step.h"
 #include "game/transcendental/cosmic_entropy.h"
-#include "game/transcendental/entity_handle_declaration.h"
 
-class cosmos;
 struct data_living_one_step;
-
-class config_lua_table;
-
-template<bool is_const>
-class basic_cosmic_step {
-protected:
-	typedef maybe_const_ref_t<is_const, cosmos> cosmos_ref;
-public:
-	cosmos_ref cosm;
-	
-	basic_cosmic_step(cosmos_ref cosm);
-	cosmos_ref get_cosmos() const;
-	operator basic_cosmic_step<true>() const;
-};
-
-typedef basic_cosmic_step<false> cosmic_step;
-typedef basic_cosmic_step<true> const_cosmic_step;
 
 template <bool is_const>
 class basic_logic_step : public basic_cosmic_step<is_const> {

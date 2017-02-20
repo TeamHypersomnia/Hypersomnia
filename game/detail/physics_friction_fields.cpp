@@ -2,7 +2,7 @@
 #include "game/components/fixtures_component.h"
 #include "game/components/special_physics_component.h"
 #include "game/transcendental/cosmos.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 #include "physics_scripts.h"
 #include "augs/templates/container_templates.h"
 

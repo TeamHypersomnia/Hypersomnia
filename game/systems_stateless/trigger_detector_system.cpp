@@ -20,7 +20,7 @@
 #include "game/components/trigger_collision_detector_component.h"
 #include "game/components/trigger_query_detector_component.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 
 void trigger_detector_system::consume_trigger_detector_presses(const logic_step step) const {
 	const auto& trigger_presses = step.transient.messages.get_queue<messages::intent_message>();

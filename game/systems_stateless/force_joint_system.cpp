@@ -11,7 +11,7 @@
 #include "game/transcendental/cosmos.h"
 
 #include "game/transcendental/entity_handle.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 
 void force_joint_system::apply_forces_towards_target_entities(const logic_step step) {
 	auto& cosmos = step.cosm;

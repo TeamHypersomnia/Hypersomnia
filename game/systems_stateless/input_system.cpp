@@ -15,7 +15,7 @@
 #include "game/messages/intent_message.h"
 
 #include "augs/window_framework/event.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 #include "game/transcendental/entity_handle.h"
 
 using namespace augs::window;

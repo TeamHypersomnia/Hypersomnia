@@ -13,7 +13,7 @@
 #include "game/messages/will_soon_be_deleted.h"
 
 #include "game/transcendental/cosmos.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 #include "game/transcendental/entity_handle.h"
 
 #include "augs/graphics/renderer.h"

@@ -18,7 +18,7 @@
 #include "game/enums/item_category.h"
 
 #include "game/transcendental/cosmos.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 
 #include "game/detail/item_slot_transfer_request.h"
 

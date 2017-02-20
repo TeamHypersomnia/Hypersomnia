@@ -5,6 +5,7 @@
 
 #include "game/detail/gui/game_gui_context.h"
 #include "game/transcendental/entity_handle_declaration.h"
+#include "game/transcendental/cosmic_entropy.h"
 #include "augs/graphics/renderer.h"
 
 struct character_gui;

@@ -3,7 +3,6 @@
 #include "augs/gui/basic_gui_context.h"
 #include "augs/templates/maybe_const.h"
 #include "game_gui_element_location.h"
-#include "game/transcendental/step.h"
 #include "game/transcendental/entity_handle.h"
 #include "augs/graphics/vertex.h"
 

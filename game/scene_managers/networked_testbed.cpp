@@ -23,7 +23,7 @@
 #include "augs/misc/machine_entropy.h"
 #include "game/transcendental/cosmic_entropy.h"
 #include "game/transcendental/viewing_session.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 
 #include "game/detail/world_camera.h"
 #include "augs/gui/text/printer.h"

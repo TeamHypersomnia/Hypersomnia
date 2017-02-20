@@ -7,7 +7,7 @@
 #include "game/components/behaviour_tree_component.h"
 
 #include "game/transcendental/entity_handle.h"
-#include "game/transcendental/step.h"
+#include "game/transcendental/logic_step.h"
 
 using namespace augs;
 
