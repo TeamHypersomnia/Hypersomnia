@@ -301,13 +301,6 @@ namespace rendering_scripts {
 
 		renderer.call_triangles(textual_infos);
 
-		pure_color_highlight_shader.use();
-
-		hud.draw_pure_color_highlights(step);
-
-		renderer.call_triangles();
-		renderer.clear_triangles();
-
 		exploding_rings_shader.use();
 		{
 			const auto projection_matrix_uniform = glGetUniformLocation(exploding_rings_shader.id, "projection_matrix");
@@ -315,6 +308,13 @@ namespace rendering_scripts {
 		}
 
 		hud.draw_exploding_rings(step);
+
+		renderer.call_triangles();
+		renderer.clear_triangles();
+
+		pure_color_highlight_shader.use();
+
+		hud.draw_pure_color_highlights(step);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();

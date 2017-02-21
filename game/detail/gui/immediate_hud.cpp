@@ -259,6 +259,44 @@ void immediate_hud::acquire_game_events(
 			if (h.effective_amount > 0) {
 				number_col = red;
 				highlight_col = white;
+
+				const auto base_radius = h.effective_amount * 1.5;
+				{
+					messages::exploding_ring ring;
+
+					ring.outer_radius_start_value = base_radius/1.5;
+					ring.outer_radius_end_value = base_radius/3;
+
+					ring.inner_radius_start_value = base_radius/2.5;
+					ring.inner_radius_end_value = base_radius/3;
+
+					ring.emit_particles_on_ring = false;
+
+					ring.time_of_occurence = current_time;
+					ring.maximum_duration_seconds = 0.25f;
+
+					ring.color = red;
+					ring.center = h.point_of_impact;
+
+					exploding_rings.push_back(ring);
+				}
+				messages::exploding_ring ring;
+
+				ring.outer_radius_start_value = base_radius / 2;
+				ring.outer_radius_end_value = base_radius;
+
+				ring.inner_radius_start_value = 0.f;
+				ring.inner_radius_end_value = base_radius;
+
+				ring.emit_particles_on_ring = false;
+
+				ring.time_of_occurence = current_time;
+				ring.maximum_duration_seconds = 0.25f;
+
+				ring.color = red;
+				ring.center = h.point_of_impact;
+			
+				exploding_rings.push_back(ring);
 			}
 			else {
 				number_col = green;
@@ -469,7 +507,7 @@ void immediate_hud::draw_pure_color_highlights(const viewing_step step) const {
 void immediate_hud::draw_exploding_rings(const viewing_step step) const {
 	const auto& cosmos = step.cosm;
 	const auto current_time = static_cast<float>(step.get_interpolated_total_time_passed_in_seconds());
-	auto& triangles = step.renderer.triangles;
+	auto& triangles = step.renderer.get_triangle_buffer();
 
 	for (const auto& r : exploding_rings) {
 		const auto passed = current_time - r.time_of_occurence;
@@ -489,26 +527,39 @@ void immediate_hud::draw_exploding_rings(const viewing_step step) const {
 
 		const auto& vis = r.visibility;
 
-		for (size_t t = 0; t < vis.get_num_triangles(); ++t) {
-			const auto world_light_tri = vis.get_world_triangle(t, world_explosion_center);
-			augs::vertex_triangle renderable_tri;
+		auto considered_color = r.color;
+		considered_color.a = static_cast<rgba_channel>(considered_color.a * (1.f - ratio));
 
-			renderable_tri.vertices[0].pos = step.camera[world_light_tri[0]];
-			renderable_tri.vertices[1].pos = step.camera[world_light_tri[1]];
-			renderable_tri.vertices[2].pos = step.camera[world_light_tri[2]];
+		if (vis.get_num_triangles() > 0) {
+			for (size_t t = 0; t < vis.get_num_triangles(); ++t) {
+				const auto world_light_tri = vis.get_world_triangle(t, world_explosion_center);
+				augs::vertex_triangle renderable_tri;
 
-			auto considered_color = r.color;
-			considered_color.a = static_cast<rgba_channel>(considered_color.a * (1.f - ratio));
+				renderable_tri.vertices[0].pos = step.camera[world_light_tri[0]];
+				renderable_tri.vertices[1].pos = step.camera[world_light_tri[1]];
+				renderable_tri.vertices[2].pos = step.camera[world_light_tri[2]];
 
-			if (considered_color == black) {
-				considered_color.set_hsv({ fmod(current_time / 16.f, 1.f), 1.0, 1.0 });
+				renderable_tri.vertices[0].color = considered_color;
+				renderable_tri.vertices[1].color = considered_color;
+				renderable_tri.vertices[2].color = considered_color;
+
+				step.renderer.push_triangle(renderable_tri);
+				step.renderer.push_special_vertex_triangle(sp, sp, sp);
 			}
+		}
+		else {
+			components::sprite spr;
+			spr.set(assets::texture_id::BLANK);
+			spr.size.set(outer_radius_now*2, outer_radius_now * 2);
+			spr.color = considered_color;
 
-			renderable_tri.vertices[0].color = considered_color;
-			renderable_tri.vertices[1].color = considered_color;
-			renderable_tri.vertices[2].color = considered_color;
+			components::sprite::drawing_input in(triangles);
+			in.renderable_transform.rotation = 0.f;
+			in.renderable_transform.pos = world_explosion_center;
+			in.camera = step.camera;
 
-			step.renderer.push_triangle(renderable_tri);
+			spr.draw(in);
+			step.renderer.push_special_vertex_triangle(sp, sp, sp);
 			step.renderer.push_special_vertex_triangle(sp, sp, sp);
 		}
 	}
