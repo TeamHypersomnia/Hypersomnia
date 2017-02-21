@@ -49,6 +49,7 @@ namespace ingredients {
 
 		info.filter = filters::see_through_dynamic_object();
 		info.density = 1;
+		info.restitution = 1.2f;
 
 		e += def;
 		e += colliders;
@@ -74,6 +75,7 @@ namespace ingredients {
 		info.density = 1.f;
 		info.restitution = 1.4f;
 		info.density = 0.001f;
+		info.collision_sound_gain_mult = 100.f;
 
 		e += def;
 		e += colliders;

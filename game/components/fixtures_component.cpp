@@ -133,6 +133,10 @@ void component_synchronizer<false, F>::set_restitution(const float r, const size
 		f->SetRestitution(r);
 }
 
+void component_synchronizer<false, F>::set_physical_material(const physical_material_type m, const size_t index) const {
+	component.colliders[index].material = m;
+}
+
 template<bool C>
 float basic_fixtures_synchronizer<C>::get_friction(const size_t index) const {
 	return component.colliders[index].friction;

@@ -207,8 +207,8 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 	messages::collision_message msgs[2];
 
 	for (int i = 0; i < 2; ++i) {
-		auto fix_a = contact->GetFixtureA();
-		auto fix_b = contact->GetFixtureB();
+		const auto* fix_a = contact->GetFixtureA();
+		const auto* fix_b = contact->GetFixtureB();
 
 		if (i == 1)
 			std::swap(fix_a, fix_b);
@@ -280,5 +280,52 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 }
 
 void physics_system::contact_listener::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) {
+	auto& sys = get_sys();
+	auto& cosmos = cosm;
+	const auto si = cosmos.get_si();
 
+	messages::collision_message msgs[2];
+
+	for (int i = 0; i < 2; ++i) {
+		const auto* fix_a = contact->GetFixtureA();
+		const auto* fix_b = contact->GetFixtureB();
+
+		if (i == 1) {
+			std::swap(fix_a, fix_b);
+		}
+
+		b2WorldManifold manifold;
+		contact->GetWorldManifold(&manifold);
+
+		const auto* const body_a = fix_a->GetBody();
+		const auto* const body_b = fix_b->GetBody();
+
+		auto& msg = msgs[i];
+
+		msg.type = messages::collision_message::event_type::POST_SOLVE;
+
+		const auto subject = cosmos[fix_a->GetUserData()];
+		const auto collider = cosmos[fix_b->GetUserData()];
+
+		msg.subject = subject;
+		msg.collider = collider;
+
+		auto& subject_fixtures = subject.get<components::fixtures>();
+		auto& collider_fixtures = collider.get<components::fixtures>();
+
+		msg.subject_b2Fixture_index = sys.get_index_in_component(fix_a, subject);
+		msg.collider_b2Fixture_index = sys.get_index_in_component(fix_b, collider);
+
+		msg.point = manifold.points[0];
+		msg.point = si.get_pixels(msg.point);
+
+		msg.subject_impact_velocity = body_a->GetLinearVelocityFromWorldPoint(manifold.points[0]);
+		msg.collider_impact_velocity = body_b->GetLinearVelocityFromWorldPoint(manifold.points[0]);
+
+		msg.normal_impulse = si.get_pixels(impulse->normalImpulses[0]);
+		msg.tangent_impulse = si.get_pixels(impulse->tangentImpulses[0]);
+	}
+
+	sys.accumulated_messages.push_back(msgs[0]);
+	sys.accumulated_messages.push_back(msgs[1]);
 }

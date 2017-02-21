@@ -84,8 +84,10 @@ void sound_existence_system::game_responses_to_sound_effects(const logic_step st
 	const auto& exhausted_casts = step.transient.messages.get_queue<messages::exhausted_cast>();
 	auto& cosmos = step.cosm;
 
-	for (const auto& c : collisions) {
-		if (c.type == messages::collision_message::event_type::PRE_SOLVE) {
+	for (size_t i = 0; i < collisions.size(); ++i) {
+		const auto& c = collisions[i];
+
+		if (c.type == messages::collision_message::event_type::POST_SOLVE) {
 			const auto subject = cosmos[c.subject];
 			const auto collider = cosmos[c.collider];
 
@@ -93,7 +95,28 @@ void sound_existence_system::game_responses_to_sound_effects(const logic_step st
 			const auto& collider_fix = collider.get<components::fixtures>();
 
 			const auto& subject_coll = subject_fix.get_collider_data(c.subject_b2Fixture_index.collider_index);
-			const auto& collider_coll = subject_fix.get_collider_data(c.collider_b2Fixture_index.collider_index);
+			const auto& collider_coll = collider_fix.get_collider_data(c.collider_b2Fixture_index.collider_index);
+			
+			const auto sound = cosmos.get_collision_sound(subject_coll.material, collider_coll.material);
+
+			const auto impulse = (c.normal_impulse + c.tangent_impulse) * subject_coll.collision_sound_gain_mult * collider_coll.collision_sound_gain_mult;
+
+			const auto gain_mult = impulse / 15.f;
+			const auto pitch_mult = impulse / 85.f;
+
+			if (gain_mult > 0.01f)
+			{
+				components::sound_existence::effect_input in;
+				in.delete_entity_after_effect_lifetime = true;
+				in.modifier.pitch = 0.95f + pitch_mult;
+				in.modifier.gain = gain_mult;
+				in.effect = sound;
+
+				create_sound_effect_entity(cosmos, in, c.point, entity_id()).add_standard_components();
+			}
+
+			// skip the next, swapped collision message
+			++i;
 		}
 	}
 

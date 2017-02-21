@@ -12,12 +12,16 @@ namespace messages {
 
 		b2Fixture_index_in_component collider_b2Fixture_index;
 		b2Fixture_index_in_component subject_b2Fixture_index;
+		
+		float normal_impulse = 0.f;
+		float tangent_impulse = 0.f;
 
 		bool one_is_sensor = false;
 
 		enum class event_type {
 			BEGIN_CONTACT,
 			PRE_SOLVE,
+			POST_SOLVE,
 			END_CONTACT
 		} type;
 	};

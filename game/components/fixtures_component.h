@@ -26,6 +26,8 @@ namespace components {
 			convex_partitioned_shape shape;
 			physical_material_type material = physical_material_type::METAL;
 
+			float collision_sound_gain_mult = 1.f;
+
 			float density = 1.f;
 			float density_multiplier = 1.f;
 			float friction = 0.f;
@@ -129,6 +131,7 @@ public:
 	void set_density_multiplier(float, size_t = 0) const;
 	void set_friction(float, size_t = 0) const;
 	void set_restitution(float, size_t = 0) const;
+	void set_physical_material(const physical_material_type, size_t = 0) const;
 	void set_owner_body(entity_id) const;
 	component_synchronizer& operator=(const components::fixtures&);
 	void set_offset(colliders_offset_type, components::transform) const;
