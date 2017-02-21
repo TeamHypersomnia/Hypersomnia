@@ -339,7 +339,7 @@ namespace resource_setups {
 
 				em.spread_degrees = std::make_pair(45, 60);
 				em.stream_lifetime_ms = std::make_pair(150.f, 200.f);
-				em.particles_per_sec = std::make_pair(130.f, 160.f);
+				em.particles_per_sec = std::make_pair(350.f, 400.f);
 
 				em.base_speed = std::make_pair(120, 300);
 				em.base_speed_variation = std::make_pair(10.f, 20.f);
@@ -410,7 +410,7 @@ namespace resource_setups {
 				em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
 
 				em.spread_degrees = std::make_pair(100, 120);
-				em.num_of_particles_to_spawn_initially.set(1400, 1540);
+				em.num_of_particles_to_spawn_initially.set(1000, 1240);
 				
 				em.stream_lifetime_ms.set(200, 300);
 				em.particles_per_sec.set(290, 320);

@@ -252,27 +252,38 @@ void immediate_hud::acquire_game_events(
 		vn.time_of_occurence = current_time;
 		vn.value = h.effective_amount;
 
-		rgba col;
+		rgba number_col;
+		rgba highlight_col;
 
 		if (h.target == messages::health_event::HEALTH) {
 			if (h.effective_amount > 0) {
-				col = { 255, 20, 20, 255 };
+				number_col = red;
+				highlight_col = white;
 			}
 			else {
-				col = green;
+				number_col = green;
+				highlight_col = green;
 			}
 		}
 		else {
 			continue;
 		}
 
-		vn.text.set_text(augs::gui::text::format(to_wstring(std::abs(int(vn.value) == 0 ? 1 : int(vn.value))), augs::gui::text::style(assets::font_id::GUI_FONT, col)));
+		vn.text.set_text(
+			augs::gui::text::format(
+				to_wstring(
+					std::abs(int(vn.value) == 0 ? 1 : int(vn.value))
+				), 
+				augs::gui::text::style(assets::font_id::GUI_FONT, number_col)
+			)
+		);
+		
 		vn.transform.pos = h.point_of_impact;
 
 		recent_vertically_flying_numbers.push_back(vn);
 
 		if (cosmos[h.spawned_remnants].alive()) {
-			vn.text.set_text(augs::gui::text::format(L"Death", augs::gui::text::style(assets::font_id::GUI_FONT, col)));
+			vn.text.set_text(augs::gui::text::format(L"Death", augs::gui::text::style(assets::font_id::GUI_FONT, number_col)));
 			vn.transform.pos = cosmos[h.spawned_remnants].get_logic_transform().pos;
 			recent_vertically_flying_numbers.push_back(vn);
 		}
@@ -288,8 +299,8 @@ void immediate_hud::acquire_game_events(
 		//	new_highlight.starting_alpha_ratio = 1.f;
 		//}
 
-		new_highlight.maximum_duration_seconds = 0.15f;
-		new_highlight.color = col;
+		new_highlight.maximum_duration_seconds = 0.10f;
+		new_highlight.color = highlight_col;
 
 		erase_remove(recent_pure_color_highlights, [&new_highlight, &cosmos](const pure_color_highlight& existing_highlight) { 
 			return existing_highlight.target == new_highlight.target;
@@ -437,7 +448,7 @@ void immediate_hud::draw_pure_color_highlights(const viewing_step step) const {
 		auto passed = current_time - r.time_of_occurence;
 		auto ratio = std::max(0.f, 1.f - static_cast<float>(passed / r.maximum_duration_seconds));
 
-		col.a = static_cast<rgba_channel>(255.f * sqrt(ratio) * r.starting_alpha_ratio);
+		col.a = static_cast<rgba_channel>(255.f * sqrt(sqrt(ratio)) * r.starting_alpha_ratio);
 		
 		render_system().draw_renderable(
 			triangles, 
