@@ -38,6 +38,7 @@ void config_lua_table::get_values(augs::lua_state_raii& lua) {
 	set(NVP(determinism_test_cloned_cosmoi_count));
 	
 	set(NVP(enable_hrtf));
+	set(NVP(max_number_of_sound_sources));
 
 	set(NVP(audio_output_device));
 

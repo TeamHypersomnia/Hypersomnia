@@ -255,12 +255,14 @@ void immediate_hud::acquire_game_events(
 		rgba number_col;
 		rgba highlight_col;
 
+		const bool is_it_death = cosmos[h.spawned_remnants].alive();
+
 		if (h.target == messages::health_event::HEALTH) {
 			if (h.effective_amount > 0) {
 				number_col = red;
 				highlight_col = white;
 
-				const auto base_radius = h.effective_amount * 1.5;
+				const auto base_radius = is_it_death ? 80.f : h.effective_amount * 1.5;
 				{
 					messages::exploding_ring ring;
 
@@ -273,7 +275,7 @@ void immediate_hud::acquire_game_events(
 					ring.emit_particles_on_ring = false;
 
 					ring.time_of_occurence = current_time;
-					ring.maximum_duration_seconds = 0.25f;
+					ring.maximum_duration_seconds = 0.20f;
 
 					ring.color = red;
 					ring.center = h.point_of_impact;
@@ -291,7 +293,7 @@ void immediate_hud::acquire_game_events(
 				ring.emit_particles_on_ring = false;
 
 				ring.time_of_occurence = current_time;
-				ring.maximum_duration_seconds = 0.25f;
+				ring.maximum_duration_seconds = 0.20f;
 
 				ring.color = red;
 				ring.center = h.point_of_impact;
@@ -320,7 +322,7 @@ void immediate_hud::acquire_game_events(
 
 		recent_vertically_flying_numbers.push_back(vn);
 
-		if (cosmos[h.spawned_remnants].alive()) {
+		if (is_it_death) {
 			vn.text.set_text(augs::gui::text::format(L"Death", augs::gui::text::style(assets::font_id::GUI_FONT, number_col)));
 			vn.transform.pos = cosmos[h.spawned_remnants].get_logic_transform().pos;
 			recent_vertically_flying_numbers.push_back(vn);

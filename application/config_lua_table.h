@@ -24,6 +24,7 @@ public:
 	unsigned determinism_test_cloned_cosmoi_count = 0;
 	
 	bool enable_hrtf = true;
+	unsigned max_number_of_sound_sources = 0u;
 
 	std::string audio_output_device;
 

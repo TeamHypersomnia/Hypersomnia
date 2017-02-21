@@ -29,6 +29,29 @@ struct immediate_hud {
 		rgba color;
 	};
 
+	struct thunder {
+		typedef augs::minmax<float> minmax;
+
+		minmax delay_between_branches_ms = minmax(0.f, 0.f);
+		minmax max_branch_lifetime_ms = minmax(0.f, 0.f);
+		minmax branch_length = minmax(0.f, 0.f);
+		
+		components::transform first_branch_root;
+		float branch_angle_spread = 0.f;
+
+		struct branch {
+			std::vector<int> children;
+			bool activated = false;
+
+			float lifetime_ms = 0.f;
+
+			vec2 from;
+			vec2 to;
+		};
+
+		std::vector<branch> branches;
+	};
+
 	std::vector<vertically_flying_number> recent_vertically_flying_numbers;
 	std::vector<pure_color_highlight> recent_pure_color_highlights;
 	std::vector<messages::exploding_ring> exploding_rings;
@@ -38,6 +61,7 @@ struct immediate_hud {
 	void draw_vertically_flying_numbers(const viewing_step) const;
 	void draw_exploding_rings(const viewing_step) const;
 	void draw_neon_highlights_of_exploding_rings(const viewing_step) const;
+	void draw_thunders(const viewing_step) const;
 
 	void acquire_game_events(
 		const const_logic_step step,

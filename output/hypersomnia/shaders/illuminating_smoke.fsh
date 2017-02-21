@@ -32,7 +32,7 @@ void main()
 	float smoke_intensity = smoke.a;//max(max(smoke.r, smoke.g), smoke.b);
 	int smoke_step_number = (int(smoke_intensity * 255.0) / smoke_step);
 
-	if(smoke_step_number <= 1)
+	if(smoke_step_number <= 0)
 		discard;
 		//else
 		//smoke_step_number = 2;

@@ -30,7 +30,10 @@ static std::string list_audio_devices(const ALCchar * const devices) {
 }
 
 namespace augs {
-	void audio_manager::generate_alsoft_ini(const bool hrtf_enabled) {
+	void audio_manager::generate_alsoft_ini(
+		const bool hrtf_enabled,
+		const unsigned max_number_of_sound_sources
+	) {
 		std::string alsoft_ini_file;
 		alsoft_ini_file += "# Do not modify.";
 		alsoft_ini_file += "\n# Hypersomnia generates this file every launch to speak with OpenAL.";
@@ -38,7 +41,7 @@ namespace augs {
 		alsoft_ini_file += "\nhrtf = ";
 		alsoft_ini_file += hrtf_enabled ? "true" : "false";
 		alsoft_ini_file += "\nhrtf-paths = " + augs::get_executable_directory() + "\\hrtf";
-		alsoft_ini_file += "\nsources = 2048";
+		alsoft_ini_file += typesafe_sprintf("\nsources = %x", max_number_of_sound_sources);
 
 		augs::create_text_file(std::string("alsoft.ini"), alsoft_ini_file);
 	}

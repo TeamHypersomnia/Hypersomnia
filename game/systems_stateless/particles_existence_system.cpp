@@ -172,7 +172,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 		if (h.target == messages::health_event::HEALTH) {
 			if (cosmos[h.spawned_remnants].alive()) {
 				burst.input.effect = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
-				burst.input.modifier.scale_amounts = 0.8f;
+				burst.input.modifier.scale_amounts = 0.6f;
 				burst.input.modifier.scale_lifetimes = 1.25f;
 				burst.input.modifier.colorize = red;
 				burst.input.modifier.homing_target = h.subject;

@@ -70,6 +70,9 @@ config_table = {
 	-- should enable head-related transfer function for OpenAL?
 	enable_hrtf = 1,
 
+	-- maximum number of audible sound effects
+	max_number_of_sound_sources = 4096,
+
 	-- value of "" means the default audio device will be used
 	audio_output_device = "",
 	-- OpenAL Soft on Line 1 (Virtual Audio Cable)

@@ -418,13 +418,13 @@ namespace resource_setups {
 				em.base_speed = std::make_pair(260, 290);
 				em.base_speed_variation = std::make_pair(10.f, 20.f);
 
-				em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEGf, 2.8f*RAD_TO_DEGf);
-				em.particle_lifetime_ms = std::make_pair(800, 900);
+				em.rotation_speed = std::make_pair(3.5f*RAD_TO_DEGf, 3.8f*RAD_TO_DEGf);
+				em.particle_lifetime_ms = std::make_pair(300, 500);
 
-				em.randomize_spawn_point_within_circle_of_inner_radius = std::make_pair(20.f, 20.f);
-				em.randomize_spawn_point_within_circle_of_outer_radius = std::make_pair(85.f, 85.f);
+				em.randomize_spawn_point_within_circle_of_inner_radius = std::make_pair(10.f, 10.f);
+				em.randomize_spawn_point_within_circle_of_outer_radius = std::make_pair(155.f, 155.f);
 
-				em.starting_spawn_circle_size_multiplier = std::make_pair(0.6f, 0.6f);
+				em.starting_spawn_circle_size_multiplier = std::make_pair(0.5f, 0.5f);
 				em.starting_spawn_circle_size_multiplier = std::make_pair(1.0f, 1.0f);
 
 				for (int i = 0; i < 3; ++i) {
@@ -432,7 +432,7 @@ namespace resource_setups {
 
 					particle_template.angular_damping = 0;
 					particle_template.linear_damping = 20;
-					particle_template.face.set(assets::texture_id(int(assets::texture_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 15));
+					particle_template.face.set(assets::texture_id(int(assets::texture_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 30));
 					particle_template.unshrinking_time_ms = 100.f;
 					particle_template.shrink_when_ms_remaining = 250.f;
 					particle_template.acc.set(500, -500);
