@@ -80,8 +80,17 @@ void standard_explosion(const standard_explosion_input in) {
 					const auto body_entity = cosmos[body_entity_id];
 					const auto& affected_physics = body_entity.get<components::physics>();
 
-					const auto impact = (point_b - in.explosion_location.pos).set_length(in.impact_force);
+					auto impact = (point_b - in.explosion_location.pos).set_length(in.impact_force);
 					const auto center_offset = (point_b - affected_physics.get_mass_position()) * 0.8f;
+
+					auto* const maybe_sentience = body_entity.find<components::sentience>();
+
+					if (maybe_sentience != nullptr) {
+						maybe_sentience->shake_for_ms = 400.f;
+						maybe_sentience->time_of_last_shake = now;
+					
+						impact *= 2.f;
+					}
 
 					{
 						affected_physics.apply_impulse(
@@ -98,13 +107,6 @@ void standard_explosion(const standard_explosion_input in) {
 						}
 
 						// LOG("Impact %x dealt to: %x. Resultant angular: %x", impact, body_entity.get_debug_name(), affected_physics.get_angular_velocity());
-					}
-
-					auto* const maybe_sentience = body_entity.find<components::sentience>();
-
-					if (maybe_sentience != nullptr) {
-						maybe_sentience->shake_for_ms = 400.f;
-						maybe_sentience->time_of_last_shake = now;
 					}
 
 					messages::damage_message damage_msg;

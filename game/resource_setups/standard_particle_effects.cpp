@@ -339,7 +339,7 @@ namespace resource_setups {
 
 				em.spread_degrees = std::make_pair(45, 60);
 				em.stream_lifetime_ms = std::make_pair(150.f, 200.f);
-				em.particles_per_sec = std::make_pair(80.f, 100.f);
+				em.particles_per_sec = std::make_pair(130.f, 160.f);
 
 				em.base_speed = std::make_pair(120, 300);
 				em.base_speed_variation = std::make_pair(10.f, 20.f);

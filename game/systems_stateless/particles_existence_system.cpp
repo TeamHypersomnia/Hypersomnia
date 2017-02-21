@@ -180,8 +180,8 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 			else if (h.effective_amount > 0) {
 				burst.input.effect = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
 				burst.input.modifier.colorize = red;
-				burst.input.modifier.scale_amounts = h.ratio_effective_to_maximum;// (1.25f + h.ratio_effective_to_maximum)*(1.25f + h.ratio_effective_to_maximum);
-				burst.input.modifier.scale_lifetimes = 1.25f + h.ratio_effective_to_maximum;
+				burst.input.modifier.scale_amounts = h.effective_amount/100.f;// (1.25f + h.ratio_effective_to_maximum)*(1.25f + h.ratio_effective_to_maximum);
+				burst.input.modifier.scale_lifetimes = 1.25f + h.effective_amount / 100.f;
 				burst.input.modifier.homing_target = h.subject;
 			}
 

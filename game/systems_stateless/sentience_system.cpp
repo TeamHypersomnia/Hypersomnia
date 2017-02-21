@@ -14,6 +14,7 @@
 #include "game/components/container_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/position_copying_component.h"
+#include "game/components/movement_component.h"
 
 #include "game/components/animation_component.h"
 #include "game/components/movement_component.h"
@@ -186,9 +187,18 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 
 	switch (h.target) {
 	case messages::health_event::HEALTH: 
-		sentience.health.value -= h.effective_amount; 
-		ensure(sentience.health.value >= 0); 
+	{
+
+		sentience.health.value -= h.effective_amount;
+		ensure(sentience.health.value >= 0);
 		sentience.time_of_last_received_damage = cosmos.get_timestamp();
+
+		auto& movement = subject.get<components::movement>();
+		movement.make_inert_for_ms += h.effective_amount*2;
+
+		subject.get<components::physics>()
+			.apply_impulse(vec2(h.impact_velocity).set_length(h.effective_amount * 5));
+	}
 		break;
 	case messages::health_event::CONSCIOUSNESS: sentience.consciousness.value -= h.effective_amount; ensure(sentience.health.value >= 0); break;
 	case messages::health_event::PERSONAL_ELECTRICITY_SHIELD: ensure(false); break;
@@ -291,6 +301,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 				if (event.effective_amount != 0) {
 					consume_health_event(event, step);
 				}
+
 			}
 
 			/*
