@@ -101,14 +101,14 @@ void sound_existence_system::game_responses_to_sound_effects(const logic_step st
 
 			const auto impulse = (c.normal_impulse + c.tangent_impulse) * subject_coll.collision_sound_gain_mult * collider_coll.collision_sound_gain_mult;
 
-			const auto gain_mult = impulse / 15.f;
-			const auto pitch_mult = impulse / 85.f;
+			const auto gain_mult = (impulse / 15.f) * (impulse / 15.f);
+			const auto pitch_mult = impulse / 185.f;
 
 			if (gain_mult > 0.01f)
 			{
 				components::sound_existence::effect_input in;
 				in.delete_entity_after_effect_lifetime = true;
-				in.modifier.pitch = 0.95f + pitch_mult;
+				in.modifier.pitch = 0.85f + pitch_mult;
 				in.modifier.gain = gain_mult;
 				in.effect = sound;
 

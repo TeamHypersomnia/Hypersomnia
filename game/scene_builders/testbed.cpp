@@ -535,19 +535,19 @@ namespace scene_builders {
 			}
 
 			{
-				const auto l = world.create_entity("l");
-				l += components::transform(164.f - 8.f, -700);
-				auto& light = l += components::light();
-				light.color = cyan;
-				//light.linear.base_value = 0.000005f;
-				//light.quadratic.base_value = 0.000025f;
-				light.max_distance.base_value = 4500.f;
-				light.wall_max_distance.base_value = 4000.f;
-				l.add_standard_components();
+				//const auto l = world.create_entity("l");
+				//l += components::transform(164.f - 8.f, -700);
+				//auto& light = l += components::light();
+				//light.color = cyan;
+				////light.linear.base_value = 0.000005f;
+				////light.quadratic.base_value = 0.000025f;
+				//light.max_distance.base_value = 4500.f;
+				//light.wall_max_distance.base_value = 4000.f;
+				//l.add_standard_components();
 			}
 			{
 				const auto l = world.create_entity("l");
-				l += components::transform(1164.f + 24.f, -700);
+				l += components::transform(564.f + 24.f, -1200);
 				auto& light = l += components::light();
 				light.color = orange;
 				light.max_distance.base_value = 4500.f;
@@ -705,6 +705,15 @@ namespace scene_builders {
 		prefabs::create_amplifier_arm(step.cosm, vec2(-370, + 50));
 
 		prefabs::create_sample_rifle(step, vec2(100, -500 + 100));
+
+		prefabs::create_sample_rifle(step, vec2(200, -600 + 100));
+		prefabs::create_sample_rifle(step, vec2(300, -700 + 100));
+		prefabs::create_sample_rifle(step, vec2(400, -800 + 100));
+		prefabs::create_sample_rifle(step, vec2(500, -900 + 100));
+
+		prefabs::create_sample_rifle(step, vec2(700, -600 + 100));
+		prefabs::create_sample_rifle(step, vec2(800, -700 + 100));
+		prefabs::create_sample_rifle(step, vec2(900, -800 + 100));
 
 		prefabs::create_kek9(step, vec2(300, -500 + 50));
 
