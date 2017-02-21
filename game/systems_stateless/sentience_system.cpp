@@ -15,6 +15,7 @@
 #include "game/components/fixtures_component.h"
 #include "game/components/position_copying_component.h"
 #include "game/components/movement_component.h"
+#include "game/components/special_physics_component.h"
 
 #include "game/components/animation_component.h"
 #include "game/components/movement_component.h"
@@ -225,7 +226,17 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		const auto* const container = subject.find<components::container>();
 
 		if (container) {
-			drop_from_all_slots(subject, step);
+			//drop_from_all_slots(subject, step);
+
+			const auto& container = subject.get<components::container>();
+
+			for (const auto& s : container.slots) {
+				for (const auto item_id : s.second.items_inside) {
+					const auto item = cosmos[item_id];
+
+					perform_transfer({ item, cosmos[inventory_slot_id()] }, step);
+				}
+			}
 		}
 
 		//const auto sub_def = subject[sub_entity_name::CORPSE_OF_SENTIENCE];
@@ -242,10 +253,23 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		//
 		//corpse.add_standard_components();
 		//
-		//corpse.get<components::physics>().apply_force(vec2().set_from_degrees(place_of_death.rotation).set_length(27850 * 2));
+		
 		//
 		subject.get<components::processing>().disable_in(processing_subjects::WITH_MOVEMENT);
+		subject.get<components::processing>().disable_in(processing_subjects::WITH_ROTATION_COPYING);
 		resolve_dampings_of_body(subject);
+		
+		const auto subject_transform = subject.get_logic_transform();
+
+		subject.get<components::physics>().apply_impulse(
+			h.impact_velocity.set_length(850) 
+			//vec2().set_from_degrees(subject_transform.rotation) * 70
+		);
+
+
+		subject.get<components::physics>().apply_angular_impulse(
+			80.f
+		);
 
 		sentience.health.enabled = false;
 	}

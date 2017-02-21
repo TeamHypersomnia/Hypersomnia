@@ -49,7 +49,7 @@ namespace ingredients {
 
 		info.filter = filters::see_through_dynamic_object();
 		info.density = 1;
-		info.restitution = 1.2f;
+		info.restitution = 0.5f;
 
 		e += def;
 		e += colliders;

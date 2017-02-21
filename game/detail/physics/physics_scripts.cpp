@@ -64,7 +64,9 @@ void resolve_dampings_of_body(const entity_handle it) {
 		}
 	}
 	else {
-
+		physics.set_linear_damping_vec(components::physics().linear_damping_vec);
+		physics.set_linear_damping(components::physics().linear_damping);
+		physics.set_angular_damping(components::physics().angular_damping);
 	}
 }
 
