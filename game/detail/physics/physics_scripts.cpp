@@ -3,10 +3,70 @@
 #include "game/components/fixtures_component.h"
 #include "game/components/item_component.h"
 #include "game/components/driver_component.h"
+#include "game/components/sentience_component.h"
+#include "game/components/movement_component.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/detail/position_scripts.h"
+
+void resolve_dampings_of_body(const entity_handle it) {
+	auto& cosmos = it.get_cosmos();
+	auto& physics = it.get<components::physics>();
+
+	auto considered_damping = 0.f;
+
+	if (it.get<components::processing>().is_in(processing_subjects::WITH_MOVEMENT)) {
+		const auto& movement = it.get<components::movement>();
+		bool is_sprint_effective = movement.sprint_enabled;
+
+		auto* const sentience = it.find<components::sentience>();
+		const bool is_sentient = sentience != nullptr;
+
+		if (is_sentient) {
+			if (sentience->consciousness.value <= 0.f) {
+				is_sprint_effective = false;
+			}
+		}
+
+		const bool is_inert = movement.make_inert_for_ms > 0.f;
+
+		if (is_inert) {
+			considered_damping = 2;
+		}
+		else {
+			considered_damping = movement.standard_linear_damping;
+		}
+
+		const auto requested_by_input = movement.get_force_requested_by_input();
+
+		if (requested_by_input.non_zero()) {
+			if (is_sprint_effective) {
+				if (!is_inert) {
+					considered_damping /= 4;
+				}
+			}
+		}
+
+		physics.set_linear_damping(considered_damping);
+
+		/* the player feels less like a physical projectile if we brake per-axis */
+		if (movement.enable_braking_damping && !(movement.make_inert_for_ms > 0.f)) {
+			physics.set_linear_damping_vec(
+				vec2(
+					requested_by_input.x_non_zero() ? 0.f : movement.braking_damping,
+					requested_by_input.y_non_zero() ? 0.f : movement.braking_damping
+				)
+			);
+		}
+		else {
+			physics.set_linear_damping_vec(vec2(0, 0));
+		}
+	}
+	else {
+
+	}
+}
 
 void resolve_density_of_associated_fixtures(const entity_handle id) {
 	auto& cosmos = id.get_cosmos();

@@ -4,6 +4,7 @@
 
 #include "augs/math/vec2.h"
 #include "game/transcendental/entity_id.h"
+#include "game/transcendental/entity_handle_declaration.h"
 
 #include "padding_byte.h"
 
@@ -33,10 +34,7 @@ namespace components {
 		bool walking_enabled = false;
 		bool enable_braking_damping = false;
 		bool enable_animation = true;
-		bool apply_movement_forces = true;
-
 		bool sprint_enabled = false;
-		padding_byte pad[3];
 
 		vec2 input_acceleration_axes;
 		float acceleration_length = -1.f;
@@ -102,6 +100,7 @@ namespace components {
 
 		void add_animation_receiver(entity_id e, bool stop_at_zero_movement);
 		void reset_movement_flags();
+		vec2 get_force_requested_by_input() const;
 		void set_flags_from_target_direction(vec2 d);
 		void set_flags_from_closest_direction(vec2 d);
 	};

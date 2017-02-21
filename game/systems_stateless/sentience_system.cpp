@@ -23,6 +23,8 @@
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "game/detail/inventory/inventory_utils.h"
 
+#include "game/detail/physics/physics_scripts.h"
+
 #include "game/transcendental/logic_step.h"
 
 components::sentience::meter::damage_result components::sentience::meter::calculate_damage_result(const float amount) const {
@@ -186,7 +188,7 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 	auto& sentience = subject.get<components::sentience>();
 
 	switch (h.target) {
-	case messages::health_event::HEALTH: 
+	case messages::health_event::target_type::HEALTH:
 	{
 
 		sentience.health.value -= h.effective_amount;
@@ -200,9 +202,9 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 			.apply_impulse(vec2(h.impact_velocity).set_length(h.effective_amount * 5));
 	}
 		break;
-	case messages::health_event::CONSCIOUSNESS: sentience.consciousness.value -= h.effective_amount; ensure(sentience.health.value >= 0); break;
-	case messages::health_event::PERSONAL_ELECTRICITY_SHIELD: ensure(false); break;
-	case messages::health_event::AIM:
+	case messages::health_event::target_type::CONSCIOUSNESS: sentience.consciousness.value -= h.effective_amount; ensure(sentience.health.value >= 0); break;
+	case messages::health_event::target_type::PERSONAL_ELECTRICITY_SHIELD: ensure(false); break;
+	case messages::health_event::target_type::AIM:
 		const auto punched = subject;
 
 		if (punched[sub_entity_name::CHARACTER_CROSSHAIR].alive() && punched[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY].alive()) {
@@ -219,7 +221,7 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		break;
 	}
 
-	if (h.special_result == messages::health_event::DEATH) {
+	if (h.special_result == messages::health_event::result_type::DEATH) {
 		const auto* const container = subject.find<components::container>();
 
 		if (container) {
@@ -242,8 +244,10 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		//
 		//corpse.get<components::physics>().apply_force(vec2().set_from_degrees(place_of_death.rotation).set_length(27850 * 2));
 		//
-		h.spawned_remnants = subject;
-		//sentience.health.enabled = false;
+		subject.get<components::processing>().disable_in(processing_subjects::WITH_MOVEMENT);
+		resolve_dampings_of_body(subject);
+
+		sentience.health.enabled = false;
 	}
 
 	step.transient.messages.post(h);
@@ -267,7 +271,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 		event.impact_velocity = d.impact_velocity;
 
 		auto aimpunch_event = event;
-		aimpunch_event.target = messages::health_event::AIM;
+		aimpunch_event.target = messages::health_event::target_type::AIM;
 
 		if (sentience) {
 			aimpunch_event.subject = subject;
@@ -285,17 +289,17 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 
 			event.effective_amount = 0;
 			event.objective_amount = d.amount;
-			event.special_result = messages::health_event::NONE;
+			event.special_result = messages::health_event::result_type::NONE;
 
 			if (s.health.enabled) {
-				event.target = messages::health_event::HEALTH;
+				event.target = messages::health_event::target_type::HEALTH;
 
 				const auto damaged = s.health.calculate_damage_result(d.amount);
 				event.effective_amount = damaged.effective;
 				event.ratio_effective_to_maximum = damaged.ratio_effective_to_maximum;
 
 				if (damaged.dropped_to_zero) {
-					event.special_result = messages::health_event::DEATH;
+					event.special_result = messages::health_event::result_type::DEATH;
 				}
 
 				if (event.effective_amount != 0) {

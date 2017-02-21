@@ -60,7 +60,6 @@ void car_system::apply_movement_forces(const logic_step step) {
 	for (const auto& it : targets_copy) {
 		auto& car = it.get<components::car>();
 		auto& physics = it.get<components::physics>();
-		auto& special_physics = it.get<components::special_physics>();
 
 		vec2 resultant;
 
@@ -90,13 +89,12 @@ void car_system::apply_movement_forces(const logic_step step) {
 			physics.apply_force(forward_tire_force * physics.get_mass()/4, forward_dir * -off.x - vec2(right_normal).set_length(off.y));
 		}
 
-		vec2 vel = physics.velocity();
-		auto speed = vel.length();
-	
+		const vec2 vel = physics.velocity();
+		const auto speed = vel.length();
 
 		vec2 lateral = right_normal * right_normal.dot(vel);
 		vec2 forwardal = forward_dir * forward_dir.dot(vel);
-		auto forwardal_speed = forwardal.length();
+		const auto forwardal_speed = forwardal.length();
 		forwardal.normalize_hint(forwardal_speed);
 
 		if (forwardal_speed < car.maximum_speed_with_static_air_resistance) {

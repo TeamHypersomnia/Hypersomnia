@@ -62,6 +62,13 @@ namespace components {
 		response_receivers.push_back(s);
 	}
 
+	vec2 movement::get_force_requested_by_input() const {
+		return {
+			moving_right * input_acceleration_axes.x - moving_left * input_acceleration_axes.x,
+			moving_backward * input_acceleration_axes.y - moving_forward * input_acceleration_axes.y
+		};
+	}
+	
 	void movement::reset_movement_flags() {
 		moving_left = moving_right = moving_forward = moving_backward = walking_enabled = sprint_enabled = false;
 	}

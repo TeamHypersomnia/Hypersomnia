@@ -16,6 +16,8 @@
 
 #include "game/systems_stateless/sentience_system.h"
 
+#include "game/detail/physics/physics_scripts.h"
+
 using namespace augs;
 
 void movement_system::set_movement_flags_from_input(const logic_step step) {
@@ -61,20 +63,6 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 	for (const auto& it : cosmos.get(processing_subjects::WITH_MOVEMENT)) {
 		auto& movement = it.get<components::movement>();
 
-		if (!movement.apply_movement_forces) {
-			continue;
-		}
-
-		vec2 resultant;
-
-		resultant.x = movement.moving_right * movement.input_acceleration_axes.x - movement.moving_left * movement.input_acceleration_axes.x;
-		resultant.y = movement.moving_backward * movement.input_acceleration_axes.y - movement.moving_forward * movement.input_acceleration_axes.y;
-
-		if (!it.has<components::physics>()) {
-			it.get<components::transform>().pos += resultant * delta.in_seconds();
-			continue;
-		}
-
 		const auto& physics = it.get<components::physics>();
 
 		if (!physics.is_constructed()) {
@@ -82,7 +70,6 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 		}
 
 		auto movement_force_mult = 1.f;
-		auto considered_damping = 0.f;
 
 		bool is_sprint_effective = movement.sprint_enabled;
 
@@ -108,18 +95,12 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 
 		if (is_inert) {
 			movement.make_inert_for_ms -= static_cast<float>(delta.in_milliseconds());
-			considered_damping = 2;
-		}
-		else {
-			considered_damping = movement.standard_linear_damping;
 		}
 
-		if (resultant.non_zero()) {
+		const auto requested_by_input = movement.get_force_requested_by_input();
+
+		if (requested_by_input.non_zero()) {
 			if (is_sprint_effective) {
-				if (!is_inert) {
-					considered_damping /= 4;
-				}
-
 				movement_force_mult /= 2.f;
 
 				if (is_sentient) {
@@ -139,26 +120,22 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 				sentience->time_of_last_exertion = cosmos.get_timestamp();
 			}
 
+			auto applied_force = requested_by_input;
+
 			if (movement.acceleration_length > 0) {
-				resultant.set_length(movement.acceleration_length);
+				applied_force.set_length(movement.acceleration_length);
 			}
 
-			resultant *= movement_force_mult;
+			applied_force *= movement_force_mult;
+			applied_force *= physics.get_mass();
 
-			physics.apply_force(resultant * physics.get_mass(), movement.applied_force_offset, true);
+			physics.apply_force(
+				applied_force, 
+				movement.applied_force_offset
+			);
 		}
 		
-		physics.set_linear_damping(considered_damping);
-
-		/* the player feels less like a physical projectile if we brake per-axis */
-		if (movement.enable_braking_damping && !(movement.make_inert_for_ms > 0.f)) {
-			physics.set_linear_damping_vec(vec2(
-				resultant.x_non_zero() ? 0.f : movement.braking_damping,
-				resultant.y_non_zero() ? 0.f : movement.braking_damping));
-		}
-		else {
-			physics.set_linear_damping_vec(vec2(0, 0));
-		}
+		resolve_dampings_of_body(it);
 	}
 }
 

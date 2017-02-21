@@ -96,7 +96,7 @@ augs::vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_i
 		const auto v = cosmos[v_id];
 		const auto* const sentience = v.find<components::sentience>();
 
-		if (sentience) {
+		if (sentience && sentience->health.is_enabled()) {
 			const auto hr = sentience->health.get_ratio();
 			const auto one_less_hr = 1 - hr;
 
@@ -255,9 +255,9 @@ void immediate_hud::acquire_game_events(
 		rgba number_col;
 		rgba highlight_col;
 
-		const bool is_it_death = cosmos[h.spawned_remnants].alive();
+		const bool is_it_death = h.special_result == messages::health_event::result_type::DEATH;
 
-		if (h.target == messages::health_event::HEALTH) {
+		if (h.target == messages::health_event::target_type::HEALTH) {
 			if (h.effective_amount > 0) {
 				number_col = red;
 				highlight_col = white;
@@ -282,23 +282,45 @@ void immediate_hud::acquire_game_events(
 
 					exploding_rings.push_back(ring);
 				}
-				messages::exploding_ring ring;
 
-				ring.outer_radius_start_value = base_radius / 2;
-				ring.outer_radius_end_value = base_radius;
+				{
+					messages::exploding_ring ring;
 
-				ring.inner_radius_start_value = 0.f;
-				ring.inner_radius_end_value = base_radius;
+					ring.outer_radius_start_value = base_radius / 2;
+					ring.outer_radius_end_value = base_radius;
 
-				ring.emit_particles_on_ring = false;
+					ring.inner_radius_start_value = 0.f;
+					ring.inner_radius_end_value = base_radius;
 
-				ring.time_of_occurence = current_time;
-				ring.maximum_duration_seconds = 0.20f;
+					ring.emit_particles_on_ring = false;
 
-				ring.color = red;
-				ring.center = h.point_of_impact;
+					ring.time_of_occurence = current_time;
+					ring.maximum_duration_seconds = 0.20f;
+
+					ring.color = red;
+					ring.center = h.point_of_impact;
 			
-				exploding_rings.push_back(ring);
+					exploding_rings.push_back(ring);
+				}
+
+				{
+					thunder th;
+
+					th.delay_between_branches_ms = std::make_pair(200.f, 300.f);
+					th.max_branch_lifetime_ms = std::make_pair(300.f, 400.f);
+					th.branch_length = std::make_pair(50.f, 60.f);
+					
+					th.max_depth = 8;
+					th.chance_to_branch_one_in = 3;
+
+					th.first_branch_root = h.point_of_impact;
+					th.first_branch_root.rotation = h.impact_velocity.degrees();
+					th.branch_angle_spread = 45.f;
+
+					th.color = highlight_col;
+
+					thunders.push_back(th);
+				}
 			}
 			else {
 				number_col = green;
@@ -324,7 +346,6 @@ void immediate_hud::acquire_game_events(
 
 		if (is_it_death) {
 			vn.text.set_text(augs::gui::text::format(L"Death", augs::gui::text::style(assets::font_id::GUI_FONT, number_col)));
-			vn.transform.pos = cosmos[h.spawned_remnants].get_logic_transform().pos;
 			recent_vertically_flying_numbers.push_back(vn);
 		}
 
@@ -334,11 +355,6 @@ void immediate_hud::acquire_game_events(
 		new_highlight.target = h.subject;
 		new_highlight.starting_alpha_ratio = 1.f;// std::min(1.f, h.ratio_effective_to_maximum * 5);
 		
-		//if (cosmos[h.spawned_remnants].alive()) {
-		//	new_highlight.target = h.spawned_remnants;
-		//	new_highlight.starting_alpha_ratio = 1.f;
-		//}
-
 		new_highlight.maximum_duration_seconds = 0.10f;
 		new_highlight.color = highlight_col;
 

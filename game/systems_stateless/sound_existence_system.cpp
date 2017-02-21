@@ -192,7 +192,7 @@ void sound_existence_system::game_responses_to_sound_effects(const logic_step st
 		
 		sound_response_type type;
 
-		if (cosmos[h.spawned_remnants].alive()) {
+		if (h.special_result == messages::health_event::result_type::DEATH) {
 			type = sound_response_type::DEATH;
 		}
 		else if (h.effective_amount > 0) {
@@ -208,7 +208,12 @@ void sound_existence_system::game_responses_to_sound_effects(const logic_step st
 
 		in.direct_listener = subject;
 
-		create_sound_effect_entity(cosmos, in, subject.get_logic_transform(), h.spawned_remnants).add_standard_components();
+		create_sound_effect_entity(
+			cosmos, 
+			in, 
+			subject.get_logic_transform(), 
+			subject
+		).add_standard_components();
 	}
 
 	for (const auto& d : damages) {

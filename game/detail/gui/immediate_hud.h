@@ -35,9 +35,13 @@ struct immediate_hud {
 		minmax delay_between_branches_ms = minmax(0.f, 0.f);
 		minmax max_branch_lifetime_ms = minmax(0.f, 0.f);
 		minmax branch_length = minmax(0.f, 0.f);
-		
+		unsigned max_depth = 8;
+		unsigned chance_to_branch_one_in = 3;
+
 		components::transform first_branch_root;
 		float branch_angle_spread = 0.f;
+
+		rgba color;
 
 		struct branch {
 			std::vector<int> children;
@@ -55,6 +59,7 @@ struct immediate_hud {
 	std::vector<vertically_flying_number> recent_vertically_flying_numbers;
 	std::vector<pure_color_highlight> recent_pure_color_highlights;
 	std::vector<messages::exploding_ring> exploding_rings;
+	std::vector<thunder> thunders;
 
 	augs::vertex_triangle_buffer draw_circular_bars_and_get_textual_info(const viewing_step) const;
 	void draw_pure_color_highlights(const viewing_step) const;

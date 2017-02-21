@@ -169,8 +169,8 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 		burst.input = existence.input;
 		burst.input.modifier = response.modifier;
 
-		if (h.target == messages::health_event::HEALTH) {
-			if (cosmos[h.spawned_remnants].alive()) {
+		if (h.target == messages::health_event::target_type::HEALTH) {
+			if (h.special_result == messages::health_event::result_type::DEATH) {
 				burst.input.effect = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
 				burst.input.modifier.scale_amounts = 0.6f;
 				burst.input.modifier.scale_lifetimes = 1.25f;
