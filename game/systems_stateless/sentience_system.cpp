@@ -360,25 +360,32 @@ void sentience_system::cooldown_aimpunches(const logic_step step) const {
 }
 
 void sentience_system::set_borders(const logic_step step) const {
-	const int timestamp_ms = static_cast<int>(step.cosm.get_total_time_passed_in_seconds() * 1000.0);
+	const auto timestamp_ms = static_cast<int>(step.cosm.get_total_time_passed_in_seconds() * 1000.0);
 
 	for (const auto& t : step.cosm.get(processing_subjects::WITH_SENTIENCE)) {
 		const auto& sentience = t.get<components::sentience>();
 
-		auto hr = sentience.health.get_ratio();
-		const auto one_less_hr = 1 - hr;
+		auto* const render = t.find<components::render>();
 
-		int pulse_duration = static_cast<int>(1250 - 1000 * (1 - hr));
-		float time_pulse_ratio = (timestamp_ms % pulse_duration) / float(pulse_duration);
+		if (render != nullptr) {
+			if (sentience.health.is_enabled()) {
+				auto hr = sentience.health.get_ratio();
+				const auto one_less_hr = 1.f - hr;
 
-		hr *= 1.f - (0.2f * time_pulse_ratio);
+				const auto pulse_duration = static_cast<int>(1250 - 1000 * (1 - hr));
+				const auto time_pulse_ratio = (timestamp_ms % pulse_duration) / static_cast<float>(pulse_duration);
 
-		auto* render = t.find<components::render>();
+				hr *= 1.f - (0.2f * time_pulse_ratio);
 
-		if (render) {
-			if (hr < 1.f) {
-				render->draw_border = true;
-				render->border_color = rgba(255, 0, 0, static_cast<rgba_channel>(one_less_hr * one_less_hr * one_less_hr * one_less_hr * 255 * time_pulse_ratio));
+				if (render) {
+					if (hr < 1.f) {
+						render->draw_border = true;
+						render->border_color = rgba(255, 0, 0, static_cast<rgba_channel>(one_less_hr * one_less_hr * one_less_hr * one_less_hr * 255 * time_pulse_ratio));
+					}
+					else {
+						render->draw_border = false;
+					}
+				}
 			}
 			else {
 				render->draw_border = false;

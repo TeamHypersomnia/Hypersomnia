@@ -93,17 +93,26 @@ namespace components {
 		}
 
 		if (in.drawing_type == renderable_drawing_type::NEON_MAPS && has_neon_map) {
-			draw(in, get_resource_manager().find_neon_map(tex)->tex, 
+			draw(
+				in, 
+				get_resource_manager().find_neon_map(tex)->tex, 
 				screen_space_pos,
 				final_rotation,
 				vec2(get_resource_manager().find_neon_map(tex)->tex.get_size())
-				/ vec2(get_resource_manager().find(tex)->tex.get_size()) * drawn_size);
+				/ vec2(get_resource_manager().find(tex)->tex.get_size()) * drawn_size
+			);
 		}
-		else if (in.drawing_type == renderable_drawing_type::NORMAL) {
-			draw(in, get_resource_manager().find(tex)->tex,
+		else if (
+			in.drawing_type == renderable_drawing_type::NORMAL
+			|| in.drawing_type == renderable_drawing_type::BORDER_HIGHLIGHTS
+		) {
+			draw(
+				in, 
+				get_resource_manager().find(tex)->tex,
 				screen_space_pos,
 				final_rotation, 
-				drawn_size);
+				drawn_size
+			);
 		}
 		else if (in.drawing_type == renderable_drawing_type::SPECULAR_HIGHLIGHTS) {
 			const auto& anim = *get_resource_manager().find(assets::animation_id::BLINK_ANIMATION);
