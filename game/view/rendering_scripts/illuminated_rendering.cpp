@@ -14,7 +14,6 @@
 #include "game/view/viewing_session.h"
 #include "game/components/item_slot_transfers_component.h"
 
-#include "game/detail/gui/immediate_hud.h"
 #include "augs/graphics/drawers.h"
 
 #include "math/matrix.h"
@@ -32,6 +31,10 @@ namespace rendering_scripts {
 		const auto& interp = step.session.systems_audiovisual.get<interpolation_system>();
 		const auto& particles = step.session.systems_audiovisual.get<particles_simulation_system>();
 		const auto& wandering_pixels = step.session.systems_audiovisual.get<wandering_pixels_system>();
+		const auto& exploding_rings = step.session.systems_audiovisual.get<exploding_ring_system>();
+		const auto& flying_numbers = step.session.systems_audiovisual.get<vertically_flying_number_system>();
+		const auto& highlights = step.session.systems_audiovisual.get<pure_color_highlight_system>();
+		const auto& thunders = step.session.systems_audiovisual.get<thunder_system>();
 		const auto global_time_seconds = static_cast<float>(step.get_interpolated_total_time_passed_in_seconds());
 
 		const auto screen_size = vec2i(camera.visible_world_area);
@@ -46,7 +49,6 @@ namespace rendering_scripts {
 		);
 
 		const auto& visible_per_layer = step.visible.per_layer;
-		const auto& hud = step.session.hud;
 
 		auto& default_shader = *get_resource_manager().find(assets::program_id::DEFAULT);
 		auto& illuminated_shader = *get_resource_manager().find(assets::program_id::DEFAULT_ILLUMINATED);
@@ -147,7 +149,11 @@ namespace rendering_scripts {
 				
 				default_shader.use();
 
-				hud.draw_neon_highlights_of_exploding_rings(step);
+				exploding_rings.draw_highlights_of_rings(
+					output,
+					camera,
+					cosmos
+				);
 			}
 		);
 
@@ -292,7 +298,7 @@ namespace rendering_scripts {
 		
 		}
 
-		const auto& textual_infos = hud.draw_circular_bars_and_get_textual_info(step);
+		const auto textual_infos = draw_circular_bars_and_get_textual_info(step);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
@@ -307,21 +313,34 @@ namespace rendering_scripts {
 			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
 		}
 
-		hud.draw_exploding_rings(step);
+		exploding_rings.draw_rings(
+			output,
+			renderer.specials,
+			camera,
+			cosmos
+		);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
 
 		pure_color_highlight_shader.use();
 
-		hud.draw_pure_color_highlights(step);
+		highlights.draw_highlights(
+			output,
+			camera,
+			cosmos,
+			interp
+		);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
 
 		default_shader.use();
 
-		hud.draw_vertically_flying_numbers(step);
+		flying_numbers.draw_numbers(
+			output, 
+			camera
+		);
 
 		if (step.settings.draw_gui_overlays) {
 			if (controlled_entity.has<components::item_slot_transfers>()) {

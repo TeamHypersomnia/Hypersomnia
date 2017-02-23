@@ -5,7 +5,6 @@
 
 #include "augs/misc/input_context.h"
 #include "game/detail/gui/aabb_highlighter.h"
-#include "game/detail/gui/immediate_hud.h"
 
 #include "augs/gui/formatted_text.h"
 
@@ -19,6 +18,10 @@
 #include "game/systems_audiovisual/wandering_pixels_system.h"
 #include "game/systems_audiovisual/sound_system.h"
 #include "game/systems_audiovisual/gui_element_system.h"
+#include "game/systems_audiovisual/vertically_flying_number_system.h"
+#include "game/systems_audiovisual/pure_color_highlight_system.h"
+#include "game/systems_audiovisual/exploding_ring_system.h"
+#include "game/systems_audiovisual/thunder_system.h"
 
 #include "game/detail/gui/character_gui.h"
 #include "game/detail/gui/item_button.h"
@@ -46,7 +49,6 @@ public:
 	input_context context;
 	vec2i viewport_coordinates;
 	aabb_highlighter world_hover_highlighter;
-	immediate_hud hud;
 	storage_for_all_systems_audiovisual systems_audiovisual;
 	game_drawing_settings drawing_settings;
 

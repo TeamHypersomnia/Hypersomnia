@@ -136,7 +136,6 @@ void standard_explosion(const standard_explosion_input in) {
 		
 		ring.emit_particles_on_ring = true;
 
-		ring.time_of_occurence = now.in_seconds(delta);
 		ring.maximum_duration_seconds = 0.20f;
 
 		ring.color = in.inner_ring_color;
@@ -157,7 +156,6 @@ void standard_explosion(const standard_explosion_input in) {
 		
 		ring.emit_particles_on_ring = true;
 
-		ring.time_of_occurence = now.in_seconds(delta);
 		ring.maximum_duration_seconds = 0.20f;
 
 		ring.color = in.outer_ring_color;

@@ -12,7 +12,6 @@ namespace messages {
 		float inner_radius_end_value = 0.f;
 
 		float maximum_duration_seconds = 0.f;
-		float time_of_occurence = 0.f;
 
 		bool emit_particles_on_ring = false;
 

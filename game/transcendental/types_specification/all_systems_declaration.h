@@ -17,6 +17,10 @@ class particles_simulation_system;
 class wandering_pixels_system;
 class sound_system;
 class gui_element_system;
+class vertically_flying_number_system;
+class pure_color_highlight_system;
+class exploding_ring_system;
+class thunder_system;
 
 typedef augs::storage_for_systems <
 	physics_system,
@@ -31,5 +35,9 @@ typedef augs::storage_for_systems <
 	particles_simulation_system,
 	wandering_pixels_system,
 	sound_system,
-	gui_element_system
+	gui_element_system,
+	vertically_flying_number_system,
+	pure_color_highlight_system,
+	exploding_ring_system,
+	thunder_system
 > storage_for_all_systems_audiovisual;

@@ -45,7 +45,7 @@ public:
 		bool constructed = false;
 	};
 
-	float global_time = 0.f;
+	float global_time_seconds = 0.f;
 
 	//std::vector<cache> per_entity_cache;
 	std::unordered_map<entity_id, cache> per_entity_cache;

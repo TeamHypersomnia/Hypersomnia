@@ -14,8 +14,6 @@
 #include "augs/graphics/renderer.h"
 #include "game/view/viewing_step.h"
 
-#include "game/detail/gui/immediate_hud.h"
-
 #include "math/matrix.h"
 
 #include "3rdparty/GL/OpenGL.h"
@@ -87,9 +85,7 @@ namespace rendering_scripts {
 		
 		}
 
-		const auto& hud = step.session.hud;
-
-		const auto& textual_infos = hud.draw_circular_bars_and_get_textual_info(step);
+		const auto& textual_infos = draw_circular_bars_and_get_textual_info(step);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
@@ -100,14 +96,14 @@ namespace rendering_scripts {
 
 		pure_color_highlight_shader.use();
 
-		hud.draw_pure_color_highlights(step);
+		// hud.draw_pure_color_highlights(step);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
 
 		default_shader.use();
 
-		hud.draw_vertically_flying_numbers(step);
+		// hud.draw_vertically_flying_numbers(step);
 
 		renderer.bind_texture(*get_resource_manager().find(assets::atlas_id::GAME_WORLD_ATLAS));
 

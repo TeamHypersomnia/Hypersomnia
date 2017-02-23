@@ -215,8 +215,8 @@ namespace augs {
 		v.push_back({ tris[0].vertices[0], tris[0].vertices[1] });
 	}
 
-	void draw_dashed_line(vertex_line_buffer& v, const vec2 from, const vec2 to, const texture& tex, const rgba color, const float dash_length, const float dash_velocity, const float global_time) {
-		auto dash_end = fmod(global_time*dash_velocity, dash_length * 2);
+	void draw_dashed_line(vertex_line_buffer& v, const vec2 from, const vec2 to, const texture& tex, const rgba color, const float dash_length, const float dash_velocity, const float global_time_seconds) {
+		auto dash_end = fmod(global_time_seconds*dash_velocity, dash_length * 2);
 		float dash_begin = dash_end - dash_length;
 		dash_begin = std::max(dash_begin, 0.f);
 

@@ -38,4 +38,6 @@ namespace rendering_scripts {
 		const cosmos& cosm,
 		const float global_time_seconds
 	);
+
+	augs::vertex_triangle_buffer draw_circular_bars_and_get_textual_info(const viewing_step);
 }

@@ -16,7 +16,6 @@
 #include "game/components/item_component.h"
 
 #include "augs/gui/rect_world.h"
-#include "game/detail/gui/immediate_hud.h"
 #include "game/enums/slot_function.h"
 #include "game/detail/gui/root_of_inventory_gui.h"
 

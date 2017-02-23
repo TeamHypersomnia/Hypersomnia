@@ -146,31 +146,6 @@ void viewing_session::control_and_remove_fetched_intents(std::vector<key_and_mou
 	});
 }
 
-void viewing_session::standard_audiovisual_post_solve(const const_logic_step step) {
-	hud.acquire_game_events(
-		step,
-		systems_audiovisual.get<particles_simulation_system>()
-	);
-
-	const auto& cosm = step.cosm;
-
-	auto& gui = systems_audiovisual.get<gui_element_system>();
-
-	gui.reposition_picked_up_and_transferred_items(step);
-
-	gui.erase_caches_for_dead_entities(step.cosm);
-	systems_audiovisual.get<sound_system>().erase_caches_for_dead_entities(step.cosm);
-	systems_audiovisual.get<particles_simulation_system>().erase_caches_for_dead_entities(step.cosm);
-	systems_audiovisual.get<wandering_pixels_system>().erase_caches_for_dead_entities(step.cosm);
-
-	for (const auto& pickup : step.transient.messages.get_queue<messages::item_picked_up_message>()) {
-		gui.get_character_gui(pickup.subject).assign_item_to_first_free_hotbar_button(
-			cosm[pickup.subject], 
-			cosm[pickup.item]
-		);
-	}
-}
-
 void viewing_session::spread_past_infection(const const_logic_step step) {
 	const auto& cosm = step.cosm;
 
@@ -194,13 +169,23 @@ void viewing_session::advance_audiovisual_systems(
 	const visible_entities& all_visible,
 	const augs::delta dt
 ) {
+	auto& thunders = systems_audiovisual.get<thunder_system>();
+	auto& exploding_rings = systems_audiovisual.get<exploding_ring_system>();
+	auto& flying_numbers = systems_audiovisual.get<vertically_flying_number_system>();
+	auto& highlights = systems_audiovisual.get<pure_color_highlight_system>();
 	auto& interp = systems_audiovisual.get<interpolation_system>();
+	auto& particles = systems_audiovisual.get<particles_simulation_system>();
+
+	thunders.advance(cosm, dt);
+	exploding_rings.advance(dt, particles);
+	flying_numbers.advance(dt);
+	highlights.advance(dt);
 
 	cosm.profiler.start(meter_type::INTERPOLATION);
 	interp.integrate_interpolated_transforms(cosm, dt, cosm.get_fixed_delta());
 	cosm.profiler.stop(meter_type::INTERPOLATION);
 
-	systems_audiovisual.get<particles_simulation_system>().advance_visible_streams_and_all_particles(
+	particles.advance_visible_streams_and_all_particles(
 		camera.smoothed_camera, 
 		cosm, 
 		dt, 

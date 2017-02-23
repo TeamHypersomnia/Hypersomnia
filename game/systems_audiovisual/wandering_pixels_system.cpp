@@ -31,7 +31,7 @@ void wandering_pixels_system::advance_for_visible(
 	const cosmos& cosm,
 	const augs::delta dt
 ) {
-	global_time += dt.in_seconds();
+	global_time_seconds += dt.in_seconds();
 
 	for (const auto e : visible.per_layer[render_layer::WANDERING_PIXELS_EFFECTS]) {
 		advance_wandering_pixels_for(cosm[e], dt);
@@ -125,19 +125,19 @@ void wandering_pixels_system::advance_wandering_pixels_for(
 
 		p.pos += considered_direction * vel * dt.in_seconds();
 		if (considered_direction.x > 0) {
-			p.pos.y += considered_direction.x * sin(global_time) * vel * dt.in_seconds() * 1.2f;
+			p.pos.y += considered_direction.x * sin(global_time_seconds) * vel * dt.in_seconds() * 1.2f;
 		}
 		else if (considered_direction.x < 0) {
-			p.pos.y -= -considered_direction.x * sin(global_time) * vel * dt.in_seconds() * 1.2f;
+			p.pos.y -= -considered_direction.x * sin(global_time_seconds) * vel * dt.in_seconds() * 1.2f;
 		}
 		if (considered_direction.y > 0) {
-			p.pos.x += considered_direction.y * cos(global_time) * vel * dt.in_seconds() * 1.2f;
+			p.pos.x += considered_direction.y * cos(global_time_seconds) * vel * dt.in_seconds() * 1.2f;
 		}
 		else if (considered_direction.y < 0) {
-			p.pos.x -= -considered_direction.y * cos(global_time) * vel * dt.in_seconds() * 1.2f;
+			p.pos.x -= -considered_direction.y * cos(global_time_seconds) * vel * dt.in_seconds() * 1.2f;
 		}
 
-		//p.pos.x += cos(global_time) * 20 * dt.in_seconds() * 1.2;
+		//p.pos.x += cos(global_time_seconds) * 20 * dt.in_seconds() * 1.2;
 	}
 }
 

@@ -6,7 +6,6 @@
 
 struct aabb_highlighter;
 class viewing_session;
-struct immediate_hud;
 class config_lua_table;
 
 namespace augs {
@@ -38,6 +37,4 @@ public:
 
 	double get_interpolated_total_time_passed_in_seconds() const;
 	float get_interpolation_ratio() const;
-
-	vec2 get_screen_space(const vec2 pos) const;
 };

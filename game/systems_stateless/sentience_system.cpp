@@ -380,7 +380,10 @@ void sentience_system::set_borders(const logic_step step) const {
 				if (render) {
 					if (hr < 1.f) {
 						render->draw_border = true;
-						render->border_color = rgba(255, 0, 0, static_cast<rgba_channel>(one_less_hr * one_less_hr * one_less_hr * one_less_hr * 255 * time_pulse_ratio));
+
+						const auto alpha_multiplier = one_less_hr * one_less_hr * one_less_hr * one_less_hr * time_pulse_ratio;
+
+						render->border_color = rgba(255, 0, 0, static_cast<rgba_channel>(255 * alpha_multiplier));
 					}
 					else {
 						render->draw_border = false;

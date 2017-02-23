@@ -584,3 +584,9 @@ std::vector<vec2> generate_circle_points(
 	const float starting_angle_in_degrees,
 	const unsigned int number_of_points
 );
+
+vec2 position_rectangle_around_a_circle(
+	const float circle_radius,
+	const vec2 rectangle_size,
+	const float position_at_degrees
+);

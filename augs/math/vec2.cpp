@@ -102,3 +102,55 @@ intersection_output segment_segment_intersection(
 
 	return out;
 }
+
+vec2 position_rectangle_around_a_circle(
+	const float circle_radius,
+	const vec2 rectangle_size,
+	const float position_at_degrees
+) {
+	const vec2 top_bounds[2] = { vec2(-rectangle_size.x / 2, -circle_radius - rectangle_size.y / 2), vec2(rectangle_size.x / 2, -circle_radius - rectangle_size.y / 2) };
+	const vec2 left_bounds[2] = { vec2(-circle_radius - rectangle_size.x / 2, rectangle_size.y / 2), vec2(-circle_radius - rectangle_size.x / 2, -rectangle_size.y / 2) };
+	const vec2 bottom_bounds[2] = { top_bounds[1] * vec2(1, -1), top_bounds[0] * vec2(1, -1) };
+	const vec2 right_bounds[2] = { left_bounds[1] * vec2(-1, 1), left_bounds[0] * vec2(-1, 1) };
+
+	const vec2 all_bounds[4][2] = {
+		{ left_bounds[0], left_bounds[1] },
+		{ top_bounds[0], top_bounds[1] },
+		{ right_bounds[0], right_bounds[1] },
+		{ bottom_bounds[0], bottom_bounds[1] }
+	};
+
+	const vec2 angle_norm = vec2().set_from_degrees(position_at_degrees);
+	const vec2 angle = angle_norm * circle_radius;
+
+	static const vec2 quadrant_multipliers[4] = { vec2(-1, -1), vec2(1, -1), vec2(1, 1), vec2(-1, 1), };
+	static const vec2 quadrants_on_circle[4] = { vec2(-1, 0), vec2(0, -1), vec2(1, 0), vec2(0, 1), };
+
+	for (int i = 0; i < 4; ++i) {
+		const auto a = vec2(all_bounds[i][0]).normalize();
+		const auto b = vec2(all_bounds[i][1]).normalize();
+		const auto c = vec2(all_bounds[(i + 1) % 4][0]).normalize();
+		const auto v = angle_norm;
+
+		float bound_angular_distance = a.cross(b);
+		float target_angular_distance = a.cross(v);
+
+		if (target_angular_distance >= 0 && b.cross(v) <= 0) {
+			return augs::interp(all_bounds[i][0], all_bounds[i][1], target_angular_distance / bound_angular_distance);
+		}
+		else {
+			bound_angular_distance = b.cross(c);
+			target_angular_distance = b.cross(v);
+
+			if (target_angular_distance >= 0.0 && c.cross(v) <= 0.0) {
+				return vec2(quadrants_on_circle[i]).rotate(
+					(target_angular_distance / bound_angular_distance) * 90, 
+					vec2(0, 0)
+				) * circle_radius + quadrant_multipliers[i] * rectangle_size / 2;
+			}
+		}
+	}
+
+	//ensure(false);
+	return vec2(0, 0);
+}
