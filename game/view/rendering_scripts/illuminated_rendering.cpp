@@ -109,7 +109,7 @@ namespace rendering_scripts {
 		const auto& light = step.session.systems_audiovisual.get<light_system>();
 		
 		light.render_all_lights(renderer, matrix, step, [&]() {
-				draw_crosshair_lines(
+				draw_crosshair_lasers(
 					[&](const vec2 from, const vec2 to, const rgba col) {
 						if (!step.settings.draw_weapon_laser) {
 							return;
@@ -230,7 +230,7 @@ namespace rendering_scripts {
 		}
 		
 		if (step.settings.draw_crosshairs && step.settings.draw_weapon_laser) {
-			draw_crosshair_lines(
+			draw_crosshair_lasers(
 				[&](const vec2 from, const vec2 to, const rgba col) {
 					augs::draw_line(
 						renderer.lines, 
@@ -332,8 +332,15 @@ namespace rendering_scripts {
 			interp
 		);
 
+		thunders.draw_thunders(
+			renderer.lines,
+			camera
+		);
+
 		renderer.call_triangles();
+		renderer.call_lines();
 		renderer.clear_triangles();
+		renderer.clear_lines();
 
 		default_shader.use();
 

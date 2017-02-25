@@ -538,7 +538,7 @@
     <ClCompile Include="application\setups\local_setup.cpp" />
     <ClCompile Include="game\view\rendering_scripts\draw_circular_bars.cpp" />
     <ClCompile Include="game\view\rendering_scripts\draw_cast_spells_highlights.cpp" />
-    <ClCompile Include="game\view\rendering_scripts\draw_crosshair_lines.cpp" />
+    <ClCompile Include="game\view\rendering_scripts\draw_crosshair_lasers.cpp" />
     <ClCompile Include="game\view\rendering_scripts\illuminated_rendering.cpp" />
     <ClCompile Include="game\view\rendering_scripts\standard_rendering.cpp" />
     <ClCompile Include="game\view\standard_audiovisual_post_solve.cpp" />

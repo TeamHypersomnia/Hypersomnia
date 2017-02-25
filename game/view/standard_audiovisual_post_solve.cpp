@@ -71,22 +71,22 @@ void viewing_session::standard_audiovisual_post_solve(const const_logic_step ste
 				}
 
 				{
-					thunder_system::thunder th;
+					thunder_system::thunder::input th;
 
-					th.delay_between_branches_ms = std::make_pair(200.f, 300.f);
-					th.max_branch_lifetime_ms = std::make_pair(300.f, 400.f);
-					th.branch_length = std::make_pair(50.f, 60.f);
+					th.delay_between_branches_ms = std::make_pair(5.f, 17.f);
+					th.max_branch_lifetime_ms = std::make_pair(17.f, 80.f);
+					th.branch_length = std::make_pair(10.f, 35.f);
 
-					th.max_depth = 8;
-					th.chance_to_branch_one_in = 3;
+					th.max_all_spawned_branches = h.effective_amount;
+					th.max_branch_children = 2;
 
 					th.first_branch_root = h.point_of_impact;
-					th.first_branch_root.rotation = h.impact_velocity.degrees();
+					th.first_branch_root.rotation = (-h.impact_velocity).degrees();
 					th.branch_angle_spread = 45.f;
 
 					th.color = highlight_col;
 
-					thunders.thunders.push_back(th);
+					thunders.add(th);
 				}
 			}
 			else {

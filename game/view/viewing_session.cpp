@@ -176,7 +176,7 @@ void viewing_session::advance_audiovisual_systems(
 	auto& interp = systems_audiovisual.get<interpolation_system>();
 	auto& particles = systems_audiovisual.get<particles_simulation_system>();
 
-	thunders.advance(cosm, dt);
+	thunders.advance(cosm, dt, particles);
 	exploding_rings.advance(dt, particles);
 	flying_numbers.advance(dt);
 	highlights.advance(dt);

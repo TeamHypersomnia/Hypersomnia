@@ -9,7 +9,7 @@
 #include "game/detail/entity_scripts.h"
 
 namespace rendering_scripts {
-	void draw_crosshair_lines(
+	void draw_crosshair_lasers(
 		std::function<void(vec2, vec2, rgba)> callback,
 		std::function<void(vec2, vec2)> dashed_line_callback,
 		const interpolation_system& interp,

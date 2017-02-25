@@ -23,7 +23,7 @@ namespace rendering_scripts {
 	void standard_rendering(const viewing_step step);
 	void illuminated_rendering(const viewing_step step);
 
-	void draw_crosshair_lines(
+	void draw_crosshair_lasers(
 		std::function<void(vec2, vec2, rgba)> callback,
 		std::function<void(vec2, vec2)> dashed_line_callback,
 		const interpolation_system& sys,
