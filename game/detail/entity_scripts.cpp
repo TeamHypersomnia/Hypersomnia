@@ -236,6 +236,10 @@ std::vector<entity_id> get_closest_hostiles(
 			return dist < b.dist;
 		}
 
+		bool operator==(const hostile_entry& b) const {
+			return s == b.s;
+		}
+
 		operator entity_id() const {
 			return s;
 		}
@@ -270,6 +274,7 @@ std::vector<entity_id> get_closest_hostiles(
 	}
 
 	sort_container(hostiles);
+	remove_duplicates_from_sorted(hostiles);
 
 	return { hostiles.begin(), hostiles.end() };
 }

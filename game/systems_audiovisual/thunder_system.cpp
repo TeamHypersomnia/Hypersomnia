@@ -95,6 +95,12 @@ void thunder_system::advance(
 			b.lifetime_ms += dt.in_milliseconds();
 			
 			if (b.activated && b.lifetime_ms > b.max_lifetime_ms) {
+				const bool is_leaf = b.children.empty();
+
+				if (is_leaf) {
+
+				}
+
 				b.activated = false;
 				--t.num_active_branches;
 			}

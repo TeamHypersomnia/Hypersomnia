@@ -311,7 +311,7 @@ void perform_spell_logic(
 
 			for (size_t i = 0; i < 3 && i < hostiles.size(); ++i) {
 				const auto next_hostile = cosmos[hostiles[i]];
-
+				LOG_NVPS(next_hostile.get_id());
 				const auto energy_ball = cosmos.create_entity("energy_ball");
 
 				auto new_energy_ball_transform = caster_transform;

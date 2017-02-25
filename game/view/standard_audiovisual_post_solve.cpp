@@ -77,7 +77,8 @@ void viewing_session::standard_audiovisual_post_solve(const const_logic_step ste
 					th.max_branch_lifetime_ms = std::make_pair(30.f, 55.f);
 					th.branch_length = std::make_pair(10.f, 60.f);
 
-					th.max_all_spawned_branches = h.effective_amount;
+					th.max_all_spawned_branches = static_cast<unsigned>(h.effective_amount);
+					++th.max_all_spawned_branches;
 					th.max_branch_children = 3;
 
 					th.first_branch_root = h.point_of_impact;

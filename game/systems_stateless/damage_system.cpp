@@ -146,7 +146,7 @@ void damage_system::destroy_outdated_bullets(const logic_step step) {
 			const auto sender_attitude = sender_capability.alive() && sender_capability.has<components::attitude>() ? sender_capability : cosmos[entity_id()];
 
 			const auto particular_homing_target = cosmos[damage.particular_homing_target];
-
+			ensure(particular_homing_target.alive());
 			const auto closest_hostile = 
 				particular_homing_target.alive() ? particular_homing_target : cosmos[get_closest_hostile(it, sender_attitude, 250, filters::bullet())];
 
