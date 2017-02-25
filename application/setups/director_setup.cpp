@@ -21,6 +21,7 @@
 #include "game/detail/visible_entities.h"
 
 #include "augs/filesystem/file.h"
+#include "augs/filesystem/directory.h"
 #include "director_setup.h"
 
 #include "augs/templates/container_templates.h"
@@ -65,6 +66,8 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 		);
 	}
 
+	augs::create_directories(cfg.director_scenario_filename);
+	
 	const std::string input_director_file = cfg.director_scenario_filename;
 	const std::string output_director_file = cfg.director_scenario_filename;
 
