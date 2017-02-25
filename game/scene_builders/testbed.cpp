@@ -129,17 +129,17 @@ namespace scene_builders {
 
 			// three metropolitan soldiers
 			else if (i == 7) {
-				transform = { -300, -3000, 0 };
+				transform = { -300, -2000, 0 };
 
 				torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
 			}
 			else if (i == 8) {
-				transform = { -400, -3000, 0 };
+				transform = { -400, -2000, 0 };
 
 				torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
 			}
 			else if (i == 9) {
-				transform = { -500, -3000, 0 };
+				transform = { -500, -2000, 0 };
 
 				torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
 			}

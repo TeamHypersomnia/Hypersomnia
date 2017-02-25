@@ -116,7 +116,7 @@ void viewing_session::standard_audiovisual_post_solve(const const_logic_step ste
 
 					ring.maximum_duration_seconds = 0.20f;
 
-					ring.color = turquoise;
+					ring.color = cyan;
 					ring.center = h.point_of_impact;
 
 					new_rings.push_back(ring);
@@ -135,7 +135,7 @@ void viewing_session::standard_audiovisual_post_solve(const const_logic_step ste
 
 					ring.maximum_duration_seconds = 0.20f;
 
-					ring.color = cyan;
+					ring.color = turquoise;
 					ring.center = h.point_of_impact;
 
 					new_rings.push_back(ring);
