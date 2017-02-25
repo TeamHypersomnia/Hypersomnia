@@ -74,15 +74,15 @@ void viewing_session::standard_audiovisual_post_solve(const const_logic_step ste
 					thunder_system::thunder::input th;
 
 					th.delay_between_branches_ms = std::make_pair(5.f, 17.f);
-					th.max_branch_lifetime_ms = std::make_pair(17.f, 80.f);
-					th.branch_length = std::make_pair(10.f, 35.f);
+					th.max_branch_lifetime_ms = std::make_pair(30.f, 55.f);
+					th.branch_length = std::make_pair(10.f, 60.f);
 
 					th.max_all_spawned_branches = h.effective_amount;
-					th.max_branch_children = 2;
+					th.max_branch_children = 3;
 
 					th.first_branch_root = h.point_of_impact;
 					th.first_branch_root.rotation = (-h.impact_velocity).degrees();
-					th.branch_angle_spread = 45.f;
+					th.branch_angle_spread = 60.f;
 
 					th.color = highlight_col;
 

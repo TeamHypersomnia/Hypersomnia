@@ -195,7 +195,7 @@ void viewing_session::advance_audiovisual_systems(
 	systems_audiovisual.get<light_system>().advance_attenuation_variations(cosm, dt);
 
 	camera.tick(
-		systems_audiovisual.get<interpolation_system>(), 
+		interp, 
 		dt, 
 		cosm[viewed_character]
 	);

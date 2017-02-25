@@ -16,6 +16,7 @@ public:
 		struct branch {
 			std::vector<int> children;
 			bool activated = true;
+			bool can_have_children = true;
 
 			float lifetime_ms = 0.f;
 			float max_lifetime_ms = 0.f;
@@ -42,6 +43,8 @@ public:
 		unsigned num_active_branches = 0u;
 
 		std::vector<branch> branches;
+
+		void create_root_branch();
 	};
 
 	std::vector<thunder> thunders;
