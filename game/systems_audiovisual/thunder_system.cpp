@@ -23,7 +23,7 @@ void thunder_system::thunder::create_root_branch() {
 	until_next_branching_ms = rng.randval(in.delay_between_branches_ms);
 	++num_active_branches;
 
-	branches.emplace_back(std::move(b));
+	branches.push_back(b);
 }
 
 void thunder_system::add(const thunder::input in) {
@@ -33,7 +33,7 @@ void thunder_system::add(const thunder::input in) {
 	new_thunder.in = in;
 	new_thunder.create_root_branch();
 
-	thunders.emplace_back(std::move(new_thunder));
+	thunders.push_back(new_thunder);
 }
 
 void thunder_system::advance(
