@@ -47,7 +47,6 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 	session.reserve_caches_for_entities(3000);
 	session.set_screen_size(screen_size);
 	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
-	session.set_interpolation_enabled(false);
 	session.set_master_gain(cfg.sound_effects_volume);
 
 	session.configure_input();
@@ -223,6 +222,8 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 		}
 
 		if (advance_steps_forward < 0) {
+			session.set_interpolation_enabled(false);
+
 			const auto current_step = get_step_number(hypersomnia);
 			const auto rewound_step = static_cast<unsigned>(-advance_steps_forward) > current_step ? 0 : current_step + advance_steps_forward;
 
@@ -261,6 +262,9 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 			}
 
 			advance_steps_forward = 0;
+		}
+		else if (advance_steps_forward > 0) {
+			session.set_interpolation_enabled(true);
 		}
 
 		auto steps = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
