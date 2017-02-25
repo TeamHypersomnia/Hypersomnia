@@ -757,6 +757,7 @@ namespace resource_setups {
 
 			effect.push_back(em);
 		}
+
 		{
 			auto& effect = get_resource_manager().create(assets::particle_effect_id::ROUND_ROTATING_BLOOD_STREAM);
 
@@ -793,6 +794,33 @@ namespace resource_setups {
 			em.particle_render_template.layer = render_layer::DIM_SMOKES;
 			em.initial_rotation_variation = 180;
 			//em.fade_when_ms_remaining = std::make_pair(10, 50);
+
+			effect.push_back(em);
+		}
+
+		{
+			auto& effect = get_resource_manager().create(assets::particle_effect_id::THUNDER_REMNANTS);
+
+			resources::emission em;
+			em.rotation_speed = std::make_pair(0, 0);
+			em.particle_lifetime_ms = std::make_pair(100, 350);
+
+			for (int i = 0; i < 5; ++i) {
+				general_particle particle_template;
+
+				particle_template.angular_damping = 0;
+				particle_template.linear_damping = 50;
+				particle_template.face.set(assets::texture_id(assets::texture_id::BLANK), rgba(255, 255, 255, 255));
+				particle_template.face.size.set(1, 1);
+				particle_template.alpha_levels = 1;	
+
+				em.add_particle_template(particle_template);
+			}
+
+			em.size_multiplier = std::make_pair(1.f, 1.5f);
+			em.particle_render_template.layer = render_layer::EFFECTS;
+			em.initial_rotation_variation = 0;
+			em.randomize_acceleration = true;
 
 			effect.push_back(em);
 		}

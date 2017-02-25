@@ -4,8 +4,10 @@
 #include "augs/graphics/drawers.h"
 #include "game/resources/manager.h"
 #include "game/systems_temporary/physics_system.h"
+#include "game/systems_audiovisual/particles_simulation_system.h"
 #include "game/enums/filters.h"
 #include "game/transcendental/cosmos.h"
+#include "game/detail/particle_types.h"
 
 void thunder_system::thunder::create_root_branch() {
 	static thread_local fast_randomization rng;
@@ -98,7 +100,29 @@ void thunder_system::advance(
 				const bool is_leaf = b.children.empty();
 
 				if (is_leaf) {
+					const auto remnants_emission = get_resource_manager().find(assets::particle_effect_id::THUNDER_REMNANTS)->at(0);
 
+					{
+						const auto spawner = [&](auto dummy) {
+							auto& new_p = particles_output_for_effects.spawn_particle<decltype(dummy)>(
+								rng,
+								0.f,
+								{ 20.f, 100.f },
+								b.to,
+								0.f,
+								360.f,
+								remnants_emission
+							);
+
+							new_p.colorize(t.in.color.rgb());
+
+							particles_output_for_effects.add_particle(remnants_emission.particle_render_template.layer, new_p);
+						};
+
+						for (size_t i = 0; i < rng.randval(2u, 16u); ++i) {
+							spawner(general_particle());
+						}
+					}
 				}
 
 				b.activated = false;

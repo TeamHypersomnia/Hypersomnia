@@ -20,6 +20,7 @@ namespace assets {
 		CAST_SPARKLES,
 		CAST_CHARGING,
 		EXHAUSTED_SMOKE,
+		THUNDER_REMNANTS,
 		COUNT
 	};
 }
