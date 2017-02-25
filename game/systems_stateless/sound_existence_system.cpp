@@ -184,29 +184,48 @@ void sound_existence_system::game_responses_to_sound_effects(const logic_step st
 
 	for (const auto& h : healths) {
 		const auto subject = cosmos[h.subject];
-		const auto& subject_response = subject.get<components::sound_response>();
-		const auto& subject_response_map = *get_resource_manager().find(subject_response.response);
 
 		components::sound_existence::effect_input in;
 		in.delete_entity_after_effect_lifetime = true;
-		
-		sound_response_type type;
+		in.direct_listener = subject;
 
-		if (h.special_result == messages::health_event::result_type::DEATH) {
-			type = sound_response_type::DEATH;
+		if (h.target == messages::health_event::target_type::HEALTH) {
+			const auto& subject_response = subject.get<components::sound_response>();
+			const auto& subject_response_map = *get_resource_manager().find(subject_response.response);
+		
+			sound_response_type type;
+
+			if (h.special_result == messages::health_event::result_type::DEATH) {
+				type = sound_response_type::DEATH;
+			}
+			else if (h.effective_amount > 0) {
+				type = sound_response_type::HEALTH_DECREASE;
+			}
+			else {
+				continue;
+			}
+
+			const auto& response_entry = subject_response_map.at(type);
+			in.effect = response_entry.id;
+			in.modifier = response_entry.modifier;
 		}
-		else if (h.effective_amount > 0) {
-			type = sound_response_type::HEALTH_DECREASE;
+		else if (h.target == messages::health_event::target_type::PERSONAL_ELECTRICITY_SHIELD) {
+			if (h.effective_amount > 0.f) {
+				in.effect = assets::sound_buffer_id::EXPLOSION;
+				in.modifier.pitch = 1.2f + h.effective_amount / 100.f;
+
+				if (h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_SHIELD_DESTRUCTION) {
+					in.effect = assets::sound_buffer_id::GREAT_EXPLOSION;
+					in.modifier.pitch = 1.5f;
+				}
+			}
+			else {
+				continue;
+			}
 		}
 		else {
 			continue;
 		}
-
-		const auto& response_entry = subject_response_map.at(type);
-		in.effect = response_entry.id;
-		in.modifier = response_entry.modifier;
-
-		in.direct_listener = subject;
 
 		create_sound_effect_entity(
 			cosmos, 

@@ -150,8 +150,8 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 				new_emission_instance.enable_streaming = true;
 				new_emission_instance.stream_lifetime_ms = 0.f;
 				new_emission_instance.angular_offset = rng.randval(emission.angular_offset);
-				new_emission_instance.target_spread = rng.randval(emission.spread_degrees);
-				new_emission_instance.target_particles_per_sec = rng.randval(emission.particles_per_sec);
+				new_emission_instance.spread = rng.randval(emission.spread_degrees);
+				new_emission_instance.particles_per_sec = rng.randval(emission.particles_per_sec);
 				new_emission_instance.swing_spread = rng.randval(emission.swing_spread);
 				new_emission_instance.swings_per_sec = rng.randval(emission.swings_per_sec);
 
@@ -195,7 +195,7 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 				continue;
 			}
 
-			auto new_particles_to_spawn_by_time = instance.target_particles_per_sec * (stream_delta / 1000.f);
+			auto new_particles_to_spawn_by_time = instance.particles_per_sec * (stream_delta / 1000.f);
 
 			instance.stream_particles_to_spawn += new_particles_to_spawn_by_time;
 
@@ -249,7 +249,7 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 						instance.particle_speed,
 						final_particle_position,
 						transform.rotation + instance.swing_spread * static_cast<float>(sin((instance.stream_lifetime_ms / 1000.f) * 2 * PI_f * instance.swings_per_sec)),
-						instance.target_spread,
+						instance.spread,
 						emission
 					);
 				};

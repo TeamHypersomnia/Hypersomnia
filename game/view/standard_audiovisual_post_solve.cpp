@@ -95,6 +95,53 @@ void viewing_session::standard_audiovisual_post_solve(const const_logic_step ste
 				highlight_col = green;
 			}
 		}
+		else if (h.target == messages::health_event::target_type::PERSONAL_ELECTRICITY_SHIELD) {
+			const bool destroyed = h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_SHIELD_DESTRUCTION;
+
+			if (h.effective_amount > 0) {
+				number_col = turquoise;
+				highlight_col = turquoise;
+
+				const auto base_radius = destroyed ? 80.f : h.effective_amount * 2.f;
+				{
+					messages::exploding_ring ring;
+
+					ring.outer_radius_start_value = base_radius / 1.5;
+					ring.outer_radius_end_value = base_radius / 3;
+
+					ring.inner_radius_start_value = base_radius / 2.5;
+					ring.inner_radius_end_value = base_radius / 3;
+
+					ring.emit_particles_on_ring = false;
+
+					ring.maximum_duration_seconds = 0.20f;
+
+					ring.color = turquoise;
+					ring.center = h.point_of_impact;
+
+					new_rings.push_back(ring);
+				}
+
+				{
+					messages::exploding_ring ring;
+
+					ring.outer_radius_start_value = base_radius / 2;
+					ring.outer_radius_end_value = base_radius;
+
+					ring.inner_radius_start_value = 0.f;
+					ring.inner_radius_end_value = base_radius;
+
+					ring.emit_particles_on_ring = false;
+
+					ring.maximum_duration_seconds = 0.20f;
+
+					ring.color = cyan;
+					ring.center = h.point_of_impact;
+
+					new_rings.push_back(ring);
+				}
+			}
+		}
 		else {
 			continue;
 		}

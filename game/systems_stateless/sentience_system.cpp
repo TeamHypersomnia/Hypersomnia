@@ -186,6 +186,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 void sentience_system::consume_health_event(messages::health_event h, const logic_step step) const {
 	auto& cosmos = step.cosm;
 	const auto subject = cosmos[h.subject];
+	const auto now = cosmos.get_timestamp();
 	auto& sentience = subject.get<components::sentience>();
 
 	switch (h.target) {
@@ -203,8 +204,15 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 			.apply_impulse(vec2(h.impact_velocity).set_length(h.effective_amount * 5));
 	}
 		break;
-	case messages::health_event::target_type::CONSCIOUSNESS: sentience.consciousness.value -= h.effective_amount; ensure(sentience.health.value >= 0); break;
-	case messages::health_event::target_type::PERSONAL_ELECTRICITY_SHIELD: ensure(false); break;
+
+	case messages::health_event::target_type::CONSCIOUSNESS: 
+		sentience.consciousness.value -= h.effective_amount; 
+		break;
+
+	case messages::health_event::target_type::PERSONAL_ELECTRICITY_SHIELD: 
+		sentience.personal_electricity.value -= h.effective_amount;
+		break;
+
 	case messages::health_event::target_type::AIM:
 		const auto punched = subject;
 
@@ -222,7 +230,11 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		break;
 	}
 
-	if (h.special_result == messages::health_event::result_type::DEATH) {
+	if (h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_SHIELD_DESTRUCTION) {
+		sentience.electric_shield.set_for_duration(-1.f, now);
+	}
+
+	else if (h.special_result == messages::health_event::result_type::DEATH) {
 		const auto* const container = subject.find<components::container>();
 
 		if (container) {
@@ -281,6 +293,8 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 	const auto& damages = step.transient.messages.get_queue<messages::damage_message>();
 	auto& healths = step.transient.messages.get_queue<messages::health_event>();
 	auto& cosmos = step.cosm;
+	const auto now = cosmos.get_timestamp();
+	const auto delta = cosmos.get_fixed_delta();
 
 	healths.clear();
 
@@ -294,19 +308,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 		event.point_of_impact = d.point_of_impact;
 		event.impact_velocity = d.impact_velocity;
 
-		auto aimpunch_event = event;
-		aimpunch_event.target = messages::health_event::target_type::AIM;
-
-		if (sentience) {
-			aimpunch_event.subject = subject;
-		}
-		else {
-			aimpunch_event.subject = subject.get_owning_transfer_capability();
-		}
-
-		if (d.amount > 0 && cosmos[aimpunch_event.subject].alive()) {
-			consume_health_event(aimpunch_event, step);
-		}
+		float remaining_damage_after_pe_shield = d.amount;
 
 		if (sentience) {
 			const auto& s = *sentience;
@@ -315,10 +317,31 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 			event.objective_amount = d.amount;
 			event.special_result = messages::health_event::result_type::NONE;
 
+			if (s.electric_shield.is_enabled(now, delta)) {
+				event.target = messages::health_event::target_type::PERSONAL_ELECTRICITY_SHIELD;
+				
+				const auto damaged = s.personal_electricity.calculate_damage_result(d.amount);
+
+				event.effective_amount = damaged.effective;
+				event.ratio_effective_to_maximum = damaged.ratio_effective_to_maximum;
+
+				if (damaged.dropped_to_zero) {
+					event.special_result = messages::health_event::result_type::PERSONAL_ELECTRICITY_SHIELD_DESTRUCTION;
+					remaining_damage_after_pe_shield -= damaged.effective;
+				}
+				else {
+					remaining_damage_after_pe_shield = 0.f;
+				}
+
+				if (event.effective_amount != 0) {
+					consume_health_event(event, step);
+				}
+			}
+
 			if (s.health.enabled) {
 				event.target = messages::health_event::target_type::HEALTH;
 
-				const auto damaged = s.health.calculate_damage_result(d.amount);
+				const auto damaged = s.health.calculate_damage_result(remaining_damage_after_pe_shield);
 				event.effective_amount = damaged.effective;
 				event.ratio_effective_to_maximum = damaged.ratio_effective_to_maximum;
 
@@ -326,10 +349,9 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 					event.special_result = messages::health_event::result_type::DEATH;
 				}
 
-				if (event.effective_amount != 0) {
+				if (event.effective_amount != 0.f) {
 					consume_health_event(event, step);
 				}
-
 			}
 
 			/*
@@ -349,6 +371,28 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 					}
 				}
 			*/
+		}
+
+		auto aimpunch_event = event;
+		aimpunch_event.target = messages::health_event::target_type::AIM;
+
+		if (sentience) {
+			aimpunch_event.subject = subject;
+			
+			if (remaining_damage_after_pe_shield > 0.f) {
+				consume_health_event(aimpunch_event, step);
+			}
+		}
+		else {
+			const auto owning_capability = subject.get_owning_transfer_capability();
+			
+			if (owning_capability.alive()) {
+				aimpunch_event.subject = owning_capability;
+
+				if (d.amount > 0.f) {
+					consume_health_event(aimpunch_event, step);
+				}
+			}
 		}
 	}
 }

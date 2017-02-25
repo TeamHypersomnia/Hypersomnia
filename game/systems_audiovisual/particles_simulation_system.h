@@ -34,8 +34,8 @@ public:
 		float stream_max_lifetime_ms = 0.0;
 		float stream_particles_to_spawn = 0.f;
 
-		float target_spread = 0.f;
-		float target_particles_per_sec = 0.f;
+		float spread = 0.f;
+		float particles_per_sec = 0.f;
 
 		float swing_spread = 0.f;
 		float swings_per_sec = 0.f;
@@ -73,7 +73,7 @@ public:
 				CEREAL_NVP(stream_max_lifetime_ms),
 				CEREAL_NVP(stream_particles_to_spawn),
 
-				CEREAL_NVP(target_spread),
+				CEREAL_NVP(spread),
 
 				CEREAL_NVP(swing_spread),
 				CEREAL_NVP(swings_per_sec),
