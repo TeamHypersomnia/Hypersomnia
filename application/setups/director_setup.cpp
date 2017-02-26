@@ -296,6 +296,8 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 				);
 
 				if (recording_replacement_mode != recording_replacement_type::ONLY_MOUSE) {
+					entropy_for_this_advancement.cast_spells.erase(hypersomnia[testbed.get_selected_character()].get_guid());
+					
 					for (const auto new_spell_requested : total_collected_guid_entropy.cast_spells) {
 						entropy_for_this_advancement.cast_spells[new_spell_requested.first] = new_spell_requested.second;
 					}

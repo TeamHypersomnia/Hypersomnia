@@ -84,4 +84,8 @@ namespace prefabs {
 	entity_handle create_brick_wall(cosmos&, const components::transform pos, const vec2 size = vec2());
 
 	entity_handle create_cyan_urban_machete(cosmos&, const vec2 pos);
+
+	entity_handle create_force_grenade(cosmos&, const vec2 pos);
+	entity_handle create_ped_grenade(cosmos&, const vec2 pos);
+	entity_handle create_interference_grenade(cosmos&, const vec2 pos);
 }

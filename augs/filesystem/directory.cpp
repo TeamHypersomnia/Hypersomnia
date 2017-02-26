@@ -12,7 +12,7 @@ namespace augs {
 	}
 	
 	bool create_directories(const std::string filename) {
-		return fs::create_directories(filename);
+		return fs::create_directories(fs::path(filename).remove_filename());
 	}
 
 	std::vector<std::string> get_all_files_in_directory(const std::string dirpath) {

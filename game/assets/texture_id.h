@@ -200,6 +200,10 @@ namespace assets {
 
 		CAST_HIGHLIGHT,
 
+		FORCE_GRENADE,
+		PED_GRENADE,
+		INTERFERENCE_GRENADE,
+
 		COUNT,
 	};
 	

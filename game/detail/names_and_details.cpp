@@ -100,6 +100,21 @@ textual_description description_by_entity_name(const entity_name n) {
 			L"Amplifier arm",
 			L"Launches electric missiles\nand gives spells their full potency."
 		};
+	case entity_name::FORCE_GRENADE:
+		return{
+			L"Force grenade",
+			L"Throwable explosive with a three seconds delay.\nDeals damage to [/color][color=red]Health[/color][color=vsdarkgray]."
+		};
+	case entity_name::PED_GRENADE:
+		return{
+			L"PED grenade",
+			L"Throwable explosive with a three seconds delay.\nDrains [color=cyan]Personal Electricity[/color].\nIf the subject has [color=turquoise]Electric Shield[/color] enabled,\n the effect is doubled."
+		};
+	case entity_name::INTERFERENCE_GRENADE:
+		return{
+			L"Force grenade",
+			L"Throwable explosive with a three seconds delay.\nDeals damage to [color=orange]Consciousness[/color].\nCauses massive aimpunch."
+		};
 	default:
 		ensure(false);
 		return{

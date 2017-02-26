@@ -80,6 +80,10 @@ namespace scene_builders {
 
 		const int num_characters = 4 + 3 + 3 + 2;
 
+		prefabs::create_force_grenade(world, { 254, 611 });
+		prefabs::create_ped_grenade(world, { 204, 611 });
+		prefabs::create_interference_grenade(world, { 154, 611 });
+
 		std::vector<entity_id> new_characters;
 		new_characters.resize(num_characters);
 
@@ -236,6 +240,11 @@ namespace scene_builders {
 
 			sentience.personal_electricity.maximum = 400;
 			sentience.personal_electricity.value = 400;
+
+			if (i == 0) {
+				sentience.personal_electricity.maximum = 800;
+				sentience.personal_electricity.value = 800;
+			}
 
 			sentience.spells[spell_type::HASTE] = spell_instance_data();
 			sentience.spells[spell_type::ELECTRIC_TRIAD] = spell_instance_data();

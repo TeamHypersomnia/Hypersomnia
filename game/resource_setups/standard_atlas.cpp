@@ -262,6 +262,10 @@ namespace resource_setups {
 
 		manager.create(assets::texture_id::CAST_HIGHLIGHT, "hypersomnia/gfx/cast_highlight.png");
 
+		manager.create(assets::texture_id::FORCE_GRENADE, "hypersomnia/gfx/force_grenade.png");
+		manager.create(assets::texture_id::PED_GRENADE, "hypersomnia/gfx/ped_grenade.png");
+		manager.create(assets::texture_id::INTERFERENCE_GRENADE, "hypersomnia/gfx/interference_grenade.png");
+
 		manager.create_inverse_with_flip(
 			assets::animation_id::TORSO_MOVE,
 			assets::texture_id::TORSO_MOVING_FIRST,

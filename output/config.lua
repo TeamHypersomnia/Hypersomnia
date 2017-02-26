@@ -46,7 +46,7 @@ recording_type = {
 }
 
 config_table = {
-	launch_mode = launch_type.DIRECTOR,
+	launch_mode = launch_type.LOCAL,
 	
 	input_recording_mode = recording_type.LIVE,
 
@@ -78,7 +78,7 @@ config_table = {
 	-- OpenAL Soft on Line 1 (Virtual Audio Cable)
 	
 	-- volume settings
-	sound_effects_volume = 1,
+	sound_effects_volume = 0.4,
 	music_volume = 1,
 
 	-- Flag. 1 disables the cursor clipping so that it is easier to mark a breakpoint, for example. 0 is for normal playing.
