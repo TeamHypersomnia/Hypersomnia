@@ -31,8 +31,8 @@ namespace augs {
 		void blit(
 			const image& source,
 			const vec2u destination,
-			const bool flip = false,
-			const bool additive = false
+			const bool flip_source = false,
+			const bool add_rgba_values = false
 		);
 
 		void paint_circle(

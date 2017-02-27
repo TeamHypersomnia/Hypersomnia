@@ -319,13 +319,13 @@ namespace augs {
 	void image::blit(
 		const image& source_image, 
 		const vec2u dst,
-		const bool flip,
-		const bool additive
+		const bool flip_source,
+		const bool add_rgba_values
 	) {
 		const auto source_size = source_image.get_size();
 
-		if (!additive) {
-			if (flip) {
+		if (!add_rgba_values) {
+			if (flip_source) {
 				for (auto y = 0u; y < source_size.y; ++y) {
 					for (auto x = 0u; x < source_size.x; ++x) {
 						pixel(dst + vec2u{ y, x }) = source_image.pixel(vec2u{ x, y });
@@ -341,7 +341,7 @@ namespace augs {
 			}
 		}
 		else {
-			if (flip) {
+			if (flip_source) {
 				for (auto y = 0u; y < source_size.y; ++y) {
 					for (auto x = 0u; x < source_size.x; ++x) {
 						pixel(dst + vec2u{ y, x }) += source_image.pixel(vec2u{ x, y });
