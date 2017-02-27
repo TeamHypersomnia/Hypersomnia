@@ -58,6 +58,7 @@ struct rgba {
 	rgba operator-(const rgba b) const;
 	rgba operator*(const rgba b) const;
 	rgba& operator*=(const rgba b);
+	rgba& operator+=(const rgba b);
 
 	bool operator==(const rgba& b) const;
 	bool operator!=(const rgba& b) const;

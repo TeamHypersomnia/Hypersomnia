@@ -8,22 +8,20 @@ namespace augs {
 
 	struct posrgba
 	{
-		vec2i pos;
+		vec2u pos;
 		rgba col;
 	};
 
 
 	std::vector<vec2i> image::get_polygonized() const {
-
 		std::vector<vec2i> vertices;
 #if ENABLE_POLYGONIZATION
 		std::vector<bool> pixelFields;
 		pixelFields.resize(size.area(), false);
-		for (int i = 0;i < size.y;++i)
-		{
-			for (int j = 0;j < size.x;++j)
-			{
-				const rgba p = pixel(j, i);
+
+		for (unsigned i = 0 ; i < size.y; ++i) {
+			for (unsigned j = 0; j < size.x; ++j) {
+				const rgba p = pixel({ j, i });
 				if (p == red)
 				{
 					vertices.push_back(vec2i(j, i));

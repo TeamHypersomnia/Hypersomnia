@@ -3,7 +3,7 @@
 #include "game/build_settings.h"
 
 namespace augs {
-	void texture_with_image::set_from_image(augs::image from) {
+	void texture_with_image::set_from_image(const augs::image& from) {
 		img = from;
 		tex.set(from);
 	}
@@ -21,9 +21,9 @@ namespace augs {
 		}
 	}
 	
-	void texture_with_image::polygonize_from_file(std::string filename) {
+	void texture_with_image::polygonize_from_file(const std::string& filename) {
 		auto polygonization_info = augs::image();
-		polygonization_info.from_file(filename, false);
+		polygonization_info.from_file(filename);
 		polygonized = polygonization_info.get_polygonized();
 	}
 }

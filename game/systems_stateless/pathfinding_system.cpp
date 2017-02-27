@@ -15,10 +15,6 @@
 #include "game/detail/physics/physics_scripts.h"
 #include "game/messages/visibility_information.h"
 
-std::vector<b2Vec2> get_world_vertices() {
-
-}
-
 void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto si = cosmos.get_si();

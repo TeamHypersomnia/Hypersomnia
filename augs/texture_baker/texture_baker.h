@@ -27,7 +27,7 @@ namespace augs {
 		bool pack(), // max texture size 
 			pack(int max_size);
 
-		void create_image(int atlas_channels, bool destroy_images);
+		void create_image(const bool destroy_images);
 		void build(bool mipmaps = false, bool linear = false, image* raw_texture = 0), nearest(), linear(), clamp(), repeat();
 
 		void default_build();

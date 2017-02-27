@@ -18,9 +18,8 @@ namespace augs {
 		texture() = default;
 		texture(const image& img);
 		void set(const image& img);
-		void luminosity_to_alpha(bool);
 
-		rects::xywhf<int> get_rect() const;
+		rect_xywhf get_rect() const;
 		vec2i get_size() const;
 
 		void get_atlas_space_uv(const rects::texture<float>& uv, rects::texture<float>& out) const;

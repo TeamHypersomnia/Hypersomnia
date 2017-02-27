@@ -12,6 +12,10 @@ namespace augs {
 	}
 	
 	bool create_directories(const std::string filename) {
+		if (fs::path(filename).filename() == filename) {
+			return true;
+		}
+
 		return fs::create_directories(fs::path(filename).remove_filename());
 	}
 

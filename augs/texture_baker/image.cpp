@@ -1,10 +1,16 @@
 #include "image.h"
 #include "3rdparty/lodepng/lodepng.h"
 #include "augs/ensure.h"
+#include "augs/filesystem/directory.h"
 
 template<class C>
-static void Line(int x1, int y1, int x2, int y2, C callback)
-{
+static void Line(
+	int x1, 
+	int y1, 
+	int x2, 
+	int y2, 
+	C callback
+) {
 	// Bresenham's line algorithm
 	const bool steep = (std::abs(y2 - y1) > std::abs(x2 - x1));
 	if (steep)
@@ -49,27 +55,14 @@ static void Line(int x1, int y1, int x2, int y2, C callback)
 }
 
 namespace augs {
-	image::image() : size(0, 0), channels(0) {}
-
-	image::image(const image& img) {
-		copy(img);
-	}
-
-	image& image::operator=(const image& img) {
-		copy(img);
-		return *this;
-	}
-
-	void image::create(int w, int h, int ch) {
-		size = vec2i(w, h);
-		channels = ch;
-		v.resize(get_bytes(), 0);
-		//v.shrink_to_fit();
+	void image::create(const vec2u new_size) {
+		size = new_size;
+		v.resize(new_size.area(), rgba(0, 0, 0, 0));
 	}
 
 	void image::paint_circle_midpoint(
-		const int radius, 
-		const int border_width, 
+		const unsigned radius, 
+		const unsigned border_width, 
 		const rgba filling, 
 		const bool scale_alpha, 
 		const bool constrain_angle, 
@@ -81,32 +74,36 @@ namespace augs {
 		image new_surface;
 		auto& surface = v.empty() ? *this : new_surface;
 		
-		surface.create(std::max(size.x, side), std::max(size.y, side), 4);
+		surface.create({ std::max(size.x, side), std::max(size.y, side) });
 
 		ensure(size.x >= side);
 		ensure(size.y >= side);
 
-		const auto pp = [&](int x, int y){
-			int x_center = x - size.x / 2;
-			int y_center = y - size.y / 2;
+		const auto pp = [&](
+			const unsigned x, 
+			const unsigned y
+		) {
+			const auto x_center = static_cast<signed>(x - size.x / 2);
+			const auto y_center = static_cast<signed>(y - size.y / 2);
 
-			auto angle = vec2i(x_center, y_center);// .degrees();
+			const auto angle = vec2i(x_center, y_center);// .degrees();
 
 			if (!constrain_angle || (angle_start.cross(angle) >= 0.f && angle_end.cross(angle) <= 0.f)) {
-				auto col = filling;
+				const auto col = filling;
 				//if (scale_alpha)
 				//	col.a = (angle - angle_start) / (angle_end - angle_start) * 255;
 
-				surface.pixel(x, y) = col;
+				surface.pixel({ x, y } ) = col;
 			}
 		};
 
-		for (int i = 0; i < border_width; ++i) {
+		for (unsigned i = 0; i < border_width; ++i) {
 			int x = radius - i;
 			int y = 0;
+			
 			int decisionOver2 = 1 - x;   // Decision criterion divided by 2 evaluated at x=r, y=0
-			int x0 = size.x / 2;
-			int y0 = size.y / 2;
+			const auto x0 = size.x / 2;
+			const auto y0 = size.y / 2;
 
 			while (y <= x)
 			{
@@ -119,26 +116,25 @@ namespace augs {
 				pp(x + x0, -y + y0); // Octant 7
 				pp(y + x0, -x + y0); // Octant 8
 				y++;
-				if (decisionOver2 <= 0)
-				{
+
+				if (decisionOver2 <= 0) {
 					decisionOver2 += 2 * y + 1;   // Change in decision criterion for y -> y+1
 				}
-				else
-				{
+				else {
 					decisionOver2 += 2 * (y - (--x)) + 1;   // Change for y -> y+1, x -> x-1
 				}
 			}
 		}
 
 		if (border_width > 1) {
-			for (int y = 0; y < surface.size.x; ++y) {
-				for (int x = 0; x < surface.size.x; ++x) {
+			for (unsigned y = 0; y < surface.size.x; ++y) {
+				for (unsigned x = 0; x < surface.size.x; ++x) {
 					if (x > 0 && y > 0 && x < surface.size.x - 1 && y < surface.size.y - 1) {
-						if (surface.pixel(x, y).a == 0 &&
-							surface.pixel(x + 1, y).a > 0 &&
-							surface.pixel(x - 1, y).a > 0 &&
-							surface.pixel(x, y + 1).a > 0 &&
-							surface.pixel(x, y - 1).a > 0)
+						if (surface.pixel({ x, y }).a == 0 &&
+							surface.pixel({x + 1, y}).a > 0 &&
+							surface.pixel({x - 1, y}).a > 0 &&
+							surface.pixel({x, y + 1}).a > 0 &&
+							surface.pixel({x, y - 1}).a > 0)
 							pp(x, y);
 					}
 				}
@@ -146,20 +142,25 @@ namespace augs {
 		}
 
 		if (&surface != this) {
-			blit(surface, 0, 0, rects::xywhf<int>(0, 0, surface.size.x, surface.size.y, false), false, true);
+			blit(
+				surface,
+				{ 0u, 0u },
+				false,
+				true
+			);
 		}
 	}
 
 	void image::paint_circle(
-		const int radius, 
-		const int border_width, 
+		const unsigned radius, 
+		const unsigned border_width, 
 		const rgba filling, 
 		const bool scale_alpha
 	) {
 		const auto side = radius * 2 + 1;
 
 		if (v.empty()) {
-			create(side, side, 4);
+			create({ side, side });
 		}
 		else {
 			ensure(size.x >= side);
@@ -167,37 +168,36 @@ namespace augs {
 		}
 
 		if (scale_alpha) {
-			for (int y = 0; y < size.y; ++y) {
-				for (int x = 0; x < size.x; ++x) {
-					int x_center = x - size.x / 2;
-					int y_center = y - size.y / 2;
+			for (unsigned y = 0; y < size.y; ++y) {
+				for (unsigned x = 0; x < size.x; ++x) {
+					const auto x_center = static_cast<signed>(x - size.x / 2);
+					const auto y_center = static_cast<signed>(y - size.y / 2);
 
-					auto angle = vec2i(x_center, y_center).degrees();
+					const auto angle = vec2i(x_center, y_center).degrees();
 
 					if (angle >= -45 && angle <= 45 &&
 						x_center*x_center + y_center*y_center <= radius*radius
 						&&
 						x_center*x_center + y_center*y_center >= (radius - border_width)*(radius - border_width)
 						) {
-						pixel(x, y) = filling;
-						pixel(x, y).a = static_cast<rgba_channel>((angle + 45) / 90.f * 255);
+						pixel({x, y}) = filling;
+						pixel({x, y}).a = static_cast<rgba_channel>((angle + 45) / 90.f * 255);
 					}
 				}
 			}
 		}
 		else {
-
-			for (int y = 0; y < size.y; ++y) {
-				for (int x = 0; x < size.x; ++x) {
-					int x_center = x - size.x / 2;
-					int y_center = y - size.y / 2;
+			for (unsigned y = 0; y < size.y; ++y) {
+				for (unsigned x = 0; x < size.x; ++x) {
+					const auto x_center = static_cast<signed>(x - size.x / 2);
+					const auto y_center = static_cast<signed>(y - size.y / 2);
 
 					if (
 						x_center*x_center + y_center*y_center <= radius*radius
 						&&
 						x_center*x_center + y_center*y_center >= (radius - border_width)*(radius - border_width)
 						) {
-						pixel(x, y) = filling;
+						pixel({ x, y }) = filling;
 					}
 				}
 			}
@@ -209,26 +209,26 @@ namespace augs {
 	}
 
 	void image::paint_filled_circle(
-		const int radius, 
+		const unsigned radius, 
 		const rgba filling
 	) {
-		auto side = radius * 2 + 1;
+		const auto side = radius * 2 + 1;
 
 		if (v.empty()) {
-			create(side, side, 4);
+			create({ side, side });
 		}
 		else {
 			ensure(size.x >= side);
 			ensure(size.y >= side);
 		}
 
-		for (int y = 0; y < size.y; ++y) {
-			for (int x = 0; x < size.x; ++x) {
-				int x_center = x - size.x / 2;
-				int y_center = y - size.y / 2;
+		for (unsigned y = 0; y < size.y; ++y) {
+			for (unsigned x = 0; x < size.x; ++x) {
+				const auto x_center = static_cast<signed>(x - size.x / 2);
+				const auto y_center = static_cast<signed>(y - size.y / 2);
 
 				if (x_center*x_center + y_center*y_center <= radius*radius) {
-					pixel(x, y) = filling;
+					pixel({ x, y }) = filling;
 				}
 			}
 		}
@@ -239,24 +239,30 @@ namespace augs {
 		//pixel(side -1, side /2) = rgba(0, 0, 0, 0);
 	}
 
-	void image::paint_line(const vec2i from, const vec2i to, const rgba filling) {
+	void image::paint_line(
+		const vec2u from, 
+		const vec2u to, 
+		const rgba filling
+	) {
 		Line(from.x, from.y, to.x, to.y, [&](const int x, const int y) {
-			ensure(in_bounds({ x, y }));
-			pixel(x, y) = filling;
+			const auto pos = vec2u(x, y);
+
+			ensure(in_bounds(pos));
+			pixel(pos) = filling;
 		});
 	}
 	
-	bool image::in_bounds(const vec2i v) const {
-		return v.x >= 0 && v.y >= 0 && v.x < size.x && v.y < size.y;
+	bool image::in_bounds(const vec2u v) const {
+		return v.x < size.x && v.y < size.y;
 	}
 
-	bool image::from_file(const std::string& filename, const unsigned force_channels) {
-		channels = 4;
-
+	bool image::from_file(
+		const std::string& filename
+	) {
 		unsigned width;
 		unsigned height;
 
-		if (lodepng::decode(v, width, height, filename)) {
+		if (lodepng::decode(*reinterpret_cast<std::vector<unsigned char>*>(&v), width, height, filename)) {
 			LOG("Failed to open %x! Ensure that the file exists and has correct format.", filename);
 			ensure(false);
 			return false;
@@ -269,203 +275,112 @@ namespace augs {
 	}
 
 	void image::swap_red_and_blue() {
-		for (int i = 0; i < size.area(); ++i) {
-			std::swap(v[i * 4 + 0], v[i * 4 + 2]);
+		for (auto& p : v) {
+			std::swap(p.r, p.b);
 		}
 	}
 
-	void image::save(const std::string& filename) {
-		if (lodepng::encode(filename, v, size.x, size.y)) {
+	void image::save(const std::string& filename) const {
+		augs::create_directories(filename);
+
+		if (lodepng::encode(filename, *reinterpret_cast<const std::vector<unsigned char>*>(&v), size.x, size.y)) {
 			LOG("Could not encode %x! Ensure that the target directory exists.", filename);
 		}
 	}
 
-	void image::fill(unsigned char val) {
-		memset(v.data(), val, get_bytes());
-	}
-
-	void image::fill(unsigned char* channel_vals) {
-		int i = 0, bytes = get_bytes(), c = 0;
-
-		while (i < bytes)
-			for (c = 0; c < channels; ++c)
-				v[i++] = channel_vals[c];
-	}
-
-	void image::fill_channel(int ch, unsigned char val) {
-		int i = 0, bytes = get_bytes() / channels;
-
-		while (i < bytes) v[ch + channels*i++] = val;
-	}
-
 	void image::fill(const rgba col) {
-		for (int j = 0; j < size.y; ++j) {
-			for (int i = 0; i < size.x; ++i) {
-				set_pixel({ i, j }, col);
-			}
+		for (auto& p : v) {
+			p = col;
 		}
 	}
 
-	void image::copy(const image& img) {
-		create(img.size.x, img.size.y, img.channels);
+	void image::create_from(
+		const unsigned char* const ptr, 
+		const unsigned channels,
+		const unsigned pitch, 
+		const vec2u size
+	) {
+		create(size);
 
-		memcpy(v.data(), img.v.data(), get_bytes());
-		channels = img.channels;
-	}
+		const int wbytes = size.x*channels;
 
-	void image::copy(unsigned char* ptr, int _channels, int pitch, const vec2i& size) {
-		create(size.x, size.y, _channels);
-		int wbytes = size.x*_channels;
-
-		for (int i = 0; i < size.y; ++i)
-			memcpy(v.data() + wbytes*i, ptr + pitch*i, wbytes);
-
-		channels = _channels;
-	}
-
-
-#define LOOP  for(int s_y = src.y, d_y = y; s_y < src.b(); ++s_y, ++d_y) \
-	for(int s_x = src.x, d_x = x; s_x < src.r(); ++s_x, ++d_x)
-#define SLOOP for(int s_y = src_rc.y, d_y = dest_rc.y; (s_y < src_rc.b() && d_y < dest_rc.b()); ++s_y, ++d_y) \
-	for(int s_x = src_rc.x, d_x = dest_rc.x; (s_x < src_rc.r() && d_x < dest_rc.r()); ++s_x, ++d_x) 
-#define BCH(ch, src_ch) *ptr(d_x, d_y, ch) = src.flipped ? (img.pix(s_y, s_x, src_ch)) : (img.pix(s_x, s_y, src_ch))
-#define BCH_ADD(ch, src_ch) *ptr(d_x, d_y, ch) += src.flipped ? (img.pix(s_y, s_x, src_ch)) : (img.pix(s_x, s_y, src_ch))
-#define DCH(ch) (ptr(d_x, d_y, ch))
-#define SCH(src_ch) (src.flipped ? (img.pix(s_y, s_x, src_ch)) : (img.pix(s_x, s_y, src_ch)))
-
-
-	void image::blit(const image& img, int x, int y, const rects::xywhf<int>& src, bool luminance_to_alpha, bool add) {
-		int c;
-		if (channels == img.channels) {
-			if (!add) {
-				LOOP{
-					for (c = 0; c < channels; ++c) BCH(c, c);
-				}
-			}
-			else {
-				LOOP{
-					for (c = 0; c < channels; ++c) BCH_ADD(c, c);
+		if (channels == 1) {
+			for (unsigned j = 0; j < size.y; ++j) {
+				for (unsigned i = 0; i < size.x; ++i) {
+					pixel({ i, j }) = { 255, 255, 255, ptr[pitch*j+i] };
 				}
 			}
 		}
 		else {
-			if (channels <= 2) {
-				if (img.channels == 1) {
-					if (luminance_to_alpha) {
-						LOOP{
-							*DCH(0) = 255;
-							BCH(1, 0);
-						}
-					}
-					else LOOP BCH(0, 0);
-				}
-				else {
-					LOOP *DCH(0) = (SCH(0) + SCH(1) + SCH(2)) / 3;
+			ensure(false);
+		}
+	}
 
-					if (channels == 2 && img.channels == 4) LOOP BCH(1, 3);
+	void image::blit(
+		const image& source_image, 
+		const vec2u dst,
+		const bool flip,
+		const bool additive
+	) {
+		const auto source_size = source_image.get_size();
+
+		if (!additive) {
+			if (flip) {
+				for (auto y = 0u; y < source_size.y; ++y) {
+					for (auto x = 0u; x < source_size.x; ++x) {
+						pixel(dst + vec2u{ y, x }) = source_image.pixel(vec2u{ x, y });
+					}
 				}
 			}
-			if (channels >= 3) {
-				if (img.channels == 2) {
-					LOOP{
-						BCH(0, 0);
-						BCH(1, 0);
-						BCH(2, 0);
-					}
-					if (channels == 4) LOOP BCH(3, 1);
-				}
-				else if (img.channels == 1) {
-					if (channels == 4 && luminance_to_alpha)
-						LOOP{
-							BCH(3, 0);
-							*DCH(0) = *DCH(1) = *DCH(2) = 255;
-					}
-					else
-						LOOP{
-							BCH(0, 0);
-							BCH(1, 0);
-							BCH(2, 0);
+			else {
+				for (auto y = 0u; y < source_size.y; ++y) {
+					for (auto x = 0u; x < source_size.x; ++x) {
+						pixel(dst + vec2u{ x, y }) = source_image.pixel(vec2u{ x, y });
 					}
 				}
-				else {
-					if (luminance_to_alpha && channels == 4)
-						LOOP{
-							BCH(0, 0);
-							BCH(1, 1);
-							BCH(2, 2);
-							*DCH(3) = (SCH(0) + SCH(1) + SCH(2)) / 3;
+			}
+		}
+		else {
+			if (flip) {
+				for (auto y = 0u; y < source_size.y; ++y) {
+					for (auto x = 0u; x < source_size.x; ++x) {
+						pixel(dst + vec2u{ y, x }) += source_image.pixel(vec2u{ x, y });
 					}
-					else
-						LOOP{
-							BCH(0, 0);
-							BCH(1, 1);
-							BCH(2, 2);
+				}
+			}
+			else {
+				for (auto y = 0u; y < source_size.y; ++y) {
+					for (auto x = 0u; x < source_size.x; ++x) {
+						pixel(dst + vec2u{ x, y }) += source_image.pixel(vec2u{ x, y });
 					}
 				}
 			}
 		}
 	}
 
-
-	void image::blit_channel(const image& img, int x, int y, const rects::xywhf<int>& src, int ch, int src_ch) {
-		LOOP BCH(ch, src_ch);
+	const rgba_channel* image::get_data() const {
+		return reinterpret_cast<const rgba_channel*>(v.data());
 	}
 
-	unsigned char* image::operator()(int x, int y, int channel) {
-		return ptr(x, y, channel);
+	rgba& image::pixel(const vec2u pos) {
+		return v[pos.y * size.x + pos.x];
 	}
 
-	unsigned char* image::ptr(int x, int y, int channel) {
-		return v.data() + (static_cast<int>(size.x) * y + x) * channels + channel;
-	}
-	
-	const unsigned char* image::ptr(int x, int y, int channel) const {
-		return v.data() + (static_cast<int>(size.x) * y + x) * channels + channel;
+	const rgba& image::pixel(const vec2u pos) const {
+		return v[pos.y * size.x + pos.x];
 	}
 
-	unsigned char image::pix(int x, int y, int channel) const {
-		return v[(static_cast<int>(size.x) * y + x) * channels + channel];
-	}
-
-	rgba& image::pixel(int x, int y) {
-		return *(rgba*)ptr(x, y, 0);
-	}
-
-	const rgba& image::pixel(int x, int y) const {
-		return *(rgba*)ptr(x, y, 0);
-	}
-
-	void image::set_pixel(const vec2i pos, const rgba col) {
-		pixel(pos.x, pos.y) = col;
-	}
-
-	const rgba& image::pixel(vec2i p) const {
-		return *(rgba*)ptr(p.x, p.y, 0);
-	}
-
-	int image::get_bytes() const {
-		return sizeof(unsigned char) * static_cast<int>(size.x) * static_cast<int>(size.y) * channels;
-	}
-
-	int image::get_channels() const {
-		return channels;
-	}
-
-	int image::get_num_pixels() const {
-		return get_bytes() / get_channels();
-	}
-
-	vec2i image::get_size() const {
+	vec2u image::get_size() const {
 		return size;
 	}
 
 	image image::get_desaturated() const {
 		image desaturated;
-		desaturated.create(size.x, size.y, 4);
+		desaturated.create(size);
 
-		for (int y = 0; y < size.y; ++y) {
-			for (int x = 0; x < size.x; ++x) {
-				desaturated.set_pixel({ x, y }, pixel({ x, y }).get_desaturated());
+		for (unsigned y = 0; y < size.y; ++y) {
+			for (unsigned x = 0; x < size.x; ++x) {
+				desaturated.pixel({ x, y }) = pixel({ x, y }).get_desaturated();
 			}
 		}
 
@@ -475,6 +390,7 @@ namespace augs {
 	void image::destroy() {
 		v.clear();
 		v.shrink_to_fit();
+		size.reset();
 	}
 }
 

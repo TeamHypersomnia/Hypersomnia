@@ -76,7 +76,7 @@ namespace augs {
 					g.unicode = j;
 
 					if (face->glyph->bitmap.width) {
-						g.sprite.img.copy(face->glyph->bitmap.buffer, 1, face->glyph->bitmap.pitch, vec2i(face->glyph->bitmap.width, face->glyph->bitmap.rows));
+						g.sprite.img.create_from(face->glyph->bitmap.buffer, 1, face->glyph->bitmap.pitch, vec2i(face->glyph->bitmap.width, face->glyph->bitmap.rows));
 						
 						//const auto sz = g.sprite.img.get_size();
 						//
@@ -134,7 +134,6 @@ namespace augs {
 		for (auto& g : glyphs) {
 			if (g.sprite.img.get_size().x) {
 				g.sprite.tex.set(g.sprite.img);
-				g.sprite.tex.luminosity_to_alpha(true);
 				atl.textures.push_back(&g.sprite);
 			}
 		}

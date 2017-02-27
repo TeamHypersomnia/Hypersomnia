@@ -219,6 +219,10 @@ rgba& rgba::operator*=(const rgba b) {
 	return (*this = *this * b);
 }
 
+rgba& rgba::operator+=(const rgba b) {
+	return (*this = *this + b);
+}
+
 bool rgba::operator==(const rgba& v) const {
 	return r == v.r && g == v.g && b == v.b && a == v.a;
 }

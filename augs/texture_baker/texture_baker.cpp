@@ -44,24 +44,28 @@ namespace augs {
 		return res;
 	}
 
-	void atlas::create_image(int atlas_channels, bool destroy_images) {
+	void atlas::create_image(const bool destroy_images) {
 		ensure(bins.size() == 1);
 		const auto& b = bins[0];
 
 		double u = 1.0 / b.size.w;
 		double v = 1.0 / b.size.h;
 
-		for (unsigned i = 0; i < textures.size(); ++i)
-			textures[i]->tex.set_uv_unit(u, v);
-
-		unsigned char pixel[] = { 0, static_cast<unsigned char>(atlas_channels == 2 ? 255 : 0), 0, 0 };
-		img.create(b.size.w, b.size.h, atlas_channels);
-		img.fill(pixel);
-
-		rects::xywhf<int> rc;
 		for (unsigned i = 0; i < textures.size(); ++i) {
-			rc = textures[i]->tex.get_rect();
-			img.blit(textures[i]->img, rc.x, rc.y, rects::xywhf<int>(0, 0, rc.w, rc.h, rc.flipped), textures[i]->tex.ltoa);
+			textures[i]->tex.set_uv_unit(u, v);
+		}
+
+		img.create({ static_cast<unsigned>(b.size.w), static_cast<unsigned>(b.size.h) });
+		img.fill(rgba(0, 0, 0, 0));
+
+		for (unsigned i = 0; i < textures.size(); ++i) {
+			const auto rc = textures[i]->tex.get_rect();
+
+			img.blit(
+				textures[i]->img,
+				{ static_cast<unsigned>(rc.x), static_cast<unsigned>(rc.y) },
+				rc.flipped
+			);
 		}
 
 		img.swap_red_and_blue();
@@ -90,7 +94,8 @@ namespace augs {
 
 		lin = !lin; if (!lin) linear(); else nearest();
 
-		int format = im.get_channels();
+		int format = 4;
+		
 		switch (format) {
 		case 1: format = GL_LUMINANCE; break;
 		case 2: format = GL_LUMINANCE_ALPHA; break;
@@ -99,7 +104,7 @@ namespace augs {
 		default: ensure(false);
 		}
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, im.get_size().x, im.get_size().y, 0, format, GL_UNSIGNED_BYTE, im.ptr()); glerr;
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, im.get_size().x, im.get_size().y, 0, format, GL_UNSIGNED_BYTE, im.get_data()); glerr;
 
 		if (mipmaps) glGenerateMipmap(GL_TEXTURE_2D); glerr;
 		built = true;
@@ -110,7 +115,7 @@ namespace augs {
 
 	void atlas::default_build() {
 		pack();
-		create_image(4, false);
+		create_image(false);
 		build(false, false);
 		/* destroy the raw image as it is already uploaded to GPU */
 		img.destroy();

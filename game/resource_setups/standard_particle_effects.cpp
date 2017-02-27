@@ -261,7 +261,7 @@ namespace resource_setups {
 			const auto& anim = *get_resource_manager().find(assets::animation_id::CAST_BLINK_ANIMATION);
 			const auto frame_duration = anim.frames[0].duration_milliseconds / 4.f;
 
-			for (int i = 0; i < anim.frames.size() - 1; ++i)
+			for (size_t i = 0; i < anim.frames.size() - 1; ++i)
 			{
 				homing_animated_particle particle_template;
 
@@ -300,7 +300,7 @@ namespace resource_setups {
 			em.add_particle_template(particle_template);
 			}
 
-			//for (int i = 0; i < anim.frames.size() - 1; ++i)
+			//for (size_t i = 0; i < anim.frames.size() - 1; ++i)
 			//{
 			//	animated_particle particle_template;
 			//
@@ -357,7 +357,7 @@ namespace resource_setups {
 					const auto& anim = *get_resource_manager().find(assets::animation_id::CAST_BLINK_ANIMATION);
 					const auto frame_duration = anim.frames[0].duration_milliseconds / 2.f;
 
-					for (int i = 0; i < anim.frames.size() - 1; ++i)
+					for (size_t i = 0; i < anim.frames.size() - 1; ++i)
 					{
 						homing_animated_particle particle_template;
 
@@ -375,7 +375,7 @@ namespace resource_setups {
 					const auto& anim = *get_resource_manager().find(assets::animation_id::BLINK_ANIMATION);
 					const auto frame_duration = anim.frames[0].duration_milliseconds / 2.f;
 
-					for (int i = 0; i < anim.frames.size() - 1; ++i)
+					for (size_t i = 0; i < anim.frames.size() - 1; ++i)
 					{
 						homing_animated_particle particle_template;
 
@@ -508,7 +508,7 @@ namespace resource_setups {
 				const auto& anim = *get_resource_manager().find(assets::animation_id::CAST_BLINK_ANIMATION);
 				const auto frame_duration = anim.frames[0].duration_milliseconds / 2.f;
 
-				for(int i = 0; i < anim.frames.size() - 1; ++i)
+				for(size_t i = 0; i < anim.frames.size() - 1; ++i)
 				{
 					animated_particle particle_template;
 

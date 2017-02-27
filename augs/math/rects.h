@@ -412,25 +412,6 @@ namespace augs {
 				ar(CEREAL_NVP(x), CEREAL_NVP(y), CEREAL_NVP(w), CEREAL_NVP(h));
 			}
 		};
-		
-		template <class T>
-		struct xywhf : public xywh<T> {
-			xywhf(const ltrb<T> rr) : xywh<T>(rr), flipped(false) {}
-			xywhf(const xywh<T> rr) : xywh<T>(rr), flipped(false) {}
-			xywhf(const T x, const T y, const T width, const T height, const bool flipped) : xywh<T>(x, y, width, height), flipped(flipped) {}
-			xywhf() : flipped(false) {}
-
-			void flip() {
-				flipped = !flipped;
-				std::swap(this->w, this->h);
-			}
-
-			xywh<T> rc() const {
-				return xywh<T>(this->x, this->y, flipped ? this->h : this->w, flipped ? this->w : this->h);
-			}
-
-			bool flipped;
-		};
 
 		template <class T>
 		struct texture {

@@ -68,7 +68,7 @@ void sentience_meter::draw(
 		const auto ratio = sentience.call_on(this_type, [](const auto& m) { return m.get_ratio(); });
 		auto actual_bar_rect = full_bar_rect;
 		const auto bar_width = static_cast<int>(actual_bar_rect.w() * ratio);
-		actual_bar_rect.w(bar_width);
+		actual_bar_rect.w(static_cast<float>(bar_width));
 
 		draw_clipped_rect(
 			bar_mat,

@@ -12,8 +12,8 @@ namespace augs {
 		std::vector<vec2i> polygonized;
 		components::sprite gui_sprite_def;
 
-		void set_from_image(augs::image img);
+		void set_from_image(const augs::image& img);
 		void set_from_image_file(std::string filename);
-		void polygonize_from_file(std::string filename);
+		void polygonize_from_file(const std::string& filename);
 	};
 }

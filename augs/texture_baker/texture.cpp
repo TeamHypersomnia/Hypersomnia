@@ -15,12 +15,8 @@ namespace augs {
 		rect = rect_xywhf(0, 0, img.get_size().x, img.get_size().y);
 	}
 
-	void texture::luminosity_to_alpha(bool flag) {
-		ltoa = flag;
-	}
-
-	rects::xywhf<int> texture::get_rect() const {
-		return rects::xywhf<int>(rect.x, rect.y, rect.w, rect.h, rect.flipped);
+	rect_xywhf texture::get_rect() const {
+		return rect;
 	}
 
 	vec2i texture::get_size() const {

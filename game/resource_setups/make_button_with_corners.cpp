@@ -9,10 +9,10 @@ namespace resource_setups {
 		const rgba border_color,
 		const rgba inside_color,
 
-		const int lower_side,
-		const int upper_side,
+		const unsigned lower_side,
+		const unsigned upper_side,
 
-		const int inside_border_padding,
+		const unsigned inside_border_padding,
 		const bool make_lb_complement
 	) {
 
@@ -30,16 +30,16 @@ namespace resource_setups {
 			augs::image r;
 			augs::image b;
 
-			l.create(lower_side, 1, 4);
+			l.create(lower_side, 1u);
 			l.paint_line({ 1, 0 }, { lower_side - 1, 0 }, inside_color);
 
-			r.create(upper_side, 1, 4);
+			r.create(upper_side, 1u);
 			r.paint_line({ upper_side - 2, 0 }, { 0, 0 }, inside_color);
 
-			b.create(1, lower_side, 4);
+			b.create(1u, lower_side);
 			b.paint_line({ 0, lower_side - 2 }, { 0, 0 }, inside_color);
 
-			t.create(1, upper_side, 4);
+			t.create(1u, upper_side);
 			t.paint_line({ 0, 1 }, { 0, upper_side - 1 }, inside_color);
 
 			manager.create(tex(button_corner_type::L), l);
@@ -57,33 +57,33 @@ namespace resource_setups {
 			augs::image lb_complement;
 			augs::image lb_complement_border;
 
-			lt.create(lower_side, upper_side, 4);
+			lt.create(lower_side, upper_side);
 			lt.fill(inside_color);
 			lt.paint_line({ 0, 0 }, { lower_side - 1, 0 }, { 0, 0, 0, 0 });
 			lt.paint_line({ 0, 0 }, { 0, upper_side - 1 }, { 0, 0, 0, 0 });
 
-			rt.create(upper_side, upper_side, 4);
+			rt.create(upper_side, upper_side);
 			rt.fill({ 0, 0, 0, 0 });
 
-			for (int i = 1; i < upper_side; ++i) {
+			for (unsigned i = 1; i < upper_side; ++i) {
 				rt.paint_line({ 0, i }, { upper_side - i - 1, upper_side - 1 }, inside_color);
 			}
 
-			rb.create(upper_side, lower_side, 4);
+			rb.create(upper_side, lower_side);
 			rb.fill(inside_color);
 			rb.paint_line({ upper_side - 1, lower_side - 1 }, { 0, lower_side - 1 }, { 0, 0, 0, 0 });
 			rb.paint_line({ upper_side - 1, lower_side - 1 }, { upper_side - 1, 0 }, { 0, 0, 0, 0 });
 
-			lb.create(lower_side, lower_side, 4);
+			lb.create(lower_side, lower_side);
 			lb.fill({ 0, 0, 0, 0 });
 
-			for (int i = 1; i < lower_side; ++i) {
+			for (unsigned i = 1; i < lower_side; ++i) {
 				lb.paint_line({ i, 0 }, { lower_side - 1, lower_side - 1 - i }, inside_color);
 			}
 
-			lb_complement.create(lower_side, lower_side, 4);
+			lb_complement.create(lower_side, lower_side);
 
-			for (int i = 1; i < lower_side; ++i) {
+			for (unsigned i = 1; i < lower_side; ++i) {
 				lb_complement.paint_line({ 0, i }, { lower_side - 1 - i, lower_side - 1 }, inside_color);
 			}
 
@@ -103,17 +103,17 @@ namespace resource_setups {
 			augs::image r;
 			augs::image b;
 
-			l.create(lower_side, 1, 4);
-			l.set_pixel({ 0, 0 }, border_color);
+			l.create(lower_side, 1u);
+			l.pixel({ 0, 0 }) = border_color;
 
-			r.create(upper_side, 1, 4);
-			r.set_pixel({ upper_side - 1, 0 }, border_color);
+			r.create(upper_side, 1u);
+			r.pixel({ upper_side - 1, 0 }) = border_color;
 
-			b.create(1, lower_side, 4);
-			b.set_pixel({ 0, lower_side - 1 }, border_color);
+			b.create(1u, lower_side);
+			b.pixel({ 0, lower_side - 1 }) = border_color;
 
-			t.create(1, upper_side, 4);
-			t.set_pixel({ 0, 0 }, border_color);
+			t.create(1u, upper_side);
+			t.pixel({ 0, 0 }) = border_color;
 
 			manager.create(tex(button_corner_type::L_BORDER), l);
 			manager.create(tex(button_corner_type::T_BORDER), t);
@@ -129,25 +129,25 @@ namespace resource_setups {
 
 			augs::image lb_complement;
 
-			lt.create(lower_side, upper_side, 4);
+			lt.create(lower_side, upper_side);
 			lt.paint_line({ 0, 0 }, { 0, upper_side - 1 }, border_color);
 			lt.paint_line({ 0, 0 }, { lower_side - 1, 0 }, border_color);
 
-			rt.create(upper_side, upper_side, 4);
+			rt.create(upper_side, upper_side);
 			rt.fill({ 0, 0, 0, 0 });
 
 			rt.paint_line({ 0, 0 }, { upper_side - 1, upper_side - 1 }, border_color);
 
-			rb.create(upper_side, lower_side, 4);
+			rb.create(upper_side, lower_side);
 			rb.paint_line({ upper_side - 1, lower_side - 1 }, { 0, lower_side - 1 }, border_color);
 			rb.paint_line({ upper_side - 1, lower_side - 1 }, { upper_side - 1, 0 }, border_color);
 
-			lb.create(lower_side, lower_side, 4);
+			lb.create(lower_side, lower_side);
 			lb.fill({ 0, 0, 0, 0 });
 
 			lb.paint_line({ 0, 0 }, { lower_side - 1, lower_side - 1 }, border_color);
 
-			lb_complement.create(lower_side, lower_side, 4);
+			lb_complement.create(lower_side, lower_side);
 			lb_complement.paint_line({ 0, lower_side - 1 }, { lower_side - 1, lower_side - 1 }, border_color);
 			lb_complement.paint_line({ 0, lower_side - 1 }, { 0, 0 }, border_color);
 
@@ -169,19 +169,19 @@ namespace resource_setups {
 
 			augs::image lb_complement;
 
-			lt.create(lower_side, upper_side, 4);
+			lt.create(lower_side, upper_side);
 			lt.paint_line({ inside_border_padding, inside_border_padding }, { inside_border_padding, upper_side - 1 }, border_color);
 			lt.paint_line({ inside_border_padding, inside_border_padding }, { lower_side - 1, inside_border_padding }, border_color);
 
-			rt.create(upper_side, upper_side, 4);
+			rt.create(upper_side, upper_side);
 			rt.fill({ 0, 0, 0, 0 });
 			rt.paint_line({ 0, inside_border_padding }, { upper_side - 1 - inside_border_padding, upper_side - 1 }, border_color);
 
-			rb.create(upper_side, lower_side, 4);
+			rb.create(upper_side, lower_side);
 			rb.paint_line({ upper_side - 1 - inside_border_padding, lower_side - 1 - inside_border_padding }, { 0, lower_side - 1 - inside_border_padding }, border_color);
 			rb.paint_line({ upper_side - 1 - inside_border_padding, lower_side - 1 - inside_border_padding }, { upper_side - 1 - inside_border_padding, 0 }, border_color);
 
-			lb.create(lower_side, lower_side, 4);
+			lb.create(lower_side, lower_side);
 			lb.fill({ 0, 0, 0, 0 });
 			lb.paint_line({ inside_border_padding, 0 }, { lower_side - 1, lower_side - 1 - inside_border_padding }, border_color);
 
@@ -192,7 +192,7 @@ namespace resource_setups {
 		}
 
 		augs::image inside;
-		inside.create(100, 100, 4);
+		inside.create(100u, 100u);
 		inside.fill(inside_color);
 		manager.create(inside_tex, inside);
 	}

@@ -21,10 +21,10 @@ namespace resource_setups {
 		const rgba border_color,
 		const rgba inside_color,
 
-		const int lower_side,
-		const int upper_side,
+		const unsigned lower_side,
+		const unsigned upper_side,
 
-		const int inside_border_padding,
+		const unsigned inside_border_padding,
 		const bool make_lb_complement
 	);
 }

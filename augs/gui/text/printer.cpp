@@ -141,7 +141,7 @@ namespace augs {
 							auto& g = *d.cached[i];
 
 							/* if it's not a whitespace */
-							if (g.sprite.tex.get_rect().good()) {
+							if (g.sprite.tex.get_size().non_zero()) {
 								rgba charcolor = style(colors[i]).color;
 
 								/* if a character is between selection bounds, we change its color to the one specified in selected_text_color
