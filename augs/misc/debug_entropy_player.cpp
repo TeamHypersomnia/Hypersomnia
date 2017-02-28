@@ -56,7 +56,7 @@ namespace augs {
 
 	template <class T>
 	void debug_entropy_player<T>::record_and_save_this_session(const std::string& folder, const std::string& filename) {
-		const auto target_folder = folder + augs::get_timestamp();
+		const auto target_folder = folder + augs::get_timestamp() + "/";
 		augs::create_directories(target_folder);
 
 		live_saving_filename = target_folder + "/" + filename;

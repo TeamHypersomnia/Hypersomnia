@@ -46,12 +46,16 @@ void thunder_system::advance(
 	for (thunder& t : thunders) {
 		t.until_next_branching_ms -= dt.in_milliseconds();
 
-		if (t.until_next_branching_ms <= 0.f) {
+		const bool should_branch_now = t.until_next_branching_ms <= 0.f;
+
+		if (should_branch_now) {
 			t.until_next_branching_ms = rng.randval(t.in.delay_between_branches_ms);
 
 			bool found_suitable_parent = false;
 
-			for (auto& b : t.branches) {
+			for (size_t i = 0; i < t.branches.size(); ++i) {
+				auto& b = t.branches[i];
+
 				const bool is_leaf = b.children.empty();
 
 				if (is_leaf && b.can_have_children) {
@@ -78,7 +82,7 @@ void thunder_system::advance(
 							child.to = raycast.intersection;
 						}
 
-						b.children.push_back(b.children.size());
+						b.children.push_back(t.branches.size());
 						t.branches.push_back(child);
 						++t.num_active_branches;
 						--t.in.max_all_spawned_branches;
