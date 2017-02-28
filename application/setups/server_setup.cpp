@@ -96,7 +96,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 	}
 
 	if (cfg.get_input_recording_mode() != input_recording_type::DISABLED) {
-		//if (player.try_to_load_or_save_new_session("server_sessions/", "server_recorded.inputs")) {
+		//if (player.try_to_load_or_save_new_session("generated/server_sessions/", "server_recorded.inputs")) {
 		//	timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
 		//}
 	}

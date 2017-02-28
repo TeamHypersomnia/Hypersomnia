@@ -91,7 +91,7 @@ namespace augs {
 
 				ensure(new_entity_entropy.empty());
 
-				if (!augs::read_vector_of_objects(ar, new_entity_entropy, unsigned short())) {
+				if (!augs::read_object(ar, new_entity_entropy, unsigned short())) {
 					return false;
 				}
 			}
@@ -119,7 +119,7 @@ namespace augs {
 			}
 		}
 
-		if (!augs::read_vector_of_objects(ar, storage.transfer_requests, unsigned short())) {
+		if (!augs::read_object(ar, storage.transfer_requests, unsigned short())) {
 			return false;
 		}
 
@@ -136,7 +136,7 @@ namespace augs {
 
 			for (const auto& per_entity : storage.intents_per_entity) {
 				augs::write_object(ar, per_entity.first);
-				augs::write_vector_of_objects(ar, per_entity.second, unsigned short());
+				augs::write_object(ar, per_entity.second, unsigned short());
 			}
 		}
 
@@ -150,7 +150,7 @@ namespace augs {
 			}
 		}
 
-		augs::write_vector_of_objects(ar, storage.transfer_requests, unsigned short());
+		augs::write_object(ar, storage.transfer_requests, unsigned short());
 	}
 
 	template<class A>

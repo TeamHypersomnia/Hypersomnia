@@ -16,9 +16,9 @@ namespace augs {
 	template<class, typename...>
 	class pool_with_meta;
 
-	template<class T, bool _or = false>
+	template<class T>
 	void verify_type() {
-		static_assert(is_memcpy_safe<T>::value || _or, "Attempt to serialize a non-trivially copyable type");
+		static_assert(is_memcpy_safe<T>::value, "Attempt to serialize a non-trivially copyable type");
 	}
 
 	template<class A, class T, class...>
@@ -62,18 +62,6 @@ namespace augs {
 		write_bytes(ar, &storage, 1);
 	}
 
-	//template<class T, class... Args>
-	//void read_object(augs::stream& ar, T& storage, Args... args) {
-	//	verify_type<T, std::is_same<T, augs::stream>::value>();
-	//	ar.read(storage, args...);
-	//}
-	//
-	//template<class T, class... Args>
-	//void write_object(augs::stream& ar, const T& storage, Args... args) {
-	//	verify_type<T, std::is_same<T, augs::stream>::value>();
-	//	ar.write(storage, args...);
-	//}
-
 	template<class... Args>
 	void write_object(augs::stream& ar, const augs::stream& storage) {
 		ar.write(storage);
@@ -110,8 +98,9 @@ namespace augs {
 		char compressed_storage[(count - 1) / 8 + 1];
 		auto result = read_bytes(ar, compressed_storage, sizeof(compressed_storage));
 
-		for (size_t bit = 0; bit < count; ++bit)
+		for (size_t bit = 0; bit < count; ++bit) {
 			storage[bit] = (compressed_storage[bit / 8] >> (bit % 8)) & 1;
+		}
 
 		return result;
 	}
@@ -123,19 +112,27 @@ namespace augs {
 		char compressed_storage[(count - 1) / 8 + 1];
 		std::memset(compressed_storage, 0, sizeof(compressed_storage));
 
-		for (size_t bit = 0; bit < count; ++bit)
-			if(storage[bit])
+		for (size_t bit = 0; bit < count; ++bit) {
+			if (storage[bit]) {
 				compressed_storage[bit / 8] |= 1 << (bit % 8);
+			}
+		}
 
 		write_bytes(ar, compressed_storage, sizeof(compressed_storage));
 	}
 
 	template<class A, class T, class vector_size_type = size_t>
-	bool read_object(A& ar, std::vector<T>& storage, vector_size_type = vector_size_type()) {
+	bool read_object(
+		A& ar, 
+		std::vector<T>& storage, 
+		vector_size_type = vector_size_type(),
+		const std::enable_if_t<is_memcpy_safe<T>::value>* const dummy = nullptr
+	) {
 		vector_size_type s;
 
-		if (!read_object(ar, s))
+		if (!read_object(ar, s)) {
 			return false;
+		}
 
 		storage.resize(s);
 
@@ -143,19 +140,65 @@ namespace augs {
 	}
 
 	template<class A, class T, class vector_size_type = size_t>
-	void write_object(A& ar, const std::vector<T>& storage, vector_size_type = vector_size_type()) {
+	void write_object(
+		A& ar, 
+		const std::vector<T>& storage, 
+		vector_size_type = vector_size_type(),
+		const std::enable_if_t<is_memcpy_safe<T>::value>* const dummy = nullptr
+	) {
 		ensure(storage.size() <= std::numeric_limits<vector_size_type>::max());
 
 		write_object(ar, static_cast<vector_size_type>(storage.size()));
 		write_bytes(ar, storage.data(), storage.size());
 	}
 
+	template<class A, class T, class vector_size_type = size_t>
+	bool read_object(
+		A& ar,
+		std::vector<T>& storage,
+		vector_size_type = vector_size_type(),
+		const std::enable_if_t<!is_memcpy_safe<T>::value>* const dummy = nullptr
+	) {
+		vector_size_type s;
+
+		if (!read_object(ar, s)) {
+			return false;
+		}
+
+		storage.resize(s);
+
+		for (auto& obj : storage) {
+			if (!read_object(ar, obj)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	template<class A, class T, class vector_size_type = size_t>
+	void write_object(
+		A& ar,
+		const std::vector<T>& storage,
+		vector_size_type = vector_size_type(),
+		const std::enable_if_t<!is_memcpy_safe<T>::value>* const dummy = nullptr
+	) {
+		ensure(storage.size() <= std::numeric_limits<vector_size_type>::max());
+
+		write_object(ar, static_cast<vector_size_type>(storage.size()));
+
+		for (const auto& obj : storage) {
+			write_object(ar, obj);
+		}
+	}
+
 	template<class A, class string_size_type = size_t>
 	bool read_object(A& ar, std::string& storage, string_size_type = string_size_type()) {
 		string_size_type s;
 
-		if (!read_object(ar, s))
+		if (!read_object(ar, s)) {
 			return false;
+		}
 
 		storage.resize(s);
 
@@ -170,39 +213,18 @@ namespace augs {
 		write_bytes(ar, storage.data(), storage.size());
 	}
 
-	template<class A, class T, class vector_size_type = size_t>
-	bool read_vector_of_objects(A& ar, std::vector<T>& storage, vector_size_type = vector_size_type()) {
-		vector_size_type s;
-
-		if (!read_object(ar, s))
-			return false;
-
-		storage.resize(s);
-		
-		for (auto& obj : storage)
-			if (!read_object(ar, obj))
-				return false;
-
-		return true;
-	}
-
-	template<class A, class T, class vector_size_type = size_t>
-	void write_vector_of_objects(A& ar, const std::vector<T>& storage, vector_size_type = vector_size_type()) {
-		ensure(storage.size() <= std::numeric_limits<vector_size_type>::max());
-
-		write_object(ar, static_cast<vector_size_type>(storage.size()));
-
-		for (const auto& obj : storage)
-			write_object(ar, obj);
-	}
-
 	template<class A, class T, class...>
 	bool read_with_capacity(A& ar, std::vector<T>& storage) {
 		size_t c;
 		size_t s;
 
-		if(!read_object(ar, c)) return false;
-		if(!read_object(ar, s)) return false;
+		if (!read_object(ar, c)) {
+			return false;
+		}
+
+		if (!read_object(ar, s)) {
+			return false;
+		}
 
 		storage.reserve(c);
 		storage.resize(s);
@@ -253,7 +275,10 @@ namespace augs {
 		bool result = true;
 		
 		for_each_in_tuple(storage, [&ar, &result](auto& element) {
-			if (!result) return;
+			if (!result) {
+				return;
+			}
+
 			result = result && read_object(ar, element);
 		});
 

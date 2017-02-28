@@ -23,12 +23,12 @@ namespace augs {
 	template<class A>
 	bool read_object(A& ar, machine_entropy& s) {
 		if(!read_object(ar, s.local)) return false;
-		return read_vector_of_objects(ar, s.remote);
+		return read_object(ar, s.remote);
 	}
 
 	template<class A>
 	void write_object(A& ar, const machine_entropy& s) {
 		write_object(ar, s.local);
-		write_vector_of_objects(ar, s.remote);
+		write_object(ar, s.remote);
 	}
 }

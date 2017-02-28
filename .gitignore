@@ -166,11 +166,9 @@ pip-log.txt
 /ReleaseDebug
 /ReleaseExe
 /RelDeb
-/output/sessions
-/output/server_sessions
 /output/saves
 /output/hypersomnia/music
-/output/logs
+/output/generated
 
 *.log
 *.tlog
