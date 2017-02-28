@@ -17,7 +17,7 @@ namespace augs {
 	}
 
 	template <class T>
-	void write_file_binary(std::string filename, T& target) {
+	void create_binary_file(std::string filename, T& target) {
 		std::ofstream out(filename, std::ios::out | std::ios::binary);
 		out.write(target.data(), target.size());
 	}

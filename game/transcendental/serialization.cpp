@@ -34,7 +34,7 @@ void cosmos::save_to_file(const std::string& filename) {
 	profiler.serialization_pass.end_measurement();
 	profiler.writing_savefile.new_measurement();
 
-	augs::write_file_binary(filename, reserved_memory.buf);
+	augs::create_binary_file(filename, reserved_memory);
 
 	profiler.writing_savefile.end_measurement();
 	profiler.total_save.end_measurement();
@@ -53,7 +53,7 @@ bool cosmos::load_from_file(const std::string& filename) {
 
 		profiler.reading_savefile.new_measurement();
 
-		augs::assign_file_contents_binary(filename, stream.buf);
+		augs::assign_file_contents_binary(filename, stream);
 
 		profiler.reading_savefile.end_measurement();
 

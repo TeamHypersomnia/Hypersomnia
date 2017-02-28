@@ -3,7 +3,7 @@
 
 namespace augs {
 	std::vector<std::string> get_file_lines(const std::string& filename) {
-		std::ifstream input("filename.ext");
+		std::ifstream input(filename);
 
 		std::vector<std::string> out;
 
