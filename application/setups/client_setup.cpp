@@ -67,7 +67,7 @@ void client_setup::init(
 	}
 
 	if (cfg.get_input_recording_mode() != input_recording_type::DISABLED) {
-		//if (player.try_to_load_or_save_new_session("sessions/", recording_filename)) {
+		//if (player.try_to_load_or_save_new_session("generated/sessions/", recording_filename)) {
 		//	timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
 		//}
 	}

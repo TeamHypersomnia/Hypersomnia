@@ -22,7 +22,7 @@
 #include "augs/filesystem/directory.h"
 
 int main(int argc, char** argv) {
-	augs::create_directories("logs/");
+	augs::create_directories("generated/logs/");
 
 	augs::global_libraries::init();
 	augs::global_libraries::run_googletest(argc, argv);
@@ -117,6 +117,6 @@ int main(int argc, char** argv) {
 
 	augs::global_libraries::deinit();
 	
-	global_log::save_complete_log("logs/successful_exit_debug_log.txt");
+	global_log::save_complete_log("generated/logs/successful_exit_debug_log.txt");
 	return 0;
 }

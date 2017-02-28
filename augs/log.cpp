@@ -69,7 +69,7 @@ void LOG(const std::string& f) {
 
 	std::cout << f << std::endl;
 #if LOG_TO_FILE
-	std::ofstream recording_file("logs/live_debug.txt", std::ios::out | std::ios::app);
+	std::ofstream recording_file("generated/logs/live_debug.txt", std::ios::out | std::ios::app);
 	recording_file << f << std::endl;
 #endif
 #endif
@@ -84,7 +84,7 @@ void LOG_COLOR(const console_color c, const std::string& f) {
 
 	augs::colored_print(c, f.c_str());
 #if LOG_TO_FILE
-	std::ofstream recording_file("logs/live_debug.txt", std::ios::out | std::ios::app);
+	std::ofstream recording_file("generated/logs/live_debug.txt", std::ios::out | std::ios::app);
 	recording_file << f << std::endl;
 #endif
 #endif

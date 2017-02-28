@@ -323,6 +323,7 @@
     <ClCompile Include="3rdparty\rectpack2D\src\pack.cpp" />
     <ClCompile Include="application\call_config_script.cpp" />
     <ClCompile Include="application\config_lua_table.cpp" />
+    <ClCompile Include="application\content_generation\neon_maps.cpp" />
     <ClCompile Include="application\setups\director_setup.cpp" />
     <ClCompile Include="application\setups\menu_setup.cpp" />
     <ClCompile Include="application\ui\app_ui_root.cpp" />
@@ -1028,6 +1029,7 @@
     <ClInclude Include="3rdparty\rectpack2D\src\pack.h" />
     <ClInclude Include="application\call_config_script.h" />
     <ClInclude Include="application\config_lua_table.h" />
+    <ClInclude Include="application\content_generation\neon_maps.h" />
     <ClInclude Include="application\menu_button_type.h" />
     <ClInclude Include="application\setups\client_setup.h" />
     <ClInclude Include="application\setups\determinism_test_setup.h" />

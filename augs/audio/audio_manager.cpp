@@ -72,7 +72,7 @@ namespace augs {
 
 		LOG(devices);
 
-		augs::create_text_file(std::string("logs/audio_devices.txt"), devices);
+		augs::create_text_file(std::string("generated/logs/audio_devices.txt"), devices);
 
 		ALint hrtf_status;
 		alcGetIntegerv(device, ALC_HRTF_STATUS_SOFT, 1, &hrtf_status);

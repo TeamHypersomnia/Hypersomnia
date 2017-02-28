@@ -17,14 +17,17 @@ if config_table.window_border == 0 or config_table.fullscreen == 1 then
 end
 
 global_gl_window:create(
-	rect_xywh_i(config_table.window_x, 
-				config_table.window_y, 
-				config_table.resolution_w, 
-				config_table.resolution_h), 
+	rect_xywh_i(
+		config_table.window_x, 
+		config_table.window_y, 
+		config_table.resolution_w, 
+		config_table.resolution_h
+	), 
 	enabled_window_border, 
 	config_table.window_name, 
 	config_table.doublebuffer, 
-	config_table.bpp)
+	config_table.bpp
+)
 	
 global_gl_window:set_vsync(0)
 
