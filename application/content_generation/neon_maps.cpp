@@ -8,7 +8,11 @@
 #include "augs/ensure.h"
 #include "augs/misc/streams.h"
 
+#include "augs/texture_baker/image.h"
+
 namespace fs = std::experimental::filesystem;
+
+void make_neon(const neon_map_metadata& meta, augs::image& source);
 
 void regenerate_neon_maps() {
 	const auto neon_directory = "generated/neon_maps/";
@@ -81,10 +85,16 @@ void regenerate_neon_maps() {
 		}
 
 		if (should_regenerate) {
-			augs::create_binary_file(neon_map_meta_filename, new_meta_stream);
-			augs::create_binary_file(neon_map_filename, new_meta_stream);
-
 			LOG("Regenerating neon map for %x", source_path.string());
+
+			augs::image source_image;
+			source_image.from_file(source_path.string());
+			
+			make_neon(new_meta, source_image);
+
+			source_image.save(neon_map_filename);
+
+			augs::create_binary_file(neon_map_meta_filename, new_meta_stream);
 		}
 
 		// skip parameters line
@@ -93,4 +103,10 @@ void regenerate_neon_maps() {
 		// skip separating newline
 		++current_line;
 	}
+}
+
+
+
+void make_neon(const neon_map_metadata& meta, augs::image& source) {
+
 }

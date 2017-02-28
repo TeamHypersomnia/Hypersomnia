@@ -5,6 +5,9 @@
 #include "augs/texture_baker/font.h"
 #include "augs/window_framework/window.h"
 #include "game/detail/particle_types.h"
+#include <experimental\filesystem>
+
+namespace fs = std::experimental::filesystem;
 
 using namespace augs;
 
@@ -319,16 +322,13 @@ namespace resources {
 
 	texture_with_image& manager::create(
 		const assets::texture_id id, 
-		std::string filename,
+		const std::string filename,
 		const bool generate_desaturated
 	) {
 		texture_with_image& tex = textures[id];
 		tex.set_from_image_file(filename);
 
-		filename.resize(filename.size() - 4);
-		
-		const auto filename_root = filename;
-		const auto neon_map_filename = filename + "_neon_map.png";
+		const auto neon_map_filename = "generated/neon_maps/" + fs::path(filename).filename().string();
 
 		if (augs::file_exists(neon_map_filename)) {
 			texture_with_image& neon_tex = neon_maps[id];

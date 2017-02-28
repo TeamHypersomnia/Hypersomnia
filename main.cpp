@@ -29,11 +29,11 @@ int main(int argc, char** argv) {
 	augs::global_libraries::init();
 	augs::global_libraries::run_googletest(argc, argv);
 
-	LOG("Checking content...");
+	LOG("\n--------------------------------------------\nChecking content integrity...");
 
 	regenerate_neon_maps();
 
-	LOG("Content regenerated successfully.");
+	LOG("Content regenerated successfully.\n--------------------------------------------\n");
 
 	augs::lua_state_raii lua;
 	bind_game_and_augs(lua);
