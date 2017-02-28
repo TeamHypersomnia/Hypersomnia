@@ -15,10 +15,15 @@ struct hsv {
 
 struct rgba {
 	struct rgb_type {
-		rgba_channel r, g, b;
+		rgba_channel r;
+		rgba_channel g;
+		rgba_channel b;
 	};
 
-	rgba_channel r, g, b, a;
+	rgba_channel r;
+	rgba_channel g;
+	rgba_channel b;
+	rgba_channel a;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
@@ -65,10 +70,13 @@ struct rgba {
 	hsv get_hsv() const;
 	rgba get_desaturated() const;
 
+	rgba_channel& operator[](const size_t index);
+	const rgba_channel& operator[](const size_t index) const;
+
 	rgb_type& rgb();
 	const rgb_type& rgb() const;
 
-	rgba& set_hsv(hsv);
+	rgba& set_hsv(const hsv);
 };
 
 extern const rgba ltblue;

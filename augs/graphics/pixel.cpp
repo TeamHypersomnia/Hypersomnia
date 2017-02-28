@@ -242,6 +242,14 @@ rgba rgba::get_desaturated() const {
 	return { avg, avg, avg, a };
 }
 
+rgba_channel& rgba::operator[](const size_t index) {
+	return (&r)[index];
+}
+
+const rgba_channel& rgba::operator[](const size_t index) const {
+	return (&r)[index];
+}
+
 rgba::rgb_type& rgba::rgb() {
 	return *(rgb_type*)this;
 }

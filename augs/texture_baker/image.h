@@ -9,7 +9,7 @@ namespace augs {
 		vec2u size;
 
 	public:
-		void create(const vec2u);
+		void create(const vec2u image_size);
 
 		template <class A, class B>
 		void create(const A x, const B y) {
@@ -72,6 +72,9 @@ namespace augs {
 		void save(const std::string& filename) const;
 		
 		vec2u get_size() const;
+		unsigned get_rows() const;
+		unsigned get_columns() const;
+
 		bool in_bounds(const vec2u) const;
 		std::vector<vec2i> get_polygonized() const;
 		const rgba_channel* get_data() const;

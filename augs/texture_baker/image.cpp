@@ -374,6 +374,14 @@ namespace augs {
 		return size;
 	}
 
+	unsigned image::get_rows() const {
+		return size.y;
+	}
+
+	unsigned image::get_columns() const {
+		return size.x;
+	}
+
 	image image::get_desaturated() const {
 		image desaturated;
 		desaturated.create(size);
