@@ -12,7 +12,10 @@
 
 namespace fs = std::experimental::filesystem;
 
-void make_neon(const neon_map_metadata& meta, augs::image& source);
+void make_neon(
+	const neon_map_metadata& meta, 
+	augs::image& source
+);
 
 void regenerate_neon_maps() {
 	const auto neon_directory = "generated/neon_maps/";
@@ -55,7 +58,13 @@ void regenerate_neon_maps() {
 		++current_line;
 		
 		std::istringstream in(lines[current_line]);
-		in >> new_meta.standard_deviation >> new_meta.radius_towards_x_axis >> new_meta.radius_towards_y_axis >> new_meta.amplification;
+		
+		in 
+			>> new_meta.standard_deviation 
+			>> new_meta.radius_towards_x_axis 
+			>> new_meta.radius_towards_y_axis 
+			>> new_meta.amplification
+		;
 
 		const auto neon_map_filename = neon_directory + source_path.filename().string();
 		const auto neon_map_meta_filename = neon_directory + source_path.filename().replace_extension(".meta").string();
@@ -105,8 +114,9 @@ void regenerate_neon_maps() {
 	}
 }
 
-
-
-void make_neon(const neon_map_metadata& meta, augs::image& source) {
+void make_neon(
+	const neon_map_metadata& meta, 
+	augs::image& source
+) {
 
 }
