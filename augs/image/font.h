@@ -45,7 +45,7 @@ namespace augs {
 
 		void free_images();
 
-		void add_to_atlas(atlas&);
+		void add_to_atlas(texture_atlas&);
 
 		// TODO: Remove placeholders
 

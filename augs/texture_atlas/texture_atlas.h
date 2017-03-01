@@ -9,7 +9,7 @@ namespace augs {
 	class renderer;
 	class texture_with_image;
 
-	class atlas {
+	class texture_atlas {
 		unsigned id = 0;
 		bool mipmaps = false, lin = false, rep = true, built = false;
 		std::vector<bin> bins;
@@ -17,7 +17,7 @@ namespace augs {
 		friend class renderer;
 
 	public:
-		~atlas();
+		~texture_atlas();
 
 		std::vector<texture_with_image*> textures;
 

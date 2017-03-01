@@ -130,7 +130,7 @@ namespace augs {
 			glyphs[i].sprite.img.destroy();
 	}
 
-	void font::add_to_atlas(atlas& atl) {
+	void font::add_to_atlas(texture_atlas& atl) {
 		for (auto& g : glyphs) {
 			if (g.sprite.img.get_size().x) {
 				g.sprite.tex.set(g.sprite.img);

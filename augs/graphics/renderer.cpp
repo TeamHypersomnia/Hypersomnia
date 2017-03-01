@@ -325,7 +325,7 @@ namespace augs {
 		glBindTexture(GL_TEXTURE_2D, f.get_texture_id()); glerr;
 	}
 
-	void renderer::bind_texture(const atlas& atl) {
+	void renderer::bind_texture(const texture_atlas& atl) {
 		glBindTexture(GL_TEXTURE_2D, atl.id); glerr;
 	}
 

@@ -89,7 +89,7 @@ namespace resources {
 		return &(*it).second;
 	}
 
-	atlas* manager::find(assets::atlas_id id) {
+	texture_atlas* manager::find(assets::atlas_id id) {
 		auto it = atlases.find(id);
 		if (it == atlases.end()) return nullptr;
 
@@ -175,8 +175,8 @@ namespace resources {
 		return sound_responses[id];
 	}
 
-	atlas& manager::create(const assets::atlas_id id, const unsigned atlas_creation_mode_flags) {
-		atlas& atl = atlases[id];
+	texture_atlas& manager::create(const assets::atlas_id id, const unsigned atlas_creation_mode_flags) {
+		texture_atlas& atl = atlases[id];
 
 		if (atlas_creation_mode_flags & atlas_creation_mode::FROM_ALL_TEXTURES) {
 			for (const auto& tex : textures) {

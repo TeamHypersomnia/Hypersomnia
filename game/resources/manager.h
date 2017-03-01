@@ -42,7 +42,7 @@ namespace resources {
 
 		sound_response& create(const assets::sound_response_id);
 		augs::sound_buffer& create(const assets::sound_buffer_id);
-		augs::atlas& create(assets::atlas_id, unsigned atlas_creation_mode_flags);
+		augs::texture_atlas& create(assets::atlas_id, unsigned atlas_creation_mode_flags);
 		augs::font& create(assets::font_id);
 		
 		void associate_neon_map(
@@ -83,7 +83,7 @@ namespace resources {
 		augs::texture_with_image* find_neon_map(const assets::texture_id);
 		augs::texture_with_image* find_desaturated(const assets::texture_id);
 		augs::font* find(assets::font_id);
-		augs::atlas* find(assets::atlas_id);
+		augs::texture_atlas* find(assets::atlas_id);
 		augs::graphics::shader_program* find(assets::program_id);
 		animation* find(assets::animation_id);
 		animation_response* find(assets::animation_response_id);
@@ -106,7 +106,7 @@ namespace resources {
 		augs::enum_associative_array<assets::texture_id, augs::texture_with_image> neon_maps;
 		augs::enum_associative_array<assets::texture_id, augs::texture_with_image> desaturated_textures;
 		augs::enum_associative_array<assets::font_id, augs::font> fonts;
-		augs::enum_associative_array<assets::atlas_id, augs::atlas> atlases;
+		augs::enum_associative_array<assets::atlas_id, augs::texture_atlas> atlases;
 		augs::enum_associative_array<assets::shader_id, augs::graphics::shader> shaders;
 		augs::enum_associative_array<assets::program_id, augs::graphics::shader_program> programs;
 		augs::enum_associative_array<assets::behaviour_tree_id, behaviour_tree> behaviour_trees;
