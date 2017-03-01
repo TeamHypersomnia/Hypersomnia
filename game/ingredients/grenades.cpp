@@ -21,30 +21,30 @@ namespace prefabs {
 		const auto grenade_spoon = world.create_entity("grenade_spoon");
 		const auto grenade = world.create_entity("force_grenade");
 
-		{
-			auto& sprite = grenade_spoon += components::sprite();
-			auto& render = grenade_spoon += components::render();
-
-			components::fixtures colliders;
-
-			render.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-			sprite.set(assets::texture_id::GRENADE_SPOON);
-
-			auto& fixture = colliders.new_collider();
-
-			fixture.shape.from_renderable(grenade_spoon);
-			fixture.density = 0.6f;
-			fixture.filter = filters::renderable();
-			fixture.sensor = true;
-
-			vec2 offset(-10, -10);
-			colliders.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
-
-			grenade_spoon += colliders;
-
-			grenade_spoon.get<components::fixtures>().set_owner_body(grenade);
-		}
+		//{
+		//	auto& sprite = grenade_spoon += components::sprite();
+		//	auto& render = grenade_spoon += components::render();
+		//
+		//	components::fixtures colliders;
+		//
+		//	render.layer = render_layer::SMALL_DYNAMIC_BODY;
+		//
+		//	sprite.set(assets::texture_id::GRENADE_SPOON);
+		//
+		//	auto& fixture = colliders.new_collider();
+		//
+		//	fixture.shape.from_renderable(grenade_spoon);
+		//	fixture.density = 0.6f;
+		//	fixture.filter = filters::renderable();
+		//	fixture.sensor = true;
+		//
+		//	vec2 offset(-10, -10);
+		//	colliders.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
+		//
+		//	grenade_spoon += colliders;
+		//
+		//	grenade_spoon.get<components::fixtures>().set_owner_body(grenade);
+		//}
 
 		name_entity(grenade, entity_name::FORCE_GRENADE);
 

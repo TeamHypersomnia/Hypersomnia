@@ -268,6 +268,14 @@ namespace resource_setups {
 		manager.create(assets::texture_id::PED_GRENADE, "hypersomnia/gfx/ped_grenade.png");
 		manager.create(assets::texture_id::INTERFERENCE_GRENADE, "hypersomnia/gfx/interference_grenade.png");
 
+		manager.create(assets::texture_id::FORCE_GRENADE_RELEASED, "hypersomnia/gfx/force_grenade_released.png");
+		manager.create(assets::texture_id::PED_GRENADE_RELEASED, "hypersomnia/gfx/ped_grenade_released.png");
+		manager.create(assets::texture_id::INTERFERENCE_GRENADE_RELEASED, "hypersomnia/gfx/interference_grenade_released.png");
+
+		manager.associate_neon_map(assets::texture_id::FORCE_GRENADE_RELEASED, assets::texture_id::FORCE_GRENADE);
+		manager.associate_neon_map(assets::texture_id::PED_GRENADE_RELEASED, assets::texture_id::PED_GRENADE);
+		manager.associate_neon_map(assets::texture_id::INTERFERENCE_GRENADE_RELEASED, assets::texture_id::INTERFERENCE_GRENADE);
+
 		manager.create_inverse_with_flip(
 			assets::animation_id::TORSO_MOVE,
 			assets::texture_id::TORSO_MOVING_FIRST,

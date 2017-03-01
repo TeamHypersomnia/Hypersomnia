@@ -45,6 +45,11 @@ namespace resources {
 		augs::atlas& create(assets::atlas_id, unsigned atlas_creation_mode_flags);
 		augs::font& create(assets::font_id);
 		
+		void associate_neon_map(
+			const assets::texture_id take_neon_map_from, 
+			const assets::texture_id target_to_be_assigned
+		);
+
 		augs::texture_with_image& create(
 			const assets::texture_id, 
 			std::string filename,

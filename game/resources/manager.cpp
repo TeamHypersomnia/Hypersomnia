@@ -209,6 +209,13 @@ namespace resources {
 		return font;
 	}
 
+	void manager::associate_neon_map(
+		const assets::texture_id target_to_be_assigned,
+		const assets::texture_id take_neon_map_from
+	) {
+		neon_maps[target_to_be_assigned] = neon_maps[take_neon_map_from];
+	}
+
 	texture_with_image& manager::create(const assets::texture_id id, const image img) {
 		ensure(textures.find(id) == textures.end());
 		texture_with_image& tex = textures[id];
