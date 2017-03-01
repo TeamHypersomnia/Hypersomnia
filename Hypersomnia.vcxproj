@@ -340,6 +340,9 @@
     <ClCompile Include="augs\gui\formatted_text.cpp" />
     <ClCompile Include="augs\gui\rect.cpp" />
     <ClCompile Include="augs\gui\text_drawer.cpp" />
+    <ClCompile Include="augs\image\font.cpp" />
+    <ClCompile Include="augs\image\image.cpp" />
+    <ClCompile Include="augs\image\polygonize_sprite.cpp" />
     <ClCompile Include="augs\misc\action_list.cpp" />
     <ClCompile Include="augs\misc\http_requests.cpp" />
     <ClCompile Include="augs\misc\delta_compression.cpp" />
@@ -359,9 +362,6 @@
     <ClCompile Include="augs\network\reliable_channel.cpp" />
     <ClCompile Include="application\setups\client_setup.cpp" />
     <ClCompile Include="application\setups\determinism_test_setup.cpp" />
-    <ClCompile Include="augs\texture_atlas\font.cpp" />
-    <ClCompile Include="augs\texture_atlas\image.cpp" />
-    <ClCompile Include="augs\texture_atlas\polygonize_sprite.cpp" />
     <ClCompile Include="augs\texture_atlas\texture.cpp" />
     <ClCompile Include="augs\texture_atlas\texture_atlas.cpp" />
     <ClCompile Include="augs\texture_atlas\texture_with_image.cpp" />
@@ -1081,6 +1081,8 @@
     <ClInclude Include="augs\gui\gui_flags.h" />
     <ClInclude Include="augs\gui\middlescrolling.h" />
     <ClInclude Include="augs\gui\text_drawer.h" />
+    <ClInclude Include="augs\image\font.h" />
+    <ClInclude Include="augs\image\image.h" />
     <ClInclude Include="augs\misc\action.h" />
     <ClInclude Include="augs\misc\action_list.h" />
     <ClInclude Include="augs\misc\easier_handle_getters_mixin.h" />
@@ -1125,8 +1127,6 @@
     <ClInclude Include="augs\templates\tuple_of.h" />
     <ClInclude Include="augs\templates\type_in_pack.h" />
     <ClInclude Include="augs\templates\type_mod_templates.h" />
-    <ClInclude Include="augs\texture_atlas\font.h" />
-    <ClInclude Include="augs\texture_atlas\image.h" />
     <ClInclude Include="augs\texture_atlas\texture.h" />
     <ClInclude Include="augs\texture_atlas\texture_atlas.h" />
     <ClInclude Include="augs\texture_atlas\texture_with_image.h" />
