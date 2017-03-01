@@ -363,7 +363,7 @@
     <ClCompile Include="augs\texture_atlas\image.cpp" />
     <ClCompile Include="augs\texture_atlas\polygonize_sprite.cpp" />
     <ClCompile Include="augs\texture_atlas\texture.cpp" />
-    <ClCompile Include="augs\texture_atlas\texture_baker.cpp" />
+    <ClCompile Include="augs\texture_atlas\texture_atlas.cpp" />
     <ClCompile Include="augs\texture_atlas\texture_with_image.cpp" />
     <ClCompile Include="augs\tweaker.cpp" />
     <ClCompile Include="game\components\flags_component.cpp" />
@@ -1128,7 +1128,7 @@
     <ClInclude Include="augs\texture_atlas\font.h" />
     <ClInclude Include="augs\texture_atlas\image.h" />
     <ClInclude Include="augs\texture_atlas\texture.h" />
-    <ClInclude Include="augs\texture_atlas\texture_baker.h" />
+    <ClInclude Include="augs\texture_atlas\texture_atlas.h" />
     <ClInclude Include="augs\texture_atlas\texture_with_image.h" />
     <ClInclude Include="augs\tweaker.h" />
     <ClInclude Include="augs\zeroed_pod.h" />
