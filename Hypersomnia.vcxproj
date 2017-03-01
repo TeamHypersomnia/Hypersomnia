@@ -342,7 +342,7 @@
     <ClCompile Include="augs\gui\text_drawer.cpp" />
     <ClCompile Include="augs\image\font.cpp" />
     <ClCompile Include="augs\image\image.cpp" />
-    <ClCompile Include="augs\image\polygonize_sprite.cpp" />
+    <ClCompile Include="augs\image\polygonize_image.cpp" />
     <ClCompile Include="augs\misc\action_list.cpp" />
     <ClCompile Include="augs\misc\http_requests.cpp" />
     <ClCompile Include="augs\misc\delta_compression.cpp" />
