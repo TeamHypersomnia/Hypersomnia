@@ -4,7 +4,7 @@
 #include "game/assets/texture_id.h"
 #include "game/resources/manager.h"
 
-#include "augs/texture_baker/texture_with_image.h"
+#include "augs/texture_atlas/texture_with_image.h"
 
 enum class button_corner_type {
 	LT,

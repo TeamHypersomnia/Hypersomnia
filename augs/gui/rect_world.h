@@ -5,8 +5,8 @@
 #include "augs/window_framework/event.h"
 #include "augs/misc/timer.h"
 #include "augs/graphics/pixel.h"
-#include "augs/texture_baker/texture_baker.h"
-#include "augs/texture_baker/font.h"
+#include "augs/texture_atlas/texture_atlas.h"
+#include "augs/image/font.h"
 #include "rect.h"
 
 #include "augs/misc/pool.h"

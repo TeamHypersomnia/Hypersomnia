@@ -8,7 +8,7 @@
 #include "augs/ensure.h"
 #include "augs/misc/streams.h"
 
-#include "augs/texture_baker/image.h"
+#include "augs/image/image.h"
 
 namespace fs = std::experimental::filesystem;
 

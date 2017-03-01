@@ -1,4 +1,4 @@
-#include "image.h"
+#include "augs/image/image.h"
 #include "augs/log.h"
 #include "augs/build_settings/setting_enable_polygonization.h"
 

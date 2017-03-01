@@ -1,6 +1,6 @@
 #pragma once
-#include "augs/texture_baker/texture.h"
-#include "augs/texture_baker/image.h"
+#include "augs/texture_atlas/texture.h"
+#include "augs/image/image.h"
 
 #include "game/components/sprite_component.h"
 

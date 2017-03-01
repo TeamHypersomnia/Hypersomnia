@@ -1,11 +1,11 @@
 #pragma once
 #include <unordered_map>
 #include <memory>
-#include "texture_baker.h"
+#include "augs/texture_atlas/texture_atlas.h"
 
 #include "game/assets/font_id.h"
 
-#include "augs/texture_baker/texture_with_image.h"
+#include "augs/texture_atlas/texture_with_image.h"
 
 struct FT_Glyph_Metrics_;
 typedef FT_Glyph_Metrics_ FT_Glyph_Metrics;

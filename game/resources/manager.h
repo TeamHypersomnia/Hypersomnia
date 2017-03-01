@@ -18,14 +18,14 @@
 #include "game/resources/animation.h"
 #include "game/resources/animation_response.h"
 #include "game/resources/sound_response.h"
-#include "augs/texture_baker/texture_with_image.h"
+#include "augs/texture_atlas/texture_with_image.h"
 #include "game/resources/particle_effect.h"
 #include "game/resources/particle_effect_response.h"
 #include "game/resources/behaviour_tree.h"
 #include "game/resources/tile_layer.h"
 
-#include "augs/texture_baker/texture_baker.h"
-#include "augs/texture_baker/font.h"
+#include "augs/texture_atlas/texture_atlas.h"
+#include "augs/image/font.h"
 #include "augs/graphics/shader.h"
 #include "augs/audio/sound_buffer.h"
 

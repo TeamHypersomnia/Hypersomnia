@@ -1,4 +1,4 @@
-#include "image.h"
+#include "augs/image/image.h"
 #include "3rdparty/lodepng/lodepng.h"
 #include "augs/ensure.h"
 #include "augs/filesystem/directory.h"

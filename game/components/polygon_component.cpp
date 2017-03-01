@@ -1,5 +1,5 @@
 #include "polygon_component.h"
-#include "augs/texture_baker/texture_baker.h"
+#include "augs/texture_atlas/texture_atlas.h"
 
 #include "3rdparty/polypartition/src/polypartition.h"
 

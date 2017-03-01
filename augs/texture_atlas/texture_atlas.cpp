@@ -1,8 +1,8 @@
 #include <GL/OpenGL.h>
 #include "augs/ensure.h"
 
-#include "texture_baker.h"
-#include "augs/texture_baker/texture_with_image.h"
+#include "texture_atlas.h"
+#include "augs/texture_atlas/texture_with_image.h"
 #include "augs/graphics/renderer.h"
 
 namespace augs {

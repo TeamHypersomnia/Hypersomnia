@@ -1,5 +1,5 @@
 #include "sprite_component.h"
-#include "augs/texture_baker/texture_baker.h"
+#include "augs/texture_atlas/texture_atlas.h"
 
 #include "game/components/render_component.h"
 

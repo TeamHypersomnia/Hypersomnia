@@ -2,7 +2,7 @@
 #include <string>
 #include "augs/filesystem/file.h"
 #include <sstream>
-#include "augs/texture_baker/font.h"
+#include "augs/image/font.h"
 #include "augs/window_framework/window.h"
 #include "game/detail/particle_types.h"
 #include <experimental\filesystem>

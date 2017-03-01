@@ -18,7 +18,7 @@
 
 #include "game/view/rendering_scripts/all.h"
 
-#include "texture_baker/font.h"
+#include "augs/image/font.h"
 
 #include "augs/misc/machine_entropy.h"
 #include "game/transcendental/cosmic_entropy.h"

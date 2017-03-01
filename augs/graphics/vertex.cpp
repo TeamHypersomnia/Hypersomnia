@@ -1,5 +1,5 @@
 #include "vertex.h"
-#include "augs/texture_baker/texture_baker.h"
+#include "augs/texture_atlas/texture_atlas.h"
 
 namespace augs {
 	vertex::vertex(vec2 pos, vec2 texcoord, rgba color, augs::texture& tex) :

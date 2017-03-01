@@ -1,5 +1,5 @@
 #include "texture.h"
-#include "image.h"
+#include "augs/image/image.h"
 
 namespace augs {
 	void texture::set_uv_unit(double u, double v) {

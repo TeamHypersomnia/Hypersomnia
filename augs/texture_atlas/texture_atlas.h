@@ -2,7 +2,7 @@
 #include <vector>
 #include "3rdparty/rectpack2D/src/pack.h"
 
-#include "image.h"
+#include "augs/image/image.h"
 #include "texture.h"
 
 namespace augs {

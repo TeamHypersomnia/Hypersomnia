@@ -19,7 +19,7 @@
 #include "game/messages/intent_message.h"
 #include "game/detail/inventory/inventory_utils.h"
 
-#include "texture_baker/font.h"
+#include "augs/image/font.h"
 
 #include "augs/misc/machine_entropy.h"
 #include "game/transcendental/cosmic_entropy.h"
