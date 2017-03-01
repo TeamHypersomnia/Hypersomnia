@@ -271,7 +271,7 @@ void item_button::draw_proc(
 			if (draw_attachments) {
 				size_t attachment_index = 1;
 
-				auto iteration_lambda = [&](const const_entity_handle desc, const inventory_traversal& trav) {
+				const auto iteration_lambda = [&](const const_entity_handle desc, const inventory_traversal& trav) {
 					const auto parent_slot = cosmos[desc.get<components::item>().current_slot];
 
 					if (parent_slot.should_item_inside_keep_physical_body(item)) {
@@ -308,7 +308,7 @@ void item_button::draw_proc(
 		}
 
 		if (f.draw_charges) {
-			auto& item_data = item.get<components::item>();
+			const auto& item_data = item.get<components::item>();
 
 			int considered_charges = item_data.charges;
 
@@ -317,7 +317,6 @@ void item_button::draw_proc(
 			}
 
 			long double bottom_number_val = -1.f;
-			auto* container = item.find<components::container>();
 			bool printing_charge_count = false;
 			bool trim_zero = false;
 

@@ -262,6 +262,8 @@ namespace resource_setups {
 
 		manager.create(assets::texture_id::CAST_HIGHLIGHT, "hypersomnia/gfx/cast_highlight.png");
 
+		manager.create(assets::texture_id::GRENADE_SPOON, "hypersomnia/gfx/grenade_spoon.png");
+
 		manager.create(assets::texture_id::FORCE_GRENADE, "hypersomnia/gfx/force_grenade.png");
 		manager.create(assets::texture_id::PED_GRENADE, "hypersomnia/gfx/ped_grenade.png");
 		manager.create(assets::texture_id::INTERFERENCE_GRENADE, "hypersomnia/gfx/interference_grenade.png");
