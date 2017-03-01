@@ -12,8 +12,8 @@ namespace augs {
 		void create(const vec2u image_size);
 
 		template <class A, class B>
-		void create(const A x, const B y) {
-			create({ x, y });
+		void create(const A columns, const B rows) {
+			create({ columns, rows });
 		}
 
 		void create_from(
@@ -23,7 +23,7 @@ namespace augs {
 			const vec2u size
 		);
 		
-		void fill(const rgba);
+		void fill(const rgba fill_color);
 
 		bool from_file(const std::string& filename);
 		bool from_clipboard();
@@ -65,7 +65,7 @@ namespace augs {
 		
 		void swap_red_and_blue();
 
-		rgba& pixel(const vec2u);
+		rgba& pixel(const vec2u at_coordinates);
 
 		void destroy();
 		
@@ -75,10 +75,10 @@ namespace augs {
 		unsigned get_rows() const;
 		unsigned get_columns() const;
 
-		bool in_bounds(const vec2u) const;
+		bool in_bounds(const vec2u at_coordinates) const;
 		std::vector<vec2i> get_polygonized() const;
 		const rgba_channel* get_data() const;
-		const rgba& pixel(const vec2u) const;
+		const rgba& pixel(const vec2u at_coordinates) const;
 
 		image get_desaturated() const;
 	};
