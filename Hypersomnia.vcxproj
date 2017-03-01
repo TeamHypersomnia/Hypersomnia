@@ -357,10 +357,14 @@
     <ClCompile Include="augs\network\network_server.cpp" />
     <ClCompile Include="augs\network\enet_raii.cpp" />
     <ClCompile Include="augs\network\reliable_channel.cpp" />
-    <ClCompile Include="augs\texture_baker\texture.cpp" />
-    <ClCompile Include="augs\texture_baker\texture_with_image.cpp" />
     <ClCompile Include="application\setups\client_setup.cpp" />
     <ClCompile Include="application\setups\determinism_test_setup.cpp" />
+    <ClCompile Include="augs\texture_atlas\font.cpp" />
+    <ClCompile Include="augs\texture_atlas\image.cpp" />
+    <ClCompile Include="augs\texture_atlas\polygonize_sprite.cpp" />
+    <ClCompile Include="augs\texture_atlas\texture.cpp" />
+    <ClCompile Include="augs\texture_atlas\texture_baker.cpp" />
+    <ClCompile Include="augs\texture_atlas\texture_with_image.cpp" />
     <ClCompile Include="augs\tweaker.cpp" />
     <ClCompile Include="game\components\flags_component.cpp" />
     <ClCompile Include="game\components\gui_element_component.cpp" />
@@ -452,7 +456,6 @@
     <ClCompile Include="augs\misc\variable_delta_timer.cpp" />
     <ClCompile Include="augs\misc\typesafe_sprintf.cpp" />
     <ClCompile Include="augs\templates\templates.cpp" />
-    <ClCompile Include="augs\texture_baker\polygonize_sprite.cpp" />
     <ClCompile Include="augs\window_framework\colored_print.cpp" />
     <ClCompile Include="augs\window_framework\platform_utils.cpp" />
     <ClCompile Include="game\bindings\classes\glwindow_binding.cpp" />
@@ -583,9 +586,6 @@
     <ClCompile Include="augs\misc\timer.cpp" />
     <ClCompile Include="augs\misc\value_animator.cpp" />
     <ClCompile Include="augs\log.cpp" />
-    <ClCompile Include="augs\texture_baker\font.cpp" />
-    <ClCompile Include="augs\texture_baker\image.cpp" />
-    <ClCompile Include="augs\texture_baker\texture_baker.cpp" />
     <ClCompile Include="augs\window_framework\event.cpp" />
     <ClCompile Include="augs\window_framework\window.cpp" />
     <ClCompile Include="application\setups\two_clients_and_server_setup.cpp" />
@@ -1125,8 +1125,11 @@
     <ClInclude Include="augs\templates\tuple_of.h" />
     <ClInclude Include="augs\templates\type_in_pack.h" />
     <ClInclude Include="augs\templates\type_mod_templates.h" />
-    <ClInclude Include="augs\texture_baker\texture.h" />
-    <ClInclude Include="augs\texture_baker\texture_with_image.h" />
+    <ClInclude Include="augs\texture_atlas\font.h" />
+    <ClInclude Include="augs\texture_atlas\image.h" />
+    <ClInclude Include="augs\texture_atlas\texture.h" />
+    <ClInclude Include="augs\texture_atlas\texture_baker.h" />
+    <ClInclude Include="augs\texture_atlas\texture_with_image.h" />
     <ClInclude Include="augs\tweaker.h" />
     <ClInclude Include="augs\zeroed_pod.h" />
     <ClInclude Include="game\assets\sound_buffer_id.h" />
@@ -1449,9 +1452,6 @@
     <ClInclude Include="augs\misc\undoredo.h" />
     <ClInclude Include="augs\misc\value_animator.h" />
     <ClInclude Include="augs\log.h" />
-    <ClInclude Include="augs\texture_baker\font.h" />
-    <ClInclude Include="augs\texture_baker\image.h" />
-    <ClInclude Include="augs\texture_baker\texture_baker.h" />
     <ClInclude Include="augs\window_framework\event.h" />
     <ClInclude Include="augs\window_framework\window.h" />
   </ItemGroup>
