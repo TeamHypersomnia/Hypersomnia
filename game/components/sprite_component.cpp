@@ -37,7 +37,7 @@ namespace components {
 	}
 
 	void sprite::draw(const drawing_input& in,
-		const augs::texture& considered_texture,
+		const augs::texture_atlas_entry& considered_texture,
 		const vec2i target_position,
 		const float final_rotation,
 		const vec2 considered_size) const {

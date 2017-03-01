@@ -217,8 +217,8 @@ namespace assets {
 }
 
 namespace augs {
-	class texture;
+	class texture_atlas_entry;
 }
 
-augs::texture& operator*(const assets::texture_id& id);
+augs::texture_atlas_entry& operator*(const assets::texture_id& id);
 bool operator!(const assets::texture_id& id);

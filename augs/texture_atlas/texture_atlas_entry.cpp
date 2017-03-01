@@ -1,29 +1,29 @@
-#include "texture.h"
+#include "texture_atlas_entry.h"
 #include "augs/image/image.h"
 
 namespace augs {
-	void texture::set_uv_unit(double u, double v) {
+	void texture_atlas_entry::set_uv_unit(double u, double v) {
 		x = float(double(rect.x) * u);
 		y = float(double(rect.y) * v);
 		w = float(double(rect.w) * u);
 		h = float(double(rect.h) * v);
 	}
 
-	texture::texture(const image& img) : rect(rect_xywhf(0, 0, img.get_size().x, img.get_size().y)), ltoa(false) {}
+	texture_atlas_entry::texture_atlas_entry(const image& img) : rect(rect_xywhf(0, 0, img.get_size().x, img.get_size().y)), ltoa(false) {}
 
-	void texture::set(const image& img) {
+	void texture_atlas_entry::set(const image& img) {
 		rect = rect_xywhf(0, 0, img.get_size().x, img.get_size().y);
 	}
 
-	rect_xywhf texture::get_rect() const {
+	rect_xywhf texture_atlas_entry::get_rect() const {
 		return rect;
 	}
 
-	vec2i texture::get_size() const {
+	vec2i texture_atlas_entry::get_size() const {
 		return !rect.flipped ? vec2i(rect.w, rect.h) : vec2i(rect.h, rect.w);
 	}
 
-	void texture::get_atlas_space_uv(float u, float v, float& u_out, float& v_out) const {
+	void texture_atlas_entry::get_atlas_space_uv(float u, float v, float& u_out, float& v_out) const {
 		if (!rect.flipped) {
 			u_out = x + w * u;
 			v_out = y + h * v;
@@ -34,12 +34,12 @@ namespace augs {
 		}
 	}
 
-	void texture::get_atlas_space_uv(vec2& texture_space) const {
+	void texture_atlas_entry::get_atlas_space_uv(vec2& texture_space) const {
 		auto temp = texture_space;
 		get_atlas_space_uv(temp.x, temp.y, texture_space.x, texture_space.y);
 	}
 
-	float texture::get_u(int vertex_num_from_cw_rect) const {
+	float texture_atlas_entry::get_u(int vertex_num_from_cw_rect) const {
 		vertex_num_from_cw_rect %= 4;
 		float u = 0.f;
 
@@ -54,7 +54,7 @@ namespace augs {
 		return x + w * u;
 	}
 
-	float texture::get_v(int vertex_num_from_cw_rect) const {
+	float texture_atlas_entry::get_v(int vertex_num_from_cw_rect) const {
 		vertex_num_from_cw_rect %= 4;
 		float v = 0.f;
 
@@ -69,16 +69,16 @@ namespace augs {
 		return y + h * v;
 	}
 
-	void texture::get_atlas_space_uv(const rects::texture<float> &uv, rects::texture<float>& out) const {
+	void texture_atlas_entry::get_atlas_space_uv(const rects::texture<float> &uv, rects::texture<float>& out) const {
 		get_atlas_space_uv(uv.u1, uv.v1, out.u1, out.v1);
 		get_atlas_space_uv(uv.u2, uv.v2, out.u2, out.v2);
 	}
 
-	float texture::get_u_unit() const {
+	float texture_atlas_entry::get_u_unit() const {
 		return rect.flipped ? h : w;
 	}
 
-	float texture::get_v_unit() const {
+	float texture_atlas_entry::get_v_unit() const {
 		return rect.flipped ? w : h;
 	}
 }

@@ -25,7 +25,7 @@ bool operator!(const assets::font_id& id) {
 	return get_resource_manager().find(id) == nullptr;
 }
 
-augs::texture& operator*(const assets::texture_id& id) {
+augs::texture_atlas_entry& operator*(const assets::texture_id& id) {
 	return get_resource_manager().find(id)->tex;
 }
 

@@ -6,7 +6,7 @@
 namespace augs {
 	class image;
 
-	class texture {
+	class texture_atlas_entry {
 		friend class texture_atlas;
 		rect_xywhf rect;
 		float x = 0.f, y = 0.f, w = 0.f, h = 0.f;
@@ -15,8 +15,8 @@ namespace augs {
 		void set_uv_unit(double, double);
 	public:
 
-		texture() = default;
-		texture(const image& img);
+		texture_atlas_entry() = default;
+		texture_atlas_entry(const image& img);
 		void set(const image& img);
 
 		rect_xywhf get_rect() const;

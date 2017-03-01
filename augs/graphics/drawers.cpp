@@ -10,7 +10,7 @@
 #include "game/components/polygon_component.h"
 
 namespace augs {
-	ltrb draw_clipped_rect(vertex_triangle_buffer& v, const ltrb origin, const augs::texture& tex, const rgba color, const ltrb clipper, const bool flip_horizontally) {
+	ltrb draw_clipped_rect(vertex_triangle_buffer& v, const ltrb origin, const augs::texture_atlas_entry& tex, const rgba color, const ltrb clipper, const bool flip_horizontally) {
 		ltrb rc = origin;
 
 		if (!rc.good()) {
@@ -83,7 +83,7 @@ namespace augs {
 		draw_rect(v, xywh {origin.x, origin.y, static_cast<float>((*id).get_size().x), static_cast<float>((*id).get_size().y) }, *id, color);
 	}
 
-	void draw_rect(vertex_triangle_buffer& v, const ltrb origin, const texture& tex, const rgba color) {
+	void draw_rect(vertex_triangle_buffer& v, const ltrb origin, const texture_atlas_entry& tex, const rgba color) {
 		augs::vertex p[4];
 
 		p[0].pos.x = p[3].pos.x = origin.l;
@@ -150,7 +150,7 @@ namespace augs {
 
 	std::array<vertex_triangle, 2> make_sprite_triangles(
 		const std::array<vec2, 4> v,
-		const augs::texture& considered_texture,
+		const augs::texture_atlas_entry& considered_texture,
 		const rgba col,
 		const bool flip_horizontally,
 		const bool flip_vertically) {
@@ -200,7 +200,7 @@ namespace augs {
 		return tris;
 	}
 
-	void draw_line(vertex_triangle_buffer& v, const vec2 from, const vec2 to, const float line_width, const texture& tex, const rgba color, const bool flip_horizontally) {
+	void draw_line(vertex_triangle_buffer& v, const vec2 from, const vec2 to, const float line_width, const texture_atlas_entry& tex, const rgba color, const bool flip_horizontally) {
 		const auto points = make_sprite_points((from + to)/2, vec2((from - to).length(), line_width), (to - from).degrees());
 		const auto tris = make_sprite_triangles(points, tex, color, flip_horizontally);
 
@@ -208,14 +208,14 @@ namespace augs {
 		v.push_back(tris[1]);
 	}
 
-	void draw_line(vertex_line_buffer& v, const vec2 from, const vec2 to, const texture& tex, const rgba color) {
+	void draw_line(vertex_line_buffer& v, const vec2 from, const vec2 to, const texture_atlas_entry& tex, const rgba color) {
 		const auto points = make_sprite_points((from + to) / 2, vec2((from - to).length(), 0), (to - from).degrees());
 		const auto tris = make_sprite_triangles(points, tex, color);
 
 		v.push_back({ tris[0].vertices[0], tris[0].vertices[1] });
 	}
 
-	void draw_dashed_line(vertex_line_buffer& v, const vec2 from, const vec2 to, const texture& tex, const rgba color, const float dash_length, const float dash_velocity, const float global_time_seconds) {
+	void draw_dashed_line(vertex_line_buffer& v, const vec2 from, const vec2 to, const texture_atlas_entry& tex, const rgba color, const float dash_length, const float dash_velocity, const float global_time_seconds) {
 		auto dash_end = fmod(global_time_seconds*dash_velocity, dash_length * 2);
 		float dash_begin = dash_end - dash_length;
 		dash_begin = std::max(dash_begin, 0.f);

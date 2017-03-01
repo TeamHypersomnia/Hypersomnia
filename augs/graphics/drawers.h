@@ -27,9 +27,9 @@ namespace augs {
 	void draw_rect(vertex_triangle_buffer& v, const ltrb origin, const assets::texture_id, const rgba color = white);
 	void draw_rect(vertex_triangle_buffer& v, const vec2 origin, const assets::texture_id, const rgba color = white);
 	
-	void draw_line(vertex_line_buffer& v, const vec2 from, const vec2 to, const texture&, const rgba color);
-	void draw_dashed_line(vertex_line_buffer& v, const vec2 from, const vec2 to, const texture&, const rgba color, const float dash_length, const float dash_velocity, const float global_time_seconds);
-	void draw_line(vertex_triangle_buffer& v, const vec2 from, const vec2 to, const float line_width, const texture&, const rgba color, const bool flip_horizontally = false);
+	void draw_line(vertex_line_buffer& v, const vec2 from, const vec2 to, const texture_atlas_entry&, const rgba color);
+	void draw_dashed_line(vertex_line_buffer& v, const vec2 from, const vec2 to, const texture_atlas_entry&, const rgba color, const float dash_length, const float dash_velocity, const float global_time_seconds);
+	void draw_line(vertex_triangle_buffer& v, const vec2 from, const vec2 to, const float line_width, const texture_atlas_entry&, const rgba color, const bool flip_horizontally = false);
 	
 	std::array<vec2, 4> make_sprite_points(
 		const vec2 pos, 
@@ -40,14 +40,14 @@ namespace augs {
 	
 	std::array<vertex_triangle, 2> make_sprite_triangles(
 		const std::array<vec2, 4> points, 
-		const augs::texture& considered_texture,
+		const augs::texture_atlas_entry& considered_texture,
 		const rgba col = white,
 		const bool flip_horizontally = false,
 		const bool flip_vertically = false
 	);
 
-	void draw_rect(vertex_triangle_buffer& v, const ltrb origin, const texture&, const rgba color);
-	ltrb draw_clipped_rect(vertex_triangle_buffer& v, const ltrb origin, const texture&, const rgba colorize, ltrb clipper, const bool flip_horizontally = false);
+	void draw_rect(vertex_triangle_buffer& v, const ltrb origin, const texture_atlas_entry&, const rgba color);
+	ltrb draw_clipped_rect(vertex_triangle_buffer& v, const ltrb origin, const texture_atlas_entry&, const rgba colorize, ltrb clipper, const bool flip_horizontally = false);
 
 	void draw_rectangle_clock(
 		vertex_triangle_buffer& v,

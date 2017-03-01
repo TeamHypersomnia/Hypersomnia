@@ -3,7 +3,7 @@
 #include "3rdparty/rectpack2D/src/pack.h"
 
 #include "augs/image/image.h"
-#include "texture.h"
+#include "texture_atlas_entry.h"
 
 namespace augs {
 	class renderer;
@@ -21,7 +21,7 @@ namespace augs {
 
 		std::vector<texture_with_image*> textures;
 
-		texture atlas_texture;
+		texture_atlas_entry atlas_texture;
 		image img;
 
 		bool pack(), // max texture size 

@@ -64,13 +64,19 @@ namespace components {
 
 		void draw(const drawing_input&) const;
 
-		void draw(const drawing_input&,
-			const augs::texture& considered_texture,
+		void draw(
+			const drawing_input&,
+			const augs::texture_atlas_entry& considered_texture,
 			const vec2i target_position,
 			const float target_rotation,
-			const vec2 considered_size) const;
+			const vec2 considered_size
+		) const;
 
 		std::vector<vec2> get_vertices() const;
-		ltrb get_aabb(const components::transform&, const renderable_positioning_type positioning = renderable_positioning_type::CENTER) const;
+		
+		ltrb get_aabb(
+			const components::transform&, 
+			const renderable_positioning_type positioning = renderable_positioning_type::CENTER
+		) const;
 	};
 }

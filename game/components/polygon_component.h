@@ -12,7 +12,7 @@
 #include "zeroed_pod.h"
 
 namespace augs {
-	class texture;
+	class texture_atlas_entry;
 }
 
 namespace components {
