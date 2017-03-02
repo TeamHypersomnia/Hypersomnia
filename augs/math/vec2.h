@@ -150,10 +150,6 @@ struct vec2t {
 		return std::max(x, y);
 	}
 
-	friend std::ostream& operator<< (std::ostream& stream, const vec2t& v) {
-		return stream << "(" << v.x << "," << v.y << ")";
-	}
-
 	vec2t get_sticking_offset(const augs::rects::sticking mode) {
 		vec2 res;
 		switch (mode) {

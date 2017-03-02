@@ -295,3 +295,22 @@ const rgba vslightgray(220, 220, 220, 255);
 const rgba vsdarkgray(127, 127, 127, 255);
 
 const rgba turquoise(0, 146, 222, 255);
+
+std::ostream& operator<<(std::ostream& out, const rgba& x) {
+	const int r = x.r;
+	const int g = x.g;
+	const int b = x.b;
+	const int a = x.a;
+
+	out << r << " " << g << " " << b << " " << a;
+}
+
+std::ostream& operator>>(std::istream& in, rgba& x) {
+	int r, g, b, a;
+	in >> r >> g >> b >> a;
+
+	x.r = static_cast<rgba_channel>(r);
+	x.g = static_cast<rgba_channel>(g);
+	x.b = static_cast<rgba_channel>(b);
+	x.a = static_cast<rgba_channel>(a);
+}

@@ -2,6 +2,36 @@
 
 using namespace assets;
 
+std::string get_filename_for(const button_corner_type t) {
+	static const std::string stems[]  = {
+		"inside",
+		"lt",
+		"rt",
+		"rb",
+		"lb",
+		"l",
+		"t",
+		"r",
+		"b",
+		"lb_complement"
+		"lt_border",
+		"rt_border",
+		"rb_border",
+		"lb_border",
+		"l_border",
+		"t_border",
+		"r_border",
+		"b_border",
+		"lb_complement_border",
+		"lt_internal_border",
+		"rt_internal_border",
+		"rb_internal_border",
+		"lb_internal_border"
+	};
+
+	return stems[static_cast<int>(t)];
+}
+
 bool is_button_corner(const button_corner_type t) {
 	if (
 		t == button_corner_type::LT
@@ -135,116 +165,121 @@ texture_id button_corners_info::get_tex_for_type(button_corner_type t) const {
 	}
 
 	switch (t) {
+
+	case button_corner_type::INSIDE:
+		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 0);
+		break;
+
 	case button_corner_type::LT:
-		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 0);
+		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 1);
 		break;
 	case button_corner_type::RT:
-		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 1);
+		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 2);
 		break;
 	case button_corner_type::RB:
-		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 2);
+		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 3);
 		break;
 	case button_corner_type::LB:
-		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 3);
+		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 4);
 		break;
 
 	case button_corner_type::L:
-		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 4);
+		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 5);
 		break;
 	case button_corner_type::T:
-		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 5);
+		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 6);
 		break;
 	case button_corner_type::R:
-		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 6);
+		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 7);
 		break;
 	case button_corner_type::B:
-		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 7);
+		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 8);
 		break;
 
 	case button_corner_type::LB_COMPLEMENT:
-		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 8);
+		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 9);
 		break;
 
 	case button_corner_type::LT_BORDER:
-		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 9);
+		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 10);
 		break;
 	case button_corner_type::RT_BORDER:
-		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 10);
+		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 11);
 		break;
 	case button_corner_type::RB_BORDER:
-		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 11);
+		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 12);
 		break;
 	case button_corner_type::LB_BORDER:
-		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 12);
+		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 13);
 		break;
 
 
 	case button_corner_type::L_BORDER:
-		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 13);
+		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 14);
 		break;
 	case button_corner_type::T_BORDER:
-		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 14);
+		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 15);
 		break;
 	case button_corner_type::R_BORDER:
-		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 15);
+		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 16);
 		break;
 	case button_corner_type::B_BORDER:
-		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 16);
+		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 17);
 		break;
 
 	case button_corner_type::LB_COMPLEMENT_BORDER:
-		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 17);
+		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 18);
 		break;
 
 	case button_corner_type::LT_INTERNAL_BORDER:
-		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 18);
+		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 19);
 		break;
 	case button_corner_type::RT_INTERNAL_BORDER:
-		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 19);
+		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 20);
 		break;
 	case button_corner_type::RB_INTERNAL_BORDER:
-		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 20);
+		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 21);
 		break;
 	case button_corner_type::LB_INTERNAL_BORDER:
-		return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 21);
+		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 22);
 		break;
 
-	default: ensure(false); return static_cast<texture_id>(static_cast<unsigned>(lt_texture) + 0); break;
+	default: ensure(false); return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 0); break;
 	}
 }
 
 ltrb button_corners_info::cornered_rc_to_internal_rc(ltrb l) const {
 	auto& manager = get_resource_manager();
-	l.l += manager.find(get_tex_for_type(button_corner_type::L))->tex.get_size().x;
-	l.t += manager.find(get_tex_for_type(button_corner_type::T))->tex.get_size().y;
-	l.r -= manager.find(get_tex_for_type(button_corner_type::R))->tex.get_size().x;
-	l.b -= manager.find(get_tex_for_type(button_corner_type::B))->tex.get_size().y;
+	l.l += manager.find(get_tex_for_type(button_corner_type::L))->get_size().x;
+	l.t += manager.find(get_tex_for_type(button_corner_type::T))->get_size().y;
+	l.r -= manager.find(get_tex_for_type(button_corner_type::R))->get_size().x;
+	l.b -= manager.find(get_tex_for_type(button_corner_type::B))->get_size().y;
 	return l;
 }
 
 ltrb button_corners_info::internal_rc_to_cornered_rc(ltrb l) const {
 	auto& manager = get_resource_manager();
-	l.l += manager.find(get_tex_for_type(button_corner_type::L))->tex.get_size().x;
-	l.t += manager.find(get_tex_for_type(button_corner_type::T))->tex.get_size().y;
-	l.r -= manager.find(get_tex_for_type(button_corner_type::R))->tex.get_size().x;
-	l.b -= manager.find(get_tex_for_type(button_corner_type::B))->tex.get_size().y;
+	l.l += manager.find(get_tex_for_type(button_corner_type::L))->get_size().x;
+	l.t += manager.find(get_tex_for_type(button_corner_type::T))->get_size().y;
+	l.r -= manager.find(get_tex_for_type(button_corner_type::R))->get_size().x;
+	l.b -= manager.find(get_tex_for_type(button_corner_type::B))->get_size().y;
 	return l;
 }
 
 vec2i button_corners_info::cornered_size_to_internal_size(vec2i l) const {
 	auto& manager = get_resource_manager();
-	l.x -= manager.find(get_tex_for_type(button_corner_type::L))->tex.get_size().x;
-	l.x -= manager.find(get_tex_for_type(button_corner_type::R))->tex.get_size().x;
-	l.y -= manager.find(get_tex_for_type(button_corner_type::T))->tex.get_size().y;
-	l.y -= manager.find(get_tex_for_type(button_corner_type::B))->tex.get_size().y;
+	l.x -= manager.find(get_tex_for_type(button_corner_type::L))->get_size().x;
+	l.x -= manager.find(get_tex_for_type(button_corner_type::R))->get_size().x;
+	l.y -= manager.find(get_tex_for_type(button_corner_type::T))->get_size().y;
+	l.y -= manager.find(get_tex_for_type(button_corner_type::B))->get_size().y;
 	return l;
 }
 
 vec2i button_corners_info::internal_size_to_cornered_size(vec2i l) const {
 	auto& manager = get_resource_manager();
-	l.x += manager.find(get_tex_for_type(button_corner_type::L))->tex.get_size().x;
-	l.x += manager.find(get_tex_for_type(button_corner_type::R))->tex.get_size().x;
-	l.y += manager.find(get_tex_for_type(button_corner_type::T))->tex.get_size().y;
-	l.y += manager.find(get_tex_for_type(button_corner_type::B))->tex.get_size().y;
+	l.x += manager.find(get_tex_for_type(button_corner_type::L))->get_size().x;
+	l.x += manager.find(get_tex_for_type(button_corner_type::R))->get_size().x;
+	l.y += manager.find(get_tex_for_type(button_corner_type::T))->get_size().y;
+	l.y += manager.find(get_tex_for_type(button_corner_type::B))->get_size().y;
 	return l;
 }

@@ -46,7 +46,7 @@ entity_handle hotbar_button::get_assigned_entity(const entity_handle owner_trans
 
 button_corners_info hotbar_button::get_button_corners_info() const {
 	button_corners_info corners;
-	corners.lt_texture = assets::texture_id::HOTBAR_BUTTON_LT;
+	corners.inside_texture = assets::texture_id::HOTBAR_BUTTON_INSIDE;
 	corners.flip_horizontally = true;
 
 	return corners;
@@ -153,14 +153,14 @@ void hotbar_button::draw(
 
 	const auto inside_mat = augs::gui::material(assets::texture_id::HOTBAR_BUTTON_INSIDE, inside_col);
 
-	augs::gui::draw_clipped_rect(inside_mat, internal_rc, {}, in.v);
-
 	std::array<bool, static_cast<size_t>(button_corner_type::COUNT)> visible_parts;
 	std::fill(visible_parts.begin(), visible_parts.end(), false);
 
 	auto part_visibility_flag = [&visible_parts](const button_corner_type n) -> bool& {
 		return visible_parts[static_cast<size_t>(n)];
 	};
+
+	part_visibility_flag(button_corner_type::INSIDE) = true;
 
 	part_visibility_flag(button_corner_type::L) = true;
 	part_visibility_flag(button_corner_type::T) = true;

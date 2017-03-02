@@ -11,44 +11,11 @@ namespace resource_setups {
 			const assets::texture_id first,
 			const std::string& filename_template
 		) {
-			auto filenames = {
-				typesafe_sprintf(filename_template, "inside"),
-
-				typesafe_sprintf(filename_template, "lt"),
-				typesafe_sprintf(filename_template, "rt"),
-				typesafe_sprintf(filename_template, "rb"),
-				typesafe_sprintf(filename_template, "lb"),
-
-				typesafe_sprintf(filename_template, "l"),
-				typesafe_sprintf(filename_template, "t"),
-				typesafe_sprintf(filename_template, "r"),
-				typesafe_sprintf(filename_template, "b"),
-
-				typesafe_sprintf(filename_template, "lb_complement"),
-
-				typesafe_sprintf(filename_template, "lt_border"),
-				typesafe_sprintf(filename_template, "rt_border"),
-				typesafe_sprintf(filename_template, "rb_border"),
-				typesafe_sprintf(filename_template, "lb_border"),
-
-				typesafe_sprintf(filename_template, "l_border"),
-				typesafe_sprintf(filename_template, "t_border"),
-				typesafe_sprintf(filename_template, "r_border"),
-				typesafe_sprintf(filename_template, "b_border"),
-
-				typesafe_sprintf(filename_template, "lb_complement_border"),
-
-				typesafe_sprintf(filename_template, "lt_internal_border"),
-				typesafe_sprintf(filename_template, "rt_internal_border"),
-				typesafe_sprintf(filename_template, "rb_internal_border"),
-				typesafe_sprintf(filename_template, "lb_internal_border")
-			};
-
 			const auto first_i = static_cast<int>(first);
-			const auto last_i = first_i + filenames.size(); 
+			const auto last_i = first_i + static_cast<int>(button_corner_type::COUNT); 
 
 			for (int i = first_i; i <= last_i; ++i) {
-				const auto full_filename = *(filenames.begin() + i);
+				const auto full_filename = typesafe_sprintf(filename_template, get_filename_for(static_cast<button_corner_type>(i - first_i)));
 
 				{
 					auto& in = output[static_cast<assets::texture_id>(i)];

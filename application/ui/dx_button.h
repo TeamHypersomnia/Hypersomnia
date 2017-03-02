@@ -104,8 +104,6 @@ public:
 		const bool flip = this_id->corners.flip_horizontally;
 		const auto internal_rc = this_id->corners.cornered_rc_to_internal_rc(this_tree_entry.get_absolute_rect());
 
-		augs::gui::draw_clipped_rect(inside_mat, internal_rc, {}, in.v);
-		
 		{
 			this_id->corners.for_each_button_corner(internal_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
 				const auto col = is_button_border(type) ? border_col : inside_col;

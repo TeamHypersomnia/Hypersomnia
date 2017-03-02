@@ -77,6 +77,9 @@ struct rgba {
 	const rgb_type& rgb() const;
 
 	rgba& set_hsv(const hsv);
+
+	friend std::ostream& operator<<(std::ostream& out, const rgba& x);
+	friend std::ostream& operator>>(std::istream& out, rgba& x);
 };
 
 extern const rgba ltblue;

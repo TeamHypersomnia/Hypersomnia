@@ -63,6 +63,8 @@ struct game_image_request {
 typedef source_font_loading_input game_font_request;
 
 struct game_image_baked {
+	vec2i get_size() const;
+
 	augs::enum_array<augs::texture_atlas_entry, texture_map_type> texture_maps;
 
 	std::vector<vec2i> polygonized;
@@ -73,6 +75,8 @@ typedef augs::baked_font game_font_baked;
 
 typedef std::unordered_map<assets::texture_id, game_image_request> game_image_requests;
 typedef std::unordered_map<assets::font_id, game_font_request> game_font_requests;
+
+struct atlases_regeneration_output;
 
 namespace resources {
 	class manager {

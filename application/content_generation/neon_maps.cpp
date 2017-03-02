@@ -38,16 +38,9 @@ void regenerate_neon_maps() {
 
 		while (lines[current_line] != "parameters:") {
 			std::istringstream in(lines[current_line]);
-			
-			int r, g, b, a;
-			in >> r >> g >> b >> a;
 
 			rgba pixel;
-
-			pixel.r = static_cast<rgba_channel>(r);
-			pixel.g = static_cast<rgba_channel>(g);
-			pixel.b = static_cast<rgba_channel>(b);
-			pixel.a = static_cast<rgba_channel>(a);
+			in >> pixel;
 
 			new_meta.light_colors.push_back(pixel);
 
@@ -83,7 +76,7 @@ void regenerate_neon_maps() {
 			}
 			else {
 				augs::stream existent_meta_stream;
-				augs::assign_file_contents_binary(neon_map_meta_filename, existent_meta_stream.buf);
+				augs::assign_file_contents_binary(neon_map_meta_filename, existent_meta_stream);
 
 				const bool are_metas_identical = (new_meta_stream == existent_meta_stream);
 

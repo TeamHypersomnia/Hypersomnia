@@ -7,6 +7,8 @@
 #include "augs/texture_atlas/texture_with_image.h"
 
 enum class button_corner_type {
+	INSIDE,
+
 	LT,
 	RT,
 	RB,
@@ -39,13 +41,15 @@ enum class button_corner_type {
 	COUNT
 };
 
+std::string get_filename_for(const button_corner_type);
+
 bool is_button_border(const button_corner_type);
 bool is_button_outside_border(const button_corner_type);
 bool is_button_corner(const button_corner_type);
 bool is_button_side(const button_corner_type);
 
 struct button_corners_info {
-	assets::texture_id lt_texture = assets::texture_id::INVALID;
+	assets::texture_id inside_texture = assets::texture_id::INVALID;
 	bool flip_horizontally = true;
 
 	assets::texture_id get_tex_for_type(button_corner_type) const;
@@ -72,7 +76,11 @@ struct button_corners_info {
 
 			ltrb target_rect;
 			
-			if (i == button_corner_type::LT || i == button_corner_type::LT_BORDER || i == button_corner_type::LT_INTERNAL_BORDER) {
+			if (i == button_corner_type::INSIDE) {
+				target_rect = rc;
+			}
+
+			else if (i == button_corner_type::LT || i == button_corner_type::LT_BORDER || i == button_corner_type::LT_INTERNAL_BORDER) {
 				target_rect.set_size(s);
 				target_rect.set_position(rc.left_top() - s);
 			}
