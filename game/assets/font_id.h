@@ -10,8 +10,8 @@ namespace assets {
 }
 
 namespace augs {
-	class font;
+	struct font_metadata;
 }
 
-augs::font& operator*(const assets::font_id& id);
+augs::font_metadata& operator*(const assets::font_id& id);
 bool operator!(const assets::font_id& id);

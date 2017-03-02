@@ -1,4 +1,4 @@
-#include <GL/OpenGL.h>
+#include "3rdparty/GL/OpenGL.h"
 #include <cassert>
 #include "shader.h"
 #include "augs/ensure.h"
@@ -37,18 +37,14 @@ namespace augs {
 			}
 		}
 
-
-		shader::shader() : built(false) {}
-		
-		shader::shader(type shader_type, std::string source_code) : shader() {
-			create(shader_type, source_code);
-		}
-
 		shader::~shader() {
 			destroy();
 		}
 
-		void shader::create(type shader_type, std::string source_code) {
+		void shader::create(
+			const type shader_type,
+			const std::string& source_code
+		) {
 			if (!built) {
 				built = true;
 
@@ -76,7 +72,6 @@ namespace augs {
 
 		int shader_program::currently_used_program = 0;
 
-		shader_program::shader_program() : id(0u), created(false), built(false) {}
 		shader_program::~shader_program() { 
 			destroy(); 
 		}

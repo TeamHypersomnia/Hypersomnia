@@ -4,6 +4,7 @@
 #include "augs/graphics/pixel.h"
 #include "augs/graphics/vertex.h"
 #include "augs/graphics/fbo.h"
+#include "augs/graphics/texture.h"
 
 #include "game/components/transform_component.h"
 #include "game/transcendental/entity_id.h"
@@ -85,7 +86,7 @@ namespace augs {
 		void initialize_fbos(const vec2i screen_size);
 
 		void bind_texture(const graphics::fbo&);
-		void bind_texture(const augs::texture_atlas&);
+		void bind_texture(const augs::texture&);
 
 		void set_active_texture(const unsigned);
 
@@ -111,7 +112,9 @@ namespace augs {
 		void clear_triangles();
 		void clear_lines();
 
-		void default_render(vec2 visible_world_area);
+		void default_render(const vec2 visible_world_area);
+
+		size_t get_max_texture_size() const;
 
 		int get_triangle_count() const;
 		vertex_triangle& get_triangle(int i);

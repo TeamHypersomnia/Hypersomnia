@@ -26,7 +26,6 @@ namespace components {
 		rgba color;
 		vec2 size;
 		vec2 size_multiplier = vec2(1, 1);
-		vec2 gui_bbox_expander;
 		vec2 center_offset;
 		float rotation_offset = 0.f;
 
@@ -48,7 +47,7 @@ namespace components {
 				CEREAL_NVP(color),
 				CEREAL_NVP(size),
 				CEREAL_NVP(size_multiplier),
-				CEREAL_NVP(gui_bbox_expander),
+				CEREAL_NVP(bbox_expander),
 				CEREAL_NVP(center_offset),
 				CEREAL_NVP(rotation_offset),
 

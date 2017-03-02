@@ -27,42 +27,51 @@
 #include "augs/texture_atlas/texture_atlas.h"
 #include "augs/image/font.h"
 #include "augs/graphics/shader.h"
+#include "augs/graphics/texture.h"
 #include "augs/audio/sound_buffer.h"
 
 #include "augs/misc/enum_associative_array.h"
+#include "augs/misc/enum_bitset.h"
+
+#include "game/resources/atlas_content_structs.h"
+
 
 namespace resources {
 	class manager {
 	public:
-		enum atlas_creation_mode {
-			EMPTY = 0,
-			FROM_ALL_TEXTURES = 1,
-			FROM_ALL_FONTS = 2
-		};
+		void regenerate_atlases_and_load_baked_metadata(const requested_atlas_resources&);
 
-		sound_response& create(const assets::sound_response_id);
-		augs::sound_buffer& create(const assets::sound_buffer_id);
-		augs::texture_atlas& create(assets::atlas_id, unsigned atlas_creation_mode_flags);
-		augs::font& create(assets::font_id);
-		
+		void set(
+			const assets::texture_id,
+			const image_usage_settings settings
+		);
+
 		void associate_neon_map(
-			const assets::texture_id take_neon_map_from, 
+			const assets::texture_id take_neon_map_from,
 			const assets::texture_id target_to_be_assigned
 		);
 
-		augs::texture_with_image& create(
-			const assets::texture_id, 
-			std::string filename,
-			const bool generate_desaturated = false
+		image_usage_settings get_usage_settings(const assets::texture_id) const;
+
+		void create(
+			const assets::atlas_id,
+			const std::string& source_filename
 		);
 
-		augs::texture_with_image& create(const assets::texture_id, augs::image img);
+		source_image_baked* find(const assets::texture_id);
+		augs::font_metadata* find(const assets::font_id);
+		augs::graphics::texture* find(const assets::atlas_id);
 
-		void create_sprites_indexed(assets::texture_id first, assets::texture_id last, std::string filename_preffix);
+		sound_response& create(const assets::sound_response_id);
+		augs::sound_buffer& create(const assets::sound_buffer_id);
 
-		animation& create(assets::animation_id, assets::texture_id first_frame, assets::texture_id last_frame, float frame_duration_ms,
+		animation& create(
+			const assets::animation_id, 
+			const assets::texture_id first_frame, 
+			const assets::texture_id last_frame, 
+			const float frame_duration_ms,
 			resources::animation::loop_type = resources::animation::INVERSE
-			);
+		);
 
 		animation& create_inverse(assets::animation_id, assets::texture_id first_frame, assets::texture_id last_frame, float frame_duration_ms);
 		animation& create_inverse_with_flip(assets::animation_id, assets::texture_id first_frame, assets::texture_id last_frame, float frame_duration_ms);
@@ -79,11 +88,6 @@ namespace resources {
 		behaviour_tree& create(assets::behaviour_tree_id);
 		tile_layer& create(assets::tile_layer_id);
 
-		augs::texture_with_image* find(const assets::texture_id);
-		augs::texture_with_image* find_neon_map(const assets::texture_id);
-		augs::texture_with_image* find_desaturated(const assets::texture_id);
-		augs::font* find(assets::font_id);
-		augs::texture_atlas* find(assets::atlas_id);
 		augs::graphics::shader_program* find(assets::program_id);
 		animation* find(assets::animation_id);
 		animation_response* find(assets::animation_response_id);
@@ -97,16 +101,18 @@ namespace resources {
 		void destroy_everything();
 
 	private:
+		augs::enum_associative_array<assets::texture_id, source_image_baked> source_images_baked;
+		augs::enum_associative_array<assets::font_id, augs::font_metadata> source_fonts_baked;
+
+		augs::enum_associative_array<assets::texture_id, image_usage_settings> usage_settings;
+
+		augs::enum_associative_array<assets::atlas_id, augs::graphics::texture> physical_textures;
 
 		augs::enum_associative_array<assets::particle_effect_id, particle_effect> particle_effects;
 		augs::enum_associative_array<assets::particle_effect_response_id, particle_effect_response> particle_effect_responses;
 		augs::enum_associative_array<assets::animation_response_id, animation_response> animation_responses;
 		augs::enum_associative_array<assets::animation_id, animation> animations;
-		augs::enum_associative_array<assets::texture_id, augs::texture_with_image> textures;
-		augs::enum_associative_array<assets::texture_id, augs::texture_with_image> neon_maps;
-		augs::enum_associative_array<assets::texture_id, augs::texture_with_image> desaturated_textures;
-		augs::enum_associative_array<assets::font_id, augs::font> fonts;
-		augs::enum_associative_array<assets::atlas_id, augs::texture_atlas> atlases;
+		
 		augs::enum_associative_array<assets::shader_id, augs::graphics::shader> shaders;
 		augs::enum_associative_array<assets::program_id, augs::graphics::shader_program> programs;
 		augs::enum_associative_array<assets::behaviour_tree_id, behaviour_tree> behaviour_trees;

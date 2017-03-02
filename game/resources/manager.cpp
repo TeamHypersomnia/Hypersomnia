@@ -5,19 +5,16 @@
 #include "augs/image/font.h"
 #include "augs/window_framework/window.h"
 #include "game/detail/particle_types.h"
-#include <experimental\filesystem>
-
-namespace fs = std::experimental::filesystem;
 
 using namespace augs;
 
 namespace assets {
 	vec2i get_size(texture_id id) {
-		return (*id).get_size();
+		return get_resource_manager().find(id)->source_size;
 	}
 }
 
-augs::font& operator*(const assets::font_id& id) {
+augs::font_metadata& operator*(const assets::font_id& id) {
 	return *get_resource_manager().find(id);
 }
 
@@ -26,7 +23,7 @@ bool operator!(const assets::font_id& id) {
 }
 
 augs::texture_atlas_entry& operator*(const assets::texture_id& id) {
-	return get_resource_manager().find(id)->tex;
+	return get_resource_manager().find(id)->textures[image_map_type::DIFFUSE];
 }
 
 resources::animation_response& operator*(const assets::animation_response_id& id) {
@@ -61,109 +58,74 @@ bool operator!(const assets::texture_id& id) {
 	return get_resource_manager().find(id) == nullptr;
 }
 
+template <class T, class K>
+auto ptr_if_found(T& container, const K& id) {
+	const auto it = container.find(id);
+
+	if (it == container.end()) {
+		return nullptr;
+	}
+
+	return &(*it).second;
+}
+
 namespace resources {
-	texture_with_image* manager::find(const assets::texture_id id) {
-		auto it = textures.find(id);
-		if (it == textures.end()) return nullptr;
+	source_image_baked* manager::find(const assets::texture_id id) {
+		return ptr_if_found(source_images_baked, id);
+	}
+	
+	image_usage_settings manager::get_usage_settings(const assets::texture_id id) const {
+		const auto it = usage_settings.find(id);
 
-		return &(*it).second;
-	}	
-
-	texture_with_image* manager::find_neon_map(const assets::texture_id id) {
-		auto it = neon_maps.find(id);
-
-		if (it == neon_maps.end()) {
-			return nullptr;
+		if (it == usage_settings.end()) {
+			return image_usage_settings();
 		}
 
-		return &(*it).second;
+		return (*it).second;
 	}
 
-	texture_with_image* manager::find_desaturated(const assets::texture_id id) {
-		auto it = desaturated_textures.find(id);
-
-		if (it == desaturated_textures.end()) {
-			return nullptr;
-		}
-
-		return &(*it).second;
+	augs::graphics::texture* manager::find(const assets::atlas_id id) {
+		return ptr_if_found(physical_textures, id);
 	}
 
-	texture_atlas* manager::find(assets::atlas_id id) {
-		auto it = atlases.find(id);
-		if (it == atlases.end()) return nullptr;
-
-		return &(*it).second;
+	augs::font_metadata* manager::find(const assets::font_id id) {
+		return ptr_if_found(source_fonts_baked, id);
 	}
 
-	font* manager::find(assets::font_id id) {
-		auto it = fonts.find(id);
-		if (it == fonts.end()) return nullptr;
-
-		return &(*it).second;
+	graphics::shader_program* manager::find(const assets::program_id id) {
+		return ptr_if_found(programs, id);
 	}
 
-	graphics::shader_program* manager::find(assets::program_id id) {
-		auto it = programs.find(id);
-		if (it == programs.end()) return nullptr;
-
-		return &(*it).second;
-	}
-
-	animation* manager::find(assets::animation_id id) {
-		auto it = animations.find(id);
-		if (it == animations.end()) return nullptr;
-
-		return &(*it).second;
+	animation* manager::find(const assets::animation_id id) {
+		return ptr_if_found(animations, id);
 	}
 
 	animation_response* manager::find(assets::animation_response_id id) {
-		auto it = animation_responses.find(id);
-		if (it == animation_responses.end()) return nullptr;
-
-		return &(*it).second;
+		return ptr_if_found(animation_responses, id);
 	}
 
 	particle_effect_response* manager::find(assets::particle_effect_response_id id) {
-		auto it = particle_effect_responses.find(id);
-		if (it == particle_effect_responses.end()) return nullptr;
-
-		return &(*it).second;
+		return ptr_if_found(particle_effect_responses, id);
 	}
 
 	behaviour_tree* manager::find(assets::behaviour_tree_id id) {
-		auto it = behaviour_trees.find(id);
-		if (it == behaviour_trees.end()) return nullptr;
-
-		return &(*it).second;
+		return ptr_if_found(behaviour_trees, id);
 	}
 
 	particle_effect* manager::find(assets::particle_effect_id id) {
-		auto it = particle_effects.find(id);
-		if (it == particle_effects.end()) return nullptr;
-
-		return &(*it).second;
+		return ptr_if_found(particle_effects, id);
 	}
 
 	tile_layer* manager::find(assets::tile_layer_id id) {
-		auto it = tile_layers.find(id);
-		if (it == tile_layers.end()) return nullptr;
-
-		return &(*it).second;
+		return ptr_if_found(tile_layers, id);
 	}
 
 	augs::sound_buffer* manager::find(const assets::sound_buffer_id id) {
-		auto it = sound_buffers.find(id);
-		if (it == sound_buffers.end()) return nullptr;
-
-		return &(*it).second;
+		return ptr_if_found(sound_buffers, id);
 	}
 
 	sound_response* manager::find(const assets::sound_response_id id) {
-		auto it = sound_responses.find(id);
-		if (it == sound_responses.end()) return nullptr;
-
-		return &(*it).second;
+		return ptr_if_found(sound_responses, id);
 	}
 
 	augs::sound_buffer& manager::create(const assets::sound_buffer_id id) {
@@ -175,7 +137,10 @@ namespace resources {
 		return sound_responses[id];
 	}
 
-	texture_atlas& manager::create(const assets::atlas_id id, const unsigned atlas_creation_mode_flags) {
+	texture_atlas& manager::create(
+		const assets::atlas_id id, 
+		const unsigned atlas_creation_mode_flags
+	) {
 		texture_atlas& atl = atlases[id];
 
 		if (atlas_creation_mode_flags & atlas_creation_mode::FROM_ALL_TEXTURES) {
@@ -327,29 +292,6 @@ namespace resources {
 		return resp;
 	}
 
-	texture_with_image& manager::create(
-		const assets::texture_id id, 
-		const std::string filename,
-		const bool generate_desaturated
-	) {
-		texture_with_image& tex = textures[id];
-		tex.set_from_image_file(filename);
-
-		const auto neon_map_filename = "generated/neon_maps/" + fs::path(filename).filename().string();
-
-		if (augs::file_exists(neon_map_filename)) {
-			texture_with_image& neon_tex = neon_maps[id];
-			neon_tex.set_from_image_file(neon_map_filename);
-		}
-
-		if (generate_desaturated) {
-			texture_with_image& neon_tex = desaturated_textures[id];
-			neon_tex.set_from_image(tex.img.get_desaturated());
-		}
-
-		return tex;
-	}
-
 	graphics::shader& manager::create(assets::shader_id id, std::string filename, augs::graphics::shader::type type) {
 		graphics::shader& sh = shaders[id];
 		sh.create(type, get_file_contents(filename));
@@ -386,9 +328,3 @@ namespace resources {
 resources::manager& get_resource_manager() {
 	return augs::window::glwindow::get_current()->resources;
 }
-
-//namespace assets {
-//	texture* texture_id::operator->() const {
-//		return &get_resource_manager().find_texture(id)->tex;
-//	}
-//}

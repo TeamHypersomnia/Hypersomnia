@@ -97,26 +97,8 @@ namespace augs {
 			}
 		}
 
-		{
-			unsigned char num_cast_spells = 0;
-
-			if (!augs::read_object(ar, num_cast_spells)) {
-				return false;
-			}
-
-			while (num_cast_spells--) {
-				K guid;
-
-				if (!augs::read_object(ar, guid)) {
-					return false;
-				}
-
-				auto& new_spell = storage.cast_spells[guid];
-
-				if (!augs::read_object(ar, new_spell)) {
-					return false;
-				}
-			}
+		if (!augs::read_object(ar, storage.cast_spells, unsigned char())) {
+			return false;
 		}
 
 		if (!augs::read_object(ar, storage.transfer_requests, unsigned short())) {
@@ -140,16 +122,7 @@ namespace augs {
 			}
 		}
 
-		{
-			const auto num_cast_spells = static_cast<unsigned char>(storage.cast_spells.size());
-			augs::write_object(ar, num_cast_spells);
-
-			for (const auto& per_entity : storage.cast_spells) {
-				augs::write_object(ar, per_entity.first);
-				augs::write_object(ar, per_entity.second);
-			}
-		}
-
+		augs::write_object(ar, storage.cast_spells, unsigned char());
 		augs::write_object(ar, storage.transfer_requests, unsigned short());
 	}
 

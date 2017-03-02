@@ -148,7 +148,7 @@ item_button::layout_with_attachments item_button::calculate_button_layout(
 		b += -origin;
 	}
 
-	const components::sprite gui_def = get_resource_manager().find(component_owner.get<components::sprite>().tex)->gui_sprite_def;
+	const auto gui_def = get_resource_manager().get_usage_settings(component_owner.get<components::sprite>().tex).gui;
 
 	if (gui_def.flip_horizontally) {
 		for (auto& b : output.boxes) {
@@ -240,14 +240,14 @@ void item_button::draw_proc(
 		{
 			const bool draw_attachments = !this_id->is_container_open || f.draw_attachments_even_if_open;
 			auto item_sprite = item.get<components::sprite>();
-			const auto gui_def = get_resource_manager().find(item_sprite.tex)->gui_sprite_def;
+			const auto gui_def = get_resource_manager().get_usage_settings(item_sprite.tex).gui;
 
 			const auto layout = calculate_button_layout(item, draw_attachments);
 			
 			vec2 expansion_offset;
 
 			if (f.expand_size_to_grid) {
-				const auto rounded_size = griddify_size(layout.aabb.get_size(), gui_def.gui_bbox_expander);
+				const auto rounded_size = griddify_size(layout.aabb.get_size(), gui_def.bbox_expander);
 				expansion_offset = (rounded_size - layout.aabb.get_size()) / 2;
 			}
 
@@ -400,7 +400,7 @@ void item_button::draw_proc(
 				container_icon = assets::texture_id::CONTAINER_CLOSED_ICON;
 			}
 
-			const auto size = (*container_icon).get_size();
+			const auto size = assets::get_size(container_icon);
 
 			augs::draw_rect(in.v, vec2(this_absolute_rect.r - size.x + 2, this_absolute_rect.t + 1), container_icon, border_col);
 		}
@@ -436,7 +436,7 @@ void item_button::rebuild_layouts(const game_gui_context context, const this_in_
 
 	if (sprite) {
 		vec2i rounded_size = calculate_button_layout(item, !this_id->is_container_open).aabb.get_size();
-		rounded_size = griddify_size(rounded_size, get_resource_manager().find(item.get<components::sprite>().tex)->gui_sprite_def.gui_bbox_expander);
+		rounded_size = griddify_size(rounded_size, get_resource_manager().get_usage_settings(item.get<components::sprite>().tex).gui.bbox_expander);
 		this_id->rc.set_size(rounded_size);
 	}
 

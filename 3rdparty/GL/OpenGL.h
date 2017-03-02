@@ -6,6 +6,7 @@
 
 #undef min
 #undef max
+
 #elif PLATFORM_LINUX
 #include <GL/glew.h>
 #include <GL/gl.h>
@@ -14,3 +15,4 @@
 
 void report_glerr(GLenum __error, std::string location);
 #define glerr { report_glerr(glGetError(), __FUNCTION__); };
+

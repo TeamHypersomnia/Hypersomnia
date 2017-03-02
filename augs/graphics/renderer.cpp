@@ -1,6 +1,4 @@
 #include "3rdparty/GL/OpenGL.h"
-#undef min
-#undef max
 #include <tuple>
 #include "renderer.h"
 #include "augs/graphics/fbo.h"
@@ -325,8 +323,14 @@ namespace augs {
 		glBindTexture(GL_TEXTURE_2D, f.get_texture_id()); glerr;
 	}
 
-	void renderer::bind_texture(const texture_atlas& atl) {
+	void renderer::bind_texture(const augs::texture& atl) {
 		glBindTexture(GL_TEXTURE_2D, atl.id); glerr;
+	}
+
+	size_t renderer::get_max_texture_size() const {
+		GLint tsize;
+		glGetIntegerv(GL_MAX_TEXTURE_SIZE, &tsize); glerr;
+		return tsize;
 	}
 
 	void renderer::default_render(vec2 visible_world_area) {

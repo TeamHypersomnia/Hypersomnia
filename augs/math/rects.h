@@ -414,12 +414,6 @@ namespace augs {
 		};
 
 		template <class T>
-		struct texture {
-			T u1, v1, u2, v2;
-			texture(T u1 = 1.0, T v1 = 1.0, T u2 = 1.0, T v2 = 1.0) : u1(u1), v1(v1), u2(u2), v2(v2) {}
-		};
-
-		template <class T>
 		extern std::wostream& operator<<(std::wostream&, const vec2t<T>&);
 
 		template <class T>

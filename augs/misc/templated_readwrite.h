@@ -192,6 +192,51 @@ namespace augs {
 		}
 	}
 
+	template<class A, class Key, class Value, class map_size_type = size_t>
+	bool read_object(
+		A& ar,
+		std::map<Key, Value>& storage,
+		map_size_type = map_size_type()
+	) {
+		map_size_type s;
+
+		if (!read_object(ar, s)) {
+			return false;
+		}
+
+		storage.reserve(s);
+
+		while (s--) {
+			Key key;
+
+			if (!augs::read_object(ar, key)) {
+				return false;
+			}
+
+			if (!augs::read_object(ar, storage.cast_spells[key])) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	template<class A, class Key, class Value, class map_size_type = size_t>
+	auto write_object(
+		A& ar,
+		const std::map<Key, Value>& storage,
+		map_size_type = map_size_type()
+	) {
+		ensure(storage.size() <= std::numeric_limits<map_size_type>::max());
+
+		write_object(ar, static_cast<map_size_type>(storage.size()));
+
+		for (const auto& obj : storage) {
+			write_object(ar, obj.first);
+			write_object(ar, obj.second);
+		}
+	}
+
 	template<class A, class string_size_type = size_t>
 	bool read_object(A& ar, std::string& storage, string_size_type = string_size_type()) {
 		string_size_type s;

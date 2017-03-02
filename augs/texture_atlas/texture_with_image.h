@@ -10,7 +10,7 @@ namespace augs {
 		augs::image img;
 		augs::texture_atlas_entry tex;
 		std::vector<vec2i> polygonized;
-		components::sprite gui_sprite_def;
+		components::sprite gui;
 
 		void set_from_image(const augs::image& img);
 		void set_from_image_file(std::string filename);

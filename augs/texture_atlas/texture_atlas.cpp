@@ -1,4 +1,3 @@
-#include <GL/OpenGL.h>
 #include "augs/ensure.h"
 
 #include "texture_atlas.h"
@@ -6,10 +5,13 @@
 #include "augs/graphics/renderer.h"
 
 namespace augs {
-
 	texture_atlas::~texture_atlas() {
 		destroy();
 	}
+
+	texture_atlas(
+		std::vector<const augs::image*> packed_images
+	);
 
 	bool texture_atlas::pack() {
 		GLint tsize;
@@ -71,17 +73,6 @@ namespace augs {
 		img.swap_red_and_blue();
 	}
 
-	bool texture_atlas::is_mipmapped() const {
-		return mipmaps;
-	}
-
-	void texture_atlas::destroy() {
-		if (built)
-			glDeleteTextures(1, &id); glerr;
-
-		rep = true;
-		lin = mipmaps = built = false;
-	}
 
 	void texture_atlas::build(bool _mipmaps, bool _linear, image* raw_texture) {
 		destroy();
@@ -109,8 +100,8 @@ namespace augs {
 		if (mipmaps) glGenerateMipmap(GL_TEXTURE_2D); glerr;
 		built = true;
 
-		atlas_texture.set(im);
-		atlas_texture.set_uv_unit(1.0 / im.get_size().x, 1.0 / im.get_size().y);
+		entry_for_whole_atlas.set(im);
+		entry_for_whole_atlas.set_uv_unit(1.0 / im.get_size().x, 1.0 / im.get_size().y);
 	}
 
 	void texture_atlas::default_build() {
@@ -119,37 +110,5 @@ namespace augs {
 		build(false, false);
 		/* destroy the raw image as it is already uploaded to GPU */
 		img.destroy();
-	}
-
-	void texture_atlas::repeat() {
-		if (!rep) {
-			rep = true;
-			augs::renderer::get_current().bind_texture(*this);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); glerr;
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); glerr;
-		}
-	}
-
-	void texture_atlas::clamp() {
-		if (rep) {
-			rep = false;
-			augs::renderer::get_current().bind_texture(*this);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); glerr;
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP); glerr;
-		}
-	}
-
-	void texture_atlas::nearest() {
-		augs::renderer::get_current().bind_texture(*this);
-		lin = false;
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); glerr;
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmaps ? GL_NEAREST : GL_NEAREST); glerr;
-	}
-
-	void texture_atlas::linear() {
-		augs::renderer::get_current().bind_texture(*this);
-		lin = true;
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); glerr;
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmaps ? GL_LINEAR : GL_LINEAR); glerr;
 	}
 }
