@@ -1,5 +1,6 @@
 #pragma once
-#include "game/resources/atlas_content_structs.h"
+#include "application/content_generation/texture_atlases.h"
+#include "game/resources/manager.h"
 #include "game/assets/texture_id.h"
 #include "augs/graphics/pixel.h"
 #include "game/flyweights/spell_data.h"
@@ -9,10 +10,8 @@
 namespace resource_setups {
 	void load_standard_everything();
 
-	std::unordered_map<assets::texture_id, game_image_request> load_standard_images();
-	std::unordered_map<assets::font_id, all_information_about_font> load_standard_fonts();
-
-	void load_standard_image_settings();
+	game_image_requests load_standard_images();
+	game_font_requests load_standard_fonts();
 
 	void load_standard_particle_effects();
 	void load_standard_behaviour_trees();

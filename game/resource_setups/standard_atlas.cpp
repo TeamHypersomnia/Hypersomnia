@@ -1,35 +1,590 @@
 #include "all.h"
 #include "game/resources/manager.h"
 #include "augs/graphics/shader.h"
+#include "augs/gui/button_corners.h"
 
 namespace resource_setups {
-	std::unordered_map<assets::texture_id, source_image_information> load_standard_images() {
-		std::unordered_map<assets::texture_id, source_image_information> output;
+	game_image_requests load_standard_images() {
+		game_image_requests output;
+
+		const auto make_button_with_corners = [&](
+			const assets::texture_id first,
+			const std::string& filename_template
+		) {
+			auto filenames = {
+				typesafe_sprintf(filename_template, "inside"),
+
+				typesafe_sprintf(filename_template, "lt"),
+				typesafe_sprintf(filename_template, "rt"),
+				typesafe_sprintf(filename_template, "rb"),
+				typesafe_sprintf(filename_template, "lb"),
+
+				typesafe_sprintf(filename_template, "l"),
+				typesafe_sprintf(filename_template, "t"),
+				typesafe_sprintf(filename_template, "r"),
+				typesafe_sprintf(filename_template, "b"),
+
+				typesafe_sprintf(filename_template, "lb_complement"),
+
+				typesafe_sprintf(filename_template, "lt_border"),
+				typesafe_sprintf(filename_template, "rt_border"),
+				typesafe_sprintf(filename_template, "rb_border"),
+				typesafe_sprintf(filename_template, "lb_border"),
+
+				typesafe_sprintf(filename_template, "l_border"),
+				typesafe_sprintf(filename_template, "t_border"),
+				typesafe_sprintf(filename_template, "r_border"),
+				typesafe_sprintf(filename_template, "b_border"),
+
+				typesafe_sprintf(filename_template, "lb_complement_border"),
+
+				typesafe_sprintf(filename_template, "lt_internal_border"),
+				typesafe_sprintf(filename_template, "rt_internal_border"),
+				typesafe_sprintf(filename_template, "rb_internal_border"),
+				typesafe_sprintf(filename_template, "lb_internal_border")
+			};
+
+			const auto first_i = static_cast<int>(first);
+			const auto last_i = first_i + filenames.size(); 
+
+			for (int i = first_i; i <= last_i; ++i) {
+				const auto full_filename = *(filenames.begin() + i);
+
+				{
+					auto& in = output[static_cast<assets::texture_id>(i)];
+					in.texture_maps[texture_map_type::DIFFUSE] = { full_filename, assets::atlas_id::GAME_WORLD_ATLAS };
+				}
+			}
+		};
+
+		const auto make_indexed = [&](
+			const assets::texture_id first,
+			const assets::texture_id last,
+			const std::string& filename_template
+		) {
+			const auto first_i = static_cast<int>(first);
+			const auto last_i = static_cast<int>(last);
+
+			for (int i = first_i; i < last_i; ++i) {
+				const auto full_filename = typesafe_sprintf(filename_template, i - first_i);
+
+				{
+					auto& in = output[static_cast<assets::texture_id>(i)];
+					in.texture_maps[texture_map_type::DIFFUSE] = { full_filename, assets::atlas_id::GAME_WORLD_ATLAS };
+				}
+			}
+		};
 
 		{
 			auto& in = output[assets::texture_id::TEST_CROSSHAIR];
-			in.textures[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/crosshair.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/crosshair.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::TEST_PLAYER];
-			in.textures[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/walk_1.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/walk_1.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::TEST_BACKGROUND];
-			in.textures[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/snow_textures/snow3.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/snow_textures/snow3.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::CRATE];
-			in.textures[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/crate2.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/crate2.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
+
+		{
+			auto& in = output[assets::texture_id::TEST_CROSSHAIR];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/crosshair.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::TEST_PLAYER];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/walk_1.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::TEST_BACKGROUND];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/snow_textures/snow3.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::CRATE];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/crate2.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::CRATE_DESTROYED];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/crate2_destroyed.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::CAR_INSIDE];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/crate2.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::CAR_FRONT];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/crate2.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::JMIX114];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/jmix114.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::TRUCK_FRONT];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/truck_front.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::TRUCK_INSIDE];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/truck_inside.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::MENU_GAME_LOGO];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/menu_game_logo.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::ASSAULT_RIFLE];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/assault_rifle.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.settings.gui.flip_horizontally = true;
+			in.settings.gui.flip_vertically = true;
+		}
+
+		{
+			auto& in = output[assets::texture_id::BILMER2000];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/bilmer2000.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.settings.gui.flip_horizontally = true;
+			in.settings.gui.flip_horizontally = false;
+		}
+
+		{
+			auto& in = output[assets::texture_id::KEK9];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/kek9.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.settings.gui.flip_horizontally = true;
+			in.settings.gui.flip_horizontally = false;
+		}
+
+		{
+			auto& in = output[assets::texture_id::SHOTGUN];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/shotgun.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.settings.gui.flip_horizontally = true;
+			in.settings.gui.flip_horizontally = true;
+		}
+
+		{
+			auto& in = output[assets::texture_id::SUBMACHINE];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/submachine.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.settings.gui.flip_horizontally = true;
+			in.settings.gui.flip_horizontally = true;
+		}
+
+		{
+			auto& in = output[assets::texture_id::PISTOL];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/pistol.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.settings.gui.flip_horizontally = true;
+			in.settings.gui.flip_horizontally = true;
+		}
+
+		{
+			auto& in = output[assets::texture_id::URBAN_CYAN_MACHETE];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/urban_cyan_machete.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.settings.gui.flip_horizontally = true;
+			in.settings.gui.flip_horizontally = true;
+		}
+
+		{
+			auto& in = output[assets::texture_id::AMPLIFIER_ARM];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/amplifier_arm.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.settings.gui.flip_horizontally = true;
+			in.settings.gui.flip_horizontally = false;
+		}
+
+		{
+			auto& in = output[assets::texture_id::SAMPLE_MAGAZINE];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/magazine.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::SMALL_MAGAZINE];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/small_magazine.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::SAMPLE_SUPPRESSOR];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/suppressor.png", assets::atlas_id::GAME_WORLD_ATLAS };				
+			in.settings.gui.flip_horizontally = true;
+		}
+
+		{
+			auto& in = output[assets::texture_id::ROUND_TRACE];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/round_trace.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::ENERGY_BALL];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/energy_ball.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::PINK_CHARGE];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/pink_charge.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::PINK_SHELL];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/pink_shell.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::CYAN_CHARGE];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/cyan_charge.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::CYAN_SHELL];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/cyan_shell.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::GREEN_CHARGE];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/green_charge.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::GREEN_SHELL];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/green_shell.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::BACKPACK];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/backpack.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.settings.gui.bbox_expander = vec2(0, 2);
+		}
+
+		{
+			auto& in = output[assets::texture_id::ATTACHMENT_CIRCLE_FILLED];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/backpack.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::ATTACHMENT_CIRCLE_BORDER];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/backpack.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::ACTION_BUTTON_FILLED];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/backpack.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::ACTION_BUTTON_BORDER];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/backpack.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/backpack.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::HAVE_A_PLEASANT];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/have_a_pleasant.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::AWAKENING];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/awakening.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::METROPOLIS];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/metropolis.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::BRICK_WALL];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/brick_wall.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::ROAD];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/road.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::ROAD_FRONT_DIRT];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/road_front_dirt.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::WANDERING_CROSS];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/wandering_cross.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::TRUCK_ENGINE];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/truck_engine.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::HEALTH_ICON];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/health_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::PERSONAL_ELECTRICITY_ICON];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/personal_electricity_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::CONSCIOUSNESS_ICON];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/consciousness_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::PERK_HASTE_ICON];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/perk_haste_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::SPELL_HASTE_ICON];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/spell_haste_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::SPELL_FURY_OF_THE_AEONS_ICON];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/spell_fury_of_the_aeons_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::SPELL_ULTIMATE_WRATH_OF_THE_AEONS_ICON];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/spell_ultimate_wrath_of_the_aeons_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::SPELL_ELECTRIC_TRIAD_ICON];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/spell_electric_triad_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::SPELL_BORDER];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/spell_border.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::PERK_ELECTRIC_SHIELD_ICON];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/perk_electric_shield_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::SPELL_ELECTRIC_SHIELD_ICON];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/spell_electric_shield_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::CAST_HIGHLIGHT];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/cast_highlight.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::GRENADE_SPOON];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/grenade_spoon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::FORCE_GRENADE];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/force_grenade.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::PED_GRENADE];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/ped_grenade.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::INTERFERENCE_GRENADE];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/interference_grenade.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::FORCE_GRENADE_RELEASED];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/force_grenade_released.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::PED_GRENADE_RELEASED];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/ped_grenade_released.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::INTERFERENCE_GRENADE_RELEASED];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/interference_grenade_released.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::CONTAINER_OPEN_ICON];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/container_open_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::CONTAINER_CLOSED_ICON];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/container_closed_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::GUI_CURSOR];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/gui_cursor.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::GUI_CURSOR_HOVER];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/gui_cursor_hover.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::GUI_CURSOR_ADD];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/gui_cursor_add.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::GUI_CURSOR_ERROR];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/gui_cursor_error.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::GUI_CURSOR_MINUS];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/gui_cursor_minus.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::BLANK];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/blank.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::LASER];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/laser.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::LASER_GLOW_EDGE];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/laser_glow_edge.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::DROP_HAND_ICON];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/drop_hand_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::SECONDARY_HAND_ICON];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/secondary_hand_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::PRIMARY_HAND_ICON];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/primary_hand_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::SHOULDER_SLOT_ICON];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/shoulder_slot_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::ARMOR_SLOT_ICON];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/armor_slot_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::CHAMBER_SLOT_ICON];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/chamber_slot_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::DETACHABLE_MAGAZINE_ICON];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/detachable_magazine_slot_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::GUN_MUZZLE_SLOT_ICON];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/gun_muzzle_slot_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::DEAD_TORSO];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/dead_torso.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		make_button_with_corners(
+			assets::texture_id::HOTBAR_BUTTON_INSIDE,
+			"generated/gui/hotbar_button"
+		);
+
+		make_button_with_corners(
+			assets::texture_id::MENU_BUTTON_INSIDE,
+			"generated/gui/menu_button"
+		);
+
+		make_indexed(
+			assets::texture_id::TORSO_MOVING_FIRST,
+			assets::texture_id::TORSO_MOVING_LAST,
+			"hypersomnia/gfx/torso_white_walk_barehands_%x.png"
+		);
+
+		make_indexed(
+			assets::texture_id::VIOLET_TORSO_MOVING_FIRST,
+			assets::texture_id::VIOLET_TORSO_MOVING_LAST,
+			"hypersomnia/gfx/sprite_%x.png"
+		);
+
+		make_indexed(
+			assets::texture_id::BLUE_TORSO_MOVING_FIRST,
+			assets::texture_id::BLUE_TORSO_MOVING_LAST,
+			"hypersomnia/gfx/walk_%x.png"
+		);
+
+		make_indexed(
+			assets::texture_id::METROPOLIS_TILE_FIRST,
+			assets::texture_id::METROPOLIS_TILE_LAST,
+			"hypersomnia/gfx/tileset/tile_%x.png"
+		);
+
+		make_indexed(
+			assets::texture_id::SMOKE_PARTICLE_FIRST,
+			assets::texture_id(int(assets::texture_id::SMOKE_PARTICLE_FIRST) + 3),
+			"hypersomnia/gfx/smoke_%x.png"
+		);
+
+		make_indexed(
+			assets::texture_id::PIXEL_THUNDER_FIRST,
+			assets::texture_id::PIXEL_THUNDER_LAST,
+			"hypersomnia/gfx/pixel_thunder_%x.png"
+		);
+
+		make_indexed(
+			assets::texture_id::BLINK_FIRST,
+			assets::texture_id::BLINK_LAST,
+			"hypersomnia/gfx/blink_%x.png"
+		);
+
+		make_indexed(
+			assets::texture_id::CAST_BLINK_FIRST,
+			assets::texture_id::CAST_BLINK_LAST,
+			"hypersomnia/gfx/cast_blink_%x.png"
+		);
 
 		return std::move(output);
 	}
 
-	std::unordered_map<assets::font_id, source_font_location> load_standard_fonts() {
+	game_font_requests load_standard_fonts() {
 		return {
 			{
 				assets::font_id::GUI_FONT,
@@ -45,280 +600,5 @@ namespace resource_setups {
 				}
 			}
 		};
-	}
-
-	requested_atlas_resources request_standard_atlas_resources() {
-		requested_atlas_resources output;
-
-		output.request(assets::texture_id::TEST_CROSSHAIR, "hypersomnia/gfx/crosshair.png");
-		output.request(assets::texture_id::TEST_PLAYER, "hypersomnia/gfx/walk_1.png");
-		output.request(assets::texture_id::TEST_BACKGROUND, "hypersomnia/gfx/snow_textures/snow3.png");
-		output.request(assets::texture_id::CRATE, "hypersomnia/gfx/crate2.png");
-		output.request(assets::texture_id::CRATE_DESTROYED, "hypersomnia/gfx/crate2_destroyed.png");
-		output.request(assets::texture_id::CAR_INSIDE, "hypersomnia/gfx/crate2.png");
-		output.request(assets::texture_id::CAR_FRONT, "hypersomnia/gfx/crate2.png");
-		output.request(assets::texture_id::JMIX114, "hypersomnia/gfx/jmix114.png");
-		output.request(assets::texture_id::TRUCK_FRONT, "hypersomnia/gfx/truck_front.png");
-		output.request(assets::texture_id::TRUCK_INSIDE, "hypersomnia/gfx/truck_inside.png");
-		output.request(assets::texture_id::MENU_GAME_LOGO, "hypersomnia/gfx/menu_game_logo.png");
-		output.request(assets::texture_id::ASSAULT_RIFLE, "hypersomnia/gfx/assault_rifle.png");
-		output.request(assets::texture_id::BILMER2000, "hypersomnia/gfx/bilmer2000.png");
-		output.request(assets::texture_id::KEK9, "hypersomnia/gfx/kek9.png");
-		output.request(assets::texture_id::SHOTGUN, "hypersomnia/gfx/shotgun.png");
-		output.request(assets::texture_id::SUBMACHINE, "hypersomnia/gfx/submachine.png");
-		output.request(assets::texture_id::PISTOL, "hypersomnia/gfx/pistol.png");
-		output.request(assets::texture_id::URBAN_CYAN_MACHETE, "hypersomnia/gfx/urban_cyan_machete.png");
-		output.request(assets::texture_id::AMPLIFIER_ARM, "hypersomnia/gfx/amplifier_arm.png");
-		output.request(assets::texture_id::SAMPLE_MAGAZINE, "hypersomnia/gfx/magazine.png");
-		output.request(assets::texture_id::SMALL_MAGAZINE, "hypersomnia/gfx/small_magazine.png");
-		output.request(assets::texture_id::SAMPLE_SUPPRESSOR, "hypersomnia/gfx/suppressor.png");
-		output.request(assets::texture_id::ROUND_TRACE, "hypersomnia/gfx/round_trace.png");
-		output.request(assets::texture_id::ENERGY_BALL, "hypersomnia/gfx/energy_ball.png");
-		output.request(assets::texture_id::PINK_CHARGE, "hypersomnia/gfx/pink_charge.png");
-		output.request(assets::texture_id::PINK_SHELL, "hypersomnia/gfx/pink_shell.png");
-		output.request(assets::texture_id::CYAN_CHARGE, "hypersomnia/gfx/cyan_charge.png");
-		output.request(assets::texture_id::CYAN_SHELL, "hypersomnia/gfx/cyan_shell.png");
-		output.request(assets::texture_id::GREEN_CHARGE, "hypersomnia/gfx/green_charge.png");
-		output.request(assets::texture_id::GREEN_SHELL, "hypersomnia/gfx/green_shell.png");
-		output.request(assets::texture_id::BACKPACK, "hypersomnia/gfx/backpack.png");
-
-		output.request(assets::texture_id::ATTACHMENT_CIRCLE_FILLED, "hypersomnia/gfx/backpack.png");
-		output.request(assets::texture_id::ATTACHMENT_CIRCLE_BORDER, "hypersomnia/gfx/backpack.png");
-		output.request(assets::texture_id::ACTION_BUTTON_FILLED, "hypersomnia/gfx/backpack.png");
-		output.request(assets::texture_id::ACTION_BUTTON_BORDER, "hypersomnia/gfx/backpack.png");
-		output.request(assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM, "hypersomnia/gfx/backpack.png");
-
-		//{
-		//	augs::image attachment_circle_filled;
-		//	attachment_circle_filled.paint_filled_circle(16);
-		//
-		//	augs::image attachment_circle_border;
-		//	attachment_circle_border.paint_circle_midpoint(16);
-		//
-		//	output.request(assets::texture_id::ATTACHMENT_CIRCLE_FILLED, attachment_circle_filled);
-		//	output.request(assets::texture_id::ATTACHMENT_CIRCLE_BORDER, attachment_circle_border);
-		//}
-		//
-		//{
-		//	augs::image action_circle_filled;
-		//	action_circle_filled.paint_filled_circle(19);
-		//
-		//	augs::image action_circle_border;
-		//	action_circle_border.paint_circle_midpoint(19);
-		//
-		//	output.request(assets::texture_id::ACTION_BUTTON_FILLED, action_circle_filled);
-		//	output.request(assets::texture_id::ACTION_BUTTON_BORDER, action_circle_border);
-		//}
-
-		//augs::image hud_circular_hud_medium;
-		//hud_circular_hud_medium.paint_circle_midpoint(57, 1, cyan, false, false, vec2().set_from_degrees(-45), vec2().set_from_degrees(45));
-		//hud_circular_hud_medium.paint_circle_midpoint(55, 5, white, false, false, vec2().set_from_degrees(135), vec2().set_from_degrees(-180 + 30));
-		//
-		//output.request(assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM, hud_circular_hud_medium);
-
-		output.request_button_with_corners(
-			assets::texture_id::HOTBAR_BUTTON_INSIDE,
-			"generated/gui/hotbar_button"
-		);
-
-		output.request_button_with_corners(
-			assets::texture_id::MENU_BUTTON_INSIDE,
-			"generated/gui/menu_button"
-		);
-
-		output.request(assets::texture_id::CONTAINER_OPEN_ICON, "hypersomnia/gfx/container_open_icon.png");
-		output.request(assets::texture_id::CONTAINER_CLOSED_ICON, "hypersomnia/gfx/container_closed_icon.png");
-
-		output.request(assets::texture_id::GUI_CURSOR, "hypersomnia/gfx/gui_cursor.png");
-		output.request(assets::texture_id::GUI_CURSOR_HOVER, "hypersomnia/gfx/gui_cursor_hover.png");
-		output.request(assets::texture_id::GUI_CURSOR_ADD, "hypersomnia/gfx/gui_cursor_add.png");
-		output.request(assets::texture_id::GUI_CURSOR_ERROR, "hypersomnia/gfx/gui_cursor_error.png");
-		output.request(assets::texture_id::GUI_CURSOR_MINUS, "hypersomnia/gfx/gui_cursor_minus.png");
-
-		output.request(assets::texture_id::BLANK, "hypersomnia/gfx/blank.png");
-		output.request(assets::texture_id::LASER, "hypersomnia/gfx/laser.png");
-		output.request(assets::texture_id::LASER_GLOW_EDGE, "hypersomnia/gfx/laser_glow_edge.png");
-		output.request(assets::texture_id::DROP_HAND_ICON, "hypersomnia/gfx/drop_hand_icon.png");
-		output.request(assets::texture_id::SECONDARY_HAND_ICON, "hypersomnia/gfx/secondary_hand_icon.png");
-		output.request(assets::texture_id::PRIMARY_HAND_ICON, "hypersomnia/gfx/primary_hand_icon.png");
-		output.request(assets::texture_id::SHOULDER_SLOT_ICON, "hypersomnia/gfx/shoulder_slot_icon.png");
-		output.request(assets::texture_id::ARMOR_SLOT_ICON, "hypersomnia/gfx/armor_slot_icon.png");
-		output.request(assets::texture_id::CHAMBER_SLOT_ICON, "hypersomnia/gfx/chamber_slot_icon.png");
-		output.request(assets::texture_id::DETACHABLE_MAGAZINE_ICON, "hypersomnia/gfx/detachable_magazine_slot_icon.png");
-		output.request(assets::texture_id::GUN_MUZZLE_SLOT_ICON, "hypersomnia/gfx/gun_muzzle_slot_icon.png");
-		
-		output.request(assets::texture_id::DEAD_TORSO, "hypersomnia/gfx/dead_torso.png");
-
-
-		output.request_indexed(
-			assets::texture_id::TORSO_MOVING_FIRST,
-			assets::texture_id::TORSO_MOVING_LAST,
-			"hypersomnia/gfx/torso_white_walk_barehands"
-		);
-
-		output.request_indexed(
-			assets::texture_id::VIOLET_TORSO_MOVING_FIRST,
-			assets::texture_id::VIOLET_TORSO_MOVING_LAST,
-			"hypersomnia/gfx/sprite"
-		);
-
-		output.request_indexed(
-			assets::texture_id::BLUE_TORSO_MOVING_FIRST,
-			assets::texture_id::BLUE_TORSO_MOVING_LAST,
-			"hypersomnia/gfx/walk"
-		);
-
-		output.request_indexed(
-			assets::texture_id::METROPOLIS_TILE_FIRST,
-			assets::texture_id::METROPOLIS_TILE_LAST,
-			"hypersomnia/gfx/tileset/tile"
-		);
-
-		output.request_indexed(
-			assets::texture_id::SMOKE_PARTICLE_FIRST,
-			assets::texture_id(int(assets::texture_id::SMOKE_PARTICLE_FIRST) + 3),
-			"hypersomnia/gfx/smoke"
-		);
-
-		output.request_indexed(
-			assets::texture_id::PIXEL_THUNDER_FIRST,
-			assets::texture_id::PIXEL_THUNDER_LAST,
-			"hypersomnia/gfx/pixel_thunder"
-		);
-
-		output.request_indexed(
-			assets::texture_id::BLINK_FIRST,
-			assets::texture_id::BLINK_LAST,
-			"hypersomnia/gfx/blink"
-		);
-
-		output.request_indexed(
-			assets::texture_id::CAST_BLINK_FIRST,
-			assets::texture_id::CAST_BLINK_LAST,
-			"hypersomnia/gfx/cast_blink"
-		);
-
-		output.request(assets::texture_id::HAVE_A_PLEASANT, "hypersomnia/gfx/have_a_pleasant.png");
-		output.request(assets::texture_id::AWAKENING, "hypersomnia/gfx/awakening.png");
-		output.request(assets::texture_id::METROPOLIS, "hypersomnia/gfx/metropolis.png");
-		output.request(assets::texture_id::BRICK_WALL, "hypersomnia/gfx/brick_wall.png");
-		output.request(assets::texture_id::ROAD, "hypersomnia/gfx/road.png");
-		output.request(assets::texture_id::ROAD_FRONT_DIRT, "hypersomnia/gfx/road_front_dirt.png");
-		output.request(assets::texture_id::WANDERING_CROSS, "hypersomnia/gfx/wandering_cross.png");
-		output.request(assets::texture_id::TRUCK_ENGINE, "hypersomnia/gfx/truck_engine.png");
-		output.request(assets::texture_id::HEALTH_ICON, "hypersomnia/gfx/health_icon.png");
-		output.request(assets::texture_id::PERSONAL_ELECTRICITY_ICON, "hypersomnia/gfx/personal_electricity_icon.png");
-		output.request(assets::texture_id::CONSCIOUSNESS_ICON, "hypersomnia/gfx/consciousness_icon.png");
-		output.request(assets::texture_id::PERK_HASTE_ICON, "hypersomnia/gfx/perk_haste_icon.png");
-		output.request(assets::texture_id::SPELL_HASTE_ICON, "hypersomnia/gfx/spell_haste_icon.png");
-		output.request(assets::texture_id::SPELL_FURY_OF_THE_AEONS_ICON, "hypersomnia/gfx/spell_fury_of_the_aeons_icon.png");
-		output.request(assets::texture_id::SPELL_ULTIMATE_WRATH_OF_THE_AEONS_ICON, "hypersomnia/gfx/spell_ultimate_wrath_of_the_aeons_icon.png");
-		output.request(assets::texture_id::SPELL_ELECTRIC_TRIAD_ICON, "hypersomnia/gfx/spell_electric_triad_icon.png");
-		output.request(assets::texture_id::SPELL_BORDER, "hypersomnia/gfx/spell_border.png");
-		output.request(assets::texture_id::PERK_ELECTRIC_SHIELD_ICON, "hypersomnia/gfx/perk_electric_shield_icon.png");
-		output.request(assets::texture_id::SPELL_ELECTRIC_SHIELD_ICON, "hypersomnia/gfx/spell_electric_shield_icon.png");
-		output.request(assets::texture_id::CAST_HIGHLIGHT, "hypersomnia/gfx/cast_highlight.png");
-		output.request(assets::texture_id::GRENADE_SPOON, "hypersomnia/gfx/grenade_spoon.png");
-		output.request(assets::texture_id::FORCE_GRENADE, "hypersomnia/gfx/force_grenade.png");
-		output.request(assets::texture_id::PED_GRENADE, "hypersomnia/gfx/ped_grenade.png");
-		output.request(assets::texture_id::INTERFERENCE_GRENADE, "hypersomnia/gfx/interference_grenade.png");
-		output.request(assets::texture_id::FORCE_GRENADE_RELEASED, "hypersomnia/gfx/force_grenade_released.png");
-		output.request(assets::texture_id::PED_GRENADE_RELEASED, "hypersomnia/gfx/ped_grenade_released.png");
-		output.request(assets::texture_id::INTERFERENCE_GRENADE_RELEASED, "hypersomnia/gfx/interference_grenade_released.png");
-
-		return std::move(output);
-	}
-
-	void load_standard_image_settings() {
-		auto& manager = get_resource_manager();
-
-		{
-			image_usage_settings s;
-			s.gui.flip_horizontally = true;
-			s.gui.flip_horizontally = true;
-
-			manager.set(assets::texture_id::ASSAULT_RIFLE, s);
-		}
-
-		{
-			image_usage_settings s;
-			s.gui.flip_horizontally = true;
-			s.gui.flip_horizontally = false;
-
-			manager.set(assets::texture_id::BILMER2000, s);
-		}
-
-		{
-			image_usage_settings s;
-			s.gui.flip_horizontally = true;
-			s.gui.flip_horizontally = false;
-
-			manager.set(assets::texture_id::KEK9, s);
-		}
-
-		{
-			image_usage_settings s;
-			s.gui.flip_horizontally = true;
-			s.gui.flip_horizontally = true;
-
-			manager.set(assets::texture_id::SHOTGUN, s);
-		}
-
-		{
-			image_usage_settings s;
-			s.gui.flip_horizontally = true;
-			s.gui.flip_horizontally = true;
-
-			manager.set(assets::texture_id::SUBMACHINE, s);
-		}
-
-		{
-			image_usage_settings s;
-			s.gui.flip_horizontally = true;
-			s.gui.flip_horizontally = true;
-
-			manager.set(assets::texture_id::PISTOL, s);
-		}
-
-		{
-			image_usage_settings s;
-			s.gui.flip_horizontally = true;
-			s.gui.flip_horizontally = true;
-
-			manager.set(assets::texture_id::URBAN_CYAN_MACHETE, s);
-		}
-
-		{
-			image_usage_settings s;
-			s.gui.flip_horizontally = true;
-			s.gui.flip_horizontally = false;
-
-			manager.set(assets::texture_id::AMPLIFIER_ARM, s);
-		}
-
-		{
-			image_usage_settings s;
-			s.gui.flip_horizontally = true;
-
-			manager.set(assets::texture_id::SAMPLE_SUPPRESSOR, s);
-		}
-
-		{
-			image_usage_settings s;
-			s.gui.flip_horizontally = true;
-
-			manager.set(assets::texture_id::SAMPLE_SUPPRESSOR, s);
-		}
-
-		{
-			image_usage_settings s;
-			s.gui.bbox_expander = vec2(0, 2);
-
-			manager.set(assets::texture_id::BACKPACK, s);
-		}
-
-		manager.associate_neon_map(assets::texture_id::FORCE_GRENADE_RELEASED, assets::texture_id::FORCE_GRENADE);
-		manager.associate_neon_map(assets::texture_id::PED_GRENADE_RELEASED, assets::texture_id::PED_GRENADE);
-		manager.associate_neon_map(assets::texture_id::INTERFERENCE_GRENADE_RELEASED, assets::texture_id::INTERFERENCE_GRENADE);
 	}
 }

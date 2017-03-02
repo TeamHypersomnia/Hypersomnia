@@ -1,6 +1,8 @@
 #pragma once
 #include "augs/templates/memcpy_safety.h"
 #include "augs/ensure.h"
+#include <map>
+#include <unordered_map>
 
 namespace augs {
 	class stream;

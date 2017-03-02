@@ -1,6 +1,7 @@
 #include "all.h"
 #include "game/resources/manager.h"
 #include "augs/graphics/shader.h"
+#include "application/content_generation/texture_atlases.h"
 
 #include "3rdparty/GL/OpenGL.h"
 
@@ -11,8 +12,25 @@ namespace resource_setups {
 		const auto images = load_standard_images();
 		const auto fonts = load_standard_fonts();
 
-		atlas_regeneration_input in;
-		manager.regenerate_atlases_and_load_baked_metadata(in);
+		atlases_regeneration_input in;
+
+		for (const auto& i : images) {
+			for (const auto& t : i.second.texture_maps) {
+				in.images.push_back({ t.filename, t.target_atlas });
+			}
+		}
+
+		for (const auto& f : fonts) {
+			in.fonts.push_back({ f.second.loading_input, f.second.target_atlas });
+		}
+
+		const auto regenerated = regenerate_atlases(in);
+
+		manager.load_baked_metadata(
+			images,
+			fonts,
+			regenerated
+		);
 
 		manager.create(assets::atlas_id::GAME_WORLD_ATLAS, "generated/atlases/game_world_atlas.png");
 

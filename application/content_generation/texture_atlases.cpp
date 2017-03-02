@@ -1,3 +1,5 @@
+#include <unordered_map>
+#include <map>
 #include "texture_atlases.h"
 
 #include <sstream>
@@ -24,7 +26,10 @@ atlases_regeneration_output regenerate_atlases(const atlases_regeneration_input&
 		std::vector<source_image_identifier> images;
 	};
 
-	std::unordered_map<assets::atlas_id, per_atlas_input> per_atlas_inputs;
+	std::unordered_map<
+		assets::atlas_id,
+		per_atlas_input
+	> per_atlas_inputs;
 
 	for (const auto& i : in.images) {
 		per_atlas_inputs[i.target_atlas].images.push_back(i.filename);
@@ -38,43 +43,46 @@ atlases_regeneration_output regenerate_atlases(const atlases_regeneration_input&
 
 	const auto atlases_directory = std::string("generated/atlases/");
 
-	for (const auto& a : per_atlas_inputs) {
-		texture_atlas_stamp new_stamp;
+	const bool always_load_only = false;
 
-		for (const auto& img_id : a.second.images) {
-			new_stamp.image_stamps[img_id] = fs::last_write_time(img_id);
-		}
-
-		for (const auto& fnt_id : a.second.fonts) {
-			new_stamp.font_stamps[fnt_id] = fs::last_write_time(fnt_id.filename);
-		}
-
-		const auto atlas_stem = typesafe_sprintf("%x", static_cast<int>(a.first));
-
+	for (const auto& input_for_this_atlas : per_atlas_inputs) {
+		const auto atlas_stem = typesafe_sprintf("%x", static_cast<int>(input_for_this_atlas.first));
 		const auto atlas_image_filename = atlases_directory + atlas_stem + ".png";
-		const auto atlas_stamp_filename = atlases_directory + atlas_stem + ".stamp";
 		const auto atlas_metadata_filename = atlases_directory + atlas_stem + ".meta";
+		const auto atlas_stamp_filename = atlases_directory + atlas_stem + ".stamp";
 
 		bool should_regenerate = false;
 
-		if (!augs::file_exists(atlas_image_filename)) {
-			should_regenerate = true;
-		}
-		else {
-			if (!augs::file_exists(atlas_stamp_filename)) {
+		texture_atlas_stamp new_stamp;
+
+		if (!always_load_only) {
+			for (const auto& img_id : input_for_this_atlas.second.images) {
+				new_stamp.image_stamps[img_id] = fs::last_write_time(img_id);
+			}
+
+			for (const auto& fnt_id : input_for_this_atlas.second.fonts) {
+				new_stamp.font_stamps[fnt_id] = fs::last_write_time(fnt_id.filename);
+			}
+
+			if (!augs::file_exists(atlas_image_filename)) {
 				should_regenerate = true;
 			}
 			else {
-				augs::stream existent_stamp_stream;
-
-				augs::assign_file_contents_binary(atlas_stamp_filename, existent_stamp_stream);
-				texture_atlas_stamp existent_stamp;
-				augs::read_object(existent_stamp_stream, existent_stamp);
-
-				const bool stamps_match = compare_containers(existent_stamp, new_stamp);
-
-				if (!stamps_match) {
+				if (!augs::file_exists(atlas_stamp_filename)) {
 					should_regenerate = true;
+				}
+				else {
+					augs::stream existent_stamp_stream;
+
+					augs::assign_file_contents_binary(atlas_stamp_filename, existent_stamp_stream);
+					texture_atlas_stamp existent_stamp;
+					augs::read_object(existent_stamp_stream, existent_stamp);
+
+					const bool stamps_match = compare_containers(existent_stamp, new_stamp);
+
+					if (!stamps_match) {
+						should_regenerate = true;
+					}
 				}
 			}
 		}
@@ -89,7 +97,7 @@ atlases_regeneration_output regenerate_atlases(const atlases_regeneration_input&
 
 			std::vector<rect_xywhf> rects_for_packing_algorithm;
 
-			for (const auto& input_img_id : a.second.images) {
+			for (const auto& input_img_id : input_for_this_atlas.second.images) {
 				auto& img = loaded_images[input_img_id];
 				img.from_file(input_img_id);
 
@@ -106,7 +114,7 @@ atlases_regeneration_output regenerate_atlases(const atlases_regeneration_input&
 				);
 			}
 
-			for (const auto& input_fnt_id : a.second.fonts) {
+			for (const auto& input_fnt_id : input_for_this_atlas.second.fonts) {
 				auto& fnt = loaded_fonts[input_fnt_id];
 				fnt = augs::font(input_fnt_id);
 				
@@ -141,7 +149,7 @@ atlases_regeneration_output regenerate_atlases(const atlases_regeneration_input&
 			const bool result = pack(
 				input_for_packing_algorithm.data(), 
 				static_cast<int>(input_for_packing_algorithm.size()), 
-				augs::renderer::get_current().get_max_texture_size(),
+				static_cast<int>(augs::renderer::get_current().get_max_texture_size()),
 				packing_output
 			);
 
@@ -168,10 +176,10 @@ atlases_regeneration_output regenerate_atlases(const atlases_regeneration_input&
 				const auto& packed_rect = rects_for_packing_algorithm[current_rect];
 
 				output_img.second.atlas_space.set(
-					packed_rect.x / atlas_size.x,
-					packed_rect.y / atlas_size.y,
-					packed_rect.w / atlas_size.x,
-					packed_rect.h / atlas_size.y
+					static_cast<float>(packed_rect.x) / atlas_size.x,
+					static_cast<float>(packed_rect.y) / atlas_size.y,
+					static_cast<float>(packed_rect.w) / atlas_size.x,
+					static_cast<float>(packed_rect.h) / atlas_size.y
 				);
 
 				output_img.second.was_flipped = packed_rect.flipped;
@@ -195,10 +203,10 @@ atlases_regeneration_output regenerate_atlases(const atlases_regeneration_input&
 					auto& g = output_font.second.glyphs_in_atlas[glyph_index];
 
 					g.atlas_space.set(
-						packed_rect.x / atlas_size.x,
-						packed_rect.y / atlas_size.y,
-						packed_rect.w / atlas_size.x,
-						packed_rect.h / atlas_size.y
+						static_cast<float>(packed_rect.x) / atlas_size.x,
+						static_cast<float>(packed_rect.y) / atlas_size.y,
+						static_cast<float>(packed_rect.w) / atlas_size.x,
+						static_cast<float>(packed_rect.h) / atlas_size.y
 					);
 
 					g.was_flipped = packed_rect.flipped;
@@ -232,7 +240,7 @@ atlases_regeneration_output regenerate_atlases(const atlases_regeneration_input&
 				augs::create_binary_file(atlas_metadata_filename, new_meta_stream);
 			}
 
-			output.metadatas.emplace_back(std::move(std::make_pair(a.first, this_atlas_metadata)));
+			output.metadatas.emplace_back(std::move(std::make_pair(input_for_this_atlas.first, this_atlas_metadata)));
 		}
 		else {
 			texture_atlas_metadata this_atlas_metadata;
@@ -244,7 +252,10 @@ atlases_regeneration_output regenerate_atlases(const atlases_regeneration_input&
 			augs::read_object(existent_meta_stream, dd);
 			augs::read_object(existent_meta_stream, this_atlas_metadata);
 
-			output.metadatas.emplace_back(std::move(std::make_pair(a.first, this_atlas_metadata)));
+			output.metadatas.emplace_back(std::move(std::make_pair(
+				input_for_this_atlas.first, 
+				this_atlas_metadata
+			)));
 		}
 	}
 

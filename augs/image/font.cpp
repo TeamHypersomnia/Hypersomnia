@@ -19,19 +19,16 @@ namespace augs {
 	}
 
 	font::font(const font_loading_input& in) {
-		const auto filename = in.filename.c_str();
-		const auto pt = in.pt;
-		const auto str = in.characters;
 		
 		FT_Face face;
 		
-		const auto error = FT_New_Face(*global_libraries::freetype_library.get(), filename, 0, &face);
+		const auto error = FT_New_Face(*global_libraries::freetype_library.get(), in.filename.c_str(), 0, &face);
 
-		LOG("Loading font %x", filename);
+		LOG("Loading font %x", in.filename);
 
 		ensure(error != FT_Err_Unknown_File_Format && L"font format unsupported");
 		ensure(!error && L"coulnd't open font file");
-		ensure(!FT_Set_Char_Size(face, 0, pt << 6, 72, 72) && L"couldn't set char size");
+		ensure(!FT_Set_Char_Size(face, 0, in.pt << 6, 72, 72) && L"couldn't set char size");
 		ensure(!FT_Select_Charmap(face, FT_ENCODING_UNICODE) && L"couldn't set encoding");
 
 		meta.ascender = face->size->metrics.ascender >> 6;
@@ -39,10 +36,12 @@ namespace augs {
 
 		FT_UInt g_index;
 
-		meta.glyphs.reserve(str.size());
-		glyph_bitmaps.reserve(str.size());
+		const auto& chars = in.characters;
 
-		for (const auto j : str) {
+		meta.glyphs.reserve(chars.size());
+		glyph_bitmaps.reserve(chars.size());
+
+		for (const auto j : chars) {
 			g_index = FT_Get_Char_Index(face, j);
 
 			if (g_index) {
@@ -82,7 +81,7 @@ namespace augs {
 					FT_Get_Kerning(face, meta.glyphs[j].index, meta.glyphs[i].index, FT_KERNING_DEFAULT, &delta);
 					
 					if (delta.x) {
-						meta.glyphs[i].kerning.push_back(std::pair<unsigned, int>(meta.glyphs[j].unicode, delta.x >> 6));
+						meta.glyphs[i].kerning.push_back({ meta.glyphs[j].unicode, delta.x >> 6 });
 					}
 				}
 

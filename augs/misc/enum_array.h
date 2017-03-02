@@ -6,6 +6,7 @@ namespace augs {
 	class enum_array : public std::array<T, static_cast<size_t>(_enum::COUNT)> {
 		typedef std::array<T, static_cast<size_t>(_enum::COUNT)> base;
 	public:
+		using base::base;
 		using base::operator[];
 
 		decltype(auto) operator[](const _enum e) {
