@@ -192,10 +192,10 @@ namespace augs {
 		}
 	}
 
-	template<class A, class Key, class Value, class map_size_type = size_t>
-	bool read_object(
+	template<class A, template <class...> class Container, class Key, class Value, class map_size_type = size_t>
+	bool read_associative_container(
 		A& ar,
-		std::map<Key, Value>& storage,
+		Container<Key, Value>& storage,
 		map_size_type = map_size_type()
 	) {
 		map_size_type s;
@@ -213,7 +213,7 @@ namespace augs {
 				return false;
 			}
 
-			if (!augs::read_object(ar, storage.cast_spells[key])) {
+			if (!augs::read_object(ar, storage[key])) {
 				return false;
 			}
 		}
@@ -221,10 +221,10 @@ namespace augs {
 		return true;
 	}
 
-	template<class A, class Key, class Value, class map_size_type = size_t>
-	auto write_object(
+	template<class A, template <class...> class Container, class Key, class Value, class map_size_type = size_t>
+	auto write_associative_container(
 		A& ar,
-		const std::map<Key, Value>& storage,
+		const Container<Key, Value>& storage,
 		map_size_type = map_size_type()
 	) {
 		ensure(storage.size() <= std::numeric_limits<map_size_type>::max());
@@ -237,8 +237,44 @@ namespace augs {
 		}
 	}
 
-	template<class A, class string_size_type = size_t>
-	bool read_object(A& ar, std::string& storage, string_size_type = string_size_type()) {
+	template<class A, class Key, class Value, class map_size_type = size_t>
+	void write_object(
+		A& ar,
+		const std::map<Key, Value>& storage,
+		map_size_type = map_size_type()
+	) {
+		write_associative_container<A, std::map, Key, Value, map_size_type>(ar, storage);
+	}
+
+	template<class A, class Key, class Value, class map_size_type = size_t>
+	auto read_object(
+		A& ar,
+		std::map<Key, Value>& storage,
+		map_size_type = map_size_type()
+	) {
+		return read_associative_container<A, std::map, Key, Value, map_size_type>(ar, storage);
+	}
+
+	template<class A, class Key, class Value, class map_size_type = size_t>
+	void write_object(
+		A& ar,
+		const std::unordered_map<Key, Value>& storage,
+		map_size_type = map_size_type()
+	) {
+		write_associative_container<A, std::unordered_map, Key, Value, map_size_type>(ar, storage);
+	}
+
+	template<class A, class Key, class Value, class map_size_type = size_t>
+	auto read_object(
+		A& ar,
+		std::unordered_map<Key, Value>& storage,
+		map_size_type = map_size_type()
+	) {
+		return read_associative_container<A, std::unordered_map, Key, Value, map_size_type>(ar, storage);
+	}
+
+	template<class A, class string_element_type, class string_size_type = size_t>
+	bool read_object(A& ar, std::basic_string<string_element_type>& storage, string_size_type = string_size_type()) {
 		string_size_type s;
 
 		if (!read_object(ar, s)) {
@@ -250,8 +286,8 @@ namespace augs {
 		return read_bytes(ar, &storage[0], storage.size());
 	}
 
-	template<class A, class string_size_type = size_t>
-	void write_object(A& ar, const std::string& storage, string_size_type = string_size_type()) {
+	template<class A, class string_element_type, class string_size_type = size_t>
+	void write_object(A& ar, const std::basic_string<string_element_type>& storage, string_size_type = string_size_type()) {
 		ensure(storage.size() <= std::numeric_limits<string_size_type>::max());
 
 		write_object(ar, static_cast<string_size_type>(storage.size()));

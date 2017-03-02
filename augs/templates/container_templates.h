@@ -75,8 +75,15 @@ bool compare_containers(const std::vector<A>& a, const std::vector<B>& b) {
 	return true;
 }
 
-template<class A, class B, class C, class D>
-bool compare_containers(const std::map<A, B>& a, const std::map<C, D>& b) {
+template<
+	template<class...> class AB, 
+	template<class...> class CD, 
+	class A, 
+	class B, 
+	class C, 
+	class D
+>
+bool compare_associative_containers(const AB<A, B>& a, const CD<C, D>& b) {
 	if (a.size() != b.size()) {
 		return false;
 	}
@@ -94,4 +101,24 @@ bool compare_containers(const std::map<A, B>& a, const std::map<C, D>& b) {
 	}
 
 	return true;
+}
+
+template<
+	class A, 
+	class B, 
+	class C, 
+	class D
+>
+bool compare_containers(const std::map<A, B>& a, const std::map<C, D>& b) {
+	return compare_associative_containers<std::map, std::map, A, B, C, D>(a, b);
+}
+
+template<
+	class A,
+	class B,
+	class C,
+	class D
+>
+bool compare_containers(const std::unordered_map<A, B>& a, const std::unordered_map<C, D>& b) {
+	return compare_associative_containers<std::unordered_map, std::unordered_map, A, B, C, D>(a, b);
 }

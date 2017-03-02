@@ -67,6 +67,8 @@ config_table = {
 	resolution_h = 768,
 	doublebuffer = 1,
 
+	check_content_integrity_every_launch = 1,
+
 	-- should enable head-related transfer function for OpenAL?
 	enable_hrtf = 1,
 

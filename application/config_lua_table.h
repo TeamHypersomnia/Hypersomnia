@@ -22,7 +22,9 @@ public:
 	float recording_replay_speed = 1.f;
 
 	unsigned determinism_test_cloned_cosmoi_count = 0;
-	
+
+	bool check_content_integrity_every_launch = false;
+
 	bool enable_hrtf = true;
 	unsigned max_number_of_sound_sources = 0u;
 

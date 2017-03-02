@@ -14,7 +14,7 @@ namespace assets {
 	}
 }
 
-augs::font_metadata& operator*(const assets::font_id& id) {
+augs::baked_font& operator*(const assets::font_id& id) {
 	return *get_resource_manager().find(id);
 }
 

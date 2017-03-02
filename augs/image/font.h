@@ -4,6 +4,8 @@
 #include "augs/image/image.h"
 
 #include "augs/misc/templated_readwrite.h"
+#include "augs/texture_atlas/texture_atlas_entry.h"
+#include "augs/misc/trivial_pair.h"
 
 struct FT_Glyph_Metrics_;
 typedef FT_Glyph_Metrics_ FT_Glyph_Metrics;
@@ -18,13 +20,13 @@ namespace augs {
 
 		vec2i size = vec2i(0, 0);
 
-		std::vector<std::pair<unsigned, int>> kerning;
+		std::vector<augs::trivial_pair<unsigned, int>> kerning;
 
 		font_glyph_metadata() = default;
 		font_glyph_metadata(const FT_Glyph_Metrics&);
 	};
 
-	struct font_metadata {
+	struct font_metadata_from_file {
 		int ascender = 0;
 		int descender = 0;
 
@@ -32,6 +34,11 @@ namespace augs {
 
 		std::vector<font_glyph_metadata> glyphs;
 		std::unordered_map<unsigned, unsigned> unicode_to_glyph_index;
+	};
+
+	struct baked_font {
+		font_metadata_from_file meta_from_file;
+		std::vector<augs::texture_atlas_entry> glyphs_in_atlas;
 	};
 
 	struct font_loading_input {
@@ -46,7 +53,7 @@ namespace augs {
 	};
 
 	struct font {
-		font_metadata meta;
+		font_metadata_from_file meta;
 		std::vector<augs::image> glyph_bitmaps;
 
 		font(
@@ -54,6 +61,64 @@ namespace augs {
 		);
 	};
 
+	template <class A>
+	bool read_object(A& ar, baked_font& data) {
+		return
+			read_object(ar, data.meta_from_file)
+			&& read_object(ar, data.glyphs_in_atlas)
+			;
+	}
+
+	template <class A>
+	void write_object(A& ar, const baked_font& data) {
+		write_object(ar, data.meta_from_file);
+		write_object(ar, data.glyphs_in_atlas);
+	}
+
+	template <class A>
+	bool read_object(A& ar, font_metadata_from_file& data) {
+		return
+			read_object(ar, data.ascender)
+			&& read_object(ar, data.descender)
+			&& read_object(ar, data.pt)
+			&& read_object(ar, data.glyphs)
+			&& read_object(ar, data.unicode_to_glyph_index)
+			;
+	}
+
+	template <class A>
+	void write_object(A& ar, const font_metadata_from_file& data) {
+		write_object(ar, data.ascender);
+		write_object(ar, data.descender);
+		write_object(ar, data.pt);
+		write_object(ar, data.glyphs);
+		write_object(ar, data.unicode_to_glyph_index);
+	}
+
+	template <class A>
+	bool read_object(A& ar, font_glyph_metadata& data) {
+		return
+			read_object(ar, data.adv)
+			&& read_object(ar, data.bear_x)
+			&& read_object(ar, data.bear_y)
+			&& read_object(ar, data.index)
+			&& read_object(ar, data.unicode)
+			&& read_object(ar, data.size)
+			&& read_object(ar, data.kerning)
+		;
+	}
+
+	template <class A>
+	void write_object(A& ar, const font_glyph_metadata& data) {
+		write_object(ar, data.adv);
+		write_object(ar, data.bear_x);
+		write_object(ar, data.bear_y);
+		write_object(ar, data.index);
+		write_object(ar, data.unicode);
+		write_object(ar, data.size);
+		write_object(ar, data.kerning);
+	}
+	
 	template <class A>
 	bool read_object(A& ar, font_loading_input& data) {
 		return

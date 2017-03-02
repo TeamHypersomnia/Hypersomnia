@@ -35,6 +35,45 @@
 
 #include "application/content_generation/atlas_content_structs.h"
 
+enum class texture_map_type {
+	DIFFUSE,
+	NEON,
+	DESATURATED,
+
+	COUNT
+};
+
+struct game_image_usage_settings {
+	struct {
+		bool flip_horizontally = false;
+		bool flip_vertically = false;
+		padding_byte pad[2];
+
+		vec2 bbox_expander;
+	} gui;
+};
+
+struct game_image_request {
+	augs::enum_array<source_image_loading_input, texture_map_type> texture_maps;
+
+	std::string polygonization_filename;
+	game_image_usage_settings settings;
+};
+
+typedef source_font_loading_input game_font_request;
+
+struct game_image_baked {
+	augs::enum_array<augs::texture_atlas_entry, texture_map_type> texture_maps;
+
+	std::vector<vec2i> polygonized;
+	game_image_usage_settings settings;
+};
+
+typedef augs::baked_font game_font_baked;
+
+typedef std::unordered_map<assets::texture_id, game_image_request> game_image_requests;
+typedef std::unordered_map<assets::font_id, game_font_request> game_font_requests;
+
 namespace resources {
 	class manager {
 	public:

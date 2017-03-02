@@ -1,5 +1,5 @@
+#include <map>
 #include "augs/image/font.h"
-#include <set>
 
 #include <ft2build.h> 
 #include FT_FREETYPE_H
@@ -71,7 +71,7 @@ namespace augs {
 					);
 				}
 
-				meta.unicode_to_glyph_index[j] = meta.glyphs.size() - 1;
+				meta.unicode_to_glyph_index[j] = static_cast<unsigned>(meta.glyphs.size() - 1u);
 			}
 		}
 
