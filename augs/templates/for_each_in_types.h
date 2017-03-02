@@ -73,3 +73,13 @@ void for_each_type(F f)
 {
 	templates_detail::for_each(std::tuple<Ts...>(), f, templates_detail::gen_seq<sizeof...(Ts)>());
 }
+
+template<
+	template<typename...> class List,
+	typename... Ts,
+	typename F
+>
+void for_each_type_in_list(const List<Ts...>& t, F f)
+{
+	for_each_type<Ts...>(f);
+}

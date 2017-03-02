@@ -1,6 +1,6 @@
 #include <experimental/filesystem>
 
-#include "gui_textures.h"
+#include "buttons_with_corners.h"
 #include "augs/gui/button_corners.h"
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
@@ -277,8 +277,10 @@ void create_and_save_button_with_corners(
 		save(button_corner_type::LB_INTERNAL_BORDER, lb);
 	}
 
-	augs::image inside;
-	inside.create(100u, 100u);
-	inside.fill(in.inside_color);
-	inside.save(typesafe_sprintf(filename_template, "inside"));
+	{
+		augs::image inside;
+		inside.create(100u, 100u);
+		inside.fill(in.inside_color);
+		save(button_corner_type::INSIDE, inside);
+	}
 }

@@ -21,19 +21,11 @@
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 
-#include "application/content_generation/neon_maps.h"
-
 int main(int argc, char** argv) {
 	augs::create_directories("generated/logs/");
 
 	augs::global_libraries::init();
 	augs::global_libraries::run_googletest(argc, argv);
-
-	LOG("\n--------------------------------------------\nChecking content integrity...");
-
-	regenerate_neon_maps();
-
-	LOG("Content regenerated successfully.\n--------------------------------------------\n");
 
 	augs::lua_state_raii lua;
 	bind_game_and_augs(lua);

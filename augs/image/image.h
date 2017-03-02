@@ -2,6 +2,9 @@
 #include <vector>
 #include "augs/math/vec2.h"
 #include "augs/graphics/pixel.h"
+#include "augs/padding_byte.h"
+#include "augs/misc/trivial_variant.h"
+#include "augs/templates/maybe_const.h"
 
 namespace augs {
 	class image {
@@ -35,33 +38,51 @@ namespace augs {
 			const bool add_rgba_values = false
 		);
 
-		void paint_circle(
-			const unsigned radius, 
-			const unsigned border_width = 1, 
-			const rgba filling = white, 
-			const bool scale_alpha = false
-		);
+		struct paint_circle_midpoint_command {
+			unsigned radius;
+			unsigned border_width = 1;
+			bool scale_alpha = false;
+			bool constrain_angle = false;
+			padding_byte pad[2];
+			float angle_start = 0.f;
+			float angle_end = 0.f;
+			rgba filling = white;
+
+			static std::string get_command_name() {
+				return "circle_midpoint";
+			}
+		};
 		
-		void paint_circle_midpoint(
-			const unsigned radius, 
-			const unsigned border_width = 1, 
-			const rgba filling = white, 
-			const bool scale_alpha = false, 
-			const bool constrain_angle = false,
-			const vec2 angle_start = vec2(), 
-			const vec2 angle_end = vec2()
-		);
+		struct paint_circle_filled_command {
+			unsigned radius;
+			rgba filling = white;
 
-		void paint_filled_circle(
-			const unsigned radius, 
-			const rgba filling = white
-		);
+			static std::string get_command_name() {
+				return "circle_filled";
+			}
+		};
 
-		void paint_line(
-			const vec2u from, 
-			const vec2u to, 
-			const rgba filling = white
-		);
+		struct paint_line_command {
+			vec2u from;
+			vec2u to;
+			rgba filling = white;
+
+			static std::string get_command_name() {
+				return "line";
+			}
+		};
+
+		typedef augs::trivial_variant<
+			paint_circle_midpoint_command,
+			paint_circle_filled_command,
+			paint_line_command
+		> command_variant;
+
+		void execute(const command_variant&);
+
+		void execute(const paint_circle_midpoint_command&);
+		void execute(const paint_circle_filled_command&);
+		void execute(const paint_line_command&);
 		
 		void swap_red_and_blue();
 
@@ -82,4 +103,37 @@ namespace augs {
 
 		image get_desaturated() const;
 	};
+
+	template <bool C, class F>
+	auto introspect(
+		maybe_const_ref_t<C, image::paint_circle_midpoint_command> t,
+		F f
+	) {
+		f(t.radius);
+		f(t.border_width);
+		f(t.scale_alpha);
+		f(t.constrain_angle);
+		f(t.angle_start);
+		f(t.angle_end);
+		f(t.filling);
+	}
+
+	template <bool C, class F>
+	auto introspect(
+		maybe_const_ref_t<C, image::paint_circle_filled_command> t,
+		F f
+	) {
+		f(t.radius);
+		f(t.filling);
+	}
+
+	template <bool C, class F>
+	auto introspect(
+		maybe_const_ref_t<C, image::paint_line_command> t,
+		F f
+	) {
+		f(t.from);
+		f(t.to);
+		f(t.filling);
+	}
 }

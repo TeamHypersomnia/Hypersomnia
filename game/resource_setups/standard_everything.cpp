@@ -1,7 +1,12 @@
 #include "all.h"
 #include "game/resources/manager.h"
 #include "augs/graphics/shader.h"
+
 #include "application/content_generation/texture_atlases.h"
+#include "application/content_generation/neon_maps.h"
+#include "application/content_generation/desaturations.h"
+#include "application/content_generation/buttons_with_corners.h"
+#include "application/content_generation/scripted_images.h"
 
 #include "3rdparty/GL/OpenGL.h"
 
@@ -24,7 +29,15 @@ namespace resource_setups {
 			in.fonts.push_back({ f.second.loading_input, f.second.target_atlas });
 		}
 
+		LOG("\n--------------------------------------------\nChecking content integrity...");
+
+		regenerate_scripted_images();
+		regenerate_buttons_with_corners();
+		regenerate_neon_maps();
+		regenerate_desaturations();
 		const auto regenerated = regenerate_atlases(in);
+
+		LOG("Content regenerated successfully.\n--------------------------------------------\n");
 
 		manager.load_baked_metadata(
 			images,

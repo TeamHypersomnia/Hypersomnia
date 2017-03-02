@@ -237,27 +237,27 @@ namespace resource_setups {
 
 		{
 			auto& in = output[assets::texture_id::ATTACHMENT_CIRCLE_FILLED];
-			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/backpack.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::DIFFUSE] = { "generated/scripted_images/attachment_circle_filled.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::ATTACHMENT_CIRCLE_BORDER];
-			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/backpack.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::DIFFUSE] = { "generated/scripted_images/attachment_circle_border.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::ACTION_BUTTON_FILLED];
-			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/backpack.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::DIFFUSE] = { "generated/scripted_images/action_button_filled.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::ACTION_BUTTON_BORDER];
-			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/backpack.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::DIFFUSE] = { "generated/scripted_images/action_button_border.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM];
-			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/backpack.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::DIFFUSE] = { "generated/scripted_images/circular_bar_medium.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
@@ -492,12 +492,12 @@ namespace resource_setups {
 
 		make_button_with_corners(
 			assets::texture_id::HOTBAR_BUTTON_INSIDE,
-			"generated/gui/hotbar_button"
+			"generated/buttons_with_corners/hotbar_button_%x.png"
 		);
 
 		make_button_with_corners(
 			assets::texture_id::MENU_BUTTON_INSIDE,
-			"generated/gui/menu_button"
+			"generated/buttons_with_corners/menu_button_%x.png"
 		);
 
 		make_indexed(

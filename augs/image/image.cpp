@@ -59,17 +59,17 @@ namespace augs {
 		size = new_size;
 		v.resize(new_size.area(), rgba(0, 0, 0, 0));
 	}
+	
+	void image::execute(const command_variant& in) {
+		in.call([&](const auto& resolved) {
+			execute(resolved);
+		});
+	}
 
-	void image::paint_circle_midpoint(
-		const unsigned radius, 
-		const unsigned border_width, 
-		const rgba filling, 
-		const bool scale_alpha, 
-		const bool constrain_angle, 
-		const vec2 angle_start, 
-		const vec2 angle_end
+	void image::execute(
+		const paint_circle_midpoint_command& in
 	) {
-		const auto side = radius * 2 + 1;
+		const auto side = in.radius * 2 + 1;
 
 		image new_surface;
 		auto& surface = v.empty() ? *this : new_surface;
@@ -78,6 +78,9 @@ namespace augs {
 
 		ensure(size.x >= side);
 		ensure(size.y >= side);
+
+		const auto angle_start = vec2().set_from_degrees(in.angle_start);
+		const auto angle_end = vec2().set_from_degrees(in.angle_end);
 
 		const auto pp = [&](
 			const unsigned x, 
@@ -88,8 +91,8 @@ namespace augs {
 
 			const auto angle = vec2i(x_center, y_center);// .degrees();
 
-			if (!constrain_angle || (angle_start.cross(angle) >= 0.f && angle_end.cross(angle) <= 0.f)) {
-				const auto col = filling;
+			if (!in.constrain_angle || (angle_start.cross(angle) >= 0.f && angle_end.cross(angle) <= 0.f)) {
+				const auto col = in.filling;
 				//if (scale_alpha)
 				//	col.a = (angle - angle_start) / (angle_end - angle_start) * 255;
 
@@ -97,8 +100,8 @@ namespace augs {
 			}
 		};
 
-		for (unsigned i = 0; i < border_width; ++i) {
-			int x = radius - i;
+		for (unsigned i = 0; i < in.border_width; ++i) {
+			int x = in.radius - i;
 			int y = 0;
 			
 			int decisionOver2 = 1 - x;   // Decision criterion divided by 2 evaluated at x=r, y=0
@@ -126,7 +129,7 @@ namespace augs {
 			}
 		}
 
-		if (border_width > 1) {
+		if (in.border_width > 1) {
 			for (unsigned y = 0; y < surface.size.x; ++y) {
 				for (unsigned x = 0; x < surface.size.x; ++x) {
 					if (x > 0 && y > 0 && x < surface.size.x - 1 && y < surface.size.y - 1) {
@@ -151,68 +154,10 @@ namespace augs {
 		}
 	}
 
-	void image::paint_circle(
-		const unsigned radius, 
-		const unsigned border_width, 
-		const rgba filling, 
-		const bool scale_alpha
+	void image::execute(
+		const paint_circle_filled_command& in
 	) {
-		const auto side = radius * 2 + 1;
-
-		if (v.empty()) {
-			create({ side, side });
-		}
-		else {
-			ensure(size.x >= side);
-			ensure(size.y >= side);
-		}
-
-		if (scale_alpha) {
-			for (unsigned y = 0; y < size.y; ++y) {
-				for (unsigned x = 0; x < size.x; ++x) {
-					const auto x_center = static_cast<signed>(x - size.x / 2);
-					const auto y_center = static_cast<signed>(y - size.y / 2);
-
-					const auto angle = vec2i(x_center, y_center).degrees();
-
-					if (angle >= -45 && angle <= 45 &&
-						x_center*x_center + y_center*y_center <= radius*radius
-						&&
-						x_center*x_center + y_center*y_center >= (radius - border_width)*(radius - border_width)
-						) {
-						pixel({x, y}) = filling;
-						pixel({x, y}).a = static_cast<rgba_channel>((angle + 45) / 90.f * 255);
-					}
-				}
-			}
-		}
-		else {
-			for (unsigned y = 0; y < size.y; ++y) {
-				for (unsigned x = 0; x < size.x; ++x) {
-					const auto x_center = static_cast<signed>(x - size.x / 2);
-					const auto y_center = static_cast<signed>(y - size.y / 2);
-
-					if (
-						x_center*x_center + y_center*y_center <= radius*radius
-						&&
-						x_center*x_center + y_center*y_center >= (radius - border_width)*(radius - border_width)
-						) {
-						pixel({ x, y }) = filling;
-					}
-				}
-			}
-		}
-		//pixel(side / 2, 0) = rgba(0, 0, 0, 0);
-		//pixel(side / 2, side - 1) = rgba(0, 0, 0, 0);
-		//pixel(0, side / 2) = rgba(0, 0, 0, 0);
-		//pixel(side - 1, side / 2) = rgba(0, 0, 0, 0);
-	}
-
-	void image::paint_filled_circle(
-		const unsigned radius, 
-		const rgba filling
-	) {
-		const auto side = radius * 2 + 1;
+		const auto side = in.radius * 2 + 1;
 
 		if (v.empty()) {
 			create({ side, side });
@@ -227,8 +172,8 @@ namespace augs {
 				const auto x_center = static_cast<signed>(x - size.x / 2);
 				const auto y_center = static_cast<signed>(y - size.y / 2);
 
-				if (x_center*x_center + y_center*y_center <= radius*radius) {
-					pixel({ x, y }) = filling;
+				if (x_center*x_center + y_center*y_center <= static_cast<int>(in.radius*in.radius)) {
+					pixel({ x, y }) = in.filling;
 				}
 			}
 		}
@@ -239,16 +184,14 @@ namespace augs {
 		//pixel(side -1, side /2) = rgba(0, 0, 0, 0);
 	}
 
-	void image::paint_line(
-		const vec2u from, 
-		const vec2u to, 
-		const rgba filling
+	void image::execute(
+		const paint_line_command& in
 	) {
-		Line(from.x, from.y, to.x, to.y, [&](const int x, const int y) {
+		Line(in.from.x, in.from.y, in.to.x, in.to.y, [&](const int x, const int y) {
 			const auto pos = vec2u(x, y);
 
 			ensure(in_bounds(pos));
-			pixel(pos) = filling;
+			pixel(pos) = in.filling;
 		});
 	}
 	

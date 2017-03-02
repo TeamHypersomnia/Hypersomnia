@@ -138,6 +138,7 @@ struct vec2t {
 	}
 
 	friend std::ostream& operator<<(std::ostream& out, const vec2t<type>& x);
+	friend std::istream& operator>>(std::istream& out, vec2t<type>& x);
 
 	typedef float real;
 
@@ -546,6 +547,12 @@ namespace augs {
 template<class T>
 std::ostream& operator<<(std::ostream& out, const vec2t<T>& x) {
 	out << "(" << x.x << ";" << x.y << ")";
+	return out;
+}
+
+template<class T>
+std::istream& operator>>(std::istream& out, vec2t<T>& x) {
+	out >> x.x >> x.y;
 	return out;
 }
 
