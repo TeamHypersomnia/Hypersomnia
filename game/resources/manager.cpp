@@ -9,8 +9,8 @@
 using namespace augs;
 
 namespace assets {
-	vec2i get_size(texture_id id) {
-		return get_resource_manager().find(id)->source_size;
+	vec2u get_size(texture_id id) {
+		return get_resource_manager().find(id)->texture_maps[texture_map_type::DIFFUSE].original_size_pixels;
 	}
 }
 
@@ -23,7 +23,7 @@ bool operator!(const assets::font_id& id) {
 }
 
 augs::texture_atlas_entry& operator*(const assets::texture_id& id) {
-	return get_resource_manager().find(id)->textures[image_map_type::DIFFUSE];
+	return get_resource_manager().find(id)->texture_maps[texture_map_type::DIFFUSE];
 }
 
 resources::animation_response& operator*(const assets::animation_response_id& id) {
@@ -59,7 +59,7 @@ bool operator!(const assets::texture_id& id) {
 }
 
 template <class T, class K>
-auto ptr_if_found(T& container, const K& id) {
+auto ptr_if_found(T& container, const K& id) -> decltype(std::addressof(container[id])) {
 	const auto it = container.find(id);
 
 	if (it == container.end()) {
@@ -70,26 +70,16 @@ auto ptr_if_found(T& container, const K& id) {
 }
 
 namespace resources {
-	source_image_baked* manager::find(const assets::texture_id id) {
-		return ptr_if_found(source_images_baked, id);
+	game_image_baked* manager::find(const assets::texture_id id) {
+		return ptr_if_found(baked_game_images, id);
 	}
-	
-	image_usage_settings manager::get_usage_settings(const assets::texture_id id) const {
-		const auto it = usage_settings.find(id);
 
-		if (it == usage_settings.end()) {
-			return image_usage_settings();
-		}
-
-		return (*it).second;
+	game_font_baked* manager::find(const assets::font_id id) {
+		return ptr_if_found(baked_game_fonts, id);
 	}
 
 	augs::graphics::texture* manager::find(const assets::atlas_id id) {
 		return ptr_if_found(physical_textures, id);
-	}
-
-	augs::font_metadata* manager::find(const assets::font_id id) {
-		return ptr_if_found(source_fonts_baked, id);
 	}
 
 	graphics::shader_program* manager::find(const assets::program_id id) {
@@ -137,64 +127,56 @@ namespace resources {
 		return sound_responses[id];
 	}
 
-	texture_atlas& manager::create(
-		const assets::atlas_id id, 
-		const unsigned atlas_creation_mode_flags
+	void manager::load_baked_metadata(
+		const game_image_requests& images,
+		const game_font_requests& fonts,
+		const atlases_regeneration_output& atlases
 	) {
-		texture_atlas& atl = atlases[id];
+		for (const auto& requested_image : images) {
+			auto& baked_image = baked_game_images[requested_image.first];
 
-		if (atlas_creation_mode_flags & atlas_creation_mode::FROM_ALL_TEXTURES) {
-			for (const auto& tex : textures) {
-				atl.textures.push_back(&tex.second);
-			}			
+			for (size_t i = 0; i < baked_image.texture_maps.size(); ++i) {
+				const auto seeked_identifier = requested_image.second.texture_maps[i].filename;
+				const bool this_texture_map_is_not_used = seeked_identifier.empty();
 
-			for (const auto& tex : neon_maps) {
-				atl.textures.push_back(&tex.second);
+				if (this_texture_map_is_not_used) {
+					continue;
+				}
+
+				for (const auto& a : atlases.metadatas) {
+					const auto it = a.second.images.find(seeked_identifier);
+
+					if (it != a.second.images.end()) {
+						const auto found_atlas_entry = (*it).second;
+						baked_image.texture_maps[i] = found_atlas_entry;
+
+						break;
+					}
+				}
 			}
 
-			for (const auto& tex : desaturated_textures) {
-				atl.textures.push_back(&tex.second);
-			}
+			baked_image.settings = requested_image.second.settings;
 		}
 
-		if (atlas_creation_mode_flags & atlas_creation_mode::FROM_ALL_FONTS) {
-			for (const auto& fnt : fonts) {
-				fnt.second.add_to_atlas(atl);
+		for (const auto& requested_font : fonts) {
+			auto& baked_font = baked_game_fonts[requested_font.first];
+
+			const auto seeked_identifier = requested_font.second.loading_input;
+
+			ensure(seeked_identifier.filename.size() > 0);
+			ensure(seeked_identifier.characters.size() > 0);
+			ensure(seeked_identifier.pt > 0);
+
+			for (const auto& a : atlases.metadatas) {
+				const auto it = a.second.fonts.find(seeked_identifier);
+
+				if (it != a.second.fonts.end()) {
+					const auto found_atlas_entry = (*it).second;
+					baked_font = found_atlas_entry;
+
+					break;
+				}
 			}
-		}
-
-		atl.default_build();
-
-		return atl;
-	}
-
-	augs::font& manager::create(const assets::font_id id) {
-		augs::font& font = fonts[id];
-
-		return font;
-	}
-
-	void manager::associate_neon_map(
-		const assets::texture_id target_to_be_assigned,
-		const assets::texture_id take_neon_map_from
-	) {
-		neon_maps[target_to_be_assigned] = neon_maps[take_neon_map_from];
-	}
-
-	texture_with_image& manager::create(const assets::texture_id id, const image img) {
-		ensure(textures.find(id) == textures.end());
-		texture_with_image& tex = textures[id];
-		tex.set_from_image(img);
-
-		return tex;
-	}
-
-	void manager::create_sprites_indexed(assets::texture_id first, assets::texture_id last, std::string filename_preffix) {
-		for (assets::texture_id i = first; i < last; i = assets::texture_id(int(i) + 1)) {
-			std::ostringstream filename;
-			filename << filename_preffix << "_" << int(int(i) - int(first) + 1) << ".png";
-
-			create(i, filename.str());
 		}
 	}
 

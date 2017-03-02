@@ -8,6 +8,8 @@
 #include "augs/padding_byte.h"
 #include "augs/image/font.h"
 
+#include "atlas_content_structs.h"
+
 struct texture_atlas_image_stamp {
 	std::experimental::filesystem::file_time_type last_write_time;
 };
@@ -22,12 +24,7 @@ struct texture_atlas_stamp {
 	std::map<std::string, texture_atlas_font_stamp> font_stamps;
 };
 
-struct texture_atlas_metadata {
-	std::map<std::string, augs::texture_atlas_entry> images;
-	std::map<std::string, augs::font_metadata> fonts;
-};
-
-void regenerate_atlases();
+atlases_regeneration_output regenerate_atlases(const atlases_regeneration_input&);
 
 namespace augs {
 	template <class A>

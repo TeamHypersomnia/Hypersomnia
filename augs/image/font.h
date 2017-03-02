@@ -39,6 +39,10 @@ namespace augs {
 		std::wstring characters;
 		
 		unsigned pt = 0u;
+
+		bool operator==(const font_loading_input& b) const {
+			return filename == b.filename && characters == b.characters && pt == b.pt;
+		}
 	};
 
 	struct font {
@@ -65,4 +69,13 @@ namespace augs {
 		write_object(ar, data.characters);
 		write_object(ar, data.pt);
 	}
+}
+
+namespace std {
+	template <>
+	struct hash<augs::font_loading_input> {
+		size_t operator()(const augs::font_loading_input& in) const {
+			return augs::simple_two_hash(in.filename, in.characters) + in.pt;
+		}
+	};
 }

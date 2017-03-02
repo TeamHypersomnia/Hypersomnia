@@ -213,11 +213,11 @@ namespace assets {
 		COUNT,
 	};
 	
-	vec2i get_size(texture_id);
+	vec2u get_size(texture_id);
 }
 
 namespace augs {
-	class texture_atlas_entry;
+	struct texture_atlas_entry;
 }
 
 augs::texture_atlas_entry& operator*(const assets::texture_id& id);

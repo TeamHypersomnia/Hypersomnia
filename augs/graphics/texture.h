@@ -3,7 +3,8 @@
 
 namespace augs {
 	namespace graphics {
-		struct texture {
+		class texture {
+		public:
 			unsigned int id = 0xdeadbeef;
 			bool built = false;
 

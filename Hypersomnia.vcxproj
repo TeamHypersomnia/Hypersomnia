@@ -323,6 +323,7 @@
     <ClCompile Include="3rdparty\rectpack2D\src\pack.cpp" />
     <ClCompile Include="application\call_config_script.cpp" />
     <ClCompile Include="application\config_lua_table.cpp" />
+    <ClCompile Include="application\content_generation\gui_textures.cpp" />
     <ClCompile Include="application\content_generation\neon_maps.cpp" />
     <ClCompile Include="application\content_generation\texture_atlases.cpp" />
     <ClCompile Include="application\setups\director_setup.cpp" />
@@ -411,7 +412,6 @@
     <ClCompile Include="game\flyweights\physical_material.cpp" />
     <ClCompile Include="game\ingredients\grenades.cpp" />
     <ClCompile Include="game\resources\tile_layer.cpp" />
-    <ClCompile Include="game\resource_setups\make_button_with_corners.cpp" />
     <ClCompile Include="game\resource_setups\standard_atlas.cpp" />
     <ClCompile Include="game\resource_setups\standard_behaviour_trees.cpp" />
     <ClCompile Include="game\resource_setups\standard_everything.cpp" />
@@ -1034,6 +1034,7 @@
     <ClInclude Include="application\content_generation\desaturations.h" />
     <ClInclude Include="application\content_generation\neon_maps.h" />
     <ClInclude Include="application\content_generation\texture_atlases.h" />
+    <ClInclude Include="application\content_generation\gui_textures.h" />
     <ClInclude Include="application\menu_button_type.h" />
     <ClInclude Include="application\setups\client_setup.h" />
     <ClInclude Include="application\setups\determinism_test_setup.h" />
@@ -1091,6 +1092,7 @@
     <ClInclude Include="augs\misc\action.h" />
     <ClInclude Include="augs\misc\action_list.h" />
     <ClInclude Include="augs\misc\easier_handle_getters_mixin.h" />
+    <ClInclude Include="augs\misc\enum_array.h" />
     <ClInclude Include="augs\misc\enum_bitset.h" />
     <ClInclude Include="augs\misc\http_requests.h" />
     <ClInclude Include="augs\misc\input_context.h" />
@@ -1218,6 +1220,7 @@
     <ClInclude Include="game\messages\exploding_ring.h" />
     <ClInclude Include="game\messages\item_picked_up_message.h" />
     <ClInclude Include="game\messages\visibility_information.h" />
+    <ClInclude Include="application\content_generation\atlas_content_structs.h" />
     <ClInclude Include="game\resources\sound_response.h" />
     <ClInclude Include="game\resources\tile_layer.h" />
     <ClInclude Include="game\resource_setups\all.h" />

@@ -6,7 +6,7 @@
 #include "game/detail/basic_renderable_drawing_input.h"
 
 namespace augs {
-	class texture_atlas_entry;
+	struct texture_atlas_entry;
 }
 
 namespace components {

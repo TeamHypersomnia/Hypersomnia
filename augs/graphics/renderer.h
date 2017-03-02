@@ -13,10 +13,9 @@
 #include "augs/misc/timer.h"
 
 namespace augs {
-	class texture_atlas;
-
 	namespace graphics {
 		class fbo;
+		class texture;
 	}
 
 	class renderer {
@@ -86,7 +85,7 @@ namespace augs {
 		void initialize_fbos(const vec2i screen_size);
 
 		void bind_texture(const graphics::fbo&);
-		void bind_texture(const augs::texture&);
+		void bind_texture(const augs::graphics::texture&);
 
 		void set_active_texture(const unsigned);
 

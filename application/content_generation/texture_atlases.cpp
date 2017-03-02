@@ -12,7 +12,9 @@
 
 #include "augs/image/image.h"
 
-void regenerate_atlases() {
+atlases_regeneration_output regenerate_atlases(const atlases_regeneration_input& in) {
+	atlases_regeneration_output output;
+
 	auto& manager = get_resource_manager();
 
 	const auto atlases_directory = std::string("generated/atlases/");

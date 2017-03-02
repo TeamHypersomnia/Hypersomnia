@@ -10,7 +10,15 @@
 
 #include "augs/padding_byte.h"
 
-struct image_usage_settings {
+enum class texture_map_type {
+	DIFFUSE,
+	NEON,
+	DESATURATED,
+
+	COUNT
+};
+
+struct game_image_usage_settings {
 	struct {
 		bool flip_horizontally = false;
 		bool flip_vertically = false;
@@ -20,78 +28,51 @@ struct image_usage_settings {
 	} gui;
 };
 
-struct source_image_baked {
-	vec2u source_size;
+typedef std::string source_image_identifier;
 
-	augs::enum_array<augs::texture_atlas_entry, image_map_type> textures;
-};
-
-enum class image_map_type {
-	DIFFUSE,
-	NEON,
-	DESATURATED,
-
-	COUNT
-};
-
-struct source_image_location {
-	std::string filename;
+struct source_image_loading_input {
+	source_image_identifier filename;
 	assets::atlas_id target_atlas;
 };
 
-struct source_font_location {
-	augs::font_loading_input loading_input;
-	assets::atlas_id target_atlas;
-};
-
-struct all_information_about_image {
-	augs::enum_array<source_image_location, image_map_type> textures;
+struct game_image_request {
+	augs::enum_array<source_image_loading_input, texture_map_type> texture_maps;
 
 	std::string polygonization_filename;
-	image_usage_settings settings;
+	game_image_usage_settings settings;
 };
 
-typedef source_font_location all_information_about_font;
+typedef std::unordered_map<assets::texture_id, game_image_request> game_image_requests;
 
-struct atlas_regeneration_input {
-	std::vector<source_font_location> fonts;
-	std::vector<source_image_location> images;
+struct game_image_baked {
+	augs::enum_array<augs::texture_atlas_entry, texture_map_type> texture_maps;
+
+	std::vector<vec2i> polygonized;
+	game_image_usage_settings settings;
 };
 
+typedef augs::font_loading_input source_font_identifier;
 
-/*
-struct source_image_input {
-	augs::enum_array<std::string, image_map_type> textures;
+struct source_font_loading_input {
+	source_font_identifier loading_input;
+	assets::atlas_id target_atlas;
 };
 
-typedef augs::font_loading_input source_font_input;
+typedef source_font_loading_input game_font_request;
+typedef std::unordered_map<assets::font_id, game_font_request> game_font_requests;
 
-struct requested_atlas_resources {
-	std::unordered_map<assets::texture_id, source_image_input> images;
-	std::unordered_map<assets::font_id, source_font_input> fonts;
+typedef augs::font_metadata game_font_baked;
 
-	void request(
-		const assets::texture_id,
-		const std::string& diffuse_filename
-	);
-
-	void request(
-		const assets::font_id,
-		const augs::font_loading_input in
-	);
-
-	void request_indexed(
-		const assets::texture_id first,
-		const assets::texture_id last,
-		const std::string& diffuse_filename
-	);
-
-	void request_button_with_corners(
-		const assets::texture_id inside_image_id,
-		const std::string& first_filename
-	);
-
-	void request_desaturated(const assets::texture_id);
-	void request_neon_map(const assets::texture_id);
+struct atlases_regeneration_input {
+	std::vector<source_font_loading_input> fonts;
+	std::vector<source_image_loading_input> images;
 };
-*/
+
+struct texture_atlas_metadata {
+	std::unordered_map<source_image_identifier, augs::texture_atlas_entry> images;
+	std::unordered_map<source_font_identifier, augs::font_metadata> fonts;
+};
+
+struct atlases_regeneration_output {
+	std::vector<std::pair<assets::atlas_id, texture_atlas_metadata>> metadatas;
+};

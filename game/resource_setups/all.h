@@ -1,5 +1,5 @@
 #pragma once
-#include "game/resources/requested_atlas_resources.h"
+#include "game/resources/atlas_content_structs.h"
 #include "game/assets/texture_id.h"
 #include "augs/graphics/pixel.h"
 #include "game/flyweights/spell_data.h"
@@ -9,7 +9,7 @@
 namespace resource_setups {
 	void load_standard_everything();
 
-	std::unordered_map<assets::texture_id, all_information_about_image> load_standard_images();
+	std::unordered_map<assets::texture_id, game_image_request> load_standard_images();
 	std::unordered_map<assets::font_id, all_information_about_font> load_standard_fonts();
 
 	void load_standard_image_settings();

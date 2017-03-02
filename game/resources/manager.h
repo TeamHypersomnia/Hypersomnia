@@ -33,33 +33,25 @@
 #include "augs/misc/enum_associative_array.h"
 #include "augs/misc/enum_bitset.h"
 
-#include "game/resources/atlas_content_structs.h"
-
+#include "application/content_generation/atlas_content_structs.h"
 
 namespace resources {
 	class manager {
 	public:
-		void regenerate_atlases_and_load_baked_metadata(const requested_atlas_resources&);
-
-		void set(
-			const assets::texture_id,
-			const image_usage_settings settings
+		void load_baked_metadata(
+			const game_image_requests&,
+			const game_font_requests&,
+			const atlases_regeneration_output&
 		);
-
-		void associate_neon_map(
-			const assets::texture_id take_neon_map_from,
-			const assets::texture_id target_to_be_assigned
-		);
-
-		image_usage_settings get_usage_settings(const assets::texture_id) const;
 
 		void create(
 			const assets::atlas_id,
 			const std::string& source_filename
 		);
 
-		source_image_baked* find(const assets::texture_id);
-		augs::font_metadata* find(const assets::font_id);
+		game_image_baked* find(const assets::texture_id);
+		game_font_baked* find(const assets::font_id);
+		
 		augs::graphics::texture* find(const assets::atlas_id);
 
 		sound_response& create(const assets::sound_response_id);
@@ -101,10 +93,8 @@ namespace resources {
 		void destroy_everything();
 
 	private:
-		augs::enum_associative_array<assets::texture_id, source_image_baked> source_images_baked;
-		augs::enum_associative_array<assets::font_id, augs::font_metadata> source_fonts_baked;
-
-		augs::enum_associative_array<assets::texture_id, image_usage_settings> usage_settings;
+		augs::enum_associative_array<assets::texture_id, game_image_baked> baked_game_images;
+		augs::enum_associative_array<assets::font_id, game_font_baked> baked_game_fonts;
 
 		augs::enum_associative_array<assets::atlas_id, augs::graphics::texture> physical_textures;
 

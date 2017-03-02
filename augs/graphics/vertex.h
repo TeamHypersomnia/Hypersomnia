@@ -10,7 +10,7 @@ enum class vertex_attribute {
 };
 
 namespace augs {
-	class texture_atlas_entry;
+	struct texture_atlas_entry;
 
 	struct vertex {
 		vec2 pos;

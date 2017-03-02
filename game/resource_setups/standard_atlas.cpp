@@ -8,22 +8,22 @@ namespace resource_setups {
 
 		{
 			auto& in = output[assets::texture_id::TEST_CROSSHAIR];
-			in.textures[image_map_type::DIFFUSE] = { "hypersomnia/gfx/crosshair.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.textures[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/crosshair.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::TEST_PLAYER];
-			in.textures[image_map_type::DIFFUSE] = { "hypersomnia/gfx/walk_1.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.textures[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/walk_1.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::TEST_BACKGROUND];
-			in.textures[image_map_type::DIFFUSE] = { "hypersomnia/gfx/snow_textures/snow3.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.textures[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/snow_textures/snow3.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::CRATE];
-			in.textures[image_map_type::DIFFUSE] = { "hypersomnia/gfx/crate2.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.textures[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/crate2.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		return std::move(output);
