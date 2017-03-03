@@ -6,9 +6,10 @@
 #include "game/flyweights/spell_data.h"
 #include "game/flyweights/physical_material.h"
 
+class config_lua_table;
 
 namespace resource_setups {
-	void load_standard_everything();
+	void load_standard_everything(const config_lua_table&);
 
 	game_image_requests load_standard_images();
 	game_font_requests load_standard_fonts();

@@ -70,7 +70,7 @@ config_table = {
 	check_content_integrity_every_launch = 1,
 
 	-- 1 - more hdd space required, but launching the game is way faster
-	save_regenerated_atlas_as_binary = 1,
+	save_regenerated_atlases_as_binary = 1,
 
 	-- should enable head-related transfer function for OpenAL?
 	enable_hrtf = 1,

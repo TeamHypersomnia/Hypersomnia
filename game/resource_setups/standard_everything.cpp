@@ -2,6 +2,8 @@
 #include "game/resources/manager.h"
 #include "augs/graphics/shader.h"
 
+#include "application/config_lua_table.h"
+
 #include "application/content_generation/texture_atlases.h"
 #include "application/content_generation/neon_maps.h"
 #include "application/content_generation/desaturations.h"
@@ -12,7 +14,7 @@
 #include "3rdparty/GL/OpenGL.h"
 
 namespace resource_setups {
-	void load_standard_everything() {
+	void load_standard_everything(const config_lua_table& cfg) {
 		auto& manager = get_resource_manager();
 		
 		const auto images = load_standard_images();
@@ -41,7 +43,12 @@ namespace resource_setups {
 		regenerate_neon_maps();
 		regenerate_desaturations();
 		regenerate_polygonizations_of_images();
-		const auto regenerated = regenerate_atlases(in);
+
+		const auto regenerated = regenerate_atlases(
+			in,
+			cfg.check_content_integrity_every_launch,
+			cfg.save_regenerated_atlases_as_binary
+		);
 
 		LOG("Content regenerated successfully.\n--------------------------------------------\n");
 
@@ -51,7 +58,10 @@ namespace resource_setups {
 			regenerated
 		);
 
-		manager.create(assets::atlas_id::GAME_WORLD_ATLAS);
+		manager.create(
+			assets::atlas_id::GAME_WORLD_ATLAS,
+			cfg.save_regenerated_atlases_as_binary
+		);
 
 		manager.create_inverse_with_flip(
 			assets::animation_id::TORSO_MOVE,

@@ -197,12 +197,19 @@ namespace resources {
 	}
 
 	void manager::create(
-		const assets::atlas_id id
+		const assets::atlas_id id,
+		const bool load_as_binary
 	) {
 		auto& tex = physical_textures[id];
 		
 		augs::image atlas_image;
-		atlas_image.from_binary_file(typesafe_sprintf("generated/atlases/%x.png", static_cast<int>(id)));
+
+		if (load_as_binary) {
+			atlas_image.from_binary_file(typesafe_sprintf("generated/atlases/%x.bin", static_cast<int>(id)));
+		}
+		else {
+			atlas_image.from_file(typesafe_sprintf("generated/atlases/%x.png", static_cast<int>(id)));
+		}
 
 		tex.create(atlas_image);
 	}

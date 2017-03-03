@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
 	game_window window;
 	call_window_script(lua, window, "window.lua");
 
-	resource_setups::load_standard_everything();
+	resource_setups::load_standard_everything(cfg);
 
 	const auto mode = cfg.get_launch_mode();
 	LOG("Launch mode: %x", static_cast<int>(mode));

@@ -19,7 +19,11 @@
 
 namespace fs = std::experimental::filesystem;
 
-atlases_regeneration_output regenerate_atlases(const atlases_regeneration_input& in) {
+atlases_regeneration_output regenerate_atlases(
+	const atlases_regeneration_input& in,
+	const bool always_check_source_images_integrity,
+	const bool save_atlases_as_binary
+) {
 	atlases_regeneration_output output;
 
 	struct per_atlas_input {
@@ -44,11 +48,9 @@ atlases_regeneration_output regenerate_atlases(const atlases_regeneration_input&
 
 	const auto atlases_directory = std::string("generated/atlases/");
 
-	const bool always_load_only = false;
-
 	for (const auto& input_for_this_atlas : per_atlas_inputs) {
 		const auto atlas_stem = typesafe_sprintf("%x", static_cast<int>(input_for_this_atlas.first));
-		const auto atlas_image_filename = atlases_directory + atlas_stem + ".png";
+		const auto atlas_image_filename = atlases_directory + atlas_stem + (save_atlases_as_binary ? ".bin" : ".png");
 		const auto atlas_metadata_filename = atlases_directory + atlas_stem + ".meta";
 		const auto atlas_stamp_filename = atlases_directory + atlas_stem + ".stamp";
 
@@ -56,7 +58,7 @@ atlases_regeneration_output regenerate_atlases(const atlases_regeneration_input&
 
 		texture_atlas_stamp new_stamp;
 
-		if (!always_load_only) {
+		if (always_check_source_images_integrity) {
 			for (const auto& img_id : input_for_this_atlas.second.images) {
 				const bool file_exists = fs::exists(img_id);
 				
@@ -262,7 +264,13 @@ atlases_regeneration_output regenerate_atlases(const atlases_regeneration_input&
 			}
 
 			atlas_image.swap_red_and_blue();
-			atlas_image.save_as_binary_file(atlas_image_filename);
+
+			if (save_atlases_as_binary) {
+				atlas_image.save_as_binary_file(atlas_image_filename);
+			}
+			else {
+				atlas_image.save(atlas_image_filename);
+			}
 
 			{
 				augs::stream new_stamp_stream;

@@ -34,7 +34,11 @@ struct texture_atlas_stamp {
 	std::unordered_map<source_font_identifier, texture_atlas_font_stamp> font_stamps;
 };
 
-atlases_regeneration_output regenerate_atlases(const atlases_regeneration_input&);
+atlases_regeneration_output regenerate_atlases(
+	const atlases_regeneration_input&,
+	const bool always_check_source_images_integrity,
+	const bool save_atlases_as_binary
+);
 
 namespace augs {
 	template <class A>
