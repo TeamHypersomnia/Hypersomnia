@@ -62,7 +62,7 @@ struct button_corners_info {
 	void for_each_button_corner(const ltrb rc, L callback) const {
 		auto& manager = get_resource_manager();
 
-		for (auto i = button_corner_type::LT; i < button_corner_type::COUNT; i = static_cast<button_corner_type>(static_cast<int>(i) + 1)) {
+		for (auto i = button_corner_type::INSIDE; i < button_corner_type::COUNT; i = static_cast<button_corner_type>(static_cast<int>(i) + 1)) {
 			const auto tex_id = get_tex_for_type(i);
 			const auto* const found_tex = manager.find(tex_id);
 
