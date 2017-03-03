@@ -25,10 +25,15 @@ intersection_output circle_ray_intersection(
 	id.SetIdentity();
 
 	if (cs.RayCast(&out, in, id, 0)) {
-		return{ true, (in.p1 + vec2(in.p2 - in.p1) * (out.fraction)) };
+		intersection_output result;
+		
+		result.hit = true;
+		result.intersection = in.p1 + vec2(in.p2 - in.p1) * (out.fraction);
+		
+		return result;
 	}
 		
-	return{ false, vec2(0, 0) };
+	return intersection_output();
 }
 
 intersection_output rectangle_ray_intersection(
@@ -51,10 +56,15 @@ intersection_output rectangle_ray_intersection(
 	id.SetIdentity();
 
 	if (ps.RayCast(&out, in, id, 0)) {
-		return{ true, center + (in.p1 + vec2(in.p2 - in.p1) * (out.fraction)) };
+		intersection_output result;
+		
+		result.hit = true;
+		result.intersection = in.p1 + vec2(in.p2 - in.p1) * (out.fraction);
+		
+		return result;
 	}
 
-	return{ false, vec2(0, 0) };
+	return intersection_output();
 }
 
 std::vector<vec2> generate_circle_points(

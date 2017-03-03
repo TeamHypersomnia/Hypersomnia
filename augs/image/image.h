@@ -65,7 +65,7 @@ namespace augs {
 		struct paint_line_command {
 			vec2u from;
 			vec2u to;
-			rgba filling = white;
+			rgba filling;
 
 			static std::string get_command_name() {
 				return "line";

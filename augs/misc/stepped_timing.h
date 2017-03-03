@@ -5,12 +5,15 @@ namespace augs {
 	class delta;
 
 	struct stepped_timestamp {
-		unsigned step = 0u;
+		unsigned step;
 
 		template <class Archive>
 		void serialize(Archive& ar) {
 			ar(CEREAL_NVP(step));
 		}
+
+		stepped_timestamp(const unsigned step = 0u)
+			: step(step) {}
 
 		stepped_timestamp operator-(const stepped_timestamp b) const;
 

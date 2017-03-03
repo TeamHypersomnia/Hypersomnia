@@ -335,7 +335,8 @@ void perform_spell_logic(
 				}
 
 				{
-					energy_ball += components::sound_response{ assets::sound_response_id::ELECTRIC_PROJECTILE_RESPONSE };
+					auto& response = energy_ball += components::sound_response();
+					response.response = assets::sound_response_id::ELECTRIC_PROJECTILE_RESPONSE;
 				}
 
 				auto& damage = energy_ball += components::damage();

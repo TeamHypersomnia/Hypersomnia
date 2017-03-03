@@ -598,20 +598,18 @@ namespace resource_setups {
 	}
 
 	game_font_requests load_standard_fonts() {
-		return {
-			{
-				assets::font_id::GUI_FONT,
+		game_font_requests output;
 
-				{
-					{
-						"hypersomnia/Kubasta.ttf",
-						L" ABCDEFGHIJKLMNOPRSTUVWXYZQabcdefghijklmnoprstuvwxyzq0123456789.!@#$%^&*()_+-=[];'\\,./{}:\"|<>?~",
-						16
-					},
+		{
+			game_font_request in;
+			in.target_atlas = assets::atlas_id::GAME_WORLD_ATLAS;
+			in.loading_input.filename = "hypersomnia/Kubasta.ttf";
+			in.loading_input.characters = L" ABCDEFGHIJKLMNOPRSTUVWXYZQabcdefghijklmnoprstuvwxyzq0123456789.!@#$%^&*()_+-=[];'\\,./{}:\"|<>?~";
+			in.loading_input.pt = 16;
 
-					assets::atlas_id::GAME_WORLD_ATLAS
-				}
-			}
-		};
+			output[assets::font_id::GUI_FONT] = in;
+		}
+
+		return std::move(output);
 	}
 }

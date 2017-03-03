@@ -263,8 +263,12 @@ std::vector<entity_id> get_closest_hostiles(
 
 					if (is_hostile(calculated_attitude)) {
 						const auto dist = distance_sq(s, subject_attitude);
+						
+						hostile_entry new_entry;
+						new_entry.s = s;
+						new_entry.dist = dist;
 
-						hostiles.push_back({ s, dist });
+						hostiles.push_back(new_entry);
 					}
 				}
 
