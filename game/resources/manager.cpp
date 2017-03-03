@@ -157,6 +157,21 @@ namespace resources {
 			}
 
 			baked_image.settings = requested_image.second.settings;
+			
+			{
+				if (requested_image.second.polygonization_filename.size() > 0) {
+					const auto lines = augs::get_file_lines(requested_image.second.polygonization_filename);
+				
+					for (const auto& l : lines) {
+						std::istringstream in(l);
+						
+						vec2u new_point;
+						in >> new_point;
+
+						baked_image.polygonized.push_back(new_point);
+					}
+				}
+			}
 		}
 
 		for (const auto& requested_font : fonts) {

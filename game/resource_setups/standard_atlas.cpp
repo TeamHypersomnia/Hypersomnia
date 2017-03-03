@@ -116,13 +116,13 @@ namespace resource_setups {
 			auto& in = output[assets::texture_id::TRUCK_FRONT];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/truck_front.png", assets::atlas_id::GAME_WORLD_ATLAS };
 			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/truck_front.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.polygonization_filename = "generated/polygonizations_of_images/truck_front.points";
 		}
 
 		{
 			auto& in = output[assets::texture_id::TRUCK_INSIDE];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/truck_inside.png", assets::atlas_id::GAME_WORLD_ATLAS };
 			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/truck_inside.png", assets::atlas_id::GAME_WORLD_ATLAS };
-			in.polygonization_filename = "generated/polygonizations_of_images/truck_front.points";
 		}
 
 		{

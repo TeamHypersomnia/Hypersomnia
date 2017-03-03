@@ -139,6 +139,7 @@ atlases_regeneration_output regenerate_atlases(const atlases_regeneration_input&
 				fnt.from_file(input_fnt_id);
 				
 				auto& out_fnt = this_atlas_metadata.fonts[input_fnt_id];
+				out_fnt.meta_from_file = fnt.meta;
 
 				for (const auto& g : fnt.glyph_bitmaps) {
 					out_fnt.glyphs_in_atlas.push_back({});

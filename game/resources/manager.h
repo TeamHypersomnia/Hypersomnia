@@ -64,7 +64,7 @@ typedef source_font_loading_input game_font_request;
 struct game_image_baked {
 	augs::enum_array<augs::texture_atlas_entry, texture_map_type> texture_maps;
 
-	std::vector<vec2i> polygonized;
+	std::vector<vec2u> polygonized;
 	game_image_usage_settings settings;
 
 	vec2u get_size() const {
