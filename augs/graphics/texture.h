@@ -16,7 +16,7 @@ namespace augs {
 			texture& operator=(const texture&) = delete;
 			texture& operator=(texture&&) = delete;
 
-			void create(const augs::image& source);
+			void create(const augs::image& bgra_source);
 			void destroy();
 		};
 	}

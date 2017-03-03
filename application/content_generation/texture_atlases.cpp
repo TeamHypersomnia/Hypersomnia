@@ -261,6 +261,7 @@ atlases_regeneration_output regenerate_atlases(const atlases_regeneration_input&
 				}
 			}
 
+			atlas_image.swap_red_and_blue();
 			atlas_image.save(atlas_image_filename);
 
 			{
