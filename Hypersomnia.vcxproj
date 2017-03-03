@@ -1099,6 +1099,7 @@
     <ClInclude Include="augs\misc\enum_bitset.h" />
     <ClInclude Include="augs\misc\http_requests.h" />
     <ClInclude Include="augs\misc\input_context.h" />
+    <ClInclude Include="augs\misc\introspect.h" />
     <ClInclude Include="augs\misc\key_and_mouse_intent.h" />
     <ClInclude Include="augs\misc\debug_entropy_player.h" />
     <ClInclude Include="augs\misc\readable_bytesize.h" />
