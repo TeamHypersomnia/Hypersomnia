@@ -3,9 +3,12 @@
 #include <vector>
 #include <fstream>
 #include <unordered_map>
+#include <chrono>
 
 namespace augs {
 	class stream;
+
+	std::chrono::system_clock::time_point last_write_time(const std::string& filename);
 
 	bool file_exists(std::string filename);
 	std::string get_file_contents(std::string filename);

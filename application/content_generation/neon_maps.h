@@ -1,15 +1,16 @@
 #pragma once
 #include <vector>
+#include <chrono>
+
 #include "augs/graphics/pixel.h"
 #include "augs/misc/templated_readwrite.h"
-#include <experimental/filesystem>
 
 struct neon_map_metadata {
 	float standard_deviation = 0.f;
 	unsigned radius_towards_x_axis = 0xdeadbeef;
 	unsigned radius_towards_y_axis = 0xdeadbeef;
 	float amplification = 0.f;
-	std::experimental::filesystem::file_time_type last_write_time_of_source;
+	std::chrono::system_clock::time_point last_write_time_of_source;
 
 	std::vector<rgba> light_colors;
 };

@@ -25,7 +25,7 @@ void regenerate_desaturations() {
 
 		const auto source_path = fs::path(lines[current_line]);
 
-		new_meta.last_write_time_of_source = fs::last_write_time(source_path);
+		new_meta.last_write_time_of_source = augs::last_write_time(source_path.string());
 
 		const auto desaturation_filename = desaturations_directory + source_path.filename().string();
 		const auto desaturation_meta_filename = desaturations_directory + source_path.filename().replace_extension(".meta").string();

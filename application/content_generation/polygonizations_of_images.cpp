@@ -25,7 +25,7 @@ void regenerate_polygonizations_of_images() {
 		polygonization_of_image_metadata new_meta;
 
 		const auto source_path = fs::path(lines[current_line]);
-		new_meta.last_write_time_of_source = fs::last_write_time(source_path);
+		new_meta.last_write_time_of_source = augs::last_write_time(source_path.string());
 
 		++current_line;
 		

@@ -1,11 +1,7 @@
-#include <experimental/filesystem>
-
 #include "buttons_with_corners.h"
 #include "augs/gui/button_corners.h"
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
-
-namespace fs = std::experimental::filesystem;
 
 void regenerate_buttons_with_corners() {
 	const auto buttons_with_corners_directory = "generated/buttons_with_corners/";

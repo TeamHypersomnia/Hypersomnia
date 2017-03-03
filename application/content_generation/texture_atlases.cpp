@@ -60,27 +60,11 @@ atlases_regeneration_output regenerate_atlases(
 
 		if (always_check_source_images_integrity) {
 			for (const auto& img_id : input_for_this_atlas.second.images) {
-				const bool file_exists = fs::exists(img_id);
-				
-				if (!file_exists) {
-					LOG("File not found: %x", img_id);
-				}
-
-				ensure(file_exists);
-
-				new_stamp.image_stamps[img_id] = fs::last_write_time(img_id);
+				new_stamp.image_stamps[img_id] = augs::last_write_time(img_id);
 			}
 
 			for (const auto& fnt_id : input_for_this_atlas.second.fonts) {
-				const bool file_exists = fs::exists(fnt_id.filename);
-
-				if (!file_exists) {
-					LOG("File not found: %x", fnt_id.filename);
-				}
-
-				ensure(file_exists);
-
-				new_stamp.font_stamps[fnt_id] = fs::last_write_time(fnt_id.filename);
+				new_stamp.font_stamps[fnt_id] = augs::last_write_time(fnt_id.filename);
 			}
 
 			if (!augs::file_exists(atlas_image_filename)) {

@@ -1,8 +1,24 @@
 #include "file.h"
+
 #include <fstream>
+#include <experimental\filesystem>
+
 #include "augs/misc/streams.h"
 
+namespace fs = std::experimental::filesystem;
+
 namespace augs {
+	std::chrono::system_clock::time_point last_write_time(const std::string& filename) {
+		const bool exists = file_exists(filename);
+		
+		if (!exists) {
+			LOG("File not found: %x", filename);
+			ensure(exists);
+		}
+
+		return fs::last_write_time(filename);
+	}
+
 	void assign_file_contents_binary(const std::string& filename, augs::stream& target) {
 		std::ifstream file(filename, std::ios::binary | std::ios::ate);
 		std::streamsize size = file.tellg();
