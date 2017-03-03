@@ -21,7 +21,7 @@ void main()
 	vec4 pixel = texture(basic_texture, theTexcoord);
     
     vec2 v = theTexcoord - texture_center;
-    float aspect = textureSize(basic_texture, 0).x / textureSize(basic_texture, 0).y;
+    float aspect = float(textureSize(basic_texture, 0).x) / float(textureSize(basic_texture, 0).y);
     v.y *= aspect;
     normalize(v);
 
