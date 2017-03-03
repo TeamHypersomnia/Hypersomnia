@@ -58,10 +58,26 @@ atlases_regeneration_output regenerate_atlases(const atlases_regeneration_input&
 
 		if (!always_load_only) {
 			for (const auto& img_id : input_for_this_atlas.second.images) {
+				const bool file_exists = fs::exists(img_id);
+				
+				if (!file_exists) {
+					LOG("File not found: %x", img_id);
+				}
+
+				ensure(file_exists);
+
 				new_stamp.image_stamps[img_id] = fs::last_write_time(img_id);
 			}
 
 			for (const auto& fnt_id : input_for_this_atlas.second.fonts) {
+				const bool file_exists = fs::exists(fnt_id.filename);
+
+				if (!file_exists) {
+					LOG("File not found: %x", fnt_id.filename);
+				}
+
+				ensure(file_exists);
+
 				new_stamp.font_stamps[fnt_id] = fs::last_write_time(fnt_id.filename);
 			}
 
@@ -120,7 +136,7 @@ atlases_regeneration_output regenerate_atlases(const atlases_regeneration_input&
 
 			for (const auto& input_fnt_id : input_for_this_atlas.second.fonts) {
 				auto& fnt = loaded_fonts[input_fnt_id];
-				fnt = augs::font(input_fnt_id);
+				fnt.from_file(input_fnt_id);
 				
 				auto& out_fnt = this_atlas_metadata.fonts[input_fnt_id];
 
@@ -150,12 +166,24 @@ atlases_regeneration_output regenerate_atlases(const atlases_regeneration_input&
 
 			std::vector<bin> packing_output;
 
+			const auto rect_padding_amount = 2;
+
+			for (auto& rr : rects_for_packing_algorithm) {
+				rr.w += rect_padding_amount;
+				rr.h += rect_padding_amount;
+			}
+
 			const bool result = pack(
 				input_for_packing_algorithm.data(), 
 				static_cast<int>(input_for_packing_algorithm.size()), 
 				static_cast<int>(augs::renderer::get_current().get_max_texture_size()),
 				packing_output
 			);
+
+			for (auto& rr : rects_for_packing_algorithm) {
+				rr.w -= rect_padding_amount;
+				rr.h -= rect_padding_amount;
+			}
 
 			const bool textures_dont_fit_into_atlas = !result || packing_output.size() > 1;
 
@@ -176,20 +204,22 @@ atlases_regeneration_output regenerate_atlases(const atlases_regeneration_input&
 			
 			size_t current_rect = 0u;
 
-			for (auto& output_img : this_atlas_metadata.images) {
+			for (auto& input_img_id : input_for_this_atlas.second.images) {
+				auto& output_img = this_atlas_metadata.images[input_img_id];
+
 				const auto& packed_rect = rects_for_packing_algorithm[current_rect];
 
-				output_img.second.atlas_space.set(
+				output_img.atlas_space.set(
 					static_cast<float>(packed_rect.x) / atlas_size.x,
 					static_cast<float>(packed_rect.y) / atlas_size.y,
 					static_cast<float>(packed_rect.w) / atlas_size.x,
 					static_cast<float>(packed_rect.h) / atlas_size.y
 				);
 
-				output_img.second.was_flipped = packed_rect.flipped;
+				output_img.was_flipped = packed_rect.flipped;
 
 				atlas_image.blit(
-					loaded_images[output_img.first],
+					loaded_images[input_img_id],
 					{
 						static_cast<unsigned>(packed_rect.x),
 						static_cast<unsigned>(packed_rect.y)
@@ -200,11 +230,13 @@ atlases_regeneration_output regenerate_atlases(const atlases_regeneration_input&
 				++current_rect;
 			}
 
-			for (auto& output_font : this_atlas_metadata.fonts) {
-				for (size_t glyph_index = 0; glyph_index < output_font.second.glyphs_in_atlas.size(); ++glyph_index) {
+			for (auto& input_font_id : input_for_this_atlas.second.fonts) {
+				auto& output_font = this_atlas_metadata.fonts[input_font_id];
+
+				for (size_t glyph_index = 0; glyph_index < output_font.glyphs_in_atlas.size(); ++glyph_index) {
 					const auto& packed_rect = rects_for_packing_algorithm[current_rect];
 
-					auto& g = output_font.second.glyphs_in_atlas[glyph_index];
+					auto& g = output_font.glyphs_in_atlas[glyph_index];
 
 					g.atlas_space.set(
 						static_cast<float>(packed_rect.x) / atlas_size.x,
@@ -216,7 +248,7 @@ atlases_regeneration_output regenerate_atlases(const atlases_regeneration_input&
 					g.was_flipped = packed_rect.flipped;
 
 					atlas_image.blit(
-						loaded_fonts[output_font.first].glyph_bitmaps[glyph_index],
+						loaded_fonts[input_font_id].glyph_bitmaps[glyph_index],
 						{
 							static_cast<unsigned>(packed_rect.x),
 							static_cast<unsigned>(packed_rect.y)

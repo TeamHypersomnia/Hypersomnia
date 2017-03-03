@@ -85,9 +85,7 @@ namespace augs {
 		font_metadata_from_file meta;
 		std::vector<augs::image> glyph_bitmaps;
 
-		font(
-			const font_loading_input& = font_loading_input()
-		);
+		void from_file(const font_loading_input&);
 	};
 
 	template <class A>

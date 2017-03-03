@@ -18,8 +18,7 @@ namespace augs {
 	{
 	}
 
-	font::font(const font_loading_input& in) {
-		
+	void font::from_file(const font_loading_input& in) {
 		FT_Face face;
 		
 		const auto error = FT_New_Face(*global_libraries::freetype_library.get(), in.filename.c_str(), 0, &face);

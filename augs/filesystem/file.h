@@ -5,6 +5,8 @@
 #include <unordered_map>
 
 namespace augs {
+	class stream;
+
 	bool file_exists(std::string filename);
 	std::string get_file_contents(std::string filename);
 
@@ -34,15 +36,7 @@ namespace augs {
 			std::istreambuf_iterator<char>());
 	}
 
-	template <class T>
-	void assign_file_contents_binary(const std::string& filename, T& target) {
-		std::ifstream file(filename, std::ios::binary | std::ios::ate);
-		std::streamsize size = file.tellg();
-		file.seekg(0, std::ios::beg);
-
-		target.reserve(static_cast<unsigned>(size));
-		file.read(target.data(), size);
-	}
+	void assign_file_contents_binary(const std::string& filename, augs::stream& target);
 
 	template <class ContainerType>
 	void read_map_until_eof(const std::string& filename, ContainerType& into) {

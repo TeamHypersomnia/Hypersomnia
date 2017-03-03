@@ -22,9 +22,12 @@ void regenerate_scripted_images() {
 		scripted_image_metadata new_meta;
 
 		const auto target_stem = lines[current_line];
+		
+		ensure(target_stem.size() > 0);
+
 		++current_line;
 
-		while (lines[current_line] != "\n") {
+		while (current_line < lines.size() && lines[current_line].size() > 0) {
 			std::istringstream in(lines[current_line]);
 
 			std::string command_name;
@@ -43,7 +46,12 @@ void regenerate_scripted_images() {
 					new_meta.commands.push_back(new_command);
 				}
 			});
+
+			++current_line;
 		}
+
+		// skip separating newline
+		++current_line;
 
 		const auto scripted_image_filename = scripted_images_directory + target_stem + ".png";
 		const auto scripted_image_meta_filename = scripted_images_directory + target_stem + ".meta";
@@ -85,8 +93,5 @@ void regenerate_scripted_images() {
 
 			augs::create_binary_file(scripted_image_meta_filename, new_meta_stream);
 		}
-
-		// skip separating newline
-		++current_line;
 	}
 }

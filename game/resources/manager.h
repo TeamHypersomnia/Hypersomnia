@@ -89,8 +89,7 @@ namespace resources {
 		);
 
 		void create(
-			const assets::atlas_id,
-			const std::string& source_filename
+			const assets::atlas_id
 		);
 
 		game_image_baked* find(const assets::texture_id);

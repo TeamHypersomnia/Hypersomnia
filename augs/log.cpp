@@ -104,7 +104,7 @@ TEST(TypesafeSprintf, TypesafeSprintfSeveralTests) {
 
 	vec2 test(123, 412);
 
-	EXPECT_EQ("Vector is equal to: (123,412)", typesafe_sprintf("Vector is equal to: %x", test));
+	EXPECT_EQ("Vector is equal to: (123;412)", typesafe_sprintf("Vector is equal to: %x", test));
 
 	int errid = 1282;
 	std::string location = "augs::window::glwindow::create";

@@ -1,7 +1,18 @@
 #include "file.h"
 #include <fstream>
+#include "augs/misc/streams.h"
 
 namespace augs {
+	void assign_file_contents_binary(const std::string& filename, augs::stream& target) {
+		std::ifstream file(filename, std::ios::binary | std::ios::ate);
+		std::streamsize size = file.tellg();
+		file.seekg(0, std::ios::beg);
+
+		target.reserve(static_cast<unsigned>(size));
+		file.read(target.data(), size);
+		target.set_write_pos(size);
+	}
+
 	std::vector<std::string> get_file_lines(const std::string& filename) {
 		std::ifstream input(filename);
 

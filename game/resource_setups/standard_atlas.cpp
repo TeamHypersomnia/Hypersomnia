@@ -9,13 +9,20 @@ namespace resource_setups {
 
 		const auto make_button_with_corners = [&](
 			const assets::texture_id first,
-			const std::string& filename_template
+			const std::string& filename_template,
+			const bool request_lb_complement
 		) {
 			const auto first_i = static_cast<int>(first);
 			const auto last_i = first_i + static_cast<int>(button_corner_type::COUNT); 
 
-			for (int i = first_i; i <= last_i; ++i) {
-				const auto full_filename = typesafe_sprintf(filename_template, get_filename_for(static_cast<button_corner_type>(i - first_i)));
+			for (int i = first_i; i < last_i; ++i) {
+				const auto type = static_cast<button_corner_type>(i - first_i);
+
+				if (!request_lb_complement && is_lb_complement(type)) {
+					continue;
+				}
+
+				const auto full_filename = typesafe_sprintf(filename_template, get_filename_for(type));
 
 				{
 					auto& in = output[static_cast<assets::texture_id>(i)];
@@ -35,10 +42,10 @@ namespace resource_setups {
 
 			for (int i = first_i; i < last_i; ++i) {
 				auto& in = output[static_cast<assets::texture_id>(i)];
-				in.texture_maps[texture_map_type::DIFFUSE] = { typesafe_sprintf(filename_template, i - first_i), assets::atlas_id::GAME_WORLD_ATLAS };
+				in.texture_maps[texture_map_type::DIFFUSE] = { typesafe_sprintf(filename_template, 1 + i - first_i), assets::atlas_id::GAME_WORLD_ATLAS };
 
 				if (neon_filename_template.size() > 0) {
-					in.texture_maps[texture_map_type::NEON] = { typesafe_sprintf(neon_filename_template, i - first_i), assets::atlas_id::GAME_WORLD_ATLAS };
+					in.texture_maps[texture_map_type::NEON] = { typesafe_sprintf(neon_filename_template, 1 + i - first_i), assets::atlas_id::GAME_WORLD_ATLAS };
 				}
 			}
 		};
@@ -525,12 +532,14 @@ namespace resource_setups {
 
 		make_button_with_corners(
 			assets::texture_id::HOTBAR_BUTTON_INSIDE,
-			"generated/buttons_with_corners/hotbar_button_%x.png"
+			"generated/buttons_with_corners/hotbar_button_%x.png",
+			true
 		);
 
 		make_button_with_corners(
 			assets::texture_id::MENU_BUTTON_INSIDE,
-			"generated/buttons_with_corners/menu_button_%x.png"
+			"generated/buttons_with_corners/menu_button_%x.png",
+			false
 		);
 
 		make_indexed(

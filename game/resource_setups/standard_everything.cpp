@@ -21,7 +21,11 @@ namespace resource_setups {
 
 		for (const auto& i : images) {
 			for (const auto& t : i.second.texture_maps) {
-				in.images.push_back({ t.filename, t.target_atlas });
+				if (t.filename.size() > 0) {
+					ensure(t.target_atlas != assets::atlas_id::INVALID);
+
+					in.images.push_back({ t.filename, t.target_atlas });
+				}
 			}
 		}
 
@@ -45,7 +49,7 @@ namespace resource_setups {
 			regenerated
 		);
 
-		manager.create(assets::atlas_id::GAME_WORLD_ATLAS, "generated/atlases/game_world_atlas.png");
+		manager.create(assets::atlas_id::GAME_WORLD_ATLAS);
 
 		manager.create_inverse_with_flip(
 			assets::animation_id::TORSO_MOVE,

@@ -41,6 +41,7 @@ enum class button_corner_type {
 
 std::string get_filename_for(const button_corner_type);
 
+bool is_lb_complement(const button_corner_type);
 bool is_button_border(const button_corner_type);
 bool is_button_outside_border(const button_corner_type);
 bool is_button_corner(const button_corner_type);

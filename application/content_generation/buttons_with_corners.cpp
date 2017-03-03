@@ -40,8 +40,11 @@ void regenerate_buttons_with_corners() {
 			std::istringstream in(lines[current_line]);
 			in >> new_meta.lower_side >> new_meta.upper_side >> new_meta.inside_border_padding >> new_meta.make_lb_complement;
 		}
-		
+
+		// skip separating newline
 		++current_line;
+
+		// go to the next filename line
 		++current_line;
 
 		const auto button_with_corners_filename_template = buttons_with_corners_directory + target_stem + "_%x.png";
@@ -92,12 +95,6 @@ void regenerate_buttons_with_corners() {
 
 			augs::create_binary_file(button_with_corners_meta_filename, new_meta_stream);
 		}
-
-		// skip parameters line
-		++current_line;
-
-		// skip separating newline
-		++current_line;
 	}
 }
 

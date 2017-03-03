@@ -3,7 +3,7 @@
 using namespace assets;
 
 std::string get_filename_for(const button_corner_type t) {
-	static const std::string stems[]  = {
+	static const std::array<std::string, static_cast<size_t>(button_corner_type::COUNT)> stems = {
 		"inside",
 		"lt",
 		"rt",
@@ -13,7 +13,7 @@ std::string get_filename_for(const button_corner_type t) {
 		"t",
 		"r",
 		"b",
-		"lb_complement"
+		"lb_complement",
 		"lt_border",
 		"rt_border",
 		"rb_border",
@@ -29,7 +29,11 @@ std::string get_filename_for(const button_corner_type t) {
 		"lb_internal_border"
 	};
 
-	return stems[static_cast<int>(t)];
+	const auto idx = static_cast<unsigned>(t);
+
+	ensure(idx < stems.size())
+
+	return stems[idx];
 }
 
 bool is_button_corner(const button_corner_type t) {
@@ -69,6 +73,17 @@ bool is_button_outside_border(const button_corner_type t) {
 
 		|| t == button_corner_type::LB_COMPLEMENT_BORDER
 		) {
+		return true;
+	}
+
+	return false;
+}
+
+bool is_lb_complement(const button_corner_type t) {
+	if (
+		t == button_corner_type::LB_COMPLEMENT
+		|| t == button_corner_type::LB_COMPLEMENT_BORDER
+	) {
 		return true;
 	}
 

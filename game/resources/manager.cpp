@@ -182,13 +182,12 @@ namespace resources {
 	}
 
 	void manager::create(
-		const assets::atlas_id id,
-		const std::string& source_filename
+		const assets::atlas_id id
 	) {
 		auto& tex = physical_textures[id];
 		
 		augs::image atlas_image;
-		atlas_image.from_file(source_filename);
+		atlas_image.from_file(typesafe_sprintf("generated/atlases/%x.png", static_cast<int>(id)));
 
 		tex.create(atlas_image);
 	}
