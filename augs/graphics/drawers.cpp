@@ -1,5 +1,4 @@
 #include "augs/graphics/drawers.h"
-#include "augs/texture_atlas/texture_atlas.h"
 
 #include "game/assets/texture_id.h"
 #include "game/resources/manager.h"

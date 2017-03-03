@@ -1,6 +1,5 @@
 #include "material.h"
 #include "rect.h"
-#include "augs/texture_atlas/texture_atlas.h"
 #include "augs/graphics/drawers.h"
 
 namespace augs {

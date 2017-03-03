@@ -9,10 +9,6 @@
 #include "game/detail/basic_renderable_drawing_input.h"
 #include "game/enums/renderable_drawing_type.h"
 
-namespace augs {
-	class texture_with_image;
-}
-
 namespace components {
 	struct sprite {
 		struct drawing_input : basic_renderable_drawing_input {

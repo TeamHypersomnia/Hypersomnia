@@ -367,9 +367,7 @@
     <ClCompile Include="augs\network\reliable_channel.cpp" />
     <ClCompile Include="application\setups\client_setup.cpp" />
     <ClCompile Include="application\setups\determinism_test_setup.cpp" />
-    <ClCompile Include="augs\texture_atlas\texture_atlas.cpp" />
     <ClCompile Include="augs\texture_atlas\texture_atlas_entry.cpp" />
-    <ClCompile Include="augs\texture_atlas\texture_with_image.cpp" />
     <ClCompile Include="augs\tweaker.cpp" />
     <ClCompile Include="game\components\flags_component.cpp" />
     <ClCompile Include="game\components\gui_element_component.cpp" />
@@ -1138,9 +1136,7 @@
     <ClInclude Include="augs\templates\tuple_of.h" />
     <ClInclude Include="augs\templates\type_in_pack.h" />
     <ClInclude Include="augs\templates\type_mod_templates.h" />
-    <ClInclude Include="augs\texture_atlas\texture_atlas.h" />
     <ClInclude Include="augs\texture_atlas\texture_atlas_entry.h" />
-    <ClInclude Include="augs\texture_atlas\texture_with_image.h" />
     <ClInclude Include="augs\tweaker.h" />
     <ClInclude Include="augs\zeroed_pod.h" />
     <ClInclude Include="game\assets\sound_buffer_id.h" />

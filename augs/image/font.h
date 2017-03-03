@@ -4,7 +4,6 @@
 #include "augs/image/image.h"
 
 #include "augs/misc/templated_readwrite.h"
-#include "augs/texture_atlas/texture_atlas_entry.h"
 #include "augs/misc/trivial_pair.h"
 
 struct FT_Glyph_Metrics_;

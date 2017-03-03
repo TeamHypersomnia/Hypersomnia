@@ -115,15 +115,15 @@ namespace rendering_scripts {
 							return;
 						}
 
-						const auto& edge_tex = get_resource_manager().find(assets::texture_id::LASER_GLOW_EDGE)->tex;
+						const auto& edge_tex = get_resource_manager().find(assets::texture_id::LASER_GLOW_EDGE)->texture_maps[texture_map_type::DIFFUSE];
 						const vec2 edge_size = static_cast<vec2>(edge_tex.get_size());
 
-						augs::draw_line(output, camera[from], camera[to], edge_size.y/3.f, get_resource_manager().find_neon_map(assets::texture_id::LASER)->tex, col);
+						augs::draw_line(output, camera[from], camera[to], edge_size.y/3.f, get_resource_manager().find(assets::texture_id::LASER)->texture_maps[texture_map_type::DIFFUSE], col);
 
 						const auto edge_offset = (to - from).set_length(edge_size.x);
 
-						augs::draw_line(output, camera[to], camera[to + edge_offset], edge_size.y / 3.f, get_resource_manager().find(assets::texture_id::LASER_GLOW_EDGE)->tex, col);
-						augs::draw_line(output, camera[from - edge_offset], camera[from], edge_size.y / 3.f, get_resource_manager().find(assets::texture_id::LASER_GLOW_EDGE)->tex, col, true);
+						augs::draw_line(output, camera[to], camera[to + edge_offset], edge_size.y / 3.f, get_resource_manager().find(assets::texture_id::LASER_GLOW_EDGE)->texture_maps[texture_map_type::DIFFUSE], col);
+						augs::draw_line(output, camera[from - edge_offset], camera[from], edge_size.y / 3.f, get_resource_manager().find(assets::texture_id::LASER_GLOW_EDGE)->texture_maps[texture_map_type::DIFFUSE], col, true);
 					},
 					[](...){},
 					interp, 
@@ -236,7 +236,7 @@ namespace rendering_scripts {
 						renderer.lines, 
 						camera[from], 
 						camera[to], 
-						get_resource_manager().find(assets::texture_id::LASER)->tex, 
+						get_resource_manager().find(assets::texture_id::LASER)->texture_maps[texture_map_type::DIFFUSE], 
 						col
 					);
 				},
@@ -246,7 +246,7 @@ namespace rendering_scripts {
 						renderer.lines,
 						camera[from],
 						camera[to],
-						get_resource_manager().find(assets::texture_id::LASER)->tex,
+						get_resource_manager().find(assets::texture_id::LASER)->texture_maps[texture_map_type::DIFFUSE],
 						white,
 						10.f,
 						40.f, 

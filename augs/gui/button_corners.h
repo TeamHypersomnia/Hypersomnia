@@ -4,8 +4,6 @@
 #include "game/assets/texture_id.h"
 #include "game/resources/manager.h"
 
-#include "augs/texture_atlas/texture_with_image.h"
-
 enum class button_corner_type {
 	INSIDE,
 
@@ -71,7 +69,7 @@ struct button_corners_info {
 				continue;
 			}
 
-			const auto& tex = found_tex->tex;
+			const auto& tex = found_tex->texture_maps[texture_map_type::DIFFUSE];
 			const vec2 s = tex.get_size();
 
 			ltrb target_rect;

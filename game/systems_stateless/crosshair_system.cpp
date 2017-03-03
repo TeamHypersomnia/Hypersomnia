@@ -10,7 +10,6 @@
 #include "game/components/transform_component.h"
 #include "game/messages/intent_message.h"
 
-#include "augs/texture_atlas/texture_atlas.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
 

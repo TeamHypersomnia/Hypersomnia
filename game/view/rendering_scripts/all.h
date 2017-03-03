@@ -1,6 +1,5 @@
 #pragma once
 #include "game/transcendental/entity_handle_declaration.h"
-#include "augs/texture_atlas/texture_atlas.h"
 #include "augs/graphics/vertex.h"
 #include "game/detail/camera_cone.h"
 #include "game/components/sentience_component.h"

@@ -18,13 +18,11 @@
 #include "game/resources/animation.h"
 #include "game/resources/animation_response.h"
 #include "game/resources/sound_response.h"
-#include "augs/texture_atlas/texture_with_image.h"
 #include "game/resources/particle_effect.h"
 #include "game/resources/particle_effect_response.h"
 #include "game/resources/behaviour_tree.h"
 #include "game/resources/tile_layer.h"
 
-#include "augs/texture_atlas/texture_atlas.h"
 #include "augs/image/font.h"
 #include "augs/graphics/shader.h"
 #include "augs/graphics/texture.h"
@@ -34,6 +32,7 @@
 #include "augs/misc/enum_bitset.h"
 
 #include "application/content_generation/atlas_content_structs.h"
+#include "augs/texture_atlas/texture_atlas_entry.h"
 
 enum class texture_map_type {
 	DIFFUSE,

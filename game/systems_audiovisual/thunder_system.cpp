@@ -147,7 +147,7 @@ void thunder_system::draw_thunders(
 	for (const auto& t : thunders) {
 		for (const auto& b : t.branches) {
 			if (b.activated) {
-				augs::draw_line(lines, camera[b.from], camera[b.to], get_resource_manager().find(assets::texture_id::BLANK)->tex, t.in.color);
+				augs::draw_line(lines, camera[b.from], camera[b.to], get_resource_manager().find(assets::texture_id::BLANK)->texture_maps[texture_map_type::DIFFUSE], t.in.color);
 			}
 		}
 	}

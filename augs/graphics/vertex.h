@@ -26,10 +26,6 @@ namespace augs {
 			);
 		}
 
-		vertex() {}
-		vertex(vec2 pos) : pos(pos) {}
-		vertex(vec2 pos, vec2 texcoord, rgba color, augs::texture_atlas_entry& tex);
-
 		void set_texcoord(vec2, const augs::texture_atlas_entry& tex);
 	};
 

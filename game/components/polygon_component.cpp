@@ -1,5 +1,4 @@
 #include "polygon_component.h"
-#include "augs/texture_atlas/texture_atlas.h"
 
 #include "3rdparty/polypartition/src/polypartition.h"
 
@@ -21,12 +20,10 @@ namespace components {
 
 	void polygon::from_polygonized_texture(const assets::texture_id tex) {
 		auto& polygonized_sprite_verts = get_resource_manager().find(tex)->polygonized;
-		auto& image_to_polygonize = get_resource_manager().find(tex)->img;
+		const vec2 size = get_resource_manager().find(tex)->get_size();
 
 		ensure(polygonized_sprite_verts.size() > 0);
 		
-		vec2 size = image_to_polygonize.get_size();
-
 		std::vector<vertex> new_concave;
 
 		for (auto v : polygonized_sprite_verts) {
@@ -50,7 +47,7 @@ namespace components {
 			return;
 		}
 
-		auto& texture_to_map = get_resource_manager().find(texture_id_to_map)->tex;
+		auto& texture_to_map = get_resource_manager().find(texture_id_to_map)->texture_maps[texture_map_type::DIFFUSE];
 
 		auto* v = vertices.data();
 		typedef const augs::vertex& vc;
@@ -77,7 +74,7 @@ namespace components {
 			}
 		}
 		else if (mapping_mode == uv_mapping_mode::OVERLAY) {
-			auto size = texture_to_map.get_size();
+			auto size = texture_to_map.original_size_pixels;
 
 			for (auto& v : vertices) {
 				v.set_texcoord(vec2(

@@ -61,7 +61,7 @@ void action_button::draw(
 
 				const augs::gui::material inside_mat(inside_tex, inside_col);
 
-				const auto absolute_icon_rect = ltrbi(vec2i(0, 0), (*inside_tex).get_size()).place_in_center_of(absolute_rect);
+				const auto absolute_icon_rect = ltrbi(vec2i(0, 0), assets::get_size(inside_tex)).place_in_center_of(absolute_rect);
 				const bool draw_partial_colorful_rect = false;
 
 				if (has_enough_mana) {
@@ -77,7 +77,7 @@ void action_button::draw(
 					augs::draw_clipped_rect(
 						info.v,
 						absolute_icon_rect,
-						get_resource_manager().find_desaturated(inside_mat.tex)->tex,
+						get_resource_manager().find(inside_mat.tex)->texture_maps[texture_map_type::DESATURATED],
 						inside_mat.color,
 						ltrbi()
 					);
@@ -91,7 +91,7 @@ void action_button::draw(
 						augs::draw_clipped_rect(
 							info.v,
 							absolute_icon_rect,
-							get_resource_manager().find(inside_mat.tex)->tex,
+							get_resource_manager().find(inside_mat.tex)->texture_maps[texture_map_type::DIFFUSE],
 							inside_mat.color,
 							colorful_rect
 						);

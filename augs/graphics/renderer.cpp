@@ -209,7 +209,7 @@ namespace augs {
 			return;
 		}
 		
-		auto& tex = get_resource_manager().find(tex_id)->tex;
+		auto& tex = get_resource_manager().find(tex_id)->texture_maps[texture_map_type::DIFFUSE];
 		
 		vec2 center = visible_world_area / 2;
 		
