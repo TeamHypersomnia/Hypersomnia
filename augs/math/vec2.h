@@ -137,8 +137,8 @@ struct vec2t {
 		ar(CEREAL_NVP(x), CEREAL_NVP(y));
 	}
 
-	friend std::ostream& operator<<(std::ostream& out, const vec2t<type>& x);
-	friend std::istream& operator>>(std::istream& out, vec2t<type>& x);
+	template <class B> friend std::ostream& operator<<(std::ostream& out, const vec2t<B>& x);
+	template <class B> friend std::istream& operator>>(std::istream& out, vec2t<B>& x);
 
 	typedef float real;
 

@@ -5,6 +5,7 @@
 #include "augs/image/font.h"
 #include "augs/window_framework/window.h"
 #include "game/detail/particle_types.h"
+#include "application/content_generation/texture_atlases.h"
 
 using namespace augs;
 
@@ -178,6 +179,18 @@ namespace resources {
 				}
 			}
 		}
+	}
+
+	void manager::create(
+		const assets::atlas_id id,
+		const std::string& source_filename
+	) {
+		auto& tex = physical_textures[id];
+		
+		augs::image atlas_image;
+		atlas_image.from_file(source_filename);
+
+		tex.create(atlas_image);
 	}
 
 	animation& manager::create(assets::animation_id id) {

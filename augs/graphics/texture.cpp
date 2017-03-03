@@ -5,6 +5,10 @@
 
 namespace augs {
 	namespace graphics {
+		texture::~texture() {
+			destroy();
+		}
+
 		void texture::create(const augs::image& source) {
 			destroy();
 

@@ -40,7 +40,7 @@ namespace augs {
 			return ascender - descender;
 		}
 
-		font_glyph_metadata* get_glyph(unsigned unicode_id) {
+		const font_glyph_metadata* get_glyph(const unsigned unicode_id) const {
 			auto it = unicode_to_glyph_index.find(unicode_id);
 			if (it == unicode_to_glyph_index.end()) return nullptr;
 			else return &glyphs[(*it).second];
@@ -60,6 +60,14 @@ namespace augs {
 	struct baked_font {
 		font_metadata_from_file meta_from_file;
 		std::vector<augs::texture_atlas_entry> glyphs_in_atlas;
+
+		bool can_be_bolded() const { return false; }
+		bool can_be_italicsed() const { return false; }
+		bool is_bolded() const { return false; }
+		bool is_italicsed() const { return false; }
+
+		assets::font_id get_bold(const bool flag) const { return assets::font_id::INVALID; }
+		assets::font_id get_italics(const bool flag) const { return assets::font_id::INVALID; }
 	};
 
 	struct font_loading_input {

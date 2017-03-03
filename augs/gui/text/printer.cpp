@@ -141,7 +141,7 @@ namespace augs {
 							auto& g = *d.cached[i];
 
 							/* if it's not a whitespace */
-							if (d.cached_atlas_entries[i].original_size_pixels.x > 0) {
+							if (d.cached_atlas_entries[i]->original_size_pixels.x > 0) {
 								rgba charcolor = style(colors[i]).color;
 
 								/* if a character is between selection bounds, we change its color to the one specified in selected_text_color
@@ -152,7 +152,7 @@ namespace augs {
 
 								/* add the resulting character taking bearings into account */
 								augs::draw_clipped_rect(v, xywhi(sectors[i] + g.bear_x, lines[l].top + lines[l].asc - g.bear_y, g.size.x, g.size.y) + pos, 
-									d.cached_atlas_entries[i], charcolor, clipper);
+									*d.cached_atlas_entries[i], charcolor, clipper);
 							}
 						}
 					}

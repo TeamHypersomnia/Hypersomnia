@@ -14,7 +14,7 @@ namespace augs {
 				forced_bold(false),
 				redraw(true),
 				forced_italics(false), max_characters(0), whitelist(nullptr), blacklist(nullptr), allow_unknown_characters_as_default(false) {}
-			augs::font& ui::getf(unsigned i) const {
+			const augs::baked_font& ui::getf(unsigned i) const {
 				return *((i < get_str().length() && get_str()[i].font_used != assets::font_id::INVALID) ? get_str()[i].font_used : caret.default_style.f);
 			}
 
@@ -326,7 +326,7 @@ namespace augs {
 					edit.front().set_redo();
 
 					for (int i = l; i < r; ++i) {
-						font& f = getf(i);
+						auto& f = getf(i);
 						edit.front().states.push_back(f.is_bolded());
 						str()[i].font_used = f.get_bold(bold_all);
 					}
@@ -351,7 +351,7 @@ namespace augs {
 					edit.front().set_redo();
 
 					for (int i = l; i < r; ++i) {
-						font& f = getf(i);
+						auto& f = getf(i);
 						edit.front().states.push_back(f.is_italicsed());
 						str()[i].font_used = f.get_italics(it_all);
 					}
@@ -560,8 +560,8 @@ namespace augs {
 					/* if we want to have newlines, we need a whitespace glyph added to the end of every line
 						similiarly with tabs, we want to replace them with spaces
 					*/
-					(iswspace(c.c) && (*c.font_used).get_glyph(L' ') != nullptr)
-					|| allow_unknown_characters_as_default || (*c.font_used).get_glyph(c.c) != nullptr;
+					(iswspace(c.c) && (*c.font_used).meta_from_file.get_glyph(L' ') != nullptr)
+					|| allow_unknown_characters_as_default || (*c.font_used).meta_from_file.get_glyph(c.c) != nullptr;
 			}
 
 			bool ui::is_whitelisted(wchar_t c) const {

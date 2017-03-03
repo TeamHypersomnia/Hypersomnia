@@ -79,7 +79,10 @@ atlases_regeneration_output regenerate_atlases(const atlases_regeneration_input&
 					texture_atlas_stamp existent_stamp;
 					augs::read_object(existent_stamp_stream, existent_stamp);
 
-					const bool stamps_match = compare_containers(existent_stamp, new_stamp);
+					const bool stamps_match = 
+						compare_containers(existent_stamp.image_stamps, new_stamp.image_stamps)
+						&& compare_containers(existent_stamp.font_stamps, new_stamp.font_stamps)
+					;
 
 					if (!stamps_match) {
 						should_regenerate = true;

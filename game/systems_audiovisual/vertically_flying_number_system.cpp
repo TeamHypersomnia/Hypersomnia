@@ -1,5 +1,6 @@
 #include "vertically_flying_number_system.h"
 #include "augs/templates/container_templates.h"
+#include "game/detail/camera_cone.h"
 
 void vertically_flying_number_system::add(const number::input new_in) {
 	number new_number;

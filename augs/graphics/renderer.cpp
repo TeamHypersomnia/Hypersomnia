@@ -1,6 +1,7 @@
-#include "3rdparty/GL/OpenGL.h"
 #include <tuple>
-#include "renderer.h"
+
+#include "3rdparty/GL/OpenGL.h"
+#include "augs/graphics/renderer.h"
 #include "augs/graphics/fbo.h"
 #include "game/messages/visibility_information.h"
 #include "game/components/physics_component.h"
@@ -9,11 +10,13 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 
-#include "fbo.h"
+#include "augs/graphics/fbo.h"
 
 #include "augs/window_framework/window.h"
 
 #include "game/resources/manager.h"
+#include "augs/graphics/drawers.h"
+#include "game/detail/camera_cone.h"
 
 namespace augs {
 	renderer& renderer::get_current() {
@@ -204,14 +207,18 @@ namespace augs {
 	void renderer::line_channel::draw_yellow(vec2 a, vec2 b) { draw(a, b, yellow); }
 	void renderer::line_channel::draw_cyan(vec2 a, vec2 b) { draw(a, b, cyan); }
 
-	void renderer::draw_debug_info(vec2 visible_world_area, components::transform camera_transform, assets::texture_id tex_id, std::vector<const_entity_handle> target_entities, float ratio) {
+	void renderer::draw_debug_info(
+		const camera_cone camera,
+		const assets::texture_id line_texture,
+		const std::vector<const_entity_handle>& target_entities,
+		const float interpolation_ratio
+	) {
+		
 		if (!debug_drawing) {
 			return;
 		}
 		
-		auto& tex = get_resource_manager().find(tex_id)->texture_maps[texture_map_type::DIFFUSE];
-		
-		vec2 center = visible_world_area / 2;
+		const auto& tex = get_resource_manager().find(line_texture)->texture_maps[texture_map_type::DIFFUSE];
 		
 		clear_triangles();
 
@@ -264,23 +271,10 @@ namespace augs {
 
 		clear_lines();
 
-		auto line_lambda = [this, camera_transform, visible_world_area, center, tex](debug_line line) {
-			line.a += center - camera_transform.pos;
-			line.b += center - camera_transform.pos;
-
-			line.a.rotate(camera_transform.rotation, center);
-			line.b.rotate(camera_transform.rotation, center);
-
-			vertex_line new_line;
-
-			new_line.vertices[0].color = line.col;
-			new_line.vertices[0].texcoord.set(tex.get_u(0), tex.get_v(0));
-			new_line.vertices[0].pos.set(line.a.x, line.a.y);
-			new_line.vertices[1].color = line.col;
-			new_line.vertices[1].texcoord.set(tex.get_u(2), tex.get_v(2));
-			new_line.vertices[1].pos.set(line.b.x, line.b.y);
-
-			push_line(new_line);
+		auto line_lambda = [&](const debug_line line) {
+			augs::draw_line(
+				lines, camera[line.a], camera[line.b], tex, line.col 
+			);
 		};
 
 		if (should_interpolate_debug_lines && logic_lines.lines.size() == prev_logic_lines.lines.size()) {
@@ -288,8 +282,8 @@ namespace augs {
 			interpolated_logic_lines.resize(logic_lines.lines.size());
 
 			for (size_t i = 0; i < logic_lines.lines.size(); ++i) {
-				interpolated_logic_lines[i].a = prev_logic_lines.lines[i].a.lerp(logic_lines.lines[i].a, ratio);
-				interpolated_logic_lines[i].b = prev_logic_lines.lines[i].b.lerp(logic_lines.lines[i].b, ratio);
+				interpolated_logic_lines[i].a = prev_logic_lines.lines[i].a.lerp(logic_lines.lines[i].a, interpolation_ratio);
+				interpolated_logic_lines[i].b = prev_logic_lines.lines[i].b.lerp(logic_lines.lines[i].b, interpolation_ratio);
 				interpolated_logic_lines[i].col = logic_lines.lines[i].col;
 			}
 
@@ -323,7 +317,7 @@ namespace augs {
 		glBindTexture(GL_TEXTURE_2D, f.get_texture_id()); glerr;
 	}
 
-	void renderer::bind_texture(const augs::texture& atl) {
+	void renderer::bind_texture(const augs::graphics::texture& atl) {
 		glBindTexture(GL_TEXTURE_2D, atl.id); glerr;
 	}
 

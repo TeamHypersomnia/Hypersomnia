@@ -275,7 +275,7 @@ namespace augs {
 				const vec2i offset = vec2i()
 			) {
 				const auto absolute = context.get_tree_entry(id).get_absolute_rect();
-				const auto tex_size = (*mat.tex).get_size();
+				const auto tex_size = assets::get_size(mat.tex);
 				
 				auto tex_rc = ltrbi(vec2i(0, 0), tex_size).place_in_center_of(absolute);
 				tex_rc.set_position(tex_rc.get_position() + offset);

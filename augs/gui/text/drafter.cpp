@@ -9,7 +9,7 @@
 namespace augs {
 	namespace gui {
 		namespace text {
-			baked_font& drafter::getf(const gui::text::fstr& source, const unsigned i) const {
+			const baked_font& drafter::getf(const gui::text::fstr& source, const unsigned i) const {
 				//return (i < source.length() && source[i].font_used) ? source[i].font_used : target_caret->default_style.f;
 				return *source[i].font_used;
 			}
@@ -186,18 +186,18 @@ namespace augs {
 
 				/* update glyph data so each glyph object corresponds to a string character */
 				for (unsigned i = 0; i < source.size(); ++i) {
-					auto& ff = getf(source, i);
+					const auto& ff = getf(source, i);
 
-					auto g = ff.meta_from_file.get_glyph(password_mode ? password_character : source[i].c);
+					const auto* const g = ff.meta_from_file.get_glyph(password_mode ? password_character : source[i].c);
 
 					/* if we allowed a null glyph in string, it must be newline */
-					auto* final_ptr = g ? g : ff.meta_from_file.get_glyph(L' ');
+					const auto* const final_ptr = g ? g : ff.meta_from_file.get_glyph(L' ');
 
 					cached.push_back(final_ptr);
 					
 					cached_atlas_entries.push_back(
 						final_ptr ? 
-						ff.glyphs_in_atlas[final_ptr - ff.meta_from_file.glyphs.data()] : augs::texture_atlas_entry()
+						&ff.glyphs_in_atlas[final_ptr - ff.meta_from_file.glyphs.data()] : nullptr
 					);
 				}
 

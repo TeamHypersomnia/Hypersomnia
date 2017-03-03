@@ -194,6 +194,16 @@ namespace augs {
 		}
 	}
 
+	template <class T>
+	void reserve_num_elements(T& container, const size_t n) {
+		container.reserve(n);
+	}
+
+	template <class Key, class Value>
+	void reserve_num_elements(std::map<Key, Value>& container, const size_t) {
+	
+	}
+
 	template<class A, template <class...> class Container, class Key, class Value, class map_size_type = size_t>
 	bool read_associative_container(
 		A& ar,
@@ -206,7 +216,7 @@ namespace augs {
 			return false;
 		}
 
-		storage.reserve(s);
+		reserve_num_elements(storage, s);
 
 		while (s--) {
 			Key key;

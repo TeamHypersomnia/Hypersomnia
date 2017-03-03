@@ -38,8 +38,8 @@ namespace prefabs {
 		front.add_sub_entity(left_wheel);
 		name_entity(front, entity_name::TRUCK);
 
-		const vec2 front_size = get_resource_manager().find(assets::texture_id::TRUCK_FRONT)->img.get_size();
-		const vec2 interior_size = get_resource_manager().find(assets::texture_id::TRUCK_INSIDE)->img.get_size();
+		const vec2 front_size = get_resource_manager().find(assets::texture_id::TRUCK_FRONT)->get_size();
+		const vec2 interior_size = get_resource_manager().find(assets::texture_id::TRUCK_INSIDE)->get_size();
 
 		{
 			auto& sprite = front += components::polygon();
@@ -178,7 +178,7 @@ namespace prefabs {
 					engine_physical.add_standard_components();
 					front.add_sub_entity(engine_physical);
 
-				const vec2 engine_size = get_resource_manager().find(assets::texture_id::TRUCK_ENGINE)->img.get_size();
+				const vec2 engine_size = get_resource_manager().find(assets::texture_id::TRUCK_ENGINE)->get_size();
 
 				{
 					messages::create_particle_effect effect;

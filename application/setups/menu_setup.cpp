@@ -138,7 +138,7 @@ void menu_setup::process(
 
 	ltrb title_rect;
 	title_rect.set_position({ 100, 100 });
-	title_rect.set_size((*assets::texture_id::MENU_GAME_LOGO).get_size());
+	title_rect.set_size(assets::get_size(assets::texture_id::MENU_GAME_LOGO));
 
 	rgba fade_overlay_color = { 0, 2, 2, 255 };
 	rgba title_text_color = { 255, 255, 255, 0 };

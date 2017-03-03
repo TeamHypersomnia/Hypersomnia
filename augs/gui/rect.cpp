@@ -10,7 +10,7 @@ namespace augs {
 
 		rect_node_data::rect_node_data(const assets::texture_id& id) {
 			set_default_flags();
-			rc.set_size((*id).get_size());
+			rc.set_size(assets::get_size(id));
 		}
 
 		void rect_node_data::set_default_flags() {

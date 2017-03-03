@@ -62,12 +62,14 @@ struct game_image_request {
 typedef source_font_loading_input game_font_request;
 
 struct game_image_baked {
-	vec2i get_size() const;
-
 	augs::enum_array<augs::texture_atlas_entry, texture_map_type> texture_maps;
 
 	std::vector<vec2i> polygonized;
 	game_image_usage_settings settings;
+
+	vec2u get_size() const {
+		return texture_maps[texture_map_type::DIFFUSE].get_size();
+	}
 };
 
 typedef augs::baked_font game_font_baked;

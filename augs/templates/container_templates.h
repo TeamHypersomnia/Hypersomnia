@@ -3,6 +3,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <unordered_map>
 
 template< typename ContainerT, typename PredicateT >
 void erase_if(ContainerT& items, const PredicateT& predicate) {

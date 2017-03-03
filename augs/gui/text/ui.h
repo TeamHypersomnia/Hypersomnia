@@ -115,7 +115,7 @@ namespace augs {
 				bool is_blacklisted(wchar_t c) const;
 
 				/* font getting helper, shortens _str[i].font_used */
-				augs::font& getf(unsigned i) const;
+				const augs::baked_font& getf(unsigned i) const;
 
 				int get_selection_offset();
 				void set_selection_offset(int);

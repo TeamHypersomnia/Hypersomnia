@@ -9,9 +9,12 @@
 #include "application/config_lua_table.h"
 #include "augs/misc/input_context.h"
 
+#include "game/detail/camera_cone.h"
+
 class root_of_inventory_gui;
 struct character_gui;
 struct aabb_highlighter;
+struct camera_cone;
 class gui_element_system;
 
 typedef augs::gui::rect_tree<game_gui_element_location> game_gui_rect_tree;

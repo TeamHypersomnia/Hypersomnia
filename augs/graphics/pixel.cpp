@@ -303,9 +303,11 @@ std::ostream& operator<<(std::ostream& out, const rgba& x) {
 	const int a = x.a;
 
 	out << r << " " << g << " " << b << " " << a;
+
+	return out;
 }
 
-std::ostream& operator>>(std::istream& in, rgba& x) {
+std::istream& operator>>(std::istream& in, rgba& x) {
 	int r, g, b, a;
 	in >> r >> g >> b >> a;
 
@@ -313,4 +315,6 @@ std::ostream& operator>>(std::istream& in, rgba& x) {
 	x.g = static_cast<rgba_channel>(g);
 	x.b = static_cast<rgba_channel>(b);
 	x.a = static_cast<rgba_channel>(a);
+
+	return in;
 }

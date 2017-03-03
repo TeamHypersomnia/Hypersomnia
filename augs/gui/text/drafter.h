@@ -22,8 +22,8 @@ namespace augs {
 					bool empty() const;
 				};
 
-				std::vector<augs::font_glyph_metadata*> cached;
-				std::vector<augs::texture_atlas_entry> cached_atlas_entries;
+				std::vector<const augs::font_glyph_metadata*> cached;
+				std::vector<const augs::texture_atlas_entry*> cached_atlas_entries;
 				std::vector<line> lines;
 				std::vector<int> sectors;
 
@@ -62,10 +62,10 @@ namespace augs {
 				std::pair<int, int> get_line_visibility(const ltrbi& clipper) const;
 			private:
 				unsigned max_x;
-				void find_ascdesc(const fstr& source, int i, int j, int&, int&) const;
-				int get_kern(const fstr& source, unsigned code1, unsigned code2) const;
-				const augs::font_glyph_metadata& get_cached(int i) const;
-				augs::baked_font& getf(const fstr& source, unsigned i) const;
+				void find_ascdesc(const fstr& source, const int i, const int j, int&, int&) const;
+				int get_kern(const fstr& source, const unsigned code1, const unsigned code2) const;
+				const augs::font_glyph_metadata& get_cached(const int i) const;
+				const augs::baked_font& getf(const fstr& source, const unsigned i) const;
 			};
 		}
 	}

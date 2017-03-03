@@ -111,8 +111,7 @@ namespace rendering_scripts {
 		renderer.clear_triangles();
 
 		renderer.draw_debug_info(
-			camera.visible_world_area,
-			camera.transform,
+			camera,
 			assets::texture_id::BLANK,
 			{},
 			step.get_interpolation_ratio()

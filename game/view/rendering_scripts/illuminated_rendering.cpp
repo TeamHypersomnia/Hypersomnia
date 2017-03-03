@@ -364,8 +364,7 @@ namespace rendering_scripts {
 		renderer.clear_triangles();
 
 		renderer.draw_debug_info(
-			screen_size,
-			camera.transform,
+			camera,
 			assets::texture_id::BLANK,
 			{},
 			step.get_interpolation_ratio()

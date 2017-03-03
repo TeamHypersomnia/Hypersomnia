@@ -60,11 +60,10 @@ void convex_partitioned_shape::from_renderable(const const_entity_handle handle)
 }
 
 void convex_partitioned_shape::from_sprite(const components::sprite& sprite, const bool polygonize_sprite) {
-	auto& polygonized_sprite_verts = get_resource_manager().find(sprite.tex)->polygonized;
-	const auto& image_to_polygonize = get_resource_manager().find(sprite.tex)->img;
+	const auto& polygonized_sprite_verts = get_resource_manager().find(sprite.tex)->polygonized;
 
 	if (polygonized_sprite_verts.size() > 0 && polygonize_sprite) {
-		const vec2 image_size = image_to_polygonize.get_size();
+		const auto image_size = get_resource_manager().find(sprite.tex)->get_size();
 
 		std::vector<vec2> new_concave;
 
@@ -77,7 +76,7 @@ void convex_partitioned_shape::from_sprite(const components::sprite& sprite, con
 			new_concave.push_back(new_v);
 		}
 
-		const vec2 origin = vec2(-image_size.x/2, image_size.y/2);
+		const vec2 origin = vec2(static_cast<float>(image_size.x)/-2.f, image_size.y/2.f);
 
 		for (auto& v : new_concave) {
 			v += origin;
