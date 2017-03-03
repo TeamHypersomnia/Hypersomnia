@@ -109,6 +109,7 @@ namespace resource_setups {
 			auto& in = output[assets::texture_id::JMIX114];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/jmix114.png", assets::atlas_id::GAME_WORLD_ATLAS };
 			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/jmix114.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.polygonization_filename = "generated/polygonizations_of_images/jmix114.points";
 		}
 
 		{
@@ -121,6 +122,7 @@ namespace resource_setups {
 			auto& in = output[assets::texture_id::TRUCK_INSIDE];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/truck_inside.png", assets::atlas_id::GAME_WORLD_ATLAS };
 			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/truck_inside.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.polygonization_filename = "generated/polygonizations_of_images/truck_front.points";
 		}
 
 		{
@@ -262,6 +264,7 @@ namespace resource_setups {
 			auto& in = output[assets::texture_id::BACKPACK];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/backpack.png", assets::atlas_id::GAME_WORLD_ATLAS };
 			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/backpack.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.polygonization_filename = "generated/polygonizations_of_images/backpack.points";
 			in.settings.gui.bbox_expander = vec2(0, 2);
 		}
 

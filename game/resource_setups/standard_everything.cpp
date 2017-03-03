@@ -7,6 +7,7 @@
 #include "application/content_generation/desaturations.h"
 #include "application/content_generation/buttons_with_corners.h"
 #include "application/content_generation/scripted_images.h"
+#include "application/content_generation/polygonizations_of_images.h"
 
 #include "3rdparty/GL/OpenGL.h"
 
@@ -39,6 +40,7 @@ namespace resource_setups {
 		regenerate_buttons_with_corners();
 		regenerate_neon_maps();
 		regenerate_desaturations();
+		regenerate_polygonizations_of_images();
 		const auto regenerated = regenerate_atlases(in);
 
 		LOG("Content regenerated successfully.\n--------------------------------------------\n");

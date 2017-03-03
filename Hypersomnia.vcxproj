@@ -325,6 +325,7 @@
     <ClCompile Include="application\config_lua_table.cpp" />
     <ClCompile Include="application\content_generation\desaturations.cpp" />
     <ClCompile Include="application\content_generation\buttons_with_corners.cpp" />
+    <ClCompile Include="application\content_generation\polygonizations_of_images.cpp" />
     <ClCompile Include="application\content_generation\scripted_images.cpp" />
     <ClCompile Include="application\content_generation\neon_maps.cpp" />
     <ClCompile Include="application\content_generation\texture_atlases.cpp" />
@@ -1032,6 +1033,7 @@
     <ClInclude Include="application\call_config_script.h" />
     <ClInclude Include="application\config_lua_table.h" />
     <ClInclude Include="application\content_generation\desaturations.h" />
+    <ClInclude Include="application\content_generation\polygonizations_of_images.h" />
     <ClInclude Include="application\content_generation\scripted_images.h" />
     <ClInclude Include="application\content_generation\neon_maps.h" />
     <ClInclude Include="application\content_generation\texture_atlases.h" />
