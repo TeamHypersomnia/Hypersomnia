@@ -187,7 +187,7 @@ namespace augs {
 
 		for (int i = 0; i < 3; ++i) {
 			t1.vertices[i].texcoord = considered_texture.get_atlas_space_uv(t1.vertices[i].texcoord);
-			t1.vertices[i].texcoord = considered_texture.get_atlas_space_uv(t2.vertices[i].texcoord);
+			t2.vertices[i].texcoord = considered_texture.get_atlas_space_uv(t2.vertices[i].texcoord);
 		}
 
 		t1.vertices[0].pos = t2.vertices[0].pos = static_cast<vec2i>(v[0]);
