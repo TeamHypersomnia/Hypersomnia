@@ -284,8 +284,6 @@ atlases_regeneration_output regenerate_atlases(const atlases_regeneration_input&
 			augs::stream existent_meta_stream;
 			augs::assign_file_contents_binary(atlas_metadata_filename, existent_meta_stream);
 
-			std::unordered_map<int, int> dd;
-			augs::read_object(existent_meta_stream, dd);
 			augs::read_object(existent_meta_stream, this_atlas_metadata);
 
 			output.metadatas.emplace_back(std::move(std::make_pair(

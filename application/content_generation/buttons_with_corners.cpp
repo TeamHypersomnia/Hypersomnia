@@ -56,11 +56,17 @@ void regenerate_buttons_with_corners() {
 		bool should_regenerate = false;
 
 		for (size_t i = 0; i < static_cast<int>(button_corner_type::COUNT); ++i) {
+			const auto type = static_cast<button_corner_type>(i);
+			
+			if (is_lb_complement(type) && !new_meta.make_lb_complement) {
+				continue;
+			}
+
 			if (
 				!augs::file_exists(
 					typesafe_sprintf(
 						button_with_corners_filename_template,
-						get_filename_for(static_cast<button_corner_type>(i))
+						get_filename_for(type)
 					)
 				)
 			) {
