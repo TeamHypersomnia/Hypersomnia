@@ -59,7 +59,7 @@ intersection_output rectangle_ray_intersection(
 		intersection_output result;
 		
 		result.hit = true;
-		result.intersection = in.p1 + vec2(in.p2 - in.p1) * (out.fraction);
+		result.intersection = center + (in.p1 + vec2(in.p2 - in.p1) * (out.fraction));
 		
 		return result;
 	}
