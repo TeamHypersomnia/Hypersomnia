@@ -2,6 +2,8 @@
 #include "3rdparty/lodepng/lodepng.h"
 #include "augs/ensure.h"
 #include "augs/filesystem/directory.h"
+#include "augs/filesystem/file.h"
+#include "augs/misc/templated_readwrite.h"
 
 template<class C>
 static void Line(
@@ -199,6 +201,12 @@ namespace augs {
 		return v.x < size.x && v.y < size.y;
 	}
 
+	bool image::from_binary_file(const std::string& filename) {
+		std::ifstream in(filename, std::ios::in | std::ios::binary);
+
+		return augs::read_object(in, size) && augs::read_object(in, v);
+	}
+
 	bool image::from_file(
 		const std::string& filename
 	) {
@@ -229,6 +237,14 @@ namespace augs {
 		if (lodepng::encode(filename, *reinterpret_cast<const std::vector<unsigned char>*>(&v), size.x, size.y)) {
 			LOG("Could not encode %x! Ensure that the target directory exists.", filename);
 		}
+	}
+
+	void image::save_as_binary_file(const std::string& filename) const {
+		augs::create_directories(filename);
+
+		std::ofstream out(filename, std::ios::out | std::ios::binary);
+		augs::write_object(out, size);
+		augs::write_object(out, v);
 	}
 
 	void image::fill(const rgba col) {

@@ -202,7 +202,7 @@ namespace resources {
 		auto& tex = physical_textures[id];
 		
 		augs::image atlas_image;
-		atlas_image.from_file(typesafe_sprintf("generated/atlases/%x.png", static_cast<int>(id)));
+		atlas_image.from_binary_file(typesafe_sprintf("generated/atlases/%x.png", static_cast<int>(id)));
 
 		tex.create(atlas_image);
 	}

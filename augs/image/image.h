@@ -29,6 +29,8 @@ namespace augs {
 		void fill(const rgba fill_color);
 
 		bool from_file(const std::string& filename);
+		bool from_binary_file(const std::string& filename);
+		
 		bool from_clipboard();
 
 		void blit(
@@ -91,6 +93,7 @@ namespace augs {
 		void destroy();
 		
 		void save(const std::string& filename) const;
+		void save_as_binary_file(const std::string& filename) const;
 		
 		vec2u get_size() const;
 		unsigned get_rows() const;
