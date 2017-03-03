@@ -27,17 +27,18 @@ namespace resource_setups {
 		const auto make_indexed = [&](
 			const assets::texture_id first,
 			const assets::texture_id last,
-			const std::string& filename_template
+			const std::string& filename_template,
+			const std::string& neon_filename_template = std::string()
 		) {
 			const auto first_i = static_cast<int>(first);
 			const auto last_i = static_cast<int>(last);
 
 			for (int i = first_i; i < last_i; ++i) {
-				const auto full_filename = typesafe_sprintf(filename_template, i - first_i);
+				auto& in = output[static_cast<assets::texture_id>(i)];
+				in.texture_maps[texture_map_type::DIFFUSE] = { typesafe_sprintf(filename_template, i - first_i), assets::atlas_id::GAME_WORLD_ATLAS };
 
-				{
-					auto& in = output[static_cast<assets::texture_id>(i)];
-					in.texture_maps[texture_map_type::DIFFUSE] = { full_filename, assets::atlas_id::GAME_WORLD_ATLAS };
+				if (neon_filename_template.size() > 0) {
+					in.texture_maps[texture_map_type::NEON] = { typesafe_sprintf(neon_filename_template, i - first_i), assets::atlas_id::GAME_WORLD_ATLAS };
 				}
 			}
 		};
@@ -100,16 +101,19 @@ namespace resource_setups {
 		{
 			auto& in = output[assets::texture_id::JMIX114];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/jmix114.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/jmix114.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::TRUCK_FRONT];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/truck_front.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/truck_front.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::TRUCK_INSIDE];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/truck_inside.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/truck_inside.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
@@ -120,6 +124,7 @@ namespace resource_setups {
 		{
 			auto& in = output[assets::texture_id::ASSAULT_RIFLE];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/assault_rifle.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/assault_rifle.png", assets::atlas_id::GAME_WORLD_ATLAS };
 			in.settings.gui.flip_horizontally = true;
 			in.settings.gui.flip_vertically = true;
 		}
@@ -127,6 +132,7 @@ namespace resource_setups {
 		{
 			auto& in = output[assets::texture_id::BILMER2000];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/bilmer2000.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/bilmer2000.png", assets::atlas_id::GAME_WORLD_ATLAS };
 			in.settings.gui.flip_horizontally = true;
 			in.settings.gui.flip_horizontally = false;
 		}
@@ -134,6 +140,7 @@ namespace resource_setups {
 		{
 			auto& in = output[assets::texture_id::KEK9];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/kek9.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/kek9.png", assets::atlas_id::GAME_WORLD_ATLAS };
 			in.settings.gui.flip_horizontally = true;
 			in.settings.gui.flip_horizontally = false;
 		}
@@ -148,6 +155,7 @@ namespace resource_setups {
 		{
 			auto& in = output[assets::texture_id::SUBMACHINE];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/submachine.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/submachine.png", assets::atlas_id::GAME_WORLD_ATLAS };
 			in.settings.gui.flip_horizontally = true;
 			in.settings.gui.flip_horizontally = true;
 		}
@@ -155,6 +163,7 @@ namespace resource_setups {
 		{
 			auto& in = output[assets::texture_id::PISTOL];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/pistol.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/pistol.png", assets::atlas_id::GAME_WORLD_ATLAS };
 			in.settings.gui.flip_horizontally = true;
 			in.settings.gui.flip_horizontally = true;
 		}
@@ -162,6 +171,7 @@ namespace resource_setups {
 		{
 			auto& in = output[assets::texture_id::URBAN_CYAN_MACHETE];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/urban_cyan_machete.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/urban_cyan_machete.png", assets::atlas_id::GAME_WORLD_ATLAS };
 			in.settings.gui.flip_horizontally = true;
 			in.settings.gui.flip_horizontally = true;
 		}
@@ -169,6 +179,7 @@ namespace resource_setups {
 		{
 			auto& in = output[assets::texture_id::AMPLIFIER_ARM];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/amplifier_arm.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/amplifier_arm.png", assets::atlas_id::GAME_WORLD_ATLAS };
 			in.settings.gui.flip_horizontally = true;
 			in.settings.gui.flip_horizontally = false;
 		}
@@ -176,62 +187,74 @@ namespace resource_setups {
 		{
 			auto& in = output[assets::texture_id::SAMPLE_MAGAZINE];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/magazine.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/magazine.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::SMALL_MAGAZINE];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/small_magazine.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/small_magazine.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::SAMPLE_SUPPRESSOR];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/suppressor.png", assets::atlas_id::GAME_WORLD_ATLAS };				
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/suppressor.png", assets::atlas_id::GAME_WORLD_ATLAS };
 			in.settings.gui.flip_horizontally = true;
 		}
 
 		{
 			auto& in = output[assets::texture_id::ROUND_TRACE];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/round_trace.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/round_trace.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::ENERGY_BALL];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/energy_ball.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/energy_ball.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::PINK_CHARGE];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/pink_charge.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/pink_charge.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::PINK_SHELL];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/pink_shell.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/pink_shell.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::CYAN_CHARGE];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/cyan_charge.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/cyan_charge.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::CYAN_SHELL];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/cyan_shell.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/cyan_shell.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::GREEN_CHARGE];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/green_charge.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/green_charge.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::GREEN_SHELL];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/green_shell.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/green_shell.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::BACKPACK];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/backpack.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/backpack.png", assets::atlas_id::GAME_WORLD_ATLAS };
 			in.settings.gui.bbox_expander = vec2(0, 2);
 		}
 
@@ -263,16 +286,19 @@ namespace resource_setups {
 		{
 			auto& in = output[assets::texture_id::HAVE_A_PLEASANT];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/have_a_pleasant.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/have_a_pleasant.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::AWAKENING];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/awakening.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/awakening.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::METROPOLIS];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/metropolis.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/metropolis.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
@@ -283,11 +309,13 @@ namespace resource_setups {
 		{
 			auto& in = output[assets::texture_id::ROAD];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/road.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/road.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::ROAD_FRONT_DIRT];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/road_front_dirt.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/road_front_dirt.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
@@ -298,6 +326,7 @@ namespace resource_setups {
 		{
 			auto& in = output[assets::texture_id::TRUCK_ENGINE];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/truck_engine.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/truck_engine.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
@@ -373,16 +402,19 @@ namespace resource_setups {
 		{
 			auto& in = output[assets::texture_id::PED_GRENADE];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/ped_grenade.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/ped_grenade.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::INTERFERENCE_GRENADE];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/interference_grenade.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/interference_grenade.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::FORCE_GRENADE_RELEASED];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/force_grenade_released.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/force_grenade.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
@@ -438,6 +470,7 @@ namespace resource_setups {
 		{
 			auto& in = output[assets::texture_id::LASER];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/laser.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/laser.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
@@ -533,7 +566,8 @@ namespace resource_setups {
 		make_indexed(
 			assets::texture_id::PIXEL_THUNDER_FIRST,
 			assets::texture_id::PIXEL_THUNDER_LAST,
-			"hypersomnia/gfx/pixel_thunder_%x.png"
+			"hypersomnia/gfx/pixel_thunder_%x.png",
+			"generated/neon_maps/pixel_thunder_%x.png"
 		);
 
 		make_indexed(
