@@ -357,21 +357,31 @@ namespace resource_setups {
 		{
 			auto& in = output[assets::texture_id::SPELL_HASTE_ICON];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/spell_haste_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::DESATURATED] = { "generated/desaturations/spell_haste_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::SPELL_FURY_OF_THE_AEONS_ICON];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/spell_fury_of_the_aeons_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::DESATURATED] = { "generated/desaturations/spell_fury_of_the_aeons_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::SPELL_ULTIMATE_WRATH_OF_THE_AEONS_ICON];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/spell_ultimate_wrath_of_the_aeons_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::DESATURATED] = { "generated/desaturations/spell_ultimate_wrath_of_the_aeons_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
 			auto& in = output[assets::texture_id::SPELL_ELECTRIC_TRIAD_ICON];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/spell_electric_triad_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::DESATURATED] = { "generated/desaturations/spell_electric_triad_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::texture_id::SPELL_ELECTRIC_SHIELD_ICON];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/spell_electric_shield_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::DESATURATED] = { "generated/desaturations/spell_electric_shield_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
@@ -382,11 +392,6 @@ namespace resource_setups {
 		{
 			auto& in = output[assets::texture_id::PERK_ELECTRIC_SHIELD_ICON];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/perk_electric_shield_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
-		}
-
-		{
-			auto& in = output[assets::texture_id::SPELL_ELECTRIC_SHIELD_ICON];
-			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/spell_electric_shield_icon.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
 
 		{
