@@ -6,6 +6,8 @@
 #include "augs/misc/templated_readwrite.h"
 #include "augs/misc/trivial_pair.h"
 
+#include "augs/texture_atlas/texture_atlas_entry.h"
+
 struct FT_Glyph_Metrics_;
 typedef FT_Glyph_Metrics_ FT_Glyph_Metrics;
 
@@ -33,6 +35,26 @@ namespace augs {
 
 		std::vector<font_glyph_metadata> glyphs;
 		std::unordered_map<unsigned, unsigned> unicode_to_glyph_index;
+
+		unsigned get_height() const {
+			return ascender - descender;
+		}
+
+		font_glyph_metadata* get_glyph(unsigned unicode_id) {
+			auto it = unicode_to_glyph_index.find(unicode_id);
+			if (it == unicode_to_glyph_index.end()) return nullptr;
+			else return &glyphs[(*it).second];
+		}
+
+		unsigned get_glyph_index(const unsigned unicode) const {
+			const auto it = unicode_to_glyph_index.find(unicode);
+
+			if (it == unicode_to_glyph_index.end()) {
+				return 0xdeadbeef;
+			}
+
+			return (*it).second;
+		}
 	};
 
 	struct baked_font {

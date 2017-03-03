@@ -416,19 +416,19 @@ struct vec2t {
 		return *this;
 	}
 
-	bool x_non_zero(const real eps = AUGS_EPSILON) const {
+	bool x_non_zero(const type eps = static_cast<type>(AUGS_EPSILON)) const {
 		return std::abs(x) > eps;
 	}
 
-	bool y_non_zero(const real eps = AUGS_EPSILON) const {
+	bool y_non_zero(const type eps = static_cast<type>(AUGS_EPSILON)) const {
 		return std::abs(y) > eps;
 	}
 
-	bool non_zero(const real eps = AUGS_EPSILON) const {
+	bool non_zero(const type eps = static_cast<type>(AUGS_EPSILON)) const {
 		return x_non_zero(eps) || y_non_zero(eps);
 	}
 
-	bool is_zero(const real eps = AUGS_EPSILON) const {
+	bool is_zero(const type eps = static_cast<type>(AUGS_EPSILON)) const {
 		return !non_zero(eps);
 	}
 

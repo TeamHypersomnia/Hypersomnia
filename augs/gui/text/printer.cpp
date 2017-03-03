@@ -72,7 +72,7 @@ namespace augs {
 					gui::draw_clipped_rect(highlight_mat, xywhi(0, highlighted.top, clip ? d.get_bbox().x + clipper.w() : d.get_bbox().x,
 
 						/* snap to default style's height */
-						highlighted.empty() ? (*(caret->default_style.f)).get_height()
+						highlighted.empty() ? (*(caret->default_style.f)).meta_from_file.get_height()
 						: highlighted.height()) + pos, clipper, v);
 				}
 
@@ -141,7 +141,7 @@ namespace augs {
 							auto& g = *d.cached[i];
 
 							/* if it's not a whitespace */
-							if (g.sprite.tex.get_size().non_zero()) {
+							if (d.cached_atlas_entries[i].original_size_pixels.x > 0) {
 								rgba charcolor = style(colors[i]).color;
 
 								/* if a character is between selection bounds, we change its color to the one specified in selected_text_color
@@ -152,7 +152,7 @@ namespace augs {
 
 								/* add the resulting character taking bearings into account */
 								augs::draw_clipped_rect(v, xywhi(sectors[i] + g.bear_x, lines[l].top + lines[l].asc - g.bear_y, g.size.x, g.size.y) + pos, 
-									g.sprite.tex, charcolor, clipper);
+									d.cached_atlas_entries[i], charcolor, clipper);
 							}
 						}
 					}
@@ -165,19 +165,19 @@ namespace augs {
 							else {
 								int pos = std::max(1u, caret->pos);
 								auto& glyph_font = *colors[pos - 1].font_used;
-								caret_rect = xywhi(sectors[caret->pos], lines[caret_line].top + lines[caret_line].asc - glyph_font.ascender,
-									caret_width, glyph_font.get_height());
+								caret_rect = xywhi(sectors[caret->pos], lines[caret_line].top + lines[caret_line].asc - glyph_font.meta_from_file.ascender,
+									caret_width, glyph_font.meta_from_file.get_height());
 							}
 						}
 						/* otherwise set caret's height to default style's height to avoid strange situations */
 						else
-							caret_rect = xywhi(0, d.lines[caret_line].top, caret_width, (*caret->default_style.f).get_height());
+							caret_rect = xywhi(0, d.lines[caret_line].top, caret_width, (*caret->default_style.f).meta_from_file.get_height());
 
 					}
 				}
 				/* there is nothing to draw, but we are still active so we want to draw caret anyway */
 				else if (active && caret)
-					caret_rect = xywhi(0, 0, caret_width, (*caret->default_style.f).get_height());
+					caret_rect = xywhi(0, 0, caret_width, (*caret->default_style.f).meta_from_file.get_height());
 
 				//					this->quad_indices.caret = v.size();
 				if (blink.caret_visible) gui::draw_clipped_rect(caret_mat, caret_rect + pos, clipper, v);

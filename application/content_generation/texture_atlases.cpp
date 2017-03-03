@@ -15,6 +15,7 @@
 #include "augs/image/image.h"
 
 #include "augs/graphics/renderer.h"
+#include "3rdparty/rectpack2D/src/pack.h"
 
 namespace fs = std::experimental::filesystem;
 

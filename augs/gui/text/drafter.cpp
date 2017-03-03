@@ -9,7 +9,7 @@
 namespace augs {
 	namespace gui {
 		namespace text {
-			font& drafter::getf(const gui::text::fstr& source, const unsigned i) const {
+			baked_font& drafter::getf(const gui::text::fstr& source, const unsigned i) const {
 				//return (i < source.length() && source[i].font_used) ? source[i].font_used : target_caret->default_style.f;
 				return *source[i].font_used;
 			}
@@ -24,27 +24,27 @@ namespace augs {
 				return 0;
 			}
 
-			const font::glyph& drafter::get_cached(const int i) const {
+			const font_glyph_metadata& drafter::get_cached(const int i) const {
 				return (cached.at(i) == nullptr) ? default_glyph : *cached[i];
 			}
 
 			void drafter::find_ascdesc(const gui::text::fstr& in, const int l, const int r, int& asc, int& desc) const {
 				if (l == r) {
 					if (l > 0) {
-						asc = getf(in, l - 1).ascender;
-						desc = getf(in, l - 1).descender;
+						asc = getf(in, l - 1).meta_from_file.ascender;
+						desc = getf(in, l - 1).meta_from_file.descender;
 					}
 					else {
-						asc = getf(in, l).ascender;
-						desc = getf(in, l).descender;
+						asc = getf(in, l).meta_from_file.ascender;
+						desc = getf(in, l).meta_from_file.descender;
 					}
 				}
 				else {
-					asc = getf(in, l).ascender, desc = getf(in, l).descender;
+					asc = getf(in, l).meta_from_file.ascender, desc = getf(in, l).meta_from_file.descender;
 
 					for (int j = l; j < r; ++j) {
-						asc = std::max(asc, getf(in, j).ascender);
-						desc = std::min(desc, getf(in, j).descender);
+						asc = std::max(asc, getf(in, j).meta_from_file.ascender);
+						desc = std::min(desc, getf(in, j).meta_from_file.descender);
 					}
 				}
 			}
@@ -69,7 +69,7 @@ namespace augs {
 				desc = _desc;
 			}
 
-			void drafter::line::adjust(const font& f) {
+			void drafter::line::adjust(const font_metadata_from_file& f) {
 				asc = std::max(asc, f.ascender);
 				desc = std::min(desc, f.descender);
 			}
@@ -182,14 +182,23 @@ namespace augs {
 
 				/* reserve enough space to avoid reallocation */
 				cached.reserve(source.size());
+				cached_atlas_entries.reserve(source.size());
 
 				/* update glyph data so each glyph object corresponds to a string character */
 				for (unsigned i = 0; i < source.size(); ++i) {
-					auto g = getf(source, i).get_glyph(password_mode ? password_character : source[i].c);
+					auto& ff = getf(source, i);
+
+					auto g = ff.meta_from_file.get_glyph(password_mode ? password_character : source[i].c);
 
 					/* if we allowed a null glyph in string, it must be newline */
-					cached.push_back(g ? g : getf(source, i).get_glyph(L' '));
+					auto* final_ptr = g ? g : ff.meta_from_file.get_glyph(L' ');
 
+					cached.push_back(final_ptr);
+					
+					cached_atlas_entries.push_back(
+						final_ptr ? 
+						ff.glyphs_in_atlas[final_ptr - ff.meta_from_file.glyphs.data()] : augs::texture_atlas_entry()
+					);
 				}
 
 				vec2i pen(0, 0);
@@ -279,7 +288,7 @@ namespace augs {
 					pen.x = 0;
 					for (unsigned i = lines[l].begin; i < lines[l].end && i < cached.size(); ++i) {
 						/* update line's height so it is maximum of all characters' heights */
-						lines[l].adjust(getf(source, i));
+						lines[l].adjust(getf(source, i).meta_from_file);
 
 						pen.x += get_kern(source, i, l);
 						sectors.push_back(pen.x);
