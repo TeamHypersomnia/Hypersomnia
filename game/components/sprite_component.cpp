@@ -27,13 +27,13 @@ namespace components {
 	void sprite::set(const assets::texture_id _tex, const rgba _color) {
 		tex = _tex;
 		color = _color;
-		has_neon_map = get_resource_manager().find_neon_map(tex) != nullptr;
+		has_neon_map = get_resource_manager().find(tex)->texture_maps[texture_map_type::NEON].exists();
 
 		update_size_from_texture_dimensions();
 	}
 
 	void sprite::update_size_from_texture_dimensions() {
-		size = vec2i(get_resource_manager().find(tex)->tex.get_size());
+		size = vec2i(get_resource_manager().find(tex)->get_size());
 	}
 
 	void sprite::draw(const drawing_input& in,
@@ -95,11 +95,11 @@ namespace components {
 		if (in.drawing_type == renderable_drawing_type::NEON_MAPS && has_neon_map) {
 			draw(
 				in, 
-				get_resource_manager().find_neon_map(tex)->tex, 
+				get_resource_manager().find(tex)->texture_maps[texture_map_type::NEON], 
 				screen_space_pos,
 				final_rotation,
-				vec2(get_resource_manager().find_neon_map(tex)->tex.get_size())
-				/ vec2(get_resource_manager().find(tex)->tex.get_size()) * drawn_size
+				vec2(get_resource_manager().find(tex)->texture_maps[texture_map_type::NEON].original_size_pixels)
+				/ vec2(get_resource_manager().find(tex)->get_size()) * drawn_size
 			);
 		}
 		else if (
@@ -108,7 +108,7 @@ namespace components {
 		) {
 			draw(
 				in, 
-				get_resource_manager().find(tex)->tex,
+				get_resource_manager().find(tex)->texture_maps[texture_map_type::DIFFUSE],
 				screen_space_pos,
 				final_rotation, 
 				drawn_size
@@ -134,7 +134,7 @@ namespace components {
 					vec2i { generator.randval(0, int(drawn_size.x)), generator.randval(0, int(drawn_size.y)) } - drawn_size / 2;
 
 				draw(in, 
-					get_resource_manager().find(target_frame.sprite.tex)->tex,
+					get_resource_manager().find(target_frame.sprite.tex)->texture_maps[texture_map_type::DIFFUSE],
 					screen_space_pos + blink_offset,
 					final_rotation,
 					assets::get_size(target_frame.sprite.tex)

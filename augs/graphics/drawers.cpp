@@ -26,22 +26,23 @@ namespace augs {
 		float tw = 1.f / origin.w();
 		float th = 1.f / origin.h();
 
-		rects::texture<float> diff(((p[0].pos.x = p[3].pos.x = rc.l) - origin.l) * tw,
-			((p[0].pos.y = p[1].pos.y = rc.t) - origin.t) * th,
-			((p[1].pos.x = p[2].pos.x = rc.r) - origin.r) * tw + 1.0f,
-			((p[2].pos.y = p[3].pos.y = rc.b) - origin.b) * th + 1.0f);
-
 		p[0].color = p[1].color = p[2].color = p[3].color = color;
 
+		auto p1 = vec2(((p[0].pos.x = p[3].pos.x = rc.l) - origin.l) * tw,
+			((p[0].pos.y = p[1].pos.y = rc.t) - origin.t) * th);
+
+		auto p2 = vec2(((p[1].pos.x = p[2].pos.x = rc.r) - origin.r) * tw + 1.0f,
+			((p[2].pos.y = p[3].pos.y = rc.b) - origin.b) * th + 1.0f);
+
 		if (flip_horizontally) {
-			diff.u1 = 1.f - diff.u1;
-			diff.u2 = 1.f - diff.u2;
+			p1.x = 1.f - p1.x;
+			p2.x = 1.f - p2.x;
 		}
 
-		tex.get_atlas_space_uv(diff.u1, diff.v1, p[0].texcoord.x, p[0].texcoord.y);
-		tex.get_atlas_space_uv(diff.u2, diff.v1, p[1].texcoord.x, p[1].texcoord.y);
-		tex.get_atlas_space_uv(diff.u2, diff.v2, p[2].texcoord.x, p[2].texcoord.y);
-		tex.get_atlas_space_uv(diff.u1, diff.v2, p[3].texcoord.x, p[3].texcoord.y);
+		p[0].texcoord = tex.get_atlas_space_uv({p1.x, p1.y});
+		p[1].texcoord = tex.get_atlas_space_uv({p2.x, p1.y});
+		p[2].texcoord = tex.get_atlas_space_uv({p2.x, p2.y});
+		p[3].texcoord = tex.get_atlas_space_uv({p1.x, p2.y});
 
 		augs::vertex_triangle out[2];
 		out[0].vertices[0] = p[0];
@@ -80,7 +81,7 @@ namespace augs {
 	}
 
 	void draw_rect(vertex_triangle_buffer& v, const vec2 origin, const assets::texture_id id, const rgba color) {
-		draw_rect(v, xywh {origin.x, origin.y, static_cast<float>((*id).get_size().x), static_cast<float>((*id).get_size().y) }, *id, color);
+		draw_rect(v, xywh {origin.x, origin.y, static_cast<float>(assets::get_size(id).x), static_cast<float>(assets::get_size(id).y) }, *id, color);
 	}
 
 	void draw_rect(vertex_triangle_buffer& v, const ltrb origin, const texture_atlas_entry& tex, const rgba color) {
@@ -91,14 +92,16 @@ namespace augs {
 		p[1].pos.x = p[2].pos.x = origin.r;
 		p[2].pos.y = p[3].pos.y = origin.b;
 
-		rects::texture<float> diff(0.f, 0.f, 1.f, 1.f);
+		vec2 p1(0.f, 0.f);
+		vec2 p2(1.f, 1.f);
 
 		p[0].color = p[1].color = p[2].color = p[3].color = color;
 
-		tex.get_atlas_space_uv(diff.u1, diff.v1, p[0].texcoord.x, p[0].texcoord.y);
-		tex.get_atlas_space_uv(diff.u2, diff.v1, p[1].texcoord.x, p[1].texcoord.y);
-		tex.get_atlas_space_uv(diff.u2, diff.v2, p[2].texcoord.x, p[2].texcoord.y);
-		tex.get_atlas_space_uv(diff.u1, diff.v2, p[3].texcoord.x, p[3].texcoord.y);
+
+		p[0].texcoord = tex.get_atlas_space_uv({ p1.x, p1.y });
+		p[1].texcoord = tex.get_atlas_space_uv({ p2.x, p1.y });
+		p[2].texcoord = tex.get_atlas_space_uv({ p2.x, p2.y });
+		p[3].texcoord = tex.get_atlas_space_uv({ p1.x, p2.y });
 
 		augs::vertex_triangle out[2];
 
@@ -184,8 +187,8 @@ namespace augs {
 		t1.vertices[2].texcoord = texcoords[3];
 
 		for (int i = 0; i < 3; ++i) {
-			considered_texture.get_atlas_space_uv(t1.vertices[i].texcoord);
-			considered_texture.get_atlas_space_uv(t2.vertices[i].texcoord);
+			t1.vertices[i].texcoord = considered_texture.get_atlas_space_uv(t1.vertices[i].texcoord);
+			t1.vertices[i].texcoord = considered_texture.get_atlas_space_uv(t2.vertices[i].texcoord);
 		}
 
 		t1.vertices[0].pos = t2.vertices[0].pos = static_cast<vec2i>(v[0]);
