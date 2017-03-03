@@ -614,7 +614,7 @@ namespace scene_builders {
 					prefabs::create_brick_wall(world, components::transform(-3 - 16 + 100 - 160, -32 - 96 + 160 - 160*b, 90), { 160, 160 });
 				}
 
-				const auto bg_size = assets::get_size(assets::texture_id::TEST_BACKGROUND);
+				const vec2i bg_size = assets::get_size(assets::texture_id::TEST_BACKGROUND);
 
 				const int num_floors = 10 * 10;
 				const int side = sqrt(num_floors) / 2;

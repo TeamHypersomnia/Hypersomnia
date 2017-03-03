@@ -81,11 +81,6 @@ namespace resource_setups {
 		}
 
 		{
-			auto& in = output[assets::texture_id::TEST_BACKGROUND];
-			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/snow_textures/snow3.png", assets::atlas_id::GAME_WORLD_ATLAS };
-		}
-
-		{
 			auto& in = output[assets::texture_id::CRATE];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/crate2.png", assets::atlas_id::GAME_WORLD_ATLAS };
 		}
