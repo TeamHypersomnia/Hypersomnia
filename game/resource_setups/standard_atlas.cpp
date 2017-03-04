@@ -551,13 +551,15 @@ namespace resource_setups {
 		make_indexed(
 			assets::game_image_id::TORSO_MOVING_FIRST,
 			assets::game_image_id::TORSO_MOVING_LAST,
-			"hypersomnia/gfx/torso_white_walk_barehands_%x.png"
+			"hypersomnia/gfx/torso_white_walk_barehands_%x.png",
+			"generated/neon_maps/torso_white_walk_barehands_%x.png"
 		);
 
 		make_indexed(
 			assets::game_image_id::VIOLET_TORSO_MOVING_FIRST,
 			assets::game_image_id::VIOLET_TORSO_MOVING_LAST,
-			"hypersomnia/gfx/sprite_%x.png"
+			"hypersomnia/gfx/sprite_%x.png",
+			"generated/neon_maps/sprite_%x.png"
 		);
 
 		make_indexed(
