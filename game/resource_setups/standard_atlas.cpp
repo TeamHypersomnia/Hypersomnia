@@ -138,7 +138,7 @@ namespace resource_setups {
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/bilmer2000.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
 			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/bilmer2000.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
 			in.settings.gui.flip_horizontally = true;
-			in.settings.gui.flip_horizontally = false;
+			in.settings.gui.flip_vertically = false;
 		}
 
 		{
@@ -146,14 +146,14 @@ namespace resource_setups {
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/kek9.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
 			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/kek9.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
 			in.settings.gui.flip_horizontally = true;
-			in.settings.gui.flip_horizontally = false;
+			in.settings.gui.flip_vertically = false;
 		}
 
 		{
 			auto& in = output[assets::game_image_id::SHOTGUN];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/shotgun.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
 			in.settings.gui.flip_horizontally = true;
-			in.settings.gui.flip_horizontally = true;
+			in.settings.gui.flip_vertically = true;
 		}
 
 		{
@@ -161,7 +161,7 @@ namespace resource_setups {
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/submachine.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
 			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/submachine.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
 			in.settings.gui.flip_horizontally = true;
-			in.settings.gui.flip_horizontally = true;
+			in.settings.gui.flip_vertically = true;
 		}
 
 		{
@@ -169,7 +169,7 @@ namespace resource_setups {
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/pistol.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
 			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/pistol.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
 			in.settings.gui.flip_horizontally = true;
-			in.settings.gui.flip_horizontally = true;
+			in.settings.gui.flip_vertically = true;
 		}
 
 		{
@@ -177,7 +177,7 @@ namespace resource_setups {
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/urban_cyan_machete.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
 			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/urban_cyan_machete.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
 			in.settings.gui.flip_horizontally = true;
-			in.settings.gui.flip_horizontally = true;
+			in.settings.gui.flip_vertically = true;
 		}
 
 		{
@@ -185,7 +185,7 @@ namespace resource_setups {
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/amplifier_arm.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
 			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/amplifier_arm.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
 			in.settings.gui.flip_horizontally = true;
-			in.settings.gui.flip_horizontally = false;
+			in.settings.gui.flip_vertically = false;
 		}
 
 		{
