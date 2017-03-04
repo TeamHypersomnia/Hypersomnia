@@ -118,12 +118,12 @@ namespace rendering_scripts {
 						const auto& edge_tex = get_resource_manager().find(assets::game_image_id::LASER_GLOW_EDGE)->texture_maps[texture_map_type::DIFFUSE];
 						const vec2 edge_size = static_cast<vec2>(edge_tex.get_size());
 
-						augs::draw_line(output, camera[from], camera[to], edge_size.y/3.f, get_resource_manager().find(assets::game_image_id::LASER)->texture_maps[texture_map_type::DIFFUSE], col);
+						augs::draw_line(output, camera[from], camera[to], edge_size.y/3.f, get_resource_manager().find(assets::game_image_id::LASER)->texture_maps[texture_map_type::NEON], col);
 
 						const auto edge_offset = (to - from).set_length(edge_size.x);
 
-						augs::draw_line(output, camera[to], camera[to + edge_offset], edge_size.y / 3.f, get_resource_manager().find(assets::game_image_id::LASER_GLOW_EDGE)->texture_maps[texture_map_type::DIFFUSE], col);
-						augs::draw_line(output, camera[from - edge_offset], camera[from], edge_size.y / 3.f, get_resource_manager().find(assets::game_image_id::LASER_GLOW_EDGE)->texture_maps[texture_map_type::DIFFUSE], col, true);
+						augs::draw_line(output, camera[to], camera[to + edge_offset], edge_size.y / 3.f, edge_tex, col);
+						augs::draw_line(output, camera[from - edge_offset], camera[from], edge_size.y / 3.f, edge_tex, col, true);
 					},
 					[](...){},
 					interp, 

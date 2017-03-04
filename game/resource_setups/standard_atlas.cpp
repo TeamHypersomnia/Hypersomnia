@@ -483,7 +483,7 @@ namespace resource_setups {
 		{
 			auto& in = output[assets::game_image_id::LASER];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/laser.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
-			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/laser.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "hypersomnia/gfx/laser_neon_map.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
 		}
 
 		{
