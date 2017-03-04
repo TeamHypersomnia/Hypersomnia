@@ -15,7 +15,9 @@ struct button_with_corners_stamp {
 	padding_byte pad[3];
 };
 
-void regenerate_buttons_with_corners();
+void regenerate_buttons_with_corners(
+	const bool force_regenerate
+);
 
 void create_and_save_button_with_corners(
 	const std::string& filename_template,

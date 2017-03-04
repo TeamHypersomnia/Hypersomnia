@@ -38,14 +38,15 @@ namespace resource_setups {
 
 		LOG("\n--------------------------------------------\nChecking content integrity...");
 
-		regenerate_scripted_images();
-		regenerate_buttons_with_corners();
-		regenerate_neon_maps();
-		regenerate_desaturations();
-		regenerate_polygonizations_of_images();
+		regenerate_scripted_images(cfg.debug_regenerate_content_every_launch);
+		regenerate_buttons_with_corners(cfg.debug_regenerate_content_every_launch);
+		regenerate_neon_maps(cfg.debug_regenerate_content_every_launch);
+		regenerate_desaturations(cfg.debug_regenerate_content_every_launch);
+		regenerate_polygonizations_of_images(cfg.debug_regenerate_content_every_launch);
 
 		const auto regenerated = regenerate_atlases(
 			in,
+			cfg.debug_regenerate_content_every_launch,
 			cfg.check_content_integrity_every_launch,
 			cfg.save_regenerated_atlases_as_binary
 		);

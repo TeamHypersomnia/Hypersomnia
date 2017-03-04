@@ -13,7 +13,9 @@
 
 namespace fs = std::experimental::filesystem;
 
-void regenerate_polygonizations_of_images() {
+void regenerate_polygonizations_of_images(
+	const bool force_regenerate
+) {
 	const auto polygonizations_directory = "generated/polygonizations_of_images/";
 
 	augs::create_directories(polygonizations_directory);
@@ -42,7 +44,7 @@ void regenerate_polygonizations_of_images() {
 		augs::stream new_stamp_stream;
 		augs::write_object(new_stamp_stream, new_stamp);
 
-		bool should_regenerate = false;
+		bool should_regenerate = force_regenerate;
 
 		if (!augs::file_exists(polygonization_target_path)) {
 			should_regenerate = true;

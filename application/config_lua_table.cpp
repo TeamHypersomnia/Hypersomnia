@@ -37,6 +37,7 @@ void config_lua_table::get_values(augs::lua_state_raii& lua) {
 
 	set(NVP(check_content_integrity_every_launch));
 	set(NVP(save_regenerated_atlases_as_binary));
+	set(NVP(debug_regenerate_content_every_launch));
 
 	set(NVP(determinism_test_cloned_cosmoi_count));
 	

@@ -9,4 +9,6 @@ struct desaturation_stamp {
 	std::chrono::system_clock::time_point last_write_time_of_source;
 };
 
-void regenerate_desaturations();
+void regenerate_desaturations(
+	const bool force_regenerate
+);

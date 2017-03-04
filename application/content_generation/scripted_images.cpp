@@ -10,7 +10,9 @@
 
 namespace fs = std::experimental::filesystem;
 
-void regenerate_scripted_images() {
+void regenerate_scripted_images(
+	const bool force_regenerate
+) {
 	const auto scripted_images_directory = "generated/scripted_images/";
 
 	augs::create_directories(scripted_images_directory);
@@ -59,7 +61,7 @@ void regenerate_scripted_images() {
 		augs::stream new_stamp_stream;
 		augs::write_object(new_stamp_stream, new_stamp);
 
-		bool should_regenerate = false;
+		bool should_regenerate = force_regenerate;
 		
 		if (!augs::file_exists(scripted_image_path)) {
 			should_regenerate = true;

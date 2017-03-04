@@ -25,6 +25,7 @@ public:
 
 	bool check_content_integrity_every_launch = false;
 	bool save_regenerated_atlases_as_binary = false;
+	bool debug_regenerate_content_every_launch = false;
 
 	bool enable_hrtf = true;
 	unsigned max_number_of_sound_sources = 0u;

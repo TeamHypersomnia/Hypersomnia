@@ -36,4 +36,6 @@ namespace augs {
 	}
 }
 
-void regenerate_neon_maps();
+void regenerate_neon_maps(
+	const bool force_regenerate
+);

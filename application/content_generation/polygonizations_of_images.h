@@ -8,4 +8,6 @@ struct polygonization_of_image_stamp {
 	std::chrono::system_clock::time_point last_write_time_of_source;
 };
 
-void regenerate_polygonizations_of_images();
+void regenerate_polygonizations_of_images(
+	const bool force_regenerate
+);

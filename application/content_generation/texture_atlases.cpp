@@ -21,6 +21,7 @@ namespace fs = std::experimental::filesystem;
 
 atlases_regeneration_output regenerate_atlases(
 	const atlases_regeneration_input& in,
+	const bool force_regenerate,
 	const bool always_check_source_images_integrity,
 	const bool save_atlases_as_binary
 ) {
@@ -54,7 +55,7 @@ atlases_regeneration_output regenerate_atlases(
 		const auto atlas_metadata_path = atlases_directory + atlas_stem + ".meta";
 		const auto atlas_stamp_path = atlases_directory + atlas_stem + ".stamp";
 
-		bool should_regenerate = false;
+		bool should_regenerate = force_regenerate;
 
 		texture_atlas_stamp new_stamp;
 

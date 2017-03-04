@@ -23,4 +23,6 @@ namespace augs {
 	}
 }
 
-void regenerate_scripted_images();
+void regenerate_scripted_images(
+	const bool force_regenerate
+);

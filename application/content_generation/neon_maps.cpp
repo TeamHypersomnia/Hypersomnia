@@ -17,7 +17,9 @@ void make_neon(
 	augs::image& source
 );
 
-void regenerate_neon_maps() {
+void regenerate_neon_maps(
+	const bool force_regenerate
+) {
 	const auto neon_directory = "generated/neon_maps/";
 
 	augs::create_directories(neon_directory);
@@ -65,7 +67,7 @@ void regenerate_neon_maps() {
 		augs::stream new_stamp_stream;
 		augs::write_object(new_stamp_stream, new_stamp);
 
-		bool should_regenerate = false;
+		bool should_regenerate = force_regenerate;
 
 		if (!augs::file_exists(neon_map_path)) {
 			should_regenerate = true;

@@ -12,7 +12,9 @@
 
 namespace fs = std::experimental::filesystem;
 
-void regenerate_desaturations() {
+void regenerate_desaturations(
+	const bool force_regenerate
+) {
 	const auto desaturations_directory = "generated/desaturations/";
 
 	augs::create_directories(desaturations_directory);
@@ -33,7 +35,7 @@ void regenerate_desaturations() {
 		augs::stream new_stamp_stream;
 		augs::write_object(new_stamp_stream, new_stamp);
 
-		bool should_regenerate = false;
+		bool should_regenerate = force_regenerate;
 
 		if (!augs::file_exists(desaturation_path)) {
 			should_regenerate = true;

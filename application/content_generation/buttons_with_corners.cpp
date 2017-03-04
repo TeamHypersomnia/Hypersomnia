@@ -3,7 +3,9 @@
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 
-void regenerate_buttons_with_corners() {
+void regenerate_buttons_with_corners(
+	const bool force_regenerate
+) {
 	const auto buttons_with_corners_directory = "generated/buttons_with_corners/";
 
 	augs::create_directories(buttons_with_corners_directory);
@@ -49,7 +51,7 @@ void regenerate_buttons_with_corners() {
 		augs::stream new_stamp_stream;
 		augs::write_object(new_stamp_stream, new_stamp);
 
-		bool should_regenerate = false;
+		bool should_regenerate = force_regenerate;
 
 		for (size_t i = 0; i < static_cast<int>(button_corner_type::COUNT); ++i) {
 			const auto type = static_cast<button_corner_type>(i);

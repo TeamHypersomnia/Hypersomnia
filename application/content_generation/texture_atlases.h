@@ -36,6 +36,7 @@ struct atlases_regeneration_output {
 
 atlases_regeneration_output regenerate_atlases(
 	const atlases_regeneration_input&,
+	const bool force_regenerate,
 	const bool always_check_source_images_integrity,
 	const bool save_atlases_as_binary
 );
