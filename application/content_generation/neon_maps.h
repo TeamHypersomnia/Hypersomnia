@@ -11,6 +11,7 @@ struct neon_map_stamp {
 	unsigned radius_towards_x_axis = 0xdeadbeef;
 	unsigned radius_towards_y_axis = 0xdeadbeef;
 	float amplification = 0.f;
+	float alpha_multiplier = 1.f;
 	std::chrono::system_clock::time_point last_write_time_of_source;
 
 	std::vector<rgba> light_colors;
@@ -30,6 +31,7 @@ namespace augs {
 			&& f(data.radius_towards_x_axis)
 			&& f(data.radius_towards_y_axis)
 			&& f(data.amplification)
+			&& f(data.alpha_multiplier)
 			&& f(data.last_write_time_of_source)
 			&& f(data.light_colors)
 		;

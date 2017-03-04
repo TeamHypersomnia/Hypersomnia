@@ -76,7 +76,8 @@ void regenerate_neon_maps(
 			>> new_stamp.radius_towards_x_axis
 			>> new_stamp.radius_towards_y_axis
 			>> new_stamp.amplification
-			;
+			>> new_stamp.alpha_multiplier
+		;
 
 		const auto neon_map_path = neon_directory + source_path.filename().string();
 		const auto neon_map_stamp_path = neon_directory + source_path.filename().replace_extension(".stamp").string();
@@ -194,6 +195,12 @@ void make_neon(
 	}
 
 	cut_empty_edges(source);
+
+	for (size_t y = 0; y < source.get_rows(); ++y) {
+		for (size_t x = 0; x < source.get_columns(); ++x) {
+			source.pixel({ x, y }).a *= stamp.alpha_multiplier;
+		}
+	}
 }
 
 std::vector<std::vector<double>> generate_gauss_kernel(const neon_map_stamp& stamp)
