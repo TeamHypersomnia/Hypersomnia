@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/templates/memcpy_safety.h"
 #include "augs/ensure.h"
+#include "augs/misc/introspect.h"
 #include <map>
 #include <unordered_map>
 
@@ -24,26 +25,26 @@ namespace augs {
 	}
 
 	template<class A, class T, class...>
-	auto read_bytes(A& ar, T* location, size_t count) {
+	auto read_bytes(A& ar, T* const location, const size_t count) {
 		verify_type<T>();
 		return ar.read(reinterpret_cast<char*>(location), count * sizeof(T));
 	}
 
 	template<class A, class T, class...>
-	void write_bytes(A& ar, const T* location, size_t count) {
+	void write_bytes(A& ar, const T* const location, const size_t count) {
 		verify_type<T>();
 		ar.write(reinterpret_cast<const char*>(location), count * sizeof(T));
 	}
 
 	template<class T, class...>
-	bool read_bytes(std::ifstream& ar, T* location, size_t count) {
+	bool read_bytes(std::ifstream& ar, T* const location, const size_t count) {
 		verify_type<T>();
 		ar.read(reinterpret_cast<char*>(location), count * sizeof(T));
 		return !ar.fail();
 	}
 
 	template<class T, class...>
-	auto read_bytes(augs::stream& ar, T* location, size_t count) {
+	auto read_bytes(augs::stream& ar, T* const location, const size_t count) {
 		verify_type<T>();
 		return ar.read(reinterpret_cast<char*>(location), count * sizeof(T));
 	}
@@ -54,14 +55,69 @@ namespace augs {
 		ar.write(reinterpret_cast<const char*>(location), count * sizeof(T));
 	}
 
+	template <class T, class = void>
+	struct trivial_or_introspect {
+		template<class A>
+		static decltype(auto) read(
+			A& ar,
+			T& storage
+		) {
+			return read_bytes(ar, &storage, 1);
+		}
+
+		template<class A>
+		static decltype(auto) write(
+			A& ar,
+			const T& storage
+		) {
+			return write_bytes(ar, &storage, 1);
+		}
+	};
+
+	template <class T>
+	struct trivial_or_introspect<T, std::enable_if_t<has_introspects<T>::value>> {
+		template<class A>
+		static decltype(auto) read(
+			A& ar,
+			T& storage
+		) {
+			return augs::introspect(
+				storage,
+				[&](auto& member) {
+					return read_object(ar, member);
+				}
+			);
+		}
+
+		template<class A>
+		static decltype(auto) write(
+			A& ar,
+			const T& storage
+		) {
+			return augs::introspect(
+				storage,
+				[&](const auto& member) {
+					write_object(ar, member);
+					return true;
+				}
+			);
+		}
+	};
+
 	template<class A, class T, class...>
-	auto read_object(A& ar, T& storage) {
-		return read_bytes(ar, &storage, 1);
+	auto read_object(
+		A& ar, 
+		T& storage
+	) {
+		return trivial_or_introspect<T>::read(ar, storage);
 	}
 
 	template<class A, class T, class...>
-	void write_object(A& ar, const T& storage) {
-		write_bytes(ar, &storage, 1);
+	auto write_object(
+		A& ar, 
+		const T& storage
+	) {
+		return trivial_or_introspect<T>::write(ar, storage);
 	}
 
 	template<class... Args>

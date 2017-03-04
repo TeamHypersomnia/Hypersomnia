@@ -2,6 +2,7 @@
 #include <thread>
 #include "game/build_settings.h"
 #include "augs/misc/streams.h"
+#include "augs/misc/introspect.h"
 #include "game/transcendental/cosmic_entropy.h"
 
 #include "augs/entity_system/operations_on_all_components_mixin.h"
@@ -261,19 +262,18 @@ public:
 };
 
 namespace augs {
-	template<class A>
-	bool read_object(A& ar, cosmos::significant_state& significant) {
+	template <
+		bool C,
+		class F
+	>
+	auto introspect(
+		maybe_const_ref_t<C, cosmos::significant_state> signi,
+		F f
+	) {
 		return 
-			read_object(ar, significant.meta)
-			&& read_object(ar, significant.pools_for_components)
-			&& read_object(ar, significant.pool_for_aggregates);
-	}
-
-	template<class A>
-	void write_object(A& ar, const cosmos::significant_state& significant) {
-		write_object(ar, significant.meta);
-		write_object(ar, significant.pools_for_components);
-		write_object(ar, significant.pool_for_aggregates);
+			f(signi.meta)
+			&& f(signi.pools_for_components)
+			&& f(signi.pool_for_aggregates);
 	}
 }
 

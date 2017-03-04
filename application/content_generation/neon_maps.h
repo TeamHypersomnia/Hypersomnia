@@ -4,6 +4,7 @@
 
 #include "augs/graphics/pixel.h"
 #include "augs/misc/templated_readwrite.h"
+#include "augs/templates/maybe_const.h"
 
 struct neon_map_stamp {
 	float standard_deviation = 0.f;
@@ -16,26 +17,22 @@ struct neon_map_stamp {
 };
 
 namespace augs {
-	template <class A>
-	bool read_object(A& ar, neon_map_stamp& data) {
+	template <
+		bool C,
+		class F
+	>
+	auto introspect(
+		maybe_const_ref_t<C, neon_map_stamp> data,
+		F f
+	) {
 		return
-			read_object(ar, data.standard_deviation)
-			&& read_object(ar, data.radius_towards_x_axis)
-			&& read_object(ar, data.radius_towards_y_axis)
-			&& read_object(ar, data.amplification)
-			&& read_object(ar, data.last_write_time_of_source)
-			&& read_object(ar, data.light_colors)
-			;
-	}
-
-	template <class A>
-	void write_object(A& ar, const neon_map_stamp& data) {
-		write_object(ar, data.standard_deviation);
-		write_object(ar, data.radius_towards_x_axis);
-		write_object(ar, data.radius_towards_y_axis);
-		write_object(ar, data.amplification);
-		write_object(ar, data.last_write_time_of_source);
-		write_object(ar, data.light_colors);
+			f(data.standard_deviation)
+			&& f(data.radius_towards_x_axis)
+			&& f(data.radius_towards_y_axis)
+			&& f(data.amplification)
+			&& f(data.last_write_time_of_source)
+			&& f(data.light_colors)
+		;
 	}
 }
 

@@ -6,7 +6,7 @@
 #include "augs/filesystem/directory.h"
 
 #include "augs/templates/for_each_in_types.h"
-#include "augs/misc/introspect.h"
+#include "augs/misc/templated_readwrite.h"
 
 namespace fs = std::experimental::filesystem;
 
