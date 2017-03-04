@@ -189,6 +189,10 @@ void make_neon(
 		}
 	}
 
+	for (size_t i = 0; i < pixel_list.size(); ++i) {
+		source.pixel(pixel_list[i]) = pixel_colors[i];
+	}
+
 	cut_empty_edges(source);
 }
 
