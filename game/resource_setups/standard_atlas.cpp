@@ -531,11 +531,6 @@ namespace resource_setups {
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/gun_muzzle_slot_icon.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
 		}
 
-		{
-			auto& in = output[assets::game_image_id::DEAD_TORSO];
-			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/dead_torso.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
-		}
-
 		make_button_with_corners(
 			assets::game_image_id::HOTBAR_BUTTON_INSIDE,
 			"generated/buttons_with_corners/hotbar_button_%x.png",
