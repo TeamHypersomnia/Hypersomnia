@@ -210,7 +210,7 @@ namespace resource_setups {
 		{
 			auto& in = output[assets::game_image_id::ROUND_TRACE];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/round_trace.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
-			in.texture_maps[texture_map_type::NEON] = { "hypersomnia/gfx/round_trace_neon_map.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/round_trace.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
 		}
 
 		{
