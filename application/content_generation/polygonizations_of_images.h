@@ -4,7 +4,7 @@
 #include "augs/misc/templated_readwrite.h"
 #include <chrono>
 
-struct polygonization_of_image_metadata {
+struct polygonization_of_image_stamp {
 	std::chrono::system_clock::time_point last_write_time_of_source;
 };
 

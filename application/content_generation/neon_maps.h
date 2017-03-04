@@ -5,7 +5,7 @@
 #include "augs/graphics/pixel.h"
 #include "augs/misc/templated_readwrite.h"
 
-struct neon_map_metadata {
+struct neon_map_stamp {
 	float standard_deviation = 0.f;
 	unsigned radius_towards_x_axis = 0xdeadbeef;
 	unsigned radius_towards_y_axis = 0xdeadbeef;
@@ -17,7 +17,7 @@ struct neon_map_metadata {
 
 namespace augs {
 	template <class A>
-	bool read_object(A& ar, neon_map_metadata& data) {
+	bool read_object(A& ar, neon_map_stamp& data) {
 		return
 			read_object(ar, data.standard_deviation)
 			&& read_object(ar, data.radius_towards_x_axis)
@@ -29,7 +29,7 @@ namespace augs {
 	}
 
 	template <class A>
-	void write_object(A& ar, const neon_map_metadata& data) {
+	void write_object(A& ar, const neon_map_stamp& data) {
 		write_object(ar, data.standard_deviation);
 		write_object(ar, data.radius_towards_x_axis);
 		write_object(ar, data.radius_towards_y_axis);

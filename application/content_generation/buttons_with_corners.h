@@ -3,7 +3,7 @@
 #include "augs/misc/templated_readwrite.h"
 #include "augs/padding_byte.h"
 
-struct button_with_corners_metadata {
+struct button_with_corners_stamp {
 	rgba border_color;
 	rgba inside_color;
 
@@ -19,5 +19,5 @@ void regenerate_buttons_with_corners();
 
 void create_and_save_button_with_corners(
 	const std::string& filename_template,
-	const button_with_corners_metadata
+	const button_with_corners_stamp
 );

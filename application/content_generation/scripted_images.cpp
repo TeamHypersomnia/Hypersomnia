@@ -19,7 +19,7 @@ void regenerate_scripted_images() {
 	size_t current_line = 0;
 
 	while (current_line < lines.size()) {
-		scripted_image_metadata new_meta;
+		scripted_image_stamp new_stamp;
 
 		const auto target_stem = lines[current_line];
 		
@@ -43,7 +43,7 @@ void regenerate_scripted_images() {
 						in >> member;
 					});
 
-					new_meta.commands.push_back(new_command);
+					new_stamp.commands.push_back(new_command);
 				}
 			});
 
@@ -54,10 +54,10 @@ void regenerate_scripted_images() {
 		++current_line;
 
 		const auto scripted_image_filename = scripted_images_directory + target_stem + ".png";
-		const auto scripted_image_meta_filename = scripted_images_directory + target_stem + ".meta";
+		const auto scripted_image_stamp_filename = scripted_images_directory + target_stem + ".stamp";
 
-		augs::stream new_meta_stream;
-		augs::write_object(new_meta_stream, new_meta);
+		augs::stream new_stamp_stream;
+		augs::write_object(new_stamp_stream, new_stamp);
 
 		bool should_regenerate = false;
 		
@@ -65,16 +65,16 @@ void regenerate_scripted_images() {
 			should_regenerate = true;
 		}
 		else {
-			if (!augs::file_exists(scripted_image_meta_filename)) {
+			if (!augs::file_exists(scripted_image_stamp_filename)) {
 				should_regenerate = true;
 			}
 			else {
-				augs::stream existent_meta_stream;
-				augs::assign_file_contents_binary(scripted_image_meta_filename, existent_meta_stream);
+				augs::stream existent_stamp_stream;
+				augs::assign_file_contents_binary(scripted_image_stamp_filename, existent_stamp_stream);
 
-				const bool are_metas_identical = (new_meta_stream == existent_meta_stream);
+				const bool are_stamps_identical = (new_stamp_stream == existent_stamp_stream);
 
-				if (!are_metas_identical) {
+				if (!are_stamps_identical) {
 					should_regenerate = true;
 				}
 			}
@@ -85,13 +85,13 @@ void regenerate_scripted_images() {
 
 			augs::image resultant;
 
-			for (const auto& c : new_meta.commands) {
+			for (const auto& c : new_stamp.commands) {
 				resultant.execute(c);
 			}
 
 			resultant.save(scripted_image_filename);
 
-			augs::create_binary_file(scripted_image_meta_filename, new_meta_stream);
+			augs::create_binary_file(scripted_image_stamp_filename, new_stamp_stream);
 		}
 	}
 }

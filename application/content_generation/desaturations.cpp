@@ -21,17 +21,17 @@ void regenerate_desaturations() {
 	size_t current_line = 0;
 
 	while (current_line < lines.size()) {
-		desaturation_metadata new_meta;
+		desaturation_stamp new_stamp;
 
 		const auto source_path = fs::path(lines[current_line]);
 
-		new_meta.last_write_time_of_source = augs::last_write_time(source_path.string());
+		new_stamp.last_write_time_of_source = augs::last_write_time(source_path.string());
 
 		const auto desaturation_filename = desaturations_directory + source_path.filename().string();
-		const auto desaturation_meta_filename = desaturations_directory + source_path.filename().replace_extension(".meta").string();
+		const auto desaturation_stamp_filename = desaturations_directory + source_path.filename().replace_extension(".stamp").string();
 
-		augs::stream new_meta_stream;
-		augs::write_object(new_meta_stream, new_meta);
+		augs::stream new_stamp_stream;
+		augs::write_object(new_stamp_stream, new_stamp);
 
 		bool should_regenerate = false;
 
@@ -39,16 +39,16 @@ void regenerate_desaturations() {
 			should_regenerate = true;
 		}
 		else {
-			if (!augs::file_exists(desaturation_meta_filename)) {
+			if (!augs::file_exists(desaturation_stamp_filename)) {
 				should_regenerate = true;
 			}
 			else {
-				augs::stream existent_meta_stream;
-				augs::assign_file_contents_binary(desaturation_meta_filename, existent_meta_stream);
+				augs::stream existent_stamp_stream;
+				augs::assign_file_contents_binary(desaturation_stamp_filename, existent_stamp_stream);
 
-				const bool are_metas_identical = (new_meta_stream == existent_meta_stream);
+				const bool are_stamps_identical = (new_stamp_stream == existent_stamp_stream);
 
-				if (!are_metas_identical) {
+				if (!are_stamps_identical) {
 					should_regenerate = true;
 				}
 			}
@@ -61,7 +61,7 @@ void regenerate_desaturations() {
 			source_image.from_file(source_path.string());
 			source_image.get_desaturated().save(desaturation_filename);
 
-			augs::create_binary_file(desaturation_meta_filename, new_meta_stream);
+			augs::create_binary_file(desaturation_stamp_filename, new_stamp_stream);
 		}
 
 		++current_line;

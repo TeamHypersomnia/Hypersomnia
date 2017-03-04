@@ -12,7 +12,7 @@ void regenerate_buttons_with_corners() {
 	size_t current_line = 0;
 
 	while (current_line < lines.size()) {
-		button_with_corners_metadata new_meta;
+		button_with_corners_stamp new_stamp;
 
 		const auto target_stem = lines[current_line];
 		
@@ -20,21 +20,21 @@ void regenerate_buttons_with_corners() {
 
 		{
 			std::istringstream in(lines[current_line]);
-			in >> new_meta.border_color;
+			in >> new_stamp.border_color;
 		}
 
 		++current_line;
 
 		{
 			std::istringstream in(lines[current_line]);
-			in >> new_meta.inside_color;
+			in >> new_stamp.inside_color;
 		}
 		
 		++current_line;
 
 		{
 			std::istringstream in(lines[current_line]);
-			in >> new_meta.lower_side >> new_meta.upper_side >> new_meta.inside_border_padding >> new_meta.make_lb_complement;
+			in >> new_stamp.lower_side >> new_stamp.upper_side >> new_stamp.inside_border_padding >> new_stamp.make_lb_complement;
 		}
 
 		// skip separating newline
@@ -44,17 +44,17 @@ void regenerate_buttons_with_corners() {
 		++current_line;
 
 		const auto button_with_corners_filename_template = buttons_with_corners_directory + target_stem + "_%x.png";
-		const auto button_with_corners_meta_filename = buttons_with_corners_directory + target_stem + ".meta";
+		const auto button_with_corners_stamp_filename = buttons_with_corners_directory + target_stem + ".stamp";
 
-		augs::stream new_meta_stream;
-		augs::write_object(new_meta_stream, new_meta);
+		augs::stream new_stamp_stream;
+		augs::write_object(new_stamp_stream, new_stamp);
 
 		bool should_regenerate = false;
 
 		for (size_t i = 0; i < static_cast<int>(button_corner_type::COUNT); ++i) {
 			const auto type = static_cast<button_corner_type>(i);
 			
-			if (is_lb_complement(type) && !new_meta.make_lb_complement) {
+			if (is_lb_complement(type) && !new_stamp.make_lb_complement) {
 				continue;
 			}
 
@@ -72,16 +72,16 @@ void regenerate_buttons_with_corners() {
 		}
 
 		if (!should_regenerate) {
-			if (!augs::file_exists(button_with_corners_meta_filename)) {
+			if (!augs::file_exists(button_with_corners_stamp_filename)) {
 				should_regenerate = true;
 			}
 			else {
-				augs::stream existent_meta_stream;
-				augs::assign_file_contents_binary(button_with_corners_meta_filename, existent_meta_stream);
+				augs::stream existent_stamp_stream;
+				augs::assign_file_contents_binary(button_with_corners_stamp_filename, existent_stamp_stream);
 
-				const bool are_metas_identical = (new_meta_stream == existent_meta_stream);
+				const bool are_stamps_identical = (new_stamp_stream == existent_stamp_stream);
 
-				if (!are_metas_identical) {
+				if (!are_stamps_identical) {
 					should_regenerate = true;
 				}
 			}
@@ -92,17 +92,17 @@ void regenerate_buttons_with_corners() {
 
 			create_and_save_button_with_corners(
 				button_with_corners_filename_template,
-				new_meta
+				new_stamp
 			);
 
-			augs::create_binary_file(button_with_corners_meta_filename, new_meta_stream);
+			augs::create_binary_file(button_with_corners_stamp_filename, new_stamp_stream);
 		}
 	}
 }
 
 void create_and_save_button_with_corners(
 	const std::string& filename_template,
-	const button_with_corners_metadata in
+	const button_with_corners_stamp in
 ) {
 	typedef augs::image img;
 

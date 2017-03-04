@@ -4,20 +4,20 @@
 #include "augs/padding_byte.h"
 #include "augs/image/image.h"
 
-struct scripted_image_metadata {
+struct scripted_image_stamp {
 	std::vector<augs::image::command_variant> commands;
 };
 
 namespace augs {
 	template <class A>
-	bool read_object(A& ar, scripted_image_metadata& data) {
+	bool read_object(A& ar, scripted_image_stamp& data) {
 		return
 			read_object(ar, data.commands)
 			;
 	}
 
 	template <class A>
-	void write_object(A& ar, const scripted_image_metadata& data) {
+	void write_object(A& ar, const scripted_image_stamp& data) {
 		write_object(ar, data.commands);
 	}
 }

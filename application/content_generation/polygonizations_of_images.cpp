@@ -22,10 +22,10 @@ void regenerate_polygonizations_of_images() {
 	size_t current_line = 0;
 
 	while (current_line < lines.size()) {
-		polygonization_of_image_metadata new_meta;
+		polygonization_of_image_stamp new_stamp;
 
 		const auto source_path = fs::path(lines[current_line]);
-		new_meta.last_write_time_of_source = augs::last_write_time(source_path.string());
+		new_stamp.last_write_time_of_source = augs::last_write_time(source_path.string());
 
 		++current_line;
 		
@@ -37,10 +37,10 @@ void regenerate_polygonizations_of_images() {
 		++current_line;
 
 		const auto polygonization_target_path = polygonizations_directory + target_filename;
-		const auto polygonization_meta_path = fs::path(polygonization_target_path).replace_extension(".meta").string();
+		const auto polygonization_stamp_path = fs::path(polygonization_target_path).replace_extension(".stamp").string();
 
-		augs::stream new_meta_stream;
-		augs::write_object(new_meta_stream, new_meta);
+		augs::stream new_stamp_stream;
+		augs::write_object(new_stamp_stream, new_stamp);
 
 		bool should_regenerate = false;
 
@@ -48,16 +48,16 @@ void regenerate_polygonizations_of_images() {
 			should_regenerate = true;
 		}
 		else {
-			if (!augs::file_exists(polygonization_meta_path)) {
+			if (!augs::file_exists(polygonization_stamp_path)) {
 				should_regenerate = true;
 			}
 			else {
-				augs::stream existent_meta_stream;
-				augs::assign_file_contents_binary(polygonization_meta_path, existent_meta_stream);
+				augs::stream existent_stamp_stream;
+				augs::assign_file_contents_binary(polygonization_stamp_path, existent_stamp_stream);
 
-				const bool are_metas_identical = (new_meta_stream == existent_meta_stream);
+				const bool are_stamps_identical = (new_stamp_stream == existent_stamp_stream);
 
-				if (!are_metas_identical) {
+				if (!are_stamps_identical) {
 					should_regenerate = true;
 				}
 			}
@@ -79,7 +79,7 @@ void regenerate_polygonizations_of_images() {
 
 			augs::create_text_file(polygonization_target_path, in.str());
 
-			augs::create_binary_file(polygonization_meta_path, new_meta_stream);
+			augs::create_binary_file(polygonization_stamp_path, new_stamp_stream);
 		}
 	}
 }
