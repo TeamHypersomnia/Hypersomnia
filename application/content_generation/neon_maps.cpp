@@ -65,7 +65,7 @@ void regenerate_neon_maps() {
 		augs::stream new_stamp_stream;
 		augs::write_object(new_stamp_stream, new_stamp);
 
-		bool should_regenerate = true;
+		bool should_regenerate = false;
 
 		if (!augs::file_exists(neon_map_path)) {
 			should_regenerate = true;
