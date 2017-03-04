@@ -138,7 +138,7 @@ void menu_setup::process(
 
 	ltrb title_rect;
 	title_rect.set_position({ 100, 100 });
-	title_rect.set_size(assets::get_size(assets::texture_id::MENU_GAME_LOGO));
+	title_rect.set_size(assets::get_size(assets::game_image_id::MENU_GAME_LOGO));
 
 	rgba fade_overlay_color = { 0, 2, 2, 255 };
 	rgba title_text_color = { 255, 255, 255, 0 };
@@ -565,7 +565,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 
 		augs::draw_rect(renderer.get_triangle_buffer(),
 			title_rect,
-			assets::texture_id::MENU_GAME_LOGO,
+			assets::game_image_id::MENU_GAME_LOGO,
 			title_text_color);
 
 		if (tweened_welcome_message_bg_size.non_zero()) {
@@ -640,10 +640,10 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 				const auto mouse_pos = menu_ui_rect_world.last_state.mouse.pos;
 				const auto gui_cursor_color = cyan;
 
-				auto gui_cursor = assets::texture_id::GUI_CURSOR;
+				auto gui_cursor = assets::game_image_id::GUI_CURSOR;
 
 				if (menu_ui_context.alive(menu_ui_rect_world.rect_hovered)) {
-					gui_cursor = assets::texture_id::GUI_CURSOR_HOVER;
+					gui_cursor = assets::game_image_id::GUI_CURSOR_HOVER;
 				}
 
 				augs::draw_rect(renderer.get_triangle_buffer(), mouse_pos, gui_cursor, gui_cursor_color);

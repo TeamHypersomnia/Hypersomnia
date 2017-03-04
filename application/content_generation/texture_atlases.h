@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include <chrono>
 
-#include "game/assets/texture_id.h"
+#include "game/assets/game_image_id.h"
 #include "game/assets/font_id.h"
 
 #include "augs/padding_byte.h"
@@ -23,7 +23,7 @@ struct texture_atlas_metadata {
 };
 
 struct atlases_regeneration_output {
-	std::vector<std::pair<assets::atlas_id, texture_atlas_metadata>> metadatas;
+	std::vector<std::pair<assets::physical_texture_id, texture_atlas_metadata>> metadatas;
 };
 
 typedef std::chrono::system_clock::time_point texture_atlas_image_stamp;

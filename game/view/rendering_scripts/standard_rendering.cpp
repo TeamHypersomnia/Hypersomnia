@@ -77,8 +77,8 @@ namespace rendering_scripts {
 			
 			vec2 upper(0.0f, 0.0f);
 			vec2 lower(1.0f, 1.0f);
-			upper = (*assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM).get_atlas_space_uv(upper);
-			lower = (*assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM).get_atlas_space_uv(lower);
+			upper = (*assets::game_image_id::HUD_CIRCULAR_BAR_MEDIUM).get_atlas_space_uv(upper);
+			lower = (*assets::game_image_id::HUD_CIRCULAR_BAR_MEDIUM).get_atlas_space_uv(lower);
 			const auto center = (upper + lower) / 2;
 		
 			glUniform2f(glGetUniformLocation(circular_bars_shader.id, "texture_center"), center.x, center.y);
@@ -105,14 +105,14 @@ namespace rendering_scripts {
 
 		// hud.draw_vertically_flying_numbers(step);
 
-		renderer.bind_texture(*get_resource_manager().find(assets::atlas_id::GAME_WORLD_ATLAS));
+		renderer.bind_texture(*get_resource_manager().find(assets::physical_texture_id::GAME_WORLD_ATLAS));
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
 
 		renderer.draw_debug_info(
 			camera,
-			assets::texture_id::BLANK,
+			assets::game_image_id::BLANK,
 			{},
 			step.get_interpolation_ratio()
 		);

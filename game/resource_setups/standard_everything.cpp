@@ -24,10 +24,10 @@ namespace resource_setups {
 
 		for (const auto& i : images) {
 			for (const auto& t : i.second.texture_maps) {
-				if (t.filename.size() > 0) {
-					ensure(t.target_atlas != assets::atlas_id::INVALID);
+				if (t.path.size() > 0) {
+					ensure(t.target_atlas != assets::physical_texture_id::INVALID);
 
-					in.images.push_back({ t.filename, t.target_atlas });
+					in.images.push_back({ t.path, t.target_atlas });
 				}
 			}
 		}
@@ -59,42 +59,42 @@ namespace resource_setups {
 		);
 
 		manager.create(
-			assets::atlas_id::GAME_WORLD_ATLAS,
+			assets::physical_texture_id::GAME_WORLD_ATLAS,
 			cfg.save_regenerated_atlases_as_binary
 		);
 
 		manager.create_inverse_with_flip(
 			assets::animation_id::TORSO_MOVE,
-			assets::texture_id::TORSO_MOVING_FIRST,
-			assets::texture_id::TORSO_MOVING_LAST,
+			assets::game_image_id::TORSO_MOVING_FIRST,
+			assets::game_image_id::TORSO_MOVING_LAST,
 			20.0f
 		);
 
 		manager.create_inverse_with_flip(
 			assets::animation_id::BLUE_TORSO_MOVE,
-			assets::texture_id::BLUE_TORSO_MOVING_FIRST,
-			assets::texture_id::BLUE_TORSO_MOVING_LAST,
+			assets::game_image_id::BLUE_TORSO_MOVING_FIRST,
+			assets::game_image_id::BLUE_TORSO_MOVING_LAST,
 			20.0f
 		);
 
 		manager.create_inverse_with_flip(
 			assets::animation_id::VIOLET_TORSO_MOVE,
-			assets::texture_id::VIOLET_TORSO_MOVING_FIRST,
-			assets::texture_id::VIOLET_TORSO_MOVING_LAST,
+			assets::game_image_id::VIOLET_TORSO_MOVING_FIRST,
+			assets::game_image_id::VIOLET_TORSO_MOVING_LAST,
 			20.0f
 		);
 
 		manager.create(
 			assets::animation_id::BLINK_ANIMATION,
-			assets::texture_id::BLINK_FIRST,
-			assets::texture_id::BLINK_LAST,
+			assets::game_image_id::BLINK_FIRST,
+			assets::game_image_id::BLINK_LAST,
 			50.0f, resources::animation::loop_type::NONE
 		);
 
 		manager.create(
 			assets::animation_id::CAST_BLINK_ANIMATION,
-			assets::texture_id::CAST_BLINK_FIRST,
-			assets::texture_id::CAST_BLINK_LAST,
+			assets::game_image_id::CAST_BLINK_FIRST,
+			assets::game_image_id::CAST_BLINK_LAST,
 			50.0f, resources::animation::loop_type::NONE
 		);
 

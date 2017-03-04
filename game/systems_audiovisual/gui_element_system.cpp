@@ -396,7 +396,7 @@ void gui_element_system::rebuild_layouts(
 	}
 
 	{
-		const auto action_button_size = get_resource_manager().find(assets::texture_id::ACTION_BUTTON_BORDER)->texture_maps[texture_map_type::DIFFUSE].get_size();
+		const auto action_button_size = get_resource_manager().find(assets::game_image_id::ACTION_BUTTON_BORDER)->texture_maps[texture_map_type::DIFFUSE].get_size();
 
 		int total_width = element.action_buttons.size() * action_button_size.x;
 

@@ -4,7 +4,7 @@
 #include "game/detail/camera_cone.h"
 #include "game/components/sentience_component.h"
 
-#include "game/assets/texture_id.h"
+#include "game/assets/game_image_id.h"
 
 namespace components {
 	struct sentience;

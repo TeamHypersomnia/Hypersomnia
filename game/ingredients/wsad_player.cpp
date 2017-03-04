@@ -187,7 +187,7 @@ namespace ingredients {
 
 		animation_response.response = torso_set;
 
-		sprite.set(assets::texture_id::TEST_PLAYER, rgba(255, 255, 255, 255));
+		sprite.set(assets::game_image_id::TEST_PLAYER, rgba(255, 255, 255, 255));
 
 		render.layer = render_layer::SMALL_DYNAMIC_BODY;
 
@@ -262,7 +262,7 @@ namespace prefabs {
 			auto& crosshair = root += components::crosshair();
 			auto& processing = root += components::processing();
 			
-			sprite.set(assets::texture_id::TEST_CROSSHAIR, rgba(255, 255, 255, 255));
+			sprite.set(assets::game_image_id::TEST_CROSSHAIR, rgba(255, 255, 255, 255));
 
 			render.layer = render_layer::CROSSHAIR;
 
@@ -282,7 +282,7 @@ namespace prefabs {
 
 			auto& sprite = recoil += components::sprite();
 
-			sprite.set(assets::texture_id::TEST_CROSSHAIR, rgba(0, 255, 0, 0));
+			sprite.set(assets::game_image_id::TEST_CROSSHAIR, rgba(0, 255, 0, 0));
 
 			auto& render = recoil += components::render();
 			render.layer = render_layer::OVER_CROSSHAIR;

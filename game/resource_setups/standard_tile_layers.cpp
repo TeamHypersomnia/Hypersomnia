@@ -6,22 +6,22 @@ namespace resource_setups {
 		{
 			auto nth_tile = [](const unsigned i) {
 				return i;
-				//return assets::texture_id(unsigned(assets::texture_id::METROPOLIS_TILE_FIRST) + i - 1);
+				//return assets::game_image_id(unsigned(assets::game_image_id::METROPOLIS_TILE_FIRST) + i - 1);
 			};
 
 			auto& metropolis_floor = get_resource_manager().create(assets::tile_layer_id::METROPOLIS_FLOOR);
 
-			for (int i = int(assets::texture_id::METROPOLIS_TILE_FIRST); i < int(assets::texture_id::METROPOLIS_TILE_LAST); ++i) {
+			for (int i = int(assets::game_image_id::METROPOLIS_TILE_FIRST); i < int(assets::game_image_id::METROPOLIS_TILE_LAST); ++i) {
 				components::sprite tt;
-				tt.set(assets::texture_id(i));
+				tt.set(assets::game_image_id(i));
 				//if (
-				//	assets::texture_id(i) == assets::texture_id(int(assets::texture_id::METROPOLIS_TILE_FIRST) + 3)
-				//	//|| assets::texture_id(i) == assets::texture_id(int(assets::texture_id::METROPOLIS_TILE_FIRST) + 4)
+				//	assets::game_image_id(i) == assets::game_image_id(int(assets::game_image_id::METROPOLIS_TILE_FIRST) + 3)
+				//	//|| assets::game_image_id(i) == assets::game_image_id(int(assets::game_image_id::METROPOLIS_TILE_FIRST) + 4)
 				//	) {
 				//	tt.effect = components::sprite::special_effect::COLOR_WAVE;
 				//}		
 				if (
-					assets::texture_id(i) == assets::texture_id(int(assets::texture_id::METROPOLIS_TILE_FIRST) + 0)
+					assets::game_image_id(i) == assets::game_image_id(int(assets::game_image_id::METROPOLIS_TILE_FIRST) + 0)
 					) {
 					tt.max_specular_blinks = 2;
 				}

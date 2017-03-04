@@ -2,7 +2,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "augs/math/vec2.h"
 
-#include "game/assets/texture_id.h"
+#include "game/assets/game_image_id.h"
 #include "game/assets/animation_response_id.h"
 #include "game/components/render_component.h"
 
@@ -23,8 +23,8 @@ namespace ingredients {
 	components::item& make_item(entity_handle);
 	void make_always_visible(entity_handle);
 
-	components::sprite& add_sprite(entity_handle, components::transform pos, assets::texture_id = assets::texture_id::BLANK, rgba col = rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
-	components::sprite& add_sprite_scalled(entity_handle, components::transform pos, vec2i size = vec2i(), assets::texture_id = assets::texture_id::BLANK, rgba col = rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
+	components::sprite& add_sprite(entity_handle, components::transform pos, assets::game_image_id = assets::game_image_id::BLANK, rgba col = rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
+	components::sprite& add_sprite_scalled(entity_handle, components::transform pos, vec2i size = vec2i(), assets::game_image_id = assets::game_image_id::BLANK, rgba col = rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
 	
 	void add_bullet_round_physics(entity_handle);
 	void add_see_through_dynamic_body(entity_handle);

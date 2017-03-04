@@ -19,7 +19,7 @@ namespace augs {
 			ltrb rc; /* actual rectangle */
 
 			rect_node_data(const xywh& rc = xywh());
-			rect_node_data(const assets::texture_id& id);
+			rect_node_data(const assets::game_image_id& id);
 
 			void set_default_flags();
 

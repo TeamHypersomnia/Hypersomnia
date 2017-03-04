@@ -66,7 +66,7 @@ namespace prefabs {
 			car.lateral_impulse_multiplier = 0.3f;
 			car.braking_angular_damping = 16.f;
 
-			sprite.set(assets::texture_id::JMIX114);
+			sprite.set(assets::game_image_id::JMIX114);
 			render.layer = render_layer::CAR_INTERIOR;
 
 			body.linear_damping = 0.4f;
@@ -95,7 +95,7 @@ namespace prefabs {
 		//
 		//	render.layer = render_layer::CAR_WHEEL;
 		//
-		//	sprite.set(assets::texture_id::MOTORCYCLE_INSIDE);
+		//	sprite.set(assets::game_image_id::MOTORCYCLE_INSIDE);
 		//
 		//	auto& info = colliders.new_collider();
 		//	info.shape.from_renderable(interior);
@@ -122,7 +122,7 @@ namespace prefabs {
 
 			render.layer = render_layer::CAR_WHEEL;
 
-			sprite.set(assets::texture_id::CAR_INSIDE, rgba(255, 255,255, 0));
+			sprite.set(assets::game_image_id::CAR_INSIDE, rgba(255, 255,255, 0));
 			sprite.size.set(40, 20);
 
 			auto& info = colliders.new_collider();

@@ -40,11 +40,11 @@ void regenerate_buttons_with_corners() {
 		// skip separating newline
 		++current_line;
 
-		// go to the next filename line
+		// go to the next path line
 		++current_line;
 
-		const auto button_with_corners_filename_template = buttons_with_corners_directory + target_stem + "_%x.png";
-		const auto button_with_corners_stamp_filename = buttons_with_corners_directory + target_stem + ".stamp";
+		const auto button_with_corners_path_template = buttons_with_corners_directory + target_stem + "_%x.png";
+		const auto button_with_corners_stamp_path = buttons_with_corners_directory + target_stem + ".stamp";
 
 		augs::stream new_stamp_stream;
 		augs::write_object(new_stamp_stream, new_stamp);
@@ -61,7 +61,7 @@ void regenerate_buttons_with_corners() {
 			if (
 				!augs::file_exists(
 					typesafe_sprintf(
-						button_with_corners_filename_template,
+						button_with_corners_path_template,
 						get_filename_for(type)
 					)
 				)
@@ -72,12 +72,12 @@ void regenerate_buttons_with_corners() {
 		}
 
 		if (!should_regenerate) {
-			if (!augs::file_exists(button_with_corners_stamp_filename)) {
+			if (!augs::file_exists(button_with_corners_stamp_path)) {
 				should_regenerate = true;
 			}
 			else {
 				augs::stream existent_stamp_stream;
-				augs::assign_file_contents_binary(button_with_corners_stamp_filename, existent_stamp_stream);
+				augs::assign_file_contents_binary(button_with_corners_stamp_path, existent_stamp_stream);
 
 				const bool are_stamps_identical = (new_stamp_stream == existent_stamp_stream);
 
@@ -91,23 +91,23 @@ void regenerate_buttons_with_corners() {
 			LOG("Regenerating button with corners: %x", target_stem);
 
 			create_and_save_button_with_corners(
-				button_with_corners_filename_template,
+				button_with_corners_path_template,
 				new_stamp
 			);
 
-			augs::create_binary_file(button_with_corners_stamp_filename, new_stamp_stream);
+			augs::create_binary_file(button_with_corners_stamp_path, new_stamp_stream);
 		}
 	}
 }
 
 void create_and_save_button_with_corners(
-	const std::string& filename_template,
+	const std::string& path_template,
 	const button_with_corners_stamp in
 ) {
 	typedef augs::image img;
 
 	const auto save = [&](const button_corner_type t, const img& im) {
-		im.save(typesafe_sprintf(filename_template, get_filename_for(t)));
+		im.save(typesafe_sprintf(path_template, get_filename_for(t)));
 	};
 
 	{

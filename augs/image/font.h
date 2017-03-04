@@ -71,13 +71,13 @@ namespace augs {
 	};
 
 	struct font_loading_input {
-		std::string filename;
+		std::string path;
 		std::wstring characters;
 		
 		unsigned pt = 0u;
 
 		bool operator==(const font_loading_input& b) const {
-			return filename == b.filename && characters == b.characters && pt == b.pt;
+			return path == b.path && characters == b.characters && pt == b.pt;
 		}
 	};
 
@@ -149,7 +149,7 @@ namespace augs {
 	template <class A>
 	bool read_object(A& ar, font_loading_input& data) {
 		return
-			read_object(ar, data.filename)
+			read_object(ar, data.path)
 			&& read_object(ar, data.characters)
 			&& read_object(ar, data.pt)
 			;
@@ -157,7 +157,7 @@ namespace augs {
 
 	template <class A>
 	void write_object(A& ar, const font_loading_input& data) {
-		write_object(ar, data.filename);
+		write_object(ar, data.path);
 		write_object(ar, data.characters);
 		write_object(ar, data.pt);
 	}
@@ -167,7 +167,7 @@ namespace std {
 	template <>
 	struct hash<augs::font_loading_input> {
 		size_t operator()(const augs::font_loading_input& in) const {
-			return augs::simple_two_hash(in.filename, in.characters) + in.pt;
+			return augs::simple_two_hash(in.path, in.characters) + in.pt;
 		}
 	};
 }

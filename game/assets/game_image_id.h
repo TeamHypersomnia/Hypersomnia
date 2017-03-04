@@ -2,7 +2,7 @@
 #include "augs/math/vec2.h"
 
 namespace assets {
-	enum class texture_id {
+	enum class game_image_id {
 		INVALID,
 
 		BLANK,
@@ -213,12 +213,12 @@ namespace assets {
 		COUNT,
 	};
 	
-	vec2u get_size(texture_id);
+	vec2u get_size(game_image_id);
 }
 
 namespace augs {
 	struct texture_atlas_entry;
 }
 
-augs::texture_atlas_entry& operator*(const assets::texture_id& id);
-bool operator!(const assets::texture_id& id);
+augs::texture_atlas_entry& operator*(const assets::game_image_id& id);
+bool operator!(const assets::game_image_id& id);

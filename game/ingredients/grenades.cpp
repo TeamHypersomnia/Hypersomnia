@@ -29,7 +29,7 @@ namespace prefabs {
 		//
 		//	render.layer = render_layer::SMALL_DYNAMIC_BODY;
 		//
-		//	sprite.set(assets::texture_id::GRENADE_SPOON);
+		//	sprite.set(assets::game_image_id::GRENADE_SPOON);
 		//
 		//	auto& fixture = colliders.new_collider();
 		//
@@ -48,7 +48,7 @@ namespace prefabs {
 
 		name_entity(grenade, entity_name::FORCE_GRENADE);
 
-		auto& sprite = ingredients::add_sprite(grenade, pos, assets::texture_id::FORCE_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
+		auto& sprite = ingredients::add_sprite(grenade, pos, assets::game_image_id::FORCE_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(grenade);
 
 		auto& item = ingredients::make_item(grenade);
@@ -64,7 +64,7 @@ namespace prefabs {
 		const auto grenade = world.create_entity("ped_grenade");
 		name_entity(grenade, entity_name::PED_GRENADE);
 
-		auto& sprite = ingredients::add_sprite(grenade, pos, assets::texture_id::PED_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
+		auto& sprite = ingredients::add_sprite(grenade, pos, assets::game_image_id::PED_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(grenade);
 
 		auto& item = ingredients::make_item(grenade);
@@ -79,7 +79,7 @@ namespace prefabs {
 		const auto grenade = world.create_entity("interference_grenade");
 		name_entity(grenade, entity_name::INTERFERENCE_GRENADE);
 
-		auto& sprite = ingredients::add_sprite(grenade, pos, assets::texture_id::INTERFERENCE_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
+		auto& sprite = ingredients::add_sprite(grenade, pos, assets::game_image_id::INTERFERENCE_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(grenade);
 
 		auto& item = ingredients::make_item(grenade);

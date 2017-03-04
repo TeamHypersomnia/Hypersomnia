@@ -9,7 +9,7 @@
 #include "game/components/transform_component.h"
 #include "game/transcendental/entity_id.h"
 
-#include "game/assets/texture_id.h"
+#include "game/assets/game_image_id.h"
 #include "augs/misc/timer.h"
 
 struct camera_cone;
@@ -98,7 +98,7 @@ namespace augs {
 		
 		void draw_debug_info(
 			const camera_cone,
-			const assets::texture_id line_texture, 
+			const assets::game_image_id line_texture, 
 			const std::vector<const_entity_handle>& target_entities, 
 			const float interpolation_ratio
 		);

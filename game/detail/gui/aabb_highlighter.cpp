@@ -78,7 +78,7 @@ void aabb_highlighter::draw(
 		state.renderable_transform.rotation = 0;
 
 		components::sprite border;
-		border.set(assets::texture_id::BLANK, cyan);
+		border.set(assets::game_image_id::BLANK, cyan);
 
 		auto& pos = state.renderable_transform.pos;
 

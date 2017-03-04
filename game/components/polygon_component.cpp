@@ -18,7 +18,7 @@ namespace components {
 		global_time_seconds = secs;
 	}
 
-	void polygon::from_polygonized_texture(const assets::texture_id tex) {
+	void polygon::from_polygonized_texture(const assets::game_image_id tex) {
 		auto& polygonized_sprite_verts = get_resource_manager().find(tex)->polygonized;
 		const vec2 size = get_resource_manager().find(tex)->get_size();
 
@@ -42,7 +42,7 @@ namespace components {
 		//automatically_map_uv(tex, uv_mapping_mode::OVERLAY);
 	}
 
-	void polygon::automatically_map_uv(const assets::texture_id texture_id_to_map, const uv_mapping_mode mapping_mode) {
+	void polygon::automatically_map_uv(const assets::game_image_id texture_id_to_map, const uv_mapping_mode mapping_mode) {
 		if (vertices.empty()) {
 			return;
 		}

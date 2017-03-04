@@ -1,7 +1,7 @@
 #pragma once
 #include "application/content_generation/texture_atlases.h"
 #include "game/resources/manager.h"
-#include "game/assets/texture_id.h"
+#include "game/assets/game_image_id.h"
 #include "augs/graphics/pixel.h"
 #include "game/flyweights/spell_data.h"
 #include "game/flyweights/physical_material.h"

@@ -31,7 +31,7 @@ namespace rendering_scripts {
 					highlight_col.a = static_cast<rgba_channel>(255 * highlight_amount);
 
 					components::sprite spr;
-					spr.set(assets::texture_id::CAST_HIGHLIGHT, highlight_col);
+					spr.set(assets::game_image_id::CAST_HIGHLIGHT, highlight_col);
 
 					spr.draw(highlight);
 				}

@@ -1,6 +1,6 @@
 #include "augs/graphics/drawers.h"
 
-#include "game/assets/texture_id.h"
+#include "game/assets/game_image_id.h"
 #include "game/resources/manager.h"
 
 #include "augs/gui/stroke.h"
@@ -59,10 +59,10 @@ namespace augs {
 	}
 	
 	void draw_rect_with_border(vertex_triangle_buffer& v, const ltrb origin, const rgba inside_color, const rgba border_color, const int border_spacing) {
-		draw_rect_with_border(v, origin, assets::texture_id::BLANK, inside_color, border_color, border_spacing);
+		draw_rect_with_border(v, origin, assets::game_image_id::BLANK, inside_color, border_color, border_spacing);
 	}
 
-	void draw_rect_with_border(vertex_triangle_buffer& v, const ltrb origin, const assets::texture_id tex, const rgba inside_color, const rgba border_color, const int border_spacing) {
+	void draw_rect_with_border(vertex_triangle_buffer& v, const ltrb origin, const assets::game_image_id tex, const rgba inside_color, const rgba border_color, const int border_spacing) {
 		draw_rect(v, origin, tex, inside_color);
 
 		augs::gui::solid_stroke stroke;
@@ -72,14 +72,14 @@ namespace augs {
 	}
 
 	void draw_rect(vertex_triangle_buffer& v, const ltrb origin, const rgba color) {
-		draw_rect(v, origin, assets::texture_id::BLANK, color);
+		draw_rect(v, origin, assets::game_image_id::BLANK, color);
 	}
 
-	void draw_rect(vertex_triangle_buffer& v, const ltrb origin, const assets::texture_id id, const rgba color) {
+	void draw_rect(vertex_triangle_buffer& v, const ltrb origin, const assets::game_image_id id, const rgba color) {
 		draw_rect(v, origin, *id, color);
 	}
 
-	void draw_rect(vertex_triangle_buffer& v, const vec2 origin, const assets::texture_id id, const rgba color) {
+	void draw_rect(vertex_triangle_buffer& v, const vec2 origin, const assets::game_image_id id, const rgba color) {
 		draw_rect(v, xywh {origin.x, origin.y, static_cast<float>(assets::get_size(id).x), static_cast<float>(assets::get_size(id).y) }, *id, color);
 	}
 
@@ -306,7 +306,7 @@ namespace augs {
 				poly.add_concave_polygon({ concave.begin(), concave.end() } );
 				
 				poly.automatically_map_uv(
-					assets::texture_id::BLANK, 
+					assets::game_image_id::BLANK, 
 					components::polygon::uv_mapping_mode::STRETCH
 				);
 

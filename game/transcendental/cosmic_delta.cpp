@@ -466,7 +466,7 @@ TEST(CosmicDelta, CosmicDeltaPaddingTest) {
 
 		dum() 
 			//:  
-			//drop_item_icon(augs::gui::material(assets::texture_id::DROP_HAND_ICON, red))
+			//drop_item_icon(augs::gui::material(assets::game_image_id::DROP_HAND_ICON, red))
 		{
 		}
 	};

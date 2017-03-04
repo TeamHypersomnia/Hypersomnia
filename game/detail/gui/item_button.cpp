@@ -233,7 +233,7 @@ void item_button::draw_proc(
 	}
 
 	if (f.draw_background) {
-		draw_stretched_texture(context, this_id, in, augs::gui::material(assets::texture_id::BLANK, inside_col));
+		draw_stretched_texture(context, this_id, in, augs::gui::material(assets::game_image_id::BLANK, inside_col));
 	}
 
 	if (f.draw_item) {
@@ -381,7 +381,7 @@ void item_button::draw_proc(
 
 	if (f.draw_border) {
 		augs::gui::solid_stroke stroke;
-		stroke.set_material(augs::gui::material(assets::texture_id::BLANK, border_col));
+		stroke.set_material(augs::gui::material(assets::game_image_id::BLANK, border_col));
 		stroke.draw(in.v, this_absolute_rect);
 	}
 
@@ -391,13 +391,13 @@ void item_button::draw_proc(
 
 	if (f.draw_container_opened_mark) {
 		if (item.find<components::container>()) {
-			assets::texture_id container_icon;
+			assets::game_image_id container_icon;
 
 			if (this_id->is_container_open) {
-				container_icon = assets::texture_id::CONTAINER_OPEN_ICON;
+				container_icon = assets::game_image_id::CONTAINER_OPEN_ICON;
 			}
 			else {
-				container_icon = assets::texture_id::CONTAINER_CLOSED_ICON;
+				container_icon = assets::game_image_id::CONTAINER_CLOSED_ICON;
 			}
 
 			const auto size = assets::get_size(container_icon);

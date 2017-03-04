@@ -195,18 +195,18 @@ void sentience_meter::respond_to_events(
 
 augs::gui::material sentience_meter::get_icon_mat(const const_this_pointer this_id) const {
 	switch (this_id.get_location().type) {
-	case sentience_meter_type::HEALTH: return{ assets::texture_id::HEALTH_ICON, white };
-	case sentience_meter_type::CONSCIOUSNESS: return{ assets::texture_id::CONSCIOUSNESS_ICON, white };
-	case sentience_meter_type::PERSONAL_ELECTRICITY: return{ assets::texture_id::PERSONAL_ELECTRICITY_ICON, white };
+	case sentience_meter_type::HEALTH: return{ assets::game_image_id::HEALTH_ICON, white };
+	case sentience_meter_type::CONSCIOUSNESS: return{ assets::game_image_id::CONSCIOUSNESS_ICON, white };
+	case sentience_meter_type::PERSONAL_ELECTRICITY: return{ assets::game_image_id::PERSONAL_ELECTRICITY_ICON, white };
 	default: ensure(false);  return{};
 	}
 }
 
 augs::gui::material sentience_meter::get_bar_mat(const const_this_pointer this_id) const {
 	switch (this_id.get_location().type) {
-	case sentience_meter_type::HEALTH: return{ assets::texture_id::BLANK, red-rgba(30, 30, 30, 0) };
-	case sentience_meter_type::CONSCIOUSNESS: return{ assets::texture_id::BLANK, orange - rgba(30, 30, 30, 0) };
-	case sentience_meter_type::PERSONAL_ELECTRICITY: return{ assets::texture_id::BLANK, cyan - rgba(30, 30, 30, 0) };
+	case sentience_meter_type::HEALTH: return{ assets::game_image_id::BLANK, red-rgba(30, 30, 30, 0) };
+	case sentience_meter_type::CONSCIOUSNESS: return{ assets::game_image_id::BLANK, orange - rgba(30, 30, 30, 0) };
+	case sentience_meter_type::PERSONAL_ELECTRICITY: return{ assets::game_image_id::BLANK, cyan - rgba(30, 30, 30, 0) };
 	default: ensure(false);  return{};
 	}
 }
@@ -235,9 +235,9 @@ void sentience_meter::rebuild_layouts(
 
 		for (size_t i = 0; i < 40; ++i) {
 			const augs::gui::material mats[3] = {
-				assets::texture_id::WANDERING_CROSS,
-				assets::texture_id::BLINK_FIRST,
-				static_cast<assets::texture_id>(static_cast<int>(assets::texture_id::BLINK_FIRST) + 2),
+				assets::game_image_id::WANDERING_CROSS,
+				assets::game_image_id::BLINK_FIRST,
+				static_cast<assets::game_image_id>(static_cast<int>(assets::game_image_id::BLINK_FIRST) + 2),
 			};
 
 			effect_particle new_part;

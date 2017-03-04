@@ -1,7 +1,7 @@
 #pragma once
 #include <array>
 #include "augs/math/rects.h"
-#include "game/assets/texture_id.h"
+#include "game/assets/game_image_id.h"
 #include "game/resources/manager.h"
 
 enum class button_corner_type {
@@ -48,10 +48,10 @@ bool is_button_corner(const button_corner_type);
 bool is_button_side(const button_corner_type);
 
 struct button_corners_info {
-	assets::texture_id inside_texture = assets::texture_id::INVALID;
+	assets::game_image_id inside_texture = assets::game_image_id::INVALID;
 	bool flip_horizontally = true;
 
-	assets::texture_id get_tex_for_type(button_corner_type) const;
+	assets::game_image_id get_tex_for_type(button_corner_type) const;
 
 	ltrb cornered_rc_to_internal_rc(ltrb) const;
 	ltrb internal_rc_to_cornered_rc(ltrb) const;

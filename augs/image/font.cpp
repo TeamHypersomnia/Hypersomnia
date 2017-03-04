@@ -21,9 +21,9 @@ namespace augs {
 	void font::from_file(const font_loading_input& in) {
 		FT_Face face;
 		
-		const auto error = FT_New_Face(*global_libraries::freetype_library.get(), in.filename.c_str(), 0, &face);
+		const auto error = FT_New_Face(*global_libraries::freetype_library.get(), in.path.c_str(), 0, &face);
 
-		LOG("Loading font %x", in.filename);
+		LOG("Loading font %x", in.path);
 
 		ensure(error != FT_Err_Unknown_File_Format && L"font format unsupported");
 		ensure(!error && L"coulnd't open font file");

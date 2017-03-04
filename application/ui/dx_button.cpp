@@ -3,7 +3,7 @@
 #include "game/resources/manager.h"
 
 dx_button::dx_button() {
-	corners.inside_texture = assets::texture_id::MENU_BUTTON_INSIDE;
+	corners.inside_texture = assets::game_image_id::MENU_BUTTON_INSIDE;
 
 	auto& manager = get_resource_manager();
 

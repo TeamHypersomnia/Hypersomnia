@@ -38,8 +38,8 @@ namespace prefabs {
 		front.add_sub_entity(left_wheel);
 		name_entity(front, entity_name::TRUCK);
 
-		const vec2 front_size = get_resource_manager().find(assets::texture_id::TRUCK_FRONT)->get_size();
-		const vec2 interior_size = get_resource_manager().find(assets::texture_id::TRUCK_INSIDE)->get_size();
+		const vec2 front_size = get_resource_manager().find(assets::game_image_id::TRUCK_FRONT)->get_size();
+		const vec2 interior_size = get_resource_manager().find(assets::game_image_id::TRUCK_INSIDE)->get_size();
 
 		{
 			auto& sprite = front += components::polygon();
@@ -54,8 +54,8 @@ namespace prefabs {
 			car.acceleration_length = 4500 / 6.2f;
 			car.speed_for_pitch_unit = 2000.f;
 
-			sprite.from_polygonized_texture(assets::texture_id::TRUCK_FRONT);
-			//sprite.set(assets::texture_id::TRUCK_FRONT, rgba(0, 255, 255));
+			sprite.from_polygonized_texture(assets::game_image_id::TRUCK_FRONT);
+			//sprite.set(assets::game_image_id::TRUCK_FRONT, rgba(0, 255, 255));
 			//sprite.size.x = 200;
 			//sprite.size.y = 100;
 
@@ -83,8 +83,8 @@ namespace prefabs {
 
 			render.layer = render_layer::CAR_INTERIOR;
 
-			sprite.set(assets::texture_id::TRUCK_INSIDE);
-			//sprite.set(assets::texture_id::TRUCK_INSIDE, rgba(122, 0, 122, 255));
+			sprite.set(assets::game_image_id::TRUCK_INSIDE);
+			//sprite.set(assets::game_image_id::TRUCK_INSIDE, rgba(122, 0, 122, 255));
 			//sprite.size.x = 250;
 			//sprite.size.y = 550;
 
@@ -115,7 +115,7 @@ namespace prefabs {
 
 			render.layer = render_layer::CAR_WHEEL;
 
-			sprite.set(assets::texture_id::CAR_INSIDE, rgba(29, 0, 0, 0));
+			sprite.set(assets::game_image_id::CAR_INSIDE, rgba(29, 0, 0, 0));
 			sprite.size.set(60, 30);
 
 			auto& fixture = colliders.new_collider();
@@ -143,8 +143,8 @@ namespace prefabs {
 
 					render.layer = render_layer::SMALL_DYNAMIC_BODY;
 
-					sprite.set(assets::texture_id::TRUCK_ENGINE);
-					//sprite.set(assets::texture_id::TRUCK_INSIDE, rgba(122, 0, 122, 255));
+					sprite.set(assets::game_image_id::TRUCK_ENGINE);
+					//sprite.set(assets::game_image_id::TRUCK_INSIDE, rgba(122, 0, 122, 255));
 					//sprite.size.x = 250;
 					//sprite.size.y = 550;
 
@@ -178,7 +178,7 @@ namespace prefabs {
 					engine_physical.add_standard_components();
 					front.add_sub_entity(engine_physical);
 
-				const vec2 engine_size = get_resource_manager().find(assets::texture_id::TRUCK_ENGINE)->get_size();
+				const vec2 engine_size = get_resource_manager().find(assets::game_image_id::TRUCK_ENGINE)->get_size();
 
 				{
 					messages::create_particle_effect effect;

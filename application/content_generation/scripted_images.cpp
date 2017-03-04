@@ -53,24 +53,24 @@ void regenerate_scripted_images() {
 		// skip separating newline
 		++current_line;
 
-		const auto scripted_image_filename = scripted_images_directory + target_stem + ".png";
-		const auto scripted_image_stamp_filename = scripted_images_directory + target_stem + ".stamp";
+		const auto scripted_image_path = scripted_images_directory + target_stem + ".png";
+		const auto scripted_image_stamp_path = scripted_images_directory + target_stem + ".stamp";
 
 		augs::stream new_stamp_stream;
 		augs::write_object(new_stamp_stream, new_stamp);
 
 		bool should_regenerate = false;
 		
-		if (!augs::file_exists(scripted_image_filename)) {
+		if (!augs::file_exists(scripted_image_path)) {
 			should_regenerate = true;
 		}
 		else {
-			if (!augs::file_exists(scripted_image_stamp_filename)) {
+			if (!augs::file_exists(scripted_image_stamp_path)) {
 				should_regenerate = true;
 			}
 			else {
 				augs::stream existent_stamp_stream;
-				augs::assign_file_contents_binary(scripted_image_stamp_filename, existent_stamp_stream);
+				augs::assign_file_contents_binary(scripted_image_stamp_path, existent_stamp_stream);
 
 				const bool are_stamps_identical = (new_stamp_stream == existent_stamp_stream);
 
@@ -89,9 +89,9 @@ void regenerate_scripted_images() {
 				resultant.execute(c);
 			}
 
-			resultant.save(scripted_image_filename);
+			resultant.save(scripted_image_path);
 
-			augs::create_binary_file(scripted_image_stamp_filename, new_stamp_stream);
+			augs::create_binary_file(scripted_image_stamp_path, new_stamp_stream);
 		}
 	}
 }

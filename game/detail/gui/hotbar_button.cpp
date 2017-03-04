@@ -46,7 +46,7 @@ entity_handle hotbar_button::get_assigned_entity(const entity_handle owner_trans
 
 button_corners_info hotbar_button::get_button_corners_info() const {
 	button_corners_info corners;
-	corners.inside_texture = assets::texture_id::HOTBAR_BUTTON_INSIDE;
+	corners.inside_texture = assets::game_image_id::HOTBAR_BUTTON_INSIDE;
 	corners.flip_horizontally = true;
 
 	return corners;
@@ -151,7 +151,7 @@ void hotbar_button::draw(
 
 	const auto label_style = augs::gui::text::style(assets::font_id::GUI_FONT, distinguished_border_color);
 
-	const auto inside_mat = augs::gui::material(assets::texture_id::HOTBAR_BUTTON_INSIDE, inside_col);
+	const auto inside_mat = augs::gui::material(assets::game_image_id::HOTBAR_BUTTON_INSIDE, inside_col);
 
 	std::array<bool, static_cast<size_t>(button_corner_type::COUNT)> visible_parts;
 	std::fill(visible_parts.begin(), visible_parts.end(), false);
@@ -194,7 +194,7 @@ void hotbar_button::draw(
 	}
 	
 	{
-		corners.for_each_button_corner(internal_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
+		corners.for_each_button_corner(internal_rc, [&](const button_corner_type type, const assets::game_image_id id, const ltrb drawn_rc) {
 			auto col = is_button_border(type) ? border_col : inside_col;
 			
 			if (distinguished_border_function(type)) {
@@ -235,7 +235,7 @@ void hotbar_button::draw(
 				const auto distance = 4.f;
 				hover_effect_rc.expand_from_center(vec2(distance, distance));
 		
-				corners.for_each_button_corner(hover_effect_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
+				corners.for_each_button_corner(hover_effect_rc, [&](const button_corner_type type, const assets::game_image_id id, const ltrb drawn_rc) {
 					if (part_visibility_flag(type) && is_button_border(type)) {
 						auto col = colorize;
 
@@ -259,7 +259,7 @@ void hotbar_button::draw(
 				const auto distance = (1.f - std::min(max_duration, this_id->elapsed_hover_time_ms) / max_duration) * max_distance;
 				hover_effect_rc.expand_from_center(vec2(distance, distance));
 		
-				corners.for_each_button_corner(hover_effect_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
+				corners.for_each_button_corner(hover_effect_rc, [&](const button_corner_type type, const assets::game_image_id id, const ltrb drawn_rc) {
 					if (part_visibility_flag(type) && is_button_border(type)) {
 						auto col = colorize;
 

@@ -49,7 +49,7 @@ struct character_gui {
 	game_gui_rect_world rect_world;
 	int dragged_charges = 0;
 
-	drag_and_drop_target_drop_item drop_item_icon = augs::gui::material(assets::texture_id::DROP_HAND_ICON, red);
+	drag_and_drop_target_drop_item drop_item_icon = augs::gui::material(assets::game_image_id::DROP_HAND_ICON, red);
 
 	void set_screen_size(const vec2i);
 	vec2i get_screen_size() const;

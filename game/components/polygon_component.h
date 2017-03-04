@@ -6,7 +6,7 @@
 
 #include "augs/graphics/pixel.h"
 #include "augs/graphics/vertex.h"
-#include "game/assets/texture_id.h"
+#include "game/assets/game_image_id.h"
 #include "game/detail/basic_renderable_drawing_input.h"
 
 #include "zeroed_pod.h"
@@ -29,7 +29,7 @@ namespace components {
 			void set_global_time_seconds(const float);
 		};
 
-		assets::texture_id center_neon_map = assets::texture_id::INVALID;
+		assets::game_image_id center_neon_map = assets::game_image_id::INVALID;
 		/* the polygon as it was originally, so possibly concave
 		it is later triangulated for rendering and divided into convex polygons for physics */
 		//augs::constant_size_vector<vec2, RENDERING_POLYGON_VERTEX_COUNT> original_polygon;
@@ -51,8 +51,8 @@ namespace components {
 			);
 		}
 		
-		void automatically_map_uv(const assets::texture_id, const uv_mapping_mode);
-		void from_polygonized_texture(const assets::texture_id);
+		void automatically_map_uv(const assets::game_image_id, const uv_mapping_mode);
+		void from_polygonized_texture(const assets::game_image_id);
 
 		/* triangulates input */
 		void add_concave_polygon(std::vector<augs::vertex>);

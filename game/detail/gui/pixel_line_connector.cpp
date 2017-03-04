@@ -131,6 +131,6 @@ void draw_pixel_line_connector(
 	const rgba col
 ) {
 	for (const auto l : get_connecting_pixel_lines(a, b)) {
-		augs::draw_line(in.v, l[0], l[1], 1, *assets::texture_id::BLANK, col);
+		augs::draw_line(in.v, l[0], l[1], 1, *assets::game_image_id::BLANK, col);
 	}
 }

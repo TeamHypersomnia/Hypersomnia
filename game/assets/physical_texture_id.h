@@ -1,7 +1,7 @@
 #pragma once
 
 namespace assets {
-	enum class atlas_id {
+	enum class physical_texture_id {
 		INVALID,
 
 		GAME_WORLD_ATLAS,

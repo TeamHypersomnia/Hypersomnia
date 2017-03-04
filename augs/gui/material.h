@@ -1,14 +1,14 @@
 #pragma once
 #include "augs/graphics/pixel.h"
-#include "game/assets/texture_id.h"
+#include "game/assets/game_image_id.h"
 #include "augs/graphics/vertex.h"
 
 namespace augs {
 	namespace gui {
 		struct material {
-			assets::texture_id tex;
+			assets::game_image_id tex;
 			rgba color;
-			material(assets::texture_id = assets::texture_id::BLANK, const rgba& = rgba());
+			material(assets::game_image_id = assets::game_image_id::BLANK, const rgba& = rgba());
 			material(const rgba&);
 		};
 

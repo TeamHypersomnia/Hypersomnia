@@ -10,7 +10,7 @@ namespace augs {
 	namespace gui {
 		namespace text {
 			printer::printer() :
-				caret_mat(material(assets::texture_id::BLANK, rgba(255, 255, 255, 255))),
+				caret_mat(material(assets::game_image_id::BLANK, rgba(255, 255, 255, 255))),
 				align_caret_height(true), caret_width(1),
 				highlight_current_line(false),
 				highlight_during_selection(true),

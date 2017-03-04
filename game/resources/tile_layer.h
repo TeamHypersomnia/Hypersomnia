@@ -2,7 +2,7 @@
 #include <vector>
 
 #include "augs/graphics/vertex.h"
-#include "game/assets/texture_id.h"
+#include "game/assets/game_image_id.h"
 #include "game/components/transform_component.h"
 #include "game/components/sprite_component.h"
 
@@ -16,12 +16,12 @@ namespace resources {
 		};
 
 		//struct tile_type {
-		//	assets::texture_id tile_texture;
+		//	assets::game_image_id tile_texture;
 		//	unsigned max_specular_blinks = 0;
 		//
-		//	tile_type(assets::texture_id = assets::texture_id::BLANK);
+		//	tile_type(assets::game_image_id = assets::game_image_id::BLANK);
 		//
-		//	operator assets::texture_id() const {
+		//	operator assets::game_image_id() const {
 		//		return tile_texture;
 		//	}
 		//};

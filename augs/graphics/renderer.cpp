@@ -209,7 +209,7 @@ namespace augs {
 
 	void renderer::draw_debug_info(
 		const camera_cone camera,
-		const assets::texture_id line_texture,
+		const assets::game_image_id line_texture,
 		const std::vector<const_entity_handle>& target_entities,
 		const float interpolation_ratio
 	) {
@@ -331,7 +331,7 @@ namespace augs {
 		graphics::fbo::use_default();
 		glClear(GL_COLOR_BUFFER_BIT); glerr;
 		
-		bind_texture(*get_resource_manager().find(assets::atlas_id::GAME_WORLD_ATLAS));
+		bind_texture(*get_resource_manager().find(assets::physical_texture_id::GAME_WORLD_ATLAS));
 
 		call_triangles();
 

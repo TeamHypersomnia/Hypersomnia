@@ -1333,14 +1333,14 @@
     <ClInclude Include="game\types_specification\all_component_includes.h" />
     <ClInclude Include="game\assets\animation_id.h" />
     <ClInclude Include="game\assets\animation_response_id.h" />
-    <ClInclude Include="game\assets\atlas_id.h" />
+    <ClInclude Include="game\assets\physical_texture_id.h" />
     <ClInclude Include="game\assets\behaviour_tree_id.h" />
     <ClInclude Include="game\assets\font_id.h" />
     <ClInclude Include="game\assets\particle_effect_id.h" />
     <ClInclude Include="game\assets\particle_effect_response_id.h" />
     <ClInclude Include="game\assets\program_id.h" />
     <ClInclude Include="game\assets\shader_id.h" />
-    <ClInclude Include="game\assets\texture_id.h" />
+    <ClInclude Include="game\assets\game_image_id.h" />
     <ClInclude Include="game\bindings\bindings.h" />
     <ClInclude Include="game\bindings\bind_game_and_augs.h" />
     <ClInclude Include="game\build_settings.h" />

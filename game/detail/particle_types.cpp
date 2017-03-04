@@ -93,7 +93,7 @@ void animated_particle::draw(components::sprite::drawing_input basic_input) cons
 	static thread_local components::sprite face;
 	const auto frame_num = std::min(static_cast<unsigned>(lifetime_ms / frame_duration_ms), frame_count - 1);
 
-	face.set(static_cast<assets::texture_id>(static_cast<int>(first_face) + frame_num));
+	face.set(static_cast<assets::game_image_id>(static_cast<int>(first_face) + frame_num));
 	
 	basic_input.renderable_transform = { pos, 0 };
 	face.color = color;
@@ -159,8 +159,8 @@ void homing_animated_particle::draw(components::sprite::drawing_input basic_inpu
 	static thread_local components::sprite face;
 	const auto frame_num = std::min(static_cast<unsigned>(lifetime_ms / frame_duration_ms), frame_count-1);
 
-	//face.set(static_cast<assets::texture_id>(static_cast<int>(first_face) + frame_count - frame_num - 1));
-	face.set(static_cast<assets::texture_id>(static_cast<int>(first_face) + frame_num));
+	//face.set(static_cast<assets::game_image_id>(static_cast<int>(first_face) + frame_count - frame_num - 1));
+	face.set(static_cast<assets::game_image_id>(static_cast<int>(first_face) + frame_num));
 
 	basic_input.renderable_transform = { pos, 0 };
 	face.color = color;

@@ -4,7 +4,7 @@
 
 #include "augs/graphics/pixel.h"
 #include "augs/graphics/vertex.h"
-#include "game/assets/texture_id.h"
+#include "game/assets/game_image_id.h"
 #include "transform_component.h"
 #include "game/detail/basic_renderable_drawing_input.h"
 #include "game/enums/renderable_drawing_type.h"
@@ -18,7 +18,7 @@ namespace components {
 			void set_global_time_seconds(const float);
 		};
 
-		assets::texture_id tex = assets::texture_id::INVALID;
+		assets::game_image_id tex = assets::game_image_id::INVALID;
 		rgba color;
 		vec2 size;
 		vec2 size_multiplier = vec2(1, 1);
@@ -54,7 +54,7 @@ namespace components {
 
 		vec2 get_size() const;
 
-		void set(assets::texture_id, rgba = rgba());
+		void set(assets::game_image_id, rgba = rgba());
 		void update_size_from_texture_dimensions();
 
 		void draw(const drawing_input&) const;

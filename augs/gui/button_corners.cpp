@@ -123,7 +123,7 @@ bool is_button_side(const button_corner_type t) {
 	return false;
 }
 
-texture_id button_corners_info::get_tex_for_type(button_corner_type t) const {
+game_image_id button_corners_info::get_tex_for_type(button_corner_type t) const {
 	if (flip_horizontally) {
 		if (t == button_corner_type::LT) {
 			t = button_corner_type::RT;
@@ -182,84 +182,84 @@ texture_id button_corners_info::get_tex_for_type(button_corner_type t) const {
 	switch (t) {
 
 	case button_corner_type::INSIDE:
-		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 0);
+		return static_cast<game_image_id>(static_cast<unsigned>(inside_texture) + 0);
 		break;
 
 	case button_corner_type::LT:
-		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 1);
+		return static_cast<game_image_id>(static_cast<unsigned>(inside_texture) + 1);
 		break;
 	case button_corner_type::RT:
-		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 2);
+		return static_cast<game_image_id>(static_cast<unsigned>(inside_texture) + 2);
 		break;
 	case button_corner_type::RB:
-		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 3);
+		return static_cast<game_image_id>(static_cast<unsigned>(inside_texture) + 3);
 		break;
 	case button_corner_type::LB:
-		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 4);
+		return static_cast<game_image_id>(static_cast<unsigned>(inside_texture) + 4);
 		break;
 
 	case button_corner_type::L:
-		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 5);
+		return static_cast<game_image_id>(static_cast<unsigned>(inside_texture) + 5);
 		break;
 	case button_corner_type::T:
-		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 6);
+		return static_cast<game_image_id>(static_cast<unsigned>(inside_texture) + 6);
 		break;
 	case button_corner_type::R:
-		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 7);
+		return static_cast<game_image_id>(static_cast<unsigned>(inside_texture) + 7);
 		break;
 	case button_corner_type::B:
-		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 8);
+		return static_cast<game_image_id>(static_cast<unsigned>(inside_texture) + 8);
 		break;
 
 	case button_corner_type::LB_COMPLEMENT:
-		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 9);
+		return static_cast<game_image_id>(static_cast<unsigned>(inside_texture) + 9);
 		break;
 
 	case button_corner_type::LT_BORDER:
-		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 10);
+		return static_cast<game_image_id>(static_cast<unsigned>(inside_texture) + 10);
 		break;
 	case button_corner_type::RT_BORDER:
-		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 11);
+		return static_cast<game_image_id>(static_cast<unsigned>(inside_texture) + 11);
 		break;
 	case button_corner_type::RB_BORDER:
-		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 12);
+		return static_cast<game_image_id>(static_cast<unsigned>(inside_texture) + 12);
 		break;
 	case button_corner_type::LB_BORDER:
-		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 13);
+		return static_cast<game_image_id>(static_cast<unsigned>(inside_texture) + 13);
 		break;
 
 
 	case button_corner_type::L_BORDER:
-		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 14);
+		return static_cast<game_image_id>(static_cast<unsigned>(inside_texture) + 14);
 		break;
 	case button_corner_type::T_BORDER:
-		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 15);
+		return static_cast<game_image_id>(static_cast<unsigned>(inside_texture) + 15);
 		break;
 	case button_corner_type::R_BORDER:
-		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 16);
+		return static_cast<game_image_id>(static_cast<unsigned>(inside_texture) + 16);
 		break;
 	case button_corner_type::B_BORDER:
-		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 17);
+		return static_cast<game_image_id>(static_cast<unsigned>(inside_texture) + 17);
 		break;
 
 	case button_corner_type::LB_COMPLEMENT_BORDER:
-		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 18);
+		return static_cast<game_image_id>(static_cast<unsigned>(inside_texture) + 18);
 		break;
 
 	case button_corner_type::LT_INTERNAL_BORDER:
-		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 19);
+		return static_cast<game_image_id>(static_cast<unsigned>(inside_texture) + 19);
 		break;
 	case button_corner_type::RT_INTERNAL_BORDER:
-		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 20);
+		return static_cast<game_image_id>(static_cast<unsigned>(inside_texture) + 20);
 		break;
 	case button_corner_type::RB_INTERNAL_BORDER:
-		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 21);
+		return static_cast<game_image_id>(static_cast<unsigned>(inside_texture) + 21);
 		break;
 	case button_corner_type::LB_INTERNAL_BORDER:
-		return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 22);
+		return static_cast<game_image_id>(static_cast<unsigned>(inside_texture) + 22);
 		break;
 
-	default: ensure(false); return static_cast<texture_id>(static_cast<unsigned>(inside_texture) + 0); break;
+	default: ensure(false); return static_cast<game_image_id>(static_cast<unsigned>(inside_texture) + 0); break;
 	}
 }
 

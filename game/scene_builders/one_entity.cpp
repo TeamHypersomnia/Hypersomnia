@@ -1,7 +1,7 @@
 #include "one_entity.h"
 #include "game/ingredients/ingredients.h"
 #include "game/transcendental/cosmos.h"
-#include "game/assets/texture_id.h"
+#include "game/assets/game_image_id.h"
 
 #include "game/systems_stateless/input_system.h"
 #include "game/systems_stateless/render_system.h"

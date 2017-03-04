@@ -5,7 +5,7 @@
 
 #include "augs/misc/stepped_timing.h"
 
-#include "game/assets/texture_id.h"
+#include "game/assets/game_image_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/step_declaration.h"
 #include "augs/misc/enum_associative_array.h"
@@ -17,7 +17,7 @@ struct spell_instance_data {
 };
 
 struct spell_appearance {
-	assets::texture_id icon = assets::texture_id::INVALID;
+	assets::game_image_id icon = assets::game_image_id::INVALID;
 	rgba border_col;
 };
 

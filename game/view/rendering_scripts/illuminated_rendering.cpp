@@ -115,15 +115,15 @@ namespace rendering_scripts {
 							return;
 						}
 
-						const auto& edge_tex = get_resource_manager().find(assets::texture_id::LASER_GLOW_EDGE)->texture_maps[texture_map_type::DIFFUSE];
+						const auto& edge_tex = get_resource_manager().find(assets::game_image_id::LASER_GLOW_EDGE)->texture_maps[texture_map_type::DIFFUSE];
 						const vec2 edge_size = static_cast<vec2>(edge_tex.get_size());
 
-						augs::draw_line(output, camera[from], camera[to], edge_size.y/3.f, get_resource_manager().find(assets::texture_id::LASER)->texture_maps[texture_map_type::DIFFUSE], col);
+						augs::draw_line(output, camera[from], camera[to], edge_size.y/3.f, get_resource_manager().find(assets::game_image_id::LASER)->texture_maps[texture_map_type::DIFFUSE], col);
 
 						const auto edge_offset = (to - from).set_length(edge_size.x);
 
-						augs::draw_line(output, camera[to], camera[to + edge_offset], edge_size.y / 3.f, get_resource_manager().find(assets::texture_id::LASER_GLOW_EDGE)->texture_maps[texture_map_type::DIFFUSE], col);
-						augs::draw_line(output, camera[from - edge_offset], camera[from], edge_size.y / 3.f, get_resource_manager().find(assets::texture_id::LASER_GLOW_EDGE)->texture_maps[texture_map_type::DIFFUSE], col, true);
+						augs::draw_line(output, camera[to], camera[to + edge_offset], edge_size.y / 3.f, get_resource_manager().find(assets::game_image_id::LASER_GLOW_EDGE)->texture_maps[texture_map_type::DIFFUSE], col);
+						augs::draw_line(output, camera[from - edge_offset], camera[from], edge_size.y / 3.f, get_resource_manager().find(assets::game_image_id::LASER_GLOW_EDGE)->texture_maps[texture_map_type::DIFFUSE], col, true);
 					},
 					[](...){},
 					interp, 
@@ -236,7 +236,7 @@ namespace rendering_scripts {
 						renderer.lines, 
 						camera[from], 
 						camera[to], 
-						get_resource_manager().find(assets::texture_id::LASER)->texture_maps[texture_map_type::DIFFUSE], 
+						get_resource_manager().find(assets::game_image_id::LASER)->texture_maps[texture_map_type::DIFFUSE], 
 						col
 					);
 				},
@@ -246,7 +246,7 @@ namespace rendering_scripts {
 						renderer.lines,
 						camera[from],
 						camera[to],
-						get_resource_manager().find(assets::texture_id::LASER)->texture_maps[texture_map_type::DIFFUSE],
+						get_resource_manager().find(assets::game_image_id::LASER)->texture_maps[texture_map_type::DIFFUSE],
 						white,
 						10.f,
 						40.f, 
@@ -290,8 +290,8 @@ namespace rendering_scripts {
 			
 			vec2 upper(0.0f, 0.0f);
 			vec2 lower(1.0f, 1.0f);
-			upper = (*assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM).get_atlas_space_uv(upper);
-			lower = (*assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM).get_atlas_space_uv(lower);
+			upper = (*assets::game_image_id::HUD_CIRCULAR_BAR_MEDIUM).get_atlas_space_uv(upper);
+			lower = (*assets::game_image_id::HUD_CIRCULAR_BAR_MEDIUM).get_atlas_space_uv(lower);
 			const auto center = (upper + lower) / 2;
 		
 			glUniform2f(glGetUniformLocation(circular_bars_shader.id, "texture_center"), center.x, center.y);
@@ -358,14 +358,14 @@ namespace rendering_scripts {
 			}
 		}
 
-		renderer.bind_texture(*get_resource_manager().find(assets::atlas_id::GAME_WORLD_ATLAS));
+		renderer.bind_texture(*get_resource_manager().find(assets::physical_texture_id::GAME_WORLD_ATLAS));
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
 
 		renderer.draw_debug_info(
 			camera,
-			assets::texture_id::BLANK,
+			assets::game_image_id::BLANK,
 			{},
 			step.get_interpolation_ratio()
 		);

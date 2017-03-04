@@ -1,7 +1,7 @@
 #include "networked_testbed.h"
 #include "game/ingredients/ingredients.h"
 #include "game/transcendental/cosmos.h"
-#include "game/assets/texture_id.h"
+#include "game/assets/game_image_id.h"
 
 #include "game/systems_stateless/input_system.h"
 #include "game/systems_stateless/render_system.h"
@@ -83,7 +83,7 @@ namespace scene_builders {
 		const auto motorcycle = prefabs::create_motorcycle(world, components::transform(0, -600, -90));
 		prefabs::create_motorcycle(world, components::transform(100, -600, -90));
 
-		const vec2 bg_size = assets::get_size(assets::texture_id::TEST_BACKGROUND);
+		const vec2 bg_size = assets::get_size(assets::game_image_id::TEST_BACKGROUND);
 
 		const int num_floors = 10 * 10;
 		const int side = sqrt(num_floors) / 2;
@@ -92,12 +92,12 @@ namespace scene_builders {
 			for (int y = -side; y < side; ++y)
 			{
 				//auto background = world.create_entity("bg[-]");
-				//ingredients::add_sprite(background, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 550)), assets::texture_id::TEST_BACKGROUND, white, render_layer::GROUND);
+				//ingredients::add_sprite(background, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 550)), assets::game_image_id::TEST_BACKGROUND, white, render_layer::GROUND);
 				//ingredients::add_standard_static_body(background);
 
 				auto street = world.create_entity("street[-]");
 				ingredients::add_sprite(street, { bg_size * vec2(x, y) },
-					assets::texture_id::TEST_BACKGROUND, gray1, render_layer::GROUND);
+					assets::game_image_id::TEST_BACKGROUND, gray1, render_layer::GROUND);
 
 				//background.add_standard_components();
 				street.add_standard_components();

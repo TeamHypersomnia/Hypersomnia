@@ -32,12 +32,12 @@ atlases_regeneration_output regenerate_atlases(
 	};
 
 	std::unordered_map<
-		assets::atlas_id,
+		assets::physical_texture_id,
 		per_atlas_input
 	> per_atlas_inputs;
 
 	for (const auto& i : in.images) {
-		per_atlas_inputs[i.target_atlas].images.push_back(i.filename);
+		per_atlas_inputs[i.target_atlas].images.push_back(i.path);
 	}
 
 	for (const auto& i : in.fonts) {
@@ -50,9 +50,9 @@ atlases_regeneration_output regenerate_atlases(
 
 	for (const auto& input_for_this_atlas : per_atlas_inputs) {
 		const auto atlas_stem = typesafe_sprintf("%x", static_cast<int>(input_for_this_atlas.first));
-		const auto atlas_image_filename = atlases_directory + atlas_stem + (save_atlases_as_binary ? ".bin" : ".png");
-		const auto atlas_metadata_filename = atlases_directory + atlas_stem + ".meta";
-		const auto atlas_stamp_filename = atlases_directory + atlas_stem + ".stamp";
+		const auto atlas_image_path = atlases_directory + atlas_stem + (save_atlases_as_binary ? ".bin" : ".png");
+		const auto atlas_metadata_path = atlases_directory + atlas_stem + ".meta";
+		const auto atlas_stamp_path = atlases_directory + atlas_stem + ".stamp";
 
 		bool should_regenerate = false;
 
@@ -64,20 +64,20 @@ atlases_regeneration_output regenerate_atlases(
 			}
 
 			for (const auto& fnt_id : input_for_this_atlas.second.fonts) {
-				new_stamp.font_stamps[fnt_id] = augs::last_write_time(fnt_id.filename);
+				new_stamp.font_stamps[fnt_id] = augs::last_write_time(fnt_id.path);
 			}
 
-			if (!augs::file_exists(atlas_image_filename)) {
+			if (!augs::file_exists(atlas_image_path)) {
 				should_regenerate = true;
 			}
 			else {
-				if (!augs::file_exists(atlas_stamp_filename)) {
+				if (!augs::file_exists(atlas_stamp_path)) {
 					should_regenerate = true;
 				}
 				else {
 					augs::stream existent_stamp_stream;
 
-					augs::assign_file_contents_binary(atlas_stamp_filename, existent_stamp_stream);
+					augs::assign_file_contents_binary(atlas_stamp_path, existent_stamp_stream);
 					texture_atlas_stamp existent_stamp;
 					augs::read_object(existent_stamp_stream, existent_stamp);
 
@@ -94,7 +94,7 @@ atlases_regeneration_output regenerate_atlases(
 		}
 
 		if (should_regenerate) {
-			LOG("Regenerating texture atlas: %x", atlas_image_filename);
+			LOG("Regenerating texture atlas: %x", atlas_image_path);
 
 			texture_atlas_metadata this_atlas_metadata;
 
@@ -250,24 +250,24 @@ atlases_regeneration_output regenerate_atlases(
 			atlas_image.swap_red_and_blue();
 
 			if (save_atlases_as_binary) {
-				atlas_image.save_as_binary_file(atlas_image_filename);
+				atlas_image.save_as_binary_file(atlas_image_path);
 			}
 			else {
-				atlas_image.save(atlas_image_filename);
+				atlas_image.save(atlas_image_path);
 			}
 
 			{
 				augs::stream new_stamp_stream;
 				augs::write_object(new_stamp_stream, new_stamp);
 
-				augs::create_binary_file(atlas_stamp_filename, new_stamp_stream);
+				augs::create_binary_file(atlas_stamp_path, new_stamp_stream);
 			}
 
 			{
 				augs::stream new_meta_stream;
 				augs::write_object(new_meta_stream, this_atlas_metadata);
 
-				augs::create_binary_file(atlas_metadata_filename, new_meta_stream);
+				augs::create_binary_file(atlas_metadata_path, new_meta_stream);
 			}
 
 			output.metadatas.emplace_back(std::move(std::make_pair(input_for_this_atlas.first, this_atlas_metadata)));
@@ -276,7 +276,7 @@ atlases_regeneration_output regenerate_atlases(
 			texture_atlas_metadata this_atlas_metadata;
 
 			augs::stream existent_meta_stream;
-			augs::assign_file_contents_binary(atlas_metadata_filename, existent_meta_stream);
+			augs::assign_file_contents_binary(atlas_metadata_path, existent_meta_stream);
 
 			augs::read_object(existent_meta_stream, this_atlas_metadata);
 

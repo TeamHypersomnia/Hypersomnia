@@ -51,8 +51,8 @@ void slot_button::draw(const viewing_game_gui_context context, const const_this_
 		border_col.a = 255;
 	}
 
-	const auto inside_tex = assets::texture_id::ATTACHMENT_CIRCLE_FILLED;
-	const auto border_tex = assets::texture_id::ATTACHMENT_CIRCLE_BORDER;
+	const auto inside_tex = assets::game_image_id::ATTACHMENT_CIRCLE_FILLED;
+	const auto border_tex = assets::game_image_id::ATTACHMENT_CIRCLE_BORDER;
 
 	const augs::gui::material inside_mat(inside_tex, inside_col);
 	const augs::gui::material border_mat(border_tex, border_col);
@@ -64,31 +64,31 @@ void slot_button::draw(const viewing_game_gui_context context, const const_this_
 		const auto slot_type = slot_id.get_id().type;
 
 		if (slot_type == slot_function::PRIMARY_HAND) {
-			draw_centered_texture(context, this_id, info, augs::gui::material(assets::texture_id::PRIMARY_HAND_ICON, border_col), vec2i(1, 0));
+			draw_centered_texture(context, this_id, info, augs::gui::material(assets::game_image_id::PRIMARY_HAND_ICON, border_col), vec2i(1, 0));
 		}
 
 		if (slot_type == slot_function::SECONDARY_HAND) {
-			draw_centered_texture(context, this_id, info, augs::gui::material(assets::texture_id::SECONDARY_HAND_ICON, border_col));
+			draw_centered_texture(context, this_id, info, augs::gui::material(assets::game_image_id::SECONDARY_HAND_ICON, border_col));
 		}
 
 		if (slot_type == slot_function::SHOULDER_SLOT) {
-			draw_centered_texture(context, this_id, info, augs::gui::material(assets::texture_id::SHOULDER_SLOT_ICON, border_col));
+			draw_centered_texture(context, this_id, info, augs::gui::material(assets::game_image_id::SHOULDER_SLOT_ICON, border_col));
 		}
 
 		if (slot_type == slot_function::TORSO_ARMOR_SLOT) {
-			draw_centered_texture(context, this_id, info, augs::gui::material(assets::texture_id::ARMOR_SLOT_ICON, border_col));
+			draw_centered_texture(context, this_id, info, augs::gui::material(assets::game_image_id::ARMOR_SLOT_ICON, border_col));
 		}
 
 		if (slot_type == slot_function::GUN_CHAMBER) {
-			draw_centered_texture(context, this_id, info, augs::gui::material(assets::texture_id::CHAMBER_SLOT_ICON, border_col));
+			draw_centered_texture(context, this_id, info, augs::gui::material(assets::game_image_id::CHAMBER_SLOT_ICON, border_col));
 		}
 
 		if (slot_type == slot_function::GUN_MUZZLE) {
-			draw_centered_texture(context, this_id, info, augs::gui::material(assets::texture_id::GUN_MUZZLE_SLOT_ICON, border_col));
+			draw_centered_texture(context, this_id, info, augs::gui::material(assets::game_image_id::GUN_MUZZLE_SLOT_ICON, border_col));
 		}
 
 		if (slot_type == slot_function::GUN_DETACHABLE_MAGAZINE) {
-			draw_centered_texture(context, this_id, info, augs::gui::material(assets::texture_id::DETACHABLE_MAGAZINE_ICON, border_col));
+			draw_centered_texture(context, this_id, info, augs::gui::material(assets::game_image_id::DETACHABLE_MAGAZINE_ICON, border_col));
 		}
 	}
 

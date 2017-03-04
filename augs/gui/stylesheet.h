@@ -37,12 +37,12 @@ namespace augs {
 
 			struct style {
 				attribute<rgba> color;
-				attribute<assets::texture_id> background_image;
+				attribute<assets::game_image_id> background_image;
 				attribute<solid_stroke> border;
 
 				style();
 				style(const attribute<rgba>& color,
-					const attribute<assets::texture_id>& background_image,
+					const attribute<assets::game_image_id>& background_image,
 					const attribute<solid_stroke>& border);
 
 				operator material() const;

@@ -172,7 +172,7 @@ void exploding_ring_system::draw_rings(
 		}
 		else {
 			components::sprite spr;
-			spr.set(assets::texture_id::BLANK);
+			spr.set(assets::game_image_id::BLANK);
 			spr.size.set(outer_radius_now * 2, outer_radius_now * 2);
 			spr.color = considered_color;
 
@@ -212,7 +212,7 @@ void exploding_ring_system::draw_highlights_of_rings(
 			highlight_col.a = static_cast<rgba_channel>(255 * highlight_amount);
 
 			components::sprite spr;
-			spr.set(assets::texture_id::CAST_HIGHLIGHT, highlight_col);
+			spr.set(assets::game_image_id::CAST_HIGHLIGHT, highlight_col);
 			spr.size.set(radius, radius);
 
 			spr.draw(highlight);

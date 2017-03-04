@@ -23,7 +23,7 @@ namespace components {
 		return size * size_multiplier;
 	}
 
-	void sprite::set(const assets::texture_id _tex, const rgba _color) {
+	void sprite::set(const assets::game_image_id _tex, const rgba _color) {
 		tex = _tex;
 		color = _color;
 		has_neon_map = get_resource_manager().find(tex)->texture_maps[texture_map_type::NEON].exists();
@@ -79,7 +79,7 @@ namespace components {
 	}
 
 	void sprite::draw(const drawing_input& in) const {
-		ensure(tex != assets::texture_id::INVALID);
+		ensure(tex != assets::game_image_id::INVALID);
 
 		vec2i transform_pos = in.renderable_transform.pos;
 		const float final_rotation = in.renderable_transform.rotation + rotation_offset;

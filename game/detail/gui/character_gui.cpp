@@ -312,7 +312,7 @@ void character_gui::draw_cursor_with_information(const viewing_game_gui_context 
 	const auto drag_amount = context.get_rect_world().current_drag_amount;
 
 	auto& output_buffer = context.get_output_buffer();
-	auto gui_cursor = assets::texture_id::GUI_CURSOR;
+	auto gui_cursor = assets::game_image_id::GUI_CURSOR;
 	auto gui_cursor_color = cyan;
 	auto gui_cursor_position = get_gui_crosshair_position();
 
@@ -358,7 +358,7 @@ void character_gui::draw_cursor_with_information(const viewing_game_gui_context 
 
 	if (!is_dragging) {
 		if (context.alive(rect_world.rect_hovered)) {
-			gui_cursor = assets::texture_id::GUI_CURSOR_HOVER;
+			gui_cursor = assets::game_image_id::GUI_CURSOR_HOVER;
 		}
 
 		draw_tooltip_from_hover_or_world_highlight(context, get_tooltip_position());
@@ -376,7 +376,7 @@ void character_gui::draw_cursor_with_information(const viewing_game_gui_context 
 
 				dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drawn_pos);
 
-				gui_cursor = assets::texture_id::GUI_CURSOR_MINUS;
+				gui_cursor = assets::game_image_id::GUI_CURSOR_MINUS;
 				gui_cursor_color = red;
 
 				gui_cursor_position = draw_cursor_hint(L"Clear assignment", get_gui_crosshair_position(), (*gui_cursor).get_size());
@@ -421,7 +421,7 @@ void character_gui::draw_cursor_with_information(const viewing_game_gui_context 
 			}
 
 			if (!(transfer_data.source_hotbar_button_id == transfer_data.assign_to)) {
-				gui_cursor = assets::texture_id::GUI_CURSOR_ADD;
+				gui_cursor = assets::game_image_id::GUI_CURSOR_ADD;
 				gui_cursor_color = green;
 			}
 
@@ -445,15 +445,15 @@ void character_gui::draw_cursor_with_information(const viewing_game_gui_context 
 			const auto& transfer_result = transfer_data.result.result;
 
 			if (transfer_result == item_transfer_result_type::SUCCESSFUL_DROP) {
-				gui_cursor = assets::texture_id::GUI_CURSOR_MINUS;
+				gui_cursor = assets::game_image_id::GUI_CURSOR_MINUS;
 				gui_cursor_color = red;
 			}
 			else if (transfer_result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
-				gui_cursor = assets::texture_id::GUI_CURSOR_ADD;
+				gui_cursor = assets::game_image_id::GUI_CURSOR_ADD;
 				gui_cursor_color = green;
 			}
 			else if (transfer_result != item_transfer_result_type::THE_SAME_SLOT) {
-				gui_cursor = assets::texture_id::GUI_CURSOR_ERROR;
+				gui_cursor = assets::game_image_id::GUI_CURSOR_ERROR;
 				gui_cursor_color = red;
 			}
 

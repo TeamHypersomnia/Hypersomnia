@@ -43,8 +43,8 @@ void action_button::draw(
 				inside_col.a = 255;
 			}
 
-			assets::texture_id inside_tex = assets::texture_id::INVALID;
-			assets::texture_id border_tex = assets::texture_id::SPELL_BORDER;
+			assets::game_image_id inside_tex = assets::game_image_id::INVALID;
+			assets::game_image_id border_tex = assets::game_image_id::SPELL_BORDER;
 
 			rgba border_col;
 
@@ -56,8 +56,8 @@ void action_button::draw(
 				border_col = border_col.get_desaturated();
 			}
 
-			if (inside_tex != assets::texture_id::INVALID) {
-				ensure(border_tex != assets::texture_id::INVALID);
+			if (inside_tex != assets::game_image_id::INVALID) {
+				ensure(border_tex != assets::game_image_id::INVALID);
 
 				const augs::gui::material inside_mat(inside_tex, inside_col);
 
@@ -166,8 +166,8 @@ void action_button::draw(
 
 			const auto label_style = augs::gui::text::style(assets::font_id::GUI_FONT, border_col);
 
-			const auto inside_tex = assets::texture_id::ACTION_BUTTON_FILLED;
-			const auto border_tex = assets::texture_id::ACTION_BUTTON_BORDER;
+			const auto inside_tex = assets::game_image_id::ACTION_BUTTON_FILLED;
+			const auto border_tex = assets::game_image_id::ACTION_BUTTON_BORDER;
 
 			const augs::gui::material inside_mat(inside_tex, inside_col);
 			const augs::gui::material border_mat(border_tex, border_col);

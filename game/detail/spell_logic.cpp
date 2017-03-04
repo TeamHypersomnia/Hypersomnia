@@ -29,27 +29,27 @@ spell_appearance get_spell_appearance(const spell_type spell) {
 
 	switch (spell) {
 	case spell_type::HASTE:
-		a.icon = assets::texture_id::SPELL_HASTE_ICON;
+		a.icon = assets::game_image_id::SPELL_HASTE_ICON;
 		a.border_col = green_spell_color;
 		break;
 
 	case spell_type::FURY_OF_THE_AEONS:
-		a.icon = assets::texture_id::SPELL_FURY_OF_THE_AEONS_ICON;
+		a.icon = assets::game_image_id::SPELL_FURY_OF_THE_AEONS_ICON;
 		a.border_col = blue_spell_border;
 		break;
 
 	case spell_type::ELECTRIC_TRIAD:
-		a.icon = assets::texture_id::SPELL_ELECTRIC_TRIAD_ICON;
+		a.icon = assets::game_image_id::SPELL_ELECTRIC_TRIAD_ICON;
 		a.border_col = blue_spell_border;
 		break;
 
 	case spell_type::ULTIMATE_WRATH_OF_THE_AEONS:
-		a.icon = assets::texture_id::SPELL_ULTIMATE_WRATH_OF_THE_AEONS_ICON;
+		a.icon = assets::game_image_id::SPELL_ULTIMATE_WRATH_OF_THE_AEONS_ICON;
 		a.border_col = blue_spell_border;
 		break;
 
 	case spell_type::ELECTRIC_SHIELD:
-		a.icon = assets::texture_id::SPELL_ELECTRIC_SHIELD_ICON;
+		a.icon = assets::game_image_id::SPELL_ELECTRIC_SHIELD_ICON;
 		a.border_col = turqoise_spell_color;
 		break;
 	
@@ -322,7 +322,7 @@ void perform_spell_logic(
 				ingredients::add_sprite(
 					energy_ball, 
 					new_energy_ball_transform, 
-					assets::texture_id::ENERGY_BALL, 
+					assets::game_image_id::ENERGY_BALL, 
 					cyan, 
 					render_layer::FLYING_BULLETS
 				);

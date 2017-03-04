@@ -1,8 +1,8 @@
 #pragma once
 #include <unordered_map>
 
-#include "game/assets/texture_id.h"
-#include "game/assets/atlas_id.h"
+#include "game/assets/game_image_id.h"
+#include "game/assets/physical_texture_id.h"
 #include "game/assets/shader_id.h"
 #include "game/assets/program_id.h"
 #include "game/assets/font_id.h"
@@ -74,7 +74,7 @@ struct game_image_baked {
 
 typedef augs::baked_font game_font_baked;
 
-typedef std::unordered_map<assets::texture_id, game_image_request> game_image_requests;
+typedef std::unordered_map<assets::game_image_id, game_image_request> game_image_requests;
 typedef std::unordered_map<assets::font_id, game_font_request> game_font_requests;
 
 struct atlases_regeneration_output;
@@ -89,28 +89,28 @@ namespace resources {
 		);
 
 		void create(
-			const assets::atlas_id,
+			const assets::physical_texture_id,
 			const bool load_as_binary
 		);
 
-		game_image_baked* find(const assets::texture_id);
+		game_image_baked* find(const assets::game_image_id);
 		game_font_baked* find(const assets::font_id);
 		
-		augs::graphics::texture* find(const assets::atlas_id);
+		augs::graphics::texture* find(const assets::physical_texture_id);
 
 		sound_response& create(const assets::sound_response_id);
 		augs::sound_buffer& create(const assets::sound_buffer_id);
 
 		animation& create(
 			const assets::animation_id, 
-			const assets::texture_id first_frame, 
-			const assets::texture_id last_frame, 
+			const assets::game_image_id first_frame, 
+			const assets::game_image_id last_frame, 
 			const float frame_duration_ms,
 			resources::animation::loop_type = resources::animation::INVERSE
 		);
 
-		animation& create_inverse(assets::animation_id, assets::texture_id first_frame, assets::texture_id last_frame, float frame_duration_ms);
-		animation& create_inverse_with_flip(assets::animation_id, assets::texture_id first_frame, assets::texture_id last_frame, float frame_duration_ms);
+		animation& create_inverse(assets::animation_id, assets::game_image_id first_frame, assets::game_image_id last_frame, float frame_duration_ms);
+		animation& create_inverse_with_flip(assets::animation_id, assets::game_image_id first_frame, assets::game_image_id last_frame, float frame_duration_ms);
 
 		animation& create(assets::animation_id at);
 		resources::animation_response& create(assets::animation_response_id at);
@@ -137,10 +137,10 @@ namespace resources {
 		void destroy_everything();
 
 	private:
-		augs::enum_associative_array<assets::texture_id, game_image_baked> baked_game_images;
+		augs::enum_associative_array<assets::game_image_id, game_image_baked> baked_game_images;
 		augs::enum_associative_array<assets::font_id, game_font_baked> baked_game_fonts;
 
-		augs::enum_associative_array<assets::atlas_id, augs::graphics::texture> physical_textures;
+		augs::enum_associative_array<assets::physical_texture_id, augs::graphics::texture> physical_textures;
 
 		augs::enum_associative_array<assets::particle_effect_id, particle_effect> particle_effects;
 		augs::enum_associative_array<assets::particle_effect_response_id, particle_effect_response> particle_effect_responses;

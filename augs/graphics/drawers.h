@@ -2,7 +2,7 @@
 #include "augs/graphics/vertex.h"
 #include "augs/graphics/pixel.h"
 #include "augs/math/vec2.h"
-#include "game/assets/texture_id.h"
+#include "game/assets/game_image_id.h"
 #include "augs/graphics/renderable_positioning_type.h"
 
 namespace augs {
@@ -17,15 +17,15 @@ namespace augs {
 	void draw_rect_with_border(
 		vertex_triangle_buffer& v, 
 		const ltrb origin, 
-		const assets::texture_id, 
+		const assets::game_image_id, 
 		const rgba inside_color, 
 		const rgba border_color,
 		const int border_spacing = 0
 	);
 	
 	void draw_rect(vertex_triangle_buffer& v, const ltrb origin, const rgba color = white);
-	void draw_rect(vertex_triangle_buffer& v, const ltrb origin, const assets::texture_id, const rgba color = white);
-	void draw_rect(vertex_triangle_buffer& v, const vec2 origin, const assets::texture_id, const rgba color = white);
+	void draw_rect(vertex_triangle_buffer& v, const ltrb origin, const assets::game_image_id, const rgba color = white);
+	void draw_rect(vertex_triangle_buffer& v, const vec2 origin, const assets::game_image_id, const rgba color = white);
 	
 	void draw_line(vertex_line_buffer& v, const vec2 from, const vec2 to, const texture_atlas_entry&, const rgba color);
 	void draw_dashed_line(vertex_line_buffer& v, const vec2 from, const vec2 to, const texture_atlas_entry&, const rgba color, const float dash_length, const float dash_velocity, const float global_time_seconds);

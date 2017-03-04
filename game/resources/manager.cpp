@@ -10,7 +10,7 @@
 using namespace augs;
 
 namespace assets {
-	vec2u get_size(texture_id id) {
+	vec2u get_size(game_image_id id) {
 		return get_resource_manager().find(id)->texture_maps[texture_map_type::DIFFUSE].original_size_pixels;
 	}
 }
@@ -23,7 +23,7 @@ bool operator!(const assets::font_id& id) {
 	return get_resource_manager().find(id) == nullptr;
 }
 
-augs::texture_atlas_entry& operator*(const assets::texture_id& id) {
+augs::texture_atlas_entry& operator*(const assets::game_image_id& id) {
 	return get_resource_manager().find(id)->texture_maps[texture_map_type::DIFFUSE];
 }
 
@@ -55,7 +55,7 @@ bool operator!(const assets::tile_layer_id& id) {
 	return get_resource_manager().find(id) == nullptr;
 }
 
-bool operator!(const assets::texture_id& id) {
+bool operator!(const assets::game_image_id& id) {
 	return get_resource_manager().find(id) == nullptr;
 }
 
@@ -71,7 +71,7 @@ auto ptr_if_found(T& container, const K& id) -> decltype(std::addressof(containe
 }
 
 namespace resources {
-	game_image_baked* manager::find(const assets::texture_id id) {
+	game_image_baked* manager::find(const assets::game_image_id id) {
 		return ptr_if_found(baked_game_images, id);
 	}
 
@@ -79,7 +79,7 @@ namespace resources {
 		return ptr_if_found(baked_game_fonts, id);
 	}
 
-	augs::graphics::texture* manager::find(const assets::atlas_id id) {
+	augs::graphics::texture* manager::find(const assets::physical_texture_id id) {
 		return ptr_if_found(physical_textures, id);
 	}
 
@@ -137,7 +137,7 @@ namespace resources {
 			auto& baked_image = baked_game_images[requested_image.first];
 
 			for (size_t i = 0; i < baked_image.texture_maps.size(); ++i) {
-				const auto seeked_identifier = requested_image.second.texture_maps[i].filename;
+				const auto seeked_identifier = requested_image.second.texture_maps[i].path;
 				const bool this_texture_map_is_not_used = seeked_identifier.empty();
 
 				if (this_texture_map_is_not_used) {
@@ -179,7 +179,7 @@ namespace resources {
 
 			const auto seeked_identifier = requested_font.second.loading_input;
 
-			ensure(seeked_identifier.filename.size() > 0);
+			ensure(seeked_identifier.path.size() > 0);
 			ensure(seeked_identifier.characters.size() > 0);
 			ensure(seeked_identifier.pt > 0);
 
@@ -197,7 +197,7 @@ namespace resources {
 	}
 
 	void manager::create(
-		const assets::atlas_id id,
+		const assets::physical_texture_id id,
 		const bool load_as_binary
 	) {
 		auto& tex = physical_textures[id];
@@ -219,13 +219,13 @@ namespace resources {
 		return anim;
 	}
 
-	animation& manager::create(assets::animation_id id, assets::texture_id first_frame, assets::texture_id last_frame, float frame_duration_ms, 
+	animation& manager::create(assets::animation_id id, assets::game_image_id first_frame, assets::game_image_id last_frame, float frame_duration_ms, 
 		resources::animation::loop_type loop_mode) {
 		
 		animation& anim = create(id);
 		anim.loop_mode = loop_mode;
 
-		for (assets::texture_id i = first_frame; i < last_frame; i = assets::texture_id(int(i)+1)) {
+		for (assets::game_image_id i = first_frame; i < last_frame; i = assets::game_image_id(int(i)+1)) {
 			animation::frame frame;
 			frame.duration_milliseconds = frame_duration_ms;
 			frame.sprite.set(i);
@@ -236,11 +236,11 @@ namespace resources {
 		return anim;
 	}
 	
-	animation& manager::create_inverse(assets::animation_id id, assets::texture_id first_frame, assets::texture_id last_frame, float frame_duration_ms) {
+	animation& manager::create_inverse(assets::animation_id id, assets::game_image_id first_frame, assets::game_image_id last_frame, float frame_duration_ms) {
 		animation& anim = create(id);
 		anim.loop_mode = animation::loop_type::INVERSE;
 
-		for (assets::texture_id i = first_frame; i < last_frame; i = assets::texture_id(int(i) + 1)) {
+		for (assets::game_image_id i = first_frame; i < last_frame; i = assets::game_image_id(int(i) + 1)) {
 			animation::frame frame;
 			frame.duration_milliseconds = frame_duration_ms;
 			frame.sprite.set(i);
@@ -251,11 +251,11 @@ namespace resources {
 		return anim;
 	}
 
-	animation& manager::create_inverse_with_flip(assets::animation_id id, assets::texture_id first_frame, assets::texture_id last_frame, float frame_duration_ms) {
+	animation& manager::create_inverse_with_flip(assets::animation_id id, assets::game_image_id first_frame, assets::game_image_id last_frame, float frame_duration_ms) {
 		animation& anim = create(id);
 		anim.loop_mode = animation::loop_type::REPEAT;
 
-		for (assets::texture_id i = first_frame; i < last_frame; i = assets::texture_id(int(i) + 1)) {
+		for (assets::game_image_id i = first_frame; i < last_frame; i = assets::game_image_id(int(i) + 1)) {
 			animation::frame frame;
 			frame.duration_milliseconds = frame_duration_ms;
 			frame.sprite.set(i);
@@ -263,7 +263,7 @@ namespace resources {
 			anim.frames.push_back(frame);
 		}
 
-		for (assets::texture_id i = assets::texture_id(int(last_frame) - 1); i >= first_frame; i = assets::texture_id(int(i) - 1)) {
+		for (assets::game_image_id i = assets::game_image_id(int(last_frame) - 1); i >= first_frame; i = assets::game_image_id(int(i) - 1)) {
 			animation::frame frame;
 			frame.duration_milliseconds = frame_duration_ms;
 			frame.sprite.set(i);
@@ -271,7 +271,7 @@ namespace resources {
 			anim.frames.push_back(frame);
 		}
 
-		for (assets::texture_id i = first_frame; i < last_frame; i = assets::texture_id(int(i) + 1)) {
+		for (assets::game_image_id i = first_frame; i < last_frame; i = assets::game_image_id(int(i) + 1)) {
 			animation::frame frame;
 			frame.duration_milliseconds = frame_duration_ms;
 			frame.sprite.set(i);
@@ -280,7 +280,7 @@ namespace resources {
 			anim.frames.push_back(frame);
 		}
 
-		for (assets::texture_id i = assets::texture_id(int(last_frame) - 1); i >= first_frame; i = assets::texture_id(int(i) - 1)) {
+		for (assets::game_image_id i = assets::game_image_id(int(last_frame) - 1); i >= first_frame; i = assets::game_image_id(int(i) - 1)) {
 			animation::frame frame;
 			frame.duration_milliseconds = frame_duration_ms;
 			frame.sprite.set(i);

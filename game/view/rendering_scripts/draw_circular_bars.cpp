@@ -44,7 +44,7 @@ namespace rendering_scripts {
 				state.renderable_transform.rotation = 0;
 
 				components::sprite circle_hud;
-				circle_hud.set(assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM, health_col);
+				circle_hud.set(assets::game_image_id::HUD_CIRCULAR_BAR_MEDIUM, health_col);
 				circle_hud.draw(state);
 
 				const auto watched_character_transform = watched_character.get_viewing_transform(r.session.systems_audiovisual.get<interpolation_system>());
@@ -128,7 +128,7 @@ namespace rendering_scripts {
 					examine_item_slot(v[slot_function::PRIMARY_HAND], starting_health_angle - 22.5f - 45.f, 45.f, true);
 				}
 
-				const int radius = (*assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM).get_size().x / 2;
+				const int radius = (*assets::game_image_id::HUD_CIRCULAR_BAR_MEDIUM).get_size().x / 2;
 				const auto empty_health_amount = static_cast<int>((1 - sentience->health.get_ratio()) * 90);
 
 				textual_infos.push_back({

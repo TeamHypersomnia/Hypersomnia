@@ -59,24 +59,24 @@ void regenerate_neon_maps() {
 			>> new_stamp.amplification
 		;
 
-		const auto neon_map_filename = neon_directory + source_path.filename().string();
-		const auto neon_map_stamp_filename = neon_directory + source_path.filename().replace_extension(".stamp").string();
+		const auto neon_map_path = neon_directory + source_path.filename().string();
+		const auto neon_map_stamp_path = neon_directory + source_path.filename().replace_extension(".stamp").string();
 
 		augs::stream new_stamp_stream;
 		augs::write_object(new_stamp_stream, new_stamp);
 
 		bool should_regenerate = false;
 
-		if (!augs::file_exists(neon_map_filename)) {
+		if (!augs::file_exists(neon_map_path)) {
 			should_regenerate = true;
 		}
 		else {
-			if (!augs::file_exists(neon_map_stamp_filename)) {
+			if (!augs::file_exists(neon_map_stamp_path)) {
 				should_regenerate = true;
 			}
 			else {
 				augs::stream existent_stamp_stream;
-				augs::assign_file_contents_binary(neon_map_stamp_filename, existent_stamp_stream);
+				augs::assign_file_contents_binary(neon_map_stamp_path, existent_stamp_stream);
 
 				const bool are_stamps_identical = (new_stamp_stream == existent_stamp_stream);
 
@@ -94,9 +94,9 @@ void regenerate_neon_maps() {
 			
 			make_neon(new_stamp, source_image);
 
-			source_image.save(neon_map_filename);
+			source_image.save(neon_map_path);
 
-			augs::create_binary_file(neon_map_stamp_filename, new_stamp_stream);
+			augs::create_binary_file(neon_map_stamp_path, new_stamp_stream);
 		}
 
 		// skip parameters line

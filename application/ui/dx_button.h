@@ -5,7 +5,7 @@
 
 #include "augs/padding_byte.h"
 
-#include "game/assets/texture_id.h"
+#include "game/assets/game_image_id.h"
 
 #include "augs/gui/button_corners.h"
 #include "application/ui/appearing_text.h"
@@ -99,13 +99,13 @@ public:
 		inside_col *= this_id->colorize;
 		border_col *= this_id->colorize;
 
-		const auto inside_mat = augs::gui::material(assets::texture_id::MENU_BUTTON_INSIDE, inside_col);
+		const auto inside_mat = augs::gui::material(assets::game_image_id::MENU_BUTTON_INSIDE, inside_col);
 
 		const bool flip = this_id->corners.flip_horizontally;
 		const auto internal_rc = this_id->corners.cornered_rc_to_internal_rc(this_tree_entry.get_absolute_rect());
 
 		{
-			this_id->corners.for_each_button_corner(internal_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
+			this_id->corners.for_each_button_corner(internal_rc, [&](const button_corner_type type, const assets::game_image_id id, const ltrb drawn_rc) {
 				const auto col = is_button_border(type) ? border_col : inside_col;
 				augs::gui::draw_clipped_rect(augs::gui::material(id, col), drawn_rc, {}, in.v, flip);
 			});
@@ -117,7 +117,7 @@ public:
 					const auto distance = 4.f;
 					hover_effect_rc.expand_from_center(vec2(distance, distance));
 
-					this_id->corners.for_each_button_corner(hover_effect_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
+					this_id->corners.for_each_button_corner(hover_effect_rc, [&](const button_corner_type type, const assets::game_image_id id, const ltrb drawn_rc) {
 						if (is_button_border(type)) {
 							augs::gui::draw_clipped_rect(augs::gui::material(id, this_id->colorize), drawn_rc, {}, in.v, flip);
 						}
@@ -130,7 +130,7 @@ public:
 					const auto distance = (1.f - std::min(max_duration, this_id->elapsed_hover_time_ms) / max_duration) * max_distance;
 					hover_effect_rc.expand_from_center(vec2(distance, distance));
 
-					this_id->corners.for_each_button_corner(hover_effect_rc, [&](const button_corner_type type, const assets::texture_id id, const ltrb drawn_rc) {
+					this_id->corners.for_each_button_corner(hover_effect_rc, [&](const button_corner_type type, const assets::game_image_id id, const ltrb drawn_rc) {
 						if (is_button_corner(type) && is_button_border(type)) {
 							augs::gui::draw_clipped_rect(augs::gui::material(id, this_id->colorize), drawn_rc, {}, in.v, flip);
 						}

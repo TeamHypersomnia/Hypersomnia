@@ -345,7 +345,7 @@ std::wstring viewing_session::summary() const {
 
 void viewing_session::draw_color_overlay(augs::renderer& renderer, const rgba col) const {
 	components::sprite overlay;
-	overlay.set(assets::texture_id::BLANK, col);
+	overlay.set(assets::game_image_id::BLANK, col);
 	overlay.size = camera.smoothed_camera.visible_world_area;
 
 	components::sprite::drawing_input in(renderer.get_triangle_buffer());
