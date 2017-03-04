@@ -10,6 +10,8 @@
 
 #include "augs/image/image.h"
 
+#define PIXEL_NONE rgba(0,0,0,0)
+
 namespace fs = std::experimental::filesystem;
 
 void make_neon(
@@ -164,7 +166,7 @@ void make_neon(
 				size_t alpha = static_cast<size_t>(255 * kernel[y][x] * stamp.amplification);
 				alpha = alpha > 255 ? 255 : alpha;
 
-				if (current_pixel_rgba == rgba{ 0, 0, 0, 0 } && alpha) {
+				if (current_pixel_rgba == PIXEL_NONE && alpha) {
 					current_pixel[2] = center_pixel[2];
 					current_pixel[1] = center_pixel[1];
 					current_pixel[0] = center_pixel[0];
@@ -249,6 +251,23 @@ void resize_image(
 	size.x = image_to_resize.get_columns() + size.x * 2;
 	size.y = image_to_resize.get_rows() + size.y * 2;
 
+	for (size_t y = 0; y < image_to_resize.get_rows(); ++y) {
+		bool pixel_found = false;
+		for (size_t x = 0; x < image_to_resize.get_columns(); ++x) {
+			if (image_to_resize.pixel({ x, y }) != PIXEL_NONE) {
+				pixel_found = true;
+				break;
+			}
+		}
+		if (!pixel_found && size.x > image_to_resize.get_columns()) {
+			size.x -= 2;
+		}
+		if (image_to_resize.pixel({ 0, y }) == PIXEL_NONE && image_to_resize.pixel({ image_to_resize.get_columns() - 1, y }) == PIXEL_NONE
+			&& size.y > image_to_resize.get_rows()) {
+			size.y -= 2;
+		}
+	}
+
 	augs::image copy_mat;
 	copy_mat.create(size);
 
@@ -290,7 +309,7 @@ std::vector<vec2u> hide_undesired_pixels(
 
 			if (found == color_whitelist.end())
 			{
-				pixel = { 0,0,0,0 };
+				pixel = PIXEL_NONE;
 			}
 			else {
 				result.push_back(vec2u{ x, y });
