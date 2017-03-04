@@ -15,6 +15,14 @@ struct atlases_regeneration_input {
 	std::vector<source_image_loading_input> images;
 };
 
+typedef std::chrono::system_clock::time_point texture_atlas_image_stamp;
+typedef std::chrono::system_clock::time_point texture_atlas_font_stamp;
+
+struct texture_atlas_stamp {
+	std::unordered_map<source_image_identifier, texture_atlas_image_stamp> image_stamps;
+	std::unordered_map<source_font_identifier, texture_atlas_font_stamp> font_stamps;
+};
+
 struct texture_atlas_metadata {
 	vec2u atlas_image_size;
 
@@ -26,14 +34,6 @@ struct atlases_regeneration_output {
 	std::vector<std::pair<assets::physical_texture_id, texture_atlas_metadata>> metadatas;
 };
 
-typedef std::chrono::system_clock::time_point texture_atlas_image_stamp;
-typedef std::chrono::system_clock::time_point texture_atlas_font_stamp;
-
-struct texture_atlas_stamp {
-	std::unordered_map<source_image_identifier, texture_atlas_image_stamp> image_stamps;
-	std::unordered_map<source_font_identifier, texture_atlas_font_stamp> font_stamps;
-};
-
 atlases_regeneration_output regenerate_atlases(
 	const atlases_regeneration_input&,
 	const bool always_check_source_images_integrity,
@@ -41,34 +41,27 @@ atlases_regeneration_output regenerate_atlases(
 );
 
 namespace augs {
-	template <class A>
-	bool read_object(A& ar, texture_atlas_metadata& data) {
+	template <bool C, class F>
+	auto introspect(
+		maybe_const_ref_t<C, texture_atlas_stamp> data,
+		F f
+	) {
 		return
-			read_object(ar, data.atlas_image_size)
-			&& read_object(ar, data.images)
-			&& read_object(ar, data.fonts)
-			;
-	}
-
-	template <class A>
-	void write_object(A& ar, const texture_atlas_metadata& data) {
-		write_object(ar, data.atlas_image_size);
-		write_object(ar, data.images);
-		write_object(ar, data.fonts);
-	}
-
-	template <class A>
-	bool read_object(A& ar, texture_atlas_stamp& data) {
-		return
-			read_object(ar, data.image_stamps)
-			&& read_object(ar, data.font_stamps)
+			f(data.image_stamps)
+			&& f(data.font_stamps)
 		;
 	}
 
-	template <class A>
-	void write_object(A& ar, const texture_atlas_stamp& data) {
-		write_object(ar, data.image_stamps);
-		write_object(ar, data.font_stamps);
+	template <bool C, class F>
+	auto introspect(
+		maybe_const_ref_t<C, texture_atlas_metadata> data,
+		F f
+	) {
+		return
+			f(data.atlas_image_size)
+			&& f(data.images)
+			&& f(data.fonts)
+		;
 	}
 }
 

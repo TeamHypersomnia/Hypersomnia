@@ -9,16 +9,17 @@ struct scripted_image_stamp {
 };
 
 namespace augs {
-	template <class A>
-	bool read_object(A& ar, scripted_image_stamp& data) {
+	template <
+		bool C,
+		class F
+	>
+	auto introspect(
+		maybe_const_ref_t<C, scripted_image_stamp> data,
+		F f
+	) {
 		return
-			read_object(ar, data.commands)
-			;
-	}
-
-	template <class A>
-	void write_object(A& ar, const scripted_image_stamp& data) {
-		write_object(ar, data.commands);
+			f(data.commands)
+		;
 	}
 }
 
