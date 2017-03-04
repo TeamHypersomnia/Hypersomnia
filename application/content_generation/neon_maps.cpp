@@ -15,9 +15,24 @@
 namespace fs = std::experimental::filesystem;
 
 void make_neon(
-	const neon_map_stamp& stamp, 
+	const neon_map_stamp& stamp,
 	augs::image& source
 );
+
+std::vector<std::vector<double>> generate_gauss_kernel(
+	const neon_map_stamp& stamp
+);
+
+std::vector<vec2u> hide_undesired_pixels(
+	augs::image& original_image,
+	const std::vector<rgba>& color_whitelist);
+
+void resize_image(
+	augs::image& image_to_resize,
+	const vec2u size
+);
+
+void cut_empty_edges(augs::image& source);
 
 void regenerate_neon_maps(
 	const bool force_regenerate
@@ -53,15 +68,15 @@ void regenerate_neon_maps(
 
 		// skip "parameters:" line
 		++current_line;
-		
+
 		std::istringstream in(lines[current_line]);
-		
-		in 
-			>> new_stamp.standard_deviation 
-			>> new_stamp.radius_towards_x_axis 
-			>> new_stamp.radius_towards_y_axis 
+
+		in
+			>> new_stamp.standard_deviation
+			>> new_stamp.radius_towards_x_axis
+			>> new_stamp.radius_towards_y_axis
 			>> new_stamp.amplification
-		;
+			;
 
 		const auto neon_map_path = neon_directory + source_path.filename().string();
 		const auto neon_map_stamp_path = neon_directory + source_path.filename().replace_extension(".stamp").string();
@@ -95,7 +110,7 @@ void regenerate_neon_maps(
 
 			augs::image source_image;
 			source_image.from_file(source_path.string());
-			
+
 			make_neon(new_stamp, source_image);
 
 			source_image.save(neon_map_path);
@@ -111,30 +126,19 @@ void regenerate_neon_maps(
 	}
 }
 
-std::vector<std::vector<double>> generate_gauss_kernel(
-	const neon_map_stamp& stamp
-);
-
-std::vector<vec2u> hide_undesired_pixels(
-	augs::image& original_image, 
-	const std::vector<rgba>& color_whitelist);
-
-void resize_image(
-	augs::image& image_to_resize,
-	const vec2u size
-);
-
 void make_neon(
-	const neon_map_stamp& stamp, 
+	const neon_map_stamp& stamp,
 	augs::image& source
 ) {
+
 	resize_image(source, vec2u(stamp.radius_towards_x_axis, stamp.radius_towards_y_axis));
 
 	const auto pixel_list = hide_undesired_pixels(source, stamp.light_colors);
+
 	const auto kernel = generate_gauss_kernel(stamp);
 
 	std::vector<rgba> pixel_colors;
-	
+
 	for (const auto& pixel : pixel_list) {
 		pixel_colors.push_back(source.pixel({ pixel.x, pixel.y }));
 	}
@@ -144,19 +148,19 @@ void make_neon(
 	for (auto& pixel : pixel_list) {
 		rgba center_pixel = pixel_colors[i];
 		++i;
-		
+
 		const auto center_pixel_rgba = rgba{ center_pixel[2], center_pixel[1], center_pixel[0], center_pixel[3] };
-		
+
 		for (size_t y = 0; y < kernel.size(); ++y) {
 			for (size_t x = 0; x < kernel[y].size(); ++x) {
 				size_t current_index_y = pixel.y + y - stamp.radius_towards_y_axis / 2;
-				
+
 				if (current_index_y < 0 || current_index_y >= source.get_rows()) {
 					continue;
 				}
 
 				size_t current_index_x = pixel.x + x - stamp.radius_towards_x_axis / 2;
-				
+
 				if (current_index_x < 0 || current_index_x >= source.get_columns()) {
 					continue;
 				}
@@ -184,6 +188,8 @@ void make_neon(
 			}
 		}
 	}
+
+	cut_empty_edges(source);
 }
 
 std::vector<std::vector<double>> generate_gauss_kernel(const neon_map_stamp& stamp)
@@ -244,41 +250,24 @@ std::vector<std::vector<double>> generate_gauss_kernel(const neon_map_stamp& sta
 
 
 void resize_image(
-	augs::image& image_to_resize, 
+	augs::image& image_to_resize,
 	vec2u size
 ) {
 
 	size.x = image_to_resize.get_columns() + size.x * 2;
 	size.y = image_to_resize.get_rows() + size.y * 2;
 
-	for (size_t y = 0; y < image_to_resize.get_rows(); ++y) {
-		bool pixel_found = false;
-		for (size_t x = 0; x < image_to_resize.get_columns(); ++x) {
-			if (image_to_resize.pixel({ x, y }) != PIXEL_NONE) {
-				pixel_found = true;
-				break;
-			}
-		}
-		if (!pixel_found && size.x > image_to_resize.get_columns()) {
-			size.x -= 2;
-		}
-		if (image_to_resize.pixel({ 0, y }) == PIXEL_NONE && image_to_resize.pixel({ image_to_resize.get_columns() - 1, y }) == PIXEL_NONE
-			&& size.y > image_to_resize.get_rows()) {
-			size.y -= 2;
-		}
-	}
-
 	augs::image copy_mat;
 	copy_mat.create(size);
 
 	auto offset_x = static_cast<int>(size.x - image_to_resize.get_columns()) / 2;
-	
+
 	if (offset_x < 0) {
 		offset_x = 0;
 	}
 
 	auto offset_y = static_cast<int>(size.y - image_to_resize.get_rows()) / 2;
-	
+
 	if (offset_y < 0) {
 		offset_y = 0;
 	}
@@ -294,7 +283,7 @@ void resize_image(
 }
 
 std::vector<vec2u> hide_undesired_pixels(
-	augs::image& original_image, 
+	augs::image& original_image,
 	const std::vector<rgba>& color_whitelist
 ) {
 	std::vector<vec2u> result;
@@ -318,4 +307,55 @@ std::vector<vec2u> hide_undesired_pixels(
 	}
 
 	return result;
+}
+
+void cut_empty_edges(augs::image& source) {
+	vec2u output_size = source.get_size();
+	vec2u offset = { 0,0 };
+	for (size_t y = 0; y < source.get_rows() / 2; ++y) {
+		bool pixel_found = false;
+		for (size_t x = 0; x < source.get_columns(); ++x) {
+			if (source.pixel({ x, y }) != PIXEL_NONE || source.pixel({ x, source.get_rows() - y - 1 }) != PIXEL_NONE) {
+				pixel_found = true;
+				break;
+			}
+		}
+		if (!pixel_found) {
+			output_size.y -= 2;
+			++offset.y;
+		}
+		else
+			break;
+	}
+
+	for (size_t x = 0; x < source.get_columns() / 2; ++x) {
+		bool pixel_found = false;
+		for (size_t y = 0; y < source.get_rows(); ++y) {
+			if (source.pixel({ x, y }) != PIXEL_NONE || source.pixel({ source.get_columns() - x - 1, y }) != PIXEL_NONE) {
+				pixel_found = true;
+				break;
+			}
+		}
+		if (!pixel_found) {
+			output_size.x -= 2;
+			++offset.x;
+		}
+		else
+			break;
+	}
+
+	if (offset == vec2u(0, 0) || output_size.x == 0 || output_size.y == 0) {
+		return;
+	}
+
+	augs::image copy;
+	copy.create(output_size);
+
+	for (size_t x = 0; x < copy.get_columns(); ++x) {
+		for (size_t y = 0; y < copy.get_rows(); ++y) {
+			copy.pixel({ x,y }) = source.pixel({ x + offset.x, y + offset.y });
+		}
+	}
+
+	source = copy;
 }
