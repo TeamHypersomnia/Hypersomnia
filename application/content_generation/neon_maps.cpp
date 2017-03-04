@@ -65,7 +65,7 @@ void regenerate_neon_maps() {
 		augs::stream new_stamp_stream;
 		augs::write_object(new_stamp_stream, new_stamp);
 
-		bool should_regenerate = false;
+		bool should_regenerate = true;
 
 		if (!augs::file_exists(neon_map_path)) {
 			should_regenerate = true;
@@ -124,8 +124,7 @@ void make_neon(
 	const neon_map_stamp& stamp, 
 	augs::image& source
 ) {
-	if (stamp.radius_towards_x_axis > source.get_columns() || stamp.radius_towards_y_axis > source.get_rows())
-		resize_image(source, vec2u(stamp.radius_towards_x_axis, stamp.radius_towards_y_axis));
+	resize_image(source, vec2u(stamp.radius_towards_x_axis, stamp.radius_towards_y_axis));
 
 	const auto pixel_list = hide_undesired_pixels(source, stamp.light_colors);
 
@@ -218,10 +217,8 @@ std::vector<std::vector<double>> generate_gauss_kernel(const neon_map_stamp& sta
 
 void resize_image(augs::image& image_to_resize, vec2u size) {
 
-	if (size.x < image_to_resize.get_columns())
-		size.x = image_to_resize.get_columns();
-	if (size.y < image_to_resize.get_rows())
-		size.y = image_to_resize.get_rows();
+	size.x = image_to_resize.get_columns() + size.x * 2;
+	size.y = image_to_resize.get_rows() + size.y * 2;
 
 	augs::image copy_mat;
 	copy_mat.create(size);
