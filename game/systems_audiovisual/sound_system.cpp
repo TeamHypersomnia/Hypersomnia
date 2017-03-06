@@ -52,9 +52,6 @@ void sound_system::play_nearby_sound_existences(
 	auto queried_size = cone.visible_world_area;
 	queried_size.set(10000.f, 10000.f);
 
-	const auto targets =
-		cosmos.get(processing_subjects::WITH_SOUND_EXISTENCE);
-
 		//cosmos[cosmos.systems_temporary.get<dynamic_tree_system>()
 		//.determine_visible_entities_from_camera(cone, components::dynamic_tree_node::tree_type::SOUND_EXISTENCES)];
 
@@ -67,53 +64,56 @@ void sound_system::play_nearby_sound_existences(
 	augs::set_listener_velocity(si, subject.get_effective_velocity());
 	augs::set_listener_orientation({ 0.f, -1.f, 0.f, 0.f, 0.f, -1.f });
 
-	for (const auto it : targets) {
-		auto& cache = get_cache(it);
-		const auto& existence = it.get<components::sound_existence>();
-		auto& source = cache.source;
+	cosmos.for_each(
+		processing_subjects::WITH_SOUND_EXISTENCE, 
+		[&](const auto it) {
+			auto& cache = get_cache(it);
+			const auto& existence = it.get<components::sound_existence>();
+			auto& source = cache.source;
 
-		const auto& buffer = get_resource_manager().find(existence.input.effect)->get_variation(existence.input.variation_number);
+			const auto& buffer = get_resource_manager().find(existence.input.effect)->get_variation(existence.input.variation_number);
 
-		const auto& requested_buf = existence.input.direct_listener == listening_character ? buffer.request_stereo() : buffer.request_mono();
+			const auto& requested_buf = existence.input.direct_listener == listening_character ? buffer.request_stereo() : buffer.request_mono();
 
-		if (
-			cache.recorded_component.time_of_birth != existence.time_of_birth
-			|| cache.recorded_component.input.effect != existence.input.effect
-			|| &requested_buf != source.get_bound_buffer()
-		) {
-			if (source.is_playing() && cache.recorded_component.input.modifier.fade_on_exit) {
-				fading_sources.emplace_back(std::move(source));
+			if (
+				cache.recorded_component.time_of_birth != existence.time_of_birth
+				|| cache.recorded_component.input.effect != existence.input.effect
+				|| &requested_buf != source.get_bound_buffer()
+			) {
+				if (source.is_playing() && cache.recorded_component.input.modifier.fade_on_exit) {
+					fading_sources.emplace_back(std::move(source));
 
-				source = augs::sound_source();
+					source = augs::sound_source();
+				}
+
+				if (listening_character == existence.input.direct_listener) {
+					source.bind_buffer(buffer.request_stereo());
+					source.set_direct_channels(true);
+				}
+				else {
+					source.bind_buffer(buffer.request_mono());
+					source.set_direct_channels(false);
+				}
+
+				source.play();
+				source.set_max_distance(si, existence.input.modifier.max_distance);
+				source.set_reference_distance(si, existence.input.modifier.reference_distance);
+				source.set_looping(existence.input.modifier.repetitions == -1);
+
+				cache.recorded_component = existence;
 			}
 
-			if (listening_character == existence.input.direct_listener) {
-				source.bind_buffer(buffer.request_stereo());
-				source.set_direct_channels(true);
-			}
-			else {
-				source.bind_buffer(buffer.request_mono());
-				source.set_direct_channels(false);
-			}
+			const auto source_pos = it.get_viewing_transform(sys).pos;
+			const auto dist_from_listener = (listener_pos - source_pos).length();
+			const float absorption = std::min(10.f, pow(std::max(0.f, dist_from_listener - 2220.f)/520.f, 2));
 
-			source.play();
-			source.set_max_distance(si, existence.input.modifier.max_distance);
-			source.set_reference_distance(si, existence.input.modifier.reference_distance);
-			source.set_looping(existence.input.modifier.repetitions == -1);
-
-			cache.recorded_component = existence;
+			source.set_air_absorption_factor(absorption);
+			source.set_pitch(existence.input.modifier.pitch);
+			source.set_gain(existence.input.modifier.gain * master_gain);
+			source.set_position(si, source_pos);
+			source.set_velocity(si, it.get_effective_velocity());
 		}
-
-		const auto source_pos = it.get_viewing_transform(sys).pos;
-		const auto dist_from_listener = (listener_pos - source_pos).length();
-		const float absorption = std::min(10.f, pow(std::max(0.f, dist_from_listener - 2220.f)/520.f, 2));
-
-		source.set_air_absorption_factor(absorption);
-		source.set_pitch(existence.input.modifier.pitch);
-		source.set_gain(existence.input.modifier.gain * master_gain);
-		source.set_position(si, source_pos);
-		source.set_velocity(si, it.get_effective_velocity());
-	}
+	);
 
 	erase_remove(fading_sources, [dt](augs::sound_source& source) {
 		const auto new_gain = source.get_gain() - dt.in_seconds()*3.f;

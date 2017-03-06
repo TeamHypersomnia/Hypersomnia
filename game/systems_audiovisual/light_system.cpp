@@ -27,23 +27,26 @@ void light_system::advance_attenuation_variations(
 	const cosmos& cosmos,
 	const augs::delta dt
 ) {
-	for (const auto it : cosmos.get(processing_subjects::WITH_LIGHT)) {
-		const auto& light = it.get<components::light>();
-		auto& cache = per_entity_cache[it.get_id().pool.indirection_index];
+	cosmos.for_each(
+		processing_subjects::WITH_LIGHT,
+		[&](const auto it) {
+			const auto& light = it.get<components::light>();
+			auto& cache = per_entity_cache[it.get_id().pool.indirection_index];
 
-		const auto delta = dt.in_seconds();
+			const auto delta = dt.in_seconds();
 
-		light.constant.variation.update_value(rng, cache.all_variation_values[0], delta);
-		light.linear.variation.update_value(rng, cache.all_variation_values[1], delta);
-		light.quadratic.variation.update_value(rng, cache.all_variation_values[2], delta);
+			light.constant.variation.update_value(rng, cache.all_variation_values[0], delta);
+			light.linear.variation.update_value(rng, cache.all_variation_values[1], delta);
+			light.quadratic.variation.update_value(rng, cache.all_variation_values[2], delta);
 
-		light.wall_constant.variation.update_value(rng, cache.all_variation_values[3], delta);
-		light.wall_linear.variation.update_value(rng, cache.all_variation_values[4], delta);
-		light.wall_quadratic.variation.update_value(rng, cache.all_variation_values[5], delta);
+			light.wall_constant.variation.update_value(rng, cache.all_variation_values[3], delta);
+			light.wall_linear.variation.update_value(rng, cache.all_variation_values[4], delta);
+			light.wall_quadratic.variation.update_value(rng, cache.all_variation_values[5], delta);
 
-		light.position_variations[0].update_value(rng, cache.all_variation_values[6], delta);
-		light.position_variations[1].update_value(rng, cache.all_variation_values[7], delta);
-	}
+			light.position_variations[0].update_value(rng, cache.all_variation_values[6], delta);
+			light.position_variations[1].update_value(rng, cache.all_variation_values[7], delta);
+		}
+	);
 }
 
 void light_system::render_all_lights(
@@ -81,19 +84,22 @@ void light_system::render_all_lights(
 
 	glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, projection_matrix.data());
 
-	for (const auto light_entity : cosmos.get(processing_subjects::WITH_LIGHT)) {
-		const auto& cache = per_entity_cache[light_entity.get_id().pool.indirection_index];
-		const auto light_displacement = vec2(cache.all_variation_values[6], cache.all_variation_values[7]);
+	cosmos.for_each(
+		processing_subjects::WITH_LIGHT,
+		[&](const auto light_entity) {
+			const auto& cache = per_entity_cache[light_entity.get_id().pool.indirection_index];
+			const auto light_displacement = vec2(cache.all_variation_values[6], cache.all_variation_values[7]);
 
-		messages::visibility_information_request request;
-		request.eye_transform = light_entity.get_viewing_transform(interp);
-		request.eye_transform.pos += light_displacement;
-		request.filter = filters::line_of_sight_query();
-		request.square_side = light_entity.get<components::light>().max_distance.base_value;
-		request.subject = light_entity;
+			messages::visibility_information_request request;
+			request.eye_transform = light_entity.get_viewing_transform(interp);
+			request.eye_transform.pos += light_displacement;
+			request.filter = filters::line_of_sight_query();
+			request.square_side = light_entity.get<components::light>().max_distance.base_value;
+			request.subject = light_entity;
 
-		requests.push_back(request);
-	}
+			requests.push_back(request);
+		}
+	);
 
 	{
 		std::vector<messages::line_of_sight_response> dummy;

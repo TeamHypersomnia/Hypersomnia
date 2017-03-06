@@ -51,10 +51,6 @@ void processing_lists_system::reserve_caches_for_entities(size_t n) {
 	per_entity_cache.resize(n);
 }
 
-std::vector<entity_handle> processing_lists_system::get(const processing_subjects list, cosmos& cosmos) const {
-	return cosmos[lists.at(list)];
-}
-
-std::vector<const_entity_handle> processing_lists_system::get(const processing_subjects list, const cosmos& cosmos) const {
-	return cosmos[lists.at(list)];
+const std::vector<entity_id>& processing_lists_system::get(const processing_subjects list) const {
+	return lists.at(list);
 }

@@ -70,7 +70,7 @@ config_table = {
 	check_content_integrity_every_launch = 1,
 
 	-- 1 - more hdd space required, but launching the game is way faster
-	save_regenerated_atlases_as_binary = 0,
+	save_regenerated_atlases_as_binary = 1,
 
 	-- 1 always regenerates the entire content. only for debugging pruposes - the game will take a lot longer to launch every time.
 	debug_regenerate_content_every_launch = 0,

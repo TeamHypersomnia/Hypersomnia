@@ -76,38 +76,39 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 		therefore we use get instead of find
 	*/
 
-	const auto targets_copy = cosmos.get(processing_subjects::WITH_MELEE);
+	cosmos.for_each(
+		processing_subjects::WITH_MELEE, 
+		[&](const auto t) {
+			auto& melee = t.get<components::melee>();
+			auto& damage = t.get<components::damage>();
 
-	for (const auto& t : targets_copy) {
-		auto& melee = t.get<components::melee>();
-		auto& damage = t.get<components::damage>();
+			//		 LOG("P: %x, S: %x, T: %x CDT: %x MVT: %x STATE: %x", melee.primary_move_flag, melee.secondary_move_flag, melee.tertiary_move_flag,melee.swing_current_cooldown_time,melee.swing_current_time,melee.state);
 
-		//		 LOG("P: %x, S: %x, T: %x CDT: %x MVT: %x STATE: %x", melee.primary_move_flag, melee.secondary_move_flag, melee.tertiary_move_flag,melee.swing_current_cooldown_time,melee.swing_current_time,melee.state);
-
-		switch (melee.current_state) {
-		case melee_state::FREE:
-			if (melee.primary_move_flag) {
-				melee.current_state = primary_action(step, dt, t, melee, damage);
+			switch (melee.current_state) {
+			case melee_state::FREE:
+				if (melee.primary_move_flag) {
+					melee.current_state = primary_action(step, dt, t, melee, damage);
+				}
+				/* send a response message so that the rest of the game knows that a swing has occured;
+				the message could be read by particles system, audio system and possibly animation system
+				to apply each their own effects.
+				*/
+				break;
+			case melee_state::ONCOOLDOWN:
+				melee.swing_current_cooldown_time += dt;
+				if (melee.swing_current_cooldown_time >= melee.swings[0].cooldown_ms) {
+					melee.swing_current_cooldown_time = 0;
+					melee.current_state = melee_state::FREE;
+				}
+				break;
+			case melee_state::PRIMARY:
+				melee.current_state = primary_action(step,dt,t,melee,damage);
+				break;
+			 default:
+				LOG("Uknown action in melee_system.cpp");
 			}
-			/* send a response message so that the rest of the game knows that a swing has occured;
-			the message could be read by particles system, audio system and possibly animation system
-			to apply each their own effects.
-			*/
-			break;
-		case melee_state::ONCOOLDOWN:
-			melee.swing_current_cooldown_time += dt;
-			if (melee.swing_current_cooldown_time >= melee.swings[0].cooldown_ms) {
-				melee.swing_current_cooldown_time = 0;
-				melee.current_state = melee_state::FREE;
-			}
-			break;
-		case melee_state::PRIMARY:
-			melee.current_state = primary_action(step,dt,t,melee,damage);
-			break;
-		 default:
-			LOG("Uknown action in melee_system.cpp");
 		}
-	}
+	);
 }
 
 melee_state melee_system::primary_action(const logic_step step, const double dt_d, const entity_handle target, components::melee& melee_component, components::damage& damage)

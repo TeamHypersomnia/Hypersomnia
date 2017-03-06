@@ -30,6 +30,5 @@ class processing_lists_system {
 public:
 	processing_lists_system();
 
-	std::vector<entity_handle> get(const processing_subjects, cosmos&) const;
-	std::vector<const_entity_handle> get(const processing_subjects, const cosmos&) const;
+	const std::vector<entity_id>& get(const processing_subjects) const;
 };

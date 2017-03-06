@@ -16,15 +16,18 @@
 void components::crosshair::update_bounds() {
 	max_look_expand = visible_world_area / 2;
 
-	if (orbit_mode == ANGLED)
+	if (orbit_mode == ANGLED) {
 		bounds_for_base_offset = visible_world_area / 2.f;
-	if (orbit_mode == LOOK)
+	}
+
+	else if (orbit_mode == LOOK) {
 		bounds_for_base_offset = max_look_expand + visible_world_area / 2;
+	}
 }
 
 void crosshair_system::generate_crosshair_intents(const logic_step step) {
 	auto& cosmos = step.cosm;
-	const auto& delta = step.get_delta();
+	const auto delta = step.get_delta();
 	step.transient.messages.get_queue<messages::crosshair_intent_message>().clear();
 	const auto& events = step.transient.messages.get_queue<messages::intent_message>();
 
@@ -84,14 +87,17 @@ void crosshair_system::apply_base_offsets_to_crosshair_transforms(const logic_st
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
 	
-	for (const auto it : cosmos.get(processing_subjects::WITH_CROSSHAIR)) {
-		const auto player_id = cosmos[it.get<components::crosshair>().character_entity_to_chase];
+	cosmos.for_each(
+		processing_subjects::WITH_CROSSHAIR,
+		[&](const auto it) {
+			const auto player_id = cosmos[it.get<components::crosshair>().character_entity_to_chase];
 
-		if (player_id.alive()) {
-			const vec2 aiming_displacement = components::crosshair::calculate_aiming_displacement(it, true);
-			const vec2 player_center = position(player_id);
+			if (player_id.alive()) {
+				const vec2 aiming_displacement = components::crosshair::calculate_aiming_displacement(it, true);
+				const vec2 player_center = position(player_id);
 
-			it.get<components::transform>().pos = aiming_displacement + player_center;
+				it.get<components::transform>().pos = aiming_displacement + player_center;
+			}
 		}
-	}
+	);
 }

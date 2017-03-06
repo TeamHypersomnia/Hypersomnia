@@ -124,49 +124,52 @@ void damage_system::destroy_outdated_bullets(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
 
-	for (const auto& it : cosmos.get(processing_subjects::WITH_DAMAGE)) {
-		auto& damage = it.get<components::damage>();
-	
-		if ((damage.constrain_lifetime && damage.lifetime_ms >= damage.max_lifetime_ms) ||
-			(damage.constrain_distance && damage.distance_travelled >= damage.max_distance)) {
-			damage.saved_point_of_impact_before_death = position(it);
-			step.transient.messages.post(messages::queue_destruction(it));
-		}
+	cosmos.for_each(
+		processing_subjects::WITH_DAMAGE,
+		[&](const auto it) {
+			auto& damage = it.get<components::damage>();
+		
+			if ((damage.constrain_lifetime && damage.lifetime_ms >= damage.max_lifetime_ms) ||
+				(damage.constrain_distance && damage.distance_travelled >= damage.max_distance)) {
+				damage.saved_point_of_impact_before_death = position(it);
+				step.transient.messages.post(messages::queue_destruction(it));
+			}
 
-		if (damage.constrain_distance) {
-			damage.distance_travelled += speed(it);
-		}
+			if (damage.constrain_distance) {
+				damage.distance_travelled += speed(it);
+			}
 
-		if (damage.constrain_lifetime) {
-			damage.lifetime_ms += static_cast<float>(delta.in_milliseconds());
-		}
+			if (damage.constrain_lifetime) {
+				damage.lifetime_ms += static_cast<float>(delta.in_milliseconds());
+			}
 
-		if (damage.homing_towards_hostile_strength > 0.f) {
-			const auto sender_capability = cosmos[damage.sender].get_owning_transfer_capability();
-			const auto sender_attitude = sender_capability.alive() && sender_capability.has<components::attitude>() ? sender_capability : cosmos[entity_id()];
+			if (damage.homing_towards_hostile_strength > 0.f) {
+				const auto sender_capability = cosmos[damage.sender].get_owning_transfer_capability();
+				const auto sender_attitude = sender_capability.alive() && sender_capability.has<components::attitude>() ? sender_capability : cosmos[entity_id()];
 
-			const auto particular_homing_target = cosmos[damage.particular_homing_target];
-			
-			const auto closest_hostile = 
-				particular_homing_target.alive() ? particular_homing_target : cosmos[get_closest_hostile(it, sender_attitude, 250, filters::bullet())];
+				const auto particular_homing_target = cosmos[damage.particular_homing_target];
+				
+				const auto closest_hostile = 
+					particular_homing_target.alive() ? particular_homing_target : cosmos[get_closest_hostile(it, sender_attitude, 250, filters::bullet())];
 
-			const auto current_velocity = it.get<components::physics>().velocity();
+				const auto current_velocity = it.get<components::physics>().velocity();
 
-			it.set_logic_transform({ it.get_logic_transform().pos, current_velocity.degrees() });
+				it.set_logic_transform({ it.get_logic_transform().pos, current_velocity.degrees() });
 
-			if (closest_hostile.alive()) {
-				vec2 dirs[] = { current_velocity.perpendicular_cw(), -current_velocity.perpendicular_cw() };
+				if (closest_hostile.alive()) {
+					vec2 dirs[] = { current_velocity.perpendicular_cw(), -current_velocity.perpendicular_cw() };
 
-				auto homing_vector = closest_hostile.get_logic_transform().pos - it.get_logic_transform().pos;
+					auto homing_vector = closest_hostile.get_logic_transform().pos - it.get_logic_transform().pos;
 
-				if (dirs[0].radians_between(homing_vector) > dirs[1].radians_between(homing_vector)) {
-					std::swap(dirs[0], dirs[1]);
+					if (dirs[0].radians_between(homing_vector) > dirs[1].radians_between(homing_vector)) {
+						std::swap(dirs[0], dirs[1]);
+					}
+
+					it.get<components::physics>().apply_force(
+						dirs[0].set_length(homing_vector.length()) * damage.homing_towards_hostile_strength
+					);
 				}
-
-				it.get<components::physics>().apply_force(
-					dirs[0].set_length(homing_vector.length()) * damage.homing_towards_hostile_strength
-				);
 			}
 		}
-	}
+	);
 }

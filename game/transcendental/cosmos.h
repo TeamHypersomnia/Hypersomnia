@@ -204,8 +204,46 @@ public:
 	randomization get_rng_for(const entity_id) const;
 	size_t get_rng_seed_for(const entity_id) const;
 
-	std::vector<entity_handle> get(const processing_subjects);
-	std::vector<const_entity_handle> get(const processing_subjects) const;
+	template <class F>
+	decltype(auto) operator()(const entity_id subject, F callback) {
+		callback(get_handle(subject));
+	}
+
+	template <class F>
+	decltype(auto) operator()(const entity_id subject, F callback) const {
+		callback(get_handle(subject));
+	}
+
+	size_t get_count_of(const processing_subjects list_type) const {
+		return systems_temporary.get<processing_lists_system>().get(list_type).size();
+	}
+
+	template <class F>
+	void for_each(
+		const processing_subjects list_type, 
+		F callback,
+		const bool is_copy_of_targets_necessary = false
+	) {
+		if (is_copy_of_targets_necessary) {
+			const auto targets = systems_temporary.get<processing_lists_system>().get(list_type);
+
+			for (const auto& subject : targets) {
+				operator()(subject, callback);
+			}
+		}
+		else {
+			for (const auto& subject : systems_temporary.get<processing_lists_system>().get(list_type)) {
+				operator()(subject, callback);
+			}
+		}
+	}
+
+	template <class F>
+	void for_each(const processing_subjects list_type, F callback) const {
+		for (const auto& subject : systems_temporary.get<processing_lists_system>().get(list_type)) {
+			operator()(subject, callback);
+		}
+	}
 
 	const spell_data& get(const spell_type) const;
 	

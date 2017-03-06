@@ -67,18 +67,21 @@ void trigger_detector_system::consume_trigger_detector_presses(const logic_step 
 void trigger_detector_system::post_trigger_requests_from_continuous_detectors(const logic_step step) const {
 	auto& cosmos = step.cosm;
 	const auto delta = step.get_delta();
-	auto targets_copy = cosmos.get(processing_subjects::WITH_TRIGGER_QUERY_DETECTOR);
 
-	for (auto& t : targets_copy) {
-		if (!t.get<components::trigger_query_detector>().detection_intent_enabled) {
-			t.get<components::processing>().disable_in(processing_subjects::WITH_TRIGGER_QUERY_DETECTOR);
-		}
-		else {
-			messages::trigger_hit_request_message request;
-			request.detector = t;
-			step.transient.messages.post(request);
-		}
-	}
+	cosmos.for_each(
+		processing_subjects::WITH_TRIGGER_QUERY_DETECTOR,
+		[&](const auto t) {
+			if (!t.get<components::trigger_query_detector>().detection_intent_enabled) {
+				t.get<components::processing>().disable_in(processing_subjects::WITH_TRIGGER_QUERY_DETECTOR);
+			}
+			else {
+				messages::trigger_hit_request_message request;
+				request.detector = t;
+				step.transient.messages.post(request);
+			}
+		},
+		true
+	);
 }
 
 void trigger_detector_system::send_trigger_confirmations(const logic_step step) const {

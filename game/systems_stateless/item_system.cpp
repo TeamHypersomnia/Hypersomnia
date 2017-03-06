@@ -106,37 +106,42 @@ void components::item_slot_transfers::interrupt_mounting() {
 
 void item_system::process_mounting_and_unmounting(const logic_step step) {
 	ensure(false);
+	
 	auto& cosmos = step.cosm;
-	const auto& delta = step.get_delta();
-	for (const auto& e : cosmos.get(processing_subjects::WITH_ITEM_SLOT_TRANSFERS)) {
-		auto& item_slot_transfers = e.get<components::item_slot_transfers>();
+	const auto delta = step.get_delta();
+	
+	cosmos.for_each(
+			processing_subjects::WITH_ITEM_SLOT_TRANSFERS, 
+			[&](const auto e) {
+			auto& item_slot_transfers = e.get<components::item_slot_transfers>();
 
-		const auto currently_mounted_item = cosmos[item_slot_transfers.mounting.current_item];
+			const auto currently_mounted_item = cosmos[item_slot_transfers.mounting.current_item];
 
-		if (currently_mounted_item.alive()) {
-			auto& item = currently_mounted_item.get<components::item>();
+			if (currently_mounted_item.alive()) {
+				auto& item = currently_mounted_item.get<components::item>();
 
-			if (item.current_slot != item_slot_transfers.mounting.intented_mounting_slot) {
-				item_slot_transfers.interrupt_mounting();
-			}
-			else {
-				ensure(item.intended_mounting != item.current_mounting);
-
-				if (item.montage_time_left_ms > 0) {
-					item.montage_time_left_ms -= static_cast<float>(delta.in_milliseconds());
+				if (item.current_slot != item_slot_transfers.mounting.intented_mounting_slot) {
+					item_slot_transfers.interrupt_mounting();
 				}
 				else {
-					item.current_mounting = item.intended_mounting;
+					ensure(item.intended_mounting != item.current_mounting);
 
-					if (item.current_mounting == components::item::UNMOUNTED) {
-						perform_transfer({ currently_mounted_item, cosmos[item.target_slot_after_unmount] }, step);
+					if (item.montage_time_left_ms > 0) {
+						item.montage_time_left_ms -= static_cast<float>(delta.in_milliseconds());
+					}
+					else {
+						item.current_mounting = item.intended_mounting;
+
+						if (item.current_mounting == components::item::UNMOUNTED) {
+							perform_transfer({ currently_mounted_item, cosmos[item.target_slot_after_unmount] }, step);
+						}
 					}
 				}
 			}
-		}
 
-		if (currently_mounted_item.dead()) {
-			item_slot_transfers.mounting = components::item_slot_transfers::find_suitable_montage_operation(e);
+			if (currently_mounted_item.dead()) {
+				item_slot_transfers.mounting = components::item_slot_transfers::find_suitable_montage_operation(e);
+			}
 		}
-	}
+	);
 }

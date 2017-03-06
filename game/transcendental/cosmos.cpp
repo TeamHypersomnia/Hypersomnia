@@ -204,14 +204,6 @@ std::wstring cosmos::summary() const {
 	return typesafe_sprintf(L"Entities: %x\n", entities_count());
 }
 
-std::vector<entity_handle> cosmos::get(const processing_subjects list) {
-	return systems_temporary.get<processing_lists_system>().get(list, *this);
-}
-
-std::vector<const_entity_handle> cosmos::get(const processing_subjects list) const {
-	return systems_temporary.get<processing_lists_system>().get(list, *this);
-}
-
 const spell_data& cosmos::get(const spell_type s) const {
 	return significant.meta.flyweights.spells[s];
 }

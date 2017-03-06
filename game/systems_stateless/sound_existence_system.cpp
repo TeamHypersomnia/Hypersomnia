@@ -59,20 +59,23 @@ void sound_existence_system::destroy_dead_sounds(const logic_step step) const {
 	auto& cosmos = step.cosm;
 	const auto timestamp = cosmos.get_timestamp();
 
-	for (const auto it : cosmos.get(processing_subjects::WITH_SOUND_EXISTENCE)) {
-		auto& existence = it.get<components::sound_existence>();
+	cosmos.for_each(
+		processing_subjects::WITH_SOUND_EXISTENCE,
+		[&](const auto it) {
+			auto& existence = it.get<components::sound_existence>();
 
-		const auto repetitions = existence.input.modifier.repetitions;
+			const auto repetitions = existence.input.modifier.repetitions;
 
-		if (repetitions > -1 && (timestamp - existence.time_of_birth).step > existence.max_lifetime_in_steps * repetitions) {
-			if (existence.input.delete_entity_after_effect_lifetime) {
-				step.transient.messages.post(messages::queue_destruction(it));
-			}
-			else {
-				components::sound_existence::deactivate(it);
+			if (repetitions > -1 && (timestamp - existence.time_of_birth).step > existence.max_lifetime_in_steps * repetitions) {
+				if (existence.input.delete_entity_after_effect_lifetime) {
+					step.transient.messages.post(messages::queue_destruction(it));
+				}
+				else {
+					components::sound_existence::deactivate(it);
+				}
 			}
 		}
-	}
+	);
 }
 
 void sound_existence_system::game_responses_to_sound_effects(const logic_step step) const {

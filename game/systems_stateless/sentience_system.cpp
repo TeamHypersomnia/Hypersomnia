@@ -123,64 +123,67 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 	auto& cosmos = step.cosm;
 	const auto delta = cosmos.get_fixed_delta();
 
-	for (const auto subject : cosmos.get(processing_subjects::WITH_SENTIENCE)) {
-		auto& sentience = subject.get<components::sentience>();
+	cosmos.for_each(
+		processing_subjects::WITH_SENTIENCE,
+		[&](const auto subject) {
+			auto& sentience = subject.get<components::sentience>();
 
-		if (sentience.health.enabled) {
-			const auto passed = (now.step - sentience.time_of_last_received_damage.step);
+			if (sentience.health.enabled) {
+				const auto passed = (now.step - sentience.time_of_last_received_damage.step);
 
-			if (passed > 0 && passed % regeneration_frequency_in_steps == 0) {
-				sentience.health.value -= sentience.health.calculate_damage_result(-2).effective;
-			}
-		}
-
-		if (sentience.consciousness.enabled) {
-			const auto passed = (now.step - sentience.time_of_last_exertion.step);
-
-			if (passed > 0 && passed % consciousness_regeneration_frequency_in_steps == 0) {
-				sentience.consciousness.value -= sentience.consciousness.calculate_damage_result(-2).effective;
+				if (passed > 0 && passed % regeneration_frequency_in_steps == 0) {
+					sentience.health.value -= sentience.health.calculate_damage_result(-2).effective;
+				}
 			}
 
-			const auto consciousness_ratio = sentience.consciousness.get_ratio();
-			const auto health_ratio = sentience.health.get_ratio();
+			if (sentience.consciousness.enabled) {
+				const auto passed = (now.step - sentience.time_of_last_exertion.step);
 
-			sentience.consciousness.value = std::min(consciousness_ratio, health_ratio) * sentience.consciousness.maximum;
-		}
+				if (passed > 0 && passed % consciousness_regeneration_frequency_in_steps == 0) {
+					sentience.consciousness.value -= sentience.consciousness.calculate_damage_result(-2).effective;
+				}
 
-		if (sentience.personal_electricity.enabled) {
-			const auto passed = now.step;
+				const auto consciousness_ratio = sentience.consciousness.get_ratio();
+				const auto health_ratio = sentience.health.get_ratio();
 
-			if (passed > 0 && passed % pe_regeneration_frequency_in_steps == 0) {
-				sentience.personal_electricity.value -= sentience.personal_electricity.calculate_damage_result(-4).effective;
+				sentience.consciousness.value = std::min(consciousness_ratio, health_ratio) * sentience.consciousness.maximum;
+			}
+
+			if (sentience.personal_electricity.enabled) {
+				const auto passed = now.step;
+
+				if (passed > 0 && passed % pe_regeneration_frequency_in_steps == 0) {
+					sentience.personal_electricity.value -= sentience.personal_electricity.calculate_damage_result(-4).effective;
+				}
+			}
+
+			const auto shake_mult = 1.f - (now - sentience.time_of_last_shake).in_milliseconds(delta) / sentience.shake_for_ms;
+
+			if (shake_mult > 0.f) {
+				const auto owning_crosshair_recoil = subject[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
+				auto rng = cosmos.get_rng_for(subject);
+
+				owning_crosshair_recoil.get<components::physics>().apply_impulse(
+					shake_mult *shake_mult * 100 * vec2{ rng.randval(-1.f, 1.f), rng.randval(-1.f, 1.f) });
+			}
+
+			if (sentience.currently_casted_spell != spell_type::COUNT) {
+				const auto spell_data = cosmos.get(sentience.currently_casted_spell);
+				const auto when_casted = sentience.time_of_last_spell_cast;
+
+				if ((now - when_casted).in_milliseconds(delta) <= spell_data.casting_time_ms) {
+					perform_spell_logic(
+						step,
+						sentience.currently_casted_spell,
+						subject,
+						sentience,
+						when_casted,
+						now
+					);
+				}
 			}
 		}
-
-		const auto shake_mult = 1.f - (now - sentience.time_of_last_shake).in_milliseconds(delta) / sentience.shake_for_ms;
-
-		if (shake_mult > 0.f) {
-			const auto owning_crosshair_recoil = subject[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
-			auto rng = cosmos.get_rng_for(subject);
-
-			owning_crosshair_recoil.get<components::physics>().apply_impulse(
-				shake_mult *shake_mult * 100 * vec2{ rng.randval(-1.f, 1.f), rng.randval(-1.f, 1.f) });
-		}
-
-		if (sentience.currently_casted_spell != spell_type::COUNT) {
-			const auto spell_data = cosmos.get(sentience.currently_casted_spell);
-			const auto when_casted = sentience.time_of_last_spell_cast;
-
-			if ((now - when_casted).in_milliseconds(delta) <= spell_data.casting_time_ms) {
-				perform_spell_logic(
-					step,
-					sentience.currently_casted_spell,
-					subject,
-					sentience,
-					when_casted,
-					now
-				);
-			}
-		}
-	}
+	);
 }
 
 void sentience_system::consume_health_event(messages::health_event h, const logic_step step) const {
@@ -398,45 +401,51 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 }
 
 void sentience_system::cooldown_aimpunches(const logic_step step) const {
-	for (const auto& t : step.cosm.get(processing_subjects::WITH_SENTIENCE)) {
-		t.get<components::sentience>().aimpunch.cooldown(step.get_delta().in_milliseconds());
-	}
+	step.cosm.for_each(
+		processing_subjects::WITH_SENTIENCE,
+		[&](const auto t) {
+			t.get<components::sentience>().aimpunch.cooldown(step.get_delta().in_milliseconds());
+		}
+	);
 }
 
 void sentience_system::set_borders(const logic_step step) const {
 	const auto timestamp_ms = static_cast<int>(step.cosm.get_total_time_passed_in_seconds() * 1000.0);
+	
+	step.cosm.for_each(
+		processing_subjects::WITH_SENTIENCE,
+		[&](const auto t) {
+			const auto& sentience = t.get<components::sentience>();
 
-	for (const auto& t : step.cosm.get(processing_subjects::WITH_SENTIENCE)) {
-		const auto& sentience = t.get<components::sentience>();
+			auto* const render = t.find<components::render>();
 
-		auto* const render = t.find<components::render>();
+			if (render != nullptr) {
+				if (sentience.health.is_enabled()) {
+					auto hr = sentience.health.get_ratio();
+					const auto one_less_hr = 1.f - hr;
 
-		if (render != nullptr) {
-			if (sentience.health.is_enabled()) {
-				auto hr = sentience.health.get_ratio();
-				const auto one_less_hr = 1.f - hr;
+					const auto pulse_duration = static_cast<int>(1250 - 1000 * (1 - hr));
+					const auto time_pulse_ratio = (timestamp_ms % pulse_duration) / static_cast<float>(pulse_duration);
 
-				const auto pulse_duration = static_cast<int>(1250 - 1000 * (1 - hr));
-				const auto time_pulse_ratio = (timestamp_ms % pulse_duration) / static_cast<float>(pulse_duration);
+					hr *= 1.f - (0.2f * time_pulse_ratio);
 
-				hr *= 1.f - (0.2f * time_pulse_ratio);
+					if (render) {
+						if (hr < 1.f) {
+							render->draw_border = true;
 
-				if (render) {
-					if (hr < 1.f) {
-						render->draw_border = true;
+							const auto alpha_multiplier = one_less_hr * one_less_hr * one_less_hr * one_less_hr * time_pulse_ratio;
 
-						const auto alpha_multiplier = one_less_hr * one_less_hr * one_less_hr * one_less_hr * time_pulse_ratio;
-
-						render->border_color = rgba(255, 0, 0, static_cast<rgba_channel>(255 * alpha_multiplier));
-					}
-					else {
-						render->draw_border = false;
+							render->border_color = rgba(255, 0, 0, static_cast<rgba_channel>(255 * alpha_multiplier));
+						}
+						else {
+							render->draw_border = false;
+						}
 					}
 				}
-			}
-			else {
-				render->draw_border = false;
+				else {
+					render->draw_border = false;
+				}
 			}
 		}
-	}
+	);
 }

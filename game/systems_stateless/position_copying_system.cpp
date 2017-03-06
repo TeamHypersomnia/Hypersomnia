@@ -46,46 +46,51 @@ components::transform components::position_copying::get_previous_transform() con
 void position_copying_system::update_transforms(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto delta = step.get_delta();
-	
-	for (const auto& it : cosmos.get(processing_subjects::WITH_POSITION_COPYING)) {
-		components::transform transform = it.get_logic_transform();
-		auto& position_copying = it.get<components::position_copying>();
 
-		position_copying.previous = transform;
+	cosmos.for_each(
+		processing_subjects::WITH_POSITION_COPYING,
+		[&](const auto it) {
+			components::transform transform = it.get_logic_transform();
+			auto& position_copying = it.get<components::position_copying>();
 
-		if (cosmos[position_copying.target].dead()) continue;
-
-		auto target_transform = cosmos[position_copying.target].get_logic_transform();
-		target_transform.rotation *= position_copying.rotation_multiplier;
-		target_transform.pos = vec2i(target_transform.pos);
-
-		if (position_copying.position_copying_mode == components::position_copying::position_copying_type::OFFSET) {
-			transform.pos = target_transform.pos;
-			transform.pos += position_copying.offset;
-
-			if (position_copying.position_copying_rotation) {
-				transform.rotation = target_transform.rotation;
-				transform.rotation += position_copying.rotation_offset;
-			}
-		}
-		else if (position_copying.position_copying_mode == components::position_copying::position_copying_type::ORBIT) {
-			transform.pos = target_transform.pos + position_copying.rotation_orbit_offset;
-			transform.pos.rotate(target_transform.rotation, target_transform.pos);
-			
-			if (position_copying.position_copying_rotation) {
-				transform.rotation = target_transform.rotation + position_copying.rotation_offset;
-			}
-		}
-		else if (position_copying.position_copying_mode == components::position_copying::position_copying_type::PARALLAX) {
-			transform.pos = position_copying.reference_position + (target_transform.pos - position_copying.target_reference_position) * position_copying.scrolling_speed;
-		}
-
-		if (position_copying.target_newly_set) {
 			position_copying.previous = transform;
-			position_copying.target_newly_set = false;
-		}
 
-		it.set_logic_transform(transform);
-	}
+			if (cosmos[position_copying.target].dead()) {
+				return;
+			}
+
+			auto target_transform = cosmos[position_copying.target].get_logic_transform();
+			target_transform.rotation *= position_copying.rotation_multiplier;
+			target_transform.pos = vec2i(target_transform.pos);
+
+			if (position_copying.position_copying_mode == components::position_copying::position_copying_type::OFFSET) {
+				transform.pos = target_transform.pos;
+				transform.pos += position_copying.offset;
+
+				if (position_copying.position_copying_rotation) {
+					transform.rotation = target_transform.rotation;
+					transform.rotation += position_copying.rotation_offset;
+				}
+			}
+			else if (position_copying.position_copying_mode == components::position_copying::position_copying_type::ORBIT) {
+				transform.pos = target_transform.pos + position_copying.rotation_orbit_offset;
+				transform.pos.rotate(target_transform.rotation, target_transform.pos);
+				
+				if (position_copying.position_copying_rotation) {
+					transform.rotation = target_transform.rotation + position_copying.rotation_offset;
+				}
+			}
+			else if (position_copying.position_copying_mode == components::position_copying::position_copying_type::PARALLAX) {
+				transform.pos = position_copying.reference_position + (target_transform.pos - position_copying.target_reference_position) * position_copying.scrolling_speed;
+			}
+
+			if (position_copying.target_newly_set) {
+				position_copying.previous = transform;
+				position_copying.target_newly_set = false;
+			}
+
+			it.set_logic_transform(transform);
+		}
+	);
 }
 

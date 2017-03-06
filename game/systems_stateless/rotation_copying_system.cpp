@@ -154,20 +154,23 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 }
 
 void rotation_copying_system::update_rotations(cosmos& cosmos) const {
-	for (const auto it : cosmos.get(processing_subjects::WITH_ROTATION_COPYING)) {
-		const auto& rotation_copying = it.get<components::rotation_copying>();
+	cosmos.for_each(
+		processing_subjects::WITH_ROTATION_COPYING,
+		[&](const auto it) {
+			const auto& rotation_copying = it.get<components::rotation_copying>();
 
-		if (rotation_copying.update_value) {
-			if (it.has<components::physics>()) {
-				const auto target_angle = resolve_rotation_copying_value(it);
-				const auto phys = it.get<components::physics>();
+			if (rotation_copying.update_value) {
+				if (it.has<components::physics>()) {
+					const auto target_angle = resolve_rotation_copying_value(it);
+					const auto phys = it.get<components::physics>();
 
-				phys.set_transform({ phys.get_position(), target_angle });
-				phys.set_angular_velocity(0);
-			}
-			else {
-				it.get<components::transform>().rotation = resolve_rotation_copying_value(it);
+					phys.set_transform({ phys.get_position(), target_angle });
+					phys.set_angular_velocity(0);
+				}
+				else {
+					it.get<components::transform>().rotation = resolve_rotation_copying_value(it);
+				}
 			}
 		}
-	}
+	);
 }

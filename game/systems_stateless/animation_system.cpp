@@ -137,70 +137,75 @@ void animation_system::progress_animation_states(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
 
-	for (const auto& it : cosmos.get(processing_subjects::WITH_ANIMATION)) {
-		auto& animation_state = it.get<components::animation>();
+	cosmos.for_each(
+		processing_subjects::WITH_ANIMATION,
+		[&](const auto it) {
+			auto& animation_state = it.get<components::animation>();
 
-		if (animation_state.state != components::animation::playing_state::PAUSED) {
-			auto& animation = *get_resource_manager().find(animation_state.current_animation);
+			if (animation_state.state != components::animation::playing_state::PAUSED) {
+				auto& animation = *get_resource_manager().find(animation_state.current_animation);
 
-			if (animation.frames.empty()) continue;
-
-			animation_state.player_position_ms += static_cast<float>(delta.in_milliseconds()) * animation_state.speed_factor;
-
-			while (true) {
-				float frame_duration = animation.frames[animation_state.get_current_frame()].duration_milliseconds;
-
-				if (animation_state.player_position_ms > frame_duration) {
-					animation_state.player_position_ms -= frame_duration;
-
-					if (animation.loop_mode == animation::loop_type::INVERSE) {
-
-						if (animation_state.state == components::animation::playing_state::INCREASING) {
-							if (animation_state.get_current_frame() < animation.frames.size() - 1) animation_state.increase_frame();
-							else {
-								animation_state.decrease_frame();
-								animation_state.state = components::animation::playing_state::DECREASING;
-							}
-						}
-
-						else if (animation_state.state == components::animation::playing_state::DECREASING) {
-							if (animation_state.get_current_frame() > 0) animation_state.decrease_frame();
-							else {
-								animation_state.increase_frame();
-								animation_state.state = components::animation::playing_state::INCREASING;
-							}
-						}
-					}
-
-					else if (animation.loop_mode == animation::loop_type::REPEAT) {
-						if (animation_state.state == components::animation::playing_state::INCREASING) {
-							if (animation_state.get_current_frame() < animation.frames.size() - 1)
-								animation_state.increase_frame();
-							else animation_state.set_current_frame(0);
-						}
-						else if (animation_state.state == components::animation::playing_state::DECREASING) {
-							if (animation_state.get_current_frame() > 0) animation_state.decrease_frame();
-							else animation_state.set_current_frame(animation.frames.size() - 1);
-						}
-					}
-
-					else if (animation.loop_mode == animation::loop_type::NONE) {
-						if (animation_state.state == components::animation::playing_state::INCREASING) {
-							if (animation_state.get_current_frame() < animation.frames.size() - 1)
-								animation_state.increase_frame();
-							else animation_state.state = components::animation::playing_state::PAUSED;
-						}
-						else if (animation_state.state == components::animation::playing_state::DECREASING) {
-							if (animation_state.get_current_frame() > 0) animation_state.decrease_frame();
-							else animation_state.state = components::animation::playing_state::PAUSED;
-						}
-					}
+				if (animation.frames.empty()) {
+					return;
 				}
-				else break;
-			}
 
-			auto& sprite = it.get<components::sprite>();
-			sprite = animation.frames[animation_state.get_current_frame()].sprite;
+				animation_state.player_position_ms += static_cast<float>(delta.in_milliseconds()) * animation_state.speed_factor;
+
+				while (true) {
+					float frame_duration = animation.frames[animation_state.get_current_frame()].duration_milliseconds;
+
+					if (animation_state.player_position_ms > frame_duration) {
+						animation_state.player_position_ms -= frame_duration;
+
+						if (animation.loop_mode == animation::loop_type::INVERSE) {
+
+							if (animation_state.state == components::animation::playing_state::INCREASING) {
+								if (animation_state.get_current_frame() < animation.frames.size() - 1) animation_state.increase_frame();
+								else {
+									animation_state.decrease_frame();
+									animation_state.state = components::animation::playing_state::DECREASING;
+								}
+							}
+
+							else if (animation_state.state == components::animation::playing_state::DECREASING) {
+								if (animation_state.get_current_frame() > 0) animation_state.decrease_frame();
+								else {
+									animation_state.increase_frame();
+									animation_state.state = components::animation::playing_state::INCREASING;
+								}
+							}
+						}
+
+						else if (animation.loop_mode == animation::loop_type::REPEAT) {
+							if (animation_state.state == components::animation::playing_state::INCREASING) {
+								if (animation_state.get_current_frame() < animation.frames.size() - 1)
+									animation_state.increase_frame();
+								else animation_state.set_current_frame(0);
+							}
+							else if (animation_state.state == components::animation::playing_state::DECREASING) {
+								if (animation_state.get_current_frame() > 0) animation_state.decrease_frame();
+								else animation_state.set_current_frame(animation.frames.size() - 1);
+							}
+						}
+
+						else if (animation.loop_mode == animation::loop_type::NONE) {
+							if (animation_state.state == components::animation::playing_state::INCREASING) {
+								if (animation_state.get_current_frame() < animation.frames.size() - 1)
+									animation_state.increase_frame();
+								else animation_state.state = components::animation::playing_state::PAUSED;
+							}
+							else if (animation_state.state == components::animation::playing_state::DECREASING) {
+								if (animation_state.get_current_frame() > 0) animation_state.decrease_frame();
+								else animation_state.state = components::animation::playing_state::PAUSED;
+							}
+						}
+					}
+					else break;
+				}
+
+				auto& sprite = it.get<components::sprite>();
+				sprite = animation.frames[animation_state.get_current_frame()].sprite;
+			}
 		}
-	}
+	);
 }

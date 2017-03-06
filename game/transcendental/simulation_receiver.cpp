@@ -29,26 +29,29 @@ void simulation_receiver::remote_entropy_predictions(
 	key_and_mouse_intent release_intent;
 	release_intent.is_pressed = false;
 
-	for (auto e : predicted_cosmos.get(processing_subjects::WITH_PAST_CONTAGIOUS)) {
-		const bool is_locally_controlled_entity = e == predictable_entity;
-		
-		if (is_locally_controlled_entity) {
-			continue;
-		}
+	predicted_cosmos.for_each(
+		processing_subjects::WITH_PAST_CONTAGIOUS,
+		[&](const auto e) {
+			const bool is_locally_controlled_entity = e == predictable_entity;
+			
+			if (is_locally_controlled_entity) {
+				return;
+			}
 
-		for (const auto g : e.guns_wielded()) {
-			if (g.get<components::gun>().trigger_pressed) {
-				if (g.get_current_slot().raw_id.type == slot_function::PRIMARY_HAND) {
-					release_intent.intent = intent_type::CROSSHAIR_PRIMARY_ACTION;
-				}
-				else {
-					release_intent.intent = intent_type::CROSSHAIR_SECONDARY_ACTION;
-				}
+			for (const auto g : e.guns_wielded()) {
+				if (g.get<components::gun>().trigger_pressed) {
+					if (g.get_current_slot().raw_id.type == slot_function::PRIMARY_HAND) {
+						release_intent.intent = intent_type::CROSSHAIR_PRIMARY_ACTION;
+					}
+					else {
+						release_intent.intent = intent_type::CROSSHAIR_SECONDARY_ACTION;
+					}
 
-				adjusted_entropy.intents_per_entity[e.get_guid()].push_back(release_intent);
+					adjusted_entropy.intents_per_entity[e.get_guid()].push_back(release_intent);
+				}
 			}
 		}
-	}
+	);
 }
 
 auto simulation_receiver::unpack_deterministic_steps(
@@ -115,14 +118,18 @@ auto simulation_receiver::acquire_potential_mispredictions(
 ) const -> std::vector<misprediction_candidate_entry> {
 	const auto& cosmos = predicted_cosmos_before_reconciliation;
 
-	const auto& unpredictables_with_past_contagious = cosmos.get(processing_subjects::WITH_PAST_CONTAGIOUS);
-
 	std::vector<misprediction_candidate_entry> potential_mispredictions;
-	potential_mispredictions.reserve(unpredictables_with_past_contagious.size() + unpredictables_infected.size());
+	
+	potential_mispredictions.reserve(
+		cosmos.get_count_of(processing_subjects::WITH_PAST_CONTAGIOUS) + unpredictables_infected.size()
+	);
 
-	for (const auto& e : unpredictables_with_past_contagious) {
-		potential_mispredictions.push_back(acquire_potential_misprediction(e));
-	}
+	cosmos.for_each(
+		processing_subjects::WITH_PAST_CONTAGIOUS,
+		[&](const auto e) {
+			potential_mispredictions.push_back(acquire_potential_misprediction(e));
+		}
+	);
 
 	for (const auto& e : unpredictables_infected) {
 		if (cosmos[e].alive()) {
