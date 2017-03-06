@@ -50,15 +50,15 @@ namespace components {
 
 		components::transform shell_spawn_offset;
 
-		entity_id magic_missile_definition;
+		child_entity_id magic_missile_definition;
 
 		float current_heat = 0.f;
 		float gunshot_adds_heat = 0.05f;
 		float maximum_heat = 1.f;
 		float engine_sound_strength = 1.f;
 
-		entity_id firing_engine_sound;
-		entity_id muzzle_particles;
+		child_entity_id firing_engine_sound;
+		child_entity_id muzzle_particles;
 
 		template<class F>
 		void for_each_held_id(F f) {

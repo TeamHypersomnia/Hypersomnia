@@ -25,6 +25,14 @@ struct entity_id : public augs::pool_id<typename put_all_components_into<augs::c
 	}
 };
 
+struct child_entity_id : entity_id {
+	typedef entity_id base;
+
+	child_entity_id(const base b = base()) : base(b) {}
+
+	using base::operator unversioned_entity_id;
+};
+
 namespace std {
 	template <>
 	struct hash<entity_id> {

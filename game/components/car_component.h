@@ -8,16 +8,16 @@ namespace components {
 	struct car {
 		entity_id current_driver;
 
-		entity_id left_wheel_trigger;
-		entity_id right_wheel_trigger;
+		child_entity_id left_wheel_trigger;
+		child_entity_id right_wheel_trigger;
 
-		entity_id acceleration_engine[2];
-		entity_id deceleration_engine[2];
+		child_entity_id acceleration_engine[2];
+		child_entity_id deceleration_engine[2];
 
-		entity_id left_engine;
-		entity_id right_engine;
+		child_entity_id left_engine;
+		child_entity_id right_engine;
 
-		entity_id engine_sound;
+		child_entity_id engine_sound;
 
 		bool accelerating = false;
 		bool decelerating = false;

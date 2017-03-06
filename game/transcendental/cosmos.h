@@ -171,16 +171,6 @@ public:
 	bool entity_exists_with_guid(const entity_guid) const;
 #endif
 
-	template <class T>
-	decltype(auto) get_handle(const T t) {
-		return t;
-	}
-
-	template <class T>
-	decltype(auto) get_handle(const T t) const {
-		return t;
-	}
-
 	entity_handle get_handle(const entity_id);
 	const_entity_handle get_handle(const entity_id) const;
 	entity_handle get_handle(const unversioned_entity_id);
@@ -403,7 +393,7 @@ inline const_inventory_slot_handle cosmos::get_handle(const basic_inventory_slot
 
 inline item_slot_transfer_request cosmos::get_handle(const basic_item_slot_transfer_request_data<entity_guid> data) {
 	return {
-		get_handle(get_entity_by_guid(data.item)),
+		get_entity_by_guid(data.item),
 		get_handle(data.target_slot),
 		data.specified_quantity,
 		data.force_immediate_mount
@@ -412,7 +402,7 @@ inline item_slot_transfer_request cosmos::get_handle(const basic_item_slot_trans
 
 inline const_item_slot_transfer_request cosmos::get_handle(const basic_item_slot_transfer_request_data<entity_guid> data) const {
 	return {
-		get_handle(get_entity_by_guid(data.item)),
+		get_entity_by_guid(data.item),
 		get_handle(data.target_slot),
 		data.specified_quantity,
 		data.force_immediate_mount
