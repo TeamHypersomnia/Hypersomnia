@@ -371,7 +371,6 @@
     <ClCompile Include="augs\texture_atlas\texture_atlas_entry.cpp" />
     <ClCompile Include="augs\tweaker.cpp" />
     <ClCompile Include="game\components\flags_component.cpp" />
-    <ClCompile Include="game\components\gui_element_component.cpp" />
     <ClCompile Include="game\components\light_component.cpp" />
     <ClCompile Include="game\components\sound_existence_component.cpp" />
     <ClCompile Include="game\detail\camera_cone.cpp" />
@@ -1146,13 +1145,13 @@
     <ClInclude Include="game\assets\tile_layer_id.h" />
     <ClInclude Include="game\components\child_component.h" />
     <ClInclude Include="game\components\flags_component.h" />
+    <ClInclude Include="game\components\grenade_component.h" />
     <ClInclude Include="game\components\guid_component.h" />
     <ClInclude Include="game\components\interpolation_component.h" />
     <ClInclude Include="game\components\light_component.h" />
     <ClInclude Include="game\components\physical_relations_component.h" />
     <ClInclude Include="game\components\sound_existence_component.h" />
     <ClInclude Include="game\components\sound_response_component.h" />
-    <ClInclude Include="game\components\sub_entities_component.h" />
     <ClInclude Include="game\components\wandering_pixels_component.h" />
     <ClInclude Include="game\container_sizes.h" />
     <ClInclude Include="game\detail\basic_renderable_drawing_input.h" />
@@ -1209,6 +1208,7 @@
     <ClInclude Include="game\detail\visible_entities.h" />
     <ClInclude Include="game\detail\wielding_result.h" />
     <ClInclude Include="game\enums\entity_flag.h" />
+    <ClInclude Include="game\enums\grenade_type.h" />
     <ClInclude Include="game\enums\input_recording_type.h" />
     <ClInclude Include="game\enums\perk_meter_type.h" />
     <ClInclude Include="game\enums\physical_material_type.h" />
@@ -1275,7 +1275,7 @@
     <ClInclude Include="game\transcendental\entity_handle.h" />
     <ClInclude Include="game\transcendental\entity_handle_declaration.h" />
     <ClInclude Include="game\enums\animation_response_type.h" />
-    <ClInclude Include="game\enums\associated_entity_name.h" />
+    <ClInclude Include="game\enums\child_entity_name.h" />
     <ClInclude Include="game\enums\attitude_type.h" />
     <ClInclude Include="game\enums\entity_name.h" />
     <ClInclude Include="game\enums\filters.h" />
@@ -1289,7 +1289,7 @@
     <ClInclude Include="game\enums\processing_subjects.h" />
     <ClInclude Include="game\enums\render_layer.h" />
     <ClInclude Include="game\enums\slot_function.h" />
-    <ClInclude Include="game\enums\sub_entity_name.h" />
+    <ClInclude Include="game\enums\associated_entity_name.h" />
     <ClInclude Include="game\simulation_settings\pathfinding_settings.h" />
     <ClInclude Include="game\simulation_settings\visibility_settings.h" />
     <ClInclude Include="game\messages\will_soon_be_deleted.h" />
@@ -1349,7 +1349,6 @@
     <ClInclude Include="game\components\car_component.h" />
     <ClInclude Include="game\components\container_component.h" />
     <ClInclude Include="game\components\force_joint_component.h" />
-    <ClInclude Include="game\components\gui_element_component.h" />
     <ClInclude Include="game\components\item_slot_transfers_component.h" />
     <ClInclude Include="game\components\item_component.h" />
     <ClInclude Include="game\components\melee_component.h" />

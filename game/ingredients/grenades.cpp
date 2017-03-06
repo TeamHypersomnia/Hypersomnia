@@ -10,6 +10,7 @@
 #include "game/components/melee_component.h"
 #include "game/components/particle_effect_response_component.h"
 #include "game/components/fixtures_component.h"
+#include "game/components/grenade_component.h"
 
 #include "game/enums/entity_name.h"
 #include "game/enums/filters.h"
@@ -19,8 +20,11 @@
 namespace prefabs {
 	entity_handle create_force_grenade(cosmos& world, vec2 pos) {
 		const auto grenade_spoon = world.create_entity("grenade_spoon");
-		const auto grenade = world.create_entity("force_grenade");
-
+		const auto grenade_entity = world.create_entity("force_grenade");
+		auto& grenade = grenade_entity += components::grenade();
+		
+		grenade.type = grenade_type::FORCE;
+		grenade.spoon = grenade_spoon;
 		//{
 		//	auto& sprite = grenade_spoon += components::sprite();
 		//	auto& render = grenade_spoon += components::render();
@@ -46,48 +50,59 @@ namespace prefabs {
 		//	grenade_spoon.get<components::fixtures>().set_owner_body(grenade);
 		//}
 
-		name_entity(grenade, entity_name::FORCE_GRENADE);
+		name_entity(grenade_entity, entity_name::FORCE_GRENADE);
 
-		auto& sprite = ingredients::add_sprite(grenade, pos, assets::game_image_id::FORCE_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::add_see_through_dynamic_body(grenade);
+		auto& sprite = ingredients::add_sprite(grenade_entity, pos, assets::game_image_id::FORCE_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(grenade_entity);
 
-		auto& item = ingredients::make_item(grenade);
+		auto& item = ingredients::make_item(grenade_entity);
 		item.space_occupied_per_charge = to_space_units("0.6");
 
-		grenade.add_standard_components();
-		grenade.add_sub_entity(grenade_spoon);
+		grenade_entity.add_standard_components();
 
-		return grenade;
+		return grenade_entity;
 	}
 
 	entity_handle create_ped_grenade(cosmos& world, vec2 pos) {
-		const auto grenade = world.create_entity("ped_grenade");
-		name_entity(grenade, entity_name::PED_GRENADE);
+		const auto grenade_spoon = world.create_entity("grenade_spoon");
+		const auto grenade_entity = world.create_entity("ped_grenade");
+		auto& grenade = grenade_entity += components::grenade();
 
-		auto& sprite = ingredients::add_sprite(grenade, pos, assets::game_image_id::PED_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::add_see_through_dynamic_body(grenade);
+		grenade.type = grenade_type::PED;
+		grenade.spoon = grenade_spoon;
 
-		auto& item = ingredients::make_item(grenade);
+		name_entity(grenade_entity, entity_name::PED_GRENADE);
+
+		auto& sprite = ingredients::add_sprite(grenade_entity, pos, assets::game_image_id::PED_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(grenade_entity);
+
+		auto& item = ingredients::make_item(grenade_entity);
 		item.space_occupied_per_charge = to_space_units("0.6");
 
-		grenade.add_standard_components();
+		grenade_entity.add_standard_components();
 
-		return grenade;
+		return grenade_entity;
 	}
 
 	entity_handle create_interference_grenade(cosmos& world, vec2 pos) {
-		const auto grenade = world.create_entity("interference_grenade");
-		name_entity(grenade, entity_name::INTERFERENCE_GRENADE);
+		const auto grenade_spoon = world.create_entity("grenade_spoon");
+		const auto grenade_entity = world.create_entity("interference_grenade");
+		auto& grenade = grenade_entity += components::grenade();
 
-		auto& sprite = ingredients::add_sprite(grenade, pos, assets::game_image_id::INTERFERENCE_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::add_see_through_dynamic_body(grenade);
+		grenade.type = grenade_type::INTERFERENCE;
+		grenade.spoon = grenade_spoon;
 
-		auto& item = ingredients::make_item(grenade);
+		name_entity(grenade_entity, entity_name::INTERFERENCE_GRENADE);
+
+		auto& sprite = ingredients::add_sprite(grenade_entity, pos, assets::game_image_id::INTERFERENCE_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(grenade_entity);
+
+		auto& item = ingredients::make_item(grenade_entity);
 		item.space_occupied_per_charge = to_space_units("0.6");
 
-		grenade.add_standard_components();
+		grenade_entity.add_standard_components();
 
-		return grenade;
+		return grenade_entity;
 	}
 }
 

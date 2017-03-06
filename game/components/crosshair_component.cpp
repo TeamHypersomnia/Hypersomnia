@@ -9,7 +9,7 @@ namespace components {
 		const const_entity_handle subject_crosshair, 
 		const bool snap_epsilon_base_offset
 	) {
-		const auto recoil_body = subject_crosshair[sub_entity_name::CROSSHAIR_RECOIL_BODY];
+		const auto recoil_body = subject_crosshair[child_entity_name::CROSSHAIR_RECOIL_BODY];
 		const auto recoil_body_transform = recoil_body.get_logic_transform();
 
 		auto considered_base_offset = subject_crosshair.get<components::crosshair>().base_offset;

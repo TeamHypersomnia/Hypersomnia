@@ -129,7 +129,7 @@ vec2i world_camera::get_camera_offset_due_to_character_crosshair(const const_ent
 	if (entity_to_chase.dead())
 		return vec2i(0, 0);
 
-	auto crosshair_entity = entity_to_chase[sub_entity_name::CHARACTER_CROSSHAIR];
+	auto crosshair_entity = entity_to_chase[child_entity_name::CHARACTER_CROSSHAIR];
 
 	/* if we set player and crosshair entity targets */
 	/* skip calculations if no orbit_mode is specified */

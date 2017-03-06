@@ -27,7 +27,7 @@ namespace rendering_scripts {
 		const auto& cosmos = step.cosm;
 		const auto camera = step.camera;
 		const auto controlled_entity = cosmos[step.viewed_character];
-		const auto controlled_crosshair = controlled_entity[sub_entity_name::CHARACTER_CROSSHAIR];
+		const auto controlled_crosshair = controlled_entity[child_entity_name::CHARACTER_CROSSHAIR];
 		const auto& interp = step.session.systems_audiovisual.get<interpolation_system>();
 		const auto& particles = step.session.systems_audiovisual.get<particles_simulation_system>();
 		const auto& wandering_pixels = step.session.systems_audiovisual.get<wandering_pixels_system>();

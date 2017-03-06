@@ -165,7 +165,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 						while (charges--) {
 							{
-								const auto round_entity = cosmos.clone_entity(catridge_or_pellet_stack[sub_entity_name::BULLET_ROUND]); //??
+								const auto round_entity = cosmos.clone_entity(catridge_or_pellet_stack[child_entity_name::BULLET_ROUND]); //??
 								
 								auto& damage = round_entity.get<components::damage>();
 								damage.amount *= gun.damage_multiplier;
@@ -182,7 +182,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 								round_entity.add_standard_components();
 							}
 
-							const auto shell_definition = catridge_or_pellet_stack[sub_entity_name::BULLET_SHELL];
+							const auto shell_definition = catridge_or_pellet_stack[child_entity_name::BULLET_SHELL];
 
 							if (shell_definition.alive()) {
 								const auto shell_entity = cosmos.clone_entity(shell_definition);
@@ -240,7 +240,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 				if (total_recoil_amount > 0.f) {
 					const auto owning_capability = it.get_owning_transfer_capability();
-					const auto owning_crosshair_recoil = owning_capability[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
+					const auto owning_crosshair_recoil = owning_capability[child_entity_name::CHARACTER_CROSSHAIR][child_entity_name::CROSSHAIR_RECOIL_BODY];
 					gun.recoil.shoot_and_apply_impulse(owning_crosshair_recoil, total_recoil_amount / 100.f, true);
 
 					gun.current_heat = std::min(gun.maximum_heat, gun.current_heat + gun.gunshot_adds_heat);

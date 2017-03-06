@@ -24,13 +24,11 @@
 namespace prefabs {
 	entity_handle create_motorcycle(cosmos& world, const components::transform& spawn_transform) {
 		auto front = world.create_entity("front");
-		//auto interior = world.create_entity("interior");
 		auto left_wheel = world.create_entity("left_wheel");
+		left_wheel.make_child_of(front);
 
 		const auto si = world.get_si();
 
-		//front.add_sub_entity(interior);
-		front.add_sub_entity(left_wheel);
 		name_entity(front, entity_name::JMIX114);
 
 		{
@@ -162,28 +160,27 @@ namespace prefabs {
 			effect.input.modifier.colorize = cyan;
 			effect.input.delete_entity_after_effect_lifetime = false;
 
-			const auto engine = particles_existence_system().create_particle_effect_entity(world, effect);
+			const auto engine_particles = particles_existence_system().create_particle_effect_entity(world, effect);
 
-			auto& existence = engine.get<components::particles_existence>();
+			auto& existence = engine_particles.get<components::particles_existence>();
 			existence.distribute_within_segment_of_length = 35.f * 0.8f;
 
-			engine.add_standard_components();
-			front.add_sub_entity(engine);
+			engine_particles.add_standard_components();
 
 			if (ee == 0) {
-				front.get<components::car>().acceleration_engine[0] = engine;
+				front.get<components::car>().acceleration_engine[0].particles = engine_particles;
 			}
 			if (ee == 1) {
-				front.get<components::car>().deceleration_engine[0] = engine;
+				front.get<components::car>().deceleration_engine[0].particles = engine_particles;
 			}
 			if (ee == 2) {
-				front.get<components::car>().left_engine = engine;
+				front.get<components::car>().left_engine.particles = engine_particles;
 			}
 			if (ee == 3) {
-				front.get<components::car>().right_engine = engine;
+				front.get<components::car>().right_engine.particles = engine_particles;
 			}
 
-			components::particles_existence::deactivate(engine);
+			components::particles_existence::deactivate(engine_particles);
 
 		}
 
@@ -194,7 +191,6 @@ namespace prefabs {
 			in.delete_entity_after_effect_lifetime = false;
 			const auto engine_sound = sound_existence_system().create_sound_effect_entity(world, in, spawn_transform, front);
 			engine_sound.add_standard_components();
-			front.add_sub_entity(engine_sound);
 			front.get<components::car>().engine_sound = engine_sound;
 			components::sound_existence::deactivate(engine_sound);
 		}

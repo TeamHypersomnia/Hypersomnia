@@ -183,7 +183,7 @@ namespace ingredients {
 		movement.standard_linear_damping = 20.f;
 		// driver.linear_damping_while_driving = 4.f;
 
-		e.map_sub_entity(sub_entity_name::CHARACTER_CROSSHAIR, crosshair_entity);
+		e.map_child_entity(child_entity_name::CHARACTER_CROSSHAIR, crosshair_entity);
 
 		animation_response.response = torso_set;
 
@@ -223,11 +223,6 @@ namespace prefabs {
 
 		ingredients::add_character_inventory(character);
 
-		const auto corpse_of_sentience = world.create_entity("corpse_of_sentience");
-		name_entity(corpse_of_sentience, entity_name::CORPSE);
-
-		character.map_sub_entity(sub_entity_name::CORPSE_OF_SENTIENCE, corpse_of_sentience);
-
 		{
 			messages::create_particle_effect effect;
 			effect.place_of_birth = character.get_logic_transform();
@@ -239,7 +234,6 @@ namespace prefabs {
 			const auto particles = particles_existence_system().create_particle_effect_entity(character.get_cosmos(), effect);
 
 			particles.add_standard_components();
-			character.add_sub_entity(particles);
 			character.get<components::sentience>().health_damage_particles = particles;
 			components::particles_existence::deactivate(particles);
 		}
@@ -312,7 +306,7 @@ namespace prefabs {
 			recoil.get<components::fixtures>().set_owner_body(recoil);
 		}
 
-		root.map_sub_entity(sub_entity_name::CROSSHAIR_RECOIL_BODY, recoil);
+		root.map_child_entity(child_entity_name::CROSSHAIR_RECOIL_BODY, recoil);
 		
 		root.add_standard_components();
 		recoil.add_standard_components();

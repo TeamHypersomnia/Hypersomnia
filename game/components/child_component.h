@@ -1,6 +1,6 @@
 #pragma once
 #include "game/transcendental/entity_id.h"
-#include "game/enums/sub_entity_name.h"
+#include "game/enums/child_entity_name.h"
 
 namespace components {
 	struct child {

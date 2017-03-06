@@ -8,14 +8,21 @@ namespace components {
 	struct car {
 		entity_id current_driver;
 
+		child_entity_id interior;
+
 		child_entity_id left_wheel_trigger;
 		child_entity_id right_wheel_trigger;
 
-		child_entity_id acceleration_engine[2];
-		child_entity_id deceleration_engine[2];
+		struct engine_entities {
+			child_entity_id physical;
+			child_entity_id particles;
+		};
 
-		child_entity_id left_engine;
-		child_entity_id right_engine;
+		engine_entities acceleration_engine[2];
+		engine_entities deceleration_engine[2];
+
+		engine_entities left_engine;
+		engine_entities right_engine;
 
 		child_entity_id engine_sound;
 
@@ -67,7 +74,7 @@ namespace components {
 			f(left_wheel_trigger);
 			f(right_wheel_trigger);
 
-			for (auto& e : acceleration_engine) {
+			for (auto& e : acceleration_engine_particles) {
 				f(e);
 			}
 
@@ -75,8 +82,8 @@ namespace components {
 				f(e);
 			}
 
-			f(left_engine);
-			f(right_engine);
+			f(left_engine_particles);
+			f(right_engine_particles);
 
 			f(engine_sound);
 		}
@@ -88,7 +95,7 @@ namespace components {
 			f(left_wheel_trigger);
 			f(right_wheel_trigger);
 
-			for (const auto& e : acceleration_engine) {
+			for (const auto& e : acceleration_engine_particles) {
 				f(e);
 			}
 
@@ -96,8 +103,8 @@ namespace components {
 				f(e);
 			}
 
-			f(left_engine);
-			f(right_engine);
+			f(left_engine_particles);
+			f(right_engine_particles);
 
 			f(engine_sound);
 		}

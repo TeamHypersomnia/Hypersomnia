@@ -34,8 +34,6 @@ namespace prefabs {
 
 		const auto si = world.get_si();
 
-		front.add_sub_entity(interior);
-		front.add_sub_entity(left_wheel);
 		name_entity(front, entity_name::TRUCK);
 
 		const vec2 front_size = get_resource_manager().find(assets::game_image_id::TRUCK_FRONT)->get_size();
@@ -48,6 +46,7 @@ namespace prefabs {
 			components::physics physics_definition(si, spawn_transform);
 			components::fixtures colliders;
 
+			car.interior = interior;
 			car.left_wheel_trigger = left_wheel;
 			car.input_acceleration.set(2500, 4500) /= 3;
 			//car.acceleration_length = 4500 / 5.0;
@@ -135,7 +134,11 @@ namespace prefabs {
 
 		{
 			for (int i = 0; i < 4; ++i) {
-					const auto engine_physical = world.create_entity("engine_body");
+				components::transform this_engine_transform;
+				const auto engine_physical = world.create_entity("engine_body");
+				engine_physical.make_child_of(front);
+
+				{
 
 					auto& sprite = engine_physical += components::sprite();
 					auto& render = engine_physical += components::render();
@@ -176,13 +179,15 @@ namespace prefabs {
 
 					engine_physical.get<components::fixtures>().set_owner_body(front);
 					engine_physical.add_standard_components();
-					front.add_sub_entity(engine_physical);
+
+					this_engine_transform = engine_physical.get_logic_transform();
+				}
 
 				const vec2 engine_size = get_resource_manager().find(assets::game_image_id::TRUCK_ENGINE)->get_size();
 
 				{
 					messages::create_particle_effect effect;
-					effect.place_of_birth = engine_physical.get_logic_transform();
+					effect.place_of_birth = this_engine_transform;
 					
 					if (i == 0 || i == 1) {
 						effect.place_of_birth.rotation += 180;
@@ -195,28 +200,32 @@ namespace prefabs {
 					effect.input.modifier.scale_lifetimes = 0.45f;
 					effect.input.delete_entity_after_effect_lifetime = false;
 
-					const auto engine = particles_existence_system().create_particle_effect_entity(world, effect);
+					const auto engine_particles = particles_existence_system().create_particle_effect_entity(world, effect);
 
-					auto& existence = engine.get<components::particles_existence>();
+					auto& existence = engine_particles.get<components::particles_existence>();
 					existence.distribute_within_segment_of_length = engine_size.y;
 
-					engine.add_standard_components();
-					engine_physical.add_sub_entity(engine);		
+					engine_particles.add_standard_components();
+
 					if (i == 0) {
-						front.get<components::car>().acceleration_engine[i] = engine;
+						front.get<components::car>().acceleration_engine[i].physical = engine_physical;
+						front.get<components::car>().acceleration_engine[i].particles = engine_particles;
 					}
 					if (i == 1) {
-						front.get<components::car>().acceleration_engine[i] = engine;
+						front.get<components::car>().acceleration_engine[i].physical = engine_physical;
+						front.get<components::car>().acceleration_engine[i].particles = engine_particles;
 					}
 					if (i == 2) {
-						front.get<components::car>().left_engine = engine;
+						front.get<components::car>().left_engine.physical = engine_physical;
+						front.get<components::car>().left_engine.particles = engine_particles;
 					}
 					if (i == 3) {
-						front.get<components::car>().right_engine = engine;
+						front.get<components::car>().right_engine.physical = engine_physical;
+						front.get<components::car>().right_engine.particles = engine_particles;
 					}
-					components::particles_existence::deactivate(engine);
-				}
 
+					components::particles_existence::deactivate(engine_particles);
+				}
 			}
 
 			{
@@ -224,9 +233,10 @@ namespace prefabs {
 				in.effect = assets::sound_buffer_id::ENGINE;
 				in.modifier.repetitions = -1;
 				in.delete_entity_after_effect_lifetime = false;
+
 				const auto engine_sound = sound_existence_system().create_sound_effect_entity(world, in, spawn_transform, front);
 				engine_sound.add_standard_components();
-				front.add_sub_entity(engine_sound);
+
 				front.get<components::car>().engine_sound = engine_sound;
 				components::sound_existence::deactivate(engine_sound);
 			}

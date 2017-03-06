@@ -564,7 +564,7 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndCreatedThreeEntitiesWithReferences) {
 	new_ent2.get<components::position_copying>().set_target(new_ent3);
 	new_ent3.get<components::position_copying>().set_target(new_ent1);
 
-	new_ent1.map_sub_entity(sub_entity_name::CHARACTER_CROSSHAIR, new_ent2);
+	new_ent1.map_child_entity(child_entity_name::CHARACTER_CROSSHAIR, new_ent2);
 
 	{
 		augs::stream s;
@@ -593,7 +593,7 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndCreatedThreeEntitiesWithReferences) {
 	ASSERT_TRUE(pc3_intact);
 
 	ASSERT_TRUE(ent1.has<components::sub_entities>());
-	const bool sub_entities_intact = ent1.get<components::sub_entities>().sub_entities_by_name[sub_entity_name::CHARACTER_CROSSHAIR] == ent2.get_id();
+	const bool sub_entities_intact = ent1.get<components::sub_entities>().sub_entities_by_name[child_entity_name::CHARACTER_CROSSHAIR] == ent2.get_id();
 	ASSERT_TRUE(sub_entities_intact);
 
 	{
@@ -632,7 +632,7 @@ TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
 		new_ent2.get<components::position_copying>().set_target(new_ent3);
 		new_ent3.get<components::position_copying>().set_target(new_ent1);
 
-		new_ent1.map_sub_entity(sub_entity_name::CHARACTER_CROSSHAIR, new_ent2);
+		new_ent1.map_child_entity(child_entity_name::CHARACTER_CROSSHAIR, new_ent2);
 	}
 
 	cosmos c2(3);
@@ -653,7 +653,7 @@ TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
 		new_ent2.get<components::position_copying>().set_target(new_ent3);
 		new_ent3.get<components::position_copying>().set_target(new_ent1);
 
-		new_ent1.map_sub_entity(sub_entity_name::CHARACTER_CROSSHAIR, new_ent2);
+		new_ent1.map_child_entity(child_entity_name::CHARACTER_CROSSHAIR, new_ent2);
 	}
 
 	ASSERT_EQ(3, c1.entities_count());
@@ -696,7 +696,7 @@ TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
 	ASSERT_TRUE(pc1_dead);
 
 	ASSERT_TRUE(ent1.has<components::sub_entities>());
-	const bool sub_entity_dead = c1[ent1.get<components::sub_entities>().sub_entities_by_name[sub_entity_name::CHARACTER_CROSSHAIR]].dead();
+	const bool sub_entity_dead = c1[ent1.get<components::sub_entities>().sub_entities_by_name[child_entity_name::CHARACTER_CROSSHAIR]].dead();
 	ASSERT_TRUE(sub_entity_dead);
 
 	ASSERT_TRUE(ent3.has<components::position_copying>());

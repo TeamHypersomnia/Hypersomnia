@@ -165,14 +165,14 @@ void car_system::apply_movement_forces(const logic_step step) {
 				}
 			};
 
-			engine_handler(cosmos[car.deceleration_engine[0]], car.decelerating && !car.accelerating);
-			engine_handler(cosmos[car.deceleration_engine[1]], car.decelerating && !car.accelerating);
+			engine_handler(cosmos[car.deceleration_engine[0].particles], car.decelerating && !car.accelerating);
+			engine_handler(cosmos[car.deceleration_engine[1].particles], car.decelerating && !car.accelerating);
 
-			engine_handler(cosmos[car.acceleration_engine[0]], car.accelerating && !car.decelerating);
-			engine_handler(cosmos[car.acceleration_engine[1]], car.accelerating && !car.decelerating);
+			engine_handler(cosmos[car.acceleration_engine[0].particles], car.accelerating && !car.decelerating);
+			engine_handler(cosmos[car.acceleration_engine[1].particles], car.accelerating && !car.decelerating);
 
-			engine_handler(cosmos[car.right_engine], car.turning_left && !car.turning_right);
-			engine_handler(cosmos[car.left_engine], car.turning_right && !car.turning_left);
+			engine_handler(cosmos[car.right_engine.particles], car.turning_left && !car.turning_right);
+			engine_handler(cosmos[car.left_engine.particles], car.turning_right && !car.turning_left);
 
 			const bool sound_enabled = cosmos[car.current_driver].alive();
 			const auto sound_entity = cosmos[car.engine_sound];

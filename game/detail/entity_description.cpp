@@ -106,7 +106,7 @@ std::wstring describe_properties(const const_entity_handle id) {
 
 	std::wstring out;
 
-	const auto& bullet_round = id[sub_entity_name::BULLET_ROUND];
+	const auto& bullet_round = id[child_entity_name::BULLET_ROUND];
 
 	if (bullet_round.alive()) {
 		out = result.str() + describe_properties(bullet_round);

@@ -101,7 +101,7 @@ namespace components {
 		float danger_amount_from_hostile_attitude = 100.f;
 
 		recoil_player aimpunch;
-		entity_id health_damage_particles;
+		child_entity_id health_damage_particles;
 
 		template<class F>
 		void for_each_held_id(F f) {

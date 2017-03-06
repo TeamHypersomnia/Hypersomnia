@@ -6,10 +6,12 @@
 #include "game/transcendental/entity_id.h"
 
 #include "game/enums/slot_function.h"
-#include "game/enums/sub_entity_name.h"
+#include "game/enums/child_entity_name.h"
 
 #include "game/build_settings.h"
 #include "augs/build_settings/setting_empty_bases.h"
+
+#include "augs/templates/maybe_const.h"
 
 struct entity_relations;
 
@@ -18,8 +20,6 @@ class basic_relations_mixin {
 protected:
 	typedef basic_inventory_slot_handle<is_const> inventory_slot_handle_type;
 	
-	const components::child& get_child_component() const;
-	const components::sub_entities& get_sub_entities_component() const;
 	const components::physical_relations& get_physical_relations_component() const;
 
 public:
@@ -32,8 +32,10 @@ public:
 	unsigned get_guid() const;
 #endif
 
+	maybe_const_ref_t<is_const, child_entity_id> get_id(const child_entity_name) const;
+
 	inventory_slot_handle_type operator[](const slot_function) const;
-	entity_handle_type operator[](const sub_entity_name) const;
+	entity_handle_type operator[](const child_entity_name) const;
 
 	template <class F>
 	void for_each_sub_entity_recursive(F callback) const {
@@ -75,17 +77,15 @@ class relations_mixin;
 template<class entity_handle_type>
 class EMPTY_BASES relations_mixin<false, entity_handle_type> : public basic_relations_mixin<false, entity_handle_type> {
 protected:
-	components::child& child_component() const;
-	components::sub_entities& sub_entities_component() const;
 	components::physical_relations& physical_relations_component() const;
 
-	void make_child(const entity_id, const sub_entity_name) const;
 public:
+	void make_child_of(const entity_id) const;
+
 	void set_owner_body(const entity_id) const;
 	void make_cloned_sub_entities_recursive(const entity_id copied) const;
 
-	void add_sub_entity(const entity_id p, const sub_entity_name optional_name = sub_entity_name::INVALID) const;
-	void map_sub_entity(const sub_entity_name n, const entity_id p) const;
+	void map_child_entity(const child_entity_name n, const entity_id p) const;
 };
 
 template<class entity_handle_type>

@@ -15,6 +15,8 @@ namespace components {
 			LOOK
 		} orbit_mode = LOOK;
 
+		child_entity_id recoil_entity;
+
 		entity_id character_entity_to_chase;
 		vec2 base_offset;
 		vec2 bounds_for_base_offset;

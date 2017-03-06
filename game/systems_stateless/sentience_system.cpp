@@ -160,7 +160,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 			const auto shake_mult = 1.f - (now - sentience.time_of_last_shake).in_milliseconds(delta) / sentience.shake_for_ms;
 
 			if (shake_mult > 0.f) {
-				const auto owning_crosshair_recoil = subject[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
+				const auto owning_crosshair_recoil = subject[child_entity_name::CHARACTER_CROSSHAIR][child_entity_name::CROSSHAIR_RECOIL_BODY];
 				auto rng = cosmos.get_rng_for(subject);
 
 				owning_crosshair_recoil.get<components::physics>().apply_impulse(
@@ -219,8 +219,8 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 	case messages::health_event::target_type::AIM:
 		const auto punched = subject;
 
-		if (punched[sub_entity_name::CHARACTER_CROSSHAIR].alive() && punched[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY].alive()) {
-			auto owning_crosshair_recoil = punched[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
+		if (punched[child_entity_name::CHARACTER_CROSSHAIR].alive() && punched[child_entity_name::CHARACTER_CROSSHAIR][child_entity_name::CROSSHAIR_RECOIL_BODY].alive()) {
+			auto owning_crosshair_recoil = punched[child_entity_name::CHARACTER_CROSSHAIR][child_entity_name::CROSSHAIR_RECOIL_BODY];
 
 			sentience.aimpunch.shoot_and_apply_impulse(
 				owning_crosshair_recoil, 
@@ -254,9 +254,6 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 			}
 		}
 
-		//const auto sub_def = subject[sub_entity_name::CORPSE_OF_SENTIENCE];
-		//
-		//const auto corpse = cosmos.clone_entity(sub_def);
 		//
 		//auto place_of_death = subject.get_logic_transform();
 		//place_of_death.rotation = h.impact_velocity.degrees();

@@ -58,7 +58,7 @@ namespace behaviours {
 			attitude.last_seen_target_velocity = velocity(closest_hostile);
 		}
 
-		auto crosshair = subject[sub_entity_name::CHARACTER_CROSSHAIR];
+		auto crosshair = subject[child_entity_name::CHARACTER_CROSSHAIR];
 
 		if (crosshair.alive()) {
 			auto& crosshair_offset = crosshair.get<components::crosshair>().base_offset;

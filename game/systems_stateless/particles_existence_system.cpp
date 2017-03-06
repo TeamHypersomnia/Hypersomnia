@@ -108,7 +108,6 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 			burst.input.modifier = round_response.modifier;
 
 			const auto trace = create_particle_effect_entity(cosmos, burst);
-			//cosmos[r].add_sub_entity(trace);
 			trace.add_standard_components();
 		}
 
@@ -126,8 +125,8 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 			step.transient.messages.post(burst);
 		}
 		
-		if (cosmos[g.subject][sub_entity_name::MUZZLE_SMOKE].alive()) {
-			messages::queue_destruction msg = { cosmos[g.subject][sub_entity_name::MUZZLE_SMOKE] };
+		if (cosmos[g.subject][child_entity_name::MUZZLE_SMOKE].alive()) {
+			messages::queue_destruction msg = { cosmos[g.subject][child_entity_name::MUZZLE_SMOKE] };
 			step.transient.messages.post(msg);
 		}
 	}

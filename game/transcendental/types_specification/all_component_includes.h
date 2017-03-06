@@ -39,7 +39,6 @@
 #include "game/components/substance_component.h"
 #include "game/components/guid_component.h"
 #include "game/components/child_component.h"
-#include "game/components/sub_entities_component.h"
 #include "game/components/physical_relations_component.h"
 #include "game/components/interpolation_component.h"
 #include "game/components/flags_component.h"
@@ -47,4 +46,5 @@
 #include "game/components/wandering_pixels_component.h"
 #include "game/components/sound_existence_component.h"
 #include "game/components/sound_response_component.h"
+#include "game/components/grenade_component.h"
 

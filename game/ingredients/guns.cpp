@@ -40,7 +40,6 @@ void add_muzzle_particles(
 	const auto engine = particles_existence_system().create_particle_effect_entity(cosmos, effect);
 
 	engine.add_standard_components();
-	weapon.add_sub_entity(engine);
 
 	components::particles_existence::deactivate(engine);
 
@@ -233,8 +232,8 @@ namespace prefabs {
 			response.modifier.colorize = pink;
 		}
 
-		pink_charge.map_sub_entity(sub_entity_name::BULLET_ROUND, round_definition);
-		pink_charge.map_sub_entity(sub_entity_name::BULLET_SHELL, shell_definition);
+		pink_charge.map_child_entity(child_entity_name::BULLET_ROUND, round_definition);
+		pink_charge.map_child_entity(child_entity_name::BULLET_SHELL, shell_definition);
 
 		pink_charge.add_standard_components();
 
@@ -288,8 +287,8 @@ namespace prefabs {
 			response.modifier.colorize = cyan;
 		}
 
-		cyan_charge.map_sub_entity(sub_entity_name::BULLET_ROUND, round_definition);
-		cyan_charge.map_sub_entity(sub_entity_name::BULLET_SHELL, shell_definition);
+		cyan_charge.map_child_entity(child_entity_name::BULLET_ROUND, round_definition);
+		cyan_charge.map_child_entity(child_entity_name::BULLET_SHELL, shell_definition);
 
 		cyan_charge.add_standard_components();
 
@@ -346,8 +345,8 @@ namespace prefabs {
 			response.modifier.colorize = green;
 		}
 
-		green_charge.map_sub_entity(sub_entity_name::BULLET_ROUND, round_definition);
-		green_charge.map_sub_entity(sub_entity_name::BULLET_SHELL, shell_definition);
+		green_charge.map_child_entity(child_entity_name::BULLET_ROUND, round_definition);
+		green_charge.map_child_entity(child_entity_name::BULLET_SHELL, shell_definition);
 
 		green_charge.add_standard_components();
 
@@ -424,7 +423,6 @@ namespace prefabs {
 			in.delete_entity_after_effect_lifetime = false;
 			const auto engine_sound = sound_existence_system().create_sound_effect_entity(cosmos, in, gun.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
 			engine_sound.add_standard_components();
-			weapon.add_sub_entity(engine_sound);
 			gun.firing_engine_sound = engine_sound;
 			components::sound_existence::deactivate(engine_sound);
 
@@ -521,7 +519,6 @@ namespace prefabs {
 			in.delete_entity_after_effect_lifetime = false;
 			const auto engine_sound = sound_existence_system().create_sound_effect_entity(cosmos, in, gun.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
 			engine_sound.add_standard_components();
-			weapon.add_sub_entity(engine_sound);
 			gun.firing_engine_sound = engine_sound;
 			components::sound_existence::deactivate(engine_sound);
 
@@ -584,7 +581,6 @@ namespace prefabs {
 			in.delete_entity_after_effect_lifetime = false;
 			const auto engine_sound = sound_existence_system().create_sound_effect_entity(cosmos, in, gun.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
 			engine_sound.add_standard_components();
-			weapon.add_sub_entity(engine_sound);
 			gun.firing_engine_sound = engine_sound;
 			components::sound_existence::deactivate(engine_sound);
 
@@ -875,7 +871,6 @@ namespace prefabs {
 			in.delete_entity_after_effect_lifetime = false;
 			const auto engine_sound = sound_existence_system().create_sound_effect_entity(cosmos, in, gun.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
 			engine_sound.add_standard_components();
-			weapon.add_sub_entity(engine_sound);
 			gun.firing_engine_sound = engine_sound;
 			components::sound_existence::deactivate(engine_sound);
 
