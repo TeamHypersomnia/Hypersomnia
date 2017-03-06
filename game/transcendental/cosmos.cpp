@@ -59,7 +59,7 @@ void cosmos::destroy_substance_completely() {
 	systems_temporary.~storage_for_all_systems_temporary();
 	new (&systems_temporary) storage_for_all_systems_temporary;
 
-	size_t n = significant.pool_for_aggregates.capacity();
+	const auto n = significant.pool_for_aggregates.capacity();
 
 	systems_temporary.for_each([n](auto& sys) {
 		sys.reserve_caches_for_entities(n);
@@ -67,7 +67,7 @@ void cosmos::destroy_substance_completely() {
 }
 
 void cosmos::create_substance_completely() {
-	for (auto& ordered_pair : guid_map_for_transport) {
+	for (const auto& ordered_pair : guid_map_for_transport) {
 		create_substance_for_entity(get_handle(ordered_pair.second));
 	}
 

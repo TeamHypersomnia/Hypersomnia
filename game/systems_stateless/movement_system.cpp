@@ -26,33 +26,38 @@ void movement_system::set_movement_flags_from_input(const logic_step step) {
 	const auto& events = step.transient.messages.get_queue<messages::intent_message>();
 
 	for (const auto& it : events) {
-		auto* const movement = cosmos[it.subject].find<components::movement>();
-		
-		if (movement == nullptr) {
-			continue;
-		}
+		cosmos(
+			it.subject,
+			[&](const auto subject) {
+				auto* const movement = subject.find<components::movement>();
 
-		switch (it.intent) {
-		case intent_type::MOVE_FORWARD:
-			movement->moving_forward = it.is_pressed;
-			break;
-		case intent_type::MOVE_BACKWARD:
-			movement->moving_backward = it.is_pressed;
-			break;
-		case intent_type::MOVE_LEFT:
-			movement->moving_left = it.is_pressed;
-			break;
-		case intent_type::MOVE_RIGHT:
-			movement->moving_right = it.is_pressed;
-			break;
-		case intent_type::WALK:
-			movement->walking_enabled = it.is_pressed;
-			break;
-		case intent_type::SPRINT:
-			movement->sprint_enabled = it.is_pressed;
-			break;
-		default: break;
-		}
+				if (movement == nullptr) {
+					return;
+				}
+
+				switch (it.intent) {
+				case intent_type::MOVE_FORWARD:
+					movement->moving_forward = it.is_pressed;
+					break;
+				case intent_type::MOVE_BACKWARD:
+					movement->moving_backward = it.is_pressed;
+					break;
+				case intent_type::MOVE_LEFT:
+					movement->moving_left = it.is_pressed;
+					break;
+				case intent_type::MOVE_RIGHT:
+					movement->moving_right = it.is_pressed;
+					break;
+				case intent_type::WALK:
+					movement->walking_enabled = it.is_pressed;
+					break;
+				case intent_type::SPRINT:
+					movement->sprint_enabled = it.is_pressed;
+					break;
+				default: break;
+				}
+			}
+		);
 	}
 }
 
