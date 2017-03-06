@@ -150,10 +150,10 @@ namespace resource_setups {
 		}
 
 		{
-			auto& in = output[assets::game_image_id::SHOTGUN];
-			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/shotgun.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
-			in.settings.gui.flip_horizontally = true;
-			in.settings.gui.flip_vertically = true;
+			// auto& in = output[assets::game_image_id::SHOTGUN];
+			// in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/shotgun.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
+			// in.settings.gui.flip_horizontally = true;
+			// in.settings.gui.flip_vertically = true;
 		}
 
 		{
