@@ -10,6 +10,7 @@
 
 namespace components {
 	struct attitude {
+		// GEN INTROSPECTOR components::attitude
 		float maximum_divergence_angle_before_shooting = 10.0;
 
 		unsigned parties = 0;
@@ -26,43 +27,6 @@ namespace components {
 
 		vec2 last_seen_target_position;
 		vec2 last_seen_target_velocity;
-
-		template<class F>
-		void for_each_held_id(F f) {
-			f(currently_attacked_visible_entity);
-
-			for (auto& e : specific_hostile_entities) {
-				f(e);
-			}
-		}
-
-		template<class F>
-		void for_each_held_id(F f) const {
-			f(currently_attacked_visible_entity);
-
-			for (const auto& e : specific_hostile_entities) {
-				f(e);
-			}
-		}
-
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(parties),
-				CEREAL_NVP(hostile_parties),
-				CEREAL_NVP(specific_hostile_entities),
-
-				CEREAL_NVP(currently_attacked_visible_entity),
-				CEREAL_NVP(target_attitude),
-
-				CEREAL_NVP(is_alert),
-
-				CEREAL_NVP(last_seen_target_position),
-				CEREAL_NVP(last_seen_target_velocity),
-				CEREAL_NVP(last_seen_target_position_inspected),
-				
-				CEREAL_NVP(maximum_divergence_angle_before_shooting)
-			);
-		}
+		// END GEN INTROSPECTOR
 	};
 }

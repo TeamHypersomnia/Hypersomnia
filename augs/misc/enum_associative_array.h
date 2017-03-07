@@ -2,6 +2,7 @@
 #include <bitset>
 #include "augs/ensure.h"
 #include "augs/templates/maybe_const.h"
+#include "augs/misc/introspect.h"
 
 namespace augs {
 	template<class Enum, class T>
@@ -10,6 +11,12 @@ namespace augs {
 
 		std::bitset<size_t(Enum::COUNT)> is_set;
 		arr_type raw;
+
+		template<bool is_const, class F, class Enum, class T>
+		friend void introspect(
+			maybe_const_ref_t<is_const, enum_associative_array<Enum, T>> t,
+			F f
+		);
 
 		unsigned find_first_set_index(unsigned from) const {
 			while (from < static_cast<size_t>(Enum::COUNT) && !is_set.test(from)) {
@@ -142,4 +149,13 @@ namespace augs {
 			is_set = std::bitset<static_cast<size_t>(Enum::COUNT)>();
 		}
 	};
+
+	template<bool is_const, class F, class Enum, class T>
+	void introspect(
+		maybe_const_ref_t<is_const, enum_associative_array<Enum, T>> t,
+		F f
+	) {
+		f(t.NVP(is_set));
+		f(t.NVP(raw));
+	}
 }

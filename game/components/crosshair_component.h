@@ -13,7 +13,10 @@ namespace components {
 			NONE,
 			ANGLED,
 			LOOK
-		} orbit_mode = LOOK;
+		};
+
+		// GEN INTROSPECTOR components::crosshair
+		orbit_type orbit_mode = LOOK;
 
 		child_entity_id recoil_entity;
 
@@ -27,34 +30,8 @@ namespace components {
 		float rotation_offset = 0.f;
 		vec2 size_multiplier = vec2(1.0f, 1.0f);
 		vec2 sensitivity = vec2(1.0f, 1.0f);
+		// END GEN INTROSPECTOR
 
 		void update_bounds();
-
-		template<class F>
-		void for_each_held_id(F f) {
-			f(character_entity_to_chase);
-		}
-
-		template<class F>
-		void for_each_held_id(F f) const {
-			f(character_entity_to_chase);
-		}
-
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(orbit_mode),
-
-				CEREAL_NVP(character_entity_to_chase),
-				CEREAL_NVP(base_offset), 
-				CEREAL_NVP(bounds_for_base_offset),
-
-				CEREAL_NVP(visible_world_area),
-				CEREAL_NVP(max_look_expand),
-				
-				CEREAL_NVP(rotation_offset), 
-				CEREAL_NVP(size_multiplier), 
-				CEREAL_NVP(sensitivity));
-		}
 	};
 }

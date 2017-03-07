@@ -10,22 +10,15 @@
 namespace components {
 	struct behaviour_tree {
 		struct instance {
+			// GEN INTROSPECTOR components::behaviour_tree::instance
 			resources::behaviour_tree::state_of_tree_instance state;
 			assets::behaviour_tree_id tree_id = assets::behaviour_tree_id::INVALID;
-
-			template <class Archive>
-			void serialize(Archive& ar) {
-				ar(CEREAL_NVP(state), 
-					CEREAL_NVP(tree_id));
-			}
+			// END GEN INTROSPECTOR
 		};
 
+		// GEN INTROSPECTOR components::behaviour_tree
 		augs::constant_size_vector<instance, CONCURRENT_TREES_COUNT> concurrent_trees;
-
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(CEREAL_NVP(concurrent_trees));
-		}
+		// END GEN INTROSPECTOR
 	};
 }
 

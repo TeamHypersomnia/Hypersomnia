@@ -6,6 +6,14 @@
 
 namespace components {
 	struct car {
+		struct engine_entities {
+			// GEN INTROSPECTOR components::car::engine_entities
+			child_entity_id physical;
+			child_entity_id particles;
+			// END GEN INTROSPECTOR
+		};
+
+		// GEN INTROSPECTOR components::car
 		entity_id current_driver;
 
 		child_entity_id interior;
@@ -13,13 +21,8 @@ namespace components {
 		child_entity_id left_wheel_trigger;
 		child_entity_id right_wheel_trigger;
 
-		struct engine_entities {
-			child_entity_id physical;
-			child_entity_id particles;
-		};
-
-		engine_entities acceleration_engine[2];
-		engine_entities deceleration_engine[2];
+		std::array<engine_entities, 2> acceleration_engine;
+		std::array<engine_entities, 2> deceleration_engine;
 
 		engine_entities left_engine;
 		engine_entities right_engine;
@@ -66,104 +69,8 @@ namespace components {
 
 		augs::stepped_timestamp last_turned_on;
 		augs::stepped_timestamp last_turned_off;
-
-		template<class F>
-		void for_each_held_id(F f) {
-			f(current_driver);
-
-			f(left_wheel_trigger);
-			f(right_wheel_trigger);
-
-			for (auto& e : acceleration_engine_particles) {
-				f(e);
-			}
-
-			for (auto& e : deceleration_engine) {
-				f(e);
-			}
-
-			f(left_engine_particles);
-			f(right_engine_particles);
-
-			f(engine_sound);
-		}
-
-		template<class F>
-		void for_each_held_id(F f) const {
-			f(current_driver);
-
-			f(left_wheel_trigger);
-			f(right_wheel_trigger);
-
-			for (const auto& e : acceleration_engine_particles) {
-				f(e);
-			}
-
-			for (const auto& e : deceleration_engine) {
-				f(e);
-			}
-
-			f(left_engine_particles);
-			f(right_engine_particles);
-
-			f(engine_sound);
-		}
-
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(current_driver),
-
-				CEREAL_NVP(left_wheel_trigger),
-				CEREAL_NVP(right_wheel_trigger),
-
-				CEREAL_NVP(accelerating),
-				CEREAL_NVP(decelerating),
-				CEREAL_NVP(turning_right),
-				CEREAL_NVP(turning_left),
-				CEREAL_NVP(hand_brake),
-
-				CEREAL_NVP(braking_damping),
-				CEREAL_NVP(braking_angular_damping),
-
-				CEREAL_NVP(input_acceleration),
-
-				CEREAL_NVP(acceleration_length),
-
-				CEREAL_NVP(maximum_speed_with_static_air_resistance),
-				CEREAL_NVP(maximum_speed_with_static_damping),
-				CEREAL_NVP(static_air_resistance),
-				CEREAL_NVP(dynamic_air_resistance),
-				CEREAL_NVP(static_damping),
-				CEREAL_NVP(dynamic_damping),
-
-				CEREAL_NVP(maximum_lateral_cancellation_impulse),
-				CEREAL_NVP(lateral_impulse_multiplier),
-
-				CEREAL_NVP(angular_damping),
-				CEREAL_NVP(angular_damping_while_hand_braking),
-
-				CEREAL_NVP(minimum_speed_for_maneuverability_decrease),
-				CEREAL_NVP(maneuverability_decrease_multiplier),
-
-				CEREAL_NVP(angular_air_resistance),
-				CEREAL_NVP(angular_air_resistance_while_hand_braking),
-
-				CEREAL_NVP(wheel_offset)
-				);
-		}
+		// END GEN INTROSPECTOR
 
 		void reset_movement_flags();
 	};
-}
-
-namespace augs {
-	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, image::paint_circle_midpoint_command> t,
-		F f
-	) {
-
-
-	}
 }

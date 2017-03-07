@@ -8,6 +8,8 @@
 #include "augs/templates/for_each_in_types.h"
 #include "augs/misc/templated_readwrite.h"
 
+#include "generated_introspect.h"
+
 namespace fs = std::experimental::filesystem;
 
 void regenerate_scripted_images(
