@@ -14,24 +14,18 @@ struct general_particle;
 
 namespace resources {
 	struct particle_effect_modifier {
+		// GEN INTROSPECTOR resources::particle_effect_modifier
 		rgba colorize;
 		float scale_amounts = 1.f;
 		float scale_lifetimes = 1.f;
 		entity_id homing_target;
-
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(colorize),
-				CEREAL_NVP(scale_amounts),
-				CEREAL_NVP(scale_lifetimes)
-			);
-		}
+		// END GEN INTROSPECTOR
 	};
 
 	struct emission {
 		typedef augs::minmax<float> minmax;
-
+		
+		// GEN INTROSPECTOR resources::emission
 		minmax spread_degrees = minmax(0.f, 0.f);
 		minmax base_speed = minmax(0.f, 0.f);
 		minmax base_speed_variation = minmax(0.f, 0.f);
@@ -69,6 +63,7 @@ namespace resources {
 		bool should_particles_look_towards_velocity = true;
 
 		put_all_particle_types_into_t<make_vector> particle_templates;
+		// END GEN INTROSPECTOR
 
 		template <class T>
 		auto& get_templates() {
@@ -86,38 +81,6 @@ namespace resources {
 		}
 
 		components::render particle_render_template;
-
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(type),
-				CEREAL_NVP(spread_degrees),
-				CEREAL_NVP(velocity),
-				CEREAL_NVP(rotation_speed),
-				CEREAL_NVP(particles_per_sec),
-				CEREAL_NVP(stream_lifetime_ms),
-				CEREAL_NVP(particle_lifetime_ms),
-				CEREAL_NVP(size_multiplier),
-				CEREAL_NVP(acceleration),
-				CEREAL_NVP(angular_offset),
-				CEREAL_NVP(swing_spread),
-				CEREAL_NVP(swings_per_sec),
-				CEREAL_NVP(min_swing_spread),
-				CEREAL_NVP(max_swing_spread),
-				CEREAL_NVP(min_swings_per_sec),
-				CEREAL_NVP(max_swings_per_sec),
-				CEREAL_NVP(swing_spread_change_rate),
-				CEREAL_NVP(swing_speed_change_rate),
-				CEREAL_NVP(fade_when_ms_remaining),
-				CEREAL_NVP(num_of_particles_to_spawn_initially),
-
-				CEREAL_NVP(initial_rotation_variation),
-				CEREAL_NVP(randomize_acceleration),
-
-				CEREAL_NVP(particle_templates),
-				CEREAL_NVP(particle_render_template)
-			);
-		}
 
 		void apply_modifier(const particle_effect_modifier m);
 	};

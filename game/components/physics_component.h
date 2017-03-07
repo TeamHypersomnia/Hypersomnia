@@ -24,6 +24,7 @@ namespace components {
 			const components::transform t = components::transform()
 		);
 
+		// GEN INTROSPECTOR components::physics
 		bool fixed_rotation = false;
 		bool bullet = false;
 		bool angled_damping = false;
@@ -41,6 +42,7 @@ namespace components {
 
 		vec2 velocity;
 		float angular_velocity = 0.f;
+		// END GEN INTROSPECTOR
 
 		void set_transform(
 			const si_scaling,

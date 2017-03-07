@@ -10,22 +10,18 @@
 namespace components {
 	struct sound_existence {
 		struct effect_input {
+			// GEN INTROSPECTOR components::sound_existence::effect_input
 			assets::sound_buffer_id effect = assets::sound_buffer_id::INVALID;
 			bool delete_entity_after_effect_lifetime = true;
 			char variation_number = -1;
 			entity_id direct_listener;
 			augs::sound_effect_modifier modifier;
-		} input;
-
-		template<class F>
-		void for_each_held_id(F f) {
-			f(input.direct_listener);
-		}
-
-		template<class F>
-		void for_each_held_id(F f) const {
-			f(input.direct_listener);
-		}
+			// END GEN INTROSPECTOR
+		};
+		
+		// GEN INTROSPECTOR components::sound_existence
+		effect_input input;
+		// END GEN INTROSPECTOR
 
 		static bool is_activated(const const_entity_handle);
 		static void activate(const entity_handle);

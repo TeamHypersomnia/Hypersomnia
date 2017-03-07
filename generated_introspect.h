@@ -3,12 +3,43 @@
 #include "game/components/car_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/light_component.h"
+#include "game/components/movement_component.h"
+#include "game/components/sound_existence_component.h"
+#include "game/components/particles_existence_component.h"
+#include "game/components/special_physics_component.h"
+#include "augs/audio/sound_effect_modifier.h"
 #include "augs/image/image.h"
+
+/*
+	This file was generated with use of Introspector-generator available at:
+	https://github.com/TeamHypersomnia/Introspector-generator
+	Please use that tool whenever you add or remove new fields to objects that need to be introspected.
+*/
+
 class config_lua_table;
+class recoil_player;
 
 #define NVP(x) x, #x
 
+namespace resources {
+	struct particle_effect_modifier;
+	struct emission;
+}
+
 namespace augs {
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, augs::sound_effect_modifier> t,
+		F f
+	) {
+		f(t.NVP(repetitions));
+		f(t.NVP(gain));
+		f(t.NVP(pitch));
+		f(t.NVP(max_distance));
+		f(t.NVP(reference_distance));
+		f(t.NVP(fade_on_exit));
+	}
+
 	template <bool C, class F>
 	void introspect(
 		maybe_const_ref_t<C, augs::image::paint_circle_midpoint_command> t,
@@ -21,7 +52,6 @@ namespace augs {
 		f(t.NVP(angle_start));
 		f(t.NVP(angle_end));
 		f(t.NVP(filling));
-
 	}
 
 	template <bool C, class F>
@@ -31,7 +61,6 @@ namespace augs {
 	) {
 		f(t.NVP(radius));
 		f(t.NVP(filling));
-
 	}
 
 	template <bool C, class F>
@@ -42,7 +71,6 @@ namespace augs {
 		f(t.NVP(from));
 		f(t.NVP(to));
 		f(t.NVP(filling));
-
 	}
 
 	template <bool C, class F, class T, int const_count>
@@ -52,7 +80,6 @@ namespace augs {
 	) {
 		f(t.NVP(count));
 		f(t.NVP(raw));
-
 	}
 
 	template <bool C, class F, class Enum, class T>
@@ -62,7 +89,21 @@ namespace augs {
 	) {
 		f(t.NVP(is_set));
 		f(t.NVP(raw));
+	}
 
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, recoil_player> t,
+		F f
+	) {
+		f(t.NVP(offsets));
+		f(t.NVP(current_offset));
+		f(t.NVP(reversed));
+		f(t.NVP(repeat_last_n_offsets));
+
+		f(t.NVP(single_cooldown_duration_ms));
+		f(t.NVP(remaining_cooldown_duration));
+		f(t.NVP(scale));
 	}
 
 	template <bool C, class F>
@@ -79,7 +120,6 @@ namespace augs {
 
 		f(t.NVP(state));
 		f(t.NVP(paused_state));
-
 	}
 
 	template <bool C, class F>
@@ -88,7 +128,6 @@ namespace augs {
 		F f
 	) {
 		f(t.NVP(response));
-
 	}
 
 	template <bool C, class F>
@@ -111,7 +150,6 @@ namespace augs {
 
 		f(t.NVP(last_seen_target_position));
 		f(t.NVP(last_seen_target_velocity));
-
 	}
 
 	template <bool C, class F>
@@ -121,7 +159,6 @@ namespace augs {
 	) {
 		f(t.NVP(state));
 		f(t.NVP(tree_id));
-
 	}
 
 	template <bool C, class F>
@@ -130,7 +167,6 @@ namespace augs {
 		F f
 	) {
 		f(t.NVP(concurrent_trees));
-
 	}
 
 	template <bool C, class F>
@@ -140,7 +176,6 @@ namespace augs {
 	) {
 		f(t.NVP(physical));
 		f(t.NVP(particles));
-
 	}
 
 	template <bool C, class F>
@@ -202,7 +237,6 @@ namespace augs {
 
 		f(t.NVP(last_turned_on));
 		f(t.NVP(last_turned_off));
-
 	}
 
 	template <bool C, class F>
@@ -211,7 +245,6 @@ namespace augs {
 		F f
 	) {
 		f(t.NVP(parent));
-
 	}
 
 	template <bool C, class F>
@@ -220,7 +253,6 @@ namespace augs {
 		F f
 	) {
 		f(t.NVP(slots));
-
 	}
 
 	template <bool C, class F>
@@ -242,7 +274,6 @@ namespace augs {
 		f(t.NVP(rotation_offset));
 		f(t.NVP(size_multiplier));
 		f(t.NVP(sensitivity));
-
 	}
 
 	template <bool C, class F>
@@ -281,7 +312,6 @@ namespace augs {
 		f(t.NVP(particular_homing_target));
 
 		f(t.NVP(saved_point_of_impact_before_death));
-
 	}
 
 	template <bool C, class F>
@@ -291,7 +321,6 @@ namespace augs {
 	) {
 		f(t.NVP(owned_vehicle));
 		f(t.NVP(density_multiplier_while_driving));
-
 	}
 
 	template <bool C, class F>
@@ -305,7 +334,6 @@ namespace augs {
 
 
 		f(t.NVP(aabb));
-
 	}
 
 	template <bool C, class F>
@@ -326,7 +354,6 @@ namespace augs {
 		f(t.NVP(filter));
 		f(t.NVP(destructible));
 		f(t.NVP(sensor));
-
 	}
 
 	template <bool C, class F>
@@ -341,7 +368,6 @@ namespace augs {
 		f(t.NVP(is_friction_ground));
 		f(t.NVP(disable_standard_collision_resolution));
 		f(t.NVP(can_driver_shoot_through));
-
 	}
 
 	template <bool C, class F>
@@ -350,7 +376,6 @@ namespace augs {
 		F f
 	) {
 		f(t.NVP(bit_flags));
-
 	}
 
 	template <bool C, class F>
@@ -372,7 +397,6 @@ namespace augs {
 		f(t.NVP(chased_entity_offset));
 
 		f(t.NVP(force_offsets));
-
 	}
 
 	template <bool C, class F>
@@ -382,7 +406,6 @@ namespace augs {
 	) {
 		f(t.NVP(spoon));
 		f(t.NVP(type));
-
 	}
 
 	template <bool C, class F>
@@ -391,7 +414,6 @@ namespace augs {
 		F f
 	) {
 		f(t.NVP(value));
-
 	}
 
 	template <bool C, class F>
@@ -432,7 +454,6 @@ namespace augs {
 
 		f(t.NVP(firing_engine_sound));
 		f(t.NVP(muzzle_particles));
-
 	}
 
 	template <bool C, class F>
@@ -442,7 +463,6 @@ namespace augs {
 	) {
 		f(t.NVP(base_exponent));
 		f(t.NVP(place_of_birth));
-
 	}
 
 	template <bool C, class F>
@@ -467,7 +487,6 @@ namespace augs {
 
 		f(t.NVP(montage_time_ms));
 		f(t.NVP(montage_time_left_ms));
-
 	}
 
 	template <bool C, class F>
@@ -480,7 +499,6 @@ namespace augs {
 
 		f(t.NVP(only_pick_these_items));
 		f(t.NVP(pick_all_touched_items_if_list_to_pick_empty));
-
 	}
 
 	template <bool C, class F>
@@ -491,7 +509,6 @@ namespace augs {
 		f(t.NVP(min_value));
 		f(t.NVP(max_value));
 		f(t.NVP(change_speed));
-
 	}
 
 	template <bool C, class F>
@@ -501,7 +518,6 @@ namespace augs {
 	) {
 		f(t.NVP(base_value));
 		f(t.NVP(variation));
-
 	}
 
 	template <bool C, class F>
@@ -522,7 +538,407 @@ namespace augs {
 		f(t.NVP(wall_max_distance));
 
 		f(t.NVP(position_variations));
+	}
 
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::melee> t,
+		F f
+	) {
+		f(t.NVP(primary_move_flag));
+		f(t.NVP(secondary_move_flag));
+		f(t.NVP(tertiary_move_flag));
+
+		f(t.NVP(current_state));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::movement::subscribtion> t,
+		F f
+	) {
+		f(t.NVP(target));
+		f(t.NVP(stop_response_at_zero_speed));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::movement> t,
+		F f
+	) {
+		f(t.NVP(response_receivers));
+		
+		f(t.NVP(moving_left));
+		f(t.NVP(moving_right));
+		f(t.NVP(moving_forward));
+		f(t.NVP(moving_backward));
+
+		f(t.NVP(walking_enabled));
+		f(t.NVP(enable_braking_damping));
+		f(t.NVP(enable_animation));
+		f(t.NVP(sprint_enabled));
+
+		f(t.NVP(input_acceleration_axes));
+		f(t.NVP(acceleration_length));
+
+		f(t.NVP(applied_force_offset));
+
+		f(t.NVP(non_braking_damping));
+		f(t.NVP(braking_damping));
+
+		f(t.NVP(standard_linear_damping));
+
+		f(t.NVP(make_inert_for_ms));
+		f(t.NVP(max_speed_for_movement_response));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::name> t,
+		F f
+	) {
+		f(t.NVP(id));
+
+		f(t.NVP(custom_nickname));
+		f(t.NVP(nickname));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::particles_existence::effect_input> t,
+		F f
+	) {
+		f(t.NVP(effect));
+		f(t.NVP(delete_entity_after_effect_lifetime));
+
+		f(t.NVP(modifier));
+
+		f(t.NVP(displace_source_position_within_radius));
+		f(t.NVP(single_displacement_duration_ms));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::particles_existence> t,
+		F f
+	) {
+		f(t.NVP(input));
+
+		f(t.NVP(current_displacement));
+		f(t.NVP(time_of_last_displacement));
+		f(t.NVP(current_displacement_duration_bound_ms));
+
+		f(t.NVP(time_of_birth));
+		f(t.NVP(max_lifetime_in_steps));
+
+		f(t.NVP(distribute_within_segment_of_length));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::particle_effect_response> t,
+		F f
+	) {
+		f(t.NVP(response));
+		f(t.NVP(modifier));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::physical_relations> t,
+		F f
+	) {
+		f(t.NVP(owner_body));
+		f(t.NVP(fixture_entities));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::physics> t,
+		F f
+	) {
+		f(t.NVP(fixed_rotation));
+		f(t.NVP(bullet));
+		f(t.NVP(angled_damping));
+		f(t.NVP(activated));
+
+		f(t.NVP(body_type));
+
+		f(t.NVP(angular_damping));
+		f(t.NVP(linear_damping));
+		f(t.NVP(linear_damping_vec));
+		f(t.NVP(gravity_scale));
+
+		f(t.NVP(transform));
+		f(t.NVP(sweep));
+
+		f(t.NVP(velocity));
+		f(t.NVP(angular_velocity));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::polygon> t,
+		F f
+	) {
+		f(t.NVP(center_neon_map));
+		f(t.NVP(vertices));
+		f(t.NVP(triangulation_indices));
+
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::position_copying> t,
+		F f
+	) {
+		f(t.NVP(target));
+
+		f(t.NVP(offset));
+		f(t.NVP(rotation_orbit_offset));
+		
+		f(t.NVP(reference_position));
+		f(t.NVP(target_reference_position));
+		
+		f(t.NVP(scrolling_speed));
+
+		f(t.NVP(rotation_offset));
+		f(t.NVP(rotation_multiplier));
+
+		f(t.NVP(position_copying_mode));
+		f(t.NVP(position_copying_rotation));
+		f(t.NVP(track_origin));
+		f(t.NVP(target_newly_set));
+		f(t.NVP(previous));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::processing> t,
+		F f
+	) {
+		f(t.NVP(activated));
+
+		f(t.NVP(processing_subject_categories));
+		f(t.NVP(disabled_categories));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::render> t,
+		F f
+	) {
+		f(t.NVP(screen_space_transform));
+		f(t.NVP(draw_border));
+		f(t.NVP(layer));
+
+		f(t.NVP(border_color));
+
+		f(t.NVP(last_step_when_visible));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::rotation_copying> t,
+		F f
+	) {
+		f(t.NVP(target));
+		f(t.NVP(stashed_target));
+
+		f(t.NVP(easing_mode));
+
+		f(t.NVP(colinearize_item_in_hand));
+		f(t.NVP(update_value));
+		
+		f(t.NVP(smoothing_average_factor));
+		f(t.NVP(averages_per_sec));
+		
+		f(t.NVP(last_rotation_interpolant));
+
+		f(t.NVP(look_mode));
+		f(t.NVP(stashed_look_mode));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::sentience> t,
+		F f
+	) {
+		f(t.NVP(time_of_last_received_damage));
+		f(t.NVP(time_of_last_exertion));
+
+		f(t.NVP(cast_cooldown_for_all_spells));
+
+		f(t.NVP(health));
+		f(t.NVP(personal_electricity));
+		f(t.NVP(consciousness));
+
+		f(t.NVP(haste));
+		f(t.NVP(electric_shield));
+
+		f(t.NVP(spells));
+
+		f(t.NVP(currently_casted_spell));
+		f(t.NVP(transform_when_spell_casted));
+		f(t.NVP(time_of_last_spell_cast));
+		f(t.NVP(time_of_last_exhausted_cast));
+
+		f(t.NVP(time_of_last_shake));
+		f(t.NVP(shake_for_ms));
+
+		f(t.NVP(comfort_zone));
+		f(t.NVP(minimum_danger_amount_to_evade));
+		f(t.NVP(danger_amount_from_hostile_attitude));
+
+		f(t.NVP(aimpunch));
+		f(t.NVP(health_damage_particles));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::sound_existence::effect_input> t,
+		F f
+	) {
+		f(t.NVP(effect));
+		f(t.NVP(delete_entity_after_effect_lifetime));
+		f(t.NVP(variation_number));
+		f(t.NVP(direct_listener));
+		f(t.NVP(modifier));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::sound_existence> t,
+		F f
+	) {
+		f(t.NVP(input));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::sound_response> t,
+		F f
+	) {
+		f(t.NVP(response));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::special_physics::friction_connection> t,
+		F f
+	) {
+		f(t.NVP(target));
+		f(t.NVP(fixtures_connected));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::special_physics> t,
+		F f
+	) {
+		f(t.NVP(dropped_collision_cooldown));
+		f(t.NVP(owner_friction_ground));
+		f(t.NVP(owner_friction_grounds));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::sprite> t,
+		F f
+	) {
+		f(t.NVP(tex));
+		f(t.NVP(color));
+		f(t.NVP(size));
+		f(t.NVP(size_multiplier));
+		f(t.NVP(center_offset));
+		f(t.NVP(rotation_offset));
+
+		f(t.NVP(flip_horizontally));
+		f(t.NVP(flip_vertically));
+		
+		f(t.NVP(effect));
+		f(t.NVP(has_neon_map));
+
+		f(t.NVP(max_specular_blinks));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::substance> t,
+		F f
+	) {
+		f(t.NVP(dummy));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::tile_layer_instance> t,
+		F f
+	) {
+		f(t.NVP(id));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::trace> t,
+		F f
+	) {
+		f(t.NVP(max_multiplier_x));
+		f(t.NVP(max_multiplier_y));
+
+		f(t.NVP(chosen_multiplier));
+
+		f(t.NVP(lengthening_duration_ms));
+		f(t.NVP(chosen_lengthening_duration_ms));
+		f(t.NVP(lengthening_time_passed_ms));
+
+		f(t.NVP(is_it_finishing_trace));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::transform> t,
+		F f
+	) {
+		f(t.NVP(pos));
+		f(t.NVP(rotation));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::trigger_collision_detector> t,
+		F f
+	) {
+		f(t.NVP(detection_intent_enabled));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::trigger> t,
+		F f
+	) {
+		f(t.NVP(entity_to_be_notified));
+		f(t.NVP(react_to_collision_detectors));
+		f(t.NVP(react_to_query_detectors));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::trigger_query_detector> t,
+		F f
+	) {
+		f(t.NVP(detection_intent_enabled));
+		f(t.NVP(spam_trigger_requests_when_detection_intented));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::wandering_pixels> t,
+		F f
+	) {
+		f(t.NVP(reach));
+		f(t.NVP(face));
+		f(t.NVP(count));
 	}
 
 	template <bool C, class F, class id_type>
@@ -532,7 +948,6 @@ namespace augs {
 	) {
 		f(t.NVP(type));
 		f(t.NVP(container_entity));
-
 	}
 
 	template <bool C, class F>
@@ -542,7 +957,6 @@ namespace augs {
 	) {
 		f(t.NVP(root_container));
 		f(t.NVP(directions));
-
 	}
 
 	template <bool C, class F>
@@ -554,7 +968,61 @@ namespace augs {
 		f(t.NVP(current_address));
 		f(t.NVP(attachment_offset));
 		f(t.NVP(item_remains_physical));
+	}
 
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, resources::particle_effect_modifier> t,
+		F f
+	) {
+		f(t.NVP(colorize));
+		f(t.NVP(scale_amounts));
+		f(t.NVP(scale_lifetimes));
+		f(t.NVP(homing_target));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, resources::emission> t,
+		F f
+	) {
+		f(t.NVP(spread_degrees));
+		f(t.NVP(base_speed));
+		f(t.NVP(base_speed_variation));
+		f(t.NVP(rotation_speed));
+		f(t.NVP(particles_per_sec));
+		f(t.NVP(stream_lifetime_ms));
+		f(t.NVP(particle_lifetime_ms));
+		f(t.NVP(size_multiplier));
+		f(t.NVP(acceleration));
+		f(t.NVP(angular_offset));
+		f(t.NVP(swing_spread));
+		f(t.NVP(swings_per_sec));
+		f(t.NVP(min_swing_spread));
+		f(t.NVP(max_swing_spread));
+		f(t.NVP(min_swings_per_sec));
+		f(t.NVP(max_swings_per_sec));
+		f(t.NVP(swing_spread_change_rate));
+		f(t.NVP(swing_speed_change_rate));
+		f(t.NVP(fade_when_ms_remaining));
+		f(t.NVP(num_of_particles_to_spawn_initially));
+
+		f(t.NVP(randomize_spawn_point_within_circle_of_outer_radius));
+		f(t.NVP(randomize_spawn_point_within_circle_of_inner_radius));
+
+		f(t.NVP(starting_spawn_circle_size_multiplier));
+		f(t.NVP(ending_spawn_circle_size_multiplier));
+
+		f(t.NVP(starting_homing_force));
+		f(t.NVP(ending_homing_force));
+
+		f(t.NVP(homing_target));
+
+		f(t.NVP(initial_rotation_variation));
+		f(t.NVP(randomize_acceleration));
+		f(t.NVP(should_particles_look_towards_velocity));
+
+		f(t.NVP(particle_templates));
 	}
 
 	template <bool C, class F, class key>
@@ -565,7 +1033,6 @@ namespace augs {
 		f(t.NVP(cast_spells));
 		f(t.NVP(intents_per_entity));
 		f(t.NVP(transfer_requests));
-
 	}
 
 	template <bool C, class F>
@@ -635,7 +1102,6 @@ namespace augs {
 
 		f(t.NVP(skip_credits));
 		f(t.NVP(latest_news_url));
-
 	}
 
 	template <bool C, class F>
@@ -644,8 +1110,6 @@ namespace augs {
 		F f
 	) {
 		f(t.NVP(commands));
-
 	}
-
 
 }

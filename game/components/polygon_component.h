@@ -29,16 +29,12 @@ namespace components {
 			void set_global_time_seconds(const float);
 		};
 
+		// GEN INTROSPECTOR components::polygon
 		assets::game_image_id center_neon_map = assets::game_image_id::INVALID;
-		/* the polygon as it was originally, so possibly concave
-		it is later triangulated for rendering and divided into convex polygons for physics */
-		//augs::constant_size_vector<vec2, RENDERING_POLYGON_VERTEX_COUNT> original_polygon;
-
-		/* triangulated version of original_polygon, ready to be rendered triangle-by-triangle */
 		augs::constant_size_vector<augs::vertex, RENDERING_POLYGON_TRIANGULATED_VERTEX_COUNT> vertices;
-
-		/* indices used in glDrawElements */
 		augs::constant_size_vector<zeroed_pod<unsigned>, RENDERING_POLYGON_INDEX_COUNT> triangulation_indices;
+
+		// END GEN INTROSPECTOR
 
 		template <class Archive>
 		void serialize(Archive& ar) {

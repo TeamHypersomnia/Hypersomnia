@@ -17,6 +17,7 @@ namespace components {
 			EXPONENTIAL
 		};
 		
+		// GEN INTROSPECTOR components::rotation_copying
 		entity_id target;
 		entity_id stashed_target;
 
@@ -26,15 +27,14 @@ namespace components {
 		bool update_value = true;
 		std::array<padding_byte, 2> pad;
 		
-		/* for exponential smoothing */
 		float smoothing_average_factor = 0.5f;
 		float averages_per_sec = 20.0f;
 		
-		/* for linear smoothing */
 		vec2 last_rotation_interpolant;
 
 		look_type look_mode = look_type::POSITION;
 		look_type stashed_look_mode = look_type::POSITION;
+		// END GEN INTROSPECTOR
 
 		void stash() {
 			stashed_look_mode = look_mode;
@@ -44,38 +44,6 @@ namespace components {
 		void unstash() {
 			look_mode = stashed_look_mode;
 			target = stashed_target;
-		}
-
-		template<class F>
-		void for_each_held_id(F f) {
-			f(target);
-		}
-
-		template<class F>
-		void for_each_held_id(F f) const {
-			f(target);
-		}
-		
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(target),
-
-				CEREAL_NVP(easing_mode),
-				CEREAL_NVP(colinearize_item_in_hand),
-
-				CEREAL_NVP(smoothing_average_factor),
-				CEREAL_NVP(averages_per_sec),
-
-				CEREAL_NVP(last_rotation_interpolant),
-
-				CEREAL_NVP(look_mode),
-
-				CEREAL_NVP(last_value),
-				CEREAL_NVP(update_value),
-
-				CEREAL_NVP(use_physical_motor)
-			);
 		}
 	};
 }

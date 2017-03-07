@@ -18,6 +18,12 @@ namespace components {
 			void set_global_time_seconds(const float);
 		};
 
+		enum class special_effect : unsigned char {
+			NONE,
+			COLOR_WAVE
+		};
+
+		// GEN INTROSPECTOR components::sprite
 		assets::game_image_id tex = assets::game_image_id::INVALID;
 		rgba color;
 		vec2 size;
@@ -27,30 +33,12 @@ namespace components {
 
 		short flip_horizontally = false;
 		short flip_vertically = false;
-
-		enum class special_effect : unsigned char {
-			NONE,
-			COLOR_WAVE
-		} effect = special_effect::NONE;
+		
+		special_effect effect = special_effect::NONE;
 		bool has_neon_map = false;
 
 		unsigned short max_specular_blinks = 0;
-
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(tex),
-				CEREAL_NVP(color),
-				CEREAL_NVP(size),
-				CEREAL_NVP(size_multiplier),
-				CEREAL_NVP(bbox_expander),
-				CEREAL_NVP(center_offset),
-				CEREAL_NVP(rotation_offset),
-
-				CEREAL_NVP(flip_horizontally),
-				CEREAL_NVP(flip_vertically)
-			);
-		}
+		// END GEN INTROSPECTOR
 
 		vec2 get_size() const;
 

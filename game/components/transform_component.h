@@ -8,16 +8,10 @@ struct si_scaling;
 
 namespace components {
 	struct transform {
+		// GEN INTROSPECTOR components::transform
 		vec2 pos;
 		float rotation = 0.0f;
-
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(pos),
-				CEREAL_NVP(rotation)
-			);
-		}
+		// END GEN INTROSPECTOR
 		
 		transform(float x, float y, float rotation = 0.0f);
 		transform(vec2 pos = vec2(), float rotation = 0.0f);

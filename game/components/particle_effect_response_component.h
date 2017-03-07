@@ -7,18 +7,12 @@
 
 namespace components {
 	struct particle_effect_response {
+		// GEN INTROSPECTOR components::particle_effect_response
 		assets::particle_effect_response_id response;
 		resources::particle_effect_modifier modifier;
+		// END GEN INTROSPECTOR
 
 		particle_effect_response(assets::particle_effect_response_id resp = assets::particle_effect_response_id::INVALID) : response(resp){
-		}
-
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(response),
-				CEREAL_NVP(modifier)
-			);
 		}
 	};
 }

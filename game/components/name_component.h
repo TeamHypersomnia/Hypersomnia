@@ -13,23 +13,15 @@ namespace components {
 		typedef augs::constant_size_wstring<NICKNAME_LENGTH> nickname_type;
 		static_assert(nickname_type::array_size % 4 == 0, "Wrong nickname padding");
 
+		// GEN INTROSPECTOR components::name
 		entity_name id = entity_name::INVALID;
 
 		int custom_nickname = false;
 		nickname_type nickname;
+		// END GEN INTROSPECTOR
 
 		std::wstring get_nickname() const;
 		void set_nickname(const std::wstring&);
-		
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(id),
-
-				CEREAL_NVP(custom_nickname),
-				CEREAL_NVP(nickname)
-			);
-		}
 	};
 }
 

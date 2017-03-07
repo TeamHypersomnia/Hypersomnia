@@ -9,6 +9,7 @@
 class recoil_player {
 	int delta_offset = 0;
 public:
+	// GEN INTROSPECTOR recoil_player
 	augs::constant_size_vector<vec2, RECOIL_PLAYER_OFFSET_COUNT> offsets;
 	unsigned current_offset = 0;
 	int reversed = false;
@@ -17,22 +18,7 @@ public:
 	float single_cooldown_duration_ms = 50.0;
 	float remaining_cooldown_duration = -1.0;
 	float scale = 1.0;
-
-	template <class Archive>
-	void serialize(Archive& ar) {
-		ar(
-			CEREAL_NVP(delta_offset),
-
-			CEREAL_NVP(offsets),
-			CEREAL_NVP(current_offset),
-			CEREAL_NVP(reversed),
-			CEREAL_NVP(repeat_last_n_offsets),
-
-			CEREAL_NVP(single_cooldown_duration_ms),
-			CEREAL_NVP(remaining_cooldown_duration),
-			CEREAL_NVP(scale)
-		);
-	}
+	// END GEN INTROSPECTOR
 
 	vec2 shoot_and_get_offset();
 	

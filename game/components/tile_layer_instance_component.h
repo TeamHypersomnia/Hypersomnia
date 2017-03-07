@@ -18,7 +18,9 @@ namespace components {
 			void set_global_time_seconds(const float);
 		};
 
+		// GEN INTROSPECTOR components::tile_layer_instance
 		assets::tile_layer_id id;
+		// END GEN INTROSPECTOR
 
 		tile_layer_instance(const assets::tile_layer_id = assets::tile_layer_id::INVALID);
 

@@ -4,13 +4,8 @@
 
 namespace components {
 	struct substance {
+		// GEN INTROSPECTOR components::substance
 		int dummy = false;
-
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(dummy)
-			);
-		}
+		// END GEN INTROSPECTOR
 	};
 }

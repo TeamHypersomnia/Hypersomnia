@@ -10,22 +10,14 @@ namespace components {
 	struct processing : synchronizable_component {
 		typedef augs::enum_bitset<processing_subjects> bitset_type;
 		
+		// GEN INTROSPECTOR components::processing
 		bool activated = true;
 		std::array<padding_byte, 3> pad;
 
 		bitset_type processing_subject_categories;
 		bitset_type disabled_categories;
+		// END GEN INTROSPECTOR
 
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(activated),
-
-				CEREAL_NVP(processing_subject_categories),
-				CEREAL_NVP(disabled_categories)
-			);
-		}
-		
 		static components::processing get_default(const const_entity_handle);
 	};
 }

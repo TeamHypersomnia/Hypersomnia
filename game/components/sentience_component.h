@@ -49,6 +49,7 @@ namespace components {
 			float get_ratio() const;
 		};
 
+		// GEN INTROSPECTOR components::sentience
 		augs::stepped_timestamp time_of_last_received_damage;
 		augs::stepped_timestamp time_of_last_exertion;
 
@@ -60,6 +61,24 @@ namespace components {
 
 		haste_perk haste;
 		electric_shield_perk electric_shield;
+
+		augs::enum_associative_array<spell_type, spell_instance_data> spells;
+
+		spell_type currently_casted_spell = spell_type::COUNT;
+		components::transform transform_when_spell_casted;
+		augs::stepped_timestamp time_of_last_spell_cast;
+		augs::stepped_timestamp time_of_last_exhausted_cast;
+
+		augs::stepped_timestamp time_of_last_shake;
+		float shake_for_ms = 0.f;
+
+		float comfort_zone = 500.f;
+		float minimum_danger_amount_to_evade = 5.f;
+		float danger_amount_from_hostile_attitude = 100.f;
+
+		recoil_player aimpunch;
+		child_entity_id health_damage_particles;
+		// END GEN INTROSPECTOR
 
 		template <class F>
 		decltype(auto) call_on(
@@ -84,48 +103,6 @@ namespace components {
 			case perk_meter_type::ELECTRIC_SHIELD: return callback(electric_shield);
 			default: ensure(false); return callback(haste);
 			}
-		}
-
-		augs::enum_associative_array<spell_type, spell_instance_data> spells;
-
-		spell_type currently_casted_spell = spell_type::COUNT;
-		components::transform transform_when_spell_casted;
-		augs::stepped_timestamp time_of_last_spell_cast;
-		augs::stepped_timestamp time_of_last_exhausted_cast;
-
-		augs::stepped_timestamp time_of_last_shake;
-		float shake_for_ms = 0.f;
-
-		float comfort_zone = 500.f;
-		float minimum_danger_amount_to_evade = 5.f;
-		float danger_amount_from_hostile_attitude = 100.f;
-
-		recoil_player aimpunch;
-		child_entity_id health_damage_particles;
-
-		template<class F>
-		void for_each_held_id(F f) {
-			f(health_damage_particles);
-		}
-
-		template<class F>
-		void for_each_held_id(F f) const {
-			f(health_damage_particles);
-		}
-
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(health),
-				CEREAL_NVP(consciousness),
-				CEREAL_NVP(personal_electricity),
-
-				CEREAL_NVP(comfort_zone),
-				CEREAL_NVP(minimum_danger_amount_to_evade),
-				CEREAL_NVP(danger_amount_from_hostile_attitude),
-
-				CEREAL_NVP(aimpunch)
-			);
 		}
 
 		sentience();
