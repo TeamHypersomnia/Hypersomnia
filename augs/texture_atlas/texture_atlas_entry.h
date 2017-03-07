@@ -6,7 +6,7 @@ namespace augs {
 	struct texture_atlas_entry {
 		xywh atlas_space;
 		bool was_flipped = false;
-		padding_byte pad[3];
+		std::array<padding_byte, 3> pad;
 
 		vec2u original_size_pixels = vec2u(0xdeadbeef, 0xdeadbeef);
 

@@ -42,7 +42,7 @@ namespace augs {
 			middlescrolling<gui_element_polymorphic_id> middlescroll;
 			
 			bool held_rect_is_dragged = false;
-			padding_byte pad[3];
+			std::array<padding_byte, 3> pad;
 			
 			gui_element_polymorphic_id rect_hovered;
 			gui_element_polymorphic_id rect_held_by_lmb;

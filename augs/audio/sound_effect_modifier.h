@@ -9,6 +9,6 @@ namespace augs {
 		float max_distance = 1920.f * 3.f;
 		float reference_distance = 0.f;
 		bool fade_on_exit = true;
-		padding_byte pad[3];
+		std::array<padding_byte, 3> pad;
 	};
 }

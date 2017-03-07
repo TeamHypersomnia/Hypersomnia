@@ -26,7 +26,7 @@ namespace components {
 		vec2 custom_impact_velocity;
 
 		bool damage_falloff = false;
-		padding_byte pad[3];
+		std::array<padding_byte, 3> pad;
 
 		float damage_falloff_starting_distance = 500.f;
 		float minimum_amount_after_falloff = 5.f;

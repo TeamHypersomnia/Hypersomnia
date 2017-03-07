@@ -12,7 +12,7 @@ struct basic_item_slot_transfer_request_data {
 
 	int specified_quantity = -1;
 	bool force_immediate_mount = false;
-	padding_byte pad[3];
+	std::array<padding_byte, 3> pad;
 
 	basic_item_slot_transfer_request_data(
 		const id_type item = id_type(),

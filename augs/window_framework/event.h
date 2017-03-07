@@ -178,7 +178,7 @@ namespace augs {
 			struct change {
 				message msg = message::unknown;
 				bool repeated = false;
-				padding_byte pad[2];
+				std::array<padding_byte, 2> pad;
 				
 				union {
 					struct mouse_data {

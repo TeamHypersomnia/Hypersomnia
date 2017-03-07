@@ -26,7 +26,7 @@ namespace components {
 			};
 
 			bool enabled = false;
-			padding_byte pad[3];
+			std::array<padding_byte, 3> pad;
 
 			float value = 100.f;
 			float maximum = 100.f;

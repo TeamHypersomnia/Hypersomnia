@@ -81,12 +81,12 @@ public:
 
 	bool skip_credits = false;
 	std::string latest_news_url;
-	// END GEN INTROSPECT
+	// END GEN INTROSPECTOR
 
 	struct hotbar_settings {
 		bool increase_inside_alpha_when_selected = false;
 		bool colorize_inside_when_selected = true;
-		padding_byte pad[2];
+		std::array<padding_byte, 2> pad;
 		
 		rgba primary_selected_color = rgba(0, 255, 255, 255);
 		rgba secondary_selected_color = rgba(86, 156, 214, 255);

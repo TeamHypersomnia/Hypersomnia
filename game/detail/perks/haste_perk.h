@@ -4,5 +4,5 @@
 
 struct haste_perk : timed_perk {
 	bool is_greater = false;
-	padding_byte pad[3];
+	std::array<padding_byte, 3> pad;
 };

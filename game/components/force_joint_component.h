@@ -20,7 +20,7 @@ namespace components {
 
 		bool divide_transform_mode = false;
 		bool consider_rotation = true;
-		padding_byte pad[2];
+		std::array<padding_byte, 2> pad;
 
 		components::transform chased_entity_offset;
 

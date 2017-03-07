@@ -17,7 +17,7 @@ namespace components {
 		bool activated = true;
 		tree_type type = tree_type::RENDERABLES;
 
-		padding_byte pad[1];
+		padding_byte pad;
 
 		ltrb aabb;
 

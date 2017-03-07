@@ -13,7 +13,7 @@ namespace components {
 		struct subscribtion {
 			entity_id target;
 			bool stop_response_at_zero_speed = false;
-			padding_byte pad[3];
+			std::array<padding_byte, 3> pad;
 
 			template <class Archive>
 			void serialize(Archive& ar) {

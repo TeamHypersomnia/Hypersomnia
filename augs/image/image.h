@@ -41,12 +41,12 @@ namespace augs {
 		);
 
 		struct paint_circle_midpoint_command {
-			// GEN INTROSPECTOR augs::image::
+			// GEN INTROSPECTOR augs::image::paint_circle_midpoint_command
 			unsigned radius;
 			unsigned border_width = 1;
 			bool scale_alpha = false;
 			bool constrain_angle = false;
-			padding_byte pad[2];
+			std::array<padding_byte, 2> pad;
 			float angle_start = 0.f;
 			float angle_end = 0.f;
 			rgba filling = white;
@@ -58,10 +58,10 @@ namespace augs {
 		};
 		
 		struct paint_circle_filled_command {
-			// GEN INTROSPECTOR augs::image::
+			// GEN INTROSPECTOR augs::image::paint_circle_filled_command
 			unsigned radius;
 			rgba filling = white;
-			// END GEN
+			// END GEN INTROSPECTOR
 
 			static std::string get_command_name() {
 				return "circle_filled";
@@ -69,11 +69,11 @@ namespace augs {
 		};
 
 		struct paint_line_command {
-			// GEN INTROSPECTOR augs::image::
+			// GEN INTROSPECTOR augs::image::paint_line_command
 			vec2u from;
 			vec2u to;
 			rgba filling;
-			// END GEN
+			// END GEN INTROSPECTOR
 
 			static std::string get_command_name() {
 				return "line";
@@ -113,24 +113,3 @@ namespace augs {
 		image get_desaturated() const;
 	};
 }
-
-AUGS_INTROSPECT_BEGIN(augs::image::paint_circle_midpoint_command)
-FIELD(radius);
-FIELD(border_width);
-FIELD(scale_alpha);
-FIELD(constrain_angle);
-FIELD(angle_start);
-FIELD(angle_end);
-FIELD(filling);
-AUGS_INTROSPECT_END
-
-AUGS_INTROSPECT_BEGIN(augs::image::paint_circle_filled_command)
-FIELD(radius);
-FIELD(filling);
-AUGS_INTROSPECT_END
-
-AUGS_INTROSPECT_BEGIN(augs::image::paint_line_command)
-FIELD(from);
-FIELD(to);
-FIELD(filling);
-AUGS_INTROSPECT_END

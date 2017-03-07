@@ -11,7 +11,7 @@ namespace components {
 		typedef augs::enum_bitset<processing_subjects> bitset_type;
 		
 		bool activated = true;
-		padding_byte pad[3];
+		std::array<padding_byte, 3> pad;
 
 		bitset_type processing_subject_categories;
 		bitset_type disabled_categories;

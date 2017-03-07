@@ -24,7 +24,7 @@ namespace components {
 
 		bool colinearize_item_in_hand = false;
 		bool update_value = true;
-		padding_byte pad[2];
+		std::array<padding_byte, 2> pad;
 		
 		/* for exponential smoothing */
 		float smoothing_average_factor = 0.5f;

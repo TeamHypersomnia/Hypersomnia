@@ -30,7 +30,7 @@ struct inventory_slot {
 	bool is_physical_attachment_slot = false;
 	bool always_allow_exactly_one_item = false;
 
-	padding_byte pad[3];
+	std::array<padding_byte, 3> pad;
 
 	float montage_time_multiplier = 1.f;
 
