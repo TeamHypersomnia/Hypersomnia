@@ -9,19 +9,13 @@
 
 template <class id_type>
 struct basic_inventory_slot_id {
+	// GEN INTROSPECTOR basic_inventory_slot_id class id_type
 	slot_function type;
 	id_type container_entity;
+	// END GEN INTROSPECTOR
 
 	basic_inventory_slot_id();
 	basic_inventory_slot_id(const slot_function, const id_type);
-
-	template <class Archive>
-	void serialize(Archive& ar) {
-		ar(
-			CEREAL_NVP(type),
-			CEREAL_NVP(container_entity)
-		);
-	}
 
 	void unset();
 
@@ -33,15 +27,19 @@ struct basic_inventory_slot_id {
 typedef basic_inventory_slot_id<entity_id> inventory_slot_id;
 
 struct inventory_item_address {
+	// GEN INTROSPECTOR inventory_item_address
 	entity_id root_container;
 	augs::constant_size_vector<slot_function, 12> directions;
+	// END GEN INTROSPECTOR
 };
 
 struct inventory_traversal {
+	// GEN INTROSPECTOR inventory_traversal
 	inventory_slot_id parent_slot;
 	inventory_item_address current_address;
 	components::transform attachment_offset;
 	bool item_remains_physical = true;
+	// END GEN INTROSPECTOR
 };
 
 namespace std {

@@ -106,10 +106,12 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 				continue;
 			}
 			if (callee_handle.find<components::melee>()) {
-				if (it.intent == intent_type::CROSSHAIR_PRIMARY_ACTION)
+				if (it.intent == intent_type::CROSSHAIR_PRIMARY_ACTION) {
 					it.intent = intent_type::MELEE_PRIMARY_MOVE;
-				else if (it.intent == intent_type::CROSSHAIR_SECONDARY_ACTION)
+				}
+				else if (it.intent == intent_type::CROSSHAIR_SECONDARY_ACTION) {
 					it.intent = intent_type::MELEE_SECONDARY_MOVE;
+				}
 
 				it.subject = callee;
 				continue;

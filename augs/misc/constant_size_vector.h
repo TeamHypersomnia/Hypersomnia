@@ -4,6 +4,7 @@
 #include "augs/zeroed_pod.h"
 
 #include "augs/misc/trivial_pair.h"
+#include "augs/misc/introspect.h"
 template<class ForwardIt, class T, class Compare = std::less<>>
 ForwardIt binary_find(ForwardIt first, ForwardIt last, const T& value, Compare comp = {})
 {
@@ -20,8 +21,17 @@ namespace augs  {
 	class constant_size_vector {
 		typedef std::array<T, const_count> arr_type;
 
-		arr_type raw;
+		// GEN INTROSPECTOR constant_size_vector class T int const_count
 		size_t count;
+		arr_type raw;
+		// END GEN INTROSPECTOR
+
+		template<bool is_const, class F, size_t count, class T>
+		friend void introspect(
+			maybe_const_ref_t<is_const, constant_size_vector<T, count>> t,
+			F f
+		);
+
 	public:
 		typedef typename arr_type::iterator iterator;
 		typedef typename arr_type::const_iterator const_iterator;

@@ -23,41 +23,13 @@ namespace components {
 			}
 		};
 
+		// GEN INTROSPECTOR components::item_slot_transfers
 		augs::stepped_cooldown pickup_timeout = augs::stepped_cooldown(200);
 		mounting_operation mounting;
 
 		augs::constant_size_vector<entity_id, ONLY_PICK_THESE_ITEMS_COUNT> only_pick_these_items;
 		int pick_all_touched_items_if_list_to_pick_empty = true;
-
-		template<class F>
-		void for_each_held_id(F f) {
-			f(mounting.current_item);
-			f(mounting.intented_mounting_slot.container_entity);
-
-			for (auto& e : only_pick_these_items)
-				f(e);
-		}
-
-		template<class F>
-		void for_each_held_id(F f) const {
-			f(mounting.current_item);
-			f(mounting.intented_mounting_slot.container_entity);
-
-			for (const auto& e : only_pick_these_items)
-				f(e);
-		}
-
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(mounting),
-
-				CEREAL_NVP(only_pick_these_items),
-				CEREAL_NVP(pick_all_touched_items_if_list_to_pick_empty),
-
-				CEREAL_NVP(pickup_timeout)
-			);
-		}
+		// END GEN INTROSPECTOR
 
 		static mounting_operation find_suitable_montage_operation(const_entity_handle parent_container);
 

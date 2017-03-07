@@ -436,6 +436,7 @@
     <ClCompile Include="game\systems_stateless\destruction_system.cpp" />
     <ClCompile Include="game\systems_stateless\gui_system.cpp" />
     <ClCompile Include="game\systems_audiovisual\light_system.cpp" />
+    <ClCompile Include="game\systems_stateless\melee_system.cpp" />
     <ClCompile Include="game\systems_stateless\particles_existence_system.cpp" />
     <ClCompile Include="game\systems_stateless\sound_existence_system.cpp" />
     <ClCompile Include="game\transcendental\cosmic_delta.cpp" />
@@ -497,7 +498,6 @@
     <ClCompile Include="game\enums\filters.cpp" />
     <ClCompile Include="game\ingredients\artificial_life.cpp" />
     <ClCompile Include="game\resources\behaviour_tree.cpp" />
-    <ClCompile Include="game\detail\combat\melee_animation.cpp" />
     <ClCompile Include="game\detail\entity_description.cpp" />
     <ClCompile Include="game\detail\names_and_details.cpp" />
     <ClCompile Include="game\ingredients\backpack.cpp" />
@@ -530,7 +530,6 @@
     <ClCompile Include="game\systems_stateless\input_system.cpp" />
     <ClCompile Include="game\systems_stateless\intent_contextualization_system.cpp" />
     <ClCompile Include="game\systems_stateless\item_system.cpp" />
-    <ClCompile Include="game\systems_stateless\melee_system.cpp" />
     <ClCompile Include="game\systems_stateless\movement_system.cpp" />
     <ClCompile Include="game\systems_stateless\pathfinding_system.cpp" />
     <ClCompile Include="game\systems_stateless\position_copying_system.cpp" />
@@ -1093,6 +1092,7 @@
     <ClInclude Include="augs\image\image.h" />
     <ClInclude Include="augs\misc\action.h" />
     <ClInclude Include="augs\misc\action_list.h" />
+    <ClInclude Include="augs\misc\container_with_small_size.h" />
     <ClInclude Include="augs\misc\easier_handle_getters_mixin.h" />
     <ClInclude Include="augs\misc\enum_array.h" />
     <ClInclude Include="augs\misc\enum_bitset.h" />
@@ -1242,6 +1242,7 @@
     <ClInclude Include="game\systems_stateless\destruction_system.h" />
     <ClInclude Include="game\systems_stateless\gui_system.h" />
     <ClInclude Include="game\systems_audiovisual\light_system.h" />
+    <ClInclude Include="game\systems_stateless\melee_system.h" />
     <ClInclude Include="game\systems_stateless\particles_existence_system.h" />
     <ClInclude Include="game\systems_audiovisual\sound_system.h" />
     <ClInclude Include="game\systems_stateless\sound_existence_system.h" />
@@ -1310,7 +1311,6 @@
     <ClInclude Include="game\systems_stateless\input_system.h" />
     <ClInclude Include="game\systems_stateless\intent_contextualization_system.h" />
     <ClInclude Include="game\systems_stateless\item_system.h" />
-    <ClInclude Include="game\systems_stateless\melee_system.h" />
     <ClInclude Include="game\systems_stateless\movement_system.h" />
     <ClInclude Include="game\systems_stateless\pathfinding_system.h" />
     <ClInclude Include="game\systems_stateless\position_copying_system.h" />
@@ -1384,7 +1384,6 @@
     <ClInclude Include="game\detail\entity_scripts.h" />
     <ClInclude Include="game\detail\position_scripts.h" />
     <ClInclude Include="game\resources\behaviour_tree.h" />
-    <ClInclude Include="game\detail\combat\melee_animation.h" />
     <ClInclude Include="game\detail\entity_description.h" />
     <ClInclude Include="game\globals\animations.h" />
     <ClInclude Include="game\globals\associated_entities.h" />

@@ -23,6 +23,7 @@ struct b2Fixture_index_in_component;
 namespace components {
 	struct fixtures : synchronizable_component {
 		struct convex_partitioned_collider {
+			// GEN INTROSPECTOR components::fixtures::convex_partitioned_collider
 			convex_partitioned_shape shape;
 			physical_material_type material = physical_material_type::METAL;
 
@@ -36,23 +37,10 @@ namespace components {
 			b2Filter filter;
 			bool destructible = false;
 			bool sensor = false;
-
-			template <class Archive>
-			void serialize(Archive& ar) {
-				ar(
-					CEREAL_NVP(shape),
-					CEREAL_NVP(filter),
-
-					CEREAL_NVP(density),
-					CEREAL_NVP(density_multiplier),
-					CEREAL_NVP(friction),
-					CEREAL_NVP(restitution),
-
-					CEREAL_NVP(sensor)
-				);
-			}
+			// END GEN INTROSPECTOR
 		};
 
+		// GEN INTROSPECTOR components::fixtures
 		augs::constant_size_vector<convex_partitioned_collider, COLLIDERS_COUNT> colliders;
 		std::array<components::transform, colliders_offset_type::OFFSET_COUNT> offsets_for_created_shapes;
 
@@ -60,19 +48,7 @@ namespace components {
 		bool is_friction_ground = false;
 		bool disable_standard_collision_resolution = false;
 		bool can_driver_shoot_through = false;
-
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(colliders),
-				CEREAL_NVP(activated),
-
-				CEREAL_NVP(offsets_for_created_shapes),
-
-				CEREAL_NVP(is_friction_ground),
-				CEREAL_NVP(disable_standard_collision_resolution)
-			);
-		}
+		// END GEN INTROSPECTOR
 
 		convex_partitioned_collider& new_collider() {
 			colliders.push_back(convex_partitioned_collider());

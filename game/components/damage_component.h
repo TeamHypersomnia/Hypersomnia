@@ -10,6 +10,7 @@
 
 namespace components {
 	struct damage {
+		// GEN INTROSPECTOR components::damage
 		float amount = 12.f;
 
 		float impulse_upon_hit = 100.f;
@@ -42,47 +43,6 @@ namespace components {
 		entity_id particular_homing_target;
 
 		vec2 saved_point_of_impact_before_death;
-
-		template<class F>
-		void for_each_held_id(F f) {
-			f(sender);
-		}
-
-		template<class F>
-		void for_each_held_id(F f) const {
-			f(sender);
-		}
-
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(amount),
-
-				CEREAL_NVP(impulse_upon_hit),
-
-				CEREAL_NVP(sender),
-				CEREAL_NVP(damage_upon_collision),
-				CEREAL_NVP(destroy_upon_damage),
-				CEREAL_NVP(damage_charges_before_destruction),
-
-				CEREAL_NVP(custom_impact_velocity),
-
-				CEREAL_NVP(constrain_lifetime),
-				CEREAL_NVP(constrain_distance),
-				CEREAL_NVP(damage_falloff),
-
-				CEREAL_NVP(damage_falloff_starting_distance),
-				CEREAL_NVP(minimum_amount_after_falloff),
-
-				CEREAL_NVP(distance_travelled),
-				CEREAL_NVP(max_distance),
-				CEREAL_NVP(max_lifetime_ms),
-				CEREAL_NVP(recoil_multiplier),
-
-				CEREAL_NVP(lifetime_ms),
-
-				CEREAL_NVP(saved_point_of_impact_before_death)
-				);
-		}
+		// END GEN INTROSPECTOR
 	};
 }

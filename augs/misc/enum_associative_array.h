@@ -9,8 +9,10 @@ namespace augs {
 	class enum_associative_array {
 		typedef std::array<T, size_t(Enum::COUNT)> arr_type;
 
+		// GEN INTROSPECTOR enum_associative_array class Enum class T
 		std::bitset<size_t(Enum::COUNT)> is_set;
 		arr_type raw;
+		// END GEN INTROSPECTOR
 
 		template<bool is_const, class F, class Enum, class T>
 		friend void introspect(
@@ -149,13 +151,4 @@ namespace augs {
 			is_set = std::bitset<static_cast<size_t>(Enum::COUNT)>();
 		}
 	};
-
-	template<bool is_const, class F, class Enum, class T>
-	void introspect(
-		maybe_const_ref_t<is_const, enum_associative_array<Enum, T>> t,
-		F f
-	) {
-		f(t.NVP(is_set));
-		f(t.NVP(raw));
-	}
 }

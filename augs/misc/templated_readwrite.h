@@ -11,88 +11,78 @@ namespace augs {
 		static_assert(is_memcpy_safe<T>::value, "Attempt to serialize a non-trivially copyable type");
 	}
 
-	template<class A, class T, class...>
+	template<class A, class T>
 	void read_bytes(A& ar, T* const location, const size_t count) {
 		verify_type<T>();
 		ar.read(reinterpret_cast<char*>(location), count * sizeof(T));
 	}
 
-	template<class A, class T, class...>
+	template<class A, class T>
 	void write_bytes(A& ar, const T* const location, const size_t count) {
 		verify_type<T>();
 		ar.write(reinterpret_cast<const char*>(location), count * sizeof(T));
 	}
 
-	template <class T, class = void>
-	struct trivial_or_introspect {
-		template<class A>
-		static void read(
-			A& ar,
-			T* const storage,
-			const size_t count
-		) {
-			read_bytes(ar, storage, count);
-		}
+	template<class A, class T>
+	void read_objects(
+		A& ar,
+		T* storage,
+		const size_t count,
+		const std::enable_if_t<is_memcpy_safe<T>::value>* dummy = nullptr
+	) {
+		read_bytes(ar, storage, count);
+	}
 
-		template<class A>
-		static void write(
-			A& ar,
-			const T* const storage,
-			const size_t count
-		) {
-			write_bytes(ar, storage, count);
-		}
-	};
+	template<class A, class T>
+	void write_objects(
+		A& ar,
+		const T* storage,
+		const size_t count,
+		const std::enable_if_t<is_memcpy_safe<T>::value>* dummy = nullptr
+	) {
+		write_bytes(ar, storage, count);
+	}
 
-	template <class T>
-	struct trivial_or_introspect<T, std::enable_if_t<has_introspects<T>::value>> {
-		template<class A>
-		static void read(
-			A& ar,
-			T* const storage,
-			const size_t count
-		) {
-			for (size_t i = 0; i < count; ++i) {
-				augs::introspect(
-					storage[i],
-					[&](auto& member) {
-						read_object(ar, member);
-					}
-				);
-			}
+	template<class A, class T>
+	void read_objects(
+		A& ar,
+		T* storage,
+		const size_t count,
+		const std::enable_if_t<!is_memcpy_safe<T>::value>* dummy = nullptr
+	) {
+		for (size_t i = 0; i < count; ++i) {
+			read_object(ar, storage[i]);
 		}
+	}
 
-		template<class A>
-		static void write(
-			A& ar,
-			const T* const storage,
-			const size_t count
-		) {
-			for (size_t i = 0; i < count; ++i) {
-				augs::introspect(
-					storage[i],
-					[&](const auto& member) {
-						write_object(ar, member);
-					}
-				);
-			}
+	template<class A, class T>
+	void write_objects(
+		A& ar,
+		T* storage,
+		const size_t count,
+		const std::enable_if_t<!is_memcpy_safe<T>::value>* dummy = nullptr
+	) {
+		for (size_t i = 0; i < count; ++i) {
+			write_object(ar, storage[i]);
 		}
-	};
+	}
 
 	template<class A, class T, class...>
 	void read_object(
 		A& ar, 
-		T& storage
+		T& storage,
+		const std::enable_if_t<is_memcpy_safe<T>::value>* dummy = nullptr
 	) {
-		trivial_or_introspect<T>::read(ar, &storage, 1);
+		read_bytes(ar, &storage, 1);
 	}
 
 	template<class A, class T, class...>
 	void write_object(
 		A& ar, 
-		const T& storage
+		const T& storage,
+		const std::enable_if_t<is_memcpy_safe<T>::value>* dummy = nullptr
 	) {
-		trivial_or_introspect<T>::write(ar, &storage, 1);
+		write_bytes(ar, &storage, 1);
 	}
 
 	template<class A, class T, class vector_size_type = size_t>
@@ -105,7 +95,7 @@ namespace augs {
 		read_object(ar, s);
 
 		storage.resize(s);
-		trivial_or_introspect<T>::read(ar, storage.data(), storage.size());
+		write_objects(ar, storage.data(), storage.size());
 	}
 
 	template<class A, class T, class vector_size_type = size_t>
@@ -117,7 +107,7 @@ namespace augs {
 		ensure(storage.size() <= std::numeric_limits<vector_size_type>::max());
 
 		write_object(ar, static_cast<vector_size_type>(storage.size()));
-		trivial_or_introspect<T>::write(ar, storage.data(), storage.size());
+		write_objects(ar, storage.data(), storage.size());
 	}
 
 	template <class T>

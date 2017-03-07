@@ -1,6 +1,8 @@
 #include "game/transcendental/types_specification/all_components_declaration.h"
 #include "game/components/behaviour_tree_component.h"
 #include "game/components/car_component.h"
+#include "game/components/fixtures_component.h"
+#include "game/components/light_component.h"
 #include "augs/image/image.h"
 class config_lua_table;
 
@@ -40,6 +42,26 @@ namespace augs {
 		f(t.NVP(from));
 		f(t.NVP(to));
 		f(t.NVP(filling));
+
+	}
+
+	template <bool C, class F, class T, int const_count>
+	void introspect(
+		maybe_const_ref_t<C, constant_size_vector<T, const_count>> t,
+		F f
+	) {
+		f(t.NVP(count));
+		f(t.NVP(raw));
+
+	}
+
+	template <bool C, class F, class Enum, class T>
+	void introspect(
+		maybe_const_ref_t<C, enum_associative_array<Enum, T>> t,
+		F f
+	) {
+		f(t.NVP(is_set));
+		f(t.NVP(raw));
 
 	}
 
@@ -225,6 +247,329 @@ namespace augs {
 
 	template <bool C, class F>
 	void introspect(
+		maybe_const_ref_t<C, components::damage> t,
+		F f
+	) {
+		f(t.NVP(amount));
+
+		f(t.NVP(impulse_upon_hit));
+
+		f(t.NVP(sender));
+
+		f(t.NVP(damage_upon_collision));
+		f(t.NVP(destroy_upon_damage));
+		f(t.NVP(constrain_lifetime));
+		f(t.NVP(constrain_distance));
+
+		f(t.NVP(damage_charges_before_destruction));
+
+		f(t.NVP(custom_impact_velocity));
+
+		f(t.NVP(damage_falloff));
+
+		f(t.NVP(damage_falloff_starting_distance));
+		f(t.NVP(minimum_amount_after_falloff));
+
+		f(t.NVP(distance_travelled));
+		f(t.NVP(max_distance));
+		f(t.NVP(max_lifetime_ms));
+		f(t.NVP(recoil_multiplier));
+
+		f(t.NVP(lifetime_ms));
+
+		f(t.NVP(homing_towards_hostile_strength));
+		f(t.NVP(particular_homing_target));
+
+		f(t.NVP(saved_point_of_impact_before_death));
+
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::driver> t,
+		F f
+	) {
+		f(t.NVP(owned_vehicle));
+		f(t.NVP(density_multiplier_while_driving));
+
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::dynamic_tree_node> t,
+		F f
+	) {
+		f(t.NVP(always_visible));
+		f(t.NVP(activated));
+		f(t.NVP(type));
+
+
+		f(t.NVP(aabb));
+
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::fixtures::convex_partitioned_collider> t,
+		F f
+	) {
+		f(t.NVP(shape));
+		f(t.NVP(material));
+
+		f(t.NVP(collision_sound_gain_mult));
+
+		f(t.NVP(density));
+		f(t.NVP(density_multiplier));
+		f(t.NVP(friction));
+		f(t.NVP(restitution));
+			
+		f(t.NVP(filter));
+		f(t.NVP(destructible));
+		f(t.NVP(sensor));
+
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::fixtures> t,
+		F f
+	) {
+		f(t.NVP(colliders));
+		f(t.NVP(offsets_for_created_shapes));
+
+		f(t.NVP(activated));
+		f(t.NVP(is_friction_ground));
+		f(t.NVP(disable_standard_collision_resolution));
+		f(t.NVP(can_driver_shoot_through));
+
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::flags> t,
+		F f
+	) {
+		f(t.NVP(bit_flags));
+
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::force_joint> t,
+		F f
+	) {
+		f(t.NVP(chased_entity));
+
+		f(t.NVP(force_towards_chased_entity));
+		f(t.NVP(distance_when_force_easing_starts));
+		f(t.NVP(power_of_force_easing_multiplier));
+
+		f(t.NVP(percent_applied_to_chased_entity));
+
+		f(t.NVP(divide_transform_mode));
+		f(t.NVP(consider_rotation));
+
+		f(t.NVP(chased_entity_offset));
+
+		f(t.NVP(force_offsets));
+
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::grenade> t,
+		F f
+	) {
+		f(t.NVP(spoon));
+		f(t.NVP(type));
+
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::guid> t,
+		F f
+	) {
+		f(t.NVP(value));
+
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::gun> t,
+		F f
+	) {
+		f(t.NVP(shot_cooldown));
+		f(t.NVP(action_mode));
+		f(t.NVP(num_last_bullets_to_trigger_low_ammo_cue));
+
+		f(t.NVP(muzzle_velocity));
+
+		f(t.NVP(damage_multiplier));
+
+		f(t.NVP(bullet_spawn_offset));
+
+		f(t.NVP(camera_shake_radius));
+		f(t.NVP(camera_shake_spread_degrees));
+
+		f(t.NVP(trigger_pressed));
+
+		f(t.NVP(shell_velocity));
+		f(t.NVP(shell_angular_velocity));
+
+		f(t.NVP(shell_spread_degrees));
+
+		f(t.NVP(recoil));
+
+		f(t.NVP(shell_spawn_offset));
+
+		f(t.NVP(magic_missile_definition));
+
+		f(t.NVP(current_heat));
+		f(t.NVP(gunshot_adds_heat));
+		f(t.NVP(maximum_heat));
+		f(t.NVP(engine_sound_strength));
+
+		f(t.NVP(firing_engine_sound));
+		f(t.NVP(muzzle_particles));
+
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::interpolation> t,
+		F f
+	) {
+		f(t.NVP(base_exponent));
+		f(t.NVP(place_of_birth));
+
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::item> t,
+		F f
+	) {
+		f(t.NVP(current_mounting));
+		f(t.NVP(intended_mounting));
+
+		f(t.NVP(categories_for_slot_compatibility));
+
+		f(t.NVP(charges));
+		f(t.NVP(space_occupied_per_charge));
+		f(t.NVP(stackable));
+
+		f(t.NVP(dual_wield_accuracy_loss_percentage));
+		f(t.NVP(dual_wield_accuracy_loss_multiplier));
+
+		f(t.NVP(current_slot));
+		f(t.NVP(target_slot_after_unmount));
+
+		f(t.NVP(montage_time_ms));
+		f(t.NVP(montage_time_left_ms));
+
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::item_slot_transfers> t,
+		F f
+	) {
+		f(t.NVP(pickup_timeout));
+		f(t.NVP(mounting));
+
+		f(t.NVP(only_pick_these_items));
+		f(t.NVP(pick_all_touched_items_if_list_to_pick_empty));
+
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::light::value_variation> t,
+		F f
+	) {
+		f(t.NVP(min_value));
+		f(t.NVP(max_value));
+		f(t.NVP(change_speed));
+
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::light::attenuation> t,
+		F f
+	) {
+		f(t.NVP(base_value));
+		f(t.NVP(variation));
+
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, components::light> t,
+		F f
+	) {
+		f(t.NVP(color));
+
+		f(t.NVP(constant));
+		f(t.NVP(linear));
+		f(t.NVP(quadratic));
+		f(t.NVP(max_distance));
+		
+		f(t.NVP(wall_constant));
+		f(t.NVP(wall_linear));
+		f(t.NVP(wall_quadratic));
+		f(t.NVP(wall_max_distance));
+
+		f(t.NVP(position_variations));
+
+	}
+
+	template <bool C, class F, class id_type>
+	void introspect(
+		maybe_const_ref_t<C, basic_inventory_slot_id<id_type>> t,
+		F f
+	) {
+		f(t.NVP(type));
+		f(t.NVP(container_entity));
+
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, inventory_item_address> t,
+		F f
+	) {
+		f(t.NVP(root_container));
+		f(t.NVP(directions));
+
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, inventory_traversal> t,
+		F f
+	) {
+		f(t.NVP(parent_slot));
+		f(t.NVP(current_address));
+		f(t.NVP(attachment_offset));
+		f(t.NVP(item_remains_physical));
+
+	}
+
+	template <bool C, class F, class key>
+	void introspect(
+		maybe_const_ref_t<C, basic_cosmic_entropy<key>> t,
+		F f
+	) {
+		f(t.NVP(cast_spells));
+		f(t.NVP(intents_per_entity));
+		f(t.NVP(transfer_requests));
+
+	}
+
+	template <bool C, class F>
+	void introspect(
 		maybe_const_ref_t<C, config_lua_table> t,
 		F f
 	) {
@@ -290,6 +635,15 @@ namespace augs {
 
 		f(t.NVP(skip_credits));
 		f(t.NVP(latest_news_url));
+
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, scripted_image_stamp> t,
+		F f
+	) {
+		f(t.NVP(commands));
 
 	}
 

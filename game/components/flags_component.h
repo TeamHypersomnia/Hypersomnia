@@ -5,6 +5,8 @@
 
 namespace components {
 	struct flags {
+		// GEN INTROSPECTOR components::flags
 		augs::enum_bitset<entity_flag> bit_flags;
+		// END GEN INTROSPECTOR
 	};
 }

@@ -25,6 +25,7 @@ namespace components {
 			AUTOMATIC
 		};
 
+		// GEN INTROSPECTOR components::gun
 		augs::stepped_cooldown shot_cooldown = augs::stepped_cooldown(100);
 		action_type action_mode = action_type::INVALID;
 		unsigned short num_last_bullets_to_trigger_low_ammo_cue = 0;
@@ -59,51 +60,7 @@ namespace components {
 
 		child_entity_id firing_engine_sound;
 		child_entity_id muzzle_particles;
-
-		template<class F>
-		void for_each_held_id(F f) {
-			f(magic_missile_definition);
-			f(firing_engine_sound);
-			f(muzzle_particles);
-		}
-
-		template<class F>
-		void for_each_held_id(F f) const {
-			f(magic_missile_definition);
-			f(firing_engine_sound);
-			f(muzzle_particles);
-		}
-
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(action_mode),
-				CEREAL_NVP(num_last_bullets_to_trigger_low_ammo_cue),
-
-				CEREAL_NVP(muzzle_velocity),
-
-				CEREAL_NVP(damage_multiplier),
-
-				CEREAL_NVP(shot_cooldown),
-
-				CEREAL_NVP(bullet_spawn_offset),
-
-				CEREAL_NVP(camera_shake_radius),
-				CEREAL_NVP(camera_shake_spread_degrees),
-
-				CEREAL_NVP(trigger_pressed),
-
-				CEREAL_NVP(shell_velocity),
-				CEREAL_NVP(shell_angular_velocity),
-
-				CEREAL_NVP(shell_spread_degrees),
-
-				CEREAL_NVP(recoil),
-
-				CEREAL_NVP(shell_spawn_offset),
-				CEREAL_NVP(magic_missile_definition)
-				);
-		}
+		// END GEN INTROSPECTOR
 
 		vec2 calculate_muzzle_position(components::transform gun_transform) const;
 		vec2 calculate_barrel_center(components::transform gun_transform) const;

@@ -14,6 +14,7 @@ namespace components {
 			UNMOUNTED,
 		};
 
+		// GEN INTROSPECTOR components::item
 		mounting_state current_mounting = UNMOUNTED;
 		mounting_state intended_mounting = UNMOUNTED;
 
@@ -31,41 +32,7 @@ namespace components {
 
 		float montage_time_ms = 1000;
 		float montage_time_left_ms = 0.f;
-
-		template<class F>
-		void for_each_held_id(F f) {
-			f(current_slot.container_entity);
-			f(target_slot_after_unmount.container_entity);
-		}
-
-		template<class F>
-		void for_each_held_id(F f) const {
-			f(current_slot.container_entity);
-			f(target_slot_after_unmount.container_entity);
-		}
-
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(current_mounting),
-				CEREAL_NVP(intended_mounting),
-
-				CEREAL_NVP(categories_for_slot_compatibility),
-
-				CEREAL_NVP(charges),
-				CEREAL_NVP(space_occupied_per_charge),
-				CEREAL_NVP(stackable),
-
-				CEREAL_NVP(dual_wield_accuracy_loss_percentage),
-				CEREAL_NVP(dual_wield_accuracy_loss_multiplier),
-
-				CEREAL_NVP(current_slot),
-				CEREAL_NVP(target_slot_after_unmount),
-
-				CEREAL_NVP(montage_time_ms),
-				CEREAL_NVP(montage_time_left_ms)
-			);
-		}
+		// END GEN INTROSPECTOR
 
 		void set_mounted();
 		void request_mount();
