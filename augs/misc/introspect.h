@@ -1,6 +1,7 @@
 #pragma once
 #include <type_traits>
 #include <xtr1common>
+#include "augs/templates/maybe_const.h"
 
 namespace augs {
 	template <class T, class F>
@@ -51,3 +52,15 @@ template <class T>
 struct has_introspects {
 	static constexpr bool value = has_introspect<T, false>::value && has_introspect<T, true>::value;
 };
+
+#define NVP(x) x, #x
+#define FIELD(x) f(t.NVP(x))
+
+#define AUGS_INTROSPECT_BEGIN(Type) \
+namespace augs { \
+	template <bool C, class F> \
+	void introspect( \
+		maybe_const_ref_t<C, Type> t, \
+		F f \
+	) {
+#define AUGS_INTROSPECT_END } }

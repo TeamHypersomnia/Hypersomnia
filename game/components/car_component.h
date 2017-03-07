@@ -156,3 +156,14 @@ namespace components {
 		void reset_movement_flags();
 	};
 }
+
+namespace augs {
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, image::paint_circle_midpoint_command> t,
+		F f
+	) {
+
+
+	}
+}

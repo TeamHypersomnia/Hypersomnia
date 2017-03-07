@@ -48,6 +48,7 @@ namespace augs {
 	class stream : public stream_position {
 	public:
 		std::vector<char> buf;
+		bool has_read_failed = false;
 
 		bool operator==(const stream&) const;
 		bool operator!=(const stream&) const;
@@ -72,18 +73,20 @@ namespace augs {
 		template <class Archive>
 		void write_with_properties(Archive& ar) const {
 			augs::write_object(ar, buf);
+			augs::write_object(ar, has_read_failed);
 			augs::write_object(ar, write_pos);
 			augs::write_object(ar, read_pos);
 		}
 
 		template <class Archive>
-		bool read_with_properties(Archive& ar) {
-			return augs::read_object(ar, buf) &&
-			augs::read_object(ar, write_pos) &&
+		void read_with_properties(Archive& ar) {
+			augs::read_object(ar, buf);
+			augs::read_object(ar, has_read_failed);
+			augs::read_object(ar, write_pos);
 			augs::read_object(ar, read_pos);
 		}
 
-		bool read(char* const data, const size_t bytes);
+		void read(char* const data, const size_t bytes);
 		void write(const char* const data, const size_t bytes);
 		void write(const augs::stream&);
 		void reserve(const size_t);
@@ -96,4 +99,54 @@ namespace augs {
 
 		void write(const char* const data, const size_t bytes);
 	};
+}
+
+namespace augs {
+	template<class T, class...>
+	bool read_bytes(std::ifstream& ar, T* const location, const size_t count) {
+		verify_type<T>();
+		ar.read(reinterpret_cast<char*>(location), count * sizeof(T));
+		return !ar.fail();
+	}
+
+	template<class T, class...>
+	auto read_bytes(augs::stream& ar, T* const location, const size_t count) {
+		verify_type<T>();
+		return ar.read(reinterpret_cast<char*>(location), count * sizeof(T));
+	}
+
+	template<class T, class...>
+	void write_bytes(augs::stream& ar, const T* location, size_t count) {
+		verify_type<T>();
+		ar.write(reinterpret_cast<const char*>(location), count * sizeof(T));
+	}
+
+	template<class... Args>
+	void write_object(augs::stream& ar, const augs::stream& storage) {
+		ar.write(storage);
+	}
+
+	template<class A, class... Args>
+	void write_stream_with_properties(A& ar, const augs::stream& storage, Args... args) {
+		storage.write_with_properties(ar);
+	}
+
+	template<class A, class... Args>
+	auto read_stream_with_properties(A& ar, augs::stream& storage, Args... args) {
+		return storage.read_with_properties(ar);
+	}
+
+	template<class A, class... Args>
+	void write_sized_stream(A& ar, const augs::stream& storage, Args... args) {
+		ensure(storage.get_read_pos() == 0);
+		write_object(ar, storage.buf);
+	}
+
+	template<class A, class... Args>
+	auto read_sized_stream(A& ar, augs::stream& storage, Args... args) {
+		auto result = read_object(ar, storage.buf);
+		storage.set_write_pos(storage.buf.size());
+
+		return result;
+	}
 }

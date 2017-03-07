@@ -41,6 +41,7 @@ namespace augs {
 		);
 
 		struct paint_circle_midpoint_command {
+			// GEN INTROSPECTOR augs::image::
 			unsigned radius;
 			unsigned border_width = 1;
 			bool scale_alpha = false;
@@ -49,6 +50,7 @@ namespace augs {
 			float angle_start = 0.f;
 			float angle_end = 0.f;
 			rgba filling = white;
+			// END GEN INTROSPECTOR
 
 			static std::string get_command_name() {
 				return "circle_midpoint";
@@ -56,8 +58,10 @@ namespace augs {
 		};
 		
 		struct paint_circle_filled_command {
+			// GEN INTROSPECTOR augs::image::
 			unsigned radius;
 			rgba filling = white;
+			// END GEN
 
 			static std::string get_command_name() {
 				return "circle_filled";
@@ -65,9 +69,11 @@ namespace augs {
 		};
 
 		struct paint_line_command {
+			// GEN INTROSPECTOR augs::image::
 			vec2u from;
 			vec2u to;
 			rgba filling;
+			// END GEN
 
 			static std::string get_command_name() {
 				return "line";
@@ -106,37 +112,25 @@ namespace augs {
 
 		image get_desaturated() const;
 	};
-
-	template <bool C, class F>
-	auto introspect(
-		maybe_const_ref_t<C, image::paint_circle_midpoint_command> t,
-		F f
-	) {
-		f(t.radius);
-		f(t.border_width);
-		f(t.scale_alpha);
-		f(t.constrain_angle);
-		f(t.angle_start);
-		f(t.angle_end);
-		f(t.filling);
-	}
-
-	template <bool C, class F>
-	auto introspect(
-		maybe_const_ref_t<C, image::paint_circle_filled_command> t,
-		F f
-	) {
-		f(t.radius);
-		f(t.filling);
-	}
-
-	template <bool C, class F>
-	auto introspect(
-		maybe_const_ref_t<C, image::paint_line_command> t,
-		F f
-	) {
-		f(t.from);
-		f(t.to);
-		f(t.filling);
-	}
 }
+
+AUGS_INTROSPECT_BEGIN(augs::image::paint_circle_midpoint_command)
+FIELD(radius);
+FIELD(border_width);
+FIELD(scale_alpha);
+FIELD(constrain_angle);
+FIELD(angle_start);
+FIELD(angle_end);
+FIELD(filling);
+AUGS_INTROSPECT_END
+
+AUGS_INTROSPECT_BEGIN(augs::image::paint_circle_filled_command)
+FIELD(radius);
+FIELD(filling);
+AUGS_INTROSPECT_END
+
+AUGS_INTROSPECT_BEGIN(augs::image::paint_line_command)
+FIELD(from);
+FIELD(to);
+FIELD(filling);
+AUGS_INTROSPECT_END

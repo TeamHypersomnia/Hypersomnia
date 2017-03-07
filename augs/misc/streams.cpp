@@ -2,28 +2,30 @@
 #include "enum_associative_array.h"
 
 namespace augs {
-	bool stream::read(char* data, const size_t bytes) {
-		if (read_pos + bytes <= size()) {
+	void stream::read(char* data, const size_t bytes) {
+		if (!has_read_failed && read_pos + bytes <= size()) {
 			memcpy(data, buf.data() + read_pos, bytes);
 			read_pos += bytes;
-
-			return true;
+		}
+		else {
+			has_read_failed = true;
 		}
 
-		ensure(false);
-		return false;
+		ensure(!has_read_failed);
 	}
 	
 	std::string stream::format_as_uchars() const {
-		const unsigned char* const first = reinterpret_cast<const unsigned char*>(data());
+		const auto first = reinterpret_cast<const unsigned char*>(data());
 
 		std::string output;
 
-		for (size_t i = 0; i < size(); ++i)
+		for (size_t i = 0; i < size(); ++i) {
 			output += std::to_string(static_cast<int>(first[i])) + " ";
+		}
 
-		if(output.size() > 0)
+		if (output.size() > 0) {
 			output.erase(output.end() - 1);
+		}
 
 		return std::move(output);
 	}
@@ -61,8 +63,9 @@ namespace augs {
 	}
 
 	void stream::write(const char* const data, const size_t bytes) {
-		if (write_pos + bytes > capacity())
+		if (write_pos + bytes > capacity()) {
 			reserve((write_pos + bytes) * 2);
+		}
 
 		memcpy(buf.data() + write_pos, data, bytes);
 		write_pos += bytes;

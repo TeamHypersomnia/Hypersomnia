@@ -360,3 +360,35 @@ namespace augs {
 	template<class T>
 	struct make_pool { typedef pool<T> type; };
 }
+
+namespace augs {
+	template<class A, class T, class...>
+	void read_object(A& ar, pool_base<T>& storage) {
+		return storage.read_object(ar);
+	}
+	
+	template<class A, class T, class...>
+	void write_object(A& ar, const pool_base<T>& storage) {
+		storage.write_object(ar);
+	}
+	
+	template<class A, class T, class...>
+	void read_object(A& ar, pool<T>& storage) {
+		return storage.read_object(ar);
+	}
+	
+	template<class A, class T, class...>
+	void write_object(A& ar, const pool<T>& storage) {
+		storage.write_object(ar);
+	}
+	
+	template<class A, class T, class... Args>
+	void read_object(A& ar, pool_with_meta<T, Args...>& storage) {
+		return storage.read_object(ar);
+	}
+	
+	template<class A, class T, class... Args>
+	void write_object(A& ar, const pool_with_meta<T, Args...>& storage) {
+		storage.write_object(ar);
+	}
+}

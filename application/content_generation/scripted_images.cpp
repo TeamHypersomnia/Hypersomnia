@@ -41,7 +41,7 @@ void regenerate_scripted_images(
 				if (command_name == command_type::get_command_name()) {
 					command_type new_command;
 
-					augs::introspect(new_command, [&](auto& member) {
+					augs::introspect(new_command, [&](auto& member, auto) {
 						in >> member;
 					});
 
