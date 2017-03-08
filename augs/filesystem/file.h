@@ -8,28 +8,30 @@
 namespace augs {
 	class stream;
 
-	std::chrono::system_clock::time_point last_write_time(const std::string& filename);
+	std::chrono::system_clock::time_point last_write_time(const std::string& path);
 
-	bool file_exists(std::string filename);
-	std::string get_file_contents(std::string filename);
+	void ensure_existence(const std::string& path);
 
-	std::vector<std::string> get_file_lines(const std::string& filename);
+	bool file_exists(const std::string& path);
+	std::string get_file_contents(const std::string& path);
+
+	std::vector<std::string> get_file_lines(const std::string& path);
 
 	template <class T>
-	void create_text_file(const T& filename, const T& text) {
-		std::ofstream out(filename, std::ios::out);
+	void create_text_file(const T& path, const T& text) {
+		std::ofstream out(path, std::ios::out);
 		out << text;
 	}
 
 	template <class T>
-	void create_binary_file(std::string filename, T& target) {
-		std::ofstream out(filename, std::ios::out | std::ios::binary);
+	void create_binary_file(std::string path, T& target) {
+		std::ofstream out(path, std::ios::out | std::ios::binary);
 		out.write(target.data(), target.size());
 	}
 
 	template <class T>
-	void assign_file_contents(const std::string& filename, T& target) {
-		std::ifstream t(filename);
+	void assign_file_contents(const std::string& path, T& target) {
+		std::ifstream t(path);
 
 		t.seekg(0, std::ios::end);
 		target.reserve(static_cast<unsigned>(t.tellg()));
@@ -39,11 +41,11 @@ namespace augs {
 			std::istreambuf_iterator<char>());
 	}
 
-	void assign_file_contents_binary(const std::string& filename, augs::stream& target);
+	void assign_file_contents_binary(const std::string& path, augs::stream& target);
 
 	template <class ContainerType>
-	void read_map_until_eof(const std::string& filename, ContainerType& into) {
-		std::ifstream source(filename, std::ios::in | std::ios::binary);
+	void read_map_until_eof(const std::string& path, ContainerType& into) {
+		std::ifstream source(path, std::ios::in | std::ios::binary);
 
 		while (source.peek() != EOF) {
 			typename ContainerType::key_type key;

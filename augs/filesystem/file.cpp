@@ -8,19 +8,14 @@
 namespace fs = std::experimental::filesystem;
 
 namespace augs {
-	std::chrono::system_clock::time_point last_write_time(const std::string& filename) {
-		const bool exists = file_exists(filename);
-		
-		if (!exists) {
-			LOG("File not found: %x", filename);
-			ensure(exists);
-		}
-
-		return fs::last_write_time(filename);
+	std::chrono::system_clock::time_point last_write_time(const std::string& path) {
+		ensure_existence(path);
+		return fs::last_write_time(path);
 	}
 
-	void assign_file_contents_binary(const std::string& filename, augs::stream& target) {
-		std::ifstream file(filename, std::ios::binary | std::ios::ate);
+	void assign_file_contents_binary(const std::string& path, augs::stream& target) {
+		ensure_existence(path);
+		std::ifstream file(path, std::ios::binary | std::ios::ate);
 		std::streamsize size = file.tellg();
 		file.seekg(0, std::ios::beg);
 
@@ -29,8 +24,9 @@ namespace augs {
 		target.set_write_pos(size);
 	}
 
-	std::vector<std::string> get_file_lines(const std::string& filename) {
-		std::ifstream input(filename);
+	std::vector<std::string> get_file_lines(const std::string& path) {
+		ensure_existence(path);
+		std::ifstream input(path);
 
 		std::vector<std::string> out;
 
@@ -41,14 +37,23 @@ namespace augs {
 		return std::move(out);
 	}
 
-	bool file_exists(std::string filename) {
-		std::ifstream infile(filename);
+	void ensure_existence(const std::string& path) {
+		const bool exists = file_exists(path);
+
+		if (!exists) {
+			LOG("File not found: %x", path);
+			ensure(exists);
+		}
+	}
+
+	bool file_exists(const std::string& path) {
+		std::ifstream infile(path);
 		return infile.good();
 	}
 
-	std::string get_file_contents(std::string filename) {
+	std::string get_file_contents(const std::string& path) {
 		std::string result;
-		assign_file_contents(filename, result);
+		assign_file_contents(path, result);
 		return result;
 	}
 }
