@@ -7,6 +7,46 @@
 #include "augs/templates/maybe_const.h"
 
 namespace augs {
+	struct paint_circle_midpoint_command {
+		// GEN INTROSPECTOR struct augs::paint_circle_midpoint_command
+		unsigned radius;
+		unsigned border_width = 1;
+		bool scale_alpha = false;
+		bool constrain_angle = false;
+		std::array<padding_byte, 2> pad;
+		float angle_start = 0.f;
+		float angle_end = 0.f;
+		rgba filling = white;
+		// END GEN INTROSPECTOR
+
+		static std::string get_command_name() {
+			return "circle_midpoint";
+		}
+	};
+
+	struct paint_circle_filled_command {
+		// GEN INTROSPECTOR struct augs::paint_circle_filled_command
+		unsigned radius;
+		rgba filling = white;
+		// END GEN INTROSPECTOR
+
+		static std::string get_command_name() {
+			return "circle_filled";
+		}
+	};
+
+	struct paint_line_command {
+		// GEN INTROSPECTOR struct augs::paint_line_command
+		vec2u from;
+		vec2u to;
+		rgba filling;
+		// END GEN INTROSPECTOR
+
+		static std::string get_command_name() {
+			return "line";
+		}
+	};
+
 	class image {
 		std::vector<rgba> v;
 		vec2u size;
@@ -39,46 +79,6 @@ namespace augs {
 			const bool flip_source = false,
 			const bool add_rgba_values = false
 		);
-
-		struct paint_circle_midpoint_command {
-			// GEN INTROSPECTOR augs::image::paint_circle_midpoint_command
-			unsigned radius;
-			unsigned border_width = 1;
-			bool scale_alpha = false;
-			bool constrain_angle = false;
-			std::array<padding_byte, 2> pad;
-			float angle_start = 0.f;
-			float angle_end = 0.f;
-			rgba filling = white;
-			// END GEN INTROSPECTOR
-
-			static std::string get_command_name() {
-				return "circle_midpoint";
-			}
-		};
-		
-		struct paint_circle_filled_command {
-			// GEN INTROSPECTOR augs::image::paint_circle_filled_command
-			unsigned radius;
-			rgba filling = white;
-			// END GEN INTROSPECTOR
-
-			static std::string get_command_name() {
-				return "circle_filled";
-			}
-		};
-
-		struct paint_line_command {
-			// GEN INTROSPECTOR augs::image::paint_line_command
-			vec2u from;
-			vec2u to;
-			rgba filling;
-			// END GEN INTROSPECTOR
-
-			static std::string get_command_name() {
-				return "line";
-			}
-		};
 
 		typedef augs::trivial_variant<
 			paint_circle_midpoint_command,

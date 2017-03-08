@@ -23,7 +23,7 @@ namespace components {
 			}
 		};
 
-		// GEN INTROSPECTOR components::item_slot_transfers
+		// GEN INTROSPECTOR struct components::item_slot_transfers
 		augs::stepped_cooldown pickup_timeout = augs::stepped_cooldown(200);
 		mounting_operation mounting;
 

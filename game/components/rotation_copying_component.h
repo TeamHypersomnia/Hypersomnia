@@ -17,7 +17,7 @@ namespace components {
 			EXPONENTIAL
 		};
 		
-		// GEN INTROSPECTOR components::rotation_copying
+		// GEN INTROSPECTOR struct components::rotation_copying
 		entity_id target;
 		entity_id stashed_target;
 

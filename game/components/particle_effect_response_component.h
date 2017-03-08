@@ -7,7 +7,7 @@
 
 namespace components {
 	struct particle_effect_response {
-		// GEN INTROSPECTOR components::particle_effect_response
+		// GEN INTROSPECTOR struct components::particle_effect_response
 		assets::particle_effect_response_id response;
 		resources::particle_effect_modifier modifier;
 		// END GEN INTROSPECTOR

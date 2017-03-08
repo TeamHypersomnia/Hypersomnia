@@ -6,7 +6,7 @@
 
 namespace components {
 	struct container {
-		// GEN INTROSPECTOR components::container
+		// GEN INTROSPECTOR struct components::container
 		augs::enum_associative_array<slot_function, inventory_slot> slots;
 		// END GEN INTROSPECTOR
 	};

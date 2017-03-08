@@ -10,7 +10,7 @@
 
 namespace components {
 	struct damage {
-		// GEN INTROSPECTOR components::damage
+		// GEN INTROSPECTOR struct components::damage
 		float amount = 12.f;
 
 		float impulse_upon_hit = 100.f;

@@ -23,7 +23,7 @@ namespace components {
 			COLOR_WAVE
 		};
 
-		// GEN INTROSPECTOR components::sprite
+		// GEN INTROSPECTOR struct components::sprite
 		assets::game_image_id tex = assets::game_image_id::INVALID;
 		rgba color;
 		vec2 size;

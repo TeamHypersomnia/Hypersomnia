@@ -20,27 +20,27 @@ class physics_system;
 struct colliders_cache;
 struct b2Fixture_index_in_component;
 
+struct convex_partitioned_collider {
+	// GEN INTROSPECTOR struct convex_partitioned_collider
+	convex_partitioned_shape shape;
+	physical_material_type material = physical_material_type::METAL;
+
+	float collision_sound_gain_mult = 1.f;
+
+	float density = 1.f;
+	float density_multiplier = 1.f;
+	float friction = 0.f;
+	float restitution = 0.f;
+
+	b2Filter filter;
+	bool destructible = false;
+	bool sensor = false;
+	// END GEN INTROSPECTOR
+};
+
 namespace components {
 	struct fixtures : synchronizable_component {
-		struct convex_partitioned_collider {
-			// GEN INTROSPECTOR components::fixtures::convex_partitioned_collider
-			convex_partitioned_shape shape;
-			physical_material_type material = physical_material_type::METAL;
-
-			float collision_sound_gain_mult = 1.f;
-
-			float density = 1.f;
-			float density_multiplier = 1.f;
-			float friction = 0.f;
-			float restitution = 0.f;
-			
-			b2Filter filter;
-			bool destructible = false;
-			bool sensor = false;
-			// END GEN INTROSPECTOR
-		};
-
-		// GEN INTROSPECTOR components::fixtures
+		// GEN INTROSPECTOR struct components::fixtures
 		augs::constant_size_vector<convex_partitioned_collider, COLLIDERS_COUNT> colliders;
 		std::array<components::transform, colliders_offset_type::OFFSET_COUNT> offsets_for_created_shapes;
 
@@ -84,7 +84,7 @@ public:
 
 	ltrb get_local_aabb() const;
 
-	const components::fixtures::convex_partitioned_collider& get_collider_data(size_t i) const;
+	const convex_partitioned_collider& get_collider_data(size_t i) const;
 	size_t get_num_colliders() const;
 
 	bool is_friction_ground() const;

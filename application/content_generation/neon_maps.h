@@ -7,7 +7,7 @@
 #include "augs/templates/maybe_const.h"
 
 struct neon_map_stamp {
-	// GEN INTROSPECTOR neon_map_stamp
+	// GEN INTROSPECTOR struct neon_map_stamp
 	float standard_deviation = 0.f;
 	unsigned radius_towards_x_axis = 0xdeadbeef;
 	unsigned radius_towards_y_axis = 0xdeadbeef;

@@ -4,7 +4,7 @@
 namespace components {
 	struct guid {
 #if COSMOS_TRACKS_GUIDS
-		// GEN INTROSPECTOR components::guid
+		// GEN INTROSPECTOR struct components::guid
 		unsigned value = 0;
 		// END GEN INTROSPECTOR
 #endif

@@ -15,7 +15,7 @@ namespace components {
 			LOOK
 		};
 
-		// GEN INTROSPECTOR components::crosshair
+		// GEN INTROSPECTOR struct components::crosshair
 		orbit_type orbit_mode = LOOK;
 
 		child_entity_id recoil_entity;

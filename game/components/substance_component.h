@@ -4,7 +4,7 @@
 
 namespace components {
 	struct substance {
-		// GEN INTROSPECTOR components::substance
+		// GEN INTROSPECTOR struct components::substance
 		int dummy = false;
 		// END GEN INTROSPECTOR
 	};

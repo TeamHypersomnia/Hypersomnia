@@ -5,7 +5,7 @@
 
 namespace components {
 	struct physical_relations {
-		// GEN INTROSPECTOR components::physical_relations
+		// GEN INTROSPECTOR struct components::physical_relations
 		entity_id owner_body;
 		augs::constant_size_vector<entity_id, FIXTURE_ENTITIES_COUNT> fixture_entities;
 		// END GEN INTROSPECTOR

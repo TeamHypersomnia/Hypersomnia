@@ -14,7 +14,7 @@ namespace components {
 			UNMOUNTED,
 		};
 
-		// GEN INTROSPECTOR components::item
+		// GEN INTROSPECTOR struct components::item
 		mounting_state current_mounting = UNMOUNTED;
 		mounting_state intended_mounting = UNMOUNTED;
 

@@ -10,7 +10,7 @@
 namespace components {
 	struct sound_existence {
 		struct effect_input {
-			// GEN INTROSPECTOR components::sound_existence::effect_input
+			// GEN INTROSPECTOR struct components::sound_existence::effect_input
 			assets::sound_buffer_id effect = assets::sound_buffer_id::INVALID;
 			bool delete_entity_after_effect_lifetime = true;
 			char variation_number = -1;
@@ -19,7 +19,7 @@ namespace components {
 			// END GEN INTROSPECTOR
 		};
 		
-		// GEN INTROSPECTOR components::sound_existence
+		// GEN INTROSPECTOR struct components::sound_existence
 		effect_input input;
 		// END GEN INTROSPECTOR
 

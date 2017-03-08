@@ -10,7 +10,7 @@
 
 namespace components {
 	struct attitude {
-		// GEN INTROSPECTOR components::attitude
+		// GEN INTROSPECTOR struct components::attitude
 		float maximum_divergence_angle_before_shooting = 10.0;
 
 		unsigned parties = 0;

@@ -24,7 +24,7 @@ namespace components {
 			const components::transform t = components::transform()
 		);
 
-		// GEN INTROSPECTOR components::physics
+		// GEN INTROSPECTOR struct components::physics
 		bool fixed_rotation = false;
 		bool bullet = false;
 		bool angled_damping = false;

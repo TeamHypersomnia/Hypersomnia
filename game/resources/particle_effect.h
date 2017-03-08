@@ -14,7 +14,7 @@ struct general_particle;
 
 namespace resources {
 	struct particle_effect_modifier {
-		// GEN INTROSPECTOR resources::particle_effect_modifier
+		// GEN INTROSPECTOR struct resources::particle_effect_modifier
 		rgba colorize;
 		float scale_amounts = 1.f;
 		float scale_lifetimes = 1.f;
@@ -25,7 +25,7 @@ namespace resources {
 	struct emission {
 		typedef augs::minmax<float> minmax;
 		
-		// GEN INTROSPECTOR resources::emission
+		// GEN INTROSPECTOR struct resources::emission
 		minmax spread_degrees = minmax(0.f, 0.f);
 		minmax base_speed = minmax(0.f, 0.f);
 		minmax base_speed_variation = minmax(0.f, 0.f);

@@ -25,7 +25,7 @@ namespace components {
 			AUTOMATIC
 		};
 
-		// GEN INTROSPECTOR components::gun
+		// GEN INTROSPECTOR struct components::gun
 		augs::stepped_cooldown shot_cooldown = augs::stepped_cooldown(100);
 		action_type action_mode = action_type::INVALID;
 		unsigned short num_last_bullets_to_trigger_low_ammo_cue = 0;

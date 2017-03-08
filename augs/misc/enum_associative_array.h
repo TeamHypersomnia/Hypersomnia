@@ -9,7 +9,7 @@ namespace augs {
 	class enum_associative_array {
 		typedef std::array<T, size_t(Enum::COUNT)> arr_type;
 
-		// GEN INTROSPECTOR enum_associative_array class Enum class T
+		// GEN INTROSPECTOR class enum_associative_array class Enum class T
 		std::bitset<size_t(Enum::COUNT)> is_set;
 		arr_type raw;
 		// END GEN INTROSPECTOR

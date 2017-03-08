@@ -9,7 +9,7 @@ namespace components {
 			PAUSED
 		};
 
-		// GEN INTROSPECTOR components::animation
+		// GEN INTROSPECTOR struct components::animation
 		assets::animation_id current_animation = assets::animation_id::INVALID;
 
 		int priority = 0;

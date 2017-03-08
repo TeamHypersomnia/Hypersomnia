@@ -5,7 +5,7 @@
 #include "augs/image/image.h"
 
 struct scripted_image_stamp {
-	// GEN INTROSPECTOR scripted_image_stamp
+	// GEN INTROSPECTOR struct scripted_image_stamp
 	std::vector<augs::image::command_variant> commands;
 	// END GEN INTROSPECTOR
 };

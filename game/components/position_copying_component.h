@@ -13,7 +13,7 @@ namespace components {
 			PARALLAX
 		};
 
-		// GEN INTROSPECTOR components::position_copying
+		// GEN INTROSPECTOR struct components::position_copying
 		entity_id target;
 
 		vec2 offset;

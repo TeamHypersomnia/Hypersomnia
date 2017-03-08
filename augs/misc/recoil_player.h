@@ -9,7 +9,7 @@
 class recoil_player {
 	int delta_offset = 0;
 public:
-	// GEN INTROSPECTOR recoil_player
+	// GEN INTROSPECTOR class recoil_player
 	augs::constant_size_vector<vec2, RECOIL_PLAYER_OFFSET_COUNT> offsets;
 	unsigned current_offset = 0;
 	int reversed = false;

@@ -8,7 +8,7 @@ struct si_scaling;
 
 namespace components {
 	struct transform {
-		// GEN INTROSPECTOR components::transform
+		// GEN INTROSPECTOR struct components::transform
 		vec2 pos;
 		float rotation = 0.0f;
 		// END GEN INTROSPECTOR

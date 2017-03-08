@@ -21,7 +21,7 @@ namespace augs  {
 	class constant_size_vector {
 		typedef std::array<T, const_count> arr_type;
 
-		// GEN INTROSPECTOR constant_size_vector class T int const_count
+		// GEN INTROSPECTOR class constant_size_vector class T int const_count
 		size_t count;
 		arr_type raw;
 		// END GEN INTROSPECTOR

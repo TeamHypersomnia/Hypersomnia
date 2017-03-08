@@ -4,16 +4,16 @@
 #include "padding_byte.h"
 #include "augs/misc/stepped_timing.h"
 
+struct car_engine_entities {
+	// GEN INTROSPECTOR struct car_engine_entities
+	child_entity_id physical;
+	child_entity_id particles;
+	// END GEN INTROSPECTOR
+};
+
 namespace components {
 	struct car {
-		struct engine_entities {
-			// GEN INTROSPECTOR components::car::engine_entities
-			child_entity_id physical;
-			child_entity_id particles;
-			// END GEN INTROSPECTOR
-		};
-
-		// GEN INTROSPECTOR components::car
+		// GEN INTROSPECTOR struct components::car
 		entity_id current_driver;
 
 		child_entity_id interior;
@@ -21,11 +21,11 @@ namespace components {
 		child_entity_id left_wheel_trigger;
 		child_entity_id right_wheel_trigger;
 
-		std::array<engine_entities, 2> acceleration_engine;
-		std::array<engine_entities, 2> deceleration_engine;
+		std::array<car_engine_entities, 2> acceleration_engine;
+		std::array<car_engine_entities, 2> deceleration_engine;
 
-		engine_entities left_engine;
-		engine_entities right_engine;
+		car_engine_entities left_engine;
+		car_engine_entities right_engine;
 
 		child_entity_id engine_sound;
 

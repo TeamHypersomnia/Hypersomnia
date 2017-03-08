@@ -10,7 +10,7 @@ namespace components {
 	struct processing : synchronizable_component {
 		typedef augs::enum_bitset<processing_subjects> bitset_type;
 		
-		// GEN INTROSPECTOR components::processing
+		// GEN INTROSPECTOR struct components::processing
 		bool activated = true;
 		std::array<padding_byte, 3> pad;
 

@@ -18,7 +18,7 @@ namespace augs {
 
 class config_lua_table {
 public:
-	// GEN INTROSPECTOR config_lua_table
+	// GEN INTROSPECTOR class config_lua_table
 	int launch_mode = 0;
 	int input_recording_mode = 0;
 

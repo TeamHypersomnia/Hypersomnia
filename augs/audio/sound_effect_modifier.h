@@ -3,7 +3,7 @@
 
 namespace augs {
 	struct sound_effect_modifier {
-		// GEN INTROSPECTOR augs::sound_effect_modifier
+		// GEN INTROSPECTOR struct augs::sound_effect_modifier
 		int repetitions = 1;
 		float gain = 1.f;
 		float pitch = 1.f;

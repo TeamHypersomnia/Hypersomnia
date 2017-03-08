@@ -10,7 +10,7 @@
 
 namespace components {
 	struct force_joint {
-		// GEN INTROSPECTOR components::force_joint
+		// GEN INTROSPECTOR struct components::force_joint
 		entity_id chased_entity;
 
 		float force_towards_chased_entity = 8000.f;

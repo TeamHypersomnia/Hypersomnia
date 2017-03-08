@@ -4,7 +4,7 @@
 
 namespace components {
 	struct trigger {
-		// GEN INTROSPECTOR components::trigger
+		// GEN INTROSPECTOR struct components::trigger
 		entity_id entity_to_be_notified;
 		bool react_to_collision_detectors = false;
 		bool react_to_query_detectors = true;

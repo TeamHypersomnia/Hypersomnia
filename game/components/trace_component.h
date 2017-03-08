@@ -7,7 +7,7 @@ class processing_system;
 
 namespace components {
 	struct trace {
-		// GEN INTROSPECTOR components::trace
+		// GEN INTROSPECTOR struct components::trace
 		augs::minmax<float> max_multiplier_x = std::make_pair(1.f, 1.f);
 		augs::minmax<float> max_multiplier_y = std::make_pair(1.f, 1.f);
 

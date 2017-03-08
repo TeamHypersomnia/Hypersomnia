@@ -14,7 +14,7 @@
 namespace components {
 	struct particles_existence {
 		struct effect_input {
-			// GEN INTROSPECTOR components::particles_existence::effect_input
+			// GEN INTROSPECTOR struct components::particles_existence::effect_input
 			assets::particle_effect_id effect = assets::particle_effect_id::INVALID;
 			bool delete_entity_after_effect_lifetime = true;
 			padding_byte pad;
@@ -26,7 +26,7 @@ namespace components {
 			// END GEN INTROSPECTOR
 		};
 		
-		// GEN INTROSPECTOR components::particles_existence
+		// GEN INTROSPECTOR struct components::particles_existence
 		effect_input input;
 
 		vec2 current_displacement;

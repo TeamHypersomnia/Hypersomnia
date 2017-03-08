@@ -9,7 +9,7 @@
 
 namespace components {
 	struct render {
-		// GEN INTROSPECTOR components::render
+		// GEN INTROSPECTOR struct components::render
 		bool screen_space_transform = false;
 		bool draw_border = false;
 		render_layer layer = render_layer::INVALID;

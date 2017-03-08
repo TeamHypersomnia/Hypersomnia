@@ -49,7 +49,7 @@ namespace components {
 			float get_ratio() const;
 		};
 
-		// GEN INTROSPECTOR components::sentience
+		// GEN INTROSPECTOR struct components::sentience
 		augs::stepped_timestamp time_of_last_received_damage;
 		augs::stepped_timestamp time_of_last_exertion;
 

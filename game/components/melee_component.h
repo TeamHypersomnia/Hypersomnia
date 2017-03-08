@@ -17,7 +17,7 @@ namespace components {
 			WINDOW_STAGE //During the window stage the player can perform the second swing or an other melee action.
 		};
 
-		// GEN INTROSPECTOR components::melee
+		// GEN INTROSPECTOR struct components::melee
 		bool primary_move_flag = false;
 		bool secondary_move_flag = false;
 		bool tertiary_move_flag = false;

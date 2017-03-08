@@ -13,7 +13,7 @@ namespace components {
 		typedef augs::constant_size_wstring<NICKNAME_LENGTH> nickname_type;
 		static_assert(nickname_type::array_size % 4 == 0, "Wrong nickname padding");
 
-		// GEN INTROSPECTOR components::name
+		// GEN INTROSPECTOR struct components::name
 		entity_name id = entity_name::INVALID;
 
 		int custom_nickname = false;

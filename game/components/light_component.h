@@ -7,7 +7,7 @@
 namespace components {
 	struct light {
 		struct value_variation {
-			// GEN INTROSPECTOR components::light::value_variation
+			// GEN INTROSPECTOR struct components::light::value_variation
 			float min_value = 0.f;
 			float max_value = 0.f;
 			float change_speed = 0.f;
@@ -17,13 +17,13 @@ namespace components {
 		};
 
 		struct attenuation {
-			// GEN INTROSPECTOR components::light::attenuation
+			// GEN INTROSPECTOR struct components::light::attenuation
 			float base_value = 0.f;
 			value_variation variation;
 			// END GEN INTROSPECTOR
 		};
 
-		// GEN INTROSPECTOR components::light
+		// GEN INTROSPECTOR struct components::light
 		rgba color;
 
 		attenuation constant;

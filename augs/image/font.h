@@ -12,7 +12,7 @@ typedef FT_Glyph_Metrics_ FT_Glyph_Metrics;
 
 namespace augs {
 	struct font_glyph_metadata {
-		// GEN INTROSPECTOR augs::font_glyph_metadata
+		// GEN INTROSPECTOR struct augs::font_glyph_metadata
 		int adv = 0;
 		int bear_x = 0;
 		int bear_y = 0;
@@ -29,7 +29,7 @@ namespace augs {
 	};
 
 	struct font_metadata_from_file {
-		// GEN INTROSPECTOR augs::font_metadata_from_file
+		// GEN INTROSPECTOR struct augs::font_metadata_from_file
 		int ascender = 0;
 		int descender = 0;
 
@@ -61,7 +61,7 @@ namespace augs {
 	};
 
 	struct baked_font {
-		// GEN INTROSPECTOR augs::baked_font
+		// GEN INTROSPECTOR struct augs::baked_font
 		font_metadata_from_file meta_from_file;
 		std::vector<augs::texture_atlas_entry> glyphs_in_atlas;
 		// END GEN INTROSPECTOR
@@ -76,7 +76,7 @@ namespace augs {
 	};
 
 	struct font_loading_input {
-		// GEN INTROSPECTOR augs::font_loading_input
+		// GEN INTROSPECTOR struct augs::font_loading_input
 		std::string path;
 		std::wstring characters;
 		

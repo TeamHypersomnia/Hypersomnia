@@ -13,7 +13,7 @@ namespace components {
 			COUNT
 		};
 		
-		// GEN INTROSPECTOR components::dynamic_tree_node
+		// GEN INTROSPECTOR struct components::dynamic_tree_node
 		bool always_visible = false;
 		bool activated = true;
 		tree_type type = tree_type::RENDERABLES;
