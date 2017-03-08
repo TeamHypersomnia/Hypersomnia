@@ -16,7 +16,7 @@
 void standard_explosion(const standard_explosion_input in) {
 	auto& cosmos = in.step.cosm;
 
-	components::sound_existence::effect_input sound_effect;
+	sound_effect_input sound_effect;
 	sound_effect.delete_entity_after_effect_lifetime = true;
 	sound_effect.direct_listener = in.subject_if_any;
 	sound_effect.effect = in.sound_effect;

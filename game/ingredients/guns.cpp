@@ -417,7 +417,7 @@ namespace prefabs {
 		};
 
 		{
-			components::sound_existence::effect_input in;
+			sound_effect_input in;
 			in.effect = assets::sound_buffer_id::FIREARM_ENGINE;
 			in.modifier.repetitions = -1;
 			in.delete_entity_after_effect_lifetime = false;
@@ -513,7 +513,7 @@ namespace prefabs {
 		};
 
 		{
-			components::sound_existence::effect_input in;
+			sound_effect_input in;
 			in.effect = assets::sound_buffer_id::FIREARM_ENGINE;
 			in.modifier.repetitions = -1;
 			in.delete_entity_after_effect_lifetime = false;
@@ -575,7 +575,7 @@ namespace prefabs {
 		gun.recoil.repeat_last_n_offsets = 20;
 
 		{
-			components::sound_existence::effect_input in;
+			sound_effect_input in;
 			in.effect = assets::sound_buffer_id::FIREARM_ENGINE;
 			in.modifier.repetitions = -1;
 			in.delete_entity_after_effect_lifetime = false;
@@ -865,7 +865,7 @@ namespace prefabs {
 		gun.recoil.scale = 30.0f / 2;
 
 		{
-			components::sound_existence::effect_input in;
+			sound_effect_input in;
 			in.effect = assets::sound_buffer_id::FIREARM_ENGINE;
 			in.modifier.repetitions = -1;
 			in.delete_entity_after_effect_lifetime = false;

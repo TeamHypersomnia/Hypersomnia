@@ -8,18 +8,18 @@
 
 #include "padding_byte.h"
 
+struct movement_subscribtion {
+	// GEN INTROSPECTOR struct components::movement::subscribtion
+	entity_id target;
+	bool stop_response_at_zero_speed = false;
+	std::array<padding_byte, 3> pad;
+	// END GEN INTROSPECTOR
+};
+
 namespace components {
 	struct movement  {
-		struct subscribtion {
-			// GEN INTROSPECTOR struct components::movement::subscribtion
-			entity_id target;
-			bool stop_response_at_zero_speed = false;
-			std::array<padding_byte, 3> pad;
-			// END GEN INTROSPECTOR
-		};
-
 		// GEN INTROSPECTOR struct components::movement
-		augs::constant_size_vector<subscribtion, MOVEMENT_RESPONSE_RECEIVERS_COUNT> response_receivers;
+		augs::constant_size_vector<movement_subscribtion, MOVEMENT_RESPONSE_RECEIVERS_COUNT> response_receivers;
 		
 		bool moving_left = false;
 		bool moving_right = false;

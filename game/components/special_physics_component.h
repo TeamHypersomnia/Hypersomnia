@@ -5,24 +5,24 @@
 #include "game/transcendental/entity_id.h"
 #include "augs/misc/stepped_timing.h"
 
+struct friction_connection {
+	// GEN INTROSPECTOR struct friction_connection
+	entity_id target;
+	unsigned fixtures_connected = 0;
+	// END GEN INTROSPECTOR
+	friction_connection(entity_id t = entity_id()) : target(t) {}
+
+	bool operator==(entity_id b) const {
+		return target == b;
+	}
+
+	operator entity_id() const {
+		return target;
+	}
+};
+
 namespace components {
 	struct special_physics {
-		struct friction_connection {
-			// GEN INTROSPECTOR struct components::special_physics::friction_connection
-			entity_id target;
-			unsigned fixtures_connected = 0;
-			// END GEN INTROSPECTOR
-			friction_connection(entity_id t = entity_id()) : target(t) {}
-
-			bool operator==(entity_id b) const {
-				return target == b;
-			}
-
-			operator entity_id() const {
-				return target;
-			}
-		};
-
 		// GEN INTROSPECTOR struct components::special_physics
 		augs::stepped_cooldown dropped_collision_cooldown;
 		entity_id owner_friction_ground;

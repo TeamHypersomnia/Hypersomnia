@@ -50,16 +50,16 @@ namespace components {
 		wall_max_distance.base_value = 2000.f;
 		*/
 	}
+}
 
-	void light::value_variation::update_value(randomization& rng, float& val, const float dt_seconds) const {
-		val += dt_seconds * rng.randval(-change_speed, change_speed);
+void light_value_variation::update_value(randomization& rng, float& val, const float dt_seconds) const {
+	val += dt_seconds * rng.randval(-change_speed, change_speed);
 
-		if (val < min_value) {
-			val = min_value;
-		}
+	if (val < min_value) {
+		val = min_value;
+	}
 
-		if (val > max_value) {
-			val = max_value;
-		}
+	if (val > max_value) {
+		val = max_value;
 	}
 }

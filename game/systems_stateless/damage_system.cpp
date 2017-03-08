@@ -91,7 +91,7 @@ void damage_system::destroy_colliding_bullets_and_send_damage(const logic_step s
 				damage_msg.collider_b2Fixture_index = it.collider_b2Fixture_index;
 
 				if (is_victim_a_held_item) {
-					components::sound_existence::effect_input in;
+					sound_effect_input in;
 					in.effect = assets::sound_buffer_id::BULLET_PASSES_THROUGH_HELD_ITEM;
 					in.delete_entity_after_effect_lifetime = true;
 					in.direct_listener = owning_capability;

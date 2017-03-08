@@ -109,7 +109,7 @@ void sound_existence_system::game_responses_to_sound_effects(const logic_step st
 
 			if (gain_mult > 0.01f)
 			{
-				components::sound_existence::effect_input in;
+				sound_effect_input in;
 				in.delete_entity_after_effect_lifetime = true;
 				in.modifier.pitch = 0.85f + pitch_mult;
 				in.modifier.gain = gain_mult;
@@ -129,7 +129,7 @@ void sound_existence_system::game_responses_to_sound_effects(const logic_step st
 			const auto& round_response = subject.get<components::sound_response>();
 			const auto& round_response_map = *get_resource_manager().find(round_response.response);
 
-			components::sound_existence::effect_input in;
+			sound_effect_input in;
 			in.delete_entity_after_effect_lifetime = true;
 			const auto& response_entry = round_response_map.at(sound_response_type::PROJECTILE_TRACE);
 			in.effect = response_entry.id;
@@ -146,7 +146,7 @@ void sound_existence_system::game_responses_to_sound_effects(const logic_step st
 				const auto& gun_response = subject.get<components::sound_response>();
 				const auto& gun_response_map = *get_resource_manager().find(gun_response.response);
 
-				components::sound_existence::effect_input in;
+				sound_effect_input in;
 				in.delete_entity_after_effect_lifetime = true;
 
 				const auto& response_entry = gun_response_map.at(sound_response_type::MUZZLE_SHOT);
@@ -167,7 +167,7 @@ void sound_existence_system::game_responses_to_sound_effects(const logic_step st
 					const auto ammo_info = get_ammunition_information(subject);
 
 					if (ammo_info.total_charges < cued_count) {
-						components::sound_existence::effect_input in;
+						sound_effect_input in;
 						in.delete_entity_after_effect_lifetime = true;
 						in.effect = assets::sound_buffer_id::LOW_AMMO_CUE;
 
@@ -187,7 +187,7 @@ void sound_existence_system::game_responses_to_sound_effects(const logic_step st
 	for (const auto& h : healths) {
 		const auto subject = cosmos[h.subject];
 
-		components::sound_existence::effect_input in;
+		sound_effect_input in;
 		in.delete_entity_after_effect_lifetime = true;
 		in.direct_listener = subject;
 
@@ -243,7 +243,7 @@ void sound_existence_system::game_responses_to_sound_effects(const logic_step st
 			const auto& inflictor_response = inflictor.get<components::sound_response>();
 			const auto& inflictor_response_map = *get_resource_manager().find(inflictor_response.response);
 
-			components::sound_existence::effect_input in;
+			sound_effect_input in;
 			in.delete_entity_after_effect_lifetime = true;
 			in.direct_listener = d.subject;
 
@@ -258,7 +258,7 @@ void sound_existence_system::game_responses_to_sound_effects(const logic_step st
 	for (const auto& e : exhausted_casts) {
 		const auto subject = cosmos[e.subject];
 
-		components::sound_existence::effect_input in;
+		sound_effect_input in;
 		in.delete_entity_after_effect_lifetime = true;
 		in.direct_listener = e.subject;
 		in.effect = assets::sound_buffer_id::CAST_UNSUCCESSFUL;
@@ -268,7 +268,7 @@ void sound_existence_system::game_responses_to_sound_effects(const logic_step st
 }
 
 entity_handle sound_existence_system::create_sound_effect_entity(cosmos& cosmos, 
-	const components::sound_existence::effect_input input,
+	const sound_effect_input input,
 	const components::transform place_of_birth,
 	const entity_id chased_subject_id
 ) const {

@@ -229,7 +229,7 @@ namespace prefabs {
 			}
 
 			{
-				components::sound_existence::effect_input in;
+				sound_effect_input in;
 				in.effect = assets::sound_buffer_id::ENGINE;
 				in.modifier.repetitions = -1;
 				in.delete_entity_after_effect_lifetime = false;

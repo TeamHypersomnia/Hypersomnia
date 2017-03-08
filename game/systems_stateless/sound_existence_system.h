@@ -12,7 +12,7 @@ public:
 	void game_responses_to_sound_effects(const logic_step) const;
 	//void create_sound_effects(const logic_step) const;
 	entity_handle create_sound_effect_entity(cosmos&, 
-		const components::sound_existence::effect_input, 
+		const sound_effect_input, 
 		const components::transform place_of_birth,
 		const entity_id chased_subject) const;
 };

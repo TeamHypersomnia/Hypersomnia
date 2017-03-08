@@ -9,7 +9,7 @@
 
 namespace messages {
 	struct create_particle_effect : public message {
-		components::particles_existence::effect_input input;
+		particles_effect_input input;
 		components::transform place_of_birth;
 	};
 }

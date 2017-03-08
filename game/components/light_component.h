@@ -4,39 +4,39 @@
 
 #include "augs/misc/randomization.h"
 
+struct light_value_variation {
+	// GEN INTROSPECTOR struct light_value_variation
+	float min_value = 0.f;
+	float max_value = 0.f;
+	float change_speed = 0.f;
+	// END GEN INTROSPECTOR
+
+	void update_value(randomization&, float& val, const float dt_seconds) const;
+};
+
+struct light_attenuation {
+	// GEN INTROSPECTOR struct light_attenuation
+	float base_value = 0.f;
+	light_value_variation variation;
+	// END GEN INTROSPECTOR
+};
+
 namespace components {
 	struct light {
-		struct value_variation {
-			// GEN INTROSPECTOR struct components::light::value_variation
-			float min_value = 0.f;
-			float max_value = 0.f;
-			float change_speed = 0.f;
-			// END GEN INTROSPECTOR
-
-			void update_value(randomization&, float& val, const float dt_seconds) const;
-		};
-
-		struct attenuation {
-			// GEN INTROSPECTOR struct components::light::attenuation
-			float base_value = 0.f;
-			value_variation variation;
-			// END GEN INTROSPECTOR
-		};
-
 		// GEN INTROSPECTOR struct components::light
 		rgba color;
 
-		attenuation constant;
-		attenuation linear;
-		attenuation quadratic;
-		attenuation max_distance;
+		light_attenuation constant;
+		light_attenuation linear;
+		light_attenuation quadratic;
+		light_attenuation max_distance;
 		
-		attenuation wall_constant;
-		attenuation wall_linear;
-		attenuation wall_quadratic;
-		attenuation wall_max_distance;
+		light_attenuation wall_constant;
+		light_attenuation wall_linear;
+		light_attenuation wall_quadratic;
+		light_attenuation wall_max_distance;
 
-		std::array<value_variation, 2> position_variations;
+		std::array<light_value_variation, 2> position_variations;
 		// END GEN INTROSPECTOR
 
 		light();

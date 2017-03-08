@@ -107,7 +107,7 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 					auto new_owner = subject_fixtures.get_owner_body().get_id();
 					auto& grounds = collider_physics.owner_friction_grounds;
 					
-					components::special_physics::friction_connection connection(new_owner);
+					friction_connection connection(new_owner);
 					connection.fixtures_connected = 1;
 
 					if (found_in(grounds, new_owner)) {

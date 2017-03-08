@@ -183,7 +183,7 @@ void perform_spell_logic(
 	};
 	
 	const auto play_sound = [&](const assets::sound_buffer_id effect, const float gain = 1.f) {
-		components::sound_existence::effect_input in;
+		sound_effect_input in;
 		in.delete_entity_after_effect_lifetime = true;
 		in.direct_listener = caster;
 		in.effect = effect;
