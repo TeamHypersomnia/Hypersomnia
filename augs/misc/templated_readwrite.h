@@ -54,7 +54,7 @@ namespace augs {
 	void read_object(
 		A& ar,
 		T& storage,
-		const std::enable_if_t<is_byte_io_safe_v<A, T>>* dummy = nullptr
+		const std::enable_if_t<is_byte_io_safe_v<A, T>>* const dummy = nullptr
 	) {
 		read_bytes(ar, &storage, 1);
 	}
@@ -63,7 +63,7 @@ namespace augs {
 	void write_object(
 		A& ar,
 		const T& storage,
-		const std::enable_if_t<is_byte_io_safe_v<A, T>>* dummy = nullptr
+		const std::enable_if_t<is_byte_io_safe_v<A, T>>* const dummy = nullptr
 	) {
 		write_bytes(ar, &storage, 1);
 	}
@@ -72,7 +72,7 @@ namespace augs {
 	void read_object(
 		A& ar,
 		T& storage,
-		const std::enable_if_t<!is_byte_io_safe_v<A, T> && has_introspects_v<T>>* dummy = nullptr
+		const std::enable_if_t<!is_byte_io_safe_v<A, T> && has_introspects_v<T>>* const dummy = nullptr
 	) {
 		augs::introspect(
 			storage,
@@ -86,7 +86,7 @@ namespace augs {
 	void write_object(
 		A& ar,
 		const T& storage,
-		const std::enable_if_t<!is_byte_io_safe_v<A, T> && has_introspects_v<T>>* dummy = nullptr
+		const std::enable_if_t<!is_byte_io_safe_v<A, T> && has_introspects_v<T>>* const dummy = nullptr
 	) {
 		augs::introspect(
 			storage,
@@ -101,7 +101,7 @@ namespace augs {
 		A& ar,
 		T* storage,
 		const size_t count,
-		const std::enable_if_t<is_byte_io_safe_v<A, T>>* dummy = nullptr
+		const std::enable_if_t<is_byte_io_safe_v<A, T>>* const dummy = nullptr
 	) {
 		read_bytes(ar, storage, count);
 	}
@@ -111,7 +111,7 @@ namespace augs {
 		A& ar,
 		const T* storage,
 		const size_t count,
-		const std::enable_if_t<is_byte_io_safe_v<A, T>>* dummy = nullptr
+		const std::enable_if_t<is_byte_io_safe_v<A, T>>* const dummy = nullptr
 	) {
 		write_bytes(ar, storage, count);
 	}
@@ -121,7 +121,7 @@ namespace augs {
 		A& ar,
 		T* storage,
 		const size_t count,
-		const std::enable_if_t<!is_byte_io_safe_v<A, T>>* dummy = nullptr
+		const std::enable_if_t<!is_byte_io_safe_v<A, T>>* const dummy = nullptr
 	) {
 		for (size_t i = 0; i < count; ++i) {
 			read_object(ar, storage[i]);
@@ -133,7 +133,7 @@ namespace augs {
 		A& ar,
 		const T* storage,
 		const size_t count,
-		const std::enable_if_t<!is_byte_io_safe_v<A, T>>* dummy = nullptr
+		const std::enable_if_t<!is_byte_io_safe_v<A, T>>* const dummy = nullptr
 	) {
 		for (size_t i = 0; i < count; ++i) {
 			write_object(ar, storage[i]);

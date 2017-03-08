@@ -21,8 +21,9 @@ bool write_delta(const T& base, const T& enco, augs::stream& out, const bool wri
 	const auto dt = augs::delta_encode(base, enco);
 	const bool has_changed = dt.changed_bytes.size() > 0;
 
-	if (write_changed_bit)
+	if (write_changed_bit) {
 		augs::write_object(out, has_changed);
+	}
 
 	if (has_changed) {
 		augs::write_object(out, dt.changed_bytes, unsigned short());
@@ -38,8 +39,9 @@ void read_delta(T& deco, augs::stream& in, const bool read_changed_bit = false) 
 
 	bool has_changed = true;
 
-	if (read_changed_bit)
+	if (read_changed_bit) {
 		augs::read_object(in, has_changed);
+	}
 
 	if (has_changed) {
 		augs::read_object(in, dt.changed_bytes, unsigned short());
@@ -123,10 +125,10 @@ bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 
 				transform_component_ids_to_guids(enco_compo, enco);
 
-				write_delta(base_compo, enco_compo, new_content, true);
+write_delta(base_compo, enco_compo, new_content, true);
 
-				entity_changed = true;
-				overridden_components[idx] = true;
+entity_changed = true;
+overridden_components[idx] = true;
 			}
 			else {
 				component_type base_compo = base_c.get();
@@ -142,7 +144,7 @@ bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 			}
 		}
 		);
-		
+
 		if (is_new) {
 #if COSMOS_TRACKS_GUIDS
 			augs::write_object(dt.stream_of_new_guids, stream_written_id);
@@ -161,7 +163,7 @@ bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 			augs::write_flags(dt.stream_for_changed, overridden_components);
 			augs::write_flags(dt.stream_for_changed, removed_components);
 			augs::write_object(dt.stream_for_changed, new_content);
-			
+
 			++dt.changed_entities;
 		}
 	});
@@ -204,8 +206,9 @@ bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 		augs::write_object(out, dt.stream_for_changed);
 		augs::write_object(out, dt.stream_for_removed);
 	}
-	else
+	else {
 		augs::write_object(out, false);
+	}
 
 	enco.profiler.delta_encoding.end_measurement();
 
@@ -220,12 +223,16 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 		return;
 
 	bool has_anything_changed = false;
-	
-	if (!augs::read_object(in, has_anything_changed))
+
+	augs::read_object(in, has_anything_changed);
+
+	if (in.failed()) {
 		return;
-	
-	if (!has_anything_changed)
+	}
+
+	if (!has_anything_changed) {
 		return;
+	}
 	
 	deco.profiler.delta_decoding.new_measurement();
 
@@ -246,10 +253,12 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 #if COSMOS_TRACKS_GUIDS
 		entity_guid new_guid;
 
-		if (!augs::read_object(in, new_guid)) {
+		augs::read_object(in, new_guid);
+		
+		if (in.failed()) {
 			return;
 		}
-		
+
 		new_entities.emplace_back(deco.create_entity_with_specific_guid("delta_created", new_guid));
 #else
 		// otherwise new entity_id assignment needs be deterministic
@@ -289,7 +298,9 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 	while (dt.changed_entities--) {
 		entity_guid guid_of_changed;
 		
-		if (!augs::read_object(in, guid_of_changed)) {
+		augs::read_object(in, guid_of_changed);
+		
+		if (in.failed()) {
 			return;
 		}
 
@@ -347,7 +358,9 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 #if COSMOS_TRACKS_GUIDS
 		entity_guid guid_of_destroyed;
 
-		if (!augs::read_object(in, guid_of_destroyed)) {
+		augs::read_object(in, guid_of_destroyed);
+		
+		if(in.failed()) {
 			return;
 		}
 
@@ -420,7 +433,8 @@ TEST(CosmicDelta, PaddingSanityCheck2) {
 TEST(CosmicDelta, CosmicDeltaPaddingTest) {
 	auto padding_checker = [](auto c, auto... args) {
 		typedef decltype(c) component_type;
-		static_assert(std::is_same<std::decay_t<component_type>, component_type>::value, "Something's wrong with the types");
+		static_assert(std::is_same_v<std::decay_t<component_type>, component_type>, "Something's wrong with the types");
+		static_assert(augs::is_byte_io_safe_v<augs::stream, component_type>, "Non-trivial component detected!");
 
 		typedef component_type checked_type;
 		constexpr size_t type_size = sizeof(checked_type);
@@ -592,10 +606,6 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndCreatedThreeEntitiesWithReferences) {
 	const bool pc3_intact = ent3.get<components::position_copying>().target == ent1.get_id();
 	ASSERT_TRUE(pc3_intact);
 
-	ASSERT_TRUE(ent1.has<components::sub_entities>());
-	const bool sub_entities_intact = ent1.get<components::sub_entities>().sub_entities_by_name[child_entity_name::CHARACTER_CROSSHAIR] == ent2.get_id();
-	ASSERT_TRUE(sub_entities_intact);
-
 	{
 		augs::stream comparatory;
 
@@ -694,10 +704,6 @@ TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
 	ASSERT_TRUE(ent1.has<components::position_copying>());
 	const bool pc1_dead = c1[ent1.get<components::position_copying>().target].dead();
 	ASSERT_TRUE(pc1_dead);
-
-	ASSERT_TRUE(ent1.has<components::sub_entities>());
-	const bool sub_entity_dead = c1[ent1.get<components::sub_entities>().sub_entities_by_name[child_entity_name::CHARACTER_CROSSHAIR]].dead();
-	ASSERT_TRUE(sub_entity_dead);
 
 	ASSERT_TRUE(ent3.has<components::position_copying>());
 	const bool pc3_intact = ent3.get<components::position_copying>().target == ent1.get_id();
