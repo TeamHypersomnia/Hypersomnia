@@ -82,7 +82,12 @@ namespace augs {
 			unsigned short reliable_ack = 0u;
 
 			input;//name_property("reliable_ack");
-			if (!augs::read_object(input, reliable_ack)) return false;
+			
+			augs::read_object(input, reliable_ack);
+			
+			if (input.failed()) {
+				return false;
+			}
 			
 			if (sequence_more_recent(reliable_ack, most_recent_acked_sequence)) {
 				auto last_message_of_acked_sequence = sequence_to_reliable_range.find(reliable_ack);
@@ -98,8 +103,9 @@ namespace augs {
 						unsigned short right = reliable_ack;
 						++right;
 
-						while (left != right)
+						while (left != right) {
 							sequence_to_reliable_range.erase(left++);
+						}
 					}
 
 					most_recent_acked_sequence = reliable_ack;
@@ -124,22 +130,31 @@ namespace augs {
 			result_data res;
 
 			input;//name_property("has_reliable");
-			if (!augs::read_object(input, has_reliable)) return res;
+			augs::read_object(input, has_reliable);
+
+			if (input.failed()) {
+				return res;
+			}
 
 			/* reliable + maybe unreliable */
 			if (has_reliable) {
 				input;//name_property("sequence");
-				if (!augs::read_object(input, received_sequence)) return res;
+				augs::read_object(input, received_sequence);
 				input;//name_property("most_recent_acked_sequence");
-				if (!augs::read_object(input, update_from_sequence)) return res;
+				augs::read_object(input, update_from_sequence);
 
 				input;//name_property("first_message");
-				if (!augs::read_object(input, received_first_message)) return res;
+				augs::read_object(input, received_first_message);
 				input;//name_property("last_message");
-				if (!augs::read_object(input, received_message_count)) return res;
+				augs::read_object(input, received_message_count);
 
-				if (!sequence_more_recent(received_sequence, last_received_sequence))
+				if (input.failed()) {
 					return res;
+				}
+
+				if (!sequence_more_recent(received_sequence, last_received_sequence)) {
+					return res;
+				}
 				
 				last_received_sequence = received_sequence;
 				ack_requested = true;
