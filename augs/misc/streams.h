@@ -50,6 +50,10 @@ namespace augs {
 		std::vector<char> buf;
 		bool has_read_failed = false;
 
+		bool failed() const {
+			return has_read_failed;
+		}
+
 		bool operator==(const stream&) const;
 		bool operator!=(const stream&) const;
 

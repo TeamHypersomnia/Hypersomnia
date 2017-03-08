@@ -127,7 +127,7 @@ bool cosmos::operator!=(const cosmos& b) const {
 	return !operator==(b);
 }
 
-cosmos& cosmos::operator=(const significant_state& b) {
+cosmos& cosmos::operator=(const cosmos_significant_state& b) {
 	profiler.duplication.new_measurement();
 	significant = b;
 	profiler.duplication.end_measurement();

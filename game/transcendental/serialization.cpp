@@ -4,6 +4,7 @@
 #include "cosmos.h"
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "augs/filesystem/file.h"
+#include "generated_introspectors.h"
 
 void cosmos::save_to_file(const std::string& filename) {
 	profiler.total_save.new_measurement();
@@ -73,7 +74,7 @@ bool cosmos::load_from_file(const std::string& filename) {
 	return false;
 }
 
-bool cosmos::significant_state::operator==(const significant_state& second) const {
+bool cosmos_significant_state::operator==(const cosmos_significant_state& second) const {
 	augs::output_stream_reserver this_serialized_reserver;
 	augs::output_stream_reserver second_serialized_reserver;
 	auto& r1 = this_serialized_reserver;
@@ -100,7 +101,7 @@ bool cosmos::significant_state::operator==(const significant_state& second) cons
 	//	}
 	//}
 	
-	//significant_state resultant;
+	//cosmos_significant_state resultant;
 	//augs::read_object(second_serialized, resultant);
 
 	//if(found_mismatch)
@@ -110,6 +111,6 @@ bool cosmos::significant_state::operator==(const significant_state& second) cons
 	return cosmoi_identical;
 }
 
-bool cosmos::significant_state::operator!=(const significant_state& second) const {
+bool cosmos_significant_state::operator!=(const cosmos_significant_state& second) const {
 	return !operator==(second);
 }

@@ -10,7 +10,10 @@
 namespace augs {
 	template <class T>
 	struct is_native_binary_stream {
-		static constexpr bool value = std::is_same_v<T, augs::stream>;
+		static constexpr bool value = 
+			std::is_same_v<T, augs::stream>
+			|| std::is_same_v<T, augs::output_stream_reserver>
+		;
 	};
 
 	template<class A, class T>
@@ -277,7 +280,7 @@ namespace augs {
 		read_bytes(ar, storage.data(), storage.size());
 	}
 
-	template<class A, class T, class...>
+	template<class A, class T>
 	void write_with_capacity(A& ar, const std::vector<T>& storage) {
 		write_object(ar, storage.capacity());
 		write_object(ar, storage.size());
@@ -287,22 +290,14 @@ namespace augs {
 
 	template<class A, class T, class... Args>
 	void read_object(A& ar, std::tuple<T, Args...>& storage) {
-		bool result = true;
-		
-		for_each_in_tuple(storage, [&ar, &result](auto& element) {
-			if (!result) {
-				return;
-			}
-
-			result = result && read_object(ar, element);
+		for_each_in_tuple(storage, [&](auto& element) {
+			read_object(ar, element);
 		});
-
-		return result;
 	}
 
 	template<class A, class T, class... Args>
 	void write_object(A& ar, const std::tuple<T, Args...>& storage) {
-		for_each_in_tuple(storage, [&ar](const auto& element) {
+		for_each_in_tuple(storage, [&](const auto& element) {
 			write_object(ar, element);
 		});
 	}

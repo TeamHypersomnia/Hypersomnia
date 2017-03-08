@@ -66,10 +66,10 @@ namespace augs {
 		}
 
 		template <class Archive>
-		bool read_object(Archive& ar) {
-			return augs::read_with_capacity(ar, pooled) &&
-			augs::read_with_capacity(ar, slots) &&
-			augs::read_with_capacity(ar, indirectors) &&
+		void read_object(Archive& ar) {
+			augs::read_with_capacity(ar, pooled);
+			augs::read_with_capacity(ar, slots);
+			augs::read_with_capacity(ar, indirectors);
 			augs::read_with_capacity(ar, free_indirectors);
 		}
 
@@ -122,8 +122,9 @@ namespace augs {
 
 		template<typename... Args>
 		id_type allocate(Args... args) {
-			if (free_indirectors.empty())
+			if (free_indirectors.empty()) {
 				throw std::runtime_error("Pool is full!");
+			}
 
 			int next_free_indirection = free_indirectors.back();
 			free_indirectors.pop_back();
@@ -286,8 +287,8 @@ namespace augs {
 		}
 
 		template <class Archive>
-		bool read_object(Archive& ar) {
-			return augs::read_object(ar, static_cast<pool_base<T>&>(*this));
+		void read_object(Archive& ar) {
+			augs::read_object(ar, static_cast<pool_base<T>&>(*this));
 		}
 	};
 
@@ -312,8 +313,8 @@ namespace augs {
 		}
 
 		template <class Archive>
-		bool read_object(Archive& ar) {
-			return augs::read_object(ar, static_cast<pool_base<T>&>(*this)) &&
+		void read_object(Archive& ar) {
+			augs::read_object(ar, static_cast<pool_base<T>&>(*this));
 			augs::read_with_capacity(ar, metas);
 		}
 
@@ -364,7 +365,7 @@ namespace augs {
 namespace augs {
 	template<class A, class T, class...>
 	void read_object(A& ar, pool_base<T>& storage) {
-		return storage.read_object(ar);
+		storage.read_object(ar);
 	}
 	
 	template<class A, class T, class...>
@@ -374,7 +375,7 @@ namespace augs {
 	
 	template<class A, class T, class...>
 	void read_object(A& ar, pool<T>& storage) {
-		return storage.read_object(ar);
+		storage.read_object(ar);
 	}
 	
 	template<class A, class T, class...>
@@ -384,7 +385,7 @@ namespace augs {
 	
 	template<class A, class T, class... Args>
 	void read_object(A& ar, pool_with_meta<T, Args...>& storage) {
-		return storage.read_object(ar);
+		storage.read_object(ar);
 	}
 	
 	template<class A, class T, class... Args>

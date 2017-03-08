@@ -119,16 +119,16 @@ void create_and_save_button_with_corners(
 		img b;
 
 		l.create(in.lower_side, 1u);
-		l.execute(img::paint_line_command{ { 1, 0 }, { in.lower_side - 1, 0 }, in.inside_color });
+		l.execute(augs::paint_line_command{ { 1, 0 }, { in.lower_side - 1, 0 }, in.inside_color });
 
 		r.create(in.upper_side, 1u);
-		r.execute(img::paint_line_command{ { in.upper_side - 2, 0 }, { 0, 0 }, in.inside_color } );
+		r.execute(augs::paint_line_command{ { in.upper_side - 2, 0 }, { 0, 0 }, in.inside_color } );
 
 		b.create(1u, in.lower_side);
-		b.execute(img::paint_line_command{{ 0, in.lower_side - 2 }, { 0, 0 }, in.inside_color });
+		b.execute(augs::paint_line_command{{ 0, in.lower_side - 2 }, { 0, 0 }, in.inside_color });
 
 		t.create(1u, in.upper_side);
-		t.execute(img::paint_line_command{{ 0, 1 }, { 0, in.upper_side - 1 }, in.inside_color });
+		t.execute(augs::paint_line_command{{ 0, 1 }, { 0, in.upper_side - 1 }, in.inside_color });
 
 		save(button_corner_type::L, l);
 		save(button_corner_type::T, t);
@@ -147,32 +147,32 @@ void create_and_save_button_with_corners(
 
 		lt.create(in.lower_side, in.upper_side);
 		lt.fill(in.inside_color);
-		lt.execute(img::paint_line_command{{ 0, 0 }, { in.lower_side - 1, 0 }, { 0, 0, 0, 0 }} );
-		lt.execute(img::paint_line_command{{ 0, 0 }, { 0, in.upper_side - 1 }, { 0, 0, 0, 0 }} );
+		lt.execute(augs::paint_line_command{{ 0, 0 }, { in.lower_side - 1, 0 }, { 0, 0, 0, 0 }} );
+		lt.execute(augs::paint_line_command{{ 0, 0 }, { 0, in.upper_side - 1 }, { 0, 0, 0, 0 }} );
 
 		rt.create(in.upper_side, in.upper_side);
 		rt.fill({ 0, 0, 0, 0 });
 
 		for (unsigned i = 1; i < in.upper_side; ++i) {
-			rt.execute(img::paint_line_command{{ 0, i }, { in.upper_side - i - 1, in.upper_side - 1 }, in.inside_color });
+			rt.execute(augs::paint_line_command{{ 0, i }, { in.upper_side - i - 1, in.upper_side - 1 }, in.inside_color });
 		}
 
 		rb.create(in.upper_side, in.lower_side);
 		rb.fill(in.inside_color);
-		rb.execute(img::paint_line_command{{ in.upper_side - 1, in.lower_side - 1 }, { 0, in.lower_side - 1 }, { 0, 0, 0, 0 }});
-		rb.execute(img::paint_line_command{{ in.upper_side - 1, in.lower_side - 1 }, { in.upper_side - 1, 0 }, { 0, 0, 0, 0 }});
+		rb.execute(augs::paint_line_command{{ in.upper_side - 1, in.lower_side - 1 }, { 0, in.lower_side - 1 }, { 0, 0, 0, 0 }});
+		rb.execute(augs::paint_line_command{{ in.upper_side - 1, in.lower_side - 1 }, { in.upper_side - 1, 0 }, { 0, 0, 0, 0 }});
 
 		lb.create(in.lower_side, in.lower_side);
 		lb.fill({ 0, 0, 0, 0 });
 
 		for (unsigned i = 1; i < in.lower_side; ++i) {
-			lb.execute(img::paint_line_command{ { i, 0 }, { in.lower_side - 1, in.lower_side - 1 - i }, in.inside_color });
+			lb.execute(augs::paint_line_command{ { i, 0 }, { in.lower_side - 1, in.lower_side - 1 - i }, in.inside_color });
 		}
 
 		lb_complement.create(in.lower_side, in.lower_side);
 
 		for (unsigned i = 1; i < in.lower_side; ++i) {
-			lb_complement.execute(img::paint_line_command{{ 0, i }, { in.lower_side - 1 - i, in.lower_side - 1 }, in.inside_color });
+			lb_complement.execute(augs::paint_line_command{{ 0, i }, { in.lower_side - 1 - i, in.lower_side - 1 }, in.inside_color });
 		}
 
 		save(button_corner_type::LT, lt);
@@ -218,26 +218,26 @@ void create_and_save_button_with_corners(
 		img lb_complement;
 
 		lt.create(in.lower_side, in.upper_side);
-		lt.execute(img::paint_line_command{{ 0, 0 }, { 0, in.upper_side - 1 }, in.border_color});
-		lt.execute(img::paint_line_command{{ 0, 0 }, { in.lower_side - 1, 0 }, in.border_color});
+		lt.execute(augs::paint_line_command{{ 0, 0 }, { 0, in.upper_side - 1 }, in.border_color});
+		lt.execute(augs::paint_line_command{{ 0, 0 }, { in.lower_side - 1, 0 }, in.border_color});
 
 		rt.create(in.upper_side, in.upper_side);
 		rt.fill({ 0, 0, 0, 0 });
 
-		rt.execute(img::paint_line_command{ { 0, 0 }, { in.upper_side - 1, in.upper_side - 1 }, in.border_color });
+		rt.execute(augs::paint_line_command{ { 0, 0 }, { in.upper_side - 1, in.upper_side - 1 }, in.border_color });
 
 		rb.create(in.upper_side, in.lower_side);
-		rb.execute(img::paint_line_command{{ in.upper_side - 1, in.lower_side - 1 }, { 0, in.lower_side - 1 }, in.border_color});
-		rb.execute(img::paint_line_command{{ in.upper_side - 1, in.lower_side - 1 }, { in.upper_side - 1, 0 }, in.border_color});
+		rb.execute(augs::paint_line_command{{ in.upper_side - 1, in.lower_side - 1 }, { 0, in.lower_side - 1 }, in.border_color});
+		rb.execute(augs::paint_line_command{{ in.upper_side - 1, in.lower_side - 1 }, { in.upper_side - 1, 0 }, in.border_color});
 
 		lb.create(in.lower_side, in.lower_side);
 		lb.fill({ 0, 0, 0, 0 });
 
-		lb.execute(img::paint_line_command{ { 0, 0 }, { in.lower_side - 1, in.lower_side - 1 }, in.border_color });
+		lb.execute(augs::paint_line_command{ { 0, 0 }, { in.lower_side - 1, in.lower_side - 1 }, in.border_color });
 
 		lb_complement.create(in.lower_side, in.lower_side);
-		lb_complement.execute(img::paint_line_command{{ 0, in.lower_side - 1 }, { in.lower_side - 1, in.lower_side - 1 }, in.border_color });
-		lb_complement.execute(img::paint_line_command{{ 0, in.lower_side - 1 }, { 0, 0 }, in.border_color });
+		lb_complement.execute(augs::paint_line_command{{ 0, in.lower_side - 1 }, { in.lower_side - 1, in.lower_side - 1 }, in.border_color });
+		lb_complement.execute(augs::paint_line_command{{ 0, in.lower_side - 1 }, { 0, 0 }, in.border_color });
 
 		save(button_corner_type::LT_BORDER, lt);
 		save(button_corner_type::RT_BORDER, rt);
@@ -258,20 +258,20 @@ void create_and_save_button_with_corners(
 		img lb_complement;
 
 		lt.create(in.lower_side, in.upper_side);
-		lt.execute(img::paint_line_command{{ in.inside_border_padding, in.inside_border_padding }, { in.inside_border_padding, in.upper_side - 1 }, in.border_color});
-		lt.execute(img::paint_line_command{{ in.inside_border_padding, in.inside_border_padding }, { in.lower_side - 1, in.inside_border_padding }, in.border_color});
+		lt.execute(augs::paint_line_command{{ in.inside_border_padding, in.inside_border_padding }, { in.inside_border_padding, in.upper_side - 1 }, in.border_color});
+		lt.execute(augs::paint_line_command{{ in.inside_border_padding, in.inside_border_padding }, { in.lower_side - 1, in.inside_border_padding }, in.border_color});
 
 		rt.create(in.upper_side, in.upper_side);
 		rt.fill({ 0, 0, 0, 0 });
-		rt.execute(img::paint_line_command{{ 0, in.inside_border_padding }, { in.upper_side - 1 - in.inside_border_padding, in.upper_side - 1 }, in.border_color });
+		rt.execute(augs::paint_line_command{{ 0, in.inside_border_padding }, { in.upper_side - 1 - in.inside_border_padding, in.upper_side - 1 }, in.border_color });
 
 		rb.create(in.upper_side, in.lower_side);
-		rb.execute(img::paint_line_command{{ in.upper_side - 1 - in.inside_border_padding, in.lower_side - 1 - in.inside_border_padding }, { 0, in.lower_side - 1 - in.inside_border_padding }, in.border_color});
-		rb.execute(img::paint_line_command{{ in.upper_side - 1 - in.inside_border_padding, in.lower_side - 1 - in.inside_border_padding }, { in.upper_side - 1 - in.inside_border_padding, 0 }, in.border_color});
+		rb.execute(augs::paint_line_command{{ in.upper_side - 1 - in.inside_border_padding, in.lower_side - 1 - in.inside_border_padding }, { 0, in.lower_side - 1 - in.inside_border_padding }, in.border_color});
+		rb.execute(augs::paint_line_command{{ in.upper_side - 1 - in.inside_border_padding, in.lower_side - 1 - in.inside_border_padding }, { in.upper_side - 1 - in.inside_border_padding, 0 }, in.border_color});
 
 		lb.create(in.lower_side, in.lower_side);
 		lb.fill({ 0, 0, 0, 0 });
-		lb.execute(img::paint_line_command{{ in.inside_border_padding, 0 }, { in.lower_side - 1, in.lower_side - 1 - in.inside_border_padding }, in.border_color });
+		lb.execute(augs::paint_line_command{{ in.inside_border_padding, 0 }, { in.lower_side - 1, in.lower_side - 1 - in.inside_border_padding }, in.border_color });
 
 		save(button_corner_type::LT_INTERNAL_BORDER, lt);
 		save(button_corner_type::RT_INTERNAL_BORDER, rt);

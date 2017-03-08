@@ -10,6 +10,7 @@
 #include "augs/misc/streams.h"
 
 #include "augs/image/image.h"
+#include "generated_introspectors.h"
 
 namespace fs = std::experimental::filesystem;
 

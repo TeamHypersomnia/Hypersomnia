@@ -8,8 +8,11 @@ namespace augs {
 		typedef std::vector<augs::window::event::change> local_type;
 		typedef std::vector<augs::network::message> remote_type;
 
+		// GEN INTROSPECTOR struct augs::machine_entropy
 		local_type local;
 		remote_type remote;
+		// END GEN INTROSPECTOR
+
 		// here will be remote entropy as well
 
 		machine_entropy& operator+=(const machine_entropy&);
@@ -17,18 +20,4 @@ namespace augs {
 		bool empty() const;
 		void clear();
 	};
-}
-
-namespace augs {
-	template<class A>
-	bool read_object(A& ar, machine_entropy& s) {
-		if(!read_object(ar, s.local)) return false;
-		return read_object(ar, s.remote);
-	}
-
-	template<class A>
-	void write_object(A& ar, const machine_entropy& s) {
-		write_object(ar, s.local);
-		write_object(ar, s.remote);
-	}
 }

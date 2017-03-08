@@ -19,7 +19,7 @@ bool operator!=(const std::vector<key_and_mouse_intent>& a, const std::vector<ke
 
 namespace augs {
 	template<class A>
-	bool read_object(A& ar, key_and_mouse_intent& intent) {
+	void read_object(A& ar, key_and_mouse_intent& intent) {
 		if (!read_object(ar, intent.intent)) return false;
 		if (!read_object(ar, intent.is_pressed)) return false;
 

@@ -39,6 +39,44 @@
 class cosmic_delta;
 struct data_living_one_step;
 
+typedef put_all_components_into<augs::operations_on_all_components_mixin, cosmos>::type cosmos_base;
+
+struct cosmos_flyweights_state {
+	// GEN INTROSPECTOR struct cosmos_flyweights_state
+	augs::enum_associative_array<spell_type, spell_data> spells;
+	collision_sound_matrix_type collision_sound_matrix;
+	// END GEN INTROSPECTOR
+};
+
+class cosmos_metadata {
+	// GEN INTROSPECTOR class cosmos_metadata
+	friend class cosmos;
+
+	augs::delta delta;
+	unsigned total_steps_passed = 0;
+
+#if COSMOS_TRACKS_GUIDS
+	entity_guid next_entity_guid = 1;
+#endif
+public:
+	all_simulation_settings settings;
+
+	cosmos_flyweights_state flyweights;
+	// END GEN INTROSPECTOR
+};
+
+struct cosmos_significant_state {
+	// GEN INTROSPECTOR struct cosmos_significant_state
+	cosmos_metadata meta;
+
+	typename cosmos_base::aggregate_pool_type pool_for_aggregates;
+	typename cosmos_base::component_pools_type pools_for_components;
+	// END GEN INTROSPECTOR
+
+	bool operator==(const cosmos_significant_state&) const;
+	bool operator!=(const cosmos_significant_state&) const;
+};
+
 class EMPTY_BASES cosmos : 
 	private put_all_components_into<augs::operations_on_all_components_mixin, cosmos>::type, 
 	public augs::easier_handle_getters_mixin<cosmos>
@@ -78,36 +116,8 @@ public:
 
 	mutable cosmic_profiler profiler;
 	augs::stream reserved_memory_for_serialization;
-
-	class significant_state {
-	public:
-		class metadata {
-			friend class cosmos;
-
-			augs::delta delta;
-			unsigned total_steps_passed = 0;
-
-#if COSMOS_TRACKS_GUIDS
-			entity_guid next_entity_guid = 1;
-#endif
-		public:
-			all_simulation_settings settings;
-
-			struct flyweights_state {
-				augs::enum_associative_array<spell_type, spell_data> spells;
-				collision_sound_matrix_type collision_sound_matrix;
-
-			} flyweights;
-
-		} meta;
-
-		aggregate_pool_type pool_for_aggregates;
-		component_pools_type pools_for_components;
-
-		bool operator==(const significant_state&) const;
-		bool operator!=(const significant_state&) const;
-
-	} significant;
+	
+	cosmos_significant_state significant;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
@@ -119,7 +129,7 @@ public:
 	cosmos(const cosmos&);
 
 	cosmos& operator=(const cosmos&);
-	cosmos& operator=(const significant_state&);
+	cosmos& operator=(const cosmos_significant_state&);
 
 	bool operator==(const cosmos&) const;
 	bool operator!=(const cosmos&) const;
@@ -288,22 +298,6 @@ public:
 		return std::get<augs::pool<T>>(significant.pools_for_components);
 	}
 };
-
-namespace augs {
-	template <
-		bool C,
-		class F
-	>
-	auto introspect(
-		maybe_const_ref_t<C, cosmos::significant_state> signi,
-		F f
-	) {
-		return 
-			f(signi.meta)
-			&& f(signi.pools_for_components)
-			&& f(signi.pool_for_aggregates);
-	}
-}
 
 inline si_scaling cosmos::get_si() const {
 	return significant.meta.settings.si;

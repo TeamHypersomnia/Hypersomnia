@@ -9,6 +9,7 @@
 #include "augs/misc/streams.h"
 
 #include "augs/image/image.h"
+#include "generated_introspectors.h"
 
 #define PIXEL_NONE rgba(0,0,0,0)
 
@@ -198,7 +199,7 @@ void make_neon(
 
 	for (size_t y = 0; y < source.get_rows(); ++y) {
 		for (size_t x = 0; x < source.get_columns(); ++x) {
-			source.pixel({ x, y }).a *= stamp.alpha_multiplier;
+			source.pixel({ x, y }).a = static_cast<rgba_channel>(source.pixel({ x, y }).a * stamp.alpha_multiplier);
 		}
 	}
 }

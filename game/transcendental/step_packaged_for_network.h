@@ -17,7 +17,7 @@ struct step_packaged_for_network {
 
 namespace augs {
 	template<class A>
-	bool read_object(A& ar, step_packaged_for_network& storage) {
+	void read_object(A& ar, step_packaged_for_network& storage) {
 		if(!augs::read_object(ar, storage.step_type)) return false;
 
 		if (storage.step_type == step_packaged_for_network::type::NEW_ENTROPY) {

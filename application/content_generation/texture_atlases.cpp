@@ -18,7 +18,7 @@
 #include "3rdparty/rectpack2D/src/pack.h"
 
 #include "augs/misc/templated_readwrite.h"
-#include "generated_introspect.h"
+#include "generated_introspectors.h"
 
 namespace fs = std::experimental::filesystem;
 

@@ -56,7 +56,7 @@ namespace components {
 	}
 
 	void movement::add_animation_receiver(entity_id e, bool stop_at_zero_movement) {
-		subscribtion s;
+		movement_subscribtion s;
 		s.target = e;
 		s.stop_response_at_zero_speed = stop_at_zero_movement;
 		response_receivers.push_back(s);
