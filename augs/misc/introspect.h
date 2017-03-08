@@ -9,13 +9,13 @@ namespace augs {
 		T& t,
 		F f
 	) {
-		return introspect<std::is_const<T>::value>(t, f);
+		return introspect<std::is_const_v<T>>(t, f);
 	}
 }
 
 struct true_returner {
-	template <class T>
-	bool operator()(T) const {
+	template <class... Types>
+	bool operator()(Types...) const {
 		return true;
 	}
 };
@@ -29,26 +29,26 @@ template <class T, bool C>
 struct has_introspect<
 	T, 
 	C,
-	std::enable_if_t<
-		std::is_same<
-			std::true_type,
-
-			decltype(
-				augs::introspect<C>(
-					std::declval<
-						std::conditional_t<C, const T, T>
-					>(),
-					true_returner()
-				), 
-				std::true_type()
-			)
-		>::value
-	>
+	decltype(
+		augs::introspect<C>(
+			std::declval<
+				std::conditional_t<C, const T, T>
+			>(),
+			true_returner()
+		), 
+		void()
+	)
 > {
 	static constexpr bool value = true;
 };
 
+template <class T, bool C>
+constexpr bool has_introspect_v = has_introspect<T, C>::value;
+
 template <class T>
 struct has_introspects {
-	static constexpr bool value = has_introspect<T, false>::value && has_introspect<T, true>::value;
-};
+	static constexpr bool value = has_introspect_v<T, false> && has_introspect_v<T, true>;
+}; 
+
+template <class T>
+constexpr bool has_introspects_v = has_introspects<T>::value;

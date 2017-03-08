@@ -9,7 +9,7 @@ namespace augs {
 
 		char buf[sizeof(std::tuple<Types...>)];
 	public:
-		static_assert(are_types_memcpy_safe<Types...>::value, "one of the types is not trivial!");
+		static_assert(are_types_memcpy_safe_v<Types...>, "one of the types is not trivial!");
 
 		tuple_type& get_tuple() {
 			return *reinterpret_cast<tuple_type*>(buf);

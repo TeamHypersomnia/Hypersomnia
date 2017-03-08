@@ -36,6 +36,9 @@ struct index_in_list<T, List<U, Types...>> {
 	static const std::size_t value = 1 + index_in_list<T, List<Types...>>::value;
 };
 
+template <class... Types>
+constexpr bool index_in_list_v = index_in_list<Types...>::value;
+
 template <typename T, typename... Types>
 using pack_contains_type = typename has_type<T, std::tuple<Types...>>::type;
 

@@ -61,6 +61,7 @@ void regenerate_scripted_images(
 		const auto scripted_image_stamp_path = scripted_images_directory + target_stem + ".stamp";
 
 		augs::stream new_stamp_stream;
+
 		augs::write_object(new_stamp_stream, new_stamp);
 
 		bool should_regenerate = force_regenerate;

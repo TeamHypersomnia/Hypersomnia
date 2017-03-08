@@ -36,7 +36,7 @@ namespace augs {
 	class trivial_variant {
 		unsigned current_type = sizeof...(Types);
 		char buf[detail::_maximum<0, sizeof(Types)...>::value];
-		static_assert(are_types_memcpy_safe<Types...>::value, "Types must be memcpy-safe!");
+		static_assert(are_types_memcpy_safe_v<Types...>, "Types must be memcpy-safe!");
 
 		template<class L>
 		decltype(auto) call_unroll(L f) {

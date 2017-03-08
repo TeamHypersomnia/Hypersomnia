@@ -102,25 +102,6 @@ namespace augs {
 }
 
 namespace augs {
-	template<class T, class...>
-	bool read_bytes(std::ifstream& ar, T* const location, const size_t count) {
-		verify_type<T>();
-		ar.read(reinterpret_cast<char*>(location), count * sizeof(T));
-		return !ar.fail();
-	}
-
-	template<class T, class...>
-	auto read_bytes(augs::stream& ar, T* const location, const size_t count) {
-		verify_type<T>();
-		return ar.read(reinterpret_cast<char*>(location), count * sizeof(T));
-	}
-
-	template<class T, class...>
-	void write_bytes(augs::stream& ar, const T* location, size_t count) {
-		verify_type<T>();
-		ar.write(reinterpret_cast<const char*>(location), count * sizeof(T));
-	}
-
 	template<class... Args>
 	void write_object(augs::stream& ar, const augs::stream& storage) {
 		ar.write(storage);

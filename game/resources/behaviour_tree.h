@@ -50,17 +50,17 @@ namespace resources {
 			const behaviour_tree& original_tree;
 			
 			behaviours::goal_tuple resolved_goals;
-			std::array<bool, std::tuple_size<decltype(resolved_goals)>::value> goals_set;
+			std::array<bool, std::tuple_size_v<decltype(resolved_goals)>> goals_set;
 
 			template<class T>
 			void set_goal(const T& g) {
 				std::get<T>(resolved_goals) = g;
-				goals_set.at(index_in_list<T, decltype(resolved_goals)>::value) = true;
+				goals_set.at(index_in_list_v<T, decltype(resolved_goals)>) = true;
 			}
 
 			template<class T>
 			T& get_goal() {
-				ensure(goals_set.at(index_in_list<T, decltype(resolved_goals)>::value));
+				ensure(goals_set.at(index_in_list_v<T, decltype(resolved_goals)>));
 				return std::get<T>(resolved_goals);
 			}
 		};

@@ -6,21 +6,89 @@
 #include <unordered_map>
 
 namespace augs {
-	template<class T>
-	void verify_type() {
-		static_assert(is_memcpy_safe<T>::value, "Attempt to serialize a non-trivially copyable type");
+	template <class T>
+	struct is_native_binary_stream {
+		static constexpr bool value = std::is_same_v<T, augs::stream>;
+	};
+
+	template<class A, class T>
+	void verify_byte_io_safety() {
+		static_assert(is_memcpy_safe_v<T>, "Attempt to serialize a non-trivially copyable type");
+		static_assert(is_native_binary_stream<A>::value, "Byte serialization of trivial structs allowed only on native binary archives");
 	}
 
 	template<class A, class T>
-	void read_bytes(A& ar, T* const location, const size_t count) {
-		verify_type<T>();
+	struct is_byte_io_safe {
+		static constexpr bool value = is_native_binary_stream<A>::value && is_memcpy_safe_v<T>;
+	};
+
+	template<class A, class T>
+	constexpr bool is_byte_io_safe_v = is_byte_io_safe<A, T>::value;
+
+	template<class A, class T>
+	void read_bytes(
+		A& ar, 
+		T* const location, 
+		const size_t count,
+		const std::enable_if_t<is_byte_io_safe_v<A, T>>* const dummy = nullptr
+	) {
 		ar.read(reinterpret_cast<char*>(location), count * sizeof(T));
 	}
 
 	template<class A, class T>
-	void write_bytes(A& ar, const T* const location, const size_t count) {
-		verify_type<T>();
+	void write_bytes(
+		A& ar, 
+		const T* const location, 
+		const size_t count,
+		const std::enable_if_t<is_byte_io_safe_v<A, T>>* const dummy = nullptr
+	) {
 		ar.write(reinterpret_cast<const char*>(location), count * sizeof(T));
+	}
+
+	template<class A, class T>
+	void read_object(
+		A& ar,
+		T& storage,
+		const std::enable_if_t<is_byte_io_safe_v<A, T>>* dummy = nullptr
+	) {
+		read_bytes(ar, &storage, 1);
+	}
+
+	template<class A, class T>
+	void write_object(
+		A& ar,
+		const T& storage,
+		const std::enable_if_t<is_byte_io_safe_v<A, T>>* dummy = nullptr
+	) {
+		write_bytes(ar, &storage, 1);
+	}
+
+	template<class A, class T>
+	void read_object(
+		A& ar,
+		T& storage,
+		const std::enable_if_t<!is_byte_io_safe_v<A, T> && has_introspects_v<T>>* dummy = nullptr
+	) {
+		augs::introspect(
+			storage,
+			[&](auto& member, auto...) {
+				read_object(ar, member);
+			}
+		);
+	}
+
+	template<class A, class T>
+	void write_object(
+		A& ar,
+		const T& storage,
+		const std::enable_if_t<!is_byte_io_safe_v<A, T> && has_introspects_v<T>>* dummy = nullptr
+	) {
+		augs::introspect(
+			storage,
+			[&](const auto& member, auto...) {
+				write_object(ar, member);
+			}
+		);
 	}
 
 	template<class A, class T>
@@ -28,7 +96,7 @@ namespace augs {
 		A& ar,
 		T* storage,
 		const size_t count,
-		const std::enable_if_t<is_memcpy_safe<T>::value>* dummy = nullptr
+		const std::enable_if_t<is_byte_io_safe_v<A, T>>* dummy = nullptr
 	) {
 		read_bytes(ar, storage, count);
 	}
@@ -38,7 +106,7 @@ namespace augs {
 		A& ar,
 		const T* storage,
 		const size_t count,
-		const std::enable_if_t<is_memcpy_safe<T>::value>* dummy = nullptr
+		const std::enable_if_t<is_byte_io_safe_v<A, T>>* dummy = nullptr
 	) {
 		write_bytes(ar, storage, count);
 	}
@@ -48,7 +116,7 @@ namespace augs {
 		A& ar,
 		T* storage,
 		const size_t count,
-		const std::enable_if_t<!is_memcpy_safe<T>::value>* dummy = nullptr
+		const std::enable_if_t<!is_byte_io_safe_v<A, T>>* dummy = nullptr
 	) {
 		for (size_t i = 0; i < count; ++i) {
 			read_object(ar, storage[i]);
@@ -58,31 +126,13 @@ namespace augs {
 	template<class A, class T>
 	void write_objects(
 		A& ar,
-		T* storage,
+		const T* storage,
 		const size_t count,
-		const std::enable_if_t<!is_memcpy_safe<T>::value>* dummy = nullptr
+		const std::enable_if_t<!is_byte_io_safe_v<A, T>>* dummy = nullptr
 	) {
 		for (size_t i = 0; i < count; ++i) {
 			write_object(ar, storage[i]);
 		}
-	}
-
-	template<class A, class T, class...>
-	void read_object(
-		A& ar, 
-		T& storage,
-		const std::enable_if_t<is_memcpy_safe<T>::value>* dummy = nullptr
-	) {
-		read_bytes(ar, &storage, 1);
-	}
-
-	template<class A, class T, class...>
-	void write_object(
-		A& ar, 
-		const T& storage,
-		const std::enable_if_t<is_memcpy_safe<T>::value>* dummy = nullptr
-	) {
-		write_bytes(ar, &storage, 1);
 	}
 
 	template<class A, class T, class vector_size_type = size_t>

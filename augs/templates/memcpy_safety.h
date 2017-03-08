@@ -12,7 +12,7 @@ namespace std {
 
 template <class T>
 struct is_memcpy_safe {
-	static const bool value = std::is_trivially_copyable<T>::value;
+	static const bool value = std::is_trivially_copyable_v<T>;
 };
 
 template <>
@@ -20,12 +20,15 @@ struct is_memcpy_safe<std::tuple<>> {
 	static const bool value = true;
 };
 
+template<class _Ty>
+constexpr bool is_memcpy_safe_v = is_memcpy_safe<_Ty>::value;
+
 template <class... Head>
 struct are_types_memcpy_safe;
 
 template <class Head>
 struct are_types_memcpy_safe<Head> {
-	static constexpr bool value = is_memcpy_safe<Head>::value;
+	static constexpr bool value = is_memcpy_safe_v<Head>;
 };
 
 template <class Head, class... Tail>
@@ -36,8 +39,12 @@ struct are_types_memcpy_safe<Head, Tail...> {
 		are_types_memcpy_safe<Tail...>::value;
 };
 
+template<class... _Ty>
+constexpr bool are_types_memcpy_safe_v = are_types_memcpy_safe<_Ty...>::value;
+
+
 template <class A>
 bool trivial_compare(const A& a, const A& b) {
-	static_assert(is_memcpy_safe<A>::value, "Type can't be trivially compared!");
+	static_assert(is_memcpy_safe_v<A>, "Type can't be trivially compared!");
 	return !std::memcmp(&a, &b, sizeof(A));
 }
