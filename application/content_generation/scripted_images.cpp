@@ -8,7 +8,7 @@
 #include "augs/templates/for_each_in_types.h"
 #include "augs/misc/templated_readwrite.h"
 
-#include "generated_introspect.h"
+#include "generated_introspectors/introspect_scripted_image_stamp.h"
 
 namespace fs = std::experimental::filesystem;
 

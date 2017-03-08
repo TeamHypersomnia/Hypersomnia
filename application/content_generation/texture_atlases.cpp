@@ -17,6 +17,9 @@
 #include "augs/graphics/renderer.h"
 #include "3rdparty/rectpack2D/src/pack.h"
 
+#include "augs/misc/templated_readwrite.h"
+#include "generated_introspect.h"
+
 namespace fs = std::experimental::filesystem;
 
 atlases_regeneration_output regenerate_atlases(

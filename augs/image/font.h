@@ -3,7 +3,6 @@
 #include "augs/math/vec2.h"
 #include "augs/image/image.h"
 
-#include "augs/misc/templated_readwrite.h"
 #include "augs/misc/trivial_pair.h"
 
 #include "augs/texture_atlas/texture_atlas_entry.h"
@@ -13,6 +12,7 @@ typedef FT_Glyph_Metrics_ FT_Glyph_Metrics;
 
 namespace augs {
 	struct font_glyph_metadata {
+		// GEN INTROSPECTOR augs::font_glyph_metadata
 		int adv = 0;
 		int bear_x = 0;
 		int bear_y = 0;
@@ -22,12 +22,14 @@ namespace augs {
 		vec2i size = vec2i(0, 0);
 
 		std::vector<augs::trivial_pair<unsigned, int>> kerning;
+		// END GEN INTROSPECTOR
 
 		font_glyph_metadata() = default;
 		font_glyph_metadata(const FT_Glyph_Metrics&);
 	};
 
 	struct font_metadata_from_file {
+		// GEN INTROSPECTOR augs::font_metadata_from_file
 		int ascender = 0;
 		int descender = 0;
 
@@ -35,6 +37,7 @@ namespace augs {
 
 		std::vector<font_glyph_metadata> glyphs;
 		std::unordered_map<unsigned, unsigned> unicode_to_glyph_index;
+		// END GEN INTROSPECTOR
 
 		unsigned get_height() const {
 			return ascender - descender;
@@ -58,8 +61,10 @@ namespace augs {
 	};
 
 	struct baked_font {
+		// GEN INTROSPECTOR augs::baked_font
 		font_metadata_from_file meta_from_file;
 		std::vector<augs::texture_atlas_entry> glyphs_in_atlas;
+		// END GEN INTROSPECTOR
 
 		bool can_be_bolded() const { return false; }
 		bool can_be_italicsed() const { return false; }
@@ -71,10 +76,12 @@ namespace augs {
 	};
 
 	struct font_loading_input {
+		// GEN INTROSPECTOR augs::font_loading_input
 		std::string path;
 		std::wstring characters;
 		
 		unsigned pt = 0u;
+		// END GEN INTROSPECTOR
 
 		bool operator==(const font_loading_input& b) const {
 			return path == b.path && characters == b.characters && pt == b.pt;
@@ -87,80 +94,6 @@ namespace augs {
 
 		void from_file(const font_loading_input&);
 	};
-
-	template <class A>
-	bool read_object(A& ar, baked_font& data) {
-		return
-			read_object(ar, data.meta_from_file)
-			&& read_object(ar, data.glyphs_in_atlas)
-			;
-	}
-
-	template <class A>
-	void write_object(A& ar, const baked_font& data) {
-		write_object(ar, data.meta_from_file);
-		write_object(ar, data.glyphs_in_atlas);
-	}
-
-	template <class A>
-	bool read_object(A& ar, font_metadata_from_file& data) {
-		return
-			read_object(ar, data.ascender)
-			&& read_object(ar, data.descender)
-			&& read_object(ar, data.pt)
-			&& read_object(ar, data.glyphs)
-			&& read_object(ar, data.unicode_to_glyph_index)
-			;
-	}
-
-	template <class A>
-	void write_object(A& ar, const font_metadata_from_file& data) {
-		write_object(ar, data.ascender);
-		write_object(ar, data.descender);
-		write_object(ar, data.pt);
-		write_object(ar, data.glyphs);
-		write_object(ar, data.unicode_to_glyph_index);
-	}
-
-	template <class A>
-	bool read_object(A& ar, font_glyph_metadata& data) {
-		return
-			read_object(ar, data.adv)
-			&& read_object(ar, data.bear_x)
-			&& read_object(ar, data.bear_y)
-			&& read_object(ar, data.index)
-			&& read_object(ar, data.unicode)
-			&& read_object(ar, data.size)
-			&& read_object(ar, data.kerning)
-		;
-	}
-
-	template <class A>
-	void write_object(A& ar, const font_glyph_metadata& data) {
-		write_object(ar, data.adv);
-		write_object(ar, data.bear_x);
-		write_object(ar, data.bear_y);
-		write_object(ar, data.index);
-		write_object(ar, data.unicode);
-		write_object(ar, data.size);
-		write_object(ar, data.kerning);
-	}
-	
-	template <class A>
-	bool read_object(A& ar, font_loading_input& data) {
-		return
-			read_object(ar, data.path)
-			&& read_object(ar, data.characters)
-			&& read_object(ar, data.pt)
-			;
-	}
-
-	template <class A>
-	void write_object(A& ar, const font_loading_input& data) {
-		write_object(ar, data.path);
-		write_object(ar, data.characters);
-		write_object(ar, data.pt);
-	}
 }
 
 namespace std {

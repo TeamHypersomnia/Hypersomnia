@@ -1423,7 +1423,6 @@
     <ClInclude Include="game\view\viewing_session.h" />
     <ClInclude Include="game\view\viewing_step.h" />
     <ClInclude Include="game\view\world_camera.h" />
-    <ClInclude Include="generated_introspect.h" />
     <ClInclude Include="generated_introspect_format.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="augs\global_libraries.h" />
