@@ -5,6 +5,8 @@
 #include <type_traits>
 #include <limits>
 
+#include "augs/templates/string_templates.h"
+
 template <typename CharType>
 void typesafe_sprintf_detail(size_t, std::basic_string<CharType>&) {
 
@@ -38,22 +40,15 @@ void typesafe_sprintf_detail(size_t starting_pos, std::basic_string<CharType>& t
 	typesafe_sprintf_detail(starting_pos, target_str, std::forward<A>(a)...);
 }
 
-template<typename CharType, typename... A>
-std::basic_string<CharType> typesafe_sprintf(std::basic_string<CharType> f, A&&... a) {
-	typesafe_sprintf_detail(0, f, std::forward<A>(a)...);
-	return f;
-}
-
-template<typename... A>
-std::string typesafe_sprintf(const char* const c_str, A&&... a) {
-	auto f = std::string(c_str);
-	typesafe_sprintf_detail(0, f, std::forward<A>(a)...);
-	return f;
-}
-
-template<typename... A>
-std::wstring typesafe_sprintf(const wchar_t* const c_str, A&&... a) {
-	auto f = std::wstring(c_str);
+template<
+	typename C, 
+	typename... A
+>
+auto typesafe_sprintf(
+	const C c_str, 
+	A&&... a
+) {
+	auto f = std::basic_string<get_underlying_char_type_t<C>>(c_str);
 	typesafe_sprintf_detail(0, f, std::forward<A>(a)...);
 	return f;
 }

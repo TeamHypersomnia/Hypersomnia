@@ -20,20 +20,12 @@ struct rgba {
 		rgba_channel b;
 	};
 
+	// GEN INTROSPECTOR struct rgba
 	rgba_channel r;
 	rgba_channel g;
 	rgba_channel b;
 	rgba_channel a;
-
-	template <class Archive>
-	void serialize(Archive& ar) {
-		ar(
-			CEREAL_NVP(r),
-			CEREAL_NVP(g),
-			CEREAL_NVP(b),
-			CEREAL_NVP(a)
-		);
-	}
+	// END GEN INTROSPECTOR
 
 	explicit rgba(const console_color);
 	

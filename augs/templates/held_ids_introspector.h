@@ -31,15 +31,37 @@ struct held_id_introspector<T, std::enable_if_t<has_held_ids_introspector<T>::va
 	}
 };
 
+
+struct ids_to_guid_transformer {
+	template <class T>
+	void operator()(
+		T&,
+		std::enable_if_t<!std::is_base_of_v<entity_id, T>>* dummy = nullptr
+	) {
+
+	}
+
+	template <class T>
+	void operator()(
+		T& id,
+		std::enable_if_t<std::is_base_of_v<entity_id, T>>* dummy = nullptr
+	) {
+		const auto handle = cosm[id];
+		id = T();
+
+		if (handle.alive()) {
+			id.guid = handle.get_guid();
+		}
+	}
+};
+
+
 template <class H, class F>
 void for_each_held_id(const H handle, F callback) {
-	handle.relations().for_each_held_id(callback);
-
 	const auto& ids = handle.get().component_ids;
-
 	auto& cosm = handle.get_cosmos();
 
-	for_each_in_tuple(ids, [&cosm, &callback](const auto& id) {
+	for_each_in_tuple(ids, [&](const auto& id) {
 		typedef typename std::decay_t<decltype(id)>::element_type component_type;
 		const auto component_handle = cosm[id];
 
@@ -66,7 +88,8 @@ void transform_component_guids_to_ids(T& comp, const cosmos& cosm) {
 	held_id_introspector<T>::for_each_held_id(comp, [&cosm](entity_id& id) {
 		const entity_guid guid = id.guid;
 
-		if (guid != 0)
+		if (guid != 0) {
 			id = cosm.guid_map_for_transport.at(guid);
+		}
 	});
 }

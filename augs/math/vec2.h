@@ -3,8 +3,11 @@
 #include <array>
 #include "rects.h"
 #include "augs/misc/randomization.h"
+#include "augs/misc/typesafe_sprintf.h"
+#include "augs/misc/typesafe_sscanf.h"
 #include "declare.h"
 #include "augs/templates/hash_templates.h"
+
 
 #define AUGS_EPSILON 0.0001f
 #define DEG_TO_RAD 0.01745329251994329576923690768489
@@ -546,13 +549,15 @@ namespace augs {
 
 template<class T>
 std::ostream& operator<<(std::ostream& out, const vec2t<T>& x) {
-	out << "(" << x.x << ";" << x.y << ")";
+	out << typesafe_sprintf("(%x;%x)", x.x, x.y);
 	return out;
 }
 
 template<class T>
 std::istream& operator>>(std::istream& out, vec2t<T>& x) {
-	out >> x.x >> x.y;
+	std::string chunk;
+	out >> chunk;
+	typesafe_sscanf(chunk, "(%x;%x)", x.x, x.y);
 	return out;
 }
 

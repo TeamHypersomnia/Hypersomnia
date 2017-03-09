@@ -457,7 +457,6 @@
     <ClCompile Include="augs\misc\measurements.cpp" />
     <ClCompile Include="augs\misc\recoil_player.cpp" />
     <ClCompile Include="augs\misc\variable_delta_timer.cpp" />
-    <ClCompile Include="augs\misc\typesafe_sprintf.cpp" />
     <ClCompile Include="augs\templates\templates.cpp" />
     <ClCompile Include="augs\window_framework\colored_print.cpp" />
     <ClCompile Include="augs\window_framework\platform_utils.cpp" />
@@ -1118,6 +1117,7 @@
     <ClInclude Include="augs\misc\trivial_pair.h" />
     <ClInclude Include="augs\misc\trivial_tuple.h" />
     <ClInclude Include="augs\misc\trivial_variant.h" />
+    <ClInclude Include="augs\misc\typesafe_sscanf.h" />
     <ClInclude Include="augs\network\network_client.h" />
     <ClInclude Include="augs\network\network_types.h" />
     <ClInclude Include="augs\network\network_server.h" />
@@ -1130,6 +1130,7 @@
     <ClInclude Include="augs\templates\hash_templates.h" />
     <ClInclude Include="augs\templates\held_ids_introspector.h" />
     <ClInclude Include="augs\templates\is_component_synchronized.h" />
+    <ClInclude Include="augs\templates\is_traits.h" />
     <ClInclude Include="augs\templates\maybe_const.h" />
     <ClInclude Include="augs\templates\memcpy_safety.h" />
     <ClInclude Include="augs\templates\minimal_templates.h" />

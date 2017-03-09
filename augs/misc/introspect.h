@@ -2,14 +2,100 @@
 #include <type_traits>
 #include <xtr1common>
 #include "augs/templates/maybe_const.h"
+#include "augs/templates/is_traits.h"
 
 namespace augs {
 	template <class T, class F>
-	decltype(auto) introspect(
+	void introspect(
 		T& t,
 		F f
 	) {
-		return introspect<std::is_const_v<T>>(t, f);
+		introspect<std::is_const_v<T>>(t, f);
+	}
+
+	template <
+		template <class A> class call_valid_predicate,
+		class MemberType,
+		class = void
+	>
+	struct recursive_introspector;
+
+	template <
+		template <class A> class call_valid_predicate,
+		class MemberType
+	>	
+	struct recursive_introspector<
+		call_valid_predicate,
+		MemberType,
+		std::enable_if_t<call_valid_predicate<MemberType>::value>
+	> {
+		template <class F, class... Args>
+		void operator()(
+			F callback,
+			MemberType& member,
+			Args&&... args
+		) {
+			callback(member, std::forward<Args>(args)...);
+		}
+	};
+
+	template <
+		template <class A> class call_valid_predicate,
+		class MemberType
+	>
+	struct recursive_introspector<
+		call_valid_predicate,
+		MemberType,
+		std::enable_if_t<!call_valid_predicate<MemberType>::value && is_introspective_leaf_v<MemberType>>
+	> {
+		template <class F, class... Args>
+		void operator()(
+			F callback,
+			MemberType& member,
+			Args&&... args
+		) {
+		}
+	};
+
+	template <
+		template <class A> class call_valid_predicate,
+		class MemberType
+	>
+	struct recursive_introspector<
+		call_valid_predicate,
+		MemberType,
+		std::enable_if_t<!call_valid_predicate<MemberType>::value && !is_introspective_leaf_v<MemberType>>
+	> {
+		template <class F, class... Args>
+		void operator()(
+			F callback,
+			MemberType& member,
+			Args&&... args
+		) {
+			static_assert(has_introspects_v<MemberType>, "Found a non-fundamental type without an introspector, on whom the call is invalid.");
+
+			introspect_recursive<call_valid_predicate>(member, callback);
+		}
+	};
+
+	template <
+		template <class A> class call_valid_predicate,
+		class MemberType,
+		class F
+	>
+	void introspect_recursive(
+		MemberType& t,
+		F member_callback
+	) {
+		introspect<std::is_const_v<MemberType>>(
+			t,
+			[&](auto& member, auto... args) {
+				recursive_introspector<
+					call_valid_predicate,
+					std::decay_t<decltype(member)>
+				>()(member_callback, member, args...);
+			}
+		);
 	}
 }
 

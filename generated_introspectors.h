@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/templates/maybe_const.h"
 
+struct rgba;
 class recoil_player;
 struct behaviour_tree_instance;
 struct car_engine_entities;
@@ -108,6 +109,17 @@ namespace augs {
 		f(t.NVP(max_distance));
 		f(t.NVP(reference_distance));
 		f(t.NVP(fade_on_exit));
+	}
+
+	template <bool C, class F>
+	void introspect(
+		maybe_const_ref_t<C, rgba> t,
+		F f
+	) {
+		f(t.NVP(r));
+		f(t.NVP(g));
+		f(t.NVP(b));
+		f(t.NVP(a));
 	}
 
 	template <bool C, class F>

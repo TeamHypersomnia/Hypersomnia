@@ -12,6 +12,11 @@
 
 namespace fs = std::experimental::filesystem;
 
+template <class T>
+struct can_stream {
+	static constexpr bool value = can_stream_right<std::istringstream, T>::value;
+};
+
 void regenerate_scripted_images(
 	const bool force_regenerate
 ) {
@@ -36,16 +41,19 @@ void regenerate_scripted_images(
 
 			std::string command_name;
 			in >> command_name;
-		
+
 			for_each_type_in_list(augs::image::command_variant(), [&](auto dummy) {
 				typedef decltype(dummy) command_type;
 
 				if (command_name == command_type::get_command_name()) {
 					command_type new_command;
 
-					augs::introspect(new_command, [&](auto& member, auto) {
-						in >> member;
-					});
+					augs::introspect_recursive<can_stream>(
+						new_command, 
+						[&](auto& member, auto) {
+							in >> member;
+						}
+					);
 
 					new_stamp.commands.push_back(new_command);
 				}
