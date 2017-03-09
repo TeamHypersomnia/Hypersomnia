@@ -54,6 +54,7 @@ namespace augs {
 			MemberType& member,
 			Args&&... args
 		) {
+
 		}
 	};
 
@@ -72,7 +73,7 @@ namespace augs {
 			MemberType& member,
 			Args&&... args
 		) {
-			static_assert(has_introspects_v<MemberType>, "Found a non-fundamental type without an introspector, on whom the call is invalid.");
+			static_assert(has_introspects_v<MemberType>, "Found a non-fundamental type without an introspector, on whom the callback is invalid.");
 
 			introspect_recursive<call_valid_predicate>(member, callback);
 		}

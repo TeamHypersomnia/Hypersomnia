@@ -110,7 +110,38 @@ TEST(TypesafeSprintf, TypesafeSprintfSeveralTests) {
 	std::string location = "augs::window::glwindow::create";
 
 	EXPECT_EQ("OpenGL error 1282 in augs::window::glwindow::create", typesafe_sprintf("OpenGL error %x in %x", errid, location));
-	
+
 	int a = 2;
 	LOG_NVPS("Test nvps: ", a, errid, test);
+}
+
+TEST(TypesafeSscanf, TypesafeSscanffSeveralTests) {
+	{
+		const auto format = "%x,%x,%x:%x";
+		const auto sprintfed = typesafe_sprintf(format, 1, 2, 3, 4);
+		EXPECT_EQ("1,2,3:4", sprintfed);
+
+		int s1, s2, s3, s4;
+		typesafe_sscanf(sprintfed, format, s1, s2, s3, s4);
+
+		EXPECT_EQ(1, s1);
+		EXPECT_EQ(2, s1);
+		EXPECT_EQ(3, s1);
+		EXPECT_EQ(4, s1);
+	}
+
+	{
+
+
+		vec2i test(123, -412);
+		const auto format = "Vector is equal to: %x";
+		const auto sprintfed = typesafe_sprintf(format, test);
+		EXPECT_EQ("Vector is equal to: (123;-412)", sprintfed);
+
+		vec2i read_test;
+
+		typesafe_sscanf(sprintfed, format, read_test);
+
+		EXPECT_EQ(test, read_test);
+	}
 }

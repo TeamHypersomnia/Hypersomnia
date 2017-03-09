@@ -15,6 +15,7 @@
 #include <gtest/gtest.h>
 
 #include "augs/templates/held_ids_introspector.h"
+#include "generated_introspectors.h"
 
 template <class T>
 bool write_delta(const T& base, const T& enco, augs::stream& out, const bool write_changed_bit = false) {
