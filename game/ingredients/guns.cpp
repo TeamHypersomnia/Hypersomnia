@@ -60,7 +60,7 @@ namespace ingredients {
 			slot_def.always_allow_exactly_one_item = true;
 			slot_def.for_categorized_items_only = true;
 			slot_def.category_allowed = item_category::MAGAZINE;
-			slot_def.attachment_sticking_mode = augs::rects::sticking::TOP;
+			slot_def.attachment_sticking_mode = rectangle_sticking::TOP;
 			slot_def.attachment_offset.pos.set(10, 5 - bbox.y/2 + 2);
 			slot_def.attachment_offset.rotation = mag_rotation;
 
@@ -84,7 +84,7 @@ namespace ingredients {
 			slot_def.always_allow_exactly_one_item = true;
 			slot_def.for_categorized_items_only = true;
 			slot_def.category_allowed = item_category::MUZZLE_ATTACHMENT;
-			slot_def.attachment_sticking_mode = augs::rects::sticking::RIGHT;
+			slot_def.attachment_sticking_mode = rectangle_sticking::RIGHT;
 			slot_def.attachment_offset.pos.x = bbox.x/2 - 1;
 
 			container.slots[slot_function::GUN_MUZZLE] = slot_def;
@@ -458,7 +458,7 @@ namespace prefabs {
 
 		auto& container = weapon.get<components::container>();
 		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_offset.pos.set(-10, -10 + bbox.y/2);
-		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_sticking_mode = augs::rects::sticking::BOTTOM;
+		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_sticking_mode = rectangle_sticking::BOTTOM;
 
 		auto& response = weapon += components::sound_response();
 		response.response = assets::sound_response_id::BILMER2000_RESPONSE;
@@ -809,7 +809,7 @@ namespace prefabs {
 		const auto bbox = weapon.get_aabb(components::transform()).get_size();
 		
 		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_offset.pos.set(1, -11 + bbox.y/2);
-		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_sticking_mode = augs::rects::sticking::BOTTOM;
+		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_sticking_mode = rectangle_sticking::BOTTOM;
 
 		auto& response = weapon += components::sound_response();
 		response.response = assets::sound_response_id::KEK9_RESPONSE;

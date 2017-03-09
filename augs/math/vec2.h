@@ -35,7 +35,7 @@ namespace augs {
 		const auto upper_x = x_pred(*std::max_element(v.begin(), v.end(), [&x_pred](const auto a, const auto b) { return x_pred(a) < x_pred(b); }));
 		const auto upper_y = y_pred(*std::max_element(v.begin(), v.end(), [&y_pred](const auto a, const auto b) { return y_pred(a) < y_pred(b); }));
 
-		return rects::ltrb<std::remove_const_t<decltype(lower_x)>>(lower_x, lower_y, upper_x, upper_y);
+		return ltrbt<std::remove_const_t<decltype(lower_x)>>(lower_x, lower_y, upper_x, upper_y);
 	}
 
 	template <class C>
@@ -47,8 +47,8 @@ namespace augs {
 	}
 
 	template <class T>
-	rects::ltrb<T> get_aabb_rotated(const vec2t<T> initial_size, const T rotation) {
-		auto verts = rects::ltrb<T>(0, 0, initial_size.x, initial_size.y).template get_vertices<T>();
+	ltrbt<T> get_aabb_rotated(const vec2t<T> initial_size, const T rotation) {
+		auto verts = ltrbt<T>(0, 0, initial_size.x, initial_size.y).template get_vertices<T>();
 
 		for (auto& v : verts) {
 			v.rotate(rotation, initial_size / 2);
@@ -154,13 +154,13 @@ struct vec2t {
 		return std::max(x, y);
 	}
 
-	vec2t get_sticking_offset(const augs::rects::sticking mode) {
+	vec2t get_sticking_offset(const rectangle_sticking mode) {
 		vec2 res;
 		switch (mode) {
-		case ::augs::rects::sticking::LEFT: res = vec2(-x / 2, 0);	break;
-		case ::augs::rects::sticking::RIGHT: res = vec2(x / 2, 0);	break;
-		case ::augs::rects::sticking::TOP: res = vec2(0, -y / 2);	break;
-		case ::augs::rects::sticking::BOTTOM: res = vec2(0, y / 2);	break;
+		case ::rectangle_sticking::LEFT: res = vec2(-x / 2, 0);	break;
+		case ::rectangle_sticking::RIGHT: res = vec2(x / 2, 0);	break;
+		case ::rectangle_sticking::TOP: res = vec2(0, -y / 2);	break;
+		case ::rectangle_sticking::BOTTOM: res = vec2(0, y / 2);	break;
 		default: res = vec2(0, 0);			break;
 		}
 

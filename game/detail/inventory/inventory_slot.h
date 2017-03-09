@@ -38,7 +38,7 @@ struct inventory_slot {
 
 	float attachment_density_multiplier = 1.f;
 
-	augs::rects::sticking attachment_sticking_mode = augs::rects::sticking::LEFT;
+	rectangle_sticking attachment_sticking_mode = rectangle_sticking::LEFT;
 	components::transform attachment_offset;
 
 	augs::constant_size_vector<entity_id, ITEMS_INSIDE_COUNT> items_inside;

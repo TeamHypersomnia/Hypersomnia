@@ -32,17 +32,17 @@ namespace bindings {
 			.property("h", (int (ltrbi::*)() const)&ltrbi::h, (void (ltrbi::*)(int)) &ltrbi::h),
 
 
-			luabind::class_<rects::ltrb<long double>>("rect_ltrb_ld")
-			.def(luabind::constructor<const rects::xywh<long double>&>())
-			.def(luabind::constructor<const rects::ltrb<long double>&>())
+			luabind::class_<ltrbt<long double>>("rect_ltrb_ld")
+			.def(luabind::constructor<const xywht<long double>&>())
+			.def(luabind::constructor<const ltrbt<long double>&>())
 			.def(luabind::constructor<long double, long double, long double, long double>())
-			.def_readwrite("l", &rects::ltrb<long double>::l)
-			.def_readwrite("t", &rects::ltrb<long double>::t)
-			.def_readwrite("r", &rects::ltrb<long double>::r)
-			.def_readwrite("b", &rects::ltrb<long double>::b)
-			.def("hover", (bool (rects::ltrb<long double>::*)(const vec2t<long double>& m) const) &rects::ltrb<long double>::hover)
-			.property("w", (long double (rects::ltrb<long double>::*)() const)&rects::ltrb<long double>::w, (void (rects::ltrb<long double>::*)(long double)) &rects::ltrb<long double>::w)
-			.property("h", (long double (rects::ltrb<long double>::*)() const)&rects::ltrb<long double>::h, (void (rects::ltrb<long double>::*)(long double)) &rects::ltrb<long double>::h)
+			.def_readwrite("l", &ltrbt<long double>::l)
+			.def_readwrite("t", &ltrbt<long double>::t)
+			.def_readwrite("r", &ltrbt<long double>::r)
+			.def_readwrite("b", &ltrbt<long double>::b)
+			.def("hover", (bool (ltrbt<long double>::*)(const vec2t<long double>& m) const) &ltrbt<long double>::hover)
+			.property("w", (long double (ltrbt<long double>::*)() const)&ltrbt<long double>::w, (void (ltrbt<long double>::*)(long double)) &ltrbt<long double>::w)
+			.property("h", (long double (ltrbt<long double>::*)() const)&ltrbt<long double>::h, (void (ltrbt<long double>::*)(long double)) &ltrbt<long double>::h)
 
 			;
 	}

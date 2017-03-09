@@ -20,7 +20,7 @@ namespace ingredients {
 		inventory_slot slot_def;
 		slot_def.is_physical_attachment_slot = true;
 		slot_def.always_allow_exactly_one_item = true;
-		slot_def.attachment_sticking_mode = augs::rects::sticking::RIGHT;
+		slot_def.attachment_sticking_mode = rectangle_sticking::RIGHT;
 		slot_def.attachment_offset.pos = vec2(bbox.x/2 - 3, 20);
 		slot_def.attachment_density_multiplier = 0.02f;
 
@@ -31,7 +31,7 @@ namespace ingredients {
 
 		slot_def.for_categorized_items_only = true;
 		slot_def.category_allowed = item_category::SHOULDER_CONTAINER;
-		slot_def.attachment_sticking_mode = augs::rects::sticking::LEFT;
+		slot_def.attachment_sticking_mode = rectangle_sticking::LEFT;
 		slot_def.attachment_offset.pos = vec2(-bbox.x/2 + 4, 0);
 		slot_def.attachment_offset.rotation = -90;
 		container.slots[slot_function::SHOULDER_SLOT] = slot_def;
