@@ -159,7 +159,7 @@ bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 		for_each_in_tuples(
 			base_components, 
 			enco_components,
-			[&](
+			[&agg, &base, &enco, &entity_changed, &removed_components, &new_content, &overridden_components](
 				const auto& base_id, 
 				const auto& enco_id
 			) {
@@ -339,7 +339,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 
 		for_each_in_tuple(
 			deco_components,
-			[&](const auto& deco_id) {
+			[&agg, &overridden_components, &new_entity, &in, &deco](const auto& deco_id) {
 				typedef std::decay_t<decltype(deco_id)> encoded_id_type;
 				typedef typename encoded_id_type::element_type component_type;
 
@@ -383,15 +383,15 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 
 		for_each_in_tuple(
 			deco_components,
-			[&](const auto& deco_id) {
+			[&agg, &removed_components, &overridden_components, &in, &deco, &changed_entity](const auto& deco_id) {
 				typedef std::decay_t<decltype(deco_id)> encoded_id_type;
 				typedef typename encoded_id_type::element_type component_type;
 
 				if (std::is_same<component_type, components::guid>::value) {
 					return;
 				}
-
-				constexpr size_t idx = index_in_list<encoded_id_type, decltype(agg.component_ids)>::value;
+				
+				constexpr size_t idx = index_in_list_v<encoded_id_type, decltype(agg.component_ids)>;
 
 				if (overridden_components[idx]) {
 					const auto deco_c = deco.get_component_pool<component_type>()[deco_id];
