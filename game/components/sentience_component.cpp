@@ -7,19 +7,19 @@ namespace components {
 		personal_electricity.enabled = true;
 	}
 
-	bool sentience::meter::is_enabled() const {
+	bool sentience::sentience_meter::is_enabled() const {
 		return enabled;
 	}
 
-	float sentience::meter::get_maximum_value() const {
+	float sentience::sentience_meter::get_maximum_value() const {
 		return maximum;
 	}
 
-	float sentience::meter::get_value() const {
+	float sentience::sentience_meter::get_value() const {
 		return value;
 	}
 
-	float sentience::meter::get_ratio() const {
+	float sentience::sentience_meter::get_ratio() const {
 		return value / maximum;
 	}
 

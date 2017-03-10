@@ -297,7 +297,12 @@ struct ltrbt {
 
 template <class T>
 struct xywht {
-	T x, y, w, h;
+	// GEN INTROSPECTOR struct xywht class T
+	T x;
+	T y;
+	T w;
+	T h;
+	// END GEN INTROSPECTOR
 
 	xywht() : x(static_cast<T>(0)), y(static_cast<T>(0)), w(static_cast<T>(0)), h(static_cast<T>(0)) {}
 	xywht(const ltrbt<T> rc) : x(rc.l), y(rc.t) { b(rc.b); r(rc.r); }

@@ -141,7 +141,10 @@ struct b2Vec2
 		return b2Vec2(-y, x);
 	}
 
-	float32 x, y;
+	// GEN INTROSPECTOR struct b2Vec
+	float32 x;
+	float32 y;
+	// END GEN INTROSPECTOR
 };
 
 
@@ -347,7 +350,10 @@ struct b2Rot
 	}
 
 	/// Sine and cosine
-	float32 s, c;
+	// GEN INTROSPECTOR struct b2Rot
+	float32 s;
+	float32 c;
+	// END GEN INTROSPECTOR
 };
 
 /// A transform contains translation and rotation. It is used to represent
@@ -374,8 +380,10 @@ struct b2Transform
 		q.Set(angle);
 	}
 
+	// GEN INTROSPECTOR struct b2Transform
 	b2Vec2 p;
 	b2Rot q;
+	// END GEN INTROSPECTOR
 };
 
 /// This describes the motion of a body/shape for TOI computation.
@@ -395,13 +403,16 @@ struct b2Sweep
 	/// Normalize the angles.
 	void Normalize();
 
-	b2Vec2 localCenter;	///< local center of mass position
-	b2Vec2 c0, c;		///< center world positions
-	float32 a0, a;		///< world angles
-
+	// GEN INTROSPECTOR struct b2Sweep
+	b2Vec2 localCenter;	
+	b2Vec2 c0;
+	b2Vec2 c;		
+	float32 a0;
+	float32 a;		
+	float32 alpha0;
+	// END GEN INTROSPECTOR
 	/// Fraction of the current time step in the range [0,1]
 	/// c0 and a0 are the positions at alpha0.
-	float32 alpha0;
 };
 
 /// Useful constant

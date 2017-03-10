@@ -16,48 +16,40 @@
 #include "game/detail/perks/electric_shield_perk.h"
 #include "game/components/transform_component.h"
 
+struct sentience_meter {
+	struct damage_result {
+		float effective = 0.f;
+		float ratio_effective_to_maximum = 0.f;
+		bool dropped_to_zero = false;
+	};
+
+	// GEN INTROSPECTOR struct sentience_meter
+	bool enabled = false;
+	std::array<padding_byte, 3> pad;
+
+	float value = 100.f;
+	float maximum = 100.f;
+	// END GEN INTROSPECTOR
+
+	damage_result calculate_damage_result(float amount) const;
+
+	bool is_enabled() const;
+	float get_maximum_value() const;
+	float get_value() const;
+	float get_ratio() const;
+};
+
 namespace components {
 	struct sentience {
-		struct meter {
-			struct damage_result {
-				float effective = 0.f;
-				float ratio_effective_to_maximum = 0.f;
-				bool dropped_to_zero = false;
-			};
-
-			bool enabled = false;
-			std::array<padding_byte, 3> pad;
-
-			float value = 100.f;
-			float maximum = 100.f;
-
-			template <class Archive>
-			void serialize(Archive& ar) {
-				ar(
-					CEREAL_NVP(enabled),
-
-					CEREAL_NVP(value),
-					CEREAL_NVP(maximum)
-				);
-			}
-
-			damage_result calculate_damage_result(float amount) const;
-
-			bool is_enabled() const;
-			float get_maximum_value() const;
-			float get_value() const;
-			float get_ratio() const;
-		};
-
 		// GEN INTROSPECTOR struct components::sentience
 		augs::stepped_timestamp time_of_last_received_damage;
 		augs::stepped_timestamp time_of_last_exertion;
 
 		augs::stepped_cooldown cast_cooldown_for_all_spells;
 
-		meter health;
-		meter personal_electricity;
-		meter consciousness;
+		sentience_meter health;
+		sentience_meter personal_electricity;
+		sentience_meter consciousness;
 
 		haste_perk haste;
 		electric_shield_perk electric_shield;

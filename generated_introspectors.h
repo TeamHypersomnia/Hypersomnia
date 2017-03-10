@@ -2,14 +2,22 @@
 #include "augs/templates/maybe_const.h"
 
 struct rgba;
+template <class T>
+struct ltrbt;
+template <class T>
+struct xywht;
+template <class type>
+struct vec2t;
 class recoil_player;
 struct behaviour_tree_instance;
 struct car_engine_entities;
 struct convex_partitioned_collider;
+struct item_slot_mounting_operation;
 struct light_value_variation;
 struct light_attenuation;
 struct movement_subscribtion;
 struct particles_effect_input;
+struct sentience_meter;
 struct sound_effect_input;
 struct friction_connection;
 template <class id_type>
@@ -26,6 +34,10 @@ struct neon_map_stamp;
 struct scripted_image_stamp;
 struct texture_atlas_stamp;
 struct texture_atlas_metadata;
+struct b2Vec;
+struct b2Rot;
+struct b2Transform;
+struct b2Sweep;
 
 namespace augs {
 	struct sound_effect_modifier;
@@ -36,11 +48,15 @@ namespace augs {
 	struct paint_circle_midpoint_command;
 	struct paint_circle_filled_command;
 	struct paint_line_command;
-	template <class T, int const_count>
+	template <class T, size_t const_count>
 	class constant_size_vector;
 	template <class Enum, class T>
 	class enum_associative_array;
 	struct machine_entropy;
+	struct stepped_timestamp;
+	struct stepped_cooldown;
+	template <class A, class B>
+	class trivial_pair;
 }
 
 namespace components {
@@ -99,9 +115,10 @@ namespace resources {
 
 namespace augs {
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, augs::sound_effect_modifier> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, augs::sound_effect_modifier>& t,
+		F f,
+		const augs::sound_effect_modifier* const
 	) {
 		f(t.NVP(repetitions));
 		f(t.NVP(gain));
@@ -112,9 +129,10 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, rgba> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, rgba>& t,
+		F f,
+		const rgba* const
 	) {
 		f(t.NVP(r));
 		f(t.NVP(g));
@@ -123,9 +141,10 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, augs::font_glyph_metadata> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, augs::font_glyph_metadata>& t,
+		F f,
+		const augs::font_glyph_metadata* const
 	) {
 		f(t.NVP(adv));
 		f(t.NVP(bear_x));
@@ -139,9 +158,10 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, augs::font_metadata_from_file> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, augs::font_metadata_from_file>& t,
+		F f,
+		const augs::font_metadata_from_file* const
 	) {
 		f(t.NVP(ascender));
 		f(t.NVP(descender));
@@ -153,18 +173,20 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, augs::baked_font> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, augs::baked_font>& t,
+		F f,
+		const augs::baked_font* const
 	) {
 		f(t.NVP(meta_from_file));
 		f(t.NVP(glyphs_in_atlas));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, augs::font_loading_input> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, augs::font_loading_input>& t,
+		F f,
+		const augs::font_loading_input* const
 	) {
 		f(t.NVP(path));
 		f(t.NVP(characters));
@@ -173,9 +195,10 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, augs::paint_circle_midpoint_command> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, augs::paint_circle_midpoint_command>& t,
+		F f,
+		const augs::paint_circle_midpoint_command* const
 	) {
 		f(t.NVP(radius));
 		f(t.NVP(border_width));
@@ -187,55 +210,95 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, augs::paint_circle_filled_command> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, augs::paint_circle_filled_command>& t,
+		F f,
+		const augs::paint_circle_filled_command* const
 	) {
 		f(t.NVP(radius));
 		f(t.NVP(filling));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, augs::paint_line_command> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, augs::paint_line_command>& t,
+		F f,
+		const augs::paint_line_command* const
 	) {
 		f(t.NVP(from));
 		f(t.NVP(to));
 		f(t.NVP(filling));
 	}
 
-	template <bool C, class F, class T, int const_count>
-	void introspect(
-		maybe_const_ref_t<C, augs::constant_size_vector<T, const_count>> t,
-		F f
+	template <bool C, class F, class T>
+	void introspect_body(
+		maybe_const_ref_t<C, ltrbt<T>>& t,
+		F f,
+		const ltrbt<T>* const
+	) {
+		f(t.NVP(l));
+		f(t.NVP(t));
+		f(t.NVP(r));
+		f(t.NVP(b));
+	}
+
+	template <bool C, class F, class T>
+	void introspect_body(
+		maybe_const_ref_t<C, xywht<T>>& t,
+		F f,
+		const xywht<T>* const
+	) {
+		f(t.NVP(x));
+		f(t.NVP(y));
+		f(t.NVP(w));
+		f(t.NVP(h));
+	}
+
+	template <bool C, class F, class type>
+	void introspect_body(
+		maybe_const_ref_t<C, vec2t<type>>& t,
+		F f,
+		const vec2t<type>* const
+	) {
+		f(t.NVP(x));
+		f(t.NVP(y));
+	}
+
+	template <bool C, class F, class T, size_t const_count>
+	void introspect_body(
+		maybe_const_ref_t<C, augs::constant_size_vector<T, const_count>>& t,
+		F f,
+		const augs::constant_size_vector<T, const_count>* const
 	) {
 		f(t.NVP(count));
 		f(t.NVP(raw));
 	}
 
 	template <bool C, class F, class Enum, class T>
-	void introspect(
-		maybe_const_ref_t<C, augs::enum_associative_array<Enum, T>> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, augs::enum_associative_array<Enum, T>>& t,
+		F f,
+		const augs::enum_associative_array<Enum, T>* const
 	) {
 		f(t.NVP(is_set));
 		f(t.NVP(raw));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, augs::machine_entropy> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, augs::machine_entropy>& t,
+		F f,
+		const augs::machine_entropy* const
 	) {
 		f(t.NVP(local));
 		f(t.NVP(remote));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, recoil_player> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, recoil_player>& t,
+		F f,
+		const recoil_player* const
 	) {
 		f(t.NVP(offsets));
 		f(t.NVP(current_offset));
@@ -248,9 +311,39 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::animation> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, augs::stepped_timestamp>& t,
+		F f,
+		const augs::stepped_timestamp* const
+	) {
+		f(t.NVP(step));
+	}
+
+	template <bool C, class F>
+	void introspect_body(
+		maybe_const_ref_t<C, augs::stepped_cooldown>& t,
+		F f,
+		const augs::stepped_cooldown* const
+	) {
+		f(t.NVP(when_last_fired));
+		f(t.NVP(cooldown_duration_ms));
+	}
+
+	template <bool C, class F, class A, class B>
+	void introspect_body(
+		maybe_const_ref_t<C, augs::trivial_pair<A, B>>& t,
+		F f,
+		const augs::trivial_pair<A, B>* const
+	) {
+		f(t.NVP(first));
+		f(t.NVP(second));
+	}
+
+	template <bool C, class F>
+	void introspect_body(
+		maybe_const_ref_t<C, components::animation>& t,
+		F f,
+		const components::animation* const
 	) {
 		f(t.NVP(current_animation));
 
@@ -264,17 +357,19 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::animation_response> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::animation_response>& t,
+		F f,
+		const components::animation_response* const
 	) {
 		f(t.NVP(response));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::attitude> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::attitude>& t,
+		F f,
+		const components::attitude* const
 	) {
 		f(t.NVP(maximum_divergence_angle_before_shooting));
 
@@ -294,35 +389,39 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, behaviour_tree_instance> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, behaviour_tree_instance>& t,
+		F f,
+		const behaviour_tree_instance* const
 	) {
 		f(t.NVP(state));
 		f(t.NVP(tree_id));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::behaviour_tree> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::behaviour_tree>& t,
+		F f,
+		const components::behaviour_tree* const
 	) {
 		f(t.NVP(concurrent_trees));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, car_engine_entities> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, car_engine_entities>& t,
+		F f,
+		const car_engine_entities* const
 	) {
 		f(t.NVP(physical));
 		f(t.NVP(particles));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::car> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::car>& t,
+		F f,
+		const components::car* const
 	) {
 		f(t.NVP(current_driver));
 
@@ -381,25 +480,28 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::child> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::child>& t,
+		F f,
+		const components::child* const
 	) {
 		f(t.NVP(parent));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::container> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::container>& t,
+		F f,
+		const components::container* const
 	) {
 		f(t.NVP(slots));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::crosshair> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::crosshair>& t,
+		F f,
+		const components::crosshair* const
 	) {
 		f(t.NVP(orbit_mode));
 
@@ -418,9 +520,10 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::damage> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::damage>& t,
+		F f,
+		const components::damage* const
 	) {
 		f(t.NVP(amount));
 
@@ -456,18 +559,20 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::driver> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::driver>& t,
+		F f,
+		const components::driver* const
 	) {
 		f(t.NVP(owned_vehicle));
 		f(t.NVP(density_multiplier_while_driving));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::dynamic_tree_node> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::dynamic_tree_node>& t,
+		F f,
+		const components::dynamic_tree_node* const
 	) {
 		f(t.NVP(always_visible));
 		f(t.NVP(activated));
@@ -478,9 +583,10 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, convex_partitioned_collider> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, convex_partitioned_collider>& t,
+		F f,
+		const convex_partitioned_collider* const
 	) {
 		f(t.NVP(shape));
 		f(t.NVP(material));
@@ -498,9 +604,10 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::fixtures> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::fixtures>& t,
+		F f,
+		const components::fixtures* const
 	) {
 		f(t.NVP(colliders));
 		f(t.NVP(offsets_for_created_shapes));
@@ -512,17 +619,19 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::flags> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::flags>& t,
+		F f,
+		const components::flags* const
 	) {
 		f(t.NVP(bit_flags));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::force_joint> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::force_joint>& t,
+		F f,
+		const components::force_joint* const
 	) {
 		f(t.NVP(chased_entity));
 
@@ -541,26 +650,29 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::grenade> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::grenade>& t,
+		F f,
+		const components::grenade* const
 	) {
 		f(t.NVP(spoon));
 		f(t.NVP(type));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::guid> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::guid>& t,
+		F f,
+		const components::guid* const
 	) {
 		f(t.NVP(value));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::gun> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::gun>& t,
+		F f,
+		const components::gun* const
 	) {
 		f(t.NVP(shot_cooldown));
 		f(t.NVP(action_mode));
@@ -598,18 +710,20 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::interpolation> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::interpolation>& t,
+		F f,
+		const components::interpolation* const
 	) {
 		f(t.NVP(base_exponent));
 		f(t.NVP(place_of_birth));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::item> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::item>& t,
+		F f,
+		const components::item* const
 	) {
 		f(t.NVP(current_mounting));
 		f(t.NVP(intended_mounting));
@@ -631,9 +745,20 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::item_slot_transfers> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, item_slot_mounting_operation>& t,
+		F f,
+		const item_slot_mounting_operation* const
+	) {
+		f(t.NVP(current_item));
+		f(t.NVP(intented_mounting_slot));
+	}
+
+	template <bool C, class F>
+	void introspect_body(
+		maybe_const_ref_t<C, components::item_slot_transfers>& t,
+		F f,
+		const components::item_slot_transfers* const
 	) {
 		f(t.NVP(pickup_timeout));
 		f(t.NVP(mounting));
@@ -643,9 +768,10 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, light_value_variation> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, light_value_variation>& t,
+		F f,
+		const light_value_variation* const
 	) {
 		f(t.NVP(min_value));
 		f(t.NVP(max_value));
@@ -653,18 +779,20 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, light_attenuation> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, light_attenuation>& t,
+		F f,
+		const light_attenuation* const
 	) {
 		f(t.NVP(base_value));
 		f(t.NVP(variation));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::light> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::light>& t,
+		F f,
+		const components::light* const
 	) {
 		f(t.NVP(color));
 
@@ -682,9 +810,10 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::melee> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::melee>& t,
+		F f,
+		const components::melee* const
 	) {
 		f(t.NVP(primary_move_flag));
 		f(t.NVP(secondary_move_flag));
@@ -694,18 +823,20 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, movement_subscribtion> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, movement_subscribtion>& t,
+		F f,
+		const movement_subscribtion* const
 	) {
 		f(t.NVP(target));
 		f(t.NVP(stop_response_at_zero_speed));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::movement> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::movement>& t,
+		F f,
+		const components::movement* const
 	) {
 		f(t.NVP(response_receivers));
 		
@@ -734,9 +865,10 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::name> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::name>& t,
+		F f,
+		const components::name* const
 	) {
 		f(t.NVP(id));
 
@@ -745,9 +877,10 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, particles_effect_input> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, particles_effect_input>& t,
+		F f,
+		const particles_effect_input* const
 	) {
 		f(t.NVP(effect));
 		f(t.NVP(delete_entity_after_effect_lifetime));
@@ -759,9 +892,10 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::particles_existence> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::particles_existence>& t,
+		F f,
+		const components::particles_existence* const
 	) {
 		f(t.NVP(input));
 
@@ -776,27 +910,30 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::particle_effect_response> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::particle_effect_response>& t,
+		F f,
+		const components::particle_effect_response* const
 	) {
 		f(t.NVP(response));
 		f(t.NVP(modifier));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::physical_relations> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::physical_relations>& t,
+		F f,
+		const components::physical_relations* const
 	) {
 		f(t.NVP(owner_body));
 		f(t.NVP(fixture_entities));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::physics> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::physics>& t,
+		F f,
+		const components::physics* const
 	) {
 		f(t.NVP(fixed_rotation));
 		f(t.NVP(bullet));
@@ -818,9 +955,10 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::polygon> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::polygon>& t,
+		F f,
+		const components::polygon* const
 	) {
 		f(t.NVP(center_neon_map));
 		f(t.NVP(vertices));
@@ -829,9 +967,10 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::position_copying> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::position_copying>& t,
+		F f,
+		const components::position_copying* const
 	) {
 		f(t.NVP(target));
 
@@ -854,9 +993,10 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::processing> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::processing>& t,
+		F f,
+		const components::processing* const
 	) {
 		f(t.NVP(activated));
 
@@ -865,9 +1005,10 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::render> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::render>& t,
+		F f,
+		const components::render* const
 	) {
 		f(t.NVP(screen_space_transform));
 		f(t.NVP(draw_border));
@@ -879,9 +1020,10 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::rotation_copying> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::rotation_copying>& t,
+		F f,
+		const components::rotation_copying* const
 	) {
 		f(t.NVP(target));
 		f(t.NVP(stashed_target));
@@ -901,9 +1043,22 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::sentience> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, sentience_meter>& t,
+		F f,
+		const sentience_meter* const
+	) {
+		f(t.NVP(enabled));
+
+		f(t.NVP(value));
+		f(t.NVP(maximum));
+	}
+
+	template <bool C, class F>
+	void introspect_body(
+		maybe_const_ref_t<C, components::sentience>& t,
+		F f,
+		const components::sentience* const
 	) {
 		f(t.NVP(time_of_last_received_damage));
 		f(t.NVP(time_of_last_exertion));
@@ -936,9 +1091,10 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, sound_effect_input> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, sound_effect_input>& t,
+		F f,
+		const sound_effect_input* const
 	) {
 		f(t.NVP(effect));
 		f(t.NVP(delete_entity_after_effect_lifetime));
@@ -948,34 +1104,38 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::sound_existence> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::sound_existence>& t,
+		F f,
+		const components::sound_existence* const
 	) {
 		f(t.NVP(input));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::sound_response> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::sound_response>& t,
+		F f,
+		const components::sound_response* const
 	) {
 		f(t.NVP(response));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, friction_connection> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, friction_connection>& t,
+		F f,
+		const friction_connection* const
 	) {
 		f(t.NVP(target));
 		f(t.NVP(fixtures_connected));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::special_physics> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::special_physics>& t,
+		F f,
+		const components::special_physics* const
 	) {
 		f(t.NVP(dropped_collision_cooldown));
 		f(t.NVP(owner_friction_ground));
@@ -983,9 +1143,10 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::sprite> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::sprite>& t,
+		F f,
+		const components::sprite* const
 	) {
 		f(t.NVP(tex));
 		f(t.NVP(color));
@@ -1004,25 +1165,28 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::substance> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::substance>& t,
+		F f,
+		const components::substance* const
 	) {
 		f(t.NVP(dummy));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::tile_layer_instance> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::tile_layer_instance>& t,
+		F f,
+		const components::tile_layer_instance* const
 	) {
 		f(t.NVP(id));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::trace> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::trace>& t,
+		F f,
+		const components::trace* const
 	) {
 		f(t.NVP(max_multiplier_x));
 		f(t.NVP(max_multiplier_y));
@@ -1037,26 +1201,29 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::transform> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::transform>& t,
+		F f,
+		const components::transform* const
 	) {
 		f(t.NVP(pos));
 		f(t.NVP(rotation));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::trigger_collision_detector> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::trigger_collision_detector>& t,
+		F f,
+		const components::trigger_collision_detector* const
 	) {
 		f(t.NVP(detection_intent_enabled));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::trigger> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::trigger>& t,
+		F f,
+		const components::trigger* const
 	) {
 		f(t.NVP(entity_to_be_notified));
 		f(t.NVP(react_to_collision_detectors));
@@ -1064,18 +1231,20 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::trigger_query_detector> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::trigger_query_detector>& t,
+		F f,
+		const components::trigger_query_detector* const
 	) {
 		f(t.NVP(detection_intent_enabled));
 		f(t.NVP(spam_trigger_requests_when_detection_intented));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, components::wandering_pixels> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, components::wandering_pixels>& t,
+		F f,
+		const components::wandering_pixels* const
 	) {
 		f(t.NVP(reach));
 		f(t.NVP(face));
@@ -1083,27 +1252,30 @@ namespace augs {
 	}
 
 	template <bool C, class F, class id_type>
-	void introspect(
-		maybe_const_ref_t<C, basic_inventory_slot_id<id_type>> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, basic_inventory_slot_id<id_type>>& t,
+		F f,
+		const basic_inventory_slot_id<id_type>* const
 	) {
 		f(t.NVP(type));
 		f(t.NVP(container_entity));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, inventory_item_address> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, inventory_item_address>& t,
+		F f,
+		const inventory_item_address* const
 	) {
 		f(t.NVP(root_container));
 		f(t.NVP(directions));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, inventory_traversal> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, inventory_traversal>& t,
+		F f,
+		const inventory_traversal* const
 	) {
 		f(t.NVP(parent_slot));
 		f(t.NVP(current_address));
@@ -1112,9 +1284,10 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, resources::particle_effect_modifier> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, resources::particle_effect_modifier>& t,
+		F f,
+		const resources::particle_effect_modifier* const
 	) {
 		f(t.NVP(colorize));
 		f(t.NVP(scale_amounts));
@@ -1123,9 +1296,10 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, resources::emission> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, resources::emission>& t,
+		F f,
+		const resources::emission* const
 	) {
 		f(t.NVP(spread_degrees));
 		f(t.NVP(base_speed));
@@ -1167,9 +1341,10 @@ namespace augs {
 	}
 
 	template <bool C, class F, class key>
-	void introspect(
-		maybe_const_ref_t<C, basic_cosmic_entropy<key>> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, basic_cosmic_entropy<key>>& t,
+		F f,
+		const basic_cosmic_entropy<key>* const
 	) {
 		f(t.NVP(cast_spells));
 		f(t.NVP(intents_per_entity));
@@ -1177,18 +1352,20 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, cosmos_flyweights_state> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, cosmos_flyweights_state>& t,
+		F f,
+		const cosmos_flyweights_state* const
 	) {
 		f(t.NVP(spells));
 		f(t.NVP(collision_sound_matrix));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, cosmos_metadata> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, cosmos_metadata>& t,
+		F f,
+		const cosmos_metadata* const
 	) {
 
 		f(t.NVP(delta));
@@ -1203,9 +1380,10 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, cosmos_significant_state> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, cosmos_significant_state>& t,
+		F f,
+		const cosmos_significant_state* const
 	) {
 		f(t.NVP(meta));
 
@@ -1214,9 +1392,10 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, config_lua_table> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, config_lua_table>& t,
+		F f,
+		const config_lua_table* const
 	) {
 		f(t.NVP(launch_mode));
 		f(t.NVP(input_recording_mode));
@@ -1283,9 +1462,10 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, neon_map_stamp> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, neon_map_stamp>& t,
+		F f,
+		const neon_map_stamp* const
 	) {
 		f(t.NVP(standard_deviation));
 		f(t.NVP(radius_towards_x_axis));
@@ -1298,31 +1478,78 @@ namespace augs {
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, scripted_image_stamp> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, scripted_image_stamp>& t,
+		F f,
+		const scripted_image_stamp* const
 	) {
 		f(t.NVP(commands));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, texture_atlas_stamp> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, texture_atlas_stamp>& t,
+		F f,
+		const texture_atlas_stamp* const
 	) {
 		f(t.NVP(image_stamps));
 		f(t.NVP(font_stamps));
 	}
 
 	template <bool C, class F>
-	void introspect(
-		maybe_const_ref_t<C, texture_atlas_metadata> t,
-		F f
+	void introspect_body(
+		maybe_const_ref_t<C, texture_atlas_metadata>& t,
+		F f,
+		const texture_atlas_metadata* const
 	) {
 		f(t.NVP(atlas_image_size));
 
 		f(t.NVP(images));
 		f(t.NVP(fonts));
+	}
+
+	template <bool C, class F>
+	void introspect_body(
+		maybe_const_ref_t<C, b2Vec>& t,
+		F f,
+		const b2Vec* const
+	) {
+		f(t.NVP(x));
+		f(t.NVP(y));
+	}
+
+	template <bool C, class F>
+	void introspect_body(
+		maybe_const_ref_t<C, b2Rot>& t,
+		F f,
+		const b2Rot* const
+	) {
+		f(t.NVP(s));
+		f(t.NVP(c));
+	}
+
+	template <bool C, class F>
+	void introspect_body(
+		maybe_const_ref_t<C, b2Transform>& t,
+		F f,
+		const b2Transform* const
+	) {
+		f(t.NVP(p));
+		f(t.NVP(q));
+	}
+
+	template <bool C, class F>
+	void introspect_body(
+		maybe_const_ref_t<C, b2Sweep>& t,
+		F f,
+		const b2Sweep* const
+	) {
+		f(t.NVP(localCenter));
+		f(t.NVP(c0));
+		f(t.NVP(c));
+		f(t.NVP(a0));
+		f(t.NVP(a));
+		f(t.NVP(alpha0));
 	}
 
 }

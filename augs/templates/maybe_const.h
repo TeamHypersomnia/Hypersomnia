@@ -31,5 +31,5 @@ using maybe_const_ptr_t = typename maybe_const_ptr<is_const, T>::type;
 
 template <class T>
 struct is_const_ref {
-	static constexpr bool value = std::is_const<std::remove_reference<T>>::value;
+	static constexpr bool value = std::is_const_v<std::remove_reference_t<T>>;
 };

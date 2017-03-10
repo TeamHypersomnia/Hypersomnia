@@ -12,7 +12,7 @@ void transform_component_ids_to_guids(
 ) {
 	augs::introspect_recursive<is_id_type>(
 		comp, 
-		[&cosm](auto& id) {
+		[&cosm](auto& id, auto...) {
 			const auto handle = cosm[id];
 
 			if (handle.alive()) {
@@ -29,7 +29,7 @@ void transform_component_guids_to_ids(
 ) {
 	augs::introspect_recursive<is_id_type>(
 		comp, 
-		[&cosm](auto& id) {
+		[&cosm](auto& id, auto...) {
 			const entity_guid guid = id.guid;
 
 			if (guid != 0) {

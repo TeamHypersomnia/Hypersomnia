@@ -7,8 +7,8 @@
 #include "game/detail/gui/drag_and_drop_target_drop_item.h"
 #include "game/detail/gui/hotbar_button.h"
 #include "game/detail/gui/action_button.h"
-#include "game/detail/gui/sentience_meter.h"
-#include "game/detail/gui/perk_meter.h"
+#include "game/detail/gui/sentience_meter_bar.h"
+#include "game/detail/gui/perk_meter_bar.h"
 #include "augs/gui/dereferenced_location.h"
 #include "game/enums/slot_function.h"
 #include "augs/ensure.h"
@@ -34,8 +34,8 @@ struct character_gui {
 	
 	std::array<hotbar_button, 10> hotbar_buttons;
 	std::array<action_button, 10> action_buttons;
-	std::array<sentience_meter, static_cast<size_t>(sentience_meter_type::COUNT)> sentience_meters;
-	std::array<perk_meter, static_cast<size_t>(perk_meter_type::COUNT)> perk_meters;
+	std::array<sentience_meter_bar, static_cast<size_t>(sentience_meter_type::COUNT)> sentience_meter_bars;
+	std::array<perk_meter_bar, static_cast<size_t>(perk_meter_type::COUNT)> perk_meters;
 
 	hotbar_selection_setup last_setups[2];
 	short currently_held_hotbar_index = -1;

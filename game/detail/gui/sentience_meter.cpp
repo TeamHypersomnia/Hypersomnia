@@ -12,12 +12,12 @@
 #include "augs/gui/text_drawer.h"
 #include "augs/gui/stroke.h"
 
-sentience_meter::sentience_meter() {
+sentience_meter_bar::sentience_meter_bar() {
 	unset_flag(augs::gui::flag::CLIP);
 	set_flag(augs::gui::flag::ENABLE_DRAWING);
 }
 
-void sentience_meter::draw(
+void sentience_meter_bar::draw(
 	const viewing_game_gui_context context, 
 	const const_this_pointer this_id, 
 	const augs::gui::draw_info info
@@ -112,7 +112,7 @@ void sentience_meter::draw(
 	}
 }
 
-ltrb sentience_meter::get_full_value_bar_rect_bordered(
+ltrb sentience_meter_bar::get_full_value_bar_rect_bordered(
 	const const_game_gui_context context,
 	const const_this_pointer this_id,
 	const ltrb absolute
@@ -133,7 +133,7 @@ ltrb sentience_meter::get_full_value_bar_rect_bordered(
 	return full_bar_rect;
 }
 
-ltrb sentience_meter::get_full_value_bar_rect(
+ltrb sentience_meter_bar::get_full_value_bar_rect(
 	const const_game_gui_context context,
 	const const_this_pointer this_id,
 	const ltrb absolute
@@ -142,7 +142,7 @@ ltrb sentience_meter::get_full_value_bar_rect(
 }
 
 
-void sentience_meter::advance_elements(
+void sentience_meter_bar::advance_elements(
 	const game_gui_context context,
 	const this_pointer this_id,
 	const augs::delta dt
@@ -183,7 +183,7 @@ void sentience_meter::advance_elements(
 	}
 }
 
-void sentience_meter::respond_to_events(
+void sentience_meter_bar::respond_to_events(
 	const game_gui_context context, 
 	const this_pointer this_id, 
 	const gui_entropy& entropies
@@ -193,7 +193,7 @@ void sentience_meter::respond_to_events(
 	}
 }
 
-augs::gui::material sentience_meter::get_icon_mat(const const_this_pointer this_id) const {
+augs::gui::material sentience_meter_bar::get_icon_mat(const const_this_pointer this_id) const {
 	switch (this_id.get_location().type) {
 	case sentience_meter_type::HEALTH: return{ assets::game_image_id::HEALTH_ICON, white };
 	case sentience_meter_type::CONSCIOUSNESS: return{ assets::game_image_id::CONSCIOUSNESS_ICON, white };
@@ -202,7 +202,7 @@ augs::gui::material sentience_meter::get_icon_mat(const const_this_pointer this_
 	}
 }
 
-augs::gui::material sentience_meter::get_bar_mat(const const_this_pointer this_id) const {
+augs::gui::material sentience_meter_bar::get_bar_mat(const const_this_pointer this_id) const {
 	switch (this_id.get_location().type) {
 	case sentience_meter_type::HEALTH: return{ assets::game_image_id::BLANK, red-rgba(30, 30, 30, 0) };
 	case sentience_meter_type::CONSCIOUSNESS: return{ assets::game_image_id::BLANK, orange - rgba(30, 30, 30, 0) };
@@ -211,7 +211,7 @@ augs::gui::material sentience_meter::get_bar_mat(const const_this_pointer this_i
 	}
 }
 
-void sentience_meter::rebuild_layouts(
+void sentience_meter_bar::rebuild_layouts(
 	const game_gui_context context,
 	const this_pointer this_id
 ) {

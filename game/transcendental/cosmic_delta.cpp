@@ -17,6 +17,13 @@
 #include "augs/templates/held_ids_introspector.h"
 #include "generated_introspectors.h"
 
+static_assert(!has_introspects_v<cosmos>, "Trait is wrong");
+static_assert(!has_introspects_v<unsigned>, "Trait is wrong");
+static_assert(has_introspects_v<cosmos_metadata>, "Trait is wrong");
+static_assert(has_introspects_v<ltrbt<float>>, "Trait is wrong");
+static_assert(has_introspects_v<ltrbt<int>>, "Trait is wrong");
+static_assert(has_introspects_v<augs::constant_size_vector<int, 2>>, "Trait is wrong");
+
 template <class T>
 bool write_delta(const T& base, const T& enco, augs::stream& out, const bool write_changed_bit = false) {
 	const auto dt = augs::delta_encode(base, enco);

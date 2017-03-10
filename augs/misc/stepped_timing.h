@@ -5,12 +5,9 @@ namespace augs {
 	class delta;
 
 	struct stepped_timestamp {
+		// GEN INTROSPECTOR struct augs::stepped_timestamp
 		unsigned step;
-
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(CEREAL_NVP(step));
-		}
+		// END GEN INTROSPECTOR
 
 		stepped_timestamp(const unsigned step = 0u)
 			: step(step) {}
@@ -25,8 +22,10 @@ namespace augs {
 	};
 
 	struct stepped_cooldown {
+		// GEN INTROSPECTOR struct augs::stepped_cooldown
 		stepped_timestamp when_last_fired;
 		float cooldown_duration_ms = 1000.f;
+		// END GEN INTROSPECTOR
 
 		template <class Archive>
 		void serialize(Archive& ar) {

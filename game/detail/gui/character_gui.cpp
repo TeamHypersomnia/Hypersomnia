@@ -476,8 +476,8 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 	const auto maybe_hovered_item = context._dynamic_cast<item_button_in_item>(rect_world.rect_hovered);
 	const auto maybe_hovered_slot = context._dynamic_cast<slot_button_in_container>(rect_world.rect_hovered);
 	const auto maybe_hovered_hotbar_button = context._dynamic_cast<hotbar_button_in_character_gui>(rect_world.rect_hovered);
-	const auto maybe_hovered_sentience_meter = context._dynamic_cast<sentience_meter_in_character_gui>(rect_world.rect_hovered);
-	const auto maybe_hovered_perk_meter = context._dynamic_cast<perk_meter_in_character_gui>(rect_world.rect_hovered);
+	const auto maybe_hovered_sentience_meter = context._dynamic_cast<sentience_meter_bar_in_character_gui>(rect_world.rect_hovered);
+	const auto maybe_hovered_perk_meter = context._dynamic_cast<perk_meter_bar_in_character_gui>(rect_world.rect_hovered);
 	const auto maybe_hovered_action_button = context._dynamic_cast<action_button_in_character_gui>(rect_world.rect_hovered);
 
 	gui::text::fstr tooltip_text;

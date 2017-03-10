@@ -17,19 +17,20 @@ ForwardIt binary_find(ForwardIt first, ForwardIt last, const T& value, Compare c
 }
 
 namespace augs  {
-	template<class T, int const_count>
+	template<class T, size_t const_count>
 	class constant_size_vector {
 		typedef std::array<T, const_count> arr_type;
 
-		// GEN INTROSPECTOR class augs::constant_size_vector class T int const_count
+		// GEN INTROSPECTOR class augs::constant_size_vector class T size_t const_count
 		size_t count;
 		arr_type raw;
 		// END GEN INTROSPECTOR
 
-		template<bool is_const, class F, size_t count, class T>
-		friend void introspect(
-			maybe_const_ref_t<is_const, constant_size_vector<T, count>> t,
-			F f
+		template <bool C, class F, class T, size_t const_count>
+		friend void introspect_body(
+			maybe_const_ref_t<C, augs::constant_size_vector<T, const_count>>& t,
+			F f,
+			const augs::constant_size_vector<T, const_count>* const
 		);
 
 	public:
@@ -229,13 +230,13 @@ namespace augs  {
 		}
 	};
 
-	template <int const_count>
+	template <size_t const_count>
 	using constant_size_string = constant_size_vector<zeroed_pod<char>, const_count>;
 
-	template <int const_count>
+	template <size_t const_count>
 	using constant_size_wstring = constant_size_vector<zeroed_pod<wchar_t>, const_count>;
 
-	template<class Key, class Value, int const_count>
+	template<class Key, class Value, size_t const_count>
 	class constant_size_associative_vector : private constant_size_vector<trivial_pair<Key, Value>, const_count> {
 		typedef trivial_pair<Key, Value> elem_type;
 		typedef constant_size_vector<trivial_pair<Key, Value>, const_count> base;

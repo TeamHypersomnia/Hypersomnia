@@ -133,7 +133,10 @@ template <class type>
 struct vec2t {
 	typedef type value_type;
 	
-	type x, y;
+	// GEN INTROSPECTOR struct vec2t class type
+	type x;
+	type y;
+	// END GEN INTROSPECTOR
 
 	template <class Archive>
 	void serialize(Archive& ar) {

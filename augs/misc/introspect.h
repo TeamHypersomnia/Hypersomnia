@@ -1,16 +1,29 @@
 #pragma once
 #include <type_traits>
 #include <xtr1common>
+#include <array>
+
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/is_traits.h"
 
 namespace augs {
+	template <bool C, class F, class ElemType, size_t count>
+	void introspect_body(
+		maybe_const_ref_t<C, std::array<ElemType, count>> t,
+		F f,
+		const std::array<ElemType, count>* const
+	) {
+		for (size_t i = 0; i < count; ++i) {
+			f(t[i], std::to_string(i));
+		}
+	}
+
 	template <class T, class F>
 	void introspect(
 		T& t,
 		F f
 	) {
-		introspect<std::is_const_v<T>>(t, f);
+		introspect_body<std::is_const_v<T>>(t, f, &t);
 	}
 
 	template <
@@ -81,14 +94,14 @@ namespace augs {
 
 	template <
 		template <class A> class call_valid_predicate,
-		class MemberType,
+		class T,
 		class F
 	>
 	void introspect_recursive(
-		MemberType& t,
+		T& t,
 		F member_callback
 	) {
-		introspect<std::is_const_v<MemberType>>(
+		introspect(
 			t,
 			[&](auto& member, auto... args) {
 				recursive_introspector<
@@ -117,11 +130,12 @@ struct has_introspect<
 	T, 
 	C,
 	decltype(
-		augs::introspect<C>(
+		augs::introspect_body<C>(
 			std::declval<
-				std::conditional_t<C, const T, T>
+				maybe_const_ref_t<C, T>
 			>(),
-			true_returner()
+			true_returner(),
+			maybe_const_ptr_t<C, T>()
 		), 
 		void()
 	)

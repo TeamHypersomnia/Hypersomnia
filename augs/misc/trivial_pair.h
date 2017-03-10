@@ -10,9 +10,11 @@ namespace augs {
 		static_assert(is_memcpy_safe<B>::value, "second type is not trivial!");
 
 		typedef std::pair<A, B> pair;
-
+		
+		// GEN INTROSPECTOR class augs::trivial_pair class A class B
 		A first;
 		B second;
+		// END GEN INTROSPECTOR
 
 		trivial_pair(const A& a = A(), const B& b = B()) : first(a), second(b) {}
 		trivial_pair(const pair& p) : first(p.first), second(p.second) {}

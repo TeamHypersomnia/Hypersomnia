@@ -1,15 +1,15 @@
 #pragma once
 #include "game/enums/perk_meter_type.h"
 
-struct perk_meter;
+struct perk_meter_bar;
 
-struct perk_meter_in_character_gui {
+struct perk_meter_bar_in_character_gui {
 public:
-	typedef perk_meter dereferenced_type;
+	typedef perk_meter_bar dereferenced_type;
 
 	perk_meter_type type = perk_meter_type::COUNT;
 
-	bool operator==(const perk_meter_in_character_gui b) const {
+	bool operator==(const perk_meter_bar_in_character_gui b) const {
 		return type == b.type;
 	}
 
@@ -27,8 +27,8 @@ public:
 
 namespace std {
 	template <>
-	struct hash<perk_meter_in_character_gui> {
-		size_t operator()(const perk_meter_in_character_gui& k) const {
+	struct hash<perk_meter_bar_in_character_gui> {
+		size_t operator()(const perk_meter_bar_in_character_gui& k) const {
 			return hash<perk_meter_type>()(k.type);
 		}
 	};

@@ -8,8 +8,8 @@
 #include "game/detail/gui/locations/hotbar_button_in_character_gui.h"
 #include "game/detail/gui/locations/action_button_in_character_gui.h"
 #include "game/detail/gui/locations/root_of_inventory_gui_in_context.h"
-#include "game/detail/gui/locations/sentience_meter_in_character_gui.h"
-#include "game/detail/gui/locations/perk_meter_in_character_gui.h"
+#include "game/detail/gui/locations/sentience_meter_bar_in_character_gui.h"
+#include "game/detail/gui/locations/perk_meter_bar_in_character_gui.h"
 
 typedef
 augs::trivial_variant<
@@ -19,8 +19,8 @@ augs::trivial_variant<
 	hotbar_button_in_character_gui,
 	action_button_in_character_gui,
 	root_of_inventory_gui_in_context,
-	sentience_meter_in_character_gui,
-	perk_meter_in_character_gui
+	sentience_meter_bar_in_character_gui,
+	perk_meter_bar_in_character_gui
 > game_gui_element_location;
 
 typedef augs::gui::rect_world<game_gui_element_location> game_gui_rect_world;

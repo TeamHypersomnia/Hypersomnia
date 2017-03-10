@@ -1,8 +1,22 @@
 #pragma once
-#include <bitset>
+
+namespace std {
+	template <size_t I>
+	class bitset;
+}
+
+namespace augs {
+	template <class T>
+	class enum_bitset;
+}
 
 template <class T>
 struct is_bitset : std::false_type {
+
+};
+
+template <class T>
+struct is_bitset<augs::enum_bitset<T>> : std::true_type {
 
 };
 

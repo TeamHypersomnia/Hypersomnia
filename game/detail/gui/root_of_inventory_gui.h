@@ -30,14 +30,14 @@ public:
 			generic_call(make_dereferenced_location(&context.get_character_gui().action_buttons[i], child_location));
 		}
 
-		for (size_t i = 0; i < context.get_character_gui().sentience_meters.size(); ++i) {
-			sentience_meter_in_character_gui child_location;
+		for (size_t i = 0; i < context.get_character_gui().sentience_meter_bars.size(); ++i) {
+			sentience_meter_bar_in_character_gui child_location;
 			child_location.type = static_cast<sentience_meter_type>(i);
-			generic_call(make_dereferenced_location(&context.get_character_gui().sentience_meters[i], child_location));
+			generic_call(make_dereferenced_location(&context.get_character_gui().sentience_meter_bars[i], child_location));
 		}
 
 		for (size_t i = 0; i < context.get_character_gui().perk_meters.size(); ++i) {
-			perk_meter_in_character_gui child_location;
+			perk_meter_bar_in_character_gui child_location;
 			child_location.type = static_cast<perk_meter_type>(i);
 			generic_call(make_dereferenced_location(&context.get_character_gui().perk_meters[i], child_location));
 		}

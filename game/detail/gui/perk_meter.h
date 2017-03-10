@@ -5,9 +5,9 @@
 
 #include "game/detail/gui/game_gui_context.h"
 
-struct perk_meter : game_gui_rect_node {
-	typedef dereferenced_location<perk_meter_in_character_gui> this_pointer;
-	typedef const_dereferenced_location<perk_meter_in_character_gui> const_this_pointer;
+struct perk_meter_bar : game_gui_rect_node {
+	typedef dereferenced_location<perk_meter_bar_in_character_gui> this_pointer;
+	typedef const_dereferenced_location<perk_meter_bar_in_character_gui> const_this_pointer;
 	typedef typename game_gui_rect_node::gui_entropy gui_entropy;
 
 	augs::gui::appearance_detector detector;
@@ -28,7 +28,7 @@ struct perk_meter : game_gui_rect_node {
 
 	std::vector<effect_particle> particles;
 
-	perk_meter();
+	perk_meter_bar();
 
 	augs::gui::material get_icon_mat(const const_this_pointer this_id) const;
 	augs::gui::material get_bar_mat(const const_this_pointer this_id) const;

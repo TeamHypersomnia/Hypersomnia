@@ -28,8 +28,8 @@
 
 #include "game/transcendental/logic_step.h"
 
-components::sentience::meter::damage_result components::sentience::meter::calculate_damage_result(const float amount) const {
-	components::sentience::meter::damage_result result;
+sentience_meter::damage_result sentience_meter::calculate_damage_result(const float amount) const {
+	sentience_meter::damage_result result;
 
 	if (amount > 0) {
 		if (value > 0) {
