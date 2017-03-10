@@ -6,6 +6,11 @@
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/is_traits.h"
 
+template <class T>
+struct exclude_no_type {
+	static constexpr bool value = false;
+};
+
 namespace augs {
 	template <bool C, class F, class ElemType, size_t count>
 	void introspect_body(
@@ -28,6 +33,7 @@ namespace augs {
 
 	template <
 		template <class A> class call_valid_predicate,
+		template <class B> class exclude_type_predicate,
 		class MemberType,
 		class = void
 	>
@@ -35,12 +41,17 @@ namespace augs {
 
 	template <
 		template <class A> class call_valid_predicate,
+		template <class B> class exclude_type_predicate,
 		class MemberType
 	>	
 	struct recursive_introspector<
 		call_valid_predicate,
+		exclude_type_predicate,
 		MemberType,
-		std::enable_if_t<call_valid_predicate<MemberType>::value>
+		std::enable_if_t<
+			call_valid_predicate<MemberType>::value 
+			&& !exclude_type_predicate<MemberType>::value
+		>
 	> {
 		template <class F, class... Args>
 		void operator()(
@@ -54,12 +65,19 @@ namespace augs {
 
 	template <
 		template <class A> class call_valid_predicate,
+		template <class B> class exclude_type_predicate,
 		class MemberType
 	>
 	struct recursive_introspector<
 		call_valid_predicate,
+		exclude_type_predicate,
 		MemberType,
-		std::enable_if_t<!call_valid_predicate<MemberType>::value && is_introspective_leaf_v<MemberType>>
+		std::enable_if_t<
+			(
+				!call_valid_predicate<MemberType>::value 
+				&& is_introspective_leaf_v<MemberType>
+			) || exclude_type_predicate<MemberType>::value
+		>
 	> {
 		template <class F, class... Args>
 		void operator()(
@@ -73,12 +91,18 @@ namespace augs {
 
 	template <
 		template <class A> class call_valid_predicate,
+		template <class B> class exclude_type_predicate,
 		class MemberType
 	>
 	struct recursive_introspector<
 		call_valid_predicate,
+		exclude_type_predicate,
 		MemberType,
-		std::enable_if_t<!call_valid_predicate<MemberType>::value && !is_introspective_leaf_v<MemberType>>
+		std::enable_if_t<
+			!call_valid_predicate<MemberType>::value 
+			&& !is_introspective_leaf_v<MemberType>
+			&& !exclude_type_predicate<MemberType>::value
+		>
 	> {
 		template <class F, class... Args>
 		void operator()(
@@ -88,12 +112,16 @@ namespace augs {
 		) {
 			static_assert(has_introspects_v<MemberType>, "Found a non-fundamental type without an introspector, on whom the callback is invalid.");
 
-			introspect_recursive<call_valid_predicate>(member, callback);
+			introspect_recursive<
+				call_valid_predicate,
+				exclude_type_predicate
+			>(member, callback);
 		}
 	};
 
 	template <
 		template <class A> class call_valid_predicate,
+		template <class B> class exclude_type_predicate,
 		class T,
 		class F
 	>
@@ -106,6 +134,7 @@ namespace augs {
 			[&](auto& member, auto... args) {
 				recursive_introspector<
 					call_valid_predicate,
+					exclude_type_predicate,
 					std::decay_t<decltype(member)>
 				>()(member_callback, member, args...);
 			}

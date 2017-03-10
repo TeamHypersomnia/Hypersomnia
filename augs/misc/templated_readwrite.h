@@ -5,8 +5,6 @@
 #include <map>
 #include <unordered_map>
 
-#define NVP(x) x, #x
-
 namespace augs {
 	template <class T>
 	struct is_native_binary_stream {

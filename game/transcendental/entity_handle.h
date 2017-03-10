@@ -4,6 +4,7 @@
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/is_component_synchronized.h"
 #include "augs/templates/type_in_pack.h"
+#include "augs/templates/for_each_in_types.h"
 
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
 #include "game/transcendental/entity_handle_declaration.h"
@@ -312,6 +313,24 @@ public:
 		}
 
 		get<components::flags>().bit_flags.set(f, false);
+	}
+
+	template <class F>
+	void for_each_component(F callback) const {
+		const auto& ids = get().component_ids;
+		auto& cosm = get_cosmos();
+
+		for_each_in_tuple(
+			ids,
+			[&](const auto& id) {
+				typedef typename std::decay_t<decltype(id)>::element_type component_type;
+				const auto component_handle = cosm.get_component_pool<component_type>().get_handle(id);
+
+				if (component_handle.alive()) {
+					callback(component_handle.get());
+				}
+			}
+		);
 	}
 };
 

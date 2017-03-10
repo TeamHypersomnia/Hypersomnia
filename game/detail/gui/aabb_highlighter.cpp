@@ -44,7 +44,7 @@ void aabb_highlighter::draw(
 	};
 
 	aabb_expansion_lambda(subject);
-	subject.for_each_sub_entity_recursive(aabb_expansion_lambda);
+	subject.for_each_child_entity_recursive(aabb_expansion_lambda);
 
 	const auto lesser_dimension = std::min(aabb.w(), aabb.h());
 	

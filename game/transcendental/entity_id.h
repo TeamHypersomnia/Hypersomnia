@@ -33,6 +33,11 @@ struct child_entity_id : entity_id {
 	using base::operator unversioned_entity_id;
 };
 
+template <class T>
+struct is_entity_id_type {
+	static constexpr bool value = std::is_base_of_v<entity_id, T>;
+};
+
 namespace std {
 	template <>
 	struct hash<entity_id> {

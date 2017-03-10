@@ -15,6 +15,11 @@
 
 struct entity_relations;
 
+template <class T>
+struct exclude_non_child_id_types {
+	static constexpr bool value = std::is_same_v<entity_id, T>;
+};
+
 template<bool is_const, class entity_handle_type>
 class basic_relations_mixin {
 protected:
@@ -38,36 +43,27 @@ public:
 	entity_handle_type operator[](const child_entity_name) const;
 
 	template <class F>
-	void for_each_sub_entity_recursive(F callback) const {
+	void for_each_child_entity_recursive(F callback) const {
 		const auto self = *static_cast<const entity_handle_type*>(this);
+		auto& cosmos = self.get_cosmos();
 
-		{
-			const auto& subs = get_sub_entities_component().other_sub_entities;
+		self.for_each_component(
+			[&](auto& subject_component) {
+				augs::introspect_recursive<
+					is_entity_id_type,
+					exclude_non_child_id_types
+				> (
+					subject_component,
+					[&](auto& member_child_id, auto...) {
+						const auto child_handle = cosmos[member_child_id];
 
-			for (const auto& s : subs) {
-				const auto handle = self.get_cosmos()[s];
-
-				if (handle.alive()) {
-					if (callback(handle)) {
-						handle.for_each_sub_entity_recursive(callback);
+						if (callback(child_handle)) {
+							child_handle.for_each_child_entity_recursive(callback);
+						}
 					}
-				}
+				);
 			}
-		}
-
-		{
-			const auto& subs = get_sub_entities_component().sub_entities_by_name;
-
-			for (const auto& s : subs) {
-				const auto handle = self.get_cosmos()[s.second];
-
-				if (handle.alive()) {
-					if (callback(handle)) {
-						handle.for_each_sub_entity_recursive(callback);
-					}
-				}
-			}
-		}
+		);
 	}
 };
 
@@ -83,7 +79,7 @@ public:
 	void make_child_of(const entity_id) const;
 
 	void set_owner_body(const entity_id) const;
-	void make_cloned_sub_entities_recursive(const entity_id copied) const;
+	void make_cloned_child_entities_recursive(const entity_id copied) const;
 
 	void map_child_entity(const child_entity_name n, const entity_id p) const;
 };

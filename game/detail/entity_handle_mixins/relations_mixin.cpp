@@ -29,7 +29,7 @@ components::physical_relations& relations_mixin<false, D>::physical_relations_co
 }
 
 template <class D>
-void relations_mixin<false, D>::make_cloned_sub_entities_recursive(const entity_id from) const {
+void relations_mixin<false, D>::make_cloned_child_entities_recursive(const entity_id from) const {
 	auto& self = *static_cast<const D*>(this);
 	auto& cosmos = self.get_cosmos();
 

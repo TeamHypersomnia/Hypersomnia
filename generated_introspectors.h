@@ -1,6 +1,8 @@
 #pragma once
 #include "augs/templates/maybe_const.h"
 
+#define NVP(x) x, #x
+
 struct rgba;
 template <class T>
 struct ltrbt;

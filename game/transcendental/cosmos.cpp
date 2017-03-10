@@ -318,7 +318,7 @@ entity_handle cosmos::clone_entity(const entity_id copied_entity_id) {
 		new_entity.get<components::item>().current_slot.unset();
 	}
 
-	new_entity.make_cloned_sub_entities_recursive(copied_entity_id);
+	new_entity.make_cloned_child_entities_recursive(copied_entity_id);
 	
 	if (copied_entity.get_owner_body() == copied_entity) {
 		new_entity.set_owner_body(new_entity);
