@@ -13,7 +13,9 @@
 struct spell_data;
 
 struct spell_instance_data {
+	// GEN INTROSPECTOR struct spell_instance_data
 	augs::stepped_cooldown cast_cooldown;
+	// END GEN INTROSPECTOR
 };
 
 struct spell_appearance {

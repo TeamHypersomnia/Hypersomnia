@@ -13,6 +13,12 @@
 #include "game/transcendental/logic_step.h"
 
 namespace resources {
+	struct state_of_behaviour_tree_instance {
+		// GEN INTROSPECTOR struct resources::state_of_behaviour_tree_instance
+		int previously_executed_leaf_id = -1;
+		// END GEN INTROSPECTOR
+	};
+
 	class behaviour_tree {
 	public:
 		enum class goal_availability {
@@ -27,26 +33,17 @@ namespace resources {
 			REPEATED
 		};
 
-		struct state_of_tree_instance {
-			int previously_executed_leaf_id = -1;
-			
-			template <class Archive>
-			void serialize(Archive& ar) {
-				ar(CEREAL_NVP(previously_executed_leaf_id));
-			}
-		};
-
 		struct state_of_traversal {
 			state_of_traversal(
 				const logic_step, 
 				const entity_handle, 
-				state_of_tree_instance&, 
+				state_of_behaviour_tree_instance&, 
 				const behaviour_tree&
 			);
 
 			const logic_step step;
 			const entity_handle subject;
-			state_of_tree_instance& instance;
+			state_of_behaviour_tree_instance& instance;
 			const behaviour_tree& original_tree;
 			
 			behaviours::goal_tuple resolved_goals;
@@ -96,7 +93,7 @@ namespace resources {
 		void evaluate_instance_of_tree(
 			const logic_step, 
 			const entity_handle, 
-			state_of_tree_instance&
+			state_of_behaviour_tree_instance&
 		) const;
 
 		const node& get_node_by_id(const int) const;

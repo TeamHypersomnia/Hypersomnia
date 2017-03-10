@@ -101,7 +101,7 @@ class component_synchronizer<false, components::fixtures> : public basic_fixture
 public:
 	using basic_fixtures_synchronizer<false>::basic_fixtures_synchronizer;
 
-	convex_partitioned_shape::convex_poly::destruction_data& get_modifiable_destruction_data(const b2Fixture_index_in_component);
+	convex_poly_destruction_data& get_modifiable_destruction_data(const b2Fixture_index_in_component);
 
 	void set_density(float, size_t = 0) const;
 	void set_density_multiplier(float, size_t = 0) const;

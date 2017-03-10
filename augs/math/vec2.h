@@ -138,11 +138,6 @@ struct vec2t {
 	type y;
 	// END GEN INTROSPECTOR
 
-	template <class Archive>
-	void serialize(Archive& ar) {
-		ar(CEREAL_NVP(x), CEREAL_NVP(y));
-	}
-
 	template <class B> friend std::ostream& operator<<(std::ostream& out, const vec2t<B>& x);
 	template <class B> friend std::istream& operator>>(std::istream& out, vec2t<B>& x);
 

@@ -14,7 +14,7 @@ namespace augs {
 		const std::array<ElemType, count>* const
 	) {
 		for (size_t i = 0; i < count; ++i) {
-			f(t[i], std::to_string(i));
+			f(*(t.data() + i), std::to_string(i));
 		}
 	}
 

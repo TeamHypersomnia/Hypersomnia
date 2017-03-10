@@ -13,14 +13,6 @@ struct basic_input_context {
 	augs::enum_associative_array<augs::window::event::keys::key, intent_enum_type> key_to_intent;
 	augs::enum_associative_array<augs::window::event::message, intent_enum_type> event_to_intent;
 
-	template <class Archive>
-	void serialize(Archive& ar) {
-		ar(
-			CEREAL_NVP(key_to_intent),
-			CEREAL_NVP(event_to_intent)
-		);
-	}
-
 	void map_key_to_intent(const augs::window::event::keys::key, const intent_enum_type);
 	void map_event_to_intent(const augs::window::event::message, const intent_enum_type);
 

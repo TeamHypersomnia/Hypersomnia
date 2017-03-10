@@ -48,29 +48,6 @@ namespace components {
 			const si_scaling,
 			const components::transform&
 		);
-
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(transform),
-
-				CEREAL_NVP(activated),
-
-				CEREAL_NVP(body_type),
-
-				CEREAL_NVP(angular_damping),
-				CEREAL_NVP(linear_damping),
-				CEREAL_NVP(linear_damping_vec),
-				CEREAL_NVP(gravity_scale),
-
-				CEREAL_NVP(fixed_rotation),
-				CEREAL_NVP(bullet),
-				CEREAL_NVP(angled_damping),
-
-				CEREAL_NVP(velocity),
-				CEREAL_NVP(angular_velocity)
-			);
-		}
 	};
 	
 	struct fixtures;

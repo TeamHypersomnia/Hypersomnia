@@ -2,8 +2,10 @@
 #include "augs/misc/stepped_timing.h"
 #include "augs/misc/delta.h"
 
-struct timed_perk {
+struct perk_timing {
+	// GEN INTROSPECTOR struct perk_timing
 	augs::stepped_cooldown duration;
+	// END GEN INTROSPECTOR
 
 	void set_for_duration(
 		const float ms,

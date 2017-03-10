@@ -1,10 +1,12 @@
 #pragma once
 #include <type_traits>
+#include "augs/templates/maybe_const.h"
 
 template <class T>
-class zeroed_pod {
+struct zeroed_pod {
+	// GEN INTROSPECTOR struct zeroed_pod class T
 	T pod;
-public:
+	// END GEN INTROSPECTOR
 
 	static_assert(std::is_pod_v<T>, "type is not POD!");
 	

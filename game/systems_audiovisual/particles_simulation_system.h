@@ -61,36 +61,6 @@ public:
 
 		resources::emission source_emission;
 
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(particles),
-
-				CEREAL_NVP(destroy_after_lifetime_passed),
-				CEREAL_NVP(stop_spawning_particles_if_chased_entity_dead),
-
-				CEREAL_NVP(stream_lifetime_ms),
-				CEREAL_NVP(stream_max_lifetime_ms),
-				CEREAL_NVP(stream_particles_to_spawn),
-
-				CEREAL_NVP(spread),
-
-				CEREAL_NVP(swing_spread),
-				CEREAL_NVP(swings_per_sec),
-				CEREAL_NVP(min_swing_spread),
-				CEREAL_NVP(max_swing_spread),
-				CEREAL_NVP(min_swings_per_sec),
-				CEREAL_NVP(max_swings_per_sec),
-				CEREAL_NVP(swing_spread_change),
-				CEREAL_NVP(swing_speed_change),
-
-				CEREAL_NVP(fade_when_ms_remaining),
-
-				CEREAL_NVP(source_emission),
-				CEREAL_NVP(enable_streaming)
-			);
-		}
-
 		void stop_streaming() {
 			enable_streaming = false;
 		}

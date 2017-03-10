@@ -6,7 +6,7 @@ namespace resources {
 	behaviour_tree::state_of_traversal::state_of_traversal(
 		const logic_step step, 
 		const entity_handle subject, 
-		state_of_tree_instance& instance, 
+		state_of_behaviour_tree_instance& instance, 
 		const behaviour_tree& original_tree
 	) : 
 		step(step), 
@@ -35,7 +35,7 @@ namespace resources {
 	void behaviour_tree::evaluate_instance_of_tree(
 		const logic_step step, 
 		const entity_handle handle, 
-		state_of_tree_instance& inst
+		state_of_behaviour_tree_instance& inst
 	) const {
 		state_of_traversal traversal(step, handle, inst, *this);
 		

@@ -25,25 +25,6 @@ struct general_particle {
 	void draw(components::sprite::drawing_input basic_input) const;
 	bool is_dead() const;
 
-	template <class Archive>
-	void serialize(Archive& ar) {
-		ar(
-			CEREAL_NVP(pos),
-			CEREAL_NVP(vel),
-			CEREAL_NVP(acc),
-			CEREAL_NVP(face),
-			CEREAL_NVP(rotation),
-			CEREAL_NVP(rotation_speed),
-			CEREAL_NVP(linear_damping),
-			CEREAL_NVP(angular_damping),
-			CEREAL_NVP(lifetime_ms),
-			CEREAL_NVP(max_lifetime_ms),
-			CEREAL_NVP(should_disappear),
-			CEREAL_NVP(ignore_rotation),
-			CEREAL_NVP(alpha_levels)
-		);
-	}
-
 	void set_position(const vec2);
 	void set_velocity(const vec2);
 	void set_acceleration(const vec2);

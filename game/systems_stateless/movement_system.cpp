@@ -88,7 +88,7 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 					is_sprint_effective = false;
 				}
 
-				if (sentience->haste.is_enabled(cosmos.get_timestamp(), cosmos.get_fixed_delta())) {
+				if (sentience->haste.timing.is_enabled(cosmos.get_timestamp(), cosmos.get_fixed_delta())) {
 					if (sentience->haste.is_greater) {
 						movement_force_mult *= 1.45f;
 					}

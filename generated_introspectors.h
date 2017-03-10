@@ -9,6 +9,8 @@ struct xywht;
 template <class type>
 struct vec2t;
 class recoil_player;
+template <class T>
+struct zeroed_pod;
 struct behaviour_tree_instance;
 struct car_engine_entities;
 struct convex_partitioned_collider;
@@ -20,10 +22,23 @@ struct particles_effect_input;
 struct sentience_meter;
 struct sound_effect_input;
 struct friction_connection;
+struct convex_poly_destruction_scar;
+struct convex_poly_destruction_data;
+struct convex_poly;
+struct convex_partitioned_shape;
+struct inventory_slot;
 template <class id_type>
 struct basic_inventory_slot_id;
 struct inventory_item_address;
 struct inventory_traversal;
+struct electric_shield_perk;
+struct haste_perk;
+struct perk_timing;
+struct spell_instance_data;
+struct all_simulation_settings;
+struct pathfinding_settings;
+struct si_scaling;
+struct visibility_settings;
 template <class key>
 struct basic_cosmic_entropy;
 struct cosmos_flyweights_state;
@@ -34,13 +49,15 @@ struct neon_map_stamp;
 struct scripted_image_stamp;
 struct texture_atlas_stamp;
 struct texture_atlas_metadata;
-struct b2Vec;
+struct b2Vec2;
 struct b2Rot;
 struct b2Transform;
 struct b2Sweep;
+struct b2Filter;
 
 namespace augs {
 	struct sound_effect_modifier;
+	struct vertex;
 	struct font_glyph_metadata;
 	struct font_metadata_from_file;
 	struct baked_font;
@@ -109,6 +126,7 @@ namespace components {
 }
 
 namespace resources {
+	struct state_of_behaviour_tree_instance;
 	struct particle_effect_modifier;
 	struct emission;
 }
@@ -138,6 +156,17 @@ namespace augs {
 		f(t.NVP(g));
 		f(t.NVP(b));
 		f(t.NVP(a));
+	}
+
+	template <bool C, class F>
+	void introspect_body(
+		maybe_const_ref_t<C, augs::vertex>& t,
+		F f,
+		const augs::vertex* const
+	) {
+		f(t.NVP(pos));
+		f(t.NVP(texcoord));
+		f(t.NVP(color));
 	}
 
 	template <bool C, class F>
@@ -337,6 +366,15 @@ namespace augs {
 	) {
 		f(t.NVP(first));
 		f(t.NVP(second));
+	}
+
+	template <bool C, class F, class T>
+	void introspect_body(
+		maybe_const_ref_t<C, zeroed_pod<T>>& t,
+		F f,
+		const zeroed_pod<T>* const
+	) {
+		f(t.NVP(pod));
 	}
 
 	template <bool C, class F>
@@ -1251,6 +1289,74 @@ namespace augs {
 		f(t.NVP(count));
 	}
 
+	template <bool C, class F>
+	void introspect_body(
+		maybe_const_ref_t<C, convex_poly_destruction_scar>& t,
+		F f,
+		const convex_poly_destruction_scar* const
+	) {
+		f(t.NVP(first_impact));
+		f(t.NVP(depth_point));
+	}
+
+	template <bool C, class F>
+	void introspect_body(
+		maybe_const_ref_t<C, convex_poly_destruction_data>& t,
+		F f,
+		const convex_poly_destruction_data* const
+	) {
+		f(t.NVP(scars));
+	}
+
+	template <bool C, class F>
+	void introspect_body(
+		maybe_const_ref_t<C, convex_poly>& t,
+		F f,
+		const convex_poly* const
+	) {
+		f(t.NVP(vertices));
+
+		f(t.NVP(destruction));
+	}
+
+	template <bool C, class F>
+	void introspect_body(
+		maybe_const_ref_t<C, convex_partitioned_shape>& t,
+		F f,
+		const convex_partitioned_shape* const
+	) {
+		f(t.NVP(convex_polys));
+	}
+
+	template <bool C, class F>
+	void introspect_body(
+		maybe_const_ref_t<C, inventory_slot>& t,
+		F f,
+		const inventory_slot* const
+	) {
+		f(t.NVP(category_allowed));
+
+		f(t.NVP(items_need_mounting));
+		f(t.NVP(only_last_inserted_is_movable));
+
+		f(t.NVP(for_categorized_items_only));
+
+		f(t.NVP(is_physical_attachment_slot));
+		f(t.NVP(always_allow_exactly_one_item));
+
+
+		f(t.NVP(montage_time_multiplier));
+
+		f(t.NVP(space_available));
+
+		f(t.NVP(attachment_density_multiplier));
+
+		f(t.NVP(attachment_sticking_mode));
+		f(t.NVP(attachment_offset));
+
+		f(t.NVP(items_inside));
+	}
+
 	template <bool C, class F, class id_type>
 	void introspect_body(
 		maybe_const_ref_t<C, basic_inventory_slot_id<id_type>>& t,
@@ -1281,6 +1387,52 @@ namespace augs {
 		f(t.NVP(current_address));
 		f(t.NVP(attachment_offset));
 		f(t.NVP(item_remains_physical));
+	}
+
+	template <bool C, class F>
+	void introspect_body(
+		maybe_const_ref_t<C, electric_shield_perk>& t,
+		F f,
+		const electric_shield_perk* const
+	) {
+		f(t.NVP(timing));
+	}
+
+	template <bool C, class F>
+	void introspect_body(
+		maybe_const_ref_t<C, haste_perk>& t,
+		F f,
+		const haste_perk* const
+	) {
+		f(t.NVP(timing));
+		f(t.NVP(is_greater));
+	}
+
+	template <bool C, class F>
+	void introspect_body(
+		maybe_const_ref_t<C, perk_timing>& t,
+		F f,
+		const perk_timing* const
+	) {
+		f(t.NVP(duration));
+	}
+
+	template <bool C, class F>
+	void introspect_body(
+		maybe_const_ref_t<C, spell_instance_data>& t,
+		F f,
+		const spell_instance_data* const
+	) {
+		f(t.NVP(cast_cooldown));
+	}
+
+	template <bool C, class F>
+	void introspect_body(
+		maybe_const_ref_t<C, resources::state_of_behaviour_tree_instance>& t,
+		F f,
+		const resources::state_of_behaviour_tree_instance* const
+	) {
+		f(t.NVP(previously_executed_leaf_id));
 	}
 
 	template <bool C, class F>
@@ -1338,6 +1490,56 @@ namespace augs {
 		f(t.NVP(should_particles_look_towards_velocity));
 
 		f(t.NVP(particle_templates));
+	}
+
+	template <bool C, class F>
+	void introspect_body(
+		maybe_const_ref_t<C, all_simulation_settings>& t,
+		F f,
+		const all_simulation_settings* const
+	) {
+		f(t.NVP(visibility));
+		f(t.NVP(pathfinding));
+		f(t.NVP(si));
+	}
+
+	template <bool C, class F>
+	void introspect_body(
+		maybe_const_ref_t<C, pathfinding_settings>& t,
+		F f,
+		const pathfinding_settings* const
+	) {
+		f(t.NVP(epsilon_distance_visible_point));
+		f(t.NVP(epsilon_distance_the_same_vertex));
+
+		f(t.NVP(draw_memorised_walls));
+		f(t.NVP(draw_undiscovered));
+	}
+
+	template <bool C, class F>
+	void introspect_body(
+		maybe_const_ref_t<C, si_scaling>& t,
+		F f,
+		const si_scaling* const
+	) {
+		f(t.NVP(to_meters_multiplier));
+		f(t.NVP(to_pixels_multiplier));
+	}
+
+	template <bool C, class F>
+	void introspect_body(
+		maybe_const_ref_t<C, visibility_settings>& t,
+		F f,
+		const visibility_settings* const
+	) {
+		f(t.NVP(draw_triangle_edges));
+		f(t.NVP(draw_cast_rays));
+		f(t.NVP(draw_discontinuities));
+		f(t.NVP(draw_visible_walls));
+
+		f(t.NVP(epsilon_ray_distance_variation));
+		f(t.NVP(epsilon_distance_vertex_hit));
+		f(t.NVP(epsilon_threshold_obstacle_hit));
 	}
 
 	template <bool C, class F, class key>
@@ -1510,9 +1712,9 @@ namespace augs {
 
 	template <bool C, class F>
 	void introspect_body(
-		maybe_const_ref_t<C, b2Vec>& t,
+		maybe_const_ref_t<C, b2Vec2>& t,
 		F f,
-		const b2Vec* const
+		const b2Vec2* const
 	) {
 		f(t.NVP(x));
 		f(t.NVP(y));
@@ -1550,6 +1752,17 @@ namespace augs {
 		f(t.NVP(a0));
 		f(t.NVP(a));
 		f(t.NVP(alpha0));
+	}
+
+	template <bool C, class F>
+	void introspect_body(
+		maybe_const_ref_t<C, b2Filter>& t,
+		F f,
+		const b2Filter* const
+	) {
+		f(t.NVP(categoryBits));
+		f(t.NVP(maskBits));
+		f(t.NVP(groupIndex));
 	}
 
 }

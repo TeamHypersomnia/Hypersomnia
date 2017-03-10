@@ -13,20 +13,14 @@
 class cosmos;
 
 struct inventory_slot {
+	// GEN INTROSPECTOR struct inventory_slot
 	item_category category_allowed = item_category::NONE;
-
-	item_category_bitset get_allowed_categories() const;
 
 	bool items_need_mounting = false;
 	bool only_last_inserted_is_movable = false;
 
 	bool for_categorized_items_only = false;
-	/*
-	true means that:
-	- space is disregarded
-	- there may be only one item
-	- putting item inside does not deactivate its physics component; it is attached to the container entity instead
-	*/
+
 	bool is_physical_attachment_slot = false;
 	bool always_allow_exactly_one_item = false;
 
@@ -42,31 +36,17 @@ struct inventory_slot {
 	components::transform attachment_offset;
 
 	augs::constant_size_vector<entity_id, ITEMS_INSIDE_COUNT> items_inside;
+	// END GEN INTROSPECTOR
+
+	/*
+	is_physical_attachment_slot set to true means that:
+	- space is disregarded
+	- there may be only one item
+	- putting item inside does not deactivate its physics component; it is attached to the container entity instead
+	*/
+	
+	item_category_bitset get_allowed_categories() const;
 
 	bool has_unlimited_space() const;
 	bool is_category_compatible_with(const_entity_handle item) const;
-
-	template <class Archive>
-	void serialize(Archive& ar) {
-		ar(
-			CEREAL_NVP(items_need_mounting),
-			CEREAL_NVP(montage_time_multiplier),
-
-			CEREAL_NVP(only_last_inserted_is_movable),
-
-			CEREAL_NVP(for_categorized_items_only),
-			CEREAL_NVP(category_allowed),
-
-			CEREAL_NVP(space_available),
-
-			CEREAL_NVP(is_physical_attachment_slot),
-			CEREAL_NVP(always_allow_exactly_one_item),
-			CEREAL_NVP(attachment_density_multiplier),
-
-			CEREAL_NVP(attachment_sticking_mode),
-			CEREAL_NVP(attachment_offset),
-
-			CEREAL_NVP(items_inside)
-			);
-	}
 };

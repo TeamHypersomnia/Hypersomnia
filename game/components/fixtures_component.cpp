@@ -95,7 +95,7 @@ void component_synchronizer<false, F>::set_density(const float d, const size_t i
 	rebuild_density(index);
 }
 
-convex_partitioned_shape::convex_poly::destruction_data& component_synchronizer<false, F>::get_modifiable_destruction_data(const b2Fixture_index_in_component indices) {
+convex_poly_destruction_data& component_synchronizer<false, F>::get_modifiable_destruction_data(const b2Fixture_index_in_component indices) {
 	return component.colliders[indices.collider_index].shape.convex_polys[indices.convex_shape_index].destruction;
 }
 

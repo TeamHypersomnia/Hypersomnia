@@ -1,6 +1,7 @@
 #pragma once
 
 struct visibility_settings {
+	// GEN INTROSPECTOR struct visibility_settings
 	bool draw_triangle_edges = false;
 	bool draw_cast_rays = false;
 	bool draw_discontinuities = false;
@@ -9,18 +10,5 @@ struct visibility_settings {
 	float epsilon_ray_distance_variation = 0.004f;
 	float epsilon_distance_vertex_hit = 1.f;
 	float epsilon_threshold_obstacle_hit = 10.f;
-
-	template <class Archive>
-	void serialize(Archive& ar) {
-		ar(
-			CEREAL_NVP(draw_triangle_edges),
-			CEREAL_NVP(draw_cast_rays),
-			CEREAL_NVP(draw_discontinuities),
-			CEREAL_NVP(draw_visible_walls),
-
-			CEREAL_NVP(epsilon_ray_distance_variation),
-			CEREAL_NVP(epsilon_distance_vertex_hit),
-			CEREAL_NVP(epsilon_threshold_obstacle_hit)
-		);
-	}
+	// END GEN INTROSPECTOR
 };

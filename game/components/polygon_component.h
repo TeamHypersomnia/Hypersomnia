@@ -35,17 +35,6 @@ namespace components {
 		augs::constant_size_vector<zeroed_pod<unsigned>, RENDERING_POLYGON_INDEX_COUNT> triangulation_indices;
 
 		// END GEN INTROSPECTOR
-
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(original_polygon),
-
-				CEREAL_NVP(vertices),
-
-				CEREAL_NVP(triangulation_indices)
-			);
-		}
 		
 		void automatically_map_uv(const assets::game_image_id, const uv_mapping_mode);
 		void from_polygonized_texture(const assets::game_image_id);

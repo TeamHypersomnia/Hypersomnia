@@ -1201,7 +1201,7 @@
     <ClInclude Include="game\detail\perks\bleeding_perk.h" />
     <ClInclude Include="game\detail\perks\haste_perk.h" />
     <ClInclude Include="game\detail\perks\electric_shield_perk.h" />
-    <ClInclude Include="game\detail\perks\timed_perk.h" />
+    <ClInclude Include="game\detail\perks\perk_timing.h" />
     <ClInclude Include="game\detail\physics\b2Fixture_index_in_component.h" />
     <ClInclude Include="game\detail\physics\physics_queries.h" />
     <ClInclude Include="game\detail\physics\physics_scripts.h" />

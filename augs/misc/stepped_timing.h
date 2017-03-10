@@ -27,14 +27,6 @@ namespace augs {
 		float cooldown_duration_ms = 1000.f;
 		// END GEN INTROSPECTOR
 
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(when_last_fired),
-				CEREAL_NVP(cooldown_duration_ms)
-			);
-		}
-
 		stepped_cooldown(const float cooldown_duration_ms = 1000.f);
 		void set(const float cooldown_duration_ms, const stepped_timestamp now);
 		

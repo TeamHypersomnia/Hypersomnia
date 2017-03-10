@@ -22,11 +22,6 @@ namespace augs {
 		bool operator<(const raw_pool_id& b) const;
 
 		friend std::ostream& operator<<(std::ostream& out, const raw_pool_id &x);
-
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(CEREAL_NVP(version), CEREAL_NVP(indirection_index));
-		}
 	};
 
 	template<class T>

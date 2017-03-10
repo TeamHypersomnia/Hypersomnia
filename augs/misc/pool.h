@@ -21,24 +21,11 @@ namespace augs {
 	protected:
 		struct metadata {
 			int pointing_indirector = -1;
-
-			template <class Archive>
-			void serialize(Archive& ar) {
-				ar(CEREAL_NVP(pointing_indirector));
-			}
 		};
 
 		struct indirector {
 			unsigned real_index = 0;
 			unsigned version = 1;
-
-			template <class Archive>
-			void serialize(Archive& ar) {
-				ar(
-					CEREAL_NVP(real_index),
-					CEREAL_NVP(version)
-				);
-			}
 		};
 
 		pooled_container_type pooled;
@@ -47,16 +34,6 @@ namespace augs {
 		std::vector<int> free_indirectors;
 
 	public:
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(pooled),
-				CEREAL_NVP(slots),
-				CEREAL_NVP(indirectors),
-				CEREAL_NVP(free_indirectors)
-			);
-		}
-
 		template <class Archive>
 		void write_object(Archive& ar) const {
 			augs::write_with_capacity(ar, pooled);
@@ -299,13 +276,6 @@ namespace augs {
 		typedef augs::handle_for_pool_container<false, pool_with_meta, T> handle_type;
 		typedef augs::handle_for_pool_container<true, pool_with_meta, T> const_handle_type;
 	public:
-		template <class Archive>
-		void serialize(Archive& ar) {
-			pool_base<T>::serialize(ar);
-
-			ar(CEREAL_NVP(metas));
-		}
-
 		template <class Archive>
 		void write_object(Archive& ar) const {
 			augs::write_object(ar, static_cast<const pool_base<T>&>(*this));

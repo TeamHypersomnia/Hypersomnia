@@ -11,35 +11,31 @@ namespace components {
 	struct polygon;
 }
 
-class convex_partitioned_shape {
-public:
-	struct destruction_scar {
-		vec2 first_impact;
-		vec2 depth_point;
-	};
+struct convex_poly_destruction_scar {
+	// GEN INTROSPECTOR struct convex_poly_destruction_scar
+	vec2 first_impact;
+	vec2 depth_point;
+	// END GEN INTROSPECTOR
+};
 
-	struct convex_poly {
-		augs::constant_size_vector<vec2, CONVEX_POLY_VERTEX_COUNT> vertices;
+struct convex_poly_destruction_data {
+	// GEN INTROSPECTOR struct convex_poly_destruction_data
+	augs::constant_size_vector<convex_poly_destruction_scar, DESTRUCTION_SCARS_COUNT> scars;
+	// END GEN INTROSPECTOR
+};
 
-		struct destruction_data {
-			augs::constant_size_vector<destruction_scar, DESTRUCTION_SCARS_COUNT> scars;
-		};
+struct convex_poly {
+	// GEN INTROSPECTOR struct convex_poly
+	augs::constant_size_vector<vec2, CONVEX_POLY_VERTEX_COUNT> vertices;
 
-		destruction_data destruction;
-	};
-	
+	convex_poly_destruction_data destruction;
+	// END GEN INTROSPECTOR
+};
+
+struct convex_partitioned_shape {
+	// GEN INTROSPECTOR struct convex_partitioned_shape
 	augs::constant_size_vector<convex_poly, CONVEX_POLYS_COUNT> convex_polys;
-
-	template <class Archive>
-	void serialize(Archive& ar) {
-		ar(
-			CEREAL_NVP(radius),
-
-			CEREAL_NVP(type),
-
-			CEREAL_NVP(convex_polys)
-		);
-	}
+	// END GEN INTROSPECTOR
 
 	void offset_vertices(components::transform);
 	void mult_vertices(vec2);

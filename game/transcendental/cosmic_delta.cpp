@@ -23,6 +23,7 @@ static_assert(has_introspects_v<cosmos_metadata>, "Trait is wrong");
 static_assert(has_introspects_v<ltrbt<float>>, "Trait is wrong");
 static_assert(has_introspects_v<ltrbt<int>>, "Trait is wrong");
 static_assert(has_introspects_v<augs::constant_size_vector<int, 2>>, "Trait is wrong");
+static_assert(has_introspects_v<zeroed_pod<unsigned int>>, "Trait is wrong");
 
 template <class T>
 bool write_delta(const T& base, const T& enco, augs::stream& out, const bool write_changed_bit = false) {

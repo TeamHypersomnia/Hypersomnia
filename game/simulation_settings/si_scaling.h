@@ -1,8 +1,10 @@
 #pragma once
 
 struct si_scaling {
+	// GEN INTROSPECTOR struct si_scaling
 	float to_meters_multiplier = 0.f;
 	float to_pixels_multiplier = 0.f;
+	// END GEN INTROSPECTOR
 
 	void set_pixels_per_meter(const float pixels) {
 		to_meters_multiplier = 1.f / pixels;

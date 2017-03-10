@@ -41,26 +41,11 @@ struct b2Filter
 		groupIndex = 0;
 	}
 
-	/// The collision category bits. Normally you would just set one bit.
+	// GEN INTROSPECTOR struct b2Filter
 	uint16 categoryBits;
-
-	/// The collision mask bits. This states the categories that this
-	/// shape would accept for collision.
 	uint16 maskBits;
-
-	/// Collision groups allow a certain group of objects to never collide (negative)
-	/// or always collide (positive). Zero means no collision group. Non-zero group
-	/// filtering always wins against the mask bits.
 	int16 groupIndex;
-
-	template <class Archive>
-	void serialize(Archive& ar) {
-		ar(
-			CEREAL_NVP(categoryBits),
-			CEREAL_NVP(maskBits),
-			CEREAL_NVP(groupIndex)
-		);
-	}
+	// END GEN INTROSPECTOR
 };
 
 /// A fixture definition is used to create a fixture. This class defines an

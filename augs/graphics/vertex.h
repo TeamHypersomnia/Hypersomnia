@@ -13,18 +13,11 @@ namespace augs {
 	struct texture_atlas_entry;
 
 	struct vertex {
+		// GEN INTROSPECTOR struct augs::vertex
 		vec2 pos;
 		vec2 texcoord;
 		rgba color;
-
-		template <class Archive>
-		void serialize(Archive& ar) {
-			ar(
-				CEREAL_NVP(pos),
-				CEREAL_NVP(texcoord),
-				CEREAL_NVP(color)
-			);
-		}
+		// END GEN INTROSPECTOR
 
 		void set_texcoord(vec2, const augs::texture_atlas_entry& tex);
 	};

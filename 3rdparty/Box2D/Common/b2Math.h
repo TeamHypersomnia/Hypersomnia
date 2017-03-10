@@ -141,7 +141,7 @@ struct b2Vec2
 		return b2Vec2(-y, x);
 	}
 
-	// GEN INTROSPECTOR struct b2Vec
+	// GEN INTROSPECTOR struct b2Vec2
 	float32 x;
 	float32 y;
 	// END GEN INTROSPECTOR

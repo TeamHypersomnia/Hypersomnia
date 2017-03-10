@@ -119,12 +119,6 @@ public:
 	
 	cosmos_significant_state significant;
 
-	template <class Archive>
-	void serialize(Archive& ar) {
-		ar(CEREAL_NVP(significant));
-		complete_resubstantiation();
-	}
-
 	cosmos(const unsigned reserved_entities = 0);
 	cosmos(const cosmos&);
 

@@ -9,7 +9,7 @@
 
 struct behaviour_tree_instance {
 	// GEN INTROSPECTOR struct behaviour_tree_instance
-	resources::behaviour_tree::state_of_tree_instance state;
+	resources::state_of_behaviour_tree_instance state;
 	assets::behaviour_tree_id tree_id = assets::behaviour_tree_id::INVALID;
 	// END GEN INTROSPECTOR
 };
