@@ -73,10 +73,10 @@ namespace augs {
 		const std::enable_if_t<!is_byte_io_safe_v<A, T> && has_introspects_v<T>>* const dummy = nullptr
 	) {
 		augs::introspect(
-			storage,
-			[&](auto& member, auto...) {
+			[&](auto, auto& member) {
 				read_object(ar, member);
-			}
+			},
+			storage,
 		);
 	}
 
@@ -87,10 +87,10 @@ namespace augs {
 		const std::enable_if_t<!is_byte_io_safe_v<A, T> && has_introspects_v<T>>* const dummy = nullptr
 	) {
 		augs::introspect(
-			storage,
-			[&](const auto& member, auto...) {
+			[&](auto, const auto& member) {
 				write_object(ar, member);
-			}
+			},
+			storage
 		);
 	}
 

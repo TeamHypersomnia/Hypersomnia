@@ -26,11 +26,11 @@ namespace augs  {
 		arr_type raw;
 		// END GEN INTROSPECTOR
 
-		template <bool C, class F, class T, size_t const_count>
+		template <class F, class T, size_t const_count, class... MemberInstances>
 		friend void introspect_body(
-			maybe_const_ref_t<C, augs::constant_size_vector<T, const_count>>& t,
+			const augs::constant_size_vector<T, const_count>* const,
 			F f,
-			const augs::constant_size_vector<T, const_count>* const
+			MemberInstances&&... _t_
 		);
 
 	public:

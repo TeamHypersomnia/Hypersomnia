@@ -48,11 +48,14 @@ void regenerate_scripted_images(
 				if (command_name == command_type::get_command_name()) {
 					command_type new_command;
 
-					augs::introspect_recursive<can_stream>(
-						new_command, 
-						[&](auto& member, auto) {
+					augs::introspect_recursive<
+						can_stream, 
+						exclude_no_type
+					>(
+						[&](auto, auto& member) {
 							in >> member;
-						}
+						},
+						new_command
 					);
 
 					new_stamp.commands.push_back(new_command);

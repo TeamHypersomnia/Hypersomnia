@@ -304,8 +304,7 @@ entity_handle cosmos::clone_entity(const entity_id copied_entity_id) {
 
 	for_each_type<
 		components::child, 
-		components::physical_relations, 
-		components::sub_entities
+		components::physical_relations
 	>([copied_entity, new_entity](auto c) {
 		typedef decltype(c) T;
 		

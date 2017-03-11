@@ -1,8 +1,6 @@
 #pragma once
 #include "augs/templates/maybe_const.h"
 
-#define NVP(x) x, #x
-
 struct rgba;
 template <class T>
 struct ltrbt;
@@ -134,1637 +132,1637 @@ namespace resources {
 }
 
 namespace augs {
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, augs::sound_effect_modifier>& t,
+		const augs::sound_effect_modifier* const,
 		F f,
-		const augs::sound_effect_modifier* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(repetitions));
-		f(t.NVP(gain));
-		f(t.NVP(pitch));
-		f(t.NVP(max_distance));
-		f(t.NVP(reference_distance));
-		f(t.NVP(fade_on_exit));
+		f("repetitions", _t_.repetitions...);
+		f("gain", _t_.gain...);
+		f("pitch", _t_.pitch...);
+		f("max_distance", _t_.max_distance...);
+		f("reference_distance", _t_.reference_distance...);
+		f("fade_on_exit", _t_.fade_on_exit...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, rgba>& t,
+		const rgba* const,
 		F f,
-		const rgba* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(r));
-		f(t.NVP(g));
-		f(t.NVP(b));
-		f(t.NVP(a));
+		f("r", _t_.r...);
+		f("g", _t_.g...);
+		f("b", _t_.b...);
+		f("a", _t_.a...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, augs::vertex>& t,
+		const augs::vertex* const,
 		F f,
-		const augs::vertex* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(pos));
-		f(t.NVP(texcoord));
-		f(t.NVP(color));
+		f("pos", _t_.pos...);
+		f("texcoord", _t_.texcoord...);
+		f("color", _t_.color...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, augs::font_glyph_metadata>& t,
+		const augs::font_glyph_metadata* const,
 		F f,
-		const augs::font_glyph_metadata* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(adv));
-		f(t.NVP(bear_x));
-		f(t.NVP(bear_y));
-		f(t.NVP(index));
-		f(t.NVP(unicode));
+		f("adv", _t_.adv...);
+		f("bear_x", _t_.bear_x...);
+		f("bear_y", _t_.bear_y...);
+		f("index", _t_.index...);
+		f("unicode", _t_.unicode...);
 
-		f(t.NVP(size));
+		f("size", _t_.size...);
 
-		f(t.NVP(kerning));
+		f("kerning", _t_.kerning...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, augs::font_metadata_from_file>& t,
+		const augs::font_metadata_from_file* const,
 		F f,
-		const augs::font_metadata_from_file* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(ascender));
-		f(t.NVP(descender));
+		f("ascender", _t_.ascender...);
+		f("descender", _t_.descender...);
 
-		f(t.NVP(pt));
+		f("pt", _t_.pt...);
 
-		f(t.NVP(glyphs));
-		f(t.NVP(unicode_to_glyph_index));
+		f("glyphs", _t_.glyphs...);
+		f("unicode_to_glyph_index", _t_.unicode_to_glyph_index...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, augs::baked_font>& t,
+		const augs::baked_font* const,
 		F f,
-		const augs::baked_font* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(meta_from_file));
-		f(t.NVP(glyphs_in_atlas));
+		f("meta_from_file", _t_.meta_from_file...);
+		f("glyphs_in_atlas", _t_.glyphs_in_atlas...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, augs::font_loading_input>& t,
+		const augs::font_loading_input* const,
 		F f,
-		const augs::font_loading_input* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(path));
-		f(t.NVP(characters));
+		f("path", _t_.path...);
+		f("characters", _t_.characters...);
 		
-		f(t.NVP(pt));
+		f("pt", _t_.pt...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, augs::paint_circle_midpoint_command>& t,
+		const augs::paint_circle_midpoint_command* const,
 		F f,
-		const augs::paint_circle_midpoint_command* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(radius));
-		f(t.NVP(border_width));
-		f(t.NVP(scale_alpha));
-		f(t.NVP(constrain_angle));
-		f(t.NVP(angle_start));
-		f(t.NVP(angle_end));
-		f(t.NVP(filling));
+		f("radius", _t_.radius...);
+		f("border_width", _t_.border_width...);
+		f("scale_alpha", _t_.scale_alpha...);
+		f("constrain_angle", _t_.constrain_angle...);
+		f("angle_start", _t_.angle_start...);
+		f("angle_end", _t_.angle_end...);
+		f("filling", _t_.filling...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, augs::paint_circle_filled_command>& t,
+		const augs::paint_circle_filled_command* const,
 		F f,
-		const augs::paint_circle_filled_command* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(radius));
-		f(t.NVP(filling));
+		f("radius", _t_.radius...);
+		f("filling", _t_.filling...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, augs::paint_line_command>& t,
+		const augs::paint_line_command* const,
 		F f,
-		const augs::paint_line_command* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(from));
-		f(t.NVP(to));
-		f(t.NVP(filling));
+		f("from", _t_.from...);
+		f("to", _t_.to...);
+		f("filling", _t_.filling...);
 	}
 
-	template <bool C, class F, class T>
+	template <class F, class T, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, ltrbt<T>>& t,
+		const ltrbt<T>* const,
 		F f,
-		const ltrbt<T>* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(l));
-		f(t.NVP(t));
-		f(t.NVP(r));
-		f(t.NVP(b));
+		f("l", _t_.l...);
+		f("t", _t_.t...);
+		f("r", _t_.r...);
+		f("b", _t_.b...);
 	}
 
-	template <bool C, class F, class T>
+	template <class F, class T, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, xywht<T>>& t,
+		const xywht<T>* const,
 		F f,
-		const xywht<T>* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(x));
-		f(t.NVP(y));
-		f(t.NVP(w));
-		f(t.NVP(h));
+		f("x", _t_.x...);
+		f("y", _t_.y...);
+		f("w", _t_.w...);
+		f("h", _t_.h...);
 	}
 
-	template <bool C, class F, class type>
+	template <class F, class type, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, vec2t<type>>& t,
+		const vec2t<type>* const,
 		F f,
-		const vec2t<type>* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(x));
-		f(t.NVP(y));
+		f("x", _t_.x...);
+		f("y", _t_.y...);
 	}
 
-	template <bool C, class F, class T, size_t const_count>
+	template <class F, class T, size_t const_count, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, augs::constant_size_vector<T, const_count>>& t,
+		const augs::constant_size_vector<T, const_count>* const,
 		F f,
-		const augs::constant_size_vector<T, const_count>* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(count));
-		f(t.NVP(raw));
+		f("count", _t_.count...);
+		f("raw", _t_.raw...);
 	}
 
-	template <bool C, class F, class Enum, class T>
+	template <class F, class Enum, class T, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, augs::enum_associative_array<Enum, T>>& t,
+		const augs::enum_associative_array<Enum, T>* const,
 		F f,
-		const augs::enum_associative_array<Enum, T>* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(is_set));
-		f(t.NVP(raw));
+		f("is_set", _t_.is_set...);
+		f("raw", _t_.raw...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, augs::machine_entropy>& t,
+		const augs::machine_entropy* const,
 		F f,
-		const augs::machine_entropy* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(local));
-		f(t.NVP(remote));
+		f("local", _t_.local...);
+		f("remote", _t_.remote...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, recoil_player>& t,
+		const recoil_player* const,
 		F f,
-		const recoil_player* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(offsets));
-		f(t.NVP(current_offset));
-		f(t.NVP(reversed));
-		f(t.NVP(repeat_last_n_offsets));
+		f("offsets", _t_.offsets...);
+		f("current_offset", _t_.current_offset...);
+		f("reversed", _t_.reversed...);
+		f("repeat_last_n_offsets", _t_.repeat_last_n_offsets...);
 
-		f(t.NVP(single_cooldown_duration_ms));
-		f(t.NVP(remaining_cooldown_duration));
-		f(t.NVP(scale));
+		f("single_cooldown_duration_ms", _t_.single_cooldown_duration_ms...);
+		f("remaining_cooldown_duration", _t_.remaining_cooldown_duration...);
+		f("scale", _t_.scale...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, augs::stepped_timestamp>& t,
+		const augs::stepped_timestamp* const,
 		F f,
-		const augs::stepped_timestamp* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(step));
+		f("step", _t_.step...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, augs::stepped_cooldown>& t,
+		const augs::stepped_cooldown* const,
 		F f,
-		const augs::stepped_cooldown* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(when_last_fired));
-		f(t.NVP(cooldown_duration_ms));
+		f("when_last_fired", _t_.when_last_fired...);
+		f("cooldown_duration_ms", _t_.cooldown_duration_ms...);
 	}
 
-	template <bool C, class F, class A, class B>
+	template <class F, class A, class B, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, augs::trivial_pair<A, B>>& t,
+		const augs::trivial_pair<A, B>* const,
 		F f,
-		const augs::trivial_pair<A, B>* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(first));
-		f(t.NVP(second));
+		f("first", _t_.first...);
+		f("second", _t_.second...);
 	}
 
-	template <bool C, class F, class T>
+	template <class F, class T, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, zeroed_pod<T>>& t,
+		const zeroed_pod<T>* const,
 		F f,
-		const zeroed_pod<T>* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(pod));
+		f("pod", _t_.pod...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::animation>& t,
+		const components::animation* const,
 		F f,
-		const components::animation* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(current_animation));
+		f("current_animation", _t_.current_animation...);
 
-		f(t.NVP(priority));
-		f(t.NVP(frame_num));
-		f(t.NVP(player_position_ms));
-		f(t.NVP(speed_factor));
+		f("priority", _t_.priority...);
+		f("frame_num", _t_.frame_num...);
+		f("player_position_ms", _t_.player_position_ms...);
+		f("speed_factor", _t_.speed_factor...);
 
-		f(t.NVP(state));
-		f(t.NVP(paused_state));
+		f("state", _t_.state...);
+		f("paused_state", _t_.paused_state...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::animation_response>& t,
+		const components::animation_response* const,
 		F f,
-		const components::animation_response* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(response));
+		f("response", _t_.response...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::attitude>& t,
+		const components::attitude* const,
 		F f,
-		const components::attitude* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(maximum_divergence_angle_before_shooting));
+		f("maximum_divergence_angle_before_shooting", _t_.maximum_divergence_angle_before_shooting...);
 
-		f(t.NVP(parties));
-		f(t.NVP(hostile_parties));
+		f("parties", _t_.parties...);
+		f("hostile_parties", _t_.hostile_parties...);
 
-		f(t.NVP(specific_hostile_entities));
+		f("specific_hostile_entities", _t_.specific_hostile_entities...);
 		
-		f(t.NVP(currently_attacked_visible_entity));
-		f(t.NVP(target_attitude));
+		f("currently_attacked_visible_entity", _t_.currently_attacked_visible_entity...);
+		f("target_attitude", _t_.target_attitude...);
 
-		f(t.NVP(is_alert));
-		f(t.NVP(last_seen_target_position_inspected));
+		f("is_alert", _t_.is_alert...);
+		f("last_seen_target_position_inspected", _t_.last_seen_target_position_inspected...);
 
-		f(t.NVP(last_seen_target_position));
-		f(t.NVP(last_seen_target_velocity));
+		f("last_seen_target_position", _t_.last_seen_target_position...);
+		f("last_seen_target_velocity", _t_.last_seen_target_velocity...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, behaviour_tree_instance>& t,
+		const behaviour_tree_instance* const,
 		F f,
-		const behaviour_tree_instance* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(state));
-		f(t.NVP(tree_id));
+		f("state", _t_.state...);
+		f("tree_id", _t_.tree_id...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::behaviour_tree>& t,
+		const components::behaviour_tree* const,
 		F f,
-		const components::behaviour_tree* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(concurrent_trees));
+		f("concurrent_trees", _t_.concurrent_trees...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, car_engine_entities>& t,
+		const car_engine_entities* const,
 		F f,
-		const car_engine_entities* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(physical));
-		f(t.NVP(particles));
+		f("physical", _t_.physical...);
+		f("particles", _t_.particles...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::car>& t,
+		const components::car* const,
 		F f,
-		const components::car* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(current_driver));
+		f("current_driver", _t_.current_driver...);
 
-		f(t.NVP(interior));
+		f("interior", _t_.interior...);
 
-		f(t.NVP(left_wheel_trigger));
-		f(t.NVP(right_wheel_trigger));
+		f("left_wheel_trigger", _t_.left_wheel_trigger...);
+		f("right_wheel_trigger", _t_.right_wheel_trigger...);
 
-		f(t.NVP(acceleration_engine));
-		f(t.NVP(deceleration_engine));
+		f("acceleration_engine", _t_.acceleration_engine...);
+		f("deceleration_engine", _t_.deceleration_engine...);
 
-		f(t.NVP(left_engine));
-		f(t.NVP(right_engine));
+		f("left_engine", _t_.left_engine...);
+		f("right_engine", _t_.right_engine...);
 
-		f(t.NVP(engine_sound));
+		f("engine_sound", _t_.engine_sound...);
 
-		f(t.NVP(accelerating));
-		f(t.NVP(decelerating));
-		f(t.NVP(turning_right));
-		f(t.NVP(turning_left));
+		f("accelerating", _t_.accelerating...);
+		f("decelerating", _t_.decelerating...);
+		f("turning_right", _t_.turning_right...);
+		f("turning_left", _t_.turning_left...);
 
-		f(t.NVP(hand_brake));
+		f("hand_brake", _t_.hand_brake...);
 		
-		f(t.NVP(braking_damping));
-		f(t.NVP(braking_angular_damping));
+		f("braking_damping", _t_.braking_damping...);
+		f("braking_angular_damping", _t_.braking_angular_damping...);
 
-		f(t.NVP(input_acceleration));
+		f("input_acceleration", _t_.input_acceleration...);
 
-		f(t.NVP(acceleration_length));
+		f("acceleration_length", _t_.acceleration_length...);
 
-		f(t.NVP(maximum_speed_with_static_air_resistance));
-		f(t.NVP(maximum_speed_with_static_damping));
-		f(t.NVP(static_air_resistance));
-		f(t.NVP(dynamic_air_resistance));
-		f(t.NVP(static_damping));
-		f(t.NVP(dynamic_damping));
+		f("maximum_speed_with_static_air_resistance", _t_.maximum_speed_with_static_air_resistance...);
+		f("maximum_speed_with_static_damping", _t_.maximum_speed_with_static_damping...);
+		f("static_air_resistance", _t_.static_air_resistance...);
+		f("dynamic_air_resistance", _t_.dynamic_air_resistance...);
+		f("static_damping", _t_.static_damping...);
+		f("dynamic_damping", _t_.dynamic_damping...);
 
-		f(t.NVP(maximum_lateral_cancellation_impulse));
-		f(t.NVP(lateral_impulse_multiplier));
+		f("maximum_lateral_cancellation_impulse", _t_.maximum_lateral_cancellation_impulse...);
+		f("lateral_impulse_multiplier", _t_.lateral_impulse_multiplier...);
 
-		f(t.NVP(angular_damping));
-		f(t.NVP(angular_damping_while_hand_braking));
+		f("angular_damping", _t_.angular_damping...);
+		f("angular_damping_while_hand_braking", _t_.angular_damping_while_hand_braking...);
 
-		f(t.NVP(minimum_speed_for_maneuverability_decrease));
-		f(t.NVP(maneuverability_decrease_multiplier));
+		f("minimum_speed_for_maneuverability_decrease", _t_.minimum_speed_for_maneuverability_decrease...);
+		f("maneuverability_decrease_multiplier", _t_.maneuverability_decrease_multiplier...);
 
-		f(t.NVP(angular_air_resistance));
-		f(t.NVP(angular_air_resistance_while_hand_braking));
+		f("angular_air_resistance", _t_.angular_air_resistance...);
+		f("angular_air_resistance_while_hand_braking", _t_.angular_air_resistance_while_hand_braking...);
 
-		f(t.NVP(speed_for_pitch_unit));
+		f("speed_for_pitch_unit", _t_.speed_for_pitch_unit...);
 
-		f(t.NVP(wheel_offset));
+		f("wheel_offset", _t_.wheel_offset...);
 
-		f(t.NVP(last_turned_on));
-		f(t.NVP(last_turned_off));
+		f("last_turned_on", _t_.last_turned_on...);
+		f("last_turned_off", _t_.last_turned_off...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::child>& t,
+		const components::child* const,
 		F f,
-		const components::child* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(parent));
+		f("parent", _t_.parent...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::container>& t,
+		const components::container* const,
 		F f,
-		const components::container* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(slots));
+		f("slots", _t_.slots...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::crosshair>& t,
+		const components::crosshair* const,
 		F f,
-		const components::crosshair* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(orbit_mode));
+		f("orbit_mode", _t_.orbit_mode...);
 
-		f(t.NVP(recoil_entity));
+		f("recoil_entity", _t_.recoil_entity...);
 
-		f(t.NVP(character_entity_to_chase));
-		f(t.NVP(base_offset));
-		f(t.NVP(bounds_for_base_offset));
+		f("character_entity_to_chase", _t_.character_entity_to_chase...);
+		f("base_offset", _t_.base_offset...);
+		f("bounds_for_base_offset", _t_.bounds_for_base_offset...);
 
-		f(t.NVP(visible_world_area));
-		f(t.NVP(max_look_expand));
+		f("visible_world_area", _t_.visible_world_area...);
+		f("max_look_expand", _t_.max_look_expand...);
 
-		f(t.NVP(rotation_offset));
-		f(t.NVP(size_multiplier));
-		f(t.NVP(sensitivity));
+		f("rotation_offset", _t_.rotation_offset...);
+		f("size_multiplier", _t_.size_multiplier...);
+		f("sensitivity", _t_.sensitivity...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::damage>& t,
+		const components::damage* const,
 		F f,
-		const components::damage* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(amount));
+		f("amount", _t_.amount...);
 
-		f(t.NVP(impulse_upon_hit));
+		f("impulse_upon_hit", _t_.impulse_upon_hit...);
 
-		f(t.NVP(sender));
+		f("sender", _t_.sender...);
 
-		f(t.NVP(damage_upon_collision));
-		f(t.NVP(destroy_upon_damage));
-		f(t.NVP(constrain_lifetime));
-		f(t.NVP(constrain_distance));
+		f("damage_upon_collision", _t_.damage_upon_collision...);
+		f("destroy_upon_damage", _t_.destroy_upon_damage...);
+		f("constrain_lifetime", _t_.constrain_lifetime...);
+		f("constrain_distance", _t_.constrain_distance...);
 
-		f(t.NVP(damage_charges_before_destruction));
+		f("damage_charges_before_destruction", _t_.damage_charges_before_destruction...);
 
-		f(t.NVP(custom_impact_velocity));
+		f("custom_impact_velocity", _t_.custom_impact_velocity...);
 
-		f(t.NVP(damage_falloff));
+		f("damage_falloff", _t_.damage_falloff...);
 
-		f(t.NVP(damage_falloff_starting_distance));
-		f(t.NVP(minimum_amount_after_falloff));
+		f("damage_falloff_starting_distance", _t_.damage_falloff_starting_distance...);
+		f("minimum_amount_after_falloff", _t_.minimum_amount_after_falloff...);
 
-		f(t.NVP(distance_travelled));
-		f(t.NVP(max_distance));
-		f(t.NVP(max_lifetime_ms));
-		f(t.NVP(recoil_multiplier));
+		f("distance_travelled", _t_.distance_travelled...);
+		f("max_distance", _t_.max_distance...);
+		f("max_lifetime_ms", _t_.max_lifetime_ms...);
+		f("recoil_multiplier", _t_.recoil_multiplier...);
 
-		f(t.NVP(lifetime_ms));
+		f("lifetime_ms", _t_.lifetime_ms...);
 
-		f(t.NVP(homing_towards_hostile_strength));
-		f(t.NVP(particular_homing_target));
+		f("homing_towards_hostile_strength", _t_.homing_towards_hostile_strength...);
+		f("particular_homing_target", _t_.particular_homing_target...);
 
-		f(t.NVP(saved_point_of_impact_before_death));
+		f("saved_point_of_impact_before_death", _t_.saved_point_of_impact_before_death...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::driver>& t,
+		const components::driver* const,
 		F f,
-		const components::driver* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(owned_vehicle));
-		f(t.NVP(density_multiplier_while_driving));
+		f("owned_vehicle", _t_.owned_vehicle...);
+		f("density_multiplier_while_driving", _t_.density_multiplier_while_driving...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::dynamic_tree_node>& t,
+		const components::dynamic_tree_node* const,
 		F f,
-		const components::dynamic_tree_node* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(always_visible));
-		f(t.NVP(activated));
-		f(t.NVP(type));
+		f("always_visible", _t_.always_visible...);
+		f("activated", _t_.activated...);
+		f("type", _t_.type...);
 
 
-		f(t.NVP(aabb));
+		f("aabb", _t_.aabb...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, convex_partitioned_collider>& t,
+		const convex_partitioned_collider* const,
 		F f,
-		const convex_partitioned_collider* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(shape));
-		f(t.NVP(material));
+		f("shape", _t_.shape...);
+		f("material", _t_.material...);
 
-		f(t.NVP(collision_sound_gain_mult));
+		f("collision_sound_gain_mult", _t_.collision_sound_gain_mult...);
 
-		f(t.NVP(density));
-		f(t.NVP(density_multiplier));
-		f(t.NVP(friction));
-		f(t.NVP(restitution));
+		f("density", _t_.density...);
+		f("density_multiplier", _t_.density_multiplier...);
+		f("friction", _t_.friction...);
+		f("restitution", _t_.restitution...);
 
-		f(t.NVP(filter));
-		f(t.NVP(destructible));
-		f(t.NVP(sensor));
+		f("filter", _t_.filter...);
+		f("destructible", _t_.destructible...);
+		f("sensor", _t_.sensor...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::fixtures>& t,
+		const components::fixtures* const,
 		F f,
-		const components::fixtures* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(colliders));
-		f(t.NVP(offsets_for_created_shapes));
+		f("colliders", _t_.colliders...);
+		f("offsets_for_created_shapes", _t_.offsets_for_created_shapes...);
 
-		f(t.NVP(activated));
-		f(t.NVP(is_friction_ground));
-		f(t.NVP(disable_standard_collision_resolution));
-		f(t.NVP(can_driver_shoot_through));
+		f("activated", _t_.activated...);
+		f("is_friction_ground", _t_.is_friction_ground...);
+		f("disable_standard_collision_resolution", _t_.disable_standard_collision_resolution...);
+		f("can_driver_shoot_through", _t_.can_driver_shoot_through...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::flags>& t,
+		const components::flags* const,
 		F f,
-		const components::flags* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(bit_flags));
+		f("bit_flags", _t_.bit_flags...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::force_joint>& t,
+		const components::force_joint* const,
 		F f,
-		const components::force_joint* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(chased_entity));
+		f("chased_entity", _t_.chased_entity...);
 
-		f(t.NVP(force_towards_chased_entity));
-		f(t.NVP(distance_when_force_easing_starts));
-		f(t.NVP(power_of_force_easing_multiplier));
+		f("force_towards_chased_entity", _t_.force_towards_chased_entity...);
+		f("distance_when_force_easing_starts", _t_.distance_when_force_easing_starts...);
+		f("power_of_force_easing_multiplier", _t_.power_of_force_easing_multiplier...);
 
-		f(t.NVP(percent_applied_to_chased_entity));
+		f("percent_applied_to_chased_entity", _t_.percent_applied_to_chased_entity...);
 
-		f(t.NVP(divide_transform_mode));
-		f(t.NVP(consider_rotation));
+		f("divide_transform_mode", _t_.divide_transform_mode...);
+		f("consider_rotation", _t_.consider_rotation...);
 
-		f(t.NVP(chased_entity_offset));
+		f("chased_entity_offset", _t_.chased_entity_offset...);
 
-		f(t.NVP(force_offsets));
+		f("force_offsets", _t_.force_offsets...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::grenade>& t,
+		const components::grenade* const,
 		F f,
-		const components::grenade* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(spoon));
-		f(t.NVP(type));
+		f("spoon", _t_.spoon...);
+		f("type", _t_.type...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::guid>& t,
+		const components::guid* const,
 		F f,
-		const components::guid* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(value));
+		f("value", _t_.value...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::gun>& t,
+		const components::gun* const,
 		F f,
-		const components::gun* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(shot_cooldown));
-		f(t.NVP(action_mode));
-		f(t.NVP(num_last_bullets_to_trigger_low_ammo_cue));
+		f("shot_cooldown", _t_.shot_cooldown...);
+		f("action_mode", _t_.action_mode...);
+		f("num_last_bullets_to_trigger_low_ammo_cue", _t_.num_last_bullets_to_trigger_low_ammo_cue...);
 
-		f(t.NVP(muzzle_velocity));
+		f("muzzle_velocity", _t_.muzzle_velocity...);
 
-		f(t.NVP(damage_multiplier));
+		f("damage_multiplier", _t_.damage_multiplier...);
 
-		f(t.NVP(bullet_spawn_offset));
+		f("bullet_spawn_offset", _t_.bullet_spawn_offset...);
 
-		f(t.NVP(camera_shake_radius));
-		f(t.NVP(camera_shake_spread_degrees));
+		f("camera_shake_radius", _t_.camera_shake_radius...);
+		f("camera_shake_spread_degrees", _t_.camera_shake_spread_degrees...);
 
-		f(t.NVP(trigger_pressed));
+		f("trigger_pressed", _t_.trigger_pressed...);
 
-		f(t.NVP(shell_velocity));
-		f(t.NVP(shell_angular_velocity));
+		f("shell_velocity", _t_.shell_velocity...);
+		f("shell_angular_velocity", _t_.shell_angular_velocity...);
 
-		f(t.NVP(shell_spread_degrees));
+		f("shell_spread_degrees", _t_.shell_spread_degrees...);
 
-		f(t.NVP(recoil));
+		f("recoil", _t_.recoil...);
 
-		f(t.NVP(shell_spawn_offset));
+		f("shell_spawn_offset", _t_.shell_spawn_offset...);
 
-		f(t.NVP(magic_missile_definition));
+		f("magic_missile_definition", _t_.magic_missile_definition...);
 
-		f(t.NVP(current_heat));
-		f(t.NVP(gunshot_adds_heat));
-		f(t.NVP(maximum_heat));
-		f(t.NVP(engine_sound_strength));
+		f("current_heat", _t_.current_heat...);
+		f("gunshot_adds_heat", _t_.gunshot_adds_heat...);
+		f("maximum_heat", _t_.maximum_heat...);
+		f("engine_sound_strength", _t_.engine_sound_strength...);
 
-		f(t.NVP(firing_engine_sound));
-		f(t.NVP(muzzle_particles));
+		f("firing_engine_sound", _t_.firing_engine_sound...);
+		f("muzzle_particles", _t_.muzzle_particles...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::interpolation>& t,
+		const components::interpolation* const,
 		F f,
-		const components::interpolation* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(base_exponent));
-		f(t.NVP(place_of_birth));
+		f("base_exponent", _t_.base_exponent...);
+		f("place_of_birth", _t_.place_of_birth...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::item>& t,
+		const components::item* const,
 		F f,
-		const components::item* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(current_mounting));
-		f(t.NVP(intended_mounting));
+		f("current_mounting", _t_.current_mounting...);
+		f("intended_mounting", _t_.intended_mounting...);
 
-		f(t.NVP(categories_for_slot_compatibility));
+		f("categories_for_slot_compatibility", _t_.categories_for_slot_compatibility...);
 
-		f(t.NVP(charges));
-		f(t.NVP(space_occupied_per_charge));
-		f(t.NVP(stackable));
+		f("charges", _t_.charges...);
+		f("space_occupied_per_charge", _t_.space_occupied_per_charge...);
+		f("stackable", _t_.stackable...);
 
-		f(t.NVP(dual_wield_accuracy_loss_percentage));
-		f(t.NVP(dual_wield_accuracy_loss_multiplier));
+		f("dual_wield_accuracy_loss_percentage", _t_.dual_wield_accuracy_loss_percentage...);
+		f("dual_wield_accuracy_loss_multiplier", _t_.dual_wield_accuracy_loss_multiplier...);
 
-		f(t.NVP(current_slot));
-		f(t.NVP(target_slot_after_unmount));
+		f("current_slot", _t_.current_slot...);
+		f("target_slot_after_unmount", _t_.target_slot_after_unmount...);
 
-		f(t.NVP(montage_time_ms));
-		f(t.NVP(montage_time_left_ms));
+		f("montage_time_ms", _t_.montage_time_ms...);
+		f("montage_time_left_ms", _t_.montage_time_left_ms...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, item_slot_mounting_operation>& t,
+		const item_slot_mounting_operation* const,
 		F f,
-		const item_slot_mounting_operation* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(current_item));
-		f(t.NVP(intented_mounting_slot));
+		f("current_item", _t_.current_item...);
+		f("intented_mounting_slot", _t_.intented_mounting_slot...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::item_slot_transfers>& t,
+		const components::item_slot_transfers* const,
 		F f,
-		const components::item_slot_transfers* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(pickup_timeout));
-		f(t.NVP(mounting));
+		f("pickup_timeout", _t_.pickup_timeout...);
+		f("mounting", _t_.mounting...);
 
-		f(t.NVP(only_pick_these_items));
-		f(t.NVP(pick_all_touched_items_if_list_to_pick_empty));
+		f("only_pick_these_items", _t_.only_pick_these_items...);
+		f("pick_all_touched_items_if_list_to_pick_empty", _t_.pick_all_touched_items_if_list_to_pick_empty...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, light_value_variation>& t,
+		const light_value_variation* const,
 		F f,
-		const light_value_variation* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(min_value));
-		f(t.NVP(max_value));
-		f(t.NVP(change_speed));
+		f("min_value", _t_.min_value...);
+		f("max_value", _t_.max_value...);
+		f("change_speed", _t_.change_speed...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, light_attenuation>& t,
+		const light_attenuation* const,
 		F f,
-		const light_attenuation* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(base_value));
-		f(t.NVP(variation));
+		f("base_value", _t_.base_value...);
+		f("variation", _t_.variation...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::light>& t,
+		const components::light* const,
 		F f,
-		const components::light* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(color));
+		f("color", _t_.color...);
 
-		f(t.NVP(constant));
-		f(t.NVP(linear));
-		f(t.NVP(quadratic));
-		f(t.NVP(max_distance));
+		f("constant", _t_.constant...);
+		f("linear", _t_.linear...);
+		f("quadratic", _t_.quadratic...);
+		f("max_distance", _t_.max_distance...);
 		
-		f(t.NVP(wall_constant));
-		f(t.NVP(wall_linear));
-		f(t.NVP(wall_quadratic));
-		f(t.NVP(wall_max_distance));
+		f("wall_constant", _t_.wall_constant...);
+		f("wall_linear", _t_.wall_linear...);
+		f("wall_quadratic", _t_.wall_quadratic...);
+		f("wall_max_distance", _t_.wall_max_distance...);
 
-		f(t.NVP(position_variations));
+		f("position_variations", _t_.position_variations...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::melee>& t,
+		const components::melee* const,
 		F f,
-		const components::melee* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(primary_move_flag));
-		f(t.NVP(secondary_move_flag));
-		f(t.NVP(tertiary_move_flag));
+		f("primary_move_flag", _t_.primary_move_flag...);
+		f("secondary_move_flag", _t_.secondary_move_flag...);
+		f("tertiary_move_flag", _t_.tertiary_move_flag...);
 
-		f(t.NVP(current_state));
+		f("current_state", _t_.current_state...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, movement_subscribtion>& t,
+		const movement_subscribtion* const,
 		F f,
-		const movement_subscribtion* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(target));
-		f(t.NVP(stop_response_at_zero_speed));
+		f("target", _t_.target...);
+		f("stop_response_at_zero_speed", _t_.stop_response_at_zero_speed...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::movement>& t,
+		const components::movement* const,
 		F f,
-		const components::movement* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(response_receivers));
+		f("response_receivers", _t_.response_receivers...);
 		
-		f(t.NVP(moving_left));
-		f(t.NVP(moving_right));
-		f(t.NVP(moving_forward));
-		f(t.NVP(moving_backward));
+		f("moving_left", _t_.moving_left...);
+		f("moving_right", _t_.moving_right...);
+		f("moving_forward", _t_.moving_forward...);
+		f("moving_backward", _t_.moving_backward...);
 
-		f(t.NVP(walking_enabled));
-		f(t.NVP(enable_braking_damping));
-		f(t.NVP(enable_animation));
-		f(t.NVP(sprint_enabled));
+		f("walking_enabled", _t_.walking_enabled...);
+		f("enable_braking_damping", _t_.enable_braking_damping...);
+		f("enable_animation", _t_.enable_animation...);
+		f("sprint_enabled", _t_.sprint_enabled...);
 
-		f(t.NVP(input_acceleration_axes));
-		f(t.NVP(acceleration_length));
+		f("input_acceleration_axes", _t_.input_acceleration_axes...);
+		f("acceleration_length", _t_.acceleration_length...);
 
-		f(t.NVP(applied_force_offset));
+		f("applied_force_offset", _t_.applied_force_offset...);
 
-		f(t.NVP(non_braking_damping));
-		f(t.NVP(braking_damping));
+		f("non_braking_damping", _t_.non_braking_damping...);
+		f("braking_damping", _t_.braking_damping...);
 
-		f(t.NVP(standard_linear_damping));
+		f("standard_linear_damping", _t_.standard_linear_damping...);
 
-		f(t.NVP(make_inert_for_ms));
-		f(t.NVP(max_speed_for_movement_response));
+		f("make_inert_for_ms", _t_.make_inert_for_ms...);
+		f("max_speed_for_movement_response", _t_.max_speed_for_movement_response...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::name>& t,
+		const components::name* const,
 		F f,
-		const components::name* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(id));
+		f("id", _t_.id...);
 
-		f(t.NVP(custom_nickname));
-		f(t.NVP(nickname));
+		f("custom_nickname", _t_.custom_nickname...);
+		f("nickname", _t_.nickname...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, particles_effect_input>& t,
+		const particles_effect_input* const,
 		F f,
-		const particles_effect_input* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(effect));
-		f(t.NVP(delete_entity_after_effect_lifetime));
+		f("effect", _t_.effect...);
+		f("delete_entity_after_effect_lifetime", _t_.delete_entity_after_effect_lifetime...);
 
-		f(t.NVP(modifier));
+		f("modifier", _t_.modifier...);
 
-		f(t.NVP(displace_source_position_within_radius));
-		f(t.NVP(single_displacement_duration_ms));
+		f("displace_source_position_within_radius", _t_.displace_source_position_within_radius...);
+		f("single_displacement_duration_ms", _t_.single_displacement_duration_ms...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::particles_existence>& t,
+		const components::particles_existence* const,
 		F f,
-		const components::particles_existence* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(input));
+		f("input", _t_.input...);
 
-		f(t.NVP(current_displacement));
-		f(t.NVP(time_of_last_displacement));
-		f(t.NVP(current_displacement_duration_bound_ms));
+		f("current_displacement", _t_.current_displacement...);
+		f("time_of_last_displacement", _t_.time_of_last_displacement...);
+		f("current_displacement_duration_bound_ms", _t_.current_displacement_duration_bound_ms...);
 
-		f(t.NVP(time_of_birth));
-		f(t.NVP(max_lifetime_in_steps));
+		f("time_of_birth", _t_.time_of_birth...);
+		f("max_lifetime_in_steps", _t_.max_lifetime_in_steps...);
 
-		f(t.NVP(distribute_within_segment_of_length));
+		f("distribute_within_segment_of_length", _t_.distribute_within_segment_of_length...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::particle_effect_response>& t,
+		const components::particle_effect_response* const,
 		F f,
-		const components::particle_effect_response* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(response));
-		f(t.NVP(modifier));
+		f("response", _t_.response...);
+		f("modifier", _t_.modifier...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::physical_relations>& t,
+		const components::physical_relations* const,
 		F f,
-		const components::physical_relations* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(owner_body));
-		f(t.NVP(fixture_entities));
+		f("owner_body", _t_.owner_body...);
+		f("fixture_entities", _t_.fixture_entities...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::physics>& t,
+		const components::physics* const,
 		F f,
-		const components::physics* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(fixed_rotation));
-		f(t.NVP(bullet));
-		f(t.NVP(angled_damping));
-		f(t.NVP(activated));
+		f("fixed_rotation", _t_.fixed_rotation...);
+		f("bullet", _t_.bullet...);
+		f("angled_damping", _t_.angled_damping...);
+		f("activated", _t_.activated...);
 
-		f(t.NVP(body_type));
+		f("body_type", _t_.body_type...);
 
-		f(t.NVP(angular_damping));
-		f(t.NVP(linear_damping));
-		f(t.NVP(linear_damping_vec));
-		f(t.NVP(gravity_scale));
+		f("angular_damping", _t_.angular_damping...);
+		f("linear_damping", _t_.linear_damping...);
+		f("linear_damping_vec", _t_.linear_damping_vec...);
+		f("gravity_scale", _t_.gravity_scale...);
 
-		f(t.NVP(transform));
-		f(t.NVP(sweep));
+		f("transform", _t_.transform...);
+		f("sweep", _t_.sweep...);
 
-		f(t.NVP(velocity));
-		f(t.NVP(angular_velocity));
+		f("velocity", _t_.velocity...);
+		f("angular_velocity", _t_.angular_velocity...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::polygon>& t,
+		const components::polygon* const,
 		F f,
-		const components::polygon* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(center_neon_map));
-		f(t.NVP(vertices));
-		f(t.NVP(triangulation_indices));
+		f("center_neon_map", _t_.center_neon_map...);
+		f("vertices", _t_.vertices...);
+		f("triangulation_indices", _t_.triangulation_indices...);
 
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::position_copying>& t,
+		const components::position_copying* const,
 		F f,
-		const components::position_copying* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(target));
+		f("target", _t_.target...);
 
-		f(t.NVP(offset));
-		f(t.NVP(rotation_orbit_offset));
+		f("offset", _t_.offset...);
+		f("rotation_orbit_offset", _t_.rotation_orbit_offset...);
 		
-		f(t.NVP(reference_position));
-		f(t.NVP(target_reference_position));
+		f("reference_position", _t_.reference_position...);
+		f("target_reference_position", _t_.target_reference_position...);
 		
-		f(t.NVP(scrolling_speed));
+		f("scrolling_speed", _t_.scrolling_speed...);
 
-		f(t.NVP(rotation_offset));
-		f(t.NVP(rotation_multiplier));
+		f("rotation_offset", _t_.rotation_offset...);
+		f("rotation_multiplier", _t_.rotation_multiplier...);
 
-		f(t.NVP(position_copying_mode));
-		f(t.NVP(position_copying_rotation));
-		f(t.NVP(track_origin));
-		f(t.NVP(target_newly_set));
-		f(t.NVP(previous));
+		f("position_copying_mode", _t_.position_copying_mode...);
+		f("position_copying_rotation", _t_.position_copying_rotation...);
+		f("track_origin", _t_.track_origin...);
+		f("target_newly_set", _t_.target_newly_set...);
+		f("previous", _t_.previous...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::processing>& t,
+		const components::processing* const,
 		F f,
-		const components::processing* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(activated));
+		f("activated", _t_.activated...);
 
-		f(t.NVP(processing_subject_categories));
-		f(t.NVP(disabled_categories));
+		f("processing_subject_categories", _t_.processing_subject_categories...);
+		f("disabled_categories", _t_.disabled_categories...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::render>& t,
+		const components::render* const,
 		F f,
-		const components::render* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(screen_space_transform));
-		f(t.NVP(draw_border));
-		f(t.NVP(layer));
+		f("screen_space_transform", _t_.screen_space_transform...);
+		f("draw_border", _t_.draw_border...);
+		f("layer", _t_.layer...);
 
-		f(t.NVP(border_color));
+		f("border_color", _t_.border_color...);
 
-		f(t.NVP(last_step_when_visible));
+		f("last_step_when_visible", _t_.last_step_when_visible...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::rotation_copying>& t,
+		const components::rotation_copying* const,
 		F f,
-		const components::rotation_copying* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(target));
-		f(t.NVP(stashed_target));
+		f("target", _t_.target...);
+		f("stashed_target", _t_.stashed_target...);
 
-		f(t.NVP(easing_mode));
+		f("easing_mode", _t_.easing_mode...);
 
-		f(t.NVP(colinearize_item_in_hand));
-		f(t.NVP(update_value));
+		f("colinearize_item_in_hand", _t_.colinearize_item_in_hand...);
+		f("update_value", _t_.update_value...);
 		
-		f(t.NVP(smoothing_average_factor));
-		f(t.NVP(averages_per_sec));
+		f("smoothing_average_factor", _t_.smoothing_average_factor...);
+		f("averages_per_sec", _t_.averages_per_sec...);
 		
-		f(t.NVP(last_rotation_interpolant));
+		f("last_rotation_interpolant", _t_.last_rotation_interpolant...);
 
-		f(t.NVP(look_mode));
-		f(t.NVP(stashed_look_mode));
+		f("look_mode", _t_.look_mode...);
+		f("stashed_look_mode", _t_.stashed_look_mode...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, sentience_meter>& t,
+		const sentience_meter* const,
 		F f,
-		const sentience_meter* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(enabled));
+		f("enabled", _t_.enabled...);
 
-		f(t.NVP(value));
-		f(t.NVP(maximum));
+		f("value", _t_.value...);
+		f("maximum", _t_.maximum...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::sentience>& t,
+		const components::sentience* const,
 		F f,
-		const components::sentience* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(time_of_last_received_damage));
-		f(t.NVP(time_of_last_exertion));
+		f("time_of_last_received_damage", _t_.time_of_last_received_damage...);
+		f("time_of_last_exertion", _t_.time_of_last_exertion...);
 
-		f(t.NVP(cast_cooldown_for_all_spells));
+		f("cast_cooldown_for_all_spells", _t_.cast_cooldown_for_all_spells...);
 
-		f(t.NVP(health));
-		f(t.NVP(personal_electricity));
-		f(t.NVP(consciousness));
+		f("health", _t_.health...);
+		f("personal_electricity", _t_.personal_electricity...);
+		f("consciousness", _t_.consciousness...);
 
-		f(t.NVP(haste));
-		f(t.NVP(electric_shield));
+		f("haste", _t_.haste...);
+		f("electric_shield", _t_.electric_shield...);
 
-		f(t.NVP(spells));
+		f("spells", _t_.spells...);
 
-		f(t.NVP(currently_casted_spell));
-		f(t.NVP(transform_when_spell_casted));
-		f(t.NVP(time_of_last_spell_cast));
-		f(t.NVP(time_of_last_exhausted_cast));
+		f("currently_casted_spell", _t_.currently_casted_spell...);
+		f("transform_when_spell_casted", _t_.transform_when_spell_casted...);
+		f("time_of_last_spell_cast", _t_.time_of_last_spell_cast...);
+		f("time_of_last_exhausted_cast", _t_.time_of_last_exhausted_cast...);
 
-		f(t.NVP(time_of_last_shake));
-		f(t.NVP(shake_for_ms));
+		f("time_of_last_shake", _t_.time_of_last_shake...);
+		f("shake_for_ms", _t_.shake_for_ms...);
 
-		f(t.NVP(comfort_zone));
-		f(t.NVP(minimum_danger_amount_to_evade));
-		f(t.NVP(danger_amount_from_hostile_attitude));
+		f("comfort_zone", _t_.comfort_zone...);
+		f("minimum_danger_amount_to_evade", _t_.minimum_danger_amount_to_evade...);
+		f("danger_amount_from_hostile_attitude", _t_.danger_amount_from_hostile_attitude...);
 
-		f(t.NVP(aimpunch));
-		f(t.NVP(health_damage_particles));
+		f("aimpunch", _t_.aimpunch...);
+		f("health_damage_particles", _t_.health_damage_particles...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, sound_effect_input>& t,
+		const sound_effect_input* const,
 		F f,
-		const sound_effect_input* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(effect));
-		f(t.NVP(delete_entity_after_effect_lifetime));
-		f(t.NVP(variation_number));
-		f(t.NVP(direct_listener));
-		f(t.NVP(modifier));
+		f("effect", _t_.effect...);
+		f("delete_entity_after_effect_lifetime", _t_.delete_entity_after_effect_lifetime...);
+		f("variation_number", _t_.variation_number...);
+		f("direct_listener", _t_.direct_listener...);
+		f("modifier", _t_.modifier...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::sound_existence>& t,
+		const components::sound_existence* const,
 		F f,
-		const components::sound_existence* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(input));
+		f("input", _t_.input...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::sound_response>& t,
+		const components::sound_response* const,
 		F f,
-		const components::sound_response* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(response));
+		f("response", _t_.response...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, friction_connection>& t,
+		const friction_connection* const,
 		F f,
-		const friction_connection* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(target));
-		f(t.NVP(fixtures_connected));
+		f("target", _t_.target...);
+		f("fixtures_connected", _t_.fixtures_connected...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::special_physics>& t,
+		const components::special_physics* const,
 		F f,
-		const components::special_physics* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(dropped_collision_cooldown));
-		f(t.NVP(owner_friction_ground));
-		f(t.NVP(owner_friction_grounds));
+		f("dropped_collision_cooldown", _t_.dropped_collision_cooldown...);
+		f("owner_friction_ground", _t_.owner_friction_ground...);
+		f("owner_friction_grounds", _t_.owner_friction_grounds...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::sprite>& t,
+		const components::sprite* const,
 		F f,
-		const components::sprite* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(tex));
-		f(t.NVP(color));
-		f(t.NVP(size));
-		f(t.NVP(size_multiplier));
-		f(t.NVP(center_offset));
-		f(t.NVP(rotation_offset));
+		f("tex", _t_.tex...);
+		f("color", _t_.color...);
+		f("size", _t_.size...);
+		f("size_multiplier", _t_.size_multiplier...);
+		f("center_offset", _t_.center_offset...);
+		f("rotation_offset", _t_.rotation_offset...);
 
-		f(t.NVP(flip_horizontally));
-		f(t.NVP(flip_vertically));
+		f("flip_horizontally", _t_.flip_horizontally...);
+		f("flip_vertically", _t_.flip_vertically...);
 		
-		f(t.NVP(effect));
-		f(t.NVP(has_neon_map));
+		f("effect", _t_.effect...);
+		f("has_neon_map", _t_.has_neon_map...);
 
-		f(t.NVP(max_specular_blinks));
+		f("max_specular_blinks", _t_.max_specular_blinks...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::substance>& t,
+		const components::substance* const,
 		F f,
-		const components::substance* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(dummy));
+		f("dummy", _t_.dummy...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::tile_layer_instance>& t,
+		const components::tile_layer_instance* const,
 		F f,
-		const components::tile_layer_instance* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(id));
+		f("id", _t_.id...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::trace>& t,
+		const components::trace* const,
 		F f,
-		const components::trace* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(max_multiplier_x));
-		f(t.NVP(max_multiplier_y));
+		f("max_multiplier_x", _t_.max_multiplier_x...);
+		f("max_multiplier_y", _t_.max_multiplier_y...);
 
-		f(t.NVP(chosen_multiplier));
+		f("chosen_multiplier", _t_.chosen_multiplier...);
 
-		f(t.NVP(lengthening_duration_ms));
-		f(t.NVP(chosen_lengthening_duration_ms));
-		f(t.NVP(lengthening_time_passed_ms));
+		f("lengthening_duration_ms", _t_.lengthening_duration_ms...);
+		f("chosen_lengthening_duration_ms", _t_.chosen_lengthening_duration_ms...);
+		f("lengthening_time_passed_ms", _t_.lengthening_time_passed_ms...);
 
-		f(t.NVP(is_it_finishing_trace));
+		f("is_it_finishing_trace", _t_.is_it_finishing_trace...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::transform>& t,
+		const components::transform* const,
 		F f,
-		const components::transform* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(pos));
-		f(t.NVP(rotation));
+		f("pos", _t_.pos...);
+		f("rotation", _t_.rotation...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::trigger_collision_detector>& t,
+		const components::trigger_collision_detector* const,
 		F f,
-		const components::trigger_collision_detector* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(detection_intent_enabled));
+		f("detection_intent_enabled", _t_.detection_intent_enabled...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::trigger>& t,
+		const components::trigger* const,
 		F f,
-		const components::trigger* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(entity_to_be_notified));
-		f(t.NVP(react_to_collision_detectors));
-		f(t.NVP(react_to_query_detectors));
+		f("entity_to_be_notified", _t_.entity_to_be_notified...);
+		f("react_to_collision_detectors", _t_.react_to_collision_detectors...);
+		f("react_to_query_detectors", _t_.react_to_query_detectors...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::trigger_query_detector>& t,
+		const components::trigger_query_detector* const,
 		F f,
-		const components::trigger_query_detector* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(detection_intent_enabled));
-		f(t.NVP(spam_trigger_requests_when_detection_intented));
+		f("detection_intent_enabled", _t_.detection_intent_enabled...);
+		f("spam_trigger_requests_when_detection_intented", _t_.spam_trigger_requests_when_detection_intented...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, components::wandering_pixels>& t,
+		const components::wandering_pixels* const,
 		F f,
-		const components::wandering_pixels* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(reach));
-		f(t.NVP(face));
-		f(t.NVP(count));
+		f("reach", _t_.reach...);
+		f("face", _t_.face...);
+		f("count", _t_.count...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, convex_poly_destruction_scar>& t,
+		const convex_poly_destruction_scar* const,
 		F f,
-		const convex_poly_destruction_scar* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(first_impact));
-		f(t.NVP(depth_point));
+		f("first_impact", _t_.first_impact...);
+		f("depth_point", _t_.depth_point...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, convex_poly_destruction_data>& t,
+		const convex_poly_destruction_data* const,
 		F f,
-		const convex_poly_destruction_data* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(scars));
+		f("scars", _t_.scars...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, convex_poly>& t,
+		const convex_poly* const,
 		F f,
-		const convex_poly* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(vertices));
+		f("vertices", _t_.vertices...);
 
-		f(t.NVP(destruction));
+		f("destruction", _t_.destruction...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, convex_partitioned_shape>& t,
+		const convex_partitioned_shape* const,
 		F f,
-		const convex_partitioned_shape* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(convex_polys));
+		f("convex_polys", _t_.convex_polys...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, inventory_slot>& t,
+		const inventory_slot* const,
 		F f,
-		const inventory_slot* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(category_allowed));
+		f("category_allowed", _t_.category_allowed...);
 
-		f(t.NVP(items_need_mounting));
-		f(t.NVP(only_last_inserted_is_movable));
+		f("items_need_mounting", _t_.items_need_mounting...);
+		f("only_last_inserted_is_movable", _t_.only_last_inserted_is_movable...);
 
-		f(t.NVP(for_categorized_items_only));
+		f("for_categorized_items_only", _t_.for_categorized_items_only...);
 
-		f(t.NVP(is_physical_attachment_slot));
-		f(t.NVP(always_allow_exactly_one_item));
+		f("is_physical_attachment_slot", _t_.is_physical_attachment_slot...);
+		f("always_allow_exactly_one_item", _t_.always_allow_exactly_one_item...);
 
 
-		f(t.NVP(montage_time_multiplier));
+		f("montage_time_multiplier", _t_.montage_time_multiplier...);
 
-		f(t.NVP(space_available));
+		f("space_available", _t_.space_available...);
 
-		f(t.NVP(attachment_density_multiplier));
+		f("attachment_density_multiplier", _t_.attachment_density_multiplier...);
 
-		f(t.NVP(attachment_sticking_mode));
-		f(t.NVP(attachment_offset));
+		f("attachment_sticking_mode", _t_.attachment_sticking_mode...);
+		f("attachment_offset", _t_.attachment_offset...);
 
-		f(t.NVP(items_inside));
+		f("items_inside", _t_.items_inside...);
 	}
 
-	template <bool C, class F, class id_type>
+	template <class F, class id_type, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, basic_inventory_slot_id<id_type>>& t,
+		const basic_inventory_slot_id<id_type>* const,
 		F f,
-		const basic_inventory_slot_id<id_type>* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(type));
-		f(t.NVP(container_entity));
+		f("type", _t_.type...);
+		f("container_entity", _t_.container_entity...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, inventory_item_address>& t,
+		const inventory_item_address* const,
 		F f,
-		const inventory_item_address* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(root_container));
-		f(t.NVP(directions));
+		f("root_container", _t_.root_container...);
+		f("directions", _t_.directions...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, inventory_traversal>& t,
+		const inventory_traversal* const,
 		F f,
-		const inventory_traversal* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(parent_slot));
-		f(t.NVP(current_address));
-		f(t.NVP(attachment_offset));
-		f(t.NVP(item_remains_physical));
+		f("parent_slot", _t_.parent_slot...);
+		f("current_address", _t_.current_address...);
+		f("attachment_offset", _t_.attachment_offset...);
+		f("item_remains_physical", _t_.item_remains_physical...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, electric_shield_perk>& t,
+		const electric_shield_perk* const,
 		F f,
-		const electric_shield_perk* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(timing));
+		f("timing", _t_.timing...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, haste_perk>& t,
+		const haste_perk* const,
 		F f,
-		const haste_perk* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(timing));
-		f(t.NVP(is_greater));
+		f("timing", _t_.timing...);
+		f("is_greater", _t_.is_greater...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, perk_timing>& t,
+		const perk_timing* const,
 		F f,
-		const perk_timing* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(duration));
+		f("duration", _t_.duration...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, spell_instance_data>& t,
+		const spell_instance_data* const,
 		F f,
-		const spell_instance_data* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(cast_cooldown));
+		f("cast_cooldown", _t_.cast_cooldown...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, resources::state_of_behaviour_tree_instance>& t,
+		const resources::state_of_behaviour_tree_instance* const,
 		F f,
-		const resources::state_of_behaviour_tree_instance* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(previously_executed_leaf_id));
+		f("previously_executed_leaf_id", _t_.previously_executed_leaf_id...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, resources::particle_effect_modifier>& t,
+		const resources::particle_effect_modifier* const,
 		F f,
-		const resources::particle_effect_modifier* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(colorize));
-		f(t.NVP(scale_amounts));
-		f(t.NVP(scale_lifetimes));
-		f(t.NVP(homing_target));
+		f("colorize", _t_.colorize...);
+		f("scale_amounts", _t_.scale_amounts...);
+		f("scale_lifetimes", _t_.scale_lifetimes...);
+		f("homing_target", _t_.homing_target...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, resources::emission>& t,
+		const resources::emission* const,
 		F f,
-		const resources::emission* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(spread_degrees));
-		f(t.NVP(base_speed));
-		f(t.NVP(base_speed_variation));
-		f(t.NVP(rotation_speed));
-		f(t.NVP(particles_per_sec));
-		f(t.NVP(stream_lifetime_ms));
-		f(t.NVP(particle_lifetime_ms));
-		f(t.NVP(size_multiplier));
-		f(t.NVP(acceleration));
-		f(t.NVP(angular_offset));
-		f(t.NVP(swing_spread));
-		f(t.NVP(swings_per_sec));
-		f(t.NVP(min_swing_spread));
-		f(t.NVP(max_swing_spread));
-		f(t.NVP(min_swings_per_sec));
-		f(t.NVP(max_swings_per_sec));
-		f(t.NVP(swing_spread_change_rate));
-		f(t.NVP(swing_speed_change_rate));
-		f(t.NVP(fade_when_ms_remaining));
-		f(t.NVP(num_of_particles_to_spawn_initially));
+		f("spread_degrees", _t_.spread_degrees...);
+		f("base_speed", _t_.base_speed...);
+		f("base_speed_variation", _t_.base_speed_variation...);
+		f("rotation_speed", _t_.rotation_speed...);
+		f("particles_per_sec", _t_.particles_per_sec...);
+		f("stream_lifetime_ms", _t_.stream_lifetime_ms...);
+		f("particle_lifetime_ms", _t_.particle_lifetime_ms...);
+		f("size_multiplier", _t_.size_multiplier...);
+		f("acceleration", _t_.acceleration...);
+		f("angular_offset", _t_.angular_offset...);
+		f("swing_spread", _t_.swing_spread...);
+		f("swings_per_sec", _t_.swings_per_sec...);
+		f("min_swing_spread", _t_.min_swing_spread...);
+		f("max_swing_spread", _t_.max_swing_spread...);
+		f("min_swings_per_sec", _t_.min_swings_per_sec...);
+		f("max_swings_per_sec", _t_.max_swings_per_sec...);
+		f("swing_spread_change_rate", _t_.swing_spread_change_rate...);
+		f("swing_speed_change_rate", _t_.swing_speed_change_rate...);
+		f("fade_when_ms_remaining", _t_.fade_when_ms_remaining...);
+		f("num_of_particles_to_spawn_initially", _t_.num_of_particles_to_spawn_initially...);
 
-		f(t.NVP(randomize_spawn_point_within_circle_of_outer_radius));
-		f(t.NVP(randomize_spawn_point_within_circle_of_inner_radius));
+		f("randomize_spawn_point_within_circle_of_outer_radius", _t_.randomize_spawn_point_within_circle_of_outer_radius...);
+		f("randomize_spawn_point_within_circle_of_inner_radius", _t_.randomize_spawn_point_within_circle_of_inner_radius...);
 
-		f(t.NVP(starting_spawn_circle_size_multiplier));
-		f(t.NVP(ending_spawn_circle_size_multiplier));
+		f("starting_spawn_circle_size_multiplier", _t_.starting_spawn_circle_size_multiplier...);
+		f("ending_spawn_circle_size_multiplier", _t_.ending_spawn_circle_size_multiplier...);
 
-		f(t.NVP(starting_homing_force));
-		f(t.NVP(ending_homing_force));
+		f("starting_homing_force", _t_.starting_homing_force...);
+		f("ending_homing_force", _t_.ending_homing_force...);
 
-		f(t.NVP(homing_target));
+		f("homing_target", _t_.homing_target...);
 
-		f(t.NVP(initial_rotation_variation));
-		f(t.NVP(randomize_acceleration));
-		f(t.NVP(should_particles_look_towards_velocity));
+		f("initial_rotation_variation", _t_.initial_rotation_variation...);
+		f("randomize_acceleration", _t_.randomize_acceleration...);
+		f("should_particles_look_towards_velocity", _t_.should_particles_look_towards_velocity...);
 
-		f(t.NVP(particle_templates));
+		f("particle_templates", _t_.particle_templates...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, all_simulation_settings>& t,
+		const all_simulation_settings* const,
 		F f,
-		const all_simulation_settings* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(visibility));
-		f(t.NVP(pathfinding));
-		f(t.NVP(si));
+		f("visibility", _t_.visibility...);
+		f("pathfinding", _t_.pathfinding...);
+		f("si", _t_.si...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, pathfinding_settings>& t,
+		const pathfinding_settings* const,
 		F f,
-		const pathfinding_settings* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(epsilon_distance_visible_point));
-		f(t.NVP(epsilon_distance_the_same_vertex));
+		f("epsilon_distance_visible_point", _t_.epsilon_distance_visible_point...);
+		f("epsilon_distance_the_same_vertex", _t_.epsilon_distance_the_same_vertex...);
 
-		f(t.NVP(draw_memorised_walls));
-		f(t.NVP(draw_undiscovered));
+		f("draw_memorised_walls", _t_.draw_memorised_walls...);
+		f("draw_undiscovered", _t_.draw_undiscovered...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, si_scaling>& t,
+		const si_scaling* const,
 		F f,
-		const si_scaling* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(to_meters_multiplier));
-		f(t.NVP(to_pixels_multiplier));
+		f("to_meters_multiplier", _t_.to_meters_multiplier...);
+		f("to_pixels_multiplier", _t_.to_pixels_multiplier...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, visibility_settings>& t,
+		const visibility_settings* const,
 		F f,
-		const visibility_settings* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(draw_triangle_edges));
-		f(t.NVP(draw_cast_rays));
-		f(t.NVP(draw_discontinuities));
-		f(t.NVP(draw_visible_walls));
+		f("draw_triangle_edges", _t_.draw_triangle_edges...);
+		f("draw_cast_rays", _t_.draw_cast_rays...);
+		f("draw_discontinuities", _t_.draw_discontinuities...);
+		f("draw_visible_walls", _t_.draw_visible_walls...);
 
-		f(t.NVP(epsilon_ray_distance_variation));
-		f(t.NVP(epsilon_distance_vertex_hit));
-		f(t.NVP(epsilon_threshold_obstacle_hit));
+		f("epsilon_ray_distance_variation", _t_.epsilon_ray_distance_variation...);
+		f("epsilon_distance_vertex_hit", _t_.epsilon_distance_vertex_hit...);
+		f("epsilon_threshold_obstacle_hit", _t_.epsilon_threshold_obstacle_hit...);
 	}
 
-	template <bool C, class F, class key>
+	template <class F, class key, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, basic_cosmic_entropy<key>>& t,
+		const basic_cosmic_entropy<key>* const,
 		F f,
-		const basic_cosmic_entropy<key>* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(cast_spells));
-		f(t.NVP(intents_per_entity));
-		f(t.NVP(transfer_requests));
+		f("cast_spells", _t_.cast_spells...);
+		f("intents_per_entity", _t_.intents_per_entity...);
+		f("transfer_requests", _t_.transfer_requests...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, cosmos_flyweights_state>& t,
+		const cosmos_flyweights_state* const,
 		F f,
-		const cosmos_flyweights_state* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(spells));
-		f(t.NVP(collision_sound_matrix));
+		f("spells", _t_.spells...);
+		f("collision_sound_matrix", _t_.collision_sound_matrix...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, cosmos_metadata>& t,
+		const cosmos_metadata* const,
 		F f,
-		const cosmos_metadata* const
+		MemberInstances&&... _t_
 	) {
 
-		f(t.NVP(delta));
-		f(t.NVP(total_steps_passed));
+		f("delta", _t_.delta...);
+		f("total_steps_passed", _t_.total_steps_passed...);
 
 #if COSMOS_TRACKS_GUIDS
-		f(t.NVP(next_entity_guid));
+		f("next_entity_guid", _t_.next_entity_guid...);
 #endif
-		f(t.NVP(settings));
+		f("settings", _t_.settings...);
 
-		f(t.NVP(flyweights));
+		f("flyweights", _t_.flyweights...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, cosmos_significant_state>& t,
+		const cosmos_significant_state* const,
 		F f,
-		const cosmos_significant_state* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(meta));
+		f("meta", _t_.meta...);
 
-		f(t.NVP(pool_for_aggregates));
-		f(t.NVP(pools_for_components));
+		f("pool_for_aggregates", _t_.pool_for_aggregates...);
+		f("pools_for_components", _t_.pools_for_components...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, config_lua_table>& t,
+		const config_lua_table* const,
 		F f,
-		const config_lua_table* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(launch_mode));
-		f(t.NVP(input_recording_mode));
+		f("launch_mode", _t_.launch_mode...);
+		f("input_recording_mode", _t_.input_recording_mode...);
 
-		f(t.NVP(recording_replay_speed));
+		f("recording_replay_speed", _t_.recording_replay_speed...);
 
-		f(t.NVP(determinism_test_cloned_cosmoi_count));
+		f("determinism_test_cloned_cosmoi_count", _t_.determinism_test_cloned_cosmoi_count...);
 
-		f(t.NVP(check_content_integrity_every_launch));
-		f(t.NVP(save_regenerated_atlases_as_binary));
-		f(t.NVP(debug_regenerate_content_every_launch));
+		f("check_content_integrity_every_launch", _t_.check_content_integrity_every_launch...);
+		f("save_regenerated_atlases_as_binary", _t_.save_regenerated_atlases_as_binary...);
+		f("debug_regenerate_content_every_launch", _t_.debug_regenerate_content_every_launch...);
 
-		f(t.NVP(enable_hrtf));
-		f(t.NVP(max_number_of_sound_sources));
+		f("enable_hrtf", _t_.enable_hrtf...);
+		f("max_number_of_sound_sources", _t_.max_number_of_sound_sources...);
 
-		f(t.NVP(audio_output_device));
+		f("audio_output_device", _t_.audio_output_device...);
 
-		f(t.NVP(sound_effects_volume));
-		f(t.NVP(music_volume));
+		f("sound_effects_volume", _t_.sound_effects_volume...);
+		f("music_volume", _t_.music_volume...);
 
-		f(t.NVP(debug_disable_cursor_clipping));
+		f("debug_disable_cursor_clipping", _t_.debug_disable_cursor_clipping...);
 
-		f(t.NVP(connect_address));
-		f(t.NVP(connect_port));
-		f(t.NVP(server_port));
-		f(t.NVP(alternative_port));
+		f("connect_address", _t_.connect_address...);
+		f("connect_port", _t_.connect_port...);
+		f("server_port", _t_.server_port...);
+		f("alternative_port", _t_.alternative_port...);
 
-		f(t.NVP(nickname));
-		f(t.NVP(debug_second_nickname));
+		f("nickname", _t_.nickname...);
+		f("debug_second_nickname", _t_.debug_second_nickname...);
 
-		f(t.NVP(mouse_sensitivity));
+		f("mouse_sensitivity", _t_.mouse_sensitivity...);
 
-		f(t.NVP(tickrate));
+		f("tickrate", _t_.tickrate...);
 
-		f(t.NVP(jitter_buffer_ms));
-		f(t.NVP(client_commands_jitter_buffer_ms));
+		f("jitter_buffer_ms", _t_.jitter_buffer_ms...);
+		f("client_commands_jitter_buffer_ms", _t_.client_commands_jitter_buffer_ms...);
 
-		f(t.NVP(interpolation_speed));
-		f(t.NVP(misprediction_smoothing_multiplier));
+		f("interpolation_speed", _t_.interpolation_speed...);
+		f("misprediction_smoothing_multiplier", _t_.misprediction_smoothing_multiplier...);
 
-		f(t.NVP(debug_var));
-		f(t.NVP(debug_randomize_entropies_in_client_setup));
-		f(t.NVP(debug_randomize_entropies_in_client_setup_once_every_steps));
+		f("debug_var", _t_.debug_var...);
+		f("debug_randomize_entropies_in_client_setup", _t_.debug_randomize_entropies_in_client_setup...);
+		f("debug_randomize_entropies_in_client_setup_once_every_steps", _t_.debug_randomize_entropies_in_client_setup_once_every_steps...);
 
-		f(t.NVP(server_launch_http_daemon));
-		f(t.NVP(server_http_daemon_port));
-		f(t.NVP(server_http_daemon_html_file_path));
+		f("server_launch_http_daemon", _t_.server_launch_http_daemon...);
+		f("server_http_daemon_port", _t_.server_http_daemon_port...);
+		f("server_http_daemon_html_file_path", _t_.server_http_daemon_html_file_path...);
 
-		f(t.NVP(db_path));
-		f(t.NVP(survey_num_file_path));
-		f(t.NVP(post_data_file_path));
-		f(t.NVP(last_session_update_link));
+		f("db_path", _t_.db_path...);
+		f("survey_num_file_path", _t_.survey_num_file_path...);
+		f("post_data_file_path", _t_.post_data_file_path...);
+		f("last_session_update_link", _t_.last_session_update_link...);
 
-		f(t.NVP(director_scenario_filename));
-		f(t.NVP(menu_intro_scenario_filename));
+		f("director_scenario_filename", _t_.director_scenario_filename...);
+		f("menu_intro_scenario_filename", _t_.menu_intro_scenario_filename...);
 
-		f(t.NVP(menu_theme_filename));
+		f("menu_theme_filename", _t_.menu_theme_filename...);
 
-		f(t.NVP(rewind_intro_scene_by_secs));
-		f(t.NVP(start_menu_music_at_secs));
+		f("rewind_intro_scene_by_secs", _t_.rewind_intro_scene_by_secs...);
+		f("start_menu_music_at_secs", _t_.start_menu_music_at_secs...);
 
-		f(t.NVP(skip_credits));
-		f(t.NVP(latest_news_url));
+		f("skip_credits", _t_.skip_credits...);
+		f("latest_news_url", _t_.latest_news_url...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, neon_map_stamp>& t,
+		const neon_map_stamp* const,
 		F f,
-		const neon_map_stamp* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(standard_deviation));
-		f(t.NVP(radius_towards_x_axis));
-		f(t.NVP(radius_towards_y_axis));
-		f(t.NVP(amplification));
-		f(t.NVP(alpha_multiplier));
-		f(t.NVP(last_write_time_of_source));
+		f("standard_deviation", _t_.standard_deviation...);
+		f("radius_towards_x_axis", _t_.radius_towards_x_axis...);
+		f("radius_towards_y_axis", _t_.radius_towards_y_axis...);
+		f("amplification", _t_.amplification...);
+		f("alpha_multiplier", _t_.alpha_multiplier...);
+		f("last_write_time_of_source", _t_.last_write_time_of_source...);
 
-		f(t.NVP(light_colors));
+		f("light_colors", _t_.light_colors...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, scripted_image_stamp>& t,
+		const scripted_image_stamp* const,
 		F f,
-		const scripted_image_stamp* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(commands));
+		f("commands", _t_.commands...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, texture_atlas_stamp>& t,
+		const texture_atlas_stamp* const,
 		F f,
-		const texture_atlas_stamp* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(image_stamps));
-		f(t.NVP(font_stamps));
+		f("image_stamps", _t_.image_stamps...);
+		f("font_stamps", _t_.font_stamps...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, texture_atlas_metadata>& t,
+		const texture_atlas_metadata* const,
 		F f,
-		const texture_atlas_metadata* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(atlas_image_size));
+		f("atlas_image_size", _t_.atlas_image_size...);
 
-		f(t.NVP(images));
-		f(t.NVP(fonts));
+		f("images", _t_.images...);
+		f("fonts", _t_.fonts...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, b2Vec2>& t,
+		const b2Vec2* const,
 		F f,
-		const b2Vec2* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(x));
-		f(t.NVP(y));
+		f("x", _t_.x...);
+		f("y", _t_.y...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, b2Rot>& t,
+		const b2Rot* const,
 		F f,
-		const b2Rot* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(s));
-		f(t.NVP(c));
+		f("s", _t_.s...);
+		f("c", _t_.c...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, b2Transform>& t,
+		const b2Transform* const,
 		F f,
-		const b2Transform* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(p));
-		f(t.NVP(q));
+		f("p", _t_.p...);
+		f("q", _t_.q...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, b2Sweep>& t,
+		const b2Sweep* const,
 		F f,
-		const b2Sweep* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(localCenter));
-		f(t.NVP(c0));
-		f(t.NVP(c));
-		f(t.NVP(a0));
-		f(t.NVP(a));
-		f(t.NVP(alpha0));
+		f("localCenter", _t_.localCenter...);
+		f("c0", _t_.c0...);
+		f("c", _t_.c...);
+		f("a0", _t_.a0...);
+		f("a", _t_.a...);
+		f("alpha0", _t_.alpha0...);
 	}
 
-	template <bool C, class F>
+	template <class F, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, b2Filter>& t,
+		const b2Filter* const,
 		F f,
-		const b2Filter* const
+		MemberInstances&&... _t_
 	) {
-		f(t.NVP(categoryBits));
-		f(t.NVP(maskBits));
-		f(t.NVP(groupIndex));
+		f("categoryBits", _t_.categoryBits...);
+		f("maskBits", _t_.maskBits...);
+		f("groupIndex", _t_.groupIndex...);
 	}
 
 }

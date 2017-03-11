@@ -33,14 +33,14 @@ void transform_component_ids_to_guids(
 		is_entity_id_type,
 		exclude_no_type
 	>(
-		comp,
-			[&cosm](auto& id, auto...) {
-				const auto handle = cosm[id];
+		[&cosm](auto, auto& id) {
+			const auto handle = cosm[id];
 
-				if (handle.alive()) {
-					id.guid = handle.get_guid();
-				}
+			if (handle.alive()) {
+				id.guid = handle.get_guid();
 			}
+		},
+		comp
 	);
 }
 
@@ -53,14 +53,14 @@ void transform_component_guids_to_ids(
 		is_entity_id_type,
 		exclude_no_type
 	> (
-		comp,
-		[&cosm](auto& id, auto...) {
+		[&cosm](auto, auto& id) {
 			const entity_guid guid = id.guid;
 
 			if (guid != 0) {
 				id = cosm.guid_map_for_transport.at(guid);
 			}
-		}
+		},
+		comp
 	);
 }
 

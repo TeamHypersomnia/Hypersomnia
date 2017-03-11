@@ -14,11 +14,11 @@ namespace augs {
 		arr_type raw;
 		// END GEN INTROSPECTOR
 
-		template <bool C, class F, class Enum, class T>
+		template <class F, class Enum, class T, class... MemberInstances>
 		friend void introspect_body(
-			maybe_const_ref_t<C, augs::enum_associative_array<Enum, T>>& t,
+			const augs::enum_associative_array<Enum, T>* const,
 			F f,
-			const augs::enum_associative_array<Enum, T>* const
+			MemberInstances&&... _t_
 		);
 
 		unsigned find_first_set_index(unsigned from) const {

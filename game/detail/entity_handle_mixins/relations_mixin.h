@@ -53,14 +53,14 @@ public:
 					is_entity_id_type,
 					exclude_non_child_id_types
 				> (
-					subject_component,
-					[&](auto& member_child_id, auto...) {
+					[&](auto, auto& member_child_id) {
 						const auto child_handle = cosmos[member_child_id];
 
 						if (callback(child_handle)) {
 							child_handle.for_each_child_entity_recursive(callback);
 						}
 					}
+					subject_component
 				);
 			}
 		);

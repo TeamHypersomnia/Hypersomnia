@@ -12,23 +12,33 @@ struct exclude_no_type {
 };
 
 namespace augs {
-	template <bool C, class F, class ElemType, size_t count>
+	template <class F, class ElemType, size_t count, class... MemberInstances>
 	void introspect_body(
-		maybe_const_ref_t<C, std::array<ElemType, count>> t,
+		const std::array<ElemType, count>* const,
 		F f,
-		const std::array<ElemType, count>* const
+		MemberInstances&&... t
 	) {
 		for (size_t i = 0; i < count; ++i) {
-			f(*(t.data() + i), std::to_string(i));
+			f(std::to_string(i), t[i]...);
 		}
 	}
 
-	template <class T, class F>
+	template <
+		class F, 
+		class Instance, 
+		class... Instances
+	>
 	void introspect(
-		T& t,
-		F f
+		F callback,
+		Instance&& t,
+		Instances&&... tn
 	) {
-		introspect_body<std::is_const_v<T>>(t, f, &t);
+		introspect_body(
+			static_cast<std::decay_t<Instance>*>(nullptr), 
+			callback, 
+			std::forward<Instance>(t), 
+			std::forward<Instances>(tn)...
+		);
 	}
 
 	template <
@@ -53,41 +63,19 @@ namespace augs {
 			&& !exclude_type_predicate<MemberType>::value
 		>
 	> {
-		template <class F, class... Args>
+		template <class F, class L, class... Args>
 		void operator()(
 			F callback,
-			MemberType& member,
+			const L& label,
 			Args&&... args
 		) {
-			callback(member, std::forward<Args>(args)...);
+			callback(
+				label,
+				std::forward<Args>(args)...
+			);
 		}
 	};
-
-	template <
-		template <class A> class call_valid_predicate,
-		template <class B> class exclude_type_predicate,
-		class MemberType
-	>
-	struct recursive_introspector<
-		call_valid_predicate,
-		exclude_type_predicate,
-		MemberType,
-		std::enable_if_t<
-			(
-				!call_valid_predicate<MemberType>::value 
-				&& is_introspective_leaf_v<MemberType>
-			) || exclude_type_predicate<MemberType>::value
-		>
-	> {
-		template <class F, class... Args>
-		void operator()(
-			F callback,
-			MemberType& member,
-			Args&&... args
-		) {
-
-		}
-	};
+	
 
 	template <
 		template <class A> class call_valid_predicate,
@@ -104,10 +92,10 @@ namespace augs {
 			&& !exclude_type_predicate<MemberType>::value
 		>
 	> {
-		template <class F, class... Args>
+		template <class F, class L, class... Args>
 		void operator()(
 			F callback,
-			MemberType& member,
+			const L& label,
 			Args&&... args
 		) {
 			static_assert(has_introspects_v<MemberType>, "Found a non-fundamental type without an introspector, on whom the callback is invalid.");
@@ -115,29 +103,67 @@ namespace augs {
 			introspect_recursive<
 				call_valid_predicate,
 				exclude_type_predicate
-			>(member, callback);
+			>(
+				callback,
+				std::forward<Args>(args)...
+			);
 		}
 	};
 
 	template <
 		template <class A> class call_valid_predicate,
 		template <class B> class exclude_type_predicate,
-		class T,
-		class F
+		class MemberType
+	>
+	struct recursive_introspector<
+		call_valid_predicate,
+		exclude_type_predicate,
+		MemberType,
+		std::enable_if_t<
+			(
+				!call_valid_predicate<MemberType>::value 
+				&& is_introspective_leaf_v<MemberType>
+			) 
+			|| exclude_type_predicate<MemberType>::value
+		>
+	> {
+		template <class F, class... Args>
+		void operator()(
+			F callback,
+			Args&&... args
+		) {
+
+		}
+	};
+
+	template <
+		template <class A> class call_valid_predicate,
+		template <class B> class exclude_type_predicate,
+		class F,
+		class... Instances
 	>
 	void introspect_recursive(
-		T& t,
-		F member_callback
+		F member_callback,
+		Instances&&... tn
 	) {
 		introspect(
-			t,
-			[&](auto& member, auto... args) {
+			[&](
+				const auto& label, 
+				auto& first_instance, 
+				auto&&... instances
+			) {
 				recursive_introspector<
 					call_valid_predicate,
 					exclude_type_predicate,
-					std::decay_t<decltype(member)>
-				>()(member_callback, member, args...);
-			}
+					std::decay_t<decltype(first_instance)>
+				>()(
+					member_callback,
+					label,
+					first_instance,
+					std::forward<decltype(instances)>(instances)...
+				);
+			},
+			std::forward<Instances>(tn)...
 		);
 	}
 }
@@ -149,22 +175,19 @@ struct true_returner {
 	}
 };
 
-template <class T, bool C, class = void>
+template <class T, class = void>
 struct has_introspect {
 	static constexpr bool value = false;
 };
 
-template <class T, bool C>
+template <class T>
 struct has_introspect<
 	T, 
-	C,
 	decltype(
-		augs::introspect_body<C>(
-			std::declval<
-				maybe_const_ref_t<C, T>
-			>(),
+		augs::introspect_body(
+			static_cast<T*>(nullptr),
 			true_returner(),
-			maybe_const_ptr_t<C, T>()
+			std::declval<T>()
 		), 
 		void()
 	)
@@ -172,13 +195,5 @@ struct has_introspect<
 	static constexpr bool value = true;
 };
 
-template <class T, bool C>
-constexpr bool has_introspect_v = has_introspect<T, C>::value;
-
 template <class T>
-struct has_introspects {
-	static constexpr bool value = has_introspect_v<T, false> && has_introspect_v<T, true>;
-}; 
-
-template <class T>
-constexpr bool has_introspects_v = has_introspects<T>::value;
+constexpr bool has_introspects_v = has_introspect<T>::value;
