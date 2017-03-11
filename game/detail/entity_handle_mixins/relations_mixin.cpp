@@ -3,12 +3,15 @@
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
+#include "game/transcendental/types_specification/all_component_includes.h"
 #include "game/components/substance_component.h"
 #include "game/components/guid_component.h"
 #include "game/components/child_component.h"
 #include "game/components/physical_relations_component.h"
 #include "game/components/crosshair_component.h"
 #include "augs/templates/container_templates.h"
+
+#include "generated_introspectors.h"
 
 template <class D>
 void relations_mixin<false, D>::make_child_of(const entity_id parent_id) const {
@@ -29,16 +32,26 @@ components::physical_relations& relations_mixin<false, D>::physical_relations_co
 }
 
 template <class D>
-void relations_mixin<false, D>::make_cloned_child_entities_recursive(const entity_id from) const {
+void relations_mixin<false, D>::make_cloned_child_entities_recursive(const entity_id from_id) const {
 	auto& self = *static_cast<const D*>(this);
 	auto& cosmos = self.get_cosmos();
+	
+	const const_entity_handle from = cosmos[from_id];
 
-	//for (const auto& id : from_rels.other_sub_entities)
-	//	add_sub_entity(cosmos.clone_entity(id));
-
-	for (const auto& id : from_rels.sub_entities_by_name) {
-		map_child_entity(id.first, cosmos.clone_entity(id.second));
-	}
+	for_each_component_type([&](auto dum) {
+		typedef decltype(dum) component_type;
+		
+		augs::introspect_recursive<
+			is_entity_id_type,
+			exclude_non_child_id_types
+		> (
+			[&](auto, auto& cloned_into_id, const auto& cloned_from_id) {
+				cloned_into_id = cosmos.clone_entity(cloned_from_id);
+			},
+			synchronizer_or_component(self.get<component_type>()),
+			synchronizer_or_component(from.get<component_type>())
+		);
+	});
 }
 
 template <class D>
@@ -135,8 +148,9 @@ const components::physical_relations& basic_relations_mixin<C, D>::get_physical_
 	
 	const auto& self = *static_cast<const D*>(this);
 
-	if (self.has<components::physical_relations>())
+	if (self.has<components::physical_relations>()) {
 		return self.get<components::physical_relations>();
+	}
 
 	return original;
 }

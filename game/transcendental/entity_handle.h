@@ -26,6 +26,14 @@
 #include "augs/build_settings/setting_empty_bases.h"
 #include "augs/build_settings/setting_entity_handle_has_debug_name_reference.h"
 
+template<class F>
+void for_each_component_type(F callback) {
+	for_each_in_tuple(
+		put_all_components_into_t<std::tuple>(), 
+		callback
+	);
+}
+
 class cosmos;
 class cosmic_delta;
 

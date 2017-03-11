@@ -107,6 +107,9 @@ struct put_all_components_into {
 	> type;
 };
 
+template<template<typename...> class List, class... prepend>
+using put_all_components_into_t = typename put_all_components_into<List, prepend...>::type;
+
 namespace std {
 	template<class...>
 	class tuple;
@@ -128,4 +131,4 @@ namespace augs {
 	class operations_on_all_components_mixin;
 }
 
-constexpr unsigned COMPONENTS_COUNT = put_all_components_into<type_count>::type::value;
+constexpr unsigned COMPONENTS_COUNT = put_all_components_into_t<type_count>::value;
