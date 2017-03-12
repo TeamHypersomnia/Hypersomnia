@@ -1,7 +1,6 @@
 #pragma once
 #include <type_traits>
 #include <xtr1common>
-#include <array>
 
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/is_traits.h"
@@ -12,17 +11,6 @@ struct exclude_no_type {
 };
 
 namespace augs {
-	template <class F, class ElemType, size_t count, class... MemberInstances>
-	void introspect_body(
-		const std::array<ElemType, count>* const,
-		F f,
-		MemberInstances&&... t
-	) {
-		for (size_t i = 0; i < count; ++i) {
-			f(std::to_string(i), t[i]...);
-		}
-	}
-
 	template <
 		class F, 
 		class Instance, 
@@ -63,15 +51,15 @@ namespace augs {
 			&& !exclude_type_predicate<MemberType>::value
 		>
 	> {
-		template <class F, class L, class... Args>
+		template <class F, class L, class... MemberInstances>
 		void operator()(
 			F callback,
 			const L& label,
-			Args&&... args
+			MemberInstances&&... member_instances
 		) {
 			callback(
 				label,
-				std::forward<Args>(args)...
+				std::forward<MemberInstances>(member_instances)...
 			);
 		}
 	};
@@ -92,11 +80,11 @@ namespace augs {
 			&& !exclude_type_predicate<MemberType>::value
 		>
 	> {
-		template <class F, class L, class... Args>
+		template <class F, class L, class... MemberInstances>
 		void operator()(
 			F callback,
 			const L& label,
-			Args&&... args
+			MemberInstances&&... member_instances
 		) {
 			static_assert(has_introspects_v<MemberType>, "Found a non-fundamental type without an introspector, on whom the callback is invalid.");
 
@@ -105,7 +93,7 @@ namespace augs {
 				exclude_type_predicate
 			>(
 				callback,
-				std::forward<Args>(args)...
+				std::forward<MemberInstances>(member_instances)...
 			);
 		}
 	};
@@ -127,10 +115,10 @@ namespace augs {
 			|| exclude_type_predicate<MemberType>::value
 		>
 	> {
-		template <class F, class... Args>
+		template <class F, class... MemberInstances>
 		void operator()(
 			F callback,
-			Args&&... args
+			MemberInstances&&... member_instances
 		) {
 
 		}
@@ -144,7 +132,7 @@ namespace augs {
 	>
 	void introspect_recursive(
 		F member_callback,
-		Instances&&... tn
+		Instances&&... introspected_instances
 	) {
 		introspect(
 			[&](
@@ -163,7 +151,7 @@ namespace augs {
 					std::forward<decltype(instances)>(instances)...
 				);
 			},
-			std::forward<Instances>(tn)...
+			std::forward<Instances>(introspected_instances)...
 		);
 	}
 }

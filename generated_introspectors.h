@@ -1,7 +1,23 @@
 #pragma once
+#include <array>
 #include "game/transcendental/entity_id.h"
 
 #define FIELD(x) f(#x, _t_.x...)
+
+/* Other introspectors that do not fit into the standard schema go here: */
+
+namespace augs {
+	template <class F, class ElemType, size_t count, class... Instances>
+	void introspect_body(
+		const std::array<ElemType, count>* const,
+		F f,
+		Instances&&... t
+	) {
+		for (size_t i = 0; i < count; ++i) {
+			f(std::to_string(i), t[i]...);
+		}
+	}
+}
 
 struct rgba;
 template <class T>
@@ -138,11 +154,11 @@ namespace resources {
 }
 
 namespace augs {
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const augs::sound_effect_modifier* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(repetitions);
 		FIELD(gain);
@@ -152,11 +168,11 @@ namespace augs {
 		FIELD(fade_on_exit);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const rgba* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(r);
 		FIELD(g);
@@ -164,22 +180,22 @@ namespace augs {
 		FIELD(a);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const augs::vertex* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(pos);
 		FIELD(texcoord);
 		FIELD(color);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const augs::font_glyph_metadata* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(adv);
 		FIELD(bear_x);
@@ -192,11 +208,11 @@ namespace augs {
 		FIELD(kerning);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const augs::font_metadata_from_file* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(ascender);
 		FIELD(descender);
@@ -207,21 +223,21 @@ namespace augs {
 		FIELD(unicode_to_glyph_index);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const augs::baked_font* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(meta_from_file);
 		FIELD(glyphs_in_atlas);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const augs::font_loading_input* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(path);
 		FIELD(characters);
@@ -229,11 +245,11 @@ namespace augs {
 		FIELD(pt);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const augs::paint_circle_midpoint_command* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(radius);
 		FIELD(border_width);
@@ -244,32 +260,32 @@ namespace augs {
 		FIELD(filling);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const augs::paint_circle_filled_command* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(radius);
 		FIELD(filling);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const augs::paint_line_command* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(from);
 		FIELD(to);
 		FIELD(filling);
 	}
 
-	template <class F, class T, class... MemberInstances>
+	template <class F, class T, class... Instances>
 	void introspect_body(
 		const ltrbt<T>* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(l);
 		FIELD(t);
@@ -277,11 +293,11 @@ namespace augs {
 		FIELD(b);
 	}
 
-	template <class F, class T, class... MemberInstances>
+	template <class F, class T, class... Instances>
 	void introspect_body(
 		const xywht<T>* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(x);
 		FIELD(y);
@@ -289,51 +305,51 @@ namespace augs {
 		FIELD(h);
 	}
 
-	template <class F, class type, class... MemberInstances>
+	template <class F, class type, class... Instances>
 	void introspect_body(
 		const vec2t<type>* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(x);
 		FIELD(y);
 	}
 
-	template <class F, class T, size_t const_count, class... MemberInstances>
+	template <class F, class T, size_t const_count, class... Instances>
 	void introspect_body(
 		const augs::constant_size_vector<T, const_count>* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(count);
 		FIELD(raw);
 	}
 
-	template <class F, class Enum, class T, class... MemberInstances>
+	template <class F, class Enum, class T, class... Instances>
 	void introspect_body(
 		const augs::enum_associative_array<Enum, T>* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(is_set);
 		FIELD(raw);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const augs::machine_entropy* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(local);
 		FIELD(remote);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const recoil_player* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(offsets);
 		FIELD(current_offset);
@@ -345,49 +361,49 @@ namespace augs {
 		FIELD(scale);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const augs::stepped_timestamp* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(step);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const augs::stepped_cooldown* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(when_last_fired);
 		FIELD(cooldown_duration_ms);
 	}
 
-	template <class F, class A, class B, class... MemberInstances>
+	template <class F, class A, class B, class... Instances>
 	void introspect_body(
 		const augs::trivial_pair<A, B>* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(first);
 		FIELD(second);
 	}
 
-	template <class F, class T, class... MemberInstances>
+	template <class F, class T, class... Instances>
 	void introspect_body(
 		const zeroed_pod<T>* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(pod);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::animation* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(current_animation);
 
@@ -400,20 +416,20 @@ namespace augs {
 		FIELD(paused_state);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::animation_response* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(response);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::attitude* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(maximum_divergence_angle_before_shooting);
 
@@ -432,40 +448,40 @@ namespace augs {
 		FIELD(last_seen_target_velocity);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const behaviour_tree_instance* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(state);
 		FIELD(tree_id);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::behaviour_tree* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(concurrent_trees);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const car_engine_entities* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(physical);
 		FIELD(particles);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::car* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(current_driver);
 
@@ -523,39 +539,39 @@ namespace augs {
 		FIELD(last_turned_off);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::catridge* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(shell);
 		FIELD(round);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::child* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(parent);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::container* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(slots);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::crosshair* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(orbit_mode);
 
@@ -573,11 +589,11 @@ namespace augs {
 		FIELD(sensitivity);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::damage* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(amount);
 
@@ -614,21 +630,21 @@ namespace augs {
 		FIELD(saved_point_of_impact_before_death);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::driver* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(owned_vehicle);
 		FIELD(density_multiplier_while_driving);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::dynamic_tree_node* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(always_visible);
 		FIELD(activated);
@@ -638,11 +654,11 @@ namespace augs {
 		FIELD(aabb);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const convex_partitioned_collider* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(shape);
 		FIELD(material);
@@ -659,11 +675,11 @@ namespace augs {
 		FIELD(sensor);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::fixtures* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(colliders);
 		FIELD(offsets_for_created_shapes);
@@ -674,20 +690,20 @@ namespace augs {
 		FIELD(can_driver_shoot_through);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::flags* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(bit_flags);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::force_joint* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(chased_entity);
 
@@ -705,30 +721,30 @@ namespace augs {
 		FIELD(force_offsets);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::grenade* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(spoon);
 		FIELD(type);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::guid* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(value);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::gun* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(shot_cooldown);
 		FIELD(action_mode);
@@ -765,21 +781,21 @@ namespace augs {
 		FIELD(muzzle_particles);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::interpolation* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(base_exponent);
 		FIELD(place_of_birth);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::item* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(current_mounting);
 		FIELD(intended_mounting);
@@ -800,21 +816,21 @@ namespace augs {
 		FIELD(montage_time_left_ms);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const item_slot_mounting_operation* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(current_item);
 		FIELD(intented_mounting_slot);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::item_slot_transfers* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(pickup_timeout);
 		FIELD(mounting);
@@ -823,32 +839,32 @@ namespace augs {
 		FIELD(pick_all_touched_items_if_list_to_pick_empty);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const light_value_variation* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(min_value);
 		FIELD(max_value);
 		FIELD(change_speed);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const light_attenuation* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(base_value);
 		FIELD(variation);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::light* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(color);
 
@@ -865,11 +881,11 @@ namespace augs {
 		FIELD(position_variations);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::melee* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(primary_move_flag);
 		FIELD(secondary_move_flag);
@@ -878,21 +894,21 @@ namespace augs {
 		FIELD(current_state);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const movement_subscribtion* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(target);
 		FIELD(stop_response_at_zero_speed);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::movement* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(response_receivers);
 		
@@ -920,11 +936,11 @@ namespace augs {
 		FIELD(max_speed_for_movement_response);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::name* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(id);
 
@@ -932,11 +948,11 @@ namespace augs {
 		FIELD(nickname);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const particles_effect_input* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(effect);
 		FIELD(delete_entity_after_effect_lifetime);
@@ -947,11 +963,11 @@ namespace augs {
 		FIELD(single_displacement_duration_ms);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::particles_existence* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(input);
 
@@ -965,31 +981,31 @@ namespace augs {
 		FIELD(distribute_within_segment_of_length);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::particle_effect_response* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(response);
 		FIELD(modifier);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::physical_relations* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(owner_body);
 		FIELD(fixture_entities);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::physics* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(fixed_rotation);
 		FIELD(bullet);
@@ -1010,11 +1026,11 @@ namespace augs {
 		FIELD(angular_velocity);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::polygon* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(center_neon_map);
 		FIELD(vertices);
@@ -1022,11 +1038,11 @@ namespace augs {
 
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::position_copying* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(target);
 
@@ -1048,11 +1064,11 @@ namespace augs {
 		FIELD(previous);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::processing* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(activated);
 
@@ -1060,11 +1076,11 @@ namespace augs {
 		FIELD(disabled_categories);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::render* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(screen_space_transform);
 		FIELD(draw_border);
@@ -1075,11 +1091,11 @@ namespace augs {
 		FIELD(last_step_when_visible);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::rotation_copying* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(target);
 		FIELD(stashed_target);
@@ -1098,11 +1114,11 @@ namespace augs {
 		FIELD(stashed_look_mode);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const sentience_meter* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(enabled);
 
@@ -1110,11 +1126,11 @@ namespace augs {
 		FIELD(maximum);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::sentience* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(time_of_last_received_damage);
 		FIELD(time_of_last_exertion);
@@ -1147,11 +1163,11 @@ namespace augs {
 		FIELD(character_crosshair);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const sound_effect_input* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(effect);
 		FIELD(delete_entity_after_effect_lifetime);
@@ -1160,11 +1176,11 @@ namespace augs {
 		FIELD(modifier);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::sound_existence* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(input);
 
@@ -1172,41 +1188,41 @@ namespace augs {
 		FIELD(max_lifetime_in_steps);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::sound_response* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(response);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const friction_connection* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(target);
 		FIELD(fixtures_connected);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::special_physics* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(dropped_collision_cooldown);
 		FIELD(owner_friction_ground);
 		FIELD(owner_friction_grounds);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::sprite* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(tex);
 		FIELD(color);
@@ -1224,29 +1240,29 @@ namespace augs {
 		FIELD(max_specular_blinks);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::substance* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(dummy);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::tile_layer_instance* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(id);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::trace* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(max_multiplier_x);
 		FIELD(max_multiplier_y);
@@ -1260,101 +1276,101 @@ namespace augs {
 		FIELD(is_it_finishing_trace);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::transform* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(pos);
 		FIELD(rotation);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::trigger_collision_detector* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(detection_intent_enabled);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::trigger* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(entity_to_be_notified);
 		FIELD(react_to_collision_detectors);
 		FIELD(react_to_query_detectors);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::trigger_query_detector* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(detection_intent_enabled);
 		FIELD(spam_trigger_requests_when_detection_intented);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const components::wandering_pixels* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(reach);
 		FIELD(face);
 		FIELD(count);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const convex_poly_destruction_scar* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(first_impact);
 		FIELD(depth_point);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const convex_poly_destruction_data* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(scars);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const convex_poly* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(vertices);
 
 		FIELD(destruction);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const convex_partitioned_shape* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(convex_polys);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const inventory_slot* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(category_allowed);
 
@@ -1379,31 +1395,31 @@ namespace augs {
 		FIELD(items_inside);
 	}
 
-	template <class F, class id_type, class... MemberInstances>
+	template <class F, class id_type, class... Instances>
 	void introspect_body(
 		const basic_inventory_slot_id<id_type>* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(type);
 		FIELD(container_entity);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const inventory_item_address* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(root_container);
 		FIELD(directions);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const inventory_traversal* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(parent_slot);
 		FIELD(current_address);
@@ -1411,57 +1427,57 @@ namespace augs {
 		FIELD(item_remains_physical);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const electric_shield_perk* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(timing);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const haste_perk* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(timing);
 		FIELD(is_greater);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const perk_timing* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(duration);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const spell_instance_data* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(cast_cooldown);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const resources::state_of_behaviour_tree_instance* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(previously_executed_leaf_id);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const resources::particle_effect_modifier* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(colorize);
 		FIELD(scale_amounts);
@@ -1469,11 +1485,11 @@ namespace augs {
 		FIELD(homing_target);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const resources::emission* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(spread_degrees);
 		FIELD(base_speed);
@@ -1514,22 +1530,22 @@ namespace augs {
 		FIELD(particle_templates);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const all_simulation_settings* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(visibility);
 		FIELD(pathfinding);
 		FIELD(si);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const pathfinding_settings* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(epsilon_distance_visible_point);
 		FIELD(epsilon_distance_the_same_vertex);
@@ -1538,21 +1554,21 @@ namespace augs {
 		FIELD(draw_undiscovered);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const si_scaling* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(to_meters_multiplier);
 		FIELD(to_pixels_multiplier);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const visibility_settings* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(draw_triangle_edges);
 		FIELD(draw_cast_rays);
@@ -1564,50 +1580,50 @@ namespace augs {
 		FIELD(epsilon_threshold_obstacle_hit);
 	}
 
-	template <class F, class key, class... MemberInstances>
+	template <class F, class key, class... Instances>
 	void introspect_body(
 		const basic_cosmic_entropy<key>* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(cast_spells);
 		FIELD(intents_per_entity);
 		FIELD(transfer_requests);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const guid_mapped_entropy* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
-		introspect_body(static_cast<basic_cosmic_entropy<entity_guid>*>(nullptr), f, std::forward<MemberInstances>(_t_)...);
+		introspect_body(static_cast<basic_cosmic_entropy<entity_guid>*>(nullptr), f, std::forward<Instances>(_t_)...);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const cosmic_entropy* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
-		introspect_body(static_cast<basic_cosmic_entropy<entity_id>*>(nullptr), f, std::forward<MemberInstances>(_t_)...);
+		introspect_body(static_cast<basic_cosmic_entropy<entity_id>*>(nullptr), f, std::forward<Instances>(_t_)...);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const cosmos_flyweights_state* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(spells);
 		FIELD(collision_sound_matrix);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const cosmos_metadata* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 
 		FIELD(delta);
@@ -1621,11 +1637,11 @@ namespace augs {
 		FIELD(flyweights);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const cosmos_significant_state* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(meta);
 
@@ -1633,11 +1649,11 @@ namespace augs {
 		FIELD(pools_for_components);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const hotbar_settings* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(hotbar_increase_inside_alpha_when_selected);
 		FIELD(hotbar_colorize_inside_when_selected);
@@ -1646,11 +1662,11 @@ namespace augs {
 		FIELD(hotbar_secondary_selected_color);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const config_lua_table* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(launch_mode);
 		FIELD(input_recording_mode);
@@ -1716,11 +1732,11 @@ namespace augs {
 		FIELD(latest_news_url);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const neon_map_stamp* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(standard_deviation);
 		FIELD(radius_towards_x_axis);
@@ -1732,30 +1748,30 @@ namespace augs {
 		FIELD(light_colors);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const scripted_image_stamp* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(commands);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const texture_atlas_stamp* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(image_stamps);
 		FIELD(font_stamps);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const texture_atlas_metadata* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(atlas_image_size);
 
@@ -1763,41 +1779,41 @@ namespace augs {
 		FIELD(fonts);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const b2Vec2* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(x);
 		FIELD(y);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const b2Rot* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(s);
 		FIELD(c);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const b2Transform* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(p);
 		FIELD(q);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const b2Sweep* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(localCenter);
 		FIELD(c0);
@@ -1807,11 +1823,11 @@ namespace augs {
 		FIELD(alpha0);
 	}
 
-	template <class F, class... MemberInstances>
+	template <class F, class... Instances>
 	void introspect_body(
 		const b2Filter* const,
 		F f,
-		MemberInstances&&... _t_
+		Instances&&... _t_
 	) {
 		FIELD(categoryBits);
 		FIELD(maskBits);
