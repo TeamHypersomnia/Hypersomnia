@@ -66,7 +66,7 @@ namespace augs {
 		}
 
 		decltype(auto) end() {
-			return container.begin();
+			return container.end();
 		}
 
 		decltype(auto) begin() const {
@@ -74,7 +74,7 @@ namespace augs {
 		}
 
 		decltype(auto) end() const {
-			return container.begin();
+			return container.end();
 		}
 
 		decltype(auto) size() const {
