@@ -43,7 +43,7 @@ void regenerate_polygonizations_of_images(
 		const auto polygonization_stamp_path = fs::path(polygonization_target_path).replace_extension(".stamp").string();
 
 		augs::stream new_stamp_stream;
-		augs::write_object(new_stamp_stream, new_stamp);
+		augs::write(new_stamp_stream, new_stamp);
 
 		bool should_regenerate = force_regenerate;
 

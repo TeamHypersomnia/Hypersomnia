@@ -14,11 +14,32 @@ namespace augs {
 		;
 	};
 
-	template<class A, class T>
-	void verify_byte_io_safety() {
-		static_assert(is_memcpy_safe_v<T>, "Attempt to serialize a non-trivially copyable type");
-		static_assert(is_native_binary_stream<A>::value, "Byte serialization of trivial structs allowed only on native binary archives");
-	}
+	template <class A, class T, class = void>
+	struct has_io_overloads {
+		static constexpr bool value = false;
+	};
+
+	template <class A, class T>
+	struct has_io_overloads <
+		A,
+		T,
+		decltype(
+			augs::read_object(
+				std::declval<A>(),
+				std::declval<T>()
+			),
+			augs::write_object(
+				std::declval<A>(),
+				std::declval<const T>()
+			),
+			void()
+		)
+	> {
+		static constexpr bool value = true;
+	};
+
+	template <class A, class T>
+	constexpr bool has_io_overloads_v = has_io_overloads<A, T>::value;
 
 	template<class A, class T>
 	struct is_byte_io_safe {
@@ -29,126 +50,162 @@ namespace augs {
 	constexpr bool is_byte_io_safe_v = is_byte_io_safe<A, T>::value;
 
 	template<class A, class T>
+	struct is_byte_io_appropriate {
+		static constexpr bool value = is_byte_io_safe_v<A, T> && !has_io_overloads_v<A, T>;
+	};
+
+	template<class A, class T>
+	constexpr bool is_byte_io_appropriate_v = is_byte_io_appropriate<A, T>::value;
+
+	template<class A, class T>
+	void verify_byte_io_safety() {
+		static_assert(is_memcpy_safe_v<T>, "Attempt to serialize a non-trivially copyable type");
+		static_assert(is_native_binary_stream<A>::value, "Byte serialization of trivial structs allowed only on native binary archives");
+	}
+
+	template<class A, class T>
 	void read_bytes(
 		A& ar, 
 		T* const location, 
-		const size_t count,
-		const std::enable_if_t<is_byte_io_safe_v<A, T>>* const dummy = nullptr
+		const size_t object_count
 	) {
-		ar.read(reinterpret_cast<char*>(location), count * sizeof(T));
+		verify_byte_io_safety<A, T>();
+		ar.read(reinterpret_cast<char*>(location), object_count * sizeof(T));
 	}
 
 	template<class A, class T>
 	void write_bytes(
 		A& ar, 
 		const T* const location, 
-		const size_t count,
-		const std::enable_if_t<is_byte_io_safe_v<A, T>>* const dummy = nullptr
+		const size_t object_count
 	) {
-		ar.write(reinterpret_cast<const char*>(location), count * sizeof(T));
+		verify_byte_io_safety<A, T>();
+		ar.write(reinterpret_cast<const char*>(location), object_count * sizeof(T));
 	}
 
 	template<class A, class T>
-	void read_object(
+	void read(
 		A& ar,
 		T& storage,
-		const std::enable_if_t<is_byte_io_safe_v<A, T>>* const dummy = nullptr
+		const std::enable_if_t<has_io_overloads_v<A, T>>* const dummy = nullptr
+	) {
+		read_object(ar, storage);
+	}
+
+	template<class A, class T>
+	void write(
+		A& ar,
+		const T& storage,
+		const std::enable_if_t<has_io_overloads_v<A, T>>* const dummy = nullptr
+	) {
+		write_object(ar, storage);
+	}
+
+	template<class A, class T>
+	void read(
+		A& ar,
+		T& storage,
+		const std::enable_if_t<is_byte_io_appropriate_v<A, T>>* const dummy = nullptr
 	) {
 		read_bytes(ar, &storage, 1);
 	}
 
 	template<class A, class T>
-	void write_object(
+	void write(
 		A& ar,
 		const T& storage,
-		const std::enable_if_t<is_byte_io_safe_v<A, T>>* const dummy = nullptr
+		const std::enable_if_t<is_byte_io_appropriate_v<A, T>>* const dummy = nullptr
 	) {
 		write_bytes(ar, &storage, 1);
 	}
 
 	template<class A, class T>
-	void read_object(
+	void read(
 		A& ar,
 		T& storage,
-		const std::enable_if_t<!is_byte_io_safe_v<A, T> && has_introspects_v<T>>* const dummy = nullptr
+		const std::enable_if_t<!has_io_overloads_v<A, T> && !is_byte_io_safe_v<A, T>>* const dummy = nullptr
 	) {
+		static_assert(has_introspects_v<T>, "Attempt to read a type in a non-bytesafe context without i/o overloads and without introspectors!");
+
 		augs::introspect(
 			[&](auto, auto& member) {
-				read_object(ar, member);
-			},
-			storage,
-		);
-	}
-
-	template<class A, class T>
-	void write_object(
-		A& ar,
-		const T& storage,
-		const std::enable_if_t<!is_byte_io_safe_v<A, T> && has_introspects_v<T>>* const dummy = nullptr
-	) {
-		augs::introspect(
-			[&](auto, const auto& member) {
-				write_object(ar, member);
+				read(ar, member);
 			},
 			storage
 		);
 	}
 
 	template<class A, class T>
-	void read_objects(
+	void write(
 		A& ar,
-		T* storage,
-		const size_t count,
-		const std::enable_if_t<is_byte_io_safe_v<A, T>>* const dummy = nullptr
+		const T& storage,
+		const std::enable_if_t<!has_io_overloads_v<A, T> && !is_byte_io_safe_v<A, T>>* const dummy = nullptr
 	) {
-		read_bytes(ar, storage, count);
+		static_assert(has_introspects_v<T>, "Attempt to write a type in a non-bytesafe context without i/o overloads and without introspectors!");
+
+		augs::introspect(
+			[&](auto, const auto& member) {
+				write(ar, member);
+			},
+			storage
+		);
 	}
 
 	template<class A, class T>
-	void write_objects(
+	void read_n(
 		A& ar,
-		const T* storage,
-		const size_t count,
-		const std::enable_if_t<is_byte_io_safe_v<A, T>>* const dummy = nullptr
+		T* const storage,
+		const size_t n,
+		const std::enable_if_t<is_byte_io_appropriate_v<A, T>>* const dummy = nullptr
 	) {
-		write_bytes(ar, storage, count);
+		read_bytes(ar, storage, n);
 	}
 
 	template<class A, class T>
-	void read_objects(
+	void write_n(
 		A& ar,
-		T* storage,
-		const size_t count,
-		const std::enable_if_t<!is_byte_io_safe_v<A, T>>* const dummy = nullptr
+		const T* const storage,
+		const size_t n,
+		const std::enable_if_t<is_byte_io_appropriate_v<A, T>>* const dummy = nullptr
 	) {
-		for (size_t i = 0; i < count; ++i) {
-			read_object(ar, storage[i]);
+		write_bytes(ar, storage, n);
+	}
+
+	template<class A, class T>
+	void read_n(
+		A& ar,
+		T* const storage,
+		const size_t n,
+		const std::enable_if_t<!is_byte_io_appropriate_v<A, T>>* const dummy = nullptr
+	) {
+		for (size_t i = 0; i < n; ++i) {
+			read(ar, storage[i]);
 		}
 	}
 
 	template<class A, class T>
-	void write_objects(
+	void write_n(
 		A& ar,
-		const T* storage,
-		const size_t count,
-		const std::enable_if_t<!is_byte_io_safe_v<A, T>>* const dummy = nullptr
+		const T* const storage,
+		const size_t n,
+		const std::enable_if_t<!is_byte_io_appropriate_v<A, T>>* const dummy = nullptr
 	) {
-		for (size_t i = 0; i < count; ++i) {
-			write_object(ar, storage[i]);
+		for (size_t i = 0; i < n; ++i) {
+			write(ar, storage[i]);
 		}
 	}
-
-	template<class A, class T, class vector_size_type = size_t>
+	
+	template <class A, class T, class vector_size_type = size_t>
 	void read_object(
 		A& ar, 
 		std::vector<T>& storage, 
 		vector_size_type = vector_size_type()
 	) {
 		vector_size_type s;
-		read_object(ar, s);
+		read(ar, s);
 
 		storage.resize(s);
-		write_objects(ar, storage.data(), storage.size());
+		write_n(ar, storage.data(), storage.size());
 	}
 
 	template<class A, class T, class vector_size_type = size_t>
@@ -159,8 +216,8 @@ namespace augs {
 	) {
 		ensure(storage.size() <= std::numeric_limits<vector_size_type>::max());
 
-		write_object(ar, static_cast<vector_size_type>(storage.size()));
-		write_objects(ar, storage.data(), storage.size());
+		write(ar, static_cast<vector_size_type>(storage.size()));
+		write_n(ar, storage.data(), storage.size());
 	}
 
 	template <class T>
@@ -181,15 +238,15 @@ namespace augs {
 	) {
 		map_size_type s;
 
-		read_object(ar, s);
+		read(ar, s);
 
 		reserve_num_elements(storage, s);
 
 		while (s--) {
 			Key key;
 
-			augs::read_object(ar, key);
-			augs::read_object(ar, storage[key]);
+			read(ar, key);
+			read(ar, storage[key]);
 		}
 	}
 
@@ -201,11 +258,11 @@ namespace augs {
 	) {
 		ensure(storage.size() <= std::numeric_limits<map_size_type>::max());
 
-		write_object(ar, static_cast<map_size_type>(storage.size()));
+		write(ar, static_cast<map_size_type>(storage.size()));
 
 		for (const auto& obj : storage) {
-			write_object(ar, obj.first);
-			write_object(ar, obj.second);
+			write(ar, obj.first);
+			write(ar, obj.second);
 		}
 	}
 
@@ -249,19 +306,19 @@ namespace augs {
 	void read_object(A& ar, std::basic_string<string_element_type>& storage, string_size_type = string_size_type()) {
 		string_size_type s;
 
-		read_object(ar, s);
+		read(ar, s);
 
 		storage.resize(s);
 
-		return read_bytes(ar, &storage[0], storage.size());
+		read_n(ar, &storage[0], storage.size());
 	}
 
 	template<class A, class string_element_type, class string_size_type = size_t>
 	void write_object(A& ar, const std::basic_string<string_element_type>& storage, string_size_type = string_size_type()) {
 		ensure(storage.size() <= std::numeric_limits<string_size_type>::max());
 
-		write_object(ar, static_cast<string_size_type>(storage.size()));
-		write_bytes(ar, storage.data(), storage.size());
+		write(ar, static_cast<string_size_type>(storage.size()));
+		write_n(ar, &storage[0], storage.size());
 	}
 
 	template<class A, class T, class...>
@@ -269,34 +326,44 @@ namespace augs {
 		size_t c;
 		size_t s;
 
-		read_object(ar, c);
-		read_object(ar, s);
+		read(ar, c);
+		read(ar, s);
 
 		storage.reserve(c);
 		storage.resize(s);
 
-		read_bytes(ar, storage.data(), storage.size());
+		read_n(ar, storage.data(), storage.size());
 	}
 
 	template<class A, class T>
 	void write_with_capacity(A& ar, const std::vector<T>& storage) {
-		write_object(ar, storage.capacity());
-		write_object(ar, storage.size());
+		write(ar, storage.capacity());
+		write(ar, storage.size());
 
-		write_bytes(ar, storage.data(), storage.size());
+		write_n(ar, storage.data(), storage.size());
 	}
 
 	template<class A, class T, class... Args>
 	void read_object(A& ar, std::tuple<T, Args...>& storage) {
 		for_each_in_tuple(storage, [&](auto& element) {
-			read_object(ar, element);
+			read(ar, element);
 		});
+	}
+
+	template<class A, class T, size_t N>
+	void read_object(A& ar, std::array<T, N>& storage) {
+		read_n(ar, storage.data(), storage.size());
+	}
+
+	template<class A, class T, size_t N>
+	void write_object(A& ar, const std::array<T, N>& storage) {
+		write_n(ar, storage.data(), storage.size());
 	}
 
 	template<class A, class T, class... Args>
 	void write_object(A& ar, const std::tuple<T, Args...>& storage) {
 		for_each_in_tuple(storage, [&](const auto& element) {
-			write_object(ar, element);
+			write(ar, element);
 		});
 	}
 
@@ -304,8 +371,8 @@ namespace augs {
 	void read_flags(A& ar, std::array<bool, count>& storage) {
 		static_assert(count > 0, "Can't read a null array");
 
-		char compressed_storage[(count - 1) / 8 + 1];
-		read_bytes(ar, compressed_storage, sizeof(compressed_storage));
+		std::array<char, (count - 1) / 8 + 1> compressed_storage;
+		read(ar, compressed_storage);
 
 		for (size_t bit = 0; bit < count; ++bit) {
 			storage[bit] = (compressed_storage[bit / 8] >> (bit % 8)) & 1;
@@ -316,8 +383,8 @@ namespace augs {
 	void write_flags(A& ar, const std::array<bool, count>& storage) {
 		static_assert(count > 0, "Can't write a null array");
 
-		char compressed_storage[(count - 1) / 8 + 1];
-		std::memset(compressed_storage, 0, sizeof(compressed_storage));
+		std::array<char, (count - 1) / 8 + 1> compressed_storage;
+		std::fill(compressed_storage.begin(), compressed_storage.end(), 0);
 
 		for (size_t bit = 0; bit < count; ++bit) {
 			if (storage[bit]) {
@@ -325,6 +392,6 @@ namespace augs {
 			}
 		}
 
-		write_bytes(ar, compressed_storage, sizeof(compressed_storage));
+		write(ar, compressed_storage);
 	}
 }

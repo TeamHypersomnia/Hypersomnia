@@ -5,7 +5,7 @@ TEST(NetChannelWrapper, SingleTransmissionDeleteAllPending) {
 	augs::stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
-		augs::write_object(msg[i], int(i));
+		augs::write(msg[i], int(i));
 		
 	}
 
@@ -46,7 +46,7 @@ TEST(NetChannelWrapper, PastAcknowledgementDeletesSeveralPending) {
 	augs::stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
-		augs::write_object(msg[i], int(i));
+		augs::write(msg[i], int(i));
 		
 	}
 
@@ -91,7 +91,7 @@ TEST(NetChannelWrapper, FlagForDeletionAndAck) {
 	augs::stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
-		augs::write_object(msg[i], int(i));
+		augs::write(msg[i], int(i));
 		
 	}
 
@@ -128,10 +128,10 @@ TEST(NetChannelWrapper, FlagForDeletionAndAck) {
 
 	b.handle_incoming_packet(sender_packets[0]);
 	int table[4];
-	augs::read_object(sender_packets[0], table[0]);
-	augs::read_object(sender_packets[0], table[1]);
-	augs::read_object(sender_packets[0], table[2]);
-	augs::read_object(sender_packets[0], table[3]);
+	augs::read(sender_packets[0], table[0]);
+	augs::read(sender_packets[0], table[1]);
+	augs::read(sender_packets[0], table[2]);
+	augs::read(sender_packets[0], table[3]);
 
 	//EXPECT_EQ(0, table[0]);
 	//EXPECT_EQ(1, table[1]);

@@ -33,7 +33,7 @@ void regenerate_desaturations(
 		const auto desaturation_stamp_path = desaturations_directory + source_path.filename().replace_extension(".stamp").string();
 
 		augs::stream new_stamp_stream;
-		augs::write_object(new_stamp_stream, new_stamp);
+		augs::write(new_stamp_stream, new_stamp);
 
 		bool should_regenerate = force_regenerate;
 

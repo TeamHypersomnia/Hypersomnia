@@ -75,12 +75,12 @@ bool write_delta(
 	const bool has_changed = dt.changed_bytes.size() > 0;
 
 	if (write_changed_bit) {
-		augs::write_object(out, has_changed);
+		augs::write(out, has_changed);
 	}
 
 	if (has_changed) {
-		augs::write_object(out, dt.changed_bytes, unsigned short());
-		augs::write_object(out, dt.changed_offsets, unsigned short());
+		augs::write(out, dt.changed_bytes, unsigned short());
+		augs::write(out, dt.changed_offsets, unsigned short());
 	}
 
 	return has_changed;
@@ -97,12 +97,12 @@ void read_delta(
 	bool has_changed = true;
 
 	if (read_changed_bit) {
-		augs::read_object(in, has_changed);
+		augs::read(in, has_changed);
 	}
 
 	if (has_changed) {
-		augs::read_object(in, dt.changed_bytes, unsigned short());
-		augs::read_object(in, dt.changed_offsets, unsigned short());
+		augs::read(in, dt.changed_bytes, unsigned short());
+		augs::read(in, dt.changed_offsets, unsigned short());
 
 		augs::delta_decode(deco, dt);
 	}
@@ -211,22 +211,22 @@ bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 
 		if (is_new) {
 #if COSMOS_TRACKS_GUIDS
-			augs::write_object(dt.stream_of_new_guids, stream_written_id);
+			augs::write(dt.stream_of_new_guids, stream_written_id);
 #else
 			// otherwise new entity_id assignment needs be deterministic
 #endif
 
 			augs::write_flags(dt.stream_for_new, overridden_components);
-			augs::write_object(dt.stream_for_new, new_content);
+			augs::write(dt.stream_for_new, new_content);
 
 			++dt.new_entities;
 		}
 		else if (entity_changed) {
-			augs::write_object(dt.stream_for_changed, stream_written_id);
+			augs::write(dt.stream_for_changed, stream_written_id);
 
 			augs::write_flags(dt.stream_for_changed, overridden_components);
 			augs::write_flags(dt.stream_for_changed, removed_components);
-			augs::write_object(dt.stream_for_changed, new_content);
+			augs::write(dt.stream_for_changed, new_content);
 
 			++dt.changed_entities;
 		}
@@ -246,7 +246,7 @@ bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 
 		if (is_dead) {
 			++dt.removed_entities;
-			augs::write_object(dt.stream_for_removed, stream_written_id);
+			augs::write(dt.stream_for_removed, stream_written_id);
 		}
 	});
 
@@ -257,21 +257,21 @@ bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 	const bool has_anything_changed = meta_changed || dt.new_entities || dt.changed_entities || dt.removed_entities;
 
 	if (has_anything_changed) {
-		augs::write_object(out, true);
+		augs::write(out, true);
 
-		augs::write_object(out, new_meta_content);
+		augs::write(out, new_meta_content);
 
-		augs::write_object(out, dt.new_entities);
-		augs::write_object(out, dt.changed_entities);
-		augs::write_object(out, dt.removed_entities);
+		augs::write(out, dt.new_entities);
+		augs::write(out, dt.changed_entities);
+		augs::write(out, dt.removed_entities);
 
-		augs::write_object(out, dt.stream_of_new_guids);
-		augs::write_object(out, dt.stream_for_new);
-		augs::write_object(out, dt.stream_for_changed);
-		augs::write_object(out, dt.stream_for_removed);
+		augs::write(out, dt.stream_of_new_guids);
+		augs::write(out, dt.stream_for_new);
+		augs::write(out, dt.stream_for_changed);
+		augs::write(out, dt.stream_for_removed);
 	}
 	else {
-		augs::write_object(out, false);
+		augs::write(out, false);
 	}
 
 	enco.profiler.delta_encoding.end_measurement();
@@ -288,7 +288,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 
 	bool has_anything_changed = false;
 
-	augs::read_object(in, has_anything_changed);
+	augs::read(in, has_anything_changed);
 
 	if (in.failed()) {
 		return;
@@ -306,9 +306,9 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 
 	delted_entity_stream dt;
 
-	augs::read_object(in, dt.new_entities);
-	augs::read_object(in, dt.changed_entities);
-	augs::read_object(in, dt.removed_entities);
+	augs::read(in, dt.new_entities);
+	augs::read(in, dt.changed_entities);
+	augs::read(in, dt.removed_entities);
 
 	size_t new_guids = dt.new_entities;
 	std::vector<entity_handle> new_entities;
@@ -317,7 +317,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 #if COSMOS_TRACKS_GUIDS
 		entity_guid new_guid;
 
-		augs::read_object(in, new_guid);
+		augs::read(in, new_guid);
 		
 		if (in.failed()) {
 			return;
@@ -364,7 +364,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 	while (dt.changed_entities--) {
 		entity_guid guid_of_changed;
 		
-		augs::read_object(in, guid_of_changed);
+		augs::read(in, guid_of_changed);
 		
 		if (in.failed()) {
 			return;
@@ -426,7 +426,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 #if COSMOS_TRACKS_GUIDS
 		entity_guid guid_of_destroyed;
 
-		augs::read_object(in, guid_of_destroyed);
+		augs::read(in, guid_of_destroyed);
 		
 		if(in.failed()) {
 			return;

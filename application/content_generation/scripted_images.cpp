@@ -73,7 +73,7 @@ void regenerate_scripted_images(
 
 		augs::stream new_stamp_stream;
 
-		augs::write_object(new_stamp_stream, new_stamp);
+		augs::write(new_stamp_stream, new_stamp);
 
 		bool should_regenerate = force_regenerate;
 		

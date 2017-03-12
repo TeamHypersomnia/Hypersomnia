@@ -20,25 +20,21 @@ bool operator!=(const std::vector<key_and_mouse_intent>& a, const std::vector<ke
 namespace augs {
 	template<class A>
 	void read_object(A& ar, key_and_mouse_intent& intent) {
-		if (!read_object(ar, intent.intent)) return false;
-		if (!read_object(ar, intent.is_pressed)) return false;
+		read(ar, intent.intent);
+		read(ar, intent.is_pressed);
 
 		if (intent.uses_mouse_motion()) {
-			if (!read_object(ar, intent.mouse_rel)) {
-				return false;
-			}
+			read(ar, intent.mouse_rel);
 		}
-
-		return true;
 	}
 
 	template<class A>
 	void write_object(A& ar, const key_and_mouse_intent& intent) {
-		write_object(ar, intent.intent);
-		write_object(ar, intent.is_pressed);
+		write(ar, intent.intent);
+		write(ar, intent.is_pressed);
 
 		if (intent.uses_mouse_motion()) {
-			write_object(ar, intent.mouse_rel);
+			write(ar, intent.mouse_rel);
 		}
 	}
 }

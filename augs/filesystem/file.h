@@ -51,8 +51,8 @@ namespace augs {
 			typename ContainerType::key_type key;
 			typename ContainerType::mapped_type value;
 
-			augs::read_object(source, key);
-			augs::read_object(source, value);
+			augs::read(source, key);
+			augs::read(source, value);
 
 			into.emplace(std::move(key), std::move(value));
 		}

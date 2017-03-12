@@ -260,12 +260,12 @@ namespace augs {
 		
 		template <class Archive>
 		void write_object(Archive& ar) const {
-			augs::write_object(ar, static_cast<const pool_base<T>&>(*this));
+			augs::write(ar, static_cast<const pool_base<T>&>(*this));
 		}
 
 		template <class Archive>
 		void read_object(Archive& ar) {
-			augs::read_object(ar, static_cast<pool_base<T>&>(*this));
+			augs::read(ar, static_cast<pool_base<T>&>(*this));
 		}
 	};
 
@@ -278,13 +278,13 @@ namespace augs {
 	public:
 		template <class Archive>
 		void write_object(Archive& ar) const {
-			augs::write_object(ar, static_cast<const pool_base<T>&>(*this));
+			augs::write(ar, static_cast<const pool_base<T>&>(*this));
 			augs::write_with_capacity(ar, metas);
 		}
 
 		template <class Archive>
 		void read_object(Archive& ar) {
-			augs::read_object(ar, static_cast<pool_base<T>&>(*this));
+			augs::read(ar, static_cast<pool_base<T>&>(*this));
 			augs::read_with_capacity(ar, metas);
 		}
 

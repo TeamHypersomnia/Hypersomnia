@@ -16,7 +16,7 @@ void cosmos::save_to_file(const std::string& filename) {
 		profiler.size_calculation_pass.new_measurement();
 		augs::output_stream_reserver reserver;
 
-		augs::write_object(reserver, significant);
+		augs::write(reserver, significant);
 		
 		profiler.size_calculation_pass.end_measurement();
 		profiler.memory_allocation_pass.new_measurement();
@@ -30,7 +30,7 @@ void cosmos::save_to_file(const std::string& filename) {
 
 	profiler.serialization_pass.new_measurement();
 
-	augs::write_object(reserved_memory, significant);
+	augs::write(reserved_memory, significant);
 
 	profiler.serialization_pass.end_measurement();
 	profiler.writing_savefile.new_measurement();
@@ -60,7 +60,7 @@ bool cosmos::load_from_file(const std::string& filename) {
 
 		profiler.deserialization_pass.new_measurement();
 
-		augs::read_object(stream, significant);
+		augs::read(stream, significant);
 
 		profiler.deserialization_pass.end_measurement();
 
@@ -80,14 +80,14 @@ bool cosmos_significant_state::operator==(const cosmos_significant_state& second
 	auto& r1 = this_serialized_reserver;
 	auto& r2 = second_serialized_reserver;
 
-	augs::write_object(r1, *this);
-	augs::write_object(r2, second);
+	augs::write(r1, *this);
+	augs::write(r2, second);
 	
 	auto this_serialized = r1.make_stream();
 	auto second_serialized = r2.make_stream();
 
-	augs::write_object(this_serialized, *this);
-	augs::write_object(second_serialized, second);
+	augs::write(this_serialized, *this);
+	augs::write(second_serialized, second);
 
 	//size_t mismatch_byte = 0;
 	//bool found_mismatch = false;
@@ -102,7 +102,7 @@ bool cosmos_significant_state::operator==(const cosmos_significant_state& second
 	//}
 	
 	//cosmos_significant_state resultant;
-	//augs::read_object(second_serialized, resultant);
+	//augs::read(second_serialized, resultant);
 
 	//if(found_mismatch)
 	//	LOG("C1: %x\nC2: %x, mismatch: %x", this_serialized.to_string(), second_serialized.to_string(), mismatch_byte);

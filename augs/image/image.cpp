@@ -204,7 +204,8 @@ namespace augs {
 	bool image::from_binary_file(const std::string& filename) {
 		std::ifstream in(filename, std::ios::in | std::ios::binary);
 
-		return augs::read_object(in, size) && augs::read_object(in, v);
+		augs::read(in, size);
+		augs::read(in, v);
 	}
 
 	bool image::from_file(
@@ -243,8 +244,8 @@ namespace augs {
 		augs::create_directories(filename);
 
 		std::ofstream out(filename, std::ios::out | std::ios::binary);
-		augs::write_object(out, size);
-		augs::write_object(out, v);
+		augs::write(out, size);
+		augs::write(out, v);
 	}
 
 	void image::fill(const rgba col) {

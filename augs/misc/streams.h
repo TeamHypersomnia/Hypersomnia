@@ -76,18 +76,18 @@ namespace augs {
 
 		template <class Archive>
 		void write_with_properties(Archive& ar) const {
-			augs::write_object(ar, buf);
-			augs::write_object(ar, has_read_failed);
-			augs::write_object(ar, write_pos);
-			augs::write_object(ar, read_pos);
+			augs::write(ar, buf);
+			augs::write(ar, has_read_failed);
+			augs::write(ar, write_pos);
+			augs::write(ar, read_pos);
 		}
 
 		template <class Archive>
 		void read_with_properties(Archive& ar) {
-			augs::read_object(ar, buf);
-			augs::read_object(ar, has_read_failed);
-			augs::read_object(ar, write_pos);
-			augs::read_object(ar, read_pos);
+			augs::read(ar, buf);
+			augs::read(ar, has_read_failed);
+			augs::read(ar, write_pos);
+			augs::read(ar, read_pos);
 		}
 
 		void read(char* const data, const size_t bytes);
@@ -107,6 +107,11 @@ namespace augs {
 
 namespace augs {
 	template<class... Args>
+	void read_object(augs::stream& ar, augs::stream& storage) {
+		static_assert(false, "Reading a stream from a stream is ill-formed.");
+	}
+
+	template<class... Args>
 	void write_object(augs::stream& ar, const augs::stream& storage) {
 		ar.write(storage);
 	}
@@ -117,21 +122,19 @@ namespace augs {
 	}
 
 	template<class A, class... Args>
-	auto read_stream_with_properties(A& ar, augs::stream& storage, Args... args) {
-		return storage.read_with_properties(ar);
+	void read_stream_with_properties(A& ar, augs::stream& storage, Args... args) {
+		storage.read_with_properties(ar);
 	}
 
 	template<class A, class... Args>
 	void write_sized_stream(A& ar, const augs::stream& storage, Args... args) {
 		ensure(storage.get_read_pos() == 0);
-		write_object(ar, storage.buf);
+		write(ar, storage.buf);
 	}
 
 	template<class A, class... Args>
-	auto read_sized_stream(A& ar, augs::stream& storage, Args... args) {
-		auto result = read_object(ar, storage.buf);
+	void read_sized_stream(A& ar, augs::stream& storage, Args... args) {
+		read(ar, storage.buf);
 		storage.set_write_pos(storage.buf.size());
-
-		return result;
 	}
 }

@@ -49,7 +49,7 @@ void regenerate_buttons_with_corners(
 		const auto button_with_corners_stamp_path = buttons_with_corners_directory + target_stem + ".stamp";
 
 		augs::stream new_stamp_stream;
-		augs::write_object(new_stamp_stream, new_stamp);
+		augs::write(new_stamp_stream, new_stamp);
 
 		bool should_regenerate = force_regenerate;
 

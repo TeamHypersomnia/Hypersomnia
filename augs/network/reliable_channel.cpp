@@ -44,19 +44,19 @@ namespace augs {
 
 			for (auto& msg : reliable_buf) {
 				reliable_bs;//name_property("reliable message");
-				augs::write_object(reliable_bs, msg);
+				augs::write(reliable_bs, msg);
 			}
 
 			if (reliable_bs.size() > 0) {
 				output;//name_property("has_reliable");
-				augs::write_object(output, bool(1));
+				augs::write(output, bool(1));
 				output;//name_property("sequence");
-				augs::write_object(output, ++sequence);
+				augs::write(output, ++sequence);
 				output;//name_property("most_recent_acked_sequence");
-				augs::write_object(output, most_recent_acked_sequence);
+				augs::write(output, most_recent_acked_sequence);
 
 				output;//name_property("first_message");
-				augs::write_object(output, first_message);
+				augs::write(output, first_message);
 				output;//name_property("last_message");
 				
 				//if (last_message - first_message > std::numeric_limits<unsigned char>::max()) {
@@ -65,17 +65,17 @@ namespace augs {
 				//}
 
 				unsigned short msg_count = last_message - first_message;
-				augs::write_object(output, msg_count);
+				augs::write(output, msg_count);
 
 				sequence_to_reliable_range[sequence] = last_message;
 			}
 			else {
 				output;//name_property("has_reliable");
-				augs::write_object(output, bool(0));
+				augs::write(output, bool(0));
 			}
 
 			output;//name_property("reliable_buffer");
-			augs::write_object(output, reliable_bs);
+			augs::write(output, reliable_bs);
 		}
 
 		bool reliable_sender::read_ack(augs::stream& input) {
@@ -83,7 +83,7 @@ namespace augs {
 
 			input;//name_property("reliable_ack");
 			
-			augs::read_object(input, reliable_ack);
+			augs::read(input, reliable_ack);
 			
 			if (input.failed()) {
 				return false;
@@ -130,7 +130,7 @@ namespace augs {
 			result_data res;
 
 			input;//name_property("has_reliable");
-			augs::read_object(input, has_reliable);
+			augs::read(input, has_reliable);
 
 			if (input.failed()) {
 				return res;
@@ -139,14 +139,14 @@ namespace augs {
 			/* reliable + maybe unreliable */
 			if (has_reliable) {
 				input;//name_property("sequence");
-				augs::read_object(input, received_sequence);
+				augs::read(input, received_sequence);
 				input;//name_property("most_recent_acked_sequence");
-				augs::read_object(input, update_from_sequence);
+				augs::read(input, update_from_sequence);
 
 				input;//name_property("first_message");
-				augs::read_object(input, received_first_message);
+				augs::read(input, received_first_message);
 				input;//name_property("last_message");
-				augs::read_object(input, received_message_count);
+				augs::read(input, received_message_count);
 
 				if (input.failed()) {
 					return res;
@@ -170,7 +170,7 @@ namespace augs {
 
 		void reliable_receiver::write_ack(augs::stream& output) {
 			output;//name_property("reliable_ack");
-			augs::write_object(output, last_received_sequence);
+			augs::write(output, last_received_sequence);
 		}
 
 		bool reliable_channel::timed_out(const size_t max_unacknowledged_sequences) const {
@@ -209,7 +209,7 @@ namespace augs {
 
 				if (output_bs.size() > 0) {
 					out;//name_property("sender channel");
-					augs::write_object(out, output_bs);
+					augs::write(out, output_bs);
 				}
 			//}
 		}
@@ -252,7 +252,7 @@ TEST(NetChannel, SingleTransmissionDeleteAllPending) {
 	augs::stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
-		augs::write_object(msg[i], int(i));
+		augs::write(msg[i], int(i));
 		
 	}
 
@@ -290,7 +290,7 @@ TEST(NetChannel, PastAcknowledgementDeletesSeveralPending) {
 	augs::stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
-		augs::write_object(msg[i], int(i));
+		augs::write(msg[i], int(i));
 		
 	}
 
@@ -336,7 +336,7 @@ TEST(NetChannel, FlagForDeletionAndAck) {
 	augs::stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
-		augs::write_object(msg[i], int(i));
+		augs::write(msg[i], int(i));
 		
 	}
 
@@ -416,7 +416,7 @@ TEST(NetChannel, SequenceNumberOverflowMultipleTries) {
 		augs::stream msg[15];
 
 		for (int i = 0; i < 15; ++i) {
-			augs::write_object(msg[i], int(i));
+			augs::write(msg[i], int(i));
 			
 		}
 
@@ -497,7 +497,7 @@ TEST(NetChannel, OutOfDatePackets) {
 		augs::stream msg[15];
 
 		for (int i = 0; i < 15; ++i) {
-			augs::write_object(msg[i], int(i));
+			augs::write(msg[i], int(i));
 			
 		}
 

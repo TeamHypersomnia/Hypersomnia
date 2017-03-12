@@ -18,41 +18,42 @@ struct step_packaged_for_network {
 namespace augs {
 	template<class A>
 	void read_object(A& ar, step_packaged_for_network& storage) {
-		if(!augs::read_object(ar, storage.step_type)) return false;
+		read(ar, storage.step_type);
 
 		if (storage.step_type == step_packaged_for_network::type::NEW_ENTROPY) {
-			return augs::read_object(ar, storage.shall_resubstantiate) &&
-			augs::read_object(ar, storage.next_client_commands_accepted) &&
-			augs::read_object(ar, storage.entropy);
+			read(ar, storage.shall_resubstantiate);
+			read(ar, storage.next_client_commands_accepted);
+			read(ar, storage.entropy);
 		}
 		else if (storage.step_type == step_packaged_for_network::type::NEW_ENTROPY_WITH_HEARTBEAT) {
-			return augs::read_object(ar, storage.next_client_commands_accepted) &&
-			augs::read_object(ar, storage.entropy) &&
+			read(ar, storage.next_client_commands_accepted);
+			read(ar, storage.entropy);
 
-			augs::read_sized_stream(ar, storage.delta);
+			read_sized_stream(ar, storage.delta);
 		}
-
-		ensure(false);
-		return false;
+		else {
+			ensure(false);
+		}
 	}
 
 	template<class A>
 	void write_object(A& ar, const step_packaged_for_network& written) {
-		augs::write_object(ar, written.step_type);
+		augs::write(ar, written.step_type);
 
 		if (written.step_type == step_packaged_for_network::type::NEW_ENTROPY) {
-			augs::write_object(ar, written.shall_resubstantiate);
-			augs::write_object(ar, written.next_client_commands_accepted);
-			augs::write_object(ar, written.entropy);
+			augs::write(ar, written.shall_resubstantiate);
+			augs::write(ar, written.next_client_commands_accepted);
+			augs::write(ar, written.entropy);
 
 		}
 		else if (written.step_type == step_packaged_for_network::type::NEW_ENTROPY_WITH_HEARTBEAT) {
-			augs::write_object(ar, written.next_client_commands_accepted);
-			augs::write_object(ar, written.entropy);
+			augs::write(ar, written.next_client_commands_accepted);
+			augs::write(ar, written.entropy);
 
 			augs::write_sized_stream(ar, written.delta);
 		}
-		else
+		else {
 			ensure(false);
+		}
 	}
 }

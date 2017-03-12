@@ -83,7 +83,7 @@ atlases_regeneration_output regenerate_atlases(
 
 					augs::assign_file_contents_binary(atlas_stamp_path, existent_stamp_stream);
 					texture_atlas_stamp existent_stamp;
-					augs::read_object(existent_stamp_stream, existent_stamp);
+					augs::read(existent_stamp_stream, existent_stamp);
 
 					const bool stamps_match = 
 						compare_containers(existent_stamp.image_stamps, new_stamp.image_stamps)
@@ -262,14 +262,14 @@ atlases_regeneration_output regenerate_atlases(
 
 			{
 				augs::stream new_stamp_stream;
-				augs::write_object(new_stamp_stream, new_stamp);
+				augs::write(new_stamp_stream, new_stamp);
 
 				augs::create_binary_file(atlas_stamp_path, new_stamp_stream);
 			}
 
 			{
 				augs::stream new_meta_stream;
-				augs::write_object(new_meta_stream, this_atlas_metadata);
+				augs::write(new_meta_stream, this_atlas_metadata);
 
 				augs::create_binary_file(atlas_metadata_path, new_meta_stream);
 			}
@@ -282,7 +282,7 @@ atlases_regeneration_output regenerate_atlases(
 			augs::stream existent_meta_stream;
 			augs::assign_file_contents_binary(atlas_metadata_path, existent_meta_stream);
 
-			augs::read_object(existent_meta_stream, this_atlas_metadata);
+			augs::read(existent_meta_stream, this_atlas_metadata);
 
 			output.metadatas.emplace_back(std::move(std::make_pair(
 				input_for_this_atlas.first, 
