@@ -8,6 +8,7 @@
 #include "game/components/container_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/item_component.h"
+#include "game/components/catridge_component.h"
 #include "game/detail/inventory/inventory_utils.h"
 #include "game/detail/inventory/inventory_slot.h"
 #include "game/detail/inventory/inventory_slot_id.h"
@@ -106,16 +107,17 @@ std::wstring describe_properties(const const_entity_handle id) {
 
 	std::wstring out;
 
-	const auto& bullet_round = id[child_entity_name::CATRIDGE_ROUND];
+	if (id.has<components::catridge>()) {
+		const auto& bullet_round = id[child_entity_name::CATRIDGE_ROUND];
 
-	if (bullet_round.alive()) {
-		out = result.str() + describe_properties(bullet_round);
-		return out;
+		if (bullet_round.alive()) {
+			out = result.str() + describe_properties(bullet_round);
+			return out;
+		}
 	}
-	else {
-		out = result.str();
-		return out.substr(0, out.length() - 1);
-	}
+	
+	out = result.str();
+	return out.substr(0, out.length() - 1);
 }
 
 std::wstring describe_slot(const const_inventory_slot_handle& id) {

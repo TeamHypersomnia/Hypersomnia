@@ -152,7 +152,13 @@ unsigned basic_relations_mixin<C, D>::get_guid() const {
 template <bool C, class D>
 D basic_relations_mixin<C, D>::get_parent() const {
 	auto& self = *static_cast<const D*>(this);
-	return self.get_cosmos()[self.get<components::child>().parent];
+
+	if (self.has<components::child>()) {
+		return self.get_cosmos()[self.get<components::child>().parent];
+	}
+	else {
+		return self.get_cosmos()[entity_id()];
+	}
 }
 
 template <bool C, class D>
