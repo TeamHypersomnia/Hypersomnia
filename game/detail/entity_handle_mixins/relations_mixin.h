@@ -59,7 +59,7 @@ public:
 						if (callback(child_handle)) {
 							child_handle.for_each_child_entity_recursive(callback);
 						}
-					}
+					},
 					subject_component
 				);
 			}

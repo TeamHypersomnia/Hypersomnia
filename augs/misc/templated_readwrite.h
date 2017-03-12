@@ -6,11 +6,16 @@
 #include <unordered_map>
 
 namespace augs {
+	class output_stream_reserver;
+	class stream;
+
 	template <class T>
 	struct is_native_binary_stream {
 		static constexpr bool value = 
 			std::is_same_v<T, augs::stream>
 			|| std::is_same_v<T, augs::output_stream_reserver>
+			|| std::is_same_v<T, std::ifstream>
+			|| std::is_same_v<T, std::ofstream>
 		;
 	};
 
@@ -24,11 +29,11 @@ namespace augs {
 		A,
 		T,
 		decltype(
-			augs::read_object(
+			read_object(
 				std::declval<A>(),
 				std::declval<T>()
 			),
-			augs::write_object(
+			write_object(
 				std::declval<A>(),
 				std::declval<const T>()
 			),
@@ -205,7 +210,7 @@ namespace augs {
 		read(ar, s);
 
 		storage.resize(s);
-		write_n(ar, storage.data(), storage.size());
+		read_n(ar, storage.data(), storage.size());
 	}
 
 	template<class A, class T, class vector_size_type = size_t>
@@ -281,7 +286,7 @@ namespace augs {
 		std::map<Key, Value>& storage,
 		map_size_type = map_size_type()
 	) {
-		return read_associative_container<A, std::map, Key, Value, map_size_type>(ar, storage);
+		read_associative_container<A, std::map, Key, Value, map_size_type>(ar, storage);
 	}
 
 	template<class A, class Key, class Value, class map_size_type = size_t>
@@ -299,7 +304,7 @@ namespace augs {
 		std::unordered_map<Key, Value>& storage,
 		map_size_type = map_size_type()
 	) {
-		return read_associative_container<A, std::unordered_map, Key, Value, map_size_type>(ar, storage);
+		read_associative_container<A, std::unordered_map, Key, Value, map_size_type>(ar, storage);
 	}
 
 	template<class A, class string_element_type, class string_size_type = size_t>

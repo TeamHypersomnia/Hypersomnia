@@ -109,7 +109,7 @@ public:
 		const_entity_handle handle,
 		tree_ref tree,
 		root_of_inventory_gui_ref root,
-		const config_lua_table::hotbar_settings& hotbar_settings,
+		const hotbar_settings& hotbar_settings,
 		camera_cone camera,
 		const aabb_highlighter& highlighter,
 		const interpolation_system& interp,
@@ -127,7 +127,7 @@ public:
 		input_information(input_information)
 	{}
 
-	const config_lua_table::hotbar_settings& hotbar_settings;
+	const hotbar_settings& hotbar_settings;
 	camera_cone camera;
 	augs::vertex_triangle_buffer& output;
 	const aabb_highlighter& highlighter;

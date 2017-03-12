@@ -831,7 +831,7 @@ namespace scene_builders {
 	//if (raw_input.key == augs::window::event::keys::key::F10) {
 	//}
 
-	void testbed::control_character_selection(std::vector<key_and_mouse_intent>& intents) {
+	void testbed::control_character_selection(key_and_mouse_intent_vector& intents) {
 		for (const auto& intent : intents) {
 			if (intent.is_pressed && intent.intent == intent_type::DEBUG_SWITCH_CHARACTER) {
 				++current_character_index;

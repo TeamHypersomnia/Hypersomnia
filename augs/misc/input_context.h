@@ -18,7 +18,7 @@ struct basic_input_context {
 
 	augs::window::event::keys::key get_bound_key_if_any(const intent_enum_type) const;
 
-	std::vector<key_and_mouse_intent> to_key_and_mouse_intents(const augs::machine_entropy::local_type&) const;
+	key_and_mouse_intent_vector to_key_and_mouse_intents(const augs::machine_entropy::local_type&) const;
 };
 
 typedef basic_input_context<intent_type> input_context;

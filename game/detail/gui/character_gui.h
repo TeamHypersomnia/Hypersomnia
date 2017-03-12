@@ -118,7 +118,7 @@ struct character_gui {
 	
 	void draw(
 		const viewing_step,
-		const config_lua_table::hotbar_settings
+		const hotbar_settings
 	) const;
 
 	void draw_tooltip_from_hover_or_world_highlight(

@@ -24,6 +24,8 @@
 #include "augs/misc/templated_readwrite.h"
 #include "game/detail/visible_entities.h"
 
+#include "generated_introspectors.h"
+
 void determinism_test_setup::process(
 	const config_lua_table& cfg, 
 	game_window& window
@@ -150,19 +152,19 @@ void determinism_test_setup::process(
 			auto& first_cosm = hypersomnias[0].reserved_memory_for_serialization;
 
 			augs::output_stream_reserver first_cosm_reserver;
-			augs::write_object(first_cosm_reserver, hypersomnias[0].significant);
+			augs::write(first_cosm_reserver, hypersomnias[0].significant);
 			first_cosm.reserve(first_cosm_reserver.get_write_pos());
 			first_cosm.reset_write_pos();
-			augs::write_object(first_cosm, hypersomnias[0].significant);
+			augs::write(first_cosm, hypersomnias[0].significant);
 
 			for (unsigned i = 1; i < cosmoi_count; ++i) {
 				auto& second_cosm = hypersomnias[i].reserved_memory_for_serialization;
 
 				augs::output_stream_reserver second_cosm_reserver;
-				augs::write_object(second_cosm_reserver, hypersomnias[i].significant);
+				augs::write(second_cosm_reserver, hypersomnias[i].significant);
 				second_cosm.reserve(second_cosm_reserver.get_write_pos());
 				second_cosm.reset_write_pos();
-				augs::write_object(second_cosm, hypersomnias[i].significant);
+				augs::write(second_cosm, hypersomnias[i].significant);
 
 				if (!(first_cosm == second_cosm)) {
 					divergence_detected = true;

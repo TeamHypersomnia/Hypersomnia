@@ -18,8 +18,8 @@ public:
 
 	std::unordered_map<entity_id, character_gui> character_guis;
 
-	std::vector<item_slot_transfer_request_data> pending_transfers;
-	std::map<entity_id, spell_type> spell_requests;
+	augs::container_with_small_size<std::vector<item_slot_transfer_request_data>, unsigned short> pending_transfers;
+	augs::container_with_small_size<std::map<entity_id, spell_type>, unsigned char> spell_requests;
 
 	bool gui_look_enabled = false;
 	vec2i screen_size_for_new_characters;
@@ -55,7 +55,7 @@ public:
 
 	void handle_hotbar_and_action_button_presses(
 		const const_entity_handle root_entity,
-		std::vector<key_and_mouse_intent> intents
+		key_and_mouse_intent_vector intents
 	);
 
 	void reserve_caches_for_entities(const size_t) const {}

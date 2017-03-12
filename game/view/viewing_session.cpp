@@ -119,7 +119,7 @@ void viewing_session::control_gui_and_remove_fetched_events(
 	);
 }
 
-void viewing_session::control_and_remove_fetched_intents(std::vector<key_and_mouse_intent>& intents) {
+void viewing_session::control_and_remove_fetched_intents(key_and_mouse_intent_vector& intents) {
 	erase_remove(intents, [&](const key_and_mouse_intent& intent) {
 		bool fetch = false;
 

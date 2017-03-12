@@ -9,6 +9,7 @@
 
 #include "game/transcendental/cosmic_entropy.h"
 #include "game/transcendental/step_declaration.h"
+
 class cosmos;
 class world_camera;
 class viewing_session;
@@ -40,7 +41,7 @@ namespace scene_builders {
 			);
 		}
 
-		void control_character_selection(std::vector<key_and_mouse_intent>&);
+		void control_character_selection(key_and_mouse_intent_vector&);
 		
 		entity_id get_selected_character() const;
 

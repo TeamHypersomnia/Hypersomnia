@@ -26,8 +26,8 @@ void basic_input_context<T>::map_event_to_intent(const message id, const T inten
 }
 
 template <class T>
-std::vector<key_and_mouse_intent> basic_input_context<T>::to_key_and_mouse_intents(const augs::machine_entropy::local_type& local) const {
-	std::vector<key_and_mouse_intent> output;
+key_and_mouse_intent_vector basic_input_context<T>::to_key_and_mouse_intents(const augs::machine_entropy::local_type& local) const {
+	key_and_mouse_intent_vector output;
 
 	for (const auto& raw : local) {
 		key_and_mouse_intent intent;

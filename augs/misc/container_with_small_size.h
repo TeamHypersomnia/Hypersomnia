@@ -30,16 +30,20 @@ namespace augs {
 
 		template <class... Args>
 		decltype(auto) insert(Args&&... args) {
-			const auto result =  container.insert(std::forward<Args>(args)...);
+			const auto result = container.insert(std::forward<Args>(args)...);
 			size_check();
 			return result;
 		}
 
 		template <class... Args>
+		decltype(auto) find(Args&&... args) {
+			return container.find(std::forward<Args>(args)...);
+		}
+
+		template <class... Args>
 		decltype(auto) push_back(Args&&... args) {
-			const auto result = container.push_back(std::forward<Args>(args)...);
+			container.push_back(std::forward<Args>(args)...);
 			size_check();
-			return result;
 		}
 		
 		template <class... Args>
@@ -72,6 +76,14 @@ namespace augs {
 		decltype(auto) end() const {
 			return container.begin();
 		}
+
+		decltype(auto) size() const {
+			return container.size();
+		}
+
+		void clear() {
+			container.clear();
+		}
 	};
 
 	template<class A, class T, class size_type>
@@ -89,4 +101,17 @@ namespace augs {
 	) {
 		write(ar, *storage, size_type());
 	}
+}
+
+template <
+	class A, 
+	class B, 
+	class size_type_A, 
+	class size_type_B
+>
+bool compare_containers(
+	const augs::container_with_small_size<A, size_type_A>& a,
+	const augs::container_with_small_size<B, size_type_B>& b
+) {
+	return compare_containers(*a, *b);
 }

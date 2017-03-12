@@ -85,10 +85,10 @@ std::wstring describe_properties(const const_entity_handle id) {
 		}
 	}
 
-	if (melee) {
-		result << L"Swing duration: [color=vscyan]" << melee->swings[0].duration_ms << L" ms[/color]\n";
-		result << L"Swing cooldown: [color=vscyan]" << melee->swings[0].cooldown_ms << L" ms[/color]\n";
-	}
+	//if (melee) {
+	//	result << L"Swing duration: [color=vscyan]" << melee->swings[0].duration_ms << L" ms[/color]\n";
+	//	result << L"Swing cooldown: [color=vscyan]" << melee->swings[0].cooldown_ms << L" ms[/color]\n";
+	//}
 
 	const auto& depo = id[slot_function::ITEM_DEPOSIT];
 

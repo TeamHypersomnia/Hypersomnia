@@ -6,12 +6,14 @@
 #include "augs/templates/string_templates.h"
 #include <fstream>
 
+#include "generated_introspectors.h"
+
 void cosmic_movie_director::save_recording_to_file(const std::string& filename) const {
 	std::ofstream f(filename, std::ios::out | std::ios::binary);
 
 	for (const auto& it : step_to_entropy) {
-		augs::write_object(f, it.first);
-		augs::write_object(f, it.second);
+		augs::write(f, it.first);
+		augs::write(f, it.second);
 	}
 }
 

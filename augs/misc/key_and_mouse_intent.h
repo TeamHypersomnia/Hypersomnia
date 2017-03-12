@@ -3,6 +3,8 @@
 #include "augs/window_framework/event.h"
 #include "augs/padding_byte.h"
 
+#include "augs/misc/container_with_small_size.h"
+
 struct key_and_mouse_intent {
 	intent_type intent = intent_type::NONE;
 	vec2t<short> mouse_rel;
@@ -14,8 +16,13 @@ struct key_and_mouse_intent {
 	bool operator!=(const key_and_mouse_intent& b) const;
 };
 
-bool operator==(const std::vector<key_and_mouse_intent>& a, const std::vector<key_and_mouse_intent>& b);
-bool operator!=(const std::vector<key_and_mouse_intent>& a, const std::vector<key_and_mouse_intent>& b);
+typedef augs::container_with_small_size<
+	std::vector<key_and_mouse_intent>,
+	unsigned char
+> key_and_mouse_intent_vector;
+
+bool operator==(const key_and_mouse_intent_vector& a, const key_and_mouse_intent_vector& b);
+bool operator!=(const key_and_mouse_intent_vector& a, const key_and_mouse_intent_vector& b);
 
 namespace augs {
 	template<class A>

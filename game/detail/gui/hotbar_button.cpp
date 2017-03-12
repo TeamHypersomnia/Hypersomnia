@@ -107,13 +107,13 @@ void hotbar_button::draw(
 	rgba distinguished_border_color = cyan;
 
 	if (is_in_primary) {
-		distinguished_border_color = settings.primary_selected_color;
+		distinguished_border_color = settings.hotbar_primary_selected_color;
 	}
 	else if (is_in_secondary) {
-		distinguished_border_color = settings.secondary_selected_color;
+		distinguished_border_color = settings.hotbar_secondary_selected_color;
 	}
 
-	if (settings.colorize_inside_when_selected) {
+	if (settings.hotbar_colorize_inside_when_selected) {
 		colorize = distinguished_border_color;
 	}
 
@@ -128,7 +128,7 @@ void hotbar_button::draw(
 		inside_col.a += 10;
 	}
 
-	if (settings.increase_inside_alpha_when_selected && is_assigned_entity_selected) {
+	if (settings.hotbar_increase_inside_alpha_when_selected && is_assigned_entity_selected) {
 		inside_col.a += 20;
 	}
 

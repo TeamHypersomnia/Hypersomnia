@@ -204,8 +204,17 @@ namespace augs {
 	bool image::from_binary_file(const std::string& filename) {
 		std::ifstream in(filename, std::ios::in | std::ios::binary);
 
-		augs::read(in, size);
-		augs::read(in, v);
+		if (in.good()) {
+			augs::read(in, size);
+			augs::read(in, v);
+
+			return !in.fail();
+		}
+		else {
+			LOG("Failed to open %x! Ensure that the file exists.", filename);
+		}
+
+		return false;
 	}
 
 	bool image::from_file(

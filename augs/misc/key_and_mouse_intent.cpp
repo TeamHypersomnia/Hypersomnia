@@ -5,20 +5,12 @@
 #include "game/transcendental/cosmos.h"
 #include "game/detail/gui/character_gui.h"
 
-bool operator==(const std::vector<key_and_mouse_intent>& a, const std::vector<key_and_mouse_intent>& b) {
-	return !(a != b);
+bool operator==(const key_and_mouse_intent_vector& a, const key_and_mouse_intent_vector& b) {
+	return compare_containers(a, b);
 }
 
-bool operator!=(const std::vector<key_and_mouse_intent>& a, const std::vector<key_and_mouse_intent>& b) {
-	if (a.size() != b.size()) {
-		return true;
-	}
-
-	if (std::memcmp(a.data(), b.data(), sizeof(key_and_mouse_intent) * a.size())) {
-		return true;
-	}
-
-	return false;
+bool operator!=(const key_and_mouse_intent_vector& a, const key_and_mouse_intent_vector& b) {
+	return !(a == b);
 }
 
 bool key_and_mouse_intent::uses_mouse_motion() const {

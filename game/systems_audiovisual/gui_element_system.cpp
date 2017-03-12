@@ -130,7 +130,7 @@ void gui_element_system::queue_transfers(const wielding_result res) {
 
 void gui_element_system::handle_hotbar_and_action_button_presses(
 	const const_entity_handle subject,
-	std::vector<key_and_mouse_intent> intents
+	key_and_mouse_intent_vector intents
 ) {
 	const auto& cosmos = subject.get_cosmos();
 	auto& gui = get_character_gui(subject);
@@ -297,7 +297,7 @@ void gui_element_system::control_gui(
 					|| change.msg == augs::window::event::message::rdoubleclick
 					) {
 					if (rect_world.held_rect_is_dragged) {
-						pending_transfers.push_back({ item_entity, cosmos[inventory_slot_id()], dragged_charges });
+						pending_transfers.push_back(item_slot_transfer_request_data { item_entity, cosmos[inventory_slot_id()], dragged_charges });
 						fetched = true;
 					}
 				}

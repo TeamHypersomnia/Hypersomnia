@@ -6,6 +6,8 @@
 #include "augs/misc/time_utils.h"
 #include "game/transcendental/cosmos.h"
 
+#include "generated_introspectors.h"
+
 namespace augs {
 	template <class T>
 	void debug_entropy_player<T>::advance_player_and_biserialize(T& total_collected_entropy) {
@@ -30,8 +32,8 @@ namespace augs {
 			if (total_collected_entropy.length() > 0) {
 				std::ofstream recording_file(live_saving_filename, std::ios::out | std::ios::binary | std::ios::app);
 
-				augs::write_object(recording_file, player_step_position);
-				augs::write_object(recording_file, total_collected_entropy);
+				augs::write(recording_file, player_step_position);
+				augs::write(recording_file, total_collected_entropy);
 			}
 
 			++player_step_position;

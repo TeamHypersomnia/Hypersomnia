@@ -82,7 +82,7 @@ public:
 		augs::machine_entropy::local_type&
 	);
 
-	void control_and_remove_fetched_intents(std::vector<key_and_mouse_intent>&);
+	void control_and_remove_fetched_intents(key_and_mouse_intent_vector&);
 	void standard_audiovisual_post_solve(const const_logic_step);
 	void spread_past_infection(const const_logic_step);
 

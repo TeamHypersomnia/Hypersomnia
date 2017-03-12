@@ -16,6 +16,17 @@ namespace augs {
 	class lua_state_raii;
 }
 
+struct hotbar_settings {
+	// GEN INTROSPECTOR struct hotbar_settings
+	bool hotbar_increase_inside_alpha_when_selected = false;
+	bool hotbar_colorize_inside_when_selected = true;
+	std::array<padding_byte, 2> pad;
+
+	rgba hotbar_primary_selected_color = rgba(0, 255, 255, 255);
+	rgba hotbar_secondary_selected_color = rgba(86, 156, 214, 255);
+	// END GEN INTROSPECTOR
+};
+
 class config_lua_table {
 public:
 	// GEN INTROSPECTOR class config_lua_table
@@ -83,14 +94,7 @@ public:
 	std::string latest_news_url;
 	// END GEN INTROSPECTOR
 
-	struct hotbar_settings {
-		bool increase_inside_alpha_when_selected = false;
-		bool colorize_inside_when_selected = true;
-		std::array<padding_byte, 2> pad;
-		
-		rgba primary_selected_color = rgba(0, 255, 255, 255);
-		rgba secondary_selected_color = rgba(86, 156, 214, 255);
-	} hotbar;
+	hotbar_settings hotbar;
 
 	void get_values(augs::lua_state_raii&);
 

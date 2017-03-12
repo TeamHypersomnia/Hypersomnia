@@ -90,11 +90,6 @@ textual_description description_by_entity_name(const entity_name n) {
 			L"Urban cyan machete",
 			L"Delivers solid slash."
 		};
-	case entity_name::CORPSE:
-		return{
-			L"Corpse",
-			L"Dead Citizen of Atlantis.\nCannot be revived by now."
-		};
 	case entity_name::AMPLIFIER_ARM:
 		return{
 			L"Amplifier arm",

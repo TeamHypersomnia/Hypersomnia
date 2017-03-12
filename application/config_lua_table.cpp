@@ -5,14 +5,14 @@
 #include "game/bindings/bind_game_and_augs.h"
 #include "augs/log.h"
 
-#include "augs/templates/string_templates.h"
-
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 #include "game/view/viewing_session.h"
 
 #include "game/detail/gui/character_gui.h"
 #include "augs/scripting/lua_state_raii.h"
+
+#include "generated_introspectors.h"
 
 template<class T>
 static void get_config_value(augs::lua_state_raii& lua, const std::string& field, T& into) {
@@ -25,10 +25,10 @@ static void get_config_value(augs::lua_state_raii& lua, const std::string& field
 
 void config_lua_table::get_values(augs::lua_state_raii& lua) {
 	augs::introspect(
-		*this,
-		[&](auto& c, const std::string& ss) {
-			get_config_value(lua, replace_all(ss, ".", "_"), c);
-		}
+		[&](const std::string& ss, auto& c) {
+			get_config_value(lua, ss, c);
+		},
+		*this
 	);
 }
 

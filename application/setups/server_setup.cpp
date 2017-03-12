@@ -33,6 +33,8 @@
 #include "game/detail/position_scripts.h"
 #include "augs/templates/container_templates.h"
 
+#include "generated_introspectors.h"
+
 void server_setup::wait_for_listen_server() {
 	std::unique_lock<std::mutex> lck(mtx);
 	while (!server_ready) cv.wait(lck);
@@ -194,7 +196,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 					}
 
 					network_command command;
-					augs::read_object(stream, command);
+					augs::read(stream, command);
 
 					if (detailed_step_log && !should_skip)
 						LOG("Server received command: %x", int(command));
@@ -202,7 +204,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 					switch (command) {
 					case network_command::CLIENT_WELCOME_MESSAGE: {
 						std::string read_nickname;
-						augs::read_object(stream, read_nickname);
+						augs::read(stream, read_nickname);
 
 						if (!should_skip) {
 							if (endpoint.sent_welcome_message) {
@@ -219,14 +221,14 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 									auto& complete_state = initial_hypersomnia.reserved_memory_for_serialization;
 									complete_state.reset_write_pos();
 
-									augs::write_object(complete_state, network_command::COMPLETE_STATE);
+									augs::write(complete_state, network_command::COMPLETE_STATE);
 
 									cosmic_delta::encode(initial_hypersomnia, hypersomnia, complete_state);
 
 									resubstantiate = true;
 
 									endpoint.controlled_entity = scene.assign_new_character();
-									augs::write_object(complete_state, hypersomnia[endpoint.controlled_entity].get_guid());
+									augs::write(complete_state, hypersomnia[endpoint.controlled_entity].get_guid());
 
 									choose_server(address).send_reliable(complete_state, address);
 								}
@@ -242,7 +244,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 						}
 						else {
 							guid_mapped_entropy result;
-							augs::read_object(stream, result);
+							augs::read(stream, result);
 
 							if (!should_skip)
 								//endpoint.commands.push_back(result);
@@ -341,8 +343,8 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 				transported_step.next_client_commands_accepted = e.next_commands_accepted;
 
 				augs::stream new_data;
-				augs::write_object(new_data, network_command::PACKAGED_STEP);
-				augs::write_object(new_data, transported_step);
+				augs::write(new_data, network_command::PACKAGED_STEP);
+				augs::write(new_data, transported_step);
 
 				choose_server(e.addr).post_redundant(new_data, e.addr);
 			}

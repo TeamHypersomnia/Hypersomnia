@@ -66,7 +66,7 @@ void perk_meter_bar::draw(
 		const auto dt = cosmos.get_fixed_delta();
 		const auto now = cosmos.get_timestamp();
 
-		const auto ratio = sentience.call_on(this_type, [&](const auto& m) { return m.get_ratio(now, dt); });
+		const auto ratio = sentience.call_on(this_type, [&](const auto& m) { return m.timing.get_ratio(now, dt); });
 		auto actual_bar_rect = full_bar_rect;
 		const auto bar_width = (actual_bar_rect.w() * ratio);
 		actual_bar_rect.w(bar_width);
@@ -218,7 +218,7 @@ void perk_meter_bar::rebuild_layouts(
 	const auto now = cosmos.get_timestamp();
 
 	if (!sentience.call_on(this_type, [&](const auto& m) {
-		return m.is_enabled(now, dt);
+		return m.timing.is_enabled(now, dt);
 	})) {
 		this_id->unset_flag(augs::gui::flag::ENABLE_DRAWING);
 		return;
@@ -231,7 +231,7 @@ void perk_meter_bar::rebuild_layouts(
 
 	for (unsigned i = 0; i < static_cast<unsigned>(this_type); ++i) {
 		if (sentience.call_on(static_cast<perk_meter_type>(i), [&](const auto& m) {
-			return m.is_enabled(now, dt);
+			return m.timing.is_enabled(now, dt);
 		})) {
 			++vertical_index;
 		}

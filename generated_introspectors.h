@@ -1,4 +1,5 @@
 #pragma once
+#include "game/transcendental/entity_id.h"
 
 struct rgba;
 template <class T>
@@ -40,9 +41,12 @@ struct si_scaling;
 struct visibility_settings;
 template <class key>
 struct basic_cosmic_entropy;
+struct guid_mapped_entropy;
+struct cosmic_entropy;
 struct cosmos_flyweights_state;
 class cosmos_metadata;
 struct cosmos_significant_state;
+struct hotbar_settings;
 class config_lua_table;
 struct neon_map_stamp;
 struct scripted_image_stamp;
@@ -1554,6 +1558,24 @@ namespace augs {
 
 	template <class F, class... MemberInstances>
 	void introspect_body(
+		const guid_mapped_entropy* const,
+		F f,
+		MemberInstances&&... _t_
+	) {
+		introspect_body(static_cast<basic_cosmic_entropy<entity_guid>*>(nullptr), f, std::forward<MemberInstances>(_t_)...);
+	}
+
+	template <class F, class... MemberInstances>
+	void introspect_body(
+		const cosmic_entropy* const,
+		F f,
+		MemberInstances&&... _t_
+	) {
+		introspect_body(static_cast<basic_cosmic_entropy<entity_id>*>(nullptr), f, std::forward<MemberInstances>(_t_)...);
+	}
+
+	template <class F, class... MemberInstances>
+	void introspect_body(
 		const cosmos_flyweights_state* const,
 		F f,
 		MemberInstances&&... _t_
@@ -1590,6 +1612,19 @@ namespace augs {
 
 		f("pool_for_aggregates", _t_.pool_for_aggregates...);
 		f("pools_for_components", _t_.pools_for_components...);
+	}
+
+	template <class F, class... MemberInstances>
+	void introspect_body(
+		const hotbar_settings* const,
+		F f,
+		MemberInstances&&... _t_
+	) {
+		f("hotbar_increase_inside_alpha_when_selected", _t_.hotbar_increase_inside_alpha_when_selected...);
+		f("hotbar_colorize_inside_when_selected", _t_.hotbar_colorize_inside_when_selected...);
+
+		f("hotbar_primary_selected_color", _t_.hotbar_primary_selected_color...);
+		f("hotbar_secondary_selected_color", _t_.hotbar_secondary_selected_color...);
 	}
 
 	template <class F, class... MemberInstances>

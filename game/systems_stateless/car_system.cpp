@@ -12,7 +12,6 @@
 #include "game/components/physics_component.h"
 #include "game/components/transform_component.h"
 #include "game/components/special_physics_component.h"
-#include "game/components/sub_entities_component.h"
 #include "game/components/processing_component.h"
 #include "game/components/particles_existence_component.h"
 #include "game/components/sound_existence_component.h"

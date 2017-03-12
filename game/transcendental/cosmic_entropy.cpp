@@ -108,7 +108,7 @@ cosmic_entropy::cosmic_entropy(
 
 cosmic_entropy::cosmic_entropy(
 	const const_entity_handle controlled_entity,
-	const std::vector<key_and_mouse_intent>& intents
+	const decltype(intents_per_entity[entity_id()])& intents
 ) {
 	intents_per_entity[controlled_entity] = intents;
 }

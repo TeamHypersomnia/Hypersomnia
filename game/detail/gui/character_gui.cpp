@@ -277,7 +277,7 @@ character_gui::hotbar_selection_setup character_gui::get_actual_selection_setup(
 
 void character_gui::draw(
 	const viewing_step step,
-	const config_lua_table::hotbar_settings hotbar
+	const hotbar_settings hotbar
 ) const {
 	const auto gui_entity = step.cosm[step.viewed_character];
 

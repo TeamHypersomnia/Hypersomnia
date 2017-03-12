@@ -1,6 +1,5 @@
 #include "aabb_highlighter.h"
 #include "game/components/sprite_component.h"
-#include "game/components/sub_entities_component.h"
 #include "game/components/crosshair_component.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/view/viewing_session.h"
@@ -8,6 +7,9 @@
 #include "game/systems_audiovisual/interpolation_system.h"
 
 #include "game/components/substance_component.h"
+
+#include "game/transcendental/types_specification/all_component_includes.h"
+#include "generated_introspectors.h"
 
 void aabb_highlighter::update(const float delta_ms) {
 	timer += delta_ms;

@@ -209,7 +209,7 @@ void perform_spell_logic(
 		ignite_sparkle_particles();
 		play_standard_sparkles_sound();
 
-		sentience.electric_shield.set_for_duration(static_cast<float>(spell_data.perk_duration_seconds * 1000), now); 
+		sentience.electric_shield.timing.set_for_duration(static_cast<float>(spell_data.perk_duration_seconds * 1000), now); 
 
 		break;
 

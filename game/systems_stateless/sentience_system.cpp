@@ -234,7 +234,7 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 	}
 
 	if (h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_SHIELD_DESTRUCTION) {
-		sentience.electric_shield.set_for_duration(-1.f, now);
+		sentience.electric_shield.timing.set_for_duration(-1.f, now);
 	}
 
 	else if (h.special_result == messages::health_event::result_type::DEATH) {
@@ -317,7 +317,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 			event.objective_amount = d.amount;
 			event.special_result = messages::health_event::result_type::NONE;
 
-			if (s.electric_shield.is_enabled(now, delta)) {
+			if (s.electric_shield.timing.is_enabled(now, delta)) {
 				event.target = messages::health_event::target_type::PERSONAL_ELECTRICITY_SHIELD;
 				
 				const auto damaged = s.personal_electricity.calculate_damage_result(d.amount);

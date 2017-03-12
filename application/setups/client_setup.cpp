@@ -27,6 +27,8 @@
 #include "client_setup.h"
 #include "game/detail/visible_entities.h"
 
+#include "generated_introspectors.h"
+
 void client_setup::process(const config_lua_table& cfg, game_window& window) {
 	init(cfg, window);
 
@@ -89,8 +91,8 @@ void client_setup::init(
 		LOG("Connected successfully to %x", readable_ip);
 		
 		augs::stream welcome;
-		augs::write_object(welcome, network_command::CLIENT_WELCOME_MESSAGE);
-		augs::write_object(welcome, use_alternative_port ? cfg.debug_second_nickname : cfg.nickname);
+		augs::write(welcome, network_command::CLIENT_WELCOME_MESSAGE);
+		augs::write(welcome, use_alternative_port ? cfg.debug_second_nickname : cfg.nickname);
 
 		client.post_redundant(welcome);
 
@@ -171,7 +173,7 @@ void client_setup::process_once(
 
 			while (stream.get_unread_bytes() > 0) {
 				network_command command;
-				augs::read_object(stream, command);
+				augs::read(stream, command);
 
 				const bool should_skip = to_skip > 0;
 
@@ -194,7 +196,7 @@ void client_setup::process_once(
 					LOG("Decoded cosm at step: %x", hypersomnia.get_total_steps_passed());
 
 					unsigned controlled_character_guid;
-					augs::read_object(stream, controlled_character_guid);
+					augs::read(stream, controlled_character_guid);
 
 					scene.select_character(hypersomnia.get_entity_by_guid(controlled_character_guid));
 
@@ -203,7 +205,7 @@ void client_setup::process_once(
 
 				case network_command::PACKAGED_STEP: {
 					step_packaged_for_network step;
-					augs::read_object(stream, step);
+					augs::read(stream, step);
 
 					if (!should_skip) {
 						receiver.acquire_next_packaged_step(step);
