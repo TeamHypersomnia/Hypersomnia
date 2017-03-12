@@ -20,8 +20,12 @@ namespace augs {
 			return &container;
 		}
 
+		bool overflowed() const {
+			return container.size() >= std::numeric_limits<size_type>::max();
+		}
+
 		void size_check() const {
-			ensure(container.size() < std::numeric_limits<size_type>::max());
+			ensure(!overflowed());
 		}
 
 		const T* operator->() const {

@@ -21,14 +21,14 @@ namespace components {
 	struct sound_existence {
 		// GEN INTROSPECTOR struct components::sound_existence
 		sound_effect_input input;
+
+		augs::stepped_timestamp time_of_birth;
+		unsigned max_lifetime_in_steps = 0u;
 		// END GEN INTROSPECTOR
 
 		static bool is_activated(const const_entity_handle);
 		static void activate(const entity_handle);
 		static void deactivate(const entity_handle);
-
-		augs::stepped_timestamp time_of_birth;
-		unsigned max_lifetime_in_steps = 0u;
 
 		float calculate_max_audible_distance() const;
 

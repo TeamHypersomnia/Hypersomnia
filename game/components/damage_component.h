@@ -41,6 +41,8 @@ namespace components {
 
 		float homing_towards_hostile_strength = 0.f;
 		entity_id particular_homing_target;
+		
+		child_entity_id trace_sound;
 
 		vec2 saved_point_of_impact_before_death;
 		// END GEN INTROSPECTOR

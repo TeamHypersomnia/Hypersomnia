@@ -56,7 +56,7 @@ public:
 					[&](auto, auto& member_child_id) {
 						const auto child_handle = cosmos[member_child_id];
 
-						if (callback(child_handle)) {
+						if (child_handle.alive() && callback(child_handle)) {
 							child_handle.for_each_child_entity_recursive(callback);
 						}
 					},

@@ -137,6 +137,7 @@ void sound_existence_system::game_responses_to_sound_effects(const logic_step st
 
 			const auto trace = create_sound_effect_entity(cosmos, in, subject.get_logic_transform(), subject);
 			trace.add_standard_components();
+			subject.get<components::damage>().trace_sound = trace;
 		}
 
 		{

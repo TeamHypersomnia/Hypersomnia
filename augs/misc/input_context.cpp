@@ -60,6 +60,11 @@ key_and_mouse_intent_vector basic_input_context<T>::to_key_and_mouse_intents(con
 		}
 	}
 
+	if (output.overflowed()) {
+		output.clear();
+		LOG("Warning! Intent vector has overflowed - clearing.");
+	}
+
 	return std::move(output);
 }
 
