@@ -56,11 +56,6 @@ namespace resource_setups {
 		}
 
 		{
-			auto& in = output[assets::game_image_id::TEST_PLAYER];
-			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/walk_1.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
-		}
-
-		{
 			auto& in = output[assets::game_image_id::TEST_BACKGROUND];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/snow_textures/snow3.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
 		}
@@ -73,11 +68,6 @@ namespace resource_setups {
 		{
 			auto& in = output[assets::game_image_id::TEST_CROSSHAIR];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/crosshair.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
-		}
-
-		{
-			auto& in = output[assets::game_image_id::TEST_PLAYER];
-			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/walk_1.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
 		}
 
 		{
@@ -560,7 +550,8 @@ namespace resource_setups {
 		make_indexed(
 			assets::game_image_id::BLUE_TORSO_MOVING_FIRST,
 			assets::game_image_id::BLUE_TORSO_MOVING_LAST,
-			"hypersomnia/gfx/walk_%x.png"
+			"hypersomnia/gfx/walk_%x.png",
+			"generated/neon_maps/walk_%x.png"
 		);
 
 		make_indexed(

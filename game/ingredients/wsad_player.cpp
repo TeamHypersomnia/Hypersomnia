@@ -187,7 +187,7 @@ namespace ingredients {
 
 		animation_response.response = torso_set;
 
-		sprite.set(assets::game_image_id::TEST_PLAYER, rgba(255, 255, 255, 255));
+		sprite.set(assets::game_image_id::TORSO_MOVING_FIRST, rgba(255, 255, 255, 255));
 
 		render.layer = render_layer::SMALL_DYNAMIC_BODY;
 
