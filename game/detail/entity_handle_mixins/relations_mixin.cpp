@@ -41,16 +41,20 @@ void relations_mixin<false, D>::make_cloned_child_entities_recursive(const entit
 	for_each_component_type([&](auto dum) {
 		typedef decltype(dum) component_type;
 		
-		augs::introspect_recursive<
-			is_entity_id_type,
-			exclude_non_child_id_types
-		> (
-			[&](auto, auto& cloned_into_id, const auto& cloned_from_id) {
-				cloned_into_id = cosmos.clone_entity(cloned_from_id);
-			},
-			synchronizer_or_component(self.get<component_type>()),
-			synchronizer_or_component(from.get<component_type>())
-		);
+		if (self.has<component_type>()) {
+			ensure(from.has<component_type>());
+
+			augs::introspect_recursive<
+				is_entity_id_type,
+				exclude_non_child_id_types
+			> (
+				[&](auto, auto& cloned_into_id, const auto& cloned_from_id) {
+					cloned_into_id = cosmos.clone_entity(cloned_from_id);
+				},
+				synchronizer_or_component(self.get<component_type>()),
+				synchronizer_or_component(from.get<component_type>())
+			);
+		}
 	});
 }
 
@@ -96,6 +100,15 @@ maybe_const_ref_t<C, child_entity_id> typename basic_relations_mixin<C, D>::get_
 	switch (n) {
 	case child_entity_name::CROSSHAIR_RECOIL_BODY:
 		return self.get<components::crosshair>().recoil_entity;
+
+	case child_entity_name::CHARACTER_CROSSHAIR:
+		return self.get<components::sentience>().character_crosshair;
+
+	case child_entity_name::CATRIDGE_ROUND:
+		return self.get<components::catridge>().round;
+
+	case child_entity_name::CATRIDGE_SHELL:
+		return self.get<components::catridge>().shell;
 
 	default:
 		LOG("Access abstraction for this child_entity_name is not implemented!");

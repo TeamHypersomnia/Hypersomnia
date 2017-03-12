@@ -72,6 +72,8 @@ bool typesafe_scanf_detail(
 				)
 			);
 
+			read_chunk >> val;
+
 			if (sizeof...(A) == 0) {
 				return true;
 			}

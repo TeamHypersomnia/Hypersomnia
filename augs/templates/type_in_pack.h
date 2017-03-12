@@ -33,11 +33,11 @@ template <class T, class U, template <class...> class List, class... Types>
 struct index_in_list<T, List<U, Types...>> {
 	static_assert(list_contains_type<T, List<U, Types...>>::value, "No such type in the tuple or parameter pack!");
 
-	static const std::size_t value = 1 + index_in_list<T, List<Types...>>::value;
+	static constexpr std::size_t value = 1 + index_in_list<T, List<Types...>>::value;
 };
 
 template <class... Types>
-constexpr bool index_in_list_v = index_in_list<Types...>::value;
+constexpr std::size_t index_in_list_v = index_in_list<Types...>::value;
 
 template <typename T, typename... Types>
 using pack_contains_type = typename has_type<T, std::tuple<Types...>>::type;
@@ -58,3 +58,6 @@ template<class T, class... Types>
 struct index_in_pack {
 	static const size_t value = index_in_list<T, std::tuple<Types...>>::value;
 };
+
+static_assert(index_in_list<int, std::tuple<float, float, int>>::value == 2, "Something wrong with trait");
+static_assert(index_in_list_v<int, std::tuple<float, float, double, int>> == 3, "Something wrong with trait");

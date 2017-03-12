@@ -132,7 +132,7 @@ float assess_projectile_velocity_of_weapon(const const_entity_handle weapon) {
 	// auto ch = weapon[slot_function::GUN_CHAMBER];
 	// 
 	// if (ch.has_items()) {
-	// 	ch.get_items_inside()[0][child_entity_name::BULLET_ROUND].get<components::damage>();
+	// 	ch.get_items_inside()[0][child_entity_name::CATRIDGE_ROUND].get<components::damage>();
 	// }
 
 	const auto* const maybe_gun = weapon.find<components::gun>();

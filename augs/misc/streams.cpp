@@ -2,6 +2,10 @@
 #include "enum_associative_array.h"
 
 namespace augs {
+	void write_object(augs::stream& ar, const augs::stream& storage) {
+		ar.write(storage);
+	}
+
 	void stream::read(char* data, const size_t bytes) {
 		if (!has_read_failed && read_pos + bytes <= size()) {
 			memcpy(data, buf.data() + read_pos, bytes);

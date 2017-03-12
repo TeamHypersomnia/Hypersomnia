@@ -85,6 +85,7 @@ namespace components {
 	struct attitude;
 	struct behaviour_tree;
 	struct car;
+	struct catridge;
 	struct child;
 	struct container;
 	struct crosshair;
@@ -518,6 +519,16 @@ namespace augs {
 
 		f("last_turned_on", _t_.last_turned_on...);
 		f("last_turned_off", _t_.last_turned_off...);
+	}
+
+	template <class F, class... MemberInstances>
+	void introspect_body(
+		const components::catridge* const,
+		F f,
+		MemberInstances&&... _t_
+	) {
+		f("shell", _t_.shell...);
+		f("round", _t_.round...);
 	}
 
 	template <class F, class... MemberInstances>
@@ -1129,6 +1140,7 @@ namespace augs {
 
 		f("aimpunch", _t_.aimpunch...);
 		f("health_damage_particles", _t_.health_damage_particles...);
+		f("character_crosshair", _t_.character_crosshair...);
 	}
 
 	template <class F, class... MemberInstances>

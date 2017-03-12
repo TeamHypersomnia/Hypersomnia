@@ -29,7 +29,7 @@ namespace augs {
 			read(ar, storage.next_client_commands_accepted);
 			read(ar, storage.entropy);
 
-			read_sized_stream(ar, storage.delta);
+			read_stream_with_size(ar, storage.delta);
 		}
 		else {
 			ensure(false);
@@ -50,7 +50,7 @@ namespace augs {
 			augs::write(ar, written.next_client_commands_accepted);
 			augs::write(ar, written.entropy);
 
-			augs::write_sized_stream(ar, written.delta);
+			augs::write_stream_with_size(ar, written.delta);
 		}
 		else {
 			ensure(false);

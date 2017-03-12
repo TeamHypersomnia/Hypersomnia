@@ -8,6 +8,7 @@
 #include "game/components/sound_response_component.h"
 #include "game/components/sound_existence_component.h"
 #include "game/components/particle_effect_response_component.h"
+#include "game/components/catridge_component.h"
 
 #include "game/messages/create_particle_effect.h"
 
@@ -183,9 +184,9 @@ namespace prefabs {
 	}
 
 	entity_handle create_pink_charge(cosmos& cosmos, vec2 pos, int charges) {
-		auto pink_charge = cosmos.create_entity("pink_charge");
-		auto round_definition = cosmos.create_entity("round_definition");
-		auto shell_definition = cosmos.create_entity("shell_definition");
+		const auto pink_charge = cosmos.create_entity("pink_charge");
+		const auto round_definition = cosmos.create_entity("round_definition");
+		const auto shell_definition = cosmos.create_entity("shell_definition");
 		name_entity(pink_charge, entity_name::PINK_CHARGE);
 
 		{
@@ -197,6 +198,8 @@ namespace prefabs {
 			item.categories_for_slot_compatibility.set(item_category::SHOT_CHARGE);
 			item.charges = charges;
 			item.stackable = true;
+
+			pink_charge += components::catridge();
 		}
 
 		{
@@ -232,8 +235,8 @@ namespace prefabs {
 			response.modifier.colorize = pink;
 		}
 
-		pink_charge.map_child_entity(child_entity_name::BULLET_ROUND, round_definition);
-		pink_charge.map_child_entity(child_entity_name::BULLET_SHELL, shell_definition);
+		pink_charge.map_child_entity(child_entity_name::CATRIDGE_ROUND, round_definition);
+		pink_charge.map_child_entity(child_entity_name::CATRIDGE_SHELL, shell_definition);
 
 		pink_charge.add_standard_components();
 
@@ -241,9 +244,9 @@ namespace prefabs {
 	}
 
 	entity_handle create_cyan_charge(cosmos& cosmos, vec2 pos, int charges) {
-		auto cyan_charge = cosmos.create_entity("cyan_charge");
-		auto round_definition = cosmos.create_entity("round_definition");
-		auto shell_definition = cosmos.create_entity("shell_definition");
+		const auto cyan_charge = cosmos.create_entity("cyan_charge");
+		const auto round_definition = cosmos.create_entity("round_definition");
+		const auto shell_definition = cosmos.create_entity("shell_definition");
 		name_entity(cyan_charge, entity_name::CYAN_CHARGE);
 
 		{
@@ -255,6 +258,7 @@ namespace prefabs {
 			item.categories_for_slot_compatibility.set(item_category::SHOT_CHARGE);
 			item.charges = charges;
 			item.stackable = true;
+			cyan_charge += components::catridge();
 		}
 
 		{
@@ -287,8 +291,8 @@ namespace prefabs {
 			response.modifier.colorize = cyan;
 		}
 
-		cyan_charge.map_child_entity(child_entity_name::BULLET_ROUND, round_definition);
-		cyan_charge.map_child_entity(child_entity_name::BULLET_SHELL, shell_definition);
+		cyan_charge.map_child_entity(child_entity_name::CATRIDGE_ROUND, round_definition);
+		cyan_charge.map_child_entity(child_entity_name::CATRIDGE_SHELL, shell_definition);
 
 		cyan_charge.add_standard_components();
 
@@ -296,9 +300,9 @@ namespace prefabs {
 	}
 
 	entity_handle create_green_charge(cosmos& cosmos, vec2 pos, int charges) {
-		auto green_charge = cosmos.create_entity("green_charge");
-		auto round_definition = cosmos.create_entity("round_definition");
-		auto shell_definition = cosmos.create_entity("shell_definition");
+		const auto green_charge = cosmos.create_entity("green_charge");
+		const auto round_definition = cosmos.create_entity("round_definition");
+		const auto shell_definition = cosmos.create_entity("shell_definition");
 		name_entity(green_charge, entity_name::GREEN_CHARGE);
 
 		{
@@ -310,6 +314,7 @@ namespace prefabs {
 			item.categories_for_slot_compatibility.set(item_category::SHOT_CHARGE);
 			item.charges = charges;
 			item.stackable = true;
+			green_charge += components::catridge();
 		}
 
 		{
@@ -345,8 +350,8 @@ namespace prefabs {
 			response.modifier.colorize = green;
 		}
 
-		green_charge.map_child_entity(child_entity_name::BULLET_ROUND, round_definition);
-		green_charge.map_child_entity(child_entity_name::BULLET_SHELL, shell_definition);
+		green_charge.map_child_entity(child_entity_name::CATRIDGE_ROUND, round_definition);
+		green_charge.map_child_entity(child_entity_name::CATRIDGE_SHELL, shell_definition);
 
 		green_charge.add_standard_components();
 

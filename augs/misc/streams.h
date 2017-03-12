@@ -106,35 +106,39 @@ namespace augs {
 }
 
 namespace augs {
-	template<class... Args>
+	template <class...>
 	void read_object(augs::stream& ar, augs::stream& storage) {
 		static_assert(false, "Reading a stream from a stream is ill-formed.");
 	}
 
-	template<class... Args>
-	void write_object(augs::stream& ar, const augs::stream& storage) {
-		ar.write(storage);
-	}
+	void write_object(augs::stream& ar, const augs::stream& storage);
 
-	template<class A, class... Args>
-	void write_stream_with_properties(A& ar, const augs::stream& storage, Args... args) {
+	template<class A>
+	void write_stream_with_properties(A& ar, const augs::stream& storage) {
 		storage.write_with_properties(ar);
 	}
 
-	template<class A, class... Args>
-	void read_stream_with_properties(A& ar, augs::stream& storage, Args... args) {
+	template <class A>
+	void read_stream_with_properties(A& ar, augs::stream& storage) {
 		storage.read_with_properties(ar);
 	}
 
-	template<class A, class... Args>
-	void write_sized_stream(A& ar, const augs::stream& storage, Args... args) {
+	template <class A>
+	void write_stream_with_size(A& ar, const augs::stream& storage) {
 		ensure(storage.get_read_pos() == 0);
-		write(ar, storage.buf);
+		write(ar, storage.size());
+		write_n(ar, storage.data(), storage.size());
 	}
 
-	template<class A, class... Args>
-	void read_sized_stream(A& ar, augs::stream& storage, Args... args) {
-		read(ar, storage.buf);
-		storage.set_write_pos(storage.buf.size());
+	template <class A>
+	void read_stream_with_size(A& ar, augs::stream& storage) {
+		size_t s;
+
+		read(ar, s);
+		
+		storage.reserve(s);
+		storage.set_write_pos(s);
+		
+		read_n(ar, storage.data(), storage.size());
 	}
 }

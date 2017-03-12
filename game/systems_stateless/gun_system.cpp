@@ -165,7 +165,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 						while (charges--) {
 							{
-								const auto round_entity = cosmos.clone_entity(catridge_or_pellet_stack[child_entity_name::BULLET_ROUND]); //??
+								const auto round_entity = cosmos.clone_entity(catridge_or_pellet_stack[child_entity_name::CATRIDGE_ROUND]); //??
 								
 								auto& damage = round_entity.get<components::damage>();
 								damage.amount *= gun.damage_multiplier;
@@ -182,7 +182,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 								round_entity.add_standard_components();
 							}
 
-							const auto shell_definition = catridge_or_pellet_stack[child_entity_name::BULLET_SHELL];
+							const auto shell_definition = catridge_or_pellet_stack[child_entity_name::CATRIDGE_SHELL];
 
 							if (shell_definition.alive()) {
 								const auto shell_entity = cosmos.clone_entity(shell_definition);

@@ -36,8 +36,13 @@ void transform_component_ids_to_guids(
 		[&cosm](auto, auto& id) {
 			const auto handle = cosm[id];
 
+			id.unset();
+			
 			if (handle.alive()) {
 				id.guid = handle.get_guid();
+			}
+			else {
+				id.guid = 0u;
 			}
 		},
 		comp
@@ -55,6 +60,8 @@ void transform_component_guids_to_ids(
 	> (
 		[&cosm](auto, auto& id) {
 			const entity_guid guid = id.guid;
+
+			id.unset();
 
 			if (guid != 0) {
 				id = cosm.guid_map_for_transport.at(guid);
@@ -170,7 +177,7 @@ bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 					return;
 				}
 
-				constexpr size_t idx = index_in_list<encoded_id_type, decltype(agg.component_ids)>::value;
+				constexpr size_t idx = index_in_list_v<encoded_id_type, decltype(agg.component_ids)>;
 
 				const auto base_c = base.get_component_pool<component_type>()[base_id];
 				const auto enco_c = enco.get_component_pool<component_type>()[enco_id];
@@ -646,6 +653,7 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndCreatedThreeEntitiesWithReferences) {
 	new_ent2.get<components::position_copying>().set_target(new_ent3);
 	new_ent3.get<components::position_copying>().set_target(new_ent1);
 
+	new_ent1 += components::sentience();
 	new_ent1.map_child_entity(child_entity_name::CHARACTER_CROSSHAIR, new_ent2);
 
 	{
@@ -662,8 +670,10 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndCreatedThreeEntitiesWithReferences) {
 	const auto ent2 = c1.get_entity_by_guid(second_guid);
 	const auto ent3 = c1.get_entity_by_guid(third_guid);
 
+	ASSERT_TRUE(ent1.has<components::sentience>());
 	ASSERT_TRUE(ent1.has<components::position_copying>());
 	const bool pc1_intact = ent1.get<components::position_copying>().target == ent2.get_id();
+	const bool pc1ch_intact = ent1[child_entity_name::CHARACTER_CROSSHAIR] == ent2.get_id();
 	ASSERT_TRUE(pc1_intact);
 
 	ASSERT_TRUE(ent2.has<components::position_copying>());
@@ -710,6 +720,7 @@ TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
 		new_ent2.get<components::position_copying>().set_target(new_ent3);
 		new_ent3.get<components::position_copying>().set_target(new_ent1);
 
+		new_ent1 += components::sentience();
 		new_ent1.map_child_entity(child_entity_name::CHARACTER_CROSSHAIR, new_ent2);
 	}
 
@@ -731,6 +742,7 @@ TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
 		new_ent2.get<components::position_copying>().set_target(new_ent3);
 		new_ent3.get<components::position_copying>().set_target(new_ent1);
 
+		new_ent1 += components::sentience();
 		new_ent1.map_child_entity(child_entity_name::CHARACTER_CROSSHAIR, new_ent2);
 	}
 

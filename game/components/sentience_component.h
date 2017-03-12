@@ -70,6 +70,7 @@ namespace components {
 
 		recoil_player aimpunch;
 		child_entity_id health_damage_particles;
+		child_entity_id character_crosshair;
 		// END GEN INTROSPECTOR
 
 		template <class F>

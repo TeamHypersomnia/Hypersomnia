@@ -124,11 +124,6 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 
 			step.transient.messages.post(burst);
 		}
-		
-		if (cosmos[g.subject][child_entity_name::MUZZLE_SMOKE].alive()) {
-			messages::queue_destruction msg = { cosmos[g.subject][child_entity_name::MUZZLE_SMOKE] };
-			step.transient.messages.post(msg);
-		}
 	}
 
 	for (const auto& d : damages) {

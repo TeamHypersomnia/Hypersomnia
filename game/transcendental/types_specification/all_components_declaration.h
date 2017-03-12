@@ -49,6 +49,7 @@ namespace components {
 	struct sound_existence;
 	struct sound_response;
 	struct grenade;
+	struct catridge;
 	struct substance;
 }
 
@@ -101,6 +102,7 @@ struct put_all_components_into {
 		components::sound_existence,
 		components::sound_response,
 		components::grenade,
+		components::catridge,
 
 		components::substance
 

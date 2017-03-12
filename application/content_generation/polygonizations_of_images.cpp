@@ -77,7 +77,7 @@ void regenerate_polygonizations_of_images(
 			std::ostringstream in;
 
 			for (const auto& p : points) {
-				in << p.x << " " << p.y << std::endl;
+				in << p << std::endl;
 			}
 
 			augs::create_text_file(polygonization_target_path, in.str());

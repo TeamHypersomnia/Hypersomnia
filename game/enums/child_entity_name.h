@@ -1,15 +1,11 @@
 #pragma once
 
 enum class child_entity_name {
-	INVALID,
-
 	CHARACTER_CROSSHAIR,
 	CROSSHAIR_RECOIL_BODY,
 
-	MUZZLE_SMOKE,
-
-	BULLET_SHELL,
-	BULLET_ROUND,
+	CATRIDGE_SHELL,
+	CATRIDGE_ROUND,
 
 	COUNT
 };

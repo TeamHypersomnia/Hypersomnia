@@ -1143,6 +1143,7 @@
     <ClInclude Include="game\assets\sound_buffer_id.h" />
     <ClInclude Include="game\assets\sound_response_id.h" />
     <ClInclude Include="game\assets\tile_layer_id.h" />
+    <ClInclude Include="game\components\catridge_component.h" />
     <ClInclude Include="game\components\child_component.h" />
     <ClInclude Include="game\components\flags_component.h" />
     <ClInclude Include="game\components\grenade_component.h" />

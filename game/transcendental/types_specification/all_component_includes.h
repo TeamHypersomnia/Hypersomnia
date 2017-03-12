@@ -47,4 +47,5 @@
 #include "game/components/sound_existence_component.h"
 #include "game/components/sound_response_component.h"
 #include "game/components/grenade_component.h"
+#include "game/components/catridge_component.h"
 
