@@ -1,9 +1,7 @@
 #pragma once
 #include <type_traits>
-#include <xtr1common>
 
-#include "augs/templates/maybe_const.h"
-#include "augs/templates/is_traits.h"
+#include "augs/templates/introspection_traits.h"
 
 template <class T>
 struct exclude_no_type {
@@ -86,7 +84,7 @@ namespace augs {
 			const L& label,
 			MemberInstances&&... member_instances
 		) {
-			static_assert(has_introspects_v<MemberType>, "Found a non-fundamental type without an introspector, on whom the callback is invalid.");
+			static_assert(has_introspect_v<MemberType>, "Found a non-fundamental type without an introspector, on whom the callback is invalid.");
 
 			introspect_recursive<
 				call_valid_predicate,
@@ -137,17 +135,19 @@ namespace augs {
 		introspect(
 			[&](
 				const auto& label, 
-				auto& first_instance, 
+				auto&& first_instance, 
 				auto&&... instances
 			) {
+				typedef std::decay_t<decltype(first_instance)> this_member_type;
+
 				recursive_introspector<
 					call_valid_predicate,
 					exclude_type_predicate,
-					std::decay_t<decltype(first_instance)>
+					this_member_type
 				>()(
 					member_callback,
 					label,
-					first_instance,
+					std::forward<decltype(first_instance)>(first_instance),
 					std::forward<decltype(instances)>(instances)...
 				);
 			},
@@ -184,4 +184,4 @@ struct has_introspect<
 };
 
 template <class T>
-constexpr bool has_introspects_v = has_introspect<T>::value;
+constexpr bool has_introspect_v = has_introspect<T>::value;

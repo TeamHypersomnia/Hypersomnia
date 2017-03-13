@@ -1129,7 +1129,7 @@
     <ClInclude Include="augs\templates\for_each_in_types.h" />
     <ClInclude Include="augs\templates\hash_templates.h" />
     <ClInclude Include="augs\templates\is_component_synchronized.h" />
-    <ClInclude Include="augs\templates\is_traits.h" />
+    <ClInclude Include="augs\templates\introspection_traits.h" />
     <ClInclude Include="augs\templates\maybe_const.h" />
     <ClInclude Include="augs\templates\memcpy_safety.h" />
     <ClInclude Include="augs\templates\minimal_templates.h" />

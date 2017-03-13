@@ -16,13 +16,13 @@
 
 #include "generated_introspectors.h"
 
-static_assert(!has_introspects_v<cosmos>, "Trait is wrong");
-static_assert(!has_introspects_v<unsigned>, "Trait is wrong");
-static_assert(has_introspects_v<cosmos_metadata>, "Trait is wrong");
-static_assert(has_introspects_v<ltrbt<float>>, "Trait is wrong");
-static_assert(has_introspects_v<ltrbt<int>>, "Trait is wrong");
-static_assert(has_introspects_v<augs::constant_size_vector<int, 2>>, "Trait is wrong");
-static_assert(has_introspects_v<zeroed_pod<unsigned int>>, "Trait is wrong");
+static_assert(!has_introspect_v<cosmos>, "Trait is wrong");
+static_assert(!has_introspect_v<unsigned>, "Trait is wrong");
+static_assert(has_introspect_v<cosmos_metadata>, "Trait is wrong");
+static_assert(has_introspect_v<ltrbt<float>>, "Trait is wrong");
+static_assert(has_introspect_v<ltrbt<int>>, "Trait is wrong");
+static_assert(has_introspect_v<augs::constant_size_vector<int, 2>>, "Trait is wrong");
+static_assert(has_introspect_v<zeroed_pod<unsigned int>>, "Trait is wrong");
 
 template <class T>
 void transform_component_ids_to_guids(

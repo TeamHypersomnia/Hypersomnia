@@ -31,7 +31,7 @@ void force_joint_system::apply_forces_towards_target_entities(const logic_step s
 			}
 
 			const auto& force_joint = it.get<components::force_joint>();
-			const auto& chased_entity = cosmos[force_joint.chased_entity];
+			const auto chased_entity = cosmos[force_joint.chased_entity];
 
 			if (chased_entity.dead()) {
 				return;

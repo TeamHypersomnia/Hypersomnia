@@ -130,7 +130,7 @@ namespace augs {
 		T& storage,
 		const std::enable_if_t<!has_io_overloads_v<A, T> && !is_byte_io_safe_v<A, T>>* const dummy = nullptr
 	) {
-		static_assert(has_introspects_v<T>, "Attempt to read a type in a non-bytesafe context without i/o overloads and without introspectors!");
+		static_assert(has_introspect_v<T>, "Attempt to read a type in a non-bytesafe context without i/o overloads and without introspectors!");
 
 		augs::introspect(
 			[&](auto, auto& member) {
@@ -146,7 +146,7 @@ namespace augs {
 		const T& storage,
 		const std::enable_if_t<!has_io_overloads_v<A, T> && !is_byte_io_safe_v<A, T>>* const dummy = nullptr
 	) {
-		static_assert(has_introspects_v<T>, "Attempt to write a type in a non-bytesafe context without i/o overloads and without introspectors!");
+		static_assert(has_introspect_v<T>, "Attempt to write a type in a non-bytesafe context without i/o overloads and without introspectors!");
 
 		augs::introspect(
 			[&](auto, const auto& member) {
