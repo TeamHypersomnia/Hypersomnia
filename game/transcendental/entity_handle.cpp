@@ -67,7 +67,7 @@ void basic_entity_handle<C>::add_standard_components() const {
 			add(components::special_physics());
 		}
 
-		get<components::special_physics>().dropped_collision_cooldown.set(200, get_cosmos().get_timestamp());
+		get<components::special_physics>().dropped_or_created_cooldown.set(200, get_cosmos().get_timestamp());
 	}
 
 	recalculate_basic_processing_categories<false, void>();

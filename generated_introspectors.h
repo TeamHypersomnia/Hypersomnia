@@ -1213,7 +1213,8 @@ namespace augs {
 		F f,
 		Instances&&... _t_
 	) {
-		FIELD(dropped_collision_cooldown);
+		FIELD(dropped_or_created_cooldown);
+		FIELD(during_cooldown_ignore_collision_with);
 		FIELD(owner_friction_ground);
 		FIELD(owner_friction_grounds);
 	}

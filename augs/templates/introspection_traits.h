@@ -1,5 +1,35 @@
 #pragma once
 
+struct true_returner {
+	template <class... Types>
+	bool operator()(Types...) const {
+		return true;
+	}
+};
+
+template <class T, class = void>
+struct has_introspect {
+	static constexpr bool value = false;
+};
+
+template <class T>
+struct has_introspect<
+	T,
+	decltype(
+		augs::introspect_body(
+			static_cast<T*>(nullptr),
+			true_returner(),
+			std::declval<T>()
+		),
+		void()
+		)
+> {
+	static constexpr bool value = true;
+};
+
+template <class T>
+constexpr bool has_introspect_v = has_introspect<T>::value;
+
 namespace std {
 	template <size_t I>
 	class bitset;
@@ -90,3 +120,9 @@ struct can_stream_right_predicate {
 
 //template <class StreamType>
 //constexpr bool can_stream_right_predicate_v = can_stream_right_predicate<StreamType>;
+
+
+template <class T>
+struct exclude_no_type {
+	static constexpr bool value = false;
+};

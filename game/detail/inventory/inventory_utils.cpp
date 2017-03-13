@@ -567,12 +567,17 @@ void perform_transfer(const item_slot_transfer_request r, const logic_step step)
 	}
 
 	if (is_drop_request) {
-		const auto force = vec2().set_from_degrees(previous_container_transform.rotation).set_length(120);
-		const auto offset = vec2().random_on_circle(20, cosmos.get_rng_for(r.get_item()));
+		ensure(previous_slot.get_container().alive());
+
+		const auto impulse = vec2().set_from_degrees(previous_container_transform.rotation).set_length(2000);
 
 		auto& physics = grabbed_item_part_handle.get<components::physics>();
-		physics.apply_force(force, offset, true);
+		
+		physics.apply_impulse(impulse * physics.get_mass());
+		physics.apply_angular_impulse(1.5f * physics.get_mass());
+
 		auto& special_physics = grabbed_item_part_handle.get<components::special_physics>();
-		special_physics.dropped_collision_cooldown.set(200, cosmos.get_timestamp());
+		special_physics.dropped_or_created_cooldown.set(400, cosmos.get_timestamp());
+		special_physics.during_cooldown_ignore_collision_with = previous_slot.get_container();
 	}
 }

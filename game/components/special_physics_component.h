@@ -24,7 +24,8 @@ struct friction_connection {
 namespace components {
 	struct special_physics {
 		// GEN INTROSPECTOR struct components::special_physics
-		augs::stepped_cooldown dropped_collision_cooldown;
+		augs::stepped_cooldown dropped_or_created_cooldown;
+		entity_id during_cooldown_ignore_collision_with;
 		entity_id owner_friction_ground;
 		augs::constant_size_vector<friction_connection, OWNER_FRICTION_GROUNDS_COUNT> owner_friction_grounds;
 		// END GEN INTROSPECTOR
