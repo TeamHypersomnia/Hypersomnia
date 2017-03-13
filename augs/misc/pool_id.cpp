@@ -27,8 +27,4 @@ namespace augs {
 	bool raw_pool_id::operator!=(const raw_pool_id& b) const {
 		return !operator==(b);
 	}
-
-	bool raw_pool_id::operator<(const raw_pool_id& b) const {
-		return std::make_tuple(pool.version, pool.indirection_index) < std::make_tuple(b.pool.version, b.pool.indirection_index);
-	}
 }

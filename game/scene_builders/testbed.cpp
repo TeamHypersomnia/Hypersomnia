@@ -73,7 +73,7 @@ namespace scene_builders {
 		//const auto main_character_motorcycle = prefabs::create_motorcycle(world, components::transform(900, 48200, -90));
 		const auto main_character_motorcycle = prefabs::create_motorcycle(world, components::transform(900, 200, -90));
 		
-		const auto riding_car = prefabs::create_car(world, components::transform(850, 44200, -90));
+		const auto riding_car = prefabs::create_car(world, components::transform(850, 1000, -90));
 
 		const auto riding_car2 = prefabs::create_car(world, components::transform(-850 + 1000, -8200, -90 + 180));
 		const auto motorcycle2 = prefabs::create_motorcycle(world, components::transform(-1150 + 1000, -8200, -90 + 180));
@@ -693,7 +693,7 @@ namespace scene_builders {
 
 		if (character(3).alive()) {
 			driver_system().assign_car_ownership(character(3), riding_car);
-			riding_car.get<components::car>().accelerating = true;
+			//riding_car.get<components::car>().accelerating = true;
 		}
 
 		select_character(character(0));

@@ -21,13 +21,6 @@ bool basic_inventory_slot_id<T>::operator==(const basic_inventory_slot_id b) con
 }
 
 template <class T>
-bool basic_inventory_slot_id<T>::operator<(const basic_inventory_slot_id b) const {
-	return
-		std::make_tuple(container_entity, type) <
-		std::make_tuple(b.container_entity, b.type);
-}
-
-template <class T>
 bool basic_inventory_slot_id<T>::operator!=(const basic_inventory_slot_id b) const {
 	return !operator==(b);
 }

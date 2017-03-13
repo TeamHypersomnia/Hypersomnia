@@ -19,7 +19,6 @@ struct basic_inventory_slot_id {
 
 	void unset();
 
-	bool operator<(const basic_inventory_slot_id b) const;
 	bool operator==(const basic_inventory_slot_id b) const;
 	bool operator!=(const basic_inventory_slot_id b) const;
 };

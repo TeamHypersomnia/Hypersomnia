@@ -19,7 +19,6 @@ namespace augs {
 
 		bool operator==(const raw_pool_id& b) const;
 		bool operator!=(const raw_pool_id& b) const;
-		bool operator<(const raw_pool_id& b) const;
 
 		friend std::ostream& operator<<(std::ostream& out, const raw_pool_id &x);
 	};
@@ -39,11 +38,6 @@ namespace augs {
 		bool operator!=(const B& b) const {
 			return pool.indirection_index != b.pool.indirection_index;
 		}
-
-		template<class B>
-		bool operator<(const B& b) const {
-			return pool.indirection_index < b.pool.indirection_index;
-		}
 	};
 
 	template<class T>
@@ -60,7 +54,6 @@ namespace augs {
 		using raw_pool_id::raw_pool_id;
 		using raw_pool_id::operator==;
 		using raw_pool_id::operator!=;
-		using raw_pool_id::operator<;
 	};
 
 	template<class T>
