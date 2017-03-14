@@ -728,6 +728,7 @@ namespace augs {
 		Instances&&... _t_
 	) {
 		FIELD(spoon);
+		FIELD(released_spoon);
 		FIELD(type);
 	}
 
