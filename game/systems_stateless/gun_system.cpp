@@ -169,6 +169,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 								
 								auto& damage = round_entity.get<components::damage>();
 								damage.amount *= gun.damage_multiplier;
+								damage.impulse_upon_hit *= gun.damage_multiplier;
 								damage.sender = it;
 								total_recoil_amount += damage.recoil_multiplier;
 

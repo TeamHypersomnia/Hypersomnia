@@ -184,9 +184,11 @@ namespace augs {
 					}
 
 					if (gr.rect_held_by_lmb == this_id && msg == message::mousemotion && mouse_pos != gr.last_ldown_position) {
+						bool has_only_started = !gr.held_rect_is_dragged;
+						
 						gr.held_rect_is_dragged = true;
 						gr.current_drag_amount = mouse_pos - gr.last_ldown_position;
-						gui_event_lambda(gui_event::ldrag);
+						gui_event_lambda(has_only_started ? gui_event::lstarteddrag : gui_event::ldrag);
 					}
 				}
 			}

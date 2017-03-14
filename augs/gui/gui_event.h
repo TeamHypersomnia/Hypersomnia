@@ -27,6 +27,7 @@ enum class gui_event {
 	hover,
 	hoverlost,
 	hout,
+	lstarteddrag,
 	ldrag,
 	loutdrag,
 	lfinisheddrag,

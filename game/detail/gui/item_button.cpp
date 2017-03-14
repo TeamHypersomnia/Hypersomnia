@@ -464,7 +464,7 @@ void item_button::respond_to_events(const game_gui_context context, const this_i
 		for (const auto& info : entropies.get_events_for(this_id)) {
 			this_id->detector.update_appearance(info);
 
-			if (info == gui_event::ldrag) {
+			if (info == gui_event::lstarteddrag) {
 				element.dragged_charges = item.get<components::item>().charges;
 			}
 

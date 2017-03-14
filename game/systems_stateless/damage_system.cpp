@@ -34,7 +34,8 @@ using namespace augs;
 
 void damage_system::destroy_colliding_bullets_and_send_damage(const logic_step step) {
 	auto& cosmos = step.cosm;
-	const auto& delta = step.get_delta();
+	const auto delta = step.get_delta();
+	const auto now = cosmos.get_timestamp();
 	const auto& events = step.transient.messages.get_queue<messages::collision_message>();
 	step.transient.messages.get_queue<messages::damage_message>().clear();
 
@@ -80,7 +81,9 @@ void damage_system::destroy_colliding_bullets_and_send_damage(const logic_step s
 					auto considered_impulse = damage.impulse_upon_hit;
 
 					if (subject_handle.has<components::sentience>()) {
-						considered_impulse *= damage.impulse_multiplier_against_sentience;
+						if (!subject_handle.get<components::sentience>().electric_shield.timing.is_enabled(now, delta)) {
+							considered_impulse *= damage.impulse_multiplier_against_sentience;
+						}
 					}
 
 					subject_of_impact.apply_force(vec2(impact_velocity).set_length(considered_impulse), it.point - subject_of_impact.get_mass_position());
