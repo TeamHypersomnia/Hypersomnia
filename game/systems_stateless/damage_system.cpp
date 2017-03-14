@@ -77,7 +77,13 @@ void damage_system::destroy_colliding_bullets_and_send_damage(const logic_step s
 				}
 
 				if (damage.impulse_upon_hit > 0.f) {
-					subject_of_impact.apply_force(vec2(impact_velocity).set_length(damage.impulse_upon_hit), it.point - subject_of_impact.get_mass_position());
+					auto considered_impulse = damage.impulse_upon_hit;
+
+					if (subject_handle.has<components::sentience>()) {
+						considered_impulse *= damage.impulse_multiplier_against_sentience;
+					}
+
+					subject_of_impact.apply_force(vec2(impact_velocity).set_length(considered_impulse), it.point - subject_of_impact.get_mass_position());
 				}
 
 				damage.saved_point_of_impact_before_death = it.point;

@@ -183,6 +183,68 @@ namespace prefabs {
 		return sample_suppressor;
 	}
 
+	entity_handle create_red_charge(cosmos& cosmos, vec2 pos, int charges) {
+		const auto red_charge = cosmos.create_entity("red_charge");
+		const auto round_definition = cosmos.create_entity("round_definition");
+		const auto shell_definition = cosmos.create_entity("shell_definition");
+		name_entity(red_charge, entity_name::RED_CHARGE);
+
+		{
+			ingredients::add_sprite(red_charge, pos, assets::game_image_id::RED_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::add_see_through_dynamic_body(red_charge);
+
+			auto& item = ingredients::make_item(red_charge);
+			item.space_occupied_per_charge = to_space_units("0.01");
+			item.categories_for_slot_compatibility.set(item_category::SHOT_CHARGE);
+			item.charges = charges;
+			item.stackable = true;
+
+			red_charge += components::catridge();
+		}
+
+		{
+			auto& s = ingredients::add_sprite(round_definition, pos, assets::game_image_id::ROUND_TRACE, red, render_layer::FLYING_BULLETS);
+			s.size *= vec2(2, 0.5);
+			ingredients::add_bullet_round_physics(round_definition);
+
+			auto& damage = round_definition += components::damage();
+			damage.impulse_upon_hit = 30000.f;
+			damage.impulse_multiplier_against_sentience = 5.f;
+			damage.amount = 3.f;
+
+			{
+				auto& response = round_definition += components::particle_effect_response();
+				response.response = assets::particle_effect_response_id::ELECTRIC_PROJECTILE_RESPONSE;
+				response.modifier.colorize = red;
+			}
+
+			{
+				auto& response = round_definition += components::sound_response();
+				response.response = assets::sound_response_id::ELECTRIC_PROJECTILE_RESPONSE;
+			}
+
+			auto& trace = round_definition += components::trace();
+			trace.max_multiplier_x = std::make_pair(0.0f, 1.2f);
+			trace.max_multiplier_y = std::make_pair(0.f, 0.f);
+			trace.lengthening_duration_ms = std::make_pair(200.f, 250.f);
+		}
+
+		{
+			ingredients::add_sprite(shell_definition, pos, assets::game_image_id::RED_SHELL, white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::add_shell_dynamic_body(shell_definition);
+
+			auto& response = shell_definition += components::particle_effect_response{ assets::particle_effect_response_id::SHELL_RESPONSE };
+			response.modifier.colorize = red;
+		}
+
+		red_charge.map_child_entity(child_entity_name::CATRIDGE_ROUND, round_definition);
+		red_charge.map_child_entity(child_entity_name::CATRIDGE_SHELL, shell_definition);
+
+		red_charge.add_standard_components();
+
+		return red_charge;
+	}
+
 	entity_handle create_pink_charge(cosmos& cosmos, vec2 pos, int charges) {
 		const auto pink_charge = cosmos.create_entity("pink_charge");
 		const auto round_definition = cosmos.create_entity("round_definition");

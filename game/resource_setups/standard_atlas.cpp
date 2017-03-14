@@ -234,6 +234,18 @@ namespace resource_setups {
 		}
 
 		{
+			auto& in = output[assets::game_image_id::RED_CHARGE];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/red_charge.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/red_charge.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
+		}
+
+		{
+			auto& in = output[assets::game_image_id::RED_SHELL];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/red_shell.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
+			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/red_shell.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
+		}
+
+		{
 			auto& in = output[assets::game_image_id::GREEN_CHARGE];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/green_charge.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
 			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/green_charge.png", assets::physical_texture_id::GAME_WORLD_ATLAS };

@@ -714,21 +714,21 @@ namespace scene_builders {
 		prefabs::create_amplifier_arm(step.cosm, vec2(-370, + 50));
 
 		prefabs::create_sample_rifle(step, vec2(100, -500 + 100), prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-			prefabs::create_cyan_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
+			prefabs::create_red_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
 
 		prefabs::create_sample_rifle(step, vec2(200, -600 + 100), prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_cyan_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
+				prefabs::create_red_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
 		prefabs::create_sample_rifle(step, vec2(300, -700 + 100), prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_cyan_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
+				prefabs::create_red_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
 		prefabs::create_sample_rifle(step, vec2(400, -800 + 100), prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_cyan_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
+				prefabs::create_red_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
 		prefabs::create_sample_rifle(step, vec2(500, -900 + 100), prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_cyan_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
+				prefabs::create_red_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
 
 		prefabs::create_sample_rifle(step, vec2(700, -600 + 100), prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_cyan_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
+				prefabs::create_red_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
 		prefabs::create_sample_rifle(step, vec2(800, -700 + 100), prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_cyan_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
+				prefabs::create_red_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
 		prefabs::create_sample_rifle(step, vec2(900, -800 + 100), prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
 				prefabs::create_cyan_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
 

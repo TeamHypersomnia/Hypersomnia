@@ -142,20 +142,20 @@ namespace resource_setups {
 
 			{
 				resources::emission em;
-				em.min_swing_spread.set(0.5, 1);
-				em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
-				em.max_swing_spread.set(10 / 2, 10 / 2);
-				em.max_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+				em.min_swing_spread.set(2.3, 2.5);
+				em.min_swings_per_sec.set(3.3, 3.5);
+				em.max_swing_spread.set(10, 20);
+				em.max_swings_per_sec.set(1.3, 1.5);
 
-				em.swing_spread.set(0, 0);
-				em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
-				em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
+				em.swing_spread.set(10, 20);
+				em.swings_per_sec.set(1.3, 1.5);
+				em.swing_spread_change_rate.set(0.8, 0.9);
 
 				em.spread_degrees = std::make_pair(7, 7);
 				em.particles_per_sec.set(40, 40);
 				em.stream_lifetime_ms = std::make_pair(3000000, 3000000);
 
-				em.base_speed = std::make_pair(20, 820);
+				em.base_speed = std::make_pair(50, 350);
 
 				em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEGf, 2.8f*RAD_TO_DEGf);
 				em.particle_lifetime_ms = std::make_pair(1500, 1500);
@@ -164,15 +164,15 @@ namespace resource_setups {
 					general_particle particle_template;
 
 					particle_template.angular_damping = 0;
-					particle_template.linear_damping = 100;
-					particle_template.face.set(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 30));
+					particle_template.linear_damping = 10;
+					particle_template.face.set(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 15));
 					particle_template.unshrinking_time_ms = 0.f;
-					particle_template.shrink_when_ms_remaining = 400.f;
+					particle_template.shrink_when_ms_remaining = 100.f;
 
 					em.add_particle_template(particle_template);
 				}
 
-				em.size_multiplier = std::make_pair(0.25, 0.55);
+				em.size_multiplier = std::make_pair(0.35, 0.65);
 				em.particle_render_template.layer = render_layer::DIM_SMOKES;
 				em.initial_rotation_variation = 180;
 
@@ -582,29 +582,33 @@ namespace resource_setups {
 				em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
 
 				em.spread_degrees = std::make_pair(360, 360);
-				em.num_of_particles_to_spawn_initially.set(30, 45);
+				em.num_of_particles_to_spawn_initially.set(18, 20);
 				em.stream_lifetime_ms = std::make_pair(0, 0);
 
-				em.base_speed = std::make_pair(150, 200);
-				em.base_speed_variation = std::make_pair(100.f, 120.f);
+				em.base_speed = std::make_pair(100, 150);
+				em.base_speed_variation = std::make_pair(10.f, 12.f);
 
 				em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEGf, 2.8f*RAD_TO_DEGf);
-				em.particle_lifetime_ms = std::make_pair(900, 900);
+				em.particle_lifetime_ms = std::make_pair(400, 500);
+
+				em.randomize_spawn_point_within_circle_of_inner_radius = std::make_pair(20.f, 25.f);
+				em.randomize_spawn_point_within_circle_of_outer_radius = std::make_pair(40.f, 45.f);
 
 				for (int i = 0; i < 3; ++i) {
 					general_particle particle_template;
 
 					particle_template.angular_damping = 0;
-					particle_template.linear_damping = 400;
+					particle_template.linear_damping = 20;
+					particle_template.acc.set(300, -300);
 					particle_template.face.set(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 15));
 					particle_template.unshrinking_time_ms = 100.f;
-					particle_template.shrink_when_ms_remaining = 200.f;
+					particle_template.shrink_when_ms_remaining = 150.f;
 
 					em.add_particle_template(particle_template);
 				}
 
-				em.size_multiplier = std::make_pair(0.25, 0.25);
-				em.particle_render_template.layer = render_layer::DIM_SMOKES;
+				em.size_multiplier = std::make_pair(0.40, 0.50);
+				em.particle_render_template.layer = render_layer::ILLUMINATING_SMOKES;
 				em.initial_rotation_variation = 180;
 
 				effect.push_back(em);

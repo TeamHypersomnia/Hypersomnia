@@ -598,6 +598,7 @@ namespace augs {
 		FIELD(amount);
 
 		FIELD(impulse_upon_hit);
+		FIELD(impulse_multiplier_against_sentience);
 
 		FIELD(sender);
 

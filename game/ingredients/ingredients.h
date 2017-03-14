@@ -64,6 +64,7 @@ namespace prefabs {
 		vec2 pos 
 	);
 
+	entity_handle create_red_charge(cosmos&, vec2 pos, int charges = 23);
 	entity_handle create_pink_charge(cosmos&, vec2 pos, int charges = 23);
 	entity_handle create_cyan_charge(cosmos&, vec2 pos, int charges = 30);
 	entity_handle create_green_charge(cosmos& world, vec2 pos, int charges = 23);

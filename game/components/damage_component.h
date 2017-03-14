@@ -14,6 +14,7 @@ namespace components {
 		float amount = 12.f;
 
 		float impulse_upon_hit = 100.f;
+		float impulse_multiplier_against_sentience = 1.f;
 
 		entity_id sender;
 

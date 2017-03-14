@@ -20,10 +20,15 @@ textual_description description_by_entity_name(const entity_name n) {
 			L"KEK9",
 			L"The love to KEK is a fanciful trek."
 		};
+	case entity_name::RED_CHARGE:
+		return{
+			L"Red charge",
+			L"Deals massive force upon impact.\nBest against armor."
+		};
 	case entity_name::PINK_CHARGE:
 		return{
 			L"Pink charge",
-			L"Effective against vehicles."
+			L"Effective against both vehicles and personnel."
 		};
 	case entity_name::CYAN_CHARGE:
 		return{

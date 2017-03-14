@@ -8,6 +8,7 @@
 #include "game/components/trigger_query_detector_component.h"
 #include "game/components/melee_component.h"
 #include "game/components/trigger_collision_detector_component.h"
+#include "game/components/grenade_component.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_id.h"
@@ -79,8 +80,9 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 			if (it.intent == intent_type::CROSSHAIR_PRIMARY_ACTION) {
 				const auto hand = subject[slot_function::PRIMARY_HAND];
 
-				if (hand.alive() && hand->items_inside.size() > 0)
+				if (hand.alive() && hand->items_inside.size() > 0) {
 					callee = hand.get_items_inside()[0];
+				}
 			}
 
 			if (it.intent == intent_type::CROSSHAIR_SECONDARY_ACTION) {
@@ -91,8 +93,9 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 				else {
 					const auto prim_hand = subject[slot_function::PRIMARY_HAND];
 
-					if (prim_hand.alive() && prim_hand->items_inside.size() > 0)
+					if (prim_hand.alive() && prim_hand->items_inside.size() > 0) {
 						callee = prim_hand.get_items_inside()[0];
+					}
 				}
 			}
 		}
@@ -100,12 +103,12 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 		const auto callee_handle = cosmos[callee];
 
 		if (callee_handle.alive()) {
-			if (callee_handle.find<components::gun>()) {
+			if (callee_handle.has<components::gun>()) {
 				it.intent = intent_type::PRESS_GUN_TRIGGER;
 				it.subject = callee;
 				continue;
 			}
-			if (callee_handle.find<components::melee>()) {
+			else if (callee_handle.has<components::melee>()) {
 				if (it.intent == intent_type::CROSSHAIR_PRIMARY_ACTION) {
 					it.intent = intent_type::MELEE_PRIMARY_MOVE;
 				}
@@ -115,6 +118,10 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 
 				it.subject = callee;
 				continue;
+			}
+			else if (callee_handle.has<components::grenade>()) {
+				it.intent = intent_type::RELEASE_GRENADE;
+				it.subject = callee;
 			}
 		}
 	}
