@@ -47,9 +47,13 @@ void component_synchronizer<false, P>::set_body_type(const components::physics::
 	resubstantiation();
 }
 
-
 void component_synchronizer<false, P>::set_activated(const bool flag) const {
 	component.activated = flag;
+	resubstantiation();
+}
+
+void component_synchronizer<false, P>::set_bullet_body(const bool flag) const {
+	component.bullet = flag;
 	resubstantiation();
 }
 

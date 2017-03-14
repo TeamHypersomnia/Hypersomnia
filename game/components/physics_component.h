@@ -101,6 +101,7 @@ public:
 	using basic_physics_synchronizer<false>::basic_physics_synchronizer;
 
 	void set_body_type(const components::physics::type) const;
+	void set_bullet_body(const bool flag) const;
 	void set_activated(const bool) const;
 	void set_velocity(const vec2) const;
 	void set_angular_velocity(const float) const;
