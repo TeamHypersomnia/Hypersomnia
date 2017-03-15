@@ -34,6 +34,9 @@ P P::get_default(const const_entity_handle id) {
 	if (id.has<components::gun>()) {
 		matching.push_back(processing_subjects::WITH_GUN);
 	}
+	if (id.has<components::grenade>()) {
+		matching.push_back(processing_subjects::WITH_GRENADE);
+	}
 	if (id.has<components::item_slot_transfers>()) {
 		matching.push_back(processing_subjects::WITH_ITEM_SLOT_TRANSFERS);
 	}

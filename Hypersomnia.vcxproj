@@ -436,6 +436,7 @@
     <ClCompile Include="game\systems_audiovisual\vertically_flying_number_system.cpp" />
     <ClCompile Include="game\systems_audiovisual\wandering_pixels_system.cpp" />
     <ClCompile Include="game\systems_stateless\destruction_system.cpp" />
+    <ClCompile Include="game\systems_stateless\grenade_system.cpp" />
     <ClCompile Include="game\systems_stateless\gui_system.cpp" />
     <ClCompile Include="game\systems_audiovisual\light_system.cpp" />
     <ClCompile Include="game\systems_stateless\melee_system.cpp" />
@@ -1247,6 +1248,7 @@
     <ClInclude Include="game\systems_audiovisual\vertically_flying_number_system.h" />
     <ClInclude Include="game\systems_audiovisual\wandering_pixels_system.h" />
     <ClInclude Include="game\systems_stateless\destruction_system.h" />
+    <ClInclude Include="game\systems_stateless\grenade_system.h" />
     <ClInclude Include="game\systems_stateless\gui_system.h" />
     <ClInclude Include="game\systems_audiovisual\light_system.h" />
     <ClInclude Include="game\systems_stateless\melee_system.h" />

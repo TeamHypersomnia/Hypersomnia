@@ -25,29 +25,10 @@ namespace prefabs {
 		
 		grenade.type = grenade_type::FORCE;
 		grenade.spoon = grenade_spoon;
+		
 		//{
-		//	auto& sprite = grenade_spoon += components::sprite();
-		//	auto& render = grenade_spoon += components::render();
-		//
-		//	components::fixtures colliders;
-		//
-		//	render.layer = render_layer::SMALL_DYNAMIC_BODY;
-		//
-		//	sprite.set(assets::game_image_id::GRENADE_SPOON);
-		//
-		//	auto& fixture = colliders.new_collider();
-		//
-		//	fixture.shape.from_renderable(grenade_spoon);
-		//	fixture.density = 0.6f;
-		//	fixture.filter = filters::renderable();
-		//	fixture.sensor = true;
-		//
-		//	vec2 offset(-10, -10);
-		//	colliders.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
-		//
-		//	grenade_spoon += colliders;
-		//
-		//	grenade_spoon.get<components::fixtures>().set_owner_body(grenade);
+		//	ingredients::add_sprite(grenade_spoon, pos, assets::game_image_id::GRENADE_SPOON, white, render_layer::SMALL_DYNAMIC_BODY);
+		//	ingredients::add_shell_dynamic_body(grenade_spoon);
 		//}
 
 		name_entity(grenade_entity, entity_name::FORCE_GRENADE);
@@ -55,10 +36,13 @@ namespace prefabs {
 		auto& sprite = ingredients::add_sprite(grenade_entity, pos, assets::game_image_id::FORCE_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(grenade_entity);
 
+		grenade.released_image_id = assets::game_image_id::FORCE_GRENADE_RELEASED;
+
 		auto& item = ingredients::make_item(grenade_entity);
 		item.space_occupied_per_charge = to_space_units("0.6");
 
 		grenade_entity.add_standard_components();
+		grenade_entity.get<components::processing>().disable_in(processing_subjects::WITH_GRENADE);
 
 		return grenade_entity;
 	}
@@ -78,6 +62,8 @@ namespace prefabs {
 
 		auto& item = ingredients::make_item(grenade_entity);
 		item.space_occupied_per_charge = to_space_units("0.6");
+
+		grenade.released_image_id = assets::game_image_id::PED_GRENADE_RELEASED;
 
 		grenade_entity.add_standard_components();
 
@@ -99,6 +85,8 @@ namespace prefabs {
 
 		auto& item = ingredients::make_item(grenade_entity);
 		item.space_occupied_per_charge = to_space_units("0.6");
+		
+		grenade.released_image_id = assets::game_image_id::INTERFERENCE_GRENADE_RELEASED;
 
 		grenade_entity.add_standard_components();
 

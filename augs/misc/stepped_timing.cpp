@@ -24,6 +24,10 @@ namespace augs {
 	float stepped_timestamp::in_milliseconds(const delta delta) const {
 		return step * delta.in_milliseconds();
 	}
+	
+	bool stepped_timestamp::was_set() const {
+		return step != 0u;
+	}
 
 	stepped_cooldown::stepped_cooldown(
 		const float cooldown_duration_ms

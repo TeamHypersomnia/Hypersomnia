@@ -19,6 +19,8 @@ namespace augs {
 
 		float in_seconds(const delta) const;
 		float in_milliseconds(const delta) const;
+
+		bool was_set() const;
 	};
 
 	struct stepped_cooldown {

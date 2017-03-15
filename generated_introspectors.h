@@ -737,6 +737,10 @@ namespace augs {
 		FIELD(spoon);
 		FIELD(released_spoon);
 		FIELD(type);
+		FIELD(released_image_id);
+
+		FIELD(when_released);
+		FIELD(when_explodes);
 	}
 
 	template <class F, class... Instances>
