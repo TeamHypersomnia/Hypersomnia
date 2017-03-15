@@ -15,6 +15,7 @@
 
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
+#include "game/detail/grenade_logic.h"
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
@@ -120,8 +121,11 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 				continue;
 			}
 			else if (callee_handle.has<components::grenade>()) {
-				it.intent = intent_type::RELEASE_GRENADE;
-				it.subject = callee;
+				release_or_throw_grenade(
+					step,
+					cosmos[callee],
+					subject
+				);
 			}
 		}
 	}

@@ -380,6 +380,7 @@
     <ClCompile Include="game\detail\entity_handle_mixins\renderable_mixin.cpp" />
     <ClCompile Include="game\detail\entity_handle_mixins\spatial_properties_mixin.cpp" />
     <ClCompile Include="game\detail\explosions.cpp" />
+    <ClCompile Include="game\detail\grenade_logic.cpp" />
     <ClCompile Include="game\detail\gui\aabb_highlighter.cpp" />
     <ClCompile Include="game\detail\gui\action_button.cpp" />
     <ClCompile Include="game\detail\gui\character_gui.cpp" />
@@ -1163,6 +1164,7 @@
     <ClInclude Include="game\detail\entity_handle_mixins\renderable_mixin.h" />
     <ClInclude Include="game\detail\entity_handle_mixins\spatial_properties_mixin.h" />
     <ClInclude Include="game\detail\explosions.h" />
+    <ClInclude Include="game\detail\grenade_logic.h" />
     <ClInclude Include="game\detail\gui\aabb_highlighter.h" />
     <ClInclude Include="game\detail\gui\action_button.h" />
     <ClInclude Include="game\detail\gui\character_gui.h" />

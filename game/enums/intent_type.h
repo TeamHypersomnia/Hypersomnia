@@ -35,7 +35,6 @@ enum intent_type : unsigned char {
 	CROSSHAIR_SECONDARY_ACTION,
 
 	PRESS_GUN_TRIGGER,
-	RELEASE_GRENADE,
 
 	RELOAD,
 
