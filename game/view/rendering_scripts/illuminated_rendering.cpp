@@ -187,7 +187,6 @@ namespace rendering_scripts {
 		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::ON_TILED_FLOOR], camera, renderable_drawing_type::NORMAL);
 		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::CAR_INTERIOR], camera, renderable_drawing_type::NORMAL);
 		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::CAR_WHEEL], camera, renderable_drawing_type::NORMAL);
-		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::CORPSES], camera, renderable_drawing_type::NORMAL);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
@@ -221,14 +220,12 @@ namespace rendering_scripts {
 
 		default_shader.use();
 		
-		for (int i = render_layer::FLYING_BULLETS; i >= 0; --i) {
-			if (i == render_layer::CROSSHAIR && !step.settings.draw_crosshairs) {
-				continue;
-			}
-
-			render_system().draw_entities(interp, global_time_seconds,output, cosmos, visible_per_layer[i], camera, renderable_drawing_type::NORMAL);
-		}
+		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::FLYING_BULLETS], camera, renderable_drawing_type::NORMAL);
 		
+		if (step.settings.draw_crosshairs) {
+			render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::CROSSHAIR], camera, renderable_drawing_type::NORMAL);
+		}
+
 		if (step.settings.draw_crosshairs && step.settings.draw_weapon_laser) {
 			draw_crosshair_lasers(
 				[&](const vec2 from, const vec2 to, const rgba col) {

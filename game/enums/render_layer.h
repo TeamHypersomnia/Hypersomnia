@@ -13,7 +13,6 @@ enum render_layer : unsigned char {
 	FLYING_BULLETS,
 	SMALL_DYNAMIC_BODY,
 	DYNAMIC_BODY,
-	CORPSES,
 	CAR_WHEEL,
 	CAR_INTERIOR,
 	ON_TILED_FLOOR,
