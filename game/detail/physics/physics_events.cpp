@@ -269,11 +269,11 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 
 		const bool colliding_with_owning_car = driver && driver->owned_vehicle == collider_owner_body;
 
-		if (dropped_item_colliding_with_container) {
-			LOG(
-				"Ignoring collisiong between %x and %x", subject_owner_body, collider_owner_body
-			);
-		}
+		// if (dropped_item_colliding_with_container) {
+		// 	LOG(
+		// 		"Ignoring collisiong between %x and %x", subject_owner_body, collider_owner_body
+		// 	);
+		// }
 
 		if (
 			dropped_item_colliding_with_container

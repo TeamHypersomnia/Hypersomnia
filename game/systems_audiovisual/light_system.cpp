@@ -219,14 +219,14 @@ void light_system::render_all_lights(
 	render_system().draw_entities(interp, global_time_seconds,output.triangles, cosmos, visible_per_layer[render_layer::FLYING_BULLETS], step.camera, renderable_drawing_type::NEON_MAPS);
 	render_system().draw_entities(interp, global_time_seconds,output.triangles, cosmos, visible_per_layer[render_layer::CAR_INTERIOR], step.camera, renderable_drawing_type::NEON_MAPS);
 	render_system().draw_entities(interp, global_time_seconds,output.triangles, cosmos, visible_per_layer[render_layer::CAR_WHEEL], step.camera, renderable_drawing_type::NEON_MAPS);
-	render_system().draw_entities(interp, global_time_seconds,output.triangles, cosmos, visible_per_layer[render_layer::EFFECTS], step.camera, renderable_drawing_type::NEON_MAPS);
+	render_system().draw_entities(interp, global_time_seconds,output.triangles, cosmos, visible_per_layer[render_layer::NEON_CAPTIONS], step.camera, renderable_drawing_type::NEON_MAPS);
 	render_system().draw_entities(interp, global_time_seconds,output.triangles, cosmos, visible_per_layer[render_layer::ON_GROUND], step.camera, renderable_drawing_type::NEON_MAPS);
 	render_system().draw_entities(interp, global_time_seconds,output.triangles, cosmos, visible_per_layer[render_layer::ON_TILED_FLOOR], step.camera, renderable_drawing_type::NEON_MAPS);
 
 	{
 		particles.draw(
 			output.triangles,
-			render_layer::EFFECTS,
+			render_layer::ILLUMINATING_PARTICLES,
 			step.camera,
 			renderable_drawing_type::NEON_MAPS
 		);

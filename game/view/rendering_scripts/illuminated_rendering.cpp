@@ -221,10 +221,13 @@ namespace rendering_scripts {
 		default_shader.use();
 		
 		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::FLYING_BULLETS], camera, renderable_drawing_type::NORMAL);
+		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::NEON_CAPTIONS], camera, renderable_drawing_type::NORMAL);
 		
 		if (step.settings.draw_crosshairs) {
 			render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::CROSSHAIR], camera, renderable_drawing_type::NORMAL);
 		}
+		
+		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::OVER_CROSSHAIR], camera, renderable_drawing_type::NORMAL);
 
 		if (step.settings.draw_crosshairs && step.settings.draw_weapon_laser) {
 			draw_crosshair_lasers(
@@ -263,7 +266,7 @@ namespace rendering_scripts {
 		{
 			particles.draw(
 				output,
-				render_layer::EFFECTS,
+				render_layer::ILLUMINATING_PARTICLES,
 				camera
 			);
 		}
@@ -284,15 +287,15 @@ namespace rendering_scripts {
 		{
 			const auto projection_matrix_uniform = glGetUniformLocation(circular_bars_shader.id, "projection_matrix");
 			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
-			
-			vec2 upper(0.0f, 0.0f);
-			vec2 lower(1.0f, 1.0f);
-			upper = (*assets::game_image_id::HUD_CIRCULAR_BAR_MEDIUM).get_atlas_space_uv(upper);
-			lower = (*assets::game_image_id::HUD_CIRCULAR_BAR_MEDIUM).get_atlas_space_uv(lower);
+
+		}
+
+		{
+			const auto upper = (*assets::game_image_id::HUD_CIRCULAR_BAR_MEDIUM).get_atlas_space_uv({ 0.0f, 0.0f });
+			const auto lower = (*assets::game_image_id::HUD_CIRCULAR_BAR_MEDIUM).get_atlas_space_uv({ 1.f, 1.f });
 			const auto center = (upper + lower) / 2;
 		
 			glUniform2f(glGetUniformLocation(circular_bars_shader.id, "texture_center"), center.x, center.y);
-		
 		}
 
 		const auto textual_infos = draw_circular_bars_and_get_textual_info(step);

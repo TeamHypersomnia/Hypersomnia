@@ -595,7 +595,7 @@ namespace scene_builders {
 				auto& render = e += components::render();
 				auto& sprite = e += components::sprite();
 
-				render.layer = render_layer::EFFECTS;
+				render.layer = render_layer::NEON_CAPTIONS;
 				sprite.set(assets::game_image_id::HAVE_A_PLEASANT);
 
 				e.add_standard_components();
@@ -665,7 +665,7 @@ namespace scene_builders {
 				auto& render = e += components::render();
 				auto& sprite = e += components::sprite();
 
-				render.layer = render_layer::EFFECTS;
+				render.layer = render_layer::NEON_CAPTIONS;
 				sprite.set(assets::game_image_id::AWAKENING);
 				sprite.effect = components::sprite::special_effect::COLOR_WAVE;
 
@@ -679,7 +679,7 @@ namespace scene_builders {
 				auto& render = e += components::render();
 				auto& sprite = e += components::sprite();
 
-				render.layer = render_layer::EFFECTS;
+				render.layer = render_layer::NEON_CAPTIONS;
 				sprite.set(assets::game_image_id::METROPOLIS);
 
 				e.add_standard_components();

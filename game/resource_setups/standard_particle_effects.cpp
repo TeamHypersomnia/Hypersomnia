@@ -130,7 +130,7 @@ namespace resource_setups {
 				//}
 
 				em.size_multiplier = std::make_pair(1.0, 1.0);
-				em.particle_render_template.layer = render_layer::EFFECTS;
+				em.particle_render_template.layer = render_layer::ILLUMINATING_PARTICLES;
 				em.initial_rotation_variation = 0;
 
 				effect.push_back(em);
@@ -315,7 +315,7 @@ namespace resource_setups {
 			//}
 
 			em.size_multiplier = std::make_pair(1, 1);
-			em.particle_render_template.layer = render_layer::EFFECTS;
+			em.particle_render_template.layer = render_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 0;
 			em.should_particles_look_towards_velocity = false;
 			em.randomize_acceleration = true;
@@ -390,7 +390,7 @@ namespace resource_setups {
 				}
 
 				em.size_multiplier = std::make_pair(1, 1);
-				em.particle_render_template.layer = render_layer::EFFECTS;
+				em.particle_render_template.layer = render_layer::ILLUMINATING_PARTICLES;
 				em.initial_rotation_variation = 0;
 				em.should_particles_look_towards_velocity = false;
 				em.randomize_acceleration = true;
@@ -559,7 +559,7 @@ namespace resource_setups {
 				}
 
 				em.size_multiplier = std::make_pair(1, 1);
-				em.particle_render_template.layer = render_layer::EFFECTS;
+				em.particle_render_template.layer = render_layer::ILLUMINATING_PARTICLES;
 				em.initial_rotation_variation = 0;
 				em.should_particles_look_towards_velocity = false;
 
@@ -634,7 +634,7 @@ namespace resource_setups {
 				}
 
 				em.size_multiplier = std::make_pair(0.5, 1);
-				em.particle_render_template.layer = render_layer::EFFECTS;
+				em.particle_render_template.layer = render_layer::ILLUMINATING_PARTICLES;
 				em.initial_rotation_variation = 0;
 
 				effect.push_back(em);
@@ -663,7 +663,7 @@ namespace resource_setups {
 			}
 
 			em.size_multiplier = std::make_pair(0.5, 1);
-			em.particle_render_template.layer = render_layer::EFFECTS;
+			em.particle_render_template.layer = render_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 0;
 
 			effect.push_back(em);
@@ -734,7 +734,7 @@ namespace resource_setups {
 			}
 
 			em.size_multiplier = std::make_pair(1, 1.5);
-			em.particle_render_template.layer = render_layer::EFFECTS;
+			em.particle_render_template.layer = render_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 0;
 
 			effect.push_back(em);
@@ -763,7 +763,7 @@ namespace resource_setups {
 			}
 
 			em.size_multiplier = std::make_pair(1, 1.5);
-			em.particle_render_template.layer = render_layer::EFFECTS;
+			em.particle_render_template.layer = render_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 0;
 
 			effect.push_back(em);
@@ -797,7 +797,7 @@ namespace resource_setups {
 			}
 
 			em.size_multiplier = std::make_pair(1, 2.0);
-			em.particle_render_template.layer = render_layer::EFFECTS;
+			em.particle_render_template.layer = render_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 0;
 
 			effect.push_back(em);
@@ -863,7 +863,7 @@ namespace resource_setups {
 			}
 
 			em.size_multiplier = std::make_pair(1.f, 1.5f);
-			em.particle_render_template.layer = render_layer::EFFECTS;
+			em.particle_render_template.layer = render_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 0;
 			em.randomize_acceleration = true;
 
