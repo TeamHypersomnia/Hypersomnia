@@ -1,8 +1,7 @@
 #pragma once
 #include "augs/misc/pool_id.h"
 #include "game/transcendental/types_specification/all_components_declaration.h"
-
-typedef unsigned entity_guid;
+#include "game/transcendental/entity_id_declaration.h"
 
 namespace augs {
 	template<class...>

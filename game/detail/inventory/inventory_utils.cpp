@@ -577,7 +577,7 @@ void perform_transfer(const item_slot_transfer_request r, const logic_step step)
 		physics.apply_angular_impulse(1.5f * physics.get_mass());
 
 		auto& special_physics = grabbed_item_part_handle.get<components::special_physics>();
-		special_physics.dropped_or_created_cooldown.set(400, cosmos.get_timestamp());
+		special_physics.dropped_or_created_cooldown.set(300, cosmos.get_timestamp());
 		special_physics.during_cooldown_ignore_collision_with = previous_slot.get_container();
 	}
 }

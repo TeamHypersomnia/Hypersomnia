@@ -22,7 +22,7 @@ struct has_introspect<
 			std::declval<T>()
 		),
 		void()
-		)
+	)
 > {
 	static constexpr bool value = true;
 };
@@ -38,7 +38,34 @@ namespace std {
 namespace augs {
 	template <class T>
 	class enum_bitset;
+
+	template <class... Types>
+	class trivial_variant;
 }
+
+template <class T, class = void>
+struct is_trivial_variant : std::false_type {
+
+};
+
+template <class... Types>
+struct is_trivial_variant<augs::trivial_variant<Types...>> : std::true_type {
+
+};
+
+template <template <typename...> class C, typename...Ts>
+std::true_type is_base_of_template_impl(const C<Ts...>*);
+
+template <template <typename...> class C>
+std::false_type is_base_of_template_impl(...);
+
+template <typename T, template <typename...> class C>
+using is_base_of_template = decltype(is_base_of_template_impl<C>(std::declval<T*>()));
+
+template <class T>
+struct is_base_of_trivial_variant {
+	static constexpr bool value = is_base_of_template<T, augs::trivial_variant>::value;
+};
 
 template <class T>
 struct is_bitset : std::false_type {
@@ -125,4 +152,9 @@ struct can_stream_right_predicate {
 template <class T>
 struct exclude_no_type {
 	static constexpr bool value = false;
+};
+
+template <class T>
+struct exclude_trivial_variants {
+
 };

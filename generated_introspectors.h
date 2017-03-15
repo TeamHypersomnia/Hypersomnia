@@ -1,10 +1,15 @@
 #pragma once
-#include <array>
-#include "game/transcendental/entity_id.h"
+#include "game/transcendental/entity_id_declaration.h"
+#include "game/detail/shape_variant_declaration.h"
 
 #define FIELD(x) f(#x, _t_.x...)
 
 /* Other introspectors that do not fit into the standard schema go here: */
+
+namespace std {
+	template <class, size_t>
+	class array;
+}
 
 namespace augs {
 	template <class F, class ElemType, size_t count, class... Instances>
@@ -52,6 +57,7 @@ struct inventory_traversal;
 struct electric_shield_perk;
 struct haste_perk;
 struct perk_timing;
+struct circle_shape;
 struct spell_instance_data;
 struct all_simulation_settings;
 struct pathfinding_settings;
@@ -1456,6 +1462,15 @@ namespace augs {
 		Instances&&... _t_
 	) {
 		FIELD(duration);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const circle_shape* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(radius);
 	}
 
 	template <class F, class... Instances>

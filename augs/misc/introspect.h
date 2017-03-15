@@ -21,6 +21,25 @@ namespace augs {
 		);
 	}
 
+	/*
+		Explanation of conditional specialization:
+
+		if call on type is valid
+			if type is not excluded
+				call without recursion
+			else
+				do nothing
+		else
+			if type is not excluded
+				if type is an introspective leaf
+					do nothing
+				else
+					recurse without calling (static_asserts that introspectors exist at this point)
+			else
+				do nothing
+	
+	*/
+
 	template <
 		template <class A> class call_valid_predicate,
 		template <class B> class exclude_type_predicate,

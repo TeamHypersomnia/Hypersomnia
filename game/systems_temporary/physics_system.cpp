@@ -103,37 +103,51 @@ void physics_system::fixtures_construct(const const_entity_handle handle) {
 			for (size_t ci = 0; ci < colliders_data.colliders.size(); ++ci) {
 				const auto& c = colliders_data.colliders[ci];
 
-				b2PolygonShape shape;
-
 				b2FixtureDef fixdef;
 				fixdef.density = c.density;
 				fixdef.friction = c.friction;
 				fixdef.isSensor = c.sensor;
 				fixdef.filter = c.filter;
 				fixdef.restitution = c.restitution;
-				fixdef.shape = &shape;
 				fixdef.userData = handle.get_id();
-
-				auto transformed_shape = c.shape;
-				transformed_shape.offset_vertices(colliders.get_total_offset());
 
 				std::vector<b2Fixture*> partitioned_collider;
 
-				for (const auto convex : transformed_shape.convex_polys) {
-					std::vector<b2Vec2> b2verts(convex.vertices.begin(), convex.vertices.end());
+				if (c.shape.is<convex_partitioned_shape>()) {
+					auto transformed_shape = c.shape.get<convex_partitioned_shape>();
+					transformed_shape.offset_vertices(colliders.get_total_offset());
 
-					for (auto& v : b2verts) {
-						v = si.get_meters(v);
+					for (const auto convex : transformed_shape.convex_polys) {
+						std::vector<b2Vec2> b2verts(convex.vertices.begin(), convex.vertices.end());
+
+						for (auto& v : b2verts) {
+							v = si.get_meters(v);
+						}
+
+						b2PolygonShape shape;
+						shape.Set(b2verts.data(), b2verts.size());
+
+						fixdef.shape = &shape;
+						b2Fixture* const new_fix = owner_cache.body->CreateFixture(&fixdef);
+						
+						ensure(static_cast<short>(ci) < std::numeric_limits<short>::max());
+						new_fix->collider_index = static_cast<short>(ci);
+
+						partitioned_collider.push_back(new_fix);
 					}
 
-					shape.Set(b2verts.data(), b2verts.size());
+				}
+				else if (c.shape.is<circle_shape>()) {
+					b2CircleShape shape;
+					shape.m_radius = si.get_meters(c.shape.get<circle_shape>().radius);
 
+					fixdef.shape = &shape;
 					b2Fixture* const new_fix = owner_cache.body->CreateFixture(&fixdef);
 					
-					ensure(static_cast<short>(ci) < std::numeric_limits<short>::max());
-					new_fix->collider_index = static_cast<short>(ci);
-
 					partitioned_collider.push_back(new_fix);
+				}
+				else {
+					ensure("Unknown shape type" && false);
 				}
 
 				cache.fixtures_per_collider.push_back(partitioned_collider);

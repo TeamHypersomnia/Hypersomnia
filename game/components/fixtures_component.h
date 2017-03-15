@@ -1,5 +1,4 @@
 #pragma once
-#include <vector>
 #include <array>
 
 #include "game/transcendental/entity_id.h"
@@ -8,7 +7,7 @@
 #include "transform_component.h"
 #include "game/transcendental/component_synchronizer.h"
 #include "game/enums/colliders_offset_type.h"
-#include "game/detail/convex_partitioned_shape.h"
+#include "game/detail/shape_variant.h"
 #include <Box2D/Dynamics/b2Fixture.h>
 
 #include "augs/misc/constant_size_vector.h"
@@ -16,13 +15,15 @@
 #include "game/enums/physical_material_type.h"
 #include "padding_byte.h"
 
+#include "augs/misc/trivial_variant.h"
+
 class physics_system;
 struct colliders_cache;
 struct b2Fixture_index_in_component;
 
 struct convex_partitioned_collider {
 	// GEN INTROSPECTOR struct convex_partitioned_collider
-	convex_partitioned_shape shape;
+	shape_variant shape;
 	physical_material_type material = physical_material_type::METAL;
 
 	float collision_sound_gain_mult = 1.f;

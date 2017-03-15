@@ -40,25 +40,6 @@ void convex_partitioned_shape::mult_vertices(const vec2 mult) {
 #endif
 }
 
-void convex_partitioned_shape::from_renderable(const const_entity_handle handle) {
-	if (handle.has<components::sprite>()) {
-		from_sprite(handle.get<components::sprite>(), true);
-	}
-	if (handle.has<components::polygon>()) {
-		std::vector<vec2> input;
-
-		const auto& poly = handle.get<components::polygon>();
-		
-		input.reserve(poly.vertices.size());
-
-		for (const auto& v : poly.vertices) {
-			input.push_back(v.pos);
-		}
-		
-		add_concave_polygon(input);
-	}
-}
-
 void convex_partitioned_shape::from_sprite(const components::sprite& sprite, const bool polygonize_sprite) {
 	const auto& polygonized_sprite_verts = get_resource_manager().find(sprite.tex)->polygonized;
 

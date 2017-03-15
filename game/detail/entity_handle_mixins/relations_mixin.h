@@ -12,6 +12,7 @@
 #include "augs/build_settings/setting_empty_bases.h"
 
 #include "augs/templates/maybe_const.h"
+#include "augs/templates/template_logic.h"
 
 struct entity_relations;
 
@@ -51,7 +52,10 @@ public:
 			[&](auto& subject_component) {
 				augs::introspect_recursive<
 					is_entity_id_type,
-					exclude_non_child_id_types
+					typename template_disjunction<
+						exclude_non_child_id_types,
+						is_base_of_trivial_variant
+					>::predicate
 				> (
 					[&](auto, auto& member_child_id) {
 						const auto child_handle = cosmos[member_child_id];

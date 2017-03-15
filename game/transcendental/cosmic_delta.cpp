@@ -18,6 +18,9 @@
 
 static_assert(!has_introspect_v<cosmos>, "Trait is wrong");
 static_assert(!has_introspect_v<unsigned>, "Trait is wrong");
+static_assert(!has_introspect_v<augs::trivial_variant<int, double>>, "Trait is wrong");
+static_assert(is_trivial_variant<augs::trivial_variant<int, double>>::value, "Trait is wrong");
+static_assert(!is_trivial_variant<double>::value, "Trait is wrong");
 static_assert(has_introspect_v<cosmos_metadata>, "Trait is wrong");
 static_assert(has_introspect_v<ltrbt<float>>, "Trait is wrong");
 static_assert(has_introspect_v<ltrbt<int>>, "Trait is wrong");
@@ -31,7 +34,7 @@ void transform_component_ids_to_guids(
 ) {
 	augs::introspect_recursive<
 		is_entity_id_type,
-		exclude_no_type
+		is_base_of_trivial_variant
 	>(
 		[&cosm](auto, auto& id) {
 			const auto handle = cosm[id];
@@ -56,7 +59,7 @@ void transform_component_guids_to_ids(
 ) {
 	augs::introspect_recursive<
 		is_entity_id_type,
-		exclude_no_type
+		is_base_of_trivial_variant
 	> (
 		[&cosm](auto, auto& id) {
 			const entity_guid guid = id.guid;

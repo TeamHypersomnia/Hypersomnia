@@ -1,10 +1,15 @@
 #pragma once
-#include <array>
-#include "game/transcendental/entity_id.h"
+#include "game/transcendental/entity_id_declaration.h"
+#include "game/detail/shape_variant_declaration.h"
 
 #define FIELD(x) f(#x, _t_.x...)
 
 /* Other introspectors that do not fit into the standard schema go here: */
+
+namespace std {
+	template <class, size_t>
+	class array;
+}
 
 namespace augs {
 	template <class F, class ElemType, size_t count, class... Instances>

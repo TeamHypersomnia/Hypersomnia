@@ -21,7 +21,8 @@ namespace ingredients {
 		components::fixtures colliders;
 
 		auto& info = colliders.new_collider();
-		info.shape.from_sprite(e.get<components::sprite>(), true);
+		
+		info.shape.from_renderable(e);
 		info.destructible = destructible;
 
 		info.filter = filters::dynamic_object();

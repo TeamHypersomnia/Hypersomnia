@@ -404,6 +404,7 @@
     <ClCompile Include="game\detail\physics\physics_friction_fields.cpp" />
     <ClCompile Include="game\detail\physics\physics_queries.cpp" />
     <ClCompile Include="game\detail\physics\physics_scripts.cpp" />
+    <ClCompile Include="game\detail\shape_variant.cpp" />
     <ClCompile Include="game\detail\spell_logic.cpp" />
     <ClCompile Include="game\detail\visible_entities.cpp" />
     <ClCompile Include="game\detail\wielding_result.cpp" />
@@ -1135,6 +1136,7 @@
     <ClInclude Include="augs\templates\memcpy_safety.h" />
     <ClInclude Include="augs\templates\minimal_templates.h" />
     <ClInclude Include="augs\templates\string_templates.h" />
+    <ClInclude Include="augs\templates\template_logic.h" />
     <ClInclude Include="augs\templates\tuple_of.h" />
     <ClInclude Include="augs\templates\type_in_pack.h" />
     <ClInclude Include="augs\templates\type_mod_templates.h" />
@@ -1207,6 +1209,8 @@
     <ClInclude Include="game\detail\physics\b2Fixture_index_in_component.h" />
     <ClInclude Include="game\detail\physics\physics_queries.h" />
     <ClInclude Include="game\detail\physics\physics_scripts.h" />
+    <ClInclude Include="game\detail\shape_variant.h" />
+    <ClInclude Include="game\detail\shape_variant_declaration.h" />
     <ClInclude Include="game\detail\spell_logic.h" />
     <ClInclude Include="game\detail\visible_entities.h" />
     <ClInclude Include="game\detail\wielding_result.h" />
@@ -1298,6 +1302,7 @@
     <ClInclude Include="game\simulation_settings\visibility_settings.h" />
     <ClInclude Include="game\messages\will_soon_be_deleted.h" />
     <ClInclude Include="game\transcendental\cosmic_profiler.h" />
+    <ClInclude Include="game\transcendental\entity_id_declaration.h" />
     <ClInclude Include="game\transcendental\logic_step.h" />
     <ClInclude Include="game\transcendental\network_commands.h" />
     <ClInclude Include="game\transcendental\simulation_broadcast.h" />

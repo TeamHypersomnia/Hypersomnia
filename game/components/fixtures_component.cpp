@@ -26,17 +26,19 @@ maybe_const_ref_t<C, colliders_cache>& basic_fixtures_synchronizer<C>::get_cache
 
 template<bool C>
 ltrb basic_fixtures_synchronizer<C>::get_local_aabb() const {
-	std::vector<vec2> all_verts;
-	
-	for (const auto& s : component.colliders) {
-		for (const auto& c : s.shape.convex_polys) {
-			for (const auto v : c.vertices) {
-				all_verts.push_back(v);
-			}
-		}
-	}
-
-	return augs::get_aabb(all_verts);
+	ensure("Not implemented" && false);
+	return {};
+	//std::vector<vec2> all_verts;
+	//
+	//for (const auto& s : component.colliders) {
+	//	for (const auto& c : s.shape.convex_polys) {
+	//		for (const auto v : c.vertices) {
+	//			all_verts.push_back(v);
+	//		}
+	//	}
+	//}
+	//
+	//return augs::get_aabb(all_verts);
 }
 
 template<bool C>
@@ -96,7 +98,7 @@ void component_synchronizer<false, F>::set_density(const float d, const size_t i
 }
 
 convex_poly_destruction_data& component_synchronizer<false, F>::get_modifiable_destruction_data(const b2Fixture_index_in_component indices) {
-	return component.colliders[indices.collider_index].shape.convex_polys[indices.convex_shape_index].destruction;
+	return component.colliders[indices.collider_index].shape.get<convex_partitioned_shape>().convex_polys[indices.convex_shape_index].destruction;
 }
 
 void component_synchronizer<false, F>::set_density_multiplier(const float mult, const size_t index) const {
