@@ -23,11 +23,15 @@ void release_or_throw_grenade(
 	auto& physics = grenade.get<components::physics>();
 	physics.apply_impulse(vec2().set_from_degrees(thrower.get_logic_transform().rotation) * 2000 * physics.get_mass());
 	physics.set_bullet_body(true);
-	physics.set_linear_damping(4.5f);
+	physics.set_linear_damping(3.0f);
 
 	auto& fixtures = grenade.get<components::fixtures>();
 	auto new_def = fixtures.get_data();
 	new_def.colliders[0].restitution = 1.0f;
+
+	const auto aabb = grenade.get_aabb();
+	const auto new_radius = 7.f;// std::min(aabb.w(), aabb.h()) / 4;// aabb.diagonal() / 2;
+	new_def.colliders[0].shape.set(circle_shape{ new_radius });
 
 	fixtures = new_def;
 	//new_def.colliders[0].shape.. = 1.f;

@@ -250,6 +250,10 @@ struct ltrbt {
 		return w()*h();
 	}
 
+	T diagonal() const {
+		return sqrt(w()*w() + h()*h());
+	}
+
 	bool good() const {
 		return w() > 0 && h() > 0;
 	}
