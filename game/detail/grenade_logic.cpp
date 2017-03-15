@@ -9,6 +9,9 @@
 #include "game/components/grenade_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/special_physics_component.h"
+#include "game/components/sound_existence_component.h"
+
+#include "game/systems_stateless/sound_existence_system.h"
 
 void release_or_throw_grenade(
 	const logic_step step,
@@ -29,12 +32,26 @@ void release_or_throw_grenade(
 
 		grenade.when_released = now;
 		grenade.when_explodes.step = now.step + (1 / delta.in_seconds() * 1.0);
+
+		sound_effect_input in;
+		in.delete_entity_after_effect_lifetime = true;
+		in.direct_listener = thrower;
+		in.effect = assets::sound_buffer_id::GRENADE_UNPIN;
+
+		sound_existence_system().create_sound_effect_entity(cosmos, in, thrower_transform, thrower).add_standard_components();
 	}
 	else {
 		perform_transfer(
 			cosmos [ item_slot_transfer_request_data{ grenade_entity, inventory_slot_id() }], 
 			step
 		);
+
+		sound_effect_input in;
+		in.delete_entity_after_effect_lifetime = true;
+		in.direct_listener = thrower;
+		in.effect = assets::sound_buffer_id::GRENADE_THROW;
+
+		sound_existence_system().create_sound_effect_entity(cosmos, in, thrower_transform, thrower).add_standard_components();
 
 		// {
 		// 	const auto spoon = cosmos[grenade.spoon];
@@ -64,6 +81,10 @@ void release_or_throw_grenade(
 		const auto aabb = grenade_entity.get_aabb();
 		const auto new_radius = std::min(aabb.w(), aabb.h()) / 2;// aabb.diagonal() / 2;
 		new_def.colliders[0].shape.set(circle_shape{ new_radius });
+
+		for (auto& c : new_def.colliders) {
+			c.material = physical_material_type::GRENADE;
+		}
 
 		fixtures = new_def;
 		//new_def.colliders[0].shape.. = 1.f;

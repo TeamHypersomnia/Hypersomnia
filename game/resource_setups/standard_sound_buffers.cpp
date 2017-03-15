@@ -103,6 +103,21 @@ namespace resource_setups {
 		}
 
 		{
+			auto& buf = get_resource_manager().create(assets::sound_buffer_id::GRENADE_UNPIN);
+			buf.from_file("hypersomnia/sfx/grenade_unpin.wav");
+		}
+
+		{
+			auto& buf = get_resource_manager().create(assets::sound_buffer_id::GRENADE_THROW);
+			buf.from_file("hypersomnia/sfx/grenade_throw.wav");
+		}
+
+		{
+			auto& buf = get_resource_manager().create(assets::sound_buffer_id::ITEM_THROW);
+			buf.from_file("hypersomnia/sfx/item_throw.wav");
+		}
+
+		{
 			auto& buf = get_resource_manager().create(assets::sound_buffer_id::COLLISION_METAL_METAL);
 			buf.from_file("hypersomnia/sfx/collision_metal_metal_%x.wav");
 		}
@@ -110,6 +125,11 @@ namespace resource_setups {
 		{
 			auto& buf = get_resource_manager().create(assets::sound_buffer_id::COLLISION_METAL_WOOD);
 			buf.from_file("hypersomnia/sfx/collision_metal_wood_%x.wav");
+		}
+
+		{
+			auto& buf = get_resource_manager().create(assets::sound_buffer_id::COLLISION_GRENADE);
+			buf.from_file("hypersomnia/sfx/collision_grenade.wav");
 		}
 
 		{

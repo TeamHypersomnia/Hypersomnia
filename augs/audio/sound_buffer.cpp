@@ -104,7 +104,10 @@ namespace augs {
 	}
 
 	single_sound_buffer& sound_buffer::variation::request_stereo() {
-		ensure(stereo.is_set());
+		if (!stereo.is_set()) {
+			return request_mono();
+		}
+
 		return stereo;
 	}
 
@@ -128,7 +131,10 @@ namespace augs {
 	}
 
 	const single_sound_buffer& sound_buffer::variation::request_stereo() const {
-		ensure(stereo.is_set());
+		if (!stereo.is_set()) {
+			return request_mono();
+		}
+
 		return stereo;
 	}
 

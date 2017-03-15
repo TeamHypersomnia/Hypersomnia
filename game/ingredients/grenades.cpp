@@ -21,6 +21,7 @@ namespace prefabs {
 	entity_handle create_force_grenade(cosmos& world, vec2 pos) {
 		const auto grenade_spoon = world.create_entity("grenade_spoon");
 		const auto grenade_entity = world.create_entity("force_grenade");
+
 		auto& grenade = grenade_entity += components::grenade();
 		
 		grenade.type = grenade_type::FORCE;
