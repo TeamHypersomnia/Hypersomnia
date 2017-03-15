@@ -8,15 +8,17 @@
 #include "declare.h"
 #include "augs/templates/hash_templates.h"
 
+template <class T>
+constexpr T AUGS_EPSILON = static_cast<T>(0.0001);
 
-#define AUGS_EPSILON 0.0001f
-#define DEG_TO_RAD 0.01745329251994329576923690768489
-#define RAD_TO_DEG (1.0/0.01745329251994329576923690768489)
-#define DEG_TO_RADf 0.01745329251994329576923690768489f
-#define RAD_TO_DEGf (1.0f/0.01745329251994329576923690768489f)
+template <class T>
+constexpr T DEG_TO_RAD = static_cast<T>(0.01745329251994329576923690768489);
 
-#define PI_f 3.1415926535897932384626433832795f
-#define PI_d 3.1415926535897932384626433832795
+template <class T>
+constexpr T RAD_TO_DEG = static_cast<T>(1.0 / 0.01745329251994329576923690768489);
+
+template <class T>
+constexpr T PI = static_cast<T>(3.1415926535897932384626433832795);
 
 template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
@@ -59,41 +61,45 @@ namespace augs {
 	}
 
 	template <class type_val>
-	void damp(type_val& val, type_val len) {
+	void damp(type_val& val, const type_val len) {
 		type_val zero = static_cast<type_val>(0);
 		if (val > zero) {
 			val -= len;
-			if (val < zero)
+			
+			if (val < zero) {
 				val = zero;
+			}
 		}
 		else if (val < zero) {
 			val += len;
-			if (val > zero)
+			
+			if (val > zero) {
 				val = zero;
+			}
 		}
 	}
 
 	template <typename T>
-	T lerp(T a, T b, T alpha) {
-		return a + (b - a)*alpha;
-	}
+	T get_clamped(const T a, const T min_a, const T max_a) {
+		if (a < min_a) {
+			return min_a;
+		}
 
-	template <typename T>
-	void clamp(T& a, T min_a, T max_a) {
-		if (a < min_a) a = min_a;
-		if (a > max_a) a = max_a;
-	}
+		if (a > max_a) {
+			return max_a;
+		}
 
-	template <typename T>
-	T get_clamp(T a, T min_a, T max_a) {
-		if (a < min_a) return min_a;
-		if (a > max_a) return max_a;
 		return a;
+	}
+
+	template <typename T>
+	void clamp(T& a, const T min_a, const T max_a) {
+		a = get_clamped(a, min_a, max_a);
 	}
 
 	template <class vec, class d>
 	vec& rotate(vec& v, const vec& origin, const d angle) {
-		return rotate_radians(v, origin, angle * static_cast<d>(DEG_TO_RAD));
+		return rotate_radians(v, origin, angle * DEG_TO_RAD<d>);
 	}
 
 	template <class T, class d>
@@ -108,24 +114,6 @@ namespace augs {
 		rotated.y = static_cast<T>(v.x * s + v.y * c);
 
 		return v = (rotated + origin);
-	}
-
-	template <class vec, class d>
-	vec from_rotation(vec v, vec origin, d angle) {
-		vec new_vec = v;
-		rotate(new_vec, origin, angle);
-		return new_vec;
-	}
-
-	template <class vec>
-	vec mult(const vec& a, const vec& b) {
-		return vec(a.x * b.x, a.y * b.y);
-	}
-
-	template<typename V1, typename V2>
-	void set(V1 target, const V2& source) {
-		target.x = source.x;
-		target.y = source.y;
 	}
 }
 
@@ -263,7 +251,7 @@ struct vec2t {
 	}
 
 	real degrees() const {
-		return radians()*RAD_TO_DEGf;
+		return radians()*RAD_TO_DEG<float>;
 	}
 
 	real radians_between(const vec2t& v) const {
@@ -285,7 +273,7 @@ struct vec2t {
 	}
 
 	real degrees_between(const vec2t& v) const {
-		return radians_between(v) * RAD_TO_DEGf;
+		return radians_between(v) * RAD_TO_DEG<float>;
 	}
 
 	template<class A, class B>
@@ -301,14 +289,14 @@ struct vec2t {
 	}
 
 	vec2t& set_from_degrees(const real degrees) {
-		const auto radians = degrees * DEG_TO_RADf;
+		const auto radians = degrees * DEG_TO_RAD<float>;
 		set(cos(radians), sin(radians));
 		normalize();
 		return *this;
 	}
 
 	vec2t& set_from_radians(const real radians) {
-		return set_from_degrees(radians * RAD_TO_DEGf);
+		return set_from_degrees(radians * RAD_TO_DEG<float>);
 	}
 
 	template <typename v>
@@ -324,7 +312,7 @@ struct vec2t {
 	}
 
 	vec2t lerp(const vec2t& bigger, const real ratio) const {
-		return (*this) + (bigger - (*this)) * ratio;
+		return augs::interp(*this, bigger, ratio);
 	}
 
 	vec2t& set_length(const real len) {
@@ -417,25 +405,25 @@ struct vec2t {
 		return *this;
 	}
 
-	bool x_non_zero(const type eps = static_cast<type>(AUGS_EPSILON)) const {
+	bool x_non_zero(const real eps = AUGS_EPSILON<real>) const {
 		return std::abs(x) > eps;
 	}
 
-	bool y_non_zero(const type eps = static_cast<type>(AUGS_EPSILON)) const {
+	bool y_non_zero(const real eps = AUGS_EPSILON<real>) const {
 		return std::abs(y) > eps;
 	}
 
-	bool non_zero(const type eps = static_cast<type>(AUGS_EPSILON)) const {
+	bool non_zero(const real eps = AUGS_EPSILON<real>) const {
 		return x_non_zero(eps) || y_non_zero(eps);
 	}
 
-	bool is_zero(const type eps = static_cast<type>(AUGS_EPSILON)) const {
+	bool is_zero(const real eps = AUGS_EPSILON<real>) const {
 		return !non_zero(eps);
 	}
 
 	vec2t operator-() const { return vec2t(x * -1, y * -1); }
 
-	bool compare_abs(const vec2t& b, const type epsilon = AUGS_EPSILON) const {
+	bool compare_abs(const vec2t& b, const real epsilon = AUGS_EPSILON<real>) const {
 		if (std::abs(x - b.x) < epsilon && std::abs(y - b.y) < epsilon) {
 			return true;
 		}
@@ -443,7 +431,7 @@ struct vec2t {
 		return false;
 	}
 
-	bool is_epsilon(const real epsilon = AUGS_EPSILON) const {
+	bool is_epsilon(const real epsilon = AUGS_EPSILON<real>) const {
 		if (std::abs(x) < epsilon && std::abs(y) < epsilon) {
 			return true;
 		}
@@ -451,7 +439,7 @@ struct vec2t {
 		return false;
 	}
 
-	bool compare(const vec2t& b, const real epsilon = AUGS_EPSILON) const {
+	bool compare(const vec2t& b, const real epsilon = AUGS_EPSILON<real>) const {
 		if ((*this - b).length_sq() <= epsilon*epsilon) {
 			return true;
 		}

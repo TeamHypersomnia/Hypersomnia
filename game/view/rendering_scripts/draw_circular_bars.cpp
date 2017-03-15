@@ -60,7 +60,12 @@ namespace rendering_scripts {
 					ending_health_angle = starting_health_angle + sentience->health.get_ratio() * 90.f;
 				}
 
-				auto push_angles = [&target](const float lower_outside, const float upper_outside, const float lower_inside, const float upper_inside) {
+				const auto push_angles = [&target](
+					const float lower_outside, 
+					const float upper_outside, 
+					const float lower_inside, 
+					const float upper_inside
+				) {
 					augs::special s;
 
 					s.v1.set(augs::normalize_degrees(lower_outside) / 180, augs::normalize_degrees(upper_outside) / 180);

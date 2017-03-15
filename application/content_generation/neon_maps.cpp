@@ -239,7 +239,7 @@ std::vector<std::vector<double>> generate_gauss_kernel(const neon_map_stamp& sta
 
 	for (size_t y = 0; y < result.size(); ++y) {
 		for (size_t x = 0; x < result[y].size(); ++x) {
-			result[y][x] = exp(-1 * (pow(index[x][y].first, 2) + pow(index[x][y].second, 2)) / 2 / pow(stamp.standard_deviation, 2)) / PI_f / 2 / pow(stamp.standard_deviation, 2);
+			result[y][x] = exp(-1 * (pow(index[x][y].first, 2) + pow(index[x][y].second, 2)) / 2 / pow(stamp.standard_deviation, 2)) / PI<float> / 2 / pow(stamp.standard_deviation, 2);
 		}
 	}
 

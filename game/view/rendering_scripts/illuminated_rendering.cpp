@@ -290,18 +290,31 @@ namespace rendering_scripts {
 
 		}
 
-		{
-			const auto upper = (*assets::game_image_id::HUD_CIRCULAR_BAR_MEDIUM).get_atlas_space_uv({ 0.0f, 0.0f });
-			const auto lower = (*assets::game_image_id::HUD_CIRCULAR_BAR_MEDIUM).get_atlas_space_uv({ 1.f, 1.f });
+		const auto set_center_uniform = [&](const auto image_id) {
+			const auto upper = (*image_id).get_atlas_space_uv({ 0.0f, 0.0f });
+			const auto lower = (*image_id).get_atlas_space_uv({ 1.f, 1.f });
 			const auto center = (upper + lower) / 2;
-		
+
 			glUniform2f(glGetUniformLocation(circular_bars_shader.id, "texture_center"), center.x, center.y);
-		}
+		};
+
+		set_center_uniform(assets::game_image_id::HUD_CIRCULAR_BAR_MEDIUM);
 
 		const auto textual_infos = draw_circular_bars_and_get_textual_info(step);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
+		
+		set_center_uniform(assets::game_image_id::HUD_CIRCULAR_BAR_SMALL);
+
+		draw_hud_for_released_grenades(
+			output,
+			renderer.specials,
+			interp,
+			camera,
+			cosmos,
+			global_time_seconds
+		);
 
 		default_shader.use();
 

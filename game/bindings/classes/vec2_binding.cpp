@@ -32,11 +32,7 @@ luabind::scope get_scope(const char* name) {
 		.def("rotate", &vec2t<T>::rotate<vec2t<T>>)
 		.def_readwrite("x", &vec2t<T>::x)
 		.def_readwrite("y", &vec2t<T>::y)
-
-		.scope
-		[
-			luabind::def("rotated", &augs::from_rotation<vec2t<T>, T>)
-		];
+	;
 }
 
 namespace bindings {

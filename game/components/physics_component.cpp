@@ -67,7 +67,7 @@ void component_synchronizer<false, P>::set_velocity(const vec2 pixels) const {
 }
 
 void component_synchronizer<false, P>::set_angular_velocity(const float degrees) const {
-	component.angular_velocity = DEG_TO_RADf * degrees;
+	component.angular_velocity = DEG_TO_RAD<float> * degrees;
 
 	if (!is_constructed())
 		return;
@@ -174,12 +174,12 @@ float basic_physics_synchronizer<C>::get_mass() const {
 
 template<bool C>
 float basic_physics_synchronizer<C>::get_angle() const {
-	return component.sweep.a * RAD_TO_DEGf;
+	return component.sweep.a * RAD_TO_DEG<float>;
 }
 
 template<bool C>
 float basic_physics_synchronizer<C>::get_angular_velocity() const {
-	return component.angular_velocity * RAD_TO_DEGf;
+	return component.angular_velocity * RAD_TO_DEG<float>;
 }
 
 template<bool C>

@@ -28,7 +28,7 @@ namespace resource_setups {
 			em.base_speed.set(200, 300);
 			em.base_speed_variation = std::make_pair(5.f, 10.f);
 
-			em.rotation_speed = std::make_pair(1.5f*RAD_TO_DEGf, 2.3f*RAD_TO_DEGf);
+			em.rotation_speed = std::make_pair(1.5f*RAD_TO_DEG<float>, 2.3f*RAD_TO_DEG<float>);
 			em.particle_lifetime_ms = std::make_pair(5000, 5000);
 
 			for (int i = 0; i < 3; ++i) {
@@ -71,7 +71,7 @@ namespace resource_setups {
 				em.base_speed = std::make_pair(100, 110);
 				em.base_speed_variation = std::make_pair(5.f, 10.f);
 
-				em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEGf, 2.8f*RAD_TO_DEGf);
+				em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
 				em.particle_lifetime_ms = std::make_pair(2500 * 1.5, 2500 * 1.5);
 
 				for (int i = 0; i < 3; ++i) {
@@ -157,7 +157,7 @@ namespace resource_setups {
 
 				em.base_speed = std::make_pair(50, 350);
 
-				em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEGf, 2.8f*RAD_TO_DEGf);
+				em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
 				em.particle_lifetime_ms = std::make_pair(1500, 1500);
 
 				for (int i = 0; i < 3; ++i) {
@@ -201,7 +201,7 @@ namespace resource_setups {
 				em.base_speed = std::make_pair(350, 400);
 				em.base_speed_variation = std::make_pair(100.f, 120.f);
 
-				em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEGf, 2.8f*RAD_TO_DEGf);
+				em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
 				em.particle_lifetime_ms = std::make_pair(900, 900);
 
 				for (int i = 0; i < 3; ++i) {
@@ -417,7 +417,7 @@ namespace resource_setups {
 			em.base_speed = std::make_pair(300, 360);
 			em.base_speed_variation = std::make_pair(10.f, 12.f);
 
-			em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEGf, 2.8f*RAD_TO_DEGf);
+			em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
 			em.particle_lifetime_ms = std::make_pair(200, 350);
 
 			for (int i = 0; i < 3; ++i) {
@@ -461,7 +461,7 @@ namespace resource_setups {
 				em.base_speed = std::make_pair(350, 400);
 				em.base_speed_variation = std::make_pair(100.f, 120.f);
 
-				em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEGf, 2.8f*RAD_TO_DEGf);
+				em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
 				em.particle_lifetime_ms = std::make_pair(900, 900);
 
 				for (int i = 0; i < 3; ++i) {
@@ -588,7 +588,7 @@ namespace resource_setups {
 				em.base_speed = std::make_pair(100, 150);
 				em.base_speed_variation = std::make_pair(10.f, 12.f);
 
-				em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEGf, 2.8f*RAD_TO_DEGf);
+				em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
 				em.particle_lifetime_ms = std::make_pair(400, 500);
 
 				em.randomize_spawn_point_within_circle_of_inner_radius = std::make_pair(20.f, 25.f);
@@ -686,7 +686,7 @@ namespace resource_setups {
 				em.base_speed = std::make_pair(250, 350);
 				em.base_speed_variation = std::make_pair(10.f, 12.f);
 
-				em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEGf, 2.8f*RAD_TO_DEGf);
+				em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
 				em.particle_lifetime_ms = std::make_pair(700, 800);
 
 				for (int i = 0; i < 3; ++i) {

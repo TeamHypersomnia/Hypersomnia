@@ -248,7 +248,7 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 						instance.angular_offset,
 						instance.particle_speed,
 						final_particle_position,
-						transform.rotation + instance.swing_spread * static_cast<float>(sin((instance.stream_lifetime_ms / 1000.f) * 2 * PI_f * instance.swings_per_sec)),
+						transform.rotation + instance.swing_spread * static_cast<float>(sin((instance.stream_lifetime_ms / 1000.f) * 2 * PI<float> * instance.swings_per_sec)),
 						instance.spread,
 						emission
 					);

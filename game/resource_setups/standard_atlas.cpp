@@ -291,6 +291,11 @@ namespace resource_setups {
 		}
 
 		{
+			auto& in = output[assets::game_image_id::HUD_CIRCULAR_BAR_SMALL];
+			in.texture_maps[texture_map_type::DIFFUSE] = { "generated/scripted_images/circular_bar_small.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
+		}
+
+		{
 			auto& in = output[assets::game_image_id::HAVE_A_PLEASANT];
 			in.texture_maps[texture_map_type::DIFFUSE] = { "hypersomnia/gfx/have_a_pleasant.png", assets::physical_texture_id::GAME_WORLD_ATLAS };
 			in.texture_maps[texture_map_type::NEON] = { "generated/neon_maps/have_a_pleasant.png", assets::physical_texture_id::GAME_WORLD_ATLAS };

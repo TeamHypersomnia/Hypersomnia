@@ -38,5 +38,14 @@ namespace rendering_scripts {
 		const float global_time_seconds
 	);
 
+	void draw_hud_for_released_grenades(
+		augs::vertex_triangle_buffer&,
+		augs::special_buffer&,
+		const interpolation_system& sys,
+		const camera_cone cam,
+		const cosmos& cosm,
+		const float global_time_seconds
+	);
+
 	augs::vertex_triangle_buffer draw_circular_bars_and_get_textual_info(const viewing_step);
 }

@@ -144,11 +144,11 @@ void car_system::apply_movement_forces(const logic_step step) {
 			}
 
 			if(forwardal_speed > car.minimum_speed_for_maneuverability_decrease)
-				physics.apply_angular_impulse(physics.get_inertia() * -angular_velocity * DEG_TO_RADf *
+				physics.apply_angular_impulse(physics.get_inertia() * -angular_velocity * DEG_TO_RAD<float> *
 					(forwardal_speed-car.minimum_speed_for_maneuverability_decrease)*car.maneuverability_decrease_multiplier);
 
 			if (angular_resistance > 0.f) {
-				auto angular_speed = angular_velocity * DEG_TO_RADf;
+				auto angular_speed = angular_velocity * DEG_TO_RAD<float>;
 				//physics.body->ApplyTorque((angular_resistance * sqrt(sqrt(angular_speed * angular_speed)) + 0.2 * angular_speed * angular_speed)* -sgn(angular_speed) * b->GetInertia(), true);
 				physics.apply_angular_impulse(delta.in_seconds() * (angular_resistance * angular_speed * angular_speed)* -sgn(angular_speed) * physics.get_inertia());
 			}

@@ -52,7 +52,7 @@ namespace augs {
 		else {
 			scale = 1000;
 			if (measurements_are_time) {
-				if (std::abs(avg_secs) > AUGS_EPSILON) {
+				if (std::abs(avg_secs) > AUGS_EPSILON<double>) {
 					return typesafe_sprintf(L"%x: %f2 ms (%f2 FPS)\n", title,
 						avg_secs * scale,
 						1 / avg_secs);

@@ -15,11 +15,11 @@ namespace components {
 	}
 
 	transform transform::to_si_space(const si_scaling si) const {
-		return{ si.get_meters(pos), rotation * DEG_TO_RADf };
+		return{ si.get_meters(pos), rotation * DEG_TO_RAD<float> };
 	}
 
 	transform transform::to_user_space(const si_scaling si) const {
-		return{ si.get_pixels(pos), rotation * RAD_TO_DEGf };
+		return{ si.get_pixels(pos), rotation * RAD_TO_DEG<float> };
 	}
 
 	transform transform::operator-(const transform& b) const {
