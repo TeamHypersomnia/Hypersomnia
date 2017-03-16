@@ -76,7 +76,8 @@ void particles_existence_system::destroy_dead_streams(const logic_step step) con
 					components::particles_existence::deactivate(it);
 				}
 			}
-		}
+		},
+		true
 	);
 }
 
