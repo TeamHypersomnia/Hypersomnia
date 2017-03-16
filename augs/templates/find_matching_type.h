@@ -52,23 +52,43 @@ template <
 	typename SearchedType,
 	typename... Candidates
 >
-struct found_matching_type {
+struct found_matching_type_detail {
 private:
-	typedef char yes;
-	typedef long no;
+	template <class, class = void>
+	struct result : std::false_type {
 
-	template <typename C>
-	static yes check(typename C::type*);
-
-	template <typename C>
-	static no check(...);
-
+	};
+	
+	template <class Dummy>
+	struct result<
+		Dummy,
+		decltype(
+			std::declval<
+				typename find_matching_type<Criterion, SearchedType, Candidates...>::type
+			>,
+			void()
+		)
+	> : std::true_type 
+	{
+	};
 public:
-	static constexpr bool value = sizeof(check<find_matching_type<Criterion, SearchedType, Candidates...>>(0)) == sizeof(yes);
+	static constexpr bool value = result<void>::value;
+};
+
+template <
+	template<class, class> class Criterion,
+	typename SearchedType,
+	typename... Candidates
+>
+struct found_matching_type 
+	: std::bool_constant<
+		found_matching_type_detail<Criterion, SearchedType, Candidates...>::value
+	>
+{
 };
 
 template <class S, class... Types>
-constexpr bool is_one_of_v = typename found_matching_type<std::is_same, S, Types...>::value;
+constexpr bool is_one_of_v = found_matching_type<std::is_same, S, Types...>::value;
 
 template<class S, class... Types>
 using find_convertible_type_t = typename find_matching_type<std::is_convertible, S, Types...>::type;
