@@ -2,8 +2,8 @@
 #include <type_traits>
 
 namespace templates_detail {
-	template<typename T>
-	struct typed {
+	template <typename T>
+	struct identity {
 		typedef T type;
 	};
 }
@@ -37,7 +37,7 @@ struct find_matching_type<
 > :
 	std::conditional_t<
 		Criterion<SearchedType, Candidate>::value, 
-		::templates_detail::typed<Candidate>, 
+		::templates_detail::identity<Candidate>,
 		find_matching_type<
 			Criterion, 
 			SearchedType, 
@@ -70,5 +70,5 @@ public:
 template <class S, class... Types>
 constexpr bool is_one_of_v = typename found_matching_type<std::is_same, S, Types...>::value;
 
-template<class S, class... T>
-using find_convertible_type_t = typename find_matching_type<std::is_convertible, S, T...>::type;
+template<class S, class... Types>
+using find_convertible_type_t = typename find_matching_type<std::is_convertible, S, Types...>::type;

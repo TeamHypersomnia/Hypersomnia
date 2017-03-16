@@ -94,6 +94,8 @@ namespace augs {
 	struct paint_line_command;
 	template <class T, size_t const_count>
 	class constant_size_vector;
+	template <class T, class _enum>
+	class enum_array;
 	template <class Enum, class T>
 	class enum_associative_array;
 	struct machine_entropy;
@@ -329,6 +331,15 @@ namespace augs {
 	) {
 		FIELD(count);
 		FIELD(raw);
+	}
+
+	template <class F, class T, class _enum, class... Instances>
+	void introspect_body(
+		const augs::enum_array<T, _enum>* const,
+		F f,
+		Instances&&... _t_
+	) {
+		introspect_body(static_cast<std::array<T, static_cast<size_t>(_enum::COUNT)>*>(nullptr), f, std::forward<Instances>(_t_)...);
 	}
 
 	template <class F, class Enum, class T, class... Instances>

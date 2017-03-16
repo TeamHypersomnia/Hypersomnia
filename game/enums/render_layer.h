@@ -1,8 +1,7 @@
 #pragma once
-#include <array>
-#include <vector>
+#include "augs/misc/enum_array.h"
 
-enum render_layer : unsigned char {
+enum class render_layer : unsigned char {
 	INVALID,
 	OVER_CROSSHAIR,
 	CROSSHAIR,
@@ -26,9 +25,9 @@ enum render_layer : unsigned char {
 };
 
 template <class T>
-struct make_array_per_layer {
-	typedef typename std::array<T, static_cast<size_t>(render_layer::COUNT)> type;
+struct per_render_layer {
+	typedef typename augs::enum_array<T, render_layer> type;
 };
 
 template<class T>
-using make_array_per_layer_t = typename make_array_per_layer<T>::type;
+using per_render_layer_t = typename per_render_layer<T>::type;

@@ -50,6 +50,16 @@ int main(int argc, char** argv) {
 	const auto mode = cfg.get_launch_mode();
 	LOG("Launch mode: %x", static_cast<int>(mode));
 
+	ensure
+	(
+		(
+			mode == config_lua_table::launch_type::LOCAL
+			|| mode == config_lua_table::launch_type::DIRECTOR
+			|| mode == config_lua_table::launch_type::LOCAL_DETERMINISM_TEST
+		)
+		&& "The launch mode you have chosen is currently out of service."
+	);
+
 	switch (mode) {
 	case config_lua_table::launch_type::MAIN_MENU:
 	{

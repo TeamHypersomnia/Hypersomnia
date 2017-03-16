@@ -109,7 +109,7 @@ void damage_system::destroy_colliding_bullets_and_send_damage(const logic_step s
 				}
 
 				if (!is_victim_a_held_item && damage.destroy_upon_damage) {
-					//damage.damage_charges_before_destruction--;
+					damage.damage_charges_before_destruction--;
 
 					// delete only once
 					if (damage.damage_charges_before_destruction == 0) {

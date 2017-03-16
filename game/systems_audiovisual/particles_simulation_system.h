@@ -73,9 +73,9 @@ public:
 		bool constructed = false;
 	};
 
-	make_array_per_layer_t<std::vector<general_particle>> general_particles;
-	make_array_per_layer_t<std::vector<animated_particle>> animated_particles;
-	make_array_per_layer_t<std::unordered_map<entity_id, std::vector<homing_animated_particle>>> homing_animated_particles;
+	per_render_layer_t<std::vector<general_particle>> general_particles;
+	per_render_layer_t<std::vector<animated_particle>> animated_particles;
+	per_render_layer_t<std::unordered_map<entity_id, std::vector<homing_animated_particle>>> homing_animated_particles;
 
 	//std::vector<cache> per_entity_cache;
 	std::unordered_map<entity_id, cache> per_entity_cache;

@@ -18,5 +18,5 @@ struct visible_entities {
 	);
 
 	std::vector<unversioned_entity_id> all;
-	make_array_per_layer_t<std::vector<unversioned_entity_id>> per_layer;
+	per_render_layer_t<std::vector<unversioned_entity_id>> per_layer;
 };
