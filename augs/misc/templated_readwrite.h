@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/templates/memcpy_safety.h"
+#include "augs/templates/find_matching_type.h"
 #include "augs/ensure.h"
 #include "augs/misc/introspect.h"
 #include <map>
@@ -10,18 +11,24 @@ namespace augs {
 	class stream;
 
 	template <class T>
-	struct is_native_binary_stream {
-		static constexpr bool value = 
-			std::is_same_v<T, augs::stream>
-			|| std::is_same_v<T, augs::output_stream_reserver>
-			|| std::is_same_v<T, std::ifstream>
-			|| std::is_same_v<T, std::ofstream>
-		;
+	struct is_native_binary_stream 
+		: std::bool_constant<
+			is_one_of_v<T, 
+				augs::stream, 
+				augs::output_stream_reserver, 
+				std::ifstream, 
+				std::ofstream
+			>
+		>
+	{
+
 	};
 
 	template <class A, class T, class = void>
-	struct has_io_overloads {
-		static constexpr bool value = false;
+	struct has_io_overloads 
+		: std::false_type 
+	{
+
 	};
 
 	template <class A, class T>
@@ -39,24 +46,28 @@ namespace augs {
 			),
 			void()
 		)
-	> {
-		static constexpr bool value = true;
+	> : std::true_type {
+	
 	};
 
 	template <class A, class T>
 	constexpr bool has_io_overloads_v = has_io_overloads<A, T>::value;
 
 	template<class A, class T>
-	struct is_byte_io_safe {
-		static constexpr bool value = is_native_binary_stream<A>::value && is_memcpy_safe_v<T>;
+	struct is_byte_io_safe 
+		: std::bool_constant<is_native_binary_stream<A>::value && is_memcpy_safe_v<T>> 
+	{
+
 	};
 
 	template<class A, class T>
 	constexpr bool is_byte_io_safe_v = is_byte_io_safe<A, T>::value;
 
 	template<class A, class T>
-	struct is_byte_io_appropriate {
-		static constexpr bool value = is_byte_io_safe_v<A, T> && !has_io_overloads_v<A, T>;
+	struct is_byte_io_appropriate 
+		: std::bool_constant<is_byte_io_safe_v<A, T> && !has_io_overloads_v<A, T>>
+	{
+
 	};
 
 	template<class A, class T>

@@ -1,4 +1,5 @@
 #pragma once
+#include <type_traits>
 
 namespace templates_detail {
 	template<bool _Test,
@@ -30,6 +31,7 @@ template<bool is_const, class T>
 using maybe_const_ptr_t = typename maybe_const_ptr<is_const, T>::type;
 
 template <class T>
-struct is_const_ref {
-	static constexpr bool value = std::is_const_v<std::remove_reference_t<T>>;
+struct is_const_ref 
+	: std::bool_constant<std::is_const_v<std::remove_reference_t<T>>>
+{
 };

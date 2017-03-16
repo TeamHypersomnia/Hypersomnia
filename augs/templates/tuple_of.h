@@ -6,7 +6,6 @@ struct empty_mod {
 	typedef T type;
 };
 
-
 template <
 	template<typename...> class List,
 	template<typename> class Mod,

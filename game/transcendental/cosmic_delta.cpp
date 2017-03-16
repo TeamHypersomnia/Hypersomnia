@@ -16,6 +16,9 @@
 
 #include "generated_introspectors.h"
 
+static_assert(is_one_of_v<cosmos, int, cosmos_metadata, cosmos>, "Trait is wrong");
+static_assert(!is_one_of_v<int, float, double>, "Trait is wrong");
+
 static_assert(!has_introspect_v<cosmos>, "Trait is wrong");
 static_assert(!has_introspect_v<unsigned>, "Trait is wrong");
 static_assert(!has_introspect_v<augs::trivial_variant<int, double>>, "Trait is wrong");

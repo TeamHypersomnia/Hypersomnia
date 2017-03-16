@@ -101,7 +101,7 @@ namespace augs {
 
 		template<class T_convertible>
 		void set(const T_convertible& t) {
-			typedef find_convertible_type<T_convertible, Types...> T;
+			typedef find_convertible_type_t<T_convertible, Types...> T;
 
 			auto converted = T(t);
 			std::memcpy(buf, &converted, sizeof(T));
@@ -110,7 +110,7 @@ namespace augs {
 
 		template<class T_convertible>
 		bool operator==(const T_convertible& b) const {
-			typedef find_convertible_type<T_convertible, Types...> T;
+			typedef find_convertible_type_t<T_convertible, Types...> T;
 			return is<T>() && get<T>() == b;
 		}
 

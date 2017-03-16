@@ -8,9 +8,7 @@ struct true_returner {
 };
 
 template <class T, class = void>
-struct has_introspect {
-	static constexpr bool value = false;
-};
+struct has_introspect : std::false_type {};
 
 template <class T>
 struct has_introspect<
@@ -23,8 +21,7 @@ struct has_introspect<
 		),
 		void()
 	)
-> {
-	static constexpr bool value = true;
+> : std::true_type {
 };
 
 template <class T>
@@ -63,8 +60,9 @@ template <typename T, template <typename...> class C>
 using is_base_of_template = decltype(is_base_of_template_impl<C>(std::declval<T*>()));
 
 template <class T>
-struct is_base_of_trivial_variant {
-	static constexpr bool value = is_base_of_template<T, augs::trivial_variant>::value;
+struct is_base_of_trivial_variant 
+	: std::bool_constant<is_base_of_template<T, augs::trivial_variant>::value>
+{
 };
 
 template <class T>
@@ -129,15 +127,11 @@ constexpr bool can_stream_left_v = can_stream_left<StreamType, T>::value;
 template <class StreamType, class T>
 constexpr bool can_stream_right_v = can_stream_right<StreamType, T>::value;
 
-
 template <class StreamType>
 struct can_stream_left_predicate {
 	template <class T>
 	static constexpr bool value = can_stream_left_v<StreamType, T>;
 };
-
-//template <class StreamType>
-//constexpr bool can_stream_left_predicate_v = can_stream_left_predicate<StreamType>;
 
 template <class StreamType>
 struct can_stream_right_predicate {
@@ -145,16 +139,7 @@ struct can_stream_right_predicate {
 	static constexpr bool value = can_stream_right_v<StreamType, T>;
 };
 
-//template <class StreamType>
-//constexpr bool can_stream_right_predicate_v = can_stream_right_predicate<StreamType>;
-
-
 template <class T>
-struct exclude_no_type {
-	static constexpr bool value = false;
-};
-
-template <class T>
-struct exclude_trivial_variants {
+struct exclude_no_type : std::false_type {
 
 };

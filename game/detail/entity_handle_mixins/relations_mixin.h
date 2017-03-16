@@ -17,8 +17,9 @@
 struct entity_relations;
 
 template <class T>
-struct exclude_non_child_id_types {
-	static constexpr bool value = std::is_same_v<entity_id, T>;
+struct exclude_non_child_id_types 
+	: std::bool_constant<std::is_same_v<entity_id, T>>
+{
 };
 
 template<bool is_const, class entity_handle_type>
@@ -52,10 +53,10 @@ public:
 			[&](auto& subject_component) {
 				augs::introspect_recursive<
 					is_entity_id_type,
-					typename template_disjunction<
+					template_disjunction_t<
 						exclude_non_child_id_types,
 						is_base_of_trivial_variant
-					>::predicate
+					>
 				> (
 					[&](auto, auto& member_child_id) {
 						const auto child_handle = cosmos[member_child_id];

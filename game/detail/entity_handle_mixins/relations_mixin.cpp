@@ -46,10 +46,10 @@ void relations_mixin<false, D>::make_cloned_child_entities_recursive(const entit
 
 			augs::introspect_recursive<
 				is_entity_id_type,
-				typename template_disjunction<
+				template_disjunction_t<
 					exclude_non_child_id_types,
 					is_base_of_trivial_variant
-				>::predicate
+				>
 			> (
 				[&](auto, auto& cloned_into_id, const auto& cloned_from_id) {
 					cloned_into_id = cosmos.clone_entity(cloned_from_id);

@@ -13,8 +13,9 @@
 namespace fs = std::experimental::filesystem;
 
 template <class T>
-struct can_stream {
-	static constexpr bool value = can_stream_right<std::istringstream, T>::value;
+struct can_stream 
+	: std::bool_constant<can_stream_right_v<std::istringstream, T>>
+{
 };
 
 void regenerate_scripted_images(

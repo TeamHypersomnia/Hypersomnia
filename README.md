@@ -34,7 +34,7 @@ git clone https://github.com/TeamHypersomnia/Hypersomnia.git --recursive
 
 The repository will start downloading. Once complete, open Hypersomnia.sln file, select **Release x86** configuration and hit **F7** to build.
 
-As it currently stands, the game can only be built in Visual Studio 2015 or higher and can only run on Windows systems.
+As it currently stands, the game can only be built in Visual Studio 2017 or higher (compilers from Visual Studio 2015 do not support some of the language features I'm using) and can only run on Windows systems.
 
 If you dream about creating an entirely new mechanic, I recommend that you be familiar with component-based entity architecture beforehand.
 Better yet, tell me about your plans! Together we can deal with problems more swiftly.

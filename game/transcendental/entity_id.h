@@ -1,4 +1,5 @@
 #pragma once
+#include <type_traits>
 #include "augs/misc/pool_id.h"
 #include "game/transcendental/types_specification/all_components_declaration.h"
 #include "game/transcendental/entity_id_declaration.h"
@@ -33,8 +34,11 @@ struct child_entity_id : entity_id {
 };
 
 template <class T>
-struct is_entity_id_type {
-	static constexpr bool value = std::is_base_of_v<entity_id, T>;
+struct is_entity_id_type 
+	: std::bool_constant<
+		std::is_base_of_v<entity_id, T>
+	>
+{
 };
 
 namespace std {
