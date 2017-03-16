@@ -14,7 +14,7 @@ Decide upon your allegiance to one of the three warring factions whose apple of 
 
 Watch gameplay with all current features on YouTube:
 
-[![IMAGE ALT TEXT](http://img.youtube.com/vi/XsSKj6hJH0w/0.jpg)](http://www.youtube.com/watch?v=YOUTUBE_VIDEO_ID_HERE "Video Title")
+[![IMAGE ALT TEXT](http://img.youtube.com/vi/XsSKj6hJH0w/0.jpg)](http://www.youtube.com/watch?v=XsSKj6hJH0w "Video Title")
 
 ![enter image description here][1]
 ![enter image description here][2]
