@@ -17,12 +17,12 @@ Watch gameplay with all current features on YouTube:
 [![IMAGE ALT TEXT](http://img.youtube.com/vi/XsSKj6hJH0w/0.jpg)](http://www.youtube.com/watch?v=XsSKj6hJH0w "Video Title")
 
 ![enter image description here][1]
-![enter image description here][2]
+![enter image description here][8]
 ![enter image description here][3]
 ![enter image description here][4]
 
   [1]: http://hypersomnia.pl/pics/summary.png
-  [2]: http://gifyu.com/images/16.main_menu.png
+  [8]: https://gifyu.com/images/16.main_menu_reup.png
   [3]: http://gifyu.com/images/23.light.png
   [4]: http://gifyu.com/images/30.smoke.png
 
