@@ -80,7 +80,7 @@ void trigger_detector_system::post_trigger_requests_from_continuous_detectors(co
 				step.transient.messages.post(request);
 			}
 		},
-		true
+		{ subjects_iteration_flag::MAKE_COPY_OF_TARGETS }
 	);
 }
 

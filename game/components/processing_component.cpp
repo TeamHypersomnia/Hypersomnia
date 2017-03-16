@@ -82,8 +82,9 @@ P P::get_default(const const_entity_handle id) {
 
 	P result;
 
-	for (const auto m : matching)
+	for (const auto m : matching) {
 		result.processing_subject_categories.set(m);
+	}
 
 	return result;
 }

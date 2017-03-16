@@ -7,7 +7,6 @@ namespace augs {
 		typedef std::bitset<static_cast<size_t>(_enum::COUNT)> base;
 
 	public:
-		using base::base;
 		using base::reset;
 		using base::any;
 		using base::all;
@@ -29,6 +28,12 @@ namespace augs {
 		decltype(auto) set(const _enum f, const bool value = true) {
 			return base::set(static_cast<size_t>(f), value);
 		}
-	};
 
+		using base::base;
+
+		template <class... Args>
+		enum_bitset(Args... setters) : base() {
+			[](auto...) {}(set(std::forward<Args>(setters))...);
+		}
+	};
 }

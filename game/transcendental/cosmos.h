@@ -7,6 +7,7 @@
 
 #include "augs/entity_system/operations_on_all_components_mixin.h"
 #include "augs/entity_system/storage_for_systems.h"
+#include "augs/misc/enum_bitset.h"
 
 #include "game/transcendental/types_specification/all_components_declaration.h"
 #include "game/transcendental/types_specification/all_messages_declaration.h"
@@ -75,6 +76,12 @@ struct cosmos_significant_state {
 
 	bool operator==(const cosmos_significant_state&) const;
 	bool operator!=(const cosmos_significant_state&) const;
+};
+
+enum class subjects_iteration_flag {
+	MAKE_COPY_OF_TARGETS,
+
+	COUNT
 };
 
 class EMPTY_BASES cosmos : 
@@ -217,9 +224,9 @@ public:
 	void for_each(
 		const processing_subjects list_type, 
 		F callback,
-		const bool is_copy_of_targets_necessary = false
+		augs::enum_bitset<subjects_iteration_flag> flags = {}
 	) {
-		if (is_copy_of_targets_necessary) {
+		if (flags.test(subjects_iteration_flag::MAKE_COPY_OF_TARGETS)) {
 			const auto targets = systems_temporary.get<processing_lists_system>().get(list_type);
 
 			for (const auto& subject : targets) {
