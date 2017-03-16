@@ -85,14 +85,14 @@ void standard_explosion(const standard_explosion_input in) {
 
 					auto* const maybe_sentience = body_entity.find<components::sentience>();
 
-					if (maybe_sentience != nullptr) {
-						maybe_sentience->shake_for_ms = 400.f;
-						maybe_sentience->time_of_last_shake = now;
-					
-						impact *= 2.f;
-					}
+					if (in.type == explosion_type::FORCE) {
+						if (maybe_sentience != nullptr) {
+							maybe_sentience->shake_for_ms = 400.f;
+							maybe_sentience->time_of_last_shake = now;
+						
+							impact *= 2.f;
+						}
 
-					{
 						affected_physics.apply_impulse(
 							impact, center_offset
 						);
@@ -107,16 +107,16 @@ void standard_explosion(const standard_explosion_input in) {
 						}
 
 						// LOG("Impact %x dealt to: %x. Resultant angular: %x", impact, body_entity.get_debug_name(), affected_physics.get_angular_velocity());
+
+						messages::damage_message damage_msg;
+
+						damage_msg.inflictor = subject;
+						damage_msg.subject = body_entity;
+						damage_msg.amount = in.damage;
+						damage_msg.impact_velocity = impact;
+						damage_msg.point_of_impact = point_b;
+						in.step.transient.messages.post(damage_msg);
 					}
-
-					messages::damage_message damage_msg;
-
-					damage_msg.inflictor = subject;
-					damage_msg.subject = body_entity;
-					damage_msg.amount = in.damage;
-					damage_msg.impact_velocity = impact;
-					damage_msg.point_of_impact = point_b;
-					in.step.transient.messages.post(damage_msg);
 				}
 			}
 

@@ -24,8 +24,10 @@ void grenade_system::init_explosions(const logic_step step) {
 			components::grenade& grenade = it.get<components::grenade>();
 
 			if (grenade.when_explodes.was_set() && now.step >= grenade.when_explodes.step) {
-				if (grenade.type == grenade_type::FORCE) {
-					standard_explosion_input in(step);
+				standard_explosion_input in(step);
+				in.type = grenade.type;
+
+				if (grenade.type == explosion_type::FORCE) {
 					in.explosion_location = it.get_logic_transform();
 					in.damage = 88.f;
 					in.inner_ring_color = red;
@@ -34,13 +36,8 @@ void grenade_system::init_explosions(const logic_step step) {
 					in.impact_force = 550.f;
 					in.sound_gain = 1.4f;
 					in.sound_effect = assets::sound_buffer_id::EXPLOSION;
-
-					standard_explosion(
-						in
-					);
 				}
-				else if (grenade.type == grenade_type::PED) {
-					standard_explosion_input in(step);
+				else if (grenade.type == explosion_type::PED) {
 					in.explosion_location = it.get_logic_transform();
 					in.damage = 12.f;
 					in.inner_ring_color = cyan;
@@ -49,13 +46,8 @@ void grenade_system::init_explosions(const logic_step step) {
 					in.impact_force = 20.f;
 					in.sound_gain = 1.4f;
 					in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
-
-					standard_explosion(
-						in
-					);
 				}
-				else if (grenade.type == grenade_type::INTERFERENCE) {
-					standard_explosion_input in(step);
+				else if (grenade.type == explosion_type::INTERFERENCE) {
 					in.explosion_location = it.get_logic_transform();
 					in.damage = 12.f;
 					in.inner_ring_color = yellow;
@@ -64,11 +56,11 @@ void grenade_system::init_explosions(const logic_step step) {
 					in.impact_force = 20.f;
 					in.sound_gain = 1.4f;
 					in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
-
-					standard_explosion(
-						in
-					);
 				}
+
+				standard_explosion(
+					in
+				);
 
 				step.transient.messages.post(messages::queue_destruction(it));
 			}

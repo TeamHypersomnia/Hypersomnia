@@ -2,6 +2,7 @@
 #include "game/assets/sound_buffer_id.h"
 #include "game/components/transform_component.h"
 #include "game/transcendental/logic_step.h"
+#include "game/enums/explosion_type.h"
 
 struct standard_explosion_input {
 	const logic_step step;
@@ -20,6 +21,7 @@ struct standard_explosion_input {
 	rgba outer_ring_color = white;
 	assets::sound_buffer_id sound_effect = assets::sound_buffer_id::EXPLOSION;
 	float sound_gain = 1.f;
+	explosion_type type = explosion_type::FORCE;
 };
 
 void standard_explosion(const standard_explosion_input);

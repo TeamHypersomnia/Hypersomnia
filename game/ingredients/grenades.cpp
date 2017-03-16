@@ -24,7 +24,7 @@ namespace prefabs {
 
 		auto& grenade = grenade_entity += components::grenade();
 		
-		grenade.type = grenade_type::FORCE;
+		grenade.type = explosion_type::FORCE;
 		grenade.spoon = grenade_spoon;
 		
 		//{
@@ -53,7 +53,7 @@ namespace prefabs {
 		const auto grenade_entity = world.create_entity("ped_grenade");
 		auto& grenade = grenade_entity += components::grenade();
 
-		grenade.type = grenade_type::PED;
+		grenade.type = explosion_type::PED;
 		grenade.spoon = grenade_spoon;
 
 		name_entity(grenade_entity, entity_name::PED_GRENADE);
@@ -76,7 +76,7 @@ namespace prefabs {
 		const auto grenade_entity = world.create_entity("interference_grenade");
 		auto& grenade = grenade_entity += components::grenade();
 
-		grenade.type = grenade_type::INTERFERENCE;
+		grenade.type = explosion_type::INTERFERENCE;
 		grenade.spoon = grenade_spoon;
 
 		name_entity(grenade_entity, entity_name::INTERFERENCE_GRENADE);

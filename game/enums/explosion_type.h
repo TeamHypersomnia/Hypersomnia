@@ -1,6 +1,6 @@
 #pragma once
 
-enum class grenade_type {
+enum class explosion_type {
 	INVALID,
 	FORCE,
 	PED,
