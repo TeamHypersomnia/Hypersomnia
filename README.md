@@ -12,6 +12,10 @@ including, but not limited to, sowing panic as a traitor to benevolent ones.
 Decide upon your allegiance to one of the three warring factions whose apple of discord is a disparity between prevailing notions of moral excellence.
 **Metropolis. Atlantis. Resistance.**
 
+Watch gameplay with all current features on YouTube:
+
+[![IMAGE ALT TEXT](http://img.youtube.com/vi/XsSKj6hJH0w/0.jpg)](http://www.youtube.com/watch?v=YOUTUBE_VIDEO_ID_HERE "Video Title")
+
 ![enter image description here][1]
 ![enter image description here][2]
 ![enter image description here][3]
