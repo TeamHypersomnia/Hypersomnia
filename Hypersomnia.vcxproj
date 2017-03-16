@@ -452,6 +452,7 @@
     <ClCompile Include="game\detail\convex_partitioned_shape.cpp" />
     <ClCompile Include="application\game_window.cpp" />
     <ClCompile Include="game\transcendental\cosmic_step.cpp" />
+    <ClCompile Include="game\transcendental\data_living_one_step.cpp" />
     <ClCompile Include="game\transcendental\entity_handle.cpp" />
     <ClCompile Include="augs\filesystem\directory.cpp" />
     <ClCompile Include="augs\gui\appearance_detector.cpp" />
