@@ -5,7 +5,7 @@
 
 class particles_existence_system {
 public:
-	void destroy_dead_streams(const logic_step) const;
+	void displace_streams_and_destroy_dead_streams(const logic_step) const;
 
 	void game_responses_to_particle_effects(const logic_step) const;
 	void create_particle_effects(const logic_step) const;

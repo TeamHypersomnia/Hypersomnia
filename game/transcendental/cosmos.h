@@ -39,7 +39,7 @@
 class cosmic_delta;
 struct data_living_one_step;
 
-typedef put_all_components_into<augs::operations_on_all_components_mixin, cosmos>::type cosmos_base;
+typedef put_all_components_into_t<augs::operations_on_all_components_mixin, cosmos> cosmos_base;
 
 struct cosmos_flyweights_state {
 	// GEN INTROSPECTOR struct cosmos_flyweights_state
@@ -78,7 +78,7 @@ struct cosmos_significant_state {
 };
 
 class EMPTY_BASES cosmos : 
-	private put_all_components_into<augs::operations_on_all_components_mixin, cosmos>::type, 
+	private cosmos_base,
 	public augs::easier_handle_getters_mixin<cosmos>
 {
 	void advance_deterministic_schemata_and_queue_destructions(const logic_step step_state);

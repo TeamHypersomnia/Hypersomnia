@@ -46,10 +46,9 @@ void components::particles_existence::deactivate(const entity_handle h) {
 	h.get<components::processing>().disable_in(processing_subjects::WITH_PARTICLES_EXISTENCE);
 }
 
-void particles_existence_system::destroy_dead_streams(const logic_step step) const {
+void particles_existence_system::displace_streams_and_destroy_dead_streams(const logic_step step) const {
 	auto& cosmos = step.cosm;
 	const auto timestamp = cosmos.get_timestamp();
-
 
 	cosmos.for_each(
 		processing_subjects::WITH_PARTICLES_EXISTENCE,

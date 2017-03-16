@@ -14,10 +14,12 @@ void thunder_system::thunder::create_root_branch() {
 
 	thunder::branch b;
 	b.lifetime_ms = 0.f;
+
 	b.from = in.first_branch_root.pos;
 	b.to = b.from + vec2().set_from_degrees(
 		in.first_branch_root.rotation + rng.randval(in.branch_angle_spread)
 	) * rng.randval(in.branch_length);
+
 	b.max_lifetime_ms = rng.randval(in.max_branch_lifetime_ms);
 
 	until_next_branching_ms = rng.randval(in.delay_between_branches_ms);
@@ -65,9 +67,14 @@ void thunder_system::advance(
 						thunder::branch child;
 						child.activated = true;
 						child.lifetime_ms = 0.f;
+						
 						child.from = b.to;
 						child.to =
-							child.from + vec2().set_from_degrees(rng.randval(t.in.branch_angle_spread) + (b.to - b.from).degrees()) * rng.randval(t.in.branch_length);
+							child.from 
+							+ vec2().set_from_degrees(rng.randval(t.in.branch_angle_spread) 
+							+ (b.to - b.from).degrees()) * rng.randval(t.in.branch_length)
+						;
+
 						child.max_lifetime_ms = rng.randval(t.in.max_branch_lifetime_ms);
 
 						const auto raycast = cosmos.systems_temporary.get<physics_system>().ray_cast_px(
@@ -147,7 +154,13 @@ void thunder_system::draw_thunders(
 	for (const auto& t : thunders) {
 		for (const auto& b : t.branches) {
 			if (b.activated) {
-				augs::draw_line(lines, camera[b.from], camera[b.to], get_resource_manager().find(assets::game_image_id::BLANK)->texture_maps[texture_map_type::DIFFUSE], t.in.color);
+				augs::draw_line(
+					lines, 
+					camera[b.from], 
+					camera[b.to], 
+					get_resource_manager().find(assets::game_image_id::BLANK)->texture_maps[texture_map_type::DIFFUSE], 
+					t.in.color
+				);
 			}
 		}
 	}

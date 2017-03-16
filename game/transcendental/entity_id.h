@@ -8,14 +8,14 @@ namespace augs {
 	class component_aggregate;
 }
 
-struct unversioned_entity_id : public augs::unversioned_id<typename put_all_components_into<augs::component_aggregate>::type> {
+struct unversioned_entity_id : public augs::unversioned_id<put_all_components_into_t<augs::component_aggregate>> {
 	typedef augs::unversioned_id<typename put_all_components_into<augs::component_aggregate>::type> base;
 
 	unversioned_entity_id(const base b = base()) : base(b) {}
 };
 
-struct entity_id : public augs::pool_id<typename put_all_components_into<augs::component_aggregate>::type> {
-	typedef augs::pool_id<typename put_all_components_into<augs::component_aggregate>::type> base;
+struct entity_id : public augs::pool_id<put_all_components_into_t<augs::component_aggregate>> {
+	typedef augs::pool_id<put_all_components_into_t<augs::component_aggregate>> base;
 
 	entity_id(const base b = base()) : base(b) {}
 

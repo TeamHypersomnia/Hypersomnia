@@ -14,7 +14,6 @@ namespace augs {
 		tuple_type queues;
 
 	public:
-		
 		template <typename T>
 		void post(const T& message_object) {
 			get_queue<T>().push_back(message_object);

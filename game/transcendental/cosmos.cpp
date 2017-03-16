@@ -470,7 +470,7 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	auto& transfers = step.transient.messages.get_queue<item_slot_transfer_request_data>();
 	perform_transfers(transfers, step);
 
-	particles_existence_system().destroy_dead_streams(step);
+	particles_existence_system().displace_streams_and_destroy_dead_streams(step);
 	sound_existence_system().destroy_dead_sounds(step);
 
 	trace_system().destroy_outdated_traces(step);

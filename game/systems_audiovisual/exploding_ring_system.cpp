@@ -75,7 +75,7 @@ void exploding_ring_system::advance(
 									0.f,
 									360.f,
 									sparkles_emission
-									);
+								);
 
 								new_p.colorize(r.color.rgb());
 								new_p.acc /= 2;
@@ -101,7 +101,7 @@ void exploding_ring_system::advance(
 								0.f,
 								360.f,
 								smokes_emission
-								);
+							);
 
 							new_p.face.color.rgb() = r.color.rgb();
 							new_p.face.color.a *= 2;

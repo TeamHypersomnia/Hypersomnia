@@ -135,7 +135,7 @@ bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 
 	enco.profiler.delta_encoding.new_measurement();
 	typedef decltype(base.significant.pool_for_aggregates)::element_type aggregate;
-
+	
 	delted_entity_stream dt;
 
 	enco.significant.pool_for_aggregates.for_each_with_id([&](const aggregate& agg, const entity_id id) {
