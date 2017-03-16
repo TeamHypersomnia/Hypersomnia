@@ -54,14 +54,14 @@ void thunder_system::advance(
 			bool found_suitable_parent = false;
 
 			for (size_t i = 0; i < t.branches.size(); ++i) {
-				auto& b = t.branches[i];
+				const bool is_leaf = t.branches[i].children.empty();
 
-				const bool is_leaf = b.children.empty();
-
-				if (is_leaf && b.can_have_children) {
+				if (is_leaf && t.branches[i].can_have_children) {
 					const auto num_children = std::min(t.in.max_all_spawned_branches, rng.randval(0u, t.in.max_branch_children));
 
 					for (auto i = 0u; i < num_children; ++i) {
+						auto& b = t.branches[i];
+
 						thunder::branch child;
 						child.activated = true;
 						child.lifetime_ms = 0.f;
