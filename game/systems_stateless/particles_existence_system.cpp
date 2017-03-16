@@ -76,7 +76,7 @@ void particles_existence_system::displace_streams_and_destroy_dead_streams(const
 				}
 			}
 		},
-		{ subjects_iteration_flag::MAKE_COPY_OF_TARGETS }
+		{ subjects_iteration_flag::POSSIBLE_ITERATOR_INVALIDATION }
 	);
 }
 

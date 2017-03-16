@@ -79,7 +79,7 @@ struct cosmos_significant_state {
 };
 
 enum class subjects_iteration_flag {
-	MAKE_COPY_OF_TARGETS,
+	POSSIBLE_ITERATOR_INVALIDATION,
 
 	COUNT
 };
@@ -226,7 +226,7 @@ public:
 		F callback,
 		augs::enum_bitset<subjects_iteration_flag> flags = {}
 	) {
-		if (flags.test(subjects_iteration_flag::MAKE_COPY_OF_TARGETS)) {
+		if (flags.test(subjects_iteration_flag::POSSIBLE_ITERATOR_INVALIDATION)) {
 			const auto targets = systems_temporary.get<processing_lists_system>().get(list_type);
 
 			for (const auto& subject : targets) {

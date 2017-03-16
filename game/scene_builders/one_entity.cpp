@@ -41,6 +41,10 @@ namespace scene_builders {
 	void one_entity::populate(const logic_step step, const vec2i screen_size) {
 		auto& world = step.cosm;
 
+		prefabs::create_force_grenade(world, { 254, 611 });
+		prefabs::create_force_grenade(world, { 254, 711 });
+		prefabs::create_force_grenade(world, { 254, 811 });
+
 		const int num_characters = 2;
 
 		std::vector<entity_id> new_characters;

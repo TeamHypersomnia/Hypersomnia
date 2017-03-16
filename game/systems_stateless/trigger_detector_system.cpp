@@ -80,7 +80,7 @@ void trigger_detector_system::post_trigger_requests_from_continuous_detectors(co
 				step.transient.messages.post(request);
 			}
 		},
-		{ subjects_iteration_flag::MAKE_COPY_OF_TARGETS }
+		{ subjects_iteration_flag::POSSIBLE_ITERATOR_INVALIDATION }
 	);
 }
 
@@ -93,8 +93,9 @@ void trigger_detector_system::send_trigger_confirmations(const logic_step step) 
 	const auto& collisions = step.transient.messages.get_queue<messages::collision_message>();
 
 	for (const auto& c : collisions) {
-		if (c.type != messages::collision_message::event_type::PRE_SOLVE)
+		if (c.type != messages::collision_message::event_type::PRE_SOLVE) {
 			continue;
+		}
 
 		const auto* const collision_detector = cosmos[c.subject].find<components::trigger_collision_detector>();
 		const auto* const trigger = cosmos[c.collider].find<components::trigger>();

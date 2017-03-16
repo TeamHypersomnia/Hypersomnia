@@ -71,3 +71,6 @@ int count_charges_in_deposit(const_entity_handle item);
 int count_charges_inside(const_inventory_slot_handle);
 
 void drop_from_all_slots(entity_handle container, const logic_step);
+
+void detail_add_item(const inventory_slot_handle handle, const entity_handle new_item);
+void detail_remove_item(const inventory_slot_handle handle, const entity_handle removed_item);

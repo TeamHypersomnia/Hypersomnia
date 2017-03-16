@@ -339,14 +339,14 @@ unsigned calculate_space_occupied_with_children(const const_entity_handle item) 
 	return space_occupied;
 }
 
-void add_item(const inventory_slot_handle handle, const entity_handle new_item) {
+void detail_add_item(const inventory_slot_handle handle, const entity_handle new_item) {
 	handle->items_inside.push_back(new_item);
 	new_item.get<components::item>().current_slot = handle;
 }
 
-void remove_item(const inventory_slot_handle handle, const entity_handle removed_item) {
+void detail_remove_item(const inventory_slot_handle handle, const entity_handle removed_item) {
 	auto& v = handle->items_inside;
-	v.erase(std::remove(v.begin(), v.end(), removed_item), v.end());
+	remove_element(v, removed_item);
 	removed_item.get<components::item>().current_slot.unset();
 }
 
@@ -459,7 +459,7 @@ void perform_transfer(const item_slot_transfer_request r, const logic_step step)
 		previous_container_transform = previous_slot.get_container().get_logic_transform();
 
 		if (whole_item_grabbed) {
-			remove_item(previous_slot, r.get_item());
+			detail_remove_item(previous_slot, r.get_item());
 		}
 
 		if (previous_slot.is_input_enabling_slot()) {
@@ -494,7 +494,7 @@ void perform_transfer(const item_slot_transfer_request r, const logic_step step)
 	const auto grabbed_item_part_handle = cosmos[grabbed_item_part];
 
 	if (target_slot_exists) {
-		add_item(r.get_target_slot(), grabbed_item_part_handle);
+		detail_add_item(r.get_target_slot(), grabbed_item_part_handle);
 	}
 
 	const auto physics_updater = [previous_container_transform](const entity_handle descendant, auto... args) {
