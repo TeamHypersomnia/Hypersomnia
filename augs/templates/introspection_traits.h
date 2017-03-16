@@ -130,14 +130,26 @@ constexpr bool can_stream_right_v = can_stream_right<StreamType, T>::value;
 template <class StreamType>
 struct can_stream_left_predicate {
 	template <class T>
-	static constexpr bool value = can_stream_left_v<StreamType, T>;
+	struct predicate
+		: std::bool_constant<can_stream_left_v<StreamType, T>> 
+	{
+	};
 };
 
 template <class StreamType>
 struct can_stream_right_predicate {
 	template <class T>
-	static constexpr bool value = can_stream_right_v<StreamType, T>;
+	struct predicate
+		: std::bool_constant<can_stream_right_v<StreamType, T>>
+	{
+	};
 };
+
+template <class StreamType>
+using can_stream_left_predicate_t = typename can_stream_left_predicate<StreamType>::predicate;
+
+template <class StreamType>
+using can_stream_right_predicate_t = typename can_stream_right_predicate<StreamType>::predicate;
 
 template <class T>
 struct exclude_no_type : std::false_type {

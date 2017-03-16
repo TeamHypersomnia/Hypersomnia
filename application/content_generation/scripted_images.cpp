@@ -12,12 +12,6 @@
 
 namespace fs = std::experimental::filesystem;
 
-template <class T>
-struct can_stream 
-	: std::bool_constant<can_stream_right_v<std::istringstream, T>>
-{
-};
-
 void regenerate_scripted_images(
 	const bool force_regenerate
 ) {
@@ -50,7 +44,7 @@ void regenerate_scripted_images(
 					command_type new_command;
 
 					augs::introspect_recursive<
-						can_stream, 
+						can_stream_right_predicate_t<std::istringstream>,
 						exclude_no_type
 					>(
 						[&](auto, auto& member) {
