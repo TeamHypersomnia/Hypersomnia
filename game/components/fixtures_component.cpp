@@ -78,12 +78,13 @@ component_synchronizer<false, F>& component_synchronizer<false, F>::operator=(co
 }
 
 void component_synchronizer<false, F>::reinference() const {
-	handle.get_cosmos().partial_reinference<processing_lists_system>(handle);
+	handle.get_cosmos().partial_reinference<physics_system>(handle);
 }
 
 void component_synchronizer<false, F>::rebuild_density(const size_t index) const {
-	for (auto f : get_cache().fixtures_per_collider[index])
+	for (auto f : get_cache().fixtures_per_collider[index]) {
 		f->SetDensity(component.colliders[index].density * component.colliders[index].density_multiplier);
+	}
 
 	get_cache().fixtures_per_collider[0][0]->GetBody()->ResetMassData();
 }
@@ -91,8 +92,9 @@ void component_synchronizer<false, F>::rebuild_density(const size_t index) const
 void component_synchronizer<false, F>::set_density(const float d, const size_t index) const {
 	component.colliders[index].density = d;
 
-	if (!is_constructed())
+	if (!is_constructed()) {
 		return;
+	}
 
 	rebuild_density(index);
 }
@@ -104,8 +106,9 @@ convex_poly_destruction_data& component_synchronizer<false, F>::get_modifiable_d
 void component_synchronizer<false, F>::set_density_multiplier(const float mult, const size_t index) const {
 	component.colliders[index].density_multiplier = mult;
 
-	if (!is_constructed())
+	if (!is_constructed()) {
 		return;
+	}
 
 	rebuild_density(index);
 }
@@ -118,21 +121,25 @@ void component_synchronizer<false, F>::set_activated(const bool flag) const {
 void component_synchronizer<false, F>::set_friction(const float fr, const size_t index) const {
 	component.colliders[index].friction = fr;
 
-	if (!is_constructed())
+	if (!is_constructed()) {
 		return;
+	}
 
-	for (auto f : get_cache().fixtures_per_collider[index])
+	for (auto f : get_cache().fixtures_per_collider[index]) {
 		f->SetFriction(fr);
+	}
 }
 
 void component_synchronizer<false, F>::set_restitution(const float r, const size_t index) const {
 	component.colliders[index].restitution = r;
 
-	if (!is_constructed())
+	if (!is_constructed()) {
 		return;
+	}
 
-	for (auto f : get_cache().fixtures_per_collider[index])
+	for (auto f : get_cache().fixtures_per_collider[index]) {
 		f->SetRestitution(r);
+	}
 }
 
 void component_synchronizer<false, F>::set_physical_material(const physical_material_type m, const size_t index) const {
