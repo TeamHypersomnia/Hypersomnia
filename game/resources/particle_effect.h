@@ -62,7 +62,7 @@ namespace resources {
 		bool randomize_acceleration = false;
 		bool should_particles_look_towards_velocity = true;
 
-		put_all_particle_types_into_t<make_vector> particle_templates;
+		tuple_of_particle_types_t<make_vector> particle_templates;
 		// END GEN INTROSPECTOR
 
 		template <class T>

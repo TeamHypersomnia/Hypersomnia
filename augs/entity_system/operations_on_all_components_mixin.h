@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/templates/tuple_of.h"
+#include "augs/templates/list_of.h"
 #include "augs/templates/for_each_in_types.h"
 
 #include "augs/misc/pool.h"
@@ -13,7 +13,7 @@ namespace augs {
 
 	public:
 		typedef pool<aggregate_type> aggregate_pool_type;
-		typedef tuple_of_t<make_pool, components...> component_pools_type;
+		typedef std::tuple<pool<components>...> component_pools_type;
 
 		void reserve_storage_for_all_components(const size_t n) {
 			auto& self = *static_cast<derived*>(this);

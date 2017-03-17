@@ -1,7 +1,7 @@
 #pragma once
 #include <tuple>
 #include <vector>
-#include "augs/templates/tuple_of.h"
+#include "augs/templates/list_of.h"
 #include "augs/templates/for_each_in_types.h"
 #include "augs/templates/container_templates.h"
 #include "augs/templates/type_mod_templates.h"
@@ -10,7 +10,7 @@
 namespace augs {
 	template<class... Queues>
 	class storage_for_message_queues {
-		typedef tuple_of_t<make_vector, Queues...> tuple_type;
+		typedef std::tuple<std::vector<Queues>...> tuple_type;
 		tuple_type queues;
 
 	public:

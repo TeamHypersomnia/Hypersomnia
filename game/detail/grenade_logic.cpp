@@ -31,7 +31,7 @@ void release_or_throw_grenade(
 		grenade_entity.get<components::processing>().enable_in(processing_subjects::WITH_GRENADE);
 
 		grenade.when_released = now;
-		grenade.when_explodes.step = now.step + (1 / delta.in_seconds() * 1.0);
+		grenade.when_explodes.step = static_cast<unsigned>(now.step + (1 / delta.in_seconds() * 1.0));
 
 		sound_effect_input in;
 		in.delete_entity_after_effect_lifetime = true;
@@ -76,7 +76,7 @@ void release_or_throw_grenade(
 
 		auto& fixtures = grenade_entity.get<components::fixtures>();
 		auto new_def = fixtures.get_data();
-		new_def.colliders[0].restitution = 1.0f;
+		new_def.colliders[0].restitution = 0.6;
 		new_def.colliders[0].density = 10.f;
 
 		const auto aabb = grenade_entity.get_aabb();

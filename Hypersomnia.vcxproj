@@ -1139,7 +1139,7 @@
     <ClInclude Include="augs\templates\minimal_templates.h" />
     <ClInclude Include="augs\templates\string_templates.h" />
     <ClInclude Include="augs\templates\template_logic.h" />
-    <ClInclude Include="augs\templates\tuple_of.h" />
+    <ClInclude Include="augs\templates\list_of.h" />
     <ClInclude Include="augs\templates\type_matching_and_indexing.h" />
     <ClInclude Include="augs\templates\type_mod_templates.h" />
     <ClInclude Include="augs\texture_atlas\texture_atlas_entry.h" />

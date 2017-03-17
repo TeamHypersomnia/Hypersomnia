@@ -26,10 +26,4 @@ template<
 	template<typename> class Mod,
 	typename ...Args
 >
-using tuple_of_t = typename list_of<std::tuple, Mod, Args...>::type;
-
-template<
-	template<typename> class Mod,
-	typename ...Args
->
-using trivial_tuple_of_t = typename list_of<augs::trivial_tuple, Mod, Args...>::type;
+using tuple_of_t = typename list_of_t<std::tuple, Mod, Args...>;

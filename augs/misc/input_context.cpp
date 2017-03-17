@@ -27,7 +27,8 @@ void basic_input_context<T>::map_event_to_intent(const message id, const T inten
 
 template <class T>
 key_and_mouse_intent_vector basic_input_context<T>::to_key_and_mouse_intents(const augs::machine_entropy::local_type& local) const {
-	key_and_mouse_intent_vector output;
+	key_and_mouse_intent_vector safe_output;
+	auto& output = *safe_output;
 
 	for (const auto& raw : local) {
 		key_and_mouse_intent intent;
@@ -60,12 +61,12 @@ key_and_mouse_intent_vector basic_input_context<T>::to_key_and_mouse_intents(con
 		}
 	}
 
-	if (output.overflowed()) {
-		output.clear();
+	if (safe_output.overflowed()) {
+		safe_output.clear();
 		LOG("Warning! Intent vector has overflowed - clearing.");
 	}
 
-	return std::move(output);
+	return safe_output;
 }
 
 template struct basic_input_context<intent_type>;
