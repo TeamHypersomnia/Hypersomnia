@@ -118,7 +118,7 @@ void menu_setup::process(
 			const auto wresult = to_wstring(result);
 
 			std::unique_lock<std::mutex> lck(news_mut);
-			latest_news_drawer.set_text(simple_bbcode(wresult, textes_style));
+			latest_news_drawer.set_text(format_as_bbcode(wresult, textes_style));
 		}
 	});
 
@@ -218,13 +218,13 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 			appearing_text task;
 			std::vector<appearing_text> personae;
 
-			void set_task(const fstr f) {
+			void set_task(const formatted_string f) {
 				task.target_text[0] = f;
 				task.population_interval = 100.f;
 				task.should_disappear = false;
 			}
 
-			void add_person(const fstr f) {
+			void add_person(const formatted_string f) {
 				appearing_text p;
 
 				p.target_text[0] = f;

@@ -21,11 +21,11 @@ std::mutex log_mutex;
 unsigned global_log::max_all_entries = 10000;
 std::vector<log_entry> global_log::all_entries;
 
-augs::gui::text::fstr global_log::format_recent_as_text(
+augs::gui::text::formatted_string global_log::format_recent_as_text(
 	const assets::font_id f,
 	unsigned lines_remaining
 ) {
-	augs::gui::text::fstr result;
+	augs::gui::text::formatted_string result;
 	
 	lines_remaining = std::min(lines_remaining, all_entries.size());
 

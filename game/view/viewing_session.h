@@ -100,7 +100,7 @@ public:
 		const entity_id viewed_character,
 		const visible_entities&,
 		const float interpolation_ratio,
-		const augs::gui::text::fstr& custom_log = augs::gui::text::fstr()
+		const augs::gui::text::formatted_string& custom_log = augs::gui::text::formatted_string()
 	) const;
 
 	void view(

@@ -7,7 +7,7 @@ namespace augs {
 			return own_clip;
 		}
 
-		void paste_clipboard_formatted(text::fstr& out, text::formatted_char f) {
+		void paste_clipboard_formatted(text::formatted_string& out, text::formatted_char f) {
 			//auto w = window::get_data_from_clipboard();
 			//size_t len = w.length();
 			//out.clear();
@@ -18,7 +18,7 @@ namespace augs {
 			//}
 		}
 
-		void clipboard::copy_clipboard(const text::fstr& s) {
+		void clipboard::copy_clipboard(const text::formatted_string& s) {
 			contents = s;
 			own_copy = true;
 			own_clip = true;

@@ -173,14 +173,14 @@ namespace augs {
 				if (clip.is_clipboard_own())
 					insert(clip.contents);
 				else {
-					fstr out;
+					formatted_string out;
 					paste_clipboard_formatted(out, get_current_style());
 					insert(out);
 				}
 			}
 
-			void ui::insert(fstr& ss) {
-				fstr s;
+			void ui::insert(formatted_string& ss) {
+				formatted_string s;
 
 				for (size_t i = 0; i < ss.length(); ++i)
 					if (is_valid_glyph(ss[i]) && is_whitelisted(ss[i].c) && !is_blacklisted(ss[i].c)) s += ss[i];
@@ -417,17 +417,17 @@ namespace augs {
 				set_undo();
 			}
 
-			ui::action::action(ui& subject, int where, const formatted_char& ch, const fstr& replaced)
+			ui::action::action(ui& subject, int where, const formatted_char& ch, const formatted_string& replaced)
 				: subject(&subject), where(where), character(ch), replaced(replaced), flag(REPLACE_CHARACTERS) {
 				set_undo();
 			}
 
-			ui::action::action(ui& subject, int where, const fstr& _str, type flag)
+			ui::action::action(ui& subject, int where, const formatted_string& _str, type flag)
 				: subject(&subject), where(where), _str(_str), flag(flag) {
 				set_undo();
 			}
 
-			ui::action::action(ui& subject, int where, const fstr& _str, const fstr& replaced)
+			ui::action::action(ui& subject, int where, const formatted_string& _str, const formatted_string& replaced)
 				: subject(&subject), where(where), _str(_str), replaced(replaced), flag(action::REPLACE) {
 				set_undo();
 			}

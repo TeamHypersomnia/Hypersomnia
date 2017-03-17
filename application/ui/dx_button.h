@@ -15,7 +15,7 @@
 class dx_button : public app_ui_rect_node {
 public:
 	augs::gui::appearance_detector detector;
-	augs::gui::text::fstr caption;
+	augs::gui::text::formatted_string caption;
 
 	augs::sound_source hover_sound;
 	augs::sound_source click_sound;
@@ -36,7 +36,7 @@ public:
 
 	dx_button();
 	vec2i get_target_button_size() const;
-	void set_appearing_caption(const augs::gui::text::fstr text);
+	void set_appearing_caption(const augs::gui::text::formatted_string text);
 
 	template <class C, class D>
 	static void advance_elements(const C context, const D this_id, const augs::delta dt) {

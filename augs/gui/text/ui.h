@@ -18,7 +18,7 @@ namespace augs {
 
 					int where, right;
 					formatted_char character;
-					fstr _str, replaced;
+					formatted_string _str, replaced;
 
 					std::vector<bool> states;
 					bool unapply;
@@ -28,9 +28,9 @@ namespace augs {
 					} flag;
 
 					action(ui& subject, int where, const formatted_char&);
-					action(ui& subject, int where, const formatted_char&, const fstr& replaced);
-					action(ui& subject, int where, const fstr&, type flag = INSERT);
-					action(ui& subject, int where, const fstr&, const fstr& replaced = fstr());
+					action(ui& subject, int where, const formatted_char&, const formatted_string& replaced);
+					action(ui& subject, int where, const formatted_string&, type flag = INSERT);
+					action(ui& subject, int where, const formatted_string&, const formatted_string& replaced = formatted_string());
 					action(ui& subject, int left, int right, bool unapply, const std::vector<bool>&, type flag);
 
 					bool include(const action&);
@@ -86,7 +86,7 @@ namespace augs {
 					copy(clipboard&),
 					paste(clipboard&),
 
-					insert(fstr&),
+					insert(formatted_string&),
 					character(const wchar_t&),
 					character(const formatted_char&),
 					backspace(bool ctrl = false),

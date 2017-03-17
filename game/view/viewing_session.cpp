@@ -243,7 +243,7 @@ void viewing_session::view(
 ) const {
 	using namespace augs::gui::text;
 	
-	const auto custom_log = multiply_alpha(simple_bbcode(typesafe_sprintf("[color=cyan]Transmission details:[/color]\n%x", details.format_transmission_details()), style(assets::font_id::GUI_FONT, white)), 150.f / 255);;
+	const auto custom_log = multiply_alpha(format_as_bbcode(typesafe_sprintf("[color=cyan]Transmission details:[/color]\n%x", details.format_transmission_details()), style(assets::font_id::GUI_FONT, white)), 150.f / 255);;
 
 	view(config, renderer, cosmos, viewed_character, all_visible, interpolation_ratio, custom_log);
 }
@@ -255,7 +255,7 @@ void viewing_session::view(
 	const entity_id viewed_character,
 	const visible_entities& all_visible,
 	const float interpolation_ratio,
-	const augs::gui::text::fstr& custom_log
+	const augs::gui::text::formatted_string& custom_log
 ) const {
 	frame_profiler.new_measurement();
 

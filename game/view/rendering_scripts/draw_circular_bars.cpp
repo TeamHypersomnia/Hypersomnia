@@ -144,7 +144,7 @@ namespace rendering_scripts {
 
 				textual_infos.push_back({
 					starting_health_angle,
-					description_of_entity(v).name,
+					get_bbcoded_entity_name(v),
 					health_col
 				});
 

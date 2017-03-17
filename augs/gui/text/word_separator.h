@@ -22,14 +22,14 @@ namespace augs {
 				and pass it as an argument to the latter versions, thus always making the offset at least one,
 				unless caret is at 0 or at str.length()
 				*/
-				unsigned get_left_word(const fstr&, int at) const;
-				unsigned get_right_word(const fstr&, int at) const;
+				unsigned get_left_word(const formatted_string&, int at) const;
+				unsigned get_right_word(const formatted_string&, int at) const;
 
-				unsigned get_left_word(const fstr&, int at, int max_left) const;
-				unsigned get_right_word(const fstr&, int at, int max_right) const;
+				unsigned get_left_word(const formatted_string&, int at, int max_left) const;
+				unsigned get_right_word(const formatted_string&, int at, int max_right) const;
 
-				unsigned get_left_word(const fstr&, int at, int max_left, int wordtype) const;
-				unsigned get_right_word(const fstr&, int at, int max_right, int wordtype) const;
+				unsigned get_left_word(const formatted_string&, int at, int max_left, int wordtype) const;
+				unsigned get_right_word(const formatted_string&, int at, int max_right, int wordtype) const;
 			};
 		}
 	}

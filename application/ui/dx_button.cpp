@@ -15,7 +15,7 @@ vec2i dx_button::get_target_button_size() const {
 	return corners.internal_size_to_cornered_size(get_text_bbox(appearing_caption.get_total_target_text(), 0)) - vec2i(0, 3);
 }
 
-void dx_button::set_appearing_caption(const augs::gui::text::fstr text) {
+void dx_button::set_appearing_caption(const augs::gui::text::formatted_string text) {
 	appearing_caption.population_interval = 100.f;
 
 	appearing_caption.should_disappear = false;

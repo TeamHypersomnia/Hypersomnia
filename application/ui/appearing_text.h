@@ -11,17 +11,17 @@ namespace augs {
 typedef std::unique_ptr<augs::action> act;
 
 struct appearing_text {
-	typedef augs::gui::text::fstr fstr;
+	typedef augs::gui::text::formatted_string formatted_string;
 
 	augs::gui::text_drawer drawer;
 	augs::gui::text::style st = augs::gui::text::style(assets::font_id::GUI_FONT, cyan);
 	rgba_channel alpha = 0;
 
-	fstr text;
+	formatted_string text;
 
-	std::array<fstr, 2> target_text;
+	std::array<formatted_string, 2> target_text;
 
-	fstr get_total_target_text() const {
+	formatted_string get_total_target_text() const {
 		return target_text[0] + target_text[1];
 	}
 
@@ -48,14 +48,14 @@ struct appearing_text {
 		};
 
 		push(act(new augs::set_value_action<rgba_channel>(alpha, 255)));
-		push(act(new augs::set_value_action<fstr>(text, fstr())));
+		push(act(new augs::set_value_action<formatted_string>(text, formatted_string())));
 		push(act(new augs::set_value_action<bool>(caret_active, true)));
 
-		push(act(new augs::populate_with_delays<fstr>(text, target_text[0], population_interval * target_text[0].length(), population_variation, rng++)));
+		push(act(new augs::populate_with_delays<formatted_string>(text, target_text[0], population_interval * target_text[0].length(), population_variation, rng++)));
 
 		if (target_text[1].size() > 0) {
 			push(act(new augs::delay_action(1000.f)));
-			push(act(new augs::populate_with_delays<fstr>(text, target_text[1], population_interval * target_text[1].length(), population_variation, rng++)));
+			push(act(new augs::populate_with_delays<formatted_string>(text, target_text[1], population_interval * target_text[1].length(), population_variation, rng++)));
 		}
 
 		push(act(new augs::delay_action(1000.f)));

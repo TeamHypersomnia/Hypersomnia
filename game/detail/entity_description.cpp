@@ -16,19 +16,22 @@
 #include "augs/log.h"
 #include <iomanip>
 
-textual_description description_of_entity(const const_entity_handle id) {
-	const auto& name = id.get<components::name>();
-	
-	auto result = description_by_entity_name(name.id);
+std::wstring get_bbcoded_entity_name(const const_entity_handle maybe_overridden_by_nickname) {
+	const auto& name = maybe_overridden_by_nickname.get<components::name>();
 
 	if (name.custom_nickname) {
-		result.name = name.get_nickname();
+		return name.get_nickname();
 	}
-
-	return result;
+	else {
+		return get_bbcoded_entity_name(name.id);
+	}
 }
 
-std::wstring describe_properties(const const_entity_handle id) {
+std::wstring get_bbcoded_entity_name_details(const const_entity_handle id) {
+	return get_bbcoded_entity_name_details(id.get<components::name>().id);
+}
+
+std::wstring get_bbcoded_entity_properties(const const_entity_handle id) {
 	std::wostringstream result;
 
 	const auto& cosmos = id.get_cosmos();
@@ -41,7 +44,7 @@ std::wstring describe_properties(const const_entity_handle id) {
 
 	if (item) {
 		if (item->categories_for_slot_compatibility.any()) {
-			result << L"[color=vsblue]" << describe_item_compatibility_categories(item->categories_for_slot_compatibility) << L"[/color]\n";
+			result << L"[color=vsblue]" << get_bbcoded_item_compatibility_categories(item->categories_for_slot_compatibility) << L"[/color]\n";
 		}
 		
 		const auto total_occupied = format_space_units(calculate_space_occupied_with_children(id));
@@ -111,7 +114,7 @@ std::wstring describe_properties(const const_entity_handle id) {
 		const auto& bullet_round = id[child_entity_name::CATRIDGE_ROUND];
 
 		if (bullet_round.alive()) {
-			out = result.str() + describe_properties(bullet_round);
+			out = result.str() + get_bbcoded_entity_properties(bullet_round);
 			return out;
 		}
 	}
@@ -120,26 +123,30 @@ std::wstring describe_properties(const const_entity_handle id) {
 	return out.substr(0, out.length() - 1);
 }
 
-std::wstring describe_slot(const const_inventory_slot_handle& id) {
-	const auto text = describe_slot_function(id.get_id().type);
+std::wstring get_bbcoded_slot_description(const const_inventory_slot_handle id) {
+	const auto name = get_bbcoded_slot_function_name(id.get_id().type);
+	const auto details = get_bbcoded_slot_function_details(id.get_id().type);
+
 	const auto catcolor = id->for_categorized_items_only ? L"violet" : L"vsblue";
 
-	return text.name + L"\n[color=vslightgray]Allows: [/color][color=" + catcolor + L"]" + describe_item_compatibility_categories(id->get_allowed_categories()) + L"[/color][color=vsdarkgray]\n" +
-		text.details + L"[/color]";
+	return name + L"\n[color=vslightgray]Allows: [/color][color=" + catcolor + L"]" + get_bbcoded_item_compatibility_categories(id->get_allowed_categories()) + L"[/color][color=vsdarkgray]\n" +
+		details + L"[/color]";
 }
 
-std::wstring describe_entity(const const_entity_handle id) {
-	const auto desc = description_of_entity(id);
-	auto properties = describe_properties(id);
+std::wstring get_bbcoded_entity_description(const const_entity_handle id) {
+	const auto name = get_bbcoded_entity_name(id);
+	const auto details = get_bbcoded_entity_name_details(id);
+
+	auto properties = get_bbcoded_entity_properties(id);
 	
 	if (!properties.empty()) {
 		properties += L"\n";
 	}
 
-	return L"[color=white]" + desc.name + L"[/color]\n" + properties + L"[color=vsdarkgray]" + desc.details + L"[/color]";
+	return L"[color=white]" + name + L"[/color]\n" + properties + L"[color=vsdarkgray]" + details + L"[/color]";
 }
 
-std::wstring describe_sentience_meter(
+std::wstring get_bbcoded_sentience_meter_description(
 	const const_entity_handle subject,
 	const sentience_meter_type type
 ) {
@@ -162,7 +169,7 @@ std::wstring describe_sentience_meter(
 	else return L"Unknown problem";
 }
 
-std::wstring describe_perk_meter(
+std::wstring get_bbcoded_perk_meter_description(
 	const const_entity_handle subject,
 	const perk_meter_type type
 ) {

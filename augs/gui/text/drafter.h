@@ -3,7 +3,7 @@
 #include "word_separator.h"
 // ui relates on draft object (result) only
 // if bugs viewing the caret, check the viewcaret where "car" variable was changed to caret_rect
-// neither drafter nor printer have their fstr declared as member fields because it is better to pass it around than rewrite each time we want to change string
+// neither drafter nor printer have their formatted_string declared as member fields because it is better to pass it around than rewrite each time we want to change string
 namespace augs {
 	namespace gui {
 		namespace text {
@@ -54,7 +54,7 @@ namespace augs {
 				/* returns text's bounding box */
 				vec2i get_bbox() const;
 
-				void draw(const fstr&);
+				void draw(const formatted_string&);
 
 				/*
 				clipper is in local drafter's space: (0, 0) = left top corner
@@ -62,10 +62,10 @@ namespace augs {
 				std::pair<int, int> get_line_visibility(const ltrbi& clipper) const;
 			private:
 				unsigned max_x;
-				void find_ascdesc(const fstr& source, const int i, const int j, int&, int&) const;
-				int get_kern(const fstr& source, const unsigned code1, const unsigned code2) const;
+				void find_ascdesc(const formatted_string& source, const int i, const int j, int&, int&) const;
+				int get_kern(const formatted_string& source, const unsigned code1, const unsigned code2) const;
 				const augs::font_glyph_metadata& get_cached(const int i) const;
-				const augs::baked_font& getf(const fstr& source, const unsigned i) const;
+				const augs::baked_font& getf(const formatted_string& source, const unsigned i) const;
 			};
 		}
 	}

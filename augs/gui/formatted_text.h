@@ -23,18 +23,18 @@ namespace augs {
 				operator formatted_char();
 			};
 
-			typedef std::basic_string<formatted_char> fstr;
+			typedef std::basic_string<formatted_char> formatted_string;
 			
-			fstr multiply_alpha(fstr, const float);
-			fstr set_alpha(fstr, const float);
+			formatted_string multiply_alpha(formatted_string, const float);
+			formatted_string set_alpha(formatted_string, const float);
 
-			std::wstring formatted_string_to_wstring(const fstr& f);
-			fstr simple_bbcode(std::string, style);
-			fstr simple_bbcode(std::wstring, style);
-			fstr format(const std::wstring&, style);
-			void format(const std::wstring&, style, fstr&);
-			void format(const wchar_t*, style, fstr&);
-			fstr format(const wchar_t*, style);
+			std::wstring formatted_string_to_wstring(const formatted_string& f);
+			
+			formatted_string format_as_bbcode(const std::string&, const style default_style);
+			formatted_string format_as_bbcode(const std::wstring&, const style default_style);
+			
+			formatted_string format(const std::wstring&, const style);
+			void format(const std::wstring&, const style, formatted_string&);
 		}
 	}
 }

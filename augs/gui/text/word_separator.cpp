@@ -23,15 +23,15 @@ namespace augs {
 				if (word_type == 0) set_default();
 			}
 
-			unsigned word_separator::get_left_word(const fstr& str, int at) const {
+			unsigned word_separator::get_left_word(const formatted_string& str, int at) const {
 				return get_left_word(str, at, -1);
 			}
 
-			unsigned word_separator::get_right_word(const fstr& str, int at) const {
+			unsigned word_separator::get_right_word(const formatted_string& str, int at) const {
 				return get_right_word(str, at, -1);
 			}
 
-			unsigned word_separator::get_left_word(const fstr& _str, int at, int max_left) const {
+			unsigned word_separator::get_left_word(const formatted_string& _str, int at, int max_left) const {
 				if (max_left == -1) max_left = 0;
 				if (_str.empty() || at <= int(max_left)) return 0;
 
@@ -41,7 +41,7 @@ namespace augs {
 					: result;
 			}
 
-			unsigned word_separator::get_right_word(const fstr& _str, int at, int max_right) const {
+			unsigned word_separator::get_right_word(const formatted_string& _str, int at, int max_right) const {
 				if (max_right == -1) max_right = _str.length();
 				if (_str.empty() || at >= int(max_right)) return 0;
 
@@ -51,7 +51,7 @@ namespace augs {
 					: result;
 			}
 
-			unsigned word_separator::get_left_word(const fstr& _str, int at, int max_left, int wordtype) const {
+			unsigned word_separator::get_left_word(const formatted_string& _str, int at, int max_left, int wordtype) const {
 				if (max_left == -1) max_left = 0;
 				if (_str.empty() || at <= int(max_left)) return 0;
 
@@ -67,7 +67,7 @@ namespace augs {
 				return offset;
 			}
 
-			unsigned word_separator::get_right_word(const fstr& _str, int at, int max_right, int wordtype) const {
+			unsigned word_separator::get_right_word(const formatted_string& _str, int at, int max_right, int wordtype) const {
 				if (max_right == -1) max_right = _str.length();
 				if (_str.empty() || at >= int(max_right)) return 0;
 

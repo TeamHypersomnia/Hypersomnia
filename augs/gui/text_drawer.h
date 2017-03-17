@@ -19,7 +19,7 @@ namespace augs {
 			
 			vec2i get_bbox();
 
-			void set_text(const text::fstr&);
+			void set_text(const text::formatted_string&);
 
 			void draw_stroke(buf&, const rgba col = black, const text::caret_info* caret = nullptr);
 			void draw(buf&, const text::caret_info* in = nullptr);

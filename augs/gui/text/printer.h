@@ -43,7 +43,7 @@ namespace augs {
 				void draw_text(
 					std::vector<augs::vertex_triangle>& out,
 					const drafter&,
-					const fstr& colors,
+					const formatted_string& colors,
 					const caret_info* const caret,
 					const vec2i pos,
 					const ltrbi clipper = ltrbi()
@@ -51,13 +51,13 @@ namespace augs {
 			};
 
 			extern vec2i get_text_bbox(
-				const fstr& str, 
+				const formatted_string& str, 
 				const unsigned wrapping_width
 			);
 
 			extern vec2 quick_print(
 				std::vector<augs::vertex_triangle>& v,
-				const fstr& str,
+				const formatted_string& str,
 				const vec2i pos,
 				const unsigned wrapping_width = 0,
 				const ltrbi clipper = ltrbi()

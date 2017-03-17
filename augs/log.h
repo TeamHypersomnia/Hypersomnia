@@ -16,7 +16,7 @@ struct global_log {
 	static std::vector<log_entry> all_entries;
 	static unsigned max_all_entries;
 
-	static augs::gui::text::fstr format_recent_as_text(
+	static augs::gui::text::formatted_string format_recent_as_text(
 		const assets::font_id,
 		unsigned max_lines = 40
 	);

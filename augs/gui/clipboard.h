@@ -12,14 +12,14 @@ namespace augs {
 		public:
 			bool fetch_clipboard = true;
 
-			text::fstr contents;
+			text::formatted_string contents;
 
 			void change_clipboard();
-			void copy_clipboard(const text::fstr&);
+			void copy_clipboard(const text::formatted_string&);
 
 			bool is_clipboard_own() const;
 		};
 
-		void paste_clipboard_formatted(text::fstr& out, text::formatted_char = text::formatted_char());
+		void paste_clipboard_formatted(text::formatted_string& out, text::formatted_char = text::formatted_char());
 	}
 }

@@ -11,27 +11,42 @@
 #include "game/enums/perk_meter_type.h"
 #include "game/enums/spell_type.h"
 
-struct textual_description {
-	std::wstring name;
-	std::wstring details;
-} description_by_entity_name(const entity_name),
-description_of_entity(const const_entity_handle)
-;
+/*
+	Example description:
 
-std::wstring describe_properties(const const_entity_handle);
+	0. Force grenade
+	1. Occupies: 0.6
+	2. Deals high damage to health of personnel
+	3. and armor.
 
-std::wstring describe_item_compatibility_categories(const item_category_bitset& flags);
-textual_description describe_slot_function(const slot_function);
+	Parts:
 
-std::wstring describe_slot(const const_inventory_slot_handle&);
-std::wstring describe_entity(const const_entity_handle);
+	0: entity name
+	1: entity properties
+	2-3: entity details
+	0-3 (the whole): entity description
+*/
 
-std::wstring describe_sentience_meter(
+std::wstring get_bbcoded_entity_name(const entity_name);
+std::wstring get_bbcoded_entity_name(const const_entity_handle maybe_overridden_by_nickname);
+
+std::wstring get_bbcoded_entity_name_details(const entity_name);
+std::wstring get_bbcoded_entity_name_details(const const_entity_handle);
+
+std::wstring get_bbcoded_item_compatibility_categories(const item_category_bitset& flags);
+
+std::wstring get_bbcoded_slot_function_name(const slot_function);
+std::wstring get_bbcoded_slot_function_details(const slot_function);
+
+std::wstring get_bbcoded_slot_description(const const_inventory_slot_handle);
+std::wstring get_bbcoded_entity_description(const const_entity_handle);
+
+std::wstring get_bbcoded_sentience_meter_description(
 	const const_entity_handle,
 	const sentience_meter_type
 );
 
-std::wstring describe_perk_meter(
+std::wstring get_bbcoded_perk_meter_description(
 	const const_entity_handle,
 	const perk_meter_type
 );

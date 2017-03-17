@@ -9,12 +9,12 @@
 namespace augs {
 	namespace gui {
 		namespace text {
-			const baked_font& drafter::getf(const gui::text::fstr& source, const unsigned i) const {
+			const baked_font& drafter::getf(const gui::text::formatted_string& source, const unsigned i) const {
 				//return (i < source.length() && source[i].font_used) ? source[i].font_used : target_caret->default_style.f;
 				return *source[i].font_used;
 			}
 
-			int drafter::get_kern(const gui::text::fstr& source, const unsigned i, const unsigned l) const {
+			int drafter::get_kern(const gui::text::formatted_string& source, const unsigned i, const unsigned l) const {
 				if (kerning && i > lines[l].begin && &getf(source, i) == &getf(source, i - 1)) {
 					auto& vk = get_cached(i).kerning;
 					for (unsigned k = 0; k < vk.size(); ++k)
@@ -28,7 +28,7 @@ namespace augs {
 				return (cached.at(i) == nullptr) ? default_glyph : *cached[i];
 			}
 
-			void drafter::find_ascdesc(const gui::text::fstr& in, const int l, const int r, int& asc, int& desc) const {
+			void drafter::find_ascdesc(const gui::text::formatted_string& in, const int l, const int r, int& asc, int& desc) const {
 				if (l == r) {
 					if (l > 0) {
 						asc = getf(in, l - 1).meta_from_file.ascender;
@@ -165,7 +165,7 @@ namespace augs {
 				return lines[map_to_line(p)].hover(p.x, sectors);
 			}
 
-			void drafter::draw(const fstr& source) {
+			void drafter::draw(const formatted_string& source) {
 				/* whole structural data clears */
 				cached.clear();
 				lines.clear();

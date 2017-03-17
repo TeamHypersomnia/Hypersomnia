@@ -371,13 +371,13 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 		}
 		else {
 			if (recording_replacement_mode == recording_replacement_type::ALL) {
-				director_text += simple_bbcode(L"[color=red]Recording (replacing all)[/color]", white_font);
+				director_text += format_as_bbcode(L"[color=red]Recording (replacing all)[/color]", white_font);
 			}
 			else if (recording_replacement_mode == recording_replacement_type::ONLY_KEYS) {
-				director_text += simple_bbcode(L"[color=red]Recording (replacing keys)[/color]", white_font);
+				director_text += format_as_bbcode(L"[color=red]Recording (replacing keys)[/color]", white_font);
 			}
 			else if (recording_replacement_mode == recording_replacement_type::ONLY_MOUSE) {
-				director_text += simple_bbcode(L"[color=red]Recording (replacing mouse)[/color]", white_font);
+				director_text += format_as_bbcode(L"[color=red]Recording (replacing mouse)[/color]", white_font);
 			}
 			else {
 				ensure(false);
@@ -394,7 +394,7 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 		}
 
 		if (unsaved_changes_exist) {
-			director_text += simple_bbcode(L"\n[color=yellow]Press F7 to save pending changes.[/color]", white_font);
+			director_text += format_as_bbcode(L"\n[color=yellow]Press F7 to save pending changes.[/color]", white_font);
 		}
 
 		auto& renderer = augs::renderer::get_current();

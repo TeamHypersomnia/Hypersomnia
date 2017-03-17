@@ -4,193 +4,187 @@
 #include <vector>
 
 #include "augs/templates/string_templates.h"
+#include "augs/templates/container_templates.h"
 
 namespace augs {
 	namespace gui {
 		namespace text {
-			std::wstring formatted_string_to_wstring(const fstr& f) {
-				size_t l = f.size();
-				std::wstring ww;
-				ww.reserve(l);
-				for (size_t i = 0; i < l; ++i)
-					ww += f[i].c;
+			std::wstring formatted_string_to_wstring(
+				const formatted_string& f
+			) {
+				const size_t l = f.size();
+				
+				std::wstring out;
+				out.reserve(l);
 
-				return ww;
+				for (const auto& c : f) {
+					out += c.c;
+				}
+
+				return out;
 			}
 
-			fstr multiply_alpha(fstr f, const float m) {
+			formatted_string multiply_alpha(
+				formatted_string f, 
+				const float m
+			) {
 				for (auto& c : f) {
 					c.a = static_cast<unsigned char>(c.a * m);
 				}
 
-				return std::move(f);
+				return f;
 			}
 
-			fstr set_alpha(fstr f, const float m) {
+			formatted_string set_alpha(
+				formatted_string f, 
+				const float m
+			) {
 				for (auto& c : f) {
 					c.a = static_cast<unsigned char>(m);
 				}
 
-				return std::move(f);
+				return f;
 			}
 
-			void format(const wchar_t* _str, style s, fstr& out) {
+			void format(
+				const std::wstring& str, 
+				const style s, 
+				formatted_string& out
+			) {
 				out.clear();
+				
 				formatted_char ch;
-				int len = wcslen(_str);
-				for (int i = 0; i < len; ++i) {
-					ch.set(_str[i], s.f, s.color);
+				
+				for (const auto& c : str) {
+					ch.set(c, s.f, s.color);
 					out.append(1, ch);
 				}
 			}
 
-			fstr format(const wchar_t* _str, style s) {
-				fstr out;
-
-				formatted_char ch;
-				ch.font_used = s.f;
-				int len = wcslen(_str);
-
-				//out.reserve(len);
-				for (int i = 0; i < len; ++i) {
-					ch.set(_str[i], s.f, s.color);
-					out.append(1, ch);
-				}
-
+			formatted_string format(
+				const std::wstring& str, 
+				const style s
+			) {
+				formatted_string out;
+				format(str, s, out);
 				return out;
 			}
 
-			void format(const std::wstring& _str, style s, fstr& out) {
-				out.clear();
-				formatted_char ch;
-				int len = _str.length();
-				for (int i = 0; i < len; ++i) {
-					ch.set(_str[i], s.f, s.color);
-					out.append(1, ch);
-				}
+			formatted_string format_as_bbcode(
+				const std::string& str, 
+				const style default_style
+			) {
+				return format_as_bbcode(to_wstring(str), default_style);
 			}
 
-			fstr format(const std::wstring& _str, style s) {
-				fstr out;
+			formatted_string format_as_bbcode(
+				const std::wstring& input_str, 
+				const style default_style
+			) {
+				typedef unsigned char flag;
+				std::vector<flag> characters_to_skip;
 
-				formatted_char ch;
-				ch.font_used = s.f;
-				int len = _str.length();
+				characters_to_skip.resize(input_str.size());
+				std::fill(characters_to_skip.begin(), characters_to_skip.end(), 0u);
 
-				//out.reserve(len);
-				for (int i = 0; i < len; ++i) {
-					ch.set(_str[i], s.f, s.color);
-					out.append(1, ch);
-				}
+				auto output = format(input_str, default_style);
 
-				return out;
-			}
+				const std::wstring opening_tag_body = L"[color=";
+				const std::wstring closing_tag_body = L"[/color]";
 
-			fstr simple_bbcode(std::string str, style s) {
-				return simple_bbcode(to_wstring(str), s);
-			}
+				auto begin_of_opening_tag = input_str.find(opening_tag_body);
 
-			fstr simple_bbcode(std::wstring _str, style s) {
-				std::vector<int> to_skip;
-				to_skip.resize(_str.size());
+				while (begin_of_opening_tag != std::wstring::npos) {
+					const auto begin_of_closing_tag = input_str.find(closing_tag_body, begin_of_opening_tag);
+					const auto end_of_closing_tag = begin_of_closing_tag + closing_tag_body.length();
 
-				fstr out;
+					const auto begin_of_argument = begin_of_opening_tag + opening_tag_body.size();
+					const auto end_of_opening_tag = input_str.find(L']', begin_of_argument) + 1;
+					const auto end_of_argument = end_of_opening_tag - 1;
 
-				formatted_char ch;
-				ch.font_used = s.f;
-				int len = _str.length();
+					const auto argument = input_str.substr(begin_of_argument, end_of_argument - begin_of_argument);
 
-				//out.reserve(len);
-				for (int i = 0; i < len; ++i) {
-					ch.set(_str[i], s.f, s.color);
-					out.append(1, ch);
-				}
-
-				auto opening_bracket_of_first = _str.find(L"[color=");
-
-				while (opening_bracket_of_first != std::wstring::npos) {
-					const auto opening_bracket_of_second = _str.find(L"[/color]", opening_bracket_of_first);
-					const auto closing_bracket_of_second = opening_bracket_of_second + 8;
-
-					const auto first_letter_of_argument = opening_bracket_of_first + 7;
-					const auto closing_bracket_of_first = _str.find(L']', first_letter_of_argument);
-
-					const auto argument = _str.substr(first_letter_of_argument, closing_bracket_of_first - first_letter_of_argument);
-
-					style newstyle = s;
+					style new_style = default_style;
 
 					if (argument == L"vsyellow") {
-						newstyle.color = vsyellow;
+						new_style.color = vsyellow;
 					}
 					if (argument == L"vsblue") {
-						newstyle.color = vsblue;
+						new_style.color = vsblue;
 					}
 					if (argument == L"vscyan") {
-						newstyle.color = vscyan;
+						new_style.color = vscyan;
 					}
 					if (argument == L"cyan") {
-						newstyle.color = cyan;
+						new_style.color = cyan;
 					}
 					if (argument == L"vsgreen") {
-						newstyle.color = vsgreen;
+						new_style.color = vsgreen;
 					}
 					if (argument == L"green") {
-						newstyle.color = green;
+						new_style.color = green;
 					}
 					if (argument == L"vsdarkgray") {
-						newstyle.color = vsdarkgray;
+						new_style.color = vsdarkgray;
 					}
 					if (argument == L"vslightgray") {
-						newstyle.color = vslightgray;
+						new_style.color = vslightgray;
 					}
 					if (argument == L"violet") {
-						newstyle.color = violet;
+						new_style.color = violet;
 					}
 					if (argument == L"red") {
-						newstyle.color = red;
+						new_style.color = red;
 					}
 					if (argument == L"yellow") {
-						newstyle.color = yellow;
+						new_style.color = yellow;
 					}
 					if (argument == L"white") {
-						newstyle.color = white;
+						new_style.color = white;
 					}
 					if (argument == L"orange") {
-						newstyle.color = orange;
+						new_style.color = orange;
 					}
 					if (argument == L"turquoise") {
-						newstyle.color = turquoise;
+						new_style.color = turquoise;
 					}
 
-					for (size_t i = opening_bracket_of_first; i < closing_bracket_of_first+1; ++i) {
-						to_skip[i] = 1;
+					for (size_t i = begin_of_opening_tag; i < end_of_opening_tag; ++i) {
+						characters_to_skip[i] = 1u;
 					}
 
-					for (size_t i = opening_bracket_of_second; i < closing_bracket_of_second; ++i) {
-						to_skip[i] = 1;
+					for (size_t i = begin_of_closing_tag; i < end_of_closing_tag; ++i) {
+						characters_to_skip[i] = 1u;
 					}
 
-					for (size_t c = closing_bracket_of_first + 1; c < opening_bracket_of_second; ++c) {
-						out[c].set(newstyle.f, newstyle.color);
+					for (size_t c = end_of_opening_tag; c < begin_of_closing_tag; ++c) {
+						output[c].set(new_style.f, new_style.color);
 					}
 
-					opening_bracket_of_first = _str.find(L"[color=", closing_bracket_of_second);
+					begin_of_opening_tag = input_str.find(opening_tag_body, end_of_closing_tag);
 				}
 
 				size_t idx = 0;
 
-				out.erase(std::remove_if(out.begin(), out.end(), [&to_skip, &idx](auto) {return to_skip[idx++]; }), out.end());
+				erase_remove(output, [&characters_to_skip, &idx](auto){ return characters_to_skip[idx++] != 0u; });
 
-				return out;
+				return output;
 			}
 
-			void formatted_char::set(wchar_t ch, assets::font_id f, const rgba& p) {
+			void formatted_char::set(
+				const wchar_t ch, 
+				const assets::font_id f, 
+				const rgba& p
+			) {
 				font_used = f;
 				c = ch;
 				memcpy(&r, &p, sizeof(rgba));
 			}
 
-			void formatted_char::set(assets::font_id f, const rgba& p) {
+			void formatted_char::set(
+				const assets::font_id f, 
+				const rgba& p
+			) {
 				font_used = f;
 				memcpy(&r, &p, sizeof(rgba));
 			}
@@ -199,9 +193,27 @@ namespace augs {
 				return font_used == b.font_used && c == b.c;
 			}
 
-			style::style(assets::font_id f, rgba c) : f(f), color(c) {}
+			style::style(
+				const assets::font_id f, 
+				const rgba c
+			) : 
+				f(f), 
+				color(c) 
+			{
+			}
 
-			style::style(const formatted_char& c) : f(c.font_used), color(rgba(c.r, c.g, c.b, c.a)) {}
+			style::style(const formatted_char& c) : 
+				f(c.font_used), 
+				color(
+					rgba(
+						c.r, 
+						c.g, 
+						c.b, 
+						c.a
+					)
+				) 
+			{
+			}
 
 			style::operator formatted_char() {
 				formatted_char c;

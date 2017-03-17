@@ -12,21 +12,21 @@ namespace augs {
 				void need_redraw();
 				void guarded_redraw();
 
-				virtual 	  fstr& str() = 0;
-				virtual const fstr& get_str() const = 0;
+				virtual 	  formatted_string& str() = 0;
+				virtual const formatted_string& get_str() const = 0;
 				virtual 	  drafter& draft() = 0;
 				virtual const drafter& get_draft() = 0;
 			};
 
 			class draft_redrawer : public abstract_draft {
-				fstr _str;
+				formatted_string _str;
 				drafter _draft;
 			public:
 
-				draft_redrawer(const fstr& = fstr(), const drafter& = drafter());
+				draft_redrawer(const formatted_string& = formatted_string(), const drafter& = drafter());
 
-				fstr& str() override;
-				const fstr& get_str() const override;
+				formatted_string& str() override;
+				const formatted_string& get_str() const override;
 				drafter& draft() override;
 				const drafter& get_draft() override;
 			};

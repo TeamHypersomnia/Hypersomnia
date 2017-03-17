@@ -47,7 +47,7 @@ namespace augs {
 			void printer::draw_text(
 				std::vector<augs::vertex_triangle>& out,
 				const drafter& d,
-				const fstr& colors,
+				const formatted_string& colors,
 				const caret_info* const caret,
 				const vec2i pos,
 				const ltrbi clipper
@@ -183,7 +183,7 @@ namespace augs {
 				if (blink.caret_visible) gui::draw_clipped_rect(caret_mat, caret_rect + pos, clipper, v);
 			}
 
-			vec2i get_text_bbox(const fstr& str, const unsigned wrapping_width) {
+			vec2i get_text_bbox(const formatted_string& str, const unsigned wrapping_width) {
 				drafter dr;
 				dr.wrap_width = wrapping_width;
 				dr.draw(str);
@@ -192,7 +192,7 @@ namespace augs {
 
 			vec2 quick_print(
 				std::vector<augs::vertex_triangle>& v,
-				const fstr& str,
+				const formatted_string& str,
 				const vec2i pos,
 				const unsigned wrapping_width,
 				const ltrbi clipper
@@ -213,7 +213,7 @@ namespace augs {
 				const unsigned wrapping_width,
 				const ltrbi clipper
 			) {
-				fstr str = format(wstr.c_str(), style);
+				formatted_string str = format(wstr.c_str(), style);
 				drafter dr;
 				printer pr;
 				dr.wrap_width = wrapping_width;

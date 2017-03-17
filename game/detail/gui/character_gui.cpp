@@ -480,21 +480,21 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 	const auto maybe_hovered_perk_meter = context._dynamic_cast<perk_meter_bar_in_character_gui>(rect_world.rect_hovered);
 	const auto maybe_hovered_action_button = context._dynamic_cast<action_button_in_character_gui>(rect_world.rect_hovered);
 
-	gui::text::fstr tooltip_text;
+	gui::text::formatted_string tooltip_text;
 
 	const auto description_style = text::style(assets::font_id::GUI_FONT, vslightgray);
 
 	if (maybe_hovered_item) {
-		tooltip_text = text::simple_bbcode(describe_entity(cosmos[maybe_hovered_item.get_location().item_id]), description_style);
+		tooltip_text = text::format_as_bbcode(get_bbcoded_entity_description(cosmos[maybe_hovered_item.get_location().item_id]), description_style);
 	}
 	else if (maybe_hovered_slot) {
-		tooltip_text = text::simple_bbcode(describe_slot(cosmos[maybe_hovered_slot.get_location().slot_id]), text::style());
+		tooltip_text = text::format_as_bbcode(get_bbcoded_slot_description(cosmos[maybe_hovered_slot.get_location().slot_id]), text::style());
 	}
 	else if (maybe_hovered_action_button) {
 		const auto bound_spell = maybe_hovered_action_button->bound_spell;
 
 		if (bound_spell != spell_type::COUNT) {
-			tooltip_text = text::simple_bbcode(
+			tooltip_text = text::format_as_bbcode(
 				describe_spell(
 					gui_entity,
 					bound_spell
@@ -504,8 +504,8 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 		}
 	}
 	else if (maybe_hovered_sentience_meter) {
-		tooltip_text = text::simple_bbcode(
-			describe_sentience_meter(
+		tooltip_text = text::format_as_bbcode(
+			get_bbcoded_sentience_meter_description(
 				gui_entity, 
 				maybe_hovered_sentience_meter.get_location().type
 			), 
@@ -513,8 +513,8 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 		);
 	}
 	else if (maybe_hovered_perk_meter) {
-		tooltip_text = text::simple_bbcode(
-			describe_perk_meter(
+		tooltip_text = text::format_as_bbcode(
+			get_bbcoded_perk_meter_description(
 				gui_entity,
 				maybe_hovered_perk_meter.get_location().type
 			), 
@@ -525,7 +525,7 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 		const auto assigned_entity = maybe_hovered_hotbar_button->get_assigned_entity(gui_entity);
 
 		if (assigned_entity.alive()) {
-			tooltip_text = text::simple_bbcode(describe_entity(assigned_entity), description_style);
+			tooltip_text = text::format_as_bbcode(get_bbcoded_entity_description(assigned_entity), description_style);
 		}
 		else {
 			tooltip_text = text::format(L"Empty slot", description_style);
@@ -544,8 +544,8 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 				context.get_camera_cone()
 			);
 
-			tooltip_text = text::simple_bbcode(
-				describe_entity(hovered), 
+			tooltip_text = text::format_as_bbcode(
+				get_bbcoded_entity_description(hovered), 
 				text::style(assets::font_id::GUI_FONT, vslightgray)
 			);
 		}

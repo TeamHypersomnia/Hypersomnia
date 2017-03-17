@@ -17,7 +17,7 @@ namespace augs {
 				}
 			}
 
-			draft_redrawer::draft_redrawer(const fstr& _str, const drafter& _draft) : _str(_str), _draft(_draft) {
+			draft_redrawer::draft_redrawer(const formatted_string& _str, const drafter& _draft) : _str(_str), _draft(_draft) {
 			}
 
 			drafter& draft_redrawer::draft() {
@@ -30,12 +30,12 @@ namespace augs {
 				return _draft;
 			}
 
-			fstr& draft_redrawer::str() {
+			formatted_string& draft_redrawer::str() {
 				need_redraw();
 				return _str;
 			}
 
-			const fstr& draft_redrawer::get_str() const {
+			const formatted_string& draft_redrawer::get_str() const {
 				return _str;
 			}
 		}

@@ -21,7 +21,7 @@ namespace augs {
 
 		target.reserve(static_cast<unsigned>(size));
 		file.read(target.data(), size);
-		target.set_write_pos(size);
+		target.set_write_pos(static_cast<size_t>(size));
 	}
 
 	std::vector<std::string> get_file_lines(const std::string& path) {
