@@ -1,11 +1,12 @@
 #pragma once
 #include "game/build_settings.h"
+#include "game/transcendental/entity_id.h"
 
 namespace components {
 	struct guid {
 #if COSMOS_TRACKS_GUIDS
 		// GEN INTROSPECTOR struct components::guid
-		unsigned value = 0;
+		entity_guid value = 0;
 		// END GEN INTROSPECTOR
 #endif
 	};

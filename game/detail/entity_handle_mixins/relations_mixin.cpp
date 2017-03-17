@@ -146,7 +146,7 @@ std::vector<D> basic_relations_mixin<C, D>::get_fixture_entities() const {
 
 #if COSMOS_TRACKS_GUIDS
 template <bool C, class D>
-unsigned basic_relations_mixin<C, D>::get_guid() const {
+entity_guid basic_relations_mixin<C, D>::get_guid() const {
 	auto& self = *static_cast<const D*>(this);
 	return self.get<components::guid>().value;
 }

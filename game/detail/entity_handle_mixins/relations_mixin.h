@@ -36,7 +36,7 @@ public:
 	std::vector<entity_handle_type> get_fixture_entities() const;
 
 #if COSMOS_TRACKS_GUIDS
-	unsigned get_guid() const;
+	entity_guid get_guid() const;
 #endif
 
 	maybe_const_ref_t<is_const, child_entity_id> get_id(const child_entity_name) const;
