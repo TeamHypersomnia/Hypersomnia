@@ -76,18 +76,6 @@ template <
 >
 using find_matching_type = find_matching_type_detail<0, Criterion, SearchedType, List>;
 
-template <
-	template<class, class> class Criterion,
-	class SearchedType,
-	class List
->
-struct has_found_matching_type 
-	: std::bool_constant<
-		find_matching_type<Criterion, SearchedType, List>::found
-	>
-{
-};
-
 template <class S, class List>
 constexpr bool has_found_type_in_list_v = find_matching_type<std::is_same, S, List>::found;
 
