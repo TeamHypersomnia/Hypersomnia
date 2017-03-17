@@ -1,3 +1,4 @@
+#include <tuple>
 #include "augs/misc/templated_readwrite.h"
 #include "game/transcendental/cosmic_entropy.h"
 #include "debug_entropy_player.h"

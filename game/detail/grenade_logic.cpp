@@ -79,7 +79,7 @@ void release_or_throw_grenade(
 		new_def.colliders[0].restitution = 1.0f;
 
 		const auto aabb = grenade_entity.get_aabb();
-		const auto new_radius = std::min(aabb.w(), aabb.h()) / 2;// aabb.diagonal() / 2;
+		const auto new_radius = 0.5f;// std::min(aabb.w(), aabb.h()) / 16;// aabb.diagonal() / 2;
 		new_def.colliders[0].shape.set(circle_shape{ new_radius });
 
 		for (auto& c : new_def.colliders) {

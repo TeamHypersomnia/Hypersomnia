@@ -1,5 +1,5 @@
 #include <tuple>
-#include "augs/templates/type_in_pack.h"
+#include "augs/templates/find_matching_type.h"
 #include "augs/templates/for_each_in_types.h"
 #include "cosmic_delta.h"
 #include "game/transcendental/types_specification/all_component_includes.h"
@@ -16,8 +16,8 @@
 
 #include "generated_introspectors.h"
 
-static_assert(is_one_of_v<cosmos, int, cosmos_metadata, cosmos>, "Trait is wrong");
-static_assert(!is_one_of_v<int, float, double>, "Trait is wrong");
+static_assert(has_found_type_in_v<cosmos, int, cosmos_metadata, cosmos>, "Trait is wrong");
+static_assert(!has_found_type_in_v<int, float, double>, "Trait is wrong");
 
 static_assert(!has_introspect_v<cosmos>, "Trait is wrong");
 static_assert(!has_introspect_v<unsigned>, "Trait is wrong");
@@ -360,7 +360,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 					return;
 				}
 
-				constexpr size_t idx = index_in_list<encoded_id_type, decltype(agg.component_ids)>::value;
+				constexpr size_t idx = index_in_list_v<encoded_id_type, decltype(agg.component_ids)>;
 				
 				if (overridden_components[idx]) {
 					component_type decoded_component;

@@ -13,7 +13,7 @@ namespace augs {
 	template <class Archive>
 	struct is_native_binary_stream 
 		: std::bool_constant<
-			is_one_of_v<
+			has_found_type_in_v<
 				Archive,
 				augs::stream, 
 				augs::output_stream_reserver, 

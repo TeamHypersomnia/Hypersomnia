@@ -1,7 +1,6 @@
 #pragma once
-#include "augs/templates/type_in_pack.h"
-#include "augs/templates/memcpy_safety.h"
 #include "augs/templates/find_matching_type.h"
+#include "augs/templates/memcpy_safety.h"
 #include "augs/ensure.h"
 
 namespace augs {
@@ -43,7 +42,7 @@ namespace augs {
 			const bool failed_to_find_polymorphic_candidate = true;
 			ensure(!failed_to_find_polymorphic_candidate);
 
-			return f(get<nth_type_in_pack_t<0, Types...>>());
+			return f(get<nth_type_in_t<0, Types...>>());
 		}
 
 		template<class L>
@@ -51,12 +50,12 @@ namespace augs {
 			const bool failed_to_find_polymorphic_candidate = true;
 			ensure(!failed_to_find_polymorphic_candidate);
 
-			return f(get<nth_type_in_pack_t<0, Types...>>());
+			return f(get<nth_type_in_t<0, Types...>>());
 		}
 
 		template<class L, class Head, class... Tail>
 		decltype(auto) call_unroll(L f) {
-			if (index_in_pack<Head, Types...>::value == current_type) {
+			if (index_in_v<Head, Types...> == current_type) {
 				return f(get<Head>());
 			}
 			else {
@@ -66,7 +65,7 @@ namespace augs {
 
 		template<class L, class Head, class... Tail>
 		decltype(auto) call_unroll_const(L f) const {
-			if (index_in_pack<Head, Types...>::value == current_type) {
+			if (index_in_v<Head, Types...> == current_type) {
 				return f(get<Head>());
 			}
 			else {
@@ -77,7 +76,7 @@ namespace augs {
 	public:
 		template<class T>
 		static void assert_correct_type() {
-			static_assert(pack_contains_type<T, Types...>::value, "trivial_variant does not contain the specified type!");
+			static_assert(has_found_type_in_v<T, Types...>, "trivial_variant does not contain the specified type!");
 		}
 
 		typedef std::tuple<Types...> types_tuple;
@@ -101,23 +100,23 @@ namespace augs {
 
 		template<class T_convertible>
 		void set(const T_convertible& t) {
-			typedef find_convertible_type_t<T_convertible, Types...> T;
+			typedef find_convertible_type_in_t<T_convertible, Types...> T;
 
 			auto converted = T(t);
 			std::memcpy(buf, &converted, sizeof(T));
-			current_type = index_in_pack<T, Types...>::value;
+			current_type = index_in_v<T, Types...>;
 		}
 
 		template<class T_convertible>
 		bool operator==(const T_convertible& b) const {
-			typedef find_convertible_type_t<T_convertible, Types...> T;
+			typedef find_convertible_type_in_t<T_convertible, Types...> T;
 			return is<T>() && get<T>() == b;
 		}
 
 		template<class T>
 		bool is() const {
 			assert_correct_type<T>();
-			return index_in_pack<T, Types...>::value == current_type;
+			return index_in_v<T, Types...> == current_type;
 		}
 
 		template<class T>
@@ -161,11 +160,14 @@ namespace augs {
 		}
 
 		bool operator==(const trivial_variant& b) const {
-			return current_type == b.current_type 
-				&& 
-				call([&](const auto& resolved_a) {
-					return resolved_a == b.get<std::decay_t<decltype(resolved_a)>>();
-				});
+			return 
+				current_type == b.current_type 
+				&& call(
+					[&](const auto& resolved_a) {
+						return resolved_a == b.get<std::decay_t<decltype(resolved_a)>>();
+					}
+				)
+			;
 		}
 	};
 }

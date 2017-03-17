@@ -3,7 +3,7 @@
 
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/is_component_synchronized.h"
-#include "augs/templates/type_in_pack.h"
+#include "augs/templates/find_matching_type.h"
 #include "augs/templates/for_each_in_types.h"
 
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
@@ -117,7 +117,7 @@ private:
 	};
 
 	template <class T>
-	struct component_or_synchronizer_or_disabled<T, std::enable_if_t<is_component_synchronized<T>::value && !has_type<T, disabled_components>::value>> {
+	struct component_or_synchronizer_or_disabled<T, std::enable_if_t<is_component_synchronized<T>::value && !has_found_type_in_list_v<T, disabled_components>>> {
 		typedef component_synchronizer<is_const, T> return_type;
 
 		basic_entity_handle<is_const> h;
@@ -142,7 +142,7 @@ private:
 	};
 
 	template <class T>
-	struct component_or_synchronizer_or_disabled<T, std::enable_if_t<has_type<T, disabled_components>::value>> {
+	struct component_or_synchronizer_or_disabled<T, std::enable_if_t<has_found_type_in_list_v<T, disabled_components>>> {
 		typedef maybe_const_ref_t<is_const, T> return_type;
 		typedef maybe_const_ptr_t<is_const, T> return_ptr;
 
