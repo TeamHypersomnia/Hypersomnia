@@ -136,7 +136,7 @@ namespace prefabs {
 			for (int i = 0; i < 4; ++i) {
 				components::transform this_engine_transform;
 				const auto engine_physical = world.create_entity("engine_body");
-				engine_physical.make_child_of(front);
+				engine_physical.make_as_child_of(front);
 
 				{
 

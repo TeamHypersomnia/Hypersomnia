@@ -17,7 +17,7 @@
 struct entity_relations;
 
 template <class T>
-struct exclude_non_child_id_types 
+struct is_non_child_id_type 
 	: std::bool_constant<std::is_same_v<entity_id, T>>
 {
 };
@@ -54,12 +54,12 @@ public:
 				augs::introspect_recursive<
 					is_entity_id_type,
 					template_disjunction_t<
-						exclude_non_child_id_types,
+						is_non_child_id_type,
 						is_base_of_trivial_variant
 					>
 				> (
-					[&](auto, auto& member_child_id) {
-						const auto child_handle = cosmos[member_child_id];
+					[&](auto, auto& member_child_entity_id) {
+						const auto child_handle = cosmos[member_child_entity_id];
 
 						if (child_handle.alive() && callback(child_handle)) {
 							child_handle.for_each_child_entity_recursive(callback);
@@ -81,7 +81,7 @@ protected:
 	components::physical_relations& physical_relations_component() const;
 
 public:
-	void make_child_of(const entity_id) const;
+	void make_as_child_of(const entity_id) const;
 
 	void set_owner_body(const entity_id) const;
 	void make_cloned_child_entities_recursive(const entity_id copied) const;

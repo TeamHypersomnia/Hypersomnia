@@ -25,7 +25,7 @@ namespace prefabs {
 	entity_handle create_motorcycle(cosmos& world, const components::transform& spawn_transform) {
 		auto front = world.create_entity("front");
 		auto left_wheel = world.create_entity("left_wheel");
-		left_wheel.make_child_of(front);
+		left_wheel.make_as_child_of(front);
 
 		const auto si = world.get_si();
 

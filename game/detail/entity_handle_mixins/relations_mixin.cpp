@@ -14,7 +14,7 @@
 #include "generated_introspectors.h"
 
 template <class D>
-void relations_mixin<false, D>::make_child_of(const entity_id parent_id) const {
+void relations_mixin<false, D>::make_as_child_of(const entity_id parent_id) const {
 	auto& self = *static_cast<const D*>(this);
 
 	auto& ch = self += components::child();
@@ -47,7 +47,7 @@ void relations_mixin<false, D>::make_cloned_child_entities_recursive(const entit
 			augs::introspect_recursive<
 				is_entity_id_type,
 				template_disjunction_t<
-					exclude_non_child_id_types,
+					is_non_child_id_type,
 					is_base_of_trivial_variant
 				>
 			> (
@@ -114,9 +114,9 @@ maybe_const_ref_t<C, child_entity_id> typename basic_relations_mixin<C, D>::get_
 		return self.get<components::catridge>().shell;
 
 	default:
-		LOG("Access abstraction for this child_entity_name is not implemented!");
+		LOG("Random access abstraction for this child_entity_name is not implemented!");
 		ensure(false);
-		return get_id(child_entity_name::CROSSHAIR_RECOIL_BODY);
+		return get_id(child_entity_name::COUNT);
 	}
 }
 
