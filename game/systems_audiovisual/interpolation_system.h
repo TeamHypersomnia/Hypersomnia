@@ -8,6 +8,8 @@
 #include "augs/misc/delta.h"
 
 class interpolation_system {
+	bool enabled = true;
+
 public:
 	struct cache {
 		components::transform recorded_place_of_birth;
@@ -16,8 +18,6 @@ public:
 		float rotational_slowdown_multiplier = 1.f;
 		float positional_slowdown_multiplier = 1.f;
 	};
-
-	bool enabled = true;
 
 	std::vector<cache> per_entity_cache;
 	float interpolation_speed = 525.f;
@@ -30,6 +30,8 @@ public:
 
 	components::transform get_interpolated(const const_entity_handle) const;
 	components::transform& get_interpolated(const const_entity_handle);
+
+	void set_interpolation_enabled(const bool flag);
 
 	void reserve_caches_for_entities(const size_t);
 

@@ -19,7 +19,7 @@ void viewing_session::set_screen_size(const vec2i new_size) {
 }
 
 void viewing_session::set_interpolation_enabled(const bool flag) {
-	systems_audiovisual.get<interpolation_system>().enabled = flag;
+	systems_audiovisual.get<interpolation_system>().set_interpolation_enabled(flag);
 }
 
 void viewing_session::set_master_gain(const float gain) {

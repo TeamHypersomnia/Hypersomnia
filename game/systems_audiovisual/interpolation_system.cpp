@@ -3,6 +3,16 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 
+void interpolation_system::set_interpolation_enabled(const bool flag) {
+	if (!enabled && flag) {
+		for (auto& c : per_entity_cache) {
+			c = cache();
+		}
+	}
+	
+	enabled = flag;
+}
+
 components::transform& interpolation_system::get_interpolated(const const_entity_handle id) {
 	return per_entity_cache[make_cache_id(id)].interpolated_transform;
 }

@@ -65,6 +65,12 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 		);
 	}
 
+	hypersomnia[testbed.characters[0]].get<components::name>().nickname = ::to_wstring(cfg.nickname);
+
+	if (testbed.characters.size() > 1) {
+		hypersomnia[testbed.characters[1]].get<components::name>().nickname = ::to_wstring(cfg.debug_second_nickname);
+	}
+
 	augs::create_directories(cfg.director_scenario_filename);
 	
 	const std::string input_director_file = cfg.director_scenario_filename;
@@ -101,7 +107,7 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 	const auto initial_step_number = hypersomnia.get_total_steps_passed();
 
 	const double seconds_between_snapshots = 3.0;
-	const auto steps_between_snapshots = static_cast<unsigned>(seconds_between_snapshots / hypersomnia.get_fixed_delta().in_seconds());
+	const auto snapshot_frequency_in_steps = static_cast<unsigned>(seconds_between_snapshots / hypersomnia.get_fixed_delta().in_seconds());
 
 	unsigned bookmarked_step = 0;
 
@@ -112,7 +118,7 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 	};
 
 	LOG("Seconds between rewind snapshots: %x", seconds_between_snapshots);
-	LOG("Steps between rewind snapshots: %x", steps_between_snapshots);
+	LOG("Steps between rewind snapshots: %x", snapshot_frequency_in_steps);
 
 	while (!should_quit) {
 		{
@@ -232,7 +238,7 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 #endif
 
 			if (rewound_step < current_step) {
-				const size_t resimulated_cosmos_index = rewound_step / steps_between_snapshots;
+				const size_t resimulated_cosmos_index = rewound_step / snapshot_frequency_in_steps;
 				
 #if LOG_REWINDING
 				LOG_NVPS(snapshots_for_rewinding.size());
@@ -263,20 +269,21 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 
 			advance_steps_forward = 0;
 		}
-		else if (advance_steps_forward > 0) {
+
+		auto new_steps_forward = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
+		
+		new_steps_forward += advance_steps_forward;
+		advance_steps_forward = 0;
+
+		if (new_steps_forward > 0) {
 			session.set_interpolation_enabled(true);
 		}
 
-		auto steps = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
-		
-		steps += advance_steps_forward;
-		advance_steps_forward = 0;
-
-		while (steps--) {
+		while (new_steps_forward--) {
 			cosmic_entropy cosmic_entropy_for_this_advancement;
 			const auto current_step = get_step_number(hypersomnia);
 
-			if (current_step % steps_between_snapshots == 0) {
+			if (current_step % snapshot_frequency_in_steps == 0) {
 				snapshots_for_rewinding.push_back(hypersomnia);
 			}
 

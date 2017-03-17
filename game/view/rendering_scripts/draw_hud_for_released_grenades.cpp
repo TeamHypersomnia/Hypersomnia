@@ -18,44 +18,48 @@ namespace rendering_scripts {
 		cosm.for_each(
 			processing_subjects::WITH_GRENADE,
 			[&](const auto it) {
-			const components::grenade& grenade = it.get<components::grenade>();
+				const components::grenade& grenade = it.get<components::grenade>();
 
-			if (grenade.when_explodes.was_set()) {
-				const auto highlight_amount = 1.f - (
-					(global_time_seconds - grenade.when_released.in_seconds(dt))
-					/
-					(grenade.when_explodes.in_seconds(dt) - grenade.when_released.in_seconds(dt))
-				);
+				if (!it.get<components::physics>().is_activated()) {
+					return;
+				}
 
-				if (highlight_amount > 0.f) {
-					components::sprite::drawing_input highlight(in);
-					highlight.camera = cam;
-					highlight.renderable_transform.pos = it.get_viewing_transform(sys).pos;
+				if (grenade.when_explodes.was_set()) {
+					const auto highlight_amount = 1.f - (
+						(global_time_seconds - grenade.when_released.in_seconds(dt))
+						/
+						(grenade.when_explodes.in_seconds(dt) - grenade.when_released.in_seconds(dt))
+					);
 
-					const auto col = augs::interp(white, red_violet, (1 - highlight_amount)* (1 - highlight_amount));
+					if (highlight_amount > 0.f) {
+						components::sprite::drawing_input highlight(in);
+						highlight.camera = cam;
+						highlight.renderable_transform.pos = it.get_viewing_transform(sys).pos;
 
-					components::sprite spr;
-					spr.set(assets::game_image_id::HUD_CIRCULAR_BAR_SMALL, col);
-					spr.draw(highlight);
+						const auto col = augs::interp(white, red_violet, (1 - highlight_amount)* (1 - highlight_amount));
 
-					augs::special s;
+						components::sprite spr;
+						spr.set(assets::game_image_id::HUD_CIRCULAR_BAR_SMALL, col);
+						spr.draw(highlight);
 
-					const auto full_rot = 360;
-					const auto empty_angular_amount = full_rot * (1 - highlight_amount);
+						augs::special s;
 
-					s.v1.set(-90, -90 + full_rot) /= 180;
-					s.v2.set(-90 + empty_angular_amount, -90) /= 180;
+						const auto full_rot = 360;
+						const auto empty_angular_amount = full_rot * (1 - highlight_amount);
 
-					in_special.push_back(s);
-					in_special.push_back(s);
-					in_special.push_back(s);
+						s.v1.set(-90, -90 + full_rot) /= 180;
+						s.v2.set(-90 + empty_angular_amount, -90) /= 180;
 
-					in_special.push_back(s);
-					in_special.push_back(s);
-					in_special.push_back(s);
+						in_special.push_back(s);
+						in_special.push_back(s);
+						in_special.push_back(s);
+
+						in_special.push_back(s);
+						in_special.push_back(s);
+						in_special.push_back(s);
+					}
 				}
 			}
-		}
 		);
 	}
 }
