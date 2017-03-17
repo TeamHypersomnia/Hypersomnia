@@ -6,7 +6,7 @@
 #include "game/components/tile_layer_instance_component.h"
 #include "game/components/particles_existence_component.h"
 #include "game/components/transform_component.h"
-#include "game/components/substance_component.h"
+#include "game/components/inferred_state_component.h"
 #include "game/components/wandering_pixels_component.h"
 #include "game/components/sound_existence_component.h"
 
@@ -42,8 +42,8 @@ bool basic_dynamic_tree_node_synchronizer<C>::is_activated() const {
 	return component.activated;
 }
 
-void component_synchronizer<false, D>::resubstantiation() const {
-	handle.get_cosmos().partial_resubstantiation<dynamic_tree_system>(handle);
+void component_synchronizer<false, D>::reinference() const {
+	handle.get_cosmos().partial_reinference<dynamic_tree_system>(handle);
 }
 
 void component_synchronizer<false, D>::update_proxy() const {
@@ -51,7 +51,7 @@ void component_synchronizer<false, D>::update_proxy() const {
 	const vec2 displacement = new_aabb.center() - component.aabb.center();
 	component.aabb = new_aabb;
 
-	auto& sys = handle.get_cosmos().systems_temporary.get<dynamic_tree_system>();
+	auto& sys = handle.get_cosmos().systems_inferred.get<dynamic_tree_system>();
 	auto& cache = sys.get_cache(handle.get_id());
 	
 	if (cache.is_constructed() && !component.always_visible) {
@@ -65,7 +65,7 @@ void component_synchronizer<false, D>::update_proxy() const {
 
 void component_synchronizer<false, D>::set_activated(bool flag) const {
 	component.activated = flag;
-	resubstantiation();
+	reinference();
 }
 
 template class basic_dynamic_tree_node_synchronizer<false>;

@@ -9,7 +9,7 @@
 #include "game/components/sprite_component.h"
 #include "game/components/damage_component.h"
 #include "game/components/physics_component.h"
-#include "game/components/substance_component.h"
+#include "game/components/inferred_state_component.h"
 
 #include "game/messages/queue_destruction.h"
 #include "game/messages/will_soon_be_deleted.h"
@@ -74,7 +74,7 @@ void trace_system::spawn_finishing_traces_for_destroyed_objects(const logic_step
 
 		const auto* const trace = e.find<components::trace>();
 
-		if (e.has<components::substance>() && trace && !trace->is_it_finishing_trace) {
+		if (e.has<components::inferred_state>() && trace && !trace->is_it_finishing_trace) {
 			const auto finishing_trace = cosmos.create_entity("finishing_trace");
 			auto copied_trace = *trace;
 			copied_trace.lengthening_time_passed_ms = 0.f;

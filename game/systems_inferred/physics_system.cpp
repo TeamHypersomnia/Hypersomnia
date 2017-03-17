@@ -240,7 +240,7 @@ void physics_system::post_and_clear_accumulated_collision_messages(const logic_s
 }
 
 physics_system& physics_system::contact_listener::get_sys() const {
-	return cosm.systems_temporary.get<physics_system>();
+	return cosm.systems_inferred.get<physics_system>();
 }
 
 physics_system::contact_listener::contact_listener(cosmos& cosm) : cosm(cosm) {

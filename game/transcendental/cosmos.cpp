@@ -47,51 +47,51 @@
 #include "game/detail/inventory/inventory_utils.h"
 #include "game/resource_setups/all.h"
 
-void cosmos::complete_resubstantiation() {
-	profiler.complete_resubstantiation.new_measurement();
+void cosmos::complete_reinference() {
+	profiler.complete_reinference.new_measurement();
 	
-	destroy_substance_completely();
-	create_substance_completely();
+	destroy_inferred_state_completely();
+	create_inferred_state_completely();
 
-	profiler.complete_resubstantiation.end_measurement();
+	profiler.complete_reinference.end_measurement();
 }
 
-void cosmos::destroy_substance_completely() {
-	systems_temporary.~storage_for_all_systems_temporary();
-	new (&systems_temporary) storage_for_all_systems_temporary;
+void cosmos::destroy_inferred_state_completely() {
+	systems_inferred.~storage_for_all_systems_inferred();
+	new (&systems_inferred) storage_for_all_systems_inferred;
 
 	const auto n = significant.pool_for_aggregates.capacity();
 
-	systems_temporary.for_each([n](auto& sys) {
+	systems_inferred.for_each([n](auto& sys) {
 		sys.reserve_caches_for_entities(n);
 	});
 }
 
-void cosmos::create_substance_completely() {
+void cosmos::create_inferred_state_completely() {
 	for (const auto& ordered_pair : guid_map_for_transport) {
-		create_substance_for_entity(get_handle(ordered_pair.second));
+		create_inferred_state_for_entity(get_handle(ordered_pair.second));
 	}
 
 	//for (auto it = guid_map_for_transport.rbegin(); it != guid_map_for_transport.rend(); ++it) {
-	//	create_substance_for_entity(get_handle((*it).second));
+	//	create_inferred_state_for_entity(get_handle((*it).second));
 	//}
 }
 
-void cosmos::destroy_substance_for_entity(const const_entity_handle h) {
+void cosmos::destroy_inferred_state_for_entity(const const_entity_handle h) {
 	auto destructor = [h](auto& sys) {
 		sys.destruct(h);
 	};
 
-	systems_temporary.for_each(destructor);
+	systems_inferred.for_each(destructor);
 }
 
-void cosmos::create_substance_for_entity(const const_entity_handle h) {
-	if (h.has<components::substance>()) {
+void cosmos::create_inferred_state_for_entity(const const_entity_handle h) {
+	if (h.has<components::inferred_state>()) {
 		auto constructor = [h](auto& sys) {
 			sys.construct(h);
 		};
 
-		systems_temporary.for_each(constructor);
+		systems_inferred.for_each(constructor);
 	}
 }
 
@@ -146,11 +146,11 @@ cosmos& cosmos::operator=(const cosmos& b) {
 	profiler.duplication.end_measurement();
 	b.profiler.duplication.end_measurement();
 	
-	//complete_resubstantiation();
-	profiler.complete_resubstantiation.new_measurement();
-	systems_temporary = b.systems_temporary;
+	//complete_reinference();
+	profiler.complete_reinference.new_measurement();
+	systems_inferred = b.systems_inferred;
 	//reserve_storage_for_entities(get_maximum_entities());
-	profiler.complete_resubstantiation.end_measurement();
+	profiler.complete_reinference.end_measurement();
 	return *this;
 }
 
@@ -181,12 +181,12 @@ void cosmos::refresh_for_new_significant_state() {
 #if COSMOS_TRACKS_GUIDS
 	remap_guids();
 #endif
-	complete_resubstantiation();
+	complete_reinference();
 }
 
-void cosmos::complete_resubstantiation(const const_entity_handle h) {
-	destroy_substance_for_entity(h);
-	create_substance_for_entity(h);
+void cosmos::complete_reinference(const const_entity_handle h) {
+	destroy_inferred_state_for_entity(h);
+	create_inferred_state_for_entity(h);
 }
 
 void cosmos::reserve_storage_for_entities(const size_t n) {
@@ -198,7 +198,7 @@ void cosmos::reserve_storage_for_entities(const size_t n) {
 		sys.reserve_caches_for_entities(n);
 	};
 
-	systems_temporary.for_each(reservation_lambda);
+	systems_inferred.for_each(reservation_lambda);
 }
 
 std::wstring cosmos::summary() const {
@@ -294,7 +294,7 @@ entity_handle cosmos::clone_entity(const entity_id copied_entity_id) {
 	}
 
 	auto new_entity = allocate_new_entity();
-	clone_all_components<components::substance>(copied_entity, new_entity);
+	clone_all_components<components::inferred_state>(copied_entity, new_entity);
 	set_debug_name(new_entity, "+" + copied_entity.get_debug_name());
 
 #if COSMOS_TRACKS_GUIDS
@@ -324,8 +324,8 @@ entity_handle cosmos::clone_entity(const entity_id copied_entity_id) {
 		new_entity.set_owner_body(new_entity);
 	}
 
-	if (copied_entity.has<components::substance>()) {
-		new_entity.add(components::substance());
+	if (copied_entity.has<components::inferred_state>()) {
+		new_entity.add(components::inferred_state());
 	}
 
 	return new_entity;
@@ -340,16 +340,16 @@ void cosmos::delete_entity(const entity_id e) {
 
 	//ensure(handle.alive());
 
-	const bool should_destruct_now_to_avoid_repeated_resubstantiation = handle.has<components::substance>();
+	const bool should_destruct_now_to_avoid_repeated_reinference = handle.has<components::inferred_state>();
 
-	if (should_destruct_now_to_avoid_repeated_resubstantiation) {
-		handle.remove<components::substance>();
+	if (should_destruct_now_to_avoid_repeated_reinference) {
+		handle.remove<components::inferred_state>();
 	}
 
 #if COSMOS_TRACKS_GUIDS
 	clear_guid(handle);
 #endif
-	// now manipulation of substanceless entity won't trigger redundant resubstantiation
+	// now manipulation of an entity without inferred_state component won't trigger redundant reinference
 
 	const auto owner_body = handle.get_owner_body();
 
@@ -412,7 +412,7 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 
 	performance.start(meter_type::PHYSICS);
 	listener.during_step = true;
-	systems_temporary.get<physics_system>().step_and_set_new_transforms(step);
+	systems_inferred.get<physics_system>().step_and_set_new_transforms(step);
 	listener.during_step = false;
 	performance.stop(meter_type::PHYSICS);
 	rotation_copying_system().update_rotations(step.cosm);
@@ -441,7 +441,7 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	grenade_system().init_explosions(step);
 	sentience_system().regenerate_values_and_advance_spell_logic(step);
 	sentience_system().apply_damage_and_generate_health_events(step);
-	systems_temporary.get<physics_system>().post_and_clear_accumulated_collision_messages(step);
+	systems_inferred.get<physics_system>().post_and_clear_accumulated_collision_messages(step);
 	sentience_system().cooldown_aimpunches(step);
 	sentience_system().set_borders(step);
 
@@ -494,7 +494,7 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	//position_copying_system().update_transforms(step);
 	//rotation_copying_system().update_rotations(step.cosm);
 
-	profiler.raycasts.measure(systems_temporary.get<physics_system>().ray_casts_since_last_step);
+	profiler.raycasts.measure(systems_inferred.get<physics_system>().ray_casts_since_last_step);
 
 	++significant.meta.total_steps_passed;
 

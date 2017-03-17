@@ -4,7 +4,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/types_specification/all_component_includes.h"
-#include "game/components/substance_component.h"
+#include "game/components/inferred_state_component.h"
 #include "game/components/guid_component.h"
 #include "game/components/child_component.h"
 #include "game/components/physical_relations_component.h"
@@ -73,7 +73,7 @@ void relations_mixin<false, D>::set_owner_body(const entity_id owner_id) const {
 
 	if (former_owner.alive()) {
 		remove_element(former_owner.physical_relations_component().fixture_entities, this_id);
-		cosmos.partial_resubstantiation<physics_system>(former_owner);
+		cosmos.partial_reinference<physics_system>(former_owner);
 	}
 
 	self.physical_relations_component().owner_body = new_owner;
@@ -81,10 +81,10 @@ void relations_mixin<false, D>::set_owner_body(const entity_id owner_id) const {
 	if (new_owner.alive()) {
 		remove_element(new_owner.physical_relations_component().fixture_entities, this_id);
 		new_owner.physical_relations_component().fixture_entities.push_back(this_id);
-		cosmos.partial_resubstantiation<physics_system>(new_owner);
+		cosmos.partial_reinference<physics_system>(new_owner);
 	}
 	else {
-		cosmos.partial_resubstantiation<physics_system>(self);
+		cosmos.partial_reinference<physics_system>(self);
 	}
 }
 

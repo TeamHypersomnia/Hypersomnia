@@ -1,5 +1,5 @@
 #include "processing_component.h"
-#include "game/systems_temporary/processing_lists_system.h"
+#include "game/systems_inferred/processing_lists_system.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/types_specification/all_component_includes.h"
@@ -99,18 +99,18 @@ bool basic_processing_synchronizer<C>::is_in(const processing_subjects list) con
 	return component.processing_subject_categories.test(list) && !component.disabled_categories.test(list);
 }
 
-void component_synchronizer<false, P>::resubstantiation() const {
-	handle.get_cosmos().partial_resubstantiation<processing_lists_system>(handle);
+void component_synchronizer<false, P>::reinference() const {
+	handle.get_cosmos().partial_reinference<processing_lists_system>(handle);
 }
 
 void component_synchronizer<false, P>::disable_in(const processing_subjects list) const {
 	component.disabled_categories.set(list, true);
-	resubstantiation();
+	reinference();
 }
 
 void component_synchronizer<false, P>::enable_in(const processing_subjects list) const {
 	component.disabled_categories.set(list, false);
-	resubstantiation();
+	reinference();
 }
 
 template<bool C>
@@ -125,12 +125,12 @@ P::bitset_type basic_processing_synchronizer<C>::get_basic_categories() const {
 
 void component_synchronizer<false, P>::set_disabled_categories(const P::bitset_type& categories) const {
 	component.disabled_categories = categories;
-	resubstantiation();
+	reinference();
 }
 
 void component_synchronizer<false, P>::set_basic_categories(const P::bitset_type& categories) const {
 	component.processing_subject_categories = categories;
-	resubstantiation();
+	reinference();
 }
 
 template class basic_processing_synchronizer<false>;

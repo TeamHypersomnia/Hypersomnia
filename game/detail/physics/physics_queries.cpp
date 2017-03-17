@@ -1,4 +1,4 @@
-#include "game/systems_temporary/physics_system.h"
+#include "game/systems_inferred/physics_system.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 

@@ -38,7 +38,7 @@ public:
 
 template<>
 class component_synchronizer<false, components::dynamic_tree_node> : public basic_dynamic_tree_node_synchronizer<false> {
-	void resubstantiation() const;
+	void reinference() const;
 public:
 	using basic_dynamic_tree_node_synchronizer<false>::basic_dynamic_tree_node_synchronizer;
 

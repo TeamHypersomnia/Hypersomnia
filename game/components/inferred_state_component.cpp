@@ -1,4 +1,4 @@
-#include "substance_component.h"
+#include "inferred_state_component.h"
 
 namespace components {
 

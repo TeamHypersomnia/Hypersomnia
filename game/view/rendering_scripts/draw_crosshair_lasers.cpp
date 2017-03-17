@@ -4,7 +4,7 @@
 #include "game/components/gun_component.h"
 #include "augs/graphics/drawers.h"
 
-#include "game/systems_temporary/physics_system.h"
+#include "game/systems_inferred/physics_system.h"
 #include "game/enums/filters.h"
 #include "game/detail/entity_scripts.h"
 
@@ -17,7 +17,7 @@ namespace rendering_scripts {
 		const const_entity_handle character) {
 		if (crosshair.alive()) {
 			const auto& cosmos = crosshair.get_cosmos();
-			const auto& physics = cosmos.systems_temporary.get<physics_system>();
+			const auto& physics = cosmos.systems_inferred.get<physics_system>();
 
 			vec2 line_from[2];
 			vec2 line_to[2];

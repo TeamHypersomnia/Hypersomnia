@@ -7,7 +7,7 @@
 #include "game/components/tile_layer_instance_component.h"
 #include "game/components/particles_existence_component.h"
 #include "game/components/transform_component.h"
-#include "game/components/substance_component.h"
+#include "game/components/inferred_state_component.h"
 #include "game/components/wandering_pixels_component.h"
 #include "game/components/sound_existence_component.h"
 

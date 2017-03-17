@@ -35,7 +35,7 @@ public:
 
 template<>
 class component_synchronizer<false, components::processing> : public basic_processing_synchronizer<false> {
-	void resubstantiation() const;
+	void reinference() const;
 public:
 	using basic_processing_synchronizer<false>::basic_processing_synchronizer;
 

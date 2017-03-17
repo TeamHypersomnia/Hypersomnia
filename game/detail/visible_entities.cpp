@@ -2,8 +2,8 @@
 
 #include "game/transcendental/cosmos.h"
 
-#include "game/systems_temporary/dynamic_tree_system.h"
-#include "game/systems_temporary/physics_system.h"
+#include "game/systems_inferred/dynamic_tree_system.h"
+#include "game/systems_inferred/physics_system.h"
 #include "game/systems_stateless/render_system.h"
 
 #include "game/enums/filters.h"
@@ -16,8 +16,8 @@ void visible_entities::from_camera(
 	const camera_cone camera,
 	const cosmos& cosmos
 ) {
-	const auto& dynamic_tree = cosmos.systems_temporary.get<dynamic_tree_system>();
-	const auto& physics = cosmos.systems_temporary.get<physics_system>();
+	const auto& dynamic_tree = cosmos.systems_inferred.get<dynamic_tree_system>();
+	const auto& physics = cosmos.systems_inferred.get<physics_system>();
 
 	all.clear();
 

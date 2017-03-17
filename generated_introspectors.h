@@ -124,6 +124,7 @@ namespace components {
 	struct grenade;
 	struct guid;
 	struct gun;
+	struct inferred_state;
 	struct interpolation;
 	struct item;
 	struct item_slot_transfers;
@@ -145,7 +146,6 @@ namespace components {
 	struct sound_response;
 	struct special_physics;
 	struct sprite;
-	struct substance;
 	struct tile_layer_instance;
 	struct trace;
 	struct transform;
@@ -806,6 +806,15 @@ namespace augs {
 
 	template <class F, class... Instances>
 	void introspect_body(
+		const components::inferred_state* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(dummy);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
 		const components::interpolation* const,
 		F f,
 		Instances&&... _t_
@@ -1262,15 +1271,6 @@ namespace augs {
 		FIELD(has_neon_map);
 
 		FIELD(max_specular_blinks);
-	}
-
-	template <class F, class... Instances>
-	void introspect_body(
-		const components::substance* const,
-		F f,
-		Instances&&... _t_
-	) {
-		FIELD(dummy);
 	}
 
 	template <class F, class... Instances>

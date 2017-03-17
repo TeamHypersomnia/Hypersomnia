@@ -102,16 +102,16 @@ private:
 		void add(const T& t) const {
 			h.allocator::add(t);
 
-			if (std::is_same<T, components::substance>()) {
-				h.get_cosmos().complete_resubstantiation(h);
+			if (std::is_same<T, components::inferred_state>()) {
+				h.get_cosmos().complete_reinference(h);
 			}
 		}
 
 		void remove() const {
 			h.allocator::template remove<T>();
 
-			if (std::is_same<T, components::substance>()) {
-				h.get_cosmos().complete_resubstantiation(h);
+			if (std::is_same<T, components::inferred_state>()) {
+				h.get_cosmos().complete_reinference(h);
 			}
 		}
 	};
@@ -132,12 +132,12 @@ private:
 
 		void add(const T& t) const {
 			h.allocator::add(t);
-			h.get_cosmos().complete_resubstantiation(h);
+			h.get_cosmos().complete_reinference(h);
 		}
 
 		void remove() const {
 			h.allocator::template remove<T>();
-			h.get_cosmos().complete_resubstantiation(h);
+			h.get_cosmos().complete_reinference(h);
 		}
 	};
 

@@ -26,7 +26,7 @@ typedef augs::storage_for_systems <
 	physics_system,
 	dynamic_tree_system,
 	processing_lists_system
-> storage_for_all_systems_temporary;
+> storage_for_all_systems_inferred;
 
 typedef augs::storage_for_systems <
 	interpolation_system,

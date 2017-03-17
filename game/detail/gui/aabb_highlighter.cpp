@@ -6,7 +6,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/systems_audiovisual/interpolation_system.h"
 
-#include "game/components/substance_component.h"
+#include "game/components/inferred_state_component.h"
 
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "generated_introspectors.h"
@@ -25,7 +25,7 @@ void aabb_highlighter::draw(
 	ltrb aabb;
 	
 	auto aabb_expansion_lambda = [&](const const_entity_handle e) {
-		if (!e.has<components::substance>()) {
+		if (!e.has<components::inferred_state>()) {
 			return false;
 		}
 

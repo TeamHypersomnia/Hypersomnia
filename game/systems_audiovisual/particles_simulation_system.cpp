@@ -117,7 +117,7 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 	static thread_local std::vector<unversioned_entity_id> targets;
 	targets.clear();
 
-	cosmos.systems_temporary.get<dynamic_tree_system>().determine_visible_entities_from_camera(
+	cosmos.systems_inferred.get<dynamic_tree_system>().determine_visible_entities_from_camera(
 		targets,
 		cone, 
 		components::dynamic_tree_node::tree_type::PARTICLE_EXISTENCES

@@ -3,8 +3,8 @@
 #include "game/enums/processing_subjects.h"
 
 namespace components {
-	struct substance {
-		// GEN INTROSPECTOR struct components::substance
+	struct inferred_state {
+		// GEN INTROSPECTOR struct components::inferred_state
 		int dummy = false;
 		// END GEN INTROSPECTOR
 	};

@@ -1,5 +1,5 @@
 #include "physics_component.h"
-#include "substance_component.h"
+#include "inferred_state_component.h"
 
 #include <Box2D\Box2D.h>
 
@@ -8,7 +8,7 @@
 
 #include "augs/math/vec2.h"
 #include "game/transcendental/cosmos.h"
-#include "game/systems_temporary/physics_system.h"
+#include "game/systems_inferred/physics_system.h"
 #include "augs/ensure.h"
 #include "game/transcendental/entity_handle.h"
 
@@ -30,31 +30,31 @@ void components::physics::set_transform(
 
 template<bool C>
 bool basic_physics_synchronizer<C>::is_constructed() const {
-	return handle.get_cosmos().systems_temporary.get<physics_system>().is_constructed_rigid_body(handle);
+	return handle.get_cosmos().systems_inferred.get<physics_system>().is_constructed_rigid_body(handle);
 }
 
 template<bool C>
 maybe_const_ref_t<C, rigid_body_cache>& basic_physics_synchronizer<C>::get_cache() const {
-	return handle.get_cosmos().systems_temporary.get<physics_system>().get_rigid_body_cache(handle);
+	return handle.get_cosmos().systems_inferred.get<physics_system>().get_rigid_body_cache(handle);
 }
 
-void component_synchronizer<false, P>::resubstantiation() const {
-	handle.get_cosmos().partial_resubstantiation<physics_system>(handle);
+void component_synchronizer<false, P>::reinference() const {
+	handle.get_cosmos().partial_reinference<physics_system>(handle);
 }
 
 void component_synchronizer<false, P>::set_body_type(const components::physics::type t) const {
 	component.body_type = t;
-	resubstantiation();
+	reinference();
 }
 
 void component_synchronizer<false, P>::set_activated(const bool flag) const {
 	component.activated = flag;
-	resubstantiation();
+	reinference();
 }
 
 void component_synchronizer<false, P>::set_bullet_body(const bool flag) const {
 	component.bullet = flag;
-	resubstantiation();
+	reinference();
 }
 
 void component_synchronizer<false, P>::set_velocity(const vec2 pixels) const {

@@ -16,7 +16,7 @@
 #include "game/components/sentience_component.h"
 #include "game/components/sound_existence_component.h"
 
-#include "game/systems_temporary/physics_system.h"
+#include "game/systems_inferred/physics_system.h"
 
 #include "game/detail/inventory/inventory_utils.h"
 
@@ -69,7 +69,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 	const auto& delta = step.get_delta();
 	step.transient.messages.get_queue<messages::gunshot_response>().clear();
 
-	auto& physics_sys = cosmos.systems_temporary.get<physics_system>();
+	auto& physics_sys = cosmos.systems_inferred.get<physics_system>();
 
 	cosmos.for_each(
 		processing_subjects::WITH_GUN,

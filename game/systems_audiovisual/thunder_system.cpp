@@ -3,7 +3,7 @@
 #include "augs/templates/container_templates.h"
 #include "augs/graphics/drawers.h"
 #include "game/resources/manager.h"
-#include "game/systems_temporary/physics_system.h"
+#include "game/systems_inferred/physics_system.h"
 #include "game/systems_audiovisual/particles_simulation_system.h"
 #include "game/enums/filters.h"
 #include "game/transcendental/cosmos.h"
@@ -77,7 +77,7 @@ void thunder_system::advance(
 
 						child.max_lifetime_ms = rng.randval(t.in.max_branch_lifetime_ms);
 
-						const auto raycast = cosmos.systems_temporary.get<physics_system>().ray_cast_px(
+						const auto raycast = cosmos.systems_inferred.get<physics_system>().ray_cast_px(
 							cosmos.get_si(),
 							child.from,
 							child.to,

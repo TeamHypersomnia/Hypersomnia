@@ -1,6 +1,6 @@
 #include "entity_handle.h"
 #include "game/components/render_component.h"
-#include "game/components/substance_component.h"
+#include "game/components/inferred_state_component.h"
 #include "game/components/processing_component.h"
 #include "game/components/dynamic_tree_node_component.h"
 #include "game/components/special_physics_component.h"
@@ -72,8 +72,8 @@ void basic_entity_handle<C>::add_standard_components() const {
 
 	recalculate_basic_processing_categories<false, void>();
 	
-	if (!has<components::substance>()) {
-		add(components::substance());
+	if (!has<components::inferred_state>()) {
+		add(components::inferred_state());
 	}
 }
 

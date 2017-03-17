@@ -86,7 +86,7 @@ public:
 			
 			if (e.resubstantiate) {
 				LOG("Cli: %x resubs at step: %x", predictable_entity, referential_cosmos.get_total_steps_passed());
-				referential_cosmos.complete_resubstantiation();
+				referential_cosmos.complete_reinference();
 			}
 
 			advance(cosmic_entropy_for_this_step, referential_cosmos);

@@ -9,7 +9,7 @@
 #include "game/systems_stateless/gui_system.h"
 
 #include "game/detail/gui/character_gui.h"
-#include "game/systems_temporary/dynamic_tree_system.h"
+#include "game/systems_inferred/dynamic_tree_system.h"
 #include "game/resources/manager.h"
 #include "augs/graphics/renderer.h"
 #include "game/view/viewing_step.h"

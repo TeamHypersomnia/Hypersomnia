@@ -13,9 +13,9 @@
 #include "game/transcendental/types_specification/all_messages_declaration.h"
 #include "game/transcendental/types_specification/all_systems_declaration.h"
 
-#include "game/systems_temporary/dynamic_tree_system.h"
-#include "game/systems_temporary/physics_system.h"
-#include "game/systems_temporary/processing_lists_system.h"
+#include "game/systems_inferred/dynamic_tree_system.h"
+#include "game/systems_inferred/physics_system.h"
+#include "game/systems_inferred/processing_lists_system.h"
 
 #include "augs/misc/delta.h"
 #include "augs/misc/easier_handle_getters_mixin.h"
@@ -114,12 +114,12 @@ private:
 	);
 #endif
 
-	void destroy_substance_completely();
-	void create_substance_completely();
+	void destroy_inferred_state_completely();
+	void create_inferred_state_completely();
 
 	entity_handle allocate_new_entity();
 public:
-	storage_for_all_systems_temporary systems_temporary;
+	storage_for_all_systems_inferred systems_inferred;
 
 	mutable cosmic_profiler profiler;
 	augs::stream reserved_memory_for_serialization;
@@ -158,21 +158,21 @@ public:
 
 	void refresh_for_new_significant_state();
 
-	void complete_resubstantiation();
-	void complete_resubstantiation(const const_entity_handle);
-	void destroy_substance_for_entity(const const_entity_handle);
-	void create_substance_for_entity(const const_entity_handle);
+	void complete_reinference();
+	void complete_reinference(const const_entity_handle);
+	void destroy_inferred_state_for_entity(const const_entity_handle);
+	void create_inferred_state_for_entity(const const_entity_handle);
 	
 	const std::string& get_debug_name(entity_id) const;
 	void set_debug_name(const entity_id, const std::string& new_debug_name);
 
 	template<class System>
-	void partial_resubstantiation(const entity_handle handle) {
-		auto& sys = systems_temporary.get<System>();
+	void partial_reinference(const entity_handle handle) {
+		auto& sys = systems_inferred.get<System>();
 
 		sys.destruct(handle);
 
-		if (handle.has<components::substance>()) {
+		if (handle.has<components::inferred_state>()) {
 			sys.construct(handle);
 		}
 	}
@@ -217,7 +217,7 @@ public:
 	}
 
 	size_t get_count_of(const processing_subjects list_type) const {
-		return systems_temporary.get<processing_lists_system>().get(list_type).size();
+		return systems_inferred.get<processing_lists_system>().get(list_type).size();
 	}
 
 	template <class F>
@@ -227,14 +227,14 @@ public:
 		augs::enum_bitset<subjects_iteration_flag> flags = {}
 	) {
 		if (flags.test(subjects_iteration_flag::POSSIBLE_ITERATOR_INVALIDATION)) {
-			const auto targets = systems_temporary.get<processing_lists_system>().get(list_type);
+			const auto targets = systems_inferred.get<processing_lists_system>().get(list_type);
 
 			for (const auto& subject : targets) {
 				operator()(subject, callback);
 			}
 		}
 		else {
-			for (const auto& subject : systems_temporary.get<processing_lists_system>().get(list_type)) {
+			for (const auto& subject : systems_inferred.get<processing_lists_system>().get(list_type)) {
 				operator()(subject, callback);
 			}
 		}
@@ -242,7 +242,7 @@ public:
 
 	template <class F>
 	void for_each(const processing_subjects list_type, F callback) const {
-		for (const auto& subject : systems_temporary.get<processing_lists_system>().get(list_type)) {
+		for (const auto& subject : systems_inferred.get<processing_lists_system>().get(list_type)) {
 			operator()(subject, callback);
 		}
 	}
@@ -268,7 +268,7 @@ public:
 	void set_fixed_delta(const augs::delta&);
 	void set_fixed_delta(const unsigned steps_per_second);
 
-	/* saving procedure is not const due to possible resubstantiation of the universe */
+	/* saving procedure is not const due to possible reinference of the universe */
 	void save_to_file(const std::string&);
 	bool load_from_file(const std::string&);
 

@@ -1,5 +1,5 @@
 #include "fixtures_component.h"
-#include "substance_component.h"
+#include "inferred_state_component.h"
 #include "physics_component.h"
 #include <Box2D\Dynamics\b2Fixture.h>
 #include <Box2D/Box2D.h>
@@ -21,7 +21,7 @@ void component_synchronizer<false, F>::set_owner_body(const entity_id owner_id) 
 template<bool C>
 maybe_const_ref_t<C, colliders_cache>& basic_fixtures_synchronizer<C>::get_cache() const {
 	auto& cosmos = handle.get_cosmos();
-	return cosmos.systems_temporary.get<physics_system>().get_colliders_cache(handle);
+	return cosmos.systems_inferred.get<physics_system>().get_colliders_cache(handle);
 }
 
 template<bool C>
@@ -68,17 +68,17 @@ bool basic_fixtures_synchronizer<C>::can_driver_shoot_through() const {
 
 void component_synchronizer<false, F>::set_offset(colliders_offset_type t, components::transform off) const {
 	component.offsets_for_created_shapes[static_cast<int>(t)] = off;
-	resubstantiation();
+	reinference();
 }
 
 component_synchronizer<false, F>& component_synchronizer<false, F>::operator=(const F& f) {
 	component = f;
-	resubstantiation();
+	reinference();
 	return *this;
 }
 
-void component_synchronizer<false, F>::resubstantiation() const {
-	handle.get_cosmos().partial_resubstantiation<processing_lists_system>(handle);
+void component_synchronizer<false, F>::reinference() const {
+	handle.get_cosmos().partial_reinference<processing_lists_system>(handle);
 }
 
 void component_synchronizer<false, F>::rebuild_density(const size_t index) const {
@@ -112,7 +112,7 @@ void component_synchronizer<false, F>::set_density_multiplier(const float mult, 
 
 void component_synchronizer<false, F>::set_activated(const bool flag) const {
 	component.activated = flag;
-	resubstantiation();
+	reinference();
 }
 
 void component_synchronizer<false, F>::set_friction(const float fr, const size_t index) const {
@@ -171,7 +171,7 @@ bool basic_fixtures_synchronizer<C>::is_activated() const {
 
 template<bool C>
 bool basic_fixtures_synchronizer<C>::is_constructed() const {
-	return handle.get_cosmos().systems_temporary.get<physics_system>().is_constructed_colliders(handle);
+	return handle.get_cosmos().systems_inferred.get<physics_system>().is_constructed_colliders(handle);
 }
 
 template<bool C>

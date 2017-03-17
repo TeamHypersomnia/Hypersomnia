@@ -9,7 +9,7 @@
 
 #include "game/messages/intent_message.h"
 
-#include "game/systems_temporary/physics_system.h"
+#include "game/systems_inferred/physics_system.h"
 
 #include "game/enums/filters.h"
 
@@ -89,7 +89,7 @@ void trigger_detector_system::send_trigger_confirmations(const logic_step step) 
 	confirmations.clear();
 
 	auto& cosmos = step.cosm;
-	const auto& physics = cosmos.systems_temporary.get<physics_system>();
+	const auto& physics = cosmos.systems_inferred.get<physics_system>();
 	const auto& collisions = step.transient.messages.get_queue<messages::collision_message>();
 
 	for (const auto& c : collisions) {

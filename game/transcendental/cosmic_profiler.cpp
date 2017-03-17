@@ -40,7 +40,7 @@ std::wstring cosmic_profiler::sorted_summary(const bool detailed) const {
 	for (auto& m : sorted_meters)
 		summary += m.summary();
 
-	summary += complete_resubstantiation.summary();
+	summary += complete_reinference.summary();
 	summary += delta_encoding.summary();
 	summary += delta_decoding.summary();
 	

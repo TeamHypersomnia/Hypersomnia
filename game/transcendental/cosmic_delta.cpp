@@ -313,7 +313,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 	
 	deco.profiler.delta_decoding.new_measurement();
 
-	deco.destroy_substance_completely();
+	deco.destroy_inferred_state_completely();
 
 	read_delta(deco.significant.meta, in, true);
 
@@ -454,7 +454,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 	const auto unread_bits = in.get_unread_bytes();
 	//should_eq(0, unread_bits);
 
-	deco.create_substance_completely();
+	deco.create_inferred_state_completely();
 
 	deco.profiler.delta_decoding.end_measurement();
 }

@@ -47,7 +47,7 @@ void standard_explosion(const standard_explosion_input in) {
 		{ request }
 	);
 
-	const auto& physics = cosmos.systems_temporary.get<physics_system>();
+	const auto& physics = cosmos.systems_inferred.get<physics_system>();
 
 	std::unordered_set<unversioned_entity_id> affected_entities_of_bodies;
 

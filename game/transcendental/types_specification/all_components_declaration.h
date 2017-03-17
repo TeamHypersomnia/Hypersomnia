@@ -50,7 +50,7 @@ namespace components {
 	struct sound_response;
 	struct grenade;
 	struct catridge;
-	struct substance;
+	struct inferred_state;
 }
 
 template<template<typename...> class List, class... prepend>
@@ -104,7 +104,7 @@ struct put_all_components_into {
 		components::grenade,
 		components::catridge,
 
-		components::substance
+		components::inferred_state
 
 	> type;
 };
