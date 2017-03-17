@@ -170,7 +170,7 @@ void damage_system::destroy_outdated_bullets(const logic_step step) {
 
 					auto homing_vector = closest_hostile.get_logic_transform().pos - it.get_logic_transform().pos;
 
-					if (dirs[0].radians_between(homing_vector) > dirs[1].radians_between(homing_vector)) {
+					if (dirs[1].dot(homing_vector) > dirs[0].dot(homing_vector)) {
 						std::swap(dirs[0], dirs[1]);
 					}
 

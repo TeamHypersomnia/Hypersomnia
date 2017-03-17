@@ -81,6 +81,7 @@ extern const rgba dark_green;
 extern const rgba green;
 extern const rgba orange;
 extern const rgba violet;
+extern const rgba red_violet;
 extern const rgba pink;
 extern const rgba darkred;
 extern const rgba black;

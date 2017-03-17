@@ -15,7 +15,7 @@ namespace components {
 			vec2().set_from_degrees(45 * 7)
 		};
 
-		const auto dir_num = std::min_element(dirs, dirs + 8, [d](vec2 a, vec2 b) { return a.radians_between(d) < b.radians_between(d); }) - dirs;
+		const auto dir_num = std::min_element(dirs, dirs + 8, [d](vec2 a, vec2 b) { return a.dot(d) > b.dot(d); }) - dirs;
 
 		if (dir_num == 0) {
 			moving_right = true;

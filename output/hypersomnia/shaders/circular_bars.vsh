@@ -13,8 +13,7 @@ out vec2 startingAngleInsideVec;
 out vec2 endingAngleInsideVec;
 out vec2 theTexcoord;
 
-#define DEG_TO_RAD 0.0174532925
-#define TO_RADIANS 180*0.0174532925
+#define SPECIAL_TO_RADIANS 180*0.0174532925
 
 void main() 
 {
@@ -24,11 +23,11 @@ void main()
 	output_vert.z = 0.0f;						
 	output_vert.w = 1.0f;
 
-	startingAngleVec = vec2(cos(special.x * TO_RADIANS), sin(special.x * TO_RADIANS));
-	endingAngleVec = vec2(cos(special.y * TO_RADIANS), sin(special.y * TO_RADIANS));
+	startingAngleVec = vec2(cos(special.x * SPECIAL_TO_RADIANS), sin(special.x * SPECIAL_TO_RADIANS));
+	endingAngleVec = vec2(cos(special.y * SPECIAL_TO_RADIANS), sin(special.y * SPECIAL_TO_RADIANS));
 
-	startingAngleInsideVec = vec2(cos(special.z * TO_RADIANS), sin(special.z * TO_RADIANS));
-	endingAngleInsideVec = vec2(cos(special.w * TO_RADIANS), sin(special.w * TO_RADIANS));
+	startingAngleInsideVec = vec2(cos(special.z * SPECIAL_TO_RADIANS), sin(special.z * SPECIAL_TO_RADIANS));
+	endingAngleInsideVec = vec2(cos(special.w * SPECIAL_TO_RADIANS), sin(special.w * SPECIAL_TO_RADIANS));
 	
 	normalize(startingAngleVec);
 	normalize(endingAngleVec);

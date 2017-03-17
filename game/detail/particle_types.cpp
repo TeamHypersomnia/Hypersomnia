@@ -146,7 +146,7 @@ void homing_animated_particle::integrate(
 
 	const auto homing_vector = homing_target - pos;
 
-	if (dirs[0].radians_between(homing_vector) > dirs[1].radians_between(homing_vector)) {
+	if (dirs[1].dot(homing_vector) > dirs[0].dot(homing_vector)) {
 		std::swap(dirs[0], dirs[1]);
 	}
 

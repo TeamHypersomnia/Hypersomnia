@@ -68,8 +68,8 @@ namespace rendering_scripts {
 				) {
 					augs::special s;
 
-					s.v1.set(augs::normalize_degrees(lower_outside) / 180, augs::normalize_degrees(upper_outside) / 180);
-					s.v2.set(augs::normalize_degrees(lower_inside) / 180, augs::normalize_degrees(upper_inside) / 180);
+					s.v1.set(augs::normalize_degrees(lower_outside), augs::normalize_degrees(upper_outside + 0.001)) /= 180;
+					s.v2.set(augs::normalize_degrees(lower_inside), augs::normalize_degrees(upper_inside + 0.001)) /= 180;
 
 					target.push_special_vertex_triangle(s, s, s);
 					target.push_special_vertex_triangle(s, s, s);
@@ -100,9 +100,7 @@ namespace rendering_scripts {
 							if (ammo_info.total_ammunition_space_available > 0) {
 								const auto ammo_ratio = 1 - (ammo_info.total_actual_free_space / ammo_info.total_ammunition_space_available);
 
-								auto redviolet = violet;
-								redviolet.r = 200;
-								circle_hud.color = augs::interp(white, redviolet, (1 - ammo_ratio)* (1 - ammo_ratio));
+								circle_hud.color = augs::interp(white, red_violet, (1 - ammo_ratio)* (1 - ammo_ratio));
 								circle_hud.color.a = 200;
 								circle_hud.draw(state);
 

@@ -316,6 +316,9 @@ namespace rendering_scripts {
 			global_time_seconds
 		);
 
+		renderer.call_triangles();
+		renderer.clear_triangles();
+
 		default_shader.use();
 
 		renderer.call_triangles(textual_infos);

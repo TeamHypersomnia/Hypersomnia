@@ -32,9 +32,27 @@ namespace rendering_scripts {
 					highlight.camera = cam;
 					highlight.renderable_transform.pos = it.get_viewing_transform(sys).pos;
 
+					const auto col = augs::interp(white, red_violet, (1 - highlight_amount)* (1 - highlight_amount));
+
 					components::sprite spr;
-					spr.set(assets::game_image_id::HUD_CIRCULAR_BAR_MEDIUM);
-					//spr.draw(highlight);
+					spr.set(assets::game_image_id::HUD_CIRCULAR_BAR_SMALL, col);
+					spr.draw(highlight);
+
+					augs::special s;
+
+					const auto full_rot = 360;
+					const auto empty_angular_amount = full_rot * (1 - highlight_amount);
+
+					s.v1.set(-90, -90 + full_rot) /= 180;
+					s.v2.set(-90 + empty_angular_amount, -90) /= 180;
+
+					in_special.push_back(s);
+					in_special.push_back(s);
+					in_special.push_back(s);
+
+					in_special.push_back(s);
+					in_special.push_back(s);
+					in_special.push_back(s);
 				}
 			}
 		}
