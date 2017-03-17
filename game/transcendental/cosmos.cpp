@@ -79,7 +79,7 @@ void cosmos::create_inferred_state_completely() {
 
 void cosmos::destroy_inferred_state_for_entity(const const_entity_handle h) {
 	auto destructor = [h](auto& sys) {
-		sys.destruct(h);
+		sys.destroy_inferred_state(h);
 	};
 
 	systems_inferred.for_each(destructor);
@@ -88,7 +88,7 @@ void cosmos::destroy_inferred_state_for_entity(const const_entity_handle h) {
 void cosmos::create_inferred_state_for_entity(const const_entity_handle h) {
 	if (h.has<components::inferred_state>()) {
 		auto constructor = [h](auto& sys) {
-			sys.construct(h);
+			sys.create_inferred_state(h);
 		};
 
 		systems_inferred.for_each(constructor);

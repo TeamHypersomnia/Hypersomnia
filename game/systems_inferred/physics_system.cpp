@@ -47,7 +47,7 @@ const colliders_cache& physics_system::get_colliders_cache(const entity_id id) c
 	return colliders_caches[id.pool.indirection_index];
 }
 
-void physics_system::destruct(const const_entity_handle handle) {
+void physics_system::destroy_inferred_state(const const_entity_handle handle) {
 	if (is_constructed_rigid_body(handle)) {
 		auto& cache = get_rigid_body_cache(handle);
 		
@@ -156,7 +156,7 @@ void physics_system::fixtures_construct(const const_entity_handle handle) {
 	}
 }
 
-void physics_system::construct(const const_entity_handle handle) {
+void physics_system::create_inferred_state(const const_entity_handle handle) {
 	//ensure(!is_constructed_rigid_body(handle));
 	if (is_constructed_rigid_body(handle)) {
 		return;

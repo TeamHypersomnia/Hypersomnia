@@ -21,8 +21,8 @@ class processing_lists_system {
 	std::unordered_map<processing_subjects, std::vector<entity_id>> lists;
 	std::vector<cache> per_entity_cache;
 	
-	void destruct(const const_entity_handle);
-	void construct(const const_entity_handle);
+	void destroy_inferred_state(const const_entity_handle);
+	void create_inferred_state(const const_entity_handle);
 
 	void reserve_caches_for_entities(const size_t n);
 

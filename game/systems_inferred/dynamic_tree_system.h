@@ -32,8 +32,8 @@ class dynamic_tree_system {
 	std::vector<cache> per_entity_cache;
 
 	void reserve_caches_for_entities(size_t n);
-	void construct(const_entity_handle);
-	void destruct(const_entity_handle);
+	void create_inferred_state(const_entity_handle);
+	void destroy_inferred_state(const_entity_handle);
 
 	tree& get_tree(const cache&);
 	cache& get_cache(const unversioned_entity_id);

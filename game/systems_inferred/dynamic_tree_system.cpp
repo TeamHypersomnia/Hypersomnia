@@ -18,7 +18,7 @@ dynamic_tree_system::tree& dynamic_tree_system::get_tree(const cache& c) {
 	return trees[static_cast<size_t>(c.type)];
 }
 
-void dynamic_tree_system::destruct(const const_entity_handle handle) {
+void dynamic_tree_system::destroy_inferred_state(const const_entity_handle handle) {
 	auto& cache = get_cache(handle.get_id());
 
 	if (cache.is_constructed()) {
@@ -32,7 +32,7 @@ void dynamic_tree_system::destruct(const const_entity_handle handle) {
 	}
 }
 
-void dynamic_tree_system::construct(const const_entity_handle handle) {
+void dynamic_tree_system::create_inferred_state(const const_entity_handle handle) {
 	if (!handle.has<components::dynamic_tree_node>()) {
 		return;
 	}

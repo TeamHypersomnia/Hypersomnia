@@ -13,7 +13,7 @@ processing_lists_system::processing_lists_system() {
 	}
 }
 
-void processing_lists_system::destruct(const const_entity_handle handle) {
+void processing_lists_system::destroy_inferred_state(const const_entity_handle handle) {
 	const auto index = make_cache_id(handle);
 
 	if (per_entity_cache[index].is_constructed) {
@@ -25,7 +25,7 @@ void processing_lists_system::destruct(const const_entity_handle handle) {
 	}
 }
 
-void processing_lists_system::construct(const const_entity_handle handle) {
+void processing_lists_system::create_inferred_state(const const_entity_handle handle) {
 	if (!handle.has<components::processing>()) {
 		return;
 	}

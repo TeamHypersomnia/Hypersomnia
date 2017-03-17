@@ -170,10 +170,10 @@ public:
 	void partial_reinference(const entity_handle handle) {
 		auto& sys = systems_inferred.get<System>();
 
-		sys.destruct(handle);
+		sys.destroy_inferred_state(handle);
 
 		if (handle.has<components::inferred_state>()) {
-			sys.construct(handle);
+			sys.create_inferred_state(handle);
 		}
 	}
 

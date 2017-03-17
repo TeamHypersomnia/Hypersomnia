@@ -41,8 +41,8 @@ class EMPTY_BASES physics_system : public physics_queries<physics_system> {
 
 	void reserve_caches_for_entities(const size_t n);
 	void fixtures_construct(const const_entity_handle);
-	void construct(const const_entity_handle);
-	void destruct(const const_entity_handle);
+	void create_inferred_state(const const_entity_handle);
+	void destroy_inferred_state(const const_entity_handle);
 
 	friend class cosmos;
 	friend class physics_queries<physics_system>;
