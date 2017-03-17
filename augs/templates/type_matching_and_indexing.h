@@ -95,16 +95,16 @@ template <class S, class... Types>
 constexpr bool has_found_type_in_v = has_found_type_in_list_v<S, std::tuple<Types...>>;
 
 template <class S, class List>
-using find_convertible_type_in_list_t = typename find_matching_type<std::is_convertible, S, List>::type;
-
-template <class S, class... Types>
-using find_convertible_type_in_t = find_convertible_type_in_list_t<S, std::tuple<Types...>>;
-
-template <class S, class List>
 constexpr unsigned index_in_list_v = find_matching_type<std::is_same, S, List>::index;
 
 template <class S, class... Types>
 constexpr unsigned index_in_v = index_in_list_v<S, std::tuple<Types...>>;
+
+template <class S, class List>
+using find_convertible_type_in_list_t = typename find_matching_type<std::is_convertible, S, List>::type;
+
+template <class S, class... Types>
+using find_convertible_type_in_t = find_convertible_type_in_list_t<S, std::tuple<Types...>>;
 
 template <unsigned idx, class... Types>
 struct nth_type_in {
@@ -114,6 +114,9 @@ struct nth_type_in {
 
 template<unsigned idx, class... Types>
 using nth_type_in_t = typename nth_type_in<idx, Types...>::type;
+
+static_assert(has_found_type_in_list_v<unsigned, std::tuple<float, float, double, unsigned>>, "Something wrong with trait");
+static_assert(has_found_type_in_v<unsigned, float, float, double, unsigned>, "Something wrong with trait");
 
 static_assert(index_in_list_v<unsigned, std::tuple<float, float, double, unsigned>> == 3, "Something wrong with trait");
 static_assert(index_in_v<unsigned, float, float, double, unsigned> == 3, "Something wrong with trait");

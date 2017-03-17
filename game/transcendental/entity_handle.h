@@ -3,7 +3,7 @@
 
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/is_component_synchronized.h"
-#include "augs/templates/find_matching_type.h"
+#include "augs/templates/type_matching_and_indexing.h"
 #include "augs/templates/for_each_in_types.h"
 
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"

@@ -1130,7 +1130,6 @@
     <ClInclude Include="augs\network\reliable_channel.h" />
     <ClInclude Include="augs\network\reliable_channel_tests.h" />
     <ClInclude Include="augs\padding_byte.h" />
-    <ClInclude Include="augs\templates\find_matching_type.h" />
     <ClInclude Include="augs\templates\for_each_in_types.h" />
     <ClInclude Include="augs\templates\hash_templates.h" />
     <ClInclude Include="augs\templates\is_component_synchronized.h" />
@@ -1141,7 +1140,7 @@
     <ClInclude Include="augs\templates\string_templates.h" />
     <ClInclude Include="augs\templates\template_logic.h" />
     <ClInclude Include="augs\templates\tuple_of.h" />
-    <ClInclude Include="augs\templates\type_in_pack.h" />
+    <ClInclude Include="augs\templates\type_matching_and_indexing.h" />
     <ClInclude Include="augs\templates\type_mod_templates.h" />
     <ClInclude Include="augs\texture_atlas\texture_atlas_entry.h" />
     <ClInclude Include="augs\tweaker.h" />
