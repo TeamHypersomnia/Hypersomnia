@@ -27,8 +27,11 @@ namespace behaviours {
 	void pull_trigger::execute_leaf_goal_callback(const tree::execution_occurence o, tree::state_of_traversal& t) const {
 		const auto subject = t.subject;
 		const auto wielded = subject.guns_wielded();
+		auto& cosmos = t.step.cosm;
 
-		for (const auto w : wielded) {
+		for (const auto w_id : wielded) {
+			const auto w = cosmos[w_id];
+
 			if (o == tree::execution_occurence::LAST) {
 				w.get<components::gun>().trigger_pressed = false;
 			}

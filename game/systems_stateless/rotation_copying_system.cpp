@@ -103,7 +103,7 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 			const auto guns = it.guns_wielded();
 
 			if (guns.size() > 0) {
-				const auto subject_item = guns[0];
+				const auto subject_item = cosmos[guns[0]];
 
 				const auto& gun = subject_item.get<components::gun>();
 

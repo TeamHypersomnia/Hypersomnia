@@ -2,6 +2,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 #include "game/components/gun_component.h"
+#include "game/components/grenade_component.h"
 #include "augs/graphics/drawers.h"
 
 #include "game/systems_inferred/physics_system.h"
@@ -19,12 +20,7 @@ namespace rendering_scripts {
 			const auto& cosmos = crosshair.get_cosmos();
 			const auto& physics = cosmos.systems_inferred.get<physics_system>();
 
-			vec2 line_from[2];
-			vec2 line_to[2];
-
 			const auto crosshair_pos = crosshair.get_viewing_transform(interp).pos;
-
-			const auto guns = character.guns_wielded();
 
 			auto calculate_color = [&](const const_entity_handle target) {
 				const auto att = calculate_attitude(character, target);
@@ -39,78 +35,80 @@ namespace rendering_scripts {
 					return cyan;
 				}
 			};
+			
+			const auto make_laser_from_to = [&](
+				const const_entity_handle subject,
+				const vec2 line_from,
+				const vec2 line_to
+			) {
+				const auto raycast = physics.ray_cast_px(
+					cosmos.get_si(),
+					line_from,
+					line_to,
+					filters::bullet(),
+					subject
+				);
 
-			if (guns.size() >= 1) {
-				const auto subject_item = guns[0];
+				if (raycast.hit) {
+					dashed_line_callback(raycast.intersection, line_to);
 
-				const auto& gun = subject_item.get<components::gun>();
-
-				const auto rifle_transform = subject_item.get_viewing_transform(interp);
-				const auto barrel_center = gun.calculate_barrel_center(rifle_transform);
-				const auto muzzle = gun.calculate_muzzle_position(rifle_transform);
-
-				line_from[0] = muzzle;
-				
-				const auto proj = crosshair_pos.get_projection_multiplier(barrel_center, muzzle);
-
-				if (proj > 1.f) {
-					line_to[0] = barrel_center + (muzzle - barrel_center) * proj;
-					
-					const auto raycast = physics.ray_cast_px(
-						cosmos.get_si(),
-						line_from[0], 
-						line_to[0], 
-						filters::bullet(), 
-						subject_item
+					callback(
+						line_from, 
+						raycast.intersection, 
+						calculate_color(cosmos[raycast.what_entity])
 					);
-
-					auto col = cyan;
-
-					if (raycast.hit) {
-						dashed_line_callback(raycast.intersection, line_to[0]);
-
-						line_to[0] = raycast.intersection;
-						col = calculate_color(cosmos[raycast.what_entity]);
-					}
-
-					callback(line_from[0], line_to[0], col);
 				}
-			}
+				else {
+					callback(
+						line_from,
+						line_to,
+						cyan
+					);
+				}
+			};
 
-			if (guns.size() >= 2) {
-				const auto subject_item = guns[1];
+			for (const auto subject_item_id : character.items_wielded()) {
+				const auto subject_item = cosmos[subject_item_id];
 
-				const auto& gun = subject_item.get<components::gun>();
+				if (subject_item.has<components::gun>()) {
+					const auto& gun = subject_item.get<components::gun>();
 
-				const auto rifle_transform = subject_item.get_viewing_transform(interp);
-				const auto barrel_center = gun.calculate_barrel_center(rifle_transform);
-				const auto muzzle = gun.calculate_muzzle_position(rifle_transform);
+					const auto rifle_transform = subject_item.get_viewing_transform(interp);
+					const auto barrel_center = gun.calculate_barrel_center(rifle_transform);
+					const auto muzzle = gun.calculate_muzzle_position(rifle_transform);
 
-				line_from[1] = muzzle;
+					const auto proj = crosshair_pos.get_projection_multiplier(barrel_center, muzzle);
 
-				const auto proj = crosshair_pos.get_projection_multiplier(barrel_center, muzzle);
+					if (proj > 1.f) {
+						const auto line_from = muzzle;
+						const auto line_to = barrel_center + (muzzle - barrel_center) * proj;
 
-				if (proj > 1.f) {
-					line_to[1] = barrel_center + (muzzle - barrel_center) * proj;
-					
-					const auto raycast = physics.ray_cast_px(
-						cosmos.get_si(),
-						line_from[1], 
-						line_to[1], 
-						filters::bullet(), 
-						subject_item
+						make_laser_from_to(
+							subject_item,
+							line_from,
+							line_to
+						);
+					}
+				}
+				else if (subject_item.has<components::grenade>()) {
+					const auto grenade_transform = subject_item.get_viewing_transform(interp);
+					const auto grenade_target_vector = grenade_transform.pos + vec2().set_from_degrees(grenade_transform.rotation);
+
+					const auto proj = crosshair_pos.get_projection_multiplier(
+						grenade_transform.pos,
+						grenade_target_vector
 					);
 
-					auto col = cyan;
+					if (proj > 1.f) {
+						const auto line_from = grenade_transform.pos;
+						const auto line_to = grenade_transform.pos + (grenade_target_vector - grenade_transform.pos) * proj;
 
-					if (raycast.hit) {
-						dashed_line_callback(raycast.intersection, line_to[1]);
-
-						line_to[1] = raycast.intersection;
-						col = calculate_color(cosmos[raycast.what_entity]);
+						make_laser_from_to(
+							subject_item,
+							line_from,
+							line_to
+						);
 					}
-
-					callback(line_from[1], line_to[1], col);
 				}
 			}
 		}

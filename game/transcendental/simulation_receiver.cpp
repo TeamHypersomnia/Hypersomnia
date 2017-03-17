@@ -38,7 +38,9 @@ void simulation_receiver::remote_entropy_predictions(
 				return;
 			}
 
-			for (const auto g : e.guns_wielded()) {
+			for (const auto g_id : e.guns_wielded()) {
+				const auto g = predicted_cosmos[g_id];
+
 				if (g.get<components::gun>().trigger_pressed) {
 					if (g.get_current_slot().raw_id.type == slot_function::PRIMARY_HAND) {
 						release_intent.intent = intent_type::CROSSHAIR_PRIMARY_ACTION;

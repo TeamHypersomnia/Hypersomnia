@@ -21,7 +21,8 @@ public:
 	
 	inventory_slot_handle_type map_primary_action_to_secondary_hand_if_primary_empty(const bool is_action_secondary) const;
 	
-	std::vector<entity_handle_type> guns_wielded() const;
+	augs::constant_size_vector<entity_id, 2> guns_wielded() const;
+	augs::constant_size_vector<entity_id, 2> items_wielded() const;
 
 	inventory_item_address get_address_from_root() const;
 

@@ -198,9 +198,9 @@ typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory
 }
 
 template <bool C, class D>
-std::vector<D> basic_inventory_mixin<C, D>::guns_wielded() const {
+augs::constant_size_vector<entity_id, 2> basic_inventory_mixin<C, D>::guns_wielded() const {
 	const auto& subject = *static_cast<const D*>(this);
-	std::vector<D> result;
+	augs::constant_size_vector<entity_id, 2> result;
 
 	{
 		const auto wielded = subject[slot_function::PRIMARY_HAND].get_item_if_any();
@@ -214,6 +214,30 @@ std::vector<D> basic_inventory_mixin<C, D>::guns_wielded() const {
 		const auto wielded = subject[slot_function::SECONDARY_HAND].get_item_if_any();
 
 		if (wielded.alive() && wielded.has<components::gun>()) {
+			result.push_back(wielded);
+		}
+	}
+
+	return result;
+}
+
+template <bool C, class D>
+augs::constant_size_vector<entity_id, 2> basic_inventory_mixin<C, D>::items_wielded() const {
+	const auto& subject = *static_cast<const D*>(this);
+	augs::constant_size_vector<entity_id, 2> result;
+
+	{
+		const auto wielded = subject[slot_function::PRIMARY_HAND].get_item_if_any();
+
+		if (wielded.alive()) {
+			result.push_back(wielded);
+		}
+	}
+
+	{
+		const auto wielded = subject[slot_function::SECONDARY_HAND].get_item_if_any();
+
+		if (wielded.alive()) {
 			result.push_back(wielded);
 		}
 	}
