@@ -2,18 +2,18 @@
 #include "augs/ensure.h"
 #include "application/menu_button_type.h"
 
-class dx_button;
+class option_button;
 
-class dx_button_in_menu {
+class option_button_in_menu {
 public:
-	typedef dx_button dereferenced_type;
+	typedef option_button dereferenced_type;
 	menu_button_type type;
 
-	const dx_button_in_menu& get_location() const {
+	const option_button_in_menu& get_location() const {
 		return *this;
 	}
 
-	bool operator==(const dx_button_in_menu& b) const {
+	bool operator==(const option_button_in_menu& b) const {
 		return type == b.type;
 	}
 
@@ -30,8 +30,8 @@ public:
 
 namespace std {
 	template <>
-	struct hash<dx_button_in_menu> {
-		std::size_t operator()(const dx_button_in_menu& k) const {
+	struct hash<option_button_in_menu> {
+		std::size_t operator()(const option_button_in_menu& k) const {
 			return std::hash<menu_button_type>()(k.type);
 		}
 	};

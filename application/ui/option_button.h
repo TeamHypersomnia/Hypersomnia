@@ -12,7 +12,7 @@
 
 #include "augs/audio/sound_source.h"
 
-class dx_button : public app_ui_rect_node {
+class option_button : public app_ui_rect_node {
 public:
 	augs::gui::appearance_detector detector;
 	augs::gui::text::formatted_string caption;
@@ -34,7 +34,7 @@ public:
 	typedef app_ui_rect_node base;
 	typedef base::gui_entropy gui_entropy;
 
-	dx_button();
+	option_button();
 	vec2i get_target_button_size() const;
 	void set_appearing_caption(const augs::gui::text::formatted_string text);
 
