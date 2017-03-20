@@ -1,5 +1,7 @@
 #include <tuple>
 
+#include "application/config_structs/debug_drawing_settings.h"
+
 #include "3rdparty/GL/OpenGL.h"
 #include "augs/graphics/renderer.h"
 #include "augs/graphics/fbo.h"
@@ -19,8 +21,17 @@
 #include "game/detail/camera_cone.h"
 
 namespace augs {
-	renderer& renderer::get_current() {
-		return window::glwindow::get_current()->gl;
+	renderer::renderer(
+		window::glwindow& parent_window,
+		const debug_drawing_settings& debug
+	) : 
+		parent_window(parent_window),
+		debug(debug)
+	{
+	}
+
+	void renderer::set_as_current_impl() {
+
 	}
 
 	void renderer::initialize() {
@@ -214,7 +225,7 @@ namespace augs {
 		const float interpolation_ratio
 	) {
 		
-		if (!debug_drawing) {
+		if (!debug.drawing_enabled) {
 			return;
 		}
 		
@@ -222,7 +233,7 @@ namespace augs {
 		
 		clear_triangles();
 
-		if (draw_visibility) {
+		if (debug.draw_visibility) {
 			for (auto it : target_entities) {
 				//auto* visibility = it.find<components::visibility>();
 				//if (visibility) {

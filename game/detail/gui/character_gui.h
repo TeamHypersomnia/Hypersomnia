@@ -16,8 +16,6 @@
 #include "augs/misc/constant_size_vector.h"
 #include "game/container_sizes.h"
 
-#include "application/config_lua_table.h"
-
 struct wielding_result;
 
 struct character_gui {

@@ -28,6 +28,7 @@
 #include "game/detail/visible_entities.h"
 
 #include "generated_introspectors.h"
+#include "application/config_lua_table.h"
 
 void client_setup::process(const config_lua_table& cfg, game_window& window) {
 	init(cfg, window);
@@ -61,10 +62,10 @@ void client_setup::init(
 
 	session.configure_input();
 
-	detailed_step_log = cfg.tickrate <= 2;
+	detailed_step_log = cfg.default_tickrate <= 2;
 
 	if (!hypersomnia.load_from_file("save.state")) {
-		hypersomnia.set_fixed_delta(cfg.tickrate);
+		hypersomnia.set_fixed_delta(cfg.default_tickrate);
 		scene.populate_world_with_entities(hypersomnia);
 	}
 

@@ -42,6 +42,7 @@
 
 #include "augs/graphics/drawers.h"
 #include "game/detail/visible_entities.h"
+#include "application/config_lua_table.h"
 
 using namespace augs::window::event::keys;
 using namespace augs::gui::text;
@@ -128,7 +129,7 @@ void menu_setup::process(
 	scene_builders::testbed testbed;
 	testbed.debug_var = cfg.debug_var;
 
-	intro_scene.set_fixed_delta(cfg.tickrate);
+	intro_scene.set_fixed_delta(cfg.default_tickrate);
 	
 	testbed.populate_world_with_entities(
 		intro_scene, 
@@ -199,14 +200,14 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 		m.click_sound.set_gain(cfg.sound_effects_volume);
 	}
 
-	menu_ui_root.menu_buttons[(int)menu_button_type::CONNECT_TO_OFFICIAL_UNIVERSE].set_appearing_caption(format(L"Login to\nofficial universe", textes_style));
-	menu_ui_root.menu_buttons[(int)menu_button_type::BROWSE_UNOFFICIAL_UNIVERSES].set_appearing_caption(format(L"Browse\nunofficial universes", textes_style));
-	menu_ui_root.menu_buttons[(int)menu_button_type::HOST_UNIVERSE].set_appearing_caption(format(L"Host\nuniverse", textes_style));
-	menu_ui_root.menu_buttons[(int)menu_button_type::CONNECT_TO_UNIVERSE].set_appearing_caption(format(L"Connect to\nuniverse", textes_style));
-	menu_ui_root.menu_buttons[(int)menu_button_type::LOCAL_UNIVERSE].set_appearing_caption(format(L"Local\nuniverse", textes_style));
-	menu_ui_root.menu_buttons[(int)menu_button_type::SETTINGS].set_appearing_caption(format(L"Settings", textes_style));
-	menu_ui_root.menu_buttons[(int)menu_button_type::CREATORS].set_appearing_caption(format(L"Creators", textes_style));
-	menu_ui_root.menu_buttons[(int)menu_button_type::QUIT].set_appearing_caption(format(L"Quit", textes_style));
+	menu_ui_root.menu_buttons[menu_button_type::CONNECT_TO_OFFICIAL_UNIVERSE].set_appearing_caption(format(L"Login to\nofficial universe", textes_style));
+	menu_ui_root.menu_buttons[menu_button_type::BROWSE_UNOFFICIAL_UNIVERSES].set_appearing_caption(format(L"Browse\nunofficial universes", textes_style));
+	menu_ui_root.menu_buttons[menu_button_type::HOST_UNIVERSE].set_appearing_caption(format(L"Host\nuniverse", textes_style));
+	menu_ui_root.menu_buttons[menu_button_type::CONNECT_TO_UNIVERSE].set_appearing_caption(format(L"Connect to\nuniverse", textes_style));
+	menu_ui_root.menu_buttons[menu_button_type::LOCAL_UNIVERSE].set_appearing_caption(format(L"Local\nuniverse", textes_style));
+	menu_ui_root.menu_buttons[menu_button_type::SETTINGS].set_appearing_caption(format(L"Settings", textes_style));
+	menu_ui_root.menu_buttons[menu_button_type::CREATORS].set_appearing_caption(format(L"Creators", textes_style));
+	menu_ui_root.menu_buttons[menu_button_type::QUIT].set_appearing_caption(format(L"Quit", textes_style));
 
 	menu_ui_root.set_menu_buttons_positions(screen_size);
 

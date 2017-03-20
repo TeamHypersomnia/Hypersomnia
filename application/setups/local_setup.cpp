@@ -25,6 +25,7 @@
 #include "local_setup.h"
 #include "augs/tweaker.h"
 #include "game/detail/visible_entities.h"
+#include "application/config_lua_table.h"
 
 using namespace augs::window::event::keys;
 
@@ -57,7 +58,7 @@ void local_setup::process(
 	testbed.debug_var = cfg.debug_var;
 
 	if (!hypersomnia.load_from_file("save.state")) {
-		hypersomnia.set_fixed_delta(cfg.tickrate);
+		hypersomnia.set_fixed_delta(cfg.default_tickrate);
 		
 		testbed.populate_world_with_entities(
 			hypersomnia, 

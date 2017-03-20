@@ -25,6 +25,7 @@
 #include "game/detail/visible_entities.h"
 
 #include "generated_introspectors.h"
+#include "application/config_lua_table.h"
 
 void determinism_test_setup::process(
 	const config_lua_table& cfg, 
@@ -58,7 +59,7 @@ void determinism_test_setup::process(
 	}
 	else {
 		for (size_t i = 0; i < cosmoi_count; ++i) {
-			hypersomnias[i].set_fixed_delta(cfg.tickrate);
+			hypersomnias[i].set_fixed_delta(cfg.default_tickrate);
 			testbeds[i].populate_world_with_entities(
 				hypersomnias[i], 
 				vec2i(1920, 1080),

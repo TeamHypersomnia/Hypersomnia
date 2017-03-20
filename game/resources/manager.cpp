@@ -340,7 +340,3 @@ namespace resources {
 		new (this) manager;
 	}
 }
-
-resources::manager& get_resource_manager() {
-	return augs::window::glwindow::get_current()->resources;
-}

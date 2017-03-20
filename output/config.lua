@@ -110,7 +110,7 @@ config_table = {
 	debug_second_nickname = "Billan",
 	
 	-- Frequency of the simulation. 1/tickrate equals the fixed delta time in seconds, so tickrate = 60 means that the logical step advances the simulation about around 16 milliseconds.
-	tickrate = 60,
+	default_tickrate = 60,
 
 	-- Client-side jitter buffer time to preserve smooth display of the past. The bigger the value, the bigger the lag.
 	jitter_buffer_ms = 50,
@@ -173,5 +173,13 @@ config_table = {
 	hotbar_increase_inside_alpha_when_selected = 0,
 	hotbar_colorize_inside_when_selected = 1,
 	hotbar_primary_selected_color = rgba(0, 255, 255, 255),
-	hotbar_secondary_selected_color = rgba(86, 156, 214, 255)
+	hotbar_secondary_selected_color = rgba(86, 156, 214, 255),
+
+	-- debug drawing settings
+	debug_drawing_enabled = 0,
+	debug_draw_colinearization = 0,
+	debug_draw_forces = 0,
+	debug_draw_friction_field_collisions_of_entering = 0,
+	debug_draw_explosion_forces = 0,
+	debug_draw_visibility = 0
 }

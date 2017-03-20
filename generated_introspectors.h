@@ -75,8 +75,9 @@ struct cosmos_significant_state;
 struct entity_guid;
 struct entity_id;
 struct child_entity_id;
-struct hotbar_settings;
 class config_lua_table;
+struct debug_drawing_settings;
+struct hotbar_settings;
 struct neon_map_stamp;
 struct scripted_image_stamp;
 struct texture_atlas_stamp;
@@ -1761,19 +1762,6 @@ namespace augs {
 
 	template <class F, class... Instances>
 	void introspect_body(
-		const hotbar_settings* const,
-		F f,
-		Instances&&... _t_
-	) {
-		FIELD(hotbar_increase_inside_alpha_when_selected);
-		FIELD(hotbar_colorize_inside_when_selected);
-
-		FIELD(hotbar_primary_selected_color);
-		FIELD(hotbar_secondary_selected_color);
-	}
-
-	template <class F, class... Instances>
-	void introspect_body(
 		const config_lua_table* const,
 		F f,
 		Instances&&... _t_
@@ -1809,7 +1797,7 @@ namespace augs {
 
 		FIELD(mouse_sensitivity);
 
-		FIELD(tickrate);
+		FIELD(default_tickrate);
 
 		FIELD(jitter_buffer_ms);
 		FIELD(client_commands_jitter_buffer_ms);
@@ -1840,6 +1828,37 @@ namespace augs {
 
 		FIELD(skip_credits);
 		FIELD(latest_news_url);
+	
+		FIELD(debug);
+		FIELD(hotbar);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const debug_drawing_settings* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(drawing_enabled);
+
+		FIELD(draw_colinearization);
+		FIELD(draw_forces);
+		FIELD(draw_friction_field_collisions_of_entering);
+		FIELD(draw_explosion_forces);
+		FIELD(draw_visibility);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const hotbar_settings* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(increase_inside_alpha_when_selected);
+		FIELD(colorize_inside_when_selected);
+
+		FIELD(primary_selected_color);
+		FIELD(secondary_selected_color);
 	}
 
 	template <class F, class... Instances>

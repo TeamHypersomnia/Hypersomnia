@@ -11,22 +11,32 @@
 
 #include "game/assets/game_image_id.h"
 #include "augs/misc/timer.h"
+#include "augs/templates/settable_as_current_mixin.h"
 
 struct camera_cone;
+struct debug_drawing_settings;
 
 namespace augs {
+	namespace window {
+		class glwindow;
+	}
+
 	namespace graphics {
 		class fbo;
 		class texture;
 	}
 
-	class renderer {
+	class renderer : public settable_as_current_mixin<renderer> {
+		friend class settable_as_current_mixin<renderer>;
+
+		void set_as_current_impl();
 	public:
 		struct debug_line {
 			debug_line(vec2 a = vec2(), vec2 b = vec2(), rgba col = rgba(255, 255, 255, 255)) : col(col), a(a), b(b) {}
 
 			rgba col;
-			vec2 a, b;
+			vec2 a;
+			vec2 b;
 		};
 
 		struct line_channel {
@@ -41,17 +51,27 @@ namespace augs {
 			void draw_cyan(vec2 a, vec2 b);
 		};
 
+		renderer(
+			window::glwindow& parent_window,
+			const debug_drawing_settings& debug_settings
+		);
+		
+		window::glwindow& parent_window;
+
 		graphics::fbo illuminating_smoke_fbo;
 		graphics::fbo smoke_fbo;
 		graphics::fbo light_fbo;
 
-		line_channel logic_lines, prev_logic_lines;
+		line_channel logic_lines;
+		line_channel prev_logic_lines;
 		line_channel frame_lines;
 		line_channel persistent_lines;
 		
 		timer line_timer;
 
-		unsigned int position_buffer_id, texcoord_buffer_id, color_buffer_id;
+		unsigned int position_buffer_id;
+		unsigned int texcoord_buffer_id;
+		unsigned int color_buffer_id;
 		unsigned int triangle_buffer_id;
 		unsigned int special_buffer_id;
 
@@ -61,28 +81,13 @@ namespace augs {
 
 		unsigned long long triangles_drawn_total = 0;
 
-		bool should_interpolate_debug_lines = false;
+		const debug_drawing_settings& debug;
 
-		bool debug_draw_colinearization = false;
-		bool debug_draw_forces = false;
-		bool debug_draw_friction_field_collisions_of_entering = false;
-		bool debug_draw_explosion_forces = false;
+		bool should_interpolate_debug_lines = false;
 
 		float visibility_expansion = 1.0f;
 		float max_visibility_expansion_distance = 1000.0f;
-		int debug_drawing = 1;
-
-		int draw_visibility = 0;
-
-		int draw_steering_forces = 0;
-		int draw_substeering_forces = 0;
-		int draw_velocities = 0;
-
-		int draw_avoidance_info = 0;
-		int draw_wandering_info = 0;
-
-		int draw_weapon_info = 0;
-
+		
 		void initialize();
 		void initialize_fbos(const vec2i screen_size);
 
@@ -128,6 +133,5 @@ namespace augs {
 		std::vector<vertex_triangle>& get_triangle_buffer();
 
 		void clear_geometry();
-		static renderer& get_current();
 	};
 }

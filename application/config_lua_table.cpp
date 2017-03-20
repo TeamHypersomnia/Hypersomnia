@@ -24,10 +24,33 @@ static void get_config_value(augs::lua_state_raii& lua, const std::string& field
 }
 
 void config_lua_table::get_values(augs::lua_state_raii& lua) {
-	augs::introspect(
-		[&](const std::string& ss, auto& c) {
-			get_config_value(lua, ss, c);
+	std::string current_prefix;
+
+	static_assert(!bind_types<can_stream_right, std::istringstream>::type<debug_drawing_settings>::value, "Trait is wrong");
+	static_assert(!bind_types<can_stream_right, std::istringstream>::type<debug_drawing_settings&>::value, "Trait is wrong");
+
+	augs::introspect_recursive_with_prologues <
+		bind_types_t<can_stream_right, std::istringstream>,
+		always_recurse,
+		stop_recursion_if_valid,
+		0u
+	> (
+		[&](const std::string& label, auto& c) {
+			get_config_value(lua, current_prefix + label, c);
 		},
+
+		[&](const unsigned depth, const std::string& ss, auto...) {
+			if (depth == 0) {
+				current_prefix = ss + "_";
+			}
+		},
+
+		[&](const unsigned depth, const std::string& ss, auto...) {
+			if (depth == 0) {
+				current_prefix.clear();
+			}
+		},
+
 		*this
 	);
 }

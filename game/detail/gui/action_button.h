@@ -2,11 +2,9 @@
 #include "augs/math/vec2.h"
 #include "game_gui_context.h"
 #include "augs/gui/appearance_detector.h"
-#include "application/config_lua_table.h"
 
 #include "game/enums/spell_type.h"
 #include "augs/audio/sound_source.h"
-
 
 class action_button : public game_gui_rect_node {
 public:

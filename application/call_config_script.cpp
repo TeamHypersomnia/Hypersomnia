@@ -7,9 +7,6 @@
 void call_window_script(augs::lua_state_raii& lua, game_window& window, const std::string& filename) {
 	lua.global_ptr("global_gl_window", &window.window);
 	lua.dofile_and_report_errors(filename);
-
-	window.window.gl.initialize();
-	window.window.gl.initialize_fbos(window.get_screen_size());
 }
 
 void call_config_script(augs::lua_state_raii& lua, const std::string& filename, const std::string& alternative_filename) {

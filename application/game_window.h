@@ -2,8 +2,6 @@
 #include "augs/window_framework/window.h"
 #include "augs/misc/machine_entropy.h"
 
-#include "config_lua_table.h"
-
 class game_window {
 public:
 	augs::window::glwindow window;

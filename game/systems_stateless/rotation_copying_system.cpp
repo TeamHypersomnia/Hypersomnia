@@ -7,6 +7,7 @@
 #include "game/components/physics_component.h"
 #include "game/components/special_physics_component.h"
 #include "game/components/gun_component.h"
+#include "game/components/grenade_component.h"
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "game/detail/inventory/inventory_slot.h"
 #include "game/detail/inventory/inventory_utils.h"
@@ -21,6 +22,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/cosmos.h"
+#include "application/config_structs/debug_drawing_settings.h"
 
 using namespace augs;
 
@@ -51,7 +53,7 @@ float colinearize_AB(const vec2 O_center_of_rotation, vec2 A_barrel_center, vec2
 
 	const auto final_angle = 2 * (CG.degrees() - AG.degrees());
 	
-	if (augs::renderer::get_current().debug_draw_colinearization) {
+	if (augs::renderer::get_current().debug.draw_colinearization) {
 		auto& ln = augs::renderer::get_current().logic_lines;
 
 		ln.draw_cyan(O_center_of_rotation, C_crosshair);
@@ -75,6 +77,7 @@ float colinearize_AB(const vec2 O_center_of_rotation, vec2 A_barrel_center, vec2
 }
 
 float rotation_copying_system::resolve_rotation_copying_value(const const_entity_handle it) const {
+	const auto subject_transform = it.get_logic_transform();
 	auto& rotation_copying = it.get<components::rotation_copying>();
 	auto& cosmos = it.get_cosmos();
 	const auto target = cosmos[rotation_copying.target];
@@ -90,7 +93,7 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 	else if (rotation_copying.look_mode == components::rotation_copying::look_type::POSITION) {
 		const auto& target_transform = target.get_logic_transform();
 		
-		const auto diff = target_transform.pos - position(it);
+		const auto diff = target_transform.pos - subject_transform.pos;
 
 		if (diff.is_epsilon(1.f)) {
 			new_angle = 0.f;
@@ -100,24 +103,37 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 		}
 
 		if (rotation_copying.colinearize_item_in_hand) {
-			const auto guns = it.guns_wielded();
+			const auto items = it.items_wielded();
 
-			if (guns.size() > 0) {
-				const auto subject_item = cosmos[guns[0]];
+			if (items.size() > 0) {
+				const auto subject_item = cosmos[items[0]];
 
-				const auto& gun = subject_item.get<components::gun>();
+				if (subject_item.has<components::gun>()) {
+					const auto& gun = subject_item.get<components::gun>();
 
-				const auto rifle_transform = subject_item.get_logic_transform();
-				auto barrel_center = gun.calculate_barrel_center(rifle_transform);
-				auto muzzle = gun.calculate_muzzle_position(rifle_transform);
-				const auto mc = position(it);
+					const auto rifle_transform = subject_item.get_logic_transform();
+					auto barrel_center = gun.calculate_barrel_center(rifle_transform);
+					auto muzzle = gun.calculate_muzzle_position(rifle_transform);
+					const auto mc = subject_transform.pos;
 
-				barrel_center.rotate(-rotation(it), mc);
-				muzzle.rotate(-rotation(it), mc);
+					barrel_center.rotate(-subject_transform.rotation, mc);
+					muzzle.rotate(-subject_transform.rotation, mc);
 
-				auto crosshair_vector = target_transform.pos - mc;
+					auto crosshair_vector = target_transform.pos - mc;
 
-				new_angle = colinearize_AB(mc, barrel_center, muzzle, target_transform.pos);
+					new_angle = colinearize_AB(mc, barrel_center, muzzle, target_transform.pos);
+				}
+				else if (subject_item.has<components::grenade>()) {
+					auto grenade_transform = subject_item.get_logic_transform();
+					auto grenade_target_vector = grenade_transform.pos + vec2().set_from_degrees(grenade_transform.rotation);
+
+					const auto mc = subject_transform.pos;
+
+					grenade_transform.pos.rotate(-subject_transform.rotation, mc);
+					grenade_target_vector.rotate(-subject_transform.rotation, mc);
+
+					new_angle = colinearize_AB(mc, grenade_transform.pos, grenade_target_vector, target_transform.pos);
+				}
 			}
 		}
 	}

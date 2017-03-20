@@ -34,6 +34,7 @@
 #include "augs/templates/container_templates.h"
 
 #include "generated_introspectors.h"
+#include "application/config_lua_table.h"
 
 void server_setup::wait_for_listen_server() {
 	std::unique_lock<std::mutex> lck(mtx);
@@ -90,10 +91,10 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
-	const bool detailed_step_log = cfg.tickrate <= 2;
+	const bool detailed_step_log = cfg.default_tickrate <= 2;
 
 	if (!hypersomnia.load_from_file("server_save.state")) {
-		hypersomnia.set_fixed_delta(cfg.tickrate);
+		hypersomnia.set_fixed_delta(cfg.default_tickrate);
 		scene.populate_world_with_entities(hypersomnia);
 	}
 

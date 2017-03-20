@@ -10,17 +10,15 @@
 
 #include "augs/graphics/renderer.h"
 #include "colored_print.h"
-
 #include "augs/audio/audio_manager.h"
-
-#include "game/resources/manager.h"
+#include "augs/templates/settable_as_current_mixin.h"
 
 namespace augs {
 	namespace window {
 #ifdef PLATFORM_WINDOWS
     extern LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
 
-		class glwindow {
+		class glwindow : public augs::settable_as_current_mixin<glwindow> {
 			friend int WINAPI ::WinMain (HINSTANCE, HINSTANCE, LPSTR, int);
 			friend LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
 
@@ -50,10 +48,10 @@ namespace augs {
 			
 			void _poll(UINT&, WPARAM, LPARAM);
 			bool poll_event(UINT& out);
+
+			friend class augs::settable_as_current_mixin<glwindow>;
+			void set_as_current_impl();
 		public:
-			renderer gl;
-			resources::manager resources;
-			
 			glwindow();
 			~glwindow();
 
@@ -65,9 +63,8 @@ namespace augs {
 				const int bitsperpixel = 24
 			);
 			
-			bool swap_buffers(), 
-				set_as_current(),
-				set_vsync(int);
+			bool swap_buffers();
+			bool set_vsync(int);
 
 			void destroy();
 
@@ -79,8 +76,6 @@ namespace augs {
 
 			bool is_active() const;
 			
-			static glwindow* get_current();
-
 			glwindow(const glwindow&) = delete;
 			glwindow(glwindow&&) = delete;
 			glwindow& operator=(const glwindow&) = delete;
@@ -91,8 +86,6 @@ namespace augs {
 		class glwindow {
 			// friend int WINAPI ::WinMain (HINSTANCE, HINSTANCE, LPSTR, int);
 			// friend LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
-
-			static glwindow* context;
 
 			// HWND hwnd = nullptr;
 			// HDC hdc = nullptr;
@@ -126,7 +119,6 @@ namespace augs {
 			int create(xywhi client_rectangle, int enable_window_border = 0, std::string name = "Window", int doublebuffer = 1, int bitsperpixel = 24);
 			
 			bool swap_buffers(), 
-				set_as_current(),
 				set_vsync(int);
 
 			void destroy();
@@ -139,8 +131,6 @@ namespace augs {
 
 			bool is_active() const;
 			
-			static glwindow* get_current();
-
 			glwindow(const glwindow&) = delete;
 			glwindow(glwindow&&) = delete;
 			glwindow& operator=(const glwindow&) = delete;

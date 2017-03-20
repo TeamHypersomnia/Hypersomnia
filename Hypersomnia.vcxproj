@@ -1034,6 +1034,8 @@
     <ClInclude Include="3rdparty\rectpack2D\src\pack.h" />
     <ClInclude Include="application\call_config_script.h" />
     <ClInclude Include="application\config_lua_table.h" />
+    <ClInclude Include="application\config_structs\debug_drawing_settings.h" />
+    <ClInclude Include="application\config_structs\hotbar_settings.h" />
     <ClInclude Include="application\content_generation\desaturations.h" />
     <ClInclude Include="application\content_generation\polygonizations_of_images.h" />
     <ClInclude Include="application\content_generation\scripted_images.h" />
@@ -1130,6 +1132,7 @@
     <ClInclude Include="augs\network\reliable_channel.h" />
     <ClInclude Include="augs\network\reliable_channel_tests.h" />
     <ClInclude Include="augs\padding_byte.h" />
+    <ClInclude Include="augs\templates\conditional_call.h" />
     <ClInclude Include="augs\templates\for_each_in_types.h" />
     <ClInclude Include="augs\templates\hash_templates.h" />
     <ClInclude Include="augs\templates\is_component_synchronized.h" />
@@ -1137,6 +1140,7 @@
     <ClInclude Include="augs\templates\maybe_const.h" />
     <ClInclude Include="augs\templates\memcpy_safety.h" />
     <ClInclude Include="augs\templates\minimal_templates.h" />
+    <ClInclude Include="augs\templates\settable_as_current_mixin.h" />
     <ClInclude Include="augs\templates\string_templates.h" />
     <ClInclude Include="augs\templates\template_logic.h" />
     <ClInclude Include="augs\templates\list_of.h" />

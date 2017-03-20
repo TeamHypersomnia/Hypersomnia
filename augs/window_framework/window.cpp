@@ -381,10 +381,6 @@ namespace augs {
 			events.msg = translate_enum(m);
 		}
 
-		glwindow* glwindow::get_current() {
-			return context;
-		}
-
 		glwindow* glwindow::context = nullptr;
 
 		glwindow::glwindow() {
@@ -458,24 +454,21 @@ namespace augs {
 			return SwapBuffers(hdc) != FALSE;
 		}
 
-		bool glwindow::set_as_current() {
-			bool ret = true;
-			if (context != this) {
-				ret = wglMakeCurrent(hdc, hglrc) != FALSE; glerr
-					context = this;
-			}
-
-			return ret;
+		void glwindow::set_as_current_impl() {
+			wglMakeCurrent(hdc, hglrc); glerr
 		}
 
 		bool glwindow::set_vsync(const int v) {
-			bool ret = WGLEW_EXT_swap_control != NULL;
-			ensure(ret && "vsync not supported!");
-			if (ret) {
-				ensure(ret = set_as_current() && "error enabling vsync, could not set current context");
+			const bool is_supported = WGLEW_EXT_swap_control != NULL;
+			
+			ensure(is_supported && "vsync not supported!");
+			
+			if (is_supported) {
+				set_as_current();
 				wglSwapIntervalEXT(v); glerr
 			}
-			return ret;
+
+			return is_supported;
 		}
 
 		bool glwindow::poll_event(UINT& out) {
@@ -492,20 +485,25 @@ namespace augs {
 		}
 
 		std::vector<event::change> glwindow::poll_events(const bool should_clip_cursor) {
+			ensure(is_current());
+
 			UINT msg;
 			std::vector<event::change> output;
 
 			while (poll_event(msg)) {
-				auto& state = glwindow::get_current()->latest_change;
+				auto& state = latest_change;
 
-				if (!state.repeated)
+				if (!state.repeated) {
 					output.push_back(state);
+				}
 			}
 
-			if (should_clip_cursor && GetFocus() == hwnd)
+			if (should_clip_cursor && GetFocus() == hwnd) {
 				enable_cursor_clipping(get_window_rect());
-			else
+			}
+			else {
 				disable_cursor_clipping();
+			}
 
 			return output;
 		}
@@ -535,16 +533,16 @@ namespace augs {
 
 		void glwindow::destroy() {
 			if (hwnd) {
-				if (context == this) {
+				if (is_current()) {
 					wglMakeCurrent(NULL, NULL); glerr
-						wglDeleteContext(hglrc); glerr
-						context = 0;
+					wglDeleteContext(hglrc); glerr
+					set_current_to_none();
 				}
 				ReleaseDC(hwnd, hdc);
 				DestroyWindow(hwnd);
-				hwnd = 0;
-				hdc = 0;
-				hglrc = 0;
+				hwnd = nullptr;
+				hdc = nullptr;
+				hglrc = nullptr;
 			}
 		}
 

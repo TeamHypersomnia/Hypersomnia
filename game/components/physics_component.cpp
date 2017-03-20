@@ -11,6 +11,7 @@
 #include "game/systems_inferred/physics_system.h"
 #include "augs/ensure.h"
 #include "game/transcendental/entity_handle.h"
+#include "application/config_structs/debug_drawing_settings.h"
 
 typedef components::physics P;
 
@@ -131,7 +132,7 @@ void component_synchronizer<false, P>::apply_force(
 	component.angular_velocity = get_cache().body->GetAngularVelocity();
 	component.velocity = get_cache().body->GetLinearVelocity();
 
-	if (augs::renderer::get_current().debug_draw_forces && force.non_zero()) {
+	if (augs::renderer::get_current().debug.draw_forces && force.non_zero()) {
 		auto& lines = augs::renderer::get_current().logic_lines;
 		lines.draw_green(to_pixels(location) + to_pixels(force), to_pixels(location));
 	}
@@ -144,8 +145,9 @@ void component_synchronizer<false, P>::apply_impulse(const vec2 pixels) const {
 void component_synchronizer<false, P>::apply_impulse(const vec2 pixels, const vec2 center_offset, const bool wake) const {
 	ensure(is_constructed());
 
-	if (pixels.is_epsilon(2.f))
+	if (pixels.is_epsilon(2.f)) {
 		return;
+	}
 
 	const vec2 force = to_meters(pixels);
 	const vec2 location = get_cache().body->GetWorldCenter() + to_meters(center_offset);
@@ -154,8 +156,8 @@ void component_synchronizer<false, P>::apply_impulse(const vec2 pixels, const ve
 	component.angular_velocity = get_cache().body->GetAngularVelocity();
 	component.velocity = get_cache().body->GetLinearVelocity();
 
-	if (augs::renderer::get_current().debug_draw_forces && force.non_zero()) {
-		auto& lines = augs::renderer::get_current().logic_lines;
+	if (augs::renderer::get_current().debug.draw_forces && force.non_zero()) {
+		auto& lines = augs::renderer::get_current().persistent_lines;
 		lines.draw_green(to_pixels(location) + to_pixels(force), to_pixels(location));
 	}
 }

@@ -10,22 +10,15 @@
 #include "game/transcendental/entity_handle_declaration.h"
 #include "augs/misc/introspect.h"
 
+#include "application/config_structs/hotbar_settings.h"
+#include "application/config_structs/debug_drawing_settings.h"
+
 class game_window;
 
 namespace augs {
 	class lua_state_raii;
 }
 
-struct hotbar_settings {
-	// GEN INTROSPECTOR struct hotbar_settings
-	bool hotbar_increase_inside_alpha_when_selected = false;
-	bool hotbar_colorize_inside_when_selected = true;
-	std::array<padding_byte, 2> pad;
-
-	rgba hotbar_primary_selected_color = rgba(0, 255, 255, 255);
-	rgba hotbar_secondary_selected_color = rgba(86, 156, 214, 255);
-	// END GEN INTROSPECTOR
-};
 
 class config_lua_table {
 public:
@@ -61,7 +54,7 @@ public:
 
 	vec2 mouse_sensitivity;
 
-	unsigned tickrate = 0;
+	unsigned default_tickrate = 0;
 
 	unsigned jitter_buffer_ms = 0;
 	unsigned client_commands_jitter_buffer_ms = 0;
@@ -92,9 +85,10 @@ public:
 
 	bool skip_credits = false;
 	std::string latest_news_url;
-	// END GEN INTROSPECTOR
-
+	
+	debug_drawing_settings debug;
 	hotbar_settings hotbar;
+	// END GEN INTROSPECTOR
 
 	void get_values(augs::lua_state_raii&);
 

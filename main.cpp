@@ -43,7 +43,21 @@ int main(int argc, char** argv) {
 	augs::audio_manager audio(cfg.audio_output_device);
 
 	game_window window;
+	
+	augs::renderer gl(
+		window.window,
+		cfg.debug
+	);
+
+	gl.set_as_current();
+
+	resources::manager resources;
+	resources.set_as_current();
+
 	call_window_script(lua, window, "window.lua");
+
+	gl.initialize();
+	gl.initialize_fbos(window.get_screen_size());
 
 	resource_setups::load_standard_everything(cfg);
 

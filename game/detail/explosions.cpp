@@ -12,6 +12,7 @@
 #include "game/components/sentience_component.h"
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/data_living_one_step.h"
+#include "application/config_structs/debug_drawing_settings.h"
 
 void standard_explosion(const standard_explosion_input in) {
 	auto& cosmos = in.step.cosm;
@@ -99,7 +100,7 @@ void standard_explosion(const standard_explosion_input in) {
 
 						auto& r = augs::renderer::get_current();
 
-						if (r.debug_draw_explosion_forces) {
+						if (r.debug.draw_explosion_forces) {
 							r.persistent_lines.draw_cyan(
 								affected_physics.get_mass_position() + center_offset,
 								affected_physics.get_mass_position() + center_offset + impact

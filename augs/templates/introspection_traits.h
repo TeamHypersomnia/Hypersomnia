@@ -255,9 +255,23 @@ using have_introspects = make_variadic_predicate<
 >::type<T...>;
 
 template <class... T>
-using is_any_not_an_introspective_leaf = make_variadic_predicate<
+using at_least_one_is_not_introspective_leaf = make_variadic_predicate<
 	std::disjunction,
 	apply_negation_t<is_introspective_leaf>
 >::type<T...>;
 
 constexpr bool stop_recursion_if_valid = true;
+
+struct no_prologue {
+	template <class... Args>
+	void operator()(Args&&...) {
+
+	}
+};
+
+struct no_epilogue {
+	template <class... Args>
+	void operator()(Args&&...) {
+
+	}
+};

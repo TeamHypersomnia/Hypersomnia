@@ -33,6 +33,7 @@
 
 #include "application/content_generation/atlas_content_structs.h"
 #include "augs/texture_atlas/texture_atlas_entry.h"
+#include "augs/templates/settable_as_current_mixin.h"
 
 enum class texture_map_type {
 	DIFFUSE,
@@ -80,7 +81,7 @@ typedef std::unordered_map<assets::font_id, game_font_request> game_font_request
 struct atlases_regeneration_output;
 
 namespace resources {
-	class manager {
+	class manager : public augs::settable_as_current_mixin<manager> {
 	public:
 		void load_baked_metadata(
 			const game_image_requests&,
@@ -156,4 +157,6 @@ namespace resources {
 	};
 }
 
-resources::manager& get_resource_manager();
+inline resources::manager& get_resource_manager() {
+	return resources::manager::get_current();
+}

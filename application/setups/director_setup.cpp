@@ -25,6 +25,7 @@
 #include "director_setup.h"
 
 #include "augs/templates/container_templates.h"
+#include "application/config_lua_table.h"
 
 #define LOG_REWINDING 0
 
@@ -56,7 +57,7 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 	};
 
 	if (!hypersomnia.load_from_file("save.state")) {
-		hypersomnia.set_fixed_delta(cfg.tickrate);
+		hypersomnia.set_fixed_delta(cfg.default_tickrate);
 		
 		testbed.populate_world_with_entities(
 			hypersomnia, 

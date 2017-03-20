@@ -1,7 +1,8 @@
 #pragma once
 #include "augs/window_framework/event.h"
 #include "augs/misc/machine_entropy.h"
-#include "application/config_lua_table.h"
+
+class config_lua_table;
 
 class setup_base {
 public:

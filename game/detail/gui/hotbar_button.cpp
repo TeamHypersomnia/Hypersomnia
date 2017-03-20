@@ -8,7 +8,7 @@
 #include "game/detail/gui/drag_and_drop.h"
 #include "game/systems_audiovisual/gui_element_system.h"
 
-#include "application/config_lua_table.h"
+#include "application/config_structs/hotbar_settings.h"
 
 const_entity_handle hotbar_button::get_assigned_entity(const const_entity_handle owner_transfer_capability) const {
 	const auto& cosm = owner_transfer_capability.get_cosmos();
@@ -107,13 +107,13 @@ void hotbar_button::draw(
 	rgba distinguished_border_color = cyan;
 
 	if (is_in_primary) {
-		distinguished_border_color = settings.hotbar_primary_selected_color;
+		distinguished_border_color = settings.primary_selected_color;
 	}
 	else if (is_in_secondary) {
-		distinguished_border_color = settings.hotbar_secondary_selected_color;
+		distinguished_border_color = settings.secondary_selected_color;
 	}
 
-	if (settings.hotbar_colorize_inside_when_selected) {
+	if (settings.colorize_inside_when_selected) {
 		colorize = distinguished_border_color;
 	}
 
@@ -128,7 +128,7 @@ void hotbar_button::draw(
 		inside_col.a += 10;
 	}
 
-	if (settings.hotbar_increase_inside_alpha_when_selected && is_assigned_entity_selected) {
+	if (settings.increase_inside_alpha_when_selected && is_assigned_entity_selected) {
 		inside_col.a += 20;
 	}
 

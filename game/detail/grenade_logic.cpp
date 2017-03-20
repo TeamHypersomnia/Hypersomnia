@@ -23,8 +23,10 @@ void release_or_throw_grenade(
 	const auto delta = step.get_delta();
 	const auto thrower = cosmos[thrower_id];
 	const auto thrower_transform = thrower.get_logic_transform();
-	const auto thrower_orientation = vec2().set_from_degrees(thrower_transform.rotation);
+	//const auto thrower_orientation = vec2().set_from_degrees(thrower_transform.rotation);
 	
+	// LOG("throrot: %x", thrower_transform.rotation);
+
 	auto& grenade = grenade_entity.get<components::grenade>();
 
 	if (!grenade.when_released.was_set()) {
@@ -70,7 +72,7 @@ void release_or_throw_grenade(
 		grenade_entity.get<components::sprite>().set(grenade.released_image_id);
 
 		auto& physics = grenade_entity.get<components::physics>();
-		physics.apply_impulse(thrower_orientation * 2000 * physics.get_mass());
+		physics.apply_impulse(vec2().set_from_degrees(grenade_entity.get_logic_transform().rotation) * 2000 * physics.get_mass());
 		physics.set_bullet_body(true);
 		physics.set_linear_damping(3.0f);
 
