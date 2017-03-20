@@ -228,8 +228,6 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 		}
 
 		if (advance_steps_forward < 0) {
-			session.set_interpolation_enabled(false);
-
 			const auto current_step = get_step_number(hypersomnia);
 			const auto rewound_step = static_cast<unsigned>(-advance_steps_forward) > current_step ? 0 : current_step + advance_steps_forward;
 
@@ -275,9 +273,7 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 		new_steps_forward += advance_steps_forward;
 		advance_steps_forward = 0;
 
-		if (new_steps_forward > 0) {
-			session.set_interpolation_enabled(true);
-		}
+		session.set_interpolation_enabled(requested_playing_speed > 0.f);
 
 		while (new_steps_forward--) {
 			cosmic_entropy cosmic_entropy_for_this_advancement;
