@@ -24,10 +24,10 @@ namespace augs {
 	/*
 		Explanation of conditional specialization:
 
-		if call on given types is valid
-			call
-		if should recurse with given types and types are not introspective leaves
-			recurse (static_asserts that introspectors exist at this point)
+		if call on given set of types is valid
+			invoke the callback
+		if should recurse with given set of types and none of them is an introspective leaf
+			recurse (static_assert ensures that introspectors exist at this point)
 	*/
 
 	template <
@@ -58,7 +58,8 @@ namespace augs {
 
 	/*
 		Because the introspected members will always be passed to the callback as some kind of reference,
-		it makes sense to remove them from the argument to predicates to simplify the implementation of "should recurse" and "call valid" predicates.
+		it makes sense to remove the references from the arguments to predicates 
+		to simplify the implementation of "should recurse" and "call valid" predicates.
 	
 		It is a separate function also for the reason that the compiler has troubles unpacking the parameter packs in lambdas,
 		when the pattern is more complex.
