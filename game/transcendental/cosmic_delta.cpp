@@ -16,39 +16,51 @@
 
 #include "generated_introspectors.h"
 
-static_assert(has_found_type_in_v<cosmos, int, cosmos_metadata, cosmos>, "Trait is wrong");
-static_assert(!has_found_type_in_v<int, float, double>, "Trait is wrong");
+static_assert(is_one_of_v<cosmos, int, cosmos_metadata, cosmos>, "Trait is wrong");
+static_assert(!is_one_of_v<int, float, double>, "Trait is wrong");
 
 static_assert(!has_introspect_v<cosmos>, "Trait is wrong");
 static_assert(!has_introspect_v<unsigned>, "Trait is wrong");
 static_assert(!has_introspect_v<augs::trivial_variant<int, double>>, "Trait is wrong");
-static_assert(is_trivial_variant<augs::trivial_variant<int, double>>::value, "Trait is wrong");
-static_assert(!is_trivial_variant<double>::value, "Trait is wrong");
+// static_assert(is_trivial_variant<augs::trivial_variant<int, double>>::value, "Trait is wrong");
+// static_assert(!is_trivial_variant<double>::value, "Trait is wrong");
 static_assert(has_introspect_v<cosmos_metadata>, "Trait is wrong");
 static_assert(has_introspect_v<ltrbt<float>>, "Trait is wrong");
 static_assert(has_introspect_v<ltrbt<int>>, "Trait is wrong");
 static_assert(has_introspect_v<augs::constant_size_vector<int, 2>>, "Trait is wrong");
 static_assert(has_introspect_v<zeroed_pod<unsigned int>>, "Trait is wrong");
 
+static_assert(bind_types_right<is_one_of, shape_variant&, const shape_variant&>::type<shape_variant&>::value, "Trait is wrong");
+static_assert(bind_types_right<is_one_of, shape_variant&, const shape_variant&>::type<const shape_variant&>::value, "Trait is wrong");
+static_assert(!bind_types_right<is_one_of, int, double, unsigned, signed>::type<float>::value, "Trait is wrong");
+
+typedef apply_negation<bind_types_t<std::is_same, shape_variant>> no_variant;
+
+static_assert(!no_variant::type<shape_variant>::value, "Trait is wrong");
+static_assert(no_variant::type<int>::value, "Trait is wrong");
+
 template <class T>
-void transform_component_ids_to_guids(
+void transform_component_ids_to_guids_in_place(
 	T& comp,
 	const cosmos& cosm
 ) {
 	augs::introspect_recursive<
-		is_entity_id_type,
-		is_base_of_trivial_variant
+		bind_types_t<std::is_base_of, entity_id>,
+		bind_types_t<std::is_same, shape_variant>,
+		stop_recursion_if_valid
 	>(
 		[&cosm](auto, auto& id) {
 			const auto handle = cosm[id];
 
 			id.unset();
 			
+			auto& guid_inside_ref = reinterpret_cast<entity_guid&>(id);
+
 			if (handle.alive()) {
-				id.guid = handle.get_guid();
+				guid_inside_ref = handle.get_guid();
 			}
 			else {
-				id.guid = 0u;
+				guid_inside_ref = entity_guid();
 			}
 		},
 		comp
@@ -56,21 +68,22 @@ void transform_component_ids_to_guids(
 }
 
 template <class T>
-void transform_component_guids_to_ids(
+void transform_component_guids_to_ids_in_place(
 	T& comp,
 	const cosmos& cosm
 ) {
 	augs::introspect_recursive<
-		is_entity_id_type,
-		is_base_of_trivial_variant
+		bind_types_t<std::is_base_of, entity_id>,
+		bind_types_t<std::is_same, shape_variant>,
+		stop_recursion_if_valid
 	> (
 		[&cosm](auto, auto& id) {
-			const entity_guid guid = id.guid;
+			const auto guid_inside = reinterpret_cast<const entity_guid&>(id);
 
 			id.unset();
 
-			if (guid != 0) {
-				id = cosm.guid_map_for_transport.at(guid);
+			if (guid_inside != 0) {
+				id = cosm.guid_map_for_transport.at(guid_inside);
 			}
 		},
 		comp
@@ -200,7 +213,7 @@ bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 					component_type base_compo;
 					component_type enco_compo = enco_c.get();
 
-					transform_component_ids_to_guids(enco_compo, enco);
+					transform_component_ids_to_guids_in_place(enco_compo, enco);
 
 					write_delta(base_compo, enco_compo, new_content, true);
 
@@ -211,8 +224,8 @@ bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 					component_type base_compo = base_c.get();
 					component_type enco_compo = enco_c.get();
 
-					transform_component_ids_to_guids(base_compo, base);
-					transform_component_ids_to_guids(enco_compo, enco);
+					transform_component_ids_to_guids_in_place(base_compo, base);
+					transform_component_ids_to_guids_in_place(enco_compo, enco);
 
 					if (write_delta(base_compo, enco_compo, new_content)) {
 						entity_changed = true;
@@ -366,7 +379,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 					component_type decoded_component;
 
 					read_delta(decoded_component, in, true);
-					transform_component_guids_to_ids(decoded_component, deco);
+					transform_component_guids_to_ids_in_place(decoded_component, deco);
 
 					new_entity.allocator::add(decoded_component);
 				}
@@ -383,7 +396,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 			return;
 		}
 
-		const auto changed_entity = deco.get_entity_by_guid(guid_of_changed);
+		const auto changed_entity = deco.get_handle(guid_of_changed);
 
 		std::array<bool, COMPONENTS_COUNT> overridden_components;
 		std::array<bool, COMPONENTS_COUNT> removed_components;
@@ -414,16 +427,16 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 
 						read_delta(decoded_component, in, true);
 						
-						transform_component_guids_to_ids(decoded_component, deco);
+						transform_component_guids_to_ids_in_place(decoded_component, deco);
 						
 						changed_entity.allocator::add(decoded_component);
 					}
 					else {
 						component_type decoded_component = deco_c.get();
 
-						transform_component_ids_to_guids(decoded_component, deco);
+						transform_component_ids_to_guids_in_place(decoded_component, deco);
 						read_delta(decoded_component, in);
-						transform_component_guids_to_ids(decoded_component, deco);
+						transform_component_guids_to_ids_in_place(decoded_component, deco);
 
 						changed_entity.allocator::get<component_type>() = decoded_component;
 					}
@@ -445,7 +458,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 			return;
 		}
 
-		deco.delete_entity(deco.get_entity_by_guid(guid_of_destroyed));
+		deco.delete_entity(deco.get_handle(guid_of_destroyed));
 #else
 		static_assert(false, "Unimplemented");
 #endif
@@ -577,6 +590,27 @@ TEST(CosmicDelta, CosmicDeltaPaddingTest) {
 	for_each_in_tuple(put_all_components_into_t<std::tuple>(), padding_checker);
 }
 
+TEST(Cosmos, GuidizeTests) {
+	cosmos c1(2);
+
+	const auto new_ent1 = c1.create_entity("e1");
+
+	item_slot_transfer_request_data dt;
+	dt.item = new_ent1;
+
+	const auto guidized = c1.guidize(dt);
+
+	EXPECT_EQ(0, guidized.target_slot.container_entity);
+	EXPECT_EQ(1, guidized.item);
+
+	const auto deguidized = c1.deguidize(guidized);
+	EXPECT_EQ(dt.item, deguidized.item);
+	EXPECT_EQ(dt.target_slot.container_entity, deguidized.target_slot.container_entity);
+	EXPECT_EQ(entity_id(), deguidized.target_slot.container_entity);
+	// sanity check
+	EXPECT_EQ(entity_id(), dt.target_slot.container_entity);
+}
+
 TEST(CosmicDelta, CosmicDeltaEmptyAndTwoNew) {
 	cosmos c1(2);
 	cosmos c2(2);
@@ -605,8 +639,8 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndTwoNew) {
 		cosmic_delta::decode(c1, s);
 	}
 
-	const auto ent1 = c1.get_entity_by_guid(first_guid);
-	const auto ent2 = c1.get_entity_by_guid(second_guid);
+	const auto ent1 = c1.get_handle(first_guid);
+	const auto ent2 = c1.get_handle(second_guid);
 
 	// check if components are intact after encode/decode cycle
 
@@ -672,9 +706,9 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndCreatedThreeEntitiesWithReferences) {
 	ASSERT_EQ(3, c1.entities_count());
 	ASSERT_EQ(3, c2.entities_count());
 
-	const auto ent1 = c1.get_entity_by_guid(first_guid);
-	const auto ent2 = c1.get_entity_by_guid(second_guid);
-	const auto ent3 = c1.get_entity_by_guid(third_guid);
+	const auto ent1 = c1.get_handle(first_guid);
+	const auto ent2 = c1.get_handle(second_guid);
+	const auto ent3 = c1.get_handle(third_guid);
 
 	ASSERT_TRUE(ent1.has<components::sentience>());
 	ASSERT_TRUE(ent1.has<components::position_copying>());
@@ -763,7 +797,7 @@ TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
 		ASSERT_EQ(1, comparatory.size());
 	}
 
-	c2.delete_entity(c2.get_entity_by_guid(c2_second_guid));
+	c2.delete_entity(c2.get_handle(c2_second_guid));
 	ASSERT_EQ(2, c2.entities_count());
 
 	{
@@ -783,9 +817,9 @@ TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
 
 	ASSERT_EQ(2, c1.entities_count());
 
-	const auto ent1 = c1.get_entity_by_guid(c1_first_guid);
+	const auto ent1 = c1.get_handle(c1_first_guid);
 	ASSERT_FALSE(c1.entity_exists_with_guid(c1_second_guid));
-	const auto ent3 = c1.get_entity_by_guid(c1_third_guid);
+	const auto ent3 = c1.get_handle(c1_third_guid);
 
 	ASSERT_TRUE(ent1.has<components::position_copying>());
 	const bool pc1_dead = c1[ent1.get<components::position_copying>().target].dead();

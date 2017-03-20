@@ -5,6 +5,7 @@
 #include "augs/misc/input_context.h"
 
 #include "game/detail/inventory/inventory_utils.h"
+#include "generated_introspectors.h"
 
 template <class key>
 void basic_cosmic_entropy<key>::override_transfers_leaving_other_entities(
@@ -12,15 +13,15 @@ void basic_cosmic_entropy<key>::override_transfers_leaving_other_entities(
 	std::vector<basic_item_slot_transfer_request_data<key>> new_transfers
 ) {
 	erase_remove(transfer_requests, [&](const basic_item_slot_transfer_request_data<key> o) {
-		const auto overridden_transfer = match_transfer_capabilities(cosm[o]);
+		const auto overridden_transfer = match_transfer_capabilities(cosm, cosm.deguidize(o));
 		
 		ensure(overridden_transfer.is_legal());
 
 		for (const auto n : new_transfers) {
-			const auto new_transfer = cosm[n];
+			const auto new_transfer = cosm[cosm.deguidize(n)];
 			
 			if (
-				match_transfer_capabilities(new_transfer).authorized_capability
+				match_transfer_capabilities(cosm, new_transfer).authorized_capability
 				== overridden_transfer.authorized_capability
 			) {
 				return true;
@@ -94,15 +95,15 @@ cosmic_entropy::cosmic_entropy(
 	const cosmos& mapper
 ) {
 	for (const auto& entry : b.intents_per_entity) {
-		intents_per_entity[mapper.get_entity_by_guid(entry.first).get_id()] = entry.second;
+		intents_per_entity[mapper.get_handle(entry.first).get_id()] = entry.second;
 	}
 
 	for (const auto& entry : b.cast_spells) {
-		cast_spells[mapper.get_entity_by_guid(entry.first).get_id()] = entry.second;
+		cast_spells[mapper.get_handle(entry.first).get_id()] = entry.second;
 	}
 
 	for (const auto& entry : b.transfer_requests) {
-		transfer_requests.push_back(mapper[entry]);
+		transfer_requests.push_back(mapper.deguidize(entry));
 	}
 }
 

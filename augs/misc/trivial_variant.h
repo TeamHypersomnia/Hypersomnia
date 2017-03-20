@@ -76,7 +76,7 @@ namespace augs {
 	public:
 		template<class T>
 		static void assert_correct_type() {
-			static_assert(has_found_type_in_v<T, Types...>, "trivial_variant does not contain the specified type!");
+			static_assert(is_one_of_v<T, Types...>, "trivial_variant does not contain the specified type!");
 		}
 
 		typedef std::tuple<Types...> types_tuple;

@@ -122,7 +122,7 @@ namespace prefabs {
 		sample_magazine.add_standard_components();
 		
 		if (charge_inside.alive()) {
-			item_slot_transfer_request load_charge(charge_inside, sample_magazine[slot_function::ITEM_DEPOSIT]);
+			item_slot_transfer_request_data load_charge(charge_inside, sample_magazine[slot_function::ITEM_DEPOSIT]);
 			perform_transfer(load_charge, step);
 		}
 
@@ -160,7 +160,7 @@ namespace prefabs {
 
 		sample_magazine.add_standard_components();
 
-		item_slot_transfer_request load_charge(charge_inside, sample_magazine[slot_function::ITEM_DEPOSIT]);
+		item_slot_transfer_request_data load_charge(charge_inside, sample_magazine[slot_function::ITEM_DEPOSIT]);
 		perform_transfer(load_charge, step);
 
 		return sample_magazine;

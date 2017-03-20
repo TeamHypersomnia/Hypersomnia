@@ -9,13 +9,13 @@ namespace augs {
 		class... Instances
 	>
 	void introspect(
-		F callback,
+		F&& callback,
 		Instance&& t,
 		Instances&&... tn
 	) {
 		introspect_body(
 			static_cast<std::decay_t<Instance>*>(nullptr), 
-			callback, 
+			std::forward<F>(callback),
 			std::forward<Instance>(t), 
 			std::forward<Instances>(tn)...
 		);
@@ -24,144 +24,98 @@ namespace augs {
 	/*
 		Explanation of conditional specialization:
 
-		if call on type is valid
-			if type is not excluded
-				call without recursion
-			else
-				do nothing
-		else
-			if type is not excluded
-				if type is an introspective leaf
-					do nothing
-				else
-					recurse without calling (static_asserts that introspectors exist at this point)
-			else
-				do nothing
-	
+		if call on given types is valid
+			call
+		if should recurse with given types and types are not introspective leaves
+			recurse (static_asserts that introspectors exist at this point)
 	*/
 
 	template <
-		template <class A> class call_valid_predicate,
-		template <class B> class exclude_type_predicate,
-		class MemberType,
-		class = void
+		bool flag,
+		class F,
+		class... Args
 	>
-	struct recursive_introspector;
+	void conditional_call(
+		F&& callback,
+		Args&&... args,
+		std::enable_if_t<flag>* = nullptr
+	) {
+		callback(std::forward<Args>(args)...);
+	}
 
 	template <
-		template <class A> class call_valid_predicate,
-		template <class B> class exclude_type_predicate,
-		class MemberType
-	>	
-	struct recursive_introspector<
-		call_valid_predicate,
-		exclude_type_predicate,
-		MemberType,
-		std::enable_if_t<
-			call_valid_predicate<MemberType>::value 
-			&& !exclude_type_predicate<MemberType>::value
-		>
-	> {
-		template <class F, class L, class... MemberInstances>
-		void operator()(
-			F callback,
-			const L& label,
-			MemberInstances&&... member_instances
-		) {
-			callback(
-				label,
-				std::forward<MemberInstances>(member_instances)...
-			);
-		}
-	};
+		bool flag,
+		class F,
+		class... Args
+	>
+	void conditional_call(
+		F&& callback,
+		Args&&...,
+		std::enable_if_t<!flag>* = nullptr
+	) {
+
+	}
+
+	/*
+		Because the introspected members will always be passed to the callback as some kind of reference,
+		it makes sense to remove them from the argument to predicates to simplify the implementation of "should recurse" and "call valid" predicates.
 	
+		It is a separate function also for the reason that the compiler has troubles unpacking the parameter packs in lambdas,
+		when the pattern is more complex.
+	*/
 
 	template <
-		template <class A> class call_valid_predicate,
-		template <class B> class exclude_type_predicate,
-		class MemberType
+		template <class...> class pred,
+		class... Args
 	>
-	struct recursive_introspector<
-		call_valid_predicate,
-		exclude_type_predicate,
-		MemberType,
-		std::enable_if_t<
-			!call_valid_predicate<MemberType>::value 
-			&& !is_introspective_leaf_v<MemberType>
-			&& !exclude_type_predicate<MemberType>::value
-		>
-	> {
-		template <class F, class L, class... MemberInstances>
-		void operator()(
-			F callback,
-			const L& label,
-			MemberInstances&&... member_instances
-		) {
-			static_assert(has_introspect_v<MemberType>, "Found a non-fundamental type without an introspector, on whom the callback is invalid.");
-
-			introspect_recursive<
-				call_valid_predicate,
-				exclude_type_predicate
-			>(
-				callback,
-				std::forward<MemberInstances>(member_instances)...
-			);
-		}
-	};
+	inline constexpr bool eval() {
+		return pred<std::remove_reference_t<Args>...>::value;
+	}
 
 	template <
-		template <class A> class call_valid_predicate,
-		template <class B> class exclude_type_predicate,
-		class MemberType
-	>
-	struct recursive_introspector<
-		call_valid_predicate,
-		exclude_type_predicate,
-		MemberType,
-		std::enable_if_t<
-			(
-				!call_valid_predicate<MemberType>::value 
-				&& is_introspective_leaf_v<MemberType>
-			) 
-			|| exclude_type_predicate<MemberType>::value
-		>
-	> {
-		template <class F, class... MemberInstances>
-		void operator()(
-			F callback,
-			MemberInstances&&... member_instances
-		) {
-
-		}
-	};
-
-	template <
-		template <class A> class call_valid_predicate,
-		template <class B> class exclude_type_predicate,
+		template <class...> class call_valid_predicate,
+		template <class...> class should_recurse_predicate,
+		bool stop_recursion_if_valid,
 		class F,
 		class... Instances
 	>
 	void introspect_recursive(
-		F member_callback,
+		F&& member_callback,
 		Instances&&... introspected_instances
 	) {
 		introspect(
 			[&](
-				const auto& label, 
-				auto&& first_instance, 
-				auto&&... instances
+				auto&& label, 
+				auto&&... args
 			) {
-				typedef std::decay_t<decltype(first_instance)> this_member_type;
+				conditional_call<
+					eval<call_valid_predicate, decltype(args)...>()
+				> (
+					[&](auto...) {
+						member_callback(
+							std::forward<decltype(label)>(label),
+							std::forward<decltype(args)>(args)...
+						);
+					}
+				);
 
-				recursive_introspector<
-					call_valid_predicate,
-					exclude_type_predicate,
-					this_member_type
-				>()(
-					member_callback,
-					label,
-					std::forward<decltype(first_instance)>(first_instance),
-					std::forward<decltype(instances)>(instances)...
+				conditional_call<
+					eval<should_recurse_predicate, decltype(args)...>()
+					&& eval<is_any_not_an_introspective_leaf, decltype(args)...>()
+					&& !(eval<call_valid_predicate, decltype(args)...>() && stop_recursion_if_valid)
+				> (
+					[&](auto...) {
+						static_assert(eval<have_introspects, decltype(args)...>(), "Recursion requested on type(s) without introspectors!");
+						
+						introspect_recursive <
+							call_valid_predicate,
+							should_recurse_predicate,
+							stop_recursion_if_valid
+						> (
+							std::forward<F>(member_callback),
+							std::forward<decltype(args)>(args)...
+						);
+					}
 				);
 			},
 			std::forward<Instances>(introspected_instances)...

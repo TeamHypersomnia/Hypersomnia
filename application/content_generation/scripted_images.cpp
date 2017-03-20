@@ -44,8 +44,9 @@ void regenerate_scripted_images(
 					command_type new_command;
 
 					augs::introspect_recursive<
-						can_stream_right_predicate_t<std::istringstream>,
-						exclude_no_type
+						bind_types_t<can_stream_right, std::istringstream>,
+						always_recurse,
+						stop_recursion_if_valid
 					>(
 						[&](auto, auto& member) {
 							in >> member;

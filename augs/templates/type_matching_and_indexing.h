@@ -77,10 +77,16 @@ template <
 using find_matching_type = find_matching_type_detail<0, Criterion, SearchedType, List>;
 
 template <class S, class List>
-constexpr bool has_found_type_in_list_v = find_matching_type<std::is_same, S, List>::found;
+using is_one_of_list = std::bool_constant<find_matching_type<std::is_same, S, List>::found>;
 
 template <class S, class... Types>
-constexpr bool has_found_type_in_v = has_found_type_in_list_v<S, std::tuple<Types...>>;
+using is_one_of = is_one_of_list<S, std::tuple<Types...>>;
+
+template <class S, class List>
+constexpr bool is_one_of_list_v = find_matching_type<std::is_same, S, List>::found;
+
+template <class S, class... Types>
+constexpr bool is_one_of_v = is_one_of_list_v<S, std::tuple<Types...>>;
 
 template <class S, class List>
 constexpr unsigned index_in_list_v = find_matching_type<std::is_same, S, List>::index;
@@ -103,8 +109,8 @@ struct nth_type_in {
 template<unsigned idx, class... Types>
 using nth_type_in_t = typename nth_type_in<idx, Types...>::type;
 
-static_assert(has_found_type_in_list_v<unsigned, std::tuple<float, float, double, unsigned>>, "Something wrong with trait");
-static_assert(has_found_type_in_v<unsigned, float, float, double, unsigned>, "Something wrong with trait");
+static_assert(is_one_of_list_v<unsigned, std::tuple<float, float, double, unsigned>>, "Something wrong with trait");
+static_assert(is_one_of_v<unsigned, float, float, double, unsigned>, "Something wrong with trait");
 
 static_assert(index_in_list_v<unsigned, std::tuple<float, float, double, unsigned>> == 3, "Something wrong with trait");
 static_assert(index_in_v<unsigned, float, float, double, unsigned> == 3, "Something wrong with trait");

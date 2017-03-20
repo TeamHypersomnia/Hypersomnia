@@ -37,8 +37,11 @@ bool capability_comparison::is_authorized(const const_entity_handle h) const {
 }
 
 capability_comparison match_transfer_capabilities(
-	const_item_slot_transfer_request r
+	const cosmos& cosm,
+	item_slot_transfer_request_data r_data
 ) {
+	const auto r = cosm[r_data];
+
 	const auto& dead_entity = r.get_item().get_cosmos()[entity_id()];
 
 	const auto item_owning_capability = r.get_item().get_owning_transfer_capability();
@@ -82,7 +85,7 @@ item_transfer_result query_transfer_result(const const_item_slot_transfer_reques
 
 	ensure(r.specified_quantity != 0);
 
-	const auto capabilities_compared = match_transfer_capabilities(r);
+	const auto capabilities_compared = match_transfer_capabilities(r.get_item().get_cosmos(), r);
 	const auto result = capabilities_compared.relation_type;
 
 	if (result == capability_relation::UNMATCHING) {
@@ -318,7 +321,7 @@ void drop_from_all_slots(const entity_handle c, const logic_step step) {
 
 	for (const auto& s : container.slots) {
 		for (const auto item : s.second.items_inside) {
-			perform_transfer({ c.get_cosmos()[item], c.get_cosmos()[inventory_slot_id()] }, step);
+			perform_transfer(item_slot_transfer_request{ c.get_cosmos(), { item, inventory_slot_id() } }, step);
 		}
 	}
 }
@@ -413,8 +416,12 @@ augs::constant_size_vector<item_slot_transfer_request_data, 4> swap_slots_for_it
 	return std::move(output);
 }
 
-void perform_transfer(const item_slot_transfer_request r, const logic_step step) {
-	auto& cosmos = r.get_item().get_cosmos();
+void perform_transfer(
+	const item_slot_transfer_request_data r_data, 
+	const logic_step step
+) {
+	auto& cosmos = step.cosm;
+	const auto r = item_slot_transfer_request{ cosmos, r_data };
 	auto& item = r.get_item().get<components::item>();
 
 	const auto result = query_transfer_result(r);

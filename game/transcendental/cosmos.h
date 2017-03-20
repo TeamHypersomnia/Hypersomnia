@@ -95,7 +95,7 @@ class EMPTY_BASES cosmos :
 	friend class cosmic_delta;
 
 	template<class T>
-	friend void transform_component_guids_to_ids(T&, const cosmos&);
+	friend void transform_component_guids_to_ids_in_place(T&, const cosmos&);
 
 	std::map<entity_guid, entity_id> guid_map_for_transport;
 	std::vector<std::string> entity_debug_names;
@@ -178,8 +178,8 @@ public:
 	}
 
 #if COSMOS_TRACKS_GUIDS
-	entity_handle get_entity_by_guid(const entity_guid);
-	const_entity_handle get_entity_by_guid(const entity_guid) const;
+	entity_handle get_handle(const entity_guid);
+	const_entity_handle get_handle(const entity_guid) const;
 	bool entity_exists_with_guid(const entity_guid) const;
 #endif
 
@@ -192,13 +192,96 @@ public:
 	item_slot_transfer_request get_handle(const item_slot_transfer_request_data);
 	const_item_slot_transfer_request get_handle(const item_slot_transfer_request_data) const;
 #if COSMOS_TRACKS_GUIDS
-	inventory_slot_handle get_handle(const basic_inventory_slot_id<entity_guid>);
-	const_inventory_slot_handle get_handle(const basic_inventory_slot_id<entity_guid>) const;
-	item_slot_transfer_request get_handle(const basic_item_slot_transfer_request_data<entity_guid>);
-	const_item_slot_transfer_request get_handle(const basic_item_slot_transfer_request_data<entity_guid>) const;
+public:
+	template <
+		class destination_id_type,
+		template <class> class T,
+		class source_id_type,
+		class F
+	>
+	static T<destination_id_type> transform_ids_in(
+		const T<source_id_type>& source,
+		F transformator,
+		std::enable_if_t<!std::is_same_v<destination_id_type, source_id_type>>* = nullptr
+	) {
+		T<destination_id_type> destination;
+		
+		auto rewrite_rest_of_the_members =
+			[](auto, auto& written_to, const auto& written_from) {
+				written_to = written_from;
+			}
+		;
 
-	basic_inventory_slot_id<entity_guid> guidize(const inventory_slot_id) const;
-	basic_item_slot_transfer_request_data<entity_guid> guidize(const item_slot_transfer_request_data) const;
+		typedef concat_unary_t<
+			std::conjunction,
+			bind_types_t<std::is_base_of, destination_id_type>,
+			bind_types_t<std::is_base_of, const source_id_type>
+		> are_of_id_types;
+
+		augs::introspect_recursive<
+			apply_to_arguments_t<std::is_assignable, std::add_lvalue_reference_t>,
+			apply_negation_t<are_of_id_types>,
+			stop_recursion_if_valid
+		>(
+			rewrite_rest_of_the_members,
+			destination,
+			source
+		);
+
+		augs::introspect_recursive<
+			are_of_id_types,
+			always_recurse,
+			stop_recursion_if_valid
+		>(
+			[transformator](auto, auto& destination_id_member, const auto& source_id_member) {
+				transformator(destination_id_member, source_id_member);
+			},
+			destination,
+			source
+		);
+
+		return destination;
+	}
+	template <
+		class destination_id_type,
+		template <class> class T,
+		class F
+	>
+	static T<destination_id_type> transform_ids_in(
+		const T<destination_id_type>& source,
+		F transformator
+	) {
+		return source;
+	}
+
+	template <template <class> class Guidized, class source_id_type>
+	Guidized<entity_guid> guidize(const Guidized<source_id_type>& id_source) const {
+		return transform_ids_in<entity_guid>(
+			id_source,
+			[this](auto& guid_member, const auto& id_member) {
+				const auto handle = get_handle(id_member);
+			
+				if (handle.alive()) {
+					guid_member = get_handle(id_member).get_guid();
+				}
+				else {
+					guid_member = entity_guid();
+				}
+			}
+		);
+	}
+
+	template <template <class> class Deguidized, class source_id_type>
+	Deguidized<entity_id> deguidize(const Deguidized<source_id_type>& guid_source) const {
+		return transform_ids_in<entity_id>(
+			guid_source,
+			[this](auto& id_member, const auto& guid_member) {
+				if (guid_member != entity_guid()) {
+					id_member = guid_map_for_transport.at(guid_member);
+				}
+			}
+		);
+	}
 #endif
 
 	si_scaling get_si() const;
@@ -306,11 +389,11 @@ inline si_scaling cosmos::get_si() const {
 }
 
 #if COSMOS_TRACKS_GUIDS
-inline entity_handle cosmos::get_entity_by_guid(const entity_guid guid) {
+inline entity_handle cosmos::get_handle(const entity_guid guid) {
 	return get_handle(guid_map_for_transport.at(guid));
 }
 
-inline const_entity_handle cosmos::get_entity_by_guid(const entity_guid guid) const {
+inline const_entity_handle cosmos::get_handle(const entity_guid guid) const {
 	return get_handle(guid_map_for_transport.at(guid));
 }
 
@@ -348,72 +431,12 @@ inline const_inventory_slot_handle cosmos::get_handle(const inventory_slot_id id
 }
 
 inline item_slot_transfer_request cosmos::get_handle(const item_slot_transfer_request_data data) {
-	return {
-		get_handle(data.item),
-		get_handle(data.target_slot),
-		data.specified_quantity,
-		data.force_immediate_mount
-	};
+	return { *this, data };
 }
 
 inline const_item_slot_transfer_request cosmos::get_handle(const item_slot_transfer_request_data data) const {
-	return {
-		get_handle(data.item),
-		get_handle(data.target_slot),
-		data.specified_quantity,
-		data.force_immediate_mount
-	};
+	return { *this, data };
 }
-
-#if COSMOS_TRACKS_GUIDS
-
-inline inventory_slot_handle cosmos::get_handle(const basic_inventory_slot_id<entity_guid> id) {
-	return {
-		*this,
-		{
-			id.type,
-			get_entity_by_guid(id.container_entity)
-		}
-	};
-}
-
-inline const_inventory_slot_handle cosmos::get_handle(const basic_inventory_slot_id<entity_guid> id) const {
-	return {
-		*this,
-		{
-			id.type,
-			get_entity_by_guid(id.container_entity)
-		}
-	};
-}
-
-inline item_slot_transfer_request cosmos::get_handle(const basic_item_slot_transfer_request_data<entity_guid> data) {
-	return {
-		get_entity_by_guid(data.item),
-		get_handle(data.target_slot),
-		data.specified_quantity,
-		data.force_immediate_mount
-	};
-}
-
-inline const_item_slot_transfer_request cosmos::get_handle(const basic_item_slot_transfer_request_data<entity_guid> data) const {
-	return {
-		get_entity_by_guid(data.item),
-		get_handle(data.target_slot),
-		data.specified_quantity,
-		data.force_immediate_mount
-	};
-}
-
-inline basic_inventory_slot_id<entity_guid> cosmos::guidize(const inventory_slot_id id) const {
-	return { id.type, get_guid(get_handle(id.container_entity)) };
-}
-
-inline basic_item_slot_transfer_request_data<entity_guid> cosmos::guidize(const item_slot_transfer_request_data data) const {
-	return { get_guid(get_handle(data.item)), guidize(data.target_slot), data.specified_quantity, data.force_immediate_mount };
-}
-
-#endif
 
 inline randomization cosmos::get_rng_for(const entity_id id) const {
 	return{ get_rng_seed_for(id) };

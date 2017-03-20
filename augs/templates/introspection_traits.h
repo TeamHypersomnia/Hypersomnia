@@ -1,4 +1,5 @@
 #pragma once
+#include <type_traits>
 
 struct true_returner {
 	template <class... Types>
@@ -35,67 +36,39 @@ namespace std {
 namespace augs {
 	template <class T>
 	class enum_bitset;
-
-	template <class... Types>
-	class trivial_variant;
 }
 
-template <class T, class = void>
-struct is_trivial_variant : std::false_type {
-
-};
-
-template <class... Types>
-struct is_trivial_variant<augs::trivial_variant<Types...>> : std::true_type {
-
-};
-
-template <template <typename...> class C, typename...Ts>
-std::true_type is_base_of_template_impl(const C<Ts...>*);
-
-template <template <typename...> class C>
-std::false_type is_base_of_template_impl(...);
-
-template <typename T, template <typename...> class C>
-using is_base_of_template = decltype(is_base_of_template_impl<C>(std::declval<T*>()));
-
 template <class T>
-struct is_base_of_trivial_variant 
-	: std::bool_constant<is_base_of_template<T, augs::trivial_variant>::value>
-{
-};
-
-template <class T>
-struct is_bitset : std::false_type {
+struct is_bitset_detail : std::false_type {
 
 };
 
 template <class T>
-struct is_bitset<augs::enum_bitset<T>> : std::true_type {
+struct is_bitset_detail<augs::enum_bitset<T>> : std::true_type {
 
 };
 
 template <size_t I>
-struct is_bitset<std::bitset<I>> : std::true_type {
+struct is_bitset_detail<std::bitset<I>> : std::true_type {
+
+};
+
+template <class T>
+struct is_bitset : is_bitset_detail<std::remove_cv_t<T>> {
 
 };
 
 template <class T>
 constexpr bool is_bitset_v = is_bitset<T>::value;
 
-template <class T, class = void>
-struct is_introspective_leaf : std::false_type {
-};
-
 template <class T>
-struct is_introspective_leaf<T, 
-	std::enable_if_t<
-		std::is_enum_v<T> 
-		|| std::is_arithmetic_v<T> 
+struct is_introspective_leaf : 
+	std::bool_constant<
+		std::is_enum_v<T>
+		|| std::is_arithmetic_v<T>
 		|| is_bitset_v<T>
-	>
-> : std::true_type {
-
+	> 
+{
 };
 
 template <class T>
@@ -127,31 +100,164 @@ constexpr bool can_stream_left_v = can_stream_left<StreamType, T>::value;
 template <class StreamType, class T>
 constexpr bool can_stream_right_v = can_stream_right<StreamType, T>::value;
 
-template <class StreamType>
-struct can_stream_left_predicate {
-	template <class T>
-	struct predicate
-		: std::bool_constant<can_stream_left_v<StreamType, T>> 
+template <
+	template <class...> class TypePredicate
+>
+struct apply_negation {
+	template <class... PredicateArguments>
+	struct type
+		: std::negation<TypePredicate<PredicateArguments...>> {
+	};
+};
+
+template <
+	template <class...> class TypePredicate
+>
+using apply_negation_t = typename apply_negation<TypePredicate>::type;
+
+template <
+	template <class...> class TypePredicate,
+	template <class> class ArgumentTransform
+>
+struct apply_to_arguments {
+	template <class... PredicateArguments>
+	struct type
+		: TypePredicate<ArgumentTransform<PredicateArguments>...> {
+	};
+};
+
+template <
+	template <class...> class TypePredicate,
+	template <class> class ArgumentTransform
+>
+using apply_to_arguments_t = typename apply_to_arguments<TypePredicate, ArgumentTransform>::type;
+
+template <
+	template <class...> class TypePredicate,
+	class... BoundTypes
+>
+struct bind_types {
+	template <class... PredicateArguments>
+	struct type 
+		: TypePredicate<BoundTypes..., PredicateArguments...> {
+	};
+};
+
+template <
+	template <class...> class TypePredicate,
+	class... BoundTypes
+>
+using bind_types_t = typename bind_types<TypePredicate, BoundTypes...>::type;
+
+template <
+	template <class...> class TypePredicate,
+	class... BoundTypes
+>
+struct bind_types_right {
+	template <class... PredicateArguments>
+	struct type
+		: TypePredicate<PredicateArguments..., BoundTypes...> {
+	};
+};
+
+template <
+	template <class...> class TypePredicate,
+	class... BoundTypes
+>
+using bind_types_right_t = typename bind_types_right<TypePredicate, BoundTypes...>::type;
+
+template <
+	template <class...> class LogicalOp,
+	template <class...> class... UnaryPredicates
+>
+struct concat_unary {
+	template <class... TypeArguments>
+	struct type
+		: LogicalOp<UnaryPredicates<TypeArguments>...>
 	{
 	};
 };
 
-template <class StreamType>
-struct can_stream_right_predicate {
-	template <class T>
-	struct predicate
-		: std::bool_constant<can_stream_right_v<StreamType, T>>
+template <
+	template <class...> class LogicalOp,
+	template <class...> class... UnaryPredicates
+>
+using concat_unary_t = typename concat_unary<LogicalOp, UnaryPredicates...>::type;
+
+template <
+	template <class...> class LogicalOp,
+	template <class...> class UnaryPredicate
+>
+struct make_variadic_predicate {
+	template <class... TypeArguments>
+	struct type
+		: LogicalOp<UnaryPredicate<TypeArguments>...>
 	{
 	};
 };
 
-template <class StreamType>
-using can_stream_left_predicate_t = typename can_stream_left_predicate<StreamType>::predicate;
+template <
+	template <class...> class LogicalOp,
+	template <class...> class UnaryPredicate
+>
+using make_variadic_predicate_t = typename make_variadic_predicate<LogicalOp, UnaryPredicate>::type;
 
-template <class StreamType>
-using can_stream_right_predicate_t = typename can_stream_right_predicate<StreamType>::predicate;
+template <
+	template <class...> class LogicalOp,
+	template <class...> class... Predicates
+>
+struct of_predicates {
+	template <class T>
+	struct type
+		: LogicalOp<Predicates<T>...>
+	{
+	};
+};
 
-template <class T>
-struct exclude_no_type : std::false_type {
+template <
+	template <class...> class LogicalOp,
+	template <class...> class... Predicates
+>
+using of_predicates_t = typename of_predicates<LogicalOp, Predicates...>::type;
+
+template <class...>
+struct true_predicate : std::true_type {
 
 };
+
+template <class...>
+struct false_predicate : std::false_type {
+
+};
+
+
+template <bool flag>
+struct bool_predicate : std::false_type {
+	template <class...>
+	struct type : std::bool_constant<flag> {
+
+	};
+};
+
+template <bool flag>
+using bool_predicate_t = typename bool_predicate<flag>::type;
+
+template <class... T>
+using do_not_recurse = false_predicate<T...>;
+
+template <class... T>
+using always_recurse = true_predicate<T...>;
+
+template <class... T>
+using have_introspects = make_variadic_predicate<
+	std::conjunction,
+	has_introspect
+>::type<T...>;
+
+template <class... T>
+using is_any_not_an_introspective_leaf = make_variadic_predicate<
+	std::disjunction,
+	apply_negation_t<is_introspective_leaf>
+>::type<T...>;
+
+constexpr bool stop_recursion_if_valid = true;

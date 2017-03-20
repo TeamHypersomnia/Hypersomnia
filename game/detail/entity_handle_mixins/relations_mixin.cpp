@@ -10,6 +10,7 @@
 #include "game/components/physical_relations_component.h"
 #include "game/components/crosshair_component.h"
 #include "augs/templates/container_templates.h"
+#include "augs/templates/type_matching_and_indexing.h"
 
 #include "generated_introspectors.h"
 
@@ -25,8 +26,9 @@ template <class D>
 components::physical_relations& relations_mixin<false, D>::physical_relations_component() const {
 	auto& self = *static_cast<const D*>(this);
 
-	if (!self.has<components::physical_relations>())
+	if (!self.has<components::physical_relations>()) {
 		self.add(components::physical_relations());
+	}
 
 	return self.get<components::physical_relations>();
 }
@@ -45,11 +47,17 @@ void relations_mixin<false, D>::make_cloned_child_entities_recursive(const entit
 			ensure(from.has<component_type>());
 
 			augs::introspect_recursive<
-				is_entity_id_type,
-				template_disjunction_t<
-					is_non_child_id_type,
-					is_base_of_trivial_variant
-				>
+				concat_unary_t<
+					std::conjunction,
+					bind_types_t<std::is_same, child_entity_id>,
+					bind_types_t<std::is_same, const child_entity_id>
+				>,
+				concat_unary_t<
+					std::conjunction,
+					bind_types_t<std::is_same, shape_variant>,
+					bind_types_t<std::is_same, const shape_variant>
+				>,
+				stop_recursion_if_valid
 			> (
 				[&](auto, auto& cloned_into_id, const auto& cloned_from_id) {
 					cloned_into_id = cosmos.clone_entity(cloned_from_id);

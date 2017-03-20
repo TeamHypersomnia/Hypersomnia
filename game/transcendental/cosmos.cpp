@@ -157,7 +157,7 @@ cosmos& cosmos::operator=(const cosmos& b) {
 #if COSMOS_TRACKS_GUIDS
 
 void cosmos::assign_next_guid(const entity_handle new_entity) {
-	auto this_guid = significant.meta.next_entity_guid++;
+	auto this_guid = significant.meta.next_entity_guid.value++;
 
 	guid_map_for_transport[this_guid] = new_entity;
 	new_entity.get<components::guid>().value = this_guid;

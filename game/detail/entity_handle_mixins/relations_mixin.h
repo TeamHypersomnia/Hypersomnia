@@ -16,12 +16,6 @@
 
 struct entity_relations;
 
-template <class T>
-struct is_non_child_id_type 
-	: std::bool_constant<std::is_same_v<entity_id, T>>
-{
-};
-
 template<bool is_const, class entity_handle_type>
 class basic_relations_mixin {
 protected:
@@ -50,17 +44,15 @@ public:
 		auto& cosmos = self.get_cosmos();
 
 		self.for_each_component(
-			[&](auto& subject_component) {
+			[&cosmos, &callback](auto& subject_component) {
 				augs::introspect_recursive<
-					is_entity_id_type,
-					template_disjunction_t<
-						is_non_child_id_type,
-						is_base_of_trivial_variant
-					>
+					bind_types_t<std::is_same, child_entity_id>,
+					apply_negation_t<apply_to_arguments_t<bind_types_t<std::is_same, shape_variant>, std::remove_cv_t>>,
+					stop_recursion_if_valid
 				> (
 					[&](auto, auto& member_child_entity_id) {
 						const auto child_handle = cosmos[member_child_entity_id];
-
+						
 						if (child_handle.alive() && callback(child_handle)) {
 							child_handle.for_each_child_entity_recursive(callback);
 						}

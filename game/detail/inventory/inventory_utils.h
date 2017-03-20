@@ -8,7 +8,10 @@
 
 #include "game/transcendental/step_declaration.h"
 
-void perform_transfer(const item_slot_transfer_request, const logic_step step);
+void perform_transfer(
+	const item_slot_transfer_request_data, 
+	const logic_step step
+);
 
 template<class C>
 void perform_transfers(const C requests, const logic_step step) {
@@ -56,7 +59,8 @@ struct capability_comparison {
 };
 
 capability_comparison match_transfer_capabilities(
-	const_item_slot_transfer_request
+	const cosmos&,
+	item_slot_transfer_request_data
 );
 
 item_transfer_result query_transfer_result(const_item_slot_transfer_request);

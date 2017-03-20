@@ -54,6 +54,8 @@ template <class id_type>
 struct basic_inventory_slot_id;
 struct inventory_item_address;
 struct inventory_traversal;
+template <class id_type>
+struct basic_item_slot_transfer_request_data;
 struct electric_shield_perk;
 struct haste_perk;
 struct perk_timing;
@@ -70,6 +72,9 @@ struct cosmic_entropy;
 struct cosmos_flyweights_state;
 class cosmos_metadata;
 struct cosmos_significant_state;
+struct entity_guid;
+struct entity_id;
+struct child_entity_id;
 struct hotbar_settings;
 class config_lua_table;
 struct neon_map_stamp;
@@ -99,6 +104,10 @@ namespace augs {
 	template <class Enum, class T>
 	class enum_associative_array;
 	struct machine_entropy;
+	struct raw_pool_id_data;
+	class raw_pool_id;
+	template <class T>
+	class pool_id;
 	struct stepped_timestamp;
 	struct stepped_cooldown;
 	template <class A, class B>
@@ -360,6 +369,34 @@ namespace augs {
 	) {
 		FIELD(local);
 		FIELD(remote);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const augs::raw_pool_id_data* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(version);
+		FIELD(indirection_index);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const augs::raw_pool_id* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(pool);
+	}
+
+	template <class F, class T, class... Instances>
+	void introspect_body(
+		const augs::pool_id<T>* const,
+		F f,
+		Instances&&... _t_
+	) {
+		introspect_body(static_cast<augs::raw_pool_id*>(nullptr), f, std::forward<Instances>(_t_)...);
 	}
 
 	template <class F, class... Instances>
@@ -1451,6 +1488,19 @@ namespace augs {
 		FIELD(item_remains_physical);
 	}
 
+	template <class F, class id_type, class... Instances>
+	void introspect_body(
+		const basic_item_slot_transfer_request_data<id_type>* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(item);
+		FIELD(target_slot);
+
+		FIELD(specified_quantity);
+		FIELD(force_immediate_mount);
+	}
+
 	template <class F, class... Instances>
 	void introspect_body(
 		const electric_shield_perk* const,
@@ -1680,6 +1730,33 @@ namespace augs {
 
 		FIELD(pool_for_aggregates);
 		FIELD(pools_for_components);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const entity_guid* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(value);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const entity_id* const,
+		F f,
+		Instances&&... _t_
+	) {
+		introspect_body(static_cast<augs::pool_id<put_all_components_into_t<augs::component_aggregate>>*>(nullptr), f, std::forward<Instances>(_t_)...);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const child_entity_id* const,
+		F f,
+		Instances&&... _t_
+	) {
+		introspect_body(static_cast<entity_id*>(nullptr), f, std::forward<Instances>(_t_)...);
 	}
 
 	template <class F, class... Instances>

@@ -7,12 +7,14 @@
 
 template <class id_type>
 struct basic_item_slot_transfer_request_data {
+	// GEN INTROSPECTOR struct basic_item_slot_transfer_request_data class id_type
 	id_type item;
 	basic_inventory_slot_id<id_type> target_slot;
 
 	int specified_quantity = -1;
 	bool force_immediate_mount = false;
 	std::array<padding_byte, 3> pad;
+	// END GEN INTROSPECTOR
 
 	basic_item_slot_transfer_request_data(
 		const id_type item = id_type(),
@@ -48,29 +50,18 @@ struct basic_item_slot_transfer_request : public item_slot_transfer_request_data
 	owner_reference owner;
 
 	basic_item_slot_transfer_request(
-		basic_entity_handle<C> item_handle,
-		basic_inventory_slot_handle<C> target_slot_handle, 
-		int specified_quantity = -1, 
-		bool force_immediate_mount = false
+		owner_reference owner,
+		const item_slot_transfer_request_data& data
 	) : 
-		item_slot_transfer_request_data(
-			item_handle.get_id(), 
-			target_slot_handle.get_id(), 
-			specified_quantity, 
-			force_immediate_mount
-		), 
-
-		owner(item_handle.get_cosmos())
+		owner(owner),
+		item_slot_transfer_request_data(data)
 	{
-		ensure_eq(&item_handle.get_cosmos(), &target_slot_handle.get_cosmos());
 	}
 
 	operator basic_item_slot_transfer_request<true>() const {
 		return {
-			get_item(),
-			get_target_slot(),
-			specified_quantity,
-			force_immediate_mount
+			owner,
+			static_cast<const item_slot_transfer_request_data&>(*this)
 		};
 	}
 };

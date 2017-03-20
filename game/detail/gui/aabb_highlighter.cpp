@@ -23,8 +23,8 @@ void aabb_highlighter::draw(
 	const camera_cone camera
 ) const {
 	ltrb aabb;
-	
-	auto aabb_expansion_lambda = [&](const const_entity_handle e) {
+
+	const auto aabb_expansion_lambda = [&aabb, &interp](const const_entity_handle e) {
 		if (!e.has<components::inferred_state>()) {
 			return false;
 		}

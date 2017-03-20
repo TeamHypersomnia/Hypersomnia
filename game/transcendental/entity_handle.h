@@ -117,7 +117,7 @@ private:
 	};
 
 	template <class T>
-	struct component_or_synchronizer_or_disabled<T, std::enable_if_t<is_component_synchronized<T>::value && !has_found_type_in_list_v<T, disabled_components>>> {
+	struct component_or_synchronizer_or_disabled<T, std::enable_if_t<is_component_synchronized<T>::value && !is_one_of_list_v<T, disabled_components>>> {
 		typedef component_synchronizer<is_const, T> return_type;
 
 		basic_entity_handle<is_const> h;
@@ -142,7 +142,7 @@ private:
 	};
 
 	template <class T>
-	struct component_or_synchronizer_or_disabled<T, std::enable_if_t<has_found_type_in_list_v<T, disabled_components>>> {
+	struct component_or_synchronizer_or_disabled<T, std::enable_if_t<is_one_of_list_v<T, disabled_components>>> {
 		typedef maybe_const_ref_t<is_const, T> return_type;
 		typedef maybe_const_ptr_t<is_const, T> return_ptr;
 

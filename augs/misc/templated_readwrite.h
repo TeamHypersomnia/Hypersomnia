@@ -13,7 +13,7 @@ namespace augs {
 	template <class Archive>
 	struct is_native_binary_stream 
 		: std::bool_constant<
-			has_found_type_in_v<
+			is_one_of_v<
 				Archive,
 				augs::stream, 
 				augs::output_stream_reserver, 
@@ -79,6 +79,20 @@ namespace augs {
 		static_assert(is_memcpy_safe_v<Serialized>, "Attempt to serialize a non-trivially copyable type");
 		static_assert(is_native_binary_stream<Archive>::value, "Byte serialization of trivial structs allowed only on native binary archives");
 	}
+	
+	/*
+		Explanation of read/write overloads:
+
+		augs::read/augs::write
+
+		if the type has augs::read_object and augs::write_object overloads
+			call these overloads
+		else if the type is trivial and the stream is a native binary stream
+			bytewise read/write via std::memcpy
+		else
+			assert that the type has introspectors
+			and call augs::read and augs::write upon all members
+	*/
 
 	template<class Archive, class Serialized>
 	void read_bytes(

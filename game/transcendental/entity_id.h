@@ -9,6 +9,24 @@ namespace augs {
 	class component_aggregate;
 }
 
+struct entity_guid {
+	typedef unsigned guid_value_type;
+	// GEN INTROSPECTOR struct entity_guid
+	guid_value_type value = 0u;
+	// END GEN INTROSPECTOR
+
+	entity_guid(const guid_value_type b = 0u) : value(b) {}
+	
+	entity_guid& operator=(const guid_value_type b) {
+		value = b;
+		return *this;
+	}
+
+	operator guid_value_type() const {
+		return value;
+	}
+};
+
 struct unversioned_entity_id : public augs::unversioned_id<put_all_components_into_t<augs::component_aggregate>> {
 	typedef augs::unversioned_id<typename put_all_components_into<augs::component_aggregate>::type> base;
 
@@ -16,6 +34,10 @@ struct unversioned_entity_id : public augs::unversioned_id<put_all_components_in
 };
 
 struct entity_id : public augs::pool_id<put_all_components_into_t<augs::component_aggregate>> {
+	// GEN INTROSPECTOR struct entity_id
+	// INTROSPECT BASE augs::pool_id<put_all_components_into_t<augs::component_aggregate>>
+	// END GEN INTROSPECTOR
+
 	typedef augs::pool_id<put_all_components_into_t<augs::component_aggregate>> base;
 
 	entity_id(const base b = base()) : base(b) {}
@@ -26,6 +48,10 @@ struct entity_id : public augs::pool_id<put_all_components_into_t<augs::componen
 };
 
 struct child_entity_id : entity_id {
+	// GEN INTROSPECTOR struct child_entity_id
+	// INTROSPECT BASE entity_id
+	// END GEN INTROSPECTOR
+
 	typedef entity_id base;
 
 	child_entity_id(const base b = base()) : base(b) {}
@@ -33,15 +59,14 @@ struct child_entity_id : entity_id {
 	using base::operator unversioned_entity_id;
 };
 
-template <class T>
-struct is_entity_id_type 
-	: std::bool_constant<
-		std::is_base_of_v<entity_id, T>
-	>
-{
-};
-
 namespace std {
+	template <>
+	struct hash<entity_guid> {
+		std::size_t operator()(const entity_guid v) const {
+			return hash<entity_guid::guid_value_type>()(v.value);
+		}
+	};
+
 	template <>
 	struct hash<entity_id> {
 		std::size_t operator()(const entity_id v) const {

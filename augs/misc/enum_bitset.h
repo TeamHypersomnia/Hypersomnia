@@ -2,10 +2,10 @@
 #include <bitset>
 
 namespace augs {
-	template<class _enum>
+	template <class _enum>
 	class enum_bitset : private std::bitset<static_cast<size_t>(_enum::COUNT)> {
 		typedef std::bitset<static_cast<size_t>(_enum::COUNT)> base;
-
+		
 	public:
 		using base::reset;
 		using base::any;

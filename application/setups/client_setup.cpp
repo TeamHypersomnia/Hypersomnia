@@ -198,7 +198,7 @@ void client_setup::process_once(
 					unsigned controlled_character_guid;
 					augs::read(stream, controlled_character_guid);
 
-					scene.select_character(hypersomnia.get_entity_by_guid(controlled_character_guid));
+					scene.select_character(hypersomnia.get_handle(controlled_character_guid));
 
 					complete_state_received = true;
 					break;
