@@ -162,6 +162,7 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 					}
 
 					if (raw_input.key == key::NUMPAD1) {
+						current_director_state = director_state::PLAYING;
 						advance_steps_forward = -1;
 
 						if (events.is_set(key::LCTRL)) {
@@ -169,6 +170,7 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 						}
 					}
 					if (raw_input.key == key::NUMPAD2) {
+						current_director_state = director_state::PLAYING;
 						advance_steps_forward = 1;
 
 						if (events.is_set(key::LCTRL)) {

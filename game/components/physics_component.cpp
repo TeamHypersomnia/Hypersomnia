@@ -50,6 +50,12 @@ void component_synchronizer<false, P>::set_body_type(const components::physics::
 
 void component_synchronizer<false, P>::set_activated(const bool flag) const {
 	component.activated = flag;
+
+	if (!flag) {
+		component.velocity.reset();
+		component.angular_velocity = 0.f;
+	}
+
 	reinference();
 }
 

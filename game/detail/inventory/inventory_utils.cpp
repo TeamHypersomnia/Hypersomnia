@@ -576,13 +576,18 @@ void perform_transfer(
 	if (is_drop_request) {
 		ensure(previous_slot.get_container().alive());
 
-		const auto impulse = vec2().set_from_degrees(previous_container_transform.rotation).set_length(2000);
-
 		auto& physics = grabbed_item_part_handle.get<components::physics>();
 		
-		physics.apply_impulse(impulse * physics.get_mass());
-		physics.apply_angular_impulse(1.5f * physics.get_mass());
+		// LOG_NVPS(physics.velocity());
+		// ensure(physics.velocity().is_epsilon());
 
+		if (r_data.impulse_applied_on_drop > 0.f) {
+			const auto impulse = vec2().set_from_degrees(previous_container_transform.rotation) * r_data.impulse_applied_on_drop;
+			physics.apply_impulse(impulse * physics.get_mass());
+		}
+
+		physics.apply_angular_impulse(1.5f * physics.get_mass());
+		
 		auto& special_physics = grabbed_item_part_handle.get<components::special_physics>();
 		special_physics.dropped_or_created_cooldown.set(300, cosmos.get_timestamp());
 		special_physics.during_cooldown_ignore_collision_with = previous_slot.get_container();

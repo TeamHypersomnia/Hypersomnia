@@ -1500,6 +1500,7 @@ namespace augs {
 
 		FIELD(specified_quantity);
 		FIELD(force_immediate_mount);
+		FIELD(impulse_applied_on_drop);
 	}
 
 	template <class F, class... Instances>

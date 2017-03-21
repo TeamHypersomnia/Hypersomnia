@@ -13,20 +13,9 @@ struct basic_item_slot_transfer_request_data {
 
 	int specified_quantity = -1;
 	bool force_immediate_mount = false;
+	float impulse_applied_on_drop = 2000.f;
 	std::array<padding_byte, 3> pad;
 	// END GEN INTROSPECTOR
-
-	basic_item_slot_transfer_request_data(
-		const id_type item = id_type(),
-		const basic_inventory_slot_id<id_type> target_slot = basic_inventory_slot_id<id_type>(),
-		const int specified_quantity = -1, 
-		const bool force_immediate_mount = false
-	) :
-		item(item), 
-		target_slot(target_slot), 
-		specified_quantity(specified_quantity), 
-		force_immediate_mount(force_immediate_mount) {
-	}
 
 	bool operator==(const basic_item_slot_transfer_request_data& b) const {
 		return trivial_compare(*this, b);

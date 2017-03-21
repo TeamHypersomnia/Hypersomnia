@@ -44,10 +44,10 @@ void release_or_throw_grenade(
 	}
 	else {
 		perform_transfer(
-			cosmos [ item_slot_transfer_request_data{ grenade_entity, inventory_slot_id() }], 
+			cosmos [ item_slot_transfer_request_data{ grenade_entity, inventory_slot_id(), -1, false, 0.f }], 
 			step
 		);
-
+		
 		sound_effect_input in;
 		in.delete_entity_after_effect_lifetime = true;
 		in.direct_listener = thrower;
@@ -72,13 +72,19 @@ void release_or_throw_grenade(
 		grenade_entity.get<components::sprite>().set(grenade.released_image_id);
 
 		auto& physics = grenade_entity.get<components::physics>();
-		physics.apply_impulse(vec2().set_from_degrees(grenade_entity.get_logic_transform().rotation) * 2000 * physics.get_mass());
+		
+		//ensure(physics.velocity().is_epsilon());
+
+		physics.set_velocity({ 0.f, 0.f });
+		physics.set_angular_velocity(0.f);
+		physics.apply_angular_impulse(1.5f * physics.get_mass());
+		physics.apply_impulse(vec2().set_from_degrees(grenade_entity.get_logic_transform().rotation) * 4000 * physics.get_mass());
 		physics.set_bullet_body(true);
 		physics.set_linear_damping(3.0f);
 
 		auto& fixtures = grenade_entity.get<components::fixtures>();
 		auto new_def = fixtures.get_data();
-		new_def.colliders[0].restitution = 0.6;
+		new_def.colliders[0].restitution = 0.6f;
 		new_def.colliders[0].density = 10.f;
 
 		const auto aabb = grenade_entity.get_aabb();

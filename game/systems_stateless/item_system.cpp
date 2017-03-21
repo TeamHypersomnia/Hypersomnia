@@ -64,7 +64,7 @@ void item_system::handle_trigger_confirmations_as_pick_requests(const logic_step
 				const bool can_pick_already = item_slot_transfers->pickup_timeout.try_to_fire_and_reset(cosmos.get_timestamp(), delta);
 
 				if (pickup_slot.alive() && can_pick_already) {
-					const item_slot_transfer_request_data request(item_entity, pickup_slot);
+					const item_slot_transfer_request_data request{ item_entity, pickup_slot };
 					perform_transfer(request, step);
 				}
 				else {

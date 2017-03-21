@@ -233,7 +233,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						}
 
 						if (source_store_for_chamber.size() > 0) {
-							const item_slot_transfer_request_data into_chamber_transfer (*source_store_for_chamber.rbegin(), chamber_slot, 1, true);
+							const item_slot_transfer_request_data into_chamber_transfer{ *source_store_for_chamber.rbegin(), chamber_slot, 1, true };
 							perform_transfer(into_chamber_transfer, step);
 						}
 					}
