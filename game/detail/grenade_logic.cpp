@@ -1,4 +1,3 @@
-#include "grenade_logic.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
@@ -6,8 +5,8 @@
 #include "game/detail/inventory/inventory_utils.h"
 #include "game/components/physics_component.h"
 #include "game/components/sprite_component.h"
-#include "game/components/grenade_component.h"
 #include "game/components/fixtures_component.h"
+#include "game/components/grenade_component.h"
 #include "game/components/special_physics_component.h"
 #include "game/components/sound_existence_component.h"
 
@@ -16,7 +15,8 @@
 void release_or_throw_grenade(
 	const logic_step step,
 	const entity_handle grenade_entity,
-	const entity_id thrower_id
+	const entity_id thrower_id,
+	bool is_pressed_flag
 ) {
 	auto& cosmos = step.cosm;
 	const auto now = cosmos.get_timestamp();
@@ -29,7 +29,7 @@ void release_or_throw_grenade(
 
 	auto& grenade = grenade_entity.get<components::grenade>();
 
-	if (!grenade.when_released.was_set()) {
+	if (is_pressed_flag && !grenade.when_released.was_set()) {
 		grenade_entity.get<components::processing>().enable_in(processing_subjects::WITH_GRENADE);
 
 		grenade.when_released = now;
@@ -42,7 +42,7 @@ void release_or_throw_grenade(
 
 		sound_existence_system().create_sound_effect_entity(cosmos, in, thrower_transform, thrower).add_standard_components();
 	}
-	else {
+	else if(!is_pressed_flag) {
 		perform_transfer(
 			cosmos [ item_slot_transfer_request_data{ grenade_entity, inventory_slot_id(), -1, false, 0.f }], 
 			step

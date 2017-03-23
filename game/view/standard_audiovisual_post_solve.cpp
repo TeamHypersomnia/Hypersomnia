@@ -8,7 +8,8 @@
 void viewing_session::standard_audiovisual_post_solve(const const_logic_step step) {
 	const auto& cosmos = step.cosm;
 	const auto& healths = step.transient.messages.get_queue<messages::health_event>();
-	auto new_rings = step.transient.messages.get_queue<messages::exploding_ring>();
+	const auto& new_thunders = step.transient.messages.get_queue<thunder_input>();
+	auto new_rings = step.transient.messages.get_queue<exploding_ring_input>();
 
 	auto& thunders = systems_audiovisual.get<thunder_system>();
 	auto& exploding_rings = systems_audiovisual.get<exploding_ring_system>();
@@ -33,7 +34,7 @@ void viewing_session::standard_audiovisual_post_solve(const const_logic_step ste
 
 				const auto base_radius = is_it_death ? 80.f : h.effective_amount * 1.5;
 				{
-					messages::exploding_ring ring;
+					exploding_ring_input ring;
 
 					ring.outer_radius_start_value = base_radius / 1.5;
 					ring.outer_radius_end_value = base_radius / 3;
@@ -52,7 +53,7 @@ void viewing_session::standard_audiovisual_post_solve(const const_logic_step ste
 				}
 
 				{
-					messages::exploding_ring ring;
+					exploding_ring_input ring;
 
 					ring.outer_radius_start_value = base_radius / 2;
 					ring.outer_radius_end_value = base_radius;
@@ -71,7 +72,7 @@ void viewing_session::standard_audiovisual_post_solve(const const_logic_step ste
 				}
 
 				{
-					thunder_system::thunder::input th;
+					thunder_input th;
 
 					th.delay_between_branches_ms = std::make_pair(5.f, 17.f);
 					th.max_branch_lifetime_ms = std::make_pair(30.f, 55.f);
@@ -104,7 +105,7 @@ void viewing_session::standard_audiovisual_post_solve(const const_logic_step ste
 
 				const auto base_radius = destroyed ? 80.f : h.effective_amount * 2.f;
 				{
-					messages::exploding_ring ring;
+					exploding_ring_input ring;
 
 					ring.outer_radius_start_value = base_radius / 1.5;
 					ring.outer_radius_end_value = base_radius / 3;
@@ -123,7 +124,7 @@ void viewing_session::standard_audiovisual_post_solve(const const_logic_step ste
 				}
 
 				{
-					messages::exploding_ring ring;
+					exploding_ring_input ring;
 
 					ring.outer_radius_start_value = base_radius / 2;
 					ring.outer_radius_end_value = base_radius;
@@ -174,6 +175,10 @@ void viewing_session::standard_audiovisual_post_solve(const const_logic_step ste
 		new_highlight.color = highlight_col;
 
 		highlights.add(new_highlight);
+	}
+
+	for (const auto& t : new_thunders) {
+		thunders.add(t);
 	}
 
 	exploding_rings.acquire_new_rings(new_rings);

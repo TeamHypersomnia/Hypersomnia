@@ -124,7 +124,8 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 				release_or_throw_grenade(
 					step,
 					cosmos[callee],
-					subject
+					subject,
+					it.is_pressed
 				);
 			}
 		}

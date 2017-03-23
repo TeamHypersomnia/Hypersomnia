@@ -1234,8 +1234,9 @@
     <ClInclude Include="game\flyweights\physical_material.h" />
     <ClInclude Include="game\flyweights\spell_data.h" />
     <ClInclude Include="game\messages\exhausted_cast_message.h" />
-    <ClInclude Include="game\messages\exploding_ring.h" />
+    <ClInclude Include="game\messages\exploding_ring_input.h" />
     <ClInclude Include="game\messages\item_picked_up_message.h" />
+    <ClInclude Include="game\messages\thunder_input.h" />
     <ClInclude Include="game\messages\visibility_information.h" />
     <ClInclude Include="application\content_generation\atlas_content_structs.h" />
     <ClInclude Include="game\resources\sound_response.h" />

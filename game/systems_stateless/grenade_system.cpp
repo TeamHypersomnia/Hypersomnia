@@ -12,6 +12,7 @@
 
 #include "game/components/grenade_component.h"
 #include "game/messages/queue_destruction.h"
+#include "game/messages/thunder_input.h"
 
 void grenade_system::init_explosions(const logic_step step) {
 	auto& cosmos = step.cosm;
@@ -26,9 +27,9 @@ void grenade_system::init_explosions(const logic_step step) {
 			if (grenade.when_explodes.was_set() && now.step >= grenade.when_explodes.step) {
 				standard_explosion_input in(step);
 				in.type = grenade.type;
+				in.explosion_location = it.get_logic_transform();
 
 				if (grenade.type == explosion_type::FORCE) {
-					in.explosion_location = it.get_logic_transform();
 					in.damage = 88.f;
 					in.inner_ring_color = red;
 					in.outer_ring_color = orange;
@@ -38,7 +39,6 @@ void grenade_system::init_explosions(const logic_step step) {
 					in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
 				}
 				else if (grenade.type == explosion_type::PED) {
-					in.explosion_location = it.get_logic_transform();
 					in.damage = 12.f;
 					in.inner_ring_color = cyan;
 					in.outer_ring_color = turquoise;
@@ -46,9 +46,31 @@ void grenade_system::init_explosions(const logic_step step) {
 					in.impact_force = 20.f;
 					in.sound_gain = 2.2f;
 					in.sound_effect = assets::sound_buffer_id::PED_EXPLOSION;
+
+					{
+						for (int t = 0; t < 4; ++t) {
+							static randomization rng;
+							thunder_input th;
+
+							th.delay_between_branches_ms = std::make_pair(10.f, 25.f);
+							th.max_branch_lifetime_ms = std::make_pair(40.f, 65.f);
+							th.branch_length = std::make_pair(10.f, 120.f);
+
+							th.max_all_spawned_branches = 40 + (t+1)*10;
+							th.max_branch_children = 2;
+
+							th.first_branch_root = in.explosion_location;
+							th.first_branch_root.pos += rng.random_point_in_circle(70.f);
+							th.first_branch_root.rotation += t * 360/4;
+							th.branch_angle_spread = 40.f;
+
+							th.color = t % 2 ? cyan : turquoise;
+
+							step.transient.messages.post(th);
+						}
+					}
 				}
 				else if (grenade.type == explosion_type::INTERFERENCE) {
-					in.explosion_location = it.get_logic_transform();
 					in.damage = 12.f;
 					in.inner_ring_color = yellow;
 					in.outer_ring_color = orange;

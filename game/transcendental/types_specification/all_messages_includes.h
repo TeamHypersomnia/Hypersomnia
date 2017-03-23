@@ -15,5 +15,6 @@
 #include "game/messages/health_event.h"
 #include "game/messages/item_picked_up_message.h"
 #include "game/messages/exhausted_cast_message.h"
-#include "game/messages/exploding_ring.h"
+#include "game/messages/exploding_ring_input.h"
+#include "game/messages/thunder_input.h"
 #include "game/detail/inventory/item_slot_transfer_request.h"

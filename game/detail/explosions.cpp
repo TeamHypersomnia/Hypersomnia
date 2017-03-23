@@ -3,7 +3,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "augs/graphics/pixel.h"
-#include "game/messages/exploding_ring.h"
+#include "game/messages/exploding_ring_input.h"
 #include "game/messages/damage_message.h"
 #include "game/systems_stateless/visibility_system.h"
 #include "game/systems_stateless/sound_existence_system.h"
@@ -127,7 +127,7 @@ void standard_explosion(const standard_explosion_input in) {
 	}
 
 	{
-		messages::exploding_ring ring;
+		exploding_ring_input ring;
 
 		ring.outer_radius_start_value = in.effective_radius / 2;
 		ring.outer_radius_end_value = in.effective_radius;
@@ -147,7 +147,7 @@ void standard_explosion(const standard_explosion_input in) {
 	}
 
 	{
-		messages::exploding_ring ring;
+		exploding_ring_input ring;
 
 		ring.outer_radius_start_value = in.effective_radius;
 		ring.outer_radius_end_value = in.effective_radius / 2;

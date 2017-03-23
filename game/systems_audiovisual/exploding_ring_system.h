@@ -3,7 +3,7 @@
 #include "game/components/transform_component.h"
 #include "augs/graphics/vertex.h"
 #include "augs/misc/delta.h"
-#include "game/messages/exploding_ring.h"
+#include "game/messages/exploding_ring_input.h"
 
 struct camera_cone;
 class particles_simulation_system;
@@ -11,7 +11,7 @@ class particles_simulation_system;
 class exploding_ring_system {
 public:
 	struct ring {
-		messages::exploding_ring in;
+		exploding_ring_input in;
 		float time_of_occurence_seconds = 0.f;
 	};
 
@@ -19,7 +19,7 @@ public:
 
 	std::vector<ring> rings;
 
-	void acquire_new_rings(const std::vector<messages::exploding_ring>& rings);
+	void acquire_new_rings(const std::vector<exploding_ring_input>& rings);
 
 	void advance(
 		const augs::delta dt,

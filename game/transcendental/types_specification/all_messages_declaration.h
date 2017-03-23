@@ -27,8 +27,10 @@ namespace messages {
 	struct line_of_sight_response;
 	struct item_picked_up_message;
 	struct exhausted_cast;
-	struct exploding_ring;
 }
+
+struct exploding_ring_input;
+struct thunder_input;
 
 typedef augs::storage_for_message_queues <
 	messages::intent_message,
@@ -51,6 +53,7 @@ typedef augs::storage_for_message_queues <
 	messages::line_of_sight_response,
 	messages::item_picked_up_message,
 	messages::exhausted_cast,
-	messages::exploding_ring,
+	exploding_ring_input,
+	thunder_input,
 	item_slot_transfer_request_data
 > storage_for_all_message_queues;

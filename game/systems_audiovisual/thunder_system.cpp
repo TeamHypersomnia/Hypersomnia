@@ -28,7 +28,7 @@ void thunder_system::thunder::create_root_branch() {
 	branches.push_back(b);
 }
 
-void thunder_system::add(const thunder::input in) {
+void thunder_system::add(const thunder_input in) {
 	ensure(in.max_all_spawned_branches > 0);
 
 	thunder new_thunder;
@@ -55,13 +55,15 @@ void thunder_system::advance(
 
 			bool found_suitable_parent = false;
 
-			for (size_t i = 0; i < t.branches.size(); ++i) {
+			const auto currently_existing_branches_num = t.branches.size();
+
+			for (size_t i = 0; i < currently_existing_branches_num; ++i) {
 				const bool is_leaf = t.branches[i].children.empty();
 
 				if (is_leaf && t.branches[i].can_have_children) {
 					const auto num_children = std::min(t.in.max_all_spawned_branches, rng.randval(0u, t.in.max_branch_children));
 
-					for (auto i = 0u; i < num_children; ++i) {
+					for (auto ch = 0u; ch < num_children; ++ch) {
 						auto& b = t.branches[i];
 
 						thunder::branch child;
@@ -143,7 +145,7 @@ void thunder_system::advance(
 	}
 
 	erase_remove(thunders, [&](const thunder& t) {
-		return t.num_active_branches == 0;
+		return t.num_active_branches == 0 && t.in.max_all_spawned_branches == 0;
 	});
 }
 

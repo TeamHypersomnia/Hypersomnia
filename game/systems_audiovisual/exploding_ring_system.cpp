@@ -7,7 +7,7 @@
 #include "game/detail/camera_cone.h"
 #include "augs/graphics/renderer.h"
 
-void exploding_ring_system::acquire_new_rings(const std::vector<messages::exploding_ring>& new_rings) {
+void exploding_ring_system::acquire_new_rings(const std::vector<exploding_ring_input>& new_rings) {
 	rings.reserve(rings.size() + new_rings.size());
 
 	for (const auto& r : new_rings) {
