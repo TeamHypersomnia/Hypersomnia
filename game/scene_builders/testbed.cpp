@@ -86,6 +86,12 @@ namespace scene_builders {
 			prefabs::create_interference_grenade(world, { 154, 611 + i * 100.f });
 		}
 
+		for (int i = 0; i < 10; ++i) {
+			prefabs::create_force_grenade(world, { 654, -811 + i *100.f });
+			prefabs::create_ped_grenade(world, { 604, -811 + i * 100.f });
+			prefabs::create_interference_grenade(world, { 554, -811 + i * 100.f });
+		}
+
 		std::vector<entity_id> new_characters;
 		new_characters.resize(num_characters);
 
