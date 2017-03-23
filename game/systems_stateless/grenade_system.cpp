@@ -34,8 +34,8 @@ void grenade_system::init_explosions(const logic_step step) {
 					in.outer_ring_color = orange;
 					in.effective_radius = 250.f;
 					in.impact_force = 550.f;
-					in.sound_gain = 1.4f;
-					in.sound_effect = assets::sound_buffer_id::EXPLOSION;
+					in.sound_gain = 1.8f;
+					in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
 				}
 				else if (grenade.type == explosion_type::PED) {
 					in.explosion_location = it.get_logic_transform();
@@ -44,8 +44,8 @@ void grenade_system::init_explosions(const logic_step step) {
 					in.outer_ring_color = turquoise;
 					in.effective_radius = 350.f;
 					in.impact_force = 20.f;
-					in.sound_gain = 1.4f;
-					in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
+					in.sound_gain = 2.2f;
+					in.sound_effect = assets::sound_buffer_id::PED_EXPLOSION;
 				}
 				else if (grenade.type == explosion_type::INTERFERENCE) {
 					in.explosion_location = it.get_logic_transform();
@@ -54,8 +54,8 @@ void grenade_system::init_explosions(const logic_step step) {
 					in.outer_ring_color = orange;
 					in.effective_radius = 450.f;
 					in.impact_force = 20.f;
-					in.sound_gain = 1.4f;
-					in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
+					in.sound_gain = 2.2f;
+					in.sound_effect = assets::sound_buffer_id::INTERFERENCE_EXPLOSION;
 				}
 
 				standard_explosion(

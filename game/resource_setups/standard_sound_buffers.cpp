@@ -98,6 +98,16 @@ namespace resource_setups {
 		}
 
 		{
+			auto& buf = get_resource_manager().create(assets::sound_buffer_id::PED_EXPLOSION);
+			buf.from_file("hypersomnia/sfx/ped_explosion.wav");
+		}
+
+		{
+			auto& buf = get_resource_manager().create(assets::sound_buffer_id::INTERFERENCE_EXPLOSION);
+			buf.from_file("hypersomnia/sfx/interference_explosion.wav");
+		}
+
+		{
 			auto& buf = get_resource_manager().create(assets::sound_buffer_id::CAST_CHARGING);
 			buf.from_file("hypersomnia/sfx/cast_charging.wav");
 		}

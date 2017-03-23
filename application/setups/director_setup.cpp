@@ -159,6 +159,9 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 					if (raw_input.key == key::F7) {
 						director.save_recording_to_file(output_director_file);
 						unsaved_changes_exist = false;
+
+						requested_playing_speed = 0.f;
+						clear_all_inputs();
 					}
 
 					if (raw_input.key == key::NUMPAD1) {
@@ -258,7 +261,7 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 
 				while (get_step_number(hypersomnia) < rewound_step) {
 					const guid_mapped_entropy replayed_entropy = director.get_entropy_for_step(get_step_number(hypersomnia));
-					const cosmic_entropy cosmic_entropy_for_this_advancement = cosmic_entropy(replayed_entropy, hypersomnia);
+					const auto cosmic_entropy_for_this_advancement = cosmic_entropy(replayed_entropy, hypersomnia);
 
 					hypersomnia.advance_deterministic_schemata(
 						cosmic_entropy_for_this_advancement, 
