@@ -1223,7 +1223,7 @@
     <ClInclude Include="game\detail\visible_entities.h" />
     <ClInclude Include="game\detail\wielding_result.h" />
     <ClInclude Include="game\enums\entity_flag.h" />
-    <ClInclude Include="game\enums\explosion_type.h" />
+    <ClInclude Include="game\enums\adverse_element_type.h" />
     <ClInclude Include="game\enums\input_recording_type.h" />
     <ClInclude Include="game\enums\perk_meter_type.h" />
     <ClInclude Include="game\enums\physical_material_type.h" />

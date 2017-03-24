@@ -86,7 +86,7 @@ void standard_explosion(const standard_explosion_input in) {
 
 					auto* const maybe_sentience = body_entity.find<components::sentience>();
 
-					if (in.type == explosion_type::FORCE) {
+					if (in.type == adverse_element_type::FORCE) {
 						if (maybe_sentience != nullptr) {
 							maybe_sentience->shake_for_ms = 400.f;
 							maybe_sentience->time_of_last_shake = now;

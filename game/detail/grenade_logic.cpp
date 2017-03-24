@@ -42,7 +42,7 @@ void release_or_throw_grenade(
 
 		sound_existence_system().create_sound_effect_entity(cosmos, in, thrower_transform, thrower).add_standard_components();
 	}
-	else if(!is_pressed_flag) {
+	else if(!is_pressed_flag && grenade.when_released.was_set()) {
 		perform_transfer(
 			cosmos [ item_slot_transfer_request_data{ grenade_entity, inventory_slot_id(), -1, false, 0.f }], 
 			step
@@ -78,7 +78,7 @@ void release_or_throw_grenade(
 		physics.set_velocity({ 0.f, 0.f });
 		physics.set_angular_velocity(0.f);
 		physics.apply_angular_impulse(1.5f * physics.get_mass());
-		physics.apply_impulse(vec2().set_from_degrees(grenade_entity.get_logic_transform().rotation) * 4000 * physics.get_mass());
+		physics.apply_impulse(vec2().set_from_degrees(grenade_entity.get_logic_transform().rotation) * 5000 * physics.get_mass());
 		physics.set_bullet_body(true);
 		physics.set_linear_damping(3.0f);
 
