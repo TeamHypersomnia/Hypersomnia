@@ -19,8 +19,10 @@
 struct sentience_meter {
 	struct damage_result {
 		float effective = 0.f;
+		float excessive = 0.f;
 		float ratio_effective_to_maximum = 0.f;
-		bool dropped_to_zero = false;
+		
+		bool has_dropped_to_zero() const;
 	};
 
 	// GEN INTROSPECTOR struct sentience_meter

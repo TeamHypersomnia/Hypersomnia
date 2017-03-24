@@ -33,13 +33,13 @@ void grenade_system::init_explosions(const logic_step step) {
 					in.damage = 88.f;
 					in.inner_ring_color = red;
 					in.outer_ring_color = orange;
-					in.effective_radius = 250.f;
+					in.effective_radius = 300.f;
 					in.impact_force = 550.f;
 					in.sound_gain = 1.8f;
 					in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
 				}
 				else if (grenade.type == adverse_element_type::PED) {
-					in.damage = 12.f;
+					in.damage = 88.f;
 					in.inner_ring_color = cyan;
 					in.outer_ring_color = turquoise;
 					in.effective_radius = 350.f;
@@ -71,7 +71,7 @@ void grenade_system::init_explosions(const logic_step step) {
 					}
 				}
 				else if (grenade.type == adverse_element_type::INTERFERENCE) {
-					in.damage = 12.f;
+					in.damage = 100.f;
 					in.inner_ring_color = yellow;
 					in.outer_ring_color = orange;
 					in.effective_radius = 450.f;

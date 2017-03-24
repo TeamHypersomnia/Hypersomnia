@@ -212,13 +212,27 @@ void sound_existence_system::game_responses_to_sound_effects(const logic_step st
 			in.effect = response_entry.id;
 			in.modifier = response_entry.modifier;
 		}
-		else if (h.target == messages::health_event::target_type::PERSONAL_ELECTRICITY_SHIELD) {
+		else if (h.target == messages::health_event::target_type::PERSONAL_ELECTRICITY) {
 			if (h.effective_amount > 0.f) {
 				in.effect = assets::sound_buffer_id::EXPLOSION;
 				in.modifier.pitch = 1.2f + h.effective_amount / 100.f;
 
-				if (h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_SHIELD_DESTRUCTION) {
+				if (h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION) {
 					in.effect = assets::sound_buffer_id::GREAT_EXPLOSION;
+					in.modifier.pitch = 1.5f;
+				}
+			}
+			else {
+				continue;
+			}
+		}
+		else if (h.target == messages::health_event::target_type::CONSCIOUSNESS) {
+			if (h.effective_amount > 0.f) {
+				in.effect = assets::sound_buffer_id::IMPACT;
+				in.modifier.pitch = 1.2f + h.effective_amount / 100.f;
+
+				if (h.special_result == messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS) {
+					in.effect = assets::sound_buffer_id::DEATH;
 					in.modifier.pitch = 1.5f;
 				}
 			}

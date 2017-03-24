@@ -25,6 +25,11 @@ template <typename T> int sgn(T val) {
 }
 
 namespace augs {
+	template <class T>
+	bool compare(const T a, const T b, const T eps = AUGS_EPSILON<T>) {
+		return std::abs(a - b) < eps;
+	}
+
 	template <class T, class A>
 	T interp(const T a, const T b, const A alpha) {
 		return static_cast<T>(a * (static_cast<A>(1) - alpha) + b * (alpha));

@@ -5,7 +5,7 @@ namespace messages {
 	struct health_event : message {
 		enum class result_type {
 			NONE,
-			PERSONAL_ELECTRICITY_SHIELD_DESTRUCTION,
+			PERSONAL_ELECTRICITY_DESTRUCTION,
 			DEATH,
 			LOSS_OF_CONSCIOUSNESS
 		} special_result = result_type::NONE;
@@ -13,7 +13,7 @@ namespace messages {
 		enum class target_type {
 			INVALID,
 			AIM,
-			PERSONAL_ELECTRICITY_SHIELD,
+			PERSONAL_ELECTRICITY,
 			CONSCIOUSNESS,
 			HEALTH
 		} target = target_type::INVALID;
@@ -22,7 +22,6 @@ namespace messages {
 		vec2 impact_velocity;
 
 		float ratio_effective_to_maximum = 1.f;
-		float objective_amount = 0.f;
 		float effective_amount = 0.f;
 	};
 }

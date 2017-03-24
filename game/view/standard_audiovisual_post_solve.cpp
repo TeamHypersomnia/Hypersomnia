@@ -25,14 +25,20 @@ void viewing_session::standard_audiovisual_post_solve(const const_logic_step ste
 		rgba number_col;
 		rgba highlight_col;
 
-		const bool is_it_death = h.special_result == messages::health_event::result_type::DEATH;
-
 		if (h.target == messages::health_event::target_type::HEALTH) {
 			if (h.effective_amount > 0) {
 				number_col = red;
 				highlight_col = white;
 
-				const auto base_radius = is_it_death ? 80.f : h.effective_amount * 1.5;
+				const bool destroyed = h.special_result == messages::health_event::result_type::DEATH;
+
+				if (destroyed) {
+					vn.text.set_text(augs::gui::text::format(L"Death", augs::gui::text::style(assets::font_id::GUI_FONT, number_col)));
+					vn.pos = cosmos[h.subject].get_logic_transform().pos;
+					flying_numbers.add(vn);
+				}
+
+				const auto base_radius = destroyed ? 80.f : h.effective_amount * 1.5;
 				{
 					exploding_ring_input ring;
 
@@ -96,8 +102,8 @@ void viewing_session::standard_audiovisual_post_solve(const const_logic_step ste
 				highlight_col = green;
 			}
 		}
-		else if (h.target == messages::health_event::target_type::PERSONAL_ELECTRICITY_SHIELD) {
-			const bool destroyed = h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_SHIELD_DESTRUCTION;
+		else if (h.target == messages::health_event::target_type::PERSONAL_ELECTRICITY) {
+			const bool destroyed = h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION;
 
 			if (h.effective_amount > 0) {
 				number_col = turquoise;
@@ -143,6 +149,59 @@ void viewing_session::standard_audiovisual_post_solve(const const_logic_step ste
 				}
 			}
 		}
+		else if (h.target == messages::health_event::target_type::CONSCIOUSNESS) {
+			const bool destroyed = h.special_result == messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS;
+
+			if (h.effective_amount > 0) {
+				number_col = orange;
+				highlight_col = orange;
+
+				if (destroyed) {
+					vn.text.set_text(augs::gui::text::format(L"Unconscious", augs::gui::text::style(assets::font_id::GUI_FONT, number_col)));
+					vn.pos = cosmos[h.subject].get_logic_transform().pos;
+					flying_numbers.add(vn);
+				}
+
+				const auto base_radius = destroyed ? 80.f : h.effective_amount * 2.f;
+				{
+					exploding_ring_input ring;
+
+					ring.outer_radius_start_value = base_radius / 1.5;
+					ring.outer_radius_end_value = base_radius / 3;
+
+					ring.inner_radius_start_value = base_radius / 2.5;
+					ring.inner_radius_end_value = base_radius / 3;
+
+					ring.emit_particles_on_ring = false;
+
+					ring.maximum_duration_seconds = 0.20f;
+
+					ring.color = yellow;
+					ring.center = h.point_of_impact;
+
+					new_rings.push_back(ring);
+				}
+
+				{
+					exploding_ring_input ring;
+
+					ring.outer_radius_start_value = base_radius / 2;
+					ring.outer_radius_end_value = base_radius;
+
+					ring.inner_radius_start_value = 0.f;
+					ring.inner_radius_end_value = base_radius;
+
+					ring.emit_particles_on_ring = false;
+
+					ring.maximum_duration_seconds = 0.20f;
+
+					ring.color = orange;
+					ring.center = h.point_of_impact;
+
+					new_rings.push_back(ring);
+				}
+			}
+		}
 		else {
 			continue;
 		}
@@ -159,12 +218,6 @@ void viewing_session::standard_audiovisual_post_solve(const const_logic_step ste
 		vn.pos = h.point_of_impact;
 		
 		flying_numbers.add(vn);
-
-		if (is_it_death) {
-			vn.text.set_text(augs::gui::text::format(L"Death", augs::gui::text::style(assets::font_id::GUI_FONT, number_col)));
-			vn.pos = cosmos[h.subject].get_logic_transform().pos;
-			flying_numbers.add(vn);
-		}
 
 		pure_color_highlight_system::highlight::input new_highlight;
 

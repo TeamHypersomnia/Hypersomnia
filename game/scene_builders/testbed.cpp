@@ -243,8 +243,8 @@ namespace scene_builders {
 
 			auto& sentience = new_character.get<components::sentience>();
 
-			sentience.consciousness.maximum = 200;
-			sentience.consciousness.value = 200;
+			sentience.consciousness.maximum = 400;
+			sentience.consciousness.value = 400;
 
 			sentience.personal_electricity.maximum = 400;
 			sentience.personal_electricity.value = 400;

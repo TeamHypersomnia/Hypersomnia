@@ -84,40 +84,55 @@ void standard_explosion(const standard_explosion_input in) {
 					auto impact = (point_b - in.explosion_location.pos).set_length(in.impact_force);
 					const auto center_offset = (point_b - affected_physics.get_mass_position()) * 0.8f;
 
-					auto* const maybe_sentience = body_entity.find<components::sentience>();
+					messages::damage_message damage_msg;
+					damage_msg.type = in.type;
+					damage_msg.inflictor = subject;
+					damage_msg.subject = body_entity;
+					damage_msg.amount = in.damage;
+					damage_msg.point_of_impact = point_b;
 
-					if (in.type == adverse_element_type::FORCE) {
-						if (maybe_sentience != nullptr) {
-							maybe_sentience->shake_for_ms = 400.f;
-							maybe_sentience->time_of_last_shake = now;
-						
-							impact *= 2.f;
-						}
+					switch (in.type) {
+						case adverse_element_type::FORCE: {
+							damage_msg.request_shake_for_ms = 400.f;
+							damage_msg.impact_velocity = impact * 2.f;
 
-						affected_physics.apply_impulse(
-							impact, center_offset
-						);
-
-						auto& r = augs::renderer::get_current();
-
-						if (r.debug.draw_explosion_forces) {
-							r.persistent_lines.draw_cyan(
-								affected_physics.get_mass_position() + center_offset,
-								affected_physics.get_mass_position() + center_offset + impact
+							affected_physics.apply_impulse(
+								impact, center_offset
 							);
+
+							auto& r = augs::renderer::get_current();
+
+							if (r.debug.draw_explosion_forces) {
+								r.persistent_lines.draw_cyan(
+									affected_physics.get_mass_position() + center_offset,
+									affected_physics.get_mass_position() + center_offset + impact
+								);
+							}
+
+							// LOG("Impact %x dealt to: %x. Resultant angular: %x", impact, body_entity.get_debug_name(), affected_physics.get_angular_velocity());
+
+							damage_msg.impact_velocity = impact;
 						}
+						break;
 
-						// LOG("Impact %x dealt to: %x. Resultant angular: %x", impact, body_entity.get_debug_name(), affected_physics.get_angular_velocity());
+						case adverse_element_type::PED: {
 
-						messages::damage_message damage_msg;
+						}
+						break;
 
-						damage_msg.inflictor = subject;
-						damage_msg.subject = body_entity;
-						damage_msg.amount = in.damage;
-						damage_msg.impact_velocity = impact;
-						damage_msg.point_of_impact = point_b;
-						in.step.transient.messages.post(damage_msg);
+						case adverse_element_type::INTERFERENCE: {
+							damage_msg.request_shake_for_ms = 800.f;
+							damage_msg.impact_velocity = impact * 300.f;
+						}
+						break;
+
+						default: {
+							ensure(false && "Unknown adverse element type");
+						}
+						break;
 					}
+
+					in.step.transient.messages.post(damage_msg);
 				}
 			}
 

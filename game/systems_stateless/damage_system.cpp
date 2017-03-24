@@ -55,11 +55,13 @@ void damage_system::destroy_colliding_bullets_and_send_damage(const logic_step s
 			bool bullet_colliding_with_senders_vehicle = false;
 
 			{
-				auto* driver = sender.get_owner_body().find<components::driver>();
+				const auto* const driver = sender.get_owner_body().find<components::driver>();
 
 				if (driver) {
-					bullet_colliding_with_senders_vehicle = driver->owned_vehicle == subject_handle.get_owner_body()
-						&& subject_handle.get_owner_body().get<components::fixtures>().can_driver_shoot_through();
+					bullet_colliding_with_senders_vehicle = 
+						driver->owned_vehicle == subject_handle.get_owner_body()
+						&& subject_handle.get_owner_body().get<components::fixtures>().can_driver_shoot_through()
+					;
 
 					//LOG("ownedveh: %x\n subj owner: %x\n, compo: %x, res: %x",
 					//	driver->owned_vehicle, subject_handle.get_owner_body(),
@@ -67,8 +69,14 @@ void damage_system::destroy_colliding_bullets_and_send_damage(const logic_step s
 				}
 			}
 
-			if (!bullet_colliding_with_sender && !bullet_colliding_with_senders_vehicle && 
-				damage.damage_upon_collision && damage.damage_charges_before_destruction > 0) {
+			const bool should_send_damage =
+				!bullet_colliding_with_sender
+				&& !bullet_colliding_with_senders_vehicle
+				&& damage.damage_upon_collision
+				&& damage.damage_charges_before_destruction > 0
+			;
+
+			if (should_send_damage) {
 				auto& subject_of_impact = subject_handle.get_owner_body().get<components::physics>();
 
 				vec2 impact_velocity = damage.custom_impact_velocity;
