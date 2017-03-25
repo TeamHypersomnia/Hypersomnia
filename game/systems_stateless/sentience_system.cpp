@@ -29,38 +29,6 @@
 #include "game/transcendental/logic_step.h"
 #include <gtest/gtest.h>
 
-bool sentience_meter::damage_result::has_dropped_to_zero() const {
-	return excessive > 0.f;
-}
-
-sentience_meter::damage_result sentience_meter::calculate_damage_result(const float amount) const {
-	sentience_meter::damage_result result;
-
-	if (amount > 0) {
-		if (value > 0) {
-			if (value <= amount) {
-				result.excessive = amount - value;
-				result.effective = value;
-			}
-			else {
-				result.effective = amount;
-			}
-		}
-	}
-	else {
-		if (value - amount > maximum) {
-			result.effective = -(maximum - value);
-		}
-		else {
-			result.effective = amount;
-		}
-	}
-
-	result.ratio_effective_to_maximum = std::abs(result.effective) / maximum;
-
-	return result;
-}
-
 void sentience_system::cast_spells(const logic_step step) const {
 	auto& cosmos = step.cosm;
 	const auto now = cosmos.get_timestamp();
@@ -82,7 +50,7 @@ void sentience_system::cast_spells(const logic_step step) const {
 			const auto spell_data = cosmos.get(spell);
 
 			const bool can_cast_already =
-				sentience.personal_electricity.value >= spell_data.personal_electricity_required
+				sentience.personal_electricity.value >= static_cast<meter_value_type>(spell_data.personal_electricity_required)
 				&& spell_instance_data.cast_cooldown.is_ready(now, delta)
 				&& sentience.cast_cooldown_for_all_spells.is_ready(now, delta)
 				&& are_additional_conditions_for_casting_fulfilled(spell, subject)
@@ -133,7 +101,11 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 		[&](const auto subject) {
 			auto& sentience = subject.get<components::sentience>();
 
-			if (sentience.health.enabled) {
+			if (!sentience.is_conscious()) {
+				return;
+			}
+
+			if (sentience.health.is_enabled()) {
 				const auto passed = (now.step - sentience.time_of_last_received_damage.step);
 
 				if (passed > 0 && passed % regeneration_frequency_in_steps == 0) {
@@ -141,7 +113,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 				}
 			}
 
-			if (sentience.consciousness.enabled) {
+			if (sentience.consciousness.is_enabled()) {
 				const auto passed = (now.step - sentience.time_of_last_exertion.step);
 
 				if (passed > 0 && passed % consciousness_regeneration_frequency_in_steps == 0) {
@@ -151,10 +123,10 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 				const auto consciousness_ratio = sentience.consciousness.get_ratio();
 				const auto health_ratio = sentience.health.get_ratio();
 
-				sentience.consciousness.value = std::min(consciousness_ratio, health_ratio) * sentience.consciousness.maximum;
+				sentience.consciousness.value = static_cast<meter_value_type>(std::min(consciousness_ratio, health_ratio) * sentience.consciousness.maximum);
 			}
 
-			if (sentience.personal_electricity.enabled) {
+			if (sentience.personal_electricity.is_enabled()) {
 				const auto passed = now.step;
 
 				if (passed > 0 && passed % pe_regeneration_frequency_in_steps == 0) {
@@ -209,16 +181,28 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		movement.make_inert_for_ms += h.effective_amount*2;
 
 		subject.get<components::physics>()
-			.apply_impulse(vec2(h.impact_velocity).set_length(h.effective_amount * 5));
+			.apply_impulse(vec2(h.impact_velocity).set_length(static_cast<float>(h.effective_amount * 5)));
+
+		if (!sentience.health.is_positive()) {
+			h.special_result = messages::health_event::result_type::DEATH;
+		}
 	}
 		break;
 
 	case messages::health_event::target_type::CONSCIOUSNESS: 
-		sentience.consciousness.value -= h.effective_amount; 
+		sentience.consciousness.value -= h.effective_amount;
+
+		if (!sentience.consciousness.is_positive()) {
+			h.special_result = messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS;
+		}
 		break;
 
 	case messages::health_event::target_type::PERSONAL_ELECTRICITY: 
 		sentience.personal_electricity.value -= h.effective_amount;
+
+		if (!sentience.personal_electricity.is_positive()) {
+			h.special_result = messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION;
+		}
 		break;
 
 	case messages::health_event::target_type::AIM:
@@ -238,14 +222,25 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		break;
 	}
 
+	bool knockout = false;
+
 	if (h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION) {
 		sentience.electric_shield.timing.set_for_duration(-1.f, now);
+
+		sentience.personal_electricity.value = 0.f;
+	}
+	else if (h.special_result == messages::health_event::result_type::DEATH) {
+		knockout = true;
+
+		sentience.health.value = 0.f;
+	}
+	else if (h.special_result == messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS) {
+		knockout = true;
+
+		sentience.consciousness.value = 0.f;
 	}
 
-	else if (
-		h.special_result == messages::health_event::result_type::DEATH
-		|| h.special_result == messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS
-	) {
+	if (knockout) {
 		const auto* const container = subject.find<components::container>();
 
 		if (container) {
@@ -290,8 +285,6 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		subject.get<components::physics>().apply_angular_impulse(
 			80.f
 		);
-
-		sentience.health.enabled = false;
 	}
 
 	step.transient.messages.post(h);
@@ -315,7 +308,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 		event_template.subject = d.subject;
 		event_template.point_of_impact = d.point_of_impact;
 		event_template.impact_velocity = d.impact_velocity;
-		event_template.effective_amount = 0.f;
+		event_template.effective_amount = 0;
 		event_template.special_result = messages::health_event::result_type::NONE;
 		
 		bool apply_aimpunch = false;
@@ -325,7 +318,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 
 			const bool is_shield_enabled = s.electric_shield.timing.is_enabled(now, delta);
 
-			auto apply_ped = [this, step, event_template, &s](const float amount) {
+			auto apply_ped = [this, step, event_template, &s](const meter_value_type amount) {
 				auto event = event_template;
 
 				event.target = messages::health_event::target_type::PERSONAL_ELECTRICITY;
@@ -334,75 +327,63 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 				event.effective_amount = damaged.effective;
 				event.ratio_effective_to_maximum = damaged.ratio_effective_to_maximum;
 
-				if (damaged.has_dropped_to_zero()) {
-					event.special_result = messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION;
-				}
-
-				if (event.effective_amount != 0.f) {
+				if (event.effective_amount != 0) {
 					consume_health_event(event, step);
 				}
 
 				return damaged;
 			};
 
-			if (d.type == adverse_element_type::FORCE && s.health.enabled) {
+			if (d.type == adverse_element_type::FORCE && s.health.is_enabled()) {
 				auto event = event_template;
 
-				float after_shield_damage = d.amount;
+				meter_value_type after_shield_damage = d.amount;
 
 				if (is_shield_enabled) {
 					after_shield_damage = apply_ped(d.amount).excessive;
 				}
 
-				if (after_shield_damage > 0.f) {
+				if (after_shield_damage > 0) {
 					event.target = messages::health_event::target_type::HEALTH;
 
 					const auto damaged = s.health.calculate_damage_result(after_shield_damage);
 					event.effective_amount = damaged.effective;
 					event.ratio_effective_to_maximum = damaged.ratio_effective_to_maximum;
 
-					if (damaged.has_dropped_to_zero()) {
-						event.special_result = messages::health_event::result_type::DEATH;
-					}
-
-					if (event.effective_amount != 0.f) {
+					if (event.effective_amount != 0) {
 						consume_health_event(event, step);
 						apply_aimpunch = true;
 					}
 				}
 			}
 			
-			else if (d.type == adverse_element_type::INTERFERENCE && s.consciousness.enabled) {
+			else if (d.type == adverse_element_type::INTERFERENCE && s.consciousness.is_enabled()) {
 				auto event = event_template;
 
-				float after_shield_damage = d.amount + d.amount * subject.get_effective_velocity().length() / 400.f;
+				meter_value_type after_shield_damage = d.amount + static_cast<meter_value_type>(d.amount * subject.get_effective_velocity().length() / 400.f);
 
 				if (is_shield_enabled) {
-					constexpr float absorption_by_shield_mult = 2;
+					constexpr meter_value_type absorption_by_shield_mult = 2;
 					after_shield_damage = absorption_by_shield_mult * apply_ped(d.amount / absorption_by_shield_mult).excessive;
 				}
 
-				if (after_shield_damage > 0.f) {
+				if (after_shield_damage > 0) {
 					event.target = messages::health_event::target_type::CONSCIOUSNESS;
 
 					const auto damaged = s.consciousness.calculate_damage_result(after_shield_damage);
 					event.effective_amount = damaged.effective;
 					event.ratio_effective_to_maximum = damaged.ratio_effective_to_maximum;
 
-					if (damaged.has_dropped_to_zero()) {
-						event.special_result = messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS;
-					}
-
-					if (event.effective_amount != 0.f) {
+					if (event.effective_amount != 0) {
 						consume_health_event(event, step);
 						apply_aimpunch = true;
 					}
 				}
 			}
 
-			else if (d.type == adverse_element_type::PED && s.personal_electricity.enabled) {
+			else if (d.type == adverse_element_type::PED && s.personal_electricity.is_enabled()) {
 				if (is_shield_enabled) {
-					apply_ped(d.amount * 2.5f);
+					apply_ped(static_cast<meter_value_type>(d.amount * 2.5));
 				}
 				else {
 					apply_ped(d.amount);
@@ -457,7 +438,7 @@ void sentience_system::set_borders(const logic_step step) const {
 			auto* const render = t.find<components::render>();
 
 			if (render != nullptr) {
-				if (sentience.health.is_enabled()) {
+				if (sentience.is_conscious()) {
 					auto hr = sentience.health.get_ratio();
 					const auto one_less_hr = 1.f - hr;
 
@@ -493,13 +474,8 @@ TEST(SentienceSystem, SentienceMeters) {
 
 		const auto new_ent1 = c1.create_entity("e1");
 		auto& sent = new_ent1 += components::sentience();
-		sent.health.enabled = true;
-		sent.health.maximum = 100.f;
-		sent.health.value = 20.f;
-
-		sent.health.enabled = true;
-		sent.health.maximum = 100.f;
-		sent.health.value = 100.f;
+		sent.health.set_maximum_value(100);
+		sent.health.set_value(20);
 
 		messages::damage_message msg;
 		msg.amount = 40.f;

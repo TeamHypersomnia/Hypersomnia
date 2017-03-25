@@ -1,26 +1,8 @@
 #include "sentience_component.h"
 
-bool sentience_meter::is_enabled() const {
-	return enabled;
-}
-
-float sentience_meter::get_maximum_value() const {
-	return maximum;
-}
-
-float sentience_meter::get_value() const {
-	return value;
-}
-
-float sentience_meter::get_ratio() const {
-	return value / maximum;
-}
-
 namespace components {
-	sentience::sentience() {
-		health.enabled = true;
-		consciousness.enabled = true;
-		personal_electricity.enabled = true;
+	bool sentience::is_conscious() const {
+		return health.is_positive() && consciousness.is_positive();
 	}
 
 	rgba sentience::calculate_health_color(const float time_pulse_multiplier) const {

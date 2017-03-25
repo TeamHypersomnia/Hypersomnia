@@ -1190,8 +1190,6 @@ namespace augs {
 		F f,
 		Instances&&... _t_
 	) {
-		FIELD(enabled);
-
 		FIELD(value);
 		FIELD(maximum);
 	}

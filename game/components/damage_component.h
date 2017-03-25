@@ -8,10 +8,12 @@
 #include "augs/graphics/pixel.h"
 #include "padding_byte.h"
 
+#include "game/detail/sentience_meter.h"
+
 namespace components {
 	struct damage {
 		// GEN INTROSPECTOR struct components::damage
-		float amount = 12.f;
+		meter_value_type amount = 12;
 
 		float impulse_upon_hit = 100.f;
 		float impulse_multiplier_against_sentience = 1.f;

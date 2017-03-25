@@ -71,14 +71,14 @@ namespace scene_builders {
 			new_characters[i] = new_character;
 
 			if (i == 0) {
-				new_character.get<components::sentience>().health.value = 100;
-				new_character.get<components::sentience>().health.maximum = 100;
+				new_character.get<components::sentience>().health.set_value(100);
+				new_character.get<components::sentience>().health.set_maximum_value(100);
 				new_character.get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
 				new_character.get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
 			}
 			else if (i == 1) {
-				new_character.get<components::sentience>().health.value = 100;
-				new_character.get<components::sentience>().health.maximum = 100;
+				new_character.get<components::sentience>().health.set_value(100);
+				new_character.get<components::sentience>().health.set_maximum_value(100);
 				new_character.get<components::attitude>().parties = party_category::METROPOLIS_CITIZEN;
 				new_character.get<components::attitude>().hostile_parties = party_category::RESISTANCE_CITIZEN;
 			}

@@ -27,7 +27,7 @@ namespace rendering_scripts {
 			const auto v = cosmos[v_id];
 			const auto* const sentience = v.find<components::sentience>();
 
-			if (sentience && sentience->health.is_enabled()) {
+			if (sentience && sentience->is_conscious()) {
 				const auto hr = sentience->health.get_ratio();
 				const auto one_less_hr = 1 - hr;
 

@@ -1,6 +1,8 @@
 #pragma once
 #include "message.h"
 
+#include "game/detail/sentience_meter.h"
+
 namespace messages {
 	struct health_event : message {
 		enum class result_type {
@@ -22,6 +24,6 @@ namespace messages {
 		vec2 impact_velocity;
 
 		float ratio_effective_to_maximum = 1.f;
-		float effective_amount = 0.f;
+		meter_value_type effective_amount = 0;
 	};
 }

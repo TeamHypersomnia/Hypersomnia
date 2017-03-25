@@ -156,30 +156,30 @@ namespace scene_builders {
 			new_characters[i] = new_character;
 
 			if (i == 0) {
-				new_character.get<components::sentience>().health.value = 100;
-				new_character.get<components::sentience>().health.maximum = 100;
+				new_character.get<components::sentience>().health.set_value(100);
+				new_character.get<components::sentience>().health.set_maximum_value(100);
 			}
 			if (i == 1) {
 				new_character.get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
 				new_character.get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
 				new_character.get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
 				new_character.get<components::sentience>().minimum_danger_amount_to_evade = 20;
-				new_character.get<components::sentience>().health.value = 300;
-				new_character.get<components::sentience>().health.maximum = 300;
+				new_character.get<components::sentience>().health.set_value(300);
+				new_character.get<components::sentience>().health.set_maximum_value(300);
 				//ingredients::add_standard_pathfinding_capability(new_character);
 				//ingredients::add_soldier_intelligence(new_character);
 				new_character.recalculate_basic_processing_categories();
 			}
 			if (i == 2) {
-				new_character.get<components::sentience>().health.value = 38;
+				new_character.get<components::sentience>().health.set_value(38);
 			}
 			if (i == 5) {
 				new_character.get<components::attitude>().parties = party_category::METROPOLIS_CITIZEN;
 				new_character.get<components::attitude>().hostile_parties = party_category::RESISTANCE_CITIZEN;
 				new_character.get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
 				new_character.get<components::sentience>().minimum_danger_amount_to_evade = 20;
-				new_character.get<components::sentience>().health.value = 300;
-				new_character.get<components::sentience>().health.maximum = 300;
+				new_character.get<components::sentience>().health.set_value(300);
+				new_character.get<components::sentience>().health.set_maximum_value(300);
 				//ingredients::add_standard_pathfinding_capability(new_character);
 				//ingredients::add_soldier_intelligence(new_character);
 				new_character.recalculate_basic_processing_categories();

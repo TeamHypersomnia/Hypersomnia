@@ -4,6 +4,8 @@
 #include "game/transcendental/logic_step.h"
 #include "game/enums/adverse_element_type.h"
 
+#include "game/detail/sentience_meter.h"
+
 struct standard_explosion_input {
 	const logic_step step;
 	
@@ -15,7 +17,7 @@ struct standard_explosion_input {
 	components::transform explosion_location;
 	entity_id subject_if_any = entity_id();
 	float effective_radius = 250.f;
-	float damage = 88.f;
+	meter_value_type damage = 88;
 	float impact_force = 150.f;
 	rgba inner_ring_color = cyan;
 	rgba outer_ring_color = white;

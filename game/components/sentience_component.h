@@ -16,30 +16,7 @@
 #include "game/detail/perks/electric_shield_perk.h"
 #include "game/components/transform_component.h"
 
-struct sentience_meter {
-	struct damage_result {
-		float effective = 0.f;
-		float excessive = 0.f;
-		float ratio_effective_to_maximum = 0.f;
-		
-		bool has_dropped_to_zero() const;
-	};
-
-	// GEN INTROSPECTOR struct sentience_meter
-	bool enabled = false;
-	std::array<padding_byte, 3> pad;
-
-	float value = 100.f;
-	float maximum = 100.f;
-	// END GEN INTROSPECTOR
-
-	damage_result calculate_damage_result(float amount) const;
-
-	bool is_enabled() const;
-	float get_maximum_value() const;
-	float get_value() const;
-	float get_ratio() const;
-};
+#include "game/detail/sentience_meter.h"
 
 namespace components {
 	struct sentience {
@@ -100,8 +77,7 @@ namespace components {
 			}
 		}
 
-		sentience();
-
 		rgba calculate_health_color(float time_pulse_multiplier) const;
+		bool is_conscious() const;
 	};
 }
