@@ -22,7 +22,7 @@ struct sentience_meter_bar : game_gui_rect_node {
 	
 	float seconds_accumulated = 0.f;
 
-	int get_total_spacing() const {
+	int get_total_border_expansion() const {
 		return border_width + border_spacing;
 	}
 
@@ -33,13 +33,13 @@ struct sentience_meter_bar : game_gui_rect_node {
 	augs::gui::material get_icon_mat(const const_this_pointer this_id) const;
 	augs::gui::material get_bar_mat(const const_this_pointer this_id) const;
 
-	ltrb get_full_value_bar_rect(
+	ltrb get_value_bar_rect(
 		const const_game_gui_context context,
 		const const_this_pointer this_id,
 		const ltrb absolute
 	) const;
 
-	ltrb get_full_value_bar_rect_bordered(
+	ltrb get_bar_rect_with_borders(
 		const const_game_gui_context context,
 		const const_this_pointer this_id,
 		const ltrb absolute

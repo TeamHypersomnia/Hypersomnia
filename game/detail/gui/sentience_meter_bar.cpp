@@ -37,7 +37,8 @@ void sentience_meter_bar::draw(
 
 	const auto absolute = context.get_tree_entry(this_id).get_absolute_rect();
 
-	auto icon_rect = absolute;
+	ltrb icon_rect;
+	icon_rect.set_position(absolute.get_position());
 	icon_rect.set_size((*icon_mat.tex).get_size());
 
 	draw_clipped_rect(
@@ -48,11 +49,11 @@ void sentience_meter_bar::draw(
 		info.v
 	);
 
-	const auto total_spacing = this_id->get_total_spacing();
+	const auto total_spacing = this_id->get_total_border_expansion();
 
 	{
-		const auto full_bar_rect_bordered = this_id->get_full_value_bar_rect_bordered(context, this_id, absolute);
-		const auto full_bar_rect = this_id->get_full_value_bar_rect(context, this_id, absolute);
+		const auto full_bar_rect_bordered = this_id->get_bar_rect_with_borders(context, this_id, absolute);
+		const auto value_bar_rect = this_id->get_value_bar_rect(context, this_id, absolute);
 
 		auto bar_mat = this_id->get_bar_mat(this_id);
 		bar_mat.color.a = icon_mat.color.a;
@@ -62,17 +63,18 @@ void sentience_meter_bar::draw(
 		const bool should_draw_value_number =
 			this_type == sentience_meter_type::HEALTH
 			|| this_type == sentience_meter_type::PERSONAL_ELECTRICITY
-			|| this_type == sentience_meter_type::CONSCIOUSNESS;
+			|| this_type == sentience_meter_type::CONSCIOUSNESS
+		;
 			
 		const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
-		const auto ratio = sentience.call_on(this_type, [](const auto& m) { return m.get_ratio(); });
-		auto actual_bar_rect = full_bar_rect;
-		const auto bar_width = static_cast<int>(actual_bar_rect.w() * ratio);
-		actual_bar_rect.w(static_cast<float>(bar_width));
+		const auto current_value_ratio = sentience.call_on(this_type, [](const auto& m) { return m.get_ratio(); });
+		auto current_value_bar_rect = value_bar_rect;
+		const auto bar_width = static_cast<int>(current_value_bar_rect.w() * current_value_ratio);
+		current_value_bar_rect.w(static_cast<float>(bar_width));
 
 		draw_clipped_rect(
 			bar_mat,
-			actual_bar_rect,
+			current_value_bar_rect,
 			context,
 			context.get_tree_entry(this_id).get_parent(),
 			info.v
@@ -81,7 +83,7 @@ void sentience_meter_bar::draw(
 		augs::gui::solid_stroke stroke;
 		stroke.set_material(bar_mat);
 		stroke.set_width(this_id->border_width);
-		stroke.draw(info.v, full_bar_rect, ltrb(), this_id->border_spacing);
+		stroke.draw(info.v, value_bar_rect, ltrb(), this_id->border_spacing);
 
 		if (should_draw_value_number) {
 			const auto value = sentience.call_on(this_type, [](const auto& m) { return m.get_value(); });
@@ -99,20 +101,37 @@ void sentience_meter_bar::draw(
 				auto particle_mat = p.mat;
 				particle_mat.color = bar_mat.color + rgba(30, 30, 30, 0);
 			
-				const auto particle_rect = ltrb(full_bar_rect.get_position() - vec2(6, 6) + p.relative_pos, (*particle_mat.tex).get_size());
+				const auto particle_rect = ltrb(value_bar_rect.get_position() - vec2(6, 6) + p.relative_pos, (*particle_mat.tex).get_size());
 
 				draw_clipped_rect(
 					particle_mat,
 					particle_rect,
-					actual_bar_rect,
+					current_value_bar_rect,
 					info.v
 				);
 			}
 		}
+
+		if (this_type == sentience_meter_type::CONSCIOUSNESS) {
+			const auto boundary_mat = augs::gui::material();
+			auto boundary_rect = ltrb();
+			boundary_rect.l = value_bar_rect.l + value_bar_rect.w() / 10;
+			boundary_rect.t = full_bar_rect_bordered.t;
+			boundary_rect.b = full_bar_rect_bordered.b;
+			boundary_rect.r = boundary_rect.l + 1;
+
+			draw_clipped_rect(
+				boundary_mat,
+				boundary_rect,
+				context,
+				context.get_tree_entry(this_id).get_parent(),
+				info.v
+			);
+		}
 	}
 }
 
-ltrb sentience_meter_bar::get_full_value_bar_rect_bordered(
+ltrb sentience_meter_bar::get_bar_rect_with_borders(
 	const const_game_gui_context context,
 	const const_this_pointer this_id,
 	const ltrb absolute
@@ -126,21 +145,20 @@ ltrb sentience_meter_bar::get_full_value_bar_rect_bordered(
 
 	const auto max_value_caption_size = drawer.get_bbox();
 
-	auto full_bar_rect = icon_rect;
-	full_bar_rect.set_position(icon_rect.get_position() + vec2i(get_total_spacing() + icon_rect.get_size().x, 0));
-	full_bar_rect.r = absolute.r - max_value_caption_size.x;
+	auto value_bar_rect = icon_rect;
+	value_bar_rect.set_position(icon_rect.get_position() + vec2i(get_total_border_expansion() + icon_rect.get_size().x, 0));
+	value_bar_rect.r = absolute.r - max_value_caption_size.x;
 
-	return full_bar_rect;
+	return value_bar_rect;
 }
 
-ltrb sentience_meter_bar::get_full_value_bar_rect(
+ltrb sentience_meter_bar::get_value_bar_rect(
 	const const_game_gui_context context,
 	const const_this_pointer this_id,
 	const ltrb absolute
 ) const {
-	return get_full_value_bar_rect_bordered(context, this_id, absolute).expand_from_center({ static_cast<float>(-get_total_spacing()), static_cast<float>(-get_total_spacing()) });
+	return get_bar_rect_with_borders(context, this_id, absolute).expand_from_center({ static_cast<float>(-get_total_border_expansion()), static_cast<float>(-get_total_border_expansion()) });
 }
-
 
 void sentience_meter_bar::advance_elements(
 	const game_gui_context context,
@@ -152,7 +170,7 @@ void sentience_meter_bar::advance_elements(
 	if (this_id->particles.size() > 0) {
 		randomization rng(static_cast<int>(this_id.get_location().type) + context.get_cosmos().get_total_time_passed_in_seconds() * 1000);
 
-		const auto bar_size = this_id->get_full_value_bar_rect(context, this_id, this_id->rc).get_size();
+		const auto value_bar_size = this_id->get_value_bar_rect(context, this_id, this_id->rc).get_size();
 
 		while (this_id->seconds_accumulated > 0.f) {
 			for (auto& p : this_id->particles) {
@@ -174,8 +192,8 @@ void sentience_meter_bar::advance_elements(
 				p.relative_pos.y = std::max(0, p.relative_pos.y);
 				p.relative_pos.x = std::max(0, p.relative_pos.x);
 
-				p.relative_pos.x %= static_cast<int>(bar_size.x + 12);
-				p.relative_pos.y %= static_cast<int>(bar_size.y + 12);
+				p.relative_pos.x %= static_cast<int>(value_bar_size.x + 12);
+				p.relative_pos.y %= static_cast<int>(value_bar_size.y + 12);
 			}
 
 			this_id->seconds_accumulated -= 1.f / 15;
@@ -231,7 +249,7 @@ void sentience_meter_bar::rebuild_layouts(
 	if (this_id->particles.empty()) {
 		randomization rng(static_cast<int>(this_id.get_location().type));
 
-		const auto bar_size = this_id->get_full_value_bar_rect(context, this_id, this_id->rc).get_size();
+		const auto value_bar_size = this_id->get_value_bar_rect(context, this_id, this_id->rc).get_size();
 
 		for (size_t i = 0; i < 40; ++i) {
 			const augs::gui::material mats[3] = {
@@ -241,7 +259,7 @@ void sentience_meter_bar::rebuild_layouts(
 			};
 
 			effect_particle new_part;
-			new_part.relative_pos = rng.randval(vec2(0, 0), bar_size);
+			new_part.relative_pos = rng.randval(vec2(0, 0), value_bar_size);
 			new_part.mat = mats[rng.randval(0, 2)];
 
 			this_id->particles.push_back(new_part);
