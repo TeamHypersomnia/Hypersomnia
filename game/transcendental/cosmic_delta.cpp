@@ -154,7 +154,7 @@ bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 	
 	delted_entity_stream dt;
 
-	enco.significant.pool_for_aggregates.for_each_with_id([&](const aggregate& agg, const entity_id id) {
+	enco.significant.pool_for_aggregates.for_each_object_and_id([&](const aggregate& agg, const entity_id id) {
 		const const_entity_handle enco_entity = enco.get_handle(id);
 #if COSMOS_TRACKS_GUIDS
 		const auto stream_written_id = enco_entity.get_guid();
@@ -258,7 +258,7 @@ bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 		}
 	});
 
-	base.significant.pool_for_aggregates.for_each_with_id([&base, &enco, &out, &dt](const aggregate&, const entity_id id) {
+	base.significant.pool_for_aggregates.for_each_object_and_id([&base, &enco, &out, &dt](const aggregate&, const entity_id id) {
 		const const_entity_handle base_entity = base.get_handle(id);
 #if COSMOS_TRACKS_GUIDS
 		const auto stream_written_id = base_entity.get_guid();

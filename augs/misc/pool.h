@@ -33,46 +33,16 @@ namespace augs {
 		std::vector<indirector> indirectors;
 		std::vector<int> free_indirectors;
 
-	public:
-		template <class Archive>
-		void write_object(Archive& ar) const {
-			augs::write_with_capacity(ar, pooled);
-			augs::write_with_capacity(ar, slots);
-			augs::write_with_capacity(ar, indirectors);
-			augs::write_with_capacity(ar, free_indirectors);
-		}
-
-		template <class Archive>
-		void read_object(Archive& ar) {
-			augs::read_with_capacity(ar, pooled);
-			augs::read_with_capacity(ar, slots);
-			augs::read_with_capacity(ar, indirectors);
-			augs::read_with_capacity(ar, free_indirectors);
-		}
-
-	protected:
-		void initialize_space(int slot_count) {
-			pooled.clear();
-			indirectors.clear();
-			slots.clear();
-			free_indirectors.clear();
-
-			pooled.reserve(slot_count);
-			slots.reserve(slot_count);
-
-			indirectors.resize(slot_count);
-
-			free_indirectors.resize(slot_count);
-			for (int i = 0; i < slot_count; ++i)
-				free_indirectors[i] = i;
-		}
-
 		template<class F>
-		bool internal_free(id_type object, F custom_mover) {
-			if (!alive(object))
+		bool internal_free(
+			const id_type object, 
+			F custom_mover
+		) {
+			if (!alive(object)) {
 				return false;
+			}
 
-			unsigned dead_index = get_real_index(object);
+			const unsigned dead_index = get_real_index(object);
 
 			// add dead object's indirector to the free indirection list
 			free_indirectors.push_back(slots[dead_index].pointing_indirector);
@@ -97,62 +67,81 @@ namespace augs {
 			return true;
 		}
 
-		template<typename... Args>
-		id_type allocate(Args... args) {
+	public:
+		pool_base(const size_t slot_count = 0u) {
+			initialize_space(slot_count);
+		}
+
+		void initialize_space(const size_t slot_count) {
+			pooled.clear();
+			indirectors.clear();
+			slots.clear();
+			free_indirectors.clear();
+
+			pooled.reserve(slot_count);
+			slots.reserve(slot_count);
+
+			indirectors.resize(slot_count);
+
+			free_indirectors.resize(slot_count);
+
+			for (size_t i = 0; i < slot_count; ++i) {
+				free_indirectors[i] = i;
+			}
+		}
+
+		template <typename... Args>
+		id_type allocate(Args&&... args) {
 			if (free_indirectors.empty()) {
 				throw std::runtime_error("Pool is full!");
 			}
 
-			int next_free_indirection = free_indirectors.back();
+			const int next_free_indirector = free_indirectors.back();
 			free_indirectors.pop_back();
-			indirector& indirector = indirectors[next_free_indirection];
 
-			size_t new_slot_index = size();
+			indirector& indirector = indirectors[next_free_indirector];
+
+			const size_t new_slot_index = size();
 
 			metadata new_slot;
-			new_slot.pointing_indirector = next_free_indirection;
+			new_slot.pointing_indirector = next_free_indirector;
 			indirector.real_index = new_slot_index;
 
 			id_type allocated_id;
 			allocated_id.version = indirector.version;
-			allocated_id.indirection_index = next_free_indirection;
+			allocated_id.indirection_index = next_free_indirector;
 
 			slots.push_back(new_slot);
-			pooled.emplace_back(args...);
+			pooled.emplace_back(std::forward<Args>(args)...);
 
 			return allocated_id;
 		}
 
-		bool free(id_type object) {
-			return internal_free(object, [](auto...){});
+		bool free(const id_type object) {
+			return internal_free(object, [](auto...) {});
 		}
 
-	public:
-		pool_base(int slot_count = 0) {
-			initialize_space(slot_count);
-		}
-
-		id_type make_versioned(unversioned_id_type unv) const {
+		id_type make_versioned(const unversioned_id_type unv) const {
 			id_type ver;
 			ver.indirection_index = unv.indirection_index;
 			ver.version = indirectors[unv.indirection_index].version;
 			return ver;
 		}
 
-		handle_type get_handle(id_type from_id) {
+		handle_type get_handle(const id_type from_id) {
 			return{ *this, from_id };
 		}
 
-		const_handle_type get_handle(id_type from_id) const {
+		const_handle_type get_handle(const id_type from_id) const {
 			return{ *this, from_id };
 		}
 
 		template<class Pred>
-		void for_each_with_id(Pred f) {
+		void for_each_object_and_id(Pred f) {
 			id_type id;
 
 			for (size_t i = 0; i < size(); ++i) {
-				metadata& s = slots[i];
+				const metadata& s = slots[i];
 				id.indirection_index = s.pointing_indirector;
 				id.version = indirectors[s.pointing_indirector].version;
 
@@ -161,7 +150,7 @@ namespace augs {
 		}
 
 		template<class Pred>
-		void for_each_with_id(Pred f) const {
+		void for_each_object_and_id(Pred f) const {
 			id_type id;
 
 			for (size_t i = 0; i < size(); ++i) {
@@ -177,7 +166,7 @@ namespace augs {
 			id_type id;
 
 			for (size_t i = 0; i < size(); ++i) {
-				metadata& s = slots[i];
+				const metadata& s = slots[i];
 				id.indirection_index = s.pointing_indirector;
 				id.version = indirectors[s.pointing_indirector].version;
 
@@ -249,100 +238,33 @@ namespace augs {
 		bool empty() const {
 			return size() == 0;
 		}
+
+		template <class Archive>
+		void write_object(Archive& ar) const {
+			augs::write_with_capacity(ar, pooled);
+			augs::write_with_capacity(ar, slots);
+			augs::write_with_capacity(ar, indirectors);
+			augs::write_with_capacity(ar, free_indirectors);
+		}
+
+		template <class Archive>
+		void read_object(Archive& ar) {
+			augs::read_with_capacity(ar, pooled);
+			augs::read_with_capacity(ar, slots);
+			augs::read_with_capacity(ar, indirectors);
+			augs::read_with_capacity(ar, free_indirectors);
+		}
 	};
 
-	template<class T>
+	template <class T>
 	class pool : public pool_base<T> {
-	public:
-		using pool_base<T>::initialize_space;
-		using pool_base<T>::allocate;
-		using pool_base<T>::free;
-		
-		template <class Archive>
-		void write_object(Archive& ar) const {
-			augs::write(ar, static_cast<const pool_base<T>&>(*this));
-		}
-
-		template <class Archive>
-		void read_object(Archive& ar) {
-			augs::read(ar, static_cast<pool_base<T>&>(*this));
-		}
 	};
 
-	template<class T, typename... meta>
-	class pool_with_meta : public pool_base<T> {
-		std::vector<std::tuple<meta...>> metas;
-
-		typedef augs::handle_for_pool_container<false, pool_with_meta, T> handle_type;
-		typedef augs::handle_for_pool_container<true, pool_with_meta, T> const_handle_type;
-	public:
-		template <class Archive>
-		void write_object(Archive& ar) const {
-			augs::write(ar, static_cast<const pool_base<T>&>(*this));
-			augs::write_with_capacity(ar, metas);
-		}
-
-		template <class Archive>
-		void read_object(Archive& ar) {
-			augs::read(ar, static_cast<pool_base<T>&>(*this));
-			augs::read_with_capacity(ar, metas);
-		}
-
-		void initialize_space(int slot_count) {
-			pool_base<T>::initialize_space(slot_count);
-
-			metas.clear();
-			metas.reserve(slot_count);
-		}
-
-		template<typename... Args>
-		typename pool_base<T>::id_type allocate(Args... args) {
-			auto result = pool_base<T>::allocate(args...);
-			metas.emplace_back(std::tuple<meta...>());
-			return result;
-		}
-
-		bool free(typename pool_base<T>::id_type object) {
-			auto result = pool_base<T>::internal_free(object, [this](size_t to, size_t from){
-				metas[to] = std::move(metas[from]);
-			});
-
-			if (result) {
-				metas.pop_back();
-				return true;
-			}
-
-			return false;
-		}
-
-		template <typename M>
-		M& get_meta(typename pool_base<T>::id_type object) {
-			ensure(alive(object));
-			return std::get<M>(metas[pool_base<T>::get_real_index(object)]);
-		}
-
-		template <typename M>
-		const M& get_meta(typename pool_base<T>::id_type object) const {
-			ensure(alive(object));
-			return std::get<M>(metas[pool_base<T>::get_real_index(object)]);
-		}
-	};
-
-	template<class T>
+	template <class T>
 	struct make_pool { typedef pool<T> type; };
 }
 
 namespace augs {
-	template<class A, class T, class...>
-	void read_object(A& ar, pool_base<T>& storage) {
-		storage.read_object(ar);
-	}
-	
-	template<class A, class T, class...>
-	void write_object(A& ar, const pool_base<T>& storage) {
-		storage.write_object(ar);
-	}
-	
 	template<class A, class T, class...>
 	void read_object(A& ar, pool<T>& storage) {
 		storage.read_object(ar);
@@ -350,16 +272,6 @@ namespace augs {
 	
 	template<class A, class T, class...>
 	void write_object(A& ar, const pool<T>& storage) {
-		storage.write_object(ar);
-	}
-	
-	template<class A, class T, class... Args>
-	void read_object(A& ar, pool_with_meta<T, Args...>& storage) {
-		storage.read_object(ar);
-	}
-	
-	template<class A, class T, class... Args>
-	void write_object(A& ar, const pool_with_meta<T, Args...>& storage) {
 		storage.write_object(ar);
 	}
 }
