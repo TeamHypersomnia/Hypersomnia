@@ -10,7 +10,10 @@
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/detail/position_scripts.h"
 
-void resolve_dampings_of_body(const entity_handle it) {
+void resolve_dampings_of_body(
+	const entity_handle it,
+	const bool is_sprint_effective
+) {
 	auto& cosmos = it.get_cosmos();
 	auto& physics = it.get<components::physics>();
 
@@ -18,16 +21,8 @@ void resolve_dampings_of_body(const entity_handle it) {
 
 	if (it.get<components::processing>().is_in(processing_subjects::WITH_MOVEMENT)) {
 		const auto& movement = it.get<components::movement>();
-		bool is_sprint_effective = movement.sprint_enabled;
 
 		auto* const sentience = it.find<components::sentience>();
-		const bool is_sentient = sentience != nullptr;
-
-		if (is_sentient) {
-			if (sentience->consciousness.value <= 0.f) {
-				is_sprint_effective = false;
-			}
-		}
 
 		const bool is_inert = movement.make_inert_for_ms > 0.f;
 

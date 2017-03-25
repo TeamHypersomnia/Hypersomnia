@@ -29,26 +29,29 @@ float sentience_meter::get_ratio() const {
 	return value / static_cast<float>(maximum);
 }
 
-sentience_meter::damage_result sentience_meter::calculate_damage_result(const meter_value_type amount) const {
+sentience_meter::damage_result sentience_meter::calculate_damage_result(
+	const meter_value_type dealt,
+	const meter_value_type lower_bound
+) const {
 	sentience_meter::damage_result result;
 
-	if (amount > 0) {
-		if (value > 0) {
-			if (value <= amount) {
-				result.excessive = amount - value;
-				result.effective = value;
-			}
-			else {
-				result.effective = amount;
-			}
+	if (dealt > 0) {
+		const auto offset_value = value - lower_bound;
+
+		if (dealt >= offset_value) {
+			result.excessive = dealt - offset_value;
+			result.effective = offset_value;
+		}
+		else {
+			result.effective = dealt;
 		}
 	}
 	else {
-		if (value - amount > maximum) {
+		if (value - dealt > maximum) {
 			result.effective = -(maximum - value);
 		}
 		else {
-			result.effective = amount;
+			result.effective = dealt;
 		}
 	}
 

@@ -83,8 +83,22 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 			auto* const sentience = it.find<components::sentience>();
 			const bool is_sentient = sentience != nullptr;
 
+			sentience_meter::damage_result consciousness_damage_by_sprint;
+			float minimum_consciousness_to_sprint = 0.f;
+
 			if (is_sentient) {
-				if (sentience->consciousness.value <= 0.f) {
+				minimum_consciousness_to_sprint = sentience->consciousness.get_maximum_value() / 10;
+
+				if (sentience->consciousness.value < minimum_consciousness_to_sprint - 0.1f) {
+					movement_force_mult /= 2;
+				}
+
+				consciousness_damage_by_sprint = sentience->consciousness.calculate_damage_result(
+					2 * delta.in_seconds(),
+					minimum_consciousness_to_sprint
+				);
+
+				if (consciousness_damage_by_sprint.excessive > 0) {
 					is_sprint_effective = false;
 				}
 
@@ -111,7 +125,7 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 					movement_force_mult /= 2.f;
 
 					if (is_sentient) {
-						sentience->consciousness.value -= sentience->consciousness.calculate_damage_result(2 * delta.in_seconds()).effective;
+						sentience->consciousness.value -= consciousness_damage_by_sprint.effective;
 					}
 				}
 
@@ -142,7 +156,7 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 				);
 			}
 			
-			resolve_dampings_of_body(it);
+			resolve_dampings_of_body(it, is_sprint_effective);
 		}
 	);
 }
