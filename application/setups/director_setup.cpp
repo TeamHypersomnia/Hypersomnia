@@ -27,6 +27,10 @@
 #include "augs/templates/container_templates.h"
 #include "application/config_lua_table.h"
 
+#include <experimental/filesystem>
+
+namespace fs = std::experimental::filesystem;
+
 #define LOG_REWINDING 0
 
 using namespace augs::window::event::keys;
@@ -74,11 +78,11 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 
 	augs::create_directories(cfg.director_scenario_path);
 	
-	const std::string input_director_file = cfg.director_scenario_path;
-	const std::string output_director_file = cfg.director_scenario_path;
+	const std::string input_director_path = cfg.director_scenario_path;
+	const std::string output_director_path = cfg.director_scenario_path;
 
 	cosmic_movie_director director;
-	director.load_recording_from_file(input_director_file);
+	director.load_recording_from_file(input_director_path);
 
 	enum class director_state {
 		PLAYING,
@@ -157,7 +161,7 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 						}
 					}
 					if (raw_input.key == key::F7) {
-						director.save_recording_to_file(output_director_file);
+						director.save_recording_to_file(output_director_path);
 						unsaved_changes_exist = false;
 
 						requested_playing_speed = 0.f;
@@ -423,6 +427,6 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 	}
 
 	if (unsaved_changes_exist) {
-		director.save_recording_to_file(output_director_file + ".unsaved.ent");
+		director.save_recording_to_file(fs::path(output_director_path).replace_extension(".unsaved.ent").string());
 	}
 }
