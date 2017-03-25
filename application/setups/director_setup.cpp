@@ -72,10 +72,10 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 		hypersomnia[testbed.characters[1]].get<components::name>().nickname = ::to_wstring(cfg.debug_second_nickname);
 	}
 
-	augs::create_directories(cfg.director_scenario_filename);
+	augs::create_directories(cfg.director_scenario_path);
 	
-	const std::string input_director_file = cfg.director_scenario_filename;
-	const std::string output_director_file = cfg.director_scenario_filename;
+	const std::string input_director_file = cfg.director_scenario_path;
+	const std::string output_director_file = cfg.director_scenario_path;
 
 	cosmic_movie_director director;
 	director.load_recording_from_file(input_director_file);

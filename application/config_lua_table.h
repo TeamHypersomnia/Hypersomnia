@@ -19,7 +19,6 @@ namespace augs {
 	class lua_state_raii;
 }
 
-
 class config_lua_table {
 public:
 	// GEN INTROSPECTOR class config_lua_table
@@ -75,10 +74,10 @@ public:
 	std::string post_data_file_path;
 	std::string last_session_update_link;
 
-	std::string director_scenario_filename;
-	std::string menu_intro_scenario_filename;
+	std::string director_scenario_path;
+	std::string menu_intro_scenario_path;
 
-	std::string menu_theme_filename;
+	std::string menu_theme_path;
 
 	float rewind_intro_scene_by_secs = 3.5;
 	float start_menu_music_at_secs = 0.f;

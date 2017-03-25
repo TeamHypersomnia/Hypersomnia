@@ -40,15 +40,16 @@ recording_type = {
 	-- no recording at all (best performance)
 	DISABLE = 0,
 	-- record with buffer (moderate performance, but some important machine inputs may be lost if a segfault is encountered)
+	-- NOT IMPLEMENTED!!!
 	LIVE_WITH_BUFFER = 1,
 	-- record live (saves machine inputs each frame to the file and does not proceed until it is done)
 	LIVE = 2
 }
 
 config_table = {
-	launch_mode = launch_type.LOCAL,
+	launch_mode = launch_type.DIRECTOR,
 	
-	input_recording_mode = recording_type.DISABLE,
+	input_recording_mode = recording_type.LIVE,
 
 	-- initial replaying speed of the machine entropies recording
 	recording_replay_speed = 1,
@@ -151,14 +152,14 @@ config_table = {
 	-- Will refresh last session time on the blog
 	last_session_update_link = "patrykcysarz.pl/comment-system/web/stats/last-update/set",
 
-	-- Intro scene filename to be opened with DIRECTOR mode
-	director_scenario_filename = "director/menu_intro.ent",
+	-- Intro scene path to be opened with DIRECTOR mode
+	director_scenario_path = "director/menu_intro.ent",
 	
-	-- Main menu intro scene filename recorded with DIRECTOR mode
-	menu_intro_scenario_filename = "director/menu_intro.ent",
+	-- Main menu intro scene path recorded with DIRECTOR mode
+	menu_intro_scenario_path = "director/menu_intro.ent",
 
-	-- Menu theme filename
-	menu_theme_filename = "hypersomnia/music/menu_theme.flac",
+	-- Menu theme path
+	menu_theme_path = "hypersomnia/music/menu_theme.flac",
 
 	-- Menu intro timing settings
 	rewind_intro_scene_by_secs = 3.5,

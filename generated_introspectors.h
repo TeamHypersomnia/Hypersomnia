@@ -1807,10 +1807,10 @@ namespace augs {
 		FIELD(post_data_file_path);
 		FIELD(last_session_update_link);
 
-		FIELD(director_scenario_filename);
-		FIELD(menu_intro_scenario_filename);
+		FIELD(director_scenario_path);
+		FIELD(menu_intro_scenario_path);
 
-		FIELD(menu_theme_filename);
+		FIELD(menu_theme_path);
 
 		FIELD(rewind_intro_scene_by_secs);
 		FIELD(start_menu_music_at_secs);

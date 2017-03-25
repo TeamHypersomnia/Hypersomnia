@@ -78,8 +78,8 @@ void menu_setup::process(
 	float gain_fade_multiplier = 0.f;
 
 	if (cfg.music_volume > 0.f) {
-		if (augs::file_exists(cfg.menu_theme_filename)) {
-			menu_theme.set_data(augs::get_sound_samples_from_file(cfg.menu_theme_filename));
+		if (augs::file_exists(cfg.menu_theme_path)) {
+			menu_theme.set_data(augs::get_sound_samples_from_file(cfg.menu_theme_path));
 
 			menu_theme_source.bind_buffer(menu_theme);
 			menu_theme_source.set_direct_channels(true);
@@ -468,7 +468,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 	}
 
 	cosmic_movie_director director;
-	director.load_recording_from_file(cfg.menu_intro_scenario_filename);
+	director.load_recording_from_file(cfg.menu_intro_scenario_path);
 	ensure(director.is_recording_available());
 
 	timer.reset_timer();

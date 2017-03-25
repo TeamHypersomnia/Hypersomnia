@@ -144,8 +144,6 @@ void physics_system::fixtures_construct(const const_entity_handle handle) {
 					fixdef.shape = &shape;
 					b2Fixture* const new_fix = owner_cache.body->CreateFixture(&fixdef);
 					
-					LOG("Radius: %x", si.get_pixels(new_fix->m_shape->m_radius));
-
 					partitioned_collider.push_back(new_fix);
 				}
 				else {
