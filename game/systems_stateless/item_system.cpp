@@ -14,6 +14,7 @@
 #include "game/components/force_joint_component.h"
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/fixtures_component.h"
+#include "game/components/sentience_component.h"
 #include "game/detail/gui/character_gui.h"
 
 #include "game/detail/inventory/inventory_utils.h"
@@ -47,16 +48,23 @@ void item_system::handle_trigger_confirmations_as_pick_requests(const logic_step
 	for (const auto& e : confirmations) {
 		const auto detector = cosmos[e.detector_body];
 
+		if (detector.has<components::sentience>()) {
+			if (!detector.get<components::sentience>().is_conscious()) {
+				continue;
+			}
+		}
+
 		auto* const item_slot_transfers = detector.find<components::item_slot_transfers>();
 		const auto item_entity = cosmos[e.trigger].get_owner_body();
 
 		const auto* const item = item_entity.find<components::item>();
 
-		if (item_slot_transfers && item && item_entity.get_owning_transfer_capability().dead()) {
+		if (item_slot_transfers != nullptr && item != nullptr && item_entity.get_owning_transfer_capability().dead()) {
 			const auto& pick_list = item_slot_transfers->only_pick_these_items;
 			const bool found_on_subscription_list = found_in(pick_list, item_entity);
 
-			const bool item_subscribed = (pick_list.empty() && item_slot_transfers->pick_all_touched_items_if_list_to_pick_empty)
+			const bool item_subscribed = 
+				(pick_list.empty() && item_slot_transfers->pick_all_touched_items_if_list_to_pick_empty)
 				|| found_in(item_slot_transfers->only_pick_these_items, item_entity);
 			
 			if (item_subscribed) {
@@ -81,10 +89,10 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 	const auto& requests = step.transient.messages.get_queue<messages::intent_message>();
 
 	for (const auto& r : requests) {
-		if (r.is_pressed &&
-			(r.intent == intent_type::THROW_PRIMARY_ITEM
-				|| r.intent == intent_type::THROW_SECONDARY_ITEM)
-			) {
+		if (
+			r.is_pressed 
+			&& (r.intent == intent_type::THROW_PRIMARY_ITEM || r.intent == intent_type::THROW_SECONDARY_ITEM)
+		) {
 			const auto subject = cosmos[r.subject];
 
 			if (subject.find<components::item_slot_transfers>()) {

@@ -119,11 +119,6 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 				if (passed > 0 && passed % consciousness_regeneration_frequency_in_steps == 0) {
 					sentience.consciousness.value -= sentience.consciousness.calculate_damage_result(-2).effective;
 				}
-
-				const auto consciousness_ratio = sentience.consciousness.get_ratio();
-				const auto health_ratio = sentience.health.get_ratio();
-
-				sentience.consciousness.value = static_cast<meter_value_type>(std::min(consciousness_ratio, health_ratio) * sentience.consciousness.maximum);
 			}
 
 			if (sentience.personal_electricity.is_enabled()) {
@@ -183,6 +178,11 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		subject.get<components::physics>()
 			.apply_impulse(vec2(h.impact_velocity).set_length(static_cast<float>(h.effective_amount * 5)));
 
+		const auto consciousness_ratio = sentience.consciousness.get_ratio();
+		const auto health_ratio = sentience.health.get_ratio();
+
+		sentience.consciousness.value = static_cast<meter_value_type>(std::min(consciousness_ratio, health_ratio) * sentience.consciousness.maximum);
+
 		if (!sentience.health.is_positive()) {
 			h.special_result = messages::health_event::result_type::DEATH;
 		}
@@ -233,6 +233,8 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		knockout = true;
 
 		sentience.health.value = 0.f;
+		sentience.personal_electricity.value = 0.f;
+		sentience.consciousness.value = 0.f;
 	}
 	else if (h.special_result == messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS) {
 		knockout = true;
@@ -270,6 +272,7 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		//
 		
 		//
+		subject.get<components::processing>().disable_in(processing_subjects::WITH_TRIGGER_QUERY_DETECTOR);
 		subject.get<components::processing>().disable_in(processing_subjects::WITH_MOVEMENT);
 		subject.get<components::processing>().disable_in(processing_subjects::WITH_ROTATION_COPYING);
 		resolve_dampings_of_body(subject);
