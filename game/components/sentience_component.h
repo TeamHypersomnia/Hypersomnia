@@ -6,7 +6,6 @@
 
 #include "augs/misc/enum_associative_array.h"
 
-#include "game/enums/perk_meter_type.h"
 #include "game/enums/sentience_meter_type.h"
 #include "game/enums/spell_type.h"
 
@@ -52,28 +51,79 @@ namespace components {
 		child_entity_id character_crosshair;
 		// END GEN INTROSPECTOR
 
+		// calls abstraction for GUI
+
+	private:
 		template <class F>
-		decltype(auto) call_on(
-			const sentience_meter_type s,
-			const F callback
+		decltype(auto) redirect_arguments_now_dt(
+			const sentience_meter_type type,
+			F callback,
+			const augs::stepped_timestamp now,
+			const augs::delta dt
 		) const {
-			switch (s) {
-			case sentience_meter_type::HEALTH: return callback(health);
-			case sentience_meter_type::PERSONAL_ELECTRICITY: return callback(personal_electricity);
-			case sentience_meter_type::CONSCIOUSNESS: return callback(consciousness);
-			default: ensure(false); return callback(health);
+			switch (type) {
+				case sentience_meter_type::HEALTH: return callback(health);
+				case sentience_meter_type::PERSONAL_ELECTRICITY: return callback(personal_electricity);
+				case sentience_meter_type::CONSCIOUSNESS: return callback(consciousness);
+				case sentience_meter_type::HASTE: return callback(haste.timing, now, dt);
+				case sentience_meter_type::ELECTRIC_SHIELD: return callback(electric_shield.timing, now, dt);
+				default: ensure("unknown sentience meter type" && false); return callback(health);
 			}
 		}
 
-		template <class F>
-		decltype(auto) call_on(
-			const perk_meter_type s,
-			const F callback
+	public:
+
+		bool is_enabled(
+			const sentience_meter_type type,
+			const augs::stepped_timestamp now,
+			const augs::delta dt
 		) const {
-			switch (s) {
-			case perk_meter_type::HASTE: return callback(haste);
-			case perk_meter_type::ELECTRIC_SHIELD: return callback(electric_shield);
-			default: ensure(false); return callback(haste);
+			return redirect_arguments_now_dt(type, [](const auto& t, auto... args) { return t.is_enabled(args...); }, now, dt);
+		}
+		
+		float get_ratio(
+			const sentience_meter_type type,
+			const augs::stepped_timestamp now,
+			const augs::delta dt
+		) const {
+			return redirect_arguments_now_dt(type, [](const auto& t, auto... args) { return t.get_ratio(args...); }, now, dt);
+		}
+
+		meter_value_type get_value(
+			const sentience_meter_type type,
+			const augs::stepped_timestamp now,
+			const augs::delta dt
+		) const {
+			switch (type) {
+			case sentience_meter_type::HEALTH: 
+				return health.get_value();
+			case sentience_meter_type::PERSONAL_ELECTRICITY: 
+				return personal_electricity.get_value();
+			case sentience_meter_type::CONSCIOUSNESS: 
+				return consciousness.get_value();
+			case sentience_meter_type::HASTE: 
+				return static_cast<meter_value_type>(haste.timing.duration.cooldown_duration_ms * haste.timing.get_ratio(now, dt));
+			case sentience_meter_type::ELECTRIC_SHIELD: 
+				return static_cast<meter_value_type>(electric_shield.timing.duration.cooldown_duration_ms * electric_shield.timing.get_ratio(now, dt));
+			default: ensure("unknown sentience meter type" && false); return 0;
+			}
+		}
+
+		meter_value_type get_maximum_value(
+			const sentience_meter_type type
+		) const {
+			switch (type) {
+			case sentience_meter_type::HEALTH:
+				return health.get_maximum_value();
+			case sentience_meter_type::PERSONAL_ELECTRICITY:
+				return personal_electricity.get_maximum_value();
+			case sentience_meter_type::CONSCIOUSNESS:
+				return consciousness.get_maximum_value();
+			case sentience_meter_type::HASTE:
+				return static_cast<meter_value_type>(haste.timing.duration.cooldown_duration_ms);
+			case sentience_meter_type::ELECTRIC_SHIELD:
+				return static_cast<meter_value_type>(electric_shield.timing.duration.cooldown_duration_ms);
+			default: ensure("unknown sentience meter type" && false); return 0;
 			}
 		}
 

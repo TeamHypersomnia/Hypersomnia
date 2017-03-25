@@ -477,7 +477,6 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 	const auto maybe_hovered_slot = context._dynamic_cast<slot_button_in_container>(rect_world.rect_hovered);
 	const auto maybe_hovered_hotbar_button = context._dynamic_cast<hotbar_button_in_character_gui>(rect_world.rect_hovered);
 	const auto maybe_hovered_sentience_meter = context._dynamic_cast<sentience_meter_bar_in_character_gui>(rect_world.rect_hovered);
-	const auto maybe_hovered_perk_meter = context._dynamic_cast<perk_meter_bar_in_character_gui>(rect_world.rect_hovered);
 	const auto maybe_hovered_action_button = context._dynamic_cast<action_button_in_character_gui>(rect_world.rect_hovered);
 
 	gui::text::formatted_string tooltip_text;
@@ -508,15 +507,6 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 			get_bbcoded_sentience_meter_description(
 				gui_entity, 
 				maybe_hovered_sentience_meter.get_location().type
-			), 
-			description_style
-		);
-	}
-	else if (maybe_hovered_perk_meter) {
-		tooltip_text = text::format_as_bbcode(
-			get_bbcoded_perk_meter_description(
-				gui_entity,
-				maybe_hovered_perk_meter.get_location().type
 			), 
 			description_style
 		);

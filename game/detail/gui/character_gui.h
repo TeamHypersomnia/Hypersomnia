@@ -1,20 +1,23 @@
 #pragma once
 #include <unordered_map>
 #include <array>
+
+#include "augs/ensure.h"
+#include "augs/misc/enum_array.h"
+#include "augs/misc/constant_size_vector.h"
+
 #include "augs/gui/rect.h"
 #include "augs/gui/rect_world.h"
+#include "augs/gui/dereferenced_location.h"
+
+#include "game/enums/slot_function.h"
+
+#include "game/container_sizes.h"
 #include "game/transcendental/entity_id.h"
 #include "game/detail/gui/drag_and_drop_target_drop_item.h"
 #include "game/detail/gui/hotbar_button.h"
 #include "game/detail/gui/action_button.h"
 #include "game/detail/gui/sentience_meter_bar.h"
-#include "game/detail/gui/perk_meter_bar.h"
-#include "augs/gui/dereferenced_location.h"
-#include "game/enums/slot_function.h"
-#include "augs/ensure.h"
-
-#include "augs/misc/constant_size_vector.h"
-#include "game/container_sizes.h"
 
 struct wielding_result;
 
@@ -32,8 +35,7 @@ struct character_gui {
 	
 	std::array<hotbar_button, 10> hotbar_buttons;
 	std::array<action_button, 10> action_buttons;
-	std::array<sentience_meter_bar, static_cast<size_t>(sentience_meter_type::COUNT)> sentience_meter_bars;
-	std::array<perk_meter_bar, static_cast<size_t>(perk_meter_type::COUNT)> perk_meters;
+	augs::enum_array<sentience_meter_bar, sentience_meter_type> sentience_meter_bars;
 
 	hotbar_selection_setup last_setups[2];
 	short currently_held_hotbar_index = -1;

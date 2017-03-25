@@ -22,6 +22,10 @@ void sentience_meter_bar::draw(
 	const const_this_pointer this_id, 
 	const augs::gui::draw_info info
 ) {
+	const auto& cosmos = context.get_cosmos();
+	const auto dt = cosmos.get_fixed_delta();
+	const auto now = cosmos.get_timestamp();
+
 	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING)) {
 		return;
 	}
@@ -67,7 +71,7 @@ void sentience_meter_bar::draw(
 		;
 			
 		const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
-		const auto current_value_ratio = sentience.call_on(this_type, [](const auto& m) { return m.get_ratio(); });
+		const auto current_value_ratio = sentience.get_ratio(this_type, now, dt);
 		auto current_value_bar_rect = value_bar_rect;
 		const auto bar_width = static_cast<int>(current_value_bar_rect.w() * current_value_ratio);
 		current_value_bar_rect.w(static_cast<float>(bar_width));
@@ -86,7 +90,7 @@ void sentience_meter_bar::draw(
 		stroke.draw(info.v, value_bar_rect, ltrb(), this_id->border_spacing);
 
 		if (should_draw_value_number) {
-			const auto value = sentience.call_on(this_type, [](const auto& m) { return m.get_value(); });
+			const auto value = sentience.get_value(this_type, now, dt);
 
 			augs::gui::text_drawer drawer;
 
@@ -216,6 +220,8 @@ augs::gui::material sentience_meter_bar::get_icon_mat(const const_this_pointer t
 	case sentience_meter_type::HEALTH: return{ assets::game_image_id::HEALTH_ICON, white };
 	case sentience_meter_type::CONSCIOUSNESS: return{ assets::game_image_id::CONSCIOUSNESS_ICON, white };
 	case sentience_meter_type::PERSONAL_ELECTRICITY: return{ assets::game_image_id::PERSONAL_ELECTRICITY_ICON, white };
+	case sentience_meter_type::HASTE: return{ assets::game_image_id::PERK_HASTE_ICON, white };
+	case sentience_meter_type::ELECTRIC_SHIELD: return{ assets::game_image_id::PERK_ELECTRIC_SHIELD_ICON, white };
 	default: ensure(false);  return{};
 	}
 }
@@ -225,6 +231,8 @@ augs::gui::material sentience_meter_bar::get_bar_mat(const const_this_pointer th
 	case sentience_meter_type::HEALTH: return{ assets::game_image_id::BLANK, red-rgba(30, 30, 30, 0) };
 	case sentience_meter_type::CONSCIOUSNESS: return{ assets::game_image_id::BLANK, orange - rgba(30, 30, 30, 0) };
 	case sentience_meter_type::PERSONAL_ELECTRICITY: return{ assets::game_image_id::BLANK, cyan - rgba(30, 30, 30, 0) };
+	case sentience_meter_type::HASTE: return{ assets::game_image_id::BLANK, green - rgba(30, 30, 30, 0) };
+	case sentience_meter_type::ELECTRIC_SHIELD: return{ assets::game_image_id::BLANK, turquoise - rgba(30, 30, 30, 0) };
 	default: ensure(false);  return{};
 	}
 }
@@ -236,13 +244,33 @@ void sentience_meter_bar::rebuild_layouts(
 	const auto this_type = this_id.get_location().type;
 	const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
 
-	const auto vertical_index = static_cast<unsigned>(this_type);
+	const auto& cosmos = context.get_cosmos();
+
+	const auto dt = cosmos.get_fixed_delta();
+	const auto now = cosmos.get_timestamp();
+
+	if (!sentience.is_enabled(this_type, now, dt)) {
+		this_id->unset_flag(augs::gui::flag::ENABLE_DRAWING);
+		return;
+	}
+	else {
+		this_id->set_flag(augs::gui::flag::ENABLE_DRAWING);
+	}
+
+	unsigned vertical_index = 0;
+
+	for (unsigned i = 0; i < static_cast<unsigned>(this_type); ++i) {
+		if (sentience.is_enabled(static_cast<sentience_meter_type>(i), now, dt)) {
+			++vertical_index;
+		}
+	}
+
 	const auto screen_size = context.get_character_gui().get_screen_size();
 	const auto icon_size = (*this_id->get_icon_mat(this_id).tex).get_size();
 	const auto with_bar_size = vec2i(icon_size.x + 4 + 180, icon_size.y);
 
 	const auto lt = vec2i(screen_size.x - 220, 20 + vertical_index * (icon_size.y + 4));
-	
+
 	this_id->rc.set_position(lt);
 	this_id->rc.set_size(with_bar_size);
 

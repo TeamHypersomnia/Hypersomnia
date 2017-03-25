@@ -8,7 +8,6 @@
 #include "game/enums/slot_function.h"
 #include "game/enums/item_category.h"
 #include "game/enums/sentience_meter_type.h"
-#include "game/enums/perk_meter_type.h"
 #include "game/enums/spell_type.h"
 
 /*
@@ -44,9 +43,4 @@ std::wstring get_bbcoded_entity_description(const const_entity_handle);
 std::wstring get_bbcoded_sentience_meter_description(
 	const const_entity_handle,
 	const sentience_meter_type
-);
-
-std::wstring get_bbcoded_perk_meter_description(
-	const const_entity_handle,
-	const perk_meter_type
 );

@@ -150,9 +150,14 @@ std::wstring get_bbcoded_sentience_meter_description(
 	const const_entity_handle subject,
 	const sentience_meter_type type
 ) {
+	const auto& cosmos = subject.get_cosmos();
+
+	const auto dt = cosmos.get_fixed_delta();
+	const auto now = cosmos.get_timestamp();
+
 	const auto& sentience = subject.get<components::sentience>();
-	const auto value = sentience.call_on(type, [](const auto& m) { return m.get_value(); } );
-	const auto maximum = sentience.call_on(type, [](const auto& m) { return m.get_maximum_value(); } );
+	const auto value = sentience.get_value(type, now, dt);
+	const auto maximum = sentience.get_maximum_value(type); 
 
 	if (type == sentience_meter_type::HEALTH) {
 		return typesafe_sprintf(L"[color=red]Health points:[/color] %x/%x\n[color=vsdarkgray]Stability of the physical body.[/color]", value, maximum);
@@ -166,20 +171,11 @@ std::wstring get_bbcoded_sentience_meter_description(
 		return typesafe_sprintf(L"[color=orange]Consciousness:[/color] %x/%x\n[color=vsdarkgray]Attunement of soul with the body.[/color]", value, maximum);
 	}
 
-	else return L"Unknown problem";
-}
-
-std::wstring get_bbcoded_perk_meter_description(
-	const const_entity_handle subject,
-	const perk_meter_type type
-) {
-	const auto& sentience = subject.get<components::sentience>();
-
-	if (type == perk_meter_type::HASTE) {
+	if (type == sentience_meter_type::HASTE) {
 		return typesafe_sprintf(L"[color=green]Haste[/color]\n[color=vsdarkgray]You move faster.[/color]");
 	}
 
-	if (type == perk_meter_type::ELECTRIC_SHIELD) {
+	if (type == sentience_meter_type::ELECTRIC_SHIELD) {
 		return typesafe_sprintf(L"[color=turquoise]Electric shield[/color]\n[color=vsdarkgray]Damage is absorbed by [/color][color=cyan]Personal Electricity[/color][color=vsdarkgray] instead of [/color][color=red]Health[/color][color=vsdarkgray].[/color]");
 	}
 

@@ -35,11 +35,5 @@ public:
 			child_location.type = static_cast<sentience_meter_type>(i);
 			generic_call(make_dereferenced_location(&context.get_character_gui().sentience_meter_bars[i], child_location));
 		}
-
-		for (size_t i = 0; i < context.get_character_gui().perk_meters.size(); ++i) {
-			perk_meter_bar_in_character_gui child_location;
-			child_location.type = static_cast<perk_meter_type>(i);
-			generic_call(make_dereferenced_location(&context.get_character_gui().perk_meters[i], child_location));
-		}
 	}
 };
