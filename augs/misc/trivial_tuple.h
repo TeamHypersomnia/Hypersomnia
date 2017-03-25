@@ -7,7 +7,7 @@ namespace augs {
 	class trivial_tuple {
 		typedef std::tuple<Types...> tuple_type;
 
-		char buf[sizeof(std::tuple<Types...>)];
+		alignas(tuple_type) char buf[sizeof(tuple_type)];
 	public:
 		static_assert(are_types_memcpy_safe_v<Types...>, "one of the types is not trivial!");
 
