@@ -9,7 +9,15 @@ namespace augs {
 
 		alignas(tuple_type) char buf[sizeof(tuple_type)];
 	public:
-		static_assert(are_types_memcpy_safe_v<Types...>, "one of the types is not trivial!");
+		static_assert(are_types_memcpy_safe_v<Types...>, "One of the types is not trivially copyable!");
+
+		template <class... Args>
+		trivial_tuple(Args&&... args) {
+			// zero-initialize the memory so that delta encoding does not see the padding bytes as different
+			std::memset(this, sizeof(*this), 0);
+
+			new (buf) tuple_type(std::forward<Args>(args)...);
+		}
 
 		tuple_type& get_tuple() {
 			return *reinterpret_cast<tuple_type*>(buf);
