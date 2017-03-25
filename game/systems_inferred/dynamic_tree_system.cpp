@@ -11,7 +11,7 @@ bool dynamic_tree_system::cache::is_constructed() const {
 }
 
 dynamic_tree_system::cache& dynamic_tree_system::get_cache(const unversioned_entity_id id) {
-	return per_entity_cache[id.pool.indirection_index];
+	return per_entity_cache[id.indirection_index];
 }
 
 dynamic_tree_system::tree& dynamic_tree_system::get_tree(const cache& c) {
@@ -59,7 +59,7 @@ void dynamic_tree_system::create_inferred_state(const const_entity_handle handle
 			auto node_userdata = handle.get_id().operator unversioned_entity_id();
 			static_assert(sizeof(node_userdata) <= sizeof(void*), "Userdata must be less than size of void*");
 
-			cache.tree_proxy_id = get_tree(cache).nodes.CreateProxy(input, reinterpret_cast<void*>(node_userdata.pool.indirection_index));
+			cache.tree_proxy_id = get_tree(cache).nodes.CreateProxy(input, reinterpret_cast<void*>(node_userdata.indirection_index));
 		}
 		
 		cache.constructed = true;
@@ -84,8 +84,8 @@ void dynamic_tree_system::determine_visible_entities_from_camera(
 		std::vector<unversioned_entity_id>* visible_entities;
 		bool QueryCallback(int32 node) {
 			unversioned_entity_id id;
-			id.pool.indirection_index = reinterpret_cast<int>(tree->GetUserData(node));
-			static_assert(std::is_same<decltype(id.pool.indirection_index), int>::value, "Userdata types incompatible");
+			id.indirection_index = reinterpret_cast<int>(tree->GetUserData(node));
+			static_assert(std::is_same<decltype(id.indirection_index), int>::value, "Userdata types incompatible");
 
 			visible_entities->push_back(id);
 			return true;

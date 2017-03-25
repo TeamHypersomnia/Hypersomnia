@@ -5,7 +5,6 @@
 
 namespace augs {
 	namespace detail {
-		// TEMPLATE CLASS aligned_union
 		template<size_t... _Vals>
 		struct _maximum;
 

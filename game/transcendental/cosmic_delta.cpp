@@ -8,7 +8,7 @@
 #include "augs/misc/streams.h"
 #include "augs/misc/delta_compression.h"
 
-#include "augs/misc/pool_id.h"
+#include "augs/misc/pooled_object_id.h"
 
 #include "cosmos.h"
 

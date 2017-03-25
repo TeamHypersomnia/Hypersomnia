@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/misc/pool_id.h"
+#include "augs/misc/pooled_object_id.h"
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include <vector>

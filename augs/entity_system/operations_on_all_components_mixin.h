@@ -3,13 +3,13 @@
 #include "augs/templates/for_each_in_types.h"
 
 #include "augs/misc/pool.h"
-#include "augs/misc/pool_id.h"
+#include "augs/misc/pooled_object_id.h"
 
 namespace augs {
 	template <class derived, class... components>
 	class operations_on_all_components_mixin {
 		typedef component_aggregate<components...> aggregate_type;
-		typedef pool_id<aggregate_type> aggregate_id;
+		typedef pooled_object_id<aggregate_type> aggregate_id;
 
 	public:
 		typedef pool<aggregate_type> aggregate_pool_type;

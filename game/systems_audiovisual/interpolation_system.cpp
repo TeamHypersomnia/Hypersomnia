@@ -74,7 +74,7 @@ void interpolation_system::integrate_interpolated_transforms(
 			auto& recorded_pob = cache.recorded_place_of_birth;
 			auto& recorded_ver = cache.recorded_version;
 			const auto& pob = info.place_of_birth;
-			const auto& ver = e.get_id().pool.version;
+			const auto& ver = e.get_id().version;
 
 			if (recorded_pob == pob && recorded_ver == ver) {
 				integrated = actual.interpolated_separate(integrated, positional_averaging_constant, rotational_averaging_constant);

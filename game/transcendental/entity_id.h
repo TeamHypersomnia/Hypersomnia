@@ -1,6 +1,6 @@
 #pragma once
 #include <type_traits>
-#include "augs/misc/pool_id.h"
+#include "augs/misc/pooled_object_id.h"
 #include "game/transcendental/types_specification/all_components_declaration.h"
 #include "game/transcendental/entity_id_declaration.h"
 
@@ -33,12 +33,12 @@ struct unversioned_entity_id : public augs::unversioned_id<put_all_components_in
 	unversioned_entity_id(const base b = base()) : base(b) {}
 };
 
-struct entity_id : public augs::pool_id<put_all_components_into_t<augs::component_aggregate>> {
+struct entity_id : public augs::pooled_object_id<put_all_components_into_t<augs::component_aggregate>> {
 	// GEN INTROSPECTOR struct entity_id
-	// INTROSPECT BASE augs::pool_id<put_all_components_into_t<augs::component_aggregate>>
+	// INTROSPECT BASE augs::pooled_object_id<put_all_components_into_t<augs::component_aggregate>>
 	// END GEN INTROSPECTOR
 
-	typedef augs::pool_id<put_all_components_into_t<augs::component_aggregate>> base;
+	typedef augs::pooled_object_id<put_all_components_into_t<augs::component_aggregate>> base;
 
 	entity_id(const base b = base()) : base(b) {}
 

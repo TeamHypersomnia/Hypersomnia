@@ -351,7 +351,7 @@ size_t make_cache_id(const entity_id handle);
 size_t make_cache_id(const const_entity_handle handle);
 
 inline size_t make_cache_id(const entity_id id) {
-	return id.pool.indirection_index;
+	return id.indirection_index;
 }
 
 inline size_t make_cache_id(const const_entity_handle handle) {

@@ -105,10 +105,9 @@ namespace augs {
 	template <class Enum, class T>
 	class enum_associative_array;
 	struct machine_entropy;
-	struct raw_pool_id_data;
-	class raw_pool_id;
+	class pooled_object_raw_id;
 	template <class T>
-	class pool_id;
+	class pooled_object_id;
 	struct stepped_timestamp;
 	struct stepped_cooldown;
 	template <class A, class B>
@@ -374,7 +373,7 @@ namespace augs {
 
 	template <class F, class... Instances>
 	void introspect_body(
-		const augs::raw_pool_id_data* const,
+		const augs::pooled_object_raw_id* const,
 		F f,
 		Instances&&... _t_
 	) {
@@ -382,22 +381,13 @@ namespace augs {
 		FIELD(indirection_index);
 	}
 
-	template <class F, class... Instances>
-	void introspect_body(
-		const augs::raw_pool_id* const,
-		F f,
-		Instances&&... _t_
-	) {
-		FIELD(pool);
-	}
-
 	template <class F, class T, class... Instances>
 	void introspect_body(
-		const augs::pool_id<T>* const,
+		const augs::pooled_object_id<T>* const,
 		F f,
 		Instances&&... _t_
 	) {
-		introspect_body(static_cast<augs::raw_pool_id*>(nullptr), f, std::forward<Instances>(_t_)...);
+		introspect_body(static_cast<augs::pooled_object_raw_id*>(nullptr), f, std::forward<Instances>(_t_)...);
 	}
 
 	template <class F, class... Instances>
@@ -1747,7 +1737,7 @@ namespace augs {
 		F f,
 		Instances&&... _t_
 	) {
-		introspect_body(static_cast<augs::pool_id<put_all_components_into_t<augs::component_aggregate>>*>(nullptr), f, std::forward<Instances>(_t_)...);
+		introspect_body(static_cast<augs::pooled_object_id<put_all_components_into_t<augs::component_aggregate>>*>(nullptr), f, std::forward<Instances>(_t_)...);
 	}
 
 	template <class F, class... Instances>

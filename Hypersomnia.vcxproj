@@ -356,7 +356,7 @@
     <ClCompile Include="augs\misc\key_and_mouse_intent.cpp" />
     <ClCompile Include="augs\misc\machine_entropy.cpp" />
     <ClCompile Include="augs\misc\debug_entropy_player.cpp" />
-    <ClCompile Include="augs\misc\pool_id.cpp" />
+    <ClCompile Include="augs\misc\pooled_object_id.cpp" />
     <ClCompile Include="augs\misc\readable_bytesize.cpp" />
     <ClCompile Include="augs\misc\standard_actions.cpp" />
     <ClCompile Include="augs\misc\streams.cpp" />
@@ -1270,7 +1270,7 @@
     <ClInclude Include="game\transcendental\cosmic_entropy.h" />
     <ClInclude Include="augs\misc\measurements.h" />
     <ClInclude Include="augs\misc\pool_handle.h" />
-    <ClInclude Include="augs\misc\pool_id.h" />
+    <ClInclude Include="augs\misc\pooled_object_id.h" />
     <ClInclude Include="augs\misc\recoil_player.h" />
     <ClInclude Include="augs\misc\variable_delta_timer.h" />
     <ClInclude Include="augs\misc\typesafe_sprintf.h" />

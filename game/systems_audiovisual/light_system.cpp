@@ -31,7 +31,7 @@ void light_system::advance_attenuation_variations(
 		processing_subjects::WITH_LIGHT,
 		[&](const auto it) {
 			const auto& light = it.get<components::light>();
-			auto& cache = per_entity_cache[it.get_id().pool.indirection_index];
+			auto& cache = per_entity_cache[it.get_id().indirection_index];
 
 			const auto delta = dt.in_seconds();
 
@@ -87,7 +87,7 @@ void light_system::render_all_lights(
 	cosmos.for_each(
 		processing_subjects::WITH_LIGHT,
 		[&](const auto light_entity) {
-			const auto& cache = per_entity_cache[light_entity.get_id().pool.indirection_index];
+			const auto& cache = per_entity_cache[light_entity.get_id().indirection_index];
 			const auto light_displacement = vec2(cache.all_variation_values[6], cache.all_variation_values[7]);
 
 			messages::visibility_information_request request;
@@ -164,7 +164,7 @@ void light_system::render_all_lights(
 		//	}
 		//}
 
-		const auto& cache = per_entity_cache[light_entity.get_id().pool.indirection_index];
+		const auto& cache = per_entity_cache[light_entity.get_id().indirection_index];
 
 		const auto light_frag_pos = step.camera.get_screen_space_revert_y(world_light_pos);
 

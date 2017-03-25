@@ -32,19 +32,19 @@ bool physics_system::is_constructed_colliders(const const_entity_handle handle) 
 }
 
 rigid_body_cache& physics_system::get_rigid_body_cache(const entity_id id) {
-	return rigid_body_caches[id.pool.indirection_index];
+	return rigid_body_caches[id.indirection_index];
 }
 
 colliders_cache& physics_system::get_colliders_cache(const entity_id id) {
-	return colliders_caches[id.pool.indirection_index];
+	return colliders_caches[id.indirection_index];
 }
 
 const rigid_body_cache& physics_system::get_rigid_body_cache(const entity_id id) const {
-	return rigid_body_caches[id.pool.indirection_index];
+	return rigid_body_caches[id.indirection_index];
 }
 
 const colliders_cache& physics_system::get_colliders_cache(const entity_id id) const {
-	return colliders_caches[id.pool.indirection_index];
+	return colliders_caches[id.indirection_index];
 }
 
 void physics_system::destroy_inferred_state(const const_entity_handle handle) {
@@ -60,7 +60,7 @@ void physics_system::destroy_inferred_state(const const_entity_handle handle) {
 	}
 	
 	if (is_constructed_colliders(handle)) {
-		const auto this_cache_id = handle.get_id().pool.indirection_index;
+		const auto this_cache_id = handle.get_id().indirection_index;
 		auto& cache = colliders_caches[this_cache_id];
 
 		ensure(cache.correspondent_rigid_body_cache != -1);
@@ -94,8 +94,8 @@ void physics_system::fixtures_construct(const const_entity_handle handle) {
 			ensure(owner_body_entity.alive());
 			auto& owner_cache = get_rigid_body_cache(owner_body_entity);
 
-			const auto this_cache_id = handle.get_id().pool.indirection_index;
-			const auto owner_cache_id = owner_body_entity.get_id().pool.indirection_index;
+			const auto this_cache_id = handle.get_id().indirection_index;
+			const auto owner_cache_id = owner_body_entity.get_id().indirection_index;
 
 			owner_cache.correspondent_colliders_caches.push_back(this_cache_id);
 			cache.correspondent_rigid_body_cache = owner_cache_id;
@@ -211,7 +211,7 @@ void physics_system::reserve_caches_for_entities(const size_t n) {
 }
 
 b2Fixture_index_in_component physics_system::get_index_in_component(const b2Fixture* const f, const const_entity_handle handle) {
-	const auto this_cache_id = handle.get_id().pool.indirection_index;
+	const auto this_cache_id = handle.get_id().indirection_index;
 	const auto& cache = colliders_caches[this_cache_id];
 
 	for (size_t collider_index = 0; collider_index < cache.fixtures_per_collider.size(); ++collider_index) {
@@ -421,7 +421,7 @@ physics_system& physics_system::operator=(const physics_system& b) {
 
 	for (b2Body* b = b2.m_bodyList; b; b = b->m_next)
 	{
-		//auto rigid_body_cache_id = b->m_userData.pool.indirection_index;
+		//auto rigid_body_cache_id = b->m_userData.indirection_index;
 		//rigid_body_caches[rigid_body_cache_id].body = b;
 
 		migrate_pointer(b->m_fixtureList);
@@ -448,7 +448,7 @@ physics_system& physics_system::operator=(const physics_system& b) {
 			}
 
 			//auto c_idx = f->collider_index;
-			//auto& cache = colliders_caches[f->m_userData.pool.indirection_index];
+			//auto& cache = colliders_caches[f->m_userData.indirection_index];
 			//cache.correspondent_rigid_body_cache = rigid_body_cache_id;
 			//
 			//if (c_idx >= cache.fixtures_per_collider.size()) {

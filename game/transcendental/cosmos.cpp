@@ -105,15 +105,15 @@ cosmos::cosmos(const unsigned reserved_entities) {
 }
 
 const std::string& cosmos::get_debug_name(entity_id id) const {
-	return entity_debug_names[id.pool.indirection_index + 1];
+	return entity_debug_names[id.indirection_index + 1];
 }
 
 void cosmos::set_debug_name(const entity_id id, const std::string& new_debug_name) {
-	entity_debug_names[id.pool.indirection_index + 1] = new_debug_name;
+	entity_debug_names[id.indirection_index + 1] = new_debug_name;
 }
 
 void cosmos::delete_debug_name(const entity_id id) {
-	entity_debug_names[id.pool.indirection_index + 1] = "dead entity";
+	entity_debug_names[id.indirection_index + 1] = "dead entity";
 }
 
 cosmos::cosmos(const cosmos& b) {
@@ -257,9 +257,9 @@ void cosmos::set_fixed_delta(const unsigned steps_per_second) {
 }
 
 entity_handle cosmos::allocate_new_entity() {
-	auto raw_pool_id = get_aggregate_pool().allocate();
+	auto pooled_object_raw_id = get_aggregate_pool().allocate();
 
-	return entity_handle(*this, raw_pool_id);
+	return entity_handle(*this, pooled_object_raw_id);
 }
 
 entity_handle cosmos::create_entity(const std::string& debug_name) {
@@ -270,8 +270,8 @@ entity_handle cosmos::create_entity(const std::string& debug_name) {
 #if COSMOS_TRACKS_GUIDS
 	assign_next_guid(new_entity);
 #endif
-	//ensure(new_entity.get_id().pool.indirection_index != 37046);
-	//ensure(new_entity.get_id().pool.indirection_index != 36985);
+	//ensure(new_entity.get_id().indirection_index != 37046);
+	//ensure(new_entity.get_id().indirection_index != 36985);
 	return new_entity;
 }
 

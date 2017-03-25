@@ -1,13 +1,13 @@
 #pragma once
 #include "augs/templates/maybe_const.h"
-#include "pool_id.h"
+#include "pooled_object_id.h"
 
 namespace augs {
 	template<bool is_const, class pool_container, class value_type>
 	class handle_for_pool_container {
 	public:
 		typedef maybe_const_ref_t<is_const, pool_container> owner_reference;
-		typedef pool_id<value_type> id_type;
+		typedef pooled_object_id<value_type> id_type;
 
 		owner_reference owner;
 		id_type raw_id;
