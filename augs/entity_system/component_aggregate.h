@@ -11,8 +11,8 @@ namespace augs {
 		component_id_tuple component_ids;
 
 		template <class component>
-		auto& writable_id() {
-			return std::get<pooled_object_id<component>>(component_ids);
+		void set_id(const pooled_object_id<component> to) {
+			std::get<pooled_object_id<component>>(component_ids) = to;
 		}
 
 		template <class component>

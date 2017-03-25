@@ -41,12 +41,15 @@ namespace augs {
 		void add(const component& c) const {
 			auto& self = *static_cast<const derived_entity_handle*>(this);
 			ensure(!has<component>());
-			self.get().template writable_id<component>() = self.get_cosmos().template get_component_pool<component>().allocate(c);
+			self.get().set_id(self.get_cosmos().template get_component_pool<component>().allocate(c));
 		}
 
-		template<class component, bool _is_const = is_const,
-			class = std::enable_if_t<!_is_const>>
-			void remove() const {
+		template <
+			class component, 
+			bool _is_const = is_const,
+			class = std::enable_if_t<!_is_const>
+		>
+		void remove() const {
 			ensure(has<component>());
 			auto& self = *static_cast<const derived_entity_handle*>(this);
 			self.get_cosmos().get_component_pool<component>().free(self.get().template get_id<component>());
