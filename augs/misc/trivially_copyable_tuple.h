@@ -4,15 +4,15 @@
 
 namespace augs {
 	template <class... Types>
-	class trivial_tuple {
+	class trivially_copyable_tuple {
 		typedef std::tuple<Types...> tuple_type;
 
 		alignas(tuple_type) char buf[sizeof(tuple_type)];
 	public:
-		static_assert(are_types_memcpy_safe_v<Types...>, "One of the types is not trivially copyable!");
+		static_assert(are_types_memcpy_safe_v<Types...>, "One of the tuple types is not trivially copyable!");
 
 		template <class... Args>
-		trivial_tuple(Args&&... args) {
+		trivially_copyable_tuple(Args&&... args) {
 			// zero-initialize the memory so that delta encoding does not see the padding bytes as different
 			std::memset(this, sizeof(*this), 0);
 
@@ -31,22 +31,22 @@ namespace augs {
 
 namespace std {
 	template<int idx, class... Types>
-	decltype(auto) get(augs::trivial_tuple<Types...>& t) {
+	decltype(auto) get(augs::trivially_copyable_tuple<Types...>& t) {
 		return std::get<idx>(t.get_tuple());
 	}
 
 	template<int idx, class... Types>
-	decltype(auto) get(const augs::trivial_tuple<Types...>& t) {
+	decltype(auto) get(const augs::trivially_copyable_tuple<Types...>& t) {
 		return std::get<idx>(t.get_tuple());
 	}
 	
 	template<class T, class... Types>
-		decltype(auto) get(augs::trivial_tuple<Types...>& t) {
+		decltype(auto) get(augs::trivially_copyable_tuple<Types...>& t) {
 		return std::get<T>(t.get_tuple());
 	}
 
 	template<class T, class... Types>
-	decltype(auto) get(const augs::trivial_tuple<Types...>& t) {
+	decltype(auto) get(const augs::trivially_copyable_tuple<Types...>& t) {
 		return std::get<T>(t.get_tuple());
 	}
 }

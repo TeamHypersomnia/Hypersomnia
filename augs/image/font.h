@@ -3,7 +3,7 @@
 #include "augs/math/vec2.h"
 #include "augs/image/image.h"
 
-#include "augs/misc/trivial_pair.h"
+#include "augs/misc/trivially_copyable_pair.h"
 
 #include "augs/texture_atlas/texture_atlas_entry.h"
 
@@ -21,7 +21,7 @@ namespace augs {
 
 		vec2i size = vec2i(0, 0);
 
-		std::vector<augs::trivial_pair<unsigned, int>> kerning;
+		std::vector<augs::trivially_copyable_pair<unsigned, int>> kerning;
 		// END GEN INTROSPECTOR
 
 		font_glyph_metadata() = default;

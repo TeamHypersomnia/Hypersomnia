@@ -1,12 +1,12 @@
 #pragma once
 #include "augs/misc/pool_id.h"
-#include "augs/misc/trivial_tuple.h"
+#include "augs/misc/trivially_copyable_tuple.h"
 
 namespace augs {
 	template <class... components>
 	class component_aggregate {
 	public:
-		typedef trivial_tuple<pool_id<components>...> component_id_tuple;
+		typedef trivially_copyable_tuple<pool_id<components>...> component_id_tuple;
 
 		component_id_tuple component_ids;
 

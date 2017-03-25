@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/misc/trivial_tuple.h"
+#include "augs/misc/trivially_copyable_tuple.h"
 
 template<class T>
 struct empty_mod {

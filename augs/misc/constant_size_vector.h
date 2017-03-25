@@ -3,7 +3,7 @@
 #include "augs/ensure.h"
 #include "augs/zeroed_pod.h"
 
-#include "augs/misc/trivial_pair.h"
+#include "augs/misc/trivially_copyable_pair.h"
 #include "augs/misc/introspect.h"
 template<class ForwardIt, class T, class Compare = std::less<>>
 ForwardIt binary_find(ForwardIt first, ForwardIt last, const T& value, Compare comp = {})
@@ -237,9 +237,9 @@ namespace augs  {
 	using constant_size_wstring = constant_size_vector<zeroed_pod<wchar_t>, const_count>;
 
 	template<class Key, class Value, size_t const_count>
-	class constant_size_associative_vector : private constant_size_vector<trivial_pair<Key, Value>, const_count> {
-		typedef trivial_pair<Key, Value> elem_type;
-		typedef constant_size_vector<trivial_pair<Key, Value>, const_count> base;
+	class constant_size_associative_vector : private constant_size_vector<trivially_copyable_pair<Key, Value>, const_count> {
+		typedef trivially_copyable_pair<Key, Value> elem_type;
+		typedef constant_size_vector<trivially_copyable_pair<Key, Value>, const_count> base;
 	public:
 		using base::clear;
 		using base::capacity;

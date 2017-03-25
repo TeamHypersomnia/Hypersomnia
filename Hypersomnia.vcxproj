@@ -1121,8 +1121,8 @@
     <ClInclude Include="augs\misc\streams.h" />
     <ClInclude Include="augs\misc\templated_readwrite.h" />
     <ClInclude Include="augs\misc\time_utils.h" />
-    <ClInclude Include="augs\misc\trivial_pair.h" />
-    <ClInclude Include="augs\misc\trivial_tuple.h" />
+    <ClInclude Include="augs\misc\trivially_copyable_pair.h" />
+    <ClInclude Include="augs\misc\trivially_copyable_tuple.h" />
     <ClInclude Include="augs\misc\trivial_variant.h" />
     <ClInclude Include="augs\misc\typesafe_sscanf.h" />
     <ClInclude Include="augs\network\network_client.h" />

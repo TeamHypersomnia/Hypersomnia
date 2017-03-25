@@ -42,7 +42,6 @@ struct light_value_variation;
 struct light_attenuation;
 struct movement_subscribtion;
 struct particles_effect_input;
-struct sentience_meter;
 struct sound_effect_input;
 struct friction_connection;
 struct convex_poly_destruction_scar;
@@ -59,6 +58,7 @@ struct basic_item_slot_transfer_request_data;
 struct electric_shield_perk;
 struct haste_perk;
 struct perk_timing;
+struct sentience_meter;
 struct circle_shape;
 struct spell_instance_data;
 struct all_simulation_settings;
@@ -112,7 +112,7 @@ namespace augs {
 	struct stepped_timestamp;
 	struct stepped_cooldown;
 	template <class A, class B>
-	class trivial_pair;
+	class trivially_copyable_pair;
 }
 
 namespace components {
@@ -437,7 +437,7 @@ namespace augs {
 
 	template <class F, class A, class B, class... Instances>
 	void introspect_body(
-		const augs::trivial_pair<A, B>* const,
+		const augs::trivially_copyable_pair<A, B>* const,
 		F f,
 		Instances&&... _t_
 	) {
@@ -1186,16 +1186,6 @@ namespace augs {
 
 	template <class F, class... Instances>
 	void introspect_body(
-		const sentience_meter* const,
-		F f,
-		Instances&&... _t_
-	) {
-		FIELD(value);
-		FIELD(maximum);
-	}
-
-	template <class F, class... Instances>
-	void introspect_body(
 		const components::sentience* const,
 		F f,
 		Instances&&... _t_
@@ -1527,6 +1517,16 @@ namespace augs {
 		Instances&&... _t_
 	) {
 		FIELD(duration);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const sentience_meter* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(value);
+		FIELD(maximum);
 	}
 
 	template <class F, class... Instances>
