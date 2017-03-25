@@ -6,8 +6,8 @@ namespace augs {
 	template<class A, class B>
 	class trivial_pair {
 	public:
-		static_assert(is_memcpy_safe<A>::value, "first type is not trivial!");
-		static_assert(is_memcpy_safe<B>::value, "second type is not trivial!");
+		static_assert(is_memcpy_safe_v<A>, "first type is not trivially copyable!");
+		static_assert(is_memcpy_safe_v<B>, "second type is not trivially copyable!");
 
 		typedef std::pair<A, B> pair;
 		
