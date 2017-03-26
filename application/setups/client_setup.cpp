@@ -61,6 +61,7 @@ void client_setup::init(
 	session.set_master_gain(cfg.sound_effects_volume);
 
 	session.configure_input();
+	session.reserve_caches_for_entities(3000);
 
 	detailed_step_log = cfg.default_tickrate <= 2;
 
@@ -102,8 +103,6 @@ void client_setup::init(
 	else {
 		LOG("Connection failed.");
 	}
-
-	session.reserve_caches_for_entities(3000);
 }
 
 void client_setup::process_once(

@@ -5,19 +5,14 @@
 
 #include "game/resources/manager.h"
 
-#include "game/scene_builders/testbed.h"
 #include "game/resource_setups/all.h"
 
 #include "game/transcendental/types_specification/all_component_includes.h"
-#include "game/view/viewing_session.h"
 #include "game/transcendental/step_packaged_for_network.h"
-#include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
-#include "game/transcendental/cosmic_movie_director.h"
 #include "game/transcendental/types_specification/all_messages_includes.h"
 #include "game/transcendental/data_living_one_step.h"
 
-#include "augs/misc/debug_entropy_player.h"
 #include "game/detail/visible_entities.h"
 
 #include "augs/filesystem/file.h"
@@ -35,19 +30,11 @@ namespace fs = std::experimental::filesystem;
 
 using namespace augs::window::event::keys;
 
-void director_setup::process(const config_lua_table& cfg, game_window& window) {
+void director_setup::init(
+	const config_lua_table& cfg, 
+	game_window& window
+) {
 	const vec2i screen_size = vec2i(window.get_screen_size());
-
-	cosmos hypersomnia(3000);
-
-	augs::window::event::state events;
-	cosmic_entropy total_collected_entropy;
-	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
-
-	scene_builders::testbed testbed;
-	testbed.debug_var = cfg.debug_var;
-
-	viewing_session session;
 
 	session.reserve_caches_for_entities(3000);
 	session.set_screen_size(screen_size);
@@ -55,16 +42,18 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 	session.set_master_gain(cfg.sound_effects_volume);
 
 	session.configure_input();
+	
+	testbed.debug_var = cfg.debug_var;
 
-	const auto standard_post_solve = [&session](const const_logic_step step) {
+	auto standard_post_solve = [this](const const_logic_step step) {
 		session.standard_audiovisual_post_solve(step);
 	};
 
 	if (!hypersomnia.load_from_file("save.state")) {
 		hypersomnia.set_fixed_delta(cfg.default_tickrate);
-		
+
 		testbed.populate_world_with_entities(
-			hypersomnia, 
+			hypersomnia,
 			standard_post_solve
 		);
 	}
@@ -76,53 +65,37 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 	}
 
 	augs::create_directories(cfg.director_scenario_path);
-	
-	const std::string input_director_path = cfg.director_scenario_path;
-	const std::string output_director_path = cfg.director_scenario_path;
 
-	cosmic_movie_director director;
+	input_director_path = cfg.director_scenario_path;
+	output_director_path = cfg.director_scenario_path;
+
 	director.load_recording_from_file(input_director_path);
+	
+	set_snapshot_frequency_in_seconds(3.0);
 
-	enum class director_state {
-		PLAYING,
-		RECORDING
-	} current_director_state = director_state::PLAYING;
+	initial_step_number = hypersomnia.get_total_steps_passed();
 
 	timer.reset_timer();
+}
+
+void director_setup::set_snapshot_frequency_in_seconds(const double seconds_between_snapshots) {
+	snapshot_frequency_in_steps = static_cast<unsigned>(seconds_between_snapshots / hypersomnia.get_fixed_delta().in_seconds());
+}
+
+unsigned director_setup::get_step_number(const cosmos& cosm) const {
+	ensure(initial_step_number <= cosm.get_total_steps_passed());
+
+	return cosm.get_total_steps_passed() - initial_step_number;
+};
+
+void director_setup::process(const config_lua_table& cfg, game_window& window) {
+	init(cfg, window);
+
+	auto standard_post_solve = [this](const const_logic_step step) {
+		session.standard_audiovisual_post_solve(step);
+	};
 
 	int advance_steps_forward = 0;
-
-	float requested_playing_speed = 0.f;
-
-	bool unsaved_changes_exist = false;
-
-	enum class recording_replacement_type {
-		ALL,
-		ONLY_KEYS,
-		ONLY_MOUSE,
-
-		COUNT
-	};
-
-	auto recording_replacement_mode = recording_replacement_type::ALL;
-
-	std::vector<cosmos> snapshots_for_rewinding;
-	
-	const auto initial_step_number = hypersomnia.get_total_steps_passed();
-
-	const double seconds_between_snapshots = 3.0;
-	const auto snapshot_frequency_in_steps = static_cast<unsigned>(seconds_between_snapshots / hypersomnia.get_fixed_delta().in_seconds());
-
-	unsigned bookmarked_step = 0;
-
-	const auto get_step_number = [initial_step_number](const cosmos& cosm) {
-		ensure(initial_step_number <= cosm.get_total_steps_passed());
-
-		return cosm.get_total_steps_passed() - initial_step_number;
-	};
-
-	LOG("Seconds between rewind snapshots: %x", seconds_between_snapshots);
-	LOG("Steps between rewind snapshots: %x", snapshot_frequency_in_steps);
 
 	while (!should_quit) {
 		{
@@ -350,10 +323,10 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 
 			augs::renderer::get_current().clear_logic_lines();
 
-			hypersomnia.advance_deterministic_schemata(cosmic_entropy_for_this_advancement, [](auto) {},
-				[this, &session](const const_logic_step step) {
-					session.standard_audiovisual_post_solve(step);
-				}
+			hypersomnia.advance_deterministic_schemata(
+				cosmic_entropy_for_this_advancement, 
+				[](auto){},
+				standard_post_solve
 			);
 			
 			total_collected_entropy = cosmic_entropy();
