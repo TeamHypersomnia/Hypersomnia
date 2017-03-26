@@ -53,6 +53,8 @@ public:
 
 	void set_snapshot_frequency_in_seconds(const double);
 
+	augs::gui::text::formatted_string get_status_text() const;
+
 	void init(
 		const config_lua_table& cfg, 
 		game_window&
@@ -62,4 +64,8 @@ public:
 		const config_lua_table& cfg, 
 		game_window&
 	);
+
+	void save_unsaved_changes();
+
+	~director_setup();
 };

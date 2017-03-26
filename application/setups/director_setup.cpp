@@ -88,6 +88,48 @@ unsigned director_setup::get_step_number(const cosmos& cosm) const {
 	return cosm.get_total_steps_passed() - initial_step_number;
 };
 
+augs::gui::text::formatted_string director_setup::get_status_text() const {
+	using namespace augs::gui::text;
+
+	const auto white_font = style(assets::font_id::GUI_FONT, white);
+
+	auto status_text = format(L"Welcome to the director setup.", white_font);
+	status_text += format(L"\nMode: ", white_font);
+
+	if (current_director_state == director_state::PLAYING) {
+		status_text += format(L"Playing", white_font);
+	}
+	else {
+		if (recording_replacement_mode == recording_replacement_type::ALL) {
+			status_text += format_as_bbcode(L"[color=red]Recording (replacing all)[/color]", white_font);
+		}
+		else if (recording_replacement_mode == recording_replacement_type::ONLY_KEYS) {
+			status_text += format_as_bbcode(L"[color=red]Recording (replacing keys)[/color]", white_font);
+		}
+		else if (recording_replacement_mode == recording_replacement_type::ONLY_MOUSE) {
+			status_text += format_as_bbcode(L"[color=red]Recording (replacing mouse)[/color]", white_font);
+		}
+		else {
+			ensure(false);
+		}
+	}
+
+	status_text += format(typesafe_sprintf(L"\nRequested playing speed: %x", requested_playing_speed), white_font);
+	status_text += format(typesafe_sprintf(L"\nStep number: %x", get_step_number(hypersomnia)), white_font);
+	status_text += format(typesafe_sprintf(L"\nTime: %x", get_step_number(hypersomnia)*hypersomnia.get_fixed_delta().in_seconds()), white_font);
+	status_text += format(typesafe_sprintf(L"\nControlling entity %x of %x", testbed.current_character_index, testbed.characters.size()), white_font);
+
+	if (bookmarked_step != 0) {
+		status_text += format(typesafe_sprintf(L"\nBookmarked time: %x", bookmarked_step*hypersomnia.get_fixed_delta().in_seconds()), white_font);
+	}
+
+	if (unsaved_changes_exist) {
+		status_text += format_as_bbcode(L"\n[color=yellow]Press F7 to save pending changes.[/color]", white_font);
+	}
+
+	return status_text;
+}
+
 void director_setup::process(const config_lua_table& cfg, game_window& window) {
 	init(cfg, window);
 
@@ -344,44 +386,6 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 			vdt
 		);
 
-		using namespace augs::gui::text;
-
-		const auto white_font = style(assets::font_id::GUI_FONT, white);
-
-		auto director_text = format(L"Welcome to the director setup.", white_font);
-		director_text += format(L"\nMode: ", white_font); 
-		
-		if (current_director_state == director_state::PLAYING) {
-			director_text += format(L"Playing", white_font);
-		}
-		else {
-			if (recording_replacement_mode == recording_replacement_type::ALL) {
-				director_text += format_as_bbcode(L"[color=red]Recording (replacing all)[/color]", white_font);
-			}
-			else if (recording_replacement_mode == recording_replacement_type::ONLY_KEYS) {
-				director_text += format_as_bbcode(L"[color=red]Recording (replacing keys)[/color]", white_font);
-			}
-			else if (recording_replacement_mode == recording_replacement_type::ONLY_MOUSE) {
-				director_text += format_as_bbcode(L"[color=red]Recording (replacing mouse)[/color]", white_font);
-			}
-			else {
-				ensure(false);
-			}
-		}
-
-		director_text += format(typesafe_sprintf(L"\nRequested playing speed: %x", requested_playing_speed), white_font);
-		director_text += format(typesafe_sprintf(L"\nStep number: %x", get_step_number(hypersomnia)), white_font);
-		director_text += format(typesafe_sprintf(L"\nTime: %x", get_step_number(hypersomnia)*hypersomnia.get_fixed_delta().in_seconds()), white_font);
-		director_text += format(typesafe_sprintf(L"\nControlling entity %x of %x", testbed.current_character_index, testbed.characters.size()), white_font);
-
-		if (bookmarked_step != 0) {
-			director_text += format(typesafe_sprintf(L"\nBookmarked time: %x", bookmarked_step*hypersomnia.get_fixed_delta().in_seconds()), white_font);
-		}
-
-		if (unsaved_changes_exist) {
-			director_text += format_as_bbcode(L"\n[color=yellow]Press F7 to save pending changes.[/color]", white_font);
-		}
-
 		auto& renderer = augs::renderer::get_current();
 		renderer.clear_current_fbo();
 
@@ -392,13 +396,19 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 			testbed.get_selected_character(), 
 			all_visible,
 			timer.fraction_of_step_until_next_step(hypersomnia.get_fixed_delta()), 
-			director_text
+			get_status_text()
 		);
 
 		window.swap_buffers();
 	}
+}
 
+void director_setup::save_unsaved_changes() {
 	if (unsaved_changes_exist) {
 		director.save_recording_to_file(fs::path(output_director_path).replace_extension(".unsaved.ent").string());
 	}
+}
+
+director_setup::~director_setup() {
+	save_unsaved_changes();
 }
