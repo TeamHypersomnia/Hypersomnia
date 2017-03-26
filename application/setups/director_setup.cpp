@@ -238,9 +238,11 @@ void director_setup::control_player(
 
 	timer.set_stepping_speed_multiplier(requested_playing_speed);
 
+	const auto current_step = get_step_number(hypersomnia);
+	unsigned rewound_step = current_step;
+
 	if (advance_steps_forward < 0) {
-		const auto current_step = get_step_number(hypersomnia);
-		const auto rewound_step = static_cast<unsigned>(-advance_steps_forward) > current_step ? 0 : current_step + advance_steps_forward;
+		rewound_step = static_cast<unsigned>(-advance_steps_forward) > current_step ? 0 : current_step + advance_steps_forward;
 
 #if LOG_REWINDING
 		LOG("Current step: %x\nRewound step: %x", current_step, rewound_step);
@@ -263,18 +265,21 @@ void director_setup::control_player(
 #if LOG_REWINDING
 			LOG("Resimulated hypersomnia step: %x", get_step_number(hypersomnia));
 #endif
-
-			while (get_step_number(hypersomnia) < rewound_step) {
-				const guid_mapped_entropy replayed_entropy = director.get_entropy_for_step(get_step_number(hypersomnia));
-				const auto cosmic_entropy_for_this_advancement = cosmic_entropy(replayed_entropy, hypersomnia);
-
-				hypersomnia.advance_deterministic_schemata(
-					cosmic_entropy_for_this_advancement,
-					[](auto) {},
-					get_standard_post_solve()
-				);
-			}
 		}
+	}
+	else {
+		rewound_step += advance_steps_forward;
+	}
+
+	while (get_step_number(hypersomnia) < rewound_step) {
+		const guid_mapped_entropy replayed_entropy = director.get_entropy_for_step(get_step_number(hypersomnia));
+		const auto cosmic_entropy_for_this_advancement = cosmic_entropy(replayed_entropy, hypersomnia);
+
+		hypersomnia.advance_deterministic_schemata(
+			cosmic_entropy_for_this_advancement,
+			[](auto) {},
+			get_standard_post_solve()
+		);
 	}
 }
 

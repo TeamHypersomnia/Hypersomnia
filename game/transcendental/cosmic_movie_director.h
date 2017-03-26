@@ -1,12 +1,12 @@
 #pragma once
-#include <unordered_map>
+#include <map>
 #include "cosmic_entropy.h"
 
 class cosmic_movie_director {
 public:
 	unsigned player_step_position = 0u;
 
-	std::unordered_map<unsigned, guid_mapped_entropy> step_to_entropy;
+	std::map<unsigned, guid_mapped_entropy> step_to_entropy;
 
 	guid_mapped_entropy get_entropy_for_step(const unsigned) const;
 
