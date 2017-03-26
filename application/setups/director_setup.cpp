@@ -239,42 +239,35 @@ void director_setup::control_player(
 	timer.set_stepping_speed_multiplier(requested_playing_speed);
 
 	const auto current_step = get_step_number(hypersomnia);
-	unsigned rewound_step = current_step;
 
 	if (advance_steps_forward < 0) {
-		rewound_step = static_cast<unsigned>(-advance_steps_forward) > current_step ? 0 : current_step + advance_steps_forward;
-
-#if LOG_REWINDING
-		LOG("Current step: %x\nRewound step: %x", current_step, rewound_step);
-#endif
-
-		if (rewound_step < current_step) {
-			const size_t resimulated_cosmos_index = rewound_step / snapshot_frequency_in_steps;
-
-#if LOG_REWINDING
-			LOG_NVPS(snapshots_for_rewinding.size());
-			LOG_NVPS(resimulated_cosmos_index);
-#endif
-
-			if (snapshots_for_rewinding.size() > 1 && resimulated_cosmos_index < snapshots_for_rewinding.size() - 1) {
-				snapshots_for_rewinding.erase(snapshots_for_rewinding.begin() + resimulated_cosmos_index + 1, snapshots_for_rewinding.end());
-			}
-
-			hypersomnia = snapshots_for_rewinding.at(resimulated_cosmos_index);
-
-#if LOG_REWINDING
-			LOG("Resimulated hypersomnia step: %x", get_step_number(hypersomnia));
-#endif
-		}
-
-		while (get_step_number(hypersomnia) < rewound_step) {
-			advance_player_by_single_step();
-		}
+		const unsigned seeked_step = static_cast<unsigned>(-advance_steps_forward) > current_step ? 0 : current_step + advance_steps_forward;
+		seek_to_step(seeked_step);
 	}
-	else {
-		while (get_step_number(hypersomnia) < current_step + advance_steps_forward) {
-			advance_player_by_single_step();
-		}
+	else if (advance_steps_forward > 0) {
+		const unsigned seeked_step = current_step + static_cast<unsigned>(advance_steps_forward);
+		seek_to_step(seeked_step);
+	}
+}
+
+void director_setup::seek_to_step(const unsigned seeked_step) {
+	const auto snapshot_index = seeked_step / snapshot_frequency_in_steps;
+
+	if (seeked_step < get_step_number(hypersomnia)) {
+		hypersomnia = snapshots_for_rewinding.at(snapshot_index);
+	}
+
+	// at this point the seeked_step is either equal or greater than the current
+
+	const auto distance_from_closest_snapshot = seeked_step % snapshot_frequency_in_steps;
+	const auto distance_from_current = seeked_step - get_step_number(hypersomnia);
+
+	if (distance_from_closest_snapshot < distance_from_current) {
+		hypersomnia = snapshots_for_rewinding.at(snapshot_index);
+	}
+
+	while (get_step_number(hypersomnia) < seeked_step) {
+		advance_player_by_single_step();
 	}
 }
 
@@ -290,10 +283,6 @@ void director_setup::push_snapshot_if_needed() {
 			snapshots_for_rewinding.push_back(hypersomnia);
 		}
 	}
-}
-
-void director_setup::seek_to_step(const unsigned step_number) {
-
 }
 
 void director_setup::process(
@@ -322,6 +311,16 @@ void director_setup::advance_player_by_single_step() {
 		cosmic_entropy_for_this_advancement = cosmic_entropy(replayed_entropy, hypersomnia);
 	}
 	else if (current_director_state == director_state::RECORDING) {
+		const auto next_snapshot_index = 1 + current_step / snapshot_frequency_in_steps;
+		const bool outdated_snapshots_to_delete_exist = next_snapshot_index < snapshots_for_rewinding.size();
+
+		if (outdated_snapshots_to_delete_exist) {
+			snapshots_for_rewinding.erase(
+				snapshots_for_rewinding.begin() + next_snapshot_index,
+				snapshots_for_rewinding.end()
+			);
+		}
+
 		const auto total_collected_guid_entropy = guid_mapped_entropy(total_collected_entropy, hypersomnia);
 
 		guid_mapped_entropy& entropy_for_this_advancement = director.step_to_entropy[current_step];
