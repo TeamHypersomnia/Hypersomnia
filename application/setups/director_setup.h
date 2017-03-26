@@ -10,6 +10,7 @@ class game_window;
 
 class director_setup : public setup_base {
 	void push_snapshot_if_needed();
+	void advance_player_by_single_step();
 
 public:
 	enum class recording_replacement_type {
