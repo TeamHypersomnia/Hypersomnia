@@ -74,8 +74,8 @@ public:
 	std::string post_data_file_path;
 	std::string last_session_update_link;
 
-	std::string director_scenario_path;
-	std::string menu_intro_scenario_path;
+	std::string director_input_scene_entropy_path;
+	std::string menu_intro_scene_entropy_path;
 
 	std::string menu_theme_path;
 
@@ -92,19 +92,21 @@ public:
 	void get_values(augs::lua_state_raii&);
 
 	enum class launch_type {
-		INVALID,
-
 		MAIN_MENU,
 
 		LOCAL,
 		LOCAL_DETERMINISM_TEST,
+
 		DIRECTOR,
+		CHOREOGRAPHIC,
 
 		ONLY_CLIENT,
 		ONLY_SERVER,
 
 		CLIENT_AND_SERVER,
 		TWO_CLIENTS_AND_SERVER,
+
+		COUNT
 	};
 	
 	launch_type get_launch_mode() const;

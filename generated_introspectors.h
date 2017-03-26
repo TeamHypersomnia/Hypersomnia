@@ -1807,8 +1807,8 @@ namespace augs {
 		FIELD(post_data_file_path);
 		FIELD(last_session_update_link);
 
-		FIELD(director_scenario_path);
-		FIELD(menu_intro_scenario_path);
+		FIELD(director_input_scene_entropy_path);
+		FIELD(menu_intro_scene_entropy_path);
 
 		FIELD(menu_theme_path);
 

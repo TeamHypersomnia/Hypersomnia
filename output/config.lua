@@ -21,18 +21,27 @@ launch_type = {
 	-- in the director mode and different behaviour of audiovisual response systems.
 	DIRECTOR = 3,
 
+	-- Choreographic mode.
+	-- Will load a scenario filename specified by choreographic_input_scenario_path.
+	-- Very helpful in creating in-game commentaries and gameplay footages in general.
+	--
+	-- Choreographic mode is not the same thing as the director mode!
+	-- This one has the ability to automatically replay and rewind multiple scenes produced by the director mode,
+	-- with varying speeds, character focus and additionally with audio overlay (commentator's voice for example)
+	CHOREOGRAPHIC = 4,
+
 	-- Will use *connect_address* and *connect_port* to connect to a remote host and start the multiplayer simulation.
-	ONLY_CLIENT = 4,
+	ONLY_CLIENT = 5,
 
 	-- Will use *server_port* to setup a listenserver without a game client.
-	ONLY_SERVER = 5,
+	ONLY_SERVER = 6,
 
 	-- **ONLY_SERVER** and **ONLY_CLIENT** in the same process
-	CLIENT_AND_SERVER = 6,
+	CLIENT_AND_SERVER = 7,
 
 	-- **ONLY_SERVER** and two clients on split-screen. 
 	-- For debugging purposes. The server will use *alternative_port* for the second connection.
-	TWO_CLIENTS_AND_SERVER = 7
+	TWO_CLIENTS_AND_SERVER = 8
 }
 
 -- machine input recording modes for deterministic bug reproduction
@@ -47,7 +56,7 @@ recording_type = {
 }
 
 config_table = {
-	launch_mode = launch_type.DIRECTOR,
+	launch_mode = launch_type.CHOREOGRAPHIC,
 	
 	input_recording_mode = recording_type.LIVE,
 
@@ -153,10 +162,13 @@ config_table = {
 	last_session_update_link = "patrykcysarz.pl/comment-system/web/stats/last-update/set",
 
 	-- Intro scene path to be opened with DIRECTOR mode
-	director_scenario_path = "director/menu_intro.ent",
+	director_input_scene_entropy_path = "director/menu_intro.ent",
+
+	-- Input scenario for choreographic launch mode
+	choreographic_input_scenario_path = "choreograhic/gameplay_1.chg", 
 	
 	-- Main menu intro scene path recorded with DIRECTOR mode
-	menu_intro_scenario_path = "director/menu_intro.ent",
+	menu_intro_scene_entropy_path = "director/menu_intro.ent",
 
 	-- Menu theme path
 	menu_theme_path = "hypersomnia/music/menu_theme.flac",

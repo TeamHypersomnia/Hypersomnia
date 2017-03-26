@@ -56,17 +56,7 @@ void config_lua_table::get_values(augs::lua_state_raii& lua) {
 }
 
 config_lua_table::launch_type config_lua_table::get_launch_mode() const {
-	switch (static_cast<int>(launch_mode)) {
-	case 0: return launch_type::MAIN_MENU; break;
-	case 1: return launch_type::LOCAL; break;
-	case 2: return launch_type::LOCAL_DETERMINISM_TEST; break;
-	case 3: return launch_type::DIRECTOR; break;
-	case 4: return launch_type::ONLY_CLIENT; break;
-	case 5: return launch_type::ONLY_SERVER; break;
-	case 6: return launch_type::CLIENT_AND_SERVER; break;
-	case 7: return launch_type::TWO_CLIENTS_AND_SERVER; break;
-	default: return launch_type::INVALID; break;
-	}
+	return static_cast<config_lua_table::launch_type>(launch_mode);
 }
 
 input_recording_type config_lua_table::get_input_recording_mode() const {

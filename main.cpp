@@ -7,6 +7,7 @@
 #include "application/setups/client_setup.h"
 #include "application/setups/server_setup.h"
 #include "application/setups/director_setup.h"
+#include "application/setups/choreographic_setup.h"
 
 #include "application/game_window.h"
 #include "application/call_config_script.h"
@@ -68,6 +69,7 @@ int main(int argc, char** argv) {
 	(
 		(
 			mode == config_lua_table::launch_type::LOCAL
+			|| mode == config_lua_table::launch_type::CHOREOGRAPHIC
 			|| mode == config_lua_table::launch_type::DIRECTOR
 			|| mode == config_lua_table::launch_type::LOCAL_DETERMINISM_TEST
 		)
@@ -95,6 +97,13 @@ int main(int argc, char** argv) {
 	case config_lua_table::launch_type::DIRECTOR:
 	{
 		director_setup setup;
+		setup.process(cfg, window);
+	}
+		break;
+
+	case config_lua_table::launch_type::CHOREOGRAPHIC:
+	{
+		choreographic_setup setup;
 		setup.process(cfg, window);
 	}
 		break;

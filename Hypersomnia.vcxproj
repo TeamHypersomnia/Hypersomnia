@@ -329,6 +329,7 @@
     <ClCompile Include="application\content_generation\scripted_images.cpp" />
     <ClCompile Include="application\content_generation\neon_maps.cpp" />
     <ClCompile Include="application\content_generation\texture_atlases.cpp" />
+    <ClCompile Include="application\setups\choreographic_setup.cpp" />
     <ClCompile Include="application\setups\director_setup.cpp" />
     <ClCompile Include="application\setups\menu_setup.cpp" />
     <ClCompile Include="application\ui\app_ui_root.cpp" />
@@ -1043,6 +1044,7 @@
     <ClInclude Include="application\content_generation\texture_atlases.h" />
     <ClInclude Include="application\content_generation\buttons_with_corners.h" />
     <ClInclude Include="application\menu_button_type.h" />
+    <ClInclude Include="application\setups\choreographic_setup.h" />
     <ClInclude Include="application\setups\client_setup.h" />
     <ClInclude Include="application\setups\determinism_test_setup.h" />
     <ClInclude Include="application\setups\director_setup.h" />

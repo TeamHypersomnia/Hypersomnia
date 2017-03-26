@@ -467,7 +467,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 	}
 
 	cosmic_movie_director director;
-	director.load_recording_from_file(cfg.menu_intro_scenario_path);
+	director.load_recording_from_file(cfg.menu_intro_scene_entropy_path);
 	ensure(director.is_recording_available());
 
 	timer.reset_timer();
