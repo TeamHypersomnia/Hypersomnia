@@ -127,164 +127,167 @@ void director_setup::clear_accumulated_inputs() {
 	total_collected_entropy.clear();
 }
 
-void director_setup::process(const config_lua_table& cfg, game_window& window) {
-	init(cfg, window);
-
+void director_setup::control_player(
+	const config_lua_table& cfg,
+	game_window& window
+) {
 	int advance_steps_forward = 0;
 
+	augs::machine_entropy new_machine_entropy;
+
+	session.local_entropy_profiler.new_measurement();
+	new_machine_entropy.local = window.collect_entropy(!cfg.debug_disable_cursor_clipping);
+	session.local_entropy_profiler.end_measurement();
+
+	process_exit_key(new_machine_entropy.local);
+
+	for (const auto& raw_input : new_machine_entropy.local) {
+		events.apply(raw_input);
+
+		if (raw_input.was_any_key_pressed()) {
+			if (raw_input.key == key::F2) {
+				current_director_state = director_state::PLAYING;
+			}
+			if (raw_input.key == key::F3) {
+				requested_playing_speed = 0.f;
+
+				if (current_director_state == director_state::RECORDING) {
+					recording_replacement_mode =
+						static_cast<recording_replacement_type>((static_cast<int>(recording_replacement_mode) + 1) % static_cast<int>(recording_replacement_type::COUNT));
+				}
+				else {
+					recording_replacement_mode = recording_replacement_type::ALL;
+
+					current_director_state = director_state::RECORDING;
+					clear_accumulated_inputs();
+				}
+			}
+			if (raw_input.key == key::F7) {
+				director.save_recording_to_file(output_director_path);
+				unsaved_changes_exist = false;
+
+				requested_playing_speed = 0.f;
+				clear_accumulated_inputs();
+			}
+
+			if (raw_input.key == key::NUMPAD1) {
+				current_director_state = director_state::PLAYING;
+				advance_steps_forward = -1;
+
+				if (events.is_set(key::LCTRL)) {
+					advance_steps_forward *= 10;
+				}
+			}
+			if (raw_input.key == key::NUMPAD2) {
+				current_director_state = director_state::PLAYING;
+				advance_steps_forward = 1;
+
+				if (events.is_set(key::LCTRL)) {
+					advance_steps_forward *= 10;
+				}
+			}
+			if (raw_input.key == key::NUMPAD3) {
+				requested_playing_speed = 0.f;
+				clear_accumulated_inputs();
+			}
+			if (raw_input.key == key::NUMPAD4) {
+				requested_playing_speed = 0.1f;
+				clear_accumulated_inputs();
+			}
+			if (raw_input.key == key::NUMPAD5) {
+				requested_playing_speed = 1.f;
+				clear_accumulated_inputs();
+			}
+			if (raw_input.key == key::NUMPAD6) {
+				requested_playing_speed = 6.f;
+				clear_accumulated_inputs();
+			}
+			if (raw_input.key == key::NUMPAD9) {
+				bookmarked_step = get_step_number(hypersomnia);
+				clear_accumulated_inputs();
+			}
+			if (raw_input.key == key::NUMPAD0) {
+				advance_steps_forward = static_cast<long long>(bookmarked_step) - static_cast<long long>(get_step_number(hypersomnia));
+				clear_accumulated_inputs();
+			}
+		}
+	}
+
+	session.switch_between_gui_and_back(new_machine_entropy.local);
+
+	session.control_gui_and_remove_fetched_events(
+		hypersomnia[testbed.get_selected_character()],
+		new_machine_entropy.local
+	);
+
+	auto new_intents = session.context.to_key_and_mouse_intents(new_machine_entropy.local);
+
+	session.control_and_remove_fetched_intents(new_intents);
+	testbed.control_character_selection(new_intents);
+
+	auto new_cosmic_entropy = cosmic_entropy(
+		hypersomnia[testbed.get_selected_character()],
+		new_intents
+	);
+
+	new_cosmic_entropy += session.systems_audiovisual.get<gui_element_system>().get_and_clear_pending_events();
+
+	if (current_director_state == director_state::RECORDING) {
+		total_collected_entropy += new_cosmic_entropy;
+	}
+
+	timer.set_stepping_speed_multiplier(requested_playing_speed);
+
+	if (advance_steps_forward < 0) {
+		const auto current_step = get_step_number(hypersomnia);
+		const auto rewound_step = static_cast<unsigned>(-advance_steps_forward) > current_step ? 0 : current_step + advance_steps_forward;
+
+#if LOG_REWINDING
+		LOG("Current step: %x\nRewound step: %x", current_step, rewound_step);
+#endif
+
+		if (rewound_step < current_step) {
+			const size_t resimulated_cosmos_index = rewound_step / snapshot_frequency_in_steps;
+
+#if LOG_REWINDING
+			LOG_NVPS(snapshots_for_rewinding.size());
+			LOG_NVPS(resimulated_cosmos_index);
+#endif
+
+			if (snapshots_for_rewinding.size() > 1 && resimulated_cosmos_index < snapshots_for_rewinding.size() - 1) {
+				snapshots_for_rewinding.erase(snapshots_for_rewinding.begin() + resimulated_cosmos_index + 1, snapshots_for_rewinding.end());
+			}
+
+			hypersomnia = snapshots_for_rewinding.at(resimulated_cosmos_index);
+
+#if LOG_REWINDING
+			LOG("Resimulated hypersomnia step: %x", get_step_number(hypersomnia));
+#endif
+
+			while (get_step_number(hypersomnia) < rewound_step) {
+				const guid_mapped_entropy replayed_entropy = director.get_entropy_for_step(get_step_number(hypersomnia));
+				const auto cosmic_entropy_for_this_advancement = cosmic_entropy(replayed_entropy, hypersomnia);
+
+				hypersomnia.advance_deterministic_schemata(
+					cosmic_entropy_for_this_advancement,
+					[](auto) {},
+					get_standard_post_solve()
+				);
+			}
+		}
+	}
+}
+
+void director_setup::process(
+	const config_lua_table& cfg, 
+	game_window& window
+) {
+	init(cfg, window);
+
 	while (!should_quit) {
-		{
-			augs::machine_entropy new_machine_entropy;
-
-			session.local_entropy_profiler.new_measurement();
-			new_machine_entropy.local = window.collect_entropy(!cfg.debug_disable_cursor_clipping);
-			session.local_entropy_profiler.end_measurement();
-
-			process_exit_key(new_machine_entropy.local);
-
-			for (const auto& raw_input : new_machine_entropy.local) {
-				events.apply(raw_input);
-
-				if (raw_input.was_any_key_pressed()) {
-					if (raw_input.key == key::F2) {
-						current_director_state = director_state::PLAYING;
-					}
-					if (raw_input.key == key::F3) {
-						requested_playing_speed = 0.f;
-
-						if (current_director_state == director_state::RECORDING) {
-							recording_replacement_mode =
-								static_cast<recording_replacement_type>((static_cast<int>(recording_replacement_mode) + 1) % static_cast<int>(recording_replacement_type::COUNT));
-						}
-						else {
-							recording_replacement_mode = recording_replacement_type::ALL;
-
-							current_director_state = director_state::RECORDING;
-							clear_accumulated_inputs();
-						}
-					}
-					if (raw_input.key == key::F7) {
-						director.save_recording_to_file(output_director_path);
-						unsaved_changes_exist = false;
-
-						requested_playing_speed = 0.f;
-						clear_accumulated_inputs();
-					}
-
-					if (raw_input.key == key::NUMPAD1) {
-						current_director_state = director_state::PLAYING;
-						advance_steps_forward = -1;
-
-						if (events.is_set(key::LCTRL)) {
-							advance_steps_forward *= 10;
-						}
-					}
-					if (raw_input.key == key::NUMPAD2) {
-						current_director_state = director_state::PLAYING;
-						advance_steps_forward = 1;
-
-						if (events.is_set(key::LCTRL)) {
-							advance_steps_forward *= 10;
-						}
-					}
-					if (raw_input.key == key::NUMPAD3) {
-						requested_playing_speed = 0.f;
-						clear_accumulated_inputs();
-					}
-					if (raw_input.key == key::NUMPAD4) {
-						requested_playing_speed = 0.1f;
-						clear_accumulated_inputs();
-					}
-					if (raw_input.key == key::NUMPAD5) {
-						requested_playing_speed = 1.f;
-						clear_accumulated_inputs();
-					}
-					if (raw_input.key == key::NUMPAD6) {
-						requested_playing_speed = 6.f;
-						clear_accumulated_inputs();
-					}
-					if (raw_input.key == key::NUMPAD9) {
-						bookmarked_step = get_step_number(hypersomnia);
-						clear_accumulated_inputs();
-					}
-					if (raw_input.key == key::NUMPAD0) {
-						advance_steps_forward = static_cast<long long>(bookmarked_step) - static_cast<long long>(get_step_number(hypersomnia));
-						clear_accumulated_inputs();
-					}
-				}
-			}
-
-			session.switch_between_gui_and_back(new_machine_entropy.local);
-
-			session.control_gui_and_remove_fetched_events(
-				hypersomnia[testbed.get_selected_character()],
-				new_machine_entropy.local
-			);
-
-			auto new_intents = session.context.to_key_and_mouse_intents(new_machine_entropy.local);
-
-			session.control_and_remove_fetched_intents(new_intents);
-			testbed.control_character_selection(new_intents);
-
-			auto new_cosmic_entropy = cosmic_entropy(
-				hypersomnia[testbed.get_selected_character()],
-				new_intents
-			);
-
-			new_cosmic_entropy += session.systems_audiovisual.get<gui_element_system>().get_and_clear_pending_events();
-
-			if (current_director_state == director_state::RECORDING) {
-				total_collected_entropy += new_cosmic_entropy;
-			}
-
-			timer.set_stepping_speed_multiplier(requested_playing_speed);
-		}
-
-		if (advance_steps_forward < 0) {
-			const auto current_step = get_step_number(hypersomnia);
-			const auto rewound_step = static_cast<unsigned>(-advance_steps_forward) > current_step ? 0 : current_step + advance_steps_forward;
-
-#if LOG_REWINDING
-			LOG("Current step: %x\nRewound step: %x", current_step, rewound_step);
-#endif
-
-			if (rewound_step < current_step) {
-				const size_t resimulated_cosmos_index = rewound_step / snapshot_frequency_in_steps;
-				
-#if LOG_REWINDING
-				LOG_NVPS(snapshots_for_rewinding.size());
-				LOG_NVPS(resimulated_cosmos_index);
-#endif
-
-				if (snapshots_for_rewinding.size() > 1 && resimulated_cosmos_index < snapshots_for_rewinding.size() - 1) {
-					snapshots_for_rewinding.erase(snapshots_for_rewinding.begin() + resimulated_cosmos_index + 1, snapshots_for_rewinding.end());
-				}
-
-				hypersomnia = snapshots_for_rewinding.at(resimulated_cosmos_index);
-				
-#if LOG_REWINDING
-				LOG("Resimulated hypersomnia step: %x", get_step_number(hypersomnia));
-#endif
-
-				while (get_step_number(hypersomnia) < rewound_step) {
-					const guid_mapped_entropy replayed_entropy = director.get_entropy_for_step(get_step_number(hypersomnia));
-					const auto cosmic_entropy_for_this_advancement = cosmic_entropy(replayed_entropy, hypersomnia);
-
-					hypersomnia.advance_deterministic_schemata(
-						cosmic_entropy_for_this_advancement, 
-						[](auto){},
-						get_standard_post_solve()
-					);
-				}
-			}
-		}
-		
-		advance_steps_forward = 0;
-
+		control_player(cfg, window);
 		advance_player();
-
 		view(cfg);
-
 		window.swap_buffers();
 	}
 }

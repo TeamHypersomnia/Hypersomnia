@@ -60,6 +60,11 @@ public:
 		game_window&
 	);
 
+	void control_player(
+		const config_lua_table& cfg,
+		game_window& window
+	);
+
 	void clear_accumulated_inputs();
 
 	void advance_player();
