@@ -65,6 +65,16 @@ basic_cosmic_entropy<key>& basic_cosmic_entropy<key>::operator+=(const basic_cos
 	return *this;
 }
 
+template <class key>
+void basic_cosmic_entropy<key>::clear() {
+	augs::introspect(
+		[](auto, auto& member) {
+			member.clear();
+		},
+		*this
+	);
+}
+
 bool guid_mapped_entropy::operator!=(const guid_mapped_entropy& b) const {
 	return !(
 		compare_containers(intents_per_entity, b.intents_per_entity)

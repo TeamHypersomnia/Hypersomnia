@@ -60,9 +60,23 @@ public:
 		game_window&
 	);
 
+	void clear_accumulated_inputs();
+
+	void advance_player();
+
+	decltype(auto) get_standard_post_solve() {
+		return [this](const const_logic_step step) {
+			session.standard_audiovisual_post_solve(step);
+		};
+	}
+
 	void process(
 		const config_lua_table& cfg, 
 		game_window&
+	);
+
+	void view(
+		const config_lua_table& cfg
 	);
 
 	void save_unsaved_changes();

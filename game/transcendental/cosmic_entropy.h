@@ -34,6 +34,8 @@ struct basic_cosmic_entropy {
 	size_t length() const;
 
 	basic_cosmic_entropy& operator+=(const basic_cosmic_entropy& b);
+
+	void clear();
 };
 
 struct cosmic_entropy;

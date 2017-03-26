@@ -152,7 +152,7 @@ void local_setup::process(
 				standard_post_solve
 			);
 
-			total_collected_entropy = cosmic_entropy();
+			total_collected_entropy.clear();
 		}
 
 		static thread_local visible_entities all_visible;

@@ -173,7 +173,7 @@ void determinism_test_setup::process(
 				}
 			}
 
-			total_collected_entropy = cosmic_entropy();
+			total_collected_entropy.clear();
 		}
 
 		std::string logged;

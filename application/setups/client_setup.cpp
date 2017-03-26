@@ -261,7 +261,7 @@ void client_setup::process_once(
 		client.send_pending_redundant();
 		session.sending_packets_profiler.end_measurement();
 
-		total_collected_entropy = cosmic_entropy();
+		total_collected_entropy.clear();
 	}
 
 	if (!still_downloading) {
