@@ -17,7 +17,7 @@ class viewing_session;
 
 namespace scene_builders {
 	class one_entity {
-		void populate(const logic_step, const vec2i screen_size);
+		void populate(const logic_step);
 	public:
 		augs::constant_size_vector<entity_id, TESTBED_CHARACTERS_COUNT> characters;
 		unsigned current_character_index = 0;
@@ -31,12 +31,11 @@ namespace scene_builders {
 		template <class T>
 		void populate_world_with_entities(
 			cosmos& cosm,
-			const vec2i screen_size,
 			const T post_solve
 		) {
 			cosm.advance_deterministic_schemata(
 				cosmic_entropy(),
-				[&](const logic_step step) { populate(step, screen_size); },
+				[&](const logic_step step) { populate(step); },
 				post_solve
 			);
 		}

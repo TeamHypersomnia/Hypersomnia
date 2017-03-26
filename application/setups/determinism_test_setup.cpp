@@ -62,7 +62,6 @@ void determinism_test_setup::process(
 			hypersomnias[i].set_fixed_delta(cfg.default_tickrate);
 			testbeds[i].populate_world_with_entities(
 				hypersomnias[i], 
-				vec2i(1920, 1080),
 				standard_post_solve
 			);
 		}

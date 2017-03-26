@@ -38,7 +38,7 @@
 #include "augs/graphics/renderer.h"
 
 namespace scene_builders {
-	void testbed::populate(const logic_step step, const vec2i screen_size) {
+	void testbed::populate(const logic_step step) {
 		auto& world = step.cosm;
 		//const auto crate = prefabs::create_crate(world, vec2(200, 200 + 300), vec2i(100, 100) / 3);
 		//const auto crate2 = prefabs::create_crate(world, vec2(400, 200 + 400), vec2i(300, 300));
@@ -158,7 +158,7 @@ namespace scene_builders {
 
 
 
-			const auto new_character = prefabs::create_character(world, transform, screen_size, typesafe_sprintf("player%x", i), torso_set);
+			const auto new_character = prefabs::create_character(world, transform, typesafe_sprintf("player%x", i), torso_set);
 
 			new_characters[i] = new_character;
 

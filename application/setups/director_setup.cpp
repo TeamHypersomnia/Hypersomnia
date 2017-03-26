@@ -65,7 +65,6 @@ void director_setup::process(const config_lua_table& cfg, game_window& window) {
 		
 		testbed.populate_world_with_entities(
 			hypersomnia, 
-			screen_size, 
 			standard_post_solve
 		);
 	}

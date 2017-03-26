@@ -203,7 +203,6 @@ namespace prefabs {
 	entity_handle create_character(
 		cosmos& world, 
 		const components::transform spawn_transform, 
-		const vec2i screen_size, 
 		const std::string name, 
 		const assets::animation_response_id torso_set
 	) {
@@ -211,7 +210,7 @@ namespace prefabs {
 
 		name_entity(character, entity_name::PERSON);
 
-		const auto crosshair = create_character_crosshair(world, screen_size);
+		const auto crosshair = create_character_crosshair(world);
 		crosshair.get<components::crosshair>().character_entity_to_chase = character;
 		crosshair.set_logic_transform(spawn_transform.pos);
 
@@ -244,7 +243,7 @@ namespace prefabs {
 		return character;
 	}
 
-	entity_handle create_character_crosshair(cosmos& world, const vec2i screen_size) {
+	entity_handle create_character_crosshair(cosmos& world) {
 		auto root = world.create_entity("crosshair");
 		auto recoil = world.create_entity("crosshair_recoil_body");
 		auto zero_target = world.create_entity("zero_target");

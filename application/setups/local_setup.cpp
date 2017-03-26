@@ -62,7 +62,6 @@ void local_setup::process(
 		
 		testbed.populate_world_with_entities(
 			hypersomnia, 
-			screen_size,
 			standard_post_solve
 		);
 	}

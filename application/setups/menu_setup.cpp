@@ -133,7 +133,6 @@ void menu_setup::process(
 	
 	testbed.populate_world_with_entities(
 		intro_scene, 
-		screen_size,
 		standard_post_solve
 	);
 

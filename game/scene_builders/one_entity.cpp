@@ -38,7 +38,7 @@
 #include "augs/graphics/renderer.h"
 
 namespace scene_builders {
-	void one_entity::populate(const logic_step step, const vec2i screen_size) {
+	void one_entity::populate(const logic_step step) {
 		auto& world = step.cosm;
 
 		prefabs::create_force_grenade(world, { 254, 611 });
@@ -66,7 +66,7 @@ namespace scene_builders {
 				transform.pos.x += 200;
 			}
 
-			const auto new_character = prefabs::create_character(world, transform, screen_size, typesafe_sprintf("player%x", i), torso_set);
+			const auto new_character = prefabs::create_character(world, transform, typesafe_sprintf("player%x", i), torso_set);
 
 			new_characters[i] = new_character;
 
