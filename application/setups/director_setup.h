@@ -9,6 +9,8 @@
 class game_window;
 
 class director_setup : public setup_base {
+	void push_snapshot_if_needed();
+
 public:
 	enum class recording_replacement_type {
 		ALL,
@@ -64,6 +66,8 @@ public:
 		const config_lua_table& cfg,
 		game_window& window
 	);
+
+	void seek_to_step(const unsigned);
 
 	void clear_accumulated_inputs();
 

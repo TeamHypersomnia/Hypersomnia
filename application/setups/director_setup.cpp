@@ -275,12 +275,32 @@ void director_setup::control_player(
 		const guid_mapped_entropy replayed_entropy = director.get_entropy_for_step(get_step_number(hypersomnia));
 		const auto cosmic_entropy_for_this_advancement = cosmic_entropy(replayed_entropy, hypersomnia);
 
+		push_snapshot_if_needed();
+
 		hypersomnia.advance_deterministic_schemata(
 			cosmic_entropy_for_this_advancement,
 			[](auto) {},
 			get_standard_post_solve()
 		);
 	}
+}
+
+void director_setup::push_snapshot_if_needed() {
+	const auto current_step = get_step_number(hypersomnia);
+
+	if (current_step % snapshot_frequency_in_steps == 0) {
+		const auto snapshot_index = current_step / snapshot_frequency_in_steps;
+
+		const bool valid_snapshot_exists = snapshot_index < snapshots_for_rewinding.size();
+
+		if (!valid_snapshot_exists) {
+			snapshots_for_rewinding.push_back(hypersomnia);
+		}
+	}
+}
+
+void director_setup::seek_to_step(const unsigned step_number) {
+
 }
 
 void director_setup::process(
@@ -306,9 +326,7 @@ void director_setup::advance_player() {
 		cosmic_entropy cosmic_entropy_for_this_advancement;
 		const auto current_step = get_step_number(hypersomnia);
 
-		if (current_step % snapshot_frequency_in_steps == 0) {
-			snapshots_for_rewinding.push_back(hypersomnia);
-		}
+		push_snapshot_if_needed();
 
 		if (current_director_state == director_state::PLAYING) {
 			guid_mapped_entropy replayed_entropy = director.get_entropy_for_step(current_step);
