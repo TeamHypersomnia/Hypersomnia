@@ -68,6 +68,11 @@ public:
 
 	viewing_session();
 
+	void initialize(
+		const game_window&,
+		const config_lua_table&
+	);
+
 	void set_screen_size(const vec2i);
 
 	void set_interpolation_enabled(const bool);
@@ -85,6 +90,12 @@ public:
 	void control_and_remove_fetched_intents(key_and_mouse_intent_vector&);
 	void standard_audiovisual_post_solve(const const_logic_step);
 	void spread_past_infection(const const_logic_step);
+
+	decltype(auto) get_standard_post_solve() {
+		return [this](const const_logic_step step) {
+			standard_audiovisual_post_solve(step);
+		};
+	}
 
 	void advance_audiovisual_systems(
 		const cosmos& cosm, 

@@ -29,7 +29,8 @@
 
 void determinism_test_setup::process(
 	const config_lua_table& cfg, 
-	game_window& window
+	game_window& window,
+	viewing_session& session
 ) {
 	const vec2i screen_size = vec2i(window.get_screen_size());
 
@@ -41,16 +42,7 @@ void determinism_test_setup::process(
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 	std::vector<scene_builders::testbed> testbeds(cosmoi_count);
 
-	viewing_session session;
 	session.reserve_caches_for_entities(3000);
-	session.set_screen_size(screen_size);
-	session.set_interpolation_enabled(false);
-	session.set_master_gain(cfg.sound_effects_volume);
-	session.configure_input();
-
-	const auto standard_post_solve = [&session](const const_logic_step step) {
-		session.standard_audiovisual_post_solve(step);
-	};
 
 	if (augs::file_exists("save.state")) {
 		for (auto& h : hypersomnias) {
@@ -62,7 +54,7 @@ void determinism_test_setup::process(
 			hypersomnias[i].set_fixed_delta(cfg.default_tickrate);
 			testbeds[i].populate_world_with_entities(
 				hypersomnias[i], 
-				standard_post_solve
+				session.get_standard_post_solve()
 			);
 		}
 	}

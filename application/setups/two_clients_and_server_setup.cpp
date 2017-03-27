@@ -11,6 +11,13 @@ void two_clients_and_server_setup::process(
 ) {
 	server_setup serv_setup;
 
+	viewing_session sessions[2];
+	sessions[0].initialize(window, cfg);
+	sessions[1].initialize(window, cfg);
+	
+	sessions[0].reserve_caches_for_entities(3000);
+	sessions[1].reserve_caches_for_entities(3000);
+
 	std::thread server_thread([&]() {
 		serv_setup.process(cfg, window, true);
 	});
@@ -18,25 +25,25 @@ void two_clients_and_server_setup::process(
 	serv_setup.wait_for_listen_server();
 
 	client_setup setups[2];
-	setups[0].init(cfg, window, "recorded_0.inputs");
-	setups[1].init(cfg, window, "recorded_1.inputs", true);
+	setups[0].init(cfg, window, sessions[0], "recorded_0.inputs");
+	setups[1].init(cfg, window, sessions[1], "recorded_1.inputs", true);
 
-	setups[0].session.camera.camera.visible_world_area.x /= 2;
-	setups[1].session.camera.camera.visible_world_area.x /= 2;
+	sessions[0].camera.camera.visible_world_area.x /= 2;
+	sessions[1].camera.camera.visible_world_area.x /= 2;
 	
-	setups[0].session.viewport_coordinates = vec2i(0, 0);
-	setups[1].session.viewport_coordinates = vec2i(static_cast<int>(setups[1].session.camera.camera.visible_world_area.x), 0);
+	sessions[0].viewport_coordinates = vec2i(0, 0);
+	sessions[1].viewport_coordinates = vec2i(static_cast<int>(sessions[1].camera.camera.visible_world_area.x), 0);
 
 	unsigned current_window = 0;
 
 	bool alive[2] = { true, true };
 
 	while (!should_quit) {
-		setups[0].session.local_entropy_profiler.new_measurement();
-		setups[1].session.local_entropy_profiler.new_measurement();
+		sessions[0].local_entropy_profiler.new_measurement();
+		sessions[1].local_entropy_profiler.new_measurement();
 		auto precollected = window.collect_entropy(!cfg.debug_disable_cursor_clipping);
-		setups[0].session.local_entropy_profiler.end_measurement();
-		setups[1].session.local_entropy_profiler.end_measurement();
+		sessions[0].local_entropy_profiler.end_measurement();
+		sessions[1].local_entropy_profiler.end_measurement();
 
 		if (process_exit_key(precollected))
 			break;
@@ -74,13 +81,13 @@ void two_clients_and_server_setup::process(
 		target.clear_current_fbo();
 
 		if (current_window == 0) {
-			if(alive[0]) setups[0].process_once(cfg, window, precollected, false);
-			if(alive[1]) setups[1].process_once(cfg, window, augs::machine_entropy::local_type(), false);
+			if(alive[0]) setups[0].process_once(cfg, window, sessions[0], precollected, false);
+			if(alive[1]) setups[1].process_once(cfg, window, sessions[1], augs::machine_entropy::local_type(), false);
 		}
 
 		if (current_window == 1) {
-			if(alive[1]) setups[1].process_once(cfg, window, precollected, false);
-			if(alive[0]) setups[0].process_once(cfg, window, augs::machine_entropy::local_type(), false);
+			if(alive[1]) setups[1].process_once(cfg, window, sessions[0], precollected, false);
+			if(alive[0]) setups[0].process_once(cfg, window, sessions[1], augs::machine_entropy::local_type(), false);
 		}
 
 		window.swap_buffers();

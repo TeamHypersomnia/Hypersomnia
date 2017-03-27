@@ -76,35 +76,38 @@ int main(int argc, char** argv) {
 		&& "The launch mode you have chosen is currently out of service."
 	);
 
+	viewing_session session;
+	session.initialize(window, cfg);
+
 	switch (mode) {
 	case config_lua_table::launch_type::MAIN_MENU:
 	{
 		menu_setup setup;
-		setup.process(cfg, window);
+		setup.process(cfg, window, session);
 	}
 		break;
 	case config_lua_table::launch_type::LOCAL:
 	{
 		local_setup setup;
-		setup.process(cfg, window);
+		setup.process(cfg, window, session);
 	}
 		break;
 	case config_lua_table::launch_type::LOCAL_DETERMINISM_TEST:
 	{
 		determinism_test_setup setup;
-		setup.process(cfg, window);
+		setup.process(cfg, window, session);
 	}
 	case config_lua_table::launch_type::DIRECTOR:
 	{
 		director_setup setup;
-		setup.process(cfg, window);
+		setup.process(cfg, window, session);
 	}
 		break;
 
 	case config_lua_table::launch_type::CHOREOGRAPHIC:
 	{
 		choreographic_setup setup;
-		setup.process(cfg, window);
+		setup.process(cfg, window, session);
 	}
 		break;
 	case config_lua_table::launch_type::CLIENT_AND_SERVER:
@@ -118,7 +121,7 @@ int main(int argc, char** argv) {
 		serv_setup.wait_for_listen_server();
 		
 		client_setup setup;
-		setup.process(cfg, window);
+		setup.process(cfg, window, session);
 		
 		serv_setup.should_quit = true;
 		
@@ -135,7 +138,7 @@ int main(int argc, char** argv) {
 	{
 
 		client_setup setup;
-		setup.process(cfg, window);
+		setup.process(cfg, window, session);
 	}
 		break;
 	case config_lua_table::launch_type::ONLY_SERVER: 

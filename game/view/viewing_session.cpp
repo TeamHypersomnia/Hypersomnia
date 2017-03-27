@@ -13,6 +13,18 @@ viewing_session::viewing_session() {
 	systems_audiovisual.get<sound_system>().initialize_sound_sources(32u);
 }
 
+void viewing_session::initialize(
+	const game_window& window,
+	const config_lua_table& cfg
+) {
+	const vec2i screen_size = vec2i(window.get_screen_size());
+
+	set_screen_size(screen_size);
+	systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
+	set_master_gain(cfg.sound_effects_volume);
+	configure_input();
+}
+
 void viewing_session::set_screen_size(const vec2i new_size) {
 	systems_audiovisual.get<gui_element_system>().screen_size_for_new_characters = new_size;
 	camera.configure_size(new_size);

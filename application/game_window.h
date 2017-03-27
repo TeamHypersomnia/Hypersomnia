@@ -6,7 +6,7 @@ class game_window {
 public:
 	augs::window::glwindow window;
 
-	vec2i get_screen_size();
+	vec2i get_screen_size() const;
 	void swap_buffers();
 
 	bool clear_window_inputs_once = true;

@@ -50,27 +50,19 @@ using namespace augs::gui;
 
 void menu_setup::process(
 	const config_lua_table& cfg, 
-	game_window& window
+	game_window& window,
+	viewing_session& session
 ) {
 	const vec2i screen_size = vec2i(window.get_screen_size());
 
 	cosmos intro_scene(3000);
 
-	viewing_session session;
 	session.reserve_caches_for_entities(3000);
-	session.set_screen_size(screen_size);
-	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
 	session.show_profile_details = false;
 	session.camera.averages_per_sec /= 2;
 
-	session.configure_input();
-
 	session.drawing_settings.draw_gui_overlays = false;
 	session.drawing_settings.draw_crosshairs = false;
-
-	const auto standard_post_solve = [&session](const const_logic_step step) {
-		session.standard_audiovisual_post_solve(step);
-	};
 
 	augs::single_sound_buffer menu_theme;
 	augs::sound_source menu_theme_source;
@@ -133,7 +125,7 @@ void menu_setup::process(
 	
 	testbed.populate_world_with_entities(
 		intro_scene, 
-		standard_post_solve
+		session.get_standard_post_solve()
 	);
 
 	ltrb title_rect;
@@ -446,7 +438,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 		intro_actions.push_non_blocking(act(new augs::tween_value_action<rgba_channel>(title_text_color.a, 255, 500.f)));
 		
 		intro_actions.push_non_blocking(act(new augs::set_value_action<bool>(roll_news, true)));
-		intro_actions.push_non_blocking(act(new augs::set_value_action<vec2i>(menu_ui_rect_world.last_state.mouse.pos, screen_size/2)));
+		intro_actions.push_non_blocking(act(new augs::set_value_action<vec2i>(menu_ui_rect_world.last_state.mouse.pos, window.get_screen_size()/2)));
 		intro_actions.push_non_blocking(act(new augs::set_value_action<bool>(draw_cursor, true)));
 		
 		for (auto& t : title_texts) {
@@ -496,10 +488,10 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 	while (intro_scene.get_total_time_passed_in_seconds() < cfg.rewind_intro_scene_by_secs) {
 		const auto entropy = cosmic_entropy(director.get_entropy_for_step(intro_scene.get_total_steps_passed() - initial_step_number), intro_scene);
 
-		intro_scene.advance_deterministic_schemata(entropy, [](auto) {},
-			[this, &session](const const_logic_step step) {
-				session.standard_audiovisual_post_solve(step);
-			}
+		intro_scene.advance_deterministic_schemata(
+			entropy, 
+			[](auto) {},
+			session.get_standard_post_solve()
 		);
 	}
 
@@ -521,10 +513,10 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 
 			const auto entropy = cosmic_entropy(director.get_entropy_for_step(intro_scene.get_total_steps_passed() - initial_step_number), intro_scene);
 
-			intro_scene.advance_deterministic_schemata(entropy, [](auto){},
-				[this, &session](const const_logic_step step){
-					session.standard_audiovisual_post_solve(step);
-				}
+			intro_scene.advance_deterministic_schemata(
+				entropy, 
+				[](auto){},
+				session.get_standard_post_solve()
 			);
 		}
 

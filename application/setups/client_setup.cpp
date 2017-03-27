@@ -30,8 +30,12 @@
 #include "generated_introspectors.h"
 #include "application/config_lua_table.h"
 
-void client_setup::process(const config_lua_table& cfg, game_window& window) {
-	init(cfg, window);
+void client_setup::process(
+	const config_lua_table& cfg, 
+	game_window& window,
+	viewing_session& session
+) {
+	init(cfg, window, session);
 
 	while (!should_quit) {
 		session.local_entropy_profiler.new_measurement();
@@ -41,26 +45,19 @@ void client_setup::process(const config_lua_table& cfg, game_window& window) {
 		if (process_exit_key(precollected))
 			break;
 
-		process_once(cfg, window, precollected);
+		process_once(cfg, window, session, precollected);
 	}
 }
 
 void client_setup::init(
 	const config_lua_table& cfg, 
-	game_window& window, 
+	game_window& window,
+	viewing_session& session,
 	const std::string recording_filename, 
 	const bool use_alternative_port
 ) {
-	const vec2i screen_size = vec2i(window.get_screen_size());
-
 	scene_builders::networked_testbed_client().populate_world_with_entities(initial_hypersomnia);
 
-	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
-
-	session.set_screen_size(screen_size);
-	session.set_master_gain(cfg.sound_effects_volume);
-
-	session.configure_input();
 	session.reserve_caches_for_entities(3000);
 
 	detailed_step_log = cfg.default_tickrate <= 2;
@@ -75,7 +72,6 @@ void client_setup::init(
 		//	timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
 		//}
 	}
-
 
 	receiver.jitter_buffer.set_lower_limit(static_cast<unsigned>(cfg.jitter_buffer_ms / hypersomnia.get_fixed_delta().in_milliseconds()));
 	receiver.misprediction_smoothing_multiplier = cfg.misprediction_smoothing_multiplier;
@@ -107,7 +103,8 @@ void client_setup::init(
 
 void client_setup::process_once(
 	const config_lua_table& cfg,
-	game_window& window, 
+	game_window& window,
+	viewing_session& session,
 	const augs::machine_entropy::local_type& precollected, 
 	const bool swap_buffers
 ) {
@@ -122,14 +119,14 @@ void client_setup::process_once(
 		);
 	};
 
-	auto step_pred_with_audiovisual_response = [this](
+	auto step_pred_with_audiovisual_response = [this, &session](
 		const cosmic_entropy& entropy, 
 		cosmos& cosm
 	) {
 		cosm.advance_deterministic_schemata(
 			entropy,
 			[this](const logic_step) {},
-			[this](const const_logic_step step) {
+			[this, &session](const const_logic_step step) {
 				session.spread_past_infection(step);
 				session.standard_audiovisual_post_solve(step);
 			}

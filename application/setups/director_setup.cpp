@@ -29,16 +29,10 @@ using namespace augs::window::event::keys;
 
 void director_setup::init(
 	const config_lua_table& cfg, 
-	game_window& window
+	game_window& window,
+	viewing_session& session
 ) {
-	const vec2i screen_size = vec2i(window.get_screen_size());
-
 	session.reserve_caches_for_entities(3000);
-	session.set_screen_size(screen_size);
-	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
-	session.set_master_gain(cfg.sound_effects_volume);
-
-	session.configure_input();
 	
 	testbed.debug_var = cfg.debug_var;
 
@@ -47,7 +41,7 @@ void director_setup::init(
 
 		testbed.populate_world_with_entities(
 			hypersomnia,
-			get_standard_post_solve()
+			session.get_standard_post_solve()
 		);
 	}
 
@@ -139,7 +133,8 @@ void director_setup::clear_accumulated_inputs() {
 
 void director_setup::control_player(
 	const config_lua_table& cfg,
-	game_window& window
+	game_window& window,
+	viewing_session& session
 ) {
 	int advance_steps_forward = 0;
 
@@ -252,15 +247,18 @@ void director_setup::control_player(
 
 	if (advance_steps_forward < 0) {
 		const unsigned seeked_step = static_cast<unsigned>(-advance_steps_forward) > current_step ? 0 : current_step + advance_steps_forward;
-		seek_to_step(seeked_step);
+		seek_to_step(seeked_step, session);
 	}
 	else if (advance_steps_forward > 0) {
 		const unsigned seeked_step = current_step + static_cast<unsigned>(advance_steps_forward);
-		seek_to_step(seeked_step);
+		seek_to_step(seeked_step, session);
 	}
 }
 
-void director_setup::seek_to_step(const unsigned seeked_step) {
+void director_setup::seek_to_step(
+	const unsigned seeked_step,
+	viewing_session& session
+) {
 	const auto snapshot_index = seeked_step / snapshot_frequency_in_steps;
 
 	if (seeked_step < get_step_number(hypersomnia)) {
@@ -277,7 +275,7 @@ void director_setup::seek_to_step(const unsigned seeked_step) {
 	}
 
 	while (get_step_number(hypersomnia) < seeked_step) {
-		advance_player_by_single_step();
+		advance_player_by_single_step(session);
 	}
 }
 
@@ -297,19 +295,20 @@ void director_setup::push_snapshot_if_needed() {
 
 void director_setup::process(
 	const config_lua_table& cfg, 
-	game_window& window
+	game_window& window,
+	viewing_session& session
 ) {
-	init(cfg, window);
+	init(cfg, window, session);
 
 	while (!should_quit) {
-		control_player(cfg, window);
-		advance_player();
-		view(cfg);
+		control_player(cfg, window, session);
+		advance_player(session);
+		view(cfg, session);
 		window.swap_buffers();
 	}
 }
 
-void director_setup::advance_player_by_single_step() {
+void director_setup::advance_player_by_single_step(viewing_session& session) {
 	cosmic_entropy cosmic_entropy_for_this_advancement;
 	const auto current_step = get_step_number(hypersomnia);
 
@@ -386,25 +385,26 @@ void director_setup::advance_player_by_single_step() {
 	hypersomnia.advance_deterministic_schemata(
 		cosmic_entropy_for_this_advancement,
 		[](auto) {},
-		get_standard_post_solve()
+		session.get_standard_post_solve()
 	);
 
 	total_collected_entropy.clear();
 }
 
-void director_setup::advance_player() {
+void director_setup::advance_player(viewing_session& session) {
 	auto steps = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
 
 	timer.set_stepping_speed_multiplier(requested_playing_speed);
 	session.set_interpolation_enabled(requested_playing_speed > 0.);
 
 	while (steps--) {
-		advance_player_by_single_step();
+		advance_player_by_single_step(session);
 	}
 }
 
 void director_setup::view(
-	const config_lua_table& cfg
+	const config_lua_table& cfg,
+	viewing_session& session
 ) {
 	static thread_local visible_entities all_visible;
 	session.get_visible_entities(all_visible, hypersomnia);

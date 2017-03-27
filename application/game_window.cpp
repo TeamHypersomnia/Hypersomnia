@@ -1,6 +1,6 @@
 #include "game_window.h"
 
-vec2i game_window::get_screen_size() {
+vec2i game_window::get_screen_size() const {
 	return window.get_screen_size();
 }
 

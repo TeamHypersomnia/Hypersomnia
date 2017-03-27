@@ -18,8 +18,6 @@ public:
 	cosmos hypersomnia_last_snapshot = cosmos(3000);
 	cosmos extrapolated_hypersomnia = cosmos(3000);
 
-	viewing_session session;
-
 	cosmic_entropy total_collected_entropy;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 	scene_builders::networked_testbed_client scene;
@@ -34,19 +32,22 @@ public:
 
 	void process(
 		const config_lua_table& cfg, 
-		game_window&
+		game_window&,
+		viewing_session&
 	);
 
 	void init(
 		const config_lua_table& cfg, 
 		game_window&, 
-		const std::string recording_filename = "recorded.inputs", 
+		viewing_session&,
+		const std::string recording_filename = "recorded.inputs",
 		const bool use_alternative_port = false
 	);
 
 	void process_once(
 		const config_lua_table& cfg, 
-		game_window&, 
+		game_window&,
+		viewing_session&,
 		const augs::machine_entropy::local_type& precollected, 
 		const bool swap_buffers = true
 	);

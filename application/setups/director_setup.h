@@ -10,7 +10,7 @@ class game_window;
 
 class director_setup : public setup_base {
 	void push_snapshot_if_needed();
-	void advance_player_by_single_step();
+	void advance_player_by_single_step(viewing_session& session);
 
 public:
 	enum class recording_replacement_type {
@@ -29,7 +29,6 @@ public:
 	director_state current_director_state = director_state::PLAYING;
 	recording_replacement_type recording_replacement_mode = recording_replacement_type::ALL;
 
-	viewing_session session;
 	augs::window::event::state events;
 	cosmos hypersomnia = cosmos(3000);
 	scene_builders::testbed testbed;
@@ -60,33 +59,34 @@ public:
 
 	void init(
 		const config_lua_table& cfg, 
-		game_window&
+		game_window&,
+		viewing_session&
 	);
 
 	void control_player(
 		const config_lua_table& cfg,
-		game_window& window
+		game_window& window,
+		viewing_session& session
 	);
 
-	void seek_to_step(const unsigned);
+	void seek_to_step(
+		const unsigned step_number,
+		viewing_session& session
+	);
 
 	void clear_accumulated_inputs();
 
-	void advance_player();
-
-	decltype(auto) get_standard_post_solve() {
-		return [this](const const_logic_step step) {
-			session.standard_audiovisual_post_solve(step);
-		};
-	}
+	void advance_player(viewing_session& session);
 
 	void process(
 		const config_lua_table& cfg, 
-		game_window&
+		game_window&,
+		viewing_session&
 	);
 
 	void view(
-		const config_lua_table& cfg
+		const config_lua_table& cfg,
+		viewing_session&
 	);
 
 	void save_unsaved_changes();

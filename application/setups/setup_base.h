@@ -3,6 +3,7 @@
 #include "augs/misc/machine_entropy.h"
 
 class config_lua_table;
+class viewing_session;
 
 class setup_base {
 public:

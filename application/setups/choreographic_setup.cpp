@@ -46,8 +46,12 @@ using namespace augs::window::event::keys;
 
 void choreographic_setup::process(
 	const config_lua_table& cfg,
-	game_window& window
+	game_window& window,
+	viewing_session& session
 ) {
+	session.show_profile_details = false;
+	session.reserve_caches_for_entities(3000);
+
 	const auto lines = augs::get_file_lines(cfg.choreographic_input_scenario_path);
 	size_t current_line = 0;
 
@@ -79,8 +83,8 @@ void choreographic_setup::process(
 
 			auto& scene = preloaded_scenes[id];
 
-			scene.init(scene_cfg, window);
-			scene.session.show_profile_details = false;
+			viewing_session dummy;
+			scene.init(scene_cfg, window, dummy);
 			scene.requested_playing_speed = 1.0;
 		}
 		else {
@@ -198,11 +202,7 @@ void choreographic_setup::process(
 
 				else if (next_event.is<set_sfx_gain>()) {
 					auto& e = next_event.get<set_sfx_gain>();
-
-					ensure(currently_played_scene_index != -1);
-
-					auto& scene = preloaded_scenes[currently_played_scene_index];
-					scene.session.set_master_gain(e.gain);
+					session.set_master_gain(e.gain);
 				}
 
 				else if (next_event.is<set_scene_speed>()) {
@@ -225,8 +225,8 @@ void choreographic_setup::process(
 		if (currently_played_scene_index != -1) {
 			auto& scene = preloaded_scenes[currently_played_scene_index];
 			
-			scene.advance_player();
-			scene.view(cfg);
+			scene.advance_player(session);
+			scene.view(cfg, session);
 		}
 
 		window.swap_buffers();

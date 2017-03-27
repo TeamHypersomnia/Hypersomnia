@@ -31,24 +31,12 @@ using namespace augs::window::event::keys;
 
 void local_setup::process(
 	const config_lua_table& cfg, 
-	game_window& window
+	game_window& window,
+	viewing_session& session
 ) {
-	const vec2i screen_size = vec2i(window.get_screen_size());
-
 	cosmos hypersomnia(3000);
-
-	viewing_session session;
-
+	
 	session.reserve_caches_for_entities(3000);
-	session.set_screen_size(screen_size);
-	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
-	session.set_master_gain(cfg.sound_effects_volume);
-
-	session.configure_input();
-
-	const auto standard_post_solve = [&session](const const_logic_step step) {
-		session.standard_audiovisual_post_solve(step);
-	};
 
 	cosmic_entropy total_collected_entropy;
 	augs::debug_entropy_player<cosmic_entropy> player;
@@ -62,7 +50,7 @@ void local_setup::process(
 		
 		testbed.populate_world_with_entities(
 			hypersomnia, 
-			standard_post_solve
+			session.get_standard_post_solve()
 		);
 	}
 
@@ -151,7 +139,7 @@ void local_setup::process(
 			hypersomnia.advance_deterministic_schemata(
 				total_collected_entropy,
 				[](const auto) {},
-				standard_post_solve
+				session.get_standard_post_solve()
 			);
 
 			total_collected_entropy.clear();

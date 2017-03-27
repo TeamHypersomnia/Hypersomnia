@@ -56,7 +56,7 @@ recording_type = {
 }
 
 config_table = {
-	launch_mode = launch_type.CHOREOGRAPHIC,
+	launch_mode = launch_type.LOCAL,
 	
 	input_recording_mode = recording_type.LIVE,
 
@@ -162,7 +162,7 @@ config_table = {
 	last_session_update_link = "patrykcysarz.pl/comment-system/web/stats/last-update/set",
 
 	-- Intro scene path to be opened with DIRECTOR mode
-	director_input_scene_entropy_path = "director/sequence_1.ent",
+	director_input_scene_entropy_path = "director/sequence_3.ent",
 
 	-- Input scenario for choreographic launch mode
 	choreographic_input_scenario_path = "choreographic/gameplay_1.chg", 
