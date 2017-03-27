@@ -98,6 +98,8 @@ void choreographic_setup::process(
 
 	std::vector<choreographic_command_variant> events;
 
+	double current_start_time_offset_for_commands = 0.0;
+
 	while (current_line < lines.size()) {
 		const auto& line = lines[current_line];
 
@@ -112,32 +114,50 @@ void choreographic_setup::process(
 
 		in >> command_name;
 
-		for_each_type_in_list(choreographic_command_variant(), [&](auto dummy) {
-			typedef decltype(dummy) command_type;
+		if (command_name == "add_time_offset") {
+			double offset = 0.0;
+			in >> offset;
 
-			if ("struct " + command_name == typeid(command_type).name()) {
-				command_type new_command;
+			current_start_time_offset_for_commands += offset;
+		}
 
-				augs::introspect_recursive<
-					bind_types_t<can_stream_right, std::istringstream>,
-					always_recurse,
-					stop_recursion_if_valid
-				>(
-					[&](auto, auto& member) {
-						in >> member;
-					},
-					new_command
-				);
+		else if (command_name == "set_time_offset") {
+			double offset = 0.0;
+			in >> offset;
 
-				events.push_back(new_command);
-			}
-		});
+			current_start_time_offset_for_commands = offset;
+		}
+
+		else {
+			for_each_type_in_list(choreographic_command_variant(), [&](auto dummy) {
+				typedef decltype(dummy) command_type;
+
+				if ("struct " + command_name == typeid(command_type).name()) {
+					command_type new_command;
+
+					augs::introspect_recursive<
+						bind_types_t<can_stream_right, std::istringstream>,
+						always_recurse,
+						stop_recursion_if_valid
+					>(
+						[&](auto, auto& member) {
+							in >> member;
+						},
+						new_command
+					);
+
+					new_command.at_time += current_start_time_offset_for_commands;
+
+					events.push_back(new_command);
+				}
+			});
+		}
 
 		++current_line;
 	}
 
 	auto get_start_time = [&](const choreographic_command_variant& a) {
-		return a.call([&](auto& r) { return r.at_time; });
+		return a.call([&](const auto& r) { return r.at_time; });
 	};
 
 	std::vector<augs::sound_source> sources;
