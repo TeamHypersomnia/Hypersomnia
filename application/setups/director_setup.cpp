@@ -248,8 +248,6 @@ void director_setup::control_player(
 		total_collected_entropy += new_cosmic_entropy;
 	}
 
-	timer.set_stepping_speed_multiplier(requested_playing_speed);
-
 	const auto current_step = get_step_number(hypersomnia);
 
 	if (advance_steps_forward < 0) {
@@ -397,6 +395,7 @@ void director_setup::advance_player_by_single_step() {
 void director_setup::advance_player() {
 	auto steps = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
 
+	timer.set_stepping_speed_multiplier(requested_playing_speed);
 	session.set_interpolation_enabled(requested_playing_speed > 0.);
 
 	while (steps--) {

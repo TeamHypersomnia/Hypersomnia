@@ -56,7 +56,7 @@ recording_type = {
 }
 
 config_table = {
-	launch_mode = launch_type.LOCAL,
+	launch_mode = launch_type.CHOREOGRAPHIC,
 	
 	input_recording_mode = recording_type.LIVE,
 
@@ -96,7 +96,7 @@ config_table = {
 	-- OpenAL Soft on Line 1 (Virtual Audio Cable)
 	
 	-- volume settings
-	sound_effects_volume = 0.4,
+	sound_effects_volume = 0.03,
 	music_volume = 1,
 
 	-- Flag. 1 disables the cursor clipping so that it is easier to mark a breakpoint, for example. 0 is for normal playing.
@@ -162,7 +162,7 @@ config_table = {
 	last_session_update_link = "patrykcysarz.pl/comment-system/web/stats/last-update/set",
 
 	-- Intro scene path to be opened with DIRECTOR mode
-	director_input_scene_entropy_path = "director/sequence_2.ent",
+	director_input_scene_entropy_path = "director/sequence_1.ent",
 
 	-- Input scenario for choreographic launch mode
 	choreographic_input_scenario_path = "choreographic/gameplay_1.chg", 

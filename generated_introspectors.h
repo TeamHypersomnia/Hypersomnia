@@ -87,6 +87,7 @@ struct play_sound;
 struct focus_guid;
 struct focus_index;
 struct set_sfx_gain;
+struct set_scene_speed;
 struct b2Vec2;
 struct b2Rot;
 struct b2Transform;
@@ -1950,6 +1951,16 @@ namespace augs {
 		Instances&&... _t_
 	) {
 		FIELD(gain);
+		FIELD(at_time);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const set_scene_speed* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(speed);
 		FIELD(at_time);
 	}
 

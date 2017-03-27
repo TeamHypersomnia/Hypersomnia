@@ -38,7 +38,8 @@ typedef augs::trivial_variant<
 	play_sound,
 	focus_guid,
 	focus_index,
-	set_sfx_gain
+	set_sfx_gain,
+	set_scene_speed
 > choreographic_command_variant;
 
 using namespace augs::window::event::keys;
@@ -76,8 +77,11 @@ void choreographic_setup::process(
 			auto scene_cfg = cfg;
 			scene_cfg.director_input_scene_entropy_path = path;
 
-			preloaded_scenes[id].init(scene_cfg, window);
-			preloaded_scenes[id].session.show_profile_details = false;
+			auto& scene = preloaded_scenes[id];
+
+			scene.init(scene_cfg, window);
+			scene.session.show_profile_details = false;
+			scene.requested_playing_speed = 1.0;
 		}
 		else {
 			ensure(false && "Unknown resource type!");
@@ -199,6 +203,15 @@ void choreographic_setup::process(
 
 					auto& scene = preloaded_scenes[currently_played_scene_index];
 					scene.session.set_master_gain(e.gain);
+				}
+
+				else if (next_event.is<set_scene_speed>()) {
+					auto& e = next_event.get<set_scene_speed>();
+
+					ensure(currently_played_scene_index != -1);
+
+					auto& scene = preloaded_scenes[currently_played_scene_index];
+					scene.requested_playing_speed = e.speed;
 				}
 
 				++next_played_event_index;

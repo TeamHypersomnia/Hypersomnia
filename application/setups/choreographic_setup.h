@@ -38,6 +38,13 @@ struct set_sfx_gain {
 	// END GEN INTROSPECTOR
 };
 
+struct set_scene_speed {
+	// GEN INTROSPECTOR struct set_scene_speed
+	double speed = 0.0;
+	double at_time = 0.0;
+	// END GEN INTROSPECTOR
+};
+
 class game_window;
 
 class choreographic_setup : public setup_base {
