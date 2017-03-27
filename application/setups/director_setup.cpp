@@ -57,10 +57,10 @@ void director_setup::init(
 		hypersomnia[testbed.characters[1]].get<components::name>().nickname = ::to_wstring(cfg.debug_second_nickname);
 	}
 
-	augs::create_directories(cfg.director_input_scene_entropy_path);
-
 	input_director_path = cfg.director_input_scene_entropy_path;
 	output_director_path = cfg.director_input_scene_entropy_path;
+
+	augs::create_directories(output_director_path);
 
 	director.load_recording_from_file(input_director_path);
 	

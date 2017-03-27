@@ -82,6 +82,9 @@ struct neon_map_stamp;
 struct scripted_image_stamp;
 struct texture_atlas_stamp;
 struct texture_atlas_metadata;
+struct play_scene;
+struct play_sound;
+struct focus_entity;
 struct b2Vec2;
 struct b2Rot;
 struct b2Transform;
@@ -1896,6 +1899,36 @@ namespace augs {
 
 		FIELD(images);
 		FIELD(fonts);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const play_scene* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(id);
+		FIELD(at_time);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const play_sound* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(id);
+		FIELD(at_time);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const focus_entity* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(guid);
+		FIELD(at_time);
 	}
 
 	template <class F, class... Instances>

@@ -29,12 +29,15 @@
 
 #include "augs/misc/trivial_variant.h"
 
-struct play_scene {
-	int guid = 0;
-	double at_time = 0.0;
-};
+#include "application/setups/director_setup.h"
 
+#include "generated_introspectors.h"
 
+typedef augs::trivial_variant<
+	play_scene,
+	play_sound,
+	focus_entity
+> choreographic_command_variant;
 
 using namespace augs::window::event::keys;
 
@@ -42,127 +45,147 @@ void choreographic_setup::process(
 	const config_lua_table& cfg,
 	game_window& window
 ) {
-	const vec2i screen_size = vec2i(window.get_screen_size());
+	const auto lines = augs::get_file_lines(cfg.choreographic_input_scenario_path);
+	size_t current_line = 0;
 
-	cosmos hypersomnia(3000);
+	ensure(lines[current_line] == "resources:");
 
-	viewing_session session;
+	std::unordered_map<resource_id_type, augs::single_sound_buffer> preloaded_sounds;
+	std::unordered_map<resource_id_type, director_setup> preloaded_scenes;
 
-	session.reserve_caches_for_entities(3000);
-	session.set_screen_size(screen_size);
-	session.systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
-	session.set_master_gain(cfg.sound_effects_volume);
+	++current_line;
 
-	session.configure_input();
+	while (lines[current_line] != "commands:") {
+		std::istringstream in(lines[current_line]);
 
-	const auto standard_post_solve = [&session](const const_logic_step step) {
-		session.standard_audiovisual_post_solve(step);
+		std::string type;
+		resource_id_type id;
+		std::string path;
+
+		in >> type >> id;
+		getline(in, path);
+
+		path = path.substr(path.find_first_not_of(" "));
+
+		if (type == "sound") {
+			preloaded_sounds[id].set_data(augs::get_sound_samples_from_file(path));
+		}
+		else if (type == "scene") {
+			auto scene_cfg = cfg;
+			scene_cfg.director_input_scene_entropy_path = path;
+
+			preloaded_scenes[id].init(scene_cfg, window);
+		}
+		else {
+			ensure(false && "Unknown resource type!");
+		}
+
+		++current_line;
+	}
+
+	++current_line;
+
+	std::vector<choreographic_command_variant> events;
+
+	while (current_line < lines.size()) {
+		std::istringstream in(lines[current_line]);
+		
+		std::string command_name;
+
+		in >> command_name;
+
+		for_each_type_in_list(choreographic_command_variant(), [&](auto dummy) {
+			typedef decltype(dummy) command_type;
+
+			if ("struct " + command_name == typeid(command_type).name()) {
+				command_type new_command;
+
+				augs::introspect_recursive<
+					bind_types_t<can_stream_right, std::istringstream>,
+					always_recurse,
+					stop_recursion_if_valid
+				>(
+					[&](auto, auto& member) {
+						in >> member;
+					},
+					new_command
+				);
+
+				events.push_back(new_command);
+			}
+		});
+
+		++current_line;
+	}
+
+	auto get_start_time = [&](const choreographic_command_variant& a) {
+		return a.call([&](auto& r) { return r.at_time; });
 	};
 
-	cosmic_entropy total_collected_entropy;
-	augs::debug_entropy_player<cosmic_entropy> player;
-	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
+	std::vector<augs::sound_source> sources;
 
-	scene_builders::testbed testbed;
-	testbed.debug_var = cfg.debug_var;
+	auto next_played_event_index = 0u;
+	int currently_played_scene_index = -1;
 
-	if (!hypersomnia.load_from_file("save.state")) {
-		hypersomnia.set_fixed_delta(cfg.default_tickrate);
+	sort_container(
+		events, 
+		[&](
+			const choreographic_command_variant a, 
+			const choreographic_command_variant b
+		) {
+			return get_start_time(a) < get_start_time(b);
+		}
+	);
 
-		testbed.populate_world_with_entities(
-			hypersomnia,
-			standard_post_solve
-		);
-	}
-
-	hypersomnia[testbed.characters[0]].get<components::name>().nickname = ::to_wstring(cfg.nickname);
-
-	if (testbed.characters.size() > 1) {
-		hypersomnia[testbed.characters[1]].get<components::name>().nickname = ::to_wstring(cfg.debug_second_nickname);
-	}
-
-
-
-
-
-	timer.reset_timer();
+	augs::timer player_time;
 
 	while (!should_quit) {
-		{
-			augs::machine_entropy new_machine_entropy;
+		if (next_played_event_index < events.size()) {
+			const auto& next_event = events[next_played_event_index];
 
-			session.local_entropy_profiler.new_measurement();
-			new_machine_entropy.local = window.collect_entropy(!cfg.debug_disable_cursor_clipping);
-			session.local_entropy_profiler.end_measurement();
+			const auto start_time = get_start_time(next_event);
 
-			process_exit_key(new_machine_entropy.local);
-			control_tweaker(new_machine_entropy.local);
+			if (start_time <= player_time.get<std::chrono::seconds>()) {
+				if (next_event.is<play_scene>()) {
+					auto& e = next_event.get<play_scene>();
 
-			session.switch_between_gui_and_back(new_machine_entropy.local);
+					currently_played_scene_index = e.id;
+				}
 
-			session.control_gui_and_remove_fetched_events(
-				hypersomnia[testbed.get_selected_character()],
-				new_machine_entropy.local
-			);
+				else if (next_event.is<play_sound>()) {
+					auto& e = next_event.get<play_sound>();
 
-			auto new_intents = session.context.to_key_and_mouse_intents(new_machine_entropy.local);
+					augs::sound_source src;
+					src.bind_buffer(preloaded_sounds[e.id]);
+					src.set_direct_channels(true);
+					src.play();
 
-			session.control_and_remove_fetched_intents(new_intents);
-			testbed.control_character_selection(new_intents);
+					sources.emplace_back(std::move(src));
+				}
 
-			auto new_cosmic_entropy = cosmic_entropy(
-				hypersomnia[testbed.get_selected_character()],
-				new_intents
-			);
+				else if (next_event.is<focus_entity>()) {
+					auto& e = next_event.get<focus_entity>();
 
-			total_collected_entropy += new_cosmic_entropy;
+					ensure(currently_played_scene_index != -1);
+
+					auto& scene = preloaded_scenes[currently_played_scene_index];
+					scene.testbed.select_character(scene.hypersomnia[e.guid].get_id());
+				}
+
+				++next_played_event_index;
+			}
 		}
 
-		auto steps = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
+		augs::machine_entropy new_machine_entropy;
+		new_machine_entropy.local = window.collect_entropy(!cfg.debug_disable_cursor_clipping);
+		process_exit_key(new_machine_entropy.local);
 
-		while (steps--) {
-			total_collected_entropy += session.systems_audiovisual.get<gui_element_system>().get_and_clear_pending_events();
-
-			player.advance_player_and_biserialize(total_collected_entropy);
-
-			augs::renderer::get_current().clear_logic_lines();
-
-			hypersomnia.advance_deterministic_schemata(
-				total_collected_entropy,
-				[](const auto) {},
-				standard_post_solve
-			);
-
-			total_collected_entropy.clear();
+		if (currently_played_scene_index != -1) {
+			auto& scene = preloaded_scenes[currently_played_scene_index];
+			
+			scene.advance_player();
+			scene.view(cfg);
 		}
-
-		static thread_local visible_entities all_visible;
-		session.get_visible_entities(all_visible, hypersomnia);
-
-		const auto vdt = session.frame_timer.extract_variable_delta(
-			hypersomnia.get_fixed_delta(),
-			timer
-		);
-
-		session.advance_audiovisual_systems(
-			hypersomnia,
-			testbed.get_selected_character(),
-			all_visible,
-			vdt
-		);
-
-		auto& renderer = augs::renderer::get_current();
-		renderer.clear_current_fbo();
-
-		session.view(
-			cfg,
-			renderer,
-			hypersomnia,
-			testbed.get_selected_character(),
-			all_visible,
-			timer.fraction_of_step_until_next_step(hypersomnia.get_fixed_delta()),
-			augs::gui::text::format(write_tweaker_report().c_str(), augs::gui::text::style(assets::font_id::GUI_FONT))
-		);
 
 		window.swap_buffers();
 	}

@@ -184,11 +184,13 @@ namespace augs {
 		return std::move(output);
 	}
 
-	single_sound_buffer::data_type get_sound_samples_from_file(const std::string filename) {
+	single_sound_buffer::data_type get_sound_samples_from_file(const std::string path) {
+		augs::ensure_existence(path);
+		
 		SF_INFO info;
 		std::memset(&info, 0, sizeof(info));
 
-		SNDFILE* file = sf_open(filename.c_str(), SFM_READ, &info);
+		SNDFILE* file = sf_open(path.c_str(), SFM_READ, &info);
 
 		single_sound_buffer::data_type new_data;
 
