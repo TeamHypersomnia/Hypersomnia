@@ -17,9 +17,23 @@ struct play_sound {
 	// END GEN INTROSPECTOR
 };
 
-struct focus_entity {
-	// GEN INTROSPECTOR struct focus_entity
+struct focus_guid {
+	// GEN INTROSPECTOR struct focus_guid
 	entity_guid guid;
+	double at_time = 0.0;
+	// END GEN INTROSPECTOR
+};
+
+struct focus_index {
+	// GEN INTROSPECTOR struct focus_index
+	unsigned index = 0u;
+	double at_time = 0.0;
+	// END GEN INTROSPECTOR
+};
+
+struct set_sfx_gain {
+	// GEN INTROSPECTOR struct set_sfx_gain
+	float gain = 0.f;
 	double at_time = 0.0;
 	// END GEN INTROSPECTOR
 };

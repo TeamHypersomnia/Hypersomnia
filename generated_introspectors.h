@@ -84,7 +84,9 @@ struct texture_atlas_stamp;
 struct texture_atlas_metadata;
 struct play_scene;
 struct play_sound;
-struct focus_entity;
+struct focus_guid;
+struct focus_index;
+struct set_sfx_gain;
 struct b2Vec2;
 struct b2Rot;
 struct b2Transform;
@@ -1923,11 +1925,31 @@ namespace augs {
 
 	template <class F, class... Instances>
 	void introspect_body(
-		const focus_entity* const,
+		const focus_guid* const,
 		F f,
 		Instances&&... _t_
 	) {
 		FIELD(guid);
+		FIELD(at_time);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const focus_index* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(index);
+		FIELD(at_time);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const set_sfx_gain* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(gain);
 		FIELD(at_time);
 	}
 

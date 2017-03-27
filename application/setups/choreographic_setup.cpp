@@ -36,7 +36,9 @@
 typedef augs::trivial_variant<
 	play_scene,
 	play_sound,
-	focus_entity
+	focus_guid,
+	focus_index,
+	set_sfx_gain
 > choreographic_command_variant;
 
 using namespace augs::window::event::keys;
@@ -75,6 +77,7 @@ void choreographic_setup::process(
 			scene_cfg.director_input_scene_entropy_path = path;
 
 			preloaded_scenes[id].init(scene_cfg, window);
+			preloaded_scenes[id].session.show_profile_details = false;
 		}
 		else {
 			ensure(false && "Unknown resource type!");
@@ -127,8 +130,9 @@ void choreographic_setup::process(
 	auto next_played_event_index = 0u;
 	int currently_played_scene_index = -1;
 
-	sort_container(
-		events, 
+	std::stable_sort(
+		events.begin(),
+		events.end(),
 		[&](
 			const choreographic_command_variant a, 
 			const choreographic_command_variant b
@@ -163,13 +167,31 @@ void choreographic_setup::process(
 					sources.emplace_back(std::move(src));
 				}
 
-				else if (next_event.is<focus_entity>()) {
-					auto& e = next_event.get<focus_entity>();
+				else if (next_event.is<focus_guid>()) {
+					auto& e = next_event.get<focus_guid>();
 
 					ensure(currently_played_scene_index != -1);
 
 					auto& scene = preloaded_scenes[currently_played_scene_index];
 					scene.testbed.select_character(scene.hypersomnia[e.guid].get_id());
+				}
+
+				else if (next_event.is<focus_index>()) {
+					auto& e = next_event.get<focus_index>();
+
+					ensure(currently_played_scene_index != -1);
+
+					auto& scene = preloaded_scenes[currently_played_scene_index];
+					scene.testbed.select_character(scene.testbed.characters[e.index]);
+				}
+
+				else if (next_event.is<set_sfx_gain>()) {
+					auto& e = next_event.get<set_sfx_gain>();
+
+					ensure(currently_played_scene_index != -1);
+
+					auto& scene = preloaded_scenes[currently_played_scene_index];
+					scene.session.set_master_gain(e.gain);
 				}
 
 				++next_played_event_index;

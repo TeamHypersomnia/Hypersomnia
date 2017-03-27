@@ -111,7 +111,16 @@ augs::gui::text::formatted_string director_setup::get_status_text() const {
 	status_text += format(typesafe_sprintf(L"\nRequested playing speed: %x", requested_playing_speed), white_font);
 	status_text += format(typesafe_sprintf(L"\nStep number: %x", get_step_number(hypersomnia)), white_font);
 	status_text += format(typesafe_sprintf(L"\nTime: %x", get_step_number(hypersomnia)*hypersomnia.get_fixed_delta().in_seconds()), white_font);
-	status_text += format(typesafe_sprintf(L"\nControlling entity %x of %x", testbed.current_character_index, testbed.characters.size()), white_font);
+	status_text += 
+		format(
+			typesafe_sprintf(
+				L"\nControlling entity %x of %x (guid: %x)", 
+				testbed.current_character_index, 
+				testbed.characters.size(),
+				hypersomnia[testbed.get_selected_character()].get_guid()
+			), 
+		white_font
+	);
 
 	if (bookmarked_step != 0) {
 		status_text += format(typesafe_sprintf(L"\nBookmarked time: %x", bookmarked_step*hypersomnia.get_fixed_delta().in_seconds()), white_font);
