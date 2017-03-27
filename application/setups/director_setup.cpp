@@ -213,6 +213,7 @@ void director_setup::control_player(
 			}
 			if (raw_input.key == key::NUMPAD0) {
 				advance_steps_forward = static_cast<long long>(bookmarked_step) - static_cast<long long>(get_step_number(hypersomnia));
+				current_director_state = director_state::PLAYING;
 				clear_accumulated_inputs();
 			}
 		}

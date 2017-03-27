@@ -362,7 +362,7 @@ std::wstring viewing_session::summary() const {
 		+ sending_commands_and_predict_profiler.summary()
 		+ unpack_remote_steps_profiler.summary()
 		+ sending_packets_profiler.summary()
-		;
+	;
 }
 
 void viewing_session::draw_color_overlay(augs::renderer& renderer, const rgba col) const {

@@ -101,7 +101,7 @@ void choreographic_setup::process(
 	while (current_line < lines.size()) {
 		const auto& line = lines[current_line];
 
-		if (std::all_of(line.begin(), line.end(), isspace)) {
+		if (std::all_of(line.begin(), line.end(), isspace) || line[0] == '%') {
 			++current_line;
 			continue;
 		}
