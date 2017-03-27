@@ -1,4 +1,5 @@
 #include "sentience_meter.h"
+#include "augs/ensure.h"
 #include <algorithm>
 
 bool sentience_meter::is_enabled() const {
@@ -36,7 +37,7 @@ sentience_meter::damage_result sentience_meter::calculate_damage_result(
 	sentience_meter::damage_result result;
 
 	if (dealt > 0) {
-		const auto offset_value = value - lower_bound;
+		const auto offset_value = std::max(0.f, value - lower_bound);
 
 		if (dealt >= offset_value) {
 			result.excessive = dealt - offset_value;
@@ -47,6 +48,8 @@ sentience_meter::damage_result sentience_meter::calculate_damage_result(
 		}
 	}
 	else {
+		ensure(!(lower_bound > 0.f));
+
 		if (value - dealt > maximum) {
 			result.effective = -(maximum - value);
 		}
