@@ -839,6 +839,29 @@ namespace scene_builders {
 	//if (raw_input.key == augs::window::event::keys::key::F10) {
 	//}
 
+	void testbed::control_character_selection_numeric(
+		augs::machine_entropy::local_type& changes
+	) {
+		using namespace augs::window::event::keys;
+
+		erase_remove(
+			changes,
+			[this](const auto& c) {
+				state.apply(c);
+
+				if (state.is_set(key::LCTRL) && c.was_any_key_pressed() && int(c.key.key) > int(key::_0) && int(c.key.key) <= int(key::_9)) {
+					current_character_index = int(c.key.key) - int(key::_0);
+
+					select_character(characters[current_character_index]);
+
+					return true;
+				}
+
+				return false;
+			}
+		);
+	}
+
 	void testbed::control_character_selection(key_and_mouse_intent_vector& intents) {
 		for (const auto& intent : intents) {
 			if (intent.is_pressed && intent.intent == intent_type::DEBUG_SWITCH_CHARACTER) {

@@ -101,31 +101,31 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 		[&](const auto subject) {
 			auto& sentience = subject.get<components::sentience>();
 
-			if (!sentience.is_conscious()) {
-				return;
-			}
+			const bool should_regenerate_values = sentience.is_conscious();
 
-			if (sentience.health.is_enabled()) {
-				const auto passed = (now.step - sentience.time_of_last_received_damage.step);
+			if (should_regenerate_values) {
+				if (sentience.health.is_enabled()) {
+					const auto passed = (now.step - sentience.time_of_last_received_damage.step);
 
-				if (passed > 0 && passed % regeneration_frequency_in_steps == 0) {
-					sentience.health.value -= sentience.health.calculate_damage_result(-2).effective;
+					if (passed > 0 && passed % regeneration_frequency_in_steps == 0) {
+						sentience.health.value -= sentience.health.calculate_damage_result(-2).effective;
+					}
 				}
-			}
 
-			if (sentience.consciousness.is_enabled()) {
-				const auto passed = (now.step - sentience.time_of_last_exertion.step);
+				if (sentience.consciousness.is_enabled()) {
+					const auto passed = (now.step - sentience.time_of_last_exertion.step);
 
-				if (passed > 0 && passed % consciousness_regeneration_frequency_in_steps == 0) {
-					sentience.consciousness.value -= sentience.consciousness.calculate_damage_result(-2).effective;
+					if (passed > 0 && passed % consciousness_regeneration_frequency_in_steps == 0) {
+						sentience.consciousness.value -= sentience.consciousness.calculate_damage_result(-2).effective;
+					}
 				}
-			}
 
-			if (sentience.personal_electricity.is_enabled()) {
-				const auto passed = now.step;
+				if (sentience.personal_electricity.is_enabled()) {
+					const auto passed = now.step;
 
-				if (passed > 0 && passed % pe_regeneration_frequency_in_steps == 0) {
-					sentience.personal_electricity.value -= sentience.personal_electricity.calculate_damage_result(-4).effective;
+					if (passed > 0 && passed % pe_regeneration_frequency_in_steps == 0) {
+						sentience.personal_electricity.value -= sentience.personal_electricity.calculate_damage_result(-4).effective;
+					}
 				}
 			}
 

@@ -91,7 +91,14 @@ void choreographic_setup::process(
 	std::vector<choreographic_command_variant> events;
 
 	while (current_line < lines.size()) {
-		std::istringstream in(lines[current_line]);
+		const auto& line = lines[current_line];
+
+		if (std::all_of(line.begin(), line.end(), isspace)) {
+			++current_line;
+			continue;
+		}
+
+		std::istringstream in(line);
 		
 		std::string command_name;
 

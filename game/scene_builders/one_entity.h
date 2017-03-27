@@ -46,5 +46,6 @@ namespace scene_builders {
 
 		void select_character(const entity_id);
 		void control_character_selection(...) const {}
+		void control_character_selection_numeric(...) const {}
 	};
 }

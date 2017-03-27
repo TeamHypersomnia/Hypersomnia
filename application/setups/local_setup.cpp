@@ -123,6 +123,8 @@ void local_setup::process(
 				hypersomnia[testbed.get_selected_character()],
 				new_machine_entropy.local
 			);
+			
+			testbed.control_character_selection_numeric(new_machine_entropy.local);
 
 			auto new_intents = session.context.to_key_and_mouse_intents(new_machine_entropy.local);
 

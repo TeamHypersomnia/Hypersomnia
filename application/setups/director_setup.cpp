@@ -230,6 +230,8 @@ void director_setup::control_player(
 		new_machine_entropy.local
 	);
 
+	testbed.control_character_selection_numeric(new_machine_entropy.local);
+
 	auto new_intents = session.context.to_key_and_mouse_intents(new_machine_entropy.local);
 
 	session.control_and_remove_fetched_intents(new_intents);
