@@ -229,6 +229,25 @@ void choreographic_setup::process(
 			scene.view(cfg, session);
 		}
 
+		using namespace augs::gui::text;
+
+		auto& renderer = augs::renderer::get_current();
+
+		session.draw_text_at_left_top(
+			renderer,
+			format(
+				typesafe_sprintf(L"View time: %x", player_time.get<std::chrono::seconds>()),
+
+				style(
+					assets::font_id::GUI_FONT,
+					rgba(255, 255, 255, 150)
+				)
+			)
+		);
+
+		renderer.call_triangles();
+		renderer.clear_triangles();
+
 		window.swap_buffers();
 	}
 }

@@ -244,6 +244,13 @@ void viewing_session::advance_audiovisual_systems(
 	);
 }
 
+void viewing_session::draw_text_at_left_top(
+	augs::renderer& renderer,
+	const augs::gui::text::formatted_string& str
+) const {
+	quick_print(renderer.triangles, str, vec2i(0, 0), 0);
+}
+
 void viewing_session::view(
 	const config_lua_table& config,
 	augs::renderer& renderer,
@@ -300,34 +307,37 @@ void viewing_session::view(
 	using namespace augs::gui::text;
 
 	if (show_profile_details) {
+		quick_print(
+			renderer.triangles, 
+			multiply_alpha(global_log::format_recent_as_text(assets::font_id::GUI_FONT), 150.f / 255), 
+			vec2i(screen_size_i.x - 300, 0), 
+			300
+		);
+
 		const auto coords = character_chased_by_camera.alive() ? character_chased_by_camera.get_logic_transform().pos : vec2();
 		const auto rot = character_chased_by_camera.alive() ? character_chased_by_camera.get_logic_transform().rotation : 0.f;
 		const auto vel = character_chased_by_camera.alive() ? character_chased_by_camera.get<components::physics>().velocity() : vec2();
 
-		const auto bbox = quick_print_format(
-			renderer.triangles, 
-
-			typesafe_sprintf(
-				L"Entities: %x\nX: %f2\nY: %f2\nRot: %f2\nVelX: %x\nVelY: %x\n", 
-				cosmos.entities_count(), 
-				coords.x, 
-				coords.y, 
-				rot, 
-				vel.x, 
-				vel.y
-			) + summary() + cosmos.profiler.sorted_summary(show_profile_details), 
-
-			style(
-				assets::font_id::GUI_FONT, 
-				rgba(255, 255, 255, 150)
-			), 
-
-			vec2i(0, 0), 
-			0
+		const auto gui_style = style(
+			assets::font_id::GUI_FONT,
+			rgba(255, 255, 255, 150)
 		);
 
-		quick_print(renderer.triangles, multiply_alpha(global_log::format_recent_as_text(assets::font_id::GUI_FONT), 150.f / 255), vec2i(screen_size_i.x - 300, 0), 300);
-		quick_print(renderer.triangles, custom_log, vec2i(0, static_cast<int>(bbox.y)), 0);
+		const auto lt_text_formatted = format(
+			typesafe_sprintf(
+				L"Entities: %x\nX: %f2\nY: %f2\nRot: %f2\nVelX: %x\nVelY: %x\n",
+				cosmos.entities_count(),
+				coords.x,
+				coords.y,
+				rot,
+				vel.x,
+				vel.y
+			) + summary() + cosmos.profiler.sorted_summary(show_profile_details) + L"\n",
+
+			gui_style
+		);
+
+		draw_text_at_left_top(renderer, lt_text_formatted + custom_log);
 	}
 		
 	renderer.call_triangles();

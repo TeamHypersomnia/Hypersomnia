@@ -124,6 +124,11 @@ public:
 		const augs::network::client& details
 	) const;
 
+	void draw_text_at_left_top(
+		augs::renderer& renderer,
+		const augs::gui::text::formatted_string&
+	) const;
+
 	void get_visible_entities(
 		visible_entities& into,
 		const cosmos&
