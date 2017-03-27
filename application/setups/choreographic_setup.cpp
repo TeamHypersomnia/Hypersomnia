@@ -27,6 +27,15 @@
 #include "game/detail/visible_entities.h"
 #include "application/config_lua_table.h"
 
+#include "augs/misc/trivial_variant.h"
+
+struct play_scene {
+	int guid = 0;
+	double at_time = 0.0;
+};
+
+
+
 using namespace augs::window::event::keys;
 
 void choreographic_setup::process(
@@ -71,6 +80,10 @@ void choreographic_setup::process(
 	if (testbed.characters.size() > 1) {
 		hypersomnia[testbed.characters[1]].get<components::name>().nickname = ::to_wstring(cfg.debug_second_nickname);
 	}
+
+
+
+
 
 	timer.reset_timer();
 

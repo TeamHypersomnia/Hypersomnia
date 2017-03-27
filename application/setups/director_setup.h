@@ -46,7 +46,7 @@ public:
 
 	cosmic_movie_director director;
 
-	float requested_playing_speed = 0.f;
+	double requested_playing_speed = 0.0;
 
 	std::vector<cosmos> snapshots_for_rewinding;
 	unsigned initial_step_number = 0u;

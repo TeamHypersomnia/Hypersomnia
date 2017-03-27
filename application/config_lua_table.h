@@ -75,6 +75,7 @@ public:
 	std::string last_session_update_link;
 
 	std::string director_input_scene_entropy_path;
+	std::string choreographic_input_scenario_path;
 	std::string menu_intro_scene_entropy_path;
 
 	std::string menu_theme_path;

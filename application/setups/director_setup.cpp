@@ -150,7 +150,7 @@ void director_setup::control_player(
 				current_director_state = director_state::PLAYING;
 			}
 			if (raw_input.key == key::F3) {
-				requested_playing_speed = 0.f;
+				requested_playing_speed = 0.0;
 
 				if (current_director_state == director_state::RECORDING) {
 					recording_replacement_mode =
@@ -167,7 +167,7 @@ void director_setup::control_player(
 				director.save_recording_to_file(output_director_path);
 				unsaved_changes_exist = false;
 
-				requested_playing_speed = 0.f;
+				requested_playing_speed = 0.0;
 				clear_accumulated_inputs();
 			}
 
@@ -188,19 +188,19 @@ void director_setup::control_player(
 				}
 			}
 			if (raw_input.key == key::NUMPAD3) {
-				requested_playing_speed = 0.f;
+				requested_playing_speed = 0.0;
 				clear_accumulated_inputs();
 			}
 			if (raw_input.key == key::NUMPAD4) {
-				requested_playing_speed = 0.1f;
+				requested_playing_speed = 0.1;
 				clear_accumulated_inputs();
 			}
 			if (raw_input.key == key::NUMPAD5) {
-				requested_playing_speed = 1.f;
+				requested_playing_speed = 1.;
 				clear_accumulated_inputs();
 			}
 			if (raw_input.key == key::NUMPAD6) {
-				requested_playing_speed = 6.f;
+				requested_playing_speed = 6.;
 				clear_accumulated_inputs();
 			}
 			if (raw_input.key == key::NUMPAD9) {
@@ -386,7 +386,7 @@ void director_setup::advance_player_by_single_step() {
 void director_setup::advance_player() {
 	auto steps = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
 
-	session.set_interpolation_enabled(requested_playing_speed > 0.f);
+	session.set_interpolation_enabled(requested_playing_speed > 0.);
 
 	while (steps--) {
 		advance_player_by_single_step();

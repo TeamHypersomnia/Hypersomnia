@@ -1808,6 +1808,7 @@ namespace augs {
 		FIELD(last_session_update_link);
 
 		FIELD(director_input_scene_entropy_path);
+		FIELD(choreographic_input_scenario_path);
 		FIELD(menu_intro_scene_entropy_path);
 
 		FIELD(menu_theme_path);

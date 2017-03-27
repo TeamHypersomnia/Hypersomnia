@@ -5,6 +5,6 @@ namespace augs {
 		const delta& dt, 
 		const fixed_delta_timer& timer
 	) {
-		return static_cast<float>(frame_timer.extract<std::chrono::milliseconds>()) * timer.get_stepping_speed_multiplier();
+		return static_cast<float>(frame_timer.extract<std::chrono::milliseconds>() * timer.get_stepping_speed_multiplier());
 	}
 }
