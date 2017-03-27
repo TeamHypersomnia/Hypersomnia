@@ -21,11 +21,18 @@ namespace augs {
 		}
 
 		bool overflowed() const {
+			return container.size() > std::numeric_limits<size_type>::max();
+		}
+
+		bool is_full() const {
 			return container.size() >= std::numeric_limits<size_type>::max();
 		}
 
-		void size_check() const {
-			ensure(!overflowed());
+		void overflow_check() {
+			if (overflowed()) {
+				LOG("Warning! %x has overflowed - clearing the container.", typeid(T).name());
+				clear();
+			}
 		}
 
 		const T* operator->() const {
@@ -35,7 +42,7 @@ namespace augs {
 		template <class... Args>
 		decltype(auto) insert(Args&&... args) {
 			const auto result = container.insert(std::forward<Args>(args)...);
-			size_check();
+			overflow_check();
 			return result;
 		}
 
@@ -47,7 +54,7 @@ namespace augs {
 		template <class... Args>
 		decltype(auto) push_back(Args&&... args) {
 			container.push_back(std::forward<Args>(args)...);
-			size_check();
+			overflow_check();
 		}
 		
 		template <class... Args>

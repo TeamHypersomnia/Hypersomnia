@@ -395,7 +395,16 @@ void director_setup::advance_player(viewing_session& session) {
 	auto steps = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
 
 	timer.set_stepping_speed_multiplier(requested_playing_speed);
-	session.set_interpolation_enabled(requested_playing_speed > 0.);
+
+	const bool is_paused = !(requested_playing_speed > 0.);
+
+	if (is_paused) {
+		session.set_interpolation_enabled(false);
+		total_collected_entropy.clear();
+	}
+	else {
+		session.set_interpolation_enabled(true);
+	}
 
 	while (steps--) {
 		advance_player_by_single_step(session);
