@@ -4,17 +4,23 @@
 
 #include <luabind/luabind.hpp>
 
-void call_window_script(augs::lua_state_raii& lua, game_window& window, const std::string& filename) {
+void call_window_script(
+	augs::lua_state_raii& lua,
+	game_window& window,
+	const std::string& window_lua_path
+) {
 	lua.global_ptr("global_gl_window", &window.window);
-	lua.dofile_and_report_errors(filename);
+	lua.dofile_and_report_errors(window_lua_path);
 }
 
-void call_config_script(augs::lua_state_raii& lua, const std::string& filename, const std::string& alternative_filename) {
-	std::string used_filename = filename;
+void call_config_script(
+	augs::lua_state_raii& lua,
+	const std::string& config_lua_path,
+	const std::string& config_override_lua_path
+) {
+	lua.dofile_and_report_errors(config_lua_path);
 
-	if (augs::file_exists(alternative_filename)) {
-		used_filename = alternative_filename;
+	if (augs::file_exists(config_override_lua_path)) {
+		lua.dofile_and_report_errors(config_override_lua_path);
 	}
-
-	lua.dofile_and_report_errors(used_filename);
 }

@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
 
 	config_lua_table cfg;
 	
-	call_config_script(lua, "config.lua", "config.local.lua");
+	call_config_script(lua, "config.lua", "config.override.lua");
 	cfg.get_values(lua);
 
 	augs::audio_manager::generate_alsoft_ini(
