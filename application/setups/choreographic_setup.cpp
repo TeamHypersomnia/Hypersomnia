@@ -275,6 +275,8 @@ void choreographic_setup::process(
 			
 			const auto current_scene_time = scene.scene.hypersomnia.get_total_time_passed_in_seconds();
 
+			scene.scene.requested_playing_speed = 1.0;
+
 			for (const auto& t : scene.speed_changes) {
 				if (current_scene_time >= t.at_time && current_scene_time < t.to_time) {
 					scene.scene.requested_playing_speed = t.speed_multiplier;
