@@ -80,8 +80,8 @@ public:
 
 	std::string menu_theme_path;
 
-	float rewind_intro_scene_by_secs = 3.5;
-	float start_menu_music_at_secs = 0.f;
+	double rewind_intro_scene_by_secs = 3.5;
+	double start_menu_music_at_secs = 0.f;
 
 	bool skip_credits = false;
 	std::string latest_news_url;

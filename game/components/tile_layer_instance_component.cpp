@@ -12,7 +12,7 @@ using namespace augs;
 namespace components {
 	tile_layer_instance::tile_layer_instance(const assets::tile_layer_id id) : id(id) {}
 
-	void tile_layer_instance::drawing_input::set_global_time_seconds(const float secs) {
+	void tile_layer_instance::drawing_input::set_global_time_seconds(const double secs) {
 		global_time_seconds = secs;
 	}
 

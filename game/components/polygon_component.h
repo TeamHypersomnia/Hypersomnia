@@ -25,8 +25,8 @@ namespace components {
 		struct drawing_input : basic_renderable_drawing_input {
 			using basic_renderable_drawing_input::basic_renderable_drawing_input;
 
-			float global_time_seconds = 0.f;
-			void set_global_time_seconds(const float);
+			double global_time_seconds = 0.0;
+			void set_global_time_seconds(const double);
 		};
 
 		// GEN INTROSPECTOR struct components::polygon

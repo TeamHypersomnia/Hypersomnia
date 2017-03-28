@@ -169,6 +169,7 @@ pip-log.txt
 /output/saves
 /output/hypersomnia/music
 /output/generated
+/output/choreographic/voices
 
 *.log
 *.tlog

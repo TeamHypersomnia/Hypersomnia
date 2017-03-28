@@ -110,7 +110,7 @@ public:
 		const cosmos& cosmos,
 		const entity_id viewed_character,
 		const visible_entities&,
-		const float interpolation_ratio,
+		const double interpolation_ratio,
 		const augs::gui::text::formatted_string& custom_log = augs::gui::text::formatted_string()
 	) const;
 
@@ -120,7 +120,7 @@ public:
 		const cosmos& cosmos,
 		const entity_id viewed_character,
 		const visible_entities&,
-		const float interpolation_ratio,
+		const double interpolation_ratio,
 		const augs::network::client& details
 	) const;
 

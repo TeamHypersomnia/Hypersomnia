@@ -14,7 +14,7 @@ namespace components {
 			v.color = col;
 	}
 
-	void polygon::drawing_input::set_global_time_seconds(const float secs) {
+	void polygon::drawing_input::set_global_time_seconds(const double secs) {
 		global_time_seconds = secs;
 	}
 

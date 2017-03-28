@@ -9,7 +9,7 @@ namespace rendering_scripts {
 		const interpolation_system& sys,
 		const camera_cone cam,
 		const cosmos& cosm,
-		const float global_time_seconds
+		const double global_time_seconds
 	) {
 		const auto dt = cosm.get_fixed_delta();
 

@@ -1,33 +1,30 @@
 #include "sentience_system.h"
 
+#include <gtest/gtest.h>
+
 #include "game/messages/damage_message.h"
 #include "game/messages/health_event.h"
-#include "game/components/sentience_component.h"
-#include "game/components/render_component.h"
 #include "game/messages/health_event.h"
 #include "game/messages/exhausted_cast_message.h"
 
 #include "game/transcendental/cosmos.h"
+#include "game/transcendental/logic_step.h"
 #include "game/transcendental/entity_id.h"
 
 #include "game/components/physics_component.h"
 #include "game/components/container_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/position_copying_component.h"
-#include "game/components/movement_component.h"
 #include "game/components/special_physics_component.h"
-
+#include "game/components/sentience_component.h"
+#include "game/components/render_component.h"
 #include "game/components/animation_component.h"
 #include "game/components/movement_component.h"
 
 #include "game/detail/inventory/inventory_slot.h"
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "game/detail/inventory/inventory_utils.h"
-
 #include "game/detail/physics/physics_scripts.h"
-
-#include "game/transcendental/logic_step.h"
-#include <gtest/gtest.h>
 
 void sentience_system::cast_spells(const logic_step step) const {
 	auto& cosmos = step.cosm;
@@ -225,7 +222,7 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 	bool knockout = false;
 
 	if (h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION) {
-		sentience.electric_shield.timing.set_for_duration(-1.f, now);
+		sentience.electric_shield = electric_shield_perk();
 
 		sentience.personal_electricity.value = 0.f;
 	}
@@ -340,7 +337,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 			if (d.type == adverse_element_type::FORCE && s.health.is_enabled()) {
 				auto event = event_template;
 
-				meter_value_type after_shield_damage = d.amount;
+				auto after_shield_damage = d.amount;
 
 				if (is_shield_enabled) {
 					after_shield_damage = apply_ped(d.amount).excessive;
@@ -363,7 +360,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 			else if (d.type == adverse_element_type::INTERFERENCE && s.consciousness.is_enabled()) {
 				auto event = event_template;
 
-				meter_value_type after_shield_damage = d.amount + static_cast<meter_value_type>(d.amount * subject.get_effective_velocity().length() / 400.f);
+				auto after_shield_damage = d.amount + static_cast<meter_value_type>(d.amount * subject.get_effective_velocity().length() / 400.f);
 
 				if (is_shield_enabled) {
 					constexpr meter_value_type absorption_by_shield_mult = 2;

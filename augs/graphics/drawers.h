@@ -28,7 +28,7 @@ namespace augs {
 	void draw_rect(vertex_triangle_buffer& v, const vec2 origin, const assets::game_image_id, const rgba color = white);
 	
 	void draw_line(vertex_line_buffer& v, const vec2 from, const vec2 to, const texture_atlas_entry&, const rgba color);
-	void draw_dashed_line(vertex_line_buffer& v, const vec2 from, const vec2 to, const texture_atlas_entry&, const rgba color, const float dash_length, const float dash_velocity, const float global_time_seconds);
+	void draw_dashed_line(vertex_line_buffer& v, const vec2 from, const vec2 to, const texture_atlas_entry&, const rgba color, const float dash_length, const float dash_velocity, const double global_time_seconds);
 	void draw_line(vertex_triangle_buffer& v, const vec2 from, const vec2 to, const float line_width, const texture_atlas_entry&, const rgba color, const bool flip_horizontally = false);
 	
 	std::array<vec2, 4> make_sprite_points(

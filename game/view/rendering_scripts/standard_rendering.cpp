@@ -26,7 +26,7 @@ namespace rendering_scripts {
 		const auto& cosmos = step.cosm;
 		const auto& controlled_entity = cosmos[step.viewed_character];
 		const auto& interp = step.session.systems_audiovisual.get<interpolation_system>();
-		const float global_time_seconds = static_cast<float>(step.get_interpolated_total_time_passed_in_seconds());
+		const auto global_time_seconds = (step.get_interpolated_total_time_passed_in_seconds());
 
 		const auto& visible_per_layer = step.visible.per_layer;
 

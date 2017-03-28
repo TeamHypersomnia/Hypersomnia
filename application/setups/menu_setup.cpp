@@ -75,7 +75,7 @@ void menu_setup::process(
 
 			menu_theme_source.bind_buffer(menu_theme);
 			menu_theme_source.set_direct_channels(true);
-			menu_theme_source.seek_to(cfg.start_menu_music_at_secs);
+			menu_theme_source.seek_to(static_cast<float>(cfg.start_menu_music_at_secs));
 			menu_theme_source.set_gain(0.f);
 			menu_theme_source.play();
 		}

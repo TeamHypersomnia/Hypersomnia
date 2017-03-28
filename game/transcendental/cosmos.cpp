@@ -226,12 +226,14 @@ size_t cosmos::get_rng_seed_for(const entity_id id) const {
 	return get_handle(id).get_guid() + transform_hash;
 }
 
-float cosmos::get_total_time_passed_in_seconds(const float view_interpolation_ratio) const {
-	return (significant.meta.total_steps_passed + view_interpolation_ratio) * significant.meta.delta.in_seconds();
+double cosmos::get_total_time_passed_in_seconds(const double view_interpolation_ratio) const {
+	const auto double_dt = static_cast<double>(significant.meta.delta.in_seconds());
+
+	return get_total_time_passed_in_seconds() + double_dt * view_interpolation_ratio;
 }
 
-float cosmos::get_total_time_passed_in_seconds() const {
-	return significant.meta.total_steps_passed * significant.meta.delta.in_seconds();
+double cosmos::get_total_time_passed_in_seconds() const {
+	return significant.meta.total_steps_passed * static_cast<double>(significant.meta.delta.in_seconds());
 }
 
 unsigned cosmos::get_total_steps_passed() const {

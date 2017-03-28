@@ -19,10 +19,10 @@ public:
 			rgba color;
 		} in;
 		
-		float time_of_occurence_seconds = 0.f;
+		double time_of_occurence_seconds = 0.0;
 	};
 
-	float global_time_seconds = 0.f;
+	double global_time_seconds = 0.0;
 
 	std::vector<highlight> highlights;
 	

@@ -5,7 +5,7 @@ double viewing_step::get_interpolated_total_time_passed_in_seconds() const {
 	return cosm.get_total_time_passed_in_seconds(get_interpolation_ratio());
 }
 
-float viewing_step::get_interpolation_ratio() const {
+double viewing_step::get_interpolation_ratio() const {
 	return interpolation_ratio;
 }
 
@@ -13,7 +13,7 @@ viewing_step::viewing_step(
 	const config_lua_table& config,
 	const cosmos& cosm,
 	const viewing_session& session,
-	const float interpolation_ratio,
+	const double interpolation_ratio,
 	augs::renderer& renderer,
 	const camera_cone camera,
 	const entity_id viewed_character,

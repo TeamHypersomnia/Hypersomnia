@@ -341,8 +341,8 @@ public:
 	size_t get_maximum_entities() const;
 	std::wstring summary() const;
 
-	float get_total_time_passed_in_seconds(const float view_interpolation_ratio) const;
-	float get_total_time_passed_in_seconds() const;
+	double get_total_time_passed_in_seconds(const double view_interpolation_ratio) const;
+	double get_total_time_passed_in_seconds() const;
 	unsigned get_total_steps_passed() const;
 
 	augs::stepped_timestamp get_timestamp() const;

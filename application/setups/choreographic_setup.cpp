@@ -1,4 +1,6 @@
 #include <thread>
+#include "choreographic_structs.h"
+
 #include "game/bindings/bind_game_and_augs.h"
 #include "augs/global_libraries.h"
 #include "application/game_window.h"
@@ -19,6 +21,7 @@
 #include "game/transcendental/data_living_one_step.h"
 
 #include "augs/misc/debug_entropy_player.h"
+#include "augs/misc/templated_readwrite.h"
 
 #include "augs/templates/string_templates.h"
 #include "augs/filesystem/file.h"
@@ -38,8 +41,7 @@ typedef augs::trivial_variant<
 	play_sound,
 	focus_guid,
 	focus_index,
-	set_sfx_gain,
-	set_scene_speed
+	set_sfx_gain
 > choreographic_command_variant;
 
 using namespace augs::window::event::keys;
@@ -58,11 +60,36 @@ void choreographic_setup::process(
 	ensure(lines[current_line] == "resources:");
 
 	std::unordered_map<resource_id_type, augs::single_sound_buffer> preloaded_sounds;
-	std::unordered_map<resource_id_type, director_setup> preloaded_scenes;
+
+	struct preloaded_scene {
+		director_setup scene;
+		std::vector<speed_change> speed_changes;
+	};
+
+	std::unordered_map<resource_id_type, preloaded_scene> preloaded_scenes;
 
 	++current_line;
 
-	while (lines[current_line] != "commands:") {
+	auto get_line_until = [&lines, &current_line](const std::string delimiter = std::string()) {
+		while (
+			current_line < lines.size() 
+			&&	(
+				std::all_of(lines[current_line].begin(), lines[current_line].end(), isspace) 
+				|| lines[current_line][0] == '%'
+			)
+		) {
+			++current_line;
+		}
+
+		if (!(current_line < lines.size()) || (!delimiter.empty() && lines[current_line] == delimiter)) {
+			return false;
+		}
+		else {
+			return true;
+		}
+	};
+
+	while (get_line_until("scene_timings:")) {
 		std::istringstream in(lines[current_line]);
 
 		std::string type;
@@ -81,7 +108,7 @@ void choreographic_setup::process(
 			auto scene_cfg = cfg;
 			scene_cfg.director_input_scene_entropy_path = path;
 
-			auto& scene = preloaded_scenes[id];
+			auto& scene = preloaded_scenes[id].scene;
 
 			viewing_session dummy;
 			scene.init(scene_cfg, window, dummy);
@@ -96,19 +123,39 @@ void choreographic_setup::process(
 
 	++current_line;
 
+	while (get_line_until("commands:")) {
+		std::istringstream in(lines[current_line]);
+
+		resource_id_type id;
+		in >> id;
+
+		speed_change change;
+
+		augs::read_members_from_istream(in, change);
+
+		preloaded_scenes[id].speed_changes.push_back(change);
+
+		++current_line;
+	}
+
+	++current_line;
+
+	for (auto& p : preloaded_scenes) {
+		std::stable_sort(
+			p.second.speed_changes.begin(), 
+			p.second.speed_changes.end(), 
+			[](const auto& a, const auto& b){
+				return a.at_time < b.at_time;
+			}
+		);
+	}
+
 	std::vector<choreographic_command_variant> events;
 
 	double current_start_time_offset_for_commands = 0.0;
 
-	while (current_line < lines.size()) {
-		const auto& line = lines[current_line];
-
-		if (std::all_of(line.begin(), line.end(), isspace) || line[0] == '%') {
-			++current_line;
-			continue;
-		}
-
-		std::istringstream in(line);
+	while (get_line_until()) {
+		std::istringstream in(lines[current_line]);
 		
 		std::string command_name;
 
@@ -134,17 +181,7 @@ void choreographic_setup::process(
 
 				if ("struct " + command_name == typeid(command_type).name()) {
 					command_type new_command;
-
-					augs::introspect_recursive<
-						bind_types_t<can_stream_right, std::istringstream>,
-						always_recurse,
-						stop_recursion_if_valid
-					>(
-						[&](auto, auto& member) {
-							in >> member;
-						},
-						new_command
-					);
+					augs::read_members_from_istream(in, new_command);
 
 					new_command.at_time += current_start_time_offset_for_commands;
 
@@ -207,7 +244,7 @@ void choreographic_setup::process(
 
 					ensure(currently_played_scene_index != -1);
 
-					auto& scene = preloaded_scenes[currently_played_scene_index];
+					auto& scene = preloaded_scenes[currently_played_scene_index].scene;
 					scene.testbed.select_character(scene.hypersomnia[e.guid].get_id());
 				}
 
@@ -216,22 +253,13 @@ void choreographic_setup::process(
 
 					ensure(currently_played_scene_index != -1);
 
-					auto& scene = preloaded_scenes[currently_played_scene_index];
+					auto& scene = preloaded_scenes[currently_played_scene_index].scene;
 					scene.testbed.select_character(scene.testbed.characters[e.index]);
 				}
 
 				else if (next_event.is<set_sfx_gain>()) {
 					auto& e = next_event.get<set_sfx_gain>();
 					session.set_master_gain(e.gain);
-				}
-
-				else if (next_event.is<set_scene_speed>()) {
-					auto& e = next_event.get<set_scene_speed>();
-
-					ensure(currently_played_scene_index != -1);
-
-					auto& scene = preloaded_scenes[currently_played_scene_index];
-					scene.requested_playing_speed = e.speed;
 				}
 
 				++next_played_event_index;
@@ -245,8 +273,17 @@ void choreographic_setup::process(
 		if (currently_played_scene_index != -1) {
 			auto& scene = preloaded_scenes[currently_played_scene_index];
 			
-			scene.advance_player(session);
-			scene.view(cfg, session);
+			const auto current_scene_time = scene.scene.hypersomnia.get_total_time_passed_in_seconds();
+
+			for (const auto& t : scene.speed_changes) {
+				if (current_scene_time >= t.at_time && current_scene_time < t.to_time) {
+					scene.scene.requested_playing_speed = t.speed_multiplier;
+					break;
+				}
+			}
+
+			scene.scene.advance_player(session);
+			scene.scene.view(cfg, session);
 		}
 
 		using namespace augs::gui::text;

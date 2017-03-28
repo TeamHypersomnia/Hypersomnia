@@ -26,9 +26,14 @@
 
 using namespace augs;
 
-float colinearize_AB(const vec2 O_center_of_rotation, vec2 A_barrel_center, vec2 B_muzzle, vec2 C_crosshair) {
+float colinearize_AB_with_C(
+	const vec2 O_center_of_rotation, 
+	vec2 A_barrel_center, 
+	vec2 B_muzzle, 
+	vec2 C_crosshair
+) {
 	auto crosshair_vector = C_crosshair - O_center_of_rotation;
-	auto barrel_vector = B_muzzle - O_center_of_rotation;
+	const auto barrel_vector = B_muzzle - O_center_of_rotation;
 	
 	if (crosshair_vector.is_epsilon(1.f)) {
 		crosshair_vector.set(1, 0);
@@ -121,7 +126,7 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 
 					auto crosshair_vector = target_transform.pos - mc;
 
-					new_angle = colinearize_AB(mc, barrel_center, muzzle, target_transform.pos);
+					new_angle = colinearize_AB_with_C(mc, barrel_center, muzzle, target_transform.pos);
 				}
 				else if (subject_item.has<components::grenade>()) {
 					auto grenade_transform = subject_item.get_logic_transform();
@@ -132,7 +137,7 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 					grenade_transform.pos.rotate(-subject_transform.rotation, mc);
 					grenade_target_vector.rotate(-subject_transform.rotation, mc);
 
-					new_angle = colinearize_AB(mc, grenade_transform.pos, grenade_target_vector, target_transform.pos);
+					new_angle = colinearize_AB_with_C(mc, grenade_transform.pos, grenade_target_vector, target_transform.pos);
 				}
 			}
 		}

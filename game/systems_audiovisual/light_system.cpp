@@ -56,7 +56,7 @@ void light_system::render_all_lights(
 	std::function<void()> neon_callback
 ) const {
 	const auto& cosmos = step.cosm;
-	const float global_time_seconds = static_cast<float>(step.get_interpolated_total_time_passed_in_seconds());
+	const auto global_time_seconds = (step.get_interpolated_total_time_passed_in_seconds());
 
 	ensure_eq(0, output.get_triangle_count());
 

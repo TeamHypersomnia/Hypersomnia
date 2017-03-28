@@ -31,7 +31,7 @@ public:
 	template<class Container>
 	void draw_entities(
 		const interpolation_system& interp,
-		const float global_time_seconds,
+		const double global_time_seconds,
 		augs::vertex_triangle_buffer& output,
 		const cosmos& cosmos,
 		const Container& entities,
@@ -66,7 +66,7 @@ public:
 	template<class renderable_type>
 	void draw_renderable(
 		augs::vertex_triangle_buffer& output,
-		const float global_time_seconds,
+		const double global_time_seconds,
 		const renderable_type& renderable,
 		const components::transform& renderable_transform,
 		const components::render& render,

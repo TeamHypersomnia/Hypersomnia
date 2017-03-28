@@ -43,16 +43,7 @@ void regenerate_scripted_images(
 				if (command_name == command_type::get_command_name()) {
 					command_type new_command;
 
-					augs::introspect_recursive<
-						bind_types_t<can_stream_right, std::istringstream>,
-						always_recurse,
-						stop_recursion_if_valid
-					>(
-						[&](auto, auto& member) {
-							in >> member;
-						},
-						new_command
-					);
+					augs::read_members_from_istream(in, new_command);
 
 					new_stamp.commands.push_back(new_command);
 				}

@@ -222,7 +222,7 @@ namespace augs {
 		const camera_cone camera,
 		const assets::game_image_id line_texture,
 		const std::vector<const_entity_handle>& target_entities,
-		const float interpolation_ratio
+		const double interpolation_ratio
 	) {
 		
 		if (!debug.drawing_enabled) {

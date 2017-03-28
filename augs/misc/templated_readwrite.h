@@ -1,10 +1,11 @@
 #pragma once
+#include <map>
+#include <unordered_map>
+
 #include "augs/templates/memcpy_safety.h"
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/ensure.h"
 #include "augs/misc/introspect.h"
-#include <map>
-#include <unordered_map>
 
 namespace augs {
 	class output_stream_reserver;
@@ -424,5 +425,22 @@ namespace augs {
 		}
 
 		write(ar, compressed_storage);
+	}
+
+	template<class Archive, class Serialized>
+	void read_members_from_istream(
+		Archive& ar,
+		Serialized& storage
+	) {
+		augs::introspect_recursive<
+			bind_types_t<can_stream_right, Archive>,
+			always_recurse,
+			stop_recursion_if_valid
+		>(
+			[&](auto, auto& member) {
+				ar >> member;
+			},
+			storage
+		);
 	}
 }

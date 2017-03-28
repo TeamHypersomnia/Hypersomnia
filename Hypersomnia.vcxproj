@@ -1045,6 +1045,7 @@
     <ClInclude Include="application\content_generation\buttons_with_corners.h" />
     <ClInclude Include="application\menu_button_type.h" />
     <ClInclude Include="application\setups\choreographic_setup.h" />
+    <ClInclude Include="application\setups\choreographic_structs.h" />
     <ClInclude Include="application\setups\client_setup.h" />
     <ClInclude Include="application\setups\determinism_test_setup.h" />
     <ClInclude Include="application\setups\director_setup.h" />

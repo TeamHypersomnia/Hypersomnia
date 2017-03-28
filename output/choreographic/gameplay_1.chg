@@ -1,0 +1,49 @@
+resources:
+
+scene 0 director/idle.ent
+scene 1 director/sequence_1.ent
+scene 2 director/sequence_2.ent
+scene 3 director/sequence_3.ent
+scene 4 director/sequence_4.ent
+
+sound 1 choreographic/voices/intro.wav
+sound 2 choreographic/voices/prototypical.wav
+sound 3 choreographic/voices/force_grenade.wav
+sound 4 choreographic/voices/ped_grenade.wav
+sound 5 choreographic/voices/interference_grenade.wav
+sound 6 choreographic/voices/baking.wav
+sound 7 choreographic/voices/unpin.wav
+
+scene_timings:
+
+2 0.1 23.7 31.7
+
+commands:
+
+%scene 4 goes until 13.0
+
+%set_sfx_gain 1.0 0.0
+%play_scene 0 0.0
+%play_scene 1 4.0
+%play_sound 1 4.0
+%set_sfx_gain 0.03 4.0
+%focus_index 3 8.0
+%focus_index 4 9.0
+%focus_index 5 10.0
+%focus_index 7 11.2
+%play_sound 2 39.0
+%play_scene 2 40.0
+%
+%set_time_offset 40.0
+
+play_scene 2 0.0
+focus_index 1 2.5
+focus_index 0 5.2
+focus_index 1 6.0
+set_sfx_gain 1.0 6.6
+set_sfx_gain 0.03 11.5
+play_sound 3 11.5
+focus_index 2 13.0
+focus_index 0 22.0
+play_sound 4 22.1
+play_sound 5 37.6

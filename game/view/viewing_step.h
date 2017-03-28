@@ -18,7 +18,7 @@ public:
 		const config_lua_table& config,
 		const cosmos&,
 		const viewing_session&,
-		const float interpolation_ratio,
+		const double interpolation_ratio,
 		augs::renderer&,
 		const camera_cone camera_state,
 		const entity_id viewed_character,
@@ -29,12 +29,12 @@ public:
 	camera_cone camera;
 	entity_id viewed_character;
 	const visible_entities& visible;
-	const float interpolation_ratio = 0.f;
+	const double interpolation_ratio = 0.0;
 
 	game_drawing_settings settings;
 	const viewing_session& session;
 	augs::renderer& renderer;
 
 	double get_interpolated_total_time_passed_in_seconds() const;
-	float get_interpolation_ratio() const;
+	double get_interpolation_ratio() const;
 };

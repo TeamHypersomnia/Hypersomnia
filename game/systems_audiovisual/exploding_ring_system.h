@@ -12,10 +12,10 @@ class exploding_ring_system {
 public:
 	struct ring {
 		exploding_ring_input in;
-		float time_of_occurence_seconds = 0.f;
+		double time_of_occurence_seconds = 0.0;
 	};
 
-	float global_time_seconds = 0.f;
+	double global_time_seconds = 0.0;
 
 	std::vector<ring> rings;
 

@@ -35,7 +35,7 @@ namespace rendering_scripts {
 		const auto& flying_numbers = step.session.systems_audiovisual.get<vertically_flying_number_system>();
 		const auto& highlights = step.session.systems_audiovisual.get<pure_color_highlight_system>();
 		const auto& thunders = step.session.systems_audiovisual.get<thunder_system>();
-		const auto global_time_seconds = static_cast<float>(step.get_interpolated_total_time_passed_in_seconds());
+		const auto global_time_seconds = (step.get_interpolated_total_time_passed_in_seconds());
 
 		const auto screen_size = vec2i(camera.visible_world_area);
 
