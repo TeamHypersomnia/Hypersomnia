@@ -22,11 +22,11 @@ template <bool is_const, class component_type>
 class component_synchronizer : public component_synchronizer_base<is_const, component_type> {};
 
 template <class T>
-auto& synchronizer_or_component(T& s) {
+auto& get_component_ref_from_component_or_synchronizer(T& s) {
 	return s;
 }
 
 template <bool is_const, class component_type>
-auto& synchronizer_or_component(component_synchronizer<is_const, component_type> s) {
+auto& get_component_ref_from_component_or_synchronizer(component_synchronizer<is_const, component_type> s) {
 	return s.get_data();
 }

@@ -46,6 +46,9 @@ void relations_mixin<false, D>::make_cloned_child_entities_recursive(const entit
 		if (self.has<component_type>()) {
 			ensure(from.has<component_type>());
 
+			auto& cloned_to_component = get_component_ref_from_component_or_synchronizer(self.get<component_type>());
+			const auto& cloned_from_component = get_component_ref_from_component_or_synchronizer(self.get<component_type>());
+
 			augs::introspect_recursive<
 				concat_unary_t<
 					std::conjunction,
@@ -54,16 +57,16 @@ void relations_mixin<false, D>::make_cloned_child_entities_recursive(const entit
 				>,
 				concat_unary_t<
 					std::conjunction,
-					bind_types_t<std::is_same, shape_variant>,
-					bind_types_t<std::is_same, const shape_variant>
+					bind_types_t<apply_negation_t<std::is_same>, shape_variant>,
+					bind_types_t<apply_negation_t<std::is_same>, const shape_variant>
 				>,
 				stop_recursion_if_valid
 			> (
 				[&](auto, auto& cloned_into_id, const auto& cloned_from_id) {
 					cloned_into_id = cosmos.clone_entity(cloned_from_id);
 				},
-				synchronizer_or_component(self.get<component_type>()),
-				synchronizer_or_component(from.get<component_type>())
+				cloned_to_component,
+				cloned_from_component
 			);
 		}
 	});
