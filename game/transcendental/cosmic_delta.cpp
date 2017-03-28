@@ -19,6 +19,12 @@
 static_assert(is_one_of_v<cosmos, int, cosmos_metadata, cosmos>, "Trait is wrong");
 static_assert(!is_one_of_v<int, float, double>, "Trait is wrong");
 
+static_assert(
+	sizeof(entity_id) >= sizeof(entity_guid)
+	&& alignof(entity_id) >= alignof(entity_guid), 
+	"With given memory layouts, entity_id<->entity_guid substitution will not be possible in delta encoding"
+);
+
 static_assert(!has_introspect_v<cosmos>, "Trait is wrong");
 static_assert(!has_introspect_v<unsigned>, "Trait is wrong");
 static_assert(!has_introspect_v<augs::trivial_variant<int, double>>, "Trait is wrong");
