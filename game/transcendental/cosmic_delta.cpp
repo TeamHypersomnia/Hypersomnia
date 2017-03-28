@@ -30,6 +30,8 @@ static_assert(has_introspect_v<ltrbt<int>>, "Trait is wrong");
 static_assert(has_introspect_v<augs::constant_size_vector<int, 2>>, "Trait is wrong");
 static_assert(has_introspect_v<zeroed_pod<unsigned int>>, "Trait is wrong");
 
+static_assert(bind_types<std::is_same, const int>::type<const int>::value, "Trait is wrong");
+
 static_assert(bind_types_right<is_one_of, shape_variant&, const shape_variant&>::type<shape_variant&>::value, "Trait is wrong");
 static_assert(bind_types_right<is_one_of, shape_variant&, const shape_variant&>::type<const shape_variant&>::value, "Trait is wrong");
 static_assert(!bind_types_right<is_one_of, int, double, unsigned, signed>::type<float>::value, "Trait is wrong");
