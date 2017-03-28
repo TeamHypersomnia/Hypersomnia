@@ -45,6 +45,7 @@ public:
 
 	cosmic_movie_director director;
 
+	double basic_playback_speed = 1.0;
 	double requested_playing_speed = 0.0;
 
 	std::vector<cosmos> snapshots_for_rewinding;

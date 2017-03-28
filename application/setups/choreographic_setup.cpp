@@ -213,15 +213,31 @@ void choreographic_setup::process(
 		}
 	);
 
-	augs::timer player_time;
+	augs::timer player_timer;
+	double player_time = 0.0;
+	double current_playback_speed = 1.0;
+
+	auto set_playback_speed_globally = [&](const double new_speed) {
+		current_playback_speed = new_speed;
+
+		for (auto& s : sources) {
+			s.set_pitch(new_speed);
+		}
+
+		for (auto& p : preloaded_scenes) {
+			p.second.scene.basic_playback_speed = new_speed;
+		}
+	};
 
 	while (!should_quit) {
+		player_time += player_timer.extract<std::chrono::seconds>() * current_playback_speed;
+
 		if (next_played_event_index < events.size()) {
 			const auto& next_event = events[next_played_event_index];
 
 			const auto start_time = get_start_time(next_event);
 
-			if (start_time <= player_time.get<std::chrono::seconds>()) {
+			if (start_time <= player_time) {
 				if (next_event.is<play_scene>()) {
 					auto& e = next_event.get<play_scene>();
 
@@ -234,6 +250,7 @@ void choreographic_setup::process(
 					augs::sound_source src;
 					src.bind_buffer(preloaded_sounds[e.id]);
 					src.set_direct_channels(true);
+					src.set_pitch(current_playback_speed);
 					src.play();
 
 					sources.emplace_back(std::move(src));
@@ -270,9 +287,31 @@ void choreographic_setup::process(
 		new_machine_entropy.local = window.collect_entropy(!cfg.debug_disable_cursor_clipping);
 		process_exit_key(new_machine_entropy.local);
 
+		session.switch_between_gui_and_back(new_machine_entropy.local);
+
+
+		for (const auto& raw_input : new_machine_entropy.local) {
+			if (raw_input.was_any_key_pressed()) {
+				if (raw_input.key == key::NUMPAD4) {
+					set_playback_speed_globally(0.1);
+				}
+				if (raw_input.key == key::NUMPAD5) {
+					set_playback_speed_globally(1.0);
+				}
+				if (raw_input.key == key::NUMPAD6) {
+					set_playback_speed_globally(6.0);
+				}
+			}
+		}
+
 		if (currently_played_scene_index != -1) {
 			auto& scene = preloaded_scenes[currently_played_scene_index];
 			
+			session.control_gui_and_remove_fetched_events(
+				scene.scene.hypersomnia[scene.scene.testbed.get_selected_character()],
+				new_machine_entropy.local
+			);
+
 			const auto current_scene_time = scene.scene.hypersomnia.get_total_time_passed_in_seconds();
 
 			scene.scene.requested_playing_speed = 1.0;
@@ -287,6 +326,8 @@ void choreographic_setup::process(
 			scene.scene.advance_player(session);
 			scene.scene.view(cfg, session);
 		}
+		
+		session.systems_audiovisual.get<gui_element_system>().get_and_clear_pending_events();
 
 		using namespace augs::gui::text;
 
@@ -295,7 +336,7 @@ void choreographic_setup::process(
 		session.draw_text_at_left_top(
 			renderer,
 			format(
-				typesafe_sprintf(L"View time: %x", player_time.get<std::chrono::seconds>()),
+				typesafe_sprintf(L"View time: %x\nPlayback speed: %x", player_time, current_playback_speed),
 
 				style(
 					assets::font_id::GUI_FONT,
