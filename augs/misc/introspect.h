@@ -75,12 +75,14 @@ namespace augs {
 				conditional_call<
 					eval<call_valid_predicate, decltype(args)...>()
 				> () (
-					[&](auto...) {
+					[&member_callback](auto&& passed_label, auto&&... passed_args) {
 						member_callback(
-							std::forward<decltype(label)>(label),
-							std::forward<decltype(args)>(args)...
+							std::forward<decltype(passed_label)>(passed_label),
+							std::forward<decltype(passed_args)>(passed_args)...
 						);
-					}
+					},
+					std::forward<decltype(label)>(label),
+					std::forward<decltype(args)>(args)...
 				);
 
 				conditional_call<

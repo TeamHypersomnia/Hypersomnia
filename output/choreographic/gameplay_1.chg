@@ -34,7 +34,7 @@ commands:
 set_sfx_gain 1.0 0.0
 play_scene 0 0.0
 
-add_time_offset 10.0
+add_time_offset 3.0
 
 play_scene 1 0.0
 play_sound 1 0.0
