@@ -95,11 +95,13 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				has_enough_physical_bullets = it[slot_function::GUN_CHAMBER].get_mounted_items().size() > 0;
 			}
 
-			const bool has_enough_mana = 
-				(is_magic_launcher 
-				&& owning_sentience.alive() 
-				&& owning_sentience.get<components::sentience>().personal_electricity.value >= mana_needed)
-				|| !is_magic_launcher;
+			const bool has_enough_mana = (
+					is_magic_launcher 
+					&& owning_sentience.alive() 
+					&& owning_sentience.get<components::sentience>().personal_electricity.value >= mana_needed
+				)
+				|| !is_magic_launcher
+			;
 
 			if (
 				gun.trigger_pressed 
@@ -111,7 +113,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					gun.trigger_pressed = false;
 				}
 
-				const components::transform muzzle_transform = { gun.calculate_muzzle_position(gun_transform), gun_transform.rotation };
+				const auto muzzle_transform = components::transform { gun.calculate_muzzle_position(gun_transform), gun_transform.rotation };
 				
 				messages::gunshot_response response;
 
@@ -145,7 +147,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					const auto chamber_slot = it[slot_function::GUN_CHAMBER];
 					const auto item_in_chamber = chamber_slot.get_mounted_items()[0];
 
-					std::vector<entity_handle> bullet_entities;
+					static thread_local std::vector<entity_handle> bullet_entities;
 					bullet_entities.clear();
 
 					const auto pellets_slot = item_in_chamber[slot_function::ITEM_DEPOSIT];
@@ -160,12 +162,12 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						bullet_entities.push_back(item_in_chamber);
 					}
 
-					for(const auto catridge_or_pellet_stack : bullet_entities) {
-						int charges = catridge_or_pellet_stack.get<components::item>().charges;
+					for (const auto single_round_or_pellet_stack : bullet_entities) {
+						int charges = single_round_or_pellet_stack.get<components::item>().charges;
 
 						while (charges--) {
 							{
-								const auto round_entity = cosmos.clone_entity(catridge_or_pellet_stack[child_entity_name::CATRIDGE_ROUND]); //??
+								const auto round_entity = cosmos.clone_entity(single_round_or_pellet_stack[child_entity_name::CATRIDGE_ROUND]); //??
 								
 								auto& damage = round_entity.get<components::damage>();
 								damage.amount *= gun.damage_multiplier;
@@ -183,7 +185,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 								round_entity.add_standard_components();
 							}
 
-							const auto shell_definition = catridge_or_pellet_stack[child_entity_name::CATRIDGE_SHELL];
+							const auto shell_definition = single_round_or_pellet_stack[child_entity_name::CATRIDGE_SHELL];
 
 							if (shell_definition.alive()) {
 								const auto shell_entity = cosmos.clone_entity(shell_definition);
@@ -205,9 +207,11 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							}
 						}
 						
-						step.transient.messages.post(response);
+						step.transient.messages.post(messages::queue_destruction(single_round_or_pellet_stack));
+					}
 
-						step.transient.messages.post(messages::queue_destruction(catridge_or_pellet_stack));
+					if (bullet_entities.size() > 0) {
+						step.transient.messages.post(response);
 					}
 
 					if (destroy_pellets_container) {

@@ -505,7 +505,9 @@ TEST(CosmicDelta, PaddingSanityCheck1) {
 	new (buf1) checked_type;
 	new (buf2) checked_type;
 
-	ASSERT_TRUE(memcmp(buf1, buf2, type_size));
+	const bool are_different = memcmp(buf1, buf2, type_size);
+
+	ASSERT_TRUE(are_different);
 }
 
 TEST(CosmicDelta, PaddingSanityCheck2) {
@@ -529,7 +531,9 @@ TEST(CosmicDelta, PaddingSanityCheck2) {
 	new (buf1) checked_type;
 	new (buf2) checked_type;
 
-	ASSERT_TRUE(memcmp(buf1, buf2, type_size));
+	const bool are_different = memcmp(buf1, buf2, type_size);
+
+	ASSERT_TRUE(are_different);
 }
 
 TEST(CosmicDelta, CosmicDeltaPaddingTest) {
