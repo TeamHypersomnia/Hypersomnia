@@ -177,7 +177,7 @@ D basic_relations_mixin<C, D>::get_parent() const {
 
 template <bool C, class D>
 const components::physical_relations& basic_relations_mixin<C, D>::get_physical_relations_component() const {
-	static thread_local const components::physical_relations original;
+	thread_local const components::physical_relations original;
 	
 	const auto& self = *static_cast<const D*>(this);
 

@@ -418,7 +418,7 @@ void director_setup::view(
 	const config_lua_table& cfg,
 	viewing_session& session
 ) {
-	static thread_local visible_entities all_visible;
+	thread_local visible_entities all_visible;
 	session.get_visible_entities(all_visible, hypersomnia);
 
 	const auto vdt = session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), timer);

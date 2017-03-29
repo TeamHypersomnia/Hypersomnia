@@ -145,7 +145,7 @@ void local_setup::process(
 			total_collected_entropy.clear();
 		}
 
-		static thread_local visible_entities all_visible;
+		thread_local visible_entities all_visible;
 		session.get_visible_entities(all_visible, hypersomnia);
 
 		const auto vdt = session.frame_timer.extract_variable_delta(

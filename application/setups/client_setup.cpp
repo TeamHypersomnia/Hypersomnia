@@ -264,7 +264,7 @@ void client_setup::process_once(
 	if (!still_downloading) {
 		const auto vdt = session.frame_timer.extract_variable_delta(extrapolated_hypersomnia.get_fixed_delta(), timer);
 		
-		static thread_local visible_entities all_visible;
+		thread_local visible_entities all_visible;
 		session.get_visible_entities(all_visible, hypersomnia);
 
 		session.advance_audiovisual_systems(

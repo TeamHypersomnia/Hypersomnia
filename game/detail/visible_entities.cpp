@@ -30,7 +30,7 @@ void visible_entities::from_camera(
 		camera
 	);
 
-	static thread_local std::unordered_set<unversioned_entity_id> unique_from_physics;
+	thread_local std::unordered_set<unversioned_entity_id> unique_from_physics;
 	unique_from_physics.clear();
 
 	physics.for_each_in_camera(

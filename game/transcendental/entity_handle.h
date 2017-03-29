@@ -157,7 +157,7 @@ private:
 		}
 
 		return_type get() const {
-			static thread_local T t;
+			thread_local T t;
 			t = T();
 			return t;
 		}

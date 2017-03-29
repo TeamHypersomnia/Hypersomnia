@@ -147,7 +147,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					const auto chamber_slot = it[slot_function::GUN_CHAMBER];
 					const auto item_in_chamber = chamber_slot.get_mounted_items()[0];
 
-					static thread_local std::vector<entity_handle> bullet_entities;
+					thread_local std::vector<entity_handle> bullet_entities;
 					bullet_entities.clear();
 
 					const auto pellets_slot = item_in_chamber[slot_function::ITEM_DEPOSIT];
@@ -161,6 +161,8 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					else {
 						bullet_entities.push_back(item_in_chamber);
 					}
+
+					ensure(bullet_entities.size() > 0);
 
 					for (const auto single_round_or_pellet_stack : bullet_entities) {
 						int charges = single_round_or_pellet_stack.get<components::item>().charges;
@@ -210,9 +212,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						step.transient.messages.post(messages::queue_destruction(single_round_or_pellet_stack));
 					}
 
-					if (bullet_entities.size() > 0) {
-						step.transient.messages.post(response);
-					}
+					step.transient.messages.post(response);
 
 					if (destroy_pellets_container) {
 						step.transient.messages.post(messages::queue_destruction(chamber_slot.get_items_inside()[0]));

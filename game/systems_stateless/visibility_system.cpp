@@ -216,7 +216,7 @@ void visibility_system::respond_to_visibility_information_requests(
 				const auto target_pos = candidate.get_logic_transform().pos;
 
 				if ((target_pos - transform.pos).length_sq() <= d*d) {
-					static thread_local std::vector<std::unordered_set<entity_id>*> target_sets;
+					thread_local std::vector<std::unordered_set<entity_id>*> target_sets;
 					target_sets.clear();
 
 					if (request.test_items) {
@@ -291,7 +291,7 @@ void visibility_system::respond_to_visibility_information_requests(
 			}
 		};
 
-		static thread_local std::vector <target_vertex> all_vertices_transformed;
+		thread_local std::vector <target_vertex> all_vertices_transformed;
 		all_vertices_transformed.clear();
 
 		/* transform entity position to Box2D coordinates and take offset into account */

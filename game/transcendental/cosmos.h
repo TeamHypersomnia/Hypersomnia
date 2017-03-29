@@ -137,7 +137,7 @@ public:
 
 	template<class Pre, class Post>
 	void advance_deterministic_schemata(const cosmic_entropy& input, Pre pre_solve, Post post_solve) {
-		static thread_local data_living_one_step queues;
+		thread_local data_living_one_step queues;
 		logic_step step(*this, input, queues);
 
 		pre_solve(step);

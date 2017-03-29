@@ -70,7 +70,7 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 	const augs::delta delta, 
 	const interpolation_system& interp
 ) {
-	static thread_local randomization rng;
+	thread_local randomization rng;
 
 	const auto dead_particles_remover = [](auto& container) {
 		erase_remove(container, [](const auto& a) { return a.is_dead(); });
@@ -114,7 +114,7 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 
 	cone.visible_world_area *= 2.5f;
 
-	static thread_local std::vector<unversioned_entity_id> targets;
+	thread_local std::vector<unversioned_entity_id> targets;
 	targets.clear();
 
 	cosmos.systems_inferred.get<dynamic_tree_system>().determine_visible_entities_from_camera(
