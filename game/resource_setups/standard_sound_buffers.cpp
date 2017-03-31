@@ -18,6 +18,11 @@ namespace resource_setups {
 		}
 
 		{
+			auto& buf = get_resource_manager().create(assets::sound_buffer_id::SUBMACHINE_MUZZLE);
+			buf.from_file("hypersomnia/sfx/submachine_muzzle.wav");
+		}
+
+		{
 			auto& buf = get_resource_manager().create(assets::sound_buffer_id::KEK9_MUZZLE);
 			buf.from_file("hypersomnia/sfx/kek9_muzzle.wav");
 		}
@@ -163,7 +168,7 @@ namespace resource_setups {
 
 		{
 			auto& res = get_resource_manager().create(assets::sound_response_id::SUBMACHINE_RESPONSE);
-			res[sound_response_type::MUZZLE_SHOT] = assets::sound_buffer_id::BILMER2000_MUZZLE;
+			res[sound_response_type::MUZZLE_SHOT] = assets::sound_buffer_id::SUBMACHINE_MUZZLE;
 		}
 
 		{
