@@ -37,11 +37,11 @@ void force_joint_system::apply_forces_towards_target_entities(const logic_step s
 				return;
 			}
 
-			const auto& chased_entity_transform = chased_entity.get_logic_transform();
-			const auto& chased_transform = chased_entity_transform + force_joint.chased_entity_offset;
+			const auto chased_entity_transform = chased_entity.get_logic_transform();
+			const auto chased_transform = chased_entity_transform + force_joint.chased_entity_offset;
 
 			auto direction = chased_transform.pos - physics.get_position();
-			const auto& distance = direction.length();
+			const auto distance = direction.length();
 			direction.normalize_hint(distance);
 
 			if (force_joint.divide_transform_mode) {
@@ -58,19 +58,20 @@ void force_joint_system::apply_forces_towards_target_entities(const logic_step s
 					force_length *= pow(mult, force_joint.power_of_force_easing_multiplier);
 				}
 
-				const auto& force_for_chaser = vec2(direction).set_length(force_length * 1.f - force_joint.percent_applied_to_chased_entity);
-				const auto& force_for_chased = -force_for_chaser * force_joint.percent_applied_to_chased_entity;
+				const auto force_for_chaser = direction * force_length * (1.f - force_joint.percent_applied_to_chased_entity);
+				const auto force_for_chased = -force_for_chaser * force_joint.percent_applied_to_chased_entity;
 
 				const bool is_force_epsilon = force_for_chaser.length() < 500;
 
 				const auto& offsets = force_joint.force_offsets;
 
-				const int& offsets_count = static_cast<int>(offsets.size());
+				const auto offsets_count = static_cast<int>(offsets.size());
 
 				//if (!is_force_epsilon) 
 				{
-					for (const auto& offset : offsets)
+					for (const auto offset : offsets) {
 						physics.apply_force(force_for_chaser * physics.get_mass() / offsets_count, offset);
+					}
 
 					//LOG("F: %x, %x, %x", force_for_chaser, physics.velocity(), AS_INTV physics.get_position());
 				}
