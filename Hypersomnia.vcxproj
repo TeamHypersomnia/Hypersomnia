@@ -374,6 +374,7 @@
     <ClCompile Include="game\components\flags_component.cpp" />
     <ClCompile Include="game\components\inferred_state_component.cpp" />
     <ClCompile Include="game\components\light_component.cpp" />
+    <ClCompile Include="game\components\rigid_body_component.cpp" />
     <ClCompile Include="game\components\sentience_component.cpp" />
     <ClCompile Include="game\components\sound_existence_component.cpp" />
     <ClCompile Include="game\detail\camera_cone.cpp" />
@@ -487,7 +488,6 @@
     <ClCompile Include="game\components\name_component.cpp" />
     <ClCompile Include="game\components\particles_existence_component.cpp" />
     <ClCompile Include="game\components\pathfinding_component.cpp" />
-    <ClCompile Include="game\components\physics_component.cpp" />
     <ClCompile Include="game\components\polygon_component.cpp" />
     <ClCompile Include="game\components\sprite_component.cpp" />
     <ClCompile Include="game\components\tile_layer_instance_component.cpp" />
@@ -1165,6 +1165,7 @@
     <ClInclude Include="game\components\interpolation_component.h" />
     <ClInclude Include="game\components\light_component.h" />
     <ClInclude Include="game\components\physical_relations_component.h" />
+    <ClInclude Include="game\components\rigid_body_component.h" />
     <ClInclude Include="game\components\sentience_component.h" />
     <ClInclude Include="game\components\sound_existence_component.h" />
     <ClInclude Include="game\components\sound_response_component.h" />
@@ -1383,7 +1384,6 @@
     <ClInclude Include="game\components\particle_effect_response_component.h" />
     <ClInclude Include="game\components\particles_existence_component.h" />
     <ClInclude Include="game\components\pathfinding_component.h" />
-    <ClInclude Include="game\components\physics_component.h" />
     <ClInclude Include="game\components\polygon_component.h" />
     <ClInclude Include="game\components\render_component.h" />
     <ClInclude Include="game\components\sprite_component.h" />
