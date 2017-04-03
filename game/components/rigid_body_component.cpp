@@ -1,4 +1,4 @@
-#include "physics_component.h"
+#include "rigid_body_component.h"
 #include "inferred_state_component.h"
 
 #include <Box2D\Box2D.h>

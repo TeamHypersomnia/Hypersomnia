@@ -7,7 +7,7 @@
 
 #include "game/components/gun_component.h"
 
-#include "game/components/physics_component.h"
+#include "game/components/rigid_body_component.h"
 #include "game/components/movement_component.h"
 #include "game/components/sentience_component.h"
 

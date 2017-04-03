@@ -4,7 +4,7 @@
 #include "game/components/item_component.h"
 #include "game/components/damage_component.h"
 #include "game/components/fixtures_component.h"
-#include "game/components/physics_component.h"
+#include "game/components/rigid_body_component.h"
 #include "game/components/special_physics_component.h"
 #include "game/components/interpolation_component.h"
 #include "game/components/item_slot_transfers_component.h"

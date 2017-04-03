@@ -6,7 +6,7 @@
 #include "game/messages/gunshot_response.h"
 #include "game/detail/inventory/item_slot_transfer_request.h"
 
-#include "game/components/physics_component.h"
+#include "game/components/rigid_body_component.h"
 #include "game/components/damage_component.h"
 #include "game/components/particles_existence_component.h"
 #include "game/components/position_copying_component.h"

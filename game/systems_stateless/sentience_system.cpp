@@ -11,7 +11,7 @@
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/entity_id.h"
 
-#include "game/components/physics_component.h"
+#include "game/components/rigid_body_component.h"
 #include "game/components/container_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/position_copying_component.h"

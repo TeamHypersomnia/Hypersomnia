@@ -8,14 +8,14 @@
 
 #include "game/components/movement_component.h"
 #include "game/components/rotation_copying_component.h"
-#include "game/components/physics_component.h"
+#include "game/components/rigid_body_component.h"
 #include "game/components/force_joint_component.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/systems_inferred/physics_system.h"
 
 #include "game/components/driver_component.h"
-#include "game/components/physics_component.h"
+#include "game/components/rigid_body_component.h"
 #include "game/components/transform_component.h"
 
 #include "game/detail/physics/physics_scripts.h"

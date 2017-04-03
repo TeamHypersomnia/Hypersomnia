@@ -8,7 +8,7 @@
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/step_declaration.h"
 
-#include "game/components/physics_component.h"
+#include "game/components/rigid_body_component.h"
 #include "game/components/transform_component.h"
 
 #include "game/messages/collision_message.h"

@@ -10,7 +10,7 @@
 #include "game/transcendental/cosmos.h"
 
 #include "game/components/item_component.h"
-#include "game/components/physics_component.h"
+#include "game/components/rigid_body_component.h"
 #include "game/components/force_joint_component.h"
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/fixtures_component.h"

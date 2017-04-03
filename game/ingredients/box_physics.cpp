@@ -1,5 +1,5 @@
 #include "game/transcendental/cosmos.h"
-#include "game/components/physics_component.h"
+#include "game/components/rigid_body_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/sprite_component.h"
 

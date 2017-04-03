@@ -14,7 +14,7 @@
 #include "game/enums/filters.h"
 
 #include "game/components/trigger_component.h"
-#include "game/components/physics_component.h"
+#include "game/components/rigid_body_component.h"
 #include "game/components/transform_component.h"
 
 #include "game/components/trigger_collision_detector_component.h"

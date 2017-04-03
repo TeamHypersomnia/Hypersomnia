@@ -1,7 +1,7 @@
 #include "world_camera.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
-#include "game/components/physics_component.h"
+#include "game/components/rigid_body_component.h"
 #include "game/components/crosshair_component.h"
 #include "augs/misc/delta.h"
 

@@ -1,6 +1,6 @@
 #include "augs/ensure.h"
 #include "recoil_player.h"
-#include "game/components/physics_component.h"
+#include "game/components/rigid_body_component.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 

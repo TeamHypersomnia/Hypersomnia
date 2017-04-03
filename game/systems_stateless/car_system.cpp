@@ -9,7 +9,7 @@
 #include "augs/log.h"
 
 #include "game/components/car_component.h"
-#include "game/components/physics_component.h"
+#include "game/components/rigid_body_component.h"
 #include "game/components/transform_component.h"
 #include "game/components/special_physics_component.h"
 #include "game/components/processing_component.h"

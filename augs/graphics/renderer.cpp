@@ -6,7 +6,7 @@
 #include "augs/graphics/renderer.h"
 #include "augs/graphics/fbo.h"
 #include "game/messages/visibility_information.h"
-#include "game/components/physics_component.h"
+#include "game/components/rigid_body_component.h"
 #include "augs/templates/container_templates.h"
 
 #include "game/transcendental/entity_handle.h"

@@ -1,5 +1,5 @@
 #include "physics_scripts.h"
-#include "game/components/physics_component.h"
+#include "game/components/rigid_body_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/item_component.h"
 #include "game/components/driver_component.h"

@@ -11,7 +11,7 @@
 #include "game/components/animation_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/animation_response_component.h"
-#include "game/components/physics_component.h"
+#include "game/components/rigid_body_component.h"
 #include "game/components/special_physics_component.h"
 #include "game/components/trigger_query_detector_component.h"
 #include "game/components/driver_component.h"

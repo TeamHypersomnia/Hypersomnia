@@ -4,7 +4,7 @@
 #include "game/transcendental/entity_id.h"
 #include "augs/graphics/renderer.h"
 
-#include "game/components/physics_component.h"
+#include "game/components/rigid_body_component.h"
 #include "game/components/special_physics_component.h"
 #include "game/components/gun_component.h"
 #include "game/components/grenade_component.h"

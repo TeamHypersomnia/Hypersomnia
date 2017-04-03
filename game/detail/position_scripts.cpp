@@ -1,6 +1,6 @@
 #include "position_scripts.h"
 #include "game/components/transform_component.h"
-#include "game/components/physics_component.h"
+#include "game/components/rigid_body_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/detail/physics/physics_scripts.h"

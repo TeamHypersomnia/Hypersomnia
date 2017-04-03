@@ -3,7 +3,7 @@
 #include "game/transcendental/logic_step.h"
 
 #include "game/detail/inventory/inventory_utils.h"
-#include "game/components/physics_component.h"
+#include "game/components/rigid_body_component.h"
 #include "game/components/sprite_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/grenade_component.h"

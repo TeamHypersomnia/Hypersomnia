@@ -8,7 +8,7 @@
 #include "game/components/transform_component.h"
 #include "game/components/sprite_component.h"
 #include "game/components/damage_component.h"
-#include "game/components/physics_component.h"
+#include "game/components/rigid_body_component.h"
 #include "game/components/inferred_state_component.h"
 
 #include "game/messages/queue_destruction.h"

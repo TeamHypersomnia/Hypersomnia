@@ -1,5 +1,5 @@
 #include "transform_component.h"
-#include "physics_component.h"
+#include "rigid_body_component.h"
 #include "Box2D/Common/b2Math.h"
 #include "game/simulation_settings/si_scaling.h"
 

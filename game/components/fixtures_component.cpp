@@ -1,6 +1,6 @@
 #include "fixtures_component.h"
 #include "inferred_state_component.h"
-#include "physics_component.h"
+#include "rigid_body_component.h"
 #include <Box2D\Dynamics\b2Fixture.h>
 #include <Box2D/Box2D.h>
 #include "augs/ensure.h"

@@ -14,7 +14,7 @@
 #include "game/components/movement_component.h"
 #include "game/components/particle_effect_response_component.h"
 #include "game/components/particles_existence_component.h"
-#include "game/components/physics_component.h"
+#include "game/components/rigid_body_component.h"
 #include "game/components/transform_component.h"
 #include "game/components/render_component.h"
 #include "game/components/sprite_component.h"
