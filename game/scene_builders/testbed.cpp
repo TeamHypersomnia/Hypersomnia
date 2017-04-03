@@ -902,7 +902,7 @@ namespace scene_builders {
 	//}
 
 	//auto ff = (new_characters[1].get<components::pathfinding>().get_current_navigation_point() - position(new_characters[1])).set_length(15000);
-	//new_characters[1].get<components::physics>().apply_force(ff);
+	//new_characters[1].get<components::rigid_body>().apply_force(ff);
 
 	// LOG("F: %x", ff);
 }

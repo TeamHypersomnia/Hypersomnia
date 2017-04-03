@@ -86,7 +86,7 @@ void trace_system::spawn_finishing_traces_for_destroyed_objects(const logic_step
 			finishing_trace += e.get_logic_transform();
 			finishing_trace += e.get<components::render>();
 
-			//finishing_trace.get<components::transform>().rotation = 90;// e.get<components::physics>().velocity().degrees();
+			//finishing_trace.get<components::transform>().rotation = 90;// e.get<components::rigid_body>().velocity().degrees();
 
 			if (e.find<components::damage>()) {
 				finishing_trace.get<components::transform>().pos = e.get<components::damage>().saved_point_of_impact_before_death - 

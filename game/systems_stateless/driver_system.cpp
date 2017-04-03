@@ -95,7 +95,7 @@ bool driver_system::change_car_ownership(
 	const auto& physics = cosmos.systems_inferred.get<physics_system>();
 
 	auto* const maybe_rotation_copying = driver_entity.find<components::rotation_copying>();
-	const bool has_physics = driver_entity.has<components::physics>();
+	const bool has_physics = driver_entity.has<components::rigid_body>();
 	auto* const maybe_movement = driver_entity.find<components::movement>();
 	auto& force_joint = driver_entity.get<components::force_joint>();
 
@@ -127,9 +127,9 @@ bool driver_system::change_car_ownership(
 		}
 
 		if (has_physics) {
-			auto& physics = driver_entity.get<components::physics>();
-			physics.set_transform(car.left_wheel_trigger);
-			physics.set_velocity(vec2(0, 0));
+			auto& rigid_body = driver_entity.get<components::rigid_body>();
+			rigid_body.set_transform(car.left_wheel_trigger);
+			rigid_body.set_velocity(vec2(0, 0));
 			resolve_density_of_associated_fixtures(driver_entity);
 		}
 	}

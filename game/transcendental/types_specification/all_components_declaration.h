@@ -18,7 +18,7 @@ namespace components {
 	struct particle_effect_response;
 	struct particles_existence;
 	struct pathfinding;
-	struct physics;
+	struct rigid_body;
 	struct render;
 	struct transform;
 	struct sprite;
@@ -71,7 +71,7 @@ struct put_all_components_into {
 		components::particle_effect_response,
 		components::particles_existence,
 		//components::pathfinding,
-		components::physics,
+		components::rigid_body,
 		components::render,
 		components::transform,
 		components::sprite,

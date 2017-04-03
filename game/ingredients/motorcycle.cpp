@@ -36,7 +36,7 @@ namespace prefabs {
 			auto& render = front += components::render();
 			auto& car = front += components::car();
 			auto& special = front += components::special_physics();
-			components::physics body(si, spawn_transform);
+			components::rigid_body body(si, spawn_transform);
 			components::fixtures colliders;
 
 			car.left_wheel_trigger = left_wheel;

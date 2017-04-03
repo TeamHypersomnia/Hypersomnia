@@ -58,12 +58,12 @@ void release_or_throw_grenade(
 		// {
 		// 	const auto spoon = cosmos[grenade.spoon];
 		// 
-		// 	auto& physics = spoon.get<components::physics>();
+		// 	auto& rigid_body = spoon.get<components::rigid_body>();
 		// 	
 		// 	spoon.set_logic_transform(thrower_transform);
 		// 	spoon.add_standard_components();
 		// 	
-		// 	physics.apply_impulse(thrower_orientation.perpendicular_cw() * 1000 * physics.get_mass());
+		// 	rigid_body.apply_impulse(thrower_orientation.perpendicular_cw() * 1000 * rigid_body.get_mass());
 		// 
 		// 	grenade.released_spoon = grenade.spoon;
 		// 	grenade.spoon.unset();
@@ -71,16 +71,16 @@ void release_or_throw_grenade(
 
 		grenade_entity.get<components::sprite>().set(grenade.released_image_id);
 
-		auto& physics = grenade_entity.get<components::physics>();
+		auto& rigid_body = grenade_entity.get<components::rigid_body>();
 		
-		//ensure(physics.velocity().is_epsilon());
+		//ensure(rigid_body.velocity().is_epsilon());
 
-		physics.set_velocity({ 0.f, 0.f });
-		physics.set_angular_velocity(0.f);
-		physics.apply_angular_impulse(1.5f * physics.get_mass());
-		physics.apply_impulse(vec2().set_from_degrees(grenade_entity.get_logic_transform().rotation) * 5000 * physics.get_mass());
-		physics.set_bullet_body(true);
-		physics.set_linear_damping(3.0f);
+		rigid_body.set_velocity({ 0.f, 0.f });
+		rigid_body.set_angular_velocity(0.f);
+		rigid_body.apply_angular_impulse(1.5f * rigid_body.get_mass());
+		rigid_body.apply_impulse(vec2().set_from_degrees(grenade_entity.get_logic_transform().rotation) * 5000 * rigid_body.get_mass());
+		rigid_body.set_bullet_body(true);
+		rigid_body.set_linear_damping(3.0f);
 
 		auto& fixtures = grenade_entity.get<components::fixtures>();
 		auto new_def = fixtures.get_data();
@@ -98,9 +98,9 @@ void release_or_throw_grenade(
 		fixtures = new_def;
 		//new_def.colliders[0].shape.. = 1.f;
 
-		//auto new_def = physics.get_data();
+		//auto new_def = rigid_body.get_data();
 		//new_def.bullet = true;
 		//
-		//physics = new_def;
+		//rigid_body = new_def;
 	}
 }

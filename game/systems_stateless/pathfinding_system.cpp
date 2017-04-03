@@ -27,7 +27,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 	) {
 		std::vector<b2Vec2> output;
 
-		auto& b = subject.get<components::physics>();
+		auto& b = subject.get<components::rigid_body>();
 
 		const auto& verts = subject.get<components::fixtures>().get_data().colliders[0].shape.get<convex_partitioned_shape>().convex_polys[fixture_num].vertices;
 
@@ -65,7 +65,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 		/* get necessary components */
 			auto& pathfinding = it.get<components::pathfinding>();
 			const auto& transform = it.get_logic_transform() + pathfinding.eye_offset;
-			auto& body = it.get<components::physics>();
+			auto& body = it.get<components::rigid_body>();
 
 			if (!body.is_constructed()) {
 				return;

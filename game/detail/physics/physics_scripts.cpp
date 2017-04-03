@@ -15,7 +15,7 @@ void resolve_dampings_of_body(
 	const bool is_sprint_effective
 ) {
 	auto& cosmos = it.get_cosmos();
-	auto& physics = it.get<components::physics>();
+	auto& rigid_body = it.get<components::rigid_body>();
 
 	auto considered_damping = 0.f;
 
@@ -43,11 +43,11 @@ void resolve_dampings_of_body(
 			}
 		}
 
-		physics.set_linear_damping(considered_damping);
+		rigid_body.set_linear_damping(considered_damping);
 
 		/* the player feels less like a physical projectile if we brake per-axis */
 		if (movement.enable_braking_damping && !(movement.make_inert_for_ms > 0.f)) {
-			physics.set_linear_damping_vec(
+			rigid_body.set_linear_damping_vec(
 				vec2(
 					requested_by_input.x_non_zero() ? 0.f : movement.braking_damping,
 					requested_by_input.y_non_zero() ? 0.f : movement.braking_damping
@@ -55,21 +55,21 @@ void resolve_dampings_of_body(
 			);
 		}
 		else {
-			physics.set_linear_damping_vec(vec2(0, 0));
+			rigid_body.set_linear_damping_vec(vec2(0, 0));
 		}
 	}
 	else {
-		physics.set_linear_damping_vec(components::physics().linear_damping_vec);
-		physics.set_linear_damping(components::physics().linear_damping);
-		physics.set_angular_damping(components::physics().angular_damping);
+		rigid_body.set_linear_damping_vec(components::rigid_body().linear_damping_vec);
+		rigid_body.set_linear_damping(components::rigid_body().linear_damping);
+		rigid_body.set_angular_damping(components::rigid_body().angular_damping);
 	}
 }
 
 void resolve_density_of_associated_fixtures(const entity_handle id) {
 	auto& cosmos = id.get_cosmos();
 
-	if (id.has<components::physics>()) {
-		const auto& entities = id.get<components::physics>().get_fixture_entities();
+	if (id.has<components::rigid_body>()) {
+		const auto& entities = id.get<components::rigid_body>().get_fixture_entities();
 
 		for (const auto f : entities) {
 			if (f != id) {

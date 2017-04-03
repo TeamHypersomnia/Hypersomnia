@@ -59,14 +59,14 @@ void car_system::apply_movement_forces(const logic_step step) {
 		processing_subjects::WITH_CAR, 
 		[&](const auto& it) {
 			auto& car = it.get<components::car>();
-			auto& physics = it.get<components::physics>();
+			auto& rigid_body = it.get<components::rigid_body>();
 
 			vec2 resultant;
 
 			vec2 forward_dir;
 			vec2 right_normal;
 
-			forward_dir = forward_dir.set_from_degrees(physics.get_angle());
+			forward_dir = forward_dir.set_from_degrees(rigid_body.get_angle());
 			right_normal = forward_dir.perpendicular_cw();
 
 			resultant.x = car.accelerating * car.input_acceleration.x - car.decelerating * car.input_acceleration.x;
@@ -83,13 +83,13 @@ void car_system::apply_movement_forces(const logic_step step) {
 
 				auto& off = car.wheel_offset;
 
-				physics.apply_force(force * physics.get_mass()/4, forward_dir * off.x + vec2(right_normal).set_length(off.y));
-				physics.apply_force(force * physics.get_mass()/4, forward_dir * off.x - vec2(right_normal).set_length(off.y));
-				physics.apply_force(forward_tire_force * physics.get_mass()/4, forward_dir * -off.x + vec2(right_normal).set_length(off.y));
-				physics.apply_force(forward_tire_force * physics.get_mass()/4, forward_dir * -off.x - vec2(right_normal).set_length(off.y));
+				rigid_body.apply_force(force * rigid_body.get_mass()/4, forward_dir * off.x + vec2(right_normal).set_length(off.y));
+				rigid_body.apply_force(force * rigid_body.get_mass()/4, forward_dir * off.x - vec2(right_normal).set_length(off.y));
+				rigid_body.apply_force(forward_tire_force * rigid_body.get_mass()/4, forward_dir * -off.x + vec2(right_normal).set_length(off.y));
+				rigid_body.apply_force(forward_tire_force * rigid_body.get_mass()/4, forward_dir * -off.x - vec2(right_normal).set_length(off.y));
 			}
 
-			const vec2 vel = physics.velocity();
+			const vec2 vel = rigid_body.velocity();
 			const auto speed = vel.length();
 
 			vec2 lateral = right_normal * right_normal.dot(vel);
@@ -98,10 +98,10 @@ void car_system::apply_movement_forces(const logic_step step) {
 			forwardal.normalize_hint(forwardal_speed);
 
 			if (forwardal_speed < car.maximum_speed_with_static_air_resistance) {
-				physics.apply_force(-forwardal * car.static_air_resistance * forwardal_speed * forwardal_speed);
+				rigid_body.apply_force(-forwardal * car.static_air_resistance * forwardal_speed * forwardal_speed);
 			}
 			else
-				physics.apply_force(-forwardal * car.dynamic_air_resistance * forwardal_speed * forwardal_speed);
+				rigid_body.apply_force(-forwardal * car.dynamic_air_resistance * forwardal_speed * forwardal_speed);
 			
 			auto base_damping = (forwardal_speed < car.maximum_speed_with_static_damping ? car.static_damping : car.dynamic_damping);
 
@@ -110,7 +110,7 @@ void car_system::apply_movement_forces(const logic_step step) {
 
 			}
 
-			const float angular_velocity = physics.get_angular_velocity();
+			const float angular_velocity = rigid_body.get_angular_velocity();
 			float base_angular_damping = 0.f;
 
 			if (car.braking_angular_damping >= 0.f) {
@@ -125,7 +125,7 @@ void car_system::apply_movement_forces(const logic_step step) {
 				}
 			}
 
-			physics.set_linear_damping(base_damping);
+			rigid_body.set_linear_damping(base_damping);
 
 			if (lateral.length() > car.maximum_lateral_cancellation_impulse) {
 				lateral.set_length(car.maximum_lateral_cancellation_impulse);
@@ -134,23 +134,23 @@ void car_system::apply_movement_forces(const logic_step step) {
 			float angular_resistance = 0;
 
 			if (!car.hand_brake) {
-				physics.set_angular_damping(base_angular_damping + car.angular_damping);
-				physics.apply_impulse(-lateral * physics.get_mass() * car.lateral_impulse_multiplier);
+				rigid_body.set_angular_damping(base_angular_damping + car.angular_damping);
+				rigid_body.apply_impulse(-lateral * rigid_body.get_mass() * car.lateral_impulse_multiplier);
 				angular_resistance = car.angular_air_resistance;
 			}
 			else {
 				angular_resistance = car.angular_air_resistance_while_hand_braking;
-				physics.set_angular_damping(base_angular_damping + car.angular_damping_while_hand_braking);
+				rigid_body.set_angular_damping(base_angular_damping + car.angular_damping_while_hand_braking);
 			}
 
 			if(forwardal_speed > car.minimum_speed_for_maneuverability_decrease)
-				physics.apply_angular_impulse(physics.get_inertia() * -angular_velocity * DEG_TO_RAD<float> *
+				rigid_body.apply_angular_impulse(rigid_body.get_inertia() * -angular_velocity * DEG_TO_RAD<float> *
 					(forwardal_speed-car.minimum_speed_for_maneuverability_decrease)*car.maneuverability_decrease_multiplier);
 
 			if (angular_resistance > 0.f) {
 				auto angular_speed = angular_velocity * DEG_TO_RAD<float>;
-				//physics.body->ApplyTorque((angular_resistance * sqrt(sqrt(angular_speed * angular_speed)) + 0.2 * angular_speed * angular_speed)* -sgn(angular_speed) * b->GetInertia(), true);
-				physics.apply_angular_impulse(delta.in_seconds() * (angular_resistance * angular_speed * angular_speed)* -sgn(angular_speed) * physics.get_inertia());
+				//rigid_body.body->ApplyTorque((angular_resistance * sqrt(sqrt(angular_speed * angular_speed)) + 0.2 * angular_speed * angular_speed)* -sgn(angular_speed) * b->GetInertia(), true);
+				rigid_body.apply_angular_impulse(delta.in_seconds() * (angular_resistance * angular_speed * angular_speed)* -sgn(angular_speed) * rigid_body.get_inertia());
 			}
 
 			auto engine_handler = [&](const entity_handle h, const bool particles_enabled) {
@@ -175,7 +175,7 @@ void car_system::apply_movement_forces(const logic_step step) {
 
 			const bool sound_enabled = cosmos[car.current_driver].alive();
 			const auto sound_entity = cosmos[car.engine_sound];
-			const float pitch = 0.3f + speed*1.2f / car.speed_for_pitch_unit + std::abs(angular_velocity / 780.f)*sqrt(physics.get_mass());
+			const float pitch = 0.3f + speed*1.2f / car.speed_for_pitch_unit + std::abs(angular_velocity / 780.f)*sqrt(rigid_body.get_mass());
 
 			if (sound_entity.alive() && sound_entity.has<components::sound_existence>()) {
 				auto& existence = sound_entity.get<components::sound_existence>();
@@ -205,8 +205,8 @@ void car_system::apply_movement_forces(const logic_step step) {
 				}
 			}
 
-		//float angle = physics.get_angle();
-		//LOG("F: %x, %x, %x", AS_INTV physics.get_position(), AS_INT angle, AS_INTV physics.velocity());
+		//float angle = rigid_body.get_angle();
+		//LOG("F: %x, %x, %x", AS_INTV rigid_body.get_position(), AS_INT angle, AS_INTV rigid_body.velocity());
 		}
 	);
 }

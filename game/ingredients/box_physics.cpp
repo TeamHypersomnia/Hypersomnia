@@ -8,7 +8,7 @@
 
 namespace ingredients {
 	void add_standard_dynamic_body(const entity_handle e, const bool destructible) {
-		components::physics def;
+		components::rigid_body def;
 		const auto si = e.get_cosmos().get_si();
 
 		if (e.has<components::transform>()) {
@@ -34,7 +34,7 @@ namespace ingredients {
 	}
 
 	void add_see_through_dynamic_body(entity_handle e) {
-		components::physics def;
+		components::rigid_body def;
 		const auto si = e.get_cosmos().get_si();
 
 		if (e.has<components::transform>()) {
@@ -58,7 +58,7 @@ namespace ingredients {
 	}
 
 	void add_shell_dynamic_body(entity_handle e) {
-		components::physics def;
+		components::rigid_body def;
 		const auto si = e.get_cosmos().get_si();
 
 		if (e.has<components::transform>()) {
@@ -84,7 +84,7 @@ namespace ingredients {
 	}
 
 	void add_standard_static_body(entity_handle e) {
-		components::physics def;
+		components::rigid_body def;
 		const auto si = e.get_cosmos().get_si();
 
 		if (e.has<components::transform>()) {
@@ -95,7 +95,7 @@ namespace ingredients {
 		components::fixtures colliders;
 
 		def.fixed_rotation = false;
-		def.body_type = components::physics::type::STATIC;
+		def.body_type = components::rigid_body::type::STATIC;
 
 		auto& info = colliders.new_collider();
 		info.shape.from_renderable(e);
@@ -109,7 +109,7 @@ namespace ingredients {
 	}
 	
 	void add_bullet_round_physics(entity_handle e) {
-		components::physics body;
+		components::rigid_body body;
 		const auto si = e.get_cosmos().get_si();
 
 		if (e.has<components::transform>()) {

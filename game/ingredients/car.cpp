@@ -43,7 +43,7 @@ namespace prefabs {
 			auto& sprite = front += components::polygon();
 			auto& render = front += components::render();
 			auto& car = front += components::car();
-			components::physics physics_definition(si, spawn_transform);
+			components::rigid_body physics_definition(si, spawn_transform);
 			components::fixtures colliders;
 
 			car.interior = interior;
@@ -72,7 +72,7 @@ namespace prefabs {
 			front += physics_definition;
 			front += colliders;
 			front.get<components::fixtures>().set_owner_body(front);
-			//physics.air_resistance = 0.2f;
+			//rigid_body.air_resistance = 0.2f;
 		}
 		
 		{

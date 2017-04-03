@@ -316,7 +316,7 @@ void viewing_session::view(
 
 		const auto coords = character_chased_by_camera.alive() ? character_chased_by_camera.get_logic_transform().pos : vec2();
 		const auto rot = character_chased_by_camera.alive() ? character_chased_by_camera.get_logic_transform().rotation : 0.f;
-		const auto vel = character_chased_by_camera.alive() ? character_chased_by_camera.get<components::physics>().velocity() : vec2();
+		const auto vel = character_chased_by_camera.alive() ? character_chased_by_camera.get<components::rigid_body>().velocity() : vec2();
 
 		const auto gui_style = style(
 			assets::font_id::GUI_FONT,

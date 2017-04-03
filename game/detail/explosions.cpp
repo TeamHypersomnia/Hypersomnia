@@ -79,7 +79,7 @@ void standard_explosion(const standard_explosion_input in) {
 
 				if (is_yet_unaffected) {
 					const auto body_entity = cosmos[body_entity_id];
-					const auto& affected_physics = body_entity.get<components::physics>();
+					const auto& affected_physics = body_entity.get<components::rigid_body>();
 
 					auto impact = (point_b - in.explosion_location.pos).set_length(in.impact_force);
 					const auto center_offset = (point_b - affected_physics.get_mass_position()) * 0.8f;

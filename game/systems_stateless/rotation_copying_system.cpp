@@ -143,8 +143,8 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 		}
 	}
 	else {
-		if (target.has<components::physics>()) {
-			const auto target_physics = target.get<components::physics>();
+		if (target.has<components::rigid_body>()) {
+			const auto target_physics = target.get<components::rigid_body>();
 
 			vec2 direction;
 
@@ -181,9 +181,9 @@ void rotation_copying_system::update_rotations(cosmos& cosmos) const {
 			const auto& rotation_copying = it.get<components::rotation_copying>();
 
 			if (rotation_copying.update_value) {
-				if (it.has<components::physics>()) {
+				if (it.has<components::rigid_body>()) {
 					const auto target_angle = resolve_rotation_copying_value(it);
-					const auto phys = it.get<components::physics>();
+					const auto phys = it.get<components::rigid_body>();
 
 					phys.set_transform({ phys.get_position(), target_angle });
 					phys.set_angular_velocity(0);

@@ -70,9 +70,9 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 		[&](const auto it) {
 			auto& movement = it.get<components::movement>();
 
-			const auto& physics = it.get<components::physics>();
+			const auto& rigid_body = it.get<components::rigid_body>();
 
-			if (!physics.is_constructed()) {
+			if (!rigid_body.is_constructed()) {
 				return;
 			}
 
@@ -148,9 +148,9 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 				}
 
 				applied_force *= movement_force_mult;
-				applied_force *= physics.get_mass();
+				applied_force *= rigid_body.get_mass();
 
-				physics.apply_force(
+				rigid_body.apply_force(
 					applied_force, 
 					movement.applied_force_offset
 				);
@@ -174,8 +174,8 @@ void movement_system::generate_movement_responses(const logic_step step) {
 			float32 speed = 0.0f;
 
 			if (movement.enable_animation) {
-				if (it.has<components::physics>()) {
-					speed = it.get<components::physics>().velocity().length();
+				if (it.has<components::rigid_body>()) {
+					speed = it.get<components::rigid_body>().velocity().length();
 				}
 			}
 

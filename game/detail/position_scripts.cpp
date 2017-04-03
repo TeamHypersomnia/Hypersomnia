@@ -35,7 +35,7 @@ float speed(const_entity_handle e) {
 }
 
 bool is_entity_physical(const_entity_handle e) {
-	return e.has<components::fixtures>() || e.has<components::physics>();
+	return e.has<components::fixtures>() || e.has<components::rigid_body>();
 }
 
 float distance_sq(const_entity_handle a, const_entity_handle b) {
@@ -47,5 +47,5 @@ float distance(const_entity_handle a, const_entity_handle b) {
 }
 
 void set_velocity(entity_handle h, vec2 v) {
-	h.get<components::physics>().set_velocity(v);
+	h.get<components::rigid_body>().set_velocity(v);
 }

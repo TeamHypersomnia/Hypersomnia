@@ -20,7 +20,7 @@ namespace rendering_scripts {
 			[&](const auto it) {
 				const components::grenade& grenade = it.get<components::grenade>();
 
-				if (!it.get<components::physics>().is_activated()) {
+				if (!it.get<components::rigid_body>().is_activated()) {
 					return;
 				}
 

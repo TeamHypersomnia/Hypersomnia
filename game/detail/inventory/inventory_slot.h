@@ -42,7 +42,7 @@ struct inventory_slot {
 	is_physical_attachment_slot set to true means that:
 	- space is disregarded
 	- there may be only one item
-	- putting item inside does not deactivate its physics component; it is attached to the container entity instead
+	- putting item inside does not deactivate its rigid_body component; it is attached to the container entity instead
 	*/
 	
 	item_category_bitset get_allowed_categories() const;

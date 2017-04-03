@@ -18,7 +18,7 @@ bool basic_spatial_properties_mixin<C, D>::has_logic_transform() const {
 	if (owner.alive() && owner != handle) {
 		return true;
 	}
-	else if (handle.has<components::physics>()) {
+	else if (handle.has<components::rigid_body>()) {
 		return true;
 	}
 	else if (handle.has<components::transform>()) {
@@ -40,7 +40,7 @@ components::transform basic_spatial_properties_mixin<C, D>::get_logic_transform(
 	if (owner.alive()) {
 		ensure(!handle.has<components::transform>());
 
-		const auto& phys = owner.get<components::physics>();
+		const auto& phys = owner.get<components::rigid_body>();
 
 		if (owner != handle) {
 			const auto& fixtures = handle.get<components::fixtures>();
@@ -79,7 +79,7 @@ vec2 basic_spatial_properties_mixin<C, D>::get_effective_velocity() const {
 	const auto owner = handle.get_owner_body();
 
 	if (owner.alive()) {
-		return owner.get<components::physics>().velocity();
+		return owner.get<components::rigid_body>().velocity();
 	}
 	else if (handle.has<components::position_copying>()) {
 		ensure(handle.has<components::transform>());
@@ -125,9 +125,9 @@ void spatial_properties_mixin<false, D>::set_logic_transform(const components::t
 
 	ensure(!is_only_fixtural);
 	
-	if (handle.has<components::physics>()) {
+	if (handle.has<components::rigid_body>()) {
 		ensure(!handle.has<components::transform>());
-		const auto& phys = handle.get<components::physics>();
+		const auto& phys = handle.get<components::rigid_body>();
 		phys.set_transform(t);
 	}
 	else {

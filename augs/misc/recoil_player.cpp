@@ -29,7 +29,7 @@ void recoil_player::shoot_and_apply_impulse(
 	const bool positional_impulse, 
 	const float positional_rotation
 ) {
-	auto& recoil_physics = recoil_body.get<components::physics>();
+	auto& recoil_physics = recoil_body.get<components::rigid_body>();
 
 	const auto offset = shoot_and_get_offset();
 

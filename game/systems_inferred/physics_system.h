@@ -46,8 +46,8 @@ class EMPTY_BASES physics_system : public physics_queries<physics_system> {
 
 	friend class cosmos;
 	friend class physics_queries<physics_system>;
-	friend class component_synchronizer<false, components::physics>;
-	friend class component_synchronizer<true, components::physics>;
+	friend class component_synchronizer<false, components::rigid_body>;
+	friend class component_synchronizer<true, components::rigid_body>;
 	friend class component_synchronizer<false, components::fixtures>;
 	friend class component_synchronizer<true, components::fixtures>;
 	template<bool> friend class basic_physics_synchronizer;

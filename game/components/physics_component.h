@@ -12,19 +12,19 @@ class physics_system;
 struct rigid_body_cache;
 
 namespace components {
-	struct physics : synchronizable_component {
+	struct rigid_body : synchronizable_component {
 		enum class type {
 			STATIC,
 			KINEMATIC,
 			DYNAMIC
 		};
 
-		physics(
+		rigid_body(
 			const si_scaling = si_scaling(),
 			const components::transform t = components::transform()
 		);
 
-		// GEN INTROSPECTOR struct components::physics
+		// GEN INTROSPECTOR struct components::rigid_body
 		bool fixed_rotation = false;
 		bool bullet = false;
 		bool angled_damping = false;
@@ -54,7 +54,7 @@ namespace components {
 }
 
 template<bool is_const>
-class basic_physics_synchronizer : public component_synchronizer_base<is_const, components::physics> {
+class basic_physics_synchronizer : public component_synchronizer_base<is_const, components::rigid_body> {
 protected:
 	friend class ::physics_system;
 	friend class component_synchronizer<is_const, components::fixtures>;
@@ -73,7 +73,7 @@ protected:
 	}
 
 public:
-	using component_synchronizer_base<is_const, components::physics>::component_synchronizer_base;
+	using component_synchronizer_base<is_const, components::rigid_body>::component_synchronizer_base;
 
 	bool is_activated() const;
 	bool is_constructed() const;
@@ -87,7 +87,7 @@ public:
 	vec2 get_mass_position() const;
 	vec2 get_world_center() const;
 
-	components::physics::type get_body_type() const;
+	components::rigid_body::type get_body_type() const;
 
 	std::vector<basic_entity_handle<is_const>> get_fixture_entities() const;
 
@@ -95,12 +95,12 @@ public:
 };
 
 template<>
-class component_synchronizer<false, components::physics> : public basic_physics_synchronizer<false> {
+class component_synchronizer<false, components::rigid_body> : public basic_physics_synchronizer<false> {
 	void reinference() const;
 public:
 	using basic_physics_synchronizer<false>::basic_physics_synchronizer;
 
-	void set_body_type(const components::physics::type) const;
+	void set_body_type(const components::rigid_body::type) const;
 	void set_bullet_body(const bool flag) const;
 	void set_activated(const bool) const;
 	void set_velocity(const vec2) const;
@@ -119,7 +119,7 @@ public:
 };
 
 template<>
-class component_synchronizer<true, components::physics> : public basic_physics_synchronizer<true> {
+class component_synchronizer<true, components::rigid_body> : public basic_physics_synchronizer<true> {
 public:
 	using basic_physics_synchronizer<true>::basic_physics_synchronizer;
 };

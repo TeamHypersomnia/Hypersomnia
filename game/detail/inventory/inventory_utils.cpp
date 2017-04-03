@@ -538,9 +538,9 @@ void perform_transfer(
 		descendant.get<components::fixtures>() = def;
 		descendant.get<components::fixtures>().set_owner_body(owner_body);
 		
-		if (descendant.has<components::physics>()) {
-			descendant.get<components::physics>().set_activated(def.activated);
-			descendant.get<components::physics>().set_transform(previous_descendant_transform);
+		if (descendant.has<components::rigid_body>()) {
+			descendant.get<components::rigid_body>().set_activated(def.activated);
+			descendant.get<components::rigid_body>().set_transform(previous_descendant_transform);
 
 			if (descendant.has<components::interpolation>()) {
 				descendant.get<components::interpolation>().place_of_birth = descendant.get_logic_transform();
@@ -576,17 +576,17 @@ void perform_transfer(
 	if (is_drop_request) {
 		ensure(previous_slot.get_container().alive());
 
-		auto& physics = grabbed_item_part_handle.get<components::physics>();
+		auto& rigid_body = grabbed_item_part_handle.get<components::rigid_body>();
 		
-		// LOG_NVPS(physics.velocity());
-		// ensure(physics.velocity().is_epsilon());
+		// LOG_NVPS(rigid_body.velocity());
+		// ensure(rigid_body.velocity().is_epsilon());
 
 		if (r_data.impulse_applied_on_drop > 0.f) {
 			const auto impulse = vec2().set_from_degrees(previous_container_transform.rotation) * r_data.impulse_applied_on_drop;
-			physics.apply_impulse(impulse * physics.get_mass());
+			rigid_body.apply_impulse(impulse * rigid_body.get_mass());
 		}
 
-		physics.apply_angular_impulse(1.5f * physics.get_mass());
+		rigid_body.apply_angular_impulse(1.5f * rigid_body.get_mass());
 		
 		auto& special_physics = grabbed_item_part_handle.get<components::special_physics>();
 		special_physics.dropped_or_created_cooldown.set(300, cosmos.get_timestamp());

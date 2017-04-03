@@ -13,16 +13,16 @@
 #include "game/transcendental/entity_handle.h"
 #include "application/config_structs/debug_drawing_settings.h"
 
-typedef components::physics P;
+typedef components::rigid_body P;
 
-components::physics::physics(
+components::rigid_body::rigid_body(
 	const si_scaling si,
 	const components::transform t
 ) {
 	set_transform(si, t);
 }
 
-void components::physics::set_transform(
+void components::rigid_body::set_transform(
 	const si_scaling si,
 	const components::transform& t
 ) {
@@ -43,7 +43,7 @@ void component_synchronizer<false, P>::reinference() const {
 	handle.get_cosmos().partial_reinference<physics_system>(handle);
 }
 
-void component_synchronizer<false, P>::set_body_type(const components::physics::type t) const {
+void component_synchronizer<false, P>::set_body_type(const components::rigid_body::type t) const {
 	component.body_type = t;
 	reinference();
 }

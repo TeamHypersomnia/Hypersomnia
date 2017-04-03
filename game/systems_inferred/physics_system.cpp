@@ -164,20 +164,20 @@ void physics_system::create_inferred_state(const const_entity_handle handle) {
 
 	fixtures_construct(handle);
 
-	if (handle.has<components::physics>()) {
-		const auto& physics = handle.get<components::physics>();
-		const auto& fixture_entities = physics.get_fixture_entities();
+	if (handle.has<components::rigid_body>()) {
+		const auto& rigid_body = handle.get<components::rigid_body>();
+		const auto& fixture_entities = rigid_body.get_fixture_entities();
 
-		if (physics.is_activated() && fixture_entities.size() > 0) {
-			const auto& physics_data = physics.get_data();
+		if (rigid_body.is_activated() && fixture_entities.size() > 0) {
+			const auto& physics_data = rigid_body.get_data();
 			auto& cache = get_rigid_body_cache(handle);
 
 			b2BodyDef def;
 
 			switch (physics_data.body_type) {
-			case components::physics::type::DYNAMIC: def.type = b2BodyType::b2_dynamicBody; break;
-			case components::physics::type::STATIC: def.type = b2BodyType::b2_staticBody; break;
-			case components::physics::type::KINEMATIC: def.type = b2BodyType::b2_kinematicBody; break;
+			case components::rigid_body::type::DYNAMIC: def.type = b2BodyType::b2_dynamicBody; break;
+			case components::rigid_body::type::STATIC: def.type = b2BodyType::b2_staticBody; break;
+			case components::rigid_body::type::KINEMATIC: def.type = b2BodyType::b2_kinematicBody; break;
 			default:ensure(false) break;
 			}
 
@@ -267,14 +267,14 @@ void physics_system::step_and_set_new_transforms(const logic_step step) {
 	for (b2Body* b = b2world->GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
 		entity_handle entity = cosmos[b->GetUserData()];
-		auto& physics = entity.get<components::physics>();
+		auto& rigid_body = entity.get<components::rigid_body>();
 
 		recurential_friction_handler(step, b, b->m_ownerFrictionGround);
 
-		physics.component.transform = b->m_xf;
-		physics.component.sweep = b->m_sweep;
-		physics.component.velocity = b->GetLinearVelocity();
-		physics.component.angular_velocity = b->GetAngularVelocity();
+		rigid_body.component.transform = b->m_xf;
+		rigid_body.component.sweep = b->m_sweep;
+		rigid_body.component.velocity = b->GetLinearVelocity();
+		rigid_body.component.angular_velocity = b->GetAngularVelocity();
 	}
 }
 

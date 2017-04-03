@@ -72,13 +72,13 @@ void world_camera::tick(const interpolation_system& interp, const augs::delta dt
 	if (entity_to_chase.alive()) {
 		vec2 target_value;
 
-		if (entity_to_chase.has<components::physics>()) {
-			auto& physics = entity_to_chase.get<components::physics>();
+		if (entity_to_chase.has<components::rigid_body>()) {
+			auto& rigid_body = entity_to_chase.get<components::rigid_body>();
 
 			vec2 player_pos;
 
-			player_pos = physics.get_position();//entity_to_chase.get_logic_transform().interpolated(dt.view_interpolation_ratio());
-				//physics.get_position();
+			player_pos = rigid_body.get_position();//entity_to_chase.get_logic_transform().interpolated(dt.view_interpolation_ratio());
+				//rigid_body.get_position();
 
 			if (player_pos != player_position_at_previous_step) {
 				player_position_previously_seen = player_position_at_previous_step;

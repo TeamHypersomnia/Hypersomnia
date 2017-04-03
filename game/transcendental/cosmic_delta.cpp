@@ -636,7 +636,7 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndTwoNew) {
 	components::transform first_transform(21, 0, 12.4f);
 
 	new_ent1 += first_transform;
-	new_ent1 += components::physics();
+	new_ent1 += components::rigid_body();
 	new_ent1 += components::render();
 	new_ent1 += components::sprite();
 	
@@ -662,7 +662,7 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndTwoNew) {
 	ASSERT_TRUE(ent1.has<components::transform>());
 	const bool transform_intact = ent1.get<components::transform>() == first_transform;
 	ASSERT_TRUE(transform_intact);
-	ASSERT_TRUE(ent1.has<components::physics>());
+	ASSERT_TRUE(ent1.has<components::rigid_body>());
 	ASSERT_TRUE(ent1.has<components::render>());
 	ASSERT_TRUE(ent1.has<components::sprite>());
 	ASSERT_FALSE(ent1.has<components::trace>());
@@ -670,7 +670,7 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndTwoNew) {
 	ASSERT_TRUE(ent2.has<components::transform>());
 	const bool default_transform_intact = ent2.get<components::transform>() == components::transform();
 	ASSERT_TRUE(default_transform_intact);
-	ASSERT_FALSE(ent2.has<components::physics>());
+	ASSERT_FALSE(ent2.has<components::rigid_body>());
 	ASSERT_FALSE(ent2.has<components::render>());
 	ASSERT_FALSE(ent2.has<components::sprite>());
 	ASSERT_TRUE(ent2.has<components::trace>());

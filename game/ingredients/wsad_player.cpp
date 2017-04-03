@@ -49,7 +49,7 @@ namespace ingredients {
 	}
 
 	void add_wsad_character_physics(const entity_handle e) {
-		components::physics body;
+		components::rigid_body body;
 		components::special_physics special;
 		components::fixtures colliders;
 
@@ -218,7 +218,7 @@ namespace prefabs {
 		
 		ingredients::add_wsad_character_physics(character);
 
-		character.get<components::physics>().set_transform(spawn_transform);
+		character.get<components::rigid_body>().set_transform(spawn_transform);
 
 		ingredients::add_character_inventory(character);
 
@@ -239,7 +239,7 @@ namespace prefabs {
 
 		character.add_standard_components();
 
-		// LOG("Character mass: %x", character.get<components::physics>().get_mass());
+		// LOG("Character mass: %x", character.get<components::rigid_body>().get_mass());
 		return character;
 	}
 
@@ -270,7 +270,7 @@ namespace prefabs {
 		{
 			auto& force_joint = recoil += components::force_joint();
 			zero_target += components::transform();
-			components::physics body;
+			components::rigid_body body;
 			components::fixtures colliders;
 
 			auto& sprite = recoil += components::sprite();

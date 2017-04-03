@@ -132,7 +132,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 				const auto owning_crosshair_recoil = subject[child_entity_name::CHARACTER_CROSSHAIR][child_entity_name::CROSSHAIR_RECOIL_BODY];
 				auto rng = cosmos.get_rng_for(subject);
 
-				owning_crosshair_recoil.get<components::physics>().apply_impulse(
+				owning_crosshair_recoil.get<components::rigid_body>().apply_impulse(
 					shake_mult *shake_mult * 100 * vec2{ rng.randval(-1.f, 1.f), rng.randval(-1.f, 1.f) });
 			}
 
@@ -172,7 +172,7 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		auto& movement = subject.get<components::movement>();
 		movement.make_inert_for_ms += h.effective_amount*2;
 
-		subject.get<components::physics>()
+		subject.get<components::rigid_body>()
 			.apply_impulse(vec2(h.impact_velocity).set_length(static_cast<float>(h.effective_amount * 5)));
 
 		const auto consciousness_ratio = sentience.consciousness.get_ratio();
@@ -276,13 +276,13 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		
 		const auto subject_transform = subject.get_logic_transform();
 
-		subject.get<components::physics>().apply_impulse(
+		subject.get<components::rigid_body>().apply_impulse(
 			h.impact_velocity.set_length(850) 
 			//vec2().set_from_degrees(subject_transform.rotation) * 70
 		);
 
 
-		subject.get<components::physics>().apply_angular_impulse(
+		subject.get<components::rigid_body>().apply_angular_impulse(
 			80.f
 		);
 	}

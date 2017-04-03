@@ -150,7 +150,7 @@ namespace components {
 	struct particles_existence;
 	struct particle_effect_response;
 	struct physical_relations;
-	struct physics;
+	struct rigid_body;
 	struct polygon;
 	struct position_copying;
 	struct processing;
@@ -1069,7 +1069,7 @@ namespace augs {
 
 	template <class F, class... Instances>
 	void introspect_body(
-		const components::physics* const,
+		const components::rigid_body* const,
 		F f,
 		Instances&&... _t_
 	) {

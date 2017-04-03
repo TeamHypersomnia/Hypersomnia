@@ -32,7 +32,7 @@ template <bool C>
 template <bool, class>
 void basic_entity_handle<C>::add_standard_components() const {
 	ensure(alive());
-	const bool has_physics = has<components::physics>();
+	const bool has_physics = has<components::rigid_body>();
 
 	if (has_physics || has<components::fixtures>()) {
 		const bool has_transform = has<components::transform>();
@@ -62,7 +62,7 @@ void basic_entity_handle<C>::add_standard_components() const {
 		add(components::dynamic_tree_node::get_default(*this));
 	}
 
-	if (has<components::physics>()) {
+	if (has<components::rigid_body>()) {
 		if (!has<components::special_physics>()) {
 			add(components::special_physics());
 		}

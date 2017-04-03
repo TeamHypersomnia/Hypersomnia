@@ -77,7 +77,7 @@ void damage_system::destroy_colliding_bullets_and_send_damage(const logic_step s
 			;
 
 			if (should_send_damage) {
-				auto& subject_of_impact = subject_handle.get_owner_body().get<components::physics>();
+				auto& subject_of_impact = subject_handle.get_owner_body().get<components::rigid_body>();
 
 				vec2 impact_velocity = damage.custom_impact_velocity;
 
@@ -169,7 +169,7 @@ void damage_system::destroy_outdated_bullets(const logic_step step) {
 				const auto closest_hostile = 
 					particular_homing_target.alive() ? particular_homing_target : cosmos[get_closest_hostile(it, sender_attitude, 250, filters::bullet())];
 
-				const auto current_velocity = it.get<components::physics>().velocity();
+				const auto current_velocity = it.get<components::rigid_body>().velocity();
 
 				it.set_logic_transform({ it.get_logic_transform().pos, current_velocity.degrees() });
 
@@ -182,7 +182,7 @@ void damage_system::destroy_outdated_bullets(const logic_step step) {
 						std::swap(dirs[0], dirs[1]);
 					}
 
-					it.get<components::physics>().apply_force(
+					it.get<components::rigid_body>().apply_force(
 						dirs[0].set_length(homing_vector.length()) * damage.homing_towards_hostile_strength
 					);
 				}

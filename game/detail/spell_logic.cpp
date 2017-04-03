@@ -346,7 +346,7 @@ void perform_spell_logic(
 				damage.sender = caster;
 
 				const auto energy_ball_velocity = vec2().set_from_degrees(new_energy_ball_transform.rotation) * 2000;
-				energy_ball.get<components::physics>().set_velocity(energy_ball_velocity);
+				energy_ball.get<components::rigid_body>().set_velocity(energy_ball_velocity);
 
 				energy_ball.add_standard_components();
 			}
