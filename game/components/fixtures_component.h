@@ -1,21 +1,26 @@
 #pragma once
-#include <array>
-
-#include "game/transcendental/entity_id.h"
-#include "augs/math/vec2.h"
-#include "augs/math/rects.h"
-#include "transform_component.h"
-#include "game/transcendental/component_synchronizer.h"
-#include "game/enums/colliders_offset_type.h"
-#include "game/detail/shape_variant.h"
 #include <Box2D/Dynamics/b2Fixture.h>
 
-#include "augs/misc/constant_size_vector.h"
-#include "game/container_sizes.h"
-#include "game/enums/physical_material_type.h"
 #include "padding_byte.h"
 
+#include "augs/math/vec2.h"
+#include "augs/math/rects.h"
+
+#include "augs/misc/constant_size_vector.h"
+#include "augs/misc/enum_array.h"
 #include "augs/misc/trivial_variant.h"
+
+#include "game/container_sizes.h"
+
+#include "game/transcendental/entity_id.h"
+#include "game/transcendental/component_synchronizer.h"
+
+#include "game/enums/colliders_offset_type.h"
+#include "game/enums/physical_material_type.h"
+
+#include "game/components/transform_component.h"
+
+#include "game/detail/shape_variant.h"
 
 class physics_system;
 struct colliders_cache;
@@ -43,7 +48,7 @@ namespace components {
 	struct fixtures : synchronizable_component {
 		// GEN INTROSPECTOR struct components::fixtures
 		augs::constant_size_vector<convex_partitioned_collider, COLLIDERS_COUNT> colliders;
-		std::array<components::transform, colliders_offset_type::OFFSET_COUNT> offsets_for_created_shapes;
+		augs::enum_array<components::transform, colliders_offset_type> offsets_for_created_shapes;
 
 		bool activated = true;
 		bool is_friction_ground = false;
@@ -69,23 +74,23 @@ protected:
 public:
 	using component_synchronizer_base<is_const, components::fixtures>::component_synchronizer_base;
 
-	components::transform get_offset(colliders_offset_type) const;
+	components::transform get_offset(const colliders_offset_type) const;
 	components::transform get_total_offset() const;
 
 	bool is_activated() const;
 	bool is_constructed() const;
 
-	float get_density_multiplier(size_t = 0) const;
-	float get_friction(size_t = 0) const;
-	float get_restitution(size_t = 0) const;
-	float get_base_density(size_t = 0) const;
-	float get_density(size_t = 0) const;
+	float get_density_multiplier(const size_t collider_index = 0) const;
+	float get_friction(const size_t collider_index = 0) const;
+	float get_restitution(const size_t collider_index = 0) const;
+	float get_base_density(const size_t collider_index = 0) const;
+	float get_density(const size_t collider_index = 0) const;
 	
 	basic_entity_handle<is_const> get_owner_body() const;
 
 	ltrb get_local_aabb() const;
 
-	const convex_partitioned_collider& get_collider_data(size_t i) const;
+	const convex_partitioned_collider& get_collider_data(const size_t collider_index) const;
 	size_t get_num_colliders() const;
 
 	bool is_friction_ground() const;
@@ -104,14 +109,40 @@ public:
 
 	convex_poly_destruction_data& get_modifiable_destruction_data(const b2Fixture_index_in_component);
 
-	void set_density(float, size_t = 0) const;
-	void set_density_multiplier(float, size_t = 0) const;
-	void set_friction(float, size_t = 0) const;
-	void set_restitution(float, size_t = 0) const;
-	void set_physical_material(const physical_material_type, size_t = 0) const;
-	void set_owner_body(entity_id) const;
+	void set_density(
+		const float density, 
+		const size_t collider_index = 0
+	) const;
+
+	void set_density_multiplier(
+		const float multiplier,
+		const size_t collider_index = 0
+	) const;
+
+	void set_friction(
+		const float friction, 
+		const size_t collider_index = 0
+	) const;
+
+	void set_restitution(
+		const float restitution, 
+		const size_t collider_index = 0
+	) const;
+
+	void set_physical_material(
+		const physical_material_type,
+		const size_t collider_index = 0
+	) const;
+
+	void set_owner_body(const entity_id) const;
+
 	component_synchronizer& operator=(const components::fixtures&);
-	void set_offset(colliders_offset_type, components::transform) const;
+	
+	void set_offset(
+		const colliders_offset_type, 
+		const components::transform
+	) const;
+
 	void set_activated(bool) const;
 };
 

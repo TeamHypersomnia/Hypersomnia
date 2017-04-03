@@ -66,8 +66,11 @@ bool basic_fixtures_synchronizer<C>::can_driver_shoot_through() const {
 	return component.can_driver_shoot_through;
 }
 
-void component_synchronizer<false, F>::set_offset(colliders_offset_type t, components::transform off) const {
-	component.offsets_for_created_shapes[static_cast<int>(t)] = off;
+void component_synchronizer<false, F>::set_offset(
+	const colliders_offset_type t, 
+	const components::transform off
+) const {
+	component.offsets_for_created_shapes[t] = off;
 	reinference();
 }
 
@@ -89,7 +92,10 @@ void component_synchronizer<false, F>::rebuild_density(const size_t index) const
 	get_cache().fixtures_per_collider[0][0]->GetBody()->ResetMassData();
 }
 
-void component_synchronizer<false, F>::set_density(const float d, const size_t index) const {
+void component_synchronizer<false, F>::set_density(
+	const float d, 
+	const size_t index
+) const {
 	component.colliders[index].density = d;
 
 	if (!is_constructed()) {
@@ -103,7 +109,10 @@ convex_poly_destruction_data& component_synchronizer<false, F>::get_modifiable_d
 	return component.colliders[indices.collider_index].shape.get<convex_partitioned_shape>().convex_polys[indices.convex_shape_index].destruction;
 }
 
-void component_synchronizer<false, F>::set_density_multiplier(const float mult, const size_t index) const {
+void component_synchronizer<false, F>::set_density_multiplier(
+	const float mult, 
+	const size_t index
+) const {
 	component.colliders[index].density_multiplier = mult;
 
 	if (!is_constructed()) {
@@ -118,7 +127,10 @@ void component_synchronizer<false, F>::set_activated(const bool flag) const {
 	reinference();
 }
 
-void component_synchronizer<false, F>::set_friction(const float fr, const size_t index) const {
+void component_synchronizer<false, F>::set_friction(
+	const float fr, 
+	const size_t index
+) const {
 	component.colliders[index].friction = fr;
 
 	if (!is_constructed()) {
@@ -130,7 +142,10 @@ void component_synchronizer<false, F>::set_friction(const float fr, const size_t
 	}
 }
 
-void component_synchronizer<false, F>::set_restitution(const float r, const size_t index) const {
+void component_synchronizer<false, F>::set_restitution(
+	const float r, 
+	const size_t index
+) const {
 	component.colliders[index].restitution = r;
 
 	if (!is_constructed()) {
@@ -142,7 +157,10 @@ void component_synchronizer<false, F>::set_restitution(const float r, const size
 	}
 }
 
-void component_synchronizer<false, F>::set_physical_material(const physical_material_type m, const size_t index) const {
+void component_synchronizer<false, F>::set_physical_material(
+	const physical_material_type m, 
+	const size_t index
+) const {
 	component.colliders[index].material = m;
 }
 
@@ -188,7 +206,7 @@ basic_entity_handle<C> basic_fixtures_synchronizer<C>::get_owner_body() const {
 
 template<bool C>
 components::transform basic_fixtures_synchronizer<C>::get_offset(const colliders_offset_type t) const {
-	return component.offsets_for_created_shapes[static_cast<int>(t)];
+	return component.offsets_for_created_shapes[t];
 }
 
 template<bool C>
