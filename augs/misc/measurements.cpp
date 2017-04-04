@@ -2,6 +2,7 @@
 #include <algorithm>
 #include "augs/log.h"
 #include "augs/math/vec2.h"
+#include "augs/templates/container_templates.h"
 
 namespace augs {
 	measurements::measurements(std::wstring title, bool measurements_are_time, size_t tracked_count) : title(title), measurements_are_time(measurements_are_time) {
@@ -26,8 +27,8 @@ namespace augs {
 			avg += v;
 
 		last_average = avg / tracked.size();
-		last_maximum = *std::max_element(tracked.begin(), tracked.end());
-		last_minimum = *std::min_element(tracked.begin(), tracked.end());
+		last_maximum = maximum_of(tracked);
+		last_minimum = minimum_of(tracked);
 	}
 
 	void measurements::end_measurement() {

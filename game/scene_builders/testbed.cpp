@@ -574,7 +574,7 @@ namespace scene_builders {
 
 			messages::create_particle_effect effect;
 			effect.place_of_birth = components::transform(-164, 500, 0);
-			effect.input.effect = assets::particle_effect_id::WANDERING_SMOKE;
+			effect.input.effect.id = assets::particle_effect_id::WANDERING_SMOKE;
 			effect.input.displace_source_position_within_radius = 500.f;
 			effect.input.single_displacement_duration_ms.set(400.f, 1500.f);
 

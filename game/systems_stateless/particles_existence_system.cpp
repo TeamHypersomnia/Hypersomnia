@@ -21,6 +21,7 @@
 #include "game/messages/exhausted_cast_message.h"
 
 #include "game/systems_audiovisual/particles_simulation_system.h"
+#include "game/detail/particle_types.h"
 
 bool components::particles_existence::is_activated(const const_entity_handle h) {
 	return h.get<components::dynamic_tree_node>().is_activated() && h.get<components::processing>().is_in(processing_subjects::WITH_PARTICLES_EXISTENCE);
@@ -96,16 +97,16 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 			messages::create_particle_effect burst;
 			burst.place_of_birth = g.muzzle_transform;
 			burst.subject = g.subject;
-			burst.input.effect = round_response_map.at(particle_effect_response_type::MUZZLE_LEAVE_EXPLOSION);
-			burst.input.modifier = round_response.modifier;
+			burst.input.effect.id = round_response_map.at(particle_effect_response_type::MUZZLE_LEAVE_EXPLOSION);
+			burst.input.effect.modifier = round_response.modifier;
 
 			step.transient.messages.post(burst);
 
 			burst.place_of_birth = cosmos[r].get_logic_transform();
 			burst.place_of_birth.rotation += 180;
 			burst.subject = r;
-			burst.input.effect = round_response_map.at(particle_effect_response_type::PROJECTILE_TRACE);
-			burst.input.modifier = round_response.modifier;
+			burst.input.effect.id = round_response_map.at(particle_effect_response_type::PROJECTILE_TRACE);
+			burst.input.effect.modifier = round_response.modifier;
 
 			const auto trace = create_particle_effect_entity(cosmos, burst);
 			trace.add_standard_components();
@@ -119,8 +120,8 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 			burst.place_of_birth = cosmos[s].get_logic_transform();
 			burst.place_of_birth.rotation += 180;
 			burst.subject = s;
-			burst.input.effect = shell_response_map.at(particle_effect_response_type::PROJECTILE_TRACE);
-			burst.input.modifier = shell_response.modifier;
+			burst.input.effect.id = shell_response_map.at(particle_effect_response_type::PROJECTILE_TRACE);
+			burst.input.effect.modifier = shell_response.modifier;
 
 			step.transient.messages.post(burst);
 		}
@@ -142,8 +143,8 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 				burst.place_of_birth.rotation = (d.impact_velocity).degrees();
 			}
 
-			burst.input.effect = response_map.at(particle_effect_response_type::DESTRUCTION_EXPLOSION);
-			burst.input.modifier = response.modifier;
+			burst.input.effect.id = response_map.at(particle_effect_response_type::DESTRUCTION_EXPLOSION);
+			burst.input.effect.modifier = response.modifier;
 
 			step.transient.messages.post(burst);
 		}
@@ -164,22 +165,22 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 		burst.place_of_birth.pos = cosmos[h.subject].get_logic_transform().pos;
 		burst.place_of_birth.rotation = (h.impact_velocity).degrees();
 		burst.input = existence.input;
-		burst.input.modifier = response.modifier;
+		burst.input.effect.modifier = response.modifier;
 
 		if (h.target == messages::health_event::target_type::HEALTH) {
 			if (h.special_result == messages::health_event::result_type::DEATH) {
-				burst.input.effect = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
-				burst.input.modifier.scale_amounts = 0.6f;
-				burst.input.modifier.scale_lifetimes = 1.25f;
-				burst.input.modifier.colorize = red;
-				burst.input.modifier.homing_target = h.subject;
+				burst.input.effect.id = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
+				burst.input.effect.modifier.scale_amounts = 0.6f;
+				burst.input.effect.modifier.scale_lifetimes = 1.25f;
+				burst.input.effect.modifier.colorize = red;
+				burst.input.effect.modifier.homing_target = h.subject;
 			}
 			else if (h.effective_amount > 0) {
-				burst.input.effect = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
-				burst.input.modifier.colorize = red;
-				burst.input.modifier.scale_amounts = h.effective_amount/100.f;// (1.25f + h.ratio_effective_to_maximum)*(1.25f + h.ratio_effective_to_maximum);
-				burst.input.modifier.scale_lifetimes = 1.25f + h.effective_amount / 100.f;
-				burst.input.modifier.homing_target = h.subject;
+				burst.input.effect.id = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
+				burst.input.effect.modifier.colorize = red;
+				burst.input.effect.modifier.scale_amounts = h.effective_amount/100.f;// (1.25f + h.ratio_effective_to_maximum)*(1.25f + h.ratio_effective_to_maximum);
+				burst.input.effect.modifier.scale_lifetimes = 1.25f + h.effective_amount / 100.f;
+				burst.input.effect.modifier.homing_target = h.subject;
 			}
 
 			particles_existence_system().create_particle_effect_components(
@@ -201,8 +202,8 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 		messages::create_particle_effect burst;
 		burst.subject = s.subject;
 		burst.place_of_birth = s.origin_transform;
-		burst.input.effect = response_map.at(particle_effect_response_type::PARTICLES_WHILE_SWINGING);
-		burst.input.modifier = response.modifier;
+		burst.input.effect.id = response_map.at(particle_effect_response_type::PARTICLES_WHILE_SWINGING);
+		burst.input.effect.modifier = response.modifier;
 
 		step.transient.messages.post(burst);
 	}
@@ -211,7 +212,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 		messages::create_particle_effect burst;
 		burst.subject = e.subject;
 		burst.place_of_birth = e.transform;
-		burst.input.effect = assets::particle_effect_id::EXHAUSTED_SMOKE;
+		burst.input.effect.id = assets::particle_effect_id::EXHAUSTED_SMOKE;
 
 		step.transient.messages.post(burst);
 	}
@@ -231,9 +232,12 @@ void particles_existence_system::create_particle_effect_components(
 	out_existence.time_of_last_displacement = cosmos.get_timestamp();
 	out_existence.current_displacement_duration_bound_ms = 0;
 
-	const float duration_ms = (*std::max_element((*it.input.effect).begin(), (*it.input.effect).end(), [](const auto& a, const auto& b) {
-		return a.stream_lifetime_ms.second < b.stream_lifetime_ms.second;
-	})).stream_lifetime_ms.second;
+	const float duration_ms = maximum_of(
+		*it.input.effect.id, 
+		[](const auto& a, const auto& b) {
+			return a.stream_lifetime_ms.second < b.stream_lifetime_ms.second;
+		}
+	).stream_lifetime_ms.second;
 
 	out_existence.max_lifetime_in_steps = static_cast<unsigned>(duration_ms / cosmos.get_fixed_delta().in_milliseconds()) + 1u;
 

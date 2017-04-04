@@ -34,6 +34,7 @@ struct vec2t;
 class recoil_player;
 template <class T>
 struct zeroed_pod;
+struct _particle_effect_response;
 struct sound_response;
 struct behaviour_tree_instance;
 struct car_engine_entities;
@@ -62,6 +63,8 @@ struct perk_timing;
 struct sentience_meter;
 struct circle_shape;
 struct spell_instance_data;
+struct particle_effect_modifier;
+struct particles_emission;
 struct all_simulation_settings;
 struct pathfinding_settings;
 struct si_scaling;
@@ -172,8 +175,6 @@ namespace components {
 
 namespace resources {
 	struct state_of_behaviour_tree_instance;
-	struct particle_effect_modifier;
-	struct emission;
 }
 
 namespace augs {
@@ -448,6 +449,16 @@ namespace augs {
 		Instances&&... _t_
 	) {
 		FIELD(pod);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const _particle_effect_response* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(id);
+		FIELD(modifier);
 	}
 
 	template <class F, class... Instances>
@@ -1038,8 +1049,6 @@ namespace augs {
 		FIELD(effect);
 		FIELD(delete_entity_after_effect_lifetime);
 
-		FIELD(modifier);
-
 		FIELD(displace_source_position_within_radius);
 		FIELD(single_displacement_duration_ms);
 	}
@@ -1563,7 +1572,7 @@ namespace augs {
 
 	template <class F, class... Instances>
 	void introspect_body(
-		const resources::particle_effect_modifier* const,
+		const particle_effect_modifier* const,
 		F f,
 		Instances&&... _t_
 	) {
@@ -1575,7 +1584,7 @@ namespace augs {
 
 	template <class F, class... Instances>
 	void introspect_body(
-		const resources::emission* const,
+		const particles_emission* const,
 		F f,
 		Instances&&... _t_
 	) {

@@ -135,8 +135,8 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 			cache.recorded_existence = existence;
 			cache.emission_instances.clear();
 
-			for (auto emission : (*existence.input.effect)) {
-				emission.apply_modifier(existence.input.modifier);
+			for (auto emission : (*existence.input.effect.id)) {
+				emission.apply_modifier(existence.input.effect.modifier);
 
 				cache.emission_instances.push_back(emission_instance());
 				auto& new_emission_instance = *cache.emission_instances.rbegin();
@@ -254,8 +254,7 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 					);
 				};
 
-				if (emission.get_templates<general_particle>().size() > 0)
-				{
+				if (emission.get_templates<general_particle>().size() > 0) {
 					auto new_general = spawner(general_particle());
 					new_general.integrate(time_elapsed);
 					add_particle(emission.particle_render_template.layer, new_general);

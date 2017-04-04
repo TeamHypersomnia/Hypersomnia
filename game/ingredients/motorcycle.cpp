@@ -151,13 +151,13 @@ namespace prefabs {
 			messages::create_particle_effect effect;
 			effect.place_of_birth = spawn_transform + engine_transforms[ee].pos.rotate(spawn_transform.rotation, vec2());
 			effect.place_of_birth.rotation += engine_transforms[ee].rotation;
-			effect.input.effect = assets::particle_effect_id::ENGINE_PARTICLES;
-			effect.input.modifier.scale_amounts = 5.7f;
-			effect.input.modifier.scale_lifetimes = 0.45f;
+			effect.input.effect.id = assets::particle_effect_id::ENGINE_PARTICLES;
+			effect.input.effect.modifier.scale_amounts = 5.7f;
+			effect.input.effect.modifier.scale_lifetimes = 0.45f;
 			//effect.input.displace_source_position_within_radius = 10.f;
 			//effect.input.single_displacement_duration_ms.set(400.f, 1500.f);
 			effect.subject = front;
-			effect.input.modifier.colorize = cyan;
+			effect.input.effect.modifier.colorize = cyan;
 			effect.input.delete_entity_after_effect_lifetime = false;
 
 			const auto engine_particles = particles_existence_system().create_particle_effect_entity(world, effect);

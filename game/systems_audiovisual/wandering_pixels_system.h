@@ -17,7 +17,7 @@ struct visible_entities;
 class interpolation_system;
 
 namespace resources {
-	struct emission;
+	struct particles_emission;
 }
 
 class wandering_pixels_system {

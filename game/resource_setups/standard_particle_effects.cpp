@@ -11,7 +11,7 @@ namespace resource_setups {
 		{
 			auto& effect = get_resource_manager().create(assets::particle_effect_id::WANDERING_SMOKE);
 
-			resources::emission em;
+			particles_emission em;
 			em.min_swing_spread.set(0.5, 1);
 			em.min_swings_per_sec.set(0.3/2, 0.5/2);
 			em.max_swing_spread.set(10/2, 10/2);
@@ -54,7 +54,7 @@ namespace resource_setups {
 			auto& effect = get_resource_manager().create(assets::particle_effect_id::ENGINE_PARTICLES);
 
 			{
-				resources::emission em;
+				particles_emission em;
 				em.min_swing_spread.set(0.5, 1);
 				em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
 				em.max_swing_spread.set(10 / 2, 10 / 2);
@@ -94,7 +94,7 @@ namespace resource_setups {
 			}
 
 			{
-				resources::emission em;
+				particles_emission em;
 				//em.min_swing_spread.set(0.5, 1);
 				//em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
 				//em.max_swing_spread.set(10 / 2, 10 / 2);
@@ -141,7 +141,7 @@ namespace resource_setups {
 			auto& effect = get_resource_manager().create(assets::particle_effect_id::MUZZLE_SMOKE);
 
 			{
-				resources::emission em;
+				particles_emission em;
 				em.min_swing_spread.set(2.3, 2.5);
 				em.min_swings_per_sec.set(3.3, 3.5);
 				em.max_swing_spread.set(10, 20);
@@ -184,7 +184,7 @@ namespace resource_setups {
 			auto& effect = get_resource_manager().create(assets::particle_effect_id::EXHAUSTED_SMOKE);
 
 			{
-				resources::emission em;
+				particles_emission em;
 				em.min_swing_spread.set(0.5, 1);
 				em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
 				em.max_swing_spread.set(10 / 2, 10 / 2);
@@ -228,7 +228,7 @@ namespace resource_setups {
 		{
 			auto& effect = get_resource_manager().create(assets::particle_effect_id::CAST_CHARGING);
 
-			resources::emission em;
+			particles_emission em;
 			em.min_swing_spread.set(0.5, 1);
 			em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
 			em.max_swing_spread.set(10 / 2, 10 / 2);
@@ -327,7 +327,7 @@ namespace resource_setups {
 			auto& effect = get_resource_manager().create(assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES);
 
 			{
-				resources::emission em;
+				particles_emission em;
 				em.min_swing_spread.set(0.5, 1);
 				em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
 				em.max_swing_spread.set(10 / 2, 10 / 2);
@@ -398,7 +398,7 @@ namespace resource_setups {
 				effect.push_back(em);
 			}
 
-			resources::emission em;
+			particles_emission em;
 			em.min_swing_spread.set(0.5, 1);
 			em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
 			em.max_swing_spread.set(10 / 2, 10 / 2);
@@ -444,7 +444,7 @@ namespace resource_setups {
 			auto& effect = get_resource_manager().create(assets::particle_effect_id::CAST_SPARKLES);
 
 			{
-				resources::emission em;
+				particles_emission em;
 				em.min_swing_spread.set(0.5, 1);
 				em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
 				em.max_swing_spread.set(10 / 2, 10 / 2);
@@ -485,7 +485,7 @@ namespace resource_setups {
 			}
 
 			{
-				resources::emission em;
+				particles_emission em;
 				em.min_swing_spread.set(0.5, 1);
 				em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
 				em.max_swing_spread.set(10 / 2, 10 / 2);
@@ -571,7 +571,7 @@ namespace resource_setups {
 			auto& effect = get_resource_manager().create(assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION);
 
 			{
-				resources::emission em;
+				particles_emission em;
 				em.min_swing_spread.set(0.5, 1);
 				em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
 				em.max_swing_spread.set(10 / 2, 10 / 2);
@@ -615,7 +615,7 @@ namespace resource_setups {
 			}
 
 			{
-				resources::emission em;
+				particles_emission em;
 				em.spread_degrees = std::make_pair(100, 130);
 				em.num_of_particles_to_spawn_initially = std::make_pair(30, 120);
 				em.base_speed = std::make_pair(250+200, 800+200);
@@ -644,7 +644,7 @@ namespace resource_setups {
 		{
 			auto& effect = get_resource_manager().create(assets::particle_effect_id::PIXEL_BURST);
 
-			resources::emission em;
+			particles_emission em;
 			em.spread_degrees = std::make_pair(150, 360);
 			em.num_of_particles_to_spawn_initially = std::make_pair(30, 120);
 			em.base_speed = std::make_pair(10, 800);
@@ -669,7 +669,7 @@ namespace resource_setups {
 			effect.push_back(em);
 
 			{
-				resources::emission em;
+				particles_emission em;
 				em.min_swing_spread.set(0.5, 1);
 				em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
 				em.max_swing_spread.set(10 / 2, 10 / 2);
@@ -713,7 +713,7 @@ namespace resource_setups {
 		{
 			auto& effect = get_resource_manager().create(assets::particle_effect_id::WANDERING_PIXELS_DIRECTED);
 
-			resources::emission em;
+			particles_emission em;
 			em.spread_degrees = std::make_pair(0, 1);
 			em.particles_per_sec = std::make_pair(70, 80);
 			em.stream_lifetime_ms = std::make_pair(300, 500);
@@ -743,7 +743,7 @@ namespace resource_setups {
 		{
 			auto& effect = get_resource_manager().create(assets::particle_effect_id::WANDERING_PIXELS_SPREAD);
 
-			resources::emission em;
+			particles_emission em;
 			em.spread_degrees = std::make_pair(0, 10);
 			em.num_of_particles_to_spawn_initially = std::make_pair(30, 40);
 			em.base_speed = std::make_pair(350, 550);
@@ -776,7 +776,7 @@ namespace resource_setups {
 		{
 			auto& effect = get_resource_manager().create(assets::particle_effect_id::CONCENTRATED_WANDERING_PIXELS);
 
-			resources::emission em;
+			particles_emission em;
 			em.spread_degrees = std::make_pair(0, 1);
 			em.particles_per_sec = std::make_pair(50, 60);
 			em.stream_lifetime_ms = std::make_pair(450, 800);
@@ -806,7 +806,7 @@ namespace resource_setups {
 		{
 			auto& effect = get_resource_manager().create(assets::particle_effect_id::ROUND_ROTATING_BLOOD_STREAM);
 
-			resources::emission em;
+			particles_emission em;
 			em.spread_degrees = std::make_pair(180, 180);
 			em.particles_per_sec = std::make_pair(5, 5);
 			em.stream_lifetime_ms = std::make_pair(3000, 3000);
@@ -846,7 +846,7 @@ namespace resource_setups {
 		{
 			auto& effect = get_resource_manager().create(assets::particle_effect_id::THUNDER_REMNANTS);
 
-			resources::emission em;
+			particles_emission em;
 			em.rotation_speed = std::make_pair(0, 0);
 			em.particle_lifetime_ms = std::make_pair(100, 350);
 

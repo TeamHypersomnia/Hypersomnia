@@ -2,9 +2,7 @@
 #include "game/resources/particle_effect.h"
 
 namespace assets {
-	enum class particle_effect_id : unsigned short {
-		INVALID,
-
+	enum class particle_effect_id : unsigned {
 		HEALTH_DAMAGE_SPARKLES,
 		PIXEL_BURST,
 		PIXEL_PROJECTILE_TRACE,
@@ -26,3 +24,10 @@ namespace assets {
 }
 
 resources::particle_effect& operator*(const assets::particle_effect_id& id);
+
+struct _particle_effect_response {
+	// GEN INTROSPECTOR struct _particle_effect_response
+	assets::particle_effect_id id = assets::particle_effect_id::COUNT;
+	particle_effect_modifier modifier;
+	// END GEN INTROSPECTOR
+};

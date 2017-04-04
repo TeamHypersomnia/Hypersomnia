@@ -13,11 +13,9 @@
 
 struct particles_effect_input {
 	// GEN INTROSPECTOR struct particles_effect_input
-	assets::particle_effect_id effect = assets::particle_effect_id::INVALID;
+	_particle_effect_response effect;
 	bool delete_entity_after_effect_lifetime = true;
-	padding_byte pad;
-
-	resources::particle_effect_modifier modifier;
+	std::array<padding_byte, 3> pad;
 
 	float displace_source_position_within_radius = 0.f;
 	augs::minmax<float> single_displacement_duration_ms = augs::minmax<float>(0.f, 0.f);

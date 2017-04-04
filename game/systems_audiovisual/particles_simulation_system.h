@@ -19,7 +19,7 @@ class viewing_step;
 class interpolation_system;
 
 namespace resources {
-	struct emission;
+	struct particles_emission;
 }
 
 class particles_simulation_system {
@@ -59,7 +59,7 @@ public:
 
 		float fade_when_ms_remaining = 0.f;
 
-		resources::emission source_emission;
+		particles_emission source_emission;
 
 		void stop_streaming() {
 			enable_streaming = false;
@@ -97,7 +97,7 @@ public:
 		const vec2 position,
 		const float basic_velocity_degrees,
 		const float spread,
-		const resources::emission& emission
+		const particles_emission& emission
 	) {
 		const auto& templates = emission.get_templates<particle_type>();
 		auto new_particle = templates[rng.randval(0u, templates.size() - 1)];

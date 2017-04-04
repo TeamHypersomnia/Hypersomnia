@@ -33,7 +33,7 @@ void add_muzzle_particles(
 	messages::create_particle_effect effect;
 	effect.place_of_birth = gun.calculate_muzzle_position(weapon.get_logic_transform());
 
-	effect.input.effect = assets::particle_effect_id::MUZZLE_SMOKE;
+	effect.input.effect.id = assets::particle_effect_id::MUZZLE_SMOKE;
 	effect.subject = weapon;
 	effect.input.delete_entity_after_effect_lifetime = false;
 

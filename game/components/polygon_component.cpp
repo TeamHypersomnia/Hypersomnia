@@ -49,21 +49,20 @@ namespace components {
 
 		auto& texture_to_map = get_resource_manager().find(texture_id_to_map)->texture_maps[texture_map_type::DIFFUSE];
 
-		auto* v = vertices.data();
 		typedef const augs::vertex& vc;
 
 		auto x_pred = [](vc a, vc b) { return a.pos.x < b.pos.x; };
 		auto y_pred = [](vc a, vc b) { return a.pos.y < b.pos.y; };
 
-		vec2i lower(
-			static_cast<int>(std::min_element(v, v + vertices.size(), x_pred)->pos.x),
-			static_cast<int>(std::min_element(v, v + vertices.size(), y_pred)->pos.y)
-			);
+		const auto lower = vec2i(
+			static_cast<int>(minimum_of(vertices, x_pred).pos.x),
+			static_cast<int>(minimum_of(vertices, y_pred).pos.y)
+		);
 
-		vec2i upper(
-			static_cast<int>(std::max_element(v, v + vertices.size(), x_pred)->pos.x),
-			static_cast<int>(std::max_element(v, v + vertices.size(), y_pred)->pos.y)
-			);
+		const auto upper = vec2i(
+			static_cast<int>(maximum_of(vertices, x_pred).pos.x),
+			static_cast<int>(maximum_of(vertices, y_pred).pos.y)
+		);
 
 		if (mapping_mode == uv_mapping_mode::STRETCH) {
 			for (auto& v : vertices) {

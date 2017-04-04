@@ -223,7 +223,7 @@ namespace prefabs {
 			messages::create_particle_effect effect;
 			effect.place_of_birth = character.get_logic_transform();
 
-			effect.input.effect = assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES;
+			effect.input.effect.id = assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES;
 			effect.subject = character;
 			effect.input.delete_entity_after_effect_lifetime = false;
 

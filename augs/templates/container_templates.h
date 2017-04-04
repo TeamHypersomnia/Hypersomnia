@@ -5,7 +5,7 @@
 #include <map>
 #include <unordered_map>
 
-template< typename ContainerT, typename PredicateT >
+template <typename ContainerT, typename PredicateT >
 void erase_if(ContainerT& items, const PredicateT& predicate) {
 	for (auto it = items.begin(); it != items.end(); ) {
 		if (predicate(*it)) it = items.erase(it);
@@ -56,6 +56,26 @@ bool found_in(Container& v, const T& l) {
 template<class Container, class T>
 auto find_in(Container& v, const T& l) {
 	return std::find(v.begin(), v.end(), l);
+}
+
+template <class Container, class T>
+decltype(auto) minimum_of(const Container& v, T&& pred) {
+	return *std::min_element(v.begin(), v.end(), std::forward<T>(pred));
+}
+
+template <class Container, class T>
+decltype(auto) maximum_of(const Container& v, T&& pred) {
+	return *std::max_element(v.begin(), v.end(), std::forward<T>(pred));
+}
+
+template <class Container>
+decltype(auto) minimum_of(const Container& v) {
+	return *std::min_element(v.begin(), v.end());
+}
+
+template <class Container>
+decltype(auto) maximum_of(const Container& v) {
+	return *std::max_element(v.begin(), v.end());
 }
 
 template<class A, class B>

@@ -163,8 +163,8 @@ void perform_spell_logic(
 		messages::create_particle_effect burst;
 		burst.subject = caster;
 		burst.place_of_birth = caster_transform;
-		burst.input.effect = assets::particle_effect_id::CAST_SPARKLES;
-		burst.input.modifier.colorize = appearance.border_col;
+		burst.input.effect.id = assets::particle_effect_id::CAST_SPARKLES;
+		burst.input.effect.modifier.colorize = appearance.border_col;
 		
 		particles_existence_system().create_particle_effect_entity(cosmos, burst).add_standard_components();
 	};
@@ -173,10 +173,10 @@ void perform_spell_logic(
 		messages::create_particle_effect burst;
 		burst.subject = caster;
 		burst.place_of_birth = caster_transform;
-		burst.input.effect = assets::particle_effect_id::CAST_CHARGING;
-		burst.input.modifier.colorize = col;
-		burst.input.modifier.scale_lifetimes = 1.3f;
-		burst.input.modifier.homing_target = caster;
+		burst.input.effect.id = assets::particle_effect_id::CAST_CHARGING;
+		burst.input.effect.modifier.colorize = col;
+		burst.input.effect.modifier.scale_lifetimes = 1.3f;
+		burst.input.effect.modifier.homing_target = caster;
 
 		particles_existence_system().create_particle_effect_entity(cosmos, burst).add_standard_components();
 	};
