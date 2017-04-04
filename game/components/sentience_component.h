@@ -11,6 +11,7 @@
 #include "game/enums/spell_type.h"
 
 #include "game/assets/sound_buffer_id.h"
+#include "game/assets/particle_effect_id.h"
 
 #include "game/components/transform_component.h"
 
@@ -54,6 +55,8 @@ namespace components {
 
 		sound_response health_decrease_sound_response;
 		sound_response death_sound_response;
+
+		_particle_effect_response health_decrease_particle_effect_response;
 
 		// END GEN INTROSPECTOR
 

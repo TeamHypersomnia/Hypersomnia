@@ -12,7 +12,6 @@
 
 #include "game/components/rotation_copying_component.h"
 #include "game/components/movement_component.h"
-#include "game/components/particle_effect_response_component.h"
 #include "game/components/particles_existence_component.h"
 #include "game/components/rigid_body_component.h"
 #include "game/components/transform_component.h"

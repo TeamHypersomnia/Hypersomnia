@@ -3,12 +3,10 @@
 #include "game/transcendental/entity_handle.h"
 
 #include "game/assets/particle_effect_id.h"
-#include "game/assets/particle_effect_response_id.h"
 
 #include "game/components/damage_component.h"
 #include "game/components/item_component.h"
 #include "game/components/melee_component.h"
-#include "game/components/particle_effect_response_component.h"
 
 #include "game/enums/entity_name.h"
 
@@ -36,9 +34,6 @@ namespace prefabs {
 		damage.constrain_distance = false;
 		damage.constrain_lifetime = false;
 
-		auto& response = machete += components::particle_effect_response{ assets::particle_effect_response_id::SWINGING_MELEE_WEAPON_RESPONSE };
-		response.modifier.colorize = cyan;
-		
 		machete.add_standard_components();
 
 		return machete;

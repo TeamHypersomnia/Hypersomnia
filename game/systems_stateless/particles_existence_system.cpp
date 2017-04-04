@@ -91,194 +91,128 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 
 	for (const auto& g : gunshots) {
 		for (auto& r : g.spawned_rounds) {
-			const auto& round_response = cosmos[r].get<components::particle_effect_response>();
-			const auto& round_response_map = *round_response.response;
+			{
+				particle_effect_input burst;
+				burst.effect = cosmos[r].get<components::damage>().muzzle_leave_particle_effect_response;
 
-			messages::create_particle_effect burst;
-			burst.place_of_birth = g.muzzle_transform;
-			burst.subject = g.subject;
-			burst.input.effect.id = round_response_map.at(particle_effect_response_type::MUZZLE_LEAVE_EXPLOSION);
-			burst.input.effect.modifier = round_response.modifier;
+				burst.create_particle_effect_entity(
+					cosmos,
+					g.muzzle_transform,
+					g.subject
+				).add_standard_components();
+			}
 
-			step.transient.messages.post(burst);
+			{
+				particle_effect_input particle_trace;
+				particle_trace.effect = cosmos[r].get<components::damage>().bullet_trace_particle_effect_response;
 
-			burst.place_of_birth = cosmos[r].get_logic_transform();
-			burst.place_of_birth.rotation += 180;
-			burst.subject = r;
-			burst.input.effect.id = round_response_map.at(particle_effect_response_type::PROJECTILE_TRACE);
-			burst.input.effect.modifier = round_response.modifier;
+				auto place_of_birth = cosmos[r].get_logic_transform();
+				place_of_birth.rotation += 180;
 
-			const auto trace = create_particle_effect_entity(cosmos, burst);
-			trace.add_standard_components();
+				particle_trace.create_particle_effect_entity(
+					cosmos,
+					place_of_birth,
+					r
+				).add_standard_components();
+			}
 		}
 
-		for (const auto& s : g.spawned_shells) {
-			const auto& shell_response = cosmos[s].get<components::particle_effect_response>();
-			const auto& shell_response_map = *shell_response.response;
+		const auto shell = cosmos[g.spawned_shell];
 
-			messages::create_particle_effect burst;
-			burst.place_of_birth = cosmos[s].get_logic_transform();
-			burst.place_of_birth.rotation += 180;
-			burst.subject = s;
-			burst.input.effect.id = shell_response_map.at(particle_effect_response_type::PROJECTILE_TRACE);
-			burst.input.effect.modifier = shell_response.modifier;
+		if (shell.alive()) {
+			particle_effect_input burst;
+			burst.effect = g.catridge_definition.shell_trace_particle_effect_response;
 
-			step.transient.messages.post(burst);
+			auto place_of_birth = shell.get_logic_transform();
+			place_of_birth.rotation += 180;
+
+			burst.create_particle_effect_entity(
+				cosmos,
+				place_of_birth,
+				shell
+			).add_standard_components();
 		}
 	}
 
 	for (const auto& d : damages) {
 		if (d.inflictor_destructed) {
-			const auto& response = cosmos[d.inflictor].get<components::particle_effect_response>();
-			const auto& response_map = *response.response;
+			const auto inflictor = cosmos[d.inflictor];
 
-			messages::create_particle_effect burst;
-			burst.subject = d.subject;
-			burst.place_of_birth.pos = d.point_of_impact;
+			particle_effect_input burst;
+			
+			auto place_of_birth = components::transform(d.point_of_impact);
 
 			if (d.amount > 0) {
-				burst.place_of_birth.rotation = (-d.impact_velocity).degrees();
+				place_of_birth.rotation = (-d.impact_velocity).degrees();
 			}
 			else {
-				burst.place_of_birth.rotation = (d.impact_velocity).degrees();
+				place_of_birth.rotation = (d.impact_velocity).degrees();
 			}
 
-			burst.input.effect.id = response_map.at(particle_effect_response_type::DESTRUCTION_EXPLOSION);
-			burst.input.effect.modifier = response.modifier;
+			burst.effect = inflictor.get<components::damage>().destruction_particle_effect_response;
 
-			step.transient.messages.post(burst);
+			burst.create_particle_effect_entity(
+				cosmos,
+				place_of_birth,
+				d.subject
+			).add_standard_components();
 		}
 	}
 
 	for (const auto& h : healths) {
-		const auto& response = cosmos[h.subject].get<components::particle_effect_response>();
-		const auto& response_map = *response.response;
-
 		const auto subject = cosmos[h.subject];
 		const auto& sentience = subject.get<components::sentience>();
 		const auto particles_entity = cosmos[sentience.health_damage_particles];
 		auto& existence = particles_entity.get<components::particles_existence>();
 
-		messages::create_particle_effect burst;
-		burst.subject = h.subject;
-		burst.place_of_birth.pos = h.point_of_impact;
-		burst.place_of_birth.pos = cosmos[h.subject].get_logic_transform().pos;
-		burst.place_of_birth.rotation = (h.impact_velocity).degrees();
-		burst.input = existence.input;
-		burst.input.effect.modifier = response.modifier;
+		particle_effect_input burst = existence.input;
 
+		auto place_of_birth = components::transform(h.point_of_impact);
+
+		place_of_birth.pos = cosmos[h.subject].get_logic_transform().pos;
+		place_of_birth.rotation = (h.impact_velocity).degrees();
+		
 		if (h.target == messages::health_event::target_type::HEALTH) {
-			if (h.special_result == messages::health_event::result_type::DEATH) {
-				burst.input.effect.id = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
-				burst.input.effect.modifier.scale_amounts = 0.6f;
-				burst.input.effect.modifier.scale_lifetimes = 1.25f;
-				burst.input.effect.modifier.colorize = red;
-				burst.input.effect.modifier.homing_target = h.subject;
-			}
-			else if (h.effective_amount > 0) {
-				burst.input.effect.id = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
-				burst.input.effect.modifier.colorize = red;
-				burst.input.effect.modifier.scale_amounts = h.effective_amount/100.f;// (1.25f + h.ratio_effective_to_maximum)*(1.25f + h.ratio_effective_to_maximum);
-				burst.input.effect.modifier.scale_lifetimes = 1.25f + h.effective_amount / 100.f;
-				burst.input.effect.modifier.homing_target = h.subject;
-			}
+			const auto& sentience = subject.get<components::sentience>();
 
-			particles_existence_system().create_particle_effect_components(
-				particles_entity.get<components::transform>(),
-				existence,
-				particles_entity.get<components::position_copying>(),
-				cosmos,
-				burst
-			);
+			if (h.effective_amount > 0) {
+				burst.effect = sentience.health_decrease_particle_effect_response;
 
+				if (h.special_result == messages::health_event::result_type::DEATH) {
+					burst.effect.modifier.scale_amounts = 0.6f;
+					burst.effect.modifier.scale_lifetimes = 1.25f;
+					burst.effect.modifier.colorize = red;
+					burst.effect.modifier.homing_target = h.subject;
+				}
+				else {
+					burst.effect.modifier.colorize = red;
+					burst.effect.modifier.scale_amounts = h.effective_amount / 100.f;// (1.25f + h.ratio_effective_to_maximum)*(1.25f + h.ratio_effective_to_maximum);
+					burst.effect.modifier.scale_lifetimes = 1.25f + h.effective_amount / 100.f;
+					burst.effect.modifier.homing_target = h.subject;
+				}
+
+				burst.create_particle_effect_components(
+					particles_entity.get<components::transform>(),
+					existence,
+					particles_entity.get<components::position_copying>(),
+					cosmos,
+					place_of_birth,
+					h.subject
+				);
+			}
+			
 			components::particles_existence::activate(particles_entity);
 		}
 	}
 
-	for (const auto& s : swings) {
-		const auto& response = cosmos[s.subject].get<components::particle_effect_response>();
-		const auto& response_map = *response.response;
-
-		messages::create_particle_effect burst;
-		burst.subject = s.subject;
-		burst.place_of_birth = s.origin_transform;
-		burst.input.effect.id = response_map.at(particle_effect_response_type::PARTICLES_WHILE_SWINGING);
-		burst.input.effect.modifier = response.modifier;
-
-		step.transient.messages.post(burst);
-	}
-
 	for (const auto& e : exhausted_casts) {
-		messages::create_particle_effect burst;
-		burst.subject = e.subject;
-		burst.place_of_birth = e.transform;
-		burst.input.effect.id = assets::particle_effect_id::EXHAUSTED_SMOKE;
+		particle_effect_input burst;
+		burst.effect.id = assets::particle_effect_id::EXHAUSTED_SMOKE;
 
-		step.transient.messages.post(burst);
+		burst.create_particle_effect_entity(
+			step.cosm,
+			e.transform,
+			e.subject
+		).add_standard_components();
 	}
-}
-
-void particles_existence_system::create_particle_effect_components(
-	components::transform& out_transform,
-	components::particles_existence& out_existence,
-	components::position_copying& out_copying,
-	cosmos& cosmos,
-	const messages::create_particle_effect it
-) const {
-	out_transform = it.place_of_birth;
-
-	out_existence.input = it.input;
-	out_existence.time_of_birth = cosmos.get_timestamp();
-	out_existence.time_of_last_displacement = cosmos.get_timestamp();
-	out_existence.current_displacement_duration_bound_ms = 0;
-
-	const float duration_ms = maximum_of(
-		*it.input.effect.id, 
-		[](const auto& a, const auto& b) {
-			return a.stream_lifetime_ms.second < b.stream_lifetime_ms.second;
-		}
-	).stream_lifetime_ms.second;
-
-	out_existence.max_lifetime_in_steps = static_cast<unsigned>(duration_ms / cosmos.get_fixed_delta().in_milliseconds()) + 1u;
-
-	const auto chased_subject = cosmos[it.subject];
-
-	if (chased_subject.alive()) {
-		out_copying = components::position_copying::configure_chasing(
-			chased_subject,
-			it.place_of_birth,
-			components::position_copying::chasing_configuration::RELATIVE_ORBIT
-		);
-	}
-}
-
-entity_handle particles_existence_system::create_particle_effect_entity(
-	cosmos& cosmos, 
-	const messages::create_particle_effect it
-) const {
-	const entity_handle new_stream_entity = cosmos.create_entity("particle_stream");
-	
-	create_particle_effect_components(
-		new_stream_entity += components::transform(),
-		new_stream_entity += components::particles_existence(),
-		new_stream_entity += components::position_copying(),
-		cosmos,
-		it
-	);
-
-	return new_stream_entity;
-}
-
-void particles_existence_system::create_particle_effects(const logic_step step) const {
-	using namespace components;
-	using namespace messages;
-
-	auto& cosmos = step.cosm;
-	auto& events = step.transient.messages.get_queue<create_particle_effect>();
-
-	for (auto& it : events) {
-		create_particle_effect_entity(cosmos, it).add_standard_components();
-	}
-
-	events.clear();
 }

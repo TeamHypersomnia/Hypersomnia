@@ -9,7 +9,6 @@
 #include "game/assets/animation_id.h"
 #include "game/assets/animation_response_id.h"
 #include "game/assets/particle_effect_id.h"
-#include "game/assets/particle_effect_response_id.h"
 #include "game/assets/behaviour_tree_id.h"
 #include "game/assets/tile_layer_id.h"
 #include "game/assets/sound_buffer_id.h"
@@ -18,7 +17,6 @@
 #include "game/resources/animation.h"
 #include "game/resources/animation_response.h"
 #include "game/resources/particle_effect.h"
-#include "game/resources/particle_effect_response.h"
 #include "game/resources/behaviour_tree.h"
 #include "game/resources/tile_layer.h"
 
@@ -115,7 +113,6 @@ namespace resources {
 		resources::animation_response& create(assets::animation_response_id at);
 
 		particle_effect& create(assets::particle_effect_id at);
-		particle_effect_response& create(assets::particle_effect_response_id at);
 
 		augs::graphics::shader& create(assets::shader_id, std::string filename, augs::graphics::shader::type);
 		augs::graphics::shader_program& create(assets::program_id, assets::shader_id vertex, assets::shader_id fragment);
@@ -127,7 +124,6 @@ namespace resources {
 		animation* find(assets::animation_id);
 		animation_response* find(assets::animation_response_id);
 		particle_effect* find(assets::particle_effect_id);
-		particle_effect_response* find(assets::particle_effect_response_id);
 		behaviour_tree* find(assets::behaviour_tree_id);
 		tile_layer* find(assets::tile_layer_id);
 		augs::sound_buffer* manager::find(const assets::sound_buffer_id id);
@@ -141,7 +137,6 @@ namespace resources {
 		augs::enum_associative_array<assets::physical_texture_id, augs::graphics::texture> physical_textures;
 
 		augs::enum_associative_array<assets::particle_effect_id, particle_effect> particle_effects;
-		augs::enum_associative_array<assets::particle_effect_response_id, particle_effect_response> particle_effect_responses;
 		augs::enum_associative_array<assets::animation_response_id, animation_response> animation_responses;
 		augs::enum_associative_array<assets::animation_id, animation> animations;
 		

@@ -148,19 +148,24 @@ namespace prefabs {
 
 		for(int ee = 0; ee < 4; ++ee)
 		{
-			messages::create_particle_effect effect;
-			effect.place_of_birth = spawn_transform + engine_transforms[ee].pos.rotate(spawn_transform.rotation, vec2());
-			effect.place_of_birth.rotation += engine_transforms[ee].rotation;
-			effect.input.effect.id = assets::particle_effect_id::ENGINE_PARTICLES;
-			effect.input.effect.modifier.scale_amounts = 5.7f;
-			effect.input.effect.modifier.scale_lifetimes = 0.45f;
+			particle_effect_input effect;
+			
+			auto place_of_birth = spawn_transform + engine_transforms[ee].pos.rotate(spawn_transform.rotation, vec2());
+			place_of_birth.rotation += engine_transforms[ee].rotation;
+			
+			effect.effect.id = assets::particle_effect_id::ENGINE_PARTICLES;
+			effect.effect.modifier.scale_amounts = 5.7f;
+			effect.effect.modifier.scale_lifetimes = 0.45f;
 			//effect.input.displace_source_position_within_radius = 10.f;
 			//effect.input.single_displacement_duration_ms.set(400.f, 1500.f);
-			effect.subject = front;
-			effect.input.effect.modifier.colorize = cyan;
-			effect.input.delete_entity_after_effect_lifetime = false;
+			effect.effect.modifier.colorize = cyan;
+			effect.delete_entity_after_effect_lifetime = false;
 
-			const auto engine_particles = particles_existence_system().create_particle_effect_entity(world, effect);
+			const auto engine_particles = effect.create_particle_effect_entity(
+				world,
+				place_of_birth,
+				front
+			);
 
 			auto& existence = engine_particles.get<components::particles_existence>();
 			existence.distribute_within_segment_of_length = 35.f * 0.8f;

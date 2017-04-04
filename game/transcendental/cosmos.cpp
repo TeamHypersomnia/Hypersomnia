@@ -420,8 +420,6 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	rotation_copying_system().update_rotations(step.cosm);
 	position_copying_system().update_transforms(step);
 
-	//particles_simulation_system().create_particle_effects(step);
-
 	trace_system().lengthen_sprites_of_traces(step);
 
 	crosshair_system().generate_crosshair_intents(step);
@@ -452,7 +450,6 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	driver_system().release_drivers_due_to_ending_contact_with_wheel(step);
 
 	particles_existence_system().game_responses_to_particle_effects(step);
-	particles_existence_system().create_particle_effects(step);
 
 	sound_existence_system().create_sounds_from_game_events(step);
 	// gui_system().translate_game_events_for_hud(step);

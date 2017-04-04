@@ -186,21 +186,25 @@ namespace prefabs {
 				const vec2 engine_size = get_resource_manager().find(assets::game_image_id::TRUCK_ENGINE)->get_size();
 
 				{
-					messages::create_particle_effect effect;
-					effect.place_of_birth = this_engine_transform;
+					particle_effect_input input;
 					
-					if (i == 0 || i == 1) {
-						effect.place_of_birth.rotation += 180;
-					}
-					
-					effect.input.effect.id = assets::particle_effect_id::ENGINE_PARTICLES;
-					effect.subject = front;
-					effect.input.effect.modifier.colorize = cyan;
-					effect.input.effect.modifier.scale_amounts = 6.7f;
-					effect.input.effect.modifier.scale_lifetimes = 0.45f;
-					effect.input.delete_entity_after_effect_lifetime = false;
+					input.effect.id = assets::particle_effect_id::ENGINE_PARTICLES;
+					input.effect.modifier.colorize = cyan;
+					input.effect.modifier.scale_amounts = 6.7f;
+					input.effect.modifier.scale_lifetimes = 0.45f;
+					input.delete_entity_after_effect_lifetime = false;
 
-					const auto engine_particles = particles_existence_system().create_particle_effect_entity(world, effect);
+					auto place_of_birth = this_engine_transform;
+
+					if (i == 0 || i == 1) {
+						place_of_birth.rotation += 180;
+					}
+
+					const auto engine_particles = input.create_particle_effect_entity(
+						world, 
+						place_of_birth,
+						front
+					);
 
 					auto& existence = engine_particles.get<components::particles_existence>();
 					existence.distribute_within_segment_of_length = engine_size.y;

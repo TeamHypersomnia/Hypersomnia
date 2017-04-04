@@ -5,7 +5,7 @@ enum class child_entity_name {
 	CROSSHAIR_RECOIL_BODY,
 
 	CATRIDGE_SHELL,
-	CATRIDGE_ROUND,
+	CATRIDGE_BULLET,
 
 	COUNT
 };

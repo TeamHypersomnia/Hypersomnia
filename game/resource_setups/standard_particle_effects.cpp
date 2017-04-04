@@ -869,40 +869,5 @@ namespace resource_setups {
 
 			effect.push_back(em);
 		}
-
-		{
-			auto& response = get_resource_manager().create(assets::particle_effect_response_id::HEALING_PROJECTILE_RESPONSE);
-
-			response[particle_effect_response_type::MUZZLE_LEAVE_EXPLOSION] = assets::particle_effect_id::WANDERING_PIXELS_SPREAD;
-			response[particle_effect_response_type::DESTRUCTION_EXPLOSION] = assets::particle_effect_id::WANDERING_PIXELS_SPREAD;
-			response[particle_effect_response_type::PROJECTILE_TRACE] = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
-		}
-
-		{
-			auto& response = get_resource_manager().create(assets::particle_effect_response_id::ELECTRIC_PROJECTILE_RESPONSE);
-
-			response[particle_effect_response_type::MUZZLE_LEAVE_EXPLOSION] = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
-			response[particle_effect_response_type::DESTRUCTION_EXPLOSION] = assets::particle_effect_id::PIXEL_BURST;
-			response[particle_effect_response_type::PROJECTILE_TRACE] = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
-		}
-
-		{
-			auto& response = get_resource_manager().create(assets::particle_effect_response_id::SWINGING_MELEE_WEAPON_RESPONSE);
-
-			response[particle_effect_response_type::PARTICLES_WHILE_SWINGING] = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
-			response[particle_effect_response_type::DESTRUCTION_EXPLOSION] = assets::particle_effect_id::PIXEL_BURST;
-		}
-
-		{
-			auto& response = get_resource_manager().create(assets::particle_effect_response_id::SHELL_RESPONSE);
-
-			response[particle_effect_response_type::PROJECTILE_TRACE] = assets::particle_effect_id::CONCENTRATED_WANDERING_PIXELS;
-		}
-
-		{
-			auto& response = get_resource_manager().create(assets::particle_effect_response_id::CHARACTER_RESPONSE);
-
-			response[particle_effect_response_type::DAMAGE_RECEIVED] = assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES;
-		}
 	}
 }

@@ -111,7 +111,7 @@ std::wstring get_bbcoded_entity_properties(const const_entity_handle id) {
 	std::wstring out;
 
 	if (id.has<components::catridge>()) {
-		const auto& bullet_round = id[child_entity_name::CATRIDGE_ROUND];
+		const auto& bullet_round = id[child_entity_name::CATRIDGE_BULLET];
 
 		if (bullet_round.alive()) {
 			out = result.str() + get_bbcoded_entity_properties(bullet_round);

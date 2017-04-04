@@ -160,25 +160,31 @@ void perform_spell_logic(
 	const auto appearance = get_spell_appearance(spell);
 	
 	const auto ignite_sparkle_particles = [&]() {
-		messages::create_particle_effect burst;
-		burst.subject = caster;
-		burst.place_of_birth = caster_transform;
-		burst.input.effect.id = assets::particle_effect_id::CAST_SPARKLES;
-		burst.input.effect.modifier.colorize = appearance.border_col;
+		particle_effect_input burst;
+
+		burst.effect.id = assets::particle_effect_id::CAST_SPARKLES;
+		burst.effect.modifier.colorize = appearance.border_col;
 		
-		particles_existence_system().create_particle_effect_entity(cosmos, burst).add_standard_components();
+		burst.create_particle_effect_entity(
+			cosmos, 
+			caster_transform,
+			caster
+		).add_standard_components();
 	};
 
 	const auto ignite_charging_particles = [&](const rgba col) {
-		messages::create_particle_effect burst;
-		burst.subject = caster;
-		burst.place_of_birth = caster_transform;
-		burst.input.effect.id = assets::particle_effect_id::CAST_CHARGING;
-		burst.input.effect.modifier.colorize = col;
-		burst.input.effect.modifier.scale_lifetimes = 1.3f;
-		burst.input.effect.modifier.homing_target = caster;
+		particle_effect_input burst;
 
-		particles_existence_system().create_particle_effect_entity(cosmos, burst).add_standard_components();
+		burst.effect.id = assets::particle_effect_id::CAST_CHARGING;
+		burst.effect.modifier.colorize = col;
+		burst.effect.modifier.scale_lifetimes = 1.3f;
+		burst.effect.modifier.homing_target = caster;
+
+		burst.create_particle_effect_entity(
+			cosmos, 
+			caster_transform,
+			caster
+		).add_standard_components();
 	};
 	
 	const auto play_sound = [&](const assets::sound_buffer_id effect, const float gain = 1.f) {
@@ -328,14 +334,18 @@ void perform_spell_logic(
 
 				ingredients::add_bullet_round_physics(energy_ball);
 
-				{
-					auto& response = energy_ball += components::particle_effect_response{ assets::particle_effect_response_id::ELECTRIC_PROJECTILE_RESPONSE };
-					response.modifier.colorize = cyan;
-				}
-
 				auto& damage = energy_ball += components::damage();
 
-				auto& trace_modifier = damage.trace_sound_response.modifier;
+				damage.destruction_particle_effect_response.id = assets::particle_effect_id::PIXEL_BURST;
+				damage.destruction_particle_effect_response.modifier.colorize = cyan;
+
+				damage.bullet_trace_particle_effect_response.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
+				damage.bullet_trace_particle_effect_response.modifier.colorize = cyan;
+
+				damage.muzzle_leave_particle_effect_response.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
+				damage.muzzle_leave_particle_effect_response.modifier.colorize = cyan;
+
+				auto& trace_modifier = damage.bullet_trace_sound_response.modifier;
 
 				trace_modifier.max_distance = 1020.f;
 				trace_modifier.reference_distance = 100.f;
@@ -343,7 +353,7 @@ void perform_spell_logic(
 				trace_modifier.repetitions = -1;
 				trace_modifier.fade_on_exit = false;
 
-				damage.trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
+				damage.bullet_trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
 				damage.destruction_sound_response.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
 
 				damage.homing_towards_hostile_strength = 1.0f;

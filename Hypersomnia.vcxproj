@@ -1355,7 +1355,6 @@
     <ClInclude Include="game\assets\behaviour_tree_id.h" />
     <ClInclude Include="game\assets\font_id.h" />
     <ClInclude Include="game\assets\particle_effect_id.h" />
-    <ClInclude Include="game\assets\particle_effect_response_id.h" />
     <ClInclude Include="game\assets\program_id.h" />
     <ClInclude Include="game\assets\shader_id.h" />
     <ClInclude Include="game\assets\game_image_id.h" />
@@ -1379,7 +1378,6 @@
     <ClInclude Include="game\components\gun_component.h" />
     <ClInclude Include="game\components\rotation_copying_component.h" />
     <ClInclude Include="game\components\movement_component.h" />
-    <ClInclude Include="game\components\particle_effect_response_component.h" />
     <ClInclude Include="game\components\particles_existence_component.h" />
     <ClInclude Include="game\components\pathfinding_component.h" />
     <ClInclude Include="game\components\polygon_component.h" />
@@ -1429,7 +1427,6 @@
     <ClInclude Include="game\resources\animation_response.h" />
     <ClInclude Include="game\resources\manager.h" />
     <ClInclude Include="game\resources\particle_effect.h" />
-    <ClInclude Include="game\resources\particle_effect_response.h" />
     <ClInclude Include="game\types_specification\all_messages_declaration.h" />
     <ClInclude Include="game\types_specification\all_messages_includes.h" />
     <ClInclude Include="game\types_specification\all_systems_declaration.h" />

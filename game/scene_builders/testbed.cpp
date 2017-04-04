@@ -572,13 +572,16 @@ namespace scene_builders {
 				l.add_standard_components();
 			}
 
-			messages::create_particle_effect effect;
-			effect.place_of_birth = components::transform(-164, 500, 0);
-			effect.input.effect.id = assets::particle_effect_id::WANDERING_SMOKE;
-			effect.input.displace_source_position_within_radius = 500.f;
-			effect.input.single_displacement_duration_ms.set(400.f, 1500.f);
+			particle_effect_input effect;
+			effect.effect.id = assets::particle_effect_id::WANDERING_SMOKE;
+			effect.displace_source_position_within_radius = 500.f;
+			effect.single_displacement_duration_ms.set(400.f, 1500.f);
 
-			particles_existence_system().create_particle_effect_entity(world, effect).add_standard_components();
+			effect.create_particle_effect_entity(
+				world, 
+				components::transform(-164, 500, 0),
+				entity_id()
+			).add_standard_components();
 
 			{
 				const auto e = world.create_entity("tiled_floor");

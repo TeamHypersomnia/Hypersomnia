@@ -118,7 +118,7 @@ maybe_const_ref_t<C, child_entity_id> typename basic_relations_mixin<C, D>::get_
 	case child_entity_name::CHARACTER_CROSSHAIR:
 		return self.get<components::sentience>().character_crosshair;
 
-	case child_entity_name::CATRIDGE_ROUND:
+	case child_entity_name::CATRIDGE_BULLET:
 		return self.get<components::catridge>().round;
 
 	case child_entity_name::CATRIDGE_SHELL:

@@ -43,7 +43,7 @@ struct item_slot_mounting_operation;
 struct light_value_variation;
 struct light_attenuation;
 struct movement_subscribtion;
-struct particles_effect_input;
+struct particle_effect_input;
 struct sound_effect_input;
 struct friction_connection;
 struct convex_poly_destruction_scar;
@@ -152,7 +152,6 @@ namespace components {
 	struct movement;
 	struct name;
 	struct particles_existence;
-	struct particle_effect_response;
 	struct physical_relations;
 	struct polygon;
 	struct position_copying;
@@ -619,6 +618,8 @@ namespace augs {
 	) {
 		FIELD(shell);
 		FIELD(round);
+
+		FIELD(shell_trace_particle_effect_response);
 	}
 
 	template <class F, class... Instances>
@@ -700,8 +701,12 @@ namespace augs {
 		
 		FIELD(trace_sound);
 
-		FIELD(trace_sound_response);
+		FIELD(bullet_trace_sound_response);
 		FIELD(destruction_sound_response);
+
+		FIELD(muzzle_leave_particle_effect_response);
+		FIELD(bullet_trace_particle_effect_response);
+		FIELD(destruction_particle_effect_response);
 
 		FIELD(saved_point_of_impact_before_death);
 	}
@@ -1042,7 +1047,7 @@ namespace augs {
 
 	template <class F, class... Instances>
 	void introspect_body(
-		const particles_effect_input* const,
+		const particle_effect_input* const,
 		F f,
 		Instances&&... _t_
 	) {
@@ -1069,16 +1074,6 @@ namespace augs {
 		FIELD(max_lifetime_in_steps);
 
 		FIELD(distribute_within_segment_of_length);
-	}
-
-	template <class F, class... Instances>
-	void introspect_body(
-		const components::particle_effect_response* const,
-		F f,
-		Instances&&... _t_
-	) {
-		FIELD(response);
-		FIELD(modifier);
 	}
 
 	template <class F, class... Instances>
@@ -1242,6 +1237,8 @@ namespace augs {
 
 		FIELD(health_decrease_sound_response);
 		FIELD(death_sound_response);
+
+		FIELD(health_decrease_particle_effect_response);
 
 	}
 

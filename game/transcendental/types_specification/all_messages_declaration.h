@@ -14,7 +14,6 @@ namespace messages {
 	struct animation_message;
 	struct movement_response;
 	struct collision_message;
-	struct create_particle_effect;
 	struct gunshot_response;
 	struct crosshair_intent_message;
 	struct trigger_hit_confirmation_message;
@@ -40,7 +39,6 @@ typedef augs::storage_for_message_queues <
 	messages::animation_message,
 	messages::movement_response,
 	messages::collision_message,
-	messages::create_particle_effect,
 	messages::gunshot_response,
 	messages::crosshair_intent_message,
 	messages::trigger_hit_confirmation_message,

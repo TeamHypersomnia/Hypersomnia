@@ -128,7 +128,7 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 			auto& damage = subject.get<components::damage>();
 
 			sound_effect_input in;
-			in.effect = damage.trace_sound_response;
+			in.effect = damage.bullet_trace_sound_response;
 
 			damage.trace_sound = in.create_sound_effect_entity(
 				cosmos,

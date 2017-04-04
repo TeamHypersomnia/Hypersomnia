@@ -15,7 +15,6 @@ namespace components {
 	struct gun;
 	struct rotation_copying;
 	struct movement;
-	struct particle_effect_response;
 	struct particles_existence;
 	struct pathfinding;
 	struct rigid_body;
@@ -67,7 +66,6 @@ struct put_all_components_into {
 		components::gun,
 		components::rotation_copying,
 		components::movement,
-		components::particle_effect_response,
 		components::particles_existence,
 		//components::pathfinding,
 		components::rigid_body,

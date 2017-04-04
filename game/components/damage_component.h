@@ -2,6 +2,7 @@
 #include "augs/math/vec2.h"
 
 #include "game/assets/sound_buffer_id.h"
+#include "game/assets/particle_effect_id.h"
 
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
@@ -49,8 +50,12 @@ namespace components {
 		
 		child_entity_id trace_sound;
 
-		sound_response trace_sound_response;
+		sound_response bullet_trace_sound_response;
 		sound_response destruction_sound_response;
+
+		_particle_effect_response muzzle_leave_particle_effect_response;
+		_particle_effect_response bullet_trace_particle_effect_response;
+		_particle_effect_response destruction_particle_effect_response;
 
 		vec2 saved_point_of_impact_before_death;
 		// END GEN INTROSPECTOR

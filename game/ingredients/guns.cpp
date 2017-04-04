@@ -6,7 +6,6 @@
 #include "game/components/name_component.h"
 #include "game/components/trace_component.h"
 #include "game/components/sound_existence_component.h"
-#include "game/components/particle_effect_response_component.h"
 #include "game/components/catridge_component.h"
 
 #include "game/messages/create_particle_effect.h"
@@ -30,14 +29,17 @@ void add_muzzle_particles(
 	components::gun& gun, 
 	cosmos& cosmos
 ) {
-	messages::create_particle_effect effect;
-	effect.place_of_birth = gun.calculate_muzzle_position(weapon.get_logic_transform());
+	particle_effect_input effect;
+	const auto place_of_birth = gun.calculate_muzzle_position(weapon.get_logic_transform());
 
-	effect.input.effect.id = assets::particle_effect_id::MUZZLE_SMOKE;
-	effect.subject = weapon;
-	effect.input.delete_entity_after_effect_lifetime = false;
+	effect.effect.id = assets::particle_effect_id::MUZZLE_SMOKE;
+	effect.delete_entity_after_effect_lifetime = false;
 
-	const auto engine = particles_existence_system().create_particle_effect_entity(cosmos, effect);
+	const auto engine = effect.create_particle_effect_entity(
+		cosmos, 
+		place_of_birth,
+		weapon
+	);
 
 	engine.add_standard_components();
 
@@ -198,7 +200,10 @@ namespace prefabs {
 			item.charges = charges;
 			item.stackable = true;
 
-			red_charge += components::catridge();
+			auto& cat = red_charge += components::catridge();
+
+			cat.shell_trace_particle_effect_response.id = assets::particle_effect_id::CONCENTRATED_WANDERING_PIXELS;
+			cat.shell_trace_particle_effect_response.modifier.colorize = red;
 		}
 
 		{
@@ -207,8 +212,11 @@ namespace prefabs {
 			ingredients::add_bullet_round_physics(round_definition);
 
 			auto& damage = round_definition += components::damage();
+			damage.impulse_upon_hit = 15000.f;
+			damage.impulse_multiplier_against_sentience = 7.f;
+			damage.amount = 3.f;
 
-			auto& trace_modifier = damage.trace_sound_response.modifier;
+			auto& trace_modifier = damage.bullet_trace_sound_response.modifier;
 
 			trace_modifier.max_distance = 1020.f;
 			trace_modifier.reference_distance = 100.f;
@@ -216,18 +224,17 @@ namespace prefabs {
 			trace_modifier.repetitions = -1;
 			trace_modifier.fade_on_exit = false;
 
-			damage.trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
+			damage.bullet_trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
 			damage.destruction_sound_response.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
 
-			damage.impulse_upon_hit = 15000.f;
-			damage.impulse_multiplier_against_sentience = 7.f;
-			damage.amount = 3.f;
+			damage.destruction_particle_effect_response.id = assets::particle_effect_id::PIXEL_BURST;
+			damage.destruction_particle_effect_response.modifier.colorize = red;
 
-			{
-				auto& response = round_definition += components::particle_effect_response();
-				response.response = assets::particle_effect_response_id::ELECTRIC_PROJECTILE_RESPONSE;
-				response.modifier.colorize = red;
-			}
+			damage.bullet_trace_particle_effect_response.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
+			damage.bullet_trace_particle_effect_response.modifier.colorize = red;
+
+			damage.muzzle_leave_particle_effect_response.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
+			damage.muzzle_leave_particle_effect_response.modifier.colorize = red;
 
 			auto& trace = round_definition += components::trace();
 			trace.max_multiplier_x = std::make_pair(0.0f, 1.2f);
@@ -238,12 +245,9 @@ namespace prefabs {
 		{
 			ingredients::add_sprite(shell_definition, pos, assets::game_image_id::RED_SHELL, white, render_layer::SMALL_DYNAMIC_BODY);
 			ingredients::add_shell_dynamic_body(shell_definition);
-
-			auto& response = shell_definition += components::particle_effect_response{ assets::particle_effect_response_id::SHELL_RESPONSE };
-			response.modifier.colorize = red;
 		}
 
-		red_charge.map_child_entity(child_entity_name::CATRIDGE_ROUND, round_definition);
+		red_charge.map_child_entity(child_entity_name::CATRIDGE_BULLET, round_definition);
 		red_charge.map_child_entity(child_entity_name::CATRIDGE_SHELL, shell_definition);
 
 		red_charge.add_standard_components();
@@ -267,7 +271,10 @@ namespace prefabs {
 			item.charges = charges;
 			item.stackable = true;
 
-			pink_charge += components::catridge();
+			auto& cat = pink_charge += components::catridge();
+
+			cat.shell_trace_particle_effect_response.id = assets::particle_effect_id::CONCENTRATED_WANDERING_PIXELS;
+			cat.shell_trace_particle_effect_response.modifier.colorize = pink;
 		}
 
 		{
@@ -276,8 +283,9 @@ namespace prefabs {
 			ingredients::add_bullet_round_physics(round_definition);
 			
 			auto& damage = round_definition += components::damage();
+			damage.impulse_upon_hit = 1000.f;
 
-			auto& trace_modifier = damage.trace_sound_response.modifier;
+			auto& trace_modifier = damage.bullet_trace_sound_response.modifier;
 
 			trace_modifier.max_distance = 1020.f;
 			trace_modifier.reference_distance = 100.f;
@@ -285,16 +293,17 @@ namespace prefabs {
 			trace_modifier.repetitions = -1;
 			trace_modifier.fade_on_exit = false;
 
-			damage.trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
+			damage.bullet_trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
 			damage.destruction_sound_response.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
 
-			damage.impulse_upon_hit = 1000.f;
+			damage.destruction_particle_effect_response.id = assets::particle_effect_id::PIXEL_BURST;
+			damage.destruction_particle_effect_response.modifier.colorize = pink;
 
-			{
-				auto& response = round_definition += components::particle_effect_response();
-				response.response = assets::particle_effect_response_id::ELECTRIC_PROJECTILE_RESPONSE;
-				response.modifier.colorize = pink;
-			}
+			damage.bullet_trace_particle_effect_response.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
+			damage.bullet_trace_particle_effect_response.modifier.colorize = pink;
+
+			damage.muzzle_leave_particle_effect_response.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
+			damage.muzzle_leave_particle_effect_response.modifier.colorize = pink;
 
 			auto& trace = round_definition += components::trace();
 			trace.max_multiplier_x = std::make_pair(0.0f, 1.2f);
@@ -305,12 +314,9 @@ namespace prefabs {
 		{
 			ingredients::add_sprite(shell_definition, pos, assets::game_image_id::PINK_SHELL, white, render_layer::SMALL_DYNAMIC_BODY);
 			ingredients::add_shell_dynamic_body(shell_definition);
-
-			auto& response = shell_definition += components::particle_effect_response{ assets::particle_effect_response_id::SHELL_RESPONSE };
-			response.modifier.colorize = pink;
 		}
 
-		pink_charge.map_child_entity(child_entity_name::CATRIDGE_ROUND, round_definition);
+		pink_charge.map_child_entity(child_entity_name::CATRIDGE_BULLET, round_definition);
 		pink_charge.map_child_entity(child_entity_name::CATRIDGE_SHELL, shell_definition);
 
 		pink_charge.add_standard_components();
@@ -333,7 +339,11 @@ namespace prefabs {
 			item.categories_for_slot_compatibility.set(item_category::SHOT_CHARGE);
 			item.charges = charges;
 			item.stackable = true;
-			cyan_charge += components::catridge();
+
+			auto& cat = cyan_charge += components::catridge();
+
+			cat.shell_trace_particle_effect_response.id = assets::particle_effect_id::CONCENTRATED_WANDERING_PIXELS;
+			cat.shell_trace_particle_effect_response.modifier.colorize = cyan;
 		}
 
 		{
@@ -341,14 +351,18 @@ namespace prefabs {
 			s.size *= vec2(2, 0.5);
 			ingredients::add_bullet_round_physics(round_definition);
 
-			{
-				auto& response = round_definition += components::particle_effect_response { assets::particle_effect_response_id::ELECTRIC_PROJECTILE_RESPONSE };
-				response.modifier.colorize = cyan;
-			}
-
 			auto& damage = round_definition += components::damage();
 
-			auto& trace_modifier = damage.trace_sound_response.modifier;
+			damage.destruction_particle_effect_response.id = assets::particle_effect_id::PIXEL_BURST;
+			damage.destruction_particle_effect_response.modifier.colorize = cyan;
+
+			damage.bullet_trace_particle_effect_response.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
+			damage.bullet_trace_particle_effect_response.modifier.colorize = cyan;
+
+			damage.muzzle_leave_particle_effect_response.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
+			damage.muzzle_leave_particle_effect_response.modifier.colorize = cyan;
+
+			auto& trace_modifier = damage.bullet_trace_sound_response.modifier;
 			
 			trace_modifier.max_distance = 1020.f;
 			trace_modifier.reference_distance = 100.f;
@@ -356,7 +370,7 @@ namespace prefabs {
 			trace_modifier.repetitions = -1;
 			trace_modifier.fade_on_exit = false;
 
-			damage.trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
+			damage.bullet_trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
 			damage.destruction_sound_response.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
 
 			auto& trace = round_definition += components::trace();
@@ -368,12 +382,9 @@ namespace prefabs {
 		{
 			ingredients::add_sprite(shell_definition, pos, assets::game_image_id::CYAN_SHELL, white, render_layer::SMALL_DYNAMIC_BODY);
 			ingredients::add_shell_dynamic_body(shell_definition);
-			
-			auto& response = shell_definition += components::particle_effect_response{ assets::particle_effect_response_id::SHELL_RESPONSE };
-			response.modifier.colorize = cyan;
 		}
 
-		cyan_charge.map_child_entity(child_entity_name::CATRIDGE_ROUND, round_definition);
+		cyan_charge.map_child_entity(child_entity_name::CATRIDGE_BULLET, round_definition);
 		cyan_charge.map_child_entity(child_entity_name::CATRIDGE_SHELL, shell_definition);
 
 		cyan_charge.add_standard_components();
@@ -404,11 +415,6 @@ namespace prefabs {
 			s.size *= vec2(2.f, 0.5f);
 			ingredients::add_bullet_round_physics(round_definition);
 
-			{
-				auto& response = round_definition += components::particle_effect_response{ assets::particle_effect_response_id::HEALING_PROJECTILE_RESPONSE };
-				response.modifier.colorize = green;
-			}
-			
 			auto& damage = round_definition += components::damage();
 			damage.amount *= -1;
 			damage.impulse_upon_hit = 0.f;
@@ -422,12 +428,9 @@ namespace prefabs {
 		{
 			ingredients::add_sprite(shell_definition, pos, assets::game_image_id::GREEN_SHELL, white, render_layer::SMALL_DYNAMIC_BODY);
 			ingredients::add_shell_dynamic_body(shell_definition);
-
-			auto& response = shell_definition += components::particle_effect_response{ assets::particle_effect_response_id::SHELL_RESPONSE };
-			response.modifier.colorize = green;
 		}
 
-		green_charge.map_child_entity(child_entity_name::CATRIDGE_ROUND, round_definition);
+		green_charge.map_child_entity(child_entity_name::CATRIDGE_BULLET, round_definition);
 		green_charge.map_child_entity(child_entity_name::CATRIDGE_SHELL, shell_definition);
 
 		green_charge.add_standard_components();
@@ -782,14 +785,18 @@ namespace prefabs {
 			auto& s = ingredients::add_sprite(round_definition, pos, assets::game_image_id::ENERGY_BALL, cyan, render_layer::FLYING_BULLETS);
 			ingredients::add_bullet_round_physics(round_definition);
 
-			{
-				auto& response = round_definition += components::particle_effect_response{ assets::particle_effect_response_id::ELECTRIC_PROJECTILE_RESPONSE };
-				response.modifier.colorize = cyan;
-			}
-
 			auto& damage = round_definition += components::damage();
 
-			auto& trace_modifier = damage.trace_sound_response.modifier;
+			damage.destruction_particle_effect_response.id = assets::particle_effect_id::PIXEL_BURST;
+			damage.destruction_particle_effect_response.modifier.colorize = cyan;
+
+			damage.bullet_trace_particle_effect_response.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
+			damage.bullet_trace_particle_effect_response.modifier.colorize = cyan;
+
+			damage.muzzle_leave_particle_effect_response.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
+			damage.muzzle_leave_particle_effect_response.modifier.colorize = cyan;
+
+			auto& trace_modifier = damage.bullet_trace_sound_response.modifier;
 
 			trace_modifier.max_distance = 1020.f;
 			trace_modifier.reference_distance = 100.f;
@@ -797,7 +804,7 @@ namespace prefabs {
 			trace_modifier.repetitions = -1;
 			trace_modifier.fade_on_exit = false;
 
-			damage.trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
+			damage.bullet_trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
 			damage.destruction_sound_response.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
 
 			damage.homing_towards_hostile_strength = 1.0f;

@@ -31,10 +31,6 @@ resources::animation_response& operator*(const assets::animation_response_id& id
 	return *get_resource_manager().find(id);
 }
 
-resources::particle_effect_response& operator*(const assets::particle_effect_response_id& id) {
-	return *get_resource_manager().find(id);
-}
-
 resources::particle_effect& operator*(const assets::particle_effect_id& id) {
 	return *get_resource_manager().find(id);
 }
@@ -93,10 +89,6 @@ namespace resources {
 
 	animation_response* manager::find(assets::animation_response_id id) {
 		return ptr_if_found(animation_responses, id);
-	}
-
-	particle_effect_response* manager::find(assets::particle_effect_response_id id) {
-		return ptr_if_found(particle_effect_responses, id);
 	}
 
 	behaviour_tree* manager::find(assets::behaviour_tree_id id) {
@@ -286,12 +278,6 @@ namespace resources {
 
 	animation_response& manager::create(assets::animation_response_id id) {
 		animation_response& resp = animation_responses[id];
-		return resp;
-	}
-
-
-	particle_effect_response& manager::create(assets::particle_effect_response_id id) {
-		auto& resp = particle_effect_responses[id];
 		return resp;
 	}
 

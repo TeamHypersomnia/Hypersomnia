@@ -3,12 +3,10 @@
 #include "game/transcendental/entity_handle.h"
 
 #include "game/assets/particle_effect_id.h"
-#include "game/assets/particle_effect_response_id.h"
 
 #include "game/components/damage_component.h"
 #include "game/components/item_component.h"
 #include "game/components/melee_component.h"
-#include "game/components/particle_effect_response_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/grenade_component.h"
 

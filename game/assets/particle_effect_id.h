@@ -19,6 +19,7 @@ namespace assets {
 		CAST_CHARGING,
 		EXHAUSTED_SMOKE,
 		THUNDER_REMNANTS,
+
 		COUNT
 	};
 }

@@ -2,7 +2,6 @@
 #include <array>
 #include "game/enums/render_layer.h"
 
-#include "game/components/particle_effect_response_component.h"
 #include "game/components/particles_existence_component.h"
 #include "game/transcendental/entity_handle_declaration.h"
 

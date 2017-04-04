@@ -19,11 +19,9 @@
 #include "game/detail/gui/character_gui.h"
 #include "game/components/name_component.h"
 #include "game/components/sentience_component.h"
-#include "game/components/particle_effect_response_component.h"
 #include "game/components/attitude_component.h"
 #include "game/components/dynamic_tree_node_component.h"
 #include "game/components/flags_component.h"
-#include "game/assets/particle_effect_response_id.h"
 #include "game/systems_stateless/particles_existence_system.h"
 
 #include "game/enums/filters.h"
@@ -87,7 +85,6 @@ namespace ingredients {
 		auto& force_joint = e += components::force_joint();
 		auto& sentience = e += components::sentience();
 		e += components::position_copying(); // used when it is an astral body
-		auto& particle_response = e += components::particle_effect_response { assets::particle_effect_response_id::CHARACTER_RESPONSE };
 		
 		auto& attitude = e += components::attitude();
 		auto& processing = e += components::processing();
@@ -96,8 +93,9 @@ namespace ingredients {
 		attitude.parties = party_category::METROPOLIS_CITIZEN;
 		attitude.hostile_parties = party_category::RESISTANCE_CITIZEN;
 
-		particle_response.modifier.colorize = red;
-		particle_response.modifier.scale_lifetimes = 1.5f;
+		sentience.health_decrease_particle_effect_response.id = assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES;
+		sentience.health_decrease_particle_effect_response.modifier.colorize = red;
+		sentience.health_decrease_particle_effect_response.modifier.scale_lifetimes = 1.5f;
 
 		sentience.health_decrease_sound_response.id = assets::sound_buffer_id::IMPACT;
 		sentience.death_sound_response.id = assets::sound_buffer_id::DEATH;
@@ -220,14 +218,16 @@ namespace prefabs {
 		ingredients::add_character_inventory(character);
 
 		{
-			messages::create_particle_effect effect;
-			effect.place_of_birth = character.get_logic_transform();
+			particle_effect_input effect;
+			
+			effect.effect.id = assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES;
+			effect.delete_entity_after_effect_lifetime = false;
 
-			effect.input.effect.id = assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES;
-			effect.subject = character;
-			effect.input.delete_entity_after_effect_lifetime = false;
-
-			const auto particles = particles_existence_system().create_particle_effect_entity(character.get_cosmos(), effect);
+			const auto particles = effect.create_particle_effect_entity(
+				character.get_cosmos(), 
+				character.get_logic_transform(),
+				character
+			);
 
 			particles.add_standard_components();
 			character.get<components::sentience>().health_damage_particles = particles;
