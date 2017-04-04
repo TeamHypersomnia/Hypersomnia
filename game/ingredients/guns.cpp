@@ -5,7 +5,6 @@
 #include "game/components/sprite_component.h"
 #include "game/components/name_component.h"
 #include "game/components/trace_component.h"
-#include "game/components/sound_response_component.h"
 #include "game/components/sound_existence_component.h"
 #include "game/components/particle_effect_response_component.h"
 #include "game/components/catridge_component.h"
@@ -208,6 +207,18 @@ namespace prefabs {
 			ingredients::add_bullet_round_physics(round_definition);
 
 			auto& damage = round_definition += components::damage();
+
+			auto& trace_modifier = damage.trace_sound_response.modifier;
+
+			trace_modifier.max_distance = 1020.f;
+			trace_modifier.reference_distance = 100.f;
+			trace_modifier.gain = 1.3f;
+			trace_modifier.repetitions = -1;
+			trace_modifier.fade_on_exit = false;
+
+			damage.trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
+			damage.destruction_sound_response.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
+
 			damage.impulse_upon_hit = 15000.f;
 			damage.impulse_multiplier_against_sentience = 7.f;
 			damage.amount = 3.f;
@@ -216,11 +227,6 @@ namespace prefabs {
 				auto& response = round_definition += components::particle_effect_response();
 				response.response = assets::particle_effect_response_id::ELECTRIC_PROJECTILE_RESPONSE;
 				response.modifier.colorize = red;
-			}
-
-			{
-				auto& response = round_definition += components::sound_response();
-				response.response = assets::sound_response_id::ELECTRIC_PROJECTILE_RESPONSE;
 			}
 
 			auto& trace = round_definition += components::trace();
@@ -270,17 +276,24 @@ namespace prefabs {
 			ingredients::add_bullet_round_physics(round_definition);
 			
 			auto& damage = round_definition += components::damage();
+
+			auto& trace_modifier = damage.trace_sound_response.modifier;
+
+			trace_modifier.max_distance = 1020.f;
+			trace_modifier.reference_distance = 100.f;
+			trace_modifier.gain = 1.3f;
+			trace_modifier.repetitions = -1;
+			trace_modifier.fade_on_exit = false;
+
+			damage.trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
+			damage.destruction_sound_response.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
+
 			damage.impulse_upon_hit = 1000.f;
 
 			{
 				auto& response = round_definition += components::particle_effect_response();
 				response.response = assets::particle_effect_response_id::ELECTRIC_PROJECTILE_RESPONSE;
 				response.modifier.colorize = pink;
-			}
-
-			{
-				auto& response = round_definition += components::sound_response();
-				response.response = assets::sound_response_id::ELECTRIC_PROJECTILE_RESPONSE;
 			}
 
 			auto& trace = round_definition += components::trace();
@@ -333,12 +346,19 @@ namespace prefabs {
 				response.modifier.colorize = cyan;
 			}
 
-			{
-				auto& response = round_definition += components::sound_response();
-				response.response = assets::sound_response_id::ELECTRIC_PROJECTILE_RESPONSE;
-			}
-
 			auto& damage = round_definition += components::damage();
+
+			auto& trace_modifier = damage.trace_sound_response.modifier;
+			
+			trace_modifier.max_distance = 1020.f;
+			trace_modifier.reference_distance = 100.f;
+			trace_modifier.gain = 1.3f;
+			trace_modifier.repetitions = -1;
+			trace_modifier.fade_on_exit = false;
+
+			damage.trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
+			damage.destruction_sound_response.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
+
 			auto& trace = round_definition += components::trace();
 			trace.max_multiplier_x = std::make_pair(0.0f, 1.2f);
 			trace.max_multiplier_y = std::make_pair(0.f, 0.f);
@@ -388,11 +408,6 @@ namespace prefabs {
 				auto& response = round_definition += components::particle_effect_response{ assets::particle_effect_response_id::HEALING_PROJECTILE_RESPONSE };
 				response.modifier.colorize = green;
 			}
-
-			{
-				auto& response = round_definition += components::sound_response();
-				response.response = assets::sound_response_id::ELECTRIC_PROJECTILE_RESPONSE;
-			}
 			
 			auto& damage = round_definition += components::damage();
 			damage.amount *= -1;
@@ -430,11 +445,10 @@ namespace prefabs {
 		auto& sprite = ingredients::add_sprite(weapon, pos, assets::game_image_id::ASSAULT_RIFLE, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(weapon);
 		ingredients::add_default_gun_container(weapon);
-
-		auto& response = weapon += components::sound_response();
-		response.response = assets::sound_response_id::ASSAULT_RIFLE_RESPONSE;
-
+		
 		auto& gun = weapon += components::gun();
+
+		gun.muzzle_shot_sound_response.id = assets::sound_buffer_id::ASSAULT_RIFLE_MUZZLE;
 
 		gun.action_mode = components::gun::action_type::AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(4000.f, 4000.f);
@@ -485,10 +499,10 @@ namespace prefabs {
 
 		{
 			sound_effect_input in;
-			in.effect = assets::sound_buffer_id::FIREARM_ENGINE;
-			in.modifier.repetitions = -1;
+			in.effect.id = assets::sound_buffer_id::FIREARM_ENGINE;
+			in.effect.modifier.repetitions = -1;
 			in.delete_entity_after_effect_lifetime = false;
-			const auto engine_sound = sound_existence_system().create_sound_effect_entity(cosmos, in, gun.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
+			const auto engine_sound = in.create_sound_effect_entity(cosmos, gun.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
 			engine_sound.add_standard_components();
 			gun.firing_engine_sound = engine_sound;
 			components::sound_existence::deactivate(engine_sound);
@@ -527,10 +541,13 @@ namespace prefabs {
 		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_offset.pos.set(-10, -10 + bbox.y/2);
 		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_sticking_mode = rectangle_sticking::BOTTOM;
 
-		auto& response = weapon += components::sound_response();
-		response.response = assets::sound_response_id::BILMER2000_RESPONSE;
-
 		auto& gun = weapon += components::gun();
+
+		gun.muzzle_shot_sound_response.id = assets::sound_buffer_id::BILMER2000_MUZZLE;
+
+		gun.muzzle_shot_sound_response.modifier.max_distance = 1920.f * 3.f;
+		gun.muzzle_shot_sound_response.modifier.reference_distance = 0.f;
+		gun.muzzle_shot_sound_response.modifier.gain = 1.3f;
 
 		gun.action_mode = components::gun::action_type::AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(4500.f, 4500.f);
@@ -581,10 +598,10 @@ namespace prefabs {
 
 		{
 			sound_effect_input in;
-			in.effect = assets::sound_buffer_id::FIREARM_ENGINE;
-			in.modifier.repetitions = -1;
+			in.effect.id = assets::sound_buffer_id::FIREARM_ENGINE;
+			in.effect.modifier.repetitions = -1;
 			in.delete_entity_after_effect_lifetime = false;
-			const auto engine_sound = sound_existence_system().create_sound_effect_entity(cosmos, in, gun.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
+			const auto engine_sound = in.create_sound_effect_entity(cosmos, gun.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
 			engine_sound.add_standard_components();
 			gun.firing_engine_sound = engine_sound;
 			components::sound_existence::deactivate(engine_sound);
@@ -619,10 +636,9 @@ namespace prefabs {
 		ingredients::add_see_through_dynamic_body(weapon);
 		ingredients::add_default_gun_container(weapon);
 
-		auto& response = weapon += components::sound_response();
-		response.response = assets::sound_response_id::SUBMACHINE_RESPONSE;
-
 		auto& gun = weapon += components::gun();
+
+		gun.muzzle_shot_sound_response.id = assets::sound_buffer_id::SUBMACHINE_MUZZLE;
 
 		gun.action_mode = components::gun::action_type::AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(3000.f, 3000.f);
@@ -643,10 +659,10 @@ namespace prefabs {
 
 		{
 			sound_effect_input in;
-			in.effect = assets::sound_buffer_id::FIREARM_ENGINE;
-			in.modifier.repetitions = -1;
+			in.effect.id = assets::sound_buffer_id::FIREARM_ENGINE;
+			in.effect.modifier.repetitions = -1;
 			in.delete_entity_after_effect_lifetime = false;
-			const auto engine_sound = sound_existence_system().create_sound_effect_entity(cosmos, in, gun.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
+			const auto engine_sound = in.create_sound_effect_entity(cosmos, gun.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
 			engine_sound.add_standard_components();
 			gun.firing_engine_sound = engine_sound;
 			components::sound_existence::deactivate(engine_sound);
@@ -708,14 +724,13 @@ namespace prefabs {
 
 		auto& sprite = ingredients::add_sprite(weapon, pos, assets::game_image_id::AMPLIFIER_ARM, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(weapon);
-
-		auto& response = weapon += components::sound_response();
-		response.response = assets::sound_response_id::SUBMACHINE_RESPONSE;
 		
 		auto& item = ingredients::make_item(weapon);
 		item.space_occupied_per_charge = to_space_units("3.0");
 
 		auto& gun = weapon += components::gun();
+
+		gun.muzzle_shot_sound_response.id = assets::sound_buffer_id::ASSAULT_RIFLE_MUZZLE;
 
 		gun.action_mode = components::gun::action_type::AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(2000.f, 2000.f);
@@ -772,12 +787,19 @@ namespace prefabs {
 				response.modifier.colorize = cyan;
 			}
 
-			{
-				auto& response = round_definition += components::sound_response();
-				response.response = assets::sound_response_id::ELECTRIC_PROJECTILE_RESPONSE;
-			}
-
 			auto& damage = round_definition += components::damage();
+
+			auto& trace_modifier = damage.trace_sound_response.modifier;
+
+			trace_modifier.max_distance = 1020.f;
+			trace_modifier.reference_distance = 100.f;
+			trace_modifier.gain = 1.3f;
+			trace_modifier.repetitions = -1;
+			trace_modifier.fade_on_exit = false;
+
+			damage.trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
+			damage.destruction_sound_response.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
+
 			damage.homing_towards_hostile_strength = 1.0f;
 			damage.amount = 42;
 
@@ -797,10 +819,9 @@ namespace prefabs {
 		ingredients::add_see_through_dynamic_body(weapon);
 		ingredients::add_default_gun_container(weapon);
 
-		auto& response = weapon += components::sound_response();
-		response.response = assets::sound_response_id::KEK9_RESPONSE;
-
 		auto& gun = weapon += components::gun();
+
+		gun.muzzle_shot_sound_response.id = assets::sound_buffer_id::KEK9_MUZZLE;
 
 		gun.action_mode = components::gun::action_type::SEMI_AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(2500.f, 2500.f);
@@ -878,10 +899,9 @@ namespace prefabs {
 		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_offset.pos.set(1, -11 + bbox.y/2);
 		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_sticking_mode = rectangle_sticking::BOTTOM;
 
-		auto& response = weapon += components::sound_response();
-		response.response = assets::sound_response_id::KEK9_RESPONSE;
-
 		auto& gun = weapon += components::gun();
+
+		gun.muzzle_shot_sound_response.id = assets::sound_buffer_id::KEK9_MUZZLE;
 
 		gun.action_mode = components::gun::action_type::SEMI_AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(3000.f, 3000.f);
@@ -933,10 +953,10 @@ namespace prefabs {
 
 		{
 			sound_effect_input in;
-			in.effect = assets::sound_buffer_id::FIREARM_ENGINE;
-			in.modifier.repetitions = -1;
+			in.effect.id = assets::sound_buffer_id::FIREARM_ENGINE;
+			in.effect.modifier.repetitions = -1;
 			in.delete_entity_after_effect_lifetime = false;
-			const auto engine_sound = sound_existence_system().create_sound_effect_entity(cosmos, in, gun.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
+			const auto engine_sound = in.create_sound_effect_entity(cosmos, gun.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
 			engine_sound.add_standard_components();
 			gun.firing_engine_sound = engine_sound;
 			components::sound_existence::deactivate(engine_sound);

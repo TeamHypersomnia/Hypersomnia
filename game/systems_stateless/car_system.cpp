@@ -184,8 +184,8 @@ void car_system::apply_movement_forces(const logic_step step) {
 					const auto since_last_turn_on = (cosmos.get_timestamp() - car.last_turned_on).in_seconds(cosmos.get_fixed_delta());
 
 					existence.input.direct_listener = car.current_driver;
-					existence.input.modifier.pitch = std::min(since_last_turn_on / 1.5f, pitch);
-					existence.input.modifier.gain = 1.f;// std::min(since_last_turn_on / 1.0f, 1.f);
+					existence.input.effect.modifier.pitch = std::min(since_last_turn_on / 1.5f, pitch);
+					existence.input.effect.modifier.gain = 1.f;// std::min(since_last_turn_on / 1.0f, 1.f);
 
 					components::sound_existence::activate(sound_entity);
 				}
@@ -193,10 +193,10 @@ void car_system::apply_movement_forces(const logic_step step) {
 					const auto since_last_turn_off = (cosmos.get_timestamp() - car.last_turned_off).in_seconds(cosmos.get_fixed_delta());
 
 					existence.input.direct_listener.unset();
-					existence.input.modifier.gain = std::max(0.f, 1.f - since_last_turn_off / 1.5f);
-					existence.input.modifier.pitch = pitch - std::min(0.2f, 0.2f * since_last_turn_off/1.5f);
+					existence.input.effect.modifier.gain = std::max(0.f, 1.f - since_last_turn_off / 1.5f);
+					existence.input.effect.modifier.pitch = pitch - std::min(0.2f, 0.2f * since_last_turn_off/1.5f);
 
-					if (existence.input.modifier.gain > 0.f) {
+					if (existence.input.effect.modifier.gain > 0.f) {
 						components::sound_existence::activate(sound_entity);
 					}
 					else {

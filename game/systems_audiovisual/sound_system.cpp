@@ -22,7 +22,7 @@ void sound_system::erase_caches_for_dead_entities(const cosmos& new_cosmos) {
 	}
 
 	for (const auto it : to_erase) {
-		if (per_entity_cache[it].recorded_component.input.modifier.fade_on_exit) {
+		if (per_entity_cache[it].recorded_component.input.effect.modifier.fade_on_exit) {
 			fading_sources.emplace_back(std::move(per_entity_cache[it].source));
 		}
 
@@ -71,16 +71,16 @@ void sound_system::play_nearby_sound_existences(
 			const auto& existence = it.get<components::sound_existence>();
 			auto& source = cache.source;
 
-			const auto& buffer = get_resource_manager().find(existence.input.effect)->get_variation(existence.input.variation_number);
+			const auto& buffer = get_resource_manager().find(existence.input.effect.id)->get_variation(existence.input.variation_number);
 
 			const auto& requested_buf = existence.input.direct_listener == listening_character ? buffer.request_stereo() : buffer.request_mono();
 
 			if (
 				cache.recorded_component.time_of_birth != existence.time_of_birth
-				|| cache.recorded_component.input.effect != existence.input.effect
+				|| cache.recorded_component.input.effect.id != existence.input.effect.id
 				|| &requested_buf != source.get_bound_buffer()
 			) {
-				if (source.is_playing() && cache.recorded_component.input.modifier.fade_on_exit) {
+				if (source.is_playing() && cache.recorded_component.input.effect.modifier.fade_on_exit) {
 					fading_sources.emplace_back(std::move(source));
 
 					source = augs::sound_source();
@@ -96,9 +96,9 @@ void sound_system::play_nearby_sound_existences(
 				}
 
 				source.play();
-				source.set_max_distance(si, existence.input.modifier.max_distance);
-				source.set_reference_distance(si, existence.input.modifier.reference_distance);
-				source.set_looping(existence.input.modifier.repetitions == -1);
+				source.set_max_distance(si, existence.input.effect.modifier.max_distance);
+				source.set_reference_distance(si, existence.input.effect.modifier.reference_distance);
+				source.set_looping(existence.input.effect.modifier.repetitions == -1);
 
 				cache.recorded_component = existence;
 			}
@@ -108,8 +108,8 @@ void sound_system::play_nearby_sound_existences(
 			const float absorption = std::min(10.f, pow(std::max(0.f, dist_from_listener - 2220.f)/520.f, 2));
 
 			source.set_air_absorption_factor(absorption);
-			source.set_pitch(existence.input.modifier.pitch);
-			source.set_gain(existence.input.modifier.gain * master_gain);
+			source.set_pitch(existence.input.effect.modifier.pitch);
+			source.set_gain(existence.input.effect.modifier.gain * master_gain);
 			source.set_position(si, source_pos);
 			source.set_velocity(si, it.get_effective_velocity());
 		}

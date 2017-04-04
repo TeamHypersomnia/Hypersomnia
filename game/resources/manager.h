@@ -17,7 +17,6 @@
 
 #include "game/resources/animation.h"
 #include "game/resources/animation_response.h"
-#include "game/resources/sound_response.h"
 #include "game/resources/particle_effect.h"
 #include "game/resources/particle_effect_response.h"
 #include "game/resources/behaviour_tree.h"
@@ -99,7 +98,6 @@ namespace resources {
 		
 		augs::graphics::texture* find(const assets::physical_texture_id);
 
-		sound_response& create(const assets::sound_response_id);
 		augs::sound_buffer& create(const assets::sound_buffer_id);
 
 		animation& create(
@@ -133,7 +131,6 @@ namespace resources {
 		behaviour_tree* find(assets::behaviour_tree_id);
 		tile_layer* find(assets::tile_layer_id);
 		augs::sound_buffer* manager::find(const assets::sound_buffer_id id);
-		sound_response* manager::find(const assets::sound_response_id id);
 
 		void destroy_everything();
 
@@ -153,7 +150,6 @@ namespace resources {
 		augs::enum_associative_array<assets::behaviour_tree_id, behaviour_tree> behaviour_trees;
 		augs::enum_associative_array<assets::tile_layer_id, tile_layer> tile_layers;
 		augs::enum_associative_array<assets::sound_buffer_id, augs::sound_buffer> sound_buffers;
-		augs::enum_associative_array<assets::sound_response_id, sound_response> sound_responses;
 	};
 }
 

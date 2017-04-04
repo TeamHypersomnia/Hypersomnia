@@ -80,7 +80,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 			const auto owning_sentience = 
 				(owning_capability.alive() && owning_capability.has<components::sentience>()) ? owning_capability : cosmos[entity_id()];
 
-			auto& gun = it.get<components::gun>();
+			components::gun& gun = it.get<components::gun>();
 
 			const auto magic_missile_def = cosmos[gun.magic_missile_definition];
 			const auto is_magic_launcher = magic_missile_def.alive();
@@ -266,11 +266,11 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 				if (sound_enabled) {
 					existence.input.direct_listener = owning_capability;
-					existence.input.modifier.pitch = pitch;
-					existence.input.modifier.gain = (gun.current_heat - 0.20f) / gun.maximum_heat;
+					existence.input.effect.modifier.pitch = pitch;
+					existence.input.effect.modifier.gain = (gun.current_heat - 0.20f) / gun.maximum_heat;
 
-					existence.input.modifier.pitch = pow(existence.input.modifier.pitch, 2) * gun.engine_sound_strength;
-					existence.input.modifier.gain = pow(existence.input.modifier.gain, 2)* gun.engine_sound_strength;
+					existence.input.effect.modifier.pitch = pow(existence.input.effect.modifier.pitch, 2) * gun.engine_sound_strength;
+					existence.input.effect.modifier.gain = pow(existence.input.effect.modifier.gain, 2)* gun.engine_sound_strength;
 
 					components::sound_existence::activate(firing_engine_sound);
 				}

@@ -20,7 +20,6 @@
 #include "game/components/name_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/particle_effect_response_component.h"
-#include "game/components/sound_response_component.h"
 #include "game/components/attitude_component.h"
 #include "game/components/dynamic_tree_node_component.h"
 #include "game/components/flags_component.h"
@@ -90,11 +89,6 @@ namespace ingredients {
 		e += components::position_copying(); // used when it is an astral body
 		auto& particle_response = e += components::particle_effect_response { assets::particle_effect_response_id::CHARACTER_RESPONSE };
 		
-		{
-			auto& sound_response = e += components::sound_response();
-			sound_response.response = assets::sound_response_id::CHARACTER_RESPONSE;
-		}
-		
 		auto& attitude = e += components::attitude();
 		auto& processing = e += components::processing();
 		e.set_flag(entity_flag::IS_PAST_CONTAGIOUS);
@@ -104,6 +98,9 @@ namespace ingredients {
 
 		particle_response.modifier.colorize = red;
 		particle_response.modifier.scale_lifetimes = 1.5f;
+
+		sentience.health_decrease_sound_response.id = assets::sound_buffer_id::IMPACT;
+		sentience.death_sound_response.id = assets::sound_buffer_id::DEATH;
 
 		sentience.aimpunch.offsets = {
 				{ vec2().set_from_degrees(0) },

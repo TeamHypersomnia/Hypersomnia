@@ -1,6 +1,5 @@
 #include "all.h"
 #include "game/resources/manager.h"
-#include "game/enums/sound_response_type.h"
 #include "augs/audio/sound_effect_modifier.h"
 
 #include <sndfile.h>
@@ -14,7 +13,7 @@ namespace resource_setups {
 
 		{
 			auto& buf = get_resource_manager().create(assets::sound_buffer_id::ASSAULT_RIFLE_MUZZLE);
-			buf.from_file("hypersomnia/sfx/bilmer2000_muzzle.wav");
+			buf.from_file("hypersomnia/sfx/assault_muzzle.wav");
 		}
 
 		{
@@ -145,49 +144,6 @@ namespace resource_setups {
 		{
 			auto& buf = get_resource_manager().create(assets::sound_buffer_id::COLLISION_GRENADE);
 			buf.from_file("hypersomnia/sfx/collision_grenade.wav");
-		}
-
-		{
-			auto& res = get_resource_manager().create(assets::sound_response_id::BILMER2000_RESPONSE);
-			augs::sound_effect_modifier mod;
-			mod.max_distance = 1920.f * 3.f;
-			mod.reference_distance = 0.f;
-			mod.gain = 1.3f;
-			res[sound_response_type::MUZZLE_SHOT] = {assets::sound_buffer_id::BILMER2000_MUZZLE, mod};
-		}
-
-		{
-			auto& res = get_resource_manager().create(assets::sound_response_id::KEK9_RESPONSE);
-			res[sound_response_type::MUZZLE_SHOT] = assets::sound_buffer_id::KEK9_MUZZLE;
-		}
-
-		{
-			auto& res = get_resource_manager().create(assets::sound_response_id::ASSAULT_RIFLE_RESPONSE);
-			res[sound_response_type::MUZZLE_SHOT] = assets::sound_buffer_id::ASSAULT_RIFLE_MUZZLE;
-		}
-
-		{
-			auto& res = get_resource_manager().create(assets::sound_response_id::SUBMACHINE_RESPONSE);
-			res[sound_response_type::MUZZLE_SHOT] = assets::sound_buffer_id::SUBMACHINE_MUZZLE;
-		}
-
-		{
-			auto& res = get_resource_manager().create(assets::sound_response_id::ELECTRIC_PROJECTILE_RESPONSE);
-			
-			augs::sound_effect_modifier trace_modifier;
-			trace_modifier.max_distance = 1020.f;
-			trace_modifier.reference_distance = 100.f;
-			trace_modifier.gain = 1.3f;
-			trace_modifier.repetitions = -1;
-			trace_modifier.fade_on_exit = false;
-			res[sound_response_type::PROJECTILE_TRACE] = { assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT, trace_modifier };
-			res[sound_response_type::DESTRUCTION_EXPLOSION] = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
-		}
-
-		{
-			auto& res = get_resource_manager().create(assets::sound_response_id::CHARACTER_RESPONSE);
-			res[sound_response_type::HEALTH_DECREASE] = assets::sound_buffer_id::IMPACT;
-			res[sound_response_type::DEATH] = assets::sound_buffer_id::DEATH;
 		}
 	}
 }

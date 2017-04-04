@@ -5,11 +5,15 @@
 
 #include "render_component.h"
 
+#include "augs/audio/sound_effect_modifier.h"
+
 #include "augs/misc/stepped_timing.h"
 #include "augs/misc/recoil_player.h"
 #include "augs/misc/minmax.h"
 
 #include "padding_byte.h"
+
+#include "game/assets/sound_buffer_id.h"
 
 class gun_system;
 class processing_system;
@@ -60,6 +64,8 @@ namespace components {
 
 		child_entity_id firing_engine_sound;
 		child_entity_id muzzle_particles;
+
+		sound_response muzzle_shot_sound_response;
 		// END GEN INTROSPECTOR
 
 		vec2 calculate_muzzle_position(components::transform gun_transform) const;

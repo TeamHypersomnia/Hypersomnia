@@ -34,6 +34,7 @@ struct vec2t;
 class recoil_player;
 template <class T>
 struct zeroed_pod;
+struct sound_response;
 struct behaviour_tree_instance;
 struct car_engine_entities;
 struct convex_partitioned_collider;
@@ -150,15 +151,14 @@ namespace components {
 	struct particles_existence;
 	struct particle_effect_response;
 	struct physical_relations;
-	struct rigid_body;
 	struct polygon;
 	struct position_copying;
 	struct processing;
 	struct render;
+	struct rigid_body;
 	struct rotation_copying;
 	struct sentience;
 	struct sound_existence;
-	struct sound_response;
 	struct special_physics;
 	struct sprite;
 	struct tile_layer_instance;
@@ -183,11 +183,11 @@ namespace augs {
 		F f,
 		Instances&&... _t_
 	) {
-		FIELD(repetitions);
 		FIELD(gain);
 		FIELD(pitch);
 		FIELD(max_distance);
 		FIELD(reference_distance);
+		FIELD(repetitions);
 		FIELD(fade_on_exit);
 	}
 
@@ -452,6 +452,16 @@ namespace augs {
 
 	template <class F, class... Instances>
 	void introspect_body(
+		const sound_response* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(id);
+		FIELD(modifier);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
 		const components::animation* const,
 		F f,
 		Instances&&... _t_
@@ -679,6 +689,9 @@ namespace augs {
 		
 		FIELD(trace_sound);
 
+		FIELD(trace_sound_response);
+		FIELD(destruction_sound_response);
+
 		FIELD(saved_point_of_impact_before_death);
 	}
 
@@ -836,6 +849,8 @@ namespace augs {
 
 		FIELD(firing_engine_sound);
 		FIELD(muzzle_particles);
+
+		FIELD(muzzle_shot_sound_response);
 	}
 
 	template <class F, class... Instances>
@@ -1069,31 +1084,6 @@ namespace augs {
 
 	template <class F, class... Instances>
 	void introspect_body(
-		const components::rigid_body* const,
-		F f,
-		Instances&&... _t_
-	) {
-		FIELD(fixed_rotation);
-		FIELD(bullet);
-		FIELD(angled_damping);
-		FIELD(activated);
-
-		FIELD(body_type);
-
-		FIELD(angular_damping);
-		FIELD(linear_damping);
-		FIELD(linear_damping_vec);
-		FIELD(gravity_scale);
-
-		FIELD(transform);
-		FIELD(sweep);
-
-		FIELD(velocity);
-		FIELD(angular_velocity);
-	}
-
-	template <class F, class... Instances>
-	void introspect_body(
 		const components::polygon* const,
 		F f,
 		Instances&&... _t_
@@ -1159,6 +1149,31 @@ namespace augs {
 
 	template <class F, class... Instances>
 	void introspect_body(
+		const components::rigid_body* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(fixed_rotation);
+		FIELD(bullet);
+		FIELD(angled_damping);
+		FIELD(activated);
+
+		FIELD(body_type);
+
+		FIELD(angular_damping);
+		FIELD(linear_damping);
+		FIELD(linear_damping_vec);
+		FIELD(gravity_scale);
+
+		FIELD(transform);
+		FIELD(sweep);
+
+		FIELD(velocity);
+		FIELD(angular_velocity);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
 		const components::rotation_copying* const,
 		F f,
 		Instances&&... _t_
@@ -1215,6 +1230,10 @@ namespace augs {
 		FIELD(aimpunch);
 		FIELD(health_damage_particles);
 		FIELD(character_crosshair);
+
+		FIELD(health_decrease_sound_response);
+		FIELD(death_sound_response);
+
 	}
 
 	template <class F, class... Instances>
@@ -1227,7 +1246,6 @@ namespace augs {
 		FIELD(delete_entity_after_effect_lifetime);
 		FIELD(variation_number);
 		FIELD(direct_listener);
-		FIELD(modifier);
 	}
 
 	template <class F, class... Instances>
@@ -1240,15 +1258,6 @@ namespace augs {
 
 		FIELD(time_of_birth);
 		FIELD(max_lifetime_in_steps);
-	}
-
-	template <class F, class... Instances>
-	void introspect_body(
-		const components::sound_response* const,
-		F f,
-		Instances&&... _t_
-	) {
-		FIELD(response);
 	}
 
 	template <class F, class... Instances>

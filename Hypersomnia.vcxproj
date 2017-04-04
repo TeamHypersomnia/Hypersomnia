@@ -1168,7 +1168,6 @@
     <ClInclude Include="game\components\rigid_body_component.h" />
     <ClInclude Include="game\components\sentience_component.h" />
     <ClInclude Include="game\components\sound_existence_component.h" />
-    <ClInclude Include="game\components\sound_response_component.h" />
     <ClInclude Include="game\components\wandering_pixels_component.h" />
     <ClInclude Include="game\container_sizes.h" />
     <ClInclude Include="game\detail\basic_renderable_drawing_input.h" />
@@ -1242,7 +1241,6 @@
     <ClInclude Include="game\messages\thunder_input.h" />
     <ClInclude Include="game\messages\visibility_information.h" />
     <ClInclude Include="application\content_generation\atlas_content_structs.h" />
-    <ClInclude Include="game\resources\sound_response.h" />
     <ClInclude Include="game\resources\tile_layer.h" />
     <ClInclude Include="game\resource_setups\all.h" />
     <ClInclude Include="game\scene_builders\networked_testbed.h" />

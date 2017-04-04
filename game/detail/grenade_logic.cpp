@@ -38,9 +38,9 @@ void release_or_throw_grenade(
 		sound_effect_input in;
 		in.delete_entity_after_effect_lifetime = true;
 		in.direct_listener = thrower;
-		in.effect = assets::sound_buffer_id::GRENADE_UNPIN;
+		in.effect.id = assets::sound_buffer_id::GRENADE_UNPIN;
 
-		sound_existence_system().create_sound_effect_entity(cosmos, in, thrower_transform, thrower).add_standard_components();
+		in.create_sound_effect_entity(cosmos, thrower_transform, thrower).add_standard_components();
 	}
 	else if(!is_pressed_flag && grenade.when_released.was_set()) {
 		perform_transfer(
@@ -51,9 +51,9 @@ void release_or_throw_grenade(
 		sound_effect_input in;
 		in.delete_entity_after_effect_lifetime = true;
 		in.direct_listener = thrower;
-		in.effect = assets::sound_buffer_id::GRENADE_THROW;
+		in.effect.id = assets::sound_buffer_id::GRENADE_THROW;
 
-		sound_existence_system().create_sound_effect_entity(cosmos, in, thrower_transform, thrower).add_standard_components();
+		in.create_sound_effect_entity(cosmos, thrower_transform, thrower).add_standard_components();
 
 		// {
 		// 	const auto spoon = cosmos[grenade.spoon];

@@ -186,10 +186,10 @@ namespace prefabs {
 
 		{
 			sound_effect_input in;
-			in.effect = assets::sound_buffer_id::ENGINE;
-			in.modifier.repetitions = -1;
+			in.effect.id = assets::sound_buffer_id::ENGINE;
+			in.effect.modifier.repetitions = -1;
 			in.delete_entity_after_effect_lifetime = false;
-			const auto engine_sound = sound_existence_system().create_sound_effect_entity(world, in, spawn_transform, front);
+			const auto engine_sound = in.create_sound_effect_entity(world, spawn_transform, front);
 			engine_sound.add_standard_components();
 			front.get<components::car>().engine_sound = engine_sound;
 			components::sound_existence::deactivate(engine_sound);

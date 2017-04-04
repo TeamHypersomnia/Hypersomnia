@@ -6,7 +6,6 @@
 #include "game/components/render_component.h"
 #include "game/components/wandering_pixels_component.h"
 #include "game/components/damage_component.h"
-#include "game/components/sound_response_component.h"
 #include "game/messages/create_particle_effect.h"
 #include "game/systems_stateless/particles_existence_system.h"
 #include "game/systems_stateless/sound_existence_system.h"
@@ -186,10 +185,10 @@ void perform_spell_logic(
 		sound_effect_input in;
 		in.delete_entity_after_effect_lifetime = true;
 		in.direct_listener = caster;
-		in.effect = effect;
-		in.modifier.gain = gain;
+		in.effect.id = effect;
+		in.effect.modifier.gain = gain;
 
-		sound_existence_system().create_sound_effect_entity(cosmos, in, caster_transform, entity_id()).add_standard_components();
+		in.create_sound_effect_entity(cosmos, caster_transform, entity_id()).add_standard_components();
 	};
 
 	const auto play_standard_sparkles_sound = [&]() {
@@ -334,12 +333,19 @@ void perform_spell_logic(
 					response.modifier.colorize = cyan;
 				}
 
-				{
-					auto& response = energy_ball += components::sound_response();
-					response.response = assets::sound_response_id::ELECTRIC_PROJECTILE_RESPONSE;
-				}
-
 				auto& damage = energy_ball += components::damage();
+
+				auto& trace_modifier = damage.trace_sound_response.modifier;
+
+				trace_modifier.max_distance = 1020.f;
+				trace_modifier.reference_distance = 100.f;
+				trace_modifier.gain = 1.3f;
+				trace_modifier.repetitions = -1;
+				trace_modifier.fade_on_exit = false;
+
+				damage.trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
+				damage.destruction_sound_response.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
+
 				damage.homing_towards_hostile_strength = 1.0f;
 				damage.particular_homing_target = next_hostile;
 				damage.amount = 42;

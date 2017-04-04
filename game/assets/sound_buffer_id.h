@@ -1,12 +1,12 @@
 #pragma once
+#include "augs/audio/sound_effect_modifier.h"
 
 namespace augs {
 	class sound_buffer;
 }
 
 namespace assets {
-	enum class sound_buffer_id : unsigned short {
-		INVALID,
+	enum class sound_buffer_id : unsigned {
 		BILMER2000_MUZZLE,
 		ASSAULT_RIFLE_MUZZLE,
 		SUBMACHINE_MUZZLE,
@@ -57,3 +57,10 @@ namespace assets {
 
 augs::sound_buffer& operator*(const assets::sound_buffer_id& id);
 bool operator!(const assets::sound_buffer_id& id);
+
+struct sound_response {
+	// GEN INTROSPECTOR struct sound_response
+	assets::sound_buffer_id id = assets::sound_buffer_id::COUNT;
+	augs::sound_effect_modifier modifier;
+	// END GEN INTROSPECTOR
+};

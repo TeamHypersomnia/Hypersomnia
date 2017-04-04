@@ -1,6 +1,8 @@
 #pragma once
 #include "augs/math/vec2.h"
 
+#include "game/assets/sound_buffer_id.h"
+
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
@@ -46,6 +48,9 @@ namespace components {
 		entity_id particular_homing_target;
 		
 		child_entity_id trace_sound;
+
+		sound_response trace_sound_response;
+		sound_response destruction_sound_response;
 
 		vec2 saved_point_of_impact_before_death;
 		// END GEN INTROSPECTOR

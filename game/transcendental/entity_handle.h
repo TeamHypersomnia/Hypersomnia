@@ -287,7 +287,7 @@ public:
 	}
 
 	template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
-	void add_standard_components() const;
+	basic_entity_handle<is_const> add_standard_components() const;
 
 	template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 	void recalculate_basic_processing_categories() const;

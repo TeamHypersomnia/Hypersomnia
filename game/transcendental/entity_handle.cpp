@@ -30,7 +30,7 @@ std::ostream& operator<<(std::ostream& out, const const_entity_handle &x) {
 
 template <bool C>
 template <bool, class>
-void basic_entity_handle<C>::add_standard_components() const {
+basic_entity_handle<C> basic_entity_handle<C>::add_standard_components() const {
 	ensure(alive());
 	const bool has_physics = has<components::rigid_body>();
 
@@ -75,6 +75,8 @@ void basic_entity_handle<C>::add_standard_components() const {
 	if (!has<components::inferred_state>()) {
 		add(components::inferred_state());
 	}
+
+	return *this;
 }
 
 template <bool C>
@@ -92,5 +94,5 @@ void basic_entity_handle<C>::recalculate_basic_processing_categories() const {
 }
 
 // explicit instantiation
-template void basic_entity_handle<false>::add_standard_components<false, void>() const;
+template basic_entity_handle<false> basic_entity_handle<false>::add_standard_components<false, void>() const;
 template void basic_entity_handle<false>::recalculate_basic_processing_categories<false, void>() const;

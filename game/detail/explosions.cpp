@@ -20,12 +20,11 @@ void standard_explosion(const standard_explosion_input in) {
 	sound_effect_input sound_effect;
 	sound_effect.delete_entity_after_effect_lifetime = true;
 	sound_effect.direct_listener = in.subject_if_any;
-	sound_effect.effect = in.sound_effect;
-	sound_effect.modifier.gain = in.sound_gain;
+	sound_effect.effect.id = in.sound_effect;
+	sound_effect.effect.modifier.gain = in.sound_gain;
 
-	sound_existence_system().create_sound_effect_entity(
+	sound_effect.create_sound_effect_entity(
 		cosmos, 
-		sound_effect, 
 		in.explosion_location,
 		entity_id()
 	).add_standard_components();

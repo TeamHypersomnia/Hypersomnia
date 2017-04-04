@@ -1,20 +1,22 @@
 #pragma once
-#include "game/transcendental/entity_id.h"
-#include "augs/misc/recoil_player.h"
 #include "augs/graphics/pixel.h"
-#include "augs/misc/stepped_timing.h"
 
+#include "augs/misc/recoil_player.h"
+#include "augs/misc/stepped_timing.h"
 #include "augs/misc/enum_associative_array.h"
+
+#include "game/transcendental/entity_id.h"
 
 #include "game/enums/sentience_meter_type.h"
 #include "game/enums/spell_type.h"
 
-#include "game/detail/spell_logic.h"
+#include "game/assets/sound_buffer_id.h"
 
-#include "game/detail/perks/haste_perk.h"
-#include "game/detail/perks/electric_shield_perk.h"
 #include "game/components/transform_component.h"
 
+#include "game/detail/spell_logic.h"
+#include "game/detail/perks/haste_perk.h"
+#include "game/detail/perks/electric_shield_perk.h"
 #include "game/detail/sentience_meter.h"
 
 namespace components {
@@ -49,6 +51,10 @@ namespace components {
 		recoil_player aimpunch;
 		child_entity_id health_damage_particles;
 		child_entity_id character_crosshair;
+
+		sound_response health_decrease_sound_response;
+		sound_response death_sound_response;
+
 		// END GEN INTROSPECTOR
 
 		// calls abstraction for GUI

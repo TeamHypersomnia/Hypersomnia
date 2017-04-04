@@ -8,11 +8,5 @@
 class sound_existence_system {
 public:
 	void destroy_dead_sounds(const logic_step) const;
-
-	void game_responses_to_sound_effects(const logic_step) const;
-	//void create_sound_effects(const logic_step) const;
-	entity_handle create_sound_effect_entity(cosmos&, 
-		const sound_effect_input, 
-		const components::transform place_of_birth,
-		const entity_id chased_subject) const;
+	void create_sounds_from_game_events(const logic_step) const;
 };

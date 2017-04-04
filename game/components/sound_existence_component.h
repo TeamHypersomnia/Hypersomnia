@@ -9,12 +9,18 @@
 
 struct sound_effect_input {
 	// GEN INTROSPECTOR struct sound_effect_input
-	assets::sound_buffer_id effect = assets::sound_buffer_id::INVALID;
+	sound_response effect;
 	bool delete_entity_after_effect_lifetime = true;
 	char variation_number = -1;
+	std::array<padding_byte, 2> pad;
 	entity_id direct_listener;
-	augs::sound_effect_modifier modifier;
 	// END GEN INTROSPECTOR
+
+	entity_handle create_sound_effect_entity(
+		cosmos& cosmos,
+		const components::transform place_of_birth,
+		const entity_id chased_subject_id
+	) const;
 };
 
 namespace components {

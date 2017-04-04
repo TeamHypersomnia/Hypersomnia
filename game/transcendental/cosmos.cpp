@@ -454,7 +454,7 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	particles_existence_system().game_responses_to_particle_effects(step);
 	particles_existence_system().create_particle_effects(step);
 
-	sound_existence_system().game_responses_to_sound_effects(step);
+	sound_existence_system().create_sounds_from_game_events(step);
 	// gui_system().translate_game_events_for_hud(step);
 
 	performance.start(meter_type::VISIBILITY);
