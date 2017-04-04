@@ -42,7 +42,7 @@ namespace components {
 		float standard_linear_damping = 0.f;
 
 		float make_inert_for_ms = 0.f;
-		float max_speed_for_movement_response = 1.f;
+		float max_speed_for_movement_event = 1.f;
 		// END GEN INTROSPECTOR
 
 		void add_animation_receiver(entity_id e, bool stop_at_zero_movement);

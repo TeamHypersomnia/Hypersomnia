@@ -1295,7 +1295,6 @@
     <ClInclude Include="game\simulation_settings\all_simulation_settings.h" />
     <ClInclude Include="game\transcendental\entity_handle.h" />
     <ClInclude Include="game\transcendental\entity_handle_declaration.h" />
-    <ClInclude Include="game\enums\animation_response_type.h" />
     <ClInclude Include="game\enums\child_entity_name.h" />
     <ClInclude Include="game\enums\attitude_type.h" />
     <ClInclude Include="game\enums\entity_name.h" />
@@ -1305,7 +1304,6 @@
     <ClInclude Include="game\enums\item_transfer_result_type.h" />
     <ClInclude Include="game\enums\joint_name.h" />
     <ClInclude Include="game\enums\melee_state.h" />
-    <ClInclude Include="game\enums\particle_effect_response_type.h" />
     <ClInclude Include="game\enums\party_category.h" />
     <ClInclude Include="game\enums\processing_subjects.h" />
     <ClInclude Include="game\enums\render_layer.h" />
@@ -1350,7 +1348,6 @@
     <ClInclude Include="game\transcendental\types_specification\all_systems_declaration.h" />
     <ClInclude Include="game\types_specification\all_component_includes.h" />
     <ClInclude Include="game\assets\animation_id.h" />
-    <ClInclude Include="game\assets\animation_response_id.h" />
     <ClInclude Include="game\assets\physical_texture_id.h" />
     <ClInclude Include="game\assets\behaviour_tree_id.h" />
     <ClInclude Include="game\assets\font_id.h" />
@@ -1409,12 +1406,11 @@
     <ClInclude Include="game\ingredients\ingredients.h" />
     <ClInclude Include="game\ingredients\renderable_includes.h" />
     <ClInclude Include="game\messages\animation_message.h" />
-    <ClInclude Include="game\components\animation_response_component.h" />
     <ClInclude Include="game\messages\collision_message.h" />
     <ClInclude Include="game\messages\gunshot_response.h" />
     <ClInclude Include="game\messages\health_event.h" />
     <ClInclude Include="game\messages\melee_swing_response.h" />
-    <ClInclude Include="game\messages\movement_response.h" />
+    <ClInclude Include="game\messages\movement_event.h" />
     <ClInclude Include="game\messages\crosshair_intent_message.h" />
     <ClInclude Include="game\messages\damage_message.h" />
     <ClInclude Include="game\messages\queue_destruction.h" />
@@ -1424,7 +1420,6 @@
     <ClInclude Include="game\messages\trigger_hit_confirmation_message.h" />
     <ClInclude Include="game\messages\trigger_hit_request_message.h" />
     <ClInclude Include="game\resources\animation.h" />
-    <ClInclude Include="game\resources\animation_response.h" />
     <ClInclude Include="game\resources\manager.h" />
     <ClInclude Include="game\resources\particle_effect.h" />
     <ClInclude Include="game\types_specification\all_messages_declaration.h" />

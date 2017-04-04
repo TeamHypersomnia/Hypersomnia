@@ -55,18 +55,17 @@ namespace scene_builders {
 		};
 
 		for (int i = 0; i < num_characters; ++i) {
-			assets::animation_response_id torso_set = assets::animation_response_id::TORSO_SET;
 			components::transform transform;
 
 			if (i == 0) {
-				torso_set = assets::animation_response_id::TORSO_SET;
+				//torso_set = assets::animation_response_id::TORSO_SET;
 			}
 			else if (i == 1) {
-				torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
+				//torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
 				transform.pos.x += 200;
 			}
 
-			const auto new_character = prefabs::create_character(world, transform, typesafe_sprintf("player%x", i), torso_set);
+			const auto new_character = prefabs::create_sample_complete_character(world, transform, typesafe_sprintf("player%x", i));
 
 			new_characters[i] = new_character;
 

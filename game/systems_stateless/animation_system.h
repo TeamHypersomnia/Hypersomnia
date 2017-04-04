@@ -1,7 +1,7 @@
 #pragma once
+#include "game/transcendental/step_declaration.h"
 
 class cosmos;
-#include "game/transcendental/step_declaration.h"
 
 class animation_system {
 public:

@@ -151,7 +151,7 @@ namespace scene_builders {
 		}
 
 		for (int i = 0; i < num_characters; ++i) {
-			const auto new_character = prefabs::create_character(world, vec2(i * 300.f, 0), typesafe_sprintf("player%x", i));
+			const auto new_character = prefabs::create_sample_complete_character(world, vec2(i * 300.f, 0), typesafe_sprintf("player%x", i));
 
 			new_characters[i] = new_character;
 

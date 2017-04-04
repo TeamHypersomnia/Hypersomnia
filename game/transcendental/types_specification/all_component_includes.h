@@ -3,7 +3,6 @@
 #include "game/components/special_physics_component.h"
 #include "game/components/behaviour_tree_component.h"
 #include "game/components/pathfinding_component.h"
-#include "game/components/animation_response_component.h"
 #include "game/components/animation_component.h"
 #include "game/components/position_copying_component.h"
 #include "game/components/crosshair_component.h"

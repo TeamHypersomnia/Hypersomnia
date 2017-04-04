@@ -14,7 +14,6 @@
 #include "game/components/fixtures_component.h"
 #include "game/components/special_physics_component.h"
 #include "game/components/animation_component.h"
-#include "game/components/animation_response_component.h"
 #include "game/components/car_component.h"
 #include "game/components/trigger_component.h"
 #include "game/components/name_component.h"

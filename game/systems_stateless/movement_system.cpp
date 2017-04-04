@@ -2,7 +2,7 @@
 #include "movement_system.h"
 #include "game/transcendental/cosmos.h"
 #include "game/messages/intent_message.h"
-#include "game/messages/movement_response.h"
+#include "game/messages/movement_event.h"
 #include "augs/log.h"
 
 #include "game/components/gun_component.h"
@@ -161,10 +161,10 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 	);
 }
 
-void movement_system::generate_movement_responses(const logic_step step) {
+void movement_system::generate_movement_events(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
-	step.transient.messages.get_queue<messages::movement_response>().clear();
+	step.transient.messages.get_queue<messages::movement_event>().clear();
 
 	cosmos.for_each(
 		processing_subjects::WITH_MOVEMENT,
@@ -179,13 +179,13 @@ void movement_system::generate_movement_responses(const logic_step step) {
 				}
 			}
 
-			messages::movement_response msg;
+			messages::movement_event msg;
 
-			if (movement.max_speed_for_movement_response == 0.f) msg.speed = 0.f;
-			else msg.speed = speed / movement.max_speed_for_movement_response;
+			if (movement.max_speed_for_movement_event == 0.f) msg.speed = 0.f;
+			else msg.speed = speed / movement.max_speed_for_movement_event;
 			
 			for (const auto receiver : movement.response_receivers) {
-				messages::movement_response copy(msg);
+				messages::movement_event copy(msg);
 				copy.stop_response_at_zero_speed = receiver.stop_response_at_zero_speed;
 				copy.subject = receiver.target;
 				step.transient.messages.post(copy);

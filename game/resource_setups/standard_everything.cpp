@@ -99,21 +99,6 @@ namespace resource_setups {
 			50.0f, resources::animation::loop_type::NONE
 		);
 
-		{
-			auto& player_response = manager.create(assets::animation_response_id::TORSO_SET);
-			player_response[animation_response_type::MOVE] = assets::animation_id::TORSO_MOVE;
-		}
-
-		{
-			auto& player_response = manager.create(assets::animation_response_id::BLUE_TORSO_SET);
-			player_response[animation_response_type::MOVE] = assets::animation_id::BLUE_TORSO_MOVE;
-		}
-
-		{
-			auto& player_response = manager.create(assets::animation_response_id::VIOLET_TORSO_SET);
-			player_response[animation_response_type::MOVE] = assets::animation_id::VIOLET_TORSO_MOVE;
-		}
-
 		resource_setups::load_standard_particle_effects();
 		resource_setups::load_standard_behaviour_trees();
 		resource_setups::load_standard_tile_layers();

@@ -10,7 +10,6 @@
 #include "game/components/rotation_copying_component.h"
 #include "game/components/animation_component.h"
 #include "game/components/fixtures_component.h"
-#include "game/components/animation_response_component.h"
 #include "game/components/rigid_body_component.h"
 #include "game/components/special_physics_component.h"
 #include "game/components/trigger_query_detector_component.h"
@@ -39,7 +38,7 @@ namespace ingredients {
 		//movement.input_acceleration_axes.set(8000, 8000);
 		//movement.acceleration_length = -1;
 
-		movement.max_speed_for_movement_response = 1000;
+		movement.max_speed_for_movement_event = 1000;
 		movement.braking_damping = 12.5f;
 		
 		movement.enable_braking_damping = true;
@@ -73,11 +72,10 @@ namespace ingredients {
 		components::animation animation;
 	}
 
-	void add_wsad_character(const entity_handle e, const entity_handle crosshair_entity, const assets::animation_response_id torso_set) {
+	void add_wsad_character(const entity_handle e, const entity_handle crosshair_entity) {
 		auto& sprite = e += components::sprite();
 		auto& render = e += components::render();
 		auto& animation = e += components::animation();
-		auto& animation_response = e += components::animation_response();
 		auto& movement = e += components::movement();
 		auto& rotation_copying = e += components::rotation_copying();
 		auto& detector = e += components::trigger_query_detector();
@@ -180,8 +178,6 @@ namespace ingredients {
 
 		e.map_child_entity(child_entity_name::CHARACTER_CROSSHAIR, crosshair_entity);
 
-		animation_response.response = torso_set;
-
 		sprite.set(assets::game_image_id::TORSO_MOVING_FIRST, rgba(255, 255, 255, 255));
 
 		render.layer = render_layer::SMALL_DYNAMIC_BODY;
@@ -195,11 +191,10 @@ namespace ingredients {
 }
 
 namespace prefabs {
-	entity_handle create_character(
+	entity_handle create_sample_complete_character(
 		cosmos& world, 
 		const components::transform spawn_transform, 
-		const std::string name, 
-		const assets::animation_response_id torso_set
+		const std::string name
 	) {
 		const auto character = world.create_entity(name);
 
@@ -209,7 +204,7 @@ namespace prefabs {
 		crosshair.get<components::crosshair>().character_entity_to_chase = character;
 		crosshair.set_logic_transform(spawn_transform.pos);
 
-		ingredients::add_wsad_character(character, crosshair, torso_set);
+		ingredients::add_wsad_character(character, crosshair);
 		
 		ingredients::add_wsad_character_physics(character);
 

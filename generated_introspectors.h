@@ -126,7 +126,6 @@ namespace augs {
 
 namespace components {
 	struct animation;
-	struct animation_response;
 	struct attitude;
 	struct behaviour_tree;
 	struct car;
@@ -485,15 +484,6 @@ namespace augs {
 
 		FIELD(state);
 		FIELD(paused_state);
-	}
-
-	template <class F, class... Instances>
-	void introspect_body(
-		const components::animation_response* const,
-		F f,
-		Instances&&... _t_
-	) {
-		FIELD(response);
 	}
 
 	template <class F, class... Instances>
@@ -1030,7 +1020,7 @@ namespace augs {
 		FIELD(standard_linear_damping);
 
 		FIELD(make_inert_for_ms);
-		FIELD(max_speed_for_movement_response);
+		FIELD(max_speed_for_movement_event);
 	}
 
 	template <class F, class... Instances>

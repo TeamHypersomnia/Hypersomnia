@@ -9,7 +9,6 @@
 #include "game/components/movement_component.h"
 #include "game/components/rotation_copying_component.h"
 #include "game/components/animation_component.h"
-#include "game/components/animation_response_component.h"
 #include "game/components/rigid_body_component.h"
 #include "game/components/car_component.h"
 #include "game/components/trigger_component.h"

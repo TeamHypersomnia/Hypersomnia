@@ -483,7 +483,7 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 
 	listener.~contact_listener();
 
-	movement_system().generate_movement_responses(step);
+	movement_system().generate_movement_events(step);
 
 	animation_system().game_responses_to_animation_messages(step);
 

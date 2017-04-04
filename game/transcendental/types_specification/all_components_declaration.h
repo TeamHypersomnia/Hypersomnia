@@ -6,7 +6,6 @@ namespace components {
 	struct dynamic_tree_node;
 	struct special_physics;
 	struct animation;
-	struct animation_response;
 	struct behaviour_tree;
 	struct position_copying;
 	struct crosshair;
@@ -48,6 +47,7 @@ namespace components {
 	struct sound_existence;
 	struct grenade;
 	struct catridge;
+
 	struct inferred_state;
 }
 
@@ -57,7 +57,6 @@ struct put_all_components_into {
 		components::dynamic_tree_node,
 		components::special_physics,
 		components::animation,
-		components::animation_response,
 		components::behaviour_tree,
 		components::position_copying,
 		components::crosshair,

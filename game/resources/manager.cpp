@@ -27,10 +27,6 @@ augs::texture_atlas_entry& operator*(const assets::game_image_id& id) {
 	return get_resource_manager().find(id)->texture_maps[texture_map_type::DIFFUSE];
 }
 
-resources::animation_response& operator*(const assets::animation_response_id& id) {
-	return *get_resource_manager().find(id);
-}
-
 resources::particle_effect& operator*(const assets::particle_effect_id& id) {
 	return *get_resource_manager().find(id);
 }
@@ -85,10 +81,6 @@ namespace resources {
 
 	animation* manager::find(const assets::animation_id id) {
 		return ptr_if_found(animations, id);
-	}
-
-	animation_response* manager::find(assets::animation_response_id id) {
-		return ptr_if_found(animation_responses, id);
 	}
 
 	behaviour_tree* manager::find(assets::behaviour_tree_id id) {
@@ -274,11 +266,6 @@ namespace resources {
 		}
 
 		return anim;
-	}
-
-	animation_response& manager::create(assets::animation_response_id id) {
-		animation_response& resp = animation_responses[id];
-		return resp;
 	}
 
 	particle_effect& manager::create(assets::particle_effect_id id) {

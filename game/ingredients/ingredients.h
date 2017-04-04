@@ -3,7 +3,6 @@
 #include "augs/math/vec2.h"
 
 #include "game/assets/game_image_id.h"
-#include "game/assets/animation_response_id.h"
 #include "game/components/render_component.h"
 
 #include "augs/graphics/pixel.h"
@@ -34,7 +33,7 @@ namespace ingredients {
 
 	void add_wsad_character_physics(entity_handle);
 	void add_wsad_character_legs(entity_handle legs, entity_handle player);
-	void add_wsad_character(entity_handle, entity_handle crosshair_entity, const assets::animation_response_id torso_set = assets::animation_response_id::TORSO_SET);
+	void add_wsad_character(entity_handle, entity_handle crosshair_entity);
 
 	void add_character_inventory(entity_handle);
 	void add_backpack(entity_handle);
@@ -73,11 +72,10 @@ namespace prefabs {
 
 	entity_handle create_character_crosshair(cosmos&);
 	
-	entity_handle create_character(
+	entity_handle create_sample_complete_character(
 		cosmos&, 
 		const components::transform pos, 
-		const std::string name = "character_unnamed", 
-		const assets::animation_response_id torso_set = assets::animation_response_id::TORSO_SET
+		const std::string name = "character_unnamed"
 	);
 	
 	entity_handle create_crate(cosmos&, const components::transform pos, const vec2 size = vec2());

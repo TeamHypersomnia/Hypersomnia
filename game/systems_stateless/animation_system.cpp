@@ -1,7 +1,6 @@
 #include "animation_system.h"
 #include "game/transcendental/cosmos.h"
-#include "game/components/animation_response_component.h"
-#include "game/messages/movement_response.h"
+#include "game/messages/movement_event.h"
 #include "game/messages/animation_message.h"
 #include "game/messages/gunshot_response.h"
 
@@ -21,43 +20,8 @@ using namespace resources;
 void animation_system::game_responses_to_animation_messages(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
-	const auto& movements = step.transient.messages.get_queue<movement_response>();
+	const auto& movements = step.transient.messages.get_queue<movement_event>();
 	const auto& gunshots = step.transient.messages.get_queue<gunshot_response>();
-
-	for (auto it : movements) {
-		animation_message msg;
-
-		msg.subject = it.subject;
-		msg.change_speed = true;
-
-		msg.change_animation = true;
-		msg.preserve_state_if_animation_changes = false;
-		msg.action = ((it.speed <= 1.f) ? animation_message::STOP : animation_message::CONTINUE);
-
-		if (!it.stop_response_at_zero_speed)
-			msg.action = animation_message::CONTINUE;
-
-		msg.animation_priority = 0;
-
-		msg.set_animation = (*(cosmos[it.subject].get<components::animation_response>().response))[animation_response_type::MOVE];
-		msg.speed_factor = it.speed;
-
-		step.transient.messages.post(msg);
-	}
-
-	for (auto it : gunshots) {
-		// animation_message msg;
-		// msg.preserve_state_if_animation_changes = false;
-		// msg.change_animation = true;
-		// msg.change_speed = true;
-		// msg.speed_factor = 1.f;
-		// msg.subject = it.subject;
-		// msg.action = messages::animation_message::START;
-		// msg.animation_priority = 1;
-		// msg.set_animation = (*(it.subject.get<components::animation_response>().response))[animation_response_type::SHOT];
-		// 
-		// step.transient.messages.post(msg);
-	}
 }
 
 void animation_system::handle_animation_messages(const logic_step step) {

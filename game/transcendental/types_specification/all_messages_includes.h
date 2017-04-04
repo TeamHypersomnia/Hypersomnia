@@ -4,7 +4,7 @@
 #include "game/messages/queue_destruction.h"
 #include "game/messages/will_soon_be_deleted.h"
 #include "game/messages/animation_message.h"
-#include "game/messages/movement_response.h"
+#include "game/messages/movement_event.h"
 #include "game/messages/collision_message.h"
 #include "game/messages/create_particle_effect.h"
 #include "game/messages/gunshot_response.h"

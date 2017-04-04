@@ -7,7 +7,6 @@
 #include "game/assets/program_id.h"
 #include "game/assets/font_id.h"
 #include "game/assets/animation_id.h"
-#include "game/assets/animation_response_id.h"
 #include "game/assets/particle_effect_id.h"
 #include "game/assets/behaviour_tree_id.h"
 #include "game/assets/tile_layer_id.h"
@@ -15,7 +14,6 @@
 #include "game/assets/sound_response_id.h"
 
 #include "game/resources/animation.h"
-#include "game/resources/animation_response.h"
 #include "game/resources/particle_effect.h"
 #include "game/resources/behaviour_tree.h"
 #include "game/resources/tile_layer.h"
@@ -110,7 +108,6 @@ namespace resources {
 		animation& create_inverse_with_flip(assets::animation_id, assets::game_image_id first_frame, assets::game_image_id last_frame, float frame_duration_ms);
 
 		animation& create(assets::animation_id at);
-		resources::animation_response& create(assets::animation_response_id at);
 
 		particle_effect& create(assets::particle_effect_id at);
 
@@ -122,7 +119,6 @@ namespace resources {
 
 		augs::graphics::shader_program* find(assets::program_id);
 		animation* find(assets::animation_id);
-		animation_response* find(assets::animation_response_id);
 		particle_effect* find(assets::particle_effect_id);
 		behaviour_tree* find(assets::behaviour_tree_id);
 		tile_layer* find(assets::tile_layer_id);
@@ -137,7 +133,6 @@ namespace resources {
 		augs::enum_associative_array<assets::physical_texture_id, augs::graphics::texture> physical_textures;
 
 		augs::enum_associative_array<assets::particle_effect_id, particle_effect> particle_effects;
-		augs::enum_associative_array<assets::animation_response_id, animation_response> animation_responses;
 		augs::enum_associative_array<assets::animation_id, animation> animations;
 		
 		augs::enum_associative_array<assets::shader_id, augs::graphics::shader> shaders;

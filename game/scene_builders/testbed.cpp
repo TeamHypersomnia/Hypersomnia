@@ -100,12 +100,11 @@ namespace scene_builders {
 		};
 
 		for (int i = 0; i < num_characters; ++i) {
-			assets::animation_response_id torso_set = assets::animation_response_id::TORSO_SET;
 			components::transform transform;
 
 			if (i == 0) {
 				//transform = { 0, 300, 0 };
-				torso_set = assets::animation_response_id::TORSO_SET;
+				//torso_set = assets::animation_response_id::TORSO_SET;
 			}
 			else if (i == 1 || i == 2) {
 				if (i == 1) {
@@ -115,10 +114,10 @@ namespace scene_builders {
 					transform = { 1102, 213, 110 };
 				}
 
-				torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
+				//torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
 			}
 			else if (i == 3) {
-				torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
+				//torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
 			}
 
 			// three rebels
@@ -126,39 +125,37 @@ namespace scene_builders {
 			else if (i == 4) {
 				transform = { -100, 20000, 0 };
 
-				torso_set = assets::animation_response_id::BLUE_TORSO_SET;
+				//torso_set = assets::animation_response_id::BLUE_TORSO_SET;
 			}
 			else if (i == 5) {
 				transform = { 1200, 15000, 0 };
 
-				torso_set = assets::animation_response_id::BLUE_TORSO_SET;
+				//torso_set = assets::animation_response_id::BLUE_TORSO_SET;
 			}
 			else if (i == 6) {
 				transform = { -300, 20000, 0 };
 
-				torso_set = assets::animation_response_id::BLUE_TORSO_SET;
+				//torso_set = assets::animation_response_id::BLUE_TORSO_SET;
 			}
 
 			// three metropolitan soldiers
 			else if (i == 7) {
 				transform = { -300, -2000, 0 };
 
-				torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
+				//torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
 			}
 			else if (i == 8) {
 				transform = { -400, -2000, 0 };
 
-				torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
+				//torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
 			}
 			else if (i == 9) {
 				transform = { -500, -2000, 0 };
 
-				torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
+				//torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
 			}
 
-
-
-			const auto new_character = prefabs::create_character(world, transform, typesafe_sprintf("player%x", i), torso_set);
+			const auto new_character = prefabs::create_sample_complete_character(world, transform, typesafe_sprintf("player%x", i));
 
 			new_characters[i] = new_character;
 
