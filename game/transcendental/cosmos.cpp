@@ -100,7 +100,10 @@ cosmos::cosmos(const unsigned reserved_entities) {
 	significant.meta.settings.si.set_pixels_per_meter(100.f);
 	entity_debug_names[0] = "dead entity";
 
-	set_standard_spell_properties(significant.meta.flyweights.spells);
+	set_standard_spell_properties(*this);
+	set_standard_animations(*this);
+	set_standard_particle_effects(*this);
+
 	set_standard_collision_sound_matrix(significant.meta.flyweights.collision_sound_matrix);
 }
 
@@ -203,10 +206,6 @@ void cosmos::reserve_storage_for_entities(const size_t n) {
 
 std::wstring cosmos::summary() const {
 	return typesafe_sprintf(L"Entities: %x\n", entities_count());
-}
-
-const spell_data& cosmos::get(const spell_type s) const {
-	return significant.meta.flyweights.spells[s];
 }
 
 assets::sound_buffer_id cosmos::get_collision_sound(

@@ -24,7 +24,7 @@ namespace components {
 		};
 
 		// GEN INTROSPECTOR struct components::sprite
-		assets::game_image_id tex = assets::game_image_id::INVALID;
+		assets::game_image_id tex = assets::game_image_id::COUNT;
 		rgba color;
 		vec2 size;
 		vec2 size_multiplier = vec2(1, 1);

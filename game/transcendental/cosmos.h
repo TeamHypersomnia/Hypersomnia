@@ -37,52 +37,7 @@
 #include "game/flyweights/spell_data.h"
 #include "game/flyweights/physical_material.h"
 
-class cosmic_delta;
-struct data_living_one_step;
-
-typedef put_all_components_into_t<augs::operations_on_all_components_mixin, cosmos> cosmos_base;
-
-struct cosmos_flyweights_state {
-	// GEN INTROSPECTOR struct cosmos_flyweights_state
-	augs::enum_associative_array<spell_type, spell_data> spells;
-	collision_sound_matrix_type collision_sound_matrix;
-	// END GEN INTROSPECTOR
-};
-
-class cosmos_metadata {
-	// GEN INTROSPECTOR class cosmos_metadata
-	friend class cosmos;
-
-	augs::delta delta;
-	unsigned total_steps_passed = 0;
-
-#if COSMOS_TRACKS_GUIDS
-	entity_guid next_entity_guid = 1;
-#endif
-public:
-	all_simulation_settings settings;
-
-	cosmos_flyweights_state flyweights;
-	// END GEN INTROSPECTOR
-};
-
-struct cosmos_significant_state {
-	// GEN INTROSPECTOR struct cosmos_significant_state
-	cosmos_metadata meta;
-
-	typename cosmos_base::aggregate_pool_type pool_for_aggregates;
-	typename cosmos_base::component_pools_type pools_for_components;
-	// END GEN INTROSPECTOR
-
-	bool operator==(const cosmos_significant_state&) const;
-	bool operator!=(const cosmos_significant_state&) const;
-};
-
-enum class subjects_iteration_flag {
-	POSSIBLE_ITERATOR_INVALIDATION,
-
-	COUNT
-};
+#include "game/transcendental/cosmos_structs.h"
 
 class EMPTY_BASES cosmos : 
 	private cosmos_base,
@@ -175,6 +130,22 @@ public:
 		if (handle.has<components::inferred_state>()) {
 			sys.create_inferred_state(handle);
 		}
+	}
+
+	template <class id_type>
+	decltype(auto) get_handle(
+		const id_type id,
+		find_flyweights_container_t<id_type>* enable_if_flyweight_type_found = nullptr
+	) {
+		return std::get<find_flyweights_container_t<id_type>>(significant.meta.flyweights.all_flyweights_by_id)[id];
+	}
+
+	template <class id_type>
+	decltype(auto) get_handle(
+		const id_type id,
+		find_flyweights_container_t<id_type>* enable_if_flyweight_type_found = nullptr
+	) const {
+		return std::get<find_flyweights_container_t<id_type>>(significant.meta.flyweights.all_flyweights_by_id)[id];
 	}
 
 #if COSMOS_TRACKS_GUIDS
@@ -329,8 +300,6 @@ public:
 			operator()(subject, callback);
 		}
 	}
-
-	const spell_data& get(const spell_type) const;
 	
 	assets::sound_buffer_id get_collision_sound(
 		const physical_material_type a, 

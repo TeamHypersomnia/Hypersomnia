@@ -29,7 +29,7 @@ void action_button::draw(
 		const auto bound_spell = this_id->bound_spell;
 
 		if (bound_spell != spell_type::COUNT && sentience.spells.find(bound_spell) != sentience.spells.end()) {
-			const auto spell_data = cosmos.get(bound_spell);
+			const auto spell_data = cosmos[bound_spell];
 			const bool has_enough_mana = sentience.personal_electricity.value >= spell_data.personal_electricity_required;
 			const float required_mana_ratio = std::min(1.f, sentience.personal_electricity.value / static_cast<float>(spell_data.personal_electricity_required));
 
@@ -43,7 +43,7 @@ void action_button::draw(
 				inside_col.a = 255;
 			}
 
-			assets::game_image_id inside_tex = assets::game_image_id::INVALID;
+			assets::game_image_id inside_tex = assets::game_image_id::COUNT;
 			assets::game_image_id border_tex = assets::game_image_id::SPELL_BORDER;
 
 			rgba border_col;
@@ -56,8 +56,8 @@ void action_button::draw(
 				border_col = border_col.get_desaturated();
 			}
 
-			if (inside_tex != assets::game_image_id::INVALID) {
-				ensure(border_tex != assets::game_image_id::INVALID);
+			if (inside_tex != assets::game_image_id::COUNT) {
+				ensure(border_tex != assets::game_image_id::COUNT);
 
 				const augs::gui::material inside_mat(inside_tex, inside_col);
 

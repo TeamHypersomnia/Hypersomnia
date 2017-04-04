@@ -1,10 +1,10 @@
 #include "animation_system.h"
+
 #include "game/transcendental/cosmos.h"
+
 #include "game/messages/movement_event.h"
 #include "game/messages/animation_message.h"
 #include "game/messages/gunshot_response.h"
-
-#include "game/resources/manager.h"
 
 #include "game/components/animation_component.h"
 #include "game/components/render_component.h"
@@ -107,7 +107,7 @@ void animation_system::progress_animation_states(const logic_step step) {
 			auto& animation_state = it.get<components::animation>();
 
 			if (animation_state.state != components::animation::playing_state::PAUSED) {
-				auto& animation = *get_resource_manager().find(animation_state.current_animation);
+				auto& animation = cosmos[animation_state.current_animation];
 
 				if (animation.frames.empty()) {
 					return;
@@ -168,7 +168,7 @@ void animation_system::progress_animation_states(const logic_step step) {
 				}
 
 				auto& sprite = it.get<components::sprite>();
-				sprite = animation.frames[animation_state.get_current_frame()].sprite;
+				sprite.set(animation.frames[animation_state.get_current_frame()].image_id);
 			}
 		}
 	);

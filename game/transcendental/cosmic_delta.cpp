@@ -47,6 +47,8 @@ typedef apply_negation<bind_types_t<std::is_same, shape_variant>> no_variant;
 static_assert(!no_variant::type<shape_variant>::value, "Trait is wrong");
 static_assert(no_variant::type<int>::value, "Trait is wrong");
 
+static_assert(augs::enum_associative_array<assets::game_image_id, int>().capacity() == int(assets::game_image_id::COUNT), "enum_associative_array is wrong");
+
 template <class T>
 void transform_component_ids_to_guids_in_place(
 	T& comp,
@@ -142,7 +144,7 @@ void read_delta(
 	}
 }
 
-struct delted_entity_stream {
+struct delted_stream_of_entities {
 	unsigned new_entities = 0;
 	unsigned changed_entities = 0;
 	unsigned removed_entities = 0;
@@ -160,7 +162,7 @@ bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 	enco.profiler.delta_encoding.new_measurement();
 	typedef decltype(base.significant.pool_for_aggregates)::element_type aggregate;
 	
-	delted_entity_stream dt;
+	delted_stream_of_entities dt;
 
 	enco.significant.pool_for_aggregates.for_each_object_and_id([&](const aggregate& agg, const entity_id id) {
 		const const_entity_handle enco_entity = enco.get_handle(id);
@@ -338,7 +340,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 
 	read_delta(deco.significant.meta, in, true);
 
-	delted_entity_stream dt;
+	delted_stream_of_entities dt;
 
 	augs::read(in, dt.new_entities);
 	augs::read(in, dt.changed_entities);
@@ -537,11 +539,13 @@ TEST(CosmicDelta, PaddingSanityCheck2) {
 }
 
 TEST(CosmicDelta, CosmicDeltaPaddingTest) {
+	static_assert(augs::is_byte_io_safe_v<augs::stream, cosmos_flyweights_state>, "cosmos_flyweights_state must be trivially copyable for delta-encoding");
+
 	auto padding_checker = [](auto c, auto... args) {
 		typedef decltype(c) component_type;
 		static_assert(std::is_same_v<std::decay_t<component_type>, component_type>, "Something's wrong with the types");
-		static_assert(augs::is_byte_io_safe_v<augs::stream, component_type>, "Non-trivial component detected!");
-
+		static_assert(augs::is_byte_io_safe_v<augs::stream, component_type>, "Non-trivially copyable component detected!");
+		
 		typedef component_type checked_type;
 		constexpr size_t type_size = sizeof(checked_type);
 

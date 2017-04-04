@@ -1,6 +1,8 @@
 #include "all.h"
 
-void set_standard_spell_properties(augs::enum_associative_array<spell_type, spell_data>& spells) {
+#include "game/transcendental/cosmos.h"
+
+void set_standard_spell_properties(cosmos& spells) {
 	{
 		auto& d = spells[spell_type::HASTE];
 		d.cooldown_ms = 5000;

@@ -7,22 +7,27 @@
 namespace augs {
 	template<class Enum, class T>
 	class enum_associative_array {
-		typedef std::array<T, size_t(Enum::COUNT)> arr_type;
+	public:
+		typedef Enum key_type;
+		typedef T mapped_type;
+	private:
 
-		// GEN INTROSPECTOR class augs::enum_associative_array class Enum class T
-		std::bitset<size_t(Enum::COUNT)> is_set;
+		typedef std::array<mapped_type, size_t(key_type::COUNT)> arr_type;
+
+		// GEN INTROSPECTOR class augs::enum_associative_array class key_type class mapped_type
+		std::bitset<size_t(key_type::COUNT)> is_set;
 		arr_type raw;
 		// END GEN INTROSPECTOR
 
-		template <class F, class Enum, class T, class... Instances>
+		template <class F, class key_type, class A, class... Instances>
 		friend void introspect_body(
-			const augs::enum_associative_array<Enum, T>* const,
+			const augs::enum_associative_array<key_type, A>* const,
 			F f,
 			Instances&&... _t_
 		);
 
 		unsigned find_first_set_index(unsigned from) const {
-			while (from < static_cast<size_t>(Enum::COUNT) && !is_set.test(from)) {
+			while (from < static_cast<size_t>(key_type::COUNT) && !is_set.test(from)) {
 				++from;
 			}
 
@@ -33,13 +38,12 @@ namespace augs {
 		template<bool is_const>
 		class basic_iterator {
 			typedef maybe_const_ptr_t<is_const, enum_associative_array> ptr_type;
-			typedef std::pair<Enum, maybe_const_ref_t<is_const, T>> ref_type;
+			typedef std::pair<key_type, maybe_const_ref_t<is_const, mapped_type>> ref_type;
 			
 			ptr_type ptr = nullptr;
 			size_t idx = 0;
 
-			//template<class Enum, class T>
-			friend class enum_associative_array;
+			friend class enum_associative_array<Enum, T>;
 
 		public:
 			basic_iterator(const ptr_type ptr, const size_t idx) : ptr(ptr), idx(idx) {}
@@ -65,7 +69,7 @@ namespace augs {
 
 			ref_type operator*() const {
 				ensure(idx < ptr->capacity());
-				return { static_cast<Enum>(idx), ptr->raw[idx] };
+				return { static_cast<key_type>(idx), ptr->raw[idx] };
 			}
 		};
 
@@ -80,7 +84,7 @@ namespace augs {
 		}
 
 		iterator end() {
-			return iterator(this, static_cast<size_t>(Enum::COUNT));
+			return iterator(this, static_cast<size_t>(key_type::COUNT));
 		}
 
 		const_iterator begin() const {
@@ -88,10 +92,10 @@ namespace augs {
 		}
 
 		const_iterator end() const {
-			return const_iterator(this, static_cast<size_t>(Enum::COUNT));
+			return const_iterator(this, static_cast<size_t>(key_type::COUNT));
 		}
 
-		iterator find(const Enum enum_idx) {
+		iterator find(const key_type enum_idx) {
 			const size_t i = static_cast<size_t>(enum_idx);
 			ensure(i < capacity());
 
@@ -102,7 +106,7 @@ namespace augs {
 			return end();
 		}
 
-		const_iterator find(const Enum enum_idx) const {
+		const_iterator find(const key_type enum_idx) const {
 			const size_t i = static_cast<size_t>(enum_idx);
 			ensure(i < capacity());
 
@@ -113,19 +117,19 @@ namespace augs {
 			return end();
 		}
 
-		T& at(const Enum enum_idx) {
+		mapped_type& at(const key_type enum_idx) {
 			const size_t i = static_cast<size_t>(enum_idx);
 			ensure(i < capacity() && is_set.test(i));
 			return raw[i];
 		}
 
-		const T& at(const Enum enum_idx) const {
+		const mapped_type& at(const key_type enum_idx) const {
 			const size_t i = static_cast<size_t>(enum_idx);
 			ensure(i < capacity() && is_set.test(i));
 			return raw[i];
 		}
 
-		T& operator[](const Enum enum_idx) {
+		mapped_type& operator[](const key_type enum_idx) {
 			const size_t i = static_cast<size_t>(enum_idx);
 
 			if (!is_set.test(i)) {
@@ -135,21 +139,21 @@ namespace augs {
 			return raw[i];
 		}
 
-		const T& operator[](const Enum enum_idx) const {
+		const mapped_type& operator[](const key_type enum_idx) const {
 			return at(enum_idx);
 		}
 
-		size_t capacity() const {
+		constexpr size_t capacity() const {
 			return raw.size();
 		}
 
 		void clear() {
 			for (auto& v : raw) {
-				v.~T();
-				new (&v) T;
+				v.~mapped_type();
+				new (&v) mapped_type;
 			}
 
-			is_set = std::bitset<static_cast<size_t>(Enum::COUNT)>();
+			is_set = std::bitset<static_cast<size_t>(key_type::COUNT)>();
 		}
 	};
 }

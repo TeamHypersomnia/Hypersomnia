@@ -1,16 +1,20 @@
 #pragma once
-#include "game/components/render_component.h"
-#include "game/components/sprite_component.h"
-
-#include "augs/misc/minmax.h"
 #include "augs/zeroed_pod.h"
 
 #include "augs/templates/type_mod_templates.h"
-#include "game/detail/particle_types_declaration.h"
+
+#include "augs/misc/minmax.h"
+#include "augs/misc/constant_size_vector.h"
+
+#include "game/container_sizes.h"
 
 #include "game/transcendental/entity_id.h"
 
-struct general_particle;
+#include "game/components/render_component.h"
+#include "game/components/sprite_component.h"
+
+#include "game/detail/particle_types.h"
+#include "game/detail/particle_types_declaration.h"
 
 struct particle_effect_modifier {
 	// GEN INTROSPECTOR struct particle_effect_modifier
@@ -61,17 +65,17 @@ struct particles_emission {
 	bool randomize_acceleration = false;
 	bool should_particles_look_towards_velocity = true;
 
-	tuple_of_particle_types_t<make_vector> particle_templates;
+	tuple_of_particle_types_t<of_size<PARTICLE_TEMPLATES_COUNT>::make_constant_vector> particle_templates;
 	// END GEN INTROSPECTOR
 
 	template <class T>
 	auto& get_templates() {
-		return std::get<std::vector<T>>(particle_templates);
+		return std::get<augs::constant_size_vector<T, PARTICLE_TEMPLATES_COUNT>>(particle_templates);
 	}
 
 	template <class T>
 	const auto& get_templates() const {
-		return std::get<std::vector<T>>(particle_templates);
+		return std::get<augs::constant_size_vector<T, PARTICLE_TEMPLATES_COUNT>>(particle_templates);
 	}
 
 	template <class T>

@@ -117,3 +117,14 @@ static_assert(index_in_v<unsigned, float, float, double, unsigned> == 3, "Someth
 
 static_assert(std::is_same_v<unsigned, nth_type_in_t<0, unsigned, float, float>>, "Something wrong with trait");
 static_assert(std::is_same_v<double, nth_type_in_t<3, unsigned, float, float, double, unsigned>>, "Something wrong with trait");
+
+template <class T, class Candidate>
+struct is_key_type_equal_to : std::bool_constant<std::is_same_v<T, typename Candidate::key_type>> {
+
+};
+
+template <class SearchedKeyType, class List>
+using find_type_with_key_type_in_list_t = typename find_matching_type<is_key_type_equal_to, SearchedKeyType, List>::type;
+
+template <class SearchedKeyType, class... Types>
+using find_type_with_key_type_t = find_type_with_key_type_in_list_t<SearchedKeyType, std::tuple<Types...>>;

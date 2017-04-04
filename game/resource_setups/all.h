@@ -7,18 +7,18 @@
 #include "game/flyweights/physical_material.h"
 
 class config_lua_table;
+class cosmos;
 
-namespace resource_setups {
-	void load_standard_everything(const config_lua_table&);
+void load_standard_everything(const config_lua_table&);
 
-	game_image_requests load_standard_images();
-	game_font_requests load_standard_fonts();
+game_image_requests load_standard_images();
+game_font_requests load_standard_fonts();
 
-	void load_standard_particle_effects();
-	void load_standard_behaviour_trees();
-	void load_standard_tile_layers();
-	void load_standard_sound_buffers();
-}
+void set_standard_particle_effects(cosmos& cosmos);
+void load_standard_behaviour_trees();
+void load_standard_tile_layers();
+void load_standard_sound_buffers();
 
 void set_standard_collision_sound_matrix(collision_sound_matrix_type&);
-void set_standard_spell_properties(augs::enum_associative_array<spell_type, spell_data>&);
+void set_standard_spell_properties(cosmos&);
+void set_standard_animations(cosmos&);

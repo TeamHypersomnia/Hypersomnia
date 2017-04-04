@@ -30,7 +30,7 @@ namespace components {
 		};
 
 		// GEN INTROSPECTOR struct components::polygon
-		assets::game_image_id center_neon_map = assets::game_image_id::INVALID;
+		assets::game_image_id center_neon_map = assets::game_image_id::COUNT;
 		augs::constant_size_vector<augs::vertex, RENDERING_POLYGON_TRIANGULATED_VERTEX_COUNT> vertices;
 		augs::constant_size_vector<zeroed_pod<unsigned>, RENDERING_POLYGON_INDEX_COUNT> triangulation_indices;
 

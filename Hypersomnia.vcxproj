@@ -421,6 +421,7 @@
     <ClCompile Include="game\flyweights\physical_material.cpp" />
     <ClCompile Include="game\flyweights\tile_layer.cpp" />
     <ClCompile Include="game\ingredients\grenades.cpp" />
+    <ClCompile Include="game\resource_setups\standard_animations.cpp" />
     <ClCompile Include="game\resource_setups\standard_atlas.cpp" />
     <ClCompile Include="game\resource_setups\standard_behaviour_trees.cpp" />
     <ClCompile Include="game\resource_setups\standard_everything.cpp" />

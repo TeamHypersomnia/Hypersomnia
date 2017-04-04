@@ -3,8 +3,6 @@
 
 namespace assets {
 	enum class game_image_id {
-		INVALID,
-
 		BLANK,
 
 		CRATE,
@@ -212,7 +210,7 @@ namespace assets {
 		PED_GRENADE_RELEASED,
 		INTERFERENCE_GRENADE_RELEASED,
 
-		COUNT,
+		COUNT
 	};
 	
 	vec2u get_size(game_image_id);

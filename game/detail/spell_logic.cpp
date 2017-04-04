@@ -64,7 +64,7 @@ std::wstring describe_spell(
 	const const_entity_handle caster,
 	const spell_type spell
 ) {
-	const auto spell_data = caster.get_cosmos().get(spell);
+	const auto spell_data = caster.get_cosmos()[spell];
 
 	const auto properties = typesafe_sprintf(
 		L"Incantation: [color=yellow]%x[/color]\nPE to cast: [color=vscyan]%x[/color]\nCooldown: [color=vscyan]%x[/color]",
@@ -154,7 +154,7 @@ void perform_spell_logic(
 	const augs::stepped_timestamp now
 ) {
 	auto& cosmos = step.cosm;
-	const auto spell_data = cosmos.get(spell);
+	const auto spell_data = cosmos[spell];
 	const auto dt = cosmos.get_fixed_delta();
 	const auto caster_transform = caster.get_logic_transform();
 	const auto appearance = get_spell_appearance(spell);

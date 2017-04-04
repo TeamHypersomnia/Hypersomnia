@@ -79,7 +79,7 @@ namespace components {
 	}
 
 	void sprite::draw(const drawing_input& in) const {
-		ensure(tex != assets::game_image_id::INVALID);
+		ensure(tex != assets::game_image_id::COUNT);
 
 		vec2i transform_pos = in.renderable_transform.pos;
 		const float final_rotation = in.renderable_transform.rotation + rotation_offset;
@@ -114,9 +114,8 @@ namespace components {
 			);
 		}
 		else if (in.drawing_type == renderable_drawing_type::SPECULAR_HIGHLIGHTS) {
-			const auto& anim = *get_resource_manager().find(assets::animation_id::BLINK_ANIMATION);
-			const auto frame_duration_ms = static_cast<unsigned>(anim.frames[0].duration_milliseconds);
-			const auto frame_count = anim.frames.size();
+			const auto frame_duration_ms = 50u;
+			const auto frame_count = 1 + int(assets::game_image_id::BLINK_LAST) - int(assets::game_image_id::BLINK_FIRST);
 			const auto animation_max_duration = frame_duration_ms * frame_count;
 			
 			for (unsigned m = 0; m < max_specular_blinks; ++m) {
@@ -127,16 +126,16 @@ namespace components {
 				fast_randomization generator(spatial_hash + m * 30 + total_ms / animation_max_duration);
 
 				const unsigned animation_current_ms = total_ms % (animation_max_duration);
-				const auto& target_frame = anim.frames[animation_current_ms / frame_duration_ms];
+				const auto& target_frame = assets::game_image_id(int(assets::game_image_id::BLINK_LAST) + animation_current_ms / frame_duration_ms);
 
 				const auto blink_offset = 
 					vec2i { generator.randval(0, int(drawn_size.x)), generator.randval(0, int(drawn_size.y)) } - drawn_size / 2;
 
 				draw(in, 
-					get_resource_manager().find(target_frame.sprite.tex)->texture_maps[texture_map_type::DIFFUSE],
+					get_resource_manager().find(target_frame)->texture_maps[texture_map_type::DIFFUSE],
 					screen_space_pos + blink_offset,
 					final_rotation,
-					assets::get_size(target_frame.sprite.tex)
+					assets::get_size(target_frame)
 				);
 			}
 		}

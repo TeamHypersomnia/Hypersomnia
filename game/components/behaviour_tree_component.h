@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 
-#include "game/resources/behaviour_tree.h"
+#include "game/flyweights/behaviour_tree.h"
 #include "game/assets/behaviour_tree_id.h"
 
 #include "game/container_sizes.h"

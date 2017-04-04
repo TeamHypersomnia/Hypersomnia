@@ -48,7 +48,7 @@ bool is_button_corner(const button_corner_type);
 bool is_button_side(const button_corner_type);
 
 struct button_corners_info {
-	assets::game_image_id inside_texture = assets::game_image_id::INVALID;
+	assets::game_image_id inside_texture = assets::game_image_id::COUNT;
 	bool flip_horizontally = true;
 
 	assets::game_image_id get_tex_for_type(button_corner_type) const;

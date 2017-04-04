@@ -63,6 +63,8 @@ struct perk_timing;
 struct sentience_meter;
 struct circle_shape;
 struct spell_instance_data;
+struct animation_frame;
+struct animation;
 struct particle_effect_modifier;
 struct particles_emission;
 struct all_simulation_settings;
@@ -112,7 +114,7 @@ namespace augs {
 	class constant_size_vector;
 	template <class T, class _enum>
 	class enum_array;
-	template <class Enum, class T>
+	template <class key_type, class mapped_type>
 	class enum_associative_array;
 	struct machine_entropy;
 	class pooled_object_raw_id;
@@ -356,9 +358,9 @@ namespace augs {
 		introspect_body(static_cast<std::array<T, static_cast<size_t>(_enum::COUNT)>*>(nullptr), f, std::forward<Instances>(_t_)...);
 	}
 
-	template <class F, class Enum, class T, class... Instances>
+	template <class F, class key_type, class mapped_type, class... Instances>
 	void introspect_body(
-		const augs::enum_associative_array<Enum, T>* const,
+		const augs::enum_associative_array<key_type, mapped_type>* const,
 		F f,
 		Instances&&... _t_
 	) {
@@ -1550,6 +1552,27 @@ namespace augs {
 
 	template <class F, class... Instances>
 	void introspect_body(
+		const animation_frame* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(image_id);
+		FIELD(duration_milliseconds);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const animation* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(frames);
+
+		FIELD(loop_mode);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
 		const resources::state_of_behaviour_tree_instance* const,
 		F f,
 		Instances&&... _t_
@@ -1699,7 +1722,8 @@ namespace augs {
 		F f,
 		Instances&&... _t_
 	) {
-		FIELD(spells);
+		FIELD(all_flyweights_by_id);
+
 		FIELD(collision_sound_matrix);
 	}
 

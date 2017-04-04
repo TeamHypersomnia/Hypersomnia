@@ -19,7 +19,7 @@ struct spell_instance_data {
 };
 
 struct spell_appearance {
-	assets::game_image_id icon = assets::game_image_id::INVALID;
+	assets::game_image_id icon = assets::game_image_id::COUNT;
 	rgba border_col;
 };
 

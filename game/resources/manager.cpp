@@ -79,10 +79,6 @@ namespace resources {
 		return ptr_if_found(programs, id);
 	}
 
-	animation* manager::find(const assets::animation_id id) {
-		return ptr_if_found(animations, id);
-	}
-
 	behaviour_tree* manager::find(assets::behaviour_tree_id id) {
 		return ptr_if_found(behaviour_trees, id);
 	}
@@ -188,84 +184,6 @@ namespace resources {
 		}
 
 		tex.create(atlas_image);
-	}
-
-	animation& manager::create(assets::animation_id id) {
-		animation& anim = animations[id];
-		return anim;
-	}
-
-	animation& manager::create(assets::animation_id id, assets::game_image_id first_frame, assets::game_image_id last_frame, float frame_duration_ms, 
-		resources::animation::loop_type loop_mode) {
-		
-		animation& anim = create(id);
-		anim.loop_mode = loop_mode;
-
-		for (assets::game_image_id i = first_frame; i < last_frame; i = assets::game_image_id(int(i)+1)) {
-			animation::frame frame;
-			frame.duration_milliseconds = frame_duration_ms;
-			frame.sprite.set(i);
-
-			anim.frames.push_back(frame);
-		}
-
-		return anim;
-	}
-	
-	animation& manager::create_inverse(assets::animation_id id, assets::game_image_id first_frame, assets::game_image_id last_frame, float frame_duration_ms) {
-		animation& anim = create(id);
-		anim.loop_mode = animation::loop_type::INVERSE;
-
-		for (assets::game_image_id i = first_frame; i < last_frame; i = assets::game_image_id(int(i) + 1)) {
-			animation::frame frame;
-			frame.duration_milliseconds = frame_duration_ms;
-			frame.sprite.set(i);
-
-			anim.frames.push_back(frame);
-		}
-
-		return anim;
-	}
-
-	animation& manager::create_inverse_with_flip(assets::animation_id id, assets::game_image_id first_frame, assets::game_image_id last_frame, float frame_duration_ms) {
-		animation& anim = create(id);
-		anim.loop_mode = animation::loop_type::REPEAT;
-
-		for (assets::game_image_id i = first_frame; i < last_frame; i = assets::game_image_id(int(i) + 1)) {
-			animation::frame frame;
-			frame.duration_milliseconds = frame_duration_ms;
-			frame.sprite.set(i);
-
-			anim.frames.push_back(frame);
-		}
-
-		for (assets::game_image_id i = assets::game_image_id(int(last_frame) - 1); i >= first_frame; i = assets::game_image_id(int(i) - 1)) {
-			animation::frame frame;
-			frame.duration_milliseconds = frame_duration_ms;
-			frame.sprite.set(i);
-
-			anim.frames.push_back(frame);
-		}
-
-		for (assets::game_image_id i = first_frame; i < last_frame; i = assets::game_image_id(int(i) + 1)) {
-			animation::frame frame;
-			frame.duration_milliseconds = frame_duration_ms;
-			frame.sprite.set(i);
-			frame.sprite.flip_vertically = true;
-
-			anim.frames.push_back(frame);
-		}
-
-		for (assets::game_image_id i = assets::game_image_id(int(last_frame) - 1); i >= first_frame; i = assets::game_image_id(int(i) - 1)) {
-			animation::frame frame;
-			frame.duration_milliseconds = frame_duration_ms;
-			frame.sprite.set(i);
-			frame.sprite.flip_vertically = true;
-
-			anim.frames.push_back(frame);
-		}
-
-		return anim;
 	}
 
 	particle_effect& manager::create(assets::particle_effect_id id) {

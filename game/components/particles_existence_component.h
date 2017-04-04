@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "augs/math/vec2.h"
-#include "game/resources/particle_effect.h"
+#include "game/flyweights/particle_effect.h"
 #include "transform_component.h"
 
 #include "augs/misc/stepped_timing.h"

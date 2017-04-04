@@ -13,10 +13,9 @@
 #include "game/assets/sound_buffer_id.h"
 #include "game/assets/sound_response_id.h"
 
-#include "game/resources/animation.h"
-#include "game/resources/particle_effect.h"
-#include "game/resources/behaviour_tree.h"
-#include "game/resources/tile_layer.h"
+#include "game/flyweights/particle_effect.h"
+#include "game/flyweights/behaviour_tree.h"
+#include "game/flyweights/tile_layer.h"
 
 #include "augs/image/font.h"
 #include "augs/graphics/shader.h"
@@ -96,19 +95,6 @@ namespace resources {
 
 		augs::sound_buffer& create(const assets::sound_buffer_id);
 
-		animation& create(
-			const assets::animation_id, 
-			const assets::game_image_id first_frame, 
-			const assets::game_image_id last_frame, 
-			const float frame_duration_ms,
-			resources::animation::loop_type = resources::animation::INVERSE
-		);
-
-		animation& create_inverse(assets::animation_id, assets::game_image_id first_frame, assets::game_image_id last_frame, float frame_duration_ms);
-		animation& create_inverse_with_flip(assets::animation_id, assets::game_image_id first_frame, assets::game_image_id last_frame, float frame_duration_ms);
-
-		animation& create(assets::animation_id at);
-
 		particle_effect& create(assets::particle_effect_id at);
 
 		augs::graphics::shader& create(assets::shader_id, std::string filename, augs::graphics::shader::type);
@@ -118,7 +104,6 @@ namespace resources {
 		tile_layer& create(assets::tile_layer_id);
 
 		augs::graphics::shader_program* find(assets::program_id);
-		animation* find(assets::animation_id);
 		particle_effect* find(assets::particle_effect_id);
 		behaviour_tree* find(assets::behaviour_tree_id);
 		tile_layer* find(assets::tile_layer_id);
@@ -133,7 +118,6 @@ namespace resources {
 		augs::enum_associative_array<assets::physical_texture_id, augs::graphics::texture> physical_textures;
 
 		augs::enum_associative_array<assets::particle_effect_id, particle_effect> particle_effects;
-		augs::enum_associative_array<assets::animation_id, animation> animations;
 		
 		augs::enum_associative_array<assets::shader_id, augs::graphics::shader> shaders;
 		augs::enum_associative_array<assets::program_id, augs::graphics::shader_program> programs;

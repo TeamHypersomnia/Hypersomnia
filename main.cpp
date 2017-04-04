@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
 	gl.initialize();
 	gl.initialize_fbos(window.get_screen_size());
 
-	resource_setups::load_standard_everything(cfg);
+	load_standard_everything(cfg);
 
 	const auto mode = cfg.get_launch_mode();
 	LOG("Launch mode: %x", static_cast<int>(mode));
