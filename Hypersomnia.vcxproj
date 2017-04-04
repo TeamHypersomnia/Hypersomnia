@@ -415,9 +415,12 @@
     <ClCompile Include="game\enums\attitude_type.cpp" />
     <ClCompile Include="game\enums\item_category.cpp" />
     <ClCompile Include="game\enums\item_transfer_result_type.cpp" />
+    <ClCompile Include="game\flyweights\animation.cpp" />
+    <ClCompile Include="game\flyweights\behaviour_tree.cpp" />
+    <ClCompile Include="game\flyweights\particle_effect.cpp" />
     <ClCompile Include="game\flyweights\physical_material.cpp" />
+    <ClCompile Include="game\flyweights\tile_layer.cpp" />
     <ClCompile Include="game\ingredients\grenades.cpp" />
-    <ClCompile Include="game\resources\tile_layer.cpp" />
     <ClCompile Include="game\resource_setups\standard_atlas.cpp" />
     <ClCompile Include="game\resource_setups\standard_behaviour_trees.cpp" />
     <ClCompile Include="game\resource_setups\standard_everything.cpp" />
@@ -504,7 +507,6 @@
     <ClCompile Include="game\detail\position_scripts.cpp" />
     <ClCompile Include="game\enums\filters.cpp" />
     <ClCompile Include="game\ingredients\artificial_life.cpp" />
-    <ClCompile Include="game\resources\behaviour_tree.cpp" />
     <ClCompile Include="game\detail\entity_description.cpp" />
     <ClCompile Include="game\detail\names_and_details.cpp" />
     <ClCompile Include="game\ingredients\backpack.cpp" />
@@ -518,9 +520,7 @@
     <ClCompile Include="game\ingredients\obstacles.cpp" />
     <ClCompile Include="game\ingredients\sprite.cpp" />
     <ClCompile Include="game\ingredients\wsad_player.cpp" />
-    <ClCompile Include="game\resources\animation.cpp" />
     <ClCompile Include="game\resources\manager.cpp" />
-    <ClCompile Include="game\resources\particle_effect.cpp" />
     <ClCompile Include="game\transcendental\logic_step.cpp" />
     <ClCompile Include="game\transcendental\serialization.cpp" />
     <ClCompile Include="game\transcendental\simulation_broadcast.cpp" />
@@ -1233,15 +1233,18 @@
     <ClInclude Include="game\enums\sentience_meter_type.h" />
     <ClInclude Include="game\enums\sound_response_type.h" />
     <ClInclude Include="game\enums\spell_type.h" />
+    <ClInclude Include="game\flyweights\animation.h" />
+    <ClInclude Include="game\flyweights\behaviour_tree.h" />
+    <ClInclude Include="game\flyweights\particle_effect.h" />
     <ClInclude Include="game\flyweights\physical_material.h" />
     <ClInclude Include="game\flyweights\spell_data.h" />
+    <ClInclude Include="game\flyweights\tile_layer.h" />
     <ClInclude Include="game\messages\exhausted_cast_message.h" />
     <ClInclude Include="game\messages\exploding_ring_input.h" />
     <ClInclude Include="game\messages\item_picked_up_message.h" />
     <ClInclude Include="game\messages\thunder_input.h" />
     <ClInclude Include="game\messages\visibility_information.h" />
     <ClInclude Include="application\content_generation\atlas_content_structs.h" />
-    <ClInclude Include="game\resources\tile_layer.h" />
     <ClInclude Include="game\resource_setups\all.h" />
     <ClInclude Include="game\scene_builders\networked_testbed.h" />
     <ClInclude Include="game\scene_builders\one_entity.h" />
@@ -1288,6 +1291,7 @@
     <ClInclude Include="game\transcendental\cosmic_movie_director.h" />
     <ClInclude Include="game\transcendental\cosmic_step.h" />
     <ClInclude Include="game\transcendental\cosmos.h" />
+    <ClInclude Include="game\transcendental\cosmos_structs.h" />
     <ClInclude Include="game\transcendental\data_living_one_step.h" />
     <ClInclude Include="game\transcendental\entity_id.h" />
     <ClInclude Include="game\enums\colliders_offset_type.h" />
@@ -1394,7 +1398,6 @@
     <ClInclude Include="game\detail\ai\goals.h" />
     <ClInclude Include="game\detail\entity_scripts.h" />
     <ClInclude Include="game\detail\position_scripts.h" />
-    <ClInclude Include="game\resources\behaviour_tree.h" />
     <ClInclude Include="game\detail\entity_description.h" />
     <ClInclude Include="game\globals\animations.h" />
     <ClInclude Include="game\globals\associated_entities.h" />
@@ -1419,9 +1422,7 @@
     <ClInclude Include="game\messages\create_particle_effect.h" />
     <ClInclude Include="game\messages\trigger_hit_confirmation_message.h" />
     <ClInclude Include="game\messages\trigger_hit_request_message.h" />
-    <ClInclude Include="game\resources\animation.h" />
     <ClInclude Include="game\resources\manager.h" />
-    <ClInclude Include="game\resources\particle_effect.h" />
     <ClInclude Include="game\types_specification\all_messages_declaration.h" />
     <ClInclude Include="game\types_specification\all_messages_includes.h" />
     <ClInclude Include="game\types_specification\all_systems_declaration.h" />
