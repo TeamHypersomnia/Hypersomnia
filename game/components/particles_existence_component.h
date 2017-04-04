@@ -13,7 +13,7 @@
 
 struct particle_effect_input {
 	// GEN INTROSPECTOR struct particle_effect_input
-	_particle_effect_response effect;
+	particle_effect_response effect;
 	bool delete_entity_after_effect_lifetime = true;
 	std::array<padding_byte, 3> pad;
 

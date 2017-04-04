@@ -53,9 +53,9 @@ namespace components {
 		sound_response bullet_trace_sound_response;
 		sound_response destruction_sound_response;
 
-		_particle_effect_response muzzle_leave_particle_effect_response;
-		_particle_effect_response bullet_trace_particle_effect_response;
-		_particle_effect_response destruction_particle_effect_response;
+		particle_effect_response muzzle_leave_particle_effect_response;
+		particle_effect_response bullet_trace_particle_effect_response;
+		particle_effect_response destruction_particle_effect_response;
 
 		vec2 saved_point_of_impact_before_death;
 		// END GEN INTROSPECTOR

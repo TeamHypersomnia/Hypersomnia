@@ -56,7 +56,7 @@ namespace components {
 		sound_response health_decrease_sound_response;
 		sound_response death_sound_response;
 
-		_particle_effect_response health_decrease_particle_effect_response;
+		particle_effect_response health_decrease_particle_effect_response;
 
 		// END GEN INTROSPECTOR
 

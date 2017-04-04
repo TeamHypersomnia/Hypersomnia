@@ -34,7 +34,7 @@ struct vec2t;
 class recoil_player;
 template <class T>
 struct zeroed_pod;
-struct _particle_effect_response;
+struct particle_effect_response;
 struct sound_response;
 struct behaviour_tree_instance;
 struct car_engine_entities;
@@ -451,7 +451,7 @@ namespace augs {
 
 	template <class F, class... Instances>
 	void introspect_body(
-		const _particle_effect_response* const,
+		const particle_effect_response* const,
 		F f,
 		Instances&&... _t_
 	) {
