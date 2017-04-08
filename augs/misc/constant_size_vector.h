@@ -26,12 +26,7 @@ namespace augs  {
 		arr_type raw;
 		// END GEN INTROSPECTOR
 
-		template <class F, class T, size_t const_count, class... Instances>
-		friend void introspect_body(
-			const augs::constant_size_vector<T, const_count>* const,
-			F f,
-			Instances&&... _t_
-		);
+		friend struct augs::introspection_access;
 
 	public:
 		typedef typename arr_type::iterator iterator;

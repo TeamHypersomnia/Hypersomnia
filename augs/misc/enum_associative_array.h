@@ -21,12 +21,7 @@ namespace augs {
 		arr_type raw;
 		// END GEN INTROSPECTOR
 
-		template <class F, class key_type, class A, class... Instances>
-		friend void introspect_body(
-			const augs::enum_associative_array<key_type, A>* const,
-			F f,
-			Instances&&... _t_
-		);
+		friend struct augs::introspection_access;
 
 		unsigned find_first_set_index(unsigned from) const {
 			while (from < max_n && !is_set.test(from)) {

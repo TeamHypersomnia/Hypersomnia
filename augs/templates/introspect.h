@@ -4,6 +4,8 @@
 #include "augs/templates/conditional_call.h"
 
 namespace augs {
+	struct introspection_access;
+
 	template <
 		class F, 
 		class Instance, 
@@ -14,7 +16,7 @@ namespace augs {
 		Instance&& t,
 		Instances&&... tn
 	) {
-		introspect_body(
+		augs::introspection_access::introspect_body(
 			static_cast<std::decay_t<Instance>*>(nullptr), 
 			std::forward<F>(callback),
 			std::forward<Instance>(t), 

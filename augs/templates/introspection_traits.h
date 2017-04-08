@@ -2,6 +2,10 @@
 #include <type_traits>
 #include "augs/templates/predicate_templates.h"
 
+namespace augs {
+	struct introspection_access;
+}
+
 struct true_returner {
 	template <class... Types>
 	bool operator()(Types...) const {
@@ -16,7 +20,7 @@ template <class T>
 struct has_introspect<
 	T,
 	decltype(
-		augs::introspect_body(
+		augs::introspection_access::introspect_body(
 			static_cast<T*>(nullptr),
 			true_returner(),
 			std::declval<T>()
