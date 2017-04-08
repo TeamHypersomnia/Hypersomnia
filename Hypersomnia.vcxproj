@@ -1113,7 +1113,6 @@
     <ClInclude Include="augs\misc\readable_bytesize.h" />
     <ClInclude Include="augs\misc\delta_compression.h" />
     <ClInclude Include="augs\misc\enum_associative_array.h" />
-    <ClInclude Include="augs\misc\bit_stream.h" />
     <ClInclude Include="augs\misc\constant_size_vector.h" />
     <ClInclude Include="augs\misc\delta.h" />
     <ClInclude Include="augs\misc\jitter_buffer.h" />
