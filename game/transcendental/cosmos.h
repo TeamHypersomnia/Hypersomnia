@@ -33,7 +33,7 @@
 #include "game/detail/inventory/item_slot_transfer_request_declaration.h"
 #include "game/detail/inventory/item_slot_transfer_request.h"
 
-#include "game/systems_inferred/dynamic_tree_system.h"
+#include "game/systems_inferred/tree_of_npo_system.h"
 #include "game/systems_inferred/physics_system.h"
 #include "game/systems_inferred/processing_lists_system.h"
 

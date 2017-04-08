@@ -1,4 +1,4 @@
-#include "dynamic_tree_node_component.h"
+#include "tree_of_npo_node_component.h"
 #include "game/transcendental/entity_handle.h"
 
 #include "game/components/polygon_component.h"
@@ -16,38 +16,38 @@
 #include "augs/ensure.h"
 
 namespace components {
-	dynamic_tree_node dynamic_tree_node::create_default_for(const_entity_handle e) {
-		dynamic_tree_node result;
+	tree_of_npo_node tree_of_npo_node::create_default_for(const_entity_handle e) {
+		tree_of_npo_node result;
 
 		const auto* const render = e.find<components::render>();
 
 		result.aabb = e.get_aabb();
 
 		if (e.has<components::particles_existence>()) {
-			result.type = tree_type::PARTICLE_EXISTENCES;
+			result.type = tree_of_npo_type::PARTICLE_EXISTENCES;
 		}
 		
 		return result;
 	}
 }
 
-typedef components::dynamic_tree_node D;
+typedef components::tree_of_npo_node D;
 
 template<bool C>
-bool basic_dynamic_tree_node_synchronizer<C>::is_activated() const {
+bool basic_tree_of_npo_node_synchronizer<C>::is_activated() const {
 	return component.activated;
 }
 
 void component_synchronizer<false, D>::reinference() const {
-	handle.get_cosmos().partial_reinference<dynamic_tree_system>(handle);
+	handle.get_cosmos().partial_reinference<tree_of_npo_system>(handle);
 }
 
 void component_synchronizer<false, D>::update_proxy() const {
-	const auto new_aabb = components::dynamic_tree_node::create_default_for(handle).aabb;
+	const auto new_aabb = components::tree_of_npo_node::create_default_for(handle).aabb;
 	const vec2 displacement = new_aabb.center() - component.aabb.center();
 	component.aabb = new_aabb;
 
-	auto& sys = handle.get_cosmos().systems_inferred.get<dynamic_tree_system>();
+	auto& sys = handle.get_cosmos().systems_inferred.get<tree_of_npo_system>();
 	auto& cache = sys.get_cache(handle.get_id());
 	
 	if (cache.is_constructed() && !component.always_visible) {
@@ -64,5 +64,5 @@ void component_synchronizer<false, D>::set_activated(bool flag) const {
 	reinference();
 }
 
-template class basic_dynamic_tree_node_synchronizer<false>;
-template class basic_dynamic_tree_node_synchronizer<true>;
+template class basic_tree_of_npo_node_synchronizer<false>;
+template class basic_tree_of_npo_node_synchronizer<true>;

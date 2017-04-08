@@ -2,7 +2,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/view/viewing_step.h"
 #include "game/view/viewing_session.h"
-#include "game/systems_inferred/dynamic_tree_system.h"
+#include "game/systems_inferred/tree_of_npo_system.h"
 #include "game/systems_audiovisual/interpolation_system.h"
 #include "game/components/sentience_component.h"
 #include "game/components/container_component.h"
@@ -11,7 +11,6 @@
 
 namespace rendering_scripts {
 	augs::vertex_triangle_buffer draw_circular_bars_and_get_textual_info(const viewing_step r) {
-		const auto& dynamic_tree = r.cosm.systems_inferred.get<dynamic_tree_system>();
 		const auto& visible_entities = r.visible.all;
 		auto& target = r.renderer;
 		const auto& cosmos = r.cosm;

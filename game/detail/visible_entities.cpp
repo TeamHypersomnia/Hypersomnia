@@ -3,7 +3,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/components/render_component.h"
 
-#include "game/systems_inferred/dynamic_tree_system.h"
+#include "game/systems_inferred/tree_of_npo_system.h"
 #include "game/systems_inferred/physics_system.h"
 #include "game/systems_stateless/render_system.h"
 
@@ -17,7 +17,7 @@ void visible_entities::from_camera(
 	const camera_cone camera,
 	const cosmos& cosmos
 ) {
-	const auto& dynamic_tree = cosmos.systems_inferred.get<dynamic_tree_system>();
+	const auto& tree_of_npo = cosmos.systems_inferred.get<tree_of_npo_system>();
 	const auto& physics = cosmos.systems_inferred.get<physics_system>();
 
 	all.clear();
@@ -26,7 +26,7 @@ void visible_entities::from_camera(
 		layer.clear();
 	}
 
-	dynamic_tree.determine_visible_entities_from_camera(
+	tree_of_npo.determine_visible_entities_from_camera(
 		all, 
 		camera
 	);

@@ -52,8 +52,8 @@ void sound_system::play_nearby_sound_existences(
 	auto queried_size = cone.visible_world_area;
 	queried_size.set(10000.f, 10000.f);
 
-		//cosmos[cosmos.systems_inferred.get<dynamic_tree_system>()
-		//.determine_visible_entities_from_camera(cone, components::dynamic_tree_node::tree_type::SOUND_EXISTENCES)];
+		//cosmos[cosmos.systems_inferred.get<tree_of_npo_system>()
+		//.determine_visible_entities_from_camera(cone, tree_of_npo_type::SOUND_EXISTENCES)];
 
 	const auto subject = cosmos[listening_character];
 	const auto si = cosmos.get_si();

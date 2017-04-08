@@ -6,7 +6,7 @@
 
 #include "game/components/item_component.h"
 #include "game/components/trigger_component.h"
-#include "game/components/dynamic_tree_node_component.h"
+#include "game/components/tree_of_npo_node_component.h"
 #include "game/components/force_joint_component.h"
 
 namespace ingredients {
@@ -25,7 +25,7 @@ namespace ingredients {
 	}
 
 	void make_always_visible(entity_handle e) {
-		components::dynamic_tree_node node;
+		components::tree_of_npo_node node;
 		node.always_visible = true;
 		e += node;
 	}

@@ -24,7 +24,7 @@
 #include "game/detail/particle_types.h"
 
 bool components::particles_existence::is_activated(const const_entity_handle h) {
-	return h.get<components::dynamic_tree_node>().is_activated() && h.get<components::processing>().is_in(processing_subjects::WITH_PARTICLES_EXISTENCE);
+	return h.get<components::tree_of_npo_node>().is_activated() && h.get<components::processing>().is_in(processing_subjects::WITH_PARTICLES_EXISTENCE);
 }
 
 void components::particles_existence::activate(const entity_handle h) {
@@ -34,7 +34,7 @@ void components::particles_existence::activate(const entity_handle h) {
 
 	auto& existence = h.get<components::particles_existence>();
 	existence.time_of_birth = h.get_cosmos().get_timestamp();
-	h.get<components::dynamic_tree_node>().set_activated(true);
+	h.get<components::tree_of_npo_node>().set_activated(true);
 	h.get<components::processing>().enable_in(processing_subjects::WITH_PARTICLES_EXISTENCE);
 }
 
@@ -43,7 +43,7 @@ void components::particles_existence::deactivate(const entity_handle h) {
 		return;
 	}
 
-	h.get<components::dynamic_tree_node>().set_activated(false);
+	h.get<components::tree_of_npo_node>().set_activated(false);
 	h.get<components::processing>().disable_in(processing_subjects::WITH_PARTICLES_EXISTENCE);
 }
 

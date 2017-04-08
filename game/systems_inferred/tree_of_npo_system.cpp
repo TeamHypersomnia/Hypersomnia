@@ -1,24 +1,24 @@
-#include "dynamic_tree_system.h"
+#include "tree_of_npo_system.h"
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/components/dynamic_tree_node_component.h"
+#include "game/components/tree_of_npo_node_component.h"
 #include "game/enums/filters.h"
 #include "augs/templates/container_templates.h"
 
-bool dynamic_tree_system::cache::is_constructed() const {
+bool tree_of_npo_system::cache::is_constructed() const {
 	return constructed;
 }
 
-dynamic_tree_system::cache& dynamic_tree_system::get_cache(const unversioned_entity_id id) {
+tree_of_npo_system::cache& tree_of_npo_system::get_cache(const unversioned_entity_id id) {
 	return per_entity_cache[id.indirection_index];
 }
 
-dynamic_tree_system::tree& dynamic_tree_system::get_tree(const cache& c) {
+tree_of_npo_system::tree& tree_of_npo_system::get_tree(const cache& c) {
 	return trees[static_cast<size_t>(c.type)];
 }
 
-void dynamic_tree_system::destroy_inferred_state(const const_entity_handle handle) {
+void tree_of_npo_system::destroy_inferred_state(const const_entity_handle handle) {
 	auto& cache = get_cache(handle.get_id());
 
 	if (cache.is_constructed()) {
@@ -28,12 +28,12 @@ void dynamic_tree_system::destroy_inferred_state(const const_entity_handle handl
 			get_tree(cache).nodes.DestroyProxy(cache.tree_proxy_id);
 		}
 
-		cache = dynamic_tree_system::cache();
+		cache = tree_of_npo_system::cache();
 	}
 }
 
-void dynamic_tree_system::create_inferred_state(const const_entity_handle handle) {
-	if (!handle.has<components::dynamic_tree_node>()) {
+void tree_of_npo_system::create_inferred_state(const const_entity_handle handle) {
+	if (!handle.has<components::tree_of_npo_node>()) {
 		return;
 	}
 
@@ -41,10 +41,10 @@ void dynamic_tree_system::create_inferred_state(const const_entity_handle handle
 
 	ensure(!cache.is_constructed());
 
-	const auto& dynamic_tree_node = handle.get<components::dynamic_tree_node>();
+	const auto& tree_of_npo_node = handle.get<components::tree_of_npo_node>();
 
-	if (dynamic_tree_node.is_activated()) {
-		auto& data = dynamic_tree_node.get_data();
+	if (tree_of_npo_node.is_activated()) {
+		auto& data = tree_of_npo_node.get_data();
 
 		cache.type = data.type;
 
@@ -66,16 +66,16 @@ void dynamic_tree_system::create_inferred_state(const const_entity_handle handle
 	}
 }
 
-void dynamic_tree_system::reserve_caches_for_entities(const size_t n) {
+void tree_of_npo_system::reserve_caches_for_entities(const size_t n) {
 	per_entity_cache.resize(n);
 }
 
-void dynamic_tree_system::determine_visible_entities_from_camera(
+void tree_of_npo_system::determine_visible_entities_from_camera(
 	std::vector<unversioned_entity_id>& into,
 	const camera_cone in,
-	const components::dynamic_tree_node::tree_type type
+	const tree_of_npo_type type
 ) const {
-	const auto& tree = trees[static_cast<size_t>(type)];
+	const auto& tree = trees[type];
 
 	concatenate(into, tree.always_visible);
 

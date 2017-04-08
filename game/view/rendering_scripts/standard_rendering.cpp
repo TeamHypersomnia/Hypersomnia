@@ -11,7 +11,7 @@
 #include "game/components/render_component.h"
 
 #include "game/detail/gui/character_gui.h"
-#include "game/systems_inferred/dynamic_tree_system.h"
+#include "game/systems_inferred/tree_of_npo_system.h"
 #include "game/assets/assets_manager.h"
 #include "augs/graphics/renderer.h"
 #include "game/view/viewing_step.h"

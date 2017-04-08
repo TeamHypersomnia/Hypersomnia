@@ -134,7 +134,6 @@ namespace components {
 	struct crosshair;
 	struct damage;
 	struct driver;
-	struct dynamic_tree_node;
 	struct fixtures;
 	struct flags;
 	struct force_joint;
@@ -164,6 +163,7 @@ namespace components {
 	struct tile_layer_instance;
 	struct trace;
 	struct transform;
+	struct tree_of_npo_node;
 	struct trigger_collision_detector;
 	struct trigger;
 	struct trigger_query_detector;
@@ -909,20 +909,6 @@ namespace augs {
 
 		template <class F, class... Instances>
 		static void introspect_body(
-			const components::dynamic_tree_node* const,
-			F f,
-			Instances&&... _t_
-		) {
-			FIELD(always_visible);
-			FIELD(activated);
-			FIELD(type);
-
-
-			FIELD(aabb);
-		}
-
-		template <class F, class... Instances>
-		static void introspect_body(
 			const convex_partitioned_collider* const,
 			F f,
 			Instances&&... _t_
@@ -1532,6 +1518,20 @@ namespace augs {
 		) {
 			FIELD(pos);
 			FIELD(rotation);
+		}
+
+		template <class F, class... Instances>
+		static void introspect_body(
+			const components::tree_of_npo_node* const,
+			F f,
+			Instances&&... _t_
+		) {
+			FIELD(always_visible);
+			FIELD(activated);
+			FIELD(type);
+
+
+			FIELD(aabb);
 		}
 
 		template <class F, class... Instances>

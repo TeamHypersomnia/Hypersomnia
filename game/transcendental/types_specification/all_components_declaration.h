@@ -5,7 +5,7 @@
 #include "augs/templates/type_list.h"
 
 namespace components {
-	struct dynamic_tree_node;
+	struct tree_of_npo_node;
 	struct special_physics;
 	struct animation;
 	struct behaviour_tree;
@@ -56,7 +56,7 @@ namespace components {
 template<template<typename...> class List, class... prepend>
 struct put_all_components_into {
 	typedef List<prepend...,
-		components::dynamic_tree_node,
+		components::tree_of_npo_node,
 		components::special_physics,
 		components::animation,
 		components::behaviour_tree,

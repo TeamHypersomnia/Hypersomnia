@@ -19,7 +19,7 @@
 #include "game/components/name_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/attitude_component.h"
-#include "game/components/dynamic_tree_node_component.h"
+#include "game/components/tree_of_npo_node_component.h"
 #include "game/components/flags_component.h"
 #include "game/systems_stateless/particles_existence_system.h"
 

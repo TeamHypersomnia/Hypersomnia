@@ -1,29 +1,34 @@
 #pragma once
+#include <vector>
 #include <Box2D/Collision/b2DynamicTree.h>
+
+#include "augs/misc/enum_array.h"
+
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
-#include <vector>
-#include "game/components/dynamic_tree_node_component.h"
+#include "game/components/tree_of_npo_node_component.h"
 #include "game/detail/camera_cone.h"
 
 class viewing_step;
 class physics_system;
 
-class dynamic_tree_system {
+/* NPO stands for "non-physical objects" */
+
+class tree_of_npo_system {
 	friend class cosmos;
 	
-	friend class component_synchronizer<false, components::dynamic_tree_node>;
+	friend class component_synchronizer<false, components::tree_of_npo_node>;
 
 	struct tree {
 		std::vector<unversioned_entity_id> always_visible;
 		b2DynamicTree nodes;
 	};
 
-	tree trees[static_cast<size_t>(components::dynamic_tree_node::tree_type::COUNT)];
+	augs::enum_array<tree, tree_of_npo_type> trees;
 
 	struct cache {
 		bool constructed = false;
-		components::dynamic_tree_node::tree_type type;
+		tree_of_npo_type type;
 		int tree_proxy_id = -1;
 
 		bool is_constructed() const;
@@ -39,10 +44,9 @@ class dynamic_tree_system {
 	cache& get_cache(const unversioned_entity_id);
 
 public:
-
 	void determine_visible_entities_from_camera(
 		std::vector<unversioned_entity_id>& into,
 		const camera_cone,
-		components::dynamic_tree_node::tree_type = components::dynamic_tree_node::tree_type::RENDERABLES
+		tree_of_npo_type = tree_of_npo_type::RENDERABLES
 	) const;
 };

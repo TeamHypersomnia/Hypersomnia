@@ -227,8 +227,8 @@ void spatial_properties_mixin<false, D>::set_logic_transform(const components::t
 	else {
 		handle.get<components::transform>() = t;
 
-		if (handle.has<components::dynamic_tree_node>()) {
-			handle.get<components::dynamic_tree_node>().update_proxy();
+		if (handle.has<components::tree_of_npo_node>()) {
+			handle.get<components::tree_of_npo_node>().update_proxy();
 		}
 	}
 }

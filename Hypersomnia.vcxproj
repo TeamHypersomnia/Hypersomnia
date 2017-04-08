@@ -383,7 +383,7 @@
     <ClCompile Include="game\components\rigid_body_component.cpp" />
     <ClCompile Include="game\components\sentience_component.cpp" />
     <ClCompile Include="game\components\sound_existence_component.cpp" />
-    <ClCompile Include="game\components\tree_of_non_physical_objects_node_component.cpp" />
+    <ClCompile Include="game\components\tree_of_npo_node_component.cpp" />
     <ClCompile Include="game\detail\camera_cone.cpp" />
     <ClCompile Include="game\detail\entity_handle_mixins\inventory_mixin.cpp" />
     <ClCompile Include="game\detail\entity_handle_mixins\physics_mixin.cpp" />
@@ -447,7 +447,7 @@
     <ClCompile Include="game\systems_audiovisual\wandering_pixels_system.cpp" />
     <ClCompile Include="game\systems_inferred\physics_system.cpp" />
     <ClCompile Include="game\systems_inferred\processing_lists_system.cpp" />
-    <ClCompile Include="game\systems_inferred\tree_of_non_physical_objects_system.cpp" />
+    <ClCompile Include="game\systems_inferred\tree_of_npo_system.cpp" />
     <ClCompile Include="game\systems_stateless\destruction_system.cpp" />
     <ClCompile Include="game\systems_stateless\grenade_system.cpp" />
     <ClCompile Include="game\systems_stateless\gui_system.cpp" />
@@ -1180,7 +1180,7 @@
     <ClInclude Include="game\components\rigid_body_component.h" />
     <ClInclude Include="game\components\sentience_component.h" />
     <ClInclude Include="game\components\sound_existence_component.h" />
-    <ClInclude Include="game\components\tree_of_non_physical_objects_node_component.h" />
+    <ClInclude Include="game\components\tree_of_npo_node_component.h" />
     <ClInclude Include="game\components\wandering_pixels_component.h" />
     <ClInclude Include="game\container_sizes.h" />
     <ClInclude Include="game\detail\basic_renderable_drawing_input.h" />
@@ -1246,6 +1246,7 @@
     <ClInclude Include="game\enums\sentience_meter_type.h" />
     <ClInclude Include="game\enums\sound_response_type.h" />
     <ClInclude Include="game\assets\spell_id.h" />
+    <ClInclude Include="game\enums\tree_of_npo_type.h" />
     <ClInclude Include="game\messages\exhausted_cast_message.h" />
     <ClInclude Include="game\messages\exploding_ring_input.h" />
     <ClInclude Include="game\messages\item_picked_up_message.h" />
@@ -1268,7 +1269,7 @@
     <ClInclude Include="game\systems_audiovisual\wandering_pixels_system.h" />
     <ClInclude Include="game\systems_inferred\physics_system.h" />
     <ClInclude Include="game\systems_inferred\processing_lists_system.h" />
-    <ClInclude Include="game\systems_inferred\tree_of_non_physical_objects_system.h" />
+    <ClInclude Include="game\systems_inferred\tree_of_npo_system.h" />
     <ClInclude Include="game\systems_stateless\destruction_system.h" />
     <ClInclude Include="game\systems_stateless\grenade_system.h" />
     <ClInclude Include="game\systems_stateless\gui_system.h" />

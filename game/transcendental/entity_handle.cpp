@@ -2,7 +2,7 @@
 #include "game/components/render_component.h"
 #include "game/components/inferred_state_component.h"
 #include "game/components/processing_component.h"
-#include "game/components/dynamic_tree_node_component.h"
+#include "game/components/tree_of_npo_node_component.h"
 #include "game/components/special_physics_component.h"
 #include "game/components/interpolation_component.h"
 #include "game/components/crosshair_component.h"
@@ -57,9 +57,9 @@ basic_entity_handle<C> basic_entity_handle<C>::add_standard_components() const {
 		//|| has<components::sound_existence>()
 		)
 		&& !is_entity_physical(*this) 
-		&& !has<components::dynamic_tree_node>()
+		&& !has<components::tree_of_npo_node>()
 	) {
-		add(components::dynamic_tree_node::create_default_for(*this));
+		add(components::tree_of_npo_node::create_default_for(*this));
 	}
 
 	if (has<components::rigid_body>()) {
