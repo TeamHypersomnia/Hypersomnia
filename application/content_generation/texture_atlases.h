@@ -35,7 +35,7 @@ struct texture_atlas_metadata {
 };
 
 struct atlases_regeneration_output {
-	std::vector<std::pair<assets::physical_texture_id, texture_atlas_metadata>> metadatas;
+	std::vector<std::pair<assets::gl_texture_id, texture_atlas_metadata>> metadatas;
 };
 
 atlases_regeneration_output regenerate_atlases(

@@ -1,6 +1,6 @@
 #include "exploding_ring_system.h"
 #include "augs/templates/container_templates.h"
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 #include "game/systems_audiovisual/particles_simulation_system.h"
 #include "game/view/viewing_step.h"
 #include "game/detail/particle_types.h"

@@ -1,7 +1,7 @@
 #include "augs/graphics/drawers.h"
 
 #include "game/assets/game_image_id.h"
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 
 #include "augs/gui/stroke.h"
 

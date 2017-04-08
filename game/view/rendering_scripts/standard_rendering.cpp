@@ -12,7 +12,7 @@
 
 #include "game/detail/gui/character_gui.h"
 #include "game/systems_inferred/dynamic_tree_system.h"
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 #include "augs/graphics/renderer.h"
 #include "game/view/viewing_step.h"
 
@@ -109,7 +109,7 @@ namespace rendering_scripts {
 
 		// hud.draw_vertically_flying_numbers(step);
 
-		renderer.bind_texture(manager[assets::physical_texture_id::GAME_WORLD_ATLAS]);
+		renderer.bind_texture(manager[assets::gl_texture_id::GAME_WORLD_ATLAS]);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();

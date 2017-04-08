@@ -21,7 +21,7 @@
 #include "game/components/polygon_component.h"
 #include "game/transcendental/cosmos.h"
 
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 
 #include "game/enums/filters.h"
 

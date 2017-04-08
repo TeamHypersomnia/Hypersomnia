@@ -1,5 +1,5 @@
 #include "all.h"
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 #include "augs/graphics/shader.h"
 #include "augs/gui/button_corners.h"
 
@@ -8,7 +8,7 @@ using namespace assets;
 static constexpr auto DIFFUSE = texture_map_type::DIFFUSE;
 static constexpr auto NEON = texture_map_type::NEON;
 static constexpr auto DESATURATED = texture_map_type::DESATURATED;
-static constexpr auto GAME_WORLD_ATLAS = physical_texture_id::GAME_WORLD_ATLAS;
+static constexpr auto GAME_WORLD_ATLAS = gl_texture_id::GAME_WORLD_ATLAS;
 
 game_image_requests load_standard_images() {
 	game_image_requests output;

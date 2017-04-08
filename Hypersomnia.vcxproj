@@ -370,6 +370,7 @@
     <ClCompile Include="application\setups\determinism_test_setup.cpp" />
     <ClCompile Include="augs\texture_atlas\texture_atlas_entry.cpp" />
     <ClCompile Include="augs\tweaker.cpp" />
+    <ClCompile Include="game\assets\animation.cpp" />
     <ClCompile Include="game\assets\assets_manager.cpp" />
     <ClCompile Include="game\assets\behaviour_tree.cpp" />
     <ClCompile Include="game\assets\game_image.cpp" />
@@ -1156,6 +1157,7 @@
     <ClInclude Include="augs\texture_atlas\texture_atlas_entry.h" />
     <ClInclude Include="augs\tweaker.h" />
     <ClInclude Include="augs\zeroed_pod.h" />
+    <ClInclude Include="game\assets\animation.h" />
     <ClInclude Include="game\assets\assets_manager.h" />
     <ClInclude Include="game\assets\assets_manager_structs.h" />
     <ClInclude Include="game\assets\behaviour_tree.h" />
@@ -1357,7 +1359,7 @@
     <ClInclude Include="game\transcendental\types_specification\all_systems_declaration.h" />
     <ClInclude Include="game\types_specification\all_component_includes.h" />
     <ClInclude Include="game\assets\animation_id.h" />
-    <ClInclude Include="game\assets\physical_texture_id.h" />
+    <ClInclude Include="game\assets\gl_texture_id.h" />
     <ClInclude Include="game\assets\behaviour_tree_id.h" />
     <ClInclude Include="game\assets\font_id.h" />
     <ClInclude Include="game\assets\particle_effect_id.h" />

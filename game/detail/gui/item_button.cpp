@@ -20,7 +20,7 @@
 #include "game/systems_stateless/gui_system.h"
 #include "game/systems_stateless/input_system.h"
 #include "game/systems_audiovisual/gui_element_system.h"
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 #include "augs/graphics/drawers.h"
 
 #include "game/detail/gui/slot_button.h"

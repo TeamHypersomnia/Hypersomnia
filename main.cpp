@@ -11,7 +11,7 @@
 
 #include "application/game_window.h"
 #include "application/call_config_script.h"
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 
 #include "game/resource_setups/all.h"
 #include "game/transcendental/types_specification/all_component_includes.h"

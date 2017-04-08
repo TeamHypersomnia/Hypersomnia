@@ -1,6 +1,6 @@
 #include "pixel_line_connector.h"
 #include "augs/graphics/drawers.h"
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 
 augs::constant_size_vector<std::array<vec2i, 2>, 2> get_connecting_pixel_lines(
 	const ltrb& a,

@@ -37,7 +37,7 @@
 #include "game/systems_inferred/physics_system.h"
 #include "game/systems_inferred/processing_lists_system.h"
 
-#include "game/flyweights/behaviour_tree.h"
+#include "game/assets/behaviour_tree.h"
 
 class EMPTY_BASES cosmos : 
 	private cosmos_base,

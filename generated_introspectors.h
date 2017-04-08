@@ -65,8 +65,18 @@ struct vec2t;
 class recoil_player;
 template <class T>
 struct zeroed_pod;
+struct animation_frame;
+struct animation;
+struct state_of_behaviour_tree_instance;
+struct particle_effect_modifier;
+struct particles_emission;
+struct particle_effect_logical_meta;
 struct particle_effect_response;
+struct physical_material;
 struct sound_response;
+struct spell_logical_meta;
+struct spell_data;
+class tile_layer;
 struct behaviour_tree_instance;
 struct car_engine_entities;
 struct convex_partitioned_collider;
@@ -97,16 +107,6 @@ struct perk_timing;
 struct sentience_meter;
 struct circle_shape;
 struct spell_instance_data;
-struct animation_frame;
-struct animation;
-struct state_of_behaviour_tree_instance;
-struct particle_effect_modifier;
-struct particles_emission;
-struct particle_effect_logical_meta;
-struct physical_material;
-struct spell_logical_meta;
-struct spell_data;
-class tile_layer;
 struct all_simulation_settings;
 struct pathfinding_settings;
 struct si_scaling;
@@ -499,6 +499,103 @@ namespace augs {
 
 	template <class F, class... Instances>
 	void introspect_body(
+		const animation_frame* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(image_id);
+		FIELD(duration_milliseconds);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const animation* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(frames);
+
+		FIELD(loop_mode);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const state_of_behaviour_tree_instance* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(previously_executed_leaf_id);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const particle_effect_modifier* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(colorize);
+		FIELD(scale_amounts);
+		FIELD(scale_lifetimes);
+		FIELD(homing_target);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const particles_emission* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(spread_degrees);
+		FIELD(base_speed);
+		FIELD(base_speed_variation);
+		FIELD(rotation_speed);
+		FIELD(particles_per_sec);
+		FIELD(stream_lifetime_ms);
+		FIELD(particle_lifetime_ms);
+		FIELD(size_multiplier);
+		FIELD(acceleration);
+		FIELD(angular_offset);
+		FIELD(swing_spread);
+		FIELD(swings_per_sec);
+		FIELD(min_swing_spread);
+		FIELD(max_swing_spread);
+		FIELD(min_swings_per_sec);
+		FIELD(max_swings_per_sec);
+		FIELD(swing_spread_change_rate);
+		FIELD(swing_speed_change_rate);
+		FIELD(fade_when_ms_remaining);
+		FIELD(num_of_particles_to_spawn_initially);
+
+		FIELD(randomize_spawn_point_within_circle_of_outer_radius);
+		FIELD(randomize_spawn_point_within_circle_of_inner_radius);
+
+		FIELD(starting_spawn_circle_size_multiplier);
+		FIELD(ending_spawn_circle_size_multiplier);
+
+		FIELD(starting_homing_force);
+		FIELD(ending_homing_force);
+
+		FIELD(homing_target);
+
+		FIELD(initial_rotation_variation);
+		FIELD(randomize_acceleration);
+		FIELD(should_particles_look_towards_velocity);
+
+		FIELD(particle_definitions);
+		FIELD(target_render_layer);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const particle_effect_logical_meta* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(max_duration_in_seconds);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
 		const particle_effect_response* const,
 		F f,
 		Instances&&... _t_
@@ -509,12 +606,61 @@ namespace augs {
 
 	template <class F, class... Instances>
 	void introspect_body(
+		const physical_material* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(collision_sound_matrix);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
 		const sound_response* const,
 		F f,
 		Instances&&... _t_
 	) {
 		FIELD(id);
 		FIELD(modifier);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const spell_logical_meta* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(personal_electricity_required);
+		FIELD(cooldown_ms);
+		FIELD(casting_time_ms);
+		FIELD(perk_duration_seconds);
+
+		FIELD(border_col);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const spell_data* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(logical);
+
+		FIELD(icon);
+		FIELD(incantation);
+		FIELD(spell_name);
+		FIELD(spell_description);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const tile_layer* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(tileset);
+
+		FIELD(tiles);
+		FIELD(size);
 	}
 
 	template <class F, class... Instances>
@@ -1656,152 +1802,6 @@ namespace augs {
 		Instances&&... _t_
 	) {
 		FIELD(cast_cooldown);
-	}
-
-	template <class F, class... Instances>
-	void introspect_body(
-		const animation_frame* const,
-		F f,
-		Instances&&... _t_
-	) {
-		FIELD(image_id);
-		FIELD(duration_milliseconds);
-	}
-
-	template <class F, class... Instances>
-	void introspect_body(
-		const animation* const,
-		F f,
-		Instances&&... _t_
-	) {
-		FIELD(frames);
-
-		FIELD(loop_mode);
-	}
-
-	template <class F, class... Instances>
-	void introspect_body(
-		const state_of_behaviour_tree_instance* const,
-		F f,
-		Instances&&... _t_
-	) {
-		FIELD(previously_executed_leaf_id);
-	}
-
-	template <class F, class... Instances>
-	void introspect_body(
-		const particle_effect_modifier* const,
-		F f,
-		Instances&&... _t_
-	) {
-		FIELD(colorize);
-		FIELD(scale_amounts);
-		FIELD(scale_lifetimes);
-		FIELD(homing_target);
-	}
-
-	template <class F, class... Instances>
-	void introspect_body(
-		const particles_emission* const,
-		F f,
-		Instances&&... _t_
-	) {
-		FIELD(spread_degrees);
-		FIELD(base_speed);
-		FIELD(base_speed_variation);
-		FIELD(rotation_speed);
-		FIELD(particles_per_sec);
-		FIELD(stream_lifetime_ms);
-		FIELD(particle_lifetime_ms);
-		FIELD(size_multiplier);
-		FIELD(acceleration);
-		FIELD(angular_offset);
-		FIELD(swing_spread);
-		FIELD(swings_per_sec);
-		FIELD(min_swing_spread);
-		FIELD(max_swing_spread);
-		FIELD(min_swings_per_sec);
-		FIELD(max_swings_per_sec);
-		FIELD(swing_spread_change_rate);
-		FIELD(swing_speed_change_rate);
-		FIELD(fade_when_ms_remaining);
-		FIELD(num_of_particles_to_spawn_initially);
-
-		FIELD(randomize_spawn_point_within_circle_of_outer_radius);
-		FIELD(randomize_spawn_point_within_circle_of_inner_radius);
-
-		FIELD(starting_spawn_circle_size_multiplier);
-		FIELD(ending_spawn_circle_size_multiplier);
-
-		FIELD(starting_homing_force);
-		FIELD(ending_homing_force);
-
-		FIELD(homing_target);
-
-		FIELD(initial_rotation_variation);
-		FIELD(randomize_acceleration);
-		FIELD(should_particles_look_towards_velocity);
-
-		FIELD(particle_definitions);
-		FIELD(target_render_layer);
-	}
-
-	template <class F, class... Instances>
-	void introspect_body(
-		const particle_effect_logical_meta* const,
-		F f,
-		Instances&&... _t_
-	) {
-		FIELD(max_duration_in_seconds);
-	}
-
-	template <class F, class... Instances>
-	void introspect_body(
-		const physical_material* const,
-		F f,
-		Instances&&... _t_
-	) {
-		FIELD(collision_sound_matrix);
-	}
-
-	template <class F, class... Instances>
-	void introspect_body(
-		const spell_logical_meta* const,
-		F f,
-		Instances&&... _t_
-	) {
-		FIELD(personal_electricity_required);
-		FIELD(cooldown_ms);
-		FIELD(casting_time_ms);
-		FIELD(perk_duration_seconds);
-
-		FIELD(border_col);
-	}
-
-	template <class F, class... Instances>
-	void introspect_body(
-		const spell_data* const,
-		F f,
-		Instances&&... _t_
-	) {
-		FIELD(logical);
-
-		FIELD(icon);
-		FIELD(incantation);
-		FIELD(spell_name);
-		FIELD(spell_description);
-	}
-
-	template <class F, class... Instances>
-	void introspect_body(
-		const tile_layer* const,
-		F f,
-		Instances&&... _t_
-	) {
-		FIELD(tileset);
-
-		FIELD(tiles);
-		FIELD(size);
 	}
 
 	template <class F, class... Instances>

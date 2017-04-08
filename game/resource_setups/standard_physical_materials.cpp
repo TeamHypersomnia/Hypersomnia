@@ -1,7 +1,7 @@
 #include "all.h"
 
-#include "game/flyweights/physical_material.h"
-#include "game/resources/manager.h"
+#include "game/assets/physical_material.h"
+#include "game/assets/assets_manager.h"
 
 void set_standard_physical_materials(assets_manager& assets) {
 	const auto set_pair = [&](

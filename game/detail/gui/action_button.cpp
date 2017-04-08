@@ -5,7 +5,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/systems_audiovisual/gui_element_system.h"
 #include "game/components/sentience_component.h"
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 
 #include "augs/graphics/drawers.h"
 

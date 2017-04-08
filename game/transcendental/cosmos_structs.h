@@ -6,13 +6,13 @@
 #include "game/assets/tile_layer_id.h"
 #include "game/assets/sound_buffer_id.h"
 
-#include "game/flyweights/animation.h"
-#include "game/flyweights/particle_effect.h"
-#include "game/flyweights/tile_layer.h"
-#include "game/flyweights/spell_data.h"
-#include "game/flyweights/physical_material.h"
+#include "game/assets/animation.h"
+#include "game/assets/particle_effect.h"
+#include "game/assets/tile_layer.h"
+#include "game/assets/spell.h"
+#include "game/assets/physical_material.h"
 
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 
 struct cosmos_metadata {
 	// GEN INTROSPECTOR struct cosmos_metadata

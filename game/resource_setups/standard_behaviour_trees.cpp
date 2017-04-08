@@ -1,6 +1,6 @@
 #include "all.h"
 #include "game/transcendental/cosmos.h"
-#include "game/flyweights/behaviour_tree.h"
+#include "game/assets/behaviour_tree.h"
 #include "game/detail/ai/behaviours.h"
 
 void set_standard_behaviour_trees(cosmos& manager) {

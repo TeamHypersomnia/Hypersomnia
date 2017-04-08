@@ -1,5 +1,5 @@
 #pragma once
-#include "game/flyweights/behaviour_tree.h"
+#include "game/assets/behaviour_tree.h"
 #include "game/assets/behaviour_tree_id.h"
 
 #include "game/container_sizes.h"

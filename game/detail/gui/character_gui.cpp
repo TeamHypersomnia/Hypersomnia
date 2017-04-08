@@ -31,7 +31,7 @@
 
 #include "augs/graphics/drawers.h"
 #include "game/detail/wielding_result.h"
-#include "game/flyweights/spell_data.h"
+#include "game/assets/spell.h"
 #include "game/detail/spell_logic.h"
 
 using namespace augs;

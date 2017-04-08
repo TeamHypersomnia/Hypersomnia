@@ -2,7 +2,7 @@
 
 #include "augs/templates/container_templates.h"
 
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 
 tile_layer::tile::tile(const unsigned type) : type_id(type) {}
 //tile_layer::tile_type::tile_type(const tile_type_id tile_texture) : tile_texture(tile_texture) {}

@@ -1,5 +1,5 @@
 #include "all.h"
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 #include "augs/graphics/shader.h"
 
 #include "application/config_lua_table.h"
@@ -27,7 +27,7 @@ void load_standard_everything(const config_lua_table& cfg) {
 	for (const auto& i : images) {
 		for (const auto& t : i.second.texture_maps) {
 			if (t.path.size() > 0) {
-				ensure(t.target_atlas != physical_texture_id::INVALID);
+				ensure(t.target_atlas != gl_texture_id::INVALID);
 
 				in.images.push_back({ t.path, t.target_atlas });
 			}
@@ -62,7 +62,7 @@ void load_standard_everything(const config_lua_table& cfg) {
 	);
 
 	manager.create(
-		physical_texture_id::GAME_WORLD_ATLAS,
+		gl_texture_id::GAME_WORLD_ATLAS,
 		cfg.save_regenerated_atlases_as_binary
 	);
 	

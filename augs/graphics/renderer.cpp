@@ -16,7 +16,7 @@
 
 #include "augs/window_framework/window.h"
 
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 #include "augs/graphics/drawers.h"
 #include "game/detail/camera_cone.h"
 
@@ -342,7 +342,7 @@ namespace augs {
 		graphics::fbo::use_default();
 		glClear(GL_COLOR_BUFFER_BIT); glerr;
 		
-		bind_texture(get_assets_manager()[assets::physical_texture_id::GAME_WORLD_ATLAS]);
+		bind_texture(get_assets_manager()[assets::gl_texture_id::GAME_WORLD_ATLAS]);
 
 		call_triangles();
 

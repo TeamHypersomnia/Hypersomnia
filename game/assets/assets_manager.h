@@ -20,7 +20,7 @@
 #include "game/assets/spell_id.h"
 #include "game/assets/game_image.h"
 #include "game/assets/game_image_id.h"
-#include "game/assets/physical_texture_id.h"
+#include "game/assets/gl_texture_id.h"
 #include "game/assets/shader_id.h"
 #include "game/assets/program_id.h"
 #include "game/assets/font_id.h"
@@ -32,11 +32,11 @@
 #include "game/assets/particle_effect_id.h"
 #include "game/assets/physical_material_id.h"
 
-#include "game/flyweights/particle_effect.h"
-#include "game/flyweights/animation.h"
-#include "game/flyweights/tile_layer.h"
-#include "game/flyweights/spell_data.h"
-#include "game/flyweights/physical_material.h"
+#include "game/assets/particle_effect.h"
+#include "game/assets/animation.h"
+#include "game/assets/tile_layer.h"
+#include "game/assets/spell.h"
+#include "game/assets/physical_material.h"
 
 #include "game/detail/shape_variant.h"
 #include "game/detail/particle_types.h"
@@ -80,7 +80,7 @@ public:
 		augs::enum_associative_array<assets::shader_id, augs::graphics::shader>,
 		augs::enum_associative_array<assets::program_id, augs::graphics::shader_program>,
 		augs::enum_associative_array<assets::sound_buffer_id, augs::sound_buffer>,
-		augs::enum_associative_array<assets::physical_texture_id, augs::graphics::texture>
+		augs::enum_associative_array<assets::gl_texture_id, augs::graphics::texture>
 	> tuple_of_all_assets;
 
 	typedef replace_list_type_t<
@@ -108,7 +108,7 @@ public:
 	);
 
 	void create(
-		const assets::physical_texture_id,
+		const assets::gl_texture_id,
 		const bool load_as_binary
 	);
 

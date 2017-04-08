@@ -1,6 +1,6 @@
 #include "all.h"
-#include "game/resources/manager.h"
-#include "game/flyweights/particle_effect.h"
+#include "game/assets/assets_manager.h"
+#include "game/assets/particle_effect.h"
 #include "game/assets/particle_effect_id.h"
 #include "augs/graphics/shader.h"
 

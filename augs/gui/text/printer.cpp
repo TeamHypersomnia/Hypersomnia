@@ -3,7 +3,7 @@
 #include "drafter.h"
 #include "printer.h"
 #include "augs/graphics/drawers.h"
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 
 /* printer's draw needs revising in terms of scrolling */
 

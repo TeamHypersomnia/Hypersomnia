@@ -4,7 +4,7 @@
 #include "game/components/particles_existence_component.h"
 #include "game/messages/queue_destruction.h"
 
-#include "game/flyweights/particle_effect.h"
+#include "game/assets/particle_effect.h"
 
 #include "game/components/damage_component.h"
 #include "game/components/render_component.h"

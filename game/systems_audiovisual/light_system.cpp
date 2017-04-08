@@ -8,7 +8,7 @@
 #include "game/components/polygon_component.h"
 #include "game/components/render_component.h"
 
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 #include "game/messages/visibility_information.h"
 
 #include "game/systems_stateless/visibility_system.h"

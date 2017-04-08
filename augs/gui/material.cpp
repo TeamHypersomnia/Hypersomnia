@@ -1,7 +1,7 @@
 #include "material.h"
 #include "rect.h"
 #include "augs/graphics/drawers.h"
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 
 namespace augs {
 	namespace gui {

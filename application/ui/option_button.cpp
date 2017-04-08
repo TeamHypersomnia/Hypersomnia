@@ -1,6 +1,6 @@
 #include <tuple>
 #include "option_button.h"
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 
 option_button::option_button() {
 	corners.inside_texture = assets::game_image_id::MENU_BUTTON_INSIDE;

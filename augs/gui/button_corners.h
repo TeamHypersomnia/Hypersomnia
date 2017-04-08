@@ -2,7 +2,7 @@
 #include <array>
 #include "augs/math/rects.h"
 #include "game/assets/game_image_id.h"
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 
 enum class button_corner_type {
 	INSIDE,

@@ -17,7 +17,7 @@
 #include "game/enums/filters.h"
 
 #include "game/detail/explosions.h"
-#include "game/flyweights/spell_data.h"
+#include "game/assets/spell.h"
 
 bool are_additional_conditions_for_casting_fulfilled(
 	const assets::spell_id spell,

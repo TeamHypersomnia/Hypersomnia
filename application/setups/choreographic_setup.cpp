@@ -5,7 +5,7 @@
 #include "augs/global_libraries.h"
 #include "application/game_window.h"
 
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 
 #include "game/scene_builders/testbed.h"
 #include "game/scene_builders/one_entity.h"

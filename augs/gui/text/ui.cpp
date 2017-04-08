@@ -1,7 +1,7 @@
 #include <algorithm>
 #include "ui.h"
 #include "augs/window_framework/window.h"
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 
 #undef min
 #undef max

@@ -2,7 +2,7 @@
 #include "game/detail/camera_cone.h"
 #include "augs/templates/container_templates.h"
 #include "augs/graphics/drawers.h"
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 #include "game/systems_inferred/physics_system.h"
 #include "game/systems_audiovisual/particles_simulation_system.h"
 #include "game/enums/filters.h"

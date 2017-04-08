@@ -1,4 +1,4 @@
-#include "manager.h"
+#include "assets_manager.h"
 #include "augs/filesystem/file.h"
 #include "augs/image/font.h"
 #include "augs/window_framework/window.h"
@@ -80,7 +80,7 @@ void assets_manager::load_baked_metadata(
 }
 
 void assets_manager::create(
-	const assets::physical_texture_id id,
+	const assets::gl_texture_id id,
 	const bool load_as_binary
 ) {
 	auto& self = *this;

@@ -6,7 +6,7 @@
 #include "game/transcendental/entity_handle.h"
 
 #include "game/systems_audiovisual/interpolation_system.h"
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 
 void sound_system::erase_caches_for_dead_entities(const cosmos& new_cosmos) {
 	std::vector<entity_id> to_erase;

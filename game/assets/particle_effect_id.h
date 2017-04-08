@@ -1,5 +1,5 @@
 #pragma once
-#include "game/flyweights/particle_effect.h"
+#include "game/assets/particle_effect.h"
 
 namespace assets {
 	enum class particle_effect_id : unsigned {

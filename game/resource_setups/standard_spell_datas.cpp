@@ -1,6 +1,6 @@
 #include "all.h"
 #include "game/assets/spell_id.h"
-#include "game/flyweights/spell_data.h"
+#include "game/assets/spell.h"
 #include "game/transcendental/cosmos.h"
 
 void set_standard_spell_properties(assets_manager& spells) {

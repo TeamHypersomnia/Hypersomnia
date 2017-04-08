@@ -5,7 +5,7 @@
 #include <sstream>
 #include <experimental/filesystem>
 
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 #include "augs/filesystem/directory.h"
 #include "augs/filesystem/file.h"
 
@@ -36,7 +36,7 @@ atlases_regeneration_output regenerate_atlases(
 	};
 
 	std::unordered_map<
-		assets::physical_texture_id,
+		assets::gl_texture_id,
 		per_atlas_input
 	> per_atlas_inputs;
 

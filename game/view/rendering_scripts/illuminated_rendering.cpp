@@ -8,7 +8,7 @@
 #include "game/systems_stateless/gui_system.h"
 
 #include "game/detail/gui/character_gui.h"
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 #include "augs/graphics/renderer.h"
 #include "game/view/viewing_step.h"
 #include "game/view/viewing_session.h"
@@ -377,7 +377,7 @@ namespace rendering_scripts {
 			}
 		}
 
-		renderer.bind_texture(manager[assets::physical_texture_id::GAME_WORLD_ATLAS]);
+		renderer.bind_texture(manager[assets::gl_texture_id::GAME_WORLD_ATLAS]);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();

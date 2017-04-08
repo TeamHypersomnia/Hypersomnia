@@ -5,10 +5,10 @@
 
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 
 #include "augs/padding_byte.h"
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 
 #include "game_gui_context.h"
 #include "game/detail/gui/game_gui_context.h"

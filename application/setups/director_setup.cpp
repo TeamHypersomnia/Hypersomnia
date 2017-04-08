@@ -9,7 +9,7 @@
 #include "augs/filesystem/directory.h"
 
 #include "game/bindings/bind_game_and_augs.h"
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 #include "game/resource_setups/all.h"
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "game/transcendental/step_packaged_for_network.h"

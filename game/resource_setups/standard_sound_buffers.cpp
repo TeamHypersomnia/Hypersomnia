@@ -1,5 +1,5 @@
 #include "all.h"
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 
 void set_standard_sound_buffers(assets_manager& manager) {
 	{

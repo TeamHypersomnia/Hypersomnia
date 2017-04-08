@@ -1,6 +1,6 @@
 #include "particle_types.h"
 
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 
 template <class T>
 inline void integrate_pos_vel_acc_damp_life(T& p, const float dt) {

@@ -3,7 +3,7 @@
 #include "augs/ensure.h"
 #include "augs/math/vec2.h"
 
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 #include "game/transcendental/cosmos.h"
 
 #include "augs/graphics/vertex.h"

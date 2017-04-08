@@ -3,7 +3,7 @@
 #include "augs/templates/get_index_type_for_size_of.h"
 
 #include "generated_introspectors.h"
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 
 struct trait_tests {
 	static_assert(!has_introspect_v<unsigned>, "Trait has failed");
@@ -142,7 +142,7 @@ sizeof(augs::enum_associative_array<assets::physical_material_id, physical_mater
 sizeof(augs::enum_associative_array<assets::shader_id, augs::graphics::shader>);
 sizeof(augs::enum_associative_array<assets::program_id, augs::graphics::shader_program>);
 sizeof(augs::enum_associative_array<assets::sound_buffer_id, augs::sound_buffer>);
-sizeof(augs::enum_associative_array<assets::physical_texture_id, augs::graphics::texture>);
+sizeof(augs::enum_associative_array<assets::gl_texture_id, augs::graphics::texture>);
 sizeof(particle_effect_logical_meta);
 sizeof(shape_variant);
 

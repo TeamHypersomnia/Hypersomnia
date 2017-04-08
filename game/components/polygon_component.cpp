@@ -4,7 +4,7 @@
 
 #include "augs/graphics/renderer.h"
 
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 #include "game/detail/convex_partitioned_shape.h"
 
 using namespace augs;

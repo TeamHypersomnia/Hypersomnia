@@ -1,5 +1,5 @@
 #pragma once
-#include "game/flyweights/behaviour_tree.h"
+#include "game/assets/behaviour_tree.h"
 
 namespace behaviours {
 	typedef behaviour_tree tree;

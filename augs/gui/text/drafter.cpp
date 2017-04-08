@@ -4,7 +4,7 @@
 #include "augs/window_framework/window.h"
 #include "augs/window_framework/platform_utils.h"
 
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 
 #undef min
 #undef max

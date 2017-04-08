@@ -6,7 +6,7 @@
 #include "augs/window_framework/event.h"
 #include "augs/misc/delta.h"
 #include "augs/misc/enum_bitset.h"
-#include "game/resources/manager.h"
+#include "game/assets/assets_manager.h"
 #include "gui_flags.h"
 
 namespace augs {
