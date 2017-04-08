@@ -69,7 +69,7 @@ cosmic_entropy gui_element_system::get_and_clear_pending_events() {
 	pending_transfers.clear();
 	spell_requests.clear();
 
-	return std::move(out);
+	return out;
 }
 
 void gui_element_system::clear_all_pending_events() {

@@ -171,7 +171,7 @@ tile_layer::visible_tiles_by_type tile_layer::get_visible_tiles_by_type(const lt
 		}
 	}
 
-	return std::move(result);
+	return result;
 }
 
 tile_layer_logical_meta tile_layer::get_logical_meta() const {

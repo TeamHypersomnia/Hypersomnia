@@ -162,7 +162,7 @@ namespace components {
 		out.push_back(get_size() / -2.f + vec2(get_size().x, 0.f));
 		out.push_back(get_size() / -2.f + get_size());
 		out.push_back(get_size() / -2.f + vec2(0.f, get_size().y));
-		return std::move(out);
+		return out;
 	}
 	
 	ltrb sprite::get_aabb(

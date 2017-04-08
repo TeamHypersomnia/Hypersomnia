@@ -34,7 +34,7 @@ namespace augs {
 			out.emplace_back(line);
 		}
 
-		return std::move(out);
+		return out;
 	}
 
 	void ensure_existence(const std::string& path) {

@@ -413,7 +413,7 @@ augs::constant_size_vector<item_slot_transfer_request_data, 4> swap_slots_for_it
 	output.push_back({ first_handle, second_slot });
 	output.push_back({ second_handle, first_slot });
 
-	return std::move(output);
+	return output;
 }
 
 void perform_transfer(

@@ -62,7 +62,7 @@ std::vector<float> basic_randomization<T>::make_random_intervals(
 
 	std::sort(result.begin(), result.end());
 
-	return std::move(result);
+	return result;
 }
 
 template <class T>
@@ -84,7 +84,7 @@ std::vector<float> basic_randomization<T>::make_random_intervals(
 
 	sort_container(result);
 
-	return std::move(result);
+	return result;
 }
 
 template struct basic_randomization<std::mt19937>;

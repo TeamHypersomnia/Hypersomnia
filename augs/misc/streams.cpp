@@ -31,7 +31,7 @@ namespace augs {
 			output.erase(output.end() - 1);
 		}
 
-		return std::move(output);
+		return output;
 	}
 
 	bool stream::operator==(const stream& b) const {
@@ -86,7 +86,7 @@ namespace augs {
 	stream output_stream_reserver::make_stream() {
 		stream reserved;
 		reserved.reserve(write_pos);
-		return std::move(reserved);
+		return reserved;
 	}
 
 	void stream::reserve(const size_t bytes) {

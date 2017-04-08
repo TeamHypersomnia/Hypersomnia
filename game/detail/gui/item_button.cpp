@@ -168,7 +168,7 @@ item_button::layout_with_attachments item_button::calculate_button_layout(
 		}
 	}
 
-	return std::move(output);
+	return output;
 }
 
 vec2 item_button::griddify_size(const vec2 size, const vec2 expander) {

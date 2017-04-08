@@ -167,7 +167,7 @@ ammunition_information get_ammunition_information(const const_entity_handle item
 		out.total_actual_free_space += chamber_slot.calculate_local_free_space();
 	}
 
-	return std::move(out);
+	return out;
 }
 
 entity_id get_closest_hostile(

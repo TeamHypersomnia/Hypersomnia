@@ -200,7 +200,7 @@ namespace augs {
 			output.at(i/2) = (static_cast<int>(samples.at(i)) + samples.at(i+1)) / 2;
 		}
 
-		return std::move(output);
+		return output;
 	}
 
 	single_sound_buffer::data_type get_sound_samples_from_file(const std::string path) {
@@ -234,7 +234,7 @@ namespace augs {
 			new_data.compute_length_in_seconds());
 #endif
 
-		return std::move(new_data);
+		return new_data;
 	}
 
 	void sound_buffer::from_file(const std::string filename, const bool generate_mono) {

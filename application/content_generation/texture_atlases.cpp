@@ -291,5 +291,5 @@ atlases_regeneration_output regenerate_atlases(
 		}
 	}
 
-	return std::move(output);
+	return output;
 }

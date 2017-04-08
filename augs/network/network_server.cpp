@@ -118,7 +118,7 @@ namespace augs {
 					total.emplace_back(new_event);
 			}
 
-			return std::move(total);
+			return total;
 		}
 	}
 }

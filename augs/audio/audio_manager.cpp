@@ -26,7 +26,7 @@ static std::string list_audio_devices(const ALCchar * const devices) {
 		next += (len + 2);
 	}
 
-	return std::move(devices_list);
+	return devices_list;
 }
 
 namespace augs {

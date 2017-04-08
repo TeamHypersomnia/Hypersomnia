@@ -361,7 +361,7 @@ namespace augs {
 			}
 		}
 
-		return std::move(desaturated);
+		return desaturated;
 	}
 
 	void image::destroy() {

@@ -55,7 +55,7 @@ namespace augs {
 					++steps_extrapolated;
 			}
 
-			return std::move(next_commands);
+			return next_commands;
 		}
 
 		bool unpack_new_command(command& next_command) {

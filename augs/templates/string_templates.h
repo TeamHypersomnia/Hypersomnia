@@ -50,7 +50,7 @@ T to_value(const std::basic_string<CharType> s) {
 	
 	T val;
 	ss >> val;
-	return std::move(val);
+	return val;
 }
 
 template<class Str, class Repl>

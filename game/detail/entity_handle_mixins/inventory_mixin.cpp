@@ -81,7 +81,7 @@ inventory_item_address basic_inventory_mixin<C, D>::get_address_from_root() cons
 
 	std::reverse(output.directions.begin(), output.directions.end());
 	
-	return std::move(output);
+	return output;
 }
 
 template <bool C, class D>

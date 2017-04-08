@@ -27,7 +27,7 @@ namespace augs {
 			}
 		}
 
-		return std::move(result);
+		return result;
 	}
 
 	std::string get_executable_directory() {

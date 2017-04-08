@@ -156,7 +156,7 @@ visibility_system::visibility_responses visibility_system::respond_to_visibility
 		output.vis
 	);
 	
-	return std::move(output);
+	return output;
 }
 
 void visibility_system::respond_to_visibility_information_requests(

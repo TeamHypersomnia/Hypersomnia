@@ -97,7 +97,7 @@ auto simulation_receiver::unpack_deterministic_steps(
 		}
 	}
 
-	return std::move(result);
+	return result;
 }
 
 auto simulation_receiver::acquire_potential_misprediction(

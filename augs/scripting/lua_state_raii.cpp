@@ -172,7 +172,7 @@ namespace augs {
 			lua_pop(raw, 1);
 		}
 
-		return std::move(output);
+		return output;
 	}
 	
 	lua_execution_result lua_state_raii::execute(std::vector<char> bytecode) {
@@ -203,6 +203,6 @@ namespace augs {
 			output.error_message = get_stack();
 		}
 
-		return std::move(output);
+		return output;
 	}
 }

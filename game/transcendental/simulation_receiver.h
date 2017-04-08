@@ -115,6 +115,6 @@ public:
 			drag_mispredictions_into_past(interp, past, predicted_cosmos, potential_mispredictions);
 		}
 
-		return std::move(result);
+		return result;
 	}
 };
