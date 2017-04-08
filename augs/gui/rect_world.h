@@ -9,7 +9,7 @@
 #include "rect.h"
 
 #include "augs/misc/pool.h"
-#include "augs/misc/easier_handle_getters_mixin.h"
+#include "augs/misc/subscript_operator_for_get_handle_mixin.h"
 
 #include "game/assets/font_id.h"
 

@@ -6,7 +6,7 @@
 #include "augs/misc/streams.h"
 #include "augs/misc/delta.h"
 #include "augs/misc/enum_bitset.h"
-#include "augs/misc/easier_handle_getters_mixin.h"
+#include "augs/misc/subscript_operator_for_get_handle_mixin.h"
 #include "augs/misc/enum_associative_array.h"
 
 #include "augs/entity_system/operations_on_all_components_mixin.h"
@@ -41,7 +41,7 @@
 
 class EMPTY_BASES cosmos : 
 	private cosmos_base,
-	public augs::easier_handle_getters_mixin<cosmos>
+	public augs::subscript_operator_for_get_handle_mixin<cosmos>
 {
 public:
 	storage_for_all_systems_inferred systems_inferred;

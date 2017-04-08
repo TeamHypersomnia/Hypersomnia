@@ -2,12 +2,12 @@
 #include <vector>
 #include "augs/ensure.h"
 #include "pool_handle.h"
-#include "easier_handle_getters_mixin.h"
+#include "subscript_operator_for_get_handle_mixin.h"
 #include "augs/build_settings/setting_empty_bases.h"
 
 namespace augs {
 	template<class T>
-	class EMPTY_BASES pool_base : public easier_handle_getters_mixin<pool_base<T>> {
+	class EMPTY_BASES pool_base : public subscript_operator_for_get_handle_mixin<pool_base<T>> {
 	public:
 		typedef pooled_object_id<T> id_type;
 		typedef unversioned_id<T> unversioned_id_type;
