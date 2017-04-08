@@ -383,6 +383,7 @@
     <ClCompile Include="game\components\rigid_body_component.cpp" />
     <ClCompile Include="game\components\sentience_component.cpp" />
     <ClCompile Include="game\components\sound_existence_component.cpp" />
+    <ClCompile Include="game\components\tree_of_non_physical_objects_node_component.cpp" />
     <ClCompile Include="game\detail\camera_cone.cpp" />
     <ClCompile Include="game\detail\entity_handle_mixins\inventory_mixin.cpp" />
     <ClCompile Include="game\detail\entity_handle_mixins\physics_mixin.cpp" />
@@ -444,9 +445,9 @@
     <ClCompile Include="game\systems_audiovisual\thunder_system.cpp" />
     <ClCompile Include="game\systems_audiovisual\vertically_flying_number_system.cpp" />
     <ClCompile Include="game\systems_audiovisual\wandering_pixels_system.cpp" />
-    <ClCompile Include="game\systems_inferred\dynamic_tree_system.cpp" />
     <ClCompile Include="game\systems_inferred\physics_system.cpp" />
     <ClCompile Include="game\systems_inferred\processing_lists_system.cpp" />
+    <ClCompile Include="game\systems_inferred\tree_of_non_physical_objects_system.cpp" />
     <ClCompile Include="game\systems_stateless\destruction_system.cpp" />
     <ClCompile Include="game\systems_stateless\grenade_system.cpp" />
     <ClCompile Include="game\systems_stateless\gui_system.cpp" />
@@ -457,7 +458,6 @@
     <ClCompile Include="game\tests_of_traits.cpp" />
     <ClCompile Include="game\transcendental\cosmic_delta.cpp" />
     <ClCompile Include="game\transcendental\cosmic_entropy.cpp" />
-    <ClCompile Include="game\components\dynamic_tree_node_component.cpp" />
     <ClCompile Include="game\components\processing_component.cpp" />
     <ClCompile Include="game\transcendental\cosmic_movie_director.cpp" />
     <ClCompile Include="game\transcendental\cosmic_profiler.cpp" />
@@ -1180,6 +1180,7 @@
     <ClInclude Include="game\components\rigid_body_component.h" />
     <ClInclude Include="game\components\sentience_component.h" />
     <ClInclude Include="game\components\sound_existence_component.h" />
+    <ClInclude Include="game\components\tree_of_non_physical_objects_node_component.h" />
     <ClInclude Include="game\components\wandering_pixels_component.h" />
     <ClInclude Include="game\container_sizes.h" />
     <ClInclude Include="game\detail\basic_renderable_drawing_input.h" />
@@ -1265,9 +1266,9 @@
     <ClInclude Include="game\systems_audiovisual\thunder_system.h" />
     <ClInclude Include="game\systems_audiovisual\vertically_flying_number_system.h" />
     <ClInclude Include="game\systems_audiovisual\wandering_pixels_system.h" />
-    <ClInclude Include="game\systems_inferred\dynamic_tree_system.h" />
     <ClInclude Include="game\systems_inferred\physics_system.h" />
     <ClInclude Include="game\systems_inferred\processing_lists_system.h" />
+    <ClInclude Include="game\systems_inferred\tree_of_non_physical_objects_system.h" />
     <ClInclude Include="game\systems_stateless\destruction_system.h" />
     <ClInclude Include="game\systems_stateless\grenade_system.h" />
     <ClInclude Include="game\systems_stateless\gui_system.h" />
@@ -1288,7 +1289,6 @@
     <ClInclude Include="augs\templates\container_templates.h" />
     <ClInclude Include="augs\window_framework\colored_print.h" />
     <ClInclude Include="augs\window_framework\platform_utils.h" />
-    <ClInclude Include="game\components\dynamic_tree_node_component.h" />
     <ClInclude Include="game\components\processing_component.h" />
     <ClInclude Include="game\components\special_physics_component.h" />
     <ClInclude Include="game\component_synchronizer.h" />
