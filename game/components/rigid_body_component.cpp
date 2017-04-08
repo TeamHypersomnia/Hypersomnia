@@ -12,6 +12,7 @@
 #include "augs/ensure.h"
 #include "game/transcendental/entity_handle.h"
 #include "application/config_structs/debug_drawing_settings.h"
+#include "game/components/physical_relations_component.h"
 
 typedef components::rigid_body P;
 
@@ -244,11 +245,6 @@ void component_synchronizer<false, P>::set_transform(const components::transform
 
 	get_cache().body->m_xf = component.transform;
 	get_cache().body->m_sweep = component.sweep;
-}
-
-template<bool C>
-std::vector<basic_entity_handle<C>> basic_physics_synchronizer<C>::get_fixture_entities() const {
-	return handle.get_fixture_entities();
 }
 
 template<bool C>

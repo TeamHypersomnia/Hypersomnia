@@ -5,6 +5,7 @@
 #include "game/components/driver_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/movement_component.h"
+#include "game/components/physical_relations_component.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
@@ -69,11 +70,11 @@ void resolve_density_of_associated_fixtures(const entity_handle id) {
 	auto& cosmos = id.get_cosmos();
 
 	if (id.has<components::rigid_body>()) {
-		const auto& entities = id.get<components::rigid_body>().get_fixture_entities();
+		const auto entities = id.get<components::rigid_body>().get_fixture_entities();
 
 		for (const auto f : entities) {
 			if (f != id) {
-				resolve_density_of_associated_fixtures(f);
+				resolve_density_of_associated_fixtures(cosmos[f]);
 			}
 		}
 	}

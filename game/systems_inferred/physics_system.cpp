@@ -7,6 +7,7 @@
 #include "game/components/driver_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/special_physics_component.h"
+#include "game/components/physical_relations_component.h"
 
 #include "game/messages/collision_message.h"
 #include "game/messages/queue_destruction.h"
@@ -157,6 +158,8 @@ void physics_system::fixtures_construct(const const_entity_handle handle) {
 }
 
 void physics_system::create_inferred_state(const const_entity_handle handle) {
+	const auto& cosmos = handle.get_cosmos();
+
 	//ensure(!is_constructed_rigid_body(handle));
 	if (is_constructed_rigid_body(handle)) {
 		return;
@@ -166,7 +169,7 @@ void physics_system::create_inferred_state(const const_entity_handle handle) {
 
 	if (handle.has<components::rigid_body>()) {
 		const auto& rigid_body = handle.get<components::rigid_body>();
-		const auto& fixture_entities = rigid_body.get_fixture_entities();
+		const auto fixture_entities = rigid_body.get_fixture_entities();
 
 		if (rigid_body.is_activated() && fixture_entities.size() > 0) {
 			const auto& physics_data = rigid_body.get_data();
@@ -197,8 +200,9 @@ void physics_system::create_inferred_state(const const_entity_handle handle) {
 			cache.body->SetAngledDampingEnabled(physics_data.angled_damping);
 			
 			/* notice that all fixtures must be unconstructed at this moment since we assert that the rigid body itself is not */
-			for (const auto& f : fixture_entities)
-				fixtures_construct(f);
+			for (const auto f : fixture_entities) {
+				fixtures_construct(cosmos[f]);
+			}
 		}
 	}
 }

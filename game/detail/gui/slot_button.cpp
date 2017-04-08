@@ -134,7 +134,7 @@ void slot_button::update_rc(const game_gui_context context, const this_in_contai
 		this_id->set_flag(augs::gui::flag::ENABLE_DRAWING);
 
 		if (slot_id.has_items()) {
-			const_dereferenced_location<item_button_in_item> child_item_button = context.dereference_location(item_button_in_item{ slot_id.get_items_inside()[0].get_id() });
+			const_dereferenced_location<item_button_in_item> child_item_button = context.dereference_location(item_button_in_item{ slot_id.get_items_inside()[0] });
 
 			if (child_item_button->is_being_wholely_dragged_or_pending_finish(context, child_item_button)) {
 				this_id->set_flag(augs::gui::flag::ENABLE_DRAWING);

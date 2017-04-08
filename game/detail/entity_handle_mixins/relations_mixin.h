@@ -27,7 +27,10 @@ public:
 	entity_handle_type get_parent() const;
 	
 	entity_handle_type get_owner_body() const;
-	std::vector<entity_handle_type> get_fixture_entities() const;
+	
+	auto get_fixture_entities() const {
+		return get_physical_relations_component().fixture_entities;
+	}
 
 #if COSMOS_TRACKS_GUIDS
 	entity_guid get_guid() const;

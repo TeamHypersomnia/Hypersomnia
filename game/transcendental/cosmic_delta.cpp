@@ -285,7 +285,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 	augs::read(in, dt.removed_entities);
 
 	size_t new_guids = dt.new_entities;
-	std::vector<entity_handle> new_entities;
+	std::vector<entity_id> new_entities_ids;
 
 	while (dt.new_entities--) {
 #if COSMOS_TRACKS_GUIDS
@@ -297,13 +297,15 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 			return;
 		}
 
-		new_entities.emplace_back(deco.create_entity_with_specific_guid("delta_created", new_guid));
+		new_entities_ids.emplace_back(deco.create_entity_with_specific_guid("delta_created", new_guid));
 #else
 		// otherwise new entity_id assignment needs be deterministic
 #endif
 	}
 
-	for(const auto& new_entity : new_entities) {
+	for(const auto new_entity_id : new_entities_ids) {
+		const auto new_entity = deco[new_entity_id];
+
 		std::array<bool, COMPONENTS_COUNT> overridden_components;
 
 		augs::read_flags(in, overridden_components);

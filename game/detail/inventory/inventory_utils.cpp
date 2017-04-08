@@ -177,6 +177,7 @@ containment_result query_containment_result(
 	int specified_quantity,
 	bool allow_replacement
 ) {
+	const auto& cosmos = item_entity.get_cosmos();
 	const auto& item = item_entity.get<components::item>();
 	const auto& slot = *target_slot;
 
@@ -192,7 +193,7 @@ containment_result query_containment_result(
 	else if (
 		slot.always_allow_exactly_one_item 
 		&& slot.items_inside.size() == 1 
-		&& !can_stack_entities(target_slot.get_items_inside().at(0), item_entity)
+		&& !can_stack_entities(cosmos[target_slot.get_items_inside().at(0)], item_entity)
 	) {
 		//if (allow_replacement) {
 		//
@@ -387,7 +388,7 @@ components::transform sum_attachment_offsets(const cosmos& cosm, const inventory
 
 		const auto item_in_slot = slot_handle.get_items_inside()[0];
 
-		total += get_attachment_offset(*slot_handle, total, item_in_slot);
+		total += get_attachment_offset(*slot_handle, total, cosm[item_in_slot]);
 
 		current_slot.container_entity = item_in_slot;
 	}
@@ -452,7 +453,7 @@ void perform_transfer(
 
 	if (target_slot_exists) {
 		for (const auto potential_stack_target : target_slot.get_items_inside()) {
-			if (can_stack_entities(r.get_item(), potential_stack_target)) {
+			if (can_stack_entities(r.get_item(), cosmos[potential_stack_target])) {
 				target_item_to_stack_with = potential_stack_target;
 			}
 		}

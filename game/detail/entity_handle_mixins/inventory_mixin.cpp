@@ -121,7 +121,9 @@ typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory
 			else {
 				const auto items_inside = maybe_slot.get_items_inside();
 
-				for (const auto potential_container_item : items_inside) {
+				for (const auto potential_container_item_id : items_inside) {
+					const auto potential_container_item = cosmos[potential_container_item_id];
+
 					const auto category = get_slot_with_compatible_category(holstered_item, potential_container_item);
 
 					if (category != slot_function::INVALID) {

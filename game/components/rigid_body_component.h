@@ -89,7 +89,9 @@ public:
 
 	components::rigid_body::type get_body_type() const;
 
-	std::vector<basic_entity_handle<is_const>> get_fixture_entities() const;
+	auto get_fixture_entities() const {
+		return handle.get_fixture_entities();
+	}
 
 	bool test_point(vec2) const;
 };

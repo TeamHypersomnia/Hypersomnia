@@ -92,14 +92,14 @@ namespace rendering_scripts {
 				std::vector<circle_info> textual_infos;
 
 				if (v == watched_character) {
-					const auto examine_item_slot = [&textual_infos, &push_angles, &circle_hud, &state](
+					const auto examine_item_slot = [&cosmos, &textual_infos, &push_angles, &circle_hud, &state](
 						const const_inventory_slot_handle id,
 						const float lower_outside,
 						const float max_angular_length,
 						const bool ccw
-						) {
+					) {
 						if (id.alive() && id.has_items()) {
-							const auto item = id.get_items_inside()[0];
+							const auto item = cosmos[id.get_items_inside()[0]];
 
 							const auto ammo_info = get_ammunition_information(item);
 

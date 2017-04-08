@@ -145,11 +145,11 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				}
 				else {
 					const auto chamber_slot = it[slot_function::GUN_CHAMBER];
-					const auto catridge_in_chamber = chamber_slot.get_mounted_items()[0];
+					const auto catridge_in_chamber = cosmos[chamber_slot.get_mounted_items()[0]];
 
 					response.catridge_definition = catridge_in_chamber.get<components::catridge>();
 
-					thread_local std::vector<entity_handle> bullet_stacks;
+					thread_local decltype(inventory_slot::items_inside) bullet_stacks;
 					bullet_stacks.clear();
 
 					const auto pellets_slot = catridge_in_chamber[slot_function::ITEM_DEPOSIT];
@@ -166,7 +166,9 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 					ensure(bullet_stacks.size() > 0);
 
-					for (const auto single_bullet_or_pellet_stack : bullet_stacks) {
+					for (const auto single_bullet_or_pellet_stack_id : bullet_stacks) {
+						const auto single_bullet_or_pellet_stack = cosmos[single_bullet_or_pellet_stack_id];
+
 						int charges = single_bullet_or_pellet_stack.get<components::item>().charges;
 
 						while (charges--) {
@@ -221,7 +223,8 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					chamber_slot->items_inside.clear();
 
 					if (gun.action_mode >= components::gun::action_type::SEMI_AUTOMATIC) {
-						std::vector<entity_handle> source_store_for_chamber;
+						thread_local decltype(inventory_slot::items_inside) source_store_for_chamber;
+						source_store_for_chamber.clear();
 
 						const auto chamber_magazine_slot = it[slot_function::GUN_CHAMBER_MAGAZINE];
 
@@ -232,12 +235,18 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							const auto detachable_magazine_slot = it[slot_function::GUN_DETACHABLE_MAGAZINE];
 
 							if (detachable_magazine_slot.alive() && detachable_magazine_slot.has_items()) {
-								source_store_for_chamber = detachable_magazine_slot.get_items_inside()[0][slot_function::ITEM_DEPOSIT].get_items_inside();
+								source_store_for_chamber = cosmos[detachable_magazine_slot.get_items_inside()[0]][slot_function::ITEM_DEPOSIT].get_items_inside();
 							}
 						}
 
 						if (source_store_for_chamber.size() > 0) {
-							const item_slot_transfer_request_data into_chamber_transfer{ *source_store_for_chamber.rbegin(), chamber_slot, 1, true };
+							const item_slot_transfer_request_data into_chamber_transfer{ 
+								source_store_for_chamber[source_store_for_chamber.size() - 1], 
+								chamber_slot, 
+								1, 
+								true 
+							};
+
 							perform_transfer(into_chamber_transfer, step);
 						}
 					}

@@ -149,12 +149,6 @@ D basic_relations_mixin<C, D>::get_owner_body() const {
 	return self.get_cosmos()[get_physical_relations_component().owner_body];
 }
 
-template <bool C, class D>
-std::vector<D> basic_relations_mixin<C, D>::get_fixture_entities() const {
-	auto& self = *static_cast<const D*>(this);
-	return self.get_cosmos()[get_physical_relations_component().fixture_entities];
-}
-
 #if COSMOS_TRACKS_GUIDS
 template <bool C, class D>
 entity_guid basic_relations_mixin<C, D>::get_guid() const {

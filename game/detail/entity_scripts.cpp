@@ -150,7 +150,7 @@ ammunition_information get_ammunition_information(const const_entity_handle item
 	const auto maybe_magazine_slot = item[slot_function::GUN_DETACHABLE_MAGAZINE];
 
 	if (maybe_magazine_slot.alive() && maybe_magazine_slot.has_items()) {
-		auto mag = maybe_magazine_slot.get_items_inside()[0];
+		auto mag = item.get_cosmos()[maybe_magazine_slot.get_items_inside()[0]];
 		auto ammo_depo = mag[slot_function::ITEM_DEPOSIT];
 		out.total_charges += count_charges_in_deposit(mag);
 

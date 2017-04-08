@@ -28,7 +28,19 @@ public:
 	
 	basic_inventory_slot_handle(owner_reference owner, const inventory_slot_id raw_id);
 	
-	std::vector<entity_handle_type> get_mounted_items() const;
+	auto get_mounted_items() const {
+		// TODO: actually implement mounted items
+		return get_items_inside();
+
+		//for (auto& i : items_inside) {
+		//	auto handle = cosmos[i];
+		//
+		//	if (handle.get<components::item>().is_mounted())
+		//		output.push_back(i);
+		//}
+		//
+		//return output;
+	}
 
 	owner_reference get_cosmos() const;
 
@@ -50,7 +62,9 @@ public:
 	entity_handle_type get_container() const;
 	entity_handle_type get_root_container() const;
 
-	std::vector<entity_handle_type> get_items_inside() const;
+	auto get_items_inside() const {
+		return get().items_inside;
+	}
 
 	bool has_items() const;
 	bool is_empty_slot() const;
