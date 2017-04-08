@@ -4,7 +4,7 @@
 #include "augs/zeroed_pod.h"
 
 #include "augs/misc/trivially_copyable_pair.h"
-#include "augs/templates/introspect.h"
+
 template<class ForwardIt, class T, class Compare = std::less<>>
 ForwardIt binary_find(ForwardIt first, ForwardIt last, const T& value, Compare comp = {})
 {
@@ -17,6 +17,8 @@ ForwardIt binary_find(ForwardIt first, ForwardIt last, const T& value, Compare c
 }
 
 namespace augs  {
+	struct introspection_access;
+
 	template<class T, size_t const_count>
 	class constant_size_vector {
 		typedef std::array<T, const_count> arr_type;

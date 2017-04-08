@@ -2,9 +2,10 @@
 #include <bitset>
 #include "augs/ensure.h"
 #include "augs/templates/maybe_const.h"
-#include "augs/templates/introspect.h"
 
 namespace augs {
+	struct introspection_access;
+
 	template<class Enum, class T>
 	class enum_associative_array {
 	public:
