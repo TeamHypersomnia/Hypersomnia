@@ -2,6 +2,8 @@
 // disables the warning due to type name length exceeded
 #pragma warning(disable : 4503)
 
+#include "augs/templates/type_list.h"
+
 namespace components {
 	struct dynamic_tree_node;
 	struct special_physics;
@@ -107,12 +109,7 @@ struct put_all_components_into {
 template<template<typename...> class List, class... prepend>
 using put_all_components_into_t = typename put_all_components_into<List, prepend...>::type;
 
-namespace std {
-	template<class...>
-	class tuple;
-}
-
-typedef std::tuple<
+typedef type_list<
 	components::pathfinding
 > disabled_components;
 

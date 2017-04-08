@@ -130,7 +130,7 @@ void menu_setup::process(
 
 	ltrb title_rect;
 	title_rect.set_position({ 100, 100 });
-	title_rect.set_size(assets::get_size(assets::game_image_id::MENU_GAME_LOGO));
+	title_rect.set_size(intro_scene[assets::game_image_id::MENU_GAME_LOGO].get_size());
 
 	rgba fade_overlay_color = { 0, 2, 2, 255 };
 	rgba title_text_color = { 255, 255, 255, 0 };
@@ -555,10 +555,12 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 		
 		session.draw_color_overlay(renderer, fade_overlay_color);
 
-		augs::draw_rect(renderer.get_triangle_buffer(),
+		augs::draw_rect(
+			renderer.get_triangle_buffer(),
 			title_rect,
 			assets::game_image_id::MENU_GAME_LOGO,
-			title_text_color);
+			title_text_color
+		);
 
 		if (tweened_welcome_message_bg_size.non_zero()) {
 			augs::draw_rect_with_border(renderer.get_triangle_buffer(),

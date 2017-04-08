@@ -83,7 +83,7 @@ namespace scene_builders {
 		const auto motorcycle = prefabs::create_motorcycle(world, components::transform(0, -600, -90));
 		prefabs::create_motorcycle(world, components::transform(100, -600, -90));
 
-		const vec2 bg_size = assets::get_size(assets::game_image_id::TEST_BACKGROUND);
+		const vec2 bg_size = world[assets::game_image_id::TEST_BACKGROUND].get_size();
 
 		const int num_floors = 10 * 10;
 		const int side = sqrt(num_floors) / 2;

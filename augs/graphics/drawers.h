@@ -3,7 +3,6 @@
 #include "augs/graphics/pixel.h"
 #include "augs/math/vec2.h"
 #include "game/assets/game_image_id.h"
-#include "augs/graphics/renderable_positioning_type.h"
 
 namespace augs {
 	void draw_rect_with_border(
@@ -29,18 +28,18 @@ namespace augs {
 	
 	void draw_line(vertex_line_buffer& v, const vec2 from, const vec2 to, const texture_atlas_entry&, const rgba color);
 	void draw_dashed_line(vertex_line_buffer& v, const vec2 from, const vec2 to, const texture_atlas_entry&, const rgba color, const float dash_length, const float dash_velocity, const double global_time_seconds);
+	
 	void draw_line(vertex_triangle_buffer& v, const vec2 from, const vec2 to, const float line_width, const texture_atlas_entry&, const rgba color, const bool flip_horizontally = false);
 	
 	std::array<vec2, 4> make_sprite_points(
 		const vec2 pos, 
 		const vec2 size, 
-		const float rotation_degrees, 
-		const renderable_positioning_type positioning = renderable_positioning_type::CENTER
+		const float rotation_degrees
 	);
 	
 	std::array<vertex_triangle, 2> make_sprite_triangles(
 		const std::array<vec2, 4> points, 
-		const augs::texture_atlas_entry& considered_texture,
+		const augs::texture_atlas_entry considered_texture,
 		const rgba col = white,
 		const bool flip_horizontally = false,
 		const bool flip_vertically = false

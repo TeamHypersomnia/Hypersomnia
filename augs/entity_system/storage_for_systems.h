@@ -18,14 +18,14 @@ namespace augs {
 
 		template <typename Pred>
 		void for_each(Pred f) {
-			for_each_in_tuple(systems, [f](auto& c) {
+			for_each_through_std_get(systems, [f](auto& c) {
 				f(c);
 			});
 		}
 
 		template <typename Pred>
 		void for_each(Pred f) const {
-			for_each_in_tuple(systems, [f](const auto& c) {
+			for_each_through_std_get(systems, [f](const auto& c) {
 				f(c);
 			});
 		}

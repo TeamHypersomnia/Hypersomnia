@@ -5,11 +5,10 @@
 #include "augs/graphics/shader.h"
 
 #include "game/detail/particle_types.h"
-#include "game/transcendental/cosmos.h"
 
-void set_standard_particle_effects(cosmos& cosmos) {
+void set_standard_particle_effects(assets_manager& manager) {
 	{
-		auto& effect = get_resource_manager().create(assets::particle_effect_id::WANDERING_SMOKE);
+		auto& effect = manager[assets::particle_effect_id::WANDERING_SMOKE];
 
 		particles_emission em;
 		em.min_swing_spread.set(0.5, 1);
@@ -32,26 +31,26 @@ void set_standard_particle_effects(cosmos& cosmos) {
 		em.particle_lifetime_ms = std::make_pair(5000, 5000);
 
 		for (int i = 0; i < 3; ++i) {
-			general_particle particle_template;
+			general_particle particle_definition;
 
-			particle_template.angular_damping = 0;
-			particle_template.linear_damping = 10;
-			particle_template.face.set(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 30));
-			particle_template.unshrinking_time_ms = 2000.f;
-			particle_template.shrink_when_ms_remaining = 1500.f;
+			particle_definition.angular_damping = 0;
+			particle_definition.linear_damping = 10;
+			particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 30));
+			particle_definition.unshrinking_time_ms = 2000.f;
+			particle_definition.shrink_when_ms_remaining = 1500.f;
 
-			em.add_particle_template(particle_template);
+			em.add_particle_definition(particle_definition);
 		}
 
 		em.size_multiplier.set(1.0, 1.0);
-		em.particle_render_template.layer = render_layer::DIM_SMOKES;
+		em.target_render_layer = render_layer::DIM_SMOKES;
 		em.initial_rotation_variation = 180;
 
-		effect.push_back(em);
+		effect.emissions.push_back(em);
 	}
 
 	{
-		auto& effect = get_resource_manager().create(assets::particle_effect_id::ENGINE_PARTICLES);
+		auto& effect = manager[assets::particle_effect_id::ENGINE_PARTICLES];
 
 		{
 			particles_emission em;
@@ -75,22 +74,22 @@ void set_standard_particle_effects(cosmos& cosmos) {
 			em.particle_lifetime_ms = std::make_pair(2500 * 1.5, 2500 * 1.5);
 
 			for (int i = 0; i < 3; ++i) {
-				general_particle particle_template;
+				general_particle particle_definition;
 
-				particle_template.angular_damping = 0;
-				particle_template.linear_damping = 10;
-				particle_template.face.set(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 60));
-				particle_template.unshrinking_time_ms = 250.f;
-				particle_template.shrink_when_ms_remaining = 1000.f;
+				particle_definition.angular_damping = 0;
+				particle_definition.linear_damping = 10;
+				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 60));
+				particle_definition.unshrinking_time_ms = 250.f;
+				particle_definition.shrink_when_ms_remaining = 1000.f;
 
-				em.add_particle_template(particle_template);
+				em.add_particle_definition(particle_definition);
 			}
 
 			em.size_multiplier = std::make_pair(1.0, 1.0);
-			em.particle_render_template.layer = render_layer::DIM_SMOKES;
+			em.target_render_layer = render_layer::DIM_SMOKES;
 			em.initial_rotation_variation = 180;
 
-			effect.push_back(em);
+			effect.emissions.push_back(em);
 		}
 
 		{
@@ -112,33 +111,33 @@ void set_standard_particle_effects(cosmos& cosmos) {
 			em.particle_lifetime_ms = std::make_pair(40, 100);
 
 			//for (int i = 0; i < 6; ++i) {
-			general_particle particle_template;
+			general_particle particle_definition;
 
-			particle_template.angular_damping = 0;
+			particle_definition.angular_damping = 0;
 			//if (i == 5) {
-			//	particle_template.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 3), rgba(255, 255, 255, 255));
+			//	particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 3), rgba(255, 255, 255, 255));
 			//}
 			//else {
-			particle_template.face.set(assets::game_image_id(int(assets::game_image_id::ROUND_TRACE)), rgba(255, 255, 255, 255));
+			particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::ROUND_TRACE)), rgba(255, 255, 255, 255));
 			//}
-			//particle_template.face.size_multiplier.set(1, 0.5);					
-			particle_template.unshrinking_time_ms = 30.f;
-			particle_template.shrink_when_ms_remaining = 30.f;
-			particle_template.alpha_levels = 1;
+			//particle_definition.face.size_multiplier.set(1, 0.5);					
+			particle_definition.unshrinking_time_ms = 30.f;
+			particle_definition.shrink_when_ms_remaining = 30.f;
+			particle_definition.alpha_levels = 1;
 
-			em.add_particle_template(particle_template);
+			em.add_particle_definition(particle_definition);
 			//}
 
 			em.size_multiplier = std::make_pair(1.0, 1.0);
-			em.particle_render_template.layer = render_layer::ILLUMINATING_PARTICLES;
+			em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 0;
 
-			effect.push_back(em);
+			effect.emissions.push_back(em);
 		}
 	}
 
 	{
-		auto& effect = get_resource_manager().create(assets::particle_effect_id::MUZZLE_SMOKE);
+		auto& effect = manager[assets::particle_effect_id::MUZZLE_SMOKE];
 
 		{
 			particles_emission em;
@@ -161,27 +160,27 @@ void set_standard_particle_effects(cosmos& cosmos) {
 			em.particle_lifetime_ms = std::make_pair(1500, 1500);
 
 			for (int i = 0; i < 3; ++i) {
-				general_particle particle_template;
+				general_particle particle_definition;
 
-				particle_template.angular_damping = 0;
-				particle_template.linear_damping = 10;
-				particle_template.face.set(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 15));
-				particle_template.unshrinking_time_ms = 0.f;
-				particle_template.shrink_when_ms_remaining = 100.f;
+				particle_definition.angular_damping = 0;
+				particle_definition.linear_damping = 10;
+				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 15));
+				particle_definition.unshrinking_time_ms = 0.f;
+				particle_definition.shrink_when_ms_remaining = 100.f;
 
-				em.add_particle_template(particle_template);
+				em.add_particle_definition(particle_definition);
 			}
 
 			em.size_multiplier = std::make_pair(0.35, 0.65);
-			em.particle_render_template.layer = render_layer::DIM_SMOKES;
+			em.target_render_layer = render_layer::DIM_SMOKES;
 			em.initial_rotation_variation = 180;
 
-			effect.push_back(em);
+			effect.emissions.push_back(em);
 		}
 	}
 
 	{
-		auto& effect = get_resource_manager().create(assets::particle_effect_id::EXHAUSTED_SMOKE);
+		auto& effect = manager[assets::particle_effect_id::EXHAUSTED_SMOKE];
 
 		{
 			particles_emission em;
@@ -205,28 +204,28 @@ void set_standard_particle_effects(cosmos& cosmos) {
 			em.particle_lifetime_ms = std::make_pair(900, 900);
 
 			for (int i = 0; i < 3; ++i) {
-				general_particle particle_template;
+				general_particle particle_definition;
 
-				particle_template.angular_damping = 0;
-				particle_template.linear_damping = 400;
-				particle_template.face.set(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 15));
-				particle_template.unshrinking_time_ms = 100.f;
-				particle_template.shrink_when_ms_remaining = 200.f;
+				particle_definition.angular_damping = 0;
+				particle_definition.linear_damping = 400;
+				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 15));
+				particle_definition.unshrinking_time_ms = 100.f;
+				particle_definition.shrink_when_ms_remaining = 200.f;
 
-				em.add_particle_template(particle_template);
+				em.add_particle_definition(particle_definition);
 			}
 
 			em.size_multiplier = std::make_pair(0.35, 0.35);
-			em.particle_render_template.layer = render_layer::DIM_SMOKES;
+			em.target_render_layer = render_layer::DIM_SMOKES;
 			em.initial_rotation_variation = 180;
 
-			effect.push_back(em);
+			effect.emissions.push_back(em);
 		}
 	}
 
 
 	{
-		auto& effect = get_resource_manager().create(assets::particle_effect_id::CAST_CHARGING);
+		auto& effect = manager[assets::particle_effect_id::CAST_CHARGING];
 
 		particles_emission em;
 		em.min_swing_spread.set(0.5, 1);
@@ -258,73 +257,73 @@ void set_standard_particle_effects(cosmos& cosmos) {
 		em.starting_homing_force = std::make_pair(100.f, 100.f);
 		em.ending_homing_force = std::make_pair(10000.f, 10000.f);
 
-		const auto& anim = cosmos[assets::animation_id::CAST_BLINK_ANIMATION];
+		const auto& anim = manager[assets::animation_id::CAST_BLINK_ANIMATION];
 		const auto frame_duration = anim.frames[0].duration_milliseconds / 4.f;
 
 		for (size_t i = 0; i < anim.frames.size() - 1; ++i)
 		{
-			homing_animated_particle particle_template;
+			homing_animated_particle particle_definition;
 
-			particle_template.linear_damping = 0;
-			particle_template.first_face = static_cast<assets::game_image_id>(static_cast<int>(anim.frames[0].image_id) + i);
-			particle_template.frame_count = anim.frames.size() - i;
-			particle_template.frame_duration_ms = frame_duration;
-			particle_template.color = white;
+			particle_definition.linear_damping = 0;
+			particle_definition.first_face = static_cast<assets::game_image_id>(static_cast<int>(anim.frames[0].image_id) + i);
+			particle_definition.frame_count = anim.frames.size() - i;
+			particle_definition.frame_duration_ms = frame_duration;
+			particle_definition.color = white;
 
-			em.add_particle_template(particle_template);
+			em.add_particle_definition(particle_definition);
 		}
 
 		for (int i = 0; i < 7 - 1; ++i)
 		{
-			homing_animated_particle particle_template;
+			homing_animated_particle particle_definition;
 
-			particle_template.linear_damping = 0;
-			particle_template.first_face = static_cast<assets::game_image_id>(static_cast<int>(assets::game_image_id::BLINK_FIRST) + i);
-			particle_template.frame_count = 7 - i;
-			particle_template.frame_duration_ms = frame_duration;
-			particle_template.color = white;
+			particle_definition.linear_damping = 0;
+			particle_definition.first_face = static_cast<assets::game_image_id>(static_cast<int>(assets::game_image_id::BLINK_FIRST) + i);
+			particle_definition.frame_count = 7 - i;
+			particle_definition.frame_duration_ms = frame_duration;
+			particle_definition.color = white;
 
-			em.add_particle_template(particle_template);
+			em.add_particle_definition(particle_definition);
 		}
 
 		{
 
-			homing_animated_particle particle_template;
+			homing_animated_particle particle_definition;
 
-			particle_template.linear_damping = 0;
-			particle_template.first_face = static_cast<assets::game_image_id>(static_cast<int>(assets::game_image_id::BLINK_FIRST) + 2);
-			particle_template.frame_count = 1;
-			particle_template.frame_duration_ms = 700.f;
-			particle_template.color = white;
+			particle_definition.linear_damping = 0;
+			particle_definition.first_face = static_cast<assets::game_image_id>(static_cast<int>(assets::game_image_id::BLINK_FIRST) + 2);
+			particle_definition.frame_count = 1;
+			particle_definition.frame_duration_ms = 700.f;
+			particle_definition.color = white;
 
-			em.add_particle_template(particle_template);
+			em.add_particle_definition(particle_definition);
 		}
 
 		//for (size_t i = 0; i < anim.frames.size() - 1; ++i)
 		//{
-		//	animated_particle particle_template;
+		//	animated_particle particle_definition;
 		//
-		//	particle_template.linear_damping = 1000;
-		//	particle_template.first_face = static_cast<assets::game_image_id>(static_cast<int>(anim.frames[0].sprite.tex) + i);
-		//	particle_template.frame_count = anim.frames.size() - i;
-		//	particle_template.frame_duration_ms = frame_duration;
-		//	particle_template.acc.set(900, -900);
-		//	particle_template.color = white;
+		//	particle_definition.linear_damping = 1000;
+		//	particle_definition.first_face = static_cast<assets::game_image_id>(static_cast<int>(anim.frames[0].sprite.tex) + i);
+		//	particle_definition.frame_count = anim.frames.size() - i;
+		//	particle_definition.frame_duration_ms = frame_duration;
+		//	particle_definition.acc.set(900, -900);
+		//	particle_definition.color = white;
 		//
-		//	em.add_particle_template(particle_template);
+		//	em.add_particle_definition(particle_definition);
 		//}
 
 		em.size_multiplier = std::make_pair(1, 1);
-		em.particle_render_template.layer = render_layer::ILLUMINATING_PARTICLES;
+		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
 		em.initial_rotation_variation = 0;
 		em.should_particles_look_towards_velocity = false;
 		em.randomize_acceleration = true;
 
-		effect.push_back(em);
+		effect.emissions.push_back(em);
 	}
 
 	{
-		auto& effect = get_resource_manager().create(assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES);
+		auto& effect = manager[assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES];
 
 		{
 			particles_emission em;
@@ -354,48 +353,48 @@ void set_standard_particle_effects(cosmos& cosmos) {
 			em.particle_lifetime_ms = std::make_pair(100, 200);
 
 			{
-				const auto& anim = cosmos[assets::animation_id::CAST_BLINK_ANIMATION];
+				const auto& anim = manager[assets::animation_id::CAST_BLINK_ANIMATION];
 				const auto frame_duration = anim.frames[0].duration_milliseconds / 2.f;
 
 				for (size_t i = 0; i < anim.frames.size() - 1; ++i)
 				{
-					homing_animated_particle particle_template;
+					homing_animated_particle particle_definition;
 
-					particle_template.linear_damping = 300;
-					particle_template.first_face = static_cast<assets::game_image_id>(static_cast<int>(anim.frames[0].image_id) + i);
-					particle_template.frame_count = anim.frames.size() - i;
-					particle_template.frame_duration_ms = frame_duration;
-					particle_template.color = white;
+					particle_definition.linear_damping = 300;
+					particle_definition.first_face = static_cast<assets::game_image_id>(static_cast<int>(anim.frames[0].image_id) + i);
+					particle_definition.frame_count = anim.frames.size() - i;
+					particle_definition.frame_duration_ms = frame_duration;
+					particle_definition.color = white;
 
-					em.add_particle_template(particle_template);
+					em.add_particle_definition(particle_definition);
 				}
 			}
 
 			{
-				const auto& anim = cosmos[assets::animation_id::BLINK_ANIMATION];
+				const auto& anim = manager[assets::animation_id::BLINK_ANIMATION];
 				const auto frame_duration = anim.frames[0].duration_milliseconds / 2.f;
 
 				for (size_t i = 0; i < anim.frames.size() - 1; ++i)
 				{
-					homing_animated_particle particle_template;
+					homing_animated_particle particle_definition;
 
-					particle_template.linear_damping = 300;
-					particle_template.first_face = static_cast<assets::game_image_id>(static_cast<int>(anim.frames[0].image_id) + i);
-					particle_template.frame_count = anim.frames.size() - i;
-					particle_template.frame_duration_ms = frame_duration;
-					particle_template.color = white;
+					particle_definition.linear_damping = 300;
+					particle_definition.first_face = static_cast<assets::game_image_id>(static_cast<int>(anim.frames[0].image_id) + i);
+					particle_definition.frame_count = anim.frames.size() - i;
+					particle_definition.frame_duration_ms = frame_duration;
+					particle_definition.color = white;
 
-					em.add_particle_template(particle_template);
+					em.add_particle_definition(particle_definition);
 				}
 			}
 
 			em.size_multiplier = std::make_pair(1, 1);
-			em.particle_render_template.layer = render_layer::ILLUMINATING_PARTICLES;
+			em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 0;
 			em.should_particles_look_towards_velocity = false;
 			em.randomize_acceleration = true;
 
-			effect.push_back(em);
+			effect.emissions.push_back(em);
 		}
 
 		particles_emission em;
@@ -421,27 +420,27 @@ void set_standard_particle_effects(cosmos& cosmos) {
 		em.particle_lifetime_ms = std::make_pair(200, 350);
 
 		for (int i = 0; i < 3; ++i) {
-			general_particle particle_template;
+			general_particle particle_definition;
 
-			particle_template.angular_damping = 0;
-			particle_template.linear_damping = 200;
-			particle_template.acc.set(700, -700);
-			particle_template.face.set(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 30));
-			particle_template.unshrinking_time_ms = 100.f;
-			particle_template.shrink_when_ms_remaining = 200.f;
+			particle_definition.angular_damping = 0;
+			particle_definition.linear_damping = 200;
+			particle_definition.acc.set(700, -700);
+			particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 30));
+			particle_definition.unshrinking_time_ms = 100.f;
+			particle_definition.shrink_when_ms_remaining = 200.f;
 
-			em.add_particle_template(particle_template);
+			em.add_particle_definition(particle_definition);
 		}
 
 		em.size_multiplier = std::make_pair(0.40, 0.40);
-		em.particle_render_template.layer = render_layer::ILLUMINATING_SMOKES;
+		em.target_render_layer = render_layer::ILLUMINATING_SMOKES;
 		em.initial_rotation_variation = 180;
 
-		effect.push_back(em);
+		effect.emissions.push_back(em);
 	}
 
 	{
-		auto& effect = get_resource_manager().create(assets::particle_effect_id::CAST_SPARKLES);
+		auto& effect = manager[assets::particle_effect_id::CAST_SPARKLES];
 
 		{
 			particles_emission em;
@@ -465,23 +464,23 @@ void set_standard_particle_effects(cosmos& cosmos) {
 			em.particle_lifetime_ms = std::make_pair(900, 900);
 
 			for (int i = 0; i < 3; ++i) {
-				general_particle particle_template;
+				general_particle particle_definition;
 
-				particle_template.angular_damping = 0;
-				particle_template.linear_damping = 400;
-				particle_template.acc.set(900, -900);
-				particle_template.face.set(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 30));
-				particle_template.unshrinking_time_ms = 100.f;
-				particle_template.shrink_when_ms_remaining = 200.f;
+				particle_definition.angular_damping = 0;
+				particle_definition.linear_damping = 400;
+				particle_definition.acc.set(900, -900);
+				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 30));
+				particle_definition.unshrinking_time_ms = 100.f;
+				particle_definition.shrink_when_ms_remaining = 200.f;
 
-				em.add_particle_template(particle_template);
+				em.add_particle_definition(particle_definition);
 			}
 
 			em.size_multiplier = std::make_pair(0.40, 0.40);
-			em.particle_render_template.layer = render_layer::ILLUMINATING_SMOKES;
+			em.target_render_layer = render_layer::ILLUMINATING_SMOKES;
 			em.initial_rotation_variation = 180;
 
-			effect.push_back(em);
+			effect.emissions.push_back(em);
 		}
 
 		{
@@ -505,70 +504,74 @@ void set_standard_particle_effects(cosmos& cosmos) {
 			em.rotation_speed = std::make_pair(0, 0);
 			em.particle_lifetime_ms = std::make_pair(200, 600);
 
-			const auto& anim = cosmos[assets::animation_id::CAST_BLINK_ANIMATION];
+			const auto& anim = manager[assets::animation_id::CAST_BLINK_ANIMATION];
 			const auto frame_duration = anim.frames[0].duration_milliseconds / 2.f;
 
 			for (size_t i = 0; i < anim.frames.size() - 1; ++i)
 			{
-				animated_particle particle_template;
+				animated_particle particle_definition;
 
-				particle_template.linear_damping = 1000;
-				particle_template.first_face = static_cast<assets::game_image_id>(static_cast<int>(anim.frames[0].image_id) + i);
-				particle_template.frame_count = anim.frames.size() - i;
-				particle_template.frame_duration_ms = frame_duration;
-				particle_template.acc.set(900, -900);
-				particle_template.color = white;
+				particle_definition.linear_damping = 1000;
+				particle_definition.first_face = static_cast<assets::game_image_id>(static_cast<int>(anim.frames[0].image_id) + i);
+				particle_definition.frame_count = anim.frames.size() - i;
+				particle_definition.frame_duration_ms = frame_duration;
+				particle_definition.acc.set(900, -900);
+				particle_definition.color = white;
 
-				em.add_particle_template(particle_template);
+				em.add_particle_definition(particle_definition);
 			}
 
 			{
-				general_particle particle_template;
+				general_particle particle_definition;
 
-				particle_template.angular_damping = 0;
-				particle_template.linear_damping = 1000;
-				particle_template.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), white);
-				particle_template.acc.set(900, -900);
-				particle_template.alpha_levels = 1;
+				particle_definition.angular_damping = 0;
+				particle_definition.linear_damping = 1000;
+				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), white);
+				particle_definition.acc.set(900, -900);
+				particle_definition.alpha_levels = 1;
 
-				em.add_particle_template(particle_template);
+				em.add_particle_definition(particle_definition);
 			}
 
 			//{
-			//	resources::particle particle_template;
+			//	resources::particle particle_definition;
 			//
-			//	particle_template.angular_damping = 0;
-			//	particle_template.linear_damping = 1000;
-			//	particle_template.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 3), white);
-			//	particle_template.acc.set(400, -400);
-			//	particle_template.alpha_levels = 1;
+			//	particle_definition.angular_damping = 0;
+			//	particle_definition.linear_damping = 1000;
+			//	particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 3), white);
+			//	particle_definition.acc.set(400, -400);
+			//	particle_definition.alpha_levels = 1;
 			//
-			//	em.particle_templates.push_back(particle_template);
+			//	em.particle_definitions.push_back(particle_definition);
 			//}
 
 			{
-				general_particle particle_template;
+				general_particle particle_definition;
 
-				particle_template.angular_damping = 0;
-				particle_template.linear_damping = 700;
-				particle_template.acc.set(1200, -1200);
-				particle_template.face.set(assets::game_image_id(int(assets::game_image_id::BLANK)), white);
-				particle_template.face.size.set(1, 1);
+				particle_definition.angular_damping = 0;
+				particle_definition.linear_damping = 700;
+				particle_definition.acc.set(1200, -1200);
+				
+				particle_definition.set_image(
+					assets::game_image_id(int(assets::game_image_id::BLANK)), 
+					vec2(1, 1),
+					white
+				);
 
-				em.add_particle_template(particle_template);
+				em.add_particle_definition(particle_definition);
 			}
 
 			em.size_multiplier = std::make_pair(1, 1);
-			em.particle_render_template.layer = render_layer::ILLUMINATING_PARTICLES;
+			em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 0;
 			em.should_particles_look_towards_velocity = false;
 
-			effect.push_back(em);
+			effect.emissions.push_back(em);
 		}
 	}
 
 	{
-		auto& effect = get_resource_manager().create(assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION);
+		auto& effect = manager[assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION];
 
 		{
 			particles_emission em;
@@ -595,23 +598,23 @@ void set_standard_particle_effects(cosmos& cosmos) {
 			em.randomize_spawn_point_within_circle_of_outer_radius = std::make_pair(40.f, 45.f);
 
 			for (int i = 0; i < 3; ++i) {
-				general_particle particle_template;
+				general_particle particle_definition;
 
-				particle_template.angular_damping = 0;
-				particle_template.linear_damping = 20;
-				particle_template.acc.set(300, -300);
-				particle_template.face.set(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 15));
-				particle_template.unshrinking_time_ms = 100.f;
-				particle_template.shrink_when_ms_remaining = 150.f;
+				particle_definition.angular_damping = 0;
+				particle_definition.linear_damping = 20;
+				particle_definition.acc.set(300, -300);
+				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 15));
+				particle_definition.unshrinking_time_ms = 100.f;
+				particle_definition.shrink_when_ms_remaining = 150.f;
 
-				em.add_particle_template(particle_template);
+				em.add_particle_definition(particle_definition);
 			}
 
 			em.size_multiplier = std::make_pair(0.40, 0.50);
-			em.particle_render_template.layer = render_layer::ILLUMINATING_SMOKES;
+			em.target_render_layer = render_layer::ILLUMINATING_SMOKES;
 			em.initial_rotation_variation = 180;
 
-			effect.push_back(em);
+			effect.emissions.push_back(em);
 		}
 
 		{
@@ -623,26 +626,26 @@ void set_standard_particle_effects(cosmos& cosmos) {
 			em.particle_lifetime_ms = std::make_pair(30, 50);
 
 			for (int i = 0; i < 5; ++i) {
-				general_particle particle_template;
+				general_particle particle_definition;
 
-				particle_template.angular_damping = 0;
-				particle_template.linear_damping = 5000;
-				particle_template.face.set(assets::game_image_id(int(assets::game_image_id::PIXEL_THUNDER_FIRST) + i), rgba(255, 255, 255, 255));
-				particle_template.alpha_levels = 1;
+				particle_definition.angular_damping = 0;
+				particle_definition.linear_damping = 5000;
+				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::PIXEL_THUNDER_FIRST) + i), rgba(255, 255, 255, 255));
+				particle_definition.alpha_levels = 1;
 
-				em.add_particle_template(particle_template);
+				em.add_particle_definition(particle_definition);
 			}
 
 			em.size_multiplier = std::make_pair(0.5, 1);
-			em.particle_render_template.layer = render_layer::ILLUMINATING_PARTICLES;
+			em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 0;
 
-			effect.push_back(em);
+			effect.emissions.push_back(em);
 		}
 	}
 
 	{
-		auto& effect = get_resource_manager().create(assets::particle_effect_id::PIXEL_BURST);
+		auto& effect = manager[assets::particle_effect_id::PIXEL_BURST];
 
 		particles_emission em;
 		em.spread_degrees = std::make_pair(150, 360);
@@ -652,21 +655,21 @@ void set_standard_particle_effects(cosmos& cosmos) {
 		em.particle_lifetime_ms = std::make_pair(1, 120);
 
 		for (int i = 0; i < 5; ++i) {
-			general_particle particle_template;
+			general_particle particle_definition;
 
-			particle_template.angular_damping = 0;
-			particle_template.linear_damping = 5000;
-			particle_template.face.set(assets::game_image_id(int(assets::game_image_id::PIXEL_THUNDER_FIRST) + i), rgba(255, 255, 255, 255));
-			particle_template.alpha_levels = 1;
+			particle_definition.angular_damping = 0;
+			particle_definition.linear_damping = 5000;
+			particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::PIXEL_THUNDER_FIRST) + i), rgba(255, 255, 255, 255));
+			particle_definition.alpha_levels = 1;
 
-			em.add_particle_template(particle_template);
+			em.add_particle_definition(particle_definition);
 		}
 
 		em.size_multiplier = std::make_pair(0.5, 1);
-		em.particle_render_template.layer = render_layer::ILLUMINATING_PARTICLES;
+		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
 		em.initial_rotation_variation = 0;
 
-		effect.push_back(em);
+		effect.emissions.push_back(em);
 
 		{
 			particles_emission em;
@@ -690,28 +693,28 @@ void set_standard_particle_effects(cosmos& cosmos) {
 			em.particle_lifetime_ms = std::make_pair(700, 800);
 
 			for (int i = 0; i < 3; ++i) {
-				general_particle particle_template;
+				general_particle particle_definition;
 
-				particle_template.angular_damping = 0;
-				particle_template.linear_damping = 20;
-				particle_template.acc.set(600, -600);
-				particle_template.face.set(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 15));
-				particle_template.unshrinking_time_ms = 30.f;
-				particle_template.shrink_when_ms_remaining = 50.f;
+				particle_definition.angular_damping = 0;
+				particle_definition.linear_damping = 20;
+				particle_definition.acc.set(600, -600);
+				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 15));
+				particle_definition.unshrinking_time_ms = 30.f;
+				particle_definition.shrink_when_ms_remaining = 50.f;
 
-				em.add_particle_template(particle_template);
+				em.add_particle_definition(particle_definition);
 			}
 
 			em.size_multiplier = std::make_pair(0.40, 0.50);
-			em.particle_render_template.layer = render_layer::ILLUMINATING_SMOKES;
+			em.target_render_layer = render_layer::ILLUMINATING_SMOKES;
 			em.initial_rotation_variation = 180;
 
-			effect.push_back(em);
+			effect.emissions.push_back(em);
 		}
 	}
 
 	{
-		auto& effect = get_resource_manager().create(assets::particle_effect_id::WANDERING_PIXELS_DIRECTED);
+		auto& effect = manager[assets::particle_effect_id::WANDERING_PIXELS_DIRECTED];
 
 		particles_emission em;
 		em.spread_degrees = std::make_pair(0, 1);
@@ -722,26 +725,31 @@ void set_standard_particle_effects(cosmos& cosmos) {
 		em.particle_lifetime_ms = std::make_pair(500, 700);
 
 		for (int i = 0; i < 5; ++i) {
-			general_particle particle_template;
+			general_particle particle_definition;
 
-			particle_template.angular_damping = 0;
-			particle_template.linear_damping = 0;
-			particle_template.face.set(assets::game_image_id(assets::game_image_id::BLANK), rgba(255, 255, 255, 255));
-			particle_template.face.size.set(1, 1);
-			particle_template.alpha_levels = 1;
+			particle_definition.angular_damping = 0;
+			particle_definition.linear_damping = 0;
+			
+			particle_definition.set_image(
+				assets::game_image_id(assets::game_image_id::BLANK), 
+				vec2(1, 1), 
+				rgba(255, 255, 255, 255)
+			);
 
-			em.add_particle_template(particle_template);
+			particle_definition.alpha_levels = 1;
+
+			em.add_particle_definition(particle_definition);
 		}
 
 		em.size_multiplier = std::make_pair(1, 1.5);
-		em.particle_render_template.layer = render_layer::ILLUMINATING_PARTICLES;
+		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
 		em.initial_rotation_variation = 0;
 
-		effect.push_back(em);
+		effect.emissions.push_back(em);
 	}
 
 	{
-		auto& effect = get_resource_manager().create(assets::particle_effect_id::WANDERING_PIXELS_SPREAD);
+		auto& effect = manager[assets::particle_effect_id::WANDERING_PIXELS_SPREAD];
 
 		particles_emission em;
 		em.spread_degrees = std::make_pair(0, 10);
@@ -751,30 +759,35 @@ void set_standard_particle_effects(cosmos& cosmos) {
 		em.particle_lifetime_ms = std::make_pair(200, 400);
 
 		for (int i = 0; i < 5; ++i) {
-			general_particle particle_template;
+			general_particle particle_definition;
 
-			particle_template.angular_damping = 0;
-			particle_template.linear_damping = 1000;
-			particle_template.face.set(assets::game_image_id(assets::game_image_id::BLANK), rgba(255, 255, 255, 255));
-			particle_template.face.size.set(1, 1);
-			particle_template.alpha_levels = 1;
+			particle_definition.angular_damping = 0;
+			particle_definition.linear_damping = 1000;
+			
+			particle_definition.set_image(
+				assets::game_image_id(assets::game_image_id::BLANK), 
+				vec2(1, 1), 
+				rgba(255, 255, 255, 255)
+			);
 
-			em.add_particle_template(particle_template);
+			particle_definition.alpha_levels = 1;
+
+			em.add_particle_definition(particle_definition);
 		}
 
 		em.size_multiplier = std::make_pair(1, 1.5);
-		em.particle_render_template.layer = render_layer::ILLUMINATING_PARTICLES;
+		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
 		em.initial_rotation_variation = 0;
 
-		effect.push_back(em);
-		auto wandering = (*assets::particle_effect_id::WANDERING_PIXELS_DIRECTED)[0];
+		effect.emissions.push_back(em);
+		auto wandering = manager[assets::particle_effect_id::WANDERING_PIXELS_DIRECTED].emissions[0];
 		wandering.spread_degrees = std::make_pair(10, 30);
 		wandering.base_speed = std::make_pair(160, 330);
-		effect.push_back(wandering);
+		effect.emissions.push_back(wandering);
 	}
 
 	{
-		auto& effect = get_resource_manager().create(assets::particle_effect_id::CONCENTRATED_WANDERING_PIXELS);
+		auto& effect = manager[assets::particle_effect_id::CONCENTRATED_WANDERING_PIXELS];
 
 		particles_emission em;
 		em.spread_degrees = std::make_pair(0, 1);
@@ -785,26 +798,31 @@ void set_standard_particle_effects(cosmos& cosmos) {
 		em.particle_lifetime_ms = std::make_pair(300, 400);
 
 		for (int i = 0; i < 5; ++i) {
-			general_particle particle_template;
+			general_particle particle_definition;
 
-			particle_template.angular_damping = 0;
-			particle_template.linear_damping = 0;
-			particle_template.face.set(assets::game_image_id(assets::game_image_id::BLANK), rgba(255, 255, 255, 255));
-			particle_template.face.size.set(1, 1);
-			particle_template.alpha_levels = 1;
+			particle_definition.angular_damping = 0;
+			particle_definition.linear_damping = 0;
+			
+			particle_definition.set_image(
+				assets::game_image_id(assets::game_image_id::BLANK), 
+				vec2(1, 1), 
+				rgba(255, 255, 255, 255)
+			);
 
-			em.add_particle_template(particle_template);
+			particle_definition.alpha_levels = 1;
+
+			em.add_particle_definition(particle_definition);
 		}
 
 		em.size_multiplier = std::make_pair(1, 2.0);
-		em.particle_render_template.layer = render_layer::ILLUMINATING_PARTICLES;
+		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
 		em.initial_rotation_variation = 0;
 
-		effect.push_back(em);
+		effect.emissions.push_back(em);
 	}
 
 	{
-		auto& effect = get_resource_manager().create(assets::particle_effect_id::ROUND_ROTATING_BLOOD_STREAM);
+		auto& effect = manager[assets::particle_effect_id::ROUND_ROTATING_BLOOD_STREAM];
 
 		particles_emission em;
 		em.spread_degrees = std::make_pair(180, 180);
@@ -825,48 +843,53 @@ void set_standard_particle_effects(cosmos& cosmos) {
 		em.angular_offset = std::make_pair(0, 0);
 
 		for (int i = 0; i < 3; ++i) {
-			general_particle particle_template;
+			general_particle particle_definition;
 
-			particle_template.angular_damping = 0;
-			particle_template.linear_damping = 10;
-			particle_template.face.set(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 220));
-			particle_template.face.size_multiplier.set(0.4, 0.4);
+			particle_definition.angular_damping = 0;
+			particle_definition.linear_damping = 10;
+			particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 220));
+			particle_definition.size *= 0.4;
 
-			em.add_particle_template(particle_template);
+			em.add_particle_definition(particle_definition);
 		}
 
 		em.size_multiplier = std::make_pair(0.2, 0.5);
-		em.particle_render_template.layer = render_layer::DIM_SMOKES;
+		em.target_render_layer = render_layer::DIM_SMOKES;
 		em.initial_rotation_variation = 180;
 		//em.fade_when_ms_remaining = std::make_pair(10, 50);
 
-		effect.push_back(em);
+		effect.emissions.push_back(em);
 	}
 
 	{
-		auto& effect = get_resource_manager().create(assets::particle_effect_id::THUNDER_REMNANTS);
+		auto& effect = manager[assets::particle_effect_id::THUNDER_REMNANTS];
 
 		particles_emission em;
 		em.rotation_speed = std::make_pair(0, 0);
 		em.particle_lifetime_ms = std::make_pair(100, 350);
 
 		for (int i = 0; i < 5; ++i) {
-			general_particle particle_template;
+			general_particle particle_definition;
 
-			particle_template.angular_damping = 0;
-			particle_template.linear_damping = 50;
-			particle_template.face.set(assets::game_image_id(assets::game_image_id::BLANK), rgba(255, 255, 255, 255));
-			particle_template.face.size.set(1, 1);
-			particle_template.alpha_levels = 1;
+			particle_definition.angular_damping = 0;
+			particle_definition.linear_damping = 50;
+			
+			particle_definition.set_image(
+				assets::game_image_id(assets::game_image_id::BLANK), 
+				vec2(1, 1),
+				rgba(255, 255, 255, 255)
+			);
 
-			em.add_particle_template(particle_template);
+			particle_definition.alpha_levels = 1;
+
+			em.add_particle_definition(particle_definition);
 		}
 
 		em.size_multiplier = std::make_pair(1.f, 1.5f);
-		em.particle_render_template.layer = render_layer::ILLUMINATING_PARTICLES;
+		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
 		em.initial_rotation_variation = 0;
 		em.randomize_acceleration = true;
 
-		effect.push_back(em);
+		effect.emissions.push_back(em);
 	}
 }

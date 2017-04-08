@@ -2,100 +2,151 @@
 #include <type_traits>
 #include <tuple>
 
-namespace std {
-	template <class...>
-	class tuple;
-}
+#include "augs/templates/predicate_templates.h"
 
-namespace templates_detail {
-	template <
-		class T,
-		unsigned Index
-	>
-	struct found_type_result {
-		typedef T type;
-		static constexpr bool found = true;
-		static constexpr unsigned index = Index;
-	};
-}
+template <class, class>
+struct add_to_tuple;
+
+template <class T, class... Args>
+struct add_to_tuple<T, std::tuple<Args...>> {
+	using type = std::tuple<T, Args...>;
+};
+
+template <size_t, class>
+struct add_to_sequence;
+
+template <size_t I, size_t... Is>
+struct add_to_sequence<I, std::index_sequence<Is...>> {
+	using type = std::index_sequence<I, Is...>;
+};
+
+template <size_t I, class T>
+struct sequence_element;
+
+template <size_t I, class T, T Head, T... Tail>
+struct sequence_element<I, std::integer_sequence<T, Head, Tail...>>
+	: sequence_element<I - 1, std::integer_sequence<T, Tail...>> { };
+
+template <class T, T Head, T... Tail>
+struct sequence_element<0, std::integer_sequence<T, Head, Tail...>> {
+	static constexpr T value = Head;
+};
+
+template <size_t I, class T>
+static constexpr auto sequence_element_v = sequence_element<I, T>::value;
 
 template <
-	unsigned CurrentCandidateIndex,
-	template <class, class> class Criterion,
-	class SearchedType,
+	unsigned Index,
+	template <class...> class Criterion,
 	class List
 >
-struct find_matching_type_detail;
+struct filter_types_detail;
 
 template <
-	unsigned CurrentCandidateIndex,
-	template<class, class> class Criterion,
-	class SearchedType,
+	unsigned Index,
+	template <class...> class Criterion,
 	template <class...> class List
 >
-struct find_matching_type_detail<
-	CurrentCandidateIndex,
+struct filter_types_detail<
+	Index,
 	Criterion,
-	SearchedType,
 	List<>
-> {
-	static constexpr bool found = false;
+> { 
+	using type = std::tuple<>; 
+	using indices = std::index_sequence<>;
 };
 
 template <
-	unsigned CurrentCandidateIndex,
-	template<class, class> class Criterion,
-	class SearchedType,
+	unsigned Index,
+	template <class...> class Criterion,
 	template <class...> class List,
-	class Candidate,
-	class... Candidates
+	class Head,
+	class... Tail
 >
-struct find_matching_type_detail<
-	CurrentCandidateIndex,
+struct filter_types_detail<
+	Index,
 	Criterion,
-	SearchedType,
-	List<Candidate, Candidates...>
-> :
-	std::conditional_t<
-		Criterion<SearchedType, Candidate>::value, 
-		templates_detail::found_type_result<Candidate, CurrentCandidateIndex>,
-		find_matching_type_detail<
-			CurrentCandidateIndex + 1,
-			Criterion, 
-			SearchedType, 
-			List<Candidates...>
-		>
-	> 
-{
+	List<Head, Tail...>
+> {
+	using type = std::conditional_t<
+		Criterion<Head>::value,
+		typename add_to_tuple<
+			Head,
+			typename filter_types_detail<Index + 1, Criterion, List<Tail...>>::type
+		>::type,
+		typename filter_types_detail<Index + 1, Criterion, List<Tail...>>::type
+	>;
+
+	using indices = std::conditional_t<
+		Criterion<Head>::value,
+		typename add_to_sequence<
+			Index,
+			typename filter_types_detail<Index + 1, Criterion, List<Tail...>>::indices
+		>::type,
+		typename filter_types_detail<Index + 1, Criterion, List<Tail...>>::indices
+	>;
+
+	static constexpr bool found = indices().size() > 0;
+
+	template <size_t I, class = void>
+	struct get_type {
+
+	};
+
+	template <size_t I>
+	struct get_type<I, std::enable_if_t<I < std::tuple_size_v<type>>> {
+		using type = std::decay_t<
+			decltype(std::get<I>(std::declval<type>()))
+		>;
+	};
 };
 
+
 template <
-	template<class, class> class Criterion,
-	class SearchedType,
+	template <class...> class Criterion,
 	class List
 >
-using find_matching_type = find_matching_type_detail<0, Criterion, SearchedType, List>;
+using filter_types_in_list = filter_types_detail<0, Criterion, List>;
+
+
+template <
+	template <class...> class Criterion,
+	class List
+>
+using filter_types_in_list_t = typename filter_types_detail<0, Criterion, List>::type;
+
+template <
+	template <class...> class Criterion,
+	class... Args
+>
+using filter_types = filter_types_in_list<Criterion, std::tuple<Args...>>;
+
+template <
+	template <class...> class Criterion,
+	class List
+>
+using find_matching_type_in_list = typename filter_types_in_list<Criterion, List>::template get_type<0>::type;
 
 template <class S, class List>
-using is_one_of_list = std::bool_constant<find_matching_type<std::is_same, S, List>::found>;
-
-template <class S, class... Types>
-using is_one_of = is_one_of_list<S, std::tuple<Types...>>;
-
-template <class S, class List>
-constexpr bool is_one_of_list_v = find_matching_type<std::is_same, S, List>::found;
+constexpr bool is_one_of_list_v = filter_types_in_list<bind_types_t<std::is_same, S>, List>::found;
 
 template <class S, class... Types>
 constexpr bool is_one_of_v = is_one_of_list_v<S, std::tuple<Types...>>;
 
 template <class S, class List>
-constexpr unsigned index_in_list_v = find_matching_type<std::is_same, S, List>::index;
+using is_one_of_list = std::bool_constant<is_one_of_list_v<S, List>>;
 
 template <class S, class... Types>
-constexpr unsigned index_in_v = index_in_list_v<S, std::tuple<Types...>>;
+using is_one_of = is_one_of_list<S, std::tuple<Types...>>;
 
 template <class S, class List>
-using find_convertible_type_in_list_t = typename find_matching_type<std::is_convertible, S, List>::type;
+constexpr size_t index_in_list_v = sequence_element_v<0, typename filter_types_in_list<bind_types_t<std::is_same, S>, List>::indices>;
+
+template <class S, class... Types>
+constexpr size_t index_in_v = index_in_list_v<S, std::tuple<Types...>>;
+
+template <class S, class List>
+using find_convertible_type_in_list_t = find_matching_type_in_list<bind_types_t<std::is_convertible, S>, List>;
 
 template <class S, class... Types>
 using find_convertible_type_in_t = find_convertible_type_in_list_t<S, std::tuple<Types...>>;
@@ -109,14 +160,6 @@ struct nth_type_in {
 template<unsigned idx, class... Types>
 using nth_type_in_t = typename nth_type_in<idx, Types...>::type;
 
-static_assert(is_one_of_list_v<unsigned, std::tuple<float, float, double, unsigned>>, "Something wrong with trait");
-static_assert(is_one_of_v<unsigned, float, float, double, unsigned>, "Something wrong with trait");
-
-static_assert(index_in_list_v<unsigned, std::tuple<float, float, double, unsigned>> == 3, "Something wrong with trait");
-static_assert(index_in_v<unsigned, float, float, double, unsigned> == 3, "Something wrong with trait");
-
-static_assert(std::is_same_v<unsigned, nth_type_in_t<0, unsigned, float, float>>, "Something wrong with trait");
-static_assert(std::is_same_v<double, nth_type_in_t<3, unsigned, float, float, double, unsigned>>, "Something wrong with trait");
 
 template <class T, class Candidate>
 struct is_key_type_equal_to : std::bool_constant<std::is_same_v<T, typename Candidate::key_type>> {
@@ -124,7 +167,7 @@ struct is_key_type_equal_to : std::bool_constant<std::is_same_v<T, typename Cand
 };
 
 template <class SearchedKeyType, class List>
-using find_type_with_key_type_in_list_t = typename find_matching_type<is_key_type_equal_to, SearchedKeyType, List>::type;
+using find_type_with_key_type_in_list_t = find_matching_type_in_list<bind_types_t<is_key_type_equal_to, SearchedKeyType>, List>;
 
 template <class SearchedKeyType, class... Types>
 using find_type_with_key_type_t = find_type_with_key_type_in_list_t<SearchedKeyType, std::tuple<Types...>>;

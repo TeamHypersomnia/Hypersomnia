@@ -84,11 +84,11 @@ character_gui& gui_element_system::get_character_gui(const entity_id id) {
 		auto& new_gui = character_guis[id];
 		new_gui.set_screen_size(screen_size_for_new_characters);
 		
-		new_gui.action_buttons[0].bound_spell = spell_type::HASTE;
-		new_gui.action_buttons[1].bound_spell = spell_type::FURY_OF_THE_AEONS;
-		new_gui.action_buttons[2].bound_spell = spell_type::ULTIMATE_WRATH_OF_THE_AEONS;
-		new_gui.action_buttons[3].bound_spell = spell_type::ELECTRIC_TRIAD;
-		new_gui.action_buttons[4].bound_spell = spell_type::ELECTRIC_SHIELD;
+		new_gui.action_buttons[0].bound_spell = assets::spell_id::HASTE;
+		new_gui.action_buttons[1].bound_spell = assets::spell_id::FURY_OF_THE_AEONS;
+		new_gui.action_buttons[2].bound_spell = assets::spell_id::ULTIMATE_WRATH_OF_THE_AEONS;
+		new_gui.action_buttons[3].bound_spell = assets::spell_id::ELECTRIC_TRIAD;
+		new_gui.action_buttons[4].bound_spell = assets::spell_id::ELECTRIC_SHIELD;
 		
 		return new_gui;
 	}
@@ -204,7 +204,7 @@ void gui_element_system::handle_hotbar_and_action_button_presses(
 			if (i.is_pressed) {
 				const auto bound_spell = action_b.bound_spell;
 
-				if (bound_spell != spell_type::COUNT) {
+				if (bound_spell != assets::spell_id::COUNT) {
 					spell_requests[subject] = bound_spell;
 				}
 			}
@@ -396,7 +396,7 @@ void gui_element_system::rebuild_layouts(
 	}
 
 	{
-		const auto action_button_size = get_resource_manager().find(assets::game_image_id::ACTION_BUTTON_BORDER)->texture_maps[texture_map_type::DIFFUSE].get_size();
+		const auto action_button_size = get_assets_manager()[assets::game_image_id::ACTION_BUTTON_BORDER].texture_maps[texture_map_type::DIFFUSE].get_size();
 
 		int total_width = element.action_buttons.size() * action_button_size.x;
 

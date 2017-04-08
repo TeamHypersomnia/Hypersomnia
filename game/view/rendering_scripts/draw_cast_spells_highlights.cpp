@@ -12,6 +12,7 @@ namespace rendering_scripts {
 		const double global_time_seconds
 	) {
 		const auto dt = cosm.get_fixed_delta();
+		const auto& manager = get_assets_manager();
 
 		cosm.for_each(
 			processing_subjects::WITH_SENTIENCE,
@@ -19,21 +20,25 @@ namespace rendering_scripts {
 				const auto& sentience = it.get<components::sentience>();
 				const auto spell = sentience.currently_casted_spell;
 
-				if (spell != spell_type::COUNT) {
+				if (spell != assets::spell_id::COUNT) {
 					const auto highlight_amount = 1.f - (global_time_seconds - sentience.time_of_last_spell_cast.in_seconds(dt)) / 0.4f;
 
 					if (highlight_amount > 0.f) {
-						const auto appearance = get_spell_appearance(spell);
+						const auto spell_data = manager[spell];
 
 						components::sprite::drawing_input highlight(in);
 						highlight.camera = cam;
 						highlight.renderable_transform.pos = it.get_viewing_transform(sys).pos;
 
-						auto highlight_col = appearance.border_col;
+						auto highlight_col = spell_data.logical.border_col;
 						highlight_col.a = static_cast<rgba_channel>(255 * highlight_amount);
 
 						components::sprite spr;
-						spr.set(assets::game_image_id::CAST_HIGHLIGHT, highlight_col);
+						spr.set(
+							assets::game_image_id::CAST_HIGHLIGHT, 
+							manager[assets::game_image_id::CAST_HIGHLIGHT].get_size(),
+							highlight_col
+						);
 
 						spr.draw(highlight);
 					}

@@ -1,5 +1,7 @@
 #include "particle_types.h"
 
+#include "game/resources/manager.h"
+
 template <class T>
 inline void integrate_pos_vel_acc_damp_life(T& p, const float dt) {
 	p.vel += p.acc * dt;
@@ -45,9 +47,8 @@ void general_particle::draw(components::sprite::drawing_input basic_input) const
 		size_mult *= std::min(1.f, (lifetime_ms / unshrinking_time_ms)*(lifetime_ms / unshrinking_time_ms));
 	}
 
-	auto f = face;
-	f.size_multiplier.x *= size_mult;
-	f.size_multiplier.y *= size_mult;
+	components::sprite f;
+	f.set(image_id, size_mult * size, color);
 
 	basic_input.renderable_transform = { pos, rotation };
 	f.draw(basic_input);
@@ -66,7 +67,7 @@ void general_particle::set_acceleration(const vec2 new_acc) {
 }
 
 void general_particle::multiply_size(const float mult) {
-	face.size *= mult;
+	size *= mult;
 }
 
 void general_particle::set_rotation(const float new_rotation) {
@@ -82,7 +83,24 @@ void general_particle::set_max_lifetime_ms(const float new_max_lifetime_ms) {
 }
 
 void general_particle::colorize(const rgba mult) {
-	face.color *= mult;
+	color *= mult;
+}
+
+void general_particle::set_image(
+	const assets::game_image_id id,
+	const rgba col
+) {
+	set_image(id, get_assets_manager()[id].get_size(), col);
+}
+
+void general_particle::set_image(
+	const assets::game_image_id id,
+	vec2 s,
+	const rgba col
+) {
+	image_id = id;
+	size = s;
+	color = col;
 }
 
 void animated_particle::integrate(const float dt) {
@@ -93,7 +111,12 @@ void animated_particle::draw(components::sprite::drawing_input basic_input) cons
 	thread_local components::sprite face;
 	const auto frame_num = std::min(static_cast<unsigned>(lifetime_ms / frame_duration_ms), frame_count - 1);
 
-	face.set(static_cast<assets::game_image_id>(static_cast<int>(first_face) + frame_num));
+	const auto target_id = static_cast<assets::game_image_id>(static_cast<int>(first_face) + frame_num);
+
+	face.set(
+		target_id,
+		get_assets_manager()[target_id].get_size()
+	);
 	
 	basic_input.renderable_transform = { pos, 0 };
 	face.color = color;
@@ -160,7 +183,12 @@ void homing_animated_particle::draw(components::sprite::drawing_input basic_inpu
 	const auto frame_num = std::min(static_cast<unsigned>(lifetime_ms / frame_duration_ms), frame_count-1);
 
 	//face.set(static_cast<assets::game_image_id>(static_cast<int>(first_face) + frame_count - frame_num - 1));
-	face.set(static_cast<assets::game_image_id>(static_cast<int>(first_face) + frame_num));
+	const auto target_id = static_cast<assets::game_image_id>(static_cast<int>(first_face) + frame_num);
+
+	face.set(
+		target_id,
+		get_assets_manager()[target_id].get_size()
+	);
 
 	basic_input.renderable_transform = { pos, 0 };
 	face.color = color;

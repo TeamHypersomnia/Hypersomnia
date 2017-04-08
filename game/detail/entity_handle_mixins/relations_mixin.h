@@ -46,7 +46,7 @@ public:
 		self.for_each_component(
 			[&cosmos, &callback](auto& subject_component) {
 				augs::introspect_recursive<
-					bind_types_t<std::is_same, child_entity_id>,
+					apply_to_arguments_t<bind_types_t<std::is_same, child_entity_id>, std::remove_cv_t>,
 					apply_negation_t<apply_to_arguments_t<bind_types_t<std::is_same, shape_variant>, std::remove_cv_t>>,
 					stop_recursion_if_valid
 				> (

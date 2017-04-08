@@ -48,7 +48,7 @@ atlases_regeneration_output regenerate_atlases(
 		per_atlas_inputs[i.target_atlas].fonts.push_back(i.loading_input);
 	}
 
-	auto& manager = get_resource_manager();
+	const auto& manager = get_assets_manager();
 
 	const auto atlases_directory = std::string("generated/atlases/");
 

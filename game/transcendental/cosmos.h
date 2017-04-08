@@ -1,59 +1,66 @@
 #pragma once
-#include <thread>
-#include "game/build_settings.h"
+#include "augs/build_settings/setting_empty_bases.h"
+
+#include "augs/templates/introspection_utilities.h"
+
 #include "augs/misc/streams.h"
-#include "augs/misc/introspect.h"
-#include "game/transcendental/cosmic_entropy.h"
+#include "augs/misc/delta.h"
+#include "augs/misc/enum_bitset.h"
+#include "augs/misc/easier_handle_getters_mixin.h"
+#include "augs/misc/enum_associative_array.h"
 
 #include "augs/entity_system/operations_on_all_components_mixin.h"
 #include "augs/entity_system/storage_for_systems.h"
-#include "augs/misc/enum_bitset.h"
 
+#include "game/build_settings.h"
+#include "game/simulation_settings/all_simulation_settings.h"
+
+#include "game/assets/physical_material_id.h"
+
+#include "game/transcendental/cosmic_entropy.h"
+#include "game/transcendental/cosmic_profiler.h"
 #include "game/transcendental/types_specification/all_components_declaration.h"
 #include "game/transcendental/types_specification/all_messages_declaration.h"
 #include "game/transcendental/types_specification/all_systems_declaration.h"
+#include "game/transcendental/cosmos_structs.h"
+#include "game/transcendental/entity_id.h"
+#include "game/transcendental/entity_handle_declaration.h"
+#include "game/transcendental/data_living_one_step.h"
+
+#include "game/detail/inventory/inventory_slot_id.h"
+#include "game/detail/inventory/inventory_slot_handle_declaration.h"
+#include "game/detail/inventory/inventory_slot_handle.h"
+#include "game/detail/inventory/item_slot_transfer_request_declaration.h"
+#include "game/detail/inventory/item_slot_transfer_request.h"
 
 #include "game/systems_inferred/dynamic_tree_system.h"
 #include "game/systems_inferred/physics_system.h"
 #include "game/systems_inferred/processing_lists_system.h"
 
-#include "augs/misc/delta.h"
-#include "augs/misc/easier_handle_getters_mixin.h"
-#include "augs/misc/enum_associative_array.h"
-
-#include "game/transcendental/entity_id.h"
-#include "game/detail/inventory/inventory_slot_id.h"
-#include "game/transcendental/entity_handle_declaration.h"
-#include "game/transcendental/data_living_one_step.h"
-#include "game/detail/inventory/inventory_slot_handle_declaration.h"
-#include "game/detail/inventory/item_slot_transfer_request_declaration.h"
-#include "game/simulation_settings/all_simulation_settings.h"
-#include "game/transcendental/cosmic_profiler.h"
-#include "augs/build_settings/setting_empty_bases.h"
-
-#include "game/detail/inventory/inventory_slot_handle.h"
-#include "game/detail/inventory/item_slot_transfer_request.h"
-
-#include "game/flyweights/spell_data.h"
-#include "game/flyweights/physical_material.h"
-
-#include "game/transcendental/cosmos_structs.h"
+#include "game/flyweights/behaviour_tree.h"
 
 class EMPTY_BASES cosmos : 
 	private cosmos_base,
 	public augs::easier_handle_getters_mixin<cosmos>
 {
-	void advance_deterministic_schemata_and_queue_destructions(const logic_step step_state);
-	void perform_deletions(const logic_step);
+public:
+	storage_for_all_systems_inferred systems_inferred;
+
+	mutable cosmic_profiler profiler;
+	augs::stream reserved_memory_for_serialization;
+
+	cosmos_significant_state significant;
+private:
+	std::vector<std::string> entity_debug_names;
+	augs::enum_associative_array<assets::behaviour_tree_id, behaviour_tree> unserializable_behaviour_trees;
 
 #if COSMOS_TRACKS_GUIDS
+	std::map<entity_guid, entity_id> guid_map_for_transport;
+
 	friend class cosmic_delta;
 
 	template<class T>
 	friend void transform_component_guids_to_ids_in_place(T&, const cosmos&);
-
-	std::map<entity_guid, entity_id> guid_map_for_transport;
-	std::vector<std::string> entity_debug_names;
 
 	void delete_debug_name(const entity_id);
 
@@ -64,23 +71,20 @@ public:
 	void remap_guids();
 private:
 	entity_handle create_entity_with_specific_guid(
-		const std::string& debug_name, 
+		const std::string& debug_name,
 		const entity_guid specific_guid
 	);
 #endif
+
+	void advance_deterministic_schemata_and_queue_destructions(const logic_step step_state);
+	void perform_deletions(const logic_step);
 
 	void destroy_inferred_state_completely();
 	void create_inferred_state_completely();
 
 	entity_handle allocate_new_entity();
+
 public:
-	storage_for_all_systems_inferred systems_inferred;
-
-	mutable cosmic_profiler profiler;
-	augs::stream reserved_memory_for_serialization;
-	
-	cosmos_significant_state significant;
-
 	cosmos(const unsigned reserved_entities = 0);
 	cosmos(const cosmos&);
 
@@ -137,7 +141,7 @@ public:
 		const id_type id,
 		find_flyweights_container_t<id_type>* enable_if_flyweight_type_found = nullptr
 	) {
-		return std::get<find_flyweights_container_t<id_type>>(significant.meta.flyweights.all_flyweights_by_id)[id];
+		return std::get<find_flyweights_container_t<id_type>>(significant.meta.logical_metas_of_assets)[id];
 	}
 
 	template <class id_type>
@@ -145,8 +149,11 @@ public:
 		const id_type id,
 		find_flyweights_container_t<id_type>* enable_if_flyweight_type_found = nullptr
 	) const {
-		return std::get<find_flyweights_container_t<id_type>>(significant.meta.flyweights.all_flyweights_by_id)[id];
+		return std::get<find_flyweights_container_t<id_type>>(significant.meta.logical_metas_of_assets)[id];
 	}
+
+	behaviour_tree& get_handle(const assets::behaviour_tree_id);
+	const behaviour_tree& get_handle(const assets::behaviour_tree_id) const;
 
 #if COSMOS_TRACKS_GUIDS
 	entity_handle get_handle(const entity_guid);
@@ -162,72 +169,11 @@ public:
 	const_inventory_slot_handle get_handle(const inventory_slot_id) const;
 	item_slot_transfer_request get_handle(const item_slot_transfer_request_data);
 	const_item_slot_transfer_request get_handle(const item_slot_transfer_request_data) const;
+
 #if COSMOS_TRACKS_GUIDS
-public:
-	template <
-		class destination_id_type,
-		template <class> class T,
-		class source_id_type,
-		class F
-	>
-	static T<destination_id_type> transform_ids_in(
-		const T<source_id_type>& source,
-		F transformator,
-		std::enable_if_t<!std::is_same_v<destination_id_type, source_id_type>>* = nullptr
-	) {
-		T<destination_id_type> destination;
-		
-		auto rewrite_rest_of_the_members =
-			[](auto, auto& written_to, const auto& written_from) {
-				written_to = written_from;
-			}
-		;
-
-		typedef concat_unary_t<
-			std::conjunction,
-			bind_types_t<std::is_base_of, destination_id_type>,
-			bind_types_t<std::is_base_of, const source_id_type>
-		> are_of_id_types;
-
-		augs::introspect_recursive<
-			apply_to_arguments_t<std::is_assignable, std::add_lvalue_reference_t>,
-			apply_negation_t<are_of_id_types>,
-			stop_recursion_if_valid
-		>(
-			rewrite_rest_of_the_members,
-			destination,
-			source
-		);
-
-		augs::introspect_recursive<
-			are_of_id_types,
-			always_recurse,
-			stop_recursion_if_valid
-		>(
-			[transformator](auto, auto& destination_id_member, const auto& source_id_member) {
-				transformator(destination_id_member, source_id_member);
-			},
-			destination,
-			source
-		);
-
-		return destination;
-	}
-	template <
-		class destination_id_type,
-		template <class> class T,
-		class F
-	>
-	static T<destination_id_type> transform_ids_in(
-		const T<destination_id_type>& source,
-		F transformator
-	) {
-		return source;
-	}
-
 	template <template <class> class Guidized, class source_id_type>
 	Guidized<entity_guid> guidize(const Guidized<source_id_type>& id_source) const {
-		return transform_ids_in<entity_guid>(
+		return rewrite_members_and_transform_templated_type_into<entity_guid>(
 			id_source,
 			[this](auto& guid_member, const auto& id_member) {
 				const auto handle = get_handle(id_member);
@@ -244,7 +190,7 @@ public:
 
 	template <template <class> class Deguidized, class source_id_type>
 	Deguidized<entity_id> deguidize(const Deguidized<source_id_type>& guid_source) const {
-		return transform_ids_in<entity_id>(
+		return rewrite_members_and_transform_templated_type_into<entity_id>(
 			guid_source,
 			[this](auto& id_member, const auto& guid_member) {
 				if (guid_member != entity_guid()) {
@@ -301,11 +247,6 @@ public:
 		}
 	}
 	
-	assets::sound_buffer_id get_collision_sound(
-		const physical_material_type a, 
-		const physical_material_type b
-	) const;
-
 	size_t entities_count() const;
 	size_t get_maximum_entities() const;
 	std::wstring summary() const;
@@ -355,6 +296,14 @@ public:
 
 inline si_scaling cosmos::get_si() const {
 	return significant.meta.settings.si;
+}
+
+inline behaviour_tree& cosmos::get_handle(const assets::behaviour_tree_id id) {
+	return unserializable_behaviour_trees[id];
+}
+
+inline const behaviour_tree& cosmos::get_handle(const assets::behaviour_tree_id id) const {
+	return unserializable_behaviour_trees[id];
 }
 
 #if COSMOS_TRACKS_GUIDS
@@ -418,3 +367,5 @@ inline size_t cosmos::entities_count() const {
 inline size_t cosmos::get_maximum_entities() const {
 	return significant.pool_for_aggregates.capacity();
 }
+
+typedef cosmos logical_flyweights_manager;

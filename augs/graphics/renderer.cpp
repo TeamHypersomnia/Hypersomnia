@@ -229,7 +229,7 @@ namespace augs {
 			return;
 		}
 		
-		const auto& tex = get_resource_manager().find(line_texture)->texture_maps[texture_map_type::DIFFUSE];
+		const auto& tex = get_assets_manager()[line_texture].texture_maps[texture_map_type::DIFFUSE];
 		
 		clear_triangles();
 
@@ -342,7 +342,7 @@ namespace augs {
 		graphics::fbo::use_default();
 		glClear(GL_COLOR_BUFFER_BIT); glerr;
 		
-		bind_texture(*get_resource_manager().find(assets::physical_texture_id::GAME_WORLD_ATLAS));
+		bind_texture(get_assets_manager()[assets::physical_texture_id::GAME_WORLD_ATLAS]);
 
 		call_triangles();
 

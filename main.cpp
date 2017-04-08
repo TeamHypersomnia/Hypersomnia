@@ -22,6 +22,11 @@
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 
+/*
+	The usage of std::make_unique calls in main is to prevent stack overflow
+	due to otherwise there possibly being many cosmoi and resources on the stack.
+*/
+
 int main(int argc, char** argv) {
 	augs::create_directories("generated/logs/");
 
@@ -51,9 +56,9 @@ int main(int argc, char** argv) {
 	);
 
 	gl.set_as_current();
-
-	resources::manager resources;
-	resources.set_as_current();
+	
+	auto resources = std::make_unique<assets_manager>();
+	resources->set_as_current();
 
 	call_window_script(lua, window, "window.lua");
 
@@ -76,75 +81,76 @@ int main(int argc, char** argv) {
 		&& "The launch mode you have chosen is currently out of service."
 	);
 
-	viewing_session session;
+	auto session_ptr = std::make_unique<viewing_session>();
+	auto& session = *session_ptr;
+
 	session.initialize(window, cfg);
 
 	switch (mode) {
 	case config_lua_table::launch_type::MAIN_MENU:
 	{
-		menu_setup setup;
-		setup.process(cfg, window, session);
+		auto setup = std::make_unique<menu_setup>();
+		setup->process(cfg, window, session);
 	}
 		break;
 	case config_lua_table::launch_type::LOCAL:
 	{
-		local_setup setup;
-		setup.process(cfg, window, session);
+		auto setup = std::make_unique<local_setup>();
+		setup->process(cfg, window, session);
 	}
 		break;
 	case config_lua_table::launch_type::LOCAL_DETERMINISM_TEST:
 	{
-		determinism_test_setup setup;
-		setup.process(cfg, window, session);
+		auto setup = std::make_unique<determinism_test_setup>();
+		setup->process(cfg, window, session);
 	}
 	case config_lua_table::launch_type::DIRECTOR:
 	{
-		director_setup setup;
-		setup.process(cfg, window, session);
+		auto setup = std::make_unique<director_setup>();
+		setup->process(cfg, window, session);
 	}
 		break;
 
 	case config_lua_table::launch_type::CHOREOGRAPHIC:
 	{
-		choreographic_setup setup;
-		setup.process(cfg, window, session);
+		auto setup = std::make_unique<choreographic_setup>();
+		setup->process(cfg, window, session);
 	}
 		break;
 	case config_lua_table::launch_type::CLIENT_AND_SERVER:
 	{
-		server_setup serv_setup;
+		auto serv_setup = std::make_unique<server_setup>();
 		
 		std::thread server_thread([&]() {
-			serv_setup.process(cfg, window);
+			serv_setup->process(cfg, window);
 		});
 		
-		serv_setup.wait_for_listen_server();
+		serv_setup->wait_for_listen_server();
 		
-		client_setup setup;
-		setup.process(cfg, window, session);
+		auto setup = std::make_unique<client_setup>();
+		setup->process(cfg, window, session);
 		
-		serv_setup.should_quit = true;
+		serv_setup->should_quit = true;
 		
 		server_thread.join();
 	}
 	break;
 	case config_lua_table::launch_type::TWO_CLIENTS_AND_SERVER:
 	{
-		two_clients_and_server_setup setup;
-		setup.process(cfg, window);
+		auto serv_setup = std::make_unique<two_clients_and_server_setup>();
+		serv_setup->process(cfg, window);
 	}
 	break;
 	case config_lua_table::launch_type::ONLY_CLIENT:  
 	{
-
-		client_setup setup;
-		setup.process(cfg, window, session);
+		auto setup = std::make_unique<client_setup>();
+		setup->process(cfg, window, session);
 	}
 		break;
 	case config_lua_table::launch_type::ONLY_SERVER: 
 	{
-		server_setup setup;
-		setup.process(cfg, window);
+		auto setup = std::make_unique<server_setup>();
+		setup->process(cfg, window);
 	}
 		break;
 

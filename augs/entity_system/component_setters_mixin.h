@@ -38,7 +38,7 @@ namespace augs {
 		void set(added_components... args) const {
 			auto components_tuple = std::make_tuple(args...);
 
-			for_each_in_tuple(components_tuple, [this](auto& c) {
+			for_each_through_std_get(components_tuple, [this](auto& c) {
 				set(c);
 			});
 		}

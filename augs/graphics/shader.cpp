@@ -1,7 +1,9 @@
-#include "3rdparty/GL/OpenGL.h"
-#include <cassert>
 #include "shader.h"
+
+#include "3rdparty/GL/OpenGL.h"
+
 #include "augs/ensure.h"
+#include "augs/filesystem/file.h"
 
 namespace augs {
 	namespace graphics {
@@ -39,6 +41,14 @@ namespace augs {
 
 		shader::~shader() {
 			destroy();
+		}
+
+
+		void shader::create_from_file(
+			const type shader_type,
+			const std::string& path
+		) {
+			create(shader_type, get_file_contents(path));
 		}
 
 		void shader::create(
@@ -123,16 +133,16 @@ namespace augs {
 			}
 		}
 
-		void shader_program::use() {
-			if (!built) build();
-
+		void shader_program::use() const {
+			ensure(built);
 			currently_used_program = id;
 			glUseProgram(id); glerr
 		}
 
-		void shader_program::guarded_use() {
-			if (currently_used_program != id)
+		void shader_program::guarded_use() const {
+			if (currently_used_program != id) {
 				use();
+			}
 		}
 	}
 }

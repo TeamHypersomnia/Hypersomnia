@@ -4,7 +4,7 @@
 #include "augs/gui/button_corners.h"
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
-
+#include "augs/misc/streams.h"
 #include "augs/templates/for_each_in_types.h"
 #include "augs/misc/templated_readwrite.h"
 
@@ -37,7 +37,7 @@ void regenerate_scripted_images(
 			std::string command_name;
 			in >> command_name;
 
-			for_each_type_in_list(augs::image::command_variant(), [&](auto dummy) {
+			for_each_through_std_get(augs::image::command_variant::types_tuple(), [&](auto dummy) {
 				typedef decltype(dummy) command_type;
 
 				if (command_name == command_type::get_command_name()) {

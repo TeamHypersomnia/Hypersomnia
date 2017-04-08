@@ -16,7 +16,7 @@
 #include "game/transcendental/component_synchronizer.h"
 
 #include "game/enums/colliders_offset_type.h"
-#include "game/enums/physical_material_type.h"
+#include "game/assets/physical_material_id.h"
 
 #include "game/components/transform_component.h"
 
@@ -29,7 +29,9 @@ struct b2Fixture_index_in_component;
 struct convex_partitioned_collider {
 	// GEN INTROSPECTOR struct convex_partitioned_collider
 	shape_variant shape;
-	physical_material_type material = physical_material_type::METAL;
+	std::array<convex_poly_destruction_data, CONVEX_POLYS_COUNT> destruction;
+
+	assets::physical_material_id material = assets::physical_material_id::METAL;
 
 	float collision_sound_gain_mult = 1.f;
 
@@ -130,7 +132,7 @@ public:
 	) const;
 
 	void set_physical_material(
-		const physical_material_type,
+		const assets::physical_material_id,
 		const size_t collider_index = 0
 	) const;
 

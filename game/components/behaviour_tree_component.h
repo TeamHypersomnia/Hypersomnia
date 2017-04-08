@@ -1,6 +1,4 @@
 #pragma once
-#include <vector>
-
 #include "game/flyweights/behaviour_tree.h"
 #include "game/assets/behaviour_tree_id.h"
 
@@ -9,7 +7,7 @@
 
 struct behaviour_tree_instance {
 	// GEN INTROSPECTOR struct behaviour_tree_instance
-	resources::state_of_behaviour_tree_instance state;
+	state_of_behaviour_tree_instance state;
 	assets::behaviour_tree_id tree_id = assets::behaviour_tree_id::INVALID;
 	// END GEN INTROSPECTOR
 };

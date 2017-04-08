@@ -16,38 +16,19 @@
 
 #include "generated_introspectors.h"
 
-static_assert(is_one_of_v<cosmos, int, cosmos_metadata, cosmos>, "Trait is wrong");
-static_assert(!is_one_of_v<int, float, double>, "Trait is wrong");
+/* Several assumptions regarding delta encoding */
 
 static_assert(
 	sizeof(entity_id) >= sizeof(entity_guid)
-	&& alignof(entity_id) >= alignof(entity_guid), 
+	&& alignof(entity_id) >= alignof(entity_guid),
 	"With given memory layouts, entity_id<->entity_guid substitution will not be possible in delta encoding"
 );
 
-static_assert(!has_introspect_v<cosmos>, "Trait is wrong");
-static_assert(!has_introspect_v<unsigned>, "Trait is wrong");
-static_assert(!has_introspect_v<augs::trivial_variant<int, double>>, "Trait is wrong");
-// static_assert(is_trivial_variant<augs::trivial_variant<int, double>>::value, "Trait is wrong");
-// static_assert(!is_trivial_variant<double>::value, "Trait is wrong");
-static_assert(has_introspect_v<cosmos_metadata>, "Trait is wrong");
-static_assert(has_introspect_v<ltrbt<float>>, "Trait is wrong");
-static_assert(has_introspect_v<ltrbt<int>>, "Trait is wrong");
-static_assert(has_introspect_v<augs::constant_size_vector<int, 2>>, "Trait is wrong");
-static_assert(has_introspect_v<zeroed_pod<unsigned int>>, "Trait is wrong");
-
-static_assert(bind_types<std::is_same, const int>::type<const int>::value, "Trait is wrong");
-
-static_assert(bind_types_right<is_one_of, shape_variant&, const shape_variant&>::type<shape_variant&>::value, "Trait is wrong");
-static_assert(bind_types_right<is_one_of, shape_variant&, const shape_variant&>::type<const shape_variant&>::value, "Trait is wrong");
-static_assert(!bind_types_right<is_one_of, int, double, unsigned, signed>::type<float>::value, "Trait is wrong");
-
-typedef apply_negation<bind_types_t<std::is_same, shape_variant>> no_variant;
-
-static_assert(!no_variant::type<shape_variant>::value, "Trait is wrong");
-static_assert(no_variant::type<int>::value, "Trait is wrong");
-
-static_assert(augs::enum_associative_array<assets::game_image_id, int>().capacity() == int(assets::game_image_id::COUNT), "enum_associative_array is wrong");
+static_assert(!has_introspect_v<cosmos>, "Trait has failed");
+static_assert(!has_introspect_v<augs::trivial_variant<int, double>>, "Trait has failed");
+static_assert(has_introspect_v<cosmos_metadata>, "Trait has failed");
+static_assert(has_introspect_v<augs::constant_size_vector<int, 2>>, "Trait has failed");
+static_assert(has_introspect_v<zeroed_pod<unsigned int>>, "Trait has failed");
 
 template <class T>
 void transform_component_ids_to_guids_in_place(
@@ -100,50 +81,6 @@ void transform_component_guids_to_ids_in_place(
 	);
 }
 
-template <class T>
-bool write_delta(
-	const T& base, 
-	const T& enco, 
-	augs::stream& out, 
-	const bool write_changed_bit = false
-) {
-	const auto dt = augs::delta_encode(base, enco);
-	const bool has_changed = dt.changed_bytes.size() > 0;
-
-	if (write_changed_bit) {
-		augs::write(out, has_changed);
-	}
-
-	if (has_changed) {
-		augs::write(out, dt.changed_bytes, unsigned short());
-		augs::write(out, dt.changed_offsets, unsigned short());
-	}
-
-	return has_changed;
-}
-
-template <class T>
-void read_delta(
-	T& deco, 
-	augs::stream& in, 
-	const bool read_changed_bit = false
-) {
-	augs::object_delta dt;
-
-	bool has_changed = true;
-
-	if (read_changed_bit) {
-		augs::read(in, has_changed);
-	}
-
-	if (has_changed) {
-		augs::read(in, dt.changed_bytes, unsigned short());
-		augs::read(in, dt.changed_offsets, unsigned short());
-
-		augs::delta_decode(deco, dt);
-	}
-}
-
 struct delted_stream_of_entities {
 	unsigned new_entities = 0;
 	unsigned changed_entities = 0;
@@ -192,10 +129,9 @@ bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 
 		augs::stream new_content;
 		
-		for_each_in_tuples(
-			base_components, 
-			enco_components,
+		augs::introspect(
 			[&agg, &base, &enco, &entity_changed, &removed_components, &new_content, &overridden_components](
+				auto label,
 				const auto& base_id, 
 				const auto& enco_id
 			) {
@@ -225,7 +161,7 @@ bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 
 					transform_component_ids_to_guids_in_place(enco_compo, enco);
 
-					write_delta(base_compo, enco_compo, new_content, true);
+					augs::write_delta(base_compo, enco_compo, new_content, true);
 
 					entity_changed = true;
 					overridden_components[idx] = true;
@@ -237,12 +173,14 @@ bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 					transform_component_ids_to_guids_in_place(base_compo, base);
 					transform_component_ids_to_guids_in_place(enco_compo, enco);
 
-					if (write_delta(base_compo, enco_compo, new_content)) {
+					if (augs::write_delta(base_compo, enco_compo, new_content)) {
 						entity_changed = true;
 						overridden_components[idx] = true;
 					}
 				}
-			}
+			},
+			base_components,
+			enco_components
 		);
 
 		if (is_new) {
@@ -288,7 +226,7 @@ bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 
 	augs::stream new_meta_content;
 
-	const bool meta_changed = write_delta(base.significant.meta, enco.significant.meta, new_meta_content, true);
+	const bool meta_changed = augs::write_delta(base.significant.meta, enco.significant.meta, new_meta_content, true);
 
 	const bool has_anything_changed = meta_changed || dt.new_entities || dt.changed_entities || dt.removed_entities;
 
@@ -338,7 +276,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 
 	deco.destroy_inferred_state_completely();
 
-	read_delta(deco.significant.meta, in, true);
+	augs::read_delta(deco.significant.meta, in, true);
 
 	delted_stream_of_entities dt;
 
@@ -373,7 +311,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 		const auto& agg = new_entity.get();
 		const auto& deco_components = agg.component_ids;
 
-		for_each_in_tuple(
+		for_each_through_std_get(
 			deco_components,
 			[&agg, &overridden_components, &new_entity, &in, &deco](const auto& deco_id) {
 				typedef std::decay_t<decltype(deco_id)> encoded_id_type;
@@ -388,7 +326,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 				if (overridden_components[idx]) {
 					component_type decoded_component;
 
-					read_delta(decoded_component, in, true);
+					augs::read_delta(decoded_component, in, true);
 					transform_component_guids_to_ids_in_place(decoded_component, deco);
 
 					new_entity.allocator::add(decoded_component);
@@ -417,7 +355,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 		const auto& agg = changed_entity.get();
 		const auto& deco_components = agg.component_ids;
 
-		for_each_in_tuple(
+		for_each_through_std_get(
 			deco_components,
 			[&agg, &removed_components, &overridden_components, &in, &deco, &changed_entity](const auto& deco_id) {
 				typedef std::decay_t<decltype(deco_id)> encoded_id_type;
@@ -435,7 +373,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 					if (deco_c.dead()) {
 						component_type decoded_component;
 
-						read_delta(decoded_component, in, true);
+						augs::read_delta(decoded_component, in, true);
 						
 						transform_component_guids_to_ids_in_place(decoded_component, deco);
 						
@@ -445,7 +383,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 						component_type decoded_component = deco_c.get();
 
 						transform_component_ids_to_guids_in_place(decoded_component, deco);
-						read_delta(decoded_component, in);
+						augs::read_delta(decoded_component, in);
 						transform_component_guids_to_ids_in_place(decoded_component, deco);
 
 						changed_entity.allocator::get<component_type>() = decoded_component;
@@ -539,7 +477,7 @@ TEST(CosmicDelta, PaddingSanityCheck2) {
 }
 
 TEST(CosmicDelta, CosmicDeltaPaddingTest) {
-	static_assert(augs::is_byte_io_safe_v<augs::stream, cosmos_flyweights_state>, "cosmos_flyweights_state must be trivially copyable for delta-encoding");
+	// static_assert(augs::is_byte_io_safe_v<augs::stream, cosmos_flyweights_state>, "cosmos_flyweights_state must be trivially copyable for delta-encoding");
 
 	auto padding_checker = [](auto c, auto... args) {
 		typedef decltype(c) component_type;
@@ -603,7 +541,7 @@ TEST(CosmicDelta, CosmicDeltaPaddingTest) {
 	//padding_checker(std::array<hotbar_button, 9>());
 	//padding_checker(drag_and_drop_target_drop_item(augs::gui::material()), augs::gui::material());
 
-	for_each_in_tuple(put_all_components_into_t<std::tuple>(), padding_checker);
+	for_each_through_std_get(put_all_components_into_t<std::tuple>(), padding_checker);
 }
 
 TEST(Cosmos, GuidizeTests) {

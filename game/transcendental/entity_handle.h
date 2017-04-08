@@ -28,7 +28,7 @@
 
 template<class F>
 void for_each_component_type(F callback) {
-	for_each_in_tuple(
+	for_each_through_std_get(
 		put_all_components_into_t<std::tuple>(), 
 		callback
 	);
@@ -328,7 +328,7 @@ public:
 		const auto& ids = get().component_ids;
 		auto& cosm = get_cosmos();
 
-		for_each_in_tuple(
+		for_each_through_std_get(
 			ids,
 			[&](const auto& id) {
 				typedef typename std::decay_t<decltype(id)>::element_type component_type;

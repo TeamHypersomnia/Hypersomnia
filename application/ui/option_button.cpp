@@ -5,10 +5,10 @@
 option_button::option_button() {
 	corners.inside_texture = assets::game_image_id::MENU_BUTTON_INSIDE;
 
-	auto& manager = get_resource_manager();
+	const auto& manager = get_assets_manager();
 
-	click_sound.bind_buffer(manager.find(assets::sound_buffer_id::BUTTON_CLICK)->get_variation(0).request_original());
-	hover_sound.bind_buffer(manager.find(assets::sound_buffer_id::BUTTON_HOVER)->get_variation(0).request_original());
+	click_sound.bind_buffer(manager[assets::sound_buffer_id::BUTTON_CLICK].get_variation(0).request_original());
+	hover_sound.bind_buffer(manager[assets::sound_buffer_id::BUTTON_HOVER].get_variation(0).request_original());
 }
 
 vec2i option_button::get_target_button_size() const {

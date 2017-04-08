@@ -6,6 +6,7 @@
 #include "game/view/viewing_session.h"
 #include "game/components/light_component.h"
 #include "game/components/polygon_component.h"
+#include "game/components/render_component.h"
 
 #include "game/resources/manager.h"
 #include "game/messages/visibility_information.h"
@@ -65,8 +66,11 @@ void light_system::render_all_lights(
 	output.clear_current_fbo();
 	glClearColor(0.f, 0.f, 0.f, 0.f);
 
-	auto& light_program = *get_resource_manager().find(assets::program_id::LIGHT);
-	auto& default_program = *get_resource_manager().find(assets::program_id::DEFAULT);
+	const auto& manager = get_assets_manager();
+
+	const auto& light_program = manager[assets::program_id::LIGHT];
+	const auto& default_program = manager[assets::program_id::DEFAULT];
+
 	light_program.use();
 
 	const auto light_pos_uniform = glGetUniformLocation(light_program.id, "light_pos");

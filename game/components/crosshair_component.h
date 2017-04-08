@@ -28,7 +28,6 @@ namespace components {
 		vec2 max_look_expand;
 
 		float rotation_offset = 0.f;
-		vec2 size_multiplier = vec2(1.0f, 1.0f);
 		vec2 sensitivity = vec2(1.0f, 1.0f);
 		// END GEN INTROSPECTOR
 

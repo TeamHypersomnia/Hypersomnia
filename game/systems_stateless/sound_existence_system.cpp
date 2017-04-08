@@ -99,7 +99,7 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 			const auto& subject_coll = subject_fix.get_collider_data(c.subject_b2Fixture_index.collider_index);
 			const auto& collider_coll = collider_fix.get_collider_data(c.collider_b2Fixture_index.collider_index);
 			
-			const auto sound_id = cosmos.get_collision_sound(subject_coll.material, collider_coll.material);
+			const auto sound_id = cosmos[subject_coll.material].collision_sound_matrix[collider_coll.material];
 
 			const auto impulse = (c.normal_impulse + c.tangent_impulse) * subject_coll.collision_sound_gain_mult * collider_coll.collision_sound_gain_mult;
 

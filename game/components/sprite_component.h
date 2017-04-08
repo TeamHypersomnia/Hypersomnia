@@ -9,6 +9,8 @@
 #include "game/detail/basic_renderable_drawing_input.h"
 #include "game/enums/renderable_drawing_type.h"
 
+#include "augs/padding_byte.h"
+
 namespace components {
 	struct sprite {
 		struct drawing_input : basic_renderable_drawing_input {
@@ -27,7 +29,6 @@ namespace components {
 		assets::game_image_id tex = assets::game_image_id::COUNT;
 		rgba color;
 		vec2 size;
-		vec2 size_multiplier = vec2(1, 1);
 		vec2 center_offset;
 		float rotation_offset = 0.f;
 
@@ -35,21 +36,32 @@ namespace components {
 		short flip_vertically = false;
 		
 		special_effect effect = special_effect::NONE;
-		bool has_neon_map = false;
+		padding_byte pad;
 
 		unsigned short max_specular_blinks = 0;
 		// END GEN INTROSPECTOR
 
 		vec2 get_size() const;
 
-		void set(assets::game_image_id, rgba = rgba());
-		void update_size_from_texture_dimensions();
+		void set(
+			const assets::game_image_id id,
+			const vec2 size,
+			const rgba color = rgba()
+		);
 
-		void draw(const drawing_input&) const;
+		void set(
+			const assets::game_image_id id,
+			const cosmos& manager,
+			const rgba color = rgba()
+		);
+
+		void draw(const drawing_input) const;
+		
+		void draw_from_lt(drawing_input) const;
 
 		void draw(
-			const drawing_input&,
-			const augs::texture_atlas_entry& considered_texture,
+			const drawing_input,
+			const augs::texture_atlas_entry considered_texture,
 			const vec2i target_position,
 			const float target_rotation,
 			const vec2 considered_size
@@ -58,8 +70,7 @@ namespace components {
 		std::vector<vec2> get_vertices() const;
 		
 		ltrb get_aabb(
-			const components::transform&, 
-			const renderable_positioning_type positioning = renderable_positioning_type::CENTER
+			const components::transform
 		) const;
 	};
 }

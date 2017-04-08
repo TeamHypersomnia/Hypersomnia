@@ -4,6 +4,8 @@
 #include "augs/window_framework/window.h"
 #include "augs/window_framework/platform_utils.h"
 
+#include "game/resources/manager.h"
+
 #undef min
 #undef max
 namespace augs {
@@ -11,7 +13,7 @@ namespace augs {
 		namespace text {
 			const baked_font& drafter::getf(const gui::text::formatted_string& source, const unsigned i) const {
 				//return (i < source.length() && source[i].font_used) ? source[i].font_used : target_caret->default_style.f;
-				return *source[i].font_used;
+				return get_assets_manager()[source[i].font_used];
 			}
 
 			int drafter::get_kern(const gui::text::formatted_string& source, const unsigned i, const unsigned l) const {

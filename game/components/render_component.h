@@ -10,10 +10,9 @@
 namespace components {
 	struct render {
 		// GEN INTROSPECTOR struct components::render
-		bool screen_space_transform = false;
 		bool draw_border = false;
 		render_layer layer = render_layer::INVALID;
-		padding_byte pad;
+		std::array<padding_byte, 2> pad;
 
 		rgba border_color;
 

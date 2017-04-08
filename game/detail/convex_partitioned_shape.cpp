@@ -6,9 +6,7 @@
 #include "game/components/polygon_component.h"
 #include "game/components/sprite_component.h"
 
-#include "game/resources/manager.h"
 #include "game/transcendental/entity_handle.h"
-
 #include "game/transcendental/cosmos.h"
 
 void convex_partitioned_shape::add_convex_polygon(const convex_poly& verts) {
@@ -24,13 +22,11 @@ void convex_partitioned_shape::offset_vertices(const components::transform trans
 	}
 }
 
-void convex_partitioned_shape::mult_vertices(const vec2 mult) {
+void convex_partitioned_shape::scale(const vec2 mult) {
 	for (auto& c : convex_polys) {
 		for (auto& v : c.vertices) {
 			v *= mult;
 		}
-
-		std::reverse(c.vertices.begin(), c.vertices.end());
 	}
 
 #if ENABLE_POLYGONIZATION
@@ -40,52 +36,7 @@ void convex_partitioned_shape::mult_vertices(const vec2 mult) {
 #endif
 }
 
-void convex_partitioned_shape::from_sprite(const components::sprite& sprite, const bool polygonize_sprite) {
-	const auto& polygonized_sprite_verts = get_resource_manager().find(sprite.tex)->polygonized;
-
-	if (polygonized_sprite_verts.size() > 0 && polygonize_sprite) {
-		const auto image_size = get_resource_manager().find(sprite.tex)->get_size();
-
-		std::vector<vec2> new_concave;
-
-		for (auto v : polygonized_sprite_verts) {
-			vec2 new_v = v;
-			vec2 scale = sprite.size / image_size;
-
-			new_v *= scale;
-			new_v.y = -new_v.y;
-			new_concave.push_back(new_v);
-		}
-
-		const vec2 origin = vec2(static_cast<float>(image_size.x)/-2.f, image_size.y/2.f);
-
-		for (auto& v : new_concave) {
-			v += origin;
-		}
-
-		add_concave_polygon(new_concave);
-
-		mult_vertices(vec2(1, -1));
-	}
-	else {
-		const auto rect_size = sprite.size;
-
-		b2PolygonShape shape;
-		shape.SetAsBox(static_cast<float>(rect_size.x) / 2.f, static_cast<float>(rect_size.y) / 2.f);
-
-		convex_poly new_convex_polygon;
-
-		for (int i = 0; i < shape.GetVertexCount(); ++i) {
-			new_convex_polygon.vertices.push_back(vec2(shape.GetVertex(i)));
-		}
-
-		add_convex_polygon(new_convex_polygon);
-	}
-
-	// TODO: remove the visual components server-side
-}
-
-void convex_partitioned_shape::add_concave_polygon(const std::vector <vec2> &verts) {
+void convex_partitioned_shape::add_concave_polygon(const std::vector<vec2> &verts) {
 	std::list<TPPLPoly> inpolys, outpolys;
 	TPPLPoly subject_poly;
 	subject_poly.Init(verts.size());

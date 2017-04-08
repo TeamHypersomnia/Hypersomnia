@@ -38,6 +38,13 @@ namespace augs {
 		operator ALuint() const;
 	};
 
+	struct sound_buffer_logical_meta {
+		// GEN INTROSPECTOR struct augs::sound_buffer_logical_meta
+		float max_duration_in_seconds = 0.f;
+		unsigned num_of_variations = 0xdeadbeef;
+		// END GEN INTROSPECTOR
+	};
+
 	class sound_buffer {
 		struct variation {
 			int original_channels = 0;
@@ -65,6 +72,8 @@ namespace augs {
 
 		ALuint get_id() const;
 		operator ALuint() const;
+
+		sound_buffer_logical_meta get_logical_meta() const;
 	};
 
 	single_sound_buffer::data_type get_sound_samples_from_file(const std::string);

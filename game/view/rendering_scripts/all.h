@@ -14,10 +14,6 @@ namespace components {
 class viewing_step;
 class interpolation_system;
 
-namespace resources {
-	class manager;
-}
-
 namespace rendering_scripts {
 	void standard_rendering(const viewing_step step);
 	void illuminated_rendering(const viewing_step step);

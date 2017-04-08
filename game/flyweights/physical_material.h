@@ -1,9 +1,20 @@
 #pragma once
 #include "augs/misc/enum_associative_array.h"
-#include "game/enums/physical_material_type.h"
+
+#include "game/assets/physical_material_id.h"
 #include "game/assets/sound_buffer_id.h"
 
-typedef augs::enum_associative_array<
-	physical_material_type,
-	augs::enum_associative_array<physical_material_type, assets::sound_buffer_id>
-> collision_sound_matrix_type;
+struct physical_material {
+	typedef augs::enum_associative_array<
+		assets::physical_material_id, 
+		assets::sound_buffer_id
+	> collision_sound_matrix_type;
+
+	// GEN INTROSPECTOR struct physical_material
+	collision_sound_matrix_type collision_sound_matrix;
+	// END GEN INTROSPECTOR
+
+	physical_material get_logical_meta() const {
+		return *this;
+	}
+};

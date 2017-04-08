@@ -136,7 +136,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 					shake_mult *shake_mult * 100 * vec2{ rng.randval(-1.f, 1.f), rng.randval(-1.f, 1.f) });
 			}
 
-			if (sentience.currently_casted_spell != spell_type::COUNT) {
+			if (sentience.currently_casted_spell != assets::spell_id::COUNT) {
 				const auto spell_data = cosmos[sentience.currently_casted_spell];
 				const auto when_casted = sentience.time_of_last_spell_cast;
 

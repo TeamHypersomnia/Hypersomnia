@@ -15,7 +15,6 @@
 using namespace augs;
 
 using namespace messages;
-using namespace resources;
 
 void animation_system::game_responses_to_animation_messages(const logic_step step) {
 	auto& cosmos = step.cosm;
@@ -168,7 +167,11 @@ void animation_system::progress_animation_states(const logic_step step) {
 				}
 
 				auto& sprite = it.get<components::sprite>();
-				sprite.set(animation.frames[animation_state.get_current_frame()].image_id);
+
+				sprite.set(
+					animation.frames[animation_state.get_current_frame()].image_id,
+					step.cosm
+				);
 			}
 		}
 	);

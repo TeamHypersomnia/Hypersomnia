@@ -23,7 +23,12 @@ namespace augs {
 
 			void create(
 				const type shader_type, 
-				const std::string& source_code
+				const std::string& path
+			);
+
+			void create_from_file(
+				const type shader_type,
+				const std::string& filename
 			);
 
 			void destroy();
@@ -51,8 +56,8 @@ namespace augs {
 			void build();
 			void destroy();
 
-			void use();
-			void guarded_use();
+			void use() const;
+			void guarded_use() const;
 
 			static void use_default();
 		};

@@ -3,7 +3,7 @@
 #include "game_gui_context.h"
 #include "augs/gui/appearance_detector.h"
 
-#include "game/enums/spell_type.h"
+#include "game/assets/spell_id.h"
 #include "augs/audio/sound_source.h"
 
 class action_button : public game_gui_rect_node {
@@ -20,7 +20,7 @@ public:
 	augs::sound_source hover_sound;
 	augs::sound_source click_sound;
 
-	spell_type bound_spell = spell_type::COUNT;
+	assets::spell_id bound_spell = assets::spell_id::COUNT;
 
 	float elapsed_hover_time_ms = 0.f;
 

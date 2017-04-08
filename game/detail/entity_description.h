@@ -8,7 +8,7 @@
 #include "game/enums/slot_function.h"
 #include "game/enums/item_category.h"
 #include "game/enums/sentience_meter_type.h"
-#include "game/enums/spell_type.h"
+#include "game/assets/spell_id.h"
 
 /*
 	Example description:
@@ -43,4 +43,9 @@ std::wstring get_bbcoded_entity_description(const const_entity_handle);
 std::wstring get_bbcoded_sentience_meter_description(
 	const const_entity_handle,
 	const sentience_meter_type
+);
+
+std::wstring get_bbcoded_spell_description(
+	const const_entity_handle,
+	const assets::spell_id
 );

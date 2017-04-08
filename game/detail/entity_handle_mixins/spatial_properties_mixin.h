@@ -12,6 +12,10 @@ public:
 	components::transform get_logic_transform() const;
 	components::transform get_viewing_transform(const interpolation_system& sys, const bool integerize = false) const;
 	vec2 get_effective_velocity() const;
+
+	ltrb get_aabb() const;
+	ltrb get_aabb(const interpolation_system&) const;
+	ltrb get_aabb(const components::transform transform) const;
 };
 
 template<bool, class>

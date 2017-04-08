@@ -1,8 +1,9 @@
 #pragma once
 #include <Box2D/Common/b2Settings.h>
 
+constexpr size_t PARTICLE_EMISSIONS_IN_EFFECT_COUNT = 4;
+
 constexpr size_t ANIMATION_FRAME_COUNT = 20;
-constexpr size_t PARTICLE_TEMPLATES_COUNT = 10;
 
 constexpr size_t SUB_ENTITIES_COUNT = 10;
 constexpr size_t FIXTURE_ENTITIES_COUNT = 10;

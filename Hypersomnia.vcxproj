@@ -352,7 +352,6 @@
     <ClCompile Include="augs\image\polygonize_image.cpp" />
     <ClCompile Include="augs\misc\action_list.cpp" />
     <ClCompile Include="augs\misc\http_requests.cpp" />
-    <ClCompile Include="augs\misc\delta_compression.cpp" />
     <ClCompile Include="augs\misc\input_context.cpp" />
     <ClCompile Include="augs\misc\key_and_mouse_intent.cpp" />
     <ClCompile Include="augs\misc\machine_entropy.cpp" />
@@ -371,6 +370,7 @@
     <ClCompile Include="application\setups\determinism_test_setup.cpp" />
     <ClCompile Include="augs\texture_atlas\texture_atlas_entry.cpp" />
     <ClCompile Include="augs\tweaker.cpp" />
+    <ClCompile Include="game\assets\game_image.cpp" />
     <ClCompile Include="game\components\flags_component.cpp" />
     <ClCompile Include="game\components\inferred_state_component.cpp" />
     <ClCompile Include="game\components\light_component.cpp" />
@@ -453,6 +453,7 @@
     <ClCompile Include="game\systems_stateless\melee_system.cpp" />
     <ClCompile Include="game\systems_stateless\particles_existence_system.cpp" />
     <ClCompile Include="game\systems_stateless\sound_existence_system.cpp" />
+    <ClCompile Include="game\tests_of_traits.cpp" />
     <ClCompile Include="game\transcendental\cosmic_delta.cpp" />
     <ClCompile Include="game\transcendental\cosmic_entropy.cpp" />
     <ClCompile Include="game\components\dynamic_tree_node_component.cpp" />
@@ -1087,7 +1088,6 @@
     <ClInclude Include="augs\entity_system\storage_for_systems.h" />
     <ClInclude Include="augs\filesystem\directory.h" />
     <ClInclude Include="augs\graphics\drawers.h" />
-    <ClInclude Include="augs\graphics\renderable_positioning_type.h" />
     <ClInclude Include="augs\gui\appearance_detector.h" />
     <ClInclude Include="augs\gui\clipboard.h" />
     <ClInclude Include="augs\gui\dereferenced_location.h" />
@@ -1108,7 +1108,6 @@
     <ClInclude Include="augs\misc\enum_bitset.h" />
     <ClInclude Include="augs\misc\http_requests.h" />
     <ClInclude Include="augs\misc\input_context.h" />
-    <ClInclude Include="augs\misc\introspect.h" />
     <ClInclude Include="augs\misc\key_and_mouse_intent.h" />
     <ClInclude Include="augs\misc\debug_entropy_player.h" />
     <ClInclude Include="augs\misc\readable_bytesize.h" />
@@ -1138,7 +1137,10 @@
     <ClInclude Include="augs\padding_byte.h" />
     <ClInclude Include="augs\templates\conditional_call.h" />
     <ClInclude Include="augs\templates\for_each_in_types.h" />
+    <ClInclude Include="augs\templates\get_index_type_for_size_of.h" />
     <ClInclude Include="augs\templates\hash_templates.h" />
+    <ClInclude Include="augs\templates\introspect.h" />
+    <ClInclude Include="augs\templates\introspection_utilities.h" />
     <ClInclude Include="augs\templates\is_component_synchronized.h" />
     <ClInclude Include="augs\templates\introspection_traits.h" />
     <ClInclude Include="augs\templates\maybe_const.h" />
@@ -1148,12 +1150,15 @@
     <ClInclude Include="augs\templates\settable_as_current_mixin.h" />
     <ClInclude Include="augs\templates\string_templates.h" />
     <ClInclude Include="augs\templates\template_logic.h" />
-    <ClInclude Include="augs\templates\list_of.h" />
+    <ClInclude Include="augs\templates\transform_types.h" />
+    <ClInclude Include="augs\templates\type_list.h" />
     <ClInclude Include="augs\templates\type_matching_and_indexing.h" />
     <ClInclude Include="augs\templates\type_mod_templates.h" />
     <ClInclude Include="augs\texture_atlas\texture_atlas_entry.h" />
     <ClInclude Include="augs\tweaker.h" />
     <ClInclude Include="augs\zeroed_pod.h" />
+    <ClInclude Include="game\assets\assets_manager_structs.h" />
+    <ClInclude Include="game\assets\game_image.h" />
     <ClInclude Include="game\assets\sound_buffer_id.h" />
     <ClInclude Include="game\assets\sound_response_id.h" />
     <ClInclude Include="game\assets\tile_layer_id.h" />
@@ -1229,11 +1234,11 @@
     <ClInclude Include="game\enums\entity_flag.h" />
     <ClInclude Include="game\enums\adverse_element_type.h" />
     <ClInclude Include="game\enums\input_recording_type.h" />
-    <ClInclude Include="game\enums\physical_material_type.h" />
+    <ClInclude Include="game\assets\physical_material_id.h" />
     <ClInclude Include="game\enums\renderable_drawing_type.h" />
     <ClInclude Include="game\enums\sentience_meter_type.h" />
     <ClInclude Include="game\enums\sound_response_type.h" />
-    <ClInclude Include="game\enums\spell_type.h" />
+    <ClInclude Include="game\assets\spell_id.h" />
     <ClInclude Include="game\flyweights\animation.h" />
     <ClInclude Include="game\flyweights\behaviour_tree.h" />
     <ClInclude Include="game\flyweights\particle_effect.h" />
@@ -1408,7 +1413,6 @@
     <ClInclude Include="game\globals\joints.h" />
     <ClInclude Include="game\globals\layers.h" />
     <ClInclude Include="game\ingredients\ingredients.h" />
-    <ClInclude Include="game\ingredients\renderable_includes.h" />
     <ClInclude Include="game\messages\animation_message.h" />
     <ClInclude Include="game\messages\collision_message.h" />
     <ClInclude Include="game\messages\gunshot_response.h" />

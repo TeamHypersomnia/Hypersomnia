@@ -9,6 +9,8 @@ namespace augs {
 	struct texture_atlas_entry;
 }
 
+typedef cosmos logical_flyweights_manager;
+
 namespace components {
 	struct tile_layer_instance {
 		struct drawing_input : basic_renderable_drawing_input {
@@ -24,8 +26,13 @@ namespace components {
 
 		tile_layer_instance(const assets::tile_layer_id = assets::tile_layer_id::INVALID);
 
-		void draw(const drawing_input&) const;
-		ltrb get_aabb(components::transform transform) const;
-		ltrbu get_visible_tiles(const drawing_input&) const;
+		void draw(const drawing_input) const;
+		
+		ltrb get_aabb(
+			const logical_flyweights_manager&,
+			const components::transform transform
+		) const;
+
+		ltrbu get_visible_tiles(const drawing_input) const;
 	};
 };

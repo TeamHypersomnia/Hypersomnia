@@ -38,8 +38,6 @@
 #include "game/detail/physics/physics_scripts.h"
 #include "augs/templates/container_templates.h"
 
-using namespace augs;
-
 void item_system::handle_trigger_confirmations_as_pick_requests(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
@@ -57,26 +55,27 @@ void item_system::handle_trigger_confirmations_as_pick_requests(const logic_step
 		auto* const item_slot_transfers = detector.find<components::item_slot_transfers>();
 		const auto item_entity = cosmos[e.trigger].get_owner_body();
 
-		const auto* const item = item_entity.find<components::item>();
+		const bool trigger_has_item = item_entity.has<components::item>();
 
-		if (item_slot_transfers != nullptr && item != nullptr && item_entity.get_owning_transfer_capability().dead()) {
+		if (item_slot_transfers != nullptr && trigger_has_item && item_entity.get_owning_transfer_capability().dead()) {
 			const auto& pick_list = item_slot_transfers->only_pick_these_items;
 			const bool found_on_subscription_list = found_in(pick_list, item_entity);
 
 			const bool item_subscribed = 
 				(pick_list.empty() && item_slot_transfers->pick_all_touched_items_if_list_to_pick_empty)
-				|| found_in(item_slot_transfers->only_pick_these_items, item_entity);
+				|| found_on_subscription_list
+			;
 			
 			if (item_subscribed) {
 				const auto pickup_slot = detector.determine_pickup_target_slot_for(item_entity);
-				const bool can_pick_already = item_slot_transfers->pickup_timeout.try_to_fire_and_reset(cosmos.get_timestamp(), delta);
 
-				if (pickup_slot.alive() && can_pick_already) {
-					const item_slot_transfer_request_data request{ item_entity, pickup_slot };
-					perform_transfer(request, step);
-				}
-				else {
-					// TODO: post gui message
+				if (pickup_slot.alive()) {
+					const bool can_pick_already = item_slot_transfers->pickup_timeout.try_to_fire_and_reset(cosmos.get_timestamp(), delta);
+
+					if (can_pick_already) {
+						const item_slot_transfer_request_data request{ item_entity, pickup_slot };
+						perform_transfer(request, step);
+					}
 				}
 			}
 		}
@@ -95,7 +94,7 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 		) {
 			const auto subject = cosmos[r.subject];
 
-			if (subject.find<components::item_slot_transfers>()) {
+			if (subject.has<components::item_slot_transfers>()) {
 				const auto hand = subject.map_primary_action_to_secondary_hand_if_primary_empty(intent_type::THROW_SECONDARY_ITEM == r.intent);
 				const auto item_inside = hand.get_item_if_any();
 

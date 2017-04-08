@@ -14,11 +14,6 @@ namespace augs {
 		
 		handle_for_pool_container(owner_reference owner, const id_type raw_id) : raw_id(raw_id), owner(owner) {}
 
-		template<class M>
-		maybe_const_ref_t<is_const, M> get_meta() const {
-			return owner.template get_meta<M>(raw_id);
-		}
-
 		decltype(auto) get() const {
 			return owner.get(raw_id);
 		}

@@ -7,13 +7,16 @@ class processing_system;
 
 namespace components {
 	struct trace {
-		// GEN INTROSPECTOR struct components::trace
-		augs::minmax<float> max_multiplier_x = std::make_pair(1.f, 1.f);
-		augs::minmax<float> max_multiplier_y = std::make_pair(1.f, 1.f);
+		typedef augs::minmax<float> minmax;
 
+		// GEN INTROSPECTOR struct components::trace
+		minmax max_multiplier_x = minmax(1.f, 1.f);
+		minmax max_multiplier_y = minmax(1.f, 1.f);
+
+		vec2 additional_multiplier;
 		vec2 chosen_multiplier = vec2(-1.f, -1.f);
 
-		augs::minmax<float> lengthening_duration_ms = std::pair<float, float>(200.f, 400.f);
+		minmax lengthening_duration_ms = minmax(200.f, 400.f);
 		float chosen_lengthening_duration_ms = -1.f;
 		float lengthening_time_passed_ms = 0.f;
 

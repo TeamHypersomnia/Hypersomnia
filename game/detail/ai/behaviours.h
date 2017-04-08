@@ -2,7 +2,7 @@
 #include "game/flyweights/behaviour_tree.h"
 
 namespace behaviours {
-	typedef resources::behaviour_tree tree;
+	typedef behaviour_tree tree;
 	typedef tree::node behaviour;
 
 	struct immediate_evasion : behaviour {

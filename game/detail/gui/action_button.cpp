@@ -28,10 +28,10 @@ void action_button::draw(
 		const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
 		const auto bound_spell = this_id->bound_spell;
 
-		if (bound_spell != spell_type::COUNT && sentience.spells.find(bound_spell) != sentience.spells.end()) {
-			const auto spell_data = cosmos[bound_spell];
-			const bool has_enough_mana = sentience.personal_electricity.value >= spell_data.personal_electricity_required;
-			const float required_mana_ratio = std::min(1.f, sentience.personal_electricity.value / static_cast<float>(spell_data.personal_electricity_required));
+		if (bound_spell != assets::spell_id::COUNT && sentience.spells.find(bound_spell) != sentience.spells.end()) {
+			const auto spell_data = get_assets_manager()[bound_spell];
+			const bool has_enough_mana = sentience.personal_electricity.value >= spell_data.logical.personal_electricity_required;
+			const float required_mana_ratio = std::min(1.f, sentience.personal_electricity.value / static_cast<float>(spell_data.logical.personal_electricity_required));
 
 			rgba inside_col = white;
 
@@ -48,9 +48,10 @@ void action_button::draw(
 
 			rgba border_col;
 
-			const auto appearance = get_spell_appearance(bound_spell);
-			inside_tex = appearance.icon;
-			border_col = appearance.border_col;
+			const auto& manager = get_assets_manager();
+
+			inside_tex = spell_data.icon;
+			border_col = spell_data.logical.border_col;
 
 			if (!has_enough_mana) {
 				border_col = border_col.get_desaturated();
@@ -61,7 +62,7 @@ void action_button::draw(
 
 				const augs::gui::material inside_mat(inside_tex, inside_col);
 
-				const auto absolute_icon_rect = ltrbi(vec2i(0, 0), assets::get_size(inside_tex)).place_in_center_of(absolute_rect);
+				const auto absolute_icon_rect = ltrbi(vec2i(0, 0), manager[inside_tex].get_size()).place_in_center_of(absolute_rect);
 				const bool draw_partial_colorful_rect = false;
 
 				if (has_enough_mana) {
@@ -77,7 +78,7 @@ void action_button::draw(
 					augs::draw_clipped_rect(
 						info.v,
 						absolute_icon_rect,
-						get_resource_manager().find(inside_mat.tex)->texture_maps[texture_map_type::DESATURATED],
+						get_assets_manager()[inside_mat.tex].texture_maps[texture_map_type::DESATURATED],
 						inside_mat.color,
 						ltrbi()
 					);
@@ -91,7 +92,7 @@ void action_button::draw(
 						augs::draw_clipped_rect(
 							info.v,
 							absolute_icon_rect,
-							get_resource_manager().find(inside_mat.tex)->texture_maps[texture_map_type::DIFFUSE],
+							get_assets_manager()[inside_mat.tex].texture_maps[texture_map_type::DIFFUSE],
 							inside_mat.color,
 							colorful_rect
 						);
@@ -220,7 +221,7 @@ void action_button::respond_to_events(
 		if (info.msg == gui_event::lclick) {
 			const auto bound_spell = this_id->bound_spell;
 
-			if (bound_spell != spell_type::COUNT) {
+			if (bound_spell != assets::spell_id::COUNT) {
 				context.get_gui_element_system().spell_requests[context.get_gui_element_entity()] = bound_spell;
 			}
 		}

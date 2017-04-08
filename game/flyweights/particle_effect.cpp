@@ -3,7 +3,7 @@
 #include "augs/templates/for_each_in_types.h"
 
 void particles_emission::apply_modifier(const particle_effect_modifier m) {
-	for_each_in_tuple(particle_templates, [&](auto& templates) {
+	for_each_through_std_get(particle_definitions, [&](auto& templates) {
 		for (auto& p : templates) {
 			p.colorize(m.colorize);
 		}

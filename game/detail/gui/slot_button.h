@@ -26,5 +26,3 @@ struct slot_button : game_gui_rect_node {
 
 	static void update_rc(const game_gui_context, const this_in_container);
 };
-
-slot_button& get_meta(inventory_slot_id);

@@ -13,8 +13,11 @@
 
 #include "3rdparty/GL/OpenGL.h"
 
+using namespace augs::graphics;
+using namespace assets;
+
 void load_standard_everything(const config_lua_table& cfg) {
-	auto& manager = get_resource_manager();
+	auto& manager = get_assets_manager();
 
 	const auto images = load_standard_images();
 	const auto fonts = load_standard_fonts();
@@ -24,7 +27,7 @@ void load_standard_everything(const config_lua_table& cfg) {
 	for (const auto& i : images) {
 		for (const auto& t : i.second.texture_maps) {
 			if (t.path.size() > 0) {
-				ensure(t.target_atlas != assets::physical_texture_id::INVALID);
+				ensure(t.target_atlas != physical_texture_id::INVALID);
 
 				in.images.push_back({ t.path, t.target_atlas });
 			}
@@ -59,52 +62,55 @@ void load_standard_everything(const config_lua_table& cfg) {
 	);
 
 	manager.create(
-		assets::physical_texture_id::GAME_WORLD_ATLAS,
+		physical_texture_id::GAME_WORLD_ATLAS,
 		cfg.save_regenerated_atlases_as_binary
 	);
+	
+	set_standard_spell_properties(manager);
+	set_standard_animations(manager);
+	set_standard_particle_effects(manager);
+	set_standard_tile_layers(manager);
+	set_standard_sound_buffers(manager);
+	set_standard_physical_materials(manager);
 
-	load_standard_behaviour_trees();
-	load_standard_tile_layers();
-	load_standard_sound_buffers();
+	manager[shader_id::DEFAULT_VERTEX].create_from_file(shader::type::VERTEX, "hypersomnia/shaders/default.vsh");
+	manager[shader_id::DEFAULT_FRAGMENT].create_from_file(shader::type::FRAGMENT, "hypersomnia/shaders/default.fsh");
+	manager.create(program_id::DEFAULT, shader_id::DEFAULT_VERTEX, shader_id::DEFAULT_FRAGMENT);
 
-	manager.create(assets::shader_id::DEFAULT_VERTEX, "hypersomnia/shaders/default.vsh", augs::graphics::shader::type::VERTEX);
-	manager.create(assets::shader_id::DEFAULT_FRAGMENT, "hypersomnia/shaders/default.fsh", augs::graphics::shader::type::FRAGMENT);
-	manager.create(assets::program_id::DEFAULT, assets::shader_id::DEFAULT_VERTEX, assets::shader_id::DEFAULT_FRAGMENT);
+	manager[shader_id::DEFAULT_ILLUMINATED_VERTEX].create_from_file(shader::type::VERTEX, "hypersomnia/shaders/default_illuminated.vsh");
+	manager[shader_id::DEFAULT_ILLUMINATED_FRAGMENT].create_from_file(shader::type::FRAGMENT, "hypersomnia/shaders/default_illuminated.fsh");
+	manager.create(program_id::DEFAULT_ILLUMINATED, shader_id::DEFAULT_ILLUMINATED_VERTEX, shader_id::DEFAULT_ILLUMINATED_FRAGMENT);
 
-	manager.create(assets::shader_id::DEFAULT_ILLUMINATED_VERTEX, "hypersomnia/shaders/default_illuminated.vsh", augs::graphics::shader::type::VERTEX);
-	manager.create(assets::shader_id::DEFAULT_ILLUMINATED_FRAGMENT, "hypersomnia/shaders/default_illuminated.fsh", augs::graphics::shader::type::FRAGMENT);
-	manager.create(assets::program_id::DEFAULT_ILLUMINATED, assets::shader_id::DEFAULT_ILLUMINATED_VERTEX, assets::shader_id::DEFAULT_ILLUMINATED_FRAGMENT);
+	manager[shader_id::PURE_COLOR_HIGHLIGHT_VERTEX].create_from_file(shader::type::VERTEX, "hypersomnia/shaders/pure_color_highlight.vsh");
+	manager[shader_id::PURE_COLOR_HIGHLIGHT_FRAGMENT].create_from_file(shader::type::FRAGMENT, "hypersomnia/shaders/pure_color_highlight.fsh");
+	manager.create(program_id::PURE_COLOR_HIGHLIGHT, shader_id::PURE_COLOR_HIGHLIGHT_VERTEX, shader_id::PURE_COLOR_HIGHLIGHT_FRAGMENT);
 
-	manager.create(assets::shader_id::PURE_COLOR_HIGHLIGHT_VERTEX, "hypersomnia/shaders/pure_color_highlight.vsh", augs::graphics::shader::type::VERTEX);
-	manager.create(assets::shader_id::PURE_COLOR_HIGHLIGHT_FRAGMENT, "hypersomnia/shaders/pure_color_highlight.fsh", augs::graphics::shader::type::FRAGMENT);
-	manager.create(assets::program_id::PURE_COLOR_HIGHLIGHT, assets::shader_id::PURE_COLOR_HIGHLIGHT_VERTEX, assets::shader_id::PURE_COLOR_HIGHLIGHT_FRAGMENT);
+	manager[shader_id::CIRCULAR_BARS_VERTEX].create_from_file(shader::type::VERTEX, "hypersomnia/shaders/circular_bars.vsh");
+	manager[shader_id::CIRCULAR_BARS_FRAGMENT].create_from_file(shader::type::FRAGMENT, "hypersomnia/shaders/circular_bars.fsh");
+	manager.create(program_id::CIRCULAR_BARS, shader_id::CIRCULAR_BARS_VERTEX, shader_id::CIRCULAR_BARS_FRAGMENT);
 
-	manager.create(assets::shader_id::CIRCULAR_BARS_VERTEX, "hypersomnia/shaders/circular_bars.vsh", augs::graphics::shader::type::VERTEX);
-	manager.create(assets::shader_id::CIRCULAR_BARS_FRAGMENT, "hypersomnia/shaders/circular_bars.fsh", augs::graphics::shader::type::FRAGMENT);
-	manager.create(assets::program_id::CIRCULAR_BARS, assets::shader_id::CIRCULAR_BARS_VERTEX, assets::shader_id::CIRCULAR_BARS_FRAGMENT);
+	manager[shader_id::EXPLODING_RING_VERTEX].create_from_file(shader::type::VERTEX, "hypersomnia/shaders/exploding_ring.vsh");
+	manager[shader_id::EXPLODING_RING_FRAGMENT].create_from_file(shader::type::FRAGMENT, "hypersomnia/shaders/exploding_ring.fsh");
+	manager.create(program_id::EXPLODING_RING, shader_id::EXPLODING_RING_VERTEX, shader_id::EXPLODING_RING_FRAGMENT);
 
-	manager.create(assets::shader_id::EXPLODING_RING_VERTEX, "hypersomnia/shaders/exploding_ring.vsh", augs::graphics::shader::type::VERTEX);
-	manager.create(assets::shader_id::EXPLODING_RING_FRAGMENT, "hypersomnia/shaders/exploding_ring.fsh", augs::graphics::shader::type::FRAGMENT);
-	manager.create(assets::program_id::EXPLODING_RING, assets::shader_id::EXPLODING_RING_VERTEX, assets::shader_id::EXPLODING_RING_FRAGMENT);
+	manager[shader_id::LIGHT_VERTEX].create_from_file(shader::type::VERTEX, "hypersomnia/shaders/light.vsh");
+	manager[shader_id::LIGHT_FRAGMENT].create_from_file(shader::type::FRAGMENT, "hypersomnia/shaders/light.fsh");
+	manager.create(program_id::LIGHT, shader_id::LIGHT_VERTEX, shader_id::LIGHT_FRAGMENT);
 
-	manager.create(assets::shader_id::LIGHT_VERTEX, "hypersomnia/shaders/light.vsh", augs::graphics::shader::type::VERTEX);
-	manager.create(assets::shader_id::LIGHT_FRAGMENT, "hypersomnia/shaders/light.fsh", augs::graphics::shader::type::FRAGMENT);
-	manager.create(assets::program_id::LIGHT, assets::shader_id::LIGHT_VERTEX, assets::shader_id::LIGHT_FRAGMENT);
+	manager[shader_id::SMOKE_VERTEX].create_from_file(shader::type::VERTEX, "hypersomnia/shaders/fullscreen.vsh");
+	manager[shader_id::SMOKE_FRAGMENT].create_from_file(shader::type::FRAGMENT, "hypersomnia/shaders/smoke.fsh");
+	manager.create(program_id::SMOKE, shader_id::SMOKE_VERTEX, shader_id::SMOKE_FRAGMENT);
 
-	manager.create(assets::shader_id::SMOKE_VERTEX, "hypersomnia/shaders/fullscreen.vsh", augs::graphics::shader::type::VERTEX);
-	manager.create(assets::shader_id::SMOKE_FRAGMENT, "hypersomnia/shaders/smoke.fsh", augs::graphics::shader::type::FRAGMENT);
-	manager.create(assets::program_id::SMOKE, assets::shader_id::SMOKE_VERTEX, assets::shader_id::SMOKE_FRAGMENT);
+	manager[shader_id::ILLUMINATING_SMOKE_VERTEX].create_from_file(shader::type::VERTEX, "hypersomnia/shaders/fullscreen.vsh");
+	manager[shader_id::ILLUMINATING_SMOKE_FRAGMENT].create_from_file(shader::type::FRAGMENT, "hypersomnia/shaders/illuminating_smoke.fsh");
+	manager.create(program_id::ILLUMINATING_SMOKE, shader_id::ILLUMINATING_SMOKE_VERTEX, shader_id::ILLUMINATING_SMOKE_FRAGMENT);
 
-	manager.create(assets::shader_id::ILLUMINATING_SMOKE_VERTEX, "hypersomnia/shaders/fullscreen.vsh", augs::graphics::shader::type::VERTEX);
-	manager.create(assets::shader_id::ILLUMINATING_SMOKE_FRAGMENT, "hypersomnia/shaders/illuminating_smoke.fsh", augs::graphics::shader::type::FRAGMENT);
-	manager.create(assets::program_id::ILLUMINATING_SMOKE, assets::shader_id::ILLUMINATING_SMOKE_VERTEX, assets::shader_id::ILLUMINATING_SMOKE_FRAGMENT);
-
-	manager.create(assets::shader_id::SPECULAR_HIGHLIGHTS_VERTEX, "hypersomnia/shaders/default.vsh", augs::graphics::shader::type::VERTEX);
-	manager.create(assets::shader_id::SPECULAR_HIGHLIGHTS_FRAGMENT, "hypersomnia/shaders/specular_highlights.fsh", augs::graphics::shader::type::FRAGMENT);
-	manager.create(assets::program_id::SPECULAR_HIGHLIGHTS, assets::shader_id::SPECULAR_HIGHLIGHTS_VERTEX, assets::shader_id::SPECULAR_HIGHLIGHTS_FRAGMENT);
+	manager[shader_id::SPECULAR_HIGHLIGHTS_VERTEX].create_from_file(shader::type::VERTEX, "hypersomnia/shaders/default.vsh");
+	manager[shader_id::SPECULAR_HIGHLIGHTS_FRAGMENT].create_from_file(shader::type::FRAGMENT, "hypersomnia/shaders/specular_highlights.fsh");
+	manager.create(program_id::SPECULAR_HIGHLIGHTS, shader_id::SPECULAR_HIGHLIGHTS_VERTEX, shader_id::SPECULAR_HIGHLIGHTS_FRAGMENT);
 
 	{
-		auto& illuminated_shader = *manager.find(assets::program_id::DEFAULT_ILLUMINATED);
+		auto& illuminated_shader = manager[program_id::DEFAULT_ILLUMINATED];
 		illuminated_shader.use();
 
 		const auto basic_texture_uniform = glGetUniformLocation(illuminated_shader.id, "basic_texture");
@@ -115,7 +121,7 @@ void load_standard_everything(const config_lua_table& cfg) {
 	}
 
 	{
-		auto& default_shader = *manager.find(assets::program_id::DEFAULT);
+		auto& default_shader = manager[program_id::DEFAULT];
 		default_shader.use();
 
 		const auto basic_texture_uniform = glGetUniformLocation(default_shader.id, "basic_texture");
@@ -123,7 +129,7 @@ void load_standard_everything(const config_lua_table& cfg) {
 	}
 
 	{
-		auto& pure_color_highlight_shader = *manager.find(assets::program_id::PURE_COLOR_HIGHLIGHT);
+		auto& pure_color_highlight_shader = manager[program_id::PURE_COLOR_HIGHLIGHT];
 		pure_color_highlight_shader.use();
 
 		const auto basic_texture_uniform = glGetUniformLocation(pure_color_highlight_shader.id, "basic_texture");
@@ -131,7 +137,7 @@ void load_standard_everything(const config_lua_table& cfg) {
 	}
 
 	{
-		auto& circular_bars_shader = *manager.find(assets::program_id::CIRCULAR_BARS);
+		auto& circular_bars_shader = manager[program_id::CIRCULAR_BARS];
 		circular_bars_shader.use();
 
 		const auto basic_texture_uniform = glGetUniformLocation(circular_bars_shader.id, "basic_texture");
@@ -139,7 +145,7 @@ void load_standard_everything(const config_lua_table& cfg) {
 	}
 
 	{
-		auto& smoke_shader = *manager.find(assets::program_id::SMOKE);
+		auto& smoke_shader = manager[program_id::SMOKE];
 		smoke_shader.use();
 
 		const auto light_texture_uniform = glGetUniformLocation(smoke_shader.id, "light_texture");
@@ -150,7 +156,7 @@ void load_standard_everything(const config_lua_table& cfg) {
 	}
 
 	{
-		auto& illuminating_smoke_shader = *manager.find(assets::program_id::ILLUMINATING_SMOKE);
+		auto& illuminating_smoke_shader = manager[program_id::ILLUMINATING_SMOKE];
 		illuminating_smoke_shader.use();
 
 		const auto illuminating_smoke_texture_uniform = glGetUniformLocation(illuminating_smoke_shader.id, "smoke_texture");
@@ -159,7 +165,7 @@ void load_standard_everything(const config_lua_table& cfg) {
 	}
 
 	{
-		auto& specular_highlights_shader = *manager.find(assets::program_id::SPECULAR_HIGHLIGHTS);
+		auto& specular_highlights_shader = manager[program_id::SPECULAR_HIGHLIGHTS];
 		specular_highlights_shader.use();
 
 		const auto basic_texture_uniform = glGetUniformLocation(specular_highlights_shader.id, "basic_texture");

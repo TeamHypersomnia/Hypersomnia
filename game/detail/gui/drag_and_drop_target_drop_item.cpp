@@ -40,6 +40,8 @@ void drag_and_drop_target_drop_item::respond_to_events(const game_gui_context co
 }
 
 void drag_and_drop_target_drop_item::rebuild_layouts(const game_gui_context context, const this_pointer this_id) {
+	const auto& manager = get_assets_manager();
+
 	const auto& world = context.get_rect_world();
 	const_dereferenced_location<item_button_in_item> dragged_item = context._dynamic_cast<item_button_in_item>(world.rect_held_by_lmb);
 
@@ -51,5 +53,5 @@ void drag_and_drop_target_drop_item::rebuild_layouts(const game_gui_context cont
 	}
 
 	this_id->rc.set_position(context.get_character_gui().get_initial_position_for(*this_id) - vec2(20, 20));
-	this_id->rc.set_size((*this_id->mat.tex).get_size() + vec2(40, 40));
+	this_id->rc.set_size(manager[this_id->mat.tex].get_size() + vec2(40, 40));
 }

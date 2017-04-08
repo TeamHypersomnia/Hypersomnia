@@ -1,13 +1,11 @@
 #include "tile_layer_instance_component.h"
 
-#include "sprite_component.h"
-
 #include "augs/graphics/vertex.h"
 #include "augs/ensure.h"
-#include "game/resources/manager.h"
 
-using namespace components;
-using namespace augs;
+#include "game/resources/manager.h"
+#include "game/components/sprite_component.h"
+#include "game/transcendental/cosmos.h"
 
 namespace components {
 	tile_layer_instance::tile_layer_instance(const assets::tile_layer_id id) : id(id) {}
@@ -16,10 +14,11 @@ namespace components {
 		global_time_seconds = secs;
 	}
 
-	ltrbu tile_layer_instance::get_visible_tiles(const drawing_input & in) const {
+	ltrbu tile_layer_instance::get_visible_tiles(const drawing_input in) const {
 		ltrbi visible_tiles;
 		const auto visible_aabb = in.camera.get_transformed_visible_world_area_aabb();
-		const auto& layer = (*id);
+		const auto& manager = get_assets_manager();
+		const auto& layer = manager[id];
 		const auto tile_square_size = layer.get_tile_side();
 
 		visible_tiles.l = static_cast<int>((visible_aabb.l - in.renderable_transform.pos.x) / tile_square_size);
@@ -35,18 +34,23 @@ namespace components {
 		return visible_tiles;
 	}
 
-	void tile_layer_instance::draw(const drawing_input & in) const {
+	void tile_layer_instance::draw(const drawing_input in) const {
 		/* if it is not visible, return */
+		const auto& manager = get_assets_manager();
+
 		const auto visible_aabb = in.camera.get_transformed_visible_world_area_aabb();
-		const auto& layer = (*id);
+		const auto& layer = manager[id];
 		const auto tile_square_size = layer.get_tile_side();
 		const auto size = layer.get_size();
 
-		if (!visible_aabb.hover(xywh(
-			in.renderable_transform.pos.x, 
-			in.renderable_transform.pos.y, 
-			static_cast<float>(size.x*tile_square_size), 
-			static_cast<float>(size.y*tile_square_size)))) {
+		if (!visible_aabb.hover(
+			xywh(
+				in.renderable_transform.pos.x, 
+				in.renderable_transform.pos.y, 
+				static_cast<float>(size.x*tile_square_size), 
+				static_cast<float>(size.y*tile_square_size)
+			)
+		)) {
 			return;
 		}
 		
@@ -60,7 +64,8 @@ namespace components {
 
 		for (unsigned y = visible_tiles.t; y < visible_tiles.b; ++y) {
 			for (unsigned x = visible_tiles.l; x < visible_tiles.r; ++x) {
-				vertex_triangle t1, t2;
+				augs::vertex_triangle t1;
+				augs::vertex_triangle t2;
 		
 				const auto& tile = layer.tile_at({ x, y });
 				if (tile.type_id == 0) continue;
@@ -77,11 +82,19 @@ namespace components {
 	}
 
 
-	ltrb tile_layer_instance::get_aabb(const components::transform transform) const {
-		const auto& layer = (*id);
+	ltrb tile_layer_instance::get_aabb(
+		const logical_flyweights_manager& flyweights,
+		const components::transform transform
+	) const {
+		const auto& layer = flyweights[id];
 		const auto tile_square_size = layer.get_tile_side();
 		const auto size = layer.get_size();
 
-		return xywh(transform.pos.x, transform.pos.y, static_cast<float>(size.x*tile_square_size), static_cast<float>(size.y*tile_square_size));
+		return xywh(
+			transform.pos.x, 
+			transform.pos.y, 
+			static_cast<float>(size.x*tile_square_size), 
+			static_cast<float>(size.y*tile_square_size)
+		);
 	}
 }

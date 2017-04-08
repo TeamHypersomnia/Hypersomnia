@@ -52,15 +52,16 @@ namespace augs {
 				LOG("An error occured during FBO creation!");
 		}
 
-		void fbo::use() {
+		void fbo::use() const {
 			ensure(created);
 			glBindFramebuffer(GL_FRAMEBUFFER, fboId); glerr
 			currently_bound_fbo = fboId;
 		}
 
-		void fbo::guarded_use() {
-			if (currently_bound_fbo != fboId)
+		void fbo::guarded_use() const {
+			if (currently_bound_fbo != fboId) {
 				use();
+			}
 		}
 
 		void fbo::use_default() {

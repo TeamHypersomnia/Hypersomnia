@@ -60,17 +60,16 @@ struct button_corners_info {
 
 	template <class L>
 	void for_each_button_corner(const ltrb rc, L callback) const {
-		auto& manager = get_resource_manager();
+		const auto& manager = get_assets_manager();
 
 		for (auto i = button_corner_type::INSIDE; i < button_corner_type::COUNT; i = static_cast<button_corner_type>(static_cast<int>(i) + 1)) {
 			const auto tex_id = get_tex_for_type(i);
-			const auto* const found_tex = manager.find(tex_id);
+			const auto& tex = manager[tex_id].texture_maps[texture_map_type::DIFFUSE];
 
-			if (found_tex == nullptr) {
+			if (!tex.exists()) {
 				continue;
 			}
 
-			const auto& tex = found_tex->texture_maps[texture_map_type::DIFFUSE];
 			const vec2 s = tex.get_size();
 
 			ltrb target_rect;

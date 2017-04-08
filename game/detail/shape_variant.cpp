@@ -8,8 +8,15 @@
 
 void shape_variant::from_renderable(const const_entity_handle handle) {
 	if (handle.has<components::sprite>()) {
-		convex_partitioned_shape coll;
-		coll.from_sprite(handle.get<components::sprite>(), true);
+		const auto& cosm = handle.get_cosmos();
+		const auto sprite = handle.get<components::sprite>();
+
+		const auto image_size = cosm[sprite.tex].get_size();
+		vec2 scale = sprite.size / image_size;
+
+		convex_partitioned_shape coll = cosm[sprite.tex].shape.get<convex_partitioned_shape>();
+		coll.scale(scale);
+
 		set(coll);
 	}
 	if (handle.has<components::polygon>()) {

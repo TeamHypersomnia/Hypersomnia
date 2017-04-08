@@ -6,6 +6,7 @@
 #include "game/detail/particle_types.h"
 #include "game/detail/camera_cone.h"
 #include "augs/graphics/renderer.h"
+#include "game/transcendental/cosmos.h"
 
 void exploding_ring_system::acquire_new_rings(const std::vector<exploding_ring_input>& new_rings) {
 	rings.reserve(rings.size() + new_rings.size());
@@ -19,6 +20,7 @@ void exploding_ring_system::acquire_new_rings(const std::vector<exploding_ring_i
 }
 
 void exploding_ring_system::advance(
+	const cosmos& cosmos,
 	const augs::delta dt,
 	particles_simulation_system& particles_output_for_effects
 ) {
@@ -26,6 +28,8 @@ void exploding_ring_system::advance(
 
 	global_time_seconds += dt.in_seconds();
 	auto rng = fast_randomization(static_cast<size_t>(global_time_seconds * 10000));
+
+	const auto& manager = get_assets_manager();
 
 	erase_remove(rings, [&](ring& e) {
 		auto& r = e.in;
@@ -42,9 +46,9 @@ void exploding_ring_system::advance(
 				const auto spawn_radius_width = (maximum_spawn_radius - minimum_spawn_radius) / 2.4;
 
 				const unsigned max_particles_to_spawn = 160;
-				auto smokes_emission = get_resource_manager().find(assets::particle_effect_id::CAST_SPARKLES)->at(0);
-				smokes_emission.particle_render_template.layer = render_layer::DIM_SMOKES;
-				const auto& sparkles_emission = get_resource_manager().find(assets::particle_effect_id::CAST_SPARKLES)->at(1);
+				auto smokes_emission = manager[assets::particle_effect_id::CAST_SPARKLES].emissions.at(0);
+				smokes_emission.target_render_layer = render_layer::DIM_SMOKES;
+				const auto& sparkles_emission = manager[assets::particle_effect_id::CAST_SPARKLES].emissions.at(1);
 
 				for (auto i = 0u; i < vis.get_num_triangles(); ++i) {
 					const auto tri = vis.get_world_triangle(i, r.center);
@@ -82,7 +86,7 @@ void exploding_ring_system::advance(
 								new_p.linear_damping /= 2;
 								new_p.acc.rotate(rng.randval(0.f, 360.f), vec2{ 0, 0 });
 
-								particles.add_particle(sparkles_emission.particle_render_template.layer, new_p);
+								particles.add_particle(sparkles_emission.target_render_layer, new_p);
 								//new_p.max_lifetime_ms *= 1.4f;
 							};
 
@@ -103,10 +107,10 @@ void exploding_ring_system::advance(
 								smokes_emission
 							);
 
-							new_p.face.color.rgb() = r.color.rgb();
-							new_p.face.color.a *= 2;
+							new_p.color.rgb() = r.color.rgb();
+							new_p.color.a *= 2;
 
-							particles.add_particle(smokes_emission.particle_render_template.layer, new_p);
+							particles.add_particle(smokes_emission.target_render_layer, new_p);
 
 							//new_p.acc /= 2;
 							//new_p.acc.rotate(rng.randval(0.f, 360.f), vec2{ 0, 0 });
@@ -172,9 +176,11 @@ void exploding_ring_system::draw_rings(
 		}
 		else {
 			components::sprite spr;
-			spr.set(assets::game_image_id::BLANK);
-			spr.size.set(outer_radius_now * 2, outer_radius_now * 2);
-			spr.color = considered_color;
+			spr.set(
+				assets::game_image_id::BLANK, 
+				vec2(outer_radius_now * 2, outer_radius_now * 2), 
+				considered_color
+			);
 
 			components::sprite::drawing_input in(triangles);
 			in.renderable_transform.rotation = 0.f;
@@ -212,8 +218,11 @@ void exploding_ring_system::draw_highlights_of_rings(
 			highlight_col.a = static_cast<rgba_channel>(255 * highlight_amount);
 
 			components::sprite spr;
-			spr.set(assets::game_image_id::CAST_HIGHLIGHT, highlight_col);
-			spr.size.set(radius, radius);
+			spr.set(
+				assets::game_image_id::CAST_HIGHLIGHT, 
+				vec2(radius, radius), 
+				highlight_col
+			);
 
 			spr.draw(highlight);
 		}

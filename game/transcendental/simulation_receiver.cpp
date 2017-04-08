@@ -139,7 +139,7 @@ auto simulation_receiver::acquire_potential_mispredictions(
 		}
 	}
 
-	return std::move(potential_mispredictions);
+	return potential_mispredictions;
 }
 
 void simulation_receiver::drag_mispredictions_into_past(

@@ -76,11 +76,16 @@ namespace augs {
 	}
 
 	void draw_rect(vertex_triangle_buffer& v, const ltrb origin, const assets::game_image_id id, const rgba color) {
-		draw_rect(v, origin, *id, color);
+		const auto& manager = get_assets_manager();
+
+		draw_rect(v, origin, manager[id].texture_maps[texture_map_type::DIFFUSE], color);
 	}
 
 	void draw_rect(vertex_triangle_buffer& v, const vec2 origin, const assets::game_image_id id, const rgba color) {
-		draw_rect(v, xywh {origin.x, origin.y, static_cast<float>(assets::get_size(id).x), static_cast<float>(assets::get_size(id).y) }, *id, color);
+		const auto& manager = get_assets_manager();
+		const auto size = manager[id].get_size();
+
+		draw_rect(v, xywh{ origin.x, origin.y, static_cast<float>(size.x), static_cast<float>(size.y) }, manager[id].texture_maps[texture_map_type::DIFFUSE], color);
 	}
 
 	void draw_rect(vertex_triangle_buffer& v, const ltrb origin, const texture_atlas_entry& tex, const rgba color) {
@@ -116,43 +121,32 @@ namespace augs {
 		v.push_back(out[1]);
 	}
 	
-	std::array<vec2, 4> make_sprite_points(const vec2 pos, const vec2 size, const float rotation_degrees, const renderable_positioning_type positioning) {
+	std::array<vec2, 4> make_sprite_points(
+		const vec2 pos, 
+		const vec2 size, 
+		const float rotation_degrees
+	) {
 		std::array<vec2, 4> v;
 
-		if (positioning == renderable_positioning_type::CENTER) {
-			const vec2 origin = pos;
-			const vec2 half_size = size / 2.f;
+		const vec2 origin = pos;
+		const vec2 half_size = size / 2.f;
 
-			v[0] = pos - half_size;
-			v[1] = pos + vec2(size.x, 0.f) - half_size;
-			v[2] = pos + size - half_size;
-			v[3] = pos + vec2(0.f, size.y) - half_size;
+		v[0] = pos - half_size;
+		v[1] = pos + vec2(size.x, 0.f) - half_size;
+		v[2] = pos + size - half_size;
+		v[3] = pos + vec2(0.f, size.y) - half_size;
 
-			v[0].rotate(rotation_degrees, origin);
-			v[1].rotate(rotation_degrees, origin);
-			v[2].rotate(rotation_degrees, origin);
-			v[3].rotate(rotation_degrees, origin);
-		}
-		else {
-			const vec2 origin = pos + size / 2.f;
-
-			v[0] = pos;
-			v[1] = pos + vec2(size.x, 0.f);
-			v[2] = pos + size;
-			v[3] = pos + vec2(0.f, size.y);
-
-			v[0].rotate(rotation_degrees, origin);
-			v[1].rotate(rotation_degrees, origin);
-			v[2].rotate(rotation_degrees, origin);
-			v[3].rotate(rotation_degrees, origin);
-		}
+		v[0].rotate(rotation_degrees, origin);
+		v[1].rotate(rotation_degrees, origin);
+		v[2].rotate(rotation_degrees, origin);
+		v[3].rotate(rotation_degrees, origin);
 
 		return v;
 	}
 
 	std::array<vertex_triangle, 2> make_sprite_triangles(
 		const std::array<vec2, 4> v,
-		const augs::texture_atlas_entry& considered_texture,
+		const augs::texture_atlas_entry considered_texture,
 		const rgba col,
 		const bool flip_horizontally,
 		const bool flip_vertically) {
@@ -306,9 +300,10 @@ namespace augs {
 				poly.add_concave_polygon({ concave.begin(), concave.end() } );
 				
 				poly.automatically_map_uv(
-					assets::game_image_id::BLANK, 
 					components::polygon::uv_mapping_mode::STRETCH
 				);
+				
+				poly.texture_map = assets::game_image_id::BLANK;
 
 				components::polygon::drawing_input in(v);
 				poly.draw(in);

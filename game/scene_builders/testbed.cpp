@@ -251,11 +251,11 @@ namespace scene_builders {
 				sentience.personal_electricity.set_value(800);
 			}
 
-			sentience.spells[spell_type::HASTE] = spell_instance_data();
-			sentience.spells[spell_type::ELECTRIC_TRIAD] = spell_instance_data();
-			sentience.spells[spell_type::FURY_OF_THE_AEONS] = spell_instance_data();
-			sentience.spells[spell_type::ULTIMATE_WRATH_OF_THE_AEONS] = spell_instance_data();
-			sentience.spells[spell_type::ELECTRIC_SHIELD] = spell_instance_data();
+			sentience.spells[assets::spell_id::HASTE] = spell_instance_data();
+			sentience.spells[assets::spell_id::ELECTRIC_TRIAD] = spell_instance_data();
+			sentience.spells[assets::spell_id::FURY_OF_THE_AEONS] = spell_instance_data();
+			sentience.spells[assets::spell_id::ULTIMATE_WRATH_OF_THE_AEONS] = spell_instance_data();
+			sentience.spells[assets::spell_id::ELECTRIC_SHIELD] = spell_instance_data();
 		}
 
 		{
@@ -274,8 +274,7 @@ namespace scene_builders {
 
 				r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-				w.face.set(assets::game_image_id(int(assets::game_image_id::BLANK)), cyan);
-				w.face.size.set(1, 1);
+				w.face.set(assets::game_image_id(int(assets::game_image_id::BLANK)), vec2(1, 1), cyan);
 				w.count = 200;
 				w.reach = reach;
 				e.add_standard_components();
@@ -288,7 +287,7 @@ namespace scene_builders {
 
 				r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-				w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), cyan);
+				w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), world, cyan);
 				//w.face.size.set(1, 1);
 				w.count = 80;
 				w.reach = reach;
@@ -302,7 +301,7 @@ namespace scene_builders {
 
 				r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-				w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), cyan);
+				w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), world, cyan);
 				//w.face.size.set(1, 1);
 				w.count = 80;
 				w.reach = reach;
@@ -356,8 +355,7 @@ namespace scene_builders {
 
 					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-					w.face.set(assets::game_image_id(int(assets::game_image_id::BLANK)), light_cyan);
-					w.face.size.set(1, 1);
+					w.face.set(assets::game_image_id(int(assets::game_image_id::BLANK)), vec2(1, 1), light_cyan);
 					w.count = 50;
 					w.reach = xywh(light_pos.x- 250, light_pos.y-250, 500, 500);
 					e.add_standard_components();
@@ -370,8 +368,7 @@ namespace scene_builders {
 
 					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-					w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), light_cyan);
-					//w.face.size.set(1, 1);
+					w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), world, light_cyan);
 					w.count = 20;
 					w.reach = xywh(light_pos.x - 150, light_pos.y - 150, 300, 300);
 					e.add_standard_components();
@@ -384,8 +381,7 @@ namespace scene_builders {
 
 					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-					w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), light_cyan);
-					//w.face.size.set(1, 1);
+					w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), world, light_cyan);
 					w.count = 20;
 					w.reach = xywh(light_pos.x - 25, light_pos.y - 25, 50, 50);
 					e.add_standard_components();
@@ -444,8 +440,7 @@ namespace scene_builders {
 
 					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-					w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), cyan);
-					//w.face.size.set(1, 1);
+					w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), world, cyan);
 					w.count = 20;
 					w.reach = left_reach;
 					e.add_standard_components();
@@ -458,8 +453,7 @@ namespace scene_builders {
 
 					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-					w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), orange);
-					//w.face.size.set(1, 1);
+					w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), world, orange);
 					w.count = 20;
 					w.reach = right_reach;
 					e.add_standard_components();
@@ -472,8 +466,7 @@ namespace scene_builders {
 
 					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-					w.face.set(assets::game_image_id(int(assets::game_image_id::BLANK)), cyan);
-					w.face.size.set(1, 1);
+					w.face.set(assets::game_image_id(int(assets::game_image_id::BLANK)), vec2(1, 1), cyan);
 					w.count = 50;
 					w.reach = left_reach;
 					e.add_standard_components();
@@ -486,8 +479,7 @@ namespace scene_builders {
 
 					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-					w.face.set(assets::game_image_id(int(assets::game_image_id::BLANK)), orange);
-					w.face.size.set(1, 1);
+					w.face.set(assets::game_image_id(int(assets::game_image_id::BLANK)), vec2(1, 1), orange);
 					w.count = 50;
 					w.reach = right_reach;
 					e.add_standard_components();
@@ -500,8 +492,7 @@ namespace scene_builders {
 
 					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-					w.face.set(assets::game_image_id(int(assets::game_image_id::BLANK)), cyan);
-					w.face.size.set(2, 2);
+					w.face.set(assets::game_image_id(int(assets::game_image_id::BLANK)), vec2(2, 2), cyan);
 					w.count = 30;
 					w.reach = left_reach;
 					e.add_standard_components();
@@ -514,8 +505,7 @@ namespace scene_builders {
 
 					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-					w.face.set(assets::game_image_id(int(assets::game_image_id::BLANK)), orange);
-					w.face.size.set(2, 2);
+					w.face.set(assets::game_image_id(int(assets::game_image_id::BLANK)), vec2(2, 2), orange);
 					w.count = 30;
 					w.reach = right_reach;
 					e.add_standard_components();
@@ -597,12 +587,13 @@ namespace scene_builders {
 			{
 				const auto e = world.create_entity("have_a_pleasant");
 
-				e += components::transform(164.f - 8.f, -60.f - 20.f);
-				auto& render = e += components::render();
-				auto& sprite = e += components::sprite();
-
-				render.layer = render_layer::NEON_CAPTIONS;
-				sprite.set(assets::game_image_id::HAVE_A_PLEASANT);
+				ingredients::add_sprite(
+					e,
+					components::transform(164.f - 8.f, -60.f - 20.f),
+					assets::game_image_id::HAVE_A_PLEASANT,
+					white,
+					render_layer::NEON_CAPTIONS
+				);
 
 				e.add_standard_components();
 
@@ -622,7 +613,7 @@ namespace scene_builders {
 					prefabs::create_brick_wall(world, components::transform(-3 - 16 + 100 - 160, -32 - 96 + 160 - 160*b, 90), { 160, 160 });
 				}
 
-				const vec2i bg_size = assets::get_size(assets::game_image_id::TEST_BACKGROUND);
+				const vec2 bg_size = world[assets::game_image_id::TEST_BACKGROUND].get_size();
 
 				const int num_floors = 10 * 10;
 				const int side = sqrt(num_floors) / 2;
@@ -643,9 +634,9 @@ namespace scene_builders {
 					}
 				}
 
-				const auto size = assets::get_size(assets::game_image_id::ROAD_FRONT_DIRT);
-
 				{
+					const vec2 size = world[assets::game_image_id::ROAD_FRONT_DIRT].get_size();
+
 					auto road_dirt = world.create_entity("road_dirt[-]");
 					ingredients::add_sprite(road_dirt, vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 - size.y / 2),
 						assets::game_image_id::ROAD_FRONT_DIRT, white, render_layer::ON_TILED_FLOOR);
@@ -654,7 +645,7 @@ namespace scene_builders {
 				}
 
 				for (int r = 0; r < 38; ++r) {
-					const auto size = assets::get_size(assets::game_image_id::ROAD);
+					const vec2 size = world[assets::game_image_id::ROAD].get_size();
 
 					auto road = world.create_entity("road[-]");
 					ingredients::add_sprite(road, vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 + size.y / 2 + size.y*r),
@@ -666,13 +657,14 @@ namespace scene_builders {
 
 			{
 				const auto e = world.create_entity("awakening");
+				auto& sprite = ingredients::add_sprite(
+					e,
+					components::transform(164.f - 8.f, -60.f - 20.f + 40.f),
+					assets::game_image_id::AWAKENING,
+					white,
+					render_layer::NEON_CAPTIONS
+				);
 
-				e += components::transform(164.f - 8.f, -60.f -20.f + 40.f);
-				auto& render = e += components::render();
-				auto& sprite = e += components::sprite();
-
-				render.layer = render_layer::NEON_CAPTIONS;
-				sprite.set(assets::game_image_id::AWAKENING);
 				sprite.effect = components::sprite::special_effect::COLOR_WAVE;
 
 				e.add_standard_components();
@@ -681,12 +673,13 @@ namespace scene_builders {
 			{
 				const auto e = world.create_entity("metropolis");
 
-				e += components::transform(1164.f + 24.f, -60.f);
-				auto& render = e += components::render();
-				auto& sprite = e += components::sprite();
-
-				render.layer = render_layer::NEON_CAPTIONS;
-				sprite.set(assets::game_image_id::METROPOLIS);
+				ingredients::add_sprite(
+					e,
+					components::transform(1164.f + 24.f, -60.f),
+					assets::game_image_id::METROPOLIS,
+					white,
+					render_layer::NEON_CAPTIONS
+				);
 
 				e.add_standard_components();
 			}

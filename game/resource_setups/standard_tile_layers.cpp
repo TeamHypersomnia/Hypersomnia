@@ -1,18 +1,18 @@
 #include "all.h"
 #include "game/resources/manager.h"
 
-void load_standard_tile_layers() {
+void set_standard_tile_layers(assets_manager& manager) {
 	{
 		auto nth_tile = [](const unsigned i) {
 			return i;
 			//return assets::game_image_id(unsigned(assets::game_image_id::METROPOLIS_TILE_FIRST) + i - 1);
 		};
 
-		auto& metropolis_floor = get_resource_manager().create(assets::tile_layer_id::METROPOLIS_FLOOR);
+		auto& metropolis_floor = manager[assets::tile_layer_id::METROPOLIS_FLOOR];
 
 		for (int i = int(assets::game_image_id::METROPOLIS_TILE_FIRST); i < int(assets::game_image_id::METROPOLIS_TILE_LAST); ++i) {
 			components::sprite tt;
-			tt.set(assets::game_image_id(i));
+			tt.set(assets::game_image_id(i), manager[assets::game_image_id(i)].get_size());
 			//if (
 			//	assets::game_image_id(i) == assets::game_image_id(int(assets::game_image_id::METROPOLIS_TILE_FIRST) + 3)
 			//	//|| assets::game_image_id(i) == assets::game_image_id(int(assets::game_image_id::METROPOLIS_TILE_FIRST) + 4)
@@ -29,7 +29,7 @@ void load_standard_tile_layers() {
 
 		//metropolis_floor.get_tile_type(nth_tile(1)).max_specular_blinks = 2;
 
-		resources::tile_layer::tile_rectangular_filling gold_floor_filling;
+		tile_layer::tile_rectangular_filling gold_floor_filling;
 		gold_floor_filling.fill = nth_tile(49);
 
 		gold_floor_filling.left_border = nth_tile(2);

@@ -8,6 +8,8 @@
 #include "game/systems_stateless/render_system.h"
 #include "game/systems_stateless/gui_system.h"
 
+#include "game/components/render_component.h"
+
 #include "game/detail/gui/character_gui.h"
 #include "game/systems_inferred/dynamic_tree_system.h"
 #include "game/resources/manager.h"
@@ -32,10 +34,12 @@ namespace rendering_scripts {
 
 		const auto matrix = augs::orthographic_projection<float>(0, camera.visible_world_area.x, camera.visible_world_area.y, 0, 0, 1);
 
-		auto& default_shader = *get_resource_manager().find(assets::program_id::DEFAULT);
-		auto& pure_color_highlight_shader = *get_resource_manager().find(assets::program_id::PURE_COLOR_HIGHLIGHT);
+		const auto& manager = get_assets_manager();
+
+		auto& default_shader = manager[assets::program_id::DEFAULT];
+		auto& pure_color_highlight_shader = manager[assets::program_id::PURE_COLOR_HIGHLIGHT];
 		auto& border_highlight_shader = pure_color_highlight_shader; // the same
-		auto& circular_bars_shader = *get_resource_manager().find(assets::program_id::CIRCULAR_BARS);
+		auto& circular_bars_shader = manager[assets::program_id::CIRCULAR_BARS];
 		
 		default_shader.use();
 		{
@@ -77,8 +81,8 @@ namespace rendering_scripts {
 			
 			vec2 upper(0.0f, 0.0f);
 			vec2 lower(1.0f, 1.0f);
-			upper = (*assets::game_image_id::HUD_CIRCULAR_BAR_MEDIUM).get_atlas_space_uv(upper);
-			lower = (*assets::game_image_id::HUD_CIRCULAR_BAR_MEDIUM).get_atlas_space_uv(lower);
+			upper = manager[assets::game_image_id::HUD_CIRCULAR_BAR_MEDIUM].texture_maps[texture_map_type::DIFFUSE].get_atlas_space_uv(upper);
+			lower = manager[assets::game_image_id::HUD_CIRCULAR_BAR_MEDIUM].texture_maps[texture_map_type::DIFFUSE].get_atlas_space_uv(lower);
 			const auto center = (upper + lower) / 2;
 		
 			glUniform2f(glGetUniformLocation(circular_bars_shader.id, "texture_center"), center.x, center.y);
@@ -105,7 +109,7 @@ namespace rendering_scripts {
 
 		// hud.draw_vertically_flying_numbers(step);
 
-		renderer.bind_texture(*get_resource_manager().find(assets::physical_texture_id::GAME_WORLD_ATLAS));
+		renderer.bind_texture(manager[assets::physical_texture_id::GAME_WORLD_ATLAS]);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();

@@ -45,6 +45,8 @@ void thunder_system::advance(
 ) {
 	thread_local fast_randomization rng;
 
+	const auto& manager = get_assets_manager();
+
 	for (thunder& t : thunders) {
 		t.until_next_branching_ms -= dt.in_milliseconds();
 
@@ -113,7 +115,7 @@ void thunder_system::advance(
 				const bool is_leaf = b.children.empty();
 
 				if (is_leaf) {
-					const auto remnants_emission = get_resource_manager().find(assets::particle_effect_id::THUNDER_REMNANTS)->at(0);
+					const auto remnants_emission = manager[assets::particle_effect_id::THUNDER_REMNANTS].emissions.at(0);
 
 					{
 						const auto spawner = [&](auto dummy) {
@@ -129,7 +131,7 @@ void thunder_system::advance(
 
 							new_p.colorize(t.in.color.rgb());
 
-							particles_output_for_effects.add_particle(remnants_emission.particle_render_template.layer, new_p);
+							particles_output_for_effects.add_particle(remnants_emission.target_render_layer, new_p);
 						};
 
 						for (size_t i = 0; i < rng.randval(2u, 16u); ++i) {
@@ -160,7 +162,7 @@ void thunder_system::draw_thunders(
 					lines, 
 					camera[b.from], 
 					camera[b.to], 
-					get_resource_manager().find(assets::game_image_id::BLANK)->texture_maps[texture_map_type::DIFFUSE], 
+					get_assets_manager()[assets::game_image_id::BLANK].texture_maps[texture_map_type::DIFFUSE], 
 					t.in.color
 				);
 			}

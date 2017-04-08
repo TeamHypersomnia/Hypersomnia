@@ -1,20 +1,23 @@
 #include "all.h"
 
-void set_standard_collision_sound_matrix(collision_sound_matrix_type& matrix) {
+#include "game/flyweights/physical_material.h"
+#include "game/resources/manager.h"
+
+void set_standard_physical_materials(assets_manager& assets) {
 	const auto set_pair = [&](
-		const auto a,
-		const auto b,
-		const auto c
-		) {
-		matrix[a][b] = c;
-		matrix[b][a] = c;
+		const assets::physical_material_id a,
+		const assets::physical_material_id b,
+		const assets::sound_buffer_id c
+	) {
+		assets[a].collision_sound_matrix[b] = c;
+		assets[b].collision_sound_matrix[a] = c;
 	};
 
-	set_pair(physical_material_type::METAL, physical_material_type::METAL, assets::sound_buffer_id::COLLISION_METAL_METAL);
-	set_pair(physical_material_type::METAL, physical_material_type::WOOD, assets::sound_buffer_id::COLLISION_METAL_WOOD);
-	set_pair(physical_material_type::WOOD, physical_material_type::WOOD, assets::sound_buffer_id::COLLISION_METAL_WOOD);
+	set_pair(assets::physical_material_id::METAL, assets::physical_material_id::METAL, assets::sound_buffer_id::COLLISION_METAL_METAL);
+	set_pair(assets::physical_material_id::METAL, assets::physical_material_id::WOOD, assets::sound_buffer_id::COLLISION_METAL_WOOD);
+	set_pair(assets::physical_material_id::WOOD, assets::physical_material_id::WOOD, assets::sound_buffer_id::COLLISION_METAL_WOOD);
 
-	set_pair(physical_material_type::GRENADE, physical_material_type::WOOD, assets::sound_buffer_id::COLLISION_GRENADE);
-	set_pair(physical_material_type::GRENADE, physical_material_type::METAL, assets::sound_buffer_id::COLLISION_GRENADE);
-	set_pair(physical_material_type::GRENADE, physical_material_type::GRENADE, assets::sound_buffer_id::COLLISION_GRENADE);
+	set_pair(assets::physical_material_id::GRENADE, assets::physical_material_id::WOOD, assets::sound_buffer_id::COLLISION_GRENADE);
+	set_pair(assets::physical_material_id::GRENADE, assets::physical_material_id::METAL, assets::sound_buffer_id::COLLISION_GRENADE);
+	set_pair(assets::physical_material_id::GRENADE, assets::physical_material_id::GRENADE, assets::sound_buffer_id::COLLISION_GRENADE);
 }

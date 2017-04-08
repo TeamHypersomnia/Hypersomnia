@@ -59,7 +59,7 @@ basic_entity_handle<C> basic_entity_handle<C>::add_standard_components() const {
 		&& !is_entity_physical(*this) 
 		&& !has<components::dynamic_tree_node>()
 	) {
-		add(components::dynamic_tree_node::get_default(*this));
+		add(components::dynamic_tree_node::create_default_for(*this));
 	}
 
 	if (has<components::rigid_body>()) {

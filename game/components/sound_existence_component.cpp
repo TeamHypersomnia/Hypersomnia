@@ -5,8 +5,6 @@
 
 #include "game/components/position_copying_component.h"
 
-#include "game/resources/manager.h"
-
 entity_handle sound_effect_input::create_sound_effect_entity(
 	cosmos& cosmos,
 	const components::transform place_of_birth,
@@ -19,16 +17,16 @@ entity_handle sound_effect_input::create_sound_effect_entity(
 	existence.input = *this;
 	existence.time_of_birth = cosmos.get_timestamp();
 
-	const auto* const buffer = get_resource_manager().find(effect.id);
+	const auto& info = cosmos[effect.id];
 
 	if (existence.input.variation_number == -1) {
-		existence.input.variation_number = static_cast<char>(existence.random_variation_number_from_transform(place_of_birth) % buffer->get_num_variations());
+		existence.input.variation_number = static_cast<char>(existence.random_variation_number_from_transform(place_of_birth) % info.num_of_variations);
 	}
 
-	const auto length_in_seconds = buffer->get_variation(existence.input.variation_number).request_original().get_length_in_seconds();
+	const auto duration_in_seconds = info.max_duration_in_seconds;
 
 	existence.max_lifetime_in_steps =
-		static_cast<unsigned>(length_in_seconds / cosmos.get_fixed_delta().in_seconds()) + 1;
+		static_cast<unsigned>(duration_in_seconds / cosmos.get_fixed_delta().in_seconds()) + 1;
 
 	const auto chased_subject = cosmos[chased_subject_id];
 

@@ -15,10 +15,7 @@ class viewing_step;
 struct visible_entities;
 
 class interpolation_system;
-
-namespace resources {
-	struct particles_emission;
-}
+struct particles_emission;
 
 class wandering_pixels_system {
 public:

@@ -189,7 +189,7 @@ void viewing_session::advance_audiovisual_systems(
 	auto& particles = systems_audiovisual.get<particles_simulation_system>();
 
 	thunders.advance(cosm, dt, particles);
-	exploding_rings.advance(dt, particles);
+	exploding_rings.advance(cosm, dt, particles);
 	flying_numbers.advance(dt);
 	highlights.advance(dt);
 
@@ -367,8 +367,7 @@ std::wstring viewing_session::summary() const {
 
 void viewing_session::draw_color_overlay(augs::renderer& renderer, const rgba col) const {
 	components::sprite overlay;
-	overlay.set(assets::game_image_id::BLANK, col);
-	overlay.size = camera.smoothed_camera.visible_world_area;
+	overlay.set(assets::game_image_id::BLANK, camera.smoothed_camera.visible_world_area, col);
 
 	components::sprite::drawing_input in(renderer.get_triangle_buffer());
 	in.camera = camera.smoothed_camera;

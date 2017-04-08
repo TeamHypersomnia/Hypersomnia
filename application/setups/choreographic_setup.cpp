@@ -176,7 +176,7 @@ void choreographic_setup::process(
 		}
 
 		else {
-			for_each_type_in_list(choreographic_command_variant(), [&](auto dummy) {
+			for_each_through_std_get(choreographic_command_variant::types_tuple(), [&](auto dummy) {
 				typedef decltype(dummy) command_type;
 
 				if ("struct " + command_name == typeid(command_type).name()) {

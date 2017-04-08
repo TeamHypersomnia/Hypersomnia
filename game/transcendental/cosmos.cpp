@@ -100,11 +100,11 @@ cosmos::cosmos(const unsigned reserved_entities) {
 	significant.meta.settings.si.set_pixels_per_meter(100.f);
 	entity_debug_names[0] = "dead entity";
 
-	set_standard_spell_properties(*this);
-	set_standard_animations(*this);
-	set_standard_particle_effects(*this);
+	if (assets_manager::current_exists()) {
+		assets_manager::get_current().write_logical_metas_of_assets_into(*this);
+	}
 
-	set_standard_collision_sound_matrix(significant.meta.flyweights.collision_sound_matrix);
+	set_standard_behaviour_trees(*this);
 }
 
 const std::string& cosmos::get_debug_name(entity_id id) const {
@@ -206,13 +206,6 @@ void cosmos::reserve_storage_for_entities(const size_t n) {
 
 std::wstring cosmos::summary() const {
 	return typesafe_sprintf(L"Entities: %x\n", entities_count());
-}
-
-assets::sound_buffer_id cosmos::get_collision_sound(
-	const physical_material_type a, 
-	const physical_material_type b
-) const {
-	return significant.meta.flyweights.collision_sound_matrix[a][b];
 }
 
 size_t cosmos::get_rng_seed_for(const entity_id id) const {

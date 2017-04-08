@@ -27,8 +27,6 @@ struct convex_poly_destruction_data {
 struct convex_poly {
 	// GEN INTROSPECTOR struct convex_poly
 	augs::constant_size_vector<vec2, CONVEX_POLY_VERTEX_COUNT> vertices;
-
-	convex_poly_destruction_data destruction;
 	// END GEN INTROSPECTOR
 };
 
@@ -37,12 +35,9 @@ struct convex_partitioned_shape {
 	augs::constant_size_vector<convex_poly, CONVEX_POLYS_COUNT> convex_polys;
 	// END GEN INTROSPECTOR
 
-	void offset_vertices(components::transform);
-	void mult_vertices(vec2);
+	void offset_vertices(const components::transform);
+	void scale(const vec2);
 
 	void add_convex_polygon(const convex_poly&);
 	void add_concave_polygon(const std::vector<vec2>&);
-
-	void from_renderable(const_entity_handle);
-	void from_sprite(const components::sprite&, bool polygonize);
 };

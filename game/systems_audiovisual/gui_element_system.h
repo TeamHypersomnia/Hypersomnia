@@ -19,7 +19,7 @@ public:
 	std::unordered_map<entity_id, character_gui> character_guis;
 
 	augs::container_with_small_size<std::vector<item_slot_transfer_request_data>, unsigned short> pending_transfers;
-	augs::container_with_small_size<std::unordered_map<entity_id, spell_type>, unsigned char> spell_requests;
+	augs::container_with_small_size<std::unordered_map<entity_id, assets::spell_id>, unsigned char> spell_requests;
 
 	bool gui_look_enabled = false;
 	vec2i screen_size_for_new_characters;

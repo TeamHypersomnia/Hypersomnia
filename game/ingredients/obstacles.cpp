@@ -12,7 +12,7 @@ namespace prefabs {
 		ingredients::add_standard_dynamic_body(crate, true);
 		crate.get<components::fixtures>().set_restitution(0.8f);
 		crate.get<components::fixtures>().set_density(0.7f);
-		crate.get<components::fixtures>().set_physical_material(physical_material_type::WOOD);
+		crate.get<components::fixtures>().set_physical_material(assets::physical_material_id::WOOD);
 		crate.add_standard_components();
 
 		return crate;
@@ -25,7 +25,7 @@ namespace prefabs {
 		ingredients::add_standard_static_body(crate);
 		crate.get<components::fixtures>().set_restitution(0.0f);
 		crate.get<components::fixtures>().set_density(100);
-		crate.get<components::fixtures>().set_physical_material(physical_material_type::WOOD);
+		crate.get<components::fixtures>().set_physical_material(assets::physical_material_id::WOOD);
 		crate.add_standard_components();
 
 		return crate;

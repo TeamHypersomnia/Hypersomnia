@@ -106,7 +106,7 @@ void component_synchronizer<false, F>::set_density(
 }
 
 convex_poly_destruction_data& component_synchronizer<false, F>::get_modifiable_destruction_data(const b2Fixture_index_in_component indices) {
-	return component.colliders[indices.collider_index].shape.get<convex_partitioned_shape>().convex_polys[indices.convex_shape_index].destruction;
+	return component.colliders[indices.collider_index].destruction[indices.convex_shape_index];
 }
 
 void component_synchronizer<false, F>::set_density_multiplier(
@@ -158,7 +158,7 @@ void component_synchronizer<false, F>::set_restitution(
 }
 
 void component_synchronizer<false, F>::set_physical_material(
-	const physical_material_type m, 
+	const assets::physical_material_id m, 
 	const size_t index
 ) const {
 	component.colliders[index].material = m;

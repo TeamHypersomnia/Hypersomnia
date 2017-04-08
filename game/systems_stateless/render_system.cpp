@@ -1,3 +1,4 @@
+#include "game/components/render_component.h"
 #include "render_system.h"
 
 bool render_system::render_order_compare(const const_entity_handle a, const const_entity_handle b) {

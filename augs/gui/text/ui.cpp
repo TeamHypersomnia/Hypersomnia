@@ -1,6 +1,7 @@
 #include <algorithm>
 #include "ui.h"
 #include "augs/window_framework/window.h"
+#include "game/resources/manager.h"
 
 #undef min
 #undef max
@@ -15,7 +16,8 @@ namespace augs {
 				redraw(true),
 				forced_italics(false), max_characters(0), whitelist(nullptr), blacklist(nullptr), allow_unknown_characters_as_default(false) {}
 			const augs::baked_font& ui::getf(unsigned i) const {
-				return *((i < get_str().length() && get_str()[i].font_used != assets::font_id::INVALID) ? get_str()[i].font_used : caret.default_style.f);
+				return get_assets_manager()
+					[(i < get_str().length() && get_str()[i].font_used != assets::font_id::INVALID) ? get_str()[i].font_used : caret.default_style.f];
 			}
 
 			void ui::anchor() {
@@ -332,7 +334,7 @@ namespace augs {
 					}
 				}
 				else if (forced_bold = !forced_bold)
-					bold_bound = !(*(get_neighbor_style().f)).is_bolded();
+					bold_bound = !get_assets_manager()[get_neighbor_style().f].is_bolded();
 				need_redraw();
 			}
 
@@ -357,7 +359,7 @@ namespace augs {
 					}
 				}
 				else if (forced_italics = !forced_italics)
-					italics_bound = !(*get_neighbor_style().f).is_italicsed();
+					italics_bound = !get_assets_manager()[get_neighbor_style().f].is_italicsed();
 			}
 
 			bool ui::undo() {
@@ -519,8 +521,8 @@ namespace augs {
 
 			style ui::get_current_style() const {
 				style ch = get_neighbor_style();
-				if (forced_bold)    ch.f = (*ch.f).get_bold(bold_bound);
-				if (forced_italics) ch.f = (*ch.f).get_italics(italics_bound);
+				if (forced_bold)    ch.f = get_assets_manager()[ch.f].get_bold(bold_bound);
+				if (forced_italics) ch.f = get_assets_manager()[ch.f].get_italics(italics_bound);
 				return ch;
 			}
 
@@ -541,7 +543,7 @@ namespace augs {
 							return false;
 					return true;
 				}
-				else return forced_bold ? bold_bound : (*get_neighbor_style().f).is_bolded();
+				else return forced_bold ? bold_bound : get_assets_manager()[get_neighbor_style().f].is_bolded();
 			}
 
 			bool ui::get_italics_status() const {
@@ -552,7 +554,7 @@ namespace augs {
 							return false;
 					return true;
 				}
-				else return forced_italics ? italics_bound : (*get_neighbor_style().f).is_italicsed();
+				else return forced_italics ? italics_bound : get_assets_manager()[get_neighbor_style().f].is_italicsed();
 			}
 
 			bool ui::is_valid_glyph(const formatted_char& c) {
@@ -560,8 +562,8 @@ namespace augs {
 					/* if we want to have newlines, we need a whitespace glyph added to the end of every line
 						similiarly with tabs, we want to replace them with spaces
 					*/
-					(iswspace(c.c) && (*c.font_used).meta_from_file.get_glyph(L' ') != nullptr)
-					|| allow_unknown_characters_as_default || (*c.font_used).meta_from_file.get_glyph(c.c) != nullptr;
+					(iswspace(c.c) && get_assets_manager()[c.font_used].meta_from_file.get_glyph(L' ') != nullptr)
+					|| allow_unknown_characters_as_default || get_assets_manager()[c.font_used].meta_from_file.get_glyph(c.c) != nullptr;
 			}
 
 			bool ui::is_whitelisted(wchar_t c) const {

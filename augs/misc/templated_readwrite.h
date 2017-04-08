@@ -5,7 +5,7 @@
 #include "augs/templates/memcpy_safety.h"
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/ensure.h"
-#include "augs/misc/introspect.h"
+#include "augs/templates/introspect.h"
 
 namespace augs {
 	class output_stream_reserver;
@@ -373,30 +373,6 @@ namespace augs {
 		write(ar, storage.size());
 
 		write_n(ar, storage.data(), storage.size());
-	}
-
-	template<class Archive, class Serialized, class... Args>
-	void read_object(Archive& ar, std::tuple<Serialized, Args...>& storage) {
-		for_each_in_tuple(storage, [&](auto& element) {
-			read(ar, element);
-		});
-	}
-
-	template<class Archive, class Serialized, size_t N>
-	void read_object(Archive& ar, std::array<Serialized, N>& storage) {
-		read_n(ar, storage.data(), storage.size());
-	}
-
-	template<class Archive, class Serialized, size_t N>
-	void write_object(Archive& ar, const std::array<Serialized, N>& storage) {
-		write_n(ar, storage.data(), storage.size());
-	}
-
-	template<class Archive, class Serialized, class... Args>
-	void write_object(Archive& ar, const std::tuple<Serialized, Args...>& storage) {
-		for_each_in_tuple(storage, [&](const auto& element) {
-			write(ar, element);
-		});
 	}
 
 	template<class Archive, size_t count>

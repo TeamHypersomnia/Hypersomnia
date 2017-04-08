@@ -1,15 +1,16 @@
 #pragma once
+#include <tuple>
+#include <array>
+
+#include "augs/misc/trivially_copyable_tuple.h"
+#include "augs/templates/for_each_in_types.h"
+
 #include "game/transcendental/entity_id_declaration.h"
 #include "game/detail/shape_variant_declaration.h"
 
 #define FIELD(x) f(#x, _t_.x...)
 
 /* Other introspectors that do not fit into the standard schema go here: */
-
-namespace std {
-	template <class, size_t>
-	class array;
-}
 
 namespace augs {
 	template <class F, class ElemType, size_t count, class... Instances>
@@ -21,6 +22,36 @@ namespace augs {
 		for (size_t i = 0; i < count; ++i) {
 			f(std::to_string(i), t[i]...);
 		}
+	}
+
+	template <class F, class... Types, class... Instances>
+	void introspect_body(
+		const std::tuple<Types...>* const,
+		F f,
+		Instances&&... t
+	) {
+		templates_detail::for_each_through_std_get(
+			[f](auto num, auto&&... args) {
+				f(std::to_string(num), std::forward<decltype(args)>(args)...);
+			},
+			std::index_sequence_for<Types...>{},
+			std::forward<Instances>(t)...
+		);
+	}
+
+	template <class F, class... Types, class... Instances>
+	void introspect_body(
+		const trivially_copyable_tuple<Types...>* const,
+		F f,
+		Instances&&... t
+	) {
+		templates_detail::for_each_through_std_get(
+			[f](auto num, auto&&... args) {
+				f(std::to_string(num), std::forward<decltype(args)>(args)...);
+			},
+			std::index_sequence_for<Types...>{},
+			std::forward<Instances>(t)...
+		);
 	}
 }
 
@@ -57,6 +88,9 @@ struct inventory_item_address;
 struct inventory_traversal;
 template <class id_type>
 struct basic_item_slot_transfer_request_data;
+struct general_particle;
+struct animated_particle;
+struct homing_animated_particle;
 struct electric_shield_perk;
 struct haste_perk;
 struct perk_timing;
@@ -65,8 +99,14 @@ struct circle_shape;
 struct spell_instance_data;
 struct animation_frame;
 struct animation;
+struct state_of_behaviour_tree_instance;
 struct particle_effect_modifier;
 struct particles_emission;
+struct particle_effect_logical_meta;
+struct physical_material;
+struct spell_logical_meta;
+struct spell_data;
+class tile_layer;
 struct all_simulation_settings;
 struct pathfinding_settings;
 struct si_scaling;
@@ -75,8 +115,7 @@ template <class key>
 struct basic_cosmic_entropy;
 struct guid_mapped_entropy;
 struct cosmic_entropy;
-struct cosmos_flyweights_state;
-class cosmos_metadata;
+struct cosmos_metadata;
 struct cosmos_significant_state;
 struct entity_guid;
 struct entity_id;
@@ -101,6 +140,7 @@ struct b2Sweep;
 struct b2Filter;
 
 namespace augs {
+	struct sound_buffer_logical_meta;
 	struct sound_effect_modifier;
 	struct vertex;
 	struct font_glyph_metadata;
@@ -173,11 +213,17 @@ namespace components {
 	struct wandering_pixels;
 }
 
-namespace resources {
-	struct state_of_behaviour_tree_instance;
-}
-
 namespace augs {
+	template <class F, class... Instances>
+	void introspect_body(
+		const augs::sound_buffer_logical_meta* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(max_duration_in_seconds);
+		FIELD(num_of_variations);
+	}
+
 	template <class F, class... Instances>
 	void introspect_body(
 		const augs::sound_effect_modifier* const,
@@ -650,7 +696,6 @@ namespace augs {
 		FIELD(max_look_expand);
 
 		FIELD(rotation_offset);
-		FIELD(size_multiplier);
 		FIELD(sensitivity);
 	}
 
@@ -734,6 +779,8 @@ namespace augs {
 		Instances&&... _t_
 	) {
 		FIELD(shape);
+		FIELD(destruction);
+
 		FIELD(material);
 
 		FIELD(collision_sound_gain_mult);
@@ -1084,7 +1131,8 @@ namespace augs {
 		F f,
 		Instances&&... _t_
 	) {
-		FIELD(center_neon_map);
+		FIELD(texture_map);
+
 		FIELD(vertices);
 		FIELD(triangulation_indices);
 
@@ -1134,7 +1182,6 @@ namespace augs {
 		F f,
 		Instances&&... _t_
 	) {
-		FIELD(screen_space_transform);
 		FIELD(draw_border);
 		FIELD(layer);
 
@@ -1289,7 +1336,6 @@ namespace augs {
 		FIELD(tex);
 		FIELD(color);
 		FIELD(size);
-		FIELD(size_multiplier);
 		FIELD(center_offset);
 		FIELD(rotation_offset);
 
@@ -1297,7 +1343,6 @@ namespace augs {
 		FIELD(flip_vertically);
 		
 		FIELD(effect);
-		FIELD(has_neon_map);
 
 		FIELD(max_specular_blinks);
 	}
@@ -1320,6 +1365,7 @@ namespace augs {
 		FIELD(max_multiplier_x);
 		FIELD(max_multiplier_y);
 
+		FIELD(additional_multiplier);
 		FIELD(chosen_multiplier);
 
 		FIELD(lengthening_duration_ms);
@@ -1406,8 +1452,6 @@ namespace augs {
 		Instances&&... _t_
 	) {
 		FIELD(vertices);
-
-		FIELD(destruction);
 	}
 
 	template <class F, class... Instances>
@@ -1496,6 +1540,70 @@ namespace augs {
 
 	template <class F, class... Instances>
 	void introspect_body(
+		const general_particle* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(pos);
+		FIELD(vel);
+		FIELD(acc);
+		FIELD(image_id);
+		FIELD(color);
+		FIELD(size);
+		FIELD(rotation);
+		FIELD(rotation_speed);
+		FIELD(linear_damping);
+		FIELD(angular_damping);
+		FIELD(lifetime_ms);
+		FIELD(max_lifetime_ms);
+		FIELD(shrink_when_ms_remaining);
+		FIELD(unshrinking_time_ms);
+
+		FIELD(alpha_levels);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const animated_particle* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(pos);
+		FIELD(vel);
+		FIELD(acc);
+	
+		FIELD(linear_damping);
+		FIELD(lifetime_ms);
+
+		FIELD(first_face);
+		FIELD(color);
+		FIELD(frame_duration_ms);
+		FIELD(frame_count);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const homing_animated_particle* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(pos);
+		FIELD(vel);
+		FIELD(acc);
+
+		FIELD(linear_damping);
+		FIELD(lifetime_ms);
+
+		FIELD(homing_force);
+
+		FIELD(first_face);
+		FIELD(color);
+		FIELD(frame_duration_ms);
+		FIELD(frame_count);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
 		const electric_shield_perk* const,
 		F f,
 		Instances&&... _t_
@@ -1573,7 +1681,7 @@ namespace augs {
 
 	template <class F, class... Instances>
 	void introspect_body(
-		const resources::state_of_behaviour_tree_instance* const,
+		const state_of_behaviour_tree_instance* const,
 		F f,
 		Instances&&... _t_
 	) {
@@ -1634,7 +1742,66 @@ namespace augs {
 		FIELD(randomize_acceleration);
 		FIELD(should_particles_look_towards_velocity);
 
-		FIELD(particle_templates);
+		FIELD(particle_definitions);
+		FIELD(target_render_layer);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const particle_effect_logical_meta* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(max_duration_in_seconds);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const physical_material* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(collision_sound_matrix);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const spell_logical_meta* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(personal_electricity_required);
+		FIELD(cooldown_ms);
+		FIELD(casting_time_ms);
+		FIELD(perk_duration_seconds);
+
+		FIELD(border_col);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const spell_data* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(logical);
+
+		FIELD(icon);
+		FIELD(incantation);
+		FIELD(spell_name);
+		FIELD(spell_description);
+	}
+
+	template <class F, class... Instances>
+	void introspect_body(
+		const tile_layer* const,
+		F f,
+		Instances&&... _t_
+	) {
+		FIELD(tileset);
+
+		FIELD(tiles);
+		FIELD(size);
 	}
 
 	template <class F, class... Instances>
@@ -1718,17 +1885,6 @@ namespace augs {
 
 	template <class F, class... Instances>
 	void introspect_body(
-		const cosmos_flyweights_state* const,
-		F f,
-		Instances&&... _t_
-	) {
-		FIELD(all_flyweights_by_id);
-
-		FIELD(collision_sound_matrix);
-	}
-
-	template <class F, class... Instances>
-	void introspect_body(
 		const cosmos_metadata* const,
 		F f,
 		Instances&&... _t_
@@ -1742,7 +1898,7 @@ namespace augs {
 #endif
 		FIELD(settings);
 
-		FIELD(flyweights);
+		FIELD(logical_metas_of_assets);
 	}
 
 	template <class F, class... Instances>

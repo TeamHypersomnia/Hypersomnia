@@ -1,6 +1,7 @@
 #include "visible_entities.h"
 
 #include "game/transcendental/cosmos.h"
+#include "game/components/render_component.h"
 
 #include "game/systems_inferred/dynamic_tree_system.h"
 #include "game/systems_inferred/physics_system.h"

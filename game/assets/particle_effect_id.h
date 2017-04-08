@@ -24,8 +24,6 @@ namespace assets {
 	};
 }
 
-resources::particle_effect& operator*(const assets::particle_effect_id& id);
-
 struct particle_effect_response {
 	// GEN INTROSPECTOR struct particle_effect_response
 	assets::particle_effect_id id = assets::particle_effect_id::COUNT;

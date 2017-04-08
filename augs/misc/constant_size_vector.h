@@ -4,7 +4,7 @@
 #include "augs/zeroed_pod.h"
 
 #include "augs/misc/trivially_copyable_pair.h"
-#include "augs/misc/introspect.h"
+#include "augs/templates/introspect.h"
 template<class ForwardIt, class T, class Compare = std::less<>>
 ForwardIt binary_find(ForwardIt first, ForwardIt last, const T& value, Compare comp = {})
 {

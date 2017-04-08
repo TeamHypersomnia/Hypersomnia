@@ -1,85 +1,50 @@
 #pragma once
-namespace std {
-	template <class...>
-	class tuple;
-}
+#include <type_traits>
+#include <tuple>
 
-namespace templates_detail
-{
-	template<int... Is>
-	struct seq { };
+namespace templates_detail {
+	template <class F, class... Instances>
+	void for_each_through_std_get(F&& f, std::index_sequence<>, Instances&&... instances)
+	{}
 
-	template<int N, int... Is>
-	struct gen_seq : gen_seq<N - 1, N - 1, Is...> { };
-
-	template<int... Is>
-	struct gen_seq<0, Is...> : seq<Is...> { };
-
-	template<typename T, typename F, int... Is>
-	void for_each(T&& t, F f, seq<Is...>)
-	{
-		auto l = { (f(std::get<Is>(t)), 0)... };
-	}
-
-	template<typename T, typename F, int... Is>
-	void for_eaches(T&& t, T&& b, F f, seq<Is...>)
-	{
-		auto l = { (f(std::get<Is>(t), std::get<Is>(b)), 0)... };
+	template <class F, class... Instances, size_t N, size_t... Is>
+	void for_each_through_std_get(F&& f, std::index_sequence<N, Is...>, Instances&&... instances) {
+		f(N, std::get<N>(instances)...);
+		
+		for_each_through_std_get(
+			std::forward<F>(f), 
+			std::index_sequence<Is...>(), 
+			std::forward<Instances>(instances)...
+		);
 	}
 }
 
-template<
-	template<typename...> class List,
-	typename... Ts, 
-	typename F
+template <class>
+struct index_sequence_for_list;
+
+template <template <class...> class List, class... Args>
+struct index_sequence_for_list<List<Args...>> {
+	typedef std::index_sequence_for<Args...> type;
+};
+
+template <class T>
+using index_sequence_for_list_t = typename index_sequence_for_list<T>::type;
+
+template <
+	class List,
+	class F
 >
-void for_each_in_tuple(const List<Ts...>& t, F f)
-{
-	templates_detail::for_each(t, f, templates_detail::gen_seq<sizeof...(Ts)>());
+void for_each_through_std_get(List&& t, F f) {
+	templates_detail::for_each_through_std_get(
+		[f](auto num, auto&&... args) {
+			f(std::forward<decltype(args)>(args)...);
+		},
+		index_sequence_for_list_t<std::decay_t<List>>{},
+		std::forward<List>(t)
+	);
 }
 
-template<
-	template<typename...> class List,
-	typename... Ts,
-	typename F
->
-void for_each_in_tuple(List<Ts...>& t, F f)
-{
-	templates_detail::for_each(t, f, templates_detail::gen_seq<sizeof...(Ts)>());
-}
-
-template<
-	template<typename...> class List,
-	typename... Ts,
-	typename F
->
-void for_each_in_tuples(const List<Ts...>& t, const List<Ts...>& b, F f)
-{
-	templates_detail::for_eaches(t, b, f, templates_detail::gen_seq<sizeof...(Ts)>());
-}
-
-template<
-	template<typename...> class List,
-	typename... Ts,
-	typename F
->
-void for_each_in_tuples(List<Ts...>& t, List<Ts...>& b, F f)
-{
-	templates_detail::for_eaches(t, b, f, templates_detail::gen_seq<sizeof...(Ts)>());
-}
-
-template<typename... Ts, typename F>
-void for_each_type(F f)
-{
-	templates_detail::for_each(std::tuple<Ts...>(), f, templates_detail::gen_seq<sizeof...(Ts)>());
-}
-
-template<
-	template<typename...> class List,
-	typename... Ts,
-	typename F
->
-void for_each_type_in_list(const List<Ts...>& t, F f)
-{
-	for_each_type<Ts...>(f);
+template <class... Ts, class F>
+void for_each_type(F&& f) {
+	for_each_through_std_get(std::tuple<Ts...>(), std::forward<F>(f));
 }

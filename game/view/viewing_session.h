@@ -10,6 +10,7 @@
 
 #include "augs/entity_system/storage_for_systems.h"
 #include "game/transcendental/types_specification/all_systems_declaration.h"
+#include "game/transcendental/logic_step.h"
 
 #include "game/systems_audiovisual/interpolation_system.h"
 #include "game/systems_audiovisual/past_infection_system.h"

@@ -25,6 +25,7 @@ void sentience_meter_bar::draw(
 	const auto& cosmos = context.get_cosmos();
 	const auto dt = cosmos.get_fixed_delta();
 	const auto now = cosmos.get_timestamp();
+	const auto& manager = get_assets_manager();
 
 	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING)) {
 		return;
@@ -43,7 +44,7 @@ void sentience_meter_bar::draw(
 
 	ltrb icon_rect;
 	icon_rect.set_position(absolute.get_position());
-	icon_rect.set_size((*icon_mat.tex).get_size());
+	icon_rect.set_size(manager[icon_mat.tex].get_size());
 
 	draw_clipped_rect(
 		icon_mat, 
@@ -105,7 +106,7 @@ void sentience_meter_bar::draw(
 				auto particle_mat = p.mat;
 				particle_mat.color = bar_mat.color + rgba(30, 30, 30, 0);
 			
-				const auto particle_rect = ltrb(value_bar_rect.get_position() - vec2(6, 6) + p.relative_pos, (*particle_mat.tex).get_size());
+				const auto particle_rect = ltrb(value_bar_rect.get_position() - vec2(6, 6) + p.relative_pos, manager[particle_mat.tex].get_size());
 
 				draw_clipped_rect(
 					particle_mat,
@@ -140,10 +141,12 @@ ltrb sentience_meter_bar::get_bar_rect_with_borders(
 	const const_this_pointer this_id,
 	const ltrb absolute
 ) const {
+	const auto& manager = get_assets_manager();
+
 	auto icon_rect = absolute;
 
 	auto icon_mat = this_id->get_icon_mat(this_id);
-	icon_rect.set_size((*icon_mat.tex).get_size());
+	icon_rect.set_size(manager[icon_mat.tex].get_size());
 	augs::gui::text_drawer drawer;
 	drawer.set_text(augs::gui::text::format(L"99999", assets::font_id::GUI_FONT));
 
@@ -245,6 +248,7 @@ void sentience_meter_bar::rebuild_layouts(
 	const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
 
 	const auto& cosmos = context.get_cosmos();
+	const auto& manager = get_assets_manager();
 
 	const auto dt = cosmos.get_fixed_delta();
 	const auto now = cosmos.get_timestamp();
@@ -266,7 +270,7 @@ void sentience_meter_bar::rebuild_layouts(
 	}
 
 	const auto screen_size = context.get_character_gui().get_screen_size();
-	const auto icon_size = (*this_id->get_icon_mat(this_id).tex).get_size();
+	const auto icon_size = manager[this_id->get_icon_mat(this_id).tex].get_size();
 	const auto with_bar_size = vec2i(icon_size.x + 4 + 180, icon_size.y);
 
 	const auto lt = vec2i(screen_size.x - 220, 20 + vertical_index * (icon_size.y + 4));

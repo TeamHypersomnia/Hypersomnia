@@ -23,7 +23,7 @@ namespace components {
 		ltrb aabb;
 		// END GEN INTROSPECTOR
 
-		static dynamic_tree_node get_default(const_entity_handle);
+		static dynamic_tree_node create_default_for(const_entity_handle);
 	};
 }
 

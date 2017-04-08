@@ -6,6 +6,7 @@
 #include "game/messages/exploding_ring_input.h"
 
 struct camera_cone;
+class cosmos;
 class particles_simulation_system;
 
 class exploding_ring_system {
@@ -22,6 +23,7 @@ public:
 	void acquire_new_rings(const std::vector<exploding_ring_input>& rings);
 
 	void advance(
+		const cosmos& cosmos,
 		const augs::delta dt,
 		particles_simulation_system& particles_output_for_effects
 	);

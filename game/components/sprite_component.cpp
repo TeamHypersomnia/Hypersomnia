@@ -1,18 +1,13 @@
 #include "sprite_component.h"
 
-#include "game/components/render_component.h"
-
-#include "game/transcendental/entity_id.h"
-
-#include "augs/graphics/renderer.h"
+#include "augs/ensure.h"
+#include "augs/math/vec2.h"
 
 #include "game/resources/manager.h"
+#include "game/transcendental/cosmos.h"
 
 #include "augs/graphics/vertex.h"
 #include "augs/graphics/drawers.h"
-#include "augs/ensure.h"
-#include "augs/math/vec2.h"
-using namespace augs;
 
 namespace components {
 	void sprite::drawing_input::set_global_time_seconds(const double secs) {
@@ -20,28 +15,36 @@ namespace components {
 	}
 
 	vec2 sprite::get_size() const {
-		return size * size_multiplier;
+		return size;
 	}
 
-	void sprite::set(const assets::game_image_id _tex, const rgba _color) {
+	void sprite::set(
+		const assets::game_image_id _tex, 
+		const vec2 _size,
+		const rgba _color
+	) {
 		tex = _tex;
 		color = _color;
-		has_neon_map = get_resource_manager().find(tex)->texture_maps[texture_map_type::NEON].exists();
-
-		update_size_from_texture_dimensions();
+		size = _size;
 	}
 
-	void sprite::update_size_from_texture_dimensions() {
-		size = vec2i(get_resource_manager().find(tex)->get_size());
+	void sprite::set(
+		const assets::game_image_id id,
+		const cosmos& manager,
+		const rgba color
+	) {
+		set(id, manager[id].get_size(), color);
 	}
 
-	void sprite::draw(const drawing_input& in,
-		const augs::texture_atlas_entry& considered_texture,
+	void sprite::draw(
+		const drawing_input in,
+		const augs::texture_atlas_entry considered_texture,
 		const vec2i target_position,
 		const float final_rotation,
-		const vec2 considered_size) const {
+		const vec2 considered_size
+	) const {
 		
-		auto v = augs::make_sprite_points(target_position, considered_size, final_rotation, in.positioning);
+		auto v = augs::make_sprite_points(target_position, considered_size, final_rotation);
 
 		/* rotate around the center of the screen */
 		//if (in.camera.transform.rotation != 0.f) {
@@ -61,7 +64,7 @@ namespace components {
 		auto tris = augs::make_sprite_triangles(v, considered_texture, target_color, flip_horizontally != 0, flip_vertically != 0);
 
 		if (effect == special_effect::COLOR_WAVE) {
-			vertex_triangle& t1 = tris[0], &t2 = tris[1];
+			augs::vertex_triangle& t1 = tris[0], &t2 = tris[1];
 
 			rgba left_col;
 			rgba right_col;
@@ -78,28 +81,39 @@ namespace components {
 		in.target_buffer.push_back(tris[1]);
 	}
 
-	void sprite::draw(const drawing_input& in) const {
+	void sprite::draw_from_lt(drawing_input in) const {
+		in.renderable_transform.pos += get_size() / 2;
+		draw(in);
+	}
+
+	void sprite::draw(const drawing_input in) const {
 		ensure(tex != assets::game_image_id::COUNT);
+
+		const auto& manager = get_assets_manager();
 
 		vec2i transform_pos = in.renderable_transform.pos;
 		const float final_rotation = in.renderable_transform.rotation + rotation_offset;
 
 		auto screen_space_pos = in.camera[transform_pos];
-		const auto drawn_size = size*size_multiplier;
+		const auto drawn_size = get_size();
 
 		if (center_offset.non_zero()) {
 			screen_space_pos -= vec2(center_offset).rotate(final_rotation, vec2(0, 0));
 		}
 
-		if (in.drawing_type == renderable_drawing_type::NEON_MAPS && has_neon_map) {
-			draw(
-				in, 
-				get_resource_manager().find(tex)->texture_maps[texture_map_type::NEON], 
-				screen_space_pos,
-				final_rotation,
-				vec2(get_resource_manager().find(tex)->texture_maps[texture_map_type::NEON].original_size_pixels)
-				/ vec2(get_resource_manager().find(tex)->get_size()) * drawn_size
-			);
+		if (in.drawing_type == renderable_drawing_type::NEON_MAPS) {
+			const auto& maybe_neon_map = manager[tex].texture_maps[texture_map_type::NEON];
+
+			if (maybe_neon_map.exists()) {
+				draw(
+					in,
+					maybe_neon_map,
+					screen_space_pos,
+					final_rotation,
+					vec2(maybe_neon_map.original_size_pixels)
+					/ manager[tex].get_size() * drawn_size
+				);
+			}
 		}
 		else if (
 			in.drawing_type == renderable_drawing_type::NORMAL
@@ -107,7 +121,7 @@ namespace components {
 		) {
 			draw(
 				in, 
-				get_resource_manager().find(tex)->texture_maps[texture_map_type::DIFFUSE],
+				manager[tex].texture_maps[texture_map_type::DIFFUSE],
 				screen_space_pos,
 				final_rotation, 
 				drawn_size
@@ -115,7 +129,7 @@ namespace components {
 		}
 		else if (in.drawing_type == renderable_drawing_type::SPECULAR_HIGHLIGHTS) {
 			const auto frame_duration_ms = 50u;
-			const auto frame_count = 1 + int(assets::game_image_id::BLINK_LAST) - int(assets::game_image_id::BLINK_FIRST);
+			const auto frame_count = int(assets::game_image_id::BLINK_LAST) - int(assets::game_image_id::BLINK_FIRST);
 			const auto animation_max_duration = frame_duration_ms * frame_count;
 			
 			for (unsigned m = 0; m < max_specular_blinks; ++m) {
@@ -126,16 +140,17 @@ namespace components {
 				fast_randomization generator(spatial_hash + m * 30 + total_ms / animation_max_duration);
 
 				const unsigned animation_current_ms = total_ms % (animation_max_duration);
-				const auto& target_frame = assets::game_image_id(int(assets::game_image_id::BLINK_LAST) + animation_current_ms / frame_duration_ms);
+				const auto& target_frame = assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + animation_current_ms / frame_duration_ms);
 
 				const auto blink_offset = 
 					vec2i { generator.randval(0, int(drawn_size.x)), generator.randval(0, int(drawn_size.y)) } - drawn_size / 2;
 
-				draw(in, 
-					get_resource_manager().find(target_frame)->texture_maps[texture_map_type::DIFFUSE],
+				draw(
+					in, 
+					manager[target_frame].texture_maps[texture_map_type::DIFFUSE],
 					screen_space_pos + blink_offset,
 					final_rotation,
-					assets::get_size(target_frame)
+					manager[target_frame].get_size()
 				);
 			}
 		}
@@ -150,7 +165,9 @@ namespace components {
 		return std::move(out);
 	}
 	
-	ltrb sprite::get_aabb(const components::transform& transform, const renderable_positioning_type positioning) const {
-		return augs::get_aabb(make_sprite_points(transform.pos, get_size(), transform.rotation + rotation_offset, positioning));
+	ltrb sprite::get_aabb(
+		const components::transform transform
+	) const {
+		return augs::get_aabb(augs::make_sprite_points(transform.pos, get_size(), transform.rotation + rotation_offset));
 	}
 }

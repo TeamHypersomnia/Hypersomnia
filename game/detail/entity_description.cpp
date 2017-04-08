@@ -181,3 +181,21 @@ std::wstring get_bbcoded_sentience_meter_description(
 
 	else return L"Unknown problem";
 }
+
+std::wstring get_bbcoded_spell_description(
+	const const_entity_handle caster,
+	const assets::spell_id spell
+) {
+	const auto& manager = get_assets_manager();
+
+	const auto spell_data = manager[spell];
+
+	const auto properties = typesafe_sprintf(
+		L"Incantation: [color=yellow]%x[/color]\nPE to cast: [color=vscyan]%x[/color]\nCooldown: [color=vscyan]%x[/color]",
+		std::wstring(spell_data.incantation), 
+		spell_data.logical.personal_electricity_required, 
+		spell_data.logical.cooldown_ms
+	);
+
+	return spell_data.spell_name + L"\n" + properties + L"\n" + spell_data.spell_description;
+}

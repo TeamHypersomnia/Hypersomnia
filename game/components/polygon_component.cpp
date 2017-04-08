@@ -5,6 +5,7 @@
 #include "augs/graphics/renderer.h"
 
 #include "game/resources/manager.h"
+#include "game/detail/convex_partitioned_shape.h"
 
 using namespace augs;
 
@@ -18,41 +19,31 @@ namespace components {
 		global_time_seconds = secs;
 	}
 
-	void polygon::from_polygonized_texture(const assets::game_image_id tex) {
-		auto& polygonized_sprite_verts = get_resource_manager().find(tex)->polygonized;
-		const vec2 size = get_resource_manager().find(tex)->get_size();
+	void polygon::add_vertices_from(const convex_partitioned_shape& shape) {
+		for (const auto& c : shape.convex_polys) {
+			std::vector<vertex> new_concave;
 
-		ensure(polygonized_sprite_verts.size() > 0);
-		
-		std::vector<vertex> new_concave;
+			for (auto v : c.vertices) {
+				vertex new_v;
+				new_v.pos = v;
+				new_concave.push_back(new_v);
+			}
 
-		for (auto v : polygonized_sprite_verts) {
-			vertex new_v;
-			new_v.pos = v;
-			new_v.set_texcoord({ v.x / size.x, v.y / size.y }, *tex);
-			new_concave.push_back(new_v);
+			add_concave_polygon(new_concave);
 		}
 
-		for (auto& v : new_concave) {
-			v.pos -= size/2;
-		}
-
-		add_concave_polygon(new_concave);
-		center_neon_map = tex;
-		//automatically_map_uv(tex, uv_mapping_mode::OVERLAY);
+		automatically_map_uv(uv_mapping_mode::STRETCH);
 	}
 
-	void polygon::automatically_map_uv(const assets::game_image_id texture_id_to_map, const uv_mapping_mode mapping_mode) {
+	void polygon::automatically_map_uv(const uv_mapping_mode mapping_mode) {
 		if (vertices.empty()) {
 			return;
 		}
 
-		auto& texture_to_map = get_resource_manager().find(texture_id_to_map)->texture_maps[texture_map_type::DIFFUSE];
-
 		typedef const augs::vertex& vc;
 
-		auto x_pred = [](vc a, vc b) { return a.pos.x < b.pos.x; };
-		auto y_pred = [](vc a, vc b) { return a.pos.y < b.pos.y; };
+		const auto x_pred = [](const vc a, const vc b) { return a.pos.x < b.pos.x; };
+		const auto y_pred = [](const vc a, const vc b) { return a.pos.y < b.pos.y; };
 
 		const auto lower = vec2i(
 			static_cast<int>(minimum_of(vertices, x_pred).pos.x),
@@ -66,28 +57,22 @@ namespace components {
 
 		if (mapping_mode == uv_mapping_mode::STRETCH) {
 			for (auto& v : vertices) {
-				v.set_texcoord(vec2(
+				v.texcoord = vec2(
 					(v.pos.x - lower.x) / (upper.x - lower.x),
 					(v.pos.y - lower.y) / (upper.y - lower.y)
-					), texture_to_map);
+				);
 			}
 		}
-		else if (mapping_mode == uv_mapping_mode::OVERLAY) {
-			auto size = texture_to_map.original_size_pixels;
-
-			for (auto& v : vertices) {
-				v.set_texcoord(vec2(
-					(v.pos.x - lower.x) / size.x,
-					(v.pos.y - lower.y) / size.y
-					), texture_to_map);
-			}
+		else {
+			ensure(false && "Unknown polygon uv mapping mode!");
 		}
-
-		center_neon_map = texture_id_to_map;
 	}
 
 	void polygon::add_concave_polygon(std::vector<vertex> polygon) {
-		if (polygon.empty()) return;
+		if (polygon.empty()) {
+			return;
+		}
+
 		size_t i1, i2;
 
 		float area = 0;
@@ -145,17 +130,21 @@ namespace components {
 	std::vector<vec2> polygon::get_vertices() const {
 		std::vector<vec2> out;
 
-		for (auto& v : vertices)
+		for (auto& v : vertices) {
 			out.push_back(v.pos);
+		}
 
-		return std::move(out);
+		return out;
 	}
 	
 	void polygon::draw(const drawing_input& in) const {
+		const auto& manager = get_assets_manager();
+		const auto& texture = manager[texture_map];
+
 		if (in.drawing_type == renderable_drawing_type::NEON_MAPS) {
 			components::sprite::drawing_input neon_in(in.target_buffer);
 			components::sprite neon_sprite;
-			neon_sprite.set(center_neon_map);
+			neon_sprite.set(texture_map, texture.get_size());
 
 			neon_in.camera = in.camera;
 			neon_in.colorize = in.colorize;
@@ -173,22 +162,30 @@ namespace components {
 
 		auto model_transformed = vertices;
 
-		/* initial transformation for visibility checks */
-		if (std::abs(in.renderable_transform.rotation) > 0.f)
-			for (auto& v : model_transformed)
+		if (std::abs(in.renderable_transform.rotation) > 0.f) {
+			for (auto& v : model_transformed) {
 				v.pos.rotate(in.renderable_transform.rotation, vec2(0, 0));
+			}
+		}
 
 		/* further rotation of the polygon to fit the camera transform */
 		for (auto& v : model_transformed) {
-			auto center = in.camera.visible_world_area / 2;
+			const auto center = in.camera.visible_world_area / 2;
+			
 			v.pos += in.renderable_transform.pos - camera_pos + center;
 
 			/* rotate around the center of the screen */
-			if (std::abs(in.camera.transform.rotation) > 0.f)
+			if (std::abs(in.camera.transform.rotation) > 0.f) {
 				v.pos.rotate(in.camera.transform.rotation, center);
+			}
 
 			v.pos.x = static_cast<float>(static_cast<int>(v.pos.x));
 			v.pos.y = static_cast<float>(static_cast<int>(v.pos.y));
+
+			v.set_texcoord(
+				v.texcoord, 
+				texture.texture_maps[texture_map_type::DIFFUSE]
+			);
 		}
 
 		for (size_t i = 0; i < triangulation_indices.size(); i += 3) {
@@ -208,9 +205,10 @@ namespace components {
 			v.pos += transform.pos;
 		}
 
-		return augs::get_aabb(model_transformed,
-			[](const vertex p) { return p.pos.x; },
-			[](const vertex p) { return p.pos.y; }
+		return augs::get_aabb(
+			model_transformed,
+			[](const vertex& p) { return p.pos.x; },
+			[](const vertex& p) { return p.pos.y; }
 		);
 	}
 }

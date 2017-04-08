@@ -18,8 +18,8 @@ namespace augs {
 			void create(int width, int height);
 			void destroy();
 
-			void use();
-			void guarded_use();
+			void use() const;
+			void guarded_use() const;
 
 			int get_width() const, get_height() const;
 			GLuint get_texture_id() const;

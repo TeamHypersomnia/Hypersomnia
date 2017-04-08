@@ -1,5 +1,4 @@
 #pragma once
-namespace resources {}
 namespace components {}
 namespace messages {}
 
@@ -11,7 +10,6 @@ namespace augs {
 namespace helpers {}
 namespace shared {}
 
-using namespace resources;
 using namespace components;
 using namespace augs;
 using namespace misc;

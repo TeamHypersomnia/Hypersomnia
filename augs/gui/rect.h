@@ -6,6 +6,7 @@
 #include "augs/window_framework/event.h"
 #include "augs/misc/delta.h"
 #include "augs/misc/enum_bitset.h"
+#include "game/resources/manager.h"
 #include "gui_flags.h"
 
 namespace augs {
@@ -276,8 +277,9 @@ namespace augs {
 				const gui::material& mat = gui::material(), 
 				const vec2i offset = vec2i()
 			) {
+				const auto& manager = get_assets_manager();
 				const auto absolute = context.get_tree_entry(id).get_absolute_rect();
-				const auto tex_size = assets::get_size(mat.tex);
+				const auto tex_size = manager[mat.tex].get_size();
 				
 				auto tex_rc = ltrbi(vec2i(0, 0), tex_size).place_in_center_of(absolute);
 				tex_rc.set_position(tex_rc.get_position() + offset);

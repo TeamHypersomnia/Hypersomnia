@@ -8,7 +8,7 @@
 #include "game/transcendental/entity_id.h"
 
 #include "game/enums/sentience_meter_type.h"
-#include "game/enums/spell_type.h"
+#include "game/assets/spell_id.h"
 
 #include "game/assets/sound_buffer_id.h"
 #include "game/assets/particle_effect_id.h"
@@ -35,9 +35,9 @@ namespace components {
 		haste_perk haste;
 		electric_shield_perk electric_shield;
 
-		augs::enum_associative_array<spell_type, spell_instance_data> spells;
+		augs::enum_associative_array<assets::spell_id, spell_instance_data> spells;
 
-		spell_type currently_casted_spell = spell_type::COUNT;
+		assets::spell_id currently_casted_spell = assets::spell_id::COUNT;
 		components::transform transform_when_spell_casted;
 		augs::stepped_timestamp time_of_last_spell_cast;
 		augs::stepped_timestamp time_of_last_exhausted_cast;

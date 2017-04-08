@@ -1,7 +1,6 @@
 #pragma once
 #include <tuple>
 #include <vector>
-#include "augs/templates/list_of.h"
 #include "augs/templates/for_each_in_types.h"
 #include "augs/templates/container_templates.h"
 #include "augs/templates/type_mod_templates.h"
@@ -52,11 +51,11 @@ namespace augs {
 		}
 
 		void ensure_all_empty() {
-			for_each_in_tuple(queues, [this](auto& q) { ensure(q.empty()); });
+			for_each_through_std_get(queues, [this](auto& q) { ensure(q.empty()); });
 		}
 
 		void flush_queues() {
-			for_each_in_tuple(queues, [this](auto& q) { q.clear(); });
+			for_each_through_std_get(queues, [this](auto& q) { q.clear(); });
 		}
 	};
 }

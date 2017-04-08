@@ -73,42 +73,44 @@ void aabb_highlighter::draw(
 	vec2i as = aabb.get_size();
 	vec2i ap = aabb.get_position();
 
+	// const auto& manager = get_assets_manager();
+
 	if (aabb.good()) {
 		components::sprite::drawing_input state(output);
 		state.camera = camera;
-		state.positioning = renderable_positioning_type::LEFT_TOP_CORNER;
 		state.renderable_transform.rotation = 0;
 
 		components::sprite border;
-		border.set(assets::game_image_id::BLANK, cyan);
+		border.tex = assets::game_image_id::BLANK;
+		border.color = cyan;
 
 		auto& pos = state.renderable_transform.pos;
 
 		pos = ap;
 		border.size.set(current_length, 1);
-		border.draw(state);
+		border.draw_from_lt(state);
 		border.size.set(1, current_length);
-		border.draw(state);
+		border.draw_from_lt(state);
 
 		pos = ap + vec2i(as.x - current_length, 0);
 		border.size.set(current_length, 1);
-		border.draw(state);
+		border.draw_from_lt(state);
 		pos = ap + vec2i(as.x - 1, 0);
 		border.size.set(1, current_length);
-		border.draw(state);
+		border.draw_from_lt(state);
 
 		pos = ap + vec2i(0, as.y - current_length);
 		border.size.set(1, current_length);
-		border.draw(state);
+		border.draw_from_lt(state);
 		pos = ap + vec2i(0, as.y - 1);
 		border.size.set(current_length, 1);
-		border.draw(state);
+		border.draw_from_lt(state);
 
 		pos = ap + vec2i(as.x - current_length, as.y - 1);
 		border.size.set(current_length, 1);
-		border.draw(state);
+		border.draw_from_lt(state);
 		pos = ap + vec2i(as.x - 1, as.y - current_length);
 		border.size.set(1, current_length);
-		border.draw(state);
+		border.draw_from_lt(state);
 	}
 }

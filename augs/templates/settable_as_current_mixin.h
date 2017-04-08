@@ -10,6 +10,10 @@ namespace augs {
 		}
 
 	public:
+		static bool current_exists() {
+			return current_instance != nullptr;
+		}
+
 		static derived& get_current() {
 			return *current_instance;
 		}

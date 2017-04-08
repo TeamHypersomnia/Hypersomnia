@@ -30,16 +30,18 @@ namespace prefabs {
 		auto front = world.create_entity("front");
 		auto interior = world.create_entity("interior");
 		auto left_wheel = world.create_entity("left_wheel");
+		left_wheel.make_as_child_of(front);
 
 		const auto si = world.get_si();
 
 		name_entity(front, entity_name::TRUCK);
 
-		const vec2 front_size = get_resource_manager().find(assets::game_image_id::TRUCK_FRONT)->get_size();
-		const vec2 interior_size = get_resource_manager().find(assets::game_image_id::TRUCK_INSIDE)->get_size();
+		const vec2 front_size = world[assets::game_image_id::TRUCK_FRONT].get_size();
+		const vec2 interior_size = world[assets::game_image_id::TRUCK_INSIDE].get_size();
 
 		{
-			auto& sprite = front += components::polygon();
+			//auto& sprite = front += components::sprite();
+			auto& poly = front += components::polygon();
 			auto& render = front += components::render();
 			auto& car = front += components::car();
 			components::rigid_body physics_definition(si, spawn_transform);
@@ -52,8 +54,9 @@ namespace prefabs {
 			car.acceleration_length = 4500 / 6.2f;
 			car.speed_for_pitch_unit = 2000.f;
 
-			sprite.from_polygonized_texture(assets::game_image_id::TRUCK_FRONT);
-			//sprite.set(assets::game_image_id::TRUCK_FRONT, rgba(0, 255, 255));
+			poly.add_vertices_from(world[assets::game_image_id::TRUCK_FRONT].shape.get<convex_partitioned_shape>());
+			poly.texture_map = assets::game_image_id::TRUCK_FRONT;
+			//sprite.set(assets::game_image_id::TRUCK_FRONT, world);
 			//sprite.size.x = 200;
 			//sprite.size.y = 100;
 
@@ -81,7 +84,7 @@ namespace prefabs {
 
 			render.layer = render_layer::CAR_INTERIOR;
 
-			sprite.set(assets::game_image_id::TRUCK_INSIDE);
+			sprite.set(assets::game_image_id::TRUCK_INSIDE, world);
 			//sprite.set(assets::game_image_id::TRUCK_INSIDE, rgba(122, 0, 122, 255));
 			//sprite.size.x = 250;
 			//sprite.size.y = 550;
@@ -99,6 +102,7 @@ namespace prefabs {
 			interior += colliders;
 
 			interior.get<components::fixtures>().set_owner_body(front);
+			interior.make_as_child_of(front);
 		}
 
 		{
@@ -113,7 +117,7 @@ namespace prefabs {
 
 			render.layer = render_layer::CAR_WHEEL;
 
-			sprite.set(assets::game_image_id::CAR_INSIDE, rgba(29, 0, 0, 0));
+			sprite.set(assets::game_image_id::CAR_INSIDE, world, rgba(29, 0, 0, 0));
 			sprite.size.set(60, 30);
 
 			auto& fixture = colliders.new_collider();
@@ -145,7 +149,7 @@ namespace prefabs {
 
 					render.layer = render_layer::SMALL_DYNAMIC_BODY;
 
-					sprite.set(assets::game_image_id::TRUCK_ENGINE);
+					sprite.set(assets::game_image_id::TRUCK_ENGINE, world);
 					//sprite.set(assets::game_image_id::TRUCK_INSIDE, rgba(122, 0, 122, 255));
 					//sprite.size.x = 250;
 					//sprite.size.y = 550;
@@ -182,7 +186,7 @@ namespace prefabs {
 					this_engine_transform = engine_physical.get_logic_transform();
 				}
 
-				const vec2 engine_size = get_resource_manager().find(assets::game_image_id::TRUCK_ENGINE)->get_size();
+				const vec2 engine_size = world[assets::game_image_id::TRUCK_ENGINE].get_size();
 
 				{
 					particle_effect_input input;

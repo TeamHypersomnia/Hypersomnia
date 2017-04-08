@@ -135,7 +135,7 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 			cache.recorded_existence = existence;
 			cache.emission_instances.clear();
 
-			for (auto emission : (*existence.input.effect.id)) {
+			for (auto emission : get_assets_manager()[existence.input.effect.id].emissions) {
 				emission.apply_modifier(existence.input.effect.modifier);
 
 				cache.emission_instances.push_back(emission_instance());
@@ -254,20 +254,20 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 					);
 				};
 
-				if (emission.get_templates<general_particle>().size() > 0) {
+				if (emission.get_definitions<general_particle>().size() > 0) {
 					auto new_general = spawner(general_particle());
 					new_general.integrate(time_elapsed);
-					add_particle(emission.particle_render_template.layer, new_general);
+					add_particle(emission.target_render_layer, new_general);
 				}
 
-				if (emission.get_templates<animated_particle>().size() > 0)
+				if (emission.get_definitions<animated_particle>().size() > 0)
 				{
 					auto new_animated = spawner(animated_particle());
 					new_animated.integrate(time_elapsed);
-					add_particle(emission.particle_render_template.layer, new_animated);
+					add_particle(emission.target_render_layer, new_animated);
 				}
 
-				if (emission.get_templates<homing_animated_particle>().size() > 0)
+				if (emission.get_definitions<homing_animated_particle>().size() > 0)
 				{
 					auto new_homing_animated = spawner(homing_animated_particle());
 
@@ -278,7 +278,7 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 					);
 
 					new_homing_animated.integrate(time_elapsed, homing_target_pos);
-					add_particle(emission.particle_render_template.layer, emission.homing_target, new_homing_animated);
+					add_particle(emission.target_render_layer, emission.homing_target, new_homing_animated);
 				}
 
 				instance.stream_particles_to_spawn -= 1.f;

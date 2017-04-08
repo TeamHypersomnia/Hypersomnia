@@ -16,10 +16,7 @@ struct general_particle;
 class viewing_step;
 
 class interpolation_system;
-
-namespace resources {
-	struct particles_emission;
-}
+struct particles_emission;
 
 class particles_simulation_system {
 public:
@@ -98,7 +95,7 @@ public:
 		const float spread,
 		const particles_emission& emission
 	) {
-		const auto& templates = emission.get_templates<particle_type>();
+		const auto& templates = emission.get_definitions<particle_type>();
 		auto new_particle = templates[rng.randval(0u, templates.size() - 1)];
 		
 		const auto velocity_degrees = basic_velocity_degrees + angular_offset + rng.randval(spread);
@@ -126,7 +123,7 @@ public:
 			);
 		}
 
-		return std::move(new_particle);
+		return new_particle;
 	}
 
 	void advance_visible_streams_and_all_particles(

@@ -264,37 +264,37 @@ game_image_id button_corners_info::get_tex_for_type(button_corner_type t) const 
 }
 
 ltrb button_corners_info::cornered_rc_to_internal_rc(ltrb l) const {
-	auto& manager = get_resource_manager();
-	l.l += manager.find(get_tex_for_type(button_corner_type::L))->get_size().x;
-	l.t += manager.find(get_tex_for_type(button_corner_type::T))->get_size().y;
-	l.r -= manager.find(get_tex_for_type(button_corner_type::R))->get_size().x;
-	l.b -= manager.find(get_tex_for_type(button_corner_type::B))->get_size().y;
+	const auto& manager = get_assets_manager();
+	l.l += manager[get_tex_for_type(button_corner_type::L)].get_size().x;
+	l.t += manager[get_tex_for_type(button_corner_type::T)].get_size().y;
+	l.r -= manager[get_tex_for_type(button_corner_type::R)].get_size().x;
+	l.b -= manager[get_tex_for_type(button_corner_type::B)].get_size().y;
 	return l;
 }
 
 ltrb button_corners_info::internal_rc_to_cornered_rc(ltrb l) const {
-	auto& manager = get_resource_manager();
-	l.l += manager.find(get_tex_for_type(button_corner_type::L))->get_size().x;
-	l.t += manager.find(get_tex_for_type(button_corner_type::T))->get_size().y;
-	l.r -= manager.find(get_tex_for_type(button_corner_type::R))->get_size().x;
-	l.b -= manager.find(get_tex_for_type(button_corner_type::B))->get_size().y;
+	const auto& manager = get_assets_manager();
+	l.l += manager[get_tex_for_type(button_corner_type::L)].get_size().x;
+	l.t += manager[get_tex_for_type(button_corner_type::T)].get_size().y;
+	l.r -= manager[get_tex_for_type(button_corner_type::R)].get_size().x;
+	l.b -= manager[get_tex_for_type(button_corner_type::B)].get_size().y;
 	return l;
 }
 
 vec2i button_corners_info::cornered_size_to_internal_size(vec2i l) const {
-	auto& manager = get_resource_manager();
-	l.x -= manager.find(get_tex_for_type(button_corner_type::L))->get_size().x;
-	l.x -= manager.find(get_tex_for_type(button_corner_type::R))->get_size().x;
-	l.y -= manager.find(get_tex_for_type(button_corner_type::T))->get_size().y;
-	l.y -= manager.find(get_tex_for_type(button_corner_type::B))->get_size().y;
+	const auto& manager = get_assets_manager();
+	l.x -= manager[get_tex_for_type(button_corner_type::L)].get_size().x;
+	l.x -= manager[get_tex_for_type(button_corner_type::R)].get_size().x;
+	l.y -= manager[get_tex_for_type(button_corner_type::T)].get_size().y;
+	l.y -= manager[get_tex_for_type(button_corner_type::B)].get_size().y;
 	return l;
 }
 
 vec2i button_corners_info::internal_size_to_cornered_size(vec2i l) const {
-	auto& manager = get_resource_manager();
-	l.x += manager.find(get_tex_for_type(button_corner_type::L))->get_size().x;
-	l.x += manager.find(get_tex_for_type(button_corner_type::R))->get_size().x;
-	l.y += manager.find(get_tex_for_type(button_corner_type::T))->get_size().y;
-	l.y += manager.find(get_tex_for_type(button_corner_type::B))->get_size().y;
+	const auto& manager = get_assets_manager();
+	l.x += manager[get_tex_for_type(button_corner_type::L)].get_size().x;
+	l.x += manager[get_tex_for_type(button_corner_type::R)].get_size().x;
+	l.y += manager[get_tex_for_type(button_corner_type::T)].get_size().y;
+	l.y += manager[get_tex_for_type(button_corner_type::B)].get_size().y;
 	return l;
 }

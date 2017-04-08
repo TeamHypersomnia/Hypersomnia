@@ -37,9 +37,11 @@ void trace_system::lengthen_sprites_of_traces(const logic_step step) const {
 				surplus_multiplier = (trace.chosen_multiplier + vec2(1, 1)) * (1.f - (trace.lengthening_time_passed_ms / trace.chosen_lengthening_duration_ms)) - vec2(1, 1);
 			}
 
-			sprite.size_multiplier = vec2(1, 1) + surplus_multiplier;
+			const auto original_image_size = step.cosm[sprite.tex].get_size();
+			const auto size_multiplier = trace.additional_multiplier + surplus_multiplier;
 
-			sprite.center_offset = sprite.size * (surplus_multiplier / 2.f);
+			sprite.size = size_multiplier * original_image_size;
+			sprite.center_offset = original_image_size * (surplus_multiplier / 2.f);
 
 			trace.lengthening_time_passed_ms += static_cast<float>(delta.in_milliseconds());
 		}
@@ -91,7 +93,7 @@ void trace_system::spawn_finishing_traces_for_destroyed_objects(const logic_step
 			if (e.find<components::damage>()) {
 				finishing_trace.get<components::transform>().pos = e.get<components::damage>().saved_point_of_impact_before_death - 
 					(e.get<components::sprite>().size/2).rotate(finishing_trace.get<components::transform>().rotation, vec2(0,0))
-					;
+				;
 			}
 
 			finishing_trace.add_standard_components();

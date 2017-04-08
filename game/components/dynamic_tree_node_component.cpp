@@ -9,21 +9,17 @@
 #include "game/components/inferred_state_component.h"
 #include "game/components/wandering_pixels_component.h"
 #include "game/components/sound_existence_component.h"
+#include "game/components/render_component.h"
 
 #include "game/transcendental/cosmos.h"
 
 #include "augs/ensure.h"
 
 namespace components {
-	dynamic_tree_node dynamic_tree_node::get_default(const_entity_handle e) {
+	dynamic_tree_node dynamic_tree_node::create_default_for(const_entity_handle e) {
 		dynamic_tree_node result;
 
 		const auto* const render = e.find<components::render>();
-
-		if (render && render->screen_space_transform) {
-			result.always_visible = true;
-			return result;
-		}
 
 		result.aabb = e.get_aabb();
 
@@ -47,7 +43,7 @@ void component_synchronizer<false, D>::reinference() const {
 }
 
 void component_synchronizer<false, D>::update_proxy() const {
-	const auto new_aabb = components::dynamic_tree_node::get_default(handle).aabb;
+	const auto new_aabb = components::dynamic_tree_node::create_default_for(handle).aabb;
 	const vec2 displacement = new_aabb.center() - component.aabb.center();
 	component.aabb = new_aabb;
 

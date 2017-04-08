@@ -171,6 +171,25 @@ namespace augs {
 		return get_id();
 	}
 	
+	sound_buffer_logical_meta sound_buffer::get_logical_meta() const {
+		sound_buffer_logical_meta output;
+		output.num_of_variations = variations.size();
+
+		const auto len = [](const variation& v) {
+			return v.request_original().get_length_in_seconds();
+		};
+
+		output.max_duration_in_seconds = len(*std::max_element(
+			variations.begin(),
+			variations.end(),
+			[len](const variation& a, const variation& b) {
+				return len(a) < len(b);
+			}
+		));
+
+		return output;
+	}
+	
 	std::vector<int16_t> mix_stereo_to_mono(const std::vector<int16_t>& samples) {
 		ensure(samples.size() % 2 == 0);
 		

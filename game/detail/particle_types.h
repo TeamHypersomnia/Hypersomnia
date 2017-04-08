@@ -6,10 +6,13 @@
 #include "game/transcendental/entity_id.h"
 
 struct general_particle {
+	// GEN INTROSPECTOR struct general_particle
 	vec2 pos;
 	vec2 vel;
 	vec2 acc;
-	components::sprite face;
+	assets::game_image_id image_id;
+	rgba color;
+	vec2 size;
 	float rotation = 0.f;
 	float rotation_speed = 0.f;
 	float linear_damping = 0.f;
@@ -20,6 +23,7 @@ struct general_particle {
 	float unshrinking_time_ms = 0.f;
 
 	int alpha_levels = -1;
+	// END GEN INTROSPECTOR
 
 	void integrate(const float dt);
 	void draw(components::sprite::drawing_input basic_input) const;
@@ -33,9 +37,21 @@ struct general_particle {
 	void set_rotation_speed(const float);
 	void set_max_lifetime_ms(const float);
 	void colorize(const rgba);
+
+	void set_image(
+		const assets::game_image_id,
+		const rgba
+	);
+
+	void set_image(
+		const assets::game_image_id,
+		vec2 size,
+		const rgba
+	);
 };
 
 struct animated_particle {
+	// GEN INTROSPECTOR struct animated_particle
 	vec2 pos;
 	vec2 vel;
 	vec2 acc;
@@ -47,6 +63,7 @@ struct animated_particle {
 	rgba color;
 	float frame_duration_ms;
 	unsigned frame_count = 0;
+	// END GEN INTROSPECTOR
 
 	void integrate(const float dt);
 	void draw(components::sprite::drawing_input basic_input) const;
@@ -63,6 +80,7 @@ struct animated_particle {
 };
 
 struct homing_animated_particle {
+	// GEN INTROSPECTOR struct homing_animated_particle
 	vec2 pos;
 	vec2 vel;
 	vec2 acc;
@@ -76,6 +94,7 @@ struct homing_animated_particle {
 	rgba color;
 	float frame_duration_ms;
 	unsigned frame_count = 0;
+	// END GEN INTROSPECTOR
 
 	void integrate(
 		const float dt, 

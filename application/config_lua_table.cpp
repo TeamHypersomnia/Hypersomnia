@@ -26,8 +26,8 @@ static void get_config_value(augs::lua_state_raii& lua, const std::string& field
 void config_lua_table::get_values(augs::lua_state_raii& lua) {
 	std::string current_prefix;
 
-	static_assert(!bind_types<can_stream_right, std::istringstream>::type<debug_drawing_settings>::value, "Trait is wrong");
-	static_assert(!bind_types<can_stream_right, std::istringstream>::type<debug_drawing_settings&>::value, "Trait is wrong");
+	static_assert(!bind_types<can_stream_right, std::istringstream>::type<debug_drawing_settings>::value, "Trait has failed");
+	static_assert(!bind_types<can_stream_right, std::istringstream>::type<debug_drawing_settings&>::value, "Trait has failed");
 
 	augs::introspect_recursive_with_prologues <
 		bind_types_t<can_stream_right, std::istringstream>,

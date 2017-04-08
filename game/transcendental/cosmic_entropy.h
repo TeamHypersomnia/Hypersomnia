@@ -11,7 +11,7 @@
 
 #include "augs/misc/machine_entropy.h"
 
-#include "game/enums/spell_type.h"
+#include "game/assets/spell_id.h"
 #include "augs/misc/container_with_small_size.h"
 
 class cosmos;
@@ -21,7 +21,7 @@ struct basic_cosmic_entropy {
 	typedef key key_type;
 
 	// GEN INTROSPECTOR struct basic_cosmic_entropy class key
-	augs::container_with_small_size<std::unordered_map<key, spell_type>, unsigned char> cast_spells;
+	augs::container_with_small_size<std::unordered_map<key, assets::spell_id>, unsigned char> cast_spells;
 	augs::container_with_small_size<std::unordered_map<key, key_and_mouse_intent_vector>, unsigned char> intents_per_entity;
 	augs::container_with_small_size<std::vector<basic_item_slot_transfer_request_data<key>>, unsigned short> transfer_requests;
 	// END GEN INTROSPECTOR

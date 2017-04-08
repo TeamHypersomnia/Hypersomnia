@@ -26,6 +26,10 @@ struct animation {
 	loop_type loop_mode = loop_type::REPEAT;
 	// END GEN INTROSPECTOR
 
+	animation get_logical_meta() const {
+		return *this;
+	}
+
 	void create_frames(
 		const assets::game_image_id first_frame,
 		const assets::game_image_id last_frame,

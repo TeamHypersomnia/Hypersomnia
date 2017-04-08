@@ -64,6 +64,8 @@ void sound_system::play_nearby_sound_existences(
 	augs::set_listener_velocity(si, subject.get_effective_velocity());
 	augs::set_listener_orientation({ 0.f, -1.f, 0.f, 0.f, 0.f, -1.f });
 
+	const auto& manager = get_assets_manager();
+
 	cosmos.for_each(
 		processing_subjects::WITH_SOUND_EXISTENCE, 
 		[&](const auto it) {
@@ -71,7 +73,7 @@ void sound_system::play_nearby_sound_existences(
 			const auto& existence = it.get<components::sound_existence>();
 			auto& source = cache.source;
 
-			const auto& buffer = get_resource_manager().find(existence.input.effect.id)->get_variation(existence.input.variation_number);
+			const auto& buffer = manager[existence.input.effect.id].get_variation(existence.input.variation_number);
 
 			const auto& requested_buf = existence.input.direct_listener == listening_character ? buffer.request_stereo() : buffer.request_mono();
 

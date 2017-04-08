@@ -15,6 +15,7 @@
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/name_component.h"
 #include "game/components/item_component.h"
+#include "game/components/render_component.h"
 #include "game/systems_stateless/render_system.h"
 
 #include "game/detail/gui/drag_and_drop.h"
@@ -310,6 +311,7 @@ void character_gui::draw(
 
 void character_gui::draw_cursor_with_information(const viewing_game_gui_context context) const {
 	const auto drag_amount = context.get_rect_world().current_drag_amount;
+	const auto& manager = get_assets_manager();
 
 	auto& output_buffer = context.get_output_buffer();
 	auto gui_cursor = assets::game_image_id::GUI_CURSOR;
@@ -317,7 +319,7 @@ void character_gui::draw_cursor_with_information(const viewing_game_gui_context 
 	auto gui_cursor_position = get_gui_crosshair_position();
 
 	auto get_tooltip_position = [&]() {
-		return get_gui_crosshair_position() + (*gui_cursor).get_size();
+		return get_gui_crosshair_position() + manager[gui_cursor].get_size();
 	};
 
 	auto draw_cursor_hint = [&](const auto& hint_text, const vec2i cursor_position, const vec2i cursor_size) {
@@ -379,7 +381,7 @@ void character_gui::draw_cursor_with_information(const viewing_game_gui_context 
 				gui_cursor = assets::game_image_id::GUI_CURSOR_MINUS;
 				gui_cursor_color = red;
 
-				gui_cursor_position = draw_cursor_hint(L"Clear assignment", get_gui_crosshair_position(), (*gui_cursor).get_size());
+				gui_cursor_position = draw_cursor_hint(L"Clear assignment", get_gui_crosshair_position(), manager[gui_cursor].get_size());
 			}
 			else {
 				const auto drawn_pos = drag_amount;
@@ -391,7 +393,7 @@ void character_gui::draw_cursor_with_information(const viewing_game_gui_context 
 			const auto& item = context.get_cosmos()[dragged_item_button.get_location().item_id].get<components::item>();
 
 			if (item.charges > 1) {
-				const auto gui_cursor_size = (*gui_cursor).get_size();
+				const auto gui_cursor_size = manager[gui_cursor].get_size();
 
 				const auto charges_text = to_wstring(dragged_charges);
 
@@ -425,7 +427,7 @@ void character_gui::draw_cursor_with_information(const viewing_game_gui_context 
 				gui_cursor_color = green;
 			}
 
-			gui_cursor_position = draw_cursor_hint(transfer_data.hint_text, get_gui_crosshair_position(), (*gui_cursor).get_size());
+			gui_cursor_position = draw_cursor_hint(transfer_data.hint_text, get_gui_crosshair_position(), manager[gui_cursor].get_size());
 		}
 		else if (drag_result.is<drop_for_item_slot_transfer>()) {
 			const auto& transfer_data = drag_result.get<drop_for_item_slot_transfer>();
@@ -457,7 +459,7 @@ void character_gui::draw_cursor_with_information(const viewing_game_gui_context 
 				gui_cursor_color = red;
 			}
 
-			gui_cursor_position = draw_cursor_hint(transfer_data.hint_text, get_gui_crosshair_position(), (*gui_cursor).get_size());
+			gui_cursor_position = draw_cursor_hint(transfer_data.hint_text, get_gui_crosshair_position(), manager[gui_cursor].get_size());
 		}
 	}
 
@@ -492,9 +494,9 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 	else if (maybe_hovered_action_button) {
 		const auto bound_spell = maybe_hovered_action_button->bound_spell;
 
-		if (bound_spell != spell_type::COUNT) {
+		if (bound_spell != assets::spell_id::COUNT) {
 			tooltip_text = text::format_as_bbcode(
-				describe_spell(
+				get_bbcoded_spell_description(
 					gui_entity,
 					bound_spell
 				),

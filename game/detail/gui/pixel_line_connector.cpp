@@ -1,5 +1,6 @@
 #include "pixel_line_connector.h"
 #include "augs/graphics/drawers.h"
+#include "game/resources/manager.h"
 
 augs::constant_size_vector<std::array<vec2i, 2>, 2> get_connecting_pixel_lines(
 	const ltrb& a,
@@ -130,7 +131,9 @@ void draw_pixel_line_connector(
 	const augs::gui::draw_info in,
 	const rgba col
 ) {
+	const auto& manager = get_assets_manager();
+
 	for (const auto l : get_connecting_pixel_lines(a, b)) {
-		augs::draw_line(in.v, l[0], l[1], 1, *assets::game_image_id::BLANK, col);
+		augs::draw_line(in.v, l[0], l[1], 1, manager[assets::game_image_id::BLANK].texture_maps[texture_map_type::DIFFUSE], col);
 	}
 }

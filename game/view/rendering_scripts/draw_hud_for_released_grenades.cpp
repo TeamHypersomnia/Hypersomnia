@@ -14,6 +14,7 @@ namespace rendering_scripts {
 		const double global_time_seconds
 	) {
 		const auto dt = cosm.get_fixed_delta();
+		const auto& manager = get_assets_manager();
 
 		cosm.for_each(
 			processing_subjects::WITH_GRENADE,
@@ -39,7 +40,13 @@ namespace rendering_scripts {
 						const auto col = augs::interp(white, red_violet, (1 - highlight_amount)* (1 - highlight_amount));
 
 						components::sprite spr;
-						spr.set(assets::game_image_id::HUD_CIRCULAR_BAR_SMALL, col);
+
+						spr.set(
+							assets::game_image_id::HUD_CIRCULAR_BAR_SMALL, 
+							manager[assets::game_image_id::HUD_CIRCULAR_BAR_SMALL].get_size(),
+							col
+						);
+
 						spr.draw(highlight);
 
 						augs::special s;

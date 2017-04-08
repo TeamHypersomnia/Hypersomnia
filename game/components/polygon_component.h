@@ -15,11 +15,14 @@ namespace augs {
 	struct texture_atlas_entry;
 }
 
+struct convex_partitioned_shape;
+
 namespace components {
 	struct polygon {
 		enum class uv_mapping_mode {
-			OVERLAY,
-			STRETCH
+			STRETCH,
+
+			COUNT
 		};
 
 		struct drawing_input : basic_renderable_drawing_input {
@@ -30,14 +33,15 @@ namespace components {
 		};
 
 		// GEN INTROSPECTOR struct components::polygon
-		assets::game_image_id center_neon_map = assets::game_image_id::COUNT;
+		assets::game_image_id texture_map = assets::game_image_id::COUNT;
+
 		augs::constant_size_vector<augs::vertex, RENDERING_POLYGON_TRIANGULATED_VERTEX_COUNT> vertices;
 		augs::constant_size_vector<zeroed_pod<unsigned>, RENDERING_POLYGON_INDEX_COUNT> triangulation_indices;
 
 		// END GEN INTROSPECTOR
 		
-		void automatically_map_uv(const assets::game_image_id, const uv_mapping_mode);
-		void from_polygonized_texture(const assets::game_image_id);
+		void automatically_map_uv(const uv_mapping_mode);
+		void add_vertices_from(const convex_partitioned_shape&);
 
 		/* triangulates input */
 		void add_concave_polygon(std::vector<augs::vertex>);

@@ -208,7 +208,6 @@ namespace prefabs {
 
 		{
 			auto& s = ingredients::add_sprite(round_definition, pos, assets::game_image_id::ROUND_TRACE, red, render_layer::FLYING_BULLETS);
-			s.size *= vec2(2, 0.5);
 			ingredients::add_bullet_round_physics(round_definition);
 
 			auto& damage = round_definition += components::damage();
@@ -240,6 +239,7 @@ namespace prefabs {
 			trace.max_multiplier_x = std::make_pair(0.0f, 1.2f);
 			trace.max_multiplier_y = std::make_pair(0.f, 0.f);
 			trace.lengthening_duration_ms = std::make_pair(200.f, 250.f);
+			trace.additional_multiplier = vec2(2, 0.5);
 		}
 
 		{
@@ -279,7 +279,6 @@ namespace prefabs {
 
 		{
 			auto& s = ingredients::add_sprite(round_definition, pos, assets::game_image_id::ROUND_TRACE, pink, render_layer::FLYING_BULLETS);
-			s.size *= vec2(2, 0.5);
 			ingredients::add_bullet_round_physics(round_definition);
 			
 			auto& damage = round_definition += components::damage();
@@ -306,6 +305,7 @@ namespace prefabs {
 			damage.muzzle_leave_particle_effect_response.modifier.colorize = pink;
 
 			auto& trace = round_definition += components::trace();
+			trace.additional_multiplier = vec2(2, 0.5);
 			trace.max_multiplier_x = std::make_pair(0.0f, 1.2f);
 			trace.max_multiplier_y = std::make_pair(0.f, 0.f);
 			trace.lengthening_duration_ms = std::make_pair(200.f, 250.f);
@@ -348,7 +348,6 @@ namespace prefabs {
 
 		{
 			auto& s = ingredients::add_sprite(round_definition, pos, assets::game_image_id::ROUND_TRACE, cyan, render_layer::FLYING_BULLETS);
-			s.size *= vec2(2, 0.5);
 			ingredients::add_bullet_round_physics(round_definition);
 
 			auto& damage = round_definition += components::damage();
@@ -377,6 +376,7 @@ namespace prefabs {
 			trace.max_multiplier_x = std::make_pair(0.0f, 1.2f);
 			trace.max_multiplier_y = std::make_pair(0.f, 0.f);
 			trace.lengthening_duration_ms = std::make_pair(200.f, 250.f);
+			trace.additional_multiplier = vec2(2, 0.5);
 		}
 
 		{
@@ -412,7 +412,6 @@ namespace prefabs {
 
 		{
 			auto& s = ingredients::add_sprite(round_definition, pos, assets::game_image_id::ROUND_TRACE, green, render_layer::FLYING_BULLETS);
-			s.size *= vec2(2.f, 0.5f);
 			ingredients::add_bullet_round_physics(round_definition);
 
 			auto& damage = round_definition += components::damage();
@@ -423,6 +422,7 @@ namespace prefabs {
 			trace.max_multiplier_x = std::make_pair(0.0f, 3.5f);
 			trace.max_multiplier_y = std::make_pair(0.f, 0.f);
 			trace.lengthening_duration_ms = std::make_pair(200.f, 250.f);
+			trace.additional_multiplier = vec2(2.f, 0.5f);
 		}
 
 		{

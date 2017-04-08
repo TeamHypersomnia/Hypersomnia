@@ -2,7 +2,7 @@
 #include <bitset>
 #include "augs/ensure.h"
 #include "augs/templates/maybe_const.h"
-#include "augs/misc/introspect.h"
+#include "augs/templates/introspect.h"
 
 namespace augs {
 	template<class Enum, class T>
@@ -11,11 +11,13 @@ namespace augs {
 		typedef Enum key_type;
 		typedef T mapped_type;
 	private:
+		static constexpr size_t max_n = static_cast<size_t>(key_type::COUNT);
 
-		typedef std::array<mapped_type, size_t(key_type::COUNT)> arr_type;
+		typedef std::array<mapped_type, max_n> arr_type;
+		typedef std::bitset<max_n> bitset_type;
 
 		// GEN INTROSPECTOR class augs::enum_associative_array class key_type class mapped_type
-		std::bitset<size_t(key_type::COUNT)> is_set;
+		bitset_type is_set;
 		arr_type raw;
 		// END GEN INTROSPECTOR
 
@@ -27,7 +29,7 @@ namespace augs {
 		);
 
 		unsigned find_first_set_index(unsigned from) const {
-			while (from < static_cast<size_t>(key_type::COUNT) && !is_set.test(from)) {
+			while (from < max_n && !is_set.test(from)) {
 				++from;
 			}
 
@@ -84,7 +86,7 @@ namespace augs {
 		}
 
 		iterator end() {
-			return iterator(this, static_cast<size_t>(key_type::COUNT));
+			return iterator(this, max_n);
 		}
 
 		const_iterator begin() const {
@@ -92,7 +94,7 @@ namespace augs {
 		}
 
 		const_iterator end() const {
-			return const_iterator(this, static_cast<size_t>(key_type::COUNT));
+			return const_iterator(this, max_n);
 		}
 
 		iterator find(const key_type enum_idx) {
@@ -118,19 +120,21 @@ namespace augs {
 		}
 
 		mapped_type& at(const key_type enum_idx) {
-			const size_t i = static_cast<size_t>(enum_idx);
-			ensure(i < capacity() && is_set.test(i));
+			const auto i = static_cast<size_t>(enum_idx);
+			ensure(i < capacity());
+			ensure(is_set.test(i));
 			return raw[i];
 		}
 
 		const mapped_type& at(const key_type enum_idx) const {
-			const size_t i = static_cast<size_t>(enum_idx);
-			ensure(i < capacity() && is_set.test(i));
+			const auto i = static_cast<size_t>(enum_idx);
+			ensure(i < capacity());
+			ensure(is_set.test(i));
 			return raw[i];
 		}
 
 		mapped_type& operator[](const key_type enum_idx) {
-			const size_t i = static_cast<size_t>(enum_idx);
+			const auto i = static_cast<size_t>(enum_idx);
 
 			if (!is_set.test(i)) {
 				is_set.set(i);
@@ -153,7 +157,7 @@ namespace augs {
 				new (&v) mapped_type;
 			}
 
-			is_set = std::bitset<static_cast<size_t>(key_type::COUNT)>();
+			is_set = bitset_type();
 		}
 	};
 }

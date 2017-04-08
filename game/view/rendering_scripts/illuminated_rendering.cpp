@@ -13,6 +13,7 @@
 #include "game/view/viewing_step.h"
 #include "game/view/viewing_session.h"
 #include "game/components/item_slot_transfers_component.h"
+#include "game/components/render_component.h"
 
 #include "augs/graphics/drawers.h"
 
@@ -50,15 +51,17 @@ namespace rendering_scripts {
 
 		const auto& visible_per_layer = step.visible.per_layer;
 
-		auto& default_shader = *get_resource_manager().find(assets::program_id::DEFAULT);
-		auto& illuminated_shader = *get_resource_manager().find(assets::program_id::DEFAULT_ILLUMINATED);
-		auto& specular_highlights_shader = *get_resource_manager().find(assets::program_id::SPECULAR_HIGHLIGHTS);
-		auto& pure_color_highlight_shader = *get_resource_manager().find(assets::program_id::PURE_COLOR_HIGHLIGHT);
-		auto& border_highlight_shader = pure_color_highlight_shader; // the same
-		auto& circular_bars_shader = *get_resource_manager().find(assets::program_id::CIRCULAR_BARS);
-		auto& smoke_shader = *get_resource_manager().find(assets::program_id::SMOKE);
-		auto& illuminating_smoke_shader = *get_resource_manager().find(assets::program_id::ILLUMINATING_SMOKE);
-		auto& exploding_rings_shader = *get_resource_manager().find(assets::program_id::EXPLODING_RING);
+		const auto& manager = get_assets_manager();
+
+		const auto& default_shader = manager[assets::program_id::DEFAULT];
+		const auto& illuminated_shader = manager[assets::program_id::DEFAULT_ILLUMINATED];
+		const auto& specular_highlights_shader = manager[assets::program_id::SPECULAR_HIGHLIGHTS];
+		const auto& pure_color_highlight_shader = manager[assets::program_id::PURE_COLOR_HIGHLIGHT];
+		const auto& border_highlight_shader = pure_color_highlight_shader; // the same
+		const auto& circular_bars_shader = manager[assets::program_id::CIRCULAR_BARS];
+		const auto& smoke_shader = manager[assets::program_id::SMOKE];
+		const auto& illuminating_smoke_shader = manager[assets::program_id::ILLUMINATING_SMOKE];
+		const auto& exploding_rings_shader = manager[assets::program_id::EXPLODING_RING];
 		
 		default_shader.use();
 		{
@@ -115,10 +118,10 @@ namespace rendering_scripts {
 							return;
 						}
 
-						const auto& edge_tex = get_resource_manager().find(assets::game_image_id::LASER_GLOW_EDGE)->texture_maps[texture_map_type::DIFFUSE];
+						const auto& edge_tex = manager[assets::game_image_id::LASER_GLOW_EDGE].texture_maps[texture_map_type::DIFFUSE];
 						const vec2 edge_size = static_cast<vec2>(edge_tex.get_size());
 
-						augs::draw_line(output, camera[from], camera[to], edge_size.y/3.f, get_resource_manager().find(assets::game_image_id::LASER)->texture_maps[texture_map_type::NEON], col);
+						augs::draw_line(output, camera[from], camera[to], edge_size.y/3.f, manager[assets::game_image_id::LASER].texture_maps[texture_map_type::NEON], col);
 
 						const auto edge_offset = (to - from).set_length(edge_size.x);
 
@@ -236,7 +239,7 @@ namespace rendering_scripts {
 						renderer.lines, 
 						camera[from], 
 						camera[to], 
-						get_resource_manager().find(assets::game_image_id::LASER)->texture_maps[texture_map_type::DIFFUSE], 
+						manager[assets::game_image_id::LASER].texture_maps[texture_map_type::DIFFUSE], 
 						col
 					);
 				},
@@ -246,7 +249,7 @@ namespace rendering_scripts {
 						renderer.lines,
 						camera[from],
 						camera[to],
-						get_resource_manager().find(assets::game_image_id::LASER)->texture_maps[texture_map_type::DIFFUSE],
+						manager[assets::game_image_id::LASER].texture_maps[texture_map_type::DIFFUSE],
 						white,
 						10.f,
 						40.f, 
@@ -291,8 +294,8 @@ namespace rendering_scripts {
 		}
 
 		const auto set_center_uniform = [&](const auto image_id) {
-			const auto upper = (*image_id).get_atlas_space_uv({ 0.0f, 0.0f });
-			const auto lower = (*image_id).get_atlas_space_uv({ 1.f, 1.f });
+			const auto upper = manager[image_id].texture_maps[texture_map_type::DIFFUSE].get_atlas_space_uv({ 0.0f, 0.0f });
+			const auto lower = manager[image_id].texture_maps[texture_map_type::DIFFUSE].get_atlas_space_uv({ 1.f, 1.f });
 			const auto center = (upper + lower) / 2;
 
 			glUniform2f(glGetUniformLocation(circular_bars_shader.id, "texture_center"), center.x, center.y);
@@ -374,7 +377,7 @@ namespace rendering_scripts {
 			}
 		}
 
-		renderer.bind_texture(*get_resource_manager().find(assets::physical_texture_id::GAME_WORLD_ATLAS));
+		renderer.bind_texture(manager[assets::physical_texture_id::GAME_WORLD_ATLAS]);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();

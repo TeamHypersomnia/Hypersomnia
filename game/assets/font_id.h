@@ -8,10 +8,3 @@ namespace assets {
 		COUNT
 	};
 }
-
-namespace augs {
-	struct baked_font;
-}
-
-augs::baked_font& operator*(const assets::font_id& id);
-bool operator!(const assets::font_id& id);

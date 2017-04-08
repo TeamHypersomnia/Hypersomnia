@@ -1,6 +1,6 @@
 #pragma once
-#include "augs/templates/list_of.h"
 #include "augs/templates/for_each_in_types.h"
+#include "augs/entity_system/component_aggregate.h"
 
 #include "augs/misc/pool.h"
 #include "augs/misc/pooled_object_id.h"

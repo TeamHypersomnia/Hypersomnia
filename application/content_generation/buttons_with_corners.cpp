@@ -1,5 +1,8 @@
 #include "buttons_with_corners.h"
 #include "augs/gui/button_corners.h"
+
+#include "augs/misc/streams.h"
+
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 
