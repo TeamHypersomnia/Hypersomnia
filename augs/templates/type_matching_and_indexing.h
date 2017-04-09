@@ -36,14 +36,14 @@ template <size_t I, class T>
 static constexpr auto sequence_element_v = sequence_element<I, T>::value;
 
 template <
-	unsigned Index,
+	size_t Index,
 	template <class...> class Criterion,
 	class List
 >
 struct filter_types_detail;
 
 template <
-	unsigned Index,
+	size_t Index,
 	template <class...> class Criterion,
 	template <class...> class List
 >
@@ -57,7 +57,7 @@ struct filter_types_detail<
 };
 
 template <
-	unsigned Index,
+	size_t Index,
 	template <class...> class Criterion,
 	template <class...> class List,
 	class Head,
@@ -95,9 +95,7 @@ struct filter_types_detail<
 
 	template <size_t I>
 	struct get_type<I, std::enable_if_t<I < std::tuple_size_v<type>>> {
-		using type = std::decay_t<
-			decltype(std::get<I>(std::declval<type>()))
-		>;
+		using type = typename std::tuple_element<I, type>::type;
 	};
 };
 
@@ -151,15 +149,8 @@ using find_convertible_type_in_list_t = find_matching_type_in_list<bind_types_t<
 template <class S, class... Types>
 using find_convertible_type_in_t = find_convertible_type_in_list_t<S, std::tuple<Types...>>;
 
-template <unsigned idx, class... Types>
-struct nth_type_in {
-	static_assert(idx < sizeof...(Types), "Type index out of bounds!");
-	typedef std::decay_t<decltype(std::get<idx>(std::tuple<Types...>()))> type;
-};
-
-template<unsigned idx, class... Types>
-using nth_type_in_t = typename nth_type_in<idx, Types...>::type;
-
+template <size_t I, class... Types>
+using nth_type_in_t = typename std::tuple_element<I, std::tuple<Types...>>::type;
 
 template <class T, class Candidate>
 struct is_key_type_equal_to : std::bool_constant<std::is_same_v<T, typename Candidate::key_type>> {
