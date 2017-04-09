@@ -9,7 +9,7 @@ namespace augs {
 	struct texture_atlas_entry;
 }
 
-typedef cosmos logical_flyweights_manager;
+typedef cosmos logical_metas_manager;
 
 namespace components {
 	struct tile_layer_instance {
@@ -29,7 +29,7 @@ namespace components {
 		void draw(const drawing_input) const;
 		
 		ltrb get_aabb(
-			const logical_flyweights_manager&,
+			const logical_metas_manager&,
 			const components::transform transform
 		) const;
 

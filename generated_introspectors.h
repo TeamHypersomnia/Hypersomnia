@@ -72,8 +72,8 @@ template <class key>
 struct basic_cosmic_entropy;
 struct guid_mapped_entropy;
 struct cosmic_entropy;
-struct cosmos_metadata;
-struct cosmos_significant_state;
+class cosmos_metadata;
+class cosmos_significant_state;
 struct entity_guid;
 struct entity_id;
 struct child_entity_id;
@@ -1908,11 +1908,12 @@ namespace augs {
 			F f,
 			Instances&&... _t_
 		) {
-			FIELD(meta);
+
 			FIELD(logical_metas_of_assets);
 
 			FIELD(pool_for_aggregates);
 			FIELD(pools_for_components);
+			FIELD(meta);
 		}
 
 		template <class F, class... Instances>

@@ -507,8 +507,6 @@ TEST(CosmicDelta, PaddingSanityCheck2) {
 }
 
 TEST(CosmicDelta, CosmicDeltaPaddingTest) {
-	// static_assert(augs::is_byte_io_safe_v<augs::stream, cosmos_flyweights_state>, "cosmos_flyweights_state must be trivially copyable for delta-encoding");
-
 	auto padding_checker = [](auto c, auto... args) {
 		typedef decltype(c) component_type;
 		static_assert(std::is_same_v<std::decay_t<component_type>, component_type>, "Something's wrong with the types");

@@ -83,10 +83,10 @@ namespace components {
 
 
 	ltrb tile_layer_instance::get_aabb(
-		const logical_flyweights_manager& flyweights,
+		const logical_metas_manager& logical_metas,
 		const components::transform transform
 	) const {
-		const auto& layer = flyweights[id];
+		const auto& layer = logical_metas[id];
 		const auto tile_square_size = layer.get_tile_side();
 		const auto size = layer.get_size();
 

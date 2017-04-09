@@ -139,17 +139,17 @@ public:
 	template <class id_type>
 	decltype(auto) get_handle(
 		const id_type id,
-		find_flyweights_container_t<id_type>* enable_if_flyweight_type_found = nullptr
+		find_logical_metas_container_t<id_type>* enable_if_flyweight_type_found = nullptr
 	) {
-		return std::get<find_flyweights_container_t<id_type>>(significant.logical_metas_of_assets)[id];
+		return std::get<find_logical_metas_container_t<id_type>>(significant.logical_metas_of_assets)[id];
 	}
 
 	template <class id_type>
 	decltype(auto) get_handle(
 		const id_type id,
-		find_flyweights_container_t<id_type>* enable_if_flyweight_type_found = nullptr
+		find_logical_metas_container_t<id_type>* enable_if_flyweight_type_found = nullptr
 	) const {
-		return std::get<find_flyweights_container_t<id_type>>(significant.logical_metas_of_assets)[id];
+		return std::get<find_logical_metas_container_t<id_type>>(significant.logical_metas_of_assets)[id];
 	}
 
 	behaviour_tree& get_handle(const assets::behaviour_tree_id);
@@ -368,4 +368,4 @@ inline size_t cosmos::get_maximum_entities() const {
 	return significant.pool_for_aggregates.capacity();
 }
 
-typedef cosmos logical_flyweights_manager;
+typedef cosmos logical_metas_manager;
