@@ -7,10 +7,8 @@
 #include "augs/misc/streams.h"
 
 namespace augs {
-	typedef unsigned short delta_offset_type;
-
 	template <class offset_type>
-	std::vector<offset_type> run_length_encoding(const std::vector<char>& bit_data) {
+	auto run_length_encoding(const std::vector<char>& bit_data) {
 		ensure(bit_data.size() < std::numeric_limits<offset_type>::max());
 
 		std::vector<offset_type> output;
@@ -31,7 +29,7 @@ namespace augs {
 					}
 				}
 				else {
-					const delta_offset_type next_offset = i - current_vec_pos;
+					const offset_type next_offset = i - current_vec_pos;
 					
 					ensure(output.size() > 0);
 
