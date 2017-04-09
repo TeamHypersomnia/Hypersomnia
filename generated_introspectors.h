@@ -1900,8 +1900,6 @@ namespace augs {
 			FIELD(next_entity_guid);
 #endif
 			FIELD(settings);
-
-			FIELD(logical_metas_of_assets);
 		}
 
 		template <class F, class... Instances>
@@ -1911,6 +1909,7 @@ namespace augs {
 			Instances&&... _t_
 		) {
 			FIELD(meta);
+			FIELD(logical_metas_of_assets);
 
 			FIELD(pool_for_aggregates);
 			FIELD(pools_for_components);

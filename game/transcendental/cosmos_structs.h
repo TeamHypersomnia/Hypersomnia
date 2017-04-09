@@ -26,8 +26,6 @@ struct cosmos_metadata {
 #endif
 public:
 	all_simulation_settings settings;
-
-	assets_manager::tuple_of_all_logical_metas_of_assets logical_metas_of_assets;
 	// END GEN INTROSPECTOR
 };
 
@@ -36,6 +34,7 @@ typedef put_all_components_into_t<augs::operations_on_all_components_mixin, cosm
 struct cosmos_significant_state {
 	// GEN INTROSPECTOR struct cosmos_significant_state
 	cosmos_metadata meta;
+	assets_manager::tuple_of_all_logical_metas_of_assets logical_metas_of_assets;
 
 	typename cosmos_base::aggregate_pool_type pool_for_aggregates;
 	typename cosmos_base::component_pools_type pools_for_components;

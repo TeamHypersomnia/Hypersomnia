@@ -92,7 +92,11 @@ struct delted_stream_of_entities {
 	augs::stream stream_for_removed;
 };
 
-bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& out) {
+bool cosmic_delta::encode(
+	const cosmos& base, 
+	const cosmos& enco, 
+	augs::stream& out
+) {
 	const auto used_bits = out.size();
 	//should_eq(0, used_bits);
 
@@ -226,9 +230,27 @@ bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 
 	augs::stream new_meta_content;
 
-	const bool meta_changed = augs::write_delta(base.significant.meta, enco.significant.meta, new_meta_content, true);
+	const bool has_meta_changed = augs::write_delta(
+		base.significant.meta, 
+		enco.significant.meta, 
+		new_meta_content, 
+		true
+	);
 
-	const bool has_anything_changed = meta_changed || dt.new_entities || dt.changed_entities || dt.removed_entities;
+	const bool have_logical_metas_changed = augs::write_delta(
+		base.significant.logical_metas_of_assets,
+		enco.significant.logical_metas_of_assets,
+		new_meta_content,
+		true
+	);
+
+	const bool has_anything_changed = 
+		has_meta_changed
+		|| have_logical_metas_changed
+		|| dt.new_entities
+		|| dt.changed_entities 
+		|| dt.removed_entities
+	;
 
 	if (has_anything_changed) {
 		augs::write(out, true);
@@ -256,9 +278,14 @@ bool cosmic_delta::encode(const cosmos& base, const cosmos& enco, augs::stream& 
 	return has_anything_changed;
 }
 
-void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstantiate_partially) {
-	if (in.get_unread_bytes() == 0)
+void cosmic_delta::decode(
+	cosmos& deco, 
+	augs::stream& in, 
+	const bool resubstantiate_partially
+) {
+	if (in.get_unread_bytes() == 0) {
 		return;
+	}
 
 	bool has_anything_changed = false;
 
@@ -277,6 +304,7 @@ void cosmic_delta::decode(cosmos& deco, augs::stream& in, const bool resubstanti
 	deco.destroy_inferred_state_completely();
 
 	augs::read_delta(deco.significant.meta, in, true);
+	augs::read_delta(deco.significant.logical_metas_of_assets, in, true);
 
 	delted_stream_of_entities dt;
 

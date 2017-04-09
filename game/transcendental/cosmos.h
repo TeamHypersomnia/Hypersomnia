@@ -141,7 +141,7 @@ public:
 		const id_type id,
 		find_flyweights_container_t<id_type>* enable_if_flyweight_type_found = nullptr
 	) {
-		return std::get<find_flyweights_container_t<id_type>>(significant.meta.logical_metas_of_assets)[id];
+		return std::get<find_flyweights_container_t<id_type>>(significant.logical_metas_of_assets)[id];
 	}
 
 	template <class id_type>
@@ -149,7 +149,7 @@ public:
 		const id_type id,
 		find_flyweights_container_t<id_type>* enable_if_flyweight_type_found = nullptr
 	) const {
-		return std::get<find_flyweights_container_t<id_type>>(significant.meta.logical_metas_of_assets)[id];
+		return std::get<find_flyweights_container_t<id_type>>(significant.logical_metas_of_assets)[id];
 	}
 
 	behaviour_tree& get_handle(const assets::behaviour_tree_id);

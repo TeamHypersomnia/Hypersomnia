@@ -128,7 +128,7 @@ void assets_manager::write_logical_metas_of_assets_into(cosmos& cosmos) const {
 				target_map_of_logical_metas[asset_entry.first] = asset_entry.second.get_logical_meta();
 			}
 		},
-		cosmos.significant.meta.logical_metas_of_assets
+		cosmos.significant.logical_metas_of_assets
 	);
 }
 
