@@ -10,17 +10,17 @@ namespace augs {
 	typedef unsigned short delta_offset_type;
 
 	template <class delta_offset_type>
-	std::vector<delta_offset_type> run_length_encoding(const std::vector<bool>& bit_data) {
+	std::vector<delta_offset_type> run_length_encoding(const std::vector<char>& bit_data) {
 		ensure(bit_data.size() < std::numeric_limits<delta_offset_type>::max());
 
 		std::vector<delta_offset_type> output;
 
-		bool previous_value = false;
+		char previous_value = 0;
 		delta_offset_type current_vec_pos = 0;
 
 		for (delta_offset_type i = 0; i < bit_data.size(); ++i) {
 			if (previous_value != bit_data[i]) {
-				if (bit_data[i]) {
+				if (bit_data[i] != 0) {
 					if (!output.size()) {
 						output.push_back(i);
 						current_vec_pos += i;
@@ -31,7 +31,7 @@ namespace augs {
 					}
 				}
 				else {
-					delta_offset_type next_offset = i - current_vec_pos;
+					const delta_offset_type next_offset = i - current_vec_pos;
 					
 					ensure(output.size() > 0);
 
@@ -58,7 +58,10 @@ namespace augs {
 	};
 
 	template <class T>
-	auto delta_encode(const T& base_object, const T& encoded_object) {
+	auto delta_encode(
+		const T& base_object, 
+		const T& encoded_object
+	) {
 		static_assert(is_memcpy_safe_v<T>, "Attempt to encode a type that is not trivially copyable");
 
 		static constexpr auto length_bytes = sizeof(T);
@@ -72,25 +75,31 @@ namespace augs {
 		const delta_unit* const base_object_ptr = reinterpret_cast<const delta_unit*>(std::addressof(base_object));
 		const delta_unit* const encoded_object_ptr = reinterpret_cast<const delta_unit*>(std::addressof(encoded_object));
 
-		std::vector<bool> byte_mask;
-		byte_mask.reserve(length);
+		thread_local std::vector<char> diff_flags;
+		diff_flags.resize(length);
+
+		auto* const diff_flags_ptr = diff_flags.data();
 
 		for (size_t i = 0; i < length; ++i) {
-			if (base_object_ptr[i] == encoded_object_ptr[i])
-				byte_mask.push_back(false);
+			if (base_object_ptr[i] == encoded_object_ptr[i]) {
+				diff_flags_ptr[i] = 0;
+			}
 			else {
-				byte_mask.push_back(true);
+				diff_flags_ptr[i] = 1;
 				result.changed_bytes.push_back(encoded_object_ptr[i]);
 			}
 		}
 
-		result.changed_offsets = run_length_encoding<delta_offset_type>(byte_mask);
+		result.changed_offsets = run_length_encoding<delta_offset_type>(diff_flags);
 
 		return result;
 	};
 
 	template <class T>
-	void delta_decode(T& decoded, const object_delta<get_index_type_for_size_of_t<T>>& delta) {
+	void delta_decode(
+		T& decoded, 
+		const object_delta<get_index_type_for_size_of_t<T>>& delta
+	) {
 		static_assert(is_memcpy_safe_v<T>, "Attempt to decode a type that is not trivially copyable");
 
 		static constexpr auto length_bytes = sizeof(T);
