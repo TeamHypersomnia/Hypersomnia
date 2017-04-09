@@ -100,10 +100,6 @@ cosmos::cosmos(const unsigned reserved_entities) {
 	significant.meta.settings.si.set_pixels_per_meter(100.f);
 	entity_debug_names[0] = "dead entity";
 
-	if (assets_manager::current_exists()) {
-		assets_manager::get_current().write_logical_metas_of_assets_into(*this);
-	}
-
 	set_standard_behaviour_trees(*this);
 }
 
@@ -358,7 +354,7 @@ void cosmos::delete_entity(const entity_id e) {
 	delete_debug_name(e);
 }
 
-void cosmos::advance_deterministic_schemata(const cosmic_entropy& input) {
+void cosmos::advance_deterministic_schemata(const logic_step_input input) {
 	data_living_one_step transient;
 	logic_step step(*this, input, transient);
 
@@ -375,9 +371,9 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 
 	physics_system::contact_listener listener(step.cosm);
 	
-	perform_transfers(step.entropy.transfer_requests, step);
+	perform_transfers(step.input.entropy.transfer_requests, step);
 	
-	performance.entropy_length.measure(step.entropy.length());
+	performance.entropy_length.measure(step.input.entropy.length());
 
 	sentience_system().cast_spells(step);
 

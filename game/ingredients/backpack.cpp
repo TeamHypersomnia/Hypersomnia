@@ -28,16 +28,17 @@ namespace ingredients {
 }
 
 namespace prefabs {
-	entity_handle create_sample_backpack(cosmos& world, vec2 pos) {
+	entity_handle create_sample_backpack(const logic_step step, vec2 pos) {
+		auto& world = step.cosm;
 		auto def = world.create_entity("sample_backpack");
 
 		name_entity(def, entity_name::VIOLET_BACKPACK);
 		ingredients::add_backpack(def);
 
 		ingredients::add_sprite(def, pos, assets::game_image_id::BACKPACK, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::add_see_through_dynamic_body(def);
+		ingredients::add_see_through_dynamic_body(step, def);
 		
-		def.add_standard_components();
+		def.add_standard_components(step);
 		return def;
 	}
 }

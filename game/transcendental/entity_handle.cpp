@@ -30,7 +30,7 @@ std::ostream& operator<<(std::ostream& out, const const_entity_handle &x) {
 
 template <bool C>
 template <bool, class>
-basic_entity_handle<C> basic_entity_handle<C>::add_standard_components() const {
+basic_entity_handle<C> basic_entity_handle<C>::add_standard_components(const logic_step step) const {
 	ensure(alive());
 	const bool has_physics = has<components::rigid_body>();
 
@@ -59,7 +59,7 @@ basic_entity_handle<C> basic_entity_handle<C>::add_standard_components() const {
 		&& !is_entity_physical(*this) 
 		&& !has<components::tree_of_npo_node>()
 	) {
-		add(components::tree_of_npo_node::create_default_for(*this));
+		add(components::tree_of_npo_node::create_default_for(step, *this));
 	}
 
 	if (has<components::rigid_body>()) {
@@ -94,5 +94,5 @@ void basic_entity_handle<C>::recalculate_basic_processing_categories() const {
 }
 
 // explicit instantiation
-template basic_entity_handle<false> basic_entity_handle<false>::add_standard_components<false, void>() const;
+template basic_entity_handle<false> basic_entity_handle<false>::add_standard_components<false, void>(const logic_step) const;
 template void basic_entity_handle<false>::recalculate_basic_processing_categories<false, void>() const;

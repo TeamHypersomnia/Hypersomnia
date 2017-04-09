@@ -114,22 +114,26 @@ augs::graphics::shader_program& assets_manager::create(
 	return p;
 }
 
-void assets_manager::write_logical_metas_of_assets_into(cosmos& cosmos) const {
+all_logical_metas_of_assets assets_manager::generate_logical_metas_of_assets() const {
+	all_logical_metas_of_assets output;
+
 	augs::introspect(
 		[this](auto, auto& target_map_of_logical_metas) {
 			typedef std::decay_t<decltype(target_map_of_logical_metas)> map_type;
 			target_map_of_logical_metas.clear();
 	
 			const auto& source_map_of_assets = 
-				std::get<find_assets_container_t<typename map_type::key_type>>(all_assets)
+				get_container_with_key_type<typename map_type::key_type>(all)
 			;
 	
 			for (const auto& asset_entry : source_map_of_assets) {
-				target_map_of_logical_metas[asset_entry.first] = asset_entry.second.get_logical_meta();
+				target_map_of_logical_metas[asset_entry.first] = asset_entry.second.get_logical_meta(*this);
 			}
 		},
-		cosmos.significant.logical_metas_of_assets
+		output.all
 	);
+
+	return output;
 }
 
 void assets_manager::destroy_everything() {

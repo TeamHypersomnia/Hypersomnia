@@ -59,31 +59,41 @@ namespace scene_builders {
 		ensure(false);
 	}
 
-	void networked_testbed::populate_world_with_entities(cosmos& cosm) {
-		cosm.advance_deterministic_schemata(cosmic_entropy(), [this](const logic_step step) { populate(step); }, [](const const_logic_step) {});
+	void networked_testbed::populate_world_with_entities(
+		cosmos& cosm,
+		const all_logical_metas_of_assets& metas_of_assets
+	) {
+		cosm.advance_deterministic_schemata(
+			{ cosmic_entropy(), metas_of_assets }, 
+			[this](const logic_step step) { 
+				populate(step); 
+			}, 
+			[](const const_logic_step) {}
+		);
 	}
 
 	void networked_testbed::populate(const logic_step step) {
 		auto& world = step.cosm;
+		const auto& metas = step.input.metas_of_assets;
 
-		const auto crate = prefabs::create_crate(world, vec2(200, 200 + 300), vec2i(100, 100) / 3);
-		const auto crate2 = prefabs::create_crate(world, vec2(400, 200 + 400), vec2i(300, 300));
-		const auto crate4 = prefabs::create_crate(world, vec2(500, 200 + 0), vec2i(100, 100));
+		const auto crate = prefabs::create_crate(step, vec2(200, 200 + 300), vec2i(100, 100) / 3);
+		const auto crate2 = prefabs::create_crate(step, vec2(400, 200 + 400), vec2i(300, 300));
+		const auto crate4 = prefabs::create_crate(step, vec2(500, 200 + 0), vec2i(100, 100));
 
 		for (int x = -4; x < 4; ++x) {
 			for (int y = -4; y < 4; ++y) {
-				auto obstacle = prefabs::create_crate(world, vec2(2000.f + x * 300.f, -1000.f +2000.f + y * 300.f), vec2i(100, 100));
+				auto obstacle = prefabs::create_crate(step, vec2(2000.f + x * 300.f, -1000.f +2000.f + y * 300.f), vec2i(100, 100));
 			}
 		}
 
-		const auto car = prefabs::create_car(world, components::transform(-300, -600, -90));
-		const auto car2 = prefabs::create_car(world, components::transform(-800, -600, -90));
-		const auto car3 = prefabs::create_car(world, components::transform(-1300, -600, -90));
+		const auto car = prefabs::create_car(step, components::transform(-300, -600, -90));
+		const auto car2 = prefabs::create_car(step, components::transform(-800, -600, -90));
+		const auto car3 = prefabs::create_car(step, components::transform(-1300, -600, -90));
 
-		const auto motorcycle = prefabs::create_motorcycle(world, components::transform(0, -600, -90));
-		prefabs::create_motorcycle(world, components::transform(100, -600, -90));
+		const auto motorcycle = prefabs::create_motorcycle(step, components::transform(0, -600, -90));
+		prefabs::create_motorcycle(step, components::transform(100, -600, -90));
 
-		const vec2 bg_size = world[assets::game_image_id::TEST_BACKGROUND].get_size();
+		const vec2 bg_size = metas[assets::game_image_id::TEST_BACKGROUND].get_size();
 
 		const int num_floors = 10 * 10;
 		const int side = sqrt(num_floors) / 2;
@@ -99,8 +109,8 @@ namespace scene_builders {
 				ingredients::add_sprite(street, { bg_size * vec2(x, y) },
 					assets::game_image_id::TEST_BACKGROUND, gray1, render_layer::GROUND);
 
-				//background.add_standard_components();
-				street.add_standard_components();
+				//background.add_standard_components(step);
+				street.add_standard_components(step);
 			}
 
 		const int num_characters = 6;
@@ -118,40 +128,40 @@ namespace scene_builders {
 				l += components::transform();
 				auto& light = l += components::light();
 				light.color = red;
-				l.add_standard_components();
+				l.add_standard_components(step);
 			}
 			{
 				const auto l = world.create_entity("l");
 				l += components::transform(300, 0);
 				auto& light = l += components::light();
 				light.color = green;
-				l.add_standard_components();
+				l.add_standard_components(step);
 			}
 			{
 				const auto l = world.create_entity("l");
 				l += components::transform(600, 0);
 				auto& light = l += components::light();
 				light.color = blue;
-				l.add_standard_components();
+				l.add_standard_components(step);
 			}
 			{
 				const auto l = world.create_entity("l");
 				l += components::transform(900, 0);
 				auto& light = l += components::light();
 				light.color = cyan;
-				l.add_standard_components();
+				l.add_standard_components(step);
 			}
 			{
 				const auto l = world.create_entity("l");
 				l += components::transform(1200, 0);
 				auto& light = l += components::light();
 				light.color = orange;
-				l.add_standard_components();
+				l.add_standard_components(step);
 			}
 		}
 
 		for (int i = 0; i < num_characters; ++i) {
-			const auto new_character = prefabs::create_sample_complete_character(world, vec2(i * 300.f, 0), typesafe_sprintf("player%x", i));
+			const auto new_character = prefabs::create_sample_complete_character(step, vec2(i * 300.f, 0), typesafe_sprintf("player%x", i));
 
 			new_characters[i] = new_character;
 
@@ -190,17 +200,17 @@ namespace scene_builders {
 			name_entity(character(0), entity_name::PERSON, L"Attacker");
 		}
 
-		prefabs::create_sample_suppressor(world, vec2(300, -500));
+		prefabs::create_sample_suppressor(step, vec2(300, -500));
 
 		const bool many_charges = false;
 
 		const auto rifle = prefabs::create_sample_rifle(step, vec2(100, -500),
 			prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_cyan_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
+				prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
 
 		const auto rifle2 = prefabs::create_sample_rifle(step, vec2(100, -500 + 50),
 			prefabs::create_sample_magazine(step, vec2(100, -650), true ? "10" : "0.3",
-				prefabs::create_cyan_charge(world, vec2(0, 0), true ? 1000 : 30)));
+				prefabs::create_cyan_charge(step, vec2(0, 0), true ? 1000 : 30)));
 
 		prefabs::create_sample_rifle(step, vec2(100, -500 + 100));
 
@@ -208,38 +218,38 @@ namespace scene_builders {
 
 		const auto pis2 = prefabs::create_pistol(step, vec2(300, 50),
 			prefabs::create_sample_magazine(step, vec2(100, -650), "0.4",
-				prefabs::create_green_charge(world, vec2(0, 0), 40)));
+				prefabs::create_green_charge(step, vec2(0, 0), 40)));
 
 		const auto submachine = prefabs::create_submachine(step, vec2(500, -500 + 50),
-			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
+			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(step, vec2(0, 0), many_charges ? 500 : 50)));
 
 		prefabs::create_submachine(step, vec2(0, -1000),
-			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
+			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(step, vec2(0, 0), many_charges ? 500 : 50)));
 
 		prefabs::create_submachine(step, vec2(150, -1000 + 150),
-			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
+			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(step, vec2(0, 0), many_charges ? 500 : 50)));
 
 		prefabs::create_submachine(step, vec2(300, -1000 + 300),
-			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
+			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(step, vec2(0, 0), many_charges ? 500 : 50)));
 
 		prefabs::create_submachine(step, vec2(450, -1000 + 450),
-			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
+			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(step, vec2(0, 0), many_charges ? 500 : 50)));
 
 
 		prefabs::create_sample_magazine(step, vec2(100 - 50, -650));
 		prefabs::create_sample_magazine(step, vec2(100 - 100, -650), "0.30");
-		//prefabs::create_pink_charge(world, vec2(100, 100));
-		//prefabs::create_pink_charge(world, vec2(100, -400));
-		//prefabs::create_pink_charge(world, vec2(150, -400));
-		//prefabs::create_pink_charge(world, vec2(200, -400));
-		prefabs::create_cyan_charge(world, vec2(150, -500));
-		prefabs::create_cyan_charge(world, vec2(200, -500));
+		//prefabs::create_pink_charge(step, vec2(100, 100));
+		//prefabs::create_pink_charge(step, vec2(100, -400));
+		//prefabs::create_pink_charge(step, vec2(150, -400));
+		//prefabs::create_pink_charge(step, vec2(200, -400));
+		prefabs::create_cyan_charge(step, vec2(150, -500));
+		prefabs::create_cyan_charge(step, vec2(200, -500));
 
-		prefabs::create_cyan_urban_machete(world, vec2(100, 100));
-		const auto second_machete = prefabs::create_cyan_urban_machete(world, vec2(0, 0));
+		prefabs::create_cyan_urban_machete(step, vec2(100, 100));
+		const auto second_machete = prefabs::create_cyan_urban_machete(step, vec2(0, 0));
 
-		const auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
-		prefabs::create_sample_backpack(world, vec2(200, -750));
+		const auto backpack = prefabs::create_sample_backpack(step, vec2(200, -650));
+		prefabs::create_sample_backpack(step, vec2(200, -750));
 
 		perform_transfer({ backpack, character(0)[slot_function::SHOULDER_SLOT] }, step);
 		perform_transfer({ submachine, character(0)[slot_function::PRIMARY_HAND] }, step);
@@ -262,7 +272,7 @@ namespace scene_builders {
 
 		if (character(5).alive()) {
 			const auto new_item = prefabs::create_submachine(step, vec2(0, -1000),
-				prefabs::create_sample_magazine(step, vec2(100 - 50, -650), true ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), true ? 500 : 50)));
+				prefabs::create_sample_magazine(step, vec2(100 - 50, -650), true ? "10" : "0.5", prefabs::create_pink_charge(step, vec2(0, 0), true ? 500 : 50)));
 
 			perform_transfer({ new_item, character(5)[slot_function::PRIMARY_HAND] }, step);
 		}

@@ -10,18 +10,20 @@
 #include "game/components/wandering_pixels_component.h"
 #include "game/components/sound_existence_component.h"
 #include "game/components/render_component.h"
+#include "game/components/fixtures_component.h"
+#include "augs/graphics/drawers.h"
 
 #include "game/transcendental/cosmos.h"
 
 #include "augs/ensure.h"
 
 namespace components {
-	tree_of_npo_node tree_of_npo_node::create_default_for(const_entity_handle e) {
+	tree_of_npo_node tree_of_npo_node::create_default_for(const logic_step step, const_entity_handle e) {
 		tree_of_npo_node result;
 
 		const auto* const render = e.find<components::render>();
 
-		result.aabb = e.get_aabb();
+		result.aabb = e.get_aabb(step.input.metas_of_assets);
 
 		if (e.has<components::particles_existence>()) {
 			result.type = tree_of_npo_type::PARTICLE_EXISTENCES;
@@ -42,8 +44,8 @@ void component_synchronizer<false, D>::reinference() const {
 	handle.get_cosmos().partial_reinference<tree_of_npo_system>(handle);
 }
 
-void component_synchronizer<false, D>::update_proxy() const {
-	const auto new_aabb = components::tree_of_npo_node::create_default_for(handle).aabb;
+void component_synchronizer<false, D>::update_proxy(const logic_step step) const {
+	const auto new_aabb = components::tree_of_npo_node::create_default_for(step, handle).aabb;
 	const vec2 displacement = new_aabb.center() - component.aabb.center();
 	component.aabb = new_aabb;
 

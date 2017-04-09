@@ -40,9 +40,10 @@
 namespace scene_builders {
 	void testbed::populate(const logic_step step) {
 		auto& world = step.cosm;
-		//const auto crate = prefabs::create_crate(world, vec2(200, 200 + 300), vec2i(100, 100) / 3);
-		//const auto crate2 = prefabs::create_crate(world, vec2(400, 200 + 400), vec2i(300, 300));
-		//const auto crate4 = prefabs::create_crate(world, vec2(500, 200 + 0), vec2i(100, 100));
+		const auto& metas = step.input.metas_of_assets;
+		//const auto crate = prefabs::create_crate(step, vec2(200, 200 + 300), vec2i(100, 100) / 3);
+		//const auto crate2 = prefabs::create_crate(step, vec2(400, 200 + 400), vec2i(300, 300));
+		//const auto crate4 = prefabs::create_crate(step, vec2(500, 200 + 0), vec2i(100, 100));
 		//
 		//crates.push_back(crate);
 		//crates.push_back(crate2);
@@ -50,7 +51,7 @@ namespace scene_builders {
 
 		//for (int x = -4; x < 4; ++x) {
 		//	for (int y = -4; y < 4; ++y) {
-		//		auto obstacle = prefabs::create_crate(world, vec2(2000 + x * 300, 2000 + y * 300), vec2i(100, 100));
+		//		auto obstacle = prefabs::create_crate(step, vec2(2000 + x * 300, 2000 + y * 300), vec2i(100, 100));
 		//		crates.push_back(obstacle);
 		//	}
 		//}
@@ -61,35 +62,35 @@ namespace scene_builders {
 		//	ingredients::add_sprite(frog, vec2(100 + x * 40, 200 + 400), assets::game_image_id::TEST_SPRITE, white, render_layer::SMALL_DYNAMIC_BODY);
 		//	ingredients::add_see_through_dynamic_body(frog);
 		//	name_entity(frog, entity_name::CRATE);
-		//	frog.add_standard_components();
+		//	frog.add_standard_components(step);
 		//}
 
-		const auto car = prefabs::create_car(world, components::transform( 1490, 340, -180));
-		const auto car2 = prefabs::create_car(world, components::transform(1490, 340 + 400, -180));
-		const auto car3 = prefabs::create_car(world, components::transform(1490, 340 + 800, -180));
+		const auto car = prefabs::create_car(step, components::transform( 1490, 340, -180));
+		const auto car2 = prefabs::create_car(step, components::transform(1490, 340 + 400, -180));
+		const auto car3 = prefabs::create_car(step, components::transform(1490, 340 + 800, -180));
 
-		const auto motorcycle = prefabs::create_motorcycle(world, components::transform(250, 400, -90 + 180));
-		//prefabs::create_motorcycle(world, components::transform(100, -600, -90));
-		//const auto main_character_motorcycle = prefabs::create_motorcycle(world, components::transform(900, 48200, -90));
-		const auto main_character_motorcycle = prefabs::create_motorcycle(world, components::transform(900, 200, -90));
+		const auto motorcycle = prefabs::create_motorcycle(step, components::transform(250, 400, -90 + 180));
+		//prefabs::create_motorcycle(step, components::transform(100, -600, -90));
+		//const auto main_character_motorcycle = prefabs::create_motorcycle(step, components::transform(900, 48200, -90));
+		const auto main_character_motorcycle = prefabs::create_motorcycle(step, components::transform(900, 200, -90));
 		
-		const auto riding_car = prefabs::create_car(world, components::transform(850, 1000, -90));
+		const auto riding_car = prefabs::create_car(step, components::transform(850, 1000, -90));
 
-		const auto riding_car2 = prefabs::create_car(world, components::transform(-850 + 1000, -8200, -90 + 180));
-		const auto motorcycle2 = prefabs::create_motorcycle(world, components::transform(-1150 + 1000, -8200, -90 + 180));
+		const auto riding_car2 = prefabs::create_car(step, components::transform(-850 + 1000, -8200, -90 + 180));
+		const auto motorcycle2 = prefabs::create_motorcycle(step, components::transform(-1150 + 1000, -8200, -90 + 180));
 
 		const int num_characters = 4 + 3 + 3 + 2;
 
 		for (int i = 0; i < 10; ++i) {
-			prefabs::create_force_grenade(world, { 254, 611 + i *100.f });
-			prefabs::create_ped_grenade(world, { 204, 611 + i * 100.f });
-			prefabs::create_interference_grenade(world, { 154, 611 + i * 100.f });
+			prefabs::create_force_grenade(step, { 254, 611 + i *100.f });
+			prefabs::create_ped_grenade(step, { 204, 611 + i * 100.f });
+			prefabs::create_interference_grenade(step, { 154, 611 + i * 100.f });
 		}
 
 		for (int i = 0; i < 10; ++i) {
-			prefabs::create_force_grenade(world, { 654, -811 + i *100.f });
-			prefabs::create_ped_grenade(world, { 604, -811 + i * 100.f });
-			prefabs::create_interference_grenade(world, { 554, -811 + i * 100.f });
+			prefabs::create_force_grenade(step, { 654, -811 + i *100.f });
+			prefabs::create_ped_grenade(step, { 604, -811 + i * 100.f });
+			prefabs::create_interference_grenade(step, { 554, -811 + i * 100.f });
 		}
 
 		std::vector<entity_id> new_characters;
@@ -155,7 +156,7 @@ namespace scene_builders {
 				//torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
 			}
 
-			const auto new_character = prefabs::create_sample_complete_character(world, transform, typesafe_sprintf("player%x", i));
+			const auto new_character = prefabs::create_sample_complete_character(step, transform, typesafe_sprintf("player%x", i));
 
 			new_characters[i] = new_character;
 
@@ -192,7 +193,7 @@ namespace scene_builders {
 				) {
 				const auto rifle = prefabs::create_sample_rifle(step, vec2(100, -500),
 					prefabs::create_sample_magazine(step, vec2(100, -650), "0.4",
-						(i == 5 ? prefabs::create_pink_charge : prefabs::create_cyan_charge)(world, vec2(0, 0), 30)));
+						(i == 5 ? prefabs::create_pink_charge : prefabs::create_cyan_charge)(step, vec2(0, 0), 30)));
 
 				name_entity(new_character, entity_name::PERSON, L"Rebel");
 				perform_transfer({ rifle, new_character[slot_function::PRIMARY_HAND] }, step);
@@ -214,19 +215,19 @@ namespace scene_builders {
 				if (i == 9) {
 					const auto rifle = prefabs::create_kek9(step, vec2(100, -500),
 						prefabs::create_small_magazine(step, vec2(100, -650), "3.4",
-							prefabs::create_pink_charge(world, vec2(0, 0), 300)));
+							prefabs::create_pink_charge(step, vec2(0, 0), 300)));
 
 					perform_transfer({ rifle, new_character[slot_function::PRIMARY_HAND] }, step);
 				}
 				else {
 					const auto rifle = (i == 7 ? prefabs::create_submachine : prefabs::create_sample_bilmer2000)(step, vec2(100, -500),
 						prefabs::create_sample_magazine(step, vec2(100, -650), "3.4",
-							prefabs::create_pink_charge(world, vec2(0, 0), 300)));
+							prefabs::create_pink_charge(step, vec2(0, 0), 300)));
 
 					perform_transfer({ rifle, new_character[slot_function::PRIMARY_HAND] }, step);
 				}
 
-				const auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
+				const auto backpack = prefabs::create_sample_backpack(step, vec2(200, -650));
 				perform_transfer({ backpack, new_character[slot_function::SHOULDER_SLOT] }, step);
 			}
 
@@ -277,7 +278,7 @@ namespace scene_builders {
 				w.face.set(assets::game_image_id(int(assets::game_image_id::BLANK)), vec2(1, 1), cyan);
 				w.count = 200;
 				w.reach = reach;
-				e.add_standard_components();
+				e.add_standard_components(step);
 			}
 
 			{
@@ -287,11 +288,11 @@ namespace scene_builders {
 
 				r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-				w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), world, cyan);
+				w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), cyan);
 				//w.face.size.set(1, 1);
 				w.count = 80;
 				w.reach = reach;
-				e.add_standard_components();
+				e.add_standard_components(step);
 			}
 
 			{
@@ -301,11 +302,11 @@ namespace scene_builders {
 
 				r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-				w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), world, cyan);
+				w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), cyan);
 				//w.face.size.set(1, 1);
 				w.count = 80;
 				w.reach = reach;
-				e.add_standard_components();
+				e.add_standard_components(step);
 			}
 		}
 
@@ -321,9 +322,9 @@ namespace scene_builders {
 			};
 
 			for (const auto c : coords) {
-				prefabs::create_crate(world, c + vec2(-100, 400) );
-				prefabs::create_crate(world, c + vec2(300, 300) );
-				prefabs::create_crate(world, c + vec2(100, -200) );
+				prefabs::create_crate(step, c + vec2(-100, 400) );
+				prefabs::create_crate(step, c + vec2(300, 300) );
+				prefabs::create_crate(step, c + vec2(100, -200) );
 
 				const auto light_pos = c + vec2(0, 100);
 				const auto light_cyan = c.x < 0 ? orange : rgba(30, 255, 255, 255);
@@ -344,7 +345,7 @@ namespace scene_builders {
 					}
 
 					light.wall_max_distance.base_value = 4000.f;
-					l.add_standard_components();
+					l.add_standard_components(step);
 				}
 
 
@@ -358,7 +359,7 @@ namespace scene_builders {
 					w.face.set(assets::game_image_id(int(assets::game_image_id::BLANK)), vec2(1, 1), light_cyan);
 					w.count = 50;
 					w.reach = xywh(light_pos.x- 250, light_pos.y-250, 500, 500);
-					e.add_standard_components();
+					e.add_standard_components(step);
 				}
 
 				{
@@ -368,10 +369,10 @@ namespace scene_builders {
 
 					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-					w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), world, light_cyan);
+					w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), light_cyan);
 					w.count = 20;
 					w.reach = xywh(light_pos.x - 150, light_pos.y - 150, 300, 300);
-					e.add_standard_components();
+					e.add_standard_components(step);
 				}
 
 				{
@@ -381,10 +382,10 @@ namespace scene_builders {
 
 					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-					w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), world, light_cyan);
+					w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), light_cyan);
 					w.count = 20;
 					w.reach = xywh(light_pos.x - 25, light_pos.y - 25, 50, 50);
-					e.add_standard_components();
+					e.add_standard_components(step);
 				}
 			}
 		}
@@ -395,21 +396,21 @@ namespace scene_builders {
 			//	l += components::transform(0, 300);
 			//	auto& light = l += components::light();
 			//	light.color = red;
-			//	l.add_standard_components();
+			//	l.add_standard_components(step);
 			//}
 			//{
 			//	const auto l = world.create_entity("l");
 			//	l += components::transform(300, 300);
 			//	auto& light = l += components::light();
 			//	light.color = green;
-			//	l.add_standard_components();
+			//	l.add_standard_components(step);
 			//}
 			//{
 			//	const auto l = world.create_entity("l");
 			//	l += components::transform(600, 300);
 			//	auto& light = l += components::light();
 			//	light.color = blue;
-			//	l.add_standard_components();
+			//	l.add_standard_components(step);
 			//}
 			{
 				const auto l = world.create_entity("l");
@@ -418,7 +419,7 @@ namespace scene_builders {
 				light.color = cyan;
 				light.max_distance.base_value = 4500.f;
 				light.wall_max_distance.base_value = 4000.f;
-				l.add_standard_components();
+				l.add_standard_components(step);
 			}
 			{
 				const auto l = world.create_entity("l");
@@ -427,7 +428,7 @@ namespace scene_builders {
 				light.color = orange;
 				light.max_distance.base_value = 4500.f;
 				light.wall_max_distance.base_value = 4000.f;
-				l.add_standard_components();
+				l.add_standard_components(step);
 			}
 			{
 				const auto left_reach = xywh(164.f - 8.f + 90.f - 550, 220 - 250, 1000, 600);
@@ -440,10 +441,10 @@ namespace scene_builders {
 
 					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-					w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), world, cyan);
+					w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), cyan);
 					w.count = 20;
 					w.reach = left_reach;
-					e.add_standard_components();
+					e.add_standard_components(step);
 				}
 
 				{
@@ -453,10 +454,10 @@ namespace scene_builders {
 
 					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-					w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), world, orange);
+					w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), orange);
 					w.count = 20;
 					w.reach = right_reach;
-					e.add_standard_components();
+					e.add_standard_components(step);
 				}
 
 				{
@@ -469,7 +470,7 @@ namespace scene_builders {
 					w.face.set(assets::game_image_id(int(assets::game_image_id::BLANK)), vec2(1, 1), cyan);
 					w.count = 50;
 					w.reach = left_reach;
-					e.add_standard_components();
+					e.add_standard_components(step);
 				}
 
 				{
@@ -482,7 +483,7 @@ namespace scene_builders {
 					w.face.set(assets::game_image_id(int(assets::game_image_id::BLANK)), vec2(1, 1), orange);
 					w.count = 50;
 					w.reach = right_reach;
-					e.add_standard_components();
+					e.add_standard_components(step);
 				}
 
 				{
@@ -495,7 +496,7 @@ namespace scene_builders {
 					w.face.set(assets::game_image_id(int(assets::game_image_id::BLANK)), vec2(2, 2), cyan);
 					w.count = 30;
 					w.reach = left_reach;
-					e.add_standard_components();
+					e.add_standard_components(step);
 				}
 
 				{
@@ -508,7 +509,7 @@ namespace scene_builders {
 					w.face.set(assets::game_image_id(int(assets::game_image_id::BLANK)), vec2(2, 2), orange);
 					w.count = 30;
 					w.reach = right_reach;
-					e.add_standard_components();
+					e.add_standard_components(step);
 				}
 
 				//{
@@ -521,7 +522,7 @@ namespace scene_builders {
 				//	w.face.set(assets::game_image_id(int(assets::game_image_id::WANDERING_CROSS)), cyan);
 				//	w.count = 15;
 				//	w.reach = xywh(164.f - 8.f + 90.f - 100, 220 - 100, 200, 200);
-				//	e.add_standard_components();
+				//	e.add_standard_components(step);
 				//}
 				//
 				//{
@@ -534,7 +535,7 @@ namespace scene_builders {
 				//	w.face.set(assets::game_image_id(int(assets::game_image_id::WANDERING_CROSS)), orange);
 				//	w.count = 15;
 				//	w.reach = xywh(1164.f - 8.f + 90.f - 100, 220 - 100, 200, 200);
-				//	e.add_standard_components();
+				//	e.add_standard_components(step);
 				//}
 			}
 
@@ -547,7 +548,7 @@ namespace scene_builders {
 				////light.quadratic.base_value = 0.000025f;
 				//light.max_distance.base_value = 4500.f;
 				//light.wall_max_distance.base_value = 4000.f;
-				//l.add_standard_components();
+				//l.add_standard_components(step);
 			}
 			{
 				const auto l = world.create_entity("l");
@@ -556,7 +557,7 @@ namespace scene_builders {
 				light.color = orange;
 				light.max_distance.base_value = 4500.f;
 				light.wall_max_distance.base_value = 4000.f;
-				l.add_standard_components();
+				l.add_standard_components(step);
 			}
 
 			particle_effect_input effect;
@@ -565,10 +566,10 @@ namespace scene_builders {
 			effect.single_displacement_duration_ms.set(400.f, 1500.f);
 
 			effect.create_particle_effect_entity(
-				world, 
+				step, 
 				components::transform(-164, 500, 0),
 				entity_id()
-			).add_standard_components();
+			).add_standard_components(step);
 
 			{
 				const auto e = world.create_entity("tiled_floor");
@@ -581,7 +582,7 @@ namespace scene_builders {
 				tile_layer_instance.id = assets::tile_layer_id::METROPOLIS_FLOOR;
 
 
-				e.add_standard_components();
+				e.add_standard_components(step);
 			}
 
 			{
@@ -595,25 +596,25 @@ namespace scene_builders {
 					render_layer::NEON_CAPTIONS
 				);
 
-				e.add_standard_components();
+				e.add_standard_components(step);
 
-				prefabs::create_brick_wall(world, components::transform(3 + 1 + 1100, -32 - 96), { 160, 160 });
-				prefabs::create_brick_wall(world, components::transform(3 + 1 + 1100 + 160, -32 - 96), { 160, 160 });
-				prefabs::create_brick_wall(world, components::transform(3 + 1 + 1100 + 160, -32 - 96 + 160), { 160, 160 });
-				prefabs::create_brick_wall(world, components::transform(3 + 1 + 1100, -32 - 96 + 160), { 160, 160 });
+				prefabs::create_brick_wall(step, components::transform(3 + 1 + 1100, -32 - 96), { 160, 160 });
+				prefabs::create_brick_wall(step, components::transform(3 + 1 + 1100 + 160, -32 - 96), { 160, 160 });
+				prefabs::create_brick_wall(step, components::transform(3 + 1 + 1100 + 160, -32 - 96 + 160), { 160, 160 });
+				prefabs::create_brick_wall(step, components::transform(3 + 1 + 1100, -32 - 96 + 160), { 160, 160 });
 
 
-				prefabs::create_brick_wall(world, components::transform(-3 -16 + 100, -32 - 96), { 160, 160 });
-				prefabs::create_brick_wall(world, components::transform(-3 -16 + 100 + 160, -32 - 96), { 160, 160 });
-				prefabs::create_brick_wall(world, components::transform(-3 -16 + 100 + 160, -32 - 96 + 160), { 160, 160 });
-				prefabs::create_brick_wall(world, components::transform(-3 -16 + 100, -32 - 96 + 160), { 160, 160 });
+				prefabs::create_brick_wall(step, components::transform(-3 -16 + 100, -32 - 96), { 160, 160 });
+				prefabs::create_brick_wall(step, components::transform(-3 -16 + 100 + 160, -32 - 96), { 160, 160 });
+				prefabs::create_brick_wall(step, components::transform(-3 -16 + 100 + 160, -32 - 96 + 160), { 160, 160 });
+				prefabs::create_brick_wall(step, components::transform(-3 -16 + 100, -32 - 96 + 160), { 160, 160 });
 
 				for (int b = 0; b < 8; ++b) {
-					prefabs::create_brick_wall(world, components::transform(3 + 1 + 1100 + 160 + 160, -32 - 96 + 160 - 160.f * b, 90), { 160, 160 });
-					prefabs::create_brick_wall(world, components::transform(-3 - 16 + 100 - 160, -32 - 96 + 160 - 160*b, 90), { 160, 160 });
+					prefabs::create_brick_wall(step, components::transform(3 + 1 + 1100 + 160 + 160, -32 - 96 + 160 - 160.f * b, 90), { 160, 160 });
+					prefabs::create_brick_wall(step, components::transform(-3 - 16 + 100 - 160, -32 - 96 + 160 - 160*b, 90), { 160, 160 });
 				}
 
-				const vec2 bg_size = world[assets::game_image_id::TEST_BACKGROUND].get_size();
+				const vec2 bg_size = metas[assets::game_image_id::TEST_BACKGROUND].get_size();
 
 				const int num_floors = 10 * 10;
 				const int side = sqrt(num_floors) / 2;
@@ -629,29 +630,29 @@ namespace scene_builders {
 						ingredients::add_sprite(street, { bg_size * vec2(x, y) },
 							assets::game_image_id::TEST_BACKGROUND, gray1, render_layer::GROUND);
 
-						//background.add_standard_components();
-						street.add_standard_components();
+						//background.add_standard_components(step);
+						street.add_standard_components(step);
 					}
 				}
 
 				{
-					const vec2 size = world[assets::game_image_id::ROAD_FRONT_DIRT].get_size();
+					const vec2 size = metas[assets::game_image_id::ROAD_FRONT_DIRT].get_size();
 
 					auto road_dirt = world.create_entity("road_dirt[-]");
 					ingredients::add_sprite(road_dirt, vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 - size.y / 2),
 						assets::game_image_id::ROAD_FRONT_DIRT, white, render_layer::ON_TILED_FLOOR);
 
-					road_dirt.add_standard_components();
+					road_dirt.add_standard_components(step);
 				}
 
 				for (int r = 0; r < 38; ++r) {
-					const vec2 size = world[assets::game_image_id::ROAD].get_size();
+					const vec2 size = metas[assets::game_image_id::ROAD].get_size();
 
 					auto road = world.create_entity("road[-]");
 					ingredients::add_sprite(road, vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 + size.y / 2 + size.y*r),
 						assets::game_image_id::ROAD, white, render_layer::ON_GROUND);
 
-					road.add_standard_components();
+					road.add_standard_components(step);
 				}
 			}
 
@@ -667,7 +668,7 @@ namespace scene_builders {
 
 				sprite.effect = components::sprite::special_effect::COLOR_WAVE;
 
-				e.add_standard_components();
+				e.add_standard_components(step);
 			}
 
 			{
@@ -681,7 +682,7 @@ namespace scene_builders {
 					render_layer::NEON_CAPTIONS
 				);
 
-				e.add_standard_components();
+				e.add_standard_components(step);
 			}
 		}
 
@@ -699,76 +700,76 @@ namespace scene_builders {
 
 		select_character(character(0));
 
-		prefabs::create_sample_suppressor(world, vec2(300, -500));
+		prefabs::create_sample_suppressor(step, vec2(300, -500));
 
 		const bool many_charges = false;
 
 		const auto rifle = prefabs::create_sample_rifle(step, vec2(100, -500),
 			prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_cyan_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
+				prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
 
 		const auto rifle2 = prefabs::create_sample_bilmer2000(step, vec2(100, -500 + 50),
 			prefabs::create_sample_magazine(step, vec2(100, -650), true ? "10" : "0.3",
-				prefabs::create_cyan_charge(world, vec2(0, 0), true ? 1000 : 30)));
+				prefabs::create_cyan_charge(step, vec2(0, 0), true ? 1000 : 30)));
 
-		const auto amplifier = prefabs::create_amplifier_arm(step.cosm, vec2(-300, -500 + 50));
-		prefabs::create_amplifier_arm(step.cosm, vec2(-370, + 50));
+		const auto amplifier = prefabs::create_amplifier_arm(step, vec2(-300, -500 + 50));
+		prefabs::create_amplifier_arm(step, vec2(-370, + 50));
 
 		prefabs::create_sample_rifle(step, vec2(100, -500 + 100), prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-			prefabs::create_red_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
+			prefabs::create_red_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
 
 		prefabs::create_sample_rifle(step, vec2(200, -600 + 100), prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_red_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
+				prefabs::create_red_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
 		prefabs::create_sample_rifle(step, vec2(300, -700 + 100), prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_red_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
+				prefabs::create_red_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
 		prefabs::create_sample_rifle(step, vec2(400, -800 + 100), prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_red_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
+				prefabs::create_red_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
 		prefabs::create_sample_rifle(step, vec2(500, -900 + 100), prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_red_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
+				prefabs::create_red_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
 
 		prefabs::create_sample_rifle(step, vec2(700, -600 + 100), prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_red_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
+				prefabs::create_red_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
 		prefabs::create_sample_rifle(step, vec2(800, -700 + 100), prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_red_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
+				prefabs::create_red_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
 		prefabs::create_sample_rifle(step, vec2(900, -800 + 100), prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_cyan_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
+				prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
 
 		prefabs::create_kek9(step, vec2(300, -500 + 50));
 
 		const auto pis2 = prefabs::create_kek9(step, vec2(300, 50),
 			prefabs::create_small_magazine(step, vec2(100, -650), "0.4",
-				prefabs::create_cyan_charge(world, vec2(0, 0), 40)));
+				prefabs::create_cyan_charge(step, vec2(0, 0), 40)));
 
 		const auto submachine = prefabs::create_submachine(step, vec2(500, -500 + 50),
-			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
+			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(step, vec2(0, 0), many_charges ? 500 : 50)));
 
 		prefabs::create_submachine(step, vec2(0, -1000),
-			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
+			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(step, vec2(0, 0), many_charges ? 500 : 50)));
 
 		prefabs::create_submachine(step, vec2(150, -1000 + 150),
-			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
+			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(step, vec2(0, 0), many_charges ? 500 : 50)));
 
 		prefabs::create_submachine(step, vec2(300, -1000 + 300),
-			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
+			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(step, vec2(0, 0), many_charges ? 500 : 50)));
 
 		prefabs::create_submachine(step, vec2(450, -1000 + 450),
-			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
+			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(step, vec2(0, 0), many_charges ? 500 : 50)));
 
 
 		prefabs::create_sample_magazine(step, vec2(100 - 50, -650));
 		prefabs::create_sample_magazine(step, vec2(100 - 100, -650), "0.30");
-		//prefabs::create_pink_charge(world, vec2(100, 100));
-		//prefabs::create_pink_charge(world, vec2(100, -400));
-		//prefabs::create_pink_charge(world, vec2(150, -400));
-		//prefabs::create_pink_charge(world, vec2(200, -400));
-		prefabs::create_cyan_charge(world, vec2(150, -500));
-		prefabs::create_cyan_charge(world, vec2(200, -500));
+		//prefabs::create_pink_charge(step, vec2(100, 100));
+		//prefabs::create_pink_charge(step, vec2(100, -400));
+		//prefabs::create_pink_charge(step, vec2(150, -400));
+		//prefabs::create_pink_charge(step, vec2(200, -400));
+		prefabs::create_cyan_charge(step, vec2(150, -500));
+		prefabs::create_cyan_charge(step, vec2(200, -500));
 
-		prefabs::create_cyan_urban_machete(world, vec2(100, 100));
-		const auto second_machete = prefabs::create_cyan_urban_machete(world, vec2(0, 300));
+		prefabs::create_cyan_urban_machete(step, vec2(100, 100));
+		const auto second_machete = prefabs::create_cyan_urban_machete(step, vec2(0, 300));
 
-		const auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
-		prefabs::create_sample_backpack(world, vec2(200, -750));
+		const auto backpack = prefabs::create_sample_backpack(step, vec2(200, -650));
+		prefabs::create_sample_backpack(step, vec2(200, -750));
 
 		//perform_transfer({ backpack, character(0)[slot_function::SHOULDER_SLOT] }, step);
 		//perform_transfer({ submachine, character(0)[slot_function::PRIMARY_HAND] }, step);

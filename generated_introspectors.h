@@ -1470,7 +1470,7 @@ namespace augs {
 		) {
 			FIELD(tex);
 			FIELD(color);
-			FIELD(size);
+			FIELD(overridden_size);
 			FIELD(center_offset);
 			FIELD(rotation_offset);
 
@@ -1908,8 +1908,6 @@ namespace augs {
 			F f,
 			Instances&&... _t_
 		) {
-
-			FIELD(logical_metas_of_assets);
 
 			FIELD(pool_for_aggregates);
 			FIELD(pools_for_components);

@@ -9,6 +9,7 @@
 #include "augs/padding_byte.h"
 
 #include "game/transcendental/entity_handle_declaration.h"
+#include "game/transcendental/step_declaration.h"
 #include "game/assets/particle_effect_id.h"
 
 struct particle_effect_input {
@@ -22,7 +23,7 @@ struct particle_effect_input {
 	// END GEN INTROSPECTOR
 
 	entity_handle create_particle_effect_entity(
-		cosmos&,
+		const logic_step,
 		const components::transform place_of_birth,
 		const entity_id chased_subject
 	) const;
@@ -31,7 +32,7 @@ struct particle_effect_input {
 		components::transform& out_transform,
 		components::particles_existence& out_existence,
 		components::position_copying& out_copying,
-		cosmos&,
+		const logic_step,
 		const components::transform place_of_birth,
 		const entity_id chased_subject
 	) const;

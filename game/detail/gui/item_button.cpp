@@ -17,6 +17,7 @@
 #include "game/detail/gui/character_gui.h"
 #include "game/components/sprite_component.h"
 #include "game/components/item_component.h"
+#include "game/components/fixtures_component.h"
 #include "game/systems_stateless/gui_system.h"
 #include "game/systems_stateless/input_system.h"
 #include "game/systems_audiovisual/gui_element_system.h"
@@ -129,17 +130,21 @@ item_button::layout_with_attachments item_button::calculate_button_layout(
 	const const_entity_handle component_owner,
 	const bool include_attachments
 ) {
+	const auto& manager = get_assets_manager();
 	const auto& cosmos = component_owner.get_cosmos();
 	
 	layout_with_attachments output;
-	output.push(component_owner.get_aabb(components::transform()));
+	output.push(component_owner.get_aabb(manager, components::transform()));
 
 	if (include_attachments) {
-		component_owner.for_each_contained_item_recursive([&](const const_entity_handle desc, const inventory_traversal& traversal) {
-			if (traversal.item_remains_physical) {
-				output.push(desc.get_aabb(traversal.attachment_offset));
+		component_owner.for_each_contained_item_recursive(
+			get_assets_manager(),
+			[&](const const_entity_handle desc, const inventory_traversal& traversal) {
+				if (traversal.item_remains_physical) {
+					output.push(desc.get_aabb(manager, traversal.attachment_offset));
+				}
 			}
-		});
+		);
 	}
 	
 	const auto origin = output.aabb.left_top();
@@ -147,8 +152,6 @@ item_button::layout_with_attachments item_button::calculate_button_layout(
 	for (auto& b : output.boxes) {
 		b += -origin;
 	}
-
-	const auto& manager = get_assets_manager();
 
 	const auto gui_def = manager[component_owner.get<components::sprite>().tex].settings.gui;
 
@@ -304,7 +307,7 @@ void item_button::draw_proc(
 					}
 				};
 
-				item.for_each_contained_item_recursive(iteration_lambda);
+				item.for_each_contained_item_recursive(get_assets_manager(), iteration_lambda);
 			}
 
 			item_sprite.draw(state);

@@ -6,10 +6,12 @@
 #include "game/components/position_copying_component.h"
 
 entity_handle sound_effect_input::create_sound_effect_entity(
-	cosmos& cosmos,
+	const logic_step step,
 	const components::transform place_of_birth,
 	const entity_id chased_subject_id
 ) const {
+	auto& cosmos = step.cosm;
+
 	const auto new_sound_entity = cosmos.create_entity("particle_stream");
 	new_sound_entity += place_of_birth;
 
@@ -17,7 +19,7 @@ entity_handle sound_effect_input::create_sound_effect_entity(
 	existence.input = *this;
 	existence.time_of_birth = cosmos.get_timestamp();
 
-	const auto& info = cosmos[effect.id];
+	const auto& info = step.input.metas_of_assets[effect.id];
 
 	if (existence.input.variation_number == -1) {
 		existence.input.variation_number = static_cast<char>(existence.random_variation_number_from_transform(place_of_birth) % info.num_of_variations);

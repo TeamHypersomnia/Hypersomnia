@@ -45,11 +45,14 @@ void local_setup::process(
 	scene_builders::testbed testbed;
 	testbed.debug_var = cfg.debug_var;
 
+	const auto metas_of_assets = get_assets_manager().generate_logical_metas_of_assets();
+
 	if (!hypersomnia.load_from_file("save.state")) {
 		hypersomnia.set_fixed_delta(cfg.default_tickrate);
 		
 		testbed.populate_world_with_entities(
 			hypersomnia, 
+			metas_of_assets,
 			session.get_standard_post_solve()
 		);
 	}
@@ -137,7 +140,7 @@ void local_setup::process(
 			augs::renderer::get_current().clear_logic_lines();
 
 			hypersomnia.advance_deterministic_schemata(
-				total_collected_entropy,
+				{ total_collected_entropy, metas_of_assets },
 				[](const auto) {},
 				session.get_standard_post_solve()
 			);

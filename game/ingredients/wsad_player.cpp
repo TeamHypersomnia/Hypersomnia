@@ -44,14 +44,14 @@ namespace ingredients {
 		movement.enable_braking_damping = true;
 	}
 
-	void add_wsad_character_physics(const entity_handle e) {
+	void add_wsad_character_physics(const logic_step step, const entity_handle e) {
 		components::rigid_body body;
 		components::special_physics special;
 		components::fixtures colliders;
 
 		auto& info = colliders.new_collider();
 
-		info.shape.from_renderable(e);
+		info.shape.from_renderable(step, e);
 
 		info.filter = filters::controlled_character();
 		info.density = 1.0;
@@ -178,7 +178,7 @@ namespace ingredients {
 
 		e.map_child_entity(child_entity_name::CHARACTER_CROSSHAIR, crosshair_entity);
 
-		sprite.set(assets::game_image_id::TORSO_MOVING_FIRST, e.get_cosmos(), white);
+		sprite.set(assets::game_image_id::TORSO_MOVING_FIRST, white);
 
 		render.layer = render_layer::SMALL_DYNAMIC_BODY;
 
@@ -192,25 +192,27 @@ namespace ingredients {
 
 namespace prefabs {
 	entity_handle create_sample_complete_character(
-		cosmos& world, 
+		const logic_step step, 
 		const components::transform spawn_transform, 
 		const std::string name
 	) {
+		auto& world = step.cosm;
+
 		const auto character = world.create_entity(name);
 
 		name_entity(character, entity_name::PERSON);
 
-		const auto crosshair = create_character_crosshair(world);
+		const auto crosshair = create_character_crosshair(step);
 		crosshair.get<components::crosshair>().character_entity_to_chase = character;
-		crosshair.set_logic_transform(spawn_transform.pos);
+		crosshair.set_logic_transform(step, spawn_transform.pos);
 
 		ingredients::add_wsad_character(character, crosshair);
 		
-		ingredients::add_wsad_character_physics(character);
+		ingredients::add_wsad_character_physics(step, character);
 
 		character.get<components::rigid_body>().set_transform(spawn_transform);
 
-		ingredients::add_character_inventory(character);
+		ingredients::add_character_inventory(step, character);
 
 		{
 			particle_effect_input effect;
@@ -219,23 +221,24 @@ namespace prefabs {
 			effect.delete_entity_after_effect_lifetime = false;
 
 			const auto particles = effect.create_particle_effect_entity(
-				character.get_cosmos(), 
+				step,
 				character.get_logic_transform(),
 				character
 			);
 
-			particles.add_standard_components();
+			particles.add_standard_components(step);
 			character.get<components::sentience>().health_damage_particles = particles;
 			components::particles_existence::deactivate(particles);
 		}
 
-		character.add_standard_components();
+		character.add_standard_components(step);
 
 		// LOG("Character mass: %x", character.get<components::rigid_body>().get_mass());
 		return character;
 	}
 
-	entity_handle create_character_crosshair(cosmos& world) {
+	entity_handle create_character_crosshair(const logic_step step) {
+		auto& world = step.cosm;
 		auto root = world.create_entity("crosshair");
 		auto recoil = world.create_entity("crosshair_recoil_body");
 		auto zero_target = world.create_entity("zero_target");
@@ -247,7 +250,7 @@ namespace prefabs {
 			auto& crosshair = root += components::crosshair();
 			auto& processing = root += components::processing();
 			
-			sprite.set(assets::game_image_id::TEST_CROSSHAIR, world, rgba(255, 255, 255, 255));
+			sprite.set(assets::game_image_id::TEST_CROSSHAIR, rgba(255, 255, 255, 255));
 
 			render.layer = render_layer::CROSSHAIR;
 
@@ -267,7 +270,7 @@ namespace prefabs {
 
 			auto& sprite = recoil += components::sprite();
 
-			sprite.set(assets::game_image_id::TEST_CROSSHAIR, world, rgba(0, 255, 0, 0));
+			sprite.set(assets::game_image_id::TEST_CROSSHAIR, rgba(0, 255, 0, 0));
 
 			auto& render = recoil += components::render();
 			render.layer = render_layer::OVER_CROSSHAIR;
@@ -275,7 +278,7 @@ namespace prefabs {
 
 			auto& info = colliders.new_collider();
 
-			info.shape.from_renderable(recoil);
+			info.shape.from_renderable(step, recoil);
 
 			info.filter = b2Filter();
 			//info.filter.categoryBits = 0;
@@ -299,9 +302,9 @@ namespace prefabs {
 
 		root.map_child_entity(child_entity_name::CROSSHAIR_RECOIL_BODY, recoil);
 		
-		root.add_standard_components();
-		recoil.add_standard_components();
-		zero_target.add_standard_components();
+		root.add_standard_components(step);
+		recoil.add_standard_components(step);
+		zero_target.add_standard_components(step);
 
 		return root;
 	}

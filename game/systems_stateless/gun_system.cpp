@@ -129,7 +129,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					damage.sender = it;
 					total_recoil_amount += damage.recoil_multiplier;
 
-					round_entity.set_logic_transform(muzzle_transform);
+					round_entity.set_logic_transform(step, muzzle_transform);
 
 					auto rng = cosmos.get_rng_for(round_entity);
 					set_velocity(round_entity, vec2().set_from_degrees(muzzle_transform.rotation).set_length(rng.randval(gun.muzzle_velocity)));
@@ -139,7 +139,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					sentience.personal_electricity.value -= sentience.personal_electricity.calculate_damage_result(mana_needed).effective;
 
 					round_entity.set_flag(entity_flag::IS_IMMUNE_TO_PAST);
-					round_entity.add_standard_components();
+					round_entity.add_standard_components(step);
 					
 					step.transient.messages.post(response);
 				}
@@ -180,14 +180,14 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							damage.sender = it;
 							total_recoil_amount += damage.recoil_multiplier;
 
-							round_entity.set_logic_transform(muzzle_transform);
+							round_entity.set_logic_transform(step, muzzle_transform);
 							
 							auto rng = cosmos.get_rng_for(round_entity);
 							set_velocity(round_entity, vec2().set_from_degrees(muzzle_transform.rotation).set_length(rng.randval(gun.muzzle_velocity)));
 							response.spawned_rounds.push_back(round_entity);
 
 							round_entity.set_flag(entity_flag::IS_IMMUNE_TO_PAST);
-							round_entity.add_standard_components();
+							round_entity.add_standard_components(step);
 						}
 
 						const auto shell_definition = single_bullet_or_pellet_stack[child_entity_name::CATRIDGE_SHELL];
@@ -203,12 +203,12 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							shell_transform.pos += vec2(gun.shell_spawn_offset.pos).rotate(gun_transform.rotation, vec2());
 							shell_transform.rotation += spread_component;
 
-							shell_entity.set_logic_transform(shell_transform);
+							shell_entity.set_logic_transform(step, shell_transform);
 
 							set_velocity(shell_entity, vec2().set_from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun.shell_velocity)));
 							response.spawned_shell = shell_entity;
 
-							shell_entity.add_standard_components();
+							shell_entity.add_standard_components(step);
 						}
 						
 						step.transient.messages.post(messages::queue_destruction(single_bullet_or_pellet_stack));

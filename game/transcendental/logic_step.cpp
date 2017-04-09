@@ -4,11 +4,11 @@
 template<bool C>
 basic_logic_step<C>::basic_logic_step(
 	cosmos_ref cosm,
-	const cosmic_entropy& entropy,
+	const logic_step_input input,
 	data_living_one_step_ref transient
 ) :
+	input(input),
 	basic_cosmic_step(cosm),
-	entropy(entropy),
 	transient(transient)
 {
 }
@@ -20,7 +20,7 @@ augs::delta basic_logic_step<C>::get_delta() const {
 
 template<bool C>
 basic_logic_step<C>::operator basic_logic_step<true>() const {
-	return { cosm, entropy, transient };
+	return { cosm, input, transient };
 }
 
 template class basic_logic_step<false>;

@@ -171,7 +171,7 @@ namespace augs {
 		return get_id();
 	}
 	
-	sound_buffer_logical_meta sound_buffer::get_logical_meta() const {
+	sound_buffer_logical_meta sound_buffer::get_logical_meta(const assets_manager& manager) const {
 		sound_buffer_logical_meta output;
 		output.num_of_variations = variations.size();
 

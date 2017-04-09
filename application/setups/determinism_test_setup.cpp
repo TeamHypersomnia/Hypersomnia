@@ -32,6 +32,8 @@ void determinism_test_setup::process(
 	game_window& window,
 	viewing_session& session
 ) {
+	const auto metas_of_assets = get_assets_manager().generate_logical_metas_of_assets();
+
 	const vec2i screen_size = vec2i(window.get_screen_size());
 
 	const unsigned cosmoi_count = 1 + cfg.determinism_test_cloned_cosmoi_count;
@@ -54,6 +56,7 @@ void determinism_test_setup::process(
 			hypersomnias[i].set_fixed_delta(cfg.default_tickrate);
 			testbeds[i].populate_world_with_entities(
 				hypersomnias[i], 
+				metas_of_assets,
 				session.get_standard_post_solve()
 			);
 		}
@@ -134,7 +137,9 @@ void determinism_test_setup::process(
 
 				augs::renderer::get_current().clear_logic_lines();
 
-				h.advance_deterministic_schemata(total_collected_entropy, [](auto) {},
+				h.advance_deterministic_schemata(
+					{ total_collected_entropy, metas_of_assets },
+					[](auto) {},
 					[this, &session](const const_logic_step step) {
 						session.spread_past_infection(step);
 					}

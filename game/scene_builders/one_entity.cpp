@@ -41,9 +41,9 @@ namespace scene_builders {
 	void one_entity::populate(const logic_step step) {
 		auto& world = step.cosm;
 
-		prefabs::create_force_grenade(world, { 254, 611 });
-		prefabs::create_force_grenade(world, { 254, 711 });
-		prefabs::create_force_grenade(world, { 254, 811 });
+		prefabs::create_force_grenade(step, { 254, 611 });
+		prefabs::create_force_grenade(step, { 254, 711 });
+		prefabs::create_force_grenade(step, { 254, 811 });
 
 		const int num_characters = 2;
 
@@ -65,7 +65,7 @@ namespace scene_builders {
 				transform.pos.x += 200;
 			}
 
-			const auto new_character = prefabs::create_sample_complete_character(world, transform, typesafe_sprintf("player%x", i));
+			const auto new_character = prefabs::create_sample_complete_character(step, transform, typesafe_sprintf("player%x", i));
 
 			new_characters[i] = new_character;
 
@@ -83,30 +83,30 @@ namespace scene_builders {
 			}
 		}
 
-		const auto amplifier = prefabs::create_amplifier_arm(step.cosm, vec2(-300, -500 + 50));
+		const auto amplifier = prefabs::create_amplifier_arm(step, vec2(-300, -500 + 50));
 
-		const auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
+		const auto backpack = prefabs::create_sample_backpack(step, vec2(200, -650));
 
 		const auto rifle2 = prefabs::create_sample_bilmer2000(step, vec2(100, -500 + 50),
 			prefabs::create_sample_magazine(step, vec2(100, -650), false ? "10" : "0.3",
-				prefabs::create_cyan_charge(world, vec2(0, 0), false ? 1000 : 5)));
+				prefabs::create_cyan_charge(step, vec2(0, 0), false ? 1000 : 5)));
 		
 		prefabs::create_kek9(step, vec2(300, -500 + 50));
 
 		prefabs::create_kek9(step, vec2(100, -500),
 			prefabs::create_small_magazine(step, vec2(100, -650), "0.4",
-				prefabs::create_pink_charge(world, vec2(0, 0), 30)));
+				prefabs::create_pink_charge(step, vec2(0, 0), 30)));
 
 		//perform_transfer({ backpack, character(0)[slot_function::SHOULDER_SLOT] }, step);
 
 		const auto rifle = prefabs::create_sample_rifle(step, vec2(100, -500),
 			prefabs::create_sample_magazine(step, vec2(100, -650), false ? "10" : "0.3",
-				prefabs::create_cyan_charge(world, vec2(0, 0), false ? 1000 : 30)));
+				prefabs::create_cyan_charge(step, vec2(0, 0), false ? 1000 : 30)));
 
 
 		prefabs::create_submachine(step, vec2(100, -700),
 			prefabs::create_sample_magazine(step, vec2(100, -650), true ? "10" : "0.3",
-				prefabs::create_cyan_charge(world, vec2(0, 0), true ? 1000 : 30)));
+				prefabs::create_cyan_charge(step, vec2(0, 0), true ? 1000 : 30)));
 
 		characters.assign(new_characters.begin(), new_characters.end());
 

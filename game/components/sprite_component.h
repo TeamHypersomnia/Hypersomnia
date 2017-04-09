@@ -9,6 +9,7 @@
 #include "game/detail/basic_renderable_drawing_input.h"
 #include "game/enums/renderable_drawing_type.h"
 
+#include "augs/graphics/drawers.h"
 #include "augs/padding_byte.h"
 
 namespace components {
@@ -28,7 +29,7 @@ namespace components {
 		// GEN INTROSPECTOR struct components::sprite
 		assets::game_image_id tex = assets::game_image_id::COUNT;
 		rgba color;
-		vec2 size;
+		vec2 overridden_size = vec2(-1.f, -1.f);
 		vec2 center_offset;
 		float rotation_offset = 0.f;
 
@@ -41,7 +42,15 @@ namespace components {
 		unsigned short max_specular_blinks = 0;
 		// END GEN INTROSPECTOR
 
-		vec2 get_size() const;
+		template <class T>
+		vec2 get_size(const T& metas) const {
+			if (overridden_size.x > 0.f) {
+				return overridden_size;
+			}
+			else {
+				return metas[tex].get_size();
+			}
+		}
 
 		void set(
 			const assets::game_image_id id,
@@ -51,7 +60,6 @@ namespace components {
 
 		void set(
 			const assets::game_image_id id,
-			const cosmos& manager,
 			const rgba color = rgba()
 		);
 
@@ -67,10 +75,18 @@ namespace components {
 			const vec2 considered_size
 		) const;
 
-		std::vector<vec2> get_vertices() const;
-		
-		ltrb get_aabb(
-			const components::transform
-		) const;
+		template <class T>
+		ltrb sprite::get_aabb(
+			const T& metas,
+			const components::transform transform
+		) const {
+			return augs::get_aabb(
+				augs::make_sprite_points(
+					transform.pos, 
+					get_size(metas),
+					transform.rotation + rotation_offset
+				)
+			);
+		}
 	};
 }

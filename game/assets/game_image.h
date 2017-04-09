@@ -4,6 +4,8 @@
 #include "game/detail/shape_variant.h"
 #include "augs/misc/enum_array.h"
 
+class assets_manager;
+
 enum class texture_map_type {
 	DIFFUSE,
 	NEON,
@@ -48,5 +50,5 @@ struct game_image_baked {
 		return texture_maps[texture_map_type::DIFFUSE].get_size();
 	}
 
-	game_image_logical_meta get_logical_meta() const;
+	game_image_logical_meta get_logical_meta(const assets_manager& manager) const;
 };

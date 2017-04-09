@@ -162,3 +162,15 @@ using find_type_with_key_type_in_list_t = find_matching_type_in_list<bind_types_
 
 template <class SearchedKeyType, class... Types>
 using find_type_with_key_type_t = find_type_with_key_type_in_list_t<SearchedKeyType, std::tuple<Types...>>;
+
+template <class T, class ContainerList>
+decltype(auto) get_container_with_key_type(ContainerList&& containers) {
+	return std::get<
+		find_type_with_key_type_in_list_t<
+			T, 
+			std::decay_t<ContainerList>
+		>
+	> (
+		std::forward<ContainerList>(containers)
+	);
+}

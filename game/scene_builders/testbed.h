@@ -32,11 +32,12 @@ namespace scene_builders {
 
 		template <class T>
 		void populate_world_with_entities(
-			cosmos& cosm, 
+			cosmos& cosm,
+			const all_logical_metas_of_assets& metas,
 			const T post_solve
 		) {
 			cosm.advance_deterministic_schemata(
-				cosmic_entropy(), 
+				{ cosmic_entropy(), metas },
 				[&](const logic_step step) { populate(step); }, 
 				post_solve
 			);

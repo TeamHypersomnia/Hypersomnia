@@ -56,7 +56,12 @@ void client_setup::init(
 	const std::string recording_filename, 
 	const bool use_alternative_port
 ) {
-	scene_builders::networked_testbed_client().populate_world_with_entities(initial_hypersomnia);
+	metas_of_assets = get_assets_manager().generate_logical_metas_of_assets();
+
+	scene_builders::networked_testbed_client().populate_world_with_entities(
+		initial_hypersomnia,
+		metas_of_assets
+	);
 
 	session.reserve_caches_for_entities(3000);
 
@@ -64,7 +69,7 @@ void client_setup::init(
 
 	if (!hypersomnia.load_from_file("save.state")) {
 		hypersomnia.set_fixed_delta(cfg.default_tickrate);
-		scene.populate_world_with_entities(hypersomnia);
+		scene.populate_world_with_entities(hypersomnia, metas_of_assets);
 	}
 
 	if (cfg.get_input_recording_mode() != input_recording_type::DISABLED) {
@@ -108,23 +113,23 @@ void client_setup::process_once(
 	const augs::machine_entropy::local_type& precollected, 
 	const bool swap_buffers
 ) {
-	auto step_pred = [this](
+	auto step_callback = [this](
 		const cosmic_entropy& entropy, 
 		cosmos& cosm
 	) {
 		cosm.advance_deterministic_schemata(
-			entropy,
+			{ entropy, metas_of_assets },
 			[this](const logic_step) {},
 			[this](const const_logic_step step) {}
 		);
 	};
 
-	auto step_pred_with_audiovisual_response = [this, &session](
+	auto step_callback_with_audiovisual_response = [this, &session](
 		const cosmic_entropy& entropy, 
 		cosmos& cosm
 	) {
 		cosm.advance_deterministic_schemata(
-			entropy,
+			{ entropy, metas_of_assets },
 			[this](const logic_step) {},
 			[this, &session](const const_logic_step step) {
 				session.spread_past_infection(step);
@@ -227,7 +232,7 @@ void client_setup::process_once(
 				client, 
 				total_collected_entropy,
 				extrapolated_hypersomnia, 
-				step_pred_with_audiovisual_response
+				step_callback_with_audiovisual_response
 			);
 
 			session.sending_commands_and_predict_profiler.end_measurement();
@@ -243,7 +248,7 @@ void client_setup::process_once(
 				hypersomnia, 
 				hypersomnia_last_snapshot, 
 				extrapolated_hypersomnia, 
-				step_pred
+				step_callback
 			);
 
 			session.unpack_remote_steps_profiler.end_measurement();

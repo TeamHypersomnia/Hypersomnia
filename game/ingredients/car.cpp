@@ -26,7 +26,10 @@
 #include "game/enums/filters.h"
 
 namespace prefabs {
-	entity_handle create_car(cosmos& world, const components::transform& spawn_transform) {
+	entity_handle create_car(const logic_step step, const components::transform& spawn_transform) {
+		auto& world = step.cosm;
+		const auto& metas = step.input.metas_of_assets;
+
 		auto front = world.create_entity("front");
 		auto interior = world.create_entity("interior");
 		auto left_wheel = world.create_entity("left_wheel");
@@ -36,8 +39,8 @@ namespace prefabs {
 
 		name_entity(front, entity_name::TRUCK);
 
-		const vec2 front_size = world[assets::game_image_id::TRUCK_FRONT].get_size();
-		const vec2 interior_size = world[assets::game_image_id::TRUCK_INSIDE].get_size();
+		const vec2 front_size = metas[assets::game_image_id::TRUCK_FRONT].get_size();
+		const vec2 interior_size = metas[assets::game_image_id::TRUCK_INSIDE].get_size();
 
 		{
 			//auto& sprite = front += components::sprite();
@@ -54,11 +57,11 @@ namespace prefabs {
 			car.acceleration_length = 4500 / 6.2f;
 			car.speed_for_pitch_unit = 2000.f;
 
-			poly.add_vertices_from(world[assets::game_image_id::TRUCK_FRONT].shape.get<convex_partitioned_shape>());
+			poly.add_vertices_from(metas[assets::game_image_id::TRUCK_FRONT].shape.get<convex_partitioned_shape>());
 			poly.texture_map = assets::game_image_id::TRUCK_FRONT;
 			//sprite.set(assets::game_image_id::TRUCK_FRONT, world);
-			//sprite.size.x = 200;
-			//sprite.size.y = 100;
+			//sprite.get_size(metas).x = 200;
+			//sprite.get_size(metas).y = 100;
 
 			render.layer = render_layer::DYNAMIC_BODY;
 
@@ -66,7 +69,7 @@ namespace prefabs {
 			physics_definition.angular_damping = 2.f;
 
 			auto& fixture = colliders.new_collider();
-			fixture.shape.from_renderable(front);
+			fixture.shape.from_renderable(step, front);
 
 			fixture.filter = filters::dynamic_object();
 			fixture.density = 0.6f;
@@ -84,17 +87,17 @@ namespace prefabs {
 
 			render.layer = render_layer::CAR_INTERIOR;
 
-			sprite.set(assets::game_image_id::TRUCK_INSIDE, world);
+			sprite.set(assets::game_image_id::TRUCK_INSIDE);
 			//sprite.set(assets::game_image_id::TRUCK_INSIDE, rgba(122, 0, 122, 255));
-			//sprite.size.x = 250;
-			//sprite.size.y = 550;
+			//sprite.get_size(metas).x = 250;
+			//sprite.get_size(metas).y = 550;
 
 			auto& fixture = colliders.new_collider();
-			fixture.shape.from_renderable(interior);
+			fixture.shape.from_renderable(step, interior);
 			fixture.density = 0.6f;
 			fixture.filter = filters::friction_ground();
 
-			vec2 offset((front_size.x / 2 + sprite.size.x / 2) * -1, 0);
+			vec2 offset((front_size.x / 2 + sprite.get_size(metas).x / 2) * -1, 0);
 
 			colliders.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
 			colliders.is_friction_ground = true;
@@ -117,17 +120,16 @@ namespace prefabs {
 
 			render.layer = render_layer::CAR_WHEEL;
 
-			sprite.set(assets::game_image_id::CAR_INSIDE, world, rgba(29, 0, 0, 0));
-			sprite.size.set(60, 30);
+			sprite.set(assets::game_image_id::CAR_INSIDE, vec2(60, 30), rgba(29, 0, 0, 0));
 
 			auto& fixture = colliders.new_collider();
 
-			fixture.shape.from_renderable(left_wheel);
+			fixture.shape.from_renderable(step, left_wheel);
 			fixture.density = 0.6f;
 			fixture.filter = filters::trigger();
 			fixture.sensor = true;
 
-			vec2 offset((front_size.x / 2 + sprite.size.x / 2 + 20) * -1, 0);
+			vec2 offset((front_size.x / 2 + sprite.get_size(metas).x / 2 + 20) * -1, 0);
 			colliders.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
 
 			left_wheel += colliders;
@@ -149,30 +151,30 @@ namespace prefabs {
 
 					render.layer = render_layer::SMALL_DYNAMIC_BODY;
 
-					sprite.set(assets::game_image_id::TRUCK_ENGINE, world);
+					sprite.set(assets::game_image_id::TRUCK_ENGINE);
 					//sprite.set(assets::game_image_id::TRUCK_INSIDE, rgba(122, 0, 122, 255));
-					//sprite.size.x = 250;
-					//sprite.size.y = 550;
+					//sprite.get_size(metas).x = 250;
+					//sprite.get_size(metas).y = 550;
 
 					auto& fixture = colliders.new_collider();
-					fixture.shape.from_renderable(engine_physical);
+					fixture.shape.from_renderable(step, engine_physical);
 					fixture.density = 1.0f;
 					fixture.filter = filters::see_through_dynamic_object();
 
 					components::transform offset;
 
 					if (i == 0) {
-						offset.pos.set((front_size.x / 2 + interior_size.x + sprite.size.x / 2 - 5.f) * -1, (-interior_size.y / 2 + sprite.size.y / 2));
+						offset.pos.set((front_size.x / 2 + interior_size.x + sprite.get_size(metas).x / 2 - 5.f) * -1, (-interior_size.y / 2 + sprite.get_size(metas).y / 2));
 					}
 					if (i == 1) {
-						offset.pos.set((front_size.x / 2 + interior_size.x + sprite.size.x / 2 - 5.f) * -1, -(-interior_size.y / 2 + sprite.size.y / 2));
+						offset.pos.set((front_size.x / 2 + interior_size.x + sprite.get_size(metas).x / 2 - 5.f) * -1, -(-interior_size.y / 2 + sprite.get_size(metas).y / 2));
 					}
 					if (i == 2) {
-						offset.pos.set(-100, (interior_size.y / 2 + sprite.size.x / 2) * -1);
+						offset.pos.set(-100, (interior_size.y / 2 + sprite.get_size(metas).x / 2) * -1);
 						offset.rotation = -90;
 					}
 					if (i == 3) {
-						offset.pos.set(-100, (interior_size.y / 2 + sprite.size.x / 2) *  1);
+						offset.pos.set(-100, (interior_size.y / 2 + sprite.get_size(metas).x / 2) *  1);
 						offset.rotation = 90;
 					}
 
@@ -181,12 +183,12 @@ namespace prefabs {
 					engine_physical += colliders;
 
 					engine_physical.get<components::fixtures>().set_owner_body(front);
-					engine_physical.add_standard_components();
+					engine_physical.add_standard_components(step);
 
 					this_engine_transform = engine_physical.get_logic_transform();
 				}
 
-				const vec2 engine_size = world[assets::game_image_id::TRUCK_ENGINE].get_size();
+				const vec2 engine_size = metas[assets::game_image_id::TRUCK_ENGINE].get_size();
 
 				{
 					particle_effect_input input;
@@ -204,7 +206,7 @@ namespace prefabs {
 					}
 
 					const auto engine_particles = input.create_particle_effect_entity(
-						world, 
+						step,
 						place_of_birth,
 						front
 					);
@@ -212,7 +214,7 @@ namespace prefabs {
 					auto& existence = engine_particles.get<components::particles_existence>();
 					existence.distribute_within_segment_of_length = engine_size.y;
 
-					engine_particles.add_standard_components();
+					engine_particles.add_standard_components(step);
 
 					if (i == 0) {
 						front.get<components::car>().acceleration_engine[i].physical = engine_physical;
@@ -241,17 +243,17 @@ namespace prefabs {
 				in.effect.modifier.repetitions = -1;
 				in.delete_entity_after_effect_lifetime = false;
 
-				const auto engine_sound = in.create_sound_effect_entity(world, spawn_transform, front);
-				engine_sound.add_standard_components();
+				const auto engine_sound = in.create_sound_effect_entity(step, spawn_transform, front);
+				engine_sound.add_standard_components(step);
 
 				front.get<components::car>().engine_sound = engine_sound;
 				components::sound_existence::deactivate(engine_sound);
 			}
 		}
 
-		front.add_standard_components();
-		left_wheel.add_standard_components();
-		interior.add_standard_components();
+		front.add_standard_components(step);
+		left_wheel.add_standard_components(step);
+		interior.add_standard_components(step);
 
 		return front;
 	}

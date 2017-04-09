@@ -113,7 +113,7 @@ void damage_system::destroy_colliding_bullets_and_send_damage(const logic_step s
 					in.delete_entity_after_effect_lifetime = true;
 					in.direct_listener = owning_capability;
 
-					in.create_sound_effect_entity(cosmos, { it.point, 0.f }, entity_id()).add_standard_components();
+					in.create_sound_effect_entity(step, { it.point, 0.f }, entity_id()).add_standard_components(step);
 				}
 
 				if (!is_victim_a_held_item && damage.destroy_upon_damage) {
@@ -171,7 +171,7 @@ void damage_system::destroy_outdated_bullets(const logic_step step) {
 
 				const auto current_velocity = it.get<components::rigid_body>().velocity();
 
-				it.set_logic_transform({ it.get_logic_transform().pos, current_velocity.degrees() });
+				it.set_logic_transform(step, { it.get_logic_transform().pos, current_velocity.degrees() });
 
 				if (closest_hostile.alive()) {
 					vec2 dirs[] = { current_velocity.perpendicular_cw(), -current_velocity.perpendicular_cw() };

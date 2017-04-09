@@ -51,7 +51,9 @@ void perform_spell_logic(
 	const augs::stepped_timestamp now
 ) {
 	auto& cosmos = step.cosm;
-	const auto spell_data = cosmos[spell];
+	const auto& metas = step.input.metas_of_assets;
+
+	const auto spell_data = metas[spell];
 	const auto dt = cosmos.get_fixed_delta();
 	const auto caster_transform = caster.get_logic_transform();
 	
@@ -62,10 +64,10 @@ void perform_spell_logic(
 		burst.effect.modifier.colorize = spell_data.border_col;
 		
 		burst.create_particle_effect_entity(
-			cosmos, 
+			step,
 			caster_transform,
 			caster
-		).add_standard_components();
+		).add_standard_components(step);
 	};
 
 	const auto ignite_charging_particles = [&](const rgba col) {
@@ -77,10 +79,10 @@ void perform_spell_logic(
 		burst.effect.modifier.homing_target = caster;
 
 		burst.create_particle_effect_entity(
-			cosmos, 
+			step,
 			caster_transform,
 			caster
-		).add_standard_components();
+		).add_standard_components(step);
 	};
 	
 	const auto play_sound = [&](const assets::sound_buffer_id effect, const float gain = 1.f) {
@@ -90,7 +92,7 @@ void perform_spell_logic(
 		in.effect.id = effect;
 		in.effect.modifier.gain = gain;
 
-		in.create_sound_effect_entity(cosmos, caster_transform, entity_id()).add_standard_components();
+		in.create_sound_effect_entity(step, caster_transform, entity_id()).add_standard_components(step);
 	};
 
 	const auto play_standard_sparkles_sound = [&]() {
@@ -228,7 +230,7 @@ void perform_spell_logic(
 					render_layer::FLYING_BULLETS
 				);
 
-				ingredients::add_bullet_round_physics(energy_ball);
+				ingredients::add_bullet_round_physics(step, energy_ball);
 
 				auto& damage = energy_ball += components::damage();
 
@@ -260,7 +262,7 @@ void perform_spell_logic(
 				const auto energy_ball_velocity = vec2().set_from_degrees(new_energy_ball_transform.rotation) * 2000;
 				energy_ball.get<components::rigid_body>().set_velocity(energy_ball_velocity);
 
-				energy_ball.add_standard_components();
+				energy_ball.add_standard_components(step);
 			}
 		}
 

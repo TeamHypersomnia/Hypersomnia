@@ -53,6 +53,8 @@ void menu_setup::process(
 	game_window& window,
 	viewing_session& session
 ) {
+	const auto metas_of_assets = get_assets_manager().generate_logical_metas_of_assets();
+
 	const vec2i screen_size = vec2i(window.get_screen_size());
 
 	cosmos intro_scene(3000);
@@ -125,12 +127,13 @@ void menu_setup::process(
 	
 	testbed.populate_world_with_entities(
 		intro_scene, 
+		metas_of_assets,
 		session.get_standard_post_solve()
 	);
 
 	ltrb title_rect;
 	title_rect.set_position({ 100, 100 });
-	title_rect.set_size(intro_scene[assets::game_image_id::MENU_GAME_LOGO].get_size());
+	title_rect.set_size(metas_of_assets[assets::game_image_id::MENU_GAME_LOGO].get_size());
 
 	rgba fade_overlay_color = { 0, 2, 2, 255 };
 	rgba title_text_color = { 255, 255, 255, 0 };
@@ -489,7 +492,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 		const auto entropy = cosmic_entropy(director.get_entropy_for_step(intro_scene.get_total_steps_passed() - initial_step_number), intro_scene);
 
 		intro_scene.advance_deterministic_schemata(
-			entropy, 
+			{ entropy, metas_of_assets },
 			[](auto) {},
 			session.get_standard_post_solve()
 		);
@@ -514,7 +517,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 			const auto entropy = cosmic_entropy(director.get_entropy_for_step(intro_scene.get_total_steps_passed() - initial_step_number), intro_scene);
 
 			intro_scene.advance_deterministic_schemata(
-				entropy, 
+				{ entropy, metas_of_assets },
 				[](auto){},
 				session.get_standard_post_solve()
 			);

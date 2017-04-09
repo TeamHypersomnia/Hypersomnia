@@ -6,15 +6,22 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 
-void shape_variant::from_renderable(const const_entity_handle handle) {
+void shape_variant::from_renderable(
+	const const_logic_step step,
+	const entity_id id
+) {
+	const auto& cosmos = step.cosm;
+	const auto handle = cosmos[id];
+	const auto& metas = step.input.metas_of_assets;
+
 	if (handle.has<components::sprite>()) {
 		const auto& cosm = handle.get_cosmos();
 		const auto sprite = handle.get<components::sprite>();
 
-		const auto image_size = cosm[sprite.tex].get_size();
-		vec2 scale = sprite.size / image_size;
+		const auto image_size = metas[sprite.tex].get_size();
+		vec2 scale = sprite.get_size(metas) / image_size;
 
-		convex_partitioned_shape coll = cosm[sprite.tex].shape.get<convex_partitioned_shape>();
+		convex_partitioned_shape coll = metas[sprite.tex].shape.get<convex_partitioned_shape>();
 		coll.scale(scale);
 
 		set(coll);

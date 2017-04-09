@@ -99,7 +99,7 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 			const auto& subject_coll = subject_fix.get_collider_data(c.subject_b2Fixture_index.collider_index);
 			const auto& collider_coll = collider_fix.get_collider_data(c.collider_b2Fixture_index.collider_index);
 			
-			const auto sound_id = cosmos[subject_coll.material].collision_sound_matrix[collider_coll.material];
+			const auto sound_id = step.input.metas_of_assets[subject_coll.material].collision_sound_matrix[collider_coll.material];
 
 			const auto impulse = (c.normal_impulse + c.tangent_impulse) * subject_coll.collision_sound_gain_mult * collider_coll.collision_sound_gain_mult;
 
@@ -113,7 +113,7 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 				in.effect.modifier.gain = gain_mult;
 				in.effect.id = sound_id;
 
-				in.create_sound_effect_entity(cosmos, c.point, entity_id()).add_standard_components();
+				in.create_sound_effect_entity(step, c.point, entity_id()).add_standard_components(step);
 			}
 
 			// skip the next, swapped collision message
@@ -131,10 +131,10 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 			in.effect = damage.bullet_trace_sound_response;
 
 			damage.trace_sound = in.create_sound_effect_entity(
-				cosmos,
+				step,
 				g.muzzle_transform,
 				r
-			).add_standard_components();
+			).add_standard_components(step);
 		}
 
 		{
@@ -148,7 +148,7 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 				in.effect = gun.muzzle_shot_sound_response;
 				in.direct_listener = owning_capability;
 
-				in.create_sound_effect_entity(cosmos, subject.get_logic_transform(), entity_id()).add_standard_components();
+				in.create_sound_effect_entity(step, subject.get_logic_transform(), entity_id()).add_standard_components(step);
 			}
 
 			{
@@ -169,10 +169,10 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 						in.direct_listener = owning_capability;
 
 						in.create_sound_effect_entity(
-							cosmos,
+							step,
 							gun_transform,
 							entity_id()
-						).add_standard_components();
+						).add_standard_components(step);
 					}
 				}
 			}
@@ -230,10 +230,10 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 		}
 
 		in.create_sound_effect_entity(
-			cosmos, 
+			step, 
 			subject.get_logic_transform(), 
 			subject
-		).add_standard_components();
+		).add_standard_components(step);
 	}
 
 	for (const auto& d : damages) {
@@ -245,10 +245,10 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 			in.effect = inflictor.get<components::damage>().destruction_sound_response;
 			
 			in.create_sound_effect_entity(
-				cosmos, 
+				step, 
 				d.point_of_impact, 
 				entity_id()
-			).add_standard_components();
+			).add_standard_components(step);
 		}
 	}
 
@@ -260,9 +260,9 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 		in.effect.id = assets::sound_buffer_id::CAST_UNSUCCESSFUL;
 
 		in.create_sound_effect_entity(
-			cosmos, 
+			step, 
 			e.transform, 
 			entity_id()
-		).add_standard_components();
+		).add_standard_components(step);
 	}
 }

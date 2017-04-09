@@ -41,64 +41,89 @@
 #include "game/detail/shape_variant.h"
 #include "game/detail/particle_types.h"
 
-class assets_manager : public augs::settable_as_current_mixin<assets_manager> {
-	friend struct trait_tests;
+class assets_manager;
 
-	template <class T, class = void>
-	struct try_to_get_logical_meta : std::false_type {};
+template <class T, class = void>
+struct try_to_get_logical_meta : std::false_type {};
 
-	template <class T>
-	struct try_to_get_logical_meta<T, decltype(std::declval<typename T::mapped_type>().get_logical_meta(), void())> : std::true_type {
-		typedef decltype(std::declval<typename T::mapped_type>().get_logical_meta()) logical_meta_type;
-		
-		typedef
-			augs::enum_associative_array<
-				typename T::key_type,
-				logical_meta_type
-			>
-		type;
-	};
+template <class T>
+struct try_to_get_logical_meta<
+	T, 
+	decltype(std::declval<typename T::mapped_type>().get_logical_meta(std::declval<assets_manager>()), void())
+> : std::true_type {
+	typedef decltype(std::declval<typename T::mapped_type>().get_logical_meta(std::declval<assets_manager>())) logical_meta_type;
+	
+	typedef
+		augs::enum_associative_array<
+			typename T::key_type,
+			logical_meta_type
+		>
+	type;
+};
 
-	template <class T>
-	using does_asset_define_get_logical_meta = try_to_get_logical_meta<T>;
+template <class T>
+using does_asset_define_get_logical_meta = try_to_get_logical_meta<T>;
 
-	template <class T>
-	struct make_array_of_logical_metas {
-		typedef typename try_to_get_logical_meta<T>::type type;
-	};
+template <class T>
+struct make_array_of_logical_metas {
+	typedef typename try_to_get_logical_meta<T>::type type;
+};
 
-public:
-	typedef std::tuple<
-		augs::enum_associative_array<assets::animation_id, animation>,
-		augs::enum_associative_array<assets::game_image_id, game_image_baked>,
-		augs::enum_associative_array<assets::font_id, game_font_baked>,
-		augs::enum_associative_array<assets::particle_effect_id, particle_effect>,
-		augs::enum_associative_array<assets::spell_id, spell_data>,
-		augs::enum_associative_array<assets::tile_layer_id, tile_layer>,
-		augs::enum_associative_array<assets::physical_material_id, physical_material>,
+typedef std::tuple<
+	augs::enum_associative_array<assets::animation_id, animation>,
+	augs::enum_associative_array<assets::game_image_id, game_image_baked>,
+	augs::enum_associative_array<assets::font_id, game_font_baked>,
+	augs::enum_associative_array<assets::particle_effect_id, particle_effect>,
+	augs::enum_associative_array<assets::spell_id, spell_data>,
+	augs::enum_associative_array<assets::tile_layer_id, tile_layer>,
+	augs::enum_associative_array<assets::physical_material_id, physical_material>,
 
-		augs::enum_associative_array<assets::shader_id, augs::graphics::shader>,
-		augs::enum_associative_array<assets::program_id, augs::graphics::shader_program>,
-		augs::enum_associative_array<assets::sound_buffer_id, augs::sound_buffer>,
-		augs::enum_associative_array<assets::gl_texture_id, augs::graphics::texture>
-	> tuple_of_all_assets;
+	augs::enum_associative_array<assets::shader_id, augs::graphics::shader>,
+	augs::enum_associative_array<assets::program_id, augs::graphics::shader_program>,
+	augs::enum_associative_array<assets::sound_buffer_id, augs::sound_buffer>,
+	augs::enum_associative_array<assets::gl_texture_id, augs::graphics::texture>
+> tuple_of_all_assets;
 
-	typedef replace_list_type_t<
-		transform_types_in_list_t<
-			filter_types_in_list_t<
-				does_asset_define_get_logical_meta,
-				tuple_of_all_assets
-			>,
-			make_array_of_logical_metas
+typedef replace_list_type_t<
+	transform_types_in_list_t<
+		filter_types_in_list_t<
+			does_asset_define_get_logical_meta,
+			tuple_of_all_assets
 		>,
-		augs::trivially_copyable_tuple
-	> tuple_of_all_logical_metas_of_assets;
+		make_array_of_logical_metas
+	>,
+	augs::trivially_copyable_tuple
+> tuple_of_all_logical_metas_of_assets;
 
-private:
-	tuple_of_all_assets all_assets;
+template <class derived>
+struct subscript_asset_getters {
+	using base = subscript_asset_getters<derived>;
 
-	template <class T>
-	using find_assets_container_t = find_type_with_key_type_in_list_t<T, tuple_of_all_assets>;
+	template <class id_type>
+	decltype(auto) operator[](const id_type id) {
+		auto& self = *static_cast<derived*>(this);
+
+		return get_container_with_key_type<id_type>(self.all)[id];
+	}
+
+	template <class id_type>
+	decltype(auto) operator[](const id_type id) const {
+		const auto& self = *static_cast<const derived*>(this);
+
+		return get_container_with_key_type<id_type>(self.all)[id];
+	}
+};
+
+struct all_logical_metas_of_assets : subscript_asset_getters<all_logical_metas_of_assets> {
+	tuple_of_all_logical_metas_of_assets all;
+};
+
+class assets_manager : 
+	public augs::settable_as_current_mixin<assets_manager>,
+	public subscript_asset_getters<assets_manager>
+{
+	friend struct base;
+	tuple_of_all_assets all;
 public:
 
 	void load_baked_metadata(
@@ -118,17 +143,7 @@ public:
 		const assets::shader_id attach_fragment
 	);
 
-	template <class id_type>
-	decltype(auto) operator[](const id_type id) {
-		return std::get<find_assets_container_t<id_type>>(all_assets)[id];
-	}
-
-	template <class id_type>
-	decltype(auto) operator[](const id_type id) const {
-		return std::get<find_assets_container_t<id_type>>(all_assets)[id];
-	}
-
-	void write_logical_metas_of_assets_into(cosmos&) const;
+	all_logical_metas_of_assets generate_logical_metas_of_assets() const;
 
 	void destroy_everything();
 };

@@ -3,6 +3,8 @@
 #include "augs/misc/constant_size_vector.h"
 #include "game/container_sizes.h"
 
+class assets_manager;
+
 struct spell_logical_meta {
 	// GEN INTROSPECTOR struct spell_logical_meta
 	unsigned personal_electricity_required = 40u;
@@ -24,7 +26,7 @@ struct spell_data {
 	std::wstring spell_description;
 	// END GEN INTROSPECTOR
 
-	spell_logical_meta get_logical_meta() const {
+	spell_logical_meta get_logical_meta(const assets_manager& manager) const {
 		return logical;
 	}
 };

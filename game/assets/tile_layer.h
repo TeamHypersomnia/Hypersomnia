@@ -6,11 +6,14 @@
 #include "game/components/transform_component.h"
 #include "game/components/sprite_component.h"
 
+class assets_manager;
+
 struct tile_layer_logical_meta {
 	float tile_side = 0.f;
 	vec2u size;
 
-	float get_tile_side() const {
+	template <class... T>
+	float get_tile_side(T&&... dummy_simulating_manager_reference) const {
 		return tile_side;
 	}
 
@@ -54,13 +57,20 @@ public:
 
 public:
 
-	float get_tile_side() const;
+	template <class T>
+	float get_tile_side(const T& manager) const {
+		return tileset[0].get_size(manager).x;
+	}
+
 	vec2u get_size() const;
 
 	tile& tile_at(vec2u);
 	const tile& tile_at(vec2u) const;
 
-	tile_type_id register_tile_type(const tile_type);
+	tile_type_id register_tile_type(
+		const assets_manager&,
+		const tile_type
+	);
 
 	tile_type& get_tile_type(const tile_type_id);
 	const components::sprite& get_tile_type(const tile_type_id) const;
@@ -94,5 +104,5 @@ public:
 
 	visible_tiles_by_type get_visible_tiles_by_type(const ltrbu) const;
 
-	tile_layer_logical_meta get_logical_meta() const;
+	tile_layer_logical_meta get_logical_meta(const assets_manager& manager) const;
 };

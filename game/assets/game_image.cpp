@@ -2,7 +2,7 @@
 
 #include <Box2D/Box2D.h>
 
-game_image_logical_meta game_image_baked::get_logical_meta() const {
+game_image_logical_meta game_image_baked::get_logical_meta(const assets_manager& manager) const {
 	game_image_logical_meta output;
 
 	convex_partitioned_shape shape;

@@ -96,10 +96,10 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 				burst.effect = cosmos[r].get<components::damage>().muzzle_leave_particle_effect_response;
 
 				burst.create_particle_effect_entity(
-					cosmos,
+					step,
 					g.muzzle_transform,
 					g.subject
-				).add_standard_components();
+				).add_standard_components(step);
 			}
 
 			{
@@ -110,10 +110,10 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 				place_of_birth.rotation += 180;
 
 				particle_trace.create_particle_effect_entity(
-					cosmos,
+					step,
 					place_of_birth,
 					r
-				).add_standard_components();
+				).add_standard_components(step);
 			}
 		}
 
@@ -127,10 +127,10 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 			place_of_birth.rotation += 180;
 
 			burst.create_particle_effect_entity(
-				cosmos,
+				step,
 				place_of_birth,
 				shell
-			).add_standard_components();
+			).add_standard_components(step);
 		}
 	}
 
@@ -152,10 +152,10 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 			burst.effect = inflictor.get<components::damage>().destruction_particle_effect_response;
 
 			burst.create_particle_effect_entity(
-				cosmos,
+				step,
 				place_of_birth,
 				d.subject
-			).add_standard_components();
+			).add_standard_components(step);
 		}
 	}
 
@@ -195,7 +195,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 					particles_entity.get<components::transform>(),
 					existence,
 					particles_entity.get<components::position_copying>(),
-					cosmos,
+					step,
 					place_of_birth,
 					h.subject
 				);
@@ -210,9 +210,9 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 		burst.effect.id = assets::particle_effect_id::EXHAUSTED_SMOKE;
 
 		burst.create_particle_effect_entity(
-			step.cosm,
+			step,
 			e.transform,
 			e.subject
-		).add_standard_components();
+		).add_standard_components(step);
 	}
 }

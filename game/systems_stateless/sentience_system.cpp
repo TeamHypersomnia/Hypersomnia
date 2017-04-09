@@ -28,12 +28,13 @@
 
 void sentience_system::cast_spells(const logic_step step) const {
 	auto& cosmos = step.cosm;
+	const auto& metas = step.input.metas_of_assets;
 	const auto now = cosmos.get_timestamp();
 	const auto delta = cosmos.get_fixed_delta();
 
 	constexpr float standard_cooldown_for_all_spells_ms = 2000.f;
 
-	for (const auto& cast : step.entropy.cast_spells) {
+	for (const auto& cast : step.input.entropy.cast_spells) {
 		const auto subject = cosmos[cast.first];
 		const auto spell = cast.second;
 
@@ -44,7 +45,7 @@ void sentience_system::cast_spells(const logic_step step) const {
 		if (found_spell != sentience.spells.end()) {
 			auto& spell_instance_data = (*found_spell).second;
 			
-			const auto spell_data = cosmos[spell];
+			const auto spell_data = metas[spell];
 
 			const bool can_cast_already =
 				sentience.personal_electricity.value >= static_cast<meter_value_type>(spell_data.personal_electricity_required)
@@ -91,6 +92,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 	const auto consciousness_regeneration_frequency_in_steps = static_cast<unsigned>(1 / step.cosm.get_fixed_delta().in_seconds() * 2);
 	const auto pe_regeneration_frequency_in_steps = static_cast<unsigned>(1 / step.cosm.get_fixed_delta().in_seconds() * 3);
 	auto& cosmos = step.cosm;
+	const auto& metas = step.input.metas_of_assets;
 	const auto delta = cosmos.get_fixed_delta();
 
 	cosmos.for_each(
@@ -137,7 +139,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 			}
 
 			if (sentience.currently_casted_spell != assets::spell_id::COUNT) {
-				const auto spell_data = cosmos[sentience.currently_casted_spell];
+				const auto spell_data = metas[sentience.currently_casted_spell];
 				const auto when_casted = sentience.time_of_last_spell_cast;
 
 				if ((now - when_casted).in_milliseconds(delta) <= spell_data.casting_time_ms) {
@@ -260,12 +262,12 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		//auto place_of_death = subject.get_logic_transform();
 		//place_of_death.rotation = h.impact_velocity.degrees();
 		//
-		//corpse.set_logic_transform(place_of_death);
+		//corpse.set_logic_transform(step, place_of_death);
 		//
 		//subject.get<components::fixtures>().set_activated(false);
 		//subject.get<components::position_copying>().set_target(corpse);
 		//
-		//corpse.add_standard_components();
+		//corpse.add_standard_components(step);
 		//
 		
 		//

@@ -20,11 +20,11 @@
 #include "game/detail/entity_handle_mixins/physics_mixin.h"
 #include "game/detail/entity_handle_mixins/relations_mixin.h"
 #include "game/detail/entity_handle_mixins/spatial_properties_mixin.h"
-#include "game/detail/entity_handle_mixins/renderable_mixin.h"
 
 #include "game/enums/entity_flag.h"
 #include "augs/build_settings/setting_empty_bases.h"
 #include "augs/build_settings/setting_entity_handle_has_debug_name_reference.h"
+#include "game/transcendental/step_declaration.h"
 
 template<class F>
 void for_each_component_type(F callback) {
@@ -48,7 +48,6 @@ class EMPTY_BASES basic_entity_handle :
 	public inventory_mixin<is_const, basic_entity_handle<is_const>>,
 	public physics_mixin<is_const, basic_entity_handle<is_const>>,
 	public relations_mixin<is_const, basic_entity_handle<is_const>>,
-	public renderable_mixin<is_const, basic_entity_handle<is_const>>,
 	public spatial_properties_mixin<is_const, basic_entity_handle<is_const>>
 {
 public:
@@ -287,7 +286,7 @@ public:
 	}
 
 	template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
-	basic_entity_handle<is_const> add_standard_components() const;
+	basic_entity_handle<is_const> add_standard_components(const logic_step step) const;
 
 	template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 	void recalculate_basic_processing_categories() const;

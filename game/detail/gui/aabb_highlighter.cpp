@@ -10,6 +10,7 @@
 
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "generated_introspectors.h"
+#include "augs/graphics/drawers.h"
 
 void aabb_highlighter::update(const float delta_ms) {
 	timer += delta_ms;
@@ -33,7 +34,7 @@ void aabb_highlighter::draw(
 			return false;
 		}
 
-		const auto new_aabb = e.get_aabb(interp);
+		const auto new_aabb = e.get_aabb(get_assets_manager(), interp);
 
 		if (aabb.good() && new_aabb.good()) {
 			aabb.contain(new_aabb);
@@ -87,30 +88,30 @@ void aabb_highlighter::draw(
 		auto& pos = state.renderable_transform.pos;
 
 		pos = ap;
-		border.size.set(current_length, 1);
+		border.overridden_size.set(current_length, 1);
 		border.draw_from_lt(state);
-		border.size.set(1, current_length);
+		border.overridden_size.set(1, current_length);
 		border.draw_from_lt(state);
 
 		pos = ap + vec2i(as.x - current_length, 0);
-		border.size.set(current_length, 1);
+		border.overridden_size.set(current_length, 1);
 		border.draw_from_lt(state);
 		pos = ap + vec2i(as.x - 1, 0);
-		border.size.set(1, current_length);
+		border.overridden_size.set(1, current_length);
 		border.draw_from_lt(state);
 
 		pos = ap + vec2i(0, as.y - current_length);
-		border.size.set(1, current_length);
+		border.overridden_size.set(1, current_length);
 		border.draw_from_lt(state);
 		pos = ap + vec2i(0, as.y - 1);
-		border.size.set(current_length, 1);
+		border.overridden_size.set(current_length, 1);
 		border.draw_from_lt(state);
 
 		pos = ap + vec2i(as.x - current_length, as.y - 1);
-		border.size.set(current_length, 1);
+		border.overridden_size.set(current_length, 1);
 		border.draw_from_lt(state);
 		pos = ap + vec2i(as.x - 1, as.y - current_length);
-		border.size.set(1, current_length);
+		border.overridden_size.set(1, current_length);
 		border.draw_from_lt(state);
 	}
 }

@@ -5,11 +5,11 @@
 #include "augs/graphics/vertex.h"
 #include "game/detail/basic_renderable_drawing_input.h"
 
+struct all_logical_metas_of_assets;
+
 namespace augs {
 	struct texture_atlas_entry;
 }
-
-typedef cosmos logical_metas_manager;
 
 namespace components {
 	struct tile_layer_instance {
@@ -28,10 +28,22 @@ namespace components {
 
 		void draw(const drawing_input) const;
 		
+		template <class T>
 		ltrb get_aabb(
-			const logical_metas_manager&,
+			const T& metas,
 			const components::transform transform
-		) const;
+		) const {
+			const auto& layer = metas[id];
+			const auto tile_square_size = layer.get_tile_side(metas);
+			const auto size = layer.get_size();
+
+			return xywh(
+				transform.pos.x, 
+				transform.pos.y, 
+				static_cast<float>(size.x*tile_square_size), 
+				static_cast<float>(size.y*tile_square_size)
+			);
+		}
 
 		ltrbu get_visible_tiles(const drawing_input) const;
 	};

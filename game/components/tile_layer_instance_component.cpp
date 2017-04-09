@@ -19,7 +19,7 @@ namespace components {
 		const auto visible_aabb = in.camera.get_transformed_visible_world_area_aabb();
 		const auto& manager = get_assets_manager();
 		const auto& layer = manager[id];
-		const auto tile_square_size = layer.get_tile_side();
+		const auto tile_square_size = layer.get_tile_side(manager);
 
 		visible_tiles.l = static_cast<int>((visible_aabb.l - in.renderable_transform.pos.x) / tile_square_size);
 		visible_tiles.t = static_cast<int>((visible_aabb.t - in.renderable_transform.pos.y) / tile_square_size);
@@ -40,7 +40,7 @@ namespace components {
 
 		const auto visible_aabb = in.camera.get_transformed_visible_world_area_aabb();
 		const auto& layer = manager[id];
-		const auto tile_square_size = layer.get_tile_side();
+		const auto tile_square_size = layer.get_tile_side(manager);
 		const auto size = layer.get_size();
 
 		if (!visible_aabb.hover(
@@ -79,22 +79,5 @@ namespace components {
 				type.draw(sprite_input);
 			}
 		}
-	}
-
-
-	ltrb tile_layer_instance::get_aabb(
-		const logical_metas_manager& logical_metas,
-		const components::transform transform
-	) const {
-		const auto& layer = logical_metas[id];
-		const auto tile_square_size = layer.get_tile_side();
-		const auto size = layer.get_size();
-
-		return xywh(
-			transform.pos.x, 
-			transform.pos.y, 
-			static_cast<float>(size.x*tile_square_size), 
-			static_cast<float>(size.y*tile_square_size)
-		);
 	}
 }

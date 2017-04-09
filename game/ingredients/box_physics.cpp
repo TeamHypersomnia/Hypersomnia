@@ -7,7 +7,7 @@
 #include "game/transcendental/entity_handle.h"
 
 namespace ingredients {
-	void add_standard_dynamic_body(const entity_handle e, const bool destructible) {
+	void add_standard_dynamic_body(const logic_step step, const entity_handle e, const bool destructible) {
 		components::rigid_body def;
 		const auto si = e.get_cosmos().get_si();
 
@@ -22,7 +22,7 @@ namespace ingredients {
 
 		auto& info = colliders.new_collider();
 		
-		info.shape.from_renderable(e);
+		info.shape.from_renderable(step, e);
 		info.destructible = destructible;
 
 		info.filter = filters::dynamic_object();
@@ -33,7 +33,7 @@ namespace ingredients {
 		e.get<components::fixtures>().set_owner_body(e);
 	}
 
-	void add_see_through_dynamic_body(entity_handle e) {
+	void add_see_through_dynamic_body(const logic_step step, entity_handle e) {
 		components::rigid_body def;
 		const auto si = e.get_cosmos().get_si();
 
@@ -46,7 +46,7 @@ namespace ingredients {
 		def.fixed_rotation = false;
 
 		auto& info = colliders.new_collider();
-		info.shape.from_renderable(e);
+		info.shape.from_renderable(step, e);
 
 		info.filter = filters::see_through_dynamic_object();
 		info.density = 1;
@@ -57,7 +57,7 @@ namespace ingredients {
 		e.get<components::fixtures>().set_owner_body(e);
 	}
 
-	void add_shell_dynamic_body(entity_handle e) {
+	void add_shell_dynamic_body(const logic_step step, entity_handle e) {
 		components::rigid_body def;
 		const auto si = e.get_cosmos().get_si();
 
@@ -70,7 +70,7 @@ namespace ingredients {
 		def.fixed_rotation = false;
 
 		auto& info = colliders.new_collider();
-		info.shape.from_renderable(e);
+		info.shape.from_renderable(step, e);
 
 		info.filter = filters::shell();
 		info.density = 1.f;
@@ -83,7 +83,7 @@ namespace ingredients {
 		e.get<components::fixtures>().set_owner_body(e);
 	}
 
-	void add_standard_static_body(entity_handle e) {
+	void add_standard_static_body(const logic_step step, entity_handle e) {
 		components::rigid_body def;
 		const auto si = e.get_cosmos().get_si();
 
@@ -98,7 +98,7 @@ namespace ingredients {
 		def.body_type = components::rigid_body::type::STATIC;
 
 		auto& info = colliders.new_collider();
-		info.shape.from_renderable(e);
+		info.shape.from_renderable(step, e);
 
 		info.filter = filters::dynamic_object();
 		info.density = 1;
@@ -108,7 +108,7 @@ namespace ingredients {
 		e.get<components::fixtures>().set_owner_body(e);
 	}
 	
-	void add_bullet_round_physics(entity_handle e) {
+	void add_bullet_round_physics(const logic_step step, entity_handle e) {
 		components::rigid_body body;
 		const auto si = e.get_cosmos().get_si();
 
@@ -129,7 +129,7 @@ namespace ingredients {
 		colliders.disable_standard_collision_resolution = true;
 
 		auto& info = colliders.new_collider();
-		info.shape.from_renderable(e);
+		info.shape.from_renderable(step, e);
 
 		info.filter = filters::bullet();
 		info.density = 1;

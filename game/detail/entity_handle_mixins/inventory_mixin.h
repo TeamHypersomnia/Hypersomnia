@@ -37,8 +37,9 @@ public:
 	wielding_result swap_wielded_items() const;
 
 private:
-	template <class S, class I>
+	template <class T, class S, class I>
 	void for_each_contained_slot_and_item_recursive(
+		const T& manager,
 		S slot_callback, 
 		I item_callback, 
 		inventory_traversal& trav
@@ -65,11 +66,24 @@ private:
 					trav.item_remains_physical = this_slot_physical;
 
 					if (trav.item_remains_physical) {
-						trav.attachment_offset = this_item_attachment_offset + get_attachment_offset(s.second, this_item_attachment_offset, child_item_handle);
+						trav.attachment_offset = 
+							this_item_attachment_offset + get_attachment_offset(
+								manager,
+								s.second, 
+								this_item_attachment_offset, 
+								child_item_handle
+							)
+						;
 					}
 
 					item_callback(child_item_handle, static_cast<const inventory_traversal&>(trav));
-					child_item_handle.for_each_contained_slot_and_item_recursive(slot_callback, item_callback, trav);
+					
+					child_item_handle.for_each_contained_slot_and_item_recursive(
+						manager,
+						slot_callback, 
+						item_callback, 
+						trav
+					);
 				}
 			}
 		}
@@ -77,8 +91,9 @@ private:
 
 public:
 
-	template <class S, class I>
+	template <class T, class S, class I>
 	void for_each_contained_slot_and_item_recursive(
+		const T& manager,
 		S slot_callback, 
 		I item_callback
 	) const {
@@ -88,15 +103,19 @@ public:
 		trav.current_address.root_container = this_item_handle.get_id();
 		
 		for_each_contained_slot_and_item_recursive(
+			manager,
 			slot_callback, 
 			item_callback, 
 			trav
 		);
 	}
 
-	template <class F>
-	void for_each_contained_item_recursive(F callback) const {
-		for_each_contained_slot_and_item_recursive([](auto){}, callback);
+	template <class T, class I>
+	void for_each_contained_item_recursive(
+		const T& manager, 
+		I item_callback
+	) const {
+		for_each_contained_slot_and_item_recursive(manager, [](auto){}, item_callback);
 	}
 };
 

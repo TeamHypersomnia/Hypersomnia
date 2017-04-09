@@ -15,7 +15,8 @@
 #include "application/config_structs/debug_drawing_settings.h"
 
 void standard_explosion(const standard_explosion_input in) {
-	auto& cosmos = in.step.cosm;
+	const auto step = in.step;
+	auto& cosmos = step.cosm;
 
 	sound_effect_input sound_effect;
 	sound_effect.delete_entity_after_effect_lifetime = true;
@@ -24,10 +25,10 @@ void standard_explosion(const standard_explosion_input in) {
 	sound_effect.effect.modifier.gain = in.sound_gain;
 
 	sound_effect.create_sound_effect_entity(
-		cosmos, 
+		step, 
 		in.explosion_location,
 		entity_id()
-	).add_standard_components();
+	).add_standard_components(step);
 
 	const auto delta = cosmos.get_fixed_delta();
 	const auto now = cosmos.get_timestamp();

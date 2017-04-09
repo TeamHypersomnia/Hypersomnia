@@ -20,7 +20,7 @@ namespace ingredients {
 		e += pos;
 
 		render.layer = layer;
-		sprite.set(id, e.get_cosmos(), col);
+		sprite.set(id, col);
 
 		return sprite;
 	}
@@ -36,7 +36,7 @@ namespace ingredients {
 		add_sprite(e, pos, id, col, layer);
 		
 		if (size.non_zero()) {
-			e.get<components::sprite>().size = size;
+			e.get<components::sprite>().overridden_size = size;
 		}
 
 		return e.get<components::sprite>();

@@ -82,12 +82,18 @@ augs::network::server& server_setup::choose_server(augs::network::endpoint_addre
 }
 
 void server_setup::process(const config_lua_table& cfg, game_window& window, const bool start_alternative_server) {
+	const auto metas_of_assets = get_assets_manager().generate_logical_metas_of_assets();
+
 	session_report rep;
 
 	cosmos hypersomnia_last_snapshot(3000);
 
 	cosmos initial_hypersomnia(3000);
-	scene_builders::networked_testbed_server().populate_world_with_entities(initial_hypersomnia);
+
+	scene_builders::networked_testbed_server().populate_world_with_entities(
+		initial_hypersomnia, 
+		metas_of_assets
+	);
 
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
@@ -95,7 +101,11 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 
 	if (!hypersomnia.load_from_file("server_save.state")) {
 		hypersomnia.set_fixed_delta(cfg.default_tickrate);
-		scene.populate_world_with_entities(hypersomnia);
+		
+		scene.populate_world_with_entities(
+			hypersomnia, 
+			metas_of_assets
+		);
 	}
 
 	if (cfg.get_input_recording_mode() != input_recording_type::DISABLED) {
@@ -361,7 +371,9 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 				resubstantiate = false;
 			}
 
-			hypersomnia.advance_deterministic_schemata(id_mapped_entropy);
+			hypersomnia.advance_deterministic_schemata(
+				{ id_mapped_entropy, metas_of_assets }
+			);
 
 			if (daemon_online) {
 				std::string this_step_stats;

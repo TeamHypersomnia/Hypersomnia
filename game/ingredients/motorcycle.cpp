@@ -21,7 +21,10 @@
 #include "game/enums/filters.h"
 
 namespace prefabs {
-	entity_handle create_motorcycle(cosmos& world, const components::transform& spawn_transform) {
+	entity_handle create_motorcycle(const logic_step step, const components::transform& spawn_transform) {
+		auto& world = step.cosm;
+		const auto& metas = step.input.metas_of_assets;
+
 		auto front = world.create_entity("front");
 		auto left_wheel = world.create_entity("left_wheel");
 		left_wheel.make_as_child_of(front);
@@ -63,14 +66,14 @@ namespace prefabs {
 			car.lateral_impulse_multiplier = 0.3f;
 			car.braking_angular_damping = 16.f;
 
-			sprite.set(assets::game_image_id::JMIX114, world);
+			sprite.set(assets::game_image_id::JMIX114);
 			render.layer = render_layer::CAR_INTERIOR;
 
 			body.linear_damping = 0.4f;
 			body.angular_damping = 2.f;
 
 			auto& info = colliders.new_collider();
-			info.shape.from_renderable(front);
+			info.shape.from_renderable(step, front);
 
 			info.filter = filters::see_through_dynamic_object();
 			info.density = 1.5f;
@@ -99,7 +102,7 @@ namespace prefabs {
 		//	info.density = 0.6f;
 		//	colliders.disable_standard_collision_resolution = true;
 		//	info.filter = filters::see_through_dynamic_object();
-		//	vec2 offset((front.get<components::sprite>().size.x / 2 + sprite.size.x / 2 - 1) * -1, 0);
+		//	vec2 offset((front.get<components::sprite>().get_size(metas).x / 2 + sprite.get_size(metas).x / 2 - 1) * -1, 0);
 		//	colliders.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
 		//	offset = front.get<components::sprite>().size + sprite.size;
 		//
@@ -119,17 +122,16 @@ namespace prefabs {
 
 			render.layer = render_layer::CAR_WHEEL;
 
-			sprite.set(assets::game_image_id::CAR_INSIDE, world, rgba(255, 255,255, 0));
-			sprite.size.set(40, 20);
+			sprite.set(assets::game_image_id::CAR_INSIDE, { 40, 20 }, rgba(255, 255, 255, 0));
 
 			auto& info = colliders.new_collider();
 
-			info.shape.from_renderable(left_wheel);
+			info.shape.from_renderable(step, left_wheel);
 			info.density = 0.6f;
 			info.filter = filters::trigger();
 			info.sensor = true;
 			vec2 offset(0, 0);
-			//((front.get<components::sprite>().size.x / 2 + sprite.size.x / 2) *  -1, 0);
+			//((front.get<components::sprite>().get_size(metas).x / 2 + sprite.get_size(metas).x / 2) *  -1, 0);
 			colliders.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
 			
 			left_wheel += colliders;
@@ -138,11 +140,10 @@ namespace prefabs {
 
 
 		components::transform engine_transforms[4] = {
-			{ vec2(-front.get<components::sprite>().size.x / 2 + 10, 0), 180 },
-			{ vec2(front.get<components::sprite>().size.x / 2 - 10, 0), 0 },
-			{ vec2(15, -(front.get<components::sprite>().size.y / 2 + 18)), 90 },
-			{ vec2(15, front.get<components::sprite>().size.y / 2 + 18), -90 },
-
+			{ vec2(-front.get<components::sprite>().get_size(metas).x / 2 + 10, 0), 180 },
+			{ vec2(front.get<components::sprite>().get_size(metas).x / 2 - 10, 0), 0 },
+			{ vec2(15, -(front.get<components::sprite>().get_size(metas).y / 2 + 18)), 90 },
+			{ vec2(15, front.get<components::sprite>().get_size(metas).y / 2 + 18), -90 },
 		};
 
 		for(int ee = 0; ee < 4; ++ee)
@@ -161,7 +162,7 @@ namespace prefabs {
 			effect.delete_entity_after_effect_lifetime = false;
 
 			const auto engine_particles = effect.create_particle_effect_entity(
-				world,
+				step,
 				place_of_birth,
 				front
 			);
@@ -169,7 +170,7 @@ namespace prefabs {
 			auto& existence = engine_particles.get<components::particles_existence>();
 			existence.distribute_within_segment_of_length = 35.f * 0.8f;
 
-			engine_particles.add_standard_components();
+			engine_particles.add_standard_components(step);
 
 			if (ee == 0) {
 				front.get<components::car>().acceleration_engine[0].particles = engine_particles;
@@ -193,14 +194,14 @@ namespace prefabs {
 			in.effect.id = assets::sound_buffer_id::ENGINE;
 			in.effect.modifier.repetitions = -1;
 			in.delete_entity_after_effect_lifetime = false;
-			const auto engine_sound = in.create_sound_effect_entity(world, spawn_transform, front);
-			engine_sound.add_standard_components();
+			const auto engine_sound = in.create_sound_effect_entity(step, spawn_transform, front);
+			engine_sound.add_standard_components(step);
 			front.get<components::car>().engine_sound = engine_sound;
 			components::sound_existence::deactivate(engine_sound);
 		}
 
-		front.add_standard_components();
-		left_wheel.add_standard_components();
+		front.add_standard_components(step);
+		left_wheel.add_standard_components(step);
 
 		return front;
 	}

@@ -354,25 +354,8 @@ void detail_remove_item(const inventory_slot_handle handle, const entity_handle 
 	removed_item.get<components::item>().current_slot.unset();
 }
 
-components::transform get_attachment_offset(
-	const inventory_slot& slot, 
-	const components::transform container_transform, 
-	const const_entity_handle item
-) {
-	ensure(slot.is_physical_attachment_slot);
-
-	components::transform total;
-
-	const auto sticking = slot.attachment_sticking_mode;
-
-	total = slot.attachment_offset;
-	total.pos += item.get_aabb(components::transform()).get_size().get_sticking_offset(sticking);
-	total.pos.rotate(container_transform.rotation, vec2(0, 0));
-
-	return total;
-}
-
-components::transform sum_attachment_offsets(const cosmos& cosm, const inventory_item_address addr) {
+components::transform sum_attachment_offsets(const const_logic_step step, const inventory_item_address addr) {
+	const auto& cosm = step.cosm;
 	components::transform total;
 
 	inventory_slot_id current_slot;
@@ -388,7 +371,7 @@ components::transform sum_attachment_offsets(const cosmos& cosm, const inventory
 
 		const auto item_in_slot = slot_handle.get_items_inside()[0];
 
-		total += get_attachment_offset(*slot_handle, total, cosm[item_in_slot]);
+		total += get_attachment_offset(step.input.metas_of_assets, *slot_handle, total, cosm[item_in_slot]);
 
 		current_slot.container_entity = item_in_slot;
 	}
@@ -505,7 +488,7 @@ void perform_transfer(
 		detail_add_item(r.get_target_slot(), grabbed_item_part_handle);
 	}
 
-	const auto physics_updater = [previous_container_transform](const entity_handle descendant, auto... args) {
+	const auto physics_updater = [previous_container_transform, step](const entity_handle descendant, auto... args) {
 		const auto& cosmos = descendant.get_cosmos();
 
 		const auto previous_descendant_transform = descendant.get_logic_transform();
@@ -521,7 +504,7 @@ void perform_transfer(
 				owner_body = parent_slot.get_root_container();
 				
 				def.offsets_for_created_shapes[colliders_offset_type::ITEM_ATTACHMENT_DISPLACEMENT]
-					= sum_attachment_offsets(cosmos, descendant.get_address_from_root());
+					= sum_attachment_offsets(step, descendant.get_address_from_root());
 			}
 			else {
 				owner_body = descendant;
@@ -550,7 +533,7 @@ void perform_transfer(
 	};
 
 	physics_updater(grabbed_item_part_handle);
-	grabbed_item_part_handle.for_each_contained_item_recursive(physics_updater);
+	grabbed_item_part_handle.for_each_contained_item_recursive(step.input.metas_of_assets, physics_updater);
 
 	if (is_pickup) {
 		const auto target_capability = r.get_target_slot().get_container().get_owning_transfer_capability();

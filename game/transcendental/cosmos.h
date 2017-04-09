@@ -94,8 +94,12 @@ public:
 	bool operator==(const cosmos&) const;
 	bool operator!=(const cosmos&) const;
 
-	template<class Pre, class Post>
-	void advance_deterministic_schemata(const cosmic_entropy& input, Pre pre_solve, Post post_solve) {
+	template <class Pre, class Post>
+	void advance_deterministic_schemata(
+		const logic_step_input input,
+		Pre pre_solve,
+		Post post_solve
+	) {
 		thread_local data_living_one_step queues;
 		logic_step step(*this, input, queues);
 
@@ -107,7 +111,7 @@ public:
 		queues.clear_all();
 	}
 
-	void advance_deterministic_schemata(const cosmic_entropy& input);
+	void advance_deterministic_schemata(const logic_step_input input);
 
 	void reserve_storage_for_entities(const size_t);
 
@@ -125,7 +129,7 @@ public:
 	const std::string& get_debug_name(entity_id) const;
 	void set_debug_name(const entity_id, const std::string& new_debug_name);
 
-	template<class System>
+	template <class System>
 	void partial_reinference(const entity_handle handle) {
 		auto& sys = systems_inferred.get<System>();
 
@@ -134,22 +138,6 @@ public:
 		if (handle.has<components::inferred_state>()) {
 			sys.create_inferred_state(handle);
 		}
-	}
-
-	template <class id_type>
-	decltype(auto) get_handle(
-		const id_type id,
-		find_logical_metas_container_t<id_type>* enable_if_flyweight_type_found = nullptr
-	) {
-		return std::get<find_logical_metas_container_t<id_type>>(significant.logical_metas_of_assets)[id];
-	}
-
-	template <class id_type>
-	decltype(auto) get_handle(
-		const id_type id,
-		find_logical_metas_container_t<id_type>* enable_if_flyweight_type_found = nullptr
-	) const {
-		return std::get<find_logical_metas_container_t<id_type>>(significant.logical_metas_of_assets)[id];
 	}
 
 	behaviour_tree& get_handle(const assets::behaviour_tree_id);
@@ -367,5 +355,3 @@ inline size_t cosmos::entities_count() const {
 inline size_t cosmos::get_maximum_entities() const {
 	return significant.pool_for_aggregates.capacity();
 }
-
-typedef cosmos logical_metas_manager;

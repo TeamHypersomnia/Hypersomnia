@@ -6,6 +6,7 @@
 #include "game/components/name_component.h"
 #include "game/components/trace_component.h"
 #include "game/components/sound_existence_component.h"
+#include "game/components/fixtures_component.h"
 #include "game/components/catridge_component.h"
 
 #include "game/messages/create_particle_effect.h"
@@ -23,11 +24,12 @@
 
 #include "ingredients.h"
 #include "game/detail/inventory/inventory_utils.h"
+#include "augs/graphics/drawers.h"
 
 void add_muzzle_particles(
 	const entity_handle weapon, 
 	components::gun& gun, 
-	cosmos& cosmos
+	const logic_step step
 ) {
 	particle_effect_input effect;
 	const auto place_of_birth = gun.calculate_muzzle_position(weapon.get_logic_transform());
@@ -36,12 +38,12 @@ void add_muzzle_particles(
 	effect.delete_entity_after_effect_lifetime = false;
 
 	const auto engine = effect.create_particle_effect_entity(
-		cosmos, 
+		step,
 		place_of_birth,
 		weapon
 	);
 
-	engine.add_standard_components();
+	engine.add_standard_components(step);
 
 	components::particles_existence::deactivate(engine);
 
@@ -49,12 +51,12 @@ void add_muzzle_particles(
 }
 
 namespace ingredients {
-	void add_default_gun_container(entity_handle e, const float mag_rotation) {
+	void add_default_gun_container(const logic_step step, entity_handle e, const float mag_rotation) {
 		auto& item = make_item(e);
 		auto& container = e += components::container();
 		item.space_occupied_per_charge = to_space_units("3.5");
 
-		const auto bbox = e.get_aabb(components::transform()).get_size();
+		const auto bbox = e.get_aabb(step.input.metas_of_assets, components::transform()).get_size();
 
 		{
 			inventory_slot slot_def;
@@ -104,7 +106,7 @@ namespace prefabs {
 
 		{
 			ingredients::add_sprite(sample_magazine, pos, assets::game_image_id::SAMPLE_MAGAZINE, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::add_see_through_dynamic_body(sample_magazine);
+			ingredients::add_see_through_dynamic_body(step, sample_magazine);
 
 			auto& item = ingredients::make_item(sample_magazine);
 			auto& container = sample_magazine += components::container();
@@ -120,7 +122,7 @@ namespace prefabs {
 			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
 		}
 
-		sample_magazine.add_standard_components();
+		sample_magazine.add_standard_components(step);
 		
 		if (charge_inside.alive()) {
 			item_slot_transfer_request_data load_charge{ charge_inside, sample_magazine[slot_function::ITEM_DEPOSIT] };
@@ -139,7 +141,7 @@ namespace prefabs {
 
 		{
 			ingredients::add_sprite(sample_magazine, pos, assets::game_image_id::SMALL_MAGAZINE, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::add_see_through_dynamic_body(sample_magazine);
+			ingredients::add_see_through_dynamic_body(step, sample_magazine);
 
 			auto& item = ingredients::make_item(sample_magazine);
 			auto& container = sample_magazine += components::container();
@@ -156,10 +158,10 @@ namespace prefabs {
 		}
 
 		if (charge_inside.dead()) {
-			charge_inside.set_id(create_cyan_charge(cosmos, vec2(0, 0), 30));
+			charge_inside.set_id(create_cyan_charge(step, vec2(0, 0), 30));
 		}
 
-		sample_magazine.add_standard_components();
+		sample_magazine.add_standard_components(step);
 
 		item_slot_transfer_request_data load_charge{ charge_inside, sample_magazine[slot_function::ITEM_DEPOSIT] };
 		perform_transfer(load_charge, step);
@@ -167,24 +169,26 @@ namespace prefabs {
 		return sample_magazine;
 	}
 
-	entity_handle create_sample_suppressor(cosmos& cosmos, vec2 pos) {
+	entity_handle create_sample_suppressor(const logic_step step, vec2 pos) {
+		auto& cosmos = step.cosm;
 		auto sample_suppressor = cosmos.create_entity("sample_suppressor");
 		name_entity(sample_suppressor, entity_name::SUPPRESSOR);
 
 		ingredients::add_sprite(sample_suppressor, pos, assets::game_image_id::SAMPLE_SUPPRESSOR, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::add_see_through_dynamic_body(sample_suppressor);
+		ingredients::add_see_through_dynamic_body(step, sample_suppressor);
 
 		auto& item = ingredients::make_item(sample_suppressor);
 
 		item.categories_for_slot_compatibility.set(item_category::MUZZLE_ATTACHMENT);
 		item.space_occupied_per_charge = to_space_units("0.2");
 
-		sample_suppressor.add_standard_components();
+		sample_suppressor.add_standard_components(step);
 
 		return sample_suppressor;
 	}
 
-	entity_handle create_red_charge(cosmos& cosmos, vec2 pos, int charges) {
+	entity_handle create_red_charge(const logic_step step, vec2 pos, int charges) {
+		auto& cosmos = step.cosm;
 		const auto red_charge = cosmos.create_entity("red_charge");
 		const auto round_definition = cosmos.create_entity("round_definition");
 		const auto shell_definition = cosmos.create_entity("shell_definition");
@@ -192,7 +196,7 @@ namespace prefabs {
 
 		{
 			ingredients::add_sprite(red_charge, pos, assets::game_image_id::RED_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::add_see_through_dynamic_body(red_charge);
+			ingredients::add_see_through_dynamic_body(step, red_charge);
 
 			auto& item = ingredients::make_item(red_charge);
 			item.space_occupied_per_charge = to_space_units("0.01");
@@ -208,7 +212,7 @@ namespace prefabs {
 
 		{
 			auto& s = ingredients::add_sprite(round_definition, pos, assets::game_image_id::ROUND_TRACE, red, render_layer::FLYING_BULLETS);
-			ingredients::add_bullet_round_physics(round_definition);
+			ingredients::add_bullet_round_physics(step, round_definition);
 
 			auto& damage = round_definition += components::damage();
 			damage.impulse_upon_hit = 15000.f;
@@ -244,18 +248,19 @@ namespace prefabs {
 
 		{
 			ingredients::add_sprite(shell_definition, pos, assets::game_image_id::RED_SHELL, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::add_shell_dynamic_body(shell_definition);
+			ingredients::add_shell_dynamic_body(step, shell_definition);
 		}
 
 		red_charge.map_child_entity(child_entity_name::CATRIDGE_BULLET, round_definition);
 		red_charge.map_child_entity(child_entity_name::CATRIDGE_SHELL, shell_definition);
 
-		red_charge.add_standard_components();
+		red_charge.add_standard_components(step);
 
 		return red_charge;
 	}
 
-	entity_handle create_pink_charge(cosmos& cosmos, vec2 pos, int charges) {
+	entity_handle create_pink_charge(const logic_step step, vec2 pos, int charges) {
+		auto& cosmos = step.cosm;
 		const auto pink_charge = cosmos.create_entity("pink_charge");
 		const auto round_definition = cosmos.create_entity("round_definition");
 		const auto shell_definition = cosmos.create_entity("shell_definition");
@@ -263,7 +268,7 @@ namespace prefabs {
 
 		{
 			ingredients::add_sprite(pink_charge, pos, assets::game_image_id::PINK_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::add_see_through_dynamic_body(pink_charge);
+			ingredients::add_see_through_dynamic_body(step, pink_charge);
 
 			auto& item = ingredients::make_item(pink_charge);
 			item.space_occupied_per_charge = to_space_units("0.01");
@@ -279,7 +284,7 @@ namespace prefabs {
 
 		{
 			auto& s = ingredients::add_sprite(round_definition, pos, assets::game_image_id::ROUND_TRACE, pink, render_layer::FLYING_BULLETS);
-			ingredients::add_bullet_round_physics(round_definition);
+			ingredients::add_bullet_round_physics(step, round_definition);
 			
 			auto& damage = round_definition += components::damage();
 			damage.impulse_upon_hit = 1000.f;
@@ -313,18 +318,19 @@ namespace prefabs {
 
 		{
 			ingredients::add_sprite(shell_definition, pos, assets::game_image_id::PINK_SHELL, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::add_shell_dynamic_body(shell_definition);
+			ingredients::add_shell_dynamic_body(step, shell_definition);
 		}
 
 		pink_charge.map_child_entity(child_entity_name::CATRIDGE_BULLET, round_definition);
 		pink_charge.map_child_entity(child_entity_name::CATRIDGE_SHELL, shell_definition);
 
-		pink_charge.add_standard_components();
+		pink_charge.add_standard_components(step);
 
 		return pink_charge;
 	}
 
-	entity_handle create_cyan_charge(cosmos& cosmos, vec2 pos, int charges) {
+	entity_handle create_cyan_charge(const logic_step step, vec2 pos, int charges) {
+		auto& cosmos = step.cosm;
 		const auto cyan_charge = cosmos.create_entity("cyan_charge");
 		const auto round_definition = cosmos.create_entity("round_definition");
 		const auto shell_definition = cosmos.create_entity("shell_definition");
@@ -332,7 +338,7 @@ namespace prefabs {
 
 		{
 			ingredients::add_sprite(cyan_charge, pos, assets::game_image_id::CYAN_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::add_see_through_dynamic_body(cyan_charge);
+			ingredients::add_see_through_dynamic_body(step, cyan_charge);
 
 			auto& item = ingredients::make_item(cyan_charge);
 			item.space_occupied_per_charge = to_space_units("0.01");
@@ -348,7 +354,7 @@ namespace prefabs {
 
 		{
 			auto& s = ingredients::add_sprite(round_definition, pos, assets::game_image_id::ROUND_TRACE, cyan, render_layer::FLYING_BULLETS);
-			ingredients::add_bullet_round_physics(round_definition);
+			ingredients::add_bullet_round_physics(step, round_definition);
 
 			auto& damage = round_definition += components::damage();
 
@@ -381,18 +387,19 @@ namespace prefabs {
 
 		{
 			ingredients::add_sprite(shell_definition, pos, assets::game_image_id::CYAN_SHELL, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::add_shell_dynamic_body(shell_definition);
+			ingredients::add_shell_dynamic_body(step, shell_definition);
 		}
 
 		cyan_charge.map_child_entity(child_entity_name::CATRIDGE_BULLET, round_definition);
 		cyan_charge.map_child_entity(child_entity_name::CATRIDGE_SHELL, shell_definition);
 
-		cyan_charge.add_standard_components();
+		cyan_charge.add_standard_components(step);
 
 		return cyan_charge;
 	}
 
-	entity_handle create_green_charge(cosmos& cosmos, vec2 pos, int charges) {
+	entity_handle create_green_charge(const logic_step step, vec2 pos, int charges) {
+		auto& cosmos = step.cosm;
 		const auto green_charge = cosmos.create_entity("green_charge");
 		const auto round_definition = cosmos.create_entity("round_definition");
 		const auto shell_definition = cosmos.create_entity("shell_definition");
@@ -400,7 +407,7 @@ namespace prefabs {
 
 		{
 			ingredients::add_sprite(green_charge, pos, assets::game_image_id::GREEN_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::add_see_through_dynamic_body(green_charge);
+			ingredients::add_see_through_dynamic_body(step, green_charge);
 
 			auto& item = ingredients::make_item(green_charge);
 			item.space_occupied_per_charge = to_space_units("0.01");
@@ -412,7 +419,7 @@ namespace prefabs {
 
 		{
 			auto& s = ingredients::add_sprite(round_definition, pos, assets::game_image_id::ROUND_TRACE, green, render_layer::FLYING_BULLETS);
-			ingredients::add_bullet_round_physics(round_definition);
+			ingredients::add_bullet_round_physics(step, round_definition);
 
 			auto& damage = round_definition += components::damage();
 			damage.amount *= -1;
@@ -427,18 +434,19 @@ namespace prefabs {
 
 		{
 			ingredients::add_sprite(shell_definition, pos, assets::game_image_id::GREEN_SHELL, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::add_shell_dynamic_body(shell_definition);
+			ingredients::add_shell_dynamic_body(step, shell_definition);
 		}
 
 		green_charge.map_child_entity(child_entity_name::CATRIDGE_BULLET, round_definition);
 		green_charge.map_child_entity(child_entity_name::CATRIDGE_SHELL, shell_definition);
 
-		green_charge.add_standard_components();
+		green_charge.add_standard_components(step);
 
 		return green_charge;
 	}
 
 	entity_handle create_sample_rifle(const logic_step step, vec2 pos, entity_id load_mag_id) {
+		auto& metas = step.input.metas_of_assets;
 		auto& cosmos = step.cosm;
 		auto load_mag = cosmos[load_mag_id];
 		
@@ -446,8 +454,8 @@ namespace prefabs {
 		name_entity(weapon, entity_name::ASSAULT_RIFLE);
 
 		auto& sprite = ingredients::add_sprite(weapon, pos, assets::game_image_id::ASSAULT_RIFLE, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::add_see_through_dynamic_body(weapon);
-		ingredients::add_default_gun_container(weapon);
+		ingredients::add_see_through_dynamic_body(step, weapon);
+		ingredients::add_default_gun_container(step, weapon);
 		
 		auto& gun = weapon += components::gun();
 
@@ -456,7 +464,7 @@ namespace prefabs {
 		gun.action_mode = components::gun::action_type::AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(4000.f, 4000.f);
 		gun.shot_cooldown = augs::stepped_cooldown(100);
-		gun.bullet_spawn_offset.set(sprite.size.x/2, 0);
+		gun.bullet_spawn_offset.set(sprite.get_size(metas).x/2, 0);
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
 
@@ -505,8 +513,8 @@ namespace prefabs {
 			in.effect.id = assets::sound_buffer_id::FIREARM_ENGINE;
 			in.effect.modifier.repetitions = -1;
 			in.delete_entity_after_effect_lifetime = false;
-			const auto engine_sound = in.create_sound_effect_entity(cosmos, gun.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
-			engine_sound.add_standard_components();
+			const auto engine_sound = in.create_sound_effect_entity(step, gun.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
+			engine_sound.add_standard_components(step);
 			gun.firing_engine_sound = engine_sound;
 			components::sound_existence::deactivate(engine_sound);
 
@@ -515,9 +523,9 @@ namespace prefabs {
 			gun.engine_sound_strength = 0.5f;
 		}
 		
-		add_muzzle_particles(weapon, gun, cosmos);
+		add_muzzle_particles(weapon, gun, step);
 
-		weapon.add_standard_components();
+		weapon.add_standard_components(step);
 
 		if (load_mag.alive()) {
 			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);
@@ -528,6 +536,7 @@ namespace prefabs {
 	}
 
 	entity_handle create_sample_bilmer2000(const logic_step step, vec2 pos, entity_id load_mag_id) {
+		auto& metas = step.input.metas_of_assets;
 		auto& cosmos = step.cosm;
 		auto load_mag = cosmos[load_mag_id];
 
@@ -535,10 +544,10 @@ namespace prefabs {
 		name_entity(weapon, entity_name::BILMER2000);
 
 		auto& sprite = ingredients::add_sprite(weapon, pos, assets::game_image_id::BILMER2000, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::add_see_through_dynamic_body(weapon);
-		ingredients::add_default_gun_container(weapon);
+		ingredients::add_see_through_dynamic_body(step, weapon);
+		ingredients::add_default_gun_container(step, weapon);
 		
-		const auto bbox = weapon.get_aabb(components::transform()).get_size();
+		const auto bbox = weapon.get_aabb(metas, components::transform()).get_size();
 
 		auto& container = weapon.get<components::container>();
 		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_offset.pos.set(-10, -10 + bbox.y/2);
@@ -555,7 +564,7 @@ namespace prefabs {
 		gun.action_mode = components::gun::action_type::AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(4500.f, 4500.f);
 		gun.shot_cooldown = augs::stepped_cooldown(150);
-		gun.bullet_spawn_offset.set(sprite.size.x / 2, 0);
+		gun.bullet_spawn_offset.set(sprite.get_size(metas).x / 2, 0);
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
 		gun.num_last_bullets_to_trigger_low_ammo_cue = 6;
@@ -604,8 +613,8 @@ namespace prefabs {
 			in.effect.id = assets::sound_buffer_id::FIREARM_ENGINE;
 			in.effect.modifier.repetitions = -1;
 			in.delete_entity_after_effect_lifetime = false;
-			const auto engine_sound = in.create_sound_effect_entity(cosmos, gun.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
-			engine_sound.add_standard_components();
+			const auto engine_sound = in.create_sound_effect_entity(step, gun.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
+			engine_sound.add_standard_components(step);
 			gun.firing_engine_sound = engine_sound;
 			components::sound_existence::deactivate(engine_sound);
 
@@ -614,9 +623,9 @@ namespace prefabs {
 			gun.engine_sound_strength = 0.5f;
 		}
 
-		add_muzzle_particles(weapon, gun, cosmos);
+		add_muzzle_particles(weapon, gun, step);
 
-		weapon.add_standard_components();
+		weapon.add_standard_components(step);
 
 		if (load_mag.alive()) {
 			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);
@@ -630,14 +639,15 @@ namespace prefabs {
 	}
 
 	entity_handle create_submachine(const logic_step step, vec2 pos, entity_id load_mag_id) {
+		auto& metas = step.input.metas_of_assets;
 		auto& cosmos = step.cosm;
 		auto load_mag = cosmos[load_mag_id];
 		auto weapon = cosmos.create_entity("submachine");
 		name_entity(weapon, entity_name::SUBMACHINE);
 
 		auto& sprite = ingredients::add_sprite(weapon, pos, assets::game_image_id::SUBMACHINE, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::add_see_through_dynamic_body(weapon);
-		ingredients::add_default_gun_container(weapon);
+		ingredients::add_see_through_dynamic_body(step, weapon);
+		ingredients::add_default_gun_container(step, weapon);
 
 		auto& gun = weapon += components::gun();
 
@@ -646,7 +656,7 @@ namespace prefabs {
 		gun.action_mode = components::gun::action_type::AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(3000.f, 3000.f);
 		gun.shot_cooldown = augs::stepped_cooldown(50);
-		gun.bullet_spawn_offset.set(sprite.size.x/2, 0);
+		gun.bullet_spawn_offset.set(sprite.get_size(metas).x/2, 0);
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
 		gun.num_last_bullets_to_trigger_low_ammo_cue = 9;
@@ -665,8 +675,8 @@ namespace prefabs {
 			in.effect.id = assets::sound_buffer_id::FIREARM_ENGINE;
 			in.effect.modifier.repetitions = -1;
 			in.delete_entity_after_effect_lifetime = false;
-			const auto engine_sound = in.create_sound_effect_entity(cosmos, gun.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
-			engine_sound.add_standard_components();
+			const auto engine_sound = in.create_sound_effect_entity(step, gun.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
+			engine_sound.add_standard_components(step);
 			gun.firing_engine_sound = engine_sound;
 			components::sound_existence::deactivate(engine_sound);
 
@@ -706,9 +716,9 @@ namespace prefabs {
 
 		gun.recoil.scale = 30.0f/2;
 	
-		add_muzzle_particles(weapon, gun, cosmos);
+		add_muzzle_particles(weapon, gun, step);
 
-		weapon.add_standard_components();
+		weapon.add_standard_components(step);
 
 		if (load_mag.alive()) {
 			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);
@@ -719,14 +729,16 @@ namespace prefabs {
 	}
 
 	entity_handle create_amplifier_arm(
-		cosmos& cosmos,
+		const logic_step step,
 		vec2 pos
 	) {
+		auto& metas = step.input.metas_of_assets;
+		auto& cosmos = step.cosm;
 		auto weapon = cosmos.create_entity("amplifier_arm");
 		name_entity(weapon, entity_name::AMPLIFIER_ARM);
 
 		auto& sprite = ingredients::add_sprite(weapon, pos, assets::game_image_id::AMPLIFIER_ARM, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::add_see_through_dynamic_body(weapon);
+		ingredients::add_see_through_dynamic_body(step, weapon);
 		
 		auto& item = ingredients::make_item(weapon);
 		item.space_occupied_per_charge = to_space_units("3.0");
@@ -738,7 +750,7 @@ namespace prefabs {
 		gun.action_mode = components::gun::action_type::AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(2000.f, 2000.f);
 		gun.shot_cooldown = augs::stepped_cooldown(500);
-		gun.bullet_spawn_offset.set(sprite.size.x / 2, 0);
+		gun.bullet_spawn_offset.set(sprite.get_size(metas).x / 2, 0);
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
 
@@ -777,13 +789,13 @@ namespace prefabs {
 
 		gun.recoil.scale = 30.0f / 2;
 
-		weapon.add_standard_components();
+		weapon.add_standard_components(step);
 
 		{
 			const auto round_definition = cosmos.create_entity("round_definition");
 
 			auto& s = ingredients::add_sprite(round_definition, pos, assets::game_image_id::ENERGY_BALL, cyan, render_layer::FLYING_BULLETS);
-			ingredients::add_bullet_round_physics(round_definition);
+			ingredients::add_bullet_round_physics(step, round_definition);
 
 			auto& damage = round_definition += components::damage();
 
@@ -817,14 +829,15 @@ namespace prefabs {
 	}
 
 	entity_handle create_pistol(const logic_step step, vec2 pos, entity_id load_mag_id) {
+		auto& metas = step.input.metas_of_assets;
 		auto& cosmos = step.cosm;
 		auto load_mag = cosmos[load_mag_id];
 		auto weapon = cosmos.create_entity("pistol");
 		name_entity(weapon, entity_name::PISTOL);
 
 		auto& sprite = ingredients::add_sprite(weapon, pos, assets::game_image_id::PISTOL, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::add_see_through_dynamic_body(weapon);
-		ingredients::add_default_gun_container(weapon);
+		ingredients::add_see_through_dynamic_body(step, weapon);
+		ingredients::add_default_gun_container(step, weapon);
 
 		auto& gun = weapon += components::gun();
 
@@ -833,7 +846,7 @@ namespace prefabs {
 		gun.action_mode = components::gun::action_type::SEMI_AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(2500.f, 2500.f);
 		gun.shot_cooldown = augs::stepped_cooldown(150);
-		gun.bullet_spawn_offset.set(sprite.size.x / 2, 0);
+		gun.bullet_spawn_offset.set(sprite.get_size(metas).x / 2, 0);
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
 		gun.num_last_bullets_to_trigger_low_ammo_cue = 6;
@@ -878,9 +891,9 @@ namespace prefabs {
 
 		gun.recoil.scale = 30.0f/2;
 		
-		add_muzzle_particles(weapon, gun, cosmos);
+		add_muzzle_particles(weapon, gun, step);
 
-		weapon.add_standard_components();
+		weapon.add_standard_components(step);
 
 		if (load_mag.alive()) {
 			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);
@@ -891,17 +904,18 @@ namespace prefabs {
 	}
 
 	entity_handle create_kek9(const logic_step step, vec2 pos, entity_id load_mag_id) {
+		auto& metas = step.input.metas_of_assets;
 		auto& cosmos = step.cosm;
 		auto load_mag = cosmos[load_mag_id];
 		auto weapon = cosmos.create_entity("pistol");
 		name_entity(weapon, entity_name::KEK9);
 
 		auto& sprite = ingredients::add_sprite(weapon, pos, assets::game_image_id::KEK9, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::add_see_through_dynamic_body(weapon);
-		ingredients::add_default_gun_container(weapon, 0);
+		ingredients::add_see_through_dynamic_body(step, weapon);
+		ingredients::add_default_gun_container(step, weapon, 0);
 		auto& container = weapon.get<components::container>();
 		
-		const auto bbox = weapon.get_aabb(components::transform()).get_size();
+		const auto bbox = weapon.get_aabb(metas, components::transform()).get_size();
 		
 		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_offset.pos.set(1, -11 + bbox.y/2);
 		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_sticking_mode = rectangle_sticking::BOTTOM;
@@ -913,7 +927,7 @@ namespace prefabs {
 		gun.action_mode = components::gun::action_type::SEMI_AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(3000.f, 3000.f);
 		gun.shot_cooldown = augs::stepped_cooldown(100);
-		gun.bullet_spawn_offset.set(sprite.size.x / 2, -7);
+		gun.bullet_spawn_offset.set(sprite.get_size(metas).x / 2, -7);
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
 		gun.num_last_bullets_to_trigger_low_ammo_cue = 6;
@@ -963,8 +977,8 @@ namespace prefabs {
 			in.effect.id = assets::sound_buffer_id::FIREARM_ENGINE;
 			in.effect.modifier.repetitions = -1;
 			in.delete_entity_after_effect_lifetime = false;
-			const auto engine_sound = in.create_sound_effect_entity(cosmos, gun.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
-			engine_sound.add_standard_components();
+			const auto engine_sound = in.create_sound_effect_entity(step, gun.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
+			engine_sound.add_standard_components(step);
 			gun.firing_engine_sound = engine_sound;
 			components::sound_existence::deactivate(engine_sound);
 
@@ -973,9 +987,9 @@ namespace prefabs {
 			gun.engine_sound_strength = 0.5f;
 		}
 
-		add_muzzle_particles(weapon, gun, cosmos);
+		add_muzzle_particles(weapon, gun, step);
 
-		weapon.add_standard_components();
+		weapon.add_standard_components(step);
 
 		if (load_mag.alive()) {
 			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);

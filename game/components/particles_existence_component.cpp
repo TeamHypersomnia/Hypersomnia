@@ -8,17 +8,17 @@
 using namespace augs;
 
 entity_handle particle_effect_input::create_particle_effect_entity(
-	cosmos& cosmos,
+	const logic_step step,
 	const components::transform place_of_birth,
 	const entity_id chased_subject
 ) const {
-	const entity_handle new_stream_entity = cosmos.create_entity("particle_stream");
+	const entity_handle new_stream_entity = step.cosm.create_entity("particle_stream");
 
 	create_particle_effect_components(
 		new_stream_entity += components::transform(),
 		new_stream_entity += components::particles_existence(),
 		new_stream_entity += components::position_copying(),
-		cosmos,
+		step,
 		place_of_birth,
 		chased_subject
 	);
@@ -30,10 +30,12 @@ void particle_effect_input::create_particle_effect_components(
 	components::transform& out_transform,
 	components::particles_existence& out_existence,
 	components::position_copying& out_copying,
-	cosmos& cosmos,
+	const logic_step step,
 	const components::transform place_of_birth,
 	const entity_id chased_subject_id
 ) const {
+	auto& cosmos = step.cosm;
+	
 	out_transform = place_of_birth;
 
 	out_existence.input = *this;
@@ -41,7 +43,7 @@ void particle_effect_input::create_particle_effect_components(
 	out_existence.time_of_last_displacement = cosmos.get_timestamp();
 	out_existence.current_displacement_duration_bound_ms = 0;
 
-	const float duration_in_seconds = cosmos[effect.id].max_duration_in_seconds;
+	const float duration_in_seconds = step.input.metas_of_assets[effect.id].max_duration_in_seconds;
 	out_existence.max_lifetime_in_steps = static_cast<unsigned>(duration_in_seconds / cosmos.get_fixed_delta().in_seconds()) + 1u;
 
 	const auto chased_subject = cosmos[chased_subject_id];

@@ -26,6 +26,8 @@ public:
 		RECORDING
 	};
 	
+	all_logical_metas_of_assets metas_of_assets;
+
 	director_state current_director_state = director_state::PLAYING;
 	recording_replacement_type recording_replacement_mode = recording_replacement_type::ALL;
 

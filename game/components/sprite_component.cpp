@@ -14,26 +14,21 @@ namespace components {
 		global_time_seconds = secs;
 	}
 
-	vec2 sprite::get_size() const {
-		return size;
-	}
-
 	void sprite::set(
 		const assets::game_image_id _tex, 
 		const vec2 _size,
 		const rgba _color
 	) {
-		tex = _tex;
-		color = _color;
-		size = _size;
+		overridden_size = _size;
+		set(_tex, _color);
 	}
 
 	void sprite::set(
-		const assets::game_image_id id,
-		const cosmos& manager,
-		const rgba color
+		const assets::game_image_id _tex,
+		const rgba _color
 	) {
-		set(id, manager[id].get_size(), color);
+		tex = _tex;
+		color = _color;
 	}
 
 	void sprite::draw(
@@ -82,7 +77,7 @@ namespace components {
 	}
 
 	void sprite::draw_from_lt(drawing_input in) const {
-		in.renderable_transform.pos += get_size() / 2;
+		in.renderable_transform.pos += get_size(get_assets_manager()) / 2;
 		draw(in);
 	}
 
@@ -95,7 +90,7 @@ namespace components {
 		const float final_rotation = in.renderable_transform.rotation + rotation_offset;
 
 		auto screen_space_pos = in.camera[transform_pos];
-		const auto drawn_size = get_size();
+		const auto drawn_size = get_size(manager);
 
 		if (center_offset.non_zero()) {
 			screen_space_pos -= vec2(center_offset).rotate(final_rotation, vec2(0, 0));
@@ -154,20 +149,5 @@ namespace components {
 				);
 			}
 		}
-	}
-
-	std::vector<vec2> sprite::get_vertices() const {
-		std::vector<vec2> out;
-		out.push_back(get_size() / -2.f);
-		out.push_back(get_size() / -2.f + vec2(get_size().x, 0.f));
-		out.push_back(get_size() / -2.f + get_size());
-		out.push_back(get_size() / -2.f + vec2(0.f, get_size().y));
-		return out;
-	}
-	
-	ltrb sprite::get_aabb(
-		const components::transform transform
-	) const {
-		return augs::get_aabb(augs::make_sprite_points(transform.pos, get_size(), transform.rotation + rotation_offset));
 	}
 }

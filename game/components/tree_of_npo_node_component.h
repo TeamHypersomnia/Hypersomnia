@@ -19,7 +19,10 @@ namespace components {
 		ltrb aabb;
 		// END GEN INTROSPECTOR
 
-		static tree_of_npo_node create_default_for(const_entity_handle);
+		static tree_of_npo_node create_default_for(
+			const logic_step step,
+			const_entity_handle
+		);
 	};
 }
 
@@ -38,7 +41,7 @@ class component_synchronizer<false, components::tree_of_npo_node> : public basic
 public:
 	using basic_tree_of_npo_node_synchronizer<false>::basic_tree_of_npo_node_synchronizer;
 
-	void update_proxy() const;
+	void update_proxy(const logic_step) const;
 	void set_activated(bool) const;
 };
 

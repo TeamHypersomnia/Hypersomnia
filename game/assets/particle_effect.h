@@ -21,6 +21,8 @@
 
 #include "game/container_sizes.h"
 
+class assets_manager;
+
 struct particle_effect_modifier {
 	// GEN INTROSPECTOR struct particle_effect_modifier
 	rgba colorize;
@@ -112,7 +114,7 @@ struct particle_effect_logical_meta {
 struct particle_effect {
 	augs::constant_size_vector<particles_emission, PARTICLE_EMISSIONS_IN_EFFECT_COUNT> emissions;
 
-	particle_effect_logical_meta get_logical_meta() const {
+	particle_effect_logical_meta get_logical_meta(const assets_manager& manager) const {
 		return {
 			maximum_of(
 				emissions,

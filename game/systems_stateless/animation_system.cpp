@@ -98,6 +98,7 @@ void components::animation::set_current_frame(unsigned number) {
 
 void animation_system::progress_animation_states(const logic_step step) {
 	auto& cosmos = step.cosm;
+	const auto& metas = step.input.metas_of_assets;
 	const auto& delta = step.get_delta();
 
 	cosmos.for_each(
@@ -106,7 +107,7 @@ void animation_system::progress_animation_states(const logic_step step) {
 			auto& animation_state = it.get<components::animation>();
 
 			if (animation_state.state != components::animation::playing_state::PAUSED) {
-				auto& animation = cosmos[animation_state.current_animation];
+				auto& animation = metas[animation_state.current_animation];
 
 				if (animation.frames.empty()) {
 					return;
@@ -169,8 +170,7 @@ void animation_system::progress_animation_states(const logic_step step) {
 				auto& sprite = it.get<components::sprite>();
 
 				sprite.set(
-					animation.frames[animation_state.get_current_frame()].image_id,
-					step.cosm
+					animation.frames[animation_state.get_current_frame()].image_id
 				);
 			}
 		}

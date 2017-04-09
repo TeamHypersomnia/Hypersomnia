@@ -7,10 +7,6 @@
 tile_layer::tile::tile(const unsigned type) : type_id(type) {}
 //tile_layer::tile_type::tile_type(const tile_type_id tile_texture) : tile_texture(tile_texture) {}
 
-float tile_layer::get_tile_side() const {
-	return tileset[0].size.x;
-}
-
 vec2u tile_layer::get_size() const {
 	return size;
 }
@@ -136,15 +132,20 @@ void tile_layer::set_tiles(const ltrbu rc, const tile_rectangular_filling id) {
 	}
 }
 
-unsigned tile_layer::register_tile_type(const tile_type new_type) {
+unsigned tile_layer::register_tile_type(
+	const assets_manager& manager,
+	const tile_type new_type
+) {
 	tileset.push_back(new_type);
 
-	const bool is_square = new_type.get_size().x == new_type.get_size().y;
+	const auto new_size = new_type.get_size(manager);
+
+	const bool is_square = new_size.x == new_size.y;
 
 	ensure(is_square);
 
 	if (tileset.size() > 1) {
-		const bool is_same_size = new_type.get_size() == tileset[tileset.size() - 2].get_size();
+		const bool is_same_size = new_size == tileset[tileset.size() - 2].get_size(manager);
 
 		ensure(is_same_size);
 	}
@@ -174,9 +175,9 @@ tile_layer::visible_tiles_by_type tile_layer::get_visible_tiles_by_type(const lt
 	return result;
 }
 
-tile_layer_logical_meta tile_layer::get_logical_meta() const {
+tile_layer_logical_meta tile_layer::get_logical_meta(const assets_manager& manager) const {
 	return {
-		get_tile_side(),
+		get_tile_side(manager),
 		get_size()
 	};
 }

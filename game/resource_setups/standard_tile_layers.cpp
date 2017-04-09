@@ -24,7 +24,10 @@ void set_standard_tile_layers(assets_manager& manager) {
 				) {
 				tt.max_specular_blinks = 2;
 			}
-			metropolis_floor.register_tile_type(tt);
+			metropolis_floor.register_tile_type(
+				manager, 
+				tt
+			);
 		}
 
 		//metropolis_floor.get_tile_type(nth_tile(1)).max_specular_blinks = 2;

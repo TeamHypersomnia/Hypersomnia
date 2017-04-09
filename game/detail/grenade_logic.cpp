@@ -40,7 +40,7 @@ void release_or_throw_grenade(
 		in.direct_listener = thrower;
 		in.effect.id = assets::sound_buffer_id::GRENADE_UNPIN;
 
-		in.create_sound_effect_entity(cosmos, thrower_transform, thrower).add_standard_components();
+		in.create_sound_effect_entity(step, thrower_transform, thrower).add_standard_components(step);
 	}
 	else if(!is_pressed_flag && grenade.when_released.was_set()) {
 		perform_transfer(
@@ -53,15 +53,15 @@ void release_or_throw_grenade(
 		in.direct_listener = thrower;
 		in.effect.id = assets::sound_buffer_id::GRENADE_THROW;
 
-		in.create_sound_effect_entity(cosmos, thrower_transform, thrower).add_standard_components();
+		in.create_sound_effect_entity(step, thrower_transform, thrower).add_standard_components(step);
 
 		// {
 		// 	const auto spoon = cosmos[grenade.spoon];
 		// 
 		// 	auto& rigid_body = spoon.get<components::rigid_body>();
 		// 	
-		// 	spoon.set_logic_transform(thrower_transform);
-		// 	spoon.add_standard_components();
+		// 	spoon.set_logic_transform(step, thrower_transform);
+		// 	spoon.add_standard_components(step);
 		// 	
 		// 	rigid_body.apply_impulse(thrower_orientation.perpendicular_cw() * 1000 * rigid_body.get_mass());
 		// 
@@ -70,8 +70,7 @@ void release_or_throw_grenade(
 		// }
 
 		grenade_entity.get<components::sprite>().set(
-			grenade.released_image_id,
-			step.cosm
+			grenade.released_image_id
 		);
 
 		auto& rigid_body = grenade_entity.get<components::rigid_body>();

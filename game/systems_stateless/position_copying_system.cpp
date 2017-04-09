@@ -89,7 +89,7 @@ void position_copying_system::update_transforms(const logic_step step) {
 				position_copying.target_newly_set = false;
 			}
 
-			it.set_logic_transform(transform);
+			it.set_logic_transform(step, transform);
 		}
 	);
 }

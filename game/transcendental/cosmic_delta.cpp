@@ -237,16 +237,8 @@ bool cosmic_delta::encode(
 		true
 	);
 
-	const bool have_logical_metas_changed = augs::write_delta(
-		base.significant.logical_metas_of_assets,
-		enco.significant.logical_metas_of_assets,
-		new_meta_content,
-		true
-	);
-
 	const bool has_anything_changed = 
 		has_meta_changed
-		|| have_logical_metas_changed
 		|| dt.new_entities
 		|| dt.changed_entities 
 		|| dt.removed_entities
@@ -304,7 +296,6 @@ void cosmic_delta::decode(
 	deco.destroy_inferred_state_completely();
 
 	augs::read_delta(deco.significant.meta, in, true);
-	augs::read_delta(deco.significant.logical_metas_of_assets, in, true);
 
 	delted_stream_of_entities dt;
 

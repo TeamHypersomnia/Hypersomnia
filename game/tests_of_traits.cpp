@@ -5,7 +5,7 @@
 #include "generated_introspectors.h"
 #include "game/assets/assets_manager.h"
 
-struct trait_tests {
+struct tests_of_traits {
 	static_assert(!has_introspect_v<unsigned>, "Trait has failed");
 	static_assert(has_introspect_v<ltrbt<float>>, "Trait has failed");
 	static_assert(has_introspect_v<ltrbt<int>>, "Trait has failed");
@@ -23,11 +23,11 @@ struct trait_tests {
 
 	static_assert(augs::enum_associative_array<assets::game_image_id, int>().capacity() == int(assets::game_image_id::COUNT), "enum_associative_array is wrong");
 
-	static_assert(assets_manager::does_asset_define_get_logical_meta<augs::enum_associative_array<assets::animation_id, animation>>::value, "Trait has failed");
+	static_assert(does_asset_define_get_logical_meta<augs::enum_associative_array<assets::animation_id, animation>>::value, "Trait has failed");
 
 	static_assert(
 		std::is_same_v<
-			typename assets_manager::make_array_of_logical_metas<augs::enum_associative_array<assets::animation_id, animation>>::type,
+			typename make_array_of_logical_metas<augs::enum_associative_array<assets::animation_id, animation>>::type,
 			augs::enum_associative_array<assets::animation_id, animation>
 		>,
 		"Trait has failed"
@@ -35,7 +35,7 @@ struct trait_tests {
 
 	static_assert(
 			std::is_same_v<
-			filter_types_in_list_t<assets_manager::does_asset_define_get_logical_meta, std::tuple<augs::enum_associative_array<assets::animation_id, animation>>>,
+			filter_types_in_list_t<does_asset_define_get_logical_meta, std::tuple<augs::enum_associative_array<assets::animation_id, animation>>>,
 			std::tuple<augs::enum_associative_array<assets::animation_id, animation>>
 		>,
 		"Trait has failed"
@@ -124,13 +124,13 @@ struct trait_tests {
 	static_assert(std::is_same_v<unsigned char, get_index_type_for_size_of_t<C>>, "Trait has failed");
 	static_assert(std::is_same_v<unsigned short, get_index_type_for_size_of_t<D>>, "Trait has failed");
 	static_assert(std::is_same_v<unsigned short, get_index_type_for_size_of_t<E>>, "Trait has failed");
-	static_assert(std::is_same_v<unsigned, get_index_type_for_size_of_t<F>>, "Trait has failed");
+	static_assert(std::is_same_v<unsigned int, get_index_type_for_size_of_t<F>>, "Trait has failed");
 };
 
 /*
 constexpr auto assets_manager_size = sizeof(assets_manager);
-constexpr auto tuple_of_assets_size = sizeof(assets_manager::tuple_of_all_assets);
-constexpr auto tuple_of_logical_metas_of_assets_size = sizeof(assets_manager::tuple_of_all_logical_metas_of_assets);
+constexpr auto tuple_of_assets_size = sizeof(tuple_of_all_assets);
+constexpr auto tuple_of_logical_metas_of_assets_size = sizeof(tuple_of_all_logical_metas_of_assets);
 
 sizeof(augs::enum_associative_array<assets::animation_id, animation>);
 sizeof(augs::enum_associative_array<assets::game_image_id, game_image_baked>);

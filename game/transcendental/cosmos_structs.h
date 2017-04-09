@@ -40,10 +40,7 @@ class cosmos_significant_state {
 	// GEN INTROSPECTOR class cosmos_significant_state
 	friend class cosmos;
 	friend class cosmic_delta;
-	friend class assets_manager;
 	friend struct augs::introspection_access;
-
-	assets_manager::tuple_of_all_logical_metas_of_assets logical_metas_of_assets;
 
 	typename cosmos_base::aggregate_pool_type pool_for_aggregates;
 	typename cosmos_base::component_pools_type pools_for_components;
@@ -60,9 +57,6 @@ enum class subjects_iteration_flag {
 
 	COUNT
 };
-
-template <class T>
-using find_logical_metas_container_t = find_type_with_key_type_in_list_t<T, assets_manager::tuple_of_all_logical_metas_of_assets>;
 
 class cosmic_delta;
 struct data_living_one_step;

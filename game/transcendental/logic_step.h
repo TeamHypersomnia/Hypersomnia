@@ -5,6 +5,12 @@
 #include "game/transcendental/cosmic_entropy.h"
 
 struct data_living_one_step;
+struct all_logical_metas_of_assets;
+
+struct logic_step_input {
+	const cosmic_entropy& entropy;
+	const all_logical_metas_of_assets& metas_of_assets;
+};
 
 template <bool is_const>
 class basic_logic_step : public basic_cosmic_step<is_const> {
@@ -12,11 +18,11 @@ class basic_logic_step : public basic_cosmic_step<is_const> {
 	typedef maybe_const_ref_t<is_const, data_living_one_step> data_living_one_step_ref;
 public:
 	data_living_one_step_ref transient;
-	const cosmic_entropy& entropy;
+	const logic_step_input input;
 
 	basic_logic_step(
 		cosmos_ref cosm,
-		const cosmic_entropy& entropy,
+		const logic_step_input logic_step_input,
 		data_living_one_step_ref transient
 	);
 

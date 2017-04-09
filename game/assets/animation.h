@@ -6,6 +6,8 @@
 #include "game/transcendental/entity_id.h"
 #include "game/components/sprite_component.h"
 
+class assets_manager;
+
 struct animation_frame {
 	// GEN INTROSPECTOR struct animation_frame
 	assets::game_image_id image_id;
@@ -26,7 +28,7 @@ struct animation {
 	loop_type loop_mode = loop_type::REPEAT;
 	// END GEN INTROSPECTOR
 
-	animation get_logical_meta() const {
+	animation get_logical_meta(const assets_manager& manager) const {
 		return *this;
 	}
 

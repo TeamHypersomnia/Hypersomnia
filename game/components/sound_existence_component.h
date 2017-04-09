@@ -5,7 +5,9 @@
 #include "augs/padding_byte.h"
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
+#include "game/transcendental/step_declaration.h"
 #include "augs/audio/sound_effect_modifier.h"
+
 
 struct sound_effect_input {
 	// GEN INTROSPECTOR struct sound_effect_input
@@ -17,7 +19,7 @@ struct sound_effect_input {
 	// END GEN INTROSPECTOR
 
 	entity_handle create_sound_effect_entity(
-		cosmos& cosmos,
+		const logic_step step,
 		const components::transform place_of_birth,
 		const entity_id chased_subject_id
 	) const;

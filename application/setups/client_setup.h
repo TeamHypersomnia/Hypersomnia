@@ -12,6 +12,8 @@ class client_setup : public setup_base {
 public:
 	bool predict_entropy = true;
 
+	all_logical_metas_of_assets metas_of_assets;
+
 	cosmos hypersomnia = cosmos(3000);
 	cosmos initial_hypersomnia = cosmos(3000);
 

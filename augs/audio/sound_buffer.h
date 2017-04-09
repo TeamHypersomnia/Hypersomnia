@@ -3,6 +3,8 @@
 
 typedef unsigned int ALuint;
 
+class assets_manager;
+
 namespace augs {
 	class single_sound_buffer {
 		double computed_length_in_seconds = 0.0;
@@ -73,7 +75,7 @@ namespace augs {
 		ALuint get_id() const;
 		operator ALuint() const;
 
-		sound_buffer_logical_meta get_logical_meta() const;
+		sound_buffer_logical_meta get_logical_meta(const assets_manager& manager) const;
 	};
 
 	single_sound_buffer::data_type get_sound_samples_from_file(const std::string);

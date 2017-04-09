@@ -32,6 +32,8 @@ void director_setup::init(
 	game_window& window,
 	viewing_session& session
 ) {
+	metas_of_assets = get_assets_manager().generate_logical_metas_of_assets();
+
 	session.reserve_caches_for_entities(3000);
 	
 	testbed.debug_var = cfg.debug_var;
@@ -41,6 +43,7 @@ void director_setup::init(
 
 		testbed.populate_world_with_entities(
 			hypersomnia,
+			metas_of_assets,
 			session.get_standard_post_solve()
 		);
 	}
@@ -384,7 +387,7 @@ void director_setup::advance_player_by_single_step(viewing_session& session) {
 	augs::renderer::get_current().clear_logic_lines();
 
 	hypersomnia.advance_deterministic_schemata(
-		cosmic_entropy_for_this_advancement,
+		{ cosmic_entropy_for_this_advancement, metas_of_assets },
 		[](auto) {},
 		session.get_standard_post_solve()
 	);

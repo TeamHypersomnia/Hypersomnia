@@ -31,7 +31,10 @@ namespace scene_builders {
 	public:
 		augs::constant_size_vector<controlled_character, TESTBED_CHARACTERS_COUNT> characters;
 
-		void populate_world_with_entities(cosmos&);
+		void populate_world_with_entities(
+			cosmos&,
+			const all_logical_metas_of_assets&
+		);
 	};
 
 	class networked_testbed_server : public networked_testbed {
