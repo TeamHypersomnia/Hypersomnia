@@ -1960,6 +1960,8 @@ namespace augs {
 			FIELD(save_regenerated_atlases_as_binary);
 			FIELD(debug_regenerate_content_every_launch);
 
+			FIELD(debug_run_unit_tests);
+
 			FIELD(enable_hrtf);
 			FIELD(max_number_of_sound_sources);
 

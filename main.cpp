@@ -31,7 +31,6 @@ int main(int argc, char** argv) {
 	augs::create_directories("generated/logs/");
 
 	augs::global_libraries::init();
-	augs::global_libraries::run_googletest(argc, argv);
 
 	augs::lua_state_raii lua;
 	bind_game_and_augs(lua);
@@ -40,6 +39,10 @@ int main(int argc, char** argv) {
 	
 	call_config_script(lua, "config.lua", "config.local.lua");
 	cfg.get_values(lua);
+
+	if (cfg.debug_run_unit_tests) {
+		augs::global_libraries::run_googletest(argc, argv);
+	}
 
 	augs::audio_manager::generate_alsoft_ini(
 		cfg.enable_hrtf,

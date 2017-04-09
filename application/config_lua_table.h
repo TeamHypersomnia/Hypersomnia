@@ -33,6 +33,8 @@ public:
 	bool save_regenerated_atlases_as_binary = false;
 	bool debug_regenerate_content_every_launch = false;
 
+	bool debug_run_unit_tests = false;
+
 	bool enable_hrtf = true;
 	unsigned max_number_of_sound_sources = 0u;
 
