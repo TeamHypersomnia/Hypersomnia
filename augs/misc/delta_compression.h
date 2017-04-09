@@ -9,16 +9,16 @@
 namespace augs {
 	typedef unsigned short delta_offset_type;
 
-	template <class delta_offset_type>
-	std::vector<delta_offset_type> run_length_encoding(const std::vector<char>& bit_data) {
-		ensure(bit_data.size() < std::numeric_limits<delta_offset_type>::max());
+	template <class offset_type>
+	std::vector<offset_type> run_length_encoding(const std::vector<char>& bit_data) {
+		ensure(bit_data.size() < std::numeric_limits<offset_type>::max());
 
-		std::vector<delta_offset_type> output;
+		std::vector<offset_type> output;
 
 		char previous_value = 0;
-		delta_offset_type current_vec_pos = 0;
+		offset_type current_vec_pos = 0;
 
-		for (delta_offset_type i = 0; i < bit_data.size(); ++i) {
+		for (offset_type i = 0; i < bit_data.size(); ++i) {
 			if (previous_value != bit_data[i]) {
 				if (bit_data[i] != 0) {
 					if (!output.size()) {
@@ -43,7 +43,7 @@ namespace augs {
 		}
 
 		if (bit_data.back()) {
-			output.push_back(static_cast<delta_offset_type>(bit_data.size()) - current_vec_pos);
+			output.push_back(static_cast<offset_type>(bit_data.size()) - current_vec_pos);
 		}
 
 		return output;
@@ -51,10 +51,12 @@ namespace augs {
 
 	typedef char delta_unit;
 
-	template <class delta_offset_type>
+	template <class T>
 	struct object_delta {
+		using offset_type = T;
+
 		std::vector<delta_unit> changed_bytes;
-		std::vector<delta_offset_type> changed_offsets;
+		std::vector<offset_type> changed_offsets;
 	};
 
 	template <class T>
@@ -134,6 +136,8 @@ namespace augs {
 		const bool write_changed_bit = false
 	) {
 		const auto dt = augs::delta_encode(base, enco);
+		typedef typename decltype(dt)::offset_type offset_type;
+
 		const bool has_changed = dt.changed_bytes.size() > 0;
 
 		if (write_changed_bit) {
@@ -141,8 +145,8 @@ namespace augs {
 		}
 
 		if (has_changed) {
-			augs::write(out, dt.changed_bytes, unsigned short());
-			augs::write(out, dt.changed_offsets, unsigned short());
+			augs::write(out, dt.changed_bytes, offset_type());
+			augs::write(out, dt.changed_offsets, offset_type());
 		}
 
 		return has_changed;
@@ -154,7 +158,9 @@ namespace augs {
 		stream& in,
 		const bool read_changed_bit = false
 	) {
-		decltype(delta_encode(deco, deco)) dt;
+		typedef decltype(delta_encode(deco, deco)) delta_type;
+		delta_type dt;
+		typedef typename delta_type::offset_type offset_type;
 
 		bool has_changed = true;
 
@@ -163,8 +169,8 @@ namespace augs {
 		}
 
 		if (has_changed) {
-			augs::read(in, dt.changed_bytes, unsigned short());
-			augs::read(in, dt.changed_offsets, unsigned short());
+			augs::read(in, dt.changed_bytes, offset_type());
+			augs::read(in, dt.changed_offsets, offset_type());
 
 			augs::delta_decode(deco, dt);
 		}
