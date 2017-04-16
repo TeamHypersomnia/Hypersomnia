@@ -35,6 +35,7 @@
 #include "application/setups/director_setup.h"
 
 #include "generated_introspectors.h"
+#include "augs/misc/parsing_utils.h"
 
 typedef augs::trivial_variant<
 	play_scene,
@@ -70,24 +71,7 @@ void choreographic_setup::process(
 
 	++current_line;
 
-	auto get_line_until = [&lines, &current_line](const std::string delimiter = std::string()) {
-		while (
-			current_line < lines.size() 
-			&&	(
-				std::all_of(lines[current_line].begin(), lines[current_line].end(), isspace) 
-				|| lines[current_line][0] == '%'
-			)
-		) {
-			++current_line;
-		}
-
-		if (!(current_line < lines.size()) || (!delimiter.empty() && lines[current_line] == delimiter)) {
-			return false;
-		}
-		else {
-			return true;
-		}
-	};
+	auto get_line_until = augs::make_get_line_until(lines, current_line);
 
 	while (get_line_until("scene_timings:")) {
 		std::istringstream in(lines[current_line]);

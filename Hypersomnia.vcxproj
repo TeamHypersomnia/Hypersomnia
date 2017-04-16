@@ -1102,6 +1102,7 @@
     <ClInclude Include="augs\misc\action.h" />
     <ClInclude Include="augs\misc\action_list.h" />
     <ClInclude Include="augs\misc\container_with_small_size.h" />
+    <ClInclude Include="augs\misc\parsing_utils.h" />
     <ClInclude Include="augs\misc\subscript_operator_for_get_handle_mixin.h" />
     <ClInclude Include="augs\misc\enum_array.h" />
     <ClInclude Include="augs\misc\enum_bitset.h" />

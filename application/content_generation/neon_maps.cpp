@@ -9,6 +9,7 @@
 #include "augs/misc/streams.h"
 
 #include "augs/image/image.h"
+#include "augs/misc/parsing_utils.h"
 #include "generated_introspectors.h"
 
 #define PIXEL_NONE rgba(0,0,0,0)
@@ -45,7 +46,9 @@ void regenerate_neon_maps(
 	const auto lines = augs::get_file_lines("neon_map_generator_input.cfg");
 	size_t current_line = 0;
 
-	while (current_line < lines.size()) {
+	auto get_line_until = augs::make_get_line_until(lines, current_line);
+
+	while (get_line_until()) {
 		neon_map_stamp new_stamp;
 
 		const auto source_path = fs::path(lines[current_line]);
@@ -56,7 +59,7 @@ void regenerate_neon_maps(
 
 		current_line += 2;
 
-		while (lines[current_line] != "parameters:") {
+		while (get_line_until("parameters:")) {
 			std::istringstream in(lines[current_line]);
 
 			rgba pixel;
