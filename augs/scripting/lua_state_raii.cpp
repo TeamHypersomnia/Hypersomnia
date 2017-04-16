@@ -11,26 +11,24 @@ extern "C" {
 #include "augs/filesystem/file.h"
 
 namespace augs {
-	lua_state_raii::lua_state_raii(lua_State* state) : raw(state) {
-		owns = false;
-	}
-	
-	lua_state_raii::lua_state_raii() : raw(luaL_newstate()) {
-		luaopen_base(raw);
-		luaL_openlibs(raw);
-	}
-
-	lua_state_raii::~lua_state_raii() { 
-		if(owns) 
-			lua_close(raw);
+	lua_state_raii::lua_state_raii() 
+		: raw(
+			luaL_newstate(), 
+			[](lua_State* const r) {
+				lua_close(r); 
+			} 
+		)
+	{
+		luaopen_base(raw.get());
+		luaL_openlibs(raw.get());
 	}
 
 	lua_state_raii::operator lua_State*() {
-		return raw;
+		return raw.get();
 	}
 
 	std::string lua_state_raii::get_error() {
-		lua_State* L = raw;
+		lua_State* L = raw.get();
 		
 		std::string str;
 
@@ -48,7 +46,7 @@ namespace augs {
 	std::string lua_state_raii::get_stack() {
 		call_debug_traceback();
 		
-		lua_State* L = raw;
+		lua_State* L = raw.get();
 
 		std::string str;
 		
@@ -64,7 +62,7 @@ namespace augs {
 	}
 
 	void lua_state_raii::call_debug_traceback(const std::string& method) {
-		lua_State* L = raw;
+		lua_State* L = raw.get();
 		luaL_traceback(L, L, nullptr, 0);
 	}
 
@@ -162,14 +160,14 @@ namespace augs {
 	lua_compilation_result lua_state_raii::compile_script(const std::string& script) {
 		lua_compilation_result output;
 		
-		const auto result = luaL_loadstring(raw, script.c_str());
+		const auto result = luaL_loadstring(raw.get(), script.c_str());
 
 		if (result != 0) {
 			output.error_message = get_error();
 		}
 		else {
-			lua_dump(raw, lua_writer, &output.bytecode, 0);
-			lua_pop(raw, 1);
+			lua_dump(raw.get(), lua_writer, &output.bytecode, 0);
+			lua_pop(raw.get(), 1);
 		}
 
 		return output;
@@ -179,12 +177,12 @@ namespace augs {
 		lua_execution_result output;
 
 		try {
-			if (lua_load(raw, lua_reader, reinterpret_cast<void*>(&bytecode), "scriptname", "b") != 0) {
+			if (lua_load(raw.get(), lua_reader, reinterpret_cast<void*>(&bytecode), "scriptname", "b") != 0) {
 				output.error_message = get_stack() + get_error();
 			}
 
-			luabind::call_function<void>(luabind::object(luabind::from_stack(raw, -1)));
-			lua_pop(raw, 1);
+			luabind::call_function<void>(luabind::object(luabind::from_stack(raw.get(), -1)));
+			lua_pop(raw.get(), 1);
 		}
 		catch (char* e) {
 			output.exception_message = typesafe_sprintf("Exception thrown! %x", e);

@@ -650,9 +650,9 @@ void set_standard_particle_effects(assets_manager& manager) {
 		particles_emission em;
 		em.spread_degrees = std::make_pair(150, 360);
 		em.num_of_particles_to_spawn_initially = std::make_pair(30, 120);
-		em.base_speed = std::make_pair(10, 800);
+		em.base_speed = std::make_pair(100, 1200);
 		em.rotation_speed = std::make_pair(0, 0);
-		em.particle_lifetime_ms = std::make_pair(1, 120);
+		em.particle_lifetime_ms = std::make_pair(16, 120);
 
 		for (int i = 0; i < 5; ++i) {
 			general_particle particle_definition;
@@ -750,8 +750,7 @@ void set_standard_particle_effects(assets_manager& manager) {
 		const auto& anim = manager[assets::animation_id::CAST_BLINK_ANIMATION];
 		const auto frame_duration = anim.frames[0].duration_milliseconds / 3.f;
 
-		for (size_t i = 0; i < anim.frames.size() - 1; ++i)
-		{
+		for (size_t i = 0; i < anim.frames.size() - 1; ++i) {
 			animated_particle particle_definition;
 
 			particle_definition.linear_damping = 0;
