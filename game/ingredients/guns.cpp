@@ -194,6 +194,8 @@ namespace prefabs {
 		const auto shell_definition = cosmos.create_entity("shell_definition");
 		name_entity(red_charge, entity_name::RED_CHARGE);
 
+		const auto red_col = rgba{ 255, 48, 1, 255 };
+		
 		{
 			ingredients::add_sprite(red_charge, pos, assets::game_image_id::RED_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
 			ingredients::add_see_through_dynamic_body(step, red_charge);
@@ -207,11 +209,11 @@ namespace prefabs {
 			auto& cat = red_charge += components::catridge();
 
 			cat.shell_trace_particle_effect_response.id = assets::particle_effect_id::CONCENTRATED_WANDERING_PIXELS;
-			cat.shell_trace_particle_effect_response.modifier.colorize = red;
+			cat.shell_trace_particle_effect_response.modifier.colorize = red_col;
 		}
 
 		{
-			auto& s = ingredients::add_sprite(round_definition, pos, assets::game_image_id::ROUND_TRACE, red, render_layer::FLYING_BULLETS);
+			auto& s = ingredients::add_sprite(round_definition, pos, assets::game_image_id::ROUND_TRACE, red_col, render_layer::FLYING_BULLETS);
 			ingredients::add_bullet_round_physics(step, round_definition);
 
 			auto& damage = round_definition += components::damage();
@@ -230,20 +232,20 @@ namespace prefabs {
 			damage.bullet_trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
 			damage.destruction_sound_response.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
 
-			damage.destruction_particle_effect_response.id = assets::particle_effect_id::PIXEL_BURST;
-			damage.destruction_particle_effect_response.modifier.colorize = red;
+			damage.destruction_particle_effect_response.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
+			damage.destruction_particle_effect_response.modifier.colorize = red_col;
 
 			damage.bullet_trace_particle_effect_response.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
-			damage.bullet_trace_particle_effect_response.modifier.colorize = red;
+			damage.bullet_trace_particle_effect_response.modifier.colorize = red_col;
 
 			damage.muzzle_leave_particle_effect_response.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
-			damage.muzzle_leave_particle_effect_response.modifier.colorize = red;
+			damage.muzzle_leave_particle_effect_response.modifier.colorize = red_col;
 
 			auto& trace = round_definition += components::trace();
 			trace.max_multiplier_x = std::make_pair(0.0f, 1.2f);
 			trace.max_multiplier_y = std::make_pair(0.f, 0.f);
 			trace.lengthening_duration_ms = std::make_pair(200.f, 250.f);
-			trace.additional_multiplier = vec2(2, 0.5);
+			trace.additional_multiplier = vec2(1.f, 1.f);
 		}
 
 		{
@@ -266,6 +268,8 @@ namespace prefabs {
 		const auto shell_definition = cosmos.create_entity("shell_definition");
 		name_entity(pink_charge, entity_name::PINK_CHARGE);
 
+		const auto pink_col = rgba { 255, 40, 255, 255 };
+
 		{
 			ingredients::add_sprite(pink_charge, pos, assets::game_image_id::PINK_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
 			ingredients::add_see_through_dynamic_body(step, pink_charge);
@@ -279,11 +283,11 @@ namespace prefabs {
 			auto& cat = pink_charge += components::catridge();
 
 			cat.shell_trace_particle_effect_response.id = assets::particle_effect_id::CONCENTRATED_WANDERING_PIXELS;
-			cat.shell_trace_particle_effect_response.modifier.colorize = pink;
+			cat.shell_trace_particle_effect_response.modifier.colorize = pink_col;
 		}
 
 		{
-			auto& s = ingredients::add_sprite(round_definition, pos, assets::game_image_id::ROUND_TRACE, pink, render_layer::FLYING_BULLETS);
+			auto& s = ingredients::add_sprite(round_definition, pos, assets::game_image_id::ROUND_TRACE, pink_col, render_layer::FLYING_BULLETS);
 			ingredients::add_bullet_round_physics(step, round_definition);
 			
 			auto& damage = round_definition += components::damage();
@@ -300,17 +304,17 @@ namespace prefabs {
 			damage.bullet_trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
 			damage.destruction_sound_response.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
 
-			damage.destruction_particle_effect_response.id = assets::particle_effect_id::PIXEL_BURST;
-			damage.destruction_particle_effect_response.modifier.colorize = pink;
+			damage.destruction_particle_effect_response.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
+			damage.destruction_particle_effect_response.modifier.colorize = pink_col;
 
 			damage.bullet_trace_particle_effect_response.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
-			damage.bullet_trace_particle_effect_response.modifier.colorize = pink;
+			damage.bullet_trace_particle_effect_response.modifier.colorize = pink_col;
 
 			damage.muzzle_leave_particle_effect_response.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
-			damage.muzzle_leave_particle_effect_response.modifier.colorize = pink;
+			damage.muzzle_leave_particle_effect_response.modifier.colorize = pink_col;
 
 			auto& trace = round_definition += components::trace();
-			trace.additional_multiplier = vec2(2, 0.5);
+			trace.additional_multiplier = vec2(1.f, 1.f);
 			trace.max_multiplier_x = std::make_pair(0.0f, 1.2f);
 			trace.max_multiplier_y = std::make_pair(0.f, 0.f);
 			trace.lengthening_duration_ms = std::make_pair(200.f, 250.f);
@@ -358,7 +362,7 @@ namespace prefabs {
 
 			auto& damage = round_definition += components::damage();
 
-			damage.destruction_particle_effect_response.id = assets::particle_effect_id::PIXEL_BURST;
+			damage.destruction_particle_effect_response.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
 			damage.destruction_particle_effect_response.modifier.colorize = cyan;
 
 			damage.bullet_trace_particle_effect_response.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
@@ -382,7 +386,7 @@ namespace prefabs {
 			trace.max_multiplier_x = std::make_pair(0.0f, 1.2f);
 			trace.max_multiplier_y = std::make_pair(0.f, 0.f);
 			trace.lengthening_duration_ms = std::make_pair(200.f, 250.f);
-			trace.additional_multiplier = vec2(2, 0.5);
+			trace.additional_multiplier = vec2(1.f, 1.f);
 		}
 
 		{
@@ -429,7 +433,7 @@ namespace prefabs {
 			trace.max_multiplier_x = std::make_pair(0.0f, 3.5f);
 			trace.max_multiplier_y = std::make_pair(0.f, 0.f);
 			trace.lengthening_duration_ms = std::make_pair(200.f, 250.f);
-			trace.additional_multiplier = vec2(2.f, 0.5f);
+			trace.additional_multiplier = vec2(1.f, 1.f);
 		}
 
 		{
@@ -799,7 +803,7 @@ namespace prefabs {
 
 			auto& damage = round_definition += components::damage();
 
-			damage.destruction_particle_effect_response.id = assets::particle_effect_id::PIXEL_BURST;
+			damage.destruction_particle_effect_response.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
 			damage.destruction_particle_effect_response.modifier.colorize = cyan;
 
 			damage.bullet_trace_particle_effect_response.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;

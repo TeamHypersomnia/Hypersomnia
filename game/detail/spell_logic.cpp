@@ -234,7 +234,7 @@ void perform_spell_logic(
 
 				auto& damage = energy_ball += components::damage();
 
-				damage.destruction_particle_effect_response.id = assets::particle_effect_id::PIXEL_BURST;
+				damage.destruction_particle_effect_response.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
 				damage.destruction_particle_effect_response.modifier.colorize = cyan;
 
 				damage.bullet_trace_particle_effect_response.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;

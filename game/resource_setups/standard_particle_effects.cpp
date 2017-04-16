@@ -645,7 +645,7 @@ void set_standard_particle_effects(assets_manager& manager) {
 	}
 
 	{
-		auto& effect = manager[assets::particle_effect_id::PIXEL_BURST];
+		auto& effect = manager[assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION];
 
 		particles_emission em;
 		em.spread_degrees = std::make_pair(150, 360);
@@ -665,7 +665,7 @@ void set_standard_particle_effects(assets_manager& manager) {
 			em.add_particle_definition(particle_definition);
 		}
 
-		em.size_multiplier = std::make_pair(0.5, 1);
+		em.size_multiplier = std::make_pair(1, 1);
 		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
 		em.initial_rotation_variation = 0;
 
@@ -720,9 +720,15 @@ void set_standard_particle_effects(assets_manager& manager) {
 		em.spread_degrees = std::make_pair(0, 1);
 		em.particles_per_sec = std::make_pair(70, 80);
 		em.stream_lifetime_ms = std::make_pair(300, 500);
-		em.base_speed = std::make_pair(30, 250);
+		em.base_speed = std::make_pair(100, 300);
 		em.rotation_speed = std::make_pair(0, 0);
 		em.particle_lifetime_ms = std::make_pair(500, 700);
+
+		em.randomize_spawn_point_within_circle_of_inner_radius = std::make_pair(9.f, 9.f);
+		em.randomize_spawn_point_within_circle_of_outer_radius = std::make_pair(15.f, 15.f);
+
+		em.starting_spawn_circle_size_multiplier = std::make_pair(1.f, 1.f);
+		em.ending_spawn_circle_size_multiplier = std::make_pair(2.f, 2.f);
 
 		for (int i = 0; i < 5; ++i) {
 			general_particle particle_definition;
@@ -732,7 +738,7 @@ void set_standard_particle_effects(assets_manager& manager) {
 			
 			particle_definition.set_image(
 				assets::game_image_id(assets::game_image_id::BLANK), 
-				vec2(1, 1), 
+				vec2(2, 2), 
 				rgba(255, 255, 255, 255)
 			);
 
@@ -741,7 +747,22 @@ void set_standard_particle_effects(assets_manager& manager) {
 			em.add_particle_definition(particle_definition);
 		}
 
-		em.size_multiplier = std::make_pair(1, 1.5);
+		const auto& anim = manager[assets::animation_id::CAST_BLINK_ANIMATION];
+		const auto frame_duration = anim.frames[0].duration_milliseconds / 3.f;
+
+		for (size_t i = 0; i < anim.frames.size() - 1; ++i)
+		{
+			animated_particle particle_definition;
+
+			particle_definition.linear_damping = 0;
+			particle_definition.first_face = static_cast<assets::game_image_id>(static_cast<int>(anim.frames[0].image_id) + i);
+			particle_definition.frame_count = anim.frames.size() - i;
+			particle_definition.frame_duration_ms = frame_duration;
+			particle_definition.color = white;
+
+			em.add_particle_definition(particle_definition);
+		}
+
 		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
 		em.initial_rotation_variation = 0;
 

@@ -19,6 +19,7 @@
 #include "game/messages/melee_swing_response.h"
 #include "game/messages/health_event.h"
 #include "game/messages/exhausted_cast_message.h"
+#include "game/messages/exploding_ring_input.h"
 
 #include "game/systems_audiovisual/particles_simulation_system.h"
 #include "game/detail/particle_types.h"
@@ -156,6 +157,27 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 				place_of_birth,
 				d.subject
 			).add_standard_components(step);
+
+			{
+				const auto max_radius = d.amount * 1.5;
+
+				exploding_ring_input ring;
+
+				ring.outer_radius_start_value = max_radius;
+				ring.outer_radius_end_value = max_radius / 1.2;
+
+				ring.inner_radius_start_value = max_radius / 1.4;
+				ring.inner_radius_end_value = max_radius / 1.2;
+
+				ring.emit_particles_on_ring = false;
+
+				ring.maximum_duration_seconds = 0.16f;
+
+				ring.color = burst.effect.modifier.colorize;
+				ring.center = place_of_birth.pos;
+
+				step.transient.messages.post(ring);
+			}
 		}
 	}
 
