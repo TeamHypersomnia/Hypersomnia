@@ -4,6 +4,7 @@
 #include "game/messages/damage_message.h"
 #include "game/messages/queue_destruction.h"
 #include "game/messages/gunshot_response.h"
+#include "game/messages/interpolation_correction_request.h"
 #include "game/detail/inventory/item_slot_transfer_request.h"
 
 #include "game/components/rigid_body_component.h"
@@ -141,6 +142,12 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					round_entity.add_standard_components(step);
 					
 					step.transient.messages.post(response);
+
+					messages::interpolation_correction_request request;
+					request.subject = round_entity;
+					request.set_previous_transform_value = muzzle_transform;
+
+					step.transient.messages.post(request);
 				}
 				else {
 					const auto chamber_slot = it[slot_function::GUN_CHAMBER];
@@ -187,6 +194,12 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 							round_entity.set_flag(entity_flag::IS_IMMUNE_TO_PAST);
 							round_entity.add_standard_components(step);
+
+							messages::interpolation_correction_request request;
+							request.subject = round_entity;
+							request.set_previous_transform_value = muzzle_transform;
+
+							step.transient.messages.post(request);
 						}
 
 						const auto shell_definition = single_bullet_or_pellet_stack[child_entity_name::CATRIDGE_SHELL];

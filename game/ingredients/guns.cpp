@@ -826,6 +826,12 @@ namespace prefabs {
 			damage.homing_towards_hostile_strength = 1.0f;
 			damage.amount = 42;
 
+			auto& trace = round_definition += components::trace();
+			trace.max_multiplier_x = std::make_pair(0.0f, 0.f);
+			trace.max_multiplier_y = std::make_pair(0.f, 0.f);
+			trace.lengthening_duration_ms = std::make_pair(200.f, 250.f);
+			trace.additional_multiplier = vec2(1.f, 1.f);
+
 			gun.magic_missile_definition = round_definition;
 		}
 

@@ -484,11 +484,11 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 
 	++significant.meta.total_steps_passed;
 
-	performance.stop(meter_type::LOGIC);
-
 	const size_t queued_at_end_num = step.transient.messages.get_queue<messages::queue_destruction>().size();
 
 	ensure_eq(queued_at_end_num, queued_before_marking_num);
+
+	performance.stop(meter_type::LOGIC);
 }
 
 void cosmos::perform_deletions(const logic_step step) {
