@@ -4,6 +4,6 @@
 
 class destroy_system {
 public:
-	void queue_children_of_queued_entities(const logic_step step);
+	void mark_queued_entities_and_their_children_for_deletion(const logic_step step);
 	void perform_deletions(const logic_step);
 };

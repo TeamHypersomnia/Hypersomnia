@@ -399,6 +399,8 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	trigger_detector_system().post_trigger_requests_from_continuous_detectors(step);
 
 	force_joint_system().apply_forces_towards_target_entities(step);
+	item_system().handle_throw_item_intents(step);
+	grenade_system().init_explosions(step);
 
 	performance.start(meter_type::PHYSICS);
 	listener.during_step = true;
@@ -418,7 +420,6 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 
 //	item_system().translate_gui_intents_to_transfer_requests(step);
 	item_system().handle_trigger_confirmations_as_pick_requests(step);
-	item_system().handle_throw_item_intents(step);
 
 	damage_system().destroy_outdated_bullets(step);
 	damage_system().destroy_colliding_bullets_and_send_damage(step);
@@ -426,7 +427,6 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	destruction_system().generate_damages_from_forceful_collisions(step);
 	destruction_system().apply_damages_and_split_fixtures(step);
 	
-	grenade_system().init_explosions(step);
 	sentience_system().regenerate_values_and_advance_spell_logic(step);
 	sentience_system().apply_damage_and_generate_health_events(step);
 	systems_inferred.get<physics_system>().post_and_clear_accumulated_collision_messages(step);
@@ -462,12 +462,11 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 
 	trace_system().destroy_outdated_traces(step);
 
-	destroy_system().queue_children_of_queued_entities(step);
+	const size_t queued_before_marking_num = step.transient.messages.get_queue<messages::queue_destruction>().size();
+
+	destroy_system().mark_queued_entities_and_their_children_for_deletion(step);
 
 	trace_system().spawn_finishing_traces_for_deleted_entities(step);
-
-	const bool no_additional_destructions_have_been_queued = step.transient.messages.get_queue<messages::queue_destruction>().empty();
-	ensure(no_additional_destructions_have_been_queued);
 
 	listener.~contact_listener();
 
@@ -486,6 +485,10 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	++significant.meta.total_steps_passed;
 
 	performance.stop(meter_type::LOGIC);
+
+	const size_t queued_at_end_num = step.transient.messages.get_queue<messages::queue_destruction>().size();
+
+	ensure_eq(queued_at_end_num, queued_before_marking_num);
 }
 
 void cosmos::perform_deletions(const logic_step step) {

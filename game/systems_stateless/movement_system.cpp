@@ -164,7 +164,6 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 void movement_system::generate_movement_events(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
-	step.transient.messages.get_queue<messages::movement_event>().clear();
 
 	cosmos.for_each(
 		processing_subjects::WITH_MOVEMENT,

@@ -122,9 +122,6 @@ void visibility_system::respond_to_visibility_information_requests(const logic_s
 	auto& los_responses = queues.get_queue<messages::line_of_sight_response>();
 	auto& vis_responses = queues.get_queue<messages::visibility_information_response>();
 
-	los_responses.clear();
-	vis_responses.clear();
-
 	respond_to_visibility_information_requests(step.cosm,
 		los_requests,
 		vis_requests,

@@ -88,8 +88,6 @@ void animation_system::handle_animation_messages(const logic_step step) {
 			}
 		}
 	}
-
-	step.transient.messages.get_queue<animation_message>().clear();
 }
 
 void components::animation::set_current_frame(unsigned number) {

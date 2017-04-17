@@ -294,12 +294,9 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 
 void sentience_system::apply_damage_and_generate_health_events(const logic_step step) const {
 	const auto& damages = step.transient.messages.get_queue<messages::damage_message>();
-	auto& healths = step.transient.messages.get_queue<messages::health_event>();
 	auto& cosmos = step.cosm;
 	const auto now = cosmos.get_timestamp();
 	const auto delta = cosmos.get_fixed_delta();
-
-	healths.clear();
 
 	for (const auto& d : damages) {
 		const auto subject = cosmos[d.subject];

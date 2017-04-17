@@ -37,7 +37,6 @@ void damage_system::destroy_colliding_bullets_and_send_damage(const logic_step s
 	const auto delta = step.get_delta();
 	const auto now = cosmos.get_timestamp();
 	const auto& events = step.transient.messages.get_queue<messages::collision_message>();
-	step.transient.messages.get_queue<messages::damage_message>().clear();
 
 	for (const auto& it : events) {
 		if (it.type != messages::collision_message::event_type::BEGIN_CONTACT || it.one_is_sensor) {

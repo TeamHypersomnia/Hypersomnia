@@ -67,7 +67,6 @@ vec2  components::gun::calculate_barrel_center(const components::transform gun_t
 void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
-	step.transient.messages.get_queue<messages::gunshot_response>().clear();
 
 	auto& physics_sys = cosmos.systems_inferred.get<physics_system>();
 

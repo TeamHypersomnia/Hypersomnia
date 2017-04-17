@@ -15,9 +15,9 @@
 
 #include "game/detail/inventory/inventory_utils.h"
 
-void destroy_system::queue_children_of_queued_entities(const logic_step step) {
+void destroy_system::mark_queued_entities_and_their_children_for_deletion(const logic_step step) {
 	auto& cosmos = step.cosm;
-	auto& queued = step.transient.messages.get_queue<messages::queue_destruction>();
+	const auto& queued = step.transient.messages.get_queue<messages::queue_destruction>();
 	auto& deletions = step.transient.messages.get_queue<messages::will_soon_be_deleted>();
 
 	for (const auto& it : queued) {
@@ -29,13 +29,11 @@ void destroy_system::queue_children_of_queued_entities(const logic_step step) {
 		deletions.push_back(it.subject);
 		cosmos[it.subject].for_each_child_entity_recursive(deletion_adder);
 	}
-
-	queued.clear();
 }
 
 void destroy_system::perform_deletions(const logic_step step) {
 	auto& cosmos = step.cosm;
-	auto& deletions = step.transient.messages.get_queue<messages::will_soon_be_deleted>();
+	const auto& deletions = step.transient.messages.get_queue<messages::will_soon_be_deleted>();
 
 	// destroy in reverse order; children first
 	for (auto it = deletions.rbegin(); it != deletions.rend(); ++it) {
@@ -52,6 +50,4 @@ void destroy_system::perform_deletions(const logic_step step) {
 
 		cosmos.delete_entity((*it).subject);
 	}
-
-	deletions.clear();
 }

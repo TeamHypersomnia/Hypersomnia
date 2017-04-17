@@ -85,9 +85,6 @@ void trigger_detector_system::post_trigger_requests_from_continuous_detectors(co
 }
 
 void trigger_detector_system::send_trigger_confirmations(const logic_step step) const {
-	auto& confirmations = step.transient.messages.get_queue<messages::trigger_hit_confirmation_message>();
-	confirmations.clear();
-
 	auto& cosmos = step.cosm;
 	const auto& physics = cosmos.systems_inferred.get<physics_system>();
 	const auto& collisions = step.transient.messages.get_queue<messages::collision_message>();
@@ -109,9 +106,9 @@ void trigger_detector_system::send_trigger_confirmations(const logic_step step) 
 		}
 	}
 
-	auto& requests = step.transient.messages.get_queue<messages::trigger_hit_request_message>();
+	const auto& requests = step.transient.messages.get_queue<messages::trigger_hit_request_message>();
 
-	for (auto& e : requests) {
+	for (const auto& e : requests) {
 		auto& trigger_query_detector = cosmos[e.detector].get<components::trigger_query_detector>();
 		const auto detector_body = cosmos[e.detector];
 		
@@ -146,6 +143,4 @@ void trigger_detector_system::send_trigger_confirmations(const logic_step step) 
 			break;
 		}
 	}
-
-	requests.clear();
 }

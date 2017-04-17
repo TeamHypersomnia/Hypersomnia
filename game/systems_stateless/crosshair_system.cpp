@@ -28,7 +28,6 @@ void components::crosshair::update_bounds() {
 void crosshair_system::generate_crosshair_intents(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto delta = step.get_delta();
-	step.transient.messages.get_queue<messages::crosshair_intent_message>().clear();
 	const auto& events = step.transient.messages.get_queue<messages::intent_message>();
 
 	for (const auto& it : events) {
