@@ -605,7 +605,8 @@ game_image_requests load_standard_images() {
 	make_indexed(
 		game_image_id::CAST_BLINK_FIRST,
 		game_image_id::CAST_BLINK_LAST,
-		"hypersomnia/gfx/cast_blink_%x.png"
+		"hypersomnia/gfx/cast_blink_%x.png",
+		"generated/neon_maps/cast_blink_%x.png"
 	);
 
 	return output;
