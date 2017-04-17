@@ -464,7 +464,7 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 
 	destroy_system().queue_children_of_queued_entities(step);
 
-	trace_system().spawn_finishing_traces_for_destroyed_objects(step);
+	trace_system().spawn_finishing_traces_for_deleted_entities(step);
 
 	const bool no_additional_destructions_have_been_queued = step.transient.messages.get_queue<messages::queue_destruction>().empty();
 	ensure(no_additional_destructions_have_been_queued);

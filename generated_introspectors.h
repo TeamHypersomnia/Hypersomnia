@@ -1507,7 +1507,7 @@ namespace augs {
 			FIELD(chosen_lengthening_duration_ms);
 			FIELD(lengthening_time_passed_ms);
 
-			FIELD(is_it_finishing_trace);
+			FIELD(is_it_a_finishing_trace);
 		}
 
 		template <class F, class... Instances>

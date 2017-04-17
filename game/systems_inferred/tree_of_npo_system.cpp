@@ -11,7 +11,7 @@ bool tree_of_npo_system::cache::is_constructed() const {
 }
 
 tree_of_npo_system::cache& tree_of_npo_system::get_cache(const unversioned_entity_id id) {
-	return per_entity_cache[id.indirection_index];
+	return per_entity_cache[make_cache_id(id)];
 }
 
 tree_of_npo_system::tree& tree_of_npo_system::get_tree(const cache& c) {

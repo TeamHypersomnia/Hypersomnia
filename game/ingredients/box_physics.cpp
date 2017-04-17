@@ -95,7 +95,7 @@ namespace ingredients {
 		components::fixtures colliders;
 
 		def.fixed_rotation = false;
-		def.body_type = components::rigid_body::type::STATIC;
+		def.body_type = rigid_body_type::STATIC;
 
 		auto& info = colliders.new_collider();
 		info.shape.from_renderable(step, e);

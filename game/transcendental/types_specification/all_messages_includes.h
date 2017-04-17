@@ -1,5 +1,6 @@
 #pragma once
 #include "game/messages/intent_message.h"
+#include "game/messages/interpolation_correction_request.h"
 #include "game/messages/damage_message.h"
 #include "game/messages/queue_destruction.h"
 #include "game/messages/will_soon_be_deleted.h"

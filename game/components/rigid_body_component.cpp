@@ -44,7 +44,7 @@ void component_synchronizer<false, P>::reinference() const {
 	handle.get_cosmos().partial_reinference<physics_system>(handle);
 }
 
-void component_synchronizer<false, P>::set_body_type(const components::rigid_body::type t) const {
+void component_synchronizer<false, P>::set_body_type(const rigid_body_type t) const {
 	component.body_type = t;
 	reinference();
 }
@@ -220,7 +220,7 @@ vec2 basic_physics_synchronizer<C>::get_world_center() const {
 }
 
 template<bool C>
-P::type basic_physics_synchronizer<C>::get_body_type() const {
+rigid_body_type basic_physics_synchronizer<C>::get_body_type() const {
 	return component.body_type;
 }
 

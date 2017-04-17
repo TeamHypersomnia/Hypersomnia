@@ -1242,12 +1242,14 @@
     <ClInclude Include="game\enums\input_recording_type.h" />
     <ClInclude Include="game\assets\physical_material_id.h" />
     <ClInclude Include="game\enums\renderable_drawing_type.h" />
+    <ClInclude Include="game\enums\rigid_body_type.h" />
     <ClInclude Include="game\enums\sentience_meter_type.h" />
     <ClInclude Include="game\enums\sound_response_type.h" />
     <ClInclude Include="game\assets\spell_id.h" />
     <ClInclude Include="game\enums\tree_of_npo_type.h" />
     <ClInclude Include="game\messages\exhausted_cast_message.h" />
     <ClInclude Include="game\messages\exploding_ring_input.h" />
+    <ClInclude Include="game\messages\interpolation_correction_request.h" />
     <ClInclude Include="game\messages\item_picked_up_message.h" />
     <ClInclude Include="game\messages\thunder_input.h" />
     <ClInclude Include="game\messages\visibility_information.h" />

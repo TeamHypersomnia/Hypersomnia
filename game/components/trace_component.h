@@ -20,7 +20,7 @@ namespace components {
 		float chosen_lengthening_duration_ms = -1.f;
 		float lengthening_time_passed_ms = 0.f;
 
-		int is_it_finishing_trace = false;
+		int is_it_a_finishing_trace = false;
 		// END GEN INTROSPECTOR
 
 		void reset(randomization& p) {

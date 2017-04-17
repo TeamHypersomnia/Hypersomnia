@@ -10,7 +10,9 @@
 #include "game/components/damage_component.h"
 #include "game/components/rigid_body_component.h"
 #include "game/components/inferred_state_component.h"
+#include "game/components/interpolation_component.h"
 
+#include "game/messages/interpolation_correction_request.h"
 #include "game/messages/queue_destruction.h"
 #include "game/messages/will_soon_be_deleted.h"
 
@@ -31,7 +33,7 @@ void trace_system::lengthen_sprites_of_traces(const logic_step step) const {
 
 			vec2 surplus_multiplier;
 			
-			if (!trace.is_it_finishing_trace) {
+			if (!trace.is_it_a_finishing_trace) {
 				surplus_multiplier = trace.chosen_multiplier * trace.lengthening_time_passed_ms / trace.chosen_lengthening_duration_ms;
 			}
 			else {
@@ -57,10 +59,10 @@ void trace_system::destroy_outdated_traces(const logic_step step) const {
 		[&](const auto t) {
 			auto& trace = t.get<components::trace>();
 
-			if (trace.lengthening_time_passed_ms > trace.chosen_lengthening_duration_ms - 0.01f) {
-				trace.lengthening_time_passed_ms = trace.chosen_lengthening_duration_ms - 0.01f;
+			if (trace.lengthening_time_passed_ms > trace.chosen_lengthening_duration_ms) {
+				trace.lengthening_time_passed_ms = trace.chosen_lengthening_duration_ms;
 
-				if (trace.is_it_finishing_trace) {
+				if (trace.is_it_a_finishing_trace) {
 					step.transient.messages.post(messages::queue_destruction(t));
 				}
 			}
@@ -68,37 +70,56 @@ void trace_system::destroy_outdated_traces(const logic_step step) const {
 	);
 }
 
-void trace_system::spawn_finishing_traces_for_destroyed_objects(const logic_step step) const {
+void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step step) const {
 	auto& cosmos = step.cosm;
 	const auto& events = step.transient.messages.get_queue<messages::will_soon_be_deleted>();
 	const auto& metas = step.input.metas_of_assets;
 
 	for (const auto& it : events) {
-		const auto e = cosmos[it.subject];
+		const auto deleted_entity = cosmos[it.subject];
 
-		const auto* const trace = e.find<components::trace>();
+		const auto* const trace = deleted_entity.find<components::trace>();
 
-		if (e.has<components::inferred_state>() && trace && !trace->is_it_finishing_trace) {
+		if (
+			deleted_entity.has<components::inferred_state>() 
+			&& trace != nullptr
+			&& !trace->is_it_a_finishing_trace
+		) {
 			const auto finishing_trace = cosmos.create_entity("finishing_trace");
+			
 			auto copied_trace = *trace;
 			copied_trace.lengthening_time_passed_ms = 0.f;
 			copied_trace.chosen_lengthening_duration_ms /= 4;
 
-			copied_trace.is_it_finishing_trace = true;
+			const auto transform_of_deleted = deleted_entity.get_logic_transform();
+
+			copied_trace.is_it_a_finishing_trace = true;
 			finishing_trace += copied_trace;
-			finishing_trace += e.get<components::sprite>();
-			finishing_trace += e.get_logic_transform();
-			finishing_trace += e.get<components::render>();
+			finishing_trace += deleted_entity.get<components::sprite>();
+			finishing_trace += transform_of_deleted;
+			finishing_trace += deleted_entity.get<components::render>();
+			
+			components::interpolation interp;
+			interp.place_of_birth = transform_of_deleted;
+			finishing_trace += interp;
 
 			//finishing_trace.get<components::transform>().rotation = 90;// e.get<components::rigid_body>().velocity().degrees();
 
-			if (e.find<components::damage>()) {
-				finishing_trace.get<components::transform>().pos = e.get<components::damage>().saved_point_of_impact_before_death - 
-					(e.get<components::sprite>().get_size(metas)/2).rotate(finishing_trace.get<components::transform>().rotation, vec2(0,0))
+			if (deleted_entity.find<components::damage>()) {
+				finishing_trace.get<components::transform>().pos = 
+					deleted_entity.get<components::damage>().saved_point_of_impact_before_death
+					- (deleted_entity.get<components::sprite>().get_size(metas) / 2)
+						.rotate(finishing_trace.get<components::transform>().rotation, vec2(0, 0))
 				;
 			}
 
 			finishing_trace.add_standard_components(step);
+
+			messages::interpolation_correction_request request;
+			request.subject = finishing_trace;
+			request.set_previous_transform_from = deleted_entity;
+
+			step.transient.messages.post(request);
 		}
 	}
 }

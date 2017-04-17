@@ -160,7 +160,7 @@ void simulation_receiver::drag_mispredictions_into_past(
 		const bool is_contagious_agent = reconciliated_entity.get_flag(entity_flag::IS_PAST_CONTAGIOUS);
 		const bool should_smooth_rotation = !is_contagious_agent || predicted_cosmos[reconciliated_entity.get<components::driver>().owned_vehicle].alive();
 
-		auto& interp_data = interp.get_data(reconciliated_entity);
+		auto& interp_data = interp.get_cache_of(reconciliated_entity);
 
 		const bool shouldnt_smooth = reconciliated_entity.has<components::crosshair>();
 		bool misprediction_detected = false;

@@ -8,6 +8,7 @@ namespace augs {
 
 namespace messages {
 	struct intent_message;
+	struct interpolation_correction_request;
 	struct damage_message;
 	struct queue_destruction;
 	struct will_soon_be_deleted;
@@ -33,6 +34,7 @@ struct thunder_input;
 
 typedef augs::storage_for_message_queues <
 	messages::intent_message,
+	messages::interpolation_correction_request,
 	messages::damage_message,
 	messages::queue_destruction,
 	messages::will_soon_be_deleted,

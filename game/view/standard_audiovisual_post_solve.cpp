@@ -3,6 +3,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/messages/health_event.h"
 #include "game/messages/item_picked_up_message.h"
+#include "game/messages/interpolation_correction_request.h"
 #include "augs/templates/string_templates.h"
 
 void viewing_session::standard_audiovisual_post_solve(const const_logic_step step) {
@@ -10,6 +11,36 @@ void viewing_session::standard_audiovisual_post_solve(const const_logic_step ste
 	const auto& healths = step.transient.messages.get_queue<messages::health_event>();
 	const auto& new_thunders = step.transient.messages.get_queue<thunder_input>();
 	auto new_rings = step.transient.messages.get_queue<exploding_ring_input>();
+
+	const auto& new_interpolation_corrections = step.transient.messages.get_queue<messages::interpolation_correction_request>();
+	auto& interp = systems_audiovisual.get<interpolation_system>();
+
+	for (const auto& c : new_interpolation_corrections) {
+		const auto from = cosmos[c.set_previous_transform_from];
+
+		if (from.alive()) {
+			//LOG_NVPS(interp.get_cache_of(c.subject).interpolated_transform.pos, interp.get_cache_of(from).interpolated_transform.pos);
+
+			interp.set_updated_interpolated_transform(
+				cosmos[c.subject],
+				interp.get_cache_of(from).interpolated_transform
+			);
+
+			//interp.get_cache_of(c.subject).interpolated_transform =
+			//	interp.get_cache_of(from).interpolated_transform
+			//;
+		}
+		else {
+			interp.set_updated_interpolated_transform(
+				cosmos[c.subject],
+				c.set_previous_transform_value
+			);
+
+			//interp.get_cache_of(c.subject).interpolated_transform = 
+			//	c.set_previous_transform_value
+			//;
+		}
+	}
 
 	auto& thunders = systems_audiovisual.get<thunder_system>();
 	auto& exploding_rings = systems_audiovisual.get<exploding_ring_system>();

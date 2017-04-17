@@ -35,5 +35,10 @@ public:
 
 	void reserve_caches_for_entities(const size_t);
 
-	cache& get_data(const entity_id);
+	cache& get_cache_of(const entity_id);
+
+	void set_updated_interpolated_transform(
+		const const_entity_handle subject,
+		const components::transform updated_value
+	);
 };

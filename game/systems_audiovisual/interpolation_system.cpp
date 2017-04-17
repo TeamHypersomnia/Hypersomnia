@@ -21,12 +21,24 @@ components::transform interpolation_system::get_interpolated(const const_entity_
 	return enabled ? per_entity_cache[make_cache_id(id)].interpolated_transform : id.get_logic_transform();
 }
 
-interpolation_system::cache& interpolation_system::get_data(const entity_id id) {
+interpolation_system::cache& interpolation_system::get_cache_of(const entity_id id) {
 	return per_entity_cache[make_cache_id(id)];
 }
 
 void interpolation_system::reserve_caches_for_entities(const size_t n) {
 	per_entity_cache.resize(n);
+}
+
+void interpolation_system::set_updated_interpolated_transform(
+	const const_entity_handle subject,
+	const components::transform updated_value
+) {
+	auto& cache = per_entity_cache[make_cache_id(subject)];
+	const auto& info = subject.get<components::interpolation>();
+	
+	cache.recorded_place_of_birth = info.place_of_birth;
+	cache.interpolated_transform = updated_value;
+	cache.recorded_version = subject.get_id().version;
 }
 
 void interpolation_system::integrate_interpolated_transforms(

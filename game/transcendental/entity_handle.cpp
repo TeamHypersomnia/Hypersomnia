@@ -20,6 +20,8 @@
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/detail/gui/gui_positioning.h"
 
+#include "game/enums/rigid_body_type.h"
+
 std::ostream& operator<<(std::ostream& out, const entity_handle &x) {
 	return out << typesafe_sprintf("%x %x", x.get_debug_name(), x.get_id());
 }
@@ -42,7 +44,7 @@ basic_entity_handle<C> basic_entity_handle<C>::add_standard_components(const log
 
 	if (!has<components::interpolation>() 
 		&& (
-			has_physics 
+			(has_physics && get<components::rigid_body>().get_body_type() != rigid_body_type::STATIC)
 			|| has<components::crosshair>() 
 			|| has<components::position_copying>()
 		)

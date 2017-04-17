@@ -1,24 +1,21 @@
 #pragma once
+#include "3rdparty/Box2D/Common/b2Math.h"
+
 #include "augs/misc/stepped_timing.h"
+
 #include "game/transcendental/component_synchronizer.h"
-#include "game/components/transform_component.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
-#include "Box2D/Common/b2Math.h"
 #include "game/simulation_settings/si_scaling.h"
+#include "game/enums/rigid_body_type.h"
 
-template<bool> class basic_physics_synchronizer;
+#include "game/components/transform_component.h"
+
 class physics_system;
 struct rigid_body_cache;
 
 namespace components {
 	struct rigid_body : synchronizable_component {
-		enum class type {
-			STATIC,
-			KINEMATIC,
-			DYNAMIC
-		};
-
 		rigid_body(
 			const si_scaling = si_scaling(),
 			const components::transform t = components::transform()
@@ -30,7 +27,7 @@ namespace components {
 		bool angled_damping = false;
 		bool activated = true;
 
-		type body_type = type::DYNAMIC;
+		rigid_body_type body_type = rigid_body_type::DYNAMIC;
 
 		float angular_damping = 6.5f;
 		float linear_damping = 6.5f;
@@ -87,7 +84,7 @@ public:
 	vec2 get_mass_position() const;
 	vec2 get_world_center() const;
 
-	components::rigid_body::type get_body_type() const;
+	rigid_body_type get_body_type() const;
 
 	auto get_fixture_entities() const {
 		return handle.get_fixture_entities();
@@ -102,7 +99,7 @@ class component_synchronizer<false, components::rigid_body> : public basic_physi
 public:
 	using basic_physics_synchronizer<false>::basic_physics_synchronizer;
 
-	void set_body_type(const components::rigid_body::type) const;
+	void set_body_type(const rigid_body_type) const;
 	void set_bullet_body(const bool flag) const;
 	void set_activated(const bool) const;
 	void set_velocity(const vec2) const;
