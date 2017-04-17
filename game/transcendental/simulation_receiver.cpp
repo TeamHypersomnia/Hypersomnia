@@ -30,7 +30,7 @@ void simulation_receiver::remote_entropy_predictions(
 	release_intent.is_pressed = false;
 
 	predicted_cosmos.for_each(
-		processing_subjects::WITH_PAST_CONTAGIOUS,
+		processing_subjects::WITH_ENABLED_PAST_CONTAGIOUS,
 		[&](const auto e) {
 			const bool is_locally_controlled_entity = e == predictable_entity;
 			
@@ -56,11 +56,11 @@ void simulation_receiver::remote_entropy_predictions(
 	);
 }
 
-auto simulation_receiver::unpack_deterministic_steps(
+steps_unpacking_result simulation_receiver::unpack_deterministic_steps(
 	cosmos& referential_cosmos, 
 	cosmos& last_delta_unpacked
-) -> unpacking_result {
-	unpacking_result result;
+) {
+	steps_unpacking_result result;
 
 	auto new_commands = jitter_buffer.buffer;
 	jitter_buffer.buffer.clear();
@@ -100,9 +100,9 @@ auto simulation_receiver::unpack_deterministic_steps(
 	return result;
 }
 
-auto simulation_receiver::acquire_potential_misprediction(
+misprediction_candidate_entry simulation_receiver::acquire_potential_misprediction(
 	const const_entity_handle e
-) const -> misprediction_candidate_entry {
+) const {
 	misprediction_candidate_entry candidate;
 	
 	if (e.has_logic_transform()) {
@@ -114,20 +114,20 @@ auto simulation_receiver::acquire_potential_misprediction(
 	return candidate;
 }
 
-auto simulation_receiver::acquire_potential_mispredictions(
+std::vector<misprediction_candidate_entry> simulation_receiver::acquire_potential_mispredictions(
 	const std::unordered_set<entity_id>& unpredictables_infected, 
 	const cosmos& predicted_cosmos_before_reconciliation
-) const -> std::vector<misprediction_candidate_entry> {
-	const auto& cosmos = predicted_cosmos_before_reconciliation;
-
+) const {
 	std::vector<misprediction_candidate_entry> potential_mispredictions;
 	
+	const auto& cosmos = predicted_cosmos_before_reconciliation;
+	
 	potential_mispredictions.reserve(
-		cosmos.get_count_of(processing_subjects::WITH_PAST_CONTAGIOUS) + unpredictables_infected.size()
+		cosmos.get_count_of(processing_subjects::WITH_ENABLED_PAST_CONTAGIOUS) + unpredictables_infected.size()
 	);
 
 	cosmos.for_each(
-		processing_subjects::WITH_PAST_CONTAGIOUS,
+		processing_subjects::WITH_ENABLED_PAST_CONTAGIOUS,
 		[&](const auto e) {
 			potential_mispredictions.push_back(acquire_potential_misprediction(e));
 		}
@@ -153,8 +153,9 @@ void simulation_receiver::drag_mispredictions_into_past(
 		
 		const bool identity_matches = reconciliated_entity.alive() && reconciliated_entity.has_logic_transform();
 
-		if (!identity_matches)
+		if (!identity_matches) {
 			continue;
+		}
 
 		const auto& reconciliated_transform = reconciliated_entity.get_logic_transform();
 		const bool is_contagious_agent = reconciliated_entity.get_flag(entity_flag::IS_PAST_CONTAGIOUS);

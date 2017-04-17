@@ -105,8 +105,6 @@ void choreographic_setup::process(
 		++current_line;
 	}
 
-	++current_line;
-
 	while (get_line_until("commands:")) {
 		std::istringstream in(lines[current_line]);
 
@@ -121,8 +119,6 @@ void choreographic_setup::process(
 
 		++current_line;
 	}
-
-	++current_line;
 
 	for (auto& p : preloaded_scenes) {
 		std::stable_sort(

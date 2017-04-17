@@ -13,22 +13,22 @@ namespace augs {
 class interpolation_system;
 class past_infection_system;
 
+struct misprediction_candidate_entry {
+	entity_id id;
+	components::transform transform;
+};
+
+struct step_to_simulate {
+	bool resubstantiate = false;
+	guid_mapped_entropy entropy;
+};
+
+struct steps_unpacking_result {
+	std::vector<step_to_simulate> entropies_to_simulate;
+	bool reconciliate_predicted = false;
+};
+
 class simulation_receiver {
-	struct misprediction_candidate_entry {
-		entity_id id;
-		components::transform transform;
-	};
-
-	struct step_to_simulate {
-		bool resubstantiate = false;
-		guid_mapped_entropy entropy;
-	};
-
-	struct unpacking_result {
-		std::vector<step_to_simulate> entropies_to_simulate;
-		bool reconciliate_predicted = false;
-	};
-
 	misprediction_candidate_entry acquire_potential_misprediction(const const_entity_handle) const;
 	
 	std::vector<misprediction_candidate_entry> acquire_potential_mispredictions(
@@ -36,7 +36,7 @@ class simulation_receiver {
 		const cosmos& predicted_cosmos_before_reconciliation
 	) const;
 
-	unpacking_result unpack_deterministic_steps(cosmos& referential_cosmos, cosmos& last_delta_unpacked);
+	steps_unpacking_result unpack_deterministic_steps(cosmos& referential_cosmos, cosmos& last_delta_unpacked);
 	void drag_mispredictions_into_past(interpolation_system&, past_infection_system&, const cosmos& predicted_cosmos, const std::vector<misprediction_candidate_entry>& mispredictions) const;
 
 	void remote_entropy_predictions(guid_mapped_entropy& adjusted_entropy, const entity_id predictable_entity, const cosmos& predicted_cosmos);
@@ -69,7 +69,7 @@ public:
 	}
 
 	template<class Step>
-	unpacking_result unpack_deterministic_steps(
+	steps_unpacking_result unpack_deterministic_steps(
 		interpolation_system& interp, 
 		past_infection_system& past,
 		const entity_id predictable_entity, 

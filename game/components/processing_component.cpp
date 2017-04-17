@@ -77,7 +77,7 @@ P P::get_default(const const_entity_handle id) {
 		matching.push_back(processing_subjects::WITH_LIGHT);
 	}
 	if (id.get_flag(entity_flag::IS_PAST_CONTAGIOUS)) {
-		matching.push_back(processing_subjects::WITH_PAST_CONTAGIOUS);
+		matching.push_back(processing_subjects::WITH_ENABLED_PAST_CONTAGIOUS);
 	}
 
 	P result;

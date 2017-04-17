@@ -19,12 +19,16 @@ namespace augs {
 				++current_line;
 			}
 
-			if (!(current_line < lines.size()) || (!delimiter.empty() && lines[current_line] == delimiter)) {
+			if (!(current_line < lines.size())) {
 				return false;
 			}
-			else {
-				return true;
+			
+			if ((!delimiter.empty() && lines[current_line] == delimiter)) {
+				++current_line;
+				return false;
 			}
+			
+			return true;
 		};
 	}
 }

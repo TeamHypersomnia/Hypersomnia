@@ -649,10 +649,10 @@ void set_standard_particle_effects(assets_manager& manager) {
 
 		particles_emission em;
 		em.spread_degrees = std::make_pair(150, 360);
-		em.num_of_particles_to_spawn_initially = std::make_pair(30, 120);
-		em.base_speed = std::make_pair(100, 1200);
+		em.num_of_particles_to_spawn_initially = std::make_pair(40, 120);
+		em.base_speed = std::make_pair(500, 900);
 		em.rotation_speed = std::make_pair(0, 0);
-		em.particle_lifetime_ms = std::make_pair(16, 120);
+		em.particle_lifetime_ms = std::make_pair(32, 90);
 
 		for (int i = 0; i < 5; ++i) {
 			general_particle particle_definition;
@@ -660,12 +660,13 @@ void set_standard_particle_effects(assets_manager& manager) {
 			particle_definition.angular_damping = 0;
 			particle_definition.linear_damping = 5000;
 			particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::PIXEL_THUNDER_FIRST) + i), rgba(255, 255, 255, 255));
+			particle_definition.size.x *= 1.3;
 			particle_definition.alpha_levels = 1;
 
 			em.add_particle_definition(particle_definition);
 		}
 
-		em.size_multiplier = std::make_pair(1, 1);
+		em.size_multiplier = std::make_pair(1.0, 1.3);
 		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
 		em.initial_rotation_variation = 0;
 
