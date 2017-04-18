@@ -5,7 +5,8 @@
 
 struct wielding_result {
 	enum class type {
-		SOMETHING_WONT_FIT,
+		NO_SPACE_FOR_HOLSTER,
+		NOT_ENOUGH_HANDS,
 		THE_SAME_SETUP,
 		SUCCESSFUL
 	};

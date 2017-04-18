@@ -143,6 +143,8 @@ item_button::layout_with_attachments item_button::calculate_button_layout(
 				if (traversal.item_remains_physical) {
 					output.push(desc.get_aabb(manager, traversal.attachment_offset));
 				}
+
+				return recursive_callback_result::CONTINUE_AND_RECURSE;
 			}
 		);
 	}
@@ -305,6 +307,8 @@ void item_button::draw_proc(
 
 						++attachment_index;
 					}
+
+					return recursive_callback_result::CONTINUE_AND_RECURSE;
 				};
 
 				item.for_each_contained_item_recursive(get_assets_manager(), iteration_lambda);

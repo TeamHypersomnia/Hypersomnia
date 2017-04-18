@@ -67,7 +67,7 @@ namespace rendering_scripts {
 				}
 			};
 
-			for (const auto subject_item_id : character.items_wielded()) {
+			for (const auto subject_item_id : character.get_wielded_items()) {
 				const auto subject_item = cosmos[subject_item_id];
 
 				if (subject_item.has<components::gun>()) {

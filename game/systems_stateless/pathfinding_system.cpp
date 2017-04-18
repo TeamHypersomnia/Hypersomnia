@@ -205,10 +205,10 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 									([&](const auto fix, auto, auto) {
 										if (cosmos[get_id_of_entity_of_body(fix)] != it) {
 											was_hit = true;
-											return query_callback_result::ABORT;
+											return callback_result::ABORT;
 										}
 										else {
-											return query_callback_result::CONTINUE;
+											return callback_result::CONTINUE;
 										}
 									})
 								);

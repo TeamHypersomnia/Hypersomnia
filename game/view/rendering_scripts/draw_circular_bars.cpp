@@ -132,8 +132,8 @@ namespace rendering_scripts {
 						}
 					};
 
-					examine_item_slot(v[slot_function::SECONDARY_HAND], starting_health_angle + 90.f + 22.5f, 45.f, false);
-					examine_item_slot(v[slot_function::PRIMARY_HAND], starting_health_angle - 22.5f - 45.f, 45.f, true);
+					examine_item_slot(v.get_secondary_hand(), starting_health_angle + 90.f + 22.5f, 45.f, false);
+					examine_item_slot(v.get_primary_hand(), starting_health_angle - 22.5f - 45.f, 45.f, true);
 				}
 
 				const int radius = manager[assets::game_image_id::HUD_CIRCULAR_BAR_MEDIUM].get_size().x / 2;

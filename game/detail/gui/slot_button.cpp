@@ -63,19 +63,19 @@ void slot_button::draw(const viewing_game_gui_context context, const const_this_
 
 		const auto slot_type = slot_id.get_id().type;
 
-		if (slot_type == slot_function::PRIMARY_HAND) {
+		if (slot_id.is_hand_slot() && slot_id.get_hand_index() == 0) {
 			draw_centered_texture(context, this_id, info, augs::gui::material(assets::game_image_id::PRIMARY_HAND_ICON, border_col), vec2i(1, 0));
 		}
 
-		if (slot_type == slot_function::SECONDARY_HAND) {
+		if (slot_id.is_hand_slot() && slot_id.get_hand_index() == 1) {
 			draw_centered_texture(context, this_id, info, augs::gui::material(assets::game_image_id::SECONDARY_HAND_ICON, border_col));
 		}
 
-		if (slot_type == slot_function::SHOULDER_SLOT) {
+		if (slot_type == slot_function::SHOULDER) {
 			draw_centered_texture(context, this_id, info, augs::gui::material(assets::game_image_id::SHOULDER_SLOT_ICON, border_col));
 		}
 
-		if (slot_type == slot_function::TORSO_ARMOR_SLOT) {
+		if (slot_type == slot_function::TORSO_ARMOR) {
 			draw_centered_texture(context, this_id, info, augs::gui::material(assets::game_image_id::ARMOR_SLOT_ICON, border_col));
 		}
 

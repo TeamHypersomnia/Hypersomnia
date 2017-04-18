@@ -16,7 +16,7 @@ void perform_transfer(
 template<class C>
 void perform_transfers(const C requests, const logic_step step) {
 	for (const auto r : requests) {
-		perform_transfer(step.cosm[r], step);
+		perform_transfer(r, step);
 	}
 }
 
@@ -77,7 +77,11 @@ capability_comparison match_transfer_capabilities(
 	item_slot_transfer_request_data
 );
 
-item_transfer_result query_transfer_result(const_item_slot_transfer_request);
+item_transfer_result query_transfer_result(
+	const cosmos&, 
+	const item_slot_transfer_request_data
+);
+
 slot_function get_slot_with_compatible_category(const_entity_handle item, const_entity_handle container);
 
 bool can_stack_entities(const_entity_handle, const_entity_handle);

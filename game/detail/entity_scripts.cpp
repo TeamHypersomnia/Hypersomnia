@@ -208,7 +208,7 @@ entity_id get_closest_hostile(
 					}
 				}
 
-				return query_callback_result::CONTINUE;
+				return callback_result::CONTINUE;
 			}
 		);
 	}
@@ -272,7 +272,7 @@ std::vector<entity_id> get_closest_hostiles(
 					}
 				}
 
-				return query_callback_result::CONTINUE;
+				return callback_result::CONTINUE;
 			}
 		);
 	}

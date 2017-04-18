@@ -1237,6 +1237,7 @@
     <ClInclude Include="game\detail\spell_logic.h" />
     <ClInclude Include="game\detail\visible_entities.h" />
     <ClInclude Include="game\detail\wielding_result.h" />
+    <ClInclude Include="game\enums\callback_result.h" />
     <ClInclude Include="game\enums\entity_flag.h" />
     <ClInclude Include="game\enums\adverse_element_type.h" />
     <ClInclude Include="game\enums\input_recording_type.h" />

@@ -44,7 +44,7 @@ void release_or_throw_grenade(
 	}
 	else if(!is_pressed_flag && grenade.when_released.was_set()) {
 		perform_transfer(
-			cosmos [ item_slot_transfer_request_data{ grenade_entity, inventory_slot_id(), -1, false, 0.f }], 
+			item_slot_transfer_request_data{ grenade_entity, inventory_slot_id(), -1, false, 0.f }, 
 			step
 		);
 		

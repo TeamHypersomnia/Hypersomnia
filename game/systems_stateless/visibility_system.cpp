@@ -207,7 +207,7 @@ void visibility_system::respond_to_visibility_information_requests(
 				const auto candidate = cosmos[get_id_of_entity_of_fixture(fix)];
 				
 				if (candidate.get_owner_body() == it) {
-					return query_callback_result::CONTINUE;
+					return callback_result::CONTINUE;
 				}
 
 				const auto target_pos = candidate.get_logic_transform().pos;
@@ -259,7 +259,7 @@ void visibility_system::respond_to_visibility_information_requests(
 					}
 				}
 
-				return query_callback_result::CONTINUE;
+				return callback_result::CONTINUE;
 			}
 		);
 
@@ -337,7 +337,7 @@ void visibility_system::respond_to_visibility_information_requests(
 			request.filter,
 			[&](const b2Fixture* const f) {
 				if (get_id_of_entity_of_body(f) == ignored_entity) {
-					return query_callback_result::CONTINUE;
+					return callback_result::CONTINUE;
 				}
 
 				const auto* const shape = f->m_shape;
@@ -355,7 +355,7 @@ void visibility_system::respond_to_visibility_information_requests(
 					}
 				}
 
-				return query_callback_result::CONTINUE;
+				return callback_result::CONTINUE;
 			}
 		);
 

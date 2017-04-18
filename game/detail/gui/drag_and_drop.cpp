@@ -194,7 +194,7 @@ drag_and_drop_result prepare_drag_and_drop_result(
 					drop.result.transferred_charges = 0;
 				}
 				else {
-					drop.result = query_transfer_result(cosmos[simulated_transfer]);
+					drop.result = query_transfer_result(cosmos, simulated_transfer);
 				}
 
 				const auto predicted_result = drop.result.result;
@@ -230,12 +230,11 @@ drag_and_drop_result prepare_drag_and_drop_result(
 						case slot_function::GUN_CHAMBER_MAGAZINE: drop.hint_text += L"Place"; break;
 						case slot_function::GUN_DETACHABLE_MAGAZINE: drop.hint_text += L"Reload"; break;
 						case slot_function::GUN_RAIL: drop.hint_text += L"Install"; break;
-						case slot_function::TORSO_ARMOR_SLOT: drop.hint_text += L"Wear"; break;
-						case slot_function::SHOULDER_SLOT: drop.hint_text += L"Wear"; break;
-						case slot_function::PRIMARY_HAND: drop.hint_text += L"Wield"; break;
-						case slot_function::SECONDARY_HAND: drop.hint_text += L"Wield"; break;
+						case slot_function::TORSO_ARMOR: drop.hint_text += L"Wear"; break;
+						case slot_function::SHOULDER: drop.hint_text += L"Wear"; break;
+						case slot_function::WIELDED_ITEM: drop.hint_text += L"Wield"; break;
 						case slot_function::GUN_MUZZLE: drop.hint_text += L"Install"; break;
-						default: ensure(false); break;
+						default: drop.hint_text += L"Unknown slot"; break;
 						}
 
 						drop.hint_text += charges_text;

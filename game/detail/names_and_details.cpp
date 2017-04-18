@@ -207,19 +207,23 @@ std::wstring get_bbcoded_slot_function_name(const slot_function f) {
 		return{
 			L"Muzzle",
 		};
-	case slot_function::PRIMARY_HAND:
+	case slot_function::WIELDED_ITEM:
 		return{
-			L"Primary hand",
+			L"Hand",
 		};
-	case slot_function::SECONDARY_HAND:
+	case slot_function::PRIMARY_ARM:
 		return{
-			L"Secondary hand",
+			L"Primary arm",
 		};
-	case slot_function::TORSO_ARMOR_SLOT:
+	case slot_function::SECONDARY_ARM:
+		return{
+			L"Secondary arm",
+		};
+	case slot_function::TORSO_ARMOR:
 		return{
 			L"Torso",
 		};
-	case slot_function::SHOULDER_SLOT:
+	case slot_function::SHOULDER:
 		return{
 			L"Shoulder",
 		};
@@ -249,19 +253,23 @@ std::wstring get_bbcoded_slot_function_details(const slot_function f) {
 		return{
 			L"Various gunshot modifiers go here."
 		};
-	case slot_function::PRIMARY_HAND:
+	case slot_function::WIELDED_ITEM:
 		return{
-			L"Can hold almost every item."
+			L"For holding of almost every item."
 		};
-	case slot_function::SECONDARY_HAND:
+	case slot_function::PRIMARY_ARM:
 		return{
-			L"Can hold almost every item."
+			L"Primary arm component."
 		};
-	case slot_function::TORSO_ARMOR_SLOT:
+	case slot_function::SECONDARY_ARM:
+		return{
+			L"Secondary arm component."
+		};
+	case slot_function::TORSO_ARMOR:
 		return{
 			L"Clothing or armors go here."
 		};
-	case slot_function::SHOULDER_SLOT:
+	case slot_function::SHOULDER:
 		return{
 			L"For backpacks or items with belts."
 		};

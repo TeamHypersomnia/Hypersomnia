@@ -63,9 +63,12 @@ namespace behaviours {
 		if (crosshair.alive()) {
 			auto& crosshair_offset = crosshair.get<components::crosshair>().base_offset;
 
-			float vel1 = assess_projectile_velocity_of_weapon(subject[slot_function::PRIMARY_HAND].get_item_if_any());
-			float vel2 = assess_projectile_velocity_of_weapon(subject[slot_function::SECONDARY_HAND].get_item_if_any());
-			float vel = std::max(vel1, vel2);
+			const auto vel = 
+				std::max(
+					assess_projectile_velocity_of_weapon(subject.get_if_any_item_in_hand_no(0)),
+					assess_projectile_velocity_of_weapon(subject.get_if_any_item_in_hand_no(1))
+				)
+			;
 
 			if (vel > 1.0 && closest_hostile.alive()) {
 				vec2 leaded;

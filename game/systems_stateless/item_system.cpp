@@ -87,19 +87,36 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 	const auto& delta = step.get_delta();
 	const auto& requests = step.transient.messages.get_queue<messages::intent_message>();
 
-	for (const auto& r : requests) {
-		if (
-			r.is_pressed 
-			&& (r.intent == intent_type::THROW_PRIMARY_ITEM || r.intent == intent_type::THROW_SECONDARY_ITEM)
-		) {
-			const auto subject = cosmos[r.subject];
+	for (auto r : requests) {
+		if (r.is_pressed) {
+			int hand_index = -1;
 
-			if (subject.has<components::item_slot_transfers>()) {
-				const auto hand = subject.map_primary_action_to_secondary_hand_if_primary_empty(intent_type::THROW_SECONDARY_ITEM == r.intent);
-				const auto item_inside = hand.get_item_if_any();
+			if (r.intent == intent_type::THROW) {
+				const auto subject = cosmos[r.subject];
 
-				if (item_inside.alive()) {
-					perform_transfer({ item_inside, cosmos[inventory_slot_id()] }, step);
+				r.intent = intent_type::THROW_PRIMARY_ITEM;
+
+				if (subject.get_if_any_item_in_hand_no(0).dead()) {
+					r.intent = intent_type::THROW_SECONDARY_ITEM;
+				}
+			}
+
+			if (r.intent == intent_type::THROW_PRIMARY_ITEM) {
+				hand_index = 0;
+			}
+			else if (r.intent == intent_type::THROW_SECONDARY_ITEM) {
+				hand_index = 1;
+			}
+
+			if (hand_index >= 0) {
+				const auto subject = cosmos[r.subject];
+
+				if (subject.has<components::item_slot_transfers>()) {
+					const auto item_inside = subject.get_hand_no(static_cast<size_t>(hand_index)).get_item_if_any();
+
+					if (item_inside.alive()) {
+						perform_transfer({ item_inside, inventory_slot_id() }, step);
+					}
 				}
 			}
 		}
@@ -118,8 +135,8 @@ void item_system::process_mounting_and_unmounting(const logic_step step) {
 	const auto delta = step.get_delta();
 	
 	cosmos.for_each(
-			processing_subjects::WITH_ITEM_SLOT_TRANSFERS, 
-			[&](const auto e) {
+		processing_subjects::WITH_ITEM_SLOT_TRANSFERS, 
+		[&](const auto e) {
 			auto& item_slot_transfers = e.get<components::item_slot_transfers>();
 
 			const auto currently_mounted_item = cosmos[item_slot_transfers.mounting.current_item];
@@ -140,7 +157,7 @@ void item_system::process_mounting_and_unmounting(const logic_step step) {
 						item.current_mounting = item.intended_mounting;
 
 						if (item.current_mounting == components::item::UNMOUNTED) {
-							perform_transfer({ currently_mounted_item, cosmos[item.target_slot_after_unmount] }, step);
+							perform_transfer({ currently_mounted_item, item.target_slot_after_unmount }, step);
 						}
 					}
 				}

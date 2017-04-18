@@ -39,7 +39,7 @@ void visible_entities::from_camera(
 		camera,
 		[&](const auto fix) {
 			unique_from_physics.insert(get_id_of_entity_of_fixture(fix));
-			return query_callback_result::CONTINUE;
+			return callback_result::CONTINUE;
 		}
 	);
 

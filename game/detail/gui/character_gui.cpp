@@ -41,9 +41,9 @@ using namespace augs::gui::text;
 xywh character_gui::get_rectangle_for_slot_function(const slot_function f) {
 	switch (f) {
 	case slot_function::PRIMARY_HAND: return xywh(100, 0, 33, 33);
-	case slot_function::SHOULDER_SLOT: return xywh(100, -100, 33, 33);
+	case slot_function::SHOULDER: return xywh(100, -100, 33, 33);
 	case slot_function::SECONDARY_HAND: return xywh(-100, 0, 33, 33);
-	case slot_function::TORSO_ARMOR_SLOT: return xywh(0, 0, 33, 33);
+	case slot_function::TORSO_ARMOR: return xywh(0, 0, 33, 33);
 
 	case slot_function::ITEM_DEPOSIT: return xywh(0, -100, 33, 33);
 
@@ -78,14 +78,14 @@ vec2 character_gui::initial_inventory_root_position() const {
 }
 
 const character_gui::hotbar_selection_setup& character_gui::get_current_hotbar_selection_setup() const {
-	return last_setups[current_hotbar_selection_setup];
+	return last_setups[current_hotbar_selection_setup_index];
 }
 
 entity_id character_gui::get_hotbar_assigned_entity_if_available(
-	const const_entity_handle element_entity,
+	const const_entity_handle gui_entity,
 	const const_entity_handle assigned_entity
 ) {
-	if (assigned_entity.get_owning_transfer_capability() == element_entity.get_owning_transfer_capability()) {
+	if (assigned_entity.get_owning_transfer_capability() == gui_entity.get_owning_transfer_capability()) {
 		return assigned_entity.get_id();
 	}
 
@@ -93,25 +93,28 @@ entity_id character_gui::get_hotbar_assigned_entity_if_available(
 }
 
 character_gui::hotbar_selection_setup character_gui::get_setup_from_button_indices(
-	const const_entity_handle element_entity,
-	const int primary_button,
-	const int secondary_button
+	const const_entity_handle gui_entity,
+	const int hotbar_button_index_for_primary_selection,
+	const int hotbar_button_index_for_secondary_selection
 ) const {
 	hotbar_selection_setup output;
 
-	if (primary_button != -1) {
-		output.primary_selection = hotbar_buttons[static_cast<size_t>(primary_button)].get_assigned_entity(element_entity);
+	const auto primary = hotbar_button_index_for_primary_selection;
+	const auto secondary = hotbar_button_index_for_secondary_selection;
+
+	if (primary != -1) {
+		output.hand_selections[0] = hotbar_buttons[static_cast<size_t>(primary)].get_assigned_entity(gui_entity);
 	}
 
-	if (secondary_button != -1) {
-		output.secondary_selection = hotbar_buttons[static_cast<size_t>(secondary_button)].get_assigned_entity(element_entity);
+	if (secondary != -1) {
+		output.hand_selections[1] = hotbar_buttons[static_cast<size_t>(secondary)].get_assigned_entity(gui_entity);
 	}
 
 	return output;
 }
 
 void character_gui::clear_hotbar_selection_for_item(
-	const const_entity_handle element_entity,
+	const const_entity_handle gui_entity,
 	const const_entity_handle item_entity
 ) {
 	for (auto& h : hotbar_buttons) {
@@ -123,19 +126,19 @@ void character_gui::clear_hotbar_selection_for_item(
 
 void character_gui::clear_hotbar_button_assignment(
 	const size_t button_index,
-	const const_entity_handle element_entity
+	const const_entity_handle gui_entity
 ) {
 	hotbar_buttons[button_index].last_assigned_entity.unset();
 }
 
 void character_gui::assign_item_to_hotbar_button(
 	const size_t button_index,
-	const const_entity_handle element_entity,
+	const const_entity_handle gui_entity,
 	const const_entity_handle item
 ) {
-	clear_hotbar_selection_for_item(element_entity, item);
+	clear_hotbar_selection_for_item(gui_entity, item);
 
-	if (item.get_owning_transfer_capability() != element_entity) {
+	if (item.get_owning_transfer_capability() != gui_entity) {
 		LOG("Warning! Assigned entity's owning capability is not the gui subject!");
 	}
 
@@ -143,14 +146,14 @@ void character_gui::assign_item_to_hotbar_button(
 }
 
 void character_gui::assign_item_to_first_free_hotbar_button(
-	const const_entity_handle element_entity,
+	const const_entity_handle gui_entity,
 	const const_entity_handle item
 ) {
-	clear_hotbar_selection_for_item(element_entity, item);
+	clear_hotbar_selection_for_item(gui_entity, item);
 
 	auto try_assign = [&](const size_t n) {
-		if (hotbar_buttons[n].get_assigned_entity(element_entity).dead()) {
-			assign_item_to_hotbar_button(n, element_entity, item);
+		if (hotbar_buttons[n].get_assigned_entity(gui_entity).dead()) {
+			assign_item_to_hotbar_button(n, gui_entity, item);
 
 			return true;
 		}
@@ -166,112 +169,120 @@ void character_gui::assign_item_to_first_free_hotbar_button(
 }
 
 character_gui::hotbar_selection_setup character_gui::hotbar_selection_setup::get_available_entities(const const_entity_handle h) const {
-	return{
-		get_hotbar_assigned_entity_if_available(h, h.get_cosmos()[primary_selection]),
-		get_hotbar_assigned_entity_if_available(h, h.get_cosmos()[secondary_selection]),
-	};
+	hotbar_selection_setup output;
+
+	for (size_t i = 0; i < hand_selections.size(); ++i) {
+		output.hand_selections[i] = get_hotbar_assigned_entity_if_available(
+			h, 
+			h.get_cosmos()[hand_selections[i]]
+		); 
+	}
+
+	return output;
 }
 
-wielding_result character_gui::make_hotbar_selection_setup(
+wielding_result character_gui::make_wielding_transfers_for(
 	const hotbar_selection_setup new_setup,
-	const const_entity_handle element_entity
+	const const_entity_handle gui_entity
 ) {
-	ensure(new_setup == new_setup.get_available_entities(element_entity));
+	const auto actually_available_setup = new_setup.get_available_entities(gui_entity);
+	ensure(new_setup == actually_available_setup);
 
-	return element_entity.wield_in_hands(
-		new_setup.primary_selection,
-		new_setup.secondary_selection
-	);
+	return gui_entity.make_wielding_transfers_for(new_setup.hand_selections);
 }
 
-wielding_result character_gui::make_previous_hotbar_selection_setup(
-	const const_entity_handle element_entity
+wielding_result character_gui::make_wielding_transfers_for_previous_hotbar_selection_setup(
+	const const_entity_handle gui_entity
 ) {
-	auto& current = current_hotbar_selection_setup;
-	const auto& cosm = element_entity.get_cosmos();
+	auto& current_setup_index = current_hotbar_selection_setup_index;
+	const auto& cosm = gui_entity.get_cosmos();
 
-	const auto setup = last_setups[1 - current].get_available_entities(element_entity);
+	const auto previous_setup = last_setups[1 - current_setup_index].get_available_entities(gui_entity);
 
-	if (setup == get_actual_selection_setup(element_entity)) {
-		const auto trial = [&](const size_t i) -> wielding_result {
-			const auto tried_setup = get_setup_from_button_indices(element_entity, i);
-			const auto candidate_entity = cosm[tried_setup.primary_selection];
+	const bool previous_is_identical_so_wield_first_item_from_hotbar
+		= previous_setup == get_actual_selection_setup(gui_entity)
+	;
+
+	if (previous_is_identical_so_wield_first_item_from_hotbar) {
+		const auto try_wielding_item_from_hotbar_button_no = [&](const size_t hotbar_button_index) {
+			wielding_result output;
+
+			const auto tried_setup = get_setup_from_button_indices(gui_entity, hotbar_button_index, -1);
+			const auto candidate_entity = cosm[tried_setup.hand_selections[0]];
 
 			if (candidate_entity.alive()) {
 				if (!is_clothing(candidate_entity.get<components::item>().categories_for_slot_compatibility)) {
+					const bool finally_found_differing_setup = !(tried_setup == previous_setup);
 
-					if (!(tried_setup == setup)) {
-						const auto s = make_and_save_hotbar_selection_setup(tried_setup, element_entity);
-
-						if (s.successful()) {
-							return s;
-						}
+					if (finally_found_differing_setup) {
+						output = make_and_push_hotbar_selection_setup(tried_setup, gui_entity);
 					}
 				}
 			}
 
-			return{};
+			return output;
 		};
 
-		for (size_t i = 0; i < hotbar_buttons.size(); ++i) {
-			const auto t = trial(i);
+		wielding_result output_transfers;
 
-			if (t.successful()) {
-				return t;
+		for (size_t i = 0; i < hotbar_buttons.size(); ++i) {
+			output_transfers = try_wielding_item_from_hotbar_button_no(i);
+
+			if (output_transfers.successful()) {
+				break;
 			}
 		}
 
-		return{};
+		return output_transfers;
 	}
 	else {
-		const auto different_setup = make_hotbar_selection_setup(setup, element_entity);
+		const auto previous_setup_that_is_different = make_wielding_transfers_for(previous_setup, gui_entity);
 
-		if (different_setup.result == wielding_result::type::SUCCESSFUL) {
-			current = 1 - current;
-			return different_setup;
+		if (previous_setup_that_is_different.result == wielding_result::type::SUCCESSFUL) {
+			current_setup_index = 1 - current_setup_index;
+			return previous_setup_that_is_different;
 		}
 		else {
-			return element_entity.swap_wielded_items();
+			return gui_entity.swap_wielded_items();
 		}
 	}
 }
 
 void character_gui::push_setup(const hotbar_selection_setup new_setup) {
-	auto& current = current_hotbar_selection_setup;
+	auto& current = current_hotbar_selection_setup_index;
 	current = 1 - current;
 
 	last_setups[current] = new_setup;
 }
 
-wielding_result character_gui::make_and_save_hotbar_selection_setup(
+wielding_result character_gui::make_and_push_hotbar_selection_setup(
 	const hotbar_selection_setup new_setup,
-	const const_entity_handle element_entity
+	const const_entity_handle gui_entity
 ) {
-	if (new_setup == get_actual_selection_setup(element_entity)) {
-		wielding_result out;
+	wielding_result out;
+
+	if (new_setup == get_actual_selection_setup(gui_entity)) {
 		out.result = wielding_result::type::THE_SAME_SETUP;
-		return out;
-	}
-
-	const auto next_wielding = make_hotbar_selection_setup(new_setup, element_entity);
-
-	if (next_wielding.successful()) {
-		push_setup(new_setup);
-
-		return next_wielding;
 	}
 	else {
-		return{};
+		out = make_wielding_transfers_for(new_setup, gui_entity);
+
+		if (out.successful()) {
+			push_setup(new_setup);
+		}
 	}
+
+	return out;
 }
 
 character_gui::hotbar_selection_setup character_gui::get_actual_selection_setup(
-	const const_entity_handle element_entity
+	const const_entity_handle gui_entity
 ) const {
 	hotbar_selection_setup output;
 
-	output.primary_selection = element_entity[slot_function::PRIMARY_HAND].get_item_if_any();
-	output.secondary_selection = element_entity[slot_function::SECONDARY_HAND].get_item_if_any();
+	for (size_t i = 0; i < output.hand_selections.size(); ++i) {
+		output.hand_selections[i] = gui_entity.get_if_any_item_in_hand_no(i);
+	}
 
 	return output;
 }
@@ -289,7 +300,7 @@ void character_gui::draw(
 		step.session.systems_audiovisual.get<gui_element_system>(),
 		rect_world,
 		*this,
-		gui_entity, 
+		gui_entity,
 		tree,
 		root_of_gui,
 		hotbar,
@@ -580,7 +591,7 @@ entity_id character_gui::get_hovered_world_entity(const cosmos& cosm, const vec2
 				hovered_entities.push_back(id);
 			}
 
-			return query_callback_result::CONTINUE;
+			return callback_result::CONTINUE;
 		}
 	);
 

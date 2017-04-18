@@ -79,16 +79,13 @@ decltype(auto) maximum_of(const Container& v) {
 }
 
 template<class A, class B>
-bool compare_containers(const A& a, const B& b);
-
-template<class A, class B>
-bool compare_containers(const std::vector<A>& a, const std::vector<B>& b) {
+bool compare_containers(const A& a, const B& b) {
 	if (a.size() != b.size()) {
 		return false;
 	}
 
-	for (size_t i = 0; i < a.size(); ++i) {
-		if (!(a[i] == b[i])) {
+	for (auto it = std::begin(a); it != std::end(a); ++it) {
+		if (!(*it == *(std::begin(b) + (it - std::begin(a))))) {
 			return false;
 		}
 	}

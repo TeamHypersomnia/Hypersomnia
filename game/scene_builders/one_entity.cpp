@@ -97,7 +97,7 @@ namespace scene_builders {
 			prefabs::create_small_magazine(step, vec2(100, -650), "0.4",
 				prefabs::create_pink_charge(step, vec2(0, 0), 30)));
 
-		//perform_transfer({ backpack, character(0)[slot_function::SHOULDER_SLOT] }, step);
+		//perform_transfer({ backpack, character(0)[slot_function::SHOULDER] }, step);
 
 		const auto rifle = prefabs::create_sample_rifle(step, vec2(100, -500),
 			prefabs::create_sample_magazine(step, vec2(100, -650), false ? "10" : "0.3",

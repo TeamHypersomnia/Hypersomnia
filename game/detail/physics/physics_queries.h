@@ -1,15 +1,11 @@
 #pragma once
 #include "game/simulation_settings/si_scaling.h"
+#include "game/enums/callback_result.h"
 
 struct camera_cone;
 struct b2AABB;
 struct b2Filter;
 class b2Shape;
-
-enum class query_callback_result {
-	CONTINUE,
-	ABORT
-};
 
 template <class derived>
 class physics_queries {
@@ -34,7 +30,7 @@ public:
 
 			bool ReportFixture(b2Fixture* fixture) override {
 				if (b2ContactFilter::ShouldCollide(&filter, &fixture->GetFilterData())) {
-					return call(fixture) == query_callback_result::CONTINUE;
+					return call(fixture) == callback_result::CONTINUE;
 				}
 
 				return true;
@@ -68,7 +64,7 @@ public:
 		for_each_in_aabb_meters(
 			shape_aabb,
 			filter,
-			[&](const b2Fixture* const fixture) -> query_callback_result {
+			[&](const b2Fixture* const fixture) -> callback_result {
 				constexpr auto index_a = 0;
 				constexpr auto index_b = 0;
 
@@ -89,7 +85,7 @@ public:
 					);
 				}
 				else {
-					return query_callback_result::CONTINUE;
+					return callback_result::CONTINUE;
 				}
 			}
 		);

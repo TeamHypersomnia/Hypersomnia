@@ -56,8 +56,8 @@ void viewing_session::configure_input() {
 	active_context.map_key_to_intent(key::E, intent_type::USE_BUTTON);
 	active_context.map_key_to_intent(key::LSHIFT, intent_type::SPRINT);
 
-	active_context.map_key_to_intent(key::G, intent_type::THROW_PRIMARY_ITEM);
-	active_context.map_key_to_intent(key::H, intent_type::HOLSTER_PRIMARY_ITEM);
+	active_context.map_key_to_intent(key::G, intent_type::THROW);
+	active_context.map_key_to_intent(key::H, intent_type::HOLSTER);
 
 	active_context.map_key_to_intent(key::BACKSPACE, intent_type::SWITCH_LOOK);
 

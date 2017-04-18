@@ -30,8 +30,8 @@ public:
 	const_entity_handle get_assigned_entity(const const_entity_handle owner_transfer_capability) const;
 	entity_handle get_assigned_entity(const entity_handle owner_transfer_capability) const;
 
-	bool is_primary_selection(const const_entity_handle owner_transfer_capability) const;
-	bool is_secondary_selection(const const_entity_handle owner_transfer_capability) const;
+	bool is_selected_as_primary(const const_entity_handle owner_transfer_capability) const;
+	bool is_selected_as_secondary(const const_entity_handle owner_transfer_capability) const;
 
 	static void draw(const viewing_game_gui_context, const const_this_in_item this_id, draw_info);
 

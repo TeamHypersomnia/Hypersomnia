@@ -130,7 +130,7 @@ void trigger_detector_system::send_trigger_confirmations(const logic_step step) 
 					found_triggers.insert(found_trigger_id);
 				}
 
-				return query_callback_result::CONTINUE;
+				return callback_result::CONTINUE;
 			})
 		);
 		

@@ -108,7 +108,7 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 		}
 
 		if (rotation_copying.colinearize_item_in_hand) {
-			const auto items = it.items_wielded();
+			const auto items = it.get_wielded_items();
 
 			if (items.size() > 0) {
 				const auto subject_item = cosmos[items[0]];

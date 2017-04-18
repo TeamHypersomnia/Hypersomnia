@@ -1,13 +1,15 @@
 #pragma once
 
-enum intent_type : unsigned char {
-	NONE,
-
+enum class intent_type : unsigned char {
 	OPEN_DEVELOPER_CONSOLE,
 
+	THROW,
+	// contextual
 	THROW_PRIMARY_ITEM,
 	THROW_SECONDARY_ITEM,
 
+	HOLSTER,
+	// contextual
 	HOLSTER_PRIMARY_ITEM,
 	HOLSTER_SECONDARY_ITEM,
 
@@ -71,5 +73,7 @@ enum intent_type : unsigned char {
 	SPECIAL_ACTION_BUTTON_9,
 	SPECIAL_ACTION_BUTTON_10,
 	SPECIAL_ACTION_BUTTON_11,
-	SPECIAL_ACTION_BUTTON_12
+	SPECIAL_ACTION_BUTTON_12,
+
+	COUNT
 };

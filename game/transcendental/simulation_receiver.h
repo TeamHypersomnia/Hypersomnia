@@ -39,10 +39,14 @@ class simulation_receiver {
 	steps_unpacking_result unpack_deterministic_steps(cosmos& referential_cosmos, cosmos& last_delta_unpacked);
 	void drag_mispredictions_into_past(interpolation_system&, past_infection_system&, const cosmos& predicted_cosmos, const std::vector<misprediction_candidate_entry>& mispredictions) const;
 
-	void remote_entropy_predictions(guid_mapped_entropy& adjusted_entropy, const entity_id predictable_entity, const cosmos& predicted_cosmos);
+	void predict_intents_of_remote_entities(
+		guid_mapped_entropy& adjusted_entropy, 
+		const entity_id locally_controlled_entity, 
+		const cosmos& predicted_cosmos
+	);
 public:
 	augs::jitter_buffer<step_packaged_for_network> jitter_buffer;
-	std::vector<guid_mapped_entropy> predicted_steps;
+	std::vector<guid_mapped_entropy> predicted_step_entropies;
 
 	float resubstantiate_prediction_every_ms = 1000.f;
 	float misprediction_smoothing_multiplier = 0.5f;
@@ -64,7 +68,7 @@ public:
 
 		client.post_redundant(client_commands);
 
-		predicted_steps.push_back(guid_mapped);
+		predicted_step_entropies.push_back(guid_mapped);
 		advance(new_local_entropy, predicted_cosmos);
 	}
 
@@ -72,7 +76,7 @@ public:
 	steps_unpacking_result unpack_deterministic_steps(
 		interpolation_system& interp, 
 		past_infection_system& past,
-		const entity_id predictable_entity, 
+		const entity_id locally_controlled_entity, 
 		cosmos& referential_cosmos, 
 		cosmos& last_delta_unpacked, 
 		cosmos& predicted_cosmos, 
@@ -85,7 +89,7 @@ public:
 			const cosmic_entropy cosmic_entropy_for_this_step(e.entropy, referential_cosmos);
 			
 			if (e.resubstantiate) {
-				LOG("Cli: %x resubs at step: %x", predictable_entity, referential_cosmos.get_total_steps_passed());
+				LOG("Cli: %x resubs at step: %x", locally_controlled_entity, referential_cosmos.get_total_steps_passed());
 				referential_cosmos.complete_reinference();
 			}
 
@@ -106,10 +110,17 @@ public:
 
 			predicted_cosmos = referential_cosmos;
 
-			for (auto& s : predicted_steps) {
-				remote_entropy_predictions(s, predictable_entity, predicted_cosmos);
+			for (auto& predicted_step_entropy : predicted_step_entropies) {
+				predict_intents_of_remote_entities(
+					predicted_step_entropy,
+					locally_controlled_entity, 
+					predicted_cosmos
+				);
 
-				advance(cosmic_entropy(s, predicted_cosmos), predicted_cosmos);
+				advance(
+					cosmic_entropy(predicted_step_entropy, predicted_cosmos),
+					predicted_cosmos
+				);
 			}
 
 			drag_mispredictions_into_past(interp, past, predicted_cosmos, potential_mispredictions);

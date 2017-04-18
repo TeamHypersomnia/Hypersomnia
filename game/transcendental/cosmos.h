@@ -155,8 +155,6 @@ public:
 	const_entity_handle get_handle(const unversioned_entity_id) const;
 	inventory_slot_handle get_handle(const inventory_slot_id);
 	const_inventory_slot_handle get_handle(const inventory_slot_id) const;
-	item_slot_transfer_request get_handle(const item_slot_transfer_request_data);
-	const_item_slot_transfer_request get_handle(const item_slot_transfer_request_data) const;
 
 #if COSMOS_TRACKS_GUIDS
 	template <template <class> class Guidized, class source_id_type>
@@ -334,14 +332,6 @@ inline inventory_slot_handle cosmos::get_handle(const inventory_slot_id id) {
 
 inline const_inventory_slot_handle cosmos::get_handle(const inventory_slot_id id) const {
 	return { *this, id };
-}
-
-inline item_slot_transfer_request cosmos::get_handle(const item_slot_transfer_request_data data) {
-	return { *this, data };
-}
-
-inline const_item_slot_transfer_request cosmos::get_handle(const item_slot_transfer_request_data data) const {
-	return { *this, data };
 }
 
 inline randomization cosmos::get_rng_for(const entity_id id) const {

@@ -35,14 +35,14 @@ namespace ingredients {
 		slot_def.attachment_sticking_mode = rectangle_sticking::LEFT;
 		slot_def.attachment_offset.pos = vec2(-bbox.x/2 + 4, 0);
 		slot_def.attachment_offset.rotation = -90;
-		container.slots[slot_function::SHOULDER_SLOT] = slot_def;
+		container.slots[slot_function::SHOULDER] = slot_def;
 
 		slot_def.attachment_density_multiplier = 1.f;
 		slot_def.for_categorized_items_only = true;
 		slot_def.category_allowed = item_category::TORSO_ARMOR;
 		slot_def.attachment_offset = vec2(0, 0);
 
-		container.slots[slot_function::TORSO_ARMOR_SLOT] = slot_def;
+		container.slots[slot_function::TORSO_ARMOR] = slot_def;
 
 	}
 }

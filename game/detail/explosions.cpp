@@ -136,7 +136,7 @@ void standard_explosion(const standard_explosion_input in) {
 				}
 			}
 
-			return query_callback_result::CONTINUE;
+			return callback_result::CONTINUE;
 		}
 		);
 	}

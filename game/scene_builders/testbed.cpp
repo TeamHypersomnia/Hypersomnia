@@ -196,7 +196,7 @@ namespace scene_builders {
 						(i == 5 ? prefabs::create_pink_charge : prefabs::create_cyan_charge)(step, vec2(0, 0), 30)));
 
 				name_entity(new_character, entity_name::PERSON, L"Rebel");
-				perform_transfer({ rifle, new_character[slot_function::PRIMARY_HAND] }, step);
+				perform_transfer({ rifle, new_character.get_primary_hand() }, step);
 
 				new_character.get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
 				new_character.get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
@@ -217,18 +217,18 @@ namespace scene_builders {
 						prefabs::create_small_magazine(step, vec2(100, -650), "3.4",
 							prefabs::create_pink_charge(step, vec2(0, 0), 300)));
 
-					perform_transfer({ rifle, new_character[slot_function::PRIMARY_HAND] }, step);
+					perform_transfer({ rifle, new_character.get_primary_hand() }, step);
 				}
 				else {
 					const auto rifle = (i == 7 ? prefabs::create_submachine : prefabs::create_sample_bilmer2000)(step, vec2(100, -500),
 						prefabs::create_sample_magazine(step, vec2(100, -650), "3.4",
 							prefabs::create_pink_charge(step, vec2(0, 0), 300)));
 
-					perform_transfer({ rifle, new_character[slot_function::PRIMARY_HAND] }, step);
+					perform_transfer({ rifle, new_character.get_primary_hand() }, step);
 				}
 
 				const auto backpack = prefabs::create_sample_backpack(step, vec2(200, -650));
-				perform_transfer({ backpack, new_character[slot_function::SHOULDER_SLOT] }, step);
+				perform_transfer({ backpack, new_character[slot_function::SHOULDER] }, step);
 			}
 
 			if (i == 10) {
@@ -771,23 +771,22 @@ namespace scene_builders {
 		const auto backpack = prefabs::create_sample_backpack(step, vec2(200, -650));
 		prefabs::create_sample_backpack(step, vec2(200, -750));
 
-		//perform_transfer({ backpack, character(0)[slot_function::SHOULDER_SLOT] }, step);
-		//perform_transfer({ submachine, character(0)[slot_function::PRIMARY_HAND] }, step);
-		//perform_transfer({ rifle, character(0)[slot_function::SECONDARY_HAND] }, step);
+		//perform_transfer({ backpack, character(0)[slot_function::SHOULDER] }, step);
+		//perform_transfer({ submachine, character(0).get_primary_hand() }, step);
 
 		if (character(1).alive()) {
 			name_entity(character(1), entity_name::PERSON, L"Sentinel");
-			perform_transfer({ rifle2, character(1)[slot_function::PRIMARY_HAND] }, step);
+			perform_transfer({ rifle2, character(1).get_primary_hand() }, step);
 		}
 
 		if (character(2).alive()) {
 			name_entity(character(2), entity_name::PERSON, L"Sentinel");
-			perform_transfer({ second_machete, character(2)[slot_function::PRIMARY_HAND] }, step);
+			perform_transfer({ second_machete, character(2).get_primary_hand() }, step);
 		}
 
 		if (character(3).alive()) {
 			name_entity(character(3), entity_name::PERSON, L"Medic");
-			perform_transfer({ pis2, character(3)[slot_function::PRIMARY_HAND] }, step);
+			perform_transfer({ pis2, character(3).get_primary_hand() }, step);
 		}
 
 		characters.assign(new_characters.begin(), new_characters.end());

@@ -19,17 +19,29 @@ void basic_inventory_slot_handle<C>::unset() {
 
 template <bool C>
 bool basic_inventory_slot_handle<C>::is_hand_slot() const {
-	return raw_id.type == slot_function::PRIMARY_HAND || raw_id.type == slot_function::SECONDARY_HAND;
+	return
+		raw_id.type == slot_function::PRIMARY_HAND
+		|| raw_id.type == slot_function::SECONDARY_HAND
+	;
 }
 
 template <bool C>
-bool basic_inventory_slot_handle<C>::is_input_enabling_slot() const {
-	return is_hand_slot();
+size_t basic_inventory_slot_handle<C>::get_hand_index() const {
+	if (raw_id.type == slot_function::PRIMARY_HAND) {
+		return 0;
+	}
+	else if (raw_id.type == slot_function::SECONDARY_HAND) {
+		return 1;
+	}
+	else {
+		ensure(false);
+		return 0xdeadbeef;
+	}
 }
 
 template <bool C>
 bool basic_inventory_slot_handle<C>::has_items() const {
-	return alive() && get().items_inside.size() > 0;
+	return get().items_inside.size() > 0;
 }
 
 template <bool C>
@@ -39,7 +51,7 @@ typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot
 
 template <bool C>
 bool basic_inventory_slot_handle<C>::is_empty_slot() const {
-	return alive() && get().items_inside.size() == 0;
+	return get().items_inside.size() == 0;
 }
 
 template <bool C>
@@ -94,6 +106,22 @@ typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot
 	}
 
 	return get_container();
+}
+
+template <bool C>
+typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot_handle<C>::get_root_container_until(const entity_id container_entity) const {
+	const auto slot = get_container().get_current_slot();
+
+	if (slot.alive() && slot.get_container() != container_entity) {
+		return slot.get_root_container_until(container_entity);
+	}
+
+	return get_container();
+}
+
+template <bool C>
+bool basic_inventory_slot_handle<C>::is_child_of(const entity_id container_entity) const {
+	return get_container() == container_entity || get_root_container_until(container_entity) == container_entity;
 }
 
 template <bool C>

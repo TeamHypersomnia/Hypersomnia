@@ -61,6 +61,9 @@ public:
 	entity_handle_type get_item_if_any() const;
 	entity_handle_type get_container() const;
 	entity_handle_type get_root_container() const;
+	entity_handle_type get_root_container_until(const entity_id container_entity) const;
+
+	bool is_child_of(const entity_id container_entity) const;
 
 	auto get_items_inside() const {
 		return get().items_inside;
@@ -70,7 +73,7 @@ public:
 	bool is_empty_slot() const;
 
 	bool is_hand_slot() const;
-	bool is_input_enabling_slot() const;
+	size_t get_hand_index() const;
 
 	float calculate_density_multiplier_due_to_being_attached() const;
 	unsigned calculate_local_free_space() const;

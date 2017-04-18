@@ -23,37 +23,3 @@ struct basic_item_slot_transfer_request_data {
 };
 
 typedef basic_item_slot_transfer_request_data<entity_id> item_slot_transfer_request_data;
-
-template <bool C>
-struct basic_item_slot_transfer_request : public item_slot_transfer_request_data {
-	typedef maybe_const_ref_t<C, cosmos> owner_reference;
-
-	basic_entity_handle<C> get_item() const {
-		return owner[item];
-	}
-
-	basic_inventory_slot_handle<C> get_target_slot() const {
-		return owner[target_slot];
-	}
-
-	owner_reference owner;
-
-	basic_item_slot_transfer_request(
-		owner_reference owner,
-		const item_slot_transfer_request_data& data
-	) : 
-		owner(owner),
-		item_slot_transfer_request_data(data)
-	{
-	}
-
-	operator basic_item_slot_transfer_request<true>() const {
-		return {
-			owner,
-			static_cast<const item_slot_transfer_request_data&>(*this)
-		};
-	}
-};
-
-typedef basic_item_slot_transfer_request<false> item_slot_transfer_request;
-typedef basic_item_slot_transfer_request<true> const_item_slot_transfer_request;

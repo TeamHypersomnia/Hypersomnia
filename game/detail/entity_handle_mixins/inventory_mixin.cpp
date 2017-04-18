@@ -1,3 +1,5 @@
+#include "inventory_mixin.h"
+
 #include "game/transcendental/entity_handle.h"
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
@@ -6,9 +8,8 @@
 #include "game/components/item_component.h"
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/gun_component.h"
+#include "game/components/sentience_component.h"
 #include "game/transcendental/cosmos.h"
-
-#include "inventory_mixin.h"
 
 template <bool C, class D>
 D basic_inventory_mixin<C, D>::get_owning_transfer_capability() const {
@@ -33,22 +34,71 @@ D basic_inventory_mixin<C, D>::get_owning_transfer_capability() const {
 }
 
 template <bool C, class D>
-typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory_mixin<C, D>::first_free_hand() const {
+typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory_mixin<C, D>::get_primary_hand() const {
+	const auto& self = *static_cast<const D*>(this);
+	ensure(self.has<components::sentience>());
+
+	return self[slot_function::PRIMARY_HAND];
+}
+
+template <bool C, class D>
+typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory_mixin<C, D>::get_secondary_hand() const {
+	const auto& self = *static_cast<const D*>(this);
+	ensure(self.has<components::sentience>());
+
+	return self[slot_function::SECONDARY_HAND];
+}
+
+template <bool C, class D>
+typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory_mixin<C, D>::get_hand_no(const size_t index) const {
+	const auto& self = *static_cast<const D*>(this);
+
+	if (index == 0) {
+		return get_primary_hand();
+	}
+	else if (index == 1) {
+		return get_secondary_hand();
+	}
+	else {
+		ensure(false && "bad hand index");
+		return self.get_cosmos()[inventory_slot_id()];
+	}
+}
+
+template <bool C, class D>
+D basic_inventory_mixin<C, D>::get_if_any_item_in_hand_no(const size_t index) const {
+	const auto& self = *static_cast<const D*>(this);
+	const auto hand = self.get_hand_no(index);
+	
+	entity_id item;
+
+	if (hand.alive()) {
+		item = hand.get_item_if_any();
+	}
+	
+	return self.get_cosmos()[item];
+}
+
+template <bool C, class D>
+typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory_mixin<C, D>::get_first_free_hand() const {
 	const auto& self = *static_cast<const D*>(this);
 	auto& cosmos = self.get_cosmos();
 
-	const auto maybe_primary = self[slot_function::PRIMARY_HAND];
-	const auto maybe_secondary = self[slot_function::SECONDARY_HAND];
+	inventory_slot_id target_slot;
 
-	if (maybe_primary.is_empty_slot()) {
-		return maybe_primary;
-	}
+	self.for_each_hand(
+		[&](const auto hand) {
+			if (hand.is_empty_slot()) {
+				target_slot = hand;
+				
+				return callback_result::ABORT;
+			}
 
-	if (maybe_secondary.is_empty_slot()) {
-		return maybe_secondary;
-	}
+			return callback_result::CONTINUE;
+		}
+	);
 
-	return cosmos[inventory_slot_id()];
+	return cosmos[target_slot];
 }
 
 template <bool C, class D>
@@ -85,77 +135,32 @@ inventory_item_address basic_inventory_mixin<C, D>::get_address_from_root() cons
 }
 
 template <bool C, class D>
-bool basic_inventory_mixin<C, D>::wields_in_primary_hand(const const_entity_handle what_item) const {
-	const auto& self = *static_cast<const D*>(this);
-	auto& cosmos = self.get_cosmos();
-
-	return self[slot_function::PRIMARY_HAND].get_item_if_any() == what_item;
-}
-
-template <bool C, class D>
-bool basic_inventory_mixin<C, D>::wields_in_secondary_hand(const const_entity_handle what_item) const {
-	const auto& self = *static_cast<const D*>(this);
-	auto& cosmos = self.get_cosmos();
-
-	return self[slot_function::SECONDARY_HAND].get_item_if_any() == what_item;
-}
-
-template <bool C, class D>
-typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory_mixin<C, D>::determine_hand_holstering_slot_for(const D holstered_item) const {
+typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory_mixin<C, D>::determine_holstering_slot_for(const D holstered_item) const {
 	const auto& searched_root_container = *static_cast<const D*>(this);
 	auto& cosmos = holstered_item.get_cosmos();
 
-	if (holstered_item.dead()) {
-		return cosmos[inventory_slot_id()];
-	}
-
+	ensure(holstered_item.alive()) 
 	ensure(searched_root_container.alive());
+	ensure(holstered_item != searched_root_container);
 
-	const auto slot_checker = [&](const slot_function type) {
-		const auto maybe_slot = searched_root_container[type];
+	inventory_slot_id target_slot;
 
-		if (maybe_slot.alive()) {
-			if (maybe_slot.can_contain(holstered_item)) {
-				return maybe_slot;
+	searched_root_container.for_each_contained_slot_recursive(
+		[&](const auto slot) {
+			if (slot.get_container() == holstered_item) {
+				return recursive_callback_result::CONTINUE_DONT_RECURSE;
 			}
-			else {
-				const auto items_inside = maybe_slot.get_items_inside();
 
-				for (const auto potential_container_item_id : items_inside) {
-					const auto potential_container_item = cosmos[potential_container_item_id];
-
-					const auto category = get_slot_with_compatible_category(holstered_item, potential_container_item);
-
-					if (category != slot_function::INVALID) {
-						const auto compatible_slot = potential_container_item[category];
-
-						if (compatible_slot.can_contain(holstered_item)) {
-							return compatible_slot;
-						}
-					}
-				}
+			if (!slot.is_hand_slot() && slot.can_contain(holstered_item)) {
+				target_slot = slot;
+				return recursive_callback_result::ABORT;
 			}
+
+			return recursive_callback_result::CONTINUE_AND_RECURSE;
 		}
+	);
 
-		return cosmos[inventory_slot_id()];
-	};
-
-	const slot_function slots_to_check[] = {
-		slot_function::SHOULDER_SLOT,
-		slot_function::PRIMARY_HAND,
-		slot_function::SECONDARY_HAND,
-		slot_function::TORSO_ARMOR_SLOT
-	};
-
-	for(const auto s : slots_to_check) {
-		const auto maybe_slot = slot_checker(s);
-
-		if (maybe_slot.alive()) {
-			return maybe_slot;
-		}
-	}
-
-	return cosmos[inventory_slot_id()];
+	return cosmos[target_slot];
 }
 
 template <bool C, class D>
@@ -167,171 +172,147 @@ typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory
 	
 	auto& cosmos = picked_item.get_cosmos();
 
-	const auto hidden_slot = searched_root_container.determine_hand_holstering_slot_for(picked_item);
+	inventory_slot_id target_slot;
 
-	if (hidden_slot.alive()) {
-		return hidden_slot;
+	const auto holster_slot = searched_root_container.determine_holstering_slot_for(picked_item);
+
+	if (holster_slot.alive()) {
+		target_slot = holster_slot;
+	}
+	else {
+		searched_root_container.for_each_hand(
+			[&](const auto hand) {
+				if (hand.can_contain(picked_item)) {
+					target_slot = hand;
+					
+					return callback_result::ABORT;
+				}
+				
+				return callback_result::CONTINUE;
+			}
+		);
 	}
 
-	if (searched_root_container[slot_function::PRIMARY_HAND].can_contain(picked_item)) {
-		return searched_root_container[slot_function::PRIMARY_HAND];
-	}
-
-	if (searched_root_container[slot_function::SECONDARY_HAND].can_contain(picked_item)) {
-		return searched_root_container[slot_function::SECONDARY_HAND];
-	}
-
-	return cosmos[inventory_slot_id()];
+	return cosmos[target_slot];
 }
 
 template <bool C, class D>
-typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory_mixin<C, D>::map_primary_action_to_secondary_hand_if_primary_empty(const bool is_action_secondary) const {
-	const auto& root_container = *static_cast<const D*>(this);
-
-	const auto primary = root_container[slot_function::PRIMARY_HAND];
-	const auto secondary = root_container[slot_function::SECONDARY_HAND];
-
-	if (primary.is_empty_slot()) {
-		return secondary;
-	}
-	else { 
-		return is_action_secondary ? secondary : primary;
-	}
-}
-
-template <bool C, class D>
-augs::constant_size_vector<entity_id, 2> basic_inventory_mixin<C, D>::guns_wielded() const {
-	const auto& subject = *static_cast<const D*>(this);
-	augs::constant_size_vector<entity_id, 2> result;
-
-	{
-		const auto wielded = subject[slot_function::PRIMARY_HAND].get_item_if_any();
-
-		if (wielded.alive() && wielded.has<components::gun>()) {
-			result.push_back(wielded);
+augs::constant_size_vector<entity_id, 2> basic_inventory_mixin<C, D>::get_wielded_guns() const {
+	const auto& self = *static_cast<const D*>(this);
+	auto result = self.get_wielded_items();
+	
+	erase_remove(
+		result, 
+		[&](const auto item) {
+			return !self.get_cosmos()[item].has<components::gun>();
 		}
-	}
-
-	{
-		const auto wielded = subject[slot_function::SECONDARY_HAND].get_item_if_any();
-
-		if (wielded.alive() && wielded.has<components::gun>()) {
-			result.push_back(wielded);
-		}
-	}
+	);
 
 	return result;
 }
 
 template <bool C, class D>
-augs::constant_size_vector<entity_id, 2> basic_inventory_mixin<C, D>::items_wielded() const {
-	const auto& subject = *static_cast<const D*>(this);
+augs::constant_size_vector<entity_id, 2> basic_inventory_mixin<C, D>::get_wielded_items() const {
+	const auto& self = *static_cast<const D*>(this);
 	augs::constant_size_vector<entity_id, 2> result;
+		
+	self.for_each_hand(
+		[&](const auto hand) {
+			const auto wielded = hand.get_item_if_any();
 
-	{
-		const auto wielded = subject[slot_function::PRIMARY_HAND].get_item_if_any();
+			if (wielded.alive()) {
+				result.push_back(wielded);
+			}
 
-		if (wielded.alive()) {
-			result.push_back(wielded);
+			return callback_result::CONTINUE;
 		}
-	}
-
-	{
-		const auto wielded = subject[slot_function::SECONDARY_HAND].get_item_if_any();
-
-		if (wielded.alive()) {
-			result.push_back(wielded);
-		}
-	}
+	);
 
 	return result;
 }
 
 template <bool C, class D>
 wielding_result basic_inventory_mixin<C, D>::swap_wielded_items() const {
-	const auto& subject = *static_cast<const D*>(this);
-	auto& cosmos = subject.get_cosmos();
+	const auto& self = *static_cast<const D*>(this);
+	auto& cosmos = self.get_cosmos();
 	
 	wielding_result result;
 
-	const auto in_primary = subject[slot_function::PRIMARY_HAND].get_item_if_any();
-	const auto in_secondary = subject[slot_function::SECONDARY_HAND].get_item_if_any();
-	
-	auto& transfers = result.transfers;
+	const bool both_hands_available = self.get_hand_no(0).alive() && self.get_hand_no(1).alive();
 
-	if (in_primary.alive() && in_secondary.alive()) {
-		transfers = swap_slots_for_items(in_primary, in_secondary);
-	}
-	else if (in_primary.alive()) {
-		transfers.push_back({ in_primary, subject[slot_function::SECONDARY_HAND] });
-	}
-	else if (in_secondary.alive()) {
-		transfers.push_back({ in_secondary, subject[slot_function::PRIMARY_HAND] });
+	if (both_hands_available) {
+		const auto in_primary = self.get_if_any_item_in_hand_no(0);
+		const auto in_secondary = self.get_if_any_item_in_hand_no(1);
+
+		auto& transfers = result.transfers;
+
+		if (in_primary.alive() && in_secondary.alive()) {
+			transfers = swap_slots_for_items(in_primary, in_secondary);
+		}
+		else if (in_primary.alive()) {
+			transfers.push_back({ in_primary, self.get_secondary_hand() });
+		}
+		else if (in_secondary.alive()) {
+			transfers.push_back({ in_secondary, self.get_primary_hand() });
+		}
+
+		result.result = wielding_result::type::SUCCESSFUL;
 	}
 
-	result.result = wielding_result::type::SUCCESSFUL;
-	
 	return result;
 }
 
 template <bool C, class D>
-wielding_result basic_inventory_mixin<C, D>::wield_in_hands(
-	entity_id first, 
-	entity_id second
-) const {
-	const auto& subject = *static_cast<const D*>(this);
-	auto& cosmos = subject.get_cosmos();
-	
+wielding_result basic_inventory_mixin<C, D>::make_wielding_transfers_for(const hand_selections_array selections) const {
+	const auto& self = *static_cast<const D*>(this);
+	auto& cosmos = self.get_cosmos();
+
 	wielding_result result;
+	result.result = wielding_result::type::THE_SAME_SETUP;
 
-	const auto in_primary = subject[slot_function::PRIMARY_HAND].get_item_if_any();
-	const auto in_secondary = subject[slot_function::SECONDARY_HAND].get_item_if_any();
+	augs::constant_size_vector<item_slot_transfer_request_data, hand_count> holsters;
+	augs::constant_size_vector<item_slot_transfer_request_data, hand_count> draws;
 
-	const bool is_only_secondary_possibly_chosen = cosmos[first].dead();
+	for (size_t i = 0; i < selections.size(); ++i) {
+		const auto hand = self.get_hand_no(i);
 
-	if (is_only_secondary_possibly_chosen) {
-		std::swap(first, second);
+		if (hand.dead()) {
+			continue;
+		}
+
+		const auto item_for_hand = cosmos[selections[i]];
+		const auto item_in_hand = hand.get_item_if_any();
+
+		const bool identical_outcome =
+			item_in_hand.dead() && item_for_hand.dead()
+			|| item_in_hand == item_for_hand
+		;
+
+		if (identical_outcome) {
+			continue;
+		}
+
+		if (item_in_hand.alive()) {
+			const auto holstering_slot = self.determine_holstering_slot_for(item_in_hand);
+
+			if (holstering_slot.dead()) {
+				result.result = wielding_result::type::NO_SPACE_FOR_HOLSTER;
+				break;
+			}
+
+			holsters.push_back({ item_in_hand, holstering_slot });
+		}
+
+		if (item_for_hand.alive()) {
+			draws.push_back({ item_for_hand, hand });
+		}
+
+		result.result = wielding_result::type::SUCCESSFUL;
 	}
 
-	if ((in_primary == first && in_secondary == second) || (is_only_secondary_possibly_chosen && (first == in_primary))) {
-		result.result = wielding_result::type::THE_SAME_SETUP;
-		return result;
-	}
+	concatenate(result.transfers, holsters);
+	concatenate(result.transfers, draws);
 
-	const auto primary_holstering_slot = subject.determine_hand_holstering_slot_for(in_primary);
-	const auto secondary_holstering_slot = subject.determine_hand_holstering_slot_for(in_secondary);
-
-	const bool something_wont_fit = 
-		(in_primary.alive() && primary_holstering_slot.dead()) ||
-		(in_secondary.alive() && secondary_holstering_slot.dead());
-
-	if (something_wont_fit) {
-		result.result = wielding_result::type::SOMETHING_WONT_FIT;
-		return result;
-	}
-
-	auto& transfers = result.transfers;
-
-	if (primary_holstering_slot.alive()) {
-		transfers.push_back({ in_primary, primary_holstering_slot });
-	}
-
-	if (secondary_holstering_slot.alive()) {
-		transfers.push_back({ in_secondary, secondary_holstering_slot });
-	}
-
-	const auto first_handle = cosmos[first];
-	const auto second_handle = cosmos[second];
-
-	if (first_handle.alive()) {
-		transfers.push_back({ first_handle, subject[slot_function::PRIMARY_HAND] });
-	}
-
-	if (second_handle.alive()) {
-		transfers.push_back({ second_handle, subject[slot_function::SECONDARY_HAND] });
-	}
-
-	result.result = wielding_result::type::SUCCESSFUL;
 	return result;
 }
 

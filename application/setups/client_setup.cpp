@@ -237,7 +237,7 @@ void client_setup::process_once(
 
 			session.sending_commands_and_predict_profiler.end_measurement();
 
-			// LOG("Predicting to step: %x; predicted steps: %x", extrapolated_hypersomnia.get_total_steps_passed(), receiver.predicted_steps.size());
+			// LOG("Predicting to step: %x; predicted steps: %x", extrapolated_hypersomnia.get_total_steps_passed(), receiver.predicted_step_entropies.size());
 
 			session.unpack_remote_steps_profiler.new_measurement();
 			

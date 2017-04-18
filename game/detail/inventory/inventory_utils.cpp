@@ -38,14 +38,16 @@ bool capability_comparison::is_authorized(const const_entity_handle h) const {
 
 capability_comparison match_transfer_capabilities(
 	const cosmos& cosm,
-	item_slot_transfer_request_data r_data
+	item_slot_transfer_request_data r
 ) {
-	const auto r = cosm[r_data];
+	const auto transferred_item = cosm[r.item];
+	// const auto target_slot = cosm[r.target_slot];
+	const auto target_slot_container = cosm[r.target_slot].get_container();
 
-	const auto& dead_entity = r.get_item().get_cosmos()[entity_id()];
+	const auto& dead_entity = transferred_item.get_cosmos()[entity_id()];
 
-	const auto item_owning_capability = r.get_item().get_owning_transfer_capability();
-	const auto target_slot_owning_capability = r.get_target_slot().get_container().get_owning_transfer_capability();
+	const auto item_owning_capability = transferred_item.get_owning_transfer_capability();
+	const auto target_slot_owning_capability = target_slot_container.get_owning_transfer_capability();
 
 	if (target_slot_owning_capability.dead() && item_owning_capability.dead()) {
 		return{ capability_relation::BOTH_DEAD, dead_entity };
@@ -79,13 +81,18 @@ capability_comparison match_transfer_capabilities(
 	return{ capability_relation::PICKUP, target_slot_owning_capability };
 }
 
-item_transfer_result query_transfer_result(const const_item_slot_transfer_request r) {
+item_transfer_result query_transfer_result(
+	const cosmos& cosm,
+	const item_slot_transfer_request_data r	
+) {
 	item_transfer_result output;
-	const auto& item = r.get_item().get<components::item>();
+	const auto transferred_item = cosm[r.item];
+	const auto target_slot = cosm[r.target_slot];
+	const auto& item = transferred_item.get<components::item>();
 
 	ensure(r.specified_quantity != 0);
 
-	const auto capabilities_compared = match_transfer_capabilities(r.get_item().get_cosmos(), r);
+	const auto capabilities_compared = match_transfer_capabilities(transferred_item.get_cosmos(), r);
 	const auto result = capabilities_compared.relation_type;
 
 	if (result == capability_relation::UNMATCHING) {
@@ -104,9 +111,12 @@ item_transfer_result query_transfer_result(const const_item_slot_transfer_reques
 	else {
 		ensure(capabilities_compared.is_legal());
 
+		const bool trying_to_insert_inside_the_transferred_item = target_slot.is_child_of(transferred_item);
+		ensure(!trying_to_insert_inside_the_transferred_item);
+
 		const auto containment_result = query_containment_result(
-			r.get_item(), 
-			r.get_target_slot(), 
+			transferred_item, 
+			target_slot,
 			r.specified_quantity
 		);
 
@@ -322,7 +332,7 @@ void drop_from_all_slots(const entity_handle c, const logic_step step) {
 
 	for (const auto& s : container.slots) {
 		for (const auto item : s.second.items_inside) {
-			perform_transfer(item_slot_transfer_request{ c.get_cosmos(), { item, inventory_slot_id() } }, step);
+			perform_transfer( item_slot_transfer_request_data{ item, inventory_slot_id() }, step);
 		}
 	}
 }
@@ -401,14 +411,14 @@ augs::constant_size_vector<item_slot_transfer_request_data, 4> swap_slots_for_it
 }
 
 void perform_transfer(
-	const item_slot_transfer_request_data r_data, 
+	const item_slot_transfer_request_data r, 
 	const logic_step step
 ) {
 	auto& cosmos = step.cosm;
-	const auto r = item_slot_transfer_request{ cosmos, r_data };
-	auto& item = r.get_item().get<components::item>();
+	const auto transferred_item = cosmos[r.item];
+	auto& item = transferred_item.get<components::item>();
 
-	const auto result = query_transfer_result(r);
+	const auto result = query_transfer_result(cosmos, r);
 
 	if (!is_successful(result.result)) {
 		LOG("Warning: an item-slot transfer was not successful.");
@@ -416,7 +426,10 @@ void perform_transfer(
 	}
 
 	const auto previous_slot = cosmos[item.current_slot];
-	const auto target_slot = r.get_target_slot();
+	const auto target_slot = cosmos[r.target_slot];
+
+	const auto previous_slot_container = previous_slot.get_container();
+	const auto target_slot_container = target_slot.get_container();
 
 	const bool is_pickup = result.result == item_transfer_result_type::SUCCESSFUL_PICKUP;
 	const bool target_slot_exists = result.result == item_transfer_result_type::SUCCESSFUL_TRANSFER || is_pickup;
@@ -436,7 +449,7 @@ void perform_transfer(
 
 	if (target_slot_exists) {
 		for (const auto potential_stack_target : target_slot.get_items_inside()) {
-			if (can_stack_entities(r.get_item(), cosmos[potential_stack_target])) {
+			if (can_stack_entities(transferred_item, cosmos[potential_stack_target])) {
 				target_item_to_stack_with = potential_stack_target;
 			}
 		}
@@ -447,20 +460,20 @@ void perform_transfer(
 	components::transform previous_container_transform;
 
 	if (previous_slot.alive()) {
-		previous_container_transform = previous_slot.get_container().get_logic_transform();
+		previous_container_transform = previous_slot_container.get_logic_transform();
 
 		if (whole_item_grabbed) {
-			detail_remove_item(previous_slot, r.get_item());
+			detail_remove_item(previous_slot, transferred_item);
 		}
 
-		if (previous_slot.is_input_enabling_slot()) {
-			unset_input_flags_of_orphaned_entity(r.get_item());
+		if (previous_slot.is_hand_slot()) {
+			unset_input_flags_of_orphaned_entity(transferred_item);
 		}
 	}
 
 	if (cosmos[target_item_to_stack_with].alive()) {
 		if (whole_item_grabbed) {
-			step.transient.messages.post(messages::queue_destruction(r.get_item()));
+			step.transient.messages.post(messages::queue_destruction(transferred_item));
 		}
 		else {
 			item.charges -= result.transferred_charges;
@@ -474,10 +487,10 @@ void perform_transfer(
 	entity_id grabbed_item_part;
 
 	if (whole_item_grabbed) {
-		grabbed_item_part = r.get_item();
+		grabbed_item_part = transferred_item;
 	}
 	else {
-		grabbed_item_part = cosmos.clone_entity(r.get_item());
+		grabbed_item_part = cosmos.clone_entity(transferred_item);
 		item.charges -= result.transferred_charges;
 		cosmos[grabbed_item_part].get<components::item>().charges = result.transferred_charges;
 	}
@@ -485,7 +498,7 @@ void perform_transfer(
 	const auto grabbed_item_part_handle = cosmos[grabbed_item_part];
 
 	if (target_slot_exists) {
-		detail_add_item(r.get_target_slot(), grabbed_item_part_handle);
+		detail_add_item(target_slot, grabbed_item_part_handle);
 	}
 
 	const auto physics_updater = [previous_container_transform, step](const entity_handle descendant, auto... args) {
@@ -530,13 +543,15 @@ void perform_transfer(
 				descendant.get<components::interpolation>().place_of_birth = descendant.get_logic_transform();
 			}
 		}
+		
+		return recursive_callback_result::CONTINUE_AND_RECURSE;
 	};
 
 	physics_updater(grabbed_item_part_handle);
 	grabbed_item_part_handle.for_each_contained_item_recursive(step.input.metas_of_assets, physics_updater);
 
 	if (is_pickup) {
-		const auto target_capability = r.get_target_slot().get_container().get_owning_transfer_capability();
+		const auto target_capability = target_slot_container.get_owning_transfer_capability();
 
 		messages::item_picked_up_message msg;
 		msg.subject = target_capability;
@@ -558,15 +573,18 @@ void perform_transfer(
 	}
 
 	if (is_drop_request) {
-		ensure(previous_slot.get_container().alive());
+		ensure(previous_slot_container.alive());
 
 		auto& rigid_body = grabbed_item_part_handle.get<components::rigid_body>();
 		
 		// LOG_NVPS(rigid_body.velocity());
 		// ensure(rigid_body.velocity().is_epsilon());
 
-		if (r_data.impulse_applied_on_drop > 0.f) {
-			const auto impulse = vec2().set_from_degrees(previous_container_transform.rotation) * r_data.impulse_applied_on_drop;
+		rigid_body.set_velocity({ 0.f, 0.f });
+		rigid_body.set_angular_velocity(0.f);
+
+		if (r.impulse_applied_on_drop > 0.f) {
+			const auto impulse = vec2().set_from_degrees(previous_container_transform.rotation) * r.impulse_applied_on_drop;
 			rigid_body.apply_impulse(impulse * rigid_body.get_mass());
 		}
 
@@ -574,6 +592,6 @@ void perform_transfer(
 		
 		auto& special_physics = grabbed_item_part_handle.get<components::special_physics>();
 		special_physics.dropped_or_created_cooldown.set(300, cosmos.get_timestamp());
-		special_physics.during_cooldown_ignore_collision_with = previous_slot.get_container();
+		special_physics.during_cooldown_ignore_collision_with = previous_slot_container;
 	}
 }

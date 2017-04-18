@@ -6,10 +6,11 @@
 #include "augs/misc/container_with_small_size.h"
 
 struct key_and_mouse_intent {
-	intent_type intent = intent_type::NONE;
+	intent_type intent = intent_type::COUNT;
 	vec2t<short> mouse_rel;
 	bool is_pressed = false;
 
+	bool is_set() const;
 	bool uses_mouse_motion() const;
 
 	bool operator==(const key_and_mouse_intent& b) const;

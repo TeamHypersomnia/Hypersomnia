@@ -13,11 +13,16 @@ bool operator!=(const key_and_mouse_intent_vector& a, const key_and_mouse_intent
 	return !(a == b);
 }
 
+bool key_and_mouse_intent::is_set() const {
+	return intent != intent_type::COUNT;
+}
+
 bool key_and_mouse_intent::uses_mouse_motion() const {
 	return
-		intent == intent_type::MOVE_CROSSHAIR ||
-		intent == intent_type::CROSSHAIR_PRIMARY_ACTION ||
-		intent == intent_type::CROSSHAIR_SECONDARY_ACTION;
+		intent == intent_type::MOVE_CROSSHAIR
+		|| intent == intent_type::CROSSHAIR_PRIMARY_ACTION
+		|| intent == intent_type::CROSSHAIR_SECONDARY_ACTION
+	;
 }
 
 bool key_and_mouse_intent::operator==(const key_and_mouse_intent& b) const {

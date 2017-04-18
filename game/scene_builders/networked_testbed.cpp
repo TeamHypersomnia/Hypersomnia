@@ -251,30 +251,30 @@ namespace scene_builders {
 		const auto backpack = prefabs::create_sample_backpack(step, vec2(200, -650));
 		prefabs::create_sample_backpack(step, vec2(200, -750));
 
-		perform_transfer({ backpack, character(0)[slot_function::SHOULDER_SLOT] }, step);
-		perform_transfer({ submachine, character(0)[slot_function::PRIMARY_HAND] }, step);
-		perform_transfer({ rifle, character(0)[slot_function::SECONDARY_HAND] }, step);
+		perform_transfer({ backpack, character(0)[slot_function::SHOULDER] }, step);
+		perform_transfer({ submachine, character(0).get_primary_hand() }, step);
+		perform_transfer({ rifle, character(0).get_secondary_hand() }, step);
 
 		if (character(1).alive()) {
 			name_entity(character(1), entity_name::PERSON, L"Enemy");
-			perform_transfer({ rifle2, character(1)[slot_function::PRIMARY_HAND] }, step);
+			perform_transfer({ rifle2, character(1).get_primary_hand() }, step);
 		}
 
 		if (character(2).alive()) {
 			name_entity(character(2), entity_name::PERSON, L"Swordsman");
-			perform_transfer({ second_machete, character(2)[slot_function::PRIMARY_HAND] }, step);
+			perform_transfer({ second_machete, character(2).get_primary_hand() }, step);
 		}
 
 		if (character(3).alive()) {
 			name_entity(character(3), entity_name::PERSON, L"Medic");
-			perform_transfer({ pis2, character(3)[slot_function::PRIMARY_HAND] }, step);
+			perform_transfer({ pis2, character(3).get_primary_hand() }, step);
 		}
 
 		if (character(5).alive()) {
 			const auto new_item = prefabs::create_submachine(step, vec2(0, -1000),
 				prefabs::create_sample_magazine(step, vec2(100 - 50, -650), true ? "10" : "0.5", prefabs::create_pink_charge(step, vec2(0, 0), true ? 500 : 50)));
 
-			perform_transfer({ new_item, character(5)[slot_function::PRIMARY_HAND] }, step);
+			perform_transfer({ new_item, character(5).get_primary_hand() }, step);
 		}
 
 		//draw_bodies.push_back(crate2);

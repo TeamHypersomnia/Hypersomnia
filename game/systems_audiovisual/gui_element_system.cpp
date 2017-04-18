@@ -129,70 +129,92 @@ void gui_element_system::queue_transfers(const wielding_result res) {
 }
 
 void gui_element_system::handle_hotbar_and_action_button_presses(
-	const const_entity_handle subject,
+	const const_entity_handle gui_entity,
 	key_and_mouse_intent_vector intents
 ) {
-	const auto& cosmos = subject.get_cosmos();
-	auto& gui = get_character_gui(subject);
+	const auto& cosmos = gui_entity.get_cosmos();
+	auto& gui = get_character_gui(gui_entity);
 
-	for (const auto& r : intents) {
-		if (r.is_pressed &&
-			(r.intent == intent_type::HOLSTER_PRIMARY_ITEM
-				|| r.intent == intent_type::HOLSTER_SECONDARY_ITEM)
-			) {
-			const auto hand_type = subject.map_primary_action_to_secondary_hand_if_primary_empty(intent_type::HOLSTER_SECONDARY_ITEM == r.intent).get_id().type;
+	for (auto r : intents) {
+		if (r.is_pressed) {
+			int hand_index = -1;
 
-			auto new_setup = gui.get_actual_selection_setup(subject);
-
-			if (hand_type == slot_function::PRIMARY_HAND) {
-				new_setup.primary_selection.unset();
-			}
-			else if (hand_type == slot_function::SECONDARY_HAND) {
-				new_setup.secondary_selection.unset();
+			if (r.intent == intent_type::HOLSTER) {
+				r.intent = intent_type::HOLSTER_PRIMARY_ITEM;
+				
+				if (gui_entity.get_if_any_item_in_hand_no(0).dead()) {
+					r.intent = intent_type::HOLSTER_SECONDARY_ITEM;
+				}
 			}
 
-			queue_transfers(gui.make_and_save_hotbar_selection_setup(new_setup, subject));
+			if (r.intent == intent_type::HOLSTER_PRIMARY_ITEM) {
+				hand_index = 0;
+			}
+			else if (r.intent == intent_type::HOLSTER_SECONDARY_ITEM) {
+				hand_index = 1;
+			}
+
+			if (hand_index >= 0) {
+				auto new_setup = gui.get_actual_selection_setup(gui_entity);
+				new_setup.hand_selections[static_cast<size_t>(hand_index)].unset();
+				queue_transfers(gui.make_and_push_hotbar_selection_setup(new_setup, gui_entity));
+			}
 		}
 	}
 
 	for (const auto& i : intents) {
-		const auto hotbar_index = intent_to_hotbar_index(i.intent);
+		const auto hotbar_button_index = intent_to_hotbar_index(i.intent);
 		const auto special_action_index = intent_to_special_action_index(i.intent);
 
-		if (hotbar_index >= 0) {
-			auto& currently_held_index = gui.currently_held_hotbar_index;
+		if (hotbar_button_index >= 0) {
+			auto& currently_held_index = gui.currently_held_hotbar_button_index;
 
-			if (currently_held_index > -1 && gui.hotbar_buttons[currently_held_index].get_assigned_entity(subject).dead()) {
+			const bool clear_currently_held_index_because_nothing_is_assigned_already =
+				currently_held_index > -1 && gui.hotbar_buttons[currently_held_index].get_assigned_entity(gui_entity).dead()
+			;
+
+			if (clear_currently_held_index_because_nothing_is_assigned_already) {
 				currently_held_index = -1;
 			}
 
-			if (gui.hotbar_buttons[hotbar_index].get_assigned_entity(subject).alive()) {
+			const bool is_anything_assigned_to_that_button = gui.hotbar_buttons[hotbar_button_index].get_assigned_entity(gui_entity).alive();
+
+			if (is_anything_assigned_to_that_button) {
 				if (i.is_pressed) {
 					const bool should_dual_wield = currently_held_index > -1;
 
 					if (should_dual_wield) {
-						const auto setup = gui.get_setup_from_button_indices(subject, currently_held_index, hotbar_index);
-						queue_transfers(gui.make_and_save_hotbar_selection_setup(setup, subject));
-						gui.push_setup_when_index_released = -1;
+						const auto setup = gui.get_setup_from_button_indices(
+							gui_entity, 
+							currently_held_index, 
+							hotbar_button_index
+						);
+
+						queue_transfers(gui.make_and_push_hotbar_selection_setup(setup, gui_entity));
+						gui.push_new_setup_when_index_released = -1;
 					}
 					else {
-						const auto setup = gui.get_setup_from_button_indices(subject, hotbar_index);
-						queue_transfers(gui.make_hotbar_selection_setup(setup, subject));
-						gui.push_setup_when_index_released = hotbar_index;
+						const auto setup = gui.get_setup_from_button_indices(
+							gui_entity, 
+							hotbar_button_index
+						);
+
+						queue_transfers(gui.make_wielding_transfers_for(setup, gui_entity));
+						gui.push_new_setup_when_index_released = hotbar_button_index;
 					}
 
-					currently_held_index = hotbar_index;
+					currently_held_index = hotbar_button_index;
 				}
 				else {
-					if (hotbar_index == currently_held_index) {
+					if (hotbar_button_index == currently_held_index) {
 						currently_held_index = -1;
 					}
-
-					if (hotbar_index == gui.push_setup_when_index_released) {
-						const auto setup = gui.get_setup_from_button_indices(subject, hotbar_index);
+				
+					if (hotbar_button_index == gui.push_new_setup_when_index_released) {
+						const auto setup = gui.get_setup_from_button_indices(gui_entity, hotbar_button_index);
 						gui.push_setup(setup);
-
-						gui.push_setup_when_index_released = -1;
+				
+						gui.push_new_setup_when_index_released = -1;
 					}
 				}
 			}
@@ -205,12 +227,12 @@ void gui_element_system::handle_hotbar_and_action_button_presses(
 				const auto bound_spell = action_b.bound_spell;
 
 				if (bound_spell != assets::spell_id::COUNT) {
-					spell_requests[subject] = bound_spell;
+					spell_requests[gui_entity] = bound_spell;
 				}
 			}
 		}
 		else if (i.intent == intent_type::PREVIOUS_HOTBAR_SELECTION_SETUP && i.is_pressed) {
-			const auto wielding = gui.make_previous_hotbar_selection_setup(subject);
+			const auto wielding = gui.make_wielding_transfers_for_previous_hotbar_selection_setup(gui_entity);
 
 			if (wielding.successful()) {
 				queue_transfers(wielding);

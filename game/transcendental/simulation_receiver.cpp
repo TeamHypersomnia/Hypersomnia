@@ -21,35 +21,47 @@ void simulation_receiver::acquire_next_packaged_step(const step_packaged_for_net
 	jitter_buffer.acquire_new_command(step);
 }
 
-void simulation_receiver::remote_entropy_predictions(
+void simulation_receiver::predict_intents_of_remote_entities(
 	guid_mapped_entropy& adjusted_entropy, 
-	const entity_id predictable_entity, 
+	const entity_id locally_controlled_entity, 
 	const cosmos& predicted_cosmos
 ) {
-	key_and_mouse_intent release_intent;
-	release_intent.is_pressed = false;
-
 	predicted_cosmos.for_each(
 		processing_subjects::WITH_ENABLED_PAST_CONTAGIOUS,
 		[&](const auto e) {
-			const bool is_locally_controlled_entity = e == predictable_entity;
+			const bool is_locally_controlled_entity = e == locally_controlled_entity;
 			
 			if (is_locally_controlled_entity) {
 				return;
 			}
 
-			for (const auto g_id : e.guns_wielded()) {
+			for (const auto g_id : e.get_wielded_guns()) {
 				const auto g = predicted_cosmos[g_id];
 
 				if (g.get<components::gun>().trigger_pressed) {
-					if (g.get_current_slot().raw_id.type == slot_function::PRIMARY_HAND) {
-						release_intent.intent = intent_type::CROSSHAIR_PRIMARY_ACTION;
-					}
-					else {
-						release_intent.intent = intent_type::CROSSHAIR_SECONDARY_ACTION;
-					}
+					const auto current_slot = g.get_current_slot();
 
-					adjusted_entropy.intents_per_entity[e.get_guid()].push_back(release_intent);
+					if (current_slot.alive() && current_slot.is_hand_slot()) {
+						const auto hand_index = current_slot.get_hand_index();
+						
+						key_and_mouse_intent release_intent;
+
+						if (hand_index == 0) {
+							release_intent.is_pressed = false;
+							release_intent.intent = intent_type::CROSSHAIR_PRIMARY_ACTION;
+						}
+						else if (hand_index == 1) {
+							release_intent.is_pressed = false;
+							release_intent.intent = intent_type::CROSSHAIR_PRIMARY_ACTION;
+						}
+						else {
+							ensure(false && "bad hand index");
+						}
+
+						if (release_intent.is_set()) {
+							adjusted_entropy.intents_per_entity[e.get_guid()].push_back(release_intent);
+						}
+					}
 				}
 			}
 		}
@@ -85,15 +97,15 @@ steps_unpacking_result simulation_receiver::unpack_deterministic_steps(
 		result.entropies_to_simulate.emplace_back(sim);
 
 		const auto& actual_server_step = sim.entropy;
-		const auto& predicted_server_step = predicted_steps.front();
+		const auto& predicted_server_step = predicted_step_entropies.front();
 
 		if (sim.resubstantiate || actual_server_step != predicted_server_step) {
 			result.reconciliate_predicted = true;
 		}
 
 		if (new_command.next_client_commands_accepted) {
-			ensure(predicted_steps.size() > 0);
-			predicted_steps.erase(predicted_steps.begin());
+			ensure(predicted_step_entropies.size() > 0);
+			predicted_step_entropies.erase(predicted_step_entropies.begin());
 		}
 	}
 
@@ -166,7 +178,7 @@ void simulation_receiver::drag_mispredictions_into_past(
 		const bool shouldnt_smooth = reconciliated_entity.has<components::crosshair>();
 		bool misprediction_detected = false;
 
-		const float num_predicted_steps = static_cast<float>(predicted_steps.size());
+		const float num_predicted_steps = static_cast<float>(predicted_step_entropies.size());
 
 		if (!shouldnt_smooth && (reconciliated_transform.pos - e.transform.pos).length_sq() > 1.f) {
 			interp_data.positional_slowdown_multiplier = std::max(1.f, misprediction_smoothing_multiplier * num_predicted_steps);

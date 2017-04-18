@@ -78,26 +78,17 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 		}
 
 		if (subject.has<components::container>()) {
-			if (it.intent == intent_type::CROSSHAIR_PRIMARY_ACTION) {
-				const auto hand = subject[slot_function::PRIMARY_HAND];
+			int hand_index = -1;
 
-				if (hand.alive() && hand->items_inside.size() > 0) {
-					callee = hand.get_items_inside()[0];
-				}
+			if (it.intent == intent_type::CROSSHAIR_PRIMARY_ACTION) {
+				hand_index = 0;
+			}
+			else if (it.intent == intent_type::CROSSHAIR_SECONDARY_ACTION) {
+				hand_index = 1;
 			}
 
-			if (it.intent == intent_type::CROSSHAIR_SECONDARY_ACTION) {
-				const auto hand = subject[slot_function::SECONDARY_HAND];
-
-				if (hand.alive() && hand->items_inside.size() > 0)
-					callee = hand.get_items_inside()[0];
-				else {
-					const auto prim_hand = subject[slot_function::PRIMARY_HAND];
-
-					if (prim_hand.alive() && prim_hand->items_inside.size() > 0) {
-						callee = prim_hand.get_items_inside()[0];
-					}
-				}
+			if (hand_index >= 0) {
+				callee = subject.get_if_any_item_in_hand_no(static_cast<size_t>(hand_index));
 			}
 		}
 
@@ -153,7 +144,7 @@ void intent_contextualization_system::contextualize_movement_intents(const logic
 				|| e.intent == intent_type::MOVE_RIGHT
 				|| e.intent == intent_type::WALK
 				|| e.intent == intent_type::SPRINT
-				) {
+			) {
 				callee = maybe_driver->owned_vehicle;
 				callee_resolved = true;
 			}
@@ -167,7 +158,7 @@ void intent_contextualization_system::contextualize_movement_intents(const logic
 		if (!callee_resolved) {
 			if (maybe_container) {
 				if (e.intent == intent_type::SPACE_BUTTON) {
-					const auto hand = subject[slot_function::PRIMARY_HAND];
+					const auto hand = subject.get_primary_hand();
 
 					if (hand.alive() && hand->items_inside.size() > 0) {
 						e.intent = intent_type::MELEE_TERTIARY_MOVE;

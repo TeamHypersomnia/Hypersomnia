@@ -21,16 +21,16 @@ const_entity_handle hotbar_button::get_assigned_entity(const const_entity_handle
 	return cosm[entity_id()];
 }
 
-bool hotbar_button::is_primary_selection(const const_entity_handle owner_transfer_capability) const {
+bool hotbar_button::is_selected_as_primary(const const_entity_handle owner_transfer_capability) const {
 	const auto assigned_entity = get_assigned_entity(owner_transfer_capability);
 
-	return assigned_entity.alive() && owner_transfer_capability.wields_in_primary_hand(assigned_entity);
+	return assigned_entity.alive() && owner_transfer_capability.get_if_any_item_in_hand_no(0) == assigned_entity;
 }
 
-bool hotbar_button::is_secondary_selection(const const_entity_handle owner_transfer_capability) const {
+bool hotbar_button::is_selected_as_secondary(const const_entity_handle owner_transfer_capability) const {
 	const auto assigned_entity = get_assigned_entity(owner_transfer_capability);
 
-	return assigned_entity.alive() && owner_transfer_capability.wields_in_secondary_hand(assigned_entity);
+	return assigned_entity.alive() && owner_transfer_capability.get_if_any_item_in_hand_no(1) == assigned_entity;
 }
 
 entity_handle hotbar_button::get_assigned_entity(const entity_handle owner_transfer_capability) const {
@@ -92,8 +92,8 @@ void hotbar_button::draw(
 	const auto assigned_entity = this_id->get_assigned_entity(owner_transfer_capability);
 	const bool has_assigned_entity = assigned_entity.alive();
 
-	const bool is_in_primary = this_id->is_primary_selection(owner_transfer_capability);
-	const bool is_in_secondary = this_id->is_secondary_selection(owner_transfer_capability);
+	const bool is_in_primary = this_id->is_selected_as_primary(owner_transfer_capability);
+	const bool is_in_secondary = this_id->is_selected_as_secondary(owner_transfer_capability);
 
 	const bool is_assigned_entity_selected = is_in_primary || is_in_secondary;
 
@@ -341,9 +341,9 @@ void hotbar_button::respond_to_events(
 
 			if (assigned_entity.alive()) {
 				character_gui::hotbar_selection_setup setup;
-				setup.primary_selection = assigned_entity;
+				setup.hand_selections[0] = assigned_entity;
 
-				const auto next_wielding = gui.make_and_save_hotbar_selection_setup(setup, context.get_gui_element_entity());
+				const auto next_wielding = gui.make_and_push_hotbar_selection_setup(setup, context.get_gui_element_entity());
 
 				context.get_gui_element_system().queue_transfers(next_wielding);
 			}

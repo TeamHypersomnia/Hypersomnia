@@ -253,7 +253,7 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 				for (const auto item_id : s.second.items_inside) {
 					const auto item = cosmos[item_id];
 
-					perform_transfer({ item, cosmos[inventory_slot_id()] }, step);
+					perform_transfer({ item, inventory_slot_id() }, step);
 				}
 			}
 		}

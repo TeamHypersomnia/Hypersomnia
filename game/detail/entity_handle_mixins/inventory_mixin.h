@@ -2,91 +2,137 @@
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/step_declaration.h"
+#include "game/transcendental/entity_id.h"
 #include "augs/build_settings/setting_empty_bases.h"
 #include "game/detail/wielding_result.h"
+#include "game/enums/callback_result.h"
+#include "augs/templates/conditional_call.h"
 
 template<bool is_const, class entity_handle_type>
 class basic_inventory_mixin {
 	typedef basic_inventory_slot_handle<is_const> inventory_slot_handle_type;
 public:
+	static constexpr size_t hand_count = 2;
+	typedef std::array<entity_id, hand_count> hand_selections_array;
 
 	entity_handle_type get_owning_transfer_capability() const;
 
-	inventory_slot_handle_type determine_hand_holstering_slot_for(const entity_handle_type holstered_item) const;
+	inventory_slot_handle_type determine_holstering_slot_for(const entity_handle_type holstered_item) const;
 	inventory_slot_handle_type determine_pickup_target_slot_for(const entity_handle_type picked_item) const;
 	
 	inventory_slot_handle_type get_current_slot() const;
 
-	inventory_slot_handle_type first_free_hand() const;
+	inventory_slot_handle_type get_first_free_hand() const;
 	
-	inventory_slot_handle_type map_primary_action_to_secondary_hand_if_primary_empty(const bool is_action_secondary) const;
-	
-	augs::constant_size_vector<entity_id, 2> guns_wielded() const;
-	augs::constant_size_vector<entity_id, 2> items_wielded() const;
+	inventory_slot_handle_type get_primary_hand() const;
+	inventory_slot_handle_type get_secondary_hand() const;
+
+	inventory_slot_handle_type get_hand_no(const size_t) const;
+	entity_handle_type get_if_any_item_in_hand_no(const size_t) const;
+
+	template <class F>
+	void for_each_hand(F callback) const {
+		for (size_t i = 0; i < hand_count; ++i) {
+			const auto hand = get_hand_no(i);
+
+			if (hand.alive()) {
+				if (callback(hand) == callback_result::ABORT) {
+					return;
+				}
+			}
+		}
+	}
+
+	augs::constant_size_vector<entity_id, 2> get_wielded_guns() const;
+	augs::constant_size_vector<entity_id, 2> get_wielded_items() const;
 
 	inventory_item_address get_address_from_root() const;
 
-	bool wields_in_primary_hand(const const_entity_handle what_item) const;
-	bool wields_in_secondary_hand(const const_entity_handle what_item) const;
-
-	wielding_result wield_in_hands(
-		entity_id first = entity_id(),
-		entity_id second = entity_id()
-	) const;
+	wielding_result make_wielding_transfers_for(const hand_selections_array) const;
 
 	wielding_result swap_wielded_items() const;
 
 private:
-	template <class T, class S, class I>
-	void for_each_contained_slot_and_item_recursive(
+	template <bool track_attachment_offsets, class T, class S, class I>
+	callback_result for_each_contained_slot_and_item_recursive(
 		const T& manager,
 		S slot_callback, 
 		I item_callback, 
 		inventory_traversal& trav
 	) const {
 		const auto this_item_handle = *static_cast<const entity_handle_type*>(this);
-		maybe_const_ref_t<is_const, cosmos> cosm = this_item_handle.get_cosmos();
+		auto& cosm = this_item_handle.get_cosmos();
 
 		if (this_item_handle.has<components::container>()) {
 			trav.current_address.directions.push_back(slot_function());
 			const auto this_item_attachment_offset = trav.attachment_offset;
-			const bool this_item_remains_physical = trav.item_remains_physical;
+			const bool does_this_item_remain_physical = trav.item_remains_physical;
 
 			for (const auto& s : this_item_handle.get<components::container>().slots) {
 				const auto this_slot_id = inventory_slot_id(s.first, this_item_handle.get_id());
 				
-				slot_callback(cosm[this_slot_id]);
-				
-				const bool this_slot_physical = this_item_remains_physical && s.second.is_physical_attachment_slot;
+				const auto slot_callback_result = slot_callback(cosm[this_slot_id]);
 
-				for (const auto& id : s.second.items_inside) {
-					const auto child_item_handle = cosm[id];
-					trav.parent_slot = this_slot_id;
-					trav.current_address.directions.back() = this_slot_id.type;
-					trav.item_remains_physical = this_slot_physical;
+				if (slot_callback_result == recursive_callback_result::ABORT) {
+					return callback_result::ABORT;
+				}
+				else if (slot_callback_result == recursive_callback_result::CONTINUE_DONT_RECURSE) {
+					continue;
+				}
+				else if (slot_callback_result == recursive_callback_result::CONTINUE_AND_RECURSE) {
+					const bool is_this_slot_physical = does_this_item_remain_physical && s.second.is_physical_attachment_slot;
 
-					if (trav.item_remains_physical) {
-						trav.attachment_offset = 
-							this_item_attachment_offset + get_attachment_offset(
+					for (const auto& id : s.second.items_inside) {
+						const auto child_item_handle = cosm[id];
+						trav.parent_slot = this_slot_id;
+						trav.current_address.directions.back() = this_slot_id.type;
+						trav.item_remains_physical = is_this_slot_physical;
+
+						augs::conditional_call<track_attachment_offsets>()(
+							[&](auto...) {
+								if (trav.item_remains_physical) {
+									trav.attachment_offset = 
+										this_item_attachment_offset + get_attachment_offset(
+											manager,
+											s.second, 
+											this_item_attachment_offset, 
+											child_item_handle
+										)
+									;
+								}
+							}
+						);
+
+						const auto item_callback_result = item_callback(child_item_handle, static_cast<const inventory_traversal&>(trav));
+
+						if (item_callback_result == recursive_callback_result::ABORT) {
+							return callback_result::ABORT;
+						}
+						else if (item_callback_result == recursive_callback_result::CONTINUE_DONT_RECURSE) {
+							continue;
+						}
+						else if (item_callback_result == recursive_callback_result::CONTINUE_AND_RECURSE) {
+							if (child_item_handle.template for_each_contained_slot_and_item_recursive<track_attachment_offsets>(
 								manager,
-								s.second, 
-								this_item_attachment_offset, 
-								child_item_handle
-							)
-						;
+								slot_callback,
+								item_callback,
+								trav
+							) == callback_result::ABORT) {
+								return callback_result::ABORT;
+							}
+						}
+						else {
+							ensure(false && "bad recursive_callback_result");
+						}
 					}
-
-					item_callback(child_item_handle, static_cast<const inventory_traversal&>(trav));
-					
-					child_item_handle.for_each_contained_slot_and_item_recursive(
-						manager,
-						slot_callback, 
-						item_callback, 
-						trav
-					);
+				}
+				else {
+					ensure(false && "bad recursive_callback_result");
 				}
 			}
 		}
+
+		return callback_result::CONTINUE;
 	}
 
 public:
@@ -102,8 +148,26 @@ public:
 		inventory_traversal trav;
 		trav.current_address.root_container = this_item_handle.get_id();
 		
-		for_each_contained_slot_and_item_recursive(
+		for_each_contained_slot_and_item_recursive<true>(
 			manager,
+			slot_callback, 
+			item_callback, 
+			trav
+		);
+	}
+	
+	template <class S, class I>
+	void for_each_contained_slot_and_item_recursive(
+		S slot_callback, 
+		I item_callback
+	) const {
+		const auto this_item_handle = *static_cast<const entity_handle_type*>(this);
+
+		inventory_traversal trav;
+		trav.current_address.root_container = this_item_handle.get_id();
+		
+		for_each_contained_slot_and_item_recursive<false>(
+			0xdeadbeef,
 			slot_callback, 
 			item_callback, 
 			trav
@@ -115,7 +179,14 @@ public:
 		const T& manager, 
 		I item_callback
 	) const {
-		for_each_contained_slot_and_item_recursive(manager, [](auto){}, item_callback);
+		for_each_contained_slot_and_item_recursive(manager, [](auto) { return recursive_callback_result::CONTINUE_AND_RECURSE; }, item_callback);
+	}
+
+	template <class S>
+	void for_each_contained_slot_recursive(
+		S slot_callback
+	) const {
+		for_each_contained_slot_and_item_recursive(slot_callback, [](auto...) { return recursive_callback_result::CONTINUE_AND_RECURSE; });
 	}
 };
 

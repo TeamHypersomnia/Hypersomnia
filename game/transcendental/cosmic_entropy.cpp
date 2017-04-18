@@ -18,7 +18,7 @@ void basic_cosmic_entropy<key>::override_transfers_leaving_other_entities(
 		ensure(overridden_transfer.is_legal());
 
 		for (const auto n : new_transfers) {
-			const auto new_transfer = cosm[cosm.deguidize(n)];
+			const auto new_transfer = cosm.deguidize(n);
 			
 			if (
 				match_transfer_capabilities(cosm, new_transfer).authorized_capability
