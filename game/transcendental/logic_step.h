@@ -13,10 +13,9 @@ struct logic_step_input {
 };
 
 template <bool is_const>
-class basic_logic_step : public basic_cosmic_step<is_const> {
-	friend class cosmos;
+struct basic_logic_step : basic_cosmic_step<is_const> {
 	typedef maybe_const_ref_t<is_const, data_living_one_step> data_living_one_step_ref;
-public:
+	
 	data_living_one_step_ref transient;
 	const logic_step_input input;
 

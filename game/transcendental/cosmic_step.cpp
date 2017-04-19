@@ -16,5 +16,5 @@ basic_cosmic_step<C>::operator basic_cosmic_step<true>() const {
 	return{ cosm };
 }
 
-template class basic_cosmic_step<false>;
-template class basic_cosmic_step<true>;
+template struct basic_cosmic_step<false>;
+template struct basic_cosmic_step<true>;

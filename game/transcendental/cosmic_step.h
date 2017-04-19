@@ -1,13 +1,11 @@
 #pragma once
-class cosmos;
-
 #include "augs/templates/maybe_const.h"
 
-template<bool is_const>
-class basic_cosmic_step {
-protected:
+class cosmos;
+
+template <bool is_const>
+struct basic_cosmic_step {
 	typedef maybe_const_ref_t<is_const, cosmos> cosmos_ref;
-public:
 	cosmos_ref cosm;
 
 	basic_cosmic_step(cosmos_ref cosm);

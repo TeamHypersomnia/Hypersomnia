@@ -23,5 +23,5 @@ basic_logic_step<C>::operator basic_logic_step<true>() const {
 	return { cosm, input, transient };
 }
 
-template class basic_logic_step<false>;
-template class basic_logic_step<true>;
+template struct basic_logic_step<false>;
+template struct basic_logic_step<true>;
