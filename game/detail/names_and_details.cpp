@@ -50,7 +50,6 @@ std::wstring get_bbcoded_entity_name(const entity_name n) {
 	case entity_name::INTERFERENCE_GRENADE:
 		return L"Force grenade";
 	default:
-		ensure(false);
 		return L"Unknown";
 	}
 }
@@ -146,7 +145,6 @@ std::wstring get_bbcoded_entity_name_details(const entity_name n) {
 			L"Throwable explosive with a three seconds delay.\nDeals damage to [color=orange]Consciousness[/color].\nCauses massive aimpunch."
 		};
 	default:
-		ensure(false);
 		return{
 			L"Unknown"
 		};
@@ -227,7 +225,7 @@ std::wstring get_bbcoded_slot_function_name(const slot_function f) {
 		return{
 			L"Shoulder",
 		};
-	default: ensure(false); return{};
+	default: return{ L"Unknown" };
 	}
 }
 
@@ -273,6 +271,6 @@ std::wstring get_bbcoded_slot_function_details(const slot_function f) {
 		return{
 			L"For backpacks or items with belts."
 		};
-	default: ensure(false); return{};
+	default: return{ L"Unknown" };
 	}
 }

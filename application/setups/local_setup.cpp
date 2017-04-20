@@ -42,7 +42,7 @@ void local_setup::process(
 	augs::debug_entropy_player<cosmic_entropy> player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
-	scene_builders::testbed testbed;
+	scene_builders::one_entity testbed;
 	testbed.debug_var = cfg.debug_var;
 
 	const auto metas_of_assets = get_assets_manager().generate_logical_metas_of_assets();
