@@ -155,7 +155,7 @@ ammunition_information get_ammunition_information(const const_entity_handle item
 		out.total_charges += count_charges_in_deposit(mag);
 
 		out.total_ammunition_space_available += ammo_depo->space_available;
-		out.total_actual_free_space += ammo_depo.calculate_local_free_space();
+		out.total_lsa += ammo_depo.calculate_local_space_available();
 	}
 
 	const auto chamber_slot = item[slot_function::GUN_CHAMBER];
@@ -164,7 +164,7 @@ ammunition_information get_ammunition_information(const const_entity_handle item
 		out.total_charges += count_charges_inside(chamber_slot);
 
 		out.total_ammunition_space_available += chamber_slot->space_available;
-		out.total_actual_free_space += chamber_slot.calculate_local_free_space();
+		out.total_lsa += chamber_slot.calculate_local_space_available();
 	}
 
 	return out;

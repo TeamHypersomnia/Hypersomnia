@@ -103,7 +103,7 @@ namespace rendering_scripts {
 							const auto ammo_info = get_ammunition_information(item);
 
 							if (ammo_info.total_ammunition_space_available > 0) {
-								const auto ammo_ratio = 1 - (ammo_info.total_actual_free_space / ammo_info.total_ammunition_space_available);
+								const auto ammo_ratio = 1 - (ammo_info.total_lsa / ammo_info.total_ammunition_space_available);
 
 								circle_hud.color = augs::interp(white, red_violet, (1 - ammo_ratio)* (1 - ammo_ratio));
 								circle_hud.color.a = 200;

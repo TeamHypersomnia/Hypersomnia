@@ -27,7 +27,7 @@ attitude_type calculate_attitude(
 struct ammunition_information {
 	unsigned total_charges = 0;
 	float total_ammunition_space_available = 0.f;
-	float total_actual_free_space = 0.f;
+	float total_lsa = 0.f;
 };
 
 ammunition_information get_ammunition_information(const const_entity_handle handle);

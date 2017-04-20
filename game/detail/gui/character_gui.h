@@ -44,7 +44,7 @@ struct character_gui {
 	unsigned char current_hotbar_selection_setup_index = 0;
 	bool is_gui_look_enabled = false;
 	bool preview_due_to_item_picking_request = false;
-	bool draw_free_space_inside_container_icons = true;
+	bool draw_space_available_inside_container_icons = true;
 
 	game_gui_rect_world rect_world;
 	int dragged_charges = 0;

@@ -130,16 +130,16 @@ typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot
 }
 
 template <bool C>
-unsigned basic_inventory_slot_handle<C>::calculate_real_free_space() const {
-	const auto maximum_space = calculate_local_free_space();
+unsigned basic_inventory_slot_handle<C>::calculate_real_space_available() const {
+	const auto lsa = calculate_local_space_available();
 
 	const auto* const maybe_item = get_container().find<components::item>();
 
 	if (maybe_item != nullptr && get_cosmos()[maybe_item->current_slot].alive()) {
-		return std::min(maximum_space, get_cosmos()[maybe_item->current_slot].calculate_real_free_space());
+		return std::min(lsa, get_cosmos()[maybe_item->current_slot].calculate_real_space_available());
 	}
 
-	return maximum_space;
+	return lsa;
 }
 
 template <bool C>
@@ -152,20 +152,20 @@ bool basic_inventory_slot_handle<C>::can_contain(const entity_id id) const {
 }
 
 template <bool C>
-unsigned basic_inventory_slot_handle<C>::calculate_local_free_space() const {
+unsigned basic_inventory_slot_handle<C>::calculate_local_space_available() const {
 	if (get().has_unlimited_space()) {
 		return 1000000 * SPACE_ATOMS_PER_UNIT;
 	}
 
-	unsigned space = get().space_available;
+	unsigned lsa = get().space_available;
 
 	for (const auto e : get_items_inside()) {
 		const auto occupied = calculate_space_occupied_with_children(get_cosmos()[e]);
-		ensure(occupied <= space);
-		space -= occupied;
+		ensure(occupied <= lsa);
+		lsa -= occupied;
 	}
 
-	return space;
+	return lsa;
 }
 
 //template <bool C>

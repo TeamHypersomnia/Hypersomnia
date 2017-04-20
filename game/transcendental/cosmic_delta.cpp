@@ -539,7 +539,7 @@ TEST(CosmicDelta, CosmicDeltaPaddingTest) {
 
 		bool is_gui_look_enabled = false;
 		bool preview_due_to_item_picking_request = false;
-		bool draw_free_space_inside_container_icons = true;
+		bool draw_space_available_inside_container_icons = true;
 		padding_byte pad;
 
 		//hotbar_button hotbar_buttons[9];

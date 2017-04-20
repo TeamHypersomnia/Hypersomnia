@@ -76,11 +76,11 @@ public:
 	size_t get_hand_index() const;
 
 	float calculate_density_multiplier_due_to_being_attached() const;
-	unsigned calculate_local_free_space() const;
+
+	unsigned calculate_local_space_available() const;
+	unsigned calculate_real_space_available() const;
 
 	bool should_item_inside_keep_physical_body(const entity_id until_parent = entity_id()) const;
-
-	unsigned calculate_real_free_space() const;
 
 	inventory_slot_id get_id() const;
 	operator inventory_slot_id() const;

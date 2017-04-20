@@ -336,7 +336,7 @@ void item_button::draw_proc(
 				bottom_number_val = considered_charges;
 				printing_charge_count = true;
 			}
-			else if (element.draw_free_space_inside_container_icons && item[slot_function::ITEM_DEPOSIT].alive()) {
+			else if (element.draw_space_available_inside_container_icons && item[slot_function::ITEM_DEPOSIT].alive()) {
 				if (item.get<components::item>().categories_for_slot_compatibility.test(item_category::MAGAZINE)) {
 					if (!this_id->is_container_open) {
 						printing_charge_count = true;
@@ -347,7 +347,7 @@ void item_button::draw_proc(
 					bottom_number_val = count_charges_in_deposit(item);
 				}
 				else {
-					bottom_number_val = item[slot_function::ITEM_DEPOSIT].calculate_real_free_space() / long double(SPACE_ATOMS_PER_UNIT);
+					bottom_number_val = item[slot_function::ITEM_DEPOSIT].calculate_real_space_available() / long double(SPACE_ATOMS_PER_UNIT);
 
 					if (bottom_number_val < 1.0 && bottom_number_val > 0.0) {
 						trim_zero = true;

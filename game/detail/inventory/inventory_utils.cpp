@@ -223,18 +223,18 @@ containment_result query_containment_result(
 		result = containment_result_type::COULD_REPLACE_BUT_NO_SPACE;
 	}
 	else {
-		const auto space_available = target_slot.calculate_real_free_space();
+		const auto rsa = target_slot.calculate_real_space_available();
 
-		if (space_available > 0) {
+		if (rsa > 0) {
 			const bool item_indivisible = item.charges == 1 || !item.stackable;
 
 			if (item_indivisible) {
-				if (space_available >= calculate_space_occupied_with_children(item_entity)) {
+				if (rsa >= calculate_space_occupied_with_children(item_entity)) {
 					output.transferred_charges = 1;
 				}
 			}
 			else {
-				const int maximum_charges_fitting_inside = space_available / item.space_occupied_per_charge;
+				const int maximum_charges_fitting_inside = rsa / item.space_occupied_per_charge;
 				output.transferred_charges = std::min(item.charges, maximum_charges_fitting_inside);
 
 				if (specified_quantity > -1) {
