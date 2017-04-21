@@ -1011,11 +1011,6 @@ namespace augs {
 			FIELD(num_last_bullets_to_trigger_low_ammo_cue);
 			FIELD(is_trigger_pressed);
 
-			FIELD(is_cocking_handle_being_pulled);
-		
-			FIELD(when_began_pulling_cocking_handle);
-			FIELD(cocking_handle_pull_duration_ms);
-
 			FIELD(muzzle_velocity);
 
 			FIELD(damage_multiplier);
@@ -1045,6 +1040,12 @@ namespace augs {
 			FIELD(muzzle_particles);
 
 			FIELD(muzzle_shot_sound_response);
+
+
+			FIELD(is_cocking_handle_being_pulled);
+
+			FIELD(when_began_pulling_cocking_handle);
+			FIELD(cocking_handle_pull_duration_ms);
 		}
 
 		template <class F, class... Instances>

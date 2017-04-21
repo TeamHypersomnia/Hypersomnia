@@ -26,26 +26,6 @@ namespace components {
 		unsigned short num_last_bullets_to_trigger_low_ammo_cue = 0;
 		bool is_trigger_pressed = false;
 
-		friend struct augs::introspection_access;
-
-	private:
-		bool is_cocking_handle_being_pulled = false;
-		std::array<padding_byte, 3> pad;
-		
-		augs::stepped_timestamp when_began_pulling_cocking_handle;
-	public:
-		float cocking_handle_pull_duration_ms = 500.f;
-
-		void set_cocking_handle_pulling(
-			const bool enabled, 
-			const augs::stepped_timestamp now
-		);
-
-		static void load_next_round(
-			const entity_id subject,
-			const logic_step step
-		);
-
 		augs::minmax<float> muzzle_velocity;
 
 		float damage_multiplier = 1.f;
@@ -75,7 +55,27 @@ namespace components {
 		child_entity_id muzzle_particles;
 
 		sound_response muzzle_shot_sound_response;
+
+	private:
+		friend struct augs::introspection_access;
+
+		bool is_cocking_handle_being_pulled = false;
+		std::array<padding_byte, 3> pad;
+
+		augs::stepped_timestamp when_began_pulling_cocking_handle;
+	public:
+		float cocking_handle_pull_duration_ms = 500.f;
 		// END GEN INTROSPECTOR
+
+		static void load_next_round(
+			const entity_id subject,
+			const logic_step step
+		);
+
+		void set_cocking_handle_pulling(
+			const bool enabled,
+			const augs::stepped_timestamp now
+		);
 
 		vec2 calculate_muzzle_position(components::transform gun_transform) const;
 		vec2 calculate_barrel_center(components::transform gun_transform) const;
