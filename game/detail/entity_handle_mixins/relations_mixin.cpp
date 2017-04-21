@@ -46,8 +46,8 @@ void relations_mixin<false, D>::make_cloned_child_entities_recursive(const entit
 		if (self.has<component_type>()) {
 			ensure(from.has<component_type>());
 
-			auto& cloned_to_component = get_component_ref_from_component_or_synchronizer(self.get<component_type>());
-			const auto& cloned_from_component = get_component_ref_from_component_or_synchronizer(self.get<component_type>());
+			auto& cloned_to_component = get_component_ref_from_synchronizer_or_component(self.get<component_type>());
+			const auto& cloned_from_component = get_component_ref_from_synchronizer_or_component(self.get<component_type>());
 
 			augs::introspect_recursive<
 				concat_unary_t<
