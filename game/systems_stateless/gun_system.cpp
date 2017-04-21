@@ -92,7 +92,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				has_enough_physical_bullets = true;
 			}
 			else {
-				has_enough_physical_bullets = it[slot_function::GUN_CHAMBER].get_mounted_items().size() > 0;
+				has_enough_physical_bullets = it[slot_function::GUN_CHAMBER].get_items_inside().size() > 0;
 			}
 
 			const bool has_enough_mana = (
@@ -151,7 +151,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				}
 				else {
 					const auto chamber_slot = it[slot_function::GUN_CHAMBER];
-					const auto catridge_in_chamber = cosmos[chamber_slot.get_mounted_items()[0]];
+					const auto catridge_in_chamber = cosmos[chamber_slot.get_items_inside()[0]];
 
 					response.catridge_definition = catridge_in_chamber.get<components::catridge>();
 
@@ -160,11 +160,15 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 					const auto pellets_slot = catridge_in_chamber[slot_function::ITEM_DEPOSIT];
 
-					bool destroy_pellets_container = false;
-
 					if (pellets_slot.alive()) {
-						destroy_pellets_container = true;
-						bullet_stacks = pellets_slot.get_mounted_items();
+						bullet_stacks = pellets_slot.get_items_inside();
+						
+						/* 
+							apart from the pellets stacks inside the catridge,
+							we must additionally queue the catridge itself
+						*/
+
+						step.transient.messages.post(messages::queue_destruction(catridge_in_chamber));
 					}
 					else {
 						bullet_stacks.push_back(catridge_in_chamber);
@@ -227,33 +231,36 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					}
 
 					step.transient.messages.post(response);
-
-					if (destroy_pellets_container) {
-						step.transient.messages.post(messages::queue_destruction(chamber_slot.get_items_inside()[0]));
-					}
 					
+					/* 
+						by now every item inside the chamber is queued for destruction.
+						we do not clear items_inside by dropping them by perform_transfers 
+						to avoid unnecessary activation of the rigid bodies of the bullets, due to being dropped.
+					*/
 					chamber_slot->items_inside.clear();
 
 					if (gun.action_mode >= components::gun::action_type::SEMI_AUTOMATIC) {
-						thread_local decltype(inventory_slot::items_inside) source_store_for_chamber;
-						source_store_for_chamber.clear();
+						thread_local decltype(inventory_slot::items_inside) take_next_catridge_for_chamber_from;
+						take_next_catridge_for_chamber_from.clear();
 
 						const auto chamber_magazine_slot = it[slot_function::GUN_CHAMBER_MAGAZINE];
 
 						if (chamber_magazine_slot.alive()) {
-							source_store_for_chamber = chamber_magazine_slot.get_items_inside();
+							take_next_catridge_for_chamber_from = chamber_magazine_slot.get_items_inside();
 						}
 						else {
 							const auto detachable_magazine_slot = it[slot_function::GUN_DETACHABLE_MAGAZINE];
 
 							if (detachable_magazine_slot.alive() && detachable_magazine_slot.has_items()) {
-								source_store_for_chamber = cosmos[detachable_magazine_slot.get_items_inside()[0]][slot_function::ITEM_DEPOSIT].get_items_inside();
+								const auto magazine = cosmos[detachable_magazine_slot.get_items_inside()[0]];
+
+								take_next_catridge_for_chamber_from = magazine[slot_function::ITEM_DEPOSIT].get_items_inside();
 							}
 						}
 
-						if (source_store_for_chamber.size() > 0) {
+						if (take_next_catridge_for_chamber_from.size() > 0) {
 							const item_slot_transfer_request_data into_chamber_transfer{ 
-								source_store_for_chamber[source_store_for_chamber.size() - 1], 
+								take_next_catridge_for_chamber_from[take_next_catridge_for_chamber_from.size() - 1], 
 								chamber_slot, 
 								1, 
 								true 

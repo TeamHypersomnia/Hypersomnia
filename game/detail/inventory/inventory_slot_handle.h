@@ -28,20 +28,6 @@ public:
 	
 	basic_inventory_slot_handle(owner_reference owner, const inventory_slot_id raw_id);
 	
-	auto get_mounted_items() const {
-		// TODO: actually implement mounted items
-		return get_items_inside();
-
-		//for (auto& i : items_inside) {
-		//	auto handle = cosmos[i];
-		//
-		//	if (handle.get<components::item>().is_mounted())
-		//		output.push_back(i);
-		//}
-		//
-		//return output;
-	}
-
 	owner_reference get_cosmos() const;
 
 	owner_reference owner;

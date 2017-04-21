@@ -245,7 +245,7 @@ drag_and_drop_result prepare_drag_and_drop_result(
 					case item_transfer_result_type::INSUFFICIENT_SPACE: drop.hint_text = L"No space"; break;
 					case item_transfer_result_type::INVALID_CAPABILITIES: drop.hint_text = L"Impossible"; break;
 					case item_transfer_result_type::INCOMPATIBLE_CATEGORIES: drop.hint_text = L"Incompatible item"; break;
-					case item_transfer_result_type::COULD_REPLACE_BUT_NO_SPACE: drop.hint_text = L"Could replace but no space"; break;
+					case item_transfer_result_type::TOO_MANY_ITEMS: drop.hint_text = L"Too many items"; break;
 					case item_transfer_result_type::SUCCESSFUL_DROP: drop.hint_text = L"Drop to ground"; break;
 					default: drop.hint_text = L"Unknown problem"; break;
 					}

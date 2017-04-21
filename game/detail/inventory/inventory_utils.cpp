@@ -144,8 +144,8 @@ item_transfer_result query_transfer_result(
 			}
 			break;
 
-		case containment_result_type::COULD_REPLACE_BUT_NO_SPACE:
-			output.result = item_transfer_result_type::COULD_REPLACE_BUT_NO_SPACE;
+		case containment_result_type::TOO_MANY_ITEMS:
+			output.result = item_transfer_result_type::TOO_MANY_ITEMS;
 			break;
 
 		default: 
@@ -200,54 +200,43 @@ containment_result query_containment_result(
 	else if (!slot.is_category_compatible_with(item_entity)) {
 		result = containment_result_type::INCOMPATIBLE_CATEGORIES;
 	}
-	else if (
-		slot.always_allow_exactly_one_item 
-		&& slot.items_inside.size() == 1 
-		&& !can_stack_entities(cosmos[target_slot.get_items_inside().at(0)], item_entity)
-	) {
-		//if (allow_replacement) {
-		//
-		//}
-		//auto& item_to_replace = slot.items_inside[0];
-		//
-		//auto& current_slot_of_replacer = item.current_slot;
-		//auto replace_request = r;
-		//
-		//replace_request.item = slot.items_inside[0];
-		//replace_request.target_slot = current_slot_of_replacer;
-		//
-		//if (query_containment_result.)
-		//
-		//	if (current_slot_of_replacer.alive())
-
-		result = containment_result_type::COULD_REPLACE_BUT_NO_SPACE;
-	}
 	else {
-		const auto rsa = target_slot.calculate_real_space_available();
+		const bool slot_would_have_too_many_items =
+			slot.always_allow_exactly_one_item
+			&& slot.items_inside.size() == 1
+			&& !can_stack_entities(cosmos[target_slot.get_items_inside().at(0)], item_entity)
+		;
 
-		if (rsa > 0) {
-			const bool item_indivisible = item.charges == 1 || !item.stackable;
-
-			if (item_indivisible) {
-				if (rsa >= calculate_space_occupied_with_children(item_entity)) {
-					output.transferred_charges = 1;
-				}
-			}
-			else {
-				const int maximum_charges_fitting_inside = rsa / item.space_occupied_per_charge;
-				output.transferred_charges = std::min(item.charges, maximum_charges_fitting_inside);
-
-				if (specified_quantity > -1) {
-					output.transferred_charges = std::min(output.transferred_charges, static_cast<unsigned>(specified_quantity));
-				}
-			}
-		}
-
-		if (output.transferred_charges == 0) {
-			output.result = containment_result_type::INSUFFICIENT_SPACE;
+		if (slot_would_have_too_many_items) {
+			result = containment_result_type::TOO_MANY_ITEMS;
 		}
 		else {
-			output.result = containment_result_type::SUCCESSFUL_CONTAINMENT;
+			const auto rsa = target_slot.calculate_real_space_available();
+
+			if (rsa > 0) {
+				const bool item_indivisible = item.charges == 1 || !item.stackable;
+
+				if (item_indivisible) {
+					if (rsa >= calculate_space_occupied_with_children(item_entity)) {
+						output.transferred_charges = 1;
+					}
+				}
+				else {
+					const int maximum_charges_fitting_inside = rsa / item.space_occupied_per_charge;
+					output.transferred_charges = std::min(item.charges, maximum_charges_fitting_inside);
+
+					if (specified_quantity > -1) {
+						output.transferred_charges = std::min(output.transferred_charges, static_cast<unsigned>(specified_quantity));
+					}
+				}
+			}
+
+			if (output.transferred_charges == 0) {
+				output.result = containment_result_type::INSUFFICIENT_SPACE;
+			}
+			else {
+				output.result = containment_result_type::SUCCESSFUL_CONTAINMENT;
+			}
 		}
 	}
 		
@@ -256,9 +245,10 @@ containment_result query_containment_result(
 
 bool can_stack_entities(const const_entity_handle a, const const_entity_handle b) {
 	const bool same_names =
-		a.has<components::name>() &&
-		b.has<components::name>() &&
-		a.get<components::name>().id == b.get<components::name>().id;
+		a.has<components::name>()
+		&& b.has<components::name>()
+		&& a.get<components::name>().id == b.get<components::name>().id
+	;
 
 	if (same_names) {
 		switch (a.get<components::name>().id) {

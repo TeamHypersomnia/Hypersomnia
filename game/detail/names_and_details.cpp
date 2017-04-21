@@ -151,7 +151,7 @@ std::wstring get_bbcoded_entity_name_details(const entity_name n) {
 	}
 }
 
-std::wstring get_bbcoded_item_compatibility_categories(const item_category_bitset& flags) {
+std::wstring get_bbcoded_item_categories(const item_category_bitset& flags) {
 	std::wstring result;
 
 	if (flags.test(item_category::MAGAZINE)) {

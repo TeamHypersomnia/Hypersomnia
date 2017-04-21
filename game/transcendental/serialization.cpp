@@ -106,7 +106,7 @@ bool cosmos_significant_state::operator==(const cosmos_significant_state& second
 	//if(found_mismatch)
 	//	LOG("C1: %x\nC2: %x, mismatch: %x", this_serialized.to_string(), second_serialized.to_string(), mismatch_byte);
 
-	bool cosmoi_identical = this_serialized == second_serialized;
+	const bool cosmoi_identical = this_serialized == second_serialized;
 	return cosmoi_identical;
 }
 

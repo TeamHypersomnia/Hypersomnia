@@ -5,6 +5,7 @@
 #include "augs/templates/is_component_synchronized.h"
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/templates/for_each_in_types.h"
+#include "augs/templates/list_ops.h"
 
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
 #include "game/transcendental/entity_handle_declaration.h"
@@ -50,6 +51,11 @@ class EMPTY_BASES basic_entity_handle :
 	public relations_mixin<is_const, basic_entity_handle<is_const>>,
 	public spatial_properties_mixin<is_const, basic_entity_handle<is_const>>
 {
+	template <typename T>
+	static void check_component_type() {
+		static_assert(is_one_of_list_v<T, concat_lists_t<disabled_components, put_all_components_into_t<type_list>>>, "Unknown component type!");
+	}
+
 public:
 	static constexpr bool is_const_value = is_const;
 private:
@@ -116,7 +122,7 @@ private:
 	};
 
 	template <class T>
-	struct component_or_synchronizer_or_disabled<T, std::enable_if_t<is_component_synchronized<T>::value && !is_one_of_list_v<T, disabled_components>>> {
+	struct component_or_synchronizer_or_disabled<T, std::enable_if_t<is_component_synchronized<T> && !is_one_of_list_v<T, disabled_components>>> {
 		typedef component_synchronizer<is_const, T> return_type;
 
 		basic_entity_handle<is_const> h;
@@ -248,18 +254,21 @@ public:
 
 	template <class component>
 	bool has() const {
+		check_component_type<component>();
 		ensure(alive());
 		return component_or_synchronizer_or_disabled<component>({ *this }).has();
 	}
 
 	template<class component>
 	decltype(auto) get() const {
+		check_component_type<component>();
 		ensure(alive());
 		return component_or_synchronizer_or_disabled<component>({ *this }).get();
 	}
 
 	template<class component, bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 	decltype(auto) add(const component& c) const {
+		check_component_type<component>();
 		ensure(alive());
 		component_or_synchronizer_or_disabled<component>({ *this }).add(c);
 		return get<component>();
@@ -267,6 +276,7 @@ public:
 
 	template<class component, bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 	decltype(auto) add(const component_synchronizer<is_const, component>& c) const {
+		check_component_type<component>();
 		ensure(alive());
 		component_or_synchronizer_or_disabled<component>({ *this }).add(c.get_data());
 		return get<component>();
@@ -274,13 +284,15 @@ public:
 
 	template<class component>
 	decltype(auto) find() const {
+		check_component_type<component>();
 		ensure(alive());
-		static_assert(!is_component_synchronized<component>::value, "Cannot return a pointer to synchronized component!");
+		static_assert(!is_component_synchronized<component>, "Cannot return a pointer to synchronized component!");
 		return component_or_synchronizer_or_disabled<component>({ *this }).find();
 	}
 
 	template<class component, bool _is_const = is_const, typename = std::enable_if_t<!_is_const>>
 	void remove() const {
+		check_component_type<component>();
 		ensure(alive());
 		return component_or_synchronizer_or_disabled<component>({ *this }).remove();
 	}

@@ -3,7 +3,8 @@
 #include "augs/misc/enum_bitset.h"
 
 enum class item_category {
-	NONE,
+	GENERAL,
+
 	RAIL_ATTACHMENT,
 	MUZZLE_ATTACHMENT,
 	SHOULDER_CONTAINER,

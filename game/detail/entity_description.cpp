@@ -44,7 +44,7 @@ std::wstring get_bbcoded_entity_properties(const const_entity_handle id) {
 
 	if (item) {
 		if (item->categories_for_slot_compatibility.any()) {
-			result << L"[color=vsblue]" << get_bbcoded_item_compatibility_categories(item->categories_for_slot_compatibility) << L"[/color]\n";
+			result << L"[color=vsblue]" << get_bbcoded_item_categories(item->categories_for_slot_compatibility) << L"[/color]\n";
 		}
 		
 		const auto total_occupied = format_space_units(calculate_space_occupied_with_children(id));
@@ -127,9 +127,9 @@ std::wstring get_bbcoded_slot_description(const const_inventory_slot_handle id) 
 	const auto name = get_bbcoded_slot_function_name(id.get_id().type);
 	const auto details = get_bbcoded_slot_function_details(id.get_id().type);
 
-	const auto catcolor = id->for_categorized_items_only ? L"violet" : L"vsblue";
+	const auto catcolor = id->category_allowed == item_category::GENERAL ? L"vsblue" : L"violet";
 
-	return name + L"\n[color=vslightgray]Allows: [/color][color=" + catcolor + L"]" + get_bbcoded_item_compatibility_categories(id->get_allowed_categories()) + L"[/color][color=vsdarkgray]\n" +
+	return name + L"\n[color=vslightgray]Allows: [/color][color=" + catcolor + L"]" + get_bbcoded_item_categories(id->get_allowed_categories()) + L"[/color][color=vsdarkgray]\n" +
 		details + L"[/color]";
 }
 

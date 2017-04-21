@@ -214,7 +214,7 @@ void item_button::draw_proc(
 	rgba inside_col = cyan;
 	rgba border_col = cyan;
 
-	if (parent_slot->for_categorized_items_only) {
+	if (parent_slot->category_allowed != item_category::GENERAL) {
 		border_col = pink;
 		inside_col = violet;
 	}
@@ -356,7 +356,7 @@ void item_button::draw_proc(
 					label_color.rgb() = cyan.rgb();
 				}
 
-				//if (item[slot_function::ITEM_DEPOSIT]->for_categorized_items_only)
+				//if (item[slot_function::ITEM_DEPOSIT]->category_allowed != item_category::GENERAL)
 				//	label_color.rgb() = pink.rgb();
 				//else
 				//	label_color.rgb() = cyan.rgb();

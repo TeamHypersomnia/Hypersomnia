@@ -12,34 +12,45 @@ namespace augs {
 		typedef std::tuple<std::vector<Queues>...> tuple_type;
 		tuple_type queues;
 
+		template <typename T>
+		static void check_valid() {
+			static_assert(is_one_of_v<T, Queues...>, "Unknown message type!");
+		}
+
 	public:
 		template <typename T>
 		void post(const T& message_object) {
+			check_valid<T>();
 			get_queue<T>().push_back(message_object);
 		}
 
 		template <typename T>
 		void post(const std::vector<T>& messages) {
+			check_valid<T>();
 			concatenate(get_queue<T>(), messages);
 		}
 
 		template <typename T>
 		std::vector<T>& get_queue() {
+			check_valid<T>();
 			return std::get<std::vector<T>>(queues);
 		}
 
 		template <typename T>
 		const std::vector<T>& get_queue() const {
+			check_valid<T>();
 			return std::get<std::vector<T>>(queues);
 		}
 
 		template <typename T>
 		void clear_queue() {
+			check_valid<T>();
 			return get_queue<T>().clear();
 		}
 
 		template <typename T>
 		void delete_marked(std::vector<T>& messages) {
+			check_valid<T>();
 			messages.erase(std::remove_if(messages.begin(), messages.end(), [](const T& msg) {
 				return msg.delete_this_message;
 			}), messages.end());
@@ -47,6 +58,7 @@ namespace augs {
 
 		template <typename T>
 		void delete_marked() {
+			check_valid<T>();
 			delete_marked_messages(get_queue<T>());
 		}
 

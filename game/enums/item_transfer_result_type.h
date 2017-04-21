@@ -3,7 +3,7 @@
 enum class containment_result_type {
 	INVALID_RESULT,
 	THE_SAME_SLOT,
-	COULD_REPLACE_BUT_NO_SPACE,
+	TOO_MANY_ITEMS,
 	INCOMPATIBLE_CATEGORIES,
 	INSUFFICIENT_SPACE,
 
@@ -17,7 +17,7 @@ enum class item_transfer_result_type {
 	INVALID_CAPABILITIES,
 
 	/* returned by query_containment_result */
-	COULD_REPLACE_BUT_NO_SPACE,
+	TOO_MANY_ITEMS,
 
 	INCOMPATIBLE_CATEGORIES,
 	INSUFFICIENT_SPACE,

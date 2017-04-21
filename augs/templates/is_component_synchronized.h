@@ -5,8 +5,5 @@ struct synchronizable_component {
 
 };
 
-template<typename T>
-struct is_component_synchronized 
-	: std::bool_constant<std::is_base_of_v<synchronizable_component, T>>
-{
-};
+template <typename T>
+constexpr bool is_component_synchronized = std::is_base_of_v<synchronizable_component, T>;

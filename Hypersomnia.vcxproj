@@ -1142,6 +1142,7 @@
     <ClInclude Include="augs\templates\introspection_utilities.h" />
     <ClInclude Include="augs\templates\is_component_synchronized.h" />
     <ClInclude Include="augs\templates\introspection_traits.h" />
+    <ClInclude Include="augs\templates\list_ops.h" />
     <ClInclude Include="augs\templates\maybe_const.h" />
     <ClInclude Include="augs\templates\memcpy_safety.h" />
     <ClInclude Include="augs\templates\minimal_templates.h" />
@@ -1245,6 +1246,7 @@
     <ClInclude Include="game\enums\renderable_drawing_type.h" />
     <ClInclude Include="game\enums\rigid_body_type.h" />
     <ClInclude Include="game\enums\sentience_meter_type.h" />
+    <ClInclude Include="game\enums\slot_physical_behaviour.h" />
     <ClInclude Include="game\enums\sound_response_type.h" />
     <ClInclude Include="game\assets\spell_id.h" />
     <ClInclude Include="game\enums\tree_of_npo_type.h" />

@@ -35,11 +35,11 @@ void slot_button::draw(const viewing_game_gui_context context, const const_this_
 
 	rgba inside_col, border_col;
 	
-	if (slot_id->for_categorized_items_only) {
-		inside_col = violet;
+	if (slot_id->category_allowed == item_category::GENERAL) {
+		inside_col = cyan;
 	}
 	else {
-		inside_col = cyan;
+		inside_col = violet;
 	}
 
 	border_col = inside_col;

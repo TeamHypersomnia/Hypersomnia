@@ -32,7 +32,7 @@ std::wstring get_bbcoded_entity_name(const const_entity_handle maybe_overridden_
 std::wstring get_bbcoded_entity_name_details(const entity_name);
 std::wstring get_bbcoded_entity_name_details(const const_entity_handle);
 
-std::wstring get_bbcoded_item_compatibility_categories(const item_category_bitset& flags);
+std::wstring get_bbcoded_item_categories(const item_category_bitset& flags);
 
 std::wstring get_bbcoded_slot_function_name(const slot_function);
 std::wstring get_bbcoded_slot_function_details(const slot_function);

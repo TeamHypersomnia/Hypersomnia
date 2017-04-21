@@ -30,7 +30,6 @@ namespace ingredients {
 		slot_def.attachment_offset.pos = vec2(bbox.x / 2 - 3, -20);
 		container.slots[slot_function::SECONDARY_HAND] = slot_def;
 
-		slot_def.for_categorized_items_only = true;
 		slot_def.category_allowed = item_category::SHOULDER_CONTAINER;
 		slot_def.attachment_sticking_mode = rectangle_sticking::LEFT;
 		slot_def.attachment_offset.pos = vec2(-bbox.x/2 + 4, 0);
@@ -38,7 +37,6 @@ namespace ingredients {
 		container.slots[slot_function::SHOULDER] = slot_def;
 
 		slot_def.attachment_density_multiplier = 1.f;
-		slot_def.for_categorized_items_only = true;
 		slot_def.category_allowed = item_category::TORSO_ARMOR;
 		slot_def.attachment_offset = vec2(0, 0);
 
