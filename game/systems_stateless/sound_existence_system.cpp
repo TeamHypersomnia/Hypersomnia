@@ -73,7 +73,8 @@ void sound_existence_system::destroy_dead_sounds(const logic_step step) const {
 					components::sound_existence::deactivate(it);
 				}
 			}
-		}
+		},
+		subjects_iteration_flag::POSSIBLE_ITERATOR_INVALIDATION
 	);
 }
 
