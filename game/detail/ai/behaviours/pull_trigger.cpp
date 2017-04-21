@@ -33,10 +33,10 @@ namespace behaviours {
 			const auto w = cosmos[w_id];
 
 			if (o == tree::execution_occurence::LAST) {
-				w.get<components::gun>().trigger_pressed = false;
+				w.get<components::gun>().is_trigger_pressed = false;
 			}
 			else {
-				w.get<components::gun>().trigger_pressed = true;
+				w.get<components::gun>().is_trigger_pressed = true;
 			}
 		}
 	}

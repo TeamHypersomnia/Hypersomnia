@@ -1009,6 +1009,12 @@ namespace augs {
 			FIELD(shot_cooldown);
 			FIELD(action_mode);
 			FIELD(num_last_bullets_to_trigger_low_ammo_cue);
+			FIELD(is_trigger_pressed);
+
+			FIELD(is_cocking_handle_being_pulled);
+		
+			FIELD(when_began_pulling_cocking_handle);
+			FIELD(cocking_handle_pull_duration_ms);
 
 			FIELD(muzzle_velocity);
 
@@ -1018,8 +1024,6 @@ namespace augs {
 
 			FIELD(camera_shake_radius);
 			FIELD(camera_shake_spread_degrees);
-
-			FIELD(trigger_pressed);
 
 			FIELD(shell_velocity);
 			FIELD(shell_angular_velocity);

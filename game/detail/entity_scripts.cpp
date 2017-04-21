@@ -31,7 +31,7 @@ void unset_input_flags_of_orphaned_entity(entity_handle e) {
 	}
 
 	if (gun) {
-		gun->trigger_pressed = false;
+		gun->is_trigger_pressed = false;
 	}
 
 	if (melee) {

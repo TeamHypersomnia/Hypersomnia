@@ -460,7 +460,7 @@ namespace prefabs {
 
 		gun.muzzle_shot_sound_response.id = assets::sound_buffer_id::ASSAULT_RIFLE_MUZZLE;
 
-		gun.action_mode = components::gun::action_type::AUTOMATIC;
+		gun.action_mode = gun_action_type::AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(4000.f, 4000.f);
 		gun.shot_cooldown = augs::stepped_cooldown(100);
 		gun.bullet_spawn_offset.set(sprite.get_size(metas).x/2, 0);
@@ -560,7 +560,7 @@ namespace prefabs {
 		gun.muzzle_shot_sound_response.modifier.reference_distance = 0.f;
 		gun.muzzle_shot_sound_response.modifier.gain = 1.3f;
 
-		gun.action_mode = components::gun::action_type::AUTOMATIC;
+		gun.action_mode = gun_action_type::AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(4500.f, 4500.f);
 		gun.shot_cooldown = augs::stepped_cooldown(150);
 		gun.bullet_spawn_offset.set(sprite.get_size(metas).x / 2, 0);
@@ -652,7 +652,7 @@ namespace prefabs {
 
 		gun.muzzle_shot_sound_response.id = assets::sound_buffer_id::SUBMACHINE_MUZZLE;
 
-		gun.action_mode = components::gun::action_type::AUTOMATIC;
+		gun.action_mode = gun_action_type::AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(3000.f, 3000.f);
 		gun.shot_cooldown = augs::stepped_cooldown(50);
 		gun.bullet_spawn_offset.set(sprite.get_size(metas).x/2, 0);
@@ -746,7 +746,7 @@ namespace prefabs {
 
 		gun.muzzle_shot_sound_response.id = assets::sound_buffer_id::ASSAULT_RIFLE_MUZZLE;
 
-		gun.action_mode = components::gun::action_type::AUTOMATIC;
+		gun.action_mode = gun_action_type::AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(2000.f, 2000.f);
 		gun.shot_cooldown = augs::stepped_cooldown(500);
 		gun.bullet_spawn_offset.set(sprite.get_size(metas).x / 2, 0);
@@ -848,7 +848,7 @@ namespace prefabs {
 
 		gun.muzzle_shot_sound_response.id = assets::sound_buffer_id::KEK9_MUZZLE;
 
-		gun.action_mode = components::gun::action_type::SEMI_AUTOMATIC;
+		gun.action_mode = gun_action_type::SEMI_AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(2500.f, 2500.f);
 		gun.shot_cooldown = augs::stepped_cooldown(150);
 		gun.bullet_spawn_offset.set(sprite.get_size(metas).x / 2, 0);
@@ -929,7 +929,7 @@ namespace prefabs {
 
 		gun.muzzle_shot_sound_response.id = assets::sound_buffer_id::KEK9_MUZZLE;
 
-		gun.action_mode = components::gun::action_type::SEMI_AUTOMATIC;
+		gun.action_mode = gun_action_type::SEMI_AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(3000.f, 3000.f);
 		gun.shot_cooldown = augs::stepped_cooldown(100);
 		gun.bullet_spawn_offset.set(sprite.get_size(metas).x / 2, -7);

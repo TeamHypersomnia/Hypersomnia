@@ -38,7 +38,7 @@ void simulation_receiver::predict_intents_of_remote_entities(
 			for (const auto g_id : e.get_wielded_guns()) {
 				const auto g = predicted_cosmos[g_id];
 
-				if (g.get<components::gun>().trigger_pressed) {
+				if (g.get<components::gun>().is_trigger_pressed) {
 					const auto current_slot = g.get_current_slot();
 
 					if (current_slot.alive() && current_slot.is_hand_slot()) {

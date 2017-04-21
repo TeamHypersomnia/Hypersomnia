@@ -33,6 +33,54 @@
 
 using namespace augs;
 
+void components::gun::set_cocking_handle_pulling(
+	const bool enabled,
+	const augs::stepped_timestamp now
+) {
+	if (!is_cocking_handle_being_pulled) {
+		when_began_pulling_cocking_handle = now;
+	}
+
+	is_cocking_handle_being_pulled = enabled;
+}
+
+void components::gun::load_next_round(
+	const entity_id subject,
+	const logic_step step
+) {
+	auto& cosmos = step.cosm;
+	const auto it = step.cosm[subject];
+
+	thread_local decltype(inventory_slot::items_inside) take_next_catridge_for_chamber_from;
+	take_next_catridge_for_chamber_from.clear();
+
+	const auto chamber_magazine_slot = it[slot_function::GUN_CHAMBER_MAGAZINE];
+
+	if (chamber_magazine_slot.alive()) {
+		take_next_catridge_for_chamber_from = chamber_magazine_slot.get_items_inside();
+	}
+	else {
+		const auto detachable_magazine_slot = it[slot_function::GUN_DETACHABLE_MAGAZINE];
+
+		if (detachable_magazine_slot.alive() && detachable_magazine_slot.has_items()) {
+			const auto magazine = cosmos[detachable_magazine_slot.get_items_inside()[0]];
+
+			take_next_catridge_for_chamber_from = magazine[slot_function::ITEM_DEPOSIT].get_items_inside();
+		}
+	}
+
+	if (take_next_catridge_for_chamber_from.size() > 0) {
+		const item_slot_transfer_request_data into_chamber_transfer{ 
+			take_next_catridge_for_chamber_from[take_next_catridge_for_chamber_from.size() - 1], 
+			it[slot_function::GUN_CHAMBER], 
+			1, 
+			true 
+		};
+
+		perform_transfer(into_chamber_transfer, step);
+	}
+}
+
 void gun_system::consume_gun_intents(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
@@ -48,7 +96,7 @@ void gun_system::consume_gun_intents(const logic_step step) {
 		auto& gun = *maybe_gun;
 
 		if (it.intent == intent_type::PRESS_GUN_TRIGGER) {
-			gun.trigger_pressed = it.is_pressed;
+			gun.is_trigger_pressed = it.is_pressed;
 		}
 
 		if (it.intent == intent_type::RELOAD && it.is_pressed) {
@@ -104,13 +152,13 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 			;
 
 			if (
-				gun.trigger_pressed 
+				gun.is_trigger_pressed 
 				&& has_enough_mana
 				&& has_enough_physical_bullets
 				&& gun.shot_cooldown.try_to_fire_and_reset(cosmos.get_timestamp(), delta)
 			) {
-				if (gun.action_mode != components::gun::action_type::AUTOMATIC) {
-					gun.trigger_pressed = false;
+				if (gun.action_mode != gun_action_type::AUTOMATIC) {
+					gun.is_trigger_pressed = false;
 				}
 
 				const auto muzzle_transform = components::transform { gun.calculate_muzzle_position(gun_transform), gun_transform.rotation };
@@ -239,35 +287,8 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					*/
 					chamber_slot->items_inside.clear();
 
-					if (gun.action_mode >= components::gun::action_type::SEMI_AUTOMATIC) {
-						thread_local decltype(inventory_slot::items_inside) take_next_catridge_for_chamber_from;
-						take_next_catridge_for_chamber_from.clear();
-
-						const auto chamber_magazine_slot = it[slot_function::GUN_CHAMBER_MAGAZINE];
-
-						if (chamber_magazine_slot.alive()) {
-							take_next_catridge_for_chamber_from = chamber_magazine_slot.get_items_inside();
-						}
-						else {
-							const auto detachable_magazine_slot = it[slot_function::GUN_DETACHABLE_MAGAZINE];
-
-							if (detachable_magazine_slot.alive() && detachable_magazine_slot.has_items()) {
-								const auto magazine = cosmos[detachable_magazine_slot.get_items_inside()[0]];
-
-								take_next_catridge_for_chamber_from = magazine[slot_function::ITEM_DEPOSIT].get_items_inside();
-							}
-						}
-
-						if (take_next_catridge_for_chamber_from.size() > 0) {
-							const item_slot_transfer_request_data into_chamber_transfer{ 
-								take_next_catridge_for_chamber_from[take_next_catridge_for_chamber_from.size() - 1], 
-								chamber_slot, 
-								1, 
-								true 
-							};
-
-							perform_transfer(into_chamber_transfer, step);
-						}
+					if (gun.action_mode >= gun_action_type::SEMI_AUTOMATIC) {
+						components::gun::load_next_round(it, step);
 					}
 				}
 

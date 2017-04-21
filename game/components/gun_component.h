@@ -1,39 +1,50 @@
 #pragma once
-#include "augs/misc/timer.h"
-
-#include "game/transcendental/entity_id.h"
-
-#include "render_component.h"
+#include "padding_byte.h"
 
 #include "augs/audio/sound_effect_modifier.h"
 
+#include "augs/misc/timer.h"
 #include "augs/misc/stepped_timing.h"
 #include "augs/misc/recoil_player.h"
 #include "augs/misc/minmax.h"
 
-#include "padding_byte.h"
-
+#include "game/enums/gun_action_type.h"
+#include "game/transcendental/entity_id.h"
+#include "game/transcendental/step_declaration.h"
 #include "game/assets/sound_buffer_id.h"
+#include "game/components/render_component.h"
 
-class gun_system;
-class processing_system;
+namespace augs {
+	struct introspection_access;
+}
 
 namespace components {
 	struct gun  {
-		enum class action_type : unsigned char {
-			INVALID,
-
-			SINGLE_SHOT,
-			BOLT_ACTION,
-			SEMI_AUTOMATIC,
-			AUTOMATIC
-		};
-
 		// GEN INTROSPECTOR struct components::gun
 		augs::stepped_cooldown shot_cooldown = augs::stepped_cooldown(100);
-		action_type action_mode = action_type::INVALID;
+		gun_action_type action_mode = gun_action_type::INVALID;
 		unsigned short num_last_bullets_to_trigger_low_ammo_cue = 0;
-		padding_byte pad;
+		bool is_trigger_pressed = false;
+
+		friend struct augs::introspection_access;
+
+	private:
+		bool is_cocking_handle_being_pulled = false;
+		std::array<padding_byte, 3> pad;
+		
+		augs::stepped_timestamp when_began_pulling_cocking_handle;
+	public:
+		float cocking_handle_pull_duration_ms = 500.f;
+
+		void set_cocking_handle_pulling(
+			const bool enabled, 
+			const augs::stepped_timestamp now
+		);
+
+		static void load_next_round(
+			const entity_id subject,
+			const logic_step step
+		);
 
 		augs::minmax<float> muzzle_velocity;
 
@@ -43,8 +54,6 @@ namespace components {
 
 		float camera_shake_radius = 0.f;
 		float camera_shake_spread_degrees = 0.f;
-
-		int trigger_pressed = false;
 
 		augs::minmax<float> shell_velocity;
 		augs::minmax<float> shell_angular_velocity;

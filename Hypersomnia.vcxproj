@@ -1241,6 +1241,7 @@
     <ClInclude Include="game\enums\callback_result.h" />
     <ClInclude Include="game\enums\entity_flag.h" />
     <ClInclude Include="game\enums\adverse_element_type.h" />
+    <ClInclude Include="game\enums\gun_action_type.h" />
     <ClInclude Include="game\enums\input_recording_type.h" />
     <ClInclude Include="game\assets\physical_material_id.h" />
     <ClInclude Include="game\enums\renderable_drawing_type.h" />
