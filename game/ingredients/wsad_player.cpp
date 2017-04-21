@@ -280,7 +280,7 @@ namespace prefabs {
 
 			info.shape.from_renderable(step, recoil);
 
-			info.filter = b2Filter();
+			info.filter = filters::trigger();
 			//info.filter.categoryBits = 0;
 			info.density = 0.1f;
 			info.sensor = true;
