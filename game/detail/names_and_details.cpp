@@ -49,6 +49,10 @@ std::wstring get_bbcoded_entity_name(const entity_name n) {
 		return L"PED grenade";
 	case entity_name::INTERFERENCE_GRENADE:
 		return L"Force grenade";
+	case entity_name::STANDARD_ARM_BACK:
+		return L"Standard arm's back";
+	case entity_name::STANDARD_ARM_FRONT:
+		return L"Standard arm's front";
 	default:
 		return L"Unknown";
 	}
@@ -144,6 +148,14 @@ std::wstring get_bbcoded_entity_name_details(const entity_name n) {
 		return{
 			L"Throwable explosive with a three seconds delay.\nDeals damage to [color=orange]Consciousness[/color].\nCauses massive aimpunch."
 		};
+	case entity_name::STANDARD_ARM_BACK:
+		return{
+			L"Back of the standard arm."
+		};
+	case entity_name::STANDARD_ARM_FRONT:
+		return{
+			L"Front of the standard arm."
+		};
 	default:
 		return{
 			L"Unknown"
@@ -171,6 +183,12 @@ std::wstring get_bbcoded_item_categories(const item_category_bitset& flags) {
 	}
 	if (flags.test(item_category::TORSO_ARMOR)) {
 		result += L"Torso armor, ";
+	}
+	if (flags.test(item_category::ARM_BACK)) {
+		result += L"Arm's back, ";
+	}
+	if (flags.test(item_category::ARM_FRONT)) {
+		result += L"Arm's front, ";
 	}
 
 	if (!result.empty()) {
@@ -209,11 +227,11 @@ std::wstring get_bbcoded_slot_function_name(const slot_function f) {
 		return{
 			L"Hand",
 		};
-	case slot_function::PRIMARY_ARM:
+	case slot_function::PRIMARY_ARM_BACK:
 		return{
 			L"Primary arm",
 		};
-	case slot_function::SECONDARY_ARM:
+	case slot_function::SECONDARY_ARM_BACK:
 		return{
 			L"Secondary arm",
 		};
@@ -224,6 +242,10 @@ std::wstring get_bbcoded_slot_function_name(const slot_function f) {
 	case slot_function::SHOULDER:
 		return{
 			L"Shoulder",
+		};
+	case slot_function::ARM_FRONT:
+		return{
+			L"Arm's front",
 		};
 	default: return{ L"Unknown" };
 	}
@@ -255,11 +277,11 @@ std::wstring get_bbcoded_slot_function_details(const slot_function f) {
 		return{
 			L"For holding of almost every item."
 		};
-	case slot_function::PRIMARY_ARM:
+	case slot_function::PRIMARY_ARM_BACK:
 		return{
 			L"Primary arm component."
 		};
-	case slot_function::SECONDARY_ARM:
+	case slot_function::SECONDARY_ARM_BACK:
 		return{
 			L"Secondary arm component."
 		};

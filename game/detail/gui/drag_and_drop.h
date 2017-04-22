@@ -14,7 +14,7 @@ struct unfinished_drag_of_item {
 struct drop_for_item_slot_transfer {
 	hotbar_button_in_character_gui source_hotbar_button_id;
 
-	item_slot_transfer_request_data simulated_transfer;
+	item_slot_transfer_request simulated_transfer;
 	item_transfer_result result;
 
 	augs::constant_size_wstring<32> hint_text;

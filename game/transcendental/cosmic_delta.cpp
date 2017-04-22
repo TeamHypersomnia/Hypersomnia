@@ -568,7 +568,7 @@ TEST(Cosmos, GuidizeTests) {
 
 	const auto new_ent1 = c1.create_entity("e1");
 
-	item_slot_transfer_request_data dt;
+	item_slot_transfer_request dt;
 	dt.item = new_ent1;
 
 	const auto guidized = c1.guidize(dt);

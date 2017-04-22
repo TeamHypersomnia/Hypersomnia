@@ -55,5 +55,5 @@ typedef augs::storage_for_message_queues <
 	messages::exhausted_cast,
 	exploding_ring_input,
 	thunder_input,
-	item_slot_transfer_request_data
+	item_slot_transfer_request
 > storage_for_all_message_queues;

@@ -454,7 +454,7 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	pathfinding_system().advance_pathfinding_sessions(step);
 	performance.stop(meter_type::PATHFINDING);
 
-	auto& transfers = step.transient.messages.get_queue<item_slot_transfer_request_data>();
+	auto& transfers = step.transient.messages.get_queue<item_slot_transfer_request>();
 	perform_transfers(transfers, step);
 
 	particles_existence_system().displace_streams_and_destroy_dead_streams(step);

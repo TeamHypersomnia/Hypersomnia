@@ -136,10 +136,12 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 
 		const auto collider_owner_body = collider.get_owner_body();
 		const auto* const damage = subject.get_owner_body().find<components::damage>();
+
 		const bool bullet_colliding_with_sender =
 			damage != nullptr
 			&& (
 				damage->sender == collider_owner_body
+				|| cosmos[damage->sender].owning_transfer_capability_alive_and_same_as_of(collider_owner_body)
 				|| damage->sender_capability == collider_owner_body
 			)
 		;
@@ -308,13 +310,8 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 			return;
 		}
 		
-		const auto subject_owning_capability = subject_owner_body.get_owning_transfer_capability();
-		const auto collider_owning_capability = collider.get_owning_transfer_capability();
-
 		const bool fixtures_share_transfer_capability =
-			subject_owning_capability.alive()
-			&& collider_owning_capability.alive()
-			&& subject_owning_capability == collider_owning_capability
+			subject_owner_body.owning_transfer_capability_alive_and_same_as_of(collider)
 		;
 
 		if (fixtures_share_transfer_capability) {

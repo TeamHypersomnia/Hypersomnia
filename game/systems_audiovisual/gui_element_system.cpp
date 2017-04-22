@@ -116,7 +116,7 @@ const item_button& gui_element_system::get_item_button(const entity_id id) const
 	return item_buttons.at(id);
 }
 
-void gui_element_system::queue_transfer(const item_slot_transfer_request_data req) {
+void gui_element_system::queue_transfer(const item_slot_transfer_request req) {
 	pending_transfers.push_back(req);
 }
 
@@ -140,9 +140,13 @@ void gui_element_system::handle_hotbar_and_action_button_presses(
 			int hand_index = -1;
 
 			if (r.intent == intent_type::HOLSTER) {
-				r.intent = intent_type::HOLSTER_PRIMARY_ITEM;
-				
-				if (gui_entity.get_if_any_item_in_hand_no(0).dead()) {
+				if (gui_entity.get_if_any_item_in_hand_no(0).alive()) {
+					r.intent = intent_type::HOLSTER_PRIMARY_ITEM;
+				}
+				else if (
+					gui_entity.get_if_any_item_in_hand_no(0).dead()
+					&& gui_entity.get_if_any_item_in_hand_no(1).alive()
+				) {
 					r.intent = intent_type::HOLSTER_SECONDARY_ITEM;
 				}
 			}
@@ -319,7 +323,7 @@ void gui_element_system::control_gui(
 					|| change.msg == augs::window::event::message::rdoubleclick
 					) {
 					if (rect_world.held_rect_is_dragged) {
-						pending_transfers.push_back(item_slot_transfer_request_data { item_entity, cosmos[inventory_slot_id()], dragged_charges });
+						pending_transfers.push_back(item_slot_transfer_request { item_entity, cosmos[inventory_slot_id()], dragged_charges });
 						fetched = true;
 					}
 				}

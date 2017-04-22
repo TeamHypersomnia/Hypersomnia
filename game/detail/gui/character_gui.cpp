@@ -40,9 +40,11 @@ using namespace augs::gui::text;
 
 xywh character_gui::get_rectangle_for_slot_function(const slot_function f) {
 	switch (f) {
-	case slot_function::PRIMARY_HAND: return xywh(100, 0, 33, 33);
+	case slot_function::WIELDED_ITEM: return xywh(0, 100, 33, 33);
+	case slot_function::ARM_FRONT: return xywh(0, 100, 33, 33);
+	case slot_function::PRIMARY_ARM_BACK: return xywh(100, 0, 33, 33);
+	case slot_function::SECONDARY_ARM_BACK: return xywh(-100, 0, 33, 33);
 	case slot_function::SHOULDER: return xywh(100, -100, 33, 33);
-	case slot_function::SECONDARY_HAND: return xywh(-100, 0, 33, 33);
 	case slot_function::TORSO_ARMOR: return xywh(0, 0, 33, 33);
 
 	case slot_function::ITEM_DEPOSIT: return xywh(0, -100, 33, 33);
@@ -149,6 +151,13 @@ void character_gui::assign_item_to_first_free_hotbar_button(
 	const const_entity_handle gui_entity,
 	const const_entity_handle item
 ) {
+	if (
+		item.get<components::item>().categories_for_slot_compatibility.test(item_category::ARM_BACK)
+		|| item.get<components::item>().categories_for_slot_compatibility.test(item_category::ARM_FRONT)
+	) {
+		return;
+	}
+
 	clear_hotbar_selection_for_item(gui_entity, item);
 
 	auto try_assign = [&](const size_t n) {

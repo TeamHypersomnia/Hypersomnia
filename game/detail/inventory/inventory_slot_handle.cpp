@@ -20,17 +20,20 @@ void basic_inventory_slot_handle<C>::unset() {
 template <bool C>
 bool basic_inventory_slot_handle<C>::is_hand_slot() const {
 	return
-		raw_id.type == slot_function::PRIMARY_HAND
-		|| raw_id.type == slot_function::SECONDARY_HAND
+		raw_id.type == slot_function::WIELDED_ITEM
 	;
 }
 
 template <bool C>
 size_t basic_inventory_slot_handle<C>::get_hand_index() const {
-	if (raw_id.type == slot_function::PRIMARY_HAND) {
+	const auto arm_front_slot = get_container().get_current_slot();
+	ensure(arm_front_slot.raw_id.type == slot_function::ARM_FRONT);
+	const auto arm_back_slot = arm_front_slot.get_container().get_current_slot().raw_id;
+
+	if (arm_back_slot.type == slot_function::PRIMARY_ARM_BACK) {
 		return 0;
 	}
-	else if (raw_id.type == slot_function::SECONDARY_HAND) {
+	else if (arm_back_slot.type == slot_function::SECONDARY_ARM_BACK) {
 		return 1;
 	}
 	else {

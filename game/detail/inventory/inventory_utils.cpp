@@ -39,7 +39,7 @@ bool capability_comparison::is_authorized(const const_entity_handle h) const {
 
 capability_comparison match_transfer_capabilities(
 	const cosmos& cosm,
-	item_slot_transfer_request_data r
+	item_slot_transfer_request r
 ) {
 	const auto transferred_item = cosm[r.item];
 	// const auto target_slot = cosm[r.target_slot];
@@ -84,7 +84,7 @@ capability_comparison match_transfer_capabilities(
 
 item_transfer_result query_transfer_result(
 	const cosmos& cosm,
-	const item_slot_transfer_request_data r	
+	const item_slot_transfer_request r	
 ) {
 	item_transfer_result output;
 	const auto transferred_item = cosm[r.item];
@@ -323,7 +323,7 @@ void drop_from_all_slots(const entity_handle c, const logic_step step) {
 
 	for (const auto& s : container.slots) {
 		for (const auto item : s.second.items_inside) {
-			perform_transfer( item_slot_transfer_request_data{ item, inventory_slot_id() }, step);
+			perform_transfer( item_slot_transfer_request{ item, inventory_slot_id() }, step);
 		}
 	}
 }
@@ -380,11 +380,11 @@ components::transform sum_attachment_offsets(const const_logic_step step, const 
 	return total;
 }
 
-augs::constant_size_vector<item_slot_transfer_request_data, 4> swap_slots_for_items(
+augs::constant_size_vector<item_slot_transfer_request, 4> swap_slots_for_items(
 	const const_entity_handle first_handle,
 	const const_entity_handle second_handle
 ) {
-	augs::constant_size_vector<item_slot_transfer_request_data, 4> output;
+	augs::constant_size_vector<item_slot_transfer_request, 4> output;
 
 	const auto first_slot = first_handle.get_current_slot();
 	const auto second_slot = second_handle.get_current_slot();
@@ -402,7 +402,7 @@ augs::constant_size_vector<item_slot_transfer_request_data, 4> swap_slots_for_it
 }
 
 void perform_transfer(
-	const item_slot_transfer_request_data r, 
+	const item_slot_transfer_request r, 
 	const logic_step step
 ) {
 	auto& cosmos = step.cosm;
@@ -544,10 +544,13 @@ void perform_transfer(
 		descendant.get<components::fixtures>() = def;
 		descendant.get<components::fixtures>().set_owner_body(owner_body);
 		
-		descendant.get<components::rigid_body>().set_activated(should_body_persist);
+		auto& rigid_body = descendant.get<components::rigid_body>();
+		rigid_body.set_activated(should_body_persist);
 
 		if (should_body_persist) {
-			descendant.get<components::rigid_body>().set_transform(target_transform);
+			rigid_body.set_transform(target_transform);
+			rigid_body.set_velocity({ 0.f, 0.f });
+			rigid_body.set_angular_velocity(0.f);
 		}
 
 		if (slot_requests_connection_of_bodies) {

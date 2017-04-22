@@ -12,7 +12,7 @@ struct wielding_result {
 	};
 
 	type result = type::THE_SAME_SETUP;
-	augs::constant_size_vector<item_slot_transfer_request_data, 4> transfers;
+	augs::constant_size_vector<item_slot_transfer_request, 4> transfers;
 
 	void apply(const logic_step);
 

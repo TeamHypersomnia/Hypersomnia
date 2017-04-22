@@ -73,7 +73,7 @@ void item_system::handle_trigger_confirmations_as_pick_requests(const logic_step
 					const bool can_pick_already = item_slot_transfers->pickup_timeout.try_to_fire_and_reset(cosmos.get_timestamp(), delta);
 
 					if (can_pick_already) {
-						const item_slot_transfer_request_data request{ item_entity, pickup_slot };
+						const item_slot_transfer_request request{ item_entity, pickup_slot };
 						perform_transfer(request, step);
 					}
 				}
@@ -94,9 +94,13 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 			if (r.intent == intent_type::THROW) {
 				const auto subject = cosmos[r.subject];
 
-				r.intent = intent_type::THROW_PRIMARY_ITEM;
-
-				if (subject.get_if_any_item_in_hand_no(0).dead()) {
+				if (subject.get_if_any_item_in_hand_no(0).alive()) {
+					r.intent = intent_type::THROW_PRIMARY_ITEM;
+				}
+				else if (
+					subject.get_if_any_item_in_hand_no(0).dead()
+					&& subject.get_if_any_item_in_hand_no(1).alive()
+				) {
 					r.intent = intent_type::THROW_SECONDARY_ITEM;
 				}
 			}

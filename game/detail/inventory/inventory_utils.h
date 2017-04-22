@@ -9,7 +9,7 @@
 #include "game/transcendental/step_declaration.h"
 
 void perform_transfer(
-	const item_slot_transfer_request_data, 
+	const item_slot_transfer_request, 
 	const logic_step step
 );
 
@@ -20,7 +20,7 @@ void perform_transfers(const C requests, const logic_step step) {
 	}
 }
 
-augs::constant_size_vector<item_slot_transfer_request_data, 4> swap_slots_for_items(
+augs::constant_size_vector<item_slot_transfer_request, 4> swap_slots_for_items(
 	const const_entity_handle first, 
 	const const_entity_handle second 
 );
@@ -74,12 +74,12 @@ struct capability_comparison {
 
 capability_comparison match_transfer_capabilities(
 	const cosmos&,
-	item_slot_transfer_request_data
+	item_slot_transfer_request
 );
 
 item_transfer_result query_transfer_result(
 	const cosmos&, 
-	const item_slot_transfer_request_data
+	const item_slot_transfer_request
 );
 
 slot_function get_slot_with_compatible_category(const_entity_handle item, const_entity_handle container);

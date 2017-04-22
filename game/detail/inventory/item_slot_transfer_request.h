@@ -6,8 +6,8 @@
 #include "augs/templates/memcpy_safety.h"
 
 template <class id_type>
-struct basic_item_slot_transfer_request_data {
-	// GEN INTROSPECTOR struct basic_item_slot_transfer_request_data class id_type
+struct basic_item_slot_transfer_request {
+	// GEN INTROSPECTOR struct basic_item_slot_transfer_request class id_type
 	id_type item;
 	basic_inventory_slot_id<id_type> target_slot;
 
@@ -17,9 +17,9 @@ struct basic_item_slot_transfer_request_data {
 	std::array<padding_byte, 3> pad;
 	// END GEN INTROSPECTOR
 
-	bool operator==(const basic_item_slot_transfer_request_data& b) const {
+	bool operator==(const basic_item_slot_transfer_request& b) const {
 		return trivial_compare(*this, b);
 	}
 };
 
-typedef basic_item_slot_transfer_request_data<entity_id> item_slot_transfer_request_data;
+typedef basic_item_slot_transfer_request<entity_id> item_slot_transfer_request;

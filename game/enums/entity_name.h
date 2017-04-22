@@ -26,7 +26,9 @@ enum class entity_name {
 	FORCE_GRENADE,
 	PED_GRENADE,
 	INTERFERENCE_GRENADE,
-	AMPLIFIER_ARM
+	AMPLIFIER_ARM,
+	STANDARD_ARM_BACK,
+	STANDARD_ARM_FRONT
 };
 
 void name_entity(const entity_handle, const entity_name);

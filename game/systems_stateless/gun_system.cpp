@@ -70,7 +70,7 @@ void components::gun::load_next_round(
 	}
 
 	if (take_next_catridge_for_chamber_from.size() > 0) {
-		const item_slot_transfer_request_data into_chamber_transfer{ 
+		const item_slot_transfer_request into_chamber_transfer{ 
 			take_next_catridge_for_chamber_from[take_next_catridge_for_chamber_from.size() - 1], 
 			it[slot_function::GUN_CHAMBER], 
 			1, 

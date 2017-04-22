@@ -16,6 +16,7 @@ public:
 	typedef std::array<entity_id, hand_count> hand_selections_array;
 
 	entity_handle_type get_owning_transfer_capability() const;
+	bool owning_transfer_capability_alive_and_same_as_of(const entity_id) const;
 
 	inventory_slot_handle_type determine_holstering_slot_for(const entity_handle_type holstered_item) const;
 	inventory_slot_handle_type determine_pickup_target_slot_for(const entity_handle_type picked_item) const;

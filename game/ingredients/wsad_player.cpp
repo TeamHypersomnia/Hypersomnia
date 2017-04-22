@@ -25,6 +25,7 @@
 
 #include "game/enums/filters.h"
 #include "game/enums/party_category.h"
+#include "game/detail/inventory/inventory_utils.h"
 
 namespace ingredients {
 	void add_character_movement(const entity_handle e) {
@@ -212,6 +213,8 @@ namespace prefabs {
 
 		ingredients::add_character_head_inventory(step, character);
 
+
+
 		{
 			particle_effect_input effect;
 			
@@ -231,6 +234,31 @@ namespace prefabs {
 
 		character.add_standard_components(step);
 
+		{
+			const auto primary_arm = prefabs::create_sample_complete_arm(
+				step,
+				vec2(50, 20),
+				vec2(70, 20)
+			);
+
+			item_slot_transfer_request r;
+			r.item = primary_arm;
+			r.target_slot = character[slot_function::PRIMARY_ARM_BACK];
+			perform_transfer(r, step);
+		}
+
+		{
+			const auto secondary_arm = prefabs::create_sample_complete_arm(
+				step,
+				vec2(50, 20),
+				vec2(70, 20)
+			);
+
+			item_slot_transfer_request r;
+			r.item = secondary_arm;
+			r.target_slot = character[slot_function::SECONDARY_ARM_BACK];
+			perform_transfer(r, step);
+		}
 		// LOG("Character mass: %x", character.get<components::rigid_body>().get_mass());
 		return character;
 	}

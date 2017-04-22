@@ -23,12 +23,12 @@ struct basic_cosmic_entropy {
 	// GEN INTROSPECTOR struct basic_cosmic_entropy class key
 	augs::container_with_small_size<std::unordered_map<key, assets::spell_id>, unsigned char> cast_spells;
 	augs::container_with_small_size<std::unordered_map<key, key_and_mouse_intent_vector>, unsigned char> intents_per_entity;
-	augs::container_with_small_size<std::vector<basic_item_slot_transfer_request_data<key>>, unsigned short> transfer_requests;
+	augs::container_with_small_size<std::vector<basic_item_slot_transfer_request<key>>, unsigned short> transfer_requests;
 	// END GEN INTROSPECTOR
 
 	void override_transfers_leaving_other_entities(
 		const cosmos&,
-		std::vector<basic_item_slot_transfer_request_data<key>> new_transfers
+		std::vector<basic_item_slot_transfer_request<key>> new_transfers
 	);
 
 	size_t length() const;

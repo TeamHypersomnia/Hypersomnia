@@ -17,6 +17,7 @@
 #include "game/components/rigid_body_component.h"
 #include "game/components/transform_component.h"
 
+#include "game/components/item_component.h"
 #include "game/components/trigger_collision_detector_component.h"
 #include "game/components/trigger_query_detector_component.h"
 #include "game/transcendental/entity_handle.h"
@@ -94,13 +95,38 @@ void trigger_detector_system::send_trigger_confirmations(const logic_step step) 
 			continue;
 		}
 
-		const auto* const collision_detector = cosmos[c.subject].find<components::trigger_collision_detector>();
-		const auto* const trigger = cosmos[c.collider].find<components::trigger>();
+		entity_id actual_detector = c.subject;
 
-		if (collision_detector && trigger && trigger->react_to_collision_detectors && collision_detector->detection_intent_enabled
-			) {
+		const auto subject = cosmos[c.subject];
+
+		const auto* collision_detector = subject.find<components::trigger_collision_detector>();
+		const auto* const trigger = cosmos[c.collider].find<components::trigger>();
+		const auto* const maybe_item = subject.find<components::item>();
+
+		if (collision_detector == nullptr) {
+			const bool is_it_arm_touching =
+				maybe_item != nullptr
+				&& (
+					maybe_item->categories_for_slot_compatibility.test(item_category::ARM_BACK)
+					|| maybe_item->categories_for_slot_compatibility.test(item_category::ARM_FRONT)
+				)
+			;
+
+			if (is_it_arm_touching) {
+				const auto capability = subject.get_owning_transfer_capability();
+				actual_detector = capability;
+				collision_detector = capability.find<components::trigger_collision_detector>();
+			}
+		}
+
+		if (
+			collision_detector != nullptr 
+			&& trigger != nullptr
+			&& trigger->react_to_collision_detectors 
+			&& collision_detector->detection_intent_enabled
+		) {
 			messages::trigger_hit_confirmation_message confirmation;
-			confirmation.detector_body = c.subject;
+			confirmation.detector_body = actual_detector;
 			confirmation.trigger = c.collider;
 			step.transient.messages.post(confirmation);
 		}

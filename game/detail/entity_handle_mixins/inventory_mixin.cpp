@@ -34,19 +34,55 @@ D basic_inventory_mixin<C, D>::get_owning_transfer_capability() const {
 }
 
 template <bool C, class D>
+bool basic_inventory_mixin<C, D>::owning_transfer_capability_alive_and_same_as_of(const entity_id b) const {
+	const auto& self = *static_cast<const D*>(this);
+	auto& cosmos = self.get_cosmos();
+	const auto this_capability = get_owning_transfer_capability();
+	const auto b_capability = cosmos[b].get_owning_transfer_capability();
+	
+	return this_capability.alive() && b_capability.alive() && this_capability == b_capability;
+}
+
+template <bool C, class D>
 typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory_mixin<C, D>::get_primary_hand() const {
 	const auto& self = *static_cast<const D*>(this);
+	auto& cosmos = self.get_cosmos();
 	ensure(self.has<components::sentience>());
 
-	return self[slot_function::PRIMARY_HAND];
+	inventory_slot_id hand;
+
+	const auto arm_back = self[slot_function::PRIMARY_ARM_BACK];
+
+	if (arm_back.has_items()) {
+		const auto arm_front = cosmos[arm_back.get_items_inside()[0]][slot_function::ARM_FRONT];
+
+		if (arm_front.has_items()) {
+			hand = cosmos[arm_front.get_items_inside()[0]][slot_function::WIELDED_ITEM];
+		}
+	}
+
+	return cosmos[hand];
 }
 
 template <bool C, class D>
 typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory_mixin<C, D>::get_secondary_hand() const {
 	const auto& self = *static_cast<const D*>(this);
+	auto& cosmos = self.get_cosmos();
 	ensure(self.has<components::sentience>());
 
-	return self[slot_function::SECONDARY_HAND];
+	inventory_slot_id hand;
+
+	const auto arm_back = self[slot_function::SECONDARY_ARM_BACK];
+
+	if (arm_back.has_items()) {
+		const auto arm_front = cosmos[arm_back.get_items_inside()[0]][slot_function::ARM_FRONT];
+
+		if (arm_front.has_items()) {
+			hand = cosmos[arm_front.get_items_inside()[0]][slot_function::WIELDED_ITEM];
+		}
+	}
+
+	return cosmos[hand];
 }
 
 template <bool C, class D>
@@ -274,8 +310,8 @@ wielding_result basic_inventory_mixin<C, D>::make_wielding_transfers_for(const h
 	wielding_result result;
 	result.result = wielding_result::type::THE_SAME_SETUP;
 
-	augs::constant_size_vector<item_slot_transfer_request_data, hand_count> holsters;
-	augs::constant_size_vector<item_slot_transfer_request_data, hand_count> draws;
+	augs::constant_size_vector<item_slot_transfer_request, hand_count> holsters;
+	augs::constant_size_vector<item_slot_transfer_request, hand_count> draws;
 
 	for (size_t i = 0; i < selections.size(); ++i) {
 		const auto hand = self.get_hand_no(i);

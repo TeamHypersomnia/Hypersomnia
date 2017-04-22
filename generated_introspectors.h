@@ -54,7 +54,7 @@ struct basic_inventory_slot_id;
 struct inventory_item_address;
 struct inventory_traversal;
 template <class id_type>
-struct basic_item_slot_transfer_request_data;
+struct basic_item_slot_transfer_request;
 struct general_particle;
 struct animated_particle;
 struct homing_animated_particle;
@@ -1678,7 +1678,7 @@ namespace augs {
 
 		template <class F, class id_type, class... Instances>
 		static void introspect_body(
-			const basic_item_slot_transfer_request_data<id_type>* const,
+			const basic_item_slot_transfer_request<id_type>* const,
 			F f,
 			Instances&&... _t_
 		) {

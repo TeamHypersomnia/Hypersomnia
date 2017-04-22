@@ -12,6 +12,9 @@ enum class item_category {
 	MAGAZINE,
 	SHOT_CHARGE,
 
+	ARM_BACK,
+	ARM_FRONT,
+
 	COUNT
 };
 
