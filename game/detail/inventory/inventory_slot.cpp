@@ -10,8 +10,12 @@ item_category_bitset inventory_slot::get_allowed_categories() const {
 	return { category_allowed };
 }
 
+bool inventory_slot::makes_physical_connection() const {
+	return physical_behaviour != slot_physical_behaviour::DEACTIVATE_BODIES;
+}
+
 bool inventory_slot::has_unlimited_space() const {
-	return is_physical_attachment_slot;
+	return physical_behaviour != slot_physical_behaviour::DEACTIVATE_BODIES;
 }
 
 bool inventory_slot::is_category_compatible_with(const const_entity_handle id) const {

@@ -46,7 +46,7 @@ public:
 	augs::constant_size_vector<entity_id, 2> get_wielded_guns() const;
 	augs::constant_size_vector<entity_id, 2> get_wielded_items() const;
 
-	inventory_item_address get_address_from_root() const;
+	inventory_item_address get_address_from_root(const entity_id until = entity_id()) const;
 
 	wielding_result make_wielding_transfers_for(const hand_selections_array) const;
 
@@ -80,7 +80,7 @@ private:
 					continue;
 				}
 				else if (slot_callback_result == recursive_callback_result::CONTINUE_AND_RECURSE) {
-					const bool is_this_slot_physical = does_this_item_remain_physical && s.second.is_physical_attachment_slot;
+					const bool is_this_slot_physical = does_this_item_remain_physical && s.second.makes_physical_connection();
 
 					for (const auto& id : s.second.items_inside) {
 						const auto child_item_handle = cosm[id];

@@ -282,7 +282,7 @@ void item_button::draw_proc(
 				const auto iteration_lambda = [&](const const_entity_handle desc, const inventory_traversal& trav) {
 					const auto parent_slot = cosmos[desc.get<components::item>().current_slot];
 
-					if (parent_slot.should_item_inside_keep_physical_body(item)) {
+					if (parent_slot.is_physically_connected_until(item)) {
 						auto attachment_sprite = desc.get<components::sprite>();
 
 						attachment_sprite.flip_horizontally = flip_horizontally;

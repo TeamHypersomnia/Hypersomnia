@@ -55,8 +55,8 @@ bool basic_inventory_slot_handle<C>::is_empty_slot() const {
 }
 
 template <bool C>
-bool basic_inventory_slot_handle<C>::should_item_inside_keep_physical_body(const entity_id until_parent) const {
-	const bool should_item_here_keep_physical_body = get().is_physical_attachment_slot;
+bool basic_inventory_slot_handle<C>::is_physically_connected_until(const entity_id until_parent) const {
+	const bool should_item_here_keep_physical_body = get().makes_physical_connection();
 
 	if (get_container() == until_parent) {
 		return should_item_here_keep_physical_body;
@@ -71,7 +71,7 @@ bool basic_inventory_slot_handle<C>::should_item_inside_keep_physical_body(const
 		const auto slot = owner[maybe_item->current_slot];
 
 		if (slot.alive()) {
-			return std::min(should_item_here_keep_physical_body, slot.should_item_inside_keep_physical_body(until_parent));
+			return std::min(should_item_here_keep_physical_body, slot.is_physically_connected_until(until_parent));
 		}
 	}
 
@@ -80,8 +80,6 @@ bool basic_inventory_slot_handle<C>::should_item_inside_keep_physical_body(const
 
 template <bool C>
 float basic_inventory_slot_handle<C>::calculate_density_multiplier_due_to_being_attached() const {
-	ensure(get().is_physical_attachment_slot);
-	
 	const float density_multiplier = get().attachment_density_multiplier;
 
 	const auto* const maybe_item = get_container().find<components::item>();
@@ -103,6 +101,21 @@ typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot
 
 	if (slot.alive()) {
 		return slot.get_root_container();
+	}
+
+	return get_container();
+}
+
+template <bool C>
+typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot_handle<C>::get_first_ancestor_with_body_connection() const {
+	const auto slot = get_container().get_current_slot();
+
+	if (slot.alive()) {
+		if (slot->physical_behaviour == slot_physical_behaviour::CONNECT_BODIES_BY_JOINT) {
+			return get_container();
+		}
+
+		return slot.get_first_ancestor_with_body_connection();
 	}
 
 	return get_container();

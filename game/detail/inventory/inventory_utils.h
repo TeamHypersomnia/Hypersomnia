@@ -32,7 +32,7 @@ components::transform get_attachment_offset(
 	const components::transform container_transform,
 	const const_entity_handle item
 ) {
-	ensure(slot.is_physical_attachment_slot);
+	ensure(slot.makes_physical_connection());
 
 	components::transform total;
 

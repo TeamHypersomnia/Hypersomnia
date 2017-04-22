@@ -115,7 +115,7 @@ typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory
 }
 
 template <bool C, class D>
-inventory_item_address basic_inventory_mixin<C, D>::get_address_from_root() const {
+inventory_item_address basic_inventory_mixin<C, D>::get_address_from_root(const entity_id until) const {
 	const auto& self = *static_cast<const D*>(this);
 	auto& cosmos = self.get_cosmos();
 
@@ -125,6 +125,10 @@ inventory_item_address basic_inventory_mixin<C, D>::get_address_from_root() cons
 	while (cosmos[current_slot].alive()) {
 		output.root_container = current_slot.container_entity;
 		output.directions.push_back(current_slot.type);
+
+		if (until == current_slot.container_entity) {
+			break;
+		}
 
 		current_slot = cosmos[current_slot.container_entity].get_current_slot();
 	}

@@ -16,6 +16,8 @@ namespace components {
 		transform(float x, float y, float rotation = 0.0f);
 		transform(vec2 pos = vec2(), float rotation = 0.0f);
 
+		transform operator*(const transform& b) const;
+
 		transform operator+(const transform& b) const;
 		transform operator-(const transform& b) const;
 		transform& operator+=(const transform& b);

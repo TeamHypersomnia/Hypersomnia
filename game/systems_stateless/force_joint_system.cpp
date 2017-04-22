@@ -38,7 +38,7 @@ void force_joint_system::apply_forces_towards_target_entities(const logic_step s
 			}
 
 			const auto chased_entity_transform = chased_entity.get_logic_transform();
-			const auto chased_transform = chased_entity_transform + force_joint.chased_entity_offset;
+			const auto chased_transform = chased_entity_transform * force_joint.chased_entity_offset;
 
 			auto direction = chased_transform.pos - rigid_body.get_position();
 			const auto distance = direction.length();

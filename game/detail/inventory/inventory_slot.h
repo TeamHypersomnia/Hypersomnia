@@ -9,6 +9,7 @@
 #include "padding_byte.h"
 
 #include "game/enums/item_category.h"
+#include "game/enums/slot_physical_behaviour.h"
 
 class cosmos;
 
@@ -19,7 +20,7 @@ struct inventory_slot {
 	bool items_need_mounting = false;
 	bool only_last_inserted_is_movable = false;
 
-	bool is_physical_attachment_slot = false;
+	slot_physical_behaviour physical_behaviour = slot_physical_behaviour::DEACTIVATE_BODIES;
 	bool always_allow_exactly_one_item = false;
 
 	float montage_time_multiplier = 1.f;
@@ -37,5 +38,7 @@ struct inventory_slot {
 	item_category_bitset get_allowed_categories() const;
 
 	bool has_unlimited_space() const;
+	bool makes_physical_connection() const;
+
 	bool is_category_compatible_with(const_entity_handle item) const;
 };

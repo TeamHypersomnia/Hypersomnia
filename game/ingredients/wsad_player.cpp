@@ -184,7 +184,7 @@ namespace ingredients {
 
 		rotation_copying.target = crosshair_entity;
 		rotation_copying.look_mode = components::rotation_copying::look_type::POSITION;
-		rotation_copying.colinearize_item_in_hand = true;
+		rotation_copying.colinearize_item_in_hand = false;
 
 		add_wsad_character_setup_movement(e);
 	}
@@ -263,7 +263,8 @@ namespace prefabs {
 		}
 
 		{
-			auto& force_joint = recoil += components::force_joint();
+			//auto& force_joint = recoil += components::force_joint();
+			components::force_joint force_joint;
 			zero_target += components::transform();
 			components::rigid_body body;
 			components::fixtures colliders;

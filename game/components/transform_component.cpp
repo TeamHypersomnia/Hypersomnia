@@ -7,6 +7,13 @@ namespace components {
 	transform::transform(float x, float y, float rotation) : pos(vec2(x, y)), rotation(rotation) {}
 	transform::transform(vec2 pos, float rotation) : pos(pos), rotation(rotation) {}
 
+	transform transform::operator*(const transform& offset) const {
+		return {
+			pos + vec2(offset.pos).rotate(rotation, vec2()),
+			rotation + offset.rotation
+		};
+	}
+
 	transform transform::operator+(const transform& b) const {
 		transform out;
 		out.pos = pos + b.pos;

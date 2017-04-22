@@ -19,11 +19,10 @@ namespace ingredients {
 		const auto bbox = e.get_aabb(step.input.metas_of_assets, components::transform{}).get_size();
 
 		inventory_slot slot_def;
-		slot_def.is_physical_attachment_slot = true;
+		slot_def.physical_behaviour = slot_physical_behaviour::CONNECT_BODIES_BY_JOINT;
 		slot_def.always_allow_exactly_one_item = true;
 		slot_def.attachment_sticking_mode = rectangle_sticking::RIGHT;
 		slot_def.attachment_offset.pos = vec2(bbox.x/2 - 3, 20);
-		slot_def.attachment_density_multiplier = 0.02f;
 
 		container.slots[slot_function::PRIMARY_HAND] = slot_def;
 		
@@ -31,6 +30,7 @@ namespace ingredients {
 		container.slots[slot_function::SECONDARY_HAND] = slot_def;
 
 		slot_def.category_allowed = item_category::SHOULDER_CONTAINER;
+		slot_def.physical_behaviour = slot_physical_behaviour::MAKE_BODIES_FIXTURES;
 		slot_def.attachment_sticking_mode = rectangle_sticking::LEFT;
 		slot_def.attachment_offset.pos = vec2(-bbox.x/2 + 4, 0);
 		slot_def.attachment_offset.rotation = -90;

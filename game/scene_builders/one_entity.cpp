@@ -41,11 +41,11 @@ namespace scene_builders {
 	void one_entity::populate(const logic_step step) {
 		auto& world = step.cosm;
 
-		prefabs::create_force_grenade(step, { 254, 611 });
-		prefabs::create_force_grenade(step, { 254, 711 });
-		prefabs::create_force_grenade(step, { 254, 811 });
+		//prefabs::create_force_grenade(step, { 254, 611 });
+		//prefabs::create_force_grenade(step, { 254, 711 });
+		//prefabs::create_force_grenade(step, { 254, 811 });
 
-		const int num_characters = 2;
+		const int num_characters = 1;
 
 		std::vector<entity_id> new_characters;
 		new_characters.resize(num_characters);
@@ -91,8 +91,8 @@ namespace scene_builders {
 			prefabs::create_sample_magazine(step, vec2(100, -650), false ? "10" : "0.3",
 				prefabs::create_cyan_charge(step, vec2(0, 0), false ? 1000 : 5)));
 		
-		prefabs::create_kek9(step, vec2(300, -500 + 50));
-
+		//prefabs::create_kek9(step, vec2(300, -500 + 50));
+		//
 		prefabs::create_kek9(step, vec2(100, -500),
 			prefabs::create_small_magazine(step, vec2(100, -650), "0.4",
 				prefabs::create_pink_charge(step, vec2(0, 0), 30)));
@@ -102,11 +102,11 @@ namespace scene_builders {
 		const auto rifle = prefabs::create_sample_rifle(step, vec2(100, -500),
 			prefabs::create_sample_magazine(step, vec2(100, -650), false ? "10" : "0.3",
 				prefabs::create_cyan_charge(step, vec2(0, 0), false ? 1000 : 30)));
-
-
-		prefabs::create_submachine(step, vec2(100, -700),
-			prefabs::create_sample_magazine(step, vec2(100, -650), true ? "10" : "0.3",
-				prefabs::create_cyan_charge(step, vec2(0, 0), true ? 1000 : 30)));
+		//
+		//
+		//prefabs::create_submachine(step, vec2(100, -700),
+		//	prefabs::create_sample_magazine(step, vec2(100, -650), true ? "10" : "0.3",
+		//		prefabs::create_cyan_charge(step, vec2(0, 0), true ? 1000 : 30)));
 
 		characters.assign(new_characters.begin(), new_characters.end());
 

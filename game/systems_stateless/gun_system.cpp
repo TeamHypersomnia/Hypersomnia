@@ -106,11 +106,11 @@ void gun_system::consume_gun_intents(const logic_step step) {
 }
 
 vec2 components::gun::calculate_muzzle_position(const components::transform gun_transform) const {
-	return gun_transform.pos + vec2(bullet_spawn_offset).rotate(gun_transform.rotation, vec2());
+	return (gun_transform * components::transform(bullet_spawn_offset)).pos;
 }
 
 vec2  components::gun::calculate_barrel_center(const components::transform gun_transform) const {
-	return gun_transform.pos + vec2(0, bullet_spawn_offset.y).rotate(gun_transform.rotation, vec2());
+	return (gun_transform * components::transform(vec2(0, bullet_spawn_offset.y))).pos;
 }
 
 void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
@@ -293,9 +293,11 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				}
 
 				if (total_recoil_amount > 0.f) {
-					const auto owning_capability = it.get_owning_transfer_capability();
-					const auto owning_crosshair_recoil = owning_capability[child_entity_name::CHARACTER_CROSSHAIR][child_entity_name::CROSSHAIR_RECOIL_BODY];
-					gun.recoil.shoot_and_apply_impulse(owning_crosshair_recoil, total_recoil_amount / 100.f, true);
+					//const auto owning_capability = it.get_owning_transfer_capability();
+					//const auto owning_crosshair_recoil = owning_capability[child_entity_name::CHARACTER_CROSSHAIR][child_entity_name::CROSSHAIR_RECOIL_BODY];
+					//gun.recoil.shoot_and_apply_impulse(owning_crosshair_recoil, total_recoil_amount / 100.f, true);
+					auto& rigid_body = it.get<components::rigid_body>();
+					rigid_body.apply_impulse(vec2().set_from_degrees(muzzle_transform.rotation) * (-total_recoil_amount) * 200.f * rigid_body.get_mass());
 
 					gun.current_heat = std::min(gun.maximum_heat, gun.current_heat + gun.gunshot_adds_heat);
 				}

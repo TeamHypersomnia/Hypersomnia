@@ -46,6 +46,9 @@ public:
 
 	entity_handle_type get_item_if_any() const;
 	entity_handle_type get_container() const;
+
+	entity_handle_type get_first_ancestor_with_body_connection() const;
+
 	entity_handle_type get_root_container() const;
 	entity_handle_type get_root_container_until(const entity_id container_entity) const;
 
@@ -66,7 +69,7 @@ public:
 	unsigned calculate_local_space_available() const;
 	unsigned calculate_real_space_available() const;
 
-	bool should_item_inside_keep_physical_body(const entity_id until_parent = entity_id()) const;
+	bool is_physically_connected_until(const entity_id until_parent = entity_id()) const;
 
 	inventory_slot_id get_id() const;
 	operator inventory_slot_id() const;

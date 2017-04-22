@@ -421,6 +421,7 @@
     <ClCompile Include="game\enums\attitude_type.cpp" />
     <ClCompile Include="game\enums\item_category.cpp" />
     <ClCompile Include="game\enums\item_transfer_result_type.cpp" />
+    <ClCompile Include="game\enums\slot_physical_behaviour.cpp" />
     <ClCompile Include="game\ingredients\grenades.cpp" />
     <ClCompile Include="game\resource_setups\standard_animations.cpp" />
     <ClCompile Include="game\resource_setups\standard_atlas.cpp" />

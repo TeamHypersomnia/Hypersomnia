@@ -4,6 +4,7 @@
 #include "game/components/driver_component.h"
 #include "game/components/special_physics_component.h"
 #include "game/components/flags_component.h"
+#include "game/components/damage_component.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
@@ -23,8 +24,12 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 	const auto delta = cosm.get_fixed_delta();
 	const auto now = cosm.get_timestamp();
 	const auto si = cosmos.get_si();
+	
+	std::array<messages::collision_message, 2> msgs;
 
 	for (int i = 0; i < 2; ++i) {
+		auto& msg = msgs[i];
+
 		const auto* fix_a = contact->GetFixtureA();
 		const auto* fix_b = contact->GetFixtureB();
 
@@ -45,8 +50,6 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 
 		const auto* const body_a = fix_a->GetBody();
 		const auto* const body_b = fix_b->GetBody();
-
-		messages::collision_message msg;
 
 		msg.one_is_sensor = fix_a->IsSensor() || fix_b->IsSensor();
 		msg.type = messages::collision_message::event_type::BEGIN_CONTACT;
@@ -131,13 +134,26 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 			}
 		}
 
+		const auto* const damage = subject.get_owner_body().find<components::damage>();
+		const bool bullet_colliding_with_sender =
+			damage != nullptr
+			&& cosmos[damage->sender].get_owning_transfer_capability() == collider.get_owner_body()
+		;
+
+		if (bullet_colliding_with_sender) {
+			contact->SetEnabled(false);
+			return;
+		}
+
 		msg.point = worldManifold.points[0];
 		msg.point = si.get_pixels(msg.point);
 
 		msg.subject_impact_velocity = body_a->GetLinearVelocityFromWorldPoint(worldManifold.points[0]);
 		msg.collider_impact_velocity = body_b->GetLinearVelocityFromWorldPoint(worldManifold.points[0]);
-		sys.accumulated_messages.push_back(msg);
 	}
+
+	sys.accumulated_messages.push_back(msgs[0]);
+	sys.accumulated_messages.push_back(msgs[1]);
 }
 
 void physics_system::contact_listener::EndContact(b2Contact* contact) {
@@ -211,7 +227,7 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 	const auto delta = cosm.get_fixed_delta();
 	const auto now = cosm.get_timestamp();
 
-	messages::collision_message msgs[2];
+	std::array<messages::collision_message, 2> msgs;
 
 	for (int i = 0; i < 2; ++i) {
 		const auto* fix_a = contact->GetFixtureA();
@@ -266,9 +282,13 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 
 		const bool dropped_item_colliding_with_container =
 			collider_special_physics.dropped_or_created_cooldown.lasts(now, delta)
-			&& collider_special_physics.during_cooldown_ignore_collision_with == subject_owner_body;
+			&& collider_special_physics.during_cooldown_ignore_collision_with == subject_owner_body
+		;
 
-		const bool colliding_with_owning_car = driver && driver->owned_vehicle == collider_owner_body;
+		const bool colliding_with_owning_car = 
+			driver 
+			&& driver->owned_vehicle == collider_owner_body
+		;
 
 		// if (dropped_item_colliding_with_container) {
 		// 	LOG(
@@ -280,6 +300,20 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 			dropped_item_colliding_with_container
 			|| colliding_with_owning_car
 		) {
+			contact->SetEnabled(false);
+			return;
+		}
+		
+		const auto subject_owning_capability = subject_owner_body.get_owning_transfer_capability();
+		const auto collider_owning_capability = collider.get_owning_transfer_capability();
+
+		const bool fixtures_share_transfer_capability =
+			subject_owning_capability.alive()
+			&& collider_owning_capability.alive()
+			&& subject_owning_capability == collider_owning_capability
+		;
+
+		if (fixtures_share_transfer_capability) {
 			contact->SetEnabled(false);
 			return;
 		}

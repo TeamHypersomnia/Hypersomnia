@@ -1628,7 +1628,7 @@ namespace augs {
 			FIELD(items_need_mounting);
 			FIELD(only_last_inserted_is_movable);
 
-			FIELD(is_physical_attachment_slot);
+			FIELD(physical_behaviour);
 			FIELD(always_allow_exactly_one_item);
 
 			FIELD(montage_time_multiplier);
