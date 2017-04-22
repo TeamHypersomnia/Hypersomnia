@@ -20,6 +20,8 @@
 #include "augs/graphics/renderer.h"
 #include "augs/templates/container_templates.h"
 
+#define PROTECT_MIGRATIONS 0
+
 bool physics_system::is_constructed_rigid_body(const const_entity_handle handle) const {
 	return handle.alive() && get_rigid_body_cache(handle).body != nullptr;
 }
@@ -282,8 +284,6 @@ void physics_system::step_and_set_new_transforms(const logic_step step) {
 	}
 }
 
-#define PROTECT_MIGRATIONS 0
-
 physics_system& physics_system::operator=(const physics_system& b) {
 	ray_casts_since_last_step = b.ray_casts_since_last_step;
 	accumulated_messages = b.accumulated_messages;
@@ -320,63 +320,74 @@ physics_system& physics_system::operator=(const physics_system& b) {
 		&already_migrated, 
 		&old_allocations,
 #endif
-		&pointer_migrations, &migrated_allocator](auto*& ptr, const unsigned num = 1) {
+		&pointer_migrations, 
+		&migrated_allocator
+	](
+		auto*& pointer_to_be_migrated, 
+		const unsigned count = 1
+	) {
 #if PROTECT_MIGRATIONS
-		ensure(already_migrated.find((void**)&ptr) == already_migrated.end());
-		already_migrated.insert((void**)&ptr);
+		ensure(already_migrated.find(reinterpret_cast<void**>(&pointer_to_be_migrated)) == already_migrated.end());
+		already_migrated.insert(reinterpret_cast<void**>(&pointer_to_be_migrated));
 #endif
 
-		typedef std::remove_pointer<std::decay_t<decltype(ptr)>>::type type;
+		typedef std::remove_pointer_t<std::decay_t<decltype(pointer_to_be_migrated)>> type;
+		
+		void* const void_ptr = reinterpret_cast<void*>(pointer_to_be_migrated);
 
-		if (ptr == nullptr) {
+		if (pointer_to_be_migrated == nullptr) {
 			return;
 		}
-		
-		void* const p = reinterpret_cast<void*>(ptr);
-		void* mig_p = nullptr;
 
-		const size_t s = sizeof(type) * num;
+		auto maybe_already_migrated = pointer_migrations.find(void_ptr);
 
-		auto maybe_migrated = pointer_migrations.find(p);
+		if (maybe_already_migrated == pointer_migrations.end()) {
+			const size_t bytes_count = sizeof(type) * count;
 
-		if (maybe_migrated == pointer_migrations.end()) {
-			mig_p = migrated_allocator.Allocate(s);
-			memcpy(mig_p, p, s);
+			void* const migrated_pointer = migrated_allocator.Allocate(bytes_count);
+			memcpy(migrated_pointer, void_ptr, bytes_count);
 
-			pointer_migrations.insert(std::make_pair(p, mig_p));
+			pointer_migrations.insert(std::make_pair(void_ptr, migrated_pointer));
 
 #if PROTECT_MIGRATIONS
-			if(old_allocations.find(p) != old_allocations.end())
+			if (old_allocations.find(p) != old_allocations.end()) {
 				old_allocations.erase(p);
+			}
 #endif
 		}
 		else {
-			mig_p = (*maybe_migrated).second;
+			pointer_to_be_migrated = reinterpret_cast<type*>((*maybe_already_migrated).second);
 		}
-
-		ptr = reinterpret_cast<type*>(mig_p);
 	};
 	
-	auto migrate_edge = [
+	auto migrate_contact_edge = [
 #if PROTECT_MIGRATIONS
 		&already_migrated,
 #endif
-		&pointer_migrations, &m_nodeAB_offset](b2ContactEdge*& ptr) {
+		&pointer_migrations, 
+		&m_nodeAB_offset
+	](b2ContactEdge*& edge_ptr) {
 #if PROTECT_MIGRATIONS
-		ensure(already_migrated.find((void**)&ptr) == already_migrated.end());
-		already_migrated.insert((void**)&ptr);
+		ensure(already_migrated.find((void**)&edge_ptr) == already_migrated.end());
+		already_migrated.insert((void**)&edge_ptr);
 #endif
-		if (ptr == nullptr) {
+		if (edge_ptr == nullptr) {
 			return;
 		}
 		else {
-			const size_t off = m_nodeAB_offset.at(ptr);
-			ensure(off == offsetof(b2Contact, m_nodeA) || off == offsetof(b2Contact, m_nodeB));
+			const size_t offset_to_edge_in_contact = m_nodeAB_offset.at(edge_ptr);
 
-			char* owner_contact = (char*)ptr - off;
+			ensure(
+				offset_to_edge_in_contact == offsetof(b2Contact, m_nodeA) 
+				|| offset_to_edge_in_contact == offsetof(b2Contact, m_nodeB)
+			);
+
+			char* const contact_that_owns_unmigrated_edge = reinterpret_cast<char*>(edge_ptr) - offset_to_edge_in_contact;
 			// here "at" requires that the contacts be already migrated
-			char* remapped_contact = (char*)pointer_migrations.at(owner_contact);
-			ptr = (b2ContactEdge*)(remapped_contact + off);
+			char* const migrated_contact = reinterpret_cast<char*>(pointer_migrations.at(contact_that_owns_unmigrated_edge));
+			char* const edge_from_migrated_contact = migrated_contact + offset_to_edge_in_contact;
+
+			edge_ptr = reinterpret_cast<b2ContactEdge*>(edge_from_migrated_contact);
 		}
 	};
 
@@ -387,7 +398,8 @@ physics_system& physics_system::operator=(const physics_system& b) {
 	//	migrate_pointer(proxy_tree.m_nodes[i].userData);
 	//}
 
-	// acquire contact edge offsets
+	// make a map of pointers to b2ContactEdges to their respective offsets in
+	// the b2Contacts that own them
 	for (b2Contact* c = b2.m_contactManager.m_contactList; c; c = c->m_next) {
 		m_nodeAB_offset.insert(std::make_pair(&c->m_nodeA, offsetof(b2Contact, m_nodeA)));
 		m_nodeAB_offset.insert(std::make_pair(&c->m_nodeB, offsetof(b2Contact, m_nodeB)));
@@ -411,11 +423,11 @@ physics_system& physics_system::operator=(const physics_system& b) {
 
 	// migrate contact edges of contacts
 	for (b2Contact* c = b2.m_contactManager.m_contactList; c; c = c->m_next) {
-		migrate_edge(c->m_nodeA.next);
-		migrate_edge(c->m_nodeA.prev);
+		migrate_contact_edge(c->m_nodeA.next);
+		migrate_contact_edge(c->m_nodeA.prev);
 
-		migrate_edge(c->m_nodeB.next);
-		migrate_edge(c->m_nodeB.prev);
+		migrate_contact_edge(c->m_nodeB.next);
+		migrate_contact_edge(c->m_nodeB.prev);
 	}
 
 	// migrate bodies and fixtures
@@ -432,7 +444,7 @@ physics_system& physics_system::operator=(const physics_system& b) {
 		migrate_pointer(b->m_jointList);
 		migrate_pointer(b->m_ownerFrictionGround);
 
-		migrate_edge(b->m_contactList);
+		migrate_contact_edge(b->m_contactList);
 		b->m_world = &b2;
 		
 		for (b2Fixture* f = b->m_fixtureList; f; f = f->m_next) {
