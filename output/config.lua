@@ -192,9 +192,9 @@ config_table = {
 	hotbar_secondary_selected_color = rgba(86, 156, 214, 255),
 
 	-- debug drawing settings
-	debug_drawing_enabled = 0,
+	debug_drawing_enabled = 1,
 	debug_draw_colinearization = 0,
-	debug_draw_forces = 0,
+	debug_draw_forces = 1,
 	debug_draw_friction_field_collisions_of_entering = 0,
 	debug_draw_explosion_forces = 0,
 	debug_draw_visibility = 0

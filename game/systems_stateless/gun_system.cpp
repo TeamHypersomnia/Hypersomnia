@@ -293,11 +293,17 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				}
 
 				if (total_recoil_amount > 0.f) {
-					//const auto owning_capability = it.get_owning_transfer_capability();
-					//const auto owning_crosshair_recoil = owning_capability[child_entity_name::CHARACTER_CROSSHAIR][child_entity_name::CROSSHAIR_RECOIL_BODY];
-					//gun.recoil.shoot_and_apply_impulse(owning_crosshair_recoil, total_recoil_amount / 100.f, true);
 					auto& rigid_body = it.get<components::rigid_body>();
-					rigid_body.apply_impulse(vec2().set_from_degrees(muzzle_transform.rotation) * (-total_recoil_amount) * 200.f * rigid_body.get_mass());
+					const auto recoil_dir = vec2().set_from_degrees(muzzle_transform.rotation);
+
+					rigid_body.apply_impulse(
+						recoil_dir * (-total_recoil_amount) * 200.f * rigid_body.get_mass()
+					);
+					
+					rigid_body.apply_impulse(
+						recoil_dir.perpendicular_cw() * (-total_recoil_amount) * 50.f * rigid_body.get_mass(),
+						-recoil_dir * 20.f
+					);
 
 					gun.current_heat = std::min(gun.maximum_heat, gun.current_heat + gun.gunshot_adds_heat);
 				}

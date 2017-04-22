@@ -263,8 +263,7 @@ namespace prefabs {
 		}
 
 		{
-			//auto& force_joint = recoil += components::force_joint();
-			components::force_joint force_joint;
+			auto& force_joint = recoil += components::force_joint();
 			zero_target += components::transform();
 			components::rigid_body body;
 			components::fixtures colliders;
