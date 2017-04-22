@@ -383,8 +383,8 @@ void physics_system::contact_listener::PostSolve(b2Contact* contact, const b2Con
 		msg.subject_impact_velocity = body_a->GetLinearVelocityFromWorldPoint(manifold.points[0]);
 		msg.collider_impact_velocity = body_b->GetLinearVelocityFromWorldPoint(manifold.points[0]);
 
-		msg.normal_impulse = si.get_pixels(impulse->normalImpulses[0]);
-		msg.tangent_impulse = si.get_pixels(impulse->tangentImpulses[0]);
+		msg.normal_impulse = si.get_pixels(maximum_of(std::to_array(impulse->normalImpulses)));
+		msg.tangent_impulse = si.get_pixels(maximum_of(std::to_array(impulse->tangentImpulses)));
 	}
 
 	sys.accumulated_messages.push_back(msgs[0]);

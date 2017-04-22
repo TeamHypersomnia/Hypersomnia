@@ -102,7 +102,7 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 			
 			const auto sound_id = step.input.metas_of_assets[subject_coll.material].collision_sound_matrix[collider_coll.material];
 
-			const auto impulse = (c.normal_impulse + c.tangent_impulse) * subject_coll.collision_sound_gain_mult * collider_coll.collision_sound_gain_mult;
+			const auto impulse = (c.normal_impulse) * subject_coll.collision_sound_gain_mult * collider_coll.collision_sound_gain_mult;
 
 			const auto gain_mult = (impulse / 15.f) * (impulse / 15.f);
 			const auto pitch_mult = impulse / 185.f;
