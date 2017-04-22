@@ -59,7 +59,7 @@ void viewing_session::configure_input() {
 	active_context.map_key_to_intent(key::G, intent_type::THROW);
 	active_context.map_key_to_intent(key::H, intent_type::HOLSTER);
 
-	active_context.map_key_to_intent(key::BACKSPACE, intent_type::SWITCH_LOOK);
+	active_context.map_key_to_intent(key::BACKSPACE, intent_type::CLEAR_DEBUG_LINES);
 
 	active_context.map_key_to_intent(key::LCTRL, intent_type::START_PICKING_UP_ITEMS);
 
@@ -135,7 +135,7 @@ void viewing_session::control_and_remove_fetched_intents(key_and_mouse_intent_ve
 	erase_remove(intents, [&](const key_and_mouse_intent& intent) {
 		bool fetch = false;
 
-		if (intent.intent == intent_type::SWITCH_LOOK) {
+		if (intent.intent == intent_type::CLEAR_DEBUG_LINES) {
 			augs::renderer::get_current().persistent_lines.lines.clear();
 		}
 

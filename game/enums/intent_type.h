@@ -74,6 +74,8 @@ enum class intent_type : unsigned char {
 	SPECIAL_ACTION_BUTTON_10,
 	SPECIAL_ACTION_BUTTON_11,
 	SPECIAL_ACTION_BUTTON_12,
+	
+	CLEAR_DEBUG_LINES,
 
 	COUNT
 };
