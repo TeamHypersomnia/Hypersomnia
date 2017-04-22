@@ -288,25 +288,27 @@ physics_system& physics_system::operator=(const physics_system& b) {
 	ray_casts_since_last_step = b.ray_casts_since_last_step;
 	accumulated_messages = b.accumulated_messages;
 
-	b2World& b2 = *b2world.get();
-	b2.~b2World();
-	new (&b2) b2World(b2Vec2(0.f, 0.f));
+	b2World& migrated_b2World = *b2world.get();
+	migrated_b2World.~b2World();
+	new (&migrated_b2World) b2World(b2Vec2(0.f, 0.f));
 
-	const b2World& b2c = *b.b2world.get();
+	const b2World& source_b2World = *b.b2world.get();
 
-	// do the initial trivial copy
-	b2 = b2c;
+	// do the initial trivial copy of all fields,
+	// we will migrate all pointers shortly
+	migrated_b2World = source_b2World;
 
-	// no need to install a new allocator since its operator= is a non-op
-	// new (&b2.m_blockAllocator) b2BlockAllocator;
+	// b2BlockAllocator has a null operator=, so the source_b2World preserves its default-constructed allocator
+	// even after the above copy. No need for further operations in this regard.
+	// new (&migrated_b2World.m_blockAllocator) b2BlockAllocator;
 
 	// reset the allocator pointer to the new one
-	b2.m_contactManager.m_allocator = &b2.m_blockAllocator;
+	migrated_b2World.m_contactManager.m_allocator = &migrated_b2World.m_blockAllocator;
 
 	std::unordered_map<void*, void*> pointer_migrations;
-	std::unordered_map<void*, size_t> m_nodeAB_offset;
+	std::unordered_map<void*, size_t> contact_edge_offsets_in_contacts;
 
-	b2BlockAllocator& migrated_allocator = b2.m_blockAllocator;
+	b2BlockAllocator& migrated_allocator = migrated_b2World.m_blockAllocator;
 
 #if PROTECT_MIGRATIONS
 	std::unordered_set<void**> already_migrated;
@@ -365,7 +367,7 @@ physics_system& physics_system::operator=(const physics_system& b) {
 		&already_migrated,
 #endif
 		&pointer_migrations, 
-		&m_nodeAB_offset
+		&contact_edge_offsets_in_contacts
 	](b2ContactEdge*& edge_ptr) {
 #if PROTECT_MIGRATIONS
 		ensure(already_migrated.find((void**)&edge_ptr) == already_migrated.end());
@@ -375,7 +377,7 @@ physics_system& physics_system::operator=(const physics_system& b) {
 			return;
 		}
 		else {
-			const size_t offset_to_edge_in_contact = m_nodeAB_offset.at(edge_ptr);
+			const size_t offset_to_edge_in_contact = contact_edge_offsets_in_contacts.at(edge_ptr);
 
 			ensure(
 				offset_to_edge_in_contact == offsetof(b2Contact, m_nodeA) 
@@ -392,7 +394,7 @@ physics_system& physics_system::operator=(const physics_system& b) {
 	};
 
 	// migrate proxy tree userdatas
-	auto& proxy_tree = b2.m_contactManager.m_broadPhase.m_tree;
+	auto& proxy_tree = migrated_b2World.m_contactManager.m_broadPhase.m_tree;
 
 	//for (size_t i = 0; i < proxy_tree.m_nodeCount; ++i) {
 	//	migrate_pointer(proxy_tree.m_nodes[i].userData);
@@ -400,15 +402,15 @@ physics_system& physics_system::operator=(const physics_system& b) {
 
 	// make a map of pointers to b2ContactEdges to their respective offsets in
 	// the b2Contacts that own them
-	for (b2Contact* c = b2.m_contactManager.m_contactList; c; c = c->m_next) {
-		m_nodeAB_offset.insert(std::make_pair(&c->m_nodeA, offsetof(b2Contact, m_nodeA)));
-		m_nodeAB_offset.insert(std::make_pair(&c->m_nodeB, offsetof(b2Contact, m_nodeB)));
+	for (b2Contact* c = migrated_b2World.m_contactManager.m_contactList; c; c = c->m_next) {
+		contact_edge_offsets_in_contacts.insert(std::make_pair(&c->m_nodeA, offsetof(b2Contact, m_nodeA)));
+		contact_edge_offsets_in_contacts.insert(std::make_pair(&c->m_nodeB, offsetof(b2Contact, m_nodeB)));
 	}
 
 	// migrate contact pointers
-	migrate_pointer(b2.m_contactManager.m_contactList);
+	migrate_pointer(migrated_b2World.m_contactManager.m_contactList);
 
-	for (b2Contact* c = b2.m_contactManager.m_contactList; c; c = c->m_next) {
+	for (b2Contact* c = migrated_b2World.m_contactManager.m_contactList; c; c = c->m_next) {
 		migrate_pointer(c->m_prev);
 		migrate_pointer(c->m_next);
 		migrate_pointer(c->m_fixtureA);
@@ -422,7 +424,7 @@ physics_system& physics_system::operator=(const physics_system& b) {
 	}
 
 	// migrate contact edges of contacts
-	for (b2Contact* c = b2.m_contactManager.m_contactList; c; c = c->m_next) {
+	for (b2Contact* c = migrated_b2World.m_contactManager.m_contactList; c; c = c->m_next) {
 		migrate_contact_edge(c->m_nodeA.next);
 		migrate_contact_edge(c->m_nodeA.prev);
 
@@ -431,9 +433,9 @@ physics_system& physics_system::operator=(const physics_system& b) {
 	}
 
 	// migrate bodies and fixtures
-	migrate_pointer(b2.m_bodyList);
+	migrate_pointer(migrated_b2World.m_bodyList);
 
-	for (b2Body* b = b2.m_bodyList; b; b = b->m_next)
+	for (b2Body* b = migrated_b2World.m_bodyList; b; b = b->m_next)
 	{
 		//auto rigid_body_cache_id = make_cache_id(b->m_userData);
 		//rigid_body_caches[rigid_body_cache_id].body = b;
@@ -445,7 +447,7 @@ physics_system& physics_system::operator=(const physics_system& b) {
 		migrate_pointer(b->m_ownerFrictionGround);
 
 		migrate_contact_edge(b->m_contactList);
-		b->m_world = &b2;
+		b->m_world = &migrated_b2World;
 		
 		for (b2Fixture* f = b->m_fixtureList; f; f = f->m_next) {
 			f->m_body = b;
@@ -494,7 +496,7 @@ physics_system& physics_system::operator=(const physics_system& b) {
 	// ensure that all allocations have been migrated
 #if PROTECT_MIGRATIONS
 	ensure(old_allocations.empty());
-	ensure_eq(b2c.m_blockAllocator.allocations.size(), migrated_allocator.allocations.size());
+	ensure_eq(source_b2World.m_blockAllocator.allocations.size(), migrated_allocator.allocations.size());
 #endif
 
 	return *this;
