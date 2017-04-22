@@ -29,11 +29,11 @@ namespace ingredients {
 	void add_standard_dynamic_body(const logic_step, entity_handle, const bool destructible = false);
 	void add_standard_static_body(const logic_step, entity_handle);
 
-	void add_wsad_character_physics(const logic_step, entity_handle);
-	void add_wsad_character_legs(const logic_step, entity_handle legs, entity_handle player);
-	void add_wsad_character(const logic_step, entity_handle, entity_handle crosshair_entity);
+	void add_character_head_physics(const logic_step, entity_handle);
+	void add_character_legs(const logic_step, entity_handle legs, entity_handle player);
+	void add_character(const logic_step, entity_handle, entity_handle crosshair_entity);
 
-	void add_character_inventory(const logic_step, entity_handle);
+	void add_character_head_inventory(const logic_step, entity_handle);
 	void add_backpack(entity_handle);
 
 	void add_default_gun_container(

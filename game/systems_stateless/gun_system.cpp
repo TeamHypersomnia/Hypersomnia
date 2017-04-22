@@ -126,7 +126,8 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 			const auto owning_capability = it.get_owning_transfer_capability();
 			
 			const auto owning_sentience = 
-				(owning_capability.alive() && owning_capability.has<components::sentience>()) ? owning_capability : cosmos[entity_id()];
+				(owning_capability.alive() && owning_capability.has<components::sentience>()) ? owning_capability : cosmos[entity_id()]
+			;
 
 			components::gun& gun = it.get<components::gun>();
 
@@ -175,6 +176,8 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 					auto& damage = round_entity.get<components::damage>();
 					damage.sender = it;
+					damage.sender_capability = owning_capability;
+					
 					total_recoil_amount += damage.recoil_multiplier;
 
 					round_entity.set_logic_transform(step, muzzle_transform);
@@ -236,6 +239,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							damage.amount *= gun.damage_multiplier;
 							damage.impulse_upon_hit *= gun.damage_multiplier;
 							damage.sender = it;
+							damage.sender_capability = owning_capability;
 							total_recoil_amount += damage.recoil_multiplier;
 
 							round_entity.set_logic_transform(step, muzzle_transform);

@@ -134,10 +134,14 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 			}
 		}
 
+		const auto collider_owner_body = collider.get_owner_body();
 		const auto* const damage = subject.get_owner_body().find<components::damage>();
 		const bool bullet_colliding_with_sender =
 			damage != nullptr
-			&& cosmos[damage->sender].get_owning_transfer_capability() == collider.get_owner_body()
+			&& (
+				damage->sender == collider_owner_body
+				|| damage->sender_capability == collider_owner_body
+			)
 		;
 
 		if (bullet_colliding_with_sender) {

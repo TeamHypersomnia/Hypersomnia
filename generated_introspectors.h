@@ -860,6 +860,7 @@ namespace augs {
 			FIELD(impulse_multiplier_against_sentience);
 
 			FIELD(sender);
+			FIELD(sender_capability);
 
 			FIELD(damage_upon_collision);
 			FIELD(destroy_upon_damage);

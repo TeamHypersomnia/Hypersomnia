@@ -27,10 +27,8 @@
 #include "game/enums/party_category.h"
 
 namespace ingredients {
-	void add_wsad_character_setup_movement(const entity_handle e) {
+	void add_character_movement(const entity_handle e) {
 		components::movement& movement = e.get<components::movement>();
-
-		movement.add_animation_receiver(e, false);
 
 		movement.input_acceleration_axes.set(1, 1);
 		movement.acceleration_length = 8000;
@@ -44,7 +42,7 @@ namespace ingredients {
 		movement.enable_braking_damping = true;
 	}
 
-	void add_wsad_character_physics(const logic_step step, const entity_handle e) {
+	void add_character_head_physics(const logic_step step, const entity_handle e) {
 		components::rigid_body body;
 		components::special_physics special;
 		components::fixtures colliders;
@@ -58,7 +56,7 @@ namespace ingredients {
 		body.fixed_rotation = false;
 		body.angled_damping = true;
 
-		add_wsad_character_setup_movement(e);
+		add_character_movement(e);
 
 		e += body;
 		e += special;
@@ -66,13 +64,13 @@ namespace ingredients {
 		e.get<components::fixtures>().set_owner_body(e);
 	}
 
-	void add_wsad_character_legs(const entity_handle legs, const entity_handle player) {
+	void add_character_legs(const entity_handle legs, const entity_handle player) {
 		components::sprite sprite;
 		components::render render;
 		components::animation animation;
 	}
 
-	void add_wsad_character(const entity_handle e, const entity_handle crosshair_entity) {
+	void add_character(const entity_handle e, const entity_handle crosshair_entity) {
 		auto& sprite = e += components::sprite();
 		auto& render = e += components::render();
 		auto& animation = e += components::animation();
@@ -186,7 +184,7 @@ namespace ingredients {
 		rotation_copying.look_mode = components::rotation_copying::look_type::POSITION;
 		rotation_copying.colinearize_item_in_hand = false;
 
-		add_wsad_character_setup_movement(e);
+		add_character_movement(e);
 	}
 }
 
@@ -206,13 +204,13 @@ namespace prefabs {
 		crosshair.get<components::crosshair>().character_entity_to_chase = character;
 		crosshair.set_logic_transform(step, spawn_transform.pos);
 
-		ingredients::add_wsad_character(character, crosshair);
+		ingredients::add_character(character, crosshair);
 		
-		ingredients::add_wsad_character_physics(step, character);
+		ingredients::add_character_head_physics(step, character);
 
 		character.get<components::rigid_body>().set_transform(spawn_transform);
 
-		ingredients::add_character_inventory(step, character);
+		ingredients::add_character_head_inventory(step, character);
 
 		{
 			particle_effect_input effect;
