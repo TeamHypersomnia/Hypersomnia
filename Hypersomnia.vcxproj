@@ -372,6 +372,7 @@
     <ClCompile Include="application\setups\determinism_test_setup.cpp" />
     <ClCompile Include="augs\texture_atlas\texture_atlas_entry.cpp" />
     <ClCompile Include="augs\tweaker.cpp" />
+    <ClCompile Include="augs\window_framework\translate_windows_enums.cpp" />
     <ClCompile Include="game\assets\animation.cpp" />
     <ClCompile Include="game\assets\assets_manager.cpp" />
     <ClCompile Include="game\assets\behaviour_tree.cpp" />
@@ -1161,6 +1162,7 @@
     <ClInclude Include="augs\templates\type_mod_templates.h" />
     <ClInclude Include="augs\texture_atlas\texture_atlas_entry.h" />
     <ClInclude Include="augs\tweaker.h" />
+    <ClInclude Include="augs\window_framework\translate_windows_enums.h" />
     <ClInclude Include="augs\zeroed_pod.h" />
     <ClInclude Include="game\assets\animation.h" />
     <ClInclude Include="game\assets\assets_manager.h" />

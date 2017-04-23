@@ -140,7 +140,7 @@ void action_button::draw(
 
 				bound_key_caption.set_text(
 					augs::gui::text::format(
-						get_key_wstring(bound_key),
+						key_to_wstring(bound_key),
 						label_style
 					)
 				);
@@ -180,7 +180,7 @@ void action_button::draw(
 
 			bound_key_caption.set_text(
 				augs::gui::text::format(
-					get_key_wstring(bound_key),
+					key_to_wstring(bound_key),
 					label_style
 				)
 			);

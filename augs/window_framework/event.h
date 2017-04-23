@@ -167,7 +167,8 @@ namespace augs {
 				};
 
 				bool is_numpad_key(const key);
-				std::wstring get_key_wstring(const key);
+				std::wstring key_to_wstring(const key);
+				key wstring_to_key(const std::wstring&);
 			}
 
 			enum class key_change {

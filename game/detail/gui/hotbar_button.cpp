@@ -213,7 +213,7 @@ void hotbar_button::draw(
 				if (bound_key != augs::window::event::keys::key::INVALID) {
 					number_caption.set_text(
 						augs::gui::text::format(
-							get_key_wstring(bound_key).substr(0, 1), 
+							key_to_wstring(bound_key).substr(0, 1), 
 							label_style
 						)
 					);
