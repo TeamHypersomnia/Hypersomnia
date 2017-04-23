@@ -1,7 +1,8 @@
 #pragma once
-#include "visibility_settings.h"
-#include "pathfinding_settings.h"
-#include "si_scaling.h"
+#include "augs/math/si_scaling.h"
+
+#include "game/simulation_settings/visibility_settings.h"
+#include "game/simulation_settings/pathfinding_settings.h"
 
 struct all_simulation_settings {
 	// GEN INTROSPECTOR struct all_simulation_settings

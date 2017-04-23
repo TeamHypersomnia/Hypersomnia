@@ -1,5 +1,5 @@
 #pragma once
-#include "game/simulation_settings/si_scaling.h"
+#include "augs/math/si_scaling.h"
 #include "game/enums/callback_result.h"
 
 struct camera_cone;

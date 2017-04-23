@@ -2,8 +2,9 @@
 #include <random>
 #include <utility>
 #include <vector>
-#include "minmax.h"
-#include "augs/math/declare.h"
+
+#include "augs/misc/minmax.h"
+#include "augs/math/declare_math.h"
 
 template <class generator_type>
 struct basic_randomization {

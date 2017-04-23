@@ -1263,7 +1263,7 @@
     <ClInclude Include="game\scene_builders\networked_testbed.h" />
     <ClInclude Include="game\scene_builders\one_entity.h" />
     <ClInclude Include="game\scene_builders\testbed.h" />
-    <ClInclude Include="game\simulation_settings\si_scaling.h" />
+    <ClInclude Include="augs\math\si_scaling.h" />
     <ClInclude Include="game\systems_audiovisual\exploding_ring_system.h" />
     <ClInclude Include="game\systems_audiovisual\gui_element_system.h" />
     <ClInclude Include="game\systems_audiovisual\interpolation_system.h" />
@@ -1470,7 +1470,7 @@
     <ClInclude Include="augs\math\matrix.h" />
     <ClInclude Include="augs\math\rects.h" />
     <ClInclude Include="augs\math\vec2.h" />
-    <ClInclude Include="augs\math\declare.h" />
+    <ClInclude Include="augs\math\declare_math.h" />
     <ClInclude Include="augs\misc\fixed_delta_timer.h" />
     <ClInclude Include="augs\misc\input_player.h" />
     <ClInclude Include="augs\misc\pool.h" />

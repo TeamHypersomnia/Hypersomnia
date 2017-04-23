@@ -17,6 +17,7 @@ template <class T>
 struct ltrbt;
 template <class T>
 struct xywht;
+struct si_scaling;
 template <class type>
 struct vec2t;
 class recoil_player;
@@ -66,7 +67,6 @@ struct circle_shape;
 struct spell_instance_data;
 struct all_simulation_settings;
 struct pathfinding_settings;
-struct si_scaling;
 struct visibility_settings;
 template <class key>
 struct basic_cosmic_entropy;
@@ -376,6 +376,16 @@ namespace augs {
 			FIELD(y);
 			FIELD(w);
 			FIELD(h);
+		}
+
+		template <class F, class... Instances>
+		static void introspect_body(
+			const si_scaling* const,
+			F f,
+			Instances&&... _t_
+		) {
+			FIELD(to_meters_multiplier);
+			FIELD(to_pixels_multiplier);
 		}
 
 		template <class F, class type, class... Instances>
@@ -1832,16 +1842,6 @@ namespace augs {
 
 			FIELD(draw_memorised_walls);
 			FIELD(draw_undiscovered);
-		}
-
-		template <class F, class... Instances>
-		static void introspect_body(
-			const si_scaling* const,
-			F f,
-			Instances&&... _t_
-		) {
-			FIELD(to_meters_multiplier);
-			FIELD(to_pixels_multiplier);
 		}
 
 		template <class F, class... Instances>

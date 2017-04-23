@@ -79,7 +79,7 @@ void car_system::apply_movement_forces(const logic_step step) {
 			if (resultant.non_zero()) {
 				vec2 force = resultant.x * forward_dir + right_normal * resultant.y;
 				
-				vec2 forward_tire_force = vec2(forward_dir).set_length(force.length()) * sgn(resultant.x);
+				vec2 forward_tire_force = vec2(forward_dir).set_length(force.length()) * augs::sgn(resultant.x);
 
 				auto& off = car.wheel_offset;
 
@@ -149,8 +149,8 @@ void car_system::apply_movement_forces(const logic_step step) {
 
 			if (angular_resistance > 0.f) {
 				auto angular_speed = angular_velocity * DEG_TO_RAD<float>;
-				//rigid_body.body->ApplyTorque((angular_resistance * sqrt(sqrt(angular_speed * angular_speed)) + 0.2 * angular_speed * angular_speed)* -sgn(angular_speed) * b->GetInertia(), true);
-				rigid_body.apply_angular_impulse(delta.in_seconds() * (angular_resistance * angular_speed * angular_speed)* -sgn(angular_speed) * rigid_body.get_inertia());
+				//rigid_body.body->ApplyTorque((angular_resistance * sqrt(sqrt(angular_speed * angular_speed)) + 0.2 * angular_speed * angular_speed)* -augs::sgn(angular_speed) * b->GetInertia(), true);
+				rigid_body.apply_angular_impulse(delta.in_seconds() * (angular_resistance * angular_speed * angular_speed)* -augs::sgn(angular_speed) * rigid_body.get_inertia());
 			}
 
 			auto engine_handler = [&](const entity_handle h, const bool particles_enabled) {

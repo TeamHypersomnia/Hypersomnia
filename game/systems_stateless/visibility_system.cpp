@@ -35,7 +35,7 @@ source:
 http://stackoverflow.com/questions/16542042/fastest-way-to-sort-vectors-by-angle-without-actually-computing-that-angle
 */
 float comparable_angle(const vec2 diff) {
-	return sgn(diff.y) * (
+	return augs::sgn(diff.y) * (
 		1 - (diff.x / (std::abs(diff.x) + std::abs(diff.y)))
 		);
 }

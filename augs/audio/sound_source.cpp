@@ -8,7 +8,7 @@
 
 #include "augs/al_log.h"
 #include "augs/math/vec2.h"
-#include "game/simulation_settings/si_scaling.h"
+#include "augs/math/si_scaling.h"
 
 #define TRACE_PARAMETERS 0
 #define TRACE_CONSTRUCTORS_DESTRUCTORS 0

@@ -1,11 +1,25 @@
 #include "transform_component.h"
 #include "rigid_body_component.h"
 #include "Box2D/Common/b2Math.h"
-#include "game/simulation_settings/si_scaling.h"
+#include "augs/math/si_scaling.h"
 
 namespace components {
-	transform::transform(float x, float y, float rotation) : pos(vec2(x, y)), rotation(rotation) {}
-	transform::transform(vec2 pos, float rotation) : pos(pos), rotation(rotation) {}
+	transform::transform(
+		const float x, 
+		const float y, 
+		const float rotation
+	) : 
+		pos(vec2(x, y)), 
+		rotation(rotation) 
+	{}
+
+	transform::transform(
+		const vec2 pos, 
+		const float rotation
+	) : 
+		pos(pos), 
+		rotation(rotation) 
+	{}
 
 	transform transform::operator*(const transform& offset) const {
 		return {
@@ -61,10 +75,12 @@ namespace components {
 		auto result = *this;
 		auto interpolated = augs::interp(previous, *this, ratio);
 
-		if ((pos - interpolated.pos).length_sq() > epsilon)
+		if ((pos - interpolated.pos).length_sq() > epsilon) {
 			result.pos = interpolated.pos;
-		if (std::abs(rotation - interpolated.rotation) > epsilon)
+		}
+		if (std::abs(rotation - interpolated.rotation) > epsilon) {
 			result.rotation = interpolated.rotation;
+		}
 
 		return result;
 	}
@@ -78,10 +94,12 @@ namespace components {
 		interpolated.pos = augs::interp(a.pos, b.pos, positional_ratio);
 		interpolated.rotation = augs::interp(vec2().set_from_degrees(a.rotation), vec2().set_from_degrees(b.rotation), rotational_ratio).degrees();
 
-		if ((pos - interpolated.pos).length_sq() > epsilon)
+		if ((pos - interpolated.pos).length_sq() > epsilon) {
 			result.pos = interpolated.pos;
-		if (std::abs(rotation - interpolated.rotation) > epsilon)
+		}
+		if (std::abs(rotation - interpolated.rotation) > epsilon) {
 			result.rotation = interpolated.rotation;
+		}
 
 		return result;
 	}

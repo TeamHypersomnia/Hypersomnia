@@ -1,11 +1,13 @@
 #pragma once
 #include <algorithm>
 #include <array>
-#include "rects.h"
-#include "augs/misc/randomization.h"
+
+#include "augs/math/rects.h"
+#include "augs/math/declare_math.h"
+
 #include "augs/misc/typesafe_sprintf.h"
 #include "augs/misc/typesafe_sscanf.h"
-#include "declare.h"
+
 #include "augs/templates/hash_templates.h"
 #include "augs/templates/container_templates.h"
 
@@ -21,11 +23,11 @@ constexpr T RAD_TO_DEG = static_cast<T>(1.0 / 0.01745329251994329576923690768489
 template <class T>
 constexpr T PI = static_cast<T>(3.1415926535897932384626433832795);
 
-template <typename T> int sgn(T val) {
-	return (T(0) < val) - (val < T(0));
-}
-
 namespace augs {
+	template <typename T> int sgn(T val) {
+		return (T(0) < val) - (val < T(0));
+	}
+
 	template <class T>
 	bool compare(const T a, const T b, const T eps = AUGS_EPSILON<T>) {
 		return std::abs(a - b) < eps;
@@ -157,11 +159,6 @@ struct vec2t {
 		}
 
 		return res;
-	}
-
-	template <class t, class gen>
-	static vec2t random_on_circle(const t radius, gen& g) {
-		return vec2t().set_from_degrees(g.randval(0.f, 360.f)) * radius;
 	}
 
 	static bool segment_in_segment(

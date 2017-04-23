@@ -3,6 +3,7 @@
 
 #include "augs/templates/introspection_utilities.h"
 
+#include "augs/misc/randomization.h"
 #include "augs/misc/streams.h"
 #include "augs/misc/delta.h"
 #include "augs/misc/enum_bitset.h"

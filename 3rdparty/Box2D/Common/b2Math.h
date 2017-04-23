@@ -49,7 +49,7 @@ inline float32 b2InvSqrt(float32 x)
 #define	b2Sqrt(x)	sqrtf(x)
 #define	b2Atan2(y, x)	atan2f(y, x)
 
-#include "augs/math/declare.h"
+#include "augs/math/declare_math.h"
 
 /// A 2D column vector.
 struct b2Vec2

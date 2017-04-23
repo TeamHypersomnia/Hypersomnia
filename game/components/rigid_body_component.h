@@ -6,7 +6,7 @@
 #include "game/transcendental/component_synchronizer.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
-#include "game/simulation_settings/si_scaling.h"
+#include "augs/math/si_scaling.h"
 #include "game/enums/rigid_body_type.h"
 
 #include "game/components/transform_component.h"

@@ -2,7 +2,7 @@
 #include <vector>
 #include <iosfwd>
 #include <algorithm>
-#include "declare.h"
+#include "declare_math.h"
 // trzeba usprawnic rect2D - rozszerzyc max_size na wh bo z samego max_s: wielkie prostokaty rozpychaja kwadrat a male wykorzystuja miejsce na dole
 
 struct b2Vec2;
