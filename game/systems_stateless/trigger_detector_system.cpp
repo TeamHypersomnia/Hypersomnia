@@ -114,8 +114,11 @@ void trigger_detector_system::send_trigger_confirmations(const logic_step step) 
 
 			if (is_it_arm_touching) {
 				const auto capability = subject.get_owning_transfer_capability();
-				actual_detector = capability;
-				collision_detector = capability.find<components::trigger_collision_detector>();
+
+				if (capability.alive()) {
+					actual_detector = capability;
+					collision_detector = capability.find<components::trigger_collision_detector>();
+				}
 			}
 		}
 
