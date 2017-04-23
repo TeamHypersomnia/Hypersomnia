@@ -356,7 +356,6 @@
     <ClCompile Include="augs\misc\http_requests.cpp" />
     <ClCompile Include="augs\misc\input_context.cpp" />
     <ClCompile Include="augs\misc\machine_entropy.cpp" />
-    <ClCompile Include="augs\misc\debug_entropy_player.cpp" />
     <ClCompile Include="augs\misc\pooled_object_id.cpp" />
     <ClCompile Include="augs\misc\readable_bytesize.cpp" />
     <ClCompile Include="augs\misc\standard_actions.cpp" />

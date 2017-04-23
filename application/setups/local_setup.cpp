@@ -28,6 +28,8 @@
 #include "game/detail/visible_entities.h"
 #include "application/config_lua_table.h"
 
+#include "generated_introspectors.h"
+
 using namespace augs::window::event::keys;
 
 void local_setup::process(
