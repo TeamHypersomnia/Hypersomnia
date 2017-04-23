@@ -78,69 +78,6 @@ decltype(auto) maximum_of(const Container& v) {
 	return *std::max_element(v.begin(), v.end());
 }
 
-template<class A, class B>
-bool compare_containers(const A& a, const B& b) {
-	if (a.size() != b.size()) {
-		return false;
-	}
-
-	for (auto it = std::begin(a); it != std::end(a); ++it) {
-		if (!(*it == *(std::begin(b) + (it - std::begin(a))))) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
-template<
-	template<class...> class AB, 
-	template<class...> class CD, 
-	class A, 
-	class B, 
-	class C, 
-	class D
->
-bool compare_associative_containers(const AB<A, B>& a, const CD<C, D>& b) {
-	if (a.size() != b.size()) {
-		return false;
-	}
-
-	for (const auto& b_element : b) {
-		const auto a_element = a.find(b_element.first);
-
-		if (a_element == a.end()) {
-			return false;
-		}
-
-		if (!(b_element.second == (*a_element).second)) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
-template<
-	class A, 
-	class B, 
-	class C, 
-	class D
->
-bool compare_containers(const std::map<A, B>& a, const std::map<C, D>& b) {
-	return compare_associative_containers<std::map, std::map, A, B, C, D>(a, b);
-}
-
-template<
-	class A,
-	class B,
-	class C,
-	class D
->
-bool compare_containers(const std::unordered_map<A, B>& a, const std::unordered_map<C, D>& b) {
-	return compare_associative_containers<std::unordered_map, std::unordered_map, A, B, C, D>(a, b);
-}
-
 namespace std {
 	namespace detail {
 		template <class T, std::size_t N, std::size_t... I>

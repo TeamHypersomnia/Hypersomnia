@@ -23,9 +23,6 @@ typedef augs::container_with_small_size<
 	unsigned char
 > key_and_mouse_intent_vector;
 
-bool operator==(const key_and_mouse_intent_vector& a, const key_and_mouse_intent_vector& b);
-bool operator!=(const key_and_mouse_intent_vector& a, const key_and_mouse_intent_vector& b);
-
 namespace augs {
 	template<class A>
 	void read_object(A& ar, key_and_mouse_intent& intent) {

@@ -120,9 +120,9 @@ template <
 	class size_type_A, 
 	class size_type_B
 >
-bool compare_containers(
+bool operator==(
 	const augs::container_with_small_size<A, size_type_A>& a,
 	const augs::container_with_small_size<B, size_type_B>& b
 ) {
-	return compare_containers(*a, *b);
+	return *a == *b;
 }

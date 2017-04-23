@@ -27,7 +27,7 @@ struct character_gui {
 		entity_handle::hand_selections_array hand_selections;
 
 		bool operator==(const hotbar_selection_setup b) const {
-			return compare_containers(hand_selections, b.hand_selections);  
+			return hand_selections == b.hand_selections;  
 		}
 
 		hotbar_selection_setup get_available_entities(const const_entity_handle h) const;

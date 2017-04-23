@@ -77,9 +77,9 @@ void basic_cosmic_entropy<key>::clear() {
 
 bool guid_mapped_entropy::operator!=(const guid_mapped_entropy& b) const {
 	return !(
-		compare_containers(intents_per_entity, b.intents_per_entity)
-		&& compare_containers(cast_spells, b.cast_spells)
-		&& compare_containers(transfer_requests, b.transfer_requests)
+		intents_per_entity == b.intents_per_entity
+		&& cast_spells == b.cast_spells
+		&& transfer_requests == b.transfer_requests
 	);
 }
 

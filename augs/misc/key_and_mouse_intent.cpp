@@ -1,14 +1,6 @@
 #include "augs/misc/key_and_mouse_intent.h"
 #include "augs/misc/input_context.h"
 
-bool operator==(const key_and_mouse_intent_vector& a, const key_and_mouse_intent_vector& b) {
-	return compare_containers(a, b);
-}
-
-bool operator!=(const key_and_mouse_intent_vector& a, const key_and_mouse_intent_vector& b) {
-	return !(a == b);
-}
-
 bool key_and_mouse_intent::is_set() const {
 	return intent != intent_type::COUNT;
 }
