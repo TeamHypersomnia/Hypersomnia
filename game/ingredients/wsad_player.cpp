@@ -97,68 +97,6 @@ namespace ingredients {
 		sentience.health_decrease_sound_response.id = assets::sound_buffer_id::IMPACT;
 		sentience.death_sound_response.id = assets::sound_buffer_id::DEATH;
 
-		sentience.aimpunch.offsets = {
-				{ vec2().set_from_degrees(0) },
-				{ vec2().set_from_degrees(6) },
-				{ vec2().set_from_degrees(-6) },
-				{ vec2().set_from_degrees(7) },
-				{ vec2().set_from_degrees(-7) },
-				{ vec2().set_from_degrees(-9) },
-				{ vec2().set_from_degrees(11) },
-				{ vec2().set_from_degrees(-12) },
-				{ vec2().set_from_degrees(-4) },
-				{ vec2().set_from_degrees(11) },
-				{ vec2().set_from_degrees(23) },
-				{ vec2().set_from_degrees(53) },
-				{ vec2().set_from_degrees(10) },
-				{ vec2().set_from_degrees(-30) },
-				{ vec2().set_from_degrees(-60) },
-				{ vec2().set_from_degrees(-70) },
-				{ vec2().set_from_degrees(-80) },
-				{ vec2().set_from_degrees(-20) },
-				{ vec2().set_from_degrees(50) },
-				{ vec2().set_from_degrees(80) },
-				{ vec2().set_from_degrees(120) },
-				{ vec2().set_from_degrees(60) },
-				{ vec2().set_from_degrees(20) },
-				{ vec2().set_from_degrees(40) },
-				{ vec2().set_from_degrees(20) },
-				{ vec2().set_from_degrees(-40) },
-		};
-
-		sentience.aimpunch.offsets = {
-			{ vec2().set_from_degrees(1) },
-			{ vec2().set_from_degrees(1) },
-			{ vec2().set_from_degrees(2) },
-			{ vec2().set_from_degrees(2) },
-			{ vec2().set_from_degrees(3) },
-			{ vec2().set_from_degrees(-1) },
-			{ vec2().set_from_degrees(1) },
-			{ vec2().set_from_degrees(-1) },
-			{ vec2().set_from_degrees(-2) },
-			{ vec2().set_from_degrees(-1) },
-			{ vec2().set_from_degrees(-1) },
-			{ vec2().set_from_degrees(-2) },
-			{ vec2().set_from_degrees(-3) },
-			{ vec2().set_from_degrees(-4) },
-			{ vec2().set_from_degrees(-5) },
-			{ vec2().set_from_degrees(-3) },
-			{ vec2().set_from_degrees(-2) },
-			{ vec2().set_from_degrees(-2) },
-			{ vec2().set_from_degrees(-1) },
-			{ vec2().set_from_degrees(1) },
-			{ vec2().set_from_degrees(2) },
-			{ vec2().set_from_degrees(3) },
-			{ vec2().set_from_degrees(2) },
-			{ vec2().set_from_degrees(3) },
-			{ vec2().set_from_degrees(4) },
-			{ vec2().set_from_degrees(5) },
-		};
-
-		sentience.aimpunch.repeat_last_n_offsets = 20;
-		sentience.aimpunch.scale = 150.0;
-		sentience.aimpunch.single_cooldown_duration_ms= 200.0;
-
 		sentience.health.set_value(100);
 		sentience.health.set_maximum_value(100);
 

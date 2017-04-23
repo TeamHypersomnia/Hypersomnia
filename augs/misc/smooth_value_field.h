@@ -1,11 +1,9 @@
 #pragma once
-
 #include "augs/math/vec2.h"
 #include "augs/misc/timer.h"
 
 namespace augs {
-	class smooth_value_field {
-	public:
+	struct smooth_value_field {
 		vec2i discrete_value;
 		vec2 value;
 
@@ -14,6 +12,6 @@ namespace augs {
 		double averages_per_sec = 20.0;
 		double smoothing_average_factor = 0.5;
 
-		void tick(double delta_seconds);
+		void tick(const double delta_seconds);
 	};
 }

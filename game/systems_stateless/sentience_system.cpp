@@ -209,13 +209,9 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 
 		if (punched[child_entity_name::CHARACTER_CROSSHAIR].alive() && punched[child_entity_name::CHARACTER_CROSSHAIR][child_entity_name::CROSSHAIR_RECOIL_BODY].alive()) {
 			auto owning_crosshair_recoil = punched[child_entity_name::CHARACTER_CROSSHAIR][child_entity_name::CROSSHAIR_RECOIL_BODY];
+			auto& recoil_physics = owning_crosshair_recoil.get<components::rigid_body>();
 
-			sentience.aimpunch.shoot_and_apply_impulse(
-				owning_crosshair_recoil, 
-				1 / 15.f, 
-				true,
-				(h.point_of_impact - punched.get_logic_transform().pos).cross(h.impact_velocity) / 100000000.f * 3.f / 25.f
-			);
+			recoil_physics.apply_angular_impulse((h.point_of_impact - punched.get_logic_transform().pos).cross(h.impact_velocity) / 10000000.f * 3.f / 25.f);
 		}
 
 		break;
@@ -421,7 +417,7 @@ void sentience_system::cooldown_aimpunches(const logic_step step) const {
 	step.cosm.for_each(
 		processing_subjects::WITH_SENTIENCE,
 		[&](const auto t) {
-			t.get<components::sentience>().aimpunch.cooldown(step.get_delta().in_milliseconds());
+
 		}
 	);
 }

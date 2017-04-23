@@ -1,7 +1,6 @@
 #pragma once
 #include "augs/graphics/pixel.h"
 
-#include "augs/misc/recoil_player.h"
 #include "augs/misc/stepped_timing.h"
 #include "augs/misc/enum_associative_array.h"
 
@@ -49,7 +48,6 @@ namespace components {
 		float minimum_danger_amount_to_evade = 5.f;
 		float danger_amount_from_hostile_attitude = 100.f;
 
-		recoil_player aimpunch;
 		child_entity_id health_damage_particles;
 		child_entity_id character_crosshair;
 

@@ -1,7 +1,9 @@
 #pragma once
 #include <functional>
-#include "action.h"
+
 #include "augs/math/vec2.h"
+
+#include "augs/misc/action.h"
 #include "augs/misc/delta.h"
 #include "augs/misc/randomization.h"
 #include "augs/misc/action_list.h"

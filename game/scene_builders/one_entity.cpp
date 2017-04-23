@@ -45,7 +45,7 @@ namespace scene_builders {
 		//prefabs::create_force_grenade(step, { 254, 711 });
 		//prefabs::create_force_grenade(step, { 254, 811 });
 
-		const int num_characters = 1;
+		const int num_characters = 2;
 
 		std::vector<entity_id> new_characters;
 		new_characters.resize(num_characters);

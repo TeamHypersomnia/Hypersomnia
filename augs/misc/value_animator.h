@@ -1,7 +1,8 @@
 #pragma once
-#include "timer.h"
 #include <functional>
 #include <vector>
+
+#include "augs/misc/timer.h"
 
 namespace augs {
 	class value_animator {

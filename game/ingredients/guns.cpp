@@ -475,38 +475,6 @@ namespace prefabs {
 		gun.damage_multiplier = 2.2f;
 		gun.num_last_bullets_to_trigger_low_ammo_cue = 6;
 
-		gun.recoil.repeat_last_n_offsets = 20;
-		gun.recoil.scale = 30.0f/2;
-
-		gun.recoil.offsets = {
-			{ vec2().set_from_degrees(1.35f*2.f) },
-			{ vec2().set_from_degrees(1.35f*2.f) },
-			{ vec2().set_from_degrees(1.35f*2.6f) },
-			{ vec2().set_from_degrees(1.35f*2.8f) },
-			{ vec2().set_from_degrees(1.35f*3.2f) },
-			{ vec2().set_from_degrees(1.35f*3.0f) },
-			{ vec2().set_from_degrees(1.35f*2.7f) },
-			{ vec2().set_from_degrees(1.35f*2.3f) },
-			{ vec2().set_from_degrees(1.35f*2.0f) },
-			{ vec2().set_from_degrees(1.35f*0.3f) },
-			{ vec2().set_from_degrees(1.35f*-0.5f) },
-			{ vec2().set_from_degrees(1.35f*-1.0f) },
-			{ vec2().set_from_degrees(1.35f*-1.5f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-3.2f) },
-			{ vec2().set_from_degrees(1.35f*-4.0f) },
-			{ vec2().set_from_degrees(1.35f*2.3f) },
-			{ vec2().set_from_degrees(1.35f*2.5f) },
-			{ vec2().set_from_degrees(1.35f*1.7f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*3.0f) },
-		};
-
 		{
 			sound_effect_input in;
 			in.effect.id = assets::sound_buffer_id::FIREARM_ENGINE;
@@ -575,38 +543,6 @@ namespace prefabs {
 		gun.shell_velocity = std::make_pair(300.f, 1700.f);
 		gun.damage_multiplier = 2.5f;
 
-		gun.recoil.repeat_last_n_offsets = 20;
-		gun.recoil.scale = 175.0f / 2;
-
-		gun.recoil.offsets = {
-			{ vec2().set_from_degrees(2.35f*2.f) },
-			{ vec2().set_from_degrees(2.35f*2.f) },
-			{ vec2().set_from_degrees(2.35f*2.6f) },
-			{ vec2().set_from_degrees(2.35f*2.8f) },
-			{ vec2().set_from_degrees(2.35f*3.2f) },
-			{ vec2().set_from_degrees(2.35f*3.0f) },
-			{ vec2().set_from_degrees(2.35f*2.7f) },
-			{ vec2().set_from_degrees(2.35f*2.3f) },
-			{ vec2().set_from_degrees(2.35f*2.0f) },
-			{ vec2().set_from_degrees(2.35f*0.3f) },
-			{ vec2().set_from_degrees(2.35f*-0.5f) },
-			{ vec2().set_from_degrees(2.35f*-1.0f) },
-			{ vec2().set_from_degrees(2.35f*-1.5f) },
-			{ vec2().set_from_degrees(2.35f*-2.f) },
-			{ vec2().set_from_degrees(2.35f*-2.f) },
-			{ vec2().set_from_degrees(2.35f*-2.f) },
-			{ vec2().set_from_degrees(2.35f*-2.f) },
-			{ vec2().set_from_degrees(2.35f*-2.f) },
-			{ vec2().set_from_degrees(2.35f*-3.2f) },
-			{ vec2().set_from_degrees(2.35f*-4.0f) },
-			{ vec2().set_from_degrees(2.35f*2.3f) },
-			{ vec2().set_from_degrees(2.35f*2.5f) },
-			{ vec2().set_from_degrees(2.35f*1.7f) },
-			{ vec2().set_from_degrees(2.35f*-2.f) },
-			{ vec2().set_from_degrees(2.35f*-2.f) },
-			{ vec2().set_from_degrees(2.35f*3.0f) },
-		};
-
 		{
 			sound_effect_input in;
 			in.effect.id = assets::sound_buffer_id::FIREARM_ENGINE;
@@ -667,8 +603,6 @@ namespace prefabs {
 		gun.shell_velocity = std::make_pair(300.f, 1700.f);
 		gun.damage_multiplier = 1.f;
 		
-		gun.recoil.repeat_last_n_offsets = 20;
-
 		{
 			sound_effect_input in;
 			in.effect.id = assets::sound_buffer_id::FIREARM_ENGINE;
@@ -683,37 +617,6 @@ namespace prefabs {
 			gun.gunshot_adds_heat = 0.030f;
 			gun.engine_sound_strength = 0.5f;
 		}
-
-		gun.recoil.offsets = {
-			{ vec2().set_from_degrees(1.35f * 2.f) },
-			{ vec2().set_from_degrees(1.35f * 2.f) },
-			{ vec2().set_from_degrees(1.35f*2.6f) },
-			{ vec2().set_from_degrees(1.35f*2.8f) },
-			{ vec2().set_from_degrees(1.35f*3.2f) },
-			{ vec2().set_from_degrees(1.35f*3.0f) },
-			{ vec2().set_from_degrees(1.35f*2.7f) },
-			{ vec2().set_from_degrees(1.35f*2.3f) },
-			{ vec2().set_from_degrees(1.35f*2.0f) },
-			{ vec2().set_from_degrees(1.35f*0.3f) },
-			{ vec2().set_from_degrees(1.35f*-0.5f) },
-			{ vec2().set_from_degrees(1.35f*-1.0f) },
-			{ vec2().set_from_degrees(1.35f*-1.5f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-3.2f) },
-			{ vec2().set_from_degrees(1.35f*-4.0f) },
-			{ vec2().set_from_degrees(1.35f*2.3f) },
-			{ vec2().set_from_degrees(1.35f*2.5f) },
-			{ vec2().set_from_degrees(1.35f*1.7f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*3.0f) },
-		};
-
-		gun.recoil.scale = 30.0f/2;
 	
 		add_muzzle_particles(weapon, gun, step);
 
@@ -754,39 +657,6 @@ namespace prefabs {
 		gun.camera_shake_spread_degrees = 45.f;
 
 		gun.damage_multiplier = 1.f;
-
-		gun.recoil.repeat_last_n_offsets = 20;
-
-		gun.recoil.offsets = {
-			{ vec2().set_from_degrees(1.35f * 2.f) },
-			{ vec2().set_from_degrees(1.35f * 2.f) },
-			{ vec2().set_from_degrees(1.35f*2.6f) },
-			{ vec2().set_from_degrees(1.35f*2.8f) },
-			{ vec2().set_from_degrees(1.35f*3.2f) },
-			{ vec2().set_from_degrees(1.35f*3.0f) },
-			{ vec2().set_from_degrees(1.35f*2.7f) },
-			{ vec2().set_from_degrees(1.35f*2.3f) },
-			{ vec2().set_from_degrees(1.35f*2.0f) },
-			{ vec2().set_from_degrees(1.35f*0.3f) },
-			{ vec2().set_from_degrees(1.35f*-0.5f) },
-			{ vec2().set_from_degrees(1.35f*-1.0f) },
-			{ vec2().set_from_degrees(1.35f*-1.5f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-3.2f) },
-			{ vec2().set_from_degrees(1.35f*-4.0f) },
-			{ vec2().set_from_degrees(1.35f*2.3f) },
-			{ vec2().set_from_degrees(1.35f*2.5f) },
-			{ vec2().set_from_degrees(1.35f*1.7f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*3.0f) },
-		};
-
-		gun.recoil.scale = 30.0f / 2;
 
 		weapon.add_standard_components(step);
 
@@ -863,39 +733,6 @@ namespace prefabs {
 		gun.shell_velocity = std::make_pair(300.f, 1700.f);
 		gun.damage_multiplier = 1.f;
 		
-		gun.recoil.repeat_last_n_offsets = 20;
-
-		gun.recoil.offsets = {
-			{ vec2().set_from_degrees(1.35f * 2.f) },
-			{ vec2().set_from_degrees(1.35f * 2.f) },
-			{ vec2().set_from_degrees(1.35f*2.6f) },
-			{ vec2().set_from_degrees(1.35f*2.8f) },
-			{ vec2().set_from_degrees(1.35f*3.2f) },
-			{ vec2().set_from_degrees(1.35f*3.0f) },
-			{ vec2().set_from_degrees(1.35f*2.7f) },
-			{ vec2().set_from_degrees(1.35f*2.3f) },
-			{ vec2().set_from_degrees(1.35f*2.0f) },
-			{ vec2().set_from_degrees(1.35f*0.3f) },
-			{ vec2().set_from_degrees(1.35f*-0.5f) },
-			{ vec2().set_from_degrees(1.35f*-1.0f) },
-			{ vec2().set_from_degrees(1.35f*-1.5f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-3.2f) },
-			{ vec2().set_from_degrees(1.35f*-4.0f) },
-			{ vec2().set_from_degrees(1.35f*2.3f) },
-			{ vec2().set_from_degrees(1.35f*2.5f) },
-			{ vec2().set_from_degrees(1.35f*1.7f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*3.0f) },
-		};
-
-		gun.recoil.scale = 30.0f/2;
-		
 		add_muzzle_particles(weapon, gun, step);
 
 		weapon.add_standard_components(step);
@@ -943,39 +780,6 @@ namespace prefabs {
 		gun.shell_spread_degrees = 20.f;
 		gun.shell_velocity = std::make_pair(300.f, 1700.f);
 		gun.damage_multiplier = 1.5f;
-
-		gun.recoil.repeat_last_n_offsets = 20;
-
-		gun.recoil.offsets = {
-			{ vec2().set_from_degrees(1.35f * 2.f) },
-			{ vec2().set_from_degrees(1.35f * 2.f) },
-			{ vec2().set_from_degrees(1.35f*2.6f) },
-			{ vec2().set_from_degrees(1.35f*2.8f) },
-			{ vec2().set_from_degrees(1.35f*3.2f) },
-			{ vec2().set_from_degrees(1.35f*3.0f) },
-			{ vec2().set_from_degrees(1.35f*2.7f) },
-			{ vec2().set_from_degrees(1.35f*2.3f) },
-			{ vec2().set_from_degrees(1.35f*2.0f) },
-			{ vec2().set_from_degrees(1.35f*0.3f) },
-			{ vec2().set_from_degrees(1.35f*-0.5f) },
-			{ vec2().set_from_degrees(1.35f*-1.0f) },
-			{ vec2().set_from_degrees(1.35f*-1.5f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-3.2f) },
-			{ vec2().set_from_degrees(1.35f*-4.0f) },
-			{ vec2().set_from_degrees(1.35f*2.3f) },
-			{ vec2().set_from_degrees(1.35f*2.5f) },
-			{ vec2().set_from_degrees(1.35f*1.7f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*-2.f) },
-			{ vec2().set_from_degrees(1.35f*3.0f) },
-		};
-
-		gun.recoil.scale = 30.0f / 2;
 
 		{
 			sound_effect_input in;

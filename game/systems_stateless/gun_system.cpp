@@ -313,8 +313,6 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				}
 			}
 			else if (gun.shot_cooldown.is_ready(cosmos.get_timestamp(), delta)) {
-				gun.recoil.cooldown(delta.in_milliseconds());
-
 				gun.current_heat = std::max(0.f, gun.current_heat - delta.in_seconds()/gun.maximum_heat);
 			}
 

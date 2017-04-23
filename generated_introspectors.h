@@ -20,7 +20,6 @@ struct xywht;
 struct si_scaling;
 template <class type>
 struct vec2t;
-class recoil_player;
 template <class T>
 struct zeroed_pod;
 struct animation_frame;
@@ -454,22 +453,6 @@ namespace augs {
 			Instances&&... _t_
 		) {
 		introspect_body(static_cast<augs::pooled_object_raw_id*>(nullptr), f, std::forward<Instances>(_t_)...);
-		}
-
-		template <class F, class... Instances>
-		static void introspect_body(
-			const recoil_player* const,
-			F f,
-			Instances&&... _t_
-		) {
-			FIELD(offsets);
-			FIELD(current_offset);
-			FIELD(reversed);
-			FIELD(repeat_last_n_offsets);
-
-			FIELD(single_cooldown_duration_ms);
-			FIELD(remaining_cooldown_duration);
-			FIELD(scale);
 		}
 
 		template <class F, class... Instances>
@@ -1036,8 +1019,6 @@ namespace augs {
 
 			FIELD(shell_spread_degrees);
 
-			FIELD(recoil);
-
 			FIELD(shell_spawn_offset);
 
 			FIELD(magic_missile_definition);
@@ -1421,7 +1402,6 @@ namespace augs {
 			FIELD(minimum_danger_amount_to_evade);
 			FIELD(danger_amount_from_hostile_attitude);
 
-			FIELD(aimpunch);
 			FIELD(health_damage_particles);
 			FIELD(character_crosshair);
 

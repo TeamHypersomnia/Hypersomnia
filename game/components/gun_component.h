@@ -5,7 +5,6 @@
 
 #include "augs/misc/timer.h"
 #include "augs/misc/stepped_timing.h"
-#include "augs/misc/recoil_player.h"
 #include "augs/misc/minmax.h"
 
 #include "game/enums/gun_action_type.h"
@@ -39,8 +38,6 @@ namespace components {
 		augs::minmax<float> shell_angular_velocity;
 
 		float shell_spread_degrees = 20.f;
-
-		recoil_player recoil;
 
 		components::transform shell_spawn_offset;
 

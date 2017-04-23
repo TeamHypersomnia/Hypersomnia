@@ -1,7 +1,7 @@
 #pragma once
-#include "timer.h"
-#include "delta.h"
-#include "fixed_delta_timer.h"
+#include "augs/misc/timer.h"
+#include "augs/misc/delta.h"
+#include "augs/misc/fixed_delta_timer.h"
 
 namespace augs {
 	class variable_delta_timer {
