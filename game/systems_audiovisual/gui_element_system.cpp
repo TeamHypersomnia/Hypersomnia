@@ -170,7 +170,7 @@ void gui_element_system::handle_hotbar_and_action_button_presses(
 		const auto hotbar_button_index = intent_to_hotbar_index(i.intent);
 		const auto special_action_index = intent_to_special_action_index(i.intent);
 
-		if (hotbar_button_index >= 0) {
+		if (hotbar_button_index >= 0 && static_cast<std::size_t>(hotbar_button_index) < gui.hotbar_buttons.size()) {
 			auto& currently_held_index = gui.currently_held_hotbar_button_index;
 
 			const bool clear_currently_held_index_because_nothing_is_assigned_already =
@@ -223,7 +223,7 @@ void gui_element_system::handle_hotbar_and_action_button_presses(
 				}
 			}
 		}
-		else if (special_action_index > -1) {
+		else if (special_action_index >= 0 && static_cast<std::size_t>(special_action_index) < gui.action_buttons.size()) {
 			auto& action_b = gui.action_buttons[special_action_index];
 			action_b.detector.update_appearance(i.is_pressed ? gui_event::ldown : gui_event::lup);
 
