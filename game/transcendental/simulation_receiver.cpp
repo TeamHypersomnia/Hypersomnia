@@ -44,7 +44,7 @@ void simulation_receiver::predict_intents_of_remote_entities(
 					if (current_slot.alive() && current_slot.is_hand_slot()) {
 						const auto hand_index = current_slot.get_hand_index();
 						
-						key_and_mouse_intent release_intent;
+						game_intent release_intent;
 
 						if (hand_index == 0) {
 							release_intent.is_pressed = false;

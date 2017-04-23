@@ -55,7 +55,7 @@ public:
 
 	void handle_hotbar_and_action_button_presses(
 		const const_entity_handle root_entity,
-		key_and_mouse_intent_vector intents
+		game_intent_vector intents
 	);
 
 	void reserve_caches_for_entities(const size_t) const {}

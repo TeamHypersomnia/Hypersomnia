@@ -231,7 +231,7 @@ void director_setup::control_player(
 
 	testbed.control_character_selection_numeric(new_machine_entropy.local);
 
-	auto new_intents = session.context.to_key_and_mouse_intents(new_machine_entropy.local);
+	game_intent_vector new_intents = session.context.to_game_intents(new_machine_entropy.local);
 
 	session.control_and_remove_fetched_intents(new_intents);
 	testbed.control_character_selection(new_intents);
@@ -352,7 +352,7 @@ void director_setup::advance_player_by_single_step(viewing_session& session) {
 		}
 
 		for (const auto& new_intents_requested : total_collected_guid_entropy.intents_per_entity) {
-			auto new_intents = new_intents_requested.second;
+			game_intent_vector new_intents = new_intents_requested.second;
 			auto& intents_written_to = entropy_for_this_advancement.intents_per_entity[new_intents_requested.first];
 
 			auto mouse_remover = [](const auto& k) { return k.uses_mouse_motion(); };

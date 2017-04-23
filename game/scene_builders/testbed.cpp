@@ -855,7 +855,7 @@ namespace scene_builders {
 		);
 	}
 
-	void testbed::control_character_selection(key_and_mouse_intent_vector& intents) {
+	void testbed::control_character_selection(game_intent_vector& intents) {
 		for (const auto& intent : intents) {
 			if (intent.is_pressed && intent.intent == intent_type::DEBUG_SWITCH_CHARACTER) {
 				++current_character_index;

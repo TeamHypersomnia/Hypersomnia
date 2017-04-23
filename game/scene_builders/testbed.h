@@ -44,7 +44,7 @@ namespace scene_builders {
 		}
 
 		void control_character_selection_numeric(augs::machine_entropy::local_type&);
-		void control_character_selection(key_and_mouse_intent_vector&);
+		void control_character_selection(game_intent_vector&);
 		
 		entity_id get_selected_character() const;
 

@@ -130,7 +130,7 @@ void gui_element_system::queue_transfers(const wielding_result res) {
 
 void gui_element_system::handle_hotbar_and_action_button_presses(
 	const const_entity_handle gui_entity,
-	key_and_mouse_intent_vector intents
+	game_intent_vector intents
 ) {
 	const auto& cosmos = gui_entity.get_cosmos();
 	auto& gui = get_character_gui(gui_entity);

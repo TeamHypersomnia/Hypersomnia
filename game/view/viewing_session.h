@@ -3,7 +3,7 @@
 #include "augs/misc/variable_delta_timer.h"
 #include "augs/misc/measurements.h"
 
-#include "augs/misc/input_context.h"
+#include "augs/misc/basic_input_context.h"
 #include "game/detail/gui/aabb_highlighter.h"
 
 #include "augs/gui/formatted_text.h"
@@ -88,7 +88,7 @@ public:
 		augs::machine_entropy::local_type&
 	);
 
-	void control_and_remove_fetched_intents(key_and_mouse_intent_vector&);
+	void control_and_remove_fetched_intents(game_intent_vector&);
 	void standard_audiovisual_post_solve(const const_logic_step);
 	void spread_past_infection(const const_logic_step);
 

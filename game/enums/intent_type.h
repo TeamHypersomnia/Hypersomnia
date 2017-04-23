@@ -1,4 +1,7 @@
 #pragma once
+#include <vector>
+#include "augs/misc/container_with_small_size.h"
+#include "augs/misc/basic_game_intent.h"
 
 enum class intent_type : unsigned char {
 	OPEN_DEVELOPER_CONSOLE,
@@ -84,3 +87,10 @@ template <class intent_enum_type>
 struct basic_input_context;
 
 typedef basic_input_context<intent_type> input_context;
+
+typedef basic_game_intent<intent_type> game_intent;
+
+typedef augs::container_with_small_size<
+	std::vector<game_intent>,
+	unsigned char
+> game_intent_vector;

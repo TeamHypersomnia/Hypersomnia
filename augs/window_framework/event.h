@@ -1,8 +1,9 @@
 #pragma once
+#include <string>
 #include <bitset>
+
 #include "augs/math/vec2.h"
 #include "augs/padding_byte.h"
-#include <string>
 
 namespace augs {
 	namespace window {

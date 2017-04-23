@@ -7,6 +7,10 @@ namespace augs {
 	class container_with_small_size {
 		T container;
 	public:
+		template <class... Args>
+		container_with_small_size(Args&&... args) : container(std::forward<Args>(args)...) {
+			overflow_check();
+		}
 
 		T& operator*() {
 			return container;

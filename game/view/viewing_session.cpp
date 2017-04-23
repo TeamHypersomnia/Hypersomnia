@@ -107,7 +107,7 @@ void viewing_session::reserve_caches_for_entities(const size_t n) {
 void viewing_session::switch_between_gui_and_back(const augs::machine_entropy::local_type& local) {
 	auto& gui = systems_audiovisual.get<gui_element_system>();
 
-	for (const auto& intent : context.to_key_and_mouse_intents(local)) {
+	for (const auto& intent : context.to_game_intents(local)) {
 		if (intent.is_pressed && intent.intent == intent_type::SWITCH_TO_GUI) {
 			gui.gui_look_enabled = !gui.gui_look_enabled;
 		}
@@ -127,12 +127,12 @@ void viewing_session::control_gui_and_remove_fetched_events(
 
 	gui.handle_hotbar_and_action_button_presses(
 		root,
-		context.to_key_and_mouse_intents(entropies)
+		context.to_game_intents(entropies)
 	);
 }
 
-void viewing_session::control_and_remove_fetched_intents(key_and_mouse_intent_vector& intents) {
-	erase_remove(intents, [&](const key_and_mouse_intent& intent) {
+void viewing_session::control_and_remove_fetched_intents(game_intent_vector& intents) {
+	erase_remove(intents, [&](const game_intent& intent) {
 		bool fetch = false;
 
 		if (intent.intent == intent_type::CLEAR_DEBUG_LINES) {

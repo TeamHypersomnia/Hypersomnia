@@ -289,7 +289,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 					if (test_entropy_randomizer.randval(0u, cfg.debug_randomize_entropies_in_client_setup_once_every_steps) == 0u) {
 						const unsigned which = test_entropy_randomizer.randval(0, 4);
 
-						key_and_mouse_intent new_intent;
+						game_intent new_intent;
 
 						switch (which) {
 						case 0: new_intent.intent = intent_type::MOVE_BACKWARD; break;

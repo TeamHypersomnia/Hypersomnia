@@ -1,15 +1,16 @@
 #pragma once
+#include "augs/templates/maybe_const.h"
+#include "augs/misc/basic_input_context.h"
+#include "augs/graphics/vertex.h"
 #include "augs/gui/dereferenced_location.h"
 #include "augs/gui/basic_gui_context.h"
-#include "augs/templates/maybe_const.h"
-#include "game_gui_element_location.h"
+
+#include "game/enums/intent_type.h"
 #include "game/transcendental/entity_handle.h"
-#include "augs/graphics/vertex.h"
+#include "game/detail/camera_cone.h"
+#include "game/detail/gui/game_gui_element_location.h"
 
 #include "application/config_lua_table.h"
-#include "augs/misc/input_context.h"
-
-#include "game/detail/camera_cone.h"
 
 class root_of_inventory_gui;
 struct character_gui;

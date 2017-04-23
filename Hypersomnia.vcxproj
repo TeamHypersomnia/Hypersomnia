@@ -355,7 +355,6 @@
     <ClCompile Include="augs\misc\enum_bitset.cpp" />
     <ClCompile Include="augs\misc\http_requests.cpp" />
     <ClCompile Include="augs\misc\input_context.cpp" />
-    <ClCompile Include="augs\misc\key_and_mouse_intent.cpp" />
     <ClCompile Include="augs\misc\machine_entropy.cpp" />
     <ClCompile Include="augs\misc\debug_entropy_player.cpp" />
     <ClCompile Include="augs\misc\pooled_object_id.cpp" />
@@ -1114,8 +1113,8 @@
     <ClInclude Include="augs\misc\enum_array.h" />
     <ClInclude Include="augs\misc\enum_bitset.h" />
     <ClInclude Include="augs\misc\http_requests.h" />
-    <ClInclude Include="augs\misc\input_context.h" />
-    <ClInclude Include="augs\misc\key_and_mouse_intent.h" />
+    <ClInclude Include="augs\misc\basic_input_context.h" />
+    <ClInclude Include="augs\misc\basic_game_intent.h" />
     <ClInclude Include="augs\misc\debug_entropy_player.h" />
     <ClInclude Include="augs\misc\readable_bytesize.h" />
     <ClInclude Include="augs\misc\delta_compression.h" />
