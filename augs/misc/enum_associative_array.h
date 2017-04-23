@@ -1,5 +1,7 @@
 #pragma once
+#include <array>
 #include <bitset>
+
 #include "augs/ensure.h"
 #include "augs/templates/maybe_const.h"
 

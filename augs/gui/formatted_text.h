@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+
 #include "augs/graphics/pixel.h"
 #include "game/assets/font_id.h"
 
@@ -24,7 +26,12 @@ namespace augs {
 			};
 
 			typedef std::basic_string<formatted_char> formatted_string;
-			
+
+			formatted_string format_recent_global_log(
+				const assets::font_id,
+				unsigned max_lines = 40
+			);
+
 			formatted_string multiply_alpha(formatted_string, const float);
 			formatted_string set_alpha(formatted_string, const float);
 

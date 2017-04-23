@@ -5,10 +5,34 @@
 
 #include "augs/templates/string_templates.h"
 #include "augs/templates/container_templates.h"
+#include "augs/log.h"
 
 namespace augs {
 	namespace gui {
 		namespace text {
+			formatted_string format_recent_global_log(
+				const assets::font_id f,
+				unsigned lines_remaining
+			) {
+				using g_log = global_log;
+
+				formatted_string result;
+
+				lines_remaining = std::min(lines_remaining, g_log::all_entries.size());
+
+				for (auto it = g_log::all_entries.end() - lines_remaining; it != g_log::all_entries.end(); ++it) {
+					std::stringstream ss((*it).text);
+					std::string line;
+
+					auto wstr = to_wstring((*it).text + "\n");
+					result += format(wstr, style(f, rgba((*it).color)));
+
+					--lines_remaining;
+				}
+
+				return result;
+			}
+
 			std::wstring formatted_string_to_wstring(
 				const formatted_string& f
 			) {

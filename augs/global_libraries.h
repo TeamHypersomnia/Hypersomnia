@@ -23,5 +23,4 @@ namespace augs {
 		static void init(unsigned which_augs = ALL);
 		static void deinit(unsigned which_augs = ALL);
 	};
-
 };

@@ -350,7 +350,9 @@
     <ClCompile Include="augs\image\font.cpp" />
     <ClCompile Include="augs\image\image.cpp" />
     <ClCompile Include="augs\image\polygonize_image.cpp" />
+    <ClCompile Include="augs\window_framework\log_color.cpp" />
     <ClCompile Include="augs\misc\action_list.cpp" />
+    <ClCompile Include="augs\misc\enum_bitset.cpp" />
     <ClCompile Include="augs\misc\http_requests.cpp" />
     <ClCompile Include="augs\misc\input_context.cpp" />
     <ClCompile Include="augs\misc\key_and_mouse_intent.cpp" />
@@ -361,6 +363,8 @@
     <ClCompile Include="augs\misc\standard_actions.cpp" />
     <ClCompile Include="augs\misc\streams.cpp" />
     <ClCompile Include="augs\misc\time_utils.cpp" />
+    <ClCompile Include="augs\misc\typesafe_sprintf.cpp" />
+    <ClCompile Include="augs\misc\typesafe_sscanf.cpp" />
     <ClCompile Include="augs\network\network_client.cpp" />
     <ClCompile Include="augs\network\network_types.cpp" />
     <ClCompile Include="augs\network\network_server.cpp" />
@@ -1061,9 +1065,11 @@
     <ClInclude Include="application\ui\app_ui_root.h" />
     <ClInclude Include="application\ui\locations\option_button_in_menu.h" />
     <ClInclude Include="application\ui\option_button.h" />
+    <ClInclude Include="augs\build_settings\setting_build_gtest.h" />
     <ClInclude Include="augs\build_settings\setting_empty_bases.h" />
     <ClInclude Include="augs\build_settings\setting_entity_handle_has_debug_name_reference.h" />
     <ClInclude Include="augs\build_settings\setting_log_audio_files.h" />
+    <ClInclude Include="augs\console_color.h" />
     <ClInclude Include="augs\graphics\texture.h" />
     <ClInclude Include="augs\gui\button_corners.h" />
     <ClInclude Include="application\ui\locations\app_ui_root_in_context.h" />
@@ -1099,6 +1105,7 @@
     <ClInclude Include="augs\gui\text_drawer.h" />
     <ClInclude Include="augs\image\font.h" />
     <ClInclude Include="augs\image\image.h" />
+    <ClInclude Include="augs\window_framework\log_color.h" />
     <ClInclude Include="augs\misc\action.h" />
     <ClInclude Include="augs\misc\action_list.h" />
     <ClInclude Include="augs\misc\container_with_small_size.h" />

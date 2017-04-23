@@ -1,6 +1,6 @@
 #pragma once
-#include <array>
-#include "augs/window_framework/colored_print.h"
+#include <iosfwd>
+#include "augs/console_color.h"
 
 typedef unsigned char rgba_channel;
 

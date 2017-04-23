@@ -48,20 +48,6 @@ namespace augs {
 			return get_queue<T>().clear();
 		}
 
-		template <typename T>
-		void delete_marked(std::vector<T>& messages) {
-			check_valid<T>();
-			messages.erase(std::remove_if(messages.begin(), messages.end(), [](const T& msg) {
-				return msg.delete_this_message;
-			}), messages.end());
-		}
-
-		template <typename T>
-		void delete_marked() {
-			check_valid<T>();
-			delete_marked_messages(get_queue<T>());
-		}
-
 		void ensure_all_empty() {
 			for_each_through_std_get(queues, [this](auto& q) { ensure(q.empty()); });
 		}

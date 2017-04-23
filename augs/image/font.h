@@ -7,6 +7,8 @@
 
 #include "augs/texture_atlas/texture_atlas_entry.h"
 
+#include "game/assets/font_id.h"
+
 struct FT_Glyph_Metrics_;
 typedef FT_Glyph_Metrics_ FT_Glyph_Metrics;
 

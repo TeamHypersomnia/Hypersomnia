@@ -12,8 +12,6 @@
 
 #include "cosmos.h"
 
-#include <gtest/gtest.h>
-
 #include "generated_introspectors.h"
 
 /* Several assumptions regarding delta encoding */
@@ -441,6 +439,11 @@ void cosmic_delta::decode(
 	deco.profiler.delta_decoding.end_measurement();
 }
 
+#include "augs/build_settings/setting_build_gtest.h"
+
+#if BUILD_GTEST
+#include <gtest/gtest.h>
+
 TEST(CosmicDelta, PaddingSanityCheck1) {
 	struct ok {
 		bool a;
@@ -802,3 +805,5 @@ TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
 	const bool pc3_intact = ent3.get<components::position_copying>().target == ent1.get_id();
 	ASSERT_TRUE(pc3_intact);
 }
+
+#endif

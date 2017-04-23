@@ -309,7 +309,7 @@ void viewing_session::view(
 	if (show_profile_details) {
 		quick_print(
 			renderer.triangles, 
-			multiply_alpha(global_log::format_recent_as_text(assets::font_id::GUI_FONT), 150.f / 255), 
+			multiply_alpha(augs::gui::text::format_recent_global_log(assets::font_id::GUI_FONT), 150.f / 255), 
 			vec2i(screen_size_i.x - 300, 0), 
 			300
 		);

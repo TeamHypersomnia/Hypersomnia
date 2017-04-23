@@ -1,7 +1,8 @@
 #include "tweaker.h"
-#include "augs/misc/timer.h"
-#include "augs/templates/container_templates.h"
+
 #include "augs/log.h"
+#include "augs/templates/container_templates.h"
+#include "augs/misc/timer.h"
 
 float TWEAK0 = 0.f;
 float TWEAK1 = 0.f;

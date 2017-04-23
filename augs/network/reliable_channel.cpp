@@ -216,8 +216,10 @@ namespace augs {
 	}
 }
 
+#include "augs/build_settings/setting_build_gtest.h"
 
-#include <gtest\gtest.h>
+#if BUILD_GTEST
+#include <gtest/gtest.h>
 
 using namespace augs;
 using namespace network;
@@ -566,3 +568,4 @@ TEST(NetChannel, OutOfDatePackets) {
 }
 
 #include "reliable_channel_tests.h"
+#endif

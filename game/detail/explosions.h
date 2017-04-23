@@ -1,4 +1,6 @@
 #pragma once
+#include "augs/graphics/pixel.h"
+
 #include "game/assets/sound_buffer_id.h"
 #include "game/components/transform_component.h"
 #include "game/transcendental/logic_step.h"

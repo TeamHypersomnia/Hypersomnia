@@ -7,7 +7,6 @@ namespace messages {
 	*/
 	struct message {
 		entity_id subject;
-		int delete_this_message = false;
 
 		message(entity_id subject = entity_id()) : subject(subject) {}
 	};

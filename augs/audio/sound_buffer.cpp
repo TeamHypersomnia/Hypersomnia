@@ -1,4 +1,4 @@
-#include "sound_buffer.h"
+#include <array>
 
 #include <AL/al.h>
 #include <AL/alc.h>
@@ -7,8 +7,10 @@
 
 #include "augs/al_log.h"
 #include "augs/ensure.h"
-#include "augs/filesystem/file.h"
+
 #include "augs/build_settings/setting_log_audio_files.h"
+#include "augs/filesystem/file.h"
+#include "augs/audio/sound_buffer.h"
 
 namespace augs {
 	single_sound_buffer::~single_sound_buffer() {

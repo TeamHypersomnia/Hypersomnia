@@ -1,6 +1,7 @@
 #include <algorithm>
 #include "augs/gui/rect.h"
 #include "drafter.h"
+
 #include "augs/window_framework/window.h"
 #include "augs/window_framework/platform_utils.h"
 

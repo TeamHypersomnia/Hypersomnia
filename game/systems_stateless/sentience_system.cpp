@@ -1,7 +1,5 @@
 #include "sentience_system.h"
 
-#include <gtest/gtest.h>
-
 #include "game/messages/damage_message.h"
 #include "game/messages/health_event.h"
 #include "game/messages/health_event.h"
@@ -462,6 +460,9 @@ void sentience_system::set_borders(const logic_step step) const {
 		}
 	);
 }
+
+#include <gtest/gtest.h>
+
 /*
 TEST(SentienceSystem, SentienceMeters) {
 	{

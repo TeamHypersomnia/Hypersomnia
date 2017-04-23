@@ -3,12 +3,12 @@ extern "C" {
 }
 
 #include <luabind/luabind.hpp>
-#include "lua_state_raii.h"
-#include "augs/window_framework/platform_utils.h"
-
 #include "augs/log.h"
 #include "augs/ensure.h"
 #include "augs/filesystem/file.h"
+#include "augs/window_framework/platform_utils.h"
+
+#include "augs/scripting/lua_state_raii.h"
 
 namespace augs {
 	lua_state_raii::lua_state_raii() 

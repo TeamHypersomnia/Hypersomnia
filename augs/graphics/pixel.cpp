@@ -1,6 +1,6 @@
-#include "pixel.h"
 #include <limits>
 #include "augs/ensure.h"
+#include "augs/graphics/pixel.h"
 
 namespace {
 	typedef struct {

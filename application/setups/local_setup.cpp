@@ -22,6 +22,7 @@
 
 #include "augs/templates/string_templates.h"
 #include "augs/filesystem/file.h"
+#include "augs/window_framework/log_color.h"
 #include "local_setup.h"
 #include "augs/tweaker.h"
 #include "game/detail/visible_entities.h"
