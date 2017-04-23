@@ -69,13 +69,13 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir);$(SolutionDir)\augs;$(SolutionDir)\3rdparty;$(SolutionDir)\3rdparty\googletest\googletest\include;$(SolutionDir)\3rdparty\googletest\googletest;$(SolutionDir)\3rdparty\freetype;$(SolutionDir)\3rdparty\enet\include;$(SolutionDir)\3rdparty\freetype\include;$(SolutionDir)\3rdparty\libsndfile\include;$(SolutionDir)\3rdparty\lua;$(SolutionDir)\3rdparty\luabind-deboostified;$(SolutionDir)\3rdparty\openal-soft-build;$(SolutionDir)\3rdparty\openal-soft\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)\3rdparty;$(SolutionDir)\3rdparty\googletest\googletest\include;$(SolutionDir)\3rdparty\googletest\googletest;$(SolutionDir)\3rdparty\freetype;$(SolutionDir)\3rdparty\enet\include;$(SolutionDir)\3rdparty\freetype\include;$(SolutionDir)\3rdparty\libsndfile\include;$(SolutionDir)\3rdparty\lua;$(SolutionDir)\3rdparty\luabind-deboostified;$(SolutionDir)\3rdparty\openal-soft-build;$(SolutionDir)\3rdparty\openal-soft\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <TargetName>$(ProjectName)</TargetName>
     <OutDir>$(SolutionDir)output/</OutDir>
     <LibraryPath>$(SolutionDir)\3rdparty\libsndfile\lib;$(SolutionDir)\3rdparty\http;$(SolutionDir)\3rdparty\openal-soft-build\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir);$(SolutionDir)\augs;$(SolutionDir)\3rdparty;$(SolutionDir)\3rdparty\googletest\googletest\include;$(SolutionDir)\3rdparty\googletest\googletest;$(SolutionDir)\3rdparty\freetype;$(SolutionDir)\3rdparty\enet\include;$(SolutionDir)\3rdparty\freetype\include;$(SolutionDir)\3rdparty\libsndfile\include;$(SolutionDir)\3rdparty\lua;$(SolutionDir)\3rdparty\luabind-deboostified;$(SolutionDir)\3rdparty\openal-soft-build;$(SolutionDir)\3rdparty\openal-soft\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)\3rdparty;$(SolutionDir)\3rdparty\googletest\googletest\include;$(SolutionDir)\3rdparty\googletest\googletest;$(SolutionDir)\3rdparty\freetype;$(SolutionDir)\3rdparty\enet\include;$(SolutionDir)\3rdparty\freetype\include;$(SolutionDir)\3rdparty\libsndfile\include;$(SolutionDir)\3rdparty\lua;$(SolutionDir)\3rdparty\luabind-deboostified;$(SolutionDir)\3rdparty\openal-soft-build;$(SolutionDir)\3rdparty\openal-soft\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <TargetName>$(ProjectName)-$(Configuration)</TargetName>
     <OutDir>$(SolutionDir)output/</OutDir>
     <LibraryPath>$(SolutionDir)\3rdparty\libsndfile\lib;$(SolutionDir)\3rdparty\http;$(SolutionDir)\3rdparty\openal-soft-build\Debug;$(LibraryPath)</LibraryPath>

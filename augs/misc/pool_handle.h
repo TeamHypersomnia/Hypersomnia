@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/templates/maybe_const.h"
-#include "pooled_object_id.h"
+#include "augs/misc/pooled_object_id.h"
 
 namespace augs {
 	template<bool is_const, class pool_container, class value_type>

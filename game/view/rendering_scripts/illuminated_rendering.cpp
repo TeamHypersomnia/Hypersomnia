@@ -17,7 +17,7 @@
 
 #include "augs/graphics/drawers.h"
 
-#include "math/matrix.h"
+#include "augs/math/matrix.h"
 
 #include "3rdparty/GL/OpenGL.h"
 

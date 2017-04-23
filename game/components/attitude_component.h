@@ -6,7 +6,7 @@
 #include "game/container_sizes.h"
 #include "augs/misc/constant_size_vector.h"
 
-#include "padding_byte.h"
+#include "augs/padding_byte.h"
 
 namespace components {
 	struct attitude {

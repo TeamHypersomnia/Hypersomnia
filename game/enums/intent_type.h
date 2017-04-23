@@ -79,3 +79,8 @@ enum class intent_type : unsigned char {
 
 	COUNT
 };
+
+template <class intent_enum_type>
+struct basic_input_context;
+
+typedef basic_input_context<intent_type> input_context;

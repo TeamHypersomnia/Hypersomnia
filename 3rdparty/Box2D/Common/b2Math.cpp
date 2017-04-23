@@ -17,7 +17,7 @@
 */
 
 #include <Box2D/Common/b2Math.h>
-#include "math/vec2.h"
+#include "augs/math/vec2.h"
 
 b2Vec2::b2Vec2(const vec2 vec) : b2Vec2(vec.x, vec.y) {}
 

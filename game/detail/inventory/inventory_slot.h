@@ -6,7 +6,7 @@
 
 #include "augs/misc/constant_size_vector.h"
 #include "game/container_sizes.h"
-#include "padding_byte.h"
+#include "augs/padding_byte.h"
 
 #include "game/enums/item_category.h"
 #include "game/enums/slot_physical_behaviour.h"

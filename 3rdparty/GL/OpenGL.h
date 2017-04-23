@@ -13,6 +13,10 @@
 #endif
 #include <string>
 
-void report_glerr(GLenum __error, std::string location);
+void report_glerr(
+	const GLenum __error, 
+	const std::string& location
+);
+
 #define glerr { report_glerr(glGetError(), __FUNCTION__); };
 

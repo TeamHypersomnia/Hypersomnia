@@ -1,10 +1,7 @@
 #pragma once
 #include "augs/misc/constant_size_vector.h"
-
+#include "game/assets/game_image_id.h"
 #include "game/container_sizes.h"
-
-#include "game/transcendental/entity_id.h"
-#include "game/components/sprite_component.h"
 
 class assets_manager;
 

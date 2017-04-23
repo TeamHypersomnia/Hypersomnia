@@ -1,5 +1,6 @@
 #pragma once
 #include "game/enums/intent_type.h"
+
 #include "augs/window_framework/event.h"
 #include "augs/padding_byte.h"
 

@@ -1,9 +1,5 @@
-#include "key_and_mouse_intent.h"
+#include "augs/misc/key_and_mouse_intent.h"
 #include "augs/misc/input_context.h"
-
-#include "game/transcendental/entity_handle.h"
-#include "game/transcendental/cosmos.h"
-#include "game/detail/gui/character_gui.h"
 
 bool operator==(const key_and_mouse_intent_vector& a, const key_and_mouse_intent_vector& b) {
 	return compare_containers(a, b);

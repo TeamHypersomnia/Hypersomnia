@@ -1,7 +1,8 @@
 #pragma once
+#include <vector>
+
 #include "augs/window_framework/event.h"
 #include "augs/network/network_types.h"
-#include <vector>
 
 namespace augs {
 	struct machine_entropy {

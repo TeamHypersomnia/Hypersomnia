@@ -8,8 +8,6 @@
 
 #include "platform_utils.h"
 
-#include "game/detail/particle_types.h"
-
 #ifdef PLATFORM_WINDOWS
 augs::window::event::message translate_enum(UINT m) {
 	using namespace augs::window::event;

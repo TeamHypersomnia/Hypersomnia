@@ -9,7 +9,7 @@
 
 #include "augs/misc/timer.h"
 #include "augs/graphics/pixel.h"
-#include "padding_byte.h"
+#include "augs/padding_byte.h"
 
 #include "game/detail/sentience_meter.h"
 

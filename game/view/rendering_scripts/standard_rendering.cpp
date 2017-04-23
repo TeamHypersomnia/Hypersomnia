@@ -16,7 +16,7 @@
 #include "augs/graphics/renderer.h"
 #include "game/view/viewing_step.h"
 
-#include "math/matrix.h"
+#include "augs/math/matrix.h"
 
 #include "3rdparty/GL/OpenGL.h"
 

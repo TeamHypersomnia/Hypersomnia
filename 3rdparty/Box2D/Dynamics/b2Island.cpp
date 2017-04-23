@@ -27,6 +27,8 @@
 #include <Box2D/Common/b2StackAllocator.h>
 #include <Box2D/Common/b2Timer.h>
 
+#include "augs/math/vec2.h"
+
 /*
 Position Correction Notes
 =========================
@@ -179,7 +181,7 @@ b2Island::~b2Island()
 	m_allocator->Free(m_contacts);
 	m_allocator->Free(m_bodies);
 }
-#include "math/vec2.h"
+
 void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& gravity, bool allowSleep)
 {
 	b2Timer timer;

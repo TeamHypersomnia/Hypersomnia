@@ -1,7 +1,5 @@
 #pragma once
 #include <unordered_map>
-#include "augs/misc/machine_entropy.h"
-#include "game/transcendental/cosmic_entropy.h"
 
 namespace augs {
 	template <class entropy_type>

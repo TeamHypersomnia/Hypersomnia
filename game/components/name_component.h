@@ -1,12 +1,12 @@
 #pragma once
-#include "game/container_sizes.h"
+#include "augs/zeroed_pod.h"
 #include "augs/misc/constant_size_vector.h"
 
+#include "game/container_sizes.h"
 #include "game/enums/entity_name.h"
+
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
-
-#include "zeroed_pod.h"
 
 namespace components {
 	struct name {

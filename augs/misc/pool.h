@@ -1,9 +1,11 @@
 #pragma once
 #include <vector>
 #include "augs/ensure.h"
-#include "pool_handle.h"
-#include "subscript_operator_for_get_handle_mixin.h"
+
 #include "augs/build_settings/setting_empty_bases.h"
+
+#include "augs/misc/pool_handle.h"
+#include "augs/misc/subscript_operator_for_get_handle_mixin.h"
 
 namespace augs {
 	template<class T>

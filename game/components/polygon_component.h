@@ -9,7 +9,7 @@
 #include "game/assets/game_image_id.h"
 #include "game/detail/basic_renderable_drawing_input.h"
 
-#include "zeroed_pod.h"
+#include "augs/zeroed_pod.h"
 
 namespace augs {
 	struct texture_atlas_entry;

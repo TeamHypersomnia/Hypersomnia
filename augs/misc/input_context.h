@@ -1,6 +1,4 @@
 #pragma once
-#include <unordered_map>
-#include "game/enums/intent_type.h"
 #include "augs/window_framework/event.h"
 
 #include "augs/misc/enum_associative_array.h"
@@ -21,4 +19,3 @@ struct basic_input_context {
 	key_and_mouse_intent_vector to_key_and_mouse_intents(const augs::machine_entropy::local_type&) const;
 };
 
-typedef basic_input_context<intent_type> input_context;
