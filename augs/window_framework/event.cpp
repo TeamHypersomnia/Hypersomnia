@@ -228,6 +228,21 @@ namespace augs {
 						case key::LALT: return L"Left Alt"; break;
 						case key::RALT: return L"Right Alt"; break;
 						case key::DASH: return L"Dash"; break;
+						case key::EQUAL: return L"Equal"; break;
+						case key::NEXT_TRACK: return L"Next Track"; break;
+						case key::PREV_TRACK: return L"Prev Track"; break;
+						case key::STOP_TRACK: return L"Stop Track"; break;
+						case key::PLAY_PAUSE_TRACK: return L"Play Or Pause"; break;
+						case key::SEMICOLON: return L"Semicolon"; break;
+						case key::PLUS: return L"Plus"; break;
+						case key::COMMA: return L"Comma"; break;
+						case key::MINUS: return L"Minus"; break;
+						case key::PERIOD: return L"Period"; break;
+						case key::SLASH: return L"Slash"; break;
+						case key::OPEN_SQUARE_BRACKET: return L"Open Square Bracket"; break;
+						case key::BACKSLASH: return L"Backslash"; break;
+						case key::CLOSE_SQUARE_BRACKET: return L"Close Square Bracket"; break;
+						case key::APOSTROPHE: return L"Apostrophe"; break;
 						default: return L"Invalid key"; break;
 					}
 				}
