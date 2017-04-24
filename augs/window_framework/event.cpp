@@ -229,6 +229,9 @@ namespace augs {
 						case key::RALT: return L"Right Alt"; break;
 						case key::DASH: return L"Dash"; break;
 						case key::EQUAL: return L"Equal"; break;
+						case key::VOLUME_MUTE: return L"Volume Mute"; break;
+						case key::VOLUME_DOWN: return L"Volume Down"; break;
+						case key::VOLUME_UP: return L"Volume Up"; break;
 						case key::NEXT_TRACK: return L"Next Track"; break;
 						case key::PREV_TRACK: return L"Prev Track"; break;
 						case key::STOP_TRACK: return L"Stop Track"; break;

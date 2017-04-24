@@ -161,6 +161,9 @@ key translate_virtual_key(const unsigned int m) {
 	case VK_LMENU:											return key::LALT;
 	case VK_RMENU:											return key::RALT;
 	case VK_OEM_NEC_EQUAL:									return key::EQUAL;
+	case VK_VOLUME_MUTE:									return key::VOLUME_MUTE;
+	case VK_VOLUME_UP:										return key::VOLUME_UP;
+	case VK_VOLUME_DOWN:									return key::VOLUME_DOWN;
 	case VK_MEDIA_NEXT_TRACK:								return key::NEXT_TRACK;
 	case VK_MEDIA_PREV_TRACK:								return key::PREV_TRACK;
 	case VK_MEDIA_STOP:										return key::STOP_TRACK;
