@@ -80,4 +80,5 @@ namespace augs {
 
 	single_sound_buffer::data_type get_sound_samples_from_file(const std::string);
 	std::vector<int16_t> mix_stereo_to_mono(const std::vector<int16_t>&);
+	single_sound_buffer::data_type mix_stereo_to_mono(const single_sound_buffer::data_type& source);
 }

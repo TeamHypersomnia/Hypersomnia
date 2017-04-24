@@ -150,12 +150,7 @@ namespace augs {
 			stereo.set_data(data);
 
 			if (generate_mono) {
-				single_sound_buffer::data_type mono_data;
-				mono_data.channels = 1;
-				mono_data.frequency = data.frequency;
-				mono_data.samples = mix_stereo_to_mono(data.samples);
-
-				mono.set_data(mono_data);
+				mono.set_data(mix_stereo_to_mono(data));
 			}
 
 		}
@@ -191,10 +186,10 @@ namespace augs {
 
 		return output;
 	}
-	
+
 	std::vector<int16_t> mix_stereo_to_mono(const std::vector<int16_t>& samples) {
 		ensure(samples.size() % 2 == 0);
-		
+
 		std::vector<int16_t> output;
 		output.resize(samples.size() / 2);
 
@@ -203,6 +198,14 @@ namespace augs {
 		}
 
 		return output;
+	}
+
+	single_sound_buffer::data_type mix_stereo_to_mono(const single_sound_buffer::data_type& source) {
+		single_sound_buffer::data_type mono_data;
+		mono_data.channels = 1;
+		mono_data.frequency = source.frequency;
+		mono_data.samples = mix_stereo_to_mono(source.samples);
+		return mono_data;
 	}
 
 	single_sound_buffer::data_type get_sound_samples_from_file(const std::string path) {
