@@ -160,7 +160,22 @@ key translate_virtual_key(const unsigned int m) {
 	case VK_RCONTROL:										return key::RCTRL;
 	case VK_LMENU:											return key::LALT;
 	case VK_RMENU:											return key::RALT;
+	case VK_OEM_NEC_EQUAL:									return key::EQUAL;
+	case VK_MEDIA_NEXT_TRACK:								return key::NEXT_TRACK;
+	case VK_MEDIA_PREV_TRACK:								return key::PREV_TRACK;
+	case VK_MEDIA_STOP:										return key::STOP_TRACK;
+	case VK_MEDIA_PLAY_PAUSE:								return key::PLAY_PAUSE_TRACK;
+	case VK_OEM_1:											return key::SEMICOLON;
+	case VK_OEM_PLUS:										return key::PLUS;
+	case VK_OEM_COMMA:										return key::COMMA;
+	case VK_OEM_MINUS:										return key::MINUS;
+	case VK_OEM_PERIOD:										return key::PERIOD;
+	case VK_OEM_2:											return key::SLASH;
 	case VK_OEM_3:											return key::DASH;
+	case VK_OEM_4:											return key::OPEN_SQUARE_BRACKET;
+	case VK_OEM_5:											return key::BACKSLASH;
+	case VK_OEM_6:											return key::CLOSE_SQUARE_BRACKET;
+	case VK_OEM_7:											return key::APOSTROPHE;
 	default:												return key::INVALID;
 	}
 }
