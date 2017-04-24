@@ -38,7 +38,13 @@ namespace augs {
 			packet payload;
 			unsigned messages_to_skip = 0;
 
-			bool operator==(const message& b) const;
+			bool message::operator==(const message& b) const {
+				return
+					message_type == b.message_type
+					&& address == b.address
+					&& messages_to_skip == b.messages_to_skip
+				;
+			}
 		};
 	}
 

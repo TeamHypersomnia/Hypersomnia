@@ -1,9 +1,10 @@
 #include <Windows.h>
 #include "translate_windows_enums.h"
 
-augs::window::event::message translate_enum(UINT m) {
-	using namespace augs::window::event;
+using namespace augs::window::event;
+using namespace augs::window::event::keys;
 
+message translate_enum(UINT m) {
 	switch (m) {
 	case UINT(message::ltripleclick):	return message::ltripleclick;
 	case SC_CLOSE:						return message::close; break;
@@ -37,26 +38,7 @@ augs::window::event::message translate_enum(UINT m) {
 	return augs::window::event::message::unknown;
 }
 
-augs::window::event::keys::key translate_key(const UINT lParam, UINT m) {
-	using namespace augs::window::event::keys;
-
-	UINT scancode = (lParam & 0x00ff0000) >> 16;
-	int extended = (lParam & 0x01000000) != 0;
-
-	switch (m) {
-	case VK_SHIFT:
-		m = MapVirtualKey(scancode, MAPVK_VSC_TO_VK_EX);
-		break;
-	case VK_CONTROL:
-		m = extended ? VK_RCONTROL : VK_LCONTROL;
-		break;
-	case VK_MENU:
-		m = extended ? VK_RMENU : VK_LMENU;
-		break;
-	default:
-		break;
-	}
-
+key translate_virtual_key(const unsigned int m) {
 	switch (m) {
 	case VK_LBUTTON:										return key::LMOUSE;
 	case VK_RBUTTON:										return key::RMOUSE;
@@ -181,4 +163,25 @@ augs::window::event::keys::key translate_key(const UINT lParam, UINT m) {
 	case VK_OEM_3:											return key::DASH;
 	default:												return key::INVALID;
 	}
+}
+
+key translate_key_with_lparam(const UINT lParam, UINT m) {
+	UINT scancode = (lParam & 0x00ff0000) >> 16;
+	int extended = (lParam & 0x01000000) != 0;
+
+	switch (m) {
+	case VK_SHIFT:
+		m = MapVirtualKey(scancode, MAPVK_VSC_TO_VK_EX);
+		break;
+	case VK_CONTROL:
+		m = extended ? VK_RCONTROL : VK_LCONTROL;
+		break;
+	case VK_MENU:
+		m = extended ? VK_RMENU : VK_LMENU;
+		break;
+	default:
+		break;
+	}
+
+	return translate_virtual_key(m);
 }

@@ -58,7 +58,7 @@ capability_comparison match_transfer_capabilities(
 		item_owning_capability.alive()
 		&& target_slot_owning_capability.alive()
 		&& item_owning_capability != target_slot_owning_capability
-		) {
+	) {
 		return{ capability_relation::UNMATCHING, dead_entity };
 	}
 
@@ -66,7 +66,7 @@ capability_comparison match_transfer_capabilities(
 		item_owning_capability.alive()
 		&& target_slot_owning_capability.alive()
 		&& item_owning_capability == target_slot_owning_capability
-		) {
+	) {
 		return{ capability_relation::THE_SAME, item_owning_capability };
 	}
 

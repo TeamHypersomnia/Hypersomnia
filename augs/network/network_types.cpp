@@ -6,11 +6,6 @@
 
 namespace augs {
 	namespace network {
-		bool message::operator==(const message& b) const {
-			return std::make_tuple(message_type, address, payload, messages_to_skip)
-				== std::make_tuple(b.message_type, b.address, b.payload, b.messages_to_skip);
-		}
-
 		endpoint_address::endpoint_address() : ip(0), port(0) {}
 
 		endpoint_address::endpoint_address(const ENetAddress& addr) {

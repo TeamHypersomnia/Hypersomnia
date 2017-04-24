@@ -85,14 +85,14 @@ namespace augs {
 				events.repeated = ((lParam & (1 << 30)) != 0);
 			case WM_KEYDOWN:
 			{
-				events.key.key = translate_key(lParam, wParam);
+				events.key.key = translate_key_with_lparam(lParam, wParam);
 				events.repeated = ((lParam & (1 << 30)) != 0);
 			}
 			break;
 
 			case WM_KEYUP:
 			{
-				events.key.key = translate_key(lParam, wParam);
+				events.key.key = translate_key_with_lparam(lParam, wParam);
 			}
 
 			break;
