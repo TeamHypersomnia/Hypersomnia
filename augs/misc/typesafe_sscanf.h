@@ -18,7 +18,23 @@ bool typesafe_scanf_detail(
 	return true;
 }
 
-template<typename CharType, typename T, typename... A>
+template <typename CharType, typename T>
+void detail_typesafe_scanf_value(
+	std::basic_istringstream<CharType>& read_chunk,
+	T& into
+) {
+	read_chunk >> into;
+}
+
+template <typename CharType>
+void detail_typesafe_scanf_value(
+	std::basic_istringstream<CharType>& read_chunk,
+	std::basic_string<CharType>& into
+) {
+	into = read_chunk.str();
+}
+
+template <typename CharType, typename T, typename... A>
 bool typesafe_scanf_detail(
 	size_t source_pos,
 	size_t format_pos,
@@ -40,10 +56,9 @@ bool typesafe_scanf_detail(
 			const auto terminating_character = format[format_pos + 2];
 			const auto found_terminating = source_string.find(terminating_character, value_beginning_at_source);
 
-			if (found_terminating == std::string::npos) {
-				return false;
-			}
-			else {
+			{
+				/* if found_terminating is std::string::npos, we take the rest of the string */
+
 				std::basic_istringstream<CharType> read_chunk(
 					source_string.substr(
 						value_beginning_at_source, 
@@ -51,28 +66,30 @@ bool typesafe_scanf_detail(
 					)
 				);
 
-				read_chunk >> val;
-
-				source_pos = found_terminating;
-				format_pos = format_pos + 2;
-
-				return typesafe_scanf_detail(
-					source_pos,
-					format_pos,
-					source_string,
-					format,
-					vals...
-				);
+				detail_typesafe_scanf_value(read_chunk, val);
 			}
+
+			source_pos = found_terminating;
+			format_pos = format_pos + 2;
+
+			return typesafe_scanf_detail(
+				source_pos,
+				format_pos,
+				source_string,
+				format,
+				vals...
+			);
 		}
 		else {
-			std::basic_istringstream<CharType> read_chunk(
-				source_string.substr(
-					value_beginning_at_source
-				)
-			);
+			{
+				std::basic_istringstream<CharType> read_chunk(
+					source_string.substr(
+						value_beginning_at_source
+					)
+				);
 
-			read_chunk >> val;
+				detail_typesafe_scanf_value(read_chunk, val);
+			}
 
 			if (sizeof...(A) == 0) {
 				return true;
