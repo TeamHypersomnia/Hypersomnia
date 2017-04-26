@@ -54,7 +54,7 @@ void force_joint_system::apply_forces_towards_target_entities(const logic_step s
 				float force_length = force_joint.force_towards_chased_entity;
 
 				if (distance < force_joint.distance_when_force_easing_starts) {
-					auto mult = distance / force_joint.distance_when_force_easing_starts;
+					const auto mult = distance / force_joint.distance_when_force_easing_starts;
 					force_length *= pow(mult, force_joint.power_of_force_easing_multiplier);
 				}
 

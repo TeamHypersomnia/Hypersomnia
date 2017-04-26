@@ -1489,9 +1489,6 @@
     <ClInclude Include="augs\window_framework\event.h" />
     <ClInclude Include="augs\window_framework\window.h" />
   </ItemGroup>
-  <ItemGroup>
-    <Image Include="C:\Users\Anon\AppData\Local\Temp\auqujqfw.bmp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

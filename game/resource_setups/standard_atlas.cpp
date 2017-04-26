@@ -544,6 +544,11 @@ game_image_requests load_standard_images() {
 		in.texture_maps[DIFFUSE] = { "hypersomnia/gfx/gun_muzzle_slot_icon.png", GAME_WORLD_ATLAS };
 	}
 
+	{
+		auto& in = output[game_image_id::STANDARD_HEAD];
+		in.texture_maps[DIFFUSE] = { "hypersomnia/gfx/standard_head.png", GAME_WORLD_ATLAS };
+	}
+
 	make_button_with_corners(
 		game_image_id::HOTBAR_BUTTON_INSIDE,
 		"generated/buttons_with_corners/hotbar_button_%x.png",
@@ -554,27 +559,6 @@ game_image_requests load_standard_images() {
 		game_image_id::MENU_BUTTON_INSIDE,
 		"generated/buttons_with_corners/menu_button_%x.png",
 		false
-	);
-
-	make_indexed(
-		game_image_id::TORSO_MOVING_FIRST,
-		game_image_id::TORSO_MOVING_LAST,
-		"hypersomnia/gfx/torso_white_walk_barehands_%x.png",
-		"generated/neon_maps/torso_white_walk_barehands_%x.png"
-	);
-
-	make_indexed(
-		game_image_id::VIOLET_TORSO_MOVING_FIRST,
-		game_image_id::VIOLET_TORSO_MOVING_LAST,
-		"hypersomnia/gfx/sprite_%x.png",
-		"generated/neon_maps/sprite_%x.png"
-	);
-
-	make_indexed(
-		game_image_id::BLUE_TORSO_MOVING_FIRST,
-		game_image_id::BLUE_TORSO_MOVING_LAST,
-		"hypersomnia/gfx/walk_%x.png",
-		"generated/neon_maps/walk_%x.png"
 	);
 
 	make_indexed(

@@ -115,7 +115,7 @@ namespace ingredients {
 
 		e.map_child_entity(child_entity_name::CHARACTER_CROSSHAIR, crosshair_entity);
 
-		sprite.set(assets::game_image_id::TORSO_MOVING_FIRST, white);
+		sprite.set(assets::game_image_id::STANDARD_HEAD);
 
 		render.layer = render_layer::SMALL_DYNAMIC_BODY;
 
