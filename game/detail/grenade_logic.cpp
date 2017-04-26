@@ -90,7 +90,7 @@ void release_or_throw_grenade(
 		new_def.colliders[0].density = 10.f;
 
 		const auto new_radius = 1.f;// std::min(aabb.w(), aabb.h()) / 16;// aabb.diagonal() / 2;
-		new_def.colliders[0].shape.set(circle_shape{ new_radius });
+		//new_def.colliders[0].shape.set(circle_shape{ new_radius });
 
 		for (auto& c : new_def.colliders) {
 			c.material = assets::physical_material_id::GRENADE;

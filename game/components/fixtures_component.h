@@ -59,6 +59,7 @@ namespace components {
 		// END GEN INTROSPECTOR
 
 		convex_partitioned_collider& new_collider() {
+			ensure(colliders.size() == 0);
 			colliders.push_back(convex_partitioned_collider());
 			return *(colliders.end()-1);
 		}
@@ -82,17 +83,17 @@ public:
 	bool is_activated() const;
 	bool is_constructed() const;
 
-	float get_density_multiplier(const size_t collider_index = 0) const;
-	float get_friction(const size_t collider_index = 0) const;
-	float get_restitution(const size_t collider_index = 0) const;
-	float get_base_density(const size_t collider_index = 0) const;
-	float get_density(const size_t collider_index = 0) const;
+	float get_density_multiplier() const;
+	float get_friction() const;
+	float get_restitution() const;
+	float get_base_density() const;
+	float get_density() const;
 	
 	basic_entity_handle<is_const> get_owner_body() const;
 
 	ltrb get_local_aabb() const;
 
-	const convex_partitioned_collider& get_collider_data(const size_t collider_index) const;
+	const convex_partitioned_collider& get_collider_data() const;
 	size_t get_num_colliders() const;
 
 	bool is_friction_ground() const;
@@ -102,7 +103,7 @@ public:
 
 template<>
 class component_synchronizer<false, components::fixtures> : public basic_fixtures_synchronizer<false> {
-	void rebuild_density(size_t) const;
+	void rebuild_density() const;
 
 	void reinference() const;
 
@@ -112,28 +113,23 @@ public:
 	convex_poly_destruction_data& get_modifiable_destruction_data(const b2Fixture_index_in_component);
 
 	void set_density(
-		const float density, 
-		const size_t collider_index = 0
+		const float density
 	) const;
 
 	void set_density_multiplier(
-		const float multiplier,
-		const size_t collider_index = 0
+		const float multiplier
 	) const;
 
 	void set_friction(
-		const float friction, 
-		const size_t collider_index = 0
+		const float friction
 	) const;
 
 	void set_restitution(
-		const float restitution, 
-		const size_t collider_index = 0
+		const float restitution
 	) const;
 
 	void set_physical_material(
-		const assets::physical_material_id,
-		const size_t collider_index = 0
+		const assets::physical_material_id
 	) const;
 
 	void set_owner_body(const entity_id) const;

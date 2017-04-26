@@ -18,6 +18,8 @@
 
 #include "augs/build_settings/setting_empty_bases.h"
 
+#include "game/container_sizes.h"
+
 class cosmos;
 
 struct rigid_body_cache {
@@ -26,8 +28,8 @@ struct rigid_body_cache {
 };
 
 struct colliders_cache {
-	std::vector<std::vector<b2Fixture*>> fixtures_per_collider;
 	int correspondent_rigid_body_cache = -1;
+	augs::constant_size_vector<b2Fixture*, CONVEX_POLYS_COUNT> all_fixtures_in_component;
 };
 
 class EMPTY_BASES physics_system : public physics_queries<physics_system> {

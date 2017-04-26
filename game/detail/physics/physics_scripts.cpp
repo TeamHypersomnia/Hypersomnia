@@ -98,9 +98,7 @@ void resolve_density_of_associated_fixtures(const entity_handle id) {
 		}
 	}
 
-	for (size_t i = 0; i < fixtures.get_num_colliders(); ++i) {
-		fixtures.set_density_multiplier(density_multiplier, i);
-	}
+	fixtures.set_density_multiplier(density_multiplier);
 }
 
 bool are_connected_by_friction(

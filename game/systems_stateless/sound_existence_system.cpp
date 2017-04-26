@@ -97,8 +97,8 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 			const auto& subject_fix = subject.get<components::fixtures>();
 			const auto& collider_fix = collider.get<components::fixtures>();
 
-			const auto& subject_coll = subject_fix.get_collider_data(c.subject_b2Fixture_index.collider_index);
-			const auto& collider_coll = collider_fix.get_collider_data(c.collider_b2Fixture_index.collider_index);
+			const auto& subject_coll = subject_fix.get_collider_data();
+			const auto& collider_coll = collider_fix.get_collider_data();
 			
 			const auto sound_id = step.input.metas_of_assets[subject_coll.material].collision_sound_matrix[collider_coll.material];
 
@@ -114,7 +114,7 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 				in.effect.modifier.gain = gain_mult;
 				in.effect.id = sound_id;
 
-				in.create_sound_effect_entity(step, c.point, entity_id()).add_standard_components(step);
+				//in.create_sound_effect_entity(step, c.point, entity_id()).add_standard_components(step);
 			}
 
 			// skip the next, swapped collision message

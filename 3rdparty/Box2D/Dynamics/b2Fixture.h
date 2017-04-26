@@ -220,7 +220,7 @@ public:
 	float32 m_restitution;
 
 	bool m_isSensor;
-	short collider_index;
+	short index_in_component;
 	unsigned char m_proxyCount;
 	b2FixtureProxy* m_proxies;
 

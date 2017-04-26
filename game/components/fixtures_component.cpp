@@ -47,8 +47,8 @@ size_t basic_fixtures_synchronizer<C>::get_num_colliders() const {
 }
 
 template<bool C>
-const convex_partitioned_collider& basic_fixtures_synchronizer<C>::get_collider_data(const size_t i) const {
-	return component.colliders[i];
+const convex_partitioned_collider& basic_fixtures_synchronizer<C>::get_collider_data() const {
+	return component.colliders[0];
 ;}
 
 template<bool C>
@@ -84,42 +84,40 @@ void component_synchronizer<false, F>::reinference() const {
 	handle.get_cosmos().partial_reinference<physics_system>(handle);
 }
 
-void component_synchronizer<false, F>::rebuild_density(const size_t index) const {
-	for (auto f : get_cache().fixtures_per_collider[index]) {
-		f->SetDensity(component.colliders[index].density * component.colliders[index].density_multiplier);
+void component_synchronizer<false, F>::rebuild_density() const {
+	for (auto f : get_cache().all_fixtures_in_component) {
+		f->SetDensity(component.colliders[0].density * component.colliders[0].density_multiplier);
 	}
 
-	get_cache().fixtures_per_collider[0][0]->GetBody()->ResetMassData();
+	get_cache().all_fixtures_in_component[0]->GetBody()->ResetMassData();
 }
 
 void component_synchronizer<false, F>::set_density(
-	const float d, 
-	const size_t index
+	const float d
 ) const {
-	component.colliders[index].density = d;
+	component.colliders[0].density = d;
 
 	if (!is_constructed()) {
 		return;
 	}
 
-	rebuild_density(index);
+	rebuild_density();
 }
 
 convex_poly_destruction_data& component_synchronizer<false, F>::get_modifiable_destruction_data(const b2Fixture_index_in_component indices) {
-	return component.colliders[indices.collider_index].destruction[indices.convex_shape_index];
+	return component.colliders[0].destruction[indices.convex_shape_index];
 }
 
 void component_synchronizer<false, F>::set_density_multiplier(
-	const float mult, 
-	const size_t index
+	const float mult
 ) const {
-	component.colliders[index].density_multiplier = mult;
+	component.colliders[0].density_multiplier = mult;
 
 	if (!is_constructed()) {
 		return;
 	}
 
-	rebuild_density(index);
+	rebuild_density();
 }
 
 void component_synchronizer<false, F>::set_activated(const bool flag) const {
@@ -128,65 +126,62 @@ void component_synchronizer<false, F>::set_activated(const bool flag) const {
 }
 
 void component_synchronizer<false, F>::set_friction(
-	const float fr, 
-	const size_t index
+	const float fr
 ) const {
-	component.colliders[index].friction = fr;
+	component.colliders[0].friction = fr;
 
 	if (!is_constructed()) {
 		return;
 	}
 
-	for (auto f : get_cache().fixtures_per_collider[index]) {
+	for (auto f : get_cache().all_fixtures_in_component) {
 		f->SetFriction(fr);
 	}
 }
 
 void component_synchronizer<false, F>::set_restitution(
-	const float r, 
-	const size_t index
+	const float r
 ) const {
-	component.colliders[index].restitution = r;
+	component.colliders[0].restitution = r;
 
 	if (!is_constructed()) {
 		return;
 	}
 
-	for (auto f : get_cache().fixtures_per_collider[index]) {
+	for (auto f : get_cache().all_fixtures_in_component) {
 		f->SetRestitution(r);
 	}
 }
 
 void component_synchronizer<false, F>::set_physical_material(
-	const assets::physical_material_id m, 
-	const size_t index
+	const assets::physical_material_id m
 ) const {
-	component.colliders[index].material = m;
+	component.colliders[0].material = m;
 }
 
 template<bool C>
-float basic_fixtures_synchronizer<C>::get_friction(const size_t index) const {
-	return component.colliders[index].friction;
+float basic_fixtures_synchronizer<C>::get_friction() const {
+	return component.colliders[0].friction;
 }
 
 template<bool C>
-float basic_fixtures_synchronizer<C>::get_restitution(const size_t index) const {
-	return component.colliders[index].restitution;
+float basic_fixtures_synchronizer<C>::get_restitution() const {
+	return component.colliders[0].restitution;
 }
 
 template<bool C>
-float basic_fixtures_synchronizer<C>::get_density(const size_t index) const {
-	return get_base_density(index) * component.colliders[index].density_multiplier;
+float basic_fixtures_synchronizer<C>::get_density() const {
+	return get_base_density() * component.colliders[0].density_multiplier;
 }
 
 template<bool C>
-float basic_fixtures_synchronizer<C>::get_base_density(const size_t index) const {
-	return component.colliders[index].density;
+float basic_fixtures_synchronizer<C>::get_base_density() const {
+	return component.colliders[0].density;
 }
 
 template<bool C>
-float basic_fixtures_synchronizer<C>::get_density_multiplier(const size_t index) const {
-	return component.colliders[index].density_multiplier;
+float basic_fixtures_synchronizer<C>::get_density_multiplier() const {
+	return component.colliders[0].density_multiplier;
 }
 
 template<bool C>

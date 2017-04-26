@@ -36,7 +36,7 @@ b2Fixture::b2Fixture()
 	m_proxyCount = 0;
 	m_shape = NULL;
 	m_density = 0.0f;
-	collider_index = -1;
+	index_in_component = -1;
 }
 
 void b2Fixture::Create(b2BlockAllocator* allocator, b2Body* body, const b2FixtureDef* def)

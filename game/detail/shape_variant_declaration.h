@@ -9,6 +9,6 @@ struct convex_partitioned_shape;
 struct circle_shape;
 
 typedef augs::trivial_variant<
-	convex_partitioned_shape,
-	circle_shape
+	convex_partitioned_shape
+	//circle_shape
 > shape_variant_base;
