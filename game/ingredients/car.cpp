@@ -57,7 +57,7 @@ namespace prefabs {
 			car.acceleration_length = 4500 / 6.2f;
 			car.speed_for_pitch_unit = 2000.f;
 
-			poly.add_vertices_from(metas[assets::game_image_id::TRUCK_FRONT].shape.get<convex_partitioned_shape>());
+			poly.add_vertices_from(metas[assets::game_image_id::TRUCK_FRONT].shape);
 			poly.texture_map = assets::game_image_id::TRUCK_FRONT;
 			//sprite.set(assets::game_image_id::TRUCK_FRONT, world);
 			//sprite.get_size(metas).x = 200;
@@ -68,14 +68,19 @@ namespace prefabs {
 			physics_definition.linear_damping = 0.4f;
 			physics_definition.angular_damping = 2.f;
 
-			auto& fixture = colliders.new_collider();
-			fixture.shape.from_renderable(step, front);
+			front.create_fixtures_component_from_renderable(
+				step,
+				[&](auto component){
+					auto& group = component.get_fixture_group_data();
 
-			fixture.filter = filters::dynamic_object();
-			fixture.density = 0.6f;
+					group.filter = filters::dynamic_object();
+					group.density = 0.6;
+
+					front += component;
+				}
+			);
 
 			front += physics_definition;
-			front += colliders;
 			front.get<components::fixtures>().set_owner_body(front);
 			//rigid_body.air_resistance = 0.2f;
 		}
@@ -91,18 +96,22 @@ namespace prefabs {
 			//sprite.set(assets::game_image_id::TRUCK_INSIDE, rgba(122, 0, 122, 255));
 			//sprite.get_size(metas).x = 250;
 			//sprite.get_size(metas).y = 550;
-
-			auto& fixture = colliders.new_collider();
-			fixture.shape.from_renderable(step, interior);
-			fixture.density = 0.6f;
-			fixture.filter = filters::friction_ground();
-
+			
 			vec2 offset((front_size.x / 2 + sprite.get_size(metas).x / 2) * -1, 0);
 
-			colliders.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
-			colliders.is_friction_ground = true;
+			interior.create_fixtures_component_from_renderable(
+				step,
+				[&](auto component){
+					auto& group = component.get_fixture_group_data();
 
-			interior += colliders;
+					group.filter = filters::friction_ground();
+					group.density = 0.6;
+					group.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
+					group.is_friction_ground = true;
+
+					interior += component;
+				}
+			);
 
 			interior.get<components::fixtures>().set_owner_body(front);
 			interior.make_as_child_of(front);
@@ -122,17 +131,23 @@ namespace prefabs {
 
 			sprite.set(assets::game_image_id::CAR_INSIDE, vec2(60, 30), rgba(29, 0, 0, 0));
 
-			auto& fixture = colliders.new_collider();
-
-			fixture.shape.from_renderable(step, left_wheel);
-			fixture.density = 0.6f;
-			fixture.filter = filters::trigger();
-			fixture.sensor = true;
+			auto& fixture = colliders.get_fixture_group_data();
 
 			vec2 offset((front_size.x / 2 + sprite.get_size(metas).x / 2 + 20) * -1, 0);
-			colliders.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
 
-			left_wheel += colliders;
+			left_wheel.create_fixtures_component_from_renderable(
+				step,
+				[&](auto component){
+					auto& group = component.get_fixture_group_data();
+
+					group.filter = filters::trigger();
+					group.density = 0.6;
+					group.sensor = true;
+					group.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
+
+					left_wheel += component;
+				}
+			);
 
 			left_wheel.get<components::fixtures>().set_owner_body(front);
 		}
@@ -147,7 +162,6 @@ namespace prefabs {
 
 					auto& sprite = engine_physical += components::sprite();
 					auto& render = engine_physical += components::render();
-					components::fixtures colliders;
 
 					render.layer = render_layer::SMALL_DYNAMIC_BODY;
 
@@ -155,11 +169,6 @@ namespace prefabs {
 					//sprite.set(assets::game_image_id::TRUCK_INSIDE, rgba(122, 0, 122, 255));
 					//sprite.get_size(metas).x = 250;
 					//sprite.get_size(metas).y = 550;
-
-					auto& fixture = colliders.new_collider();
-					fixture.shape.from_renderable(step, engine_physical);
-					fixture.density = 1.0f;
-					fixture.filter = filters::see_through_dynamic_object();
 
 					components::transform offset;
 
@@ -177,10 +186,20 @@ namespace prefabs {
 						offset.pos.set(-100, (interior_size.y / 2 + sprite.get_size(metas).x / 2) *  1);
 						offset.rotation = 90;
 					}
+					
+					engine_physical.create_fixtures_component_from_renderable(
+						step,
+						[&](auto component){
+							auto& group = component.get_fixture_group_data();
 
-					colliders.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET] = offset;
+							group.filter = filters::see_through_dynamic_object();
+							group.density = 1.0f;
+							group.sensor = true;
+							group.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET] = offset;
 
-					engine_physical += colliders;
+							engine_physical += component;
+						}
+					);
 
 					engine_physical.get<components::fixtures>().set_owner_body(front);
 					engine_physical.add_standard_components(step);

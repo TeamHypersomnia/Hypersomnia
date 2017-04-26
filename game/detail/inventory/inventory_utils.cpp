@@ -538,8 +538,8 @@ void perform_transfer(
 		}
 
 		auto def = descendant.get<components::fixtures>().get_data();
-		def.offsets_for_created_shapes[colliders_offset_type::ITEM_ATTACHMENT_DISPLACEMENT] = fixtures_offset;
-		def.activated = should_fixtures_persist;
+		def.group.offsets_for_created_shapes[colliders_offset_type::ITEM_ATTACHMENT_DISPLACEMENT] = fixtures_offset;
+		def.group.activated = should_fixtures_persist;
 
 		descendant.get<components::fixtures>() = def;
 		descendant.get<components::fixtures>().set_owner_body(owner_body);

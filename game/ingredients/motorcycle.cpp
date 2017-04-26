@@ -72,19 +72,26 @@ namespace prefabs {
 			body.linear_damping = 0.4f;
 			body.angular_damping = 2.f;
 
-			auto& info = colliders.new_collider();
-			info.shape.from_renderable(step, front);
-
-			info.filter = filters::see_through_dynamic_object();
-			info.density = 1.5f;
-			info.restitution = 0.3f;
-			colliders.can_driver_shoot_through = true;
 
 			car.angular_air_resistance = 0.55f;
 			car.angular_air_resistance_while_hand_braking = 0.05f;
 
 			front += body;
-			front += colliders;
+						
+			front.create_fixtures_component_from_renderable(
+				step,
+				[&](auto component){
+					auto& group = component.get_fixture_group_data();
+
+					group.filter = filters::see_through_dynamic_object();
+					group.density = 1.5f;
+					group.restitution = 0.3f;
+					group.can_driver_shoot_through = true;
+
+					front += component;
+				}
+			);
+
 			front.get<components::fixtures>().set_owner_body(front);
 		}
 
@@ -97,7 +104,7 @@ namespace prefabs {
 		//
 		//	sprite.set(assets::game_image_id::MOTORCYCLE_INSIDE);
 		//
-		//	auto& info = colliders.new_collider();
+		//	auto& info = colliders.get_fixture_group_data();
 		//	info.shape.from_renderable(interior);
 		//	info.density = 0.6f;
 		//	colliders.disable_standard_collision_resolution = true;
@@ -124,17 +131,23 @@ namespace prefabs {
 
 			sprite.set(assets::game_image_id::CAR_INSIDE, { 40, 20 }, rgba(255, 255, 255, 0));
 
-			auto& info = colliders.new_collider();
-
-			info.shape.from_renderable(step, left_wheel);
-			info.density = 0.6f;
-			info.filter = filters::trigger();
-			info.sensor = true;
 			vec2 offset(0, 0);
 			//((front.get<components::sprite>().get_size(metas).x / 2 + sprite.get_size(metas).x / 2) *  -1, 0);
-			colliders.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
 			
-			left_wheel += colliders;
+			left_wheel.create_fixtures_component_from_renderable(
+				step,
+				[&](auto component){
+					auto& group = component.get_fixture_group_data();
+
+					group.density = 0.6f;
+					group.filter = filters::trigger();
+					group.sensor = true;
+					group.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
+
+					left_wheel += component;
+				}
+			);
+
 			left_wheel.get<components::fixtures>().set_owner_body(front);
 		}
 

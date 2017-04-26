@@ -55,11 +55,7 @@ void relations_mixin<false, D>::make_cloned_child_entities_recursive(const entit
 					bind_types_t<std::is_same, child_entity_id>,
 					bind_types_t<std::is_same, const child_entity_id>
 				>,
-				concat_unary_t<
-					std::conjunction,
-					bind_types_t<apply_negation_t<std::is_same>, shape_variant>,
-					bind_types_t<apply_negation_t<std::is_same>, const shape_variant>
-				>,
+				always_recurse,
 				stop_recursion_if_valid
 			> (
 				[&](auto, auto& cloned_into_id, const auto& cloned_from_id) {

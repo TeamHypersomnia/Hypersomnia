@@ -38,7 +38,6 @@
 #include "game/assets/spell.h"
 #include "game/assets/physical_material.h"
 
-#include "game/detail/shape_variant.h"
 #include "game/detail/particle_types.h"
 
 class assets_manager;

@@ -6,7 +6,6 @@
 #include "augs/templates/for_each_in_types.h"
 
 #include "game/transcendental/entity_id_declaration.h"
-#include "game/detail/shape_variant_declaration.h"
 
 #define FIELD(x) f(#x, _t_.x...)
 
@@ -36,7 +35,7 @@ struct spell_data;
 class tile_layer;
 struct behaviour_tree_instance;
 struct car_engine_entities;
-struct convex_partitioned_collider;
+struct fixture_group_data;
 struct item_slot_mounting_operation;
 struct light_value_variation;
 struct light_attenuation;
@@ -62,7 +61,6 @@ struct electric_shield_perk;
 struct haste_perk;
 struct perk_timing;
 struct sentience_meter;
-struct circle_shape;
 struct spell_instance_data;
 struct all_simulation_settings;
 struct pathfinding_settings;
@@ -903,12 +901,14 @@ namespace augs {
 
 		template <class F, class... Instances>
 		static void introspect_body(
-			const convex_partitioned_collider* const,
+			const fixture_group_data* const,
 			F f,
 			Instances&&... _t_
 		) {
-			FIELD(shape);
-			FIELD(destruction);
+			FIELD(activated);
+			FIELD(is_friction_ground);
+			FIELD(disable_standard_collision_resolution);
+			FIELD(can_driver_shoot_through);
 
 			FIELD(material);
 
@@ -922,6 +922,8 @@ namespace augs {
 			FIELD(filter);
 			FIELD(destructible);
 			FIELD(sensor);
+	
+			FIELD(offsets_for_created_shapes);
 		}
 
 		template <class F, class... Instances>
@@ -930,13 +932,10 @@ namespace augs {
 			F f,
 			Instances&&... _t_
 		) {
-			FIELD(colliders);
-			FIELD(offsets_for_created_shapes);
+			FIELD(shape);
+			FIELD(destruction);
 
-			FIELD(activated);
-			FIELD(is_friction_ground);
-			FIELD(disable_standard_collision_resolution);
-			FIELD(can_driver_shoot_through);
+			FIELD(group);
 		}
 
 		template <class F, class... Instances>
@@ -1780,15 +1779,6 @@ namespace augs {
 		) {
 			FIELD(value);
 			FIELD(maximum);
-		}
-
-		template <class F, class... Instances>
-		static void introspect_body(
-			const circle_shape* const,
-			F f,
-			Instances&&... _t_
-		) {
-			FIELD(radius);
 		}
 
 		template <class F, class... Instances>

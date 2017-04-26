@@ -16,20 +16,20 @@ namespace ingredients {
 			e.remove<components::transform>();
 		}
 
-		def.fixed_rotation = false;
+		e.create_fixtures_component_from_renderable(
+			step,
+			[&](auto component){
+				auto& group = component.get_fixture_group_data();
 
-		components::fixtures colliders;
+				group.destructible = destructible;
+				group.filter = filters::dynamic_object();
+				group.density = 1;
 
-		auto& info = colliders.new_collider();
-		
-		info.shape.from_renderable(step, e);
-		info.destructible = destructible;
-
-		info.filter = filters::dynamic_object();
-		info.density = 1;
+				e += component;
+			}
+		);
 
 		e += def;
-		e += colliders;
 		e.get<components::fixtures>().set_owner_body(e);
 	}
 
@@ -42,18 +42,20 @@ namespace ingredients {
 			e.remove<components::transform>();
 		}
 
-		components::fixtures colliders;
-		def.fixed_rotation = false;
+		e.create_fixtures_component_from_renderable(
+			step,
+			[&](auto component){
+				auto& group = component.get_fixture_group_data();
 
-		auto& info = colliders.new_collider();
-		info.shape.from_renderable(step, e);
+				group.filter = filters::see_through_dynamic_object();
+				group.density = 1;
+				group.restitution = 0.5f;
 
-		info.filter = filters::see_through_dynamic_object();
-		info.density = 1;
-		info.restitution = 0.5f;
+				e += component;
+			}
+		);
 
 		e += def;
-		e += colliders;
 		e.get<components::fixtures>().set_owner_body(e);
 	}
 
@@ -66,25 +68,30 @@ namespace ingredients {
 			e.remove<components::transform>();
 		}
 
-		components::fixtures colliders;
-		def.fixed_rotation = false;
+		e.create_fixtures_component_from_renderable(
+			step,
+			[&](auto component){
+				auto& group = component.get_fixture_group_data();
 
-		auto& info = colliders.new_collider();
-		info.shape.from_renderable(step, e);
+				group.filter = filters::shell();
+				group.density = 1;
+				group.restitution = 0.5f;
+				group.restitution = 1.4f;
+				group.density = 0.001f;
+				group.collision_sound_gain_mult = 100.f;
 
-		info.filter = filters::shell();
-		info.density = 1.f;
-		info.restitution = 1.4f;
-		info.density = 0.001f;
-		info.collision_sound_gain_mult = 100.f;
+				e += component;
+			}
+		);
 
 		e += def;
-		e += colliders;
 		e.get<components::fixtures>().set_owner_body(e);
 	}
 
 	void add_standard_static_body(const logic_step step, entity_handle e) {
 		components::rigid_body def;
+		def.body_type = rigid_body_type::STATIC;
+
 		const auto si = e.get_cosmos().get_si();
 
 		if (e.has<components::transform>()) {
@@ -92,19 +99,19 @@ namespace ingredients {
 			e.remove<components::transform>();
 		}
 
-		components::fixtures colliders;
+		e.create_fixtures_component_from_renderable(
+			step,
+			[&](auto component){
+				auto& group = component.get_fixture_group_data();
 
-		def.fixed_rotation = false;
-		def.body_type = rigid_body_type::STATIC;
+				group.filter = filters::dynamic_object();
+				group.density = 1;
 
-		auto& info = colliders.new_collider();
-		info.shape.from_renderable(step, e);
-
-		info.filter = filters::dynamic_object();
-		info.density = 1;
+				e += component;
+			}
+		);
 
 		e += def;
-		e += colliders;
 		e.get<components::fixtures>().set_owner_body(e);
 	}
 	
@@ -117,8 +124,6 @@ namespace ingredients {
 			e.remove<components::transform>();
 		}
 
-		components::fixtures colliders;
-
 		body.bullet = true;
 		body.angular_damping = 0.f,
 		body.linear_damping = 0.f,
@@ -126,16 +131,20 @@ namespace ingredients {
 		body.fixed_rotation = false;
 		body.angled_damping = false;
 		
-		colliders.disable_standard_collision_resolution = true;
+		e.create_fixtures_component_from_renderable(
+			step,
+			[&](auto component){
+				auto& group = component.get_fixture_group_data();
 
-		auto& info = colliders.new_collider();
-		info.shape.from_renderable(step, e);
+				group.filter = filters::bullet();
+				group.density = 1;
+				group.disable_standard_collision_resolution = true;
 
-		info.filter = filters::bullet();
-		info.density = 1;
+				e += component;
+			}
+		);
 
 		e += body;
-		e += colliders;
 		e.get<components::fixtures>().set_owner_body(e);
 	}
 }

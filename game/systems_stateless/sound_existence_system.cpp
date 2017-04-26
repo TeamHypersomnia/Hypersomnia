@@ -97,8 +97,8 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 			const auto& subject_fix = subject.get<components::fixtures>();
 			const auto& collider_fix = collider.get<components::fixtures>();
 
-			const auto& subject_coll = subject_fix.get_collider_data();
-			const auto& collider_coll = collider_fix.get_collider_data();
+			const auto& subject_coll = subject_fix.get_fixture_group_data();
+			const auto& collider_coll = collider_fix.get_fixture_group_data();
 			
 			const auto sound_id = step.input.metas_of_assets[subject_coll.material].collision_sound_matrix[collider_coll.material];
 

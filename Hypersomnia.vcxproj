@@ -417,7 +417,6 @@
     <ClCompile Include="game\detail\physics\physics_queries.cpp" />
     <ClCompile Include="game\detail\physics\physics_scripts.cpp" />
     <ClCompile Include="game\detail\sentience_meter.cpp" />
-    <ClCompile Include="game\detail\shape_variant.cpp" />
     <ClCompile Include="game\detail\spell_logic.cpp" />
     <ClCompile Include="game\detail\visible_entities.cpp" />
     <ClCompile Include="game\detail\wielding_result.cpp" />
@@ -1240,8 +1239,6 @@
     <ClInclude Include="game\detail\physics\physics_queries.h" />
     <ClInclude Include="game\detail\physics\physics_scripts.h" />
     <ClInclude Include="game\detail\sentience_meter.h" />
-    <ClInclude Include="game\detail\shape_variant.h" />
-    <ClInclude Include="game\detail\shape_variant_declaration.h" />
     <ClInclude Include="game\detail\spell_logic.h" />
     <ClInclude Include="game\detail\visible_entities.h" />
     <ClInclude Include="game\detail\wielding_result.h" />

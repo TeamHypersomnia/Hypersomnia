@@ -86,15 +86,12 @@ void release_or_throw_grenade(
 
 		auto& fixtures = grenade_entity.get<components::fixtures>();
 		auto new_def = fixtures.get_data();
-		new_def.colliders[0].restitution = 0.6f;
-		new_def.colliders[0].density = 10.f;
+		new_def.group.restitution = 0.6f;
+		new_def.group.density = 10.f;
+		new_def.group.material = assets::physical_material_id::GRENADE;
 
 		const auto new_radius = 1.f;// std::min(aabb.w(), aabb.h()) / 16;// aabb.diagonal() / 2;
 		//new_def.colliders[0].shape.set(circle_shape{ new_radius });
-
-		for (auto& c : new_def.colliders) {
-			c.material = assets::physical_material_id::GRENADE;
-		}
 
 		fixtures = new_def;
 		//new_def.colliders[0].shape.. = 1.f;

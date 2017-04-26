@@ -45,23 +45,27 @@ namespace ingredients {
 
 	void add_character_head_physics(const logic_step step, const entity_handle e) {
 		components::rigid_body body;
-		components::special_physics special;
-		components::fixtures colliders;
-
-		auto& info = colliders.new_collider();
-
-		info.shape.from_renderable(step, e);
-
-		info.filter = filters::controlled_character();
-		info.density = 1.0;
 		body.fixed_rotation = false;
 		body.angled_damping = true;
+
+		components::special_physics special;
 
 		add_character_movement(e);
 
 		e += body;
 		e += special;
-		e += colliders;
+
+		e.create_fixtures_component_from_renderable(
+			step,
+			[&](auto component){
+				auto& group = component.get_fixture_group_data();
+
+				group.filter = filters::controlled_character();
+				group.density = 1.0;
+				e += component;
+			}
+		);
+
 		e.get<components::fixtures>().set_owner_body(e);
 	}
 
@@ -240,15 +244,6 @@ namespace prefabs {
 			render.layer = render_layer::OVER_CROSSHAIR;
 			ingredients::make_always_visible(recoil);
 
-			auto& info = colliders.new_collider();
-
-			info.shape.from_renderable(step, recoil);
-
-			info.filter = filters::trigger();
-			//info.filter.categoryBits = 0;
-			info.density = 0.1f;
-			info.sensor = true;
-
 			body.linear_damping = 5;
 			body.angular_damping = 5;
 
@@ -260,7 +255,20 @@ namespace prefabs {
 			force_joint.divide_transform_mode = true;
 
 			recoil += body;
-			recoil += colliders;
+
+			recoil.create_fixtures_component_from_renderable(
+				step,
+				[&](auto component){
+					auto& group = component.get_fixture_group_data();
+
+					group.filter = filters::trigger();
+					//group.filter.categoryBits = 0;
+					group.density = 0.1f;
+					group.sensor = true;
+
+					recoil += component;
+				}
+			);
 			recoil.get<components::fixtures>().set_owner_body(recoil);
 		}
 

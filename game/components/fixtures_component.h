@@ -19,17 +19,18 @@
 #include "game/assets/physical_material_id.h"
 
 #include "game/components/transform_component.h"
-
-#include "game/detail/shape_variant.h"
+#include "game/detail/convex_partitioned_shape.h"
 
 class physics_system;
 struct colliders_cache;
 struct b2Fixture_index_in_component;
 
-struct convex_partitioned_collider {
-	// GEN INTROSPECTOR struct convex_partitioned_collider
-	shape_variant shape;
-	std::array<convex_poly_destruction_data, CONVEX_POLYS_COUNT> destruction;
+struct fixture_group_data {
+	// GEN INTROSPECTOR struct fixture_group_data
+	bool activated = true;
+	bool is_friction_ground = false;
+	bool disable_standard_collision_resolution = false;
+	bool can_driver_shoot_through = false;
 
 	assets::physical_material_id material = assets::physical_material_id::METAL;
 
@@ -43,25 +44,22 @@ struct convex_partitioned_collider {
 	b2Filter filter;
 	bool destructible = false;
 	bool sensor = false;
+	
+	augs::enum_array<components::transform, colliders_offset_type> offsets_for_created_shapes;
 	// END GEN INTROSPECTOR
 };
 
 namespace components {
 	struct fixtures : synchronizable_component {
 		// GEN INTROSPECTOR struct components::fixtures
-		augs::constant_size_vector<convex_partitioned_collider, COLLIDERS_COUNT> colliders;
-		augs::enum_array<components::transform, colliders_offset_type> offsets_for_created_shapes;
+		convex_partitioned_shape shape;
+		std::array<convex_poly_destruction_data, CONVEX_POLYS_COUNT> destruction;
 
-		bool activated = true;
-		bool is_friction_ground = false;
-		bool disable_standard_collision_resolution = false;
-		bool can_driver_shoot_through = false;
+		fixture_group_data group;
 		// END GEN INTROSPECTOR
 
-		convex_partitioned_collider& new_collider() {
-			ensure(colliders.size() == 0);
-			colliders.push_back(convex_partitioned_collider());
-			return *(colliders.end()-1);
+		fixture_group_data& get_fixture_group_data() {
+			return group;
 		}
 
 		static components::transform transform_around_body(const const_entity_handle fixtures_entity, const components::transform& body_transform);
@@ -93,8 +91,7 @@ public:
 
 	ltrb get_local_aabb() const;
 
-	const convex_partitioned_collider& get_collider_data() const;
-	size_t get_num_colliders() const;
+	const fixture_group_data& get_fixture_group_data() const;
 
 	bool is_friction_ground() const;
 	bool standard_collision_resolution_disabled() const;

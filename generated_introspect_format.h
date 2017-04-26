@@ -6,7 +6,6 @@
 #include "augs/templates/for_each_in_types.h"
 
 #include "game/transcendental/entity_id_declaration.h"
-#include "game/detail/shape_variant_declaration.h"
 
 #define FIELD(x) f(#x, _t_.x...)
 

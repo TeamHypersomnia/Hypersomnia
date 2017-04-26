@@ -1,7 +1,6 @@
 #pragma once
 #include "application/content_generation/atlas_content_structs.h"
-
-#include "game/detail/shape_variant.h"
+#include "game/detail/convex_partitioned_shape.h"
 #include "augs/misc/enum_array.h"
 
 class assets_manager;
@@ -33,7 +32,7 @@ struct game_image_request {
 
 struct game_image_logical_meta {
 	vec2u original_image_size;
-	shape_variant shape;
+	convex_partitioned_shape shape;
 
 	vec2u get_size() const {
 		return original_image_size;

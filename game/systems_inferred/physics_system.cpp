@@ -102,58 +102,51 @@ void physics_system::fixtures_construct(const const_entity_handle handle) {
 			owner_cache.correspondent_colliders_caches.push_back(this_cache_id);
 			cache.correspondent_rigid_body_cache = owner_cache_id;
 
-			{
-				const auto& c = colliders_data.colliders[0];
+			const auto& group = colliders_data.group;
 
-				b2FixtureDef fixdef;
-				fixdef.density = c.density;
-				fixdef.friction = c.friction;
-				fixdef.isSensor = c.sensor;
-				fixdef.filter = c.filter;
-				fixdef.restitution = c.restitution;
-				fixdef.userData = handle.get_id();
+			b2FixtureDef fixdef;
+			fixdef.density = group.density;
+			fixdef.friction = group.friction;
+			fixdef.isSensor = group.sensor;
+			fixdef.filter = group.filter;
+			fixdef.restitution = group.restitution;
+			fixdef.userData = handle.get_id();
 
-				auto& all_fixtures_in_component = cache.all_fixtures_in_component;
-				all_fixtures_in_component.clear();
+			auto& all_fixtures_in_component = cache.all_fixtures_in_component;
+			all_fixtures_in_component.clear();
 
-				if (c.shape.is<convex_partitioned_shape>()) {
-					auto transformed_shape = c.shape.get<convex_partitioned_shape>();
-					transformed_shape.offset_vertices(colliders.get_total_offset());
+			auto transformed_shape = colliders_data.shape;
+			transformed_shape.offset_vertices(colliders.get_total_offset());
 
-					for (std::size_t ci = 0; ci < transformed_shape.convex_polys.size(); ++ci) {
-						const auto& convex = transformed_shape.convex_polys[ci];
-						std::vector<b2Vec2> b2verts(convex.vertices.begin(), convex.vertices.end());
+			for (std::size_t ci = 0; ci < transformed_shape.convex_polys.size(); ++ci) {
+				const auto& convex = transformed_shape.convex_polys[ci];
+				std::vector<b2Vec2> b2verts(convex.vertices.begin(), convex.vertices.end());
 
-						for (auto& v : b2verts) {
-							v = si.get_meters(v);
-						}
-
-						b2PolygonShape shape;
-						shape.Set(b2verts.data(), b2verts.size());
-
-						fixdef.shape = &shape;
-						b2Fixture* const new_fix = owner_cache.body->CreateFixture(&fixdef);
-						
-						ensure(static_cast<short>(ci) < std::numeric_limits<short>::max());
-						new_fix->index_in_component = static_cast<short>(ci);
-
-						all_fixtures_in_component.push_back(new_fix);
-					}
-
+				for (auto& v : b2verts) {
+					v = si.get_meters(v);
 				}
-				//else if (c.shape.is<circle_shape>()) {
-				//	b2CircleShape shape;
-				//	shape.m_radius = si.get_meters(c.shape.get<circle_shape>().radius);
-				//
-				//	fixdef.shape = &shape;
-				//	b2Fixture* const new_fix = owner_cache.body->CreateFixture(&fixdef);
-				//	
-				//	partitioned_collider.push_back(new_fix);
-				//}
-				else {
-					ensure("Unknown shape type" && false);
-				}
+
+				b2PolygonShape shape;
+				shape.Set(b2verts.data(), b2verts.size());
+
+				fixdef.shape = &shape;
+				b2Fixture* const new_fix = owner_cache.body->CreateFixture(&fixdef);
+
+				ensure(static_cast<short>(ci) < std::numeric_limits<short>::max());
+				new_fix->index_in_component = static_cast<short>(ci);
+
+				all_fixtures_in_component.push_back(new_fix);
 			}
+
+			//else if (c.shape.is<circle_shape>()) {
+			//	b2CircleShape shape;
+			//	shape.m_radius = si.get_meters(c.shape.get<circle_shape>().radius);
+			//
+			//	fixdef.shape = &shape;
+			//	b2Fixture* const new_fix = owner_cache.body->CreateFixture(&fixdef);
+			//	
+			//	partitioned_collider.push_back(new_fix);
+			//}
 		}
 	}
 }

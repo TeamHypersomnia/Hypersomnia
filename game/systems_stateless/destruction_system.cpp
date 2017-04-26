@@ -24,7 +24,7 @@ void destruction_system::generate_damages_from_forceful_collisions(const logic_s
 		const auto& data_indices = it.subject_b2Fixture_index;
 
 		if (data_indices.is_set()) {
-			const auto& coll = fixtures.get_collider_data();
+			const auto& coll = fixtures.get_fixture_group_data();
 
 			if (coll.destructible) {
 				//LOG("Destructible fixture was hit.");
@@ -59,7 +59,7 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 			const auto& data_indices = d.subject_b2Fixture_index;
 
 			if (data_indices.is_set()) {
-				const auto& coll = fixtures.get_collider_data();
+				const auto& coll = fixtures.get_fixture_group_data();
 
 				if (coll.destructible) {
 					auto& dest_data = fixtures.get_modifiable_destruction_data(data_indices);

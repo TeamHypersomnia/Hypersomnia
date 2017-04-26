@@ -29,7 +29,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 
 		auto& b = subject.get<components::rigid_body>();
 
-		const auto& verts = subject.get<components::fixtures>().get_data().colliders[0].shape.get<convex_partitioned_shape>().convex_polys[fixture_num].vertices;
+		const auto& verts = subject.get<components::fixtures>().get_data().shape.convex_polys[fixture_num].vertices;
 
 		/* for every vertex in given fixture's shape */
 		for (auto& v : verts) {

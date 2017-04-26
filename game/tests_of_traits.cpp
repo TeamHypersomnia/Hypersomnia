@@ -12,14 +12,7 @@ struct tests_of_traits {
 
 	static_assert(bind_types<std::is_same, const int>::type<const int>::value, "Trait has failed");
 
-	static_assert(bind_types_right<is_one_of, shape_variant&, const shape_variant&>::type<shape_variant&>::value, "Trait has failed");
-	static_assert(bind_types_right<is_one_of, shape_variant&, const shape_variant&>::type<const shape_variant&>::value, "Trait has failed");
 	static_assert(!bind_types_right<is_one_of, int, double, unsigned, signed>::type<float>::value, "Trait has failed");
-
-	typedef apply_negation<bind_types_t<std::is_same, shape_variant>> no_variant;
-
-	static_assert(!no_variant::type<shape_variant>::value, "Trait has failed");
-	static_assert(no_variant::type<int>::value, "Trait has failed");
 
 	static_assert(augs::enum_associative_array<assets::game_image_id, int>().capacity() == int(assets::game_image_id::COUNT), "enum_associative_array is wrong");
 
@@ -144,7 +137,6 @@ sizeof(augs::enum_associative_array<assets::program_id, augs::graphics::shader_p
 sizeof(augs::enum_associative_array<assets::sound_buffer_id, augs::sound_buffer>);
 sizeof(augs::enum_associative_array<assets::gl_texture_id, augs::graphics::texture>);
 sizeof(particle_effect_logical_meta);
-sizeof(shape_variant);
 
 static_assert(
 sizeof(tuple_of_all_logical_metas_of_assets) <= sizeof(tuple_of_all_assets),

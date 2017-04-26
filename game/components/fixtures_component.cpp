@@ -42,35 +42,30 @@ ltrb basic_fixtures_synchronizer<C>::get_local_aabb() const {
 }
 
 template<bool C>
-size_t basic_fixtures_synchronizer<C>::get_num_colliders() const {
-	return component.colliders.size();
-}
-
-template<bool C>
-const convex_partitioned_collider& basic_fixtures_synchronizer<C>::get_collider_data() const {
-	return component.colliders[0];
+const fixture_group_data& basic_fixtures_synchronizer<C>::get_fixture_group_data() const {
+	return component.group;
 ;}
 
 template<bool C>
 bool basic_fixtures_synchronizer<C>::is_friction_ground() const {
-	return component.is_friction_ground;
+	return component.group.is_friction_ground;
 }
 
 template<bool C>
 bool basic_fixtures_synchronizer<C>::standard_collision_resolution_disabled() const {
-	return component.disable_standard_collision_resolution;
+	return component.group.disable_standard_collision_resolution;
 }
 
 template<bool C>
 bool basic_fixtures_synchronizer<C>::can_driver_shoot_through() const {
-	return component.can_driver_shoot_through;
+	return component.group.can_driver_shoot_through;
 }
 
 void component_synchronizer<false, F>::set_offset(
 	const colliders_offset_type t, 
 	const components::transform off
 ) const {
-	component.offsets_for_created_shapes[t] = off;
+	component.group.offsets_for_created_shapes[t] = off;
 	reinference();
 }
 
@@ -86,7 +81,7 @@ void component_synchronizer<false, F>::reinference() const {
 
 void component_synchronizer<false, F>::rebuild_density() const {
 	for (auto f : get_cache().all_fixtures_in_component) {
-		f->SetDensity(component.colliders[0].density * component.colliders[0].density_multiplier);
+		f->SetDensity(component.group.density * component.group.density_multiplier);
 	}
 
 	get_cache().all_fixtures_in_component[0]->GetBody()->ResetMassData();
@@ -95,7 +90,7 @@ void component_synchronizer<false, F>::rebuild_density() const {
 void component_synchronizer<false, F>::set_density(
 	const float d
 ) const {
-	component.colliders[0].density = d;
+	component.group.density = d;
 
 	if (!is_constructed()) {
 		return;
@@ -105,13 +100,13 @@ void component_synchronizer<false, F>::set_density(
 }
 
 convex_poly_destruction_data& component_synchronizer<false, F>::get_modifiable_destruction_data(const b2Fixture_index_in_component indices) {
-	return component.colliders[0].destruction[indices.convex_shape_index];
+	return component.destruction[indices.convex_shape_index];
 }
 
 void component_synchronizer<false, F>::set_density_multiplier(
 	const float mult
 ) const {
-	component.colliders[0].density_multiplier = mult;
+	component.group.density_multiplier = mult;
 
 	if (!is_constructed()) {
 		return;
@@ -121,14 +116,14 @@ void component_synchronizer<false, F>::set_density_multiplier(
 }
 
 void component_synchronizer<false, F>::set_activated(const bool flag) const {
-	component.activated = flag;
+	component.group.activated = flag;
 	reinference();
 }
 
 void component_synchronizer<false, F>::set_friction(
 	const float fr
 ) const {
-	component.colliders[0].friction = fr;
+	component.group.friction = fr;
 
 	if (!is_constructed()) {
 		return;
@@ -142,7 +137,7 @@ void component_synchronizer<false, F>::set_friction(
 void component_synchronizer<false, F>::set_restitution(
 	const float r
 ) const {
-	component.colliders[0].restitution = r;
+	component.group.restitution = r;
 
 	if (!is_constructed()) {
 		return;
@@ -156,37 +151,37 @@ void component_synchronizer<false, F>::set_restitution(
 void component_synchronizer<false, F>::set_physical_material(
 	const assets::physical_material_id m
 ) const {
-	component.colliders[0].material = m;
+	component.group.material = m;
 }
 
 template<bool C>
 float basic_fixtures_synchronizer<C>::get_friction() const {
-	return component.colliders[0].friction;
+	return component.group.friction;
 }
 
 template<bool C>
 float basic_fixtures_synchronizer<C>::get_restitution() const {
-	return component.colliders[0].restitution;
+	return component.group.restitution;
 }
 
 template<bool C>
 float basic_fixtures_synchronizer<C>::get_density() const {
-	return get_base_density() * component.colliders[0].density_multiplier;
+	return get_base_density() * component.group.density_multiplier;
 }
 
 template<bool C>
 float basic_fixtures_synchronizer<C>::get_base_density() const {
-	return component.colliders[0].density;
+	return component.group.density;
 }
 
 template<bool C>
 float basic_fixtures_synchronizer<C>::get_density_multiplier() const {
-	return component.colliders[0].density_multiplier;
+	return component.group.density_multiplier;
 }
 
 template<bool C>
 bool basic_fixtures_synchronizer<C>::is_activated() const {
-	return component.activated;
+	return component.group.activated;
 }
 
 template<bool C>
@@ -201,12 +196,18 @@ basic_entity_handle<C> basic_fixtures_synchronizer<C>::get_owner_body() const {
 
 template<bool C>
 components::transform basic_fixtures_synchronizer<C>::get_offset(const colliders_offset_type t) const {
-	return component.offsets_for_created_shapes[t];
+	return component.group.offsets_for_created_shapes[t];
 }
 
 template<bool C>
 components::transform basic_fixtures_synchronizer<C>::get_total_offset() const {
-	return std::accumulate(component.offsets_for_created_shapes.begin(), component.offsets_for_created_shapes.end(), components::transform());
+	const auto& offsets = component.group.offsets_for_created_shapes;
+
+	return std::accumulate(
+		offsets.begin(), 
+		offsets.end(), 
+		components::transform()
+	);
 }
 
 components::transform components::fixtures::transform_around_body(

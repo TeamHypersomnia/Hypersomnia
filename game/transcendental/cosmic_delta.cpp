@@ -35,7 +35,7 @@ void transform_component_ids_to_guids_in_place(
 ) {
 	augs::introspect_recursive<
 		bind_types_t<std::is_base_of, entity_id>,
-		apply_negation_t<bind_types_t<std::is_same, shape_variant>>,
+		always_recurse,
 		stop_recursion_if_valid
 	>(
 		[&cosm](auto, auto& id) {
@@ -63,7 +63,7 @@ void transform_component_guids_to_ids_in_place(
 ) {
 	augs::introspect_recursive<
 		bind_types_t<std::is_base_of, entity_id>,
-		apply_negation_t<bind_types_t<std::is_same, shape_variant>>,
+		always_recurse,
 		stop_recursion_if_valid
 	> (
 		[&cosm](auto, auto& id) {

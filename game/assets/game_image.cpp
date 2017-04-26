@@ -5,7 +5,7 @@
 game_image_logical_meta game_image_baked::get_logical_meta(const assets_manager& manager) const {
 	game_image_logical_meta output;
 
-	convex_partitioned_shape shape;
+	auto& shape = output.shape;
 
 	if (polygonized.size() > 0) {
 		const auto image_size = get_size();
@@ -47,7 +47,6 @@ game_image_logical_meta game_image_baked::get_logical_meta(const assets_manager&
 		shape.add_convex_polygon(new_convex_polygon);
 	}
 
-	output.shape.set(shape);
 	output.original_image_size = get_size();
 	return output;
 }
