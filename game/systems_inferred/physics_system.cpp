@@ -28,7 +28,7 @@ bool physics_system::is_constructed_rigid_body(const const_entity_handle handle)
 
 bool physics_system::is_constructed_colliders(const const_entity_handle handle) const {
 	return
-		handle.alive() // && is_constructed_rigid_body(handle.get<components::fixtures>().get_owner_body())
+		handle.alive() // && is_constructed_rigid_body(handle.get_owner_body())
 		&& get_colliders_cache(handle).all_fixtures_in_component.size() > 0
 	;
 }
@@ -87,12 +87,12 @@ void physics_system::fixtures_construct(const const_entity_handle handle) {
 	if (handle.has<components::fixtures>()) {
 		const auto colliders = handle.get<components::fixtures>();
 
-		if (colliders.is_activated() && is_constructed_rigid_body(colliders.get_owner_body())) {
+		if (colliders.is_activated() && is_constructed_rigid_body(handle.get_owner_body())) {
 			const auto si = handle.get_cosmos().get_si();
 			const auto& colliders_data = colliders.get_data();
 			auto& cache = get_colliders_cache(handle);
 
-			const auto owner_body_entity = colliders.get_owner_body();
+			const auto owner_body_entity = handle.get_owner_body();
 			ensure(owner_body_entity.alive());
 			auto& owner_cache = get_rigid_body_cache(owner_body_entity);
 

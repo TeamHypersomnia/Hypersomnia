@@ -68,7 +68,7 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 			if (!collider_fixtures.is_friction_ground)
 #endif
 			{
-				auto& collider_physics = collider_fixtures.get_owner_body().get<components::special_physics>();
+				auto& collider_physics = collider.get_owner_body().get<components::special_physics>();
 
 				bool found_suitable = false;
 
@@ -110,7 +110,7 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 				}
 
 				if (found_suitable) {
-					auto new_owner = subject_fixtures.get_owner_body().get_id();
+					auto new_owner = subject.get_owner_body().get_id();
 					auto& grounds = collider_physics.owner_friction_grounds;
 					
 					friction_connection connection(new_owner);
@@ -129,7 +129,7 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 					
 					grounds.push_back(connection);
 
-					sys.rechoose_owner_friction_body(collider_fixtures.get_owner_body());
+					sys.rechoose_owner_friction_body(collider.get_owner_body());
 				}
 			}
 		}
@@ -190,7 +190,7 @@ void physics_system::contact_listener::EndContact(b2Contact* contact) {
 		auto& subject_fixtures = subject.get<components::fixtures>();
 		auto& collider_fixtures = collider.get<components::fixtures>();
 
-		auto& collider_physics = collider_fixtures.get_owner_body().get<components::special_physics>();
+		auto& collider_physics = collider.get_owner_body().get<components::special_physics>();
 
 		if (subject_fixtures.is_friction_ground() && during_step) {
 #if FRICTION_FIELDS_COLLIDE
@@ -198,19 +198,19 @@ void physics_system::contact_listener::EndContact(b2Contact* contact) {
 #endif
 			{
 				for (auto it = collider_physics.owner_friction_grounds.begin(); it != collider_physics.owner_friction_grounds.end(); ++it) {
-					if ((*it).target == subject_fixtures.get_owner_body()) {
+					if ((*it).target == subject.get_owner_body()) {
 						auto& fixtures_connected = (*it).fixtures_connected;
 						ensure(fixtures_connected > 0);
 
 						--fixtures_connected;
 
 						if (fixtures_connected == 0) {
-							 LOG("Unreg: %x", subject_fixtures.get_owner_body().get_id());
+							 LOG("Unreg: %x", subject.get_owner_body().get_id());
 							collider_physics.owner_friction_grounds.erase(it);
-							sys.rechoose_owner_friction_body(collider_fixtures.get_owner_body());
+							sys.rechoose_owner_friction_body(collider.get_owner_body());
 						}
 						else {
-							 LOG("Decr: %x", subject_fixtures.get_owner_body().get_id());
+							 LOG("Decr: %x", subject.get_owner_body().get_id());
 						}
 
 						break;

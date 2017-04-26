@@ -190,11 +190,6 @@ bool basic_fixtures_synchronizer<C>::is_constructed() const {
 }
 
 template<bool C>
-basic_entity_handle<C> basic_fixtures_synchronizer<C>::get_owner_body() const {
-	return handle.get_owner_body();
-}
-
-template<bool C>
 components::transform basic_fixtures_synchronizer<C>::get_offset(const colliders_offset_type t) const {
 	return component.group.offsets_for_created_shapes[t];
 }

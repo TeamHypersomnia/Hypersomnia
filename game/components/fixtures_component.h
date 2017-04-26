@@ -87,8 +87,6 @@ public:
 	float get_base_density() const;
 	float get_density() const;
 	
-	basic_entity_handle<is_const> get_owner_body() const;
-
 	ltrb get_local_aabb() const;
 
 	const fixture_group_data& get_fixture_group_data() const;
