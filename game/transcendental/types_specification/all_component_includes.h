@@ -37,7 +37,6 @@
 #include "game/components/inferred_state_component.h"
 #include "game/components/guid_component.h"
 #include "game/components/child_component.h"
-#include "game/components/physical_relations_component.h"
 #include "game/components/interpolation_component.h"
 #include "game/components/flags_component.h"
 #include "game/components/light_component.h"
@@ -45,4 +44,6 @@
 #include "game/components/sound_existence_component.h"
 #include "game/components/grenade_component.h"
 #include "game/components/catridge_component.h"
+#include "game/components/shape_polygon_component.h"
+#include "game/components/shape_circle_component.h"
 

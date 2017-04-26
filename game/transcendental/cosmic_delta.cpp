@@ -1,4 +1,6 @@
 #include <tuple>
+#include "game/transcendental/cosmos.h"
+
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/templates/for_each_in_types.h"
 #include "cosmic_delta.h"
@@ -9,8 +11,6 @@
 #include "augs/misc/delta_compression.h"
 
 #include "augs/misc/pooled_object_id.h"
-
-#include "cosmos.h"
 
 #include "generated_introspectors.h"
 

@@ -6,6 +6,7 @@
 #include "game/systems_inferred/physics_system.h"
 
 #include "game/components/pathfinding_component.h"
+#include "game/components/shape_polygon_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/messages/visibility_information.h"
 
@@ -29,7 +30,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 
 		auto& b = subject.get<components::rigid_body>();
 
-		const auto& verts = subject.get<components::fixtures>().get_data().shape.convex_polys[fixture_num].vertices;
+		const auto& verts = subject.get<components::shape_polygon>().get_raw_component().shape.convex_polys[fixture_num].vertices;
 
 		/* for every vertex in given fixture's shape */
 		for (auto& v : verts) {

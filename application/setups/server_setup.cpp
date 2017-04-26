@@ -1,4 +1,5 @@
 #include <thread>
+#include "game/transcendental/cosmos.h"
 #include "augs/misc/templated_readwrite.h"
 #include "game/bindings/bind_game_and_augs.h"
 #include "augs/global_libraries.h"
@@ -11,7 +12,6 @@
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "game/view/viewing_session.h"
 #include "game/transcendental/simulation_broadcast.h"
-#include "game/transcendental/cosmos.h"
 #include "game/transcendental/cosmic_delta.h"
 
 #include "augs/misc/debug_entropy_player.h"

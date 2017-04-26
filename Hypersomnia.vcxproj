@@ -1180,12 +1180,13 @@
     <ClInclude Include="game\components\flags_component.h" />
     <ClInclude Include="game\components\grenade_component.h" />
     <ClInclude Include="game\components\guid_component.h" />
+    <ClInclude Include="game\components\shape_circle_component.h" />
     <ClInclude Include="game\components\inferred_state_component.h" />
     <ClInclude Include="game\components\interpolation_component.h" />
     <ClInclude Include="game\components\light_component.h" />
-    <ClInclude Include="game\components\physical_relations_component.h" />
     <ClInclude Include="game\components\rigid_body_component.h" />
     <ClInclude Include="game\components\sentience_component.h" />
+    <ClInclude Include="game\components\shape_polygon_component.h" />
     <ClInclude Include="game\components\sound_existence_component.h" />
     <ClInclude Include="game\components\tree_of_npo_node_component.h" />
     <ClInclude Include="game\components\wandering_pixels_component.h" />

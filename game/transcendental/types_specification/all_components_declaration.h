@@ -42,13 +42,14 @@ namespace components {
 	struct processing;
 	struct guid;
 	struct child;
-	struct physical_relations;
 	struct interpolation;
 	struct light;
 	struct wandering_pixels;
 	struct sound_existence;
 	struct grenade;
 	struct catridge;
+	struct shape_polygon;
+	struct shape_circle;
 
 	struct inferred_state;
 }
@@ -93,13 +94,14 @@ struct put_all_components_into {
 		components::processing,
 		components::guid,
 		components::child,
-		components::physical_relations,
 		components::interpolation,
 		components::light,
 		components::wandering_pixels,
 		components::sound_existence,
 		components::grenade,
 		components::catridge,
+		components::shape_polygon,
+		components::shape_circle,
 
 		components::inferred_state
 

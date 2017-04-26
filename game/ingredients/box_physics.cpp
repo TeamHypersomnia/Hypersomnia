@@ -1,6 +1,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/components/rigid_body_component.h"
 #include "game/components/fixtures_component.h"
+#include "game/components/shape_polygon_component.h"
 #include "game/components/sprite_component.h"
 
 #include "game/enums/filters.h"
@@ -16,19 +17,17 @@ namespace ingredients {
 			e.remove<components::transform>();
 		}
 
-		e.create_fixtures_component_from_renderable(
-			step,
-			[&](auto component){
-				auto& group = component.get_fixture_group_data();
-
-				group.destructible = destructible;
-				group.filter = filters::dynamic_object();
-				group.density = 1;
-
-				e += component;
-			}
+		e.add_shape_component_from_renderable(
+			step
 		);
 
+		components::fixtures group;
+
+		group.destructible = destructible;
+		group.filter = filters::dynamic_object();
+		group.density = 1;
+
+		e += group;
 		e += def;
 		e.get<components::fixtures>().set_owner_body(e);
 	}
@@ -42,19 +41,17 @@ namespace ingredients {
 			e.remove<components::transform>();
 		}
 
-		e.create_fixtures_component_from_renderable(
-			step,
-			[&](auto component){
-				auto& group = component.get_fixture_group_data();
-
-				group.filter = filters::see_through_dynamic_object();
-				group.density = 1;
-				group.restitution = 0.5f;
-
-				e += component;
-			}
+		e.add_shape_component_from_renderable(
+			step
 		);
 
+		components::fixtures group;
+
+		group.filter = filters::see_through_dynamic_object();
+		group.density = 1;
+		group.restitution = 0.5f;
+
+		e += group;
 		e += def;
 		e.get<components::fixtures>().set_owner_body(e);
 	}
@@ -68,23 +65,22 @@ namespace ingredients {
 			e.remove<components::transform>();
 		}
 
-		e.create_fixtures_component_from_renderable(
-			step,
-			[&](auto component){
-				auto& group = component.get_fixture_group_data();
-
-				group.filter = filters::shell();
-				group.density = 1;
-				group.restitution = 0.5f;
-				group.restitution = 1.4f;
-				group.density = 0.001f;
-				group.collision_sound_gain_mult = 100.f;
-
-				e += component;
-			}
+		e.add_shape_component_from_renderable(
+			step
 		);
 
+		components::fixtures group;
+
+		group.filter = filters::shell();
+		group.density = 1;
+		group.restitution = 0.5f;
+		group.restitution = 1.4f;
+		group.density = 0.001f;
+		group.collision_sound_gain_mult = 100.f;
+
+		e += group;
 		e += def;
+
 		e.get<components::fixtures>().set_owner_body(e);
 	}
 
@@ -99,18 +95,16 @@ namespace ingredients {
 			e.remove<components::transform>();
 		}
 
-		e.create_fixtures_component_from_renderable(
-			step,
-			[&](auto component){
-				auto& group = component.get_fixture_group_data();
-
-				group.filter = filters::dynamic_object();
-				group.density = 1;
-
-				e += component;
-			}
+		e.add_shape_component_from_renderable(
+			step
 		);
 
+		components::fixtures group;
+
+		group.filter = filters::dynamic_object();
+		group.density = 1;
+
+		e += group;
 		e += def;
 		e.get<components::fixtures>().set_owner_body(e);
 	}
@@ -131,19 +125,17 @@ namespace ingredients {
 		body.fixed_rotation = false;
 		body.angled_damping = false;
 		
-		e.create_fixtures_component_from_renderable(
-			step,
-			[&](auto component){
-				auto& group = component.get_fixture_group_data();
-
-				group.filter = filters::bullet();
-				group.density = 1;
-				group.disable_standard_collision_resolution = true;
-
-				e += component;
-			}
+		e.add_shape_component_from_renderable(
+			step
 		);
 
+		components::fixtures group;
+
+		group.filter = filters::bullet();
+		group.density = 1;
+		group.disable_standard_collision_resolution = true;
+
+		e += group;
 		e += body;
 		e.get<components::fixtures>().set_owner_body(e);
 	}

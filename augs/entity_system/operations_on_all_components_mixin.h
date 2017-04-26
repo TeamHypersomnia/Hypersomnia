@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/templates/for_each_in_types.h"
+#include "augs/templates/type_matching_and_indexing.h"
 #include "augs/entity_system/component_aggregate.h"
 
 #include "augs/misc/pool.h"
@@ -26,25 +27,28 @@ namespace augs {
 			for_each_type<components...>(r);
 		}
 
-		template <class excluded_component, class handle_type>
-		void clone_all_components(
-			const handle_type from, 
-			const handle_type into
+		template <class... excluded_components, class handle_type>
+		void clone_all_components_except(
+			const handle_type into,
+			const handle_type from 
 		) {
 			for_each_type<components...>([&from, &into](auto c) {
-				if (std::is_same<excluded_component, decltype(c)>::value)
+				if (is_one_of_v<decltype(c), excluded_components...>) {
 					return;
+				}
 
-				if (from.template has<decltype(c)>())
+				if (from.template has<decltype(c)>()) {
 					into += from.template get<decltype(c)>();
+				}
 			});
 		}
 
 		template <class handle_type>
 		void remove_all_components(const handle_type handle) {
 			for_each_type<components...>([&handle](auto c) {
-				if(handle.template has<decltype(c)>())
+				if(handle.template has<decltype(c)>()) {
 					handle.template remove<decltype(c)>();
+				}
 			});
 		}
 	};

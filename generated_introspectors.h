@@ -35,7 +35,6 @@ struct spell_data;
 class tile_layer;
 struct behaviour_tree_instance;
 struct car_engine_entities;
-struct fixture_group_data;
 struct item_slot_mounting_operation;
 struct light_value_variation;
 struct light_attenuation;
@@ -146,7 +145,6 @@ namespace components {
 	struct movement;
 	struct name;
 	struct particles_existence;
-	struct physical_relations;
 	struct polygon;
 	struct position_copying;
 	struct processing;
@@ -154,6 +152,8 @@ namespace components {
 	struct rigid_body;
 	struct rotation_copying;
 	struct sentience;
+	struct shape_circle;
+	struct shape_polygon;
 	struct sound_existence;
 	struct special_physics;
 	struct sprite;
@@ -901,7 +901,7 @@ namespace augs {
 
 		template <class F, class... Instances>
 		static void introspect_body(
-			const fixture_group_data* const,
+			const components::fixtures* const,
 			F f,
 			Instances&&... _t_
 		) {
@@ -922,20 +922,10 @@ namespace augs {
 			FIELD(filter);
 			FIELD(destructible);
 			FIELD(sensor);
-	
+
 			FIELD(offsets_for_created_shapes);
-		}
 
-		template <class F, class... Instances>
-		static void introspect_body(
-			const components::fixtures* const,
-			F f,
-			Instances&&... _t_
-		) {
-			FIELD(shape);
-			FIELD(destruction);
-
-			FIELD(group);
+			FIELD(owner_body);
 		}
 
 		template <class F, class... Instances>
@@ -1248,16 +1238,6 @@ namespace augs {
 
 		template <class F, class... Instances>
 		static void introspect_body(
-			const components::physical_relations* const,
-			F f,
-			Instances&&... _t_
-		) {
-			FIELD(owner_body);
-			FIELD(fixture_entities);
-		}
-
-		template <class F, class... Instances>
-		static void introspect_body(
 			const components::polygon* const,
 			F f,
 			Instances&&... _t_
@@ -1344,6 +1324,8 @@ namespace augs {
 
 			FIELD(velocity);
 			FIELD(angular_velocity);
+
+			FIELD(fixture_entities);
 		}
 
 		template <class F, class... Instances>
@@ -1409,6 +1391,27 @@ namespace augs {
 
 			FIELD(health_decrease_particle_effect_response);
 
+		}
+
+		template <class F, class... Instances>
+		static void introspect_body(
+			const components::shape_circle* const,
+			F f,
+			Instances&&... _t_
+		) {
+			FIELD(radius);
+			FIELD(activated);
+		}
+
+		template <class F, class... Instances>
+		static void introspect_body(
+			const components::shape_polygon* const,
+			F f,
+			Instances&&... _t_
+		) {
+			FIELD(shape);
+			FIELD(destruction);
+			FIELD(activated);
 		}
 
 		template <class F, class... Instances>

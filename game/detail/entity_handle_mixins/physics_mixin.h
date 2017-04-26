@@ -11,7 +11,7 @@ public:
 	entity_handle_type get_owner_friction_ground() const;
 	
 	template <class F>
-	void create_fixtures_component_from_renderable(
+	void create_shape_component_from_renderable(
 		const const_logic_step step,
 		F callback_for_created_component
 	) const {
@@ -26,11 +26,11 @@ public:
 			const auto image_size = metas[sprite.tex].get_size();
 			vec2 scale = sprite.get_size(metas) / image_size;
 
-			components::fixtures fixtures;
-			fixtures.shape = metas[sprite.tex].shape;
-			fixtures.shape.scale(scale);
+			components::shape_polygon shape_polygon;
+			shape_polygon.shape = metas[sprite.tex].shape;
+			shape_polygon.shape.scale(scale);
 			
-			callback_for_created_component(fixtures);
+			callback_for_created_component(shape_polygon);
 		}
 		if (handle.has<components::polygon>()) {
 			std::vector<vec2> input;
@@ -43,9 +43,10 @@ public:
 				input.push_back(v.pos);
 			}
 
-			components::fixtures fixtures;
-			fixtures.shape.add_concave_polygon(input);
-			callback_for_created_component(fixtures);
+			components::shape_polygon shape_polygon;
+			shape_polygon.shape.add_concave_polygon(input);
+
+			callback_for_created_component(shape_polygon);
 		}
 	}
 };
@@ -55,7 +56,18 @@ class physics_mixin;
 
 template <class entity_handle_type>
 class EMPTY_BASES physics_mixin<false, entity_handle_type> : public basic_physics_mixin<false, entity_handle_type> {
-public:	
+public:
+	void add_shape_component_from_renderable(
+		const const_logic_step step
+	) const {
+		create_shape_component_from_renderable(
+			step, 
+			[this](const auto& component){
+				const auto& handle = *static_cast<const entity_handle_type*>(this);
+				handle += component;
+			}
+		);
+	}
 };
 
 template <class entity_handle_type>

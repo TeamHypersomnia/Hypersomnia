@@ -17,6 +17,7 @@
 #include "game/components/car_component.h"
 #include "game/components/trigger_component.h"
 #include "game/components/name_component.h"
+#include "game/components/shape_polygon_component.h"
 
 #include "game/enums/filters.h"
 
@@ -78,20 +79,18 @@ namespace prefabs {
 
 			front += body;
 						
-			front.create_fixtures_component_from_renderable(
-				step,
-				[&](auto component){
-					auto& group = component.get_fixture_group_data();
-
-					group.filter = filters::see_through_dynamic_object();
-					group.density = 1.5f;
-					group.restitution = 0.3f;
-					group.can_driver_shoot_through = true;
-
-					front += component;
-				}
+			front.add_shape_component_from_renderable(
+				step
 			);
 
+			components::fixtures group;
+
+			group.filter = filters::see_through_dynamic_object();
+			group.density = 1.5f;
+			group.restitution = 0.3f;
+			group.can_driver_shoot_through = true;
+
+			front  += group;
 			front.get<components::fixtures>().set_owner_body(front);
 		}
 
@@ -104,7 +103,6 @@ namespace prefabs {
 		//
 		//	sprite.set(assets::game_image_id::MOTORCYCLE_INSIDE);
 		//
-		//	auto& info = colliders.get_fixture_group_data();
 		//	info.shape.from_renderable(interior);
 		//	info.density = 0.6f;
 		//	colliders.disable_standard_collision_resolution = true;
@@ -134,20 +132,18 @@ namespace prefabs {
 			vec2 offset(0, 0);
 			//((front.get<components::sprite>().get_size(metas).x / 2 + sprite.get_size(metas).x / 2) *  -1, 0);
 			
-			left_wheel.create_fixtures_component_from_renderable(
-				step,
-				[&](auto component){
-					auto& group = component.get_fixture_group_data();
-
-					group.density = 0.6f;
-					group.filter = filters::trigger();
-					group.sensor = true;
-					group.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
-
-					left_wheel += component;
-				}
+			left_wheel.add_shape_component_from_renderable(
+				step
 			);
 
+			components::fixtures group;
+
+			group.density = 0.6f;
+			group.filter = filters::trigger();
+			group.sensor = true;
+			group.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
+
+			left_wheel  += group;
 			left_wheel.get<components::fixtures>().set_owner_body(front);
 		}
 

@@ -371,9 +371,6 @@ void physics_system::contact_listener::PostSolve(b2Contact* contact, const b2Con
 		msg.subject = subject;
 		msg.collider = collider;
 
-		auto& subject_fixtures = subject.get<components::fixtures>();
-		auto& collider_fixtures = collider.get<components::fixtures>();
-
 		msg.subject_b2Fixture_index = sys.get_index_in_component(fix_a, subject);
 		msg.collider_b2Fixture_index = sys.get_index_in_component(fix_b, collider);
 

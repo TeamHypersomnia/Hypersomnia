@@ -20,16 +20,15 @@ template<bool is_const, class entity_handle_type>
 class basic_relations_mixin {
 protected:
 	typedef basic_inventory_slot_handle<is_const> inventory_slot_handle_type;
-	
-	const components::physical_relations& get_physical_relations_component() const;
-
 public:
 	entity_handle_type get_parent() const;
 	
 	entity_handle_type get_owner_body() const;
 	
 	auto get_fixture_entities() const {
-		return get_physical_relations_component().fixture_entities;
+		const auto self = *static_cast<const entity_handle_type*>(this);
+
+		return self.get<components::rigid_body>().get_fixture_entities();
 	}
 
 #if COSMOS_TRACKS_GUIDS
@@ -73,8 +72,6 @@ class relations_mixin;
 template<class entity_handle_type>
 class EMPTY_BASES relations_mixin<false, entity_handle_type> : public basic_relations_mixin<false, entity_handle_type> {
 protected:
-	components::physical_relations& physical_relations_component() const;
-
 public:
 	void make_as_child_of(const entity_id) const;
 

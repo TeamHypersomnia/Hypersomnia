@@ -12,7 +12,6 @@
 #include "augs/ensure.h"
 #include "game/transcendental/entity_handle.h"
 #include "application/config_structs/debug_drawing_settings.h"
-#include "game/components/physical_relations_component.h"
 
 typedef components::rigid_body P;
 
@@ -45,46 +44,46 @@ void component_synchronizer<false, P>::reinference() const {
 }
 
 void component_synchronizer<false, P>::set_body_type(const rigid_body_type t) const {
-	component.body_type = t;
+	get_data().body_type = t;
 	reinference();
 }
 
 void component_synchronizer<false, P>::set_activated(const bool flag) const {
-	component.activated = flag;
+	get_data().activated = flag;
 
 	if (!flag) {
-		component.velocity.reset();
-		component.angular_velocity = 0.f;
+		get_data().velocity.reset();
+		get_data().angular_velocity = 0.f;
 	}
 
 	reinference();
 }
 
 void component_synchronizer<false, P>::set_bullet_body(const bool flag) const {
-	component.bullet = flag;
+	get_data().bullet = flag;
 	reinference();
 }
 
 void component_synchronizer<false, P>::set_velocity(const vec2 pixels) const {
-	component.velocity = to_meters(pixels);
+	get_data().velocity = to_meters(pixels);
 
 	if (!is_constructed())
 		return;
 
-	get_cache().body->SetLinearVelocity(component.velocity);
+	get_cache().body->SetLinearVelocity(get_data().velocity);
 }
 
 void component_synchronizer<false, P>::set_angular_velocity(const float degrees) const {
-	component.angular_velocity = DEG_TO_RAD<float> * degrees;
+	get_data().angular_velocity = DEG_TO_RAD<float> * degrees;
 
 	if (!is_constructed())
 		return;
 
-	get_cache().body->SetLinearVelocity(component.velocity);
+	get_cache().body->SetLinearVelocity(get_data().velocity);
 }
 
 void component_synchronizer<false, P>::set_linear_damping(const float damping) const {
-	component.linear_damping = damping;
+	get_data().linear_damping = damping;
 
 	if (!is_constructed())
 		return;
@@ -94,7 +93,7 @@ void component_synchronizer<false, P>::set_linear_damping(const float damping) c
 
 
 void component_synchronizer<false, P>::set_angular_damping(const float damping) const {
-	component.angular_damping = damping;
+	get_data().angular_damping = damping;
 
 	if (!is_constructed())
 		return;
@@ -104,7 +103,7 @@ void component_synchronizer<false, P>::set_angular_damping(const float damping) 
 
 
 void component_synchronizer<false, P>::set_linear_damping_vec(const vec2 damping) const {
-	component.linear_damping_vec = damping;
+	get_data().linear_damping_vec = damping;
 
 	if (!is_constructed())
 		return;
@@ -136,8 +135,8 @@ void component_synchronizer<false, P>::apply_force(
 		wake
 	);
 
-	component.angular_velocity = get_cache().body->GetAngularVelocity();
-	component.velocity = get_cache().body->GetLinearVelocity();
+	get_data().angular_velocity = get_cache().body->GetAngularVelocity();
+	get_data().velocity = get_cache().body->GetLinearVelocity();
 
 	if (augs::renderer::get_current().debug.draw_forces && force.non_zero()) {
 		auto& lines = augs::renderer::get_current().logic_lines;
@@ -160,8 +159,8 @@ void component_synchronizer<false, P>::apply_impulse(const vec2 pixels, const ve
 	const vec2 location = get_cache().body->GetWorldCenter() + to_meters(center_offset);
 
 	get_cache().body->ApplyLinearImpulse(force, location, true);
-	component.angular_velocity = get_cache().body->GetAngularVelocity();
-	component.velocity = get_cache().body->GetLinearVelocity();
+	get_data().angular_velocity = get_cache().body->GetAngularVelocity();
+	get_data().velocity = get_cache().body->GetLinearVelocity();
 
 	if (augs::renderer::get_current().debug.draw_forces && force.non_zero()) {
 		auto& lines = augs::renderer::get_current().persistent_lines;
@@ -172,7 +171,7 @@ void component_synchronizer<false, P>::apply_impulse(const vec2 pixels, const ve
 void component_synchronizer<false, P>::apply_angular_impulse(const float imp) const {
 	ensure(is_constructed());
 	get_cache().body->ApplyAngularImpulse(imp, true);
-	component.angular_velocity = get_cache().body->GetAngularVelocity();
+	get_data().angular_velocity = get_cache().body->GetAngularVelocity();
 }
 
 template<bool C>
@@ -183,12 +182,12 @@ float basic_physics_synchronizer<C>::get_mass() const {
 
 template<bool C>
 float basic_physics_synchronizer<C>::get_angle() const {
-	return component.sweep.a * RAD_TO_DEG<float>;
+	return get_data().sweep.a * RAD_TO_DEG<float>;
 }
 
 template<bool C>
 float basic_physics_synchronizer<C>::get_angular_velocity() const {
-	return component.angular_velocity * RAD_TO_DEG<float>;
+	return get_data().angular_velocity * RAD_TO_DEG<float>;
 }
 
 template<bool C>
@@ -199,7 +198,7 @@ float basic_physics_synchronizer<C>::get_inertia() const {
 
 template<bool C>
 vec2 basic_physics_synchronizer<C>::get_position() const {
-	return to_pixels(component.transform.p);
+	return to_pixels(get_data().transform.p);
 }
 
 template<bool C>
@@ -210,7 +209,7 @@ vec2 basic_physics_synchronizer<C>::get_mass_position() const {
 
 template<bool C>
 vec2 basic_physics_synchronizer<C>::velocity() const {
-	return to_pixels(component.velocity);
+	return to_pixels(get_data().velocity);
 }
 
 template<bool C>
@@ -221,12 +220,12 @@ vec2 basic_physics_synchronizer<C>::get_world_center() const {
 
 template<bool C>
 rigid_body_type basic_physics_synchronizer<C>::get_body_type() const {
-	return component.body_type;
+	return get_data().body_type;
 }
 
 template<bool C>
 bool basic_physics_synchronizer<C>::is_activated() const {
-	return component.activated;
+	return get_data().activated;
 }
 
 void component_synchronizer<false, P>::set_transform(const entity_id id) const {
@@ -234,7 +233,7 @@ void component_synchronizer<false, P>::set_transform(const entity_id id) const {
 }
 
 void component_synchronizer<false, P>::set_transform(const components::transform& transform) const {
-	component.set_transform(
+	get_data().set_transform(
 		handle.get_cosmos().significant.meta.settings.si,
 		transform
 	);
@@ -243,8 +242,8 @@ void component_synchronizer<false, P>::set_transform(const components::transform
 		return;
 	}
 
-	get_cache().body->m_xf = component.transform;
-	get_cache().body->m_sweep = component.sweep;
+	get_cache().body->m_xf = get_data().transform;
+	get_cache().body->m_sweep = get_data().sweep;
 }
 
 template<bool C>

@@ -60,7 +60,7 @@ public:
 	static constexpr bool is_const_value = is_const;
 private:
 
-	friend class relations_mixin<is_const, basic_entity_handle<is_const>>;
+	template <bool, class> friend class relations_mixin;
 	template <bool, class> friend class basic_relations_mixin;
 
 	typedef maybe_const_ref_t<is_const, cosmos> owner_reference;
@@ -131,8 +131,12 @@ private:
 			return h.allocator::template has<T>();
 		}
 
+		return_type find() const {
+			return { h.allocator::template find<T>(), h };
+		}
+
 		return_type get() const {
-			return component_synchronizer<is_const, T>(h.allocator::template get<T>(), h);
+			return { &h.allocator::template get<T>(), h };
 		}
 
 		void add(const T& t) const {
@@ -278,7 +282,7 @@ public:
 	decltype(auto) add(const component_synchronizer<is_const, component>& c) const {
 		check_component_type<component>();
 		ensure(alive());
-		component_or_synchronizer_or_disabled<component>({ *this }).add(c.get_data());
+		component_or_synchronizer_or_disabled<component>({ *this }).add(c.get_raw_component());
 		return get<component>();
 	}
 
@@ -286,7 +290,6 @@ public:
 	decltype(auto) find() const {
 		check_component_type<component>();
 		ensure(alive());
-		static_assert(!is_component_synchronized<component>, "Cannot return a pointer to synchronized component!");
 		return component_or_synchronizer_or_disabled<component>({ *this }).find();
 	}
 

@@ -9,6 +9,8 @@
 #include "game/components/melee_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/grenade_component.h"
+#include "game/components/shape_circle_component.h"
+#include "game/components/shape_polygon_component.h"
 
 #include "game/enums/entity_name.h"
 #include "game/enums/filters.h"
@@ -41,6 +43,11 @@ namespace prefabs {
 		auto& item = ingredients::make_item(grenade_entity);
 		item.space_occupied_per_charge = to_space_units("0.6");
 
+		components::shape_circle shape_circle;
+		shape_circle.radius = 1.f;
+
+		grenade_entity += shape_circle;
+
 		grenade_entity.add_standard_components(step);
 		grenade_entity.get<components::processing>().disable_in(processing_subjects::WITH_GRENADE);
 
@@ -66,6 +73,11 @@ namespace prefabs {
 
 		grenade.released_image_id = assets::game_image_id::PED_GRENADE_RELEASED;
 
+		components::shape_circle shape_circle;
+		shape_circle.radius = 1.f;
+
+		grenade_entity += shape_circle;
+
 		grenade_entity.add_standard_components(step);
 
 		return grenade_entity;
@@ -89,6 +101,11 @@ namespace prefabs {
 		item.space_occupied_per_charge = to_space_units("0.6");
 		
 		grenade.released_image_id = assets::game_image_id::INTERFERENCE_GRENADE_RELEASED;
+
+		components::shape_circle shape_circle;
+		shape_circle.radius = 1.f;
+
+		grenade_entity += shape_circle;
 
 		grenade_entity.add_standard_components(step);
 

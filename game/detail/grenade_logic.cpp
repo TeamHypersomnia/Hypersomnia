@@ -10,6 +10,10 @@
 #include "game/components/special_physics_component.h"
 #include "game/components/sound_existence_component.h"
 
+#include "game/components/shape_polygon_component.h"
+#include "game/components/shape_circle_component.h"
+#include "game/components/inferred_state_component.h"
+
 #include "game/systems_stateless/sound_existence_system.h"
 
 void release_or_throw_grenade(
@@ -85,20 +89,15 @@ void release_or_throw_grenade(
 		rigid_body.set_linear_damping(3.0f);
 
 		auto& fixtures = grenade_entity.get<components::fixtures>();
-		auto new_def = fixtures.get_data();
-		new_def.group.restitution = 0.6f;
-		new_def.group.density = 10.f;
-		new_def.group.material = assets::physical_material_id::GRENADE;
-
-		const auto new_radius = 1.f;// std::min(aabb.w(), aabb.h()) / 16;// aabb.diagonal() / 2;
-		//new_def.colliders[0].shape.set(circle_shape{ new_radius });
-
+		
+		auto new_def = fixtures.get_raw_component();
+		new_def.restitution = 0.6f;
+		new_def.density = 10.f;
+		new_def.material = assets::physical_material_id::GRENADE;
+		
 		fixtures = new_def;
-		//new_def.colliders[0].shape.. = 1.f;
 
-		//auto new_def = rigid_body.get_data();
-		//new_def.bullet = true;
-		//
-		//rigid_body = new_def;
+		grenade_entity.get<components::shape_polygon>().set_activated(false);
+		grenade_entity.get<components::shape_circle>().set_activated(true);
 	}
 }

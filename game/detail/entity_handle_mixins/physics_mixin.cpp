@@ -1,3 +1,6 @@
+#include "game/transcendental/cosmos.h"
+#include "game/transcendental/entity_handle.h"
+
 #include "physics_mixin.h"
 #include "game/assets/assets_manager.h"
 
@@ -6,9 +9,8 @@
 #include "game/components/fixtures_component.h"
 #include "game/components/polygon_component.h"
 #include "game/components/sprite_component.h"
-
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/entity_handle.h"
+#include "game/components/shape_polygon_component.h"
+#include "game/components/shape_circle_component.h"
 
 template <bool C, class D>
 D basic_physics_mixin<C, D>::get_owner_friction_ground() const {

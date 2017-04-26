@@ -7,7 +7,6 @@
 #include "game/components/inferred_state_component.h"
 #include "game/components/guid_component.h"
 #include "game/components/child_component.h"
-#include "game/components/physical_relations_component.h"
 #include "game/components/crosshair_component.h"
 #include "augs/templates/container_templates.h"
 #include "augs/templates/type_matching_and_indexing.h"
@@ -23,31 +22,18 @@ void relations_mixin<false, D>::make_as_child_of(const entity_id parent_id) cons
 }
 
 template <class D>
-components::physical_relations& relations_mixin<false, D>::physical_relations_component() const {
-	auto& self = *static_cast<const D*>(this);
-
-	if (!self.has<components::physical_relations>()) {
-		self.add(components::physical_relations());
-	}
-
-	return self.get<components::physical_relations>();
-}
-
-template <class D>
 void relations_mixin<false, D>::make_cloned_child_entities_recursive(const entity_id from_id) const {
 	auto& self = *static_cast<const D*>(this);
 	auto& cosmos = self.get_cosmos();
-	
+
 	const const_entity_handle from = cosmos[from_id];
 
 	for_each_component_type([&](auto dum) {
 		typedef decltype(dum) component_type;
 		
 		if (self.has<component_type>()) {
-			ensure(from.has<component_type>());
-
-			auto& cloned_to_component = get_component_ref_from_synchronizer_or_component(self.get<component_type>());
-			const auto& cloned_from_component = get_component_ref_from_synchronizer_or_component(self.get<component_type>());
+			auto& cloned_to_component = self.allocator::template get<component_type>();
+			const auto& cloned_from_component = from.allocator::template get<component_type>();
 
 			augs::introspect_recursive<
 				concat_unary_t<
@@ -69,38 +55,17 @@ void relations_mixin<false, D>::make_cloned_child_entities_recursive(const entit
 }
 
 template <class D>
-void relations_mixin<false, D>::set_owner_body(const entity_id owner_id) const {
-	auto& self = *static_cast<const D*>(this);
-
-	auto& cosmos = self.get_cosmos();
-	auto new_owner = cosmos[owner_id];
-	auto this_id = self.get_id();
-
-	auto former_owner = cosmos[self.get_physical_relations_component().owner_body];
-
-	if (former_owner.alive()) {
-		remove_element(former_owner.physical_relations_component().fixture_entities, this_id);
-		cosmos.partial_reinference<physics_system>(former_owner);
-	}
-
-	self.physical_relations_component().owner_body = new_owner;
-
-	if (new_owner.alive()) {
-		remove_element(new_owner.physical_relations_component().fixture_entities, this_id);
-		new_owner.physical_relations_component().fixture_entities.push_back(this_id);
-		cosmos.partial_reinference<physics_system>(new_owner);
-	}
-	else {
-		cosmos.partial_reinference<physics_system>(self);
-	}
-}
-
-template <class D>
 void relations_mixin<false, D>::map_child_entity(
 	const child_entity_name n, 
 	const entity_id p
 ) const {
 	get_id(n) = p;
+}
+
+template <class D>
+void relations_mixin<false, D>::set_owner_body(const entity_id parent_id) const {
+	auto& self = *static_cast<const D*>(this);
+	self.get<components::fixtures>().set_owner_body(parent_id);
 }
 
 template <bool C, class D>
@@ -142,7 +107,8 @@ D basic_relations_mixin<C, D>::operator[](const child_entity_name child) const {
 template <bool C, class D>
 D basic_relations_mixin<C, D>::get_owner_body() const {
 	auto& self = *static_cast<const D*>(this);
-	return self.get_cosmos()[get_physical_relations_component().owner_body];
+	const auto fixtures = self.find<components::fixtures>();
+	return fixtures != nullptr ? self.get_cosmos()[fixtures.get_owner_body()] : self.get_cosmos()[entity_id()];
 }
 
 #if COSMOS_TRACKS_GUIDS
@@ -163,19 +129,6 @@ D basic_relations_mixin<C, D>::get_parent() const {
 	else {
 		return self.get_cosmos()[entity_id()];
 	}
-}
-
-template <bool C, class D>
-const components::physical_relations& basic_relations_mixin<C, D>::get_physical_relations_component() const {
-	thread_local const components::physical_relations original;
-	
-	const auto& self = *static_cast<const D*>(this);
-
-	if (self.has<components::physical_relations>()) {
-		return self.get<components::physical_relations>();
-	}
-
-	return original;
 }
 
 template class basic_relations_mixin<false, basic_entity_handle<false>>;

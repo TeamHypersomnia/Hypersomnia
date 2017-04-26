@@ -91,12 +91,12 @@ P P::get_default(const const_entity_handle id) {
 
 template<bool C>
 bool basic_processing_synchronizer<C>::is_activated() const {
-	return component.activated;
+	return get_data().activated;
 }
 
 template<bool C>
 bool basic_processing_synchronizer<C>::is_in(const processing_subjects list) const {
-	return component.processing_subject_categories.test(list) && !component.disabled_categories.test(list);
+	return get_data().processing_subject_categories.test(list) && !get_data().disabled_categories.test(list);
 }
 
 void component_synchronizer<false, P>::reinference() const {
@@ -104,32 +104,32 @@ void component_synchronizer<false, P>::reinference() const {
 }
 
 void component_synchronizer<false, P>::disable_in(const processing_subjects list) const {
-	component.disabled_categories.set(list, true);
+	get_data().disabled_categories.set(list, true);
 	reinference();
 }
 
 void component_synchronizer<false, P>::enable_in(const processing_subjects list) const {
-	component.disabled_categories.set(list, false);
+	get_data().disabled_categories.set(list, false);
 	reinference();
 }
 
 template<bool C>
 P::bitset_type basic_processing_synchronizer<C>::get_disabled_categories() const {
-	return component.disabled_categories;
+	return get_data().disabled_categories;
 }
 
 template<bool C>
 P::bitset_type basic_processing_synchronizer<C>::get_basic_categories() const {
-	return component.processing_subject_categories;
+	return get_data().processing_subject_categories;
 }
 
 void component_synchronizer<false, P>::set_disabled_categories(const P::bitset_type& categories) const {
-	component.disabled_categories = categories;
+	get_data().disabled_categories = categories;
 	reinference();
 }
 
 void component_synchronizer<false, P>::set_basic_categories(const P::bitset_type& categories) const {
-	component.processing_subject_categories = categories;
+	get_data().processing_subject_categories = categories;
 	reinference();
 }
 

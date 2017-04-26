@@ -44,7 +44,7 @@ void tree_of_npo_system::create_inferred_state(const const_entity_handle handle)
 	const auto& tree_of_npo_node = handle.get<components::tree_of_npo_node>();
 
 	if (tree_of_npo_node.is_activated()) {
-		auto& data = tree_of_npo_node.get_data();
+		const auto data = tree_of_npo_node.get_raw_component();
 
 		cache.type = data.type;
 

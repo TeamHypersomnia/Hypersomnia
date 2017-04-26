@@ -21,6 +21,7 @@
 #include "game/components/attitude_component.h"
 #include "game/components/tree_of_npo_node_component.h"
 #include "game/components/flags_component.h"
+#include "game/components/shape_polygon_component.h"
 #include "game/systems_stateless/particles_existence_system.h"
 
 #include "game/enums/filters.h"
@@ -55,17 +56,16 @@ namespace ingredients {
 		e += body;
 		e += special;
 
-		e.create_fixtures_component_from_renderable(
-			step,
-			[&](auto component){
-				auto& group = component.get_fixture_group_data();
-
-				group.filter = filters::controlled_character();
-				group.density = 1.0;
-				e += component;
-			}
+		e.add_shape_component_from_renderable(
+			step
 		);
 
+		components::fixtures group;
+
+		group.filter = filters::controlled_character();
+		group.density = 1.0;
+
+		e  += group;
 		e.get<components::fixtures>().set_owner_body(e);
 	}
 
@@ -256,19 +256,18 @@ namespace prefabs {
 
 			recoil += body;
 
-			recoil.create_fixtures_component_from_renderable(
-				step,
-				[&](auto component){
-					auto& group = component.get_fixture_group_data();
-
-					group.filter = filters::trigger();
-					//group.filter.categoryBits = 0;
-					group.density = 0.1f;
-					group.sensor = true;
-
-					recoil += component;
-				}
+			recoil.add_shape_component_from_renderable(
+				step
 			);
+
+			components::fixtures group;
+
+			group.filter = filters::trigger();
+			//group.filter.categoryBits = 0;
+			group.density = 0.1f;
+			group.sensor = true;
+
+			recoil += group;
 			recoil.get<components::fixtures>().set_owner_body(recoil);
 		}
 

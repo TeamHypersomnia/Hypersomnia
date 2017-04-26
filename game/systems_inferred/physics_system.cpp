@@ -7,7 +7,9 @@
 #include "game/components/driver_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/special_physics_component.h"
-#include "game/components/physical_relations_component.h"
+#include "game/components/shape_polygon_component.h"
+#include "game/components/shape_circle_component.h"
+#include "game/components/inferred_state_component.h"
 
 #include "game/messages/collision_message.h"
 #include "game/messages/queue_destruction.h"
@@ -84,12 +86,12 @@ void physics_system::fixtures_construct(const const_entity_handle handle) {
 		return;
 	}
 
-	if (handle.has<components::fixtures>()) {
-		const auto colliders = handle.get<components::fixtures>();
+	const auto colliders = handle.find<components::fixtures>();
 
+	if (colliders != nullptr) {
 		if (colliders.is_activated() && is_constructed_rigid_body(handle.get_owner_body())) {
 			const auto si = handle.get_cosmos().get_si();
-			const auto& colliders_data = colliders.get_data();
+			const auto& group = colliders.get_data();
 			auto& cache = get_colliders_cache(handle);
 
 			const auto owner_body_entity = handle.get_owner_body();
@@ -102,8 +104,6 @@ void physics_system::fixtures_construct(const const_entity_handle handle) {
 			owner_cache.correspondent_colliders_caches.push_back(this_cache_id);
 			cache.correspondent_rigid_body_cache = owner_cache_id;
 
-			const auto& group = colliders_data.group;
-
 			b2FixtureDef fixdef;
 			fixdef.density = group.density;
 			fixdef.friction = group.friction;
@@ -114,39 +114,52 @@ void physics_system::fixtures_construct(const const_entity_handle handle) {
 
 			auto& all_fixtures_in_component = cache.all_fixtures_in_component;
 			all_fixtures_in_component.clear();
+			
+			const auto shape_polygon = handle.find<components::shape_polygon>();
 
-			auto transformed_shape = colliders_data.shape;
-			transformed_shape.offset_vertices(colliders.get_total_offset());
+			if (shape_polygon != nullptr && shape_polygon.is_activated()) {
+				auto transformed_shape = shape_polygon.get_raw_component().shape;
+				transformed_shape.offset_vertices(colliders.get_total_offset());
 
-			for (std::size_t ci = 0; ci < transformed_shape.convex_polys.size(); ++ci) {
-				const auto& convex = transformed_shape.convex_polys[ci];
-				std::vector<b2Vec2> b2verts(convex.vertices.begin(), convex.vertices.end());
+				for (std::size_t ci = 0; ci < transformed_shape.convex_polys.size(); ++ci) {
+					const auto& convex = transformed_shape.convex_polys[ci];
+					std::vector<b2Vec2> b2verts(convex.vertices.begin(), convex.vertices.end());
 
-				for (auto& v : b2verts) {
-					v = si.get_meters(v);
+					for (auto& v : b2verts) {
+						v = si.get_meters(v);
+					}
+
+					b2PolygonShape shape;
+					shape.Set(b2verts.data(), b2verts.size());
+
+					fixdef.shape = &shape;
+					b2Fixture* const new_fix = owner_cache.body->CreateFixture(&fixdef);
+
+					ensure(static_cast<short>(ci) < std::numeric_limits<short>::max());
+					new_fix->index_in_component = static_cast<short>(ci);
+
+					all_fixtures_in_component.push_back(new_fix);
 				}
 
-				b2PolygonShape shape;
-				shape.Set(b2verts.data(), b2verts.size());
-
+				return;
+			}
+			
+			const auto shape_circle = handle.find<components::shape_circle>();
+			
+			if (shape_circle != nullptr && shape_circle.is_activated()) {
+				b2CircleShape shape;
+				shape.m_radius = si.get_meters(shape_circle.get_radius());
+			
 				fixdef.shape = &shape;
 				b2Fixture* const new_fix = owner_cache.body->CreateFixture(&fixdef);
-
-				ensure(static_cast<short>(ci) < std::numeric_limits<short>::max());
-				new_fix->index_in_component = static_cast<short>(ci);
-
+				
+				new_fix->index_in_component = 0u;
 				all_fixtures_in_component.push_back(new_fix);
+				
+				return;
 			}
-
-			//else if (c.shape.is<circle_shape>()) {
-			//	b2CircleShape shape;
-			//	shape.m_radius = si.get_meters(c.shape.get<circle_shape>().radius);
-			//
-			//	fixdef.shape = &shape;
-			//	b2Fixture* const new_fix = owner_cache.body->CreateFixture(&fixdef);
-			//	
-			//	partitioned_collider.push_back(new_fix);
-			//}
+			
+			ensure(false && "fixtures requested with no shape attached!");
 		}
 	}
 }
@@ -279,10 +292,10 @@ void physics_system::step_and_set_new_transforms(const logic_step step) {
 
 		recurential_friction_handler(step, b, b->m_ownerFrictionGround);
 
-		rigid_body.component.transform = b->m_xf;
-		rigid_body.component.sweep = b->m_sweep;
-		rigid_body.component.velocity = b->GetLinearVelocity();
-		rigid_body.component.angular_velocity = b->GetAngularVelocity();
+		rigid_body.get_data().transform = b->m_xf;
+		rigid_body.get_data().sweep = b->m_sweep;
+		rigid_body.get_data().velocity = b->GetLinearVelocity();
+		rigid_body.get_data().angular_velocity = b->GetAngularVelocity();
 	}
 }
 

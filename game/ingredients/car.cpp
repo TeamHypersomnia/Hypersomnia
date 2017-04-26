@@ -1,5 +1,5 @@
 #include "ingredients.h"
-
+#include "game/transcendental/cosmos.h"
 #include "game/systems_stateless/particles_existence_system.h"
 #include "game/systems_stateless/sound_existence_system.h"
 #include "game/components/position_copying_component.h"
@@ -19,6 +19,7 @@
 #include "game/components/particles_existence_component.h"
 #include "game/components/sound_existence_component.h"
 #include "game/components/polygon_component.h"
+#include "game/components/shape_polygon_component.h"
 #include "game/transcendental/cosmos.h"
 
 #include "game/assets/assets_manager.h"
@@ -68,18 +69,16 @@ namespace prefabs {
 			physics_definition.linear_damping = 0.4f;
 			physics_definition.angular_damping = 2.f;
 
-			front.create_fixtures_component_from_renderable(
-				step,
-				[&](auto component){
-					auto& group = component.get_fixture_group_data();
-
-					group.filter = filters::dynamic_object();
-					group.density = 0.6;
-
-					front += component;
-				}
+			front.add_shape_component_from_renderable(
+				step
 			);
 
+			components::fixtures group;
+
+			group.filter = filters::dynamic_object();
+			group.density = 0.6;
+
+			front += group;
 			front += physics_definition;
 			front.get<components::fixtures>().set_owner_body(front);
 			//rigid_body.air_resistance = 0.2f;
@@ -99,19 +98,18 @@ namespace prefabs {
 			
 			vec2 offset((front_size.x / 2 + sprite.get_size(metas).x / 2) * -1, 0);
 
-			interior.create_fixtures_component_from_renderable(
-				step,
-				[&](auto component){
-					auto& group = component.get_fixture_group_data();
-
-					group.filter = filters::friction_ground();
-					group.density = 0.6;
-					group.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
-					group.is_friction_ground = true;
-
-					interior += component;
-				}
+			interior.add_shape_component_from_renderable(
+				step
 			);
+
+			components::fixtures group;
+
+			group.filter = filters::friction_ground();
+			group.density = 0.6;
+			group.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
+			group.is_friction_ground = true;
+
+			interior  += group;
 
 			interior.get<components::fixtures>().set_owner_body(front);
 			interior.make_as_child_of(front);
@@ -131,24 +129,20 @@ namespace prefabs {
 
 			sprite.set(assets::game_image_id::CAR_INSIDE, vec2(60, 30), rgba(29, 0, 0, 0));
 
-			auto& fixture = colliders.get_fixture_group_data();
-
 			vec2 offset((front_size.x / 2 + sprite.get_size(metas).x / 2 + 20) * -1, 0);
 
-			left_wheel.create_fixtures_component_from_renderable(
-				step,
-				[&](auto component){
-					auto& group = component.get_fixture_group_data();
-
-					group.filter = filters::trigger();
-					group.density = 0.6;
-					group.sensor = true;
-					group.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
-
-					left_wheel += component;
-				}
+			left_wheel.add_shape_component_from_renderable(
+				step
 			);
 
+			components::fixtures group;
+
+			group.filter = filters::trigger();
+			group.density = 0.6;
+			group.sensor = true;
+			group.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
+
+			left_wheel  += group;
 			left_wheel.get<components::fixtures>().set_owner_body(front);
 		}
 
@@ -187,19 +181,18 @@ namespace prefabs {
 						offset.rotation = 90;
 					}
 					
-					engine_physical.create_fixtures_component_from_renderable(
-						step,
-						[&](auto component){
-							auto& group = component.get_fixture_group_data();
-
-							group.filter = filters::see_through_dynamic_object();
-							group.density = 1.0f;
-							group.sensor = true;
-							group.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET] = offset;
-
-							engine_physical += component;
-						}
+					engine_physical.add_shape_component_from_renderable(
+						step
 					);
+
+					components::fixtures group;
+
+					group.filter = filters::see_through_dynamic_object();
+					group.density = 1.0f;
+					group.sensor = true;
+					group.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET] = offset;
+
+					engine_physical  += group;
 
 					engine_physical.get<components::fixtures>().set_owner_body(front);
 					engine_physical.add_standard_components(step);

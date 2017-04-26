@@ -47,6 +47,8 @@
 #include "game/detail/inventory/inventory_utils.h"
 #include "game/resource_setups/all.h"
 
+#include "game/components/fixtures_component.h"
+
 void cosmos::complete_reinference() {
 	profiler.complete_reinference.new_measurement();
 	
@@ -276,45 +278,73 @@ entity_handle cosmos::create_entity_with_specific_guid(const std::string& debug_
 }
 #endif
 
-entity_handle cosmos::clone_entity(const entity_id copied_entity_id) {
-	entity_handle copied_entity = get_handle(copied_entity_id);
-	
-	if (copied_entity.dead()) {
+entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
+	entity_handle source_entity = get_handle(source_entity_id);
+
+	if (source_entity.dead()) {
 		return get_handle(entity_id());
 	}
 
+	ensure(
+		!source_entity.has<components::child>() 
+		&& "Cloning of entities with child component is not yet supported"
+	);
+
 	auto new_entity = allocate_new_entity();
-	clone_all_components<components::inferred_state>(copied_entity, new_entity);
-	set_debug_name(new_entity, "+" + copied_entity.get_debug_name());
+	
+	clone_all_components_except<
+		/*
+			These components will be cloned shortly,
+			with due care to each of them.
+		*/
+		components::inferred_state,
+		components::rigid_body,
+		components::fixtures,
+		components::child
+	>(new_entity, source_entity);
+
+	set_debug_name(new_entity, "+" + source_entity.get_debug_name());
 
 #if COSMOS_TRACKS_GUIDS
 	assign_next_guid(new_entity);
 #endif
 
-	// zero-out non-trivial relational components
-
-	for_each_type<
-		components::child, 
-		components::physical_relations
-	>([copied_entity, new_entity](auto c) {
-		typedef decltype(c) T;
-		
-		if (copied_entity.has<T>()) {
-			new_entity.get<T>() = T();
-		}
-	});
-
 	if (new_entity.has<components::item>()) {
 		new_entity.get<components::item>().current_slot.unset();
 	}
 
-	new_entity.make_cloned_child_entities_recursive(copied_entity_id);
+	new_entity.make_cloned_child_entities_recursive(source_entity_id);
 	
-	if (copied_entity.get_owner_body() == copied_entity) {
-		new_entity.set_owner_body(new_entity);
+	if (source_entity.has<components::rigid_body>()) {
+		/*
+			Copy all properties from the component of the source entity except the fixture_entities field.
+			Exactly as if we were creating that component by hand.
+		*/
+
+		components::rigid_body rigid = source_entity.get<components::rigid_body>().get_raw_component();
+		rigid.fixture_entities.clear();
+		new_entity += rigid;
 	}
 
-	if (copied_entity.has<components::inferred_state>()) {
+	if (source_entity.has<components::fixtures>()) {
+		/*
+			Copy all properties from the component of the source entity except the owner_body field.
+			Exactly as if we were creating that component by hand.
+		*/
+
+		components::fixtures fixtures = source_entity.get<components::fixtures>().get_raw_component();
+		const auto owner_of_the_source = fixtures.owner_body;
+		fixtures.owner_body = entity_id();
+
+		new_entity += fixtures;
+
+		/*
+			Only now assign the owner_body in a controllable manner.
+		*/
+		new_entity.set_owner_body(owner_of_the_source);
+	}
+
+	if (source_entity.has<components::inferred_state>()) {
 		new_entity.add(components::inferred_state());
 	}
 
@@ -341,12 +371,16 @@ void cosmos::delete_entity(const entity_id e) {
 #endif
 	// now manipulation of an entity without inferred_state component won't trigger redundant reinference
 
-	const auto owner_body = handle.get_owner_body();
+	const auto maybe_fixtures = handle.find<components::fixtures>();
 
-	const bool should_release_dependency = owner_body != handle;
+	if (maybe_fixtures != nullptr) {
+		const auto owner_body = maybe_fixtures.get_owner_body();
 
-	if (should_release_dependency) {
-		handle.set_owner_body(handle);
+		const bool should_release_dependency = owner_body != handle;
+
+		if (should_release_dependency) {
+			maybe_fixtures.set_owner_body(handle);
+		}
 	}
 
 	remove_all_components(get_handle(e));
