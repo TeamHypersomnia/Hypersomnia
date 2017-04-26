@@ -10,6 +10,7 @@
 #include "game/enums/rigid_body_type.h"
 
 #include "game/components/transform_component.h"
+#include "game/components/fixtures_component.h"
 
 class physics_system;
 struct rigid_body_cache;
@@ -45,9 +46,9 @@ namespace components {
 
 		vec2 velocity;
 		float angular_velocity = 0.f;
-	//private:
+	private:
 		friend augs::introspection_access;
-		//friend void component_synchronizer<false, components::fixtures>::set_owner_body(const entity_id) const;
+		friend void component_synchronizer<false, components::fixtures>::set_owner_body(const entity_id) const;
 		friend class cosmos;
 
 		augs::constant_size_vector<entity_id, FIXTURE_ENTITIES_COUNT> fixture_entities;
@@ -57,11 +58,10 @@ namespace components {
 			Normally, this private state could be inferred by iterating over all entities,
 			taking their fixtures_group component and checking if owner_body equals this entity.
 			This however would be ridiculously expensive; thusly, we will track fixture_entities in the significant state.
-
-			It should however not be altered by any other code than that which controllably sets/unsets parent-childhood relationship.
-			Therefore, we only befriend the introspection and the fixtures component.
-
-			We also befriend the cosmos so it may clear that field when an entity is cloned.
+			
+			Therefore, we only befriend the set_owner_body function and the introspection (unfortunately, necessary).
+			We also befriend the cosmos so it may clear that field when an entity is cloned,
+			so that each id entry in the fixture_entities is unique to that single rigid_body.
 		*/
 
 	public:

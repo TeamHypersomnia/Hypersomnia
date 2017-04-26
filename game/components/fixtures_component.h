@@ -22,48 +22,10 @@ namespace augs {
 	struct introspection_access;
 }
 
-namespace components {
-	struct fixtures : synchronizable_component {
-		// GEN INTROSPECTOR struct components::fixtures
-		bool activated = true;
-		bool is_friction_ground = false;
-		bool disable_standard_collision_resolution = false;
-		bool can_driver_shoot_through = false;
-
-		assets::physical_material_id material = assets::physical_material_id::METAL;
-
-		float collision_sound_gain_mult = 1.f;
-
-		float density = 1.f;
-		float density_multiplier = 1.f;
-		float friction = 0.f;
-		float restitution = 0.f;
-
-		b2Filter filter;
-		bool destructible = false;
-		bool sensor = false;
-
-		augs::enum_array<components::transform, colliders_offset_type> offsets_for_created_shapes;
-//	private:
-		friend augs::introspection_access;
-		//friend class component_synchronizer<false, components::fixtures>;
-		friend class cosmos;
-
-		entity_id owner_body;
-		// END GEN INTROSPECTOR
-
-		/*
-			We also befriend the cosmos so it may reset that private field when an entity is cloned.
-		*/
-	public:
-		auto get_owner_body() const {
-			return owner_body;
-		}
-
-		static components::transform transform_around_body(const const_entity_handle fixtures_entity, const components::transform& body_transform);
-	};
-}
-
+/*
+	Normally, component data comes first,
+	but here synchronizer class goes first to properly befriend its member function.
+*/
 
 template <bool is_const>
 class basic_fixtures_synchronizer : public component_synchronizer_base<is_const, components::fixtures> {
@@ -142,3 +104,51 @@ class component_synchronizer<true, components::fixtures> : public basic_fixtures
 public:
 	using basic_fixtures_synchronizer<true>::basic_fixtures_synchronizer;
 };
+
+namespace components {
+	struct fixtures : synchronizable_component {
+		// GEN INTROSPECTOR struct components::fixtures
+		bool activated = true;
+		bool is_friction_ground = false;
+		bool disable_standard_collision_resolution = false;
+		bool can_driver_shoot_through = false;
+
+		assets::physical_material_id material = assets::physical_material_id::METAL;
+
+		float collision_sound_gain_mult = 1.f;
+
+		float density = 1.f;
+		float density_multiplier = 1.f;
+		float friction = 0.f;
+		float restitution = 0.f;
+
+		b2Filter filter;
+		bool destructible = false;
+		bool sensor = false;
+
+		augs::enum_array<components::transform, colliders_offset_type> offsets_for_created_shapes;
+	private:
+		friend augs::introspection_access;
+		friend void component_synchronizer<false, components::fixtures>::set_owner_body(const entity_id) const;
+		friend class cosmos;
+
+		entity_id owner_body;
+		// END GEN INTROSPECTOR
+
+		/*
+			owner_body is a private state, which is unusual for components. 
+			This is because we also track fixture_entities (a vector of children ids) inside rigid_body,
+			and every change to body/fixtures ownership must therefore be done in a manner 
+			that controllably sets/unsets parent-childhood relationship.
+
+			Therefore, we only befriend the set_owner_body function and the introspection (unfortunately, necessary).
+			We also befriend the cosmos so it may reset that field when this component is cloned.
+		*/
+	public:
+		auto get_owner_body() const {
+			return owner_body;
+		}
+
+		static components::transform transform_around_body(const const_entity_handle fixtures_entity, const components::transform& body_transform);
+	};
+}
