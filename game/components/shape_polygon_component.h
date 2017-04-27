@@ -8,7 +8,7 @@
 #include "game/transcendental/component_synchronizer.h"
 
 #include "augs/padding_byte.h"
-#include "game/components/inferred_state_component.h"
+#include "game/components/all_inferred_state_component.h"
 
 namespace components {
 	struct shape_polygon : synchronizable_component {
@@ -46,6 +46,10 @@ public:
 	}
 
 	void set_activated(const bool flag) const {
+		if (flag == get_data().activated) {
+			return;
+		}
+
 		get_data().activated = flag;
 		reinference();
 	}

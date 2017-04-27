@@ -381,7 +381,6 @@
     <ClCompile Include="game\assets\physical_material.cpp" />
     <ClCompile Include="game\assets\tile_layer.cpp" />
     <ClCompile Include="game\components\flags_component.cpp" />
-    <ClCompile Include="game\components\inferred_state_component.cpp" />
     <ClCompile Include="game\components\light_component.cpp" />
     <ClCompile Include="game\components\rigid_body_component.cpp" />
     <ClCompile Include="game\components\sentience_component.cpp" />
@@ -1181,7 +1180,7 @@
     <ClInclude Include="game\components\grenade_component.h" />
     <ClInclude Include="game\components\guid_component.h" />
     <ClInclude Include="game\components\shape_circle_component.h" />
-    <ClInclude Include="game\components\inferred_state_component.h" />
+    <ClInclude Include="game\components\all_inferred_state_component.h" />
     <ClInclude Include="game\components\interpolation_component.h" />
     <ClInclude Include="game\components\light_component.h" />
     <ClInclude Include="game\components\rigid_body_component.h" />

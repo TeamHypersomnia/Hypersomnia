@@ -1,6 +1,8 @@
-#include "entity_handle.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/cosmos.h"
+
 #include "game/components/render_component.h"
-#include "game/components/inferred_state_component.h"
+#include "game/components/all_inferred_state_component.h"
 #include "game/components/processing_component.h"
 #include "game/components/tree_of_npo_node_component.h"
 #include "game/components/special_physics_component.h"
@@ -15,7 +17,6 @@
 
 //#include "game/systems_audiovisual/interpolation_system.h"
 
-#include "game/transcendental/cosmos.h"
 #include "game/detail/physics/physics_scripts.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/detail/gui/gui_positioning.h"
@@ -74,8 +75,8 @@ basic_entity_handle<C> basic_entity_handle<C>::add_standard_components(const log
 
 	recalculate_basic_processing_categories<false, void>();
 	
-	if (!has<components::inferred_state>()) {
-		add(components::inferred_state());
+	if (!has<components::all_inferred_state>()) {
+		add(components::all_inferred_state());
 	}
 
 	return *this;

@@ -88,7 +88,7 @@ void cosmos::destroy_inferred_state_of(const const_entity_handle h) {
 }
 
 void cosmos::create_inferred_state_for(const const_entity_handle h) {
-	if (h.has<components::inferred_state>()) {
+	if (h.is_inferred_state_activated()) {
 		auto constructor = [h](auto& sys) {
 			sys.create_inferred_state_for(h);
 		};
@@ -297,7 +297,7 @@ entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
 			These components will be cloned shortly,
 			with due care to each of them.
 		*/
-		components::inferred_state,
+		components::all_inferred_state,
 		components::rigid_body,
 		components::fixtures,
 		components::child
@@ -360,8 +360,8 @@ entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
 		}
 	}
 
-	if (source_entity.has<components::inferred_state>()) {
-		new_entity.add(components::inferred_state());
+	if (source_entity.has<components::all_inferred_state>()) {
+		new_entity.add(components::all_inferred_state());
 	}
 
 	return new_entity;
@@ -376,16 +376,18 @@ void cosmos::delete_entity(const entity_id e) {
 
 	//ensure(handle.alive());
 
-	const bool should_destruct_now_to_avoid_repeated_reinference = handle.has<components::inferred_state>();
+	const auto inferred = handle.find<components::all_inferred_state>();
 
-	if (should_destruct_now_to_avoid_repeated_reinference) {
-		handle.remove<components::inferred_state>();
+	const bool should_deactivate_inferred_state_to_avoid_repeated_reinference = inferred != nullptr;
+
+	if (should_deactivate_inferred_state_to_avoid_repeated_reinference) {
+		inferred.set_activated(false);
 	}
 
 #if COSMOS_TRACKS_GUIDS
 	clear_guid(handle);
 #endif
-	// now manipulation of an entity without inferred_state component won't trigger redundant reinference
+	// now manipulation of an entity without all_inferred_state component won't trigger redundant reinference
 
 	const auto maybe_fixtures = handle.find<components::fixtures>();
 

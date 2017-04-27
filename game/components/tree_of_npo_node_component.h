@@ -42,7 +42,7 @@ public:
 	using basic_tree_of_npo_node_synchronizer<false>::basic_tree_of_npo_node_synchronizer;
 
 	void update_proxy(const logic_step) const;
-	void set_activated(bool) const;
+	void set_activated(const bool) const;
 };
 
 template<>

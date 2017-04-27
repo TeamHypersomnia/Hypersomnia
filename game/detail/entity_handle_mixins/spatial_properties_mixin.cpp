@@ -1,4 +1,5 @@
 #include "game/transcendental/entity_handle.h"
+#include "game/transcendental/cosmos.h"
 
 #include "game/components/rigid_body_component.h"
 #include "game/components/special_physics_component.h"
@@ -9,9 +10,8 @@
 #include "game/components/item_component.h"
 
 #include "game/components/transform_component.h"
-#include "game/components/inferred_state_component.h"
+#include "game/components/all_inferred_state_component.h"
 
-#include "game/transcendental/cosmos.h"
 #include "spatial_properties_mixin.h"
 #include "game/systems_audiovisual/interpolation_system.h"
 #include "augs/graphics/drawers.h"

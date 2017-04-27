@@ -120,6 +120,7 @@ namespace augs {
 }
 
 namespace components {
+	struct all_inferred_state;
 	struct animation;
 	struct attitude;
 	struct behaviour_tree;
@@ -136,7 +137,6 @@ namespace components {
 	struct grenade;
 	struct guid;
 	struct gun;
-	struct inferred_state;
 	struct interpolation;
 	struct item;
 	struct item_slot_transfers;
@@ -659,6 +659,15 @@ namespace augs {
 
 		template <class F, class... Instances>
 		static void introspect_body(
+			const components::all_inferred_state* const,
+			F f,
+			Instances&&... _t_
+		) {
+			FIELD(activated);
+		}
+
+		template <class F, class... Instances>
+		static void introspect_body(
 			const components::animation* const,
 			F f,
 			Instances&&... _t_
@@ -1027,15 +1036,6 @@ namespace augs {
 
 			FIELD(when_began_pulling_cocking_handle);
 			FIELD(cocking_handle_pull_duration_ms);
-		}
-
-		template <class F, class... Instances>
-		static void introspect_body(
-			const components::inferred_state* const,
-			F f,
-			Instances&&... _t_
-		) {
-			FIELD(dummy);
 		}
 
 		template <class F, class... Instances>

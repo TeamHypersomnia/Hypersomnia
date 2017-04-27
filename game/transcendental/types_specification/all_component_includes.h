@@ -34,7 +34,7 @@
 #include "game/components/sentience_component.h"
 #include "game/components/attitude_component.h"
 #include "game/components/processing_component.h"
-#include "game/components/inferred_state_component.h"
+#include "game/components/all_inferred_state_component.h"
 #include "game/components/guid_component.h"
 #include "game/components/child_component.h"
 #include "game/components/interpolation_component.h"

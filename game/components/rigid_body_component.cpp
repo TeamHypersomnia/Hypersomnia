@@ -1,5 +1,7 @@
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/cosmos.h"
 #include "rigid_body_component.h"
-#include "inferred_state_component.h"
+#include "all_inferred_state_component.h"
 
 #include <Box2D\Box2D.h>
 
@@ -7,10 +9,8 @@
 #include "fixtures_component.h"
 
 #include "augs/math/vec2.h"
-#include "game/transcendental/cosmos.h"
 #include "game/systems_inferred/physics_system.h"
 #include "augs/ensure.h"
-#include "game/transcendental/entity_handle.h"
 #include "application/config_structs/debug_drawing_settings.h"
 
 typedef components::rigid_body P;
@@ -49,6 +49,10 @@ void component_synchronizer<false, P>::set_body_type(const rigid_body_type t) co
 }
 
 void component_synchronizer<false, P>::set_activated(const bool flag) const {
+	if (flag == get_data().activated) {
+		return;
+	}
+
 	get_data().activated = flag;
 
 	if (!flag) {

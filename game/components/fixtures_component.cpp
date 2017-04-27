@@ -1,15 +1,17 @@
-#include "fixtures_component.h"
-#include "inferred_state_component.h"
-#include "rigid_body_component.h"
-#include <Box2D\Dynamics\b2Fixture.h>
-#include <Box2D/Box2D.h>
-#include "augs/ensure.h"
-#include <algorithm>
-
 #include <numeric>
-#include <string>
+
+#include <3rdparty/Box2D/Dynamics/b2Fixture.h>
+#include <3rdparty/Box2D/Box2D.h>
+
+#include "augs/ensure.h"
+
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
+
+#include "game/components/fixtures_component.h"
+#include "game/components/all_inferred_state_component.h"
+#include "game/components/rigid_body_component.h"
+
 #include "game/detail/physics/b2Fixture_index_in_component.h"
 
 typedef components::fixtures F;
@@ -108,6 +110,10 @@ void component_synchronizer<false, F>::set_density_multiplier(
 }
 
 void component_synchronizer<false, F>::set_activated(const bool flag) const {
+	if (flag == get_data().activated) {
+		return;
+	}
+
 	get_data().activated = flag;
 	reinference();
 }

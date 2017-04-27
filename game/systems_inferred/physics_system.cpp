@@ -9,7 +9,7 @@
 #include "game/components/special_physics_component.h"
 #include "game/components/shape_polygon_component.h"
 #include "game/components/shape_circle_component.h"
-#include "game/components/inferred_state_component.h"
+#include "game/components/all_inferred_state_component.h"
 
 #include "game/messages/collision_message.h"
 #include "game/messages/queue_destruction.h"

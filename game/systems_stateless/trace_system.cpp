@@ -9,7 +9,7 @@
 #include "game/components/sprite_component.h"
 #include "game/components/damage_component.h"
 #include "game/components/rigid_body_component.h"
-#include "game/components/inferred_state_component.h"
+#include "game/components/all_inferred_state_component.h"
 #include "game/components/interpolation_component.h"
 
 #include "game/messages/interpolation_correction_request.h"
@@ -81,7 +81,7 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 		const auto* const trace = deleted_entity.find<components::trace>();
 
 		if (
-			deleted_entity.has<components::inferred_state>() 
+			deleted_entity.is_inferred_state_activated()
 			&& trace != nullptr
 			&& !trace->is_it_a_finishing_trace
 		) {

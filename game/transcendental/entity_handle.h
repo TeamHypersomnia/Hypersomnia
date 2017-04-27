@@ -106,18 +106,10 @@ private:
 
 		void add(const T& t) const {
 			h.allocator::add(t);
-
-			if (std::is_same<T, components::inferred_state>()) {
-				h.get_cosmos().complete_reinference(h);
-			}
 		}
 
 		void remove() const {
 			h.allocator::template remove<T>();
-
-			if (std::is_same<T, components::inferred_state>()) {
-				h.get_cosmos().complete_reinference(h);
-			}
 		}
 	};
 
@@ -353,6 +345,12 @@ public:
 				}
 			}
 		);
+	}
+
+	bool is_inferred_state_activated() const {
+		const auto inferred = find<components::all_inferred_state>();
+
+		return inferred != nullptr && inferred.is_activated();
 	}
 };
 

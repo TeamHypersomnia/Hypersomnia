@@ -136,7 +136,7 @@ public:
 
 		sys.destroy_inferred_state_of(handle);
 
-		if (handle.has<components::inferred_state>()) {
+		if (handle.is_inferred_state_activated()) {
 			sys.create_inferred_state_for(handle);
 		}
 	}

@@ -12,7 +12,7 @@
 
 #include "game/components/shape_polygon_component.h"
 #include "game/components/shape_circle_component.h"
-#include "game/components/inferred_state_component.h"
+#include "game/components/all_inferred_state_component.h"
 
 #include "game/systems_stateless/sound_existence_system.h"
 

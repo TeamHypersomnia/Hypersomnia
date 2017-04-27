@@ -1,4 +1,5 @@
 #include "tree_of_npo_node_component.h"
+#include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 
 #include "game/components/polygon_component.h"
@@ -6,14 +7,12 @@
 #include "game/components/tile_layer_instance_component.h"
 #include "game/components/particles_existence_component.h"
 #include "game/components/transform_component.h"
-#include "game/components/inferred_state_component.h"
+#include "game/components/all_inferred_state_component.h"
 #include "game/components/wandering_pixels_component.h"
 #include "game/components/sound_existence_component.h"
 #include "game/components/render_component.h"
 #include "game/components/fixtures_component.h"
 #include "augs/graphics/drawers.h"
-
-#include "game/transcendental/cosmos.h"
 
 #include "augs/ensure.h"
 
@@ -62,6 +61,10 @@ void component_synchronizer<false, D>::update_proxy(const logic_step step) const
 }
 
 void component_synchronizer<false, D>::set_activated(bool flag) const {
+	if (flag == get_data().activated) {
+		return;
+	}
+
 	get_data().activated = flag;
 	reinference();
 }

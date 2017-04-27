@@ -51,7 +51,7 @@ namespace components {
 	struct shape_polygon;
 	struct shape_circle;
 
-	struct inferred_state;
+	struct all_inferred_state;
 }
 
 template<template<typename...> class List, class... prepend>
@@ -103,7 +103,7 @@ struct put_all_components_into {
 		components::shape_polygon,
 		components::shape_circle,
 
-		components::inferred_state
+		components::all_inferred_state
 
 	> type;
 };

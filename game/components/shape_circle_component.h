@@ -39,6 +39,10 @@ public:
 	using basic_shape_circle_synchronizer<false>::basic_shape_circle_synchronizer;
 
 	void set_activated(const bool flag) const {
+		if (flag == get_data().activated) {
+			return;
+		}
+
 		get_data().activated = flag;
 		reinference();
 	}
