@@ -18,7 +18,7 @@ tree_of_npo_system::tree& tree_of_npo_system::get_tree(const cache& c) {
 	return trees[static_cast<size_t>(c.type)];
 }
 
-void tree_of_npo_system::destroy_inferred_state(const const_entity_handle handle) {
+void tree_of_npo_system::destroy_inferred_state_of(const const_entity_handle handle) {
 	auto& cache = get_cache(handle.get_id());
 
 	if (cache.is_constructed()) {
@@ -32,7 +32,7 @@ void tree_of_npo_system::destroy_inferred_state(const const_entity_handle handle
 	}
 }
 
-void tree_of_npo_system::create_inferred_state(const const_entity_handle handle) {
+void tree_of_npo_system::create_inferred_state_for(const const_entity_handle handle) {
 	if (!handle.has<components::tree_of_npo_node>()) {
 		return;
 	}

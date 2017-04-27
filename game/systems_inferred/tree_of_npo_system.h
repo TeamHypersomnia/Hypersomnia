@@ -36,9 +36,9 @@ class tree_of_npo_system {
 
 	std::vector<cache> per_entity_cache;
 
-	void reserve_caches_for_entities(size_t n);
-	void create_inferred_state(const_entity_handle);
-	void destroy_inferred_state(const_entity_handle);
+	void reserve_caches_for_entities(const size_t n);
+	void create_inferred_state_for(const const_entity_handle);
+	void destroy_inferred_state_of(const const_entity_handle);
 
 	tree& get_tree(const cache&);
 	cache& get_cache(const unversioned_entity_id);

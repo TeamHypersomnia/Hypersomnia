@@ -71,26 +71,26 @@ void cosmos::destroy_inferred_state_completely() {
 
 void cosmos::create_inferred_state_completely() {
 	for (const auto& ordered_pair : guid_map_for_transport) {
-		create_inferred_state_for_entity(get_handle(ordered_pair.second));
+		create_inferred_state_for(get_handle(ordered_pair.second));
 	}
 
 	//for (auto it = guid_map_for_transport.rbegin(); it != guid_map_for_transport.rend(); ++it) {
-	//	create_inferred_state_for_entity(get_handle((*it).second));
+	//	create_inferred_state_for(get_handle((*it).second));
 	//}
 }
 
-void cosmos::destroy_inferred_state_for_entity(const const_entity_handle h) {
+void cosmos::destroy_inferred_state_of(const const_entity_handle h) {
 	auto destructor = [h](auto& sys) {
-		sys.destroy_inferred_state(h);
+		sys.destroy_inferred_state_of(h);
 	};
 
 	systems_inferred.for_each(destructor);
 }
 
-void cosmos::create_inferred_state_for_entity(const const_entity_handle h) {
+void cosmos::create_inferred_state_for(const const_entity_handle h) {
 	if (h.has<components::inferred_state>()) {
 		auto constructor = [h](auto& sys) {
-			sys.create_inferred_state(h);
+			sys.create_inferred_state_for(h);
 		};
 
 		systems_inferred.for_each(constructor);
@@ -105,7 +105,7 @@ cosmos::cosmos(const unsigned reserved_entities) {
 	set_standard_behaviour_trees(*this);
 }
 
-const std::string& cosmos::get_debug_name(entity_id id) const {
+const std::string& cosmos::get_debug_name(const entity_id id) const {
 	return entity_debug_names[id.indirection_index + 1];
 }
 
@@ -186,8 +186,8 @@ void cosmos::refresh_for_new_significant_state() {
 }
 
 void cosmos::complete_reinference(const const_entity_handle h) {
-	destroy_inferred_state_for_entity(h);
-	create_inferred_state_for_entity(h);
+	destroy_inferred_state_of(h);
+	create_inferred_state_for(h);
 }
 
 void cosmos::reserve_storage_for_entities(const size_t n) {

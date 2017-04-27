@@ -206,7 +206,7 @@ bool basic_fixtures_synchronizer<C>::is_activated() const {
 
 template<bool C>
 bool basic_fixtures_synchronizer<C>::is_constructed() const {
-	return handle.get_cosmos().systems_inferred.get<physics_system>().is_constructed_colliders(handle);
+	return handle.get_cosmos().systems_inferred.get<physics_system>().is_inferred_state_created_for_colliders(handle);
 }
 
 template<bool C>

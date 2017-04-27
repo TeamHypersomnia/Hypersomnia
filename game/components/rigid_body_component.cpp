@@ -31,7 +31,7 @@ void components::rigid_body::set_transform(
 
 template<bool C>
 bool basic_physics_synchronizer<C>::is_constructed() const {
-	return handle.get_cosmos().systems_inferred.get<physics_system>().is_constructed_rigid_body(handle);
+	return handle.get_cosmos().systems_inferred.get<physics_system>().is_inferred_state_created_for_rigid_body(handle);
 }
 
 template<bool C>

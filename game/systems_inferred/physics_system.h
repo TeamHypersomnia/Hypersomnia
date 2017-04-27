@@ -41,10 +41,11 @@ class EMPTY_BASES physics_system : public physics_queries<physics_system> {
 		const const_entity_handle
 	);
 
+	void create_inferred_state_for_fixtures(const const_entity_handle);
+
 	void reserve_caches_for_entities(const size_t n);
-	void fixtures_construct(const const_entity_handle);
-	void create_inferred_state(const const_entity_handle);
-	void destroy_inferred_state(const const_entity_handle);
+	void create_inferred_state_for(const const_entity_handle);
+	void destroy_inferred_state_of(const const_entity_handle);
 
 	friend class cosmos;
 	friend class physics_queries<physics_system>;
@@ -55,8 +56,8 @@ class EMPTY_BASES physics_system : public physics_queries<physics_system> {
 	template<bool> friend class basic_physics_synchronizer;
 	template<bool> friend class basic_fixtures_synchronizer;
 
-	bool is_constructed_rigid_body(const const_entity_handle) const;
-	bool is_constructed_colliders(const const_entity_handle) const;
+	bool is_inferred_state_created_for_rigid_body(const const_entity_handle) const;
+	bool is_inferred_state_created_for_colliders(const const_entity_handle) const;
 
 	rigid_body_cache& get_rigid_body_cache(const entity_id);
 	colliders_cache& get_colliders_cache(const entity_id);

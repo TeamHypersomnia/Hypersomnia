@@ -24,13 +24,13 @@
 
 #define PROTECT_MIGRATIONS 0
 
-bool physics_system::is_constructed_rigid_body(const const_entity_handle handle) const {
+bool physics_system::is_inferred_state_created_for_rigid_body(const const_entity_handle handle) const {
 	return handle.alive() && get_rigid_body_cache(handle).body != nullptr;
 }
 
-bool physics_system::is_constructed_colliders(const const_entity_handle handle) const {
+bool physics_system::is_inferred_state_created_for_colliders(const const_entity_handle handle) const {
 	return
-		handle.alive() // && is_constructed_rigid_body(handle.get_owner_body())
+		handle.alive() // && is_inferred_state_created_for_rigid_body(handle.get_owner_body())
 		&& get_colliders_cache(handle).all_fixtures_in_component.size() > 0
 	;
 }
@@ -51,8 +51,8 @@ const colliders_cache& physics_system::get_colliders_cache(const entity_id id) c
 	return colliders_caches[make_cache_id(id)];
 }
 
-void physics_system::destroy_inferred_state(const const_entity_handle handle) {
-	if (is_constructed_rigid_body(handle)) {
+void physics_system::destroy_inferred_state_of(const const_entity_handle handle) {
+	if (is_inferred_state_created_for_rigid_body(handle)) {
 		auto& cache = get_rigid_body_cache(handle);
 		
 		for (const auto& colliders_cache_id : cache.correspondent_colliders_caches) {
@@ -64,7 +64,7 @@ void physics_system::destroy_inferred_state(const const_entity_handle handle) {
 		cache = rigid_body_cache();
 	}
 	
-	if (is_constructed_colliders(handle)) {
+	if (is_inferred_state_created_for_colliders(handle)) {
 		const auto this_cache_id = make_cache_id(handle);
 		auto& cache = colliders_caches[this_cache_id];
 
@@ -81,9 +81,9 @@ void physics_system::destroy_inferred_state(const const_entity_handle handle) {
 	}
 }
 
-void physics_system::fixtures_construct(const const_entity_handle handle) {
-	//ensure(!is_constructed_colliders(handle));
-	const bool is_already_constructed = is_constructed_colliders(handle);
+void physics_system::create_inferred_state_for_fixtures(const const_entity_handle handle) {
+	//ensure(!is_inferred_state_created_for_colliders(handle));
+	const bool is_already_constructed = is_inferred_state_created_for_colliders(handle);
 
 	if (is_already_constructed) {
 		return;
@@ -94,7 +94,7 @@ void physics_system::fixtures_construct(const const_entity_handle handle) {
 	const bool is_anything_to_construct =
 		colliders != nullptr
 		&& colliders.is_activated()
-		&& is_constructed_rigid_body(handle.get_owner_body())
+		&& is_inferred_state_created_for_rigid_body(handle.get_owner_body())
 	;
 
 	if (is_anything_to_construct) {
@@ -171,17 +171,17 @@ void physics_system::fixtures_construct(const const_entity_handle handle) {
 	}
 }
 
-void physics_system::create_inferred_state(const const_entity_handle handle) {
+void physics_system::create_inferred_state_for(const const_entity_handle handle) {
 	const auto& cosmos = handle.get_cosmos();
 
-	//ensure(!is_constructed_rigid_body(handle));
-	const bool is_already_constructed = is_constructed_rigid_body(handle);
+	//ensure(!is_inferred_state_created_for_rigid_body(handle));
+	const bool is_already_constructed = is_inferred_state_created_for_rigid_body(handle);
 
 	if (is_already_constructed) {
 		return;
 	}
 
-	fixtures_construct(handle);
+	create_inferred_state_for_fixtures(handle);
 
 	const auto rigid_body = handle.find<components::rigid_body>();
 	
@@ -223,7 +223,7 @@ void physics_system::create_inferred_state(const const_entity_handle handle) {
 		
 		/* notice that all fixtures must be unconstructed at this moment since we assert that the rigid body itself is not */
 		for (const auto f : fixture_entities) {
-			fixtures_construct(cosmos[f]);
+			create_inferred_state_for_fixtures(cosmos[f]);
 		}
 	}
 }

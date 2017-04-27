@@ -124,8 +124,8 @@ public:
 
 	void complete_reinference();
 	void complete_reinference(const const_entity_handle);
-	void destroy_inferred_state_for_entity(const const_entity_handle);
-	void create_inferred_state_for_entity(const const_entity_handle);
+	void destroy_inferred_state_of(const const_entity_handle);
+	void create_inferred_state_for(const const_entity_handle);
 	
 	const std::string& get_debug_name(entity_id) const;
 	void set_debug_name(const entity_id, const std::string& new_debug_name);
@@ -134,10 +134,10 @@ public:
 	void partial_reinference(const entity_handle handle) {
 		auto& sys = systems_inferred.get<System>();
 
-		sys.destroy_inferred_state(handle);
+		sys.destroy_inferred_state_of(handle);
 
 		if (handle.has<components::inferred_state>()) {
-			sys.create_inferred_state(handle);
+			sys.create_inferred_state_for(handle);
 		}
 	}
 
