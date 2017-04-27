@@ -105,6 +105,7 @@ namespace scene_builders {
 			components::transform transform;
 
 			if (i == 0) {
+				transform = main_character_motorcycle.get_logic_transform();
 				//transform = { 0, 300, 0 };
 				//torso_set = assets::animation_response_id::TORSO_SET;
 			}
@@ -120,6 +121,7 @@ namespace scene_builders {
 			}
 			else if (i == 3) {
 				//torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
+				transform = riding_car.get_logic_transform();
 			}
 
 			// three rebels
@@ -155,6 +157,12 @@ namespace scene_builders {
 				transform = { -500, -2000, 0 };
 
 				//torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
+			}
+			else if(i == 10) {
+				transform = riding_car2.get_logic_transform();
+			}
+			else if(i == 11) {
+				transform = motorcycle2.get_logic_transform();
 			}
 
 			const auto new_character = prefabs::create_sample_complete_character(step, transform, typesafe_sprintf("player%x", i));
