@@ -82,12 +82,12 @@ void transform_component_guids_to_ids_in_place(
 struct delted_stream_of_entities {
 	unsigned new_entities = 0;
 	unsigned changed_entities = 0;
-	unsigned removed_entities = 0;
+	unsigned deleted_entities = 0;
 
 	augs::stream stream_of_new_guids;
 	augs::stream stream_for_new;
 	augs::stream stream_for_changed;
-	augs::stream stream_for_removed;
+	augs::stream stream_for_deleted;
 };
 
 bool cosmic_delta::encode(
@@ -125,14 +125,12 @@ bool cosmic_delta::encode(
 		bool entity_changed = false;
 
 		std::array<bool, COMPONENTS_COUNT> overridden_components;
-		std::array<bool, COMPONENTS_COUNT> removed_components;
 		std::fill(overridden_components.begin(), overridden_components.end(), false);
-		std::fill(removed_components.begin(), removed_components.end(), false);
 
 		augs::stream new_content;
 		
 		augs::introspect(
-			[&agg, &base, &enco, &entity_changed, &removed_components, &new_content, &overridden_components](
+			[&agg, &base, &enco, &entity_changed, &new_content, &overridden_components](
 				auto label,
 				const auto& base_id, 
 				const auto& enco_id
@@ -153,8 +151,8 @@ bool cosmic_delta::encode(
 					return;
 				}
 				else if (enco_c.dead() && base_c.alive()) {
-					entity_changed = true;
-					removed_components[idx] = true;
+					ensure(false && "Error! A previously existing component does not exist now.");
+					std::terminate();
 					return;
 				}
 				else if (enco_c.alive() && base_c.dead()) {
@@ -201,7 +199,6 @@ bool cosmic_delta::encode(
 			augs::write(dt.stream_for_changed, stream_written_id);
 
 			augs::write_flags(dt.stream_for_changed, overridden_components);
-			augs::write_flags(dt.stream_for_changed, removed_components);
 			augs::write(dt.stream_for_changed, new_content);
 
 			++dt.changed_entities;
@@ -221,8 +218,8 @@ bool cosmic_delta::encode(
 #endif
 
 		if (is_dead) {
-			++dt.removed_entities;
-			augs::write(dt.stream_for_removed, stream_written_id);
+			++dt.deleted_entities;
+			augs::write(dt.stream_for_deleted, stream_written_id);
 		}
 	});
 
@@ -239,7 +236,7 @@ bool cosmic_delta::encode(
 		has_meta_changed
 		|| dt.new_entities
 		|| dt.changed_entities 
-		|| dt.removed_entities
+		|| dt.deleted_entities
 	;
 
 	if (has_anything_changed) {
@@ -249,12 +246,12 @@ bool cosmic_delta::encode(
 
 		augs::write(out, dt.new_entities);
 		augs::write(out, dt.changed_entities);
-		augs::write(out, dt.removed_entities);
+		augs::write(out, dt.deleted_entities);
 
 		augs::write(out, dt.stream_of_new_guids);
 		augs::write(out, dt.stream_for_new);
 		augs::write(out, dt.stream_for_changed);
-		augs::write(out, dt.stream_for_removed);
+		augs::write(out, dt.stream_for_deleted);
 	}
 	else {
 		augs::write(out, false);
@@ -299,7 +296,7 @@ void cosmic_delta::decode(
 
 	augs::read(in, dt.new_entities);
 	augs::read(in, dt.changed_entities);
-	augs::read(in, dt.removed_entities);
+	augs::read(in, dt.deleted_entities);
 
 	size_t new_guids = dt.new_entities;
 	std::vector<entity_id> new_entities_ids;
@@ -366,17 +363,14 @@ void cosmic_delta::decode(
 		const auto changed_entity = deco.get_handle(guid_of_changed);
 
 		std::array<bool, COMPONENTS_COUNT> overridden_components;
-		std::array<bool, COMPONENTS_COUNT> removed_components;
-
 		augs::read_flags(in, overridden_components);
-		augs::read_flags(in, removed_components);
 
 		const auto& agg = changed_entity.get();
 		const auto& deco_components = agg.component_ids;
 
 		for_each_through_std_get(
 			deco_components,
-			[&agg, &removed_components, &overridden_components, &in, &deco, &changed_entity](const auto& deco_id) {
+			[&agg, &overridden_components, &in, &deco, &changed_entity](const auto& deco_id) {
 				typedef std::decay_t<decltype(deco_id)> encoded_id_type;
 				typedef typename encoded_id_type::element_type component_type;
 
@@ -408,14 +402,11 @@ void cosmic_delta::decode(
 						changed_entity.allocator::get<component_type>() = decoded_component;
 					}
 				}
-				else if (removed_components[idx]) {
-					changed_entity.remove<component_type>();
-				}
 			}
 		);
 	}
 
-	while (dt.removed_entities--) {
+	while (dt.deleted_entities--) {
 #if COSMOS_TRACKS_GUIDS
 		entity_guid guid_of_destroyed;
 

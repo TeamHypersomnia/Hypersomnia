@@ -20,7 +20,7 @@ namespace augs {
 			auto& self = *static_cast<derived*>(this);
 
 			auto r = [&self, n](auto c) {
-				auto& component_pool = self.get_component_pool<decltype(c)>();
+				auto& component_pool = self.template get_component_pool<decltype(c)>();
 				component_pool.initialize_space(n);
 			};
 
@@ -44,10 +44,14 @@ namespace augs {
 		}
 
 		template <class handle_type>
-		void remove_all_components(const handle_type handle) {
-			for_each_type<components...>([&handle](auto c) {
-				if(handle.template has<decltype(c)>()) {
-					handle.template remove<decltype(c)>();
+		void free_all_components(const handle_type handle) {
+			auto& self = *static_cast<derived*>(this);
+
+			for_each_type<components...>([&](auto c) {
+				typedef decltype(c) component;
+
+				if(handle.allocator::template has<component>()) {
+					self.template get_component_pool<component>().free(handle.get().template get_id<component>());
 				}
 			});
 		}

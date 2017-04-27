@@ -69,7 +69,7 @@ namespace prefabs {
 
 		render.layer = render_layer::SMALL_DYNAMIC_BODY;
 
-		ingredients::add_see_through_dynamic_body(step, e); 
+		ingredients::add_see_through_dynamic_body(step, e, {}); 
 		
 		auto& item = ingredients::make_item(e);
 		item.categories_for_slot_compatibility.set(item_category::ARM_BACK);
@@ -103,7 +103,7 @@ namespace prefabs {
 
 		render.layer = render_layer::SMALL_DYNAMIC_BODY;
 
-		ingredients::add_see_through_dynamic_body(step, e);
+		ingredients::add_see_through_dynamic_body(step, e, {});
 
 		auto& item = ingredients::make_item(e);
 		item.categories_for_slot_compatibility.set(item_category::ARM_FRONT);

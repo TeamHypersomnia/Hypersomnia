@@ -102,8 +102,8 @@ namespace prefabs {
 		name_entity(sample_magazine, entity_name::MAGAZINE);
 
 		{
-			ingredients::add_sprite(sample_magazine, pos, assets::game_image_id::SAMPLE_MAGAZINE, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::add_see_through_dynamic_body(step, sample_magazine);
+			ingredients::add_sprite(sample_magazine, assets::game_image_id::SAMPLE_MAGAZINE, white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::add_see_through_dynamic_body(step, sample_magazine, pos);
 
 			auto& item = ingredients::make_item(sample_magazine);
 			auto& container = sample_magazine += components::container();
@@ -136,8 +136,8 @@ namespace prefabs {
 		name_entity(sample_magazine, entity_name::MAGAZINE);
 
 		{
-			ingredients::add_sprite(sample_magazine, pos, assets::game_image_id::SMALL_MAGAZINE, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::add_see_through_dynamic_body(step, sample_magazine);
+			ingredients::add_sprite(sample_magazine, assets::game_image_id::SMALL_MAGAZINE, white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::add_see_through_dynamic_body(step, sample_magazine, pos);
 
 			auto& item = ingredients::make_item(sample_magazine);
 			auto& container = sample_magazine += components::container();
@@ -169,8 +169,8 @@ namespace prefabs {
 		auto sample_suppressor = cosmos.create_entity("sample_suppressor");
 		name_entity(sample_suppressor, entity_name::SUPPRESSOR);
 
-		ingredients::add_sprite(sample_suppressor, pos, assets::game_image_id::SAMPLE_SUPPRESSOR, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::add_see_through_dynamic_body(step, sample_suppressor);
+		ingredients::add_sprite(sample_suppressor, assets::game_image_id::SAMPLE_SUPPRESSOR, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(step, sample_suppressor, pos);
 
 		auto& item = ingredients::make_item(sample_suppressor);
 
@@ -192,8 +192,8 @@ namespace prefabs {
 		const auto red_col = rgba{ 255, 48, 1, 255 };
 		
 		{
-			ingredients::add_sprite(red_charge, pos, assets::game_image_id::RED_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::add_see_through_dynamic_body(step, red_charge);
+			ingredients::add_sprite(red_charge, assets::game_image_id::RED_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::add_see_through_dynamic_body(step, red_charge, pos);
 
 			auto& item = ingredients::make_item(red_charge);
 			item.space_occupied_per_charge = to_space_units("0.01");
@@ -208,8 +208,8 @@ namespace prefabs {
 		}
 
 		{
-			auto& s = ingredients::add_sprite(round_definition, pos, assets::game_image_id::ROUND_TRACE, red_col, render_layer::FLYING_BULLETS);
-			ingredients::add_bullet_round_physics(step, round_definition);
+			auto& s = ingredients::add_sprite(round_definition, assets::game_image_id::ROUND_TRACE, red_col, render_layer::FLYING_BULLETS);
+			ingredients::add_bullet_round_physics(step, round_definition, pos);
 
 			auto& damage = round_definition += components::damage();
 			damage.impulse_upon_hit = 15000.f;
@@ -244,8 +244,8 @@ namespace prefabs {
 		}
 
 		{
-			ingredients::add_sprite(shell_definition, pos, assets::game_image_id::RED_SHELL, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::add_shell_dynamic_body(step, shell_definition);
+			ingredients::add_sprite(shell_definition, assets::game_image_id::RED_SHELL, white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::add_shell_dynamic_body(step, shell_definition, pos);
 		}
 
 		red_charge.map_child_entity(child_entity_name::CATRIDGE_BULLET, round_definition);
@@ -266,8 +266,8 @@ namespace prefabs {
 		const auto pink_col = rgba { 255, 40, 255, 255 };
 
 		{
-			ingredients::add_sprite(pink_charge, pos, assets::game_image_id::PINK_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::add_see_through_dynamic_body(step, pink_charge);
+			ingredients::add_sprite(pink_charge, assets::game_image_id::PINK_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::add_see_through_dynamic_body(step, pink_charge, pos);
 
 			auto& item = ingredients::make_item(pink_charge);
 			item.space_occupied_per_charge = to_space_units("0.01");
@@ -282,8 +282,8 @@ namespace prefabs {
 		}
 
 		{
-			auto& s = ingredients::add_sprite(round_definition, pos, assets::game_image_id::ROUND_TRACE, pink_col, render_layer::FLYING_BULLETS);
-			ingredients::add_bullet_round_physics(step, round_definition);
+			auto& s = ingredients::add_sprite(round_definition, assets::game_image_id::ROUND_TRACE, pink_col, render_layer::FLYING_BULLETS);
+			ingredients::add_bullet_round_physics(step, round_definition, pos);
 			
 			auto& damage = round_definition += components::damage();
 			damage.impulse_upon_hit = 1000.f;
@@ -316,8 +316,8 @@ namespace prefabs {
 		}
 
 		{
-			ingredients::add_sprite(shell_definition, pos, assets::game_image_id::PINK_SHELL, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::add_shell_dynamic_body(step, shell_definition);
+			ingredients::add_sprite(shell_definition, assets::game_image_id::PINK_SHELL, white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::add_shell_dynamic_body(step, shell_definition, pos);
 		}
 
 		pink_charge.map_child_entity(child_entity_name::CATRIDGE_BULLET, round_definition);
@@ -336,8 +336,8 @@ namespace prefabs {
 		name_entity(cyan_charge, entity_name::CYAN_CHARGE);
 
 		{
-			ingredients::add_sprite(cyan_charge, pos, assets::game_image_id::CYAN_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::add_see_through_dynamic_body(step, cyan_charge);
+			ingredients::add_sprite(cyan_charge, assets::game_image_id::CYAN_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::add_see_through_dynamic_body(step, cyan_charge, pos);
 
 			auto& item = ingredients::make_item(cyan_charge);
 			item.space_occupied_per_charge = to_space_units("0.01");
@@ -352,8 +352,8 @@ namespace prefabs {
 		}
 
 		{
-			auto& s = ingredients::add_sprite(round_definition, pos, assets::game_image_id::ROUND_TRACE, cyan, render_layer::FLYING_BULLETS);
-			ingredients::add_bullet_round_physics(step, round_definition);
+			auto& s = ingredients::add_sprite(round_definition, assets::game_image_id::ROUND_TRACE, cyan, render_layer::FLYING_BULLETS);
+			ingredients::add_bullet_round_physics(step, round_definition, pos);
 
 			auto& damage = round_definition += components::damage();
 
@@ -385,8 +385,8 @@ namespace prefabs {
 		}
 
 		{
-			ingredients::add_sprite(shell_definition, pos, assets::game_image_id::CYAN_SHELL, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::add_shell_dynamic_body(step, shell_definition);
+			ingredients::add_sprite(shell_definition, assets::game_image_id::CYAN_SHELL, white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::add_shell_dynamic_body(step, shell_definition, pos);
 		}
 
 		cyan_charge.map_child_entity(child_entity_name::CATRIDGE_BULLET, round_definition);
@@ -405,8 +405,8 @@ namespace prefabs {
 		name_entity(green_charge, entity_name::GREEN_CHARGE);
 
 		{
-			ingredients::add_sprite(green_charge, pos, assets::game_image_id::GREEN_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::add_see_through_dynamic_body(step, green_charge);
+			ingredients::add_sprite(green_charge, assets::game_image_id::GREEN_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::add_see_through_dynamic_body(step, green_charge, pos);
 
 			auto& item = ingredients::make_item(green_charge);
 			item.space_occupied_per_charge = to_space_units("0.01");
@@ -417,8 +417,8 @@ namespace prefabs {
 		}
 
 		{
-			auto& s = ingredients::add_sprite(round_definition, pos, assets::game_image_id::ROUND_TRACE, green, render_layer::FLYING_BULLETS);
-			ingredients::add_bullet_round_physics(step, round_definition);
+			auto& s = ingredients::add_sprite(round_definition, assets::game_image_id::ROUND_TRACE, green, render_layer::FLYING_BULLETS);
+			ingredients::add_bullet_round_physics(step, round_definition, pos);
 
 			auto& damage = round_definition += components::damage();
 			damage.amount *= -1;
@@ -432,8 +432,8 @@ namespace prefabs {
 		}
 
 		{
-			ingredients::add_sprite(shell_definition, pos, assets::game_image_id::GREEN_SHELL, white, render_layer::SMALL_DYNAMIC_BODY);
-			ingredients::add_shell_dynamic_body(step, shell_definition);
+			ingredients::add_sprite(shell_definition, assets::game_image_id::GREEN_SHELL, white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::add_shell_dynamic_body(step, shell_definition, pos);
 		}
 
 		green_charge.map_child_entity(child_entity_name::CATRIDGE_BULLET, round_definition);
@@ -452,8 +452,8 @@ namespace prefabs {
 		auto weapon = cosmos.create_entity("sample_rifle");
 		name_entity(weapon, entity_name::ASSAULT_RIFLE);
 
-		auto& sprite = ingredients::add_sprite(weapon, pos, assets::game_image_id::ASSAULT_RIFLE, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::add_see_through_dynamic_body(step, weapon);
+		auto& sprite = ingredients::add_sprite(weapon, assets::game_image_id::ASSAULT_RIFLE, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(step, weapon, pos);
 		ingredients::add_default_gun_container(step, weapon);
 		
 		auto& gun = weapon += components::gun();
@@ -510,8 +510,8 @@ namespace prefabs {
 		auto weapon = cosmos.create_entity("sample_rifle");
 		name_entity(weapon, entity_name::BILMER2000);
 
-		auto& sprite = ingredients::add_sprite(weapon, pos, assets::game_image_id::BILMER2000, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::add_see_through_dynamic_body(step, weapon);
+		auto& sprite = ingredients::add_sprite(weapon, assets::game_image_id::BILMER2000, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(step, weapon, pos);
 		ingredients::add_default_gun_container(step, weapon);
 		
 		const auto bbox = weapon.get_aabb(metas, components::transform()).get_size();
@@ -580,8 +580,8 @@ namespace prefabs {
 		auto weapon = cosmos.create_entity("submachine");
 		name_entity(weapon, entity_name::SUBMACHINE);
 
-		auto& sprite = ingredients::add_sprite(weapon, pos, assets::game_image_id::SUBMACHINE, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::add_see_through_dynamic_body(step, weapon);
+		auto& sprite = ingredients::add_sprite(weapon, assets::game_image_id::SUBMACHINE, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(step, weapon, pos);
 		ingredients::add_default_gun_container(step, weapon);
 
 		auto& gun = weapon += components::gun();
@@ -639,8 +639,8 @@ namespace prefabs {
 		auto weapon = cosmos.create_entity("amplifier_arm");
 		name_entity(weapon, entity_name::AMPLIFIER_ARM);
 
-		auto& sprite = ingredients::add_sprite(weapon, pos, assets::game_image_id::AMPLIFIER_ARM, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::add_see_through_dynamic_body(step, weapon);
+		auto& sprite = ingredients::add_sprite(weapon, assets::game_image_id::AMPLIFIER_ARM, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(step, weapon, pos);
 		
 		auto& item = ingredients::make_item(weapon);
 		item.space_occupied_per_charge = to_space_units("3.0");
@@ -663,8 +663,8 @@ namespace prefabs {
 		{
 			const auto round_definition = cosmos.create_entity("round_definition");
 
-			auto& s = ingredients::add_sprite(round_definition, pos, assets::game_image_id::ENERGY_BALL, cyan, render_layer::FLYING_BULLETS);
-			ingredients::add_bullet_round_physics(step, round_definition);
+			auto& s = ingredients::add_sprite(round_definition, assets::game_image_id::ENERGY_BALL, cyan, render_layer::FLYING_BULLETS);
+			ingredients::add_bullet_round_physics(step, round_definition, pos);
 
 			auto& damage = round_definition += components::damage();
 
@@ -710,8 +710,8 @@ namespace prefabs {
 		auto weapon = cosmos.create_entity("pistol");
 		name_entity(weapon, entity_name::PISTOL);
 
-		auto& sprite = ingredients::add_sprite(weapon, pos, assets::game_image_id::PISTOL, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::add_see_through_dynamic_body(step, weapon);
+		auto& sprite = ingredients::add_sprite(weapon, assets::game_image_id::PISTOL, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(step, weapon, pos);
 		ingredients::add_default_gun_container(step, weapon);
 
 		auto& gun = weapon += components::gun();
@@ -752,8 +752,8 @@ namespace prefabs {
 		auto weapon = cosmos.create_entity("pistol");
 		name_entity(weapon, entity_name::KEK9);
 
-		auto& sprite = ingredients::add_sprite(weapon, pos, assets::game_image_id::KEK9, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::add_see_through_dynamic_body(step, weapon);
+		auto& sprite = ingredients::add_sprite(weapon, assets::game_image_id::KEK9, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(step, weapon, pos);
 		ingredients::add_default_gun_container(step, weapon, 0);
 		auto& container = weapon.get<components::container>();
 		

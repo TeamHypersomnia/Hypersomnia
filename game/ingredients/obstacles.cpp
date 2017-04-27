@@ -8,8 +8,8 @@ namespace prefabs {
 		const auto crate = step.cosm.create_entity("crate");
 
 		name_entity(crate, entity_name::CRATE);
-		ingredients::add_sprite_scalled(crate, pos, size, assets::game_image_id::CRATE, white, render_layer::DYNAMIC_BODY);
-		ingredients::add_standard_dynamic_body(step, crate, true);
+		ingredients::add_sprite_scalled(crate, size, assets::game_image_id::CRATE, white, render_layer::DYNAMIC_BODY);
+		ingredients::add_standard_dynamic_body(step, crate, pos, true);
 		crate.get<components::fixtures>().set_restitution(0.8f);
 		crate.get<components::fixtures>().set_density(0.7f);
 		crate.get<components::fixtures>().set_physical_material(assets::physical_material_id::WOOD);
@@ -21,8 +21,8 @@ namespace prefabs {
 	entity_handle create_brick_wall(const logic_step step, const components::transform pos, const vec2 size) {
 		const auto crate = step.cosm.create_entity("brick_wall");
 
-		ingredients::add_sprite_scalled(crate, pos, size, assets::game_image_id::BRICK_WALL, white, render_layer::DYNAMIC_BODY);
-		ingredients::add_standard_static_body(step, crate);
+		ingredients::add_sprite_scalled(crate, size, assets::game_image_id::BRICK_WALL, white, render_layer::DYNAMIC_BODY);
+		ingredients::add_standard_static_body(step, crate, pos);
 		crate.get<components::fixtures>().set_restitution(0.0f);
 		crate.get<components::fixtures>().set_density(100);
 		crate.get<components::fixtures>().set_physical_material(assets::physical_material_id::WOOD);

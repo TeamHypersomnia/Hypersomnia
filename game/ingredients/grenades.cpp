@@ -29,14 +29,14 @@ namespace prefabs {
 		grenade.spoon = grenade_spoon;
 		
 		//{
-		//	ingredients::add_sprite(grenade_spoon, pos, assets::game_image_id::GRENADE_SPOON, white, render_layer::SMALL_DYNAMIC_BODY);
+		//	ingredients::add_sprite(grenade_spoon, assets::game_image_id::GRENADE_SPOON, white, render_layer::SMALL_DYNAMIC_BODY);
 		//	ingredients::add_shell_dynamic_body(grenade_spoon);
 		//}
 
 		name_entity(grenade_entity, entity_name::FORCE_GRENADE);
 
-		auto& sprite = ingredients::add_sprite(grenade_entity, pos, assets::game_image_id::FORCE_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::add_see_through_dynamic_body(step, grenade_entity);
+		auto& sprite = ingredients::add_sprite(grenade_entity, assets::game_image_id::FORCE_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(step, grenade_entity, pos);
 
 		grenade.released_image_id = assets::game_image_id::FORCE_GRENADE_RELEASED;
 
@@ -65,8 +65,8 @@ namespace prefabs {
 
 		name_entity(grenade_entity, entity_name::PED_GRENADE);
 
-		auto& sprite = ingredients::add_sprite(grenade_entity, pos, assets::game_image_id::PED_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::add_see_through_dynamic_body(step, grenade_entity);
+		auto& sprite = ingredients::add_sprite(grenade_entity, assets::game_image_id::PED_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(step, grenade_entity, pos);
 
 		auto& item = ingredients::make_item(grenade_entity);
 		item.space_occupied_per_charge = to_space_units("0.6");
@@ -94,8 +94,8 @@ namespace prefabs {
 
 		name_entity(grenade_entity, entity_name::INTERFERENCE_GRENADE);
 
-		auto& sprite = ingredients::add_sprite(grenade_entity, pos, assets::game_image_id::INTERFERENCE_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::add_see_through_dynamic_body(step, grenade_entity);
+		auto& sprite = ingredients::add_sprite(grenade_entity, assets::game_image_id::INTERFERENCE_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(step, grenade_entity, pos);
 
 		auto& item = ingredients::make_item(grenade_entity);
 		item.space_occupied_per_charge = to_space_units("0.6");

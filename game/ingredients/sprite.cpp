@@ -10,14 +10,12 @@
 namespace ingredients {
 	components::sprite& add_sprite(
 		const entity_handle e, 
-		const components::transform pos, 
 		const assets::game_image_id id, 
 		const rgba col, 
 		const render_layer layer
 	) {
 		auto& sprite = e += components::sprite();
 		auto& render = e += components::render();
-		e += pos;
 
 		render.layer = layer;
 		sprite.set(id, col);
@@ -27,13 +25,12 @@ namespace ingredients {
 
 	components::sprite& add_sprite_scalled(
 		const entity_handle e, 
-		const components::transform pos, 
 		const vec2i size, 
 		const assets::game_image_id id, 
 		const rgba col, 
 		const render_layer layer
 	) {
-		add_sprite(e, pos, id, col, layer);
+		add_sprite(e, id, col, layer);
 		
 		if (size.non_zero()) {
 			e.get<components::sprite>().overridden_size = size;

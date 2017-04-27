@@ -8,14 +8,11 @@
 #include "game/transcendental/entity_handle.h"
 
 namespace ingredients {
-	void add_standard_dynamic_body(const logic_step step, const entity_handle e, const bool destructible) {
-		components::rigid_body def;
+	void add_standard_dynamic_body(const logic_step step, const entity_handle e, const components::transform target_transform, const bool destructible) {
+		components::rigid_body body;
 		const auto si = e.get_cosmos().get_si();
 
-		if (e.has<components::transform>()) {
-			def.set_transform(si, e.get<components::transform>());
-			e.remove<components::transform>();
-		}
+		body.set_transform(si, target_transform);
 
 		e.add_shape_component_from_renderable(
 			step
@@ -28,18 +25,15 @@ namespace ingredients {
 		group.density = 1;
 
 		e += group;
-		e += def;
+		e += body;
 		e.get<components::fixtures>().set_owner_body(e);
 	}
 
-	void add_see_through_dynamic_body(const logic_step step, entity_handle e) {
-		components::rigid_body def;
+	void add_see_through_dynamic_body(const logic_step step, entity_handle e, const components::transform target_transform) {
+		components::rigid_body body;
 		const auto si = e.get_cosmos().get_si();
 
-		if (e.has<components::transform>()) {
-			def.set_transform(si, e.get<components::transform>());
-			e.remove<components::transform>();
-		}
+		body.set_transform(si, target_transform);
 
 		e.add_shape_component_from_renderable(
 			step
@@ -52,18 +46,16 @@ namespace ingredients {
 		group.restitution = 0.5f;
 
 		e += group;
-		e += def;
+		e += body;
 		e.get<components::fixtures>().set_owner_body(e);
 	}
 
-	void add_shell_dynamic_body(const logic_step step, entity_handle e) {
-		components::rigid_body def;
+	void add_shell_dynamic_body(const logic_step step, entity_handle e, const components::transform target_transform) {
+		components::rigid_body body;
+		
 		const auto si = e.get_cosmos().get_si();
-
-		if (e.has<components::transform>()) {
-			def.set_transform(si, e.get<components::transform>());
-			e.remove<components::transform>();
-		}
+		
+		body.set_transform(si, target_transform);
 
 		e.add_shape_component_from_renderable(
 			step
@@ -79,21 +71,18 @@ namespace ingredients {
 		group.collision_sound_gain_mult = 100.f;
 
 		e += group;
-		e += def;
+		e += body;
 
 		e.get<components::fixtures>().set_owner_body(e);
 	}
 
-	void add_standard_static_body(const logic_step step, entity_handle e) {
-		components::rigid_body def;
-		def.body_type = rigid_body_type::STATIC;
+	void add_standard_static_body(const logic_step step, entity_handle e, const components::transform target_transform) {
+		components::rigid_body body;
+		body.body_type = rigid_body_type::STATIC;
 
 		const auto si = e.get_cosmos().get_si();
 
-		if (e.has<components::transform>()) {
-			def.set_transform(si, e.get<components::transform>());
-			e.remove<components::transform>();
-		}
+		body.set_transform(si, target_transform);
 
 		e.add_shape_component_from_renderable(
 			step
@@ -105,18 +94,15 @@ namespace ingredients {
 		group.density = 1;
 
 		e += group;
-		e += def;
+		e += body;
 		e.get<components::fixtures>().set_owner_body(e);
 	}
 	
-	void add_bullet_round_physics(const logic_step step, entity_handle e) {
+	void add_bullet_round_physics(const logic_step step, entity_handle e, const components::transform target_transform) {
 		components::rigid_body body;
 		const auto si = e.get_cosmos().get_si();
 
-		if (e.has<components::transform>()) {
-			body.set_transform(si, e.get<components::transform>());
-			e.remove<components::transform>();
-		}
+		body.set_transform(si, target_transform);
 
 		body.bullet = true;
 		body.angular_damping = 0.f,

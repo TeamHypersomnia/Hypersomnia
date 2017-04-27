@@ -17,8 +17,8 @@ namespace prefabs {
 		auto& machete = step.cosm.create_entity("urban_cyan_machete");
 		name_entity(machete, entity_name::URBAN_CYAN_MACHETE);
 
-		auto& sprite = ingredients::add_sprite(machete, pos, assets::game_image_id::URBAN_CYAN_MACHETE, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::add_see_through_dynamic_body(step, machete);
+		auto& sprite = ingredients::add_sprite(machete, assets::game_image_id::URBAN_CYAN_MACHETE, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(step, machete, pos);
 
 		auto& item = ingredients::make_item(machete);
 		item.space_occupied_per_charge = to_space_units("2.5");

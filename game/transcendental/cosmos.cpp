@@ -401,7 +401,7 @@ void cosmos::delete_entity(const entity_id e) {
 		}
 	}
 
-	remove_all_components(get_handle(e));
+	free_all_components(get_handle(e));
 	get_aggregate_pool().free(e);
 	delete_debug_name(e);
 }

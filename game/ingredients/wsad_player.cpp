@@ -44,10 +44,13 @@ namespace ingredients {
 		movement.enable_braking_damping = true;
 	}
 
-	void add_character_head_physics(const logic_step step, const entity_handle e) {
+	void add_character_head_physics(const logic_step step, const entity_handle e, const components::transform spawn_transform) {
 		components::rigid_body body;
 		body.fixed_rotation = false;
 		body.angled_damping = true;
+		const auto si = step.cosm.get_si();
+
+		body.set_transform(si, spawn_transform);
 
 		components::special_physics special;
 
@@ -149,9 +152,7 @@ namespace prefabs {
 
 		ingredients::add_character(character, crosshair);
 		
-		ingredients::add_character_head_physics(step, character);
-
-		character.get<components::rigid_body>().set_transform(spawn_transform);
+		ingredients::add_character_head_physics(step, character, spawn_transform);
 
 		ingredients::add_character_head_inventory(step, character);
 

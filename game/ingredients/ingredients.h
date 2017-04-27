@@ -20,21 +20,33 @@ namespace ingredients {
 	components::item& make_item(entity_handle);
 	void make_always_visible(entity_handle);
 
-	components::sprite& add_sprite(entity_handle, components::transform pos, assets::game_image_id = assets::game_image_id::BLANK, rgba col = rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
-	components::sprite& add_sprite_scalled(entity_handle, components::transform pos, vec2i size = vec2i(), assets::game_image_id = assets::game_image_id::BLANK, rgba col = rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
-	
-	void add_bullet_round_physics(const logic_step, entity_handle);
-	void add_see_through_dynamic_body(const logic_step, entity_handle);
-	void add_shell_dynamic_body(const logic_step, entity_handle);
-	void add_standard_dynamic_body(const logic_step, entity_handle, const bool destructible = false);
-	void add_standard_static_body(const logic_step, entity_handle);
+	components::sprite& add_sprite(
+		entity_handle, 
+		assets::game_image_id = assets::game_image_id::BLANK, 
+		rgba col = rgba(255, 255, 255, 255), 
+		render_layer = render_layer::GROUND
+	);
 
-	void add_character_head_physics(const logic_step, entity_handle);
+	components::sprite& add_sprite_scalled(
+		entity_handle, 
+		vec2i size = vec2i(), 
+		assets::game_image_id = assets::game_image_id::BLANK, 
+		rgba col = rgba(255, 255, 255, 255), 
+		render_layer = render_layer::GROUND
+	);
+	
+	void add_bullet_round_physics(const logic_step, entity_handle, const components::transform);
+	void add_see_through_dynamic_body(const logic_step, entity_handle, const components::transform);
+	void add_shell_dynamic_body(const logic_step, entity_handle, const components::transform);
+	void add_standard_dynamic_body(const logic_step, entity_handle, const components::transform, const bool destructible = false);
+	void add_standard_static_body(const logic_step, entity_handle, const components::transform);
+
+	void add_character_head_physics(const logic_step, entity_handle, const components::transform);
 	void add_character_legs(const logic_step, entity_handle legs, entity_handle player);
 	void add_character(const logic_step, entity_handle, entity_handle crosshair_entity);
 
 	void add_character_head_inventory(const logic_step, entity_handle);
-	void add_backpack(entity_handle);
+	void add_backpack_container(entity_handle);
 
 	void add_default_gun_container(
 		const logic_step, 

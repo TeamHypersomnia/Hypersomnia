@@ -224,13 +224,16 @@ void perform_spell_logic(
 
 				ingredients::add_sprite(
 					energy_ball, 
-					new_energy_ball_transform, 
 					assets::game_image_id::ENERGY_BALL, 
 					cyan, 
 					render_layer::FLYING_BULLETS
 				);
 
-				ingredients::add_bullet_round_physics(step, energy_ball);
+				ingredients::add_bullet_round_physics(
+					step, 
+					energy_ball,
+					new_energy_ball_transform
+				);
 
 				auto& damage = energy_ball += components::damage();
 

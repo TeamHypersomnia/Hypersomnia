@@ -41,6 +41,7 @@ namespace scene_builders {
 	void testbed::populate(const logic_step step) {
 		auto& world = step.cosm;
 		const auto& metas = step.input.metas_of_assets;
+		
 		//const auto crate = prefabs::create_crate(step, vec2(200, 200 + 300), vec2i(100, 100) / 3);
 		//const auto crate2 = prefabs::create_crate(step, vec2(400, 200 + 400), vec2i(300, 300));
 		//const auto crate4 = prefabs::create_crate(step, vec2(500, 200 + 0), vec2i(100, 100));
@@ -60,7 +61,7 @@ namespace scene_builders {
 		//{
 		//	auto frog = world.create_entity("frog");
 		//	ingredients::add_sprite(frog, vec2(100 + x * 40, 200 + 400), assets::game_image_id::TEST_SPRITE, white, render_layer::SMALL_DYNAMIC_BODY);
-		//	ingredients::add_see_through_dynamic_body(frog);
+		//	ingredients::add_see_through_dynamic_body(frog, pos);
 		//	name_entity(frog, entity_name::CRATE);
 		//	frog.add_standard_components(step);
 		//}
@@ -590,11 +591,12 @@ namespace scene_builders {
 
 				ingredients::add_sprite(
 					e,
-					components::transform(164.f - 8.f, -60.f - 20.f),
 					assets::game_image_id::HAVE_A_PLEASANT,
 					white,
 					render_layer::NEON_CAPTIONS
 				);
+
+				e += components::transform(164.f - 8.f, -60.f - 20.f);
 
 				e.add_standard_components(step);
 
@@ -627,8 +629,10 @@ namespace scene_builders {
 						//ingredients::add_standard_static_body(background);
 
 						auto street = world.create_entity("street[-]");
-						ingredients::add_sprite(street, { bg_size * vec2(x, y) },
+						ingredients::add_sprite(street,
 							assets::game_image_id::TEST_BACKGROUND, gray1, render_layer::GROUND);
+
+						street += components::transform{ bg_size * vec2(x, y) };
 
 						//background.add_standard_components(step);
 						street.add_standard_components(step);
@@ -639,8 +643,10 @@ namespace scene_builders {
 					const vec2 size = metas[assets::game_image_id::ROAD_FRONT_DIRT].get_size();
 
 					auto road_dirt = world.create_entity("road_dirt[-]");
-					ingredients::add_sprite(road_dirt, vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 - size.y / 2),
+					ingredients::add_sprite(road_dirt,
 						assets::game_image_id::ROAD_FRONT_DIRT, white, render_layer::ON_TILED_FLOOR);
+
+					road_dirt += components::transform{ vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 - size.y / 2) };
 
 					road_dirt.add_standard_components(step);
 				}
@@ -649,8 +655,10 @@ namespace scene_builders {
 					const vec2 size = metas[assets::game_image_id::ROAD].get_size();
 
 					auto road = world.create_entity("road[-]");
-					ingredients::add_sprite(road, vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 + size.y / 2 + size.y*r),
+					ingredients::add_sprite(road,
 						assets::game_image_id::ROAD, white, render_layer::ON_GROUND);
+
+					road += components::transform{ vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 + size.y / 2 + size.y*r) };
 
 					road.add_standard_components(step);
 				}
@@ -660,11 +668,12 @@ namespace scene_builders {
 				const auto e = world.create_entity("awakening");
 				auto& sprite = ingredients::add_sprite(
 					e,
-					components::transform(164.f - 8.f, -60.f - 20.f + 40.f),
 					assets::game_image_id::AWAKENING,
 					white,
 					render_layer::NEON_CAPTIONS
 				);
+
+				e += components::transform(164.f - 8.f, -60.f - 20.f + 40.f);
 
 				sprite.effect = components::sprite::special_effect::COLOR_WAVE;
 
@@ -676,11 +685,12 @@ namespace scene_builders {
 
 				ingredients::add_sprite(
 					e,
-					components::transform(1164.f + 24.f, -60.f),
 					assets::game_image_id::METROPOLIS,
 					white,
 					render_layer::NEON_CAPTIONS
 				);
+
+				e += components::transform(1164.f + 24.f, -60.f);
 
 				e.add_standard_components(step);
 			}
