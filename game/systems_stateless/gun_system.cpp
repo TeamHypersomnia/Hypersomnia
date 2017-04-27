@@ -29,7 +29,6 @@
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
-#include "game/detail/position_scripts.h"
 
 using namespace augs;
 
@@ -183,7 +182,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					round_entity.set_logic_transform(step, muzzle_transform);
 
 					auto rng = cosmos.get_rng_for(round_entity);
-					set_velocity(round_entity, vec2().set_from_degrees(muzzle_transform.rotation).set_length(rng.randval(gun.muzzle_velocity)));
+					round_entity.get<components::rigid_body>().set_velocity(vec2().set_from_degrees(muzzle_transform.rotation).set_length(rng.randval(gun.muzzle_velocity)));
 					response.spawned_rounds.push_back(round_entity);
 
 					auto& sentience = owning_sentience.get<components::sentience>();
@@ -245,7 +244,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							round_entity.set_logic_transform(step, muzzle_transform);
 							
 							auto rng = cosmos.get_rng_for(round_entity);
-							set_velocity(round_entity, vec2().set_from_degrees(muzzle_transform.rotation).set_length(rng.randval(gun.muzzle_velocity)));
+							round_entity.get<components::rigid_body>().set_velocity(vec2().set_from_degrees(muzzle_transform.rotation).set_length(rng.randval(gun.muzzle_velocity)));
 							response.spawned_rounds.push_back(round_entity);
 
 							round_entity.set_flag(entity_flag::IS_IMMUNE_TO_PAST);
@@ -273,7 +272,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 							shell_entity.set_logic_transform(step, shell_transform);
 
-							set_velocity(shell_entity, vec2().set_from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun.shell_velocity)));
+							shell_entity.get<components::rigid_body>().set_velocity(vec2().set_from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun.shell_velocity)));
 							response.spawned_shell = shell_entity;
 
 							shell_entity.add_standard_components(step);

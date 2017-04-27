@@ -59,7 +59,8 @@ basic_entity_handle<C> basic_entity_handle<C>::add_standard_components(const log
 		|| has<components::particles_existence>()
 		//|| has<components::sound_existence>()
 		)
-		&& !is_entity_physical(*this) 
+		&& !has<components::fixtures>() 
+		&& !has<components::rigid_body>() 
 		&& !has<components::tree_of_npo_node>()
 	) {
 		add(components::tree_of_npo_node::create_default_for(step, *this));

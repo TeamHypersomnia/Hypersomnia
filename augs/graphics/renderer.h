@@ -8,6 +8,7 @@
 
 #include "game/components/transform_component.h"
 #include "game/transcendental/entity_id.h"
+#include "game/transcendental/entity_handle_declaration.h"
 
 #include "game/assets/game_image_id.h"
 #include "augs/misc/timer.h"

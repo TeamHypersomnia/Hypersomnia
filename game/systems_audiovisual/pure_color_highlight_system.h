@@ -6,6 +6,8 @@
 #include "game/transcendental/entity_id.h"
 
 struct camera_cone;
+class cosmos;
+class interpolation_system;
 
 class pure_color_highlight_system {
 public:

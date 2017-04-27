@@ -8,7 +8,6 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
-#include "game/detail/position_scripts.h"
 
 void resolve_dampings_of_body(
 	const entity_handle it,
@@ -106,25 +105,23 @@ bool are_connected_by_friction(
 ) {
 	const auto& cosmos = child.get_cosmos();
 
-	if (is_entity_physical(child) && is_entity_physical(parent)) {
-		bool matched_ancestor = false;
+	bool matched_ancestor = false;
 
-		const auto parent_body_entity = parent.get_owner_body();
-		entity_id childs_ancestor_entity = child.get_owner_body().get_owner_friction_ground();
+	const auto owner_body_of_parent = parent.get_owner_body();
+	const auto owner_body_of_child = child.get_owner_body();
+
+	if(owner_body_of_child.alive()) {
+		entity_id childs_ancestor_entity = owner_body_of_child.get_owner_friction_ground();
 
 		while (cosmos[childs_ancestor_entity].alive()) {
-			if (childs_ancestor_entity == parent_body_entity) {
+			if (childs_ancestor_entity == owner_body_of_parent) {
 				matched_ancestor = true;
 				break;
 			}
 
 			childs_ancestor_entity = cosmos[childs_ancestor_entity].get_owner_friction_ground();
 		}
-
-		if (matched_ancestor) {
-			return true;
-		}
 	}
 
-	return false;
+	return matched_ancestor;
 }

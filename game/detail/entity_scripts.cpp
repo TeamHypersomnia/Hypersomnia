@@ -64,9 +64,9 @@ identified_danger assess_danger(
 		return result;
 	}
 
-	const auto victim_pos = position(victim);
-	const auto danger_pos = position(danger);
-	const auto danger_vel = velocity(danger.get_owner_body());
+	const auto victim_pos = victim.get_logic_transform().pos;
+	const auto danger_pos = danger.get_logic_transform().pos;
+	const auto danger_vel = danger.get_owner_body().get_effective_velocity();
 	const auto danger_speed = danger_vel.length();
 	const auto danger_dir = (danger_pos - victim_pos);
 	const float danger_distance = danger_dir.length();
@@ -187,6 +187,8 @@ entity_id get_closest_hostile(
 	float min_distance = std::numeric_limits<float>::max();
 
 	if (subject_attitude.alive()) {
+		const auto subject_attitude_transform = subject_attitude.get_logic_transform();
+
 		physics.for_each_in_aabb(
 			si,
 			transform.pos - vec2(radius, radius),
@@ -199,7 +201,7 @@ entity_id get_closest_hostile(
 					const auto calculated_attitude = calculate_attitude(s, subject_attitude);
 
 					if (is_hostile(calculated_attitude)) {
-						auto dist = distance_sq(s, subject_attitude);
+						const auto dist = (s.get_logic_transform().pos - subject_attitude_transform.pos).length_sq();
 
 						if (dist < min_distance) {
 							closest_hostile = s;
@@ -250,6 +252,8 @@ std::vector<entity_id> get_closest_hostiles(
 	float min_distance = std::numeric_limits<float>::max();
 
 	if (subject_attitude.alive()) {
+		const auto subject_attitude_transform = subject_attitude.get_logic_transform();
+
 		physics.for_each_in_aabb(
 			si,
 			transform.pos - vec2(radius, radius),
@@ -262,7 +266,7 @@ std::vector<entity_id> get_closest_hostiles(
 					const auto calculated_attitude = calculate_attitude(s, subject_attitude);
 
 					if (is_hostile(calculated_attitude)) {
-						const auto dist = distance_sq(s, subject_attitude);
+						const auto dist = (s.get_logic_transform().pos - subject_attitude_transform.pos).length_sq();
 						
 						hostile_entry new_entry;
 						new_entry.s = s;

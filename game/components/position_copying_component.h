@@ -1,6 +1,6 @@
 #pragma once
-
 #include "game/transcendental/entity_id.h"
+#include "game/transcendental/entity_handle_declaration.h"
 #include "augs/math/vec2.h"
 
 class position_copying_system;

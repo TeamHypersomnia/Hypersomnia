@@ -81,7 +81,7 @@ void damage_system::destroy_colliding_bullets_and_send_damage(const logic_step s
 				vec2 impact_velocity = damage.custom_impact_velocity;
 
 				if (impact_velocity.is_zero()) {
-					impact_velocity = velocity(collider_handle);
+					impact_velocity = collider_handle.get_effective_velocity();
 				}
 
 				if (damage.impulse_upon_hit > 0.f) {
@@ -147,12 +147,12 @@ void damage_system::destroy_outdated_bullets(const logic_step step) {
 		
 			if ((damage.constrain_lifetime && damage.lifetime_ms >= damage.max_lifetime_ms) ||
 				(damage.constrain_distance && damage.distance_travelled >= damage.max_distance)) {
-				damage.saved_point_of_impact_before_death = position(it);
+				damage.saved_point_of_impact_before_death = it.get_logic_transform().pos;
 				step.transient.messages.post(messages::queue_destruction(it));
 			}
 
 			if (damage.constrain_distance) {
-				damage.distance_travelled += speed(it);
+				damage.distance_travelled += it.get_effective_velocity().length();
 			}
 
 			if (damage.constrain_lifetime) {

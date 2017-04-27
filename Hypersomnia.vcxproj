@@ -507,7 +507,6 @@
     <ClCompile Include="game\detail\ai\behaviours\pull_trigger.cpp" />
     <ClCompile Include="game\detail\ai\behaviours\target_closest_enemy.cpp" />
     <ClCompile Include="game\detail\entity_scripts.cpp" />
-    <ClCompile Include="game\detail\position_scripts.cpp" />
     <ClCompile Include="game\enums\filters.cpp" />
     <ClCompile Include="game\ingredients\artificial_life.cpp" />
     <ClCompile Include="game\detail\entity_description.cpp" />
@@ -1412,7 +1411,6 @@
     <ClInclude Include="game\detail\ai\behaviours.h" />
     <ClInclude Include="game\detail\ai\goals.h" />
     <ClInclude Include="game\detail\entity_scripts.h" />
-    <ClInclude Include="game\detail\position_scripts.h" />
     <ClInclude Include="game\detail\entity_description.h" />
     <ClInclude Include="game\globals\animations.h" />
     <ClInclude Include="game\globals\associated_entities.h" />

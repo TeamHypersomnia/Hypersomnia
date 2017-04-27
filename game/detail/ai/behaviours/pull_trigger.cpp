@@ -5,7 +5,6 @@
 #include "game/components/crosshair_component.h"
 #include "game/components/gun_component.h"
 #include "game/detail/entity_scripts.h"
-#include "game/detail/position_scripts.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
 

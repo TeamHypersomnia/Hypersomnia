@@ -39,8 +39,9 @@ namespace behaviours {
 			if (pathfinding.has_pathfinding_finished()) {
 				attitude.last_seen_target_position_inspected = true;
 			}
-			else
-				movement.set_flags_from_closest_direction(pathfinding.get_current_navigation_point() - position(subject));
+			else {
+				movement.set_flags_from_closest_direction(pathfinding.get_current_navigation_point() - subject.get_logic_transform().pos);
+			}
 		}
 	}
 }

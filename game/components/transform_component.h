@@ -34,6 +34,7 @@ namespace components {
 		void flip_rotation();
 		void reset();
 		vec2 interpolation_direction(const transform& previous) const;
+		vec2 get_orientation() const;
 	};
 }
 
@@ -46,5 +47,3 @@ namespace augs {
 		return res;
 	}
 }
-
-#include "game/detail/position_scripts.h"

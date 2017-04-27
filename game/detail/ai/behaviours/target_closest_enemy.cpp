@@ -6,7 +6,6 @@
 #include "game/messages/visibility_information.h"
 #include "game/components/gun_component.h"
 #include "game/detail/entity_scripts.h"
-#include "game/detail/position_scripts.h"
 
 #include "game/detail/inventory/inventory_utils.h"
 #include "game/transcendental/cosmos.h"
@@ -25,7 +24,8 @@ namespace behaviours {
 
 		auto& cosmos = t.step.cosm;
 		auto subject = t.subject;
-		auto pos = position(subject);
+		const auto subject_transform = subject.get_logic_transform();
+		auto pos = subject_transform.pos;
 		auto& los = t.step.transient.calculated_line_of_sight.at(subject);
 		auto& attitude = subject.get<components::attitude>();
 
@@ -38,7 +38,7 @@ namespace behaviours {
 			const auto calculated_attitude = calculate_attitude(s, subject);
 
 			if (is_hostile(calculated_attitude)) {
-				auto dist = distance_sq(s, subject);
+				auto dist = (s.get_logic_transform().pos - subject_transform.pos).length_sq();
 
 				if (dist < min_distance) {
 					closest_hostile_raw = s;
@@ -51,11 +51,14 @@ namespace behaviours {
 
 		attitude.currently_attacked_visible_entity = closest_hostile;
 
+		const auto closest_hostile_transform = closest_hostile.get_logic_transform();
+		const auto closest_hostile_velocity = closest_hostile.get_effective_velocity();
+
 		if (closest_hostile.alive()) {
 			attitude.is_alert = true;
 			attitude.last_seen_target_position_inspected = false;
-			attitude.last_seen_target_position = position(closest_hostile);
-			attitude.last_seen_target_velocity = velocity(closest_hostile);
+			attitude.last_seen_target_position = closest_hostile_transform.pos;
+			attitude.last_seen_target_velocity = closest_hostile_velocity;
 		}
 
 		auto crosshair = subject[child_entity_name::CHARACTER_CROSSHAIR];
@@ -73,17 +76,19 @@ namespace behaviours {
 			if (vel > 1.0 && closest_hostile.alive()) {
 				vec2 leaded;
 
-				if (velocity(closest_hostile).length_sq() > 1) {
-					leaded = position(closest_hostile) + velocity(closest_hostile) * distance(closest_hostile, subject) / vel;// direct_solution(position(closest_hostile), velocity(closest_hostile), vel);
+				if (closest_hostile_velocity.length_sq() > 1) {
+					leaded = closest_hostile_transform.pos + closest_hostile_velocity * (closest_hostile_transform.pos - subject_transform.pos).length_sq() / vel;// direct_solution(position(closest_hostile), velocity(closest_hostile), vel);
 				}
 				else {
-					leaded = position(closest_hostile);
+					leaded = closest_hostile_transform.pos;
 				}
 
-				crosshair_offset = leaded - position(subject);
+				crosshair_offset = leaded - subject_transform.pos;
 			}
-			else if (is_entity_physical(subject)) {
-				crosshair_offset = velocity(subject).length() > 3.0 ? velocity(subject) : vec2(10, 0);
+			else if (subject.has<components::rigid_body>()) {
+				const auto subject_vel = subject.get_effective_velocity();
+
+				crosshair_offset = subject_vel.length() > 3.0 ? subject_vel : vec2(10, 0);
 			}
 			else {
 				crosshair_offset = vec2(10, 0);

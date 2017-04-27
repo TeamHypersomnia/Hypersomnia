@@ -30,7 +30,6 @@
 #include "augs/templates/string_templates.h"
 #include "augs/templates/container_templates.h"
 
-#include "game/detail/position_scripts.h"
 #include "augs/templates/container_templates.h"
 
 #include "generated_introspectors.h"
@@ -394,8 +393,8 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 					const const_entity_handle character = hypersomnia[endpoints[i].controlled_entity];
 
 					if (character.alive()) {
-						auto pos = character.get_logic_transform().pos;
-						auto vel = velocity(character);
+						const auto pos = character.get_logic_transform().pos;
+						const auto vel = character.get_effective_velocity();
 
 						this_step_stats += typesafe_sprintf("\n#%x%x%x %x (%x%x%x)\nPos: %x%x%x\nVel: %x%x%x", whb, i+1, whe, endpoints[i].nickname, ipb, endpoints[i].addr.get_readable_ip(), ipe, whb, pos, whe, whb, vel, whe);
 					}

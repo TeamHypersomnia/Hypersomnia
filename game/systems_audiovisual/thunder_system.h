@@ -8,6 +8,7 @@
 
 struct camera_cone;
 class particles_simulation_system;
+class cosmos;
 
 class thunder_system {
 public:

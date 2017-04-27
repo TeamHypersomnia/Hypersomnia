@@ -116,4 +116,8 @@ namespace components {
 	vec2 transform::interpolation_direction(const transform& previous) const {
 		return pos - previous.pos;
 	}
+
+	vec2 transform::get_orientation() const {
+		return vec2().set_from_degrees(rotation);
+	}
 }

@@ -10,6 +10,11 @@ class basic_physics_mixin {
 public:
 	entity_handle_type get_owner_friction_ground() const;
 	
+	bool is_physical() const {
+		const auto& handle = *static_cast<const entity_handle_type*>(this);
+		return handle.has<components::fixtures>() || handle.has<components::rigid_body>();
+	}
+
 	template <class F>
 	void create_shape_component_from_renderable(
 		const const_logic_step step,

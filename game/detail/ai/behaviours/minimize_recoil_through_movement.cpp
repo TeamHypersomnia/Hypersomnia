@@ -5,7 +5,6 @@
 #include "game/components/movement_component.h"
 #include "game/components/crosshair_component.h"
 #include "game/detail/entity_scripts.h"
-#include "game/detail/position_scripts.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
@@ -24,7 +23,9 @@ namespace behaviours {
 
 			minimize_recoil_through_movement_goal goal;
 
-			goal.movement_direction = (c.base_offset - orientation(subject).set_length(c.base_offset.length()));
+			const auto subject_orientation = subject.get_logic_transform().get_orientation();
+
+			goal.movement_direction = (c.base_offset - subject_orientation * c.base_offset.length());
 			t.set_goal(goal);
 			return tree::goal_availability::SHOULD_EXECUTE;
 		}
