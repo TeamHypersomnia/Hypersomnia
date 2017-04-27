@@ -56,7 +56,7 @@ namespace components {
 
 		/*
 			Normally, this private state could be inferred by iterating over all entities,
-			taking their fixtures_group component and checking if owner_body equals this entity.
+			taking their components::fixtures and checking if owner_body equals this entity.
 			This however would be ridiculously expensive; thusly, we will track fixture_entities in the significant state.
 			
 			Therefore, we only befriend the set_owner_body function and the introspection (unfortunately, necessary).

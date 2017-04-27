@@ -55,8 +55,9 @@ void physics_system::destroy_inferred_state(const const_entity_handle handle) {
 	if (is_constructed_rigid_body(handle)) {
 		auto& cache = get_rigid_body_cache(handle);
 		
-		for (const auto& colliders_cache_id : cache.correspondent_colliders_caches)
+		for (const auto& colliders_cache_id : cache.correspondent_colliders_caches) {
 			colliders_caches[colliders_cache_id] = colliders_cache();
+		}
 
 		b2world->DestroyBody(cache.body);
 
@@ -82,85 +83,91 @@ void physics_system::destroy_inferred_state(const const_entity_handle handle) {
 
 void physics_system::fixtures_construct(const const_entity_handle handle) {
 	//ensure(!is_constructed_colliders(handle));
-	if (is_constructed_colliders(handle)) {
+	const bool is_already_constructed = is_constructed_colliders(handle);
+
+	if (is_already_constructed) {
 		return;
 	}
 
 	const auto colliders = handle.find<components::fixtures>();
 
-	if (colliders != nullptr) {
-		if (colliders.is_activated() && is_constructed_rigid_body(handle.get_owner_body())) {
-			const auto si = handle.get_cosmos().get_si();
-			const auto& group = colliders.get_data();
-			auto& cache = get_colliders_cache(handle);
+	const bool is_anything_to_construct =
+		colliders != nullptr
+		&& colliders.is_activated()
+		&& is_constructed_rigid_body(handle.get_owner_body())
+	;
 
-			const auto owner_body_entity = handle.get_owner_body();
-			ensure(owner_body_entity.alive());
-			auto& owner_cache = get_rigid_body_cache(owner_body_entity);
+	if (is_anything_to_construct) {
+		const auto si = handle.get_cosmos().get_si();
+		const auto& group = colliders.get_data();
+		auto& cache = get_colliders_cache(handle);
 
-			const auto this_cache_id = make_cache_id(handle);
-			const auto owner_cache_id = make_cache_id(owner_body_entity);
+		const auto owner_body_entity = handle.get_owner_body();
+		ensure(owner_body_entity.alive());
+		auto& owner_cache = get_rigid_body_cache(owner_body_entity);
 
-			owner_cache.correspondent_colliders_caches.push_back(this_cache_id);
-			cache.correspondent_rigid_body_cache = owner_cache_id;
+		const auto this_cache_id = make_cache_id(handle);
+		const auto owner_cache_id = make_cache_id(owner_body_entity);
 
-			b2FixtureDef fixdef;
-			fixdef.density = group.density;
-			fixdef.friction = group.friction;
-			fixdef.isSensor = group.sensor;
-			fixdef.filter = group.filter;
-			fixdef.restitution = group.restitution;
-			fixdef.userData = handle.get_id();
+		owner_cache.correspondent_colliders_caches.push_back(this_cache_id);
+		cache.correspondent_rigid_body_cache = owner_cache_id;
 
-			auto& all_fixtures_in_component = cache.all_fixtures_in_component;
-			all_fixtures_in_component.clear();
-			
-			const auto shape_polygon = handle.find<components::shape_polygon>();
+		b2FixtureDef fixdef;
+		fixdef.density = group.density;
+		fixdef.friction = group.friction;
+		fixdef.isSensor = group.sensor;
+		fixdef.filter = group.filter;
+		fixdef.restitution = group.restitution;
+		fixdef.userData = handle.get_id();
 
-			if (shape_polygon != nullptr && shape_polygon.is_activated()) {
-				auto transformed_shape = shape_polygon.get_raw_component().shape;
-				transformed_shape.offset_vertices(colliders.get_total_offset());
+		auto& all_fixtures_in_component = cache.all_fixtures_in_component;
+		all_fixtures_in_component.clear();
+		
+		const auto shape_polygon = handle.find<components::shape_polygon>();
 
-				for (std::size_t ci = 0; ci < transformed_shape.convex_polys.size(); ++ci) {
-					const auto& convex = transformed_shape.convex_polys[ci];
-					std::vector<b2Vec2> b2verts(convex.vertices.begin(), convex.vertices.end());
+		if (shape_polygon != nullptr && shape_polygon.is_activated()) {
+			auto transformed_shape = shape_polygon.get_raw_component().shape;
+			transformed_shape.offset_vertices(colliders.get_total_offset());
 
-					for (auto& v : b2verts) {
-						v = si.get_meters(v);
-					}
+			for (std::size_t ci = 0; ci < transformed_shape.convex_polys.size(); ++ci) {
+				const auto& convex = transformed_shape.convex_polys[ci];
+				std::vector<b2Vec2> b2verts(convex.vertices.begin(), convex.vertices.end());
 
-					b2PolygonShape shape;
-					shape.Set(b2verts.data(), b2verts.size());
-
-					fixdef.shape = &shape;
-					b2Fixture* const new_fix = owner_cache.body->CreateFixture(&fixdef);
-
-					ensure(static_cast<short>(ci) < std::numeric_limits<short>::max());
-					new_fix->index_in_component = static_cast<short>(ci);
-
-					all_fixtures_in_component.push_back(new_fix);
+				for (auto& v : b2verts) {
+					v = si.get_meters(v);
 				}
 
-				return;
-			}
-			
-			const auto shape_circle = handle.find<components::shape_circle>();
-			
-			if (shape_circle != nullptr && shape_circle.is_activated()) {
-				b2CircleShape shape;
-				shape.m_radius = si.get_meters(shape_circle.get_radius());
-			
+				b2PolygonShape shape;
+				shape.Set(b2verts.data(), b2verts.size());
+
 				fixdef.shape = &shape;
 				b2Fixture* const new_fix = owner_cache.body->CreateFixture(&fixdef);
-				
-				new_fix->index_in_component = 0u;
+
+				ensure(static_cast<short>(ci) < std::numeric_limits<short>::max());
+				new_fix->index_in_component = static_cast<short>(ci);
+
 				all_fixtures_in_component.push_back(new_fix);
-				
-				return;
 			}
-			
-			ensure(false && "fixtures requested with no shape attached!");
+
+			return;
 		}
+		
+		const auto shape_circle = handle.find<components::shape_circle>();
+		
+		if (shape_circle != nullptr && shape_circle.is_activated()) {
+			b2CircleShape shape;
+			shape.m_radius = si.get_meters(shape_circle.get_radius());
+		
+			fixdef.shape = &shape;
+			b2Fixture* const new_fix = owner_cache.body->CreateFixture(&fixdef);
+			
+			new_fix->index_in_component = 0u;
+			all_fixtures_in_component.push_back(new_fix);
+			
+			return;
+		}
+		
+		ensure(false && "fixtures requested with no shape attached!");
 	}
 }
 
@@ -168,48 +175,55 @@ void physics_system::create_inferred_state(const const_entity_handle handle) {
 	const auto& cosmos = handle.get_cosmos();
 
 	//ensure(!is_constructed_rigid_body(handle));
-	if (is_constructed_rigid_body(handle)) {
+	const bool is_already_constructed = is_constructed_rigid_body(handle);
+
+	if (is_already_constructed) {
 		return;
 	}
 
 	fixtures_construct(handle);
 
-	if (handle.has<components::rigid_body>()) {
-		const auto& rigid_body = handle.get<components::rigid_body>();
+	const auto rigid_body = handle.find<components::rigid_body>();
+	
+	const bool is_anything_to_construct =
+		rigid_body != nullptr
+		&& rigid_body.is_activated()
+		&& rigid_body.get_fixture_entities().size() > 0
+	;
+
+	if (is_anything_to_construct) {
 		const auto fixture_entities = rigid_body.get_fixture_entities();
 
-		if (rigid_body.is_activated() && fixture_entities.size() > 0) {
-			const auto& physics_data = rigid_body.get_data();
-			auto& cache = get_rigid_body_cache(handle);
+		const auto& physics_data = rigid_body.get_data();
+		auto& cache = get_rigid_body_cache(handle);
 
-			b2BodyDef def;
+		b2BodyDef def;
 
-			switch (physics_data.body_type) {
-			case rigid_body_type::DYNAMIC: def.type = b2BodyType::b2_dynamicBody; break;
-			case rigid_body_type::STATIC: def.type = b2BodyType::b2_staticBody; break;
-			case rigid_body_type::KINEMATIC: def.type = b2BodyType::b2_kinematicBody; break;
-			default:ensure(false) break;
-			}
+		switch (physics_data.body_type) {
+		case rigid_body_type::DYNAMIC: def.type = b2BodyType::b2_dynamicBody; break;
+		case rigid_body_type::STATIC: def.type = b2BodyType::b2_staticBody; break;
+		case rigid_body_type::KINEMATIC: def.type = b2BodyType::b2_kinematicBody; break;
+		default:ensure(false) break;
+		}
 
-			def.userData = handle.get_id();
-			def.bullet = physics_data.bullet;
-			def.transform = physics_data.transform;
-			def.sweep = physics_data.sweep;
-			def.angularDamping = physics_data.angular_damping;
-			def.linearDamping = physics_data.linear_damping;
-			def.fixedRotation = physics_data.fixed_rotation;
-			def.gravityScale = physics_data.gravity_scale;
-			def.active = true;
-			def.linearVelocity = physics_data.velocity;
-			def.angularVelocity = physics_data.angular_velocity;
+		def.userData = handle.get_id();
+		def.bullet = physics_data.bullet;
+		def.transform = physics_data.transform;
+		def.sweep = physics_data.sweep;
+		def.angularDamping = physics_data.angular_damping;
+		def.linearDamping = physics_data.linear_damping;
+		def.fixedRotation = physics_data.fixed_rotation;
+		def.gravityScale = physics_data.gravity_scale;
+		def.active = true;
+		def.linearVelocity = physics_data.velocity;
+		def.angularVelocity = physics_data.angular_velocity;
 
-			cache.body = b2world->CreateBody(&def);
-			cache.body->SetAngledDampingEnabled(physics_data.angled_damping);
-			
-			/* notice that all fixtures must be unconstructed at this moment since we assert that the rigid body itself is not */
-			for (const auto f : fixture_entities) {
-				fixtures_construct(cosmos[f]);
-			}
+		cache.body = b2world->CreateBody(&def);
+		cache.body->SetAngledDampingEnabled(physics_data.angled_damping);
+		
+		/* notice that all fixtures must be unconstructed at this moment since we assert that the rigid body itself is not */
+		for (const auto f : fixture_entities) {
+			fixtures_construct(cosmos[f]);
 		}
 	}
 }

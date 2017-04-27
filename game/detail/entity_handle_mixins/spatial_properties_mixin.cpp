@@ -129,16 +129,20 @@ void spatial_properties_mixin<false, D>::set_logic_transform(
 	}
 	
 	const auto handle = *static_cast<const D*>(this);
-	const auto owner = handle.get_owner_body();
+	const auto owner_body = handle.get_owner_body();
 
-	const bool is_only_fixtural = owner.alive() && owner != handle;
+	const bool this_entity_does_not_have_its_own_transform = 
+		owner_body.alive() 
+		&& owner_body != handle
+	;
 
-	ensure(!is_only_fixtural);
+	ensure(!this_entity_does_not_have_its_own_transform);
 	
-	if (handle.has<components::rigid_body>()) {
+	const auto rigid_body = handle.find<components::rigid_body>();
+
+	if (rigid_body != nullptr) {
 		ensure(!handle.has<components::transform>());
-		const auto& phys = handle.get<components::rigid_body>();
-		phys.set_transform(t);
+		rigid_body.set_transform(t);
 	}
 	else {
 		handle.get<components::transform>() = t;

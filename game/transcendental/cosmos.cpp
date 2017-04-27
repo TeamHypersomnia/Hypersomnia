@@ -341,7 +341,23 @@ entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
 		/*
 			Only now assign the owner_body in a controllable manner.
 		*/
-		new_entity.set_owner_body(owner_of_the_source);
+
+		const bool source_owns_itself = owner_of_the_source == source_entity;
+
+		if (source_owns_itself) {
+			/*
+				If the fixtures of the source entity were owned by the same entity,
+				let the cloned entity also own itself
+			*/
+			new_entity.set_owner_body(new_entity);
+		}
+		else {
+			/*
+				If the fixtures of the source entity were owned by a different entity,
+				let the cloned entity also be owned by that different entity
+			*/
+			new_entity.set_owner_body(owner_of_the_source);
+		}
 	}
 
 	if (source_entity.has<components::inferred_state>()) {
