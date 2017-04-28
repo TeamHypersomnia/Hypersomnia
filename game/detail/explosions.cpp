@@ -67,7 +67,10 @@ void standard_explosion(const standard_explosion_input in) {
 				const vec2 point_b
 			) {
 				const auto body_entity_id = get_id_of_entity_of_body(fix);
-				const bool is_self = body_entity_id == subject.get_id();
+				const bool is_self = 
+					body_entity_id == subject.get_id()
+					|| cosmos[body_entity_id].get_owning_transfer_capability() == subject.get_id()
+				;
 
 				if (is_self) {
 					return callback_result::CONTINUE;
