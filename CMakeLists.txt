@@ -522,8 +522,14 @@ add_definitions(
 	-DAL_ALEXT_PROTOTYPES
 )
 
-add_executable(hypexperientia ${HYPERSOMNIA_SRCS})
-target_link_libraries(hypexperientia ${HYPERSOMNIA_LIBS})
+add_executable(Hypersomnia ${HYPERSOMNIA_SRCS})
+target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS})
+set_target_properties(Hypersomnia PROPERTIES DEBUG_POSTFIX "-Debug")
+set_target_properties(Hypersomnia PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/output")
+
+#set(VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/output")
+#set_target_properties(Hypersomnia PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/output")
+
 
 message(${CMAKE_CXX_FLAGS_RELEASE})
 message(${CMAKE_CXX_FLAGS})
