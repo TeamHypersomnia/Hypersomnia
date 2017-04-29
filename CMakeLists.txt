@@ -434,7 +434,6 @@ set(HYPERSOMNIA_LIBS
 	"Ws2_32.lib"
 	"Gdiplus.lib"
 	"winmm.lib"
-	"shlwapi.lib"
 	"kernel32.lib"
 	"user32.lib"
 	"gdi32.lib"

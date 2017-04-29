@@ -1,7 +1,6 @@
 #include "platform_utils.h"
 #ifdef PLATFORM_WINDOWS
 #include <Windows.h>
-#include <Shlwapi.h>
 #elif PLATFORM_LINUX
 #endif
 #include "augs/templates/string_templates.h"
@@ -66,14 +65,6 @@ namespace augs {
 
 			return result;
 		}*/
-
-		std::string get_executable_path() {
-			wchar_t buffer[MAX_PATH + 1];
-			SecureZeroMemory(buffer, sizeof(buffer));
-			GetModuleFileName(NULL, buffer, MAX_PATH);
-			PathRemoveFileSpec(buffer);
-			return to_string(buffer);
-		}
 
 		void enable_cursor_clipping(ltrbi lt) {
 			thread_local RECT r;

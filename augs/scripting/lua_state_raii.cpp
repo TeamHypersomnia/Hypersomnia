@@ -6,7 +6,7 @@ extern "C" {
 #include "augs/log.h"
 #include "augs/ensure.h"
 #include "augs/filesystem/file.h"
-#include "augs/window_framework/platform_utils.h"
+#include "augs/filesystem/directory.h"
 
 #include "augs/scripting/lua_state_raii.h"
 
@@ -88,9 +88,8 @@ namespace augs {
 
 			to2.erase(to2.end() - 1);
 			if (to2.find(".lua") != std::string::npos) {
-				auto ws = window::get_executable_path();
-				std::string exe_path(ws.begin(), ws.end());
-				std::string full_file_path = (exe_path + "\\" + to2);
+				const auto exe_dir = augs::get_executable_directory();
+				const auto full_file_path = (exe_dir + "\\" + to2);
 				
 				lines += full_file_path + "\n";
 				full_command += full_file_path + " ";
