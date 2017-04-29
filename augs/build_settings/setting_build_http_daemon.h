@@ -1,2 +1,2 @@
 #pragma once
-#define BUILD_HTTP_DAEMON 1
+#define BUILD_HTTP_DAEMON 0

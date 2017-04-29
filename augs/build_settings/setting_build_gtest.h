@@ -1,2 +1,2 @@
 #pragma once
-#define BUILD_GTEST 1
+#define BUILD_GTEST 0
