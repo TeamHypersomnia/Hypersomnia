@@ -431,21 +431,8 @@ set(HYPERSOMNIA_SRCS
 
 set(HYPERSOMNIA_LIBS
 	"OpenGL32.lib"
-	"Ws2_32.lib"
-	"Gdiplus.lib"
-	"winmm.lib"
-	"kernel32.lib"
-	"user32.lib"
-	"gdi32.lib"
-	"winspool.lib"
-	"comdlg32.lib"
-	"advapi32.lib"
-	"shell32.lib"
-	"ole32.lib"
-	"oleaut32.lib"
-	"uuid.lib"
-	"odbc32.lib"
-	"odbccp32.lib"
+	"Ws2_32.lib" 		# for ENet
+	"winmm.lib"  		# for ENet
 	"${PROJECT_SOURCE_DIR}/3rdparty/http/libmicrohttpd.lib"
 	"${PROJECT_SOURCE_DIR}/3rdparty/libsndfile/lib/libsndfile-1.lib"
 )
