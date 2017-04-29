@@ -1,11 +1,14 @@
 #include <array>
 
+#include "augs/al_log.h"
+
+#if BUILD_OPENAL
 #include <AL/al.h>
 #include <AL/alc.h>
+#endif
 
 #include <sndfile.h>
 
-#include "augs/al_log.h"
 #include "augs/ensure.h"
 
 #include "augs/build_settings/setting_log_audio_files.h"
@@ -62,6 +65,7 @@ namespace augs {
 	}
 
 	int single_sound_buffer::data_type::get_format() const {
+#if BUILD_OPENAL
 		if (channels == 1) {
 			return AL_FORMAT_MONO16;
 		}
@@ -72,6 +76,9 @@ namespace augs {
 		const bool bad_format = true;
 		ensure(!bad_format);
 		return AL_FORMAT_MONO8;
+#else
+		return 0xdeadbeef;
+#endif
 	}
 
 	//single_sound_buffer::data_type single_sound_buffer::get_data() const {

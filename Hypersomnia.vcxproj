@@ -1062,6 +1062,7 @@
     <ClInclude Include="application\ui\locations\option_button_in_menu.h" />
     <ClInclude Include="application\ui\option_button.h" />
     <ClInclude Include="augs\build_settings\setting_build_gtest.h" />
+    <ClInclude Include="augs\build_settings\setting_build_openal.h" />
     <ClInclude Include="augs\build_settings\setting_empty_bases.h" />
     <ClInclude Include="augs\build_settings\setting_entity_handle_has_debug_name_reference.h" />
     <ClInclude Include="augs\build_settings\setting_log_audio_files.h" />

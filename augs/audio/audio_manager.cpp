@@ -1,16 +1,20 @@
 #include "audio_manager.h"
 
+#include "augs/al_log.h"
+
+#if BUILD_OPENAL
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <AL/efx.h>
 #include <AL/alext.h>
+#endif
 
-#include "augs/al_log.h"
 #include "augs/ensure.h"
 
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 
+#if BUILD_OPENAL
 static std::string list_audio_devices(const ALCchar * const devices) {
 	const ALCchar *device = devices, *next = devices + 1;
 	size_t len = 0;
@@ -28,6 +32,7 @@ static std::string list_audio_devices(const ALCchar * const devices) {
 
 	return devices_list;
 }
+#endif
 
 namespace augs {
 	void audio_manager::generate_alsoft_ini(
@@ -47,6 +52,7 @@ namespace augs {
 	}
 
 	audio_manager::audio_manager(const std::string output_device_name) {
+#if BUILD_OPENAL
 		alGetError();
 
 		device = alcOpenDevice(output_device_name.size() > 0 ? output_device_name.c_str() : nullptr);
@@ -79,18 +85,25 @@ namespace augs {
 
 		LOG("Default device: %x", alcGetString(nullptr, ALC_DEFAULT_DEVICE_SPECIFIER));
 		LOG("HRTF status: %x", hrtf_status);
+#endif
 	}
 
 	bool audio_manager::make_current() {
+#if BUILD_OPENAL
 		return (alcMakeContextCurrent(context)) == ALC_TRUE;
+#else
+		return true;
+#endif
 	}
 
 	audio_manager::~audio_manager() {
+#if BUILD_OPENAL
 		AL_CHECK(alcMakeContextCurrent(nullptr));
 		alcDestroyContext(context);
 		alcCloseDevice(device);
 		LOG("Destroyed audio manager");
 		context = nullptr;
 		device = nullptr;
+#endif
 	}
 }

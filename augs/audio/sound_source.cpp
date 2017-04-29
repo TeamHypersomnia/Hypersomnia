@@ -1,12 +1,15 @@
 #include "sound_source.h"
 #include "sound_buffer.h"
 
+#include "augs/al_log.h"
+
+#if BUILD_OPENAL
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <AL/alext.h>
 #include <AL/efx.h>
+#endif
 
-#include "augs/al_log.h"
 #include "augs/math/vec2.h"
 #include "augs/math/si_scaling.h"
 
@@ -177,9 +180,13 @@ namespace augs {
 	}
 
 	bool sound_source::is_playing() const {
+#if BUILD_OPENAL
 		ALenum state = 0xdeadbeef;
 		AL_CHECK(alGetSourcei(id, AL_SOURCE_STATE, &state));
 		return state == AL_PLAYING;
+#else
+		return false;
+#endif
 	}
 
 	void sound_source::bind_buffer(const single_sound_buffer& buf) {

@@ -1,5 +1,7 @@
 #include "al_log.h"
 #include "ensure.h"
+
+#if BUILD_OPENAL
 #include <AL/al.h>
 
 const char * GetOpenALErrorString(int errID) {
@@ -21,3 +23,4 @@ void CheckOpenALError(const char* stmt, const char* fname, int line) {
 		ensure(false);
 	}
 };
+#endif
