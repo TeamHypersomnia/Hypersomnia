@@ -11,7 +11,6 @@ namespace bindings {
 	extern luabind::scope
 		_vec2(),
 		_rgba(),
-		_rect_ltrb(),
 		_rect_xywh(),
 		_glwindow();
 }
@@ -27,7 +26,6 @@ void bind_game_and_augs(augs::lua_state_raii& wrapper) {
 
 	luabind::module(raw)[
 			bindings::_rgba(),
-			bindings::_rect_ltrb(),
 			bindings::_rect_xywh(),
 			bindings::_glwindow(),
 

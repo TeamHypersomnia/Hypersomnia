@@ -231,7 +231,6 @@ set(HYPERSOMNIA_SRCS
 	"augs/window_framework/colored_print.cpp"
 	"augs/window_framework/platform_utils.cpp"
 	"game/bindings/classes/glwindow_binding.cpp"
-	"game/bindings/classes/rect_ltrb_binding.cpp"
 	"game/bindings/classes/rect_xywh_binding.cpp"
 	"game/bindings/classes/rgba_binding.cpp"
 	"game/bindings/classes/vec2_binding.cpp"
