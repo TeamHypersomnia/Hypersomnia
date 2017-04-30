@@ -49,22 +49,18 @@ Open Hypersomnia.sln file, select **Release** configuration and hit **F7** to bu
 
 As it currently stands, the game is known to build successfully only with Visual Studio 2017 under Win32. Compilers from Visual Studio 2015 do not support some of the language features I'm using.
 
-If you dream about creating an entirely new mechanic, I recommend that you be familiar with component-based entity architecture beforehand.
-Better yet, tell me about your plans! Together we can deal with problems more swiftly.
+# Contributing
+
+We fondly welcome every pull request, should it even be a typo fix or a missing const guarantee.
+
+If you however plan to add a completely new feature, please notice us in advance, because the project is continuously in a very, very active development and may undergo a revolution when it is the least expected.
+I also recommend that you be familiar with component-based entity architecture beforehand.
 
 You will be added to our TeamHypersomnia organization once we accept at least one of your pull requests.
 
 If you have questions, just ask me via mail: patryk.czachurski@gmail.com
 
 Or if you just can't wait to utter some brilliant suggestions regarding the game, please do so, too!
-
-# Contributing
-
-We fondly welcome every pull request, should it even be a typo fix or a missing const guarantee.
-
-If you however plan to add a completely new feature, please notice us in advance, because the project is continuously in a very, very active development and may undergo a revolution when it is the least expected.
-
-[Mail](mailto:patryk.czachurski@gmail.com).
 
 # Launching
 
