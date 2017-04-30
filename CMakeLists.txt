@@ -49,45 +49,6 @@ set(HYPERSOMNIA_SRCS
 	"3rdparty/Box2D/Dynamics/Joints/b2WeldJoint.cpp"
 	"3rdparty/Box2D/Dynamics/Joints/b2WheelJoint.cpp"
 	"3rdparty/Box2D/Rope/b2Rope.cpp"
-	"3rdparty/freetype/src/autofit/autofit.c"
-	"3rdparty/freetype/src/bdf/bdf.c"
-	"3rdparty/freetype/src/cff/cff.c"
-	"3rdparty/freetype/src/base/ftbase.c"
-	"3rdparty/freetype/src/base/ftbitmap.c"
-	"3rdparty/freetype/src/cache/ftcache.c"
-	"3rdparty/freetype/builds/windows/ftdebug.c"
-	"3rdparty/freetype/src/base/ftfstype.c"
-	"3rdparty/freetype/src/base/ftgasp.c"
-	"3rdparty/freetype/src/base/ftglyph.c"
-	"3rdparty/freetype/src/gzip/ftgzip.c"
-	"3rdparty/freetype/src/base/ftinit.c"
-	"3rdparty/freetype/src/lzw/ftlzw.c"
-	"3rdparty/freetype/src/base/ftstroke.c"
-	"3rdparty/freetype/src/base/ftsystem.c"
-	"3rdparty/freetype/src/smooth/smooth.c"
-	"3rdparty/freetype/src/base/ftbbox.c"
-	"3rdparty/freetype/src/base/ftfntfmt.c"
-	"3rdparty/freetype/src/base/ftmm.c"
-	"3rdparty/freetype/src/base/ftpfr.c"
-	"3rdparty/freetype/src/base/ftsynth.c"
-	"3rdparty/freetype/src/base/fttype1.c"
-	"3rdparty/freetype/src/base/ftwinfnt.c"
-	"3rdparty/freetype/src/base/ftlcdfil.c"
-	"3rdparty/freetype/src/base/ftgxval.c"
-	"3rdparty/freetype/src/base/ftotval.c"
-	"3rdparty/freetype/src/base/ftpatent.c"
-	"3rdparty/freetype/src/pcf/pcf.c"
-	"3rdparty/freetype/src/pfr/pfr.c"
-	"3rdparty/freetype/src/psaux/psaux.c"
-	"3rdparty/freetype/src/pshinter/pshinter.c"
-	"3rdparty/freetype/src/psnames/psmodule.c"
-	"3rdparty/freetype/src/raster/raster.c"
-	"3rdparty/freetype/src/sfnt/sfnt.c"
-	"3rdparty/freetype/src/truetype/truetype.c"
-	"3rdparty/freetype/src/type1/type1.c"
-	"3rdparty/freetype/src/cid/type1cid.c"
-	"3rdparty/freetype/src/type42/type42.c"
-	"3rdparty/freetype/src/winfonts/winfnt.c"
 	"3rdparty/GL/glew.c"
 	"3rdparty/GL/OpenGL.cpp"
 	"3rdparty/lodepng/lodepng.cpp"
@@ -432,8 +393,6 @@ set(HYPERSOMNIA_LIBS
 set(HYPERSOMNIA_INCLUDE_DIRS
 	"${PROJECT_SOURCE_DIR}"
 	"${PROJECT_SOURCE_DIR}/3rdparty"
-	"${PROJECT_SOURCE_DIR}/3rdparty/freetype"
-	"${PROJECT_SOURCE_DIR}/3rdparty/freetype/include"
 	"${PROJECT_SOURCE_DIR}/3rdparty/libsndfile/include"
 	"${PROJECT_SOURCE_DIR}/3rdparty/lua"
 	"${PROJECT_SOURCE_DIR}/3rdparty/luabind-deboostified"
@@ -499,6 +458,7 @@ add_definitions(
 )
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/3rdparty/enet")
+add_subdirectory("${PROJECT_SOURCE_DIR}/3rdparty/freetype")
 
 get_property(dirs TARGET enet PROPERTY INCLUDE_DIRECTORIES)
 
@@ -507,23 +467,25 @@ foreach(dir ${dirs})
 	include_directories(${dir})
 endforeach()
 
+get_property(fdirs TARGET freetype PROPERTY INCLUDE_DIRECTORIES)
+
+foreach(dir ${fdirs})
+	message(STATUS "external include dir='${dir}'")
+	include_directories(${dir})
+endforeach()
+
+#set(ENV{FREETYPE_DIR} "${PROJECT_SOURCE_DIR}/3rdparty/freetype")
+
+#find_package(Freetype REQUIRED)
+#include_directories(${FREETYPE_INCLUDE_DIRS})
+
 include_directories(${HYPERSOMNIA_INCLUDE_DIRS})
 
 add_executable(Hypersomnia ${HYPERSOMNIA_SRCS})
-target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS})
-target_link_libraries(Hypersomnia enet)
+target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS} enet freetype)
+
 set_target_properties(Hypersomnia PROPERTIES DEBUG_POSTFIX "-Debug")
 set_target_properties(Hypersomnia PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/output")
 
 #set(VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/output")
 #set_target_properties(Hypersomnia PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/output")
-
-
-message(${CMAKE_CXX_FLAGS_RELEASE})
-message(${CMAKE_CXX_FLAGS})
-message(${PROJECT_SOURCE_DIR})
-message(${PROJECT_BINARY_DIR})
-message(${CMAKE_SOURCE_DIR})
-message(${CMAKE_BINARY_DIR})
-message(${CMAKE_CURRENT_SOURCE_DIR})
-message(${CMAKE_CURRENT_BINARY_DIR})
