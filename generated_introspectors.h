@@ -1930,6 +1930,16 @@ namespace augs {
 
 			FIELD(determinism_test_cloned_cosmoi_count);
 
+			FIELD(window_name);
+			FIELD(fullscreen);
+			FIELD(window_border);
+			FIELD(window_x);
+			FIELD(window_y);
+			FIELD(bpp);
+			FIELD(resolution_w);
+			FIELD(resolution_h);
+			FIELD(doublebuffer);
+
 			FIELD(check_content_integrity_every_launch);
 			FIELD(save_regenerated_atlases_as_binary);
 			FIELD(debug_regenerate_content_every_launch);

@@ -15,8 +15,8 @@
 
 class game_window;
 
-namespace augs {
-	class lua_state_raii;
+namespace sol {
+	class state;
 }
 
 class config_lua_table {
@@ -28,6 +28,16 @@ public:
 	float recording_replay_speed = 1.f;
 
 	unsigned determinism_test_cloned_cosmoi_count = 0;
+
+	std::string window_name = "example";
+	bool fullscreen = false;
+	bool window_border = 1;
+	unsigned window_x = 100;
+	unsigned window_y = 10;
+	unsigned bpp = 24;
+	unsigned resolution_w = 1280;
+	unsigned resolution_h = 768;
+	bool doublebuffer = true;
 
 	bool check_content_integrity_every_launch = false;
 	bool save_regenerated_atlases_as_binary = false;
@@ -92,7 +102,7 @@ public:
 	hotbar_settings hotbar;
 	// END GEN INTROSPECTOR
 
-	void get_values(augs::lua_state_raii&);
+	void get_values(sol::state&);
 
 	enum class launch_type {
 		MAIN_MENU,

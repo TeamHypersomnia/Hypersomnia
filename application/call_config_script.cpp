@@ -1,20 +1,10 @@
 #include "call_config_script.h"
 #include "augs/filesystem/file.h"
-#include "augs/scripting/lua_state_raii.h"
 
-#include <luabind/luabind.hpp>
-
-void call_window_script(
-	augs::lua_state_raii& lua,
-	game_window& window,
-	const std::string& window_lua_path
-) {
-	lua.global_ptr("global_gl_window", &window.window);
-	lua.dofile_and_report_errors(window_lua_path);
-}
+#include <sol.hpp>
 
 void call_config_script(
-	augs::lua_state_raii& lua,
+	sol::state& lua,
 	const std::string& config_lua_path,
 	const std::string& config_local_lua_path
 ) {
@@ -24,5 +14,12 @@ void call_config_script(
 		used_filename = config_local_lua_path;
 	}
 
-	lua.dofile_and_report_errors(used_filename);
+	lua.script_file(used_filename, [](
+		lua_State* L, 
+		sol::protected_function_result pfr
+	){
+		LOG(pfr.operator std::string());
+		ensure(pfr.valid());
+		return pfr;
+	});
 }

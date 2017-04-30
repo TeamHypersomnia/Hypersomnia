@@ -68,28 +68,28 @@ config_table = {
 
 	-- game window settings
 	window_name = "example",
-	fullscreen = 0,
+	fullscreen = false,
 	window_border = 1,
 	window_x = 100,
 	window_y = 10,
 	bpp = 24,
 	resolution_w = 1280,
 	resolution_h = 768,
-	doublebuffer = 1,
+	doublebuffer = true,
 
-	check_content_integrity_every_launch = 1,
+	check_content_integrity_every_launch = true,
 
 	-- 1 - more hdd space required, but launching the game is way faster
-	save_regenerated_atlases_as_binary = 1,
+	save_regenerated_atlases_as_binary = true,
 
 	-- 1 always regenerates the entire content. only for debugging pruposes - the game will take a lot longer to launch every time.
-	debug_regenerate_content_every_launch = 0,
+	debug_regenerate_content_every_launch = false,
 
 	-- should run googletest on every launch? When it's on, it may possibly take longer to launch in debug mode. 
-	debug_run_unit_tests = 1,
+	debug_run_unit_tests = true,
 
 	-- should enable head-related transfer function for OpenAL?
-	enable_hrtf = 1,
+	enable_hrtf = true,
 
 	-- maximum number of audible sound effects
 	max_number_of_sound_sources = 4096,
@@ -103,10 +103,10 @@ config_table = {
 	music_volume = 1,
 
 	-- Flag. 1 disables the cursor clipping so that it is easier to mark a breakpoint, for example. 0 is for normal playing.
-	debug_disable_cursor_clipping = 0,
+	debug_disable_cursor_clipping = false,
 	
 	-- vec2. Sensitivity of mouse movement in-game.
-	mouse_sensitivity = vec2(1.5, 1.5),
+	mouse_sensitivity = vec2.new(1.5, 1.5),
 	
 	-- Network variables. See launch_mode for details.
 	connect_address = "192.168.1.8",
@@ -138,13 +138,13 @@ config_table = {
 	debug_var = 0,
 
 	-- Used by the server to inject random inputs to the other players to examine and test lag compensation strategies.
-	debug_randomize_entropies_in_client_setup = 1,
+	debug_randomize_entropies_in_client_setup = true,
 
 	-- How often the above input injection happens. The less it is, the more erratic the movements are.
 	debug_randomize_entropies_in_client_setup_once_every_steps = 1,
 
 	-- Flag. 1 will launch a http daemon on the localhost in a separate thread which samples the server statistics. Used as a widget on http://hypersomnia.pl
-	server_launch_http_daemon = 1,
+	server_launch_http_daemon = true,
 
 	-- What port to open the web daemon on. Recommended value: 80.
 	server_http_daemon_port = 80,
@@ -180,22 +180,22 @@ config_table = {
 	rewind_intro_scene_by_secs = 3.5,
 	start_menu_music_at_secs = 63.5 - 22.5,
 
-	skip_credits = 0,
+	skip_credits = false,
 	
 	-- Url for the rolling news bar in the main menu
 	latest_news_url = "http://hypersomnia.pl/latest_post/",
 
 	-- hotbar appearance settings
-	hotbar_increase_inside_alpha_when_selected = 0,
-	hotbar_colorize_inside_when_selected = 1,
-	hotbar_primary_selected_color = rgba(0, 255, 255, 255),
-	hotbar_secondary_selected_color = rgba(86, 156, 214, 255),
+	hotbar_increase_inside_alpha_when_selected = false,
+	hotbar_colorize_inside_when_selected = true,
+	hotbar_primary_selected_color = rgba.new(0, 255, 255, 255),
+	hotbar_secondary_selected_color = rgba.new(86, 156, 214, 255),
 
 	-- debug drawing settings
-	debug_drawing_enabled = 1,
-	debug_draw_colinearization = 0,
-	debug_draw_forces = 1,
-	debug_draw_friction_field_collisions_of_entering = 0,
-	debug_draw_explosion_forces = 0,
-	debug_draw_visibility = 0
+	debug_drawing_enabled = true,
+	debug_draw_colinearization = false,
+	debug_draw_forces = true,
+	debug_draw_friction_field_collisions_of_entering = false,
+	debug_draw_explosion_forces = false,
+	debug_draw_visibility = false
 }

@@ -1,39 +1,18 @@
-#include "stdafx.h"
-#include "bindings.h"
-
-#include "game/bindings/bind_game_and_augs.h"
-#include "augs/scripting/lua_state_raii.h"
-
 #include "augs/log.h"
-#include <luabind/class_info.hpp>
 
-namespace bindings {
-	extern luabind::scope
-		_vec2(),
-		_rgba(),
-		_rect_xywh(),
-		_glwindow();
-}
+#include <sol.hpp>
 
-static void LOG_surrogate(const std::string& s) {
-	LOG(s);
-}
+#include "augs/math/vec2.h"
+#include "augs/graphics/pixel.h"
 
-void bind_game_and_augs(augs::lua_state_raii& wrapper) {
-	lua_State* raw = wrapper;
+void bind_game_and_augs(sol::state& wrapper) {
+	wrapper.new_usertype<vec2>(
+		"vec2",
+		sol::constructors<vec2, vec2(float, float)>()
+	);
 
-	luabind::open(raw);
-
-	luabind::module(raw)[
-			bindings::_rgba(),
-			bindings::_rect_xywh(),
-			bindings::_glwindow(),
-
-			luabind::def("LOG", LOG_surrogate),
-
-			bindings::_vec2()
-	];
-
-	//wrapper.global("THIS_LUA_STATE", wrapper);
-	luabind::bind_class_info(raw);
+	wrapper.new_usertype<rgba>(
+		"rgba",
+		sol::constructors<rgba, rgba(rgba_channel, rgba_channel, rgba_channel, rgba_channel)>()
+	);
 }

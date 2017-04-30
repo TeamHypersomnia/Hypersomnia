@@ -17,30 +17,24 @@
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "game/bindings/bind_game_and_augs.h"
 
-#include "augs/scripting/lua_state_raii.h"
-
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
+#include "augs/window_framework/platform_utils.h"
+
 #include <sol.hpp>
+
 /*
 	The usage of std::make_unique calls in main is to prevent stack overflow
 	due to otherwise there possibly being many cosmoi and resources on the stack.
 */
 
 int main(int argc, char** argv) {
-	{
-		sol::state lua;
-		int x = 0;
-		lua.set_function("beep", [&x]{ ++x; });
-		lua.script("beep()");
-		ensure_eq(1, x);
-	}
-
 	augs::create_directories("generated/logs/");
 
 	augs::global_libraries::init();
 
-	augs::lua_state_raii lua;
+	sol::state lua;
+	lua.open_libraries( sol::lib::base );
 	bind_game_and_augs(lua);
 
 	config_lua_table cfg;
@@ -71,7 +65,44 @@ int main(int argc, char** argv) {
 	auto resources = std::make_unique<assets_manager>();
 	resources->set_as_current();
 
-	call_window_script(lua, window, "window.lua");
+	{
+		augs::window::set_cursor_visible(cfg.debug_disable_cursor_clipping);
+
+		xywhi screen_rect = {
+			static_cast<int>(cfg.window_x),	
+			static_cast<int>(cfg.window_y),	
+			static_cast<int>(cfg.resolution_w),	
+			static_cast<int>(cfg.resolution_h)	
+		};
+
+		if (cfg.fullscreen) {
+			const auto display = augs::window::get_display();
+
+			screen_rect.x = 0;
+			screen_rect.y = 0;
+			screen_rect.w = display.w;
+			screen_rect.h = display.h;
+
+			augs::window::set_display(display.w, display.h, cfg.bpp);
+		}
+
+		bool enable_window_border = cfg.window_border;
+
+		if (cfg.fullscreen) {
+			enable_window_border = false;
+		}
+
+		window.window.create(
+			screen_rect,
+			enable_window_border,
+			cfg.window_name,
+			cfg.doublebuffer,
+			cfg.bpp
+		);
+
+		window.window.set_vsync(0);
+		window.window.set_as_current();
+	}
 
 	gl.initialize();
 	gl.initialize_fbos(window.get_screen_size());

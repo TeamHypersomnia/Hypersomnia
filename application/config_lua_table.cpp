@@ -1,7 +1,6 @@
 #include "config_lua_table.h"
 #include "game_window.h"
 
-#include <luabind/luabind.hpp>
 #include "game/bindings/bind_game_and_augs.h"
 #include "augs/log.h"
 
@@ -10,20 +9,21 @@
 #include "game/view/viewing_session.h"
 
 #include "game/detail/gui/character_gui.h"
-#include "augs/scripting/lua_state_raii.h"
 
 #include "generated_introspectors.h"
+#include <sol.hpp>
 
 template<class T>
-static void get_config_value(augs::lua_state_raii& lua, const std::string& field, T& into) {
-	into = luabind::object_cast<T>(luabind::globals(lua)["config_table"][field]);
+static void get_config_value(
+	sol::state& lua, 
+	const std::string& field, 
+	T& into
+) {
+	auto cfg_table = lua["config_table"];
+	into = cfg_table[field].get<T>();
 }
 
-static void get_config_value(augs::lua_state_raii& lua, const std::string& field, bool& into) {
-	into = luabind::object_cast<double>(luabind::globals(lua)["config_table"][field]) > 0.0;
-}
-
-void config_lua_table::get_values(augs::lua_state_raii& lua) {
+void config_lua_table::get_values(sol::state& lua) {
 	std::string current_prefix;
 
 	static_assert(!bind_types<can_stream_right, std::istringstream>::type<debug_drawing_settings>::value, "Trait has failed");

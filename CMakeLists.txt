@@ -52,27 +52,6 @@ set(HYPERSOMNIA_SRCS
 	"3rdparty/GL/glew.c"
 	"3rdparty/GL/OpenGL.cpp"
 	"3rdparty/lodepng/lodepng.cpp"
-	"3rdparty/luabind-deboostified/src/class.cpp"
-	"3rdparty/luabind-deboostified/src/class_info.cpp"
-	"3rdparty/luabind-deboostified/src/class_registry.cpp"
-	"3rdparty/luabind-deboostified/src/class_rep.cpp"
-	"3rdparty/luabind-deboostified/src/create_class.cpp"
-	"3rdparty/luabind-deboostified/src/error.cpp"
-	"3rdparty/luabind-deboostified/src/exception_handler.cpp"
-	"3rdparty/luabind-deboostified/src/function.cpp"
-	"3rdparty/luabind-deboostified/src/function_introspection.cpp"
-	"3rdparty/luabind-deboostified/src/headertest.cpp"
-	"3rdparty/luabind-deboostified/src/inheritance.cpp"
-	"3rdparty/luabind-deboostified/src/link_compatibility.cpp"
-	"3rdparty/luabind-deboostified/src/object_rep.cpp"
-	"3rdparty/luabind-deboostified/src/open.cpp"
-	"3rdparty/luabind-deboostified/src/operator.cpp"
-	"3rdparty/luabind-deboostified/src/pcall.cpp"
-	"3rdparty/luabind-deboostified/src/scope.cpp"
-	"3rdparty/luabind-deboostified/src/set_package_preload.cpp"
-	"3rdparty/luabind-deboostified/src/stack_content_by_name.cpp"
-	"3rdparty/luabind-deboostified/src/weak_ref.cpp"
-	"3rdparty/luabind-deboostified/src/wrapper_base.cpp"
 	"3rdparty/polypartition/src/polypartition.cpp"
 	"3rdparty/rectpack2D/src/pack.cpp"
 	"application/call_config_script.cpp"
@@ -230,10 +209,6 @@ set(HYPERSOMNIA_SRCS
 	"augs/templates/templates.cpp"
 	"augs/window_framework/colored_print.cpp"
 	"augs/window_framework/platform_utils.cpp"
-	"game/bindings/classes/glwindow_binding.cpp"
-	"game/bindings/classes/rect_xywh_binding.cpp"
-	"game/bindings/classes/rgba_binding.cpp"
-	"game/bindings/classes/vec2_binding.cpp"
 	"game/bindings/bind_game_and_augs.cpp"
 	"game/components/animation_component.cpp"
 	"game/components/car_component.cpp"
@@ -334,7 +309,6 @@ set(HYPERSOMNIA_SRCS
 	"augs/gui/text/printer.cpp"
 	"augs/gui/text/ui.cpp"
 	"augs/gui/text/word_separator.cpp"
-	"augs/scripting/lua_state_raii.cpp"
 	"augs/math/rects.cpp"
 	"augs/math/vec2.cpp"
 	"augs/misc/fixed_delta_timer.cpp"
@@ -346,6 +320,13 @@ set(HYPERSOMNIA_SRCS
 	"augs/window_framework/event.cpp"
 	"augs/window_framework/window.cpp"
 	"application/setups/two_clients_and_server_setup.cpp"
+)
+
+file(GLOB_RECURSE HYPERSOMNIA_HEADERS
+    "augs/*.h"
+    "game/*.h"
+    "application/*.h"
+    "3rdparty/Box2D/*.h"
 )
 
 # We will be building Lua manually.
@@ -401,7 +382,6 @@ set(HYPERSOMNIA_INCLUDE_DIRS
 	"${PROJECT_SOURCE_DIR}/3rdparty"
 	"${PROJECT_SOURCE_DIR}/3rdparty/libsndfile/include"
 	"${PROJECT_SOURCE_DIR}/3rdparty/lua"
-	"${PROJECT_SOURCE_DIR}/3rdparty/luabind-deboostified"
 	"${PROJECT_SOURCE_DIR}/3rdparty/sol2/single/sol"
 )
 
@@ -461,7 +441,6 @@ add_definitions(
 	-D_SCL_SECURE_NO_WARNINGS
 	-DAL_LIBTYPE_STATIC
 	-DAL_ALEXT_PROTOTYPES
-	-DLUABIND_CPLUSPLUS_LUA
 	-DSOL_USING_CXX_LUA
 )
 
@@ -485,7 +464,7 @@ add_include_dirs_of("freetype")
 
 include_directories(${HYPERSOMNIA_INCLUDE_DIRS})
 
-add_executable(Hypersomnia ${HYPERSOMNIA_SRCS})
+add_executable(Hypersomnia ${HYPERSOMNIA_SRCS} ${HYPERSOMNIA_HEADERS})
 target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS} enet freetype lua)
 
 set_target_properties(Hypersomnia PROPERTIES DEBUG_POSTFIX "-Debug")
