@@ -25,3 +25,6 @@
 [submodule "3rdparty/lodepng"]
 	path = 3rdparty/lodepng
 	url = https://github.com/lvandeve/lodepng.git
+[submodule "3rdparty/sol2"]
+	path = 3rdparty/sol2
+	url = https://github.com/ThePhD/sol2.git
