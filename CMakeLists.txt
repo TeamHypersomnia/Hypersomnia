@@ -460,24 +460,17 @@ add_definitions(
 add_subdirectory("${PROJECT_SOURCE_DIR}/3rdparty/enet")
 add_subdirectory("${PROJECT_SOURCE_DIR}/3rdparty/freetype")
 
-get_property(dirs TARGET enet PROPERTY INCLUDE_DIRECTORIES)
+macro(add_include_dirs_of target_name)
+	get_property(dirs TARGET ${target_name} PROPERTY INCLUDE_DIRECTORIES)
+	
+	foreach(dir ${dirs})
+		message(STATUS "adding external include dir='${dir}'")
+		include_directories(${dir})
+	endforeach()
+endmacro(add_include_dirs_of target_name)
 
-foreach(dir ${dirs})
-	message(STATUS "external include dir='${dir}'")
-	include_directories(${dir})
-endforeach()
-
-get_property(fdirs TARGET freetype PROPERTY INCLUDE_DIRECTORIES)
-
-foreach(dir ${fdirs})
-	message(STATUS "external include dir='${dir}'")
-	include_directories(${dir})
-endforeach()
-
-#set(ENV{FREETYPE_DIR} "${PROJECT_SOURCE_DIR}/3rdparty/freetype")
-
-#find_package(Freetype REQUIRED)
-#include_directories(${FREETYPE_INCLUDE_DIRS})
+add_include_dirs_of("enet")
+add_include_dirs_of("freetype")
 
 include_directories(${HYPERSOMNIA_INCLUDE_DIRS})
 
