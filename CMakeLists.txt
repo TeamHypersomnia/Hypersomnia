@@ -73,39 +73,6 @@ set(HYPERSOMNIA_SRCS
 	"3rdparty/luabind-deboostified/src/stack_content_by_name.cpp"
 	"3rdparty/luabind-deboostified/src/weak_ref.cpp"
 	"3rdparty/luabind-deboostified/src/wrapper_base.cpp"
-	"3rdparty/lua/lapi.c"
-	"3rdparty/lua/lauxlib.c"
-	"3rdparty/lua/lbaselib.c"
-	"3rdparty/lua/lbitlib.c"
-	"3rdparty/lua/lcode.c"
-	"3rdparty/lua/lcorolib.c"
-	"3rdparty/lua/lctype.c"
-	"3rdparty/lua/ldblib.c"
-	"3rdparty/lua/ldebug.c"
-	"3rdparty/lua/ldo.c"
-	"3rdparty/lua/ldump.c"
-	"3rdparty/lua/lfunc.c"
-	"3rdparty/lua/lgc.c"
-	"3rdparty/lua/linit.c"
-	"3rdparty/lua/liolib.c"
-	"3rdparty/lua/llex.c"
-	"3rdparty/lua/lmathlib.c"
-	"3rdparty/lua/lmem.c"
-	"3rdparty/lua/loadlib.c"
-	"3rdparty/lua/lobject.c"
-	"3rdparty/lua/lopcodes.c"
-	"3rdparty/lua/loslib.c"
-	"3rdparty/lua/lparser.c"
-	"3rdparty/lua/lstate.c"
-	"3rdparty/lua/lstring.c"
-	"3rdparty/lua/lstrlib.c"
-	"3rdparty/lua/ltable.c"
-	"3rdparty/lua/ltablib.c"
-	"3rdparty/lua/ltm.c"
-	"3rdparty/lua/lundump.c"
-	"3rdparty/lua/lutf8lib.c"
-	"3rdparty/lua/lvm.c"
-	"3rdparty/lua/lzio.c"
 	"3rdparty/polypartition/src/polypartition.cpp"
 	"3rdparty/rectpack2D/src/pack.cpp"
 	"application/call_config_script.cpp"
@@ -382,6 +349,44 @@ set(HYPERSOMNIA_SRCS
 	"application/setups/two_clients_and_server_setup.cpp"
 )
 
+# Manually building Lua and setting proper variables for both Hypersomnia and Luabind.
+
+set(LUA_SRCS
+	"3rdparty/lua/lapi.c"
+	"3rdparty/lua/lauxlib.c"
+	"3rdparty/lua/lbaselib.c"
+	"3rdparty/lua/lbitlib.c"
+	"3rdparty/lua/lcode.c"
+	"3rdparty/lua/lcorolib.c"
+	"3rdparty/lua/lctype.c"
+	"3rdparty/lua/ldblib.c"
+	"3rdparty/lua/ldebug.c"
+	"3rdparty/lua/ldo.c"
+	"3rdparty/lua/ldump.c"
+	"3rdparty/lua/lfunc.c"
+	"3rdparty/lua/lgc.c"
+	"3rdparty/lua/linit.c"
+	"3rdparty/lua/liolib.c"
+	"3rdparty/lua/llex.c"
+	"3rdparty/lua/lmathlib.c"
+	"3rdparty/lua/lmem.c"
+	"3rdparty/lua/loadlib.c"
+	"3rdparty/lua/lobject.c"
+	"3rdparty/lua/lopcodes.c"
+	"3rdparty/lua/loslib.c"
+	"3rdparty/lua/lparser.c"
+	"3rdparty/lua/lstate.c"
+	"3rdparty/lua/lstring.c"
+	"3rdparty/lua/lstrlib.c"
+	"3rdparty/lua/ltable.c"
+	"3rdparty/lua/ltablib.c"
+	"3rdparty/lua/ltm.c"
+	"3rdparty/lua/lundump.c"
+	"3rdparty/lua/lutf8lib.c"
+	"3rdparty/lua/lvm.c"
+	"3rdparty/lua/lzio.c"
+)
+
 set(HYPERSOMNIA_LIBS
 	"OpenGL32.lib"
 	"Ws2_32.lib" 		# for ENet
@@ -457,6 +462,13 @@ add_definitions(
 	-DAL_ALEXT_PROTOTYPES
 )
 
+# We build lua sources manually as there is no up-to-date CMakeLists for lua.
+
+add_library(lua ${LUA_SRCS})
+set(LUA_LIBRARIES "lua")
+set(LUA_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/3rdparty/lua")
+set(LUA_FOUND TRUE)
+
 add_subdirectory("${PROJECT_SOURCE_DIR}/3rdparty/enet")
 add_subdirectory("${PROJECT_SOURCE_DIR}/3rdparty/freetype")
 
@@ -475,7 +487,7 @@ add_include_dirs_of("freetype")
 include_directories(${HYPERSOMNIA_INCLUDE_DIRS})
 
 add_executable(Hypersomnia ${HYPERSOMNIA_SRCS})
-target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS} enet freetype)
+target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS} enet freetype lua)
 
 set_target_properties(Hypersomnia PROPERTIES DEBUG_POSTFIX "-Debug")
 set_target_properties(Hypersomnia PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/output")
