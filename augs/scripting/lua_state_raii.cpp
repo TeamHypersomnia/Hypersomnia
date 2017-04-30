@@ -1,8 +1,6 @@
-extern "C" {
-	#include <lua/lualib.h>
-}
-
+#include <lua/lualib.h>
 #include <luabind/luabind.hpp>
+
 #include "augs/log.h"
 #include "augs/ensure.h"
 #include "augs/filesystem/file.h"

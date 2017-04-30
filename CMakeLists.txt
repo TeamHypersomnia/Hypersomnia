@@ -348,7 +348,7 @@ set(HYPERSOMNIA_SRCS
 	"application/setups/two_clients_and_server_setup.cpp"
 )
 
-# Manually building Lua and setting proper variables for both Hypersomnia and Luabind.
+# We will be building Lua manually.
 
 set(LUA_SRCS
 	"3rdparty/lua/lapi.c"
@@ -386,6 +386,8 @@ set(LUA_SRCS
 	"3rdparty/lua/lzio.c"
 )
 
+set_source_files_properties(${LUA_SRCS} PROPERTIES LANGUAGE CXX)
+
 set(HYPERSOMNIA_LIBS
 	"OpenGL32.lib"
 	"Ws2_32.lib" 		# for ENet
@@ -400,6 +402,7 @@ set(HYPERSOMNIA_INCLUDE_DIRS
 	"${PROJECT_SOURCE_DIR}/3rdparty/libsndfile/include"
 	"${PROJECT_SOURCE_DIR}/3rdparty/lua"
 	"${PROJECT_SOURCE_DIR}/3rdparty/luabind-deboostified"
+	"${PROJECT_SOURCE_DIR}/3rdparty/sol2/single/sol"
 )
 
 set(HYPERSOMNIA_ADDITIONAL_COMPILER_FLAGS "/MP /Gm- /fp:strict /bigobj")
@@ -445,7 +448,6 @@ endmacro()
 
 configure_msvc_runtime()
 
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${HYPERSOMNIA_ADDITIONAL_COMPILER_FLAGS}")
 
 add_definitions(
@@ -459,15 +461,13 @@ add_definitions(
 	-D_SCL_SECURE_NO_WARNINGS
 	-DAL_LIBTYPE_STATIC
 	-DAL_ALEXT_PROTOTYPES
+	-DLUABIND_CPLUSPLUS_LUA
+	-DSOL_USING_CXX_LUA
 )
 
 # We build lua sources manually as there is no up-to-date CMakeLists for lua.
 
 add_library(lua ${LUA_SRCS})
-set(LUA_LIBRARIES "lua")
-set(LUA_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/3rdparty/lua")
-set(LUA_FOUND TRUE)
-
 add_subdirectory("${PROJECT_SOURCE_DIR}/3rdparty/enet")
 add_subdirectory("${PROJECT_SOURCE_DIR}/3rdparty/freetype")
 

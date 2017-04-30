@@ -21,13 +21,21 @@
 
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
-
+#include <sol.hpp>
 /*
 	The usage of std::make_unique calls in main is to prevent stack overflow
 	due to otherwise there possibly being many cosmoi and resources on the stack.
 */
 
 int main(int argc, char** argv) {
+	{
+		sol::state lua;
+		int x = 0;
+		lua.set_function("beep", [&x]{ ++x; });
+		lua.script("beep()");
+		ensure_eq(1, x);
+	}
+
 	augs::create_directories("generated/logs/");
 
 	augs::global_libraries::init();
