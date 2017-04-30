@@ -199,3 +199,4 @@ Hypersomnia-Debug.lib
 alsoft.ini
 *.db-shm
 *.db-wal
+build
