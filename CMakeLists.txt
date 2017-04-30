@@ -468,12 +468,12 @@ endmacro(add_include_dirs_of target_name)
 
 add_include_dirs_of("enet")
 add_include_dirs_of("freetype")
-add_include_dirs_of("OpenAL32")
+add_include_dirs_of("OpenAL")
 
 include_directories(${HYPERSOMNIA_INCLUDE_DIRS})
 
 add_executable(Hypersomnia ${HYPERSOMNIA_SRCS} ${HYPERSOMNIA_HEADERS})
-target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS} enet freetype lua OpenAL32)
+target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS} enet freetype lua OpenAL)
 
 set_target_properties(Hypersomnia PROPERTIES DEBUG_POSTFIX "-Debug")
 set_target_properties(Hypersomnia PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/output")
