@@ -8,8 +8,9 @@ namespace augs {
 		ENetHost_raii::ENetHost_raii() : ptr(nullptr) {}
 
 		ENetHost_raii::~ENetHost_raii() {
-			if (ptr)
+			if (ptr != nullptr) {
 				enet_host_destroy(ptr);
+			}
 		}
 
 		ENetHost* ENetHost_raii::get() {

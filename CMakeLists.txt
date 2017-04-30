@@ -49,14 +49,6 @@ set(HYPERSOMNIA_SRCS
 	"3rdparty/Box2D/Dynamics/Joints/b2WeldJoint.cpp"
 	"3rdparty/Box2D/Dynamics/Joints/b2WheelJoint.cpp"
 	"3rdparty/Box2D/Rope/b2Rope.cpp"
-	"3rdparty/enet/callbacks.c"
-	"3rdparty/enet/compress.c"
-	"3rdparty/enet/host.c"
-	"3rdparty/enet/list.c"
-	"3rdparty/enet/packet.c"
-	"3rdparty/enet/peer.c"
-	"3rdparty/enet/protocol.c"
-	"3rdparty/enet/win32.c"
 	"3rdparty/freetype/src/autofit/autofit.c"
 	"3rdparty/freetype/src/bdf/bdf.c"
 	"3rdparty/freetype/src/cff/cff.c"
@@ -441,7 +433,6 @@ set(HYPERSOMNIA_INCLUDE_DIRS
 	"${PROJECT_SOURCE_DIR}"
 	"${PROJECT_SOURCE_DIR}/3rdparty"
 	"${PROJECT_SOURCE_DIR}/3rdparty/freetype"
-	"${PROJECT_SOURCE_DIR}/3rdparty/enet/include"
 	"${PROJECT_SOURCE_DIR}/3rdparty/freetype/include"
 	"${PROJECT_SOURCE_DIR}/3rdparty/libsndfile/include"
 	"${PROJECT_SOURCE_DIR}/3rdparty/lua"
@@ -491,7 +482,6 @@ endmacro()
 
 configure_msvc_runtime()
 
-include_directories(${HYPERSOMNIA_INCLUDE_DIRS})
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${HYPERSOMNIA_ADDITIONAL_COMPILER_FLAGS}")
 
@@ -508,8 +498,20 @@ add_definitions(
 	-DAL_ALEXT_PROTOTYPES
 )
 
+add_subdirectory("${PROJECT_SOURCE_DIR}/3rdparty/enet")
+
+get_property(dirs TARGET enet PROPERTY INCLUDE_DIRECTORIES)
+
+foreach(dir ${dirs})
+	message(STATUS "external include dir='${dir}'")
+	include_directories(${dir})
+endforeach()
+
+include_directories(${HYPERSOMNIA_INCLUDE_DIRS})
+
 add_executable(Hypersomnia ${HYPERSOMNIA_SRCS})
 target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS})
+target_link_libraries(Hypersomnia enet)
 set_target_properties(Hypersomnia PROPERTIES DEBUG_POSTFIX "-Debug")
 set_target_properties(Hypersomnia PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/output")
 
