@@ -200,3 +200,4 @@ alsoft.ini
 *.db-shm
 *.db-wal
 build
+dev/

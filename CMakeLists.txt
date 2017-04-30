@@ -290,7 +290,6 @@ set(HYPERSOMNIA_SRCS
 	"application/setups/server_setup.cpp"
 	"application/setups/setup_base.cpp"
 	"application/web_daemon/session_report.cpp"
-	"stdafx.cpp"
 	"augs/global_libraries.cpp"
 	"augs/filesystem/file.cpp"
 	"augs/graphics/fbo.cpp"
@@ -448,6 +447,14 @@ add_definitions(
 
 add_library(lua ${LUA_SRCS})
 add_subdirectory("${PROJECT_SOURCE_DIR}/3rdparty/enet")
+
+set(LIBTYPE "STATIC")
+set(FORCE_STATIC_VCRT TRUE CACHE BOOL "/MT for static VC runtimes" FORCE)
+set(ALSOFT_UTILS FALSE CACHE BOOL          "Build and install utility programs"         FORCE)
+set(ALSOFT_EXAMPLES FALSE CACHE BOOL "Build and install example programs"  FORCE)
+set(ALSOFT_TESTS FALSE CACHE BOOL     "Build and install test programs"     FORCE)
+
+add_subdirectory("${PROJECT_SOURCE_DIR}/3rdparty/openal-soft")
 add_subdirectory("${PROJECT_SOURCE_DIR}/3rdparty/freetype")
 
 macro(add_include_dirs_of target_name)
@@ -461,11 +468,12 @@ endmacro(add_include_dirs_of target_name)
 
 add_include_dirs_of("enet")
 add_include_dirs_of("freetype")
+add_include_dirs_of("OpenAL32")
 
 include_directories(${HYPERSOMNIA_INCLUDE_DIRS})
 
 add_executable(Hypersomnia ${HYPERSOMNIA_SRCS} ${HYPERSOMNIA_HEADERS})
-target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS} enet freetype lua)
+target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS} enet freetype lua OpenAL32)
 
 set_target_properties(Hypersomnia PROPERTIES DEBUG_POSTFIX "-Debug")
 set_target_properties(Hypersomnia PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/output")
