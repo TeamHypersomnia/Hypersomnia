@@ -5,6 +5,9 @@
 #if BUILD_OPENAL
 #include <AL/al.h>
 #include <AL/alc.h>
+extern "C" {
+	#include <compat.h>
+}
 #include <AL/efx.h>
 #include <AL/alext.h>
 #endif
@@ -48,7 +51,12 @@ namespace augs {
 		alsoft_ini_file += "\nhrtf-paths = " + augs::get_executable_directory() + "\\hrtf";
 		alsoft_ini_file += typesafe_sprintf("\nsources = %x", max_number_of_sound_sources);
 
-		augs::create_text_file(std::string("alsoft.ini"), alsoft_ini_file);
+		auto dir_where_openal_expects_alsoft_ini = GetProcPath();
+		alstr_append_cstr(&dir_where_openal_expects_alsoft_ini, "\\alsoft.ini");
+
+		const auto alsoft_ini_path = std::string(alstr_get_cstr(dir_where_openal_expects_alsoft_ini));
+
+		augs::create_text_file(alsoft_ini_path, alsoft_ini_file);
 	}
 
 	audio_manager::audio_manager(const std::string output_device_name) {
