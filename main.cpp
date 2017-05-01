@@ -69,6 +69,10 @@ int main(int argc, char** argv) {
 	
 	auto resources = std::make_unique<assets_manager>();
 	resources->set_as_current();
+	
+	std::thread regeneration_thread([&cfg](){
+		load_standard_everything(cfg);
+	});
 
 	{
 		augs::window::set_cursor_visible(cfg.debug_disable_cursor_clipping);
@@ -111,7 +115,8 @@ int main(int argc, char** argv) {
 	gl.initialize();
 	gl.initialize_fbos(window.get_screen_size());
 
-	load_standard_everything(cfg);
+	regeneration_thread.join();
+	create_standard_opengl_resources(cfg);
 
 	const auto mode = cfg.get_launch_mode();
 	LOG("Launch mode: %x", static_cast<int>(mode));

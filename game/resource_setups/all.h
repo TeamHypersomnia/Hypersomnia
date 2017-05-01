@@ -7,6 +7,7 @@ class assets_manager;
 class cosmos;
 
 void load_standard_everything(const config_lua_table&);
+void create_standard_opengl_resources(const config_lua_table&);
 
 game_image_requests load_standard_images();
 game_font_requests load_standard_fonts();

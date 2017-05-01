@@ -61,17 +61,21 @@ void load_standard_everything(const config_lua_table& cfg) {
 		regenerated
 	);
 
-	manager.create(
-		gl_texture_id::GAME_WORLD_ATLAS,
-		cfg.save_regenerated_atlases_as_binary
-	);
-	
 	set_standard_spell_properties(manager);
 	set_standard_animations(manager);
 	set_standard_particle_effects(manager);
 	set_standard_tile_layers(manager);
 	set_standard_sound_buffers(manager);
 	set_standard_physical_materials(manager);
+}
+
+void create_standard_opengl_resources(const config_lua_table& cfg) {
+	auto& manager = get_assets_manager();
+
+	manager.create(
+		gl_texture_id::GAME_WORLD_ATLAS,
+		cfg.save_regenerated_atlases_as_binary
+	);
 
 	manager[shader_id::DEFAULT_VERTEX].create_from_file(shader::type::VERTEX, "hypersomnia/shaders/default.vsh");
 	manager[shader_id::DEFAULT_FRAGMENT].create_from_file(shader::type::FRAGMENT, "hypersomnia/shaders/default.fsh");
