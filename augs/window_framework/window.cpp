@@ -1,6 +1,5 @@
 #include "window.h"
 
-#include <GL/OpenGL.h>
 #include <algorithm>
 
 #include "augs/log.h"
@@ -12,8 +11,6 @@
 #include "augs/window_framework/translate_windows_enums.h"
 
 namespace augs {
-	extern HINSTANCE hinst;
-
 	namespace window {
 		LRESULT CALLBACK wndproc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 			if (umsg == WM_GETMINMAXINFO || umsg == WM_INPUT)
@@ -212,6 +209,25 @@ namespace augs {
 			const int doublebuffer, 
 			const int bpp
 		) {
+			if(!window_class_registered) {
+				WNDCLASSEX wcl = { 0 };
+				wcl.cbSize = sizeof(wcl);
+				wcl.style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+				wcl.lpfnWndProc = window::wndproc;
+				wcl.cbClsExtra = 0;
+				wcl.cbWndExtra = 0;
+				wcl.hInstance = GetModuleHandle(NULL);
+				wcl.hIcon = LoadIcon(0, IDI_APPLICATION);
+				wcl.hCursor = LoadCursor(0, IDC_ARROW);
+				wcl.hbrBackground = 0;
+				wcl.lpszMenuName = 0;
+				wcl.lpszClassName = L"AugmentedWindow";
+				wcl.hIconSm = 0;
+
+				ensure(RegisterClassEx(&wcl) != 0 && "class registering");
+				window_class_registered = true;
+			}
+
 			enum flag {
 				CAPTION = WS_CAPTION,
 				MENU = CAPTION | WS_SYSMENU,
@@ -244,7 +260,7 @@ namespace augs {
 			ensure(pf = ChoosePixelFormat(hdc, &p));
 			ensure(SetPixelFormat(hdc, pf, &p));
 
-			ensure(hglrc = wglCreateContext(hdc)); glerr
+			ensure(hglrc = wglCreateContext(hdc));
 
 				set_as_current();
 			ShowWindow(hwnd, SW_SHOW);
@@ -273,20 +289,7 @@ namespace augs {
 		}
 
 		void glwindow::set_as_current_impl() {
-			wglMakeCurrent(hdc, hglrc); glerr
-		}
-
-		bool glwindow::set_vsync(const int v) {
-			const bool is_supported = WGLEW_EXT_swap_control != NULL;
-			
-			ensure(is_supported && "vsync not supported!");
-			
-			if (is_supported) {
-				set_as_current();
-				wglSwapIntervalEXT(v); glerr
-			}
-
-			return is_supported;
+			wglMakeCurrent(hdc, hglrc);
 		}
 
 		bool glwindow::poll_event(UINT& out) {
@@ -352,8 +355,8 @@ namespace augs {
 		void glwindow::destroy() {
 			if (hwnd) {
 				if (is_current()) {
-					wglMakeCurrent(NULL, NULL); glerr
-					wglDeleteContext(hglrc); glerr
+					wglMakeCurrent(NULL, NULL);
+					wglDeleteContext(hglrc);
 					set_current_to_none();
 				}
 				ReleaseDC(hwnd, hdc);
@@ -368,6 +371,9 @@ namespace augs {
 			destroy();
 		}
 	}
-	}
+}
+
+bool augs::window::glwindow::window_class_registered = false;
+
 #elif PLATFORM_LINUX
 #endif

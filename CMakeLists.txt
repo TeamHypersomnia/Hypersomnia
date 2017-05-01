@@ -365,7 +365,6 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 )
 
 set(HYPERSOMNIA_SRCS
-	"3rdparty/GL/glew.c"
 	"3rdparty/GL/OpenGL.cpp"
 	"3rdparty/lodepng/lodepng.cpp"
 	"3rdparty/polypartition/src/polypartition.cpp"
@@ -393,6 +392,7 @@ set(HYPERSOMNIA_LIBS
 	freetype
 	lua
 	OpenAL
+	glad
 )
 
 set(HYPERSOMNIA_INCLUDE_DIRS
@@ -412,7 +412,6 @@ configure_msvc_runtime()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${HYPERSOMNIA_ADDITIONAL_COMPILER_FLAGS}")
 
 add_definitions(
-	-DGLEW_STATIC
 	-DSOL_USING_CXX_LUA
 )
 
@@ -450,6 +449,7 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/3rdparty/openal-soft")
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/3rdparty/enet")
 add_subdirectory("${PROJECT_SOURCE_DIR}/3rdparty/freetype")
+add_subdirectory("${PROJECT_SOURCE_DIR}/3rdparty/glad")
 
 macro(add_include_dirs_of target_name)
 	get_property(dirs TARGET ${target_name} PROPERTY INCLUDE_DIRECTORIES)
@@ -470,6 +470,12 @@ add_include_dirs_of("freetype")
 include_directories(${HYPERSOMNIA_INCLUDE_DIRS})
 
 add_executable(Hypersomnia ${HYPERSOMNIA_SRCS} ${HYPERSOMNIA_HEADERS})
+
+# GLAD must first download and generate the source files,
+# therefore Hypersomnia depends on glad.
+
+add_dependencies(Hypersomnia glad)
+
 target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS})
 
 set_target_properties(Hypersomnia PROPERTIES DEBUG_POSTFIX "-Debug")

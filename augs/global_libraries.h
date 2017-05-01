@@ -1,20 +1,22 @@
 #pragma once
 #include <memory>
+#include "augs/misc/enum_bitset.h"
 
 struct FT_LibraryRec_;
 typedef struct FT_LibraryRec_  *FT_Library;
 
 namespace augs {
 	struct global_libraries {
-		enum library {
-			GLEW = 1 << 1,
-			FREETYPE = 1 << 2,
-			WINDOWS_API = 1 << 3,
-			ENET = 1 << 4,
-			ALL = GLEW | FREETYPE | WINDOWS_API | ENET
+		enum class library {
+			FREETYPE,
+			ENET,
+
+			COUNT
 		};
 
-		static unsigned initialized;
+		typedef augs::enum_bitset<library> library_bitset;
+
+		static library_bitset initialized;
 
 		static std::unique_ptr<FT_Library> freetype_library;
 
@@ -25,7 +27,7 @@ namespace augs {
 			const bool break_on_failure
 		);
 
-		static void init(unsigned which_augs = ALL);
-		static void deinit(unsigned which_augs = ALL);
+		static void init  (const library_bitset = { library::FREETYPE, library::ENET });
+		static void deinit(const library_bitset = { library::FREETYPE, library::ENET });
 	};
 };

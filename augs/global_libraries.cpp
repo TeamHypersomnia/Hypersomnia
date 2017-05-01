@@ -1,109 +1,55 @@
+#include <signal.h>
 #include <enet/enet.h>
-#undef min
-#undef max
 
-#ifdef PLATFORM_WINDOWS
-#include <Windows.h>
-#endif
-
-#ifdef PLATFORM_WINDOWS
-#include <GL/OpenGL.h>
-#elif PLATFORM_LINUX
-#include <GL/gl.h>
-#endif
-
-#ifdef PLATFORM_WINDOWS
 #include <ft2build.h>
-#elif PLATFORM_LINUX
-#include <ft2build.h>
-#endif
 #include FT_FREETYPE_H
 
-#include "global_libraries.h"
-#include "augs/window_framework/window.h"
-#include "augs/window_framework/platform_utils.h"
+#include "3rdparty/GL/OpenGL.h"
 
+#include "global_libraries.h"
+#include "augs/log.h"
+#include "augs/ensure.h"
+#include "augs/window_framework/platform_utils.h"
 #include "augs/build_settings/setting_build_unit_tests.h"
+
 #if BUILD_UNIT_TESTS
 #define CATCH_CONFIG_RUNNER
 #include <catch.hpp>
 #endif
-#include "augs/log.h"
-#include "augs/ensure.h"
 
-#include <signal.h>
-
-
-void SignalHandler(int signal) {
+void sigsegv_handler(const int signal) {
 	augs::window::disable_cursor_clipping();
 	throw "Access violation!";
 }
 
 namespace augs {
-	namespace window {
-#ifdef PLATFORM_WINDOWS
-    extern LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
-#endif
-  };
-
-	unsigned global_libraries::initialized = 0;
 	std::unique_ptr<FT_Library> global_libraries::freetype_library(new FT_Library);
 
-	void global_libraries::init(const unsigned to_initialize) {
-		// signal(SIGSEGV, SignalHandler);
+	void global_libraries::init(const library_bitset to_initialize) {
+		// signal(SIGSEGV, sigsegv_handler);
 
-		if(to_initialize & FREETYPE)
+		if(to_initialize.test(library::FREETYPE)) {
 			ensure(!FT_Init_FreeType(freetype_library.get()) && "freetype initialization");
-#ifdef PLATFORM_WINDOWS
-    if(to_initialize & WINDOWS_API) {
-			WNDCLASSEX wcl = { 0 };
-			wcl.cbSize = sizeof(wcl);
-			wcl.style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
-			wcl.lpfnWndProc = window::wndproc;
-			wcl.cbClsExtra = 0;
-			wcl.cbWndExtra = 0;
-			wcl.hInstance = GetModuleHandle(NULL);
-			wcl.hIcon = LoadIcon(0, IDI_APPLICATION);
-			wcl.hCursor = LoadCursor(0, IDC_ARROW);
-			wcl.hbrBackground = 0;
-			wcl.lpszMenuName = 0;
-			wcl.lpszClassName = L"AugmentedWindow";
-			wcl.hIconSm = 0;
-
-			ensure(RegisterClassEx(&wcl) != 0 && "class registering");
+			initialized.set(library::FREETYPE);
 		}
-
 		
-		if(to_initialize & GLEW) {
-			window::glwindow dummy;
-			dummy.create(xywhi(10, 10, 200, 200));
-			
-			glewExperimental = FALSE;
-			ensure(glewInit() == GLEW_OK && L"Failed to initialize GLEW");
-		}
-
-		if (to_initialize & ENET) {
+		if(to_initialize.test(library::ENET)) {
 			ensure(enet_initialize() == 0 && L"Failed to initialize enet");
+			initialized.set(library::ENET);
 		}
-#endif
-		initialized |= to_initialize;
 	}
 
-	void global_libraries::deinit(const unsigned which_augs) {
-		if (which_augs & GLEW) {
-
-		}
-
-		if (which_augs & FREETYPE) {
-			ensure(initialized & FREETYPE);
+	void global_libraries::deinit(const library_bitset to_deinitialize) {
+		if(to_deinitialize.test(library::FREETYPE)) {
+			ensure(initialized.test(library::FREETYPE));
 			ensure(!FT_Done_FreeType(*freetype_library.get()) && "freetype deinitialization");
-			initialized &= ~FREETYPE;
+			initialized.set(library::FREETYPE, false);
 		}
 
-		if (which_augs & ENET) {
-			ensure(initialized & ENET);
+		if(to_deinitialize.test(library::ENET)) {
+			ensure(initialized.test(library::ENET));
 			enet_deinitialize();
-			initialized &= ~ENET;
+			initialized.set(library::ENET, false);
 		}
 	}
 
@@ -128,3 +74,5 @@ namespace augs {
 #endif
 	}
 };
+
+augs::global_libraries::library_bitset augs::global_libraries::initialized;

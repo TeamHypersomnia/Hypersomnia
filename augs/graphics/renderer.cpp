@@ -35,6 +35,8 @@ namespace augs {
 	}
 
 	void renderer::initialize() {
+		gladLoadGL();
+
 		glEnable(GL_TEXTURE_2D); glerr;
 		glEnable(GL_BLEND); glerr;
 

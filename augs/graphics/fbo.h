@@ -1,5 +1,6 @@
 #pragma once
-#include "3rdparty/GL/OpenGL.h"
+
+typedef unsigned int GLuint;
 
 namespace augs {
 	class renderer;

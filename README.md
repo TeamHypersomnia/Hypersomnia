@@ -29,6 +29,7 @@ Watch gameplays on YouTube:
 
 # How to build
 To build Hypersomnia, you will need **CMake 3.8** or newer.
+Some script might also require that you have Python installed on your system.
 
 Go to the directory where you wish to have your Hypersomnia project downloaded,
 open git bash and paste:

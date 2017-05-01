@@ -23,6 +23,7 @@ namespace augs {
 			friend LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
 
 			static glwindow* context;
+			static bool window_class_registered;
 
 			HWND hwnd = nullptr;
 			HDC hdc = nullptr;
@@ -64,7 +65,6 @@ namespace augs {
 			);
 			
 			bool swap_buffers();
-			bool set_vsync(int);
 
 			void destroy();
 
@@ -118,8 +118,7 @@ namespace augs {
 
 			int create(xywhi client_rectangle, int enable_window_border = 0, std::string name = "Window", int doublebuffer = 1, int bitsperpixel = 24);
 			
-			bool swap_buffers(), 
-				set_vsync(int);
+			bool swap_buffers();
 
 			void destroy();
 

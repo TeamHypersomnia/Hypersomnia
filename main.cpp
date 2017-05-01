@@ -105,7 +105,6 @@ int main(int argc, char** argv) {
 			cfg.bpp
 		);
 
-		window.window.set_vsync(0);
 		window.window.set_as_current();
 	}
 

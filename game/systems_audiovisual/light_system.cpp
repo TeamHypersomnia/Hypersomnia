@@ -14,6 +14,7 @@
 #include "game/systems_stateless/visibility_system.h"
 #include "game/systems_stateless/render_system.h"
 
+#include "3rdparty/GL/OpenGL.h"
 #include "game/enums/filters.h"
 
 void light_system::reserve_caches_for_entities(const size_t n) {
