@@ -362,10 +362,10 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"augs/window_framework/event.cpp"
 	"augs/window_framework/window.cpp"
 	"application/setups/two_clients_and_server_setup.cpp"
+	"augs/graphics/OpenGL_error.cpp"
 )
 
 set(HYPERSOMNIA_SRCS
-	"3rdparty/GL/OpenGL.cpp"
 	"3rdparty/lodepng/lodepng.cpp"
 	"3rdparty/polypartition/src/polypartition.cpp"
 	"3rdparty/rectpack2D/src/pack.cpp"

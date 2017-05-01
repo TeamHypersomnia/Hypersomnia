@@ -2,7 +2,7 @@
 
 #include "application/config_structs/debug_drawing_settings.h"
 
-#include "3rdparty/GL/OpenGL.h"
+#include "augs/graphics/OpenGL_includes.h"
 #include "augs/graphics/renderer.h"
 #include "augs/graphics/fbo.h"
 #include "game/messages/visibility_information.h"

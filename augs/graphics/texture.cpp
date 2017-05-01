@@ -1,4 +1,4 @@
-#include "3rdparty/GL/OpenGL.h"
+#include "augs/graphics/OpenGL_includes.h"
 #include "texture.h"
 
 #include "augs/graphics/renderer.h"

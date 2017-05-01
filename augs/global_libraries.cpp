@@ -4,7 +4,7 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-#include "3rdparty/GL/OpenGL.h"
+#include "augs/graphics/OpenGL_includes.h"
 
 #include "global_libraries.h"
 #include "augs/log.h"

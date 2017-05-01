@@ -18,7 +18,7 @@
 
 #include "augs/math/matrix.h"
 
-#include "3rdparty/GL/OpenGL.h"
+#include "augs/graphics/OpenGL_includes.h"
 
 namespace rendering_scripts {
 	void standard_rendering(const viewing_step step) {

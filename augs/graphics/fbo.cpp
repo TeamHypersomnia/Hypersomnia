@@ -1,7 +1,7 @@
 #include "fbo.h"
 #include "augs/log.h"
 #include "augs/ensure.h"
-#include "3rdparty/GL/OpenGL.h"
+#include "augs/graphics/OpenGL_includes.h"
 
 namespace augs {
 	namespace graphics {

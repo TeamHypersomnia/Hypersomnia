@@ -1,6 +1,6 @@
 #include "shader.h"
 
-#include "3rdparty/GL/OpenGL.h"
+#include "augs/graphics/OpenGL_includes.h"
 
 #include "augs/ensure.h"
 #include "augs/filesystem/file.h"

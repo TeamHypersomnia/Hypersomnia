@@ -11,7 +11,7 @@
 #include "application/content_generation/scripted_images.h"
 #include "application/content_generation/polygonizations_of_images.h"
 
-#include "3rdparty/GL/OpenGL.h"
+#include "augs/graphics/OpenGL_includes.h"
 
 using namespace augs::graphics;
 using namespace assets;
