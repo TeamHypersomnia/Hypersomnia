@@ -1,12 +1,12 @@
 #include "augs/build_settings/setting_build_unit_tests.h"
 
 #if BUILD_UNIT_TESTS
-#include <gtest/gtest.h>
+#include <catch.hpp>
 
 #include "augs/math/vec2.h"
 #include "augs/misc/typesafe_sscanf.h"
 
-TEST(TypesafeSscanf, TypesafeSscanfSeveralTests) {
+TEST_CASE("TypesafeSscanf", "TypesafeSscanfSeveralTests") {
 	{
 		const auto format = "%x";
 		const auto sprintfed = "1442";
@@ -14,7 +14,7 @@ TEST(TypesafeSscanf, TypesafeSscanfSeveralTests) {
 		unsigned s1 = 0xdeadbeef;
 		typesafe_sscanf(sprintfed, format, s1);
 
-		EXPECT_EQ(1442, s1);
+		REQUIRE(1442 == s1);
 	}
 
 	{
@@ -25,22 +25,22 @@ TEST(TypesafeSscanf, TypesafeSscanfSeveralTests) {
 		unsigned s2 = 0xdeadbeef;
 		typesafe_sscanf(sprintfed, format, s1, s2);
 
-		EXPECT_EQ(1442, s1);
-		EXPECT_EQ(1337, s2);
+		REQUIRE(1442 == s1);
+		REQUIRE(1337 == s2);
 	}
 
 	{
 		const auto format = "%x,%x,%x:%x";
 		const auto sprintfed = typesafe_sprintf(format, 1, 2, 3, 4);
-		EXPECT_EQ("1,2,3:4", sprintfed);
+		REQUIRE("1,2,3:4" == sprintfed);
 
 		int s1, s2, s3, s4;
 		typesafe_sscanf(sprintfed, format, s1, s2, s3, s4);
 
-		EXPECT_EQ(1, s1);
-		EXPECT_EQ(2, s2);
-		EXPECT_EQ(3, s3);
-		EXPECT_EQ(4, s4);
+		REQUIRE(1 == s1);
+		REQUIRE(2 == s2);
+		REQUIRE(3 == s3);
+		REQUIRE(4 == s4);
 	}
 
 	{
@@ -49,13 +49,13 @@ TEST(TypesafeSscanf, TypesafeSscanfSeveralTests) {
 		vec2i test(123, -412);
 		const auto format = "Vector is equal to: %x";
 		const auto sprintfed = typesafe_sprintf(format, test);
-		EXPECT_EQ("Vector is equal to: (123;-412)", sprintfed);
+		REQUIRE("Vector is equal to: (123;-412)" == sprintfed);
 
 		vec2i read_test;
 
 		typesafe_sscanf(sprintfed, format, read_test);
 
-		EXPECT_EQ(test, read_test);
+		REQUIRE(test == read_test);
 	}
 }
 

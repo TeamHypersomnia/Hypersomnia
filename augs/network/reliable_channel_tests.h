@@ -1,5 +1,5 @@
 
-TEST(NetChannelWrapper, SingleTransmissionDeleteAllPending) {
+TEST_CASE("NetChannelWrapper SingleTransmissionDeleteAllPending") {
 	reliable_channel a, b;
 	
 	augs::stream msg[15];
@@ -18,28 +18,28 @@ TEST(NetChannelWrapper, SingleTransmissionDeleteAllPending) {
 	augs::stream sender_bs;
 	augs::stream receiver_bs;
 
-	EXPECT_EQ(false, a.receiver.ack_requested);
+	REQUIRE(false == a.receiver.ack_requested);
 	a.build_next_packet(sender_bs);
-	EXPECT_EQ(false, a.receiver.ack_requested);
+	REQUIRE(false == a.receiver.ack_requested);
 
 	b.handle_incoming_packet(sender_bs);
-	EXPECT_EQ(true, b.receiver.ack_requested);
+	REQUIRE(true == b.receiver.ack_requested);
 
 	b.build_next_packet(receiver_bs);
-	EXPECT_EQ(false, b.receiver.ack_requested);
+	REQUIRE(false == b.receiver.ack_requested);
 
 	a.handle_incoming_packet(receiver_bs);
 
 	a.sender.post_message(msg[4]);
 
-	EXPECT_EQ(1, a.sender.reliable_buf.size());
-	EXPECT_EQ(1, a.sender.sequence);
-	EXPECT_EQ(1, a.sender.most_recent_acked_sequence);
+	REQUIRE(1 == a.sender.reliable_buf.size());
+	REQUIRE(1 == a.sender.sequence);
+	REQUIRE(1 == a.sender.most_recent_acked_sequence);
 
-	EXPECT_EQ(1, b.receiver.last_received_sequence);
+	REQUIRE(1 == b.receiver.last_received_sequence);
 }
 
-TEST(NetChannelWrapper, PastAcknowledgementDeletesSeveralPending) {
+TEST_CASE("NetChannelWrapper PastAcknowledgementDeletesSeveralPending") {
 	reliable_channel a, b;
 
 	
@@ -77,14 +77,14 @@ TEST(NetChannelWrapper, PastAcknowledgementDeletesSeveralPending) {
 
 	a.handle_incoming_packet(receiver_packet);
 
-	EXPECT_EQ(3, a.sender.sequence);
-	EXPECT_EQ(5, a.sender.reliable_buf.size());
-	EXPECT_EQ(1, a.sender.most_recent_acked_sequence);
+	REQUIRE(3 == a.sender.sequence);
+	REQUIRE(5 == a.sender.reliable_buf.size());
+	REQUIRE(1 == a.sender.most_recent_acked_sequence);
 
-	EXPECT_EQ(1, b.receiver.last_received_sequence);
+	REQUIRE(1 == b.receiver.last_received_sequence);
 }
 
-TEST(NetChannelWrapper, FlagForDeletionAndAck) {
+TEST_CASE("NetChannelWrapper FlagForDeletionAndAck") {
 	reliable_channel a, b;
 
 	
@@ -133,23 +133,23 @@ TEST(NetChannelWrapper, FlagForDeletionAndAck) {
 	augs::read(sender_packets[0], table[2]);
 	augs::read(sender_packets[0], table[3]);
 
-	//EXPECT_EQ(0, table[0]);
-	//EXPECT_EQ(1, table[1]);
-	//EXPECT_EQ(2, table[2]);
-	//EXPECT_EQ(3, table[3]);
+	//REQUIRE(0 == table[0]);
+	//REQUIRE(1 == table[1]);
+	//REQUIRE(2 == table[2]);
+	//REQUIRE(3 == table[3]);
 
 
 	b.build_next_packet(receiver_packet);
 
 	a.handle_incoming_packet(receiver_packet);
 
-	EXPECT_EQ(6, a.sender.sequence);
-	EXPECT_EQ(1, a.sender.most_recent_acked_sequence);
-	//EXPECT_EQ(2, a.sender.reliable_buf.size());
+	REQUIRE(6 == a.sender.sequence);
+	REQUIRE(1 == a.sender.most_recent_acked_sequence);
+	//REQUIRE(2 == a.sender.reliable_buf.size());
 
 
-	//EXPECT_EQ(msg + 7, a.sender.reliable_buf[0].output_bitstream);
-	//EXPECT_EQ(msg + 8, a.sender.reliable_buf[1].output_bitstream);
+	//REQUIRE(msg + 7 == a.sender.reliable_buf[0].output_bitstream);
+	//REQUIRE(msg + 8 == a.sender.reliable_buf[1].output_bitstream);
 
-	EXPECT_EQ(1, b.receiver.last_received_sequence);
+	REQUIRE(1 == b.receiver.last_received_sequence);
 }

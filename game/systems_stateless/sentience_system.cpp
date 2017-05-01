@@ -462,9 +462,9 @@ void sentience_system::set_borders(const logic_step step) const {
 }
 /*
 
-#include <gtest/gtest.h>
+#include <catch.hpp>
 
-TEST(SentienceSystem, SentienceMeters) {
+TEST_CASE("SentienceSystem", "SentienceMeters") {
 	{
 		cosmos c1(1);
 

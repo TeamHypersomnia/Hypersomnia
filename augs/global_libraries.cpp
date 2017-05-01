@@ -24,9 +24,9 @@
 #include "augs/window_framework/platform_utils.h"
 
 #include "augs/build_settings/setting_build_unit_tests.h"
-
 #if BUILD_UNIT_TESTS
-#include <gtest/gtest.h>
+#define CATCH_CONFIG_RUNNER
+#include <catch.hpp>
 #endif
 #include "augs/log.h"
 #include "augs/ensure.h"
@@ -107,10 +107,24 @@ namespace augs {
 		}
 	}
 
-	void global_libraries::run_unit_tests(int argc, char** argv) {
+	void global_libraries::run_unit_tests(
+		const int argc, 
+		const char* const * const argv,
+		const bool show_successful,
+		const bool break_on_failure
+	) {
 #if BUILD_UNIT_TESTS
-		::testing::InitGoogleTest(&argc, argv);
-		auto result = RUN_ALL_TESTS();
+		Catch::Session session;
+
+		{
+			auto& cfg = session.configData();
+
+			cfg.showSuccessfulTests = show_successful;
+			cfg.shouldDebugBreak = break_on_failure;
+			cfg.outputFilename = "generated/logs/unit_tests.txt";
+		}
+
+		session.run(argc, argv);
 #endif
 	}
 };

@@ -85,8 +85,14 @@ config_table = {
 	-- 1 always regenerates the entire content. only for debugging pruposes - the game will take a lot longer to launch every time.
 	debug_regenerate_content_every_launch = false,
 
-	-- should run googletest on every launch? When it's on, it may possibly take longer to launch in debug mode. 
+	-- if true, runs unit tests on every launch.
 	debug_run_unit_tests = true,
+
+	-- if true, logs all unit tests that succeed, not just failures.
+	debug_log_successful_unit_tests = true,
+
+	-- if true, breaks on the first failure.
+	debug_break_on_unit_test_failure = true,
 
 	-- should enable head-related transfer function for OpenAL?
 	enable_hrtf = true,

@@ -433,9 +433,9 @@ void cosmic_delta::decode(
 #include "augs/build_settings/setting_build_unit_tests.h"
 
 #if BUILD_UNIT_TESTS
-#include <gtest/gtest.h>
+#include <catch.hpp>
 
-TEST(CosmicDelta, PaddingSanityCheck1) {
+TEST_CASE("CosmicDelta PaddingSanityCheck1") {
 	struct ok {
 		bool a;
 		int b;
@@ -462,10 +462,10 @@ TEST(CosmicDelta, PaddingSanityCheck1) {
 
 	const bool are_different = memcmp(buf1, buf2, type_size);
 
-	ASSERT_TRUE(are_different);
+	REQUIRE(are_different);
 }
 
-TEST(CosmicDelta, PaddingSanityCheck2) {
+TEST_CASE("CosmicDelta PaddingSanityCheck2") {
 	struct ok {
 		bool a = false;
 		int b = 1;
@@ -488,10 +488,10 @@ TEST(CosmicDelta, PaddingSanityCheck2) {
 
 	const bool are_different = memcmp(buf1, buf2, type_size);
 
-	ASSERT_TRUE(are_different);
+	REQUIRE(are_different);
 }
 
-TEST(CosmicDelta, CosmicDeltaPaddingTest) {
+TEST_CASE("CosmicDelta PaddingTest") {
 	auto padding_checker = [](auto c, auto... args) {
 		typedef decltype(c) component_type;
 		static_assert(std::is_same_v<std::decay_t<component_type>, component_type>, "Something's wrong with the types");
@@ -521,7 +521,14 @@ TEST(CosmicDelta, CosmicDeltaPaddingTest) {
 			}
 		}
 
-		ASSERT_TRUE(same) << "Padding is wrong in " << typeid(checked_type).name() << "\nsizeof: " << type_size << "\nDivergence position: " << iter;
+		if(!same) {
+			FAIL(typesafe_sprintf(
+				"Padding is wrong in %x\nsizeof: %x\nDivergence position: %x", 
+				typeid(checked_type).name(),
+				type_size,
+				iter
+			));
+		}
 	};
 
 	padding_checker(augs::window::event::change());
@@ -546,10 +553,6 @@ TEST(CosmicDelta, CosmicDeltaPaddingTest) {
 		}
 	};
 
-	LOG_NVPS(sizeof(dum));
-	sizeof(dum);
-	LOG_NVPS(sizeof(entity_handle));
-
 	padding_checker(dum());
 	//padding_checker(std::array<hotbar_button, 9>());
 	//padding_checker(drag_and_drop_target_drop_item(augs::gui::material()), augs::gui::material());
@@ -557,7 +560,7 @@ TEST(CosmicDelta, CosmicDeltaPaddingTest) {
 	for_each_through_std_get(put_all_components_into_t<std::tuple>(), padding_checker);
 }
 
-TEST(Cosmos, GuidizeTests) {
+TEST_CASE("Cosmos", "GuidizeTests") {
 	cosmos c1(2);
 
 	const auto new_ent1 = c1.create_entity("e1");
@@ -567,18 +570,20 @@ TEST(Cosmos, GuidizeTests) {
 
 	const auto guidized = c1.guidize(dt);
 
-	EXPECT_EQ(0, guidized.target_slot.container_entity);
-	EXPECT_EQ(1, guidized.item);
+	REQUIRE(0 == guidized.target_slot.container_entity);
+	REQUIRE(1 == guidized.item);
 
 	const auto deguidized = c1.deguidize(guidized);
-	EXPECT_EQ(dt.item, deguidized.item);
-	EXPECT_EQ(dt.target_slot.container_entity, deguidized.target_slot.container_entity);
-	EXPECT_EQ(entity_id(), deguidized.target_slot.container_entity);
+	REQUIRE(dt.item == deguidized.item);
+	REQUIRE(dt.target_slot.container_entity == deguidized.target_slot.container_entity);
+	entity_id dead;
+
+	REQUIRE(dead == deguidized.target_slot.container_entity);
 	// sanity check
-	EXPECT_EQ(entity_id(), dt.target_slot.container_entity);
+	REQUIRE(dead == dt.target_slot.container_entity);
 }
 
-TEST(CosmicDelta, CosmicDeltaEmptyAndTwoNew) {
+TEST_CASE("CosmicDelta EmptyAndTwoNew") {
 	cosmos c1(2);
 	cosmos c2(2);
 
@@ -612,35 +617,35 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndTwoNew) {
 	// check if components are intact after encode/decode cycle
 
 
-	ASSERT_EQ(2, c1.entities_count());
-	ASSERT_EQ(2, c2.entities_count());
-	ASSERT_TRUE(ent1.has<components::transform>());
+	REQUIRE(2 == c1.entities_count());
+	REQUIRE(2 == c2.entities_count());
+	REQUIRE(ent1.has<components::transform>());
 	const bool transform_intact = ent1.get<components::transform>() == first_transform;
-	ASSERT_TRUE(transform_intact);
-	ASSERT_TRUE(ent1.has<components::rigid_body>());
-	ASSERT_TRUE(ent1.has<components::render>());
-	ASSERT_TRUE(ent1.has<components::sprite>());
-	ASSERT_FALSE(ent1.has<components::trace>());
+	REQUIRE(transform_intact);
+	REQUIRE(ent1.has<components::rigid_body>());
+	REQUIRE(ent1.has<components::render>());
+	REQUIRE(ent1.has<components::sprite>());
+	REQUIRE(!ent1.has<components::trace>());
 
-	ASSERT_TRUE(ent2.has<components::transform>());
+	REQUIRE(ent2.has<components::transform>());
 	const bool default_transform_intact = ent2.get<components::transform>() == components::transform();
-	ASSERT_TRUE(default_transform_intact);
-	ASSERT_FALSE(ent2.has<components::rigid_body>());
-	ASSERT_FALSE(ent2.has<components::render>());
-	ASSERT_FALSE(ent2.has<components::sprite>());
-	ASSERT_TRUE(ent2.has<components::trace>());
+	REQUIRE(default_transform_intact);
+	REQUIRE(!ent2.has<components::rigid_body>());
+	REQUIRE(!ent2.has<components::render>());
+	REQUIRE(!ent2.has<components::sprite>());
+	REQUIRE(ent2.has<components::trace>());
 
 	{
 		augs::stream comparatory;
 		
-		ASSERT_FALSE(cosmic_delta::encode(c1, c2, comparatory));
+		REQUIRE(!cosmic_delta::encode(c1, c2, comparatory));
 
-		ASSERT_EQ(1, comparatory.size());
-		ASSERT_TRUE(c1 == c2);
+		REQUIRE(1 == comparatory.size());
+		REQUIRE(c1 == c2);
 	}
 }
 
-TEST(CosmicDelta, CosmicDeltaEmptyAndCreatedThreeEntitiesWithReferences) {
+TEST_CASE("CosmicDelta EmptyAndCreatedThreeEntitiesWithReferences") {
 	cosmos c1(3);
 	cosmos c2(3);
 
@@ -670,38 +675,38 @@ TEST(CosmicDelta, CosmicDeltaEmptyAndCreatedThreeEntitiesWithReferences) {
 		cosmic_delta::decode(c1, s);
 	}
 
-	ASSERT_EQ(3, c1.entities_count());
-	ASSERT_EQ(3, c2.entities_count());
+	REQUIRE(3 == c1.entities_count());
+	REQUIRE(3 == c2.entities_count());
 
 	const auto ent1 = c1.get_handle(first_guid);
 	const auto ent2 = c1.get_handle(second_guid);
 	const auto ent3 = c1.get_handle(third_guid);
 
-	ASSERT_TRUE(ent1.has<components::sentience>());
-	ASSERT_TRUE(ent1.has<components::position_copying>());
+	REQUIRE(ent1.has<components::sentience>());
+	REQUIRE(ent1.has<components::position_copying>());
 	const bool pc1_intact = ent1.get<components::position_copying>().target == ent2.get_id();
 	const bool pc1ch_intact = ent1[child_entity_name::CHARACTER_CROSSHAIR] == ent2.get_id();
-	ASSERT_TRUE(pc1_intact);
+	REQUIRE(pc1_intact);
 
-	ASSERT_TRUE(ent2.has<components::position_copying>());
+	REQUIRE(ent2.has<components::position_copying>());
 	const bool pc2_intact = ent2.get<components::position_copying>().target == ent3.get_id();
-	ASSERT_TRUE(pc2_intact);
+	REQUIRE(pc2_intact);
 
-	ASSERT_TRUE(ent3.has<components::position_copying>());
+	REQUIRE(ent3.has<components::position_copying>());
 	const bool pc3_intact = ent3.get<components::position_copying>().target == ent1.get_id();
-	ASSERT_TRUE(pc3_intact);
+	REQUIRE(pc3_intact);
 
 	{
 		augs::stream comparatory;
 
-		ASSERT_FALSE(cosmic_delta::encode(c1, c2, comparatory));
+		REQUIRE(!cosmic_delta::encode(c1, c2, comparatory));
 
-		ASSERT_EQ(1, comparatory.size());
+		REQUIRE(1 == comparatory.size());
 	}
 }
 
 
-TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
+TEST_CASE("CosmicDelta ThreeEntitiesWithReferencesAndDestroyedChild") {
 	entity_guid c1_first_guid = 0;
 	entity_guid c1_second_guid = 0;
 	entity_guid c1_third_guid = 0;
@@ -753,19 +758,19 @@ TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
 		new_ent1.map_child_entity(child_entity_name::CHARACTER_CROSSHAIR, new_ent2);
 	}
 
-	ASSERT_EQ(3, c1.entities_count());
-	ASSERT_EQ(3, c2.entities_count());
+	REQUIRE(3 == c1.entities_count());
+	REQUIRE(3 == c2.entities_count());
 
 	{
 		augs::stream comparatory;
 
-		ASSERT_FALSE(cosmic_delta::encode(c1, c2, comparatory));
+		REQUIRE(!cosmic_delta::encode(c1, c2, comparatory));
 
-		ASSERT_EQ(1, comparatory.size());
+		REQUIRE(1 == comparatory.size());
 	}
 
 	c2.delete_entity(c2.get_handle(c2_second_guid));
-	ASSERT_EQ(2, c2.entities_count());
+	REQUIRE(2 == c2.entities_count());
 
 	{
 		augs::stream s;
@@ -777,24 +782,24 @@ TEST(CosmicDelta, CosmicDeltaThreeEntitiesWithReferencesAndDestroyedChild) {
 	{
 		augs::stream comparatory;
 
-		ASSERT_FALSE(cosmic_delta::encode(c1, c2, comparatory));
+		REQUIRE(!cosmic_delta::encode(c1, c2, comparatory));
 
-		ASSERT_EQ(1, comparatory.size());
+		REQUIRE(1 == comparatory.size());
 	}
 
-	ASSERT_EQ(2, c1.entities_count());
+	REQUIRE(2 == c1.entities_count());
 
 	const auto ent1 = c1.get_handle(c1_first_guid);
-	ASSERT_FALSE(c1.entity_exists_with_guid(c1_second_guid));
+	REQUIRE(!c1.entity_exists_with_guid(c1_second_guid));
 	const auto ent3 = c1.get_handle(c1_third_guid);
 
-	ASSERT_TRUE(ent1.has<components::position_copying>());
+	REQUIRE(ent1.has<components::position_copying>());
 	const bool pc1_dead = c1[ent1.get<components::position_copying>().target].dead();
-	ASSERT_TRUE(pc1_dead);
+	REQUIRE(pc1_dead);
 
-	ASSERT_TRUE(ent3.has<components::position_copying>());
+	REQUIRE(ent3.has<components::position_copying>());
 	const bool pc3_intact = ent3.get<components::position_copying>().target == ent1.get_id();
-	ASSERT_TRUE(pc3_intact);
+	REQUIRE(pc3_intact);
 }
 
 #endif

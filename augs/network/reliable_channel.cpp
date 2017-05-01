@@ -219,34 +219,34 @@ namespace augs {
 #include "augs/build_settings/setting_build_unit_tests.h"
 
 #if BUILD_UNIT_TESTS
-#include <gtest/gtest.h>
+#include <catch.hpp>
 
 using namespace augs;
 using namespace network;
 
-TEST(NetChannel, SequenceArithmetic) {
+TEST_CASE("NetChannel SequenceArithmetic") {
 	typedef unsigned short us;
 
-	EXPECT_EQ(1, sequence_distance(us(65535), us(0)));
-	EXPECT_EQ(1, sequence_distance(us(0), us(65535)));
-	EXPECT_EQ(3, sequence_distance(us(65535), us(2)));
-	EXPECT_EQ(3, sequence_distance(us(2), us(65535)));
-	EXPECT_EQ(1, sequence_distance(us(2), us(1)));
-	EXPECT_EQ(1, sequence_distance(us(1), us(2)));
-	EXPECT_EQ(0, sequence_distance(us(0), us(0)));
-	EXPECT_EQ(0, sequence_distance(us(65535), us(65535)));
+	REQUIRE(1 == sequence_distance(us(65535), us(0)));
+	REQUIRE(1 == sequence_distance(us(0), us(65535)));
+	REQUIRE(3 == sequence_distance(us(65535), us(2)));
+	REQUIRE(3 == sequence_distance(us(2), us(65535)));
+	REQUIRE(1 == sequence_distance(us(2), us(1)));
+	REQUIRE(1 == sequence_distance(us(1), us(2)));
+	REQUIRE(0 == sequence_distance(us(0), us(0)));
+	REQUIRE(0 == sequence_distance(us(65535), us(65535)));
 
-	EXPECT_TRUE(sequence_more_recent(us(0), us(65535)));
-	EXPECT_TRUE(sequence_more_recent(us(1), us(65535)));
-	EXPECT_TRUE(sequence_more_recent(us(2), us(65535)));
-	EXPECT_TRUE(sequence_more_recent(us(2), us(65534)));
-	EXPECT_FALSE(sequence_more_recent(us(65535), us(0)));
-	EXPECT_FALSE(sequence_more_recent(us(65535), us(0)));
-	EXPECT_FALSE(sequence_more_recent(us(65535), us(1)));
-	EXPECT_FALSE(sequence_more_recent(us(65534), us(2)));
+	REQUIRE(sequence_more_recent(us(0), us(65535)));
+	REQUIRE(sequence_more_recent(us(1), us(65535)));
+	REQUIRE(sequence_more_recent(us(2), us(65535)));
+	REQUIRE(sequence_more_recent(us(2), us(65534)));
+	REQUIRE(!sequence_more_recent(us(65535), us(0)));
+	REQUIRE(!sequence_more_recent(us(65535), us(0)));
+	REQUIRE(!sequence_more_recent(us(65535), us(1)));
+	REQUIRE(!sequence_more_recent(us(65534), us(2)));
 }
 
-TEST(NetChannel, SingleTransmissionDeleteAllPending) {
+TEST_CASE("NetChannel SingleTransmissionDeleteAllPending") {
 	reliable_sender sender;
 	reliable_receiver receiver;
 
@@ -277,17 +277,16 @@ TEST(NetChannel, SingleTransmissionDeleteAllPending) {
 
 	sender.post_message(msg[4]);
 
-	EXPECT_EQ(1, sender.reliable_buf.size());
-	EXPECT_EQ(1, sender.sequence);
-	EXPECT_EQ(1, sender.most_recent_acked_sequence);
+	REQUIRE(1 == sender.reliable_buf.size());
+	REQUIRE(1 == sender.sequence);
+	REQUIRE(1 == sender.most_recent_acked_sequence);
 
-	EXPECT_EQ(1, receiver.last_received_sequence);
+	REQUIRE(1 == receiver.last_received_sequence);
 }
 
-TEST(NetChannel, PastAcknowledgementDeletesSeveralPending) {
+TEST_CASE("NetChannel PastAcknowledgementDeletesSeveralPending") {
 	reliable_sender sender;
 	reliable_receiver receiver;
-
 	
 	augs::stream msg[15];
 
@@ -323,14 +322,14 @@ TEST(NetChannel, PastAcknowledgementDeletesSeveralPending) {
 
 	sender.read_ack(receiver_packet);
 
-	EXPECT_EQ(3, sender.sequence);
-	EXPECT_EQ(5, sender.reliable_buf.size());
-	EXPECT_EQ(1, sender.most_recent_acked_sequence);
+	REQUIRE(3 == sender.sequence);
+	REQUIRE(5 == sender.reliable_buf.size());
+	REQUIRE(1 == sender.most_recent_acked_sequence);
 
-	EXPECT_EQ(1, receiver.last_received_sequence);
+	REQUIRE(1 == receiver.last_received_sequence);
 }
 
-TEST(NetChannel, FlagForDeletionAndAck) {
+TEST_CASE("NetChannel FlagForDeletionAndAck") {
 	reliable_sender sender;
 	reliable_receiver receiver;
 
@@ -380,31 +379,28 @@ TEST(NetChannel, FlagForDeletionAndAck) {
 	//sender_packets[0].Read(table[2]);
 	//sender_packets[0].Read(table[3]);
 	//
-	//EXPECT_EQ(0, table[0]);
-	//EXPECT_EQ(1, table[1]);
-	//EXPECT_EQ(2, table[2]);
-	//EXPECT_EQ(3, table[3]);
+	//REQUIRE(0 == table[0]);
+	//REQUIRE(1 == table[1]);
+	//REQUIRE(2 == table[2]);
+	//REQUIRE(3 == table[3]);
 
 
 	receiver.write_ack(receiver_packet);
 
 	sender.read_ack(receiver_packet);
 
-	EXPECT_EQ(6, sender.sequence);
-	EXPECT_EQ(1, sender.most_recent_acked_sequence);
-	//EXPECT_EQ(2, sender.reliable_buf.size());
+	REQUIRE(6 == sender.sequence);
+	REQUIRE(1 == sender.most_recent_acked_sequence);
+	//REQUIRE(2 == sender.reliable_buf.size());
 
 
-	//EXPECT_EQ(msg+7, sender.reliable_buf[0].output_bitstream);
-	//EXPECT_EQ(msg+8, sender.reliable_buf[1].output_bitstream);
+	//REQUIRE(msg+7 == sender.reliable_buf[0].output_bitstream);
+	//REQUIRE(msg+8 == sender.reliable_buf[1].output_bitstream);
 
-	EXPECT_EQ(1, receiver.last_received_sequence);
+	REQUIRE(1 == receiver.last_received_sequence);
 }
 
-
-
-TEST(NetChannel, SequenceNumberOverflowMultipleTries) {
-
+TEST_CASE("NetChannel SequenceNumberOverflowMultipleTries") {
 	reliable_sender sender;
 	reliable_receiver receiver;
 
@@ -460,32 +456,32 @@ TEST(NetChannel, SequenceNumberOverflowMultipleTries) {
 		//sender_packets[0].Read(table[2]);
 		//sender_packets[0].Read(table[3]);
 		//
-		//EXPECT_EQ(0, table[0]);
-		//EXPECT_EQ(1, table[1]);
-		//EXPECT_EQ(2, table[2]);
-		//EXPECT_EQ(3, table[3]);
+		//REQUIRE(0 == table[0]);
+		//REQUIRE(1 == table[1]);
+		//REQUIRE(2 == table[2]);
+		//REQUIRE(3 == table[3]);
 
 		receiver.write_ack(receiver_packet);
 
 		sender.read_ack(receiver_packet);
 
 		if (k == 0) {
-			EXPECT_EQ(5, sender.sequence);
-			EXPECT_EQ(0, sender.most_recent_acked_sequence);
-			EXPECT_EQ(0, receiver.last_received_sequence);
+			REQUIRE(5 == sender.sequence);
+			REQUIRE(0 == sender.most_recent_acked_sequence);
+			REQUIRE(0 == receiver.last_received_sequence);
 		}
 
-		//EXPECT_EQ(2, sender.reliable_buf.size());
+		//REQUIRE(2 == sender.reliable_buf.size());
 
-		//EXPECT_EQ(msg + 7, sender.reliable_buf[0].output_bitstream);
-		//EXPECT_EQ(msg + 8, sender.reliable_buf[1].output_bitstream);
+		//REQUIRE(msg + 7 == sender.reliable_buf[0].output_bitstream);
+		//REQUIRE(msg + 8 == sender.reliable_buf[1].output_bitstream);
 
 		sender.reliable_buf.clear();
 	}
 }
 
 
-TEST(NetChannel, OutOfDatePackets) {
+TEST_CASE("NetChannel OutOfDatePackets") {
 	reliable_sender sender;
 	reliable_receiver receiver;
 
@@ -535,32 +531,32 @@ TEST(NetChannel, OutOfDatePackets) {
 		sender.write_data(sender_packets[5]);
 
 		receiver.read_sequence(sender_packets[1]);
-		EXPECT_EQ(reliable_receiver::result_data::NOTHING_RECEIVED, receiver.read_sequence(sender_packets[0]).result_type);
+		REQUIRE(reliable_receiver::result_data::NOTHING_RECEIVED == receiver.read_sequence(sender_packets[0]).result_type);
 		//int table[4];
 		//sender_packets[1].Read(table[0]);
 		//sender_packets[1].Read(table[1]);
 		//sender_packets[1].Read(table[2]);
 		//sender_packets[1].Read(table[3]);
 
-		//EXPECT_EQ(0, table[0]);
-		//EXPECT_EQ(1, table[1]);
-		//EXPECT_EQ(2, table[2]);
-		//EXPECT_EQ(3, table[3]);
+		//REQUIRE(0 == table[0]);
+		//REQUIRE(1 == table[1]);
+		//REQUIRE(2 == table[2]);
+		//REQUIRE(3 == table[3]);
 
 		receiver.write_ack(receiver_packet);
 
 		sender.read_ack(receiver_packet);
 
 		if (k == 0) {
-			EXPECT_EQ(5, sender.sequence);
-			EXPECT_EQ(1, sender.most_recent_acked_sequence);
-			EXPECT_EQ(1, receiver.last_received_sequence);
+			REQUIRE(5 == sender.sequence);
+			REQUIRE(1 == sender.most_recent_acked_sequence);
+			REQUIRE(1 == receiver.last_received_sequence);
 		}
 
-		//EXPECT_EQ(2, sender.reliable_buf.size());
+		//REQUIRE(2 == sender.reliable_buf.size());
 
-		//EXPECT_EQ(msg + 7, sender.reliable_buf[0].output_bitstream);
-		//EXPECT_EQ(msg + 8, sender.reliable_buf[1].output_bitstream);
+		//REQUIRE(msg + 7 == sender.reliable_buf[0].output_bitstream);
+		//REQUIRE(msg + 8 == sender.reliable_buf[1].output_bitstream);
 
 		sender.reliable_buf.clear();
 	}

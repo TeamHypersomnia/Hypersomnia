@@ -1945,6 +1945,8 @@ namespace augs {
 			FIELD(debug_regenerate_content_every_launch);
 
 			FIELD(debug_run_unit_tests);
+			FIELD(debug_log_successful_unit_tests);
+			FIELD(debug_break_on_unit_test_failure);
 
 			FIELD(enable_hrtf);
 			FIELD(max_number_of_sound_sources);

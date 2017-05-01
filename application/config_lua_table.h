@@ -44,6 +44,8 @@ public:
 	bool debug_regenerate_content_every_launch = false;
 
 	bool debug_run_unit_tests = false;
+	bool debug_log_successful_unit_tests = false;
+	bool debug_break_on_unit_test_failure = false;
 
 	bool enable_hrtf = true;
 	unsigned max_number_of_sound_sources = 0u;
