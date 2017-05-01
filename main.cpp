@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
 	cfg.get_values(lua);
 
 	if (cfg.debug_run_unit_tests) {
-		augs::global_libraries::run_googletest(argc, argv);
+		augs::global_libraries::run_unit_tests(argc, argv);
 	}
 
 	augs::audio_manager::generate_alsoft_ini(

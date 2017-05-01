@@ -2,7 +2,51 @@ cmake_minimum_required(VERSION 3.8)
 
 project(Hypersomnia)
 
-set(HYPERSOMNIA_SRCS
+set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+# We will be building Lua manually.
+
+set(LUA_SRCS
+	"3rdparty/lua/lapi.c"
+	"3rdparty/lua/lauxlib.c"
+	"3rdparty/lua/lbaselib.c"
+	"3rdparty/lua/lbitlib.c"
+	"3rdparty/lua/lcode.c"
+	"3rdparty/lua/lcorolib.c"
+	"3rdparty/lua/lctype.c"
+	"3rdparty/lua/ldblib.c"
+	"3rdparty/lua/ldebug.c"
+	"3rdparty/lua/ldo.c"
+	"3rdparty/lua/ldump.c"
+	"3rdparty/lua/lfunc.c"
+	"3rdparty/lua/lgc.c"
+	"3rdparty/lua/linit.c"
+	"3rdparty/lua/liolib.c"
+	"3rdparty/lua/llex.c"
+	"3rdparty/lua/lmathlib.c"
+	"3rdparty/lua/lmem.c"
+	"3rdparty/lua/loadlib.c"
+	"3rdparty/lua/lobject.c"
+	"3rdparty/lua/lopcodes.c"
+	"3rdparty/lua/loslib.c"
+	"3rdparty/lua/lparser.c"
+	"3rdparty/lua/lstate.c"
+	"3rdparty/lua/lstring.c"
+	"3rdparty/lua/lstrlib.c"
+	"3rdparty/lua/ltable.c"
+	"3rdparty/lua/ltablib.c"
+	"3rdparty/lua/ltm.c"
+	"3rdparty/lua/lundump.c"
+	"3rdparty/lua/lutf8lib.c"
+	"3rdparty/lua/lvm.c"
+	"3rdparty/lua/lzio.c"
+)
+
+set_source_files_properties(${LUA_SRCS} PROPERTIES LANGUAGE CXX)
+
+# We will be building Box2D manually, as it is hacked to the utmost.
+
+set(HYPERSOMNIA_BOX2D_SRCS
 	"3rdparty/Box2D/Collision/b2BroadPhase.cpp"
 	"3rdparty/Box2D/Collision/b2CollideCircle.cpp"
 	"3rdparty/Box2D/Collision/b2CollideEdge.cpp"
@@ -49,11 +93,11 @@ set(HYPERSOMNIA_SRCS
 	"3rdparty/Box2D/Dynamics/Joints/b2WeldJoint.cpp"
 	"3rdparty/Box2D/Dynamics/Joints/b2WheelJoint.cpp"
 	"3rdparty/Box2D/Rope/b2Rope.cpp"
-	"3rdparty/GL/glew.c"
-	"3rdparty/GL/OpenGL.cpp"
-	"3rdparty/lodepng/lodepng.cpp"
-	"3rdparty/polypartition/src/polypartition.cpp"
-	"3rdparty/rectpack2D/src/pack.cpp"
+)
+
+# We don't care about alphabetical order. Put new files to the very bottom.
+
+set(HYPERSOMNIA_CODEBASE_SRCS
 	"application/call_config_script.cpp"
 	"application/config_lua_table.cpp"
 	"application/content_generation/desaturations.cpp"
@@ -286,7 +330,6 @@ set(HYPERSOMNIA_SRCS
 	"game/view/viewing_session.cpp"
 	"game/view/viewing_step.cpp"
 	"game/view/world_camera.cpp"
-	"main.cpp"
 	"application/setups/server_setup.cpp"
 	"application/setups/setup_base.cpp"
 	"application/web_daemon/session_report.cpp"
@@ -321,52 +364,27 @@ set(HYPERSOMNIA_SRCS
 	"application/setups/two_clients_and_server_setup.cpp"
 )
 
+set(HYPERSOMNIA_SRCS
+	"3rdparty/GL/glew.c"
+	"3rdparty/GL/OpenGL.cpp"
+	"3rdparty/lodepng/lodepng.cpp"
+	"3rdparty/polypartition/src/polypartition.cpp"
+	"3rdparty/rectpack2D/src/pack.cpp"
+
+	${HYPERSOMNIA_BOX2D_SRCS}
+	${HYPERSOMNIA_CODEBASE_SRCS}
+
+	"main.cpp"
+)
+
+# To aid IntelliSense.
+
 file(GLOB_RECURSE HYPERSOMNIA_HEADERS
     "augs/*.h"
     "game/*.h"
     "application/*.h"
     "3rdparty/Box2D/*.h"
 )
-
-# We will be building Lua manually.
-
-set(LUA_SRCS
-	"3rdparty/lua/lapi.c"
-	"3rdparty/lua/lauxlib.c"
-	"3rdparty/lua/lbaselib.c"
-	"3rdparty/lua/lbitlib.c"
-	"3rdparty/lua/lcode.c"
-	"3rdparty/lua/lcorolib.c"
-	"3rdparty/lua/lctype.c"
-	"3rdparty/lua/ldblib.c"
-	"3rdparty/lua/ldebug.c"
-	"3rdparty/lua/ldo.c"
-	"3rdparty/lua/ldump.c"
-	"3rdparty/lua/lfunc.c"
-	"3rdparty/lua/lgc.c"
-	"3rdparty/lua/linit.c"
-	"3rdparty/lua/liolib.c"
-	"3rdparty/lua/llex.c"
-	"3rdparty/lua/lmathlib.c"
-	"3rdparty/lua/lmem.c"
-	"3rdparty/lua/loadlib.c"
-	"3rdparty/lua/lobject.c"
-	"3rdparty/lua/lopcodes.c"
-	"3rdparty/lua/loslib.c"
-	"3rdparty/lua/lparser.c"
-	"3rdparty/lua/lstate.c"
-	"3rdparty/lua/lstring.c"
-	"3rdparty/lua/lstrlib.c"
-	"3rdparty/lua/ltable.c"
-	"3rdparty/lua/ltablib.c"
-	"3rdparty/lua/ltm.c"
-	"3rdparty/lua/lundump.c"
-	"3rdparty/lua/lutf8lib.c"
-	"3rdparty/lua/lvm.c"
-	"3rdparty/lua/lzio.c"
-)
-
-set_source_files_properties(${LUA_SRCS} PROPERTIES LANGUAGE CXX)
 
 set(HYPERSOMNIA_LIBS
 	"OpenGL32.lib"
@@ -388,45 +406,7 @@ set(HYPERSOMNIA_INCLUDE_DIRS
 
 set(HYPERSOMNIA_ADDITIONAL_COMPILER_FLAGS "/MP /Gm- /fp:strict /bigobj")
 
-macro(configure_msvc_runtime)
-  if(MSVC)
-    # Default to statically-linked runtime.
-    if("${MSVC_RUNTIME}" STREQUAL "")
-      set(MSVC_RUNTIME "static")
-    endif()
-    # Set compiler options.
-    set(variables
-      CMAKE_C_FLAGS_DEBUG
-      CMAKE_C_FLAGS_MINSIZEREL
-      CMAKE_C_FLAGS_RELEASE
-      CMAKE_C_FLAGS_RELWITHDEBINFO
-      CMAKE_CXX_FLAGS_DEBUG
-      CMAKE_CXX_FLAGS_MINSIZEREL
-      CMAKE_CXX_FLAGS_RELEASE
-      CMAKE_CXX_FLAGS_RELWITHDEBINFO
-    )
-    if(${MSVC_RUNTIME} STREQUAL "static")
-      message(STATUS
-        "MSVC -> forcing use of statically-linked runtime."
-      )
-      foreach(variable ${variables})
-        if(${variable} MATCHES "/MD")
-          string(REGEX REPLACE "/MD" "/MT" ${variable} "${${variable}}")
-        endif()
-      endforeach()
-    else()
-      message(STATUS
-        "MSVC -> forcing use of dynamically-linked runtime."
-      )
-      foreach(variable ${variables})
-        if(${variable} MATCHES "/MT")
-          string(REGEX REPLACE "/MT" "/MD" ${variable} "${${variable}}")
-        endif()
-      endforeach()
-    endif()
-  endif()
-endmacro()
-
+include(configure_runtime_library)
 configure_msvc_runtime()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${HYPERSOMNIA_ADDITIONAL_COMPILER_FLAGS}")
@@ -479,6 +459,9 @@ macro(add_include_dirs_of target_name)
 		include_directories(${dir})
 	endforeach()
 endmacro(add_include_dirs_of target_name)
+
+# As the following libraries do not use target_include_directories,
+# we must manually acquire the directories that they add via include_directories.
 
 add_include_dirs_of("OpenAL")
 add_include_dirs_of("enet")

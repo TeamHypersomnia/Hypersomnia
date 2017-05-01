@@ -1,6 +1,6 @@
-#include "augs/build_settings/setting_build_gtest.h"
+#include "augs/build_settings/setting_build_unit_tests.h"
 
-#if BUILD_GTEST
+#if BUILD_UNIT_TESTS
 #include <gtest/gtest.h>
 
 #include "augs/math/vec2.h"

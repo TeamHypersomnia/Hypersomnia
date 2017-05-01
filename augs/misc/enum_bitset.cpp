@@ -1,6 +1,6 @@
-#include "augs/build_settings/setting_build_gtest.h"
+#include "augs/build_settings/setting_build_unit_tests.h"
 
-#if BUILD_GTEST
+#if BUILD_UNIT_TESTS
 #include "augs/misc/enum_bitset.h"
 #include <gtest/gtest.h>
 
