@@ -370,10 +370,11 @@ set_source_files_properties(${LUA_SRCS} PROPERTIES LANGUAGE CXX)
 
 set(HYPERSOMNIA_LIBS
 	"OpenGL32.lib"
-	"Ws2_32.lib" 		# for ENet
-	"winmm.lib"  		# for ENet
-	"${PROJECT_SOURCE_DIR}/3rdparty/http/libmicrohttpd.lib"
 	"${PROJECT_SOURCE_DIR}/3rdparty/libsndfile/lib/libsndfile-1.lib"
+	enet
+	freetype
+	lua
+	OpenAL
 )
 
 set(HYPERSOMNIA_INCLUDE_DIRS
@@ -382,6 +383,7 @@ set(HYPERSOMNIA_INCLUDE_DIRS
 	"${PROJECT_SOURCE_DIR}/3rdparty/libsndfile/include"
 	"${PROJECT_SOURCE_DIR}/3rdparty/lua"
 	"${PROJECT_SOURCE_DIR}/3rdparty/sol2/single/sol"
+	"${PROJECT_SOURCE_DIR}/3rdparty/Catch/single_include"
 )
 
 set(HYPERSOMNIA_ADDITIONAL_COMPILER_FLAGS "/MP /Gm- /fp:strict /bigobj")
@@ -430,23 +432,31 @@ configure_msvc_runtime()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${HYPERSOMNIA_ADDITIONAL_COMPILER_FLAGS}")
 
 add_definitions(
-	-DUNICODE
-	-D_CRT_SECURE_NO_WARNINGS
 	-DGLEW_STATIC
-	-DSFML_STATIC
-	-D_WINSOCK_DEPRECATED_NO_WARNINGS
-	-DPLATFORM_WINDOWS
-	-DFT2_BUILD_LIBRARY
-	-D_SCL_SECURE_NO_WARNINGS
-	-DAL_LIBTYPE_STATIC
-	-DAL_ALEXT_PROTOTYPES
 	-DSOL_USING_CXX_LUA
 )
+
+if(MSVC)
+	list(APPEND HYPERSOMNIA_LIBS
+		"Ws2_32.lib" 		# for ENet
+		"winmm.lib"  		# for ENet
+		"${PROJECT_SOURCE_DIR}/3rdparty/http/libmicrohttpd.lib"
+	)
+
+	add_definitions(
+		-DPLATFORM_WINDOWS
+		-D_WINSOCK_DEPRECATED_NO_WARNINGS
+		-D_CRT_SECURE_NO_WARNINGS
+		-D_SCL_SECURE_NO_WARNINGS
+		-DUNICODE
+	)
+endif()
 
 # We build lua sources manually as there is no up-to-date CMakeLists for lua.
 
 add_library(lua ${LUA_SRCS})
-add_subdirectory("${PROJECT_SOURCE_DIR}/3rdparty/enet")
+
+# We build OpenAL. We need to set some variables beforehand.
 
 set(LIBTYPE "STATIC")
 set(FORCE_STATIC_VCRT TRUE CACHE BOOL "/MT for static VC runtimes" FORCE)
@@ -455,6 +465,10 @@ set(ALSOFT_EXAMPLES FALSE CACHE BOOL "Build and install example programs"  FORCE
 set(ALSOFT_TESTS FALSE CACHE BOOL     "Build and install test programs"     FORCE)
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/3rdparty/openal-soft")
+
+# We build the remaining libraries.
+
+add_subdirectory("${PROJECT_SOURCE_DIR}/3rdparty/enet")
 add_subdirectory("${PROJECT_SOURCE_DIR}/3rdparty/freetype")
 
 macro(add_include_dirs_of target_name)
@@ -466,17 +480,18 @@ macro(add_include_dirs_of target_name)
 	endforeach()
 endmacro(add_include_dirs_of target_name)
 
+add_include_dirs_of("OpenAL")
 add_include_dirs_of("enet")
 add_include_dirs_of("freetype")
-add_include_dirs_of("OpenAL")
 
 include_directories(${HYPERSOMNIA_INCLUDE_DIRS})
 
 add_executable(Hypersomnia ${HYPERSOMNIA_SRCS} ${HYPERSOMNIA_HEADERS})
-target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS} enet freetype lua OpenAL)
+target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS})
 
 set_target_properties(Hypersomnia PROPERTIES DEBUG_POSTFIX "-Debug")
-set_target_properties(Hypersomnia PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/output")
 
-#set(VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/output")
-#set_target_properties(Hypersomnia PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/output")
+if(MSVC)
+	set_target_properties(Hypersomnia PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/output")
+	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Hypersomnia)
+endif()
