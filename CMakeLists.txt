@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.8)
 
 project(Hypersomnia)
 
-set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # We will be building Lua manually.
 
@@ -365,11 +365,14 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"augs/graphics/OpenGL_error.cpp"
 )
 
-set(HYPERSOMNIA_SRCS
+set(HYPERSOMNIA_TRIVIAL_3RDPARTY_SRCS
 	"3rdparty/lodepng/lodepng.cpp"
 	"3rdparty/polypartition/src/polypartition.cpp"
 	"3rdparty/rectpack2D/src/pack.cpp"
+)
 
+set(HYPERSOMNIA_SRCS
+	${HYPERSOMNIA_TRIVIAL_3RDPARTY_SRCS}
 	${HYPERSOMNIA_BOX2D_SRCS}
 	${HYPERSOMNIA_CODEBASE_SRCS}
 
@@ -441,6 +444,7 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO
  
 add_definitions(
 	-DSOL_USING_CXX_LUA
+	-DAL_LIBTYPE_STATIC
 )
 
 if(MSVC)

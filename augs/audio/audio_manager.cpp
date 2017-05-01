@@ -51,18 +51,16 @@ namespace augs {
 		alsoft_ini_file += "\nhrtf-paths = " + augs::get_executable_directory() + "\\hrtf";
 		alsoft_ini_file += typesafe_sprintf("\nsources = %x", max_number_of_sound_sources);
 
-		auto dir_where_openal_expects_alsoft_ini = GetProcPath();
-		alstr_append_cstr(&dir_where_openal_expects_alsoft_ini, "\\alsoft.ini");
+		auto where_openal_expects_alsoft_ini = GetProcPath();
+		alstr_append_cstr(&where_openal_expects_alsoft_ini, "\\alsoft.ini");
 
-		const auto alsoft_ini_path = std::string(alstr_get_cstr(dir_where_openal_expects_alsoft_ini));
+		const auto alsoft_ini_path = std::string(alstr_get_cstr(where_openal_expects_alsoft_ini));
 
 		augs::create_text_file(alsoft_ini_path, alsoft_ini_file);
 	}
 
 	audio_manager::audio_manager(const std::string output_device_name) {
 #if BUILD_OPENAL
-		alGetError();
-
 		device = alcOpenDevice(output_device_name.size() > 0 ? output_device_name.c_str() : nullptr);
 
 		context = alcCreateContext(device, nullptr);
