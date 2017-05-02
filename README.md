@@ -56,7 +56,7 @@ Then, use your favorite shell to go into the newly created ```build/``` folder a
 cmake ..
 ```
 
-If you are on Windows, resultant .sln and .vcxproj files should appear in the ```build/``` directory.
+If you are on Windows, resultant ```.sln``` and ```.vcxproj``` files should appear in the ```build/``` directory.
 Open ```Hypersomnia.sln``` file, select **Release** configuration and hit **F7** to build the game.
 
 As it currently stands, the game is known to build successfully only with Visual Studio 2017 under Win32. Compilers from Visual Studio 2015 do not support some of the C++ language features.
@@ -77,7 +77,5 @@ Or if you just can't wait to utter some brilliant suggestions regarding the game
 # Launching
 
 You might want to properly configure some variables before launching the game.
-- Clone the **config.lua file** and name it **config.local.lua** so that it stays unversioned and unique to your filesystem, if for example you want to preserve your original window resolution and coordinates across further commits.
-- The game will try to read **config.local.lua** and if there is no such file, it shall try loading **config.lua**.
-
-**Explanation of config values is found within config.lua file.**
+- Clone the ```config.lua``` and name it ```config.local.lua``` so that it stays unversioned and unique to your filesystem, if for example you want to preserve your original window resolution and coordinates across further commits.
+- The game will try to read ```config.local.lua``` and if there is no such file, it shall try loading ```config.lua```.

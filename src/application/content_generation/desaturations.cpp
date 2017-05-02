@@ -46,7 +46,7 @@ void regenerate_desaturations(
 			}
 			else {
 				augs::stream existent_stamp_stream;
-				augs::assign_file_contents_binary(desaturation_stamp_path, existent_stamp_stream);
+				augs::get_file_contents_binary_into(desaturation_stamp_path, existent_stamp_stream);
 
 				const bool are_stamps_identical = (new_stamp_stream == existent_stamp_stream);
 

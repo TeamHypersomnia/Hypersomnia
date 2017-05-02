@@ -54,7 +54,7 @@ bool cosmos::load_from_file(const std::string& filename) {
 
 		profiler.reading_savefile.new_measurement();
 
-		augs::assign_file_contents_binary(filename, stream);
+		augs::get_file_contents_binary_into(filename, stream);
 
 		profiler.reading_savefile.end_measurement();
 		profiler.deserialization_pass.new_measurement();

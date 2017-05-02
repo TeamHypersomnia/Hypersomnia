@@ -82,7 +82,7 @@ atlases_regeneration_output regenerate_atlases(
 				else {
 					augs::stream existent_stamp_stream;
 
-					augs::assign_file_contents_binary(atlas_stamp_path, existent_stamp_stream);
+					augs::get_file_contents_binary_into(atlas_stamp_path, existent_stamp_stream);
 					texture_atlas_stamp existent_stamp;
 					augs::read(existent_stamp_stream, existent_stamp);
 
@@ -281,7 +281,7 @@ atlases_regeneration_output regenerate_atlases(
 			texture_atlas_metadata this_atlas_metadata;
 
 			augs::stream existent_meta_stream;
-			augs::assign_file_contents_binary(atlas_metadata_path, existent_meta_stream);
+			augs::get_file_contents_binary_into(atlas_metadata_path, existent_meta_stream);
 
 			augs::read(existent_meta_stream, this_atlas_metadata);
 

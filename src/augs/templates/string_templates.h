@@ -3,26 +3,9 @@
 #include <sstream>
 #include <iomanip>
 
-#include "container_templates.h"
-#include "maybe_const.h"
-
-template <class T>
-struct get_underlying_char_type {
-	typedef T type;
-};
-
-template <class T>
-struct get_underlying_char_type<std::basic_string<T>> {
-	typedef T type;
-};
-
-template <class T>
-struct get_underlying_char_type<const T*> {
-	typedef T type;
-};
-
-template <class T>
-using get_underlying_char_type_t = typename get_underlying_char_type<T>::type;
+#include "augs/templates/container_templates.h"
+#include "augs/templates/maybe_const.h"
+#include "augs/templates/get_underlying_char_type.h"
 
 std::string to_string(std::wstring val);
 

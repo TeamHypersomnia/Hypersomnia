@@ -334,7 +334,6 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/application/setups/setup_base.cpp"
 	"src/application/web_daemon/session_report.cpp"
 	"src/augs/global_libraries.cpp"
-	"src/augs/filesystem/file.cpp"
 	"src/augs/graphics/fbo.cpp"
 	"src/augs/graphics/pixel.cpp"
 	"src/augs/graphics/renderer.cpp"
@@ -500,6 +499,17 @@ add_include_dirs_of("enet")
 add_include_dirs_of("freetype")
 
 include_directories(${HYPERSOMNIA_INCLUDE_DIRS})
+
+#add_executable(version_file_generator 
+#	"${PROJECT_SOURCE_DIR}/cmake/version_file_generator.cpp"
+#)
+#
+#add_custom_command(
+#  OUTPUT version.h version.cpp
+#  COMMAND version_file_generator ${GIT_EXECUTABLE}
+#  COMMENT "Generating version files..."
+#  VERBATIM
+#)
 
 add_executable(Hypersomnia ${HYPERSOMNIA_SRCS} ${HYPERSOMNIA_HEADERS})
 

@@ -5,46 +5,83 @@
 #include <unordered_map>
 #include <chrono>
 
+#include <fstream>
+#include <experimental\filesystem>
+
 namespace augs {
-	class stream;
+	template <class P>
+	std::chrono::system_clock::time_point last_write_time(const P& path) {
+		ensure_existence(path);
+		return fs::last_write_time(path);
+	}
 
-	std::chrono::system_clock::time_point last_write_time(const std::string& path);
+	template <class P>
+	bool file_exists(const P& path) {
+		std::ifstream infile(path);
+		return infile.good();
+	}
 
-	void ensure_existence(const std::string& path);
+	template <class P>
+	void ensure_existence(const P& path) {
+		const bool exists = file_exists(path);
 
-	bool file_exists(const std::string& path);
-	std::string get_file_contents(const std::string& path);
+		if (!exists) {
+			LOG("File not found: %x", path);
+			ensure(exists);
+		}
+	}
+	
+	template <class P>
+	auto get_file_contents(const P& path) {
+		std::ifstream t(path);
+		std::stringstream buffer;
+		buffer << t.rdbuf();
 
-	std::vector<std::string> get_file_lines(const std::string& path);
+		return buffer.str();
+	}
 
-	template <class T>
-	void create_text_file(const T& path, const T& text) {
+	template <class P>
+	auto get_file_lines(const P& path) {
+		typedef std::string string_type;
+
+		ensure_existence(path);
+		std::ifstream input(path);
+
+		std::vector<string_type> out;
+
+		for (string_type line; std::getline(input, line);) {
+			out.push_back(line);
+		}
+
+		return out;
+	}
+
+	template <class P, class S>
+	void create_text_file(const P& path, const S& text) {
 		std::ofstream out(path, std::ios::out);
 		out << text;
 	}
 
-	template <class T>
-	void create_binary_file(std::string path, T& target) {
+	template <class P, class C>
+	void create_binary_file(const P& path, const C& content) {
 		std::ofstream out(path, std::ios::out | std::ios::binary);
-		out.write(target.data(), target.size());
+		out.write(content.data(), content.size());
 	}
 
-	template <class T>
-	void assign_file_contents(const std::string& path, T& target) {
-		std::ifstream t(path);
+	template <class P, class S>
+	void get_file_contents_binary_into(const P& path, S& target) {
+		ensure_existence(path);
+		std::ifstream file(path, std::ios::binary | std::ios::ate);
+		const std::streamsize size = file.tellg();
+		file.seekg(0, std::ios::beg);
 
-		t.seekg(0, std::ios::end);
-		target.reserve(static_cast<unsigned>(t.tellg()));
-		t.seekg(0, std::ios::beg);
-
-		target.assign((std::istreambuf_iterator<char>(t)),
-			std::istreambuf_iterator<char>());
+		target.reserve(static_cast<unsigned>(size));
+		file.read(target.data(), size);
+		target.set_write_pos(static_cast<size_t>(size));
 	}
 
-	void assign_file_contents_binary(const std::string& path, augs::stream& target);
-
-	template <class ContainerType>
-	void read_map_until_eof(const std::string& path, ContainerType& into) {
+	template <class P, class ContainerType>
+	void read_map_until_eof(const P& path, ContainerType& into) {
 		std::ifstream source(path, std::ios::in | std::ios::binary);
 
 		while (source.peek() != EOF) {

@@ -73,7 +73,7 @@ void regenerate_scripted_images(
 			}
 			else {
 				augs::stream existent_stamp_stream;
-				augs::assign_file_contents_binary(scripted_image_stamp_path, existent_stamp_stream);
+				augs::get_file_contents_binary_into(scripted_image_stamp_path, existent_stamp_stream);
 
 				const bool are_stamps_identical = (new_stamp_stream == existent_stamp_stream);
 

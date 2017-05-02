@@ -56,7 +56,7 @@ void regenerate_polygonizations_of_images(
 			}
 			else {
 				augs::stream existent_stamp_stream;
-				augs::assign_file_contents_binary(polygonization_stamp_path, existent_stamp_stream);
+				augs::get_file_contents_binary_into(polygonization_stamp_path, existent_stamp_stream);
 
 				const bool are_stamps_identical = (new_stamp_stream == existent_stamp_stream);
 
