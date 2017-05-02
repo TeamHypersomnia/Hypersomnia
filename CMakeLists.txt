@@ -513,6 +513,6 @@ target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS})
 set_target_properties(Hypersomnia PROPERTIES DEBUG_POSTFIX "-Debug")
 
 if(MSVC)
-	set_target_properties(Hypersomnia PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/output")
+	set_target_properties(Hypersomnia PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/hypersomnia")
 	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Hypersomnia)
 endif()

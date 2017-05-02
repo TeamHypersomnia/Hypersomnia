@@ -165,10 +165,10 @@ pip-log.txt
 /ReleaseDebug
 /ReleaseExe
 /RelDeb
-/output/saves
-/output/hypersomnia/music
-/output/generated
-/output/choreographic/voices
+/hypersomnia/saves
+/hypersomnia/hypersomnia/music
+/hypersomnia/generated
+/hypersomnia/choreographic/voices
 
 *.log
 *.tlog
