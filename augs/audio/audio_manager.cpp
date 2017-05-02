@@ -3,11 +3,12 @@
 #include "augs/al_log.h"
 
 #if BUILD_OPENAL
-#include <AL/al.h>
-#include <AL/alc.h>
 extern "C" {
 	#include <compat.h>
 }
+
+#include <AL/al.h>
+#include <AL/alc.h>
 #include <AL/efx.h>
 #include <AL/alext.h>
 #endif
@@ -80,11 +81,14 @@ namespace augs {
 		AL_CHECK(alDistanceModel(AL_LINEAR_DISTANCE_CLAMPED));
 		AL_CHECK(alListenerf(AL_METERS_PER_UNIT, 1.3f));
 
-		const auto devices = list_audio_devices(alcGetString(nullptr, ALC_ALL_DEVICES_SPECIFIER));
+		const auto all_audio_devices = list_audio_devices(alcGetString(nullptr, ALC_ALL_DEVICES_SPECIFIER));
 
-		LOG(devices);
+		LOG(all_audio_devices);
 
-		augs::create_text_file(std::string("generated/logs/audio_devices.txt"), devices);
+		augs::create_text_file(
+			std::string("generated/logs/audio_devices.txt"), 
+			all_audio_devices
+		);
 
 		ALint hrtf_status;
 		alcGetIntegerv(device, ALC_HRTF_STATUS_SOFT, 1, &hrtf_status);
