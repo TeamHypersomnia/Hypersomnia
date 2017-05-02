@@ -1943,6 +1943,7 @@ namespace augs {
 			FIELD(check_content_integrity_every_launch);
 			FIELD(save_regenerated_atlases_as_binary);
 			FIELD(debug_regenerate_content_every_launch);
+			FIELD(packer_detail_max_atlas_size);
 
 			FIELD(debug_run_unit_tests);
 			FIELD(debug_log_successful_unit_tests);

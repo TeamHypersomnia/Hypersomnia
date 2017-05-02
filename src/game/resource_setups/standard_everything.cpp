@@ -50,7 +50,8 @@ void load_standard_everything(const config_lua_table& cfg) {
 		in,
 		cfg.debug_regenerate_content_every_launch,
 		cfg.check_content_integrity_every_launch,
-		cfg.save_regenerated_atlases_as_binary
+		cfg.save_regenerated_atlases_as_binary,
+		cfg.packer_detail_max_atlas_size
 	);
 
 	LOG("Content regenerated successfully.\n--------------------------------------------\n");

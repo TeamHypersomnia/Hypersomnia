@@ -13,7 +13,7 @@ void regenerate_buttons_with_corners(
 
 	augs::create_directories(buttons_with_corners_directory);
 
-	const auto lines = augs::get_file_lines("buttons_with_corners_generator_input.cfg");
+	const auto lines = augs::get_file_lines("cfg/buttons_with_corners_generator_input.cfg");
 	size_t current_line = 0;
 
 	while (current_line < lines.size()) {

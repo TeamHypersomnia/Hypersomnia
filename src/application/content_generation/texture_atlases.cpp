@@ -26,7 +26,8 @@ atlases_regeneration_output regenerate_atlases(
 	const atlases_regeneration_input& in,
 	const bool force_regenerate,
 	const bool always_check_source_images_integrity,
-	const bool save_atlases_as_binary
+	const bool save_atlases_as_binary,
+	const unsigned packer_detail_max_atlas_size
 ) {
 	atlases_regeneration_output output;
 
@@ -167,7 +168,7 @@ atlases_regeneration_output regenerate_atlases(
 			const bool result = pack(
 				input_for_packing_algorithm.data(), 
 				static_cast<int>(input_for_packing_algorithm.size()), 
-				static_cast<int>(augs::renderer::get_current().get_max_texture_size()),
+				static_cast<int>(packer_detail_max_atlas_size),
 				packing_output
 			);
 

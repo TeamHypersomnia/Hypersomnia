@@ -85,6 +85,9 @@ config_table = {
 	-- 1 always regenerates the entire content. only for debugging pruposes - the game will take a lot longer to launch every time.
 	debug_regenerate_content_every_launch = false,
 
+	-- detail value. so that the regenerator does not have to query actual value from opengl.
+	packer_detail_max_atlas_size = 8192,
+
 	-- if true, runs unit tests on every launch.
 	debug_run_unit_tests = true,
 

@@ -42,6 +42,7 @@ public:
 	bool check_content_integrity_every_launch = false;
 	bool save_regenerated_atlases_as_binary = false;
 	bool debug_regenerate_content_every_launch = false;
+	unsigned packer_detail_max_atlas_size = 8192;
 
 	bool debug_run_unit_tests = false;
 	bool debug_log_successful_unit_tests = false;

@@ -19,7 +19,7 @@ void regenerate_scripted_images(
 
 	augs::create_directories(scripted_images_directory);
 
-	const auto lines = augs::get_file_lines("scripted_images_generator_input.cfg");
+	const auto lines = augs::get_file_lines("cfg/scripted_images_generator_input.cfg");
 	size_t current_line = 0;
 
 	while (current_line < lines.size()) {
