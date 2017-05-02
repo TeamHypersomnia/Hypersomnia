@@ -1,6 +1,5 @@
 Tree structure:
 
-- ```build/``` - untracked directory for files you will generate with ```cmake ..```. 
 - ```cmake/``` - CMake scripts.
 - ```hypersomnia/``` - all files needed by the Hypersomnia executable to run properly.
 - ```src/``` - complete source code of Hypersomnia, along with 3rd party libraries.
@@ -50,15 +49,15 @@ open git bash and paste:
 git clone https://github.com/TeamHypersomnia/Hypersomnia.git --recursive
 ```
 
-The repository will start downloading. Once complete, use your favorite shell to go into the build/
-directory, and run:
+The repository will start downloading. Once complete, create a ```build/``` folder next to ```CMakeLists.txt``` file. 
+Then, use your favorite shell to go into the newly created ```build/``` folder and run:
 
 ```
 cmake ..
 ```
 
 If you are on Windows, resultant .sln and .vcxproj files should appear in the ```build/``` directory.
-Open ```Hypersomnia.sln``` file, select **Release** configuration and hit **F7** to build.
+Open ```Hypersomnia.sln``` file, select **Release** configuration and hit **F7** to build the game.
 
 As it currently stands, the game is known to build successfully only with Visual Studio 2017 under Win32. Compilers from Visual Studio 2015 do not support some of the C++ language features.
 
