@@ -381,6 +381,7 @@ set(HYPERSOMNIA_SRCS
 # To aid IntelliSense.
 
 file(GLOB_RECURSE HYPERSOMNIA_HEADERS
+    "src/hypersomnia_version.h"
     "src/augs/*.h"
     "src/game/*.h"
     "src/application/*.h"
@@ -500,22 +501,30 @@ add_include_dirs_of("freetype")
 
 include_directories(${HYPERSOMNIA_INCLUDE_DIRS})
 
-#add_executable(version_file_generator 
-#	"${PROJECT_SOURCE_DIR}/cmake/version_file_generator.cpp"
-#)
-#
-#add_custom_command(
-#  OUTPUT version.h version.cpp
-#  COMMAND version_file_generator ${GIT_EXECUTABLE}
-#  COMMENT "Generating version files..."
-#  VERBATIM
-#)
+add_executable(version_file_generator 
+	"${PROJECT_SOURCE_DIR}/cmake/version_file_generator.cpp"
+	"src/augs/misc/time_utils.cpp"
+)
 
-add_executable(Hypersomnia ${HYPERSOMNIA_SRCS} ${HYPERSOMNIA_HEADERS})
+set(HYPERSOMNIA_VERSION_FILES
+	"hypersomnia_version.cpp"
+)
+
+set_source_files_properties(${HYPERSOMNIA_VERSION_FILES} PROPERTIES GENERATED TRUE)
+
+add_executable(Hypersomnia ${HYPERSOMNIA_VERSION_FILES} ${HYPERSOMNIA_SRCS} ${HYPERSOMNIA_HEADERS})
+
+add_custom_command(
+  PRE_BUILD
+  TARGET Hypersomnia
+  COMMAND version_file_generator ${GIT_EXECUTABLE} "${PROJECT_SOURCE_DIR}/src/hypersomnia_version.cpp.in" "${PROJECT_BINARY_DIR}/hypersomnia_version.cpp"
+  COMMENT "Generating version files..."
+)
 
 # GLAD must first download and generate the source files,
 # therefore Hypersomnia depends on glad.
 
+add_dependencies(Hypersomnia version_file_generator)
 add_dependencies(Hypersomnia glad)
 
 target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS})

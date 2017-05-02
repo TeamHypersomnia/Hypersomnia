@@ -1,0 +1,13 @@
+/*
+	timestamp: %x
+	argc: %x
+	argv: %x*/
+
+#include "hypersomnia_version.h"
+
+unsigned HYPERSOMNIA_COMMIT_NUMBER = %x;
+std::string HYPERSOMNIA_COMMIT_MESSAGE = "%x";
+std::string HYPERSOMNIA_COMMIT_DATE = "%x";
+std::string HYPERSOMNIA_COMMIT_HASH = "%x";
+std::vector<std::string> HYPERSOMNIA_WORKING_TREE_CHANGES = {
+%x};

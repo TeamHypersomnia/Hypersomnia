@@ -8,6 +8,7 @@
 #include "game/messages/item_picked_up_message.h"
 
 #include "augs/network/network_client.h"
+#include "hypersomnia_version.h"
 
 viewing_session::viewing_session() {
 	systems_audiovisual.get<sound_system>().initialize_sound_sources(32u);
@@ -323,7 +324,18 @@ void viewing_session::view(
 			rgba(255, 255, 255, 150)
 		);
 
-		const auto lt_text_formatted = format(
+		const auto revision_info =
+			augs::gui::text::format_as_bbcode(
+				typesafe_sprintf(
+					"Revision no.: %x %x\nMessage: %x\n",
+					HYPERSOMNIA_COMMIT_NUMBER,
+					HYPERSOMNIA_WORKING_TREE_CHANGES.empty() ? "(clean)" : "(dirty)"
+				),
+				gui_style
+			)
+		;
+
+		const auto lt_text_formatted = revision_info + format(
 			typesafe_sprintf(
 				L"Entities: %x\nX: %f2\nY: %f2\nRot: %f2\nVelX: %x\nVelY: %x\n",
 				cosmos.entities_count(),

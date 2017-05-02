@@ -21,6 +21,14 @@ namespace augs {
 			}
 		}
 
+		const bool remove_trailing_newline_for_convenience = 
+			result.size() > 0 && result.back() == '\n'
+		;
+
+		if (remove_trailing_newline_for_convenience) {
+			result.pop_back();
+		}
+
 		return result;
 	}
 }

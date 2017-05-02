@@ -1,4 +1,5 @@
 #include <limits>
+#include <algorithm>
 #include "augs/ensure.h"
 #include "augs/graphics/pixel.h"
 

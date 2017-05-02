@@ -29,6 +29,7 @@
 #include "application/config_lua_table.h"
 
 #include "generated_introspectors.h"
+#include "hypersomnia_version.h"
 
 using namespace augs::window::event::keys;
 
@@ -168,6 +169,9 @@ void local_setup::process(
 
 		auto& renderer = augs::renderer::get_current();
 		renderer.clear_current_fbo();
+
+
+
 
 		session.view(
 			cfg,

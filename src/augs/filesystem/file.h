@@ -62,6 +62,14 @@ namespace augs {
 		out << text;
 	}
 
+	template <class P, class S>
+	void create_text_file_if_different(const P& path, const S& text) {
+		if (!file_exists(path) || text != get_file_contents(path)) {
+			std::ofstream out(path, std::ios::out);
+			out << text;
+		}
+	}
+
 	template <class P, class C>
 	void create_binary_file(const P& path, const C& content) {
 		std::ofstream out(path, std::ios::out | std::ios::binary);

@@ -5,7 +5,7 @@
 #include <type_traits>
 #include <limits>
 
-#include "augs/templates/string_templates.h"
+#include "augs/templates/get_underlying_char_type.h"
 
 template <typename CharType>
 void typesafe_sprintf_detail(size_t, std::basic_string<CharType>&) {
