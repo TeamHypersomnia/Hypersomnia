@@ -57,10 +57,10 @@ directory, and run:
 cmake ..
 ```
 
-If you are on Windows, resultant .sln and .vcxproj files should appear in the build/ directory.
-Open Hypersomnia.sln file, select **Release** configuration and hit **F7** to build.
+If you are on Windows, resultant .sln and .vcxproj files should appear in the ```build/``` directory.
+Open ```Hypersomnia.sln``` file, select **Release** configuration and hit **F7** to build.
 
-As it currently stands, the game is known to build successfully only with Visual Studio 2017 under Win32. Compilers from Visual Studio 2015 do not support some of the language features I'm using.
+As it currently stands, the game is known to build successfully only with Visual Studio 2017 under Win32. Compilers from Visual Studio 2015 do not support some of the C++ language features.
 
 # Contributing
 
@@ -71,7 +71,7 @@ I also recommend that you be familiar with component-based entity architecture b
 
 You will be added to our TeamHypersomnia organization once we accept at least one of your pull requests.
 
-If you have questions, just ask me via mail: patryk.czachurski@gmail.com
+If you have questions or you fail to build Hypersomnia, ask via mail: patryk.czachurski@gmail.com
 
 Or if you just can't wait to utter some brilliant suggestions regarding the game, please do so, too!
 
@@ -82,5 +82,3 @@ You might want to properly configure some variables before launching the game.
 - The game will try to read **config.local.lua** and if there is no such file, it shall try loading **config.lua**.
 
 **Explanation of config values is found within config.lua file.**
-
-After that, just go to output/ folder and open Hypersomnia.exe or Hypersomnia-Debug.exe for debugging.
