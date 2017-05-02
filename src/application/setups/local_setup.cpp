@@ -170,9 +170,6 @@ void local_setup::process(
 		auto& renderer = augs::renderer::get_current();
 		renderer.clear_current_fbo();
 
-
-
-
 		session.view(
 			cfg,
 			renderer, 

@@ -327,9 +327,10 @@ void viewing_session::view(
 		const auto revision_info =
 			augs::gui::text::format_as_bbcode(
 				typesafe_sprintf(
-					"Revision no.: %x %x\nMessage: %x\n",
+					"Revision no.: %x %x\nMessage:\n%x\n",
 					HYPERSOMNIA_COMMIT_NUMBER,
-					HYPERSOMNIA_WORKING_TREE_CHANGES.empty() ? "(clean)" : "(dirty)"
+					HYPERSOMNIA_WORKING_TREE_CHANGES.empty() ? "(clean)" : "(dirty)",
+					HYPERSOMNIA_COMMIT_MESSAGE.size() < 30 ? HYPERSOMNIA_COMMIT_MESSAGE : HYPERSOMNIA_COMMIT_MESSAGE.substr(0, 30) + "(...)"
 				),
 				gui_style
 			)
