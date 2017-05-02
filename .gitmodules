@@ -1,27 +1,27 @@
 [submodule "3rdparty/polypartition"]
-	path = 3rdparty/polypartition
+	path = src/3rdparty/polypartition
 	url = https://github.com/ivanfratric/polypartition.git
 [submodule "3rdparty/lua"]
-	path = 3rdparty/lua
+	path = src/3rdparty/lua
 	url = https://github.com/lua/lua.git
 [submodule "3rdparty/freetype"]
-	path = 3rdparty/freetype
+	path = src/3rdparty/freetype
 	url = git://git.sv.nongnu.org/freetype/freetype2.git
 [submodule "3rdparty/rectpack2D"]
-	path = 3rdparty/rectpack2D
+	path = src/3rdparty/rectpack2D
 	url = https://github.com/TeamHypersomnia/rectpack2D.git
 [submodule "3rdparty/enet"]
-	path = 3rdparty/enet
+	path = src/3rdparty/enet
 	url = https://github.com/lsalzman/enet.git
 [submodule "3rdparty/openal-soft"]
-	path = 3rdparty/openal-soft
+	path = src/3rdparty/openal-soft
 	url = https://github.com/kcat/openal-soft.git
 [submodule "3rdparty/lodepng"]
-	path = 3rdparty/lodepng
+	path = src/3rdparty/lodepng
 	url = https://github.com/lvandeve/lodepng.git
 [submodule "3rdparty/Catch"]
-	path = 3rdparty/Catch
+	path = src/3rdparty/Catch
 	url = https://github.com/philsquared/Catch.git
 [submodule "3rdparty/glad"]
-	path = 3rdparty/glad
+	path = src/3rdparty/glad
 	url = https://github.com/Dav1dde/glad.git
