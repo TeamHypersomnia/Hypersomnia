@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
 	augs::global_libraries::init();
 
 	sol::state lua;
-	lua.open_libraries( sol::lib::base );
+	lua.open_libraries(sol::lib::base);
 	bind_game_and_augs(lua);
 
 	config_lua_table cfg;

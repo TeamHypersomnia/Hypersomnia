@@ -126,7 +126,7 @@ void local_setup::process(
 			session.control_and_remove_fetched_intents(new_intents);
 			testbed.control_character_selection(new_intents);
 
-			auto new_cosmic_entropy = cosmic_entropy(
+			const auto new_cosmic_entropy = cosmic_entropy(
 				hypersomnia[testbed.get_selected_character()],
 				new_intents
 			);

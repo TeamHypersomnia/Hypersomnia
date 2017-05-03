@@ -1,6 +1,6 @@
 Tree structure:
 
-- ```cmake/``` - CMake scripts.
+- ```cmake/``` - CMake scripts and soruce code generators.
 - ```hypersomnia/``` - all files needed by the Hypersomnia executable to run properly.
 - ```src/``` - complete source code of Hypersomnia, along with 3rd party libraries.
   - ```src/3rdparty``` - 3rd party libraries, upon which the rest of the code depends.
