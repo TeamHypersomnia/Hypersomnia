@@ -463,7 +463,6 @@ if(MSVC)
 	list(APPEND HYPERSOMNIA_LIBS
 		"Ws2_32.lib" 		# for ENet
 		"winmm.lib"  		# for ENet
-		"${PROJECT_SOURCE_DIR}/src/3rdparty/http/libmicrohttpd.lib"
 	)
 
 	add_definitions(
