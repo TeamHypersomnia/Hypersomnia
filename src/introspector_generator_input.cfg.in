@@ -1,3 +1,28 @@
+beginning-line:
+// GEN INTROSPECTOR 
+ending-line:
+// END GEN INTROSPECTOR
+introspect-base-line:
+// INTROSPECT BASE
+header-directories:
+header-files:
+@HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES_NEWLINE_SEPARATED@
+generated-file-path:
+@GENERATED_SOURCES_PATH@/generated_introspectors.h
+introspector-field-format:
+			FIELD(%x);
+base-introspector-field-format:
+			introspect_body(static_cast<%x*>(nullptr), f, std::forward<Instances>(_t_)...);
+introspector-body-format:
+		template <class F%x, class... Instances>
+		static void introspect_body(
+			%x,
+			F f,
+			Instances&&... _t_
+		) {
+%x		}
+
+generated-file-format:
 #pragma once
 #include <tuple>
 #include <array>

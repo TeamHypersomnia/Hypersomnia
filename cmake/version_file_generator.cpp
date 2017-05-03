@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
 		throw std::runtime_error("Path to the output file was not specified!");
 	}
 	
-	const std::string git_executable = "\"" + std::string(argv[1]) + "\"";
+	const std::string git_executable_path = "\"" + std::string(argv[1]) + "\"";
 	const std::string input_file_path = argv[2];
 	const std::string output_file_path = argv[3];
 
@@ -30,12 +30,12 @@ int main(int argc, char** argv) {
 
 	debug_argv_content += "\n";
 
-	const auto git_commit_number = augs::exec(git_executable + " rev-list --count master");
-	const auto git_commit_message = augs::exec(git_executable + " log -1 --format=%s");
-	const auto git_commit_date = augs::exec(git_executable + " log -1 --format=%ad --date=local");
-	const auto git_commit_hash = augs::exec(git_executable + " rev-parse --verify HEAD");
+	const auto git_commit_number = augs::exec(git_executable_path + " rev-list --count master");
+	const auto git_commit_message = augs::exec(git_executable_path + " log -1 --format=%s");
+	const auto git_commit_date = augs::exec(git_executable_path + " log -1 --format=%ad --date=local");
+	const auto git_commit_hash = augs::exec(git_executable_path + " rev-parse --verify HEAD");
 
-	std::istringstream git_working_tree_changes (augs::exec(git_executable + " diff --name-only"));
+	std::istringstream git_working_tree_changes (augs::exec(git_executable_path + " diff --name-only"));
 
 	std::string git_working_tree_changes_lines;
 

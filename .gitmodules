@@ -28,3 +28,6 @@
 [submodule "src/3rdparty/sol2"]
 	path = src/3rdparty/sol2
 	url = https://github.com/ThePhD/sol2.git
+[submodule "cmake/Introspector-generator"]
+	path = cmake/Introspector-generator
+	url = https://github.com/TeamHypersomnia/Introspector-generator.git

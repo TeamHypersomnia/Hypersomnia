@@ -41,6 +41,29 @@ namespace augs {
 	}
 
 	template <class P>
+	std::vector<std::string> get_file_lines_without_blanks_and_comments(
+		const P& path,
+		const char comment_begin_character = '%'
+	) {
+		std::ifstream input(filename);
+	
+		std::vector<std::string> out;
+	
+		for (std::string line; std::getline(input, line); ) {
+			const bool should_omit = 
+				std::all_of(line.begin(), line.end(), isspace) 
+				|| line[0] == comment_begin_character
+			;
+	
+			if(!should_omit) {
+				out.emplace_back(line);
+			}
+		}
+	
+		return out;
+	}
+
+	template <class P>
 	auto get_file_lines(const P& path) {
 		typedef std::string string_type;
 

@@ -380,12 +380,18 @@ set(HYPERSOMNIA_SRCS
 
 # To aid IntelliSense.
 
+
+file(GLOB_RECURSE HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES
+	"src/augs/*.h"
+	"src/game/*.h"
+	"src/application/*.h"
+	"src/3rdparty/Box2D/Common/*.h"
+	"src/3rdparty/Box2D/Dynamics/*.h"
+)
+
 file(GLOB_RECURSE HYPERSOMNIA_HEADERS
     "src/hypersomnia_version.h"
-    "src/augs/*.h"
-    "src/game/*.h"
-    "src/application/*.h"
-    "src/3rdparty/Box2D/*.h"
+    ${HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES}
 )
 
 set(HYPERSOMNIA_LIBS
@@ -483,17 +489,10 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/enet")
 add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/freetype")
 add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/glad")
 
-macro(add_include_dirs_of target_name)
-	get_property(dirs TARGET ${target_name} PROPERTY INCLUDE_DIRECTORIES)
-	
-	foreach(dir ${dirs})
-		message(STATUS "adding external include dir='${dir}'")
-		include_directories(${dir})
-	endforeach()
-endmacro(add_include_dirs_of target_name)
-
 # As the following libraries do not use target_include_directories,
 # we must manually acquire the directories that they add via include_directories.
+
+include(add_include_dirs_of)
 
 add_include_dirs_of("OpenAL")
 add_include_dirs_of("enet")
@@ -501,30 +500,84 @@ add_include_dirs_of("freetype")
 
 include_directories(${HYPERSOMNIA_INCLUDE_DIRS})
 
+# Source-code generators go here.
+
+set(GENERATED_SOURCES_PATH
+	"${PROJECT_BINARY_DIR}/generated_sources"
+)
+
+file(MAKE_DIRECTORY ${GENERATED_SOURCES_PATH})
+
+include_directories(${GENERATED_SOURCES_PATH})
+
+add_subdirectory("${CMAKE_MODULE_PATH}/Introspector-generator")
+
 add_executable(version_file_generator 
-	"${PROJECT_SOURCE_DIR}/cmake/version_file_generator.cpp"
+	"${CMAKE_MODULE_PATH}/version_file_generator.cpp"
 	"src/augs/misc/time_utils.cpp"
 )
 
-set(HYPERSOMNIA_VERSION_FILES
-	"hypersomnia_version.cpp"
+set(HYPERSOMNIA_VERSION_FILE_PATH
+	"${GENERATED_SOURCES_PATH}/hypersomnia_version.cpp"
 )
 
-set_source_files_properties(${HYPERSOMNIA_VERSION_FILES} PROPERTIES GENERATED TRUE)
+set_source_files_properties(${HYPERSOMNIA_VERSION_FILE_PATH} PROPERTIES GENERATED TRUE)
 
-add_executable(Hypersomnia ${HYPERSOMNIA_VERSION_FILES} ${HYPERSOMNIA_SRCS} ${HYPERSOMNIA_HEADERS})
+# The Hypersomnia executable.
+
+add_executable(Hypersomnia ${HYPERSOMNIA_VERSION_FILE_PATH} ${HYPERSOMNIA_SRCS} ${HYPERSOMNIA_HEADERS})
+
+# Here, we define pre-build events calling the source code generators.
+
+# Before Hypersomnia builds,
+# version_file_generator must first query the git bash for commit information.
 
 add_custom_command(
   PRE_BUILD
   TARGET Hypersomnia
-  COMMAND version_file_generator ${GIT_EXECUTABLE} "${PROJECT_SOURCE_DIR}/src/hypersomnia_version.cpp.in" "${PROJECT_BINARY_DIR}/hypersomnia_version.cpp"
+  COMMAND version_file_generator ${GIT_EXECUTABLE} "${PROJECT_SOURCE_DIR}/src/hypersomnia_version.cpp.in" "${HYPERSOMNIA_VERSION_FILE_PATH}"
   COMMENT "Generating version files..."
 )
 
-# GLAD must first download and generate the source files,
-# therefore Hypersomnia depends on glad.
-
 add_dependencies(Hypersomnia version_file_generator)
+
+# Before Hypersomnia builds,
+# Introspector-generator must first generate the type information.
+
+# First we prepare a correct input configuration file for Introspector-generator
+# that contains paths to all headers for whom the generator should create introspectors,
+# and the correct output file path.
+# That call should only substitute HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES and GENERATED_SOURCES_PATH for output file path.
+
+string (REPLACE ";" "\n" 
+	HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES_NEWLINE_SEPARATED 
+	"${HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES}"
+)
+
+set(INTROSPECTOR_GENERATOR_ACTUAL_INPUT_PATH
+	"${PROJECT_BINARY_DIR}/introspector_generator_input.cfg"
+)
+
+configure_file(
+	"src/introspector_generator_input.cfg.in"
+	${INTROSPECTOR_GENERATOR_ACTUAL_INPUT_PATH}
+	@ONLY
+)
+
+# Now to define the actual pre-build event.
+
+add_custom_command(
+  PRE_BUILD
+  TARGET Hypersomnia
+  COMMAND Introspector-generator ${INTROSPECTOR_GENERATOR_ACTUAL_INPUT_PATH}
+  COMMENT "Generating type information for introspection..."
+)
+
+add_dependencies(Hypersomnia Introspector-generator)
+
+# Before Hypersomnia builds,
+# GLAD must first download and generate the source files.
+
 add_dependencies(Hypersomnia glad)
 
 target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS})
