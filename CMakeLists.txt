@@ -475,7 +475,7 @@ if(MSVC)
 	)
 endif()
 
-# We build lua sources manually as there is no up-to-date CMakeLists for lua.
+# We build lua sources manually as there is no up-to-date CMakeLists for Lua.
 
 add_library(lua ${LUA_SRCS})
 
@@ -543,10 +543,10 @@ add_executable(Hypersomnia
 # version_file_generator must first query the git bash for information about the most recent commit.
 
 add_custom_command(
-  PRE_BUILD
-  TARGET Hypersomnia
-  COMMAND version_file_generator ${GIT_EXECUTABLE} "${PROJECT_SOURCE_DIR}/src/hypersomnia_version.cpp.in" "${HYPERSOMNIA_VERSION_FILE_PATH}"
-  COMMENT "Generating version files..."
+	PRE_BUILD
+	TARGET Hypersomnia
+	COMMAND version_file_generator ${GIT_EXECUTABLE} "${PROJECT_SOURCE_DIR}/src/hypersomnia_version.cpp.in" "${HYPERSOMNIA_VERSION_FILE_PATH}"
+	COMMENT "Generating version files..."
 )
 
 add_dependencies(Hypersomnia version_file_generator)
@@ -570,7 +570,9 @@ set(INTROSPECTOR_GENERATOR_ACTUAL_INPUT_PATH
 
 # The correct input configuration file shall contain paths to all headers for whom the generator should create introspectors,
 # and should also contain the correct output file path.
-# Accordingly, that call should substitute HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES and GENERATED_SOURCES_PATH for the output file path.
+# Accordingly, that call should substitute:
+# HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES_NEWLINE_SEPARATED 
+# and GENERATED_SOURCES_PATH for the output file path.
 
 configure_file(
 	"src/introspector_generator_input.cfg.in"
@@ -581,10 +583,10 @@ configure_file(
 # Now to define the actual pre-build event.
 
 add_custom_command(
-  PRE_BUILD
-  TARGET Hypersomnia
-  COMMAND Introspector-generator ${INTROSPECTOR_GENERATOR_ACTUAL_INPUT_PATH}
-  COMMENT "Generating type information for introspection..."
+	PRE_BUILD
+	TARGET Hypersomnia
+	COMMAND Introspector-generator ${INTROSPECTOR_GENERATOR_ACTUAL_INPUT_PATH}
+	COMMENT "Generating type information for introspection..."
 )
 
 add_dependencies(Hypersomnia Introspector-generator)
