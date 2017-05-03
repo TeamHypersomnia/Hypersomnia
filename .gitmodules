@@ -31,3 +31,6 @@
 [submodule "cmake/Introspector-generator"]
 	path = cmake/Introspector-generator
 	url = https://github.com/TeamHypersomnia/Introspector-generator.git
+[submodule "src/3rdparty/libsndfile"]
+	path = src/3rdparty/libsndfile
+	url = https://github.com/erikd/libsndfile.git
