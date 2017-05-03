@@ -378,8 +378,7 @@ set(HYPERSOMNIA_SRCS
 	"src/main.cpp"
 )
 
-# To aid IntelliSense.
-
+# We add headers to aid IntelliSense.
 
 file(GLOB_RECURSE HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES
 	"src/augs/*.h"
@@ -413,6 +412,8 @@ set(HYPERSOMNIA_INCLUDE_DIRS
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/Catch/single_include"
 )
 
+# We configure MSVC to use static runtime.
+
 include(configure_runtime_library)
 configure_msvc_runtime()
 
@@ -421,8 +422,10 @@ set(HYPERSOMNIA_CXX_RELEASE_FLAGS "/Ob2 /GL /Oi")
 
 if(MSVC)
 	set(HYPERSOMNIA_LINKER_RELEASE_FLAGS "/LTCG /INCREMENTAL:NO /OPT:REF")
-# We enable incremental LTCG for at least one release configuration,
-# because LTCG takes vastly long even with just a single source file modified
+
+	# We enable incremental LTCG for at least one release configuration,
+	# because LTCG takes vastly long even with just a single source file modified.
+
 	set(HYPERSOMNIA_LINKER_RELWITHDEBINFO_FLAGS "/LTCG:incremental /INCREMENTAL:NO")
 else()
 
@@ -447,7 +450,10 @@ set(CMAKE_CXX_FLAGS_RELEASE
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO 
  "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${HYPERSOMNIA_CXX_RELEASE_FLAGS}"
 )
- 
+
+# We compile Lua as C++, of which sol2 library must necessarily know.
+# To avoid linker errors, we also need to tell OpenAL Soft we will be using it statically.
+
 add_definitions(
 	-DSOL_USING_CXX_LUA
 	-DAL_LIBTYPE_STATIC
@@ -473,7 +479,7 @@ endif()
 
 add_library(lua ${LUA_SRCS})
 
-# We build OpenAL. We need to set some variables beforehand.
+# We build OpenAL Soft. We need to set some variables beforehand.
 
 set(LIBTYPE "STATIC")
 set(FORCE_STATIC_VCRT TRUE CACHE BOOL "/MT for static VC runtimes" FORCE)
@@ -489,7 +495,7 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/enet")
 add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/freetype")
 add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/glad")
 
-# As the following libraries do not use target_include_directories,
+# As the following libraries do not use the preferred target_include_directories,
 # we must manually acquire the directories that they add via include_directories.
 
 include(add_include_dirs_of)
@@ -500,7 +506,7 @@ add_include_dirs_of("freetype")
 
 include_directories(${HYPERSOMNIA_INCLUDE_DIRS})
 
-# Source-code generators go here.
+# We build the source code generators.
 
 set(GENERATED_SOURCES_PATH
 	"${PROJECT_BINARY_DIR}/generated_sources"
@@ -523,14 +529,18 @@ set(HYPERSOMNIA_VERSION_FILE_PATH
 
 set_source_files_properties(${HYPERSOMNIA_VERSION_FILE_PATH} PROPERTIES GENERATED TRUE)
 
-# The Hypersomnia executable.
+# We build the main Hypersomnia executable.
 
-add_executable(Hypersomnia ${HYPERSOMNIA_VERSION_FILE_PATH} ${HYPERSOMNIA_SRCS} ${HYPERSOMNIA_HEADERS})
+add_executable(Hypersomnia 
+	${HYPERSOMNIA_VERSION_FILE_PATH} 
+	${HYPERSOMNIA_SRCS} 
+	${HYPERSOMNIA_HEADERS}
+)
 
 # Here, we define pre-build events calling the source code generators.
 
 # Before Hypersomnia builds,
-# version_file_generator must first query the git bash for commit information.
+# version_file_generator must first query the git bash for information about the most recent commit.
 
 add_custom_command(
   PRE_BUILD
@@ -544,10 +554,10 @@ add_dependencies(Hypersomnia version_file_generator)
 # Before Hypersomnia builds,
 # Introspector-generator must first generate the type information.
 
-# First we prepare a correct input configuration file for Introspector-generator
-# that contains paths to all headers for whom the generator should create introspectors,
-# and the correct output file path.
-# That call should only substitute HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES and GENERATED_SOURCES_PATH for output file path.
+# We prepare a correct input configuration file for Introspector-generator.
+
+# CMake separates elements of lists with a semicolon, but the Introspector-generator accepts lists separated by newlines.
+# We must correct that.
 
 string (REPLACE ";" "\n" 
 	HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES_NEWLINE_SEPARATED 
@@ -557,6 +567,10 @@ string (REPLACE ";" "\n"
 set(INTROSPECTOR_GENERATOR_ACTUAL_INPUT_PATH
 	"${PROJECT_BINARY_DIR}/introspector_generator_input.cfg"
 )
+
+# The correct input configuration file shall contain paths to all headers for whom the generator should create introspectors,
+# and should also contain the correct output file path.
+# Accordingly, that call should substitute HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES and GENERATED_SOURCES_PATH for the output file path.
 
 configure_file(
 	"src/introspector_generator_input.cfg.in"
