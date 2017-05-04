@@ -247,6 +247,7 @@ void director_setup::control_player(
 	const auto current_step = get_step_number(hypersomnia);
 
 	if (advance_steps_forward < 0) {
+		/* Trim to zero if we want to rewind too much */
 		const unsigned seeked_step = static_cast<unsigned>(-advance_steps_forward) > current_step ? 0 : current_step + advance_steps_forward;
 		seek_to_step(seeked_step, session);
 	}
@@ -260,19 +261,22 @@ void director_setup::seek_to_step(
 	const unsigned seeked_step,
 	viewing_session& session
 ) {
-	const auto snapshot_index = seeked_step / snapshot_frequency_in_steps;
+	const auto previous_snapshot_index = std::min(
+		snapshots_for_rewinding.size() - 1,
+		seeked_step / snapshot_frequency_in_steps
+	);
 
 	if (seeked_step < get_step_number(hypersomnia)) {
-		hypersomnia = snapshots_for_rewinding.at(snapshot_index);
+		hypersomnia = snapshots_for_rewinding.at(previous_snapshot_index);
 	}
 
 	// at this point the seeked_step is either equal or greater than the current
 
-	const auto distance_from_closest_snapshot = seeked_step % snapshot_frequency_in_steps;
+	const auto distance_from_previous_snapshot = seeked_step - previous_snapshot_index * snapshot_frequency_in_steps;
 	const auto distance_from_current = seeked_step - get_step_number(hypersomnia);
 
-	if (distance_from_closest_snapshot < distance_from_current) {
-		hypersomnia = snapshots_for_rewinding.at(snapshot_index);
+	if (distance_from_previous_snapshot < distance_from_current) {
+		hypersomnia = snapshots_for_rewinding.at(previous_snapshot_index);
 	}
 
 	while (get_step_number(hypersomnia) < seeked_step) {
