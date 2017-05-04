@@ -42,6 +42,8 @@
 #include "game/detail/visible_entities.h"
 #include "application/config_lua_table.h"
 
+#include "augs/audio/sound_samples_from_file.h"
+
 using namespace augs::window::event::keys;
 using namespace augs::gui::text;
 using namespace augs::gui;

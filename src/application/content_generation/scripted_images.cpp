@@ -1,5 +1,3 @@
-#include <experimental/filesystem>
-
 #include "scripted_images.h"
 #include "augs/gui/button_corners.h"
 #include "augs/filesystem/file.h"
@@ -9,8 +7,6 @@
 #include "augs/misc/templated_readwrite.h"
 
 #include "generated_introspectors.h"
-
-namespace fs = std::experimental::filesystem;
 
 void regenerate_scripted_images(
 	const bool force_regenerate

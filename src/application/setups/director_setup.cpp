@@ -1,7 +1,6 @@
 #include "director_setup.h"
 
 #include <thread>
-#include <experimental/filesystem>
 
 #include "augs/global_libraries.h"
 #include "augs/templates/container_templates.h"
@@ -20,8 +19,6 @@
 
 #include "application/game_window.h"
 #include "application/config_lua_table.h"
-
-namespace fs = std::experimental::filesystem;
 
 #define LOG_REWINDING 0
 
@@ -449,7 +446,7 @@ void director_setup::view(
 
 void director_setup::save_unsaved_changes() {
 	if (unsaved_changes_exist) {
-		director.save_recording_to_file(fs::path(output_director_path).replace_extension(".unsaved.ent").string());
+		director.save_recording_to_file(augs::replace_extension(output_director_path, ".unsaved.ent"));
 	}
 }
 

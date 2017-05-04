@@ -2,24 +2,21 @@
 #include <vector>
 
 typedef unsigned int ALuint;
+typedef int ALenum;
 
 class assets_manager;
 
 namespace augs {
+	struct sound_data;
+
+	ALenum get_openal_format_of(const sound_data&);
+
 	class single_sound_buffer {
 		double computed_length_in_seconds = 0.0;
 		bool initialized = false;
 		ALuint id = 0;
 
 	public:
-		struct data_type {
-			std::vector<int16_t> samples;
-			int frequency = 0;
-			int channels = 0;
-
-			double compute_length_in_seconds() const;
-			int get_format() const;
-		};
 
 		single_sound_buffer() = default;
 		~single_sound_buffer();
@@ -30,7 +27,7 @@ namespace augs {
 		single_sound_buffer(const single_sound_buffer&) = delete;
 		single_sound_buffer& operator=(const single_sound_buffer&) = delete;
 
-		void set_data(const data_type&);
+		void set_data(const sound_data&);
 		// data_type get_data() const;
 		bool is_set() const;
 
@@ -53,7 +50,7 @@ namespace augs {
 			single_sound_buffer mono;
 			single_sound_buffer stereo;
 
-			void set_data(const single_sound_buffer::data_type&, const bool generate_mono);
+			void set_data(const sound_data&, const bool generate_mono);
 
 			single_sound_buffer& request_original();
 			single_sound_buffer& request_mono();
@@ -66,7 +63,10 @@ namespace augs {
 		std::vector<variation> variations;
 	
 	public:
-		void from_file(const std::string filename, const bool generate_mono = true);
+		void from_file(
+			const std::string& path, 
+			const bool generate_mono = true
+		);
 
 		size_t get_num_variations() const;
 		variation& get_variation(const size_t);
@@ -77,8 +77,4 @@ namespace augs {
 
 		sound_buffer_logical_meta get_logical_meta(const assets_manager& manager) const;
 	};
-
-	single_sound_buffer::data_type get_sound_samples_from_file(const std::string);
-	std::vector<int16_t> mix_stereo_to_mono(const std::vector<int16_t>&);
-	single_sound_buffer::data_type mix_stereo_to_mono(const single_sound_buffer::data_type& source);
 }

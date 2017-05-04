@@ -1,5 +1,4 @@
 #include <sstream>
-#include <experimental/filesystem>
 
 #include "desaturations.h"
 #include "augs/filesystem/directory.h"
@@ -9,8 +8,6 @@
 #include "augs/misc/streams.h"
 
 #include "augs/image/image.h"
-
-namespace fs = std::experimental::filesystem;
 
 void regenerate_desaturations(
 	const bool force_regenerate
@@ -25,12 +22,12 @@ void regenerate_desaturations(
 	while (current_line < lines.size()) {
 		desaturation_stamp new_stamp;
 
-		const auto source_path = fs::path(lines[current_line]);
+		const auto source_path = lines[current_line];
 
-		new_stamp.last_write_time_of_source = augs::last_write_time(source_path.string());
+		new_stamp.last_write_time_of_source = augs::last_write_time(source_path);
 
-		const auto desaturation_path = desaturations_directory + source_path.filename().string();
-		const auto desaturation_stamp_path = desaturations_directory + source_path.filename().replace_extension(".stamp").string();
+		const auto desaturation_path = desaturations_directory + augs::get_filename(source_path);
+		const auto desaturation_stamp_path = desaturations_directory + augs::replace_extension(augs::get_filename(source_path), ".stamp");
 
 		augs::stream new_stamp_stream;
 		augs::write(new_stamp_stream, new_stamp);
@@ -57,10 +54,10 @@ void regenerate_desaturations(
 		}
 
 		if (should_regenerate) {
-			LOG("Regenerating desaturation for %x", source_path.string());
+			LOG("Regenerating desaturation for %x", source_path);
 
 			augs::image source_image;
-			source_image.from_file(source_path.string());
+			source_image.from_file(source_path);
 			source_image.get_desaturated().save(desaturation_path);
 
 			augs::create_binary_file(desaturation_stamp_path, new_stamp_stream);

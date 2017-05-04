@@ -1,21 +1,39 @@
 #include <array>
 
-#include "augs/al_log.h"
+#include "augs/build_settings/setting_build_openal.h"
 
 #if BUILD_OPENAL
 #include <AL/al.h>
 #include <AL/alc.h>
 #endif
 
-#include <sndfile.h>
-
 #include "augs/ensure.h"
+#include "augs/al_log.h"
 
-#include "augs/build_settings/setting_log_audio_files.h"
 #include "augs/filesystem/file.h"
+
+#include "augs/audio/sound_data.h"
 #include "augs/audio/sound_buffer.h"
+#include "augs/audio/sound_samples_from_file.h"
 
 namespace augs {
+	ALenum get_openal_format_of(const sound_data& d) {
+#if BUILD_OPENAL
+		if (d.channels == 1) {
+			return AL_FORMAT_MONO16;
+		}
+		else if (d.channels == 2) {
+			return AL_FORMAT_STEREO16;
+		}
+
+		const bool bad_format = true;
+		ensure(!bad_format);
+		return AL_FORMAT_MONO8;
+#else
+		return 0xdeadbeef;
+#endif
+	}
+
 	single_sound_buffer::~single_sound_buffer() {
 		if (initialized) {
 			AL_CHECK(alDeleteBuffers(1, &id));
@@ -42,15 +60,20 @@ namespace augs {
 		return get_id();
 	}
 
-	void single_sound_buffer::set_data(const data_type& new_data) {
+	void single_sound_buffer::set_data(const sound_data& new_data) {
 		if (!initialized) {
 			AL_CHECK(alGenBuffers(1, &id));
 			initialized = true;
 		}
 
-		const auto passed_format = new_data.get_format();
+		if (new_data.samples.empty()) {
+			LOG("WARNING! No samples were sent to a sound buffer.");
+			return;
+		}
+
+		const auto passed_format = get_openal_format_of(new_data);
 		const auto passed_frequency = new_data.frequency;
-		const auto passed_bytesize = new_data.samples.size() * sizeof(int16_t);
+		const auto passed_bytesize = new_data.samples.size() * sizeof(sound_sample_type);
 		computed_length_in_seconds = new_data.compute_length_in_seconds();
 
 #if LOG_AUDIO_BUFFERS
@@ -60,28 +83,7 @@ namespace augs {
 		AL_CHECK(alBufferData(id, passed_format, new_data.samples.data(), passed_bytesize, passed_frequency));
 	}
 
-	double single_sound_buffer::data_type::compute_length_in_seconds() const {
-		return static_cast<double>(samples.size()) / (frequency * channels);
-	}
-
-	int single_sound_buffer::data_type::get_format() const {
-#if BUILD_OPENAL
-		if (channels == 1) {
-			return AL_FORMAT_MONO16;
-		}
-		else if (channels == 2) {
-			return AL_FORMAT_STEREO16;
-		}
-
-		const bool bad_format = true;
-		ensure(!bad_format);
-		return AL_FORMAT_MONO8;
-#else
-		return 0xdeadbeef;
-#endif
-	}
-
-	//single_sound_buffer::data_type single_sound_buffer::get_data() const {
+	//sound_data single_sound_buffer::get_data() const {
 	//	return data;
 	//}
 
@@ -147,7 +149,7 @@ namespace augs {
 		return stereo;
 	}
 
-	void sound_buffer::variation::set_data(const single_sound_buffer::data_type& data, const bool generate_mono) {
+	void sound_buffer::variation::set_data(const sound_data& data, const bool generate_mono) {
 		original_channels = data.channels;
 
 		if (data.channels == 1) {
@@ -183,84 +185,29 @@ namespace augs {
 			return v.request_original().get_length_in_seconds();
 		};
 
-		output.max_duration_in_seconds = len(*std::max_element(
+		output.max_duration_in_seconds = static_cast<float>(len(*std::max_element(
 			variations.begin(),
 			variations.end(),
 			[len](const variation& a, const variation& b) {
 				return len(a) < len(b);
 			}
-		));
+		)));
 
 		return output;
 	}
 
-	std::vector<int16_t> mix_stereo_to_mono(const std::vector<int16_t>& samples) {
-		ensure(samples.size() % 2 == 0);
-
-		std::vector<int16_t> output;
-		output.resize(samples.size() / 2);
-
-		for (size_t i = 0; i < samples.size(); i += 2) {
-			output.at(i/2) = (static_cast<int>(samples.at(i)) + samples.at(i+1)) / 2;
-		}
-
-		return output;
-	}
-
-	single_sound_buffer::data_type mix_stereo_to_mono(const single_sound_buffer::data_type& source) {
-		single_sound_buffer::data_type mono_data;
-		mono_data.channels = 1;
-		mono_data.frequency = source.frequency;
-		mono_data.samples = mix_stereo_to_mono(source.samples);
-		return mono_data;
-	}
-
-	single_sound_buffer::data_type get_sound_samples_from_file(const std::string path) {
-		augs::ensure_existence(path);
-		
-		SF_INFO info;
-		std::memset(&info, 0, sizeof(info));
-
-		SNDFILE* file = sf_open(path.c_str(), SFM_READ, &info);
-
-		single_sound_buffer::data_type new_data;
-
-		new_data.channels = info.channels;
-		new_data.frequency = info.samplerate;
-
-		std::array<int16_t, 4096> read_buf;
-		size_t read_size = 0;
-
-		while ((read_size = static_cast<size_t>(sf_read_short(file, read_buf.data(), read_buf.size()))) != 0) {
-			new_data.samples.insert(new_data.samples.end(), read_buf.begin(), read_buf.begin() + read_size);
-		}
-
-		sf_close(file);
-
-#if LOG_AUDIO_BUFFERS
-		LOG("Sound: %x\nSample rate: %x\nChannels: %x\nFormat: %x\nLength in seconds: %x",
-			filename,
-			info.samplerate,
-			info.channels,
-			info.format,
-			new_data.compute_length_in_seconds());
-#endif
-
-		return new_data;
-	}
-
-	void sound_buffer::from_file(const std::string filename, const bool generate_mono) {
+	void sound_buffer::from_file(const std::string& path, const bool generate_mono) {
 		for (size_t i = 1;;++i) {
-			const auto target_filename = typesafe_sprintf(filename, i);
+			const auto target_path = typesafe_sprintf(path, i);
 
-			const bool no_change_in_filename = target_filename == filename;
+			const bool no_change_in_path = target_path == path;
 
-			if (!augs::file_exists(target_filename) || (i > 1 && no_change_in_filename)) {
+			if (!augs::file_exists(target_path) || (i > 1 && no_change_in_path)) {
 				break;
 			}
 
 			variation new_variation;
-			new_variation.set_data(get_sound_samples_from_file(target_filename), generate_mono);
+			new_variation.set_data(get_sound_samples_from_file(target_path), generate_mono);
 			variations.emplace_back(std::move(new_variation));
 		}
 

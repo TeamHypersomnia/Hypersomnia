@@ -4,7 +4,7 @@ project(Hypersomnia)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-# We will be building Lua manually.
+# We will be building Lua manually as there is no up-to-date CMakeLists for Lua.
 
 set(LUA_SRCS
 	"src/3rdparty/lua/lapi.c"
@@ -362,6 +362,8 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/augs/window_framework/window.cpp"
 	"src/application/setups/two_clients_and_server_setup.cpp"
 	"src/augs/graphics/OpenGL_error.cpp"
+	"src/augs/audio/sound_data.cpp"
+	"src/augs/audio/sound_samples_from_file.cpp"
 )
 
 set(HYPERSOMNIA_TRIVIAL_3RDPARTY_SRCS
@@ -395,18 +397,17 @@ file(GLOB_RECURSE HYPERSOMNIA_HEADERS
 
 set(HYPERSOMNIA_LIBS
 	"OpenGL32.lib"
-	"${PROJECT_SOURCE_DIR}/src/3rdparty/libsndfile/lib/libsndfile-1.lib"
 	enet
 	freetype
 	lua
 	OpenAL
 	glad
+	vorbisfile
 )
 
 set(HYPERSOMNIA_INCLUDE_DIRS
 	"${PROJECT_SOURCE_DIR}/src"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty"
-	"${PROJECT_SOURCE_DIR}/src/3rdparty/libsndfile/include"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/lua"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/sol2/single/sol"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/Catch/single_include"
@@ -474,7 +475,7 @@ if(MSVC)
 	)
 endif()
 
-# We build lua sources manually as there is no up-to-date CMakeLists for Lua.
+# We build Lua manually as there is no up-to-date CMakeLists for Lua.
 
 add_library(lua ${LUA_SRCS})
 
@@ -482,11 +483,22 @@ add_library(lua ${LUA_SRCS})
 
 set(LIBTYPE "STATIC")
 set(FORCE_STATIC_VCRT TRUE CACHE BOOL "/MT for static VC runtimes" FORCE)
-set(ALSOFT_UTILS FALSE CACHE BOOL          "Build and install utility programs"         FORCE)
-set(ALSOFT_EXAMPLES FALSE CACHE BOOL "Build and install example programs"  FORCE)
-set(ALSOFT_TESTS FALSE CACHE BOOL     "Build and install test programs"     FORCE)
+set(ALSOFT_UTILS FALSE CACHE BOOL "Build and install utility programs" FORCE)
+set(ALSOFT_EXAMPLES FALSE CACHE BOOL "Build and install example programs" FORCE)
+set(ALSOFT_TESTS FALSE CACHE BOOL "Build and install test programs" FORCE)
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/openal-soft")
+
+# We build OGG.
+
+add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/ogg")
+
+# We build Vorbis. It must know the paths for OGG that we've just build.
+
+set(OGG_ROOT "${PROJECT_SOURCE_DIR}/src/3rdparty/ogg")
+set(OGG_LIBRARIES ogg)
+
+add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/vorbis")
 
 # We build the remaining libraries.
 
@@ -502,6 +514,8 @@ include(add_include_dirs_of)
 add_include_dirs_of("OpenAL")
 add_include_dirs_of("enet")
 add_include_dirs_of("freetype")
+add_include_dirs_of("ogg")
+add_include_dirs_of("vorbis")
 
 include_directories(${HYPERSOMNIA_INCLUDE_DIRS})
 

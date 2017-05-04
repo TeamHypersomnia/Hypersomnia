@@ -12,8 +12,6 @@
 #include "augs/image/image.h"
 #include "generated_introspectors.h"
 
-namespace fs = std::experimental::filesystem;
-
 void regenerate_polygonizations_of_images(
 	const bool force_regenerate
 ) {
@@ -27,8 +25,8 @@ void regenerate_polygonizations_of_images(
 	while (current_line < lines.size()) {
 		polygonization_of_image_stamp new_stamp;
 
-		const auto source_path = fs::path(lines[current_line]);
-		new_stamp.last_write_time_of_source = augs::last_write_time(source_path.string());
+		const auto source_path = lines[current_line];
+		new_stamp.last_write_time_of_source = augs::last_write_time(source_path);
 
 		++current_line;
 		
@@ -40,7 +38,7 @@ void regenerate_polygonizations_of_images(
 		++current_line;
 
 		const auto polygonization_target_path = polygonizations_directory + target_filename;
-		const auto polygonization_stamp_path = fs::path(polygonization_target_path).replace_extension(".stamp").string();
+		const auto polygonization_stamp_path = augs::replace_extension(polygonization_target_path, ".stamp");
 
 		augs::stream new_stamp_stream;
 		augs::write(new_stamp_stream, new_stamp);
@@ -67,10 +65,10 @@ void regenerate_polygonizations_of_images(
 		}
 
 		if (should_regenerate) {
-			LOG("Regenerating polygonization for %x", source_path.string());
+			LOG("Regenerating polygonization for %x", source_path);
 
 			augs::image source_image;
-			source_image.from_file(source_path.string());
+			source_image.from_file(source_path);
 			
 			const auto points = source_image.get_polygonized();
 			

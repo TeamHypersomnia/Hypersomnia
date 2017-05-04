@@ -3,7 +3,6 @@
 #include "texture_atlases.h"
 
 #include <sstream>
-#include <experimental/filesystem>
 
 #include "game/assets/assets_manager.h"
 #include "augs/filesystem/directory.h"
@@ -19,8 +18,6 @@
 
 #include "augs/misc/templated_readwrite.h"
 #include "generated_introspectors.h"
-
-namespace fs = std::experimental::filesystem;
 
 atlases_regeneration_output regenerate_atlases(
 	const atlases_regeneration_input& in,

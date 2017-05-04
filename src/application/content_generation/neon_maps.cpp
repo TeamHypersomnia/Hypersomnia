@@ -1,5 +1,4 @@
 #include <sstream>
-#include <experimental/filesystem>
 
 #include "neon_maps.h"
 #include "augs/filesystem/directory.h"
@@ -13,8 +12,6 @@
 #include "generated_introspectors.h"
 
 #define PIXEL_NONE rgba(0,0,0,0)
-
-namespace fs = std::experimental::filesystem;
 
 void make_neon(
 	const neon_map_stamp& stamp,
@@ -91,8 +88,8 @@ void regenerate_neon_maps(
 
 			new_stamp.last_write_time_of_source = augs::last_write_time(source_path);
 
-			const auto neon_map_path = neon_directory + fs::path(source_path).filename().string();
-			const auto neon_map_stamp_path = neon_directory + fs::path(source_path).filename().replace_extension(".stamp").string();
+			const auto neon_map_path = neon_directory + augs::get_filename(source_path);
+			const auto neon_map_stamp_path = neon_directory + augs::replace_extension(augs::get_filename(source_path), ".stamp");
 
 			augs::stream new_stamp_stream;
 			augs::write(new_stamp_stream, new_stamp);

@@ -9,6 +9,8 @@
 #include <experimental\filesystem>
 
 namespace augs {
+	namespace fs = std::experimental::filesystem;
+	
 	template <class P>
 	std::chrono::system_clock::time_point last_write_time(const P& path) {
 		ensure_existence(path);
@@ -19,6 +21,21 @@ namespace augs {
 	bool file_exists(const P& path) {
 		std::ifstream infile(path);
 		return infile.good();
+	}
+
+	template <class P>
+	auto get_extension(const P& path) {
+		return fs::path(path).extension().string();
+	}
+
+	template <class P, class S>
+	auto replace_extension(const P& path, const S& new_ext) {
+		return fs::path(path).replace_extension(new_ext).string();
+	}
+
+	template <class P>
+	auto get_filename(const P& path) {
+		return fs::path(path).filename().string();
 	}
 
 	template <class P>

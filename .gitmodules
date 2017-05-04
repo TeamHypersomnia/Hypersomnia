@@ -34,3 +34,9 @@
 [submodule "src/3rdparty/libsndfile"]
 	path = src/3rdparty/libsndfile
 	url = https://github.com/erikd/libsndfile.git
+[submodule "src/3rdparty/ogg"]
+	path = src/3rdparty/ogg
+	url = https://github.com/xiph/ogg
+[submodule "src/3rdparty/vorbis"]
+	path = src/3rdparty/vorbis
+	url = https://github.com/xiph/vorbis
