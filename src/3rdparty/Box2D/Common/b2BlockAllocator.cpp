@@ -21,6 +21,9 @@
 #include <climits>
 #include <cstring>
 #include <memory>
+
+#include "augs/build_settings/setting_debug_physics_system_copy.h"
+
 using namespace std;
 
 int32 b2BlockAllocator::s_blockSizes[b2_blockSizes] =
@@ -57,6 +60,9 @@ struct b2Block
 b2BlockAllocator::b2BlockAllocator()
 {
 	b2Assert(b2_blockSizes < UCHAR_MAX);
+#if DEBUG_PHYSICS_SYSTEM_COPY
+	m_numAllocatedObjects = 0;
+#endif
 
 	m_chunkSpace = b2_chunkArrayIncrement;
 	m_chunkCount = 0;
@@ -102,6 +108,10 @@ void* b2BlockAllocator::Allocate(int32 size)
 		return NULL;
 
 	b2Assert(0 < size);
+
+#if DEBUG_PHYSICS_SYSTEM_COPY
+	++m_numAllocatedObjects;
+#endif
 
 	if (size > b2_maxBlockSize)
 	{
@@ -162,6 +172,10 @@ void b2BlockAllocator::Free(void* p, int32 size)
 	}
 
 	b2Assert(0 < size);
+	
+#if DEBUG_PHYSICS_SYSTEM_COPY
+	--m_numAllocatedObjects;
+#endif
 
 	if (size > b2_maxBlockSize)
 	{

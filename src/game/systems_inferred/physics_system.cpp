@@ -21,8 +21,7 @@
 
 #include "augs/graphics/renderer.h"
 #include "augs/templates/container_templates.h"
-
-#define PROTECT_MIGRATIONS 0
+#include "augs/build_settings/setting_debug_physics_system_copy.h"
 
 bool physics_system::is_inferred_state_created_for_rigid_body(const const_entity_handle handle) const {
 	return handle.alive() && get_rigid_body_cache(handle).body != nullptr;
@@ -339,17 +338,13 @@ physics_system& physics_system::operator=(const physics_system& b) {
 
 	b2BlockAllocator& migrated_allocator = migrated_b2World.m_blockAllocator;
 
-#if PROTECT_MIGRATIONS
-	std::unordered_set<void**> already_migrated;
-	auto old_allocations = migrated_allocator.allocations;
-
-	migrated_allocator.allocations.clear();
+#if DEBUG_PHYSICS_SYSTEM_COPY
+	std::unordered_set<void**> already_migrated_pointers;
 #endif
 
 	auto migrate_pointer = [
-#if PROTECT_MIGRATIONS
-		&already_migrated, 
-		&old_allocations,
+#if DEBUG_PHYSICS_SYSTEM_COPY
+		&already_migrated_pointers, 
 #endif
 		&pointer_migrations, 
 		&migrated_allocator
@@ -357,9 +352,9 @@ physics_system& physics_system::operator=(const physics_system& b) {
 		auto*& pointer_to_be_migrated, 
 		const unsigned count = 1
 	) {
-#if PROTECT_MIGRATIONS
-		ensure(already_migrated.find(reinterpret_cast<void**>(&pointer_to_be_migrated)) == already_migrated.end());
-		already_migrated.insert(reinterpret_cast<void**>(&pointer_to_be_migrated));
+#if DEBUG_PHYSICS_SYSTEM_COPY
+		ensure(already_migrated_pointers.find(reinterpret_cast<void**>(&pointer_to_be_migrated)) == already_migrated_pointers.end());
+		already_migrated_pointers.insert(reinterpret_cast<void**>(&pointer_to_be_migrated));
 #endif
 
 		typedef std::remove_pointer_t<std::decay_t<decltype(pointer_to_be_migrated)>> type;
@@ -377,14 +372,15 @@ physics_system& physics_system::operator=(const physics_system& b) {
 
 			void* const migrated_pointer = migrated_allocator.Allocate(bytes_count);
 			memcpy(migrated_pointer, void_ptr, bytes_count);
+			
+			/* Bookmark position in memory of each and every element */
 
-			pointer_migrations.insert(std::make_pair(void_ptr, migrated_pointer));
-
-#if PROTECT_MIGRATIONS
-			if (old_allocations.find(p) != old_allocations.end()) {
-				old_allocations.erase(p);
-			}
-#endif
+			pointer_migrations.insert(std::make_pair(
+				void_ptr, 
+				migrated_pointer
+			));
+			
+			pointer_to_be_migrated = reinterpret_cast<type*>(migrated_pointer);
 		}
 		else {
 			pointer_to_be_migrated = reinterpret_cast<type*>((*maybe_already_migrated).second);
@@ -392,15 +388,15 @@ physics_system& physics_system::operator=(const physics_system& b) {
 	};
 	
 	auto migrate_contact_edge = [
-#if PROTECT_MIGRATIONS
-		&already_migrated,
+#if DEBUG_PHYSICS_SYSTEM_COPY
+		&already_migrated_pointers,
 #endif
 		&pointer_migrations, 
 		&contact_edge_offsets_in_contacts
 	](b2ContactEdge*& edge_ptr) {
-#if PROTECT_MIGRATIONS
-		ensure(already_migrated.find((void**)&edge_ptr) == already_migrated.end());
-		already_migrated.insert((void**)&edge_ptr);
+#if DEBUG_PHYSICS_SYSTEM_COPY
+		ensure(already_migrated_pointers.find((void**)&edge_ptr) == already_migrated_pointers.end());
+		already_migrated_pointers.insert((void**)&edge_ptr);
 #endif
 		if (edge_ptr == nullptr) {
 			return;
@@ -421,13 +417,6 @@ physics_system& physics_system::operator=(const physics_system& b) {
 			edge_ptr = reinterpret_cast<b2ContactEdge*>(edge_from_migrated_contact);
 		}
 	};
-
-	// migrate proxy tree userdatas
-	auto& proxy_tree = migrated_b2World.m_contactManager.m_broadPhase.m_tree;
-
-	//for (size_t i = 0; i < proxy_tree.m_nodeCount; ++i) {
-	//	migrate_pointer(proxy_tree.m_nodes[i].userData);
-	//}
 
 	// make a map of pointers to b2ContactEdges to their respective offsets in
 	// the b2Contacts that own them
@@ -461,6 +450,8 @@ physics_system& physics_system::operator=(const physics_system& b) {
 		migrate_contact_edge(c->m_nodeB.prev);
 	}
 
+	auto& proxy_tree = migrated_b2World.m_contactManager.m_broadPhase.m_tree;
+
 	// migrate bodies and fixtures
 	migrate_pointer(migrated_b2World.m_bodyList);
 
@@ -478,6 +469,12 @@ physics_system& physics_system::operator=(const physics_system& b) {
 		migrate_contact_edge(b->m_contactList);
 		b->m_world = &migrated_b2World;
 		
+		/*
+			b->m_fixtureList is already migrated.
+			f->m_next will also be always migrated before the next iteration
+			thus f is always already a migrated instance.
+		*/
+
 		for (b2Fixture* f = b->m_fixtureList; f; f = f->m_next) {
 			f->m_body = b;
 			
@@ -485,25 +482,30 @@ physics_system& physics_system::operator=(const physics_system& b) {
 			f->m_shape = f->m_shape->Clone(&migrated_allocator);
 			migrate_pointer(f->m_next);
 
-			for (size_t i = 0; i < f->m_proxyCount; ++i) {
+			for (std::size_t i = 0; i < f->m_proxyCount; ++i) {
+#if DEBUG_PHYSICS_SYSTEM_COPY
+				/* 
+					"fixture" field of b2FixtureProxy should point to the fixture itself,
+					thus its value should already be found in the pointer map. 
+				*/
+
+				ensure(pointer_migrations.find(f->m_proxies[i].fixture) != pointer_migrations.end())
+				const auto ff = pointer_migrations[f->m_proxies[i].fixture];
+				ensure_eq(reinterpret_cast<void*>(f), ff);
+#endif
 				f->m_proxies[i].fixture = f;
 				
 				void*& ud = proxy_tree.m_nodes[f->m_proxies[i].proxyId].userData;
 				ud = pointer_migrations.at(ud);
 			}
-
-			//auto c_idx = f->collider_index;
-			//auto& cache = colliders_caches[make_cache_id(f->m_userData)];
-			//cache.correspondent_rigid_body_cache = rigid_body_cache_id;
-			//
-			//if (c_idx >= cache.all_fixtures_in_component.size()) {
-			//	ensure_eq(c_idx, cache.all_fixtures_in_component.size());
-			//	cache.all_fixtures_in_component.push_back(std::vector<b2Fixture*>());
-			//}
-			//
-			//cache.all_fixtures_in_component[c_idx].push_back(f);
 		}
 	}
+
+	/*
+		There is no need to iterate userdatas of the broadphase's dynamic tree,
+		as for every existing b2FixtureProxy we have manually migrated the correspondent userdata
+		inside the loop that migrated all bodies and fixtures.
+	*/
 
 	colliders_caches = b.colliders_caches;
 	rigid_body_caches = b.rigid_body_caches;
@@ -520,10 +522,13 @@ physics_system& physics_system::operator=(const physics_system& b) {
 		}
 	}
 
+#if DEBUG_PHYSICS_SYSTEM_COPY
 	// ensure that all allocations have been migrated
-#if PROTECT_MIGRATIONS
-	ensure(old_allocations.empty());
-	ensure_eq(source_b2World.m_blockAllocator.allocations.size(), migrated_allocator.allocations.size());
+
+	ensure_eq(
+		migrated_allocator.m_numAllocatedObjects, 
+		source_b2World.m_blockAllocator.m_numAllocatedObjects
+	);
 #endif
 
 	return *this;

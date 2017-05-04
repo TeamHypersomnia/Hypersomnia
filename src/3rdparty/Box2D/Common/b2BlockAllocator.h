@@ -20,6 +20,7 @@
 #define B2_BLOCK_ALLOCATOR_H
 
 #include <Box2D/Common/b2Settings.h>
+#include "augs/build_settings/setting_debug_physics_system_copy.h"
 
 const int32 b2_chunkSize = 16 * 1024;
 const int32 b2_maxBlockSize = 640;
@@ -56,6 +57,12 @@ private:
 	int32 m_chunkSpace;
 
 	b2Block* m_freeLists[b2_blockSizes];
+
+#if DEBUG_PHYSICS_SYSTEM_COPY
+public:
+	unsigned m_numAllocatedObjects;
+private:
+#endif
 
 	static int32 s_blockSizes[b2_blockSizes];
 	static uint8 s_blockSizeLookup[b2_maxBlockSize + 1];
