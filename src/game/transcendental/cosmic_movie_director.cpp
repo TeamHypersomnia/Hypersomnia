@@ -8,7 +8,7 @@
 
 #include "augs/templates/string_templates.h"
 
-#include "generated_introspectors.h"
+#include "generated/introspectors.h"
 
 void cosmic_movie_director::save_recording_to_file(const std::string& filename) const {
 	std::ofstream f(filename, std::ios::out | std::ios::binary);

@@ -17,7 +17,7 @@
 #include "3rdparty/rectpack2D/src/pack.h"
 
 #include "augs/misc/templated_readwrite.h"
-#include "generated_introspectors.h"
+#include "generated/introspectors.h"
 
 atlases_regeneration_output regenerate_atlases(
 	const atlases_regeneration_input& in,

@@ -4,7 +4,7 @@
 #include "cosmos.h"
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "augs/filesystem/file.h"
-#include "generated_introspectors.h"
+#include "generated/introspectors.h"
 
 void cosmos::save_to_file(const std::string& filename) {
 	profiler.total_save.new_measurement();

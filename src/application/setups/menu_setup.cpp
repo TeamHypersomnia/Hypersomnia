@@ -28,7 +28,6 @@
 #include "menu_setup.h"
 
 #include "augs/gui/text/caret.h"
-#include "augs/build_settings/setting_is_production_build.h"
 
 #include "application/ui/app_ui_root.h"
 #include "application/ui/app_ui_context.h"

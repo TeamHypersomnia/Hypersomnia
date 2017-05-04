@@ -2,7 +2,7 @@
 #include "augs/templates/predicate_templates.h"
 #include "augs/templates/get_index_type_for_size_of.h"
 
-#include "generated_introspectors.h"
+#include "generated/introspectors.h"
 #include "game/assets/assets_manager.h"
 
 struct tests_of_traits {

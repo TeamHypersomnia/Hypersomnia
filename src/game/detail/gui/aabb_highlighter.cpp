@@ -9,7 +9,7 @@
 #include "game/components/all_inferred_state_component.h"
 
 #include "game/transcendental/types_specification/all_component_includes.h"
-#include "generated_introspectors.h"
+#include "generated/introspectors.h"
 #include "augs/graphics/drawers.h"
 
 void aabb_highlighter::update(const float delta_ms) {

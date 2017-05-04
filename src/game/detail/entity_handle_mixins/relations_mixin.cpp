@@ -11,7 +11,7 @@
 #include "augs/templates/container_templates.h"
 #include "augs/templates/type_matching_and_indexing.h"
 
-#include "generated_introspectors.h"
+#include "generated/introspectors.h"
 
 template <class D>
 void relations_mixin<false, D>::make_as_child_of(const entity_id parent_id) const {

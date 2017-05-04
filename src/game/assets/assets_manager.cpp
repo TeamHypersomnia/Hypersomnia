@@ -7,7 +7,7 @@
 #include "game/transcendental/cosmos.h"
 
 #include "augs/templates/introspect.h"
-#include "generated_introspectors.h"
+#include "generated/introspectors.h"
 
 void assets_manager::load_baked_metadata(
 	const game_image_requests& images,

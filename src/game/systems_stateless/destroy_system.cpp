@@ -9,7 +9,7 @@
 #include "game/transcendental/logic_step.h"
 
 #include "augs/ensure.h"
-#include "generated_introspectors.h"
+#include "generated/introspectors.h"
 
 #include "game/transcendental/types_specification/all_component_includes.h"
 

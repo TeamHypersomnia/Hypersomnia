@@ -12,7 +12,7 @@
 
 #include "augs/misc/pooled_object_id.h"
 
-#include "generated_introspectors.h"
+#include "generated/introspectors.h"
 
 /* Several assumptions regarding delta encoding */
 

@@ -9,7 +9,7 @@
 
 #include "augs/image/image.h"
 #include "augs/misc/parsing_utils.h"
-#include "generated_introspectors.h"
+#include "generated/introspectors.h"
 
 #define PIXEL_NONE rgba(0,0,0,0)
 

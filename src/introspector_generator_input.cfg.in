@@ -8,7 +8,7 @@ header-directories:
 header-files:
 @HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES_NEWLINE_SEPARATED@
 generated-file-path:
-@GENERATED_SOURCES_PATH@/generated_introspectors.h
+@GENERATED_SOURCES_PATH@/introspectors.h
 introspector-field-format:
 			FIELD(%x);
 base-introspector-field-format:

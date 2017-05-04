@@ -24,7 +24,7 @@
 #include "augs/misc/templated_readwrite.h"
 #include "game/detail/visible_entities.h"
 
-#include "generated_introspectors.h"
+#include "generated/introspectors.h"
 #include "application/config_lua_table.h"
 
 void determinism_test_setup::process(

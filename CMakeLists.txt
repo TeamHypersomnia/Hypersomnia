@@ -395,15 +395,7 @@ file(GLOB_RECURSE HYPERSOMNIA_HEADERS
     ${HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES}
 )
 
-set(HYPERSOMNIA_LIBS
-	"OpenGL32.lib"
-	enet
-	freetype
-	lua
-	OpenAL
-	glad
-	vorbisfile
-)
+# We configure include directories for Hypersomnia codebase.
 
 set(HYPERSOMNIA_INCLUDE_DIRS
 	"${PROJECT_SOURCE_DIR}/src"
@@ -413,13 +405,12 @@ set(HYPERSOMNIA_INCLUDE_DIRS
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/Catch/single_include"
 )
 
-# We configure MSVC to use static runtime.
-
-include(configure_runtime_library)
-configure_msvc_runtime()
+# We configure additional flags for the compiler.
 
 set(HYPERSOMNIA_CXX_FLAGS "/MP /Gm- /fp:strict /bigobj")
 set(HYPERSOMNIA_CXX_RELEASE_FLAGS "/Ob2 /GL /Oi")
+
+# We configure additional flags for linker.
 
 if(MSVC)
 	set(HYPERSOMNIA_LINKER_RELEASE_FLAGS "/LTCG /INCREMENTAL:NO /OPT:REF")
@@ -431,6 +422,34 @@ if(MSVC)
 else()
 
 endif()
+
+# We configure some preprocessor defines.
+
+# Lua is configured to compile as C++, of which sol2 library must necessarily know.
+# To avoid linker errors, we also need to tell OpenAL Soft we will be using it statically.
+
+add_definitions(
+	-DSOL_USING_CXX_LUA
+	-DAL_LIBTYPE_STATIC
+)
+
+if(MSVC)
+	add_definitions(
+		-DPLATFORM_WINDOWS
+		-D_WINSOCK_DEPRECATED_NO_WARNINGS
+		-D_CRT_SECURE_NO_WARNINGS
+		-D_SCL_SECURE_NO_WARNINGS
+		-DUNICODE
+	)
+endif()
+
+# Additionally, we mark Release as the production build.
+
+set(HYPERSOMNIA_CXX_RELEASE_FLAGS
+ "${HYPERSOMNIA_CXX_RELEASE_FLAGS} -DIS_PRODUCTION_BUILD=1"
+)
+
+# We apply the variables to the actual flags.
 
 set(CMAKE_EXE_LINKER_FLAGS_RELEASE 
  "${CMAKE_EXE_LINKER_FLAGS_RELEASE} ${HYPERSOMNIA_LINKER_RELEASE_FLAGS}"
@@ -452,28 +471,11 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO
  "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${HYPERSOMNIA_CXX_RELEASE_FLAGS}"
 )
 
-# We compile Lua as C++, of which sol2 library must necessarily know.
-# To avoid linker errors, we also need to tell OpenAL Soft we will be using it statically.
+# We configure MSVC to use static runtime libraries ("/MT" switch),
+# instead of DLL ones.
 
-add_definitions(
-	-DSOL_USING_CXX_LUA
-	-DAL_LIBTYPE_STATIC
-)
-
-if(MSVC)
-	list(APPEND HYPERSOMNIA_LIBS
-		"Ws2_32.lib" 		# for ENet
-		"winmm.lib"  		# for ENet
-	)
-
-	add_definitions(
-		-DPLATFORM_WINDOWS
-		-D_WINSOCK_DEPRECATED_NO_WARNINGS
-		-D_CRT_SECURE_NO_WARNINGS
-		-D_SCL_SECURE_NO_WARNINGS
-		-DUNICODE
-	)
-endif()
+include(configure_runtime_library)
+configure_msvc_runtime()
 
 # We build Lua manually as there is no up-to-date CMakeLists for Lua.
 
@@ -522,12 +524,12 @@ include_directories(${HYPERSOMNIA_INCLUDE_DIRS})
 # We build the source code generators.
 
 set(GENERATED_SOURCES_PATH
-	"${PROJECT_BINARY_DIR}/generated_sources"
+	"${PROJECT_BINARY_DIR}/generators_output/generated"
 )
 
 file(MAKE_DIRECTORY ${GENERATED_SOURCES_PATH})
 
-include_directories(${GENERATED_SOURCES_PATH})
+include_directories("${PROJECT_BINARY_DIR}/generators_output")
 
 add_subdirectory("${CMAKE_MODULE_PATH}/Introspector-generator")
 
@@ -608,6 +610,25 @@ add_dependencies(Hypersomnia Introspector-generator)
 # GLAD must first download and generate the source files.
 
 add_dependencies(Hypersomnia glad)
+
+# We define libraries upon which Hypersomnia depends.
+
+set(HYPERSOMNIA_LIBS
+	"OpenGL32.lib"
+	enet
+	freetype
+	lua
+	OpenAL
+	glad
+	vorbisfile
+)
+
+if(MSVC)
+	list(APPEND HYPERSOMNIA_LIBS
+		"Ws2_32.lib" 		# for ENet
+		"winmm.lib"  		# for ENet
+	)
+endif()
 
 target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS})
 

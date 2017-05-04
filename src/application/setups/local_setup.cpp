@@ -28,8 +28,7 @@
 #include "game/detail/visible_entities.h"
 #include "application/config_lua_table.h"
 
-#include "generated_introspectors.h"
-#include "hypersomnia_version.h"
+#include "generated/introspectors.h"
 
 using namespace augs::window::event::keys;
 

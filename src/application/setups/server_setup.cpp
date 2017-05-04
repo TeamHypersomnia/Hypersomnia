@@ -32,7 +32,7 @@
 
 #include "augs/templates/container_templates.h"
 
-#include "generated_introspectors.h"
+#include "generated/introspectors.h"
 #include "application/config_lua_table.h"
 
 void server_setup::wait_for_listen_server() {

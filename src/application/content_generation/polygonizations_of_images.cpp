@@ -10,7 +10,7 @@
 #include "augs/misc/streams.h"
 
 #include "augs/image/image.h"
-#include "generated_introspectors.h"
+#include "generated/introspectors.h"
 
 void regenerate_polygonizations_of_images(
 	const bool force_regenerate

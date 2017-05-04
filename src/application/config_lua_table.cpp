@@ -10,7 +10,7 @@
 
 #include "game/detail/gui/character_gui.h"
 
-#include "generated_introspectors.h"
+#include "generated/introspectors.h"
 #include <sol.hpp>
 
 template<class T>

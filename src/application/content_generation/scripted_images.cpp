@@ -6,7 +6,7 @@
 #include "augs/templates/for_each_in_types.h"
 #include "augs/misc/templated_readwrite.h"
 
-#include "generated_introspectors.h"
+#include "generated/introspectors.h"
 
 void regenerate_scripted_images(
 	const bool force_regenerate
