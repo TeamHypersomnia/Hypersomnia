@@ -70,7 +70,7 @@ namespace augs {
 
 			wav_hdr wavHeader;
 			ensure(fread(&wavHeader, 1, sizeof(wav_hdr), wavFile) > 0);
-			ensure(wavHeader.bitsPerSample == 16);
+			ensure_eq(16, wavHeader.bitsPerSample);
 			//ensure(wavHeader.SamplesPerSec == 44100);
 
 			new_data.channels = wavHeader.NumOfChan;

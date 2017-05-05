@@ -2,6 +2,19 @@ cmake_minimum_required(VERSION 3.8)
 
 project(Hypersomnia)
 
+if (NOT HYPERSOMNIA_BUILD_ARCHIVE_DIR)
+	# By default, we set the installer output directory to completely outside of the source tree,
+	# because it might be useful to preserve some older builds even if the repository is deleted.
+
+	set(HYPERSOMNIA_BUILD_ARCHIVE_DIR
+		"${PROJECT_SOURCE_DIR}/../build_database"
+	)
+
+	file(MAKE_DIRECTORY ${HYPERSOMNIA_BUILD_ARCHIVE_DIR})
+endif()
+
+set(HYPERSOMNIA_EXE_RESOURCES_DIR "${PROJECT_SOURCE_DIR}/hypersomnia")
+
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # We will be building Lua manually as there is no up-to-date CMakeLists for Lua.
@@ -523,6 +536,8 @@ include_directories(${HYPERSOMNIA_INCLUDE_DIRS})
 
 # We build the source code generators.
 
+# We arrange the output directory for the generated source files.
+
 set(GENERATED_SOURCES_PATH
 	"${PROJECT_BINARY_DIR}/generators_output/generated"
 )
@@ -531,7 +546,11 @@ file(MAKE_DIRECTORY ${GENERATED_SOURCES_PATH})
 
 include_directories("${PROJECT_BINARY_DIR}/generators_output")
 
+# We build the generator of type information required for introspection.
+
 add_subdirectory("${CMAKE_MODULE_PATH}/Introspector-generator")
+
+# We build the generator of commit information.
 
 add_executable(version_file_generator 
 	"${CMAKE_MODULE_PATH}/version_file_generator.cpp"
@@ -585,7 +604,7 @@ set(INTROSPECTOR_GENERATOR_ACTUAL_INPUT_PATH
 
 # The correct input configuration file shall contain paths to all headers for whom the generator should create introspectors,
 # and should also contain the correct output file path.
-# Accordingly, that call should substitute:
+# Thus, that call should substitute:
 # HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES_NEWLINE_SEPARATED 
 # and GENERATED_SOURCES_PATH for the output file path.
 
@@ -638,3 +657,23 @@ if(MSVC)
 	set_target_properties(Hypersomnia PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/hypersomnia")
 	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Hypersomnia)
 endif()
+
+# We add a command to automatically create an archive for every Release build.
+
+add_custom_command(
+  TARGET Hypersomnia
+  POST_BUILD
+  COMMAND ${CMAKE_COMMAND}
+    -DCONFIG=$<CONFIGURATION>
+    -DEXE_PATH=$<TARGET_FILE:Hypersomnia>
+    -DARCHIVE_OUTPUT_DIR=${HYPERSOMNIA_BUILD_ARCHIVE_DIR}
+    -DRESOURCES_DIR=${HYPERSOMNIA_EXE_RESOURCES_DIR}
+    -DPYTHON_EXE=${PYTHON_EXECUTABLE}
+    -DGIT_EXE=${GIT_EXECUTABLE}
+    -DWINRAR_CREATE_ARCHIVE_PY_PATH=${CMAKE_MODULE_PATH}/winrar_create_archive.py.in
+    -P ${CMAKE_MODULE_PATH}/create_build_archive.cmake
+  DEPENDS ${CMAKE_MODULE_PATH}/create_build_archive.cmake
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+  COMMENT "Running executable packer..."
+  VERBATIM
+)

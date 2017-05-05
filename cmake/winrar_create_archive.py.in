@@ -1,0 +1,11 @@
+import os
+print("Calling WinRAR from python.")
+str = "\"@WINRAR_EXECUTABLE_PATH@\" a -afzip -ep1 -m5 @NEW_ARCHIVE_OUTPUT_PATH@ @RESOURCES_DIR@ -x@RESOURCES_DIR@\generated"
+
+# The command breaks for some reason if we use forward slashes.
+# Thus, we need to replace them.
+
+shell_str = str.replace("/", "\\")
+print("Shell command: ")
+print(shell_str)
+os.system(shell_str)
