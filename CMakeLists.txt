@@ -670,7 +670,7 @@ add_custom_command(
     -DRESOURCES_DIR=${HYPERSOMNIA_EXE_RESOURCES_DIR}
     -DPYTHON_EXE=${PYTHON_EXECUTABLE}
     -DGIT_EXE=${GIT_EXECUTABLE}
-    -DWINRAR_CREATE_ARCHIVE_PY_PATH=${CMAKE_MODULE_PATH}/winrar_create_archive.py.in
+    -DCREATE_ARCHIVE_PY_PATH=${CMAKE_MODULE_PATH}/create_archive.py.in
     -P ${CMAKE_MODULE_PATH}/create_build_archive.cmake
   DEPENDS ${CMAKE_MODULE_PATH}/create_build_archive.cmake
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}

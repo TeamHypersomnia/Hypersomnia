@@ -9,17 +9,17 @@ if(WIN32)
 		string(REGEX REPLACE "\n$" "" COMMIT_NUMBER "${COMMIT_NUMBER}")
 
 		set(NEW_ARCHIVE_OUTPUT_PATH "${ARCHIVE_OUTPUT_DIR}/Hypersomnia-${COMMIT_NUMBER}.rar")
-		set(WINRAR_EXECUTABLE_PATH $ENV{ProgramW6432}/WinRAR/WinRAR.exe)
+		set(ARCHIVER_EXECUTABLE_PATH $ENV{ProgramW6432}/WinRAR/WinRAR.exe)
 
 		# We need to call the python script,
 		# as CMake does not offer a civilized way of calling shell,
 		# and the WinRar command breaks for some reason.
 
 		# First we configure the script to use the correct input and output paths.
-		# This should substitute NEW_ARCHIVE_OUTPUT_PATH, RESOURCES_DIR and EXE_PATH.
+		# This should substitute ARCHIVER_EXECUTABLE_PATH, NEW_ARCHIVE_OUTPUT_PATH, RESOURCES_DIR and EXE_PATH.
 
 		configure_file(
-			${WINRAR_CREATE_ARCHIVE_PY_PATH}
+			${CREATE_ARCHIVE_PY_PATH}
 			gen_create_archive.py
 			@ONLY
 		)
