@@ -5,12 +5,14 @@ project(Hypersomnia)
 # Various feature switches.
 # If it is your first time building Hypersomnia, and you get some errors,
 # try turning all of these off to build the minimal possible working Hypersomnia runtime. Then, try to work from there.
+# The game should still work, even not having these features.
 # In the future, the switches will also differ depending on whether the target application is a client or a server.
 
-option(BUILD_SOUND_FORMAT_DECODERS "Build ogg and vorbis" ON)
+option(BUILD_SOUND_FORMAT_DECODERS "Build ogg and vorbis. If this is off, there is also no point in enabling OpenAL." ON)
 option(BUILD_OPENAL "Build OpenAL Soft" ON)
 option(BUILD_UNIT_TESTS "Build unit tests launched with the game." ON)
 option(BUILD_VERSION_FILE_GENERATOR "Build version file generator." ON)
+option(BUILD_ENET "Build ENet networking library." ON)
 option(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE "Add command to archive builds in Release." ON)
 
 if (NOT HYPERSOMNIA_RUNTIME_ARCHIVE_DIR)
@@ -511,7 +513,6 @@ message("Git path: ${GIT_EXECUTABLE}")
 if(NOT (GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git"))
 	set(BUILD_VERSION_FILE_GENERATOR FALSE)
 	set(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE FALSE)
-else()
 	message("Git not found. Some functionality will be disabled.")
 endif()
 
@@ -552,7 +553,10 @@ endif()
 
 # We build the remaining libraries.
 
-add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/enet")
+if(BUILD_ENET)
+	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/enet")
+endif()
+
 add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/freetype")
 add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/glad")
 
@@ -561,7 +565,10 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/glad")
 
 include(add_include_dirs_of)
 
-add_include_dirs_of("enet")
+if(BUILD_ENET)
+	add_include_dirs_of("enet")
+endif()
+
 add_include_dirs_of("freetype")
 
 if(BUILD_SOUND_FORMAT_DECODERS)
@@ -593,7 +600,7 @@ include_directories("${PROJECT_BINARY_DIR}/generators_output")
 
 configure_file("src/augs/build_settings/setting_build_openal.h.in" "${GENERATED_SOURCES_PATH}/setting_build_openal.h") 
 configure_file("src/augs/build_settings/setting_build_sound_format_decoders.h.in" "${GENERATED_SOURCES_PATH}/setting_build_sound_format_decoders.h") 
-
+configure_file("src/augs/build_settings/setting_build_enet.h.in" "${GENERATED_SOURCES_PATH}/setting_build_enet.h") 
 configure_file("src/augs/build_settings/setting_build_unit_tests.h.in" "${GENERATED_SOURCES_PATH}/setting_build_unit_tests.h")
 # Just a different name for the variable
 set(WAS_VERSION_GENERATOR_BUILT ${BUILD_VERSION_FILE_GENERATOR})
@@ -701,11 +708,14 @@ set(HYPERSOMNIA_LIBS
 	freetype
 	lua
 	glad
-	enet
 )
 
 if(BUILD_OPENAL)
 	list(APPEND HYPERSOMNIA_LIBS OpenAL)
+endif()
+
+if(BUILD_ENET)
+	list(APPEND HYPERSOMNIA_LIBS enet)
 endif()
 
 if(BUILD_SOUND_FORMAT_DECODERS)
@@ -713,10 +723,12 @@ if(BUILD_SOUND_FORMAT_DECODERS)
 endif()
 
 if(MSVC)
-	list(APPEND HYPERSOMNIA_LIBS
-		"Ws2_32.lib" 		# for ENet
-		"winmm.lib"  		# for ENet
-	)
+	if(BUILD_ENET)
+		list(APPEND HYPERSOMNIA_LIBS
+			"Ws2_32.lib" 		# for ENet
+			"winmm.lib"  		# for ENet
+		)
+	endif()
 endif()
 
 target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS})

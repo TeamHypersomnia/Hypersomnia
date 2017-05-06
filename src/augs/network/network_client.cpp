@@ -1,6 +1,8 @@
+#if BUILD_ENET
 #include <enet/enet.h>
 #undef min
 #undef max
+#endif
 
 #include "augs/misc/templated_readwrite.h"
 #include "network_client.h"
@@ -10,6 +12,7 @@
 namespace augs {
 	namespace network {
 		bool client::connect(const std::string host_address, const unsigned short port, const unsigned timeout_ms) {
+#if BUILD_ENET
 			host.init(nullptr /* create a client host */,
 				1 /* only allow 1 outgoing connection */,
 				2 /* allow up 2 channels to be used, 0 and 1 */,
@@ -46,17 +49,26 @@ namespace augs {
 				LOG("Connection to %x:%x failed.", host_address, port);
 				return false;
 			}
+#else
+			LOG("Warning! ENet wasn't built.");
+			return false;
+#endif
 		}
 
 		bool client::post_redundant(const packet& payload) {
+#if BUILD_ENET
 			if (peer == nullptr || host.get() == nullptr)
 				return false;
 
 			packet stream = payload;
 			return redundancy.sender.post_message(stream);
+#else
+			return false;
+#endif
 		}
 
 		bool client::send_pending_redundant() {
+#if BUILD_ENET
 			if (peer == nullptr || host.get() == nullptr)
 				return false;
 
@@ -70,9 +82,13 @@ namespace augs {
 			enet_host_flush(host.get());
 
 			return result;
+#else
+			return false;
+#endif
 		}
 
 		bool client::send_reliable(const packet& payload) {
+#if BUILD_ENET
 			if (peer == nullptr || host.get() == nullptr)
 				return false;
 
@@ -82,6 +98,9 @@ namespace augs {
 			enet_host_flush(host.get());
 
 			return result;
+#else
+			return false;
+#endif
 		}
 
 		bool client::has_timed_out(const float sequence_interval_ms, const float ms) const {
@@ -89,19 +108,35 @@ namespace augs {
 		}
 
 		unsigned client::total_bytes_received() const {
+#if BUILD_ENET
 			return host.get() == nullptr ? 0 : host.get()->totalReceivedData;
+#else
+			return 0;
+#endif
 		}
 
 		unsigned client::total_bytes_sent() const {
+#if BUILD_ENET
 			return host.get() == nullptr ? 0 : host.get()->totalSentData;
+#else
+			return 0;
+#endif
 		}
 
 		unsigned client::total_packets_sent() const {
+#if BUILD_ENET
 			return host.get() == nullptr ? 0 : host.get()->totalSentPackets;
+#else
+			return 0;
+#endif
 		}
 
 		unsigned client::total_packets_received() const {
+#if BUILD_ENET
 			return host.get() == nullptr ? 0 : host.get()->totalReceivedPackets;
+#else
+			return 0;
+#endif
 		}
 
 		std::string client::format_transmission_details() const {
@@ -113,16 +148,21 @@ namespace augs {
 		}
 
 		void client::disconnect() {
+#if BUILD_ENET
 			enet_peer_disconnect(peer, 0);
+#endif
 		}
 
 		void client::forceful_disconnect() {
+#if BUILD_ENET
 			enet_peer_reset(peer);
+#endif
 		}
 
 		std::vector<message> client::collect_entropy() {
 			std::vector<message> total;
 			
+#if BUILD_ENET
 			if (host.get() == nullptr)
 				return total;
 
@@ -168,7 +208,7 @@ namespace augs {
 				if(add_event)
 					total.emplace_back(new_event);
 			}
-
+#endif
 			return total;
 		}
 	}

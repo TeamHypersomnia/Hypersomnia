@@ -1,6 +1,10 @@
+#include "generated/setting_build_enet.h"
+
+#if BUILD_ENET
 #include <enet/enet.h>
 #undef min
 #undef max
+#endif
 
 #include "network_types.h"
 
@@ -9,8 +13,10 @@ namespace augs {
 		endpoint_address::endpoint_address() : ip(0), port(0) {}
 
 		endpoint_address::endpoint_address(const ENetAddress& addr) {
+#if BUILD_ENET
 			ip = addr.host;
 			port = addr.port;
+#endif
 		}
 
 		std::string endpoint_address::get_readable_ip() const {

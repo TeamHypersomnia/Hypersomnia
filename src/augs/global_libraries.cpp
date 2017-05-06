@@ -1,6 +1,7 @@
 #include <signal.h>
+#if BUILD_ENET
 #include <enet/enet.h>
-
+#endif
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
@@ -34,8 +35,10 @@ namespace augs {
 		}
 		
 		if(to_initialize.test(library::ENET)) {
+#if BUILD_ENET
 			ensure(enet_initialize() == 0 && L"Failed to initialize enet");
 			initialized.set(library::ENET);
+#endif
 		}
 	}
 
@@ -47,9 +50,11 @@ namespace augs {
 		}
 
 		if(to_deinitialize.test(library::ENET)) {
+#if BUILD_ENET
 			ensure(initialized.test(library::ENET));
 			enet_deinitialize();
 			initialized.set(library::ENET, false);
+#endif
 		}
 	}
 

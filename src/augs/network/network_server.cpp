@@ -1,13 +1,16 @@
+#if BUILD_ENET
 #include <enet/enet.h>
 #undef min
 #undef max
+#endif
 
 #include "network_server.h"
 #include "augs/misc/templated_readwrite.h"
 
 namespace augs {
 	namespace network {
-		bool server::listen(unsigned short port, unsigned max_connections) {
+		bool server::listen(const unsigned short port, const unsigned max_connections) {
+#if BUILD_ENET
 			ENetAddress addr;
 
 			addr.host = ENET_HOST_ANY;
@@ -18,6 +21,10 @@ namespace augs {
 				2      /* allow up to 2 channels to be used, 0 and 1 */,
 				0      /* assume any amount of incoming bandwidth */,
 				0);
+#else
+			LOG("Warning! ENet wasn't built.");
+			return false;
+#endif
 		}
 
 		bool server::post_redundant(const packet& payload, const endpoint_address& target) {
@@ -34,6 +41,7 @@ namespace augs {
 		}
 
 		bool server::send_pending_redundant() {
+#if BUILD_ENET
 			bool result = true;
 
 			for (auto& e : peer_map) {
@@ -45,30 +53,39 @@ namespace augs {
 				result = result && !enet_peer_send(e.second, 0, packet);
 				enet_host_flush(host.get());
 			}
-
 			return result;
+#endif
+			return false;
 		}
 
 		bool server::send_reliable(const packet& payload, const endpoint_address& target) {
+#if BUILD_ENET
 			ENetPacket * const packet = enet_packet_create(payload.data(), payload.size(), ENET_PACKET_FLAG_RELIABLE);
 			auto result = !enet_peer_send(peer_map.at(target), 1, packet);
 			enet_host_flush(host.get());
 
 			return result;
+#endif
+			return false;
 		}
 
 		void server::disconnect(const endpoint_address& target) {
+#if BUILD_ENET
 			enet_peer_disconnect(peer_map.at(target), 0);
+#endif
 		}
 
 		void server::forceful_disconnect(const endpoint_address& target) {
+#if BUILD_ENET
 			enet_peer_reset(peer_map.at(target));
+#endif
 			peer_map.erase(target);
 		}
 
 		std::vector<message> server::collect_entropy() {
 			std::vector<message> total;
 
+#if BUILD_ENET
 			if (host.get() == nullptr)
 				return total;
 
@@ -117,7 +134,7 @@ namespace augs {
 				if(add_event)
 					total.emplace_back(new_event);
 			}
-
+#endif
 			return total;
 		}
 	}

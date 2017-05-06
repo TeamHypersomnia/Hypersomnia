@@ -7,7 +7,7 @@ typedef struct _ENetHost ENetHost;
 namespace augs {
 	namespace network {
 		class ENetHost_raii {
-			ENetHost* ptr;
+			ENetHost* ptr = nullptr;
 		public:
 			template<class... Args>
 			bool init(Args... args) {
@@ -21,7 +21,7 @@ namespace augs {
 				return true;
 			}
 
-			ENetHost_raii();
+			ENetHost_raii() = default;
 			~ENetHost_raii();
 			
 			ENetHost* get();
