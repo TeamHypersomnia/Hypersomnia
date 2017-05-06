@@ -3,15 +3,15 @@ cmake_minimum_required(VERSION 3.8)
 project(Hypersomnia)
 
 # Various feature switches.
-# If it is your first time building Hypersomnia, and you get some errors,
+# If it is your first time building Hypersomnia and you get some errors,
 # try turning all of these off to build the minimal possible working Hypersomnia runtime. Then, try to work from there.
 # The game should still work, even not having these features.
 # In the future, the switches will also differ depending on whether the target application is a client or a server.
 
 option(BUILD_SOUND_FORMAT_DECODERS "Build ogg and vorbis. If this is off, there is also no point in enabling OpenAL." ON)
-option(BUILD_OPENAL "Build OpenAL Soft" ON)
-option(BUILD_UNIT_TESTS "Build unit tests launched with the game." ON)
-option(BUILD_VERSION_FILE_GENERATOR "Build version file generator." ON)
+option(BUILD_OPENAL "Build OpenAL Soft." ON)
+option(BUILD_UNIT_TESTS "Build unit tests that are run on game startup." ON)
+option(BUILD_VERSION_FILE_GENERATOR "Build version file generator to generate commit information." ON)
 option(BUILD_ENET "Build ENet networking library." ON)
 option(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE "Add command to archive builds in Release." ON)
 
@@ -543,7 +543,7 @@ if(BUILD_SOUND_FORMAT_DECODERS)
 	
 	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/ogg")
 	
-	# We build Vorbis. It must know the paths for OGG that we've just build.
+	# We build Vorbis. It must know the paths for OGG that we have just built.
 	
 	set(OGG_ROOT "${PROJECT_SOURCE_DIR}/src/3rdparty/ogg")
 	set(OGG_LIBRARIES ogg)
@@ -636,7 +636,7 @@ add_executable(Hypersomnia
 # Here, we define pre-build events calling the source code generators.
 
 # Before Hypersomnia builds,
-# version_file_generator must first query the git bash for information about the most recent commit.
+# version_file_generator must first query git for information about the most recent commit.
 
 set(HYPERSOMNIA_VERSION_FILE_IN_PATH
 	"${PROJECT_SOURCE_DIR}/src/hypersomnia_version.cpp.in"
@@ -747,18 +747,18 @@ if(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE)
 		TARGET Hypersomnia
 		POST_BUILD
 		COMMAND ${CMAKE_COMMAND}
-		    -DCONFIG=$<CONFIGURATION>
-		    -DEXE_PATH=$<TARGET_FILE:Hypersomnia>
-		    -DARCHIVE_OUTPUT_DIR=${HYPERSOMNIA_RUNTIME_ARCHIVE_DIR}
-		    -DRESOURCES_DIR=${HYPERSOMNIA_EXE_RESOURCES_DIR}
-		    -DPYTHON_EXE=${PYTHON_EXECUTABLE}
-		    -DGIT_EXE=${GIT_EXECUTABLE}
-		    -DCREATE_ARCHIVE_PY_PATH=${CMAKE_MODULE_PATH}/create_archive.py.in
-		    -DRESOURCE_FOLDER_NAME=${RESOURCE_FOLDER_NAME}
-		    -P ${CMAKE_MODULE_PATH}/create_build_archive.cmake
+			-DCONFIG=$<CONFIGURATION>
+			-DEXE_PATH=$<TARGET_FILE:Hypersomnia>
+			-DARCHIVE_OUTPUT_DIR=${HYPERSOMNIA_RUNTIME_ARCHIVE_DIR}
+			-DRESOURCES_DIR=${HYPERSOMNIA_EXE_RESOURCES_DIR}
+			-DPYTHON_EXE=${PYTHON_EXECUTABLE}
+			-DGIT_EXE=${GIT_EXECUTABLE}
+			-DCREATE_ARCHIVE_PY_PATH=${CMAKE_MODULE_PATH}/create_archive.py.in
+			-DRESOURCE_FOLDER_NAME=${RESOURCE_FOLDER_NAME}
+			-P ${CMAKE_MODULE_PATH}/create_build_archive.cmake
 		DEPENDS ${CMAKE_MODULE_PATH}/create_build_archive.cmake
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-		COMMENT "Running executable packer..."
+		COMMENT "Archiving the executable and resources..."
 		VERBATIM
 	)
 endif()
