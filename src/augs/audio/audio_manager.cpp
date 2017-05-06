@@ -1,6 +1,7 @@
 #include "audio_manager.h"
 
 #include "augs/al_log.h"
+#include "generated/setting_build_openal.h"
 
 #if BUILD_OPENAL
 extern "C" {
@@ -43,6 +44,7 @@ namespace augs {
 		const bool hrtf_enabled,
 		const unsigned max_number_of_sound_sources
 	) {
+#if BUILD_OPENAL
 		std::string alsoft_ini_file;
 		alsoft_ini_file += "# Do not modify.";
 		alsoft_ini_file += "\n# Hypersomnia generates this file every launch to speak with OpenAL.";
@@ -58,6 +60,7 @@ namespace augs {
 		const auto alsoft_ini_path = std::string(alstr_get_cstr(where_openal_expects_alsoft_ini));
 
 		augs::create_text_file(alsoft_ini_path, alsoft_ini_file);
+#endif
 	}
 
 	audio_manager::audio_manager(const std::string output_device_name) {

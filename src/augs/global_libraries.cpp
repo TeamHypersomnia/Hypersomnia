@@ -10,7 +10,7 @@
 #include "augs/log.h"
 #include "augs/ensure.h"
 #include "augs/window_framework/platform_utils.h"
-#include "augs/build_settings/setting_build_unit_tests.h"
+#include "generated/setting_build_unit_tests.h"
 
 #if BUILD_UNIT_TESTS
 #define CATCH_CONFIG_RUNNER

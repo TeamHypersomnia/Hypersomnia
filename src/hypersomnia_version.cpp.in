@@ -4,6 +4,9 @@
 	argv: %x*/
 
 #include "hypersomnia_version.h"
+#include "generated/setting_was_version_generator_built.h"
+
+#if WAS_VERSION_GENERATOR_BUILT
 
 unsigned HYPERSOMNIA_COMMIT_NUMBER = %x;
 std::string HYPERSOMNIA_COMMIT_MESSAGE = "%x";
@@ -11,3 +14,13 @@ std::string HYPERSOMNIA_COMMIT_DATE = "%x";
 std::string HYPERSOMNIA_COMMIT_HASH = "%x";
 std::vector<std::string> HYPERSOMNIA_WORKING_TREE_CHANGES = {
 %x};
+
+#else
+
+unsigned HYPERSOMNIA_COMMIT_NUMBER = 0;
+std::string HYPERSOMNIA_COMMIT_MESSAGE = "Unknown";
+std::string HYPERSOMNIA_COMMIT_DATE = "Unknown";
+std::string HYPERSOMNIA_COMMIT_HASH = "Unknown";
+std::vector<std::string> HYPERSOMNIA_WORKING_TREE_CHANGES = {};
+
+#endif

@@ -5,19 +5,24 @@
 #include "augs/audio/sound_samples_from_file.h"
 
 #include "augs/build_settings/setting_log_audio_files.h"
+#include "generated/setting_build_sound_format_decoders.h"
+
+#if BUILD_SOUND_FORMAT_DECODERS
 
 #include <vorbis/vorbisfile.h>
-
 #define OGG_BUFFER_SIZE 32768 // 32 KB buffers
+
+#endif
 
 namespace augs {
 	sound_data get_sound_samples_from_file(const std::string& path) {
+		sound_data new_data;
+		new_data.channels = 1;
+
+#if BUILD_SOUND_FORMAT_DECODERS
 		augs::ensure_existence(path);
 
 		const auto extension = augs::get_extension(path);
-
-		sound_data new_data;
-		new_data.channels = 1;
 
 		if (extension == ".ogg") {
 			std::vector<char> buffer;
@@ -87,7 +92,9 @@ namespace augs {
 			info.samplerate,
 			info.channels,
 			info.format,
-			new_data.compute_length_in_seconds());
+			new_data.compute_length_in_seconds()
+		);
+#endif
 #endif
 
 		return new_data;

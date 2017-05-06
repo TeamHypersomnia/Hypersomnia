@@ -2,15 +2,26 @@ cmake_minimum_required(VERSION 3.8)
 
 project(Hypersomnia)
 
-if (NOT HYPERSOMNIA_BUILD_ARCHIVE_DIR)
+# Various feature switches.
+# If it is your first time building Hypersomnia, and you get some errors,
+# try turning all of these off to build the minimal possible working Hypersomnia runtime. Then, try to work from there.
+# In the future, the switches will also differ depending on whether the target application is a client or a server.
+
+option(BUILD_SOUND_FORMAT_DECODERS "Build ogg and vorbis" ON)
+option(BUILD_OPENAL "Build OpenAL Soft" ON)
+option(BUILD_UNIT_TESTS "Build unit tests launched with the game." ON)
+option(BUILD_VERSION_FILE_GENERATOR "Build version file generator." ON)
+option(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE "Add command to archive builds in Release." ON)
+
+if (NOT HYPERSOMNIA_RUNTIME_ARCHIVE_DIR)
 	# By default, we set the installer output directory to completely outside of the source tree,
 	# because it might be useful to preserve some older builds even if the repository is deleted.
 
-	set(HYPERSOMNIA_BUILD_ARCHIVE_DIR
+	set(HYPERSOMNIA_RUNTIME_ARCHIVE_DIR
 		"${PROJECT_SOURCE_DIR}/../build_database"
 	)
 
-	file(MAKE_DIRECTORY ${HYPERSOMNIA_BUILD_ARCHIVE_DIR})
+	file(MAKE_DIRECTORY ${HYPERSOMNIA_RUNTIME_ARCHIVE_DIR})
 endif()
 
 set(RESOURCE_FOLDER_NAME "hypersomnia")
@@ -416,8 +427,13 @@ set(HYPERSOMNIA_INCLUDE_DIRS
 	"${PROJECT_SOURCE_DIR}/src/3rdparty"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/lua"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/sol2/single/sol"
-	"${PROJECT_SOURCE_DIR}/src/3rdparty/Catch/single_include"
 )
+
+if(BUILD_UNIT_TESTS)
+	list(APPEND HYPERSOMNIA_INCLUDE_DIRS
+		"${PROJECT_SOURCE_DIR}/src/3rdparty/Catch/single_include"
+	)
+endif()
 
 # We configure additional flags for the compiler.
 
@@ -440,12 +456,14 @@ endif()
 # We configure some preprocessor defines.
 
 # Lua is configured to compile as C++, of which sol2 library must necessarily know.
+
+add_definitions(-DSOL_USING_CXX_LUA)
+
 # To avoid linker errors, we also need to tell OpenAL Soft we will be using it statically.
 
-add_definitions(
-	-DSOL_USING_CXX_LUA
-	-DAL_LIBTYPE_STATIC
-)
+if(BUILD_OPENAL)
+	add_definitions(-DAL_LIBTYPE_STATIC)
+endif()
 
 if(MSVC)
 	add_definitions(
@@ -485,6 +503,18 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO
  "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${HYPERSOMNIA_CXX_RELEASE_FLAGS}"
 )
 
+# From now on, we will be using Git to obtain some information about commits.
+find_package(Git)
+
+message("Git path: ${GIT_EXECUTABLE}")
+
+if(NOT (GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git"))
+	set(BUILD_VERSION_FILE_GENERATOR FALSE)
+	set(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE FALSE)
+else()
+	message("Git not found. Some functionality will be disabled.")
+endif()
+
 # We configure MSVC to use static runtime libraries ("/MT" switch),
 # instead of DLL ones.
 
@@ -495,26 +525,30 @@ configure_msvc_runtime()
 
 add_library(lua ${LUA_SRCS})
 
-# We build OpenAL Soft. We need to set some variables beforehand.
+if(BUILD_OPENAL)
+	# We build OpenAL Soft. We need to set some variables beforehand.
+	
+	set(LIBTYPE "STATIC")
+	set(FORCE_STATIC_VCRT TRUE CACHE BOOL "/MT for static VC runtimes" FORCE)
+	set(ALSOFT_UTILS FALSE CACHE BOOL "Build and install utility programs" FORCE)
+	set(ALSOFT_EXAMPLES FALSE CACHE BOOL "Build and install example programs" FORCE)
+	set(ALSOFT_TESTS FALSE CACHE BOOL "Build and install test programs" FORCE)
+	
+	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/openal-soft")
+endif()
 
-set(LIBTYPE "STATIC")
-set(FORCE_STATIC_VCRT TRUE CACHE BOOL "/MT for static VC runtimes" FORCE)
-set(ALSOFT_UTILS FALSE CACHE BOOL "Build and install utility programs" FORCE)
-set(ALSOFT_EXAMPLES FALSE CACHE BOOL "Build and install example programs" FORCE)
-set(ALSOFT_TESTS FALSE CACHE BOOL "Build and install test programs" FORCE)
-
-add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/openal-soft")
-
-# We build OGG.
-
-add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/ogg")
-
-# We build Vorbis. It must know the paths for OGG that we've just build.
-
-set(OGG_ROOT "${PROJECT_SOURCE_DIR}/src/3rdparty/ogg")
-set(OGG_LIBRARIES ogg)
-
-add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/vorbis")
+if(BUILD_SOUND_FORMAT_DECODERS)
+	# We build OGG.
+	
+	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/ogg")
+	
+	# We build Vorbis. It must know the paths for OGG that we've just build.
+	
+	set(OGG_ROOT "${PROJECT_SOURCE_DIR}/src/3rdparty/ogg")
+	set(OGG_LIBRARIES ogg)
+	
+	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/vorbis")
+endif()
 
 # We build the remaining libraries.
 
@@ -527,11 +561,17 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/glad")
 
 include(add_include_dirs_of)
 
-add_include_dirs_of("OpenAL")
 add_include_dirs_of("enet")
 add_include_dirs_of("freetype")
-add_include_dirs_of("ogg")
-add_include_dirs_of("vorbis")
+
+if(BUILD_SOUND_FORMAT_DECODERS)
+	add_include_dirs_of("ogg")
+	add_include_dirs_of("vorbis")
+endif()
+
+if(BUILD_OPENAL)
+	add_include_dirs_of("OpenAL")
+endif()
 
 include_directories(${HYPERSOMNIA_INCLUDE_DIRS})
 
@@ -547,16 +587,30 @@ file(MAKE_DIRECTORY ${GENERATED_SOURCES_PATH})
 
 include_directories("${PROJECT_BINARY_DIR}/generators_output")
 
+# First we configure the define headers according to the currently set options.
+# We could just add the preprocessor definitions as flags,
+# but this has the advantage that testing a change to a flag does not incur recompilation of the whole project.
+
+configure_file("src/augs/build_settings/setting_build_openal.h.in" "${GENERATED_SOURCES_PATH}/setting_build_openal.h") 
+configure_file("src/augs/build_settings/setting_build_sound_format_decoders.h.in" "${GENERATED_SOURCES_PATH}/setting_build_sound_format_decoders.h") 
+
+configure_file("src/augs/build_settings/setting_build_unit_tests.h.in" "${GENERATED_SOURCES_PATH}/setting_build_unit_tests.h")
+# Just a different name for the variable
+set(WAS_VERSION_GENERATOR_BUILT ${BUILD_VERSION_FILE_GENERATOR})
+configure_file("src/augs/build_settings/setting_was_version_generator_built.h.in" "${GENERATED_SOURCES_PATH}/setting_was_version_generator_built.h") 
+
 # We build the generator of type information required for introspection.
 
 add_subdirectory("${CMAKE_MODULE_PATH}/Introspector-generator")
 
 # We build the generator of commit information.
 
-add_executable(version_file_generator 
-	"${CMAKE_MODULE_PATH}/version_file_generator.cpp"
-	"src/augs/misc/time_utils.cpp"
-)
+if(BUILD_VERSION_FILE_GENERATOR)
+	add_executable(version_file_generator 
+		"${CMAKE_MODULE_PATH}/version_file_generator.cpp"
+		"src/augs/misc/time_utils.cpp"
+	)
+endif()
 
 set(HYPERSOMNIA_VERSION_FILE_PATH
 	"${GENERATED_SOURCES_PATH}/hypersomnia_version.cpp"
@@ -577,14 +631,23 @@ add_executable(Hypersomnia
 # Before Hypersomnia builds,
 # version_file_generator must first query the git bash for information about the most recent commit.
 
-add_custom_command(
-	PRE_BUILD
-	TARGET Hypersomnia
-	COMMAND version_file_generator ${GIT_EXECUTABLE} "${PROJECT_SOURCE_DIR}/src/hypersomnia_version.cpp.in" "${HYPERSOMNIA_VERSION_FILE_PATH}"
-	COMMENT "Generating version files..."
+set(HYPERSOMNIA_VERSION_FILE_IN_PATH
+	"${PROJECT_SOURCE_DIR}/src/hypersomnia_version.cpp.in"
 )
 
-add_dependencies(Hypersomnia version_file_generator)
+if(BUILD_VERSION_FILE_GENERATOR)
+	add_custom_command(
+		PRE_BUILD
+		TARGET Hypersomnia
+		COMMAND version_file_generator ${GIT_EXECUTABLE} ${HYPERSOMNIA_VERSION_FILE_IN_PATH} ${HYPERSOMNIA_VERSION_FILE_PATH}
+		COMMENT "Generating version files..."
+	)
+	
+	add_dependencies(Hypersomnia version_file_generator)
+else()
+	message("Version file generator will not be built. Copying ${HYPERSOMNIA_VERSION_FILE_IN_PATH} into ${HYPERSOMNIA_VERSION_FILE_PATH}")
+	execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${HYPERSOMNIA_VERSION_FILE_IN_PATH} ${HYPERSOMNIA_VERSION_FILE_PATH})
+endif()
 
 # Before Hypersomnia builds,
 # Introspector-generator must first generate the type information.
@@ -635,13 +698,19 @@ add_dependencies(Hypersomnia glad)
 
 set(HYPERSOMNIA_LIBS
 	"OpenGL32.lib"
-	enet
 	freetype
 	lua
-	OpenAL
 	glad
-	vorbisfile
+	enet
 )
+
+if(BUILD_OPENAL)
+	list(APPEND HYPERSOMNIA_LIBS OpenAL)
+endif()
+
+if(BUILD_SOUND_FORMAT_DECODERS)
+	list(APPEND HYPERSOMNIA_LIBS vorbisfile)
+endif()
 
 if(MSVC)
 	list(APPEND HYPERSOMNIA_LIBS
@@ -655,27 +724,29 @@ target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS})
 set_target_properties(Hypersomnia PROPERTIES DEBUG_POSTFIX "-Debug")
 
 if(MSVC)
-	set_target_properties(Hypersomnia PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/${HYPERSOMNIA_EXE_RESOURCES_DIR}")
+	set_target_properties(Hypersomnia PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${HYPERSOMNIA_EXE_RESOURCES_DIR}")
 	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Hypersomnia)
 endif()
 
 # We add a command to automatically create an archive for every Release build.
 
-add_custom_command(
-  TARGET Hypersomnia
-  POST_BUILD
-  COMMAND ${CMAKE_COMMAND}
-    -DCONFIG=$<CONFIGURATION>
-    -DEXE_PATH=$<TARGET_FILE:Hypersomnia>
-    -DARCHIVE_OUTPUT_DIR=${HYPERSOMNIA_BUILD_ARCHIVE_DIR}
-    -DRESOURCES_DIR=${HYPERSOMNIA_EXE_RESOURCES_DIR}
-    -DPYTHON_EXE=${PYTHON_EXECUTABLE}
-    -DGIT_EXE=${GIT_EXECUTABLE}
-    -DCREATE_ARCHIVE_PY_PATH=${CMAKE_MODULE_PATH}/create_archive.py.in
-    -DRESOURCE_FOLDER_NAME=${RESOURCE_FOLDER_NAME}
-    -P ${CMAKE_MODULE_PATH}/create_build_archive.cmake
-  DEPENDS ${CMAKE_MODULE_PATH}/create_build_archive.cmake
-  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-  COMMENT "Running executable packer..."
-  VERBATIM
-)
+if(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE)
+	add_custom_command(
+		TARGET Hypersomnia
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND}
+		    -DCONFIG=$<CONFIGURATION>
+		    -DEXE_PATH=$<TARGET_FILE:Hypersomnia>
+		    -DARCHIVE_OUTPUT_DIR=${HYPERSOMNIA_RUNTIME_ARCHIVE_DIR}
+		    -DRESOURCES_DIR=${HYPERSOMNIA_EXE_RESOURCES_DIR}
+		    -DPYTHON_EXE=${PYTHON_EXECUTABLE}
+		    -DGIT_EXE=${GIT_EXECUTABLE}
+		    -DCREATE_ARCHIVE_PY_PATH=${CMAKE_MODULE_PATH}/create_archive.py.in
+		    -DRESOURCE_FOLDER_NAME=${RESOURCE_FOLDER_NAME}
+		    -P ${CMAKE_MODULE_PATH}/create_build_archive.cmake
+		DEPENDS ${CMAKE_MODULE_PATH}/create_build_archive.cmake
+		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+		COMMENT "Running executable packer..."
+		VERBATIM
+	)
+endif()

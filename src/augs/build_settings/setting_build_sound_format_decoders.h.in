@@ -1,0 +1,2 @@
+#pragma once
+#cmakedefine01 BUILD_SOUND_FORMAT_DECODERS

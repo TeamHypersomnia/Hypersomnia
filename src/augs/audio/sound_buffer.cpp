@@ -1,6 +1,6 @@
 #include <array>
 
-#include "augs/build_settings/setting_build_openal.h"
+#include "generated/setting_build_openal.h"
 
 #if BUILD_OPENAL
 #include <AL/al.h>
