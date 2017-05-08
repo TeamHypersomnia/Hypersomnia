@@ -10,6 +10,7 @@
 
 #include "game/components/rigid_body_component.h"
 #include "game/components/transform_component.h"
+#include "game/components/motor_joint_component.h"
 
 #include "game/messages/collision_message.h"
 
@@ -32,9 +33,14 @@ struct colliders_cache {
 	augs::constant_size_vector<b2Fixture*, CONVEX_POLYS_COUNT> all_fixtures_in_component;
 };
 
+struct joint_cache {
+	b2Joint* joint = nullptr;
+};
+
 class EMPTY_BASES physics_system : public physics_queries<physics_system> {
 	std::vector<colliders_cache> colliders_caches;
 	std::vector<rigid_body_cache> rigid_body_caches;
+	std::vector<joint_cache> joint_caches;
 
 	b2Fixture_index_in_component get_index_in_component(
 		const b2Fixture* const f, 
@@ -51,10 +57,12 @@ class EMPTY_BASES physics_system : public physics_queries<physics_system> {
 	friend class physics_queries<physics_system>;
 	friend class component_synchronizer<false, components::rigid_body>;
 	friend class component_synchronizer<true, components::rigid_body>;
+	friend class component_synchronizer<false, components::motor_joint>;
+	friend class component_synchronizer<true, components::motor_joint>;
 	friend class component_synchronizer<false, components::fixtures>;
 	friend class component_synchronizer<true, components::fixtures>;
-	template<bool> friend class basic_physics_synchronizer;
-	template<bool> friend class basic_fixtures_synchronizer;
+	template <bool> friend class basic_physics_synchronizer;
+	template <bool> friend class basic_fixtures_synchronizer;
 
 	bool is_inferred_state_created_for_rigid_body(const const_entity_handle) const;
 	bool is_inferred_state_created_for_colliders(const const_entity_handle) const;
@@ -128,7 +136,7 @@ public:
 		return *b2world.get();
 	}
 
-	// b2world causes a stack overflow due to a large stack allocator, therefore it must be dynamically allocated
+	// b2World on stack causes a stack overflow due to a large stack allocator, therefore it must be dynamically allocated
 	std::unique_ptr<b2World> b2world;
 
 	physics_system& operator=(const physics_system&);

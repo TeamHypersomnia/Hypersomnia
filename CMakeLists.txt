@@ -16,7 +16,7 @@ option(BUILD_ENET "Build ENet networking library." ON)
 option(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE "Add command to archive builds in Release." ON)
 
 if (NOT HYPERSOMNIA_RUNTIME_ARCHIVE_DIR)
-	# By default, we set the installer output directory to completely outside of the source tree,
+	# By default, we set output directory for archives to completely outside of the source tree,
 	# because it might be useful to preserve some older builds even if the repository is deleted.
 
 	set(HYPERSOMNIA_RUNTIME_ARCHIVE_DIR

@@ -46,4 +46,5 @@
 #include "game/components/catridge_component.h"
 #include "game/components/shape_polygon_component.h"
 #include "game/components/shape_circle_component.h"
+#include "game/components/motor_joint_component.h"
 

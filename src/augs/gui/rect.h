@@ -40,7 +40,10 @@ namespace augs {
 			using rect_node_data::rect_node_data;
 
 			template <class C, class gui_element_id>
-			static void build_tree_data(const C context, const gui_element_id this_id) {
+			static void build_tree_data(
+				const C context, 
+				const gui_element_id this_id
+			) {
 				auto& tree_entry = context.make_tree_entry(this_id);
 				const auto parent = tree_entry.get_parent();
 				
@@ -89,7 +92,12 @@ namespace augs {
 			}
 
 			template <class C, class gui_element_id>
-			static void consume_raw_input_and_generate_gui_events(const C context, const gui_element_id this_id, gui::event_traversal_flags& inf, gui_entropy& entropies) {
+			static void consume_raw_input_and_generate_gui_events(
+				const C context, 
+				const gui_element_id this_id, 
+				gui::event_traversal_flags& inf, 
+				gui_entropy& entropies
+			) {
 				using namespace augs::window::event;
 				auto& gr = context.get_rect_world();
 				const auto& tree_entry = context.get_tree_entry(this_id);
@@ -232,14 +240,21 @@ namespace augs {
 			}
 
 			template <class C, class gui_element_id>
-			static void rebuild_layouts(const C context, const gui_element_id this_id) {
+			static void rebuild_layouts(
+				const C context, 
+				const gui_element_id this_id
+			) {
 				this_id->for_each_child(context, this_id, [&](const auto& child_id) {
 					child_id->rebuild_layouts(context, child_id);
 				});
 			}
 			
 			template <class C, class gui_element_id>
-			static void draw(const C context, const gui_element_id this_id, draw_info in) {
+			static void draw(
+				const C context, 
+				const gui_element_id this_id, 
+				draw_info in
+			) {
 				if (!this_id->get_flag(flag::ENABLE_DRAWING)) {
 					return;
 				}
@@ -248,7 +263,11 @@ namespace augs {
 			}
 
 			template <class C, class gui_element_id>
-			static void draw_children(const C context, const gui_element_id this_id, draw_info in) {
+			static void draw_children(
+				const C context, 
+				const gui_element_id this_id, 
+				draw_info in
+			) {
 				if (!this_id->get_flag(flag::ENABLE_DRAWING_OF_CHILDREN)) {
 					return;
 				}
@@ -288,7 +307,12 @@ namespace augs {
 			}
 
 			template <class C, class gui_element_id>
-			static void draw_rectangle_stylesheeted(const C context, const gui_element_id& id, gui::draw_info in, const gui::stylesheet& styles) {
+			static void draw_rectangle_stylesheeted(
+				const C context, 
+				const gui_element_id& id, 
+				gui::draw_info in, 
+				const gui::stylesheet& styles
+			) {
 				const auto st = styles.get_style();
 				const auto& this_entry = context.get_tree_entry(id);
 
@@ -302,12 +326,21 @@ namespace augs {
 			}
 
 			template <class C, class gui_element_id, class L>
-			static void for_each_child(C&, const gui_element_id&, L) {
+			static void for_each_child(
+				const C, 
+				const gui_element_id&, 
+				L
+			) {
 
 			}
 
 			template <class C, class gui_element_id>
-			static void unhover(const C context, const gui_element_id this_id, gui::event_traversal_flags& inf, gui_entropy& entropies) {
+			static void unhover(
+				const C context, 
+				const gui_element_id this_id, 
+				gui::event_traversal_flags& inf, 
+				gui_entropy& entropies
+			) {
 				auto& world = context.get_rect_world();
 
 				auto gui_event_lambda = [&](const gui_event ev) {

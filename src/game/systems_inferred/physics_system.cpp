@@ -230,6 +230,7 @@ void physics_system::create_inferred_state_for(const const_entity_handle handle)
 void physics_system::reserve_caches_for_entities(const size_t n) {
 	rigid_body_caches.resize(n);
 	colliders_caches.resize(n);
+	joint_caches.resize(n);
 }
 
 b2Fixture_index_in_component physics_system::get_index_in_component(
