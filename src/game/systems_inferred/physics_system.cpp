@@ -54,10 +54,10 @@ void physics_system::destroy_inferred_state_of(const const_entity_handle handle)
 	if (is_inferred_state_created_for_rigid_body(handle)) {
 		auto& cache = get_rigid_body_cache(handle);
 		
-		for (const auto& colliders_cache_id : cache.correspondent_colliders_caches) {
-			colliders_caches[colliders_cache_id] = colliders_cache();
+		for (b2Fixture* f = cache.body->m_fixtureList; f; f = f->m_next) {
+			colliders_caches[make_cache_id(f->GetUserData())] = colliders_cache();
 		}
-
+		
 		b2world->DestroyBody(cache.body);
 
 		cache = rigid_body_cache();
@@ -67,15 +67,12 @@ void physics_system::destroy_inferred_state_of(const const_entity_handle handle)
 		const auto this_cache_id = make_cache_id(handle);
 		auto& cache = colliders_caches[this_cache_id];
 
-		ensure(cache.correspondent_rigid_body_cache != -1);
-
-		auto& owner_body_cache = rigid_body_caches[cache.correspondent_rigid_body_cache];
+		auto& owner_body_cache = rigid_body_caches[make_cache_id(cache.all_fixtures_in_component[0]->GetBody()->GetUserData())];
 
 		for (const auto& f : cache.all_fixtures_in_component) {
 			owner_body_cache.body->DestroyFixture(f);
 		}
 
-		remove_element(owner_body_cache.correspondent_colliders_caches, this_cache_id);
 		cache = colliders_cache();
 	}
 }
@@ -107,9 +104,6 @@ void physics_system::create_inferred_state_for_fixtures(const const_entity_handl
 
 		const auto this_cache_id = make_cache_id(handle);
 		const auto owner_cache_id = make_cache_id(owner_body_entity);
-
-		owner_cache.correspondent_colliders_caches.push_back(this_cache_id);
-		cache.correspondent_rigid_body_cache = owner_cache_id;
 
 		b2FixtureDef fixdef;
 		fixdef.density = group.density;

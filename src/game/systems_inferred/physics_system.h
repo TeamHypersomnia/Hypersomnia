@@ -25,11 +25,9 @@ class cosmos;
 
 struct rigid_body_cache {
 	b2Body* body = nullptr;
-	std::vector<int> correspondent_colliders_caches;
 };
 
 struct colliders_cache {
-	int correspondent_rigid_body_cache = -1;
 	augs::constant_size_vector<b2Fixture*, CONVEX_POLYS_COUNT> all_fixtures_in_component;
 };
 
