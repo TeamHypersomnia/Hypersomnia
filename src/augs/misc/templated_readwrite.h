@@ -26,6 +26,9 @@ namespace augs {
 
 	};
 
+	template <class Archive>
+	constexpr bool is_native_binary_stream_v = is_native_binary_stream<Archive>::value;
+
 	template <class Archive, class Serialized, class = void>
 	struct has_io_overloads 
 		: std::false_type 
@@ -57,7 +60,7 @@ namespace augs {
 
 	template<class Archive, class Serialized>
 	struct is_byte_io_safe 
-		: std::bool_constant<is_native_binary_stream<Archive>::value && is_memcpy_safe_v<Serialized>> 
+		: std::bool_constant<is_native_binary_stream_v<Archive> && is_memcpy_safe_v<Serialized>> 
 	{
 
 	};
@@ -78,7 +81,7 @@ namespace augs {
 	template<class Archive, class Serialized>
 	void verify_byte_io_safety() {
 		static_assert(is_memcpy_safe_v<Serialized>, "Attempt to serialize a non-trivially copyable type");
-		static_assert(is_native_binary_stream<Archive>::value, "Byte serialization of trivial structs allowed only on native binary archives");
+		static_assert(is_native_binary_stream_v<Archive>, "Byte serialization of trivial structs allowed only on native binary archives");
 	}
 	
 	/*

@@ -5,7 +5,7 @@
 #include "game/transcendental/entity_id_declaration.h"
 
 namespace augs {
-	template<class...>
+	template <class...>
 	class component_aggregate;
 }
 

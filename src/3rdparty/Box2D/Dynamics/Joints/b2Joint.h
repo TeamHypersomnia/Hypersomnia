@@ -20,8 +20,9 @@
 #define B2_JOINT_H
 
 #include <Box2D/Common/b2Math.h>
+#include "game/transcendental/entity_id.h"
 
-#include "game/enums/joint_name.h"
+typedef unversioned_entity_id joint_userdata;
 
 class b2Body;
 class b2Joint;
@@ -78,7 +79,6 @@ struct b2JointDef
 	b2JointDef()
 	{
 		type = e_unknownJoint;
-		userData = joint_name::JOINT;
 		bodyA = NULL;
 		bodyB = NULL;
 		collideConnected = false;
@@ -88,7 +88,7 @@ struct b2JointDef
 	b2JointType type;
 
 	/// Use this to attach application specific data to your joints.
-	joint_name userData;
+	joint_userdata userData;
 
 	/// The first attached body.
 	b2Body* bodyA;
@@ -132,10 +132,10 @@ public:
 	const b2Joint* GetNext() const;
 
 	/// Get the user data pointer.
-	joint_name GetUserData() const;
+	joint_userdata GetUserData() const;
 
 	/// Set the user data pointer.
-	void SetUserData(joint_name data);
+	void SetUserData(joint_userdata data);
 
 	/// Short-cut function to determine if either body is inactive.
 	bool IsActive() const;
@@ -182,7 +182,7 @@ protected:
 	bool m_islandFlag;
 	bool m_collideConnected;
 
-	joint_name m_userData;
+	joint_userdata m_userData;
 };
 
 inline b2JointType b2Joint::GetType() const
@@ -210,12 +210,12 @@ inline const b2Joint* b2Joint::GetNext() const
 	return m_next;
 }
 
-inline joint_name b2Joint::GetUserData() const
+inline joint_userdata b2Joint::GetUserData() const
 {
 	return m_userData;
 }
 
-inline void b2Joint::SetUserData(joint_name data)
+inline void b2Joint::SetUserData(joint_userdata data)
 {
 	m_userData = data;
 }

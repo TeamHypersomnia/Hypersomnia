@@ -51,7 +51,7 @@ capability_comparison match_transfer_capabilities(
 	const auto target_slot_owning_capability = target_slot_container.get_owning_transfer_capability();
 
 	if (target_slot_owning_capability.dead() && item_owning_capability.dead()) {
-		return{ capability_relation::BOTH_DEAD, dead_entity };
+		return { capability_relation::BOTH_DEAD, dead_entity };
 	}
 
 	if (
@@ -59,7 +59,7 @@ capability_comparison match_transfer_capabilities(
 		&& target_slot_owning_capability.alive()
 		&& item_owning_capability != target_slot_owning_capability
 	) {
-		return{ capability_relation::UNMATCHING, dead_entity };
+		return { capability_relation::UNMATCHING, dead_entity };
 	}
 
 	if (
@@ -67,19 +67,19 @@ capability_comparison match_transfer_capabilities(
 		&& target_slot_owning_capability.alive()
 		&& item_owning_capability == target_slot_owning_capability
 	) {
-		return{ capability_relation::THE_SAME, item_owning_capability };
+		return { capability_relation::THE_SAME, item_owning_capability };
 	}
 
 	if (target_slot_owning_capability.dead() && item_owning_capability.alive()) {
-		return{ capability_relation::DROP, item_owning_capability };
+		return { capability_relation::DROP, item_owning_capability };
 	}
 
 	if (target_slot_owning_capability.alive() && item_owning_capability.dead()) {
-		return{ capability_relation::PICKUP, target_slot_owning_capability };
+		return { capability_relation::PICKUP, target_slot_owning_capability };
 	}
 
 	ensure(false);
-	return{ capability_relation::PICKUP, target_slot_owning_capability };
+	return { capability_relation::PICKUP, target_slot_owning_capability };
 }
 
 item_transfer_result query_transfer_result(

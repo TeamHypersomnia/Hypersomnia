@@ -20,7 +20,14 @@ namespace components {
 	struct motor_joint : synchronizable_component {
 		// GEN INTROSPECTOR struct components::motor_joint
 		bool activated = true;
-		std::array<padding_byte, 3> pad;
+		bool collide_connected = false;
+		std::array<padding_byte, 2> pad;
+
+		vec2 linear_offset;
+		float angular_offset = 0.f;
+		float max_force = 1.f;
+		float max_torque = 1.f;
+		float correction_factor = 0.3f;
 		// END GEN INTROSPECTOR
 	};
 }

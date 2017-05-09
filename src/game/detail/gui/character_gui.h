@@ -114,7 +114,10 @@ struct character_gui {
 		const const_entity_handle gui_entity
 	) const;
 
-	static entity_id get_hovered_world_entity(const cosmos& cosm, const vec2 world_cursor_position);
+	static entity_id get_hovered_world_entity(
+		const cosmos& cosm, 
+		const vec2 world_cursor_position
+	);
 	
 	void draw(
 		const viewing_step,

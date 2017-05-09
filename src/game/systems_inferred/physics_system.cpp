@@ -58,6 +58,9 @@ void physics_system::destroy_inferred_state_of(const const_entity_handle handle)
 			colliders_caches[make_cache_id(f->GetUserData())] = colliders_cache();
 		}
 		
+		// no need to manually destroy each fixture of the body,
+		// Box2D will take care of that after just deleting the body.
+
 		b2world->DestroyBody(cache.body);
 
 		cache = rigid_body_cache();
