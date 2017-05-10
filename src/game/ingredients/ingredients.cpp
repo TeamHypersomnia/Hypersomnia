@@ -5,22 +5,27 @@
 #include "game/transcendental/entity_handle.h"
 
 #include "game/components/item_component.h"
+#include "game/components/container_component.h"
 #include "game/components/trigger_component.h"
 #include "game/components/tree_of_npo_node_component.h"
-#include "game/components/force_joint_component.h"
+#include "game/components/motor_joint_component.h"
 
 namespace ingredients {
-	components::item& make_item(entity_handle e) {
+	components::item& make_item(const entity_handle e) {
 		auto& item = e += components::item();
-		auto& processing = e += components::processing();
 
 		e.add(components::trigger());
 		e.get<components::trigger>().react_to_collision_detectors = true;
 		e.get<components::trigger>().react_to_query_detectors = false;
 
-		auto& force_joint = e.add(components::force_joint());
-		processing.disable_in(processing_subjects::WITH_FORCE_JOINT);
+		components::motor_joint motor;
+		motor.activated = false;
+		motor.max_force = 20000.f;
+		motor.max_torque = 2.f;
+		motor.correction_factor = 0.82;
 
+		e += motor;
+		
 		return item;
 	}
 

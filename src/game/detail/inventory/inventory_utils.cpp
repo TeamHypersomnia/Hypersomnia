@@ -8,7 +8,7 @@
 #include "game/components/special_physics_component.h"
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/name_component.h"
-#include "game/components/force_joint_component.h"
+#include "game/components/motor_joint_component.h"
 #include "game/detail/gui/character_gui.h"
 #include "game/detail/entity_scripts.h"
 #include "game/messages/queue_destruction.h"
@@ -553,14 +553,23 @@ void perform_transfer(
 			rigid_body.set_angular_velocity(0.f);
 		}
 
-		if (slot_requests_connection_of_bodies) {
-			auto& force_joint = descendant.get<components::force_joint>();
-			force_joint.chased_entity_offset = force_joint_offset;
-			force_joint.chased_entity = slot.get_container();
-			descendant.get<components::processing>().enable_in(processing_subjects::WITH_FORCE_JOINT);
-		}
-		else {
-			descendant.get<components::processing>().disable_in(processing_subjects::WITH_FORCE_JOINT);
+		{
+			const auto motor_handle = descendant.get<components::motor_joint>();
+			components::motor_joint motor = motor_handle.get_raw_component();
+
+			if (slot_requests_connection_of_bodies) {
+				motor.activated = true;  
+				motor.target_bodies.at(0) = slot.get_container();
+				motor.target_bodies.at(1) = descendant;
+				motor.linear_offset = force_joint_offset.pos;
+				motor.angular_offset = force_joint_offset.rotation;
+				motor.collide_connected = false;
+			}
+			else {
+				motor.activated = false;  
+			}
+
+			motor_handle = motor;
 		}
 
 		messages::interpolation_correction_request request;

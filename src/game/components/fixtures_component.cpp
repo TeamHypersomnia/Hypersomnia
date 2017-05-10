@@ -67,7 +67,7 @@ void component_synchronizer<false, F>::set_offset(
 	reinference();
 }
 
-component_synchronizer<false, F>& component_synchronizer<false, F>::operator=(const F& f) {
+const component_synchronizer<false, F>& component_synchronizer<false, F>::operator=(const F& f) const {
 	get_data() = f;
 	reinference();
 	return *this;

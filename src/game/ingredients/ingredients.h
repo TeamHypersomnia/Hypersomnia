@@ -17,7 +17,8 @@ namespace components {
 }
 
 namespace ingredients {
-	components::item& make_item(entity_handle);
+	components::item& make_item(const entity_handle);
+	
 	void make_always_visible(entity_handle);
 
 	components::sprite& add_sprite(

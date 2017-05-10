@@ -21,17 +21,28 @@
 
 #include "augs/graphics/renderer.h"
 #include "augs/templates/container_templates.h"
+#include "augs/templates/dynamic_cast_dispatch.h"
 #include "augs/build_settings/setting_debug_physics_system_copy.h"
 #include "game/systems_inferred/relational_system.h"
 
 bool physics_system::is_inferred_state_created_for_rigid_body(const const_entity_handle handle) const {
-	return handle.alive() && get_rigid_body_cache(handle).body != nullptr;
+	return 
+		handle.alive() 
+		&& get_rigid_body_cache(handle).body != nullptr
+	;
 }
 
 bool physics_system::is_inferred_state_created_for_colliders(const const_entity_handle handle) const {
 	return
-		handle.alive() // && is_inferred_state_created_for_rigid_body(handle.get_owner_body())
+		handle.alive()
 		&& get_colliders_cache(handle).all_fixtures_in_component.size() > 0u
+	;
+}
+
+bool physics_system::is_inferred_state_created_for_joint(const const_entity_handle handle) const {
+	return 
+		handle.alive() 
+		&& get_joint_cache(handle).joint != nullptr
 	;
 }
 
@@ -43,6 +54,10 @@ colliders_cache& physics_system::get_colliders_cache(const entity_id id) {
 	return colliders_caches[make_cache_id(id)];
 }
 
+joint_cache& physics_system::get_joint_cache(const entity_id id) {
+	return joint_caches[make_cache_id(id)];
+}
+
 const rigid_body_cache& physics_system::get_rigid_body_cache(const entity_id id) const {
 	return rigid_body_caches[make_cache_id(id)];
 }
@@ -51,15 +66,25 @@ const colliders_cache& physics_system::get_colliders_cache(const entity_id id) c
 	return colliders_caches[make_cache_id(id)];
 }
 
+const joint_cache& physics_system::get_joint_cache(const entity_id id) const {
+	return joint_caches[make_cache_id(id)];
+}
+
 void physics_system::destroy_inferred_state_of(const const_entity_handle handle) {
+	const auto& cosmos = handle.get_cosmos();
+
 	if (is_inferred_state_created_for_rigid_body(handle)) {
 		auto& cache = get_rigid_body_cache(handle);
 		
 		for (b2Fixture* f = cache.body->m_fixtureList; f; f = f->m_next) {
-			colliders_caches[make_cache_id(f->GetUserData())] = colliders_cache();
+			get_colliders_cache(cosmos[f->GetUserData()]) = colliders_cache();
 		}
 		
-		// no need to manually destroy each fixture of the body,
+		for (b2JointEdge* j = cache.body->m_jointList; j; j = j->next) {
+			get_joint_cache(cosmos[j->joint->GetUserData()]) = joint_cache();
+		}
+		
+		// no need to manually destroy each fixture and joint of the body,
 		// Box2D will take care of that after just deleting the body.
 
 		b2world->DestroyBody(cache.body);
@@ -68,10 +93,8 @@ void physics_system::destroy_inferred_state_of(const const_entity_handle handle)
 	}
 	
 	if (is_inferred_state_created_for_colliders(handle)) {
-		const auto this_cache_id = make_cache_id(handle);
-		auto& cache = colliders_caches[this_cache_id];
-
-		auto& owner_body_cache = rigid_body_caches[make_cache_id(cache.all_fixtures_in_component[0]->GetBody()->GetUserData())];
+		auto& cache = get_colliders_cache(handle);
+		auto& owner_body_cache = get_rigid_body_cache(cosmos[cache.all_fixtures_in_component[0]->GetBody()->GetUserData()]);
 
 		for (const auto& f : cache.all_fixtures_in_component) {
 			owner_body_cache.body->DestroyFixture(f);
@@ -79,92 +102,13 @@ void physics_system::destroy_inferred_state_of(const const_entity_handle handle)
 
 		cache = colliders_cache();
 	}
-}
 
-void physics_system::create_inferred_state_for_fixtures(const const_entity_handle handle) {
-	//ensure(!is_inferred_state_created_for_colliders(handle));
-	const bool is_already_constructed = is_inferred_state_created_for_colliders(handle);
+	if (is_inferred_state_created_for_joint(handle)) {
+		auto& cache = get_joint_cache(handle);
 
-	if (is_already_constructed) {
-		return;
-	}
+		b2world->DestroyJoint(cache.joint);
 
-	const auto colliders = handle.find<components::fixtures>();
-
-	const bool is_anything_to_construct =
-		colliders != nullptr
-		&& colliders.is_activated()
-		&& is_inferred_state_created_for_rigid_body(handle.get_owner_body())
-	;
-
-	if (is_anything_to_construct) {
-		const auto si = handle.get_cosmos().get_si();
-		const auto& group = colliders.get_data();
-		auto& cache = get_colliders_cache(handle);
-
-		const auto owner_body_entity = handle.get_owner_body();
-		ensure(owner_body_entity.alive());
-		auto& owner_cache = get_rigid_body_cache(owner_body_entity);
-
-		const auto this_cache_id = make_cache_id(handle);
-		const auto owner_cache_id = make_cache_id(owner_body_entity);
-
-		b2FixtureDef fixdef;
-		fixdef.density = group.density;
-		fixdef.friction = group.friction;
-		fixdef.isSensor = group.sensor;
-		fixdef.filter = group.filter;
-		fixdef.restitution = group.restitution;
-		fixdef.userData = handle.get_id();
-
-		auto& all_fixtures_in_component = cache.all_fixtures_in_component;
-		all_fixtures_in_component.clear();
-		
-		const auto shape_polygon = handle.find<components::shape_polygon>();
-
-		if (shape_polygon != nullptr && shape_polygon.is_activated()) {
-			auto transformed_shape = shape_polygon.get_raw_component().shape;
-			transformed_shape.offset_vertices(colliders.get_total_offset());
-
-			for (std::size_t ci = 0; ci < transformed_shape.convex_polys.size(); ++ci) {
-				const auto& convex = transformed_shape.convex_polys[ci];
-				std::vector<b2Vec2> b2verts(convex.vertices.begin(), convex.vertices.end());
-
-				for (auto& v : b2verts) {
-					v = si.get_meters(v);
-				}
-
-				b2PolygonShape shape;
-				shape.Set(b2verts.data(), b2verts.size());
-
-				fixdef.shape = &shape;
-				b2Fixture* const new_fix = owner_cache.body->CreateFixture(&fixdef);
-
-				ensure(static_cast<short>(ci) < std::numeric_limits<short>::max());
-				new_fix->index_in_component = static_cast<short>(ci);
-
-				all_fixtures_in_component.push_back(new_fix);
-			}
-
-			return;
-		}
-		
-		const auto shape_circle = handle.find<components::shape_circle>();
-		
-		if (shape_circle != nullptr && shape_circle.is_activated()) {
-			b2CircleShape shape;
-			shape.m_radius = si.get_meters(shape_circle.get_radius());
-		
-			fixdef.shape = &shape;
-			b2Fixture* const new_fix = owner_cache.body->CreateFixture(&fixdef);
-			
-			new_fix->index_in_component = 0u;
-			all_fixtures_in_component.push_back(new_fix);
-			
-			return;
-		}
-		
-		ensure(false && "fixtures requested with no shape attached!");
+		cache = joint_cache();
 	}
 }
 
@@ -221,6 +165,131 @@ void physics_system::create_inferred_state_for(const const_entity_handle handle)
 		for (const auto f : fixture_entities) {
 			create_inferred_state_for_fixtures(cosmos[f]);
 		}
+	}
+
+	create_inferred_state_for_joint(handle);
+}
+
+void physics_system::create_inferred_state_for_fixtures(const const_entity_handle handle) {
+	//ensure(!is_inferred_state_created_for_colliders(handle));
+	const bool is_already_constructed = is_inferred_state_created_for_colliders(handle);
+
+	if (is_already_constructed) {
+		return;
+	}
+
+	const auto colliders = handle.find<components::fixtures>();
+
+	const bool is_anything_to_construct =
+		colliders != nullptr
+		&& colliders.is_activated()
+		&& is_inferred_state_created_for_rigid_body(handle.get_owner_body())
+	;
+
+	if (is_anything_to_construct) {
+		const auto si = handle.get_cosmos().get_si();
+		const auto owner_body_entity = handle.get_owner_body();
+		ensure(owner_body_entity.alive());
+		auto* const owner_b2Body = get_rigid_body_cache(owner_body_entity).body;
+		const auto& colliders_data = colliders.get_data();
+
+		b2FixtureDef fixdef;
+		fixdef.density = colliders_data.density;
+		fixdef.friction = colliders_data.friction;
+		fixdef.isSensor = colliders_data.sensor;
+		fixdef.filter = colliders_data.filter;
+		fixdef.restitution = colliders_data.restitution;
+		fixdef.userData = handle.get_id();
+
+		auto& all_fixtures_in_component = get_colliders_cache(handle).all_fixtures_in_component;
+		ensure(all_fixtures_in_component.empty());
+		
+		const auto shape_polygon = handle.find<components::shape_polygon>();
+
+		if (shape_polygon != nullptr && shape_polygon.is_activated()) {
+			auto transformed_shape = shape_polygon.get_raw_component().shape;
+			transformed_shape.offset_vertices(colliders.get_total_offset());
+
+			for (std::size_t ci = 0; ci < transformed_shape.convex_polys.size(); ++ci) {
+				const auto& convex = transformed_shape.convex_polys[ci];
+				std::vector<b2Vec2> b2verts(convex.vertices.begin(), convex.vertices.end());
+
+				for (auto& v : b2verts) {
+					v = si.get_meters(v);
+				}
+
+				b2PolygonShape shape;
+				shape.Set(b2verts.data(), b2verts.size());
+
+				fixdef.shape = &shape;
+				b2Fixture* const new_fix = owner_b2Body->CreateFixture(&fixdef);
+
+				ensure(static_cast<short>(ci) < std::numeric_limits<short>::max());
+				new_fix->index_in_component = static_cast<short>(ci);
+
+				all_fixtures_in_component.push_back(new_fix);
+			}
+
+			return;
+		}
+		
+		const auto shape_circle = handle.find<components::shape_circle>();
+		
+		if (shape_circle != nullptr && shape_circle.is_activated()) {
+			b2CircleShape shape;
+			shape.m_radius = si.get_meters(shape_circle.get_radius());
+		
+			fixdef.shape = &shape;
+			b2Fixture* const new_fix = owner_b2Body->CreateFixture(&fixdef);
+			
+			new_fix->index_in_component = 0u;
+			all_fixtures_in_component.push_back(new_fix);
+			
+			return;
+		}
+		
+		ensure(false && "fixtures requested with no shape attached!");
+	}
+}
+
+void physics_system::create_inferred_state_for_joint(const const_entity_handle handle) {
+	const bool is_already_constructed = is_inferred_state_created_for_joint(handle);
+	ensure(!is_already_constructed);
+
+	if (is_already_constructed) {
+		return;
+	}
+
+	const auto& cosmos = handle.get_cosmos();
+
+	const auto motor_joint = handle.find<components::motor_joint>();
+
+	const bool is_anything_to_construct =
+		motor_joint != nullptr
+		&& motor_joint.is_activated()
+		&& is_inferred_state_created_for_rigid_body(cosmos[motor_joint.get_target_bodies().at(0)])
+		&& is_inferred_state_created_for_rigid_body(cosmos[motor_joint.get_target_bodies().at(1)])
+	;
+	
+	if (is_anything_to_construct) {
+		const components::motor_joint joint_data = motor_joint.get_raw_component();
+
+		const auto si = handle.get_cosmos().get_si();
+		auto& cache = get_joint_cache(handle);
+		ensure(cache.joint == nullptr);
+
+		b2MotorJointDef def;
+		def.userData = handle.get_id();
+		def.bodyA = get_rigid_body_cache(cosmos[joint_data.target_bodies.at(0)]).body;
+		def.bodyB = get_rigid_body_cache(cosmos[joint_data.target_bodies.at(1)]).body;
+		def.collideConnected = joint_data.collide_connected;
+		def.linearOffset = si.get_meters(joint_data.linear_offset);
+		def.angularOffset = DEG_TO_RAD<float> * joint_data.angular_offset;
+		def.maxForce = si.get_meters(joint_data.max_force);
+		def.maxTorque = joint_data.max_torque;
+		def.correctionFactor = joint_data.correction_factor;
+
+		cache.joint = b2world->CreateJoint(&def);
 	}
 }
 
@@ -333,6 +402,7 @@ physics_system& physics_system::operator=(const physics_system& b) {
 
 	std::unordered_map<void*, void*> pointer_migrations;
 	std::unordered_map<void*, size_t> contact_edge_offsets_in_contacts;
+	std::unordered_map<void*, size_t> joint_edge_offsets_in_joints;
 
 	b2BlockAllocator& migrated_allocator = migrated_b2World.m_blockAllocator;
 
@@ -356,7 +426,8 @@ physics_system& physics_system::operator=(const physics_system& b) {
 #endif
 
 		typedef std::remove_pointer_t<std::decay_t<decltype(pointer_to_be_migrated)>> type;
-		
+		static_assert(!std::is_same_v<type, b2Joint>, "Can't migrate an abstract base class");
+
 		void* const void_ptr = reinterpret_cast<void*>(pointer_to_be_migrated);
 
 		if (pointer_to_be_migrated == nullptr) {
@@ -384,6 +455,8 @@ physics_system& physics_system::operator=(const physics_system& b) {
 			pointer_to_be_migrated = reinterpret_cast<type*>((*maybe_already_migrated).second);
 		}
 	};
+
+	// migration of contacts and contact edges
 	
 	auto migrate_contact_edge = [
 #if DEBUG_PHYSICS_SYSTEM_COPY
@@ -399,21 +472,20 @@ physics_system& physics_system::operator=(const physics_system& b) {
 		if (edge_ptr == nullptr) {
 			return;
 		}
-		else {
-			const size_t offset_to_edge_in_contact = contact_edge_offsets_in_contacts.at(edge_ptr);
 
-			ensure(
-				offset_to_edge_in_contact == offsetof(b2Contact, m_nodeA) 
-				|| offset_to_edge_in_contact == offsetof(b2Contact, m_nodeB)
-			);
+		const size_t offset_to_edge_in_contact = contact_edge_offsets_in_contacts.at(edge_ptr);
 
-			char* const contact_that_owns_unmigrated_edge = reinterpret_cast<char*>(edge_ptr) - offset_to_edge_in_contact;
-			// here "at" requires that the contacts be already migrated
-			char* const migrated_contact = reinterpret_cast<char*>(pointer_migrations.at(contact_that_owns_unmigrated_edge));
-			char* const edge_from_migrated_contact = migrated_contact + offset_to_edge_in_contact;
+		ensure(
+			offset_to_edge_in_contact == offsetof(b2Contact, m_nodeA) 
+			|| offset_to_edge_in_contact == offsetof(b2Contact, m_nodeB)
+		);
 
-			edge_ptr = reinterpret_cast<b2ContactEdge*>(edge_from_migrated_contact);
-		}
+		char* const contact_that_owns_unmigrated_edge = reinterpret_cast<char*>(edge_ptr) - offset_to_edge_in_contact;
+		// here "at" requires that the contacts be already migrated
+		char* const migrated_contact = reinterpret_cast<char*>(pointer_migrations.at(contact_that_owns_unmigrated_edge));
+		char* const edge_from_migrated_contact = migrated_contact + offset_to_edge_in_contact;
+
+		edge_ptr = reinterpret_cast<b2ContactEdge*>(edge_from_migrated_contact);
 	};
 
 	// make a map of pointers to b2ContactEdges to their respective offsets in
@@ -424,6 +496,9 @@ physics_system& physics_system::operator=(const physics_system& b) {
 	}
 
 	// migrate contact pointers
+	// contacts are polymorphic, but their derived classes do not add any member fields.
+	// thus, it is safe to just memcpy sizeof(b2Contact)
+
 	migrate_pointer(migrated_b2World.m_contactManager.m_contactList);
 
 	for (b2Contact* c = migrated_b2World.m_contactManager.m_contactList; c; c = c->m_next) {
@@ -447,24 +522,112 @@ physics_system& physics_system::operator=(const physics_system& b) {
 		migrate_contact_edge(c->m_nodeB.next);
 		migrate_contact_edge(c->m_nodeB.prev);
 	}
+	
+	// migration of joints and joint edges
+
+	auto migrate_joint_edge = [
+#if DEBUG_PHYSICS_SYSTEM_COPY
+		&already_migrated_pointers,
+#endif
+		&pointer_migrations,
+		&joint_edge_offsets_in_joints
+	](b2JointEdge*& edge_ptr) {
+#if DEBUG_PHYSICS_SYSTEM_COPY
+		ensure(already_migrated_pointers.find((void**)&edge_ptr) == already_migrated_pointers.end());
+		already_migrated_pointers.insert((void**)&edge_ptr);
+#endif
+		if (edge_ptr == nullptr) {
+			return;
+		}
+
+		const size_t offset_to_edge_in_joint = joint_edge_offsets_in_joints.at(edge_ptr);
+
+		ensure(
+			offset_to_edge_in_joint == offsetof(b2Joint, m_edgeA)
+			|| offset_to_edge_in_joint == offsetof(b2Joint, m_edgeB)
+		);
+
+		char* const joint_that_owns_unmigrated_edge = reinterpret_cast<char*>(edge_ptr) - offset_to_edge_in_joint;
+		// here "at" requires that the joints be already migrated
+		char* const migrated_joint = reinterpret_cast<char*>(pointer_migrations.at(joint_that_owns_unmigrated_edge));
+		char* const edge_from_migrated_joint = migrated_joint + offset_to_edge_in_joint;
+
+		edge_ptr = reinterpret_cast<b2JointEdge*>(edge_from_migrated_joint);
+	};
+
+	auto migrate_joint = [&migrate_pointer](b2Joint*& j){
+		if (j == nullptr) {
+			return;
+		}
+
+		dynamic_cast_dispatch<
+			b2MotorJoint, // most likely
+
+			b2DistanceJoint,
+			b2FrictionJoint,
+			b2GearJoint,
+			b2MouseJoint,
+			b2PrismaticJoint,
+			b2PulleyJoint,
+			b2RevoluteJoint,
+			b2RopeJoint,
+			b2WeldJoint,
+			b2WheelJoint
+		>(j, [&j, &migrate_pointer](auto* derived){
+			using derived_type = std::remove_pointer_t<decltype(derived)>;
+			// static_assert(std::is_same_v<derived_type, b2MotorJoint>, "test failed");
+			migrate_pointer(reinterpret_cast<derived_type*&>(j));
+		});
+	};
+
+	// make a map of pointers to b2JointEdges to their respective offsets in
+	// the b2Joints that own them
+	for (b2Joint* j = migrated_b2World.m_jointList; j; j = j->m_next) {
+		joint_edge_offsets_in_joints.insert(std::make_pair(&j->m_edgeA, offsetof(b2Joint, m_edgeA)));
+		joint_edge_offsets_in_joints.insert(std::make_pair(&j->m_edgeB, offsetof(b2Joint, m_edgeB)));
+	}
+
+	// migrate joint pointers
+	migrate_joint(migrated_b2World.m_jointList);
+
+	for (b2Joint* c = migrated_b2World.m_jointList; c; c = c->m_next) {
+		migrate_joint(c->m_prev);
+		migrate_joint(c->m_next);
+		migrate_pointer(c->m_bodyA);
+		migrate_pointer(c->m_bodyB);
+
+		c->m_edgeA.joint = c;
+		migrate_pointer(c->m_edgeA.other);
+
+		c->m_edgeB.joint = c;
+		migrate_pointer(c->m_edgeB.other);
+	}
+
+	// migrate joint edges of joints
+	for (b2Joint* c = migrated_b2World.m_jointList; c; c = c->m_next) {
+		migrate_joint_edge(c->m_edgeA.next);
+		migrate_joint_edge(c->m_edgeA.prev);
+
+		migrate_joint_edge(c->m_edgeB.next);
+		migrate_joint_edge(c->m_edgeB.prev);
+	}
 
 	auto& proxy_tree = migrated_b2World.m_contactManager.m_broadPhase.m_tree;
 
 	// migrate bodies and fixtures
 	migrate_pointer(migrated_b2World.m_bodyList);
 
-	for (b2Body* b = migrated_b2World.m_bodyList; b; b = b->m_next)
-	{
+	for (b2Body* b = migrated_b2World.m_bodyList; b; b = b->m_next) {
 		//auto rigid_body_cache_id = make_cache_id(b->m_userData);
 		//rigid_body_caches[rigid_body_cache_id].body = b;
 
 		migrate_pointer(b->m_fixtureList);
 		migrate_pointer(b->m_prev);
 		migrate_pointer(b->m_next);
-		migrate_pointer(b->m_jointList);
 		migrate_pointer(b->m_ownerFrictionGround);
 
 		migrate_contact_edge(b->m_contactList);
+		migrate_joint_edge(b->m_jointList);
 		b->m_world = &migrated_b2World;
 		
 		/*

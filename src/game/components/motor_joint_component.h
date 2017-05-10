@@ -19,6 +19,8 @@ struct b2Fixture_index_in_component;
 namespace components {
 	struct motor_joint : synchronizable_component {
 		// GEN INTROSPECTOR struct components::motor_joint
+		std::array<entity_id, 2> target_bodies;
+		
 		bool activated = true;
 		bool collide_connected = false;
 		std::array<padding_byte, 2> pad;
@@ -37,24 +39,21 @@ class basic_motor_joint_synchronizer : public component_synchronizer_base<is_con
 protected:
 	friend class ::physics_system;
 
-	maybe_const_ref_t<is_const, motor_joint_cache>& get_cache() const;
 public:
 	using component_synchronizer_base<is_const, components::motor_joint>::component_synchronizer_base;
 
+	bool is_activated() const;
+	decltype(components::motor_joint::target_bodies) get_target_bodies() const;
 };
 
 template<>
 class component_synchronizer<false, components::motor_joint> : public basic_motor_joint_synchronizer<false> {
-	void reinference() const {
-	
-	}
+	void reinference() const;
 
 public:
 	using basic_motor_joint_synchronizer<false>::basic_motor_joint_synchronizer;
 
-	component_synchronizer& operator=(const components::motor_joint&) {
-	
-	}
+	const component_synchronizer& operator=(const components::motor_joint& m) const;
 };
 
 template<>

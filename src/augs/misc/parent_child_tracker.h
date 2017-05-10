@@ -7,6 +7,9 @@
 namespace augs {
 	template <class id_type, std::size_t parent_count>
 	class parent_child_tracker {
+	public:
+		using parent_array_type = std::array<id_type, parent_count>;
+	private:
 		struct parent_state {
 			std::array<
 				std::vector<id_type>,
@@ -15,7 +18,7 @@ namespace augs {
 		};
 
 		struct child_state {
-			std::array<id_type, parent_count> parents;
+			parent_array_type parents;
 		};
 
 		std::vector<child_state> child_caches;
@@ -90,19 +93,12 @@ namespace augs {
 			}
 		}
 
-		template <class H1, class H2>
 		void set_parent(
-			const H1 of_child_handle, 
-			const H2 parent_handle,
+			const id_type child_id, 
+			const id_type parent_id,
 			const std::size_t parent_index = 0u
 		) {
-			const auto parent_id = parent_handle.get_id();
-			const auto child_id = of_child_handle.get_id();
-			
 			unset_parent_of(child_id, parent_index);
-
-			ensure(of_child_handle.alive());
-			ensure(parent_handle.alive());
 
 			auto& child_cache = child_caches[make_cache_id(child_id)];
 			child_cache.parents.at(parent_index) = parent_id;
@@ -110,7 +106,7 @@ namespace augs {
 			for (std::size_t p = 0; p < parent_count; ++p) {
 				if (p != parent_index) {
 					const bool the_same_parent_in_different_slot_exists =
-						child_cache.parents.at(parent_index) == parent_id
+						child_cache.parents.at(p) == parent_id
 					;
 
 					ensure(!the_same_parent_in_different_slot_exists);
@@ -133,6 +129,15 @@ namespace augs {
 			const std::size_t parenthood_index
 		) const {
 			return parent_caches[make_cache_id(parent)].children.at(parenthood_index);
+		}
+
+		void set_parents(
+			const id_type child_id, 
+			const parent_array_type parents
+		) {
+			for(std::size_t p = 0; p < parent_count; ++p) {
+				set_parent(child_id, parents.at(p));
+			}
 		}
 	};
 }

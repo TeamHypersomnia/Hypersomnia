@@ -116,7 +116,7 @@ public:
 		const assets::physical_material_id
 	) const;
 
-	component_synchronizer& operator=(const components::fixtures&);
+	const component_synchronizer& operator=(const components::fixtures&) const;
 	
 	void set_offset(
 		const colliders_offset_type, 

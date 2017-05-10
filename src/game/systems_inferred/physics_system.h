@@ -36,19 +36,21 @@ struct joint_cache {
 };
 
 class EMPTY_BASES physics_system : public physics_queries<physics_system> {
-	std::vector<colliders_cache> colliders_caches;
 	std::vector<rigid_body_cache> rigid_body_caches;
+	std::vector<colliders_cache> colliders_caches;
 	std::vector<joint_cache> joint_caches;
 
 	b2Fixture_index_in_component get_index_in_component(
 		const b2Fixture* const f, 
 		const const_entity_handle
 	);
-
-	void create_inferred_state_for_fixtures(const const_entity_handle);
-
+	
 	void reserve_caches_for_entities(const size_t n);
+
 	void create_inferred_state_for(const const_entity_handle);
+	void create_inferred_state_for_fixtures(const const_entity_handle);
+	void create_inferred_state_for_joint(const const_entity_handle);
+
 	void destroy_inferred_state_of(const const_entity_handle);
 
 	friend class cosmos;
@@ -64,11 +66,14 @@ class EMPTY_BASES physics_system : public physics_queries<physics_system> {
 
 	bool is_inferred_state_created_for_rigid_body(const const_entity_handle) const;
 	bool is_inferred_state_created_for_colliders(const const_entity_handle) const;
+	bool is_inferred_state_created_for_joint(const const_entity_handle) const;
 
 	rigid_body_cache& get_rigid_body_cache(const entity_id);
 	colliders_cache& get_colliders_cache(const entity_id);
+	joint_cache& get_joint_cache(const entity_id);
 	const rigid_body_cache& get_rigid_body_cache(const entity_id) const;
 	const colliders_cache& get_colliders_cache(const entity_id) const;
+	const joint_cache& get_joint_cache(const entity_id) const;
 
 	std::vector<messages::collision_message> accumulated_messages;
 public:

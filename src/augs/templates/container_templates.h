@@ -78,6 +78,11 @@ decltype(auto) maximum_of(const Container& v) {
 	return *std::max_element(v.begin(), v.end());
 }
 
+template <class Container1, class Container2>
+void copy_container(const Container1& from, Container2& into) {
+	std::copy(from.begin(), from.end(), into.begin());
+} 
+
 namespace std {
 	namespace detail {
 		template <class T, std::size_t N, std::size_t... I>

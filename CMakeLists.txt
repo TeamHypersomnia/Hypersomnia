@@ -392,6 +392,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/augs/audio/sound_data.cpp"
 	"src/augs/audio/sound_samples_from_file.cpp"
 	"src/game/systems_inferred/relational_system.cpp"
+	"src/game/components/motor_joint_component.cpp"
 )
 
 set(HYPERSOMNIA_TRIVIAL_3RDPARTY_SRCS

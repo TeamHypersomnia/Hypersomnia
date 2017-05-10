@@ -50,7 +50,6 @@ public:
 
 	/// Register a destruction listener. The listener is owned by you and must
 	/// remain in scope.
-	void SetDestructionListener(b2DestructionListener* listener);
 
 	/// Register a contact filter to provide specific control over collision.
 	/// Otherwise the default filter is used (b2_defaultFilter). The listener is
@@ -251,7 +250,6 @@ public:
 	b2Vec2 m_gravity;
 	bool m_allowSleep;
 
-	b2DestructionListener* m_destructionListener;
 	b2Draw* m_debugDraw;
 
 	// This is used to compute the time step ratio to

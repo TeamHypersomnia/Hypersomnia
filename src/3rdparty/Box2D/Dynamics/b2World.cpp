@@ -36,7 +36,6 @@
 
 b2World::b2World(const b2Vec2& gravity)
 {
-	m_destructionListener = NULL;
 	m_debugDraw = NULL;
 
 	m_bodyList = NULL;
@@ -82,11 +81,6 @@ b2World::~b2World()
 
 		b = bNext;
 	}
-}
-
-void b2World::SetDestructionListener(b2DestructionListener* listener)
-{
-	m_destructionListener = listener;
 }
 
 void b2World::SetContactFilter(b2ContactFilter* filter)
@@ -144,11 +138,6 @@ void b2World::DestroyBody(b2Body* b)
 		b2JointEdge* je0 = je;
 		je = je->next;
 
-		if (m_destructionListener)
-		{
-			m_destructionListener->SayGoodbye(je0->joint);
-		}
-
 		DestroyJoint(je0->joint);
 
 		b->m_jointList = je;
@@ -171,11 +160,6 @@ void b2World::DestroyBody(b2Body* b)
 	{
 		b2Fixture* f0 = f;
 		f = f->m_next;
-
-		if (m_destructionListener)
-		{
-			m_destructionListener->SayGoodbye(f0);
-		}
 
 		f0->DestroyProxies(&m_contactManager.m_broadPhase);
 		f0->Destroy(&m_blockAllocator);
