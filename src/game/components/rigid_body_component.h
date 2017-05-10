@@ -13,6 +13,7 @@
 #include "game/components/fixtures_component.h"
 
 class physics_system;
+class relational_system;
 struct rigid_body_cache;
 
 namespace augs {
@@ -46,28 +47,8 @@ namespace components {
 
 		vec2 velocity;
 		float angular_velocity = 0.f;
-	private:
-		friend augs::introspection_access;
-		friend void component_synchronizer<false, components::fixtures>::set_owner_body(const entity_id) const;
-		friend class cosmos;
 
-		augs::constant_size_vector<entity_id, FIXTURE_ENTITIES_COUNT> fixture_entities;
 		// END GEN INTROSPECTOR
-
-		/*
-			Normally, this private state could be inferred by iterating over all entities,
-			taking their components::fixtures and checking if owner_body equals this entity.
-			This however would be ridiculously expensive; thusly, we will track fixture_entities in the significant state.
-			
-			Therefore, we only befriend the set_owner_body function and the introspection (unfortunately, necessary).
-			We also befriend the cosmos so it may clear that field when an entity is cloned,
-			so that each id entry in the fixture_entities is unique to that single rigid_body.
-		*/
-
-	public:
-		auto get_fixture_entities() const {
-			return fixture_entities;
-		}
 
 		void set_transform(
 			const si_scaling,
@@ -81,7 +62,8 @@ class basic_physics_synchronizer : public component_synchronizer_base<is_const, 
 protected:
 	friend class ::physics_system;
 	friend class component_synchronizer<is_const, components::fixtures>;
-	template<bool> friend class basic_fixtures_synchronizer;
+	template <bool> 
+	friend class basic_fixtures_synchronizer;
 
 	maybe_const_ref_t<is_const, rigid_body_cache>& get_cache() const;
 
@@ -113,10 +95,10 @@ public:
 	rigid_body_type get_body_type() const;
 
 	auto get_fixture_entities() const {
-		return get_data().get_fixture_entities();
+		return handle.get_cosmos().systems_inferred.get<relational_system>().fixtures_of_bodies.get_children_of(handle);
 	}
 
-	bool test_point(vec2) const;
+	bool test_point(const vec2) const;
 };
 
 template<>

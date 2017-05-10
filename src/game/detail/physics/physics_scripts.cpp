@@ -67,12 +67,16 @@ void resolve_dampings_of_body(
 void resolve_density_of_associated_fixtures(const entity_handle id) {
 	auto& cosmos = id.get_cosmos();
 
-	if (id.has<components::rigid_body>()) {
-		const auto entities = id.get<components::rigid_body>().get_fixture_entities();
+	{
+		const auto rigid_body = id.find<components::rigid_body>();
 
-		for (const auto f : entities) {
-			if (f != id) {
-				resolve_density_of_associated_fixtures(cosmos[f]);
+		if (rigid_body != nullptr) {
+			const auto entities = rigid_body.get_fixture_entities();
+
+			for (const auto f : entities) {
+				if (f != id.get_id()) {
+					resolve_density_of_associated_fixtures(cosmos[f]);
+				}
 			}
 		}
 	}

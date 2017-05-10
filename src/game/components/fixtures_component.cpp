@@ -75,6 +75,7 @@ component_synchronizer<false, F>& component_synchronizer<false, F>::operator=(co
 
 void component_synchronizer<false, F>::reinference() const {
 	handle.get_cosmos().partial_reinference<physics_system>(handle);
+	handle.get_cosmos().partial_reinference<relational_system>(handle);
 }
 
 void component_synchronizer<false, F>::rebuild_density() const {
@@ -160,24 +161,17 @@ void component_synchronizer<false, F>::set_owner_body(const entity_id owner_id) 
 	const auto this_id = self.get_id();
 
 	const auto former_owner = cosmos[get_data().owner_body];
+	get_data().owner_body = new_owner;
+
+	auto& relational = cosmos.systems_inferred.get<relational_system>().fixtures_of_bodies;
+	relational.set_parent(self, new_owner);
 
 	if (former_owner.alive()) {
-		remove_element(former_owner.get<components::rigid_body>().get_data().fixture_entities, this_id);
 		cosmos.partial_reinference<physics_system>(former_owner);
 	}
 
-	get_data().owner_body = new_owner;
-
-	if (new_owner.alive()) {
-		auto& fixture_entities_of_new_owner = new_owner.get<components::rigid_body>().get_data().fixture_entities;
-
-		remove_element(fixture_entities_of_new_owner, this_id);
-		fixture_entities_of_new_owner.push_back(this_id);
-		cosmos.partial_reinference<physics_system>(new_owner);
-	}
-	else {
-		cosmos.partial_reinference<physics_system>(self);
-	}
+	ensure(new_owner.alive());
+	cosmos.partial_reinference<physics_system>(new_owner);
 }
 
 template<bool C>
@@ -233,7 +227,7 @@ components::transform basic_fixtures_synchronizer<C>::get_total_offset() const {
 
 components::transform components::fixtures::transform_around_body(
 	const const_entity_handle fe, 
-	const components::transform& body_transform
+	const components::transform body_transform
 ) {
 	const auto total_offset = fe.get<components::fixtures>().get_total_offset();
 	

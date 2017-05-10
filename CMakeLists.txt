@@ -391,6 +391,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/augs/graphics/OpenGL_error.cpp"
 	"src/augs/audio/sound_data.cpp"
 	"src/augs/audio/sound_samples_from_file.cpp"
+	"src/game/systems_inferred/relational_system.cpp"
 )
 
 set(HYPERSOMNIA_TRIVIAL_3RDPARTY_SRCS

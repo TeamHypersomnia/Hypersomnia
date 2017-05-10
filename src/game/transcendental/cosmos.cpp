@@ -298,7 +298,6 @@ entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
 			with due care to each of them.
 		*/
 		components::all_inferred_state,
-		components::rigid_body,
 		components::fixtures,
 		components::child
 	>(new_entity, source_entity);
@@ -315,17 +314,6 @@ entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
 
 	new_entity.make_cloned_child_entities_recursive(source_entity_id);
 	
-	if (source_entity.has<components::rigid_body>()) {
-		/*
-			Copy all properties from the component of the source entity except the fixture_entities field.
-			Exactly as if we were creating that component by hand.
-		*/
-
-		components::rigid_body rigid = source_entity.get<components::rigid_body>().get_raw_component();
-		rigid.fixture_entities.clear();
-		new_entity += rigid;
-	}
-
 	if (source_entity.has<components::fixtures>()) {
 		/*
 			Copy all properties from the component of the source entity except the owner_body field.
@@ -404,6 +392,12 @@ void cosmos::delete_entity(const entity_id e) {
 	free_all_components(get_handle(e));
 	get_aggregate_pool().free(e);
 	delete_debug_name(e);
+
+	/*
+		Unregister that id as a parent from the relational system
+	*/
+
+	systems_inferred.get<relational_system>().handle_deletion_of_potential_parent(e);
 }
 
 void cosmos::advance_deterministic_schemata(const logic_step_input input) {

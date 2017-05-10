@@ -37,6 +37,7 @@
 #include "game/systems_inferred/tree_of_npo_system.h"
 #include "game/systems_inferred/physics_system.h"
 #include "game/systems_inferred/processing_lists_system.h"
+#include "game/systems_inferred/relational_system.h"
 
 #include "game/assets/behaviour_tree.h"
 

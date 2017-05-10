@@ -108,6 +108,7 @@ public:
 namespace components {
 	struct fixtures : synchronizable_component {
 		// GEN INTROSPECTOR struct components::fixtures
+
 		bool activated = true;
 		bool is_friction_ground = false;
 		bool disable_standard_collision_resolution = false;
@@ -127,28 +128,18 @@ namespace components {
 		bool sensor = false;
 
 		augs::enum_array<components::transform, colliders_offset_type> offsets_for_created_shapes;
-	private:
-		friend augs::introspection_access;
-		friend void component_synchronizer<false, components::fixtures>::set_owner_body(const entity_id) const;
-		friend class cosmos;
-
+		
 		entity_id owner_body;
+
 		// END GEN INTROSPECTOR
 
-		/*
-			owner_body is a private state, which is unusual for components. 
-			This is because we also track fixture_entities (a vector of children ids) inside rigid_body,
-			and every change to body/fixtures ownership must therefore be done in a manner 
-			that controllably sets/unsets parent-childhood relationship.
-
-			Therefore, we only befriend the set_owner_body function and the introspection (unfortunately, necessary).
-			We also befriend the cosmos so it may reset that field when this component is cloned.
-		*/
-	public:
 		auto get_owner_body() const {
 			return owner_body;
 		}
 
-		static components::transform transform_around_body(const const_entity_handle fixtures_entity, const components::transform& body_transform);
+		static components::transform transform_around_body(
+			const const_entity_handle fixtures_entity, 
+			const components::transform body_transform
+		);
 	};
 }

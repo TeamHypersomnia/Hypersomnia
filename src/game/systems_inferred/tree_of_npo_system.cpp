@@ -33,17 +33,13 @@ void tree_of_npo_system::destroy_inferred_state_of(const const_entity_handle han
 }
 
 void tree_of_npo_system::create_inferred_state_for(const const_entity_handle handle) {
-	if (!handle.has<components::tree_of_npo_node>()) {
-		return;
-	}
-
 	auto& cache = get_cache(handle.get_id());
 
 	ensure(!cache.is_constructed());
 
-	const auto& tree_of_npo_node = handle.get<components::tree_of_npo_node>();
+	const auto tree_of_npo_node = handle.find<components::tree_of_npo_node>();
 
-	if (tree_of_npo_node.is_activated()) {
+	if (tree_of_npo_node != nullptr && tree_of_npo_node.is_activated()) {
 		const auto data = tree_of_npo_node.get_raw_component();
 
 		cache.type = data.type;

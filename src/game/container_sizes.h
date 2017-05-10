@@ -8,7 +8,6 @@ constexpr size_t PARTICLE_EMISSIONS_IN_EFFECT_COUNT = 4;
 constexpr size_t ANIMATION_FRAME_COUNT = 20;
 
 constexpr size_t SUB_ENTITIES_COUNT = 10;
-constexpr size_t FIXTURE_ENTITIES_COUNT = 10;
 constexpr size_t SPECIFIC_HOSTILE_ENTITIES_COUNT = 5;
 constexpr size_t CONCURRENT_TREES_COUNT = 5;
 constexpr size_t ITEMS_INSIDE_COUNT = 20;

@@ -9,6 +9,7 @@ namespace augs {
 class physics_system;
 class tree_of_npo_system;
 class processing_lists_system;
+class relational_system;
 
 class interpolation_system;
 class past_infection_system;
@@ -23,6 +24,10 @@ class exploding_ring_system;
 class thunder_system;
 
 typedef augs::storage_for_systems <
+	// It is critical that the relational system is the first on this list
+	// so that it creates inferred state of relations before physics_system uses it for constructing
+	// bodies, fixtures and joints.
+	relational_system,
 	physics_system,
 	tree_of_npo_system,
 	processing_lists_system

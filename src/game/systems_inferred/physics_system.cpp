@@ -22,6 +22,7 @@
 #include "augs/graphics/renderer.h"
 #include "augs/templates/container_templates.h"
 #include "augs/build_settings/setting_debug_physics_system_copy.h"
+#include "game/systems_inferred/relational_system.h"
 
 bool physics_system::is_inferred_state_created_for_rigid_body(const const_entity_handle handle) const {
 	return handle.alive() && get_rigid_body_cache(handle).body != nullptr;
@@ -30,7 +31,7 @@ bool physics_system::is_inferred_state_created_for_rigid_body(const const_entity
 bool physics_system::is_inferred_state_created_for_colliders(const const_entity_handle handle) const {
 	return
 		handle.alive() // && is_inferred_state_created_for_rigid_body(handle.get_owner_body())
-		&& get_colliders_cache(handle).all_fixtures_in_component.size() > 0
+		&& get_colliders_cache(handle).all_fixtures_in_component.size() > 0u
 	;
 }
 
@@ -169,6 +170,7 @@ void physics_system::create_inferred_state_for_fixtures(const const_entity_handl
 
 void physics_system::create_inferred_state_for(const const_entity_handle handle) {
 	const auto& cosmos = handle.get_cosmos();
+	const auto& relational = cosmos.systems_inferred.get<relational_system>();
 
 	//ensure(!is_inferred_state_created_for_rigid_body(handle));
 	const bool is_already_constructed = is_inferred_state_created_for_rigid_body(handle);
@@ -184,12 +186,9 @@ void physics_system::create_inferred_state_for(const const_entity_handle handle)
 	const bool is_anything_to_construct =
 		rigid_body != nullptr
 		&& rigid_body.is_activated()
-		&& rigid_body.get_fixture_entities().size() > 0
 	;
 
 	if (is_anything_to_construct) {
-		const auto fixture_entities = rigid_body.get_fixture_entities();
-
 		const auto& physics_data = rigid_body.get_data();
 		auto& cache = get_rigid_body_cache(handle);
 
@@ -217,6 +216,7 @@ void physics_system::create_inferred_state_for(const const_entity_handle handle)
 		cache.body = b2world->CreateBody(&def);
 		cache.body->SetAngledDampingEnabled(physics_data.angled_damping);
 		
+		const auto fixture_entities = rigid_body.get_fixture_entities();
 		/* notice that all fixtures must be unconstructed at this moment since we assert that the rigid body itself is not */
 		for (const auto f : fixture_entities) {
 			create_inferred_state_for_fixtures(cosmos[f]);
