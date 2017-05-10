@@ -3,13 +3,21 @@
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
-#include "game/components/fixtures_component.h"
+namespace components {
+	struct fixtures;
+}
+
+template <bool, class>
+class component_synchronizer;
 
 class relational_system {
-public:
 	friend class cosmos;
 	friend class physics_system;
-	friend void component_synchronizer<false, components::fixtures>::set_owner_body(const entity_id) const;
+
+	friend class component_synchronizer<false, components::fixtures>;
+
+	template <bool is_const>
+	friend class basic_physics_synchronizer;
 
 	void reserve_caches_for_entities(const size_t n);
 	void create_inferred_state_for(const const_entity_handle);

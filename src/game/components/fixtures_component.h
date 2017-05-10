@@ -14,18 +14,47 @@
 
 #include "game/components/transform_component.h"
 
-class physics_system;
-struct colliders_cache;
-struct b2Fixture_index_in_component;
+namespace components {
+	struct fixtures : synchronizable_component {
+		// GEN INTROSPECTOR struct components::fixtures
 
-namespace augs {
-	struct introspection_access;
+		bool activated = true;
+		bool is_friction_ground = false;
+		bool disable_standard_collision_resolution = false;
+		bool can_driver_shoot_through = false;
+
+		assets::physical_material_id material = assets::physical_material_id::METAL;
+
+		float collision_sound_gain_mult = 1.f;
+
+		float density = 1.f;
+		float density_multiplier = 1.f;
+		float friction = 0.f;
+		float restitution = 0.f;
+
+		b2Filter filter;
+		bool destructible = false;
+		bool sensor = false;
+
+		augs::enum_array<components::transform, colliders_offset_type> offsets_for_created_shapes;
+
+		entity_id owner_body;
+
+		// END GEN INTROSPECTOR
+
+		auto get_owner_body() const {
+			return owner_body;
+		}
+
+		static components::transform transform_around_body(
+			const const_entity_handle fixtures_entity, 
+			const components::transform body_transform
+		);
+	};
 }
 
-/*
-	Normally, component data comes first,
-	but here synchronizer class goes first to properly befriend its member function.
-*/
+class physics_system;
+struct colliders_cache;
 
 template <bool is_const>
 class basic_fixtures_synchronizer : public component_synchronizer_base<is_const, components::fixtures> {
@@ -104,42 +133,3 @@ class component_synchronizer<true, components::fixtures> : public basic_fixtures
 public:
 	using basic_fixtures_synchronizer<true>::basic_fixtures_synchronizer;
 };
-
-namespace components {
-	struct fixtures : synchronizable_component {
-		// GEN INTROSPECTOR struct components::fixtures
-
-		bool activated = true;
-		bool is_friction_ground = false;
-		bool disable_standard_collision_resolution = false;
-		bool can_driver_shoot_through = false;
-
-		assets::physical_material_id material = assets::physical_material_id::METAL;
-
-		float collision_sound_gain_mult = 1.f;
-
-		float density = 1.f;
-		float density_multiplier = 1.f;
-		float friction = 0.f;
-		float restitution = 0.f;
-
-		b2Filter filter;
-		bool destructible = false;
-		bool sensor = false;
-
-		augs::enum_array<components::transform, colliders_offset_type> offsets_for_created_shapes;
-		
-		entity_id owner_body;
-
-		// END GEN INTROSPECTOR
-
-		auto get_owner_body() const {
-			return owner_body;
-		}
-
-		static components::transform transform_around_body(
-			const const_entity_handle fixtures_entity, 
-			const components::transform body_transform
-		);
-	};
-}

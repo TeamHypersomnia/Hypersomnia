@@ -10,19 +10,8 @@
 #include "game/enums/rigid_body_type.h"
 
 #include "game/components/transform_component.h"
-#include "game/components/fixtures_component.h"
-
-class physics_system;
-class relational_system;
-struct rigid_body_cache;
-
-namespace augs {
-	struct introspection_access;
-}
 
 namespace components {
-	struct fixtures;
-
 	struct rigid_body : synchronizable_component {
 		rigid_body(
 			const si_scaling = si_scaling(),
@@ -57,7 +46,10 @@ namespace components {
 	};
 }
 
-template<bool is_const>
+class physics_system;
+struct rigid_body_cache;
+
+template <bool is_const>
 class basic_physics_synchronizer : public component_synchronizer_base<is_const, components::rigid_body> {
 protected:
 	friend class ::physics_system;
