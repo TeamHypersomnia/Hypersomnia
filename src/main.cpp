@@ -67,9 +67,11 @@ int main(int argc, char** argv) {
 
 	gl.set_as_current();
 	
+#if !ONLY_ONE_GLOBAL_ASSETS_MANAGER
 	auto resources = std::make_unique<assets_manager>();
 	resources->set_as_current();
-	
+#endif
+
 	std::thread regeneration_thread([&cfg](){
 		load_standard_everything(cfg);
 	});

@@ -42,10 +42,6 @@ namespace components {
 
 		// END GEN INTROSPECTOR
 
-		auto get_owner_body() const {
-			return owner_body;
-		}
-
 		static components::transform transform_around_body(
 			const const_entity_handle fixtures_entity, 
 			const components::transform body_transform

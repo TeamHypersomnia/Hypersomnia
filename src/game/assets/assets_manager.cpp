@@ -140,3 +140,7 @@ void assets_manager::destroy_everything() {
 	this->~assets_manager();
 	new (this) assets_manager;
 }
+
+#if ONLY_ONE_GLOBAL_ASSETS_MANAGER
+assets_manager assets_manager::global_instance;
+#endif

@@ -1,4 +1,9 @@
 #pragma once
+// This is a performance switch.
+// Asset manager being global means one indirection less (and thus one cache fetch less) when accessing resources.
+// This may prove very beneficial, for example when rendering many sprites.
+#define ONLY_ONE_GLOBAL_ASSETS_MANAGER 1
+
 #include <tuple>
 
 #include "augs/templates/settable_as_current_mixin.h"
@@ -118,11 +123,17 @@ struct all_logical_metas_of_assets : subscript_asset_getters<all_logical_metas_o
 };
 
 class assets_manager : 
+#if !ONLY_ONE_GLOBAL_ASSETS_MANAGER
 	public augs::settable_as_current_mixin<assets_manager>,
+#endif
 	public subscript_asset_getters<assets_manager>
 {
 	friend struct base;
 	tuple_of_all_assets all;
+#if ONLY_ONE_GLOBAL_ASSETS_MANAGER
+	static assets_manager global_instance;
+#endif
+
 public:
 
 	void load_baked_metadata(
@@ -145,6 +156,16 @@ public:
 	all_logical_metas_of_assets generate_logical_metas_of_assets() const;
 
 	void destroy_everything();
+
+#if ONLY_ONE_GLOBAL_ASSETS_MANAGER
+	void set_as_current() {
+		ensure(false && "To enable multiple instances of assets_manager, disable ONLY_ONE_GLOBAL_ASSETS_MANAGER switch.");
+	}
+
+	inline static assets_manager& get_current() {
+		return global_instance;
+	}
+#endif
 };
 
 inline assets_manager& get_assets_manager() {

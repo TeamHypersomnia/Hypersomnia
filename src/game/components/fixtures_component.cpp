@@ -239,7 +239,7 @@ components::transform components::fixtures::transform_around_body(
 
 template<bool C>
 entity_id basic_fixtures_synchronizer<C>::get_owner_body() const {
-	return get_data().get_owner_body();
+	return get_data().owner_body;
 }
 
 template class basic_fixtures_synchronizer<false>;
