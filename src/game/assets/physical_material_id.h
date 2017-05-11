@@ -1,4 +1,6 @@
 #pragma once
+#include "game/container_sizes.h"
+#include "game/assets/particle_effect.h"
 
 namespace assets {
 	enum class physical_material_id {
@@ -6,6 +8,6 @@ namespace assets {
 		METAL,
 		GRENADE,
 
-		COUNT
+		COUNT = MAX_PHYSICAL_MATERIAL_COUNT
 	};
 }

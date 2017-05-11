@@ -47,19 +47,19 @@ namespace components {
 		void add_concave_polygon(std::vector<augs::vertex>);
 		void add_triangle(const augs::vertex_triangle&);
 
-		void set_color(rgba col);
+		void set_color(const rgba col);
 
 		size_t get_vertex_count() const {
 			return vertices.size();
 		}
 
-		augs::vertex& get_vertex(size_t i) {
+		augs::vertex& get_vertex(const std::size_t i) {
 			return vertices[i];
 		}
 
 		void draw(const drawing_input&) const;
 
 		std::vector<vec2> get_vertices() const;
-		ltrb get_aabb(components::transform) const;
+		ltrb get_aabb(const components::transform) const;
 	};
 }

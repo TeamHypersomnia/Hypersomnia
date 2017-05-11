@@ -1,4 +1,5 @@
 #pragma once
+#include "game/container_sizes.h"
 #include "game/assets/particle_effect.h"
 
 namespace assets {
@@ -20,7 +21,7 @@ namespace assets {
 		EXHAUSTED_SMOKE,
 		THUNDER_REMNANTS,
 
-		COUNT
+		COUNT = MAX_PARTICLE_EFFECT_COUNT
 	};
 }
 

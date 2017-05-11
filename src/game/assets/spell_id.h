@@ -1,4 +1,5 @@
 #pragma once
+#include "game/container_sizes.h"
 
 namespace assets {
 	enum class spell_id {
@@ -12,6 +13,6 @@ namespace assets {
 
 		ELECTRIC_TRIAD,
 
-		COUNT
+		COUNT = MAX_SPELL_COUNT
 	};
 }

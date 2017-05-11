@@ -17,7 +17,7 @@ struct movement_subscribtion {
 };
 
 namespace components {
-	struct movement  {
+	struct movement {
 		// GEN INTROSPECTOR struct components::movement
 		augs::constant_size_vector<movement_subscribtion, MOVEMENT_RESPONSE_RECEIVERS_COUNT> response_receivers;
 		

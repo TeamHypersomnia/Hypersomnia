@@ -33,7 +33,6 @@
 #include "game/assets/behaviour_tree_id.h"
 #include "game/assets/tile_layer_id.h"
 #include "game/assets/sound_buffer_id.h"
-#include "game/assets/sound_response_id.h"
 #include "game/assets/particle_effect_id.h"
 #include "game/assets/physical_material_id.h"
 

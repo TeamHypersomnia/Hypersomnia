@@ -1,4 +1,5 @@
 #pragma once
+#include "game/container_sizes.h"
 
 namespace assets {
 	enum class program_id {
@@ -14,6 +15,6 @@ namespace assets {
 		ILLUMINATING_SMOKE,
 		SPECULAR_HIGHLIGHTS,
 		FULLSCREEN,
-		COUNT
+		COUNT = MAX_SHADER_PROGRAM_COUNT
 	};
 }

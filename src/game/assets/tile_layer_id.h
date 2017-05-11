@@ -1,4 +1,5 @@
 #pragma once
+#include "game/container_sizes.h"
 
 namespace assets {
 	enum class tile_layer_id {
@@ -7,6 +8,6 @@ namespace assets {
 		METROPOLIS_FLOOR,
 		CATHEDRAL_FLOOR,
 
-		COUNT
+		COUNT = MAX_TILE_LAYER_COUNT
 	};
 }

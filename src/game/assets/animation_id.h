@@ -1,4 +1,5 @@
 #pragma once
+#include "game/container_sizes.h"
 
 namespace assets {
 	enum class animation_id {
@@ -7,6 +8,6 @@ namespace assets {
 		BLINK_ANIMATION,
 		CAST_BLINK_ANIMATION,
 		
-		COUNT
+		COUNT = MAX_ANIMATION_COUNT
 	};
 }

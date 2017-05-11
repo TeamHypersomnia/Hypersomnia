@@ -1,4 +1,5 @@
 #pragma once
+#include "game/container_sizes.h"
 #include "augs/audio/sound_effect_modifier.h"
 
 namespace assets {
@@ -47,7 +48,7 @@ namespace assets {
 		COLLISION_METAL_METAL,
 		COLLISION_GRENADE,
 
-		COUNT
+		COUNT = MAX_SOUND_BUFFER_COUNT
 	};
 }
 

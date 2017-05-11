@@ -1,4 +1,5 @@
 #pragma once
+#include "game/container_sizes.h"
 
 namespace assets {
 	enum class game_image_id {
@@ -200,6 +201,6 @@ namespace assets {
 		PED_GRENADE_RELEASED,
 		INTERFERENCE_GRENADE_RELEASED,
 
-		COUNT
+		COUNT = MAX_GAME_IMAGE_COUNT
 	};
 }

@@ -800,6 +800,8 @@ TEST_CASE("CosmicDelta ThreeEntitiesWithReferencesAndDestroyedChild") {
 	REQUIRE(ent3.has<components::position_copying>());
 	const bool pc3_intact = ent3.get<components::position_copying>().target == ent1.get_id();
 	REQUIRE(pc3_intact);
+
+	LOG_NVPS(sizeof(assets_manager));
 }
 
 #endif
