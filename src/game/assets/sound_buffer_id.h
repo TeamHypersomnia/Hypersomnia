@@ -1,9 +1,12 @@
 #pragma once
 #include "game/container_sizes.h"
+#include "game/build_settings.h"
 #include "augs/audio/sound_effect_modifier.h"
 
 namespace assets {
 	enum class sound_buffer_id : unsigned {
+		INVALID,
+#if BUILD_UNSCRIPTED_TEST_SCENES
 		BILMER2000_MUZZLE,
 		ASSAULT_RIFLE_MUZZLE,
 		SUBMACHINE_MUZZLE,
@@ -47,8 +50,8 @@ namespace assets {
 		COLLISION_METAL_WOOD,
 		COLLISION_METAL_METAL,
 		COLLISION_GRENADE,
-
-		COUNT = MAX_SOUND_BUFFER_COUNT
+#endif
+		COUNT = MAX_SOUND_BUFFER_COUNT + 1
 	};
 }
 

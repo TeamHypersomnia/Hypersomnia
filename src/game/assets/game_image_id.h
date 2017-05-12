@@ -1,8 +1,11 @@
 #pragma once
 #include "game/container_sizes.h"
+#include "game/build_settings.h"
 
 namespace assets {
 	enum class game_image_id {
+		INVALID,
+#if BUILD_UNSCRIPTED_TEST_SCENES
 		BLANK,
 
 		CRATE,
@@ -198,7 +201,7 @@ namespace assets {
 		FORCE_GRENADE_RELEASED,
 		PED_GRENADE_RELEASED,
 		INTERFERENCE_GRENADE_RELEASED,
-
-		COUNT = MAX_GAME_IMAGE_COUNT
+#endif
+		COUNT = MAX_GAME_IMAGE_COUNT + 1
 	};
 }

@@ -1,3 +1,5 @@
+#include "game/build_settings.h"
+#if BUILD_UNSCRIPTED_TEST_SCENES
 #include "all.h"
 
 #include "game/transcendental/cosmos.h"
@@ -25,3 +27,4 @@ void set_standard_animations(assets_manager& anims) {
 		);
 	}
 }
+#endif

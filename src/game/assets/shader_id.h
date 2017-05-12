@@ -1,10 +1,11 @@
 #pragma once
 #include "game/container_sizes.h"
+#include "game/build_settings.h"
 
 namespace assets {
 	enum class shader_id {
 		INVALID,
-
+#if BUILD_UNSCRIPTED_TEST_SCENES
 		DEFAULT_VERTEX,
 		DEFAULT_FRAGMENT,
 		DEFAULT_ILLUMINATED_VERTEX,
@@ -25,6 +26,7 @@ namespace assets {
 		ILLUMINATING_SMOKE_FRAGMENT,
 		SPECULAR_HIGHLIGHTS_VERTEX,
 		SPECULAR_HIGHLIGHTS_FRAGMENT,
-		COUNT = MAX_SHADER_COUNT
+#endif
+		COUNT = MAX_SHADER_COUNT + 1
 	};
 }

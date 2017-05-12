@@ -1,3 +1,5 @@
+#include "game/build_settings.h"
+#if BUILD_UNSCRIPTED_TEST_SCENES
 #include "all.h"
 
 #include "game/assets/physical_material.h"
@@ -21,3 +23,4 @@ void set_standard_physical_materials(assets_manager& assets) {
 	set_pair(assets::physical_material_id::GRENADE, assets::physical_material_id::METAL, assets::sound_buffer_id::COLLISION_GRENADE);
 	set_pair(assets::physical_material_id::GRENADE, assets::physical_material_id::GRENADE, assets::sound_buffer_id::COLLISION_GRENADE);
 }
+#endif

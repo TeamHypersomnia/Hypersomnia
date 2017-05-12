@@ -1,3 +1,5 @@
+#include "game/build_settings.h"
+#if BUILD_UNSCRIPTED_TEST_SCENES
 #include "all.h"
 #include "game/assets/assets_manager.h"
 #include "augs/graphics/shader.h"
@@ -611,3 +613,4 @@ game_font_requests load_standard_fonts() {
 
 	return output;
 }
+#endif

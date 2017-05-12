@@ -1,3 +1,5 @@
+#include "game/build_settings.h"
+#if BUILD_UNSCRIPTED_TEST_SCENES
 #include "all.h"
 #include "game/assets/assets_manager.h"
 #include "game/assets/particle_effect.h"
@@ -914,3 +916,4 @@ void set_standard_particle_effects(assets_manager& manager) {
 		effect.emissions.push_back(em);
 	}
 }
+#endif

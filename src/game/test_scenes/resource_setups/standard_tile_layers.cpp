@@ -1,3 +1,5 @@
+#include "game/build_settings.h"
+#if BUILD_UNSCRIPTED_TEST_SCENES
 #include "all.h"
 #include "game/assets/assets_manager.h"
 
@@ -62,3 +64,4 @@ void set_standard_tile_layers(assets_manager& manager) {
 		metropolis_floor.set_tiles(xywhu(31 + 1, 30, 10, 1), nth_tile(3));
 	}
 }
+#endif

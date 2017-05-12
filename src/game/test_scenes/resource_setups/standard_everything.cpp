@@ -1,3 +1,5 @@
+#include "game/build_settings.h"
+#if BUILD_UNSCRIPTED_TEST_SCENES
 #include "all.h"
 #include "game/assets/assets_manager.h"
 #include "augs/graphics/shader.h"
@@ -180,3 +182,4 @@ void create_standard_opengl_resources(const config_lua_table& cfg) {
 		glUniform1i(light_texture_uniform, 2);
 	}
 }
+#endif

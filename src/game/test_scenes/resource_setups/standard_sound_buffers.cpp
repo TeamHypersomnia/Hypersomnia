@@ -1,3 +1,5 @@
+#include "game/build_settings.h"
+#if BUILD_UNSCRIPTED_TEST_SCENES
 #include "all.h"
 #include "game/assets/assets_manager.h"
 
@@ -142,3 +144,4 @@ void set_standard_sound_buffers(assets_manager& manager) {
 		buf.from_file("resources/sfx/collision_grenade.wav");
 	}
 }
+#endif

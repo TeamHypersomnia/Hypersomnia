@@ -1,9 +1,12 @@
 #pragma once
 #include "game/container_sizes.h"
+#include "game/build_settings.h"
 #include "game/assets/particle_effect.h"
 
 namespace assets {
 	enum class particle_effect_id : unsigned {
+		INVALID,
+#if BUILD_UNSCRIPTED_TEST_SCENES
 		HEALTH_DAMAGE_SPARKLES,
 		ELECTRIC_PROJECTILE_DESTRUCTION,
 		PIXEL_PROJECTILE_TRACE,
@@ -20,8 +23,8 @@ namespace assets {
 		CAST_CHARGING,
 		EXHAUSTED_SMOKE,
 		THUNDER_REMNANTS,
-
-		COUNT = MAX_PARTICLE_EFFECT_COUNT
+#endif
+		COUNT = MAX_PARTICLE_EFFECT_COUNT + 1
 	};
 }
 

@@ -2,9 +2,8 @@
 // This is a performance switch.
 // Asset manager being global means one indirection less (and thus one cache fetch less) when accessing resources.
 // This may prove very beneficial, for example when rendering many sprites.
-#define ONLY_ONE_GLOBAL_ASSETS_MANAGER 1
-
 #include <tuple>
+#include "game/build_settings.h"
 
 #include "augs/templates/settable_as_current_mixin.h"
 #include "augs/templates/type_matching_and_indexing.h"

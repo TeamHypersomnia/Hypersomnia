@@ -1,3 +1,5 @@
+#include "game/build_settings.h"
+#if BUILD_UNSCRIPTED_TEST_SCENES
 #include "all.h"
 #include "game/assets/spell_id.h"
 #include "game/assets/spell.h"
@@ -93,3 +95,4 @@ void set_standard_spell_properties(assets_manager& spells) {
 		d.icon = assets::game_image_id::SPELL_ELECTRIC_SHIELD_ICON;
 	}
 }
+#endif

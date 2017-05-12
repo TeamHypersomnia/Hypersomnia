@@ -1,10 +1,11 @@
 #pragma once
 #include "game/container_sizes.h"
+#include "game/build_settings.h"
 
 namespace assets {
 	enum class program_id {
 		INVALID,
-
+#if BUILD_UNSCRIPTED_TEST_SCENES
 		DEFAULT,
 		DEFAULT_ILLUMINATED,
 		LIGHT,
@@ -15,6 +16,7 @@ namespace assets {
 		ILLUMINATING_SMOKE,
 		SPECULAR_HIGHLIGHTS,
 		FULLSCREEN,
-		COUNT = MAX_SHADER_PROGRAM_COUNT
+#endif
+		COUNT = MAX_SHADER_PROGRAM_COUNT + 1
 	};
 }
