@@ -94,6 +94,39 @@ namespace scene_builders {
 			prefabs::create_interference_grenade(step, { 554, -811 + i * 100.f });
 		}
 
+		// rls
+		{
+			const auto quantity = 3;
+			const vec2 pos = {1184, -611};
+			const auto angel_offset = 90.f;
+			const auto distance_from_center = 50.f;
+
+			for(auto i = 0; i != quantity; ++i) {
+				const auto angel = angel_offset + 360.f / quantity * i;
+				const components::transform transform = {pos + vec2{distance_from_center, 0}.rotate(angel, vec2{}), angel};
+
+				prefabs::create_rl(step, transform, entity_id());
+			}
+		}
+
+		// rockets
+		{
+			const auto rows = 3;
+			const vec2 pos = {1184, -811};
+			const vec2 cell_size = {35, 28};
+
+			for(auto r = 0; r != rows; ++r) {
+				for(auto c = 0; c != r + 1; ++c) {
+					const vec2 offset = {
+						-cell_size.x * r / 2 + c * cell_size.x,
+						r * cell_size.y
+					};
+
+					prefabs::create_force_rocket(step, {pos + offset, 0});
+				}
+			}
+		}
+
 		std::vector<entity_id> new_characters;
 		new_characters.resize(num_characters);
 
