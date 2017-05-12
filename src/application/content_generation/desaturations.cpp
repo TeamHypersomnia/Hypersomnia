@@ -16,7 +16,7 @@ void regenerate_desaturations(
 
 	augs::create_directories(desaturations_directory);
 
-	const auto lines = augs::get_file_lines("cfg/desaturations_generator_input.cfg");
+	const auto lines = augs::get_file_lines("generators/desaturations_generator_input.cfg");
 	size_t current_line = 0;
 
 	while (current_line < lines.size()) {

@@ -40,7 +40,7 @@ void regenerate_neon_maps(
 
 	augs::create_directories(neon_directory);
 
-	const auto lines = augs::get_file_lines("cfg/neon_map_generator_input.cfg");
+	const auto lines = augs::get_file_lines("generators/neon_map_generator_input.cfg");
 	size_t current_line = 0;
 
 	auto get_line_until = augs::make_get_line_until(lines, current_line);

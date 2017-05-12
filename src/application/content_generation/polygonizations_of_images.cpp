@@ -19,7 +19,7 @@ void regenerate_polygonizations_of_images(
 
 	augs::create_directories(polygonizations_directory);
 
-	const auto lines = augs::get_file_lines("cfg/polygonizations_of_images_generator_input.cfg");
+	const auto lines = augs::get_file_lines("generators/polygonizations_of_images_generator_input.cfg");
 	size_t current_line = 0;
 
 	while (current_line < lines.size()) {
