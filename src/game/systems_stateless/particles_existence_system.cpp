@@ -92,6 +92,10 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 
 	for (const auto& g : gunshots) {
 		for (auto& r : g.spawned_rounds) {
+			if(!cosmos[r].has<components::damage>()) {
+				continue;
+			}
+
 			{
 				particle_effect_input burst;
 				burst.effect = cosmos[r].get<components::damage>().muzzle_leave_particle_effect_response;

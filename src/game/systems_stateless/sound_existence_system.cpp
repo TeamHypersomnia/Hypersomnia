@@ -126,6 +126,10 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 		for (const auto r : g.spawned_rounds) {
 			const auto subject = cosmos[r];
 
+			if(!subject.has<components::damage>()) {
+				continue;
+			}
+
 			auto& damage = subject.get<components::damage>();
 
 			sound_effect_input in;
