@@ -13,7 +13,7 @@
 #include "application/call_config_script.h"
 #include "game/assets/assets_manager.h"
 
-#include "game/resource_setups/all.h"
+#include "game/test_scenes/resource_setups/all.h"
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "game/bindings/bind_game_and_augs.h"
 

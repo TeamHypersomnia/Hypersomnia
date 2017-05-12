@@ -45,7 +45,7 @@
 #include "game/transcendental/data_living_one_step.h"
 
 #include "game/detail/inventory/inventory_utils.h"
-#include "game/resource_setups/all.h"
+#include "game/test_scenes/resource_setups/all.h"
 
 #include "game/components/fixtures_component.h"
 
