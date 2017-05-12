@@ -37,7 +37,7 @@
 
 #include "augs/graphics/renderer.h"
 
-namespace scene_builders {
+namespace test_scenes {
 	void one_entity::populate(const logic_step step) {
 		auto& world = step.cosm;
 

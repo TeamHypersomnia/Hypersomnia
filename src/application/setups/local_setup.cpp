@@ -5,8 +5,8 @@
 
 #include "game/assets/assets_manager.h"
 
-#include "game/scene_builders/testbed.h"
-#include "game/scene_builders/one_entity.h"
+#include "game/test_scenes/testbed.h"
+#include "game/test_scenes/one_entity.h"
 #include "game/resource_setups/all.h"
 
 #include "game/transcendental/types_specification/all_component_includes.h"
@@ -45,7 +45,7 @@ void local_setup::process(
 	augs::debug_entropy_player<cosmic_entropy> player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
-	scene_builders::testbed testbed;
+	test_scenes::testbed testbed;
 	testbed.debug_var = cfg.debug_var;
 
 	const auto metas_of_assets = get_assets_manager().generate_logical_metas_of_assets();

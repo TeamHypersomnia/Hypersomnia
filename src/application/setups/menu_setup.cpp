@@ -7,7 +7,7 @@
 
 #include "game/assets/assets_manager.h"
 
-#include "game/scene_builders/testbed.h"
+#include "game/test_scenes/testbed.h"
 #include "game/resource_setups/all.h"
 
 #include "game/transcendental/types_specification/all_component_includes.h"
@@ -119,7 +119,7 @@ void menu_setup::process(
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 	timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
 
-	scene_builders::testbed testbed;
+	test_scenes::testbed testbed;
 	testbed.debug_var = cfg.debug_var;
 
 	intro_scene.set_fixed_delta(cfg.default_tickrate);

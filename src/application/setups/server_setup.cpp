@@ -89,7 +89,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 
 	cosmos initial_hypersomnia(3000);
 
-	scene_builders::networked_testbed_server().populate_world_with_entities(
+	test_scenes::networked_testbed_server().populate_world_with_entities(
 		initial_hypersomnia, 
 		metas_of_assets
 	);

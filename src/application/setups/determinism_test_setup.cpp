@@ -5,7 +5,7 @@
 
 #include "game/assets/assets_manager.h"
 
-#include "game/scene_builders/testbed.h"
+#include "game/test_scenes/testbed.h"
 #include "game/resource_setups/all.h"
 
 #include "game/transcendental/types_specification/all_component_includes.h"
@@ -42,7 +42,7 @@ void determinism_test_setup::process(
 	cosmic_entropy total_collected_entropy;
 	augs::debug_entropy_player<cosmic_entropy> player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
-	std::vector<scene_builders::testbed> testbeds(cosmoi_count);
+	std::vector<test_scenes::testbed> testbeds(cosmoi_count);
 
 	session.reserve_caches_for_entities(3000);
 

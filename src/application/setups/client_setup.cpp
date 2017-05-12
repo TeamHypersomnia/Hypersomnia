@@ -5,7 +5,7 @@
 
 #include "game/assets/assets_manager.h"
 
-#include "game/scene_builders/networked_testbed.h"
+#include "game/test_scenes/networked_testbed.h"
 #include "game/resource_setups/all.h"
 
 #include "game/transcendental/types_specification/all_component_includes.h"
@@ -58,7 +58,7 @@ void client_setup::init(
 ) {
 	metas_of_assets = get_assets_manager().generate_logical_metas_of_assets();
 
-	scene_builders::networked_testbed_client().populate_world_with_entities(
+	test_scenes::networked_testbed_client().populate_world_with_entities(
 		initial_hypersomnia,
 		metas_of_assets
 	);

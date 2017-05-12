@@ -34,7 +34,7 @@
 
 #include "game/transcendental/cosmic_delta.h"
 
-namespace scene_builders {
+namespace test_scenes {
 	entity_id networked_testbed_server::assign_new_character() {
 		for (auto& c : characters) {
 			if (!c.occupied) {

@@ -7,8 +7,8 @@
 
 #include "game/assets/assets_manager.h"
 
-#include "game/scene_builders/testbed.h"
-#include "game/scene_builders/one_entity.h"
+#include "game/test_scenes/testbed.h"
+#include "game/test_scenes/one_entity.h"
 #include "game/resource_setups/all.h"
 
 #include "game/transcendental/types_specification/all_component_includes.h"

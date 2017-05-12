@@ -15,7 +15,7 @@ class cosmos;
 class world_camera;
 class viewing_session;
 
-namespace scene_builders {
+namespace test_scenes {
 	class one_entity {
 		void populate(const logic_step);
 	public:
