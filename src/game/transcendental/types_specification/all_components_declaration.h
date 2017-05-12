@@ -50,6 +50,7 @@ namespace components {
 	struct catridge;
 	struct shape_polygon;
 	struct shape_circle;
+	struct contact_explosive;
 
 	struct all_inferred_state;
 }
@@ -102,6 +103,7 @@ struct put_all_components_into {
 		components::catridge,
 		components::shape_polygon,
 		components::shape_circle,
+		components::contact_explosive,
 
 		components::all_inferred_state
 

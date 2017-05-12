@@ -26,6 +26,7 @@
 #include "game/systems_stateless/destruction_system.h"
 #include "game/systems_stateless/sound_existence_system.h"
 #include "game/systems_stateless/grenade_system.h"
+#include "game/systems_stateless/contact_explosive_system.h"
 
 #include "game/enums/render_layer.h"
 
@@ -479,6 +480,8 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	destruction_system().generate_damages_from_forceful_collisions(step);
 	destruction_system().apply_damages_and_split_fixtures(step);
 	
+	contact_explosive_system().init_explosions(step);
+
 	sentience_system().regenerate_values_and_advance_spell_logic(step);
 	sentience_system().apply_damage_and_generate_health_events(step);
 	systems_inferred.get<physics_system>().post_and_clear_accumulated_collision_messages(step);
