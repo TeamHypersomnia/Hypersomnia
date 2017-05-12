@@ -53,6 +53,10 @@ std::wstring get_bbcoded_entity_name(const entity_name n) {
 		return L"Standard arm's back";
 	case entity_name::STANDARD_ARM_FRONT:
 		return L"Standard arm's front";
+	case entity_name::RL:
+		return L"RL";
+	case entity_name::ROCKET:
+		return L"Rocket";
 	default:
 		return L"Unknown";
 	}
@@ -155,6 +159,14 @@ std::wstring get_bbcoded_entity_name_details(const entity_name n) {
 	case entity_name::STANDARD_ARM_FRONT:
 		return{
 			L"Front of the standard arm."
+		};
+	case entity_name::RL:
+		return{
+			L"Test your enemy dodging skills."
+		};
+	case entity_name::ROCKET:
+		return{
+			L"Supply for RL.\nTreat with care."
 		};
 	default:
 		return{

@@ -11,6 +11,7 @@ enum class item_category {
 	TORSO_ARMOR,
 	MAGAZINE,
 	SHOT_CHARGE,
+	ROCKET,
 
 	ARM_BACK,
 	ARM_FRONT,

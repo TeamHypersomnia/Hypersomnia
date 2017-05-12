@@ -8,6 +8,7 @@
 #include "game/components/sound_existence_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/catridge_component.h"
+#include "game/components/contact_explosive_component.h"
 
 #include "game/messages/create_particle_effect.h"
 
@@ -806,6 +807,97 @@ namespace prefabs {
 		}
 
 		return weapon;
+	}
+
+	entity_handle create_rl(const logic_step step, const components::transform transform, const entity_id load_rocket_id) {
+		auto& metas = step.input.metas_of_assets;
+		auto& cosmos = step.cosm;
+		auto weapon = cosmos.create_entity("rl");
+		name_entity(weapon, entity_name::RL);
+
+		auto& sprite = ingredients::add_sprite(weapon, assets::game_image_id::RL, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(step, weapon, transform);
+
+		// ingredients::add_default_gun_container(step, weapon);
+		{
+			auto& item = ingredients::make_item(weapon);
+			auto& container = weapon += components::container();
+			item.space_occupied_per_charge = to_space_units("5");
+
+			const auto bbox = weapon.get_aabb(step.input.metas_of_assets, components::transform()).get_size();
+
+			{
+				inventory_slot slot_def;
+				slot_def.physical_behaviour = slot_physical_behaviour::DEACTIVATE_BODIES;
+				slot_def.always_allow_exactly_one_item = true;
+				slot_def.category_allowed = item_category::ROCKET;
+				slot_def.space_available = to_space_units("0.8");
+
+				container.slots[slot_function::GUN_CHAMBER] = slot_def;
+			}
+		}
+
+		auto& gun = weapon += components::gun();
+
+		gun.muzzle_shot_sound_response.id = assets::sound_buffer_id::RL_MUZZLE;
+
+		gun.action_mode = gun_action_type::BOLT_ACTION;
+		gun.muzzle_velocity = std::make_pair(2500.f / 2, 2500.f / 2);
+		gun.shot_cooldown = augs::stepped_cooldown(1500);
+		gun.bullet_spawn_offset.set(sprite.get_size(metas).x / 2, 0);
+		gun.camera_shake_radius = 5.f;
+		gun.camera_shake_spread_degrees = 80.f;
+		
+		weapon.add_standard_components(step);
+
+		const auto load_rocket = cosmos[load_rocket_id];
+		if (load_rocket.alive()) {
+			perform_transfer({ load_rocket, weapon[slot_function::GUN_CHAMBER], 1 }, step);
+		}
+
+		return weapon;
+	}
+
+	entity_handle create_force_rocket(const logic_step step, const components::transform transform) {
+		auto& cosmos = step.cosm;
+
+		const auto force_rocket = cosmos.create_entity("force_rocket");
+		{
+			name_entity(force_rocket, entity_name::ROCKET);
+
+			ingredients::add_sprite(force_rocket, assets::game_image_id::FORCE_ROCKET, white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::add_see_through_dynamic_body(step, force_rocket, transform);
+
+			auto& item = ingredients::make_item(force_rocket);
+			item.space_occupied_per_charge = to_space_units("0.8");
+			item.categories_for_slot_compatibility.set(item_category::ROCKET);
+
+			force_rocket += components::catridge();
+		}
+
+		const auto round_definition = cosmos.create_entity("force_rocket_definition");
+		{
+			ingredients::add_sprite(round_definition, assets::game_image_id::FORCE_ROCKET, white, render_layer::FLYING_BULLETS);
+			ingredients::add_bullet_round_physics(step, round_definition, transform);
+
+			auto& contact_explosive = round_definition += components::contact_explosive();
+
+			auto& def = contact_explosive.explosion_defenition;
+			def.type = adverse_element_type::FORCE;
+			def.damage = 88.f;
+			def.inner_ring_color = red;
+			def.outer_ring_color = orange;
+			def.effective_radius = 300.f;
+			def.impact_force = 550.f;
+			def.sound_gain = 1.8f;
+			def.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
+		}
+
+		force_rocket.map_child_entity(child_entity_name::CATRIDGE_BULLET, round_definition);
+
+		force_rocket.add_standard_components(step);
+
+		return force_rocket;
 	}
 }
 

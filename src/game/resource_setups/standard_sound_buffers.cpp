@@ -23,6 +23,11 @@ void set_standard_sound_buffers(assets_manager& manager) {
 	}
 
 	{
+		auto& buf = manager[assets::sound_buffer_id::RL_MUZZLE];
+		buf.from_file("resources/sfx/rl_muzzle.wav");
+	}
+
+	{
 		auto& buf = manager[assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT];
 		buf.from_file("resources/sfx/electric_projectile_flight.wav");
 	}
