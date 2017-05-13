@@ -899,7 +899,6 @@ namespace prefabs {
 			trace_modifier.fade_on_exit = false;
 
 			damage.bullet_trace_sound_response.id = assets::sound_buffer_id::MISSILE_THRUSTER;
-			damage.destruction_sound_response.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
 
 			auto& contact_explosive = round_definition += components::contact_explosive();
 
