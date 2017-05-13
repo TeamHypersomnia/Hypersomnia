@@ -10,7 +10,7 @@ header-files:
 generated-file-path:
 @GENERATED_SOURCES_PATH@/introspectors.h
 introspector-field-format:
-			FIELD(%x);
+			FIELD(%x); /* %x */
 base-introspector-field-format:
 			introspect_body(static_cast<%x*>(nullptr), f, std::forward<Instances>(_t_)...);
 introspector-body-format:

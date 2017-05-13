@@ -61,7 +61,7 @@ private:
 
 	friend class cosmic_delta;
 
-	template<class T>
+	template <class T>
 	friend void transform_component_guids_to_ids_in_place(T&, const cosmos&);
 
 	void delete_debug_name(const entity_id);
@@ -87,7 +87,7 @@ private:
 	entity_handle allocate_new_entity();
 
 public:
-	cosmos(const unsigned reserved_entities = 0);
+	cosmos(const std::size_t reserved_entities = 0u);
 	cosmos(const cosmos&);
 
 	cosmos& operator=(const cosmos&);

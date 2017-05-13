@@ -97,12 +97,16 @@ void cosmos::create_inferred_state_for(const const_entity_handle h) {
 	}
 }
 
-cosmos::cosmos(const unsigned reserved_entities) {
+cosmos::cosmos(const std::size_t reserved_entities) {
 	reserve_storage_for_entities(reserved_entities);
 	significant.meta.settings.si.set_pixels_per_meter(100.f);
 	entity_debug_names[0] = "dead entity";
 
 	set_standard_behaviour_trees(*this);
+}
+
+cosmos::cosmos(const cosmos& b) {
+	*this = b;
 }
 
 const std::string& cosmos::get_debug_name(const entity_id id) const {
@@ -115,10 +119,6 @@ void cosmos::set_debug_name(const entity_id id, const std::string& new_debug_nam
 
 void cosmos::delete_debug_name(const entity_id id) {
 	entity_debug_names[id.indirection_index + 1] = "dead entity";
-}
-
-cosmos::cosmos(const cosmos& b) {
-	*this = b;
 }
 
 bool cosmos::operator==(const cosmos& b) const {
