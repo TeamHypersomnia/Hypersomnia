@@ -880,6 +880,27 @@ namespace prefabs {
 			ingredients::add_sprite(round_definition, assets::game_image_id::FORCE_ROCKET, white, render_layer::FLYING_BULLETS);
 			ingredients::add_bullet_round_physics(step, round_definition, transform);
 
+			auto& damage = round_definition += components::damage();
+
+			damage.damage_upon_collision = false;
+
+			damage.bullet_trace_particle_effect_response.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
+			damage.bullet_trace_particle_effect_response.modifier.colorize = white;
+
+			damage.muzzle_leave_particle_effect_response.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
+			damage.muzzle_leave_particle_effect_response.modifier.colorize = white;
+
+			auto& trace_modifier = damage.bullet_trace_sound_response.modifier;
+
+			trace_modifier.max_distance = 1020.f;
+			trace_modifier.reference_distance = 100.f;
+			trace_modifier.gain = 1.3f;
+			trace_modifier.repetitions = -1;
+			trace_modifier.fade_on_exit = false;
+
+			damage.bullet_trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
+			damage.destruction_sound_response.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
+
 			auto& contact_explosive = round_definition += components::contact_explosive();
 
 			auto& def = contact_explosive.explosion_defenition;
