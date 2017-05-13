@@ -5,7 +5,6 @@
 #include "game/components/special_physics_component.h"
 #include "game/components/flags_component.h"
 #include "game/components/damage_component.h"
-#include "game/components/contact_explosive_component.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
@@ -137,7 +136,6 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 
 		const auto collider_owner_body = collider.get_owner_body();
 		const auto* const damage = subject.get_owner_body().find<components::damage>();
-		const auto* const contact_explosive = subject.get_owner_body().find<components::contact_explosive>();
 
 		const bool bullet_colliding_with_sender =
 			damage != nullptr
@@ -145,13 +143,6 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 				damage->sender == collider_owner_body
 				|| cosmos[damage->sender].owning_transfer_capability_alive_and_same_as_of(collider_owner_body)
 				|| damage->sender_capability == collider_owner_body
-			)
-			|| (
-				contact_explosive != nullptr
-				&& (
-					contact_explosive->ignore_collision_with == collider_owner_body
-					|| cosmos[contact_explosive->ignore_collision_with].owning_transfer_capability_alive_and_same_as_of(collider_owner_body)
-				)
 			)
 		;
 
