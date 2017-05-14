@@ -1,6 +1,8 @@
 #pragma once
 #include <array>
 
-class padding_byte {
-	char dummy = static_cast<char>(0);
+struct padding_byte {
+	// GEN INTROSPECTOR struct padding_byte
+	char byte = static_cast<char>(0);
+	// END GEN INTROSPECTOR
 };

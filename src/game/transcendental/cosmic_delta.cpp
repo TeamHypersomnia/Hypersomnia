@@ -13,6 +13,7 @@
 #include "augs/misc/pooled_object_id.h"
 
 #include "generated/introspectors.h"
+#include "augs/templates/introspection_utils/describe_fields.h"
 
 /* Several assumptions regarding delta encoding */
 
@@ -530,6 +531,8 @@ TEST_CASE("CosmicDelta PaddingTest") {
 				type_size,
 				iter
 			));
+
+			LOG("Object 1: %x\n Object 2: %x", describe_fields(*(checked_type*)buf1), describe_fields(*(checked_type*)buf2));
 		}
 		
 		// test by delta
@@ -546,35 +549,11 @@ TEST_CASE("CosmicDelta PaddingTest") {
 					type_size,
 					dt.changed_offsets[0]
 				));
+
+				LOG("Object 1: %x\n Object 2: %x", describe_fields(a), describe_fields(b));
 			}
 		}
 	};
-
-	padding_checker(augs::window::event::change());
-	//padding_checker(game_gui_element_location());
-	
-	struct dum {
-	//	game_gui_rect_world rect_world;
-		int dragged_charges = 0;
-
-		bool is_gui_look_enabled = false;
-		bool preview_due_to_item_picking_request = false;
-		bool draw_space_available_inside_container_icons = true;
-		padding_byte pad;
-
-		//hotbar_button hotbar_buttons[9];
-		//drag_and_drop_target_drop_item drop_item_icon = augs::gui::material();
-
-		dum() 
-			//:  
-			//drop_item_icon(augs::gui::material(assets::game_image_id::DROP_HAND_ICON, red))
-		{
-		}
-	};
-
-	padding_checker(dum());
-	//padding_checker(std::array<hotbar_button, 9>());
-	//padding_checker(drag_and_drop_target_drop_item(augs::gui::material()), augs::gui::material());
 
 	for_each_through_std_get(put_all_components_into_t<std::tuple>(), padding_checker);
 }
@@ -727,17 +706,12 @@ TEST_CASE("CosmicDelta EmptyAndCreatedThreeEntitiesWithReferences") {
 	REQUIRE(deco_ent1.has<components::position_copying>());
 	const auto& s1 = new_ent1.get<components::sentience>();
 	const auto& s2 = deco_ent1.get<components::sentience>();
-	const bool sentience_intact = !std::memcmp(&s1, &s2, sizeof(s1));
 	const bool pc1_intact = deco_ent1.get<components::position_copying>().target == deco_ent2.get_id();
 	const bool pc1ch_intact = deco_ent1[child_entity_name::CHARACTER_CROSSHAIR] == deco_ent2.get_id();
 	REQUIRE(pc1_intact);
 	REQUIRE(pc1ch_intact);
 
-	if(!sentience_intact) {
-		auto mis = std::mismatch((char*)&s1, (char*)&s1 + sizeof(s1), (char*)&s2);
-		auto ind = mis.first - (char*)&s1;
-		FAIL(typesafe_sprintf("Sentience broken at %x", ind));
-	}
+	LOG(describe_fields(s1));
 
 	REQUIRE(deco_ent2.has<components::position_copying>());
 	const bool pc2_intact = deco_ent2.get<components::position_copying>().target == deco_ent3.get_id();

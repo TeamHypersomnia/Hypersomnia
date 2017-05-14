@@ -5,7 +5,7 @@
 #include "augs/misc/enum_bitset.h"
 #include <catch.hpp>
 
-TEST_CASE("CustomContainers", "EnumBitsetTest") {
+TEST_CASE("CustomContainers EnumBoolsetTest") {
 	enum class bb {
 		A,
 		B,

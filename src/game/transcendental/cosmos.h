@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/build_settings/setting_empty_bases.h"
 
-#include "augs/templates/introspection_utilities.h"
+#include "augs/templates/introspection_utils/rewrite_members.h"
 
 #include "augs/misc/randomization.h"
 #include "augs/misc/streams.h"

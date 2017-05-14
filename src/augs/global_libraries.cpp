@@ -75,7 +75,10 @@ namespace augs {
 			cfg.outputFilename = "generated/logs/unit_tests.txt";
 		}
 
-		session.run(argc, argv);
+		const auto result = session.run(argc, argv);
+		const bool was_catch_session_successful = result == 0;
+		
+		ensure(was_catch_session_successful);
 #endif
 	}
 };
