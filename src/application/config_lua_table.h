@@ -5,10 +5,8 @@
 
 #include "augs/padding_byte.h"
 #include "augs/graphics/pixel.h"
-#include "augs/templates/introspect.h"
 
 #include "game/transcendental/entity_handle_declaration.h"
-#include "augs/templates/introspect.h"
 
 #include "application/config_structs/hotbar_settings.h"
 #include "application/config_structs/debug_drawing_settings.h"

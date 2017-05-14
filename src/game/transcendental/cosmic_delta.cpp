@@ -562,6 +562,7 @@ TEST_CASE("CosmicDelta PaddingTest") {
 
 		if (breaks.size() > 0) {
 			LOG(breaks);
+			LOG(describe_fields(checked_type()));
 
 			FAIL(typesafe_sprintf(
 				"Padding is wrong in %x\nsizeof: %x\n", 

@@ -7,6 +7,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 #include "game/view/viewing_session.h"
+#include "augs/templates/introspect.h"
 
 #include "game/detail/gui/character_gui.h"
 
