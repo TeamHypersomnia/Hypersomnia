@@ -8,7 +8,7 @@ intersection_output circle_ray_intersection(
 	const vec2 a, 
 	const vec2 b, 
 	const vec2 circle_center, 
-	const float circle_radius
+	const real32 circle_radius
 ) {
 	b2CircleShape cs;
 
@@ -59,7 +59,7 @@ intersection_output rectangle_ray_intersection(
 		intersection_output result;
 		
 		result.hit = true;
-		result.intersection = center + (in.p1 + vec2(in.p2 - in.p1) * (out.fraction));
+		result.intersection = center + vec2(in.p1 + vec2(in.p2 - in.p1) * (out.fraction));
 		
 		return result;
 	}
@@ -68,16 +68,16 @@ intersection_output rectangle_ray_intersection(
 }
 
 std::vector<vec2> generate_circle_points(
-	const float circle_radius, 
-	const float last_angle_in_degrees,
-	const float starting_angle_in_degrees, 
+	const real32 circle_radius, 
+	const real32 last_angle_in_degrees,
+	const real32 starting_angle_in_degrees, 
 	const unsigned int number_of_points
 ) {
 	std::vector<vec2> result;
 
-	const float step = (last_angle_in_degrees - starting_angle_in_degrees) / number_of_points;
+	const real32 step = (last_angle_in_degrees - starting_angle_in_degrees) / number_of_points;
 
-	for (float i = starting_angle_in_degrees; i < last_angle_in_degrees; i += step) {
+	for (real32 i = starting_angle_in_degrees; i < last_angle_in_degrees; i += step) {
 		result.push_back(vec2().set_from_degrees(i).set_length(circle_radius) );
 	}
 
@@ -114,9 +114,9 @@ intersection_output segment_segment_intersection(
 }
 
 vec2 position_rectangle_around_a_circle(
-	const float circle_radius,
+	const real32 circle_radius,
 	const vec2 rectangle_size,
-	const float position_at_degrees
+	const real32 position_at_degrees
 ) {
 	const vec2 top_bounds[2] = { vec2(-rectangle_size.x / 2, -circle_radius - rectangle_size.y / 2), vec2(rectangle_size.x / 2, -circle_radius - rectangle_size.y / 2) };
 	const vec2 left_bounds[2] = { vec2(-circle_radius - rectangle_size.x / 2, rectangle_size.y / 2), vec2(-circle_radius - rectangle_size.x / 2, -rectangle_size.y / 2) };
@@ -142,8 +142,8 @@ vec2 position_rectangle_around_a_circle(
 		const auto c = vec2(all_bounds[(i + 1) % 4][0]).normalize();
 		const auto v = angle_norm;
 
-		float bound_angular_distance = a.cross(b);
-		float target_angular_distance = a.cross(v);
+		real32 bound_angular_distance = a.cross(b);
+		real32 target_angular_distance = a.cross(v);
 
 		if (target_angular_distance >= 0 && b.cross(v) <= 0) {
 			return augs::interp(all_bounds[i][0], all_bounds[i][1], target_angular_distance / bound_angular_distance);

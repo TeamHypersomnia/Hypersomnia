@@ -137,7 +137,7 @@ struct vec2t {
 	template <class B> friend std::ostream& operator<<(std::ostream& out, const vec2t<B>& x);
 	template <class B> friend std::istream& operator>>(std::istream& out, vec2t<B>& x);
 
-	typedef float real;
+	using real = real32;
 
 	void reset() {
 		x = static_cast<type>(0);
@@ -177,16 +177,27 @@ struct vec2t {
 	}
 
 	template <class t>
-	vec2t(const t& v) : x(static_cast<type>(v.x)), y(static_cast<type>(v.y)) {}
+	vec2t(
+		const vec2t<t>& v
+	) : 
+		x(static_cast<type>(v.x)), 
+		y(static_cast<type>(v.y)) 
+	{}
 
 	template <class t>
-	vec2t& operator=(const t& v) {
+	vec2t& operator=(const vec2t<t>& v) {
 		x = static_cast<type>(v.x);
 		y = static_cast<type>(v.y);
 		return *this;
 	}
 
-	vec2t(const type x = static_cast<type>(0), const type y = static_cast<type>(0)) : x(x), y(y) {}
+	vec2t(
+		const type x = static_cast<type>(0), 
+		const type y = static_cast<type>(0)
+	) : 
+		x(x), 
+		y(y) 
+	{}
 
 	/* from http://stackoverflow.com/a/1501725 */
 	real distance_from_segment_sq(const vec2t v, const vec2t w) const {
@@ -254,7 +265,7 @@ struct vec2t {
 	}
 
 	real degrees() const {
-		return radians()*RAD_TO_DEG<float>;
+		return radians()*RAD_TO_DEG<real>;
 	}
 
 	real radians_between(const vec2t& v) const {
@@ -276,7 +287,7 @@ struct vec2t {
 	}
 
 	real degrees_between(const vec2t& v) const {
-		return radians_between(v) * RAD_TO_DEG<float>;
+		return radians_between(v) * RAD_TO_DEG<real>;
 	}
 
 	template<class A, class B>
@@ -292,14 +303,14 @@ struct vec2t {
 	}
 
 	vec2t& set_from_degrees(const real degrees) {
-		const auto radians = degrees * DEG_TO_RAD<float>;
+		const auto radians = degrees * DEG_TO_RAD<real>;
 		set(cos(radians), sin(radians));
 		normalize();
 		return *this;
 	}
 
 	vec2t& set_from_radians(const real radians) {
-		return set_from_degrees(radians * RAD_TO_DEG<float>);
+		return set_from_degrees(radians * RAD_TO_DEG<real>);
 	}
 
 	template <typename v>
@@ -346,6 +357,13 @@ struct vec2t {
 
 	vec2t& normalize() {
 		return normalize_hint(length());
+	}
+	
+	template <class = std::enable_if_t<!std::is_integral_v<type>>>
+	vec2t& discard_fract() {
+		std::modf(x, &x);
+		std::modf(y, &y);
+		return *this;
 	}
 
 	vec2t perpendicular_cw() const {
@@ -450,29 +468,28 @@ struct vec2t {
 		return false;
 	}
 
-	template <class v> bool operator < (const v& p) const { return std::make_pair(x, y) < std::make_pair(p.x, p.y); }
 	template <class v> bool operator==(const v& p) const { return x == p.x && y == p.y; }
 	template <class v> bool operator!=(const v& p) const { return x != p.x || y != p.y; }
 
-	template <class v> vec2t operator-(const v& p) const { return vec2t(x - static_cast<type>(p.x), y - static_cast<type>(p.y)); }
-	template <class v> vec2t operator+(const v& p) const { return vec2t(x + static_cast<type>(p.x), y + static_cast<type>(p.y)); }
-	template <class v> vec2t operator*(const v& p) const { return vec2t(x * static_cast<type>(p.x), y * static_cast<type>(p.y)); }
-	template <class v> vec2t operator/(const v& p) const { return vec2t(x / static_cast<type>(p.x), y / static_cast<type>(p.y)); }
+	vec2t operator-(const vec2t& p) const { return vec2t(x - static_cast<type>(p.x), y - static_cast<type>(p.y)); }
+	vec2t operator+(const vec2t& p) const { return vec2t(x + static_cast<type>(p.x), y + static_cast<type>(p.y)); }
+	vec2t operator*(const vec2t& p) const { return vec2t(x * static_cast<type>(p.x), y * static_cast<type>(p.y)); }
+	vec2t operator/(const vec2t& p) const { return vec2t(x / static_cast<type>(p.x), y / static_cast<type>(p.y)); }
 
-	template <class v> vec2t& operator-=(const v& p) { x -= static_cast<type>(p.x); y -= static_cast<type>(p.y); return *this; }
-	template <class v> vec2t& operator+=(const v& p) { x += static_cast<type>(p.x); y += static_cast<type>(p.y); return *this; }
-	template <class v> vec2t& operator*=(const v& p) { x *= static_cast<type>(p.x); y *= static_cast<type>(p.y); return *this; }
-	template <class v> vec2t& operator/=(const v& p) { x /= static_cast<type>(p.x); y /= static_cast<type>(p.y); return *this; }
+	vec2t& operator-=(const vec2t& p) { x -= static_cast<type>(p.x); y -= static_cast<type>(p.y); return *this; }
+	vec2t& operator+=(const vec2t& p) { x += static_cast<type>(p.x); y += static_cast<type>(p.y); return *this; }
+	vec2t& operator*=(const vec2t& p) { x *= static_cast<type>(p.x); y *= static_cast<type>(p.y); return *this; }
+	vec2t& operator/=(const vec2t& p) { x /= static_cast<type>(p.x); y /= static_cast<type>(p.y); return *this; }
 
-	vec2t& operator-=(const double d) { x -= static_cast<type>(d); y -= static_cast<type>(d); return *this; }
-	vec2t& operator+=(const double d) { x += static_cast<type>(d); y += static_cast<type>(d); return *this; }
-	vec2t& operator*=(const double d) { x *= static_cast<type>(d); y *= static_cast<type>(d); return *this; }
-	vec2t& operator/=(const double d) { x /= static_cast<type>(d); y /= static_cast<type>(d); return *this; }
+	vec2t& operator-=(const real64 d) { x -= static_cast<type>(d); y -= static_cast<type>(d); return *this; }
+	vec2t& operator+=(const real64 d) { x += static_cast<type>(d); y += static_cast<type>(d); return *this; }
+	vec2t& operator*=(const real64 d) { x *= static_cast<type>(d); y *= static_cast<type>(d); return *this; }
+	vec2t& operator/=(const real64 d) { x /= static_cast<type>(d); y /= static_cast<type>(d); return *this; }
 
-	vec2t& operator-=(const float d) { x -= static_cast<type>(d); y -= static_cast<type>(d); return *this; }
-	vec2t& operator+=(const float d) { x += static_cast<type>(d); y += static_cast<type>(d); return *this; }
-	vec2t& operator*=(const float d) { x *= static_cast<type>(d); y *= static_cast<type>(d); return *this; }
-	vec2t& operator/=(const float d) { x /= static_cast<type>(d); y /= static_cast<type>(d); return *this; }
+	vec2t& operator-=(const real32 d) { x -= static_cast<type>(d); y -= static_cast<type>(d); return *this; }
+	vec2t& operator+=(const real32 d) { x += static_cast<type>(d); y += static_cast<type>(d); return *this; }
+	vec2t& operator*=(const real32 d) { x *= static_cast<type>(d); y *= static_cast<type>(d); return *this; }
+	vec2t& operator/=(const real32 d) { x /= static_cast<type>(d); y /= static_cast<type>(d); return *this; }
 
 	vec2t& operator-=(const int d) { x -= static_cast<type>(d); y -= static_cast<type>(d); return *this; }
 	vec2t& operator+=(const int d) { x += static_cast<type>(d); y += static_cast<type>(d); return *this; }
@@ -485,39 +502,39 @@ struct vec2t {
 	vec2t& operator/=(const unsigned d) { x /= static_cast<type>(d); y /= static_cast<type>(d); return *this; }
 };
 
-template <class T> inline vec2t<T> operator-(const vec2t<T> t, const double d) { return { t.x - static_cast<T>(d), t.y - static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator+(const vec2t<T> t, const double d) { return { t.x + static_cast<T>(d), t.y + static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator*(const vec2t<T> t, const double d) { return { t.x * static_cast<T>(d), t.y * static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator/(const vec2t<T> t, const double d) { return { t.x / static_cast<T>(d), t.y / static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator-(const vec2t<T> t, const float d) { return { t.x - static_cast<T>(d), t.y - static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator+(const vec2t<T> t, const float d) { return { t.x + static_cast<T>(d), t.y + static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator*(const vec2t<T> t, const float d) { return { t.x * static_cast<T>(d), t.y * static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator/(const vec2t<T> t, const float d) { return { t.x / static_cast<T>(d), t.y / static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator-(const vec2t<T> t, const int d) { return { t.x - static_cast<T>(d), t.y - static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator+(const vec2t<T> t, const int d) { return { t.x + static_cast<T>(d), t.y + static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator*(const vec2t<T> t, const int d) { return { t.x * static_cast<T>(d), t.y * static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator/(const vec2t<T> t, const int d) { return { t.x / static_cast<T>(d), t.y / static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator-(const vec2t<T> t, const unsigned d) { return { t.x - static_cast<T>(d), t.y - static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator+(const vec2t<T> t, const unsigned d) { return { t.x + static_cast<T>(d), t.y + static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator*(const vec2t<T> t, const unsigned d) { return { t.x * static_cast<T>(d), t.y * static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator/(const vec2t<T> t, const unsigned d) { return { t.x / static_cast<T>(d), t.y / static_cast<T>(d)}; }
+template <class type> inline vec2t<type> operator-(const vec2t<type> t, const real64 d) { return { t.x - static_cast<type>(d), t.y - static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator+(const vec2t<type> t, const real64 d) { return { t.x + static_cast<type>(d), t.y + static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator*(const vec2t<type> t, const real64 d) { return { t.x * static_cast<type>(d), t.y * static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator/(const vec2t<type> t, const real64 d) { return { t.x / static_cast<type>(d), t.y / static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator-(const vec2t<type> t, const real32 d) { return { t.x - static_cast<type>(d), t.y - static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator+(const vec2t<type> t, const real32 d) { return { t.x + static_cast<type>(d), t.y + static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator*(const vec2t<type> t, const real32 d) { return { t.x * static_cast<type>(d), t.y * static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator/(const vec2t<type> t, const real32 d) { return { t.x / static_cast<type>(d), t.y / static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator-(const vec2t<type> t, const int d) { return { t.x - static_cast<type>(d), t.y - static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator+(const vec2t<type> t, const int d) { return { t.x + static_cast<type>(d), t.y + static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator*(const vec2t<type> t, const int d) { return { t.x * static_cast<type>(d), t.y * static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator/(const vec2t<type> t, const int d) { return { t.x / static_cast<type>(d), t.y / static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator-(const vec2t<type> t, const unsigned d) { return { t.x - static_cast<type>(d), t.y - static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator+(const vec2t<type> t, const unsigned d) { return { t.x + static_cast<type>(d), t.y + static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator*(const vec2t<type> t, const unsigned d) { return { t.x * static_cast<type>(d), t.y * static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator/(const vec2t<type> t, const unsigned d) { return { t.x / static_cast<type>(d), t.y / static_cast<type>(d)}; }
 
-template <class T> inline vec2t<T> operator-(const double d, const vec2t<T> t) { return { t.x - static_cast<T>(d), t.y - static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator+(const double d, const vec2t<T> t) { return { t.x + static_cast<T>(d), t.y + static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator*(const double d, const vec2t<T> t) { return { t.x * static_cast<T>(d), t.y * static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator/(const double d, const vec2t<T> t) { return { t.x / static_cast<T>(d), t.y / static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator-(const float d, const vec2t<T> t) { return { t.x - static_cast<T>(d), t.y - static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator+(const float d, const vec2t<T> t) { return { t.x + static_cast<T>(d), t.y + static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator*(const float d, const vec2t<T> t) { return { t.x * static_cast<T>(d), t.y * static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator/(const float d, const vec2t<T> t) { return { t.x / static_cast<T>(d), t.y / static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator-(const int d, const vec2t<T> t) { return { t.x - static_cast<T>(d), t.y - static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator+(const int d, const vec2t<T> t) { return { t.x + static_cast<T>(d), t.y + static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator*(const int d, const vec2t<T> t) { return { t.x * static_cast<T>(d), t.y * static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator/(const int d, const vec2t<T> t) { return { t.x / static_cast<T>(d), t.y / static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator-(const unsigned d, const vec2t<T> t) { return { t.x - static_cast<T>(d), t.y - static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator+(const unsigned d, const vec2t<T> t) { return { t.x + static_cast<T>(d), t.y + static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator*(const unsigned d, const vec2t<T> t) { return { t.x * static_cast<T>(d), t.y * static_cast<T>(d) }; }
-template <class T> inline vec2t<T> operator/(const unsigned d, const vec2t<T> t) { return { t.x / static_cast<T>(d), t.y / static_cast<T>(d) }; }
+template <class type> inline vec2t<type> operator-(const real64 d, const vec2t<type> t) { return { t.x - static_cast<type>(d), t.y - static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator+(const real64 d, const vec2t<type> t) { return { t.x + static_cast<type>(d), t.y + static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator*(const real64 d, const vec2t<type> t) { return { t.x * static_cast<type>(d), t.y * static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator/(const real64 d, const vec2t<type> t) { return { t.x / static_cast<type>(d), t.y / static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator-(const real32 d, const vec2t<type> t) { return { t.x - static_cast<type>(d), t.y - static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator+(const real32 d, const vec2t<type> t) { return { t.x + static_cast<type>(d), t.y + static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator*(const real32 d, const vec2t<type> t) { return { t.x * static_cast<type>(d), t.y * static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator/(const real32 d, const vec2t<type> t) { return { t.x / static_cast<type>(d), t.y / static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator-(const int d, const vec2t<type> t) { return { t.x - static_cast<type>(d), t.y - static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator+(const int d, const vec2t<type> t) { return { t.x + static_cast<type>(d), t.y + static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator*(const int d, const vec2t<type> t) { return { t.x * static_cast<type>(d), t.y * static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator/(const int d, const vec2t<type> t) { return { t.x / static_cast<type>(d), t.y / static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator-(const unsigned d, const vec2t<type> t) { return { t.x - static_cast<type>(d), t.y - static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator+(const unsigned d, const vec2t<type> t) { return { t.x + static_cast<type>(d), t.y + static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator*(const unsigned d, const vec2t<type> t) { return { t.x * static_cast<type>(d), t.y * static_cast<type>(d) }; }
+template <class type> inline vec2t<type> operator/(const unsigned d, const vec2t<type> t) { return { t.x / static_cast<type>(d), t.y / static_cast<type>(d) }; }
 
 namespace std {
 	template <class T>
@@ -565,7 +582,7 @@ intersection_output circle_ray_intersection(
 	const vec2 a,
 	const vec2 b,
 	const vec2 circle_center,
-	const float circle_radius
+	const real32 circle_radius
 );
 
 intersection_output segment_segment_intersection(
@@ -576,14 +593,14 @@ intersection_output segment_segment_intersection(
 );
 
 std::vector<vec2> generate_circle_points(
-	const float radius,
-	const float last_angle_in_degrees,
-	const float starting_angle_in_degrees,
+	const real32 radius,
+	const real32 last_angle_in_degrees,
+	const real32 starting_angle_in_degrees,
 	const unsigned int number_of_points
 );
 
 vec2 position_rectangle_around_a_circle(
-	const float circle_radius,
+	const real32 circle_radius,
 	const vec2 rectangle_size,
-	const float position_at_degrees
+	const real32 position_at_degrees
 );

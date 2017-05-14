@@ -107,7 +107,7 @@ components::transform basic_spatial_properties_mixin<C, D>::get_viewing_transfor
 		auto in = sys.get_interpolated(owner);
 
 		if (integerize) {
-			in.pos = vec2i(in.pos);
+			in.pos.discard_fract();
 		}
 
 		return components::fixtures::transform_around_body(handle, in);

@@ -61,7 +61,7 @@ void position_copying_system::update_transforms(const logic_step step) {
 
 			auto target_transform = cosmos[position_copying.target].get_logic_transform();
 			target_transform.rotation *= position_copying.rotation_multiplier;
-			target_transform.pos = vec2i(target_transform.pos);
+			target_transform.pos.discard_fract();
 
 			if (position_copying.position_copying_mode == components::position_copying::position_copying_type::OFFSET) {
 				transform.pos = target_transform.pos;

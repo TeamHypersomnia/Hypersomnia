@@ -184,10 +184,18 @@ namespace augs {
 			t2.vertices[i].texcoord = considered_texture.get_atlas_space_uv(t2.vertices[i].texcoord);
 		}
 
-		t1.vertices[0].pos = t2.vertices[0].pos = static_cast<vec2i>(v[0]);
-		t2.vertices[1].pos = static_cast<vec2i>(v[1]);
-		t1.vertices[1].pos = t2.vertices[2].pos = static_cast<vec2i>(v[2]);
-		t1.vertices[2].pos = static_cast<vec2i>(v[3]);
+		t1.vertices[0].pos = t2.vertices[0].pos = v[0];
+		t2.vertices[1].pos = v[1];
+		t1.vertices[1].pos = t2.vertices[2].pos = v[2];
+		t1.vertices[2].pos = v[3];
+
+		t1.vertices[0].pos.discard_fract();
+		t1.vertices[1].pos.discard_fract();
+		t1.vertices[2].pos.discard_fract();
+
+		t2.vertices[0].pos.discard_fract();
+		t2.vertices[1].pos.discard_fract();
+		t2.vertices[2].pos.discard_fract();
 
 		t1.vertices[0].color = t2.vertices[0].color = col;
 		t1.vertices[1].color = t2.vertices[1].color = col;
