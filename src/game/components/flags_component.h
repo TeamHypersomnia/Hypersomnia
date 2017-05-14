@@ -1,12 +1,11 @@
 #pragma once
-#include <bitset>
 #include "game/enums/entity_flag.h"
-#include "augs/misc/enum_bitset.h"
+#include "augs/misc/enum_boolset.h"
 
 namespace components {
 	struct flags {
 		// GEN INTROSPECTOR struct components::flags
-		augs::enum_bitset<entity_flag> bit_flags;
+		augs::enum_boolset<entity_flag> values;
 		// END GEN INTROSPECTOR
 	};
 }

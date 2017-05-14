@@ -10,7 +10,6 @@
 #include "augs/texture_atlas/texture_atlas_entry.h"
 
 #include "augs/misc/enum_associative_array.h"
-#include "augs/misc/enum_bitset.h"
 
 #include "augs/graphics/shader.h"
 #include "augs/graphics/texture.h"

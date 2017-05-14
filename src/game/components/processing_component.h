@@ -1,21 +1,20 @@
 #pragma once
-#include <bitset>
 #include "game/enums/processing_subjects.h"
 #include "game/transcendental/component_synchronizer.h"
 
 #include "augs/padding_byte.h"
-#include "augs/misc/enum_bitset.h"
+#include "augs/misc/enum_boolset.h"
 
 namespace components {
 	struct processing : synchronizable_component {
-		typedef augs::enum_bitset<processing_subjects> bitset_type;
+		typedef augs::enum_boolset<processing_subjects> flagset_type;
 		
 		// GEN INTROSPECTOR struct components::processing
 		bool activated = true;
 		std::array<padding_byte, 3> pad;
 
-		bitset_type processing_subject_categories;
-		bitset_type disabled_categories;
+		flagset_type processing_subject_categories;
+		flagset_type disabled_categories;
 		// END GEN INTROSPECTOR
 
 		static components::processing get_default(const const_entity_handle);
@@ -29,8 +28,8 @@ public:
 
 	bool is_activated() const;
 	bool is_in(const processing_subjects) const;
-	components::processing::bitset_type get_disabled_categories() const;
-	components::processing::bitset_type get_basic_categories() const;
+	components::processing::flagset_type get_disabled_categories() const;
+	components::processing::flagset_type get_basic_categories() const;
 };
 
 template<>
@@ -41,8 +40,8 @@ public:
 
 	void disable_in(const processing_subjects) const;
 	void enable_in(const processing_subjects) const;
-	void set_disabled_categories(const components::processing::bitset_type&) const;
-	void set_basic_categories(const components::processing::bitset_type&) const;
+	void set_disabled_categories(const components::processing::flagset_type&) const;
+	void set_basic_categories(const components::processing::flagset_type&) const;
 };
 
 template<>

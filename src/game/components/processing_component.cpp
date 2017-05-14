@@ -114,21 +114,21 @@ void component_synchronizer<false, P>::enable_in(const processing_subjects list)
 }
 
 template<bool C>
-P::bitset_type basic_processing_synchronizer<C>::get_disabled_categories() const {
+P::flagset_type basic_processing_synchronizer<C>::get_disabled_categories() const {
 	return get_data().disabled_categories;
 }
 
 template<bool C>
-P::bitset_type basic_processing_synchronizer<C>::get_basic_categories() const {
+P::flagset_type basic_processing_synchronizer<C>::get_basic_categories() const {
 	return get_data().processing_subject_categories;
 }
 
-void component_synchronizer<false, P>::set_disabled_categories(const P::bitset_type& categories) const {
+void component_synchronizer<false, P>::set_disabled_categories(const P::flagset_type& categories) const {
 	get_data().disabled_categories = categories;
 	reinference();
 }
 
-void component_synchronizer<false, P>::set_basic_categories(const P::bitset_type& categories) const {
+void component_synchronizer<false, P>::set_basic_categories(const P::flagset_type& categories) const {
 	get_data().processing_subject_categories = categories;
 	reinference();
 }

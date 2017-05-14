@@ -292,7 +292,7 @@ public:
 			from = get<components::flags>();
 		}
 
-		return from.bit_flags.test(f);
+		return from.values.test(f);
 	}
 
 	template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
@@ -302,7 +302,7 @@ public:
 			add(components::flags());
 		}
 
-		get<components::flags>().bit_flags.set(f, true);
+		get<components::flags>().values.set(f, true);
 	}
 
 	template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
@@ -312,7 +312,7 @@ public:
 			add(components::flags());
 		}
 
-		get<components::flags>().bit_flags.set(f, false);
+		get<components::flags>().values.set(f, false);
 	}
 
 	template <class F>

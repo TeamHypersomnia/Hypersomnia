@@ -1,14 +1,12 @@
 #pragma once
-#include <array>
-#include <bitset>
-
 #include "augs/ensure.h"
 #include "augs/templates/maybe_const.h"
+#include "augs/misc/enum_boolset.h"
 
 namespace augs {
 	struct introspection_access;
 
-	template<class Enum, class T>
+	template <class Enum, class T>
 	class enum_associative_array {
 	public:
 		typedef Enum key_type;
@@ -17,19 +15,19 @@ namespace augs {
 		static constexpr size_t max_n = static_cast<size_t>(key_type::COUNT);
 
 		typedef std::array<mapped_type, max_n> arr_type;
-		typedef std::bitset<max_n> bitset_type;
+		typedef augs::enum_boolset<Enum> flagset_type;
 
 		// GEN INTROSPECTOR class augs::enum_associative_array class key_type class mapped_type
-		bitset_type is_value_set;
+		flagset_type is_value_set;
 		arr_type raw;
 		// END GEN INTROSPECTOR
 		
 		bool is_set(const std::size_t index) const {
-			return is_value_set.test(index);
+			return is_value_set.test(static_cast<Enum>(index));
 		}
 
 		void set(const std::size_t index) {
-			is_value_set.set(index);
+			is_value_set.set(static_cast<Enum>(index));
 		}
 
 		friend struct augs::introspection_access;
@@ -164,8 +162,8 @@ namespace augs {
 			}
 
 			// std::fill(is_set_buf.begin(), is_set_buf.end(), 0u);
-			// get_bitset() = bitset_type();
-			is_value_set = bitset_type();
+			// get_flags() = flagset_type();
+			is_value_set = flagset_type();
 		}
 	};
 }

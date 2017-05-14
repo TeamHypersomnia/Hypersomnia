@@ -33,45 +33,11 @@ struct has_introspect<
 template <class T>
 constexpr bool has_introspect_v = has_introspect<T>::value;
 
-namespace std {
-	template <size_t I>
-	class bitset;
-}
-
-namespace augs {
-	template <class T>
-	class enum_bitset;
-}
-
-template <class T>
-struct is_bitset_detail : std::false_type {
-
-};
-
-template <class T>
-struct is_bitset_detail<augs::enum_bitset<T>> : std::true_type {
-
-};
-
-template <size_t I>
-struct is_bitset_detail<std::bitset<I>> : std::true_type {
-
-};
-
-template <class T>
-struct is_bitset : is_bitset_detail<std::remove_cv_t<T>> {
-
-};
-
-template <class T>
-constexpr bool is_bitset_v = is_bitset<T>::value;
-
 template <class T>
 struct is_introspective_leaf : 
 	std::bool_constant<
 		std::is_enum_v<T>
 		|| std::is_arithmetic_v<T>
-		|| is_bitset_v<T>
 	> 
 {
 };

@@ -38,6 +38,6 @@ constexpr std::size_t MAX_PHYSICAL_MATERIAL_COUNT = 15;
 constexpr std::size_t MAX_SHADER_PROGRAM_COUNT = 50;
 constexpr std::size_t MAX_SHADER_COUNT = 100;
 constexpr std::size_t MAX_SOUND_BUFFER_COUNT = 1000;
-constexpr std::size_t MAX_SPELL_COUNT = 200;
+constexpr std::size_t MAX_SPELL_COUNT = 70;
 constexpr std::size_t MAX_TILE_LAYER_COUNT = 400;
 

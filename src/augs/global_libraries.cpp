@@ -26,7 +26,7 @@ void sigsegv_handler(const int signal) {
 namespace augs {
 	std::unique_ptr<FT_Library> global_libraries::freetype_library(new FT_Library);
 
-	void global_libraries::init(const library_bitset to_initialize) {
+	void global_libraries::init(const library_flagset to_initialize) {
 		// signal(SIGSEGV, sigsegv_handler);
 
 		if(to_initialize.test(library::FREETYPE)) {
@@ -42,7 +42,7 @@ namespace augs {
 		}
 	}
 
-	void global_libraries::deinit(const library_bitset to_deinitialize) {
+	void global_libraries::deinit(const library_flagset to_deinitialize) {
 		if(to_deinitialize.test(library::FREETYPE)) {
 			ensure(initialized.test(library::FREETYPE));
 			ensure(!FT_Done_FreeType(*freetype_library.get()) && "freetype deinitialization");
@@ -80,4 +80,4 @@ namespace augs {
 	}
 };
 
-augs::global_libraries::library_bitset augs::global_libraries::initialized;
+augs::global_libraries::library_flagset augs::global_libraries::initialized;

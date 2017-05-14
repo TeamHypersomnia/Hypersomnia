@@ -1,6 +1,5 @@
 #pragma once
-#include <bitset>
-#include "augs/misc/enum_bitset.h"
+#include "augs/misc/enum_boolset.h"
 
 enum class item_category {
 	GENERAL,
@@ -18,6 +17,6 @@ enum class item_category {
 	COUNT
 };
 
-typedef augs::enum_bitset<item_category> item_category_bitset;
+typedef augs::enum_boolset<item_category> item_category_flagset;
 
-bool is_clothing(const item_category_bitset& category);
+bool is_clothing(const item_category_flagset& category);

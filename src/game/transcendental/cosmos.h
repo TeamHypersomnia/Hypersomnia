@@ -6,7 +6,7 @@
 #include "augs/misc/randomization.h"
 #include "augs/misc/streams.h"
 #include "augs/misc/delta.h"
-#include "augs/misc/enum_bitset.h"
+#include "augs/misc/enum_boolset.h"
 #include "augs/misc/subscript_operator_for_get_handle_mixin.h"
 #include "augs/misc/enum_associative_array.h"
 
@@ -212,7 +212,7 @@ public:
 	void for_each(
 		const processing_subjects list_type, 
 		F callback,
-		augs::enum_bitset<subjects_iteration_flag> flags = {}
+		augs::enum_boolset<subjects_iteration_flag> flags = {}
 	) {
 		if (flags.test(subjects_iteration_flag::POSSIBLE_ITERATOR_INVALIDATION)) {
 			const auto targets = systems_inferred.get<processing_lists_system>().get(list_type);

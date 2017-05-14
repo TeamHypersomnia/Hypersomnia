@@ -6,7 +6,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "augs/ensure.h"
 
-item_category_bitset inventory_slot::get_allowed_categories() const {
+item_category_flagset inventory_slot::get_allowed_categories() const {
 	return { category_allowed };
 }
 

@@ -122,7 +122,7 @@ bool cosmic_delta::encode(
 		const auto& base_components = is_new ? aggregate::component_id_tuple() : base_entity.get().component_ids;
 		const auto& enco_components = agg.component_ids;
 
-		bool entity_changed = false;
+		bool has_entity_changed = false;
 
 		std::array<bool, COMPONENTS_COUNT> overridden_components;
 		std::fill(overridden_components.begin(), overridden_components.end(), false);
@@ -130,7 +130,7 @@ bool cosmic_delta::encode(
 		augs::stream new_content;
 		
 		augs::introspect(
-			[&agg, &base, &enco, &entity_changed, &new_content, &overridden_components](
+			[&agg, &base, &enco, &has_entity_changed, &new_content, &overridden_components](
 				auto label,
 				const auto& base_id, 
 				const auto& enco_id
@@ -163,7 +163,7 @@ bool cosmic_delta::encode(
 
 					augs::write_delta(base_compo, enco_compo, new_content, true);
 
-					entity_changed = true;
+					has_entity_changed = true;
 					overridden_components[idx] = true;
 				}
 				else {
@@ -173,8 +173,10 @@ bool cosmic_delta::encode(
 					transform_component_ids_to_guids_in_place(base_compo, base);
 					transform_component_ids_to_guids_in_place(enco_compo, enco);
 
+					auto dt = augs::delta_encode(base_compo, enco_compo);
+
 					if (augs::write_delta(base_compo, enco_compo, new_content)) {
-						entity_changed = true;
+						has_entity_changed = true;
 						overridden_components[idx] = true;
 					}
 				}
@@ -195,7 +197,7 @@ bool cosmic_delta::encode(
 
 			++dt.new_entities;
 		}
-		else if (entity_changed) {
+		else if (has_entity_changed) {
 			augs::write(dt.stream_for_changed, stream_written_id);
 
 			augs::write_flags(dt.stream_for_changed, overridden_components);
@@ -529,6 +531,23 @@ TEST_CASE("CosmicDelta PaddingTest") {
 				iter
 			));
 		}
+		
+		// test by delta
+		{
+			checked_type a;
+			checked_type b;
+
+			const auto dt = augs::delta_encode(a, b);
+
+			if(dt.changed_offsets.size() > 0) {
+				FAIL(typesafe_sprintf(
+					"Padding is wrong in %x\nsizeof: %x\nDivergence position: %x", 
+					typeid(checked_type).name(),
+					type_size,
+					dt.changed_offsets[0]
+				));
+			}
+		}
 	};
 
 	padding_checker(augs::window::event::change());
@@ -646,7 +665,29 @@ TEST_CASE("CosmicDelta EmptyAndTwoNew") {
 }
 
 TEST_CASE("CosmicDelta EmptyAndCreatedThreeEntitiesWithReferences") {
+	{
+		// (in)sanity check
+		cosmos t(3);
+		const auto id = t.create_entity("");
+		t.delete_entity(id);
+		const auto new_id = t.create_entity("");
+		REQUIRE(id != new_id);
+	}
+	
 	cosmos c1(3);
+	// increment the local id counter in the base cosmos to have different ids 
+	// once it allocates its own entities when decoding
+	{
+		entity_id ids[3] = {
+			c1.create_entity("test"),
+			c1.create_entity("test2"),
+			c1.create_entity("test3")
+		};
+
+		for(const auto i : ids) {
+			c1.delete_entity(i);
+		}
+	}
 	cosmos c2(3);
 
 	const auto new_ent1 = c2.create_entity("e1");
@@ -678,22 +719,32 @@ TEST_CASE("CosmicDelta EmptyAndCreatedThreeEntitiesWithReferences") {
 	REQUIRE(3 == c1.entities_count());
 	REQUIRE(3 == c2.entities_count());
 
-	const auto ent1 = c1.get_handle(first_guid);
-	const auto ent2 = c1.get_handle(second_guid);
-	const auto ent3 = c1.get_handle(third_guid);
+	const auto deco_ent1 = c1.get_handle(first_guid);
+	const auto deco_ent2 = c1.get_handle(second_guid);
+	const auto deco_ent3 = c1.get_handle(third_guid);
 
-	REQUIRE(ent1.has<components::sentience>());
-	REQUIRE(ent1.has<components::position_copying>());
-	const bool pc1_intact = ent1.get<components::position_copying>().target == ent2.get_id();
-	const bool pc1ch_intact = ent1[child_entity_name::CHARACTER_CROSSHAIR] == ent2.get_id();
+	REQUIRE(deco_ent1.has<components::sentience>());
+	REQUIRE(deco_ent1.has<components::position_copying>());
+	const auto& s1 = new_ent1.get<components::sentience>();
+	const auto& s2 = deco_ent1.get<components::sentience>();
+	const bool sentience_intact = !std::memcmp(&s1, &s2, sizeof(s1));
+	const bool pc1_intact = deco_ent1.get<components::position_copying>().target == deco_ent2.get_id();
+	const bool pc1ch_intact = deco_ent1[child_entity_name::CHARACTER_CROSSHAIR] == deco_ent2.get_id();
 	REQUIRE(pc1_intact);
+	REQUIRE(pc1ch_intact);
 
-	REQUIRE(ent2.has<components::position_copying>());
-	const bool pc2_intact = ent2.get<components::position_copying>().target == ent3.get_id();
+	if(!sentience_intact) {
+		auto mis = std::mismatch((char*)&s1, (char*)&s1 + sizeof(s1), (char*)&s2);
+		auto ind = mis.first - (char*)&s1;
+		FAIL(typesafe_sprintf("Sentience broken at %x", ind));
+	}
+
+	REQUIRE(deco_ent2.has<components::position_copying>());
+	const bool pc2_intact = deco_ent2.get<components::position_copying>().target == deco_ent3.get_id();
 	REQUIRE(pc2_intact);
 
-	REQUIRE(ent3.has<components::position_copying>());
-	const bool pc3_intact = ent3.get<components::position_copying>().target == ent1.get_id();
+	REQUIRE(deco_ent3.has<components::position_copying>());
+	const bool pc3_intact = deco_ent3.get<components::position_copying>().target == deco_ent1.get_id();
 	REQUIRE(pc3_intact);
 
 	{

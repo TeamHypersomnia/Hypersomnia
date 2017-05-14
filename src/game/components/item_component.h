@@ -18,7 +18,7 @@ namespace components {
 		mounting_state current_mounting = UNMOUNTED;
 		mounting_state intended_mounting = UNMOUNTED;
 
-		item_category_bitset categories_for_slot_compatibility = { item_category::GENERAL };
+		item_category_flagset categories_for_slot_compatibility = { item_category::GENERAL };
 
 		int charges = 1;
 		unsigned space_occupied_per_charge = 1;

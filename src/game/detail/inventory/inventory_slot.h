@@ -35,7 +35,7 @@ struct inventory_slot {
 	augs::constant_size_vector<entity_id, ITEMS_INSIDE_COUNT> items_inside;
 	// END GEN INTROSPECTOR
 
-	item_category_bitset get_allowed_categories() const;
+	item_category_flagset get_allowed_categories() const;
 
 	bool has_unlimited_space() const;
 	bool makes_physical_connection() const;

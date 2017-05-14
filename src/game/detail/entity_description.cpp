@@ -43,9 +43,7 @@ std::wstring get_bbcoded_entity_properties(const const_entity_handle id) {
 	const auto* const item = id.find<components::item>();
 
 	if (item) {
-		if (item->categories_for_slot_compatibility.any()) {
-			result << L"[color=vsblue]" << get_bbcoded_item_categories(item->categories_for_slot_compatibility) << L"[/color]\n";
-		}
+		result << L"[color=vsblue]" << get_bbcoded_item_categories(item->categories_for_slot_compatibility) << L"[/color]\n";
 		
 		const auto total_occupied = format_space_units(calculate_space_occupied_with_children(id));
 		const auto per_charge = format_space_units(item->space_occupied_per_charge);

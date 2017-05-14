@@ -1,11 +1,10 @@
 #pragma once
 #include <vector>
-#include <bitset>
 #include "material.h"
 #include "gui_traversal_structs.h"
 #include "augs/window_framework/event.h"
 #include "augs/misc/delta.h"
-#include "augs/misc/enum_bitset.h"
+#include "augs/misc/enum_boolset.h"
 #include "game/assets/assets_manager.h"
 #include "gui_flags.h"
 
@@ -14,7 +13,7 @@ namespace augs {
 		struct stylesheet;
 
 		struct rect_node_data {
-			augs::enum_bitset<flag> flags;
+			augs::enum_boolset<flag> flags;
 			vec2i rc_pos_before_dragging;
 
 			ltrb rc; /* actual rectangle */
