@@ -361,8 +361,8 @@ struct vec2t {
 	
 	template <class = std::enable_if_t<!std::is_integral_v<type>>>
 	vec2t& discard_fract() {
-		std::modf(x, &x);
-		std::modf(y, &y);
+		x = std::trunc(x);
+		y = std::trunc(y);
 		return *this;
 	}
 

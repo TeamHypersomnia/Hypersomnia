@@ -20,14 +20,22 @@ namespace augs {
 		typedef std::bitset<max_n> bitset_type;
 
 		// GEN INTROSPECTOR class augs::enum_associative_array class key_type class mapped_type
-		bitset_type is_set;
+		bitset_type is_value_set;
 		arr_type raw;
 		// END GEN INTROSPECTOR
+		
+		bool is_set(const std::size_t index) const {
+			return is_value_set.test(index);
+		}
+
+		void set(const std::size_t index) {
+			is_value_set.set(index);
+		}
 
 		friend struct augs::introspection_access;
 
 		unsigned find_first_set_index(unsigned from) const {
-			while (from < max_n && !is_set.test(from)) {
+			while (from < max_n && !is_set(from)) {
 				++from;
 			}
 
@@ -99,7 +107,7 @@ namespace augs {
 			const size_t i = static_cast<size_t>(enum_idx);
 			ensure(i < capacity());
 
-			if (is_set.test(i)) {
+			if (is_set(i)) {
 				return iterator(this, i);
 			}
 
@@ -110,7 +118,7 @@ namespace augs {
 			const size_t i = static_cast<size_t>(enum_idx);
 			ensure(i < capacity());
 
-			if (is_set.test(i)) {
+			if (is_set(i)) {
 				return const_iterator(this, i);
 			}
 
@@ -120,22 +128,22 @@ namespace augs {
 		mapped_type& at(const key_type enum_idx) {
 			const auto i = static_cast<size_t>(enum_idx);
 			ensure(i < capacity());
-			ensure(is_set.test(i));
+			ensure(is_set(i));
 			return raw[i];
 		}
 
 		const mapped_type& at(const key_type enum_idx) const {
 			const auto i = static_cast<size_t>(enum_idx);
 			ensure(i < capacity());
-			ensure(is_set.test(i));
+			ensure(is_set(i));
 			return raw[i];
 		}
 
 		mapped_type& operator[](const key_type enum_idx) {
 			const auto i = static_cast<size_t>(enum_idx);
 
-			if (!is_set.test(i)) {
-				is_set.set(i);
+			if (!is_set(i)) {
+				set(i);
 			}
 
 			return raw[i];
@@ -155,7 +163,9 @@ namespace augs {
 				new (&v) mapped_type;
 			}
 
-			is_set = bitset_type();
+			// std::fill(is_set_buf.begin(), is_set_buf.end(), 0u);
+			// get_bitset() = bitset_type();
+			is_value_set = bitset_type();
 		}
 	};
 }

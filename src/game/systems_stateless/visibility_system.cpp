@@ -34,10 +34,10 @@ using namespace messages;
 source:
 http://stackoverflow.com/questions/16542042/fastest-way-to-sort-vectors-by-angle-without-actually-computing-that-angle
 */
-float comparable_angle(const vec2 diff) {
+static auto comparable_angle(const vec2 diff) {
 	return augs::sgn(diff.y) * (
 		1 - (diff.x / (std::abs(diff.x) + std::abs(diff.y)))
-		);
+	);
 }
 
 typedef visibility_information_response::edge edge;
@@ -80,7 +80,11 @@ triangle visibility_information_response::get_world_triangle(const size_t i, con
 	return { origin, edges[i].first, edges[i].second };
 }
 
-std::vector<vec2> visibility_information_response::get_world_polygon(const float distance_epsilon, const vec2 expand_origin, const float expand_mult) const {
+std::vector<vec2> visibility_information_response::get_world_polygon(
+	const real32 distance_epsilon, 
+	const vec2 expand_origin, 
+	const real32 expand_mult
+) const {
 	std::vector<vec2> output;
 
 	for (size_t i = 0; i < edges.size(); ++i) {
@@ -174,11 +178,12 @@ void visibility_system::respond_to_visibility_information_requests(
 	auto& lines = renderer.logic_lines;
 
 	/* prepare epsilons to be used later, just to make the notation more clear */
-	const float epsilon_distance_vertex_hit_sq =
+	const auto epsilon_distance_vertex_hit_sq =
 		si.get_meters(settings.epsilon_distance_vertex_hit) *
-		si.get_meters(settings.epsilon_distance_vertex_hit);
+		si.get_meters(settings.epsilon_distance_vertex_hit)
+	;
 
-	const float epsilon_threshold_obstacle_hit_meters = si.get_meters(settings.epsilon_threshold_obstacle_hit);
+	const auto epsilon_threshold_obstacle_hit_meters = si.get_meters(settings.epsilon_threshold_obstacle_hit);
 
 	/* we'll need a reference to physics system for raycasting */
 	const physics_system& physics = cosmos.systems_inferred.get<physics_system>();
@@ -196,7 +201,7 @@ void visibility_system::respond_to_visibility_information_requests(
 
 		line_of_sight_response response;
 
-		const float d = request.maximum_distance;
+		const auto d = request.maximum_distance;
 		
 		physics.for_each_in_aabb(
 			si,
@@ -276,7 +281,7 @@ void visibility_system::respond_to_visibility_information_requests(
 		/* prepare container for all the vertices that we will cast the ray to */
 		struct target_vertex {
 			bool is_on_a_bound;
-			float angle;
+			real32 angle;
 			vec2 pos;
 
 			bool operator<(const target_vertex& b) {
@@ -284,7 +289,7 @@ void visibility_system::respond_to_visibility_information_requests(
 			}
 
 			bool operator==(const target_vertex& b) {
-				return pos.compare(b.pos) || (b.angle - angle) <= std::numeric_limits<float>::epsilon();
+				return pos.compare(b.pos) || (b.angle - angle) <= std::numeric_limits<decltype(angle)>::epsilon();
 			}
 		};
 
@@ -295,7 +300,7 @@ void visibility_system::respond_to_visibility_information_requests(
 		const vec2 position_meters = si.get_meters(transform.pos + request.offset);
 
 		/* to Box2D coordinates */
-		const float vision_side_meters = si.get_meters(request.square_side);
+		const auto vision_side_meters = si.get_meters(request.square_side);
 
 		/* prepare maximum visibility square */
 		b2AABB aabb;
@@ -371,7 +376,7 @@ void visibility_system::respond_to_visibility_information_requests(
 		note we lengthen them a bit and add/substract 1.f to avoid undeterministic vertex cases
 		*/
 		b2EdgeShape bounds[4];
-		const float moving_epsilon = si.get_meters(1.f);
+		const auto moving_epsilon = si.get_meters(1.f);
 		bounds[0].Set(vec2(whole_vision[0]) + vec2(-moving_epsilon, 0.f), vec2(whole_vision[1]) + vec2(moving_epsilon, 0.f));
 		bounds[1].Set(vec2(whole_vision[1]) + vec2(0.f, -moving_epsilon), vec2(whole_vision[2]) + vec2(0.f, moving_epsilon));
 		bounds[2].Set(vec2(whole_vision[2]) + vec2(moving_epsilon, 0.f), vec2(whole_vision[3]) + vec2(-moving_epsilon, 0.f));
@@ -621,7 +626,7 @@ void visibility_system::respond_to_visibility_information_requests(
 				if (ray_callbacks[0].hit && ray_callbacks[1].hit) {
 					/* if distance between both intersections and position is less than distance from target to position
 					then rays must have intersected with an obstacle BEFORE reaching the vertex, ignoring intersection completely */
-					float distance_from_origin = (vertex.pos - position_meters).length();
+					const auto distance_from_origin = (vertex.pos - position_meters).length();
 
 					if ((ray_callbacks[0].intersection - position_meters).length() + epsilon_threshold_obstacle_hit_meters < distance_from_origin &&
 						(ray_callbacks[1].intersection - position_meters).length() + epsilon_threshold_obstacle_hit_meters < distance_from_origin) {

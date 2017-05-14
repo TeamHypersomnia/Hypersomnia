@@ -2,5 +2,5 @@
 #include <array>
 
 class padding_byte {
-	bool dummy = false;
+	char dummy = static_cast<char>(0);
 };
