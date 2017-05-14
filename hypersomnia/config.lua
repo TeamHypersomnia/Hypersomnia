@@ -92,7 +92,7 @@ config_table = {
 	debug_run_unit_tests = true,
 
 	-- if true, logs all unit tests that succeed, not just failures.
-	debug_log_successful_unit_tests = true,
+	debug_log_successful_unit_tests = false,
 
 	-- if true, breaks on the first failure.
 	debug_break_on_unit_test_failure = true,

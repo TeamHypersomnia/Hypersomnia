@@ -511,6 +511,9 @@ TEST_CASE("CosmicDelta PaddingTest") {
 			buf2[i] = 4;
 		}
 
+		// it looks like the placement new may zero-out the memory before allocation.
+		// we will leave this test as it is useful anyway.
+
 		new (buf1) checked_type(args...);
 		new (buf2) checked_type(args...);
 
@@ -525,16 +528,16 @@ TEST_CASE("CosmicDelta PaddingTest") {
 		}
 
 		if(!same) {
+			LOG("Object 1:\n%x\n Object 2:\n%x\n", describe_fields(*(checked_type*)buf1), describe_fields(*(checked_type*)buf2));
+
 			FAIL(typesafe_sprintf(
 				"Padding is wrong in %x\nsizeof: %x\nDivergence position: %x", 
 				typeid(checked_type).name(),
 				type_size,
 				iter
 			));
-
-			LOG("Object 1: %x\n Object 2: %x", describe_fields(*(checked_type*)buf1), describe_fields(*(checked_type*)buf2));
 		}
-		
+
 		// test by delta
 		{
 			checked_type a;
@@ -543,15 +546,28 @@ TEST_CASE("CosmicDelta PaddingTest") {
 			const auto dt = augs::delta_encode(a, b);
 
 			if(dt.changed_offsets.size() > 0) {
+				LOG("Object 1:\n%x\n Object 2:\n%x\n", describe_fields(a), describe_fields(b));
+
 				FAIL(typesafe_sprintf(
 					"Padding is wrong in %x\nsizeof: %x\nDivergence position: %x", 
 					typeid(checked_type).name(),
 					type_size,
-					dt.changed_offsets[0]
+					static_cast<int>(dt.changed_offsets[0])
 				));
-
-				LOG("Object 1: %x\n Object 2: %x", describe_fields(a), describe_fields(b));
 			}
+		}
+
+		// prove by introspection that all members are continuous
+		const auto breaks = determine_breaks_in_fields_continuity_by_introspection(checked_type());
+
+		if (breaks.size() > 0) {
+			LOG(breaks);
+
+			FAIL(typesafe_sprintf(
+				"Padding is wrong in %x\nsizeof: %x\n", 
+				typeid(checked_type).name(),
+				type_size
+			));
 		}
 	};
 
@@ -710,8 +726,6 @@ TEST_CASE("CosmicDelta EmptyAndCreatedThreeEntitiesWithReferences") {
 	const bool pc1ch_intact = deco_ent1[child_entity_name::CHARACTER_CROSSHAIR] == deco_ent2.get_id();
 	REQUIRE(pc1_intact);
 	REQUIRE(pc1ch_intact);
-
-	LOG(describe_fields(s1));
 
 	REQUIRE(deco_ent2.has<components::position_copying>());
 	const bool pc2_intact = deco_ent2.get<components::position_copying>().target == deco_ent3.get_id();

@@ -78,3 +78,71 @@ auto describe_fields(const T& object) {
 
 	return result;
 }
+
+template <class T>
+auto determine_breaks_in_fields_continuity_by_introspection(const T& object) {
+	std::string result;
+	std::vector<std::string> fields;
+
+	auto make_full_field_name = [&fields](){
+		std::string name;
+
+		for (const auto& d : fields) {
+			name += d + ".";
+		}
+
+		return name;
+	};
+
+	int next_expected_offset = 0;
+
+	augs::introspect_recursive_with_prologues<
+		true_predicate,
+		true_predicate,
+		false,
+		0
+	> (
+		[&](const std::string& label, auto& field) {
+			if (is_introspective_leaf_v<std::decay_t<decltype(field)>>) {
+				const auto this_offset = (char*)&field - (char*)&object;
+
+				if (this_offset != next_expected_offset) {
+					result += typesafe_sprintf("Field breaks continuity!\nExpected offset: %x\nActual offset: %x\n%x - %x (%x) (%x) %x",
+						next_expected_offset,
+						this_offset,
+						this_offset,
+						this_offset + sizeof field,
+						sizeof field,
+						// print type name without the leading "struct ", "class " or "enum "
+						replace_all(replace_all(replace_all(std::string(typeid(field).name()), "struct ", ""), "class ", ""), "enum ", ""), 
+						make_full_field_name() + label
+					);
+
+					const auto value = to_string_or_not(field);
+
+					if (value.size() > 0) {
+						result += " = " + value + ";";
+					}
+
+					result += "\n\n";
+				}
+
+				next_expected_offset = this_offset + sizeof field;
+			}
+		},
+
+		[&](const unsigned depth, const std::string& label, auto& field) {
+			ensure(fields.size() == depth);
+			fields.push_back(label);
+		},
+
+		[&](const unsigned depth, const std::string& label, auto...) {
+			ensure(fields.back() == label);
+			fields.pop_back();
+		},
+
+		object
+	);
+	
+	return result;
+}
