@@ -394,6 +394,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/systems_inferred/relational_system.cpp"
 	"src/game/components/motor_joint_component.cpp"
 	"src/augs/misc/enum_boolset.cpp"
+	"src/game/systems_stateless/contact_explosive_system.cpp"
 )
 
 set(HYPERSOMNIA_TRIVIAL_3RDPARTY_SRCS

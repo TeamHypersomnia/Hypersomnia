@@ -14,33 +14,36 @@
 #include "game/transcendental/data_living_one_step.h"
 #include "application/config_structs/debug_drawing_settings.h"
 
-void standard_explosion(const standard_explosion_input in) {
-	const auto step = in.step;
+void standard_explosion_input::standard_explosion(
+	const logic_step step,
+	const components::transform explosion_location,
+	const entity_id subject_if_any
+) const {
 	auto& cosmos = step.cosm;
 
 	sound_effect_input sound_effect;
 	sound_effect.delete_entity_after_effect_lifetime = true;
-	sound_effect.direct_listener = in.subject_if_any;
-	sound_effect.effect.id = in.sound_effect;
-	sound_effect.effect.modifier.gain = in.sound_gain;
+	sound_effect.direct_listener = subject_if_any;
+	sound_effect.effect.id = this->sound_effect;
+	sound_effect.effect.modifier.gain = sound_gain;
 
 	sound_effect.create_sound_effect_entity(
 		step, 
-		in.explosion_location,
+		explosion_location,
 		entity_id()
 	).add_standard_components(step);
 
 	const auto delta = cosmos.get_fixed_delta();
 	const auto now = cosmos.get_timestamp();
 
-	const auto effective_radius_sq = in.effective_radius*in.effective_radius;
-	const auto subject = cosmos[in.subject_if_any];
+	const auto effective_radius_sq = effective_radius*effective_radius;
+	const auto subject = cosmos[subject_if_any];
 
 	messages::visibility_information_request request;
-	request.eye_transform = in.explosion_location;
+	request.eye_transform = explosion_location;
 	request.filter = filters::line_of_sight_query();
-	request.square_side = in.effective_radius * 2;
-	request.subject = in.subject_if_any;
+	request.square_side = effective_radius * 2;
+	request.subject = subject_if_any;
 
 	const auto response = visibility_system().respond_to_visibility_information_requests(
 		cosmos,
@@ -77,8 +80,8 @@ void standard_explosion(const standard_explosion_input in) {
 				}
 
 				const bool in_range =
-					(in.explosion_location.pos - point_a).length_sq() <= effective_radius_sq
-					|| (in.explosion_location.pos - point_b).length_sq() <= effective_radius_sq
+					(explosion_location.pos - point_a).length_sq() <= effective_radius_sq
+					|| (explosion_location.pos - point_b).length_sq() <= effective_radius_sq
 				;
 
 				const bool should_be_affected = in_range;
@@ -91,17 +94,17 @@ void standard_explosion(const standard_explosion_input in) {
 						const auto body_entity = cosmos[body_entity_id];
 						const auto& affected_physics = body_entity.get<components::rigid_body>();
 
-						auto impact = (point_b - in.explosion_location.pos).set_length(in.impact_force);
+						auto impact = (point_b - explosion_location.pos).set_length(impact_force);
 						const auto center_offset = (point_b - affected_physics.get_mass_position()) * 0.8f;
 
 						messages::damage_message damage_msg;
-						damage_msg.type = in.type;
+						damage_msg.type = type;
 						damage_msg.inflictor = subject;
 						damage_msg.subject = body_entity;
-						damage_msg.amount = in.damage;
+						damage_msg.amount = damage;
 						damage_msg.point_of_impact = point_b;
 
-						switch (in.type) {
+						switch (type) {
 							case adverse_element_type::FORCE: {
 								damage_msg.request_shake_for_ms = 400.f;
 								damage_msg.impact_velocity = impact * 2.f;
@@ -142,7 +145,7 @@ void standard_explosion(const standard_explosion_input in) {
 							break;
 						}
 
-						in.step.transient.messages.post(damage_msg);
+						step.transient.messages.post(damage_msg);
 					}
 				}
 
@@ -154,40 +157,40 @@ void standard_explosion(const standard_explosion_input in) {
 	{
 		exploding_ring_input ring;
 
-		ring.outer_radius_start_value = in.effective_radius / 2;
-		ring.outer_radius_end_value = in.effective_radius;
+		ring.outer_radius_start_value = effective_radius / 2;
+		ring.outer_radius_end_value = effective_radius;
 
 		ring.inner_radius_start_value = 0.f;
-		ring.inner_radius_end_value = in.effective_radius;
+		ring.inner_radius_end_value = effective_radius;
 		
 		ring.emit_particles_on_ring = true;
 
 		ring.maximum_duration_seconds = 0.20f;
 
-		ring.color = in.inner_ring_color;
+		ring.color = inner_ring_color;
 		ring.center = request.eye_transform.pos;
 		ring.visibility = std::move(response.vis[0]);
 
-		in.step.transient.messages.post(ring);
+		step.transient.messages.post(ring);
 	}
 
 	{
 		exploding_ring_input ring;
 
-		ring.outer_radius_start_value = in.effective_radius;
-		ring.outer_radius_end_value = in.effective_radius / 2;
+		ring.outer_radius_start_value = effective_radius;
+		ring.outer_radius_end_value = effective_radius / 2;
 
-		ring.inner_radius_start_value = in.effective_radius / 1.5f;
-		ring.inner_radius_end_value = in.effective_radius / 2;
+		ring.inner_radius_start_value = effective_radius / 1.5f;
+		ring.inner_radius_end_value = effective_radius / 2;
 		
 		ring.emit_particles_on_ring = true;
 
 		ring.maximum_duration_seconds = 0.20f;
 
-		ring.color = in.outer_ring_color;
+		ring.color = outer_ring_color;
 		ring.center = request.eye_transform.pos;
 		ring.visibility = std::move(response.vis[0]);
 
-		in.step.transient.messages.post(ring);
+		step.transient.messages.post(ring);
 	}
 }

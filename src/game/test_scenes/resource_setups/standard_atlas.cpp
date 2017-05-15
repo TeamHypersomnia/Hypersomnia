@@ -179,6 +179,13 @@ game_image_requests load_standard_images() {
 	}
 
 	{
+		auto& in = output[game_image_id::RL];
+		in.texture_maps[DIFFUSE] = { "resources/gfx/rl.png", GAME_WORLD_ATLAS };
+		in.texture_maps[NEON] = { "generated/neon_maps/rl.png", GAME_WORLD_ATLAS };
+		in.settings.gui.flip_horizontally = true;
+	}
+
+	{
 		auto& in = output[game_image_id::AMPLIFIER_ARM];
 		in.texture_maps[DIFFUSE] = { "resources/gfx/amplifier_arm.png", GAME_WORLD_ATLAS };
 		in.texture_maps[NEON] = { "generated/neon_maps/amplifier_arm.png", GAME_WORLD_ATLAS };
@@ -453,6 +460,12 @@ game_image_requests load_standard_images() {
 		auto& in = output[game_image_id::INTERFERENCE_GRENADE_RELEASED];
 		in.texture_maps[DIFFUSE] = { "resources/gfx/interference_grenade_released.png", GAME_WORLD_ATLAS };
 		in.texture_maps[NEON] = { "generated/neon_maps/interference_grenade.png", GAME_WORLD_ATLAS };
+	}
+
+	{
+		auto& in = output[game_image_id::FORCE_ROCKET];
+		in.texture_maps[DIFFUSE] = { "resources/gfx/force_rocket.png", GAME_WORLD_ATLAS };
+		in.texture_maps[NEON] = { "generated/neon_maps/force_rocket.png", GAME_WORLD_ATLAS };
 	}
 
 	{

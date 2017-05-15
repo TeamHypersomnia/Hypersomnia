@@ -125,9 +125,7 @@ void perform_spell_logic(
 			sentience.shake_for_ms = 400.f;
 			sentience.time_of_last_shake = now;
 
-			standard_explosion_input in(step);
-			in.explosion_location = caster_transform;
-			in.subject_if_any = caster;
+			standard_explosion_input in;
 			in.effective_radius = 250.f;
 			in.damage = 88.f;
 			in.impact_force = 150.f;
@@ -136,7 +134,7 @@ void perform_spell_logic(
 			in.sound_effect = assets::sound_buffer_id::EXPLOSION;
 			in.sound_gain = 1.2f;
 
-			standard_explosion(in);
+			in.standard_explosion(step, caster_transform, caster);
 		}
 
 		break;
@@ -148,9 +146,7 @@ void perform_spell_logic(
 		const auto second_at = augs::stepped_timestamp{ when_casted.step + static_cast<unsigned>(1.8f / dt.in_seconds()) };
 		const auto third_at = augs::stepped_timestamp{ when_casted.step + static_cast<unsigned>(2.3f / dt.in_seconds()) };
 		
-		standard_explosion_input in(step);
-		in.explosion_location = caster_transform;
-		in.subject_if_any = caster;
+		standard_explosion_input in;
 		in.damage = 88.f;
 		in.inner_ring_color = cyan;
 		in.outer_ring_color = white;
@@ -171,7 +167,7 @@ void perform_spell_logic(
 			in.sound_gain = 1.2f;
 			in.sound_effect = assets::sound_buffer_id::EXPLOSION;
 
-			standard_explosion(in);
+			in.standard_explosion(step, caster_transform, caster);
 		}
 		else if (now == second_at) {
 			sentience.shake_for_ms = 500.f;
@@ -182,7 +178,7 @@ void perform_spell_logic(
 			in.sound_gain = 1.0f;
 			in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
 
-			standard_explosion(in);
+			in.standard_explosion(step, caster_transform, caster);
 		}
 		else if (now == third_at) {
 			sentience.shake_for_ms = 600.f;
@@ -193,7 +189,7 @@ void perform_spell_logic(
 			in.sound_gain = 1.2f;
 			in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
 
-			standard_explosion(in);
+			in.standard_explosion(step, caster_transform, caster);
 		}
 
 		break;
