@@ -94,7 +94,8 @@ auto determine_breaks_in_fields_continuity_by_introspection(const T& object) {
 		return name;
 	};
 
-	int next_expected_offset = 0;
+	long next_expected_offset = 0;
+	long total_size_of_leaves = 0;
 
 	augs::introspect_recursive_with_prologues<
 		true_predicate,
@@ -128,6 +129,7 @@ auto determine_breaks_in_fields_continuity_by_introspection(const T& object) {
 				}
 
 				next_expected_offset = this_offset + sizeof field;
+				total_size_of_leaves += sizeof field;
 			}
 		},
 
@@ -143,6 +145,15 @@ auto determine_breaks_in_fields_continuity_by_introspection(const T& object) {
 
 		object
 	);
+
+	if (total_size_of_leaves != sizeof T) {
+		result += typesafe_sprintf(
+			"sizeofs of leaf fields do not sum up to sizeof %x!\nExpected: %x\nActual:%x",
+			typeid(T).name(),
+			sizeof T,
+			total_size_of_leaves
+		);
+	}
 	
 	return result;
 }
