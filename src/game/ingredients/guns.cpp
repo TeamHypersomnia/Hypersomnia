@@ -884,7 +884,7 @@ namespace prefabs {
 
 			damage.damage_upon_collision = false;
 
-			damage.bullet_trace_particle_effect_response.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
+			damage.bullet_trace_particle_effect_response.id = assets::particle_effect_id::MISSILE_SMOKE_TRAIL;
 			damage.bullet_trace_particle_effect_response.modifier.colorize = white;
 
 			damage.muzzle_leave_particle_effect_response.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
