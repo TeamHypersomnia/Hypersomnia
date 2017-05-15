@@ -1,25 +1,8 @@
 #pragma once
+#include "augs/templates/conditional_to_string.h"
 #include "augs/templates/string_templates.h"
 #include "augs/templates/introspect.h"
 #include "augs/misc/typesafe_sprintf.h"
-
-template <class T>
-std::string to_string_or_not(
-	const T&, 
-	std::enable_if_t<!can_stream_left<std::ostringstream, T>::value>* dummy = nullptr
-) {
-	return {};
-}
-
-template <class T>
-std::string to_string_or_not(
-	const T& t, 
-	std::enable_if_t<can_stream_left<std::ostringstream, T>::value>* dummy = nullptr
-) {
-	std::ostringstream out;
-	out << t;
-	return out.str();
-}
 
 template <class T>
 auto describe_fields(const T& object) {
@@ -54,7 +37,7 @@ auto describe_fields(const T& object) {
 				make_full_field_name() + label
 			);
 
-			const auto value = to_string_or_not(field);
+			const auto value = conditional_to_string(field);
 
 			if (value.size() > 0) {
 				result += " = " + value + ";";
@@ -119,7 +102,7 @@ auto determine_breaks_in_fields_continuity_by_introspection(const T& object) {
 						make_full_field_name() + label
 					);
 
-					const auto value = to_string_or_not(field);
+					const auto value = conditional_to_string(field);
 
 					if (value.size() > 0) {
 						result += " = " + value + ";";
