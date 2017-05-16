@@ -557,7 +557,7 @@ TEST_CASE("CosmicDelta PaddingTest") {
 			}
 		}
 
-		// prove by introspection that all members are continuous
+		// prove by introspection that all members are directly next to each other in memory
 		const auto breaks = determine_breaks_in_fields_continuity_by_introspection(checked_type());
 
 		if (breaks.size() > 0) {
@@ -572,6 +572,7 @@ TEST_CASE("CosmicDelta PaddingTest") {
 		}
 	};
 
+	LOG(describe_fields(components::sentience()));
 	for_each_through_std_get(put_all_components_into_t<std::tuple>(), padding_checker);
 }
 

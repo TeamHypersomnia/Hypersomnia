@@ -27,13 +27,16 @@ auto describe_fields(const T& object) {
 	> (
 		[&](const std::string& label, auto& field) {
 			const auto this_offset = (char*)&field - (char*)&object;
+			auto type_name = std::string(typeid(field).name());
+			// print type name without the leading "struct ", "class " or "enum "
+			str_ops(type_name).multi_replace_all({ "struct ", "class ", "enum " }, "");
 
 			result += typesafe_sprintf("%x - %x (%x) (%x) %x",
 				this_offset,
 				this_offset + sizeof field,
 				sizeof field,
 				// print type name without the leading "struct ", "class " or "enum "
-				replace_all(replace_all(replace_all(std::string(typeid(field).name()), "struct ", ""), "class ", ""), "enum ", ""), 
+				type_name, 
 				make_full_field_name() + label
 			);
 
@@ -91,14 +94,17 @@ auto determine_breaks_in_fields_continuity_by_introspection(const T& object) {
 				const auto this_offset = (char*)&field - (char*)&object;
 
 				if (this_offset != next_expected_offset) {
+					auto type_name = std::string(typeid(field).name());
+					// print type name without the leading "struct ", "class " or "enum "
+					str_ops(type_name).multi_replace_all({ "struct ", "class ", "enum " }, "");
+
 					result += typesafe_sprintf("Field breaks continuity!\nExpected offset: %x\nActual offset: %x\n%x - %x (%x) (%x) %x",
 						next_expected_offset,
 						this_offset,
 						this_offset,
 						this_offset + sizeof field,
 						sizeof field,
-						// print type name without the leading "struct ", "class " or "enum "
-						replace_all(replace_all(replace_all(std::string(typeid(field).name()), "struct ", ""), "class ", ""), "enum ", ""), 
+						type_name,
 						make_full_field_name() + label
 					);
 

@@ -402,7 +402,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 					this_step_stats += "\n";
 				}
 
-				this_step_stats = replace_all(this_step_stats, "\n", "\n<br/>");
+				str_ops(this_step_stats).replace_all("\n", "\n<br/>");
 
 				rep.fetch_stats(this_step_stats);
 			}

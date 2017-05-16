@@ -3,6 +3,8 @@
 #include <sstream>
 #include <iomanip>
 
+#include "augs/ensure.h"
+
 #include "augs/templates/container_templates.h"
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/get_underlying_char_type.h"
@@ -36,37 +38,40 @@ T to_value(const std::basic_string<CharType> s) {
 	return val;
 }
 
-template<class Str, class Repl>
-Str replace_all(Str str, Repl _from, Repl _to) {
-	const Str& from(_from);
-	const Str& to(_to);
+template <class Str>
+struct str_ops_impl {
+	Str& subject;
+	using Ch = get_underlying_char_type_t<Str>;
 
-	size_t start_pos = 0;
-	while ((start_pos = str.find(from, start_pos)) != Str::npos) {
-		str.replace(start_pos, from.length(), to);
-		start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+	auto replace_all(
+		const Str from,
+		const Str to
+	) const {
+		ensure(from.size() > 0 && "The search pattern shall not be empty!");
+
+		std::size_t pos = 0;
+
+		while ((pos = subject.find(from, pos)) != Str::npos) {
+			subject.replace(pos, from.length(), to);
+			pos += to.length();
+		}
+
+		return *this;
 	}
-	return str;
-}
 
-template<class Str, class Ch>
-Str strip_tags(Str str, Ch open_bracket, Ch close_bracket) {
-
-	size_t count = 0;
-
-	erase_remove(str, [&](const Ch c) {
-		bool skip = (count > 0) || c == open_bracket;
-
-		if (c == open_bracket) {
-			++count;
+	auto multi_replace_all(
+		const std::vector<Str>& from, 
+		const Str& to
+	) const {
+		for (const auto& f : from) {
+			replace_all(f, to);
 		}
 
-		else if (c == close_bracket && count > 0) {
-			--count;
-		}
+		return *this;
+	}
+};
 
-		return skip;
-	});
-
-	return str;
+template <class Ch>
+auto str_ops(std::basic_string<Ch>& s) {
+	return str_ops_impl<std::basic_string<Ch>> { s };
 }

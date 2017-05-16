@@ -395,6 +395,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/components/motor_joint_component.cpp"
 	"src/augs/misc/enum_boolset.cpp"
 	"src/game/systems_stateless/contact_explosive_system.cpp"
+	"src/augs/templates/string_templates.cpp"
 )
 
 set(HYPERSOMNIA_TRIVIAL_3RDPARTY_SRCS

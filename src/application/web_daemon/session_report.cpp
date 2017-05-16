@@ -108,8 +108,10 @@ bool session_report::start_daemon(const config_lua_table& cfg) {
 		t << survey_num;
 	}
 
-	contents = replace_all(contents, survey_num_token, std::to_string(survey_num));
-	contents = replace_all(contents, port_token, std::to_string(cfg.server_port));
+	str_ops(contents)
+		.replace_all(survey_num_token, std::to_string(survey_num))
+		.replace_all(port_token, std::to_string(cfg.server_port))
+	;
 
 	auto it = contents.find(stats_token);
 

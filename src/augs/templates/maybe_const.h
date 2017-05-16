@@ -35,3 +35,9 @@ struct is_const_ref
 	: std::bool_constant<std::is_const_v<std::remove_reference_t<T>>>
 {
 };
+
+template <class T>
+struct is_const_ptr 
+	: std::bool_constant<std::is_const_v<std::remove_pointer_t<T>>>
+{
+};

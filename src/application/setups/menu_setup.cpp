@@ -103,10 +103,9 @@ void menu_setup::process(
 
 		result = result.substr(it + delim.length());
 
-		result = replace_all(result, "\n", "");
-		result = replace_all(result, "\r", "");
-
-		result = strip_tags(result, '<', '>');
+		str_ops(result)
+			.multi_replace_all({ "\r", "\n" }, "")
+		;
 
 		if (result.size() > 0) {
 			const auto wresult = to_wstring(result);
