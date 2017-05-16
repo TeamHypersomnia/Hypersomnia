@@ -839,7 +839,7 @@ namespace prefabs {
 
 		auto& gun = weapon += components::gun();
 
-		gun.muzzle_shot_sound_response.id = assets::sound_buffer_id::RL_MUZZLE;
+		gun.muzzle_shot_sound_response.id = assets::sound_buffer_id::ROCKET_LAUNCHER_MUZZLE;
 
 		gun.action_mode = gun_action_type::BOLT_ACTION;
 		gun.muzzle_velocity = std::make_pair(2500.f / 2, 2500.f / 2);

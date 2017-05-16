@@ -25,8 +25,8 @@ void set_standard_sound_buffers(assets_manager& manager) {
 	}
 
 	{
-		auto& buf = manager[assets::sound_buffer_id::RL_MUZZLE];
-		buf.from_file("resources/sfx/rl_muzzle.wav");
+		auto& buf = manager[assets::sound_buffer_id::ROCKET_LAUNCHER_MUZZLE];
+		buf.from_file("resources/sfx/rocket_launcher_muzzle.wav");
 	}
 
 	{
