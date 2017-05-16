@@ -150,6 +150,7 @@ void perform_spell_logic(
 		in.damage = 88.f;
 		in.inner_ring_color = cyan;
 		in.outer_ring_color = white;
+		in.type = adverse_element_type::FORCE;
 
 		if (now == when_casted) {
 			ignite_sparkle_particles();
