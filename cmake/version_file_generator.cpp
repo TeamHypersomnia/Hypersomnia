@@ -36,8 +36,11 @@ int main(int argc, char** argv) {
 	const auto git_commit_number = augs::exec(git_executable_path + " rev-list --count master");
 	
 	auto git_commit_message = augs::exec(git_executable_path + " log -1 --format=%s");
-	// We shall add the backslash before " to avoid compilation errors
-	str_ops(git_commit_message).replace_all("\"", "\\\"");
+	// We shall add the backslash both before \ and " to avoid compilation errors
+	str_ops(git_commit_message)
+		.replace_all("\\", "\\\\")
+		.replace_all("\"", "\\\"")
+	;
 
 	const auto git_commit_date = augs::exec(git_executable_path + " log -1 --format=%ad --date=local");
 	const auto git_commit_hash = augs::exec(git_executable_path + " rev-parse --verify HEAD");
