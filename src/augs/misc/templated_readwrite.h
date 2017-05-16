@@ -413,7 +413,7 @@ namespace augs {
 	) {
 		augs::introspect_recursive<
 			bind_types_t<can_stream_right, Archive>,
-			always_recurse,
+			is_not_predicate_t<padding_byte>,
 			stop_recursion_if_valid
 		>(
 			[&](auto, auto& member) {

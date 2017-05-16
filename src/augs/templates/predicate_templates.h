@@ -107,7 +107,7 @@ template <
 	template <class...> class LogicalOp,
 	template <class...> class... Predicates
 >
-struct of_predicates {
+struct of_unary_predicates {
 	template <class T>
 	struct type
 		: LogicalOp<Predicates<T>...>
@@ -119,7 +119,7 @@ template <
 	template <class...> class LogicalOp,
 	template <class...> class... Predicates
 >
-using of_predicates_t = typename of_predicates<LogicalOp, Predicates...>::type;
+using of_unary_predicates_t = typename of_unary_predicates<LogicalOp, Predicates...>::type;
 
 template <class...>
 struct true_predicate : std::true_type {
@@ -141,3 +141,6 @@ struct bool_predicate : std::false_type {
 
 template <bool flag>
 using bool_predicate_t = typename bool_predicate<flag>::type;
+
+template <class T>
+using is_not_predicate_t = apply_negation_t<bind_types_t<std::is_same, T>>;
