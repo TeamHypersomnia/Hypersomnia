@@ -572,7 +572,6 @@ TEST_CASE("CosmicDelta PaddingTest") {
 		}
 	};
 
-	LOG(describe_fields(components::sentience()));
 	for_each_through_std_get(put_all_components_into_t<std::tuple>(), padding_checker);
 }
 
