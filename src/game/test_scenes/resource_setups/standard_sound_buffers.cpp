@@ -25,10 +25,20 @@ void set_standard_sound_buffers(assets_manager& manager) {
 	}
 
 	{
+		auto& buf = manager[assets::sound_buffer_id::RL_MUZZLE];
+		buf.from_file("resources/sfx/rl_muzzle.wav");
+	}
+
+	{
 		auto& buf = manager[assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT];
 		buf.from_file("resources/sfx/electric_projectile_flight.wav");
 	}
-
+	
+	{
+		auto& buf = manager[assets::sound_buffer_id::MISSILE_THRUSTER];
+		buf.from_file("resources/sfx/missile_thruster.wav");
+	}
+	
 	{
 		auto& buf = manager[assets::sound_buffer_id::BULLET_PASSES_THROUGH_HELD_ITEM];
 		buf.from_file("resources/sfx/bullet_hits_held_item.wav");

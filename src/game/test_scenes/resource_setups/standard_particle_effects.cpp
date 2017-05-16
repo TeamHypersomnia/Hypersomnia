@@ -915,5 +915,35 @@ void set_standard_particle_effects(assets_manager& manager) {
 
 		effect.emissions.push_back(em);
 	}
+
+	{
+		auto& effect = manager[assets::particle_effect_id::MISSILE_SMOKE_TRAIL];
+
+		particles_emission em;
+		em.spread_degrees = std::make_pair(7, 7);
+		em.particles_per_sec = std::make_pair(70, 80);
+		em.stream_lifetime_ms = std::make_pair(2000, 2000);
+		em.base_speed = std::make_pair(0, 0);
+		em.rotation_speed = std::make_pair(1.5f*RAD_TO_DEG<float>, 2.3f*RAD_TO_DEG<float>);
+		em.particle_lifetime_ms = std::make_pair(700, 700);
+		em.size_multiplier = std::make_pair(0.3f, 0.3f);
+
+		for (int i = 0; i < 3; ++i) {
+			general_particle particle_definition;
+
+			particle_definition.angular_damping = 0;
+			particle_definition.linear_damping = 10;
+			particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 30));
+			particle_definition.unshrinking_time_ms = 10;
+			particle_definition.shrink_when_ms_remaining = 50;
+
+			em.add_particle_definition(particle_definition);
+		}
+
+		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+		em.initial_rotation_variation = 0;
+
+		effect.emissions.push_back(em);
+	}
 }
 #endif

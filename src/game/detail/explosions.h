@@ -9,15 +9,7 @@
 #include "game/detail/sentience_meter.h"
 
 struct standard_explosion_input {
-	const logic_step step;
-	
-	standard_explosion_input(const logic_step step)
-		: step(step)
-	{
-	}
-	
-	components::transform explosion_location;
-	entity_id subject_if_any = entity_id();
+	// GEN INTROSPECTOR struct standard_explosion_input
 	float effective_radius = 250.f;
 	meter_value_type damage = 88;
 	float impact_force = 150.f;
@@ -26,6 +18,7 @@ struct standard_explosion_input {
 	assets::sound_buffer_id sound_effect = assets::sound_buffer_id::EXPLOSION;
 	float sound_gain = 1.f;
 	adverse_element_type type = adverse_element_type::FORCE;
-};
+	// END GEN INTROSPECTOR
 
-void standard_explosion(const standard_explosion_input);
+	void standard_explosion(logic_step, components::transform, entity_id subject_if_any) const;
+};
