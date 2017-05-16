@@ -4,7 +4,7 @@
 
 void cleanup_proc();
 
-#if ENABLE_ENSURE
+#if ENABLE_ENSURE && !FORCE_DISABLE_ENSURE
 #define ensure(x) if(!(x))\
 {\
     LOG( "ensure(%x) failed\nfile: %x\nline: %x", #x, __FILE__, __LINE__ );\

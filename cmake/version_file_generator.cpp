@@ -1,7 +1,10 @@
+#define FORCE_DISABLE_ENSURE 1
+
 #include "augs/window_framework/exec.h"
 #include "augs/filesystem/file.h"
 #include "augs/misc/typesafe_sprintf.h"
 #include "augs/misc/time_utils.h"
+#include "augs/templates/string_templates.h"
 
 int main(int argc, char** argv) {
 	if (argc < 2) {
@@ -31,7 +34,11 @@ int main(int argc, char** argv) {
 	debug_argv_content += "\n";
 
 	const auto git_commit_number = augs::exec(git_executable_path + " rev-list --count master");
-	const auto git_commit_message = augs::exec(git_executable_path + " log -1 --format=%s");
+	
+	auto git_commit_message = augs::exec(git_executable_path + " log -1 --format=%s");
+	// We shall add the backslash before " to avoid compilation errors
+	str_ops(git_commit_message).replace_all("\"", "\\\"");
+
 	const auto git_commit_date = augs::exec(git_executable_path + " log -1 --format=%ad --date=local");
 	const auto git_commit_hash = augs::exec(git_executable_path + " rev-parse --verify HEAD");
 
