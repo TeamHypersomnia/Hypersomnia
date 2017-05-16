@@ -179,9 +179,9 @@ game_image_requests load_standard_images() {
 	}
 
 	{
-		auto& in = output[game_image_id::RL];
-		in.texture_maps[DIFFUSE] = { "resources/gfx/rl.png", GAME_WORLD_ATLAS };
-		in.texture_maps[NEON] = { "generated/neon_maps/rl.png", GAME_WORLD_ATLAS };
+		auto& in = output[game_image_id::ROCKET_LAUNCHER];
+		in.texture_maps[DIFFUSE] = { "resources/gfx/rocket_launcher.png", GAME_WORLD_ATLAS };
+		in.texture_maps[NEON] = { "generated/neon_maps/rocket_launcher.png", GAME_WORLD_ATLAS };
 		in.settings.gui.flip_horizontally = true;
 	}
 

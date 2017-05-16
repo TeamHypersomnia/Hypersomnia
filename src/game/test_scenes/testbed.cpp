@@ -105,7 +105,7 @@ namespace test_scenes {
 				const auto angel = angel_offset + 360.f / quantity * i;
 				const components::transform transform = {pos + vec2{distance_from_center, 0}.rotate(angel, vec2{}), angel};
 
-				prefabs::create_rl(step, transform, entity_id());
+				prefabs::create_rocket_launcher(step, transform, entity_id());
 			}
 		}
 

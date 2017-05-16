@@ -29,7 +29,7 @@ enum class entity_name {
 	AMPLIFIER_ARM,
 	STANDARD_ARM_BACK,
 	STANDARD_ARM_FRONT,
-	RL,
+	ROCKET_LAUNCHER,
 	ROCKET,
 };
 

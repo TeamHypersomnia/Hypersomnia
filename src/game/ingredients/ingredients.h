@@ -108,6 +108,6 @@ namespace prefabs {
 	entity_handle create_ped_grenade(const logic_step, const vec2 pos);
 	entity_handle create_interference_grenade(const logic_step, const vec2 pos);
 
-	entity_handle create_rl(logic_step, components::transform, entity_id load_rocket);
+	entity_handle create_rocket_launcher(logic_step, components::transform, entity_id load_rocket);
 	entity_handle create_force_rocket(logic_step, components::transform);
 }

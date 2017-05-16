@@ -809,13 +809,13 @@ namespace prefabs {
 		return weapon;
 	}
 
-	entity_handle create_rl(const logic_step step, const components::transform transform, const entity_id load_rocket_id) {
+	entity_handle create_rocket_launcher(const logic_step step, const components::transform transform, const entity_id load_rocket_id) {
 		auto& metas = step.input.metas_of_assets;
 		auto& cosmos = step.cosm;
-		auto weapon = cosmos.create_entity("rl");
-		name_entity(weapon, entity_name::RL);
+		auto weapon = cosmos.create_entity("rocket_launcher");
+		name_entity(weapon, entity_name::ROCKET_LAUNCHER);
 
-		auto& sprite = ingredients::add_sprite(weapon, assets::game_image_id::RL, white, render_layer::SMALL_DYNAMIC_BODY);
+		auto& sprite = ingredients::add_sprite(weapon, assets::game_image_id::ROCKET_LAUNCHER, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(step, weapon, transform);
 
 		// ingredients::add_default_gun_container(step, weapon);
