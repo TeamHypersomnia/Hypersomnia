@@ -24,8 +24,16 @@ namespace prefabs {
 		const auto grenade_entity = world.create_entity("force_grenade");
 
 		auto& grenade = grenade_entity += components::grenade();
-		
-		grenade.type = adverse_element_type::FORCE;
+		auto& in = grenade.explosion;
+		in.type = adverse_element_type::FORCE;
+		in.damage = 88.f;
+		in.inner_ring_color = red;
+		in.outer_ring_color = orange;
+		in.effective_radius = 300.f;
+		in.impact_force = 550.f;
+		in.sound_gain = 1.8f;
+		in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
+
 		grenade.spoon = grenade_spoon;
 		
 		//{
@@ -60,7 +68,17 @@ namespace prefabs {
 		const auto grenade_entity = world.create_entity("ped_grenade");
 		auto& grenade = grenade_entity += components::grenade();
 
-		grenade.type = adverse_element_type::PED;
+		auto& in = grenade.explosion;
+		in.damage = 88.f;
+		in.inner_ring_color = cyan;
+		in.outer_ring_color = turquoise;
+		in.effective_radius = 350.f;
+		in.impact_force = 20.f;
+		in.sound_gain = 2.2f;
+		in.sound_effect = assets::sound_buffer_id::PED_EXPLOSION;
+		in.type = adverse_element_type::PED;
+		in.create_thunders_effect = true;
+		
 		grenade.spoon = grenade_spoon;
 
 		name_entity(grenade_entity, entity_name::PED_GRENADE);
@@ -87,9 +105,19 @@ namespace prefabs {
 		auto& world = step.cosm;
 		const auto grenade_spoon = world.create_entity("grenade_spoon");
 		const auto grenade_entity = world.create_entity("interference_grenade");
+		
 		auto& grenade = grenade_entity += components::grenade();
+		auto& in = grenade.explosion;
 
-		grenade.type = adverse_element_type::INTERFERENCE;
+		in.damage = 100.f;
+		in.inner_ring_color = yellow;
+		in.outer_ring_color = orange;
+		in.effective_radius = 450.f;
+		in.impact_force = 20.f;
+		in.sound_gain = 2.2f;
+		in.sound_effect = assets::sound_buffer_id::INTERFERENCE_EXPLOSION;
+		in.type = adverse_element_type::INTERFERENCE;
+		
 		grenade.spoon = grenade_spoon;
 
 		name_entity(grenade_entity, entity_name::INTERFERENCE_GRENADE);

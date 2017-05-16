@@ -17,7 +17,9 @@ struct standard_explosion_input {
 	rgba outer_ring_color = white;
 	assets::sound_buffer_id sound_effect = assets::sound_buffer_id::EXPLOSION;
 	float sound_gain = 1.f;
-	adverse_element_type type = adverse_element_type::FORCE;
+	adverse_element_type type = adverse_element_type::INVALID;
+	bool create_thunders_effect = false;
+	std::array<padding_byte, 2> pad;
 	// END GEN INTROSPECTOR
 
 	void instantiate(

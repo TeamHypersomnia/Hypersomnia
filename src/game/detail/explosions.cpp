@@ -13,12 +13,36 @@
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/data_living_one_step.h"
 #include "application/config_structs/debug_drawing_settings.h"
+#include "game/messages/thunder_input.h"
 
 void standard_explosion_input::instantiate(
 	const logic_step step,
 	const components::transform explosion_location,
 	const entity_id subject_if_any
 ) const {
+	if (create_thunders_effect) {
+		for (int t = 0; t < 4; ++t) {
+			static randomization rng;
+			thunder_input th;
+
+			th.delay_between_branches_ms = std::make_pair(10.f, 25.f);
+			th.max_branch_lifetime_ms = std::make_pair(40.f, 65.f);
+			th.branch_length = std::make_pair(10.f, 120.f);
+
+			th.max_all_spawned_branches = 40 + (t+1)*10;
+			th.max_branch_children = 2;
+
+			th.first_branch_root = explosion_location;
+			th.first_branch_root.pos += rng.random_point_in_circle(70.f);
+			th.first_branch_root.rotation += t * 360/4;
+			th.branch_angle_spread = 40.f;
+
+			th.color = t % 2 ? cyan : turquoise;
+
+			step.transient.messages.post(th);
+		}
+	}
+
 	auto& cosmos = step.cosm;
 
 	sound_effect_input sound_effect;
