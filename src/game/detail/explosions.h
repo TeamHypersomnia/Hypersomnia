@@ -20,5 +20,9 @@ struct standard_explosion_input {
 	adverse_element_type type = adverse_element_type::FORCE;
 	// END GEN INTROSPECTOR
 
-	void standard_explosion(logic_step, components::transform, entity_id subject_if_any) const;
+	void instantiate(
+		const logic_step step, 
+		const components::transform explosion_location, 
+		const entity_id subject_if_any
+	) const;
 };

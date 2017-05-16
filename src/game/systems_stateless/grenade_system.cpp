@@ -80,7 +80,7 @@ void grenade_system::init_explosions(const logic_step step) {
 					in.sound_effect = assets::sound_buffer_id::INTERFERENCE_EXPLOSION;
 				}
 
-				in.standard_explosion(step, explosion_location, entity_id());
+				in.instantiate(step, explosion_location, entity_id());
 
 				step.transient.messages.post(messages::queue_destruction(it));
 			}

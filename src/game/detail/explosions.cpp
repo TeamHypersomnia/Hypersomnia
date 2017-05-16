@@ -14,7 +14,7 @@
 #include "game/transcendental/data_living_one_step.h"
 #include "application/config_structs/debug_drawing_settings.h"
 
-void standard_explosion_input::standard_explosion(
+void standard_explosion_input::instantiate(
 	const logic_step step,
 	const components::transform explosion_location,
 	const entity_id subject_if_any

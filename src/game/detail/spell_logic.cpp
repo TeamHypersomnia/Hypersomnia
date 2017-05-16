@@ -134,7 +134,7 @@ void perform_spell_logic(
 			in.sound_effect = assets::sound_buffer_id::EXPLOSION;
 			in.sound_gain = 1.2f;
 
-			in.standard_explosion(step, caster_transform, caster);
+			in.instantiate(step, caster_transform, caster);
 		}
 
 		break;
@@ -167,7 +167,7 @@ void perform_spell_logic(
 			in.sound_gain = 1.2f;
 			in.sound_effect = assets::sound_buffer_id::EXPLOSION;
 
-			in.standard_explosion(step, caster_transform, caster);
+			in.instantiate(step, caster_transform, caster);
 		}
 		else if (now == second_at) {
 			sentience.shake_for_ms = 500.f;
@@ -178,7 +178,7 @@ void perform_spell_logic(
 			in.sound_gain = 1.0f;
 			in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
 
-			in.standard_explosion(step, caster_transform, caster);
+			in.instantiate(step, caster_transform, caster);
 		}
 		else if (now == third_at) {
 			sentience.shake_for_ms = 600.f;
@@ -189,7 +189,7 @@ void perform_spell_logic(
 			in.sound_gain = 1.2f;
 			in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
 
-			in.standard_explosion(step, caster_transform, caster);
+			in.instantiate(step, caster_transform, caster);
 		}
 
 		break;

@@ -34,7 +34,7 @@ void contact_explosive_system::init_explosions(const logic_step step) {
 		already_processed.push_back(it.collider);
 
 		const auto& contact_explosive = collider_handle.get<components::contact_explosive>();
-		contact_explosive.explosion_defenition.standard_explosion(step, collider_handle.get_logic_transform(), entity_id());
+		contact_explosive.explosion_defenition.instantiate(step, collider_handle.get_logic_transform(), entity_id());
 
 		step.transient.messages.post(messages::queue_destruction(it.collider));
 	}
