@@ -19,27 +19,29 @@ void basic_inventory_slot_handle<C>::unset() {
 
 template <bool C>
 bool basic_inventory_slot_handle<C>::is_hand_slot() const {
-	return
-		raw_id.type == slot_function::WIELDED_ITEM
-	;
+	return get_hand_index() != 0xdeadbeef;
 }
 
 template <bool C>
-size_t basic_inventory_slot_handle<C>::get_hand_index() const {
+std::size_t basic_inventory_slot_handle<C>::get_hand_index() const {
 	const auto arm_front_slot = get_container().get_current_slot();
-	ensure(arm_front_slot.raw_id.type == slot_function::ARM_FRONT);
-	const auto arm_back_slot = arm_front_slot.get_container().get_current_slot().raw_id;
 
-	if (arm_back_slot.type == slot_function::PRIMARY_ARM_BACK) {
-		return 0;
+	std::size_t index = 0xdeadbeef;
+
+	if (arm_front_slot.alive() && arm_front_slot.raw_id.type == slot_function::ARM_FRONT) {
+		const auto arm_back_slot = arm_front_slot.get_container().get_current_slot();
+
+		if (arm_back_slot.alive()) {
+			if (arm_back_slot.raw_id.type == slot_function::PRIMARY_ARM_BACK) {
+				index = 0;
+			}
+			else if (arm_back_slot.raw_id.type == slot_function::SECONDARY_ARM_BACK) {
+				index = 1;
+			}
+		}
 	}
-	else if (arm_back_slot.type == slot_function::SECONDARY_ARM_BACK) {
-		return 1;
-	}
-	else {
-		ensure(false);
-		return 0xdeadbeef;
-	}
+	
+	return index;
 }
 
 template <bool C>

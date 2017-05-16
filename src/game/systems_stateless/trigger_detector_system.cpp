@@ -18,7 +18,6 @@
 #include "game/components/transform_component.h"
 
 #include "game/components/item_component.h"
-#include "game/components/trigger_collision_detector_component.h"
 #include "game/components/trigger_query_detector_component.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
@@ -55,13 +54,6 @@ void trigger_detector_system::consume_trigger_detector_presses(const logic_step 
 				}
 			}
 		}
-		else if (e.intent == intent_type::DETECT_TRIGGER_COLLISIONS) {
-			auto* const trigger_collision_detector = subject.find<components::trigger_collision_detector>();
-
-			if (trigger_collision_detector) {
-				trigger_collision_detector->detection_intent_enabled = e.is_pressed;
-			}
-		}
 	}
 }
 
@@ -88,52 +80,6 @@ void trigger_detector_system::post_trigger_requests_from_continuous_detectors(co
 void trigger_detector_system::send_trigger_confirmations(const logic_step step) const {
 	auto& cosmos = step.cosm;
 	const auto& physics = cosmos.systems_inferred.get<physics_system>();
-	const auto& collisions = step.transient.messages.get_queue<messages::collision_message>();
-
-	for (const auto& c : collisions) {
-		if (c.type != messages::collision_message::event_type::PRE_SOLVE) {
-			continue;
-		}
-
-		entity_id actual_detector = c.subject;
-
-		const auto subject = cosmos[c.subject];
-
-		const auto* collision_detector = subject.find<components::trigger_collision_detector>();
-		const auto* const trigger = cosmos[c.collider].find<components::trigger>();
-		const auto* const maybe_item = subject.find<components::item>();
-
-		if (collision_detector == nullptr) {
-			const bool is_it_arm_touching =
-				maybe_item != nullptr
-				&& (
-					maybe_item->categories_for_slot_compatibility.test(item_category::ARM_BACK)
-					|| maybe_item->categories_for_slot_compatibility.test(item_category::ARM_FRONT)
-				)
-			;
-
-			if (is_it_arm_touching) {
-				const auto capability = subject.get_owning_transfer_capability();
-
-				if (capability.alive()) {
-					actual_detector = capability;
-					collision_detector = capability.find<components::trigger_collision_detector>();
-				}
-			}
-		}
-
-		if (
-			collision_detector != nullptr 
-			&& trigger != nullptr
-			&& trigger->react_to_collision_detectors 
-			&& collision_detector->detection_intent_enabled
-		) {
-			messages::trigger_hit_confirmation_message confirmation;
-			confirmation.detector_body = actual_detector;
-			confirmation.trigger = c.collider;
-			step.transient.messages.post(confirmation);
-		}
-	}
 
 	const auto& requests = step.transient.messages.get_queue<messages::trigger_hit_request_message>();
 

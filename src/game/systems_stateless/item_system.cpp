@@ -1,8 +1,7 @@
 #include "item_system.h"
 
 #include "game/messages/intent_message.h"
-#include "game/messages/trigger_hit_confirmation_message.h"
-#include "game/messages/trigger_hit_request_message.h"
+#include "game/messages/collision_message.h"
 
 #include "game/detail/inventory/item_slot_transfer_request.h"
 #include "game/messages/queue_destruction.h"
@@ -38,43 +37,98 @@
 #include "game/detail/physics/physics_scripts.h"
 #include "augs/templates/container_templates.h"
 
-void item_system::handle_trigger_confirmations_as_pick_requests(const logic_step step) {
-	auto& cosmos = step.cosm;
-	const auto& delta = step.get_delta();
-	const auto& confirmations = step.transient.messages.get_queue<messages::trigger_hit_confirmation_message>();
+void item_system::start_picking_up_items(const logic_step step) {
+	const auto& intents = step.transient.messages.get_queue<messages::intent_message>();
+	auto& cosm = step.cosm;
 
-	for (const auto& e : confirmations) {
-		const auto detector = cosmos[e.detector_body];
+	for (const auto& i : intents) {
+		if (i.intent == intent_type::START_PICKING_UP_ITEMS) {
+			const auto it = cosm[i.subject];
 
-		if (detector.has<components::sentience>()) {
-			if (!detector.get<components::sentience>().is_conscious()) {
-				continue;
+			const auto maybe_transfers = it.find<components::item_slot_transfers>();
+
+			if (maybe_transfers != nullptr) {
+				maybe_transfers->picking_up_touching_items_enabled = i.is_pressed;
 			}
 		}
+	}
+}
 
-		auto* const item_slot_transfers = detector.find<components::item_slot_transfers>();
-		const auto item_entity = cosmos[e.trigger].get_owner_body();
+void item_system::pick_up_touching_items(const logic_step step) {
+	auto& cosmos = step.cosm;
+	const auto& delta = step.get_delta();
+	const auto& collisions = step.transient.messages.get_queue<messages::collision_message>();
 
-		const bool trigger_has_item = item_entity.has<components::item>();
+	for (const auto& c : collisions) {
+		if (c.type != messages::collision_message::event_type::PRE_SOLVE) {
+			continue;
+		}
 
-		if (item_slot_transfers != nullptr && trigger_has_item && item_entity.get_owning_transfer_capability().dead()) {
-			const auto& pick_list = item_slot_transfers->only_pick_these_items;
-			const bool found_on_subscription_list = found_in(pick_list, item_entity);
+		entity_id picker_id = c.subject;
 
-			const bool item_subscribed = 
-				(pick_list.empty() && item_slot_transfers->pick_all_touched_items_if_list_to_pick_empty)
-				|| found_on_subscription_list
-			;
-			
-			if (item_subscribed) {
-				const auto pickup_slot = detector.determine_pickup_target_slot_for(item_entity);
+		const auto picker = cosmos[picker_id];
+		const auto item = cosmos[c.collider];
 
-				if (pickup_slot.alive()) {
-					const bool can_pick_already = item_slot_transfers->pickup_timeout.try_to_fire_and_reset(cosmos.get_timestamp(), delta);
+		const auto* const maybe_item = item.find<components::item>();
 
-					if (can_pick_already) {
-						const item_slot_transfer_request request{ item_entity, pickup_slot };
-						perform_transfer(request, step);
+		if (maybe_item != nullptr && item.get_owning_transfer_capability().dead()) {
+			auto* maybe_transfers = picker.find<components::item_slot_transfers>();
+
+			if (maybe_transfers == nullptr) {
+				const auto* maybe_item_of_picker = picker.find<components::item>();
+
+				if (maybe_item_of_picker != nullptr) {
+					const bool is_it_arm_touching =
+						maybe_item != nullptr
+						&& (
+							maybe_item_of_picker->categories_for_slot_compatibility.test(item_category::ARM_BACK)
+							|| maybe_item_of_picker->categories_for_slot_compatibility.test(item_category::ARM_FRONT)
+						)
+					;
+
+					if (is_it_arm_touching) {
+						picker_id = picker.get_owning_transfer_capability();
+
+						const bool is_it_arm_of_somebody = cosmos[picker_id].alive();
+						
+						if (is_it_arm_of_somebody) {
+							maybe_transfers = cosmos[picker_id].find<components::item_slot_transfers>();
+							ensure(maybe_transfers != nullptr);
+						}
+					}
+				}
+			}
+
+			if (
+				maybe_transfers != nullptr
+				&& maybe_transfers->picking_up_touching_items_enabled	
+			) {
+				const auto actual_picker = cosmos[picker_id];
+
+				if (actual_picker.has<components::sentience>()) {
+					if (!actual_picker.get<components::sentience>().is_conscious()) {
+						continue;
+					}
+				}
+
+				const auto& pick_list = maybe_transfers->only_pick_these_items;
+				const bool found_on_subscription_list = found_in(pick_list, item);
+
+				const bool item_subscribed = 
+					(pick_list.empty() && maybe_transfers->pick_all_touched_items_if_list_to_pick_empty)
+					|| found_on_subscription_list
+				;
+
+				if (item_subscribed) {
+					const auto pickup_slot = actual_picker.determine_pickup_target_slot_for(item);
+
+					if (pickup_slot.alive()) {
+						const bool can_pick_already = maybe_transfers->pickup_timeout.try_to_fire_and_reset(cosmos.get_timestamp(), delta);
+
+						if (can_pick_already) {
+							const item_slot_transfer_request request{ item, pickup_slot };
+							perform_transfer(request, step);
+						}
 					}
 				}
 			}

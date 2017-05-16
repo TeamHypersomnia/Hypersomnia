@@ -7,7 +7,6 @@
 #include "game/components/container_component.h"
 #include "game/components/trigger_query_detector_component.h"
 #include "game/components/melee_component.h"
-#include "game/components/trigger_collision_detector_component.h"
 #include "game/components/grenade_component.h"
 
 #include "game/transcendental/cosmos.h"
@@ -31,7 +30,6 @@ void intent_contextualization_system::contextualize_use_button_intents(const log
 		const auto subject = cosmos[e.subject];
 
 		const auto* const query_detector = subject.find<components::trigger_query_detector>();
-		const auto* const collision_detector = subject.find<components::trigger_collision_detector>();
 		
 		if (e.intent == intent_type::USE_BUTTON) {
 			const auto* const maybe_driver = subject.find<components::driver>();
@@ -48,12 +46,6 @@ void intent_contextualization_system::contextualize_use_button_intents(const log
 
 			if (query_detector) {
 				e.intent = intent_type::QUERY_TOUCHING_TRIGGERS;
-				continue;
-			}
-		}
-		else if (e.intent == intent_type::START_PICKING_UP_ITEMS) {
-			if (collision_detector) {
-				e.intent = intent_type::DETECT_TRIGGER_COLLISIONS;
 				continue;
 			}
 		}

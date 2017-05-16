@@ -83,7 +83,7 @@ namespace test_scenes {
 			}
 		}
 
-		const auto amplifier = prefabs::create_amplifier_arm(step, vec2(-300, -500 + 50));
+		//const auto amplifier = prefabs::create_amplifier_arm(step, vec2(-300, -500 + 50));
 
 		const auto backpack = prefabs::create_sample_backpack(step, vec2(200, -650));
 
@@ -93,15 +93,15 @@ namespace test_scenes {
 		
 		//prefabs::create_kek9(step, vec2(300, -500 + 50));
 		//
-		prefabs::create_kek9(step, vec2(100, -500),
-			prefabs::create_small_magazine(step, vec2(100, -650), "0.4",
-				prefabs::create_pink_charge(step, vec2(0, 0), 30)));
+		//prefabs::create_kek9(step, vec2(100, -500),
+		//	prefabs::create_small_magazine(step, vec2(100, -650), "0.4",
+		//		prefabs::create_pink_charge(step, vec2(0, 0), 30)));
 
 		//perform_transfer({ backpack, character(0)[slot_function::SHOULDER] }, step);
 
-		const auto rifle = prefabs::create_sample_rifle(step, vec2(100, -500),
-			prefabs::create_sample_magazine(step, vec2(100, -650), false ? "10" : "0.3",
-				prefabs::create_cyan_charge(step, vec2(0, 0), false ? 1000 : 30)));
+		//const auto rifle = prefabs::create_sample_rifle(step, vec2(100, -500),
+		//	prefabs::create_sample_magazine(step, vec2(100, -650), false ? "10" : "0.3",
+		//		prefabs::create_cyan_charge(step, vec2(0, 0), false ? 1000 : 30)));
 		//
 		//
 		//prefabs::create_submachine(step, vec2(100, -700),

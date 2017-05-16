@@ -466,7 +466,8 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	trigger_detector_system().send_trigger_confirmations(step);
 
 //	item_system().translate_gui_intents_to_transfer_requests(step);
-	item_system().handle_trigger_confirmations_as_pick_requests(step);
+	item_system().start_picking_up_items(step);
+	item_system().pick_up_touching_items(step);
 
 	damage_system().destroy_outdated_bullets(step);
 	damage_system().destroy_colliding_bullets_and_send_damage(step);

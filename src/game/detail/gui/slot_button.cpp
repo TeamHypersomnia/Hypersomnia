@@ -30,7 +30,7 @@ void slot_button::draw(const viewing_game_gui_context context, const const_this_
 	const auto& cosmos = context.get_cosmos();
 
 	const auto slot_id = cosmos[this_id.get_location().slot_id];
-	const bool is_hand_slot = slot_id.is_hand_slot();
+	const auto hand_index = slot_id.get_hand_index();
 	const auto& detector = this_id->detector;
 
 	rgba inside_col, border_col;
@@ -63,11 +63,11 @@ void slot_button::draw(const viewing_game_gui_context context, const const_this_
 
 		const auto slot_type = slot_id.get_id().type;
 
-		if (slot_id.is_hand_slot() && slot_id.get_hand_index() == 0) {
+		if (hand_index == 0) {
 			draw_centered_texture(context, this_id, info, augs::gui::material(assets::game_image_id::PRIMARY_HAND_ICON, border_col), vec2i(1, 0));
 		}
 
-		if (slot_id.is_hand_slot() && slot_id.get_hand_index() == 1) {
+		if (hand_index == 1) {
 			draw_centered_texture(context, this_id, info, augs::gui::material(assets::game_image_id::SECONDARY_HAND_ICON, border_col));
 		}
 

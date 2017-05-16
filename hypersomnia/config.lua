@@ -61,7 +61,7 @@ config_table = {
 	input_recording_mode = recording_type.LIVE,
 
 	-- initial replaying speed of the machine entropies recording
-	recording_replay_speed = 1,
+	recording_replay_speed = 6,
 
 	-- see LOCAL_DETERMINISM_TEST
 	determinism_test_cloned_cosmoi_count = 2,

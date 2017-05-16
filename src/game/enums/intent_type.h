@@ -21,7 +21,6 @@ enum class intent_type : unsigned char {
 	USE_BUTTON,
 	// contextual
 	QUERY_TOUCHING_TRIGGERS,
-	DETECT_TRIGGER_COLLISIONS,
 	RELEASE_CAR,
 
 	SPACE_BUTTON,

@@ -7,6 +7,7 @@
 
 #include "game/transcendental/entity_handle_declaration.h"
 #include "augs/misc/stepped_timing.h"
+#include "augs/padding_byte.h"
 
 struct item_slot_mounting_operation {
 	// GEN INTROSPECTOR struct item_slot_mounting_operation
@@ -22,7 +23,9 @@ namespace components {
 		item_slot_mounting_operation mounting;
 
 		augs::constant_size_vector<entity_id, ONLY_PICK_THESE_ITEMS_COUNT> only_pick_these_items;
-		int pick_all_touched_items_if_list_to_pick_empty = true;
+		bool pick_all_touched_items_if_list_to_pick_empty = true;
+		bool picking_up_touching_items_enabled = false;
+		std::array<padding_byte, 2> pad;
 		// END GEN INTROSPECTOR
 
 		static item_slot_mounting_operation find_suitable_montage_operation(const_entity_handle parent_container);

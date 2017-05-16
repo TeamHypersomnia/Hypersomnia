@@ -33,7 +33,6 @@ namespace components {
 	struct item;
 	struct force_joint;
 	struct item_slot_transfers;
-	struct trigger_collision_detector;
 	struct name;
 	struct trace;
 	struct melee;
@@ -87,7 +86,6 @@ struct put_all_components_into {
 		components::item,
 		components::force_joint,
 		components::item_slot_transfers,
-		components::trigger_collision_detector,
 		components::name,
 		components::trace,
 		components::melee,

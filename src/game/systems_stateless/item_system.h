@@ -6,7 +6,8 @@ class cosmos;
 
 class item_system {
 public:
-	void handle_trigger_confirmations_as_pick_requests(const logic_step step);
+	void start_picking_up_items(const logic_step step);
+	void pick_up_touching_items(const logic_step step);
 	
 	void handle_throw_item_intents(const logic_step step);
 	

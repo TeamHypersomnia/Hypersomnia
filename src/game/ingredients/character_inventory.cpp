@@ -7,7 +7,6 @@
 #include "game/components/fixtures_component.h"
 #include "game/components/item_component.h"
 #include "game/components/item_slot_transfers_component.h"
-#include "game/components/trigger_collision_detector_component.h"
 #include "game/detail/gui/character_gui.h"
 #include "game/detail/inventory/inventory_utils.h"
 #include "game/enums/entity_name.h"
@@ -16,7 +15,6 @@ namespace ingredients {
 	void add_character_head_inventory(const logic_step step, entity_handle e) {
 		auto& container = e += components::container();
 		auto& item_slot_transfers = e += components::item_slot_transfers();
-		auto& detector = e += components::trigger_collision_detector();
 
 		const auto bbox = e.get_aabb(step.input.metas_of_assets, components::transform{}).get_size();
 

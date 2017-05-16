@@ -203,9 +203,12 @@ containment_result query_containment_result(
 	}
 	else {
 		const bool slot_would_have_too_many_items =
-			slot.always_allow_exactly_one_item
-			&& slot.items_inside.size() == 1
-			&& !can_stack_entities(cosmos[target_slot.get_items_inside().at(0)], item_entity)
+			slot.items_inside.size() == slot.items_inside.capacity()
+			|| (
+				slot.always_allow_exactly_one_item
+				&& slot.items_inside.size() == 1
+				&& !can_stack_entities(cosmos[target_slot.get_items_inside().at(0)], item_entity)
+			)
 		;
 
 		if (slot_would_have_too_many_items) {
