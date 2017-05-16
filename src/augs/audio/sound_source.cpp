@@ -37,6 +37,7 @@ namespace augs {
 
 	void sound_source::destroy() {
 		if (initialized) {
+			stop();
 #if TRACE_CONSTRUCTORS_DESTRUCTORS
 			--g_num_sources;
 			LOG("alDeleteSources: %x (now %x sources)", id, g_num_sources);

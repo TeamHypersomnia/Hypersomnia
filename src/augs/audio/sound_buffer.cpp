@@ -16,6 +16,12 @@
 #include "augs/audio/sound_buffer.h"
 #include "augs/audio/sound_samples_from_file.h"
 
+#define TRACE_CONSTRUCTORS_DESTRUCTORS 0
+
+#if TRACE_CONSTRUCTORS_DESTRUCTORS
+int g_num_buffers = 0;
+#endif
+
 namespace augs {
 	ALenum get_openal_format_of(const sound_data& d) {
 #if BUILD_OPENAL
@@ -36,6 +42,10 @@ namespace augs {
 
 	single_sound_buffer::~single_sound_buffer() {
 		if (initialized) {
+#if TRACE_CONSTRUCTORS_DESTRUCTORS
+			--g_num_buffers;
+			LOG("alDeleteBuffers: %x (now %x buffers)", id, g_num_buffers);
+#endif
 			AL_CHECK(alDeleteBuffers(1, &id));
 			initialized = false;
 		}
@@ -63,6 +73,11 @@ namespace augs {
 	void single_sound_buffer::set_data(const sound_data& new_data) {
 		if (!initialized) {
 			AL_CHECK(alGenBuffers(1, &id));
+
+#if TRACE_CONSTRUCTORS_DESTRUCTORS
+			++g_num_buffers;
+			LOG("alGenBuffers: %x (now %x buffers)", id, g_num_buffers);
+#endif
 			initialized = true;
 		}
 

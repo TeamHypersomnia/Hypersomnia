@@ -133,82 +133,94 @@ int main(int argc, char** argv) {
 		)
 		&& "The launch mode you have chosen is currently out of service."
 	);
+	
+	{
+		auto session_ptr = std::make_unique<viewing_session>();
+		auto& session = *session_ptr;
 
-	auto session_ptr = std::make_unique<viewing_session>();
-	auto& session = *session_ptr;
+		session.initialize(window, cfg);
 
-	session.initialize(window, cfg);
+		switch (mode) {
+		case config_lua_table::launch_type::MAIN_MENU:
+		{
+			auto setup = std::make_unique<menu_setup>();
+			setup->process(cfg, window, session);
+		}
+			break;
+		case config_lua_table::launch_type::LOCAL:
+		{
+			auto setup = std::make_unique<local_setup>();
+			setup->process(cfg, window, session);
+		}
+			break;
+		case config_lua_table::launch_type::LOCAL_DETERMINISM_TEST:
+		{
+			auto setup = std::make_unique<determinism_test_setup>();
+			setup->process(cfg, window, session);
+		}
+		case config_lua_table::launch_type::DIRECTOR:
+		{
+			auto setup = std::make_unique<director_setup>();
+			setup->process(cfg, window, session);
+		}
+			break;
 
-	switch (mode) {
-	case config_lua_table::launch_type::MAIN_MENU:
-	{
-		auto setup = std::make_unique<menu_setup>();
-		setup->process(cfg, window, session);
-	}
+		case config_lua_table::launch_type::CHOREOGRAPHIC:
+		{
+			auto setup = std::make_unique<choreographic_setup>();
+			setup->process(cfg, window, session);
+		}
+			break;
+		case config_lua_table::launch_type::CLIENT_AND_SERVER:
+		{
+			auto serv_setup = std::make_unique<server_setup>();
+			
+			std::thread server_thread([&]() {
+				serv_setup->process(cfg, window);
+			});
+			
+			serv_setup->wait_for_listen_server();
+			
+			auto setup = std::make_unique<client_setup>();
+			setup->process(cfg, window, session);
+			
+			serv_setup->should_quit = true;
+			
+			server_thread.join();
+		}
 		break;
-	case config_lua_table::launch_type::LOCAL:
-	{
-		auto setup = std::make_unique<local_setup>();
-		setup->process(cfg, window, session);
-	}
-		break;
-	case config_lua_table::launch_type::LOCAL_DETERMINISM_TEST:
-	{
-		auto setup = std::make_unique<determinism_test_setup>();
-		setup->process(cfg, window, session);
-	}
-	case config_lua_table::launch_type::DIRECTOR:
-	{
-		auto setup = std::make_unique<director_setup>();
-		setup->process(cfg, window, session);
-	}
-		break;
-
-	case config_lua_table::launch_type::CHOREOGRAPHIC:
-	{
-		auto setup = std::make_unique<choreographic_setup>();
-		setup->process(cfg, window, session);
-	}
-		break;
-	case config_lua_table::launch_type::CLIENT_AND_SERVER:
-	{
-		auto serv_setup = std::make_unique<server_setup>();
-		
-		std::thread server_thread([&]() {
+		case config_lua_table::launch_type::TWO_CLIENTS_AND_SERVER:
+		{
+			auto serv_setup = std::make_unique<two_clients_and_server_setup>();
 			serv_setup->process(cfg, window);
-		});
-		
-		serv_setup->wait_for_listen_server();
-		
-		auto setup = std::make_unique<client_setup>();
-		setup->process(cfg, window, session);
-		
-		serv_setup->should_quit = true;
-		
-		server_thread.join();
-	}
-	break;
-	case config_lua_table::launch_type::TWO_CLIENTS_AND_SERVER:
-	{
-		auto serv_setup = std::make_unique<two_clients_and_server_setup>();
-		serv_setup->process(cfg, window);
-	}
-	break;
-	case config_lua_table::launch_type::ONLY_CLIENT:  
-	{
-		auto setup = std::make_unique<client_setup>();
-		setup->process(cfg, window, session);
-	}
+		}
 		break;
-	case config_lua_table::launch_type::ONLY_SERVER: 
-	{
-		auto setup = std::make_unique<server_setup>();
-		setup->process(cfg, window);
-	}
-		break;
+		case config_lua_table::launch_type::ONLY_CLIENT:  
+		{
+			auto setup = std::make_unique<client_setup>();
+			setup->process(cfg, window, session);
+		}
+			break;
+		case config_lua_table::launch_type::ONLY_SERVER: 
+		{
+			auto setup = std::make_unique<server_setup>();
+			setup->process(cfg, window);
+		}
+			break;
 
-	default: ensure(false); break;
+		default: ensure(false); break;
+		}
 	}
+	
+	//	By now, all sound sources from the viewing session are released.
+
+#if ONLY_ONE_GLOBAL_ASSETS_MANAGER
+	/*
+		We need to manually destroy the global assets manager,
+		before the audio manager gets destroyed.
+	*/
+	get_assets_manager().destroy_everything();
+#endif
 
 	augs::global_libraries::deinit();
 	
