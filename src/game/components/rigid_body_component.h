@@ -24,7 +24,9 @@ namespace components {
 		bool angled_damping = false;
 		bool activated = true;
 
+		bool allow_sleep = true;
 		rigid_body_type body_type = rigid_body_type::DYNAMIC;
+		std::array<padding_byte, 2> pad;
 
 		float angular_damping = 6.5f;
 		float linear_damping = 6.5f;

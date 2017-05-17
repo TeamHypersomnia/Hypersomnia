@@ -12,7 +12,6 @@
 #include "game/components/fixtures_component.h"
 #include "game/components/rigid_body_component.h"
 #include "game/components/special_physics_component.h"
-#include "game/components/trigger_query_detector_component.h"
 #include "game/components/driver_component.h"
 #include "game/components/force_joint_component.h"
 #include "game/detail/gui/character_gui.h"
@@ -48,6 +47,7 @@ namespace ingredients {
 		components::rigid_body body;
 		body.fixed_rotation = false;
 		body.angled_damping = true;
+		body.allow_sleep = false;
 		const auto si = step.cosm.get_si();
 
 		body.set_transform(si, spawn_transform);
@@ -84,7 +84,6 @@ namespace ingredients {
 		auto& animation = e += components::animation();
 		auto& movement = e += components::movement();
 		auto& rotation_copying = e += components::rotation_copying();
-		auto& detector = e += components::trigger_query_detector();
 		auto& driver = e += components::driver();
 		auto& force_joint = e += components::force_joint();
 		auto& sentience = e += components::sentience();
@@ -108,8 +107,6 @@ namespace ingredients {
 		sentience.health.set_maximum_value(100);
 
 		processing.disable_in(processing_subjects::WITH_FORCE_JOINT);
-
-		detector.spam_trigger_requests_when_detection_intented = true;
 
 		force_joint.force_towards_chased_entity = 92000.f;
 		force_joint.distance_when_force_easing_starts = 10.f;
@@ -138,7 +135,8 @@ namespace prefabs {
 	entity_handle create_sample_complete_character(
 		const logic_step step, 
 		const components::transform spawn_transform, 
-		const std::string name
+		const std::string name,
+		const bool add_sample_arms
 	) {
 		auto& world = step.cosm;
 
@@ -177,31 +175,34 @@ namespace prefabs {
 
 		character.add_standard_components(step);
 
-		{
-			const auto primary_arm = prefabs::create_sample_complete_arm(
-				step,
-				vec2(50, 20),
-				vec2(70, 20)
-			);
+		if (add_sample_arms) {
+			{
+				const auto primary_arm = prefabs::create_sample_complete_arm(
+					step,
+					vec2(50, 20),
+					vec2(70, 20)
+				);
 
-			item_slot_transfer_request r;
-			r.item = primary_arm;
-			r.target_slot = character[slot_function::PRIMARY_ARM_BACK];
-			perform_transfer(r, step);
+				item_slot_transfer_request r;
+				r.item = primary_arm;
+				r.target_slot = character[slot_function::PRIMARY_ARM_BACK];
+				perform_transfer(r, step);
+			}
+
+			{
+				const auto secondary_arm = prefabs::create_sample_complete_arm(
+					step,
+					vec2(50, 20),
+					vec2(70, 20)
+				);
+
+				item_slot_transfer_request r;
+				r.item = secondary_arm;
+				r.target_slot = character[slot_function::SECONDARY_ARM_BACK];
+				perform_transfer(r, step);
+			}
 		}
 
-		{
-			const auto secondary_arm = prefabs::create_sample_complete_arm(
-				step,
-				vec2(50, 20),
-				vec2(70, 20)
-			);
-
-			item_slot_transfer_request r;
-			r.item = secondary_arm;
-			r.target_slot = character[slot_function::SECONDARY_ARM_BACK];
-			perform_transfer(r, step);
-		}
 		// LOG("Character mass: %x", character.get<components::rigid_body>().get_mass());
 		return character;
 	}

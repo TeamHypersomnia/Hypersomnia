@@ -198,7 +198,7 @@ namespace test_scenes {
 				transform = motorcycle2.get_logic_transform();
 			}
 
-			const auto new_character = prefabs::create_sample_complete_character(step, transform, typesafe_sprintf("player%x", i));
+			const auto new_character = prefabs::create_sample_complete_character(step, transform, typesafe_sprintf("player%x", i), i != 0);
 
 			new_characters[i] = new_character;
 

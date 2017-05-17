@@ -20,8 +20,6 @@
 #include "game/components/tile_layer_instance_component.h"
 #include "game/components/car_component.h"
 #include "game/components/driver_component.h"
-#include "game/components/trigger_component.h"
-#include "game/components/trigger_query_detector_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/container_component.h"
 #include "game/components/item_component.h"

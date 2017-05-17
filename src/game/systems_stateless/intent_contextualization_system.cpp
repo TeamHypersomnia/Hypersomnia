@@ -5,7 +5,6 @@
 #include "game/components/driver_component.h"
 #include "game/components/gun_component.h"
 #include "game/components/container_component.h"
-#include "game/components/trigger_query_detector_component.h"
 #include "game/components/melee_component.h"
 #include "game/components/grenade_component.h"
 
@@ -29,24 +28,24 @@ void intent_contextualization_system::contextualize_use_button_intents(const log
 	for (auto& e : intents) {
 		const auto subject = cosmos[e.subject];
 
-		const auto* const query_detector = subject.find<components::trigger_query_detector>();
-		
 		if (e.intent == intent_type::USE_BUTTON) {
-			const auto* const maybe_driver = subject.find<components::driver>();
+			auto* const maybe_driver = subject.find<components::driver>();
 
 			if (maybe_driver) {
 				const auto car_id = maybe_driver->owned_vehicle;
 				const auto car = cosmos[car_id];
 
-				if (car.alive() && car.get<components::car>().current_driver == e.subject) {
-					e.intent = intent_type::RELEASE_CAR;
-					continue;
-				}
-			}
+				const bool is_now_driving = 
+					car.alive() 
+					&& car.get<components::car>().current_driver == e.subject
+				;
 
-			if (query_detector) {
-				e.intent = intent_type::QUERY_TOUCHING_TRIGGERS;
-				continue;
+				if (is_now_driving) {
+					e.intent = intent_type::RELEASE_CAR;
+				}
+				else {
+					e.intent = intent_type::TAKE_HOLD_OF_WHEEL;
+				}
 			}
 		}
 	}

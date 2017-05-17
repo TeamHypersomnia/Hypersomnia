@@ -18,11 +18,14 @@
 #include "game/components/render_component.h"
 #include "game/components/animation_component.h"
 #include "game/components/movement_component.h"
+#include "game/components/driver_component.h"
 
 #include "game/detail/inventory/inventory_slot.h"
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "game/detail/inventory/inventory_utils.h"
 #include "game/detail/physics/physics_scripts.h"
+
+#include "game/systems_stateless/driver_system.h"
 
 void sentience_system::cast_spells(const logic_step step) const {
 	auto& cosmos = step.cosm;
@@ -265,7 +268,14 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		//
 		
 		//
-		subject.get<components::processing>().disable_in(processing_subjects::WITH_TRIGGER_QUERY_DETECTOR);
+		auto& driver = subject.get<components::driver>();
+		
+		if(cosmos[driver.owned_vehicle].alive()) {
+			driver_system().release_car_ownership(subject);
+		}
+		
+		driver.take_hold_of_wheel_when_touched = false;
+
 		subject.get<components::processing>().disable_in(processing_subjects::WITH_MOVEMENT);
 		subject.get<components::processing>().disable_in(processing_subjects::WITH_ROTATION_COPYING);
 		resolve_dampings_of_body(subject);

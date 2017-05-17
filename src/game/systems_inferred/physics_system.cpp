@@ -152,6 +152,7 @@ void physics_system::create_inferred_state_for(const const_entity_handle handle)
 		def.angularDamping = physics_data.angular_damping;
 		def.linearDamping = physics_data.linear_damping;
 		def.fixedRotation = physics_data.fixed_rotation;
+		def.allowSleep = physics_data.allow_sleep;
 		def.gravityScale = physics_data.gravity_scale;
 		def.active = true;
 		def.linearVelocity = physics_data.velocity;

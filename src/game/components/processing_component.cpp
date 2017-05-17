@@ -70,9 +70,6 @@ P P::get_default(const const_entity_handle id) {
 	if (id.has<components::trace>()) {
 		matching.push_back(processing_subjects::WITH_TRACE);
 	}
-	if (id.has<components::trigger_query_detector>()) {
-		matching.push_back(processing_subjects::WITH_TRIGGER_QUERY_DETECTOR);
-	}
 	if (id.has<components::light>()) {
 		matching.push_back(processing_subjects::WITH_LIGHT);
 	}

@@ -26,8 +26,6 @@ namespace components {
 	struct tile_layer_instance;
 	struct car;
 	struct driver;
-	struct trigger;
-	struct trigger_query_detector;
 	struct fixtures;
 	struct container;
 	struct item;
@@ -79,8 +77,6 @@ struct put_all_components_into {
 		components::tile_layer_instance,
 		components::car,
 		components::driver,
-		components::trigger,
-		components::trigger_query_detector,
 		components::fixtures,
 		components::container,
 		components::item,

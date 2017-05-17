@@ -15,7 +15,6 @@
 #include "game/components/special_physics_component.h"
 #include "game/components/animation_component.h"
 #include "game/components/car_component.h"
-#include "game/components/trigger_component.h"
 #include "game/components/name_component.h"
 #include "game/components/shape_polygon_component.h"
 
@@ -118,12 +117,7 @@ namespace prefabs {
 		{
 			auto& sprite = left_wheel += components::sprite();
 			auto& render = left_wheel += components::render();
-			auto& trigger = left_wheel += components::trigger();
 			components::fixtures colliders;
-
-			trigger.entity_to_be_notified = front;
-			trigger.react_to_collision_detectors = false;
-			trigger.react_to_query_detectors = true;
 
 			render.layer = render_layer::CAR_WHEEL;
 
@@ -140,10 +134,10 @@ namespace prefabs {
 
 			group.density = 0.6f;
 			group.filter = filters::trigger();
-			group.sensor = true;
+			group.disable_standard_collision_resolution = true;
 			group.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
 
-			left_wheel  += group;
+			left_wheel += group;
 			left_wheel.get<components::fixtures>().set_owner_body(front);
 		}
 

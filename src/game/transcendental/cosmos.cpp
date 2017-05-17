@@ -16,7 +16,6 @@
 #include "game/systems_stateless/behaviour_tree_system.h"
 #include "game/systems_stateless/car_system.h"
 #include "game/systems_stateless/driver_system.h"
-#include "game/systems_stateless/trigger_detector_system.h"
 #include "game/systems_stateless/item_system.h"
 #include "game/systems_stateless/force_joint_system.h"
 #include "game/systems_stateless/intent_contextualization_system.h"
@@ -442,9 +441,6 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	melee_system().consume_melee_intents(step);
 	melee_system().initiate_and_update_moves(step);
 
-	trigger_detector_system().consume_trigger_detector_presses(step);
-	trigger_detector_system().post_trigger_requests_from_continuous_detectors(step);
-
 	force_joint_system().apply_forces_towards_target_entities(step);
 	item_system().handle_throw_item_intents(step);
 	grenade_system().init_explosions(step);
@@ -462,8 +458,6 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	crosshair_system().generate_crosshair_intents(step);
 	crosshair_system().apply_crosshair_intents_to_base_offsets(step);
 	crosshair_system().apply_base_offsets_to_crosshair_transforms(step);
-
-	trigger_detector_system().send_trigger_confirmations(step);
 
 //	item_system().translate_gui_intents_to_transfer_requests(step);
 	item_system().start_picking_up_items(step);
@@ -484,7 +478,7 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	sentience_system().set_borders(step);
 
 	driver_system().release_drivers_due_to_requests(step);
-	driver_system().assign_drivers_from_successful_trigger_hits(step);
+	driver_system().assign_drivers_who_touch_wheels(step);
 	driver_system().release_drivers_due_to_ending_contact_with_wheel(step);
 
 	particles_existence_system().game_responses_to_particle_effects(step);

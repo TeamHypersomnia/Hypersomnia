@@ -1,15 +1,14 @@
 #include "driver_system.h"
-#include "game/messages/trigger_hit_confirmation_message.h"
 #include "game/messages/collision_message.h"
 #include "game/messages/intent_message.h"
 
-#include "game/components/trigger_component.h"
 #include "game/components/car_component.h"
 
 #include "game/components/movement_component.h"
 #include "game/components/rotation_copying_component.h"
 #include "game/components/rigid_body_component.h"
 #include "game/components/force_joint_component.h"
+#include "game/components/sentience_component.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/systems_inferred/physics_system.h"
@@ -23,22 +22,28 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
 
-void driver_system::assign_drivers_from_successful_trigger_hits(const logic_step step) {
+void driver_system::assign_drivers_who_touch_wheels(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
-	const auto& confirmations = step.transient.messages.get_queue<messages::trigger_hit_confirmation_message>();
+	const auto& contacts = step.transient.messages.get_queue<messages::collision_message>();
 
-	for (const auto& e : confirmations) {
-		const auto& subject_car = cosmos[cosmos[e.trigger].get<components::trigger>().entity_to_be_notified];
-
-		if (subject_car.dead()) {
+	for (const auto& e : contacts) {
+		if (!(e.type == messages::collision_message::event_type::PRE_SOLVE)) {
 			continue;
 		}
 
-		const auto* const maybe_car = subject_car.find<components::car>();
+		const auto driver = cosmos[e.subject];
+		const auto maybe_driver = driver.find<components::driver>();
 
-		if (maybe_car && e.trigger == maybe_car->left_wheel_trigger) {
-			assign_car_ownership(cosmos[e.detector_body], subject_car);
+		if (maybe_driver != nullptr && maybe_driver->take_hold_of_wheel_when_touched) {
+			const auto car = cosmos[e.collider].get_owner_body();
+			const auto maybe_car = car.find<components::car>();
+
+			if(maybe_car != nullptr) {
+				if (e.collider == maybe_car->left_wheel_trigger) {
+					assign_car_ownership(driver, car);
+				}
+			}
 		}
 	}
 }
@@ -74,6 +79,21 @@ void driver_system::release_drivers_due_to_requests(const logic_step step) {
 		if (e.intent == intent_type::RELEASE_CAR && e.is_pressed) {
 			release_car_ownership(cosmos[e.subject]);
 		}
+		else if (e.intent == intent_type::TAKE_HOLD_OF_WHEEL) {
+			const auto subject = cosmos[e.subject];
+
+			const auto* const sentience = subject.find<components::sentience>();
+
+			if (sentience && !sentience->is_conscious()) {
+				continue;
+			}
+
+			auto* const maybe_driver = subject.find<components::driver>();
+
+			if (maybe_driver != nullptr) {
+				maybe_driver->take_hold_of_wheel_when_touched = e.is_pressed;
+			}
+		}
 	}
 }
 
@@ -95,7 +115,8 @@ bool driver_system::change_car_ownership(
 	const auto& physics = cosmos.systems_inferred.get<physics_system>();
 
 	auto* const maybe_rotation_copying = driver_entity.find<components::rotation_copying>();
-	const bool has_physics = driver_entity.has<components::rigid_body>();
+	const auto maybe_rigid_body = driver_entity.find<components::rigid_body>();
+	const bool has_physics = maybe_rigid_body != nullptr;
 	auto* const maybe_movement = driver_entity.find<components::movement>();
 	auto& force_joint = driver_entity.get<components::force_joint>();
 
@@ -106,6 +127,9 @@ bool driver_system::change_car_ownership(
 			return false;
 		}
 
+		// reset the input flag so it is necessary to press the key again
+		driver.take_hold_of_wheel_when_touched = false;
+		
 		driver.owned_vehicle = car_entity;
 		car.current_driver = driver_entity;
 		
@@ -127,9 +151,8 @@ bool driver_system::change_car_ownership(
 		}
 
 		if (has_physics) {
-			auto& rigid_body = driver_entity.get<components::rigid_body>();
-			rigid_body.set_transform(car.left_wheel_trigger);
-			rigid_body.set_velocity(vec2(0, 0));
+			maybe_rigid_body.set_transform(car.left_wheel_trigger);
+			maybe_rigid_body.set_velocity(vec2(0, 0));
 			resolve_density_of_associated_fixtures(driver_entity);
 		}
 	}

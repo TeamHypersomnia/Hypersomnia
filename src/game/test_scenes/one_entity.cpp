@@ -45,7 +45,7 @@ namespace test_scenes {
 		//prefabs::create_force_grenade(step, { 254, 711 });
 		//prefabs::create_force_grenade(step, { 254, 811 });
 
-		const int num_characters = 2;
+		const int num_characters = 1;
 
 		std::vector<entity_id> new_characters;
 		new_characters.resize(num_characters);
@@ -65,7 +65,7 @@ namespace test_scenes {
 				transform.pos.x += 200;
 			}
 
-			const auto new_character = prefabs::create_sample_complete_character(step, transform, typesafe_sprintf("player%x", i));
+			const auto new_character = prefabs::create_sample_complete_character(step, transform, typesafe_sprintf("player%x", i), false);
 
 			new_characters[i] = new_character;
 
@@ -91,6 +91,8 @@ namespace test_scenes {
 			prefabs::create_sample_magazine(step, vec2(100, -650), false ? "10" : "0.3",
 				prefabs::create_cyan_charge(step, vec2(0, 0), false ? 1000 : 5)));
 		
+		prefabs::create_car(step, { -800, 0, -180 });
+
 		//prefabs::create_kek9(step, vec2(300, -500 + 50));
 		//
 		//prefabs::create_kek9(step, vec2(100, -500),

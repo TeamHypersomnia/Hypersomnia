@@ -344,7 +344,6 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/systems_stateless/rotation_copying_system.cpp"
 	"src/game/systems_stateless/sentience_system.cpp"
 	"src/game/systems_stateless/trace_system.cpp"
-	"src/game/systems_stateless/trigger_detector_system.cpp"
 	"src/game/systems_stateless/visibility_system.cpp"
 	"src/application/setups/local_setup.cpp"
 	"src/game/view/rendering_scripts/draw_circular_bars.cpp"

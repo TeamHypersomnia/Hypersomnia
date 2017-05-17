@@ -2,7 +2,6 @@
 #include "car_system.h"
 #include "game/messages/intent_message.h"
 
-#include "game/components/trigger_component.h"
 #include <Box2D\Box2D.h>
 
 #include "render_system.h"
