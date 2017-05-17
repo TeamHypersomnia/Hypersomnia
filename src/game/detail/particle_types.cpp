@@ -9,7 +9,7 @@ inline void integrate_pos_vel_acc_damp_life(T& p, const float dt) {
 	
 	p.vel.damp(p.linear_damping * dt);
 
-	p.lifetime_ms += dt * 1000.f;
+	p.current_lifetime_ms += dt * 1000.f;
 }
 
 void general_particle::integrate(const float dt) {
@@ -20,14 +20,14 @@ void general_particle::integrate(const float dt) {
 }
 
 bool general_particle::is_dead() const {
-	return lifetime_ms >= max_lifetime_ms;
+	return current_lifetime_ms >= max_lifetime_ms;
 }
 
 void general_particle::draw(components::sprite::drawing_input basic_input) const {
 	float size_mult = 1.f;
 
 	if (shrink_when_ms_remaining > 0.f) {
-		const auto alivity_multiplier = std::min(1.f, (max_lifetime_ms - lifetime_ms) / shrink_when_ms_remaining);
+		const auto alivity_multiplier = std::min(1.f, (max_lifetime_ms - current_lifetime_ms) / shrink_when_ms_remaining);
 
 		size_mult *= sqrt(alivity_multiplier);
 
@@ -44,7 +44,7 @@ void general_particle::draw(components::sprite::drawing_input basic_input) const
 	}
 
 	if (unshrinking_time_ms > 0.f) {
-		size_mult *= std::min(1.f, (lifetime_ms / unshrinking_time_ms)*(lifetime_ms / unshrinking_time_ms));
+		size_mult *= std::min(1.f, (current_lifetime_ms / unshrinking_time_ms)*(current_lifetime_ms / unshrinking_time_ms));
 	}
 
 	components::sprite f;
@@ -109,7 +109,7 @@ void animated_particle::integrate(const float dt) {
 
 void animated_particle::draw(components::sprite::drawing_input basic_input) const {
 	thread_local components::sprite face;
-	const auto frame_num = std::min(static_cast<unsigned>(lifetime_ms / frame_duration_ms), frame_count - 1);
+	const auto frame_num = std::min(static_cast<unsigned>(current_lifetime_ms / frame_duration_ms), frame_count - 1);
 
 	const auto target_id = static_cast<assets::game_image_id>(static_cast<int>(first_face) + frame_num);
 
@@ -124,7 +124,7 @@ void animated_particle::draw(components::sprite::drawing_input basic_input) cons
 }
 
 bool animated_particle::is_dead() const {
-	return lifetime_ms >= frame_duration_ms * frame_count;
+	return current_lifetime_ms >= frame_duration_ms * frame_count;
 }
 
 void animated_particle::set_position(const vec2 new_pos) {
@@ -180,7 +180,7 @@ void homing_animated_particle::integrate(
 
 void homing_animated_particle::draw(components::sprite::drawing_input basic_input) const {
 	thread_local components::sprite face;
-	const auto frame_num = std::min(static_cast<unsigned>(lifetime_ms / frame_duration_ms), frame_count-1);
+	const auto frame_num = std::min(static_cast<unsigned>(current_lifetime_ms / frame_duration_ms), frame_count-1);
 
 	//face.set(static_cast<assets::game_image_id>(static_cast<int>(first_face) + frame_count - frame_num - 1));
 	const auto target_id = static_cast<assets::game_image_id>(static_cast<int>(first_face) + frame_num);
@@ -196,7 +196,7 @@ void homing_animated_particle::draw(components::sprite::drawing_input basic_inpu
 }
 
 bool homing_animated_particle::is_dead() const {
-	return lifetime_ms >= frame_duration_ms * frame_count;
+	return current_lifetime_ms >= frame_duration_ms * frame_count;
 }
 
 void homing_animated_particle::set_position(const vec2 new_pos) {

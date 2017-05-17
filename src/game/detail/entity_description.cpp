@@ -79,9 +79,6 @@ std::wstring get_bbcoded_entity_properties(const const_entity_handle id) {
 			result << L"Restores health: [color=vscyan]" << -damage->amount << L"[/color]\n";
 		}
 
-		if (damage->constrain_distance) {
-			result << L"Max distance: [color=vscyan]" << damage->max_distance << L"[/color]\n";
-		}
 		if (damage->constrain_lifetime) {
 			result << L"Max lifetime: [color=vscyan]" << damage->max_lifetime_ms << L" ms[/color]\n";
 		}

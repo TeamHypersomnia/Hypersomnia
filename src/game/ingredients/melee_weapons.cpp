@@ -31,7 +31,6 @@ namespace prefabs {
 		damage.amount = 50.f;
 		damage.impulse_upon_hit = 1000.f;
 		damage.sender = machete;
-		damage.constrain_distance = false;
 		damage.constrain_lifetime = false;
 
 		machete.add_standard_components(step);

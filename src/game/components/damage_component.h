@@ -27,24 +27,19 @@ namespace components {
 		bool damage_upon_collision = true;
 		bool destroy_upon_damage = true;
 		bool constrain_lifetime = true;
-		bool constrain_distance = false;
+		bool damage_falloff = false;
 
 		int damage_charges_before_destruction = 1;
 
 		vec2 custom_impact_velocity;
 
-		bool damage_falloff = false;
-		std::array<padding_byte, 3> pad;
-
 		float damage_falloff_starting_distance = 500.f;
 		float minimum_amount_after_falloff = 5.f;
 
-		float distance_travelled = 0.f;
-		float max_distance = 0.f;
 		float max_lifetime_ms = 2000.f;
 		float recoil_multiplier = 1.f;
 
-		float lifetime_ms = 0.f;
+		float current_lifetime_ms = 0.f;
 
 		float homing_towards_hostile_strength = 0.f;
 		entity_id particular_homing_target;

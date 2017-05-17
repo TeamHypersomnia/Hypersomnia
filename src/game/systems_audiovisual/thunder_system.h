@@ -18,7 +18,7 @@ public:
 			bool activated = true;
 			bool can_have_children = true;
 
-			float lifetime_ms = 0.f;
+			float current_lifetime_ms = 0.f;
 			float max_lifetime_ms = 0.f;
 
 			vec2 from;

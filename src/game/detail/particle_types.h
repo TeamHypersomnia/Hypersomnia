@@ -17,7 +17,7 @@ struct general_particle {
 	float rotation_speed = 0.f;
 	float linear_damping = 0.f;
 	float angular_damping = 0.f;
-	float lifetime_ms = 0.f;
+	float current_lifetime_ms = 0.f;
 	float max_lifetime_ms = 0.f;
 	float shrink_when_ms_remaining = 0.f;
 	float unshrinking_time_ms = 0.f;
@@ -57,7 +57,7 @@ struct animated_particle {
 	vec2 acc;
 	
 	float linear_damping = 0.f;
-	float lifetime_ms = 0.f;
+	float current_lifetime_ms = 0.f;
 
 	assets::game_image_id first_face = assets::game_image_id::COUNT;
 	rgba color;
@@ -86,7 +86,7 @@ struct homing_animated_particle {
 	vec2 acc;
 
 	float linear_damping = 0.f;
-	float lifetime_ms = 0.f;
+	float current_lifetime_ms = 0.f;
 
 	float homing_force = 3000.f;
 

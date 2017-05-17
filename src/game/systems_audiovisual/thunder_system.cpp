@@ -13,7 +13,7 @@ void thunder_system::thunder::create_root_branch() {
 	thread_local fast_randomization rng;
 
 	thunder::branch b;
-	b.lifetime_ms = 0.f;
+	b.current_lifetime_ms = 0.f;
 
 	b.from = in.first_branch_root.pos;
 	b.to = b.from + vec2().set_from_degrees(
@@ -70,7 +70,7 @@ void thunder_system::advance(
 
 						thunder::branch child;
 						child.activated = true;
-						child.lifetime_ms = 0.f;
+						child.current_lifetime_ms = 0.f;
 						
 						child.from = b.to;
 						child.to =
@@ -109,9 +109,9 @@ void thunder_system::advance(
 		}
 
 		for (auto& b : t.branches) {
-			b.lifetime_ms += dt.in_milliseconds();
+			b.current_lifetime_ms += dt.in_milliseconds();
 			
-			if (b.activated && b.lifetime_ms > b.max_lifetime_ms) {
+			if (b.activated && b.current_lifetime_ms > b.max_lifetime_ms) {
 				const bool is_leaf = b.children.empty();
 
 				if (is_leaf) {

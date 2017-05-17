@@ -145,18 +145,16 @@ void damage_system::destroy_outdated_bullets(const logic_step step) {
 		[&](const auto it) {
 			auto& damage = it.get<components::damage>();
 		
-			if ((damage.constrain_lifetime && damage.lifetime_ms >= damage.max_lifetime_ms) ||
-				(damage.constrain_distance && damage.distance_travelled >= damage.max_distance)) {
-				damage.saved_point_of_impact_before_death = it.get_logic_transform().pos;
-				step.transient.messages.post(messages::queue_destruction(it));
-			}
-
-			if (damage.constrain_distance) {
-				damage.distance_travelled += it.get_effective_velocity().length();
-			}
-
 			if (damage.constrain_lifetime) {
-				damage.lifetime_ms += static_cast<float>(delta.in_milliseconds());
+				const bool should_already_expire = damage.current_lifetime_ms >= damage.max_lifetime_ms;
+
+				if (should_already_expire) {
+					damage.saved_point_of_impact_before_death = it.get_logic_transform().pos;
+					step.transient.messages.post(messages::queue_destruction(it));
+				}
+				else {
+					damage.current_lifetime_ms += static_cast<float>(delta.in_milliseconds());
+				}
 			}
 
 			if (damage.homing_towards_hostile_strength > 0.f) {

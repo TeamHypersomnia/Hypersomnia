@@ -56,7 +56,7 @@ recording_type = {
 }
 
 config_table = {
-	launch_mode = launch_type.LOCAL,
+	launch_mode = launch_type.DIRECTOR,
 	
 	input_recording_mode = recording_type.LIVE,
 
