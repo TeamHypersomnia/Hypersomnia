@@ -133,6 +133,7 @@ void perform_spell_logic(
 			in.outer_ring_color = white;
 			in.sound_effect = assets::sound_buffer_id::EXPLOSION;
 			in.sound_gain = 1.2f;
+			in.type = adverse_element_type::FORCE;
 
 			in.instantiate(step, caster_transform, caster);
 		}
