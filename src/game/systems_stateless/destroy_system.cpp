@@ -37,17 +37,17 @@ void destroy_system::perform_deletions(const logic_step step) {
 
 	// destroy in reverse order; children first
 	for (auto it = deletions.rbegin(); it != deletions.rend(); ++it) {
-		// ensure(cosmos[(*it).subject].alive());
-
 		const auto subject = cosmos[(*it).subject];
 
-		const auto current_slot = subject.get_current_slot();
-		const bool should_release_item_ownership = current_slot.alive();
-		
-		if (should_release_item_ownership) {
-			detail_remove_item(current_slot, subject);
-		}
+		if (subject.alive()) {
+			const auto current_slot = subject.get_current_slot();
+			const bool should_release_item_ownership = current_slot.alive();
+			
+			if (should_release_item_ownership) {
+				detail_remove_item(current_slot, subject);
+			}
 
-		cosmos.delete_entity((*it).subject);
+			cosmos.delete_entity((*it).subject);
+		}
 	}
 }
