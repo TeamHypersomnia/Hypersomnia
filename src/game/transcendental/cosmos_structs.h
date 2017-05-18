@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/misc/stepped_timing.h"
 #include "augs/misc/trivially_copyable_tuple.h"
 
 #include "game/assets/animation_id.h"
@@ -24,7 +25,7 @@ class cosmos_metadata {
 	friend struct augs::introspection_access;
 
 	augs::delta delta;
-	unsigned total_steps_passed = 0;
+	augs::stepped_timestamp now = 0;
 
 #if COSMOS_TRACKS_GUIDS
 	entity_guid next_entity_guid = 1;

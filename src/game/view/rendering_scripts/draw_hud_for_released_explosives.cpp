@@ -25,11 +25,11 @@ namespace rendering_scripts {
 					return;
 				}
 
-				if (hand_fuse.when_explodes.was_set()) {
+				if (hand_fuse.when_detonates.was_set()) {
 					const auto highlight_amount = 1.f - (
 						(global_time_seconds - hand_fuse.when_released.in_seconds(dt))
 						/
-						(hand_fuse.when_explodes.in_seconds(dt) - hand_fuse.when_released.in_seconds(dt))
+						(hand_fuse.when_detonates.in_seconds(dt) - hand_fuse.when_released.in_seconds(dt))
 					);
 
 					if (highlight_amount > 0.f) {

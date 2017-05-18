@@ -137,6 +137,7 @@ void damage_system::destroy_colliding_bullets_and_send_damage(const logic_step s
 
 void damage_system::destroy_outdated_bullets(const logic_step step) {
 	auto& cosmos = step.cosm;
+	const auto now = cosmos.get_timestamp();
 	const auto& delta = step.get_delta();
 
 	cosmos.for_each(
@@ -145,17 +146,19 @@ void damage_system::destroy_outdated_bullets(const logic_step step) {
 			auto& damage = it.get<components::damage>();
 		
 			if (damage.constrain_lifetime) {
-				const bool should_already_expire = damage.current_lifetime_ms >= damage.max_lifetime_ms;
+				if (!damage.when_released.was_set()) {
+					damage.when_released = now;
+					damage.when_detonates.step = static_cast<unsigned>(now.step + (1 / delta.in_milliseconds() * damage.max_lifetime_ms));
+				}
 
-				if (should_already_expire) {
+				const bool should_already_detonate = now >= damage.when_detonates;
+
+				if (should_already_detonate) {
 					const auto current_pos = it.get_logic_transform().pos;
 
 					damage.saved_point_of_impact_before_death = current_pos;
 					detonate_missile(step, current_pos, it);
 					step.transient.messages.post(messages::queue_destruction(it));
-				}
-				else {
-					damage.current_lifetime_ms += static_cast<float>(delta.in_milliseconds());
 				}
 			}
 

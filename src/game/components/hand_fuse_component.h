@@ -8,7 +8,7 @@ namespace components {
 	struct hand_fuse {
 		// GEN INTROSPECTOR struct components::hand_fuse
 		augs::stepped_timestamp when_released;
-		augs::stepped_timestamp when_explodes;
+		augs::stepped_timestamp when_detonates;
 		// END GEN INTROSPECTOR
 	};
 }

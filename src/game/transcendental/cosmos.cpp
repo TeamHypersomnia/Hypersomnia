@@ -222,17 +222,15 @@ double cosmos::get_total_time_passed_in_seconds(const double view_interpolation_
 }
 
 double cosmos::get_total_time_passed_in_seconds() const {
-	return significant.meta.total_steps_passed * static_cast<double>(significant.meta.delta.in_seconds());
+	return significant.meta.now.step * static_cast<double>(significant.meta.delta.in_seconds());
 }
 
-unsigned cosmos::get_total_steps_passed() const {
-	return significant.meta.total_steps_passed;
+decltype(augs::stepped_timestamp::step) cosmos::get_total_steps_passed() const {
+	return significant.meta.now.step;
 }
 
 augs::stepped_timestamp cosmos::get_timestamp() const {
-	augs::stepped_timestamp result;
-	result.step = significant.meta.total_steps_passed;
-	return result;
+	return significant.meta.now;
 }
 
 const augs::delta& cosmos::get_fixed_delta() const {
@@ -438,7 +436,7 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 
 	force_joint_system().apply_forces_towards_target_entities(step);
 	item_system().handle_throw_item_intents(step);
-	hand_fuse_system().init_explosions(step);
+	hand_fuse_system().detonate_fuses(step);
 
 	performance.start(meter_type::PHYSICS);
 	listener.during_step = true;
@@ -519,7 +517,7 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 
 	profiler.raycasts.measure(systems_inferred.get<physics_system>().ray_casts_since_last_step);
 
-	++significant.meta.total_steps_passed;
+	++significant.meta.now.step;
 
 	const size_t queued_at_end_num = step.transient.messages.get_queue<messages::queue_destruction>().size();
 

@@ -3,5 +3,5 @@
 
 class hand_fuse_system {
 public:
-	void init_explosions(const logic_step step);
+	void detonate_fuses(const logic_step step);
 };

@@ -8,6 +8,7 @@
 #include "game/transcendental/entity_handle_declaration.h"
 
 #include "augs/misc/timer.h"
+#include "augs/misc/stepped_timing.h"
 #include "augs/graphics/pixel.h"
 #include "augs/padding_byte.h"
 
@@ -36,7 +37,8 @@ namespace components {
 		float max_lifetime_ms = 2000.f;
 		float recoil_multiplier = 1.f;
 
-		float current_lifetime_ms = 0.f;
+		augs::stepped_timestamp when_released;
+		augs::stepped_timestamp when_detonates;
 
 		float homing_towards_hostile_strength = 0.f;
 		entity_id particular_homing_target;

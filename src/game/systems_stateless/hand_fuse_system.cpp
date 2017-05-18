@@ -14,7 +14,7 @@
 #include "game/components/hand_fuse_component.h"
 #include "game/messages/queue_destruction.h"
 
-void hand_fuse_system::init_explosions(const logic_step step) {
+void hand_fuse_system::detonate_fuses(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto delta = step.get_delta();
 	const auto now = cosmos.get_timestamp();
@@ -24,7 +24,7 @@ void hand_fuse_system::init_explosions(const logic_step step) {
 		[&](const auto it) {
 			auto& fuse = it.get<components::hand_fuse>();
 
-			if (fuse.when_explodes.was_set() && now.step >= fuse.when_explodes.step) {
+			if (fuse.when_detonates.was_set() && now >= fuse.when_detonates) {
 				const auto* const maybe_explosive = it.find<components::explosive>();
 
 				if (maybe_explosive != nullptr) {
