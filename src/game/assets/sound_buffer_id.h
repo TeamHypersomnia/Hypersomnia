@@ -59,7 +59,7 @@ namespace assets {
 
 struct sound_response {
 	// GEN INTROSPECTOR struct sound_response
-	assets::sound_buffer_id id = assets::sound_buffer_id::COUNT;
+	assets::sound_buffer_id id = assets::sound_buffer_id::INVALID;
 	augs::sound_effect_modifier modifier;
 	// END GEN INTROSPECTOR
 };

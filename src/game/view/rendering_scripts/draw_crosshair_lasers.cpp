@@ -2,7 +2,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 #include "game/components/gun_component.h"
-#include "game/components/grenade_component.h"
+#include "game/components/explosive_component.h"
 #include "augs/graphics/drawers.h"
 
 #include "game/systems_inferred/physics_system.h"
@@ -90,18 +90,18 @@ namespace rendering_scripts {
 						);
 					}
 				}
-				else if (subject_item.has<components::grenade>()) {
-					const auto grenade_transform = subject_item.get_viewing_transform(interp);
-					const auto grenade_target_vector = grenade_transform.pos + vec2().set_from_degrees(grenade_transform.rotation);
+				else if (subject_item.has<components::explosive>()) {
+					const auto explosive_transform = subject_item.get_viewing_transform(interp);
+					const auto explosive_target_vector = explosive_transform.pos + vec2().set_from_degrees(explosive_transform.rotation);
 
 					const auto proj = crosshair_pos.get_projection_multiplier(
-						grenade_transform.pos,
-						grenade_target_vector
+						explosive_transform.pos,
+						explosive_target_vector
 					);
 
 					if (proj > 1.f) {
-						const auto line_from = grenade_transform.pos;
-						const auto line_to = grenade_transform.pos + (grenade_target_vector - grenade_transform.pos) * proj;
+						const auto line_from = explosive_transform.pos;
+						const auto line_to = explosive_transform.pos + (explosive_target_vector - explosive_transform.pos) * proj;
 
 						make_laser_from_to(
 							subject_item,

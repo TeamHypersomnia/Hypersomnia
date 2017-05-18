@@ -13,7 +13,7 @@
 #include "game/components/position_copying_component.h"
 #include "game/components/sender_component.h"
 #include "game/components/damage_component.h"
-#include "game/components/grenade_component.h"
+#include "game/components/explosive_component.h"
 
 #include "game/components/sound_existence_component.h"
 #include "game/components/particles_existence_component.h"
@@ -79,7 +79,7 @@ basic_entity_handle<C> basic_entity_handle<C>::add_standard_components(const log
 
 	if (
 		has<components::damage>()
-		|| has<components::grenade>()
+		|| has<components::explosive>()
 	) {
 		ensure(has<components::sender>());
 	}

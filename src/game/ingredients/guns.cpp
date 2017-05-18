@@ -8,7 +8,7 @@
 #include "game/components/sound_existence_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/catridge_component.h"
-#include "game/components/contact_explosive_component.h"
+#include "game/components/explosive_component.h"
 #include "game/components/sender_component.h"
 
 #include "game/messages/create_particle_effect.h"
@@ -889,13 +889,16 @@ namespace prefabs {
 			auto& sender = round_definition += components::sender();
 			auto& damage = round_definition += components::damage();
 
-			damage.damage_upon_collision = false;
+			damage.destruction_particle_effect_response.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
+			damage.destruction_particle_effect_response.modifier.colorize = orange;
 
 			damage.bullet_trace_particle_effect_response.id = assets::particle_effect_id::MISSILE_SMOKE_TRAIL;
 			damage.bullet_trace_particle_effect_response.modifier.colorize = white;
 
 			damage.muzzle_leave_particle_effect_response.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
 			damage.muzzle_leave_particle_effect_response.modifier.colorize = white;
+
+			damage.max_lifetime_ms = 4000.f;
 
 			auto& trace_modifier = damage.bullet_trace_sound_response.modifier;
 
@@ -907,9 +910,9 @@ namespace prefabs {
 
 			damage.bullet_trace_sound_response.id = assets::sound_buffer_id::MISSILE_THRUSTER;
 
-			auto& contact_explosive = round_definition += components::contact_explosive();
+			auto& explosive = round_definition += components::explosive();
 
-			auto& def = contact_explosive.explosion_defenition;
+			auto& def = explosive.explosion;
 			def.type = adverse_element_type::FORCE;
 			def.damage = 88.f;
 			def.inner_ring_color = red;

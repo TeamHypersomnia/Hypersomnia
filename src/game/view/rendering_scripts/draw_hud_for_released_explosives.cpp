@@ -2,10 +2,10 @@
 #include "augs/graphics/drawers.h"
 #include "game/transcendental/cosmos.h"
 #include "game/components/sprite_component.h"
-#include "game/components/grenade_component.h"
+#include "game/components/hand_fuse_component.h"
 
 namespace rendering_scripts {
-	void draw_hud_for_released_grenades(
+	void draw_hud_for_released_explosives(
 		augs::vertex_triangle_buffer& in,
 		augs::special_buffer& in_special,
 		const interpolation_system& sys,
@@ -17,19 +17,19 @@ namespace rendering_scripts {
 		const auto& manager = get_assets_manager();
 
 		cosm.for_each(
-			processing_subjects::WITH_GRENADE,
+			processing_subjects::WITH_HAND_FUSE,
 			[&](const auto it) {
-				const components::grenade& grenade = it.get<components::grenade>();
+				const components::hand_fuse& hand_fuse = it.get<components::hand_fuse>();
 
 				if (!it.get<components::rigid_body>().is_activated()) {
 					return;
 				}
 
-				if (grenade.when_explodes.was_set()) {
+				if (hand_fuse.when_explodes.was_set()) {
 					const auto highlight_amount = 1.f - (
-						(global_time_seconds - grenade.when_released.in_seconds(dt))
+						(global_time_seconds - hand_fuse.when_released.in_seconds(dt))
 						/
-						(grenade.when_explodes.in_seconds(dt) - grenade.when_released.in_seconds(dt))
+						(hand_fuse.when_explodes.in_seconds(dt) - hand_fuse.when_released.in_seconds(dt))
 					);
 
 					if (highlight_amount > 0.f) {

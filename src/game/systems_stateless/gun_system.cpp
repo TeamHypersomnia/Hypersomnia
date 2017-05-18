@@ -16,7 +16,7 @@
 #include "game/components/flags_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/sound_existence_component.h"
-#include "game/components/contact_explosive_component.h"
+#include "game/components/explosive_component.h"
 #include "game/components/sender_component.h"
 
 #include "game/systems_inferred/physics_system.h"
@@ -244,10 +244,10 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							damage.impulse_upon_hit *= gun.damage_multiplier;
 							total_recoil_amount += damage.recoil_multiplier;
 
-							if(round_entity.has<components::contact_explosive>()) {
-								auto& contact_explosive = round_entity.get<components::contact_explosive>();
-								contact_explosive.explosion_defenition.damage *= gun.damage_multiplier;
-								contact_explosive.explosion_defenition.impact_force *= gun.damage_multiplier;
+							if (round_entity.has<components::explosive>()) {
+								auto& explosive = round_entity.get<components::explosive>();
+								explosive.explosion.damage *= gun.damage_multiplier;
+								explosive.explosion.impact_force *= gun.damage_multiplier;
 							}
 
 							round_entity.set_logic_transform(step, muzzle_transform);

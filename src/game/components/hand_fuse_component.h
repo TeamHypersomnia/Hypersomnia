@@ -5,13 +5,8 @@
 #include "game/detail/explosions.h"
 
 namespace components {
-	struct grenade {
-		// GEN INTROSPECTOR struct components::grenade
-		child_entity_id spoon;
-		entity_id released_spoon;
-		standard_explosion_input explosion;
-		assets::game_image_id released_image_id = assets::game_image_id::COUNT;
-
+	struct hand_fuse {
+		// GEN INTROSPECTOR struct components::hand_fuse
 		augs::stepped_timestamp when_released;
 		augs::stepped_timestamp when_explodes;
 		// END GEN INTROSPECTOR

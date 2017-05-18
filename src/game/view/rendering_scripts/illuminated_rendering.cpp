@@ -310,7 +310,7 @@ namespace rendering_scripts {
 		
 		set_center_uniform(assets::game_image_id::HUD_CIRCULAR_BAR_SMALL);
 
-		draw_hud_for_released_grenades(
+		draw_hud_for_released_explosives(
 			output,
 			renderer.specials,
 			interp,

@@ -245,11 +245,13 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 			in.direct_listener = d.subject;
 			in.effect = inflictor.get<components::damage>().destruction_sound_response;
 			
-			in.create_sound_effect_entity(
-				step, 
-				d.point_of_impact, 
-				entity_id()
-			).add_standard_components(step);
+			if (in.effect.id != assets::sound_buffer_id::INVALID) {
+				in.create_sound_effect_entity(
+					step, 
+					d.point_of_impact, 
+					entity_id()
+				).add_standard_components(step);
+			}
 		}
 	}
 

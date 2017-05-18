@@ -43,12 +43,12 @@ namespace components {
 	struct light;
 	struct wandering_pixels;
 	struct sound_existence;
-	struct grenade;
+	struct explosive;
 	struct catridge;
 	struct shape_polygon;
 	struct shape_circle;
 	struct motor_joint;
-	struct contact_explosive;
+	struct hand_fuse;
 	struct sender;
 
 	struct all_inferred_state;
@@ -95,12 +95,12 @@ struct put_all_components_into {
 		components::light,
 		components::wandering_pixels,
 		components::sound_existence,
-		components::grenade,
+		components::explosive,
 		components::catridge,
 		components::shape_polygon,
 		components::shape_circle,
 		components::motor_joint,
-		components::contact_explosive,
+		components::hand_fuse,
 		components::sender,
 
 		components::all_inferred_state

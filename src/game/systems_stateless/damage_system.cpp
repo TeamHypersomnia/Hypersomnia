@@ -19,6 +19,7 @@
 #include "game/components/sentience_component.h"
 #include "game/components/attitude_component.h"
 #include "game/components/sender_component.h"
+#include "game/components/explosive_component.h"
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
@@ -33,6 +34,18 @@
 
 using namespace augs;
 
+static void detonate_missile(
+	const logic_step step,
+	const vec2 location,
+	const const_entity_handle missile
+) {
+	const auto maybe_explosive = missile.find<components::explosive>();
+
+	if (maybe_explosive != nullptr) {
+		maybe_explosive->explosion.instantiate(step, location, entity_id());
+	}
+}
+
 void damage_system::destroy_colliding_bullets_and_send_damage(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto delta = step.get_delta();
@@ -45,11 +58,11 @@ void damage_system::destroy_colliding_bullets_and_send_damage(const logic_step s
 		}
 
 		const auto subject_handle = cosmos[it.subject];
-		const auto collider_handle = cosmos[it.collider];
+		const auto missile_handle = cosmos[it.collider];
 
-		if (collider_handle.has<components::damage>()) {
-			auto& damage = collider_handle.get<components::damage>();
-			const auto& sender = collider_handle.get<components::sender>();
+		if (missile_handle.has<components::damage>()) {
+			auto& damage = missile_handle.get<components::damage>();
+			const auto& sender = missile_handle.get<components::sender>();
 
 			const bool bullet_colliding_with_any_subject_of_sender = sender.is_sender_subject(subject_handle);
 			
@@ -65,7 +78,7 @@ void damage_system::destroy_colliding_bullets_and_send_damage(const logic_step s
 				vec2 impact_velocity = damage.custom_impact_velocity;
 
 				if (impact_velocity.is_zero()) {
-					impact_velocity = collider_handle.get_effective_velocity();
+					impact_velocity = missile_handle.get_effective_velocity();
 				}
 
 				if (damage.impulse_upon_hit > 0.f) {
@@ -101,6 +114,8 @@ void damage_system::destroy_colliding_bullets_and_send_damage(const logic_step s
 
 				if (!is_victim_a_held_item && damage.destroy_upon_damage) {
 					damage.damage_charges_before_destruction--;
+					
+					detonate_missile(step, it.point, missile_handle);
 
 					// delete only once
 					if (damage.damage_charges_before_destruction == 0) {
@@ -133,7 +148,10 @@ void damage_system::destroy_outdated_bullets(const logic_step step) {
 				const bool should_already_expire = damage.current_lifetime_ms >= damage.max_lifetime_ms;
 
 				if (should_already_expire) {
-					damage.saved_point_of_impact_before_death = it.get_logic_transform().pos;
+					const auto current_pos = it.get_logic_transform().pos;
+
+					damage.saved_point_of_impact_before_death = current_pos;
+					detonate_missile(step, current_pos, it);
 					step.transient.messages.post(messages::queue_destruction(it));
 				}
 				else {

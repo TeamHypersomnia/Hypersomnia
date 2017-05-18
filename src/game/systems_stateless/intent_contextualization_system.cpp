@@ -6,14 +6,14 @@
 #include "game/components/gun_component.h"
 #include "game/components/container_component.h"
 #include "game/components/melee_component.h"
-#include "game/components/grenade_component.h"
+#include "game/components/hand_fuse_component.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_id.h"
 
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
-#include "game/detail/grenade_logic.h"
+#include "game/detail/hand_fuse_logic.h"
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
@@ -102,8 +102,8 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 				it.subject = callee;
 				continue;
 			}
-			else if (callee_handle.has<components::grenade>()) {
-				release_or_throw_grenade(
+			else if (callee_handle.has<components::hand_fuse>()) {
+				release_or_throw_fused_object(
 					step,
 					cosmos[callee],
 					subject,

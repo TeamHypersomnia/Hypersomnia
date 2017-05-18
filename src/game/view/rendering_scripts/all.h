@@ -34,7 +34,7 @@ namespace rendering_scripts {
 		const double global_time_seconds
 	);
 
-	void draw_hud_for_released_grenades(
+	void draw_hud_for_released_explosives(
 		augs::vertex_triangle_buffer&,
 		augs::special_buffer&,
 		const interpolation_system& sys,

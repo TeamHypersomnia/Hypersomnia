@@ -7,7 +7,7 @@
 #include "game/components/rigid_body_component.h"
 #include "game/components/special_physics_component.h"
 #include "game/components/gun_component.h"
-#include "game/components/grenade_component.h"
+#include "game/components/hand_fuse_component.h"
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "game/detail/inventory/inventory_slot.h"
 #include "game/detail/inventory/inventory_utils.h"
@@ -128,16 +128,16 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 
 					new_angle = colinearize_AB_with_C(mc, barrel_center, muzzle, target_transform.pos);
 				}
-				else if (subject_item.has<components::grenade>()) {
-					auto grenade_transform = subject_item.get_logic_transform();
-					auto grenade_target_vector = grenade_transform.pos + vec2().set_from_degrees(grenade_transform.rotation);
+				else if (subject_item.has<components::hand_fuse>()) {
+					auto throwable_transform = subject_item.get_logic_transform();
+					auto throwable_target_vector = throwable_transform.pos + vec2().set_from_degrees(throwable_transform.rotation);
 
 					const auto mc = subject_transform.pos;
 
-					grenade_transform.pos.rotate(-subject_transform.rotation, mc);
-					grenade_target_vector.rotate(-subject_transform.rotation, mc);
+					throwable_transform.pos.rotate(-subject_transform.rotation, mc);
+					throwable_target_vector.rotate(-subject_transform.rotation, mc);
 
-					new_angle = colinearize_AB_with_C(mc, grenade_transform.pos, grenade_target_vector, target_transform.pos);
+					new_angle = colinearize_AB_with_C(mc, throwable_transform.pos, throwable_target_vector, target_transform.pos);
 				}
 			}
 		}
