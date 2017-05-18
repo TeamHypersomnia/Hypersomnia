@@ -15,7 +15,7 @@ namespace ingredients {
 
 		components::motor_joint motor;
 		motor.activated = false;
-		motor.max_force = 20000.f;
+		motor.max_force = 2.f;
 		motor.max_torque = 2.f;
 		motor.correction_factor = 0.82;
 

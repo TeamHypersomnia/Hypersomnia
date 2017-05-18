@@ -27,6 +27,8 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 	
 	std::array<messages::collision_message, 2> msgs;
 
+	bool post_collision_messages = true;
+
 	for (int i = 0; i < 2; ++i) {
 		auto& msg = msgs[i];
 
@@ -148,7 +150,8 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 
 		if (bullet_colliding_with_sender) {
 			contact->SetEnabled(false);
-			return;
+			post_collision_messages = false;
+			break;
 		}
 
 		msg.point = worldManifold.points[0];
@@ -158,8 +161,10 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 		msg.collider_impact_velocity = body_b->GetLinearVelocityFromWorldPoint(worldManifold.points[0]);
 	}
 
-	sys.accumulated_messages.push_back(msgs[0]);
-	sys.accumulated_messages.push_back(msgs[1]);
+	if (post_collision_messages) {
+		sys.accumulated_messages.push_back(msgs[0]);
+		sys.accumulated_messages.push_back(msgs[1]);
+	}
 }
 
 void physics_system::contact_listener::EndContact(b2Contact* contact) {
@@ -235,6 +240,8 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 
 	std::array<messages::collision_message, 2> msgs;
 
+	bool post_collision_messages = true;
+
 	for (int i = 0; i < 2; ++i) {
 		const auto* fix_a = contact->GetFixtureA();
 		const auto* fix_b = contact->GetFixtureB();
@@ -263,13 +270,15 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 		auto& collider_fixtures = subject.get<components::fixtures>();
 
 		const const_entity_handle subject_owner_body = subject.get_owner_body();
+		const const_entity_handle subject_capability = subject.get_owning_transfer_capability();
 		const const_entity_handle collider_owner_body = collider.get_owner_body();
 
 		if (subject_fixtures.is_friction_ground()) {
 			// friction fields do not collide with their children
 			if (are_connected_by_friction(collider, subject)) {
 				contact->SetEnabled(false);
-				return;
+				post_collision_messages = false;
+				break;
 			}
 
 			auto& collider_physics = collider_owner_body.get<components::special_physics>();
@@ -277,12 +286,26 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 			for (const auto& it : collider_physics.owner_friction_grounds) {
 				if (it.target == subject_owner_body) {
 					contact->SetEnabled(false);
-					return;
+					post_collision_messages = false;
+					break;
 				}
 			}
 		}
 
-		const auto* const driver = subject_owner_body.find<components::driver>();
+		if (subject_capability.alive()) {
+			const auto* const driver = subject_capability.find<components::driver>();
+			
+			const bool colliding_with_driven_car = 
+				driver 
+				&& driver->owned_vehicle == collider_owner_body
+			;
+
+			if (colliding_with_driven_car) {
+				contact->SetEnabled(false);
+				post_collision_messages = false;
+				break;
+			}
+		}
 		
 		const auto& collider_special_physics = collider_owner_body.get<components::special_physics>();
 
@@ -291,23 +314,16 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 			&& collider_special_physics.during_cooldown_ignore_collision_with == subject_owner_body
 		;
 
-		const bool colliding_with_owning_car = 
-			driver 
-			&& driver->owned_vehicle == collider_owner_body
-		;
-
 		// if (dropped_item_colliding_with_container) {
 		// 	LOG(
 		// 		"Ignoring collisiong between %x and %x", subject_owner_body, collider_owner_body
 		// 	);
 		// }
 
-		if (
-			dropped_item_colliding_with_container
-			|| colliding_with_owning_car
-		) {
+		if (dropped_item_colliding_with_container) {
 			contact->SetEnabled(false);
-			return;
+			post_collision_messages = false;
+			break;
 		}
 		
 		const bool fixtures_share_transfer_capability =
@@ -316,7 +332,8 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 
 		if (fixtures_share_transfer_capability) {
 			contact->SetEnabled(false);
-			return;
+			post_collision_messages = false;
+			break;
 		}
 
 		if (
@@ -336,8 +353,10 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 		msg.collider_impact_velocity = body_b->GetLinearVelocityFromWorldPoint(manifold.points[0]);
 	}
 
-	sys.accumulated_messages.push_back(msgs[0]);
-	sys.accumulated_messages.push_back(msgs[1]);
+	if (post_collision_messages) {
+		sys.accumulated_messages.push_back(msgs[0]);
+		sys.accumulated_messages.push_back(msgs[1]);
+	}
 }
 
 void physics_system::contact_listener::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) {
