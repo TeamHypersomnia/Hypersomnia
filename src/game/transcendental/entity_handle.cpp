@@ -11,6 +11,9 @@
 #include "game/components/container_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/position_copying_component.h"
+#include "game/components/sender_component.h"
+#include "game/components/damage_component.h"
+#include "game/components/grenade_component.h"
 
 #include "game/components/sound_existence_component.h"
 #include "game/components/particles_existence_component.h"
@@ -72,6 +75,13 @@ basic_entity_handle<C> basic_entity_handle<C>::add_standard_components(const log
 		}
 
 		get<components::special_physics>().dropped_or_created_cooldown.set(200, get_cosmos().get_timestamp());
+	}
+
+	if (
+		has<components::damage>()
+		|| has<components::grenade>()
+	) {
+		ensure(has<components::sender>());
 	}
 
 	recalculate_basic_processing_categories<false, void>();

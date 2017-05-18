@@ -11,6 +11,7 @@
 #include "game/components/grenade_component.h"
 #include "game/components/shape_circle_component.h"
 #include "game/components/shape_polygon_component.h"
+#include "game/components/sender_component.h"
 
 #include "game/enums/entity_name.h"
 #include "game/enums/filters.h"
@@ -23,6 +24,7 @@ namespace prefabs {
 		const auto grenade_spoon = world.create_entity("grenade_spoon");
 		const auto grenade_entity = world.create_entity("force_grenade");
 
+		auto& sender = grenade_entity += components::sender();
 		auto& grenade = grenade_entity += components::grenade();
 		auto& in = grenade.explosion;
 		in.type = adverse_element_type::FORCE;
@@ -66,6 +68,8 @@ namespace prefabs {
 		auto& world = step.cosm;
 		const auto grenade_spoon = world.create_entity("grenade_spoon");
 		const auto grenade_entity = world.create_entity("ped_grenade");
+
+		auto& sender = grenade_entity += components::sender();
 		auto& grenade = grenade_entity += components::grenade();
 
 		auto& in = grenade.explosion;
@@ -106,6 +110,7 @@ namespace prefabs {
 		const auto grenade_spoon = world.create_entity("grenade_spoon");
 		const auto grenade_entity = world.create_entity("interference_grenade");
 		
+		auto& sender = grenade_entity += components::sender();
 		auto& grenade = grenade_entity += components::grenade();
 		auto& in = grenade.explosion;
 

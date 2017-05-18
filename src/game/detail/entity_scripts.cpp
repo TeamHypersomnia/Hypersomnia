@@ -7,6 +7,7 @@
 #include "game/components/damage_component.h"
 #include "game/components/attitude_component.h"
 #include "game/components/container_component.h"
+#include "game/components/sender_component.h"
 #include "game/detail/inventory/inventory_utils.h"
 #include "game/detail/inventory/inventory_slot.h"
 #include "game/transcendental/entity_handle.h"
@@ -60,7 +61,7 @@ identified_danger assess_danger(
 	const auto* const damage = danger.find<components::damage>();
 	const auto* const attitude = danger.find<components::attitude>();
 
-	if ((!damage && !attitude) || (damage && cosmos[damage->sender].get_owning_transfer_capability() == victim)) {
+	if ((!damage && !attitude) || (damage && danger.get<components::sender>().is_sender_subject(victim))) {
 		return result;
 	}
 

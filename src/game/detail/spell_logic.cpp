@@ -6,6 +6,7 @@
 #include "game/components/render_component.h"
 #include "game/components/wandering_pixels_component.h"
 #include "game/components/damage_component.h"
+#include "game/components/sender_component.h"
 #include "game/messages/create_particle_effect.h"
 #include "game/systems_stateless/particles_existence_system.h"
 #include "game/systems_stateless/sound_existence_system.h"
@@ -258,7 +259,9 @@ void perform_spell_logic(
 				damage.homing_towards_hostile_strength = 1.0f;
 				damage.particular_homing_target = next_hostile;
 				damage.amount = 42;
-				damage.sender = caster;
+
+				auto& sender = energy_ball += components::sender();
+				sender.set(caster);
 
 				const auto energy_ball_velocity = vec2().set_from_degrees(new_energy_ball_transform.rotation) * 2000;
 				energy_ball.get<components::rigid_body>().set_velocity(energy_ball_velocity);

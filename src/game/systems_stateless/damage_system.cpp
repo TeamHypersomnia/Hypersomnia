@@ -18,6 +18,7 @@
 #include "game/components/sound_existence_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/attitude_component.h"
+#include "game/components/sender_component.h"
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
@@ -48,29 +49,12 @@ void damage_system::destroy_colliding_bullets_and_send_damage(const logic_step s
 
 		if (collider_handle.has<components::damage>()) {
 			auto& damage = collider_handle.get<components::damage>();
-			const auto sender = cosmos[damage.sender];
+			const auto& sender = collider_handle.get<components::sender>();
 
-			const bool bullet_colliding_with_sender = sender.get_owner_body() == subject_handle.get_owner_body();
-			bool bullet_colliding_with_senders_vehicle = false;
-
-			{
-				const auto* const driver = sender.get_owner_body().find<components::driver>();
-
-				if (driver) {
-					bullet_colliding_with_senders_vehicle = 
-						driver->owned_vehicle == subject_handle.get_owner_body()
-						&& subject_handle.get_owner_body().get<components::fixtures>().can_driver_shoot_through()
-					;
-
-					//LOG("ownedveh: %x\n subj owner: %x\n, compo: %x, res: %x",
-					//	driver->owned_vehicle, subject_handle.get_owner_body(),
-					//	subject_handle.get_owner_body().get<components::fixtures>().can_driver_shoot_through(), bullet_colliding_with_senders_vehicle);
-				}
-			}
-
+			const bool bullet_colliding_with_any_subject_of_sender = sender.is_sender_subject(subject_handle);
+			
 			const bool should_send_damage =
-				!bullet_colliding_with_sender
-				&& !bullet_colliding_with_senders_vehicle
+				!bullet_colliding_with_any_subject_of_sender
 				&& damage.damage_upon_collision
 				&& damage.damage_charges_before_destruction > 0
 			;
@@ -157,8 +141,10 @@ void damage_system::destroy_outdated_bullets(const logic_step step) {
 				}
 			}
 
-			if (damage.homing_towards_hostile_strength > 0.f) {
-				const auto sender_capability = cosmos[damage.sender].get_owning_transfer_capability();
+			const auto* const maybe_sender = it.find<components::sender>();
+
+			if (maybe_sender != nullptr && damage.homing_towards_hostile_strength > 0.f) {
+				const auto sender_capability = cosmos[maybe_sender->capability_of_sender];
 				const auto sender_attitude = sender_capability.alive() && sender_capability.has<components::attitude>() ? sender_capability : cosmos[entity_id()];
 
 				const auto particular_homing_target = cosmos[damage.particular_homing_target];

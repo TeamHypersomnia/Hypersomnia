@@ -395,6 +395,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/augs/misc/enum_boolset.cpp"
 	"src/game/systems_stateless/contact_explosive_system.cpp"
 	"src/augs/templates/string_templates.cpp"
+	"src/game/components/sender_component.cpp"
 )
 
 set(HYPERSOMNIA_TRIVIAL_3RDPARTY_SRCS
@@ -522,6 +523,7 @@ endif()
 
 # We configure MSVC to use static runtime libraries ("/MT" switch),
 # instead of DLL ones.
+# The definition of this function is found in cmake/configure_runtime_library.cmake
 
 include(configure_runtime_library)
 configure_msvc_runtime()
@@ -598,7 +600,7 @@ file(MAKE_DIRECTORY ${GENERATED_SOURCES_PATH})
 
 include_directories("${PROJECT_BINARY_DIR}/generators_output")
 
-# First we configure the define headers according to the currently set options.
+# First we configure the headers with defines in accordance with the currently set options.
 # We could just add the preprocessor definitions as flags,
 # but this has the advantage that testing a change to a flag does not incur recompilation of the whole project.
 

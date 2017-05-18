@@ -49,6 +49,7 @@ namespace components {
 	struct shape_circle;
 	struct motor_joint;
 	struct contact_explosive;
+	struct sender;
 
 	struct all_inferred_state;
 }
@@ -100,6 +101,7 @@ struct put_all_components_into {
 		components::shape_circle,
 		components::motor_joint,
 		components::contact_explosive,
+		components::sender,
 
 		components::all_inferred_state
 

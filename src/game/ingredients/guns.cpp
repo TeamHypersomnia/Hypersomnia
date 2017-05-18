@@ -9,6 +9,7 @@
 #include "game/components/fixtures_component.h"
 #include "game/components/catridge_component.h"
 #include "game/components/contact_explosive_component.h"
+#include "game/components/sender_component.h"
 
 #include "game/messages/create_particle_effect.h"
 
@@ -28,8 +29,8 @@
 #include "augs/graphics/drawers.h"
 
 void add_muzzle_particles(
-	const entity_handle weapon, 
-	components::gun& gun, 
+	const entity_handle weapon,
+	components::gun& gun,
 	const logic_step step
 ) {
 	particle_effect_input effect;
@@ -65,7 +66,7 @@ namespace ingredients {
 			slot_def.always_allow_exactly_one_item = true;
 			slot_def.category_allowed = item_category::MAGAZINE;
 			slot_def.attachment_sticking_mode = rectangle_sticking::TOP;
-			slot_def.attachment_offset.pos.set(10, 5 - bbox.y/2 + 2);
+			slot_def.attachment_offset.pos.set(10, 5 - bbox.y / 2 + 2);
 			slot_def.attachment_offset.rotation = mag_rotation;
 
 			container.slots[slot_function::GUN_DETACHABLE_MAGAZINE] = slot_def;
@@ -87,7 +88,7 @@ namespace ingredients {
 			slot_def.always_allow_exactly_one_item = true;
 			slot_def.category_allowed = item_category::MUZZLE_ATTACHMENT;
 			slot_def.attachment_sticking_mode = rectangle_sticking::RIGHT;
-			slot_def.attachment_offset.pos.x = bbox.x/2 - 1;
+			slot_def.attachment_offset.pos.x = bbox.x / 2 - 1;
 
 			container.slots[slot_function::GUN_MUZZLE] = slot_def;
 		}
@@ -108,7 +109,7 @@ namespace prefabs {
 
 			auto& item = ingredients::make_item(sample_magazine);
 			auto& container = sample_magazine += components::container();
-			
+
 			item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
 			item.space_occupied_per_charge = to_space_units("0.5");
 
@@ -120,7 +121,7 @@ namespace prefabs {
 		}
 
 		sample_magazine.add_standard_components(step);
-		
+
 		if (charge_inside.alive()) {
 			item_slot_transfer_request load_charge{ charge_inside, sample_magazine[slot_function::ITEM_DEPOSIT] };
 			perform_transfer(load_charge, step);
@@ -191,7 +192,7 @@ namespace prefabs {
 		name_entity(red_charge, entity_name::RED_CHARGE);
 
 		const auto red_col = rgba{ 255, 48, 1, 255 };
-		
+
 		{
 			ingredients::add_sprite(red_charge, assets::game_image_id::RED_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
 			ingredients::add_see_through_dynamic_body(step, red_charge, pos);
@@ -212,6 +213,7 @@ namespace prefabs {
 			auto& s = ingredients::add_sprite(round_definition, assets::game_image_id::ROUND_TRACE, red_col, render_layer::FLYING_BULLETS);
 			ingredients::add_bullet_round_physics(step, round_definition, pos);
 
+			auto& sender = round_definition += components::sender();
 			auto& damage = round_definition += components::damage();
 			damage.impulse_upon_hit = 15000.f;
 			damage.impulse_multiplier_against_sentience = 7.f;
@@ -264,7 +266,7 @@ namespace prefabs {
 		const auto shell_definition = cosmos.create_entity("shell_definition");
 		name_entity(pink_charge, entity_name::PINK_CHARGE);
 
-		const auto pink_col = rgba { 255, 40, 255, 255 };
+		const auto pink_col = rgba{ 255, 40, 255, 255 };
 
 		{
 			ingredients::add_sprite(pink_charge, assets::game_image_id::PINK_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
@@ -285,7 +287,8 @@ namespace prefabs {
 		{
 			auto& s = ingredients::add_sprite(round_definition, assets::game_image_id::ROUND_TRACE, pink_col, render_layer::FLYING_BULLETS);
 			ingredients::add_bullet_round_physics(step, round_definition, pos);
-			
+
+			auto& sender = round_definition += components::sender();
 			auto& damage = round_definition += components::damage();
 			damage.impulse_upon_hit = 1000.f;
 
@@ -356,6 +359,7 @@ namespace prefabs {
 			auto& s = ingredients::add_sprite(round_definition, assets::game_image_id::ROUND_TRACE, cyan, render_layer::FLYING_BULLETS);
 			ingredients::add_bullet_round_physics(step, round_definition, pos);
 
+			auto& sender = round_definition += components::sender();
 			auto& damage = round_definition += components::damage();
 
 			damage.destruction_particle_effect_response.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
@@ -368,7 +372,7 @@ namespace prefabs {
 			damage.muzzle_leave_particle_effect_response.modifier.colorize = cyan;
 
 			auto& trace_modifier = damage.bullet_trace_sound_response.modifier;
-			
+
 			trace_modifier.max_distance = 1020.f;
 			trace_modifier.reference_distance = 100.f;
 			trace_modifier.gain = 1.3f;
@@ -421,6 +425,7 @@ namespace prefabs {
 			auto& s = ingredients::add_sprite(round_definition, assets::game_image_id::ROUND_TRACE, green, render_layer::FLYING_BULLETS);
 			ingredients::add_bullet_round_physics(step, round_definition, pos);
 
+			auto& sender = round_definition += components::sender();
 			auto& damage = round_definition += components::damage();
 			damage.amount *= -1;
 			damage.impulse_upon_hit = 0.f;
@@ -449,14 +454,14 @@ namespace prefabs {
 		auto& metas = step.input.metas_of_assets;
 		auto& cosmos = step.cosm;
 		auto load_mag = cosmos[load_mag_id];
-		
+
 		auto weapon = cosmos.create_entity("sample_rifle");
 		name_entity(weapon, entity_name::ASSAULT_RIFLE);
 
 		auto& sprite = ingredients::add_sprite(weapon, assets::game_image_id::ASSAULT_RIFLE, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(step, weapon, pos);
 		ingredients::add_default_gun_container(step, weapon);
-		
+
 		auto& gun = weapon += components::gun();
 
 		gun.muzzle_shot_sound_response.id = assets::sound_buffer_id::ASSAULT_RIFLE_MUZZLE;
@@ -464,7 +469,7 @@ namespace prefabs {
 		gun.action_mode = gun_action_type::AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(4000.f, 4000.f);
 		gun.shot_cooldown = augs::stepped_cooldown(100);
-		gun.bullet_spawn_offset.set(sprite.get_size(metas).x/2, 0);
+		gun.bullet_spawn_offset.set(sprite.get_size(metas).x / 2, 0);
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
 
@@ -490,7 +495,7 @@ namespace prefabs {
 			gun.gunshot_adds_heat = 0.052f;
 			gun.engine_sound_strength = 0.5f;
 		}
-		
+
 		add_muzzle_particles(weapon, gun, step);
 
 		weapon.add_standard_components(step);
@@ -514,11 +519,11 @@ namespace prefabs {
 		auto& sprite = ingredients::add_sprite(weapon, assets::game_image_id::BILMER2000, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(step, weapon, pos);
 		ingredients::add_default_gun_container(step, weapon);
-		
+
 		const auto bbox = weapon.get_aabb(metas, components::transform()).get_size();
 
 		auto& container = weapon.get<components::container>();
-		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_offset.pos.set(-10, -10 + bbox.y/2);
+		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_offset.pos.set(-10, -10 + bbox.y / 2);
 		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_sticking_mode = rectangle_sticking::BOTTOM;
 
 		auto& gun = weapon += components::gun();
@@ -565,7 +570,7 @@ namespace prefabs {
 
 		if (load_mag.alive()) {
 			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);
-			
+
 			if (load_mag[slot_function::ITEM_DEPOSIT].has_items()) {
 				perform_transfer({ load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1 }, step);
 			}
@@ -592,7 +597,7 @@ namespace prefabs {
 		gun.action_mode = gun_action_type::AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(3000.f, 3000.f);
 		gun.shot_cooldown = augs::stepped_cooldown(50);
-		gun.bullet_spawn_offset.set(sprite.get_size(metas).x/2, 0);
+		gun.bullet_spawn_offset.set(sprite.get_size(metas).x / 2, 0);
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
 		gun.num_last_bullets_to_trigger_low_ammo_cue = 9;
@@ -603,7 +608,7 @@ namespace prefabs {
 		gun.shell_spread_degrees = 20.f;
 		gun.shell_velocity = std::make_pair(300.f, 1700.f);
 		gun.damage_multiplier = 1.f;
-		
+
 		{
 			sound_effect_input in;
 			in.effect.id = assets::sound_buffer_id::FIREARM_ENGINE;
@@ -618,7 +623,7 @@ namespace prefabs {
 			gun.gunshot_adds_heat = 0.030f;
 			gun.engine_sound_strength = 0.5f;
 		}
-	
+
 		add_muzzle_particles(weapon, gun, step);
 
 		weapon.add_standard_components(step);
@@ -642,7 +647,7 @@ namespace prefabs {
 
 		auto& sprite = ingredients::add_sprite(weapon, assets::game_image_id::AMPLIFIER_ARM, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(step, weapon, pos);
-		
+
 		auto& item = ingredients::make_item(weapon);
 		item.space_occupied_per_charge = to_space_units("3.0");
 
@@ -667,6 +672,7 @@ namespace prefabs {
 			auto& s = ingredients::add_sprite(round_definition, assets::game_image_id::ENERGY_BALL, cyan, render_layer::FLYING_BULLETS);
 			ingredients::add_bullet_round_physics(step, round_definition, pos);
 
+			auto& sender = round_definition += components::sender();
 			auto& damage = round_definition += components::damage();
 
 			damage.destruction_particle_effect_response.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
@@ -733,7 +739,7 @@ namespace prefabs {
 		gun.shell_spread_degrees = 20.f;
 		gun.shell_velocity = std::make_pair(300.f, 1700.f);
 		gun.damage_multiplier = 1.f;
-		
+
 		add_muzzle_particles(weapon, gun, step);
 
 		weapon.add_standard_components(step);
@@ -757,10 +763,10 @@ namespace prefabs {
 		ingredients::add_see_through_dynamic_body(step, weapon, pos);
 		ingredients::add_default_gun_container(step, weapon, 0);
 		auto& container = weapon.get<components::container>();
-		
+
 		const auto bbox = weapon.get_aabb(metas, components::transform()).get_size();
-		
-		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_offset.pos.set(1, -11 + bbox.y/2);
+
+		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_offset.pos.set(1, -11 + bbox.y / 2);
 		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE].attachment_sticking_mode = rectangle_sticking::BOTTOM;
 
 		auto& gun = weapon += components::gun();
@@ -847,7 +853,7 @@ namespace prefabs {
 		gun.bullet_spawn_offset.set(sprite.get_size(metas).x / 2, 0);
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 80.f;
-		
+
 		weapon.add_standard_components(step);
 
 		const auto load_rocket = cosmos[load_rocket_id];
@@ -880,6 +886,7 @@ namespace prefabs {
 			ingredients::add_sprite(round_definition, assets::game_image_id::FORCE_ROCKET, white, render_layer::FLYING_BULLETS);
 			ingredients::add_bullet_round_physics(step, round_definition, transform);
 
+			auto& sender = round_definition += components::sender();
 			auto& damage = round_definition += components::damage();
 
 			damage.damage_upon_collision = false;

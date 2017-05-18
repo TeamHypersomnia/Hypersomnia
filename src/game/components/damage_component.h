@@ -21,9 +21,6 @@ namespace components {
 		float impulse_upon_hit = 100.f;
 		float impulse_multiplier_against_sentience = 1.f;
 
-		entity_id sender;
-		entity_id sender_capability;
-
 		bool damage_upon_collision = true;
 		bool destroy_upon_damage = true;
 		bool constrain_lifetime = true;

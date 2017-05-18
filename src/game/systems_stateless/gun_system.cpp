@@ -17,6 +17,7 @@
 #include "game/components/sentience_component.h"
 #include "game/components/sound_existence_component.h"
 #include "game/components/contact_explosive_component.h"
+#include "game/components/sender_component.h"
 
 #include "game/systems_inferred/physics_system.h"
 
@@ -174,10 +175,10 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				if (is_magic_launcher) {
 					const auto round_entity = cosmos.clone_entity(magic_missile_def); //??
 
+					auto& sender = round_entity.get<components::sender>();
+					sender.set(it);
+
 					auto& damage = round_entity.get<components::damage>();
-					damage.sender = it;
-					damage.sender_capability = owning_capability;
-					
 					total_recoil_amount += damage.recoil_multiplier;
 
 					round_entity.set_logic_transform(step, muzzle_transform);
@@ -235,11 +236,12 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						while (charges--) {
 							const auto round_entity = cosmos.clone_entity(single_bullet_or_pellet_stack[child_entity_name::CATRIDGE_BULLET]);
 
+							auto& sender = round_entity.get<components::sender>();
+							sender.set(it);
+
 							auto& damage = round_entity.get<components::damage>();
 							damage.amount *= gun.damage_multiplier;
 							damage.impulse_upon_hit *= gun.damage_multiplier;
-							damage.sender = it;
-							damage.sender_capability = owning_capability;
 							total_recoil_amount += damage.recoil_multiplier;
 
 							if(round_entity.has<components::contact_explosive>()) {
