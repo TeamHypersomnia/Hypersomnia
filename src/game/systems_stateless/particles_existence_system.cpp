@@ -104,13 +104,15 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 			}
 
 			{
+				auto& missile = cosmos[r].get<components::missile>();
+
 				particle_effect_input particle_trace;
-				particle_trace.effect = cosmos[r].get<components::missile>().bullet_trace_particle_effect_response;
+				particle_trace.effect = missile.bullet_trace_particle_effect_response;
 
 				auto place_of_birth = cosmos[r].get_logic_transform();
 				place_of_birth.rotation += 180;
 
-				particle_trace.create_particle_effect_entity(
+				missile.trace_particles = particle_trace.create_particle_effect_entity(
 					step,
 					place_of_birth,
 					r

@@ -44,6 +44,7 @@ namespace components {
 		entity_id particular_homing_target;
 		
 		child_entity_id trace_sound;
+		child_entity_id trace_particles;
 
 		sound_response bullet_trace_sound_response;
 		sound_response destruction_sound_response;
