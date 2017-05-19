@@ -111,8 +111,14 @@ void item_system::pick_up_touching_items(const logic_step step) {
 					}
 				}
 
+				entity_id item_to_pick = item;
+
+				if (item.get_current_slot().alive()) {
+					item_to_pick = item.get_current_slot().get_root_container();
+				}
+
 				const auto& pick_list = maybe_transfers->only_pick_these_items;
-				const bool found_on_subscription_list = found_in(pick_list, item);
+				const bool found_on_subscription_list = found_in(pick_list, item_to_pick);
 
 				const bool item_subscribed = 
 					(pick_list.empty() && maybe_transfers->pick_all_touched_items_if_list_to_pick_empty)
@@ -120,13 +126,13 @@ void item_system::pick_up_touching_items(const logic_step step) {
 				;
 
 				if (item_subscribed) {
-					const auto pickup_slot = actual_picker.determine_pickup_target_slot_for(item);
+					const auto pickup_slot = actual_picker.determine_pickup_target_slot_for(cosmos[item_to_pick]);
 
 					if (pickup_slot.alive()) {
 						const bool can_pick_already = maybe_transfers->pickup_timeout.try_to_fire_and_reset(cosmos.get_timestamp(), delta);
 
 						if (can_pick_already) {
-							const item_slot_transfer_request request{ item, pickup_slot };
+							const item_slot_transfer_request request{ item_to_pick, pickup_slot };
 							perform_transfer(request, step);
 						}
 					}
