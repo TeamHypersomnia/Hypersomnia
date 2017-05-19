@@ -4,7 +4,7 @@
 #include "game/components/name_component.h"
 #include "game/components/melee_component.h"
 #include "game/components/gun_component.h"
-#include "game/components/damage_component.h"
+#include "game/components/missile_component.h"
 #include "game/components/container_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/item_component.h"
@@ -38,7 +38,7 @@ std::wstring get_bbcoded_entity_properties(const const_entity_handle id) {
 
 	const auto* const melee = id.find<components::melee>();
 	const auto* const gun = id.find<components::gun>();
-	const auto* const damage = id.find<components::damage>();
+	const auto* const damage = id.find<components::missile>();
 	const auto* const container = id.find<components::container>();
 	const auto* const item = id.find<components::item>();
 
@@ -72,11 +72,11 @@ std::wstring get_bbcoded_entity_properties(const const_entity_handle id) {
 	}
 
 	if (damage) {
-		if (damage->amount > 0) {
-			result << L"Base damage: [color=vscyan]" << damage->amount << L"[/color]\n";
+		if (damage->damage_amount > 0) {
+			result << L"Base damage: [color=vscyan]" << damage->damage_amount << L"[/color]\n";
 		}
-		else if (damage->amount < 0) {
-			result << L"Restores health: [color=vscyan]" << -damage->amount << L"[/color]\n";
+		else if (damage->damage_amount < 0) {
+			result << L"Restores health: [color=vscyan]" << -damage->damage_amount << L"[/color]\n";
 		}
 
 		if (damage->constrain_lifetime) {

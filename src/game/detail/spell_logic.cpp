@@ -5,7 +5,7 @@
 #include "game/components/sentience_component.h"
 #include "game/components/render_component.h"
 #include "game/components/wandering_pixels_component.h"
-#include "game/components/damage_component.h"
+#include "game/components/missile_component.h"
 #include "game/components/sender_component.h"
 #include "game/messages/create_particle_effect.h"
 #include "game/systems_stateless/particles_existence_system.h"
@@ -234,18 +234,18 @@ void perform_spell_logic(
 					new_energy_ball_transform
 				);
 
-				auto& damage = energy_ball += components::damage();
+				auto& missile = energy_ball += components::missile();
 
-				damage.destruction_particle_effect_response.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
-				damage.destruction_particle_effect_response.modifier.colorize = cyan;
+				missile.destruction_particle_effect_response.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
+				missile.destruction_particle_effect_response.modifier.colorize = cyan;
 
-				damage.bullet_trace_particle_effect_response.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
-				damage.bullet_trace_particle_effect_response.modifier.colorize = cyan;
+				missile.bullet_trace_particle_effect_response.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
+				missile.bullet_trace_particle_effect_response.modifier.colorize = cyan;
 
-				damage.muzzle_leave_particle_effect_response.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
-				damage.muzzle_leave_particle_effect_response.modifier.colorize = cyan;
+				missile.muzzle_leave_particle_effect_response.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
+				missile.muzzle_leave_particle_effect_response.modifier.colorize = cyan;
 
-				auto& trace_modifier = damage.bullet_trace_sound_response.modifier;
+				auto& trace_modifier = missile.bullet_trace_sound_response.modifier;
 
 				trace_modifier.max_distance = 1020.f;
 				trace_modifier.reference_distance = 100.f;
@@ -253,12 +253,12 @@ void perform_spell_logic(
 				trace_modifier.repetitions = -1;
 				trace_modifier.fade_on_exit = false;
 
-				damage.bullet_trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
-				damage.destruction_sound_response.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
+				missile.bullet_trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
+				missile.destruction_sound_response.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
 
-				damage.homing_towards_hostile_strength = 1.0f;
-				damage.particular_homing_target = next_hostile;
-				damage.amount = 42;
+				missile.homing_towards_hostile_strength = 1.0f;
+				missile.particular_homing_target = next_hostile;
+				missile.damage_amount = 42;
 
 				auto& sender = energy_ball += components::sender();
 				sender.set(caster);

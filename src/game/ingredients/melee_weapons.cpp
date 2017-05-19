@@ -5,7 +5,7 @@
 #include "game/assets/particle_effect_id.h"
 
 #include "game/components/sender_component.h"
-#include "game/components/damage_component.h"
+#include "game/components/missile_component.h"
 #include "game/components/item_component.h"
 #include "game/components/melee_component.h"
 
@@ -27,12 +27,12 @@ namespace prefabs {
 		auto& melee = machete += components::melee();
 
 		auto& sender = machete += components::sender();
-		auto& damage = machete += components::damage();
-		damage.destroy_upon_damage = false;
-		damage.damage_upon_collision = false;
-		damage.amount = 50.f;
-		damage.impulse_upon_hit = 1000.f;
-		damage.constrain_lifetime = false;
+		auto& missile = machete += components::missile();
+		missile.destroy_upon_damage = false;
+		missile.damage_upon_collision = false;
+		missile.damage_amount = 50.f;
+		missile.impulse_upon_hit = 1000.f;
+		missile.constrain_lifetime = false;
 
 		machete.add_standard_components(step);
 

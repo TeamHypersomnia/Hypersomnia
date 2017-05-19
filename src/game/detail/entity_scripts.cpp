@@ -4,7 +4,7 @@
 #include "game/components/melee_component.h"
 #include "game/components/car_component.h"
 #include "game/components/sentience_component.h"
-#include "game/components/damage_component.h"
+#include "game/components/missile_component.h"
 #include "game/components/attitude_component.h"
 #include "game/components/container_component.h"
 #include "game/components/sender_component.h"
@@ -21,7 +21,7 @@ void unset_input_flags_of_orphaned_entity(entity_handle e) {
 	auto* const melee = e.find<components::melee>();
 	auto* const car = e.find<components::car>();
 	auto* const movement = e.find<components::movement>();
-	auto* const damage = e.find<components::damage>();
+	auto* const damage = e.find<components::missile>();
 
 	if (car) {
 		car->reset_movement_flags();
@@ -58,7 +58,7 @@ identified_danger assess_danger(
 
 	result.danger = danger;
 
-	const auto* const damage = danger.find<components::damage>();
+	const auto* const damage = danger.find<components::missile>();
 	const auto* const attitude = danger.find<components::attitude>();
 
 	if ((!damage && !attitude) || (damage && danger.get<components::sender>().is_sender_subject(victim))) {
@@ -90,7 +90,7 @@ identified_danger assess_danger(
 	}
 
 	if (damage) {
-		result.amount += comfort_zone_disturbance_ratio * damage->amount*4;
+		result.amount += comfort_zone_disturbance_ratio * damage->damage_amount*4;
 	}
 
 	if (attitude) {
@@ -133,7 +133,7 @@ float assess_projectile_velocity_of_weapon(const const_entity_handle weapon) {
 	// auto ch = weapon[slot_function::GUN_CHAMBER];
 	// 
 	// if (ch.has_items()) {
-	// 	ch.get_items_inside()[0][child_entity_name::CATRIDGE_BULLET].get<components::damage>();
+	// 	ch.get_items_inside()[0][child_entity_name::CATRIDGE_BULLET].get<components::missile>();
 	// }
 
 	const auto* const maybe_gun = weapon.find<components::gun>();

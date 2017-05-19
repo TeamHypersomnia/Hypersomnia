@@ -22,7 +22,7 @@ P P::get_default(const const_entity_handle id) {
 	if (id.has<components::crosshair>()) {
 		matching.push_back(processing_subjects::WITH_CROSSHAIR);
 	}
-	if (id.has<components::damage>()) {
+	if (id.has<components::missile>()) {
 		matching.push_back(processing_subjects::WITH_DAMAGE);
 	}
 	if (id.has<components::driver>()) {

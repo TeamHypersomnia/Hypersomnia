@@ -5,7 +5,7 @@
 
 #include "game/detail/entity_scripts.h"
 
-#include "game/components/damage_component.h"
+#include "game/components/missile_component.h"
 #include "game/components/render_component.h"
 #include "game/components/gun_component.h"
 #include "game/components/fixtures_component.h"
@@ -126,12 +126,12 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 		for (const auto r : g.spawned_rounds) {
 			const auto subject = cosmos[r];
 
-			auto& damage = subject.get<components::damage>();
+			auto& missile = subject.get<components::missile>();
 
 			sound_effect_input in;
-			in.effect = damage.bullet_trace_sound_response;
+			in.effect = missile.bullet_trace_sound_response;
 
-			damage.trace_sound = in.create_sound_effect_entity(
+			missile.trace_sound = in.create_sound_effect_entity(
 				step,
 				g.muzzle_transform,
 				r
@@ -243,7 +243,7 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 			
 			sound_effect_input in;
 			in.direct_listener = d.subject;
-			in.effect = inflictor.get<components::damage>().destruction_sound_response;
+			in.effect = inflictor.get<components::missile>().destruction_sound_response;
 			
 			if (in.effect.id != assets::sound_buffer_id::INVALID) {
 				in.create_sound_effect_entity(

@@ -7,7 +7,7 @@
 #include "game/components/render_component.h"
 #include "game/components/transform_component.h"
 #include "game/components/sprite_component.h"
-#include "game/components/damage_component.h"
+#include "game/components/missile_component.h"
 #include "game/components/rigid_body_component.h"
 #include "game/components/all_inferred_state_component.h"
 #include "game/components/interpolation_component.h"
@@ -105,9 +105,9 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 
 			//finishing_trace.get<components::transform>().rotation = 90;// e.get<components::rigid_body>().velocity().degrees();
 
-			if (deleted_entity.find<components::damage>()) {
+			if (deleted_entity.find<components::missile>()) {
 				finishing_trace.get<components::transform>().pos = 
-					deleted_entity.get<components::damage>().saved_point_of_impact_before_death
+					deleted_entity.get<components::missile>().saved_point_of_impact_before_death
 					- (deleted_entity.get<components::sprite>().get_size(metas) / 2)
 						.rotate(finishing_trace.get<components::transform>().rotation, vec2(0, 0))
 				;

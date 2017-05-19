@@ -10,7 +10,7 @@
 #include "game/systems_stateless/crosshair_system.h"
 #include "game/systems_stateless/rotation_copying_system.h"
 #include "game/systems_stateless/position_copying_system.h"
-#include "game/systems_stateless/damage_system.h"
+#include "game/systems_stateless/missile_system.h"
 #include "game/systems_stateless/destroy_system.h"
 #include "game/systems_stateless/particles_existence_system.h"
 #include "game/systems_stateless/behaviour_tree_system.h"
@@ -456,8 +456,8 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	item_system().start_picking_up_items(step);
 	item_system().pick_up_touching_items(step);
 
-	damage_system().destroy_outdated_bullets(step);
-	damage_system().destroy_colliding_bullets_and_send_damage(step);
+	missile_system().detonate_expired_missiles(step);
+	missile_system().detonate_colliding_missiles(step);
 
 	destruction_system().generate_damages_from_forceful_collisions(step);
 	destruction_system().apply_damages_and_split_fixtures(step);

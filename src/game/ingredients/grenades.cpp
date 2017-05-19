@@ -4,7 +4,7 @@
 
 #include "game/assets/particle_effect_id.h"
 
-#include "game/components/damage_component.h"
+#include "game/components/missile_component.h"
 #include "game/components/item_component.h"
 #include "game/components/melee_component.h"
 #include "game/components/fixtures_component.h"

@@ -11,7 +11,7 @@ namespace components {
 	struct behaviour_tree;
 	struct position_copying;
 	struct crosshair;
-	struct damage;
+	struct missile;
 	struct flags;
 	struct gun;
 	struct rotation_copying;
@@ -63,7 +63,7 @@ struct put_all_components_into {
 		components::behaviour_tree,
 		components::position_copying,
 		components::crosshair,
-		components::damage,
+		components::missile,
 		components::flags,
 		components::gun,
 		components::rotation_copying,

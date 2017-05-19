@@ -6,7 +6,7 @@
 #include "game/components/animation_component.h"
 #include "game/components/position_copying_component.h"
 #include "game/components/crosshair_component.h"
-#include "game/components/damage_component.h"
+#include "game/components/missile_component.h"
 #include "game/components/gun_component.h"
 
 #include "game/components/rotation_copying_component.h"

@@ -1,7 +1,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/components/gun_component.h"
 #include "game/components/item_component.h"
-#include "game/components/damage_component.h"
+#include "game/components/missile_component.h"
 #include "game/components/sprite_component.h"
 #include "game/components/name_component.h"
 #include "game/components/trace_component.h"
@@ -214,12 +214,12 @@ namespace prefabs {
 			ingredients::add_bullet_round_physics(step, round_definition, pos);
 
 			auto& sender = round_definition += components::sender();
-			auto& damage = round_definition += components::damage();
-			damage.impulse_upon_hit = 15000.f;
-			damage.impulse_multiplier_against_sentience = 7.f;
-			damage.amount = 3.f;
+			auto& missile = round_definition += components::missile();
+			missile.impulse_upon_hit = 15000.f;
+			missile.impulse_multiplier_against_sentience = 7.f;
+			missile.damage_amount = 3.f;
 
-			auto& trace_modifier = damage.bullet_trace_sound_response.modifier;
+			auto& trace_modifier = missile.bullet_trace_sound_response.modifier;
 
 			trace_modifier.max_distance = 1020.f;
 			trace_modifier.reference_distance = 100.f;
@@ -227,17 +227,17 @@ namespace prefabs {
 			trace_modifier.repetitions = -1;
 			trace_modifier.fade_on_exit = false;
 
-			damage.bullet_trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
-			damage.destruction_sound_response.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
+			missile.bullet_trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
+			missile.destruction_sound_response.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
 
-			damage.destruction_particle_effect_response.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
-			damage.destruction_particle_effect_response.modifier.colorize = red_col;
+			missile.destruction_particle_effect_response.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
+			missile.destruction_particle_effect_response.modifier.colorize = red_col;
 
-			damage.bullet_trace_particle_effect_response.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
-			damage.bullet_trace_particle_effect_response.modifier.colorize = red_col;
+			missile.bullet_trace_particle_effect_response.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
+			missile.bullet_trace_particle_effect_response.modifier.colorize = red_col;
 
-			damage.muzzle_leave_particle_effect_response.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
-			damage.muzzle_leave_particle_effect_response.modifier.colorize = red_col;
+			missile.muzzle_leave_particle_effect_response.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
+			missile.muzzle_leave_particle_effect_response.modifier.colorize = red_col;
 
 			auto& trace = round_definition += components::trace();
 			trace.max_multiplier_x = std::make_pair(0.0f, 1.2f);
@@ -289,10 +289,10 @@ namespace prefabs {
 			ingredients::add_bullet_round_physics(step, round_definition, pos);
 
 			auto& sender = round_definition += components::sender();
-			auto& damage = round_definition += components::damage();
-			damage.impulse_upon_hit = 1000.f;
+			auto& missile = round_definition += components::missile();
+			missile.impulse_upon_hit = 1000.f;
 
-			auto& trace_modifier = damage.bullet_trace_sound_response.modifier;
+			auto& trace_modifier = missile.bullet_trace_sound_response.modifier;
 
 			trace_modifier.max_distance = 1020.f;
 			trace_modifier.reference_distance = 100.f;
@@ -300,17 +300,17 @@ namespace prefabs {
 			trace_modifier.repetitions = -1;
 			trace_modifier.fade_on_exit = false;
 
-			damage.bullet_trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
-			damage.destruction_sound_response.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
+			missile.bullet_trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
+			missile.destruction_sound_response.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
 
-			damage.destruction_particle_effect_response.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
-			damage.destruction_particle_effect_response.modifier.colorize = pink_col;
+			missile.destruction_particle_effect_response.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
+			missile.destruction_particle_effect_response.modifier.colorize = pink_col;
 
-			damage.bullet_trace_particle_effect_response.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
-			damage.bullet_trace_particle_effect_response.modifier.colorize = pink_col;
+			missile.bullet_trace_particle_effect_response.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
+			missile.bullet_trace_particle_effect_response.modifier.colorize = pink_col;
 
-			damage.muzzle_leave_particle_effect_response.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
-			damage.muzzle_leave_particle_effect_response.modifier.colorize = pink_col;
+			missile.muzzle_leave_particle_effect_response.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
+			missile.muzzle_leave_particle_effect_response.modifier.colorize = pink_col;
 
 			auto& trace = round_definition += components::trace();
 			trace.additional_multiplier = vec2(1.f, 1.f);
@@ -360,18 +360,18 @@ namespace prefabs {
 			ingredients::add_bullet_round_physics(step, round_definition, pos);
 
 			auto& sender = round_definition += components::sender();
-			auto& damage = round_definition += components::damage();
+			auto& missile = round_definition += components::missile();
 
-			damage.destruction_particle_effect_response.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
-			damage.destruction_particle_effect_response.modifier.colorize = cyan;
+			missile.destruction_particle_effect_response.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
+			missile.destruction_particle_effect_response.modifier.colorize = cyan;
 
-			damage.bullet_trace_particle_effect_response.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
-			damage.bullet_trace_particle_effect_response.modifier.colorize = cyan;
+			missile.bullet_trace_particle_effect_response.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
+			missile.bullet_trace_particle_effect_response.modifier.colorize = cyan;
 
-			damage.muzzle_leave_particle_effect_response.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
-			damage.muzzle_leave_particle_effect_response.modifier.colorize = cyan;
+			missile.muzzle_leave_particle_effect_response.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
+			missile.muzzle_leave_particle_effect_response.modifier.colorize = cyan;
 
-			auto& trace_modifier = damage.bullet_trace_sound_response.modifier;
+			auto& trace_modifier = missile.bullet_trace_sound_response.modifier;
 
 			trace_modifier.max_distance = 1020.f;
 			trace_modifier.reference_distance = 100.f;
@@ -379,8 +379,8 @@ namespace prefabs {
 			trace_modifier.repetitions = -1;
 			trace_modifier.fade_on_exit = false;
 
-			damage.bullet_trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
-			damage.destruction_sound_response.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
+			missile.bullet_trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
+			missile.destruction_sound_response.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
 
 			auto& trace = round_definition += components::trace();
 			trace.max_multiplier_x = std::make_pair(0.0f, 1.2f);
@@ -426,10 +426,10 @@ namespace prefabs {
 			ingredients::add_bullet_round_physics(step, round_definition, pos);
 
 			auto& sender = round_definition += components::sender();
-			auto& damage = round_definition += components::damage();
-			damage.amount *= -1;
-			damage.impulse_upon_hit = 0.f;
-			damage.recoil_multiplier = 0.1f;
+			auto& missile = round_definition += components::missile();
+			missile.damage_amount *= -1;
+			missile.impulse_upon_hit = 0.f;
+			missile.recoil_multiplier = 0.1f;
 			auto& trace = round_definition += components::trace();
 			trace.max_multiplier_x = std::make_pair(0.0f, 3.5f);
 			trace.max_multiplier_y = std::make_pair(0.f, 0.f);
@@ -673,18 +673,18 @@ namespace prefabs {
 			ingredients::add_bullet_round_physics(step, round_definition, pos);
 
 			auto& sender = round_definition += components::sender();
-			auto& damage = round_definition += components::damage();
+			auto& missile = round_definition += components::missile();
 
-			damage.destruction_particle_effect_response.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
-			damage.destruction_particle_effect_response.modifier.colorize = cyan;
+			missile.destruction_particle_effect_response.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
+			missile.destruction_particle_effect_response.modifier.colorize = cyan;
 
-			damage.bullet_trace_particle_effect_response.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
-			damage.bullet_trace_particle_effect_response.modifier.colorize = cyan;
+			missile.bullet_trace_particle_effect_response.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
+			missile.bullet_trace_particle_effect_response.modifier.colorize = cyan;
 
-			damage.muzzle_leave_particle_effect_response.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
-			damage.muzzle_leave_particle_effect_response.modifier.colorize = cyan;
+			missile.muzzle_leave_particle_effect_response.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
+			missile.muzzle_leave_particle_effect_response.modifier.colorize = cyan;
 
-			auto& trace_modifier = damage.bullet_trace_sound_response.modifier;
+			auto& trace_modifier = missile.bullet_trace_sound_response.modifier;
 
 			trace_modifier.max_distance = 1020.f;
 			trace_modifier.reference_distance = 100.f;
@@ -692,11 +692,11 @@ namespace prefabs {
 			trace_modifier.repetitions = -1;
 			trace_modifier.fade_on_exit = false;
 
-			damage.bullet_trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
-			damage.destruction_sound_response.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
+			missile.bullet_trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
+			missile.destruction_sound_response.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
 
-			damage.homing_towards_hostile_strength = 1.0f;
-			damage.amount = 42;
+			missile.homing_towards_hostile_strength = 1.0f;
+			missile.damage_amount = 42;
 
 			auto& trace = round_definition += components::trace();
 			trace.max_multiplier_x = std::make_pair(0.0f, 0.f);
@@ -887,20 +887,20 @@ namespace prefabs {
 			ingredients::add_bullet_round_physics(step, round_definition, transform);
 
 			auto& sender = round_definition += components::sender();
-			auto& damage = round_definition += components::damage();
+			auto& missile = round_definition += components::missile();
 
-			damage.destruction_particle_effect_response.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
-			damage.destruction_particle_effect_response.modifier.colorize = orange;
+			missile.destruction_particle_effect_response.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
+			missile.destruction_particle_effect_response.modifier.colorize = orange;
 
-			damage.bullet_trace_particle_effect_response.id = assets::particle_effect_id::MISSILE_SMOKE_TRAIL;
-			damage.bullet_trace_particle_effect_response.modifier.colorize = white;
+			missile.bullet_trace_particle_effect_response.id = assets::particle_effect_id::MISSILE_SMOKE_TRAIL;
+			missile.bullet_trace_particle_effect_response.modifier.colorize = white;
 
-			damage.muzzle_leave_particle_effect_response.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
-			damage.muzzle_leave_particle_effect_response.modifier.colorize = white;
+			missile.muzzle_leave_particle_effect_response.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
+			missile.muzzle_leave_particle_effect_response.modifier.colorize = white;
 
-			damage.max_lifetime_ms = 4000.f;
+			missile.max_lifetime_ms = 4000.f;
 
-			auto& trace_modifier = damage.bullet_trace_sound_response.modifier;
+			auto& trace_modifier = missile.bullet_trace_sound_response.modifier;
 
 			trace_modifier.max_distance = 1020.f;
 			trace_modifier.reference_distance = 100.f;
@@ -908,7 +908,7 @@ namespace prefabs {
 			trace_modifier.repetitions = -1;
 			trace_modifier.fade_on_exit = false;
 
-			damage.bullet_trace_sound_response.id = assets::sound_buffer_id::MISSILE_THRUSTER;
+			missile.bullet_trace_sound_response.id = assets::sound_buffer_id::MISSILE_THRUSTER;
 
 			auto& explosive = round_definition += components::explosive();
 

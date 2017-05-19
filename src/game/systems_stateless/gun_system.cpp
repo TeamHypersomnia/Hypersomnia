@@ -8,7 +8,7 @@
 #include "game/detail/inventory/item_slot_transfer_request.h"
 
 #include "game/components/rigid_body_component.h"
-#include "game/components/damage_component.h"
+#include "game/components/missile_component.h"
 #include "game/components/particles_existence_component.h"
 #include "game/components/position_copying_component.h"
 #include "game/components/container_component.h"
@@ -134,7 +134,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 			const auto magic_missile_def = cosmos[gun.magic_missile_definition];
 			const auto is_magic_launcher = magic_missile_def.alive();
-			const auto mana_needed = is_magic_launcher ? magic_missile_def.get<components::damage>().amount / 4 : 0;
+			const auto mana_needed = is_magic_launcher ? magic_missile_def.get<components::missile>().damage_amount / 4 : 0;
 			
 			bool has_enough_physical_bullets = false;
 
@@ -178,8 +178,8 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					auto& sender = round_entity.get<components::sender>();
 					sender.set(it);
 
-					auto& damage = round_entity.get<components::damage>();
-					total_recoil_amount += damage.recoil_multiplier;
+					auto& missile = round_entity.get<components::missile>();
+					total_recoil_amount += missile.recoil_multiplier;
 
 					round_entity.set_logic_transform(step, muzzle_transform);
 
@@ -239,10 +239,10 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							auto& sender = round_entity.get<components::sender>();
 							sender.set(it);
 
-							auto& damage = round_entity.get<components::damage>();
-							damage.amount *= gun.damage_multiplier;
-							damage.impulse_upon_hit *= gun.damage_multiplier;
-							total_recoil_amount += damage.recoil_multiplier;
+							auto& missile = round_entity.get<components::missile>();
+							missile.damage_amount *= gun.damage_multiplier;
+							missile.impulse_upon_hit *= gun.damage_multiplier;
+							total_recoil_amount += missile.recoil_multiplier;
 
 							if (round_entity.has<components::explosive>()) {
 								auto& explosive = round_entity.get<components::explosive>();

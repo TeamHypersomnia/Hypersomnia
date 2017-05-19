@@ -6,7 +6,7 @@
 
 #include "game/assets/particle_effect.h"
 
-#include "game/components/damage_component.h"
+#include "game/components/missile_component.h"
 #include "game/components/render_component.h"
 #include "game/components/position_copying_component.h"
 #include "game/components/particles_existence_component.h"
@@ -94,7 +94,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 		for (auto& r : g.spawned_rounds) {
 			{
 				particle_effect_input burst;
-				burst.effect = cosmos[r].get<components::damage>().muzzle_leave_particle_effect_response;
+				burst.effect = cosmos[r].get<components::missile>().muzzle_leave_particle_effect_response;
 
 				burst.create_particle_effect_entity(
 					step,
@@ -105,7 +105,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 
 			{
 				particle_effect_input particle_trace;
-				particle_trace.effect = cosmos[r].get<components::damage>().bullet_trace_particle_effect_response;
+				particle_trace.effect = cosmos[r].get<components::missile>().bullet_trace_particle_effect_response;
 
 				auto place_of_birth = cosmos[r].get_logic_transform();
 				place_of_birth.rotation += 180;
@@ -150,7 +150,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 				place_of_birth.rotation = (d.impact_velocity).degrees();
 			}
 
-			burst.effect = inflictor.get<components::damage>().destruction_particle_effect_response;
+			burst.effect = inflictor.get<components::missile>().destruction_particle_effect_response;
 
 			burst.create_particle_effect_entity(
 				step,

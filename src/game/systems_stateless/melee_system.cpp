@@ -7,7 +7,7 @@
 #include "game/detail/inventory/inventory_utils.h"
 
 #include "game/components/melee_component.h"
-#include "game/components/damage_component.h"
+#include "game/components/missile_component.h"
 #include "game/components/fixtures_component.h"
 
 #include "game/transcendental/entity_handle.h"
@@ -20,7 +20,7 @@ void components::melee::reset_weapon(entity_handle e) {
 	m.reset_move_flags();
 	m.current_state = melee_state::FREE;
 
-	auto& d = e.get<components::damage>();
+	auto& d = e.get<components::missile>();
 	d.damage_upon_collision = false;
 }
 

@@ -4,7 +4,7 @@
 #include "game/components/driver_component.h"
 #include "game/components/special_physics_component.h"
 #include "game/components/flags_component.h"
-#include "game/components/damage_component.h"
+#include "game/components/missile_component.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
@@ -137,7 +137,7 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 		}
 
 		//const auto collider_owner_body = collider.get_owner_body();
-		//const auto* const damage = subject.get_owner_body().find<components::damage>();
+		//const auto* const damage = subject.get_owner_body().find<components::missile>();
 		//
 		//const bool bullet_colliding_with_sender =
 		//	damage != nullptr

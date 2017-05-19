@@ -15,9 +15,9 @@
 #include "game/detail/sentience_meter.h"
 
 namespace components {
-	struct damage {
-		// GEN INTROSPECTOR struct components::damage
-		meter_value_type amount = 12;
+	struct missile {
+		// GEN INTROSPECTOR struct components::missile
+		meter_value_type damage_amount = 12;
 
 		float impulse_upon_hit = 100.f;
 		float impulse_multiplier_against_sentience = 1.f;
