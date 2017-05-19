@@ -456,8 +456,8 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	item_system().start_picking_up_items(step);
 	item_system().pick_up_touching_items(step);
 
-	missile_system().detonate_expired_missiles(step);
 	missile_system().detonate_colliding_missiles(step);
+	missile_system().detonate_expired_missiles(step);
 
 	destruction_system().generate_damages_from_forceful_collisions(step);
 	destruction_system().apply_damages_and_split_fixtures(step);

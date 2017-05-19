@@ -145,7 +145,11 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 		[&](const auto it) {
 			auto& missile = it.get<components::missile>();
 		
-			if (missile.constrain_lifetime) {
+			const bool already_detonated_in_this_step = 
+				missile.damage_charges_before_destruction == 0
+			;
+
+			if (missile.constrain_lifetime && !already_detonated_in_this_step) {
 				if (!missile.when_released.was_set()) {
 					missile.when_released = now;
 					missile.when_detonates.step = static_cast<unsigned>(now.step + (1 / delta.in_milliseconds() * missile.max_lifetime_ms));
