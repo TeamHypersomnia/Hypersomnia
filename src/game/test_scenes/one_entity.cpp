@@ -65,7 +65,7 @@ namespace test_scenes {
 				transform.pos.x += 200;
 			}
 
-			const auto new_character = prefabs::create_sample_complete_character(step, transform, typesafe_sprintf("player%x", i), false);
+			const auto new_character = prefabs::create_sample_complete_character(step, transform, typesafe_sprintf("player%x", i), true);
 
 			new_characters[i] = new_character;
 
@@ -85,13 +85,18 @@ namespace test_scenes {
 
 		//const auto amplifier = prefabs::create_amplifier_arm(step, vec2(-300, -500 + 50));
 
-		const auto backpack = prefabs::create_sample_backpack(step, vec2(200, -650));
+		const auto backpack = prefabs::create_sample_backpack(step, vec2(100, -150));
 
 		const auto rifle2 = prefabs::create_sample_bilmer2000(step, vec2(100, -500 + 50),
 			prefabs::create_sample_magazine(step, vec2(100, -650), false ? "10" : "0.3",
 				prefabs::create_cyan_charge(step, vec2(0, 0), false ? 1000 : 5)));
 		
-		prefabs::create_car(step, { -800, 0, -180 });
+		prefabs::create_rocket_launcher(step, { -100, 0, -180 }, prefabs::create_force_rocket(step, {}));
+		prefabs::create_motorcycle(step, {0, 0, -90});
+
+		//prefabs::create_force_rocket(step, { 0, 100 });
+		//prefabs::create_force_rocket(step, { 100, 100 });
+		//prefabs::create_force_rocket(step, { 200, 100 });
 
 		//prefabs::create_kek9(step, vec2(300, -500 + 50));
 		//

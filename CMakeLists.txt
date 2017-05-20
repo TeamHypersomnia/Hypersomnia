@@ -446,6 +446,10 @@ endif()
 set(HYPERSOMNIA_CXX_FLAGS "/MP /Gm- /fp:strict /bigobj")
 set(HYPERSOMNIA_CXX_RELEASE_FLAGS "/Ob2 /GL /Oi")
 
+# Don't add /GL to RelWithDebInfo for fast recompilations.
+
+set(HYPERSOMNIA_CXX_RELWITHDEBINFO_FLAGS "/Ob2 /Oi")
+
 # We configure additional flags for linker.
 
 if(MSVC)
@@ -454,7 +458,11 @@ if(MSVC)
 	# We enable incremental LTCG for at least one release configuration,
 	# because LTCG takes vastly long even with just a single source file modified.
 
-	set(HYPERSOMNIA_LINKER_RELWITHDEBINFO_FLAGS "/LTCG:incremental /INCREMENTAL:NO")
+	# set(HYPERSOMNIA_LINKER_RELWITHDEBINFO_FLAGS "/LTCG:incremental /INCREMENTAL:NO")
+
+	# Actually, for RelWithDebInfo, we completely disable LTCG because it proves painfully long.
+
+	set(HYPERSOMNIA_LINKER_RELWITHDEBINFO_FLAGS "/LTCG:OFF /INCREMENTAL:YES")
 else()
 
 endif()
@@ -506,7 +514,7 @@ set(CMAKE_CXX_FLAGS_RELEASE
 )
 
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO 
- "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${HYPERSOMNIA_CXX_RELEASE_FLAGS}"
+ "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${HYPERSOMNIA_CXX_RELWITHDEBINFO_FLAGS}"
 )
 
 # From now on, we will be using Git to obtain some information about commits.

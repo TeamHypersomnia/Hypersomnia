@@ -87,6 +87,10 @@ public:
 		viewing_session&
 	);
 
+	void advance_audiovisuals(
+		viewing_session&
+	);
+
 	void view(
 		const config_lua_table& cfg,
 		viewing_session&

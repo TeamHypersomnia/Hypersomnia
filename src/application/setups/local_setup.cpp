@@ -133,7 +133,29 @@ void local_setup::process(
 			total_collected_entropy += new_cosmic_entropy;
 		}
 
+		thread_local visible_entities all_visible;
+
+		auto advance_audiovisuals = [&](){
+			session.get_visible_entities(all_visible, hypersomnia);
+
+			const auto vdt = session.frame_timer.extract_variable_delta(
+				hypersomnia.get_fixed_delta(), 
+				timer
+			);
+
+			session.advance_audiovisual_systems(
+				hypersomnia, 
+				testbed.get_selected_character(),
+				all_visible,
+				vdt
+			);
+		};
+
 		auto steps = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
+
+		if (!steps) {
+			advance_audiovisuals();
+		}
 
 		while (steps--) {
 			total_collected_entropy += session.systems_audiovisual.get<gui_element_system>().get_and_clear_pending_events();
@@ -149,22 +171,8 @@ void local_setup::process(
 			);
 
 			total_collected_entropy.clear();
+			advance_audiovisuals();
 		}
-
-		thread_local visible_entities all_visible;
-		session.get_visible_entities(all_visible, hypersomnia);
-
-		const auto vdt = session.frame_timer.extract_variable_delta(
-			hypersomnia.get_fixed_delta(), 
-			timer
-		);
-
-		session.advance_audiovisual_systems(
-			hypersomnia, 
-			testbed.get_selected_character(),
-			all_visible,
-			vdt
-		);
 
 		auto& renderer = augs::renderer::get_current();
 		renderer.clear_current_fbo();

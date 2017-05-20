@@ -394,6 +394,8 @@ void director_setup::advance_player_by_single_step(viewing_session& session) {
 	);
 
 	total_collected_entropy.clear();
+
+	advance_audiovisuals(session);
 }
 
 void director_setup::advance_player(viewing_session& session) {
@@ -413,16 +415,20 @@ void director_setup::advance_player(viewing_session& session) {
 		session.set_interpolation_enabled(true);
 	}
 
+	if (!steps) {
+		advance_audiovisuals(session);
+	}
+
 	while (steps--) {
 		advance_player_by_single_step(session);
 	}
 }
 
-void director_setup::view(
-	const config_lua_table& cfg,
+thread_local visible_entities all_visible;
+
+void director_setup::advance_audiovisuals(
 	viewing_session& session
 ) {
-	thread_local visible_entities all_visible;
 	session.get_visible_entities(all_visible, hypersomnia);
 
 	const auto vdt = session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), timer);
@@ -433,6 +439,13 @@ void director_setup::view(
 		all_visible,
 		vdt
 	);
+}
+
+void director_setup::view(
+	const config_lua_table& cfg,
+	viewing_session& session
+) {
+	advance_audiovisuals(session);
 
 	auto& renderer = augs::renderer::get_current();
 	renderer.clear_current_fbo();
