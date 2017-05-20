@@ -445,10 +445,7 @@ endif()
 
 set(HYPERSOMNIA_CXX_FLAGS "/MP /Gm- /fp:strict /bigobj")
 set(HYPERSOMNIA_CXX_RELEASE_FLAGS "/Ob2 /GL /Oi")
-
-# Don't add /GL to RelWithDebInfo for fast recompilations.
-
-set(HYPERSOMNIA_CXX_RELWITHDEBINFO_FLAGS "/Ob2 /Oi")
+set(HYPERSOMNIA_CXX_RELWITHDEBINFO_FLAGS "/Ob2 /GL /Oi")
 
 # We configure additional flags for linker.
 
@@ -458,11 +455,7 @@ if(MSVC)
 	# We enable incremental LTCG for at least one release configuration,
 	# because LTCG takes vastly long even with just a single source file modified.
 
-	# set(HYPERSOMNIA_LINKER_RELWITHDEBINFO_FLAGS "/LTCG:incremental /INCREMENTAL:NO")
-
-	# Actually, for RelWithDebInfo, we completely disable LTCG because it proves painfully long.
-
-	set(HYPERSOMNIA_LINKER_RELWITHDEBINFO_FLAGS "/LTCG:OFF /INCREMENTAL:YES")
+	set(HYPERSOMNIA_LINKER_RELWITHDEBINFO_FLAGS "/LTCG:incremental /INCREMENTAL:NO")
 else()
 
 endif()

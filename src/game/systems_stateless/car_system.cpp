@@ -60,13 +60,11 @@ void car_system::apply_movement_forces(const logic_step step) {
 			auto& car = it.get<components::car>();
 			auto& rigid_body = it.get<components::rigid_body>();
 
+			const auto body_angle = rigid_body.get_angle();
+			const vec2 forward_dir = vec2().set_from_degrees(body_angle);
+			const vec2 right_normal = forward_dir.perpendicular_cw();
+			
 			vec2 resultant;
-
-			vec2 forward_dir;
-			vec2 right_normal;
-
-			forward_dir = forward_dir.set_from_degrees(rigid_body.get_angle());
-			right_normal = forward_dir.perpendicular_cw();
 
 			resultant.x = car.accelerating * car.input_acceleration.x - car.decelerating * car.input_acceleration.x;
 			resultant.y = car.turning_right * car.input_acceleration.y - car.turning_left * car.input_acceleration.y;
@@ -76,11 +74,10 @@ void car_system::apply_movement_forces(const logic_step step) {
 			}
 
 			if (resultant.non_zero()) {
-				vec2 force = resultant.x * forward_dir + right_normal * resultant.y;
-				
-				vec2 forward_tire_force = vec2(forward_dir).set_length(force.length()) * augs::sgn(resultant.x);
+				const vec2 force = resultant.x * forward_dir + right_normal * resultant.y;
+				const vec2 forward_tire_force = vec2(forward_dir).set_length(force.length()) * augs::sgn(resultant.x);
 
-				auto& off = car.wheel_offset;
+				const auto& off = car.wheel_offset;
 
 				rigid_body.apply_force(force * rigid_body.get_mass()/4, forward_dir * off.x + vec2(right_normal).set_length(off.y));
 				rigid_body.apply_force(force * rigid_body.get_mass()/4, forward_dir * off.x - vec2(right_normal).set_length(off.y));
@@ -99,14 +96,14 @@ void car_system::apply_movement_forces(const logic_step step) {
 			if (forwardal_speed < car.maximum_speed_with_static_air_resistance) {
 				rigid_body.apply_force(-forwardal * car.static_air_resistance * forwardal_speed * forwardal_speed);
 			}
-			else
+			else {
 				rigid_body.apply_force(-forwardal * car.dynamic_air_resistance * forwardal_speed * forwardal_speed);
+			}
 			
 			auto base_damping = (forwardal_speed < car.maximum_speed_with_static_damping ? car.static_damping : car.dynamic_damping);
 
 			if (car.braking_damping >= 0.f) {
 				base_damping += resultant.x > 0 ? 0.0f : car.braking_damping;
-
 			}
 
 			const float angular_velocity = rigid_body.get_angular_velocity();
@@ -142,9 +139,15 @@ void car_system::apply_movement_forces(const logic_step step) {
 				rigid_body.set_angular_damping(base_angular_damping + car.angular_damping_while_hand_braking);
 			}
 
-			if(forwardal_speed > car.minimum_speed_for_maneuverability_decrease)
-				rigid_body.apply_angular_impulse(rigid_body.get_inertia() * -angular_velocity * DEG_TO_RAD<float> *
-					(forwardal_speed-car.minimum_speed_for_maneuverability_decrease)*car.maneuverability_decrease_multiplier);
+			if (forwardal_speed > car.minimum_speed_for_maneuverability_decrease) {
+				rigid_body.apply_angular_impulse(
+					rigid_body.get_inertia() 
+					* -angular_velocity 
+					* DEG_TO_RAD<float> 
+					* (forwardal_speed-car.minimum_speed_for_maneuverability_decrease)
+					* car.maneuverability_decrease_multiplier
+				);
+			}
 
 			if (angular_resistance > 0.f) {
 				auto angular_speed = angular_velocity * DEG_TO_RAD<float>;
@@ -174,7 +177,12 @@ void car_system::apply_movement_forces(const logic_step step) {
 
 			const bool sound_enabled = cosmos[car.current_driver].alive();
 			const auto sound_entity = cosmos[car.engine_sound];
-			const float pitch = 0.3f + speed*1.2f / car.speed_for_pitch_unit + std::abs(angular_velocity / 780.f)*sqrt(rigid_body.get_mass());
+			const float pitch = 0.3f 
+				+ speed 
+					* 1.2f / car.speed_for_pitch_unit
+				+ std::abs(angular_velocity / 780.f) 
+					* sqrt(rigid_body.get_mass())
+			;
 
 			if (sound_entity.alive() && sound_entity.has<components::sound_existence>()) {
 				auto& existence = sound_entity.get<components::sound_existence>();
@@ -203,9 +211,6 @@ void car_system::apply_movement_forces(const logic_step step) {
 					}
 				}
 			}
-
-		//float angle = rigid_body.get_angle();
-		//LOG("F: %x, %x, %x", AS_INTV rigid_body.get_position(), AS_INT angle, AS_INTV rigid_body.velocity());
 		}
 	);
 }
