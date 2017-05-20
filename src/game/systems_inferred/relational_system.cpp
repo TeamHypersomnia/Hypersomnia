@@ -34,15 +34,20 @@ void relational_system::create_inferred_state_for(const const_entity_handle h) {
 	}
 
 	if (motor_joint != nullptr && motor_joint.is_activated()) {
+		static_assert(std::is_same_v<std::array<unversioned_entity_id, 2>, decltype(joints_of_bodies)::parent_array_type>, "Make it work for more joints plx");
+		
 		ensure(!joints_of_bodies.is_parent_set(h, 0));
 		ensure(!joints_of_bodies.is_parent_set(h, 1));
 
 		const auto bodies = motor_joint.get_target_bodies();
 
-		decltype(joints_of_bodies)::parent_array_type parents;
-		copy_container(bodies, parents);
-
-		joints_of_bodies.set_parents(h, parents);
+		joints_of_bodies.set_parents(
+			h, 
+			std::array<unversioned_entity_id, 2> { 
+				bodies[0], 
+				bodies[1] 
+			} 
+		);
 	}
 }
 

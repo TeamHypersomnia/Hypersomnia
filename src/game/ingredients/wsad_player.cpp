@@ -136,7 +136,7 @@ namespace prefabs {
 		const logic_step step, 
 		const components::transform spawn_transform, 
 		const std::string name,
-		const bool add_sample_arms
+		const int create_arm_count
 	) {
 		auto& world = step.cosm;
 
@@ -153,7 +153,6 @@ namespace prefabs {
 		ingredients::add_character_head_physics(step, character, spawn_transform);
 
 		ingredients::add_character_head_inventory(step, character);
-
 
 
 		{
@@ -175,32 +174,30 @@ namespace prefabs {
 
 		character.add_standard_components(step);
 
-		if (add_sample_arms) {
-			{
-				const auto primary_arm = prefabs::create_sample_complete_arm(
-					step,
-					vec2(50, 20),
-					vec2(70, 20)
-				);
+		if (create_arm_count > 0) {
+			const auto primary_arm = prefabs::create_sample_complete_arm(
+				step,
+				vec2(50, 20),
+				vec2(70, 20)
+			);
 
-				item_slot_transfer_request r;
-				r.item = primary_arm;
-				r.target_slot = character[slot_function::PRIMARY_ARM_BACK];
-				perform_transfer(r, step);
-			}
+			item_slot_transfer_request r;
+			r.item = primary_arm;
+			r.target_slot = character[slot_function::PRIMARY_ARM_BACK];
+			perform_transfer(r, step);
+		}
 
-			{
-				const auto secondary_arm = prefabs::create_sample_complete_arm(
-					step,
-					vec2(50, 20),
-					vec2(70, 20)
-				);
+		if (create_arm_count > 1) {
+			const auto secondary_arm = prefabs::create_sample_complete_arm(
+				step,
+				vec2(50, 20),
+				vec2(70, 20)
+			);
 
-				item_slot_transfer_request r;
-				r.item = secondary_arm;
-				r.target_slot = character[slot_function::SECONDARY_ARM_BACK];
-				perform_transfer(r, step);
-			}
+			item_slot_transfer_request r;
+			r.item = secondary_arm;
+			r.target_slot = character[slot_function::SECONDARY_ARM_BACK];
+			perform_transfer(r, step);
 		}
 
 		// LOG("Character mass: %x", character.get<components::rigid_body>().get_mass());

@@ -68,14 +68,15 @@ void component_synchronizer<false, F>::set_offset(
 }
 
 const component_synchronizer<false, F>& component_synchronizer<false, F>::operator=(const F& f) const {
+	set_owner_body(f.owner_body);
 	get_data() = f;
 	reinference();
 	return *this;
 }
 
 void component_synchronizer<false, F>::reinference() const {
-	handle.get_cosmos().partial_reinference<physics_system>(handle);
 	handle.get_cosmos().partial_reinference<relational_system>(handle);
+	handle.get_cosmos().partial_reinference<physics_system>(handle);
 }
 
 void component_synchronizer<false, F>::rebuild_density() const {

@@ -62,7 +62,7 @@ namespace augs {
 
 		bool is_parent_set(
 			const id_type child_id,
-			const std::size_t parent_index = 0u
+			const std::size_t parent_index
 		) {
 			auto& child_cache = child_caches[make_cache_id(child_id)];
 			auto& parent_entry = child_cache.parents.at(parent_index);
@@ -70,9 +70,16 @@ namespace augs {
 			return is_valid_cache_id(parent_entry);
 		}
 
+		template <class = std::enable_if_t<parent_count == 1>>
+		bool is_parent_set(
+			const id_type child_id
+		) {
+			return is_parent_set(child_id, 0u);
+		}
+
 		void unset_parent_of(
 			const id_type child_id,
-			const std::size_t parent_index = 0u
+			const std::size_t parent_index
 		) {
 			auto& child_cache = child_caches[make_cache_id(child_id)];
 			auto& parent_entry = child_cache.parents.at(parent_index);
@@ -87,6 +94,13 @@ namespace augs {
 			}
 		}
 
+		template <class = std::enable_if_t<parent_count == 1>>
+		void unset_parent_of(
+			const id_type child_id
+		) {
+			unset_parent_of(child_id, 0u);
+		}
+
 		void unset_parents_of(const id_type child_id) {
 			for (std::size_t p = 0; p < parent_count; ++p) {
 				unset_parent_of(child_id, p);
@@ -96,7 +110,7 @@ namespace augs {
 		void set_parent(
 			const id_type child_id, 
 			const id_type parent_id,
-			const std::size_t parent_index = 0u
+			const std::size_t parent_index
 		) {
 			unset_parent_of(child_id, parent_index);
 
@@ -118,25 +132,45 @@ namespace augs {
 		}
 
 		template <class = std::enable_if_t<parent_count == 1>>
-		auto& get_children_of(
+		void set_parent(
+			const id_type child_id, 
+			const id_type parent_id
+		) {
+			set_parent(child_id, parent_id, 0u);
+		}
+
+		template <class = std::enable_if_t<parent_count == 1>>
+		const auto& get_children_of(
 			const id_type parent
 		) const {
 			return parent_caches[make_cache_id(parent)].children.at(0);
 		}
 
-		auto& get_children_of(
+		const auto& get_children_of(
 			const id_type parent, 
 			const std::size_t parenthood_index
 		) const {
 			return parent_caches[make_cache_id(parent)].children.at(parenthood_index);
 		}
 
+		auto get_all_children_of(
+			const id_type parent 
+		) const {
+			std::vector<id_type> all_children;
+
+			for (std::size_t p = 0; p < parent_count; ++p) {
+				concatenate(all_children, get_children_of(parent, p));
+			}
+
+			return all_children;
+		}
+
 		void set_parents(
 			const id_type child_id, 
 			const parent_array_type parents
 		) {
-			for(std::size_t p = 0; p < parent_count; ++p) {
-				set_parent(child_id, parents.at(p));
+			for (std::size_t p = 0; p < parent_count; ++p) {
+				set_parent(child_id, parents.at(p), p);
 			}
 		}
 	};

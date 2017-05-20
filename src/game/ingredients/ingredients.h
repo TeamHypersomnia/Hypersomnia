@@ -91,7 +91,7 @@ namespace prefabs {
 		const logic_step,
 		const components::transform pos, 
 		const std::string name = "character_unnamed",
-		const bool add_sample_arms = true
+		const int create_arm_count = 2
 	);
 	
 	entity_handle create_sample_complete_arm(

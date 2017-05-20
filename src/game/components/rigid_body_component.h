@@ -92,6 +92,10 @@ public:
 		return handle.get_cosmos().systems_inferred.get<relational_system>().fixtures_of_bodies.get_children_of(handle);
 	}
 
+	auto get_attached_joints() const {
+		return handle.get_cosmos().systems_inferred.get<relational_system>().joints_of_bodies.get_all_children_of(handle);
+	}
+
 	bool test_point(const vec2) const;
 };
 

@@ -76,11 +76,11 @@ void physics_system::destroy_inferred_state_of(const const_entity_handle handle)
 	if (is_inferred_state_created_for_rigid_body(handle)) {
 		auto& cache = get_rigid_body_cache(handle);
 		
-		for (b2Fixture* f = cache.body->m_fixtureList; f; f = f->m_next) {
+		for (const b2Fixture* f = cache.body->m_fixtureList; f != nullptr; f = f->m_next) {
 			get_colliders_cache(cosmos[f->GetUserData()]) = colliders_cache();
 		}
 		
-		for (b2JointEdge* j = cache.body->m_jointList; j; j = j->next) {
+		for (const b2JointEdge* j = cache.body->m_jointList; j != nullptr; j = j->next) {
 			get_joint_cache(cosmos[j->joint->GetUserData()]) = joint_cache();
 		}
 		
@@ -96,7 +96,7 @@ void physics_system::destroy_inferred_state_of(const const_entity_handle handle)
 		auto& cache = get_colliders_cache(handle);
 		auto& owner_body_cache = get_rigid_body_cache(cosmos[cache.all_fixtures_in_component[0]->GetBody()->GetUserData()]);
 
-		for (const auto& f : cache.all_fixtures_in_component) {
+		for (b2Fixture* f : cache.all_fixtures_in_component) {
 			owner_body_cache.body->DestroyFixture(f);
 		}
 
@@ -116,7 +116,6 @@ void physics_system::create_inferred_state_for(const const_entity_handle handle)
 	const auto& cosmos = handle.get_cosmos();
 	const auto& relational = cosmos.systems_inferred.get<relational_system>();
 
-	//ensure(!is_inferred_state_created_for_rigid_body(handle));
 	const bool is_already_constructed = is_inferred_state_created_for_rigid_body(handle);
 
 	if (is_already_constructed) {
@@ -162,9 +161,15 @@ void physics_system::create_inferred_state_for(const const_entity_handle handle)
 		cache.body->SetAngledDampingEnabled(physics_data.angled_damping);
 		
 		const auto fixture_entities = rigid_body.get_fixture_entities();
-		/* notice that all fixtures must be unconstructed at this moment since we assert that the rigid body itself is not */
+
 		for (const auto f : fixture_entities) {
 			create_inferred_state_for_fixtures(cosmos[f]);
+		}
+
+		const auto joint_entities = rigid_body.get_attached_joints();
+		
+		for (const auto j : joint_entities) {
+			create_inferred_state_for_joint(cosmos[j]);
 		}
 	}
 
@@ -172,7 +177,6 @@ void physics_system::create_inferred_state_for(const const_entity_handle handle)
 }
 
 void physics_system::create_inferred_state_for_fixtures(const const_entity_handle handle) {
-	//ensure(!is_inferred_state_created_for_colliders(handle));
 	const bool is_already_constructed = is_inferred_state_created_for_colliders(handle);
 
 	if (is_already_constructed) {
@@ -255,7 +259,6 @@ void physics_system::create_inferred_state_for_fixtures(const const_entity_handl
 
 void physics_system::create_inferred_state_for_joint(const const_entity_handle handle) {
 	const bool is_already_constructed = is_inferred_state_created_for_joint(handle);
-	ensure(!is_already_constructed);
 
 	if (is_already_constructed) {
 		return;

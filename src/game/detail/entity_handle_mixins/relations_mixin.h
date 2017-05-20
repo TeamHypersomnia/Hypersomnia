@@ -31,6 +31,12 @@ public:
 		return self.get<components::rigid_body>().get_fixture_entities();
 	}
 
+	auto get_attached_joints() const {
+		const auto self = *static_cast<const entity_handle_type*>(this);
+
+		return self.get<components::rigid_body>().get_attached_joints();
+	}
+
 #if COSMOS_TRACKS_GUIDS
 	entity_guid get_guid() const;
 #endif
