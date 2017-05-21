@@ -149,20 +149,24 @@ void character_gui::assign_item_to_hotbar_button(
 
 void character_gui::assign_item_to_first_free_hotbar_button(
 	const const_entity_handle gui_entity,
-	const const_entity_handle item
+	const const_entity_handle item_entity
 ) {
-	if (
-		item.get<components::item>().categories_for_slot_compatibility.test(item_category::ARM_BACK)
-		|| item.get<components::item>().categories_for_slot_compatibility.test(item_category::ARM_FRONT)
-	) {
+	const auto categories = item_entity.get<components::item>().categories_for_slot_compatibility;
+
+	const bool no_point_in_quick_selection =
+		categories.test(item_category::ARM_BACK)
+		|| categories.test(item_category::ARM_FRONT)
+	;
+
+	if (no_point_in_quick_selection) {
 		return;
 	}
 
-	clear_hotbar_selection_for_item(gui_entity, item);
+	clear_hotbar_selection_for_item(gui_entity, item_entity);
 
 	auto try_assign = [&](const size_t n) {
 		if (hotbar_buttons[n].get_assigned_entity(gui_entity).dead()) {
-			assign_item_to_hotbar_button(n, gui_entity, item);
+			assign_item_to_hotbar_button(n, gui_entity, item_entity);
 
 			return true;
 		}

@@ -1,11 +1,12 @@
-#include "game/transcendental/cosmos.h"
-#include "car_system.h"
-#include "game/messages/intent_message.h"
-
 #include <Box2D\Box2D.h>
 
-#include "render_system.h"
 #include "augs/log.h"
+
+#include "game/transcendental/cosmos.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/logic_step.h"
+
+#include "game/messages/intent_message.h"
 
 #include "game/components/car_component.h"
 #include "game/components/rigid_body_component.h"
@@ -15,17 +16,20 @@
 #include "game/components/particles_existence_component.h"
 #include "game/components/sound_existence_component.h"
 
-#include "game/transcendental/entity_handle.h"
-#include "game/transcendental/logic_step.h"
+#include "game/systems_stateless/car_system.h"
+#include "game/systems_stateless/render_system.h"
 
 void car_system::set_steering_flags_from_intents(const logic_step step) {
 	auto& cosmos = step.cosm;
-	const auto& delta = step.get_delta();
+	const auto delta = step.get_delta();
 	const auto& intents = step.transient.messages.get_queue<messages::intent_message>();
 
 	for (auto& it : intents) {
-		auto* maybe_car = cosmos[it.subject].find<components::car>();
-		if (maybe_car == nullptr) continue;
+		auto* const maybe_car = cosmos[it.subject].find<components::car>();
+		
+		if (maybe_car == nullptr) {
+			continue;
+		}
 
 		auto& car = *maybe_car;
 

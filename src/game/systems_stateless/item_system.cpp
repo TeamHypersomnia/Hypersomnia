@@ -75,14 +75,16 @@ void item_system::pick_up_touching_items(const logic_step step) {
 			auto* maybe_transfers = picker.find<components::item_slot_transfers>();
 
 			if (maybe_transfers == nullptr) {
-				const auto* maybe_item_of_picker = picker.find<components::item>();
+				const auto* const maybe_item_of_picker = picker.find<components::item>();
 
 				if (maybe_item_of_picker != nullptr) {
+					const auto categories = maybe_item_of_picker->categories_for_slot_compatibility;
+
 					const bool is_it_arm_touching =
 						maybe_item != nullptr
 						&& (
-							maybe_item_of_picker->categories_for_slot_compatibility.test(item_category::ARM_BACK)
-							|| maybe_item_of_picker->categories_for_slot_compatibility.test(item_category::ARM_FRONT)
+							categories.test(item_category::ARM_BACK)
+							|| categories.test(item_category::ARM_FRONT)
 						)
 					;
 
