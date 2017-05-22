@@ -41,6 +41,9 @@ void relational_system::create_inferred_state_for(const const_entity_handle h) {
 
 		const auto bodies = motor_joint.get_target_bodies();
 
+		ensure(cosmos[bodies[0]].alive());
+		ensure(cosmos[bodies[1]].alive());
+
 		joints_of_bodies.set_parents(
 			h, 
 			std::array<unversioned_entity_id, 2> { 

@@ -309,12 +309,12 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					const auto recoil_dir = vec2().set_from_degrees(muzzle_transform.rotation);
 
 					rigid_body.apply_impulse(
-						recoil_dir * (-total_recoil_amount) * 200.f * rigid_body.get_mass()
+						recoil_dir * (-total_recoil_amount) * 800.f * rigid_body.get_mass()
 					);
 					
 					rigid_body.apply_impulse(
-						recoil_dir.perpendicular_cw() * (-total_recoil_amount) * 50.f * rigid_body.get_mass(),
-						-recoil_dir * 20.f
+						recoil_dir.perpendicular_cw() * (-total_recoil_amount) * 380.f * rigid_body.get_mass(),
+						-recoil_dir * 55.f
 					);
 
 					gun.current_heat = std::min(gun.maximum_heat, gun.current_heat + gun.gunshot_adds_heat);

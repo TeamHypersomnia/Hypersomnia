@@ -118,7 +118,7 @@ bool driver_system::change_car_ownership(
 	const auto maybe_rigid_body = driver_entity.find<components::rigid_body>();
 	const bool has_physics = maybe_rigid_body != nullptr;
 	auto* const maybe_movement = driver_entity.find<components::movement>();
-	auto& force_joint = driver_entity.get<components::force_joint>();
+	auto force_joint = driver_entity.get<components::motor_joint>().get_raw_component();
 
 	if (!lost_ownership) {
 		auto& car = car_entity.get<components::car>();
@@ -135,8 +135,10 @@ bool driver_system::change_car_ownership(
 		
 		car.last_turned_on = cosmos.get_timestamp();
 
-		force_joint.chased_entity = car.left_wheel_trigger;
-		driver_entity.get<components::processing>().enable_in(processing_subjects::WITH_FORCE_JOINT);
+		force_joint.target_bodies.at(0) = driver_entity;
+		force_joint.target_bodies.at(1) = car.left_wheel_trigger;
+		force_joint.activated = true;
+		driver_entity.get<components::motor_joint>() = force_joint;
 
 		if (maybe_movement) {
 			maybe_movement->reset_movement_flags();
@@ -151,9 +153,9 @@ bool driver_system::change_car_ownership(
 		}
 
 		if (has_physics) {
-			maybe_rigid_body.set_transform(car.left_wheel_trigger);
-			maybe_rigid_body.set_velocity(vec2(0, 0));
-			resolve_density_of_associated_fixtures(driver_entity);
+			//maybe_rigid_body.set_transform(car.left_wheel_trigger);
+			//maybe_rigid_body.set_velocity(vec2(0, 0));
+			//resolve_density_of_associated_fixtures(driver_entity);
 		}
 	}
 	else {
@@ -163,7 +165,9 @@ bool driver_system::change_car_ownership(
 
 		driver.owned_vehicle.unset();
 		car.current_driver.unset();
-		driver_entity.get<components::processing>().disable_in(processing_subjects::WITH_FORCE_JOINT);
+
+		force_joint.activated = false;
+		driver_entity.get<components::motor_joint>() = force_joint;
 
 		if (maybe_movement) {
 			maybe_movement->reset_movement_flags();
@@ -186,8 +190,6 @@ bool driver_system::change_car_ownership(
 			resolve_density_of_associated_fixtures(driver_entity);
 		}
 	}
-
-	// networking the message, since it was successful
 
 	return true;
 }

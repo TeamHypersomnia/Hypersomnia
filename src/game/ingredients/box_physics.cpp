@@ -42,7 +42,7 @@ namespace ingredients {
 		components::fixtures group;
 
 		group.filter = filters::see_through_dynamic_object();
-		group.density = 1;
+		group.density = 0.2;
 		group.restitution = 0.5f;
 
 		e += group;

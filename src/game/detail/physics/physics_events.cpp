@@ -296,7 +296,7 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 			const auto* const driver = subject_capability.find<components::driver>();
 			
 			const bool colliding_with_driven_car = 
-				driver 
+				driver != nullptr
 				&& driver->owned_vehicle == collider_owner_body
 			;
 

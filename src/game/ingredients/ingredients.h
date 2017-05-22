@@ -96,8 +96,9 @@ namespace prefabs {
 	
 	entity_handle create_sample_complete_arm(
 		const logic_step,
-		vec2 back_arm_size,
-		vec2 front_arm_size
+		const vec2 back_arm_size,
+		const vec2 front_arm_size,
+		const bool primary = true
 	);
 
 	entity_handle create_crate(const logic_step, const components::transform pos, const vec2 size = vec2());

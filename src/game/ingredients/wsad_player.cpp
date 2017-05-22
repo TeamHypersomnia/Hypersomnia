@@ -32,7 +32,7 @@ namespace ingredients {
 		components::movement& movement = e.get<components::movement>();
 
 		movement.input_acceleration_axes.set(1, 1);
-		movement.acceleration_length = 8000;
+		movement.acceleration_length = 10000;
 		
 		//movement.input_acceleration_axes.set(8000, 8000);
 		//movement.acceleration_length = -1;
@@ -85,7 +85,7 @@ namespace ingredients {
 		auto& movement = e += components::movement();
 		auto& rotation_copying = e += components::rotation_copying();
 		auto& driver = e += components::driver();
-		auto& force_joint = e += components::force_joint();
+		components::motor_joint force_joint;
 		auto& sentience = e += components::sentience();
 		e += components::position_copying(); // used when it is an astral body
 		
@@ -108,9 +108,14 @@ namespace ingredients {
 
 		processing.disable_in(processing_subjects::WITH_FORCE_JOINT);
 
-		force_joint.force_towards_chased_entity = 92000.f;
-		force_joint.distance_when_force_easing_starts = 10.f;
-		force_joint.power_of_force_easing_multiplier = 2.f;
+		force_joint.max_force = 80000.f;
+		force_joint.max_torque = 2000.f;
+		force_joint.correction_factor = 0.8f;
+		force_joint.activated = false;
+		e += force_joint;
+		//force_joint.force_towards_chased_entity = 92000.f;
+		//force_joint.distance_when_force_easing_starts = 10.f;
+		//force_joint.power_of_force_easing_multiplier = 2.f;
 
 		driver.density_multiplier_while_driving = 0.02f;
 
@@ -191,7 +196,8 @@ namespace prefabs {
 			const auto secondary_arm = prefabs::create_sample_complete_arm(
 				step,
 				vec2(50, 20),
-				vec2(70, 20)
+				vec2(70, 20),
+				false
 			);
 
 			item_slot_transfer_request r;
