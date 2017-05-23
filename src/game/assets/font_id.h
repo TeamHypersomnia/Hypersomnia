@@ -5,7 +5,7 @@
 namespace assets {
 	enum class font_id {
 		INVALID,
-#if BUILD_UNSCRIPTED_TEST_SCENES
+#if BUILD_TEST_SCENES
 		GUI_FONT,
 #endif
 		COUNT = MAX_FONT_COUNT + 1

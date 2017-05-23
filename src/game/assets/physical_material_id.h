@@ -6,7 +6,7 @@
 namespace assets {
 	enum class physical_material_id {
 		INVALID,
-#if BUILD_UNSCRIPTED_TEST_SCENES
+#if BUILD_TEST_SCENES
 		WOOD,
 		METAL,
 		GRENADE,

@@ -22,7 +22,6 @@ namespace test_scenes {
 		augs::constant_size_vector<entity_id, TESTBED_CHARACTERS_COUNT> characters;
 		unsigned current_character_index = 0;
 		entity_id selected_character;
-		int debug_var = 0;
 		augs::constant_size_vector<entity_id, TESTBED_DRAW_BODIES_COUNT> draw_bodies;
 
 		cosmos stashed_cosmos;

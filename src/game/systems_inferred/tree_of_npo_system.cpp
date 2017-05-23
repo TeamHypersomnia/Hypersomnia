@@ -22,7 +22,7 @@ void tree_of_npo_system::destroy_inferred_state_of(const const_entity_handle han
 	auto& cache = get_cache(handle.get_id());
 
 	if (cache.is_constructed()) {
-		remove_element(get_tree(cache).always_visible, handle.get_id());
+		erase_element(get_tree(cache).always_visible, handle.get_id());
 
 		if (cache.tree_proxy_id != -1) {
 			get_tree(cache).nodes.DestroyProxy(cache.tree_proxy_id);

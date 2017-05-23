@@ -7,7 +7,7 @@ namespace prefabs {
 	entity_handle create_crate(const logic_step step, const components::transform pos, const vec2 size) {
 		const auto crate = step.cosm.create_entity("crate");
 
-		name_entity(crate, entity_name::CRATE);
+		
 		ingredients::add_sprite_scalled(crate, size, assets::game_image_id::CRATE, white, render_layer::DYNAMIC_BODY);
 		ingredients::add_standard_dynamic_body(step, crate, pos, true);
 		crate.get<components::fixtures>().set_restitution(0.8f);

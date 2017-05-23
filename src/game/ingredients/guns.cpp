@@ -101,7 +101,7 @@ namespace prefabs {
 		auto charge_inside = cosmos[charge_inside_id];
 
 		auto sample_magazine = cosmos.create_entity("sample_magazine");
-		name_entity(sample_magazine, entity_name::MAGAZINE);
+		
 
 		{
 			ingredients::add_sprite(sample_magazine, assets::game_image_id::SAMPLE_MAGAZINE, white, render_layer::SMALL_DYNAMIC_BODY);
@@ -135,7 +135,7 @@ namespace prefabs {
 		auto charge_inside = cosmos[charge_inside_id];
 
 		auto sample_magazine = cosmos.create_entity("sample_magazine");
-		name_entity(sample_magazine, entity_name::MAGAZINE);
+		
 
 		{
 			ingredients::add_sprite(sample_magazine, assets::game_image_id::SMALL_MAGAZINE, white, render_layer::SMALL_DYNAMIC_BODY);
@@ -169,7 +169,7 @@ namespace prefabs {
 	entity_handle create_sample_suppressor(const logic_step step, vec2 pos) {
 		auto& cosmos = step.cosm;
 		auto sample_suppressor = cosmos.create_entity("sample_suppressor");
-		name_entity(sample_suppressor, entity_name::SUPPRESSOR);
+		
 
 		ingredients::add_sprite(sample_suppressor, assets::game_image_id::SAMPLE_SUPPRESSOR, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(step, sample_suppressor, pos);
@@ -189,7 +189,7 @@ namespace prefabs {
 		const auto red_charge = cosmos.create_entity("red_charge");
 		const auto round_definition = cosmos.create_entity("round_definition");
 		const auto shell_definition = cosmos.create_entity("shell_definition");
-		name_entity(red_charge, entity_name::RED_CHARGE);
+		
 
 		const auto red_col = rgba{ 255, 48, 1, 255 };
 
@@ -264,7 +264,7 @@ namespace prefabs {
 		const auto pink_charge = cosmos.create_entity("pink_charge");
 		const auto round_definition = cosmos.create_entity("round_definition");
 		const auto shell_definition = cosmos.create_entity("shell_definition");
-		name_entity(pink_charge, entity_name::PINK_CHARGE);
+		
 
 		const auto pink_col = rgba{ 255, 40, 255, 255 };
 
@@ -337,7 +337,7 @@ namespace prefabs {
 		const auto cyan_charge = cosmos.create_entity("cyan_charge");
 		const auto round_definition = cosmos.create_entity("round_definition");
 		const auto shell_definition = cosmos.create_entity("shell_definition");
-		name_entity(cyan_charge, entity_name::CYAN_CHARGE);
+		
 
 		{
 			ingredients::add_sprite(cyan_charge, assets::game_image_id::CYAN_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
@@ -407,7 +407,7 @@ namespace prefabs {
 		const auto green_charge = cosmos.create_entity("green_charge");
 		const auto round_definition = cosmos.create_entity("round_definition");
 		const auto shell_definition = cosmos.create_entity("shell_definition");
-		name_entity(green_charge, entity_name::GREEN_CHARGE);
+		
 
 		{
 			ingredients::add_sprite(green_charge, assets::game_image_id::GREEN_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
@@ -456,7 +456,7 @@ namespace prefabs {
 		auto load_mag = cosmos[load_mag_id];
 
 		auto weapon = cosmos.create_entity("sample_rifle");
-		name_entity(weapon, entity_name::ASSAULT_RIFLE);
+		
 
 		auto& sprite = ingredients::add_sprite(weapon, assets::game_image_id::ASSAULT_RIFLE, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(step, weapon, pos);
@@ -514,7 +514,7 @@ namespace prefabs {
 		auto load_mag = cosmos[load_mag_id];
 
 		auto weapon = cosmos.create_entity("sample_rifle");
-		name_entity(weapon, entity_name::BILMER2000);
+		
 
 		auto& sprite = ingredients::add_sprite(weapon, assets::game_image_id::BILMER2000, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(step, weapon, pos);
@@ -584,7 +584,7 @@ namespace prefabs {
 		auto& cosmos = step.cosm;
 		auto load_mag = cosmos[load_mag_id];
 		auto weapon = cosmos.create_entity("submachine");
-		name_entity(weapon, entity_name::SUBMACHINE);
+		
 
 		auto& sprite = ingredients::add_sprite(weapon, assets::game_image_id::SUBMACHINE, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(step, weapon, pos);
@@ -643,7 +643,7 @@ namespace prefabs {
 		auto& metas = step.input.metas_of_assets;
 		auto& cosmos = step.cosm;
 		auto weapon = cosmos.create_entity("amplifier_arm");
-		name_entity(weapon, entity_name::AMPLIFIER_ARM);
+		
 
 		auto& sprite = ingredients::add_sprite(weapon, assets::game_image_id::AMPLIFIER_ARM, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(step, weapon, pos);
@@ -715,7 +715,7 @@ namespace prefabs {
 		auto& cosmos = step.cosm;
 		auto load_mag = cosmos[load_mag_id];
 		auto weapon = cosmos.create_entity("pistol");
-		name_entity(weapon, entity_name::PISTOL);
+		
 
 		auto& sprite = ingredients::add_sprite(weapon, assets::game_image_id::PISTOL, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(step, weapon, pos);
@@ -757,7 +757,7 @@ namespace prefabs {
 		auto& cosmos = step.cosm;
 		auto load_mag = cosmos[load_mag_id];
 		auto weapon = cosmos.create_entity("pistol");
-		name_entity(weapon, entity_name::KEK9);
+		
 
 		auto& sprite = ingredients::add_sprite(weapon, assets::game_image_id::KEK9, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(step, weapon, pos);
@@ -819,7 +819,7 @@ namespace prefabs {
 		auto& metas = step.input.metas_of_assets;
 		auto& cosmos = step.cosm;
 		auto weapon = cosmos.create_entity("rocket_launcher");
-		name_entity(weapon, entity_name::ROCKET_LAUNCHER);
+		
 
 		auto& sprite = ingredients::add_sprite(weapon, assets::game_image_id::ROCKET_LAUNCHER, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(step, weapon, transform);
@@ -869,7 +869,7 @@ namespace prefabs {
 
 		const auto force_rocket = cosmos.create_entity("force_rocket");
 		{
-			name_entity(force_rocket, entity_name::ROCKET);
+			
 
 			ingredients::add_sprite(force_rocket, assets::game_image_id::FORCE_ROCKET, white, render_layer::SMALL_DYNAMIC_BODY);
 			ingredients::add_see_through_dynamic_body(step, force_rocket, transform);

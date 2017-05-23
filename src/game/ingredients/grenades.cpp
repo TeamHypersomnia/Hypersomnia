@@ -14,7 +14,6 @@
 #include "game/components/sender_component.h"
 #include "game/components/hand_fuse_component.h"
 
-#include "game/enums/entity_name.h"
 #include "game/enums/filters.h"
 
 #include "game/detail/inventory/inventory_utils.h"
@@ -38,7 +37,7 @@ namespace prefabs {
 		in.sound_gain = 1.8f;
 		in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
 
-		name_entity(grenade_entity, entity_name::FORCE_GRENADE);
+		
 
 		auto& sprite = ingredients::add_sprite(grenade_entity, assets::game_image_id::FORCE_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(step, grenade_entity, pos);
@@ -77,7 +76,7 @@ namespace prefabs {
 		in.type = adverse_element_type::PED;
 		in.create_thunders_effect = true;
 
-		name_entity(grenade_entity, entity_name::PED_GRENADE);
+		
 
 		auto& sprite = ingredients::add_sprite(grenade_entity, assets::game_image_id::PED_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(step, grenade_entity, pos);
@@ -116,7 +115,7 @@ namespace prefabs {
 		in.sound_effect = assets::sound_buffer_id::INTERFERENCE_EXPLOSION;
 		in.type = adverse_element_type::INTERFERENCE;
 		
-		name_entity(grenade_entity, entity_name::INTERFERENCE_GRENADE);
+		
 
 		auto& sprite = ingredients::add_sprite(grenade_entity, assets::game_image_id::INTERFERENCE_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(step, grenade_entity, pos);

@@ -6,7 +6,7 @@ namespace assets {
 	enum class tile_layer_id {
 		INVALID,
 
-#if BUILD_UNSCRIPTED_TEST_SCENES
+#if BUILD_TEST_SCENES
 		METROPOLIS_FLOOR,
 		CATHEDRAL_FLOOR,
 #endif

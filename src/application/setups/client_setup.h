@@ -6,7 +6,6 @@
 #include "game/transcendental/simulation_receiver.h"
 #include "game/view/viewing_session.h"
 #include "augs/misc/debug_entropy_player.h"
-#include "game/test_scenes/networked_testbed.h"
 
 class client_setup : public setup_base {
 public:
@@ -22,7 +21,7 @@ public:
 
 	cosmic_entropy total_collected_entropy;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
-	test_scenes::networked_testbed_client scene;
+	entity_id currently_controlled_character;
 
 	bool last_stepped_was_extrapolated = false;
 	bool complete_state_received = false;

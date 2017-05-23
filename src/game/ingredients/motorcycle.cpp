@@ -31,7 +31,7 @@ namespace prefabs {
 
 		const auto si = world.get_si();
 
-		name_entity(front, entity_name::JMIX114);
+		
 
 		{
 			auto& sprite = front += components::sprite();

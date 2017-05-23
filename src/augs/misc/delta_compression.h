@@ -49,82 +49,161 @@ namespace augs {
 
 	typedef char delta_unit;
 
+	template <class T, class = void>
+	class object_delta;
+
 	template <class T>
-	struct object_delta {
-		using offset_type = T;
+	class object_delta<T, std::enable_if_t<is_memcpy_safe_v<T>>> {
+		using offset_type = get_index_type_for_size_of_t<T>;
+		static constexpr std::size_t length_bytes = sizeof T;
+		static_assert(0 == length_bytes % sizeof delta_unit, "Type size must be divisble by the size of delta unit");
 
 		std::vector<delta_unit> changed_bytes;
 		std::vector<offset_type> changed_offsets;
-	};
+	
+	public:
+		bool write(
+			stream& out,
+			const bool write_changed_bit = false
+		) const {
+			const bool has_changed = changed_bytes.size() > 0;
 
-	template <class T>
-	auto delta_encode(
-		const T& base_object, 
-		const T& encoded_object
-	) {
-		static_assert(is_memcpy_safe_v<T>, "Attempt to encode a type that is not trivially copyable");
-
-		static constexpr auto length_bytes = sizeof(T);
-		static_assert(0 == length_bytes % sizeof(delta_unit), "Type size must be divisble by the size of delta unit");
-
-		constexpr auto length = length_bytes / sizeof(delta_unit);
-
-		typedef get_index_type_for_size_of_t<T> delta_offset_type;
-		object_delta<delta_offset_type> result;
-
-		const delta_unit* const base_object_ptr = reinterpret_cast<const delta_unit*>(std::addressof(base_object));
-		const delta_unit* const encoded_object_ptr = reinterpret_cast<const delta_unit*>(std::addressof(encoded_object));
-
-		thread_local std::vector<char> diff_flags;
-		diff_flags.resize(length);
-
-		auto* const diff_flags_ptr = diff_flags.data();
-
-		for (size_t i = 0; i < length; ++i) {
-			if (base_object_ptr[i] == encoded_object_ptr[i]) {
-				diff_flags_ptr[i] = 0;
+			if (write_changed_bit) {
+				augs::write(out, has_changed);
 			}
-			else {
-				diff_flags_ptr[i] = 1;
-				result.changed_bytes.push_back(encoded_object_ptr[i]);
+
+			if (has_changed) {
+				augs::write(out, changed_bytes, offset_type());
+				augs::write(out, changed_offsets, offset_type());
+			}
+
+			return has_changed;
+		}
+
+		void read(
+			stream& in,
+			const bool read_changed_bit = false
+		) {
+			bool has_changed = true;
+
+			if (read_changed_bit) {
+				augs::read(in, has_changed);
+			}
+
+			if (has_changed) {
+				augs::read(in, changed_bytes, offset_type());
+				augs::read(in, changed_offsets, offset_type());
 			}
 		}
 
-		result.changed_offsets = run_length_encoding<delta_offset_type>(diff_flags);
+		static auto encode(
+			const T& base_object, 
+			const T& encoded_object
+		) {
+			object_delta result;
 
-		return result;
-	};
+			const delta_unit* const base_object_ptr = reinterpret_cast<const delta_unit*>(std::addressof(base_object));
+			const delta_unit* const encoded_object_ptr = reinterpret_cast<const delta_unit*>(std::addressof(encoded_object));
 
-	template <class T>
-	void delta_decode(
-		T& decoded, 
-		const object_delta<get_index_type_for_size_of_t<T>>& delta
-	) {
-		static_assert(is_memcpy_safe_v<T>, "Attempt to decode a type that is not trivially copyable");
+			thread_local std::vector<char> diff_flags;
+			diff_flags.resize(length);
 
-		static constexpr auto length_bytes = sizeof(T);
-		static_assert(0 == length_bytes % sizeof(delta_unit), "Type size must be divisble by the size of delta unit");
+			auto* const diff_flags_ptr = diff_flags.data();
 
-		delta_unit* ptr = reinterpret_cast<delta_unit*>(std::addressof(decoded));
+			for (std::size_t i = 0; i < length; ++i) {
+				if (base_object_ptr[i] == encoded_object_ptr[i]) {
+					diff_flags_ptr[i] = 0;
+				}
+				else {
+					diff_flags_ptr[i] = 1;
+					result.changed_bytes.push_back(encoded_object_ptr[i]);
+				}
+			}
 
-		constexpr auto length = length_bytes / sizeof(delta_unit);
+			result.changed_offsets = run_length_encoding<offset_type>(diff_flags);
 
-		const delta_unit * const original_location = ptr;
-
-		const auto& changed_offsets = delta.changed_offsets;
-		const auto& changed_bytes = delta.changed_bytes;
-
-		size_t previous_vector_pos = 0;
-
-		for (size_t i = 0; i < changed_offsets.size(); i += 2) {
-			ptr += changed_offsets[i];
-			std::copy(changed_bytes.begin() + previous_vector_pos, changed_bytes.begin() + previous_vector_pos + changed_offsets[i + 1], ptr);
-			previous_vector_pos += changed_offsets[i + 1];
-			ptr += changed_offsets[i + 1];
+			return result;
 		}
 
-		ensure(ptr <= original_location + length);
+		void decode_into(T& decoded) const {
+			delta_unit* ptr = reinterpret_cast<delta_unit*>(std::addressof(decoded));
+
+			constexpr auto length = length_bytes / sizeof(delta_unit);
+
+			const delta_unit * const original_location = ptr;
+
+			std::size_t previous_vector_pos = 0;
+
+			for (std::size_t i = 0; i < changed_offsets.size(); i += 2) {
+				ptr += changed_offsets[i];
+				std::copy(changed_bytes.begin() + previous_vector_pos, changed_bytes.begin() + previous_vector_pos + changed_offsets[i + 1], ptr);
+				previous_vector_pos += changed_offsets[i + 1];
+				ptr += changed_offsets[i + 1];
+			}
+
+			ensure(ptr <= original_location + length);
+		}
 	};
+
+
+	template <class T>
+	class object_delta<T, std::enable_if_t<!is_memcpy_safe_v<T>>> {
+		augs::stream new_content;
+	public:
+		bool write(
+			stream& out,
+			const bool write_changed_bit = false
+		) const {
+			const bool has_changed = new_content.size() > 0;
+
+			if (write_changed_bit) {
+				augs::write(out, has_changed);
+			}
+
+			if (has_changed) {
+				augs::write(out, new_content);
+			}
+
+			return has_changed;
+		}
+
+		void read(
+			stream& in,
+			const bool read_changed_bit = false
+		) {
+			bool has_changed = true;
+
+			if (read_changed_bit) {
+				augs::read(in, has_changed);
+			}
+
+			if (has_changed) {
+				augs::read(in, new_content);
+			}
+		}
+
+		static auto encode(
+			const T& base_object,
+			const T& encoded_object
+		) {
+			augs::stream base_content;
+
+			augs::write(base_content, base_object);
+			augs::write(new_content, encoded_object);
+
+			if (base_content == new_content) {
+				new_content.set_write_pos(0u);
+			}
+		}
+
+		void decode_into(T& decoded) const {
+			if (new_content.size() > 0) {
+				augs::read(new_content, decoded);
+			}
+		}
+	};
+
+	/* shortcuts */
 
 	template <class T>
 	bool write_delta(
@@ -133,44 +212,18 @@ namespace augs {
 		stream& out,
 		const bool write_changed_bit = false
 	) {
-		const auto dt = augs::delta_encode(base, enco);
-		typedef typename decltype(dt)::offset_type offset_type;
-
-		const bool has_changed = dt.changed_bytes.size() > 0;
-
-		if (write_changed_bit) {
-			augs::write(out, has_changed);
-		}
-
-		if (has_changed) {
-			augs::write(out, dt.changed_bytes, offset_type());
-			augs::write(out, dt.changed_offsets, offset_type());
-		}
-
-		return has_changed;
+		const auto dt = object_delta<T>::encode(base, enco);
+		return dt.write(out, write_changed_bit);
 	}
 
 	template <class T>
 	void read_delta(
-		T& deco,
+		T& decode_target,
 		stream& in,
 		const bool read_changed_bit = false
 	) {
-		typedef decltype(delta_encode(deco, deco)) delta_type;
-		delta_type dt;
-		typedef typename delta_type::offset_type offset_type;
-
-		bool has_changed = true;
-
-		if (read_changed_bit) {
-			augs::read(in, has_changed);
-		}
-
-		if (has_changed) {
-			augs::read(in, dt.changed_bytes, offset_type());
-			augs::read(in, dt.changed_offsets, offset_type());
-
-			augs::delta_decode(deco, dt);
-		}
+		object_delta<T> dt;
+		dt.read(in, read_changed_bit);
+		dt.decode_into(decode_target);
 	}
 }

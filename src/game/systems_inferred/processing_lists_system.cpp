@@ -17,7 +17,7 @@ void processing_lists_system::destroy_inferred_state_of(const const_entity_handl
 
 	if (per_entity_cache[index].is_constructed) {
 		for (auto& list : lists) {
-			remove_element(list.second, handle.get_id());
+			erase_element(list.second, handle.get_id());
 		}
 
 		per_entity_cache[index] = cache();

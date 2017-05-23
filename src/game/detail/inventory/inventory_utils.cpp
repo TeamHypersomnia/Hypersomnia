@@ -21,7 +21,7 @@
 #include "augs/templates/string_templates.h"
 #include "game/detail/gui/gui_positioning.h"
 
-#include "game/enums/entity_name.h"
+
 #include "game/transcendental/data_living_one_step.h"
 
 bool capability_comparison::is_legal() const {
@@ -247,22 +247,10 @@ containment_result query_containment_result(
 	return output;
 }
 
-bool can_stack_entities(const const_entity_handle a, const const_entity_handle b) {
-	const bool same_names =
-		a.has<components::name>()
-		&& b.has<components::name>()
-		&& a.get<components::name>().id == b.get<components::name>().id
-	;
-
-	if (same_names) {
-		switch (a.get<components::name>().id) {
-		case entity_name::GREEN_CHARGE: return true;
-		case entity_name::PINK_CHARGE: return true;
-		case entity_name::CYAN_CHARGE: return true;
-		default: return false;
-		}
-	}
-
+bool can_stack_entities(
+	const const_entity_handle a, 
+	const const_entity_handle b
+) {
 	return false;
 }
 
@@ -354,7 +342,7 @@ void detail_add_item(const inventory_slot_handle handle, const entity_handle new
 
 void detail_remove_item(const inventory_slot_handle handle, const entity_handle removed_item) {
 	auto& v = handle->items_inside;
-	remove_element(v, removed_item);
+	erase_element(v, removed_item);
 	removed_item.get<components::item>().current_slot.unset();
 }
 

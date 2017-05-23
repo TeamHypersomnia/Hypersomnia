@@ -2,6 +2,8 @@
 #include "augs/misc/stepped_timing.h"
 #include "augs/misc/trivially_copyable_tuple.h"
 
+#include "game/transcendental/cosmos_global_state.h"
+
 #include "game/assets/animation_id.h"
 #include "game/assets/particle_effect_id.h"
 #include "game/assets/tile_layer_id.h"
@@ -31,7 +33,7 @@ class cosmos_metadata {
 	entity_guid next_entity_guid = 1;
 #endif
 public:
-	all_simulation_settings settings;
+	cosmos_global_state global;
 	// END GEN INTROSPECTOR
 };
 

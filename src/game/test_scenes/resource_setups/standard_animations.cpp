@@ -1,5 +1,5 @@
 #include "game/build_settings.h"
-#if BUILD_UNSCRIPTED_TEST_SCENES
+#if BUILD_TEST_SCENES
 #include "all.h"
 
 #include "game/transcendental/cosmos.h"

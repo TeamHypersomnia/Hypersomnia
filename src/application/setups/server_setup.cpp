@@ -35,6 +35,7 @@
 #include "generated/introspectors.h"
 #include "application/config_lua_table.h"
 
+
 void server_setup::wait_for_listen_server() {
 	std::unique_lock<std::mutex> lck(mtx);
 	while (!server_ready) cv.wait(lck);
@@ -51,8 +52,9 @@ server_setup::endpoint& server_setup::get_endpoint(const augs::network::endpoint
 void server_setup::deinit_endpoint(endpoint& end, const bool gracefully) {
 	LOG("%x disconnected.", end.nick_and_ip());
 
-	if (hypersomnia[end.controlled_entity].alive())
+	if (hypersomnia[end.controlled_entity].alive()) {
 		scene.free_character(end.controlled_entity);
+	}
 
 	if (!gracefully) {
 		choose_server(end.addr).forceful_disconnect(end.addr);
@@ -68,7 +70,7 @@ void server_setup::deinit_endpoint(const augs::network::endpoint_address addr, c
 
 void server_setup::disconnect(const augs::network::endpoint_address addr, const bool gracefully) {
 	deinit_endpoint(addr, gracefully);
-	remove_element(endpoints, addr);
+	erase_element(endpoints, addr);
 }
 
 augs::network::server& server_setup::choose_server(augs::network::endpoint_address addr) {
@@ -89,23 +91,11 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 
 	cosmos initial_hypersomnia(3000);
 
-	test_scenes::networked_testbed_server().populate_world_with_entities(
-		initial_hypersomnia, 
-		metas_of_assets
-	);
-
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
-	const bool detailed_step_log = cfg.default_tickrate <= 2;
 
-	if (!hypersomnia.load_from_file("server_save.state")) {
-		hypersomnia.set_fixed_delta(cfg.default_tickrate);
-		
-		scene.populate_world_with_entities(
-			hypersomnia, 
-			metas_of_assets
-		);
-	}
+	hypersomnia.load_from_file("server_save.state");
+	const bool detailed_step_log = cfg.default_tickrate <= 2;
 
 	if (cfg.get_input_recording_mode() != input_recording_type::DISABLED) {
 		//if (player.try_to_load_or_save_new_session("generated/server_sessions/", "server_recorded.inputs")) {

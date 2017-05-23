@@ -155,7 +155,7 @@ bool driver_system::change_car_ownership(
 		if (has_physics) {
 			//maybe_rigid_body.set_transform(car.left_wheel_trigger);
 			//maybe_rigid_body.set_velocity(vec2(0, 0));
-			//resolve_density_of_associated_fixtures(driver_entity);
+			resolve_density_of_associated_fixtures(driver_entity);
 		}
 	}
 	else {

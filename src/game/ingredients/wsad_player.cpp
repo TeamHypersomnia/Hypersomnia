@@ -108,7 +108,7 @@ namespace ingredients {
 
 		processing.disable_in(processing_subjects::WITH_FORCE_JOINT);
 
-		force_joint.max_force = 80000.f;
+		force_joint.max_force = 800000.f;
 		force_joint.max_torque = 2000.f;
 		force_joint.correction_factor = 0.8f;
 		force_joint.activated = false;
@@ -147,7 +147,7 @@ namespace prefabs {
 
 		const auto character = world.create_entity(name);
 
-		name_entity(character, entity_name::PERSON);
+		
 
 		const auto crosshair = create_character_crosshair(step);
 		crosshair.get<components::crosshair>().character_entity_to_chase = character;

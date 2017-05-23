@@ -1,29 +1,17 @@
 #include "name_component.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
+#include "game/systems_inferred/name_system.h"
+#include "game/components/all_inferred_state_component.h"
 
 namespace components {
-	std::wstring name::get_nickname() const {
-		return { nickname.begin(), nickname.end() };
+	entity_name_type name::get_value() const {
+		return { value.begin(), value.end() };
 	}
 
-	void name::set_nickname(const std::wstring& s) {
-		nickname.assign(s.begin(), s.end());
+	void name::set_value(const entity_name_type& s) {
+		value.assign(s.begin(), s.end());
 	}
-}
-
-void name_entity(const entity_handle id, const entity_name n) {
-	components::name name;
-	name.id = n;
-	id.set(name);
-}
-
-void name_entity(const entity_handle id, const entity_name n, const std::wstring& nick) {
-	components::name name;
-	name.id = n;
-	name.custom_nickname = true;
-	name.set_nickname(nick);
-	id.set(name);
 }
 
 entity_id get_first_named_ancestor(const const_entity_handle p) {
@@ -41,3 +29,21 @@ entity_id get_first_named_ancestor(const const_entity_handle p) {
 
 	return entity_id();
 }
+
+typedef components::name N;
+
+template <bool C>
+entity_name_type basic_name_synchronizer<C>::get_value() const {
+	return get_data().get_value();
+}
+
+void basic_name_synchronizer<false, N>::set_value(const entity_name_type& new_name) const {
+	handle.get_cosmos().systems_inferred.get<relational_system>().set_name(
+		handle, 
+		component,
+		new_name
+	);
+}
+
+template class basic_name_synchronizer<false>;
+template class basic_name_synchronizer<true>;

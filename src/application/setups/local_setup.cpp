@@ -46,7 +46,6 @@ void local_setup::process(
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
 	test_scenes::testbed testbed;
-	testbed.debug_var = cfg.debug_var;
 
 	const auto metas_of_assets = get_assets_manager().generate_logical_metas_of_assets();
 

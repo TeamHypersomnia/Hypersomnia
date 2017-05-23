@@ -6,7 +6,7 @@
 namespace assets {
 	enum class sound_buffer_id : unsigned {
 		INVALID,
-#if BUILD_UNSCRIPTED_TEST_SCENES
+#if BUILD_TEST_SCENES
 		BILMER2000_MUZZLE,
 		ASSAULT_RIFLE_MUZZLE,
 		SUBMACHINE_MUZZLE,

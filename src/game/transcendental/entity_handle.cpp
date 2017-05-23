@@ -27,11 +27,11 @@
 #include "game/enums/rigid_body_type.h"
 
 std::ostream& operator<<(std::ostream& out, const entity_handle &x) {
-	return out << typesafe_sprintf("%x %x", x.get_debug_name(), x.get_id());
+	return out << typesafe_sprintf("%x %x", x.get_name(), x.get_id());
 }
 
 std::ostream& operator<<(std::ostream& out, const const_entity_handle &x) {
-	return out << typesafe_sprintf("%x %x", x.get_debug_name(), x.get_id());
+	return out << typesafe_sprintf("%x %x", x.get_name(), x.get_id());
 }
 
 template <bool C>

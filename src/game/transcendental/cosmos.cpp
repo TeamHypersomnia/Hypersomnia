@@ -69,11 +69,11 @@ void cosmos::destroy_inferred_state_completely() {
 }
 
 void cosmos::create_inferred_state_completely() {
-	for (const auto& ordered_pair : guid_map_for_transport) {
+	for (const auto& ordered_pair : guid_to_id) {
 		create_inferred_state_for(get_handle(ordered_pair.second));
 	}
 
-	//for (auto it = guid_map_for_transport.rbegin(); it != guid_map_for_transport.rend(); ++it) {
+	//for (auto it = guid_to_id.rbegin(); it != guid_to_id.rend(); ++it) {
 	//	create_inferred_state_for(get_handle((*it).second));
 	//}
 }
@@ -98,8 +98,7 @@ void cosmos::create_inferred_state_for(const const_entity_handle h) {
 
 cosmos::cosmos(const std::size_t reserved_entities) {
 	reserve_storage_for_entities(reserved_entities);
-	significant.meta.settings.si.set_pixels_per_meter(100.f);
-	entity_debug_names[0] = "dead entity";
+	significant.meta.global.si.set_pixels_per_meter(100.f);
 
 	set_standard_behaviour_trees(*this);
 }
@@ -108,16 +107,15 @@ cosmos::cosmos(const cosmos& b) {
 	*this = b;
 }
 
-const std::string& cosmos::get_debug_name(const entity_id id) const {
-	return entity_debug_names[id.indirection_index + 1];
+const std::string& cosmos::get_name(const entity_id id) const {
+	return entity_names[id.indirection_index + 1];
 }
 
-void cosmos::set_debug_name(const entity_id id, const std::string& new_debug_name) {
-	entity_debug_names[id.indirection_index + 1] = new_debug_name;
-}
-
-void cosmos::delete_debug_name(const entity_id id) {
-	entity_debug_names[id.indirection_index + 1] = "dead entity";
+void cosmos::set_name(
+	const entity_id id, 
+	const std::string& new_debug_name
+) {
+	entity_names[id.indirection_index + 1] = new_debug_name;
 }
 
 bool cosmos::operator==(const cosmos& b) const {
@@ -141,7 +139,7 @@ cosmos& cosmos::operator=(const cosmos& b) {
 	profiler.duplication.new_measurement();
 	significant = b.significant;
 #if COSMOS_TRACKS_GUIDS
-	guid_map_for_transport = b.guid_map_for_transport;
+	guid_to_id = b.guid_to_id;
 #endif
 	profiler.duplication.end_measurement();
 	b.profiler.duplication.end_measurement();
@@ -157,21 +155,21 @@ cosmos& cosmos::operator=(const cosmos& b) {
 #if COSMOS_TRACKS_GUIDS
 
 void cosmos::assign_next_guid(const entity_handle new_entity) {
-	auto this_guid = significant.meta.next_entity_guid.value++;
+	const auto this_guid = significant.meta.next_entity_guid.value++;
 
-	guid_map_for_transport[this_guid] = new_entity;
+	guid_to_id[this_guid] = new_entity;
 	new_entity.get<components::guid>().value = this_guid;
 }
 
 void cosmos::clear_guid(const entity_handle cleared) {
-	guid_map_for_transport.erase(get_guid(cleared));
+	guid_to_id.erase(get_guid(cleared));
 }
 
 void cosmos::remap_guids() {
-	guid_map_for_transport.clear();
+	guid_to_id.clear();
 
 	for_each_entity_id([this](const entity_id id) {
-		guid_map_for_transport[get_guid(get_handle(id))] = id;
+		guid_to_id[get_guid(get_handle(id))] = id;
 	});
 }
 
@@ -192,7 +190,7 @@ void cosmos::complete_reinference(const const_entity_handle h) {
 void cosmos::reserve_storage_for_entities(const size_t n) {
 	get_aggregate_pool().initialize_space(n);
 	reserve_storage_for_all_components(n);
-	entity_debug_names.resize(n + 1);
+	entity_names.resize(n + 1);
 
 	auto reservation_lambda = [n](auto& sys) {
 		sys.reserve_caches_for_entities(n);
@@ -251,10 +249,20 @@ entity_handle cosmos::allocate_new_entity() {
 	return entity_handle(*this, pooled_object_raw_id);
 }
 
-entity_handle cosmos::create_entity(const std::string& debug_name) {
+
+void cosmos::set_name(
+	const entity_id id, 
+	const std::string new_name
+) {
+	const std::wstring name(new_name.begin(), new_name.end());
+	get_handle(id).get<components::name>().nickname = 
+}
+
+entity_handle cosmos::create_entity(const std::string name_str) {
 	auto new_entity = allocate_new_entity();
-	set_debug_name(new_entity, debug_name);
 	new_entity += components::guid();
+	new_entity += components::name();
+	set_name(new_entity, name_str);
 
 #if COSMOS_TRACKS_GUIDS
 	assign_next_guid(new_entity);
@@ -269,7 +277,7 @@ entity_handle cosmos::create_entity_with_specific_guid(const std::string& debug_
 	const auto new_entity = allocate_new_entity();
 	new_entity += components::guid();
 
-	guid_map_for_transport[specific_guid] = new_entity;
+	guid_to_id[specific_guid] = new_entity;
 	new_entity.get<components::guid>().value = specific_guid;
 	return new_entity;
 }
@@ -299,7 +307,7 @@ entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
 		components::child
 	>(new_entity, source_entity);
 
-	set_debug_name(new_entity, "+" + source_entity.get_debug_name());
+	set_name(new_entity, "+" + source_entity.get_name());
 
 #if COSMOS_TRACKS_GUIDS
 	assign_next_guid(new_entity);

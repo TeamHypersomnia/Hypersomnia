@@ -5,7 +5,7 @@
 namespace assets {
 	enum class gl_texture_id {
 		INVALID,
-#if BUILD_UNSCRIPTED_TEST_SCENES
+#if BUILD_TEST_SCENES
 		GAME_WORLD_ATLAS,
 #endif
 		COUNT = MAX_GL_TEXTURE_COUNT + 1

@@ -90,7 +90,7 @@ namespace augs {
 				auto& parent_cache = parent_caches[make_cache_id(parent_entry)];
 
 				parent_entry = id_type();
-				remove_element(parent_cache.children.at(parent_index), child_id);
+				erase_element(parent_cache.children.at(parent_index), child_id);
 			}
 		}
 

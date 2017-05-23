@@ -146,7 +146,7 @@ void standard_explosion_input::instantiate(
 									);
 								}
 
-								// LOG("Impact %x dealt to: %x. Resultant angular: %x", impact, body_entity.get_debug_name(), affected_physics.get_angular_velocity());
+								// LOG("Impact %x dealt to: %x. Resultant angular: %x", impact, body_entity.get_name(), affected_physics.get_angular_velocity());
 
 								damage_msg.impact_velocity = impact;
 							}

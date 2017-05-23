@@ -143,9 +143,6 @@ config_table = {
 	interpolation_speed = 525,
 	misprediction_smoothing_multiplier = 1.2,
 
-	-- Reserved for experimental use, don't touch.
-	debug_var = 0,
-
 	-- Used by the server to inject random inputs to the other players to examine and test lag compensation strategies.
 	debug_randomize_entropies_in_client_setup = true,
 

@@ -13,6 +13,7 @@ option(BUILD_OPENAL "Build OpenAL Soft." ON)
 option(BUILD_UNIT_TESTS "Build unit tests that are run on game startup." ON)
 option(BUILD_VERSION_FILE_GENERATOR "Build version file generator to generate commit information." ON)
 option(BUILD_ENET "Build ENet networking library." ON)
+option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ON)
 option(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE "Add command to archive builds in Release." ON)
 
 if (NOT HYPERSOMNIA_RUNTIME_ARCHIVE_DIR)
@@ -124,6 +125,22 @@ set(HYPERSOMNIA_BOX2D_SRCS
 
 # We don't care about alphabetical order. Put new files to the very bottom.
 
+set(HYPERSOMNIA_TEST_SCENES_SRCS
+	"src/game/ingredients/artificial_life.cpp"
+	"src/game/ingredients/backpack.cpp"
+	"src/game/ingredients/box_physics.cpp"
+	"src/game/ingredients/car.cpp"
+	"src/game/ingredients/character_inventory.cpp"
+	"src/game/ingredients/guns.cpp"
+	"src/game/ingredients/ingredients.cpp"
+	"src/game/ingredients/melee_weapons.cpp"
+	"src/game/ingredients/motorcycle.cpp"
+	"src/game/ingredients/obstacles.cpp"
+	"src/game/ingredients/sprite.cpp"
+	"src/game/ingredients/wsad_player.cpp"
+	"src/game/ingredients/grenades.cpp"
+)
+
 set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/application/call_config_script.cpp"
 	"src/application/config_lua_table.cpp"
@@ -227,7 +244,6 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/enums/item_category.cpp"
 	"src/game/enums/item_transfer_result_type.cpp"
 	"src/game/enums/slot_physical_behaviour.cpp"
-	"src/game/ingredients/grenades.cpp"
 	"src/game/test_scenes/resource_setups/standard_animations.cpp"
 	"src/game/test_scenes/resource_setups/standard_atlas.cpp"
 	"src/game/test_scenes/resource_setups/standard_behaviour_trees.cpp"
@@ -237,7 +253,6 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/test_scenes/resource_setups/standard_sound_buffers.cpp"
 	"src/game/test_scenes/resource_setups/standard_spell_datas.cpp"
 	"src/game/test_scenes/resource_setups/standard_tile_layers.cpp"
-	"src/game/test_scenes/networked_testbed.cpp"
 	"src/game/test_scenes/one_entity.cpp"
 	"src/game/test_scenes/testbed.cpp"
 	"src/game/systems_audiovisual/exploding_ring_system.cpp"
@@ -307,20 +322,8 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/detail/ai/behaviours/target_closest_enemy.cpp"
 	"src/game/detail/entity_scripts.cpp"
 	"src/game/enums/filters.cpp"
-	"src/game/ingredients/artificial_life.cpp"
 	"src/game/detail/entity_description.cpp"
 	"src/game/detail/names_and_details.cpp"
-	"src/game/ingredients/backpack.cpp"
-	"src/game/ingredients/box_physics.cpp"
-	"src/game/ingredients/car.cpp"
-	"src/game/ingredients/character_inventory.cpp"
-	"src/game/ingredients/guns.cpp"
-	"src/game/ingredients/ingredients.cpp"
-	"src/game/ingredients/melee_weapons.cpp"
-	"src/game/ingredients/motorcycle.cpp"
-	"src/game/ingredients/obstacles.cpp"
-	"src/game/ingredients/sprite.cpp"
-	"src/game/ingredients/wsad_player.cpp"
 	"src/game/transcendental/logic_step.cpp"
 	"src/game/transcendental/serialization.cpp"
 	"src/game/transcendental/simulation_broadcast.cpp"
@@ -608,6 +611,7 @@ configure_file("src/augs/build_settings/setting_build_openal.h.in" "${GENERATED_
 configure_file("src/augs/build_settings/setting_build_sound_format_decoders.h.in" "${GENERATED_SOURCES_PATH}/setting_build_sound_format_decoders.h") 
 configure_file("src/augs/build_settings/setting_build_enet.h.in" "${GENERATED_SOURCES_PATH}/setting_build_enet.h") 
 configure_file("src/augs/build_settings/setting_build_unit_tests.h.in" "${GENERATED_SOURCES_PATH}/setting_build_unit_tests.h")
+configure_file("src/game/setting_build_test_scenes.h.in" "${GENERATED_SOURCES_PATH}/setting_build_test_scenes.h") 
 # Just a different name for the variable
 set(WAS_VERSION_GENERATOR_BUILT ${BUILD_VERSION_FILE_GENERATOR})
 configure_file("src/augs/build_settings/setting_was_version_generator_built.h.in" "${GENERATED_SOURCES_PATH}/setting_was_version_generator_built.h") 

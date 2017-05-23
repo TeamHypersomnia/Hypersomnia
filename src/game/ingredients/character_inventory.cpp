@@ -9,7 +9,7 @@
 #include "game/components/item_slot_transfers_component.h"
 #include "game/detail/gui/character_gui.h"
 #include "game/detail/inventory/inventory_utils.h"
-#include "game/enums/entity_name.h"
+
 
 namespace ingredients {
 	void add_character_head_inventory(const logic_step step, entity_handle e) {
@@ -59,7 +59,7 @@ namespace prefabs {
 		const bool primary = true
 	) {
 		auto e = step.cosm.create_entity("arm_back");
-		name_entity(e, entity_name::STANDARD_ARM_BACK);
+		
 
 		auto& container = e += components::container();
 		auto& sprite = e += components::sprite();
@@ -94,7 +94,7 @@ namespace prefabs {
 		const vec2 size
 	) {
 		auto e = step.cosm.create_entity("arm_front");
-		name_entity(e, entity_name::STANDARD_ARM_FRONT);
+		
 
 		auto& container = e += components::container();
 		auto& sprite = e += components::sprite();

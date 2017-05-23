@@ -184,7 +184,7 @@ public:
 		raw_id(raw_id), 
 		owner(owner) 
 #if ENTITY_HANDLE_HAS_DEBUG_NAME_REFERENCE
-		, debug_name(owner.get_debug_name(raw_id))
+		, debug_name(owner.get_name(raw_id))
 #endif
 	{
 
@@ -208,8 +208,8 @@ public:
 		return !alive();
 	}
 
-	std::string get_debug_name() const {
-		return get_cosmos().get_debug_name(raw_id);
+	std::string get_name() const {
+		return get_cosmos().get_name(raw_id);
 	}
 
 	typename owner_reference get_cosmos() const {
@@ -281,7 +281,7 @@ public:
 	template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 	basic_entity_handle<is_const> add_standard_components(const logic_step step) const;
 
-	template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
+	template <bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 	void recalculate_basic_processing_categories() const;
 
 	bool get_flag(const entity_flag f) const {
@@ -295,7 +295,7 @@ public:
 		return from.values.test(f);
 	}
 
-	template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
+	template <bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 	void set_flag(const entity_flag f) const {
 		ensure(alive());
 		if (!has<components::flags>()) {
@@ -331,6 +331,10 @@ public:
 				}
 			}
 		);
+	}
+
+	auto get_name() const {
+		return get<components::name>().get_name();
 	}
 
 	bool is_inferred_state_activated() const {

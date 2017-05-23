@@ -6,7 +6,7 @@
 namespace assets {
 	enum class particle_effect_id : unsigned {
 		INVALID,
-#if BUILD_UNSCRIPTED_TEST_SCENES
+#if BUILD_TEST_SCENES
 		HEALTH_DAMAGE_SPARKLES,
 		ELECTRIC_PROJECTILE_DESTRUCTION,
 		PIXEL_PROJECTILE_TRACE,

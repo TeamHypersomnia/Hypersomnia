@@ -1,3 +1,5 @@
+#include "game/build_settings.h"
+
 #include "one_entity.h"
 #include "game/ingredients/ingredients.h"
 #include "game/transcendental/cosmos.h"
@@ -39,6 +41,7 @@
 
 namespace test_scenes {
 	void one_entity::populate(const logic_step step) {
+#if BUILD_TEST_SCENES 1
 		auto& world = step.cosm;
 
 		//prefabs::create_force_grenade(step, { 254, 611 });
@@ -119,6 +122,7 @@ namespace test_scenes {
 
 		select_character(character(0));
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
+#endif
 	}
 
 	entity_id one_entity::get_selected_character() const {

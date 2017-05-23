@@ -16,15 +16,8 @@
 #include "augs/log.h"
 #include <iomanip>
 
-std::wstring get_bbcoded_entity_name(const const_entity_handle maybe_overridden_by_nickname) {
-	const auto& name = maybe_overridden_by_nickname.get<components::name>();
-
-	if (name.custom_nickname) {
-		return name.get_nickname();
-	}
-	else {
-		return get_bbcoded_entity_name(name.id);
-	}
+entity_name_type get_bbcoded_entity_name(const const_entity_handle maybe_overridden_by_nickname) {
+	return maybe_overridden_by_nickname.get<components::name>().get_value();
 }
 
 std::wstring get_bbcoded_entity_name_details(const const_entity_handle id) {

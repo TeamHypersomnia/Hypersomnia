@@ -33,8 +33,6 @@ void director_setup::init(
 
 	session.reserve_caches_for_entities(3000);
 	
-	testbed.debug_var = cfg.debug_var;
-
 	if (!hypersomnia.load_from_file("save.state")) {
 		hypersomnia.set_fixed_delta(cfg.default_tickrate);
 

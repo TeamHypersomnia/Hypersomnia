@@ -1,4 +1,8 @@
+#include "generated/setting_build_test_scenes.h"
 #include "testbed.h"
+
+#if BUILD_TEST_SCENES
+
 #include "game/ingredients/ingredients.h"
 #include "game/transcendental/cosmos.h"
 #include "game/assets/game_image_id.h"
@@ -36,9 +40,10 @@
 #include "game/transcendental/cosmic_delta.h"
 
 #include "augs/graphics/renderer.h"
-
+#endif
 namespace test_scenes {
 	void testbed::populate(const logic_step step) {
+#if BUILD_TEST_SCENES
 		auto& world = step.cosm;
 		const auto& metas = step.input.metas_of_assets;
 		
@@ -62,7 +67,7 @@ namespace test_scenes {
 		//	auto frog = world.create_entity("frog");
 		//	ingredients::add_sprite(frog, vec2(100 + x * 40, 200 + 400), assets::game_image_id::TEST_SPRITE, white, render_layer::SMALL_DYNAMIC_BODY);
 		//	ingredients::add_see_through_dynamic_body(frog, pos);
-		//	name_entity(frog, entity_name::CRATE);
+		//	
 		//	frog.add_standard_components(step);
 		//}
 
@@ -237,7 +242,7 @@ namespace test_scenes {
 					prefabs::create_sample_magazine(step, vec2(100, -650), "0.4",
 						(i == 5 ? prefabs::create_pink_charge : prefabs::create_cyan_charge)(step, vec2(0, 0), 30)));
 
-				name_entity(new_character, entity_name::PERSON, L"Rebel");
+				
 				perform_transfer({ rifle, new_character.get_primary_hand() }, step);
 
 				new_character.get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
@@ -248,10 +253,10 @@ namespace test_scenes {
 				i == 7 || i == 8 || i == 9
 				) {
 
-				name_entity(new_character, entity_name::PERSON, L"Hunter");
+				
 				
 				if (i == 8) {
-					name_entity(new_character, entity_name::PERSON, L"Commander");
+					
 				}
 
 				if (i == 9) {
@@ -738,7 +743,7 @@ namespace test_scenes {
 		}
 
 		if (character(0).alive()) {
-			name_entity(character(0), entity_name::PERSON, L"Newborn");
+			
 
 			driver_system().assign_car_ownership(character(0), main_character_motorcycle);
 			//main_character_motorcycle.get<components::car>().accelerating = true;
@@ -826,127 +831,22 @@ namespace test_scenes {
 		//perform_transfer({ submachine, character(0).get_primary_hand() }, step);
 
 		if (character(1).alive()) {
-			name_entity(character(1), entity_name::PERSON, L"Sentinel");
+			
 			perform_transfer({ rifle2, character(1).get_primary_hand() }, step);
 		}
 
 		if (character(2).alive()) {
-			name_entity(character(2), entity_name::PERSON, L"Sentinel");
+			
 			perform_transfer({ second_machete, character(2).get_primary_hand() }, step);
 		}
 
 		if (character(3).alive()) {
-			name_entity(character(3), entity_name::PERSON, L"Medic");
+			
 			perform_transfer({ pis2, character(3).get_primary_hand() }, step);
 		}
 
 		characters.assign(new_characters.begin(), new_characters.end());
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
+#endif
 	}
-
-	entity_id testbed::get_selected_character() const {
-		return selected_character;
-	}
-
-	void testbed::select_character(const entity_id h) {
-		selected_character = h;
-	}
-
-	//if (raw_input.key == augs::window::event::keys::key::F7) {
-	//	auto target_folder = "saves/" + augs::get_timestamp();
-	//	augs::create_directories(target_folder);
-	//
-	//	main_cosmos.save_to_file(target_folder + "/" + "save.state");
-	//}
-	//if (raw_input.key == augs::window::event::keys::key::F4) {
-	//	cosmos cosm_with_guids;
-	//	cosm_with_guids.significant = stashed_cosmos.significant;
-	//	cosm_with_guids.remap_guids();
-	//
-	//	ensure(stashed_delta.get_write_pos() == 0);
-	//	cosmic_delta::encode(cosm_with_guids, main_cosmos, stashed_delta);
-	//
-	//	stashed_delta.reset_read_pos();
-	//	cosmic_delta::decode(cosm_with_guids, stashed_delta);
-	//	stashed_delta.reset_write_pos();
-	//
-	//	main_cosmos = cosm_with_guids;
-	//}
-	//if (raw_input.key == augs::window::event::keys::key::F8) {
-	//	main_cosmos.profiler.duplication.new_measurement();
-	//	stashed_cosmos = main_cosmos;
-	//	main_cosmos.profiler.duplication.end_measurement();
-	//}
-	//if (raw_input.key == augs::window::event::keys::key::F9) {
-	//	main_cosmos = stashed_cosmos;
-	//}
-	//if (raw_input.key == augs::window::event::keys::key::F10) {
-	//}
-
-	void testbed::control_character_selection_numeric(
-		augs::machine_entropy::local_type& changes
-	) {
-		using namespace augs::window::event::keys;
-
-		erase_remove(
-			changes,
-			[this](const auto& c) {
-				state.apply(c);
-
-				if (state.is_set(key::LCTRL) && c.was_any_key_pressed() && int(c.key.key) > int(key::_0) && int(c.key.key) <= int(key::_9)) {
-					current_character_index = int(c.key.key) - int(key::_0);
-
-					select_character(characters[current_character_index]);
-
-					return true;
-				}
-
-				return false;
-			}
-		);
-	}
-
-	void testbed::control_character_selection(game_intent_vector& intents) {
-		for (const auto& intent : intents) {
-			if (intent.is_pressed && intent.intent == intent_type::DEBUG_SWITCH_CHARACTER) {
-				++current_character_index;
-				current_character_index %= characters.size();
-
-				select_character(characters[current_character_index]);
-			}
-		}
-	}
-
-	//auto& cosmos = cosm;
-	//auto& ln = augs::renderer::get_current().logic_lines;
-	//
-	//for (auto crate : crates) {
-	//	auto& fixes = cosmos[crate].get<components::fixtures>();
-	//
-	//	auto& dest = fixes.get_modifiable_destruction_data({ 0, 0 });
-	//
-	//	for (auto scar : dest.scars) {
-	//		ln.draw_cyan(scar.first_impact, scar.depth_point);
-	//	}
-	//}
-
-	//for (auto& tested : draw_bodies) {
-	//	auto& s = tested.get<components::physics_definition>();
-	//
-	//	auto& lines = renderer::get_current().logic_lines;
-	//
-	//	auto vv = s.fixtures[0].debug_original;
-	//
-	//	for (int i = 0; i < vv.size(); ++i) {
-	//		auto& tt = tested.get_logic_transform();
-	//		auto pos = tt.pos;
-	//
-	//		lines.draw_cyan((pos + vv[i]).rotate(tt.rotation, pos), (pos + vv[(i + 1) % vv.size()]).rotate(tt.rotation, pos));
-	//	}
-	//}
-
-	//auto ff = (new_characters[1].get<components::pathfinding>().get_current_navigation_point() - position(new_characters[1])).set_length(15000);
-	//new_characters[1].get<components::rigid_body>().apply_force(ff);
-
-	// LOG("F: %x", ff);
 }

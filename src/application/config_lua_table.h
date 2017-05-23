@@ -74,7 +74,6 @@ public:
 	float interpolation_speed = 0;
 	float misprediction_smoothing_multiplier = 0.5;
 
-	int debug_var = 0;
 	bool debug_randomize_entropies_in_client_setup = 0;
 	unsigned debug_randomize_entropies_in_client_setup_once_every_steps = 0;
 

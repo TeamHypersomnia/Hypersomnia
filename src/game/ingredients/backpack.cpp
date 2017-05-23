@@ -3,7 +3,7 @@
 #include "game/transcendental/cosmos.h"
 
 #include "game/enums/item_category.h"
-#include "game/enums/entity_name.h"
+
 #include "game/detail/inventory/inventory_utils.h"
 #include "game/components/container_component.h"
 #include "game/components/item_component.h"
@@ -32,7 +32,7 @@ namespace prefabs {
 		auto& world = step.cosm;
 		const auto def = world.create_entity("sample_backpack");
 
-		name_entity(def, entity_name::VIOLET_BACKPACK);
+		
 		ingredients::add_backpack_container(def);
 
 		ingredients::add_sprite(def, assets::game_image_id::BACKPACK, white, render_layer::SMALL_DYNAMIC_BODY);

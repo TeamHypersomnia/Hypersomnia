@@ -1,15 +1,20 @@
 #pragma once
-#include "game/transcendental/entity_handle.h"
+#include "game/build_settings.h"
+
+#if BUILD_TEST_SCENES
 #include "augs/math/vec2.h"
+#include "augs/graphics/pixel.h"
+
 
 #include "game/assets/game_image_id.h"
-#include "game/components/render_component.h"
 
-#include "augs/graphics/pixel.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/step_declaration.h"
 #include "game/transcendental/entity_handle.h"
 
+#include "game/components/render_component.h"
+
 class cosmos;
-#include "game/transcendental/step_declaration.h"
 
 namespace components {
 	struct item;
@@ -113,3 +118,4 @@ namespace prefabs {
 	entity_handle create_rocket_launcher(logic_step, components::transform, entity_id load_rocket);
 	entity_handle create_force_rocket(logic_step, components::transform);
 }
+#endif

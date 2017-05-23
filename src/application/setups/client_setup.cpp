@@ -5,7 +5,6 @@
 
 #include "game/assets/assets_manager.h"
 
-#include "game/test_scenes/networked_testbed.h"
 #include "game/test_scenes/resource_setups/all.h"
 
 #include "game/transcendental/types_specification/all_component_includes.h"
@@ -58,18 +57,12 @@ void client_setup::init(
 ) {
 	metas_of_assets = get_assets_manager().generate_logical_metas_of_assets();
 
-	test_scenes::networked_testbed_client().populate_world_with_entities(
-		initial_hypersomnia,
-		metas_of_assets
-	);
-
 	session.reserve_caches_for_entities(3000);
 
 	detailed_step_log = cfg.default_tickrate <= 2;
 
 	if (!hypersomnia.load_from_file("save.state")) {
 		hypersomnia.set_fixed_delta(cfg.default_tickrate);
-		scene.populate_world_with_entities(hypersomnia, metas_of_assets);
 	}
 
 	if (cfg.get_input_recording_mode() != input_recording_type::DISABLED) {
@@ -150,7 +143,7 @@ void client_setup::process_once(
 	session.switch_between_gui_and_back(new_machine_entropy.local);
 
 	session.control_gui_and_remove_fetched_events(
-		hypersomnia[scene.get_selected_character()],
+		hypersomnia[currently_controlled_character],
 		new_machine_entropy.local
 	);
 
@@ -159,7 +152,7 @@ void client_setup::process_once(
 	session.control_and_remove_fetched_intents(new_intents);
 
 	auto new_cosmic_entropy = cosmic_entropy(
-		hypersomnia[scene.get_selected_character()],
+		hypersomnia[currently_controlled_character],
 		new_intents
 	);
 
@@ -200,7 +193,7 @@ void client_setup::process_once(
 					unsigned controlled_character_guid;
 					augs::read(stream, controlled_character_guid);
 
-					scene.select_character(hypersomnia.get_handle(controlled_character_guid));
+					currently_controlled_character = hypersomnia.get_handle(controlled_character_guid);
 
 					complete_state_received = true;
 					break;
@@ -244,7 +237,7 @@ void client_setup::process_once(
 			receiver.unpack_deterministic_steps(
 				session.systems_audiovisual.get<interpolation_system>(),
 				session.systems_audiovisual.get<past_infection_system>(),
-				scene.get_selected_character(), 
+				currently_controlled_character, 
 				hypersomnia, 
 				hypersomnia_last_snapshot, 
 				extrapolated_hypersomnia, 
@@ -274,7 +267,7 @@ void client_setup::process_once(
 
 		session.advance_audiovisual_systems(
 			extrapolated_hypersomnia, 
-			scene.get_selected_character(),
+			currently_controlled_character,
 			all_visible,
 			vdt
 		);
@@ -289,7 +282,7 @@ void client_setup::process_once(
 			cfg,
 			renderer,
 			extrapolated_hypersomnia,
-			scene.get_selected_character(),
+			currently_controlled_character,
 			all_visible,
 			timer.fraction_of_step_until_next_step(extrapolated_hypersomnia.get_fixed_delta()),
 			client

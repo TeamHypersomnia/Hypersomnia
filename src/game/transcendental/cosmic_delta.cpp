@@ -73,7 +73,7 @@ void transform_component_guids_to_ids_in_place(
 			id.unset();
 
 			if (guid_inside != 0) {
-				id = cosm.guid_map_for_transport.at(guid_inside);
+				id = cosm.guid_to_id.at(guid_inside);
 			}
 		},
 		comp
@@ -108,9 +108,9 @@ bool cosmic_delta::encode(
 		const const_entity_handle enco_entity = enco.get_handle(id);
 #if COSMOS_TRACKS_GUIDS
 		const auto stream_written_id = enco_entity.get_guid();
-		const auto maybe_base_entity = base.guid_map_for_transport.find(stream_written_id);
+		const auto maybe_base_entity = base.guid_to_id.find(stream_written_id);
 
-		const bool is_new = maybe_base_entity == base.guid_map_for_transport.end();
+		const bool is_new = maybe_base_entity == base.guid_to_id.end();
 		const entity_id base_entity_id = is_new ? entity_id() : (*maybe_base_entity).second;
 
 		const const_entity_handle base_entity = base[base_entity_id];
@@ -174,8 +174,6 @@ bool cosmic_delta::encode(
 					transform_component_ids_to_guids_in_place(base_compo, base);
 					transform_component_ids_to_guids_in_place(enco_compo, enco);
 
-					auto dt = augs::delta_encode(base_compo, enco_compo);
-
 					if (augs::write_delta(base_compo, enco_compo, new_content)) {
 						has_entity_changed = true;
 						overridden_components[idx] = true;
@@ -212,8 +210,8 @@ bool cosmic_delta::encode(
 		const const_entity_handle base_entity = base.get_handle(id);
 #if COSMOS_TRACKS_GUIDS
 		const auto stream_written_id = base_entity.get_guid();
-		const auto maybe_enco_entity = enco.guid_map_for_transport.find(stream_written_id);
-		const bool is_dead = maybe_enco_entity == enco.guid_map_for_transport.end();
+		const auto maybe_enco_entity = enco.guid_to_id.find(stream_written_id);
+		const bool is_dead = maybe_enco_entity == enco.guid_to_id.end();
 #else
 		const auto stream_written_id = id;
 		const const_entity_handle enco_entity = enco.get_handle(stream_written_id);

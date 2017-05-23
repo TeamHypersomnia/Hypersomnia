@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "game/enums/entity_name.h"
+
 #include "game/transcendental/entity_id.h"
 
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
@@ -9,6 +9,7 @@
 #include "game/enums/item_category.h"
 #include "game/enums/sentience_meter_type.h"
 #include "game/assets/spell_id.h"
+#include "game/components/name_component.h"
 
 /*
 	Example description:
@@ -26,10 +27,7 @@
 	0-3 (the whole): entity description
 */
 
-std::wstring get_bbcoded_entity_name(const entity_name);
-std::wstring get_bbcoded_entity_name(const const_entity_handle maybe_overridden_by_nickname);
-
-std::wstring get_bbcoded_entity_name_details(const entity_name);
+entity_name_type get_bbcoded_entity_name(const const_entity_handle maybe_overridden_by_nickname);
 std::wstring get_bbcoded_entity_name_details(const const_entity_handle);
 
 std::wstring get_bbcoded_item_categories(const item_category_flagset& flags);

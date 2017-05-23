@@ -19,15 +19,12 @@ constexpr std::size_t CONVEX_POLY_VERTEX_COUNT = b2_maxPolygonVertices;
 constexpr std::size_t ONLY_PICK_THESE_ITEMS_COUNT = 20;
 constexpr std::size_t MOVEMENT_RESPONSE_RECEIVERS_COUNT = 2;
 
-constexpr std::size_t NICKNAME_LENGTH = 50;
+constexpr std::size_t ENTITY_NAME_LENGTH = 50;
 
 constexpr std::size_t RENDERING_POLYGON_INDEX_COUNT = 20;
 constexpr std::size_t RENDERING_POLYGON_TRIANGULATED_VERTEX_COUNT = 20;
 
 constexpr std::size_t OWNER_FRICTION_GROUNDS_COUNT = 10;
-
-constexpr std::size_t TESTBED_CHARACTERS_COUNT = 20;
-constexpr std::size_t TESTBED_DRAW_BODIES_COUNT = 20;
 
 constexpr std::size_t MAX_ANIMATION_COUNT = 20;
 constexpr std::size_t MAX_FONT_COUNT = 20;

@@ -238,7 +238,7 @@ void component_synchronizer<false, P>::set_transform(const entity_id id) const {
 
 void component_synchronizer<false, P>::set_transform(const components::transform& transform) const {
 	get_data().set_transform(
-		handle.get_cosmos().significant.meta.settings.si,
+		handle.get_cosmos().significant.meta.global.si,
 		transform
 	);
 

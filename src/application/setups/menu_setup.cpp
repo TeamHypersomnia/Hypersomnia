@@ -119,7 +119,6 @@ void menu_setup::process(
 	timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
 
 	test_scenes::testbed testbed;
-	testbed.debug_var = cfg.debug_var;
 
 	intro_scene.set_fixed_delta(cfg.default_tickrate);
 	

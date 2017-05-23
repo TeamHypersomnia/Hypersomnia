@@ -5,7 +5,7 @@
 namespace assets {
 	enum class program_id {
 		INVALID,
-#if BUILD_UNSCRIPTED_TEST_SCENES
+#if BUILD_TEST_SCENES
 		DEFAULT,
 		DEFAULT_ILLUMINATED,
 		LIGHT,

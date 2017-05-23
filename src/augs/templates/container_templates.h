@@ -13,7 +13,17 @@ void erase_if(ContainerT& items, const PredicateT& predicate) {
 	}
 };
 
-template<class Container, class T>
+template <class Container, class... T>
+void add_element(Container& v, T&&... l) {
+	v.emplace(std::forward<T>(l)...);
+}
+
+template <class T, class... Args>
+void add_element(std::vector<T>& v, Args&&... l) {
+	v.emplace_back(std::forward<Args>(args)...);
+}
+
+template <class Container, class T>
 void erase_remove(Container& v, const T& l) {
 	v.erase(std::remove_if(v.begin(), v.end(), l), v.end());
 }
@@ -33,9 +43,14 @@ void remove_duplicates_from_sorted(Container& v) {
 	v.erase(std::unique(v.begin(), v.end()), v.end());
 }
 
-template<class Container, class T>
-void remove_element(Container& v, const T& l) {
+template <class Container, class T>
+void erase_element(Container& v, const T& l) {
 	v.erase(std::remove(v.begin(), v.end(), l), v.end());
+}
+
+template <class T>
+void erase_element(std::unordered_set<T>& v, const T& l) {
+	v.erase(l);
 }
 
 template<class A, class B>

@@ -14,8 +14,6 @@
 #include "augs/entity_system/storage_for_systems.h"
 
 #include "game/build_settings.h"
-#include "game/simulation_settings/all_simulation_settings.h"
-
 #include "game/assets/physical_material_id.h"
 
 #include "game/transcendental/cosmic_entropy.h"
@@ -53,18 +51,15 @@ public:
 
 	cosmos_significant_state significant;
 private:
-	std::vector<std::string> entity_debug_names;
 	augs::enum_associative_array<assets::behaviour_tree_id, behaviour_tree> unserializable_behaviour_trees;
 
 #if COSMOS_TRACKS_GUIDS
-	std::map<entity_guid, entity_id> guid_map_for_transport;
+	std::map<entity_guid, entity_id> guid_to_id;
 
 	friend class cosmic_delta;
 
 	template <class T>
 	friend void transform_component_guids_to_ids_in_place(T&, const cosmos&);
-
-	void delete_debug_name(const entity_id);
 
 	void assign_next_guid(const entity_handle);
 	void clear_guid(const entity_handle);
@@ -117,7 +112,7 @@ public:
 
 	void reserve_storage_for_entities(const size_t);
 
-	entity_handle create_entity(const std::string& debug_name);
+	entity_handle create_entity(const std::string name);
 	entity_handle clone_entity(const entity_id);
 	void delete_entity(const entity_id);
 
@@ -128,8 +123,11 @@ public:
 	void destroy_inferred_state_of(const const_entity_handle);
 	void create_inferred_state_for(const const_entity_handle);
 	
-	const std::string& get_debug_name(entity_id) const;
-	void set_debug_name(const entity_id, const std::string& new_debug_name);
+	std::wstring get_name(entity_id) const;
+	void set_name(
+		const entity_id, 
+		const std::string new_name
+	);
 
 	template <class System>
 	void partial_reinference(const entity_handle handle) {
@@ -182,7 +180,7 @@ public:
 			guid_source,
 			[this](auto& id_member, const auto& guid_member) {
 				if (guid_member != entity_guid()) {
-					id_member = guid_map_for_transport.at(guid_member);
+					id_member = guid_to_id.at(guid_member);
 				}
 			}
 		);
@@ -283,7 +281,7 @@ public:
 };
 
 inline si_scaling cosmos::get_si() const {
-	return significant.meta.settings.si;
+	return significant.meta.global.si;
 }
 
 inline behaviour_tree& cosmos::get_handle(const assets::behaviour_tree_id id) {
@@ -296,15 +294,15 @@ inline const behaviour_tree& cosmos::get_handle(const assets::behaviour_tree_id 
 
 #if COSMOS_TRACKS_GUIDS
 inline entity_handle cosmos::get_handle(const entity_guid guid) {
-	return get_handle(guid_map_for_transport.at(guid));
+	return get_handle(guid_to_id.at(guid));
 }
 
 inline const_entity_handle cosmos::get_handle(const entity_guid guid) const {
-	return get_handle(guid_map_for_transport.at(guid));
+	return get_handle(guid_to_id.at(guid));
 }
 
 inline bool cosmos::entity_exists_with_guid(const entity_guid guid) const {
-	return guid_map_for_transport.find(guid) != guid_map_for_transport.end();
+	return guid_to_id.find(guid) != guid_to_id.end();
 }
 
 inline entity_guid cosmos::get_guid(const const_entity_handle handle) const {
