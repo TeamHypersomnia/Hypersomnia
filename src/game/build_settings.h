@@ -1,4 +1,3 @@
 #pragma once
 #define COSMOS_TRACKS_GUIDS 1
 #define ONLY_ONE_GLOBAL_ASSETS_MANAGER 1
-#define BUILD_TEST_SCENES 1

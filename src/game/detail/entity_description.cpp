@@ -20,8 +20,9 @@ entity_name_type get_bbcoded_entity_name(const const_entity_handle maybe_overrid
 	return maybe_overridden_by_nickname.get<components::name>().get_value();
 }
 
-std::wstring get_bbcoded_entity_name_details(const const_entity_handle id) {
-	return get_bbcoded_entity_name_details(id.get<components::name>().id);
+entity_description_type get_bbcoded_entity_name_details(const const_entity_handle id) {
+	const auto& descs = id.get_cosmos().significant.meta.global.names_meta.descriptions;
+	return found_or_default(descs, id.get_name(), L"No description");
 }
 
 std::wstring get_bbcoded_entity_properties(const const_entity_handle id) {

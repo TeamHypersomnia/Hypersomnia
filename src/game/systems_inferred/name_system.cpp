@@ -5,7 +5,7 @@
 
 #include "augs/templates/container_templates.h"
 
-void relational_system::create_inferred_state_for(const const_entity_handle h) {
+void name_system::create_inferred_state_for(const const_entity_handle h) {
 	/* Every entity must have a name */
 	const auto& name = h.get<components::name>().get_value();
 
@@ -13,7 +13,7 @@ void relational_system::create_inferred_state_for(const const_entity_handle h) {
 	add_element(entities_with_this_name, h.get_id());
 }
 
-void relational_system::destroy_inferred_state_of(const const_entity_handle h) {
+void name_system::destroy_inferred_state_of(const const_entity_handle h) {
 	const auto& name = h.get<components::name>().get_value();
 
 	auto& entities_with_this_name = entities_by_name.at(name);
@@ -25,13 +25,14 @@ void relational_system::destroy_inferred_state_of(const const_entity_handle h) {
 }
 
 std::unordered_set<entity_id> name_system::get_entities_by_name(const entity_name_type& name) const {
-	const auto it = entities_by_name.find(name);
+	return found_or_default(entities_by_name, name);
+}
 
-	const bool this_name_exists = it != entities_by_name.end();
-
-	if (this_name_exists) {
-		return (*it).second;
-	}
-
-	return {};
+void name_system::set_name(
+	const entity_handle handle,
+	const entity_name_type& new_name
+) {
+	destroy_inferred_state_of(handle);
+	handle.get<components::name>().get_data().set_value(new_name);
+	create_inferred_state_for(handle);
 }

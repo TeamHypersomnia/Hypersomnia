@@ -1,6 +1,6 @@
 #pragma once
 #include "game/container_sizes.h"
-#include "game/build_settings.h"
+#include "generated/setting_build_test_scenes.h"
 #include "augs/audio/sound_effect_modifier.h"
 
 namespace assets {

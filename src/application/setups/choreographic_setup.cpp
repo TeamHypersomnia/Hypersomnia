@@ -7,7 +7,7 @@
 
 #include "game/assets/assets_manager.h"
 
-#include "game/test_scenes/testbed.h"
+#include "game/test_scenes/characters.h"
 #include "game/test_scenes/one_entity.h"
 #include "game/test_scenes/resource_setups/all.h"
 
@@ -242,7 +242,7 @@ void choreographic_setup::process(
 					ensure(currently_played_scene_index != -1);
 
 					auto& scene = preloaded_scenes[currently_played_scene_index].scene;
-					scene.testbed.select_character(scene.hypersomnia[e.guid].get_id());
+					scene.characters.select_character(scene.hypersomnia[e.guid].get_id());
 				}
 
 				else if (next_event.is<focus_index>()) {
@@ -251,7 +251,7 @@ void choreographic_setup::process(
 					ensure(currently_played_scene_index != -1);
 
 					auto& scene = preloaded_scenes[currently_played_scene_index].scene;
-					scene.testbed.select_character(scene.testbed.characters[e.index]);
+					scene.characters.select_character(scene.characters.characters[e.index]);
 				}
 
 				else if (next_event.is<set_sfx_gain>()) {
@@ -288,7 +288,7 @@ void choreographic_setup::process(
 			auto& scene = preloaded_scenes[currently_played_scene_index];
 			
 			session.control_gui_and_remove_fetched_events(
-				scene.scene.hypersomnia[scene.scene.testbed.get_selected_character()],
+				scene.scene.hypersomnia[scene.scene.characters.get_selected_character()],
 				new_machine_entropy.local
 			);
 

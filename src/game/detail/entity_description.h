@@ -9,7 +9,8 @@
 #include "game/enums/item_category.h"
 #include "game/enums/sentience_meter_type.h"
 #include "game/assets/spell_id.h"
-#include "game/components/name_component.h"
+#include "game/components/name_component_declaration.h"
+#include "game/global_state/entity_names_meta.h"
 
 /*
 	Example description:
@@ -28,7 +29,7 @@
 */
 
 entity_name_type get_bbcoded_entity_name(const const_entity_handle maybe_overridden_by_nickname);
-std::wstring get_bbcoded_entity_name_details(const const_entity_handle);
+entity_description_type get_bbcoded_entity_name_details(const const_entity_handle);
 
 std::wstring get_bbcoded_item_categories(const item_category_flagset& flags);
 

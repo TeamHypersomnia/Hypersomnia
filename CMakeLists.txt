@@ -398,6 +398,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/augs/misc/enum_boolset.cpp"
 	"src/augs/templates/string_templates.cpp"
 	"src/game/components/sender_component.cpp"
+	"src/game/systems_inferred/name_system.cpp"
 )
 
 set(HYPERSOMNIA_TRIVIAL_3RDPARTY_SRCS

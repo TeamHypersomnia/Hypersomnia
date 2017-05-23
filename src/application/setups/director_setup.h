@@ -1,7 +1,7 @@
 #pragma once
 #include "setup_base.h"
 #include "game/view/viewing_session.h"
-#include "game/test_scenes/testbed.h"
+#include "game/view/debug_character_selection.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/cosmic_movie_director.h"
@@ -33,7 +33,7 @@ public:
 
 	augs::window::event::state events;
 	cosmos hypersomnia = cosmos(3000);
-	test_scenes::testbed testbed;
+	debug_character_selection characters;
 
 	std::string input_director_path;
 	std::string output_director_path;

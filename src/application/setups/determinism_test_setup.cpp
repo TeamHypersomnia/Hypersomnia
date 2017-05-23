@@ -25,6 +25,7 @@
 #include "game/detail/visible_entities.h"
 
 #include "generated/introspectors.h"
+#include "game/view/debug_character_selection.h"
 #include "application/config_lua_table.h"
 
 void determinism_test_setup::process(
@@ -42,7 +43,7 @@ void determinism_test_setup::process(
 	cosmic_entropy total_collected_entropy;
 	augs::debug_entropy_player<cosmic_entropy> player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
-	std::vector<test_scenes::testbed> testbeds(cosmoi_count);
+	std::vector<debug_character_selection> characters(cosmoi_count);
 
 	session.reserve_caches_for_entities(3000);
 
@@ -54,11 +55,13 @@ void determinism_test_setup::process(
 	else {
 		for (size_t i = 0; i < cosmoi_count; ++i) {
 			hypersomnias[i].set_fixed_delta(cfg.default_tickrate);
-			testbeds[i].populate_world_with_entities(
+			test_scenes::testbed().populate_world_with_entities(
 				hypersomnias[i], 
 				metas_of_assets,
 				session.get_standard_post_solve()
 			);
+
+			characters[i].acquire_available_characters(hypersomnias[i]);
 		}
 	}
 
@@ -100,7 +103,7 @@ void determinism_test_setup::process(
 		session.switch_between_gui_and_back(new_machine_entropy.local);
 
 		session.control_gui_and_remove_fetched_events(
-			hypersomnias[0][testbeds[0].get_selected_character()],
+			hypersomnias[0][characters[0].get_selected_character()],
 			new_machine_entropy.local
 		);
 
@@ -109,7 +112,7 @@ void determinism_test_setup::process(
 		session.control_and_remove_fetched_intents(new_intents);
 
 		auto new_cosmic_entropy = cosmic_entropy(
-			hypersomnias[0][testbeds[0].get_selected_character()],
+			hypersomnias[0][characters[0].get_selected_character()],
 			new_intents
 		);
 
@@ -131,7 +134,7 @@ void determinism_test_setup::process(
 					hypersomnias[i] = hypersomnias[i + 1];
 				}
 
-				testbeds[i].control_character_selection(new_intents);
+				characters[i].control_character_selection(new_intents);
 
 				player.advance_player_and_biserialize(total_collected_entropy);
 
@@ -188,7 +191,7 @@ void determinism_test_setup::process(
 
 		session.advance_audiovisual_systems(
 			hypersomnias[currently_viewn_cosmos],
-			testbeds[currently_viewn_cosmos].get_selected_character(),
+			characters[currently_viewn_cosmos].get_selected_character(),
 			all_visible,
 			vdt
 		);
@@ -200,7 +203,7 @@ void determinism_test_setup::process(
 			cfg,
 			renderer, 
 			hypersomnias[currently_viewn_cosmos], 
-			testbeds[currently_viewn_cosmos].get_selected_character(),
+			characters[currently_viewn_cosmos].get_selected_character(),
 			all_visible,
 			timer.fraction_of_step_until_next_step(hypersomnias[currently_viewn_cosmos].get_fixed_delta())
 		);

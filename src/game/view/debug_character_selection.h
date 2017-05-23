@@ -7,11 +7,28 @@
 #include "game/transcendental/cosmic_entropy.h"
 #include "game/transcendental/step_declaration.h"
 
-struct simple_character_selection {
+struct debug_character_selection {
 	std::vector<entity_id> characters;
 	unsigned current_character_index = 0;
 	entity_id selected_character;
 	augs::window::event::state state;
+
+	void acquire_available_characters(const cosmos& cosm) {
+		int i = 0;
+
+		while (true) {
+			const auto requested_name = typesafe_sprintf("player%x", i);
+			const auto character = cosm.get_entity_by_name(requested_name);
+
+			if (character.dead()) {
+				break;
+			}
+
+			characters.push_back(character.get_id());
+		}
+
+		select_character(characters[0]);
+	}
 
 	void control_character_selection_numeric(
 		augs::machine_entropy::local_type& changes

@@ -1,6 +1,7 @@
 #pragma once
 #include <map>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "augs/templates/memcpy_safety.h"
 #include "augs/templates/type_matching_and_indexing.h"
@@ -230,7 +231,7 @@ namespace augs {
 		}
 	}
 	
-	template <class Archive, class Serialized, class vector_size_type = size_t>
+	template <class Archive, class Serialized, class vector_size_type = std::size_t>
 	void read_object(
 		Archive& ar, 
 		std::vector<Serialized>& storage, 
@@ -243,7 +244,7 @@ namespace augs {
 		read_n(ar, storage.data(), storage.size());
 	}
 
-	template<class Archive, class Serialized, class vector_size_type = size_t>
+	template<class Archive, class Serialized, class vector_size_type = std::size_t>
 	void write_object(
 		Archive& ar, 
 		const std::vector<Serialized>& storage, 
@@ -265,7 +266,40 @@ namespace augs {
 	
 	}
 
-	template<class Archive, template <class...> class Container, class Key, class Value, class map_size_type = size_t>
+	template<class Archive, template <class...> class Container, class container_size_type = std::size_t>
+	void read_unary_container(
+		Archive& ar,
+		Container& storage,
+		container_size_type = container_size_type()
+	) {
+		container_size_type s;
+
+		read(ar, s);
+
+		storage.reserve(s);
+
+		while (s--) {
+			const auto it = storage.emplace({});
+			read(ar, (*it).second);
+		}
+	}
+
+	template<class Archive, template <class...> class Container, class container_size_type = std::size_t>
+	void write_unary_container(
+		Archive& ar,
+		const Container& storage,
+		container_size_type = container_size_type()
+	) {
+		ensure(storage.size() <= std::numeric_limits<container_size_type>::max());
+
+		write(ar, static_cast<container_size_type>(storage.size()));
+
+		for (const auto& obj : storage) {
+			write(ar, obj);
+		}
+	}
+
+	template<class Archive, template <class...> class Container, class Key, class Value, class map_size_type = std::size_t>
 	void read_associative_container(
 		Archive& ar,
 		Container<Key, Value>& storage,
@@ -285,8 +319,8 @@ namespace augs {
 		}
 	}
 
-	template<class Archive, template <class...> class Container, class Key, class Value, class map_size_type = size_t>
-	auto write_associative_container(
+	template<class Archive, template <class...> class Container, class Key, class Value, class map_size_type = std::size_t>
+	void write_associative_container(
 		Archive& ar,
 		const Container<Key, Value>& storage,
 		map_size_type = map_size_type()
@@ -301,7 +335,25 @@ namespace augs {
 		}
 	}
 
-	template<class Archive, class Key, class Value, class map_size_type = size_t>
+	template<class Archive, class Value, class map_size_type = std::size_t>
+	void write_object(
+		Archive& ar,
+		const std::unordered_set<Value>& storage,
+		map_size_type = map_size_type()
+	) {
+		write_unary_container(ar, storage, map_size_type());
+	}
+
+	template<class Archive, class Value, class map_size_type = std::size_t>
+	void read_object(
+		Archive& ar,
+		std::unordered_set<Value>& storage,
+		map_size_type = map_size_type()
+	) {
+		read_unary_container(ar, storage, map_size_type());
+	}
+
+	template<class Archive, class Key, class Value, class map_size_type = std::size_t>
 	void write_object(
 		Archive& ar,
 		const std::map<Key, Value>& storage,
@@ -310,7 +362,7 @@ namespace augs {
 		write_associative_container<Archive, std::map, Key, Value, map_size_type>(ar, storage);
 	}
 
-	template<class Archive, class Key, class Value, class map_size_type = size_t>
+	template<class Archive, class Key, class Value, class map_size_type = std::size_t>
 	void read_object(
 		Archive& ar,
 		std::map<Key, Value>& storage,
@@ -319,7 +371,7 @@ namespace augs {
 		read_associative_container<Archive, std::map, Key, Value, map_size_type>(ar, storage);
 	}
 
-	template<class Archive, class Key, class Value, class map_size_type = size_t>
+	template<class Archive, class Key, class Value, class map_size_type = std::size_t>
 	void write_object(
 		Archive& ar,
 		const std::unordered_map<Key, Value>& storage,
@@ -328,7 +380,7 @@ namespace augs {
 		write_associative_container<Archive, std::unordered_map, Key, Value, map_size_type>(ar, storage);
 	}
 
-	template<class Archive, class Key, class Value, class map_size_type = size_t>
+	template<class Archive, class Key, class Value, class map_size_type = std::size_t>
 	void read_object(
 		Archive& ar,
 		std::unordered_map<Key, Value>& storage,
@@ -337,7 +389,7 @@ namespace augs {
 		read_associative_container<Archive, std::unordered_map, Key, Value, map_size_type>(ar, storage);
 	}
 
-	template<class Archive, class string_element_type, class string_size_type = size_t>
+	template<class Archive, class string_element_type, class string_size_type = std::size_t>
 	void read_object(Archive& ar, std::basic_string<string_element_type>& storage, string_size_type = string_size_type()) {
 		string_size_type s;
 
@@ -348,7 +400,7 @@ namespace augs {
 		read_n(ar, &storage[0], storage.size());
 	}
 
-	template<class Archive, class string_element_type, class string_size_type = size_t>
+	template<class Archive, class string_element_type, class string_size_type = std::size_t>
 	void write_object(Archive& ar, const std::basic_string<string_element_type>& storage, string_size_type = string_size_type()) {
 		ensure(storage.size() <= std::numeric_limits<string_size_type>::max());
 

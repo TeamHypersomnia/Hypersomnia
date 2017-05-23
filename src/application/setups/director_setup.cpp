@@ -19,6 +19,7 @@
 
 #include "application/game_window.h"
 #include "application/config_lua_table.h"
+#include "game/test_scenes/testbed.h"
 
 #define LOG_REWINDING 0
 
@@ -36,17 +37,21 @@ void director_setup::init(
 	if (!hypersomnia.load_from_file("save.state")) {
 		hypersomnia.set_fixed_delta(cfg.default_tickrate);
 
-		testbed.populate_world_with_entities(
+		test_scenes::testbed().populate_world_with_entities(
 			hypersomnia,
 			metas_of_assets,
 			session.get_standard_post_solve()
 		);
 	}
 
-	hypersomnia[testbed.characters[0]].get<components::name>().nickname = ::to_wstring(cfg.nickname);
+	characters.acquire_available_characters(hypersomnia);
 
-	if (testbed.characters.size() > 1) {
-		hypersomnia[testbed.characters[1]].get<components::name>().nickname = ::to_wstring(cfg.debug_second_nickname);
+	hypersomnia.get_entity_by_name("player0").set_name(::to_wstring(cfg.nickname));
+
+	const auto player1 = hypersomnia.get_entity_by_name("player1");
+
+	if (player1.alive()) {
+		player1.set_name(::to_wstring(cfg.debug_second_nickname));
 	}
 
 	input_director_path = cfg.director_input_scene_entropy_path;
@@ -107,9 +112,9 @@ augs::gui::text::formatted_string director_setup::get_status_text() const {
 		format(
 			typesafe_sprintf(
 				L"\nControlling entity %x of %x (guid: %x)", 
-				testbed.current_character_index, 
-				testbed.characters.size(),
-				hypersomnia[testbed.get_selected_character()].get_guid()
+				characters.current_character_index, 
+				characters.characters.size(),
+				hypersomnia[characters.get_selected_character()].get_guid()
 			), 
 		white_font
 	);
@@ -220,19 +225,19 @@ void director_setup::control_player(
 	session.switch_between_gui_and_back(new_machine_entropy.local);
 
 	session.control_gui_and_remove_fetched_events(
-		hypersomnia[testbed.get_selected_character()],
+		hypersomnia[get_selected_character()],
 		new_machine_entropy.local
 	);
 
-	testbed.control_character_selection_numeric(new_machine_entropy.local);
+	characters.control_character_selection_numeric(new_machine_entropy.local);
 
 	game_intent_vector new_intents = session.context.to_game_intents(new_machine_entropy.local);
 
 	session.control_and_remove_fetched_intents(new_intents);
-	testbed.control_character_selection(new_intents);
+	characters.control_character_selection(new_intents);
 
 	auto new_cosmic_entropy = cosmic_entropy(
-		hypersomnia[testbed.get_selected_character()],
+		hypersomnia[characters.get_selected_character()],
 		new_intents
 	);
 
@@ -343,7 +348,7 @@ void director_setup::advance_player_by_single_step(viewing_session& session) {
 		);
 
 		if (recording_replacement_mode != recording_replacement_type::ONLY_MOUSE) {
-			entropy_for_this_advancement.cast_spells->erase(hypersomnia[testbed.get_selected_character()].get_guid());
+			entropy_for_this_advancement.cast_spells->erase(hypersomnia[characters.get_selected_character()].get_guid());
 
 			for (const auto new_spell_requested : total_collected_guid_entropy.cast_spells) {
 				entropy_for_this_advancement.cast_spells[new_spell_requested.first] = new_spell_requested.second;
@@ -433,7 +438,7 @@ void director_setup::advance_audiovisuals(
 
 	session.advance_audiovisual_systems(
 		hypersomnia,
-		testbed.get_selected_character(),
+		characters.get_selected_character(),
 		all_visible,
 		vdt
 	);
@@ -452,7 +457,7 @@ void director_setup::view(
 		cfg,
 		renderer,
 		hypersomnia,
-		testbed.get_selected_character(),
+		characters.get_selected_character(),
 		all_visible,
 		timer.fraction_of_step_until_next_step(hypersomnia.get_fixed_delta()),
 		get_status_text()

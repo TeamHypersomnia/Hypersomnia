@@ -5,12 +5,15 @@
 
 #include "game/assets/assets_manager.h"
 
-#include "game/test_scenes/testbed.h"
+#include "game/test_scenes/characters.h"
 #include "game/test_scenes/one_entity.h"
 #include "game/test_scenes/resource_setups/all.h"
 
 #include "game/transcendental/types_specification/all_component_includes.h"
+
 #include "game/view/viewing_session.h"
+#include "game/view/debug_character_selection.h"
+
 #include "game/transcendental/step_packaged_for_network.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
@@ -45,24 +48,28 @@ void local_setup::process(
 	augs::debug_entropy_player<cosmic_entropy> player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
-	test_scenes::testbed testbed;
+	debug_character_selection characters;
 
 	const auto metas_of_assets = get_assets_manager().generate_logical_metas_of_assets();
 
 	if (!hypersomnia.load_from_file("save.state")) {
 		hypersomnia.set_fixed_delta(cfg.default_tickrate);
 		
-		testbed.populate_world_with_entities(
+		test_scenes::testbed().populate_world_with_entities(
 			hypersomnia, 
 			metas_of_assets,
 			session.get_standard_post_solve()
 		);
 	}
 
-	hypersomnia[testbed.characters[0]].get<components::name>().nickname = ::to_wstring(cfg.nickname);
+	characters.acquire_available_characters(hypersomnia);
 
-	if (testbed.characters.size() > 1) {
-		hypersomnia[testbed.characters[1]].get<components::name>().nickname = ::to_wstring(cfg.debug_second_nickname);
+	hypersomnia.get_entity_by_name("player0").set_name(::to_wstring(cfg.nickname));
+
+	const auto player1 = hypersomnia.get_entity_by_name("player1");
+
+	if (player1.alive()) {
+		player1.set_name(::to_wstring(cfg.debug_second_nickname));
 	}
 
 	if (cfg.get_input_recording_mode() != input_recording_type::DISABLED) {
@@ -113,19 +120,19 @@ void local_setup::process(
 			session.switch_between_gui_and_back(new_machine_entropy.local);
 			
 			session.control_gui_and_remove_fetched_events(
-				hypersomnia[testbed.get_selected_character()],
+				hypersomnia[characters.get_selected_character()],
 				new_machine_entropy.local
 			);
 			
-			testbed.control_character_selection_numeric(new_machine_entropy.local);
+			characters.control_character_selection_numeric(new_machine_entropy.local);
 
 			game_intent_vector new_intents = session.context.to_game_intents(new_machine_entropy.local);
 
 			session.control_and_remove_fetched_intents(new_intents);
-			testbed.control_character_selection(new_intents);
+			characters.control_character_selection(new_intents);
 
 			const auto new_cosmic_entropy = cosmic_entropy(
-				hypersomnia[testbed.get_selected_character()],
+				hypersomnia[characters.get_selected_character()],
 				new_intents
 			);
 
@@ -144,7 +151,7 @@ void local_setup::process(
 
 			session.advance_audiovisual_systems(
 				hypersomnia, 
-				testbed.get_selected_character(),
+				characters.get_selected_character(),
 				all_visible,
 				vdt
 			);
@@ -180,7 +187,7 @@ void local_setup::process(
 			cfg,
 			renderer, 
 			hypersomnia, 
-			testbed.get_selected_character(), 
+			characters.get_selected_character(), 
 			all_visible,
 			timer.fraction_of_step_until_next_step(hypersomnia.get_fixed_delta()),
 			augs::gui::text::format(write_tweaker_report().c_str(), augs::gui::text::style(assets::font_id::GUI_FONT))

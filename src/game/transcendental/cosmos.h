@@ -36,6 +36,7 @@
 #include "game/systems_inferred/physics_system.h"
 #include "game/systems_inferred/processing_lists_system.h"
 #include "game/systems_inferred/relational_system.h"
+#include "game/systems_inferred/name_system.h"
 
 #include "game/assets/behaviour_tree.h"
 
@@ -123,11 +124,10 @@ public:
 	void destroy_inferred_state_of(const const_entity_handle);
 	void create_inferred_state_for(const const_entity_handle);
 	
-	std::wstring get_name(entity_id) const;
-	void set_name(
-		const entity_id, 
-		const std::string new_name
-	);
+	//void set_name(
+	//	const entity_id, 
+	//	const std::string new_name
+	//);
 
 	template <class System>
 	void partial_reinference(const entity_handle handle) {
@@ -233,8 +233,19 @@ public:
 		}
 	}
 	
-	size_t entities_count() const;
-	size_t get_maximum_entities() const;
+	// shortcuts
+	std::unordered_set<entity_id> get_entities_by_name(const entity_name_type&) const;
+	
+	entity_handle get_entity_by_name(const entity_name_type&);
+	const_entity_handle get_entity_by_name(const entity_name_type&) const;
+	
+	void set_name(
+		const entity_handle h, 
+		const entity_name_type& new_name
+	) const;
+
+	std::size_t entities_count() const;
+	std::size_t get_maximum_entities() const;
 	std::wstring summary() const;
 
 	double get_total_time_passed_in_seconds(const double view_interpolation_ratio) const;
@@ -310,6 +321,41 @@ inline entity_guid cosmos::get_guid(const const_entity_handle handle) const {
 }
 #endif
 
+//inline void cosmos::set_name(
+//	const entity_handle h, 
+//	const entity_name_type& new_name
+//) const {
+//	systems_inferred.get<name_system>().set_name(h, new_name);
+//}
+
+inline std::unordered_set<entity_id> cosmos::get_entities_by_name(const entity_name_type& name) const {
+	return systems_inferred.get<name_system>().get_entities_by_name(name);
+}
+
+inline entity_handle cosmos::get_entity_by_name(const entity_name_type& name) {
+	const auto entities = get_entities_by_name(name);
+	ensure(entities.size() <= 1);
+
+	if (entities.empty()) {
+		return get_handle(entity_id());		
+	}
+	else {
+		return get_handle(*entities.begin());		
+	}
+}
+
+inline const_entity_handle cosmos::get_entity_by_name(const entity_name_type& name) const {
+	const auto entities = get_entities_by_name(name);
+	ensure(entities.size() <= 1);
+
+	if (entities.empty()) {
+		return get_handle(entity_id());		
+	}
+	else {
+		return get_handle(*entities.begin());		
+	}
+}
+
 inline entity_handle cosmos::get_handle(const entity_id id) {
 	return { *this, id };
 }
@@ -338,10 +384,10 @@ inline randomization cosmos::get_rng_for(const entity_id id) const {
 	return{ get_rng_seed_for(id) };
 }
 
-inline size_t cosmos::entities_count() const {
+inline std::size_t cosmos::entities_count() const {
 	return significant.pool_for_aggregates.size();
 }
 
-inline size_t cosmos::get_maximum_entities() const {
+inline std::size_t cosmos::get_maximum_entities() const {
 	return significant.pool_for_aggregates.capacity();
 }

@@ -4,6 +4,7 @@
 #include <set>
 #include <map>
 #include <unordered_map>
+#include <unordered_set>
 
 template <typename ContainerT, typename PredicateT >
 void erase_if(ContainerT& items, const PredicateT& predicate) {
@@ -112,4 +113,18 @@ namespace std {
 	constexpr std::array<std::remove_cv_t<T>, N> to_array(T(&a)[N]) {
 		return detail::to_array_impl(a, std::make_index_sequence<N>{});
 	}
+}
+
+template <class Container, class Key, class... Args>
+auto found_or_default(Container&& container, Key&& key, Args&&... default_args) {
+	const auto it = container.find(std::forward<Key>(key));
+
+	const bool found = it != container.end();
+	using type = std::decay_t<decltype((*it).second)>;
+
+	if (found) {
+		return (*it).second; 		
+	}
+
+	return type(std::forward<Args>(default_args)...);
 }

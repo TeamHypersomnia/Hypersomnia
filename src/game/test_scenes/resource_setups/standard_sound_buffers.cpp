@@ -1,4 +1,4 @@
-#include "game/build_settings.h"
+#include "generated/setting_build_test_scenes.h"
 #if BUILD_TEST_SCENES
 #include "all.h"
 #include "game/assets/assets_manager.h"

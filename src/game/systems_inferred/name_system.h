@@ -28,8 +28,7 @@ class name_system {
 	void destroy_inferred_state_of(const const_entity_handle);
 
 	void set_name(
-		const entity_id id,
-		components::name& data,
+		const entity_handle,
 		const entity_name_type& new_name
 	);
 public:

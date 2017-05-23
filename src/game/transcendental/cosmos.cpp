@@ -107,10 +107,6 @@ cosmos::cosmos(const cosmos& b) {
 	*this = b;
 }
 
-const std::string& cosmos::get_name(const entity_id id) const {
-	return entity_names[id.indirection_index + 1];
-}
-
 void cosmos::set_name(
 	const entity_id id, 
 	const std::string& new_debug_name

@@ -26,6 +26,7 @@
 #include "augs/build_settings/setting_empty_bases.h"
 #include "augs/build_settings/setting_entity_handle_has_debug_name_reference.h"
 #include "game/transcendental/step_declaration.h"
+#include "game/components/name_component_declaration.h"
 
 template<class F>
 void for_each_component_type(F callback) {
@@ -74,7 +75,7 @@ private:
 	owner_reference owner;
 	entity_id raw_id;
 #if ENTITY_HANDLE_HAS_DEBUG_NAME_REFERENCE
-	const std::string& debug_name;
+	const entity_name_type& debug_name;
 #endif
 
 	entity_id get_id_for_handle_operations() const {
@@ -184,7 +185,7 @@ public:
 		raw_id(raw_id), 
 		owner(owner) 
 #if ENTITY_HANDLE_HAS_DEBUG_NAME_REFERENCE
-		, debug_name(owner.get_name(raw_id))
+		, debug_name(get_name())
 #endif
 	{
 
@@ -206,10 +207,6 @@ public:
 
 	bool dead() const {
 		return !alive();
-	}
-
-	std::string get_name() const {
-		return get_cosmos().get_name(raw_id);
 	}
 
 	typename owner_reference get_cosmos() const {
@@ -334,7 +331,11 @@ public:
 	}
 
 	auto get_name() const {
-		return get<components::name>().get_name();
+		return get<components::name>().get_value();
+	}
+
+	void set_name(const entity_name_type& new_name) const {
+		return get<components::name>().set_name(new_name);
 	}
 
 	bool is_inferred_state_activated() const {

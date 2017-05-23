@@ -6,10 +6,11 @@ namespace augs {
 	class storage_for_systems;
 }
 
+class relational_system;
+class name_system;
 class physics_system;
 class tree_of_npo_system;
 class processing_lists_system;
-class relational_system;
 
 class interpolation_system;
 class past_infection_system;
@@ -28,6 +29,7 @@ typedef augs::storage_for_systems <
 	// so that it creates inferred state of relations before physics_system uses it for constructing
 	// bodies, fixtures and joints.
 	relational_system,
+	name_system,
 	physics_system,
 	tree_of_npo_system,
 	processing_lists_system
