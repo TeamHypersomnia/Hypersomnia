@@ -8,6 +8,7 @@
 
 #include "augs/templates/container_templates.h"
 #include "game/detail/particle_types.h"
+#include "game/assets/assets_manager.h"
 
 void particles_simulation_system::draw(
 	augs::vertex_triangle_buffer& target_buffer,

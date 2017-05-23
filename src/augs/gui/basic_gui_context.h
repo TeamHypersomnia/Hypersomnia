@@ -27,7 +27,7 @@ namespace augs {
 				return tree.at(id);
 			}
 			
-			template<class id_type, bool _is_const = is_const_ref<rect_tree_entry_ref>::value, class = std::enable_if_t<!_is_const>>
+			template<class id_type, bool _is_const = is_const_ref_v<rect_tree_entry_ref>, class = std::enable_if_t<!_is_const>>
 			rect_tree_entry_ref make_tree_entry(const id_type& id) const {
 				//ensure(tree.find(id) == tree.end()) 
 				

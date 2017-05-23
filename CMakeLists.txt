@@ -401,6 +401,12 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/systems_inferred/name_system.cpp"
 )
 
+if(BUILD_TEST_SCENES)
+	list(APPEND HYPERSOMNIA_CODEBASE_SRCS
+		${HYPERSOMNIA_TEST_SCENES_SRCS}
+	)
+endif()
+
 set(HYPERSOMNIA_TRIVIAL_3RDPARTY_SRCS
 	"src/3rdparty/lodepng/lodepng.cpp"
 	"src/3rdparty/polypartition/src/polypartition.cpp"

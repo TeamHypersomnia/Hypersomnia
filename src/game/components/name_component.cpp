@@ -15,7 +15,7 @@ namespace components {
 
 	void name::set_value(const entity_name_type& s) {
 		value.assign(s.begin(), s.end());
-		hash = static_cast<unsigned>(std::hash<std::wstring>()(std::wstring(L"unnamed")));
+		name_id = static_cast<unsigned>(std::hash<std::wstring>()(std::wstring(L"unnamed")));
 	}
 
 	bool name::operator==(const name& b) const {

@@ -7,7 +7,7 @@
 
 #include "game/assets/assets_manager.h"
 
-#include "game/test_scenes/characters.h"
+#include "game/test_scenes/testbed.h"
 #include "game/test_scenes/one_entity.h"
 #include "game/test_scenes/resource_setups/all.h"
 

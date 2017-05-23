@@ -5,7 +5,7 @@
 
 #include "game/assets/assets_manager.h"
 
-#include "game/test_scenes/characters.h"
+#include "game/test_scenes/testbed.h"
 #include "game/test_scenes/one_entity.h"
 #include "game/test_scenes/resource_setups/all.h"
 
@@ -64,9 +64,9 @@ void local_setup::process(
 
 	characters.acquire_available_characters(hypersomnia);
 
-	hypersomnia.get_entity_by_name("player0").set_name(::to_wstring(cfg.nickname));
+	hypersomnia.get_entity_by_name(L"player0").set_name(::to_wstring(cfg.nickname));
 
-	const auto player1 = hypersomnia.get_entity_by_name("player1");
+	const auto player1 = hypersomnia.get_entity_by_name(L"player1");
 
 	if (player1.alive()) {
 		player1.set_name(::to_wstring(cfg.debug_second_nickname));

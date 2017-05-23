@@ -186,7 +186,7 @@ namespace prefabs {
 
 	entity_handle create_red_charge(const logic_step step, vec2 pos, int charges) {
 		auto& cosmos = step.cosm;
-		const auto red_charge = cosmos.create_entity("red_charge");
+		const auto red_charge = cosmos.create_entity("Red charge");
 		const auto round_definition = cosmos.create_entity("round_definition");
 		const auto shell_definition = cosmos.create_entity("shell_definition");
 		
@@ -255,13 +255,14 @@ namespace prefabs {
 		red_charge.map_child_entity(child_entity_name::CATRIDGE_SHELL, shell_definition);
 
 		red_charge.add_standard_components(step);
+		red_charge.get_meta_of_name().stackable = true;
 
 		return red_charge;
 	}
 
 	entity_handle create_pink_charge(const logic_step step, vec2 pos, int charges) {
 		auto& cosmos = step.cosm;
-		const auto pink_charge = cosmos.create_entity("pink_charge");
+		const auto pink_charge = cosmos.create_entity("Pink charge");
 		const auto round_definition = cosmos.create_entity("round_definition");
 		const auto shell_definition = cosmos.create_entity("shell_definition");
 		
@@ -328,13 +329,14 @@ namespace prefabs {
 		pink_charge.map_child_entity(child_entity_name::CATRIDGE_SHELL, shell_definition);
 
 		pink_charge.add_standard_components(step);
+		pink_charge.get_meta_of_name().stackable = true;
 
 		return pink_charge;
 	}
 
 	entity_handle create_cyan_charge(const logic_step step, vec2 pos, int charges) {
 		auto& cosmos = step.cosm;
-		const auto cyan_charge = cosmos.create_entity("cyan_charge");
+		const auto cyan_charge = cosmos.create_entity("Cyan charge");
 		const auto round_definition = cosmos.create_entity("round_definition");
 		const auto shell_definition = cosmos.create_entity("shell_definition");
 		
@@ -398,13 +400,14 @@ namespace prefabs {
 		cyan_charge.map_child_entity(child_entity_name::CATRIDGE_SHELL, shell_definition);
 
 		cyan_charge.add_standard_components(step);
+		cyan_charge.get_meta_of_name().stackable = true;
 
 		return cyan_charge;
 	}
 
 	entity_handle create_green_charge(const logic_step step, vec2 pos, int charges) {
 		auto& cosmos = step.cosm;
-		const auto green_charge = cosmos.create_entity("green_charge");
+		const auto green_charge = cosmos.create_entity("Green charge");
 		const auto round_definition = cosmos.create_entity("round_definition");
 		const auto shell_definition = cosmos.create_entity("shell_definition");
 		
@@ -446,6 +449,7 @@ namespace prefabs {
 		green_charge.map_child_entity(child_entity_name::CATRIDGE_SHELL, shell_definition);
 
 		green_charge.add_standard_components(step);
+		green_charge.get_meta_of_name().stackable = true;
 
 		return green_charge;
 	}

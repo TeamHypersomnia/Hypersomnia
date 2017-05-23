@@ -5,6 +5,8 @@
 #include "augs/graphics/vertex.h"
 #include "game/detail/basic_renderable_drawing_input.h"
 
+#include "game/assets/assets_manager.h"
+
 struct all_logical_metas_of_assets;
 
 namespace augs {

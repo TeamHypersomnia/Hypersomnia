@@ -7,7 +7,7 @@ namespace augs {
 	class component_allocators_mixin {
 	public:
 		template<class component>
-		typename maybe_const_ptr<is_const, component>::type find() const {
+		maybe_const_ptr_t<is_const, component> find() const {
 			auto& self = *static_cast<const derived_entity_handle*>(this);
 
 			auto& aggregate = self.get();

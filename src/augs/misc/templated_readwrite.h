@@ -16,7 +16,7 @@ namespace augs {
 	struct is_native_binary_stream 
 		: std::bool_constant<
 			is_one_of_v<
-				Archive,
+				std::decay_t<Archive>,
 				augs::stream, 
 				augs::output_stream_reserver, 
 				std::ifstream, 
@@ -24,7 +24,7 @@ namespace augs {
 			>
 		>
 	{
-
+		static_assert(!std::is_const_v<std::remove_reference_t<Archive>>, "Non-modifiable archives are ill-formed.");
 	};
 
 	template <class Archive>
@@ -266,7 +266,7 @@ namespace augs {
 	
 	}
 
-	template<class Archive, template <class...> class Container, class container_size_type = std::size_t>
+	template<class Archive, class Container, class container_size_type = std::size_t>
 	void read_unary_container(
 		Archive& ar,
 		Container& storage,
@@ -284,7 +284,7 @@ namespace augs {
 		}
 	}
 
-	template<class Archive, template <class...> class Container, class container_size_type = std::size_t>
+	template<class Archive, class Container, class container_size_type = std::size_t>
 	void write_unary_container(
 		Archive& ar,
 		const Container& storage,

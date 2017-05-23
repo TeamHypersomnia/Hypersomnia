@@ -118,15 +118,15 @@ void menu_setup::process(
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 	timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
 
-	test_scenes::testbed testbed;
-
 	intro_scene.set_fixed_delta(cfg.default_tickrate);
 	
-	testbed.populate_world_with_entities(
+	test_scenes::testbed().populate_world_with_entities(
 		intro_scene, 
 		metas_of_assets,
 		session.get_standard_post_solve()
 	);
+
+	const auto character_in_focus = intro_scene.get_entity_by_name(L"player0");
 
 	ltrb title_rect;
 	title_rect.set_position({ 100, 100 });
@@ -533,7 +533,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 
 		session.advance_audiovisual_systems(
 			intro_scene, 
-			testbed.get_selected_character(), 
+			character_in_focus, 
 			all_visible,
 			vdt
 		);
@@ -547,7 +547,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 			cfg,
 			renderer, 
 			intro_scene,
-			testbed.get_selected_character(),
+			character_in_focus,
 			all_visible,
 			timer.fraction_of_step_until_next_step(intro_scene.get_fixed_delta()), 
 			augs::gui::text::format(typesafe_sprintf(L"Current time: %x", current_time_seconds), textes_style)

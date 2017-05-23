@@ -46,9 +46,9 @@ void director_setup::init(
 
 	characters.acquire_available_characters(hypersomnia);
 
-	hypersomnia.get_entity_by_name("player0").set_name(::to_wstring(cfg.nickname));
+	hypersomnia.get_entity_by_name(L"player0").set_name(::to_wstring(cfg.nickname));
 
-	const auto player1 = hypersomnia.get_entity_by_name("player1");
+	const auto player1 = hypersomnia.get_entity_by_name(L"player1");
 
 	if (player1.alive()) {
 		player1.set_name(::to_wstring(cfg.debug_second_nickname));
@@ -225,7 +225,7 @@ void director_setup::control_player(
 	session.switch_between_gui_and_back(new_machine_entropy.local);
 
 	session.control_gui_and_remove_fetched_events(
-		hypersomnia[get_selected_character()],
+		hypersomnia[characters.get_selected_character()],
 		new_machine_entropy.local
 	);
 

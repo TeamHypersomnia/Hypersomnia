@@ -28,6 +28,7 @@ static_assert(!has_introspect_v<augs::trivial_variant<int, double>>, "Trait has 
 static_assert(has_introspect_v<cosmos_metadata>, "Trait has failed");
 static_assert(has_introspect_v<augs::constant_size_vector<int, 2>>, "Trait has failed");
 static_assert(has_introspect_v<zeroed_pod<unsigned int>>, "Trait has failed");
+static_assert(has_introspect_v<augs::delta>, "Trait has failed");
 
 template <class T>
 void transform_component_ids_to_guids_in_place(
@@ -312,7 +313,7 @@ void cosmic_delta::decode(
 			return;
 		}
 
-		new_entities_ids.emplace_back(deco.create_entity_with_specific_guid("delta_created", new_guid));
+		new_entities_ids.emplace_back(deco.create_entity_with_specific_guid(new_guid));
 #else
 		// otherwise new entity_id assignment needs be deterministic
 #endif
@@ -541,16 +542,16 @@ TEST_CASE("CosmicDelta PaddingTest") {
 			checked_type a;
 			checked_type b;
 
-			const auto dt = augs::delta_encode(a, b);
+			const auto dt = augs::object_delta<checked_type>(a, b);
 
-			if(dt.changed_offsets.size() > 0) {
+			if (dt.has_changed()) {
 				LOG("Object 1:\n%x\n Object 2:\n%x\n", describe_fields(a), describe_fields(b));
 
 				FAIL(typesafe_sprintf(
 					"Padding is wrong in %x\nsizeof: %x\nDivergence position: %x", 
 					typeid(checked_type).name(),
 					type_size,
-					static_cast<int>(dt.changed_offsets[0])
+					static_cast<int>(dt.get_changed_offsets()[0])
 				));
 			}
 		}

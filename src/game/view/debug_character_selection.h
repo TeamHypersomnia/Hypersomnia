@@ -17,7 +17,7 @@ struct debug_character_selection {
 		int i = 0;
 
 		while (true) {
-			const auto requested_name = typesafe_sprintf("player%x", i);
+			const auto requested_name = typesafe_sprintf(L"player%x", i);
 			const auto character = cosm.get_entity_by_name(requested_name);
 
 			if (character.dead()) {

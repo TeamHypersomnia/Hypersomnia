@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include "augs/padding_byte.h"
-#include "game/components/name_component_declaration.h"
+#include "game/components/name_component.h"
 
 using entity_details_type = entity_name_type;
 

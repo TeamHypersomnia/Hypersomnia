@@ -107,13 +107,6 @@ cosmos::cosmos(const cosmos& b) {
 	*this = b;
 }
 
-void cosmos::set_name(
-	const entity_id id, 
-	const std::string& new_debug_name
-) {
-	entity_names[id.indirection_index + 1] = new_debug_name;
-}
-
 bool cosmos::operator==(const cosmos& b) const {
 	return significant == b.significant;
 }
@@ -186,7 +179,6 @@ void cosmos::complete_reinference(const const_entity_handle h) {
 void cosmos::reserve_storage_for_entities(const size_t n) {
 	get_aggregate_pool().initialize_space(n);
 	reserve_storage_for_all_components(n);
-	entity_names.resize(n + 1);
 
 	auto reservation_lambda = [n](auto& sys) {
 		sys.reserve_caches_for_entities(n);
@@ -240,25 +232,24 @@ void cosmos::set_fixed_delta(const unsigned steps_per_second) {
 }
 
 entity_handle cosmos::allocate_new_entity() {
+	thread_local std::wstring debug_name(L"Freshly allocated");
+
 	auto pooled_object_raw_id = get_aggregate_pool().allocate();
 
-	return entity_handle(*this, pooled_object_raw_id);
+	return entity_handle(*this, pooled_object_raw_id, debug_name);
 }
 
-
-void cosmos::set_name(
-	const entity_id id, 
-	const std::string new_name
-) {
-	const std::wstring name(new_name.begin(), new_name.end());
-	get_handle(id).get<components::name>().nickname = 
+entity_handle cosmos::create_entity(const std::string& name) {
+	return create_entity(to_wstring(name));
 }
 
-entity_handle cosmos::create_entity(const std::string name_str) {
+entity_handle cosmos::create_entity(const std::wstring& name) {
 	auto new_entity = allocate_new_entity();
 	new_entity += components::guid();
-	new_entity += components::name();
-	set_name(new_entity, name_str);
+	
+	components::name new_name;
+	new_name.set_value(name);
+	new_entity += new_name;
 
 #if COSMOS_TRACKS_GUIDS
 	assign_next_guid(new_entity);
@@ -269,7 +260,7 @@ entity_handle cosmos::create_entity(const std::string name_str) {
 }
 
 #if COSMOS_TRACKS_GUIDS
-entity_handle cosmos::create_entity_with_specific_guid(const std::string& debug_name, const entity_guid specific_guid) {
+entity_handle cosmos::create_entity_with_specific_guid(const entity_guid specific_guid) {
 	const auto new_entity = allocate_new_entity();
 	new_entity += components::guid();
 
@@ -302,8 +293,6 @@ entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
 		components::fixtures,
 		components::child
 	>(new_entity, source_entity);
-
-	set_name(new_entity, "+" + source_entity.get_name());
 
 #if COSMOS_TRACKS_GUIDS
 	assign_next_guid(new_entity);
@@ -388,7 +377,6 @@ void cosmos::delete_entity(const entity_id e) {
 
 	free_all_components(get_handle(e));
 	get_aggregate_pool().free(e);
-	delete_debug_name(e);
 
 	/*
 		Unregister that id as a parent from the relational system

@@ -4,6 +4,7 @@
 #include "game/transcendental/entity_handle.h"
 
 #include "game/components/position_copying_component.h"
+#include "game/assets/assets_manager.h"
 
 using namespace augs;
 

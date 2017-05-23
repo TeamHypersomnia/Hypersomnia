@@ -4,19 +4,6 @@
 
 #include "game/transcendental/cosmos_global_state.h"
 
-#include "game/assets/animation_id.h"
-#include "game/assets/particle_effect_id.h"
-#include "game/assets/tile_layer_id.h"
-#include "game/assets/sound_buffer_id.h"
-
-#include "game/assets/animation.h"
-#include "game/assets/particle_effect.h"
-#include "game/assets/tile_layer.h"
-#include "game/assets/spell.h"
-#include "game/assets/physical_material.h"
-
-#include "game/assets/assets_manager.h"
-
 namespace augs {
 	struct introspection_access;
 }

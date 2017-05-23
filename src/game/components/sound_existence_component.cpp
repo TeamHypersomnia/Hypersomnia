@@ -4,6 +4,7 @@
 #include "game/transcendental/entity_handle.h"
 
 #include "game/components/position_copying_component.h"
+#include "game/assets/assets_manager.h"
 
 entity_handle sound_effect_input::create_sound_effect_entity(
 	const logic_step step,

@@ -178,6 +178,20 @@ private:
 	}
 
 public:
+#if ENTITY_HANDLE_HAS_DEBUG_NAME_REFERENCE
+	basic_entity_handle(
+		owner_reference owner,
+		const entity_id raw_id,
+		const entity_name_type& custom_debug_name
+	) : 
+		raw_id(raw_id), 
+		owner(owner) 
+		, debug_name(custom_debug_name)
+	{
+
+	}
+#endif
+
 	basic_entity_handle(
 		owner_reference owner, 
 		const entity_id raw_id
@@ -335,7 +349,7 @@ public:
 	}
 
 	void set_name(const entity_name_type& new_name) const {
-		return get<components::name>().set_name(new_name);
+		get<components::name>().set_value(new_name);
 	}
 	
 	template<bool _is_const = is_const, class = std::enable_if_t<_is_const>>

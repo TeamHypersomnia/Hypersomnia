@@ -14,7 +14,8 @@
 #include "augs/entity_system/storage_for_systems.h"
 
 #include "game/build_settings.h"
-#include "game/assets/physical_material_id.h"
+#include "game/assets/behaviour_tree_id.h"
+#include "game/assets/behaviour_tree.h"
 
 #include "game/transcendental/cosmic_entropy.h"
 #include "game/transcendental/cosmic_profiler.h"
@@ -69,7 +70,6 @@ public:
 	void remap_guids();
 private:
 	entity_handle create_entity_with_specific_guid(
-		const std::string& debug_name,
 		const entity_guid specific_guid
 	);
 #endif
@@ -113,7 +113,8 @@ public:
 
 	void reserve_storage_for_entities(const size_t);
 
-	entity_handle create_entity(const std::string name);
+	entity_handle create_entity(const std::wstring& name);
+	entity_handle create_entity(const std::string& name);
 	entity_handle clone_entity(const entity_id);
 	void delete_entity(const entity_id);
 

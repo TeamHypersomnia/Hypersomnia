@@ -255,15 +255,8 @@ bool can_stack_entities(
 	
 	const auto name = a.get_name();
 
-	if (name == b.get_name()) 
-		if(
-			name == L"Red charge"
-			|| name == L"Cyan charge"
-			|| name == L"Pink charge"
-			|| name == L"Green charge"
-		) {
-			return true;
-		}
+	if (name == b.get_name() && a.get_meta_of_name().stackable) {
+		return true;
 	}
 
 	//const auto catridge_a = a.find<components::missile>();

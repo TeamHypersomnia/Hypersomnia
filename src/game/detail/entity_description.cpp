@@ -14,6 +14,7 @@
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "game/transcendental/cosmos.h"
 #include "augs/log.h"
+#include "game/assets/assets_manager.h"
 #include <iomanip>
 
 entity_name_type get_bbcoded_entity_name(const const_entity_handle maybe_overridden_by_nickname) {

@@ -9,7 +9,7 @@
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/get_underlying_char_type.h"
 
-std::string to_string(std::wstring val);
+std::string to_string(const std::wstring& val);
 
 template <class T>
 std::wstring to_wstring(T val, int precision = -1, bool fixed = false) {
@@ -27,7 +27,7 @@ std::wstring to_wstring(T val, int precision = -1, bool fixed = false) {
 	return ss.str();
 }
 
-std::wstring to_wstring(std::string val);
+std::wstring to_wstring(const std::string& val);
 
 template <class T, class CharType>
 T to_value(const std::basic_string<CharType> s) {

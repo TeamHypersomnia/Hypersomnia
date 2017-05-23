@@ -62,67 +62,75 @@ namespace augs {
 		std::vector<offset_type> changed_offsets;
 	
 	public:
+		const auto& get_changed_offsets() const {
+			return changed_offsets;
+		}
+
+		const auto& get_changed_bytes() const {
+			return changed_bytes;
+		}
+
+		bool has_changed() const {
+			return changed_bytes.size() > 0;
+		}
+
 		bool write(
 			stream& out,
 			const bool write_changed_bit = false
 		) const {
-			const bool has_changed = changed_bytes.size() > 0;
+			const bool changed = has_changed();
 
 			if (write_changed_bit) {
-				augs::write(out, has_changed);
+				augs::write(out, changed);
 			}
 
-			if (has_changed) {
+			if (changed) {
 				augs::write(out, changed_bytes, offset_type());
 				augs::write(out, changed_offsets, offset_type());
 			}
 
-			return has_changed;
+			return changed;
 		}
 
-		void read(
+		object_delta(
 			stream& in,
 			const bool read_changed_bit = false
 		) {
-			bool has_changed = true;
+			bool changed = true;
 
 			if (read_changed_bit) {
-				augs::read(in, has_changed);
+				augs::read(in, changed);
 			}
 
-			if (has_changed) {
+			if (changed) {
 				augs::read(in, changed_bytes, offset_type());
 				augs::read(in, changed_offsets, offset_type());
 			}
 		}
 
-		static auto encode(
+		object_delta(
 			const T& base_object, 
 			const T& encoded_object
 		) {
-			object_delta result;
-
 			const delta_unit* const base_object_ptr = reinterpret_cast<const delta_unit*>(std::addressof(base_object));
 			const delta_unit* const encoded_object_ptr = reinterpret_cast<const delta_unit*>(std::addressof(encoded_object));
 
 			thread_local std::vector<char> diff_flags;
-			diff_flags.resize(length);
+			diff_flags.resize(length_bytes);
 
 			auto* const diff_flags_ptr = diff_flags.data();
 
-			for (std::size_t i = 0; i < length; ++i) {
+			for (std::size_t i = 0; i < length_bytes; ++i) {
 				if (base_object_ptr[i] == encoded_object_ptr[i]) {
 					diff_flags_ptr[i] = 0;
 				}
 				else {
 					diff_flags_ptr[i] = 1;
-					result.changed_bytes.push_back(encoded_object_ptr[i]);
+					changed_bytes.push_back(encoded_object_ptr[i]);
 				}
 			}
 
-			result.changed_offsets = run_length_encoding<offset_type>(diff_flags);
-
-			return result;
+			changed_offsets = run_length_encoding<offset_type>(diff_flags);
 		}
 
 		void decode_into(T& decoded) const {
@@ -150,39 +158,43 @@ namespace augs {
 	class object_delta<T, std::enable_if_t<!is_memcpy_safe_v<T>>> {
 		augs::stream new_content;
 	public:
+		bool has_changed() const {
+			return new_content.size() > 0;
+		}
+
 		bool write(
 			stream& out,
 			const bool write_changed_bit = false
 		) const {
-			const bool has_changed = new_content.size() > 0;
+			const bool changed = has_changed();
 
 			if (write_changed_bit) {
-				augs::write(out, has_changed);
+				augs::write(out, changed);
 			}
 
-			if (has_changed) {
-				augs::write(out, new_content);
+			if (changed) {
+				augs::write(out, new_content.buf);
 			}
 
-			return has_changed;
+			return changed;
 		}
 
-		void read(
+		object_delta(
 			stream& in,
 			const bool read_changed_bit = false
 		) {
-			bool has_changed = true;
+			bool changed = true;
 
 			if (read_changed_bit) {
-				augs::read(in, has_changed);
+				augs::read(in, changed);
 			}
 
-			if (has_changed) {
-				augs::read(in, new_content);
+			if (changed) {
+				augs::read(in, new_content.buf);
 			}
 		}
 
-		static auto encode(
+		object_delta(
 			const T& base_object,
 			const T& encoded_object
 		) {
@@ -191,12 +203,14 @@ namespace augs {
 			augs::write(base_content, base_object);
 			augs::write(new_content, encoded_object);
 
-			if (base_content == new_content) {
+			if (new_content == base_content) {
 				new_content.set_write_pos(0u);
 			}
 		}
 
-		void decode_into(T& decoded) const {
+		void decode_into(T& decoded) {
+			new_content.set_read_pos(0u);
+
 			if (new_content.size() > 0) {
 				augs::read(new_content, decoded);
 			}
@@ -212,7 +226,7 @@ namespace augs {
 		stream& out,
 		const bool write_changed_bit = false
 	) {
-		const auto dt = object_delta<T>::encode(base, enco);
+		const auto dt = object_delta<T>(base, enco);
 		return dt.write(out, write_changed_bit);
 	}
 
@@ -222,8 +236,7 @@ namespace augs {
 		stream& in,
 		const bool read_changed_bit = false
 	) {
-		object_delta<T> dt;
-		dt.read(in, read_changed_bit);
+		auto dt = object_delta<T>(in, read_changed_bit);
 		dt.decode_into(decode_target);
 	}
 }
