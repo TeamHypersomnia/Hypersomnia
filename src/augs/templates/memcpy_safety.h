@@ -18,3 +18,9 @@ bool trivial_compare(const A& a, const A& b) {
 	static_assert(is_memcpy_safe_v<A>, "Type can't be trivially compared!");
 	return !std::memcmp(&a, &b, sizeof(A));
 }
+
+template <class A>
+bool trivial_compare(const A* const a, const A* const b) {
+	static_assert(is_memcpy_safe_v<A>, "Type can't be trivially compared!");
+	return !std::memcmp(a, b, sizeof(A));
+}

@@ -337,6 +337,17 @@ public:
 	void set_name(const entity_name_type& new_name) const {
 		return get<components::name>().set_name(new_name);
 	}
+	
+	template<bool _is_const = is_const, class = std::enable_if_t<_is_const>>
+	auto get_meta_of_name() const {
+		const auto& descs = get_cosmos().significant.meta.global.names_meta;
+		return found_or_default(descs, get<components::name>().get_raw_component());
+	}
+
+	template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
+	auto& get_meta_of_name() const {
+		return get_cosmos().significant.meta.global.names_meta[get<components::name>().get_raw_component()];
+	}
 
 	bool is_inferred_state_activated() const {
 		const auto inferred = find<components::all_inferred_state>();

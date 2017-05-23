@@ -29,7 +29,13 @@
 */
 
 entity_name_type get_bbcoded_entity_name(const const_entity_handle maybe_overridden_by_nickname);
-entity_description_type get_bbcoded_entity_name_details(const const_entity_handle);
+
+void set_bbcoded_entity_name_details(
+	const entity_handle, 
+	const entity_details_type&
+);
+
+entity_details_type get_bbcoded_entity_name_details(const const_entity_handle);
 
 std::wstring get_bbcoded_item_categories(const item_category_flagset& flags);
 

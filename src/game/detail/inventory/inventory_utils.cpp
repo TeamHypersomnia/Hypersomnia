@@ -248,9 +248,36 @@ containment_result query_containment_result(
 }
 
 bool can_stack_entities(
-	const const_entity_handle a, 
+	const const_entity_handle a,
 	const const_entity_handle b
 ) {
+	const auto& cosmos = a.get_cosmos();
+	
+	const auto name = a.get_name();
+
+	if (name == b.get_name()) 
+		if(
+			name == L"Red charge"
+			|| name == L"Cyan charge"
+			|| name == L"Pink charge"
+			|| name == L"Green charge"
+		) {
+			return true;
+		}
+	}
+
+	//const auto catridge_a = a.find<components::missile>();
+	//const auto catridge_b = b.find<components::missile>();
+	//
+	//const auto missile_a = a.find<components::missile>();
+	//const auto missile_b = b.find<components::missile>();
+	//
+	//if (missile_a != nullptr && missile_b != nullptr) {
+	//	if (trivial_compare(*missile_a, *missile_b)) {
+	//
+	//	}
+	//}
+
 	return false;
 }
 

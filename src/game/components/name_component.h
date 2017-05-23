@@ -1,4 +1,5 @@
 #pragma once
+#include <xstddef>
 #include "augs/zeroed_pod.h"
 #include "game/transcendental/component_synchronizer.h"
 #include "augs/templates/is_component_synchronized.h"
@@ -8,14 +9,39 @@
 
 #include "game/components/name_component_declaration.h"
 
+namespace augs {
+	struct introspection_access;
+}
+
 namespace components {
 	struct name : synchronizable_component {
+	private:
+		friend struct augs::introspection_access;
 		// GEN INTROSPECTOR struct components::name
-		fixed_entity_name_type value = entity_name_type(L"unnamed");
+		unsigned hash;
+		fixed_entity_name_type value;
 		// END GEN INTROSPECTOR
+	public:
+		name();
+
+		bool operator==(const name&) const;
+		bool operator!=(const name&) const;
 
 		entity_name_type get_value() const;
 		void set_value(const entity_name_type&);
+
+		auto get_hash() const {
+			return hash;
+		}
+	};
+}
+
+namespace std {
+	template <>
+	struct hash<components::name> {
+		size_t operator()(const components::name& k) const {
+			return std::hash<unsigned>()(k.get_hash());
+		}
 	};
 }
 

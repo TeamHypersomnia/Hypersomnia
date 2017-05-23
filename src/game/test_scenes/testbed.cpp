@@ -19,6 +19,7 @@
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "game/transcendental/types_specification/all_messages_includes.h"
 #include "game/enums/party_category.h"
+#include "game/detail/entity_description.h"
 
 #include "game/messages/intent_message.h"
 #include "game/detail/inventory/inventory_utils.h"
@@ -304,6 +305,8 @@ namespace test_scenes {
 			sentience.spells[assets::spell_id::FURY_OF_THE_AEONS] = spell_instance_data();
 			sentience.spells[assets::spell_id::ULTIMATE_WRATH_OF_THE_AEONS] = spell_instance_data();
 			sentience.spells[assets::spell_id::ELECTRIC_SHIELD] = spell_instance_data();
+
+			set_bbcoded_entity_name_details(new_character, L"Member of Atlantic nations.");
 		}
 
 		{
@@ -754,8 +757,6 @@ namespace test_scenes {
 			//riding_car.get<components::car>().accelerating = true;
 		}
 
-		select_character(character(0));
-
 		prefabs::create_sample_suppressor(step, vec2(300, -500));
 
 		const bool many_charges = false;
@@ -844,8 +845,6 @@ namespace test_scenes {
 			
 			perform_transfer({ pis2, character(3).get_primary_hand() }, step);
 		}
-
-		characters.assign(new_characters.begin(), new_characters.end());
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 #endif
 	}

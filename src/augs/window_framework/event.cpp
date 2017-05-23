@@ -1,5 +1,6 @@
 #include "event.h"
 #include "augs/ensure.h"
+#include "augs/templates/memcpy_safety.h"
 
 namespace augs {
 	namespace window {
@@ -29,13 +30,17 @@ namespace augs {
 			}
 			
 			bool change::operator==(const change& c) const {
-				return !std::memcmp(this, &c, sizeof(change));
+				return trivial_compare(*this, c);
 			}
 			
 			bool change::uses_mouse() const {
-				return msg == message::mousemotion
-					|| (get_key_change() != key_change::NO_CHANGE && msg != message::keydown && msg != message::keyup)
-					;
+				return 
+					msg == message::mousemotion
+					||	(get_key_change() != key_change::NO_CHANGE 
+						&& msg != message::keydown 
+						&& msg != message::keyup
+					)
+				;
 			}
 
 			bool change::was_any_key_pressed() const {

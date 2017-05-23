@@ -59,7 +59,7 @@ void particle_effect_input::create_particle_effect_components(
 
 namespace components {
 	bool particles_existence::operator==(const particles_existence& b) const {
-		return !std::memcmp(this, &b, sizeof(b));
+		return trivial_compare(*this, b);
 	}
 
 	bool particles_existence::operator!=(const particles_existence& b) const {

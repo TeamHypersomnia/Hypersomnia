@@ -20,9 +20,15 @@ entity_name_type get_bbcoded_entity_name(const const_entity_handle maybe_overrid
 	return maybe_overridden_by_nickname.get<components::name>().get_value();
 }
 
-entity_description_type get_bbcoded_entity_name_details(const const_entity_handle id) {
-	const auto& descs = id.get_cosmos().significant.meta.global.names_meta.descriptions;
-	return found_or_default(descs, id.get_name(), L"No description");
+void set_bbcoded_entity_name_details(
+	const entity_handle handle, 
+	const entity_details_type& new_details
+) {
+	handle.get_meta_of_name().details = new_details;
+}
+
+entity_details_type get_bbcoded_entity_name_details(const const_entity_handle handle) {
+	return handle.get_meta_of_name().details;
 }
 
 std::wstring get_bbcoded_entity_properties(const const_entity_handle id) {

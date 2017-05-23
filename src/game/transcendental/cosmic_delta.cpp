@@ -461,7 +461,7 @@ TEST_CASE("CosmicDelta PaddingSanityCheck1") {
 	new (buf1) checked_type;
 	new (buf2) checked_type;
 
-	const bool are_different = memcmp(buf1, buf2, type_size);
+	const bool are_different = std::memcmp(buf1, buf2, type_size);
 
 	REQUIRE(are_different);
 }
@@ -487,7 +487,7 @@ TEST_CASE("CosmicDelta PaddingSanityCheck2") {
 	new (buf1) checked_type;
 	new (buf2) checked_type;
 
-	const bool are_different = memcmp(buf1, buf2, type_size);
+	const bool are_different = std::memcmp(buf1, buf2, type_size);
 
 	REQUIRE(are_different);
 }
