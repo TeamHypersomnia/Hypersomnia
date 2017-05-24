@@ -271,8 +271,8 @@ void physics_system::create_inferred_state_for_joint(const const_entity_handle h
 	const bool is_anything_to_construct =
 		motor_joint != nullptr
 		&& motor_joint.is_activated()
-		&& is_inferred_state_created_for_rigid_body(cosmos[motor_joint.get_target_bodies().at(0)])
-		&& is_inferred_state_created_for_rigid_body(cosmos[motor_joint.get_target_bodies().at(1)])
+		&& is_inferred_state_created_for_rigid_body(cosmos[motor_joint.get_target_bodies()[0]])
+		&& is_inferred_state_created_for_rigid_body(cosmos[motor_joint.get_target_bodies()[1]])
 	;
 	
 	if (is_anything_to_construct) {
@@ -284,8 +284,8 @@ void physics_system::create_inferred_state_for_joint(const const_entity_handle h
 
 		b2MotorJointDef def;
 		def.userData = handle.get_id();
-		def.bodyA = get_rigid_body_cache(cosmos[joint_data.target_bodies.at(0)]).body;
-		def.bodyB = get_rigid_body_cache(cosmos[joint_data.target_bodies.at(1)]).body;
+		def.bodyA = get_rigid_body_cache(cosmos[joint_data.target_bodies[0]]).body;
+		def.bodyB = get_rigid_body_cache(cosmos[joint_data.target_bodies[1]]).body;
 		def.collideConnected = joint_data.collide_connected;
 		def.linearOffset = si.get_meters(joint_data.linear_offset);
 		def.angularOffset = DEG_TO_RAD<float> * joint_data.angular_offset;

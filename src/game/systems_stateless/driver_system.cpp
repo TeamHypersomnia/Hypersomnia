@@ -135,8 +135,8 @@ bool driver_system::change_car_ownership(
 		
 		car.last_turned_on = cosmos.get_timestamp();
 
-		force_joint.target_bodies.at(0) = driver_entity;
-		force_joint.target_bodies.at(1) = car.left_wheel_trigger;
+		force_joint.target_bodies[0] = driver_entity;
+		force_joint.target_bodies[1] = car.left_wheel_trigger;
 		force_joint.activated = true;
 		driver_entity.get<components::motor_joint>() = force_joint;
 

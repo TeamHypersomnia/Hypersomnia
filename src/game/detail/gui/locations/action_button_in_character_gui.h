@@ -19,7 +19,7 @@ public:
 
 	template <class C>
 	decltype(auto) dereference(const C context) const {
-		return &context.get_character_gui().action_buttons.at(index);
+		return &context.get_character_gui().action_buttons[index];
 	}
 };
 

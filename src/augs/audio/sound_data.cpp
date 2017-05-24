@@ -9,7 +9,7 @@ namespace augs {
 		output.resize(samples.size() / 2);
 
 		for (size_t i = 0; i < samples.size(); i += 2) {
-			output.at(i/2) = (static_cast<int>(samples.at(i)) + samples.at(i+1)) / 2;
+			output[i/2] = (static_cast<int>(samples[i]) + samples[i+1]) / 2;
 		}
 
 		return output;

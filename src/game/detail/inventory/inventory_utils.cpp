@@ -570,8 +570,8 @@ void perform_transfer(
 
 			if (slot_requests_connection_of_bodies) {
 				motor.activated = true;  
-				motor.target_bodies.at(0) = slot.get_container();
-				motor.target_bodies.at(1) = descendant;
+				motor.target_bodies[0] = slot.get_container();
+				motor.target_bodies[1] = descendant;
 				motor.linear_offset = force_joint_offset.pos;
 				motor.angular_offset = force_joint_offset.rotation;
 				motor.collide_connected = false;
