@@ -33,7 +33,7 @@ namespace ingredients {
 		render_layer = render_layer::GROUND
 	);
 
-	components::sprite& add_sprite_scalled(
+	components::sprite& add_sprite_scaled(
 		entity_handle, 
 		vec2i size = vec2i(), 
 		assets::game_image_id = assets::game_image_id::BLANK, 

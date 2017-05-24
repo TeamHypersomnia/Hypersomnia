@@ -23,7 +23,7 @@ namespace ingredients {
 		return sprite;
 	}
 
-	components::sprite& add_sprite_scalled(
+	components::sprite& add_sprite_scaled(
 		const entity_handle e, 
 		const vec2i size, 
 		const assets::game_image_id id, 

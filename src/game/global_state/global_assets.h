@@ -5,6 +5,8 @@
 
 struct global_assets {
 	// GEN INTROSPECTOR struct global_assets
-	int dummy = 0;
+	sound_response ped_shield_impact_sound;
+	sound_response ped_shield_destruction_sound;
+	sound_response cast_unsuccessful_sound;
 	// END GEN INTROSPECTOR
 };

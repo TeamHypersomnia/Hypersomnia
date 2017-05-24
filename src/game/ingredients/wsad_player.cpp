@@ -106,6 +106,9 @@ namespace ingredients {
 		sentience.health.set_value(100);
 		sentience.health.set_maximum_value(100);
 
+		sentience.loss_of_consciousness_sound.id = assets::sound_buffer_id::DEATH;
+		sentience.consciousness_decrease_sound.id = assets::sound_buffer_id::IMPACT;
+
 		processing.disable_in(processing_subjects::WITH_FORCE_JOINT);
 
 		force_joint.max_force = 800000.f;

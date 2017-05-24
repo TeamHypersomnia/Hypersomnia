@@ -11,6 +11,10 @@ entity_handle sound_effect_input::create_sound_effect_entity(
 	const components::transform place_of_birth,
 	const entity_id chased_subject_id
 ) const {
+	if (effect.id == assets::sound_buffer_id::INVALID) {
+		return step.cosm[entity_id()];
+	}
+
 	auto& cosmos = step.cosm;
 
 	const auto new_sound_entity = cosmos.create_entity("particle_stream");

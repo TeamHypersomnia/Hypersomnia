@@ -13,6 +13,10 @@ entity_handle particle_effect_input::create_particle_effect_entity(
 	const components::transform place_of_birth,
 	const entity_id chased_subject
 ) const {
+	if (effect.id == assets::particle_effect_id::INVALID) {
+		return step.cosm[entity_id()];
+	}
+
 	const entity_handle new_stream_entity = step.cosm.create_entity("particle_stream");
 
 	create_particle_effect_components(

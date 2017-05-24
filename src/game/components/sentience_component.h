@@ -52,7 +52,10 @@ namespace components {
 		child_entity_id character_crosshair;
 
 		sound_response health_decrease_sound;
+		sound_response consciousness_decrease_sound;
+
 		sound_response death_sound;
+		sound_response loss_of_consciousness_sound;
 
 		particle_effect_response health_decrease_particles;
 

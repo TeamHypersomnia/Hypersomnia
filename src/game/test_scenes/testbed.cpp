@@ -713,8 +713,6 @@ namespace test_scenes {
 		}
 
 		if (character(0).alive()) {
-			
-
 			driver_system().assign_car_ownership(character(0), main_character_motorcycle);
 			//main_character_motorcycle.get<components::car>().accelerating = true;
 		}
@@ -782,10 +780,6 @@ namespace test_scenes {
 
 		prefabs::create_sample_magazine(step, vec2(100 - 50, -650));
 		prefabs::create_sample_magazine(step, vec2(100 - 100, -650), "0.30");
-		//prefabs::create_cyan_charge(step, vec2(100, 100));
-		//prefabs::create_cyan_charge(step, vec2(100, -400));
-		//prefabs::create_cyan_charge(step, vec2(150, -400));
-		//prefabs::create_cyan_charge(step, vec2(200, -400));
 		prefabs::create_cyan_charge(step, vec2(150, -500));
 		prefabs::create_cyan_charge(step, vec2(200, -500));
 
@@ -795,23 +789,21 @@ namespace test_scenes {
 		const auto backpack = prefabs::create_sample_backpack(step, vec2(200, -650));
 		prefabs::create_sample_backpack(step, vec2(200, -750));
 
-		//perform_transfer({ backpack, character(0)[slot_function::SHOULDER] }, step);
-		//perform_transfer({ submachine, character(0).get_primary_hand() }, step);
-
 		if (character(1).alive()) {
-			
 			perform_transfer({ rifle2, character(1).get_primary_hand() }, step);
 		}
 
 		if (character(2).alive()) {
-			
 			perform_transfer({ second_machete, character(2).get_primary_hand() }, step);
 		}
 
 		if (character(3).alive()) {
-			
 			perform_transfer({ pis2, character(3).get_primary_hand() }, step);
 		}
+
+		world.get_global_assets().cast_unsuccessful_sound.id = assets::sound_buffer_id::CAST_UNSUCCESSFUL;
+		world.get_global_assets().ped_shield_impact_sound.id = assets::sound_buffer_id::EXPLOSION;
+		world.get_global_assets().ped_shield_destruction_sound.id = assets::sound_buffer_id::GREAT_EXPLOSION;
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 #endif
 	}

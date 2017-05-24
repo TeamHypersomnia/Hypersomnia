@@ -261,6 +261,9 @@ public:
 
 	entity_name_metas& get_name_metas();
 	const entity_name_metas& get_name_metas() const;
+	
+	global_assets& get_global_assets();
+	const global_assets& get_global_assets() const;
 
 	/* saving procedure is not const due to possible reinference of the universe */
 	void save_to_file(const std::string&);
@@ -324,6 +327,14 @@ inline entity_guid cosmos::get_guid(const const_entity_handle handle) const {
 	return handle.get_guid();
 }
 #endif
+
+inline global_assets& cosmos::get_global_assets() {
+	return significant.meta.global.assets;
+}
+
+inline const global_assets& cosmos::get_global_assets() const {
+	return significant.meta.global.assets;
+}
 
 inline entity_name_metas& cosmos::get_name_metas() {
 	return significant.meta.global.name_metas;

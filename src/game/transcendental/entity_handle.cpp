@@ -37,7 +37,10 @@ std::ostream& operator<<(std::ostream& out, const const_entity_handle &x) {
 template <bool C>
 template <bool, class>
 basic_entity_handle<C> basic_entity_handle<C>::add_standard_components(const logic_step step) const {
-	ensure(alive());
+	if (dead()) {
+		return *this;
+	}
+
 	const bool has_physics = has<components::rigid_body>();
 
 	if (has_physics || has<components::fixtures>()) {

@@ -205,12 +205,12 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 		}
 		else if (h.target == messages::health_event::target_type::PERSONAL_ELECTRICITY) {
 			if (h.effective_amount > 0.f) {
-				in.effect.id = assets::sound_buffer_id::EXPLOSION;
-				in.effect.modifier.pitch = 1.2f + h.effective_amount / 100.f;
+				in.effect = cosmos.get_global_assets().ped_shield_impact_sound;
+				in.effect.modifier.pitch *= 1.2f + h.effective_amount / 100.f;
 
 				if (h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION) {
-					in.effect.id = assets::sound_buffer_id::GREAT_EXPLOSION;
-					in.effect.modifier.pitch = 1.5f;
+					in.effect = cosmos.get_global_assets().ped_shield_destruction_sound;
+					in.effect.modifier.pitch *= 1.5f;
 				}
 			}
 			else {
@@ -219,12 +219,12 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 		}
 		else if (h.target == messages::health_event::target_type::CONSCIOUSNESS) {
 			if (h.effective_amount > 0.f) {
-				in.effect.id = assets::sound_buffer_id::IMPACT;
-				in.effect.modifier.pitch = 1.2f + h.effective_amount / 100.f;
+				in.effect = sentience.consciousness_decrease_sound;
+				in.effect.modifier.pitch *= 1.2f + h.effective_amount / 100.f;
 
 				if (h.special_result == messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS) {
-					in.effect.id = assets::sound_buffer_id::DEATH;
-					in.effect.modifier.pitch = 1.5f;
+					in.effect = sentience.loss_of_consciousness_sound;
+					in.effect.modifier.pitch *= 1.5f;
 				}
 			}
 			else {
@@ -250,13 +250,11 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 			in.direct_listener = d.subject;
 			in.effect = inflictor.get<components::missile>().destruction_sound;
 			
-			if (in.effect.id != assets::sound_buffer_id::INVALID) {
-				in.create_sound_effect_entity(
-					step, 
-					d.point_of_impact, 
-					entity_id()
-				).add_standard_components(step);
-			}
+			in.create_sound_effect_entity(
+				step, 
+				d.point_of_impact, 
+				entity_id()
+			).add_standard_components(step);
 		}
 	}
 
@@ -265,7 +263,7 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 
 		sound_effect_input in;
 		in.direct_listener = e.subject;
-		in.effect.id = assets::sound_buffer_id::CAST_UNSUCCESSFUL;
+		in.effect = cosmos.get_global_assets().cast_unsuccessful_sound;
 
 		in.create_sound_effect_entity(
 			step, 

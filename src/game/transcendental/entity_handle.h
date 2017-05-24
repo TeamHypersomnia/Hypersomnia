@@ -78,14 +78,6 @@ private:
 	const entity_name_type& debug_name;
 #endif
 
-	entity_id get_id_for_handle_operations() const {
-		return raw_id;
-	}
-
-	decltype(auto) get_pool_for_handle_operations() const {
-		return owner.get_aggregate_pool();
-	}
-
 	typedef augs::component_allocators_mixin<is_const, basic_entity_handle<is_const>> allocator;
 
 	friend class augs::component_allocators_mixin<is_const, basic_entity_handle<is_const>>;
@@ -192,6 +184,8 @@ public:
 	}
 #endif
 
+	static entity_name_type dead_entity_name;
+
 	basic_entity_handle(
 		owner_reference owner, 
 		const entity_id raw_id
@@ -199,7 +193,7 @@ public:
 		raw_id(raw_id), 
 		owner(owner) 
 #if ENTITY_HANDLE_HAS_DEBUG_NAME_REFERENCE
-		, debug_name(alive() ? get_name() : L"Dead entity")
+		, debug_name(alive() ? get_name() : dead_entity_name)
 #endif
 	{
 
@@ -227,11 +221,11 @@ public:
 		return this->owner;
 	}
 
-	bool operator==(entity_id id) const {
+	bool operator==(const entity_id id) const {
 		return raw_id == id;
 	}
 
-	bool operator!=(entity_id id) const {
+	bool operator!=(const entity_id id) const {
 		return raw_id != id;
 	}
 
@@ -397,3 +391,6 @@ inline size_t make_cache_id(const unversioned_entity_id id) {
 inline size_t make_cache_id(const const_entity_handle handle) {
 	return make_cache_id(handle.get_id());
 }
+
+template <bool C>
+entity_name_type basic_entity_handle<C>::dead_entity_name = L"Dead entity";
