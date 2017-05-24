@@ -71,22 +71,14 @@ namespace prefabs {
 	entity_handle create_sample_suppressor(const logic_step world, const vec2 pos);
 
 	entity_handle create_sample_magazine(const logic_step, components::transform pos, std::string space = "0.30", entity_id charge_inside = entity_id());
-	entity_handle create_small_magazine(const logic_step, components::transform pos, std::string space = "0.30", entity_id charge_inside = entity_id());
 	entity_handle create_sample_rifle(const logic_step, vec2 pos, entity_id load_mag = entity_id());
-	entity_handle create_sample_bilmer2000(const logic_step, vec2 pos, entity_id load_mag = entity_id());
-	entity_handle create_pistol(const logic_step, vec2 pos, entity_id load_mag = entity_id());
-	entity_handle create_kek9(const logic_step, vec2 pos, entity_id load_mag = entity_id());
-	entity_handle create_submachine(const logic_step, vec2 pos, entity_id load_mag = entity_id());
 
 	entity_handle create_amplifier_arm(
 		const logic_step,
 		const vec2 pos 
 	);
 
-	entity_handle create_red_charge(const logic_step, vec2 pos, int charges = 23);
-	entity_handle create_pink_charge(const logic_step, vec2 pos, int charges = 23);
 	entity_handle create_cyan_charge(const logic_step, vec2 pos, int charges = 30);
-	entity_handle create_green_charge(const logic_step, vec2 pos, int charges = 23);
 
 	entity_handle create_sample_backpack(const logic_step, vec2 pos);
 
@@ -114,8 +106,5 @@ namespace prefabs {
 	entity_handle create_force_grenade(const logic_step, const vec2 pos);
 	entity_handle create_ped_grenade(const logic_step, const vec2 pos);
 	entity_handle create_interference_grenade(const logic_step, const vec2 pos);
-
-	entity_handle create_rocket_launcher(logic_step, components::transform, entity_id load_rocket);
-	entity_handle create_force_rocket(logic_step, components::transform);
 }
 #endif

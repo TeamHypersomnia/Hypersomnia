@@ -91,7 +91,7 @@ namespace test_scenes {
 
 		//const auto backpack = prefabs::create_sample_backpack(step, vec2(100, -150));
 
-		//const auto rifle2 = prefabs::create_sample_bilmer2000(step, vec2(100, -500 + 50),
+		//const auto rifle2 = prefabs::create_sample_rifle(step, vec2(100, -500 + 50),
 		//	prefabs::create_sample_magazine(step, vec2(100, -650), false ? "10" : "0.3",
 		//		prefabs::create_cyan_charge(step, vec2(0, 0), false ? 1000 : 5)));
 		
@@ -102,11 +102,11 @@ namespace test_scenes {
 		//prefabs::create_force_rocket(step, { 100, 100 });
 		//prefabs::create_force_rocket(step, { 200, 100 });
 
-		//prefabs::create_kek9(step, vec2(300, -500 + 50));
+		//prefabs::create_sample_rifle(step, vec2(300, -500 + 50));
 		//
-		//prefabs::create_kek9(step, vec2(100, -500),
-		//	prefabs::create_small_magazine(step, vec2(100, -650), "0.4",
-		//		prefabs::create_pink_charge(step, vec2(0, 0), 30)));
+		//prefabs::create_sample_rifle(step, vec2(100, -500),
+		//	prefabs::create_sample_magazine(step, vec2(100, -650), "0.4",
+		//		prefabs::create_cyan_charge(step, vec2(0, 0), 30)));
 
 		//perform_transfer({ backpack, character(0)[slot_function::SHOULDER] }, step);
 
@@ -115,7 +115,7 @@ namespace test_scenes {
 		//		prefabs::create_cyan_charge(step, vec2(0, 0), false ? 1000 : 30)));
 		//
 		//
-		//prefabs::create_submachine(step, vec2(100, -700),
+		//prefabs::create_sample_rifle(step, vec2(100, -700),
 		//	prefabs::create_sample_magazine(step, vec2(100, -650), true ? "10" : "0.3",
 		//		prefabs::create_cyan_charge(step, vec2(0, 0), true ? 1000 : 30)));
 

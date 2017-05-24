@@ -166,10 +166,10 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 
 					if (ammo_info.total_charges < cued_count) {
 						sound_effect_input in;
-						in.effect.id = assets::sound_buffer_id::LOW_AMMO_CUE;
+						in.effect = gun.low_ammo_cue_sound;
 
 						if (ammo_info.total_charges == cued_count - 1) {
-							in.effect.modifier.gain = 0.65f;
+							in.effect.modifier.gain *= 0.65f;
 						}
 
 						in.direct_listener = owning_capability;
