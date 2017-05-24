@@ -133,7 +133,7 @@ void viewing_session::control_gui_and_remove_fetched_events(
 }
 
 void viewing_session::control_and_remove_fetched_intents(game_intent_vector& intents) {
-	erase_remove(intents, [&](const game_intent& intent) {
+	erase_if(intents, [&](const game_intent& intent) {
 		bool fetch = false;
 
 		if (intent.intent == intent_type::CLEAR_DEBUG_LINES) {

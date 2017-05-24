@@ -13,6 +13,7 @@
 
 #include "augs/graphics/renderer.h"
 #include "augs/templates/container_templates.h"
+#include "augs/templates/to_array.h"
 #include "application/config_structs/debug_drawing_settings.h"
 
 #define FRICTION_FIELDS_COLLIDE 0
@@ -118,18 +119,19 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 					friction_connection connection(new_owner);
 					connection.fixtures_connected = 1;
 
-					if (found_in(grounds, new_owner)) {
-						auto found = find_in(grounds, new_owner);
-						 LOG("Incr: %x", new_owner);
+					const auto found = find_in(grounds, new_owner);
+
+					if (found != grounds.end()) {
+						LOG("Incr: %x", new_owner);
 
 						connection.fixtures_connected = (*found).fixtures_connected + 1;
 						grounds.erase(found);
 					}
 					else {
-						 LOG("Reg: %x", new_owner);
+						LOG("Reg: %x", new_owner);
 					}
 					
-					grounds.push_back(connection);
+					add_element(grounds, connection);
 
 					sys.rechoose_owner_friction_body(collider.get_owner_body());
 				}

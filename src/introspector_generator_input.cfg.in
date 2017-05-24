@@ -51,6 +51,16 @@ generated-file-format:
 			}
 		}
 
+		template <class F, class First, class Second, class... Instances>
+		static void introspect_body(
+			const std::pair<First, Second>* const,
+			F f,
+			Instances&&... _t_
+		) {
+			FIELD(first);
+			FIELD(second);
+		}
+
 		template <class F, class... Types, class... Instances>
 		static void introspect_body(
 			const std::tuple<Types...>* const,

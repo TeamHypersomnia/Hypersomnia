@@ -1,32 +1,53 @@
 #pragma once
 #include <algorithm>
-#include <vector>
-#include <set>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
+#include <type_traits>
+#include "augs/templates/container_traits.h"
+#include "augs/templates/conditional_call.h"
 
-template <typename ContainerT, typename PredicateT >
-void erase_if(ContainerT& items, const PredicateT& predicate) {
-	for (auto it = items.begin(); it != items.end(); ) {
-		if (predicate(*it)) it = items.erase(it);
-		else ++it;
+template <typename Container, typename T>
+void erase_if(Container& v, const T& l, std::enable_if_t<!can_access_data_v<Container>>* dummy = nullptr) {
+	for (auto it = v.begin(); it != v.end(); ) {
+		if (l(*it)) {
+			it = v.erase(it);
+		}
+		else {
+			++it;
+		}
 	}
 };
 
-template <class Container, class... T>
-void add_element(Container& v, T&&... l) {
-	v.emplace(std::forward<T>(l)...);
-}
-
-template <class T, class... Args>
-void add_element(std::vector<T>& v, Args&&... l) {
-	v.emplace_back(std::forward<Args>(args)...);
+template <class Container, class T>
+void erase_if(Container& v, const T& l, std::enable_if_t<can_access_data_v<Container>>* dummy = nullptr) {
+	v.erase(std::remove_if(v.begin(), v.end(), l), v.end());
 }
 
 template <class Container, class T>
-void erase_remove(Container& v, const T& l) {
-	v.erase(std::remove_if(v.begin(), v.end(), l), v.end());
+void erase_element(Container& v, const T& l, std::enable_if_t<can_access_data_v<Container>>* dummy = nullptr) {
+	static_assert(!std::is_same_v<decltype(v.begin()), T>, "erase_element serves to erase keys or values, not iterators!");
+	v.erase(std::remove(v.begin(), v.end(), l), v.end());
+}
+
+template <class Container, class T>
+void erase_element(Container& v, const T& l, std::enable_if_t<!can_access_data_v<Container>>* dummy = nullptr) {
+	static_assert(!std::is_same_v<decltype(v.begin()), T>, "erase_element serves to erase keys or values, not iterators!");
+	v.erase(l);
+}
+
+template <class Container, class... T>
+void add_element(Container& v, T&&... l) {
+	augs::conditional_call<!can_access_data_v<Container>>()(
+		[&v](auto&&... args){
+			v.emplace(std::forward<decltype(args)>(args)...);
+		}, 
+		std::forward<T>(l)...
+	);
+
+	augs::conditional_call<can_access_data_v<Container>>()(
+		[&v](auto&&... args){
+			v.emplace_back(std::forward<decltype(args)>(args)...);
+		}, 
+		std::forward<T>(l)...
+	);
 }
 
 template<class Container, class T>
@@ -40,38 +61,38 @@ void sort_container(Container& v) {
 }
 
 template<class Container>
-void remove_duplicates_from_sorted(Container& v) {
+void remove_duplicates_from_sorted(Container& v, std::enable_if_t<can_access_data_v<Container>>* dummy = nullptr) {
 	v.erase(std::unique(v.begin(), v.end()), v.end());
 }
 
-template <class Container, class T>
-void erase_element(Container& v, const T& l) {
-	v.erase(std::remove(v.begin(), v.end(), l), v.end());
-}
-
-template <class T>
-void erase_element(std::unordered_set<T>& v, const T& l) {
-	v.erase(l);
-}
-
 template<class A, class B>
-void concatenate(A& a, const B& b) {
+void concatenate(A& a, const B& b, std::enable_if_t<can_access_data_v<A>>* dummy = nullptr) {
 	a.insert(a.end(), b.begin(), b.end());
 }
 
 template<class A, class B>
-void concatenate(std::set<A>& a, const std::set<B>& b) {
+void concatenate(A& a, const B& b, std::enable_if_t<!can_access_data_v<A>>* dummy = nullptr) {
 	a.insert(b.begin(), b.end());
 }
 
 template<class Container, class T>
-bool found_in(Container& v, const T& l) {
+bool found_in(Container& v, const T& l, std::enable_if_t<can_access_data_v<Container>>* dummy = nullptr) {
 	return std::find(v.begin(), v.end(), l) != v.end();
 }
 
 template<class Container, class T>
-auto find_in(Container& v, const T& l) {
+auto find_in(Container& v, const T& l, std::enable_if_t<can_access_data_v<Container>>* dummy = nullptr) {
 	return std::find(v.begin(), v.end(), l);
+}
+
+template<class Container, class T>
+bool found_in(Container& v, const T& l, std::enable_if_t<!can_access_data_v<Container>>* dummy = nullptr) {
+	return v.find(l) != v.end();
+}
+
+template<class Container, class T>
+auto find_in(Container& v, const T& l, std::enable_if_t<!can_access_data_v<Container>>* dummy = nullptr) {
+	return v.find(l);
 }
 
 template <class Container, class T>
@@ -99,25 +120,9 @@ void copy_container(const Container1& from, Container2& into) {
 	std::copy(from.begin(), from.end(), into.begin());
 } 
 
-namespace std {
-	namespace detail {
-		template <class T, std::size_t N, std::size_t... I>
-		constexpr std::array<std::remove_cv_t<T>, N>
-			to_array_impl(T(&a)[N], std::index_sequence<I...>)
-		{
-			return { { a[I]... } };
-		}
-	}
-
-	template <class T, std::size_t N>
-	constexpr std::array<std::remove_cv_t<T>, N> to_array(T(&a)[N]) {
-		return detail::to_array_impl(a, std::make_index_sequence<N>{});
-	}
-}
-
 template <class Container, class Key, class... Args>
 auto found_or_default(Container&& container, Key&& key, Args&&... default_args) {
-	const auto it = container.find(std::forward<Key>(key));
+	const auto it = find_in(std::forward<Container>(container), std::forward<Key>(key));
 
 	const bool found = it != container.end();
 	using type = std::decay_t<decltype((*it).second)>;

@@ -77,7 +77,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 				/* get visibility information */
 				auto& vision = step.transient.calculated_visibility[it];
 				
-				std::vector<components::pathfinding::pathfinding_session::navigation_vertex> undiscovered_visible;
+				std::vector<pathfinding_navigation_vertex> undiscovered_visible;
 
 				/* proceed only if the session is not degenerate */
 				if (!vision.edges.empty() && !vision.discontinuities.empty()) {
@@ -103,10 +103,10 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 					for (const auto& visible_vertex : vision.vertex_hits) {
 						bool this_visible_vertex_is_already_memorised = false;
 
-						//auto components::pathfinding::pathfinding_session::* location = 
+						//auto pathfinding_session::* location = 
 						//		pathfinding.force_touch_sensors ? 
-						//	&components::pathfinding::pathfinding_session::undiscovered_vertices :
-						//&components::pathfinding::pathfinding_session::discovered_vertices;
+						//	&pathfinding_session::undiscovered_vertices :
+						//&pathfinding_session::discovered_vertices;
 
 						for (auto& memorised : pathfinding.session().discovered_vertices) {
 							/* if a similiar discovered vertex exists */
@@ -120,7 +120,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 
 						/* save if unique */
 						if (!this_visible_vertex_is_already_memorised) {
-							components::pathfinding::pathfinding_session::navigation_vertex vert;
+							pathfinding_navigation_vertex vert;
 							vert.location = visible_vertex.second;
 							pathfinding.session().discovered_vertices.push_back(vert);
 						}
@@ -135,7 +135,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 						bool this_discontinuity_is_already_memorised = false;
 						bool this_discontinuity_is_already_discovered = false;
 
-						components::pathfinding::pathfinding_session::navigation_vertex vert;
+						pathfinding_navigation_vertex vert;
 
 						for (auto& memorised_undiscovered : pathfinding.session().undiscovered_vertices) {
 							/* if a discontinuity with the same closer vertex already exists */
@@ -249,7 +249,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 
 				/* for every undiscovered navigation point */
 				auto& undiscs = pathfinding.session().undiscovered_vertices;
-				undiscs.erase(std::remove_if(undiscs.begin(), undiscs.end(), [&](const components::pathfinding::pathfinding_session::navigation_vertex& nav){
+				undiscs.erase(std::remove_if(undiscs.begin(), undiscs.end(), [&](const pathfinding_navigation_vertex& nav){
 
 					/* if we want to force the entity to touch the sensors, we can't discard undiscovered vertices only by 
 						saying that there exists a discovered vertex (which is discovered only because it is fully visible)
@@ -380,7 +380,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 				if (!vertices.empty()) {
 					bool persistent_navpoint_found = false;
 
-					components::pathfinding::pathfinding_session::navigation_vertex current_target;
+					pathfinding_navigation_vertex current_target;
 
 					if (pathfinding.force_persistent_navpoints) {
 						if (pathfinding.session().persistent_navpoint_set) {
@@ -400,8 +400,8 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 						vec2 unit_vel = body.velocity();
 						unit_vel.normalize();
 						
-						auto local_minimum_predicate = [&pathfinding, &transform, unit_vel](const components::pathfinding::pathfinding_session::navigation_vertex& a,
-							const components::pathfinding::pathfinding_session::navigation_vertex& b) {
+						auto local_minimum_predicate = [&pathfinding, &transform, unit_vel](const pathfinding_navigation_vertex& a,
+							const pathfinding_navigation_vertex& b) {
 
 							/* if we're exploring, we have no target in the first session */
 							if (pathfinding.is_exploring && pathfinding.session_stack.size() == 1) {
@@ -434,7 +434,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 						bool first_priority_navpoint_found = false;
 
 						//if (pathfinding.first_priority_navpoint_check) {
-						//	std::vector<components::pathfinding::pathfinding_session::navigation_vertex> first_priority_candidates;
+						//	std::vector<pathfinding_navigation_vertex> first_priority_candidates;
 						//
 						//	for (auto& v : vertices) {
 						//		try {
@@ -538,7 +538,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 					else {
 						if (pathfinding.enable_backtracking) {
 							vec2 new_target = pathfinding.session().navigate_to;
-							pathfinding.session_stack.push_back(components::pathfinding::pathfinding_session());
+							pathfinding.session_stack.push_back(pathfinding_session());
 							pathfinding.session().target = new_target;
 							pathfinding.session().temporary_ignore_discontinuities_shorter_than = pathfinding.starting_ignore_discontinuities_shorter_than;
 						}

@@ -310,7 +310,7 @@ void gui_element_system::control_gui(
 	rect_world.build_tree_data_into_context(context, root_location);
 
 	if (gui_look_enabled) {
-		erase_remove(events, [&](const augs::window::event::change change) {
+		erase_if(events, [&](const augs::window::event::change change) {
 			bool fetched = false;
 
 			const auto held_rect = context._dynamic_cast<item_button_in_item>(rect_world.rect_held_by_lmb);

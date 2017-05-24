@@ -13,7 +13,7 @@ void vertically_flying_number_system::add(const number::input new_in) {
 void vertically_flying_number_system::advance(const augs::delta dt) {
 	global_time_seconds += dt.in_seconds();
 
-	erase_remove(
+	erase_if(
 		numbers,
 		[this](const number& n) {
 			return (global_time_seconds - n.time_of_occurence_seconds) > n.in.maximum_duration_seconds;

@@ -69,7 +69,7 @@ struct put_all_components_into {
 		components::rotation_copying,
 		components::movement,
 		components::particles_existence,
-		//components::pathfinding,
+		components::pathfinding,
 		components::rigid_body,
 		components::render,
 		components::transform,
@@ -110,10 +110,6 @@ struct put_all_components_into {
 
 template<template<typename...> class List, class... prepend>
 using put_all_components_into_t = typename put_all_components_into<List, prepend...>::type;
-
-typedef type_list<
-	components::pathfinding
-> disabled_components;
 
 template<class... Types>
 struct type_count {

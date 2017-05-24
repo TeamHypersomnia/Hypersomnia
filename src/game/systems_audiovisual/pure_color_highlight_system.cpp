@@ -27,7 +27,7 @@ void pure_color_highlight_system::add(const highlight::input new_in) {
 void pure_color_highlight_system::advance(const augs::delta dt) {
 	global_time_seconds += dt.in_seconds();
 	
-	erase_remove(
+	erase_if(
 		highlights, 
 		[this](const highlight& h) {
 			return (global_time_seconds - h.time_of_occurence_seconds) > h.in.maximum_duration_seconds;

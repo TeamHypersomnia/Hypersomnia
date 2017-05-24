@@ -146,7 +146,7 @@ void thunder_system::advance(
 		}
 	}
 
-	erase_remove(thunders, [&](const thunder& t) {
+	erase_if(thunders, [&](const thunder& t) {
 		return t.num_active_branches == 0 && t.in.max_all_spawned_branches == 0;
 	});
 }

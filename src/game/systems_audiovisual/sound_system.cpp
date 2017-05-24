@@ -117,7 +117,7 @@ void sound_system::play_nearby_sound_existences(
 		}
 	);
 
-	erase_remove(fading_sources, [dt](augs::sound_source& source) {
+	erase_if(fading_sources, [dt](augs::sound_source& source) {
 		const auto new_gain = source.get_gain() - dt.in_seconds()*3.f;
 		const auto new_pitch = source.get_pitch() - dt.in_seconds()/3.f;
 

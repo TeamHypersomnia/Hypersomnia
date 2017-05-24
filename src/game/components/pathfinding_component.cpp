@@ -1,7 +1,7 @@
 #include "pathfinding_component.h"
 
 namespace components {
-	pathfinding::pathfinding_session& pathfinding::session() {
+	pathfinding_session& pathfinding::session() {
 		return session_stack.back();
 	}
 
@@ -37,7 +37,7 @@ namespace components {
 		session().persistent_navpoint_set = false;
 	}
 
-	const pathfinding::pathfinding_session& pathfinding::session() const {
+	const pathfinding_session& pathfinding::session() const {
 		return session_stack.back();
 	}
 

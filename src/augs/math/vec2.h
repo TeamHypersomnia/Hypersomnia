@@ -127,8 +127,6 @@ namespace augs {
 
 template <class type>
 struct vec2t {
-	typedef type value_type;
-	
 	// GEN INTROSPECTOR struct vec2t class type
 	type x;
 	type y;

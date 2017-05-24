@@ -241,7 +241,7 @@ augs::constant_size_vector<entity_id, 2> basic_inventory_mixin<C, D>::get_wielde
 	const auto& self = *static_cast<const D*>(this);
 	auto result = self.get_wielded_items();
 	
-	erase_remove(
+	erase_if(
 		result, 
 		[&](const auto item) {
 			return !self.get_cosmos()[item].has<components::gun>();

@@ -13,7 +13,7 @@ void physics_system::rechoose_owner_friction_body(const entity_handle entity) {
 	auto& cosmos = entity.get_cosmos();
 	// purge of dead entities
 
-	erase_remove(special_physics.owner_friction_grounds, [&cosmos](const entity_id subject) {
+	erase_if(special_physics.owner_friction_grounds, [&cosmos](const entity_id subject) {
 		return cosmos[subject].dead();
 	});
 
@@ -23,7 +23,7 @@ void physics_system::rechoose_owner_friction_body(const entity_handle entity) {
 		// cycle guard
 		// remove friction grounds whom I do own myself
 
-		erase_remove(feasible_grounds, [this, entity, &cosmos](const entity_id subject) {
+		erase_if(feasible_grounds, [this, entity, &cosmos](const entity_id subject) {
 			return are_connected_by_friction(cosmos[subject], entity);
 		});
 	}

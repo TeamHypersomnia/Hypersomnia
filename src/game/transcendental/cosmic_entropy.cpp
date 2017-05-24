@@ -12,7 +12,7 @@ void basic_cosmic_entropy<key>::override_transfers_leaving_other_entities(
 	const cosmos& cosm,
 	std::vector<basic_item_slot_transfer_request<key>> new_transfers
 ) {
-	erase_remove(transfer_requests, [&](const basic_item_slot_transfer_request<key> o) {
+	erase_if(transfer_requests, [&](const basic_item_slot_transfer_request<key> o) {
 		const auto overridden_transfer = match_transfer_capabilities(cosm, cosm.deguidize(o));
 		
 		ensure(overridden_transfer.is_legal());

@@ -85,6 +85,14 @@ namespace test_scenes {
 				new_character.get<components::attitude>().parties = party_category::METROPOLIS_CITIZEN;
 				new_character.get<components::attitude>().hostile_parties = party_category::RESISTANCE_CITIZEN;
 			}
+
+			auto& sentience = new_character.get<components::sentience>();
+
+			sentience.spells[assets::spell_id::HASTE] = spell_instance_data();
+			sentience.spells[assets::spell_id::ELECTRIC_TRIAD] = spell_instance_data();
+			sentience.spells[assets::spell_id::FURY_OF_THE_AEONS] = spell_instance_data();
+			sentience.spells[assets::spell_id::ULTIMATE_WRATH_OF_THE_AEONS] = spell_instance_data();
+			sentience.spells[assets::spell_id::ELECTRIC_SHIELD] = spell_instance_data();
 		}
 
 		//const auto amplifier = prefabs::create_amplifier_arm(step, vec2(-300, -500 + 50));

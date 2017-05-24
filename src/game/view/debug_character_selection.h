@@ -36,7 +36,7 @@ struct debug_character_selection {
 	) {
 		using namespace augs::window::event::keys;
 
-		erase_remove(
+		erase_if(
 			changes,
 			[this](const auto& c) {
 			state.apply(c);

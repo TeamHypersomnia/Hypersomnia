@@ -366,14 +366,14 @@ void director_setup::advance_player_by_single_step(viewing_session& session) {
 				intents_written_to = new_intents;
 			}
 			else if (recording_replacement_mode == recording_replacement_type::ONLY_KEYS) {
-				erase_remove(intents_written_to, key_remover);
-				erase_remove(new_intents, mouse_remover);
+				erase_if(intents_written_to, key_remover);
+				erase_if(new_intents, mouse_remover);
 
 				concatenate(intents_written_to, new_intents);
 			}
 			else if (recording_replacement_mode == recording_replacement_type::ONLY_MOUSE) {
-				erase_remove(intents_written_to, mouse_remover);
-				erase_remove(new_intents, key_remover);
+				erase_if(intents_written_to, mouse_remover);
+				erase_if(new_intents, key_remover);
 
 				concatenate(intents_written_to, new_intents);
 			}

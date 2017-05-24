@@ -31,7 +31,7 @@ void control_tweaker(augs::machine_entropy::local_type& in) {
 	const auto magnify_key = key::RCTRL;
 	const auto enable_key = key::RSHIFT;
 
-	erase_remove(in, [&](const augs::window::event::change ch) {
+	erase_if(in, [&](const augs::window::event::change ch) {
 		st.apply(ch);
 
 		bool fetched = false;

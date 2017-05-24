@@ -31,7 +31,7 @@ void exploding_ring_system::advance(
 
 	const auto& manager = get_assets_manager();
 
-	erase_remove(rings, [&](ring& e) {
+	erase_if(rings, [&](ring& e) {
 		auto& r = e.in;
 
 		const auto secs_remaining = r.maximum_duration_seconds - (global_time_seconds - e.time_of_occurence_seconds);

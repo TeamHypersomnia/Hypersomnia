@@ -295,7 +295,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 				}
 			}
 
-			erase_remove(endpoints, [this](endpoint& e) {
+			erase_if(endpoints, [this](endpoint& e) {
 				if (choose_server(e.addr).has_timed_out(e.addr, hypersomnia.get_fixed_delta().in_milliseconds())) {
 					LOG("%x has timed out. Disconnecting.", e.nick_and_ip());
 					deinit_endpoint(e);

@@ -77,6 +77,12 @@ namespace augs  {
 			raw[count++] = obj;
 		}
 
+		template <class... Args>
+		void emplace_back(Args&&... args) {
+			ensure(count < capacity());
+			raw[count++] = T(std::forward<Args>(args)...);
+		}
+
 		T& operator[](const size_t i) {
 			return raw[i];
 		}

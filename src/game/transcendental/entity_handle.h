@@ -59,7 +59,7 @@ class EMPTY_BASES basic_entity_handle :
 {
 	template <typename T>
 	static void check_component_type() {
-		static_assert(is_one_of_list_v<T, concat_lists_t<disabled_components, put_all_components_into_t<type_list>>>, "Unknown component type!");
+		static_assert(is_one_of_list_v<T, put_all_components_into_t<type_list>>, "Unknown component type!");
 	}
 
 public:
@@ -109,7 +109,7 @@ private:
 	};
 
 	template <class T>
-	struct component_or_synchronizer_or_disabled<T, std::enable_if_t<is_component_synchronized<T> && !is_one_of_list_v<T, disabled_components>>> {
+	struct component_or_synchronizer_or_disabled<T, std::enable_if_t<is_component_synchronized<T>>> {
 		typedef component_synchronizer<is_const, T> return_type;
 
 		basic_entity_handle<is_const> h;
@@ -129,32 +129,6 @@ private:
 		void add(const T& t) const {
 			h.allocator::add(t);
 			h.get_cosmos().complete_reinference(h);
-		}
-	};
-
-	template <class T>
-	struct component_or_synchronizer_or_disabled<T, std::enable_if_t<is_one_of_list_v<T, disabled_components>>> {
-		typedef maybe_const_ref_t<is_const, T> return_type;
-		typedef maybe_const_ptr_t<is_const, T> return_ptr;
-
-		basic_entity_handle<is_const> h;
-
-		return_ptr find() const {
-			return nullptr;
-		}
-
-		bool has() const {
-			return false;
-		}
-
-		return_type get() const {
-			thread_local T t;
-			t = T();
-			return t;
-		}
-
-		void add(const T& t) const {
-
 		}
 	};
 

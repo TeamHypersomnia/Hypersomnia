@@ -190,7 +190,7 @@ namespace augs {
 
 				size_t idx = 0;
 
-				erase_remove(output, [&characters_to_skip, &idx](auto){ return characters_to_skip[idx++] != 0u; });
+				erase_if(output, [&characters_to_skip, &idx](auto){ return characters_to_skip[idx++] != 0u; });
 
 				return output;
 			}

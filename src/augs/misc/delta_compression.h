@@ -62,6 +62,10 @@ namespace augs {
 		std::vector<offset_type> changed_offsets;
 	
 	public:
+		offset_type get_first_divergence_pos() const {
+			return changed_offsets.at(0);
+		}
+
 		const auto& get_changed_offsets() const {
 			return changed_offsets;
 		}
@@ -158,6 +162,11 @@ namespace augs {
 	class object_delta<T, std::enable_if_t<!is_memcpy_safe_v<T>>> {
 		augs::stream new_content;
 	public:
+		std::size_t get_first_divergence_pos() const {
+			ensure(false && "not implemented");
+			return 0xdeadbeef;
+		}
+
 		bool has_changed() const {
 			return new_content.size() > 0;
 		}

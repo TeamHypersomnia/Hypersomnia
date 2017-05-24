@@ -74,7 +74,7 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 	thread_local randomization rng;
 
 	const auto dead_particles_remover = [](auto& container) {
-		erase_remove(container, [](const auto& a) { return a.is_dead(); });
+		erase_if(container, [](const auto& a) { return a.is_dead(); });
 	};
 
 	for (auto& particle_layer : general_particles) {

@@ -6,60 +6,67 @@
 
 class pathfinding_system;
 
+struct pathfinding_navigation_hint {
+	// GEN INTROSPECTOR struct pathfinding_navigation_hint
+	bool enabled = false;
+	std::array<padding_byte, 3> pad;
+	vec2 origin;
+	vec2 target;
+	// END GEN INTROSPECTOR
+};
+
+struct pathfinding_navigation_vertex {
+	// GEN INTROSPECTOR struct pathfinding_navigation_vertex
+	vec2 location;
+	vec2 sensor;
+	// END GEN INTROSPECTOR
+};
+
+struct pathfinding_session {
+	// GEN INTROSPECTOR struct pathfinding_session
+	vec2 target;
+	vec2 navigate_to;
+
+	bool persistent_navpoint_set = false;
+	std::array<padding_byte, 3> pad;
+	pathfinding_navigation_vertex persistent_navpoint;
+
+	std::vector<pathfinding_navigation_vertex> discovered_vertices;
+	std::vector<pathfinding_navigation_vertex> undiscovered_vertices;
+	std::vector<pathfinding_navigation_vertex> undiscovered_visible;
+
+	float temporary_ignore_discontinuities_shorter_than = 0.f;
+	// END GEN INTROSPECTOR
+};
+
 namespace components {
-	struct pathfinding  {
-		typedef std::pair<vec2, vec2> edge;
+	struct pathfinding {
+		static constexpr bool allow_nontriviality = true;
 
-		struct navigation_hint {
-			bool enabled = false;
-			vec2 origin, target;
-		};
-
-		struct pathfinding_session {
-			struct navigation_vertex {
-				vec2 location;
-				vec2 sensor;
-			};
-
-			vec2 target;
-			vec2 navigate_to;
-
-			bool persistent_navpoint_set = false;
-			navigation_vertex persistent_navpoint;
-
-			std::vector<navigation_vertex> discovered_vertices;
-			std::vector<navigation_vertex> undiscovered_vertices;
-			std::vector<navigation_vertex> undiscovered_visible;
-
-			float temporary_ignore_discontinuities_shorter_than = 0.f;
-		};
-
-
+		// GEN INTROSPECTOR struct components::pathfinding
 		float target_offset = 0.f;
 		float rotate_navpoints = 0.f;
 		float distance_navpoint_hit = 0.f;
 		float starting_ignore_discontinuities_shorter_than = 100.f;
 
+		b2Filter filter;
 		bool force_persistent_navpoints = false;
 		bool force_touch_sensors = false;
+
 		bool enable_session_rollbacks = true;
 		bool mark_touched_as_discovered = false;
+		bool is_exploring = false;
+		bool enable_backtracking = true;
+		
+		bool favor_velocity_parallellness = false;
+		std::array<padding_byte, 3> pad;
 
 		vec2 eye_offset;
 
-		navigation_hint custom_exploration_hint;
+		pathfinding_navigation_hint custom_exploration_hint;
 
-		bool is_exploring = false;
-		std::vector <pathfinding_session> session_stack;
-
-		b2Filter filter;
-
-		bool enable_backtracking = true;
-
-		/* only in the context of exploration
-		will pick vertices that are the most parallell with the velocity
-		*/
-		bool favor_velocity_parallellness = false;
+		std::vector<pathfinding_session> session_stack;
+		// END GEN INTROSPECTOR
 
 		pathfinding_session& session();
 		void start_pathfinding(vec2 target);

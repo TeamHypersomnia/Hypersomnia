@@ -1,12 +1,11 @@
 #pragma once
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
+#include <type_traits>
+#include "augs/ensure.h"
 
 #include "augs/templates/memcpy_safety.h"
 #include "augs/templates/type_matching_and_indexing.h"
-#include "augs/ensure.h"
 #include "augs/templates/introspect.h"
+#include "augs/templates/container_traits.h"
 
 namespace augs {
 	class output_stream_reserver;
@@ -86,17 +85,19 @@ namespace augs {
 	}
 	
 	/*
-		Explanation of read/write overloads:
-
-		augs::read/augs::write
+		Explanation of augs::read/augs::write overloads:
 
 		if the type has augs::read_object and augs::write_object overloads
 			call these overloads
 		else if the type is trivial and the stream is a native binary stream
 			bytewise read/write via std::memcpy
+		else if the type is a container with elements contiguous in memory
+			call special augs::read_n and augs::write_n that offer potential optimization
+		else if the type is other container
+			call augs::read and augs::write upon all contained objects
 		else
 			assert that the type has introspectors
-			and call augs::read and augs::write upon all members
+			call augs::read and augs::write upon all members
 	*/
 
 	template<class Archive, class Serialized>
@@ -159,7 +160,11 @@ namespace augs {
 	void read(
 		Archive& ar,
 		Serialized& storage,
-		const std::enable_if_t<!has_io_overloads_v<Archive, Serialized> && !is_byte_io_safe_v<Archive, Serialized>>* const dummy = nullptr
+		const std::enable_if_t<
+			!has_io_overloads_v<Archive, Serialized> 
+			&& !is_byte_io_safe_v<Archive, Serialized>
+			&& !has_value_type_v<Serialized>
+		>* const dummy = nullptr
 	) {
 		static_assert(has_introspect_v<Serialized>, "Attempt to read a type in a non-bytesafe context without i/o overloads and without introspectors!");
 
@@ -175,7 +180,11 @@ namespace augs {
 	void write(
 		Archive& ar,
 		const Serialized& storage,
-		const std::enable_if_t<!has_io_overloads_v<Archive, Serialized> && !is_byte_io_safe_v<Archive, Serialized>>* const dummy = nullptr
+		const std::enable_if_t<
+			!has_io_overloads_v<Archive, Serialized> 
+			&& !is_byte_io_safe_v<Archive, Serialized>
+			&& !has_value_type_v<Serialized>
+		>* const dummy = nullptr
 	) {
 		static_assert(has_introspect_v<Serialized>, "Attempt to write a type in a non-bytesafe context without i/o overloads and without introspectors!");
 
@@ -230,186 +239,45 @@ namespace augs {
 			write(ar, storage[i]);
 		}
 	}
-	
-	template <class Archive, class Serialized, class vector_size_type = std::size_t>
+
+	/*
+		Special i/o for containers whose memory is contiguous (e.g. strings and vectors)
+		We call read_n/write_n that can optimize for trivial elements continuous in memory
+	*/
+
+	template <class Archive, class Container, class container_size_type = std::size_t>
 	void read_object(
 		Archive& ar, 
-		std::vector<Serialized>& storage, 
-		vector_size_type = vector_size_type()
+		Container& storage, 
+		container_size_type = container_size_type(),
+		const std::enable_if_t<can_access_data_v<Container>>* const dummy = nullptr
 	) {
-		vector_size_type s;
+		container_size_type s;
 		read(ar, s);
 
 		storage.resize(s);
 		read_n(ar, storage.data(), storage.size());
 	}
 
-	template<class Archive, class Serialized, class vector_size_type = std::size_t>
+	template<class Archive, class Container, class container_size_type = std::size_t>
 	void write_object(
 		Archive& ar, 
-		const std::vector<Serialized>& storage, 
-		vector_size_type = vector_size_type()
-	) {
-		ensure(storage.size() <= std::numeric_limits<vector_size_type>::max());
-
-		write(ar, static_cast<vector_size_type>(storage.size()));
-		write_n(ar, storage.data(), storage.size());
-	}
-
-	template <class Serialized>
-	void reserve_num_elements(Serialized& container, const size_t n) {
-		container.reserve(n);
-	}
-
-	template <class Key, class Value>
-	void reserve_num_elements(std::map<Key, Value>& container, const size_t) {
-	
-	}
-
-	template<class Archive, class Container, class container_size_type = std::size_t>
-	void read_unary_container(
-		Archive& ar,
-		Container& storage,
-		container_size_type = container_size_type()
-	) {
-		container_size_type s;
-
-		read(ar, s);
-
-		storage.reserve(s);
-
-		while (s--) {
-			const auto it = storage.emplace({});
-			read(ar, (*it).second);
-		}
-	}
-
-	template<class Archive, class Container, class container_size_type = std::size_t>
-	void write_unary_container(
-		Archive& ar,
-		const Container& storage,
-		container_size_type = container_size_type()
+		const Container& storage, 
+		container_size_type = container_size_type(),
+		const std::enable_if_t<can_access_data_v<Container>>* const dummy = nullptr
 	) {
 		ensure(storage.size() <= std::numeric_limits<container_size_type>::max());
 
 		write(ar, static_cast<container_size_type>(storage.size()));
-
-		for (const auto& obj : storage) {
-			write(ar, obj);
-		}
+		write_n(ar, storage.data(), storage.size());
 	}
 
-	template<class Archive, template <class...> class Container, class Key, class Value, class map_size_type = std::size_t>
-	void read_associative_container(
-		Archive& ar,
-		Container<Key, Value>& storage,
-		map_size_type = map_size_type()
-	) {
-		map_size_type s;
+	/*
+		Utility functions
+	*/
 
-		read(ar, s);
-
-		reserve_num_elements(storage, s);
-
-		while (s--) {
-			Key key;
-
-			read(ar, key);
-			read(ar, storage[key]);
-		}
-	}
-
-	template<class Archive, template <class...> class Container, class Key, class Value, class map_size_type = std::size_t>
-	void write_associative_container(
-		Archive& ar,
-		const Container<Key, Value>& storage,
-		map_size_type = map_size_type()
-	) {
-		ensure(storage.size() <= std::numeric_limits<map_size_type>::max());
-
-		write(ar, static_cast<map_size_type>(storage.size()));
-
-		for (const auto& obj : storage) {
-			write(ar, obj.first);
-			write(ar, obj.second);
-		}
-	}
-
-	template<class Archive, class Value, class map_size_type = std::size_t>
-	void write_object(
-		Archive& ar,
-		const std::unordered_set<Value>& storage,
-		map_size_type = map_size_type()
-	) {
-		write_unary_container(ar, storage, map_size_type());
-	}
-
-	template<class Archive, class Value, class map_size_type = std::size_t>
-	void read_object(
-		Archive& ar,
-		std::unordered_set<Value>& storage,
-		map_size_type = map_size_type()
-	) {
-		read_unary_container(ar, storage, map_size_type());
-	}
-
-	template<class Archive, class Key, class Value, class map_size_type = std::size_t>
-	void write_object(
-		Archive& ar,
-		const std::map<Key, Value>& storage,
-		map_size_type = map_size_type()
-	) {
-		write_associative_container<Archive, std::map, Key, Value, map_size_type>(ar, storage);
-	}
-
-	template<class Archive, class Key, class Value, class map_size_type = std::size_t>
-	void read_object(
-		Archive& ar,
-		std::map<Key, Value>& storage,
-		map_size_type = map_size_type()
-	) {
-		read_associative_container<Archive, std::map, Key, Value, map_size_type>(ar, storage);
-	}
-
-	template<class Archive, class Key, class Value, class map_size_type = std::size_t>
-	void write_object(
-		Archive& ar,
-		const std::unordered_map<Key, Value>& storage,
-		map_size_type = map_size_type()
-	) {
-		write_associative_container<Archive, std::unordered_map, Key, Value, map_size_type>(ar, storage);
-	}
-
-	template<class Archive, class Key, class Value, class map_size_type = std::size_t>
-	void read_object(
-		Archive& ar,
-		std::unordered_map<Key, Value>& storage,
-		map_size_type = map_size_type()
-	) {
-		read_associative_container<Archive, std::unordered_map, Key, Value, map_size_type>(ar, storage);
-	}
-
-	template<class Archive, class string_element_type, class string_size_type = std::size_t>
-	void read_object(Archive& ar, std::basic_string<string_element_type>& storage, string_size_type = string_size_type()) {
-		string_size_type s;
-
-		read(ar, s);
-
-		storage.resize(s);
-
-		read_n(ar, &storage[0], storage.size());
-	}
-
-	template<class Archive, class string_element_type, class string_size_type = std::size_t>
-	void write_object(Archive& ar, const std::basic_string<string_element_type>& storage, string_size_type = string_size_type()) {
-		ensure(storage.size() <= std::numeric_limits<string_size_type>::max());
-
-		write(ar, static_cast<string_size_type>(storage.size()));
-		write_n(ar, &storage[0], storage.size());
-	}
-
-	template<class Archive, class Serialized, class...>
-	void read_with_capacity(Archive& ar, std::vector<Serialized>& storage) {
+	template<class Archive, class Container, class...>
+	void read_with_capacity(Archive& ar, Container& storage) {
 		size_t c;
 		size_t s;
 
@@ -422,12 +290,62 @@ namespace augs {
 		read_n(ar, storage.data(), storage.size());
 	}
 
-	template<class Archive, class Serialized>
-	void write_with_capacity(Archive& ar, const std::vector<Serialized>& storage) {
+	template<class Archive, class Container>
+	void write_with_capacity(Archive& ar, const Container& storage) {
 		write(ar, storage.capacity());
 		write(ar, storage.size());
 
 		write_n(ar, storage.data(), storage.size());
+	}
+
+	/*
+		General i/o for containers without memory contiguity of elements
+	*/
+
+	template <class Serialized>
+	void reserve_num_elements(Serialized& container, const size_t n) {
+		container.reserve(n);
+	}
+
+	template <class Key, class Value>
+	void reserve_num_elements(std::map<Key, Value>& container, const size_t) {
+
+	}
+
+	template <class Archive, class Container, class container_size_type = std::size_t>
+	void read_object(
+		Archive& ar,
+		Container& storage,
+		container_size_type = container_size_type(),
+		const std::enable_if_t<!can_access_data_v<Container> && has_value_type_v<Container>>* const dummy = nullptr
+	) {
+		container_size_type s;
+
+		read(ar, s);
+
+		reserve_num_elements(storage, s);
+
+		while (s--) {
+			typename Container::value_type val;
+			read(ar, val);
+			storage.emplace(std::move(val));
+		}
+	}
+
+	template<class Archive, class Container, class container_size_type = std::size_t>
+	void write_object(
+		Archive& ar,
+		const Container& storage,
+		container_size_type = container_size_type(),
+		const std::enable_if_t<!can_access_data_v<Container> && has_value_type_v<Container>>* const dummy = nullptr
+	) {
+		ensure(storage.size() <= std::numeric_limits<container_size_type>::max());
+
+		write(ar, static_cast<container_size_type>(storage.size()));
+
+		for (const auto& obj : storage) {
+			write(ar, obj);
+		}
 	}
 
 	template<class Archive, size_t count>
