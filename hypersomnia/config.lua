@@ -126,7 +126,7 @@ config_table = {
 	alternative_port = 13373,
 	
 	-- Client-chosen nickname of the controlled character.
-	nickname = "Newborn",
+	nickname = "Sentinel",
 
 	-- Client-chosen nickname of the second controlled character used in launch_mode.TWO_CLIENTS_AND_SERVER.
 	debug_second_nickname = "Billan",

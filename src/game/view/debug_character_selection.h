@@ -25,6 +25,7 @@ struct debug_character_selection {
 			}
 
 			characters.push_back(character.get_id());
+			++i;
 		}
 
 		select_character(characters[0]);

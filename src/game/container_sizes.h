@@ -19,8 +19,6 @@ constexpr std::size_t CONVEX_POLY_VERTEX_COUNT = b2_maxPolygonVertices;
 constexpr std::size_t ONLY_PICK_THESE_ITEMS_COUNT = 20;
 constexpr std::size_t MOVEMENT_RESPONSE_RECEIVERS_COUNT = 2;
 
-constexpr std::size_t ENTITY_NAME_LENGTH = 50;
-
 constexpr std::size_t RENDERING_POLYGON_INDEX_COUNT = 20;
 constexpr std::size_t RENDERING_POLYGON_TRIANGULATED_VERTEX_COUNT = 20;
 

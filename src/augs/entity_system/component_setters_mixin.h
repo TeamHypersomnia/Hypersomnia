@@ -9,14 +9,14 @@ namespace augs {
 			bool _is_const = is_const,
 			class = std::enable_if_t<!_is_const>
 		>
-		decltype(auto) set(const component& c) const {
+		void set(const component& c) const {
 			auto& self = *static_cast<const derived_entity_handle*>(this);
 			
 			if (self.template has<component>()) {
-				return self.template get<component>() = c;
+				self.template get<component>() = c;
 			}
 			else {
-				return self.add(c);
+				self.add(c);
 			}
 		}
 

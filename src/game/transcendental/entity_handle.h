@@ -199,7 +199,7 @@ public:
 		raw_id(raw_id), 
 		owner(owner) 
 #if ENTITY_HANDLE_HAS_DEBUG_NAME_REFERENCE
-		, debug_name(get_name())
+		, debug_name(alive() ? get_name() : L"Dead entity")
 #endif
 	{
 
@@ -343,24 +343,24 @@ public:
 			}
 		);
 	}
-
-	auto get_name() const {
-		return get<components::name>().get_value();
-	}
-
-	void set_name(const entity_name_type& new_name) const {
-		get<components::name>().set_value(new_name);
-	}
 	
-	template<bool _is_const = is_const, class = std::enable_if_t<_is_const>>
-	auto get_meta_of_name() const {
-		const auto& descs = get_cosmos().significant.meta.global.names_meta;
-		return found_or_default(descs, get<components::name>().get_raw_component());
+	auto& get_meta_of_name() const {
+		return get_cosmos()
+			.get_name_metas()
+				.get_meta(
+					get<components::name>()
+						.get_name_id()
+				)
+		;
 	}
 
-	template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
-	auto& get_meta_of_name() const {
-		return get_cosmos().significant.meta.global.names_meta[get<components::name>().get_raw_component()];
+	const auto& get_name() const {
+		return get_meta_of_name().get_name();
+	}
+
+	void set_name(const entity_name_type& new_name) const {	
+		const auto new_or_existing_id = get_cosmos().get_name_metas().make_id_for(new_name);
+		get<components::name>().set_name_id(new_or_existing_id);
 	}
 
 	bool is_inferred_state_activated() const {

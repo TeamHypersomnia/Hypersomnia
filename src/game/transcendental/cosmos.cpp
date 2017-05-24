@@ -236,33 +236,29 @@ entity_handle cosmos::allocate_new_entity() {
 
 	auto pooled_object_raw_id = get_aggregate_pool().allocate();
 
-	return entity_handle(*this, pooled_object_raw_id, debug_name);
+	const auto handle = entity_handle(*this, pooled_object_raw_id, debug_name);
+	handle += components::guid();
+	handle += components::name();
+	return handle;
 }
 
 entity_handle cosmos::create_entity(const std::string& name) {
 	return create_entity(to_wstring(name));
 }
 
-entity_handle cosmos::create_entity(const std::wstring& name) {
+entity_handle cosmos::create_entity(const std::wstring& name_str) {
 	auto new_entity = allocate_new_entity();
-	new_entity += components::guid();
-	
-	components::name new_name;
-	new_name.set_value(name);
-	new_entity += new_name;
+	new_entity.set_name(name_str);
 
 #if COSMOS_TRACKS_GUIDS
 	assign_next_guid(new_entity);
 #endif
-	//ensure(new_entity.get_id().indirection_index != 37046);
-	//ensure(new_entity.get_id().indirection_index != 36985);
 	return new_entity;
 }
 
 #if COSMOS_TRACKS_GUIDS
 entity_handle cosmos::create_entity_with_specific_guid(const entity_guid specific_guid) {
 	const auto new_entity = allocate_new_entity();
-	new_entity += components::guid();
 
 	guid_to_id[specific_guid] = new_entity;
 	new_entity.get<components::guid>().value = specific_guid;
@@ -282,9 +278,10 @@ entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
 		&& "Cloning of entities with child component is not yet supported"
 	);
 
-	auto new_entity = allocate_new_entity();
+	const auto new_entity = allocate_new_entity();
 	
 	clone_all_components_except<
+		components::guid,
 		/*
 			These components will be cloned shortly,
 			with due care to each of them.

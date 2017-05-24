@@ -14,33 +14,10 @@ namespace augs {
 
 namespace components {
 	struct name : synchronizable_component {
-	private:
 		friend struct augs::introspection_access;
 		// GEN INTROSPECTOR struct components::name
-		unsigned name_hash;
-		fixed_entity_name_type value;
+		entity_name_id name_id = 0u;
 		// END GEN INTROSPECTOR
-	public:
-		name();
-
-		bool operator==(const name&) const;
-		bool operator!=(const name&) const;
-
-		entity_name_type get_value() const;
-		void set_value(const entity_name_type&);
-
-		auto get_name_hash() const {
-			return name_hash;
-		}
-	};
-}
-
-namespace std {
-	template <>
-	struct hash<components::name> {
-		size_t operator()(const components::name& k) const {
-			return std::hash<unsigned>()(k.get_name_hash());
-		}
 	};
 }
 
@@ -50,7 +27,7 @@ class basic_name_synchronizer : public component_synchronizer_base<is_const, com
 public:
 	using component_synchronizer_base<is_const, components::name>::component_synchronizer_base;
 	
-	entity_name_type get_value() const;
+	entity_name_id get_name_id() const;
 };
 
 template<>
@@ -60,7 +37,7 @@ class component_synchronizer<false, components::name> : public basic_name_synchr
 public:
 	using basic_name_synchronizer<false>::basic_name_synchronizer;
 
-	void set_value(const entity_name_type&) const;
+	void set_name_id(const entity_name_id&) const;
 };
 
 template<>

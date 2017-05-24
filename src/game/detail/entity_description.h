@@ -10,7 +10,7 @@
 #include "game/enums/sentience_meter_type.h"
 #include "game/assets/spell_id.h"
 #include "game/components/name_component_declaration.h"
-#include "game/global_state/entity_names_meta.h"
+#include "game/global_state/entity_name_metas.h"
 
 /*
 	Example description:

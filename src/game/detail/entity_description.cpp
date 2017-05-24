@@ -18,7 +18,7 @@
 #include <iomanip>
 
 entity_name_type get_bbcoded_entity_name(const const_entity_handle maybe_overridden_by_nickname) {
-	return maybe_overridden_by_nickname.get<components::name>().get_value();
+	return maybe_overridden_by_nickname.get_name();
 }
 
 void set_bbcoded_entity_name_details(

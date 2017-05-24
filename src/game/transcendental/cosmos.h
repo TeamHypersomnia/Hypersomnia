@@ -259,6 +259,9 @@ public:
 	void set_fixed_delta(const augs::delta&);
 	void set_fixed_delta(const unsigned steps_per_second);
 
+	entity_name_metas& get_name_metas();
+	const entity_name_metas& get_name_metas() const;
+
 	/* saving procedure is not const due to possible reinference of the universe */
 	void save_to_file(const std::string&);
 	bool load_from_file(const std::string&);
@@ -322,15 +325,16 @@ inline entity_guid cosmos::get_guid(const const_entity_handle handle) const {
 }
 #endif
 
-//inline void cosmos::set_name(
-//	const entity_handle h, 
-//	const entity_name_type& new_name
-//) const {
-//	systems_inferred.get<name_system>().set_name(h, new_name);
-//}
+inline entity_name_metas& cosmos::get_name_metas() {
+	return significant.meta.global.name_metas;
+}
+
+inline const entity_name_metas& cosmos::get_name_metas() const {
+	return significant.meta.global.name_metas;
+}
 
 inline std::unordered_set<entity_id> cosmos::get_entities_by_name(const entity_name_type& name) const {
-	return systems_inferred.get<name_system>().get_entities_by_name(name);
+	return systems_inferred.get<name_system>().get_entities_by_name_id(get_name_metas().get_id_for(name));
 }
 
 inline entity_handle cosmos::get_entity_by_name(const entity_name_type& name) {

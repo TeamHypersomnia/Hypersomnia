@@ -4,29 +4,6 @@
 #include "game/systems_inferred/name_system.h"
 #include "game/components/all_inferred_state_component.h"
 
-namespace components {
-	name::name() {
-		set_value(L"Unnamed");
-	}
-
-	entity_name_type name::get_value() const {
-		return { value.begin(), value.end() };
-	}
-
-	void name::set_value(const entity_name_type& s) {
-		value.assign(s.begin(), s.end());
-		name_id = static_cast<unsigned>(std::hash<std::wstring>()(std::wstring(L"unnamed")));
-	}
-
-	bool name::operator==(const name& b) const {
-		return trivial_compare(*this, b);
-	}
-
-	bool name::operator!=(const name& b) const {
-		return !operator==(b);
-	}
-}
-
 entity_id get_first_named_ancestor(const const_entity_handle p) {
 	entity_id iterator = p;
 	const auto& cosmos = p.get_cosmos();
@@ -46,14 +23,14 @@ entity_id get_first_named_ancestor(const const_entity_handle p) {
 typedef components::name N;
 
 template <bool C>
-entity_name_type basic_name_synchronizer<C>::get_value() const {
-	return get_data().get_value();
+entity_name_id basic_name_synchronizer<C>::get_name_id() const {
+	return get_data().name_id;
 }
 
-void component_synchronizer<false, N>::set_value(const entity_name_type& new_name) const {
-	handle.get_cosmos().systems_inferred.get<name_system>().set_name(
+void component_synchronizer<false, N>::set_name_id(const entity_name_id& new_name_id) const {
+	handle.get_cosmos().systems_inferred.get<name_system>().set_name_id(
 		handle, 
-		new_name
+		new_name_id
 	);
 }
 

@@ -37,8 +37,13 @@ namespace augs {
 					return;
 				}
 
-				if (from.template has<decltype(c)>()) {
-					into += from.template get<decltype(c)>();
+				if (from.allocator::template has<decltype(c)>()) {
+					if (into.allocator::template has<decltype(c)>()) {
+						into.allocator::template get<decltype(c)>() = from.allocator::template get<decltype(c)>();
+					}
+					else {
+						into.allocator::template add<decltype(c)>(from.allocator::template get<decltype(c)>());
+					}
 				}
 			});
 		}
