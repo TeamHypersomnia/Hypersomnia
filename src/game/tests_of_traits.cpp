@@ -5,7 +5,30 @@
 #include "generated/introspectors.h"
 #include "game/assets/assets_manager.h"
 
+#include "augs/misc/templated_readwrite.h"
+#include "augs/templates/container_traits.h"
+#include "game/components/pathfinding_component.h"
+
+#include "augs/padding_byte.h"
 struct tests_of_traits {
+	static_assert(!is_fixed_size_v<std::vector<int>>, "Trait has failed");
+	static_assert(is_fixed_size_v<std::array<int, 3>>, "Trait has failed");
+	static_assert(is_fixed_size_v<std::array<vec2, 3>>, "Trait has failed");
+	static_assert(is_fixed_size_v<std::array<padding_byte, 3>>, "Trait has failed");
+	static_assert(!is_dynamic_container_v<std::array<padding_byte, 3>>, "Trait has failed");
+	
+
+	static_assert(augs::has_io_overloads_v<augs::stream, std::vector<int>>, "Trait has failed");
+	static_assert(augs::has_io_overloads_v<augs::stream, std::vector<vec2>>, "Trait has failed");
+	static_assert(augs::has_io_overloads_v<augs::stream, std::vector<cosmos>>, "Trait has failed");
+	static_assert(augs::has_io_overloads_v<augs::stream, std::vector<pathfinding_session>>, "Trait has failed");
+
+	static_assert(can_access_data_v<std::string>, "Trait has failed");
+	static_assert(can_access_data_v<std::vector<int>>, "Trait has failed");
+	static_assert(!can_access_data_v<std::set<int>>, "Trait has failed");
+	static_assert(can_reserve_v<std::vector<int>>, "Trait has failed");
+	static_assert(!can_reserve_v<std::map<int, int>>, "Trait has failed");
+
 	static_assert(!has_introspect_v<unsigned>, "Trait has failed");
 	static_assert(has_introspect_v<ltrbt<float>>, "Trait has failed");
 	static_assert(has_introspect_v<ltrbt<int>>, "Trait has failed");

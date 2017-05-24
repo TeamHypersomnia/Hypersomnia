@@ -197,8 +197,12 @@ namespace augs  {
 			return raw.begin() + size();
 		}
 
-		size_t size() const {
+		std::size_t size() const {
 			return count;
+		}
+
+		constexpr std::size_t max_size() const {
+			return raw.max_size();
 		}
 
 		bool empty() const {

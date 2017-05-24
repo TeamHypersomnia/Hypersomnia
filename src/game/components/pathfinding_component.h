@@ -43,6 +43,8 @@ namespace components {
 	struct pathfinding {
 		static constexpr bool allow_nontriviality = true;
 
+		static void clone_children(cosmos&, pathfinding&, const pathfinding&) { /* no children */ }
+
 		// GEN INTROSPECTOR struct components::pathfinding
 		float target_offset = 0.f;
 		float rotate_navpoints = 0.f;

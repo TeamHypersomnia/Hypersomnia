@@ -1,4 +1,5 @@
 #pragma once
+#include <map>
 #include "augs/build_settings/setting_empty_bases.h"
 
 #include "augs/templates/introspection_utils/rewrite_members.h"

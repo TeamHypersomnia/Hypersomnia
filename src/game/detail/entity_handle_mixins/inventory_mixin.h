@@ -6,7 +6,7 @@
 #include "augs/build_settings/setting_empty_bases.h"
 #include "game/detail/wielding_result.h"
 #include "game/enums/callback_result.h"
-#include "augs/templates/conditional_call.h"
+#include "augs/templates/constexpr_if.h"
 
 template<bool is_const, class entity_handle_type>
 class basic_inventory_mixin {
@@ -89,7 +89,7 @@ private:
 						trav.current_address.directions.back() = this_slot_id.type;
 						trav.item_remains_physical = is_this_slot_physical;
 
-						augs::conditional_call<track_attachment_offsets>()(
+						augs::constexpr_if<track_attachment_offsets>()(
 							[&](auto...) {
 								if (trav.item_remains_physical) {
 									trav.attachment_offset = 

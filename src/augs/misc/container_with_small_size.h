@@ -96,6 +96,16 @@ namespace augs {
 			return container.size();
 		}
 
+		template <class = std::enable_if_t<can_access_data_v<T>>>
+		decltype(auto) data() {
+			return container.data();
+		}
+
+		template <class = std::enable_if_t<can_access_data_v<T>>>
+		decltype(auto) data() const {
+			return container.data();
+		}
+
 		void clear() {
 			container.clear();
 		}
@@ -106,7 +116,7 @@ namespace augs {
 		A& ar,
 		container_with_small_size<T, size_type>& storage
 	) {
-		read(ar, *storage, size_type());
+		read_object(ar, *storage, size_type());
 	}
 
 	template<class A, class T, class size_type>
@@ -114,7 +124,7 @@ namespace augs {
 		A& ar,
 		const container_with_small_size<T, size_type>& storage
 	) {
-		write(ar, *storage, size_type());
+		write_object(ar, *storage, size_type());
 	}
 }
 

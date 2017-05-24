@@ -494,88 +494,88 @@ TEST_CASE("CosmicDelta PaddingSanityCheck2") {
 }
 
 TEST_CASE("CosmicDelta PaddingTest") {
-	//auto padding_checker = [](auto c) {
-	//	typedef decltype(c) checked_type;
-	//	static_assert(std::is_same_v<std::decay_t<checked_type>, checked_type>, "Something's wrong with the types");
-	//	static_assert(
-	//		augs::is_byte_io_safe_v<augs::stream, checked_type> || allows_nontriviality_v<checked_type>,
-	//		"Non-trivially copyable component detected! If you need a non-trivial component, explicitly define static constexpr bool allow_nontriviality = true; within the class"
-	//	);
-	//	
-	//	augs::conditional_call<!allows_nontriviality_v<checked_type>>()([](auto...){
-	//		constexpr size_t type_size = sizeof(checked_type);
-	//
-	//		char buf1[type_size];
-	//		char buf2[type_size];
-	//
-	//		for (int i = 0; i < type_size; ++i) {
-	//			buf1[i] = 3;
-	//			buf2[i] = 4;
-	//		}
-	//
-	//		// it looks like the placement new may zero-out the memory before allocation.
-	//		// we will leave this test as it is useful anyway.
-	//
-	//		new (buf1) checked_type();
-	//		new (buf2) checked_type();
-	//
-	//		int iter = 0;
-	//		bool same = true;
-	//
-	//		for (; iter < type_size; ++iter) {
-	//			if (buf1[iter] != buf2[iter]) {
-	//				same = false;
-	//				break;
-	//			}
-	//		}
-	//
-	//		if(!same) {
-	//			LOG("Object 1:\n%x\n Object 2:\n%x\n", describe_fields(*(checked_type*)buf1), describe_fields(*(checked_type*)buf2));
-	//
-	//			FAIL(typesafe_sprintf(
-	//				"Padding is wrong in %x\nsizeof: %x\nDivergence position: %x", 
-	//				typeid(checked_type).name(),
-	//				type_size,
-	//				iter
-	//			));
-	//		}
-	//
-	//		// test by delta
-	//		{
-	//			checked_type a;
-	//			checked_type b;
-	//
-	//			const auto dt = augs::object_delta<checked_type>(a, b);
-	//
-	//			if (dt.has_changed()) {
-	//				LOG("Object 1:\n%x\n Object 2:\n%x\n", describe_fields(a), describe_fields(b));
-	//
-	//				FAIL(typesafe_sprintf(
-	//					"Padding is wrong in %x\nsizeof: %x\nDivergence position: %x", 
-	//					typeid(checked_type).name(),
-	//					type_size,
-	//					static_cast<int>(dt.get_first_divergence_pos())
-	//				));
-	//			}
-	//		}
-	//
-	//		// prove by introspection that all members are directly next to each other in memory
-	//		const auto breaks = determine_breaks_in_fields_continuity_by_introspection(checked_type());
-	//
-	//		if (breaks.size() > 0) {
-	//			LOG(breaks);
-	//			LOG(describe_fields(checked_type()));
-	//
-	//			FAIL(typesafe_sprintf(
-	//				"Padding is wrong in %x\nsizeof: %x\n", 
-	//				typeid(checked_type).name(),
-	//				type_size
-	//			));
-	//		}
-	//	});
-	//};
-	//
-	//for_each_through_std_get(put_all_components_into_t<std::tuple>(), padding_checker);
+	auto padding_checker = [](auto c) {
+		typedef decltype(c) checked_type;
+		static_assert(std::is_same_v<std::decay_t<checked_type>, checked_type>, "Something's wrong with the types");
+		static_assert(
+			augs::is_byte_io_safe_v<augs::stream, checked_type> || allows_nontriviality_v<checked_type>,
+			"Non-trivially copyable component detected! If you need a non-trivial component, explicitly define static constexpr bool allow_nontriviality = true; within the class"
+		);
+		
+		augs::constexpr_if<!allows_nontriviality_v<checked_type>>()([](auto...){
+			constexpr size_t type_size = sizeof(checked_type);
+	
+			char buf1[type_size];
+			char buf2[type_size];
+	
+			for (int i = 0; i < type_size; ++i) {
+				buf1[i] = 3;
+				buf2[i] = 4;
+			}
+	
+			// it looks like the placement new may zero-out the memory before allocation.
+			// we will leave this test as it is useful anyway.
+	
+			new (buf1) checked_type();
+			new (buf2) checked_type();
+	
+			int iter = 0;
+			bool same = true;
+	
+			for (; iter < type_size; ++iter) {
+				if (buf1[iter] != buf2[iter]) {
+					same = false;
+					break;
+				}
+			}
+	
+			if(!same) {
+				LOG("Object 1:\n%x\n Object 2:\n%x\n", describe_fields(*(checked_type*)buf1), describe_fields(*(checked_type*)buf2));
+	
+				FAIL(typesafe_sprintf(
+					"Padding is wrong in %x\nsizeof: %x\nDivergence position: %x", 
+					typeid(checked_type).name(),
+					type_size,
+					iter
+				));
+			}
+	
+			// test by delta
+			{
+				checked_type a;
+				checked_type b;
+	
+				const auto dt = augs::object_delta<checked_type>(a, b);
+	
+				if (dt.has_changed()) {
+					LOG("Object 1:\n%x\n Object 2:\n%x\n", describe_fields(a), describe_fields(b));
+	
+					FAIL(typesafe_sprintf(
+						"Padding is wrong in %x\nsizeof: %x\nDivergence position: %x", 
+						typeid(checked_type).name(),
+						type_size,
+						static_cast<int>(dt.get_first_divergence_pos())
+					));
+				}
+			}
+	
+			// prove by introspection that all members are directly next to each other in memory
+			const auto breaks = determine_breaks_in_fields_continuity_by_introspection(checked_type());
+	
+			if (breaks.size() > 0) {
+				LOG(breaks);
+				LOG(describe_fields(checked_type()));
+	
+				FAIL(typesafe_sprintf(
+					"Padding is wrong in %x\nsizeof: %x\n", 
+					typeid(checked_type).name(),
+					type_size
+				));
+			}
+		});
+	};
+	
+	for_each_through_std_get(put_all_components_into_t<std::tuple>(), padding_checker);
 }
 
 TEST_CASE("Cosmos", "GuidizeTests") {

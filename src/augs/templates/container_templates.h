@@ -2,23 +2,26 @@
 #include <algorithm>
 #include <type_traits>
 #include "augs/templates/container_traits.h"
-#include "augs/templates/conditional_call.h"
-
-template <typename Container, typename T>
-void erase_if(Container& v, const T& l, std::enable_if_t<!can_access_data_v<Container>>* dummy = nullptr) {
-	for (auto it = v.begin(); it != v.end(); ) {
-		if (l(*it)) {
-			it = v.erase(it);
-		}
-		else {
-			++it;
-		}
-	}
-};
+#include "augs/templates/constexpr_if.h"
 
 template <class Container, class T>
-void erase_if(Container& v, const T& l, std::enable_if_t<can_access_data_v<Container>>* dummy = nullptr) {
-	v.erase(std::remove_if(v.begin(), v.end(), l), v.end());
+void erase_if(Container& v, const T& l) {
+	augs::constexpr_if<can_access_data_v<Container>>()(
+		[&v, &l](auto...){
+			v.erase(std::remove_if(v.begin(), v.end(), l), v.end());
+		}
+	)._else(
+		[&v, &l](auto...){
+			for (auto it = v.begin(); it != v.end(); ) {
+				if (l(*it)) {
+					it = v.erase(it);
+				}
+				else {
+					++it;
+				}
+			}
+		}
+	);
 }
 
 template <class Container, class T>
@@ -35,16 +38,14 @@ void erase_element(Container& v, const T& l, std::enable_if_t<!can_access_data_v
 
 template <class Container, class... T>
 void add_element(Container& v, T&&... l) {
-	augs::conditional_call<!can_access_data_v<Container>>()(
-		[&v](auto&&... args){
-			v.emplace(std::forward<decltype(args)>(args)...);
-		}, 
-		std::forward<T>(l)...
-	);
-
-	augs::conditional_call<can_access_data_v<Container>>()(
+	augs::constexpr_if<can_access_data_v<Container>>()(
 		[&v](auto&&... args){
 			v.emplace_back(std::forward<decltype(args)>(args)...);
+		}, 
+		std::forward<T>(l)...
+	)._else(
+		[&v](auto&&... args){
+			v.emplace(std::forward<decltype(args)>(args)...);
 		}, 
 		std::forward<T>(l)...
 	);

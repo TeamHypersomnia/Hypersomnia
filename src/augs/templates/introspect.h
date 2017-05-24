@@ -1,7 +1,7 @@
 #pragma once
 #include <type_traits>
 #include "augs/templates/introspection_traits.h"
-#include "augs/templates/conditional_call.h"
+#include "augs/templates/constexpr_if.h"
 
 namespace augs {
 	struct introspection_access;
@@ -54,7 +54,7 @@ namespace augs {
 		if should_recurse_predicate returns true on a given set of types and none of them is an introspective leaf
 			recurse (static_assert ensures that introspectors exist at this point)
 
-		I pass the arguments for the lambda via conditional_call's Args&& right under the lambda itself, 
+		I pass the arguments for the lambda via constexpr_if's Args&& right under the lambda itself, 
 		instead of letting them being captured by [&] - compiler is faulty when it comes to capturing parameter packs.
 	*/
 
@@ -81,7 +81,7 @@ namespace augs {
 				auto&& label, 
 				auto&&... args
 			) {
-				conditional_call<
+				constexpr_if<
 					eval<call_valid_predicate, decltype(args)...>()
 				> () (
 					[&member_callback](auto&& passed_label, auto&&... passed_args) {
@@ -94,7 +94,7 @@ namespace augs {
 					std::forward<decltype(args)>(args)...
 				);
 
-				conditional_call<
+				constexpr_if<
 					eval<should_recurse_predicate, decltype(args)...>()
 					&& eval<at_least_one_is_not_introspective_leaf, decltype(args)...>()
 					&& !(eval<call_valid_predicate, decltype(args)...>() && stop_recursion_if_valid)
@@ -164,7 +164,7 @@ namespace augs {
 				auto&& label, 
 				auto&& arg
 			) {
-				conditional_call<
+				constexpr_if<
 					eval<call_valid_predicate, decltype(arg)>()
 				> () (
 					[&member_callback](auto&& passed_label, auto&& passed_arg) {
@@ -177,7 +177,7 @@ namespace augs {
 					std::forward<decltype(arg)>(arg)
 				);
 
-				conditional_call<
+				constexpr_if<
 					eval<should_recurse_predicate, decltype(arg)>()
 					&& eval<at_least_one_is_not_introspective_leaf, decltype(arg)>()
 					&& !(eval<call_valid_predicate, decltype(arg)>() && stop_recursion_if_valid)
@@ -185,7 +185,7 @@ namespace augs {
 					[&member_callback, &recursion_prologue, &recursion_epilogue](auto&& passed_label, auto&& passed_arg) {
 						using checked_type = std::remove_reference_t<decltype(passed_arg)>;
 
-						static_assert(has_introspect_v<checked_type> || has_value_type_v<checked_type>, 
+						static_assert(has_introspect_v<checked_type> || is_dynamic_container_v<checked_type>, 
 							"Recursion requested on type without introspectors, that is not an iteratable container!"
 						);
 						
@@ -194,22 +194,8 @@ namespace augs {
 							std::forward<decltype(passed_label)>(passed_label),
 							std::forward<decltype(passed_arg)>(passed_arg)
 						);
-
-						conditional_call<!has_value_type_v<decltype(passed_arg)>>()([&](auto...){
-							introspect_recursive_with_prologues <
-								call_valid_predicate,
-								should_recurse_predicate,
-								stop_recursion_if_valid,
-								current_depth + 1u
-							> (
-								std::forward<F>(member_callback),
-								std::forward<G>(recursion_prologue),
-								std::forward<H>(recursion_epilogue),
-								std::forward<decltype(passed_arg)>(passed_arg)
-							);
-						});
-
-						conditional_call<has_value_type_v<decltype(passed_arg)>>()([&](auto...){
+						
+						constexpr_if<is_dynamic_container_v<checked_type>>()([&](auto...){
 							for (auto& val : passed_arg) {
 								introspect_recursive_with_prologues <
 									call_valid_predicate,
@@ -223,6 +209,18 @@ namespace augs {
 									val
 								);
 							}
+						})._else([&](auto...){
+							introspect_recursive_with_prologues <
+								call_valid_predicate,
+								should_recurse_predicate,
+								stop_recursion_if_valid,
+								current_depth + 1u
+							> (
+								std::forward<F>(member_callback),
+								std::forward<G>(recursion_prologue),
+								std::forward<H>(recursion_epilogue),
+								std::forward<decltype(passed_arg)>(passed_arg)
+							);
 						});
 
 						recursion_epilogue(

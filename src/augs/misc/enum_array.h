@@ -10,6 +10,7 @@ namespace augs {
 		// INTROSPECT BASE std::array<T, static_cast<size_t>(_enum::COUNT)>
 		// END GEN INTROSPECTOR
 
+		using base::max_size;
 		using base::base;
 		using base::operator[];
 

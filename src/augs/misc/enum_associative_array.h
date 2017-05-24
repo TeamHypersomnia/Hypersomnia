@@ -151,8 +151,12 @@ namespace augs {
 			return at(enum_idx);
 		}
 
-		constexpr size_t capacity() const {
+		constexpr std::size_t capacity() const {
 			return raw.size();
+		}
+
+		constexpr std::size_t max_size() const {
+			return raw.max_size();
 		}
 
 		void clear() {

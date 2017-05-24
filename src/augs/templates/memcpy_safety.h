@@ -26,7 +26,7 @@ bool trivial_compare(const A* const a, const A* const b) {
 }
 
 template <class A, class = void>
-struct allows_nontriviality : std::bool_constant<false> {
+struct allows_nontriviality : std::false_type {
 
 };
 

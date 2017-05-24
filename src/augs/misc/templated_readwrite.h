@@ -6,6 +6,7 @@
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/templates/introspect.h"
 #include "augs/templates/container_traits.h"
+#include "augs/templates/constexpr_if.h"
 
 namespace augs {
 	class output_stream_reserver;
@@ -83,28 +84,17 @@ namespace augs {
 		static_assert(is_memcpy_safe_v<Serialized>, "Attempt to serialize a non-trivially copyable type");
 		static_assert(is_native_binary_stream_v<Archive>, "Byte serialization of trivial structs allowed only on native binary archives");
 	}
+
+	template <class Serialized>
+	void verify_has_introspect(Serialized) {
+		static_assert(has_introspect_v<Serialized>, "Attempt to serialize a type in a non-bytesafe context without i/o overloads and without introspectors!");
+	}
 	
-	/*
-		Explanation of augs::read/augs::write overloads:
-
-		if the type has augs::read_object and augs::write_object overloads
-			call these overloads
-		else if the type is trivial and the stream is a native binary stream
-			bytewise read/write via std::memcpy
-		else if the type is a container with elements contiguous in memory
-			call special augs::read_n and augs::write_n that offer potential optimization
-		else if the type is other container
-			call augs::read and augs::write upon all contained objects
-		else
-			assert that the type has introspectors
-			call augs::read and augs::write upon all members
-	*/
-
 	template<class Archive, class Serialized>
 	void read_bytes(
 		Archive& ar, 
 		Serialized* const location, 
-		const size_t object_count
+		const std::size_t object_count
 	) {
 		verify_byte_io_safety<Archive, Serialized>();
 		ar.read(reinterpret_cast<char*>(location), object_count * sizeof(Serialized));
@@ -114,7 +104,7 @@ namespace augs {
 	void write_bytes(
 		Archive& ar, 
 		const Serialized* const location, 
-		const size_t object_count
+		const std::size_t object_count
 	) {
 		verify_byte_io_safety<Archive, Serialized>();
 		ar.write(reinterpret_cast<const char*>(location), object_count * sizeof(Serialized));
@@ -123,153 +113,181 @@ namespace augs {
 	template<class Archive, class Serialized>
 	void read(
 		Archive& ar,
-		Serialized& storage,
-		const std::enable_if_t<has_io_overloads_v<Archive, Serialized>>* const dummy = nullptr
+		Serialized& storage
 	) {
-		read_object(ar, storage);
-	}
+		constexpr_if<has_io_overloads_v<Archive, Serialized>>()(
+			[&](auto...){
+				read_object(ar, storage);
+			}
+		)._else_if<is_byte_io_appropriate_v<Archive, Serialized>>(
+			[&](auto...){
+				read_bytes(ar, &storage, 1);
+			}
+		)._else(
+			[&](auto...){
+				verify_has_introspect(storage);
 
-	template<class Archive, class Serialized>
-	void write(
-		Archive& ar,
-		const Serialized& storage,
-		const std::enable_if_t<has_io_overloads_v<Archive, Serialized>>* const dummy = nullptr
-	) {
-		write_object(ar, storage);
-	}
-
-	template<class Archive, class Serialized>
-	void read(
-		Archive& ar,
-		Serialized& storage,
-		const std::enable_if_t<is_byte_io_appropriate_v<Archive, Serialized>>* const dummy = nullptr
-	) {
-		read_bytes(ar, &storage, 1);
-	}
-
-	template<class Archive, class Serialized>
-	void write(
-		Archive& ar,
-		const Serialized& storage,
-		const std::enable_if_t<is_byte_io_appropriate_v<Archive, Serialized>>* const dummy = nullptr
-	) {
-		write_bytes(ar, &storage, 1);
-	}
-
-	template<class Archive, class Serialized>
-	void read(
-		Archive& ar,
-		Serialized& storage,
-		const std::enable_if_t<
-			!has_io_overloads_v<Archive, Serialized> 
-			&& !is_byte_io_safe_v<Archive, Serialized>
-			&& !has_value_type_v<Serialized>
-		>* const dummy = nullptr
-	) {
-		static_assert(has_introspect_v<Serialized>, "Attempt to read a type in a non-bytesafe context without i/o overloads and without introspectors!");
-
-		augs::introspect(
-			[&](auto, auto& member) {
-				read(ar, member);
-			},
-			storage
+				augs::introspect(
+					[&](auto, auto& member) {
+						constexpr_if<!std::is_same_v<padding_byte&, decltype(member)>>()(
+							[&](auto...){
+								read(ar, member);
+							}
+						);
+					},
+					storage
+				);
+			}
 		);
 	}
 
 	template<class Archive, class Serialized>
 	void write(
 		Archive& ar,
-		const Serialized& storage,
-		const std::enable_if_t<
-			!has_io_overloads_v<Archive, Serialized> 
-			&& !is_byte_io_safe_v<Archive, Serialized>
-			&& !has_value_type_v<Serialized>
-		>* const dummy = nullptr
+		const Serialized& storage
 	) {
-		static_assert(has_introspect_v<Serialized>, "Attempt to write a type in a non-bytesafe context without i/o overloads and without introspectors!");
+		constexpr_if<has_io_overloads_v<Archive, Serialized>>()(
+			[&](auto...){
+				write_object(ar, storage);
+			}
+		)._else_if<is_byte_io_appropriate_v<Archive, Serialized>>(
+			[&](auto...){
+				write_bytes(ar, &storage, 1);
+			}
+		)._else(
+			[&](auto...){
+				verify_has_introspect(storage);
 
-		augs::introspect(
-			[&](auto, const auto& member) {
-				write(ar, member);
-			},
-			storage
+				augs::introspect(
+					[&](auto, const auto& member) {
+						constexpr_if<!std::is_same_v<const padding_byte&, decltype(member)>>()(
+							[&](auto...){
+								write(ar, member);
+							}
+						);
+					},
+					storage
+				);
+			}
 		);
 	}
 
-	template<class Archive, class Serialized>
+	template <class Archive, class Serialized>
 	void read_n(
 		Archive& ar,
 		Serialized* const storage,
-		const size_t n,
-		const std::enable_if_t<is_byte_io_appropriate_v<Archive, Serialized>>* const dummy = nullptr
+		const std::size_t n
 	) {
-		read_bytes(ar, storage, n);
+		constexpr_if<is_byte_io_appropriate_v<Archive, Serialized>>()(
+			[&](auto...){
+				read_bytes(ar, storage, n);
+			}
+		)._else(
+			[&](auto...){
+				for (std::size_t i = 0; i < n; ++i) {
+					read(ar, storage[i]);
+				}
+			}
+		);
 	}
 
-	template<class Archive, class Serialized>
+	template <class Archive, class Serialized>
 	void write_n(
 		Archive& ar,
 		const Serialized* const storage,
-		const size_t n,
-		const std::enable_if_t<is_byte_io_appropriate_v<Archive, Serialized>>* const dummy = nullptr
+		const std::size_t n
 	) {
-		write_bytes(ar, storage, n);
+		constexpr_if<is_byte_io_appropriate_v<Archive, Serialized>>()(
+			[&](auto...){
+				write_bytes(ar, storage, n);
+			}
+		)._else(
+			[&](auto...){
+				for (std::size_t i = 0; i < n; ++i) {
+					write(ar, storage[i]);
+				}
+			}
+		);
 	}
-
-	template<class Archive, class Serialized>
-	void read_n(
-		Archive& ar,
-		Serialized* const storage,
-		const size_t n,
-		const std::enable_if_t<!is_byte_io_appropriate_v<Archive, Serialized>>* const dummy = nullptr
-	) {
-		for (size_t i = 0; i < n; ++i) {
-			read(ar, storage[i]);
-		}
-	}
-
-	template<class Archive, class Serialized>
-	void write_n(
-		Archive& ar,
-		const Serialized* const storage,
-		const size_t n,
-		const std::enable_if_t<!is_byte_io_appropriate_v<Archive, Serialized>>* const dummy = nullptr
-	) {
-		for (size_t i = 0; i < n; ++i) {
-			write(ar, storage[i]);
-		}
-	}
-
-	/*
-		Special i/o for containers whose memory is contiguous (e.g. strings and vectors)
-		We call read_n/write_n that can optimize for trivial elements continuous in memory
-	*/
 
 	template <class Archive, class Container, class container_size_type = std::size_t>
 	void read_object(
 		Archive& ar, 
 		Container& storage, 
 		container_size_type = container_size_type(),
-		const std::enable_if_t<can_access_data_v<Container>>* const dummy = nullptr
+		std::enable_if_t<is_dynamic_container_v<Container>>* dummy = nullptr
 	) {
 		container_size_type s;
 		read(ar, s);
 
-		storage.resize(s);
-		read_n(ar, storage.data(), storage.size());
+		if (s == 0) {
+			return;
+		}
+
+		constexpr_if<can_access_data_v<Container>>()(
+			[&](auto...) {
+				storage.resize(s);
+				read_n(ar, &storage[0], storage.size());
+			}
+		)._else(
+			[&](auto& c) {
+				/* Compiler has problem catching the top-level Container type */
+				using Container = std::remove_reference_t<decltype(c)>;
+
+				constexpr_if<can_reserve_v<Container>>()(
+					[&](auto...) {
+						storage.reserve(s);
+					}
+				);
+				
+				constexpr_if<is_associative_container_v<Container>>()(
+					[&](auto...) {
+						while (s--) {
+							typename Container::key_type key;
+							typename Container::mapped_type mapped;
+
+							read(ar, key);
+							read(ar, mapped);
+
+							storage.emplace(std::move(key), std::move(mapped));
+						}
+					}
+				)._else(
+					[&](auto...) {
+						while (s--) {
+							typename Container::value_type val;
+
+							read(ar, val);
+
+							storage.emplace(std::move(val));
+						}
+					}
+				);
+			}, storage
+		);
 	}
 
-	template<class Archive, class Container, class container_size_type = std::size_t>
+	template <class Archive, class Container, class container_size_type = std::size_t>
 	void write_object(
 		Archive& ar, 
 		const Container& storage, 
 		container_size_type = container_size_type(),
-		const std::enable_if_t<can_access_data_v<Container>>* const dummy = nullptr
+		std::enable_if_t<is_container_v<Container>>* dummy = nullptr
 	) {
 		ensure(storage.size() <= std::numeric_limits<container_size_type>::max());
-
 		write(ar, static_cast<container_size_type>(storage.size()));
-		write_n(ar, storage.data(), storage.size());
+
+		constexpr_if<can_access_data_v<Container>>()(
+			[&](auto...) {
+				write_n(ar, storage.data(), storage.size());
+			}
+		)._else(
+			[&](auto...) {
+				for (const auto& obj : storage) {
+					write(ar, obj);
+				}
+			}
+		);
 	}
 
 	/*
@@ -278,8 +296,8 @@ namespace augs {
 
 	template<class Archive, class Container, class...>
 	void read_with_capacity(Archive& ar, Container& storage) {
-		size_t c;
-		size_t s;
+		std::size_t c;
+		std::size_t s;
 
 		read(ar, c);
 		read(ar, s);
@@ -287,7 +305,7 @@ namespace augs {
 		storage.reserve(c);
 		storage.resize(s);
 
-		read_n(ar, storage.data(), storage.size());
+		read_n(ar, &storage[0], storage.size());
 	}
 
 	template<class Archive, class Container>
@@ -298,76 +316,26 @@ namespace augs {
 		write_n(ar, storage.data(), storage.size());
 	}
 
-	/*
-		General i/o for containers without memory contiguity of elements
-	*/
-
-	template <class Serialized>
-	void reserve_num_elements(Serialized& container, const size_t n) {
-		container.reserve(n);
-	}
-
-	template <class Key, class Value>
-	void reserve_num_elements(std::map<Key, Value>& container, const size_t) {
-
-	}
-
-	template <class Archive, class Container, class container_size_type = std::size_t>
-	void read_object(
-		Archive& ar,
-		Container& storage,
-		container_size_type = container_size_type(),
-		const std::enable_if_t<!can_access_data_v<Container> && has_value_type_v<Container>>* const dummy = nullptr
-	) {
-		container_size_type s;
-
-		read(ar, s);
-
-		reserve_num_elements(storage, s);
-
-		while (s--) {
-			typename Container::value_type val;
-			read(ar, val);
-			storage.emplace(std::move(val));
-		}
-	}
-
-	template<class Archive, class Container, class container_size_type = std::size_t>
-	void write_object(
-		Archive& ar,
-		const Container& storage,
-		container_size_type = container_size_type(),
-		const std::enable_if_t<!can_access_data_v<Container> && has_value_type_v<Container>>* const dummy = nullptr
-	) {
-		ensure(storage.size() <= std::numeric_limits<container_size_type>::max());
-
-		write(ar, static_cast<container_size_type>(storage.size()));
-
-		for (const auto& obj : storage) {
-			write(ar, obj);
-		}
-	}
-
-	template<class Archive, size_t count>
+	template<class Archive, std::size_t count>
 	void read_flags(Archive& ar, std::array<bool, count>& storage) {
 		static_assert(count > 0, "Can't read a null array");
 
 		std::array<char, (count - 1) / 8 + 1> compressed_storage;
 		read(ar, compressed_storage);
 
-		for (size_t bit = 0; bit < count; ++bit) {
+		for (std::size_t bit = 0; bit < count; ++bit) {
 			storage[bit] = (compressed_storage[bit / 8] >> (bit % 8)) & 1;
 		}
 	}
 
-	template<class Archive, size_t count>
+	template<class Archive, std::size_t count>
 	void write_flags(Archive& ar, const std::array<bool, count>& storage) {
 		static_assert(count > 0, "Can't write a null array");
 
 		std::array<char, (count - 1) / 8 + 1> compressed_storage;
 		std::fill(compressed_storage.begin(), compressed_storage.end(), 0);
 
-		for (size_t bit = 0; bit < count; ++bit) {
+		for (std::size_t bit = 0; bit < count; ++bit) {
 			if (storage[bit]) {
 				compressed_storage[bit / 8] |= 1 << (bit % 8);
 			}

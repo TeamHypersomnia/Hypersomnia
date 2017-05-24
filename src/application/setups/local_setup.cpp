@@ -55,7 +55,7 @@ void local_setup::process(
 	if (!hypersomnia.load_from_file("save.state")) {
 		hypersomnia.set_fixed_delta(cfg.default_tickrate);
 		
-		test_scenes::one_entity().populate_world_with_entities(
+		test_scenes::testbed().populate_world_with_entities(
 			hypersomnia, 
 			metas_of_assets,
 			session.get_standard_post_solve()

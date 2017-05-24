@@ -1,5 +1,6 @@
 #include <unordered_map>
 #include <map>
+#include <string>
 #include "texture_atlases.h"
 
 #include <sstream>
