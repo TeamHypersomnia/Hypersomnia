@@ -23,7 +23,7 @@ namespace components {
 		bool disable_standard_collision_resolution = false;
 		bool can_driver_shoot_through = false;
 
-		assets::physical_material_id material = assets::physical_material_id::METAL;
+		assets::physical_material_id material = assets::physical_material_id::INVALID;
 
 		float collision_sound_gain_mult = 1.f;
 

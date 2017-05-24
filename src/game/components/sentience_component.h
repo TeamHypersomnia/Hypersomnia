@@ -36,7 +36,7 @@ namespace components {
 
 		augs::enum_associative_array<assets::spell_id, spell_instance_data> spells;
 
-		assets::spell_id currently_casted_spell = assets::spell_id::COUNT;
+		assets::spell_id currently_casted_spell = assets::spell_id::INVALID;
 		components::transform transform_when_spell_casted;
 		augs::stepped_timestamp time_of_last_spell_cast;
 		augs::stepped_timestamp time_of_last_exhausted_cast;
@@ -51,10 +51,10 @@ namespace components {
 		child_entity_id health_damage_particles;
 		child_entity_id character_crosshair;
 
-		sound_response health_decrease_sound_response;
-		sound_response death_sound_response;
+		sound_response health_decrease_sound;
+		sound_response death_sound;
 
-		particle_effect_response health_decrease_particle_effect_response;
+		particle_effect_response health_decrease_particles;
 
 		// END GEN INTROSPECTOR
 

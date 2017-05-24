@@ -8,7 +8,7 @@ namespace components {
 		child_entity_id shell;
 		child_entity_id round;
 
-		particle_effect_response shell_trace_particle_effect_response;
+		particle_effect_response shell_trace_particles;
 		// END GEN INTROSPECTOR
 	};
 }

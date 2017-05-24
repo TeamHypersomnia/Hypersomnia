@@ -82,7 +82,7 @@ namespace components {
 	}
 
 	void sprite::draw(const drawing_input in) const {
-		ensure(tex != assets::game_image_id::COUNT);
+		ensure(tex != assets::game_image_id::INVALID);
 
 		const auto& manager = get_assets_manager();
 

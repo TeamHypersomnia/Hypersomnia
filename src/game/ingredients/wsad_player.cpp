@@ -96,12 +96,12 @@ namespace ingredients {
 		attitude.parties = party_category::METROPOLIS_CITIZEN;
 		attitude.hostile_parties = party_category::RESISTANCE_CITIZEN;
 
-		sentience.health_decrease_particle_effect_response.id = assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES;
-		sentience.health_decrease_particle_effect_response.modifier.colorize = red;
-		sentience.health_decrease_particle_effect_response.modifier.scale_lifetimes = 1.5f;
+		sentience.health_decrease_particles.id = assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES;
+		sentience.health_decrease_particles.modifier.colorize = red;
+		sentience.health_decrease_particles.modifier.scale_lifetimes = 1.5f;
 
-		sentience.health_decrease_sound_response.id = assets::sound_buffer_id::IMPACT;
-		sentience.death_sound_response.id = assets::sound_buffer_id::DEATH;
+		sentience.health_decrease_sound.id = assets::sound_buffer_id::IMPACT;
+		sentience.death_sound.id = assets::sound_buffer_id::DEATH;
 
 		sentience.health.set_value(100);
 		sentience.health.set_maximum_value(100);
@@ -271,6 +271,7 @@ namespace prefabs {
 			//group.filter.categoryBits = 0;
 			group.density = 0.1f;
 			group.sensor = true;
+			group.material = assets::physical_material_id::METAL;
 
 			recoil += group;
 			recoil.get<components::fixtures>().set_owner_body(recoil);

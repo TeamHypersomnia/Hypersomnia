@@ -20,7 +20,7 @@ public:
 	augs::sound_source hover_sound;
 	augs::sound_source click_sound;
 
-	assets::spell_id bound_spell = assets::spell_id::COUNT;
+	assets::spell_id bound_spell = assets::spell_id::INVALID;
 
 	float elapsed_hover_time_ms = 0.f;
 

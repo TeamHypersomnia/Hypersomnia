@@ -230,7 +230,7 @@ void gui_element_system::handle_hotbar_and_action_button_presses(
 			if (i.is_pressed) {
 				const auto bound_spell = action_b.bound_spell;
 
-				if (bound_spell != assets::spell_id::COUNT) {
+				if (bound_spell != assets::spell_id::INVALID) {
 					spell_requests[gui_entity] = bound_spell;
 				}
 			}

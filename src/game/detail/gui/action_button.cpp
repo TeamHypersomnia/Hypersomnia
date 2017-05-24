@@ -28,7 +28,7 @@ void action_button::draw(
 		const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
 		const auto bound_spell = this_id->bound_spell;
 
-		if (bound_spell != assets::spell_id::COUNT && sentience.spells.find(bound_spell) != sentience.spells.end()) {
+		if (bound_spell != assets::spell_id::INVALID && sentience.spells.find(bound_spell) != sentience.spells.end()) {
 			const auto spell_data = get_assets_manager()[bound_spell];
 			const bool has_enough_mana = sentience.personal_electricity.value >= spell_data.logical.personal_electricity_required;
 			const float required_mana_ratio = std::min(1.f, sentience.personal_electricity.value / static_cast<float>(spell_data.logical.personal_electricity_required));
@@ -43,7 +43,7 @@ void action_button::draw(
 				inside_col.a = 255;
 			}
 
-			assets::game_image_id inside_tex = assets::game_image_id::COUNT;
+			assets::game_image_id inside_tex = assets::game_image_id::INVALID;
 			assets::game_image_id border_tex = assets::game_image_id::SPELL_BORDER;
 
 			rgba border_col;
@@ -57,8 +57,8 @@ void action_button::draw(
 				border_col = border_col.get_desaturated();
 			}
 
-			if (inside_tex != assets::game_image_id::COUNT) {
-				ensure(border_tex != assets::game_image_id::COUNT);
+			if (inside_tex != assets::game_image_id::INVALID) {
+				ensure(border_tex != assets::game_image_id::INVALID);
 
 				const augs::gui::material inside_mat(inside_tex, inside_col);
 
@@ -221,7 +221,7 @@ void action_button::respond_to_events(
 		if (info.msg == gui_event::lclick) {
 			const auto bound_spell = this_id->bound_spell;
 
-			if (bound_spell != assets::spell_id::COUNT) {
+			if (bound_spell != assets::spell_id::INVALID) {
 				context.get_gui_element_system().spell_requests[context.get_gui_element_entity()] = bound_spell;
 			}
 		}

@@ -5,6 +5,6 @@
 
 struct global_assets {
 	// GEN INTROSPECTOR struct global_assets
-	assets::sound_buffer_id bullet_passes_through_item_sound;
+	int dummy = 0;
 	// END GEN INTROSPECTOR
 };

@@ -20,7 +20,7 @@ namespace rendering_scripts {
 				const auto& sentience = it.get<components::sentience>();
 				const auto spell = sentience.currently_casted_spell;
 
-				if (spell != assets::spell_id::COUNT) {
+				if (spell != assets::spell_id::INVALID) {
 					const auto highlight_amount = 1.f - (global_time_seconds - sentience.time_of_last_spell_cast.in_seconds(dt)) / 0.4f;
 
 					if (highlight_amount > 0.f) {

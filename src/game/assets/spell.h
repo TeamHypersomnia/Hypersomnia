@@ -20,7 +20,7 @@ struct spell_data {
 	// GEN INTROSPECTOR struct spell_data
 	spell_logical_meta logical;
 
-	assets::game_image_id icon = assets::game_image_id::COUNT;
+	assets::game_image_id icon = assets::game_image_id::INVALID;
 	augs::constant_size_wstring<INCANTATION_STRING_LENGTH> incantation;
 	std::wstring spell_name;
 	std::wstring spell_description;

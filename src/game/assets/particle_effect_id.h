@@ -31,7 +31,7 @@ namespace assets {
 
 struct particle_effect_response {
 	// GEN INTROSPECTOR struct particle_effect_response
-	assets::particle_effect_id id = assets::particle_effect_id::COUNT;
+	assets::particle_effect_id id = assets::particle_effect_id::INVALID;
 	particle_effect_modifier modifier;
 	// END GEN INTROSPECTOR
 };

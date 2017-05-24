@@ -51,7 +51,7 @@ namespace components {
 		child_entity_id firing_engine_sound;
 		child_entity_id muzzle_particles;
 
-		sound_response muzzle_shot_sound_response;
+		sound_response muzzle_shot_sound;
 
 	private:
 		friend struct augs::introspection_access;

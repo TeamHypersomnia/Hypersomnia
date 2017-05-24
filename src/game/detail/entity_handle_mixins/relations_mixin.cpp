@@ -88,7 +88,7 @@ maybe_const_ref_t<C, child_entity_id> typename basic_relations_mixin<C, D>::get_
 	default:
 		LOG("Random access abstraction for this child_entity_name is not implemented!");
 		ensure(false);
-		return get_id(child_entity_name::COUNT);
+		return get_id(child_entity_name::INVALID);
 	}
 }
 

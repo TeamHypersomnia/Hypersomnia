@@ -76,6 +76,7 @@ namespace prefabs {
 
 			group.filter = filters::dynamic_object();
 			group.density = 0.6;
+			group.material = assets::physical_material_id::METAL;
 
 			front += group;
 			front += physics_definition;
@@ -107,6 +108,7 @@ namespace prefabs {
 			group.density = 0.6;
 			group.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
 			group.is_friction_ground = true;
+			group.material = assets::physical_material_id::METAL;
 
 			interior  += group;
 
@@ -135,6 +137,7 @@ namespace prefabs {
 			group.density = 0.6;
 			group.disable_standard_collision_resolution = true;
 			group.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
+			group.material = assets::physical_material_id::METAL;
 
 			left_wheel  += group;
 			left_wheel.get<components::fixtures>().set_owner_body(front);
@@ -185,6 +188,7 @@ namespace prefabs {
 					group.density = 1.0f;
 					group.sensor = true;
 					group.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET] = offset;
+					group.material = assets::physical_material_id::METAL;
 
 					engine_physical  += group;
 

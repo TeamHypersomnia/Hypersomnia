@@ -23,6 +23,7 @@ namespace ingredients {
 		group.destructible = destructible;
 		group.filter = filters::dynamic_object();
 		group.density = 1;
+		group.material = assets::physical_material_id::METAL;
 
 		e += group;
 		e += body;
@@ -44,6 +45,7 @@ namespace ingredients {
 		group.filter = filters::see_through_dynamic_object();
 		group.density = 0.2;
 		group.restitution = 0.5f;
+		group.material = assets::physical_material_id::METAL;
 
 		e += group;
 		e += body;
@@ -69,6 +71,7 @@ namespace ingredients {
 		group.restitution = 1.4f;
 		group.density = 0.001f;
 		group.collision_sound_gain_mult = 100.f;
+		group.material = assets::physical_material_id::METAL;
 
 		e += group;
 		e += body;
@@ -92,6 +95,7 @@ namespace ingredients {
 
 		group.filter = filters::dynamic_object();
 		group.density = 1;
+		group.material = assets::physical_material_id::METAL;
 
 		e += group;
 		e += body;
@@ -120,6 +124,7 @@ namespace ingredients {
 		group.filter = filters::bullet();
 		group.density = 1;
 		group.disable_standard_collision_resolution = true;
+		group.material = assets::physical_material_id::METAL;
 
 		e += group;
 		e += body;

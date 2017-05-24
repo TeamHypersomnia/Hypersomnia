@@ -94,7 +94,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 		for (auto& r : g.spawned_rounds) {
 			{
 				particle_effect_input burst;
-				burst.effect = cosmos[r].get<components::missile>().muzzle_leave_particle_effect_response;
+				burst.effect = cosmos[r].get<components::missile>().muzzle_leave_particles;
 
 				burst.create_particle_effect_entity(
 					step,
@@ -107,12 +107,12 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 				auto& missile = cosmos[r].get<components::missile>();
 
 				particle_effect_input particle_trace;
-				particle_trace.effect = missile.bullet_trace_particle_effect_response;
+				particle_trace.effect = missile.trace_particles;
 
 				auto place_of_birth = cosmos[r].get_logic_transform();
 				place_of_birth.rotation += 180;
 
-				missile.trace_particles = particle_trace.create_particle_effect_entity(
+				missile.trace_particles_entity = particle_trace.create_particle_effect_entity(
 					step,
 					place_of_birth,
 					r
@@ -124,7 +124,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 
 		if (shell.alive()) {
 			particle_effect_input burst;
-			burst.effect = g.catridge_definition.shell_trace_particle_effect_response;
+			burst.effect = g.catridge_definition.shell_trace_particles;
 
 			auto place_of_birth = shell.get_logic_transform();
 			place_of_birth.rotation += 180;
@@ -152,7 +152,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 				place_of_birth.rotation = (d.impact_velocity).degrees();
 			}
 
-			burst.effect = inflictor.get<components::missile>().destruction_particle_effect_response;
+			burst.effect = inflictor.get<components::missile>().destruction_particles;
 
 			burst.create_particle_effect_entity(
 				step,
@@ -200,7 +200,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 			const auto& sentience = subject.get<components::sentience>();
 
 			if (h.effective_amount > 0) {
-				burst.effect = sentience.health_decrease_particle_effect_response;
+				burst.effect = sentience.health_decrease_particles;
 
 				if (h.special_result == messages::health_event::result_type::DEATH) {
 					burst.effect.modifier.scale_amounts = 0.6f;

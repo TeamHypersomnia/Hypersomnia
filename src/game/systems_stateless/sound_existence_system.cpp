@@ -100,21 +100,26 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 			const auto subject_coll = subject_fix.get_raw_component();
 			const auto collider_coll = collider_fix.get_raw_component();
 			
-			const auto sound_id = step.input.metas_of_assets[subject_coll.material].collision_sound_matrix[collider_coll.material];
+			if (
+				subject_coll.material != assets::physical_material_id::INVALID
+				&& collider_coll.material != assets::physical_material_id::INVALID
+			) {
+				const auto sound_id = step.input.metas_of_assets[subject_coll.material].collision_sound_matrix[collider_coll.material];
 
-			const auto impulse = (c.normal_impulse) * subject_coll.collision_sound_gain_mult * collider_coll.collision_sound_gain_mult;
+				const auto impulse = (c.normal_impulse) * subject_coll.collision_sound_gain_mult * collider_coll.collision_sound_gain_mult;
 
-			const auto gain_mult = (impulse / 15.f) * (impulse / 15.f);
-			const auto pitch_mult = impulse / 185.f;
+				const auto gain_mult = (impulse / 15.f) * (impulse / 15.f);
+				const auto pitch_mult = impulse / 185.f;
 
-			if (gain_mult > 0.01f) {
-				sound_effect_input in;
-				in.delete_entity_after_effect_lifetime = true;
-				in.effect.modifier.pitch = 0.85f + pitch_mult;
-				in.effect.modifier.gain = gain_mult;
-				in.effect.id = sound_id;
+				if (gain_mult > 0.01f) {
+					sound_effect_input in;
+					in.delete_entity_after_effect_lifetime = true;
+					in.effect.modifier.pitch = 0.85f + pitch_mult;
+					in.effect.modifier.gain = gain_mult;
+					in.effect.id = sound_id;
 
-				//in.create_sound_effect_entity(step, c.point, entity_id()).add_standard_components(step);
+					//in.create_sound_effect_entity(step, c.point, entity_id()).add_standard_components(step);
+				}
 			}
 
 			// skip the next, swapped collision message
@@ -129,9 +134,9 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 			auto& missile = subject.get<components::missile>();
 
 			sound_effect_input in;
-			in.effect = missile.bullet_trace_sound_response;
+			in.effect = missile.trace_sound;
 
-			missile.trace_sound = in.create_sound_effect_entity(
+			missile.trace_sound_entity = in.create_sound_effect_entity(
 				step,
 				g.muzzle_transform,
 				r
@@ -146,7 +151,7 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 
 			{
 				sound_effect_input in;
-				in.effect = gun.muzzle_shot_sound_response;
+				in.effect = gun.muzzle_shot_sound;
 				in.direct_listener = owning_capability;
 
 				in.create_sound_effect_entity(step, subject.get_logic_transform(), entity_id()).add_standard_components(step);
@@ -189,10 +194,10 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 
 		if (h.target == messages::health_event::target_type::HEALTH) {
 			if (h.special_result == messages::health_event::result_type::DEATH) {
-				in.effect = sentience.death_sound_response;
+				in.effect = sentience.death_sound;
 			}
 			else if (h.effective_amount > 0) {
-				in.effect = sentience.health_decrease_sound_response;
+				in.effect = sentience.health_decrease_sound;
 			}
 			else {
 				continue;
@@ -243,7 +248,7 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 			
 			sound_effect_input in;
 			in.direct_listener = d.subject;
-			in.effect = inflictor.get<components::missile>().destruction_sound_response;
+			in.effect = inflictor.get<components::missile>().destruction_sound;
 			
 			if (in.effect.id != assets::sound_buffer_id::INVALID) {
 				in.create_sound_effect_entity(

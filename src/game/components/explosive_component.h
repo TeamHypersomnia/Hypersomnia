@@ -8,7 +8,7 @@ namespace components {
 	struct explosive {
 		// GEN INTROSPECTOR struct components::explosive
 		standard_explosion_input explosion;
-		assets::game_image_id released_image_id = assets::game_image_id::COUNT;
+		assets::game_image_id released_image_id = assets::game_image_id::INVALID;
 		// END GEN INTROSPECTOR
 	};
 }

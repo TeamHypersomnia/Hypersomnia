@@ -88,6 +88,7 @@ namespace prefabs {
 			group.density = 1.5f;
 			group.restitution = 0.3f;
 			group.can_driver_shoot_through = true;
+			group.material = assets::physical_material_id::METAL;
 
 			front  += group;
 			front.get<components::fixtures>().set_owner_body(front);
@@ -136,6 +137,7 @@ namespace prefabs {
 			group.filter = filters::trigger();
 			group.disable_standard_collision_resolution = true;
 			group.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
+			group.material = assets::physical_material_id::METAL;
 
 			left_wheel += group;
 			left_wheel.get<components::fixtures>().set_owner_body(front);

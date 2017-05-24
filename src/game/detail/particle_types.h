@@ -59,7 +59,7 @@ struct animated_particle {
 	float linear_damping = 0.f;
 	float current_lifetime_ms = 0.f;
 
-	assets::game_image_id first_face = assets::game_image_id::COUNT;
+	assets::game_image_id first_face = assets::game_image_id::INVALID;
 	rgba color;
 	float frame_duration_ms;
 	unsigned frame_count = 0;
@@ -90,7 +90,7 @@ struct homing_animated_particle {
 
 	float homing_force = 3000.f;
 
-	assets::game_image_id first_face = assets::game_image_id::COUNT;
+	assets::game_image_id first_face = assets::game_image_id::INVALID;
 	rgba color;
 	float frame_duration_ms;
 	unsigned frame_count = 0;

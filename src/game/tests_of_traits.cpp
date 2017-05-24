@@ -14,8 +14,6 @@ struct tests_of_traits {
 
 	static_assert(!bind_types_right<is_one_of, int, double, unsigned, signed>::type<float>::value, "Trait has failed");
 
-	// static_assert(augs::enum_associative_array<assets::game_image_id, int>().capacity() == int(assets::game_image_id::COUNT), "enum_associative_array is wrong");
-
 	static_assert(does_asset_define_get_logical_meta<augs::enum_associative_array<assets::animation_id, animation>>::value, "Trait has failed");
 
 	static_assert(

@@ -236,16 +236,16 @@ void perform_spell_logic(
 
 				auto& missile = energy_ball += components::missile();
 
-				missile.destruction_particle_effect_response.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
-				missile.destruction_particle_effect_response.modifier.colorize = cyan;
+				missile.destruction_particles.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
+				missile.destruction_particles.modifier.colorize = cyan;
 
-				missile.bullet_trace_particle_effect_response.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
-				missile.bullet_trace_particle_effect_response.modifier.colorize = cyan;
+				missile.trace_particles.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
+				missile.trace_particles.modifier.colorize = cyan;
 
-				missile.muzzle_leave_particle_effect_response.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
-				missile.muzzle_leave_particle_effect_response.modifier.colorize = cyan;
+				missile.muzzle_leave_particles.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
+				missile.muzzle_leave_particles.modifier.colorize = cyan;
 
-				auto& trace_modifier = missile.bullet_trace_sound_response.modifier;
+				auto& trace_modifier = missile.trace_sound.modifier;
 
 				trace_modifier.max_distance = 1020.f;
 				trace_modifier.reference_distance = 100.f;
@@ -253,8 +253,8 @@ void perform_spell_logic(
 				trace_modifier.repetitions = -1;
 				trace_modifier.fade_on_exit = false;
 
-				missile.bullet_trace_sound_response.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
-				missile.destruction_sound_response.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
+				missile.trace_sound.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
+				missile.destruction_sound.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
 
 				missile.homing_towards_hostile_strength = 1.0f;
 				missile.particular_homing_target = next_hostile;

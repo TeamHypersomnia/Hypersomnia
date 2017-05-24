@@ -43,15 +43,16 @@ namespace components {
 		float homing_towards_hostile_strength = 0.f;
 		entity_id particular_homing_target;
 		
-		child_entity_id trace_sound;
-		child_entity_id trace_particles;
+		child_entity_id trace_sound_entity;
+		child_entity_id trace_particles_entity;
 
-		sound_response bullet_trace_sound_response;
-		sound_response destruction_sound_response;
+		sound_response trace_sound;
+		sound_response destruction_sound;
+		sound_response pass_through_held_item_sound;
 
-		particle_effect_response muzzle_leave_particle_effect_response;
-		particle_effect_response bullet_trace_particle_effect_response;
-		particle_effect_response destruction_particle_effect_response;
+		particle_effect_response muzzle_leave_particles;
+		particle_effect_response trace_particles;
+		particle_effect_response destruction_particles;
 
 		vec2 saved_point_of_impact_before_death;
 		// END GEN INTROSPECTOR

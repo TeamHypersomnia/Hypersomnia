@@ -4,6 +4,8 @@
 #include "augs/misc/basic_game_intent.h"
 
 enum class intent_type : unsigned char {
+	INVALID,
+
 	OPEN_DEVELOPER_CONSOLE,
 
 	THROW,

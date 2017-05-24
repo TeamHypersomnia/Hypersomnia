@@ -518,7 +518,7 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 	else if (maybe_hovered_action_button) {
 		const auto bound_spell = maybe_hovered_action_button->bound_spell;
 
-		if (bound_spell != assets::spell_id::COUNT) {
+		if (bound_spell != assets::spell_id::INVALID) {
 			tooltip_text = text::format_as_bbcode(
 				get_bbcoded_spell_description(
 					gui_entity,
