@@ -138,7 +138,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 		cv.notify_all();
 	}
 
-	bool resubstantiate = false;
+	bool reinfer = false;
 	
 	timer.reset_timer();
 	
@@ -225,7 +225,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 
 									cosmic_delta::encode(initial_hypersomnia, hypersomnia, complete_state);
 
-									resubstantiate = true;
+									reinfer = true;
 
 									endpoint.controlled_entity = scene.assign_new_character();
 									augs::write(complete_state, hypersomnia[endpoint.controlled_entity].get_guid());
@@ -333,12 +333,12 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 
 				step_packaged_for_network transported_step;
 
-				if (resubstantiate) {
+				if (reinfer) {
 					LOG("Ser sends resub request at step: %x", hypersomnia.get_total_steps_passed());
 				}
 
 				transported_step.step_type = step_packaged_for_network::type::NEW_ENTROPY;
-				transported_step.shall_resubstantiate = resubstantiate;
+				transported_step.shall_reinfer = reinfer;
 				transported_step.entropy = total_unpacked_entropy;
 				transported_step.next_client_commands_accepted = e.next_commands_accepted;
 
@@ -354,10 +354,10 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 
 			cosmic_entropy id_mapped_entropy(total_unpacked_entropy, hypersomnia);
 			
-			if (resubstantiate) {
+			if (reinfer) {
 				LOG("Ser: resubs at step: %x", hypersomnia.get_total_steps_passed());
 				hypersomnia.complete_reinference();
-				resubstantiate = false;
+				reinfer = false;
 			}
 
 			hypersomnia.advance_deterministic_schemata(

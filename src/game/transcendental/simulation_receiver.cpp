@@ -91,7 +91,7 @@ steps_unpacking_result simulation_receiver::unpack_deterministic_steps(
 			ensure(new_command.step_type == step_packaged_for_network::type::NEW_ENTROPY);
 
 		step_to_simulate sim;
-		sim.resubstantiate = new_command.shall_resubstantiate;
+		sim.reinfer = new_command.shall_reinfer;
 		sim.entropy = new_command.entropy;
 
 		result.entropies_to_simulate.emplace_back(sim);
@@ -99,7 +99,7 @@ steps_unpacking_result simulation_receiver::unpack_deterministic_steps(
 		const auto& actual_server_step = sim.entropy;
 		const auto& predicted_server_step = predicted_step_entropies.front();
 
-		if (sim.resubstantiate || actual_server_step != predicted_server_step) {
+		if (sim.reinfer || actual_server_step != predicted_server_step) {
 			result.reconciliate_predicted = true;
 		}
 

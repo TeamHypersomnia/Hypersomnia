@@ -270,7 +270,7 @@ bool cosmic_delta::encode(
 void cosmic_delta::decode(
 	cosmos& deco, 
 	augs::stream& in, 
-	const bool resubstantiate_partially
+	const bool reinfer_partially
 ) {
 	if (in.get_unread_bytes() == 0) {
 		return;

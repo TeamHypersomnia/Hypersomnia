@@ -19,7 +19,7 @@ struct misprediction_candidate_entry {
 };
 
 struct step_to_simulate {
-	bool resubstantiate = false;
+	bool reinfer = false;
 	guid_mapped_entropy entropy;
 };
 
@@ -48,7 +48,7 @@ public:
 	augs::jitter_buffer<step_packaged_for_network> jitter_buffer;
 	std::vector<guid_mapped_entropy> predicted_step_entropies;
 
-	float resubstantiate_prediction_every_ms = 1000.f;
+	float reinfer_prediction_every_ms = 1000.f;
 	float misprediction_smoothing_multiplier = 0.5f;
 
 	void acquire_next_packaged_step(const step_packaged_for_network&);
@@ -88,7 +88,7 @@ public:
 		for (const auto& e : result.entropies_to_simulate) {
 			const cosmic_entropy cosmic_entropy_for_this_step(e.entropy, referential_cosmos);
 			
-			if (e.resubstantiate) {
+			if (e.reinfer) {
 				LOG("Cli: %x resubs at step: %x", locally_controlled_entity, referential_cosmos.get_total_steps_passed());
 				referential_cosmos.complete_reinference();
 			}
@@ -96,9 +96,9 @@ public:
 			advance(cosmic_entropy_for_this_step, referential_cosmos);
 
 			const auto total_steps = referential_cosmos.get_total_steps_passed();
-			const auto resubstantiate_per_steps = static_cast<int>(resubstantiate_prediction_every_ms / referential_cosmos.get_fixed_delta().in_milliseconds());
+			const auto reinfer_once_per_steps = static_cast<int>(reinfer_prediction_every_ms / referential_cosmos.get_fixed_delta().in_milliseconds());
 
-			if (total_steps % resubstantiate_per_steps == 0) {
+			if (total_steps % reinfer_once_per_steps == 0) {
 				reconciliate_predicted = true;
 			}
 		}

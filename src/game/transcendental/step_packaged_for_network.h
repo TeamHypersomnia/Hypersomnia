@@ -9,7 +9,7 @@ struct step_packaged_for_network {
 		NEW_ENTROPY_WITH_HEARTBEAT
 	} step_type = type::INVALID;
 
-	bool shall_resubstantiate = false;
+	bool shall_reinfer = false;
 	bool next_client_commands_accepted = false;
 	augs::stream delta;
 	guid_mapped_entropy entropy;
@@ -21,7 +21,7 @@ namespace augs {
 		read(ar, storage.step_type);
 
 		if (storage.step_type == step_packaged_for_network::type::NEW_ENTROPY) {
-			read(ar, storage.shall_resubstantiate);
+			read(ar, storage.shall_reinfer);
 			read(ar, storage.next_client_commands_accepted);
 			read(ar, storage.entropy);
 		}
@@ -41,7 +41,7 @@ namespace augs {
 		augs::write(ar, written.step_type);
 
 		if (written.step_type == step_packaged_for_network::type::NEW_ENTROPY) {
-			augs::write(ar, written.shall_resubstantiate);
+			augs::write(ar, written.shall_reinfer);
 			augs::write(ar, written.next_client_commands_accepted);
 			augs::write(ar, written.entropy);
 
