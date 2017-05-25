@@ -37,9 +37,10 @@ void action_button::draw(
 
 			inside_col.a = 220;
 
-			const bool is_pushed = this_id->detector.current_appearance == augs::gui::appearance_detector::appearance::pushed;
+			const auto& detector = this_id->detector;
+			const bool is_pushed = detector.current_appearance == augs::gui::appearance_detector::appearance::pushed;
 
-			if (this_id->detector.is_hovered) {
+			if (detector.is_hovered) {
 				inside_col.a = 255;
 			}
 

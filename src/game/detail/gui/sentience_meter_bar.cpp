@@ -40,7 +40,8 @@ void sentience_meter_bar::draw(
 		icon_mat.color.a = 200;
 	}
 
-	const auto absolute = context.get_tree_entry(this_id).get_absolute_rect();
+	const auto& tree_entry = context.get_tree_entry(this_id);
+	const auto absolute = tree_entry.get_absolute_rect();
 
 	ltrb icon_rect;
 	icon_rect.set_position(absolute.get_position());
@@ -50,7 +51,7 @@ void sentience_meter_bar::draw(
 		icon_mat, 
 		icon_rect, 
 		context, 
-		context.get_tree_entry(this_id).get_parent(), 
+		tree_entry.get_parent(), 
 		info.v
 	);
 

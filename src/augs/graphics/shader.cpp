@@ -58,12 +58,16 @@ namespace augs {
 			if (!built) {
 				built = true;
 
-				if (shader_type == type::VERTEX)
-					id = glCreateShader(GL_VERTEX_SHADER); glerr;
-				if (shader_type == type::FRAGMENT)
-					id = glCreateShader(GL_FRAGMENT_SHADER); glerr;
+				if (shader_type == type::VERTEX) {
+					id = glCreateShader(GL_VERTEX_SHADER); 
+					glerr;
+				}
+				if (shader_type == type::FRAGMENT) {
+					id = glCreateShader(GL_FRAGMENT_SHADER); 
+					glerr;
+				}
 
-				auto* source_ptr = source_code.c_str();
+				auto* const source_ptr = source_code.c_str();
 				glShaderSource(id, 1, &source_ptr, nullptr); glerr
 				glCompileShader(id); glerr
 				printShaderInfoLog(id, source_code);

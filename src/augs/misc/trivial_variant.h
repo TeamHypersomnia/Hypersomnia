@@ -54,7 +54,7 @@ namespace augs {
 
 		template<class L, class Head, class... Tail>
 		decltype(auto) call_unroll(L f) {
-			if (index_in_v<Head, Types...> == current_type) {
+			if (index_in_v<Head, Types...> == static_cast<std::size_t>(current_type)) {
 				return f(get<Head>());
 			}
 			else {
@@ -64,7 +64,7 @@ namespace augs {
 
 		template<class L, class Head, class... Tail>
 		decltype(auto) call_unroll_const(L f) const {
-			if (index_in_v<Head, Types...> == current_type) {
+			if (index_in_v<Head, Types...> == static_cast<std::size_t>(current_type)) {
 				return f(get<Head>());
 			}
 			else {
@@ -103,7 +103,7 @@ namespace augs {
 
 			auto converted = T(t);
 			std::memcpy(buf, &converted, sizeof(T));
-			current_type = index_in_v<T, Types...>;
+			current_type = static_cast<unsigned>(index_in_v<T, Types...>);
 		}
 
 		template<class T_convertible>
@@ -115,7 +115,7 @@ namespace augs {
 		template<class T>
 		bool is() const {
 			assert_correct_type<T>();
-			return index_in_v<T, Types...> == current_type;
+			return index_in_v<T, Types...> == static_cast<std::size_t>(current_type);
 		}
 
 		template<class T>

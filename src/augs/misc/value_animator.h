@@ -54,7 +54,7 @@ namespace augs {
 
 		int loops;
 		int current_loop = 0;
-		unsigned current;
+		unsigned current = 0u;
 		value_animation(int loops = -1);
 
 		void start();

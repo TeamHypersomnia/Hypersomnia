@@ -7,8 +7,8 @@ namespace augs {
 	namespace graphics {
 		GLuint fbo::currently_bound_fbo = 0u;
 
-		fbo::fbo(const GLuint width, const GLuint height) {
-			create(width, height);
+		fbo::fbo(const GLuint w, const GLuint h) {
+			create(w, h);
 		}
 
 		void fbo::create(const GLuint w, const GLuint h) {

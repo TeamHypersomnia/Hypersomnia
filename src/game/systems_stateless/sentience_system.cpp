@@ -89,12 +89,13 @@ void sentience_system::cast_spells(const logic_step step) const {
 
 void sentience_system::regenerate_values_and_advance_spell_logic(const logic_step step) const {
 	const auto now = step.cosm.get_timestamp();
-	const auto regeneration_frequency_in_steps = static_cast<unsigned>(1 / step.cosm.get_fixed_delta().in_seconds() * 3);
-	const auto consciousness_regeneration_frequency_in_steps = static_cast<unsigned>(1 / step.cosm.get_fixed_delta().in_seconds() * 2);
-	const auto pe_regeneration_frequency_in_steps = static_cast<unsigned>(1 / step.cosm.get_fixed_delta().in_seconds() * 3);
 	auto& cosmos = step.cosm;
-	const auto& metas = step.input.metas_of_assets;
 	const auto delta = cosmos.get_fixed_delta();
+
+	const auto regeneration_frequency_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 3);
+	const auto consciousness_regeneration_frequency_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 2);
+	const auto pe_regeneration_frequency_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 3);
+	const auto& metas = step.input.metas_of_assets;
 
 	cosmos.for_each(
 		processing_subjects::WITH_SENTIENCE,
