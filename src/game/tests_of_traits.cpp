@@ -14,8 +14,8 @@ struct tests_of_traits {
 	static_assert(!is_constexpr_size_container_v<std::vector<int>>, "Trait has failed");
 	static_assert(is_constexpr_size_container_v<std::array<int, 3>>, "Trait has failed");
 	static_assert(is_constexpr_size_container_v<std::array<vec2, 3>>, "Trait has failed");
-	static_assert(is_constexpr_size_container_v<std::array<padding_byte, 3>>, "Trait has failed");
-	static_assert(!is_variable_size_container_v<std::array<padding_byte, 3>>, "Trait has failed");
+	static_assert(is_constexpr_size_container_v<decltype(pad_bytes<3>::pad)>, "Trait has failed");
+	static_assert(!is_variable_size_container_v<decltype(pad_bytes<3>::pad)>, "Trait has failed");
 	static_assert(is_variable_size_container_v<augs::enum_associative_array<intent_type, vec2>>, "Trait has failed");
 
 

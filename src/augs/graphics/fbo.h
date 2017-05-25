@@ -8,15 +8,25 @@ namespace augs {
 	namespace graphics {
 		class fbo {
 			friend class ::augs::renderer;
-			GLuint fboId, textureId, width, height;
-			bool created;
-			fbo& operator=(const fbo&) {}
+			GLuint fboId = 0u;
+			GLuint textureId = 0u;
+			GLuint width = 0u;
+			GLuint height = 0u;
+			
+			bool created = false;
 
 			static GLuint currently_bound_fbo;
 		public:
-			fbo(); ~fbo();
-			fbo(int width, int height);
-			void create(int width, int height);
+			fbo() = default;
+			~fbo();
+
+			fbo(fbo&&) = delete;
+			fbo(const fbo&) = delete;
+			fbo& operator=(const fbo&) = delete;
+			fbo& operator=(fbo&&) = delete;
+
+			fbo(const GLuint width, const GLuint height);
+			void create(const GLuint width, const GLuint height);
 			void destroy();
 
 			void use() const;

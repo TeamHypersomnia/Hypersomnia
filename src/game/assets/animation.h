@@ -7,7 +7,7 @@ class assets_manager;
 
 struct animation_frame {
 	// GEN INTROSPECTOR struct animation_frame
-	assets::game_image_id image_id;
+	assets::game_image_id image_id = assets::game_image_id::INVALID;
 	float duration_milliseconds = 0.f;
 	// END GEN INTROSPECTOR
 };

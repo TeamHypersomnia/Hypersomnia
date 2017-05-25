@@ -9,11 +9,11 @@
 namespace augs {
 	struct paint_circle_midpoint_command {
 		// GEN INTROSPECTOR struct augs::paint_circle_midpoint_command
-		unsigned radius;
+		unsigned radius = 0u;
 		unsigned border_width = 1;
 		bool scale_alpha = false;
 		bool constrain_angle = false;
-		std::array<padding_byte, 2> pad;
+		pad_bytes<2> pad;
 		float angle_start = 0.f;
 		float angle_end = 0.f;
 		rgba filling = white;
@@ -26,7 +26,7 @@ namespace augs {
 
 	struct paint_circle_filled_command {
 		// GEN INTROSPECTOR struct augs::paint_circle_filled_command
-		unsigned radius;
+		unsigned radius = 0u;
 		rgba filling = white;
 		// END GEN INTROSPECTOR
 

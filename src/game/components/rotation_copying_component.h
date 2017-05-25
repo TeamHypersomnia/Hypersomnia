@@ -25,7 +25,7 @@ namespace components {
 
 		bool colinearize_item_in_hand = false;
 		bool update_value = true;
-		std::array<padding_byte, 2> pad;
+		pad_bytes<2> pad;
 		
 		float smoothing_average_factor = 0.5f;
 		float averages_per_sec = 20.0f;

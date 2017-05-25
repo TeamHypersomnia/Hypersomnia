@@ -47,7 +47,7 @@ namespace components {
 		}
 	}
 
-	void movement::set_flags_from_target_direction(vec2 d) {
+	void movement::set_flags_from_target_direction(const vec2 d) {
 		moving_left = moving_right = moving_forward = moving_backward = false;
 		if (d.x > 0) moving_right = true;
 		if (d.y > 0) moving_backward = true;

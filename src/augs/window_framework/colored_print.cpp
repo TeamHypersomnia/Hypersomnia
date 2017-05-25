@@ -33,8 +33,7 @@ namespace augs {
 			GetColorAttribute(color) | FOREGROUND_INTENSITY);
 
 		fflush(stdout);
-		printf(text);
-		printf("\n");
+		printf("%s\n", text);
 		// Restores the text color.
 		SetConsoleTextAttribute(stdout_handle, old_color_attrs);
 	}

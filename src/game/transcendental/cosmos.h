@@ -308,7 +308,7 @@ inline behaviour_tree& cosmos::get_handle(const assets::behaviour_tree_id id) {
 }
 
 inline const behaviour_tree& cosmos::get_handle(const assets::behaviour_tree_id id) const {
-	return unserializable_behaviour_trees[id];
+	return unserializable_behaviour_trees.at(id);
 }
 
 #if COSMOS_TRACKS_GUIDS

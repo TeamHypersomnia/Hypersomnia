@@ -29,7 +29,7 @@ public:
 
 	rgba colorize;
 	bool click_callback_required = false;
-	std::array<padding_byte, 3> pad;
+	pad_bytes<3> pad;
 
 	typedef app_ui_rect_node base;
 	typedef base::gui_entropy gui_entropy;

@@ -12,7 +12,7 @@ struct button_with_corners_stamp {
 
 	unsigned inside_border_padding = 0u;
 	bool make_lb_complement = false;
-	std::array<padding_byte, 3> pad;
+	pad_bytes<3> pad;
 };
 
 void regenerate_buttons_with_corners(

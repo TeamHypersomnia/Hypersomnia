@@ -147,10 +147,6 @@ namespace augs {
 			return raw[i];
 		}
 
-		const mapped_type& operator[](const key_type enum_idx) const {
-			return at(enum_idx);
-		}
-
 		constexpr std::size_t capacity() const {
 			return raw.size();
 		}

@@ -23,7 +23,7 @@ namespace components {
 
 		bool is_alert = false;
 		bool last_seen_target_position_inspected = false;
-		std::array<padding_byte, 2> pad;
+		pad_bytes<2> pad;
 
 		vec2 last_seen_target_position;
 		vec2 last_seen_target_velocity;

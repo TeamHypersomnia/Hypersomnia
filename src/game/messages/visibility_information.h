@@ -15,7 +15,7 @@ enum class visibility_type {
 
 struct visibility_information_request_input {
 	b2Filter filter;
-	std::array<padding_byte, 2> pad;
+	pad_bytes<2> pad;
 
 	float square_side = 0.f;
 	float ignore_discontinuities_shorter_than = -1.f;

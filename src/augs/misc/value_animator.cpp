@@ -55,7 +55,7 @@ namespace augs {
 		reset(init, desired);
 	}
 
-	value_animation::value_animation(int loops) : loops(loops), current(0) {}
+	value_animation::value_animation(const int loops) : loops(loops) {}
 
 	void value_animation::start() {
 		current = current_loop = 0;

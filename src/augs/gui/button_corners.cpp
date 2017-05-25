@@ -274,10 +274,10 @@ ltrb button_corners_info::cornered_rc_to_internal_rc(ltrb l) const {
 
 ltrb button_corners_info::internal_rc_to_cornered_rc(ltrb l) const {
 	const auto& manager = get_assets_manager();
-	l.l += manager[get_tex_for_type(button_corner_type::L)].get_size().x;
-	l.t += manager[get_tex_for_type(button_corner_type::T)].get_size().y;
-	l.r -= manager[get_tex_for_type(button_corner_type::R)].get_size().x;
-	l.b -= manager[get_tex_for_type(button_corner_type::B)].get_size().y;
+	l.l -= manager[get_tex_for_type(button_corner_type::L)].get_size().x;
+	l.t -= manager[get_tex_for_type(button_corner_type::T)].get_size().y;
+	l.r += manager[get_tex_for_type(button_corner_type::R)].get_size().x;
+	l.b += manager[get_tex_for_type(button_corner_type::B)].get_size().y;
 	return l;
 }
 

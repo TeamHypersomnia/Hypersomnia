@@ -46,25 +46,28 @@ namespace augs {
 			{
 				posrgba current;
 				current.pos = field + offsets[i];
-				if (current.pos.x >= size.x || current.pos.x < 0 || current.pos.y >= size.y
-					|| current.pos.y < 0)
+				
+				if (current.pos.x >= size.x || current.pos.y >= size.y) {
 					continue;
-				if (vertices.size() > 1 && current.pos == vertices[0])
-				{
+				}
+
+				if (vertices.size() > 1 && current.pos == vertices[0]) {
 					quit = true;
 					break;
 				}
-				if (pixelFields[current.pos.y * size.x + current.pos.x])
+
+				if (pixelFields[current.pos.y * size.x + current.pos.x]) {
 					continue;
+				}
+
 				current.col = pixel(current.pos);
-				if (current.col == black)
-				{
+
+				if (current.col == black) {
 					field = current.pos;
 					pixelFields[current.pos.y * size.x + current.pos.x] = true;
 					break;
 				}	
-				else if (current.col == red)
-				{
+				else if (current.col == red) {
 					vertices.push_back(current.pos);
 					field = current.pos;
 					pixelFields[current.pos.y * size.x + current.pos.x] = true;
@@ -72,7 +75,7 @@ namespace augs {
 				}
 				pixelFields[current.pos.y * size.x + current.pos.x] = true;
 			}	
-		}while (!quit);
+		} while(!quit);
 #else
 		vertices = { vec2i(0, 0), vec2i(size.x, 0), vec2i(size.x, size.y), vec2i(0, size.y) };
 #endif

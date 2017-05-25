@@ -10,7 +10,7 @@ namespace augs {
 		float reference_distance = 0.f;
 		short repetitions = 1;
 		bool fade_on_exit = true;
-		padding_byte pad;
+		pad_bytes<1> pad;
 		// END GEN INTROSPECTOR
 	};
 }

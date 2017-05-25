@@ -23,7 +23,7 @@ class particles_simulation_system {
 public:
 	struct emission_instance {
 		bool enable_streaming = false;
-		std::array<padding_byte, 2> pad;
+		pad_bytes<2> pad;
 
 		float angular_offset = 0.f;
 

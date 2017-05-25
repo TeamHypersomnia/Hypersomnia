@@ -9,7 +9,7 @@
 
 namespace components {
 	struct item {
-		enum mounting_state {
+		enum mounting_state : unsigned char {
 			MOUNTED,
 			UNMOUNTED,
 		};
@@ -17,12 +17,13 @@ namespace components {
 		// GEN INTROSPECTOR struct components::item
 		mounting_state current_mounting = UNMOUNTED;
 		mounting_state intended_mounting = UNMOUNTED;
+		bool stackable = false;
+		pad_bytes<1> pad;
 
 		item_category_flagset categories_for_slot_compatibility = { item_category::GENERAL };
 
 		int charges = 1;
 		unsigned space_occupied_per_charge = 1;
-		int stackable = false;
 
 		unsigned dual_wield_accuracy_loss_percentage = 50;
 		unsigned dual_wield_accuracy_loss_multiplier = 1;

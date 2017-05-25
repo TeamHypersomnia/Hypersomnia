@@ -22,7 +22,7 @@ TEST_CASE("Templates StringTemplates") {
 			.multi_replace_all({ "abc" }, "")
 		;
 
-		REQUIRE(test == "");
+		REQUIRE(test.empty());
 	}
 
 	{
@@ -31,7 +31,7 @@ TEST_CASE("Templates StringTemplates") {
 			.multi_replace_all({ " " }, "")
 		;
 
-		REQUIRE(test == "");
+		REQUIRE(test.empty());
 	}
 }
 #endif

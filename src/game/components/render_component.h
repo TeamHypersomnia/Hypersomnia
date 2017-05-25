@@ -12,7 +12,7 @@ namespace components {
 		// GEN INTROSPECTOR struct components::render
 		bool draw_border = false;
 		render_layer layer = render_layer::INVALID;
-		std::array<padding_byte, 2> pad;
+		pad_bytes<2> pad;
 
 		rgba border_color;
 

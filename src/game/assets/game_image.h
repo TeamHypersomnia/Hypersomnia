@@ -17,7 +17,7 @@ struct game_image_usage_settings {
 	struct {
 		bool flip_horizontally = false;
 		bool flip_vertically = false;
-		std::array<padding_byte, 2> pad;
+		pad_bytes<2> pad;
 
 		vec2 bbox_expander;
 	} gui;

@@ -18,22 +18,24 @@ public:
 			generic_call(dereferenced);
 		});
 
-		for (size_t i = 0; i < context.get_character_gui().hotbar_buttons.size(); ++i) {
+		auto& character_gui = context.get_character_gui();
+
+		for (std::size_t i = 0; i < character_gui.hotbar_buttons.size(); ++i) {
 			hotbar_button_in_character_gui child_location;
 			child_location.index = static_cast<int>(i);
-			generic_call(make_dereferenced_location(&context.get_character_gui().hotbar_buttons[i], child_location));
+			generic_call(make_dereferenced_location(&character_gui.hotbar_buttons[i], child_location));
 		}
 
-		for (size_t i = 0; i < context.get_character_gui().action_buttons.size(); ++i) {
+		for (std::size_t i = 0; i < character_gui.action_buttons.size(); ++i) {
 			action_button_in_character_gui child_location;
 			child_location.index = static_cast<int>(i);
-			generic_call(make_dereferenced_location(&context.get_character_gui().action_buttons[i], child_location));
+			generic_call(make_dereferenced_location(&character_gui.action_buttons[i], child_location));
 		}
 
-		for (size_t i = 0; i < context.get_character_gui().sentience_meter_bars.size(); ++i) {
+		for (std::size_t i = 0; i < character_gui.sentience_meter_bars.size(); ++i) {
 			sentience_meter_bar_in_character_gui child_location;
 			child_location.type = static_cast<sentience_meter_type>(i);
-			generic_call(make_dereferenced_location(&context.get_character_gui().sentience_meter_bars[i], child_location));
+			generic_call(make_dereferenced_location(&character_gui.sentience_meter_bars[i], child_location));
 		}
 	}
 };

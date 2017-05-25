@@ -116,8 +116,6 @@ namespace augs {
 		}
 		
 		reliable_receiver::result_data reliable_receiver::read_sequence(augs::stream& input) {
-			std::stringstream report;
-
 			unsigned short update_from_sequence = 0u;
 			unsigned received_first_message = 0u;
 			unsigned short received_message_count = 0u;

@@ -6,7 +6,7 @@ namespace components {
 	struct all_inferred_state : synchronizable_component {
 		// GEN INTROSPECTOR struct components::all_inferred_state
 		bool activated = true;
-		std::array<padding_byte, 3> pad;
+		pad_bytes<3> pad;
 		// END GEN INTROSPECTOR
 	};
 }

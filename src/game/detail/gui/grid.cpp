@@ -2,7 +2,7 @@
 
 #define GRID_WIDTH 11
 
-vec2i griddify(vec2 v) {
+vec2i griddify(const vec2 v) {
 	vec2i vi = v;
 	return griddify(vi);
 }

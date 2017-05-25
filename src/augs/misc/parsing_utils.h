@@ -6,7 +6,7 @@
 namespace augs {
 	auto make_get_line_until(
 		const std::vector<std::string>& lines,
-		size_t& current_line
+		std::size_t& current_line
 	) {
 		return [&lines, &current_line](const std::string delimiter = std::string()) {
 			while (
@@ -14,8 +14,8 @@ namespace augs {
 				&& (
 					std::all_of(lines[current_line].begin(), lines[current_line].end(), isspace)
 					|| lines[current_line][0] == '%'
-					)
-				) {
+				)
+			) {
 				++current_line;
 			}
 
@@ -23,7 +23,7 @@ namespace augs {
 				return false;
 			}
 			
-			if ((!delimiter.empty() && lines[current_line] == delimiter)) {
+			if (!delimiter.empty() && lines[current_line] == delimiter) {
 				++current_line;
 				return false;
 			}

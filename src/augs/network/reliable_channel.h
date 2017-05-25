@@ -28,11 +28,9 @@ namespace augs {
 		};
 
 		struct reliable_receiver {
-			bool ack_requested = false;
-
 			unsigned last_message = 0u;
-
 			unsigned short last_received_sequence = 0u;
+			bool ack_requested = false;
 
 			struct result_data {
 				enum type {

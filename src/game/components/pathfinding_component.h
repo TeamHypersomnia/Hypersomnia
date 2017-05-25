@@ -9,7 +9,7 @@ class pathfinding_system;
 struct pathfinding_navigation_hint {
 	// GEN INTROSPECTOR struct pathfinding_navigation_hint
 	bool enabled = false;
-	std::array<padding_byte, 3> pad;
+	pad_bytes<3> pad;
 	vec2 origin;
 	vec2 target;
 	// END GEN INTROSPECTOR
@@ -28,7 +28,7 @@ struct pathfinding_session {
 	vec2 navigate_to;
 
 	bool persistent_navpoint_set = false;
-	std::array<padding_byte, 3> pad;
+	pad_bytes<3> pad;
 	pathfinding_navigation_vertex persistent_navpoint;
 
 	std::vector<pathfinding_navigation_vertex> discovered_vertices;
@@ -61,7 +61,7 @@ namespace components {
 		bool enable_backtracking = true;
 		
 		bool favor_velocity_parallellness = false;
-		std::array<padding_byte, 3> pad;
+		pad_bytes<3> pad;
 
 		vec2 eye_offset;
 

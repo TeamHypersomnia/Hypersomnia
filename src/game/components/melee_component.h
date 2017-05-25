@@ -21,7 +21,7 @@ namespace components {
 		bool primary_move_flag = false;
 		bool secondary_move_flag = false;
 		bool tertiary_move_flag = false;
-		padding_byte pad;
+		pad_bytes<1> pad;
 
 		melee_state current_state = melee_state::FREE;
 		// END GEN INTROSPECTOR

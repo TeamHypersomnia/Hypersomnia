@@ -52,8 +52,8 @@ struct ltrbt {
 		b = t + hh;
 	}
 
-	void set(const T l, const T t, const T r, const T b) {
-		*this = ltrbt(l, t, r, b);
+	void set(const T _l, const T _t, const T _r, const T _b) {
+		*this = ltrbt(_l, _t, _r, _b);
 	}
 
 	ltrbt& set_position(const vec2t<T> v) {
@@ -285,7 +285,7 @@ struct ltrbt {
 		return ltrbt(l + T(p.x), t + T(p.y), r + T(p.x), b + T(p.y));
 	}
 
-	ltrbt& scale(T s) {
+	ltrbt& scale(const T s) {
 		l *= s;
 		t *= s;
 		r *= s;
@@ -314,8 +314,8 @@ struct xywht {
 	xywht(const T x, const T y, const vec2t<T>& s) : x(x), y(y), w(s.x), h(s.y) {}
 	xywht(const vec2t<T>& p, const vec2t<T>& s) : x(p.x), y(p.y), w(s.x), h(s.y) {}
 
-	void set(const T x, const T y, const T w, const T h) {
-		*this = xywht(x, y, w, h);
+	void set(const T _x, const T _y, const T _w, const T _h) {
+		*this = xywht(_x, _y, _w, _h);
 	}
 
 	bool clip(const xywht& rc) {
@@ -330,11 +330,11 @@ struct xywht {
 		return true;
 	}
 
-	void r(T right) {
+	void r(const T right) {
 		this->w = right - x;
 	}
 
-	void b(T bottom) {
+	void b(const T bottom) {
 		this->h = bottom - y;
 	}
 

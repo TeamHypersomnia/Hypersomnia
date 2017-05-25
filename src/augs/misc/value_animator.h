@@ -52,7 +52,8 @@ namespace augs {
 	struct value_animation {
 		std::vector<value_animator> animators;
 
-		int loops, current_loop;
+		int loops;
+		int current_loop = 0;
 		unsigned current;
 		value_animation(int loops = -1);
 

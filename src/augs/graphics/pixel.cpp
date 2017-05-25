@@ -216,12 +216,12 @@ rgba rgba::operator-(const rgba s) const {
 	);
 }
 
-rgba& rgba::operator*=(const rgba b) {
-	return (*this = *this * b);
+rgba& rgba::operator*=(const rgba s) {
+	return (*this = *this * s);
 }
 
-rgba& rgba::operator+=(const rgba b) {
-	return (*this = *this + b);
+rgba& rgba::operator+=(const rgba s) {
+	return (*this = *this + s);
 }
 
 bool rgba::operator==(const rgba& v) const {

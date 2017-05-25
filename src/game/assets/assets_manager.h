@@ -111,7 +111,7 @@ struct subscript_asset_getters {
 	decltype(auto) operator[](const id_type id) const {
 		const auto& self = *static_cast<const derived*>(this);
 
-		return get_container_with_key_type<id_type>(self.all)[id];
+		return get_container_with_key_type<id_type>(self.all).at(id);
 	}
 };
 

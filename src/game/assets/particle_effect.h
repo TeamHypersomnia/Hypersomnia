@@ -81,10 +81,10 @@ struct particles_emission {
 	float initial_rotation_variation = 0.f;
 	bool randomize_acceleration = false;
 	bool should_particles_look_towards_velocity = true;
-	std::array<padding_byte, 2> pad;
+	pad_bytes<2> pad;
 
 	tuple_of_particle_definitions_vectors particle_definitions;
-	render_layer target_render_layer;
+	render_layer target_render_layer = render_layer::INVALID;
 	// END GEN INTROSPECTOR
 
 	template <class T>

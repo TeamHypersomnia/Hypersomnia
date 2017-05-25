@@ -11,7 +11,6 @@ entity_id get_first_named_ancestor(const const_entity_handle p) {
 	while (cosmos[iterator].alive()) {
 		if (cosmos[iterator].has<components::name>()) {
 			return iterator;
-			break;
 		}
 
 		iterator = cosmos[iterator].get_parent();

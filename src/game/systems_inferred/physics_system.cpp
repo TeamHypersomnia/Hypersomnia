@@ -372,14 +372,15 @@ void physics_system::step_and_set_new_transforms(const logic_step step) {
 	for (b2Body* b = b2world->GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
 		entity_handle entity = cosmos[b->GetUserData()];
-		auto& rigid_body = entity.get<components::rigid_body>();
 
 		recurential_friction_handler(step, b, b->m_ownerFrictionGround);
 
-		rigid_body.get_data().transform = b->m_xf;
-		rigid_body.get_data().sweep = b->m_sweep;
-		rigid_body.get_data().velocity = b->GetLinearVelocity();
-		rigid_body.get_data().angular_velocity = b->GetAngularVelocity();
+		auto& body = entity.get<components::rigid_body>().get_data();
+		
+		body.transform = b->m_xf;
+		body.sweep = b->m_sweep;
+		body.velocity = b->GetLinearVelocity();
+		body.angular_velocity = b->GetAngularVelocity();
 	}
 }
 
@@ -405,8 +406,8 @@ physics_system& physics_system::operator=(const physics_system& b) {
 	migrated_b2World.m_contactManager.m_allocator = &migrated_b2World.m_blockAllocator;
 
 	std::unordered_map<void*, void*> pointer_migrations;
-	std::unordered_map<void*, size_t> contact_edge_offsets_in_contacts;
-	std::unordered_map<void*, size_t> joint_edge_offsets_in_joints;
+	std::unordered_map<void*, std::size_t> contact_edge_offsets_in_contacts;
+	std::unordered_map<void*, std::size_t> joint_edge_offsets_in_joints;
 
 	b2BlockAllocator& migrated_allocator = migrated_b2World.m_blockAllocator;
 

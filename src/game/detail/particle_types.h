@@ -10,7 +10,7 @@ struct general_particle {
 	vec2 pos;
 	vec2 vel;
 	vec2 acc;
-	assets::game_image_id image_id;
+	assets::game_image_id image_id = assets::game_image_id::INVALID;
 	rgba color;
 	vec2 size;
 	float rotation = 0.f;
@@ -61,7 +61,7 @@ struct animated_particle {
 
 	assets::game_image_id first_face = assets::game_image_id::INVALID;
 	rgba color;
-	float frame_duration_ms;
+	float frame_duration_ms = 0.f;
 	unsigned frame_count = 0;
 	// END GEN INTROSPECTOR
 
@@ -92,7 +92,7 @@ struct homing_animated_particle {
 
 	assets::game_image_id first_face = assets::game_image_id::INVALID;
 	rgba color;
-	float frame_duration_ms;
+	float frame_duration_ms = 0.f;
 	unsigned frame_count = 0;
 	// END GEN INTROSPECTOR
 

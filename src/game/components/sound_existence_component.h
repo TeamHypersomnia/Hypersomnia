@@ -14,7 +14,7 @@ struct sound_effect_input {
 	sound_response effect;
 	bool delete_entity_after_effect_lifetime = true;
 	char variation_number = -1;
-	std::array<padding_byte, 2> pad;
+	pad_bytes<2> pad;
 	entity_id direct_listener;
 	// END GEN INTROSPECTOR
 

@@ -7,7 +7,7 @@
 
 namespace augs {
 	namespace graphics {
-		void printShaderInfoLog(GLuint obj, std::string source_code) {
+		void printShaderInfoLog(const GLuint obj, const std::string& source_code) {
 			int infologLength = 0;
 			int charsWritten = 0;
 			char *infoLog;
@@ -23,7 +23,7 @@ namespace augs {
 			}
 		}
 
-		void printProgramInfoLog(GLuint obj) {
+		void printProgramInfoLog(const GLuint obj) {
 			int infologLength = 0;
 			int charsWritten = 0;
 			char *infoLog;

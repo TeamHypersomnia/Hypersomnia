@@ -11,7 +11,7 @@ namespace components {
 		// GEN INTROSPECTOR struct components::shape_circle
 		float radius = 0.f;
 		bool activated = true;
-		std::array<padding_byte, 3> pad;
+		pad_bytes<3> pad;
 		// END GEN INTROSPECTOR
 	};
 }

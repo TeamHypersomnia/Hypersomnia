@@ -66,9 +66,11 @@ namespace augs {
 	}
 
 	void renderer::initialize_fbos(const vec2i screen_size) {
-		illuminating_smoke_fbo.create(screen_size.x, screen_size.y);
-		smoke_fbo.create(screen_size.x, screen_size.y);
-		light_fbo.create(screen_size.x, screen_size.y);
+		const auto sz = vec2u(screen_size);
+
+		illuminating_smoke_fbo.create(sz.x, sz.y);
+		smoke_fbo.create(sz.x, sz.y);
+		light_fbo.create(sz.x, sz.y);
 	}
 
 	void renderer::enable_special_vertex_attribute() {
@@ -88,7 +90,9 @@ namespace augs {
 	}
 
 	void renderer::call_triangles() {
-		if (triangles.empty()) return;
+		if (triangles.empty()) {
+			return;
+		}
 
 		if (!specials.empty()) {
 			enable_special_vertex_attribute();
@@ -98,8 +102,9 @@ namespace augs {
 
 		call_triangles(triangles);
 
-		if (!specials.empty()) 
+		if (!specials.empty()) {
 			disable_special_vertex_attribute();
+		}
 	}
 
 	void renderer::call_triangles(const vertex_triangle_buffer& buffer) {
@@ -126,7 +131,7 @@ namespace augs {
 		lines.push_back(line);
 	}
 
-	void renderer::set_viewport(xywhi xywh) {
+	void renderer::set_viewport(const xywhi xywh) {
 		glViewport(xywh.x, xywh.y, xywh.w, xywh.h);
 	}
 	
@@ -134,7 +139,11 @@ namespace augs {
 		concatenate(triangles, added);
 	}
 
-	void renderer::push_special_vertex_triangle(augs::special s1, augs::special s2, augs::special s3) {
+	void renderer::push_special_vertex_triangle(
+		const augs::special s1, 
+		const augs::special s2, 
+		const augs::special s3
+	) {
 		specials.push_back(s1);
 		specials.push_back(s2);
 		specials.push_back(s3);
@@ -210,15 +219,15 @@ namespace augs {
 		frame_lines.lines.clear();
 	}
 
-	void renderer::line_channel::draw(vec2 a, vec2 b, rgba col) {
+	void renderer::line_channel::draw(const vec2 a, const vec2 b, const rgba col) {
 		lines.push_back(debug_line(a, b, col));
 	}
 
-	void renderer::line_channel::draw_red(vec2 a, vec2 b) { draw(a, b, red); }
-	void renderer::line_channel::draw_green(vec2 a, vec2 b) { draw(a, b, dark_green); }
-	void renderer::line_channel::draw_blue(vec2 a, vec2 b) { draw(a, b, blue); }
-	void renderer::line_channel::draw_yellow(vec2 a, vec2 b) { draw(a, b, yellow); }
-	void renderer::line_channel::draw_cyan(vec2 a, vec2 b) { draw(a, b, cyan); }
+	void renderer::line_channel::draw_red(const vec2 a, const vec2 b) { draw(a, b, red); }
+	void renderer::line_channel::draw_green(const vec2 a, const vec2 b) { draw(a, b, dark_green); }
+	void renderer::line_channel::draw_blue(const vec2 a, const vec2 b) { draw(a, b, blue); }
+	void renderer::line_channel::draw_yellow(const vec2 a, const vec2 b) { draw(a, b, yellow); }
+	void renderer::line_channel::draw_cyan(const vec2 a, const vec2 b) { draw(a, b, cyan); }
 
 	void renderer::draw_debug_info(
 		const camera_cone camera,

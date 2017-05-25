@@ -8,7 +8,7 @@ namespace components {
 		entity_id owned_vehicle;
 		float density_multiplier_while_driving = 1.f/3.f;
 		bool take_hold_of_wheel_when_touched = false;
-		std::array<padding_byte, 3> pad;
+		pad_bytes<3> pad;
 		// END GEN INTROSPECTOR
 	};
 }

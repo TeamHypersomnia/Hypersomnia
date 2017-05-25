@@ -105,7 +105,6 @@ void component_synchronizer<false, P>::set_angular_damping(const float damping) 
 	get_cache().body->SetAngularDamping(damping);
 }
 
-
 void component_synchronizer<false, P>::set_linear_damping_vec(const vec2 damping) const {
 	get_data().linear_damping_vec = damping;
 
@@ -130,17 +129,20 @@ void component_synchronizer<false, P>::apply_force(
 		return;
 	}
 
-	const auto force = handle.get_cosmos().get_fixed_delta().in_seconds() * to_meters(pixels);
-	const auto location = vec2(get_cache().body->GetWorldCenter() + to_meters(center_offset));
+	const auto body = get_cache().body;
+	auto& data = get_data();
 
-	get_cache().body->ApplyLinearImpulse(
+	const auto force = handle.get_cosmos().get_fixed_delta().in_seconds() * to_meters(pixels);
+	const auto location = vec2(body->GetWorldCenter() + to_meters(center_offset));
+
+	body->ApplyLinearImpulse(
 		force, 
 		location, 
 		wake
 	);
 
-	get_data().angular_velocity = get_cache().body->GetAngularVelocity();
-	get_data().velocity = get_cache().body->GetLinearVelocity();
+	data.angular_velocity = body->GetAngularVelocity();
+	data.velocity = body->GetLinearVelocity();
 
 	if (augs::renderer::get_current().debug.draw_forces && force.non_zero()) {
 		auto& lines = augs::renderer::get_current().logic_lines;
@@ -152,19 +154,26 @@ void component_synchronizer<false, P>::apply_impulse(const vec2 pixels) const {
 	apply_impulse(pixels, vec2(0, 0), true);
 }
 
-void component_synchronizer<false, P>::apply_impulse(const vec2 pixels, const vec2 center_offset, const bool wake) const {
+void component_synchronizer<false, P>::apply_impulse(
+	const vec2 pixels, 
+	const vec2 center_offset, 
+	const bool wake
+) const {
 	ensure(is_constructed());
 
 	if (pixels.is_epsilon(2.f)) {
 		return;
 	}
 
-	const vec2 force = to_meters(pixels);
-	const vec2 location = get_cache().body->GetWorldCenter() + to_meters(center_offset);
+	const auto body = get_cache().body;
+	auto& data = get_data();
 
-	get_cache().body->ApplyLinearImpulse(force, location, true);
-	get_data().angular_velocity = get_cache().body->GetAngularVelocity();
-	get_data().velocity = get_cache().body->GetLinearVelocity();
+	const vec2 force = to_meters(pixels);
+	const vec2 location = body->GetWorldCenter() + to_meters(center_offset);
+
+	body->ApplyLinearImpulse(force, location, true);
+	data.angular_velocity = body->GetAngularVelocity();
+	data.velocity = body->GetLinearVelocity();
 
 	if (augs::renderer::get_current().debug.draw_forces && force.non_zero()) {
 		auto& lines = augs::renderer::get_current().persistent_lines;
@@ -174,8 +183,11 @@ void component_synchronizer<false, P>::apply_impulse(const vec2 pixels, const ve
 
 void component_synchronizer<false, P>::apply_angular_impulse(const float imp) const {
 	ensure(is_constructed());
-	get_cache().body->ApplyAngularImpulse(imp, true);
-	get_data().angular_velocity = get_cache().body->GetAngularVelocity();
+	const auto body = get_cache().body;
+	auto& data = get_data();
+
+	body->ApplyAngularImpulse(imp, true);
+	data.angular_velocity = body->GetAngularVelocity();
 }
 
 template<bool C>
@@ -237,7 +249,10 @@ void component_synchronizer<false, P>::set_transform(const entity_id id) const {
 }
 
 void component_synchronizer<false, P>::set_transform(const components::transform& transform) const {
-	get_data().set_transform(
+	const auto body = get_cache().body;
+	auto& data = get_data();
+
+	data.set_transform(
 		handle.get_cosmos().significant.meta.global.si,
 		transform
 	);
@@ -246,8 +261,8 @@ void component_synchronizer<false, P>::set_transform(const components::transform
 		return;
 	}
 
-	get_cache().body->m_xf = get_data().transform;
-	get_cache().body->m_sweep = get_data().sweep;
+	body->m_xf = get_data().transform;
+	body->m_sweep = get_data().sweep;
 }
 
 template<bool C>

@@ -242,37 +242,4 @@ namespace augs  {
 
 	template <size_t const_count>
 	using constant_size_wstring = constant_size_vector<zeroed_pod<wchar_t>, const_count>;
-
-	template<class Key, class Value, size_t const_count>
-	class constant_size_associative_vector : private constant_size_vector<trivially_copyable_pair<Key, Value>, const_count> {
-		typedef trivially_copyable_pair<Key, Value> elem_type;
-		typedef constant_size_vector<trivially_copyable_pair<Key, Value>, const_count> base;
-	public:
-		using base::clear;
-		using base::capacity;
-		using base::size;
-		using base::empty;
-
-		void erase(const Key& i) {
-			auto it = binary_find(begin(), end(), i, [](const elem_type& a, const elem_type& b) { return a.first < b.first; });
-			ensure(it != end());
-			base::erase(it);
-		}
-
-		Value& operator[](const Key& i) {
-			auto it = binary_find(begin(), end(), i, [](const elem_type& a, const elem_type& b) { return a.first < b.first; });
-			
-			if (it == end()) {
-				insert(it, elem_type(i, Value()));
-			}
-
-			return (*it).second;
-		}
-
-		const Value& operator[](const Key& i) const {
-			auto it = binary_find(begin(), end(), i, [](const elem_type& a, const elem_type& b) { return a.first < b.first; });
-			ensure(it != end());
-			return (*it).second;
-		}
-	};
 }

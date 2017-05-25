@@ -28,7 +28,7 @@ class tree_of_npo_system {
 
 	struct cache {
 		bool constructed = false;
-		tree_of_npo_type type;
+		tree_of_npo_type type = tree_of_npo_type::COUNT;
 		int tree_proxy_id = -1;
 
 		bool is_constructed() const;

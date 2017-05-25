@@ -160,13 +160,13 @@ void make_neon(
 			for (size_t x = 0; x < kernel[y].size(); ++x) {
 				size_t current_index_y = pixel.y + y - stamp.radius_towards_y_axis / 2;
 
-				if (current_index_y < 0 || current_index_y >= source.get_rows()) {
+				if (current_index_y >= source.get_rows()) {
 					continue;
 				}
 
 				size_t current_index_x = pixel.x + x - stamp.radius_towards_x_axis / 2;
 
-				if (current_index_x < 0 || current_index_x >= source.get_columns()) {
+				if (current_index_x >= source.get_columns()) {
 					continue;
 				}
 
@@ -210,10 +210,10 @@ void make_neon(
 std::vector<std::vector<double>> generate_gauss_kernel(const neon_map_stamp& stamp)
 {
 	const auto radius_towards_x_axis = stamp.radius_towards_x_axis;
-	const auto radius_towards_y_axis = stamp.radius_towards_y_axis;
+	auto radius_towards_y_axis = stamp.radius_towards_y_axis;
 
 	if (!stamp.radius_towards_y_axis) {
-		const auto radius_towards_y_axis = radius_towards_x_axis;
+		radius_towards_y_axis = radius_towards_x_axis;
 	}
 
 	std::vector<std::vector<std::pair<int, int> > > index;

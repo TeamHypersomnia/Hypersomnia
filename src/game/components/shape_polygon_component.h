@@ -16,7 +16,7 @@ namespace components {
 		convex_partitioned_shape shape;
 		std::array<convex_poly_destruction_data, CONVEX_POLYS_COUNT> destruction;
 		bool activated = true;
-		std::array<padding_byte, 3> pad;
+		pad_bytes<3> pad;
 		// END GEN INTROSPECTOR
 	};
 }

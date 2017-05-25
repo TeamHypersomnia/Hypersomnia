@@ -10,8 +10,9 @@ static std::string leading_zero(T component)
 	out << component;
 	std::string result = out.str();
 
-	if (result.length() == 1)
+	if (result.length() == 1) {
 		result = "0" + result;
+	}
 
 	return result;
 }
@@ -23,8 +24,6 @@ std::string augs::get_timestamp() {
 	struct tm *local_time;
 	local_time = localtime(&current_time);
 
-	std::stringstream timestamp;
-
 	return "[" 
 		+ leading_zero(local_time->tm_mday) + "." 
 		+ leading_zero(local_time->tm_mon + 1) + "." 
@@ -32,5 +31,5 @@ std::string augs::get_timestamp() {
 		+ leading_zero(local_time->tm_hour) + "." 
 		+ leading_zero(local_time->tm_min) + "." 
 		+ leading_zero(local_time->tm_sec) + 
-		"]";
+	"]";
 }

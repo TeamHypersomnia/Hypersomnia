@@ -2,6 +2,7 @@
 #include "augs/math/vec2.h"
 #include "augs/misc/randomization.h"
 #include "augs/misc/minmax.h"
+#include "augs/padding_byte.h"
 
 class processing_system;
 
@@ -20,7 +21,8 @@ namespace components {
 		float chosen_lengthening_duration_ms = -1.f;
 		float lengthening_time_passed_ms = 0.f;
 
-		int is_it_a_finishing_trace = false;
+		bool is_it_a_finishing_trace = false;
+		pad_bytes<3> pad;
 		// END GEN INTROSPECTOR
 
 		void reset(randomization& p) {

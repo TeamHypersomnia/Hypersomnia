@@ -58,7 +58,7 @@ namespace components {
 		friend struct augs::introspection_access;
 
 		bool is_cocking_handle_being_pulled = false;
-		std::array<padding_byte, 3> pad;
+		pad_bytes<3> pad;
 
 		augs::stepped_timestamp when_began_pulling_cocking_handle;
 	public:

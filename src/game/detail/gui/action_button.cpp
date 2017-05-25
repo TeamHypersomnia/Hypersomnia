@@ -103,7 +103,7 @@ void action_button::draw(
 
 				{
 					const auto all_cooldown = sentience.cast_cooldown_for_all_spells;
-					const auto this_cooldown = sentience.spells[bound_spell].cast_cooldown;
+					const auto this_cooldown = sentience.spells.at(bound_spell).cast_cooldown;
 
 					const auto effective_cooldown_ratio =
 						all_cooldown.get_remaining_time_ms(now, dt) > this_cooldown.get_remaining_time_ms(now, dt)

@@ -45,13 +45,13 @@ void standard_explosion_input::instantiate(
 
 	auto& cosmos = step.cosm;
 
-	sound_effect_input sound_effect;
-	sound_effect.delete_entity_after_effect_lifetime = true;
-	sound_effect.direct_listener = subject_if_any;
-	sound_effect.effect.id = this->sound_effect;
-	sound_effect.effect.modifier.gain = sound_gain;
+	sound_effect_input sound_in;
+	sound_in.delete_entity_after_effect_lifetime = true;
+	sound_in.direct_listener = subject_if_any;
+	sound_in.effect.id = sound_effect;
+	sound_in.effect.modifier.gain = sound_gain;
 
-	sound_effect.create_sound_effect_entity(
+	sound_in.create_sound_effect_entity(
 		step, 
 		explosion_location,
 		entity_id()
@@ -131,7 +131,7 @@ void standard_explosion_input::instantiate(
 						switch (type) {
 							case adverse_element_type::FORCE: {
 								damage_msg.request_shake_for_ms = 400.f;
-								damage_msg.impact_velocity = impact * 2.f;
+								damage_msg.impact_velocity = impact;
 
 								affected_physics.apply_impulse(
 									impact, center_offset
@@ -147,8 +147,6 @@ void standard_explosion_input::instantiate(
 								}
 
 								// LOG("Impact %x dealt to: %x. Resultant angular: %x", impact, body_entity.get_name(), affected_physics.get_angular_velocity());
-
-								damage_msg.impact_velocity = impact;
 							}
 							break;
 

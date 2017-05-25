@@ -25,7 +25,7 @@ struct item_button : game_gui_rect_node {
 
 	bool is_container_open = false;
 	bool started_drag = false;
-	std::array<padding_byte, 2> pad;
+	pad_bytes<2> pad;
 
 	vec2i drag_offset_in_item_deposit;
 

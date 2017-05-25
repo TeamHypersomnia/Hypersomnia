@@ -81,11 +81,8 @@ void item_system::pick_up_touching_items(const logic_step step) {
 					const auto categories = maybe_item_of_picker->categories_for_slot_compatibility;
 
 					const bool is_it_arm_touching =
-						maybe_item != nullptr
-						&& (
-							categories.test(item_category::ARM_BACK)
-							|| categories.test(item_category::ARM_FRONT)
-						)
+						categories.test(item_category::ARM_BACK)
+						|| categories.test(item_category::ARM_FRONT)
 					;
 
 					if (is_it_arm_touching) {

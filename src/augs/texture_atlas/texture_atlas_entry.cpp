@@ -5,7 +5,7 @@ namespace augs {
 		return atlas_space.w > 0.f;
 	}
 
-	vec2 texture_atlas_entry::get_atlas_space_uv(vec2 entry_space) const {
+	vec2 texture_atlas_entry::get_atlas_space_uv(const vec2 entry_space) const {
 		if (!was_flipped) {
 			return { 
 				atlas_space.x + atlas_space.w * entry_space.x,

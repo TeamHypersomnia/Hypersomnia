@@ -83,7 +83,7 @@ void choreographic_setup::process(
 		in >> type >> id;
 		getline(in, path);
 
-		path = path.substr(path.find_first_not_of(" "));
+		path = path.substr(path.find_first_not_of(' '));
 
 		if (type == "sound") {
 			preloaded_sounds[id].set_data(augs::get_sound_samples_from_file(path));

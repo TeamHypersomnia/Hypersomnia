@@ -35,7 +35,7 @@ namespace components {
 		bool turning_left = false;
 
 		bool hand_brake = false;
-		std::array<padding_byte, 3> pad;
+		pad_bytes<3> pad;
 		
 		float braking_damping = -1.f;
 		float braking_angular_damping = -1.f;

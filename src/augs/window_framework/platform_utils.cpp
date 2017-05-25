@@ -66,7 +66,7 @@ namespace augs {
 			return result;
 		}*/
 
-		void enable_cursor_clipping(ltrbi lt) {
+		void enable_cursor_clipping(const ltrbi lt) {
 			thread_local RECT r;
 			r.bottom = lt.b;
 			r.left = lt.l;

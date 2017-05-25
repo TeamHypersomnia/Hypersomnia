@@ -11,7 +11,7 @@ namespace components {
 		
 		// GEN INTROSPECTOR struct components::processing
 		bool activated = true;
-		std::array<padding_byte, 3> pad;
+		pad_bytes<3> pad;
 
 		flagset_type processing_subject_categories;
 		flagset_type disabled_categories;

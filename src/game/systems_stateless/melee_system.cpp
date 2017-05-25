@@ -15,7 +15,7 @@
 
 using namespace augs;
 
-void components::melee::reset_weapon(entity_handle e) {
+void components::melee::reset_weapon(const entity_handle e) {
 	auto& m = e.get<components::melee>();
 	m.reset_move_flags();
 	m.current_state = melee_state::FREE;

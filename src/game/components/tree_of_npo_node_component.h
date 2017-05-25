@@ -14,7 +14,7 @@ namespace components {
 		bool activated = true;
 		tree_of_npo_type type = tree_of_npo_type::RENDERABLES;
 
-		padding_byte pad;
+		pad_bytes<1> pad;
 
 		ltrb aabb;
 		// END GEN INTROSPECTOR

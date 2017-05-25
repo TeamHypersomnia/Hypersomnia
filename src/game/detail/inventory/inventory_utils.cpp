@@ -278,7 +278,7 @@ unsigned to_space_units(const std::string& s) {
 	unsigned sum = 0;
 	unsigned mult = SPACE_ATOMS_PER_UNIT;
 
-	if (s.find(".") == std::string::npos) {
+	if (s.find('.') == std::string::npos) {
 		int l = s.length() - 1;
 		
 		while (l--) {
@@ -286,7 +286,7 @@ unsigned to_space_units(const std::string& s) {
 		}
 	}
 	else {
-		int l = s.find(".") - 1;
+		int l = s.find('.') - 1;
 
 		while (l--) {
 			mult *= 10;

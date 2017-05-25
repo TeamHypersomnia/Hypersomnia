@@ -67,7 +67,6 @@ namespace ingredients {
 
 		group.filter = filters::shell();
 		group.density = 1;
-		group.restitution = 0.5f;
 		group.restitution = 1.4f;
 		group.density = 0.001f;
 		group.collision_sound_gain_mult = 100.f;

@@ -7,17 +7,12 @@ namespace augs {
 	namespace graphics {
 		GLuint fbo::currently_bound_fbo = 0u;
 
-		fbo::fbo() : created(false), fboId(0u), textureId(0u) {
-		}
-
-		fbo::fbo(const int width, const int height) : created(false) {
+		fbo::fbo(const GLuint width, const GLuint height) {
 			create(width, height);
 		}
 
-		void fbo::create(const int w, const int h) {
+		void fbo::create(const GLuint w, const GLuint h) {
 			ensure(!created);
-			ensure(w > 0);
-			ensure(h > 0);
 
 			created = true;
 			width = w;

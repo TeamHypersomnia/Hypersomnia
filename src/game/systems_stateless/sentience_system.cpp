@@ -450,17 +450,15 @@ void sentience_system::set_borders(const logic_step step) const {
 
 					hr *= 1.f - (0.2f * time_pulse_ratio);
 
-					if (render) {
-						if (hr < 1.f) {
-							render->draw_border = true;
+					if (hr < 1.f) {
+						render->draw_border = true;
 
-							const auto alpha_multiplier = one_less_hr * one_less_hr * one_less_hr * one_less_hr * time_pulse_ratio;
+						const auto alpha_multiplier = one_less_hr * one_less_hr * one_less_hr * one_less_hr * time_pulse_ratio;
 
-							render->border_color = rgba(255, 0, 0, static_cast<rgba_channel>(255 * alpha_multiplier));
-						}
-						else {
-							render->draw_border = false;
-						}
+						render->border_color = rgba(255, 0, 0, static_cast<rgba_channel>(255 * alpha_multiplier));
+					}
+					else {
+						render->draw_border = false;
 					}
 				}
 				else {

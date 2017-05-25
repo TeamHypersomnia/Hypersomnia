@@ -33,13 +33,13 @@ namespace components {
 		vec2 center_offset;
 		float rotation_offset = 0.f;
 
-		short flip_horizontally = false;
-		short flip_vertically = false;
+		bool flip_horizontally = false;
+		bool flip_vertically = false;
 		
 		special_effect effect = special_effect::NONE;
-		padding_byte pad;
+		pad_bytes<1> pad;
 
-		unsigned short max_specular_blinks = 0;
+		unsigned max_specular_blinks = 0;
 		// END GEN INTROSPECTOR
 
 		template <class T>

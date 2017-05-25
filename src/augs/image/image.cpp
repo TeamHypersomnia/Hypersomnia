@@ -197,8 +197,8 @@ namespace augs {
 		});
 	}
 	
-	bool image::in_bounds(const vec2u v) const {
-		return v.x < size.x && v.y < size.y;
+	bool image::in_bounds(const vec2u p) const {
+		return p.x < size.x && p.y < size.y;
 	}
 
 	bool image::from_binary_file(const std::string& filename) {
@@ -267,15 +267,15 @@ namespace augs {
 		const unsigned char* const ptr, 
 		const unsigned channels,
 		const unsigned pitch, 
-		const vec2u size
+		const vec2u new_size
 	) {
-		create(size);
+		create(new_size);
 
-		const int wbytes = size.x*channels;
+		const int wbytes = new_size.x*channels;
 
 		if (channels == 1) {
-			for (unsigned j = 0; j < size.y; ++j) {
-				for (unsigned i = 0; i < size.x; ++i) {
+			for (unsigned j = 0; j < new_size.y; ++j) {
+				for (unsigned i = 0; i < new_size.x; ++i) {
 					pixel({ i, j }) = { 255, 255, 255, ptr[pitch*j+i] };
 				}
 			}

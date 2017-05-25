@@ -21,9 +21,6 @@ namespace augs {
 				lines_remaining = std::min(lines_remaining, g_log::all_entries.size());
 
 				for (auto it = g_log::all_entries.end() - lines_remaining; it != g_log::all_entries.end(); ++it) {
-					std::stringstream ss((*it).text);
-					std::string line;
-
 					auto wstr = to_wstring((*it).text + "\n");
 					result += format(wstr, style(f, rgba((*it).color)));
 
@@ -202,7 +199,10 @@ namespace augs {
 			) {
 				font_used = f;
 				c = ch;
-				memcpy(&r, &p, sizeof(rgba));
+				r = p.r;
+				g = p.g;
+				b = p.b;
+				a = p.a;
 			}
 
 			void formatted_char::set(
@@ -210,11 +210,14 @@ namespace augs {
 				const rgba& p
 			) {
 				font_used = f;
-				memcpy(&r, &p, sizeof(rgba));
+				r = p.r;
+				g = p.g;
+				b = p.b;
+				a = p.a;
 			}
 
-			bool formatted_char::operator==(const formatted_char& b) const {
-				return font_used == b.font_used && c == b.c;
+			bool formatted_char::operator==(const formatted_char& second) const {
+				return font_used == second.font_used && c == second.c;
 			}
 
 			style::style(
