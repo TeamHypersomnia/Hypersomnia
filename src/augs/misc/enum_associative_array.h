@@ -44,7 +44,7 @@ namespace augs {
 		template<bool is_const>
 		class basic_iterator {
 			typedef maybe_const_ptr_t<is_const, enum_associative_array> ptr_type;
-			typedef std::pair<key_type, maybe_const_ref_t<is_const, mapped_type>> ref_type;
+			typedef std::pair<const key_type, maybe_const_ref_t<is_const, mapped_type>> ref_type;
 			
 			ptr_type ptr = nullptr;
 			size_t idx = 0;

@@ -215,7 +215,7 @@ namespace augs {
 		Archive& ar, 
 		Container& storage, 
 		container_size_type = container_size_type(),
-		std::enable_if_t<is_dynamic_container_v<Container>>* dummy = nullptr
+		std::enable_if_t<is_variable_size_container_v<Container>>* dummy = nullptr
 	) {
 		container_size_type s;
 		read(ar, s);

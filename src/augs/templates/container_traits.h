@@ -35,19 +35,12 @@ template <class T>
 struct can_reserve<T, decltype(std::declval<T>().reserve(0u), void())> : std::true_type {};
 
 
-template <class T, class = void>
-struct can_resize : std::false_type {};
-
-template <class T>
-struct can_resize<T, decltype(std::declval<T>().resize(0u), void())> : std::true_type {};
-
-
 template<typename Trait>
-struct max_size_test_detail
+struct size_test_detail
 {
 	static Trait ttt;
 
-	template<int Value = ttt.max_size()>
+	template<int Value = ttt.size()>
 	static std::true_type do_call(int){ return std::true_type(); }
 
 	static std::false_type do_call(...){ return std::false_type(); }
@@ -56,7 +49,7 @@ struct max_size_test_detail
 };
 
 template<typename Trait>
-struct max_size_test : decltype(max_size_test_detail<Trait>::call()) {
+struct size_test : decltype(size_test_detail<Trait>::call()) {
 
 };
 
@@ -77,19 +70,16 @@ template <class T>
 constexpr bool can_reserve_v = can_reserve<T>::value;
 
 template <class T>
-constexpr bool can_resize_v = can_resize<T>::value;
-
-template <class T>
-constexpr bool is_associative_container_v = has_key_type_v<T> && has_value_type_v<T>;
+constexpr bool is_associative_container_v = has_key_type_v<T> && has_mapped_type_v<T>;
 
 template <class T>
 constexpr bool is_unary_container = has_value_type_v<T> && !is_associative_container_v<T>;
 
 template <class T>
-constexpr bool is_fixed_size_v = max_size_test<T>::value;
+constexpr bool is_constexpr_size_container_v = size_test<T>::value;
 
 template <class T>
-constexpr bool is_container_v = has_value_type_v<T>;
+constexpr bool is_variable_size_container_v = is_container_v<T> && !is_constexpr_size_container_v<T>;
 
 template <class T>
-constexpr bool is_dynamic_container_v = is_container_v<T> && !is_fixed_size_v<T>;
+constexpr bool is_container_v = is_unary_container<T> || is_associative_container_v<T>;

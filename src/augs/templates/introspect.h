@@ -185,7 +185,7 @@ namespace augs {
 					[&member_callback, &recursion_prologue, &recursion_epilogue](auto&& passed_label, auto&& passed_arg) {
 						using checked_type = std::remove_reference_t<decltype(passed_arg)>;
 
-						static_assert(has_introspect_v<checked_type> || is_dynamic_container_v<checked_type>, 
+						static_assert(has_introspect_v<checked_type> || is_variable_size_container_v<checked_type>, 
 							"Recursion requested on type without introspectors, that is not an iteratable container!"
 						);
 						
@@ -195,7 +195,7 @@ namespace augs {
 							std::forward<decltype(passed_arg)>(passed_arg)
 						);
 						
-						constexpr_if<is_dynamic_container_v<checked_type>>()([&](auto...){
+						constexpr_if<is_variable_size_container_v<checked_type>>()([&](auto...){
 							for (auto& val : passed_arg) {
 								introspect_recursive_with_prologues <
 									call_valid_predicate,
