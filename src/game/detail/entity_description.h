@@ -7,7 +7,7 @@
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/enums/slot_function.h"
 #include "game/enums/item_category.h"
-#include "game/enums/sentience_meter_type.h"
+
 #include "game/assets/spell_id.h"
 #include "game/components/name_component_declaration.h"
 #include "game/global_state/entity_name_metas.h"
@@ -45,12 +45,25 @@ std::wstring get_bbcoded_slot_function_details(const slot_function);
 std::wstring get_bbcoded_slot_description(const const_inventory_slot_handle);
 std::wstring get_bbcoded_entity_description(const const_entity_handle);
 
-std::wstring get_bbcoded_sentience_meter_description(
-	const const_entity_handle,
-	const sentience_meter_type
-);
-
+template <class T>
 std::wstring get_bbcoded_spell_description(
 	const const_entity_handle,
-	const assets::spell_id
-);
+	const T& spell
+) {
+	const auto properties = typesafe_sprintf(
+		L"Incantation: [color=yellow]%x[/color]\nPE to cast: [color=vscyan]%x[/color]\nCooldown: [color=vscyan]%x[/color]",
+		spell.appearance.incantation, 
+		spell.common.personal_electricity_required, 
+		spell.common.cooldown_ms
+	);
+
+	return spell_data.appearance.name + L"\n" + properties + L"\n" + spell_data.appearance.description;
+}
+
+template <class T>
+std::wstring get_bbcoded_meter_description(
+	const cosmos& owner, 
+	const components::sentience& sentience
+) {
+	
+}

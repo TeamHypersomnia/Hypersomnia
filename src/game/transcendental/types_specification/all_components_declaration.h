@@ -56,7 +56,7 @@ namespace components {
 
 template<template<typename...> class List, class... prepend>
 struct put_all_components_into {
-	typedef List<prepend...,
+	using type = List<prepend...,
 		components::tree_of_npo_node,
 		components::special_physics,
 		components::animation,
@@ -105,7 +105,7 @@ struct put_all_components_into {
 
 		components::all_inferred_state
 
-	> type;
+	>;
 };
 
 template<template<typename...> class List, class... prepend>

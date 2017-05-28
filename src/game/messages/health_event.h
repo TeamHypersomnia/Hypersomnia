@@ -1,7 +1,7 @@
 #pragma once
 #include "message.h"
 
-#include "game/detail/sentience_meter.h"
+#include "augs/misc/value_meter.h"
 
 namespace messages {
 	struct health_event : message {

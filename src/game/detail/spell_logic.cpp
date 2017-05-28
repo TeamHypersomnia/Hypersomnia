@@ -18,7 +18,7 @@
 #include "game/enums/filters.h"
 
 #include "game/detail/explosions.h"
-#include "game/assets/spell.h"
+#include "game/detail/spells/spell_structs.h"
 
 bool are_additional_conditions_for_casting_fulfilled(
 	const assets::spell_id spell,
@@ -105,7 +105,7 @@ void perform_spell_logic(
 		ignite_sparkle_particles();
 		play_standard_sparkles_sound();
 
-		sentience.haste.timing.set_for_duration(static_cast<float>(spell_data.perk_duration_seconds * 1000), now); 
+		sentience.haste.perk.set_for_duration(static_cast<float>(spell_data.perk_duration_seconds * 1000), now); 
 
 		break;
 
@@ -113,7 +113,7 @@ void perform_spell_logic(
 		ignite_sparkle_particles();
 		play_standard_sparkles_sound();
 
-		sentience.electric_shield.timing.set_for_duration(static_cast<float>(spell_data.perk_duration_seconds * 1000), now); 
+		sentience.electric_shield.perk.set_for_duration(static_cast<float>(spell_data.perk_duration_seconds * 1000), now); 
 
 		break;
 

@@ -83,7 +83,7 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 			auto* const sentience = it.find<components::sentience>();
 			const bool is_sentient = sentience != nullptr;
 
-			sentience_meter::damage_result consciousness_damage_by_sprint;
+			value_meter::damage_result consciousness_damage_by_sprint;
 			float minimum_consciousness_to_sprint = 0.f;
 
 			if (is_sentient) {
@@ -102,8 +102,10 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 					is_sprint_effective = false;
 				}
 
-				if (sentience->haste.timing.is_enabled(cosmos.get_timestamp(), cosmos.get_fixed_delta())) {
-					if (sentience->haste.is_greater) {
+				const auto& haste = std::get<haste_perk>(sentience->perks);
+
+				if (haste.is_enabled(cosmos.get_timestamp(), cosmos.get_fixed_delta())) {
+					if (haste.is_greater) {
 						movement_force_mult *= 1.45f;
 					}
 					else {

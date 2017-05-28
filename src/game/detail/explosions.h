@@ -6,7 +6,7 @@
 #include "game/transcendental/logic_step.h"
 #include "game/enums/adverse_element_type.h"
 
-#include "game/detail/sentience_meter.h"
+#include "augs/misc/value_meter.h"
 
 struct standard_explosion_input {
 	// GEN INTROSPECTOR struct standard_explosion_input

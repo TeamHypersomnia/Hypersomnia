@@ -30,7 +30,7 @@ namespace rendering_scripts {
 						highlight.camera = cam;
 						highlight.renderable_transform.pos = it.get_viewing_transform(sys).pos;
 
-						auto highlight_col = spell_data.logical.border_col;
+						auto highlight_col = spell_data.common.associated_color;
 						highlight_col.a = static_cast<rgba_channel>(255 * highlight_amount);
 
 						components::sprite spr;

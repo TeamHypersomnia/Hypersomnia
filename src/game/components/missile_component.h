@@ -12,7 +12,7 @@
 #include "augs/graphics/pixel.h"
 #include "augs/padding_byte.h"
 
-#include "game/detail/sentience_meter.h"
+#include "augs/misc/value_meter.h"
 
 namespace components {
 	struct missile {

@@ -152,7 +152,7 @@ std::wstring get_bbcoded_sentience_meter_description(
 	const auto now = cosmos.get_timestamp();
 
 	const auto& sentience = subject.get<components::sentience>();
-	const auto value = sentience.get_value(type, now, dt);
+	const auto value = sentience.get_meter_value(type, now, dt);
 	const auto maximum = sentience.get_maximum_value(type); 
 
 	if (type == sentience_meter_type::HEALTH) {
@@ -160,7 +160,7 @@ std::wstring get_bbcoded_sentience_meter_description(
 	}
 
 	if (type == sentience_meter_type::PERSONAL_ELECTRICITY) {
-		return typesafe_sprintf(L"[color=cyan]Personal electricity:[/color] %x/%x\n[color=vsdarkgray]Mind-programmable matter.[/color]", value, maximum);
+		return typesafe_sprintf(L, value, maximum);
 	}
 
 	if (type == sentience_meter_type::CONSCIOUSNESS) {
@@ -168,30 +168,12 @@ std::wstring get_bbcoded_sentience_meter_description(
 	}
 
 	if (type == sentience_meter_type::HASTE) {
-		return typesafe_sprintf(L"[color=green]Haste[/color]\n[color=vsdarkgray]You move faster.[/color]");
+		return typesafe_sprintf();
 	}
 
 	if (type == sentience_meter_type::ELECTRIC_SHIELD) {
-		return typesafe_sprintf(L"[color=turquoise]Electric shield[/color]\n[color=vsdarkgray]Damage is absorbed by [/color][color=cyan]Personal Electricity[/color][color=vsdarkgray] instead of [/color][color=red]Health[/color][color=vsdarkgray].[/color]");
+		return typesafe_sprintf(");
 	}
 
 	else return L"Unknown problem";
-}
-
-std::wstring get_bbcoded_spell_description(
-	const const_entity_handle caster,
-	const assets::spell_id spell
-) {
-	const auto& manager = get_assets_manager();
-
-	const auto spell_data = manager[spell];
-
-	const auto properties = typesafe_sprintf(
-		L"Incantation: [color=yellow]%x[/color]\nPE to cast: [color=vscyan]%x[/color]\nCooldown: [color=vscyan]%x[/color]",
-		std::wstring(spell_data.incantation), 
-		spell_data.logical.personal_electricity_required, 
-		spell_data.logical.cooldown_ms
-	);
-
-	return spell_data.spell_name + L"\n" + properties + L"\n" + spell_data.spell_description;
 }

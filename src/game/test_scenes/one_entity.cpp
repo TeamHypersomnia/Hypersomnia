@@ -39,6 +39,7 @@
 #include "game/transcendental/cosmic_delta.h"
 
 #include "augs/graphics/renderer.h"
+#include "game/test_scenes/resource_setups/all.h"
 #endif
 namespace test_scenes {
 	void one_entity::populate(const logic_step step) {
@@ -88,11 +89,13 @@ namespace test_scenes {
 
 			auto& sentience = new_character.get<components::sentience>();
 
-			sentience.spells[assets::spell_id::HASTE] = spell_instance_data();
-			sentience.spells[assets::spell_id::ELECTRIC_TRIAD] = spell_instance_data();
-			sentience.spells[assets::spell_id::FURY_OF_THE_AEONS] = spell_instance_data();
-			sentience.spells[assets::spell_id::ULTIMATE_WRATH_OF_THE_AEONS] = spell_instance_data();
-			sentience.spells[assets::spell_id::ELECTRIC_SHIELD] = spell_instance_data();
+
+			for_each_through_std_get(
+				sentience.spells,
+				[](auto& spell) {
+					spell.common.learned = true;
+				}
+			);
 		}
 
 		//const auto amplifier = prefabs::create_amplifier_arm(step, vec2(-300, -500 + 50));
@@ -128,6 +131,10 @@ namespace test_scenes {
 		//		prefabs::create_cyan_charge(step, vec2(0, 0), true ? 1000 : 30)));
 
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
+		set_standard_sentience_properties(
+			world.significant.meta.global.spells,
+			world.significant.meta.global.perks
+		);
 #endif
 	}
 }

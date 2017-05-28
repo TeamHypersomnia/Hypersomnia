@@ -64,7 +64,7 @@ cosmic_entropy gui_element_system::get_and_clear_pending_events() {
 	cosmic_entropy out;
 
 	out.transfer_requests = pending_transfers;
-	out.cast_spells = spell_requests;
+	out.cast_spells_per_entity = spell_requests;
 
 	pending_transfers.clear();
 	spell_requests.clear();

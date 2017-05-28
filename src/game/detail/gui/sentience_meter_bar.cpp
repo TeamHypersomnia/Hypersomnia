@@ -73,7 +73,7 @@ void sentience_meter_bar::draw(
 		;
 			
 		const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
-		const auto current_value_ratio = sentience.get_ratio(this_type, now, dt);
+		const auto current_value_ratio = sentience.get_meter_ratio(this_type, now, dt);
 		auto current_value_bar_rect = value_bar_rect;
 		const auto bar_width = static_cast<int>(current_value_bar_rect.w() * current_value_ratio);
 		current_value_bar_rect.w(static_cast<float>(bar_width));
@@ -92,7 +92,7 @@ void sentience_meter_bar::draw(
 		stroke.draw(info.v, value_bar_rect, ltrb(), this_id->border_spacing);
 
 		if (should_draw_value_number) {
-			const auto value = sentience.get_value(this_type, now, dt);
+			const auto value = sentience.get_meter_value(this_type, now, dt);
 
 			augs::gui::text_drawer drawer;
 
@@ -221,7 +221,7 @@ void sentience_meter_bar::respond_to_events(
 
 augs::gui::material sentience_meter_bar::get_icon_mat(const const_this_pointer this_id) const {
 	switch (this_id.get_location().type) {
-	case sentience_meter_type::HEALTH: return{ assets::game_image_id::HEALTH_ICON, white };
+	case sentience_meter_type::HEALTH: return{ , white };
 	case sentience_meter_type::CONSCIOUSNESS: return{ assets::game_image_id::CONSCIOUSNESS_ICON, white };
 	case sentience_meter_type::PERSONAL_ELECTRICITY: return{ assets::game_image_id::PERSONAL_ELECTRICITY_ICON, white };
 	case sentience_meter_type::HASTE: return{ assets::game_image_id::PERK_HASTE_ICON, white };
@@ -236,7 +236,7 @@ augs::gui::material sentience_meter_bar::get_bar_mat(const const_this_pointer th
 	case sentience_meter_type::CONSCIOUSNESS: return{ assets::game_image_id::BLANK, orange - rgba(30, 30, 30, 0) };
 	case sentience_meter_type::PERSONAL_ELECTRICITY: return{ assets::game_image_id::BLANK, cyan - rgba(30, 30, 30, 0) };
 	case sentience_meter_type::HASTE: return{ assets::game_image_id::BLANK, green - rgba(30, 30, 30, 0) };
-	case sentience_meter_type::ELECTRIC_SHIELD: return{ assets::game_image_id::BLANK, turquoise - rgba(30, 30, 30, 0) };
+	case sentience_meter_type::ELECTRIC_SHIELD: return{ assets::game_image_id::BLANK,  };
 	default: ensure(false);  return{};
 	}
 }

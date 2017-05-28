@@ -30,8 +30,8 @@ void action_button::draw(
 
 		if (bound_spell != assets::spell_id::INVALID && sentience.spells.find(bound_spell) != sentience.spells.end()) {
 			const auto spell_data = get_assets_manager()[bound_spell];
-			const bool has_enough_mana = sentience.personal_electricity.value >= spell_data.logical.personal_electricity_required;
-			const float required_mana_ratio = std::min(1.f, sentience.personal_electricity.value / static_cast<float>(spell_data.logical.personal_electricity_required));
+			const bool has_enough_mana = sentience.personal_electricity.value >= spell_data.common.personal_electricity_required;
+			const float required_mana_ratio = std::min(1.f, sentience.personal_electricity.value / static_cast<float>(spell_data.common.personal_electricity_required));
 
 			rgba inside_col = white;
 
@@ -51,8 +51,8 @@ void action_button::draw(
 
 			const auto& manager = get_assets_manager();
 
-			inside_tex = spell_data.icon;
-			border_col = spell_data.logical.border_col;
+			inside_tex = spell_data.appearance.icon;
+			border_col = spell_data.common.associated_color;
 
 			if (!has_enough_mana) {
 				border_col = border_col.get_desaturated();

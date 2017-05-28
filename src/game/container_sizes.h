@@ -2,8 +2,6 @@
 #include <cstddef>
 #include <Box2D/Common/b2Settings.h>
 
-constexpr std::size_t INCANTATION_STRING_LENGTH = 32;
-
 constexpr std::size_t PARTICLE_EMISSIONS_IN_EFFECT_COUNT = 4;
 
 constexpr std::size_t ANIMATION_FRAME_COUNT = 20;

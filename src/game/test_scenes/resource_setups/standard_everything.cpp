@@ -64,7 +64,6 @@ void load_standard_everything(const config_lua_table& cfg) {
 		regenerated
 	);
 
-	set_standard_spell_properties(manager);
 	set_standard_animations(manager);
 	set_standard_particle_effects(manager);
 	set_standard_tile_layers(manager);

@@ -31,7 +31,7 @@
 
 #include "augs/graphics/drawers.h"
 #include "game/detail/wielding_result.h"
-#include "game/assets/spell.h"
+#include "game/detail/spells/spell_structs.h"
 #include "game/detail/spell_logic.h"
 
 using namespace augs;
@@ -529,6 +529,8 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 		}
 	}
 	else if (maybe_hovered_sentience_meter) {
+		maybe_hovered_sentience_meter->is_perk_meter
+
 		tooltip_text = text::format_as_bbcode(
 			get_bbcoded_sentience_meter_description(
 				gui_entity, 

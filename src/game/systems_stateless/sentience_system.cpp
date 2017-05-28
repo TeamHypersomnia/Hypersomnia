@@ -140,8 +140,17 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 					shake_mult *shake_mult * 100 * vec2{ rng.randval(-1.f, 1.f), rng.randval(-1.f, 1.f) });
 			}
 
-			if (sentience.currently_casted_spell != assets::spell_id::INVALID) {
-				const auto spell_data = metas[sentience.currently_casted_spell];
+			if (sentience.is_spell_being_cast()) {
+				const auto casting_time_ms = 
+					dynamic_dispatch(
+						cosmos.signisficant.meta.global.spells, 
+						sentience.currently_casted_spell,
+						[](const auto& spell){
+							return spell.common.casting_time_ms;
+						}
+					)
+				;
+
 				const auto when_casted = sentience.time_of_last_spell_cast;
 
 				if ((now - when_casted).in_milliseconds(delta) <= spell_data.casting_time_ms) {
@@ -320,7 +329,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 		if (sentience) {
 			const auto& s = *sentience;
 
-			const bool is_shield_enabled = s.electric_shield.timing.is_enabled(now, delta);
+			const bool is_shield_enabled = s.electric_shield.perk.is_enabled(now, delta);
 
 			auto apply_ped = [this, step, event_template, &s](const meter_value_type amount) {
 				auto event = event_template;

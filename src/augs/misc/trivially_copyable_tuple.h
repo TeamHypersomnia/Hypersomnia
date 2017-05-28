@@ -30,18 +30,18 @@ namespace augs {
 }
 
 namespace std {
-	template<int idx, class... Types>
+	template <std::size_t I, class... Types>
 	decltype(auto) get(augs::trivially_copyable_tuple<Types...>& t) {
-		return std::get<idx>(t.get_tuple());
+		return std::get<I>(t.get_tuple());
 	}
 
-	template<int idx, class... Types>
+	template <std::size_t I, class... Types>
 	decltype(auto) get(const augs::trivially_copyable_tuple<Types...>& t) {
-		return std::get<idx>(t.get_tuple());
+		return std::get<I>(t.get_tuple());
 	}
 	
 	template<class T, class... Types>
-		decltype(auto) get(augs::trivially_copyable_tuple<Types...>& t) {
+	decltype(auto) get(augs::trivially_copyable_tuple<Types...>& t) {
 		return std::get<T>(t.get_tuple());
 	}
 

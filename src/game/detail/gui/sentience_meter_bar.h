@@ -33,6 +33,11 @@ struct sentience_meter_bar : game_gui_rect_node {
 	augs::gui::material get_icon_mat(const const_this_pointer this_id) const;
 	augs::gui::material get_bar_mat(const const_this_pointer this_id) const;
 
+	bool is_sentience_meter(const const_this_pointer) const;
+	bool is_perk_meter(const const_this_pointer) const;
+
+	std::wstring get_description_for_hover(const const_this_pointer);
+
 	ltrb get_value_bar_rect(
 		const const_game_gui_context context,
 		const const_this_pointer this_id,
@@ -68,3 +73,35 @@ struct sentience_meter_bar : game_gui_rect_node {
 		const this_pointer this_id
 	);
 };
+
+template <class T, class F, class G>
+decltype(auto) dispatch_by_vertical_index(
+	T&& sentience, 
+	const std::size_t index, 
+	F&& meter_callback,
+	G&& perk_callback
+) {
+	static_assert(std::is_same_v<std::decay_t<T>, components::sentience>, "No matching function to call dispatch_by_vertical_index");
+	constexpr std::size_t num_meters = num_types_in_list_v<decltype(sentience.meters)>;
+
+	if (index < num_meters) {
+		return dynamic_dispatch(sentience.meters, index, std::forward<F>(meter_callback));
+	}
+
+	return dynamic_dispatch(sentience.perks, index - num_meters, std::forward<G>(perk_callback));
+}
+
+
+template <class T, class F, class G>
+decltype(auto) dispatch_by_vertical_index(
+	T&& sentience, 
+	const std::size_t index, 
+	F&& callback
+) {
+	return dispatch_by_vertical_index(
+		std::forward<T>(sentience),
+		index,
+		std::forward<F>(callback),
+		std::forward<F>(callback)
+	);
+}

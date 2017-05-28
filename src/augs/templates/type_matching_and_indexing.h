@@ -95,7 +95,7 @@ struct filter_types_detail<
 
 	template <size_t I>
 	struct get_type<I, std::enable_if_t<I < std::tuple_size_v<type>>> {
-		using type = typename std::tuple_element<I, type>::type;
+		using type = std::tuple_element_t<I, type>;
 	};
 };
 

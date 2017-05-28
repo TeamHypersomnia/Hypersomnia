@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/templates/memcpy_safety.h"
+#include "augs/templates/dynamic_dispatch.h"
 #include "augs/ensure.h"
 
 namespace augs {
@@ -36,49 +37,11 @@ namespace augs {
 		char buf[detail::_maximum<0, sizeof(Types)...>::value];
 		static_assert(are_types_memcpy_safe_v<Types...>, "Types must be memcpy-safe!");
 
-		template<class L>
-		decltype(auto) call_unroll(L f) {
-			const bool failed_to_find_polymorphic_candidate = true;
-			ensure(!failed_to_find_polymorphic_candidate);
-
-			return f(get<nth_type_in_t<0, Types...>>());
-		}
-
-		template<class L>
-		decltype(auto) call_unroll_const(L f) const {
-			const bool failed_to_find_polymorphic_candidate = true;
-			ensure(!failed_to_find_polymorphic_candidate);
-
-			return f(get<nth_type_in_t<0, Types...>>());
-		}
-
-		template<class L, class Head, class... Tail>
-		decltype(auto) call_unroll(L f) {
-			if (index_in_v<Head, Types...> == static_cast<std::size_t>(current_type)) {
-				return f(get<Head>());
-			}
-			else {
-				return call_unroll<L, Tail...>(f);
-			}
-		}
-
-		template<class L, class Head, class... Tail>
-		decltype(auto) call_unroll_const(L f) const {
-			if (index_in_v<Head, Types...> == static_cast<std::size_t>(current_type)) {
-				return f(get<Head>());
-			}
-			else {
-				return call_unroll_const<L, Tail...>(f);
-			}
-		}
-
 	public:
 		template<class T>
 		static void assert_correct_type() {
 			static_assert(is_one_of_v<T, Types...>, "trivial_variant does not contain the specified type!");
 		}
-
-		typedef std::tuple<Types...> types_tuple;
 
 		trivial_variant() {
 			std::memset(buf, 0, sizeof(buf));
@@ -118,14 +81,24 @@ namespace augs {
 			return index_in_v<T, Types...> == static_cast<std::size_t>(current_type);
 		}
 
-		template<class T>
+		template <std::size_t I>
+		auto& get() {
+			return get<nth_type_in_t<I, Types...>>();
+		}
+
+		template <std::size_t I>
+		const auto& get() const {
+			return get<nth_type_in_t<I, Types...>>();
+		}
+
+		template <class T>
 		T& get() {
 			assert_correct_type<T>();
 			ensure(is<T>());
 			return *reinterpret_cast<T*>(buf);
 		}
 
-		template<class T>
+		template <class T>
 		const T& get() const {
 			assert_correct_type<T>();
 			ensure(is<T>());
@@ -145,13 +118,13 @@ namespace augs {
 		}
 
 		template<class L>
-		decltype(auto) call(L generic_call) {
-			return call_unroll<L, Types...>(generic_call);
+		decltype(auto) call(L&& generic_call) {
+			return dynamic_dispatch(*this, current_type, std::forward<L>(generic_call));
 		}
 
 		template<class L>
-		decltype(auto) call(L generic_call) const {
-			return call_unroll_const<L, Types...>(generic_call);
+		decltype(auto) call(L&& generic_call) const {
+			return dynamic_dispatch(*this, current_type, std::forward<L>(generic_call));
 		}
 
 		unsigned get_current_type_index() const {
@@ -172,6 +145,26 @@ namespace augs {
 }
 
 namespace std {
+	template<std::size_t I, class... Types>
+	decltype(auto) get(augs::trivial_variant<Types...>& t) {
+		return t.get<I>();
+	}
+
+	template<std::size_t I, class... Types>
+	decltype(auto) get(const augs::trivial_variant<Types...>& t) {
+		return t.get<I>();
+	}
+
+	template<class T, class... Types>
+	decltype(auto) get(augs::trivial_variant<Types...>& t) {
+		return t.get<T>();
+	}
+
+	template<class T, class... Types>
+	decltype(auto) get(const augs::trivial_variant<Types...>& t) {
+		return t.get<T>();
+	}
+
 	template <class... Types>
 	struct hash<augs::trivial_variant<Types...>> {
 		std::size_t operator()(const augs::trivial_variant<Types...>& k) const {

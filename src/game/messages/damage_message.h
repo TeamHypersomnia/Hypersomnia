@@ -3,7 +3,7 @@
 #include "augs/math/vec2.h"
 #include "game/detail/physics/b2Fixture_index_in_component.h"
 #include "game/enums/adverse_element_type.h"
-#include "game/detail/sentience_meter.h"
+#include "augs/misc/value_meter.h"
 
 namespace messages {
 	struct damage_message : public message {

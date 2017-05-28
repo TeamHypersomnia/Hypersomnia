@@ -236,7 +236,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/detail/physics/physics_friction_fields.cpp"
 	"src/game/detail/physics/physics_queries.cpp"
 	"src/game/detail/physics/physics_scripts.cpp"
-	"src/game/detail/sentience_meter.cpp"
+	"src/augs/misc/value_meter.cpp"
 	"src/game/detail/spell_logic.cpp"
 	"src/game/detail/visible_entities.cpp"
 	"src/game/detail/wielding_result.cpp"
@@ -251,7 +251,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/test_scenes/resource_setups/standard_particle_effects.cpp"
 	"src/game/test_scenes/resource_setups/standard_physical_materials.cpp"
 	"src/game/test_scenes/resource_setups/standard_sound_buffers.cpp"
-	"src/game/test_scenes/resource_setups/standard_spell_datas.cpp"
+	"src/game/test_scenes/resource_setups/standard_sentience_properties.cpp"
 	"src/game/test_scenes/resource_setups/standard_tile_layers.cpp"
 	"src/game/test_scenes/one_entity.cpp"
 	"src/game/test_scenes/testbed.cpp"
@@ -399,6 +399,11 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/augs/templates/string_templates.cpp"
 	"src/game/components/sender_component.cpp"
 	"src/game/systems_inferred/name_system.cpp"
+	"src/game/detail/spells/electric_shield.cpp"
+	"src/game/detail/spells/electric_triad.cpp"
+	"src/game/detail/spells/fury_of_the_aeons.cpp"
+	"src/game/detail/spells/haste.cpp"
+	"src/game/detail/spells/ultimate_wrath_of_the_aeons.cpp"
 )
 
 if(BUILD_TEST_SCENES)

@@ -43,7 +43,7 @@ size_t basic_cosmic_entropy<key>::length() const {
 	}
 
 	total += transfer_requests.size();
-	total += cast_spells.size();
+	total += cast_spells_per_entity.size();
 
 	return total;
 }
@@ -56,9 +56,9 @@ basic_cosmic_entropy<key>& basic_cosmic_entropy<key>::operator+=(const basic_cos
 
 	concatenate(transfer_requests, b.transfer_requests);
 
-	for (const auto& spell : b.cast_spells) {
-		if (cast_spells.find(spell.first) == cast_spells.end()) {
-			cast_spells[spell.first] = spell.second;
+	for (const auto& spell : b.cast_spells_per_entity) {
+		if (cast_spells_per_entity.find(spell.first) == cast_spells_per_entity.end()) {
+			cast_spells_per_entity[spell.first] = spell.second;
 		}
 	}
 
@@ -78,7 +78,7 @@ void basic_cosmic_entropy<key>::clear() {
 bool guid_mapped_entropy::operator!=(const guid_mapped_entropy& b) const {
 	return !(
 		intents_per_entity == b.intents_per_entity
-		&& cast_spells == b.cast_spells
+		&& cast_spells_per_entity == b.cast_spells_per_entity
 		&& transfer_requests == b.transfer_requests
 	);
 }
@@ -91,8 +91,8 @@ guid_mapped_entropy::guid_mapped_entropy(
 		intents_per_entity[mapper[entry.first].get_guid()] = entry.second;
 	}
 
-	for (const auto& entry : b.cast_spells) {
-		cast_spells[mapper[entry.first].get_guid()] = entry.second;
+	for (const auto& entry : b.cast_spells_per_entity) {
+		cast_spells_per_entity[mapper[entry.first].get_guid()] = entry.second;
 	}
 
 	for (const auto& entry : b.transfer_requests) {
@@ -108,8 +108,8 @@ cosmic_entropy::cosmic_entropy(
 		intents_per_entity[mapper.get_handle(entry.first).get_id()] = entry.second;
 	}
 
-	for (const auto& entry : b.cast_spells) {
-		cast_spells[mapper.get_handle(entry.first).get_id()] = entry.second;
+	for (const auto& entry : b.cast_spells_per_entity) {
+		cast_spells_per_entity[mapper.get_handle(entry.first).get_id()] = entry.second;
 	}
 
 	for (const auto& entry : b.transfer_requests) {

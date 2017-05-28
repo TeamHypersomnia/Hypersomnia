@@ -41,6 +41,7 @@
 #include "game/transcendental/cosmic_delta.h"
 
 #include "augs/graphics/renderer.h"
+#include "game/test_scenes/resource_setups/all.h"
 #endif
 namespace test_scenes {
 	void testbed::populate(const logic_step step) {
@@ -267,18 +268,14 @@ namespace test_scenes {
 				sentience.personal_electricity.set_value(800);
 			}
 
-			sentience.spells[assets::spell_id::HASTE] = spell_instance_data();
-			sentience.spells[assets::spell_id::ELECTRIC_TRIAD] = spell_instance_data();
-			sentience.spells[assets::spell_id::FURY_OF_THE_AEONS] = spell_instance_data();
-			sentience.spells[assets::spell_id::ULTIMATE_WRATH_OF_THE_AEONS] = spell_instance_data();
-			sentience.spells[assets::spell_id::ELECTRIC_SHIELD] = spell_instance_data();
+			for_each_through_std_get(
+				sentience.spells,
+				[](auto& spell) {
+					spell.common.learned = true;
+				}
+			);
 
 			set_bbcoded_entity_name_details(new_character, L"Member of Atlantic nations.");
-		}
-
-		{
-
-
 		}
 
 		// street wandering pixels
@@ -805,6 +802,11 @@ namespace test_scenes {
 		world.get_global_assets().ped_shield_impact_sound.id = assets::sound_buffer_id::EXPLOSION;
 		world.get_global_assets().ped_shield_destruction_sound.id = assets::sound_buffer_id::GREAT_EXPLOSION;
 		world.get_global_assets().exhausted_smoke_particles.id = assets::particle_effect_id::EXHAUSTED_SMOKE;
+		
+		set_standard_sentience_properties(
+			world.significant.meta.global.spells,
+			world.significant.meta.global.perks
+		);
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 #endif
 	}

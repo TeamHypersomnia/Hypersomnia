@@ -37,7 +37,6 @@
 #include "game/assets/particle_effect.h"
 #include "game/assets/animation.h"
 #include "game/assets/tile_layer.h"
-#include "game/assets/spell.h"
 #include "game/assets/physical_material.h"
 
 #include "game/detail/particle_types.h"
@@ -75,7 +74,6 @@ typedef std::tuple<
 	augs::enum_associative_array<assets::game_image_id, game_image_baked>,
 	augs::enum_associative_array<assets::font_id, game_font_baked>,
 	augs::enum_associative_array<assets::particle_effect_id, particle_effect>,
-	augs::enum_associative_array<assets::spell_id, spell_data>,
 	augs::enum_associative_array<assets::tile_layer_id, tile_layer>,
 	augs::enum_associative_array<assets::physical_material_id, physical_material>,
 
