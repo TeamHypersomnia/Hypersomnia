@@ -34,6 +34,10 @@ void set_standard_sentience_props(
 		);
 
 		d.appearance.icon = assets::game_image_id::SPELL_HASTE_ICON;
+
+		d.common.cast_successful_sound.id = assets::sound_buffer_id::CAST_SUCCESSFUL;
+		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
+		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
 	}
 
 	{
@@ -50,6 +54,10 @@ void set_standard_sentience_props(
 		);
 
 		d.appearance.icon = assets::game_image_id::SPELL_FURY_OF_THE_AEONS_ICON;
+
+		d.common.cast_successful_sound.id = assets::sound_buffer_id::CAST_SUCCESSFUL;
+		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
+		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
 	}
 
 	{
@@ -66,12 +74,15 @@ void set_standard_sentience_props(
 		);
 
 		d.appearance.icon = assets::game_image_id::SPELL_ELECTRIC_TRIAD_ICON;
+
+		d.common.cast_successful_sound.id = assets::sound_buffer_id::CAST_SUCCESSFUL;
+		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
+		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
 	}
 
 	{
 		auto& d = std::get<ultimate_wrath_of_the_aeons>(spells);
 		d.common.cooldown_ms = 2000;
-		d.common.casting_time_ms = 3000;
 		d.common.personal_electricity_required = 260;
 		d.common.associated_color = blue_spell_border;
 
@@ -83,6 +94,45 @@ void set_standard_sentience_props(
 		);
 
 		d.appearance.icon = assets::game_image_id::SPELL_ULTIMATE_WRATH_OF_THE_AEONS_ICON;
+
+		d.charging_particles.id = assets::particle_effect_id::CAST_CHARGING;
+		d.charging_particles.modifier.scale_lifetimes = 1.3f;
+		d.charging_sound.id = assets::sound_buffer_id::CAST_CHARGING;
+
+		{
+			standard_explosion_input in;
+			in.damage = 88.f;
+			in.inner_ring_color = cyan;
+			in.outer_ring_color = white;
+			in.type = adverse_element_type::FORCE;
+
+			{
+				in.effective_radius = 200.f;
+				in.impact_force = 150.f;
+				in.sound_gain = 1.2f;
+				in.sound_effect = assets::sound_buffer_id::EXPLOSION;
+
+				d.explosions[0] = in;
+			}
+			
+			{
+				in.effective_radius = 400.f;
+				in.impact_force = 200.f;
+				in.sound_gain = 1.0f;
+				in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
+
+				d.explosions[1] = in;
+			}
+			
+			{
+				in.effective_radius = 600.f;
+				in.impact_force = 250.f;
+				in.sound_gain = 1.2f;
+				in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
+
+				d.explosions[2] = in;
+			}
+		}
 	}
 
 	{
@@ -101,6 +151,10 @@ void set_standard_sentience_props(
 		);
 
 		d.appearance.icon = assets::game_image_id::SPELL_ELECTRIC_SHIELD_ICON;
+
+		d.common.cast_successful_sound.id = assets::sound_buffer_id::CAST_SUCCESSFUL;
+		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
+		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
 	}
 
 	{

@@ -262,7 +262,10 @@ public:
 
 	entity_name_metas& get_name_metas();
 	const entity_name_metas& get_name_metas() const;
-	
+
+	cosmos_global_state& get_global_state();
+	const cosmos_global_state& get_global_state() const;
+
 	global_assets& get_global_assets();
 	const global_assets& get_global_assets() const;
 
@@ -329,12 +332,20 @@ inline entity_guid cosmos::get_guid(const const_entity_handle handle) const {
 }
 #endif
 
+inline cosmos_global_state& cosmos::get_global_state() {
+	return significant.meta.global;
+}
+
+inline const cosmos_global_state& cosmos::get_global_state() const {
+	return significant.meta.global;
+}
+
 inline global_assets& cosmos::get_global_assets() {
-	return significant.meta.global.assets;
+	return get_global_state().assets;
 }
 
 inline const global_assets& cosmos::get_global_assets() const {
-	return significant.meta.global.assets;
+	return get_global_state().assets;
 }
 
 inline entity_name_metas& cosmos::get_name_metas() {

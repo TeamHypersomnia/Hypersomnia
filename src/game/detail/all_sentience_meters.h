@@ -73,3 +73,5 @@ using put_all_meter_instances_into_t = transform_types_in_list_t<
 	put_all_meters_into_t<List>,
 	make_meter_instance
 >;
+
+using meter_instance_tuple = put_all_meter_instances_into_t<augs::trivially_copyable_tuple>;

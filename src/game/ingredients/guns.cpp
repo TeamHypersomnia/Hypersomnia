@@ -10,6 +10,7 @@
 #include "game/components/catridge_component.h"
 #include "game/components/explosive_component.h"
 #include "game/components/sender_component.h"
+#include "game/components/all_inferred_state.h"
 
 #include "game/messages/create_particle_effect.h"
 
@@ -33,7 +34,7 @@ void add_muzzle_particles(
 	components::gun& gun,
 	const logic_step step
 ) {
-	particle_effect_input effect;
+	particles_existence_input effect;
 	const auto place_of_birth = gun.calculate_muzzle_position(weapon.get_logic_transform());
 
 	effect.effect.id = assets::particle_effect_id::MUZZLE_SMOKE;
@@ -252,7 +253,7 @@ namespace prefabs {
 		gun.low_ammo_cue_sound.id = assets::sound_buffer_id::LOW_AMMO_CUE;
 
 		{
-			sound_effect_input in;
+			sound_existence_input in;
 			in.effect.id = assets::sound_buffer_id::FIREARM_ENGINE;
 			in.effect.modifier.repetitions = -1;
 			in.delete_entity_after_effect_lifetime = false;
@@ -351,5 +352,54 @@ namespace prefabs {
 		}
 
 		return weapon;
+	}
+
+	entity_handle create_electric_missile_def(const logic_step step, const components::transform transform) {
+		const auto energy_ball = step.cosm.create_entity("electric_missile");
+
+		ingredients::add_sprite(
+			energy_ball, 
+			assets::game_image_id::ENERGY_BALL, 
+			cyan, 
+			render_layer::FLYING_BULLETS
+		);
+
+		ingredients::add_bullet_round_physics(
+			step, 
+			energy_ball,
+			transform
+		);
+
+		auto& missile = energy_ball += components::missile();
+
+		missile.destruction_particles.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
+		missile.destruction_particles.modifier.colorize = cyan;
+
+		missile.trace_particles.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
+		missile.trace_particles.modifier.colorize = cyan;
+
+		missile.muzzle_leave_particles.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
+		missile.muzzle_leave_particles.modifier.colorize = cyan;
+
+		auto& trace_modifier = missile.trace_sound.modifier;
+
+		trace_modifier.max_distance = 1020.f;
+		trace_modifier.reference_distance = 100.f;
+		trace_modifier.gain = 1.3f;
+		trace_modifier.repetitions = -1;
+		trace_modifier.fade_on_exit = false;
+
+		missile.trace_sound.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
+		missile.destruction_sound.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
+
+		missile.homing_towards_hostile_strength = 1.0f;
+		missile.damage_amount = 42;
+
+		auto& sender = energy_ball += components::sender();
+		energy_ball += components::all_inferred_state { false };
+
+		energy_ball.add_standard_components(step);
+
+		return energy_ball;
 	}
 }

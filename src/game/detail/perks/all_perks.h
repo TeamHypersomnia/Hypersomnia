@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/templates/transform_types.h"
+#include "augs/templates/instance_type.h"
 
 #include "game/detail/perks/haste_perk.h"
 #include "game/detail/perks/electric_shield_perk.h"
@@ -15,13 +16,11 @@ struct put_all_perks_into {
 template <template <typename...> class List>
 using put_all_perks_into_t = typename put_all_perks_into<List>::type;
 
-template <class T>
-struct make_perk_instance {
-	using type = typename T::instance;
-};
-
 template <template <typename...> class List>
 using put_all_perk_instances_into_t = transform_types_in_list_t<
 	put_all_perks_into_t<List>,
-	make_perk_instance
+	make_instance
 >;
+
+using perk_instance_tuple = put_all_perk_instances_into_t<augs::trivially_copyable_tuple>;
+using perk_id = type_in_list_id<spell_instance_tuple>;

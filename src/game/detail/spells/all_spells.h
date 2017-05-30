@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/templates/transform_types.h"
+#include "augs/templates/instance_type.h"
 
 #include "game/detail/spells/haste.h"
 #include "game/detail/spells/fury_of_the_aeons.h"
@@ -7,7 +8,7 @@
 #include "game/detail/spells/electric_shield.h"
 #include "game/detail/spells/electric_triad.h"
 
-template<template <typename...> class List>
+template <template <typename...> class List>
 struct put_all_spells_into {
 	using type = List<
 		haste,
@@ -21,13 +22,11 @@ struct put_all_spells_into {
 template <template <typename...> class List>
 using put_all_spells_into_t = typename put_all_spells_into<List>::type;
 
-template <class T>
-struct make_spell_instance {
-	using type = typename T::instance;
-};
-
 template <template <typename...> class List>
 using put_all_spell_instances_into_t = transform_types_in_list_t<
 	put_all_spells_into_t<List>,
-	make_spell_instance
+	make_instance
 >;
+
+using spell_instance_tuple = put_all_spell_instances_into_t<augs::trivially_copyable_tuple>;
+using spell_id = type_in_list_id<spell_instance_tuple>;

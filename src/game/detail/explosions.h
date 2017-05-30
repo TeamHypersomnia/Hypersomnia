@@ -3,7 +3,7 @@
 
 #include "game/assets/sound_buffer_id.h"
 #include "game/components/transform_component.h"
-#include "game/transcendental/logic_step.h"
+#include "game/transcendental/step_declaration.h"
 #include "game/enums/adverse_element_type.h"
 
 #include "augs/misc/value_meter.h"

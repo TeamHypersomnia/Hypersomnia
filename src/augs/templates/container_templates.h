@@ -134,3 +134,8 @@ auto found_or_default(Container&& container, Key&& key, Args&&... default_args) 
 
 	return type(std::forward<Args>(default_args)...);
 }
+
+template <class Container, class T>
+void fill_container(Container& c, T&& val) {
+	std::fill(c.begin(), c.end(), std::forward<T>(val));
+}

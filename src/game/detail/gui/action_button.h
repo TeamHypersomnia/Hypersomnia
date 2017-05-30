@@ -4,6 +4,7 @@
 #include "augs/gui/appearance_detector.h"
 
 #include "game/assets/spell_id.h"
+#include "game/detail/spells/all_spells.h"
 #include "augs/audio/sound_source.h"
 
 class action_button : public game_gui_rect_node {
@@ -20,7 +21,7 @@ public:
 	augs::sound_source hover_sound;
 	augs::sound_source click_sound;
 
-	assets::spell_id bound_spell = assets::spell_id::INVALID;
+	spell_id bound_spell;
 
 	float elapsed_hover_time_ms = 0.f;
 

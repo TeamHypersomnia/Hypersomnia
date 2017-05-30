@@ -91,7 +91,6 @@ decltype(auto) dispatch_by_vertical_index(
 	return dynamic_dispatch(sentience.perks, index - num_meters, std::forward<G>(perk_callback));
 }
 
-
 template <class T, class F, class G>
 decltype(auto) dispatch_by_vertical_index(
 	T&& sentience, 

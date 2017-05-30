@@ -153,7 +153,7 @@ namespace prefabs {
 
 		for(int ee = 0; ee < 4; ++ee)
 		{
-			particle_effect_input effect;
+			particles_existence_input effect;
 			
 			auto place_of_birth = spawn_transform + engine_transforms[ee].pos.rotate(spawn_transform.rotation, vec2());
 			place_of_birth.rotation += engine_transforms[ee].rotation;
@@ -195,7 +195,7 @@ namespace prefabs {
 		}
 
 		{
-			sound_effect_input in;
+			sound_existence_input in;
 			in.effect.id = assets::sound_buffer_id::ENGINE;
 			in.effect.modifier.repetitions = -1;
 			in.delete_entity_after_effect_lifetime = false;

@@ -201,7 +201,7 @@ namespace prefabs {
 				const vec2 engine_size = metas[assets::game_image_id::TRUCK_ENGINE].get_size();
 
 				{
-					particle_effect_input input;
+					particles_existence_input input;
 					
 					input.effect.id = assets::particle_effect_id::ENGINE_PARTICLES;
 					input.effect.modifier.colorize = cyan;
@@ -248,7 +248,7 @@ namespace prefabs {
 			}
 
 			{
-				sound_effect_input in;
+				sound_existence_input in;
 				in.effect.id = assets::sound_buffer_id::ENGINE;
 				in.effect.modifier.repetitions = -1;
 				in.delete_entity_after_effect_lifetime = false;

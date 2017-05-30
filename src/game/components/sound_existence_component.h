@@ -8,10 +8,9 @@
 #include "game/transcendental/step_declaration.h"
 #include "augs/audio/sound_effect_modifier.h"
 
-
-struct sound_effect_input {
-	// GEN INTROSPECTOR struct sound_effect_input
-	sound_response effect;
+struct sound_existence_input {
+	// GEN INTROSPECTOR struct sound_existence_input
+	sound_effect_input effect;
 	bool delete_entity_after_effect_lifetime = true;
 	char variation_number = -1;
 	pad_bytes<2> pad;
@@ -28,7 +27,7 @@ struct sound_effect_input {
 namespace components {
 	struct sound_existence {
 		// GEN INTROSPECTOR struct components::sound_existence
-		sound_effect_input input;
+		sound_existence_input input;
 
 		augs::stepped_timestamp time_of_birth;
 		unsigned max_lifetime_in_steps = 0u;

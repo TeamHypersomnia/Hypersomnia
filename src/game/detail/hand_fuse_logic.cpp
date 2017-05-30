@@ -39,7 +39,7 @@ void release_or_throw_fused_object(
 		fuse.when_released = now;
 		fuse.when_detonates.step = static_cast<unsigned>(now.step + (1 / delta.in_seconds() * 1.0));
 
-		sound_effect_input in;
+		sound_existence_input in;
 		in.delete_entity_after_effect_lifetime = true;
 		in.direct_listener = thrower;
 		in.effect.id = assets::sound_buffer_id::GRENADE_UNPIN;
@@ -57,7 +57,7 @@ void release_or_throw_fused_object(
 				step
 			);
 			
-			sound_effect_input in;
+			sound_existence_input in;
 			in.delete_entity_after_effect_lifetime = true;
 			in.direct_listener = thrower;
 			in.effect.id = assets::sound_buffer_id::GRENADE_THROW;

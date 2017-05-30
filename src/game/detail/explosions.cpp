@@ -45,7 +45,7 @@ void standard_explosion_input::instantiate(
 
 	auto& cosmos = step.cosm;
 
-	sound_effect_input sound_in;
+	sound_existence_input sound_in;
 	sound_in.delete_entity_after_effect_lifetime = true;
 	sound_in.direct_listener = subject_if_any;
 	sound_in.effect.id = sound_effect;

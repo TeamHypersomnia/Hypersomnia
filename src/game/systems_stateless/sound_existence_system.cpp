@@ -112,7 +112,7 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 				const auto pitch_mult = impulse / 185.f;
 
 				if (gain_mult > 0.01f) {
-					sound_effect_input in;
+					sound_existence_input in;
 					in.delete_entity_after_effect_lifetime = true;
 					in.effect.modifier.pitch = 0.85f + pitch_mult;
 					in.effect.modifier.gain = gain_mult;
@@ -133,7 +133,7 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 
 			auto& missile = subject.get<components::missile>();
 
-			sound_effect_input in;
+			sound_existence_input in;
 			in.effect = missile.trace_sound;
 
 			missile.trace_sound_entity = in.create_sound_effect_entity(
@@ -150,7 +150,7 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 			const auto owning_capability = subject.get_owning_transfer_capability();
 
 			{
-				sound_effect_input in;
+				sound_existence_input in;
 				in.effect = gun.muzzle_shot_sound;
 				in.direct_listener = owning_capability;
 
@@ -165,7 +165,7 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 					const auto ammo_info = get_ammunition_information(subject);
 
 					if (ammo_info.total_charges < cued_count) {
-						sound_effect_input in;
+						sound_existence_input in;
 						in.effect = gun.low_ammo_cue_sound;
 
 						if (ammo_info.total_charges == cued_count - 1) {
@@ -189,7 +189,7 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 		const auto subject = cosmos[h.subject];
 		const auto& sentience = subject.get<components::sentience>();
 
-		sound_effect_input in;
+		sound_existence_input in;
 		in.direct_listener = subject;
 
 		if (h.target == messages::health_event::target_type::HEALTH) {
@@ -246,7 +246,7 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 		if (d.inflictor_destructed) {
 			const auto inflictor = cosmos[d.inflictor];
 			
-			sound_effect_input in;
+			sound_existence_input in;
 			in.direct_listener = d.subject;
 			in.effect = inflictor.get<components::missile>().destruction_sound;
 			
@@ -261,7 +261,7 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 	for (const auto& e : exhausted_casts) {
 		const auto subject = cosmos[e.subject];
 
-		sound_effect_input in;
+		sound_existence_input in;
 		in.direct_listener = e.subject;
 		in.effect = cosmos.get_global_assets().cast_unsuccessful_sound;
 

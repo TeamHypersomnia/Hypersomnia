@@ -8,7 +8,7 @@
 
 using namespace augs;
 
-entity_handle particle_effect_input::create_particle_effect_entity(
+entity_handle particles_existence_input::create_particle_effect_entity(
 	const logic_step step,
 	const components::transform place_of_birth,
 	const entity_id chased_subject
@@ -31,7 +31,7 @@ entity_handle particle_effect_input::create_particle_effect_entity(
 	return new_stream_entity;
 }
 
-void particle_effect_input::create_particle_effect_components(
+void particles_existence_input::create_particle_effect_components(
 	components::transform& out_transform,
 	components::particles_existence& out_existence,
 	components::position_copying& out_copying,

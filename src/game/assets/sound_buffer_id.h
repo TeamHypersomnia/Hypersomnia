@@ -57,8 +57,8 @@ namespace assets {
 	};
 }
 
-struct sound_response {
-	// GEN INTROSPECTOR struct sound_response
+struct sound_effect_input {
+	// GEN INTROSPECTOR struct sound_effect_input
 	assets::sound_buffer_id id = assets::sound_buffer_id::INVALID;
 	augs::sound_effect_modifier modifier;
 	// END GEN INTROSPECTOR

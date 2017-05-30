@@ -26,16 +26,7 @@ bool are_additional_conditions_for_casting_fulfilled(
 ) {
 	switch (spell) {
 	case assets::spell_id::ELECTRIC_TRIAD: {
-		constexpr float standard_triad_radius = 800.f;
 
-		const bool is_any_hostile_in_proximity = get_closest_hostiles(
-			caster,
-			caster,
-			standard_triad_radius,
-			filters::bullet()
-		).size() > 0;
-
-		return is_any_hostile_in_proximity;
 	}
 
 	default:
@@ -59,7 +50,7 @@ void perform_spell_logic(
 	const auto caster_transform = caster.get_logic_transform();
 	
 	const auto ignite_sparkle_particles = [&]() {
-		particle_effect_input burst;
+		particles_existence_input burst;
 
 		burst.effect.id = assets::particle_effect_id::CAST_SPARKLES;
 		burst.effect.modifier.colorize = spell_data.border_col;
@@ -72,7 +63,7 @@ void perform_spell_logic(
 	};
 
 	const auto ignite_charging_particles = [&](const rgba col) {
-		particle_effect_input burst;
+		particles_existence_input burst;
 
 		burst.effect.id = assets::particle_effect_id::CAST_CHARGING;
 		burst.effect.modifier.colorize = col;
@@ -87,7 +78,7 @@ void perform_spell_logic(
 	};
 	
 	const auto play_sound = [&](const assets::sound_buffer_id effect, const float gain = 1.f) {
-		sound_effect_input in;
+		sound_existence_input in;
 		in.delete_entity_after_effect_lifetime = true;
 		in.direct_listener = caster;
 		in.effect.id = effect;
@@ -121,7 +112,6 @@ void perform_spell_logic(
 		if (when_casted == now) {
 			ignite_sparkle_particles();
 			play_standard_sparkles_sound();
-			play_sound(assets::sound_buffer_id::EXPLOSION, 1.2f);
 
 			sentience.shake_for_ms = 400.f;
 			sentience.time_of_last_shake = now;
@@ -201,73 +191,6 @@ void perform_spell_logic(
 		ignite_sparkle_particles();
 		play_standard_sparkles_sound();
 
-		{
-			constexpr float standard_triad_radius = 800.f;
-
-			const auto hostiles = get_closest_hostiles(
-				caster,
-				caster,
-				standard_triad_radius,
-				filters::bullet()
-			);
-
-			for (size_t i = 0; i < 3 && i < hostiles.size(); ++i) {
-				const auto next_hostile = cosmos[hostiles[i]];
-				LOG_NVPS(next_hostile.get_id());
-				const auto energy_ball = cosmos.create_entity("energy_ball");
-
-				auto new_energy_ball_transform = caster_transform;
-				
-				new_energy_ball_transform.rotation = 
-					(next_hostile.get_logic_transform().pos - caster_transform.pos).degrees();
-
-				ingredients::add_sprite(
-					energy_ball, 
-					assets::game_image_id::ENERGY_BALL, 
-					cyan, 
-					render_layer::FLYING_BULLETS
-				);
-
-				ingredients::add_bullet_round_physics(
-					step, 
-					energy_ball,
-					new_energy_ball_transform
-				);
-
-				auto& missile = energy_ball += components::missile();
-
-				missile.destruction_particles.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
-				missile.destruction_particles.modifier.colorize = cyan;
-
-				missile.trace_particles.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
-				missile.trace_particles.modifier.colorize = cyan;
-
-				missile.muzzle_leave_particles.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
-				missile.muzzle_leave_particles.modifier.colorize = cyan;
-
-				auto& trace_modifier = missile.trace_sound.modifier;
-
-				trace_modifier.max_distance = 1020.f;
-				trace_modifier.reference_distance = 100.f;
-				trace_modifier.gain = 1.3f;
-				trace_modifier.repetitions = -1;
-				trace_modifier.fade_on_exit = false;
-
-				missile.trace_sound.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
-				missile.destruction_sound.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
-
-				missile.homing_towards_hostile_strength = 1.0f;
-				missile.particular_homing_target = next_hostile;
-				missile.damage_amount = 42;
-
-				auto& sender = energy_ball += components::sender();
-				sender.set(caster);
-
-				const auto energy_ball_velocity = vec2().set_from_degrees(new_energy_ball_transform.rotation) * 2000;
-				energy_ball.get<components::rigid_body>().set_velocity(energy_ball_velocity);
-
-				energy_ball.add_standard_components(step);
-			}
 		}
 
 		break;

@@ -90,12 +90,13 @@ namespace test_scenes {
 			auto& sentience = new_character.get<components::sentience>();
 
 
-			for_each_through_std_get(
-				sentience.spells,
-				[](auto& spell) {
-					spell.common.learned = true;
-				}
-			);
+			fill_container(sentience.learned_spells, true);
+			//for_each_through_std_get(
+			//	sentience.spells,
+			//	[](auto& spell) {
+			//		spell.common.learned = true;
+			//	}
+			//);
 		}
 
 		//const auto amplifier = prefabs::create_amplifier_arm(step, vec2(-300, -500 + 50));
@@ -135,6 +136,8 @@ namespace test_scenes {
 			world.significant.meta.global.spells,
 			world.significant.meta.global.perks
 		);
+
+		std::get<electric_triad>(world.get_global_state().spells).missile_definition = prefabs::create_electric_missile_def(step, {});
 #endif
 	}
 }

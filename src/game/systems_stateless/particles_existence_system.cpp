@@ -93,7 +93,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 	for (const auto& g : gunshots) {
 		for (auto& r : g.spawned_rounds) {
 			{
-				particle_effect_input burst;
+				particles_existence_input burst;
 				burst.effect = cosmos[r].get<components::missile>().muzzle_leave_particles;
 
 				burst.create_particle_effect_entity(
@@ -106,7 +106,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 			{
 				auto& missile = cosmos[r].get<components::missile>();
 
-				particle_effect_input particle_trace;
+				particles_existence_input particle_trace;
 				particle_trace.effect = missile.trace_particles;
 
 				auto place_of_birth = cosmos[r].get_logic_transform();
@@ -123,7 +123,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 		const auto shell = cosmos[g.spawned_shell];
 
 		if (shell.alive()) {
-			particle_effect_input burst;
+			particles_existence_input burst;
 			burst.effect = g.catridge_definition.shell_trace_particles;
 
 			auto place_of_birth = shell.get_logic_transform();
@@ -141,7 +141,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 		if (d.inflictor_destructed) {
 			const auto inflictor = cosmos[d.inflictor];
 
-			particle_effect_input burst;
+			particles_existence_input burst;
 			
 			auto place_of_birth = components::transform(d.point_of_impact);
 
@@ -189,7 +189,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 		const auto particles_entity = cosmos[sentience.health_damage_particles];
 		auto& existence = particles_entity.get<components::particles_existence>();
 
-		particle_effect_input burst = existence.input;
+		particles_existence_input burst = existence.input;
 
 		auto place_of_birth = components::transform(h.point_of_impact);
 
@@ -230,7 +230,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 	}
 
 	for (const auto& e : exhausted_casts) {
-		particle_effect_input burst;
+		particles_existence_input burst;
 		burst.effect = cosmos.get_global_assets().exhausted_smoke_particles;
 
 		burst.create_particle_effect_entity(

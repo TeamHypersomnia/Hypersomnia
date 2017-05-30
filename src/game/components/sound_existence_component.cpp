@@ -6,7 +6,7 @@
 #include "game/components/position_copying_component.h"
 #include "game/assets/assets_manager.h"
 
-entity_handle sound_effect_input::create_sound_effect_entity(
+entity_handle sound_existence_input::create_sound_effect_entity(
 	const logic_step step,
 	const components::transform place_of_birth,
 	const entity_id chased_subject_id

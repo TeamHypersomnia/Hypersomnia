@@ -164,7 +164,7 @@ namespace prefabs {
 
 
 		{
-			particle_effect_input effect;
+			particles_existence_input effect;
 			
 			effect.effect.id = assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES;
 			effect.delete_entity_after_effect_lifetime = false;

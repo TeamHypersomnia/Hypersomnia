@@ -31,18 +31,13 @@ namespace augs {
 
 	}
 
-	template<class... Types>
+	template <class... Types>
 	class trivial_variant {
-		unsigned current_type = sizeof...(Types);
+		type_in_list_id<trivial_variant<Types...>> current_type;
 		char buf[detail::_maximum<0, sizeof(Types)...>::value];
 		static_assert(are_types_memcpy_safe_v<Types...>, "Types must be memcpy-safe!");
 
 	public:
-		template<class T>
-		static void assert_correct_type() {
-			static_assert(is_one_of_v<T, Types...>, "trivial_variant does not contain the specified type!");
-		}
-
 		trivial_variant() {
 			std::memset(buf, 0, sizeof(buf));
 		}
@@ -53,20 +48,20 @@ namespace augs {
 		}
 
 		void unset() {
-			current_type = sizeof...(Types);
+			current_type.unset();
 		}
 
 		bool is_set() const {
-			return current_type != sizeof...(Types);
+			return current_type.is_set();
 		}
 
 		template<class T_convertible>
 		void set(const T_convertible& t) {
 			typedef find_convertible_type_in_t<T_convertible, Types...> T;
 
-			auto converted = T(t);
+			const auto converted = T(t);
 			std::memcpy(buf, &converted, sizeof(T));
-			current_type = static_cast<unsigned>(index_in_v<T, Types...>);
+			current_type.set<T>();
 		}
 
 		template<class T_convertible>
@@ -75,10 +70,9 @@ namespace augs {
 			return is<T>() && get<T>() == b;
 		}
 
-		template<class T>
+		template <class T>
 		bool is() const {
-			assert_correct_type<T>();
-			return index_in_v<T, Types...> == static_cast<std::size_t>(current_type);
+			return current_type.is<T>();
 		}
 
 		template <std::size_t I>
@@ -93,27 +87,23 @@ namespace augs {
 
 		template <class T>
 		T& get() {
-			assert_correct_type<T>();
 			ensure(is<T>());
 			return *reinterpret_cast<T*>(buf);
 		}
 
 		template <class T>
 		const T& get() const {
-			assert_correct_type<T>();
 			ensure(is<T>());
 			return *reinterpret_cast<const T*>(buf);
 		}
 
 		template<class T>
 		T* find() {
-			assert_correct_type<T>();
 			return is<T>() ? reinterpret_cast<T*>(buf) : nullptr;
 		}
 
 		template<class T>
 		const T* find() const {
-			assert_correct_type<T>();
 			return is<T>() ? reinterpret_cast<T*>(buf) : nullptr;
 		}
 
@@ -127,7 +117,7 @@ namespace augs {
 			return dynamic_dispatch(*this, current_type, std::forward<L>(generic_call));
 		}
 
-		unsigned get_current_type_index() const {
+		auto get_current_type_id() const {
 			return current_type;
 		}
 
@@ -169,7 +159,7 @@ namespace std {
 	struct hash<augs::trivial_variant<Types...>> {
 		std::size_t operator()(const augs::trivial_variant<Types...>& k) const {
 			return k.call([&k](const auto& resolved) {
-				return augs::simple_two_hash(k.get_current_type_index(), resolved);
+				return augs::simple_two_hash(k.get_current_type_id(), resolved);
 			});
 		}
 	};

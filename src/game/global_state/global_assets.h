@@ -5,10 +5,10 @@
 
 struct global_assets {
 	// GEN INTROSPECTOR struct global_assets
-	sound_response ped_shield_impact_sound;
-	sound_response ped_shield_destruction_sound;
-	sound_response cast_unsuccessful_sound;
+	sound_effect_input ped_shield_impact_sound;
+	sound_effect_input ped_shield_destruction_sound;
+	sound_effect_input cast_unsuccessful_sound;
 
-	particle_effect_response exhausted_smoke_particles;
+	particle_effect_input exhausted_smoke_particles;
 	// END GEN INTROSPECTOR
 };

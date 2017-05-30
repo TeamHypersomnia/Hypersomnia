@@ -104,7 +104,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 				damage_msg.collider_b2Fixture_index = it.collider_b2Fixture_index;
 
 				if (is_victim_a_held_item) {
-					sound_effect_input in;
+					sound_existence_input in;
 					in.effect = missile.pass_through_held_item_sound; 
 					in.delete_entity_after_effect_lifetime = true;
 					in.direct_listener = owning_capability;

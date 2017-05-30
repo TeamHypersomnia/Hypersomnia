@@ -8,6 +8,7 @@
 #include "game/assets/assets_manager.h"
 
 #include "augs/graphics/drawers.h"
+#include "augs/templates/dynamic_dispatch.h"
 
 void action_button::draw(
 	const viewing_game_gui_context context,
@@ -28,129 +29,137 @@ void action_button::draw(
 		const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
 		const auto bound_spell = this_id->bound_spell;
 
-		if (bound_spell != assets::spell_id::INVALID && sentience.spells.find(bound_spell) != sentience.spells.end()) {
-			const auto spell_data = get_assets_manager()[bound_spell];
-			const bool has_enough_mana = sentience.personal_electricity.value >= spell_data.common.personal_electricity_required;
-			const float required_mana_ratio = std::min(1.f, sentience.personal_electricity.value / static_cast<float>(spell_data.common.personal_electricity_required));
+		if (bound_spell.is_set() && sentience.is_learned(bound_spell)) {
+			dynamic_dispatch(
+				sentience.spells,
+				bound_spell,
+				[&](const auto& spell){
+					const auto spell_data = get_meta_of(spell, cosmos.get_global_state().spells);
 
-			rgba inside_col = white;
+					const auto& pe = sentience.get<personal_electricity_meter_instance>();
+					const bool has_enough_mana = pe.value >= spell_data.common.personal_electricity_required;
+					const float required_mana_ratio = std::min(1.f, pe.value / static_cast<float>(spell_data.common.personal_electricity_required));
 
-			inside_col.a = 220;
+					rgba inside_col = white;
 
-			const auto& detector = this_id->detector;
-			const bool is_pushed = detector.current_appearance == augs::gui::appearance_detector::appearance::pushed;
+					inside_col.a = 220;
 
-			if (detector.is_hovered) {
-				inside_col.a = 255;
-			}
+					const auto& detector = this_id->detector;
+					const bool is_pushed = detector.current_appearance == augs::gui::appearance_detector::appearance::pushed;
 
-			assets::game_image_id inside_tex = assets::game_image_id::INVALID;
-			assets::game_image_id border_tex = assets::game_image_id::SPELL_BORDER;
+					if (detector.is_hovered) {
+						inside_col.a = 255;
+					}
 
-			rgba border_col;
+					assets::game_image_id inside_tex = assets::game_image_id::INVALID;
+					assets::game_image_id border_tex = assets::game_image_id::SPELL_BORDER;
 
-			const auto& manager = get_assets_manager();
+					rgba border_col;
 
-			inside_tex = spell_data.appearance.icon;
-			border_col = spell_data.common.associated_color;
+					const auto& manager = get_assets_manager();
 
-			if (!has_enough_mana) {
-				border_col = border_col.get_desaturated();
-			}
+					inside_tex = spell_data.appearance.icon;
+					border_col = spell_data.common.associated_color;
 
-			if (inside_tex != assets::game_image_id::INVALID) {
-				ensure(border_tex != assets::game_image_id::INVALID);
+					if (!has_enough_mana) {
+						border_col = border_col.get_desaturated();
+					}
 
-				const augs::gui::material inside_mat(inside_tex, inside_col);
+					if (inside_tex != assets::game_image_id::INVALID) {
+						ensure(border_tex != assets::game_image_id::INVALID);
 
-				const auto absolute_icon_rect = ltrbi(vec2i(0, 0), manager[inside_tex].get_size()).place_in_center_of(absolute_rect);
-				const bool draw_partial_colorful_rect = false;
+						const augs::gui::material inside_mat(inside_tex, inside_col);
 
-				if (has_enough_mana) {
-					draw_clipped_rect(
-						inside_mat,
-						absolute_icon_rect,
-						context,
-						context.get_tree_entry(this_id).get_parent(),
-						info.v
-					);
-				}
-				else {
-					augs::draw_clipped_rect(
-						info.v,
-						absolute_icon_rect,
-						get_assets_manager()[inside_mat.tex].texture_maps[texture_map_type::DESATURATED],
-						inside_mat.color,
-						ltrbi()
-					);
+						const auto absolute_icon_rect = ltrbi(vec2i(0, 0), manager[inside_tex].get_size()).place_in_center_of(absolute_rect);
+						const bool draw_partial_colorful_rect = false;
 
-					if (draw_partial_colorful_rect) {
-						auto colorful_rect = absolute_icon_rect;
-						const auto colorful_height = static_cast<int>(absolute_icon_rect.h() * required_mana_ratio);
-						colorful_rect.t = absolute_icon_rect.b - colorful_height;
-						colorful_rect.b = colorful_rect.t + colorful_height;
+						if (has_enough_mana) {
+							draw_clipped_rect(
+								inside_mat,
+								absolute_icon_rect,
+								context,
+								context.get_tree_entry(this_id).get_parent(),
+								info.v
+							);
+						}
+						else {
+							augs::draw_clipped_rect(
+								info.v,
+								absolute_icon_rect,
+								get_assets_manager()[inside_mat.tex].texture_maps[texture_map_type::DESATURATED],
+								inside_mat.color,
+								ltrbi()
+							);
 
-						augs::draw_clipped_rect(
-							info.v,
-							absolute_icon_rect,
-							get_assets_manager()[inside_mat.tex].texture_maps[texture_map_type::DIFFUSE],
-							inside_mat.color,
-							colorful_rect
+							if (draw_partial_colorful_rect) {
+								auto colorful_rect = absolute_icon_rect;
+								const auto colorful_height = static_cast<int>(absolute_icon_rect.h() * required_mana_ratio);
+								colorful_rect.t = absolute_icon_rect.b - colorful_height;
+								colorful_rect.b = colorful_rect.t + colorful_height;
+
+								augs::draw_clipped_rect(
+									info.v,
+									absolute_icon_rect,
+									get_assets_manager()[inside_mat.tex].texture_maps[texture_map_type::DIFFUSE],
+									inside_mat.color,
+									colorful_rect
+								);
+							}
+						}
+
+						bool is_still_cooled_down = false;
+
+						{
+							const auto all_cooldown = sentience.cast_cooldown_for_all_spells;
+							const auto this_cooldown = spell.cast_cooldown;
+
+							const auto effective_cooldown_ratio =
+								all_cooldown.get_remaining_time_ms(now, dt) > this_cooldown.get_remaining_time_ms(now, dt)
+								?
+								all_cooldown.get_ratio_of_remaining_time(now, dt) : this_cooldown.get_ratio_of_remaining_time(now, dt);
+
+							if (effective_cooldown_ratio > 0.f) {
+								augs::draw_rectangle_clock(info.v, effective_cooldown_ratio, absolute_icon_rect, { 0, 0, 0, 200 });
+								is_still_cooled_down = true;
+							}
+						}
+						
+						if (is_still_cooled_down) {
+							border_col.a -= 150;
+						}
+
+						if (this_id->detector.is_hovered) {
+							border_col = rgba(180, 180, 180, 255);
+						}
+
+						if (is_pushed) {
+							border_col = rgba(220, 220, 220, 255);
+						}
+
+						const augs::gui::material border_mat(border_tex, border_col);
+
+						draw_centered_texture(context, this_id, info, border_mat);
+
+						auto label_col = has_enough_mana ? cyan : white;
+						label_col.a = 255;
+						const auto label_style = augs::gui::text::style(assets::font_id::GUI_FONT, label_col );
+
+						augs::gui::text_drawer bound_key_caption;
+
+						bound_key_caption.set_text(
+							augs::gui::text::format(
+								key_to_wstring(bound_key),
+								label_style
+							)
 						);
+
+						bound_key_caption.bottom_right(absolute_rect);
+						bound_key_caption.pos.x -= 3;
+						bound_key_caption.draw_stroke(info.v);
+						bound_key_caption.draw(info.v);
 					}
 				}
-
-				bool is_still_cooled_down = false;
-
-				{
-					const auto all_cooldown = sentience.cast_cooldown_for_all_spells;
-					const auto this_cooldown = sentience.spells.at(bound_spell).cast_cooldown;
-
-					const auto effective_cooldown_ratio =
-						all_cooldown.get_remaining_time_ms(now, dt) > this_cooldown.get_remaining_time_ms(now, dt)
-						?
-						all_cooldown.get_ratio_of_remaining_time(now, dt) : this_cooldown.get_ratio_of_remaining_time(now, dt);
-
-					if (effective_cooldown_ratio > 0.f) {
-						augs::draw_rectangle_clock(info.v, effective_cooldown_ratio, absolute_icon_rect, { 0, 0, 0, 200 });
-						is_still_cooled_down = true;
-					}
-				}
-				
-				if (is_still_cooled_down) {
-					border_col.a -= 150;
-				}
-
-				if (this_id->detector.is_hovered) {
-					border_col = rgba(180, 180, 180, 255);
-				}
-
-				if (is_pushed) {
-					border_col = rgba(220, 220, 220, 255);
-				}
-
-				const augs::gui::material border_mat(border_tex, border_col);
-
-				draw_centered_texture(context, this_id, info, border_mat);
-
-				auto label_col = has_enough_mana ? cyan : white;
-				label_col.a = 255;
-				const auto label_style = augs::gui::text::style(assets::font_id::GUI_FONT, label_col );
-
-				augs::gui::text_drawer bound_key_caption;
-
-				bound_key_caption.set_text(
-					augs::gui::text::format(
-						key_to_wstring(bound_key),
-						label_style
-					)
-				);
-
-				bound_key_caption.bottom_right(absolute_rect);
-				bound_key_caption.pos.x -= 3;
-				bound_key_caption.draw_stroke(info.v);
-				bound_key_caption.draw(info.v);
-			}
+			);
 		}
 		else {
 			rgba inside_col, border_col;
@@ -221,8 +230,10 @@ void action_button::respond_to_events(
 
 		if (info.msg == gui_event::lclick) {
 			const auto bound_spell = this_id->bound_spell;
+			
+			const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
 
-			if (bound_spell != assets::spell_id::INVALID) {
+			if (bound_spell.is_set() && sentience.is_learned(bound_spell)) {
 				context.get_gui_element_system().spell_requests[context.get_gui_element_entity()] = bound_spell;
 			}
 		}

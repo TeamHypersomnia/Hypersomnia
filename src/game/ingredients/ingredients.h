@@ -106,5 +106,7 @@ namespace prefabs {
 	entity_handle create_force_grenade(const logic_step, const vec2 pos);
 	entity_handle create_ped_grenade(const logic_step, const vec2 pos);
 	entity_handle create_interference_grenade(const logic_step, const vec2 pos);
+
+	entity_handle create_electric_missile_def(const logic_step, const components::transform);
 }
 #endif

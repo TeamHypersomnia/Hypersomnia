@@ -46,13 +46,13 @@ namespace components {
 		child_entity_id trace_sound_entity;
 		child_entity_id trace_particles_entity;
 
-		sound_response trace_sound;
-		sound_response destruction_sound;
-		sound_response pass_through_held_item_sound;
+		sound_effect_input trace_sound;
+		sound_effect_input destruction_sound;
+		sound_effect_input pass_through_held_item_sound;
 
-		particle_effect_response muzzle_leave_particles;
-		particle_effect_response trace_particles;
-		particle_effect_response destruction_particles;
+		particle_effect_input muzzle_leave_particles;
+		particle_effect_input trace_particles;
+		particle_effect_input destruction_particles;
 
 		vec2 saved_point_of_impact_before_death;
 		// END GEN INTROSPECTOR

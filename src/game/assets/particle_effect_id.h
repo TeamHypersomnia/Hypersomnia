@@ -29,8 +29,8 @@ namespace assets {
 	};
 }
 
-struct particle_effect_response {
-	// GEN INTROSPECTOR struct particle_effect_response
+struct particle_effect_input {
+	// GEN INTROSPECTOR struct particle_effect_input
 	assets::particle_effect_id id = assets::particle_effect_id::INVALID;
 	particle_effect_modifier modifier;
 	// END GEN INTROSPECTOR

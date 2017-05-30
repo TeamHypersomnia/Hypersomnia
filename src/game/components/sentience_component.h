@@ -20,6 +20,9 @@
 #include "game/detail/spell_logic.h"
 #include "augs/misc/value_meter.h"
 
+#include "augs/templates/type_in_list_id.h"
+#include "augs/templates/constexpr_arithmetic.h"
+
 namespace components {
 	struct sentience {
 		// GEN INTROSPECTOR struct components::sentience
@@ -28,11 +31,18 @@ namespace components {
 
 		augs::stepped_cooldown cast_cooldown_for_all_spells;
 
-		put_all_meter_instances_into_t<augs::trivially_copyable_tuple> meters;
-		put_all_spell_instances_into_t<augs::trivially_copyable_tuple> spells;
-		put_all_perk_instances_into_t<augs::trivially_copyable_tuple> perks;
+		meter_instance_tuple meters;
 
-		unsigned currently_casted_spell = 0xdeadbeef;
+		std::array<
+			zeroed_pod<bool>, 
+			aligned_num_of_bytes_v<num_types_in_list_v<spell_instance_tuple>, 4> 
+		> learned_spells;
+
+		spell_instance_tuple spells;
+		perk_instance_tuple perks;
+
+		spell_id currently_casted_spell;
+		
 		components::transform transform_when_spell_casted;
 		augs::stepped_timestamp time_of_last_spell_cast;
 		augs::stepped_timestamp time_of_last_exhausted_cast;
@@ -47,21 +57,51 @@ namespace components {
 		child_entity_id health_damage_particles;
 		child_entity_id character_crosshair;
 
-		sound_response health_decrease_sound;
-		sound_response consciousness_decrease_sound;
+		sound_effect_input health_decrease_sound;
+		sound_effect_input consciousness_decrease_sound;
 
-		sound_response death_sound;
-		sound_response loss_of_consciousness_sound;
+		sound_effect_input death_sound;
+		sound_effect_input loss_of_consciousness_sound;
 
-		particle_effect_response health_decrease_particles;
+		particle_effect_input health_decrease_particles;
 
 		// END GEN INTROSPECTOR
 
+		bool is_learned(const spell_id id) const {
+			ensure(id.is_set());
+			return learned_spells[id.get_index()] == true;
+		}
+
 		bool is_spell_being_cast() const {
-			return currently_casted_spell != 0xdeadbeef;
+			return currently_casted_spell.is_set();
 		}
 
 		rgba calculate_health_color(float time_pulse_multiplier) const;
 		bool is_conscious() const;
+
+	private:
+		template <class T, class List>
+		using can_get_from_t = std::enable_if_t<is_one_of_list_v<T, std::decay_t<List>>>;
+	public:
+
+		template <class T>
+		auto& get(can_get_from_t<T, meter_instance_tuple>* = nullptr) {
+			return std::get<T>(meters);
+		}
+
+		template <class T>
+		const auto& get(can_get_from_t<T, meter_instance_tuple>* = nullptr) const {
+			return std::get<T>(meters);
+		}
+
+		template <class T>
+		auto& get(can_get_from_t<T, perk_instance_tuple>* = nullptr) {
+			return std::get<T>(perks);
+		}
+
+		template <class T>
+		const auto& get(can_get_from_t<T, perk_instance_tuple>* = nullptr) const {
+			return std::get<T>(perks);
+		}
 	};
 }

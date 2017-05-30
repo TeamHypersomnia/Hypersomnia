@@ -12,9 +12,9 @@
 #include "game/transcendental/step_declaration.h"
 #include "game/assets/particle_effect_id.h"
 
-struct particle_effect_input {
-	// GEN INTROSPECTOR struct particle_effect_input
-	particle_effect_response effect;
+struct particles_existence_input {
+	// GEN INTROSPECTOR struct particles_existence_input
+	particle_effect_input effect;
 	bool delete_entity_after_effect_lifetime = true;
 	pad_bytes<3> pad;
 
@@ -41,7 +41,7 @@ struct particle_effect_input {
 namespace components {
 	struct particles_existence {
 		// GEN INTROSPECTOR struct components::particles_existence
-		particle_effect_input input;
+		particles_existence_input input;
 
 		vec2 current_displacement;
 		augs::stepped_timestamp time_of_last_displacement;

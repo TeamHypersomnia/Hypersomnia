@@ -268,12 +268,14 @@ namespace test_scenes {
 				sentience.personal_electricity.set_value(800);
 			}
 
-			for_each_through_std_get(
-				sentience.spells,
-				[](auto& spell) {
-					spell.common.learned = true;
-				}
-			);
+			fill_container(sentience.learned_spells, true);
+
+			// for_each_through_std_get(
+			// 	sentience.spells,
+			// 	[](auto& spell) {
+			// 		spell.common.learned = true;
+			// 	}
+			// );
 
 			set_bbcoded_entity_name_details(new_character, L"Member of Atlantic nations.");
 		}
@@ -574,7 +576,7 @@ namespace test_scenes {
 				l.add_standard_components(step);
 			}
 
-			particle_effect_input effect;
+			particles_existence_input effect;
 			effect.effect.id = assets::particle_effect_id::WANDERING_SMOKE;
 			effect.displace_source_position_within_radius = 500.f;
 			effect.single_displacement_duration_ms.set(400.f, 1500.f);
@@ -807,6 +809,24 @@ namespace test_scenes {
 			world.significant.meta.global.spells,
 			world.significant.meta.global.perks
 		);
+
+		auto& spells = world.get_global_state().spells;
+		std::get<electric_triad>(spells).missile_definition = prefabs::create_electric_missile_def(step, {});
+
+		{
+			auto& in = std::get<fury_of_the_aeons>(spells).explosion;
+
+			in.effective_radius = 250.f;
+			in.damage = 88.f;
+			in.impact_force = 150.f;
+			in.inner_ring_color = cyan;
+			in.outer_ring_color = white;
+			in.sound_effect = assets::sound_buffer_id::EXPLOSION;
+			in.sound_gain = 1.2f;
+			in.type = adverse_element_type::FORCE;
+		}
+
+
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 #endif
 	}

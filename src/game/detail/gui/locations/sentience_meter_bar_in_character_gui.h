@@ -1,5 +1,6 @@
 #pragma once
-
+#include "game/detail/spells/all_spells.h"
+#include "game/detail/perks/all_perks.h"
 
 struct sentience_meter_bar;
 
@@ -15,7 +16,7 @@ public:
 
 	template <class C>
 	bool alive(const C context) const {
-		return static_cast<int>(vertical_index) < static_cast<int>(sentience_meter_type::COUNT);
+		return vertical_index < num_types_in_list_v<spell_instance_tuple> + num_types_in_list_v<perk_instance_tuple>;
 	}
 
 	template <class C>
@@ -29,7 +30,7 @@ namespace std {
 	template <>
 	struct hash<sentience_meter_bar_in_character_gui> {
 		size_t operator()(const sentience_meter_bar_in_character_gui& k) const {
-			return hash<sentience_meter_type>()(k.vertical_index);
+			return hash<decltype(k.vertical_index)>()(k.vertical_index);
 		}
 	};
 }

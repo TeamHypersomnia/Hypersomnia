@@ -16,14 +16,8 @@ struct spell_instance_data {
 	// END GEN INTROSPECTOR
 };
 
-bool are_additional_conditions_for_casting_fulfilled(
-	const assets::spell_id,
-	const const_entity_handle subject
-);
-
 void perform_spell_logic(
 	const logic_step step,
-	const assets::spell_id,
 	const entity_handle subject,
 	components::sentience& subject_sentience,
 	const augs::stepped_timestamp when_casted,
