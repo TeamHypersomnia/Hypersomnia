@@ -19,7 +19,7 @@
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "game/transcendental/types_specification/all_messages_includes.h"
 #include "game/enums/party_category.h"
-#include "game/detail/entity_description.h"
+#include "game/detail/describers.h"
 
 #include "game/messages/intent_message.h"
 #include "game/detail/inventory/inventory_utils.h"
@@ -277,7 +277,7 @@ namespace test_scenes {
 			// 	}
 			// );
 
-			set_bbcoded_entity_name_details(new_character, L"Member of Atlantic nations.");
+			set_bbcoded_entity_description(new_character, L"Member of Atlantic nations.");
 		}
 
 		// street wandering pixels

@@ -7,7 +7,7 @@
 #include "game/components/sentience_component.h"
 #include "game/components/container_component.h"
 #include "augs/templates/string_templates.h"
-#include "game/detail/entity_description.h"
+#include "game/detail/describers.h"
 
 namespace rendering_scripts {
 	augs::vertex_triangle_buffer draw_circular_bars_and_get_textual_info(const viewing_step r) {

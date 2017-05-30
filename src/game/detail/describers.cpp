@@ -1,4 +1,4 @@
-#include "entity_description.h"
+#include "describers.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/components/name_component.h"
@@ -21,15 +21,15 @@ entity_name_type get_bbcoded_entity_name(const const_entity_handle maybe_overrid
 	return maybe_overridden_by_nickname.get_name();
 }
 
-void set_bbcoded_entity_name_details(
+void set_bbcoded_entity_description(
 	const entity_handle handle, 
-	const entity_details_type& new_details
+	const entity_description_type& new_details
 ) {
-	handle.get_meta_of_name().details = new_details;
+	handle.get_meta_of_name().description = new_details;
 }
 
-entity_details_type get_bbcoded_entity_name_details(const const_entity_handle handle) {
-	return handle.get_meta_of_name().details;
+entity_description_type get_bbcoded_entity_description(const const_entity_handle handle) {
+	return handle.get_meta_of_name().description;
 }
 
 std::wstring get_bbcoded_entity_properties(const const_entity_handle id) {
@@ -119,19 +119,19 @@ std::wstring get_bbcoded_entity_properties(const const_entity_handle id) {
 	return out.substr(0, out.length() - 1);
 }
 
-std::wstring get_bbcoded_slot_description(const const_inventory_slot_handle id) {
+std::wstring get_bbcoded_slot_details(const const_inventory_slot_handle id) {
 	const auto name = get_bbcoded_slot_function_name(id.get_id().type);
-	const auto details = get_bbcoded_slot_function_details(id.get_id().type);
+	const auto description = get_bbcoded_slot_function_description(id.get_id().type);
 
 	const auto catcolor = id->category_allowed == item_category::GENERAL ? L"vsblue" : L"violet";
 
 	return name + L"\n[color=vslightgray]Allows: [/color][color=" + catcolor + L"]" + get_bbcoded_item_categories(id->get_allowed_categories()) + L"[/color][color=vsdarkgray]\n" +
-		details + L"[/color]";
+		description + L"[/color]";
 }
 
-std::wstring get_bbcoded_entity_description(const const_entity_handle id) {
+std::wstring get_bbcoded_entity_details(const const_entity_handle id) {
 	const auto name = get_bbcoded_entity_name(id);
-	const auto details = get_bbcoded_entity_name_details(id);
+	const auto description = get_bbcoded_entity_description(id);
 
 	auto properties = get_bbcoded_entity_properties(id);
 	
@@ -139,5 +139,5 @@ std::wstring get_bbcoded_entity_description(const const_entity_handle id) {
 		properties += L"\n";
 	}
 
-	return L"[color=white]" + name + L"[/color]\n" + properties + L"[color=vsdarkgray]" + details + L"[/color]";
+	return L"[color=white]" + name + L"[/color]\n" + properties + L"[color=vsdarkgray]" + description + L"[/color]";
 }

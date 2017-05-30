@@ -4,7 +4,7 @@
 #include "game/components/name_component_declaration.h"
 #include "augs/templates/container_templates.h"
 
-using entity_details_type = entity_name_type;
+using entity_description_type = entity_name_type;
 
 namespace augs {
 	struct introspection_access;
@@ -13,12 +13,12 @@ namespace augs {
 class entity_name_meta {
 	// GEN INTROSPECTOR class entity_name_meta
 	friend struct augs::introspection_access;
+	friend class entity_name_metas;
 	
 	entity_name_type name;
-	friend class entity_name_metas;
 public:
 	bool stackable = false;
-	entity_details_type details = L"No description";
+	entity_description_type description = L"No description";
 	// END GEN INTROSPECTOR
 
 	const auto& get_name() const {

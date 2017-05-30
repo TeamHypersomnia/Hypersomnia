@@ -341,7 +341,7 @@ augs::gui::material value_bar::get_bar_mat(
 	const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
 
 	return { 
-		context.get_gui_element_system().blank_image, 
+		context.get_gui_element_system().value_bar_background, 
 		dispatch_by_vertical_index(
 			sentience,
 			cosmos,

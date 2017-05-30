@@ -23,7 +23,7 @@
 #include "augs/graphics/renderer.h"
 #include "game/enums/filters.h"
 
-#include "game/detail/entity_description.h"
+#include "game/detail/describers.h"
 
 #include "augs/templates/string_templates.h"
 
@@ -509,10 +509,10 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 	const auto description_style = text::style(assets::font_id::GUI_FONT, vslightgray);
 
 	if (maybe_hovered_item) {
-		tooltip_text = text::format_as_bbcode(get_bbcoded_entity_description(cosmos[maybe_hovered_item.get_location().item_id]), description_style);
+		tooltip_text = text::format_as_bbcode(get_bbcoded_entity_details(cosmos[maybe_hovered_item.get_location().item_id]), description_style);
 	}
 	else if (maybe_hovered_slot) {
-		tooltip_text = text::format_as_bbcode(get_bbcoded_slot_description(cosmos[maybe_hovered_slot.get_location().slot_id]), text::style());
+		tooltip_text = text::format_as_bbcode(get_bbcoded_slot_details(cosmos[maybe_hovered_slot.get_location().slot_id]), text::style());
 	}
 	else if (maybe_hovered_action_button) {
 		const auto bound_spell = maybe_hovered_action_button->get_bound_spell(context, maybe_hovered_action_button);
@@ -547,7 +547,7 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 		const auto assigned_entity = maybe_hovered_hotbar_button->get_assigned_entity(gui_entity);
 
 		if (assigned_entity.alive()) {
-			tooltip_text = text::format_as_bbcode(get_bbcoded_entity_description(assigned_entity), description_style);
+			tooltip_text = text::format_as_bbcode(get_bbcoded_entity_details(assigned_entity), description_style);
 		}
 		else {
 			tooltip_text = text::format(L"Empty slot", description_style);
@@ -567,7 +567,7 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 			);
 
 			tooltip_text = text::format_as_bbcode(
-				get_bbcoded_entity_description(hovered), 
+				get_bbcoded_entity_details(hovered), 
 				text::style(assets::font_id::GUI_FONT, vslightgray)
 			);
 		}

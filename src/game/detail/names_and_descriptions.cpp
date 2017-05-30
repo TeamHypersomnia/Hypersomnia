@@ -1,4 +1,3 @@
-#include "describers"
 #include "game/enums/slot_function.h"
 #include "game/enums/item_category.h"
 #include "augs/ensure.h"

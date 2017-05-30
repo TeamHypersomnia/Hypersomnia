@@ -276,7 +276,7 @@ namespace prefabs {
 			perform_transfer({ load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1 }, step);
 		}
 
-		weapon.get_meta_of_name().details = L"Robi super naclick.";
+		weapon.get_meta_of_name().description = L"Robi super naclick.";
 
 		return weapon;
 	}
