@@ -9,9 +9,14 @@
 
 #include "augs/network/network_client.h"
 #include "hypersomnia_version.h"
+#include "game/build_settings.h"
 
 viewing_session::viewing_session() {
 	systems_audiovisual.get<sound_system>().initialize_sound_sources(32u);
+
+#if BUILD_TEST_SCENES
+	systems_audiovisual.get<gui_element_system>().blank_image = assets::game_image_id::BLANK;
+#endif
 }
 
 void viewing_session::initialize(

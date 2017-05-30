@@ -1,17 +1,7 @@
 #pragma once
 #include "augs/ensure.h"
 #include "augs/templates/type_in_list_id.h"
-
-template <class T>
-struct num_types_in_list {
-	static constexpr std::size_t value = 0;
-};
-
-template <template <class...> class T, class... Types>
-struct num_types_in_list<T<Types...>> : std::integral_constant<std::size_t, sizeof...(Types)> {};
-
-template <class T>
-constexpr std::size_t num_types_in_list_v = num_types_in_list<T>::value;
+#include "augs/templates/type_list.h"
 
 template <
 	std::size_t current_candidate = 0,

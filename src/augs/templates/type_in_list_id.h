@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/templates/type_list.h"
 #include "augs/templates/type_matching_and_indexing.h"
 
 namespace augs {
@@ -9,8 +10,10 @@ template <class List>
 class type_in_list_id {
 	using index_type = unsigned;
 	friend struct augs::introspection_access;
+	static constexpr std::size_t dead_value = 0xdeadbeef;
+	static_assert(num_types_in_list_v<List> < dead_value, "Take it easy, man.");
 	// GEN INTROSPECTOR type_in_list_id class List
-	index_type index = 0xdeadbeef;
+	index_type index = dead_value;
 	// END GEN INTROSPECTOR
 
 	template <class T>
@@ -24,7 +27,7 @@ class type_in_list_id {
 	}
 public:
 	bool is_set() const {
-		return index != 0xdeadbeef;
+		return index < num_types_in_list_v<List>;
 	}
 
 	void unset() {
@@ -41,6 +44,11 @@ public:
 	bool is() const {
 		assert_correct_type<T>();
 		return index == get_index_of<T>();
+	}
+
+	void set_index(const index_type idx) {
+		index = idx;
+		ensure(is_set());
 	}
 
 	index_type get_index() const {

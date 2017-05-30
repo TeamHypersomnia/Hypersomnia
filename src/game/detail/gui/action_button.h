@@ -22,6 +22,11 @@ public:
 	augs::sound_source click_sound;
 
 	spell_id bound_spell;
+	
+	static spell_id get_bound_spell(
+		const const_game_gui_context, 
+		const const_this_in_item this_id
+	);
 
 	float elapsed_hover_time_ms = 0.f;
 

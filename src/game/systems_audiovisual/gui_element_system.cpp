@@ -84,11 +84,11 @@ character_gui& gui_element_system::get_character_gui(const entity_id id) {
 		auto& new_gui = character_guis[id];
 		new_gui.set_screen_size(screen_size_for_new_characters);
 		
-		new_gui.action_buttons[0].bound_spell = assets::spell_id::HASTE;
-		new_gui.action_buttons[1].bound_spell = assets::spell_id::FURY_OF_THE_AEONS;
-		new_gui.action_buttons[2].bound_spell = assets::spell_id::ULTIMATE_WRATH_OF_THE_AEONS;
-		new_gui.action_buttons[3].bound_spell = assets::spell_id::ELECTRIC_TRIAD;
-		new_gui.action_buttons[4].bound_spell = assets::spell_id::ELECTRIC_SHIELD;
+		new_gui.action_buttons[0].bound_spell.set<haste_instance>();
+		new_gui.action_buttons[1].bound_spell.set<fury_of_the_aeons_instance>();
+		new_gui.action_buttons[2].bound_spell.set<ultimate_wrath_of_the_aeons_instance>();
+		new_gui.action_buttons[3].bound_spell.set<electric_triad_instance>();
+		new_gui.action_buttons[4].bound_spell.set<electric_shield_instance>();
 		
 		return new_gui;
 	}
@@ -230,7 +230,7 @@ void gui_element_system::handle_hotbar_and_action_button_presses(
 			if (i.is_pressed) {
 				const auto bound_spell = action_b.bound_spell;
 
-				if (bound_spell != assets::spell_id::INVALID) {
+				if (bound_spell.is_set() && gui_entity.get<components::sentience>().is_learned(bound_spell)) {
 					spell_requests[gui_entity] = bound_spell;
 				}
 			}

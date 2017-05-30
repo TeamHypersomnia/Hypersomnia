@@ -20,7 +20,7 @@
 #include "game/detail/spell_logic.h"
 #include "augs/misc/value_meter.h"
 
-#include "augs/templates/type_in_list_id.h"
+#include "augs/templates/type_list.h"
 #include "augs/templates/constexpr_arithmetic.h"
 
 namespace components {
@@ -79,28 +79,23 @@ namespace components {
 		rgba calculate_health_color(float time_pulse_multiplier) const;
 		bool is_conscious() const;
 
-	private:
-		template <class T, class List>
-		using can_get_from_t = std::enable_if_t<is_one_of_list_v<T, std::decay_t<List>>>;
-	public:
-
 		template <class T>
-		auto& get(can_get_from_t<T, meter_instance_tuple>* = nullptr) {
+		auto& get(can_get_from<T, meter_instance_tuple>* = nullptr) {
 			return std::get<T>(meters);
 		}
 
 		template <class T>
-		const auto& get(can_get_from_t<T, meter_instance_tuple>* = nullptr) const {
+		const auto& get(can_get_from<T, meter_instance_tuple>* = nullptr) const {
 			return std::get<T>(meters);
 		}
 
 		template <class T>
-		auto& get(can_get_from_t<T, perk_instance_tuple>* = nullptr) {
+		auto& get(can_get_from<T, perk_instance_tuple>* = nullptr) {
 			return std::get<T>(perks);
 		}
 
 		template <class T>
-		const auto& get(can_get_from_t<T, perk_instance_tuple>* = nullptr) const {
+		const auto& get(can_get_from<T, perk_instance_tuple>* = nullptr) const {
 			return std::get<T>(perks);
 		}
 	};

@@ -174,7 +174,7 @@ void set_standard_sentience_props(
 	{
 		auto& m = std::get<health_meter>(meters);
 
-		m.appearance.description = L"[color=red]Healsth points:[/color] %x/%x\n[color=vsdarkgray]Stability of the physical body.[/color]";
+		m.appearance.description = L"[color=red]Health points:[/color] %x/%x\n[color=vsdarkgray]Stability of the physical body.[/color]";
 		m.appearance.icon = assets::game_image_id::HEALTH_ICON;
 		m.appearance.bar_color = red - rgba(30, 30, 30, 0);
 	}

@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/templates/transform_types.h"
 #include "augs/templates/instance_type.h"
+#include "augs/templates/type_in_list_id.h"
 
 #include "game/detail/spells/haste.h"
 #include "game/detail/spells/fury_of_the_aeons.h"

@@ -174,3 +174,6 @@ decltype(auto) get_container_with_key_type(ContainerList&& containers) {
 		std::forward<ContainerList>(containers)
 	);
 }
+
+template <class T, class List>
+using can_get_from = std::enable_if_t<is_one_of_list_v<T, std::decay_t<List>>>;

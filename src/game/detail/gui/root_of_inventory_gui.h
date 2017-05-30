@@ -32,10 +32,10 @@ public:
 			generic_call(make_dereferenced_location(&character_gui.action_buttons[i], child_location));
 		}
 
-		for (std::size_t i = 0; i < character_gui.sentience_meter_bars.size(); ++i) {
-			sentience_meter_bar_in_character_gui child_location;
+		for (std::size_t i = 0; i < character_gui.value_bars.size(); ++i) {
+			value_bar_in_character_gui child_location;
 			child_location.type = static_cast<sentience_meter_type>(i);
-			generic_call(make_dereferenced_location(&character_gui.sentience_meter_bars[i], child_location));
+			generic_call(make_dereferenced_location(&character_gui.value_bars[i], child_location));
 		}
 	}
 };

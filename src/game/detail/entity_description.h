@@ -47,7 +47,7 @@ std::wstring get_bbcoded_entity_description(const const_entity_handle);
 
 template <class T>
 std::wstring get_bbcoded_spell_description(
-	const const_entity_handle,
+	const const_entity_handle subject,
 	const T& spell
 ) {
 	const auto properties = typesafe_sprintf(

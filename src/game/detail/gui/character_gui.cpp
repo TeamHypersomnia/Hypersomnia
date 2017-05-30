@@ -502,7 +502,7 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 	const auto maybe_hovered_item = context._dynamic_cast<item_button_in_item>(rect_world.rect_hovered);
 	const auto maybe_hovered_slot = context._dynamic_cast<slot_button_in_container>(rect_world.rect_hovered);
 	const auto maybe_hovered_hotbar_button = context._dynamic_cast<hotbar_button_in_character_gui>(rect_world.rect_hovered);
-	const auto maybe_hovered_sentience_meter = context._dynamic_cast<sentience_meter_bar_in_character_gui>(rect_world.rect_hovered);
+	const auto maybe_hovered_sentience_meter = context._dynamic_cast<value_bar_in_character_gui>(rect_world.rect_hovered);
 	const auto maybe_hovered_action_button = context._dynamic_cast<action_button_in_character_gui>(rect_world.rect_hovered);
 
 	gui::text::formatted_string tooltip_text;
@@ -516,21 +516,29 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 		tooltip_text = text::format_as_bbcode(get_bbcoded_slot_description(cosmos[maybe_hovered_slot.get_location().slot_id]), text::style());
 	}
 	else if (maybe_hovered_action_button) {
-		const auto bound_spell = maybe_hovered_action_button->bound_spell;
+		const auto bound_spell = maybe_hovered_action_button->get_bound_spell(context, maybe_hovered_action_button);
 
-		if (bound_spell != assets::spell_id::INVALID) {
-			tooltip_text = text::format_as_bbcode(
-				get_bbcoded_spell_description(
-					gui_entity,
-					bound_spell
-				),
-				description_style
+		if (bound_spell.is_set()) {
+			const auto& sentience = gui_entity.get<components::sentience>();
+
+			tooltip_text = dynamic_dispatch(
+				sentience.spells,
+				bound_spell,
+				[](const auto& spell){
+					const auto& spell_data = get_meta_of(spell, cosmos.get_global_state().spells);
+
+					return text::format_as_bbcode(
+						get_bbcoded_spell_description(
+							gui_entity,
+							spell_data
+						),
+						description_style
+					);
+				}
 			);
 		}
 	}
 	else if (maybe_hovered_sentience_meter) {
-		maybe_hovered_sentience_meter->is_perk_meter
-
 		tooltip_text = text::format_as_bbcode(
 			get_bbcoded_sentience_meter_description(
 				gui_entity, 

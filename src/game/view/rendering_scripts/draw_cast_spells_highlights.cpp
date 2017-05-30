@@ -18,30 +18,36 @@ namespace rendering_scripts {
 			processing_subjects::WITH_SENTIENCE,
 			[&](const auto it) {
 				const auto& sentience = it.get<components::sentience>();
-				const auto spell = sentience.currently_casted_spell;
+				const auto casted_spell = sentience.currently_casted_spell;
 
-				if (spell != assets::spell_id::INVALID) {
-					const auto highlight_amount = 1.f - (global_time_seconds - sentience.time_of_last_spell_cast.in_seconds(dt)) / 0.4f;
+				if (casted_spell.is_set()) {
+					dynamic_dispatch(
+						sentience.spells,
+						casted_spell,
+						[&](const auto& spell){
+							const auto highlight_amount = 1.f - (global_time_seconds - sentience.time_of_last_spell_cast.in_seconds(dt)) / 0.4f;
 
-					if (highlight_amount > 0.f) {
-						const auto spell_data = manager[spell];
+							if (highlight_amount > 0.f) {
+								const auto spell_data = get_meta_of(spell, cosm.get_global_state().spells);
 
-						components::sprite::drawing_input highlight(in);
-						highlight.camera = cam;
-						highlight.renderable_transform.pos = it.get_viewing_transform(sys).pos;
+								components::sprite::drawing_input highlight(in);
+								highlight.camera = cam;
+								highlight.renderable_transform.pos = it.get_viewing_transform(sys).pos;
 
-						auto highlight_col = spell_data.common.associated_color;
-						highlight_col.a = static_cast<rgba_channel>(255 * highlight_amount);
+								auto highlight_col = spell_data.common.associated_color;
+								highlight_col.a = static_cast<rgba_channel>(255 * highlight_amount);
 
-						components::sprite spr;
-						spr.set(
-							assets::game_image_id::CAST_HIGHLIGHT, 
-							manager[assets::game_image_id::CAST_HIGHLIGHT].get_size(),
-							highlight_col
-						);
+								components::sprite spr;
+								spr.set(
+									assets::game_image_id::CAST_HIGHLIGHT, 
+									manager[assets::game_image_id::CAST_HIGHLIGHT].get_size(),
+									highlight_col
+								);
 
-						spr.draw(highlight);
-					}
+								spr.draw(highlight);
+							}
+						}
+					);
 				}
 			}
 		);

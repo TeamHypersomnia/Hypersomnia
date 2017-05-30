@@ -23,6 +23,7 @@ public:
 
 	bool gui_look_enabled = false;
 	vec2i screen_size_for_new_characters;
+	assets::game_image_id blank_image = assets::game_image_id::INVALID;
 
 	cosmic_entropy get_and_clear_pending_events();
 	void clear_all_pending_events();

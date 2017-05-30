@@ -17,7 +17,7 @@
 #include "game/detail/gui/drag_and_drop_target_drop_item.h"
 #include "game/detail/gui/hotbar_button.h"
 #include "game/detail/gui/action_button.h"
-#include "game/detail/gui/sentience_meter_bar.h"
+#include "game/detail/gui/value_bar.h"
 #include "augs/templates/container_templates.h"
 
 struct wielding_result;
@@ -35,7 +35,7 @@ struct character_gui {
 	
 	std::array<hotbar_button, 10> hotbar_buttons;
 	std::array<action_button, 10> action_buttons;
-	augs::enum_array<sentience_meter_bar, sentience_meter_type> sentience_meter_bars;
+	std::array<value_bar, value_bar_count> value_bars;
 
 	hotbar_selection_setup last_setups[2];
 	short currently_held_hotbar_button_index = -1;
