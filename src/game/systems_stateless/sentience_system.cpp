@@ -507,8 +507,6 @@ TEST_CASE("SentienceSystem", "SentienceMeters") {
 
 		const auto new_ent1 = c1.create_entity("e1");
 		auto& sent = new_ent1 += components::sentience();
-		sent.health.set_maximum_value(100);
-		sent.health.set_value(20);
 
 		messages::damage_message msg;
 		msg.amount = 40.f;

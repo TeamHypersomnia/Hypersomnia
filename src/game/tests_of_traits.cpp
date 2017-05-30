@@ -193,7 +193,6 @@ sizeof(augs::enum_associative_array<assets::animation_id, animation>);
 sizeof(augs::enum_associative_array<assets::game_image_id, game_image_baked>);
 sizeof(augs::enum_associative_array<assets::font_id, game_font_baked>);
 sizeof(augs::enum_associative_array<assets::particle_effect_id, particle_effect>);
-sizeof(augs::enum_associative_array<assets::spell_id, spell_data>);
 sizeof(augs::enum_associative_array<assets::tile_layer_id, tile_layer>);
 sizeof(augs::enum_associative_array<assets::physical_material_id, physical_material>);
 sizeof(augs::enum_associative_array<assets::shader_id, augs::graphics::shader>);

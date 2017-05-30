@@ -103,8 +103,8 @@ namespace ingredients {
 		sentience.health_decrease_sound.id = assets::sound_buffer_id::IMPACT;
 		sentience.death_sound.id = assets::sound_buffer_id::DEATH;
 
-		sentience.health.set_value(100);
-		sentience.health.set_maximum_value(100);
+		sentience.get<health_meter_instance>().set_value(100);
+		sentience.get<health_meter_instance>().set_maximum_value(100);
 
 		sentience.loss_of_consciousness_sound.id = assets::sound_buffer_id::DEATH;
 		sentience.consciousness_decrease_sound.id = assets::sound_buffer_id::IMPACT;

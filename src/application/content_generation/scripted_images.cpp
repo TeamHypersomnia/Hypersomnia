@@ -33,7 +33,7 @@ void regenerate_scripted_images(
 			std::string command_name;
 			in >> command_name;
 
-			for_each_through_std_get(augs::image::command_variant::types_tuple(), [&](auto dummy) {
+			for_each_through_std_get(replace_list_type_t<augs::image::command_variant, std::tuple>(), [&](auto dummy) {
 				typedef decltype(dummy) command_type;
 
 				if (command_name == command_type::get_command_name()) {

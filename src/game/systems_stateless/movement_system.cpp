@@ -87,13 +87,15 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 			float minimum_consciousness_to_sprint = 0.f;
 
 			if (is_sentient) {
-				minimum_consciousness_to_sprint = sentience->consciousness.get_maximum_value() / 10;
+				auto& consciousness = sentience->get<consciousness_meter_instance>();
 
-				if (sentience->consciousness.value < minimum_consciousness_to_sprint - 0.1f) {
+				minimum_consciousness_to_sprint = consciousness.get_maximum_value() / 10;
+
+				if (consciousness.value < minimum_consciousness_to_sprint - 0.1f) {
 					movement_force_mult /= 2;
 				}
 
-				consciousness_damage_by_sprint = sentience->consciousness.calculate_damage_result(
+				consciousness_damage_by_sprint = consciousness.calculate_damage_result(
 					2 * delta.in_seconds(),
 					minimum_consciousness_to_sprint
 				);
@@ -102,9 +104,9 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 					is_sprint_effective = false;
 				}
 
-				const auto& haste = std::get<haste_perk>(sentience->perks);
+				const auto& haste = sentience->get<haste_perk_instance>();
 
-				if (haste.is_enabled(cosmos.get_timestamp(), cosmos.get_fixed_delta())) {
+				if (haste.timing.is_enabled(cosmos.get_timestamp(), cosmos.get_fixed_delta())) {
 					if (haste.is_greater) {
 						movement_force_mult *= 1.45f;
 					}
@@ -127,7 +129,7 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 					movement_force_mult /= 2.f;
 
 					if (is_sentient) {
-						sentience->consciousness.value -= consciousness_damage_by_sprint.effective;
+						sentience->get<consciousness_meter_instance>().value -= consciousness_damage_by_sprint.effective;
 					}
 				}
 

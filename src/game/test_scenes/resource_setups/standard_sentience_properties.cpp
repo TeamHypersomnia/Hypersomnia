@@ -7,7 +7,7 @@
 #include "game/detail/spells/all_spells.h"
 #include "game/detail/perks/all_perks.h"
 
-void set_standard_sentience_props(
+void set_standard_sentience_properties(
 	cosmos_global_state& state
 ) {
 	auto& perks = state.perks;
@@ -94,6 +94,10 @@ void set_standard_sentience_props(
 		);
 
 		d.appearance.icon = assets::game_image_id::SPELL_ULTIMATE_WRATH_OF_THE_AEONS_ICON;
+
+		d.common.cast_successful_sound.id = assets::sound_buffer_id::CAST_SUCCESSFUL;
+		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
+		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
 
 		d.charging_particles.id = assets::particle_effect_id::CAST_CHARGING;
 		d.charging_particles.modifier.scale_lifetimes = 1.3f;

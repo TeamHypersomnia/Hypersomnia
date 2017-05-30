@@ -2,7 +2,7 @@
 #include "game/detail/perks/perk_timing.h"
 
 struct perk_appearance {
-	// GEN INTROSPECTOR struct spell_appearance
+	// GEN INTROSPECTOR struct perk_appearance
 	assets::game_image_id icon = assets::game_image_id::INVALID;
 	std::wstring description;
 	rgba bar_color;

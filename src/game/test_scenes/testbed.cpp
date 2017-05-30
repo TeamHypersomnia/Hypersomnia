@@ -177,28 +177,28 @@ namespace test_scenes {
 			new_characters[i] = new_character;
 
 			if (i == 0) {
-				new_character.get<components::sentience>().health.set_value(100);
-				new_character.get<components::sentience>().health.set_maximum_value(100);
+				new_character.get<components::sentience>().get<health_meter_instance>().set_value(100);
+				new_character.get<components::sentience>().get<health_meter_instance>().set_maximum_value(100);
 				new_character.get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
 				new_character.get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
 			}
 			if (i == 1) {
 				new_character.get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
 				new_character.get<components::sentience>().minimum_danger_amount_to_evade = 20;
-				new_character.get<components::sentience>().health.set_value(300);
-				new_character.get<components::sentience>().health.set_maximum_value(300);
+				new_character.get<components::sentience>().get<health_meter_instance>().set_value(300);
+				new_character.get<components::sentience>().get<health_meter_instance>().set_maximum_value(300);
 				//ingredients::add_standard_pathfinding_capability(new_character);
 				//ingredients::add_soldier_intelligence(new_character);
 				new_character.recalculate_basic_processing_categories();
 			}
 			if (i == 2) {
-				new_character.get<components::sentience>().health.set_value(100);
+				new_character.get<components::sentience>().get<health_meter_instance>().set_value(100);
 			}
 			if (i == 5) {
 				new_character.get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
 				new_character.get<components::sentience>().minimum_danger_amount_to_evade = 20;
-				new_character.get<components::sentience>().health.set_value(300);
-				new_character.get<components::sentience>().health.set_maximum_value(300);
+				new_character.get<components::sentience>().get<health_meter_instance>().set_value(300);
+				new_character.get<components::sentience>().get<health_meter_instance>().set_maximum_value(300);
 				//ingredients::add_standard_pathfinding_capability(new_character);
 				//ingredients::add_soldier_intelligence(new_character);
 				new_character.recalculate_basic_processing_categories();
@@ -257,15 +257,15 @@ namespace test_scenes {
 
 			auto& sentience = new_character.get<components::sentience>();
 
-			sentience.consciousness.set_maximum_value(400);
-			sentience.consciousness.set_value(400);
+			sentience.get<consciousness_meter_instance>().set_maximum_value(400);
+			sentience.get<consciousness_meter_instance>().set_value(400);
 
-			sentience.personal_electricity.set_maximum_value(400);
-			sentience.personal_electricity.set_value(400);
+			sentience.get<personal_electricity_meter_instance>().set_maximum_value(400);
+			sentience.get<personal_electricity_meter_instance>().set_value(400);
 
 			if (i == 0) {
-				sentience.personal_electricity.set_maximum_value(800);
-				sentience.personal_electricity.set_value(800);
+				sentience.get<personal_electricity_meter_instance>().set_maximum_value(800);
+				sentience.get<personal_electricity_meter_instance>().set_value(800);
 			}
 
 			fill_container(sentience.learned_spells, true);
@@ -806,8 +806,7 @@ namespace test_scenes {
 		world.get_global_assets().exhausted_smoke_particles.id = assets::particle_effect_id::EXHAUSTED_SMOKE;
 		
 		set_standard_sentience_properties(
-			world.significant.meta.global.spells,
-			world.significant.meta.global.perks
+			world.significant.meta.global
 		);
 
 		auto& spells = world.get_global_state().spells;

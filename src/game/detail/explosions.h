@@ -8,6 +8,8 @@
 
 #include "augs/misc/value_meter.h"
 
+struct entity_id;
+
 struct standard_explosion_input {
 	// GEN INTROSPECTOR struct standard_explosion_input
 	float effective_radius = 250.f;

@@ -34,7 +34,7 @@ public:
 
 		for (std::size_t i = 0; i < character_gui.value_bars.size(); ++i) {
 			value_bar_in_character_gui child_location;
-			child_location.type = static_cast<sentience_meter_type>(i);
+			child_location.vertical_index = static_cast<unsigned>(i);
 			generic_call(make_dereferenced_location(&character_gui.value_bars[i], child_location));
 		}
 	}

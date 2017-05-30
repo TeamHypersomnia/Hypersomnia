@@ -57,7 +57,7 @@ std::wstring get_bbcoded_spell_description(
 		spell.common.cooldown_ms
 	);
 
-	return spell_data.appearance.name + L"\n" + properties + L"\n" + spell_data.appearance.description;
+	return spell.appearance.name + L"\n" + properties + L"\n" + spell.appearance.description;
 }
 
 template <class T>

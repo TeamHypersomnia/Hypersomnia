@@ -33,7 +33,6 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/detail/inventory/item_slot_transfer_request.h"
-#include "game/detail/spell_logic.h"
 
 #include "game/messages/health_event.h"
 

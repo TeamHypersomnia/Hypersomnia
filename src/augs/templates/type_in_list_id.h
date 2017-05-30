@@ -12,7 +12,7 @@ class type_in_list_id {
 	friend struct augs::introspection_access;
 	static constexpr std::size_t dead_value = 0xdeadbeef;
 	static_assert(num_types_in_list_v<List> < dead_value, "Take it easy, man.");
-	// GEN INTROSPECTOR type_in_list_id class List
+	// GEN INTROSPECTOR class type_in_list_id class List
 	index_type index = dead_value;
 	// END GEN INTROSPECTOR
 
@@ -31,7 +31,7 @@ public:
 	}
 
 	void unset() {
-		index = type_in_list_id();
+		*this = type_in_list_id();
 	}
 
 	template <class T>

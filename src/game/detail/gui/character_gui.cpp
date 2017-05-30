@@ -32,7 +32,6 @@
 #include "augs/graphics/drawers.h"
 #include "game/detail/wielding_result.h"
 #include "game/detail/spells/spell_structs.h"
-#include "game/detail/spell_logic.h"
 
 using namespace augs;
 using namespace augs::gui;
@@ -524,7 +523,7 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 			tooltip_text = dynamic_dispatch(
 				sentience.spells,
 				bound_spell,
-				[](const auto& spell){
+				[&](const auto& spell){
 					const auto& spell_data = get_meta_of(spell, cosmos.get_global_state().spells);
 
 					return text::format_as_bbcode(
@@ -540,10 +539,7 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 	}
 	else if (maybe_hovered_sentience_meter) {
 		tooltip_text = text::format_as_bbcode(
-			get_bbcoded_sentience_meter_description(
-				gui_entity, 
-				maybe_hovered_sentience_meter.get_location().type
-			), 
+			maybe_hovered_sentience_meter->get_description_for_hover(context, maybe_hovered_sentience_meter),
 			description_style
 		);
 	}

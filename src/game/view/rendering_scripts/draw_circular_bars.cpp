@@ -27,7 +27,8 @@ namespace rendering_scripts {
 			const auto* const sentience = v.find<components::sentience>();
 
 			if (sentience && sentience->is_conscious()) {
-				const auto hr = sentience->health.get_ratio();
+				const auto& health = sentience->get<health_meter_instance>();
+				const auto hr = health.get_ratio();
 				const auto one_less_hr = 1 - hr;
 
 				const auto pulse_duration = static_cast<int>(1250 - 1000 * (1 - hr));
@@ -58,11 +59,11 @@ namespace rendering_scripts {
 
 				if (v == watched_character) {
 					starting_health_angle = watched_character_transform.rotation + 135;
-					ending_health_angle = starting_health_angle + sentience->health.get_ratio() * 90.f;
+					ending_health_angle = starting_health_angle + health.get_ratio() * 90.f;
 				}
 				else {
 					starting_health_angle = (v.get_viewing_transform(interp).pos - watched_character_transform.pos).degrees() - 45;
-					ending_health_angle = starting_health_angle + sentience->health.get_ratio() * 90.f;
+					ending_health_angle = starting_health_angle + health.get_ratio() * 90.f;
 				}
 
 				const auto push_angles = [&target](
@@ -137,11 +138,11 @@ namespace rendering_scripts {
 				}
 
 				const int radius = manager[assets::game_image_id::HUD_CIRCULAR_BAR_MEDIUM].get_size().x / 2;
-				const auto empty_health_amount = static_cast<int>((1 - sentience->health.get_ratio()) * 90);
+				const auto empty_health_amount = static_cast<int>((1 - health.get_ratio()) * 90);
 
 				textual_infos.push_back({
 					starting_health_angle + 90 - empty_health_amount / 2,
-					to_wstring(int(sentience->health.value) == 0 ? 1 : int(sentience->health.value)),
+					to_wstring(int(health.value) == 0 ? 1 : int(health.value)),
 					health_col
 				});
 

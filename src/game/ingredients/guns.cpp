@@ -10,7 +10,7 @@
 #include "game/components/catridge_component.h"
 #include "game/components/explosive_component.h"
 #include "game/components/sender_component.h"
-#include "game/components/all_inferred_state.h"
+#include "game/components/all_inferred_state_component.h"
 
 #include "game/messages/create_particle_effect.h"
 
@@ -396,7 +396,9 @@ namespace prefabs {
 		missile.damage_amount = 42;
 
 		auto& sender = energy_ball += components::sender();
-		energy_ball += components::all_inferred_state { false };
+		components::all_inferred_state inferred;
+		inferred.activated = false;
+		energy_ball += inferred;
 
 		energy_ball.add_standard_components(step);
 

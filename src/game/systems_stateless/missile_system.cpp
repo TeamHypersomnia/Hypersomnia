@@ -85,7 +85,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 					auto considered_impulse = missile.impulse_upon_hit;
 
 					if (subject_handle.has<components::sentience>()) {
-						if (!subject_handle.get<components::sentience>().electric_shield.perk.is_enabled(now, delta)) {
+						if (!subject_handle.get<components::sentience>().get<electric_shield_perk_instance>().timing.is_enabled(now, delta)) {
 							considered_impulse *= missile.impulse_multiplier_against_sentience;
 						}
 					}

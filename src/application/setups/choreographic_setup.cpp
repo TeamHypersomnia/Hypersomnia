@@ -45,6 +45,8 @@ typedef augs::trivial_variant<
 	set_sfx_gain
 > choreographic_command_variant;
 
+using choreographic_command_tuple = replace_list_type_t<choreographic_command_variant, std::tuple>;
+
 using namespace augs::window::event::keys;
 
 void choreographic_setup::process(
@@ -156,15 +158,15 @@ void choreographic_setup::process(
 		}
 
 		else {
-			for_each_through_std_get(choreographic_command_variant::types_tuple(), [&](auto dummy) {
+			for_each_through_std_get(choreographic_command_tuple(), [&](auto dummy) {
 				typedef decltype(dummy) command_type;
-
+			
 				if ("struct " + command_name == typeid(command_type).name()) {
 					command_type new_command;
 					augs::read_members_from_istream(in, new_command);
-
+			
 					new_command.at_time += current_start_time_offset_for_commands;
-
+			
 					events.push_back(new_command);
 				}
 			});
@@ -173,8 +175,8 @@ void choreographic_setup::process(
 		++current_line;
 	}
 
-	auto get_start_time = [&](const choreographic_command_variant& a) {
-		return a.call([&](const auto& r) { return r.at_time; });
+	auto get_start_time = [](const auto& a) {
+		return a.call([](const auto& r) { return r.at_time; });
 	};
 
 	std::vector<augs::sound_source> sources;
@@ -186,8 +188,8 @@ void choreographic_setup::process(
 		events.begin(),
 		events.end(),
 		[&](
-			const choreographic_command_variant a, 
-			const choreographic_command_variant b
+			const choreographic_command_variant& a, 
+			const choreographic_command_variant& b
 		) {
 			return get_start_time(a) < get_start_time(b);
 		}

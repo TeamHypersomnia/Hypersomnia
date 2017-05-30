@@ -75,14 +75,14 @@ namespace test_scenes {
 			new_characters[i] = new_character;
 
 			if (i == 0) {
-				new_character.get<components::sentience>().health.set_value(100);
-				new_character.get<components::sentience>().health.set_maximum_value(100);
+				new_character.get<components::sentience>().get<health_meter_instance>().set_value(100);
+				new_character.get<components::sentience>().get<health_meter_instance>().set_maximum_value(100);
 				new_character.get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
 				new_character.get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
 			}
 			else if (i == 1) {
-				new_character.get<components::sentience>().health.set_value(100);
-				new_character.get<components::sentience>().health.set_maximum_value(100);
+				new_character.get<components::sentience>().get<health_meter_instance>().set_value(100);
+				new_character.get<components::sentience>().get<health_meter_instance>().set_maximum_value(100);
 				new_character.get<components::attitude>().parties = party_category::METROPOLIS_CITIZEN;
 				new_character.get<components::attitude>().hostile_parties = party_category::RESISTANCE_CITIZEN;
 			}
@@ -133,8 +133,7 @@ namespace test_scenes {
 
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 		set_standard_sentience_properties(
-			world.significant.meta.global.spells,
-			world.significant.meta.global.perks
+			world.significant.meta.global
 		);
 
 		std::get<electric_triad>(world.get_global_state().spells).missile_definition = prefabs::create_electric_missile_def(step, {});

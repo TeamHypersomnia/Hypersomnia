@@ -17,11 +17,15 @@
 #include "game/detail/spells/all_spells.h"
 #include "game/detail/perks/all_perks.h"
 
-#include "game/detail/spell_logic.h"
 #include "augs/misc/value_meter.h"
 
 #include "augs/templates/type_list.h"
 #include "augs/templates/constexpr_arithmetic.h"
+
+using learned_spells_array_type = std::array<
+	zeroed_pod<bool>,
+	aligned_num_of_bytes_v<num_types_in_list_v<spell_instance_tuple>, 4>
+>;
 
 namespace components {
 	struct sentience {
@@ -33,10 +37,7 @@ namespace components {
 
 		meter_instance_tuple meters;
 
-		std::array<
-			zeroed_pod<bool>, 
-			aligned_num_of_bytes_v<num_types_in_list_v<spell_instance_tuple>, 4> 
-		> learned_spells;
+		learned_spells_array_type learned_spells;
 
 		spell_instance_tuple spells;
 		perk_instance_tuple perks;
