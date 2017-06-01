@@ -11,6 +11,36 @@
 
 #include "augs/padding_byte.h"
 struct tests_of_traits {
+	static_assert(
+		sizeof(entity_id) >= sizeof(entity_guid)
+		&& alignof(entity_id) >= alignof(entity_guid),
+		"With given memory layouts, entity_id<->entity_guid substitution will not be possible in delta encoding"
+	);
+
+	static_assert(!has_introspect_v<cosmos>, "Trait has failed");
+	static_assert(!has_introspect_v<augs::trivial_variant<int, double>>, "Trait has failed");
+	static_assert(has_introspect_v<cosmos_metadata>, "Trait has failed");
+	static_assert(has_introspect_v<augs::constant_size_vector<int, 2>>, "Trait has failed");
+	static_assert(has_introspect_v<zeroed_pod<unsigned int>>, "Trait has failed");
+	static_assert(has_introspect_v<augs::delta>, "Trait has failed");
+	static_assert(alignof(meter_instance_tuple) == 4, "Trait has failed");
+
+	static_assert(std::is_same_v<std::tuple<int, double, float>, reverse_types_in_list_t<std::tuple<float, double, int>>>, "Trait has failed");
+	static_assert(std::is_same_v<type_list<int, double, float>, reverse_types_in_list_t<type_list<float, double, int>>>, "Trait has failed");
+
+	static_assert(sum_sizes_until_nth_v<0, std::tuple<int, double, float>> == 0, "Trait has failed");
+	static_assert(sum_sizes_until_nth_v<1, std::tuple<int, double, float>> == 4, "Trait has failed");
+	static_assert(sum_sizes_until_nth_v<2, std::tuple<int, double, float>> == 12, "Trait has failed");
+	static_assert(sum_sizes_until_nth_v<3, std::tuple<int, double, float>> == 16, "Trait has failed");
+
+	static_assert(sum_sizes_of_types_in_list_v<std::tuple<int, double, float>> == 16, "Trait has failed");
+	static_assert(sum_sizes_of_types_in_list_v<std::tuple<int>> == 4, "Trait has failed");
+	static_assert(sum_sizes_of_types_in_list_v<std::tuple<>> == 0, "Trait has failed");
+
+	static_assert(count_occurences_in_v<int, int, double, float> == 1, "Trait has failed");
+	static_assert(count_occurences_in_list_v<int, std::tuple<int, double, float>> == 1, "Trait has failed");
+	static_assert(count_occurences_in_list_v<int, std::tuple<int, double, float, int>> == 2, "Trait has failed");
+
 	static_assert(!is_constexpr_size_container_v<std::vector<int>>, "Trait has failed");
 	static_assert(is_constexpr_size_container_v<std::array<int, 3>>, "Trait has failed");
 	static_assert(is_constexpr_size_container_v<std::array<vec2, 3>>, "Trait has failed");

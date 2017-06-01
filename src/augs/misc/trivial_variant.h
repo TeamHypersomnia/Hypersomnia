@@ -2,39 +2,14 @@
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/templates/memcpy_safety.h"
 #include "augs/templates/dynamic_dispatch.h"
+#include "augs/templates/constexpr_arithmetic.h"
 #include "augs/ensure.h"
 
 namespace augs {
-	namespace detail {
-		template<size_t... _Vals>
-		struct _maximum;
-
-		template<>
-		struct _maximum<>
-		{	// maximum of nothing is 0
-			static constexpr size_t value = 0;
-		};
-
-		template<size_t _Val>
-		struct _maximum<_Val>
-		{	// maximum of _Val is _Val
-			static constexpr size_t value = _Val;
-		};
-
-		template<size_t _First,
-			size_t _Second,
-			size_t... _Rest>
-			struct _maximum<_First, _Second, _Rest...>
-			: _maximum<(_First < _Second ? _Second : _First), _Rest...>
-		{	// find maximum value in _First, _Second, _Rest...
-		};
-
-	}
-
 	template <class... Types>
 	class trivial_variant {
 		type_in_list_id<trivial_variant<Types...>> current_type;
-		char buf[detail::_maximum<0, sizeof(Types)...>::value];
+		char buf[constexpr_max_v<std::size_t, 0, sizeof(Types)...>];
 		static_assert(are_types_memcpy_safe_v<Types...>, "Types must be memcpy-safe!");
 
 	public:

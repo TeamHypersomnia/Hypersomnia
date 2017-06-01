@@ -37,13 +37,15 @@
 #include "augs/misc/parsing_utils.h"
 #include "augs/audio/sound_samples_from_file.h"
 
-typedef augs::trivial_variant<
+using choreographic_command_variant = augs::trivial_variant<
 	play_scene,
 	play_sound,
 	focus_guid,
 	focus_index,
 	set_sfx_gain
-> choreographic_command_variant;
+>;
+
+choreographic_command_variant dummy_to_avoid_errors;
 
 using choreographic_command_tuple = replace_list_type_t<choreographic_command_variant, std::tuple>;
 
@@ -175,7 +177,7 @@ void choreographic_setup::process(
 		++current_line;
 	}
 
-	auto get_start_time = [](const auto& a) {
+	auto get_start_time = [](const choreographic_command_variant& a) {
 		return a.call([](const auto& r) { return r.at_time; });
 	};
 

@@ -9,10 +9,10 @@
 namespace augs {
 	template <class derived, class... components>
 	class operations_on_all_components_mixin {
+	public:
 		typedef component_aggregate<components...> aggregate_type;
 		typedef pooled_object_id<aggregate_type> aggregate_id;
 
-	public:
 		typedef pool<aggregate_type> aggregate_pool_type;
 		typedef std::tuple<pool<components>...> component_pools_type;
 

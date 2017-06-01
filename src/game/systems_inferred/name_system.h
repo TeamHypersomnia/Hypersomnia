@@ -20,6 +20,11 @@ class name_system {
 		std::unordered_set<entity_id>
 	> entities_by_name_id;
 
+	std::unordered_map<
+		entity_name_type, 
+		entity_name_id
+	> name_to_id;
+
 	friend class cosmos;
 	friend class component_synchronizer<false, components::name>;
 

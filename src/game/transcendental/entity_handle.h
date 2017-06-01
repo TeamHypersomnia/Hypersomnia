@@ -144,7 +144,6 @@ private:
 	}
 
 public:
-#if ENTITY_HANDLE_HAS_DEBUG_NAME_REFERENCE
 	basic_entity_handle(
 		owner_reference owner,
 		const entity_id raw_id,
@@ -152,11 +151,12 @@ public:
 	) : 
 		raw_id(raw_id), 
 		owner(owner) 
+#if ENTITY_HANDLE_HAS_DEBUG_NAME_REFERENCE
 		, debug_name(custom_debug_name)
+#endif
 	{
 
 	}
-#endif
 
 	static entity_name_type dead_entity_name;
 

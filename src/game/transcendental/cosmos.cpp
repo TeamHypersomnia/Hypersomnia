@@ -237,7 +237,6 @@ entity_handle cosmos::allocate_new_entity() {
 
 	const auto handle = entity_handle(*this, pooled_object_raw_id, debug_name);
 	handle += components::guid();
-	handle += components::name();
 	return handle;
 }
 
@@ -247,6 +246,7 @@ entity_handle cosmos::create_entity(const std::string& name) {
 
 entity_handle cosmos::create_entity(const std::wstring& name_str) {
 	auto new_entity = allocate_new_entity();
+	new_entity += components::name();
 	new_entity.set_name(name_str);
 
 #if COSMOS_TRACKS_GUIDS

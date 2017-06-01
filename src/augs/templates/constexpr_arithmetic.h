@@ -25,3 +25,25 @@ static_assert(aligned_num_of_bytes_v<7, 4> == 8, "Trait is wrong");
 static_assert(aligned_num_of_bytes_v<8, 4> == 8, "Trait is wrong");
 static_assert(aligned_num_of_bytes_v<9, 4> == 12, "Trait is wrong");
 
+template<class T, T... Vals>
+struct constexpr_max;
+
+template<class T>
+struct constexpr_max<T>
+{	// maximum of nothing is 0
+	static constexpr T value = static_cast<T>(0);
+};
+
+template<class T, T Val>
+struct constexpr_max<T, Val>
+{	// maximum of Val is Val
+	static constexpr T value = Val;
+};
+
+template <class T, T First, T Second, T... Rest>
+struct constexpr_max<T, First, Second, Rest...> : constexpr_max<T, (First < Second ? Second : First), Rest...>
+{	// find maximum value in First, Second, Rest...
+};
+
+template <class T, T First, T Second, T... Rest>
+constexpr T constexpr_max_v = constexpr_max<T, First, Second, Rest...>::value;

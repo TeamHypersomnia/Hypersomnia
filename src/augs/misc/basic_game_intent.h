@@ -4,8 +4,8 @@
 template <class intent_type_enum>
 struct basic_game_intent {
 	intent_type_enum intent = intent_type_enum::INVALID;
-	vec2t<short> mouse_rel;
 	bool is_pressed = false;
+	vec2t<short> mouse_rel;
 
 	bool is_set() const {
 		return intent != intent_type_enum::INVALID;

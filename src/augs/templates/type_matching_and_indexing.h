@@ -3,14 +3,30 @@
 #include <tuple>
 
 #include "augs/templates/predicate_templates.h"
+#include "augs/templates/type_list.h"
 
 template <class, class>
-struct add_to_tuple;
+struct prepend_to_list;
 
-template <class T, class... Args>
-struct add_to_tuple<T, std::tuple<Args...>> {
-	using type = std::tuple<T, Args...>;
+template <class T, template <class...> class List, class... Args>
+struct prepend_to_list<T, List<Args...>> {
+	using type = List<T, Args...>;
 };
+
+template <class Element, class List>
+using prepend_to_list_t = typename prepend_to_list<Element, List>::type;
+
+template <class, class>
+struct append_to_list;
+
+template <class T, template <class...> class List, class... Args>
+struct append_to_list<T, List<Args...>> {
+	using type = List<Args..., T>;
+};
+
+template <class Element, class List>
+using append_to_list_t = typename append_to_list<Element, List>::type;
+
 
 template <size_t, class>
 struct add_to_sequence;
@@ -70,10 +86,10 @@ struct filter_types_detail<
 > {
 	using type = std::conditional_t<
 		Criterion<Head>::value,
-		typename add_to_tuple<
+		prepend_to_list_t<
 			Head,
 			typename filter_types_detail<Index + 1, Criterion, List<Tail...>>::type
-		>::type,
+		>,
 		typename filter_types_detail<Index + 1, Criterion, List<Tail...>>::type
 	>;
 
@@ -129,19 +145,25 @@ template <class S, class List>
 constexpr bool is_one_of_list_v = filter_types_in_list<bind_types_t<std::is_same, S>, List>::found;
 
 template <class S, class... Types>
-constexpr bool is_one_of_v = is_one_of_list_v<S, std::tuple<Types...>>;
+constexpr bool is_one_of_v = is_one_of_list_v<S, type_list<Types...>>;
 
 template <class S, class List>
 using is_one_of_list = std::bool_constant<is_one_of_list_v<S, List>>;
 
 template <class S, class... Types>
-using is_one_of = is_one_of_list<S, std::tuple<Types...>>;
+using is_one_of = is_one_of_list<S, type_list<Types...>>;
 
 template <class S, class List>
 constexpr size_t index_in_list_v = sequence_element_v<0, typename filter_types_in_list<bind_types_t<std::is_same, S>, List>::indices>;
 
 template <class S, class... Types>
-constexpr size_t index_in_v = index_in_list_v<S, std::tuple<Types...>>;
+constexpr size_t index_in_v = index_in_list_v<S, type_list<Types...>>;
+
+template <class S, class List>
+constexpr size_t count_occurences_in_list_v = typename filter_types_in_list<bind_types_t<std::is_same, S>, List>::indices::size();
+
+template <class S, class... Types>
+constexpr size_t count_occurences_in_v = count_occurences_in_list_v<S, type_list<Types...>>;
 
 template <class S, class List>
 using find_convertible_type_in_list_t = find_matching_type_in_list<bind_types_t<std::is_convertible, S>, List>;
@@ -161,7 +183,7 @@ template <class SearchedKeyType, class List>
 using find_type_with_key_type_in_list_t = find_matching_type_in_list<bind_types_t<is_key_type_equal_to, SearchedKeyType>, List>;
 
 template <class SearchedKeyType, class... Types>
-using find_type_with_key_type_t = find_type_with_key_type_in_list_t<SearchedKeyType, std::tuple<Types...>>;
+using find_type_with_key_type_t = find_type_with_key_type_in_list_t<SearchedKeyType, type_list<Types...>>;
 
 template <class T, class ContainerList>
 decltype(auto) get_container_with_key_type(ContainerList&& containers) {

@@ -89,7 +89,7 @@ config_table = {
 	packer_detail_max_atlas_size = 8192,
 
 	-- if true, runs unit tests on every launch.
-	debug_run_unit_tests = false,
+	debug_run_unit_tests = true,
 
 	-- if true, logs all unit tests that succeed, not just failures.
 	debug_log_successful_unit_tests = false,

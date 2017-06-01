@@ -195,7 +195,12 @@ namespace augs {
 							std::forward<decltype(passed_arg)>(passed_arg)
 						);
 						
-						constexpr_if<is_variable_size_container_v<checked_type>>()([&](auto...){
+						/* 
+							If the container is not introspectable, iterate through all members,
+							otherwise use the introspector defined for this container 
+						*/
+
+						constexpr_if<!has_introspect_v<checked_type> && is_variable_size_container_v<checked_type>>()([&](auto...){
 							for (auto& val : passed_arg) {
 								introspect_recursive_with_prologues <
 									call_valid_predicate,

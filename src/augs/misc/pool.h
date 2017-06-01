@@ -114,7 +114,7 @@ namespace augs {
 			allocated_id.indirection_index = next_free_indirector;
 
 			slots.push_back(new_slot);
-			pooled.emplace_back(std::forward<Args>(args)...);
+			pooled.push_back(T(std::forward<Args>(args)...));
 
 			return allocated_id;
 		}

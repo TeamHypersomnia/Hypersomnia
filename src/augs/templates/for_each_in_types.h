@@ -9,7 +9,7 @@ namespace templates_detail {
 
 	template <class F, class... Instances, size_t N, size_t... Is>
 	void for_each_through_std_get(F&& f, std::index_sequence<N, Is...>, Instances&&... instances) {
-		f(N, std::get<N>(instances)...);
+		f(N, std::get<N>(std::forward<Instances>(instances))...);
 		
 		for_each_through_std_get(
 			std::forward<F>(f), 

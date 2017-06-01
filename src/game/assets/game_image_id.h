@@ -5,8 +5,8 @@
 namespace assets {
 	enum class game_image_id {
 		INVALID,
-#if BUILD_TEST_SCENES
 		BLANK,
+#if BUILD_TEST_SCENES
 
 		CRATE,
 		CRATE_DESTROYED,
