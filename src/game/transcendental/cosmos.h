@@ -42,6 +42,8 @@
 
 #include "game/assets/behaviour_tree.h"
 
+using rng_seed_type = unsigned;
+
 class EMPTY_BASES cosmos : 
 	private cosmos_base,
 	public augs::subscript_operator_for_get_handle_mixin<cosmos>
@@ -192,7 +194,7 @@ public:
 	si_scaling get_si() const;
 
 	randomization get_rng_for(const entity_id) const;
-	size_t get_rng_seed_for(const entity_id) const;
+	rng_seed_type get_rng_seed_for(const entity_id) const;
 
 	template <class F>
 	decltype(auto) operator()(const entity_id subject, F callback) {
@@ -204,7 +206,7 @@ public:
 		callback(get_handle(subject));
 	}
 
-	size_t get_count_of(const processing_subjects list_type) const {
+	std::size_t get_count_of(const processing_subjects list_type) const {
 		return systems_inferred.get<processing_lists_system>().get(list_type).size();
 	}
 
@@ -237,15 +239,11 @@ public:
 	
 	// shortcuts
 	std::unordered_set<entity_id> get_entities_by_name(const entity_name_type&) const;
+	std::unordered_set<entity_id> get_entities_by_name_id(const entity_name_id&) const;
 	
 	entity_handle get_entity_by_name(const entity_name_type&);
 	const_entity_handle get_entity_by_name(const entity_name_type&) const;
 	
-	void set_name(
-		const entity_handle h, 
-		const entity_name_type& new_name
-	) const;
-
 	std::size_t entities_count() const;
 	std::size_t get_maximum_entities() const;
 	std::wstring summary() const;
@@ -259,9 +257,6 @@ public:
 	const augs::delta& get_fixed_delta() const;
 	void set_fixed_delta(const augs::delta&);
 	void set_fixed_delta(const unsigned steps_per_second);
-
-	entity_name_metas& get_name_metas();
-	const entity_name_metas& get_name_metas() const;
 
 	cosmos_global_state& get_global_state();
 	const cosmos_global_state& get_global_state() const;
@@ -348,16 +343,12 @@ inline const global_assets& cosmos::get_global_assets() const {
 	return get_global_state().assets;
 }
 
-inline entity_name_metas& cosmos::get_name_metas() {
-	return significant.meta.global.name_metas;
-}
-
-inline const entity_name_metas& cosmos::get_name_metas() const {
-	return significant.meta.global.name_metas;
-}
-
 inline std::unordered_set<entity_id> cosmos::get_entities_by_name(const entity_name_type& name) const {
-	return systems_inferred.get<name_system>().get_entities_by_name_id(get_name_metas().get_id_for(name));
+	return systems_inferred.get<name_system>().get_entities_by_name(name);
+}
+
+inline std::unordered_set<entity_id> cosmos::get_entities_by_name_id(const entity_name_id& id) const {
+	return systems_inferred.get<name_system>().get_entities_by_name_id(id);
 }
 
 inline entity_handle cosmos::get_entity_by_name(const entity_name_type& name) {
@@ -409,7 +400,7 @@ inline const_inventory_slot_handle cosmos::get_handle(const inventory_slot_id id
 }
 
 inline randomization cosmos::get_rng_for(const entity_id id) const {
-	return{ get_rng_seed_for(id) };
+	return{ static_cast<std::size_t>(get_rng_seed_for(id)) };
 }
 
 inline std::size_t cosmos::entities_count() const {

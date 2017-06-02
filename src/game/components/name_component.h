@@ -12,6 +12,8 @@ namespace augs {
 	struct introspection_access;
 }
 
+class entity_name_meta;
+
 namespace components {
 	struct name : synchronizable_component {
 		friend struct augs::introspection_access;
@@ -27,6 +29,9 @@ class basic_name_synchronizer : public component_synchronizer_base<is_const, com
 public:
 	using component_synchronizer_base<is_const, components::name>::component_synchronizer_base;
 	
+	maybe_const_ref_t<is_const, entity_name_meta> get_meta() const;
+
+	const entity_name_type& get_name() const;
 	entity_name_id get_name_id() const;
 };
 
@@ -37,7 +42,8 @@ class component_synchronizer<false, components::name> : public basic_name_synchr
 public:
 	using basic_name_synchronizer<false>::basic_name_synchronizer;
 
-	void set_name_id(const entity_name_id&) const;
+	void set_name(const entity_name_type&) const;
+	void set_name_id(const entity_name_id) const;
 };
 
 template<>

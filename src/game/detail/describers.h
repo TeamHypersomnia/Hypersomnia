@@ -35,7 +35,7 @@ void set_bbcoded_entity_description(
 	const entity_description_type&
 );
 
-entity_description_type get_bbcoded_entity_description(const const_entity_handle);
+const entity_description_type& get_bbcoded_entity_description(const const_entity_handle);
 
 std::wstring get_bbcoded_item_categories(const item_category_flagset& flags);
 

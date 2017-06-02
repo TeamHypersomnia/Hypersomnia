@@ -811,21 +811,6 @@ namespace test_scenes {
 
 		auto& spells = world.get_global_state().spells;
 		std::get<electric_triad>(spells).missile_definition = prefabs::create_electric_missile_def(step, {});
-
-		{
-			auto& in = std::get<fury_of_the_aeons>(spells).explosion;
-
-			in.effective_radius = 250.f;
-			in.damage = 88.f;
-			in.impact_force = 150.f;
-			in.inner_ring_color = cyan;
-			in.outer_ring_color = white;
-			in.sound_effect = assets::sound_buffer_id::EXPLOSION;
-			in.sound_gain = 1.2f;
-			in.type = adverse_element_type::FORCE;
-		}
-
-
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 #endif
 	}

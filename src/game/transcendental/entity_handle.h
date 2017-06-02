@@ -313,22 +313,16 @@ public:
 	}
 	
 	auto& get_meta_of_name() const {
-		return get_cosmos()
-			.get_name_metas()
-				.get_meta(
-					get<components::name>()
-						.get_name_id()
-				)
-		;
+		return get<components::name>().get_meta();
 	}
 
 	const auto& get_name() const {
-		return get_meta_of_name().get_name();
+		return get<components::name>().get_name();
 	}
 
+	template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 	void set_name(const entity_name_type& new_name) const {	
-		const auto new_or_existing_id = get_cosmos().get_name_metas().make_id_for(new_name);
-		get<components::name>().set_name_id(new_or_existing_id);
+		get<components::name>().set_name(new_name);
 	}
 
 	bool is_inferred_state_activated() const {

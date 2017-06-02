@@ -58,6 +58,19 @@ void set_standard_sentience_properties(
 		d.common.cast_successful_sound.id = assets::sound_buffer_id::CAST_SUCCESSFUL;
 		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
+
+		{
+			auto& in = d.explosion;
+
+			in.effective_radius = 250.f;
+			in.damage = 88.f;
+			in.impact_force = 150.f;
+			in.inner_ring_color = cyan;
+			in.outer_ring_color = white;
+			in.sound_effect = assets::sound_buffer_id::EXPLOSION;
+			in.sound_gain = 1.2f;
+			in.type = adverse_element_type::FORCE;
+		}
 	}
 
 	{

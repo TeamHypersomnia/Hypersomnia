@@ -182,7 +182,7 @@ namespace augs {
 			}
 
 			if (changed) {
-				augs::write(out, new_content.buf);
+				augs::write_stream_with_size(out, new_content);
 			}
 
 			return changed;
@@ -199,7 +199,7 @@ namespace augs {
 			}
 
 			if (changed) {
-				augs::read(in, new_content.buf);
+				augs::read_stream_with_size(in, new_content);
 			}
 		}
 

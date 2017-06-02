@@ -11,6 +11,7 @@
 
 class viewing_step;
 class physics_system;
+struct cosmos_global_state;
 
 /* NPO stands for "non-physical objects" */
 
@@ -39,6 +40,9 @@ class tree_of_npo_system {
 	void reserve_caches_for_entities(const size_t n);
 	void create_inferred_state_for(const const_entity_handle);
 	void destroy_inferred_state_of(const const_entity_handle);
+
+	void create_additional_inferred_state(const cosmos_global_state&) {}
+	void destroy_additional_inferred_state(const cosmos_global_state&) {}
 
 	tree& get_tree(const cache&);
 	cache& get_cache(const unversioned_entity_id);

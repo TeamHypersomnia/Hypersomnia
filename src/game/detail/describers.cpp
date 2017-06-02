@@ -28,7 +28,7 @@ void set_bbcoded_entity_description(
 	handle.get_meta_of_name().description = new_details;
 }
 
-entity_description_type get_bbcoded_entity_description(const const_entity_handle handle) {
+const entity_description_type& get_bbcoded_entity_description(const const_entity_handle handle) {
 	return handle.get_meta_of_name().description;
 }
 

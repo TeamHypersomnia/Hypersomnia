@@ -46,8 +46,8 @@ namespace augs {
 	};
 
 	class stream : public stream_position {
-	public:
 		std::vector<char> buf;
+	public:
 		bool has_read_failed = false;
 
 		bool failed() const {
@@ -132,7 +132,7 @@ namespace augs {
 
 	template <class A>
 	void read_stream_with_size(A& ar, augs::stream& storage) {
-		size_t s;
+		std::size_t s;
 
 		read(ar, s);
 		

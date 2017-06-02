@@ -72,6 +72,10 @@ void cosmos::create_inferred_state_completely() {
 		create_inferred_state_for(get_handle(ordered_pair.second));
 	}
 
+	systems_inferred.for_each([this](auto& sys) {
+		sys.create_additional_inferred_state(significant.meta.global);
+	});
+
 	//for (auto it = guid_to_id.rbegin(); it != guid_to_id.rend(); ++it) {
 	//	create_inferred_state_for(get_handle((*it).second));
 	//}
@@ -190,12 +194,12 @@ std::wstring cosmos::summary() const {
 	return typesafe_sprintf(L"Entities: %x\n", entities_count());
 }
 
-size_t cosmos::get_rng_seed_for(const entity_id id) const {
-	size_t transform_hash = 0;
+rng_seed_type cosmos::get_rng_seed_for(const entity_id id) const {
+	rng_seed_type transform_hash = 0;
 	const auto tr = get_handle(id).get_logic_transform();
-	transform_hash = static_cast<size_t>(std::abs(tr.pos.x)*100.0);
-	transform_hash += static_cast<size_t>(std::abs(tr.pos.y)*100.0);
-	transform_hash += static_cast<size_t>(std::abs(tr.rotation)*100.0);
+	transform_hash = static_cast<rng_seed_type>(std::abs(tr.pos.x)*100.0);
+	transform_hash += static_cast<rng_seed_type>(std::abs(tr.pos.y)*100.0);
+	transform_hash += static_cast<rng_seed_type>(std::abs(tr.rotation)*100.0);
 
 	return get_handle(id).get_guid() + transform_hash;
 }

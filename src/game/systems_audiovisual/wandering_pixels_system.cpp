@@ -52,7 +52,7 @@ void wandering_pixels_system::advance_wandering_pixels_for(
 	}
 
 	if (!(cache.recorded_component.reach == wandering.reach)) {
-		cache.rng = fast_randomization(cosmos.get_rng_seed_for(it));
+		cache.rng = fast_randomization(static_cast<std::size_t>(cosmos.get_rng_seed_for(it)));
 
 		for (auto& p : cache.particles) {
 			p.pos.set(
