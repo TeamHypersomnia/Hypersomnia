@@ -6,22 +6,19 @@
 
 template <class Container, class T>
 void erase_if(Container& v, const T& l) {
-	augs::constexpr_if<can_access_data_v<Container>>()(
-		[&v, &l](auto...){
-			v.erase(std::remove_if(v.begin(), v.end(), l), v.end());
-		}
-	)._else(
-		[&v, &l](auto...){
-			for (auto it = v.begin(); it != v.end(); ) {
-				if (l(*it)) {
-					it = v.erase(it);
-				}
-				else {
-					++it;
-				}
+	if constexpr(can_access_data_v<Container>) {
+		v.erase(std::remove_if(v.begin(), v.end(), l), v.end());
+	}
+	else {
+		for (auto it = v.begin(); it != v.end(); ) {
+			if (l(*it)) {
+				it = v.erase(it);
+			}
+			else {
+				++it;
 			}
 		}
-	);
+	}
 }
 
 template <class Container, class T>

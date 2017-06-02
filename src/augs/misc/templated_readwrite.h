@@ -1,6 +1,7 @@
 #pragma once
 #include <type_traits>
 #include "augs/ensure.h"
+#include "augs/padding_byte.h"
 
 #include "augs/templates/memcpy_safety.h"
 #include "augs/templates/type_matching_and_indexing.h"
@@ -115,30 +116,26 @@ namespace augs {
 		Archive& ar,
 		Serialized& storage
 	) {
-		constexpr_if<has_io_overloads_v<Archive, Serialized>>()(
-			[&](auto...){
-				read_object(ar, storage);
-			}
-		)._else_if<is_byte_io_appropriate_v<Archive, Serialized>>(
-			[&](auto...){
-				read_bytes(ar, &storage, 1);
-			}
-		)._else(
-			[&](auto...){
-				verify_has_introspect(storage);
+		if constexpr(has_io_overloads_v<Archive, Serialized>) {
+			read_object(ar, storage);
+		}
+		else if constexpr(is_byte_io_appropriate_v<Archive, Serialized>) {
+			read_bytes(ar, &storage, 1);
+		}
+		else {
+			verify_has_introspect(storage);
 
-				augs::introspect(
-					[&](auto, auto& member) {
-						constexpr_if<!std::is_same_v<padding_byte&, decltype(member)>>()(
-							[&](auto...){
-								read(ar, member);
-							}
-						);
-					},
-					storage
-				);
-			}
-		);
+			augs::introspect(
+				[&](auto, auto& member) {
+					using member_type = std::decay_t<decltype(member)>;
+					
+					if constexpr (!is_padding_field_v<member_type>) {
+						read(ar, member);
+					}
+				},
+				storage
+			);
+		}
 	}
 
 	template<class Archive, class Serialized>
@@ -160,11 +157,11 @@ namespace augs {
 
 				augs::introspect(
 					[&](auto, const auto& member) {
-						constexpr_if<!std::is_same_v<const padding_byte&, decltype(member)>>()(
-							[&](auto...){
-								write(ar, member);
-							}
-						);
+						using member_type = std::decay_t<decltype(member)>;
+
+						if constexpr (!is_padding_field_v<member_type>) {
+							write(ar, member);
+						}
 					},
 					storage
 				);
@@ -351,7 +348,7 @@ namespace augs {
 	) {
 		augs::introspect_recursive<
 			bind_types_t<can_stream_right, Archive>,
-			is_not_predicate_t<padding_byte>,
+			apply_negation_t<is_padding_field>,
 			stop_recursion_if_valid
 		>(
 			[&](auto, auto& member) {

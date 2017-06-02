@@ -24,6 +24,10 @@ struct tests_of_traits {
 		"With given memory layouts, entity_id<->entity_guid substitution will not be possible in delta encoding"
 	);
 
+	static_assert(!is_padding_field_v<entity_id>);
+	static_assert(is_padding_field_v<pad_bytes<4>>);
+	static_assert(is_padding_field_v<pad_bytes<1>>);
+
 	static_assert(!has_introspect_v<cosmos>, "Trait has failed");
 	static_assert(!has_introspect_v<augs::trivial_variant<int, double>>, "Trait has failed");
 	static_assert(has_introspect_v<cosmos_metadata>, "Trait has failed");
