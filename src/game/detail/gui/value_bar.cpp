@@ -107,7 +107,7 @@ void value_bar::draw(
 		return;
 	}
 
-	auto icon_mat = this_id->get_icon_mat(context, this_id);
+	auto icon_mat = get_icon_mat(context, this_id);
 
 	if (this_id->detector.is_hovered) {
 		icon_mat.color.a = 255;
@@ -134,10 +134,10 @@ void value_bar::draw(
 	const auto total_spacing = this_id->get_total_border_expansion();
 
 	{
-		const auto full_bar_rect_bordered = this_id->get_bar_rect_with_borders(context, this_id, absolute);
-		const auto value_bar_rect = this_id->get_value_bar_rect(context, this_id, absolute);
+		const auto full_bar_rect_bordered = get_bar_rect_with_borders(context, this_id, absolute);
+		const auto value_bar_rect = get_value_bar_rect(context, this_id, absolute);
 
-		auto bar_mat = this_id->get_bar_mat(context, this_id);
+		auto bar_mat = get_bar_mat(context, this_id);
 		bar_mat.color.a = icon_mat.color.a;
 
 		const auto vertical_index = this_id.get_location().vertical_index;
@@ -177,7 +177,7 @@ void value_bar::draw(
 
 		meter_id id;
 
-		if (this_id->is_sentience_meter(this_id)) {
+		if (is_sentience_meter(this_id)) {
 			id.set_index(vertical_index);
 
 			const auto value = dynamic_dispatch(
@@ -240,7 +240,7 @@ ltrb value_bar::get_bar_rect_with_borders(
 
 	auto icon_rect = absolute;
 
-	auto icon_mat = this_id->get_icon_mat(context, this_id);
+	auto icon_mat = get_icon_mat(context, this_id);
 	icon_rect.set_size(manager[icon_mat.tex].get_size());
 	augs::gui::text_drawer drawer;
 	drawer.set_text(augs::gui::text::format(L"99999", assets::font_id::GUI_FONT));
@@ -273,7 +273,7 @@ void value_bar::advance_elements(
 	if (this_id->particles.size() > 0) {
 		randomization rng(this_id.get_location().vertical_index + context.get_cosmos().get_total_time_passed_in_seconds() * 1000);
 
-		const auto value_bar_size = this_id->get_value_bar_rect(context, this_id, this_id->rc).get_size();
+		const auto value_bar_size = get_value_bar_rect(context, this_id, this_id->rc).get_size();
 
 		while (this_id->seconds_accumulated > 0.f) {
 			for (auto& p : this_id->particles) {
@@ -409,7 +409,7 @@ void value_bar::rebuild_layouts(
 	}
 
 	const auto screen_size = context.get_character_gui().get_screen_size();
-	const auto icon_size = manager[this_id->get_icon_mat(context, this_id).tex].get_size();
+	const auto icon_size = manager[get_icon_mat(context, this_id).tex].get_size();
 	const auto with_bar_size = vec2i(icon_size.x + 4 + 180, icon_size.y);
 
 	const auto lt = vec2i(screen_size.x - 220, 20 + drawing_vertical_index * (icon_size.y + 4));
@@ -420,7 +420,7 @@ void value_bar::rebuild_layouts(
 	if (this_id->particles.empty()) {
 		randomization rng(this_id.get_location().vertical_index);
 
-		const auto value_bar_size = this_id->get_value_bar_rect(context, this_id, this_id->rc).get_size();
+		const auto value_bar_size = get_value_bar_rect(context, this_id, this_id->rc).get_size();
 
 		for (size_t i = 0; i < 40; ++i) {
 			const augs::gui::material mats[3] = {

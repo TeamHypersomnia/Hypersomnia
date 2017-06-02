@@ -10,6 +10,13 @@
 #include "game/components/pathfinding_component.h"
 
 #include "augs/padding_byte.h"
+namespace templates_detail {
+	template <class T>
+	struct identity {
+		using type = T;
+	};
+}
+
 struct tests_of_traits {
 	static_assert(
 		sizeof(entity_id) >= sizeof(entity_guid)
@@ -138,7 +145,7 @@ struct tests_of_traits {
 	);
 	
 	static_assert(
-		std::is_same_v<type_list<const int&, double&&, float&>, transform_types_in_list_t<type_list<const int&, double&&, float&>, std::identity>>,
+		std::is_same_v<type_list<const int&, double&&, float&>, transform_types_in_list_t<type_list<const int&, double&&, float&>, templates_detail::identity>>,
 		"Trait has failed."
 	);
 

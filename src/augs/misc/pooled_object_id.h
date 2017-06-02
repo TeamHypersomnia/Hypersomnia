@@ -62,6 +62,9 @@ namespace augs {
 
 namespace std {
 	template <class T>
+	struct hash;
+
+	template <class T>
 	struct hash<augs::pooled_object_id<T>> {
 		std::size_t operator()(const augs::pooled_object_id<T>& k) const {
 			return augs::simple_two_hash(k.indirection_index, k.version);

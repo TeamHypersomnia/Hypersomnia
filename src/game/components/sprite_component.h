@@ -76,7 +76,7 @@ namespace components {
 		) const;
 
 		template <class T>
-		ltrb sprite::get_aabb(
+		ltrb get_aabb(
 			const T& metas,
 			const components::transform transform
 		) const {

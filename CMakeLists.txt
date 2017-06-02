@@ -466,6 +466,9 @@ set(HYPERSOMNIA_CXX_RELWITHDEBINFO_FLAGS "/Ob2 /GL /Oi")
 # We configure additional flags for linker.
 
 if(MSVC)
+	# Enable latest features of C++17
+	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} /std:c++latest")
+
 	set(HYPERSOMNIA_LINKER_RELEASE_FLAGS "/LTCG /INCREMENTAL:NO /OPT:REF")
 
 	# We enable incremental LTCG for at least one release configuration,
