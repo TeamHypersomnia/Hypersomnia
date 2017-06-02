@@ -7,7 +7,6 @@
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/templates/introspect.h"
 #include "augs/templates/container_traits.h"
-#include "augs/templates/constexpr_if.h"
 
 namespace augs {
 	class output_stream_reserver;
@@ -143,30 +142,26 @@ namespace augs {
 		Archive& ar,
 		const Serialized& storage
 	) {
-		constexpr_if<has_io_overloads_v<Archive, Serialized>>()(
-			[&](auto...){
-				write_object(ar, storage);
-			}
-		)._else_if<is_byte_io_appropriate_v<Archive, Serialized>>(
-			[&](auto...){
-				write_bytes(ar, &storage, 1);
-			}
-		)._else(
-			[&](auto...){
-				verify_has_introspect(storage);
+		if constexpr(has_io_overloads_v<Archive, Serialized>) {
+			write_object(ar, storage);
+		}
+		else if constexpr(is_byte_io_appropriate_v<Archive, Serialized>) {
+			write_bytes(ar, &storage, 1);
+		}
+		else {
+			verify_has_introspect(storage);
 
-				augs::introspect(
-					[&](auto, const auto& member) {
-						using member_type = std::decay_t<decltype(member)>;
+			augs::introspect(
+				[&](auto, const auto& member) {
+					using member_type = std::decay_t<decltype(member)>;
 
-						if constexpr (!is_padding_field_v<member_type>) {
-							write(ar, member);
-						}
-					},
-					storage
-				);
-			}
-		);
+					if constexpr (!is_padding_field_v<member_type>) {
+						write(ar, member);
+					}
+				},
+				storage
+			);
+		}
 	}
 
 	template <class Archive, class Serialized>
@@ -175,17 +170,14 @@ namespace augs {
 		Serialized* const storage,
 		const std::size_t n
 	) {
-		constexpr_if<is_byte_io_appropriate_v<Archive, Serialized>>()(
-			[&](auto...){
-				read_bytes(ar, storage, n);
+		if constexpr(is_byte_io_appropriate_v<Archive, Serialized>) {
+			read_bytes(ar, storage, n);
+		}
+		else {
+			for (std::size_t i = 0; i < n; ++i) {
+				read(ar, storage[i]);
 			}
-		)._else(
-			[&](auto...){
-				for (std::size_t i = 0; i < n; ++i) {
-					read(ar, storage[i]);
-				}
-			}
-		);
+		}
 	}
 
 	template <class Archive, class Serialized>
@@ -194,17 +186,14 @@ namespace augs {
 		const Serialized* const storage,
 		const std::size_t n
 	) {
-		constexpr_if<is_byte_io_appropriate_v<Archive, Serialized>>()(
-			[&](auto...){
-				write_bytes(ar, storage, n);
+		if constexpr(is_byte_io_appropriate_v<Archive, Serialized>) {
+			write_bytes(ar, storage, n);
+		}
+		else {
+			for (std::size_t i = 0; i < n; ++i) {
+				write(ar, storage[i]);
 			}
-		)._else(
-			[&](auto...){
-				for (std::size_t i = 0; i < n; ++i) {
-					write(ar, storage[i]);
-				}
-			}
-		);
+		}
 	}
 
 	template <class Archive, class Container, class container_size_type = std::size_t>
@@ -221,47 +210,36 @@ namespace augs {
 			return;
 		}
 
-		constexpr_if<can_access_data_v<Container>>()(
-			[&](auto...) {
-				storage.resize(s);
-				read_n(ar, &storage[0], storage.size());
+		if constexpr(can_access_data_v<Container>) {
+			storage.resize(s);
+			read_n(ar, storage.data(), storage.size());
+		}
+		else {
+			if constexpr(can_reserve_v<Container>) {
+				storage.reserve(s);
 			}
-		)._else(
-			[&](auto& c) {
-				/* Compiler has problem catching the top-level Container type */
-				using Container = std::remove_reference_t<decltype(c)>;
 
-				constexpr_if<can_reserve_v<Container>>()(
-					[&](auto...) {
-						storage.reserve(s);
-					}
-				);
-				
-				constexpr_if<is_associative_container_v<Container>>()(
-					[&](auto...) {
-						while (s--) {
-							typename Container::key_type key;
-							typename Container::mapped_type mapped;
+			if constexpr(is_associative_container_v<Container>) {
+				while (s--) {
+					typename Container::key_type key;
+					typename Container::mapped_type mapped;
 
-							read(ar, key);
-							read(ar, mapped);
+					read(ar, key);
+					read(ar, mapped);
 
-							storage.emplace(std::move(key), std::move(mapped));
-						}
-					}
-				)._else(
-					[&](auto...) {
-						while (s--) {
-							typename Container::value_type val;
+					storage.emplace(std::move(key), std::move(mapped));
+				}
+			}
+			else {
+				while (s--) {
+					typename Container::value_type val;
 
-							read(ar, val);
+					read(ar, val);
 
-							storage.emplace(std::move(val));
-						}
-					}
-				);
-			}, storage
-		);
+					storage.emplace(std::move(val));
+				}
+			}
+		}
 	}
 
 	template <class Archive, class Container, class container_size_type = std::size_t>
@@ -274,17 +252,14 @@ namespace augs {
 		ensure(storage.size() <= std::numeric_limits<container_size_type>::max());
 		write(ar, static_cast<container_size_type>(storage.size()));
 
-		constexpr_if<can_access_data_v<Container>>()(
-			[&](auto...) {
-				write_n(ar, storage.data(), storage.size());
+		if constexpr(can_access_data_v<Container>) {
+			write_n(ar, storage.data(), storage.size());
+		}
+		else {
+			for (const auto& obj : storage) {
+				write(ar, obj);
 			}
-		)._else(
-			[&](auto...) {
-				for (const auto& obj : storage) {
-					write(ar, obj);
-				}
-			}
-		);
+		}
 	}
 
 	/*

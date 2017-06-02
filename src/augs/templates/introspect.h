@@ -1,7 +1,6 @@
 #pragma once
 #include <type_traits>
 #include "augs/templates/introspection_traits.h"
-#include "augs/templates/constexpr_if.h"
 
 namespace augs {
 	struct introspection_access;
@@ -81,54 +80,44 @@ namespace augs {
 				auto&& label, 
 				auto&&... args
 			) {
-				constexpr_if<
-					eval<call_valid_predicate, decltype(args)...>()
-				> () (
-					[&member_callback](auto&& passed_label, auto&&... passed_args) {
-						member_callback(
-							std::forward<decltype(passed_label)>(passed_label),
-							std::forward<decltype(passed_args)>(passed_args)...
-						);
-					},
-					std::forward<decltype(label)>(label),
-					std::forward<decltype(args)>(args)...
-				);
+				if constexpr(eval<call_valid_predicate, decltype(args)...>()) {
+					member_callback(
+						std::forward<decltype(label)>(label),
+						std::forward<decltype(args)>(args)...
+					);
+				}
 
-				constexpr_if<
+				if constexpr(
 					eval<should_recurse_predicate, decltype(args)...>()
 					&& eval<at_least_one_is_not_introspective_leaf, decltype(args)...>()
 					&& !(eval<call_valid_predicate, decltype(args)...>() && stop_recursion_if_valid)
-				>()(
-					[&member_callback, &recursion_prologue, &recursion_epilogue](auto&& passed_label, auto&&... passed_args) {
-						static_assert(eval<have_introspects, decltype(passed_args)...>(), "Recursion requested on type(s) without introspectors!");
-						
-						recursion_prologue(
-							current_depth,
-							std::forward<decltype(passed_label)>(passed_label),
-							std::forward<decltype(passed_args)>(passed_args)...
-						);
+				) {
+					static_assert(eval<have_introspects, decltype(args)...>(), "Recursion requested on type(s) without introspectors!");
+					
+					recursion_prologue(
+						current_depth,
+						std::forward<decltype(label)>(label),
+						std::forward<decltype(args)>(args)...
+					);
 
-						introspect_recursive_with_prologues <
-							call_valid_predicate,
-							should_recurse_predicate,
-							stop_recursion_if_valid,
-							current_depth + 1u
-						> (
-							std::forward<F>(member_callback),
-							std::forward<G>(recursion_prologue),
-							std::forward<H>(recursion_epilogue),
-							std::forward<decltype(passed_args)>(passed_args)...
-						);
+					introspect_recursive_with_prologues <
+						call_valid_predicate,
+						should_recurse_predicate,
+						stop_recursion_if_valid,
+						current_depth + 1u
+					> (
+						std::forward<F>(member_callback),
+						std::forward<G>(recursion_prologue),
+						std::forward<H>(recursion_epilogue),
+						std::forward<decltype(args)>(args)...
+					);
 
-						recursion_epilogue(
-							current_depth,
-							std::forward<decltype(passed_label)>(passed_label),
-							std::forward<decltype(passed_args)>(passed_args)...
-						);
-					},
-					std::forward<decltype(label)>(label),
-					std::forward<decltype(args)>(args)...
-				);
+					recursion_epilogue(
+						current_depth,
+						std::forward<decltype(label)>(label),
+						std::forward<decltype(args)>(args)...
+					);
+				}
 			},
 			std::forward<Instance>(introspected_instance),
 			std::forward<Instances>(introspected_instances)...
@@ -164,57 +153,37 @@ namespace augs {
 				auto&& label, 
 				auto&& arg
 			) {
-				constexpr_if<
-					eval<call_valid_predicate, decltype(arg)>()
-				> () (
-					[&member_callback](auto&& passed_label, auto&& passed_arg) {
-						member_callback(
-							std::forward<decltype(passed_label)>(passed_label),
-							std::forward<decltype(passed_arg)>(passed_arg)
-						);
-					},
-					std::forward<decltype(label)>(label),
-					std::forward<decltype(arg)>(arg)
-				);
+				if constexpr(eval<call_valid_predicate, decltype(arg)>()) {
+					member_callback(
+						std::forward<decltype(label)>(label),
+						std::forward<decltype(arg)>(arg)
+					);
+				}
 
-				constexpr_if<
+				if constexpr(
 					eval<should_recurse_predicate, decltype(arg)>()
 					&& eval<at_least_one_is_not_introspective_leaf, decltype(arg)>()
 					&& !(eval<call_valid_predicate, decltype(arg)>() && stop_recursion_if_valid)
-				>()(
-					[&member_callback, &recursion_prologue, &recursion_epilogue](auto&& passed_label, auto&& passed_arg) {
-						using checked_type = std::remove_reference_t<decltype(passed_arg)>;
+				) {
+					using checked_type = std::remove_reference_t<decltype(arg)>;
 
-						static_assert(has_introspect_v<checked_type> || is_variable_size_container_v<checked_type>, 
-							"Recursion requested on type without introspectors, that is not an iteratable container!"
-						);
-						
-						recursion_prologue(
-							current_depth,
-							std::forward<decltype(passed_label)>(passed_label),
-							std::forward<decltype(passed_arg)>(passed_arg)
-						);
-						
-						/* 
-							If the container is not introspectable, iterate through all members,
-							otherwise use the introspector defined for this container 
-						*/
+					static_assert(has_introspect_v<checked_type> || is_variable_size_container_v<checked_type>, 
+						"Recursion requested on type without introspectors, that is not an iteratable container!"
+					);
+					
+					recursion_prologue(
+						current_depth,
+						std::forward<decltype(label)>(label),
+						std::forward<decltype(arg)>(arg)
+					);
+					
+					/* 
+						If the container is not introspectable, iterate through all members,
+						otherwise use the introspector defined for this container 
+					*/
 
-						constexpr_if<!has_introspect_v<checked_type> && is_variable_size_container_v<checked_type>>()([&](auto...){
-							for (auto& val : passed_arg) {
-								introspect_recursive_with_prologues <
-									call_valid_predicate,
-									should_recurse_predicate,
-									stop_recursion_if_valid,
-									current_depth + 1u
-								> (
-									std::forward<F>(member_callback),
-									std::forward<G>(recursion_prologue),
-									std::forward<H>(recursion_epilogue),
-									val
-								);
-							}
-						})._else([&](auto...){
+					if constexpr(!has_introspect_v<checked_type> && is_variable_size_container_v<checked_type>){
+						for (auto& val : arg) {
 							introspect_recursive_with_prologues <
 								call_valid_predicate,
 								should_recurse_predicate,
@@ -224,19 +193,30 @@ namespace augs {
 								std::forward<F>(member_callback),
 								std::forward<G>(recursion_prologue),
 								std::forward<H>(recursion_epilogue),
-								std::forward<decltype(passed_arg)>(passed_arg)
+								val
 							);
-						});
-
-						recursion_epilogue(
-							current_depth,
-							std::forward<decltype(passed_label)>(passed_label),
-							std::forward<decltype(passed_arg)>(passed_arg)
+						}
+					}
+					else {
+						introspect_recursive_with_prologues <
+							call_valid_predicate,
+							should_recurse_predicate,
+							stop_recursion_if_valid,
+							current_depth + 1u
+						>(
+							std::forward<F>(member_callback),
+							std::forward<G>(recursion_prologue),
+							std::forward<H>(recursion_epilogue),
+							std::forward<decltype(arg)>(arg)
 						);
-					},
-					std::forward<decltype(label)>(label),
-					std::forward<decltype(arg)>(arg)
-				);
+					}
+
+					recursion_epilogue(
+						current_depth,
+						std::forward<decltype(label)>(label),
+						std::forward<decltype(arg)>(arg)
+					);
+				}
 			},
 			std::forward<Instance>(introspected_instance)
 		);

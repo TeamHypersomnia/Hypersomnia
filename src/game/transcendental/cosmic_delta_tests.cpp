@@ -84,7 +84,7 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 		total_components_size += sizeof checked_type;
 		component_size_information += typesafe_sprintf("%x == sizeof %x\n", sizeof checked_type, typeid(checked_type).name());
 
-		augs::constexpr_if<!allows_nontriviality_v<checked_type>>()([](auto...){
+		if constexpr(!allows_nontriviality_v<checked_type>) {
 			constexpr size_t type_size = sizeof(checked_type);
 
 			char buf1[type_size];
@@ -154,7 +154,7 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 					type_size
 				));
 			}
-		});
+		}
 	};
 
 	for_each_through_std_get(put_all_components_into_t<std::tuple>(), padding_checker);

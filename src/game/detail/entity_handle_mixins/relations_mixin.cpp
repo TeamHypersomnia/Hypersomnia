@@ -35,33 +35,30 @@ void relations_mixin<false, D>::make_cloned_child_entities_recursive(const entit
 			auto& cloned_to_component = self.allocator::template get<component_type>();
 			const auto& cloned_from_component = from.allocator::template get<component_type>();
 
-			augs::constexpr_if<allows_nontriviality_v<component_type>>()(
-				[&](auto...) {
-					component_type::clone_children(
-						cosmos, 
-						cloned_to_component, 
-						cloned_from_component
-					);
-				}
-			)._else(
-				[&](auto...) {
-					augs::introspect_recursive<
-						concat_unary_t<
-							std::conjunction,
-							bind_types_t<std::is_same, child_entity_id>,
-							bind_types_t<std::is_same, const child_entity_id>
-						>,
-						always_recurse,
-						stop_recursion_if_valid
-					> (
-						[&](auto, auto& cloned_into_id, const auto& cloned_from_id) {
-							cloned_into_id = cosmos.clone_entity(cloned_from_id);
-						},
-						cloned_to_component,
-						cloned_from_component
-					);
-				}
-			);
+			if constexpr(allows_nontriviality_v<component_type>) {
+				component_type::clone_children(
+					cosmos, 
+					cloned_to_component, 
+					cloned_from_component
+				);
+			}
+			else {
+				augs::introspect_recursive<
+					concat_unary_t<
+						std::conjunction,
+						bind_types_t<std::is_same, child_entity_id>,
+						bind_types_t<std::is_same, const child_entity_id>
+					>,
+					always_recurse,
+					stop_recursion_if_valid
+				> (
+					[&](auto, auto& cloned_into_id, const auto& cloned_from_id) {
+						cloned_into_id = cosmos.clone_entity(cloned_from_id);
+					},
+					cloned_to_component,
+					cloned_from_component
+				);
+			}
 		}
 	});
 }

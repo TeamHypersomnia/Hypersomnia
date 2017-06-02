@@ -33,22 +33,28 @@ struct cosmos_global_state {
 
 namespace std {
 	template <class T>
-	auto& get(cosmos_global_state& s, can_get_from<T, meter_tuple>* = nullptr) {
-		return std::get<T>(s.meters);
+	auto& get(const cosmos_global_state& s) {
+		if constexpr(is_one_of_list_v<T, decltype(s.meters)>) {
+			return std::get<T>(s.meters);
+		}
+		else if constexpr(is_one_of_list_v<T, decltype(s.perks)>) {
+			return std::get<T>(s.perks);
+		}
+		else {
+			static_assert(always_false_v<T>);
+		}
 	}
 
 	template <class T>
-	const auto& get(const cosmos_global_state& s, can_get_from<T, meter_tuple>* = nullptr) {
-		return std::get<T>(s.meters);
-	}
-
-	template <class T>
-	auto& get(cosmos_global_state& s, can_get_from<T, perk_tuple>* = nullptr) {
-		return std::get<T>(s.perks);
-	}
-
-	template <class T>
-	const auto& get(const cosmos_global_state& s, can_get_from<T, perk_tuple>* = nullptr) {
-		return std::get<T>(s.perks);
+	const auto& get(const cosmos_global_state& s) {
+		if constexpr(is_one_of_list_v<T, decltype(s.meters)>) {
+			return std::get<T>(s.meters);
+		}
+		else if constexpr(is_one_of_list_v<T, decltype(s.perks)>) {
+			return std::get<T>(s.perks);
+		}
+		else {
+			static_assert(always_false_v<T>);
+		}
 	}
 }

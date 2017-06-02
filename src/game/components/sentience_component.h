@@ -81,23 +81,29 @@ namespace components {
 		bool is_conscious() const;
 
 		template <class T>
-		auto& get(can_get_from<T, meter_instance_tuple>* = nullptr) {
-			return std::get<T>(meters);
+		auto& get() {
+			if constexpr(is_one_of_list_v<T, decltype(meters)>) {
+				return std::get<T>(meters);
+			}
+			else if constexpr(is_one_of_list_v<T, decltype(perks)>) {
+				return std::get<T>(perks);
+			}
+			else {
+				static_assert(always_false_v<T>);
+			}
 		}
 
 		template <class T>
-		const auto& get(can_get_from<T, meter_instance_tuple>* = nullptr) const {
-			return std::get<T>(meters);
-		}
-
-		template <class T>
-		auto& get(can_get_from<T, perk_instance_tuple>* = nullptr) {
-			return std::get<T>(perks);
-		}
-
-		template <class T>
-		const auto& get(can_get_from<T, perk_instance_tuple>* = nullptr) const {
-			return std::get<T>(perks);
+		const auto& get() const {
+			if constexpr(is_one_of_list_v<T, decltype(meters)>) {
+				return std::get<T>(meters);
+			}
+			else if constexpr(is_one_of_list_v<T, decltype(perks)>) {
+				return std::get<T>(perks);
+			}
+			else {
+				static_assert(always_false_v<T>);
+			}
 		}
 	};
 }
