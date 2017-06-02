@@ -34,8 +34,12 @@ namespace augs {
 		return output;
 	}
 
+	std::size_t stream::mismatch(const stream& b) const {
+		return std::mismatch(data(), data() + size(), b.data()).first - data();
+	}
+
 	bool stream::operator==(const stream& b) const {
-		return std::equal(data(), data() + size(), b.data(), b.data() + size());
+		return std::equal(data(), data() + size(), b.data());
 	}
 
 	bool stream::operator!=(const stream& b) const {

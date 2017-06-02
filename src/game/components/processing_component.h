@@ -7,7 +7,7 @@
 
 namespace components {
 	struct processing : synchronizable_component {
-		typedef augs::enum_boolset<processing_subjects> flagset_type;
+		using flagset_type = augs::enum_boolset<processing_subjects>;
 		
 		// GEN INTROSPECTOR struct components::processing
 		bool activated = true;

@@ -20,7 +20,8 @@ namespace augs {
 			auto& self = *static_cast<derived*>(this);
 
 			auto r = [&self, n](auto c) {
-				auto& component_pool = self.template get_component_pool<decltype(c)>();
+				using component = decltype(c);
+				auto& component_pool = self.template get_component_pool<component>();
 				component_pool.initialize_space(n);
 			};
 
@@ -33,16 +34,18 @@ namespace augs {
 			const handle_type from 
 		) {
 			for_each_type<components...>([&from, &into](auto c) {
-				if (is_one_of_v<decltype(c), excluded_components...>) {
+				using component = decltype(c);
+
+				if (is_one_of_v<component, excluded_components...>) {
 					return;
 				}
 
-				if (from.allocator::template has<decltype(c)>()) {
-					if (into.allocator::template has<decltype(c)>()) {
-						into.allocator::template get<decltype(c)>() = from.allocator::template get<decltype(c)>();
+				if (from.allocator::template has<component>()) {
+					if (into.allocator::template has<component>()) {
+						into.allocator::template get<component>() = from.allocator::template get<component>();
 					}
 					else {
-						into.allocator::template add<decltype(c)>(from.allocator::template get<decltype(c)>());
+						into.allocator::template add<component>(from.allocator::template get<component>());
 					}
 				}
 			});
@@ -56,7 +59,7 @@ namespace augs {
 				typedef decltype(c) component;
 
 				if(handle.allocator::template has<component>()) {
-					self.template get_component_pool<component>().free(handle.get().template get_id<component>());
+					handle.allocator::template remove<component>();
 				}
 			});
 		}

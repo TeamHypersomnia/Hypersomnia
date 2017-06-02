@@ -106,6 +106,10 @@ private:
 		void add(const T& t) const {
 			h.allocator::add(t);
 		}
+
+		void remove() const {
+			h.allocator::template remove<T>();
+		}
 	};
 
 	template <class T>
@@ -128,6 +132,11 @@ private:
 
 		void add(const T& t) const {
 			h.allocator::add(t);
+			h.get_cosmos().complete_reinference(h);
+		}
+		
+		void remove() const {
+			h.allocator::template remove<T>();
 			h.get_cosmos().complete_reinference(h);
 		}
 	};
@@ -255,6 +264,13 @@ public:
 		check_component_type<component>();
 		ensure(alive());
 		return component_or_synchronizer_or_disabled<component>({ *this }).find();
+	}
+
+	template<class component, bool _is_const = is_const, typename = std::enable_if_t<!_is_const>>
+	void remove() const {
+		check_component_type<component>();
+		ensure(alive());
+		return component_or_synchronizer_or_disabled<component>({ *this }).remove();
 	}
 
 	template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>

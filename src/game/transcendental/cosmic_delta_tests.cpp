@@ -11,7 +11,7 @@
 #include "augs/misc/templated_readwrite.h"
 #include "generated/introspectors.h"
 
-TEST_CASE("CosmicDelta PaddingSanityCheck1") {
+TEST_CASE("CosmicDelta0 PaddingSanityCheck1") {
 	struct ok {
 		bool a;
 		int b;
@@ -41,7 +41,7 @@ TEST_CASE("CosmicDelta PaddingSanityCheck1") {
 	REQUIRE(are_different);
 }
 
-TEST_CASE("CosmicDelta PaddingSanityCheck2") {
+TEST_CASE("CosmicDelta1 PaddingSanityCheck2") {
 	struct ok {
 		bool a = false;
 		int b = 1;
@@ -69,7 +69,7 @@ TEST_CASE("CosmicDelta PaddingSanityCheck2") {
 
 #include "augs/filesystem/file.h"
 
-TEST_CASE("CosmicDelta PaddingTest") {
+TEST_CASE("CosmicDelta2 PaddingTest") {
 	std::string component_size_information;
 	std::size_t total_components_size = 0u;
 
@@ -163,7 +163,7 @@ TEST_CASE("CosmicDelta PaddingTest") {
 	augs::create_text_file("generated/logs/components.txt", component_size_information);
 }
 
-TEST_CASE("Cosmos", "GuidizeTests") {
+TEST_CASE("CosmicDelta3 GuidizeTests") {
 	cosmos c1(2);
 
 	const auto new_ent1 = c1.create_entity("e1");
@@ -186,7 +186,7 @@ TEST_CASE("Cosmos", "GuidizeTests") {
 	REQUIRE(dead == dt.target_slot.container_entity);
 }
 
-TEST_CASE("CosmicDelta EmptyAndTwoNew") {
+TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 	cosmos c1(2);
 	cosmos c2(2);
 
@@ -212,6 +212,7 @@ TEST_CASE("CosmicDelta EmptyAndTwoNew") {
 
 		cosmic_delta::encode(c1, c2, s);
 		cosmic_delta::decode(c1, s);
+		REQUIRE(c1 == c2);
 	}
 
 	const auto ent1 = c1.get_handle(first_guid);
@@ -246,9 +247,39 @@ TEST_CASE("CosmicDelta EmptyAndTwoNew") {
 		REQUIRE(1 == comparatory.size());
 		REQUIRE(c1 == c2);
 	}
+
+	// test removals of components
+	new_ent1.remove<components::rigid_body>();
+	new_ent2.remove<components::trace>();
+	new_ent2.remove<components::position_copying>();
+
+	{
+		augs::stream s;
+
+		cosmic_delta::encode(c1, c2, s);
+		cosmic_delta::decode(c1, s);
+		REQUIRE(c1 == c2);
+	}
+
+	REQUIRE(!ent1.has<components::rigid_body>());
+	REQUIRE(!ent2.has<components::trace>());
+	REQUIRE(!ent2.has<components::position_copying>());
+
+	// if both remove a transform, cosmoi shall be identical
+	new_ent1.remove<components::transform>();
+	ent1.remove<components::transform>();
+
+	{
+		augs::stream comparatory;
+
+		REQUIRE(!cosmic_delta::encode(c1, c2, comparatory));
+
+		REQUIRE(1 == comparatory.size());
+		REQUIRE(c1 == c2);
+	}
 }
 
-TEST_CASE("CosmicDelta EmptyAndCreatedThreeEntitiesWithReferences") {
+TEST_CASE("CosmicDelta5 EmptyAndCreatedThreeEntitiesWithReferences") {
 	{
 		// (in)sanity check
 		cosmos t(3);
@@ -298,6 +329,8 @@ TEST_CASE("CosmicDelta EmptyAndCreatedThreeEntitiesWithReferences") {
 
 		cosmic_delta::encode(c1, c2, s);
 		cosmic_delta::decode(c1, s);
+		// should be byte-wise different due to different entity_id values
+		REQUIRE(c1 != c2);
 	}
 
 	REQUIRE(3 == c1.entities_count());
@@ -334,7 +367,11 @@ TEST_CASE("CosmicDelta EmptyAndCreatedThreeEntitiesWithReferences") {
 }
 
 
-TEST_CASE("CosmicDelta ThreeEntitiesWithReferencesAndDestroyedChild") {
+TEST_CASE("CosmicDelta6 ThreeEntitiesWithReferencesAndDestroyedChild") {
+	// Insanity check
+	REQUIRE(cosmos(1) == cosmos(1));
+	REQUIRE(cosmos(3) == cosmos(3));
+
 	entity_guid c1_first_guid = 0;
 	entity_guid c1_second_guid = 0;
 	entity_guid c1_third_guid = 0;
@@ -386,6 +423,10 @@ TEST_CASE("CosmicDelta ThreeEntitiesWithReferencesAndDestroyedChild") {
 		new_ent1.map_child_entity(child_entity_name::CHARACTER_CROSSHAIR, new_ent2);
 	}
 
+	REQUIRE(c1_first_guid == c2_first_guid);
+	REQUIRE(c1_second_guid == c2_second_guid);
+	REQUIRE(c1_third_guid == c2_third_guid);
+
 	REQUIRE(3 == c1.entities_count());
 	REQUIRE(3 == c2.entities_count());
 
@@ -403,19 +444,61 @@ TEST_CASE("CosmicDelta ThreeEntitiesWithReferencesAndDestroyedChild") {
 	{
 		augs::stream s;
 
+		/*
+			Note: when components with entity_ids are delta compared,
+			firstly the fields with entity_id are replaced with entity_guid contents.
+			This is because entity_ids are fields whose value we permit to be unique to the current machine,
+			and the outputs of delta are supposed to be in a format correct for a network transfer.
+			Thus, it is completely incorrect to compare entity_ids as they are,
+			since the pool can assign them completely different values (despite them pointing to entities with identical guids), let alone if they are simply pointers.
+
+			When the entity with c2_second_guid is deleted in c2, that guid can no longer be retrieved in c2 by the time we perform delta,
+			making it impossible to detect that the position_copying components of ent1 of both c1 and c2 represent the same guid.
+			Therefore, the cosmic delta has no other choice but to substitute the dead entity_id in c2->ent1->position_copying with zero-valued entity_guid which is defined to be "null guid".
+			This in effect will detect a difference between the position_copying components of c1->ent1 and c2->ent1. 
+			That is because we will substitute an alive guid for the former, and the null guid for the latter.
+
+			This notice exists so that there is no more confusion when delta detects 1 changed entity and 1 deleted entity when the only thing we did was a deletion of a single entity.
+		*/
+
 		cosmic_delta::encode(c1, c2, s);
 		cosmic_delta::decode(c1, s);
 	}
+	REQUIRE(2 == c1.entities_count());
 
 	{
 		augs::stream comparatory;
 
 		REQUIRE(!cosmic_delta::encode(c1, c2, comparatory));
+		
+		/* 
+			The following REQUIRE(c1 != c2) may seem counter-intuitive.
+			This, however, is actually the expected behaviour if we use straight-serializable entity_ids that let us avoid checking entity_ids everywhere in the cosmos for resetting
+			every time that an entity of a given entity_id is destroyed.
+
+			Read the previous comment and consider what happens when we encode c2.
+			Notice that we intend NO CHANGE to c2, (which, by the way, is taken by const&) since it is the cosmos we encode against.
+			Delta will detect a difference between entity_ids in c1->ent1->position_copying and c2->ent1->position_copying, 
+			supplying a default, unset entity_id for c1->ent1->position_copying.
+			c2->ent1->position_copying however, will NOT change AT ALL (as it was const& all the time), 
+			and despite it pointing to the already dead ent2, it will remain set to some value (that the pool correctly recognizes as dead), 
+			and therefore byte-wisely different from the default (entity_id()) (which is now the value for c1->ent1->position_copying).
+
+		*/
+		
+		// remove this REQUIRE if we switch entity_ids to types that need manual resetting upon deletion of an object,
+		// for example pointer types that are set to null every time that the object pointed to is deleted.
+		// In such case, this should become REQUIRE(c1 == c2).
+		REQUIRE(c1 != c2);
+		c2.get_handle(c2_first_guid).get<components::position_copying>().target = entity_id();
+		// note: we were also setting this child to ent2, so we need to nullify it too before ensuring equality
+		c2.get_handle(c2_first_guid).map_child_entity(child_entity_name::CHARACTER_CROSSHAIR, entity_id());
+		
+		// Only now shall the two cosmoi be equal. (the following expression is  equivalent to c1 == c2)
+		REQUIRE(c1.significant.get_first_mismatch_pos(c2.significant) == -1);
 
 		REQUIRE(1 == comparatory.size());
 	}
-
-	REQUIRE(2 == c1.entities_count());
 
 	const auto ent1 = c1.get_handle(c1_first_guid);
 	REQUIRE(!c1.entity_exists_with_guid(c1_second_guid));
@@ -423,13 +506,12 @@ TEST_CASE("CosmicDelta ThreeEntitiesWithReferencesAndDestroyedChild") {
 
 	REQUIRE(ent1.has<components::position_copying>());
 	const bool pc1_dead = c1[ent1.get<components::position_copying>().target].dead();
+	REQUIRE(entity_id() == ent1.get<components::position_copying>().target);
 	REQUIRE(pc1_dead);
 
 	REQUIRE(ent3.has<components::position_copying>());
 	const bool pc3_intact = ent3.get<components::position_copying>().target == ent1.get_id();
 	REQUIRE(pc3_intact);
-
-	LOG_NVPS(sizeof(assets_manager));
 }
 
 #endif

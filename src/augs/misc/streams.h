@@ -54,6 +54,8 @@ namespace augs {
 			return has_read_failed;
 		}
 
+		std::size_t mismatch(const stream&) const;
+
 		bool operator==(const stream&) const;
 		bool operator!=(const stream&) const;
 

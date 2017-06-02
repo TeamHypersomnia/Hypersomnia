@@ -11,6 +11,7 @@ namespace augs {
 		// END GEN INTROSPECTOR
 
 		void unset();
+		bool is_set() const;
 
 		bool operator==(const pooled_object_raw_id& b) const;
 		bool operator!=(const pooled_object_raw_id& b) const;

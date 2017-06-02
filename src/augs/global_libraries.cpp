@@ -73,7 +73,7 @@ namespace augs {
 			cfg.showSuccessfulTests = show_successful;
 			cfg.shouldDebugBreak = break_on_failure;
 			cfg.outputFilename = "generated/logs/unit_tests.txt";
-			cfg.runOrder = Catch::RunTests::InWhatOrder::InLexicographicalOrder;
+			cfg.runOrder = Catch::RunTests::InWhatOrder::InDeclarationOrder;
 		}
 
 		const auto result = session.run(argc, argv);

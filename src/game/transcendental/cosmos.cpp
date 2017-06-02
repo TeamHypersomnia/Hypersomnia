@@ -339,7 +339,7 @@ entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
 	}
 
 	if (source_entity.has<components::all_inferred_state>()) {
-		new_entity.add(components::all_inferred_state());
+		new_entity.add(source_entity.get<components::all_inferred_state>());
 	}
 
 	return new_entity;

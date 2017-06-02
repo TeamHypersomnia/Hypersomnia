@@ -85,7 +85,6 @@ bool cosmic_delta::encode(
 	//should_eq(0, used_bits);
 
 	enco.profiler.delta_encoding.new_measurement();
-	typedef decltype(base.significant.pool_for_aggregates)::element_type aggregate;
 	
 	delted_stream_of_entities dt;
 
@@ -105,7 +104,8 @@ bool cosmic_delta::encode(
 		const auto stream_written_id = id;
 #endif
 
-		typename std::decay_t<decltype(agg)>::component_id_tuple base_components;
+		using aggregate_type = typename std::decay_t<decltype(agg)>::component_id_tuple;
+		aggregate_type base_components;
 		
 		if (!is_new){
 			base_components = base_entity.get().component_ids;
@@ -116,18 +116,20 @@ bool cosmic_delta::encode(
 		bool has_entity_changed = false;
 
 		std::array<bool, COMPONENTS_COUNT> overridden_components;
+		std::array<bool, COMPONENTS_COUNT> removed_components;
 		std::fill(overridden_components.begin(), overridden_components.end(), false);
+		std::fill(removed_components.begin(), removed_components.end(), false);
 
 		augs::stream new_content;
 		
 		augs::introspect(
-			[&agg, &base, &enco, &has_entity_changed, &new_content, &overridden_components](
+			[&agg, &base, &enco, &has_entity_changed, &new_content, &overridden_components, &removed_components](
 				auto label,
 				const auto& base_id, 
 				const auto& enco_id
 			) {
-				typedef std::decay_t<decltype(enco_id)> encoded_id_type;
-				typedef typename encoded_id_type::element_type component_type;
+				using encoded_id_type = std::decay_t<decltype(enco_id)>;
+				using component_type = typename encoded_id_type::element_type;
 		
 				if (std::is_same_v<component_type, components::guid>) {
 					return;
@@ -142,8 +144,8 @@ bool cosmic_delta::encode(
 					return;
 				}
 				else if (enco_c.dead() && base_c.alive()) {
-					ensure(false && "Error! A previously existing component does not exist now.");
-					std::terminate();
+					has_entity_changed = true;
+					removed_components[idx] = true;
 					return;
 				}
 				else if (enco_c.alive() && base_c.dead()) {
@@ -190,13 +192,14 @@ bool cosmic_delta::encode(
 			augs::write(dt.stream_for_changed, stream_written_id);
 
 			augs::write_flags(dt.stream_for_changed, overridden_components);
+			augs::write_flags(dt.stream_for_changed, removed_components);
 			augs::write(dt.stream_for_changed, new_content);
 
 			++dt.changed_entities;
 		}
 	});
 
-	base.significant.pool_for_aggregates.for_each_object_and_id([&base, &enco, &out, &dt](const aggregate&, const entity_id id) {
+	base.significant.pool_for_aggregates.for_each_id([&base, &enco, &out, &dt](const entity_id id) {
 		const const_entity_handle base_entity = base.get_handle(id);
 #if COSMOS_TRACKS_GUIDS
 		const auto stream_written_id = base_entity.get_guid();
@@ -322,8 +325,8 @@ void cosmic_delta::decode(
 		for_each_through_std_get(
 			deco_components,
 			[&agg, &overridden_components, &new_entity, &in, &deco](const auto& deco_id) {
-				typedef std::decay_t<decltype(deco_id)> encoded_id_type;
-				typedef typename encoded_id_type::element_type component_type;
+				using encoded_id_type = std::decay_t<decltype(deco_id)>;
+				using component_type = typename encoded_id_type::element_type;
 		
 				if (std::is_same_v<component_type, components::guid>) {
 					return;
@@ -355,16 +358,18 @@ void cosmic_delta::decode(
 		const auto changed_entity = deco.get_handle(guid_of_changed);
 
 		std::array<bool, COMPONENTS_COUNT> overridden_components;
+		std::array<bool, COMPONENTS_COUNT> removed_components;
 		augs::read_flags(in, overridden_components);
+		augs::read_flags(in, removed_components);
 
 		const auto& agg = changed_entity.get();
 		const auto& deco_components = agg.component_ids;
 
 		for_each_through_std_get(
 			deco_components,
-			[&agg, &overridden_components, &in, &deco, &changed_entity](const auto& deco_id) {
-				typedef std::decay_t<decltype(deco_id)> encoded_id_type;
-				typedef typename encoded_id_type::element_type component_type;
+			[&agg, &overridden_components, &removed_components, &in, &deco, &changed_entity](const auto& deco_id) {
+				using encoded_id_type = std::decay_t<decltype(deco_id)>;
+				using component_type = typename encoded_id_type::element_type;
 		
 				if (std::is_same<component_type, components::guid>::value) {
 					return;
@@ -393,6 +398,9 @@ void cosmic_delta::decode(
 		
 						changed_entity.allocator::get<component_type>() = decoded_component;
 					}
+				}
+				else if (removed_components[idx]) {
+					changed_entity.remove<component_type>();
 				}
 			}
 		);
