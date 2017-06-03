@@ -16,76 +16,81 @@
 
 void drag_and_drop_callback(
 	game_gui_context context, 
-	const drag_and_drop_result& drag_result,
+	const std::optional<drag_and_drop_result>& drag_result,
 	const vec2i total_dragged_amount
 ) {
 	auto& cosmos = context.get_cosmos();
 	auto& gui = context.get_character_gui();
 
-	if (drag_result.is<drop_for_item_slot_transfer>()) {
-		const auto& transfer_data = drag_result.get<drop_for_item_slot_transfer>();
-
-		if (transfer_data.result.result >= item_transfer_result_type::SUCCESSFUL_TRANSFER) {
-			context.get_gui_element_system().queue_transfer(transfer_data.simulated_transfer);
-		}
+	if (!drag_result.has_value()) {
+		return;
 	}
-	else if (drag_result.is<unfinished_drag_of_item>()) {
-		const auto& transfer_data = drag_result.get<unfinished_drag_of_item>();
 
-		const auto hotbar_location = context.dereference_location(transfer_data.source_hotbar_button_id);
+	std::visit([&](const auto& transfer_data) {
+		using T = std::decay_t<decltype(transfer_data)>;
 
-		if (hotbar_location != nullptr) {
-			gui.clear_hotbar_button_assignment(
-				hotbar_location.get_location().index, 
-				context.get_gui_element_entity()
-			);
+		if constexpr (std::is_same_v<T, drop_for_item_slot_transfer>) {
+			if (transfer_data.result.result >= item_transfer_result_type::SUCCESSFUL_TRANSFER) {
+				context.get_gui_element_system().queue_transfer(transfer_data.simulated_transfer);
+			}
 		}
-		else {
-			const auto& item = cosmos[transfer_data.item_id];
+		else if constexpr (std::is_same_v<T, unfinished_drag_of_item>) {
+			const auto hotbar_location = context.dereference_location(transfer_data.source_hotbar_button_id);
 
-			const vec2i griddified = griddify(total_dragged_amount);
-
-			const auto this_button = context.dereference_location(item_button_in_item{ transfer_data.item_id });
-			const auto parent_slot = cosmos[item.get<components::item>().current_slot];
-			const auto parent_button = context.dereference_location(slot_button_in_container{ parent_slot.get_id() });
-
-			if (parent_slot->always_allow_exactly_one_item) {
-				parent_button->user_drag_offset += griddified;
-				parent_button->update_rc(context, parent_button);
+			if (hotbar_location != nullptr) {
+				gui.clear_hotbar_button_assignment(
+					hotbar_location.get_location().index, 
+					context.get_gui_element_entity()
+				);
 			}
 			else {
-				this_button->drag_offset_in_item_deposit += griddified;
+				const auto& item = cosmos[transfer_data.item_id];
+
+				const vec2i griddified = griddify(total_dragged_amount);
+
+				const auto this_button = context.dereference_location(item_button_in_item{ transfer_data.item_id });
+				const auto parent_slot = cosmos[item.get<components::item>().current_slot];
+				const auto parent_button = context.dereference_location(slot_button_in_container{ parent_slot.get_id() });
+
+				if (parent_slot->always_allow_exactly_one_item) {
+					parent_button->user_drag_offset += griddified;
+					parent_button->update_rc(context, parent_button);
+				}
+				else {
+					this_button->drag_offset_in_item_deposit += griddified;
+				}
 			}
 		}
-	}
-	else if (drag_result.is<drop_for_hotbar_assignment>()) {
-		const auto& transfer_data = drag_result.get<drop_for_hotbar_assignment>();
+		else if constexpr (std::is_same_v<T, drop_for_hotbar_assignment>) {
+			const auto dereferenced_button = context.dereference_location(transfer_data.assign_to);
+			const auto new_assigned_item = cosmos[transfer_data.item_id];
+			const auto owner_transfer_capability = context.get_gui_element_entity();
 
-		const auto dereferenced_button = context.dereference_location(transfer_data.assign_to);
-		const auto new_assigned_item = cosmos[transfer_data.item_id];
-		const auto owner_transfer_capability = context.get_gui_element_entity();
+			ensure(dereferenced_button != nullptr);
 
-		ensure(dereferenced_button != nullptr);
-
-		const auto source_hotbar_location = context.dereference_location(transfer_data.source_hotbar_button_id);
-		
-		if (source_hotbar_location != nullptr) {
-			const auto item_to_be_swapped = dereferenced_button->get_assigned_entity(owner_transfer_capability);
-
-			gui.assign_item_to_hotbar_button(dereferenced_button.get_location().index, owner_transfer_capability, new_assigned_item);
+			const auto source_hotbar_location = context.dereference_location(transfer_data.source_hotbar_button_id);
 			
-			if (item_to_be_swapped.alive()) {
-				gui.assign_item_to_hotbar_button(source_hotbar_location.get_location().index, owner_transfer_capability, item_to_be_swapped);
+			if (source_hotbar_location != nullptr) {
+				const auto item_to_be_swapped = dereferenced_button->get_assigned_entity(owner_transfer_capability);
+
+				gui.assign_item_to_hotbar_button(dereferenced_button.get_location().index, owner_transfer_capability, new_assigned_item);
+				
+				if (item_to_be_swapped.alive()) {
+					gui.assign_item_to_hotbar_button(source_hotbar_location.get_location().index, owner_transfer_capability, item_to_be_swapped);
+				}
+			}
+			else {
+				gui.assign_item_to_hotbar_button(dereferenced_button.get_location().index, owner_transfer_capability, new_assigned_item);
 			}
 		}
 		else {
-			gui.assign_item_to_hotbar_button(dereferenced_button.get_location().index, owner_transfer_capability, new_assigned_item);
+			static_assert(always_false_v<T>);
 		}
-	}
+	}, drag_result.value());
 }
 
 template <class C>
-drag_and_drop_result prepare_drag_and_drop_result(
+std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 	const C context, 
 	const game_gui_element_location held_rect_id, 
 	const game_gui_element_location drop_target_rect_id
@@ -94,7 +99,7 @@ drag_and_drop_result prepare_drag_and_drop_result(
 	const auto& element = context.get_character_gui();
 	const auto owning_transfer_capability = context.get_gui_element_entity();
 
-	drag_and_drop_result output;
+	std::optional<drag_and_drop_result> output;
 
 	auto dragged_item = context._dynamic_cast<item_button_in_item>(held_rect_id);
 	const auto dragged_hotbar_button = context._dynamic_cast<hotbar_button_in_character_gui>(held_rect_id);
@@ -149,7 +154,7 @@ drag_and_drop_result prepare_drag_and_drop_result(
 
 				hotbar_drop.item_id = dragged_item_handle;
 
-				output.set(hotbar_drop);
+				output = hotbar_drop;
 				return output;
 			}
 
@@ -251,27 +256,27 @@ drag_and_drop_result prepare_drag_and_drop_result(
 					}
 				}
 
-				output.set(drop);
+				output = drop;
 			}
 		}
 
 		if (!possible_target_hovered) {
-			output.set(unfinished_drag_of_item{
+			output = unfinished_drag_of_item{
 				source_hotbar_button_id, dragged_item.get_location().item_id
-			});
+			};
 		}
 	}
 
 	return output;
 }
 
-template drag_and_drop_result prepare_drag_and_drop_result(
+template std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 	game_gui_context context,
 	const game_gui_element_location held_rect_id,
 	const game_gui_element_location drop_target_rect_id
 );
 
-template drag_and_drop_result prepare_drag_and_drop_result(
+template std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 	viewing_game_gui_context context,
 	const game_gui_element_location held_rect_id,
 	const game_gui_element_location drop_target_rect_id

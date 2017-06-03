@@ -1,4 +1,7 @@
 #pragma once
+#include <variant>
+#include <optional>
+
 #include "augs/gui/dereferenced_location.h"
 #include "game/detail/inventory/item_transfer_result.h"
 #include "game/detail/inventory/item_slot_transfer_request.h"
@@ -29,14 +32,14 @@ struct drop_for_hotbar_assignment {
 	augs::constant_size_wstring<20> hint_text;
 };
 
-typedef augs::trivial_variant<
+using drag_and_drop_result = std::variant<
 	drop_for_item_slot_transfer,
 	drop_for_hotbar_assignment,
 	unfinished_drag_of_item
-> drag_and_drop_result;
+>;
 
 template <class C>
-drag_and_drop_result prepare_drag_and_drop_result(
+std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 	const C context, 
 	const game_gui_element_location held_rect_id, 
 	const game_gui_element_location drop_target_rect_id
@@ -44,6 +47,6 @@ drag_and_drop_result prepare_drag_and_drop_result(
 
 void drag_and_drop_callback(
 	game_gui_context context, 
-	const drag_and_drop_result&,
+	const std::optional<drag_and_drop_result>&,
 	const vec2i total_dragged_amount
 );

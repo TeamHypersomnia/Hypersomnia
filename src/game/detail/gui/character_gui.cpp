@@ -391,98 +391,104 @@ void character_gui::draw_cursor_with_information(const viewing_game_gui_context 
 	else {
 		const auto drag_result = prepare_drag_and_drop_result(context, rect_world.rect_held_by_lmb, rect_world.rect_hovered);
 
-		if (drag_result.is<unfinished_drag_of_item>()) {
-			const auto transfer_data = drag_result.get<unfinished_drag_of_item>();
-			const auto& dragged_item_button = context.dereference_location(item_button_in_item{ transfer_data.item_id });
-			const auto hotbar_location = context.dereference_location(transfer_data.source_hotbar_button_id);
+		if (drag_result.has_value()) {
+			std::visit([&](const auto& transfer_data) {
+				using T = std::decay_t<decltype(transfer_data)>;
 
-			if (hotbar_location != nullptr) {
-				const auto drawn_pos = drag_amount + get_absolute_pos(hotbar_location) - get_absolute_pos(dragged_item_button);
+				if constexpr (std::is_same_v<T, unfinished_drag_of_item>) {
+					const auto& dragged_item_button = context.dereference_location(item_button_in_item{ transfer_data.item_id });
+					const auto hotbar_location = context.dereference_location(transfer_data.source_hotbar_button_id);
 
-				dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drawn_pos);
+					if (hotbar_location != nullptr) {
+						const auto drawn_pos = drag_amount + get_absolute_pos(hotbar_location) - get_absolute_pos(dragged_item_button);
 
-				gui_cursor = assets::game_image_id::GUI_CURSOR_MINUS;
-				gui_cursor_color = red;
+						dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drawn_pos);
 
-				gui_cursor_position = draw_cursor_hint(L"Clear assignment", get_gui_crosshair_position(), manager[gui_cursor].get_size());
-			}
-			else {
-				const auto drawn_pos = drag_amount;
+						gui_cursor = assets::game_image_id::GUI_CURSOR_MINUS;
+						gui_cursor_color = red;
 
-				dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drawn_pos);
-				dragged_item_button->draw_grid_border_ghost(context, dragged_item_button, output_buffer, drawn_pos);
-			}
+						gui_cursor_position = draw_cursor_hint(L"Clear assignment", get_gui_crosshair_position(), manager[gui_cursor].get_size());
+					}
+					else {
+						const auto drawn_pos = drag_amount;
 
-			const auto& item = context.get_cosmos()[dragged_item_button.get_location().item_id].get<components::item>();
+						dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drawn_pos);
+						dragged_item_button->draw_grid_border_ghost(context, dragged_item_button, output_buffer, drawn_pos);
+					}
 
-			if (item.charges > 1) {
-				const auto gui_cursor_size = manager[gui_cursor].get_size();
+					const auto& item = context.get_cosmos()[dragged_item_button.get_location().item_id].get<components::item>();
 
-				const auto charges_text = to_wstring(dragged_charges);
+					if (item.charges > 1) {
+						const auto gui_cursor_size = manager[gui_cursor].get_size();
 
-				augs::gui::text_drawer dragged_charges_drawer;
+						const auto charges_text = to_wstring(dragged_charges);
 
-				dragged_charges_drawer.set_text(augs::gui::text::format(charges_text, text::style()));
-				dragged_charges_drawer.pos = get_gui_crosshair_position() + vec2i(0, int(gui_cursor_size.y));
+						augs::gui::text_drawer dragged_charges_drawer;
 
-				dragged_charges_drawer.draw_stroke(output_buffer, black);
-				dragged_charges_drawer.draw(output_buffer);
-			}
-		}
-		else if (drag_result.is<drop_for_hotbar_assignment>()) {
-			const auto& transfer_data = drag_result.get<drop_for_hotbar_assignment>();
-			const auto& dragged_item_button = context.dereference_location(item_button_in_item{ transfer_data.item_id });
+						dragged_charges_drawer.set_text(augs::gui::text::format(charges_text, text::style()));
+						dragged_charges_drawer.pos = get_gui_crosshair_position() + vec2i(0, int(gui_cursor_size.y));
 
-			const auto hotbar_location = context.dereference_location(transfer_data.source_hotbar_button_id);
+						dragged_charges_drawer.draw_stroke(output_buffer, black);
+						dragged_charges_drawer.draw(output_buffer);
+					}
+				}
+				else if constexpr (std::is_same_v<T, drop_for_hotbar_assignment>) {
+					const auto& dragged_item_button = context.dereference_location(item_button_in_item{ transfer_data.item_id });
 
-			if (hotbar_location != nullptr) {
-				const auto drawn_pos = drag_amount + get_absolute_pos(hotbar_location) - get_absolute_pos(dragged_item_button);
+					const auto hotbar_location = context.dereference_location(transfer_data.source_hotbar_button_id);
 
-				dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drawn_pos);
-			}
-			else {
-				const auto drawn_pos = drag_amount;
-				dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drag_amount);
-			}
+					if (hotbar_location != nullptr) {
+						const auto drawn_pos = drag_amount + get_absolute_pos(hotbar_location) - get_absolute_pos(dragged_item_button);
 
-			if (!(transfer_data.source_hotbar_button_id == transfer_data.assign_to)) {
-				gui_cursor = assets::game_image_id::GUI_CURSOR_ADD;
-				gui_cursor_color = green;
-			}
+						dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drawn_pos);
+					}
+					else {
+						const auto drawn_pos = drag_amount;
+						dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drag_amount);
+					}
 
-			gui_cursor_position = draw_cursor_hint(transfer_data.hint_text, get_gui_crosshair_position(), manager[gui_cursor].get_size());
-		}
-		else if (drag_result.is<drop_for_item_slot_transfer>()) {
-			const auto& transfer_data = drag_result.get<drop_for_item_slot_transfer>();
-			const auto& dragged_item_button = context.dereference_location(item_button_in_item{ transfer_data.simulated_transfer.item });
+					if (!(transfer_data.source_hotbar_button_id == transfer_data.assign_to)) {
+						gui_cursor = assets::game_image_id::GUI_CURSOR_ADD;
+						gui_cursor_color = green;
+					}
 
-			const auto hotbar_location = context.dereference_location(transfer_data.source_hotbar_button_id);
+					gui_cursor_position = draw_cursor_hint(transfer_data.hint_text, get_gui_crosshair_position(), manager[gui_cursor].get_size());
+				}
+				else if constexpr (std::is_same_v<T, drop_for_item_slot_transfer>) {
+					const auto& dragged_item_button = context.dereference_location(item_button_in_item{ transfer_data.simulated_transfer.item });
 
-			if (hotbar_location != nullptr) {
-				dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drag_amount
-					+ get_absolute_pos(hotbar_location) - get_absolute_pos(dragged_item_button)
-				);
-			}
-			else {
-				dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drag_amount);
-			}
+					const auto hotbar_location = context.dereference_location(transfer_data.source_hotbar_button_id);
 
-			const auto& transfer_result = transfer_data.result.result;
+					if (hotbar_location != nullptr) {
+						dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drag_amount
+							+ get_absolute_pos(hotbar_location) - get_absolute_pos(dragged_item_button)
+						);
+					}
+					else {
+						dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drag_amount);
+					}
 
-			if (transfer_result == item_transfer_result_type::SUCCESSFUL_DROP) {
-				gui_cursor = assets::game_image_id::GUI_CURSOR_MINUS;
-				gui_cursor_color = red;
-			}
-			else if (transfer_result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
-				gui_cursor = assets::game_image_id::GUI_CURSOR_ADD;
-				gui_cursor_color = green;
-			}
-			else if (transfer_result != item_transfer_result_type::THE_SAME_SLOT) {
-				gui_cursor = assets::game_image_id::GUI_CURSOR_ERROR;
-				gui_cursor_color = red;
-			}
+					const auto& transfer_result = transfer_data.result.result;
 
-			gui_cursor_position = draw_cursor_hint(transfer_data.hint_text, get_gui_crosshair_position(), manager[gui_cursor].get_size());
+					if (transfer_result == item_transfer_result_type::SUCCESSFUL_DROP) {
+						gui_cursor = assets::game_image_id::GUI_CURSOR_MINUS;
+						gui_cursor_color = red;
+					}
+					else if (transfer_result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
+						gui_cursor = assets::game_image_id::GUI_CURSOR_ADD;
+						gui_cursor_color = green;
+					}
+					else if (transfer_result != item_transfer_result_type::THE_SAME_SLOT) {
+						gui_cursor = assets::game_image_id::GUI_CURSOR_ERROR;
+						gui_cursor_color = red;
+					}
+
+					gui_cursor_position = draw_cursor_hint(transfer_data.hint_text, get_gui_crosshair_position(), manager[gui_cursor].get_size());
+				}
+				else {
+					static_assert(always_false_v<T>);
+				}
+			}, drag_result.value());
 		}
 	}
 
