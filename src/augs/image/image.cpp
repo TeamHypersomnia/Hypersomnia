@@ -63,9 +63,9 @@ namespace augs {
 	}
 	
 	void image::execute(const command_variant& in) {
-		in.call([&](const auto& resolved) {
+		std::visit([&](const auto& resolved) {
 			execute(resolved);
-		});
+		}, in);
 	}
 
 	void image::execute(

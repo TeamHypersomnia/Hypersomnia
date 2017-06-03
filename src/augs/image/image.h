@@ -1,10 +1,12 @@
 #pragma once
 #include <vector>
+#include <variant>
+
+#include "augs/padding_byte.h"
+#include "augs/templates/maybe_const.h"
+
 #include "augs/math/vec2.h"
 #include "augs/graphics/pixel.h"
-#include "augs/padding_byte.h"
-#include "augs/misc/trivial_variant.h"
-#include "augs/templates/maybe_const.h"
 
 namespace augs {
 	struct paint_circle_midpoint_command {
@@ -80,11 +82,11 @@ namespace augs {
 			const bool add_rgba_values = false
 		);
 
-		typedef augs::trivial_variant<
+		using command_variant = std::variant<
 			paint_circle_midpoint_command,
 			paint_circle_filled_command,
 			paint_line_command
-		> command_variant;
+		>;
 
 		void execute(const command_variant&);
 

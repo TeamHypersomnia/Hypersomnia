@@ -29,23 +29,21 @@
 #include "game/detail/visible_entities.h"
 #include "application/config_lua_table.h"
 
-#include "augs/misc/trivial_variant.h"
-
 #include "application/setups/director_setup.h"
 
 #include "generated/introspectors.h"
 #include "augs/misc/parsing_utils.h"
 #include "augs/audio/sound_samples_from_file.h"
 
-using choreographic_command_variant = augs::trivial_variant<
+#include <variant>
+
+using choreographic_command_variant = std::variant<
 	play_scene,
 	play_sound,
 	focus_guid,
 	focus_index,
 	set_sfx_gain
 >;
-
-choreographic_command_variant dummy_to_avoid_errors;
 
 using choreographic_command_tuple = replace_list_type_t<choreographic_command_variant, std::tuple>;
 
@@ -178,7 +176,7 @@ void choreographic_setup::process(
 	}
 
 	auto get_start_time = [](const choreographic_command_variant& a) {
-		return a.call([](const auto& r) { return r.at_time; });
+		return std::visit([](const auto& r) { return r.at_time; }, a);
 	};
 
 	std::vector<augs::sound_source> sources;
@@ -205,7 +203,7 @@ void choreographic_setup::process(
 		current_playback_speed = new_speed;
 
 		for (auto& s : sources) {
-			s.set_pitch(new_speed);
+			s.set_pitch(static_cast<float>(new_speed));
 		}
 
 		for (auto& p : preloaded_scenes) {
@@ -222,46 +220,37 @@ void choreographic_setup::process(
 			const auto start_time = get_start_time(next_event);
 
 			if (start_time <= player_time) {
-				if (next_event.is<play_scene>()) {
-					auto& e = next_event.get<play_scene>();
+				std::visit([&](auto& e){
+					using t = std::decay_t<decltype(e)>;
 
-					currently_played_scene_index = e.id;
-				}
+					if constexpr (std::is_same_v<t, play_scene>) {
+						currently_played_scene_index = e.id;
+					}
+					else if constexpr (std::is_same_v<t, play_sound>) {
+						augs::sound_source src;
+						src.bind_buffer(preloaded_sounds[e.id]);
+						src.set_direct_channels(true);
+						src.set_pitch(current_playback_speed);
+						src.play();
 
-				else if (next_event.is<play_sound>()) {
-					auto& e = next_event.get<play_sound>();
+						sources.emplace_back(std::move(src));
+					}
+					else if constexpr (std::is_same_v<t, focus_guid>) {
+						ensure(currently_played_scene_index != -1);
 
-					augs::sound_source src;
-					src.bind_buffer(preloaded_sounds[e.id]);
-					src.set_direct_channels(true);
-					src.set_pitch(current_playback_speed);
-					src.play();
+						auto& scene = preloaded_scenes[currently_played_scene_index].scene;
+						scene.characters.select_character(scene.hypersomnia[e.guid].get_id());
+					}
+					else if constexpr (std::is_same_v<t, focus_index>) {
+						ensure(currently_played_scene_index != -1);
 
-					sources.emplace_back(std::move(src));
-				}
-
-				else if (next_event.is<focus_guid>()) {
-					auto& e = next_event.get<focus_guid>();
-
-					ensure(currently_played_scene_index != -1);
-
-					auto& scene = preloaded_scenes[currently_played_scene_index].scene;
-					scene.characters.select_character(scene.hypersomnia[e.guid].get_id());
-				}
-
-				else if (next_event.is<focus_index>()) {
-					auto& e = next_event.get<focus_index>();
-
-					ensure(currently_played_scene_index != -1);
-
-					auto& scene = preloaded_scenes[currently_played_scene_index].scene;
-					scene.characters.select_character(scene.characters.characters[e.index]);
-				}
-
-				else if (next_event.is<set_sfx_gain>()) {
-					auto& e = next_event.get<set_sfx_gain>();
-					session.set_master_gain(e.gain);
-				}
+						auto& scene = preloaded_scenes[currently_played_scene_index].scene;
+						scene.characters.select_character(scene.characters.characters[e.index]);
+					}
+					else if constexpr (std::is_same_v<t, set_sfx_gain>) {
+						session.set_master_gain(static_cast<float>(e.gain));
+					}
+				}, next_event);
 
 				++next_played_event_index;
 			}
@@ -272,7 +261,6 @@ void choreographic_setup::process(
 		process_exit_key(new_machine_entropy.local);
 
 		session.switch_between_gui_and_back(new_machine_entropy.local);
-
 
 		for (const auto& raw_input : new_machine_entropy.local) {
 			if (raw_input.was_any_key_pressed()) {

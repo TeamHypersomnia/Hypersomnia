@@ -96,6 +96,10 @@ namespace augs {
 			return current_type;
 		}
 
+		auto index() const {
+			return current_type.get_index();
+		}
+
 		bool operator==(const trivial_variant& b) const {
 			return 
 				current_type == b.current_type 

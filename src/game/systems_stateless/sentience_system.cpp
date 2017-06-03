@@ -1,5 +1,6 @@
 #include "sentience_system.h"
 
+#include "augs/templates/dynamic_dispatch.h"
 #include "game/messages/damage_message.h"
 #include "game/messages/health_event.h"
 #include "game/messages/health_event.h"

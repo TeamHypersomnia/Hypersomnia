@@ -1,5 +1,6 @@
 #include "all.h"
 #include "augs/graphics/drawers.h"
+#include "augs/templates/dynamic_dispatch.h"
 #include "game/transcendental/cosmos.h"
 #include "game/components/sprite_component.h"
 

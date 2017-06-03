@@ -6,6 +6,7 @@
 #include "game/assets/assets_manager.h"
 
 #include "augs/misc/templated_readwrite.h"
+#include "augs/misc/trivial_variant.h"
 #include "augs/templates/container_traits.h"
 #include "game/components/pathfinding_component.h"
 
