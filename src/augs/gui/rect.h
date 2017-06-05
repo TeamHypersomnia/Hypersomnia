@@ -32,9 +32,9 @@ namespace augs {
 			vec2 get_scroll() const;
 		};
 
-		template <class gui_element_polymorphic_id>
+		template <class gui_element_variant_id>
 		struct rect_node : rect_node_data {
-			typedef augs::gui::gui_entropy<gui_element_polymorphic_id> gui_entropy;
+			typedef augs::gui::gui_entropy<gui_element_variant_id> gui_entropy;
 
 			using rect_node_data::rect_node_data;
 
@@ -125,11 +125,11 @@ namespace augs {
 						if (context.dead(gr.rect_hovered)) {
 							if (hover) {
 								gui_event_lambda(gui_event::hover);
-								gr.rect_hovered.set(this_id);
+								gr.rect_hovered = this_id;
 								inf.was_hovered_rect_visited = true;
 							}
 						}
-						else if (gr.rect_hovered == this_id) {
+						else if (gr.rect_hovered == gui_element_variant_id(this_id)) {
 							const bool still_hover = hover;
 
 							if (still_hover) {
@@ -137,7 +137,7 @@ namespace augs {
 									gui_event_lambda(gui_event::lup);
 								}
 								if (msg == message::ldown) {
-									gr.rect_held_by_lmb.set(this_id);
+									gr.rect_held_by_lmb = this_id;
 									gr.ldrag_relative_anchor = mouse_pos - this_id->rc.get_position();
 									gr.last_ldown_position = mouse_pos;
 									this_id->rc_pos_before_dragging = vec2i(this_id->rc.get_position());
@@ -150,23 +150,23 @@ namespace augs {
 									gui_event_lambda(gui_event::mdoubleclick);
 								}
 								if (msg == message::ldoubleclick) {
-									gr.rect_held_by_lmb.set(this_id);
+									gr.rect_held_by_lmb = this_id;
 									gr.ldrag_relative_anchor = mouse_pos - this_id->rc.get_position();
 									gr.last_ldown_position = mouse_pos;
 									gui_event_lambda(gui_event::ldoubleclick);
 								}
 								if (msg == message::ltripleclick) {
-									gr.rect_held_by_lmb.set(this_id);
+									gr.rect_held_by_lmb = this_id;
 									gr.ldrag_relative_anchor = mouse_pos - this_id->rc.get_position();
 									gr.last_ldown_position = mouse_pos;
 									gui_event_lambda(gui_event::ltripleclick);
 								}
 								if (msg == message::rdown) {
-									gr.rect_held_by_rmb.set(this_id);
+									gr.rect_held_by_rmb = this_id;
 									gui_event_lambda(gui_event::rdown);
 								}
 								if (msg == message::rdoubleclick) {
-									gr.rect_held_by_rmb.set(this_id);
+									gr.rect_held_by_rmb = this_id;
 									gui_event_lambda(gui_event::rdoubleclick);
 								}
 
@@ -174,10 +174,10 @@ namespace augs {
 									gui_event_lambda(gui_event::wheel, inf.change.scroll.amount);
 								}
 
-								if (gr.rect_held_by_lmb == this_id && msg == message::mousemotion && state.get_mouse_key(0) && absolute_clipped_rect.hover(m.ldrag)) {
+								if (gr.rect_held_by_lmb == gui_element_variant_id(this_id) && msg == message::mousemotion && state.get_mouse_key(0) && absolute_clipped_rect.hover(m.ldrag)) {
 									gui_event_lambda(gui_event::lpressed);
 								}
-								if (gr.rect_held_by_rmb == this_id && msg == message::mousemotion && state.get_mouse_key(1) && absolute_clipped_rect.hover(m.rdrag)) {
+								if (gr.rect_held_by_rmb == gui_element_variant_id(this_id) && msg == message::mousemotion && state.get_mouse_key(1) && absolute_clipped_rect.hover(m.rdrag)) {
 									gui_event_lambda(gui_event::rpressed);
 								}
 							}
@@ -191,7 +191,7 @@ namespace augs {
 						}
 					}
 
-					if (gr.rect_held_by_lmb == this_id && msg == message::mousemotion && mouse_pos != gr.last_ldown_position) {
+					if (gr.rect_held_by_lmb == gui_element_variant_id(this_id) && msg == message::mousemotion && mouse_pos != gr.last_ldown_position) {
 						bool has_only_started = !gr.held_rect_is_dragged;
 						
 						gr.held_rect_is_dragged = true;
@@ -348,11 +348,11 @@ namespace augs {
 
 				gui_event_lambda(gui_event::hoverlost);
 
-				if (world.rect_held_by_lmb == this_id) {
+				if (world.rect_held_by_lmb == gui_element_variant_id(this_id)) {
 					gui_event_lambda(gui_event::loutdrag);
 				}
 
-				world.rect_hovered.unset();
+				world.rect_hovered = gui_element_variant_id();
 			}
 
 			//template <class C, class gui_element_id>
@@ -442,7 +442,7 @@ namespace augs {
 			//
 			//	if (e == gui_event::mdown || e == gui_event::mdoubleclick) {
 			//		if (get_flag(flag::SCROLLABLE) && !content_size.inside(vec2(rc))) {
-			//			owner.middlescroll.subject.set(this_id);
+			//			owner.middlescroll.subject = this_id;
 			//			owner.middlescroll.pos = wnd.mouse.pos;
 			//			owner.set_focus(this_id);
 			//		}

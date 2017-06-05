@@ -7,12 +7,12 @@
 
 namespace augs {
 	namespace gui {
-		template <class gui_element_polymorphic_id, bool is_const, class derived>
+		template <class gui_element_variant_id, bool is_const, class derived>
 		class basic_context {
 		public:
-			typedef maybe_const_ref_t<is_const, rect_world<gui_element_polymorphic_id>> rect_world_ref;
-			typedef maybe_const_ref_t<false, rect_tree<gui_element_polymorphic_id>> tree_ref;
-			typedef maybe_const_ref_t<false, rect_tree_entry<gui_element_polymorphic_id>> rect_tree_entry_ref;
+			typedef maybe_const_ref_t<is_const, rect_world<gui_element_variant_id>> rect_world_ref;
+			typedef maybe_const_ref_t<false, rect_tree<gui_element_variant_id>> tree_ref;
+			typedef maybe_const_ref_t<false, rect_tree_entry<gui_element_variant_id>> rect_tree_entry_ref;
 
 			rect_world_ref world;
 			tree_ref tree;
@@ -23,7 +23,7 @@ namespace augs {
 				return world;
 			}
 
-			rect_tree_entry_ref get_tree_entry(const gui_element_polymorphic_id& id) const {
+			rect_tree_entry_ref get_tree_entry(const gui_element_variant_id& id) const {
 				return tree.at(id);
 			}
 			
@@ -36,21 +36,24 @@ namespace augs {
 				})).first).second;
 			}
 
-			bool alive(const gui_element_polymorphic_id& id) const {
-				return id.is_set() && id.call([this](const auto resolved) {
-					return resolved.alive(*static_cast<const derived*>(this));
-				});
+			bool alive(const gui_element_variant_id& id) const {
+				return 
+					!(id == gui_element_variant_id()) 
+					&& std::visit([this](const auto resolved) {
+						return resolved.alive(*static_cast<const derived*>(this));
+					}, id)
+				;
 			}
 
-			bool dead(const gui_element_polymorphic_id& id) const {
+			bool dead(const gui_element_variant_id& id) const {
 				return !alive(id);
 			}
 
-			bool alive(gui_element_polymorphic_id& id) const {
+			bool alive(gui_element_variant_id& id) const {
 				const auto& const_id = id;
 
 				if (!alive(const_id)) {
-					id.unset();
+					id = gui_element_variant_id();
 
 					return false;
 				}
@@ -58,7 +61,7 @@ namespace augs {
 				return true;
 			}
 
-			bool dead(gui_element_polymorphic_id& id) const {
+			bool dead(gui_element_variant_id& id) const {
 				return !alive(id);
 			}
 
@@ -76,10 +79,10 @@ namespace augs {
 			}
 
 			template <class L>
-			decltype(auto) operator()(const gui_element_polymorphic_id& id, L generic_call) const {
-				return id.call([&](const auto specific_loc) {
+			decltype(auto) operator()(const gui_element_variant_id& id, L generic_call) const {
+				return std::visit([&](const auto specific_loc) {
 					return generic_call(dereference_location(specific_loc));
-				});
+				}, id);
 			}
 
 			template <bool is_const, class T, class L>
@@ -88,26 +91,28 @@ namespace augs {
 			}
 
 			template <class T>
-			auto _dynamic_cast(const gui_element_polymorphic_id& polymorphic_id) const {
-				typedef decltype(dereference_location(polymorphic_id.get<T>())) dereferenced_location_type;
+			auto get_if(const gui_element_variant_id& variant_id) const {
+				auto* const maybe_t = std::get_if<T>(&variant_id);
 				
-				if (polymorphic_id.is<T>()) {
-					return dereference_location(polymorphic_id.get<T>());
+				using dereferenced_location_type = decltype(dereference_location(*maybe_t));
+
+				if (maybe_t) {
+					return dereference_location(*maybe_t);
 				}
 
 				return dereferenced_location_type();
 			}
 		};
 
-		//template <class gui_element_polymorphic_id, bool is_const, class derived>
+		//template <class gui_element_variant_id, bool is_const, class derived>
 		//class basic_context;
 		//
-		//template <class gui_element_polymorphic_id, class derived>
-		//class basic_context<gui_element_polymorphic_id, false, derived> : public basic_context_base<gui_element_polymorphic_id, false, derived> {
+		//template <class gui_element_variant_id, class derived>
+		//class basic_context<gui_element_variant_id, false, derived> : public basic_context_base<gui_element_variant_id, false, derived> {
 		//public:
-		//	typedef std::unordered_map<gui_element_polymorphic_id, std::vector<event_info>> gui_entropy;
+		//	typedef std::unordered_map<gui_element_variant_id, std::vector<event_info>> gui_entropy;
 		//	typedef gui_entropy& gui_entropy_ref;
-		//	typedef basic_context_base<gui_element_polymorphic_id, false, derived> base;
+		//	typedef basic_context_base<gui_element_variant_id, false, derived> base;
 		//
 		//	typedef typename base::rect_world_ref rect_world_ref;
 		//	typedef typename base::tree_ref tree_ref;
@@ -116,19 +121,19 @@ namespace augs {
 		//
 		//	gui_entropy entropy;
 		//
-		//	void generate_gui_event(const gui_element_polymorphic_id& id, const event_info& in) {
+		//	void generate_gui_event(const gui_element_variant_id& id, const event_info& in) {
 		//		entropy[id].push_back(in);
 		//	}
 		//
-		//	const std::vector<event_info>& get_entropy_for(const gui_element_polymorphic_id& id) const {
+		//	const std::vector<event_info>& get_entropy_for(const gui_element_variant_id& id) const {
 		//		return entropy.at(id);
 		//	}
 		//};
 		//
-		//template <class gui_element_polymorphic_id, class derived>
-		//class basic_context<gui_element_polymorphic_id, true, derived> : public basic_context_base<gui_element_polymorphic_id, true, derived> {
+		//template <class gui_element_variant_id, class derived>
+		//class basic_context<gui_element_variant_id, true, derived> : public basic_context_base<gui_element_variant_id, true, derived> {
 		//public:
-		//	typedef basic_context_base<gui_element_polymorphic_id, true, derived> base;
+		//	typedef basic_context_base<gui_element_variant_id, true, derived> base;
 		//	
 		//	using base::base;
 		//

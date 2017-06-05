@@ -313,15 +313,16 @@ void gui_element_system::control_gui(
 		erase_if(events, [&](const augs::window::event::change change) {
 			bool fetched = false;
 
-			const auto held_rect = context._dynamic_cast<item_button_in_item>(rect_world.rect_held_by_lmb);
+			const auto held_rect = context.get_if<item_button_in_item>(rect_world.rect_held_by_lmb);
 
 			if (held_rect != nullptr) {
 				const auto& item_entity = cosmos[held_rect.get_location().item_id];
 				auto& dragged_charges = element.dragged_charges;
 
-				if (change.msg == augs::window::event::message::rdown
+				if (
+					change.msg == augs::window::event::message::rdown
 					|| change.msg == augs::window::event::message::rdoubleclick
-					) {
+				) {
 					if (rect_world.held_rect_is_dragged) {
 						pending_transfers.push_back(item_slot_transfer_request { item_entity, cosmos[inventory_slot_id()], dragged_charges });
 						fetched = true;

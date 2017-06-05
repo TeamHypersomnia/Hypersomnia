@@ -11,11 +11,12 @@
 #include "augs/tweaker.h"
 #include "augs/gui/text_drawer.h"
 #include "augs/gui/stroke.h"
+#include "augs/templates/visit_list.h"
 
 static constexpr std::size_t num_sentience_meters = num_types_in_list_v<decltype(components::sentience::meters)>;
 
 template <class F, class G>
-decltype(auto) dispatch_by_vertical_index(
+decltype(auto) visit_by_vertical_index(
 	const components::sentience& sentience,
 	const cosmos& cosm,
 	const unsigned index, 
@@ -26,7 +27,7 @@ decltype(auto) dispatch_by_vertical_index(
 		meter_id id;
 		id.set_index(index);
 
-		return dynamic_dispatch(sentience.meters, id, 
+		return visit_list(sentience.meters, id, 
 			[&cosm, &meter_callback](const auto& meter){
 				return meter_callback(meter, get_meta_of(meter, cosm.get_global_state().meters));
 			}
@@ -37,7 +38,7 @@ decltype(auto) dispatch_by_vertical_index(
 		perk_id id;
 		id.set_index(index - num_sentience_meters);
 
-		return dynamic_dispatch(sentience.perks, id, 
+		return visit_list(sentience.perks, id, 
 			[&cosm, &perk_callback](const auto& perk){
 				return perk_callback(perk, get_meta_of(perk, cosm.get_global_state().perks));
 			}
@@ -46,13 +47,13 @@ decltype(auto) dispatch_by_vertical_index(
 }
 
 template <class F>
-decltype(auto) dispatch_by_vertical_index(
+decltype(auto) visit_by_vertical_index(
 	const components::sentience& sentience,
 	const cosmos& cosm,
 	const unsigned index, 
 	F&& callback
 ) {
-	return dispatch_by_vertical_index(
+	return visit_by_vertical_index(
 		sentience,
 		cosm,
 		index,
@@ -73,7 +74,7 @@ std::wstring value_bar::get_description_for_hover(
 	const auto& metas = cosmos.get_global_state();
 	const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
 
-	return dispatch_by_vertical_index(
+	return visit_by_vertical_index(
 		context.get_gui_element_entity().get<components::sentience>(),
 		cosmos,
 		self.get_location().vertical_index,
@@ -144,7 +145,7 @@ void value_bar::draw(
 			
 		const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
 		
-		const auto current_value_ratio = dispatch_by_vertical_index(
+		const auto current_value_ratio = visit_by_vertical_index(
 			sentience,
 			cosmos,
 			vertical_index,
@@ -180,7 +181,7 @@ void value_bar::draw(
 		if (is_sentience_meter(this_id)) {
 			id.set_index(vertical_index);
 
-			const auto value = dynamic_dispatch(
+			const auto value = visit_list(
 				sentience.meters,
 				id,
 				[](const auto& meter) {
@@ -322,7 +323,7 @@ augs::gui::material value_bar::get_icon_mat(
 	const auto& metas = cosmos.get_global_state();
 	const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
 
-	return { dispatch_by_vertical_index(
+	return { visit_by_vertical_index(
 		sentience,
 		cosmos,
 		this_id.get_location().vertical_index,
@@ -342,7 +343,7 @@ augs::gui::material value_bar::get_bar_mat(
 
 	return { 
 		context.get_gui_element_system().value_bar_background, 
-		dispatch_by_vertical_index(
+		visit_by_vertical_index(
 			sentience,
 			cosmos,
 			this_id.get_location().vertical_index,
@@ -363,7 +364,7 @@ bool value_bar::is_enabled(
 	const auto now = cosm.get_timestamp();
 
 	return 		
-		dispatch_by_vertical_index(
+		visit_by_vertical_index(
 			context.get_gui_element_entity().get<components::sentience>(),
 			cosm,
 			vertical_index,

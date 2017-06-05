@@ -6,7 +6,6 @@
 #include "game/assets/assets_manager.h"
 
 #include "augs/misc/templated_readwrite.h"
-#include "augs/misc/trivial_variant.h"
 #include "augs/templates/container_traits.h"
 #include "game/components/pathfinding_component.h"
 
@@ -30,7 +29,6 @@ struct tests_of_traits {
 	static_assert(is_padding_field_v<pad_bytes<1>>);
 
 	static_assert(!has_introspect_v<cosmos>, "Trait has failed");
-	static_assert(!has_introspect_v<augs::trivial_variant<int, double>>, "Trait has failed");
 	static_assert(has_introspect_v<cosmos_metadata>, "Trait has failed");
 	static_assert(has_introspect_v<augs::constant_size_vector<int, 2>>, "Trait has failed");
 	static_assert(has_introspect_v<zeroed_pod<unsigned int>>, "Trait has failed");

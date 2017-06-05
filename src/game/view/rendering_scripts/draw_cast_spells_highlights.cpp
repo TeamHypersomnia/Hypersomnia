@@ -1,6 +1,6 @@
 #include "all.h"
 #include "augs/graphics/drawers.h"
-#include "augs/templates/dynamic_dispatch.h"
+#include "augs/templates/visit_list.h"
 #include "game/transcendental/cosmos.h"
 #include "game/components/sprite_component.h"
 
@@ -22,7 +22,7 @@ namespace rendering_scripts {
 				const auto casted_spell = sentience.currently_casted_spell;
 
 				if (casted_spell.is_set()) {
-					dynamic_dispatch(
+					visit_list(
 						sentience.spells,
 						casted_spell,
 						[&](const auto& spell){

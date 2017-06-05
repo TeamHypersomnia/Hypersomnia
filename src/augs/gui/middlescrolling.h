@@ -7,12 +7,12 @@
 
 namespace augs {
 	namespace gui {
-		template <class gui_element_polymorphic_id>
+		template <class gui_element_variant_id>
 		struct middlescrolling {
 			material mat;
 			vec2 size = vec2(25, 25);
 			vec2i middlescroll_icon_position;
-			gui_element_polymorphic_id subject;
+			gui_element_variant_id subject;
 			float speed_mult = 1.f;
 
 			template<class C>
@@ -28,7 +28,7 @@ namespace augs {
 			bool handle_new_raw_state(const C context, const window::event::change& state) {
 				if (context.alive(subject)) {
 					if (state.msg == window::event::message::mdown || state.msg == window::event::message::mdoubleclick)
-						subject.unset();
+						subject = gui_element_variant_id();
 
 					return true;
 				}

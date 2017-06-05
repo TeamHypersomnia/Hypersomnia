@@ -36,6 +36,14 @@ public:
 		return !operator==(b);
 	}
 
+	bool operator==(const location_type b) const {
+		return location == b;
+	}
+
+	bool operator!=(const location_type b) const {
+		return !operator==(b);
+	}
+
 	operator location_type() const {
 		return location;
 	}

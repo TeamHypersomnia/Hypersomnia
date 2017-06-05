@@ -43,7 +43,7 @@ void drag_and_drop_target_drop_item::rebuild_layouts(const game_gui_context cont
 	const auto& manager = get_assets_manager();
 
 	const auto& world = context.get_rect_world();
-	const_dereferenced_location<item_button_in_item> dragged_item = context._dynamic_cast<item_button_in_item>(world.rect_held_by_lmb);
+	const_dereferenced_location<item_button_in_item> dragged_item = context.get_if<item_button_in_item>(world.rect_held_by_lmb);
 
 	if (dragged_item != nullptr && world.held_rect_is_dragged) {
 		this_id->set_flag(augs::gui::flag::ENABLE_DRAWING);

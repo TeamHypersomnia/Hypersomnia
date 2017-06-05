@@ -6,17 +6,17 @@
 
 namespace augs {
 	namespace gui {
-		template <class gui_element_polymorphic_id>
+		template <class gui_element_variant_id>
 		class rect_tree_entry {
 			ltrb rc;
-			gui_element_polymorphic_id parent;
+			gui_element_variant_id parent;
 			vec2 absolute_position;
 			ltrb absolute_clipped_rect;
 			ltrb absolute_clipping_rect;
 		public:
 			rect_tree_entry(const ltrb& rc) : rc(rc) {}
 
-			void set_parent(const gui_element_polymorphic_id& id) {
+			void set_parent(const gui_element_variant_id& id) {
 				parent = id;
 			}
 
@@ -32,7 +32,7 @@ namespace augs {
 				absolute_position = v;
 			}
 
-			gui_element_polymorphic_id get_parent() const {
+			gui_element_variant_id get_parent() const {
 				return parent;
 			}
 
@@ -53,7 +53,7 @@ namespace augs {
 			}
 		};
 
-		template <class gui_element_polymorphic_id>
-		using rect_tree = std::unordered_map<gui_element_polymorphic_id, rect_tree_entry<gui_element_polymorphic_id>>;
+		template <class gui_element_variant_id>
+		using rect_tree = std::unordered_map<gui_element_variant_id, rect_tree_entry<gui_element_variant_id>>;
 	}
 }

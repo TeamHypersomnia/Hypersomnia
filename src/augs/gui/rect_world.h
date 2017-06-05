@@ -25,10 +25,10 @@ namespace augs {
 	namespace gui {
 		extern clipboard global_clipboard;
 
-		template <class gui_element_polymorphic_id>
+		template <class gui_element_variant_id>
 		class rect_world {
 		public:
-			typedef augs::gui::gui_entropy<gui_element_polymorphic_id> gui_entropy;
+			typedef augs::gui::gui_entropy<gui_element_variant_id> gui_entropy;
 
 			template<class C, class gui_element_id>
 			bool is_hovered(const C context, const gui_element_id& id) {
@@ -39,16 +39,16 @@ namespace augs {
 
 			window::event::state last_state;
 
-			middlescrolling<gui_element_polymorphic_id> middlescroll;
+			middlescrolling<gui_element_variant_id> middlescroll;
 			
 			bool held_rect_is_dragged = false;
 			pad_bytes<3> pad;
 			
-			gui_element_polymorphic_id rect_hovered;
-			gui_element_polymorphic_id rect_held_by_lmb;
-			gui_element_polymorphic_id rect_held_by_rmb;
+			gui_element_variant_id rect_hovered;
+			gui_element_variant_id rect_held_by_lmb;
+			gui_element_variant_id rect_held_by_rmb;
 
-			gui_element_polymorphic_id rect_in_focus;
+			gui_element_variant_id rect_in_focus;
 			
 			vec2i ldrag_relative_anchor;
 			vec2i last_ldown_position;
@@ -56,14 +56,14 @@ namespace augs {
 
 			template <class gui_element_id>
 			bool is_currently_dragging(const gui_element_id& id) const {
-				return rect_held_by_lmb == id && held_rect_is_dragged;
+				return rect_held_by_lmb == gui_element_variant_id(id) && held_rect_is_dragged;
 			}
 
 			bool is_currently_dragging() const {
 				return held_rect_is_dragged;
 			}
 
-			gui_element_polymorphic_id get_rect_in_focus() const {
+			gui_element_variant_id get_rect_in_focus() const {
 				return rect_in_focus;
 			}
 
@@ -118,7 +118,7 @@ namespace augs {
 						}
 
 						current_drag_amount.set(0, 0);
-						rect_held_by_lmb.unset();
+						rect_held_by_lmb = gui_element_variant_id();
 						held_rect_is_dragged = false;
 					}
 				}
@@ -135,7 +135,7 @@ namespace augs {
 						}
 
 						current_drag_amount.set(0, 0);
-						rect_held_by_rmb.unset();
+						rect_held_by_rmb = gui_element_variant_id();
 					}
 				}
 

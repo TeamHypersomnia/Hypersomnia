@@ -30,6 +30,7 @@
 #include "game/view/viewing_session.h"
 
 #include "augs/graphics/drawers.h"
+#include "augs/templates/visit_list.h"
 #include "game/detail/wielding_result.h"
 #include "game/detail/spells/spell_structs.h"
 
@@ -504,60 +505,75 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 	const auto gui_entity = context.get_gui_element_entity();
 	auto& output_buffer = context.get_output_buffer();
 
-	const auto maybe_hovered_item = context._dynamic_cast<item_button_in_item>(rect_world.rect_hovered);
-	const auto maybe_hovered_slot = context._dynamic_cast<slot_button_in_container>(rect_world.rect_hovered);
-	const auto maybe_hovered_hotbar_button = context._dynamic_cast<hotbar_button_in_character_gui>(rect_world.rect_hovered);
-	const auto maybe_hovered_sentience_meter = context._dynamic_cast<value_bar_in_character_gui>(rect_world.rect_hovered);
-	const auto maybe_hovered_action_button = context._dynamic_cast<action_button_in_character_gui>(rect_world.rect_hovered);
-
 	gui::text::formatted_string tooltip_text;
 
 	const auto description_style = text::style(assets::font_id::GUI_FONT, vslightgray);
 
-	if (maybe_hovered_item) {
-		tooltip_text = text::format_as_bbcode(get_bbcoded_entity_details(cosmos[maybe_hovered_item.get_location().item_id]), description_style);
-	}
-	else if (maybe_hovered_slot) {
-		tooltip_text = text::format_as_bbcode(get_bbcoded_slot_details(cosmos[maybe_hovered_slot.get_location().slot_id]), text::style());
-	}
-	else if (maybe_hovered_action_button) {
-		const auto bound_spell = maybe_hovered_action_button->get_bound_spell(context, maybe_hovered_action_button);
+	const auto hovered = rect_world.rect_hovered;
 
-		if (bound_spell.is_set()) {
-			const auto& sentience = gui_entity.get<components::sentience>();
+	if (context.alive(hovered)) {
+		context(
+			hovered,
+			[&](const auto dereferenced) {
+				const auto location = dereferenced.get_location();
+				using T = std::decay_t<decltype(location)>;
 
-			tooltip_text = dynamic_dispatch(
-				sentience.spells,
-				bound_spell,
-				[&](const auto& spell){
-					const auto& spell_data = get_meta_of(spell, cosmos.get_global_state().spells);
+				if constexpr(std::is_same_v<T, item_button_in_item>) {
+					tooltip_text = text::format_as_bbcode(get_bbcoded_entity_details(cosmos[location.item_id]), description_style);
+				}
+				else if constexpr(std::is_same_v<T, slot_button_in_container>) {
+					tooltip_text = text::format_as_bbcode(get_bbcoded_slot_details(cosmos[location.slot_id]), text::style());
+				}
+				else if constexpr(std::is_same_v<T, hotbar_button_in_character_gui>) {
+					const auto assigned_entity = dereferenced->get_assigned_entity(gui_entity);
 
-					return text::format_as_bbcode(
-						get_bbcoded_spell_description(
-							gui_entity,
-							spell_data
-						),
+					if (assigned_entity.alive()) {
+						tooltip_text = text::format_as_bbcode(get_bbcoded_entity_details(assigned_entity), description_style);
+					}
+					else {
+						tooltip_text = text::format(L"Empty slot", description_style);
+					}
+				}
+				else if constexpr(std::is_same_v<T, value_bar_in_character_gui>) {
+					tooltip_text = text::format_as_bbcode(
+						dereferenced->get_description_for_hover(context, dereferenced),
 						description_style
 					);
 				}
-			);
-		}
-	}
-	else if (maybe_hovered_sentience_meter) {
-		tooltip_text = text::format_as_bbcode(
-			maybe_hovered_sentience_meter->get_description_for_hover(context, maybe_hovered_sentience_meter),
-			description_style
-		);
-	}
-	else if (maybe_hovered_hotbar_button) {
-		const auto assigned_entity = maybe_hovered_hotbar_button->get_assigned_entity(gui_entity);
+				else if constexpr(std::is_same_v<T, action_button_in_character_gui>) {
+					const auto bound_spell = dereferenced->get_bound_spell(context, dereferenced);
 
-		if (assigned_entity.alive()) {
-			tooltip_text = text::format_as_bbcode(get_bbcoded_entity_details(assigned_entity), description_style);
-		}
-		else {
-			tooltip_text = text::format(L"Empty slot", description_style);
-		}
+					if (bound_spell.is_set()) {
+						const auto& sentience = gui_entity.get<components::sentience>();
+
+						tooltip_text = visit_list(
+							sentience.spells,
+							bound_spell,
+							[&](const auto& spell) {
+								const auto& spell_data = get_meta_of(spell, cosmos.get_global_state().spells);
+
+								return text::format_as_bbcode(
+									get_bbcoded_spell_description(
+										gui_entity,
+										spell_data
+									),
+									description_style
+								);
+							}
+						);
+					}
+				}
+				else if constexpr(std::is_same_v<T, root_of_inventory_gui_in_context>) {
+
+				}
+				else if constexpr(std::is_same_v<T, drag_and_drop_target_drop_item_in_character_gui>) {
+
+				}
+				else {
+					static_assert(always_false<T>::value);
+				}
+			}
+		);
 	}
 	else {
 		const auto camera = context.get_camera_cone();
