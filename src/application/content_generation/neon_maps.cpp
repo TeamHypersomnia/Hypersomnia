@@ -36,7 +36,7 @@ void cut_empty_edges(augs::image& source);
 void regenerate_neon_maps(
 	const bool force_regenerate
 ) {
-	const auto neon_directory = "generated/neon_maps/";
+	const std::string neon_directory = "generated/neon_maps/";
 
 	augs::create_directories(neon_directory);
 

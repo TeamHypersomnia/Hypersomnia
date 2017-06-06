@@ -400,7 +400,7 @@ namespace prefabs {
 		inferred.activated = false;
 		energy_ball += inferred;
 
-		energy_ball.add_standard_components(step);
+		energy_ball.add_standard_components(step, false);
 
 		return energy_ball;
 	}

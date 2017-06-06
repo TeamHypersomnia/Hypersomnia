@@ -133,7 +133,7 @@ template <
 	template <class...> class Criterion,
 	class... Args
 >
-using filter_types = filter_types_in_list<Criterion, std::tuple<Args...>>;
+using filter_types = filter_types_in_list_t<Criterion, type_list<Args...>>;
 
 template <
 	template <class...> class Criterion,

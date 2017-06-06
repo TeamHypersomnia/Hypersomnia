@@ -12,7 +12,9 @@
 #include "game/components/transform_component.h"
 
 namespace components {
-	struct rigid_body : synchronizable_component {
+	struct rigid_body {
+		static constexpr bool is_synchronized = true;
+
 		rigid_body(
 			const si_scaling = si_scaling(),
 			const components::transform t = components::transform()

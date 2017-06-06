@@ -8,7 +8,9 @@
 /* NPO stands for "non-physical objects" */
 
 namespace components {
-	struct tree_of_npo_node : synchronizable_component {		
+	struct tree_of_npo_node {		
+		static constexpr bool is_synchronized = true;
+
 		// GEN INTROSPECTOR struct components::tree_of_npo_node
 		bool always_visible = false;
 		bool activated = true;

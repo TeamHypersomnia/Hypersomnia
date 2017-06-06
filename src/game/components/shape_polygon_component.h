@@ -11,7 +11,9 @@
 #include "game/components/all_inferred_state_component.h"
 
 namespace components {
-	struct shape_polygon : synchronizable_component {
+	struct shape_polygon {
+		static constexpr bool is_synchronized = true;
+
 		// GEN INTROSPECTOR struct components::shape_polygon
 		convex_partitioned_shape shape;
 		std::array<convex_poly_destruction_data, CONVEX_POLYS_COUNT> destruction;

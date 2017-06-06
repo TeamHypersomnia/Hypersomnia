@@ -88,7 +88,7 @@ bool cosmic_delta::encode(
 	
 	delted_stream_of_entities dt;
 
-	enco.significant.pool_for_aggregates.for_each_object_and_id([&](const auto& agg, const entity_id id) {
+	enco.significant.pool_for_aggregates.for_each_object_and_id([&](const auto& enco_agg, const entity_id id) {
 		const const_entity_handle enco_entity = enco.get_handle(id);
 #if COSMOS_TRACKS_GUIDS
 		const auto stream_written_id = enco_entity.get_guid();
@@ -104,15 +104,6 @@ bool cosmic_delta::encode(
 		const auto stream_written_id = id;
 #endif
 
-		using aggregate_type = typename std::decay_t<decltype(agg)>::component_id_tuple;
-		aggregate_type base_components;
-		
-		if (!is_new){
-			base_components = base_entity.get().component_ids;
-		}
-
-		const auto enco_components = agg.component_ids;
-
 		bool has_entity_changed = false;
 
 		std::array<bool, COMPONENTS_COUNT> overridden_components;
@@ -122,34 +113,29 @@ bool cosmic_delta::encode(
 
 		augs::stream new_content;
 		
-		augs::introspect(
-			[&agg, &base, &enco, &has_entity_changed, &new_content, &overridden_components, &removed_components](
-				auto label,
-				const auto& base_id, 
-				const auto& enco_id
-			) {
-				using encoded_id_type = std::decay_t<decltype(enco_id)>;
-				using component_type = typename encoded_id_type::element_type;
+		for_each_component_type(
+			[&base, &enco, base_entity, is_new, enco_entity, &has_entity_changed, &new_content, &overridden_components, &removed_components](auto c) {
+				using component_type = decltype(c);
 		
 				// guid components is handled separately by the cosmos
 
 				if constexpr(!std::is_same_v<component_type, components::guid>) {
-					constexpr size_t idx = index_in_list_v<encoded_id_type, decltype(agg.component_ids)>;
+					constexpr size_t idx = component_index_v<component_type>;
 		
-					const auto base_c = base.get_component_pool<component_type>()[base_id];
-					const auto enco_c = enco.get_component_pool<component_type>()[enco_id];
+					const auto maybe_base = is_new ? nullptr : base_entity.allocator::template find<component_type>();
+					const auto maybe_enco = enco_entity.allocator::template find<component_type>();
 		
-					if (enco_c.dead() && base_c.dead()) {
+					if (!maybe_enco && !maybe_base) {
 						return;
 					}
-					else if (enco_c.dead() && base_c.alive()) {
+					else if (!maybe_enco && maybe_base) {
 						has_entity_changed = true;
 						removed_components[idx] = true;
 						return;
 					}
-					else if (enco_c.alive() && base_c.dead()) {
+					else if (maybe_enco && !maybe_base) {
 						component_type base_compo;
-						component_type enco_compo = enco_c.get();
+						component_type enco_compo = *maybe_enco;
 		
 						transform_component_ids_to_guids_in_place(enco_compo, enco);
 		
@@ -159,8 +145,8 @@ bool cosmic_delta::encode(
 						overridden_components[idx] = true;
 					}
 					else {
-						component_type base_compo = base_c.get();
-						component_type enco_compo = enco_c.get();
+						component_type base_compo = *maybe_base;
+						component_type enco_compo = *maybe_enco;
 		
 						transform_component_ids_to_guids_in_place(base_compo, base);
 						transform_component_ids_to_guids_in_place(enco_compo, enco);
@@ -171,9 +157,7 @@ bool cosmic_delta::encode(
 						}
 					}
 				}
-			},
-			base_components,
-			enco_components
+			}
 		);
 
 		if (is_new) {
@@ -312,26 +296,20 @@ void cosmic_delta::decode(
 	}
 
 	for(const auto new_entity_id : new_entities_ids) {
-		static entity_name_type debug_name = L"new_entity_handle";
-		const auto new_entity = entity_handle(deco, new_entity_id, debug_name);
+		const auto new_entity = deco[new_entity_id];
 
 		std::array<bool, COMPONENTS_COUNT> overridden_components;
 
 		augs::read_flags(in, overridden_components);
 
-		const auto& agg = new_entity.get();
-		const auto& deco_components = agg.component_ids;
-
-		for_each_through_std_get(
-			deco_components,
-			[&agg, &overridden_components, &new_entity, &in, &deco](const auto& deco_id) {
-				using encoded_id_type = std::decay_t<decltype(deco_id)>;
-				using component_type = typename encoded_id_type::element_type;
+		for_each_component_type(
+			[&overridden_components, &new_entity, &in, &deco](auto c) {
+				using component_type = decltype(c);
 		
 				// guid components is handled separately by the cosmos
 
 				if constexpr(!std::is_same_v<component_type, components::guid>) {
-					constexpr std::size_t idx = index_in_list_v<encoded_id_type, decltype(agg.component_ids)>;
+					constexpr size_t idx = component_index_v<component_type>;
 					
 					if (overridden_components[idx]) {
 						component_type decoded_component;
@@ -339,7 +317,7 @@ void cosmic_delta::decode(
 						augs::read_delta(decoded_component, in, true);
 						transform_component_guids_to_ids_in_place(decoded_component, deco);
 		
-						new_entity.allocator::add(decoded_component);
+						new_entity.allocator::template add(decoded_component);
 					}
 				}
 			}
@@ -362,45 +340,35 @@ void cosmic_delta::decode(
 		augs::read_flags(in, overridden_components);
 		augs::read_flags(in, removed_components);
 
-		const auto& agg = changed_entity.get();
-		const auto& deco_components = agg.component_ids;
-
-		for_each_through_std_get(
-			deco_components,
-			[&agg, &overridden_components, &removed_components, &in, &deco, &changed_entity](const auto& deco_id) {
-				using encoded_id_type = std::decay_t<decltype(deco_id)>;
-				using component_type = typename encoded_id_type::element_type;
+		for_each_component_type(
+			[&overridden_components, &removed_components, &in, &deco, &changed_entity](auto c) {
+				using component_type = decltype(c);
 		
-				if (std::is_same<component_type, components::guid>::value) {
-					return;
-				}
-				
-				constexpr size_t idx = index_in_list_v<encoded_id_type, decltype(agg.component_ids)>;
+				if constexpr(!std::is_same_v<component_type, components::guid>) {
+					constexpr size_t idx = component_index_v<component_type>;
 		
-				if (overridden_components[idx]) {
-					const auto deco_c = deco.get_component_pool<component_type>()[deco_id];
-		
-					if (deco_c.dead()) {
-						component_type decoded_component;
-		
-						augs::read_delta(decoded_component, in, true);
+					if (overridden_components[idx]) {
+						const auto maybe_component = changed_entity.allocator::template find<component_type>();
 						
-						transform_component_guids_to_ids_in_place(decoded_component, deco);
-						
-						changed_entity.allocator::add(decoded_component);
-					}
-					else {
-						component_type decoded_component = deco_c.get();
+						if (maybe_component == nullptr) {
+							component_type decoded_component;
 		
-						transform_component_ids_to_guids_in_place(decoded_component, deco);
-						augs::read_delta(decoded_component, in);
-						transform_component_guids_to_ids_in_place(decoded_component, deco);
-		
-						changed_entity.allocator::get<component_type>() = decoded_component;
+							augs::read_delta(decoded_component, in, true);
+							
+							transform_component_guids_to_ids_in_place(decoded_component, deco);
+							changed_entity.allocator::template add(decoded_component);
+						}
+						else {
+							transform_component_ids_to_guids_in_place(*maybe_component, deco);
+							augs::read_delta(*maybe_component, in);
+							transform_component_guids_to_ids_in_place(*maybe_component, deco);
+						}
 					}
-				}
-				else if (removed_components[idx]) {
-					changed_entity.remove<component_type>();
+					else if (removed_components[idx]) {
+						if constexpr(!is_component_fundamental_v<component_type>) {
+							changed_entity.allocator::template remove<component_type>();
+						}
+					}
 				}
 			}
 		);

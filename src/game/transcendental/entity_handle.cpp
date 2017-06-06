@@ -34,9 +34,16 @@ std::ostream& operator<<(std::ostream& out, const const_entity_handle &x) {
 	return out << typesafe_sprintf("%x %x", to_string(x.get_name()), x.get_id());
 }
 
+
 template <bool C>
-template <bool, class>
+template <class>
 basic_entity_handle<C> basic_entity_handle<C>::add_standard_components(const logic_step step) const {
+	return add_standard_components(step, true);
+}
+
+template <bool C>
+template <class>
+basic_entity_handle<C> basic_entity_handle<C>::add_standard_components(const logic_step step, const bool activate_inferred) const {
 	if (dead()) {
 		return *this;
 	}
@@ -87,17 +94,17 @@ basic_entity_handle<C> basic_entity_handle<C>::add_standard_components(const log
 		ensure(has<components::sender>());
 	}
 
-	recalculate_basic_processing_categories<false, void>();
+	recalculate_basic_processing_categories();
 	
-	if (!has<components::all_inferred_state>()) {
-		add(components::all_inferred_state());
+	if (activate_inferred) {
+		get<components::all_inferred_state>().set_activated(true);
 	}
 
 	return *this;
 }
 
 template <bool C>
-template <bool, class>
+template <class>
 void basic_entity_handle<C>::recalculate_basic_processing_categories() const {
 	ensure(alive());
 	const auto default_processing = components::processing::get_default(*this);
@@ -111,5 +118,6 @@ void basic_entity_handle<C>::recalculate_basic_processing_categories() const {
 }
 
 // explicit instantiation
-template basic_entity_handle<false> basic_entity_handle<false>::add_standard_components<false, void>(const logic_step) const;
-template void basic_entity_handle<false>::recalculate_basic_processing_categories<false, void>() const;
+template basic_entity_handle<false> basic_entity_handle<false>::add_standard_components<void>(const logic_step, const bool) const;
+template basic_entity_handle<false> basic_entity_handle<false>::add_standard_components<void>(const logic_step) const;
+template void basic_entity_handle<false>::recalculate_basic_processing_categories<void>() const;

@@ -6,7 +6,9 @@
 #include "augs/misc/enum_boolset.h"
 
 namespace components {
-	struct processing : synchronizable_component {
+	struct processing {
+		static constexpr bool is_synchronized = true;
+
 		using flagset_type = augs::enum_boolset<processing_subjects>;
 		
 		// GEN INTROSPECTOR struct components::processing

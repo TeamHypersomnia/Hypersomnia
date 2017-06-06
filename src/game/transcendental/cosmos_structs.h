@@ -33,7 +33,7 @@ class cosmos_significant_state {
 	friend struct augs::introspection_access;
 
 	typename cosmos_base::aggregate_pool_type pool_for_aggregates;
-	typename cosmos_base::component_pools_type pools_for_components;
+	typename cosmos_base::dynamic_component_pools_type pools_for_components;
 public:
 	cosmos_metadata meta;
 	// END GEN INTROSPECTOR

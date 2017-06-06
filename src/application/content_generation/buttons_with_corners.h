@@ -4,6 +4,7 @@
 #include "augs/padding_byte.h"
 
 struct button_with_corners_stamp {
+	// GEN INTROSPECTOR struct button_with_corners_stamp
 	rgba border_color;
 	rgba inside_color;
 
@@ -13,6 +14,7 @@ struct button_with_corners_stamp {
 	unsigned inside_border_padding = 0u;
 	bool make_lb_complement = false;
 	pad_bytes<3> pad;
+	// END GEN INTROSPECTOR
 };
 
 void regenerate_buttons_with_corners(

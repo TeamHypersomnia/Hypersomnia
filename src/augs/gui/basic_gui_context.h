@@ -27,7 +27,7 @@ namespace augs {
 				return tree.at(id);
 			}
 			
-			template<class id_type, bool _is_const = is_const_ref_v<rect_tree_entry_ref>, class = std::enable_if_t<!_is_const>>
+			template <class id_type, class = std::enable_if_t<!is_const_ref_v<rect_tree_entry_ref>>>
 			rect_tree_entry_ref make_tree_entry(const id_type& id) const {
 				//ensure(tree.find(id) == tree.end()) 
 				
@@ -49,33 +49,17 @@ namespace augs {
 				return !alive(id);
 			}
 
-			bool alive(gui_element_variant_id& id) const {
-				const auto& const_id = id;
-
-				if (!alive(const_id)) {
-					id = gui_element_variant_id();
-
-					return false;
-				}
-
-				return true;
-			}
-
-			bool dead(gui_element_variant_id& id) const {
-				return !alive(id);
-			}
-
 			template <class T>
 			auto dereference_location(const T& location) const {
 				const auto& self = *static_cast<const derived*>(this);
 				
-				typedef decltype(location.dereference(self)) dereferenced_ptr;
+				using dereferenced_ptr = decltype(location.dereference(self));
 
 				if (location.alive(self)) {
-					return make_dereferenced_location( location.dereference(self), location );
+					return make_dereferenced_location(location.dereference(self), location);
 				}
 
-				return make_dereferenced_location(static_cast<dereferenced_ptr>(nullptr), location );
+				return make_dereferenced_location(static_cast<dereferenced_ptr>(nullptr), location);
 			}
 
 			template <class L>
@@ -103,42 +87,5 @@ namespace augs {
 				return dereferenced_location_type();
 			}
 		};
-
-		//template <class gui_element_variant_id, bool is_const, class derived>
-		//class basic_context;
-		//
-		//template <class gui_element_variant_id, class derived>
-		//class basic_context<gui_element_variant_id, false, derived> : public basic_context_base<gui_element_variant_id, false, derived> {
-		//public:
-		//	typedef std::unordered_map<gui_element_variant_id, std::vector<event_info>> gui_entropy;
-		//	typedef gui_entropy& gui_entropy_ref;
-		//	typedef basic_context_base<gui_element_variant_id, false, derived> base;
-		//
-		//	typedef typename base::rect_world_ref rect_world_ref;
-		//	typedef typename base::tree_ref tree_ref;
-		//
-		//	using base::base;
-		//
-		//	gui_entropy entropy;
-		//
-		//	void generate_gui_event(const gui_element_variant_id& id, const event_info& in) {
-		//		entropy[id].push_back(in);
-		//	}
-		//
-		//	const std::vector<event_info>& get_entropy_for(const gui_element_variant_id& id) const {
-		//		return entropy.at(id);
-		//	}
-		//};
-		//
-		//template <class gui_element_variant_id, class derived>
-		//class basic_context<gui_element_variant_id, true, derived> : public basic_context_base<gui_element_variant_id, true, derived> {
-		//public:
-		//	typedef basic_context_base<gui_element_variant_id, true, derived> base;
-		//	
-		//	using base::base;
-		//
-		//	typedef typename base::rect_world_ref rect_world_ref;
-		//	typedef typename base::tree_ref tree_ref;
-		//};
 	}
 }

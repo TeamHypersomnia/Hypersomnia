@@ -2,15 +2,13 @@
 #include <iosfwd>
 
 #include "augs/templates/maybe_const.h"
-#include "augs/templates/is_component_synchronized.h"
+#include "augs/templates/component_traits.h"
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/templates/for_each_in_types.h"
 #include "augs/templates/list_ops.h"
 
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
 #include "game/transcendental/entity_handle_declaration.h"
-
-#include "augs/entity_system/component_aggregate.h"
 #include "augs/entity_system/component_setters_mixin.h"
 #include "augs/entity_system/component_allocators_mixin.h"
 #include "augs/misc/pool_handle.h"
@@ -24,15 +22,17 @@
 
 #include "game/enums/entity_flag.h"
 #include "augs/build_settings/setting_empty_bases.h"
-#include "augs/build_settings/setting_entity_handle_has_debug_name_reference.h"
 #include "game/transcendental/step_declaration.h"
 #include "game/components/name_component_declaration.h"
 
+template <class T>
+constexpr std::size_t component_index_v = index_in_list_v<T, put_all_components_into_t<type_list>>;
+
 template<class F>
-void for_each_component_type(F callback) {
+void for_each_component_type(F&& callback) {
 	for_each_through_std_get(
 		put_all_components_into_t<std::tuple>(), 
-		callback
+		std::forward<F>(callback)
 	);
 }
 
@@ -70,13 +70,12 @@ private:
 	template <bool, class> friend class relations_mixin;
 	template <bool, class> friend class basic_relations_mixin;
 
-	typedef maybe_const_ref_t<is_const, cosmos> owner_reference;
+	using owner_reference = maybe_const_ref_t<is_const, cosmos>;
+	using aggregate_ptr = maybe_const_ptr_t<is_const, put_all_components_into_t<augs::component_aggregate>>;
 
 	owner_reference owner;
 	entity_id raw_id;
-#if ENTITY_HANDLE_HAS_DEBUG_NAME_REFERENCE
-	const entity_name_type& debug_name;
-#endif
+	aggregate_ptr ptr;
 
 	typedef augs::component_allocators_mixin<is_const, basic_entity_handle<is_const>> allocator;
 
@@ -113,7 +112,7 @@ private:
 	};
 
 	template <class T>
-	struct component_or_synchronizer_or_disabled<T, std::enable_if_t<is_component_synchronized<T>>> {
+	struct component_or_synchronizer_or_disabled<T, std::enable_if_t<is_component_synchronized_v<T>>> {
 		typedef component_synchronizer<is_const, T> return_type;
 
 		basic_entity_handle<is_const> h;
@@ -144,40 +143,18 @@ private:
 	template<class T>
 	using component_or_synchronizer_t = typename component_or_synchronizer_or_disabled<T>::return_type;
 
-	decltype(auto) get_aggregate_pool() const {
-		return owner.get_aggregate_pool();
-	}
-
-	decltype(auto) get() const {
-		return get_aggregate_pool().get(raw_id);
+	auto& get() const {
+		return *ptr;
 	}
 
 public:
-	basic_entity_handle(
-		owner_reference owner,
-		const entity_id raw_id,
-		const entity_name_type& custom_debug_name
-	) : 
-		raw_id(raw_id), 
-		owner(owner) 
-#if ENTITY_HANDLE_HAS_DEBUG_NAME_REFERENCE
-		, debug_name(custom_debug_name)
-#endif
-	{
-
-	}
-
-	static entity_name_type dead_entity_name;
-
 	basic_entity_handle(
 		owner_reference owner, 
 		const entity_id raw_id
 	) : 
 		raw_id(raw_id), 
-		owner(owner) 
-#if ENTITY_HANDLE_HAS_DEBUG_NAME_REFERENCE
-		, debug_name(alive() ? get_name() : dead_entity_name)
-#endif
+		owner(owner),
+		ptr(owner.get_aggregate_pool().find(raw_id))
 	{
 
 	}
@@ -193,7 +170,7 @@ public:
 	}
 
 	bool alive() const {
-		return get_aggregate_pool().alive(get_id());
+		return ptr != nullptr;
 	}
 
 	bool dead() const {
@@ -212,7 +189,7 @@ public:
 		return raw_id != id;
 	}
 
-	template <bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
+	template <class = std::enable_if_t<!is_const>>
 	operator const_entity_handle() const {
 		return const_entity_handle(this->owner, this->raw_id);
 	}
@@ -243,7 +220,7 @@ public:
 		return component_or_synchronizer_or_disabled<component>({ *this }).get();
 	}
 
-	template<class component, bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
+	template<class component, class = std::enable_if_t<!is_const>>
 	decltype(auto) add(const component& c) const {
 		check_component_type<component>();
 		ensure(alive());
@@ -251,7 +228,7 @@ public:
 		return get<component>();
 	}
 
-	template<class component, bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
+	template<class component, class = std::enable_if_t<!is_const>>
 	decltype(auto) add(const component_synchronizer<is_const, component>& c) const {
 		check_component_type<component>();
 		ensure(alive());
@@ -266,17 +243,20 @@ public:
 		return component_or_synchronizer_or_disabled<component>({ *this }).find();
 	}
 
-	template<class component, bool _is_const = is_const, typename = std::enable_if_t<!_is_const>>
+	template<class component, class = std::enable_if_t<!is_const>>
 	void remove() const {
 		check_component_type<component>();
 		ensure(alive());
 		return component_or_synchronizer_or_disabled<component>({ *this }).remove();
 	}
 
-	template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
+	template <class = std::enable_if_t<!is_const>>
+	basic_entity_handle<is_const> add_standard_components(const logic_step step, const bool activate_inferred) const;
+
+	template <class = std::enable_if_t<!is_const>>
 	basic_entity_handle<is_const> add_standard_components(const logic_step step) const;
 
-	template <bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
+	template <class = std::enable_if_t<!is_const>>
 	void recalculate_basic_processing_categories() const;
 
 	bool get_flag(const entity_flag f) const {
@@ -290,7 +270,7 @@ public:
 		return from.values.test(f);
 	}
 
-	template <bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
+	template <class = std::enable_if_t<!is_const>>
 	void set_flag(const entity_flag f) const {
 		ensure(alive());
 		if (!has<components::flags>()) {
@@ -300,7 +280,7 @@ public:
 		get<components::flags>().values.set(f, true);
 	}
 
-	template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
+	template<class = std::enable_if_t<!is_const>>
 	void unset_flag(const entity_flag f) const {
 		ensure(alive());
 		if (!has<components::flags>()) {
@@ -311,14 +291,21 @@ public:
 	}
 
 	template <class F>
-	void for_each_component(F callback) const {
-		const auto& ids = get().component_ids;
+	void for_each_component(F&& callback) const {
+		auto& self = get();
+		const auto& ids = self.component_ids;
+		auto& fundamentals = self.fundamentals;
 		auto& cosm = get_cosmos();
+
+		for_each_through_std_get(
+			fundamentals,
+			std::forward<F>(callback)
+		);
 
 		for_each_through_std_get(
 			ids,
 			[&](const auto& id) {
-				typedef typename std::decay_t<decltype(id)>::element_type component_type;
+				using component_type = typename std::decay_t<decltype(id)>::element_type;
 				const auto component_handle = cosm.get_component_pool<component_type>().get_handle(id);
 
 				if (component_handle.alive()) {
@@ -336,7 +323,7 @@ public:
 		return get<components::name>().get_name();
 	}
 
-	template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
+	template<class = std::enable_if_t<!is_const>>
 	void set_name(const entity_name_type& new_name) const {	
 		get<components::name>().set_name(new_name);
 	}
@@ -375,6 +362,3 @@ inline size_t make_cache_id(const unversioned_entity_id id) {
 inline size_t make_cache_id(const const_entity_handle handle) {
 	return make_cache_id(handle.get_id());
 }
-
-template <bool C>
-entity_name_type basic_entity_handle<C>::dead_entity_name = L"Dead entity";

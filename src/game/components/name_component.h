@@ -1,7 +1,6 @@
 #pragma once
 #include "augs/zeroed_pod.h"
 #include "game/transcendental/component_synchronizer.h"
-#include "augs/templates/is_component_synchronized.h"
 
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
@@ -15,7 +14,10 @@ namespace augs {
 class entity_name_meta;
 
 namespace components {
-	struct name : synchronizable_component {
+	struct name {
+		static constexpr bool is_fundamental = true;
+		static constexpr bool is_synchronized = true;
+
 		friend struct augs::introspection_access;
 		// GEN INTROSPECTOR struct components::name
 		entity_name_id name_id = 0u;

@@ -6,8 +6,7 @@ namespace augs {
 	public:
 		template <
 			class component, 
-			bool _is_const = is_const,
-			class = std::enable_if_t<!_is_const>
+			class = std::enable_if_t<!is_const>
 		>
 		void set(const component& c) const {
 			auto& self = *static_cast<const derived_entity_handle*>(this);
@@ -22,8 +21,7 @@ namespace augs {
 
 		template<
 			class component, 
-			bool _is_const = is_const,
-			class = std::enable_if_t<!_is_const>
+			class = std::enable_if_t<!is_const>
 		>
 		decltype(auto) operator+=(const component& c) const {
 			auto& self = *static_cast<const derived_entity_handle*>(this);
@@ -32,8 +30,7 @@ namespace augs {
 
 		template<
 			class... added_components, 
-			bool _is_const = is_const,
-			class = std::enable_if_t<!_is_const>
+			class = std::enable_if_t<!is_const>
 		>
 		void set(added_components... args) const {
 			auto components_tuple = std::make_tuple(args...);

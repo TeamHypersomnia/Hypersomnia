@@ -28,8 +28,8 @@ void relations_mixin<false, D>::make_cloned_child_entities_recursive(const entit
 
 	const const_entity_handle from = cosmos[from_id];
 
-	for_each_component_type([&](auto dum) {
-		typedef decltype(dum) component_type;
+	for_each_component_type([&](auto c) {
+		using component_type = decltype(c);
 		
 		if (self.has<component_type>()) {
 			auto& cloned_to_component = self.allocator::template get<component_type>();
@@ -124,7 +124,7 @@ D basic_relations_mixin<C, D>::get_owner_body() const {
 template <bool C, class D>
 entity_guid basic_relations_mixin<C, D>::get_guid() const {
 	auto& self = *static_cast<const D*>(this);
-	return self.get<components::guid>().value;
+	return self.get<components::guid>().get_value();
 }
 #endif
 

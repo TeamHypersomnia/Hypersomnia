@@ -9,10 +9,7 @@ entity_id get_first_named_ancestor(const const_entity_handle p) {
 	const auto& cosmos = p.get_cosmos();
 
 	while (cosmos[iterator].alive()) {
-		if (
-			cosmos[iterator].has<components::name>() 
-			&& cosmos[iterator].get<components::name>().get_name_id() != 0
-		) {
+		if (cosmos[iterator].get<components::name>().get_name_id() != 0) {
 			return iterator;
 		}
 

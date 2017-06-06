@@ -3,9 +3,12 @@
 #include "game/transcendental/component_synchronizer.h"
 
 namespace components {
-	struct all_inferred_state : synchronizable_component {
+	struct all_inferred_state {
+		static constexpr bool is_fundamental = true;
+		static constexpr bool is_synchronized = true;
+
 		// GEN INTROSPECTOR struct components::all_inferred_state
-		bool activated = true;
+		bool activated = false;
 		pad_bytes<3> pad;
 		// END GEN INTROSPECTOR
 	};
@@ -16,31 +19,16 @@ class basic_all_inferred_state_synchronizer : public component_synchronizer_base
 public:
 	using component_synchronizer_base<is_const, components::all_inferred_state>::component_synchronizer_base;
 
-	auto get_radius() const {
-		return get_data().radius;
-	}
-
-	bool is_activated() const {
-		return get_data().activated;
-	}
+	bool is_activated() const;
 };
 
 template<>
 class component_synchronizer<false, components::all_inferred_state> : public basic_all_inferred_state_synchronizer<false> {
-	void reinference() const {
-		handle.get_cosmos().complete_reinference(handle);
-	}
+	void reinference() const;
 public:
 	using basic_all_inferred_state_synchronizer<false>::basic_all_inferred_state_synchronizer;
 
-	void set_activated(const bool flag) const {
-		if (flag == get_data().activated) {
-			return;
-		}
-
-		get_data().activated = flag;
-		reinference();
-	}
+	void set_activated(const bool flag) const;
 };
 
 template<>

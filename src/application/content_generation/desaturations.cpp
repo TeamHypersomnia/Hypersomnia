@@ -12,7 +12,7 @@
 void regenerate_desaturations(
 	const bool force_regenerate
 ) {
-	const auto desaturations_directory = "generated/desaturations/";
+	const std::string desaturations_directory = "generated/desaturations/";
 
 	augs::create_directories(desaturations_directory);
 
@@ -20,10 +20,9 @@ void regenerate_desaturations(
 	size_t current_line = 0;
 
 	while (current_line < lines.size()) {
-		desaturation_stamp new_stamp;
-
 		const auto source_path = lines[current_line];
 
+		desaturation_stamp new_stamp;
 		new_stamp.last_write_time_of_source = augs::last_write_time(source_path);
 
 		const auto desaturation_path = desaturations_directory + augs::get_filename(source_path);

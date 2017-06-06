@@ -10,19 +10,30 @@ namespace augs {
 	template <class derived, class... components>
 	class operations_on_all_components_mixin {
 	public:
-		typedef component_aggregate<components...> aggregate_type;
-		typedef pooled_object_id<aggregate_type> aggregate_id;
+		using aggregate_type = component_aggregate<components...>;
+		using aggregate_id = pooled_object_id<aggregate_type>;
 
-		typedef pool<aggregate_type> aggregate_pool_type;
-		typedef std::tuple<pool<components>...> component_pools_type;
+		using dynamic_component_pools_type = 
+			replace_list_type_t<
+				transform_types_in_list_t<
+					typename aggregate_type::dynamic_components_list,
+					augs::make_pool
+				>, 
+			std::tuple
+		>;
 
-		void reserve_storage_for_all_components(const size_t n) {
+		using aggregate_pool_type = pool<aggregate_type>;
+
+		void reserve_storage_for_all_components(const std::size_t n) {
 			auto& self = *static_cast<derived*>(this);
 
 			auto r = [&self, n](auto c) {
 				using component = decltype(c);
-				auto& component_pool = self.template get_component_pool<component>();
-				component_pool.initialize_space(n);
+
+				if constexpr(!is_component_fundamental_v<component>) {
+					auto& component_pool = self.template get_component_pool<component>();
+					component_pool.initialize_space(n);
+				}
 			};
 
 			for_each_type<components...>(r);
@@ -36,16 +47,19 @@ namespace augs {
 			for_each_type<components...>([&from, &into](auto c) {
 				using component = decltype(c);
 
-				if (is_one_of_v<component, excluded_components...>) {
-					return;
-				}
-
-				if (from.allocator::template has<component>()) {
-					if (into.allocator::template has<component>()) {
+				if constexpr(!is_one_of_v<component, excluded_components...>) {
+					if constexpr(is_component_fundamental_v<component>) {
 						into.allocator::template get<component>() = from.allocator::template get<component>();
 					}
 					else {
-						into.allocator::template add<component>(from.allocator::template get<component>());
+						if (from.allocator::template has<component>()) {
+							if (into.allocator::template has<component>()) {
+								into.allocator::template get<component>() = from.allocator::template get<component>();
+							}
+							else {
+								into.allocator::template add<component>(from.allocator::template get<component>());
+							}
+						}
 					}
 				}
 			});
@@ -58,8 +72,10 @@ namespace augs {
 			for_each_type<components...>([&](auto c) {
 				typedef decltype(c) component;
 
-				if(handle.allocator::template has<component>()) {
-					handle.allocator::template remove<component>();
+				if constexpr(!is_component_fundamental_v<component>) {
+					if (handle.allocator::template has<component>()) {
+						handle.allocator::template remove<component>();
+					}
 				}
 			});
 		}

@@ -15,7 +15,7 @@
 void regenerate_polygonizations_of_images(
 	const bool force_regenerate
 ) {
-	const auto polygonizations_directory = "generated/polygonizations_of_images/";
+	const std::string polygonizations_directory = "generated/polygonizations_of_images/";
 
 	augs::create_directories(polygonizations_directory);
 
@@ -30,6 +30,7 @@ void regenerate_polygonizations_of_images(
 
 		++current_line;
 		
+		ensure(current_line < lines.size());
 		const auto target_filename = lines[current_line];
 		
 		++current_line;

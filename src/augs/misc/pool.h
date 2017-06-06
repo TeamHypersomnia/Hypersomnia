@@ -213,6 +213,14 @@ namespace augs {
 			return pooled[get_real_index(object)];
 		}
 
+		T* find(const id_type object) {
+			return alive(object) ? &get(object) : nullptr; 
+		}
+
+		const T* find(const id_type object) const {
+			return alive(object) ? &get(object) : nullptr; 
+		}
+
 		bool alive(const id_type object) const {
 			return object.indirection_index >= 0 && indirectors[object.indirection_index].version == object.version;
 		}

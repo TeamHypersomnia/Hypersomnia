@@ -17,7 +17,9 @@ struct motor_joint_cache;
 struct b2Fixture_index_in_component;
 
 namespace components {
-	struct motor_joint : synchronizable_component {
+	struct motor_joint {
+		static constexpr bool is_synchronized = true;
+
 		// GEN INTROSPECTOR struct components::motor_joint
 		std::array<entity_id, 2> target_bodies;
 		

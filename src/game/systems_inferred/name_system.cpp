@@ -25,11 +25,13 @@ void name_system::create_inferred_state_for(const entity_id id, const components
 }
 
 void name_system::destroy_inferred_state_of(const entity_id id, const components::name& name) {
-	auto& entities_with_this_name_id = entities_by_name_id[name.name_id];
+	const auto this_name_id = name.name_id;
+	auto& entities_with_this_name_id = entities_by_name_id[this_name_id];
+
 	erase_element(entities_with_this_name_id, id);
 
 	if (entities_with_this_name_id.empty()) {
-		entities_by_name_id.erase(name.name_id);
+		erase_element(entities_by_name_id, this_name_id);
 	}
 }
 

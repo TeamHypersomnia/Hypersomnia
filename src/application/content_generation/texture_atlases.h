@@ -15,8 +15,8 @@ struct atlases_regeneration_input {
 	std::vector<source_image_loading_input> images;
 };
 
-typedef std::chrono::system_clock::time_point texture_atlas_image_stamp;
-typedef std::chrono::system_clock::time_point texture_atlas_font_stamp;
+using texture_atlas_image_stamp = std::chrono::system_clock::time_point;
+using texture_atlas_font_stamp = std::chrono::system_clock::time_point;
 
 struct texture_atlas_stamp {
 	// GEN INTROSPECTOR struct texture_atlas_stamp

@@ -27,7 +27,7 @@ void action_button::draw(
 
 	if (bound_key != augs::window::event::keys::key::INVALID) {
 		const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
-		const auto bound_spell = this_id->get_bound_spell(context, this_id);
+		const auto bound_spell = get_bound_spell(context, this_id);
 
 		if (bound_spell.is_set()) {
 			visit_list(
@@ -243,7 +243,7 @@ void action_button::respond_to_events(
 		this_id->detector.update_appearance(info);
 
 		if (info.msg == gui_event::lclick) {
-			const auto bound_spell = this_id->get_bound_spell(context, this_id);
+			const auto bound_spell = get_bound_spell(context, this_id);
 			
 			if (bound_spell.is_set()) {
 				context.get_gui_element_system().spell_requests[context.get_gui_element_entity()] = bound_spell;

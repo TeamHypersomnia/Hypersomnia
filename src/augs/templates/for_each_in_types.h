@@ -44,7 +44,12 @@ void for_each_through_std_get(List&& t, F f) {
 	);
 }
 
-template <class... Ts, class F>
+
+template <class F>
+void for_each_type(F&&) {}
+
+template <class T, class... Ts, class F>
 void for_each_type(F&& f) {
-	for_each_through_std_get(std::tuple<Ts...>(), std::forward<F>(f));
+	f(T());
+	for_each_type<Ts...>(std::forward<F>(f));
 }

@@ -5,7 +5,9 @@
 #include <chrono>
 
 struct polygonization_of_image_stamp {
+	// GEN INTROSPECTOR struct polygonization_of_image_stamp
 	std::chrono::system_clock::time_point last_write_time_of_source;
+	// END GEN INTROSPECTOR
 };
 
 void regenerate_polygonizations_of_images(

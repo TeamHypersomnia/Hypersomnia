@@ -49,7 +49,7 @@ atlases_regeneration_output regenerate_atlases(
 
 	const auto& manager = get_assets_manager();
 
-	const auto atlases_directory = std::string("generated/atlases/");
+	const std::string atlases_directory = "generated/atlases/";
 
 	for (const auto& input_for_this_atlas : per_atlas_inputs) {
 		const auto atlas_stem = typesafe_sprintf("%x", static_cast<int>(input_for_this_atlas.first));

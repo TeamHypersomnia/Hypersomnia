@@ -201,6 +201,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/assets/particle_effect.cpp"
 	"src/game/assets/physical_material.cpp"
 	"src/game/assets/tile_layer.cpp"
+	"src/game/components/all_inferred_state_component.cpp"
 	"src/game/components/flags_component.cpp"
 	"src/game/components/light_component.cpp"
 	"src/game/components/rigid_body_component.cpp"
@@ -460,6 +461,7 @@ endif()
 # We configure additional flags for the compiler.
 
 set(HYPERSOMNIA_CXX_FLAGS "/MP /Gm- /fp:strict /bigobj")
+set(HYPERSOMNIA_CXX_DEBUG_FLAGS " ")
 set(HYPERSOMNIA_CXX_RELEASE_FLAGS "/Ob2 /GL /Oi")
 set(HYPERSOMNIA_CXX_RELWITHDEBINFO_FLAGS "/Ob2 /GL /Oi")
 
@@ -519,6 +521,10 @@ set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO
 
 set(CMAKE_CXX_FLAGS 
  "${CMAKE_CXX_FLAGS} ${HYPERSOMNIA_CXX_FLAGS}"
+)
+
+set(CMAKE_CXX_FLAGS_DEBUG 
+ "${CMAKE_CXX_FLAGS_DEBUG} ${HYPERSOMNIA_CXX_DEBUG_FLAGS}"
 )
 
 set(CMAKE_CXX_FLAGS_RELEASE 

@@ -18,6 +18,9 @@
 #include "game/assets/behaviour_tree_id.h"
 #include "game/assets/behaviour_tree.h"
 
+#include "game/transcendental/types_specification/all_fundamental_component_includes.h"
+#include "augs/entity_system/component_aggregate.h"
+
 #include "game/transcendental/cosmic_entropy.h"
 #include "game/transcendental/cosmic_profiler.h"
 #include "game/transcendental/types_specification/all_components_declaration.h"

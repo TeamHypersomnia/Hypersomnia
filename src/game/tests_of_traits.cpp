@@ -1,4 +1,6 @@
 #include "game/transcendental/cosmos.h"
+#include "game/transcendental/types_specification/all_component_includes.h"
+
 #include "augs/templates/predicate_templates.h"
 #include "augs/templates/get_index_type_for_size_of.h"
 
@@ -10,6 +12,7 @@
 #include "game/components/pathfinding_component.h"
 
 #include "augs/padding_byte.h"
+
 namespace templates_detail {
 	template <class T>
 	struct identity {
@@ -23,6 +26,8 @@ struct tests_of_traits {
 		&& alignof(entity_id) >= alignof(entity_guid),
 		"With given memory layouts, entity_id<->entity_guid substitution will not be possible in delta encoding"
 	);
+
+	static_assert(is_component_fundamental_v<components::name>);
 
 	static_assert(!is_padding_field_v<entity_id>);
 	static_assert(is_padding_field_v<pad_bytes<4>>);
@@ -98,9 +103,9 @@ struct tests_of_traits {
 		"Trait has failed"
 	);
 	
-	static_assert(std::is_same_v<filter_types<std::is_integral, double, int, float>::indices, std::index_sequence<1>>, "Trait has failed");
-	static_assert(std::is_same_v<filter_types<std::is_integral, double, int, float>::type, std::tuple<int>>, "Trait has failed");
-	static_assert(std::is_same_v<filter_types<std::is_integral, double, int, float>::get_type<0>::type, int>, "Trait has failed");
+	static_assert(std::is_same_v<filter_types_in_list<std::is_integral, type_list<double, int, float>>::indices, std::index_sequence<1>>, "Trait has failed");
+	static_assert(std::is_same_v<filter_types_in_list<std::is_integral, type_list<double, int, float>>::type, std::tuple<int>>, "Trait has failed");
+	static_assert(std::is_same_v<filter_types_in_list<std::is_integral, type_list<double, int, float>>::get_type<0>::type, int>, "Trait has failed");
 	
 	static_assert(is_one_of_list_v<unsigned, std::tuple<float, float, double, unsigned>>, "Trait has failed");
 	static_assert(!is_one_of_v<int, float, double>, "Trait has failed");
@@ -115,7 +120,7 @@ struct tests_of_traits {
 	
 	static_assert(
 		std::is_same_v<
-			filter_types<std::is_integral, int, double, float, unsigned>::type, 
+			filter_types_in_list<std::is_integral, type_list<int, double, float, unsigned>>::type, 
 			std::tuple<int, unsigned>
 		>, 
 		"Trait has failed"
@@ -123,7 +128,7 @@ struct tests_of_traits {
 	
 	static_assert(
 		std::is_same_v<
-			filter_types<std::is_integral, int, double, float, unsigned>::indices, 
+		filter_types_in_list<std::is_integral, type_list<int, double, float, unsigned>>::indices,
 			std::index_sequence<0, 3>
 		>, 
 		"Trait has failed"
@@ -131,7 +136,7 @@ struct tests_of_traits {
 	
 	static_assert(
 		!std::is_same_v<
-			filter_types<std::is_floating_point, int, double, float, unsigned>::type, 
+		filter_types_in_list<std::is_floating_point, type_list<int, double, float, unsigned>>::type,
 			std::tuple<int, unsigned>
 		>, 
 		"Trait has failed"

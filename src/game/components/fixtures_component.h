@@ -15,7 +15,9 @@
 #include "game/components/transform_component.h"
 
 namespace components {
-	struct fixtures : synchronizable_component {
+	struct fixtures {
+		static constexpr bool is_synchronized = true;
+
 		// GEN INTROSPECTOR struct components::fixtures
 
 		bool activated = true;

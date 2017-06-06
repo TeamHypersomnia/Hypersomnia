@@ -7,7 +7,9 @@
 #include "game/transcendental/component_synchronizer.h"
 
 namespace components {
-	struct shape_circle : synchronizable_component {
+	struct shape_circle {
+		static constexpr bool is_synchronized = true;
+
 		// GEN INTROSPECTOR struct components::shape_circle
 		float radius = 0.f;
 		bool activated = true;

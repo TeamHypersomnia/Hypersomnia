@@ -235,13 +235,7 @@ void cosmos::set_fixed_delta(const unsigned steps_per_second) {
 }
 
 entity_handle cosmos::allocate_new_entity() {
-	thread_local std::wstring debug_name(L"Freshly allocated");
-
-	auto pooled_object_raw_id = get_aggregate_pool().allocate();
-
-	const auto handle = entity_handle(*this, pooled_object_raw_id, debug_name);
-	handle += components::guid();
-	return handle;
+	return { *this, get_aggregate_pool().allocate() };
 }
 
 entity_handle cosmos::create_entity(const std::string& name) {
@@ -250,7 +244,6 @@ entity_handle cosmos::create_entity(const std::string& name) {
 
 entity_handle cosmos::create_entity(const std::wstring& name_str) {
 	auto new_entity = allocate_new_entity();
-	new_entity += components::name();
 	new_entity.set_name(name_str);
 
 #if COSMOS_TRACKS_GUIDS
@@ -284,14 +277,18 @@ entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
 	const auto new_entity = allocate_new_entity();
 	
 	clone_all_components_except<
-		components::guid,
 		/*
 			These components will be cloned shortly,
 			with due care to each of them.
 		*/
-		components::all_inferred_state,
 		components::fixtures,
-		components::child
+		components::child,
+
+		/*
+			Let us keep the inferred state of the new entity disabled for a while,
+			to avoid unnecessary reinference.
+		*/
+		components::all_inferred_state
 	>(new_entity, source_entity);
 
 #if COSMOS_TRACKS_GUIDS
@@ -338,8 +335,8 @@ entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
 		}
 	}
 
-	if (source_entity.has<components::all_inferred_state>()) {
-		new_entity.add(source_entity.get<components::all_inferred_state>());
+	if (source_entity.is_inferred_state_activated()) {
+		new_entity.get<components::all_inferred_state>().set_activated(true);
 	}
 
 	return new_entity;
@@ -350,12 +347,12 @@ void cosmos::delete_entity(const entity_id e) {
 	
 	ensure(handle.alive());
 
-	const auto inferred = handle.find<components::all_inferred_state>();
-
-	const bool should_deactivate_inferred_state_to_avoid_repeated_reinference = inferred != nullptr;
+	const bool should_deactivate_inferred_state_to_avoid_repeated_reinference 
+		= handle.is_inferred_state_activated()
+	;
 
 	if (should_deactivate_inferred_state_to_avoid_repeated_reinference) {
-		inferred.set_activated(false);
+		handle.get<components::all_inferred_state>().set_activated(false);
 	}
 
 #if COSMOS_TRACKS_GUIDS
