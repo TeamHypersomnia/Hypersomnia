@@ -1,6 +1,6 @@
 #pragma once
 #ifdef PLATFORM_WINDOWS
-#define EMPTY_BASES __declspec(empty_bases)
+#define EMPTY_BASES
 #else
 #define EMPTY_BASES
 #endif

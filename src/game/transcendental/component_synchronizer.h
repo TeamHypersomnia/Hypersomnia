@@ -18,6 +18,10 @@ protected:
 	}
 
 public:
+	auto get_handle() const {
+		return handle;
+	}
+
 	component_type get_raw_component() const {
 		return *component;
 	}

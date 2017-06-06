@@ -105,6 +105,12 @@ basic_entity_handle<C> basic_entity_handle<C>::add_standard_components(const log
 
 template <bool C>
 template <class>
+void basic_entity_handle<C>::set_name(const entity_name_type& new_name) const {
+	get<components::name>().set_name(new_name);
+}
+
+template <bool C>
+template <class>
 void basic_entity_handle<C>::recalculate_basic_processing_categories() const {
 	ensure(alive());
 	const auto default_processing = components::processing::get_default(*this);
@@ -120,4 +126,5 @@ void basic_entity_handle<C>::recalculate_basic_processing_categories() const {
 // explicit instantiation
 template basic_entity_handle<false> basic_entity_handle<false>::add_standard_components<void>(const logic_step, const bool) const;
 template basic_entity_handle<false> basic_entity_handle<false>::add_standard_components<void>(const logic_step) const;
+template void basic_entity_handle<false>::set_name<void>(const entity_name_type&) const;
 template void basic_entity_handle<false>::recalculate_basic_processing_categories<void>() const;

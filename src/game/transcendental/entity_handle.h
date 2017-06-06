@@ -69,6 +69,7 @@ private:
 
 	template <bool, class> friend class relations_mixin;
 	template <bool, class> friend class basic_relations_mixin;
+	template <bool> friend class basic_entity_handle;
 
 	using owner_reference = maybe_const_ref_t<is_const, cosmos>;
 	using aggregate_ptr = maybe_const_ptr_t<is_const, put_all_components_into_t<augs::component_aggregate>>;
@@ -83,80 +84,30 @@ private:
 	friend class cosmic_delta;
 	friend class cosmos;
 
-	template <class T, typename = void>
-	struct component_or_synchronizer_or_disabled {
-		typedef maybe_const_ref_t<is_const, T> return_type;
-		typedef maybe_const_ptr_t<is_const, T> return_ptr;
-
-		basic_entity_handle<is_const> h;
-
-		return_ptr find() const {
-			return h.allocator::template find<T>();
-		}
-
-		bool has() const {
-			return h.allocator::template has<T>();
-		}
-
-		return_type get() const {
-			return h.allocator::template get<T>();
-		}
-
-		void add(const T& t) const {
-			h.allocator::add(t);
-		}
-
-		void remove() const {
-			h.allocator::template remove<T>();
-		}
-	};
-
-	template <class T>
-	struct component_or_synchronizer_or_disabled<T, std::enable_if_t<is_component_synchronized_v<T>>> {
-		typedef component_synchronizer<is_const, T> return_type;
-
-		basic_entity_handle<is_const> h;
-
-		bool has() const {
-			return h.allocator::template has<T>();
-		}
-
-		return_type find() const {
-			return { h.allocator::template find<T>(), h };
-		}
-
-		return_type get() const {
-			return { &h.allocator::template get<T>(), h };
-		}
-
-		void add(const T& t) const {
-			h.allocator::add(t);
-			h.get_cosmos().complete_reinference(h);
-		}
-		
-		void remove() const {
-			h.allocator::template remove<T>();
-			h.get_cosmos().complete_reinference(h);
-		}
-	};
-
-	template<class T>
-	using component_or_synchronizer_t = typename component_or_synchronizer_or_disabled<T>::return_type;
-
 	auto& get() const {
 		return *ptr;
 	}
+
+private:
+	basic_entity_handle(
+		owner_reference owner,
+		const entity_id raw_id,
+		const aggregate_ptr ptr
+	) :
+		raw_id(raw_id),
+		owner(owner),
+		ptr(ptr)
+	{}
 
 public:
 	basic_entity_handle(
 		owner_reference owner, 
 		const entity_id raw_id
-	) : 
-		raw_id(raw_id), 
-		owner(owner),
-		ptr(owner.get_aggregate_pool().find(raw_id))
-	{
-
+	) : basic_entity_handle(
+		owner, 
+		raw_id, 
+		owner.get_aggregate_pool().find(raw_id)
+	) {
 	}
 
 	friend std::ostream& operator<<(std::ostream& out, const basic_entity_handle &x);
@@ -177,8 +128,8 @@ public:
 		return !alive();
 	}
 
-	typename owner_reference get_cosmos() const {
-		return this->owner;
+	auto& get_cosmos() const {
+		return owner;
 	}
 
 	bool operator==(const entity_id id) const {
@@ -191,7 +142,7 @@ public:
 
 	template <class = std::enable_if_t<!is_const>>
 	operator const_entity_handle() const {
-		return const_entity_handle(this->owner, this->raw_id);
+		return const_entity_handle(owner, raw_id, ptr);
 	}
 
 	operator entity_id() const {
@@ -206,48 +157,68 @@ public:
 		return raw_id;
 	}
 
-	template <class component>
-	bool has() const {
-		check_component_type<component>();
-		ensure(alive());
-		return component_or_synchronizer_or_disabled<component>({ *this }).has();
-	}
+	using allocator::has;
 
-	template<class component>
+	template <class T>
 	decltype(auto) get() const {
-		check_component_type<component>();
+		check_component_type<T>();
+
 		ensure(alive());
-		return component_or_synchronizer_or_disabled<component>({ *this }).get();
+		
+		if constexpr(is_component_synchronized_v<T>) {
+			return component_synchronizer<is_const, T>(&allocator::template get<T>(), *this);
+		}
+		else {
+			return allocator::template get<T>();
+		}
 	}
 
-	template<class component, class = std::enable_if_t<!is_const>>
-	decltype(auto) add(const component& c) const {
-		check_component_type<component>();
+	template <class T, class = std::enable_if_t<!is_const>>
+	void add(const T& c) const {
+		check_component_type<T>();
 		ensure(alive());
-		component_or_synchronizer_or_disabled<component>({ *this }).add(c);
-		return get<component>();
+		
+		if constexpr(is_component_synchronized_v<T>) {
+			allocator::template add<T>(c);
+			owner.complete_reinference(*this);
+		}
+		else {
+			allocator::template add<T>(c);
+		}
 	}
 
-	template<class component, class = std::enable_if_t<!is_const>>
-	decltype(auto) add(const component_synchronizer<is_const, component>& c) const {
-		check_component_type<component>();
-		ensure(alive());
-		component_or_synchronizer_or_disabled<component>({ *this }).add(c.get_raw_component());
-		return get<component>();
+	template <class T, class = std::enable_if_t<!is_const>>
+	void add(const component_synchronizer<is_const, T>& c) const {
+		add(c.get_raw_component());
 	}
 
-	template<class component>
+	template<class T>
 	decltype(auto) find() const {
-		check_component_type<component>();
+		check_component_type<T>();
+
 		ensure(alive());
-		return component_or_synchronizer_or_disabled<component>({ *this }).find();
+
+		if constexpr(is_component_synchronized_v<T>) {
+			return component_synchronizer<is_const, T>(allocator::template find<T>(), *this);
+		}
+		else {
+			return allocator::template find<T>();
+		}
 	}
 
-	template<class component, class = std::enable_if_t<!is_const>>
+	template<class T, class = std::enable_if_t<!is_const>>
 	void remove() const {
-		check_component_type<component>();
+		check_component_type<T>();
+
 		ensure(alive());
-		return component_or_synchronizer_or_disabled<component>({ *this }).remove();
+
+		if constexpr(is_component_synchronized_v<T>) {
+			allocator::template remove<T>();
+			owner.complete_reinference(*this);
+		}
+		else {
+			allocator::template remove<T>();
+		}
 	}
 
 	template <class = std::enable_if_t<!is_const>>
@@ -323,10 +294,8 @@ public:
 		return get<components::name>().get_name();
 	}
 
-	template<class = std::enable_if_t<!is_const>>
-	void set_name(const entity_name_type& new_name) const {	
-		get<components::name>().set_name(new_name);
-	}
+	template <class = std::enable_if_t<!is_const>>
+	void set_name(const entity_name_type& new_name) const;
 
 	bool is_inferred_state_activated() const {
 		const auto inferred = find<components::all_inferred_state>();
