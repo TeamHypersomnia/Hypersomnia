@@ -55,6 +55,10 @@ recording_type = {
 	LIVE = 2
 }
 
+function get_config_table() {
+	
+}
+
 config_table = {
 	launch_mode = launch_type.LOCAL,
 	
