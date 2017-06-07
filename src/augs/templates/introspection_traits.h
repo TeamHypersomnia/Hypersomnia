@@ -70,37 +70,3 @@ constexpr bool can_stream_left_v = can_stream_left<StreamType, T>::value;
 
 template <class StreamType, class T>
 constexpr bool can_stream_right_v = can_stream_right<StreamType, T>::value;
-
-template <class... T>
-using do_not_recurse = false_predicate<T...>;
-
-template <class... T>
-using always_recurse = true_predicate<T...>;
-
-template <class... T>
-using have_introspects = make_variadic_predicate<
-	std::conjunction,
-	has_introspect
->::type<T...>;
-
-template <class... T>
-using at_least_one_is_not_introspective_leaf = make_variadic_predicate<
-	std::disjunction,
-	apply_negation_t<is_introspective_leaf>
->::type<T...>;
-
-constexpr bool stop_recursion_if_valid = true;
-
-struct no_prologue {
-	template <class... Args>
-	void operator()(Args&&...) {
-
-	}
-};
-
-struct no_epilogue {
-	template <class... Args>
-	void operator()(Args&&...) {
-
-	}
-};

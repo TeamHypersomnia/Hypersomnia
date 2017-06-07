@@ -321,15 +321,21 @@ namespace augs {
 		Archive& ar,
 		Serialized& storage
 	) {
-		augs::introspect_recursive<
-			bind_types_t<can_stream_right, Archive>,
-			apply_negation_t<is_padding_field>,
-			stop_recursion_if_valid
-		>(
-			[&](auto, auto& member) {
-				ar >> member;
-			},
-			storage
-		);
+		struct callback {
+			static auto f(Archive& ar) {
+				return [&](auto, auto& member) {
+					using T = std::decay_t<decltype(member)>;
+
+					if constexpr(!is_padding_field<T>) {
+						if constexpr(can_stream_right_v<Archive, T>) {
+							ar >> member;
+						}
+						else {
+							augs::introspect(f(ar), member);
+						}
+					}
+				};
+			}
+		};
 	}
 }

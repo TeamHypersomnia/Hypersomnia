@@ -19,27 +19,40 @@ void transform_component_ids_to_guids_in_place(
 	T& comp,
 	const cosmos& cosm
 ) {
-	augs::introspect_recursive<
-		bind_types_t<std::is_base_of, entity_id>,
-		always_recurse,
-		stop_recursion_if_valid
-	>(
-		[&cosm](auto, auto& id) {
-			const auto handle = cosm[id];
+	struct callback {
+		static auto get(const cosmos& cosm) {
+			return [&](auto, auto& id) {
+				using T = std::decay_t<decltype(id)>;
 
-			id.unset();
-			
-			auto& guid_inside_ref = reinterpret_cast<entity_guid&>(id);
+				if constexpr(std::is_base_of_v<entity_id, T>) {
+					const auto handle = cosm[id];
 
-			if (handle.alive()) {
-				guid_inside_ref = handle.get_guid();
-			}
-			else {
-				guid_inside_ref = entity_guid();
-			}
-		},
-		comp
-	);
+					id.unset();
+
+					auto& guid_inside_ref = reinterpret_cast<entity_guid&>(id);
+
+					if (handle.alive()) {
+						guid_inside_ref = handle.get_guid();
+					}
+					else {
+						guid_inside_ref = entity_guid();
+					}
+				}
+				else {
+					if constexpr(is_variable_size_container_v<T>) {
+						for (auto& e : id) {
+							augs::introspect_if_not_leaf(get(cosm), e);
+						}
+					}
+					else {
+						augs::introspect_if_not_leaf(get(cosm), id);
+					}
+				}
+			};
+		}
+	};
+
+	augs::introspect(callback::get(cosm), comp);
 }
 
 template <class T>
@@ -47,22 +60,35 @@ void transform_component_guids_to_ids_in_place(
 	T& comp,
 	const cosmos& cosm
 ) {
-	augs::introspect_recursive<
-		bind_types_t<std::is_base_of, entity_id>,
-		always_recurse,
-		stop_recursion_if_valid
-	> (
-		[&cosm](auto, auto& id) {
-			const auto guid_inside = reinterpret_cast<const entity_guid&>(id);
+	struct callback {
+		static auto get(const cosmos& cosm) {
+			return [&](auto, auto& id) {
+				using T = std::decay_t<decltype(id)>;
 
-			id.unset();
+				if constexpr(std::is_base_of_v<entity_id, T>) {
+					const auto guid_inside = reinterpret_cast<const entity_guid&>(id);
 
-			if (guid_inside != 0) {
-				id = cosm.guid_to_id.at(guid_inside);
-			}
-		},
-		comp
-	);
+					id.unset();
+
+					if (guid_inside != 0) {
+						id = cosm.guid_to_id.at(guid_inside);
+					}
+				}
+				else {
+					if constexpr(is_variable_size_container_v<T>) {
+						for (auto& e : id) {
+							augs::introspect_if_not_leaf(get(cosm), e);
+						}
+					}
+					else {
+						augs::introspect_if_not_leaf(get(cosm), id);
+					}
+				}
+			};
+		}
+	};
+
+	augs::introspect(callback::get(cosm), comp);
 }
 
 struct delted_stream_of_entities {

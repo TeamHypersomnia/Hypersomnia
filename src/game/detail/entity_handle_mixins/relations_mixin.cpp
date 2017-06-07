@@ -24,9 +24,9 @@ void relations_mixin<false, D>::make_as_child_of(const entity_id parent_id) cons
 template <class D>
 void relations_mixin<false, D>::make_cloned_child_entities_recursive(const entity_id from_id) const {
 	auto& self = *static_cast<const D*>(this);
-	auto& cosmos = self.get_cosmos();
+	auto& cosm = self.get_cosmos();
 
-	const const_entity_handle from = cosmos[from_id];
+	const const_entity_handle from = cosm[from_id];
 
 	for_each_component_type([&](auto c) {
 		using component_type = decltype(c);
@@ -37,24 +37,27 @@ void relations_mixin<false, D>::make_cloned_child_entities_recursive(const entit
 
 			if constexpr(allows_nontriviality_v<component_type>) {
 				component_type::clone_children(
-					cosmos, 
+					cosm,
 					cloned_to_component, 
 					cloned_from_component
 				);
 			}
 			else {
-				augs::introspect_recursive<
-					concat_unary_t<
-						std::conjunction,
-						bind_types_t<std::is_same, child_entity_id>,
-						bind_types_t<std::is_same, const child_entity_id>
-					>,
-					always_recurse,
-					stop_recursion_if_valid
-				> (
-					[&](auto, auto& cloned_into_id, const auto& cloned_from_id) {
-						cloned_into_id = cosmos.clone_entity(cloned_from_id);
-					},
+				struct callback {
+					static auto f(cosmos& cosm) {
+						return [&](auto, auto& into, const auto& from) {
+							if constexpr(std::is_same_v<decltype(into), child_entity_id&>) {
+								into = cosm.clone_entity(from);
+							}
+							else {
+								augs::introspect_if_not_leaf(f(cosm), into, from);
+							}
+						};
+					}
+				};
+
+				augs::introspect(
+					callback::f(cosm),
 					cloned_to_component,
 					cloned_from_component
 				);
