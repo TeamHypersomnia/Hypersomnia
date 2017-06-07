@@ -45,7 +45,7 @@ auto describe_fields(const T& object) {
 			result += "\n";
 
 			fields.push_back(label);
-			augs::introspect_if_not_leaf(augs::pass_self(self), field);
+			augs::introspect_if_not_leaf(augs::recursive(self), field);
 			fields.pop_back();
 		}), 
 		object
@@ -107,7 +107,7 @@ auto determine_breaks_in_fields_continuity_by_introspection(const T& object) {
 				}
 				else {
 					fields.push_back(label);
-					augs::introspect(augs::pass_self(self), field);
+					augs::introspect(augs::recursive(self), field);
 					fields.pop_back();
 				}
 			}

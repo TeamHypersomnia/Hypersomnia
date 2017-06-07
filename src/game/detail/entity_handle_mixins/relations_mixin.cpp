@@ -49,7 +49,7 @@ void relations_mixin<false, D>::make_cloned_child_entities_recursive(const entit
 							into = cosm.clone_entity(from);
 						}
 						else {
-							augs::introspect_if_not_leaf(augs::pass_self(self), into, from);
+							augs::introspect_if_not_leaf(augs::recursive(self), into, from);
 						}
 					}),
 					cloned_to_component,

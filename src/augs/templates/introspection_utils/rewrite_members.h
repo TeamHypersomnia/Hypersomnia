@@ -31,7 +31,7 @@ T<destination_type> rewrite_members_and_transform_templated_type_into(
 					rewritten_to = rewritten_from;
 				}
 				else {
-					augs::introspect(augs::pass_self(self), rewritten_to, rewritten_from);
+					augs::introspect(augs::recursive(self), rewritten_to, rewritten_from);
 				}
 			}
 		), 

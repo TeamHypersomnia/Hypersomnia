@@ -39,11 +39,11 @@ void transform_component_ids_to_guids_in_place(
 		else {
 			if constexpr(is_variable_size_container_v<T>) {
 				for (auto& e : id) {
-					augs::introspect_if_not_leaf(augs::pass_self(self), e);
+					augs::introspect_if_not_leaf(augs::recursive(self), e);
 				}
 			}
 			else {
-				augs::introspect_if_not_leaf(augs::pass_self(self), id);
+				augs::introspect_if_not_leaf(augs::recursive(self), id);
 			}
 		}
 	}), comp);
@@ -69,11 +69,11 @@ void transform_component_guids_to_ids_in_place(
 		else {
 			if constexpr(is_variable_size_container_v<T>) {
 				for (auto& e : id) {
-					augs::introspect_if_not_leaf(augs::pass_self(self), e);
+					augs::introspect_if_not_leaf(augs::recursive(self), e);
 				}
 			}
 			else {
-				augs::introspect_if_not_leaf(augs::pass_self(self), id);
+				augs::introspect_if_not_leaf(augs::recursive(self), id);
 			}
 		}
 	}), comp);
