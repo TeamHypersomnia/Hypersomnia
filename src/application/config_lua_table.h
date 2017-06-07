@@ -20,7 +20,7 @@ namespace sol {
 class config_lua_table {
 public:
 	// GEN INTROSPECTOR class config_lua_table
-	int launch_mode = 0;
+	int launch_mode = 1;
 	int input_recording_mode = 0;
 
 	float recording_replay_speed = 1.f;
@@ -37,8 +37,8 @@ public:
 	unsigned resolution_h = 768;
 	bool doublebuffer = true;
 
-	bool check_content_integrity_every_launch = false;
-	bool save_regenerated_atlases_as_binary = false;
+	bool check_content_integrity_every_launch = true;
+	bool save_regenerated_atlases_as_binary = true;
 	bool debug_regenerate_content_every_launch = false;
 	unsigned packer_detail_max_atlas_size = 8192;
 
@@ -66,7 +66,7 @@ public:
 
 	vec2 mouse_sensitivity;
 
-	unsigned default_tickrate = 0;
+	unsigned default_tickrate = 60;
 
 	unsigned jitter_buffer_ms = 0;
 	unsigned client_commands_jitter_buffer_ms = 0;

@@ -29,31 +29,6 @@ void config_lua_table::get_values(sol::state& lua) {
 
 	static_assert(!bind_types<can_stream_right, std::istringstream>::type<debug_drawing_settings>::value, "Trait has failed");
 	static_assert(!bind_types<can_stream_right, std::istringstream>::type<debug_drawing_settings&>::value, "Trait has failed");
-
-	augs::introspect_recursive_with_prologues <
-		bind_types_t<can_stream_right, std::istringstream>,
-		always_recurse,
-		stop_recursion_if_valid,
-		0u
-	> (
-		[&](const std::string& label, auto& c) {
-			get_config_value(lua, current_prefix + label, c);
-		},
-
-		[&](const unsigned depth, const std::string& ss, auto...) {
-			if (depth == 0) {
-				current_prefix = ss + "_";
-			}
-		},
-
-		[&](const unsigned depth, const std::string& ss, auto...) {
-			if (depth == 0) {
-				current_prefix.clear();
-			}
-		},
-
-		*this
-	);
 }
 
 config_lua_table::launch_type config_lua_table::get_launch_mode() const {
