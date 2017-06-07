@@ -188,45 +188,7 @@ struct tests_of_traits {
 	static_assert(std::is_same_v<unsigned short, get_index_type_for_size_of_t<E>>, "Trait has failed");
 	static_assert(std::is_same_v<unsigned int, get_index_type_for_size_of_t<F>>, "Trait has failed");
 
-	static_assert(concat_unary<
-		std::conjunction,
-		bind_types_t<std::is_same, int>,
-		bind_types_t<std::is_same, double>
-	>::type<int, double>::value == true, "Trait has failed");
-
-	static_assert(concat_unary<
-		std::conjunction,
-		bind_types_t<std::is_same, int>,
-		bind_types_t<std::is_same, double>
-	>::type<double, int>::value == false, "Trait has failed");
-
-	static_assert(of_unary_predicates<
-		std::disjunction,
-		bind_types_t<std::is_same, int>,
-		bind_types_t<std::is_same, double>
-	>::type<int>::value == true, "Trait has failed");
-
-	static_assert(of_unary_predicates<
-		std::disjunction,
-		bind_types_t<std::is_same, int>,
-		bind_types_t<std::is_same, double>
-	>::type<float>::value == false, "Trait has failed");
-
-	static_assert(of_unary_predicates<
-		std::conjunction,
-		is_not_predicate_t<int>,
-		is_not_predicate_t<float>,
-		is_not_predicate_t<double>,
-		is_not_predicate_t<char>
-	>::type<float>::value == false, "Trait has failed");
-
-	static_assert(of_unary_predicates<
-		std::conjunction,
-		is_not_predicate_t<int>,
-		is_not_predicate_t<float>,
-		is_not_predicate_t<double>,
-		is_not_predicate_t<char>
-	>::type<unsigned char>::value == true, "Trait has failed");
+	static_assert(sizeof(cosmos) < 1000000, "Possible stack overflow due to cosmos on the stack");
 };
 
 /*

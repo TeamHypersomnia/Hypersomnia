@@ -46,21 +46,6 @@ public:
 	inventory_slot_handle_type operator[](const slot_function) const;
 	entity_handle_type operator[](const child_entity_name) const;
 	
-	struct recursive_callback {
-		template <class C, class F>
-		static auto f(C& cosmos, F&& callback) {
-			return [&](auto, auto& member) {
-				if constexpr(std::is_same_v<std::decay_t<decltype(member)>, child_entity_id>) {
-					const auto child_handle = cosmos[member];
-
-					if (child_handle.alive() && callback(child_handle)) {
-						child_handle.for_each_child_entity_recursive(std::forward<F>(callback));
-					}
-				}
-			};
-		}
-	};
-
 	template <class F>
 	void for_each_child_entity_recursive(F&& callback) const {
 		const auto self = *static_cast<const entity_handle_type*>(this);
@@ -69,7 +54,15 @@ public:
 		self.for_each_component(
 			[&cosmos, &callback](auto& subject_component) {
 				augs::introspect(
-					recursive_callback::f(cosmos, std::forward<F>(callback)),
+					[&](auto, auto& member) {
+						if constexpr(std::is_same_v<std::decay_t<decltype(member)>, child_entity_id>) {
+							const auto child_handle = cosmos[member];
+
+							if (child_handle.alive() && callback(child_handle)) {
+								child_handle.for_each_child_entity_recursive(std::forward<F>(callback));
+							}
+						}
+					},
 					subject_component
 				);
 			}

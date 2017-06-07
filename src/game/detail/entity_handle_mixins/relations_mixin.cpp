@@ -43,21 +43,15 @@ void relations_mixin<false, D>::make_cloned_child_entities_recursive(const entit
 				);
 			}
 			else {
-				struct callback {
-					static auto f(cosmos& cosm) {
-						return [&](auto, auto& into, const auto& from) {
-							if constexpr(std::is_same_v<decltype(into), child_entity_id&>) {
-								into = cosm.clone_entity(from);
-							}
-							else {
-								augs::introspect_if_not_leaf(f(cosm), into, from);
-							}
-						};
-					}
-				};
-
 				augs::introspect(
-					callback::f(cosm),
+					augs::recursive([&](auto&& self, auto, auto& into, const auto& from) {
+						if constexpr(std::is_same_v<decltype(into), child_entity_id&>) {
+							into = cosm.clone_entity(from);
+						}
+						else {
+							augs::introspect_if_not_leaf(augs::pass_self(self), into, from);
+						}
+					}),
 					cloned_to_component,
 					cloned_from_component
 				);

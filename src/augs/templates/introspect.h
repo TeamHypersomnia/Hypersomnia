@@ -47,6 +47,8 @@ namespace augs {
 		Instance&& t,
 		Instances&&... tn
 	) {
+		using T = std::remove_reference_t<Instance>;
+
 		if constexpr(!is_introspective_leaf_v<T>) {
 			augs::introspection_access::introspect_body(
 				static_cast<std::decay_t<Instance>*>(nullptr),
