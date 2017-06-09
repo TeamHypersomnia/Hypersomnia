@@ -1,7 +1,6 @@
 #include <thread>
 #include "game/transcendental/cosmos.h"
 #include "augs/misc/templated_readwrite.h"
-#include "game/bindings/bind_game_and_augs.h"
 #include "augs/global_libraries.h"
 #include "application/game_window.h"
 

@@ -12,20 +12,34 @@ namespace augs {
 	void set_listener_orientation(const std::array<float, 6>);
 
 	class sound_source {
-		sound_source(const sound_source&) = delete;
-		sound_source& operator=(const sound_source&) = delete;
-
 		bool initialized = false;
 		ALuint id = 0;
 		const single_sound_buffer* attached_buffer = nullptr;
 
 		void destroy();
 	public:
+		friend void swap(sound_source& a, sound_source& b) {
+			using std::swap;
+
+			swap(a.attached_buffer, b.attached_buffer);
+			swap(a.initialized, b.initialized);
+			swap(a.id, b.id);
+		}
+
 		sound_source();
 		~sound_source();
 
-		sound_source(sound_source&&);
-		sound_source& operator=(sound_source&&);
+		sound_source(sound_source&& b) 
+			: initialized(false) {
+			swap(*this, b);
+		}
+		
+		sound_source& operator=(sound_source b) {
+			swap(*this, b);
+			return *this;
+		}
+
+		sound_source(const sound_source&) = delete;
 
 		void play() const;
 		void seek_to(const float seconds) const;

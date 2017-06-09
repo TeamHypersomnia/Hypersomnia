@@ -210,7 +210,8 @@ void viewing_session::advance_audiovisual_systems(
 
 	camera.tick(
 		interp, 
-		dt, 
+		dt,
+		camera_settings,
 		cosm[viewed_character]
 	);
 	

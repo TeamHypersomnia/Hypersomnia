@@ -9,8 +9,18 @@ void world_camera::configure_size(const vec2 size) {
 	camera.visible_world_area = size;
 }
 
-void world_camera::tick(const interpolation_system& interp, const augs::delta dt, const const_entity_handle entity_to_chase) {
+void world_camera::tick(
+	const interpolation_system& interp,
+	const augs::delta dt,
+	world_camera_settings settings,
+	const const_entity_handle entity_to_chase
+) {
 	const auto& cosm = entity_to_chase.get_cosmos();
+
+	const auto enable_smoothing = settings.enable_smoothing;
+	const auto angled_look_length = settings.angled_look_length;
+	const auto smoothing_average_factor = settings.smoothing_average_factor;
+	const auto averages_per_sec = settings.averages_per_sec;
 
 	/* we obtain transform as a copy because we'll be now offsetting it by crosshair position */
 	if (entity_to_chase.alive()) {
@@ -20,7 +30,7 @@ void world_camera::tick(const interpolation_system& interp, const augs::delta dt
 
 	camera.transform.pos = vec2i(camera.transform.pos);
 
-	const vec2i camera_crosshair_offset = get_camera_offset_due_to_character_crosshair(entity_to_chase);
+	const vec2i camera_crosshair_offset = get_camera_offset_due_to_character_crosshair(entity_to_chase, settings);
 
 	smoothed_camera = camera;
 	smoothed_camera.transform.pos += camera_crosshair_offset;
@@ -89,10 +99,10 @@ void world_camera::tick(const interpolation_system& interp, const augs::delta dt
 
 			if (target_value.length() < smoothing_player_pos.value.length()) {
 				// braking
-				smoothing_player_pos.averages_per_sec = 3.5;
+				settings.smooth_value_field_settings.averages_per_sec += 3.5;
 			}
 			else {
-				smoothing_player_pos.averages_per_sec = 1.5;
+				settings.smooth_value_field_settings.averages_per_sec += 1.5;
 			}
 
 			if (target_value.length() > 50) {
@@ -108,7 +118,7 @@ void world_camera::tick(const interpolation_system& interp, const augs::delta dt
 		//}
 
 		smoothing_player_pos.target_value = target_value * (-1);
-		smoothing_player_pos.tick(dt.in_seconds());
+		smoothing_player_pos.tick(dt.in_seconds(), settings.smooth_value_field_settings);
 	}
 
 	if (enable_smoothing) {
@@ -123,7 +133,10 @@ void world_camera::tick(const interpolation_system& interp, const augs::delta dt
 	dont_smooth_once = false;
 }
 
-vec2i world_camera::get_camera_offset_due_to_character_crosshair(const const_entity_handle entity_to_chase) const {
+vec2i world_camera::get_camera_offset_due_to_character_crosshair(
+	const const_entity_handle entity_to_chase,
+	const world_camera_settings settings
+) const {
 	vec2 camera_crosshair_offset;
 
 	if (entity_to_chase.dead())
@@ -139,7 +152,7 @@ vec2i world_camera::get_camera_offset_due_to_character_crosshair(const const_ent
 			camera_crosshair_offset = components::crosshair::calculate_aiming_displacement(crosshair_entity, false);
 
 			if (crosshair.orbit_mode == crosshair.ANGLED)
-				camera_crosshair_offset.set_length(angled_look_length);
+				camera_crosshair_offset.set_length(settings.angled_look_length);
 
 			if (crosshair.orbit_mode == crosshair.LOOK) {
 				/* simple proportion */

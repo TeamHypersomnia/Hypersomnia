@@ -8,7 +8,7 @@
 #include "game/transcendental/step_declaration.h"
 
 class cosmos;
-class world_camera;
+struct world_camera;
 class viewing_session;
 
 namespace test_scenes {

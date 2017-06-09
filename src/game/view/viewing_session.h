@@ -47,6 +47,7 @@ namespace augs {
 class viewing_session {
 public:
 	world_camera camera;
+	world_camera_settings camera_settings;
 	input_context context;
 	vec2i viewport_coordinates;
 	aabb_highlighter world_hover_highlighter;

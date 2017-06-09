@@ -297,7 +297,6 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/augs/templates/templates.cpp"
 	"src/augs/window_framework/colored_print.cpp"
 	"src/augs/window_framework/platform_utils.cpp"
-	"src/game/bindings/bind_game_and_augs.cpp"
 	"src/game/components/animation_component.cpp"
 	"src/game/components/car_component.cpp"
 	"src/game/components/container_component.cpp"

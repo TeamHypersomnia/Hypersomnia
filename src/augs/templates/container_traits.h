@@ -73,7 +73,7 @@ template <class T>
 constexpr bool is_associative_container_v = has_key_type_v<T> && has_mapped_type_v<T>;
 
 template <class T>
-constexpr bool is_unary_container = has_value_type_v<T> && !is_associative_container_v<T>;
+constexpr bool is_unary_container_v = has_value_type_v<T> && !is_associative_container_v<T>;
 
 template <class T>
 constexpr bool is_constexpr_size_container_v = size_test<T>::value;
@@ -82,4 +82,4 @@ template <class T>
 constexpr bool is_variable_size_container_v = is_container_v<T> && !is_constexpr_size_container_v<T>;
 
 template <class T>
-constexpr bool is_container_v = is_unary_container<T> || is_associative_container_v<T>;
+constexpr bool is_container_v = is_unary_container_v<T> || is_associative_container_v<T>;

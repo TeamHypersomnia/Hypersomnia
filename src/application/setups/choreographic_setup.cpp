@@ -1,7 +1,6 @@
 #include <thread>
 #include "choreographic_structs.h"
 
-#include "game/bindings/bind_game_and_augs.h"
 #include "augs/global_libraries.h"
 #include "application/game_window.h"
 
@@ -115,7 +114,7 @@ void choreographic_setup::process(
 
 		speed_change change;
 
-		augs::read_members_from_istream(in, change);
+		augs::read_from_stream(in, change);
 
 		preloaded_scenes[id].speed_changes.push_back(change);
 
@@ -163,7 +162,7 @@ void choreographic_setup::process(
 			
 				if ("struct " + command_name == typeid(command_type).name()) {
 					command_type new_command;
-					augs::read_members_from_istream(in, new_command);
+					augs::read_from_stream(in, new_command);
 			
 					new_command.at_time += current_start_time_offset_for_commands;
 			

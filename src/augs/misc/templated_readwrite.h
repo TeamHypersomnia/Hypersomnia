@@ -7,6 +7,7 @@
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/templates/introspect.h"
 #include "augs/templates/container_traits.h"
+#include "augs/templates/recursive.h"
 
 namespace augs {
 	class output_stream_reserver;
@@ -31,11 +32,8 @@ namespace augs {
 	constexpr bool is_native_binary_stream_v = is_native_binary_stream<Archive>::value;
 
 	template <class Archive, class Serialized, class = void>
-	struct has_io_overloads 
-		: std::false_type 
-	{
-
-	};
+	struct has_io_overloads : std::false_type 
+	{};
 
 	template <class Archive, class Serialized>
 	struct has_io_overloads <
@@ -52,34 +50,19 @@ namespace augs {
 			),
 			void()
 		)
-	> : std::true_type {
-	
-	};
+	> : std::true_type 
+	{};
 
 	template <class Archive, class Serialized>
 	constexpr bool has_io_overloads_v = has_io_overloads<Archive, Serialized>::value;
 
-	template<class Archive, class Serialized>
-	struct is_byte_io_safe 
-		: std::bool_constant<is_native_binary_stream_v<Archive> && is_memcpy_safe_v<Serialized>> 
-	{
+	template <class Archive, class Serialized>
+	constexpr bool is_byte_io_safe_v = is_native_binary_stream_v<Archive> && is_memcpy_safe_v<Serialized>;
 
-	};
+	template <class Archive, class Serialized>
+	constexpr bool is_byte_io_appropriate_v = is_byte_io_safe_v<Archive, Serialized> && !has_io_overloads_v<Archive, Serialized>;
 
-	template<class Archive, class Serialized>
-	constexpr bool is_byte_io_safe_v = is_byte_io_safe<Archive, Serialized>::value;
-
-	template<class Archive, class Serialized>
-	struct is_byte_io_appropriate 
-		: std::bool_constant<is_byte_io_safe_v<Archive, Serialized> && !has_io_overloads_v<Archive, Serialized>>
-	{
-
-	};
-
-	template<class Archive, class Serialized>
-	constexpr bool is_byte_io_appropriate_v = is_byte_io_appropriate<Archive, Serialized>::value;
-
-	template<class Archive, class Serialized>
+	template <class Archive, class Serialized>
 	void verify_byte_io_safety() {
 		static_assert(is_memcpy_safe_v<Serialized>, "Attempt to serialize a non-trivially copyable type");
 		static_assert(is_native_binary_stream_v<Archive>, "Byte serialization of trivial structs allowed only on native binary archives");
@@ -126,9 +109,9 @@ namespace augs {
 
 			augs::introspect(
 				[&](auto, auto& member) {
-					using member_type = std::decay_t<decltype(member)>;
+					using T = std::decay_t<decltype(member)>;
 					
-					if constexpr (!is_padding_field_v<member_type>) {
+					if constexpr (!is_padding_field_v<T>) {
 						read(ar, member);
 					}
 				},
@@ -153,9 +136,9 @@ namespace augs {
 
 			augs::introspect(
 				[&](auto, const auto& member) {
-					using member_type = std::decay_t<decltype(member)>;
+					using T = std::decay_t<decltype(member)>;
 
-					if constexpr (!is_padding_field_v<member_type>) {
+					if constexpr (!is_padding_field_v<T>) {
 						write(ar, member);
 					}
 				},
@@ -316,26 +299,24 @@ namespace augs {
 		write(ar, compressed_storage);
 	}
 
+	// due to be deleted as we will introduce reading from lua tables
+
 	template<class Archive, class Serialized>
-	void read_members_from_istream(
+	void read_from_stream(
 		Archive& ar,
 		Serialized& storage
 	) {
-		struct callback {
-			static auto f(Archive& ar) {
-				return [&](auto, auto& member) {
-					using T = std::decay_t<decltype(member)>;
+		augs::introspect(augs::recursive([&](auto&& self, auto, auto& member) {
+			using T = std::decay_t<decltype(member)>;
 
-					if constexpr(!is_padding_field<T>) {
-						if constexpr(can_stream_right_v<Archive, T>) {
-							ar >> member;
-						}
-						else {
-							augs::introspect(f(ar), member);
-						}
-					}
-				};
+			if constexpr(!is_padding_field_v<T>) {
+				if constexpr(can_stream_right_v<Archive, T>) {
+					ar >> member;
+				}
+				else {
+					augs::introspect(augs::recursive(self), member);
+				}
 			}
-		};
+		}), storage);
 	}
 }

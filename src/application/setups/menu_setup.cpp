@@ -1,7 +1,6 @@
 #include <thread>
 #include <mutex>
 #include <array>
-#include "game/bindings/bind_game_and_augs.h"
 #include "augs/global_libraries.h"
 #include "application/game_window.h"
 
@@ -60,7 +59,7 @@ void menu_setup::process(
 
 	session.reserve_caches_for_entities(3000);
 	session.show_profile_details = false;
-	session.camera.averages_per_sec /= 2;
+	session.camera_settings.averages_per_sec /= 2;
 
 	session.drawing_settings.draw_gui_overlays = false;
 	session.drawing_settings.draw_crosshairs = false;

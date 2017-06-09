@@ -52,17 +52,6 @@ namespace augs {
 		destroy();
 	}
 
-	sound_source::sound_source(sound_source&& b) {
-		*this = std::move(b);
-	}
-
-	sound_source& sound_source::operator=(sound_source&& b) {
-		std::swap(initialized, b.initialized);
-		std::swap(id, b.id);
-		std::swap(attached_buffer, b.attached_buffer);
-		return *this;
-	}
-
 	ALuint sound_source::get_id() const {
 		return id;
 	}

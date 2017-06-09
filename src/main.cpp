@@ -15,7 +15,6 @@
 
 #include "game/test_scenes/resource_setups/all.h"
 #include "game/transcendental/types_specification/all_component_includes.h"
-#include "game/bindings/bind_game_and_augs.h"
 
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
@@ -35,7 +34,6 @@ int main(int argc, char** argv) {
 
 	sol::state lua;
 	lua.open_libraries(sol::lib::base);
-	bind_game_and_augs(lua);
 
 	config_lua_table cfg;
 	
@@ -126,10 +124,10 @@ int main(int argc, char** argv) {
 	ensure
 	(
 		(
-			mode == config_lua_table::launch_type::LOCAL
-			|| mode == config_lua_table::launch_type::CHOREOGRAPHIC
-			|| mode == config_lua_table::launch_type::DIRECTOR
-			|| mode == config_lua_table::launch_type::LOCAL_DETERMINISM_TEST
+			mode == launch_type::LOCAL
+			|| mode == launch_type::CHOREOGRAPHIC
+			|| mode == launch_type::DIRECTOR
+			|| mode == launch_type::LOCAL_DETERMINISM_TEST
 		)
 		&& "The launch mode you have chosen is currently out of service."
 	);
@@ -141,37 +139,37 @@ int main(int argc, char** argv) {
 		session.initialize(window, cfg);
 
 		switch (mode) {
-		case config_lua_table::launch_type::MAIN_MENU:
+		case launch_type::MAIN_MENU:
 		{
 			auto setup = std::make_unique<menu_setup>();
 			setup->process(cfg, window, session);
 		}
 			break;
-		case config_lua_table::launch_type::LOCAL:
+		case launch_type::LOCAL:
 		{
 			auto setup = std::make_unique<local_setup>();
 			setup->process(cfg, window, session);
 		}
 			break;
-		case config_lua_table::launch_type::LOCAL_DETERMINISM_TEST:
+		case launch_type::LOCAL_DETERMINISM_TEST:
 		{
 			auto setup = std::make_unique<determinism_test_setup>();
 			setup->process(cfg, window, session);
 		}
-		case config_lua_table::launch_type::DIRECTOR:
+		case launch_type::DIRECTOR:
 		{
 			auto setup = std::make_unique<director_setup>();
 			setup->process(cfg, window, session);
 		}
 			break;
 
-		case config_lua_table::launch_type::CHOREOGRAPHIC:
+		case launch_type::CHOREOGRAPHIC:
 		{
 			auto setup = std::make_unique<choreographic_setup>();
 			setup->process(cfg, window, session);
 		}
 			break;
-		case config_lua_table::launch_type::CLIENT_AND_SERVER:
+		case launch_type::CLIENT_AND_SERVER:
 		{
 			auto serv_setup = std::make_unique<server_setup>();
 			
@@ -189,19 +187,19 @@ int main(int argc, char** argv) {
 			server_thread.join();
 		}
 		break;
-		case config_lua_table::launch_type::TWO_CLIENTS_AND_SERVER:
+		case launch_type::TWO_CLIENTS_AND_SERVER:
 		{
 			auto serv_setup = std::make_unique<two_clients_and_server_setup>();
 			serv_setup->process(cfg, window);
 		}
 		break;
-		case config_lua_table::launch_type::ONLY_CLIENT:  
+		case launch_type::ONLY_CLIENT:  
 		{
 			auto setup = std::make_unique<client_setup>();
 			setup->process(cfg, window, session);
 		}
 			break;
-		case config_lua_table::launch_type::ONLY_SERVER: 
+		case launch_type::ONLY_SERVER: 
 		{
 			auto setup = std::make_unique<server_setup>();
 			setup->process(cfg, window);

@@ -22,6 +22,16 @@ introspector-body-format:
 		) {
 %x		}
 
+enum-field-format:
+		case %x::%x: return "%x";
+enum-introspector-body-format:
+	template <class... T>
+	const char* enum_to_string(const %x e, T...) {
+		switch(e) {
+%x		default: return "Invalid";
+		}
+	}
+
 generated-file-format:
 #pragma once
 #include <tuple>
@@ -37,7 +47,7 @@ generated-file-format:
 // Forward declarations
 
 %xnamespace augs {
-	struct introspection_access {
+%x	struct introspection_access {
 		/* Hand-written introspectors that do not fit into the standard schema begin here */
 
 		template <class F, class ElemType, size_t count, class... Instances>

@@ -51,17 +51,6 @@ namespace augs {
 		}
 	}
 
-	single_sound_buffer& single_sound_buffer::operator=(single_sound_buffer&& b) {
-		std::swap(initialized, b.initialized);
-		std::swap(computed_length_in_seconds, b.computed_length_in_seconds);
-		std::swap(id, b.id);
-		return *this;
-	}
-	
-	single_sound_buffer::single_sound_buffer(single_sound_buffer&& b) {
-		*this = std::move(b);
-	}
-
 	ALuint single_sound_buffer::get_id() const {
 		return id;
 	}

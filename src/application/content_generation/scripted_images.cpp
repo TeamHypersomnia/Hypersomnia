@@ -39,7 +39,7 @@ void regenerate_scripted_images(
 				if (command_name == command_type::get_command_name()) {
 					command_type new_command;
 
-					augs::read_members_from_istream(in, new_command);
+					augs::read_from_stream(in, new_command);
 
 					new_stamp.commands.push_back(new_command);
 				}

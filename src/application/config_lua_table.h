@@ -17,11 +17,31 @@ namespace sol {
 	class state;
 }
 
+enum class launch_type {
+	// GEN INTROSPECTOR enum class launch_type
+	MAIN_MENU,
+
+	LOCAL,
+	LOCAL_DETERMINISM_TEST,
+
+	DIRECTOR,
+	CHOREOGRAPHIC,
+
+	ONLY_CLIENT,
+	ONLY_SERVER,
+
+	CLIENT_AND_SERVER,
+	TWO_CLIENTS_AND_SERVER,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
 class config_lua_table {
 public:
 	// GEN INTROSPECTOR class config_lua_table
-	int launch_mode = 1;
-	int input_recording_mode = 0;
+	launch_type launch_mode = launch_type::LOCAL;
+	input_recording_type input_recording_mode = input_recording_type::DISABLED;
 
 	float recording_replay_speed = 1.f;
 
@@ -71,8 +91,8 @@ public:
 	unsigned jitter_buffer_ms = 0;
 	unsigned client_commands_jitter_buffer_ms = 0;
 
-	float interpolation_speed = 0;
-	float misprediction_smoothing_multiplier = 0.5;
+	float interpolation_speed = 525.f;
+	float misprediction_smoothing_multiplier = 1.2f;
 
 	bool debug_randomize_entropies_in_client_setup = 0;
 	unsigned debug_randomize_entropies_in_client_setup_once_every_steps = 0;
@@ -103,24 +123,6 @@ public:
 	// END GEN INTROSPECTOR
 
 	void get_values(sol::state&);
-
-	enum class launch_type {
-		MAIN_MENU,
-
-		LOCAL,
-		LOCAL_DETERMINISM_TEST,
-
-		DIRECTOR,
-		CHOREOGRAPHIC,
-
-		ONLY_CLIENT,
-		ONLY_SERVER,
-
-		CLIENT_AND_SERVER,
-		TWO_CLIENTS_AND_SERVER,
-
-		COUNT
-	};
 	
 	launch_type get_launch_mode() const;
 	input_recording_type get_input_recording_mode() const;

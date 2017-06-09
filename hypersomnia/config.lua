@@ -1,68 +1,7 @@
--- Clone this file ("config.lua") and name it "config.local.lua"" so that it stays unversioned and unique to your filesystem,
--- if for example you want to preserve your original window resolution and coordinates across further commits.
--- Hypersomnia will try to read "config.local.lua"" and if there is no such file, it shall try loading "config.lua".
-
--- various game launching types passed as values only to the variable "launch_mode"
-launch_type = {
-	-- Will enter the game's main menu.
-	MAIN_MENU = 0,
-
-	-- Will launch the game locally without networking at all.
-	LOCAL = 1,
-	
-	-- Same as **LOCAL**, but will launch *determinism_test_cloned_cosmoi_count* copies of the world 
-	-- running in parallel to whom applied are exactly the same inputs.
-	-- If the worlds differ at some point, the game will hit an assertion.
-	LOCAL_DETERMINISM_TEST = 2,
-	
-	-- Director mode. You can record, replay and rewind actions for multiple entities,
-	-- so that you can create elaborate scenes for intros, trailers etc. 
-	-- Remember that in-game replayed results may look different due to disabled interpolation
-	-- in the director mode and different behaviour of audiovisual response systems.
-	DIRECTOR = 3,
-
-	-- Choreographic mode.
-	-- Will load a scenario filename specified by choreographic_input_scenario_path.
-	-- Very helpful in creating in-game commentaries and gameplay footages in general.
-	--
-	-- Choreographic mode is not the same thing as the director mode!
-	-- This one has the ability to automatically replay and rewind multiple scenes produced by the director mode,
-	-- with varying speeds, character focus and additionally with audio overlay (commentator's voice for example)
-	CHOREOGRAPHIC = 4,
-
-	-- Will use *connect_address* and *connect_port* to connect to a remote host and start the multiplayer simulation.
-	ONLY_CLIENT = 5,
-
-	-- Will use *server_port* to setup a listenserver without a game client.
-	ONLY_SERVER = 6,
-
-	-- **ONLY_SERVER** and **ONLY_CLIENT** in the same process
-	CLIENT_AND_SERVER = 7,
-
-	-- **ONLY_SERVER** and two clients on split-screen. 
-	-- For debugging purposes. The server will use *alternative_port* for the second connection.
-	TWO_CLIENTS_AND_SERVER = 8
-}
-
--- machine input recording modes for deterministic bug reproduction
-recording_type = {
-	-- no recording at all (best performance)
-	DISABLE = 0,
-	-- record with buffer (moderate performance, but some important machine inputs may be lost if a segfault is encountered)
-	-- NOT IMPLEMENTED!!!
-	LIVE_WITH_BUFFER = 1,
-	-- record live (saves machine inputs each frame to the file and does not proceed until it is done)
-	LIVE = 2
-}
-
-function get_config_table()
-
-end
-
 config_table = {
-	launch_mode = launch_type.LOCAL,
+	launch_mode = "LOCAL",
 	
-	input_recording_mode = recording_type.LIVE,
+	input_recording_mode = "LIVE",
 
 	-- initial replaying speed of the machine entropies recording
 	recording_replay_speed = 6,
@@ -119,7 +58,7 @@ config_table = {
 	debug_disable_cursor_clipping = false,
 	
 	-- vec2. Sensitivity of mouse movement in-game.
-	mouse_sensitivity = vec2.new(1.5, 1.5),
+	mouse_sensitivity = { x = 1.5, y = 1.5 },
 	
 	-- Network variables. See launch_mode for details.
 	connect_address = "192.168.1.8",
@@ -196,16 +135,21 @@ config_table = {
 	latest_news_url = "http://hypersomnia.pl/latest_post/",
 
 	-- hotbar appearance settings
-	hotbar_increase_inside_alpha_when_selected = false,
-	hotbar_colorize_inside_when_selected = true,
-	hotbar_primary_selected_color = rgba.new(0, 255, 255, 255),
-	hotbar_secondary_selected_color = rgba.new(86, 156, 214, 255),
+	hotbar = {
+		increase_inside_alpha_when_selected = false,
+		colorize_inside_when_selected = true,
+		primary_selected_color = { r = 0, g = 255, b = 255, a = 255 },
+		secondary_selected_color = { r = 86, g = 156, b = 214, a = 255 }
+	},
 
 	-- debug drawing settings
-	debug_drawing_enabled = true,
-	debug_draw_colinearization = false,
-	debug_draw_forces = true,
-	debug_draw_friction_field_collisions_of_entering = false,
-	debug_draw_explosion_forces = false,
-	debug_draw_visibility = false
+
+	debug = {
+		drawing_enabled = true,
+		draw_colinearization = false,
+		draw_forces = true,
+		draw_friction_field_collisions_of_entering = false,
+		draw_explosion_forces = false,
+		draw_visibility = false
+	}
 }

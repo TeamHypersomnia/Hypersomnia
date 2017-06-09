@@ -1,7 +1,5 @@
 #include <thread>
-#include "game/bindings/bind_game_and_augs.h"
 #include "game/transcendental/cosmos.h"
-static_assert(is_component_fundamental_v<components::all_inferred_state>);
 #include "augs/global_libraries.h"
 #include "application/game_window.h"
 

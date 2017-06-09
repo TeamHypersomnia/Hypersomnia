@@ -17,15 +17,27 @@ namespace augs {
 		ALuint id = 0;
 
 	public:
+		friend void swap(single_sound_buffer& a, single_sound_buffer& b) {
+			using std::swap;
+
+			swap(a.computed_length_in_seconds, b.computed_length_in_seconds);
+			swap(a.initialized, b.initialized);
+			swap(a.id, b.id);
+		}
 
 		single_sound_buffer() = default;
 		~single_sound_buffer();
 
-		single_sound_buffer& operator=(single_sound_buffer&&);
-		single_sound_buffer(single_sound_buffer&&);
+		single_sound_buffer& operator=(single_sound_buffer b) {
+			swap(*this, b);
+		}
+
+		single_sound_buffer(single_sound_buffer&& b)
+			: single_sound_buffer() {
+			swap(*this, b);
+		}
 
 		single_sound_buffer(const single_sound_buffer&) = delete;
-		single_sound_buffer& operator=(const single_sound_buffer&) = delete;
 
 		void set_data(const sound_data&);
 		// data_type get_data() const;
