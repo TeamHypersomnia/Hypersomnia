@@ -7,7 +7,7 @@ namespace augs {
 	template <class Serialized>
 	void read(sol::table input_table, Serialized& into) {
 		augs::introspect(
-			[input_table, &into](const auto label, auto& field) {
+			[input_table](const auto label, auto& field) {
 				using T = std::decay_t<decltype(field)>;
 				
 				if constexpr(!is_padding_field_v<T>) {
@@ -29,6 +29,29 @@ namespace augs {
 				}
 			},
 			into
+		);
+	}
+
+	template <class Serialized>
+	void write(sol::table output_table, const Serialized& from) {
+		augs::introspect(
+			[output_table](const auto label, const auto& field) mutable {
+				using T = std::decay_t<decltype(field)>;
+				
+				if constexpr(!is_padding_field_v<T>) {
+					if constexpr(std::is_same_v<T, std::string> || std::is_arithmetic_v<T>) {
+						output_table[label] = field;
+					}
+					else if constexpr(std::is_enum_v<T>) {
+						output_table[label] = enum_to_string(field);
+					}
+					else {
+						static_assert(!is_introspective_leaf_v<T>);
+						write(output_table.create_named(label), field);
+					}
+				}
+			},
+			from
 		);
 	}
 }

@@ -72,7 +72,7 @@ void client_setup::init(
 	}
 
 	receiver.jitter_buffer.set_lower_limit(static_cast<unsigned>(cfg.jitter_buffer_ms / hypersomnia.get_fixed_delta().in_milliseconds()));
-	receiver.misprediction_smoothing_multiplier = cfg.misprediction_smoothing_multiplier;
+	receiver.misprediction_smoothing_multiplier = static_cast<float>(cfg.misprediction_smoothing_multiplier);
 
 	const bool is_replaying =
 		false;// player.is_replaying();

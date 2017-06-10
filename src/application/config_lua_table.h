@@ -71,8 +71,8 @@ public:
 
 	std::string audio_output_device;
 
-	float sound_effects_volume = 1.f;
-	float music_volume = 1.f;
+	double sound_effects_volume = 1.0;
+	double music_volume = 1.0;
 
 	bool debug_disable_cursor_clipping = false;
 
@@ -91,8 +91,8 @@ public:
 	unsigned jitter_buffer_ms = 0;
 	unsigned client_commands_jitter_buffer_ms = 0;
 
-	float interpolation_speed = 525.f;
-	float misprediction_smoothing_multiplier = 1.2f;
+	double interpolation_speed = 525.f;
+	double misprediction_smoothing_multiplier = 1.2f;
 
 	bool debug_randomize_entropies_in_client_setup = 0;
 	unsigned debug_randomize_entropies_in_client_setup_once_every_steps = 0;

@@ -22,7 +22,7 @@ void viewing_session::initialize(
 	const vec2i screen_size = vec2i(window.get_screen_size());
 
 	set_screen_size(screen_size);
-	systems_audiovisual.get<interpolation_system>().interpolation_speed = cfg.interpolation_speed;
+	systems_audiovisual.get<interpolation_system>().interpolation_speed = static_cast<float>(cfg.interpolation_speed);
 	set_master_gain(cfg.sound_effects_volume);
 	configure_input();
 }

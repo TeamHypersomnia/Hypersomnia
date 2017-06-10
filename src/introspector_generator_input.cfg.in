@@ -46,7 +46,26 @@ generated-file-format:
 
 // Forward declarations
 
+namespace augs {
+	namespace window {
+		namespace event {
+			namespace keys {
+				enum class key;
+			}
+		}
+	}
+}
+
 %xnamespace augs {
+	/* Hand-written enum introspectors that do not fit into the standard schema begin here */
+
+	template <class... T>
+	std::string enum_to_string(const window::event::keys::key k, T...) {
+		const auto wstr = key_to_wstring(key);
+		return std::string(wstr.begin(), wstr.end());
+	}
+
+	/* Generated introspectors begin here */
 %x	struct introspection_access {
 		/* Hand-written introspectors that do not fit into the standard schema begin here */
 

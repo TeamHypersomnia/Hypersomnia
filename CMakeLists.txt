@@ -405,6 +405,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/detail/spells/fury_of_the_aeons.cpp"
 	"src/game/detail/spells/haste.cpp"
 	"src/game/detail/spells/ultimate_wrath_of_the_aeons.cpp"
+	"src/augs/misc/script_utils.cpp"
 )
 
 if(BUILD_TEST_SCENES)

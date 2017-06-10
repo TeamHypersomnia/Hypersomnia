@@ -1,7 +1,6 @@
 #include "call_config_script.h"
 #include "augs/filesystem/file.h"
-
-#include <sol.hpp>
+#include "augs/misc/script_utils.h"
 
 void call_config_script(
 	sol::state& lua,
@@ -14,12 +13,5 @@ void call_config_script(
 		used_filename = config_local_lua_path;
 	}
 
-	lua.script_file(used_filename, [](
-		lua_State* L, 
-		sol::protected_function_result pfr
-	){
-		LOG(pfr.operator std::string());
-		ensure(pfr.valid());
-		return pfr;
-	});
+	lua.script_file(used_filename, augs::lua_error_callback);
 }

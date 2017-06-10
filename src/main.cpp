@@ -20,7 +20,7 @@
 #include "augs/filesystem/directory.h"
 #include "augs/window_framework/platform_utils.h"
 
-#include <sol.hpp>
+#include "augs/misc/script_utils.h"
 
 /*
 	The usage of std::make_unique calls in main is to prevent stack overflow
@@ -33,13 +33,41 @@ int main(int argc, char** argv) {
 	augs::global_libraries::init();
 
 	sol::state lua;
-	lua.open_libraries(sol::lib::base);
 
+	lua.open_libraries(
+		sol::lib::base,
+		sol::lib::package,
+		sol::lib::string,
+		sol::lib::os,
+		sol::lib::math,
+		sol::lib::table,
+		sol::lib::debug,
+		sol::lib::bit32,
+		sol::lib::io,
+		sol::lib::utf8
+	);
+	
+	lua["LOG"] = [](const std::string content) { 
+		LOG(content); 
+	};
+
+	lua["ensure"] = [](
+		const bool condition, 
+		const std::string message
+	) { 
+		if (!condition) { 
+			LOG(message); 
+			ensure(false); 
+		} 
+	};
+	
+	lua.script_file("scripts/utils.lua", augs::lua_error_callback);
+	
 	config_lua_table cfg;
 	
 	call_config_script(lua, "config.lua", "config.local.lua");
 	cfg.get_values(lua);
-
+	
 	if (cfg.debug_run_unit_tests) {
 		augs::global_libraries::run_unit_tests(
 			argc, 
