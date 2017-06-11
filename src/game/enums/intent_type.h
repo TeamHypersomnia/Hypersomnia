@@ -4,29 +4,26 @@
 #include "augs/misc/basic_game_intent.h"
 
 enum class intent_type : unsigned char {
+	// GEN INTROSPECTOR enum class intent_type
 	INVALID,
 
 	OPEN_DEVELOPER_CONSOLE,
 
 	THROW,
-	// contextual
 	THROW_PRIMARY_ITEM,
 	THROW_SECONDARY_ITEM,
 
 	HOLSTER,
-	// contextual
 	HOLSTER_PRIMARY_ITEM,
 	HOLSTER_SECONDARY_ITEM,
 
 	START_PICKING_UP_ITEMS,
 
 	USE_BUTTON,
-	// contextual
 	TAKE_HOLD_OF_WHEEL,
 	RELEASE_CAR,
 
 	SPACE_BUTTON,
-	// contextual
 	HAND_BRAKE,
 
 	MOVE_FORWARD,
@@ -82,6 +79,7 @@ enum class intent_type : unsigned char {
 	CLEAR_DEBUG_LINES,
 
 	COUNT
+	// END GEN INTROSPECTOR
 };
 
 template <class intent_enum_type>

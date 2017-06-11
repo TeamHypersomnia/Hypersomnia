@@ -15,7 +15,12 @@ namespace augs {
 						field = input_table[label].get<T>();
 					}
 					else if constexpr(std::is_enum_v<T>) {
-						field = string_to_enum<T>(input_table[label].get<std::string>());
+						if constexpr(has_enum_to_string_v<T>) {
+							field = string_to_enum<T>(input_table[label].get<std::string>());
+						}
+						else {
+							field = static_cast<T>(input_table[label].get<int>());
+						}
 					}
 					else {
 						static_assert(!is_introspective_leaf_v<T>);
@@ -43,7 +48,12 @@ namespace augs {
 						output_table[label] = field;
 					}
 					else if constexpr(std::is_enum_v<T>) {
-						output_table[label] = enum_to_string(field);
+						if constexpr(has_enum_to_string_v<T>) {
+							output_table[label] = enum_to_string(field);
+						}
+						else {
+							output_table[label] = static_cast<int>(field);
+						}
 					}
 					else {
 						static_assert(!is_introspective_leaf_v<T>);

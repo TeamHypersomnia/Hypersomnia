@@ -33,6 +33,17 @@ struct has_introspect<
 template <class T>
 constexpr bool has_introspect_v = has_introspect<T>::value;
 
+template <class T, class = void>
+struct has_enum_to_string : std::false_type {};
+
+template <class T>
+struct has_enum_to_string<T, decltype(augs::enum_to_string(T()), void())> 
+	: std::true_type 
+{};
+
+template <class T>
+constexpr bool has_enum_to_string_v = has_introspect<T>::value;
+
 template <class T>
 struct is_introspective_leaf : 
 	std::bool_constant<

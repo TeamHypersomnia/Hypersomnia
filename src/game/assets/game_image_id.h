@@ -18,8 +18,6 @@ namespace assets {
 
 		JMIX114,
 		
-		DEAD_TORSO,
-
 		TEST_CROSSHAIR,
 
 		STANDARD_HEAD,

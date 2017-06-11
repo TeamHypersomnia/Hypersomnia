@@ -260,7 +260,7 @@ namespace augs {
 		storage.reserve(c);
 		storage.resize(s);
 
-		read_n(ar, &storage[0], storage.size());
+		read_n(ar, storage.data(), storage.size());
 	}
 
 	template<class Archive, class Container>
