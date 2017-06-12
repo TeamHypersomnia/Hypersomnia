@@ -72,10 +72,10 @@ int main(int argc, char** argv) {
 		augs::window::set_cursor_visible(cfg.debug_disable_cursor_clipping);
 
 		xywhi screen_rect = {
-			static_cast<int>(cfg.window_x),	
-			static_cast<int>(cfg.window_y),	
-			static_cast<int>(cfg.resolution_w),	
-			static_cast<int>(cfg.resolution_h)	
+			static_cast<int>(cfg.window_pos.x),	
+			static_cast<int>(cfg.window_pos.y),	
+			static_cast<int>(cfg.resolution.x),	
+			static_cast<int>(cfg.resolution.y)	
 		};
 
 		if (cfg.fullscreen) {

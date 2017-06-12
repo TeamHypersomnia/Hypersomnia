@@ -65,11 +65,9 @@ public:
 	std::string window_name = "example";
 	bool fullscreen = false;
 	bool window_border = 1;
-	unsigned window_x = 100;
-	unsigned window_y = 10;
+	vec2i window_pos = vec2i(100, 10);
 	unsigned bpp = 24;
-	unsigned resolution_w = 1280;
-	unsigned resolution_h = 768;
+	vec2u resolution = vec2u(1280, 768);
 	bool doublebuffer = true;
 
 	bool check_content_integrity_every_launch = true;

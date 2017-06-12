@@ -245,8 +245,7 @@
   packer_detail_max_atlas_size = 8192,
   post_data_file_path = "",
   recording_replay_speed = 1,
-  resolution_h = 768,
-  resolution_w = 1280,
+  resolution = { x = 1280, y = 768 },
   rewind_intro_scene_by_secs = 3.5,
   save_regenerated_atlases_as_binary = true,
   server_http_daemon_html_file_path = "",
@@ -259,6 +258,5 @@
   survey_num_file_path = "",
   window_border = true,
   window_name = "example",
-  window_x = 100,
-  window_y = 10
+  window_pos = {x = 100, y = 10 }
 }
