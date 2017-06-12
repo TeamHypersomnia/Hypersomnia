@@ -47,7 +47,6 @@ using namespace augs::gui::text;
 using namespace augs::gui;
 
 void menu_setup::process(
-	const config_lua_table& cfg, 
 	game_window& window,
 	viewing_session& session
 ) {
@@ -59,23 +58,23 @@ void menu_setup::process(
 
 	session.reserve_caches_for_entities(3000);
 	session.show_profile_details = false;
-	session.camera_settings.averages_per_sec /= 2;
+	session.config.camera_settings.averages_per_sec /= 2;
 
-	session.drawing_settings.draw_gui_overlays = false;
-	session.drawing_settings.draw_crosshairs = false;
+	session.config.drawing_settings.draw_gui_overlays = false;
+	session.config.drawing_settings.draw_crosshairs = false;
 
 	augs::single_sound_buffer menu_theme;
 	augs::sound_source menu_theme_source;
 
 	float gain_fade_multiplier = 0.f;
 
-	if (cfg.music_volume > 0.f) {
-		if (augs::file_exists(cfg.menu_theme_path)) {
-			menu_theme.set_data(augs::get_sound_samples_from_file(cfg.menu_theme_path));
+	if (session.config.music_volume > 0.f) {
+		if (augs::file_exists(session.config.menu_theme_path)) {
+			menu_theme.set_data(augs::get_sound_samples_from_file(session.config.menu_theme_path));
 
 			menu_theme_source.bind_buffer(menu_theme);
 			menu_theme_source.set_direct_channels(true);
-			menu_theme_source.seek_to(static_cast<float>(cfg.start_menu_music_at_secs));
+			menu_theme_source.seek_to(static_cast<float>(session.config.start_menu_music_at_secs));
 			menu_theme_source.set_gain(0.f);
 			menu_theme_source.play();
 		}
@@ -90,8 +89,8 @@ void menu_setup::process(
 	text_drawer latest_news_drawer;
 	vec2 news_pos = vec2(static_cast<float>(screen_size.x), 5.f);
 
-	std::thread latest_news_query([&latest_news_drawer, &cfg, &textes_style, &news_mut]() {
-		auto result = augs::http_get_request(cfg.latest_news_url);
+	std::thread latest_news_query([&latest_news_drawer, &session, &textes_style, &news_mut]() {
+		auto result = augs::http_get_request(session.config.latest_news_url);
 		const std::string delim = "newsbegin";
 
 		const auto it = result.find(delim);
@@ -115,9 +114,9 @@ void menu_setup::process(
 	});
 
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
-	timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
+	timer.set_stepping_speed_multiplier(session.config.recording_replay_speed);
 
-	intro_scene.set_fixed_delta(cfg.default_tickrate);
+	intro_scene.set_fixed_delta(session.config.default_tickrate);
 	
 	test_scenes::testbed().populate_world_with_entities(
 		intro_scene, 
@@ -186,8 +185,8 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 		m.hover_highlight_maximum_distance = 10.f;
 		m.hover_highlight_duration_ms = 300.f;
 
-		m.hover_sound.set_gain(cfg.sound_effects_volume);
-		m.click_sound.set_gain(cfg.sound_effects_volume);
+		m.hover_sound.set_gain(session.config.sound_effects_volume);
+		m.click_sound.set_gain(session.config.sound_effects_volume);
 	}
 
 	menu_ui_root.menu_buttons[menu_button_type::CONNECT_TO_OFFICIAL_UNIVERSE].set_appearing_caption(format(L"Login to\nofficial universe", textes_style));
@@ -402,7 +401,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 	{
 		size_t rng = 0;
 
-		if (!cfg.skip_credits) {
+		if (!session.config.skip_credits) {
 			intro_actions.push_blocking(act(new augs::delay_action(500.f)));
 			intro_actions.push_non_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 100, 6000.f)));
 			intro_actions.push_non_blocking(act(new augs::tween_value_action<float>(gain_fade_multiplier, 1.f, 6000.f)));
@@ -458,7 +457,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 	}
 
 	cosmic_movie_director director;
-	director.load_recording_from_file(cfg.menu_intro_scene_entropy_path);
+	director.load_recording_from_file(session.config.menu_intro_scene_entropy_path);
 	ensure(director.is_recording_available());
 
 	timer.reset_timer();
@@ -484,7 +483,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 		}
 	};
 
-	while (intro_scene.get_total_time_passed_in_seconds() < cfg.rewind_intro_scene_by_secs) {
+	while (intro_scene.get_total_time_passed_in_seconds() < session.config.rewind_intro_scene_by_secs) {
 		const auto entropy = cosmic_entropy(director.get_entropy_for_step(intro_scene.get_total_steps_passed() - initial_step_number), intro_scene);
 
 		intro_scene.advance_deterministic_schemata(
@@ -499,7 +498,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 
 		{
 			session.local_entropy_profiler.new_measurement();
-			new_machine_entropy.local = window.collect_entropy(!cfg.debug_disable_cursor_clipping);
+			new_machine_entropy.local = window.collect_entropy(!session.config.debug_disable_cursor_clipping);
 			session.local_entropy_profiler.end_measurement();
 			
 			process_exit_key(new_machine_entropy.local);
@@ -519,8 +518,8 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 			);
 		}
 
-		session.set_master_gain(cfg.sound_effects_volume * 0.3f * gain_fade_multiplier);
-		menu_theme_source.set_gain(cfg.music_volume * gain_fade_multiplier);
+		session.set_master_gain(session.config.sound_effects_volume * 0.3f * gain_fade_multiplier);
+		menu_theme_source.set_gain(session.config.music_volume * gain_fade_multiplier);
 
 		thread_local visible_entities all_visible;
 		session.get_visible_entities(all_visible, intro_scene);
@@ -543,7 +542,6 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 		const auto current_time_seconds = intro_scene.get_total_time_passed_in_seconds();
 
 		session.view(
-			cfg,
 			renderer, 
 			intro_scene,
 			character_in_focus,

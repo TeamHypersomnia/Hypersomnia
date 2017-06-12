@@ -35,7 +35,7 @@
 using namespace augs::window::event::keys;
 
 void local_setup::process(
-	const config_lua_table& cfg, 
+	
 	game_window& window,
 	viewing_session& session
 ) {
@@ -52,7 +52,7 @@ void local_setup::process(
 	const auto metas_of_assets = get_assets_manager().generate_logical_metas_of_assets();
 
 	if (!hypersomnia.load_from_file("save.state")) {
-		hypersomnia.set_fixed_delta(cfg.default_tickrate);
+		hypersomnia.set_fixed_delta(session.config.default_tickrate);
 		
 		test_scenes::testbed().populate_world_with_entities(
 			hypersomnia, 
@@ -63,17 +63,17 @@ void local_setup::process(
 
 	characters.acquire_available_characters(hypersomnia);
 
-	hypersomnia.get_entity_by_name(L"player0").set_name(::to_wstring(cfg.nickname));
+	hypersomnia.get_entity_by_name(L"player0").set_name(::to_wstring(session.config.nickname));
 
 	const auto player1 = hypersomnia.get_entity_by_name(L"player1");
 
 	if (player1.alive()) {
-		player1.set_name(::to_wstring(cfg.debug_second_nickname));
+		player1.set_name(::to_wstring(session.config.debug_second_nickname));
 	}
 
-	if (cfg.get_input_recording_mode() != input_recording_type::DISABLED) {
+	if (session.config.get_input_recording_mode() != input_recording_type::DISABLED) {
 		if (player.try_to_load_or_save_new_session("generated/sessions/", "recorded.inputs")) {
-			timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
+			timer.set_stepping_speed_multiplier(session.config.recording_replay_speed);
 		}
 	}
 
@@ -86,7 +86,7 @@ void local_setup::process(
 			augs::machine_entropy new_machine_entropy;
 
 			session.local_entropy_profiler.new_measurement();
-			new_machine_entropy.local = window.collect_entropy(!cfg.debug_disable_cursor_clipping);
+			new_machine_entropy.local = window.collect_entropy(!session.config.debug_disable_cursor_clipping);
 			session.local_entropy_profiler.end_measurement();
 			
 			process_exit_key(new_machine_entropy.local);
@@ -125,14 +125,14 @@ void local_setup::process(
 			
 			characters.control_character_selection_numeric(new_machine_entropy.local);
 
-			game_intent_vector new_intents = session.context.to_game_intents(new_machine_entropy.local);
+			auto translated = session.config.controls.translate(new_machine_entropy.local);
 
-			session.control_and_remove_fetched_intents(new_intents);
-			characters.control_character_selection(new_intents);
+			session.control_and_remove_fetched_intents(translated.intents);
+			characters.control_character_selection(translated.intents);
 
 			const auto new_cosmic_entropy = cosmic_entropy(
 				hypersomnia[characters.get_selected_character()],
-				new_intents
+				translated
 			);
 
 			total_collected_entropy += new_cosmic_entropy;
@@ -183,7 +183,6 @@ void local_setup::process(
 		renderer.clear_current_fbo();
 
 		session.view(
-			cfg,
 			renderer, 
 			hypersomnia, 
 			characters.get_selected_character(), 

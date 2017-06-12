@@ -1,5 +1,6 @@
 #include "intent_contextualization_system.h"
 #include "game/messages/intent_message.h"
+#include "game/messages/motion_message.h"
 
 #include "game/components/car_component.h"
 #include "game/components/driver_component.h"
@@ -54,19 +55,28 @@ void intent_contextualization_system::contextualize_use_button_intents(const log
 void intent_contextualization_system::contextualize_crosshair_action_intents(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
+
+	{
+		auto& events = step.transient.messages.get_queue<messages::motion_message>();
+		
+		for (auto& it : events) {
+			const auto subject = cosmos[it.subject];
+
+			const auto maybe_crosshair = subject[child_entity_name::CHARACTER_CROSSHAIR];
+
+			if (it.get_motion_type() == motion_type::MOVE_CROSSHAIR && maybe_crosshair.alive()) {
+				it.subject = maybe_crosshair;
+				continue;
+			}
+		}
+	}
+
 	auto& events = step.transient.messages.get_queue<messages::intent_message>();
 
 	for (auto& it : events) {
 		entity_id callee;
 
 		const auto subject = cosmos[it.subject];
-
-		const auto maybe_crosshair = subject[child_entity_name::CHARACTER_CROSSHAIR];
-
-		if (it.intent == intent_type::MOVE_CROSSHAIR && maybe_crosshair.alive()) {
-			it.subject = maybe_crosshair;
-			continue;
-		}
 
 		if (subject.has<components::container>()) {
 			int hand_index = -1;

@@ -37,6 +37,7 @@ namespace rendering_scripts {
 		const auto& highlights = step.session.systems_audiovisual.get<pure_color_highlight_system>();
 		const auto& thunders = step.session.systems_audiovisual.get<thunder_system>();
 		const auto global_time_seconds = (step.get_interpolated_total_time_passed_in_seconds());
+		const auto settings = step.session.config.drawing_settings;
 
 		const auto screen_size = vec2i(camera.visible_world_area);
 
@@ -114,7 +115,7 @@ namespace rendering_scripts {
 		light.render_all_lights(renderer, matrix, step, [&]() {
 				draw_crosshair_lasers(
 					[&](const vec2 from, const vec2 to, const rgba col) {
-						if (!step.settings.draw_weapon_laser) {
+						if (!settings.draw_weapon_laser) {
 							return;
 						}
 
@@ -226,13 +227,13 @@ namespace rendering_scripts {
 		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::FLYING_BULLETS], camera, renderable_drawing_type::NORMAL);
 		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::NEON_CAPTIONS], camera, renderable_drawing_type::NORMAL);
 		
-		if (step.settings.draw_crosshairs) {
+		if (settings.draw_crosshairs) {
 			render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::CROSSHAIR], camera, renderable_drawing_type::NORMAL);
 		}
 		
 		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::OVER_CROSSHAIR], camera, renderable_drawing_type::NORMAL);
 
-		if (step.settings.draw_crosshairs && step.settings.draw_weapon_laser) {
+		if (settings.draw_crosshairs && settings.draw_weapon_laser) {
 			draw_crosshair_lasers(
 				[&](const vec2 from, const vec2 to, const rgba col) {
 					augs::draw_line(
@@ -368,11 +369,11 @@ namespace rendering_scripts {
 			camera
 		);
 
-		if (step.settings.draw_gui_overlays) {
+		if (settings.draw_gui_overlays) {
 			if (controlled_entity.has<components::item_slot_transfers>()) {
 				step.session.systems_audiovisual.get<gui_element_system>().get_character_gui(controlled_entity).draw(
 					step,
-					step.config.hotbar
+					step.session.config.hotbar
 				);
 			}
 		}

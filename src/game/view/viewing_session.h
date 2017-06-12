@@ -30,8 +30,6 @@
 
 #include "game/detail/particle_types.h"
 
-#include "game/view/game_drawing_settings.h"
-
 class game_window;
 
 namespace augs {
@@ -46,13 +44,12 @@ namespace augs {
 
 class viewing_session {
 public:
+	config_lua_table& config;
+
 	world_camera camera;
-	world_camera_settings camera_settings;
-	input_context context;
 	vec2i viewport_coordinates;
 	aabb_highlighter world_hover_highlighter;
 	storage_for_all_systems_audiovisual systems_audiovisual;
-	game_drawing_settings drawing_settings;
 
 	bool show_profile_details = true;
 	bool gui_look_enabled = false;
@@ -68,11 +65,9 @@ public:
 	mutable augs::measurements remote_entropy_profiler = augs::measurements(L"Acquiring remote entropy");
 	mutable augs::measurements triangles = augs::measurements(L"Triangles", false);
 
-	viewing_session();
-
-	void initialize(
-		const game_window&,
-		const config_lua_table&
+	viewing_session(
+		const vec2i screen_size,
+		config_lua_table&
 	);
 
 	void set_screen_size(const vec2i);
@@ -80,7 +75,6 @@ public:
 	void set_interpolation_enabled(const bool);
 	void set_master_gain(const float);
 
-	void configure_input();
 	void reserve_caches_for_entities(const size_t);
 	void switch_between_gui_and_back(const augs::machine_entropy::local_type&);
 	
@@ -107,7 +101,6 @@ public:
 	);
 	
 	void view(
-		const config_lua_table& config,
 		augs::renderer& renderer,
 		const cosmos& cosmos,
 		const entity_id viewed_character,
@@ -117,7 +110,6 @@ public:
 	) const;
 
 	void view(
-		const config_lua_table& config,
 		augs::renderer& renderer,
 		const cosmos& cosmos,
 		const entity_id viewed_character,

@@ -33,13 +33,11 @@ public:
 	simulation_receiver receiver;
 
 	void process(
-		const config_lua_table& cfg, 
 		game_window&,
 		viewing_session&
 	);
 
 	void init(
-		const config_lua_table& cfg, 
 		game_window&, 
 		viewing_session&,
 		const std::string recording_filename = "recorded.inputs",
@@ -47,7 +45,6 @@ public:
 	);
 
 	void process_once(
-		const config_lua_table& cfg, 
 		game_window&,
 		viewing_session&,
 		const augs::machine_entropy::local_type& precollected, 

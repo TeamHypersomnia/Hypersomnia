@@ -12,13 +12,46 @@
 #include "game/view/viewing_session.h"
 #include "game/detail/gui/character_gui.h"
 
+#include "augs/misc/script_utils.h"
+#include "augs/filesystem/file.h"
+
 static_assert(is_introspective_leaf_v<launch_type>);
 
-void config_lua_table::get_values(sol::state& lua) {
-	sol::table config_table = lua["config_table"];
-	ensure(config_table.valid());
+config_lua_table::config_lua_table(
+	const std::string& config_lua_path, 
+	const std::string& config_local_lua_path
+) {
+	auto lua = augs::create_lua_state();
 
-	augs::read(config_table, *this);
+	std::string used_filename = config_lua_path;
+
+	if (augs::file_exists(config_local_lua_path)) {
+		used_filename = config_local_lua_path;
+	}
+
+	const auto script_contents = "config_table = " + augs::get_file_contents(used_filename);
+	lua.script(script_contents, augs::lua_error_callback);
+
+	sol::table input_table = lua["config_table"];
+	ensure(input_table.valid());
+
+	augs::read(input_table, *this);
+}
+
+static_assert(has_enum_to_string_v<launch_type>);
+static_assert(is_container_v<decltype(input_context::key_to_intent)>);
+
+void config_lua_table::save(
+	const std::string& target_path
+) const {
+	auto lua = augs::create_lua_state();
+
+	auto output_table = lua.create_named_table("config_table");
+	augs::write(output_table, *this);
+
+	const std::string file_contents = lua["table_to_string"](output_table);
+
+	augs::create_text_file(target_path, file_contents);
 }
 
 launch_type config_lua_table::get_launch_mode() const {

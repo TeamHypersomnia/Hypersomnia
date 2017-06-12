@@ -15,7 +15,6 @@ namespace augs {
 class viewing_step : public const_cosmic_step {
 public:
 	viewing_step(
-		const config_lua_table& config,
 		const cosmos&,
 		const viewing_session&,
 		const double interpolation_ratio,
@@ -25,13 +24,11 @@ public:
 		const visible_entities&
 	);
 
-	const config_lua_table& config;
 	camera_cone camera;
 	entity_id viewed_character;
 	const visible_entities& visible;
 	const double interpolation_ratio = 0.0;
 
-	game_drawing_settings settings;
 	const viewing_session& session;
 	augs::renderer& renderer;
 

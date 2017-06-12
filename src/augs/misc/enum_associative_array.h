@@ -2,6 +2,7 @@
 #include "augs/ensure.h"
 #include "augs/templates/maybe_const.h"
 #include "augs/misc/enum_boolset.h"
+#include "augs/misc/trivially_copyable_pair.h"
 
 namespace augs {
 	struct introspection_access;
@@ -110,6 +111,15 @@ namespace augs {
 			}
 
 			return end();
+		}
+
+		iterator emplace(const key_type k, const mapped_type v) {
+			operator[](k) = v;
+			return find(k);
+		}
+
+		iterator emplace(const augs::trivially_copyable_pair<key_type, mapped_type> p) {
+			return emplace(p.first, p.second);
 		}
 
 		const_iterator find(const key_type enum_idx) const {

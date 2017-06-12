@@ -5,7 +5,7 @@
 #include "augs/gui/dereferenced_location.h"
 #include "augs/gui/basic_gui_context.h"
 
-#include "game/enums/intent_type.h"
+#include "game/enums/input_context_enums.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/detail/camera_cone.h"
 #include "game/detail/gui/game_gui_element_location.h"

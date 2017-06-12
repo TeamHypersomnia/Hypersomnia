@@ -10,11 +10,11 @@
 #include "application/setups/choreographic_setup.h"
 
 #include "application/game_window.h"
-#include "application/call_config_script.h"
 #include "game/assets/assets_manager.h"
 
 #include "game/test_scenes/resource_setups/all.h"
 #include "game/transcendental/types_specification/all_component_includes.h"
+#include "game/view/viewing_session.h"
 
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
@@ -31,42 +31,8 @@ int main(int argc, char** argv) {
 	augs::create_directories("generated/logs/");
 
 	augs::global_libraries::init();
-
-	sol::state lua;
-
-	lua.open_libraries(
-		sol::lib::base,
-		sol::lib::package,
-		sol::lib::string,
-		sol::lib::os,
-		sol::lib::math,
-		sol::lib::table,
-		sol::lib::debug,
-		sol::lib::bit32,
-		sol::lib::io,
-		sol::lib::utf8
-	);
 	
-	lua["LOG"] = [](const std::string content) { 
-		LOG(content); 
-	};
-
-	lua["ensure"] = [](
-		const bool condition, 
-		const std::string message
-	) { 
-		if (!condition) { 
-			LOG(message); 
-			ensure(false); 
-		} 
-	};
-	
-	lua.script_file("scripts/utils.lua", augs::lua_error_callback);
-	
-	config_lua_table cfg;
-	
-	call_config_script(lua, "config.lua", "config.local.lua");
-	cfg.get_values(lua);
+	auto cfg = config_lua_table("config.lua", "config.local.lua");
 	
 	if (cfg.debug_run_unit_tests) {
 		augs::global_libraries::run_unit_tests(
@@ -161,40 +127,37 @@ int main(int argc, char** argv) {
 	);
 	
 	{
-		auto session_ptr = std::make_unique<viewing_session>();
-		auto& session = *session_ptr;
-
-		session.initialize(window, cfg);
+		auto session = viewing_session(window.get_screen_size(), cfg);
 
 		switch (mode) {
 		case launch_type::MAIN_MENU:
 		{
 			auto setup = std::make_unique<menu_setup>();
-			setup->process(cfg, window, session);
+			setup->process(window, session);
 		}
 			break;
 		case launch_type::LOCAL:
 		{
 			auto setup = std::make_unique<local_setup>();
-			setup->process(cfg, window, session);
+			setup->process(window, session);
 		}
 			break;
 		case launch_type::LOCAL_DETERMINISM_TEST:
 		{
 			auto setup = std::make_unique<determinism_test_setup>();
-			setup->process(cfg, window, session);
+			setup->process(window, session);
 		}
 		case launch_type::DIRECTOR:
 		{
 			auto setup = std::make_unique<director_setup>();
-			setup->process(cfg, window, session);
+			setup->process(window, session);
 		}
 			break;
 
 		case launch_type::CHOREOGRAPHIC:
 		{
 			auto setup = std::make_unique<choreographic_setup>();
-			setup->process(cfg, window, session);
+			setup->process(window, session);
 		}
 			break;
 		case launch_type::CLIENT_AND_SERVER:
@@ -208,7 +171,7 @@ int main(int argc, char** argv) {
 			serv_setup->wait_for_listen_server();
 			
 			auto setup = std::make_unique<client_setup>();
-			setup->process(cfg, window, session);
+			setup->process(window, session);
 			
 			serv_setup->should_quit = true;
 			
@@ -224,7 +187,7 @@ int main(int argc, char** argv) {
 		case launch_type::ONLY_CLIENT:  
 		{
 			auto setup = std::make_unique<client_setup>();
-			setup->process(cfg, window, session);
+			setup->process(window, session);
 		}
 			break;
 		case launch_type::ONLY_SERVER: 

@@ -8,6 +8,7 @@ namespace augs {
 
 namespace messages {
 	struct intent_message;
+	struct motion_message;
 	struct interpolation_correction_request;
 	struct damage_message;
 	struct queue_destruction;
@@ -16,7 +17,7 @@ namespace messages {
 	struct movement_event;
 	struct collision_message;
 	struct gunshot_response;
-	struct crosshair_intent_message;
+	struct crosshair_motion_message;
 	struct melee_swing_response;
 	struct health_event;
 	struct visibility_information_request;
@@ -32,6 +33,7 @@ struct thunder_input;
 
 typedef augs::storage_for_message_queues <
 	messages::intent_message,
+	messages::motion_message,
 	messages::interpolation_correction_request,
 	messages::damage_message,
 	messages::queue_destruction,
@@ -40,7 +42,7 @@ typedef augs::storage_for_message_queues <
 	messages::movement_event,
 	messages::collision_message,
 	messages::gunshot_response,
-	messages::crosshair_intent_message,
+	messages::crosshair_motion_message,
 	messages::melee_swing_response,
 	messages::health_event,
 	messages::visibility_information_request,

@@ -28,7 +28,6 @@
 #include "application/config_lua_table.h"
 
 void determinism_test_setup::process(
-	const config_lua_table& cfg, 
 	game_window& window,
 	viewing_session& session
 ) {
@@ -36,7 +35,7 @@ void determinism_test_setup::process(
 
 	const vec2i screen_size = vec2i(window.get_screen_size());
 
-	const unsigned cosmoi_count = 1 + cfg.determinism_test_cloned_cosmoi_count;
+	const unsigned cosmoi_count = 1 + session.config.determinism_test_cloned_cosmoi_count;
 	std::vector<cosmos> hypersomnias(cosmoi_count, cosmos(3000));
 
 	cosmic_entropy total_collected_entropy;
@@ -53,7 +52,7 @@ void determinism_test_setup::process(
 	}
 	else {
 		for (size_t i = 0; i < cosmoi_count; ++i) {
-			hypersomnias[i].set_fixed_delta(cfg.default_tickrate);
+			hypersomnias[i].set_fixed_delta(session.config.default_tickrate);
 			test_scenes::testbed().populate_world_with_entities(
 				hypersomnias[i], 
 				metas_of_assets,
@@ -68,12 +67,11 @@ void determinism_test_setup::process(
 		ensure(h == hypersomnias[0]);
 	}
 
-	if (cfg.get_input_recording_mode() != input_recording_type::DISABLED) {
+	if (session.config.get_input_recording_mode() != input_recording_type::DISABLED) {
 		if (player.try_to_load_or_save_new_session("generated/sessions/", "recorded.inputs")) {
-			timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
+			timer.set_stepping_speed_multiplier(session.config.recording_replay_speed);
 		}
 	}
-
 
 	unsigned currently_viewn_cosmos = 0;
 	bool divergence_detected = false;
@@ -84,7 +82,7 @@ void determinism_test_setup::process(
 	while (!should_quit) {
 		augs::machine_entropy new_machine_entropy;
 
-		new_machine_entropy.local = window.collect_entropy(!cfg.debug_disable_cursor_clipping);
+		new_machine_entropy.local = window.collect_entropy(!session.config.debug_disable_cursor_clipping);
 		
 		if (process_exit_key(new_machine_entropy.local)) {
 			break;
@@ -106,13 +104,13 @@ void determinism_test_setup::process(
 			new_machine_entropy.local
 		);
 
-		game_intent_vector new_intents = session.context.to_game_intents(new_machine_entropy.local);
+		auto translated = session.config.controls.translate(new_machine_entropy.local);
 
-		session.control_and_remove_fetched_intents(new_intents);
+		session.control_and_remove_fetched_intents(translated.intents);
 
 		auto new_cosmic_entropy = cosmic_entropy(
 			hypersomnias[0][characters[0].get_selected_character()],
-			new_intents
+			translated
 		);
 
 		new_cosmic_entropy += session.systems_audiovisual.get<gui_element_system>().get_and_clear_pending_events();
@@ -133,7 +131,7 @@ void determinism_test_setup::process(
 					hypersomnias[i] = hypersomnias[i + 1];
 				}
 
-				characters[i].control_character_selection(new_intents);
+				characters[i].control_character_selection(translated.intents);
 
 				player.advance_player_and_biserialize(total_collected_entropy);
 
@@ -199,7 +197,6 @@ void determinism_test_setup::process(
 		renderer.clear_current_fbo();
 
 		session.view(
-			cfg,
 			renderer, 
 			hypersomnias[currently_viewn_cosmos], 
 			characters[currently_viewn_cosmos].get_selected_character(),

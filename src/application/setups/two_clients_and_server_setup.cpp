@@ -6,14 +6,12 @@
 #include "application/game_window.h"
 
 void two_clients_and_server_setup::process(
-	const config_lua_table& cfg, 
+	config_lua_table& cfg, 
 	game_window& window
 ) {
 	server_setup serv_setup;
 
-	viewing_session sessions[2];
-	sessions[0].initialize(window, cfg);
-	sessions[1].initialize(window, cfg);
+	viewing_session sessions[2] = { { window.get_screen_size(), cfg }, { window.get_screen_size(), cfg} };
 	
 	sessions[0].reserve_caches_for_entities(3000);
 	sessions[1].reserve_caches_for_entities(3000);
@@ -25,8 +23,8 @@ void two_clients_and_server_setup::process(
 	serv_setup.wait_for_listen_server();
 
 	client_setup setups[2];
-	setups[0].init(cfg, window, sessions[0], "recorded_0.inputs");
-	setups[1].init(cfg, window, sessions[1], "recorded_1.inputs", true);
+	setups[0].init(window, sessions[0], "recorded_0.inputs");
+	setups[1].init(window, sessions[1], "recorded_1.inputs", true);
 
 	sessions[0].camera.camera.visible_world_area.x /= 2;
 	sessions[1].camera.camera.visible_world_area.x /= 2;
@@ -81,13 +79,13 @@ void two_clients_and_server_setup::process(
 		target.clear_current_fbo();
 
 		if (current_window == 0) {
-			if(alive[0]) setups[0].process_once(cfg, window, sessions[0], precollected, false);
-			if(alive[1]) setups[1].process_once(cfg, window, sessions[1], augs::machine_entropy::local_type(), false);
+			if(alive[0]) setups[0].process_once(window, sessions[0], precollected, false);
+			if(alive[1]) setups[1].process_once(window, sessions[1], augs::machine_entropy::local_type(), false);
 		}
 
 		if (current_window == 1) {
-			if(alive[1]) setups[1].process_once(cfg, window, sessions[0], precollected, false);
-			if(alive[0]) setups[0].process_once(cfg, window, sessions[1], augs::machine_entropy::local_type(), false);
+			if(alive[1]) setups[1].process_once(window, sessions[0], precollected, false);
+			if(alive[0]) setups[0].process_once(window, sessions[1], augs::machine_entropy::local_type(), false);
 		}
 
 		window.swap_buffers();

@@ -13,13 +13,24 @@ class director_setup : public setup_base {
 	void advance_player_by_single_step(viewing_session& session);
 
 public:
-	enum class recording_replacement_type {
+	enum class recording_type {
 		ALL,
 		ONLY_KEYS,
 		ONLY_MOUSE,
 
 		COUNT
 	};
+
+	enum class recording_flags {
+		ALLOW_KEYS,
+		ALLOW_MOUSE,
+
+		COUNT
+	};
+	
+	using recording_boolset = augs::enum_boolset<recording_flags>;
+
+	recording_boolset get_flags();
 
 	enum class director_state {
 		PLAYING,
@@ -29,7 +40,7 @@ public:
 	all_logical_metas_of_assets metas_of_assets;
 
 	director_state current_director_state = director_state::PLAYING;
-	recording_replacement_type recording_replacement_mode = recording_replacement_type::ALL;
+	recording_type recording_mode = recording_type::ALL;
 
 	augs::window::event::state events;
 	cosmos hypersomnia = cosmos(3000);
@@ -61,13 +72,11 @@ public:
 	augs::gui::text::formatted_string get_status_text() const;
 
 	void init(
-		const config_lua_table& cfg, 
 		game_window&,
 		viewing_session&
 	);
 
 	void control_player(
-		const config_lua_table& cfg,
 		game_window& window,
 		viewing_session& session
 	);
@@ -82,7 +91,6 @@ public:
 	void advance_player(viewing_session& session);
 
 	void process(
-		const config_lua_table& cfg, 
 		game_window&,
 		viewing_session&
 	);
@@ -92,7 +100,6 @@ public:
 	);
 
 	void view(
-		const config_lua_table& cfg,
 		viewing_session&
 	);
 

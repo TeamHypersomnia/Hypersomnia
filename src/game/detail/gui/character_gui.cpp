@@ -321,7 +321,7 @@ void character_gui::draw(
 		step.session.world_hover_highlighter,
 		step.session.systems_audiovisual.get<interpolation_system>(),
 		step.get_interpolation_ratio(),
-		step.session.context,
+		step.session.config.controls,
 		step.renderer.get_triangle_buffer()
 	);
 

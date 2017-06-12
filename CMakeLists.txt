@@ -142,7 +142,6 @@ set(HYPERSOMNIA_TEST_SCENES_SRCS
 )
 
 set(HYPERSOMNIA_CODEBASE_SRCS
-	"src/application/call_config_script.cpp"
 	"src/application/config_lua_table.cpp"
 	"src/application/content_generation/desaturations.cpp"
 	"src/application/content_generation/buttons_with_corners.cpp"

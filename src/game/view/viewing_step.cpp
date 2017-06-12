@@ -10,7 +10,6 @@ double viewing_step::get_interpolation_ratio() const {
 }
 
 viewing_step::viewing_step(
-	const config_lua_table& config,
 	const cosmos& cosm,
 	const viewing_session& session,
 	const double interpolation_ratio,
@@ -20,7 +19,6 @@ viewing_step::viewing_step(
 	const visible_entities& visible
 ) :
 	const_cosmic_step(cosm),
-	config(config),
 	session(session),
 	interpolation_ratio(interpolation_ratio),
 	renderer(renderer),

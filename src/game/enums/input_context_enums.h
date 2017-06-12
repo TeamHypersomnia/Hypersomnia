@@ -2,8 +2,19 @@
 #include <vector>
 #include "augs/misc/container_with_small_size.h"
 #include "augs/misc/basic_game_intent.h"
+#include "augs/misc/basic_game_motion.h"
 
-enum class intent_type : unsigned char {
+enum class motion_type {
+	// GEN INTROSPECTOR enum class motion_type
+	INVALID,
+
+	MOVE_CROSSHAIR,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
+enum class intent_type {
 	// GEN INTROSPECTOR enum class intent_type
 	INVALID,
 
@@ -33,7 +44,6 @@ enum class intent_type : unsigned char {
 	WALK,
 	SPRINT,
 
-	MOVE_CROSSHAIR,
 	CROSSHAIR_PRIMARY_ACTION,
 	CROSSHAIR_SECONDARY_ACTION,
 
@@ -82,14 +92,12 @@ enum class intent_type : unsigned char {
 	// END GEN INTROSPECTOR
 };
 
-template <class intent_enum_type>
+template <class, class>
 struct basic_input_context;
 
-typedef basic_input_context<intent_type> input_context;
+using input_context = basic_input_context<intent_type, motion_type>;
 
-typedef basic_game_intent<intent_type> game_intent;
+using game_intent = basic_game_intent<intent_type>;
+using game_motion = basic_game_motion<motion_type>;
 
-typedef augs::container_with_small_size<
-	std::vector<game_intent>,
-	unsigned char
-> game_intent_vector;
+using game_intent_vector = std::vector<game_intent>;

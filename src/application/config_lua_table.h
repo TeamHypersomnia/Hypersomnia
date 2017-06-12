@@ -5,8 +5,12 @@
 
 #include "augs/padding_byte.h"
 #include "augs/graphics/pixel.h"
+#include "augs/misc/basic_input_context.h"
 
 #include "game/transcendental/entity_handle_declaration.h"
+#include "game/enums/input_context_enums.h"
+#include "game/view/game_drawing_settings.h"
+#include "game/view/world_camera.h"
 
 #include "application/config_structs/hotbar_settings.h"
 #include "application/config_structs/debug_drawing_settings.h"
@@ -39,6 +43,17 @@ enum class launch_type {
 
 class config_lua_table {
 public:
+	config_lua_table() = default;
+
+	config_lua_table(
+		const std::string& config_lua_path, 
+		const std::string& config_local_lua_path
+	);
+
+	void save(
+		const std::string& target_path
+	) const;
+
 	// GEN INTROSPECTOR class config_lua_table
 	launch_type launch_mode = launch_type::LOCAL;
 	input_recording_type input_recording_mode = input_recording_type::DISABLED;
@@ -120,6 +135,11 @@ public:
 	
 	debug_drawing_settings debug;
 	hotbar_settings hotbar;
+
+	world_camera_settings camera_settings;
+	game_drawing_settings drawing_settings;
+	input_context controls;
+
 	// END GEN INTROSPECTOR
 
 	void get_values(sol::state&);

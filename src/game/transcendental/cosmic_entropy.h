@@ -14,6 +14,8 @@
 #include "game/assets/spell_id.h"
 #include "augs/misc/container_with_small_size.h"
 #include "game/components/sentience_component.h"
+#include "augs/misc/basic_input_context.h"
+#include "game/enums/input_context_enums.h"
 
 class cosmos;
 
@@ -23,7 +25,8 @@ struct basic_cosmic_entropy {
 
 	// GEN INTROSPECTOR struct basic_cosmic_entropy class key
 	augs::container_with_small_size<std::unordered_map<key, spell_id>, unsigned char> cast_spells_per_entity;
-	augs::container_with_small_size<std::unordered_map<key, game_intent_vector>, unsigned char> intents_per_entity;
+	augs::container_with_small_size<std::unordered_map<key, decltype(input_context::translated::intents)>, unsigned char> intents_per_entity;
+	augs::container_with_small_size<std::unordered_map<key, decltype(input_context::translated::motions)>, unsigned char> motions_per_entity;
 	augs::container_with_small_size<std::vector<basic_item_slot_transfer_request<key>>, unsigned short> transfer_requests;
 	// END GEN INTROSPECTOR
 
@@ -75,7 +78,7 @@ struct cosmic_entropy : basic_cosmic_entropy<entity_id> {
 	
 	explicit cosmic_entropy(
 		const const_entity_handle controlled_entity, 
-		const decltype(intents_per_entity[entity_id()])&
+		const input_context::translated&
 	);
 
 	cosmic_entropy& operator+=(const cosmic_entropy& b) {

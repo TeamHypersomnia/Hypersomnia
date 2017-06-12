@@ -42,7 +42,7 @@ struct has_enum_to_string<T, decltype(augs::enum_to_string(T()), void())>
 {};
 
 template <class T>
-constexpr bool has_enum_to_string_v = has_introspect<T>::value;
+constexpr bool has_enum_to_string_v = has_enum_to_string<T>::value;
 
 template <class T>
 struct is_introspective_leaf : 

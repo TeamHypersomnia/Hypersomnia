@@ -49,14 +49,13 @@ using choreographic_command_tuple = replace_list_type_t<choreographic_command_va
 using namespace augs::window::event::keys;
 
 void choreographic_setup::process(
-	const config_lua_table& cfg,
 	game_window& window,
 	viewing_session& session
 ) {
 	session.show_profile_details = false;
 	session.reserve_caches_for_entities(3000);
 
-	const auto lines = augs::get_file_lines(cfg.choreographic_input_scenario_path);
+	const auto lines = augs::get_file_lines(session.config.choreographic_input_scenario_path);
 	size_t current_line = 0;
 
 	ensure(lines[current_line] == "resources:");
@@ -90,13 +89,13 @@ void choreographic_setup::process(
 			preloaded_sounds[id].set_data(augs::get_sound_samples_from_file(path));
 		}
 		else if (type == "scene") {
-			auto scene_cfg = cfg;
+			auto scene_cfg = session.config;
 			scene_cfg.director_input_scene_entropy_path = path;
 
 			auto& scene = preloaded_scenes[id].scene;
 
-			viewing_session dummy;
-			scene.init(scene_cfg, window, dummy);
+			auto dummy = viewing_session(window.get_screen_size(), scene_cfg);
+			scene.init(window, dummy);
 			scene.requested_playing_speed = 1.0;
 		}
 		else {
@@ -256,7 +255,7 @@ void choreographic_setup::process(
 		}
 
 		augs::machine_entropy new_machine_entropy;
-		new_machine_entropy.local = window.collect_entropy(!cfg.debug_disable_cursor_clipping);
+		new_machine_entropy.local = window.collect_entropy(!session.config.debug_disable_cursor_clipping);
 		process_exit_key(new_machine_entropy.local);
 
 		session.switch_between_gui_and_back(new_machine_entropy.local);
@@ -295,7 +294,7 @@ void choreographic_setup::process(
 			}
 
 			scene.scene.advance_player(session);
-			scene.scene.view(cfg, session);
+			scene.scene.view(session);
 		}
 		
 		session.systems_audiovisual.get<gui_element_system>().get_and_clear_pending_events();

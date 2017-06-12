@@ -30,26 +30,24 @@
 
 
 void client_setup::process(
-	const config_lua_table& cfg, 
 	game_window& window,
 	viewing_session& session
 ) {
-	init(cfg, window, session);
+	init(window, session);
 
 	while (!should_quit) {
 		session.local_entropy_profiler.new_measurement();
-		auto precollected = window.collect_entropy(!cfg.debug_disable_cursor_clipping);
+		auto precollected = window.collect_entropy(!session.config.debug_disable_cursor_clipping);
 		session.local_entropy_profiler.end_measurement();
 
 		if (process_exit_key(precollected))
 			break;
 
-		process_once(cfg, window, session, precollected);
+		process_once(window, session, precollected);
 	}
 }
 
 void client_setup::init(
-	const config_lua_table& cfg, 
 	game_window& window,
 	viewing_session& session,
 	const std::string recording_filename, 
@@ -59,36 +57,36 @@ void client_setup::init(
 
 	session.reserve_caches_for_entities(3000);
 
-	detailed_step_log = cfg.default_tickrate <= 2;
+	detailed_step_log = session.config.default_tickrate <= 2;
 
 	if (!hypersomnia.load_from_file("save.state")) {
-		hypersomnia.set_fixed_delta(cfg.default_tickrate);
+		hypersomnia.set_fixed_delta(session.config.default_tickrate);
 	}
 
-	if (cfg.get_input_recording_mode() != input_recording_type::DISABLED) {
+	if (session.config.get_input_recording_mode() != input_recording_type::DISABLED) {
 		//if (player.try_to_load_or_save_new_session("generated/sessions/", recording_filename)) {
-		//	timer.set_stepping_speed_multiplier(cfg.recording_replay_speed);
+		//	timer.set_stepping_speed_multiplier(session.config.recording_replay_speed);
 		//}
 	}
 
-	receiver.jitter_buffer.set_lower_limit(static_cast<unsigned>(cfg.jitter_buffer_ms / hypersomnia.get_fixed_delta().in_milliseconds()));
-	receiver.misprediction_smoothing_multiplier = static_cast<float>(cfg.misprediction_smoothing_multiplier);
+	receiver.jitter_buffer.set_lower_limit(static_cast<unsigned>(session.config.jitter_buffer_ms / hypersomnia.get_fixed_delta().in_milliseconds()));
+	receiver.misprediction_smoothing_multiplier = static_cast<float>(session.config.misprediction_smoothing_multiplier);
 
 	const bool is_replaying =
 		false;// player.is_replaying();
 	LOG("Is client replaying: %x", is_replaying);
-	const auto port = use_alternative_port ? cfg.alternative_port : cfg.connect_port;
+	const auto port = use_alternative_port ? session.config.alternative_port : session.config.connect_port;
 
-	const std::string readable_ip = typesafe_sprintf("%x:%x", cfg.connect_address, port);
+	const std::string readable_ip = typesafe_sprintf("%x:%x", session.config.connect_address, port);
 
 	LOG("Connecting to: %x", readable_ip);
 
-	if (is_replaying || client.connect(cfg.connect_address, port, 15000)) {
+	if (is_replaying || client.connect(session.config.connect_address, port, 15000)) {
 		LOG("Connected successfully to %x", readable_ip);
 		
 		augs::stream welcome;
 		augs::write(welcome, network_command::CLIENT_WELCOME_MESSAGE);
-		augs::write(welcome, use_alternative_port ? cfg.debug_second_nickname : cfg.nickname);
+		augs::write(welcome, use_alternative_port ? session.config.debug_second_nickname : session.config.nickname);
 
 		client.post_redundant(welcome);
 
@@ -100,7 +98,6 @@ void client_setup::init(
 }
 
 void client_setup::process_once(
-	const config_lua_table& cfg,
 	game_window& window,
 	viewing_session& session,
 	const augs::machine_entropy::local_type& precollected, 
@@ -147,13 +144,13 @@ void client_setup::process_once(
 		new_machine_entropy.local
 	);
 
-	game_intent_vector new_intents = session.context.to_game_intents(new_machine_entropy.local);
+	auto translated = session.config.controls.translate(new_machine_entropy.local);
 
-	session.control_and_remove_fetched_intents(new_intents);
+	session.control_and_remove_fetched_intents(translated.intents);
 
 	auto new_cosmic_entropy = cosmic_entropy(
 		hypersomnia[currently_controlled_character],
-		new_intents
+		translated
 	);
 
 	new_cosmic_entropy += session.systems_audiovisual.get<gui_element_system>().get_and_clear_pending_events();
@@ -279,7 +276,6 @@ void client_setup::process_once(
 		}
 
 		session.view(
-			cfg,
 			renderer,
 			extrapolated_hypersomnia,
 			currently_controlled_character,

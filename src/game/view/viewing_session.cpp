@@ -11,20 +11,15 @@
 #include "hypersomnia_version.h"
 #include "game/build_settings.h"
 
-viewing_session::viewing_session() {
+viewing_session::viewing_session(
+	const vec2i screen_size,
+	config_lua_table& config
+) : config(config) {
 	systems_audiovisual.get<sound_system>().initialize_sound_sources(32u);
-}
-
-void viewing_session::initialize(
-	const game_window& window,
-	const config_lua_table& cfg
-) {
-	const vec2i screen_size = vec2i(window.get_screen_size());
-
+	
 	set_screen_size(screen_size);
-	systems_audiovisual.get<interpolation_system>().interpolation_speed = static_cast<float>(cfg.interpolation_speed);
-	set_master_gain(cfg.sound_effects_volume);
-	configure_input();
+	systems_audiovisual.get<interpolation_system>().interpolation_speed = static_cast<float>(config.interpolation_speed);
+	set_master_gain(static_cast<float>(config.sound_effects_volume));
 }
 
 void viewing_session::set_screen_size(const vec2i new_size) {
@@ -40,66 +35,6 @@ void viewing_session::set_master_gain(const float gain) {
 	systems_audiovisual.get<sound_system>().master_gain = gain;
 }
 
-void viewing_session::configure_input() {
-	auto& active_context = context;
-
-	using namespace augs::window::event::keys;
-	using namespace augs::window::event;
-
-	active_context.map_key_to_intent(key::W, intent_type::MOVE_FORWARD);
-	active_context.map_key_to_intent(key::S, intent_type::MOVE_BACKWARD);
-	active_context.map_key_to_intent(key::A, intent_type::MOVE_LEFT);
-	active_context.map_key_to_intent(key::D, intent_type::MOVE_RIGHT);
-
-	active_context.map_event_to_intent(message::mousemotion, intent_type::MOVE_CROSSHAIR);
-	active_context.map_key_to_intent(key::LMOUSE, intent_type::CROSSHAIR_PRIMARY_ACTION);
-	active_context.map_key_to_intent(key::RMOUSE, intent_type::CROSSHAIR_SECONDARY_ACTION);
-
-	active_context.map_key_to_intent(key::E, intent_type::USE_BUTTON);
-	active_context.map_key_to_intent(key::LSHIFT, intent_type::SPRINT);
-
-	active_context.map_key_to_intent(key::G, intent_type::THROW);
-	active_context.map_key_to_intent(key::H, intent_type::HOLSTER);
-
-	active_context.map_key_to_intent(key::BACKSPACE, intent_type::CLEAR_DEBUG_LINES);
-
-	active_context.map_key_to_intent(key::LCTRL, intent_type::START_PICKING_UP_ITEMS);
-
-	active_context.map_key_to_intent(key::SPACE, intent_type::SPACE_BUTTON);
-	active_context.map_key_to_intent(key::MOUSE4, intent_type::SWITCH_TO_GUI);
-	
-	active_context.map_key_to_intent(key::CAPSLOCK, intent_type::DEBUG_SWITCH_CHARACTER);
-
-	active_context.map_key_to_intent(key::_1, intent_type::HOTBAR_BUTTON_0);
-	active_context.map_key_to_intent(key::_2, intent_type::HOTBAR_BUTTON_1);
-	active_context.map_key_to_intent(key::_3, intent_type::HOTBAR_BUTTON_2);
-	active_context.map_key_to_intent(key::_4, intent_type::HOTBAR_BUTTON_3);
-	active_context.map_key_to_intent(key::_5, intent_type::HOTBAR_BUTTON_4);
-	active_context.map_key_to_intent(key::_6, intent_type::HOTBAR_BUTTON_5);
-	active_context.map_key_to_intent(key::_7, intent_type::HOTBAR_BUTTON_6);
-	active_context.map_key_to_intent(key::_8, intent_type::HOTBAR_BUTTON_7);
-	active_context.map_key_to_intent(key::_9, intent_type::HOTBAR_BUTTON_8);
-	active_context.map_key_to_intent(key::_0, intent_type::HOTBAR_BUTTON_9);
-
-	active_context.map_key_to_intent(key::Z, intent_type::SPECIAL_ACTION_BUTTON_1);
-	active_context.map_key_to_intent(key::X, intent_type::SPECIAL_ACTION_BUTTON_2);
-	active_context.map_key_to_intent(key::C, intent_type::SPECIAL_ACTION_BUTTON_3);
-	active_context.map_key_to_intent(key::V, intent_type::SPECIAL_ACTION_BUTTON_4);
-	active_context.map_key_to_intent(key::B, intent_type::SPECIAL_ACTION_BUTTON_5);
-	active_context.map_key_to_intent(key::N, intent_type::SPECIAL_ACTION_BUTTON_6);
-	active_context.map_key_to_intent(key::M, intent_type::SPECIAL_ACTION_BUTTON_7);
-	active_context.map_key_to_intent(key::F2, intent_type::SPECIAL_ACTION_BUTTON_8);
-	active_context.map_key_to_intent(key::F3, intent_type::SPECIAL_ACTION_BUTTON_9);
-	active_context.map_key_to_intent(key::F4, intent_type::SPECIAL_ACTION_BUTTON_10);
-	active_context.map_key_to_intent(key::F5, intent_type::SPECIAL_ACTION_BUTTON_11);
-	active_context.map_key_to_intent(key::F6, intent_type::SPECIAL_ACTION_BUTTON_12);
-
-	active_context.map_key_to_intent(key::Q, intent_type::PREVIOUS_HOTBAR_SELECTION_SETUP);
-
-	active_context.map_key_to_intent(key::F, intent_type::SWITCH_WEAPON_LASER);
-	active_context.map_key_to_intent(key::DASH, intent_type::OPEN_DEVELOPER_CONSOLE);
-}
-
 void viewing_session::reserve_caches_for_entities(const size_t n) {
 	systems_audiovisual.for_each([n](auto& sys) {
 		sys.reserve_caches_for_entities(n);
@@ -109,7 +44,7 @@ void viewing_session::reserve_caches_for_entities(const size_t n) {
 void viewing_session::switch_between_gui_and_back(const augs::machine_entropy::local_type& local) {
 	auto& gui = systems_audiovisual.get<gui_element_system>();
 
-	for (const auto& intent : context.to_game_intents(local)) {
+	for (const auto& intent : config.controls.translate(local).intents) {
 		if (intent.is_pressed && intent.intent == intent_type::SWITCH_TO_GUI) {
 			gui.gui_look_enabled = !gui.gui_look_enabled;
 		}
@@ -118,18 +53,18 @@ void viewing_session::switch_between_gui_and_back(const augs::machine_entropy::l
 
 void viewing_session::control_gui_and_remove_fetched_events(
 	const const_entity_handle root,
-	augs::machine_entropy::local_type& entropies
+	augs::machine_entropy::local_type& window_inputs
 ) {
 	auto& gui = systems_audiovisual.get<gui_element_system>();
 
 	gui.control_gui(
 		root, 
-		entropies
+		window_inputs
 	);
 
 	gui.handle_hotbar_and_action_button_presses(
 		root,
-		context.to_game_intents(entropies)
+		config.controls.translate(window_inputs).intents
 	);
 }
 
@@ -152,7 +87,7 @@ void viewing_session::control_and_remove_fetched_intents(game_intent_vector& int
 			fetch = true;
 
 			if (intent.is_pressed) {
-				drawing_settings.draw_weapon_laser = !drawing_settings.draw_weapon_laser;
+				config.drawing_settings.draw_weapon_laser = !config.drawing_settings.draw_weapon_laser;
 			}
 		}
 
@@ -211,7 +146,7 @@ void viewing_session::advance_audiovisual_systems(
 	camera.tick(
 		interp, 
 		dt,
-		camera_settings,
+		config.camera_settings,
 		cosm[viewed_character]
 	);
 	
@@ -255,7 +190,6 @@ void viewing_session::draw_text_at_left_top(
 }
 
 void viewing_session::view(
-	const config_lua_table& config,
 	augs::renderer& renderer,
 	const cosmos& cosmos,
 	const entity_id viewed_character,
@@ -267,11 +201,10 @@ void viewing_session::view(
 	
 	const auto custom_log = multiply_alpha(format_as_bbcode(typesafe_sprintf("[color=cyan]Transmission details:[/color]\n%x", details.format_transmission_details()), style(assets::font_id::GUI_FONT, white)), 150.f / 255);;
 
-	view(config, renderer, cosmos, viewed_character, all_visible, interpolation_ratio, custom_log);
+	view(renderer, cosmos, viewed_character, all_visible, interpolation_ratio, custom_log);
 }
 
 void viewing_session::view(
-	const config_lua_table& config,
 	augs::renderer& renderer,
 	const cosmos& cosmos,
 	const entity_id viewed_character,
@@ -289,7 +222,6 @@ void viewing_session::view(
 	const auto character_chased_by_camera = cosmos[viewed_character];
 
 	auto main_cosmos_viewing_step = viewing_step(
-		config,
 		cosmos, 
 		*this, 
 		interpolation_ratio,
@@ -298,8 +230,6 @@ void viewing_session::view(
 		character_chased_by_camera,
 		all_visible
 	);
-
-	main_cosmos_viewing_step.settings = drawing_settings;
 
 #if NDEBUG || _DEBUG
 	rendering_scripts::illuminated_rendering(main_cosmos_viewing_step);

@@ -12,7 +12,7 @@ namespace augs {
 class interpolation_system;
 
 struct world_camera_settings {
-	// GEN INTROSPECTOR struct world_camera_settngs
+	// GEN INTROSPECTOR struct world_camera_settings
 	augs::smooth_value_field_settings smooth_value_field_settings; 
 	float angled_look_length = 100.f;
 	float smoothing_average_factor = 0.5;

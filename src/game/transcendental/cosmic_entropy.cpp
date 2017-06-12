@@ -42,6 +42,10 @@ size_t basic_cosmic_entropy<key>::length() const {
 		total += ent.second.size();
 	}
 
+	for (const auto& ent : motions_per_entity) {
+		total += ent.second.size();
+	}
+
 	total += transfer_requests.size();
 	total += cast_spells_per_entity.size();
 
@@ -52,6 +56,10 @@ template <class key>
 basic_cosmic_entropy<key>& basic_cosmic_entropy<key>::operator+=(const basic_cosmic_entropy& b) {
 	for (const auto& intents : b.intents_per_entity) {
 		concatenate(intents_per_entity[intents.first], intents.second);
+	}
+
+	for (const auto& intents : b.motions_per_entity) {
+		concatenate(motions_per_entity[intents.first], intents.second);
 	}
 
 	concatenate(transfer_requests, b.transfer_requests);
@@ -78,6 +86,7 @@ void basic_cosmic_entropy<key>::clear() {
 bool guid_mapped_entropy::operator!=(const guid_mapped_entropy& b) const {
 	return !(
 		intents_per_entity == b.intents_per_entity
+		&& motions_per_entity == b.motions_per_entity
 		&& cast_spells_per_entity == b.cast_spells_per_entity
 		&& transfer_requests == b.transfer_requests
 	);
@@ -89,6 +98,10 @@ guid_mapped_entropy::guid_mapped_entropy(
 ) {
 	for (const auto& entry : b.intents_per_entity) {
 		intents_per_entity[mapper[entry.first].get_guid()] = entry.second;
+	}
+
+	for (const auto& entry : b.motions_per_entity) {
+		motions_per_entity[mapper[entry.first].get_guid()] = entry.second;
 	}
 
 	for (const auto& entry : b.cast_spells_per_entity) {
@@ -108,6 +121,10 @@ cosmic_entropy::cosmic_entropy(
 		intents_per_entity[mapper.get_handle(entry.first).get_id()] = entry.second;
 	}
 
+	for (const auto& entry : b.motions_per_entity) {
+		motions_per_entity[mapper.get_handle(entry.first).get_id()] = entry.second;
+	}
+
 	for (const auto& entry : b.cast_spells_per_entity) {
 		cast_spells_per_entity[mapper.get_handle(entry.first).get_id()] = entry.second;
 	}
@@ -119,9 +136,10 @@ cosmic_entropy::cosmic_entropy(
 
 cosmic_entropy::cosmic_entropy(
 	const const_entity_handle controlled_entity,
-	const decltype(intents_per_entity[entity_id()])& intents
+	const input_context::translated& translated
 ) {
-	intents_per_entity[controlled_entity] = intents;
+	intents_per_entity[controlled_entity] = translated.intents;
+	motions_per_entity[controlled_entity] = translated.motions;
 }
 
 template struct basic_cosmic_entropy<entity_id>;

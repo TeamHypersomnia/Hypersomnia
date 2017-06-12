@@ -2,10 +2,8 @@
 #include "message.h"
 #include "augs/math/vec2.h"
 
-#include "intent_message.h"
-
 namespace messages {
-	struct crosshair_intent_message : public intent_message {
+	struct crosshair_motion_message : message {
 		vec2 crosshair_base_offset;
 		vec2 crosshair_base_offset_rel;
 
