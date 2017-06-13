@@ -99,6 +99,18 @@ struct subscript_asset_getters {
 	using base = subscript_asset_getters<derived>;
 
 	template <class id_type>
+	decltype(auto) find(const id_type id) {
+		const auto& self = *static_cast<const derived*>(this);
+		return found_or_nullptr(get_container_with_key_type<id_type>(self.all), id);
+	}
+
+	template <class id_type>
+	decltype(auto) find(const id_type id) const {
+		const auto& self = *static_cast<const derived*>(this);
+		return found_or_nullptr(get_container_with_key_type<id_type>(self.all), id);
+	}
+
+	template <class id_type>
 	decltype(auto) operator[](const id_type id) {
 		auto& self = *static_cast<derived*>(this);
 

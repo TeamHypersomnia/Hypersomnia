@@ -231,7 +231,7 @@
   jitter_buffer_ms = 0,
   last_session_update_link = "",
   latest_news_url = "",
-  launch_mode = "LOCAL",
+  launch_mode = "MAIN_MENU",
   max_number_of_sound_sources = 0,
   menu_intro_scene_entropy_path = "",
   menu_theme_path = "",

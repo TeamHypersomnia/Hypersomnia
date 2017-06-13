@@ -29,10 +29,6 @@ namespace augs {
 		}
 
 		void text_drawer::set_text(const text::formatted_string& f) {
-			if (draft.get_str().size() == f.size() && !std::memcmp(draft.get_str().data(), f.data(), f.size() * sizeof(text::formatted_char))) {
-				return;
-			}
-
 			draft.str() = f;
 		}
 

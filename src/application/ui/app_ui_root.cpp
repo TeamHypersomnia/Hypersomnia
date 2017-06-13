@@ -23,6 +23,7 @@ void app_ui_root::set_menu_buttons_positions(const vec2i screen_size) {
 }
 
 void app_ui_root::set_menu_buttons_sizes(const vec2i size) {
+	LOG_NVPS(size);
 	for (size_t i = 0; i < menu_buttons.size(); ++i) {
 		auto this_size = size;
 		

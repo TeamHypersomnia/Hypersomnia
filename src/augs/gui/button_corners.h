@@ -64,7 +64,13 @@ struct button_corners_info {
 
 		for (auto i = button_corner_type::INSIDE; i < button_corner_type::COUNT; i = static_cast<button_corner_type>(static_cast<int>(i) + 1)) {
 			const auto tex_id = get_tex_for_type(i);
-			const auto& tex = manager[tex_id].texture_maps[texture_map_type::DIFFUSE];
+			const auto tex_it = manager.find(tex_id);
+
+			if (tex_it == nullptr) {
+				continue;
+			}
+
+			const auto& tex = tex_it->texture_maps[texture_map_type::DIFFUSE];
 
 			if (!tex.exists()) {
 				continue;

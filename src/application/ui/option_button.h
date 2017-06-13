@@ -99,8 +99,6 @@ public:
 		inside_col *= this_id->colorize;
 		border_col *= this_id->colorize;
 
-		const auto inside_mat = augs::gui::material(assets::game_image_id::MENU_BUTTON_INSIDE, inside_col);
-
 		const bool flip = this_id->corners.flip_horizontally;
 		const auto internal_rc = this_id->corners.cornered_rc_to_internal_rc(this_tree_entry.get_absolute_rect());
 

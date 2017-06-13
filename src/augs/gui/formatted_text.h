@@ -25,7 +25,7 @@ namespace augs {
 				operator formatted_char();
 			};
 
-			typedef std::basic_string<formatted_char> formatted_string;
+			using formatted_string = std::basic_string<formatted_char>;
 
 			formatted_string format_recent_global_log(
 				const assets::font_id,

@@ -13,7 +13,6 @@ typedef std::unique_ptr<augs::action> act;
 struct appearing_text {
 	typedef augs::gui::text::formatted_string formatted_string;
 
-	augs::gui::text_drawer drawer;
 	augs::gui::text::style st = augs::gui::text::style(assets::font_id::GUI_FONT, cyan);
 	rgba_channel alpha = 0;
 
@@ -76,6 +75,8 @@ struct appearing_text {
 		}
 
 		text = set_alpha(text, alpha);
+		
+		augs::gui::text_drawer drawer;
 		drawer.pos = target_pos;
 		drawer.set_text(text);
 

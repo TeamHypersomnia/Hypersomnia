@@ -15,12 +15,6 @@
 #include "application/config_structs/hotbar_settings.h"
 #include "application/config_structs/debug_drawing_settings.h"
 
-class game_window;
-
-namespace sol {
-	class state;
-}
-
 enum class launch_type {
 	// GEN INTROSPECTOR enum class launch_type
 	MAIN_MENU,
@@ -140,8 +134,6 @@ public:
 
 	// END GEN INTROSPECTOR
 
-	void get_values(sol::state&);
-	
 	launch_type get_launch_mode() const;
 	input_recording_type get_input_recording_mode() const;
 };

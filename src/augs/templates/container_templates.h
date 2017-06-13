@@ -125,6 +125,20 @@ auto found_or_default(Container&& container, Key&& key, Args&&... default_args) 
 	return type(std::forward<Args>(default_args)...);
 }
 
+template <class Container, class Key>
+auto found_or_nullptr(Container&& container, Key&& key) {
+	const auto it = find_in(std::forward<Container>(container), std::forward<Key>(key));
+
+	const bool found = it != container.end();
+	using ptr_type = decltype(std::addressof((*it).second));
+
+	if (found) {
+		return std::addressof((*it).second);
+	}
+
+	return reinterpret_cast<ptr_type>(nullptr);
+}
+
 template <class Container, class T>
 void fill_container(Container& c, T&& val) {
 	std::fill(c.begin(), c.end(), std::forward<T>(val));

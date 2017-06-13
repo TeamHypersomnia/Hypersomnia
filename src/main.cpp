@@ -119,6 +119,7 @@ int main(int argc, char** argv) {
 	(
 		(
 			mode == launch_type::LOCAL
+			|| mode == launch_type::MAIN_MENU
 			|| mode == launch_type::CHOREOGRAPHIC
 			|| mode == launch_type::DIRECTOR
 			|| mode == launch_type::LOCAL_DETERMINISM_TEST

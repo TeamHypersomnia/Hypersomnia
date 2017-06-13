@@ -205,7 +205,7 @@ namespace augs {
 				edit.front().set_redo();
 
 				anchor();
-				need_redraw();
+				set_needs_redraw();
 			}
 
 			void ui::character(const wchar_t& cc) {
@@ -213,7 +213,7 @@ namespace augs {
 				ch.c = cc;
 				character(ch);
 				unbind_styles();
-				need_redraw();
+				set_needs_redraw();
 			}
 
 			void ui::character(const formatted_char& ch) {
@@ -235,7 +235,7 @@ namespace augs {
 					edit.action(action(*this, get_left_selection(), get_str().substr(get_left_selection(), get_right_selection() - get_left_selection()), action::ERASE));
 					clean_selection();
 					edit.front().set_redo();
-					need_redraw();
+					set_needs_redraw();
 				}
 				else if (ctrl) {
 					unsigned left_offset = separator.get_left_word(get_str(), caret.pos);
@@ -244,14 +244,14 @@ namespace augs {
 						caret.pos -= left_offset;
 						str().erase(get_str().begin() + caret.pos, get_str().begin() + caret.pos + left_offset);
 						edit.front().set_redo();
-						need_redraw();
+						set_needs_redraw();
 					}
 				}
 				else if (caret.pos > 0) {
 					edit.action(action(*this, caret.pos - 1, get_str().substr(caret.pos - 1, 1), action::ERASE));
 					str().erase(get_str().begin() + --caret.pos);
 					edit.front().set_redo();
-					need_redraw();
+					set_needs_redraw();
 				}
 				anchor();
 			}
@@ -277,7 +277,7 @@ namespace augs {
 					edit.front().set_redo();
 				}
 				anchor();
-				need_redraw();
+				set_needs_redraw();
 			}
 
 			void ui::select_all() {
@@ -335,7 +335,7 @@ namespace augs {
 				}
 				else if (forced_bold = !forced_bold)
 					bold_bound = !get_assets_manager()[get_neighbor_style().f].is_bolded();
-				need_redraw();
+				set_needs_redraw();
 			}
 
 			void ui::italics() {
@@ -363,12 +363,12 @@ namespace augs {
 			}
 
 			bool ui::undo() {
-				need_redraw();
+				set_needs_redraw();
 				return edit.undo();
 			}
 
 			bool ui::redo() {
-				need_redraw();
+				set_needs_redraw();
 				return edit.redo();
 			}
 

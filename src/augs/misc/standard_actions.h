@@ -31,6 +31,10 @@ namespace augs {
 		void on_update(const delta dt) final {
 			current = static_cast<T>(augs::interp(initial, to, elapsed_ms/duration_ms));
 			elapsed_ms += dt.in_milliseconds();
+
+			if (is_complete()) {
+				current = to;
+			}
 		}
 
 		bool is_complete() const final {
@@ -108,8 +112,8 @@ namespace augs {
 		void on_update(const delta dt) final {
 			elapsed_ms += dt.in_milliseconds();
 
-			while (intervals[current_interval] < elapsed_ms && current_interval < intervals.size()) {
-				target_container.insert(target_container.end(), from_container[current_interval]);
+			while (current_interval < intervals.size() && intervals[current_interval] < elapsed_ms) {
+				target_container.insert(target_container.end(), from_container.at(current_interval));
 
 				++current_interval;
 			}
