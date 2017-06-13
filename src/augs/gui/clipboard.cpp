@@ -28,7 +28,7 @@ namespace augs {
 		void clipboard::change_clipboard() {
 			if (!own_copy && fetch_clipboard) {
 				text::formatted_char ch;
-				ch.set(0, assets::font_id::GUI_FONT, rgba(0, 0, 0, 255));
+				ch.set(0, { assets::font_id::GUI_FONT, rgba(0, 0, 0, 255) });
 				paste_clipboard_formatted(contents, ch);
 				own_clip = false;
 			}

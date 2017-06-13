@@ -35,7 +35,7 @@ namespace augs {
 				if (max_left == -1) max_left = 0;
 				if (_str.empty() || at <= int(max_left)) return 0;
 
-				unsigned result = get_left_word(_str, at, max_left, word_type(_str[at ? at - 1 : 0].c));
+				unsigned result = get_left_word(_str, at, max_left, word_type(_str[at ? at - 1 : 0].unicode));
 				return result == 0 ?
 					1 /* newline encountered */
 					: result;
@@ -45,7 +45,7 @@ namespace augs {
 				if (max_right == -1) max_right = _str.length();
 				if (_str.empty() || at >= int(max_right)) return 0;
 
-				unsigned result = get_right_word(_str, at, max_right, word_type(_str[at].c));
+				unsigned result = get_right_word(_str, at, max_right, word_type(_str[at].unicode));
 				return result == 0 ?
 					1 /* newline encountered */
 					: result;
@@ -57,7 +57,7 @@ namespace augs {
 
 				unsigned offset = 0;
 				while (at > max_left) {
-					if (!is_character_newline(_str[at ? at - 1 : 0].c) && word_type(_str[at ? at - 1 : 0].c) == wordtype) {
+					if (!is_character_newline(_str[at ? at - 1 : 0].unicode) && word_type(_str[at ? at - 1 : 0].unicode) == wordtype) {
 						++offset;
 						--at;
 					}
@@ -73,7 +73,7 @@ namespace augs {
 
 				unsigned offset = 0;
 				while (at < max_right) {
-					if (!is_character_newline(_str[at].c) && word_type(_str[at].c) == wordtype) {
+					if (!is_character_newline(_str[at].unicode) && word_type(_str[at].unicode) == wordtype) {
 						++offset;
 						++at;
 					}

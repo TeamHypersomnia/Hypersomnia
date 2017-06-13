@@ -75,7 +75,7 @@ namespace augs {
 					gui::draw_clipped_rect(highlight_mat, xywhi(0, highlighted.top, clip ? d.get_bbox().x + clipper.w() : d.get_bbox().x,
 
 						/* snap to default style's height */
-						highlighted.empty() ? manager[caret->default_style.f].meta_from_file.get_height()
+						highlighted.empty() ? manager[caret->default_style.font].meta_from_file.get_height()
 						: highlighted.height()) + pos, clipper, v);
 				}
 
@@ -167,20 +167,20 @@ namespace augs {
 								caret_rect = xywhi(sectors[caret->pos], lines[caret_line].top, caret_width, lines[caret_line].height());
 							else {
 								int pos = std::max(1u, caret->pos);
-								auto& glyph_font = manager[colors[pos - 1].font_used];
+								auto& glyph_font = manager[colors[pos - 1].format.font];
 								caret_rect = xywhi(sectors[caret->pos], lines[caret_line].top + lines[caret_line].asc - glyph_font.meta_from_file.ascender,
 									caret_width, glyph_font.meta_from_file.get_height());
 							}
 						}
 						/* otherwise set caret's height to default style's height to avoid strange situations */
 						else
-							caret_rect = xywhi(0, d.lines[caret_line].top, caret_width, manager[caret->default_style.f].meta_from_file.get_height());
+							caret_rect = xywhi(0, d.lines[caret_line].top, caret_width, manager[caret->default_style.font].meta_from_file.get_height());
 
 					}
 				}
 				/* there is nothing to draw, but we are still active so we want to draw caret anyway */
 				else if (active && caret)
-					caret_rect = xywhi(0, 0, caret_width, manager[caret->default_style.f].meta_from_file.get_height());
+					caret_rect = xywhi(0, 0, caret_width, manager[caret->default_style.font].meta_from_file.get_height());
 
 				//					this->quad_indices.caret = v.size();
 				if (blink.caret_visible) gui::draw_clipped_rect(caret_mat, caret_rect + pos, clipper, v);

@@ -13,15 +13,15 @@ namespace augs {
 	namespace gui {
 		namespace text {
 			const baked_font& drafter::getf(const gui::text::formatted_string& source, const unsigned i) const {
-				//return (i < source.length() && source[i].font_used) ? source[i].font_used : target_caret->default_style.f;
-				return get_assets_manager()[source[i].font_used];
+				//return (i < source.length() && source[i].format.font) ? source[i].format.font : target_caret->default_style.f;
+				return get_assets_manager()[source[i].format.font];
 			}
 
 			int drafter::get_kern(const gui::text::formatted_string& source, const unsigned i, const unsigned l) const {
 				if (kerning && i > lines[l].begin && &getf(source, i) == &getf(source, i - 1)) {
 					auto& vk = get_cached(i).kerning;
 					for (unsigned k = 0; k < vk.size(); ++k)
-						if (vk[k].first == source[i - 1].c)
+						if (vk[k].first == source[i - 1].unicode)
 							return vk[k].second;
 				}
 				return 0;
@@ -191,7 +191,7 @@ namespace augs {
 				for (unsigned i = 0; i < source.size(); ++i) {
 					const auto& ff = getf(source, i);
 
-					const auto* const g = ff.meta_from_file.get_glyph(password_mode ? password_character : source[i].c);
+					const auto* const g = ff.meta_from_file.get_glyph(password_mode ? password_character : source[i].unicode);
 
 					/* if we allowed a null glyph in string, it must be newline */
 					const auto* const final_ptr = g ? g : ff.meta_from_file.get_glyph(L' ');
@@ -219,7 +219,7 @@ namespace augs {
 
 					/* if we have just encountered a newline character or there is need to wrap, we have to break the current line and
 					create another */
-					if (augs::window::is_character_newline(source[i].c) || wrap) {
+					if (augs::window::is_character_newline(source[i].unicode) || wrap) {
 						/* take care of the current line */
 						lines[l].wrapped = wrap;
 						/* this will be moved left if we're wrapping */

@@ -375,7 +375,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/augs/gui/stylesheet.cpp"
 	"src/augs/gui/text/caret.cpp"
 	"src/augs/gui/text/drafter.cpp"
-	"src/augs/gui/text/draft_interface.cpp"
+	"src/augs/gui/text/draft_redrawer.cpp"
 	"src/augs/gui/text/printer.cpp"
 	"src/augs/gui/text/ui.cpp"
 	"src/augs/gui/text/word_separator.cpp"

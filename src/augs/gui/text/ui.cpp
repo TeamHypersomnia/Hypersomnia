@@ -17,7 +17,7 @@ namespace augs {
 				forced_italics(false), max_characters(0), whitelist(nullptr), blacklist(nullptr), allow_unknown_characters_as_default(false) {}
 			const augs::baked_font& ui::getf(unsigned i) const {
 				return get_assets_manager()
-					[(i < get_str().length() && get_str()[i].font_used != assets::font_id::INVALID) ? get_str()[i].font_used : caret.default_style.f];
+					[(i < get_str().length() && get_str()[i].format.font != assets::font_id::INVALID) ? get_str()[i].format.font : caret.default_style.font];
 			}
 
 			void ui::anchor() {
@@ -185,7 +185,7 @@ namespace augs {
 				formatted_string s;
 
 				for (size_t i = 0; i < ss.length(); ++i)
-					if (is_valid_glyph(ss[i]) && is_whitelisted(ss[i].c) && !is_blacklisted(ss[i].c)) s += ss[i];
+					if (is_valid_glyph(ss[i]) && is_whitelisted(ss[i].unicode) && !is_blacklisted(ss[i].unicode)) s += ss[i];
 
 				if (max_characters > 0) {
 					size_t newlen = get_str().size() + s.size() - std::abs(caret.selection_offset);
@@ -210,14 +210,14 @@ namespace augs {
 
 			void ui::character(const wchar_t& cc) {
 				formatted_char ch = get_current_style();
-				ch.c = cc;
+				ch.unicode = cc;
 				character(ch);
 				unbind_styles();
 				set_needs_redraw();
 			}
 
 			void ui::character(const formatted_char& ch) {
-				if (!is_valid_glyph(ch) || !is_whitelisted(ch.c) || is_blacklisted(ch.c) || (max_characters > 0 && get_str().size() + 1 - std::abs(caret.selection_offset) > max_characters)) return;
+				if (!is_valid_glyph(ch) || !is_whitelisted(ch.unicode) || is_blacklisted(ch.unicode) || (max_characters > 0 && get_str().size() + 1 - std::abs(caret.selection_offset) > max_characters)) return;
 
 				if (caret.selection_offset) {
 					edit.action(action(*this, get_left_selection(), ch, get_str().substr(get_left_selection(), get_right_selection() - get_left_selection())));
@@ -290,7 +290,7 @@ namespace augs {
 				if (get_str().empty()) return;
 
 				int left = 0, right = 0;
-				auto chr = get_str()[std::min<unsigned long>(at, get_str().length() - 1)].c;
+				auto chr = get_str()[std::min<unsigned long>(at, get_str().length() - 1)].unicode;
 
 				if (at >= get_str().length() || separator.is_character_newline(chr))
 					left = separator.get_left_word(get_str(), at);
@@ -330,11 +330,11 @@ namespace augs {
 					for (int i = l; i < r; ++i) {
 						auto& f = getf(i);
 						edit.front().states.push_back(f.is_bolded());
-						str()[i].font_used = f.get_bold(bold_all);
+						str()[i].format.font = f.get_bold(bold_all);
 					}
 				}
 				else if (forced_bold = !forced_bold)
-					bold_bound = !get_assets_manager()[get_neighbor_style().f].is_bolded();
+					bold_bound = !get_assets_manager()[get_neighbor_style().font].is_bolded();
 				set_needs_redraw();
 			}
 
@@ -355,11 +355,11 @@ namespace augs {
 					for (int i = l; i < r; ++i) {
 						auto& f = getf(i);
 						edit.front().states.push_back(f.is_italicsed());
-						str()[i].font_used = f.get_italics(it_all);
+						str()[i].format.font = f.get_italics(it_all);
 					}
 				}
 				else if (forced_italics = !forced_italics)
-					italics_bound = !get_assets_manager()[get_neighbor_style().f].is_italicsed();
+					italics_bound = !get_assets_manager()[get_neighbor_style().font].is_italicsed();
 			}
 
 			bool ui::undo() {
@@ -440,7 +440,7 @@ namespace augs {
 			}
 
 			bool ui::action::include(const action& next) {
-				if ((flag == CHARACTERS || flag == REPLACE_CHARACTERS) && next.flag == CHARACTERS && !subject->separator.is_character_newline(next.character.c)
+				if ((flag == CHARACTERS || flag == REPLACE_CHARACTERS) && next.flag == CHARACTERS && !subject->separator.is_character_newline(next.character.unicode)
 					&& next.where == where + _str.length() + 1 /* we don't want to merge characters at different positions */
 					) {
 					_str += next.character;
@@ -490,7 +490,7 @@ namespace augs {
 
 				if (flag == action::BOLDEN || flag == action::ITALICSEN) {
 					for (int i = where; i < right; ++i) {
-						assets::font_id& f = subject->str()[i].font_used;
+						assets::font_id& f = subject->str()[i].format.font;
 						f = flag == action::BOLDEN ? subject->getf(i).get_bold(undo ? (unapply ? true : states[i - where]) : !unapply) :
 							subject->getf(i).get_italics(undo ? (unapply ? true : states[i - where]) : !unapply);
 					}
@@ -521,8 +521,8 @@ namespace augs {
 
 			style ui::get_current_style() const {
 				style ch = get_neighbor_style();
-				if (forced_bold)    ch.f = get_assets_manager()[ch.f].get_bold(bold_bound);
-				if (forced_italics) ch.f = get_assets_manager()[ch.f].get_italics(italics_bound);
+				if (forced_bold)    ch.font = get_assets_manager()[ch.font].get_bold(bold_bound);
+				if (forced_italics) ch.font = get_assets_manager()[ch.font].get_italics(italics_bound);
 				return ch;
 			}
 
@@ -543,7 +543,7 @@ namespace augs {
 							return false;
 					return true;
 				}
-				else return forced_bold ? bold_bound : get_assets_manager()[get_neighbor_style().f].is_bolded();
+				else return forced_bold ? bold_bound : get_assets_manager()[get_neighbor_style().font].is_bolded();
 			}
 
 			bool ui::get_italics_status() const {
@@ -554,7 +554,7 @@ namespace augs {
 							return false;
 					return true;
 				}
-				else return forced_italics ? italics_bound : get_assets_manager()[get_neighbor_style().f].is_italicsed();
+				else return forced_italics ? italics_bound : get_assets_manager()[get_neighbor_style().font].is_italicsed();
 			}
 
 			bool ui::is_valid_glyph(const formatted_char& c) {
@@ -562,8 +562,8 @@ namespace augs {
 					/* if we want to have newlines, we need a whitespace glyph added to the end of every line
 						similiarly with tabs, we want to replace them with spaces
 					*/
-					(iswspace(c.c) && get_assets_manager()[c.font_used].meta_from_file.get_glyph(L' ') != nullptr)
-					|| allow_unknown_characters_as_default || get_assets_manager()[c.font_used].meta_from_file.get_glyph(c.c) != nullptr;
+					(iswspace(c.unicode) && get_assets_manager()[c.format.font].meta_from_file.get_glyph(L' ') != nullptr)
+					|| allow_unknown_characters_as_default || get_assets_manager()[c.format.font].meta_from_file.get_glyph(c.unicode) != nullptr;
 			}
 
 			bool ui::is_whitelisted(wchar_t c) const {

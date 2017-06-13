@@ -39,7 +39,7 @@ namespace augs {
 				out.reserve(l);
 
 				for (const auto& c : f) {
-					out += c.c;
+					out += c.unicode;
 				}
 
 				return out;
@@ -50,7 +50,7 @@ namespace augs {
 				const float m
 			) {
 				for (auto& c : f) {
-					c.a = static_cast<unsigned char>(c.a * m);
+					c.format.color.a = static_cast<unsigned char>(c.format.color.a * m);
 				}
 
 				return f;
@@ -61,7 +61,7 @@ namespace augs {
 				const float m
 			) {
 				for (auto& c : f) {
-					c.a = static_cast<unsigned char>(m);
+					c.format.color.a = static_cast<unsigned char>(m);
 				}
 
 				return f;
@@ -77,7 +77,7 @@ namespace augs {
 				formatted_char ch;
 				
 				for (const auto& c : str) {
-					ch.set(c, s.f, s.color);
+					ch.set(c, s);
 					out.append(1, ch);
 				}
 			}
@@ -179,7 +179,7 @@ namespace augs {
 					}
 
 					for (size_t c = end_of_opening_tag; c < begin_of_closing_tag; ++c) {
-						output[c].set(new_style.f, new_style.color);
+						output[c].set_format(new_style);
 					}
 
 					begin_of_opening_tag = input_str.find(opening_tag_body, end_of_closing_tag);
@@ -192,60 +192,51 @@ namespace augs {
 				return output;
 			}
 
-			void formatted_char::set(
-				const wchar_t ch, 
-				const assets::font_id f, 
-				const rgba& p
-			) {
-				font_used = f;
-				c = ch;
-				r = p.r;
-				g = p.g;
-				b = p.b;
-				a = p.a;
-			}
 
 			void formatted_char::set(
-				const assets::font_id f, 
-				const rgba& p
+				const wchar_t code,
+				const style _format
 			) {
-				font_used = f;
-				r = p.r;
-				g = p.g;
-				b = p.b;
-				a = p.a;
+				unicode = code;
+				set_format(_format);
+			}
+
+			void formatted_char::set_format(const style _format) {
+				format = _format;
+			}
+
+			void formatted_char::set_font(const assets::font_id f) {
+				format.font = f;
+			}
+
+			void formatted_char::set_color(const rgba col) {
+				format.color = col;
 			}
 
 			bool formatted_char::operator==(const formatted_char& second) const {
-				return font_used == second.font_used && c == second.c;
+				return unicode == second.unicode && format == second.format;
 			}
 
 			style::style(
 				const assets::font_id f, 
 				const rgba c
 			) : 
-				f(f), 
+				font(f), 
 				color(c) 
 			{
 			}
 
-			style::style(const formatted_char& c) : 
-				f(c.font_used), 
-				color(
-					rgba(
-						c.r, 
-						c.g, 
-						c.b, 
-						c.a
-					)
-				) 
-			{
-			}
+			style::style(const formatted_char& c) : style(c.format)
+			{}
 
 			style::operator formatted_char() {
 				formatted_char c;
-				c.set(f, color);
+				c.set_format(*this);
 				return c;
+			}
+
+			bool style::operator==(const style& b) const {
+				return color == b.color && font == b.font;
 			}
 		}
 	}

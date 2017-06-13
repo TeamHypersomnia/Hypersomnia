@@ -1,7 +1,7 @@
 #pragma once
 #include "text/drafter.h"
 #include "text/printer.h"
-#include "text/draft_interface.h"
+#include "text/draft_redrawer.h"
 #include "rect_world.h"
 
 namespace augs {

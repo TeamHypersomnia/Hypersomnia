@@ -1,4 +1,4 @@
-#include "draft_interface.h"
+#include "draft_redrawer.h"
 namespace augs {
 	namespace gui {
 		namespace text {

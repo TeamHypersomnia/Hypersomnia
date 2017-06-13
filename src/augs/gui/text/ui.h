@@ -1,7 +1,7 @@
 #pragma once
 #include "caret.h"
 #include "augs/gui/clipboard.h"
-#include "draft_interface.h"
+#include "draft_redrawer.h"
 #include "augs/misc/undoredo.h"
 #include "augs/image/font.h"
 
@@ -114,7 +114,7 @@ namespace augs {
 				bool is_whitelisted(wchar_t c) const;
 				bool is_blacklisted(wchar_t c) const;
 
-				/* font getting helper, shortens _str[i].font_used */
+				/* font getting helper, shortens _str[i].format.font */
 				const augs::baked_font& getf(unsigned i) const;
 
 				int get_selection_offset();

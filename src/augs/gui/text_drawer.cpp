@@ -10,7 +10,7 @@ namespace augs {
 			auto coloured_str = draft.get_str();
 			
 			for (auto& c : coloured_str) {
-				c.set(c.font_used, col);
+				c.set_color(col);
 			}
 
 			print.draw_text(v, draft.get_draft(), coloured_str, in, pos + vec2(-1, 0));

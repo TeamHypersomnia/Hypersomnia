@@ -7,22 +7,32 @@
 namespace augs {
 	namespace gui {
 		namespace text {
-			struct formatted_char {
-				assets::font_id font_used;
-				wchar_t c;
-				unsigned char r, g, b, a;
-				void set(wchar_t, assets::font_id = assets::font_id::GUI_FONT, const rgba& = rgba());
-				void set(assets::font_id = assets::font_id::GUI_FONT, const rgba& = rgba());
-
-				bool operator==(const formatted_char& b) const;
-			};
+			struct formatted_char;
 
 			struct style {
-				assets::font_id f;
+				assets::font_id font;
 				rgba color;
 				style(assets::font_id = assets::font_id::GUI_FONT, rgba = rgba());
 				style(const formatted_char&);
 				operator formatted_char();
+
+				bool operator==(const style& b) const;
+			};
+
+			struct formatted_char {
+				style format;
+				wchar_t unicode = 0;
+
+				void set(
+					const wchar_t code,
+					const style format
+				);
+
+				void set_format(const style format);
+				void set_font(const assets::font_id f);
+				void set_color(const rgba col);
+
+				bool operator==(const formatted_char& b) const;
 			};
 
 			using formatted_string = std::basic_string<formatted_char>;
