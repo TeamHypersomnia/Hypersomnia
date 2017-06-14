@@ -6,21 +6,23 @@ namespace augs {
 			appearance app = appearance::unknown;
 
 			if (!remain_pushed_if_mouse_leaves) {
-				if (m == gui_event::hoverlost
+				if (
+					m == gui_event::hoverlost
 					|| m == gui_event::lup
 					|| m == gui_event::loutup
 					|| m == gui_event::rup
 					|| m == gui_event::routup
-					) {
+				) {
 					app = appearance::released;
 				}
 			}
 			else {
-				if (m == gui_event::lup
+				if (
+					m == gui_event::lup
 					|| m == gui_event::loutup
 					|| m == gui_event::rup
 					|| m == gui_event::routup
-					) {
+				) {
 					app = appearance::released;
 				}
 			}
@@ -29,14 +31,15 @@ namespace augs {
 				is_hovered = true;
 			}
 
-			if (m == gui_event::lpressed
+			if (
+				m == gui_event::lpressed
 				|| m == gui_event::ldown
 				|| m == gui_event::ldoubleclick
 				|| m == gui_event::ltripleclick
 				|| m == gui_event::rpressed
 				|| m == gui_event::rdown
 				|| m == gui_event::rdoubleclick
-				) {
+			) {
 				app = appearance::pushed;
 			}
 

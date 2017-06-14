@@ -4,11 +4,12 @@
 #include "augs/gui/text/caret.h"
 #include "augs/misc/action_list.h"
 #include "augs/misc/standard_actions.h"
+
 namespace augs {
 	class action;
 }
 
-typedef std::unique_ptr<augs::action> act;
+using act = std::unique_ptr<augs::action>;
 
 struct appearing_text {
 	typedef augs::gui::text::formatted_string formatted_string;

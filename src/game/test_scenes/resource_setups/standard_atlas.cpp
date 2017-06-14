@@ -148,24 +148,9 @@ game_image_requests load_standard_images() {
 	}
 
 	{
-		// auto& in = output[game_image_id::SHOTGUN];
-		// in.texture_maps[DIFFUSE] = { "resources/gfx/shotgun.png", GAME_WORLD_ATLAS };
-		// in.settings.gui.flip_horizontally = true;
-		// in.settings.gui.flip_vertically = true;
-	}
-
-	{
 		auto& in = output[game_image_id::SUBMACHINE];
 		in.texture_maps[DIFFUSE] = { "resources/gfx/submachine.png", GAME_WORLD_ATLAS };
 		in.texture_maps[NEON] = { "generated/neon_maps/submachine.png", GAME_WORLD_ATLAS };
-		in.settings.gui.flip_horizontally = true;
-		in.settings.gui.flip_vertically = true;
-	}
-
-	{
-		auto& in = output[game_image_id::PISTOL];
-		in.texture_maps[DIFFUSE] = { "resources/gfx/pistol.png", GAME_WORLD_ATLAS };
-		in.texture_maps[NEON] = { "generated/neon_maps/pistol.png", GAME_WORLD_ATLAS };
 		in.settings.gui.flip_horizontally = true;
 		in.settings.gui.flip_vertically = true;
 	}
@@ -419,11 +404,6 @@ game_image_requests load_standard_images() {
 	{
 		auto& in = output[game_image_id::CAST_HIGHLIGHT];
 		in.texture_maps[DIFFUSE] = { "resources/gfx/cast_highlight.png", GAME_WORLD_ATLAS };
-	}
-
-	{
-		auto& in = output[game_image_id::GRENADE_SPOON];
-		in.texture_maps[DIFFUSE] = { "resources/gfx/grenade_spoon.png", GAME_WORLD_ATLAS };
 	}
 
 	{

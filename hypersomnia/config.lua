@@ -252,7 +252,7 @@
   server_http_daemon_port = 0,
   server_launch_http_daemon = false,
   server_port = 0,
-  skip_credits = false,
+  skip_credits = true,
   sound_effects_volume = 1,
   start_menu_music_at_secs = 0,
   survey_num_file_path = "",

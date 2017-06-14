@@ -3,41 +3,7 @@
 #include "augs/math/rects.h"
 #include "game/assets/game_image_id.h"
 #include "game/assets/assets_manager.h"
-
-enum class button_corner_type {
-	INSIDE,
-
-	LT,
-	RT,
-	RB,
-	LB,
-
-	L,
-	T,
-	R,
-	B,
-	
-	LB_COMPLEMENT,
-
-	LT_BORDER,
-	RT_BORDER,
-	RB_BORDER,
-	LB_BORDER,
-
-	L_BORDER,
-	T_BORDER,
-	R_BORDER,
-	B_BORDER,
-	
-	LB_COMPLEMENT_BORDER,
-
-	LT_INTERNAL_BORDER,
-	RT_INTERNAL_BORDER,
-	RB_INTERNAL_BORDER,
-	LB_INTERNAL_BORDER,
-
-	COUNT
-};
+#include "button_corners_type.h"
 
 std::string get_filename_for(const button_corner_type);
 

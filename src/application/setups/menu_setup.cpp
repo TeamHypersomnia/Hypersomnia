@@ -458,15 +458,11 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 		}
 	}
 
-#define PLAY_DIRECTED_SCENE 0
-
 	cosmic_movie_director director;
-	
-#if PLAY_DIRECTED_SCENE
 	director.load_recording_from_file(session.config.menu_intro_scene_entropy_path);
-	ensure(director.is_recording_available());
-#endif
-
+	
+	const bool is_recording_available = director.is_recording_available();
+	
 	timer.reset_timer();
 
 	const auto initial_step_number = intro_scene.get_total_steps_passed();
@@ -490,17 +486,17 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 		}
 	};
 
-#if PLAY_DIRECTED_SCENE
-	while (intro_scene.get_total_time_passed_in_seconds() < session.config.rewind_intro_scene_by_secs) {
-		const auto entropy = cosmic_entropy(director.get_entropy_for_step(intro_scene.get_total_steps_passed() - initial_step_number), intro_scene);
+	if (is_recording_available) {
+		while (intro_scene.get_total_time_passed_in_seconds() < session.config.rewind_intro_scene_by_secs) {
+			const auto entropy = cosmic_entropy(director.get_entropy_for_step(intro_scene.get_total_steps_passed() - initial_step_number), intro_scene);
 
-		intro_scene.advance_deterministic_schemata(
-			{ entropy, metas_of_assets },
-			[](auto) {},
-			session.get_standard_post_solve()
-		);
+			intro_scene.advance_deterministic_schemata(
+				{ entropy, metas_of_assets },
+				[](auto) {},
+				session.get_standard_post_solve()
+			);
+		}
 	}
-#endif
 
 	while (!should_quit) {
 		augs::machine_entropy new_machine_entropy;
@@ -518,11 +514,11 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 		while (steps--) {
 			augs::renderer::get_current().clear_logic_lines();
 
-#if PLAY_DIRECTED_SCENE
-			const auto entropy = cosmic_entropy(director.get_entropy_for_step(intro_scene.get_total_steps_passed() - initial_step_number), intro_scene);
-#else
-			const auto entropy = cosmic_entropy();
-#endif
+			const auto entropy = is_recording_available ? 
+				cosmic_entropy(director.get_entropy_for_step(intro_scene.get_total_steps_passed() - initial_step_number), intro_scene)
+				: cosmic_entropy()
+			;
+			
 			intro_scene.advance_deterministic_schemata(
 				{ entropy, metas_of_assets },
 				[](auto){},

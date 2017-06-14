@@ -100,11 +100,14 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 			const auto subject_coll = subject_fix.get_raw_component();
 			const auto collider_coll = collider_fix.get_raw_component();
 			
+			const auto* const subject_coll_material = step.input.metas_of_assets.find(subject_coll.material);
+			const auto* const collider_coll_material = step.input.metas_of_assets.find(collider_coll.material);
+
 			if (
-				subject_coll.material != assets::physical_material_id::INVALID
-				&& collider_coll.material != assets::physical_material_id::INVALID
+				subject_coll_material != nullptr
+				&& collider_coll_material != nullptr
 			) {
-				const auto sound_id = step.input.metas_of_assets[subject_coll.material].collision_sound_matrix.at(collider_coll.material);
+				const auto sound_id = subject_coll_material->collision_sound_matrix.at(collider_coll.material);
 
 				const auto impulse = (c.normal_impulse) * subject_coll.collision_sound_gain_mult * collider_coll.collision_sound_gain_mult;
 

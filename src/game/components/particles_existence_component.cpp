@@ -6,14 +6,12 @@
 #include "game/components/position_copying_component.h"
 #include "game/assets/assets_manager.h"
 
-using namespace augs;
-
 entity_handle particles_existence_input::create_particle_effect_entity(
 	const logic_step step,
 	const components::transform place_of_birth,
 	const entity_id chased_subject
 ) const {
-	if (effect.id == assets::particle_effect_id::INVALID) {
+	if (step.input.metas_of_assets.find(effect.id) == nullptr) {
 		return step.cosm[entity_id()];
 	}
 

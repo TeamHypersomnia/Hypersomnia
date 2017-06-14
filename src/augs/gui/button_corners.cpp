@@ -1,39 +1,12 @@
 #include "button_corners.h"
+#include "generated/introspectors.h"
 
 using namespace assets;
 
 std::string get_filename_for(const button_corner_type t) {
-	static const std::array<std::string, static_cast<size_t>(button_corner_type::COUNT)> stems = {
-		"inside",
-		"lt",
-		"rt",
-		"rb",
-		"lb",
-		"l",
-		"t",
-		"r",
-		"b",
-		"lb_complement",
-		"lt_border",
-		"rt_border",
-		"rb_border",
-		"lb_border",
-		"l_border",
-		"t_border",
-		"r_border",
-		"b_border",
-		"lb_complement_border",
-		"lt_internal_border",
-		"rt_internal_border",
-		"rb_internal_border",
-		"lb_internal_border"
-	};
-
-	const auto idx = static_cast<unsigned>(t);
-
-	ensure(idx < stems.size())
-
-	return stems[idx];
+	std::string str = augs::enum_to_string(t);
+	std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+	return str;
 }
 
 bool is_button_corner(const button_corner_type t) {
@@ -72,7 +45,7 @@ bool is_button_outside_border(const button_corner_type t) {
 		|| t == button_corner_type::LB_BORDER
 
 		|| t == button_corner_type::LB_COMPLEMENT_BORDER
-		) {
+	) {
 		return true;
 	}
 
@@ -116,7 +89,7 @@ bool is_button_side(const button_corner_type t) {
 		|| t == button_corner_type::T_BORDER
 		|| t == button_corner_type::R_BORDER
 		|| t == button_corner_type::B_BORDER
-		) {
+	) {
 		return true;
 	}
 

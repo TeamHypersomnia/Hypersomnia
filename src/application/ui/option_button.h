@@ -31,10 +31,11 @@ public:
 	bool click_callback_required = false;
 	pad_bytes<3> pad;
 
-	typedef app_ui_rect_node base;
-	typedef base::gui_entropy gui_entropy;
+	using base = app_ui_rect_node;
+	using gui_entropy = base::gui_entropy;
 
 	option_button();
+
 	vec2i get_target_button_size() const;
 	void set_appearing_caption(const augs::gui::text::formatted_string text);
 
