@@ -197,7 +197,7 @@ namespace assets {
 		FORCE_ROCKET,
 #endif
 
-		RESERVED_COUNT,
+		REQUISITE_COUNT,
 		COUNT = MAX_GAME_IMAGE_COUNT + 1
 	};
 }

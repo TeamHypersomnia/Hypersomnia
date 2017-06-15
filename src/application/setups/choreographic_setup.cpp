@@ -8,7 +8,6 @@
 
 #include "game/test_scenes/testbed.h"
 #include "game/test_scenes/one_entity.h"
-#include "game/test_scenes/resource_setups/all.h"
 
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "game/view/viewing_session.h"

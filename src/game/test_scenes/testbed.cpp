@@ -805,7 +805,7 @@ namespace test_scenes {
 		world.get_global_assets().ped_shield_destruction_sound.id = assets::sound_buffer_id::GREAT_EXPLOSION;
 		world.get_global_assets().exhausted_smoke_particles.id = assets::particle_effect_id::EXHAUSTED_SMOKE;
 		
-		set_standard_sentience_properties(
+		set_test_scene_sentience_properties(
 			world.significant.meta.global
 		);
 

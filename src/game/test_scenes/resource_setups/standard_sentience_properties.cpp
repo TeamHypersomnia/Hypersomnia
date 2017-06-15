@@ -7,7 +7,7 @@
 #include "game/detail/spells/all_spells.h"
 #include "game/detail/perks/all_perks.h"
 
-void set_standard_sentience_properties(
+void set_test_scene_sentience_properties(
 	cosmos_global_state& state
 ) {
 	auto& perks = state.perks;

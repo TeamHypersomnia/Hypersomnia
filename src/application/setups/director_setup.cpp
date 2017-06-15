@@ -9,7 +9,6 @@
 #include "augs/filesystem/directory.h"
 
 #include "game/assets/assets_manager.h"
-#include "game/test_scenes/resource_setups/all.h"
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "game/transcendental/step_packaged_for_network.h"
 #include "game/transcendental/logic_step.h"

@@ -132,7 +132,7 @@ namespace test_scenes {
 		//		prefabs::create_cyan_charge(step, vec2(0, 0), true ? 1000 : 30)));
 
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
-		set_standard_sentience_properties(
+		set_test_scene_sentience_properties(
 			world.significant.meta.global
 		);
 

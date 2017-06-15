@@ -68,7 +68,7 @@ void load_all_requisite(const config_lua_table& cfg) {
 	set_test_scene_particle_effects(manager);
 	set_test_scene_tile_layers(manager);
 	set_standard_sound_buffers(manager);
-	set_test_physical_materials(manager);
+	set_test_scene_physical_materials(manager);
 }
 
 void create_standard_opengl_resources(const config_lua_table& cfg) {

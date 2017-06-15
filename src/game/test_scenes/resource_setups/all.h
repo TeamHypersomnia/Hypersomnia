@@ -17,10 +17,11 @@ game_font_requests load_requisite_fonts();
 void set_standard_sound_buffers(assets_manager&);
 
 void set_requisite_animations(assets_manager&);
-void set_test_scene_particle_effects(assets_manager&);
-void set_test_physical_materials(assets_manager&);
 
-void set_standard_sentience_properties(
+void set_test_scene_particle_effects(assets_manager&);
+void set_test_scene_physical_materials(assets_manager&);
+
+void set_test_scene_sentience_properties(
 	cosmos_global_state&
 );
 
