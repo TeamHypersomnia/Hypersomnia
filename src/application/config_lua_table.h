@@ -116,7 +116,8 @@ public:
 	std::string director_input_scene_entropy_path;
 	std::string choreographic_input_scenario_path;
 	std::string menu_intro_scene_entropy_path;
-
+	std::string menu_intro_scene_cosmos_path;
+	
 	std::string menu_theme_path;
 
 	double rewind_intro_scene_by_secs = 3.5;

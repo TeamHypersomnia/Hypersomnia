@@ -55,17 +55,19 @@ void viewing_session::control_gui_and_remove_fetched_events(
 	const const_entity_handle root,
 	augs::machine_entropy::local_type& window_inputs
 ) {
-	auto& gui = systems_audiovisual.get<gui_element_system>();
+	if (root.alive()) {
+		auto& gui = systems_audiovisual.get<gui_element_system>();
 
-	gui.control_gui(
-		root, 
-		window_inputs
-	);
+		gui.control_gui(
+			root, 
+			window_inputs
+		);
 
-	gui.handle_hotbar_and_action_button_presses(
-		root,
-		config.controls.translate(window_inputs).intents
-	);
+		gui.handle_hotbar_and_action_button_presses(
+			root,
+			config.controls.translate(window_inputs).intents
+		);
+	}
 }
 
 void viewing_session::control_and_remove_fetched_intents(game_intent_vector& intents) {
@@ -114,7 +116,7 @@ void viewing_session::spread_past_infection(const const_logic_step step) {
 
 void viewing_session::advance_audiovisual_systems(
 	const cosmos& cosm, 
-	const entity_id viewed_character,
+	const entity_id viewed_character_id,
 	const visible_entities& all_visible,
 	const augs::delta dt
 ) {
@@ -124,6 +126,8 @@ void viewing_session::advance_audiovisual_systems(
 	auto& highlights = systems_audiovisual.get<pure_color_highlight_system>();
 	auto& interp = systems_audiovisual.get<interpolation_system>();
 	auto& particles = systems_audiovisual.get<particles_simulation_system>();
+
+	const auto viewed_character = cosm[viewed_character_id];
 
 	thunders.advance(cosm, dt, particles);
 	exploding_rings.advance(cosm, dt, particles);
@@ -147,7 +151,7 @@ void viewing_session::advance_audiovisual_systems(
 		interp, 
 		dt,
 		config.camera_settings,
-		cosm[viewed_character]
+		viewed_character
 	);
 	
 	systems_audiovisual.get<wandering_pixels_system>().advance_for_visible(
@@ -159,27 +163,29 @@ void viewing_session::advance_audiovisual_systems(
 	world_hover_highlighter.cycle_duration_ms = 400;
 	world_hover_highlighter.update(dt.in_milliseconds());
 
-	auto& gui = systems_audiovisual.get<gui_element_system>();
+	if (viewed_character.alive()) {
+		auto& gui = systems_audiovisual.get<gui_element_system>();
 
-	gui.advance_elements(
-		cosm[viewed_character],
-		dt
-	);
+		gui.advance_elements(
+			viewed_character,
+			dt
+		);
 
-	gui.rebuild_layouts(
-		cosm[viewed_character]
-	);
+		gui.rebuild_layouts(
+			viewed_character
+		);
 
-	auto listener_cone = camera.smoothed_camera;
-	listener_cone.transform = cosm[viewed_character].get_viewing_transform(interp);
+		auto listener_cone = camera.smoothed_camera;
+		listener_cone.transform = viewed_character.get_viewing_transform(interp);
 
-	systems_audiovisual.get<sound_system>().play_nearby_sound_existences(
-		listener_cone,
-		viewed_character,
-		cosm,
-		interp,
-		dt
-	);
+		systems_audiovisual.get<sound_system>().play_nearby_sound_existences(
+			listener_cone,
+			viewed_character,
+			cosm,
+			interp,
+			dt
+		);
+	}
 }
 
 void viewing_session::draw_text_at_left_top(

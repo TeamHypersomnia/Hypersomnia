@@ -39,7 +39,7 @@
 #include "game/transcendental/cosmic_delta.h"
 
 #include "augs/graphics/renderer.h"
-#include "game/hardcoded_content/all.h"
+#include "game/hardcoded_content/all_hardcoded_content.h"
 #endif
 namespace test_scenes {
 	void one_entity::populate(const logic_step step) {

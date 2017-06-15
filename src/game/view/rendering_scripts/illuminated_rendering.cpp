@@ -28,7 +28,7 @@ namespace rendering_scripts {
 		const auto& cosmos = step.cosm;
 		const auto camera = step.camera;
 		const auto controlled_entity = cosmos[step.viewed_character];
-		const auto controlled_crosshair = controlled_entity[child_entity_name::CHARACTER_CROSSHAIR];
+		const auto controlled_crosshair = controlled_entity.alive() ? controlled_entity[child_entity_name::CHARACTER_CROSSHAIR] : cosmos[entity_id()];
 		const auto& interp = step.session.systems_audiovisual.get<interpolation_system>();
 		const auto& particles = step.session.systems_audiovisual.get<particles_simulation_system>();
 		const auto& wandering_pixels = step.session.systems_audiovisual.get<wandering_pixels_system>();
@@ -113,27 +113,29 @@ namespace rendering_scripts {
 		const auto& light = step.session.systems_audiovisual.get<light_system>();
 		
 		light.render_all_lights(renderer, matrix, step, [&]() {
-				draw_crosshair_lasers(
-					[&](const vec2 from, const vec2 to, const rgba col) {
-						if (!settings.draw_weapon_laser) {
-							return;
-						}
+				if (controlled_entity.alive()) {
+					draw_crosshair_lasers(
+						[&](const vec2 from, const vec2 to, const rgba col) {
+							if (!settings.draw_weapon_laser) {
+								return;
+							}
 
-						const auto& edge_tex = manager[assets::game_image_id::LASER_GLOW_EDGE].texture_maps[texture_map_type::DIFFUSE];
-						const vec2 edge_size = static_cast<vec2>(edge_tex.get_size());
+							const auto& edge_tex = manager[assets::game_image_id::LASER_GLOW_EDGE].texture_maps[texture_map_type::DIFFUSE];
+							const vec2 edge_size = static_cast<vec2>(edge_tex.get_size());
 
-						augs::draw_line(output, camera[from], camera[to], edge_size.y/3.f, manager[assets::game_image_id::LASER].texture_maps[texture_map_type::NEON], col);
+							augs::draw_line(output, camera[from], camera[to], edge_size.y/3.f, manager[assets::game_image_id::LASER].texture_maps[texture_map_type::NEON], col);
 
-						const auto edge_offset = (to - from).set_length(edge_size.x);
+							const auto edge_offset = (to - from).set_length(edge_size.x);
 
-						augs::draw_line(output, camera[to], camera[to + edge_offset], edge_size.y / 3.f, edge_tex, col);
-						augs::draw_line(output, camera[from - edge_offset], camera[from], edge_size.y / 3.f, edge_tex, col, true);
-					},
-					[](...){},
-					interp, 
-					controlled_crosshair, 
-					controlled_entity
-				);
+							augs::draw_line(output, camera[to], camera[to + edge_offset], edge_size.y / 3.f, edge_tex, col);
+							augs::draw_line(output, camera[from - edge_offset], camera[from], edge_size.y / 3.f, edge_tex, col, true);
+						},
+						[](...){},
+						interp, 
+						controlled_crosshair, 
+						controlled_entity
+					);
+				}
 
 				draw_cast_spells_highlights(
 					output,
@@ -233,7 +235,7 @@ namespace rendering_scripts {
 		
 		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::OVER_CROSSHAIR], camera, renderable_drawing_type::NORMAL);
 
-		if (settings.draw_crosshairs && settings.draw_weapon_laser) {
+		if (settings.draw_crosshairs && settings.draw_weapon_laser && controlled_entity.alive()) {
 			draw_crosshair_lasers(
 				[&](const vec2 from, const vec2 to, const rgba col) {
 					augs::draw_line(
@@ -369,7 +371,7 @@ namespace rendering_scripts {
 			camera
 		);
 
-		if (settings.draw_gui_overlays) {
+		if (settings.draw_gui_overlays && controlled_entity.alive()) {
 			if (controlled_entity.has<components::item_slot_transfers>()) {
 				step.session.systems_audiovisual.get<gui_element_system>().get_character_gui(controlled_entity).draw(
 					step,

@@ -114,16 +114,27 @@ void menu_setup::process(
 
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 	timer.set_stepping_speed_multiplier(session.config.recording_replay_speed);
-
-	intro_scene.set_fixed_delta(session.config.default_tickrate);
 	
-	test_scenes::testbed().populate_world_with_entities(
-		intro_scene, 
-		metas_of_assets,
-		session.get_standard_post_solve()
-	);
+	// TODO: actually load a cosmos with its resources from a file/folder
+	const bool is_intro_scene_available = session.config.menu_intro_scene_cosmos_path.size() > 0;
 
-	const auto character_in_focus = intro_scene.get_entity_by_name(L"player0");
+	if (is_intro_scene_available) {
+		intro_scene.set_fixed_delta(session.config.default_tickrate);
+
+		test_scenes::testbed().populate_world_with_entities(
+			intro_scene,
+			metas_of_assets,
+			session.get_standard_post_solve()
+		);
+	}
+	else {
+		intro_scene.set_fixed_delta(session.config.default_tickrate);
+	}
+
+	const auto character_in_focus = is_intro_scene_available ? 
+		intro_scene.get_entity_by_name(L"player0")
+		: intro_scene[entity_id()]
+	;
 
 	ltrb title_rect;
 	title_rect.set_position({ 100, 100 });
@@ -460,7 +471,7 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 	cosmic_movie_director director;
 	director.load_recording_from_file(session.config.menu_intro_scene_entropy_path);
 	
-	const bool is_recording_available = director.is_recording_available();
+	const bool is_recording_available = is_intro_scene_available && director.is_recording_available();
 	
 	timer.reset_timer();
 
@@ -510,19 +521,21 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 
 		auto steps = timer.count_logic_steps_to_perform(intro_scene.get_fixed_delta());
 
-		while (steps--) {
-			augs::renderer::get_current().clear_logic_lines();
+		if (is_intro_scene_available) {
+			while (steps--) {
+				augs::renderer::get_current().clear_logic_lines();
 
-			const auto entropy = is_recording_available ? 
-				cosmic_entropy(director.get_entropy_for_step(intro_scene.get_total_steps_passed() - initial_step_number), intro_scene)
-				: cosmic_entropy()
-			;
-			
-			intro_scene.advance_deterministic_schemata(
-				{ entropy, metas_of_assets },
-				[](auto){},
-				session.get_standard_post_solve()
-			);
+				const auto entropy = is_recording_available ? 
+					cosmic_entropy(director.get_entropy_for_step(intro_scene.get_total_steps_passed() - initial_step_number), intro_scene)
+					: cosmic_entropy()
+				;
+				
+				intro_scene.advance_deterministic_schemata(
+					{ entropy, metas_of_assets },
+					[](auto){},
+					session.get_standard_post_solve()
+				);
+			}
 		}
 
 		session.set_master_gain(session.config.sound_effects_volume * 0.3f * gain_fade_multiplier);
