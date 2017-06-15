@@ -416,6 +416,8 @@ if(BUILD_TEST_SCENES)
 	list(APPEND HYPERSOMNIA_CODEBASE_SRCS
 		${HYPERSOMNIA_TEST_SCENES_SRCS}
 	)
+
+	message("Building of test scenes is enabled.")
 endif()
 
 set(HYPERSOMNIA_TRIVIAL_3RDPARTY_SRCS

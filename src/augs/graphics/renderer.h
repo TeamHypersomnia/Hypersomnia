@@ -125,8 +125,6 @@ namespace augs {
 		void clear_triangles();
 		void clear_lines();
 
-		void default_render(const vec2 visible_world_area);
-
 		size_t get_max_texture_size() const;
 
 		int get_triangle_count() const;

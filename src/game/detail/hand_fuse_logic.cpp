@@ -42,7 +42,7 @@ void release_or_throw_fused_object(
 		sound_existence_input in;
 		in.delete_entity_after_effect_lifetime = true;
 		in.direct_listener = thrower;
-		in.effect.id = assets::sound_buffer_id::GRENADE_UNPIN;
+		in.effect = fuse.unpin_sound;
 
 		in.create_sound_effect_entity(step, thrower_transform, thrower).add_standard_components(step);
 	}
@@ -60,8 +60,8 @@ void release_or_throw_fused_object(
 			sound_existence_input in;
 			in.delete_entity_after_effect_lifetime = true;
 			in.direct_listener = thrower;
-			in.effect.id = assets::sound_buffer_id::GRENADE_THROW;
-
+			in.effect = fuse.throw_sound;
+			
 			in.create_sound_effect_entity(step, thrower_transform, thrower).add_standard_components(step);
 
 			fused_entity.get<components::sprite>().set(
@@ -84,7 +84,14 @@ void release_or_throw_fused_object(
 			auto new_def = fixtures.get_raw_component();
 			new_def.restitution = 0.6f;
 			new_def.density = 10.f;
-			new_def.material = assets::physical_material_id::GRENADE;
+
+			const bool overwrite_physical_material = 
+				explosive.released_physical_material != assets::physical_material_id::INVALID
+			;
+
+			if (overwrite_physical_material) {
+				new_def.material = explosive.released_physical_material;
+			}
 			
 			fixtures = new_def;
 

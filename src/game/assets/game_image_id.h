@@ -108,6 +108,8 @@ namespace assets {
 		SPELL_BORDER,
 		
 		CAST_HIGHLIGHT,
+		
+		REQUISITE_COUNT,
 
 #if BUILD_TEST_SCENES
 		CRATE,
@@ -196,8 +198,6 @@ namespace assets {
 		INTERFERENCE_GRENADE_RELEASED,
 		FORCE_ROCKET,
 #endif
-
-		REQUISITE_COUNT,
 		COUNT = MAX_GAME_IMAGE_COUNT + 1
 	};
 }

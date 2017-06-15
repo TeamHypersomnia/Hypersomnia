@@ -26,6 +26,8 @@ namespace prefabs {
 		auto& sender = grenade_entity += components::sender();
 		auto& explosive = grenade_entity += components::explosive();
 		auto& fuse = grenade_entity += components::hand_fuse();
+		fuse.throw_sound.id = assets::sound_buffer_id::GRENADE_THROW;
+		fuse.unpin_sound.id = assets::sound_buffer_id::GRENADE_UNPIN;
 
 		auto& in = explosive.explosion;
 		in.type = adverse_element_type::FORCE;
@@ -36,8 +38,6 @@ namespace prefabs {
 		in.impact_force = 550.f;
 		in.sound_gain = 1.8f;
 		in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
-
-		
 
 		auto& sprite = ingredients::add_sprite(grenade_entity, assets::game_image_id::FORCE_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(step, grenade_entity, pos);
@@ -64,6 +64,8 @@ namespace prefabs {
 		auto& sender = grenade_entity += components::sender();
 		auto& explosive = grenade_entity += components::explosive();
 		auto& fuse = grenade_entity += components::hand_fuse();
+		fuse.throw_sound.id = assets::sound_buffer_id::GRENADE_THROW;
+		fuse.unpin_sound.id = assets::sound_buffer_id::GRENADE_UNPIN;
 
 		auto& in = explosive.explosion;
 		in.damage = 88.f;
@@ -75,8 +77,6 @@ namespace prefabs {
 		in.sound_effect = assets::sound_buffer_id::PED_EXPLOSION;
 		in.type = adverse_element_type::PED;
 		in.create_thunders_effect = true;
-
-		
 
 		auto& sprite = ingredients::add_sprite(grenade_entity, assets::game_image_id::PED_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(step, grenade_entity, pos);
@@ -103,6 +103,8 @@ namespace prefabs {
 		auto& sender = grenade_entity += components::sender();
 		auto& explosive = grenade_entity += components::explosive();
 		auto& fuse = grenade_entity += components::hand_fuse();
+		fuse.throw_sound.id = assets::sound_buffer_id::GRENADE_THROW;
+		fuse.unpin_sound.id = assets::sound_buffer_id::GRENADE_UNPIN;
 
 		auto& in = explosive.explosion;
 
@@ -114,8 +116,6 @@ namespace prefabs {
 		in.sound_gain = 2.2f;
 		in.sound_effect = assets::sound_buffer_id::INTERFERENCE_EXPLOSION;
 		in.type = adverse_element_type::INTERFERENCE;
-		
-		
 
 		auto& sprite = ingredients::add_sprite(grenade_entity, assets::game_image_id::INTERFERENCE_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(step, grenade_entity, pos);

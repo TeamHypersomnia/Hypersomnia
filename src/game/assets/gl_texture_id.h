@@ -5,9 +5,8 @@
 namespace assets {
 	enum class gl_texture_id {
 		INVALID,
-#if BUILD_TEST_SCENES
 		GAME_WORLD_ATLAS,
-#endif
+		REQUISITE_COUNT,
 		COUNT = MAX_GL_TEXTURE_COUNT + 1
 	};
 }

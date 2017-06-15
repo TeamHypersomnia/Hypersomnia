@@ -115,27 +115,31 @@ void thunder_system::advance(
 				const bool is_leaf = b.children.empty();
 
 				if (is_leaf) {
-					const auto remnants_emission = manager[assets::particle_effect_id::THUNDER_REMNANTS].emissions.at(0);
+					const auto* const remnants = manager.find(cosmos.get_global_assets().thunder_remnants);
 
-					{
-						const auto spawner = [&](auto dummy) {
-							auto& new_p = particles_output_for_effects.spawn_particle<decltype(dummy)>(
-								rng,
-								0.f,
-								{ 20.f, 100.f },
-								b.to,
-								0.f,
-								360.f,
-								remnants_emission
-							);
+					if (remnants != nullptr) {
+						const auto remnants_emission = remnants->emissions.at(0);
 
-							new_p.colorize(t.in.color.rgb());
+						{
+							const auto spawner = [&](auto dummy) {
+								auto& new_p = particles_output_for_effects.spawn_particle<decltype(dummy)>(
+									rng,
+									0.f,
+									{ 20.f, 100.f },
+									b.to,
+									0.f,
+									360.f,
+									remnants_emission
+								);
 
-							particles_output_for_effects.add_particle(remnants_emission.target_render_layer, new_p);
-						};
+								new_p.colorize(t.in.color.rgb());
 
-						for (size_t i = 0; i < rng.randval(2u, 16u); ++i) {
-							spawner(general_particle());
+								particles_output_for_effects.add_particle(remnants_emission.target_render_layer, new_p);
+							};
+
+							for (size_t i = 0; i < rng.randval(2u, 16u); ++i) {
+								spawner(general_particle());
+							}
 						}
 					}
 				}

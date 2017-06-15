@@ -800,10 +800,14 @@ namespace test_scenes {
 			perform_transfer({ pis2, character(3).get_primary_hand() }, step);
 		}
 
-		world.get_global_assets().cast_unsuccessful_sound.id = assets::sound_buffer_id::CAST_UNSUCCESSFUL;
-		world.get_global_assets().ped_shield_impact_sound.id = assets::sound_buffer_id::EXPLOSION;
-		world.get_global_assets().ped_shield_destruction_sound.id = assets::sound_buffer_id::GREAT_EXPLOSION;
-		world.get_global_assets().exhausted_smoke_particles.id = assets::particle_effect_id::EXHAUSTED_SMOKE;
+		auto& global_assets = world.get_global_assets();
+		global_assets.cast_unsuccessful_sound.id = assets::sound_buffer_id::CAST_UNSUCCESSFUL;
+		global_assets.ped_shield_impact_sound.id = assets::sound_buffer_id::EXPLOSION;
+		global_assets.ped_shield_destruction_sound.id = assets::sound_buffer_id::GREAT_EXPLOSION;
+		global_assets.exhausted_smoke_particles.id = assets::particle_effect_id::EXHAUSTED_SMOKE;
+		global_assets.exploding_ring_smoke = assets::particle_effect_id::EXPLODING_RING_SMOKE;
+		global_assets.exploding_ring_sparkles = assets::particle_effect_id::EXPLODING_RING_SPARKLES;
+		global_assets.thunder_remnants = assets::particle_effect_id::THUNDER_REMNANTS;
 		
 		load_test_scene_sentience_properties(
 			world.significant.meta.global

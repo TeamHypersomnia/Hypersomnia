@@ -573,6 +573,141 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 	}
 
 	{
+		auto& effect = manager[assets::particle_effect_id::EXPLODING_RING_SMOKE];
+
+		{
+			particles_emission em;
+			em.min_swing_spread.set(0.5, 1);
+			em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+			em.max_swing_spread.set(10 / 2, 10 / 2);
+			em.max_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+
+			em.swing_spread.set(0, 0);
+			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
+			em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
+
+			em.spread_degrees = std::make_pair(360, 360);
+			em.num_of_particles_to_spawn_initially.set(150, 170);
+			em.stream_lifetime_ms = std::make_pair(0, 0);
+
+			em.base_speed = std::make_pair(350, 400);
+			em.base_speed_variation = std::make_pair(100.f, 120.f);
+
+			em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
+			em.particle_lifetime_ms = std::make_pair(900, 900);
+
+			for (int i = 0; i < 3; ++i) {
+				general_particle particle_definition;
+
+				particle_definition.angular_damping = 0;
+				particle_definition.linear_damping = 400;
+				particle_definition.acc.set(900, -900);
+				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 30));
+				particle_definition.unshrinking_time_ms = 100.f;
+				particle_definition.shrink_when_ms_remaining = 200.f;
+
+				em.add_particle_definition(particle_definition);
+			}
+
+			em.size_multiplier = std::make_pair(0.40, 0.40);
+			em.target_render_layer = render_layer::ILLUMINATING_SMOKES;
+			em.initial_rotation_variation = 180;
+
+			effect.emissions.push_back(em);
+		}
+	}
+
+	{
+		auto& effect = manager[assets::particle_effect_id::EXPLODING_RING_SPARKLES];
+		
+		{
+			particles_emission em;
+			em.min_swing_spread.set(0.5, 1);
+			em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+			em.max_swing_spread.set(10 / 2, 10 / 2);
+			em.max_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+
+			em.swing_spread.set(0, 0);
+			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
+			em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
+
+			em.spread_degrees = std::make_pair(360, 360);
+			em.num_of_particles_to_spawn_initially.set(300, 340);
+			em.stream_lifetime_ms = std::make_pair(0, 0);
+
+			em.base_speed = std::make_pair(320, 600);
+			em.base_speed_variation = std::make_pair(10.f, 20.f);
+
+			em.rotation_speed = std::make_pair(0, 0);
+			em.particle_lifetime_ms = std::make_pair(200, 600);
+
+			const auto& anim = manager[assets::animation_id::CAST_BLINK_ANIMATION];
+			const auto frame_duration = anim.frames[0].duration_milliseconds / 2.f;
+
+			for (size_t i = 0; i < anim.frames.size() - 1; ++i)
+			{
+				animated_particle particle_definition;
+
+				particle_definition.linear_damping = 1000;
+				particle_definition.first_face = static_cast<assets::game_image_id>(static_cast<int>(anim.frames[0].image_id) + i);
+				particle_definition.frame_count = anim.frames.size() - i;
+				particle_definition.frame_duration_ms = frame_duration;
+				particle_definition.acc.set(900, -900);
+				particle_definition.color = white;
+
+				em.add_particle_definition(particle_definition);
+			}
+
+			{
+				general_particle particle_definition;
+
+				particle_definition.angular_damping = 0;
+				particle_definition.linear_damping = 1000;
+				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), white);
+				particle_definition.acc.set(900, -900);
+				particle_definition.alpha_levels = 1;
+
+				em.add_particle_definition(particle_definition);
+			}
+
+			//{
+			//	resources::particle particle_definition;
+			//
+			//	particle_definition.angular_damping = 0;
+			//	particle_definition.linear_damping = 1000;
+			//	particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 3), white);
+			//	particle_definition.acc.set(400, -400);
+			//	particle_definition.alpha_levels = 1;
+			//
+			//	em.particle_definitions.push_back(particle_definition);
+			//}
+
+			{
+				general_particle particle_definition;
+
+				particle_definition.angular_damping = 0;
+				particle_definition.linear_damping = 700;
+				particle_definition.acc.set(1200, -1200);
+				
+				particle_definition.set_image(
+					assets::game_image_id(int(assets::game_image_id::BLANK)), 
+					vec2(1, 1),
+					white
+				);
+
+				em.add_particle_definition(particle_definition);
+			}
+
+			em.size_multiplier = std::make_pair(1, 1);
+			em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+			em.initial_rotation_variation = 0;
+			em.should_particles_look_towards_velocity = false;
+
+			effect.emissions.push_back(em);
+		}
+	}
+
+	{
 		auto& effect = manager[assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION];
 
 		{

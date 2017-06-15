@@ -348,15 +348,4 @@ namespace augs {
 		glGetIntegerv(GL_MAX_TEXTURE_SIZE, &tsize); glerr;
 		return tsize;
 	}
-
-	void renderer::default_render(vec2 visible_world_area) {
-		graphics::fbo::use_default();
-		glClear(GL_COLOR_BUFFER_BIT); glerr;
-		
-		bind_texture(get_assets_manager()[assets::gl_texture_id::GAME_WORLD_ATLAS]);
-
-		call_triangles();
-
-		triangles.clear();
-	}
 }

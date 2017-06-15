@@ -5,7 +5,6 @@
 namespace assets {
 	enum class program_id {
 		INVALID,
-#if BUILD_TEST_SCENES
 		DEFAULT,
 		DEFAULT_ILLUMINATED,
 		LIGHT,
@@ -16,7 +15,7 @@ namespace assets {
 		ILLUMINATING_SMOKE,
 		SPECULAR_HIGHLIGHTS,
 		FULLSCREEN,
-#endif
+		REQUISITE_COUNT,
 		COUNT = MAX_SHADER_PROGRAM_COUNT + 1
 	};
 }

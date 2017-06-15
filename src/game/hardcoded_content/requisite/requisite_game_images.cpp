@@ -1,5 +1,3 @@
-#include "generated/setting_build_test_scenes.h"
-#if BUILD_TEST_SCENES
 #include "game/hardcoded_content/all_hardcoded_content.h"
 #include "game/assets/assets_manager.h"
 #include "augs/graphics/shader.h"
@@ -235,4 +233,3 @@ game_font_requests load_requisite_fonts() {
 
 	return output;
 }
-#endif
