@@ -3,7 +3,7 @@
 
 #if BUILD_TEST_SCENES
 
-#include "game/ingredients/ingredients.h"
+#include "game/hardcoded_content/ingredients/ingredients.h"
 #include "game/transcendental/cosmos.h"
 #include "game/assets/game_image_id.h"
 
