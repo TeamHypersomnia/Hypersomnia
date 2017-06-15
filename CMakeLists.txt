@@ -139,6 +139,13 @@ set(HYPERSOMNIA_TEST_SCENES_SRCS
 	"src/game/ingredients/sprite.cpp"
 	"src/game/ingredients/wsad_player.cpp"
 	"src/game/ingredients/grenades.cpp"
+	"src/game/hardcoded_content/test_scenes/test_scene_particle_effects.cpp"
+	"src/game/hardcoded_content/test_scenes/test_scene_physical_materials.cpp"
+	"src/game/hardcoded_content/test_scenes/test_scene_sentience_properties.cpp"
+	"src/game/hardcoded_content/test_scenes/test_scene_tile_layers.cpp"
+	"src/game/hardcoded_content/test_scenes/test_scene_animations.cpp"
+	"src/game/hardcoded_content/test_scenes/test_scene_game_images.cpp"
+	"src/game/hardcoded_content/test_scenes/test_scene_sound_buffers.cpp"
 )
 
 set(HYPERSOMNIA_CODEBASE_SRCS
@@ -243,17 +250,9 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/enums/item_category.cpp"
 	"src/game/enums/item_transfer_result_type.cpp"
 	"src/game/enums/slot_physical_behaviour.cpp"
-	"src/game/test_scenes/resource_setups/standard_animations.cpp"
-	"src/game/test_scenes/resource_setups/standard_atlas.cpp"
 	"src/game/detail/ai/create_standard_behaviour_trees.cpp"
-	"src/game/test_scenes/resource_setups/standard_everything.cpp"
-	"src/game/test_scenes/resource_setups/standard_particle_effects.cpp"
-	"src/game/test_scenes/resource_setups/standard_physical_materials.cpp"
-	"src/game/test_scenes/resource_setups/standard_sound_buffers.cpp"
-	"src/game/test_scenes/resource_setups/standard_sentience_properties.cpp"
-	"src/game/test_scenes/resource_setups/standard_tile_layers.cpp"
-	"src/game/test_scenes/one_entity.cpp"
-	"src/game/test_scenes/testbed.cpp"
+	"src/game/hardcoded_content/test_scenes/one_entity.cpp"
+	"src/game/hardcoded_content/test_scenes/testbed.cpp"
 	"src/game/systems_audiovisual/exploding_ring_system.cpp"
 	"src/game/systems_audiovisual/gui_element_system.cpp"
 	"src/game/systems_audiovisual/interpolation_system.cpp"
@@ -405,6 +404,12 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/detail/spells/haste.cpp"
 	"src/game/detail/spells/ultimate_wrath_of_the_aeons.cpp"
 	"src/augs/misc/script_utils.cpp"
+	"src/game/hardcoded_content/all_hardcoded_content.cpp"
+	"src/game/hardcoded_content/requisite/requisite_animations.cpp"
+	"src/game/hardcoded_content/requisite/requisite_atlases.cpp"
+	"src/game/hardcoded_content/requisite/requisite_game_images.cpp"
+	"src/game/hardcoded_content/requisite/requisite_shaders.cpp"
+	"src/game/hardcoded_content/requisite/requisite_sound_buffers.cpp"
 )
 
 if(BUILD_TEST_SCENES)

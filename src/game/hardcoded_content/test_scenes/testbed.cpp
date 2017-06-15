@@ -41,7 +41,7 @@
 #include "game/transcendental/cosmic_delta.h"
 
 #include "augs/graphics/renderer.h"
-#include "game/test_scenes/resource_setups/all.h"
+#include "game/hardcoded_content/all.h"
 #endif
 namespace test_scenes {
 	void testbed::populate(const logic_step step) {
@@ -805,7 +805,7 @@ namespace test_scenes {
 		world.get_global_assets().ped_shield_destruction_sound.id = assets::sound_buffer_id::GREAT_EXPLOSION;
 		world.get_global_assets().exhausted_smoke_particles.id = assets::particle_effect_id::EXHAUSTED_SMOKE;
 		
-		set_test_scene_sentience_properties(
+		load_test_scene_sentience_properties(
 			world.significant.meta.global
 		);
 

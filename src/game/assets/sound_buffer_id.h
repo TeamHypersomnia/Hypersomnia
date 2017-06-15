@@ -6,6 +6,12 @@
 namespace assets {
 	enum class sound_buffer_id : unsigned {
 		INVALID,
+
+		BUTTON_HOVER,
+		BUTTON_CLICK,
+
+		REQUISITE_COUNT,
+
 #if BUILD_TEST_SCENES
 		BILMER2000_MUZZLE,
 		ASSAULT_RIFLE_MUZZLE,
@@ -24,9 +30,6 @@ namespace assets {
 
 		WIND,
 		ENGINE,
-
-		BUTTON_HOVER,
-		BUTTON_CLICK,
 
 		LOW_AMMO_CUE,
 		FIREARM_ENGINE,

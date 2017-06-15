@@ -18,7 +18,7 @@
 
 #include "application/game_window.h"
 #include "application/config_lua_table.h"
-#include "game/test_scenes/testbed.h"
+#include "game/hardcoded_content/test_scenes/testbed.h"
 
 #define LOG_REWINDING 0
 

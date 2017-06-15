@@ -39,7 +39,7 @@
 #include "game/transcendental/cosmic_delta.h"
 
 #include "augs/graphics/renderer.h"
-#include "game/test_scenes/resource_setups/all.h"
+#include "game/hardcoded_content/all.h"
 #endif
 namespace test_scenes {
 	void one_entity::populate(const logic_step step) {
@@ -132,7 +132,7 @@ namespace test_scenes {
 		//		prefabs::create_cyan_charge(step, vec2(0, 0), true ? 1000 : 30)));
 
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
-		set_test_scene_sentience_properties(
+		load_test_scene_sentience_properties(
 			world.significant.meta.global
 		);
 

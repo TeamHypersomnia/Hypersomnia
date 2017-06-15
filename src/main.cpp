@@ -12,7 +12,7 @@
 #include "application/game_window.h"
 #include "game/assets/assets_manager.h"
 
-#include "game/test_scenes/resource_setups/all.h"
+#include "game/hardcoded_content/all_hardcoded_content.h"
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "game/view/viewing_session.h"
 
@@ -62,6 +62,8 @@ int main(int argc, char** argv) {
 #if !ONLY_ONE_GLOBAL_ASSETS_MANAGER
 	auto resources = std::make_unique<assets_manager>();
 	resources->set_as_current();
+#else
+	auto* resources = &get_assets_manager();
 #endif
 
 	std::thread regeneration_thread([&cfg](){
@@ -110,7 +112,8 @@ int main(int argc, char** argv) {
 	gl.initialize_fbos(window.get_screen_size());
 
 	regeneration_thread.join();
-	create_standard_opengl_resources(cfg);
+	load_requisite_atlases(*resources, cfg);
+	load_requisite_shaders(*resources);
 
 	const auto mode = cfg.get_launch_mode();
 	LOG("Launch mode: %x", static_cast<int>(mode));
@@ -209,7 +212,7 @@ int main(int argc, char** argv) {
 		We need to manually destroy the global assets manager,
 		before the audio manager gets destroyed.
 	*/
-	get_assets_manager().destroy_everything();
+	resources->destroy_everything();
 #endif
 
 	augs::global_libraries::deinit();

@@ -1,11 +1,11 @@
 #include "generated/setting_build_test_scenes.h"
 #if BUILD_TEST_SCENES
-#include "all.h"
+#include "game/hardcoded_content/all_hardcoded_content.h"
 
 #include "game/assets/physical_material.h"
 #include "game/assets/assets_manager.h"
 
-void set_test_scene_physical_materials(assets_manager& assets) {
+void load_test_scene_physical_materials(assets_manager& assets) {
 	const auto set_pair = [&](
 		const assets::physical_material_id a,
 		const assets::physical_material_id b,

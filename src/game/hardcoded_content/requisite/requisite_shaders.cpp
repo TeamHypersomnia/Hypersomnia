@@ -1,84 +1,14 @@
-#include "generated/setting_build_test_scenes.h"
-#if BUILD_TEST_SCENES
-#include "all.h"
+#include "game/hardcoded_content/all_hardcoded_content.h"
+#include "augs/graphics/OpenGL_includes.h"
 #include "game/assets/assets_manager.h"
+#include "game/assets/shader_id.h"
+#include "game/assets/program_id.h"
 #include "augs/graphics/shader.h"
 
-#include "application/config_lua_table.h"
-
-#include "application/content_generation/texture_atlases.h"
-#include "application/content_generation/neon_maps.h"
-#include "application/content_generation/desaturations.h"
-#include "application/content_generation/buttons_with_corners.h"
-#include "application/content_generation/scripted_images.h"
-#include "application/content_generation/polygonizations_of_images.h"
-
-#include "augs/graphics/OpenGL_includes.h"
-
-using namespace augs::graphics;
 using namespace assets;
+using namespace augs::graphics;
 
-void load_all_requisite(const config_lua_table& cfg) {
-	auto& manager = get_assets_manager();
-
-	const auto images = load_requisite_images();
-	const auto fonts = load_requisite_fonts();
-
-	atlases_regeneration_input in;
-
-	for (const auto& i : images) {
-		for (const auto& t : i.second.texture_maps) {
-			if (t.path.size() > 0) {
-				ensure(t.target_atlas != gl_texture_id::INVALID);
-
-				in.images.push_back({ t.path, t.target_atlas });
-			}
-		}
-	}
-
-	for (const auto& f : fonts) {
-		in.fonts.push_back({ f.second.loading_input, f.second.target_atlas });
-	}
-
-	LOG("\n--------------------------------------------\nChecking content integrity...");
-
-	regenerate_scripted_images(cfg.debug_regenerate_content_every_launch);
-	regenerate_buttons_with_corners(cfg.debug_regenerate_content_every_launch);
-	regenerate_neon_maps(cfg.debug_regenerate_content_every_launch);
-	regenerate_desaturations(cfg.debug_regenerate_content_every_launch);
-	regenerate_polygonizations_of_images(cfg.debug_regenerate_content_every_launch);
-
-	const auto regenerated = regenerate_atlases(
-		in,
-		cfg.debug_regenerate_content_every_launch,
-		cfg.check_content_integrity_every_launch,
-		cfg.save_regenerated_atlases_as_binary,
-		cfg.packer_detail_max_atlas_size
-	);
-
-	LOG("Content regenerated successfully.\n--------------------------------------------\n");
-
-	manager.load_baked_metadata(
-		images,
-		fonts,
-		regenerated
-	);
-
-	set_requisite_animations(manager);
-	set_test_scene_particle_effects(manager);
-	set_test_scene_tile_layers(manager);
-	set_standard_sound_buffers(manager);
-	set_test_scene_physical_materials(manager);
-}
-
-void create_standard_opengl_resources(const config_lua_table& cfg) {
-	auto& manager = get_assets_manager();
-
-	manager.create(
-		gl_texture_id::GAME_WORLD_ATLAS,
-		cfg.save_regenerated_atlases_as_binary
-	);
-
+void load_requisite_shaders(assets_manager& manager) {
 	manager[shader_id::DEFAULT_VERTEX].create_from_file(shader::type::VERTEX, "resources/shaders/default.vsh");
 	manager[shader_id::DEFAULT_FRAGMENT].create_from_file(shader::type::FRAGMENT, "resources/shaders/default.fsh");
 	manager.create(program_id::DEFAULT, shader_id::DEFAULT_VERTEX, shader_id::DEFAULT_FRAGMENT);
@@ -181,4 +111,3 @@ void create_standard_opengl_resources(const config_lua_table& cfg) {
 		glUniform1i(light_texture_uniform, 2);
 	}
 }
-#endif

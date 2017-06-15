@@ -1,9 +1,9 @@
 #include "generated/setting_build_test_scenes.h"
 #if BUILD_TEST_SCENES
-#include "all.h"
+#include "game/hardcoded_content/all_hardcoded_content.h"
 #include "game/assets/assets_manager.h"
 
-void set_standard_sound_buffers(assets_manager& manager) {
+void load_test_scene_sound_buffers(assets_manager& manager) {
 	{
 		auto& buf = manager[assets::sound_buffer_id::BILMER2000_MUZZLE];
 		buf.from_file("resources/sfx/bilmer2000_muzzle.wav");
@@ -67,16 +67,6 @@ void set_standard_sound_buffers(assets_manager& manager) {
 	{
 		auto& buf = manager[assets::sound_buffer_id::WIND];
 		buf.from_file("resources/sfx/wind_%x.ogg");
-	}
-
-	{
-		auto& buf = manager[assets::sound_buffer_id::BUTTON_HOVER];
-		buf.from_file("resources/sfx/button_hover.wav");
-	}
-
-	{
-		auto& buf = manager[assets::sound_buffer_id::BUTTON_CLICK];
-		buf.from_file("resources/sfx/button_click.wav");
 	}
 
 	{

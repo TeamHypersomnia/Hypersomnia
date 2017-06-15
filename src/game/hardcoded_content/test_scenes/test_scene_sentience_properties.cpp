@@ -1,13 +1,13 @@
 #include "generated/setting_build_test_scenes.h"
 #if BUILD_TEST_SCENES
-#include "all.h"
+#include "game/hardcoded_content/all_hardcoded_content.h"
 #include "game/detail/spells/spell_structs.h"
 #include "game/transcendental/cosmos.h"
 
 #include "game/detail/spells/all_spells.h"
 #include "game/detail/perks/all_perks.h"
 
-void set_test_scene_sentience_properties(
+void load_test_scene_sentience_properties(
 	cosmos_global_state& state
 ) {
 	auto& perks = state.perks;

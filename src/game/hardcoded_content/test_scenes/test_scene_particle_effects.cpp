@@ -1,6 +1,6 @@
 #include "generated/setting_build_test_scenes.h"
 #if BUILD_TEST_SCENES
-#include "all.h"
+#include "game/hardcoded_content/all_hardcoded_content.h"
 #include "game/assets/assets_manager.h"
 #include "game/assets/particle_effect.h"
 #include "game/assets/particle_effect_id.h"
@@ -8,7 +8,7 @@
 
 #include "game/detail/particle_types.h"
 
-void set_test_scene_particle_effects(assets_manager& manager) {
+void load_test_scene_particle_effects(assets_manager& manager) {
 	{
 		auto& effect = manager[assets::particle_effect_id::WANDERING_SMOKE];
 

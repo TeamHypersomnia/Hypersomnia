@@ -6,7 +6,7 @@
 
 #include "game/assets/assets_manager.h"
 
-#include "game/test_scenes/testbed.h"
+#include "game/hardcoded_content/test_scenes/testbed.h"
 
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "game/view/viewing_session.h"
