@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
 #endif
 
 	std::thread regeneration_thread([&cfg](){
-		load_standard_everything(cfg);
+		load_all_requisite(cfg);
 	});
 
 	{

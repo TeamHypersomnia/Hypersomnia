@@ -8,7 +8,7 @@
 
 #include "game/detail/particle_types.h"
 
-void set_standard_particle_effects(assets_manager& manager) {
+void set_test_scene_particle_effects(assets_manager& manager) {
 	{
 		auto& effect = manager[assets::particle_effect_id::WANDERING_SMOKE];
 

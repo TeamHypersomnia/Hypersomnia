@@ -12,7 +12,7 @@ static constexpr auto NEON = texture_map_type::NEON;
 static constexpr auto DESATURATED = texture_map_type::DESATURATED;
 static constexpr auto GAME_WORLD_ATLAS = gl_texture_id::GAME_WORLD_ATLAS;
 
-game_image_requests load_standard_images() {
+game_image_requests load_requisite_images() {
 	game_image_requests output;
 
 	const auto make_button_with_corners = [&](
@@ -591,7 +591,7 @@ game_image_requests load_standard_images() {
 	return output;
 }
 
-game_font_requests load_standard_fonts() {
+game_font_requests load_requisite_fonts() {
 	game_font_requests output;
 
 	{

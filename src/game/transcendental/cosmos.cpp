@@ -43,9 +43,10 @@
 #include "game/transcendental/data_living_one_step.h"
 
 #include "game/detail/inventory/inventory_utils.h"
-#include "game/test_scenes/resource_setups/all.h"
 
 #include "game/components/fixtures_component.h"
+
+void create_standard_behaviour_trees(cosmos&);
 
 void cosmos::complete_reinference() {
 	profiler.complete_reinference.new_measurement();
@@ -103,7 +104,7 @@ cosmos::cosmos(const std::size_t reserved_entities) {
 	reserve_storage_for_entities(reserved_entities);
 	significant.meta.global.si.set_pixels_per_meter(100.f);
 
-	set_standard_behaviour_trees(*this);
+	create_standard_behaviour_trees(*this);
 }
 
 cosmos::cosmos(const cosmos& b) {

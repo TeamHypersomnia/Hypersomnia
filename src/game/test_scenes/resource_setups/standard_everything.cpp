@@ -18,11 +18,11 @@
 using namespace augs::graphics;
 using namespace assets;
 
-void load_standard_everything(const config_lua_table& cfg) {
+void load_all_requisite(const config_lua_table& cfg) {
 	auto& manager = get_assets_manager();
 
-	const auto images = load_standard_images();
-	const auto fonts = load_standard_fonts();
+	const auto images = load_requisite_images();
+	const auto fonts = load_requisite_fonts();
 
 	atlases_regeneration_input in;
 
@@ -64,11 +64,11 @@ void load_standard_everything(const config_lua_table& cfg) {
 		regenerated
 	);
 
-	set_standard_animations(manager);
-	set_standard_particle_effects(manager);
-	set_standard_tile_layers(manager);
+	set_requisite_animations(manager);
+	set_test_scene_particle_effects(manager);
+	set_test_scene_tile_layers(manager);
 	set_standard_sound_buffers(manager);
-	set_standard_physical_materials(manager);
+	set_test_physical_materials(manager);
 }
 
 void create_standard_opengl_resources(const config_lua_table& cfg) {

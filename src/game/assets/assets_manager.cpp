@@ -119,7 +119,7 @@ all_logical_metas_of_assets assets_manager::generate_logical_metas_of_assets() c
 
 	augs::introspect(
 		[this](auto, auto& target_map_of_logical_metas) {
-			typedef std::decay_t<decltype(target_map_of_logical_metas)> map_type;
+			using map_type = std::decay_t<decltype(target_map_of_logical_metas)>;
 			target_map_of_logical_metas.clear();
 	
 			const auto& source_map_of_assets = 

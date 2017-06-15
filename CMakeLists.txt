@@ -245,7 +245,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/enums/slot_physical_behaviour.cpp"
 	"src/game/test_scenes/resource_setups/standard_animations.cpp"
 	"src/game/test_scenes/resource_setups/standard_atlas.cpp"
-	"src/game/test_scenes/resource_setups/standard_behaviour_trees.cpp"
+	"src/game/detail/ai/create_standard_behaviour_trees.cpp"
 	"src/game/test_scenes/resource_setups/standard_everything.cpp"
 	"src/game/test_scenes/resource_setups/standard_particle_effects.cpp"
 	"src/game/test_scenes/resource_setups/standard_physical_materials.cpp"

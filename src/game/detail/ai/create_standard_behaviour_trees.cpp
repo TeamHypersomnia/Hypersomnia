@@ -1,9 +1,8 @@
-#include "all.h"
 #include "game/transcendental/cosmos.h"
 #include "game/assets/behaviour_tree.h"
 #include "game/detail/ai/behaviours.h"
 
-void set_standard_behaviour_trees(cosmos& manager) {
+void create_standard_behaviour_trees(cosmos& manager) {
 	auto& soldier_movement = manager[assets::behaviour_tree_id::SOLDIER_MOVEMENT];
 
 	soldier_movement.root.mode = behaviour_tree::node::type::SELECTOR;

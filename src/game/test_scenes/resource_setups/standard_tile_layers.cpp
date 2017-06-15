@@ -3,7 +3,7 @@
 #include "all.h"
 #include "game/assets/assets_manager.h"
 
-void set_standard_tile_layers(assets_manager& manager) {
+void set_test_scene_tile_layers(assets_manager& manager) {
 	{
 		auto nth_tile = [](const unsigned i) {
 			return i;

@@ -5,7 +5,7 @@
 #include "game/assets/physical_material.h"
 #include "game/assets/assets_manager.h"
 
-void set_standard_physical_materials(assets_manager& assets) {
+void set_test_physical_materials(assets_manager& assets) {
 	const auto set_pair = [&](
 		const assets::physical_material_id a,
 		const assets::physical_material_id b,

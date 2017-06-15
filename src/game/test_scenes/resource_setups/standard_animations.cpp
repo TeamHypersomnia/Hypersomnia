@@ -1,11 +1,11 @@
 #include "generated/setting_build_test_scenes.h"
-#if BUILD_TEST_SCENES
 #include "all.h"
 
 #include "game/transcendental/cosmos.h"
 
-void set_standard_animations(assets_manager& anims) {
+void set_requisite_animations(assets_manager& anims) {
 	{
+#if BUILD_TEST_SCENES
 		auto& anim = anims[assets::animation_id::CAST_BLINK_ANIMATION];
 		anim.loop_mode = animation::loop_type::NONE;
 
@@ -15,7 +15,8 @@ void set_standard_animations(assets_manager& anims) {
 			50.0f
 		);
 	} 
-	
+#endif
+
 	{
 		auto& anim = anims[assets::animation_id::BLINK_ANIMATION];
 		anim.loop_mode = animation::loop_type::NONE;
@@ -27,4 +28,3 @@ void set_standard_animations(assets_manager& anims) {
 		);
 	}
 }
-#endif
