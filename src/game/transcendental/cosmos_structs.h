@@ -24,7 +24,7 @@ public:
 	// END GEN INTROSPECTOR
 };
 
-typedef put_all_components_into_t<augs::operations_on_all_components_mixin, cosmos> cosmos_base;
+using cosmos_base = put_all_components_into_t<augs::operations_on_all_components_mixin, cosmos>;
 
 class cosmos_significant_state {
 	// GEN INTROSPECTOR class cosmos_significant_state

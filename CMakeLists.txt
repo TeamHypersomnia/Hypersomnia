@@ -410,6 +410,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/hardcoded_content/requisite/requisite_game_images.cpp"
 	"src/game/hardcoded_content/requisite/requisite_shaders.cpp"
 	"src/game/hardcoded_content/requisite/requisite_sound_buffers.cpp"
+	"src/game/hardcoded_content/loader_utils.cpp"
 )
 
 if(BUILD_TEST_SCENES)

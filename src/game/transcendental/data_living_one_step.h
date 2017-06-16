@@ -5,8 +5,8 @@
 #include "game/messages/visibility_information.h"
 #include "augs/entity_system/storage_for_message_queues.h"
 
-typedef std::unordered_map<entity_id, messages::visibility_information_response> calculated_visibility_map;
-typedef std::unordered_map<entity_id, messages::line_of_sight_response> calculated_line_of_sight_map;
+using calculated_visibility_map = std::unordered_map<entity_id, messages::visibility_information_response>;
+using calculated_line_of_sight_map = std::unordered_map<entity_id, messages::line_of_sight_response>;
 
 struct data_living_one_step {
 	storage_for_all_message_queues messages;

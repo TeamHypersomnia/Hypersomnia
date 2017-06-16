@@ -1,62 +1,10 @@
 #include "generated/setting_build_test_scenes.h"
 #if BUILD_TEST_SCENES
 #include "game/hardcoded_content/all_hardcoded_content.h"
-#include "game/assets/assets_manager.h"
-#include "augs/graphics/shader.h"
-#include "augs/gui/button_corners.h"
-
-using namespace assets;
-
-static constexpr auto DIFFUSE = texture_map_type::DIFFUSE;
-static constexpr auto NEON = texture_map_type::NEON;
-static constexpr auto DESATURATED = texture_map_type::DESATURATED;
-static constexpr auto GAME_WORLD_ATLAS = gl_texture_id::GAME_WORLD_ATLAS;
+#include "game/hardcoded_content/loader_utils.h"
 
 game_image_requests load_test_scene_images() {
 	game_image_requests output;
-
-	const auto make_button_with_corners = [&](
-		const game_image_id first,
-		const std::string& filename_template,
-		const bool request_lb_complement
-	) {
-		const auto first_i = static_cast<int>(first);
-		const auto last_i = first_i + static_cast<int>(button_corner_type::COUNT);
-
-		for (int i = first_i; i < last_i; ++i) {
-			const auto type = static_cast<button_corner_type>(i - first_i);
-
-			if (!request_lb_complement && is_lb_complement(type)) {
-				continue;
-			}
-
-			const auto full_filename = typesafe_sprintf(filename_template, get_filename_for(type));
-
-			{
-				auto& in = output[static_cast<game_image_id>(i)];
-				in.texture_maps[DIFFUSE] = { full_filename, GAME_WORLD_ATLAS };
-			}
-		}
-	};
-
-	const auto make_indexed = [&](
-		const game_image_id first,
-		const game_image_id last,
-		const std::string& filename_template,
-		const std::string& neon_filename_template = std::string()
-	) {
-		const auto first_i = static_cast<int>(first);
-		const auto last_i = static_cast<int>(last);
-
-		for (int i = first_i; i < last_i; ++i) {
-			auto& in = output[static_cast<game_image_id>(i)];
-			in.texture_maps[DIFFUSE] = { typesafe_sprintf(filename_template, 1 + i - first_i), GAME_WORLD_ATLAS };
-
-			if (neon_filename_template.size() > 0) {
-				in.texture_maps[NEON] = { typesafe_sprintf(neon_filename_template, 1 + i - first_i), GAME_WORLD_ATLAS };
-			}
-		}
-	};
 
 	{
 		auto& in = output[game_image_id::TEST_CROSSHAIR];
@@ -403,26 +351,30 @@ game_image_requests load_test_scene_images() {
 		in.texture_maps[DIFFUSE] = { "resources/gfx/standard_head.png", GAME_WORLD_ATLAS };
 	}
 
-	make_indexed(
+	make_indexed_images(
+		output,
 		game_image_id::METROPOLIS_TILE_FIRST,
 		game_image_id::METROPOLIS_TILE_LAST,
 		"resources/gfx/tileset/tile_%x.png"
 	);
 
-	make_indexed(
+	make_indexed_images(
+		output,
 		game_image_id::SMOKE_PARTICLE_FIRST,
 		game_image_id(int(game_image_id::SMOKE_PARTICLE_FIRST) + 3),
 		"resources/gfx/smoke_%x.png"
 	);
 
-	make_indexed(
+	make_indexed_images(
+		output,
 		game_image_id::PIXEL_THUNDER_FIRST,
 		game_image_id::PIXEL_THUNDER_LAST,
 		"resources/gfx/pixel_thunder_%x.png",
 		"generated/neon_maps/pixel_thunder_%x.png"
 	);
 
-	make_indexed(
+	make_indexed_images(
+		output,
 		game_image_id::CAST_BLINK_FIRST,
 		game_image_id::CAST_BLINK_LAST,
 		"resources/gfx/cast_blink_%x.png",
