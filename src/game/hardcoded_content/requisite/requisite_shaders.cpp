@@ -9,40 +9,40 @@ using namespace assets;
 using namespace augs::graphics;
 
 void load_requisite_shaders(assets_manager& manager) {
-	manager[shader_id::DEFAULT_VERTEX].create_from_file(shader::type::VERTEX, "resources/shaders/default.vsh");
-	manager[shader_id::DEFAULT_FRAGMENT].create_from_file(shader::type::FRAGMENT, "resources/shaders/default.fsh");
+	manager[shader_id::DEFAULT_VERTEX].create_from_file(shader::type::VERTEX, "content/shaders/default.vsh");
+	manager[shader_id::DEFAULT_FRAGMENT].create_from_file(shader::type::FRAGMENT, "content/shaders/default.fsh");
 	manager.create(program_id::DEFAULT, shader_id::DEFAULT_VERTEX, shader_id::DEFAULT_FRAGMENT);
 
-	manager[shader_id::DEFAULT_ILLUMINATED_VERTEX].create_from_file(shader::type::VERTEX, "resources/shaders/default_illuminated.vsh");
-	manager[shader_id::DEFAULT_ILLUMINATED_FRAGMENT].create_from_file(shader::type::FRAGMENT, "resources/shaders/default_illuminated.fsh");
+	manager[shader_id::DEFAULT_ILLUMINATED_VERTEX].create_from_file(shader::type::VERTEX, "content/shaders/default_illuminated.vsh");
+	manager[shader_id::DEFAULT_ILLUMINATED_FRAGMENT].create_from_file(shader::type::FRAGMENT, "content/shaders/default_illuminated.fsh");
 	manager.create(program_id::DEFAULT_ILLUMINATED, shader_id::DEFAULT_ILLUMINATED_VERTEX, shader_id::DEFAULT_ILLUMINATED_FRAGMENT);
 
-	manager[shader_id::PURE_COLOR_HIGHLIGHT_VERTEX].create_from_file(shader::type::VERTEX, "resources/shaders/pure_color_highlight.vsh");
-	manager[shader_id::PURE_COLOR_HIGHLIGHT_FRAGMENT].create_from_file(shader::type::FRAGMENT, "resources/shaders/pure_color_highlight.fsh");
+	manager[shader_id::PURE_COLOR_HIGHLIGHT_VERTEX].create_from_file(shader::type::VERTEX, "content/shaders/pure_color_highlight.vsh");
+	manager[shader_id::PURE_COLOR_HIGHLIGHT_FRAGMENT].create_from_file(shader::type::FRAGMENT, "content/shaders/pure_color_highlight.fsh");
 	manager.create(program_id::PURE_COLOR_HIGHLIGHT, shader_id::PURE_COLOR_HIGHLIGHT_VERTEX, shader_id::PURE_COLOR_HIGHLIGHT_FRAGMENT);
 
-	manager[shader_id::CIRCULAR_BARS_VERTEX].create_from_file(shader::type::VERTEX, "resources/shaders/circular_bars.vsh");
-	manager[shader_id::CIRCULAR_BARS_FRAGMENT].create_from_file(shader::type::FRAGMENT, "resources/shaders/circular_bars.fsh");
+	manager[shader_id::CIRCULAR_BARS_VERTEX].create_from_file(shader::type::VERTEX, "content/shaders/circular_bars.vsh");
+	manager[shader_id::CIRCULAR_BARS_FRAGMENT].create_from_file(shader::type::FRAGMENT, "content/shaders/circular_bars.fsh");
 	manager.create(program_id::CIRCULAR_BARS, shader_id::CIRCULAR_BARS_VERTEX, shader_id::CIRCULAR_BARS_FRAGMENT);
 
-	manager[shader_id::EXPLODING_RING_VERTEX].create_from_file(shader::type::VERTEX, "resources/shaders/exploding_ring.vsh");
-	manager[shader_id::EXPLODING_RING_FRAGMENT].create_from_file(shader::type::FRAGMENT, "resources/shaders/exploding_ring.fsh");
+	manager[shader_id::EXPLODING_RING_VERTEX].create_from_file(shader::type::VERTEX, "content/shaders/exploding_ring.vsh");
+	manager[shader_id::EXPLODING_RING_FRAGMENT].create_from_file(shader::type::FRAGMENT, "content/shaders/exploding_ring.fsh");
 	manager.create(program_id::EXPLODING_RING, shader_id::EXPLODING_RING_VERTEX, shader_id::EXPLODING_RING_FRAGMENT);
 
-	manager[shader_id::LIGHT_VERTEX].create_from_file(shader::type::VERTEX, "resources/shaders/light.vsh");
-	manager[shader_id::LIGHT_FRAGMENT].create_from_file(shader::type::FRAGMENT, "resources/shaders/light.fsh");
+	manager[shader_id::LIGHT_VERTEX].create_from_file(shader::type::VERTEX, "content/shaders/light.vsh");
+	manager[shader_id::LIGHT_FRAGMENT].create_from_file(shader::type::FRAGMENT, "content/shaders/light.fsh");
 	manager.create(program_id::LIGHT, shader_id::LIGHT_VERTEX, shader_id::LIGHT_FRAGMENT);
 
-	manager[shader_id::SMOKE_VERTEX].create_from_file(shader::type::VERTEX, "resources/shaders/fullscreen.vsh");
-	manager[shader_id::SMOKE_FRAGMENT].create_from_file(shader::type::FRAGMENT, "resources/shaders/smoke.fsh");
+	manager[shader_id::SMOKE_VERTEX].create_from_file(shader::type::VERTEX, "content/shaders/fullscreen.vsh");
+	manager[shader_id::SMOKE_FRAGMENT].create_from_file(shader::type::FRAGMENT, "content/shaders/smoke.fsh");
 	manager.create(program_id::SMOKE, shader_id::SMOKE_VERTEX, shader_id::SMOKE_FRAGMENT);
 
-	manager[shader_id::ILLUMINATING_SMOKE_VERTEX].create_from_file(shader::type::VERTEX, "resources/shaders/fullscreen.vsh");
-	manager[shader_id::ILLUMINATING_SMOKE_FRAGMENT].create_from_file(shader::type::FRAGMENT, "resources/shaders/illuminating_smoke.fsh");
+	manager[shader_id::ILLUMINATING_SMOKE_VERTEX].create_from_file(shader::type::VERTEX, "content/shaders/fullscreen.vsh");
+	manager[shader_id::ILLUMINATING_SMOKE_FRAGMENT].create_from_file(shader::type::FRAGMENT, "content/shaders/illuminating_smoke.fsh");
 	manager.create(program_id::ILLUMINATING_SMOKE, shader_id::ILLUMINATING_SMOKE_VERTEX, shader_id::ILLUMINATING_SMOKE_FRAGMENT);
 
-	manager[shader_id::SPECULAR_HIGHLIGHTS_VERTEX].create_from_file(shader::type::VERTEX, "resources/shaders/default.vsh");
-	manager[shader_id::SPECULAR_HIGHLIGHTS_FRAGMENT].create_from_file(shader::type::FRAGMENT, "resources/shaders/specular_highlights.fsh");
+	manager[shader_id::SPECULAR_HIGHLIGHTS_VERTEX].create_from_file(shader::type::VERTEX, "content/shaders/default.vsh");
+	manager[shader_id::SPECULAR_HIGHLIGHTS_FRAGMENT].create_from_file(shader::type::FRAGMENT, "content/shaders/specular_highlights.fsh");
 	manager.create(program_id::SPECULAR_HIGHLIGHTS, shader_id::SPECULAR_HIGHLIGHTS_VERTEX, shader_id::SPECULAR_HIGHLIGHTS_FRAGMENT);
 
 	{
