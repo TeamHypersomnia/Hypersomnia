@@ -13,7 +13,7 @@ game_image_requests load_test_scene_images() {
 
 	{
 		auto& in = output[game_image_id::TEST_BACKGROUND];
-		in.texture_maps[DIFFUSE] = { "content/gfx/snow_textures/snow3.png", GAME_WORLD_ATLAS };
+		in.texture_maps[DIFFUSE] = { "content/gfx/snow3.png", GAME_WORLD_ATLAS };
 	}
 
 	{
