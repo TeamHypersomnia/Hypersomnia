@@ -24,6 +24,24 @@ namespace augs {
 	}
 
 	template <class P>
+	auto switch_file(
+		const P& filename, 
+		const P& official_directory, 
+		const P& custom_directory
+	) {
+		const auto custom = custom_directory + filename;
+
+		if (file_exists(custom)) {
+			return custom;
+		}
+		else {
+			const auto official = official_directory + filename;
+			ensure(file_exists(official));
+			return official;
+		}
+	}
+
+	template <class P>
 	auto get_extension(const P& path) {
 		return fs::path(path).extension().string();
 	}
