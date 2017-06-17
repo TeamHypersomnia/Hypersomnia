@@ -32,6 +32,16 @@ enum-introspector-body-format:
 		}
 	}
 
+enum-arg-format:
+		%x
+enum-to-args-body-format:
+	template <class F>
+	void enum_to_args_impl(const %x, F f) {
+		f(
+%x
+		);
+	}
+
 generated-file-format:
 #pragma once
 #include <tuple>

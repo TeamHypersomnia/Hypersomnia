@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/math/vec2.h"
 #include "game/assets/tile_layer_id.h"
-#include "augs/graphics/pixel.h"
+#include "augs/graphics/rgba.h"
 #include "augs/graphics/vertex.h"
 #include "game/detail/basic_renderable_drawing_input.h"
 

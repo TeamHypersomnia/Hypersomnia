@@ -37,7 +37,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 
 			particle_definition.angular_damping = 0;
 			particle_definition.linear_damping = 10;
-			particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 30));
+			particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 30));
 			particle_definition.unshrinking_time_ms = 2000.f;
 			particle_definition.shrink_when_ms_remaining = 1500.f;
 
@@ -80,7 +80,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 10;
-				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 60));
+				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 60));
 				particle_definition.unshrinking_time_ms = 250.f;
 				particle_definition.shrink_when_ms_remaining = 1000.f;
 
@@ -117,7 +117,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 
 			particle_definition.angular_damping = 0;
 			//if (i == 5) {
-			//	particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 3), rgba(255, 255, 255, 255));
+			//	particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::BLINK_1) + 3), rgba(255, 255, 255, 255));
 			//}
 			//else {
 			particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::ROUND_TRACE)), rgba(255, 255, 255, 255));
@@ -166,7 +166,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 10;
-				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 15));
+				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 15));
 				particle_definition.unshrinking_time_ms = 0.f;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
@@ -210,7 +210,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 400;
-				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 15));
+				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 15));
 				particle_definition.unshrinking_time_ms = 100.f;
 				particle_definition.shrink_when_ms_remaining = 200.f;
 
@@ -280,7 +280,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 			homing_animated_particle particle_definition;
 
 			particle_definition.linear_damping = 0;
-			particle_definition.first_face = static_cast<assets::game_image_id>(static_cast<int>(assets::game_image_id::BLINK_FIRST) + i);
+			particle_definition.first_face = static_cast<assets::game_image_id>(static_cast<int>(assets::game_image_id::BLINK_1) + i);
 			particle_definition.frame_count = 7 - i;
 			particle_definition.frame_duration_ms = frame_duration;
 			particle_definition.color = white;
@@ -293,7 +293,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 			homing_animated_particle particle_definition;
 
 			particle_definition.linear_damping = 0;
-			particle_definition.first_face = static_cast<assets::game_image_id>(static_cast<int>(assets::game_image_id::BLINK_FIRST) + 2);
+			particle_definition.first_face = static_cast<assets::game_image_id>(static_cast<int>(assets::game_image_id::BLINK_1) + 2);
 			particle_definition.frame_count = 1;
 			particle_definition.frame_duration_ms = 700.f;
 			particle_definition.color = white;
@@ -427,7 +427,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 			particle_definition.angular_damping = 0;
 			particle_definition.linear_damping = 200;
 			particle_definition.acc.set(700, -700);
-			particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 30));
+			particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 30));
 			particle_definition.unshrinking_time_ms = 100.f;
 			particle_definition.shrink_when_ms_remaining = 200.f;
 
@@ -471,7 +471,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 400;
 				particle_definition.acc.set(900, -900);
-				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 30));
+				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 30));
 				particle_definition.unshrinking_time_ms = 100.f;
 				particle_definition.shrink_when_ms_remaining = 200.f;
 
@@ -528,7 +528,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 1000;
-				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), white);
+				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::BLINK_1) + 2), white);
 				particle_definition.acc.set(900, -900);
 				particle_definition.alpha_levels = 1;
 
@@ -540,7 +540,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 			//
 			//	particle_definition.angular_damping = 0;
 			//	particle_definition.linear_damping = 1000;
-			//	particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 3), white);
+			//	particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::BLINK_1) + 3), white);
 			//	particle_definition.acc.set(400, -400);
 			//	particle_definition.alpha_levels = 1;
 			//
@@ -602,7 +602,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 400;
 				particle_definition.acc.set(900, -900);
-				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 30));
+				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 30));
 				particle_definition.unshrinking_time_ms = 100.f;
 				particle_definition.shrink_when_ms_remaining = 200.f;
 
@@ -663,7 +663,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 1000;
-				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), white);
+				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::BLINK_1) + 2), white);
 				particle_definition.acc.set(900, -900);
 				particle_definition.alpha_levels = 1;
 
@@ -675,7 +675,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 			//
 			//	particle_definition.angular_damping = 0;
 			//	particle_definition.linear_damping = 1000;
-			//	particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 3), white);
+			//	particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::BLINK_1) + 3), white);
 			//	particle_definition.acc.set(400, -400);
 			//	particle_definition.alpha_levels = 1;
 			//
@@ -740,7 +740,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 20;
 				particle_definition.acc.set(300, -300);
-				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 15));
+				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 15));
 				particle_definition.unshrinking_time_ms = 100.f;
 				particle_definition.shrink_when_ms_remaining = 150.f;
 
@@ -767,7 +767,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 5000;
-				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::PIXEL_THUNDER_FIRST) + i), rgba(255, 255, 255, 255));
+				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::PIXEL_THUNDER_1) + i), rgba(255, 255, 255, 255));
 				particle_definition.alpha_levels = 1;
 
 				em.add_particle_definition(particle_definition);
@@ -796,7 +796,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 
 			particle_definition.angular_damping = 0;
 			particle_definition.linear_damping = 5000;
-			particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::PIXEL_THUNDER_FIRST) + i), rgba(255, 255, 255, 255));
+			particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::PIXEL_THUNDER_1) + i), rgba(255, 255, 255, 255));
 			particle_definition.size.x *= 1.3;
 			particle_definition.alpha_levels = 1;
 
@@ -836,7 +836,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 20;
 				particle_definition.acc.set(600, -600);
-				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 15));
+				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 15));
 				particle_definition.unshrinking_time_ms = 30.f;
 				particle_definition.shrink_when_ms_remaining = 50.f;
 
@@ -1005,7 +1005,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 
 			particle_definition.angular_damping = 0;
 			particle_definition.linear_damping = 10;
-			particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 220));
+			particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 220));
 			particle_definition.size *= 0.4;
 
 			em.add_particle_definition(particle_definition);
@@ -1068,7 +1068,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 
 			particle_definition.angular_damping = 0;
 			particle_definition.linear_damping = 10;
-			particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_PARTICLE_FIRST) + i), rgba(255, 255, 255, 30));
+			particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 30));
 			particle_definition.unshrinking_time_ms = 10;
 			particle_definition.shrink_when_ms_remaining = 50;
 

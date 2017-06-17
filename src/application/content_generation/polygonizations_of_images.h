@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "augs/graphics/pixel.h"
+#include "augs/graphics/rgba.h"
 #include "augs/misc/templated_readwrite.h"
 #include <chrono>
 

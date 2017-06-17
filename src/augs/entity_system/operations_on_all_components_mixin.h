@@ -27,7 +27,7 @@ namespace augs {
 		void reserve_storage_for_all_components(const std::size_t n) {
 			auto& self = *static_cast<derived*>(this);
 
-			auto r = [&self, n](auto c) {
+			auto reserver = [&self, n](auto c) {
 				using component = decltype(c);
 
 				if constexpr(!is_component_fundamental_v<component>) {
@@ -36,7 +36,7 @@ namespace augs {
 				}
 			};
 
-			for_each_type<components...>(r);
+			for_each_type<components...>(reserver);
 		}
 
 		template <class... excluded_components, class handle_type>
@@ -70,7 +70,7 @@ namespace augs {
 			auto& self = *static_cast<derived*>(this);
 
 			for_each_type<components...>([&](auto c) {
-				typedef decltype(c) component;
+				using component = decltype(c);
 
 				if constexpr(!is_component_fundamental_v<component>) {
 					if (handle.allocator::template has<component>()) {

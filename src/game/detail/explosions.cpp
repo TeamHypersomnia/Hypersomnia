@@ -2,7 +2,7 @@
 #include "game/assets/sound_buffer_id.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
-#include "augs/graphics/pixel.h"
+#include "augs/graphics/rgba.h"
 #include "game/messages/exploding_ring_input.h"
 #include "game/messages/damage_message.h"
 #include "game/systems_stateless/visibility_system.h"

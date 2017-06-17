@@ -1,6 +1,6 @@
 #pragma once
 #include "game/components/transform_component.h"
-#include "augs/graphics/pixel.h"
+#include "augs/graphics/rgba.h"
 
 struct thunder_input {
 	typedef augs::minmax<float> minmax;

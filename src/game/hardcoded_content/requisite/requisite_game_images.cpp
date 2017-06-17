@@ -159,13 +159,6 @@ game_image_requests load_requisite_images() {
 		false
 	);
 
-	make_indexed_images(
-		output,
-		game_image_id::BLINK_FIRST,
-		game_image_id::BLINK_LAST,
-		"content/gfx/blink_%x.png"
-	);
-
 	return output;
 }
 

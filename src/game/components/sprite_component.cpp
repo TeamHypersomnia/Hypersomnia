@@ -124,7 +124,7 @@ namespace components {
 		}
 		else if (in.drawing_type == renderable_drawing_type::SPECULAR_HIGHLIGHTS) {
 			const auto frame_duration_ms = 50u;
-			const auto frame_count = int(assets::game_image_id::BLINK_LAST) - int(assets::game_image_id::BLINK_FIRST);
+			const auto frame_count = int(assets::game_image_id::BLINK_7) - int(assets::game_image_id::BLINK_1);
 			const auto animation_max_duration = frame_duration_ms * frame_count;
 			
 			for (unsigned m = 0; m < max_specular_blinks; ++m) {
@@ -135,7 +135,7 @@ namespace components {
 				fast_randomization generator(spatial_hash + m * 30 + total_ms / animation_max_duration);
 
 				const unsigned animation_current_ms = total_ms % (animation_max_duration);
-				const auto& target_frame = assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + animation_current_ms / frame_duration_ms);
+				const auto& target_frame = assets::game_image_id(int(assets::game_image_id::BLINK_1) + animation_current_ms / frame_duration_ms);
 
 				const auto blink_offset = 
 					vec2i { generator.randval(0, int(drawn_size.x)), generator.randval(0, int(drawn_size.y)) } - drawn_size / 2;

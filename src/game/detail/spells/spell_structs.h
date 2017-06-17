@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include "game/assets/game_image_id.h"
-#include "augs/graphics/pixel.h"
+#include "augs/graphics/rgba.h"
 
 #include "game/assets/particle_effect_id.h"
 #include "game/assets/sound_buffer_id.h"

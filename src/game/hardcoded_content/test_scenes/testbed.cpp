@@ -304,7 +304,7 @@ namespace test_scenes {
 
 				r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-				w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), cyan);
+				w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_1) + 2), cyan);
 				//w.face.size.set(1, 1);
 				w.count = 80;
 				w.reach = reach;
@@ -318,7 +318,7 @@ namespace test_scenes {
 
 				r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-				w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), cyan);
+				w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_1) + 2), cyan);
 				//w.face.size.set(1, 1);
 				w.count = 80;
 				w.reach = reach;
@@ -385,7 +385,7 @@ namespace test_scenes {
 
 					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-					w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), light_cyan);
+					w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_1) + 2), light_cyan);
 					w.count = 20;
 					w.reach = xywh(light_pos.x - 150, light_pos.y - 150, 300, 300);
 					e.add_standard_components(step);
@@ -398,7 +398,7 @@ namespace test_scenes {
 
 					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-					w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), light_cyan);
+					w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_1) + 2), light_cyan);
 					w.count = 20;
 					w.reach = xywh(light_pos.x - 25, light_pos.y - 25, 50, 50);
 					e.add_standard_components(step);
@@ -457,7 +457,7 @@ namespace test_scenes {
 
 					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-					w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), cyan);
+					w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_1) + 2), cyan);
 					w.count = 20;
 					w.reach = left_reach;
 					e.add_standard_components(step);
@@ -470,7 +470,7 @@ namespace test_scenes {
 
 					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-					w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_FIRST) + 2), orange);
+					w.face.set(assets::game_image_id(int(assets::game_image_id::BLINK_1) + 2), orange);
 					w.count = 20;
 					w.reach = right_reach;
 					e.add_standard_components(step);

@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/graphics/vertex.h"
-#include "augs/graphics/pixel.h"
+#include "augs/graphics/rgba.h"
 #include "augs/math/vec2.h"
 #include "game/assets/game_image_id.h"
 

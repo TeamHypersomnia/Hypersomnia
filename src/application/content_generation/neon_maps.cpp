@@ -1,30 +1,30 @@
 #include <sstream>
 
 #include "neon_maps.h"
-#include "augs/filesystem/directory.h"
 #include "augs/filesystem/file.h"
 
 #include "augs/ensure.h"
 #include "augs/misc/streams.h"
 
 #include "augs/image/image.h"
-#include "augs/misc/parsing_utils.h"
+#include "augs/misc/lua_readwrite.h"
 #include "generated/introspectors.h"
 
 #define PIXEL_NONE rgba(0,0,0,0)
 
 void make_neon(
-	const neon_map_stamp& stamp,
+	const neon_map_input& input,
 	augs::image& source
 );
 
 std::vector<std::vector<double>> generate_gauss_kernel(
-	const neon_map_stamp& stamp
+	const neon_map_input& input
 );
 
 std::vector<vec2u> hide_undesired_pixels(
 	augs::image& original_image,
-	const std::vector<rgba>& color_whitelist);
+	const std::vector<rgba>& color_whitelist
+);
 
 void resize_image(
 	augs::image& image_to_resize,
@@ -33,114 +33,70 @@ void resize_image(
 
 void cut_empty_edges(augs::image& source);
 
-void regenerate_neon_maps(
+void regenerate_neon_map(
+	const std::string& source_image_path,
+	const std::string& output_image_path,
+	const neon_map_input in,
 	const bool force_regenerate
 ) {
-	const std::string neon_directory = "generated/neon_maps/";
+	std::vector<nnn> nnns;
+	augs::load_from_lua_table(nnns, "reqs.lua");
 
-	augs::create_directories(neon_directory);
+	neon_map_stamp new_stamp;
+	new_stamp.input = in;
+	new_stamp.last_write_time_of_source = augs::last_write_time(source_image_path);
 
-	const auto lines = augs::get_file_lines("generators/neon_map_generator_input.cfg");
-	size_t current_line = 0;
+	const auto neon_map_path = output_image_path;
+	const auto neon_map_stamp_path = augs::replace_extension(neon_map_path, ".stamp");
 
-	auto get_line_until = augs::make_get_line_until(lines, current_line);
+	augs::stream new_stamp_stream;
+	augs::write(new_stamp_stream, new_stamp);
 
-	while (get_line_until()) {
-		neon_map_stamp new_stamp_template;
+	bool should_regenerate = force_regenerate;
 
-		std::vector<std::string> source_paths;
-
-		while (get_line_until("whitelist:")) {
-			source_paths.push_back(lines[current_line]);
-
-			++current_line;
+	if (!augs::file_exists(neon_map_path)) {
+		should_regenerate = true;
+	}
+	else {
+		if (!augs::file_exists(neon_map_stamp_path)) {
+			should_regenerate = true;
 		}
+		else {
+			augs::stream existent_stamp_stream;
+			augs::get_file_contents_binary_into(neon_map_stamp_path, existent_stamp_stream);
 
-		while (get_line_until("parameters:")) {
-			std::istringstream in(lines[current_line]);
+			const bool are_stamps_identical = (new_stamp_stream == existent_stamp_stream);
 
-			rgba pixel;
-			in >> pixel;
-
-			new_stamp_template.light_colors.push_back(pixel);
-
-			++current_line;
-		}
-		
-		std::istringstream in(lines[current_line]);
-
-		in
-			>> new_stamp_template.standard_deviation
-			>> new_stamp_template.radius_towards_x_axis
-			>> new_stamp_template.radius_towards_y_axis
-			>> new_stamp_template.amplification
-			>> new_stamp_template.alpha_multiplier
-		;
-
-		// skip line with parameters
-		++current_line;
-
-		// skip separating newline
-		++current_line;
-
-		for (const auto& source_path : source_paths) {
-			neon_map_stamp new_stamp = new_stamp_template;
-
-			new_stamp.last_write_time_of_source = augs::last_write_time(source_path);
-
-			const auto neon_map_path = neon_directory + augs::get_filename(source_path);
-			const auto neon_map_stamp_path = neon_directory + augs::replace_extension(augs::get_filename(source_path), ".stamp");
-
-			augs::stream new_stamp_stream;
-			augs::write(new_stamp_stream, new_stamp);
-
-			bool should_regenerate = force_regenerate;
-
-			if (!augs::file_exists(neon_map_path)) {
+			if (!are_stamps_identical) {
 				should_regenerate = true;
 			}
-			else {
-				if (!augs::file_exists(neon_map_stamp_path)) {
-					should_regenerate = true;
-				}
-				else {
-					augs::stream existent_stamp_stream;
-					augs::get_file_contents_binary_into(neon_map_stamp_path, existent_stamp_stream);
-
-					const bool are_stamps_identical = (new_stamp_stream == existent_stamp_stream);
-
-					if (!are_stamps_identical) {
-						should_regenerate = true;
-					}
-				}
-			}
-
-			if (should_regenerate) {
-				LOG("Regenerating neon map for %x", source_path);
-
-				augs::image source_image;
-				source_image.from_file(source_path);
-
-				make_neon(new_stamp, source_image);
-
-				source_image.save(neon_map_path);
-
-				augs::create_binary_file(neon_map_stamp_path, new_stamp_stream);
-			}
 		}
+	}
+
+	if (should_regenerate) {
+		LOG("Regenerating neon map for %x", source_image_path);
+
+		augs::image source_image;
+		source_image.from_file(source_image_path);
+
+		make_neon(new_stamp.input, source_image);
+
+		source_image.save(neon_map_path);
+
+		augs::create_binary_file(neon_map_stamp_path, new_stamp_stream);
 	}
 }
 
 void make_neon(
-	const neon_map_stamp& stamp,
+	const neon_map_input& input,
 	augs::image& source
 ) {
 
-	resize_image(source, vec2u(stamp.radius_towards_x_axis, stamp.radius_towards_y_axis));
+	resize_image(source, vec2u(input.radius_towards_x_axis, input.radius_towards_y_axis));
 
-	const auto pixel_list = hide_undesired_pixels(source, stamp.light_colors);
+	const auto pixel_list = hide_undesired_pixels(source, input.light_colors);
 
-	const auto kernel = generate_gauss_kernel(stamp);
+	const auto kernel = generate_gauss_kernel(input);
 
 	std::vector<rgba> pixel_colors;
 
@@ -158,13 +114,13 @@ void make_neon(
 
 		for (size_t y = 0; y < kernel.size(); ++y) {
 			for (size_t x = 0; x < kernel[y].size(); ++x) {
-				size_t current_index_y = pixel.y + y - stamp.radius_towards_y_axis / 2;
+				size_t current_index_y = pixel.y + y - input.radius_towards_y_axis / 2;
 
 				if (current_index_y >= source.get_rows()) {
 					continue;
 				}
 
-				size_t current_index_x = pixel.x + x - stamp.radius_towards_x_axis / 2;
+				size_t current_index_x = pixel.x + x - input.radius_towards_x_axis / 2;
 
 				if (current_index_x >= source.get_columns()) {
 					continue;
@@ -172,7 +128,7 @@ void make_neon(
 
 				rgba& current_pixel = source.pixel({ current_index_x, current_index_y });
 				auto current_pixel_rgba = rgba{ current_pixel[2], current_pixel[1], current_pixel[0], current_pixel[3] };
-				size_t alpha = static_cast<size_t>(255 * kernel[y][x] * stamp.amplification);
+				size_t alpha = static_cast<size_t>(255 * kernel[y][x] * input.amplification);
 				alpha = alpha > 255 ? 255 : alpha;
 
 				if (current_pixel_rgba == PIXEL_NONE && alpha) {
@@ -202,17 +158,17 @@ void make_neon(
 
 	for (size_t y = 0; y < source.get_rows(); ++y) {
 		for (size_t x = 0; x < source.get_columns(); ++x) {
-			source.pixel({ x, y }).a = static_cast<rgba_channel>(source.pixel({ x, y }).a * stamp.alpha_multiplier);
+			source.pixel({ x, y }).a = static_cast<rgba_channel>(source.pixel({ x, y }).a * input.alpha_multiplier);
 		}
 	}
 }
 
-std::vector<std::vector<double>> generate_gauss_kernel(const neon_map_stamp& stamp)
+std::vector<std::vector<double>> generate_gauss_kernel(const neon_map_input& input)
 {
-	const auto radius_towards_x_axis = stamp.radius_towards_x_axis;
-	auto radius_towards_y_axis = stamp.radius_towards_y_axis;
+	const auto radius_towards_x_axis = input.radius_towards_x_axis;
+	auto radius_towards_y_axis = input.radius_towards_y_axis;
 
-	if (!stamp.radius_towards_y_axis) {
+	if (!input.radius_towards_y_axis) {
 		radius_towards_y_axis = radius_towards_x_axis;
 	}
 
@@ -242,7 +198,7 @@ std::vector<std::vector<double>> generate_gauss_kernel(const neon_map_stamp& sta
 
 	for (size_t y = 0; y < result.size(); ++y) {
 		for (size_t x = 0; x < result[y].size(); ++x) {
-			result[y][x] = exp(-1 * (pow(index[x][y].first, 2) + pow(index[x][y].second, 2)) / 2 / pow(stamp.standard_deviation, 2)) / PI<float> / 2 / pow(stamp.standard_deviation, 2);
+			result[y][x] = exp(-1 * (pow(index[x][y].first, 2) + pow(index[x][y].second, 2)) / 2 / pow(input.standard_deviation, 2)) / PI<float> / 2 / pow(input.standard_deviation, 2);
 		}
 	}
 

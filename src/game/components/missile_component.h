@@ -9,7 +9,7 @@
 
 #include "augs/misc/timer.h"
 #include "augs/misc/stepped_timing.h"
-#include "augs/graphics/pixel.h"
+#include "augs/graphics/rgba.h"
 #include "augs/padding_byte.h"
 
 #include "augs/misc/value_meter.h"

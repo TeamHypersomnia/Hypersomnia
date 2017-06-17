@@ -2,7 +2,7 @@
 #include "augs/math/vec2.h"
 #include "game/components/sprite_component.h"
 #include "game/detail/particle_types_declaration.h"
-#include "augs/graphics/pixel.h"
+#include "augs/graphics/rgba.h"
 #include "game/transcendental/entity_id.h"
 
 struct general_particle {

@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-#include "augs/graphics/pixel.h"
+#include "augs/graphics/rgba.h"
 #include "game/assets/font_id.h"
 
 namespace augs {

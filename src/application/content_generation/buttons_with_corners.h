@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/graphics/pixel.h"
+#include "augs/graphics/rgba.h"
 #include "augs/misc/templated_readwrite.h"
 #include "augs/padding_byte.h"
 

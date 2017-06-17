@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/graphics/pixel.h"
+#include "augs/graphics/rgba.h"
 
 #include "augs/misc/stepped_timing.h"
 #include "augs/misc/enum_associative_array.h"

@@ -1,7 +1,7 @@
 #pragma once
 #include <array>
 #include "augs/padding_byte.h"
-#include "augs/graphics/pixel.h"
+#include "augs/graphics/rgba.h"
 
 struct hotbar_settings {
 	// GEN INTROSPECTOR struct hotbar_settings

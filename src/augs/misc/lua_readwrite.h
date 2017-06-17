@@ -2,18 +2,46 @@
 #include <sol2/sol.hpp>
 #include "augs/templates/string_to_enum.h"
 #include "augs/misc/templated_readwrite.h"
+#include "augs/misc/custom_lua_representations.h"
+#include "augs/misc/script_utils.h"
 
 namespace augs {
+	template <class T, class = void>
+	struct has_custom_lua_value_representation : std::false_type {};
+
+	template <class T>
+	struct has_custom_lua_value_representation<
+		T, 
+		decltype(
+			to_lua_value(
+				std::declval<const T>(),
+				std::declval<sol::object>()
+			),
+			from_lua_value(
+				std::declval<T>(),
+				std::declval<sol::object>()
+			),
+			void()
+		)
+	> : std::true_type {};
+
+	template <class T>
+	constexpr bool has_custom_lua_value_representation_v = has_custom_lua_value_representation<T>::value;
+
 	template <class T>
 	constexpr bool representable_as_lua_value =
 		std::is_same_v<T, std::string>
 		|| std::is_arithmetic_v<T>
 		|| std::is_enum_v<T>
+		|| has_custom_lua_value_representation_v<T>
 	;
 
 	template <class T, class L>
 	void read_table_field(sol::table input_table, T& field, const L label) {
-		if constexpr(std::is_same_v<T, std::string> || std::is_arithmetic_v<T>) {
+		if constexpr(has_custom_lua_value_representation_v<T>) {
+			from_lua_value(field, input_table[label]);
+		}
+		else if constexpr(std::is_same_v<T, std::string> || std::is_arithmetic_v<T>) {
 			field = input_table[label].get<T>();
 		}
 		else if constexpr(std::is_enum_v<T>) {
@@ -45,7 +73,10 @@ namespace augs {
 
 	template <class Serialized>
 	void read(sol::table input_table, Serialized& into) {
-		static_assert(!representable_as_lua_value<Serialized>, "No key (label) value provided! Use read_table_field to directly serialize this object.");
+		static_assert(
+			!representable_as_lua_value<Serialized>, 
+			"Directly representable, but no key (label) provided! Use read_table_field to directly serialize this object."
+		);
 
 		if constexpr(is_container_v<Serialized>) {
 			using Container = Serialized;
@@ -77,7 +108,7 @@ namespace augs {
 
 						read_table_or_field(input_table, val, counter);
 
-						into.emplace(std::move(val));
+						into.emplace_back(std::move(val));
 					}
 				}
 				else {
@@ -104,7 +135,10 @@ namespace augs {
 
 	template <class T, class L>
 	void write_table_field(sol::table output_table, const T& field, const L label) {
-		if constexpr(std::is_same_v<T, std::string> || std::is_arithmetic_v<T>) {
+		if constexpr(has_custom_lua_value_representation_v<T>) {
+			to_lua_value(field, output_table[label]);
+		}
+		else if constexpr(std::is_same_v<T, std::string> || std::is_arithmetic_v<T>) {
 			output_table[label] = field;
 		}
 		else if constexpr(std::is_enum_v<T>) {
@@ -134,7 +168,10 @@ namespace augs {
 
 	template <class Serialized>
 	void write(sol::table output_table, const Serialized& from) {
-		static_assert(!representable_as_lua_value<Serialized>, "No key (label) value provided! Use write_table_field to directly serialize this object.");
+		static_assert(
+			!representable_as_lua_value<Serialized>, 
+			"Directly representable, but no key (label) provided! Use write_table_field to directly serialize this object."
+		);
 
 		if constexpr(is_container_v<Serialized>) {
 			using Container = Serialized;
@@ -169,5 +206,40 @@ namespace augs {
 				from
 			);
 		}
+	}
+
+	template <class T, class... SaverArgs>
+	void save_as_lua_table(
+		T&& object, 
+		const std::string& target_path, 
+		SaverArgs&&... args
+	) {
+		auto lua = augs::create_lua_state();
+
+		auto output_table = lua.create_named_table("my_table");
+		augs::write(output_table, std::forward<T>(object));
+
+		const std::string file_contents = lua["table_to_string"](
+			output_table, 
+			std::forward<SaverArgs>(args)...
+		);
+
+		augs::create_text_file(target_path, file_contents);
+	}
+
+	template <class T>
+	void load_from_lua_table(
+		T& object,
+		const std::string& source_path
+	) {
+		auto lua = augs::create_lua_state();
+
+		const auto script_contents = "tbl = " + augs::get_file_contents(source_path);
+		lua.script(script_contents, augs::lua_error_callback);
+
+		sol::table input_table = lua["tbl"];
+		ensure(input_table.valid());
+
+		augs::read(input_table, object);
 	}
 }

@@ -1,6 +1,6 @@
 #pragma once
 #include <array>
-#include "augs/graphics/pixel.h"
+#include "augs/graphics/rgba.h"
 
 #include "augs/misc/randomization.h"
 

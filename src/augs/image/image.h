@@ -6,7 +6,7 @@
 #include "augs/templates/maybe_const.h"
 
 #include "augs/math/vec2.h"
-#include "augs/graphics/pixel.h"
+#include "augs/graphics/rgba.h"
 
 namespace augs {
 	struct paint_circle_midpoint_command {

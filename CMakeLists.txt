@@ -363,7 +363,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/application/web_daemon/session_report.cpp"
 	"src/augs/global_libraries.cpp"
 	"src/augs/graphics/fbo.cpp"
-	"src/augs/graphics/pixel.cpp"
+	"src/augs/graphics/rgba.cpp"
 	"src/augs/graphics/renderer.cpp"
 	"src/augs/graphics/shader.cpp"
 	"src/augs/graphics/vertex.cpp"

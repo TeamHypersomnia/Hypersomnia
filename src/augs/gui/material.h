@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/graphics/pixel.h"
+#include "augs/graphics/rgba.h"
 #include "game/assets/game_image_id.h"
 #include "augs/graphics/vertex.h"
 

@@ -4,7 +4,7 @@
 #include "game/enums/input_recording_type.h"
 
 #include "augs/padding_byte.h"
-#include "augs/graphics/pixel.h"
+#include "augs/graphics/rgba.h"
 #include "augs/misc/basic_input_context.h"
 
 #include "game/transcendental/entity_handle_declaration.h"

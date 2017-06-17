@@ -8,8 +8,8 @@ void load_requisite_animations(assets_manager& anims) {
 		anim.loop_mode = animation::loop_type::NONE;
 
 		anim.create_frames(
-			assets::game_image_id::BLINK_FIRST,
-			assets::game_image_id::BLINK_LAST,
+			assets::game_image_id::BLINK_1,
+			assets::game_image_id::BLINK_7,
 			50.0f
 		);
 	}

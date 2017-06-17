@@ -426,8 +426,8 @@ void value_bar::rebuild_layouts(
 		for (size_t i = 0; i < 40; ++i) {
 			const augs::gui::material mats[3] = {
 				assets::game_image_id::WANDERING_CROSS,
-				assets::game_image_id::BLINK_FIRST,
-				static_cast<assets::game_image_id>(static_cast<int>(assets::game_image_id::BLINK_FIRST) + 2),
+				assets::game_image_id::BLINK_1,
+				static_cast<assets::game_image_id>(static_cast<int>(assets::game_image_id::BLINK_1) + 2),
 			};
 
 			effect_particle new_part;

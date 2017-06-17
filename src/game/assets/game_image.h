@@ -1,33 +1,40 @@
 #pragma once
+#include <optional>
+
 #include "application/content_generation/atlas_content_structs.h"
+#include "application/content_generation/neon_maps.h"
 #include "game/detail/convex_partitioned_shape.h"
 #include "augs/misc/enum_array.h"
+#include "augs/misc/enum_associative_array.h"
 
 class assets_manager;
 
 enum class texture_map_type {
+	// GEN INTROSPECTOR enum class texture_map_type
 	DIFFUSE,
 	NEON,
 	DESATURATED,
 
 	COUNT
+	// END GEN INTROSPECTOR
 };
 
-struct game_image_usage_settings {
-	struct {
-		bool flip_horizontally = false;
-		bool flip_vertically = false;
-		pad_bytes<2> pad;
-
-		vec2 bbox_expander;
-	} gui;
+struct game_image_gui_usage {
+	// GEN INTROSPECTOR struct game_image_gui_usage
+	bool flip_horizontally = false;
+	bool flip_vertically = false;
+	vec2 bbox_expander;
+	// END GEN INTROSPECTOR
 };
 
 struct game_image_request {
-	augs::enum_array<source_image_loading_input, texture_map_type> texture_maps;
+	// GEN INTROSPECTOR struct game_image_request
+	std::string source_image_path;
 
-	std::string polygonization_filename;
-	game_image_usage_settings settings;
+	std::optional<neon_map_input> neon_map;
+	game_image_gui_usage gui_usage;
+	bool generate_desaturation = false;
+	// END GEN INTROSPECTOR
 };
 
 struct game_image_logical_meta {
@@ -43,7 +50,7 @@ struct game_image_baked {
 	augs::enum_array<augs::texture_atlas_entry, texture_map_type> texture_maps;
 
 	std::vector<vec2u> polygonized;
-	game_image_usage_settings settings;
+	game_image_gui_usage settings;
 
 	vec2u get_size() const {
 		return texture_maps[texture_map_type::DIFFUSE].get_size();

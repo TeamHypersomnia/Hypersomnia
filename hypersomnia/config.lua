@@ -213,18 +213,8 @@
   hotbar = {
     colorize_inside_when_selected = true,
     increase_inside_alpha_when_selected = false,
-    primary_selected_color = {
-      a = 255,
-      b = 255,
-      g = 255,
-      r = 0
-    },
-    secondary_selected_color = {
-      a = 255,
-      b = 214,
-      g = 156,
-      r = 86
-    }
+    primary_selected_color = "0 255 255 255",
+    secondary_selected_color = "86 156 214 255"
   },
   input_recording_mode = "DISABLED",
   interpolation_speed = 525,

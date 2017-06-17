@@ -57,8 +57,8 @@ struct rgba {
 	rgba& operator*=(const rgba b);
 	rgba& operator+=(const rgba b);
 
-	bool operator==(const rgba& b) const;
-	bool operator!=(const rgba& b) const;
+	bool operator==(const rgba b) const;
+	bool operator!=(const rgba b) const;
 	hsv get_hsv() const;
 	rgba get_desaturated() const;
 
@@ -69,6 +69,34 @@ struct rgba {
 	const rgb_type& rgb() const;
 
 	rgba& set_hsv(const hsv);
+
+	template <class T>
+	T& stream_to(T& out) const {
+		const int ir = r;
+		const int ig = g;
+		const int ib = b;
+		const int ia = a;
+
+		out << ir << " " << ig << " " << ib << " " << ia;
+		return out;
+	}
+
+	template <class T>
+	T& from_stream(T& in) {
+		int ir;
+		int ig;
+		int ib;
+		int ia;
+
+		in >> ir >> ig >> ib >> ia;
+
+		r = static_cast<rgba_channel>(ir);
+		g = static_cast<rgba_channel>(ig);
+		b = static_cast<rgba_channel>(ib);
+		a = static_cast<rgba_channel>(ia);
+
+		return in;
+	}
 
 	friend std::ostream& operator<<(std::ostream& out, const rgba& x);
 	friend std::istream& operator>>(std::istream& out, rgba& x);

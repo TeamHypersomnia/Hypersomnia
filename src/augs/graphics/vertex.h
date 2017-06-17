@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/graphics/pixel.h"
+#include "augs/graphics/rgba.h"
 #include "augs/math/vec2.h"
 
 enum class vertex_attribute {

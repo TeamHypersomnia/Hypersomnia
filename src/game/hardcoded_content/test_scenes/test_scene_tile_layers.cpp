@@ -7,22 +7,22 @@ void load_test_scene_tile_layers(assets_manager& manager) {
 	{
 		auto nth_tile = [](const unsigned i) {
 			return i;
-			//return assets::game_image_id(unsigned(assets::game_image_id::METROPOLIS_TILE_FIRST) + i - 1);
+			//return assets::game_image_id(unsigned(assets::game_image_id::CATHEDRAL_TILE_1) + i - 1);
 		};
 
 		auto& metropolis_floor = manager[assets::tile_layer_id::METROPOLIS_FLOOR];
 
-		for (int i = int(assets::game_image_id::METROPOLIS_TILE_FIRST); i < int(assets::game_image_id::METROPOLIS_TILE_LAST); ++i) {
+		for (int i = int(assets::game_image_id::CATHEDRAL_TILE_1); i < int(assets::game_image_id::CATHEDRAL_TILE_49); ++i) {
 			components::sprite tt;
 			tt.set(assets::game_image_id(i), manager[assets::game_image_id(i)].get_size());
 			//if (
-			//	assets::game_image_id(i) == assets::game_image_id(int(assets::game_image_id::METROPOLIS_TILE_FIRST) + 3)
-			//	//|| assets::game_image_id(i) == assets::game_image_id(int(assets::game_image_id::METROPOLIS_TILE_FIRST) + 4)
+			//	assets::game_image_id(i) == assets::game_image_id(int(assets::game_image_id::CATHEDRAL_TILE_1) + 3)
+			//	//|| assets::game_image_id(i) == assets::game_image_id(int(assets::game_image_id::CATHEDRAL_TILE_1) + 4)
 			//	) {
 			//	tt.effect = components::sprite::special_effect::COLOR_WAVE;
 			//}		
 			if (
-				assets::game_image_id(i) == assets::game_image_id(int(assets::game_image_id::METROPOLIS_TILE_FIRST) + 0)
+				assets::game_image_id(i) == assets::game_image_id(int(assets::game_image_id::CATHEDRAL_TILE_1) + 0)
 				) {
 				tt.max_specular_blinks = 2;
 			}

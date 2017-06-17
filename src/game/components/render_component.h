@@ -3,7 +3,7 @@
 
 #include "augs/math/vec2.h"
 #include "game/enums/render_layer.h"
-#include "augs/graphics/pixel.h"
+#include "augs/graphics/rgba.h"
 
 #include "augs/padding_byte.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "augs/math/vec2.h"
-#include "augs/graphics/pixel.h"
+#include "augs/graphics/rgba.h"
 #include "augs/graphics/vertex.h"
 #include "augs/graphics/fbo.h"
 #include "augs/graphics/texture.h"

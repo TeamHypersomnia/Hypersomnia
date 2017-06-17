@@ -50,14 +50,14 @@ game_image_requests load_test_scene_images() {
 		auto& in = output[game_image_id::JMIX114];
 		in.texture_maps[DIFFUSE] = { "content/gfx/jmix114.png", GAME_WORLD_ATLAS };
 		in.texture_maps[NEON] = { "generated/neon_maps/jmix114.png", GAME_WORLD_ATLAS };
-		in.polygonization_filename = "generated/polygonizations_of_images/jmix114.points";
+		in.polygonization_path = "generated/polygonizations_of_images/jmix114.points";
 	}
 
 	{
 		auto& in = output[game_image_id::TRUCK_FRONT];
 		in.texture_maps[DIFFUSE] = { "content/gfx/truck_front.png", GAME_WORLD_ATLAS };
 		in.texture_maps[NEON] = { "generated/neon_maps/truck_front.png", GAME_WORLD_ATLAS };
-		in.polygonization_filename = "generated/polygonizations_of_images/truck_front.points";
+		in.polygonization_path = "generated/polygonizations_of_images/truck_front.points";
 	}
 
 	{
@@ -204,7 +204,7 @@ game_image_requests load_test_scene_images() {
 		auto& in = output[game_image_id::BACKPACK];
 		in.texture_maps[DIFFUSE] = { "content/gfx/backpack.png", GAME_WORLD_ATLAS };
 		in.texture_maps[NEON] = { "generated/neon_maps/backpack.png", GAME_WORLD_ATLAS };
-		in.polygonization_filename = "generated/polygonizations_of_images/backpack.points";
+		in.polygonization_path = "generated/polygonizations_of_images/backpack.points";
 		in.settings.gui.bbox_expander = vec2(0, 2);
 	}
 
@@ -350,36 +350,6 @@ game_image_requests load_test_scene_images() {
 		auto& in = output[game_image_id::STANDARD_HEAD];
 		in.texture_maps[DIFFUSE] = { "content/gfx/standard_head.png", GAME_WORLD_ATLAS };
 	}
-
-	make_indexed_images(
-		output,
-		game_image_id::METROPOLIS_TILE_FIRST,
-		game_image_id::METROPOLIS_TILE_LAST,
-		"content/gfx/tileset/tile_%x.png"
-	);
-
-	make_indexed_images(
-		output,
-		game_image_id::SMOKE_PARTICLE_FIRST,
-		game_image_id(int(game_image_id::SMOKE_PARTICLE_FIRST) + 3),
-		"content/gfx/smoke_%x.png"
-	);
-
-	make_indexed_images(
-		output,
-		game_image_id::PIXEL_THUNDER_FIRST,
-		game_image_id::PIXEL_THUNDER_LAST,
-		"content/gfx/pixel_thunder_%x.png",
-		"generated/neon_maps/pixel_thunder_%x.png"
-	);
-
-	make_indexed_images(
-		output,
-		game_image_id::CAST_BLINK_FIRST,
-		game_image_id::CAST_BLINK_LAST,
-		"content/gfx/cast_blink_%x.png",
-		"generated/neon_maps/cast_blink_%x.png"
-	);
 
 	return output;
 }

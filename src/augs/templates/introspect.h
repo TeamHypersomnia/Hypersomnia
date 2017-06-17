@@ -58,4 +58,16 @@ namespace augs {
 			);
 		}
 	}
+
+	template <class Enum, class F>
+	void for_each_enum(F callback) {
+		augs::enum_to_args_impl(
+			Enum(),
+			[callback](const auto... all_enums) {
+				for (const auto _enum : { all_enums }) {
+					callback(_enum);
+				}
+			}
+		);
+	}
 }

@@ -9,14 +9,14 @@
 
 #include "augs/padding_byte.h"
 
-typedef std::string source_image_identifier;
+using source_image_identifier = std::string;
 
 struct source_image_loading_input {
 	source_image_identifier path;
 	assets::gl_texture_id target_atlas;
 };
 
-typedef augs::font_loading_input source_font_identifier;
+using source_font_identifier = augs::font_loading_input;
 
 struct source_font_loading_input {
 	source_font_identifier loading_input;

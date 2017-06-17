@@ -1,7 +1,7 @@
 #include <limits>
 #include <algorithm>
 #include "augs/ensure.h"
-#include "augs/graphics/pixel.h"
+#include "augs/graphics/rgba.h"
 
 namespace {
 	typedef struct {
@@ -224,11 +224,11 @@ rgba& rgba::operator+=(const rgba s) {
 	return (*this = *this + s);
 }
 
-bool rgba::operator==(const rgba& v) const {
+bool rgba::operator==(const rgba v) const {
 	return r == v.r && g == v.g && b == v.b && a == v.a;
 }
 
-bool rgba::operator!=(const rgba& v) const {
+bool rgba::operator!=(const rgba v) const {
 	return !operator==(v);
 }
 
@@ -299,24 +299,9 @@ const rgba vsdarkgray(127, 127, 127, 255);
 const rgba turquoise(0, 146, 222, 255);
 
 std::ostream& operator<<(std::ostream& out, const rgba& x) {
-	const int r = x.r;
-	const int g = x.g;
-	const int b = x.b;
-	const int a = x.a;
-
-	out << r << " " << g << " " << b << " " << a;
-
-	return out;
+	return x.stream_to(out);
 }
 
 std::istream& operator>>(std::istream& in, rgba& x) {
-	int r, g, b, a;
-	in >> r >> g >> b >> a;
-
-	x.r = static_cast<rgba_channel>(r);
-	x.g = static_cast<rgba_channel>(g);
-	x.b = static_cast<rgba_channel>(b);
-	x.a = static_cast<rgba_channel>(a);
-
-	return in;
+	return x.from_stream(in);
 }

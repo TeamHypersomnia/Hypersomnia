@@ -2,7 +2,7 @@
 #include "augs/math/vec2.h"
 #include "augs/math/rects.h"
 
-#include "augs/graphics/pixel.h"
+#include "augs/graphics/rgba.h"
 #include "augs/graphics/vertex.h"
 #include "game/assets/game_image_id.h"
 #include "transform_component.h"

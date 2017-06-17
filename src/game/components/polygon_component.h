@@ -4,7 +4,7 @@
 
 #include "augs/math/vec2.h"
 
-#include "augs/graphics/pixel.h"
+#include "augs/graphics/rgba.h"
 #include "augs/graphics/vertex.h"
 #include "game/assets/game_image_id.h"
 #include "game/detail/basic_renderable_drawing_input.h"

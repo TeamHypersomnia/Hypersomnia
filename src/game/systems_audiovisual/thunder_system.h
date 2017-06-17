@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/misc/minmax.h"
 #include "game/components/transform_component.h"
-#include "augs/graphics/pixel.h"
+#include "augs/graphics/rgba.h"
 #include "augs/misc/delta.h"
 #include "augs/graphics/vertex.h"
 #include "game/messages/thunder_input.h"

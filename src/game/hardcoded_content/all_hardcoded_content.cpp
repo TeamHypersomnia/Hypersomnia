@@ -12,6 +12,7 @@
 #include "application/content_generation/polygonizations_of_images.h"
 
 #include "augs/graphics/OpenGL_includes.h"
+#include "augs/misc/lua_readwrite.h"
 
 using namespace augs::graphics;
 using namespace assets;
@@ -30,6 +31,8 @@ void load_all_requisite(const config_lua_table& cfg) {
 	atlases_regeneration_input in;
 
 	for (const auto& i : images) {
+		in.images.push_back({ i.second.source_image_path, t.target_atlas });
+
 		for (const auto& t : i.second.texture_maps) {
 			if (t.path.size() > 0) {
 				ensure(t.target_atlas != gl_texture_id::INVALID);
@@ -45,9 +48,13 @@ void load_all_requisite(const config_lua_table& cfg) {
 
 	LOG("\n--------------------------------------------\nChecking content integrity...");
 
+
+	//const std::string neon_directory = "generated/neon_maps/";
+	//augs::create_directories(neon_directory);
+
+	regenerate_neon_map("", "", {}, false); //cfg.debug_regenerate_content_every_launch);
 	regenerate_scripted_images(cfg.debug_regenerate_content_every_launch);
 	regenerate_buttons_with_corners(cfg.debug_regenerate_content_every_launch);
-	regenerate_neon_maps(cfg.debug_regenerate_content_every_launch);
 	regenerate_desaturations(cfg.debug_regenerate_content_every_launch);
 	regenerate_polygonizations_of_images(cfg.debug_regenerate_content_every_launch);
 

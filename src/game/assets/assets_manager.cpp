@@ -42,8 +42,8 @@ void assets_manager::load_baked_metadata(
 		baked_image.settings = requested_image.second.settings;
 
 		{
-			if (requested_image.second.polygonization_filename.size() > 0) {
-				const auto lines = augs::get_file_lines(requested_image.second.polygonization_filename);
+			if (requested_image.second.polygonization_path.size() > 0) {
+				const auto lines = augs::get_file_lines(requested_image.second.polygonization_path);
 
 				for (const auto& l : lines) {
 					std::istringstream in(l);

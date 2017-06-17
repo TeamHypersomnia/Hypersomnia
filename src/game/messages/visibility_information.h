@@ -3,7 +3,7 @@
 #include <set>
 #include <unordered_set>
 #include <vector>
-#include "augs/graphics/pixel.h"
+#include "augs/graphics/rgba.h"
 #include "game/components/transform_component.h"
 #include "3rdparty/Box2D/Dynamics/b2Fixture.h"
 #include "augs/math/vec2.h"

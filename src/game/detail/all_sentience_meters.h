@@ -4,7 +4,7 @@
 #include "augs/templates/type_in_list_id.h"
 #include "augs/templates/instance_type.h"
 #include "augs/misc/value_meter.h"
-#include "augs/graphics/pixel.h"
+#include "augs/graphics/rgba.h"
 
 #include "game/assets/game_image_id.h"
 

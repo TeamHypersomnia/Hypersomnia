@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/graphics/pixel.h"
+#include "augs/graphics/rgba.h"
 
 #include "game/assets/sound_buffer_id.h"
 #include "game/components/transform_component.h"

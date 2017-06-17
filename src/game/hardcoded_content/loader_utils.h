@@ -14,11 +14,3 @@ void make_button_with_corners(
 	const std::string& filename_template,
 	const bool request_lb_complement
 );
-
-void make_indexed_images(
-	game_image_requests& into,
-	const game_image_id first,
-	const game_image_id last,
-	const std::string& filename_template,
-	const std::string& neon_filename_template = std::string()
-);
