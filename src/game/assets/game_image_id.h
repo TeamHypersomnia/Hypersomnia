@@ -4,7 +4,7 @@
 
 namespace assets {
 	enum class game_image_id {
-		// GEN INTROSPECTOR enum class game_image_id
+		// GEN INTROSPECTOR enum class assets::game_image_id
 		INVALID,
 		BLANK,
 

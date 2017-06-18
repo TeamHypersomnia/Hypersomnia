@@ -14,14 +14,34 @@
 #include "augs/graphics/OpenGL_includes.h"
 #include "augs/misc/lua_readwrite.h"
 
+#include "generated/introspectors.h"
+
 using namespace augs::graphics;
 using namespace assets;
 
 void load_all_requisite(const config_lua_table& cfg) {
 	auto& manager = get_assets_manager();
 
-	auto images = load_requisite_images();
+	game_image_requests images;
 	auto fonts = load_requisite_fonts();
+
+	augs::for_each_enum<game_image_id>(
+		[&images](const game_image_id id){
+			if (
+				id != game_image_id::INVALID
+				&& id != game_image_id::REQUISITE_COUNT
+				&& id != game_image_id::BLANK
+				&& id != game_image_id::COUNT
+			) {
+				const std::string stem = augs::enum_to_string(id);
+				game_image_request rq;
+				rq.source_image_path = stem;
+				images[stem] = rq;
+			}
+		}
+	);
+
+	augs::save_as_lua_table(images, "imgs.lua");
 
 #if BUILD_TEST_SCENES
 	const auto test_scene_images = load_test_scene_images();
@@ -31,14 +51,16 @@ void load_all_requisite(const config_lua_table& cfg) {
 	atlases_regeneration_input in;
 
 	for (const auto& i : images) {
-		in.images.push_back({ i.second.source_image_path, t.target_atlas });
+		const auto& request = i.second;
 
-		for (const auto& t : i.second.texture_maps) {
-			if (t.path.size() > 0) {
-				ensure(t.target_atlas != gl_texture_id::INVALID);
+		in.images.push_back({ request.source_image_path, assets::gl_texture_id::GAME_WORLD_ATLAS });
 
-				in.images.push_back({ t.path, t.target_atlas });
-			}
+		if (request.neon_map) {
+			in.images.push_back({ request.get_neon_map_path(), assets::gl_texture_id::GAME_WORLD_ATLAS });
+		}
+
+		if (request.generate_desaturation) {
+			in.images.push_back({ request.get_desaturation_path(), assets::gl_texture_id::GAME_WORLD_ATLAS });
 		}
 	}
 

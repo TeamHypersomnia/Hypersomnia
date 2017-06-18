@@ -64,7 +64,7 @@ namespace augs {
 		augs::enum_to_args_impl(
 			Enum(),
 			[callback](const auto... all_enums) {
-				for (const auto _enum : { all_enums }) {
+				for (const auto _enum : { all_enums... }) {
 					callback(_enum);
 				}
 			}

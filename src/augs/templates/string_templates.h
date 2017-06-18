@@ -69,9 +69,45 @@ struct str_ops_impl {
 
 		return *this;
 	}
+
+	auto to_lowercase() const {
+		std::transform(
+			subject.begin(),
+			subject.end(),
+			subject.begin(),
+			::tolower
+		);
+
+		return *this;
+	}
+
+	auto to_uppercase() const {
+		std::transform(
+			subject.begin(),
+			subject.end(),
+			subject.begin(),
+			::tolower
+		);
+		
+		return *this;
+	}
+
+	operator Str() {
+		return subject;
+	}
 };
 
 template <class Ch>
 auto str_ops(std::basic_string<Ch>& s) {
 	return str_ops_impl<std::basic_string<Ch>> { s };
+}
+
+template <class S>
+auto to_lowercase(S s) {
+	return str_ops(s).to_lowercase();
+}
+
+template <class S>
+auto to_uppercase(S s) {
+	return str_ops(s).to_uppercase();
 }

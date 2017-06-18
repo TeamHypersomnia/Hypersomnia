@@ -1,7 +1,7 @@
 #pragma once
 #include <tuple>
 #include "application/content_generation/texture_atlases.h"
-#include "game/assets/assets_manager_structs.h"
+#include "game/assets/game_image_structs.h"
 
 class config_lua_table;
 class assets_manager;

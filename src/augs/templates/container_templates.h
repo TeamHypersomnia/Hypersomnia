@@ -112,7 +112,7 @@ void copy_container(const Container1& from, Container2& into) {
 } 
 
 template <class Container, class Key, class... Args>
-auto found_or_default(Container&& container, Key&& key, Args&&... default_args) {
+auto found_or(Container&& container, Key&& key, Args&&... default_args) {
 	const auto it = find_in(std::forward<Container>(container), std::forward<Key>(key));
 
 	const bool found = it != container.end();
@@ -123,6 +123,11 @@ auto found_or_default(Container&& container, Key&& key, Args&&... default_args) 
 	}
 
 	return type(std::forward<Args>(default_args)...);
+}
+
+template <class Container, class Key>
+auto found_or_default(Container&& container, Key&& key) {
+	return found_or(std::forward<Container>(container), std::forward<Key>(key));
 }
 
 template <class Container, class Key>

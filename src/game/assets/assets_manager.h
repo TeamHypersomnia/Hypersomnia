@@ -18,7 +18,7 @@
 
 #include "augs/image/font.h"
 
-#include "game/assets/assets_manager_structs.h"
+#include "game/assets/game_image_structs.h"
 
 #include "game/assets/spell_id.h"
 #include "game/assets/game_image.h"

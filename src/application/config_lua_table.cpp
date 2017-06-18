@@ -31,6 +31,9 @@ config_lua_table::config_lua_table(
 }
 
 static_assert(has_enum_to_string_v<launch_type>);
+static_assert(has_for_each_enum_v<launch_type>);
+static_assert(has_for_each_enum_v<input_recording_type>);
+
 static_assert(is_container_v<decltype(input_context::key_to_intent)>);
 
 void config_lua_table::save(const std::string& target_path) const {

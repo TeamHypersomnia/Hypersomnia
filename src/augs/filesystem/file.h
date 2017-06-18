@@ -57,6 +57,11 @@ namespace augs {
 	}
 
 	template <class P>
+	auto get_stem(const P& path) {
+		return fs::path(path).stem().string();
+	}
+
+	template <class P>
 	void ensure_existence(const P& path) {
 		const bool exists = file_exists(path);
 

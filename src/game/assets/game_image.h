@@ -35,6 +35,13 @@ struct game_image_request {
 	game_image_gui_usage gui_usage;
 	bool generate_desaturation = false;
 	// END GEN INTROSPECTOR
+
+	std::string get_default_name() const;
+
+	std::string get_neon_map_path() const;
+	std::string get_desaturation_path() const;
+	
+	std::optional<std::string> get_polygonization_path() const;
 };
 
 struct game_image_logical_meta {

@@ -7,6 +7,8 @@
 #include "game/transcendental/cosmos.h"
 
 #include "augs/templates/introspect.h"
+#include "augs/templates/string_to_enum.h"
+#include "augs/templates/string_templates.h"
 #include "generated/introspectors.h"
 
 void assets_manager::load_baked_metadata(
@@ -17,33 +19,44 @@ void assets_manager::load_baked_metadata(
 	auto& self = *this;
 
 	for (const auto& requested_image : images) {
-		auto& baked_image = self[requested_image.first];
+		const auto image_id = augs::string_to_enum_or<assets::game_image_id>(to_uppercase(requested_image.first));
 
-		for (size_t i = 0; i < baked_image.texture_maps.size(); ++i) {
-			const auto seeked_identifier = requested_image.second.texture_maps[i].path;
-			const bool this_texture_map_is_not_used = seeked_identifier.empty();
+		ensure(image_id != assets::game_image_id::INVALID);
+		// if it is invalid, dynamically allocate id
 
-			if (this_texture_map_is_not_used) {
-				continue;
-			}
+		auto& baked_image = self[image_id];
+		const auto& request = requested_image.second;
 
+		auto assign_atlas_entry = [&](augs::texture_atlas_entry& into, const source_image_path& p) {
 			for (const auto& a : atlases.metadatas) {
-				const auto it = a.second.images.find(seeked_identifier);
+				const auto it = a.second.images.find(p);
 
 				if (it != a.second.images.end()) {
 					const auto found_atlas_entry = (*it).second;
-					baked_image.texture_maps[i] = found_atlas_entry;
+					into = found_atlas_entry;
 
 					break;
 				}
 			}
+		};
+
+		assign_atlas_entry(baked_image.texture_maps[texture_map_type::DIFFUSE], request.source_image_path);
+
+		if (request.neon_map) {
+			assign_atlas_entry(baked_image.texture_maps[texture_map_type::NEON], request.get_neon_map_path());
 		}
 
-		baked_image.settings = requested_image.second.settings;
+		if (request.generate_desaturation) {
+			assign_atlas_entry(baked_image.texture_maps[texture_map_type::DESATURATED], request.get_desaturation_path());
+		}
+
+		baked_image.settings = request.gui_usage;
 
 		{
-			if (requested_image.second.polygonization_path.size() > 0) {
-				const auto lines = augs::get_file_lines(requested_image.second.polygonization_path);
+			const auto polygonization_path = request.get_polygonization_path();
+
+			if (augs::file_exists(polygonization_path)) {
+				const auto lines = augs::get_file_lines(polygonization_path);
 
 				for (const auto& l : lines) {
 					std::istringstream in(l);

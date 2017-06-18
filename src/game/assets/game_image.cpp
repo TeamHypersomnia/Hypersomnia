@@ -1,6 +1,10 @@
 #include "game_image.h"
-
+#include "augs/filesystem/file.h"
 #include <Box2D/Box2D.h>
+
+std::string game_image_request::get_default_name() const {
+	return augs::get_stem(source_image_path);
+}
 
 game_image_logical_meta game_image_baked::get_logical_meta(const assets_manager& manager) const {
 	game_image_logical_meta output;

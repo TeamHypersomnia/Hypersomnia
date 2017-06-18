@@ -1,12 +1,11 @@
 #include "button_corners.h"
 #include "generated/introspectors.h"
+#include "augs/templates/string_templates.h"
 
 using namespace assets;
 
 std::string get_filename_for(const button_corner_type t) {
-	std::string str = augs::enum_to_string(t);
-	std::transform(str.begin(), str.end(), str.begin(), ::tolower);
-	return str;
+	return to_lowercase(augs::enum_to_string(t));
 }
 
 bool is_button_corner(const button_corner_type t) {

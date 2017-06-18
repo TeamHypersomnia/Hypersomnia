@@ -14,7 +14,7 @@ namespace augs {
 			COUNT
 		};
 
-		typedef augs::enum_boolset<library> library_flagset;
+		using library_flagset = augs::enum_boolset<library>;
 
 		static library_flagset initialized;
 

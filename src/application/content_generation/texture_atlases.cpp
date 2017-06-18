@@ -31,7 +31,7 @@ atlases_regeneration_output regenerate_atlases(
 
 	struct per_atlas_input {
 		std::vector<source_font_identifier> fonts;
-		std::vector<source_image_identifier> images;
+		std::vector<source_image_path> images;
 	};
 
 	std::unordered_map<
@@ -101,7 +101,7 @@ atlases_regeneration_output regenerate_atlases(
 
 			texture_atlas_metadata this_atlas_metadata;
 
-			std::unordered_map<source_image_identifier, augs::image> loaded_images;
+			std::unordered_map<source_image_path, augs::image> loaded_images;
 			std::unordered_map<source_font_identifier, augs::font> loaded_fonts;
 
 			std::vector<rect_xywhf> rects_for_packing_algorithm;
