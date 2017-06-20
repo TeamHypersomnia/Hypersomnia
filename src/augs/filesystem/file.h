@@ -71,10 +71,10 @@ namespace augs {
 		}
 	}
 	
-	template <class P>
-	auto get_file_contents(const P& path) {
-		std::ifstream t(path);
-		std::stringstream buffer;
+	template <class P, class C = char>
+	auto get_file_contents(const P& path, const C = C()) {
+		std::basic_ifstream<C> t(path);
+		std::basic_stringstream<C> buffer;
 		buffer << t.rdbuf();
 
 		return buffer.str();

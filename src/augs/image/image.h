@@ -49,6 +49,32 @@ namespace augs {
 		}
 	};
 
+	inline const char* get_custom_type_name(const paint_circle_midpoint_command&) {
+		return "circle_midpoint";
+	}
+	
+	inline const char* get_custom_type_name(const paint_circle_filled_command&) {
+		return "circle_filled";
+	}
+
+	inline const char* get_custom_type_name(const paint_line_command&) {
+		return "line";
+	}
+
+	using paint_command_variant = std::variant<
+		paint_circle_midpoint_command,
+		paint_circle_filled_command,
+		paint_line_command
+	>;
+
+	inline const char* get_variant_type_label(const paint_command_variant&) {
+		return "command";
+	}
+
+	inline const char* get_variant_content_label(const paint_command_variant&) {
+		return "input";
+	}
+
 	class image {
 		std::vector<rgba> v;
 		vec2u size;
@@ -82,13 +108,7 @@ namespace augs {
 			const bool add_rgba_values = false
 		);
 
-		using command_variant = std::variant<
-			paint_circle_midpoint_command,
-			paint_circle_filled_command,
-			paint_line_command
-		>;
-
-		void execute(const command_variant&);
+		void execute(const paint_command_variant&);
 
 		void execute(const paint_circle_midpoint_command&);
 		void execute(const paint_circle_filled_command&);

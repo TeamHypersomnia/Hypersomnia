@@ -53,3 +53,8 @@ void for_each_type(F&& f) {
 	f(T());
 	for_each_type<Ts...>(std::forward<F>(f));
 }
+
+template <class L, class F>
+void for_each_type_in_list(F&& f) {
+	for_each_through_std_get(replace_list_type_t<augs::paint_command_variant, std::tuple>(), std::forward<F>(f));
+}

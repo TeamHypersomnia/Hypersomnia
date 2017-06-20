@@ -2,7 +2,7 @@
 #include "augs/filesystem/file.h"
 #include <Box2D/Box2D.h>
 
-std::string game_image_request::get_default_name() const {
+std::string game_image_definition::get_default_name() const {
 	return augs::get_stem(source_image_path);
 }
 

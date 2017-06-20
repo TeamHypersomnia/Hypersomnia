@@ -62,7 +62,7 @@ namespace augs {
 		v.resize(new_size.area(), rgba(0, 0, 0, 0));
 	}
 	
-	void image::execute(const command_variant& in) {
+	void image::execute(const paint_command_variant& in) {
 		std::visit([&](const auto& resolved) {
 			execute(resolved);
 		}, in);

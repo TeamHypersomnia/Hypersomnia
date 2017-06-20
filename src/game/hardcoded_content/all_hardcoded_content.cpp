@@ -19,11 +19,15 @@
 using namespace augs::graphics;
 using namespace assets;
 
+game_image_definitions load_game_image_definitions(const std::string& lua_file_path) {
+
+}
+
 void load_all_requisite(const config_lua_table& cfg) {
 	auto& manager = get_assets_manager();
 
-	game_image_requests images;
-	auto fonts = load_requisite_fonts();
+	game_image_definitions images;
+	const auto fonts = augs::load_from_lua_table<game_font_requests>("official/requisite_font_definitions.lua");
 
 	augs::for_each_enum<game_image_id>(
 		[&images](const game_image_id id){
@@ -34,7 +38,7 @@ void load_all_requisite(const config_lua_table& cfg) {
 				&& id != game_image_id::COUNT
 			) {
 				const std::string stem = augs::enum_to_string(id);
-				game_image_request rq;
+				game_image_definition rq;
 				rq.source_image_path = stem;
 				images[stem] = rq;
 			}

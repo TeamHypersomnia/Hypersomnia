@@ -1,8 +1,8 @@
 #include "game/hardcoded_content/all_hardcoded_content.h"
 #include "game/hardcoded_content/loader_utils.h"
 
-game_image_requests load_requisite_images() {
-	game_image_requests output;
+game_image_definitions load_requisite_images() {
+	game_image_definitions output;
 
 	{
 		auto& in = output[game_image_id::MENU_GAME_LOGO];
@@ -158,22 +158,6 @@ game_image_requests load_requisite_images() {
 		"generated/buttons_with_corners/menu_button_%x.png",
 		false
 	);
-
-	return output;
-}
-
-game_font_requests load_requisite_fonts() {
-	game_font_requests output;
-
-	{
-		game_font_request in;
-		in.target_atlas = GAME_WORLD_ATLAS;
-		in.loading_input.path = "content/fonts/Kubasta.ttf";
-		in.loading_input.characters = L" ABCDEFGHIJKLMNOPRSTUVWXYZQabcdefghijklmnoprstuvwxyzq0123456789.!@#$%^&*()_+-=[];'\\,./{}:\"|<>?~";
-		in.loading_input.pt = 16;
-
-		output[font_id::GUI_FONT] = in;
-	}
 
 	return output;
 }

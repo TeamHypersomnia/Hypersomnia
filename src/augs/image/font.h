@@ -79,14 +79,18 @@ namespace augs {
 
 	struct font_loading_input {
 		// GEN INTROSPECTOR struct augs::font_loading_input
-		std::string path;
-		std::wstring characters;
+		std::string source_font_path;
+		std::string charset_path;
 		
 		unsigned pt = 0u;
 		// END GEN INTROSPECTOR
 
 		bool operator==(const font_loading_input& b) const {
-			return path == b.path && characters == b.characters && pt == b.pt;
+			return 
+				source_font_path == b.source_font_path 
+				&& charset_path == b.charset_path 
+				&& pt == b.pt
+			;
 		}
 	};
 
@@ -102,7 +106,7 @@ namespace std {
 	template <>
 	struct hash<augs::font_loading_input> {
 		size_t operator()(const augs::font_loading_input& in) const {
-			return augs::simple_two_hash(in.path, in.characters) + in.pt;
+			return augs::simple_two_hash(in.source_font_path, in.charset_path) + in.pt;
 		}
 	};
 }

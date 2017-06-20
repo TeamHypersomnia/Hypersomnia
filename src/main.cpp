@@ -32,7 +32,8 @@ int main(int argc, char** argv) {
 
 	augs::global_libraries::init();
 	
-	auto cfg = config_lua_table("config.lua", "config.local.lua");
+	//auto cfg = config_lua_table("config.lua", "config.local.lua");
+	auto cfg = config_lua_table();
 	
 	if (cfg.debug_run_unit_tests) {
 		augs::global_libraries::run_unit_tests(

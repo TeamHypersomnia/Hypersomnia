@@ -6,7 +6,9 @@
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 
-void regenerate_buttons_with_corners(
+void regenerate_button_with_corner(
+	const std::string& output_image_path,
+	const button_with_corners_input input,
 	const bool force_regenerate
 ) {
 	const auto buttons_with_corners_directory = "generated/buttons_with_corners/";
@@ -109,7 +111,7 @@ void create_and_save_button_with_corners(
 	const std::string& path_template,
 	const button_with_corners_stamp in
 ) {
-	typedef augs::image img;
+	using img = augs::image;
 
 	const auto save = [&](const button_corner_type t, const img& im) {
 		im.save(typesafe_sprintf(path_template, get_filename_for(t)));

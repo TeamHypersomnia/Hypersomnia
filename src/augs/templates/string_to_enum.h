@@ -24,14 +24,15 @@ namespace augs {
 	};
 
 	template <class Enum>
+	global_lookup<Enum> string_to_enum_lookup;
+
+	template <class Enum>
 	Enum string_to_enum(const std::string& label) {
-		thread_local const global_lookup<Enum> lookup;
-		return lookup.enums.at(label);
+		return string_to_enum_lookup<Enum>.enums.at(label);
 	}
 
 	template <class Enum>
 	Enum string_to_enum_or(const std::string& label, const Enum or = Enum::INVALID) {
-		thread_local const global_lookup<Enum> lookup;
-		return found_or(lookup, label, or);
+		return found_or(string_to_enum_lookup<Enum>.enums, label, or);
 	}
 }

@@ -51,14 +51,12 @@ struct try_to_get_logical_meta<
 	T, 
 	decltype(std::declval<typename T::mapped_type>().get_logical_meta(std::declval<assets_manager>()), void())
 > : std::true_type {
-	typedef decltype(std::declval<typename T::mapped_type>().get_logical_meta(std::declval<assets_manager>())) logical_meta_type;
+	using logical_meta_type = decltype(std::declval<typename T::mapped_type>().get_logical_meta(std::declval<assets_manager>()));
 	
-	typedef
-		augs::enum_associative_array<
-			typename T::key_type,
-			logical_meta_type
-		>
-	type;
+	using type = augs::enum_associative_array<
+		typename T::key_type,
+		logical_meta_type
+	>;
 };
 
 template <class T>
@@ -66,10 +64,10 @@ using does_asset_define_get_logical_meta = try_to_get_logical_meta<T>;
 
 template <class T>
 struct make_array_of_logical_metas {
-	typedef typename try_to_get_logical_meta<T>::type type;
+	using type = typename try_to_get_logical_meta<T>::type;
 };
 
-typedef std::tuple<
+using tuple_of_all_assets = std::tuple<
 	augs::enum_associative_array<assets::animation_id, animation>,
 	augs::enum_associative_array<assets::game_image_id, game_image_baked>,
 	augs::enum_associative_array<assets::font_id, game_font_baked>,
@@ -81,9 +79,9 @@ typedef std::tuple<
 	augs::enum_associative_array<assets::program_id, augs::graphics::shader_program>,
 	augs::enum_associative_array<assets::sound_buffer_id, augs::sound_buffer>,
 	augs::enum_associative_array<assets::gl_texture_id, augs::graphics::texture>
-> tuple_of_all_assets;
+>;
 
-typedef replace_list_type_t<
+using tuple_of_all_logical_metas_of_assets = replace_list_type_t<
 	transform_types_in_list_t<
 		filter_types_in_list_t<
 			does_asset_define_get_logical_meta,
@@ -92,7 +90,7 @@ typedef replace_list_type_t<
 		make_array_of_logical_metas
 	>,
 	augs::trivially_copyable_tuple
-> tuple_of_all_logical_metas_of_assets;
+>;
 
 template <class derived>
 struct subscript_asset_getters {
@@ -142,9 +140,8 @@ class assets_manager :
 #endif
 
 public:
-
 	void load_baked_metadata(
-		const game_image_requests&,
+		const game_image_definitions&,
 		const game_font_requests&,
 		const atlases_regeneration_output&
 	);

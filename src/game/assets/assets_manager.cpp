@@ -12,7 +12,7 @@
 #include "generated/introspectors.h"
 
 void assets_manager::load_baked_metadata(
-	const game_image_requests& images,
+	const game_image_definitions& images,
 	const game_font_requests& fonts,
 	const atlases_regeneration_output& atlases
 ) {

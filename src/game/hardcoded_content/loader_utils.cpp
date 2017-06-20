@@ -2,7 +2,7 @@
 #include "loader_utils.h"
 
 void make_button_with_corners(
-	game_image_requests& into,
+	game_image_definitions& into,
 	const game_image_id first,
 	const std::string& filename_template,
 	const bool request_lb_complement
@@ -27,7 +27,7 @@ void make_button_with_corners(
 }
 
 void make_indexed_images(
-	game_image_requests& into,
+	game_image_definitions& into,
 	const game_image_id first,
 	const game_image_id last,
 	const std::string& filename_template,

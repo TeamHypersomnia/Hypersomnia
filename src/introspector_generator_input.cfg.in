@@ -49,6 +49,7 @@ generated-file-format:
 
 #include "augs/misc/trivially_copyable_tuple.h"
 #include "augs/templates/for_each_in_types.h"
+#include "augs/templates/string_templates.h"
 
 #include "game/transcendental/entity_id_declaration.h"
 
@@ -71,7 +72,8 @@ namespace augs {
 
 	template <class... T>
 	std::string enum_to_string(const window::event::keys::key k, T...) {
-		const auto wstr = window::event::keys::key_to_wstring(k);
+		auto wstr = window::event::keys::key_to_wstring(k);
+		str_ops(wstr).replace_all(L" ", L"");
 		return std::string(wstr.begin(), wstr.end());
 	}
 

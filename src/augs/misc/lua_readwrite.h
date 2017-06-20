@@ -1,21 +1,22 @@
 #pragma once
 #include <sol2/sol.hpp>
 #include "augs/templates/string_to_enum.h"
+#include "augs/templates/is_variant.h"
 #include "augs/misc/templated_readwrite.h"
 #include "augs/misc/custom_lua_representations.h"
 #include "augs/misc/script_utils.h"
 
+
 namespace augs {
 	template <class T, class = void>
-	struct has_custom_lua_value_representation : std::false_type {};
+	struct has_custom_to_lua_value : std::false_type {};
 
 	template <class T>
-	struct has_custom_lua_value_representation<
+	struct has_custom_to_lua_value<
 		T, 
 		decltype(
 			to_lua_value(
-				std::declval<const T>(),
-				std::declval<sol::object>()
+				std::declval<const T>()
 			),
 			from_lua_value(
 				std::declval<T>(),
@@ -26,142 +27,172 @@ namespace augs {
 	> : std::true_type {};
 
 	template <class T>
-	constexpr bool has_custom_lua_value_representation_v = has_custom_lua_value_representation<T>::value;
+	constexpr bool has_custom_to_lua_value_v = has_custom_to_lua_value<T>::value;
 
 	template <class T>
 	constexpr bool representable_as_lua_value =
 		std::is_same_v<T, std::string>
 		|| std::is_arithmetic_v<T>
 		|| std::is_enum_v<T>
-		|| has_custom_lua_value_representation_v<T>
+		|| has_custom_to_lua_value_v<T>
 	;
 
-	template <class T, class L>
-	void read_table_field(sol::table input_table, T& field, const L label) {
-		if constexpr(has_custom_lua_value_representation_v<T>) {
-			from_lua_value(field, input_table[label]);
+	template <class T>
+	void general_from_lua_value(sol::object object, T& field) {
+		if constexpr(has_custom_to_lua_value_v<T>) {
+			from_lua_value(object, field);
 		}
 		else if constexpr(std::is_same_v<T, std::string> || std::is_arithmetic_v<T>) {
-			field = input_table[label].get<T>();
+			field = object.get<T>();
 		}
 		else if constexpr(std::is_enum_v<T>) {
 			if constexpr(has_enum_to_string_v<T>) {
-				field = string_to_enum<T>(input_table[label].get<std::string>());
+				field = string_to_enum<T>(object.get<std::string>());
 			}
 			else {
-				field = static_cast<T>(input_table[label].get<int>());
+				field = static_cast<T>(object.get<int>());
 			}
 		}
 		else {
-			static_assert(!representable_as_lua_value<T>, "Non-exhaustive read_table_field");
-		}
-	}
-
-	template <class T, class L>
-	void read_table_or_field(sol::table input_table, T& into, const L label) {
-		if constexpr(representable_as_lua_value<T>) {
-			read_table_field(input_table, into, label);
-		}
-		else {
-			sol::object maybe_table = input_table[label];
-			ensure(maybe_table.is<sol::table>());
-
-			sol::table table = maybe_table;
-			read(table, into);
+			static_assert(always_false_v<T>, "Non-exhaustive read_representable_field");
 		}
 	}
 
 	template <class Serialized>
-	void read(sol::table input_table, Serialized& into) {
-		static_assert(
-			!representable_as_lua_value<Serialized>, 
-			"Directly representable, but no key (label) provided! Use read_table_field to directly serialize this object."
-		);
+	void read(sol::object input_object, Serialized& into) {
+		if constexpr(is_variant_v<Serialized>) {
+			sol::table input_table = input_object;
+			ensure(input_table.is<sol::table>());
 
-		if constexpr(is_container_v<Serialized>) {
-			using Container = Serialized;
+			const auto variant_type_label = get_variant_type_label(std::declval<Serialized>());
+			const auto variant_content_label = get_variant_content_label(std::declval<Serialized>());
 
-			int counter = 1;
+			std::string variant_type = input_table[variant_type_label];
+			sol::object variant_content = input_table[variant_content_label];
 
-			while (true) {
-				sol::object maybe_element = input_table[counter];
+			for_each_type_in_list<Serialized>(
+				[input_object, variant_content, variant_type, &into](auto specific_object){
+					const auto this_type_name = get_custom_type_name(specific_object);
 
-				if (maybe_element.valid()) {
-					if constexpr(is_associative_container_v<Container>) {
+					if (this_type_name == variant_type) {
+						read(variant_content, specific_object);
+						into = specific_object;
+					}
+				}
+			);
+		}
+		else if constexpr(representable_as_lua_value<Serialized>) {
+			read_representable_field(input_object, into);
+		}
+		else {
+			sol::table input_table = input_object;
+			ensure(input_table.is<sol::table>());
+			
+			if constexpr(is_container_v<Serialized>) {
+				using Container = Serialized;
+				
+				/*
+					If container is associative and the keys are representable as lua values,
+					read these values as keys in a lua table. Otherwise, read from a sequence like for a vector.
+				*/
+
+				if constexpr(
+					is_associative_container_v<Container> 
+					&& representable_as_lua_value<typename Container::key_type>
+				) {
+					for (auto key_value_pair : input_table) {
 						typename Container::key_type key;
 						typename Container::mapped_type mapped;
 
-						ensure(maybe_element.is<sol::table>());
-						
-						sol::table key_value_table = maybe_element;
-
-						ensure(key_value_table[1].valid());
-						ensure(key_value_table[2].valid());
-
-						read_table_or_field(key_value_table, key, 1);
-						read_table_or_field(key_value_table, mapped, 2);
+						read_representable_field(key_value_pair.first, key);
+						read(key_value_pair.second, mapped);
 
 						into.emplace(std::move(key), std::move(mapped));
 					}
-					else {
-						typename Container::value_type val;
-
-						read_table_or_field(input_table, val, counter);
-
-						into.emplace_back(std::move(val));
-					}
 				}
 				else {
-					break;
-				}
+					int counter = 1;
 
-				++counter;
-			}
-		}
-		else {
-			augs::introspect(
-				[input_table](const auto label, auto& field) {
-					using T = std::decay_t<decltype(field)>;
-					
-					if constexpr(!is_padding_field_v<T>) {
-						read_table_or_field(input_table, field, label);
+					while (true) {
+						sol::object maybe_element = input_table[counter];
+
+						if (maybe_element.valid()) {
+							if constexpr(is_associative_container_v<Container>) {
+								typename Container::key_type key;
+								typename Container::mapped_type mapped;
+
+								ensure(maybe_element.is<sol::table>());
+								
+								sol::table key_value_table = maybe_element;
+
+								ensure(key_value_table[1].valid());
+								ensure(key_value_table[2].valid());
+
+								read(key_value_table[1], key);
+								read(key_value_table[2], mapped);
+
+								into.emplace(std::move(key), std::move(mapped));
+							}
+							else {
+								typename Container::value_type val;
+
+								read(input_table[counter], val);
+
+								into.emplace_back(std::move(val));
+							}
+						}
+						else {
+							break;
+						}
+
+						++counter;
 					}
-				},
-				into
-			);
+				}
+			}
+			else {
+				augs::introspect(
+					[input_table](const auto label, auto& field) {
+						using T = std::decay_t<decltype(field)>;
+						
+						if constexpr(!is_padding_field_v<T>) {
+							read(input_table[label], field);
+						}
+					},
+					into
+				);
+			}
 		}
 	}
 
-
-	template <class T, class L>
-	void write_table_field(sol::table output_table, const T& field, const L label) {
-		if constexpr(has_custom_lua_value_representation_v<T>) {
-			to_lua_value(field, output_table[label]);
+	template <class T>
+	decltype(auto) general_to_lua_value(const T& field) {
+		if constexpr(has_custom_to_lua_value_v<T>) {
+			return to_lua_value(field);
 		}
 		else if constexpr(std::is_same_v<T, std::string> || std::is_arithmetic_v<T>) {
-			output_table[label] = field;
+			return field;
 		}
 		else if constexpr(std::is_enum_v<T>) {
 			if constexpr(has_enum_to_string_v<T>) {
-				output_table[label] = enum_to_string(field);
+				return enum_to_string(field);
 			}
 			else {
-				output_table[label] = static_cast<int>(field);
+				return static_cast<int>(field);
 			}
 		}
 		else {
-			static_assert(!representable_as_lua_value<T>, "Non-exhaustive write_table_field");
+			static_assert(always_false_v<T>, "Non-exhaustive to_lua_representation");
 		}
 	}
 	
-	template <class T, class L>
-	void write_table_or_field(sol::table output_table, const T& from, const L label) {
+	template <class T, class K>
+	void write_table_or_field(sol::table output_table, const T& from, K&& key) {
 		if constexpr(representable_as_lua_value<T>) {
-			write_table_field(output_table, from, label);
+			output_table[std::forward<K>(key)] = general_to_lua_value(from);
 		}
 		else {
 			auto new_table = output_table.create();
-			output_table[label] = new_table;
+			output_table[std::forward<K>(key)] = new_table;
 			write(new_table, from);
 		}
 	}
@@ -170,28 +201,53 @@ namespace augs {
 	void write(sol::table output_table, const Serialized& from) {
 		static_assert(
 			!representable_as_lua_value<Serialized>, 
-			"Directly representable, but no key (label) provided! Use write_table_field to directly serialize this object."
+			"Directly representable, but no key (label) provided! Use write_representable_field to directly serialize this object."
 		);
 
-		if constexpr(is_container_v<Serialized>) {
+		if constexpr(is_variant_v<Serialized>) {
+			std::visit(
+				[output_table](const auto& resolved){
+					using T = std::decay_t<decltype(resolved)>;
+					
+					const auto variant_type_label = get_variant_type_label(std::declval<Serialized>());
+					const auto variant_content_label = get_variant_content_label(std::declval<Serialized>());
+					const auto this_type_name = get_custom_type_name(std::declval<T>());
+
+					output_table[variant_type_label] = this_type_name;
+					write_table_or_field(output_table, resolved, variant_content_label);
+				}, 
+				from
+			);
+		}
+		else if constexpr(is_container_v<Serialized>) {
 			using Container = Serialized;
 
-			int counter = 1;
-
-			for (const auto& element : from) {
-				if constexpr(is_associative_container_v<Container>) {
-					auto key_value_pair_table = output_table.create();
-
-					write_table_or_field(key_value_pair_table, element.first, 1);
-					write_table_or_field(key_value_pair_table, element.second, 2);
-
-					output_table[counter] = key_value_pair_table;
+			if constexpr(
+				is_associative_container_v<Container>
+				&& representable_as_lua_value<typename Container::key_type>
+			) {
+				for (const auto& element : from) {
+					write_table_or_field(output_table, element.second, general_to_lua_value(element.first));
 				}
-				else {
-					write_table_or_field(output_table, element, counter);
-				}
+			}
+			else {
+				int counter = 1;
 
-				++counter;
+				for (const auto& element : from) {
+					if constexpr(is_associative_container_v<Container>) {
+						auto key_value_pair_table = output_table.create();
+
+						write_table_or_field(key_value_pair_table, element.first, 1);
+						write_table_or_field(key_value_pair_table, element.second, 2);
+
+						output_table[counter] = key_value_pair_table;
+					}
+					else {
+						write_table_or_field(output_table, element, counter);
+					}
+
+					++counter;
+				}
 			}
 		}
 		else {
@@ -219,7 +275,7 @@ namespace augs {
 		auto output_table = lua.create_named_table("my_table");
 		augs::write(output_table, std::forward<T>(object));
 
-		const std::string file_contents = lua["table_to_string"](
+		const std::string file_contents = "return " + lua["table_to_string"](
 			output_table, 
 			std::forward<SaverArgs>(args)...
 		);
@@ -234,12 +290,20 @@ namespace augs {
 	) {
 		auto lua = augs::create_lua_state();
 
-		const auto script_contents = "tbl = " + augs::get_file_contents(source_path);
-		lua.script(script_contents, augs::lua_error_callback);
-
-		sol::table input_table = lua["tbl"];
+		sol::table input_table = lua.script(
+			augs::get_file_contents(source_path), 
+			augs::lua_error_callback
+		);
+		
 		ensure(input_table.valid());
 
 		augs::read(input_table, object);
+	}
+
+	template <class T>
+	T load_from_lua_table(const std::string& source_path) {
+		T object;
+		load_from_lua_table(object, source_path);
+		return object;
 	}
 }

@@ -27,8 +27,8 @@ struct game_image_gui_usage {
 	// END GEN INTROSPECTOR
 };
 
-struct game_image_request {
-	// GEN INTROSPECTOR struct game_image_request
+struct game_image_definition {
+	// GEN INTROSPECTOR struct game_image_definition
 	std::string source_image_path;
 
 	std::optional<neon_map_input> neon_map;
@@ -41,7 +41,7 @@ struct game_image_request {
 	std::string get_neon_map_path() const;
 	std::string get_desaturation_path() const;
 	
-	std::optional<std::string> get_polygonization_path() const;
+	std::string get_polygonization_path() const;
 };
 
 struct game_image_logical_meta {

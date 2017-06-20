@@ -6,6 +6,7 @@
 
 #include "augs/global_libraries.h"
 #include "augs/ensure.h"
+#include "augs/filesystem/file.h"
 
 namespace augs {
 	font_glyph_metadata::font_glyph_metadata(
@@ -23,7 +24,7 @@ namespace augs {
 		
 		const auto error = FT_New_Face(*global_libraries::freetype_library.get(), in.path.c_str(), 0, &face);
 
-		LOG("Loading font %x", in.path);
+		LOG("Loading font %x", in.source_font_path);
 
 		ensure(error != FT_Err_Unknown_File_Format && L"font format unsupported");
 		ensure(!error && L"coulnd't open font file");
@@ -35,7 +36,7 @@ namespace augs {
 
 		FT_UInt g_index;
 
-		const auto& chars = in.characters;
+		const auto& chars = augs::get_file_contents(in.charset_path, wchar_t());
 
 		meta.glyphs.reserve(chars.size());
 		glyph_bitmaps.reserve(chars.size());

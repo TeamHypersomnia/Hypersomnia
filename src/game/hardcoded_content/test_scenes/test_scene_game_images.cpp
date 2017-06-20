@@ -3,8 +3,8 @@
 #include "game/hardcoded_content/all_hardcoded_content.h"
 #include "game/hardcoded_content/loader_utils.h"
 
-game_image_requests load_test_scene_images() {
-	game_image_requests output;
+game_image_definitions load_test_scene_images() {
+	game_image_definitions output;
 
 	{
 		auto& in = output[game_image_id::TEST_CROSSHAIR];
