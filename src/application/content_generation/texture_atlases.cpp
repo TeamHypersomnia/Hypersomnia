@@ -61,6 +61,8 @@ atlases_regeneration_output regenerate_atlases(
 
 		texture_atlas_stamp new_stamp;
 
+		/* This check is optional to improve launch times */
+
 		if (always_check_source_images_integrity) {
 			for (const auto& img_id : input_for_this_atlas.second.images) {
 				new_stamp.image_stamps[img_id] = augs::last_write_time(img_id);

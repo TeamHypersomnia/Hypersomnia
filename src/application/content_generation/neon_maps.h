@@ -25,13 +25,6 @@ struct neon_map_stamp {
 	// END GEN INTROSPECTOR
 };
 
-struct nnn {
-	// GEN INTROSPECTOR struct nnn
-	std::vector<std::string> paths;
-	neon_map_input input;
-	// END GEN INTROSPECTOR
-};
-
 void regenerate_neon_map(
 	const std::string& source_image_path,
 	const std::string& output_image_path,

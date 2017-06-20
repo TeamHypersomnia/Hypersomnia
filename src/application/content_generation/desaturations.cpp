@@ -9,59 +9,47 @@
 
 #include "augs/image/image.h"
 
-void regenerate_desaturations(
+void regenerate_desaturation(
+	const std::string& source_path,
+	const std::string& output_path,
 	const bool force_regenerate
 ) {
-	const std::string desaturations_directory = "generated/desaturations/";
+	desaturation_stamp new_stamp;
+	new_stamp.last_write_time_of_source = augs::last_write_time(source_path);
 
-	augs::create_directories(desaturations_directory);
+	const auto desaturation_stamp_path = augs::replace_extension(source_path, ".stamp");
 
-	const auto lines = augs::get_file_lines("generators/desaturations_generator_input.cfg");
-	size_t current_line = 0;
+	augs::stream new_stamp_stream;
+	augs::write(new_stamp_stream, new_stamp);
 
-	while (current_line < lines.size()) {
-		const auto source_path = lines[current_line];
+	bool should_regenerate = force_regenerate;
 
-		desaturation_stamp new_stamp;
-		new_stamp.last_write_time_of_source = augs::last_write_time(source_path);
-
-		const auto desaturation_path = desaturations_directory + augs::get_filename(source_path);
-		const auto desaturation_stamp_path = desaturations_directory + augs::replace_extension(augs::get_filename(source_path), ".stamp");
-
-		augs::stream new_stamp_stream;
-		augs::write(new_stamp_stream, new_stamp);
-
-		bool should_regenerate = force_regenerate;
-
-		if (!augs::file_exists(desaturation_path)) {
+	if (!augs::file_exists(output_path)) {
+		should_regenerate = true;
+	}
+	else {
+		if (!augs::file_exists(desaturation_stamp_path)) {
 			should_regenerate = true;
 		}
 		else {
-			if (!augs::file_exists(desaturation_stamp_path)) {
+			augs::stream existent_stamp_stream;
+			augs::get_file_contents_binary_into(desaturation_stamp_path, existent_stamp_stream);
+
+			const bool are_stamps_identical = (new_stamp_stream == existent_stamp_stream);
+
+			if (!are_stamps_identical) {
 				should_regenerate = true;
 			}
-			else {
-				augs::stream existent_stamp_stream;
-				augs::get_file_contents_binary_into(desaturation_stamp_path, existent_stamp_stream);
-
-				const bool are_stamps_identical = (new_stamp_stream == existent_stamp_stream);
-
-				if (!are_stamps_identical) {
-					should_regenerate = true;
-				}
-			}
 		}
+	}
 
-		if (should_regenerate) {
-			LOG("Regenerating desaturation for %x", source_path);
+	if (should_regenerate) {
+		LOG("Regenerating desaturation for %x", source_path);
 
-			augs::image source_image;
-			source_image.from_file(source_path);
-			source_image.get_desaturated().save(desaturation_path);
+		augs::image source_image;
+		source_image.from_file(source_path);
+		source_image.get_desaturated().save(output_path);
 
-			augs::create_binary_file(desaturation_stamp_path, new_stamp_stream);
-		}
-
-		++current_line;
+		augs::create_binary_file(desaturation_stamp_path, new_stamp_stream);
 	}
 }

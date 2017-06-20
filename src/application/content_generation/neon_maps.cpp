@@ -39,9 +39,6 @@ void regenerate_neon_map(
 	const neon_map_input in,
 	const bool force_regenerate
 ) {
-	std::vector<nnn> nnns;
-	augs::load_from_lua_table(nnns, "reqs.lua");
-
 	neon_map_stamp new_stamp;
 	new_stamp.input = in;
 	new_stamp.last_write_time_of_source = augs::last_write_time(source_image_path);
@@ -91,7 +88,6 @@ void make_neon(
 	const neon_map_input& input,
 	augs::image& source
 ) {
-
 	resize_image(source, vec2u(input.radius_towards_x_axis, input.radius_towards_y_axis));
 
 	const auto pixel_list = hide_undesired_pixels(source, input.light_colors);

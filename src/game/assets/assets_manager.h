@@ -142,7 +142,7 @@ class assets_manager :
 public:
 	void load_baked_metadata(
 		const game_image_definitions&,
-		const game_font_requests&,
+		const game_font_definitions&,
 		const atlases_regeneration_output&
 	);
 

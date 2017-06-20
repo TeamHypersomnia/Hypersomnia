@@ -13,16 +13,21 @@
 
 void assets_manager::load_baked_metadata(
 	const game_image_definitions& images,
-	const game_font_requests& fonts,
+	const game_font_definitions& fonts,
 	const atlases_regeneration_output& atlases
 ) {
 	auto& self = *this;
 
 	for (const auto& requested_image : images) {
 		const auto image_id = augs::string_to_enum_or<assets::game_image_id>(to_uppercase(requested_image.first));
+		const bool is_reserved_asset = image_id != assets::game_image_id::INVALID;
 
-		ensure(image_id != assets::game_image_id::INVALID);
-		// if it is invalid, dynamically allocate id
+		ensure(is_reserved_asset);
+
+		// if it is not reserved, dynamically allocate id
+		if (!is_reserved_asset) {
+
+		}
 
 		auto& baked_image = self[image_id];
 		const auto& request = requested_image.second;
@@ -42,7 +47,7 @@ void assets_manager::load_baked_metadata(
 
 		assign_atlas_entry(baked_image.texture_maps[texture_map_type::DIFFUSE], request.source_image_path);
 
-		if (request.neon_map) {
+		if (request.neon_map || request.custom_neon_map_path) {
 			assign_atlas_entry(baked_image.texture_maps[texture_map_type::NEON], request.get_neon_map_path());
 		}
 
@@ -53,7 +58,7 @@ void assets_manager::load_baked_metadata(
 		baked_image.settings = request.gui_usage;
 
 		{
-			const auto polygonization_path = request.get_polygonization_path();
+			const auto polygonization_path = request.get_polygonization_output_path();
 
 			if (augs::file_exists(polygonization_path)) {
 				const auto lines = augs::get_file_lines(polygonization_path);

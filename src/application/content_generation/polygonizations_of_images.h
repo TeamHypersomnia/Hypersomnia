@@ -10,6 +10,8 @@ struct polygonization_of_image_stamp {
 	// END GEN INTROSPECTOR
 };
 
-void regenerate_polygonizations_of_images(
+void regenerate_polygonization_of_image(
+	const std::string& source_red_black_image,
+	const std::string& output_path,
 	const bool force_regenerate
 );

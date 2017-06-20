@@ -6,7 +6,6 @@
 #include "augs/misc/custom_lua_representations.h"
 #include "augs/misc/script_utils.h"
 
-
 namespace augs {
 	template <class T, class = void>
 	struct has_custom_to_lua_value : std::false_type {};
@@ -30,7 +29,7 @@ namespace augs {
 	constexpr bool has_custom_to_lua_value_v = has_custom_to_lua_value<T>::value;
 
 	template <class T>
-	constexpr bool representable_as_lua_value =
+	constexpr bool representable_as_lua_value_v =
 		std::is_same_v<T, std::string>
 		|| std::is_arithmetic_v<T>
 		|| std::is_enum_v<T>
@@ -38,28 +37,33 @@ namespace augs {
 	;
 
 	template <class T>
-	void general_from_lua_value(sol::object object, T& field) {
+	void general_from_lua_value(sol::object object, T& into) {
 		if constexpr(has_custom_to_lua_value_v<T>) {
-			from_lua_value(object, field);
+			from_lua_value(object, into);
 		}
 		else if constexpr(std::is_same_v<T, std::string> || std::is_arithmetic_v<T>) {
-			field = object.get<T>();
+			into = object.get<T>();
 		}
 		else if constexpr(std::is_enum_v<T>) {
 			if constexpr(has_enum_to_string_v<T>) {
-				field = string_to_enum<T>(object.get<std::string>());
+				into = string_to_enum<T>(object.get<std::string>());
 			}
 			else {
-				field = static_cast<T>(object.get<int>());
+				into = static_cast<T>(object.get<int>());
 			}
 		}
 		else {
-			static_assert(always_false_v<T>, "Non-exhaustive read_representable_field");
+			static_assert(always_false_v<T>, "Non-exhaustive general_from_lua_value");
 		}
 	}
 
 	template <class Serialized>
 	void read(sol::object input_object, Serialized& into) {
+		static_assert(
+			!is_optional_v<Serialized>,
+			"std::optional can only be serialized as a member object."
+		);
+
 		if constexpr(is_variant_v<Serialized>) {
 			sol::table input_table = input_object;
 			ensure(input_table.is<sol::table>());
@@ -81,30 +85,42 @@ namespace augs {
 				}
 			);
 		}
-		else if constexpr(representable_as_lua_value<Serialized>) {
-			read_representable_field(input_object, into);
+		else if constexpr(representable_as_lua_value_v<Serialized>) {
+			general_from_lua_value(input_object, into);
 		}
 		else {
 			sol::table input_table = input_object;
-			ensure(input_table.is<sol::table>());
+			ensure(input_table.is<sol::table>() && "A container must be read from a table, not a value.");
 			
 			if constexpr(is_container_v<Serialized>) {
 				using Container = Serialized;
 				
 				/*
 					If container is associative and the keys are representable as lua values,
-					read these values as keys in a lua table. Otherwise, read from a sequence like for a vector.
+					read container table as:
+					
+					{
+						ab = "abc",
+						cd = "cde"
+					}
+
+					otherwise, read container table as a sequence of key-value pairs (like vector):
+
+					{
+						{ "ab", "abc" },
+						{ "cd", "cde" }
+					}
 				*/
 
 				if constexpr(
 					is_associative_container_v<Container> 
-					&& representable_as_lua_value<typename Container::key_type>
+					&& representable_as_lua_value_v<typename Container::key_type>
 				) {
 					for (auto key_value_pair : input_table) {
 						typename Container::key_type key;
 						typename Container::mapped_type mapped;
 
-						read_representable_field(key_value_pair.first, key);
+						general_from_lua_value(key_value_pair.first, key);
 						read(key_value_pair.second, mapped);
 
 						into.emplace(std::move(key), std::move(mapped));
@@ -153,8 +169,17 @@ namespace augs {
 				augs::introspect(
 					[input_table](const auto label, auto& field) {
 						using T = std::decay_t<decltype(field)>;
-						
-						if constexpr(!is_padding_field_v<T>) {
+
+						if constexpr(is_optional_v<T>) {
+							sol::object maybe_field = input_table[label];
+							
+							if (maybe_field.is_valid()) {
+								typename Serialized::value_type value;
+								read(input_table[label], value);
+								field.emplace(std::move(value));
+							}
+						}
+						else if constexpr(!is_padding_field_v<T>) {
 							read(input_table[label], field);
 						}
 					},
@@ -187,7 +212,7 @@ namespace augs {
 	
 	template <class T, class K>
 	void write_table_or_field(sol::table output_table, const T& from, K&& key) {
-		if constexpr(representable_as_lua_value<T>) {
+		if constexpr(representable_as_lua_value_v<T>) {
 			output_table[std::forward<K>(key)] = general_to_lua_value(from);
 		}
 		else {
@@ -200,8 +225,13 @@ namespace augs {
 	template <class Serialized>
 	void write(sol::table output_table, const Serialized& from) {
 		static_assert(
-			!representable_as_lua_value<Serialized>, 
+			!representable_as_lua_value_v<Serialized>, 
 			"Directly representable, but no key (label) provided! Use write_representable_field to directly serialize this object."
+		);
+
+		static_assert(
+			!is_optional_v<Serialized>, 
+			"std::optional can only be serialized as a member object."
 		);
 
 		if constexpr(is_variant_v<Serialized>) {
@@ -222,9 +252,26 @@ namespace augs {
 		else if constexpr(is_container_v<Serialized>) {
 			using Container = Serialized;
 
+			/*
+				If container is associative and the keys are representable as lua values,
+				write container table as:
+				
+				{
+					ab = "abc",
+					cd = "cde"
+				}
+
+				otherwise, write container table as a sequence of key-value pairs (like vector):
+
+				{
+					{ "ab", "abc" },
+					{ "cd", "cde" }
+				}
+			*/
+
 			if constexpr(
 				is_associative_container_v<Container>
-				&& representable_as_lua_value<typename Container::key_type>
+				&& representable_as_lua_value_v<typename Container::key_type>
 			) {
 				for (const auto& element : from) {
 					write_table_or_field(output_table, element.second, general_to_lua_value(element.first));
@@ -254,8 +301,13 @@ namespace augs {
 			augs::introspect(
 				[output_table](const auto label, const auto& field) mutable {
 					using T = std::decay_t<decltype(field)>;
-					
-					if constexpr(!is_padding_field_v<T>) {
+
+					if constexpr(is_optional_v<T>) {
+						if (field) {
+							write_table_or_field(output_table, field.value(), label);
+						}
+					}
+					else if constexpr(!is_padding_field_v<T>) {
 						write_table_or_field(output_table, field, label);
 					}
 				},

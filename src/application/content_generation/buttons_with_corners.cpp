@@ -6,104 +6,66 @@
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 
-void regenerate_button_with_corner(
-	const std::string& output_image_path,
+void regenerate_button_with_corners(
+	const std::string& output_path_template,
 	const button_with_corners_input input,
 	const bool force_regenerate
 ) {
-	const auto buttons_with_corners_directory = "generated/buttons_with_corners/";
+	button_with_corners_stamp new_stamp = input;
 
-	augs::create_directories(buttons_with_corners_directory);
+	const auto untemplatized_path = typesafe_sprintf(output_path_template, "");
+	const auto button_with_corners_stamp_path = augs::replace_extension(untemplatized_path, ".stamp");
 
-	const auto lines = augs::get_file_lines("generators/buttons_with_corners_generator_input.cfg");
-	size_t current_line = 0;
+	augs::stream new_stamp_stream;
+	augs::write(new_stamp_stream, new_stamp);
 
-	while (current_line < lines.size()) {
-		button_with_corners_stamp new_stamp;
+	bool should_regenerate = force_regenerate;
 
-		const auto target_stem = lines[current_line];
-		
-		++current_line;
+	for (size_t i = 0; i < static_cast<int>(button_corner_type::COUNT); ++i) {
+		const auto type = static_cast<button_corner_type>(i);
 
-		{
-			std::istringstream in(lines[current_line]);
-			in >> new_stamp.border_color;
+		if (is_lb_complement(type) && !new_stamp.make_lb_complement) {
+			continue;
 		}
 
-		++current_line;
-
-		{
-			std::istringstream in(lines[current_line]);
-			in >> new_stamp.inside_color;
-		}
-		
-		++current_line;
-
-		{
-			std::istringstream in(lines[current_line]);
-			in >> new_stamp.lower_side >> new_stamp.upper_side >> new_stamp.inside_border_padding >> new_stamp.make_lb_complement;
-		}
-
-		// skip separating newline
-		++current_line;
-
-		// go to the next path line
-		++current_line;
-
-		const auto button_with_corners_path_template = buttons_with_corners_directory + target_stem + "_%x.png";
-		const auto button_with_corners_stamp_path = buttons_with_corners_directory + target_stem + ".stamp";
-
-		augs::stream new_stamp_stream;
-		augs::write(new_stamp_stream, new_stamp);
-
-		bool should_regenerate = force_regenerate;
-
-		for (size_t i = 0; i < static_cast<int>(button_corner_type::COUNT); ++i) {
-			const auto type = static_cast<button_corner_type>(i);
-			
-			if (is_lb_complement(type) && !new_stamp.make_lb_complement) {
-				continue;
-			}
-
-			if (
-				!augs::file_exists(
-					typesafe_sprintf(
-						button_with_corners_path_template,
-						get_filename_for(type)
-					)
+		if (
+			!augs::file_exists(
+				typesafe_sprintf(
+					output_path_template,
+					get_filename_for(type)
 				)
-			) {
+			)
+		) {
+			should_regenerate = true;
+			break;
+		}
+	}
+
+	if (!should_regenerate) {
+		if (!augs::file_exists(button_with_corners_stamp_path)) {
+			should_regenerate = true;
+		}
+		else {
+			augs::stream existent_stamp_stream;
+			augs::get_file_contents_binary_into(button_with_corners_stamp_path, existent_stamp_stream);
+
+			const bool are_stamps_identical = (new_stamp_stream == existent_stamp_stream);
+
+			if (!are_stamps_identical) {
 				should_regenerate = true;
-				break;
 			}
 		}
+	}
 
-		if (!should_regenerate) {
-			if (!augs::file_exists(button_with_corners_stamp_path)) {
-				should_regenerate = true;
-			}
-			else {
-				augs::stream existent_stamp_stream;
-				augs::get_file_contents_binary_into(button_with_corners_stamp_path, existent_stamp_stream);
+	if (should_regenerate) {
+		LOG("Regenerating button with corners: %x", untemplatized_path);
 
-				const bool are_stamps_identical = (new_stamp_stream == existent_stamp_stream);
+		create_and_save_button_with_corners(
+			output_path_template,
+			new_stamp
+		);
 
-				if (!are_stamps_identical) {
-					should_regenerate = true;
-				}
-			}
-		}
-
-		if (should_regenerate) {
-			LOG("Regenerating button with corners: %x", target_stem);
-
-			create_and_save_button_with_corners(
-				button_with_corners_path_template,
-				new_stamp
-			);
-
-			augs::create_binary_file(button_with_corners_stamp_path, new_stamp_stream);
-		}
+		augs::create_binary_file(button_with_corners_stamp_path, new_stamp_stream);
 	}
 }
 

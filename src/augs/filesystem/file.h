@@ -51,6 +51,11 @@ namespace augs {
 		return fs::path(path).replace_extension(new_ext).string();
 	}
 
+	template <class P, class S>
+	auto replace_filename(const P& path, const S& new_fn) {
+		return fs::path(path).replace_filename(new_fn).string();
+	}
+
 	template <class P>
 	auto get_filename(const P& path) {
 		return fs::path(path).filename().string();

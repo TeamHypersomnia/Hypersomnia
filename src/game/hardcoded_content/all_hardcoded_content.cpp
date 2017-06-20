@@ -13,22 +13,62 @@
 
 #include "augs/graphics/OpenGL_includes.h"
 #include "augs/misc/lua_readwrite.h"
+#include "augs/filesystem/file.h"
 
 #include "generated/introspectors.h"
 
 using namespace augs::graphics;
 using namespace assets;
 
-game_image_definitions load_game_image_definitions(const std::string& lua_file_path) {
+void regenerate_what_is_needed_for(const game_image_definitions& defs, const bool force_regenerate) {
+	for (const auto& def : defs) {
+		def.second.regenerate_resources(force_regenerate);
+	}
+}
 
+auto expand_source_image_path_templates(const game_image_definitions& defs) {
+	game_image_definitions output;
+	output.reserve(defs.size());
+
+	for (const auto& def : defs) {
+		const auto& d = def.second;
+		
+		if (d.source_image_path.find("%x") != std::string::npos) {
+			for (unsigned i = 1;; ++i) {
+				const auto unrolled_path = typesafe_sprintf(d.source_image_path, i);
+
+				if (augs::file_exists(unrolled_path)) {
+					auto unrolled_def = d;
+					unrolled_def.source_image_path = unrolled_path;
+					output.emplace(def.first, std::move(unrolled_def));
+				}
+			}
+		}
+	}
+	
+	return output;
 }
 
 void load_all_requisite(const config_lua_table& cfg) {
 	auto& manager = get_assets_manager();
 
 	game_image_definitions images;
-	const auto fonts = augs::load_from_lua_table<game_font_requests>("official/requisite_font_definitions.lua");
+	const auto fonts = augs::load_from_lua_table<game_font_definitions>("official/requisite_fonts.lua");
+	
+	auto images =
+		expand_source_image_path_templates(
+			augs::load_from_lua_table<game_image_definitions>("official/requisite_game_images.lua")
+		)
+	;
 
+#if BUILD_TEST_SCENES
+	concatenate(
+		images, 
+		augs::load_from_lua_table<game_image_definitions>("official/test_scene_game_images.lua")
+	);
+#endif
+	
+	/*
 	augs::for_each_enum<game_image_id>(
 		[&images](const game_image_id id){
 			if (
@@ -44,47 +84,24 @@ void load_all_requisite(const config_lua_table& cfg) {
 			}
 		}
 	);
+	*/
 
-	augs::save_as_lua_table(images, "imgs.lua");
+	LOG("\n--------------------------------------------\nChecking content integrity...");
 
-#if BUILD_TEST_SCENES
-	const auto test_scene_images = load_test_scene_images();
-	concatenate(images, test_scene_images);
-#endif
+	const bool force_regenerate = cfg.debug_regenerate_content_every_launch;
+	regenerate_what_is_needed_for(images, force_regenerate);
 
 	atlases_regeneration_input in;
 
 	for (const auto& i : images) {
-		const auto& request = i.second;
-
-		in.images.push_back({ request.source_image_path, assets::gl_texture_id::GAME_WORLD_ATLAS });
-
-		if (request.neon_map) {
-			in.images.push_back({ request.get_neon_map_path(), assets::gl_texture_id::GAME_WORLD_ATLAS });
-		}
-
-		if (request.generate_desaturation) {
-			in.images.push_back({ request.get_desaturation_path(), assets::gl_texture_id::GAME_WORLD_ATLAS });
-		}
+		concatenate(in.images, i.second.get_atlas_inputs());
 	}
 
 	for (const auto& f : fonts) {
 		in.fonts.push_back({ f.second.loading_input, f.second.target_atlas });
 	}
 
-	LOG("\n--------------------------------------------\nChecking content integrity...");
-
-
-	//const std::string neon_directory = "generated/neon_maps/";
-	//augs::create_directories(neon_directory);
-
-	regenerate_neon_map("", "", {}, false); //cfg.debug_regenerate_content_every_launch);
-	regenerate_scripted_images(cfg.debug_regenerate_content_every_launch);
-	regenerate_buttons_with_corners(cfg.debug_regenerate_content_every_launch);
-	regenerate_desaturations(cfg.debug_regenerate_content_every_launch);
-	regenerate_polygonizations_of_images(cfg.debug_regenerate_content_every_launch);
-
-	const auto regenerated = regenerate_atlases(
+	const auto atlases = regenerate_atlases(
 		in,
 		cfg.debug_regenerate_content_every_launch,
 		cfg.check_content_integrity_every_launch,
@@ -97,7 +114,7 @@ void load_all_requisite(const config_lua_table& cfg) {
 	manager.load_baked_metadata(
 		images,
 		fonts,
-		regenerated
+		atlases
 	);
 
 	load_requisite_animations(manager);

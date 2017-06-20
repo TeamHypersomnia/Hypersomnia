@@ -23,4 +23,9 @@ return {
     		flip_vertically = false
     	}
 	}
+
+    spell_ultimate_wrath_of_the_aeons_icon = {
+        source_image_path = "content/gfx/spell_ultimate_wrath_of_the_aeons_icon.png",
+        generate_desaturation = true
+    }
 }
