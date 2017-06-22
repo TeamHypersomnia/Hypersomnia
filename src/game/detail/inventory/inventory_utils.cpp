@@ -366,8 +366,11 @@ void detail_remove_item(const inventory_slot_handle handle, const entity_handle 
 	removed_item.get<components::item>().current_slot.unset();
 }
 
-components::transform sum_attachment_offsets(const const_logic_step step, const inventory_item_address addr) {
-	const auto& cosm = step.cosm;
+components::transform sum_attachment_offsets(
+	const cosmos& cosm,
+	const all_logical_metas_of_assets& metas,
+	const inventory_item_address addr
+) {
 	components::transform total;
 
 	inventory_slot_id current_slot;
@@ -383,7 +386,7 @@ components::transform sum_attachment_offsets(const const_logic_step step, const 
 
 		const auto item_in_slot = slot_handle.get_items_inside()[0];
 
-		total += get_attachment_offset(step.input.metas_of_assets, *slot_handle, total, cosm[item_in_slot]);
+		total += get_attachment_offset(metas, *slot_handle, total, cosm[item_in_slot]);
 
 		current_slot.container_entity = item_in_slot;
 	}
@@ -529,7 +532,7 @@ void perform_transfer(
 			if (should_fixtures_persist) {
 				const auto first_with_body = slot.get_first_ancestor_with_body_connection();
 
-				fixtures_offset = sum_attachment_offsets(step, descendant.get_address_from_root(first_with_body));
+				fixtures_offset = sum_attachment_offsets(step.cosm, step.input.metas_of_assets, descendant.get_address_from_root(first_with_body));
 				
 				if (slot->physical_behaviour == slot_physical_behaviour::CONNECT_BODIES_BY_JOINT) {
 					slot_requests_connection_of_bodies = true;

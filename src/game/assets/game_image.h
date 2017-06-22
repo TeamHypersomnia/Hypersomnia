@@ -46,15 +46,20 @@ struct game_image_definition {
 		return generate_desaturation;// generate_desaturation.has_value() && generate_desaturation.value();
 	}
 
-	std::string get_neon_map_path(const std::string& from_metafile_path) const;
-	std::string get_desaturation_path(const std::string& from_metafile_path) const;
+	std::string get_source_image_path(const std::string& from_definition_path) const;
 
-	std::string get_scripted_image_path(const std::string& from_metafile_path) const;
-	std::string get_button_with_corners_path_template(const std::string& from_metafile_path) const;
+	std::string get_neon_map_path(const std::string& from_definition_path) const;
+	std::string get_desaturation_path(const std::string& from_definition_path) const;
 
-	void regenerate_resources(const bool force_regenerate) const;
+	std::string get_scripted_image_path(const std::string& from_definition_path) const;
+	std::string get_button_with_corners_path_template(const std::string& from_definition_path) const;
 
-	std::vector<source_image_loading_input> get_atlas_inputs() const;
+	void regenerate_resources(
+		const std::string& definition_path, 
+		const bool force_regenerate
+	) const;
+
+	std::vector<source_image_loading_input> get_atlas_inputs(const std::string& definition_path) const;
 };
 
 struct game_image_lua_file {
@@ -75,7 +80,7 @@ struct game_image_baked {
 	augs::enum_array<augs::texture_atlas_entry, texture_map_type> texture_maps;
 
 	std::vector<vec2u> polygonized;
-	game_image_gui_usage settings;
+	game_image_gui_usage gui_usage;
 
 	vec2u get_size() const {
 		return texture_maps[texture_map_type::DIFFUSE].get_size();

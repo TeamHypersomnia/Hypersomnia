@@ -6,6 +6,8 @@
 #include "augs/templates/for_each_in_types.h"
 #include "augs/misc/templated_readwrite.h"
 
+#include "generated/introspectors.h"
+
 void regenerate_scripted_image(
 	const std::string& output_image_path,
 	const scripted_image_input& input,

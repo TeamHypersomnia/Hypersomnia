@@ -2,7 +2,7 @@
 #include "augs/graphics/rgba.h"
 
 namespace augs {
-	auto to_lua_value(const rgba r) {
+	inline auto to_lua_value(const rgba r) {
 		return r.stream_to(std::ostringstream()).str();
 	}
 

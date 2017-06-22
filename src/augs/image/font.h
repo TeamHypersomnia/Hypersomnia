@@ -82,6 +82,10 @@ namespace augs {
 		std::string charset_path;
 		unsigned pt = 0u;
 		// END GEN INTROSPECTOR
+
+		bool operator==(const font_loading_input& b) const {
+			return charset_path == b.charset_path && pt == b.pt;
+		}
 	};
 
 	struct font {
@@ -99,7 +103,7 @@ namespace std {
 	template <>
 	struct hash<augs::font_loading_input> {
 		size_t operator()(const augs::font_loading_input& in) const {
-			return augs::simple_two_hash(in.source_font_path, in.charset_path) + in.pt;
+			return augs::simple_two_hash(in.pt, in.charset_path);
 		}
 	};
 }

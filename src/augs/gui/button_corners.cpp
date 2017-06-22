@@ -5,7 +5,7 @@
 using namespace assets;
 
 std::string get_filename_for(const button_corner_type t) {
-	return to_lowercase(augs::enum_to_string(t));
+	return to_lowercase(std::string(augs::enum_to_string(t)));
 }
 
 bool is_button_corner(const button_corner_type t) {

@@ -63,7 +63,7 @@ template <class T>
 using does_asset_define_get_logical_meta = try_to_get_logical_meta<T>;
 
 template <class T>
-struct make_array_of_logical_metas {
+struct make_container_of_logical_metas {
 	using type = typename try_to_get_logical_meta<T>::type;
 };
 
@@ -87,7 +87,7 @@ using tuple_of_all_logical_metas_of_assets = replace_list_type_t<
 			does_asset_define_get_logical_meta,
 			tuple_of_all_assets
 		>,
-		make_array_of_logical_metas
+		make_container_of_logical_metas
 	>,
 	augs::trivially_copyable_tuple
 >;

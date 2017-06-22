@@ -13,6 +13,7 @@
 #include "augs/graphics/OpenGL_includes.h"
 #include "augs/misc/lua_readwrite.h"
 #include "augs/filesystem/file.h"
+#include "augs/filesystem/directory.h"
 
 #include "generated/introspectors.h"
 
@@ -21,50 +22,49 @@ using namespace assets;
 
 void regenerate_what_is_needed_for(const game_image_definitions& defs, const bool force_regenerate) {
 	for (const auto& def : defs) {
-		def.second.regenerate_resources(force_regenerate);
+		def.second.regenerate_resources(def.first, force_regenerate);
 	}
 }
 
-auto expand_source_image_path_templates(const game_image_definitions& defs) {
-	game_image_definitions output;
-	output.reserve(defs.size());
+void create_default_definitions_in_dir(const std::string& dir_path) {
+	augs::for_each_file_in_dir_recursive(
+		dir_path,
+		[](const std::string& path) {
+			if (augs::get_extension(path) == ".png") {
+				const auto path_of_meta = augs::replace_filename(path, ".lua");
 
-	for (const auto& def : defs) {
-		const auto& d = def.second;
-		
-		if (d.source_image_path.find("%x") != std::string::npos) {
-			for (unsigned i = 1;; ++i) {
-				const auto unrolled_path = typesafe_sprintf(d.source_image_path, i);
-
-				if (augs::file_exists(unrolled_path)) {
-					auto unrolled_def = d;
-					unrolled_def.source_image_path = unrolled_path;
-					output.emplace(def.first, std::move(unrolled_def));
+				if (!augs::file_exists(path_of_meta)) {
+					augs::create_text_file(path_of_meta, "return {}");
 				}
 			}
 		}
-	}
-	
-	return output;
+	);
+}
+
+template <class T>
+void add_definitions_recursively_from_dir(const std::string& dir_path, T& into) {
+	augs::for_each_file_in_dir_recursive(
+		dir_path,
+		[&into](const std::string& path) {
+			if (augs::get_extension(path) == ".lua") {
+				augs::load_from_lua_table(into[path], path);
+			}
+		}
+	);
 }
 
 void load_all_requisite(const config_lua_table& cfg) {
 	auto& manager = get_assets_manager();
 
 	game_image_definitions images;
-	const auto fonts = augs::load_from_lua_table<game_font_definitions>("official/requisite_fonts.lua");
-	
-	auto images =
-		expand_source_image_path_templates(
-			augs::load_from_lua_table<game_image_definitions>("official/requisite_game_images.lua")
-		)
-	;
+	game_font_definitions fonts;
+
+	add_definitions_recursively_from_dir("content/requisite/gfx/", images);
+	add_definitions_recursively_from_dir("content/requisite/fonts/", fonts);
 
 #if BUILD_TEST_SCENES
-	concatenate(
-		images, 
-		augs::load_from_lua_table<game_image_definitions>("official/test_scene_game_images.lua")
-	);
+	add_definitions_recursively_from_dir("content/official/gfx/", images);
+	add_definitions_recursively_from_dir("content/official/fonts/", fonts);
 #endif
 	
 	/*
@@ -93,7 +93,7 @@ void load_all_requisite(const config_lua_table& cfg) {
 	atlases_regeneration_input in;
 
 	for (const auto& i : images) {
-		concatenate(in.images, i.second.get_atlas_inputs());
+		concatenate(in.images, i.second.get_atlas_inputs(i.first));
 	}
 
 	for (const auto& f : fonts) {

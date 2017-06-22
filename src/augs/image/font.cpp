@@ -20,12 +20,12 @@ namespace augs {
 	}
 
 	void font::from_file(
-			const std::string& source_font_path,
-			const font_loading_input& in
+		const std::string& source_font_path,
+		const font_loading_input& in
 	) {
 		FT_Face face;
 		
-		const auto error = FT_New_Face(*global_libraries::freetype_library.get(), in.path.c_str(), 0, &face);
+		const auto error = FT_New_Face(*global_libraries::freetype_library.get(), source_font_path.c_str(), 0, &face);
 
 		LOG("Loading font %x", source_font_path);
 

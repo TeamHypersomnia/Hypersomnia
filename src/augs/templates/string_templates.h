@@ -104,10 +104,10 @@ auto str_ops(std::basic_string<Ch>& s) {
 
 template <class S>
 auto to_lowercase(S s) {
-	return str_ops(s).to_lowercase();
+	return str_ops(s).to_lowercase().subject;
 }
 
 template <class S>
 auto to_uppercase(S s) {
-	return str_ops(s).to_uppercase();
+	return str_ops(s).to_uppercase().subject;
 }

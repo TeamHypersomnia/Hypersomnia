@@ -20,7 +20,7 @@ using texture_atlas_font_stamp = std::chrono::system_clock::time_point;
 
 struct texture_atlas_stamp {
 	// GEN INTROSPECTOR struct texture_atlas_stamp
-	std::unordered_map<source_image_path, texture_atlas_image_stamp> image_stamps;
+	std::unordered_map<source_image_identifier, texture_atlas_image_stamp> image_stamps;
 	std::unordered_map<source_font_identifier, texture_atlas_font_stamp> font_stamps;
 	// END GEN INTROSPECTOR
 };
@@ -29,7 +29,7 @@ struct texture_atlas_metadata {
 	// GEN INTROSPECTOR struct texture_atlas_metadata
 	vec2u atlas_image_size;
 
-	std::unordered_map<source_image_path, augs::texture_atlas_entry> images;
+	std::unordered_map<source_image_identifier, augs::texture_atlas_entry> images;
 	std::unordered_map<source_font_identifier, augs::baked_font> fonts;
 	// END GEN INTROSPECTOR
 };

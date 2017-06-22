@@ -89,7 +89,7 @@ struct tests_of_traits {
 
 	static_assert(
 		std::is_same_v<
-			typename make_array_of_logical_metas<augs::enum_associative_array<assets::animation_id, animation>>::type,
+			typename make_container_of_logical_metas<augs::enum_associative_array<assets::animation_id, animation>>::type,
 			augs::enum_associative_array<assets::animation_id, animation>
 		>,
 		"Trait has failed"

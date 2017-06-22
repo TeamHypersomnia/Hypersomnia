@@ -30,9 +30,14 @@ void assets_manager::load_baked_metadata(
 		}
 
 		auto& baked_image = self[image_id];
+
+		const auto& definition_file_path = requested_image.first;
 		const auto& request = requested_image.second;
 
-		auto assign_atlas_entry = [&](augs::texture_atlas_entry& into, const source_image_path& p) {
+		auto assign_atlas_entry = [&](
+			augs::texture_atlas_entry& into, 
+			const source_image_identifier& p
+		) {
 			for (const auto& a : atlases.metadatas) {
 				const auto it = a.second.images.find(p);
 
@@ -45,19 +50,17 @@ void assets_manager::load_baked_metadata(
 			}
 		};
 
-		assign_atlas_entry(baked_image.texture_maps[texture_map_type::DIFFUSE], request.source_image_path);
+		assign_atlas_entry(baked_image.texture_maps[texture_map_type::DIFFUSE], request.get_source_image_path(definition_file_path));
 
 		if (request.neon_map || request.custom_neon_map_path) {
-			assign_atlas_entry(baked_image.texture_maps[texture_map_type::NEON], request.get_neon_map_path());
+			assign_atlas_entry(baked_image.texture_maps[texture_map_type::NEON], request.get_neon_map_path(definition_file_path));
 		}
 
 		if (request.generate_desaturation) {
-			assign_atlas_entry(baked_image.texture_maps[texture_map_type::DESATURATED], request.get_desaturation_path());
+			assign_atlas_entry(baked_image.texture_maps[texture_map_type::DESATURATED], request.get_desaturation_path(definition_file_path));
 		}
 
-		if (request.gui_usage.has_value()) {
-			baked_image.settings = request.gui_usage.value();
-		}
+		baked_image.gui_usage = request.gui_usage;
 
 		if (request.physical_shape.has_value()) {
 			baked_image.polygonized = request.physical_shape.value();
@@ -65,13 +68,23 @@ void assets_manager::load_baked_metadata(
 	}
 
 	for (const auto& requested_font : fonts) {
-		auto& baked_font = self[requested_font.first];
+		const auto font_id = augs::string_to_enum_or<assets::font_id>(to_uppercase(requested_font.first));
+		const bool is_reserved_asset = font_id != assets::font_id::INVALID;
+
+		ensure(is_reserved_asset);
+
+		// if it is not reserved, dynamically allocate id
+		if (!is_reserved_asset) {
+
+		}
+
+		auto& baked_font = self[font_id];
 
 		const auto seeked_identifier = requested_font.second.loading_input;
 
 		ensure(seeked_identifier.path.size() > 0);
-		ensure(seeked_identifier.characters.size() > 0);
-		ensure(seeked_identifier.pt > 0);
+		ensure(seeked_identifier.input.charset_path.size() > 0);
+		ensure(seeked_identifier.input.pt > 0);
 
 		for (const auto& a : atlases.metadatas) {
 			const auto it = a.second.fonts.find(seeked_identifier);

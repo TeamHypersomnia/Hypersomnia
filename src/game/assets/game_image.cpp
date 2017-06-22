@@ -4,37 +4,44 @@
 #include "augs/filesystem/file.h"
 #include "application/content_generation/desaturations.h"
 
-std::string game_image_definition::get_neon_map_path(const std::string& from_metafile_path) const {
+std::string game_image_definition::get_source_image_path(const std::string& from_definition_path) const {
+	return augs::replace_extension(from_definition_path, ".png");
+}
+
+std::string game_image_definition::get_neon_map_path(const std::string& from_definition_path) const {
 	if (custom_neon_map_path) {
 		return custom_neon_map_path.value();
 	}
 
-	const auto filename = augs::replace_extension(augs::get_filename(from_metafile_path), ".png");
-	return augs::replace_filename(from_metafile_path, "generated/neon_maps/" + filename);
+	const auto filename = augs::replace_extension(augs::get_filename(from_definition_path), ".png");
+	return augs::replace_filename(from_definition_path, "generated/neon_maps/" + filename);
 }
 
-std::string game_image_definition::get_desaturation_path(const std::string& from_metafile_path) const {
-	const auto filename = augs::replace_extension(augs::get_filename(from_metafile_path), ".png");
-	return augs::replace_filename(from_metafile_path, "generated/desaturations/" + filename);
+std::string game_image_definition::get_desaturation_path(const std::string& from_definition_path) const {
+	const auto filename = augs::replace_extension(augs::get_filename(from_definition_path), ".png");
+	return augs::replace_filename(from_definition_path, "generated/desaturations/" + filename);
 }
 
-std::string game_image_definition::get_scripted_image_path(const std::string& from_metafile_path) const {
-	const auto filename = augs::replace_extension(augs::get_filename(from_metafile_path), ".png");
-	return augs::replace_filename(from_metafile_path, "generated/scripted/" + filename);
+std::string game_image_definition::get_scripted_image_path(const std::string& from_definition_path) const {
+	const auto filename = augs::replace_extension(augs::get_filename(from_definition_path), ".png");
+	return augs::replace_filename(from_definition_path, "generated/scripted/" + filename);
 }
 
-std::string game_image_definition::get_button_with_corners_path_template(const std::string& from_metafile_path) const {
-	const auto filename = augs::replace_extension(augs::get_filename(from_metafile_path), "_%x.png");
-	return augs::replace_filename(from_metafile_path, "generated/buttons_with_corners/" + filename);
+std::string game_image_definition::get_button_with_corners_path_template(const std::string& from_definition_path) const {
+	const auto filename = augs::replace_extension(augs::get_filename(from_definition_path), "_%x.png");
+	return augs::replace_filename(from_definition_path, "generated/buttons_with_corners/" + filename);
 }
 
-void game_image_definition::regenerate_resources(const bool force_regenerate) const {
+void game_image_definition::regenerate_resources(
+	const std::string& definition_path,
+	const bool force_regenerate
+) const {
 	if (neon_map) {
 		ensure(!custom_neon_map_path.has_value() && "neon_map can't be specified if custom_neon_map_path already is.");
 		
 		regenerate_neon_map(
-			source_image_path, 
-			get_neon_map_path(), 
+			get_source_image_path(definition_path),
+			get_neon_map_path(definition_path),
 			neon_map.value(), 
 			force_regenerate
 		);
@@ -42,15 +49,15 @@ void game_image_definition::regenerate_resources(const bool force_regenerate) co
 	
 	if (should_generate_desaturation()) {
 		regenerate_desaturation(
-			source_image_path,
-			get_desaturation_path(), 
+			get_source_image_path(definition_path),
+			get_desaturation_path(definition_path),
 			force_regenerate
 		);
 	}
 
 	if (scripted_image) {
 		regenerate_scripted_image(
-			get_scripted_image_path(), 
+			get_scripted_image_path(definition_path),
 			scripted_image.value(), 
 			force_regenerate
 		);
@@ -58,24 +65,24 @@ void game_image_definition::regenerate_resources(const bool force_regenerate) co
 
 	if (button_with_corners) {
 		regenerate_button_with_corners(
-			get_button_with_corners_path_template(),
+			get_button_with_corners_path_template(definition_path),
 			button_with_corners.value(), 
 			force_regenerate
 		);
 	}
 }
 
-std::vector<source_image_loading_input> game_image_definition::get_atlas_inputs() const {
-	decltype(get_atlas_inputs()) output;
+std::vector<source_image_loading_input> game_image_definition::get_atlas_inputs(const std::string& definition_path) const {
+	decltype(get_atlas_inputs(definition_path)) output;
 
-	output.push_back({ source_image_path, assets::gl_texture_id::GAME_WORLD_ATLAS });
+	output.push_back({ get_source_image_path(definition_path), assets::gl_texture_id::GAME_WORLD_ATLAS });
 
 	if (neon_map) {
-		output.push_back({ get_neon_map_path(), assets::gl_texture_id::GAME_WORLD_ATLAS });
+		output.push_back({ get_neon_map_path(definition_path), assets::gl_texture_id::GAME_WORLD_ATLAS });
 	}
 
 	if (should_generate_desaturation()) {
-		output.push_back({ get_desaturation_path(), assets::gl_texture_id::GAME_WORLD_ATLAS });
+		output.push_back({ get_desaturation_path(definition_path), assets::gl_texture_id::GAME_WORLD_ATLAS });
 	}
 
 	return output;

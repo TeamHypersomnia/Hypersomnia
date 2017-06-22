@@ -45,7 +45,11 @@ components::transform get_attachment_offset(
 	return total;
 }
 
-components::transform sum_attachment_offsets(const const_logic_step, const inventory_item_address addr);
+components::transform sum_attachment_offsets(
+	const cosmos&, 
+	const all_logical_metas_of_assets&, 
+	const inventory_item_address addr
+);
 
 unsigned calculate_space_occupied_with_children(const_entity_handle item);
 

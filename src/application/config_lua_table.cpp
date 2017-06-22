@@ -16,6 +16,7 @@
 #include "augs/filesystem/file.h"
 
 static_assert(is_introspective_leaf_v<launch_type>);
+static_assert(has_enum_to_string_v<launch_type>);
 
 config_lua_table::config_lua_table(
 	const std::string& config_lua_path, 

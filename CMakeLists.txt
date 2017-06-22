@@ -15,7 +15,7 @@ option(BUILD_VERSION_FILE_GENERATOR "Build version file generator to generate co
 option(BUILD_ENET "Build ENet networking library." ON)
 option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ON)
 option(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE "Add command to archive builds in Release." ON)
-
+set(BUILD_TEST_SCENES FALSE)
 if (NOT HYPERSOMNIA_RUNTIME_ARCHIVE_DIR)
 	# By default, we set output directory for archives to completely outside of the source tree,
 	# because it might be useful to preserve some older builds even if the repository is deleted.
@@ -144,7 +144,6 @@ set(HYPERSOMNIA_TEST_SCENES_SRCS
 	"src/game/hardcoded_content/test_scenes/test_scene_sentience_properties.cpp"
 	"src/game/hardcoded_content/test_scenes/test_scene_tile_layers.cpp"
 	"src/game/hardcoded_content/test_scenes/test_scene_animations.cpp"
-	"src/game/hardcoded_content/test_scenes/test_scene_game_images.cpp"
 	"src/game/hardcoded_content/test_scenes/test_scene_sound_buffers.cpp"
 )
 
@@ -152,7 +151,6 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/application/config_lua_table.cpp"
 	"src/application/content_generation/desaturations.cpp"
 	"src/application/content_generation/buttons_with_corners.cpp"
-	"src/application/content_generation/polygonizations_of_images.cpp"
 	"src/application/content_generation/scripted_images.cpp"
 	"src/application/content_generation/neon_maps.cpp"
 	"src/application/content_generation/texture_atlases.cpp"
@@ -176,7 +174,6 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/augs/gui/text_drawer.cpp"
 	"src/augs/image/font.cpp"
 	"src/augs/image/image.cpp"
-	"src/augs/image/polygonize_image.cpp"
 	"src/augs/window_framework/log_color.cpp"
 	"src/augs/misc/action_list.cpp"
 	"src/augs/misc/enum_bitset.cpp"
@@ -407,10 +404,8 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/hardcoded_content/all_hardcoded_content.cpp"
 	"src/game/hardcoded_content/requisite/requisite_animations.cpp"
 	"src/game/hardcoded_content/requisite/requisite_atlases.cpp"
-	"src/game/hardcoded_content/requisite/requisite_game_images.cpp"
 	"src/game/hardcoded_content/requisite/requisite_shaders.cpp"
 	"src/game/hardcoded_content/requisite/requisite_sound_buffers.cpp"
-	"src/game/hardcoded_content/loader_utils.cpp"
 )
 
 if(BUILD_TEST_SCENES)
