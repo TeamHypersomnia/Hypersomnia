@@ -180,7 +180,13 @@ namespace augs {
 							}
 						}
 						else if constexpr(!is_padding_field_v<T>) {
-							read(input_table[label], field);
+							sol::object maybe_field = input_table[label];
+
+							const bool field_specified = maybe_field.is_valid();
+							
+							if (field_specified) {
+								read(maybe_field, field);
+							}
 						}
 					},
 					into

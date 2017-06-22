@@ -9,7 +9,6 @@
 #include "application/content_generation/desaturations.h"
 #include "application/content_generation/buttons_with_corners.h"
 #include "application/content_generation/scripted_images.h"
-#include "application/content_generation/polygonizations_of_images.h"
 
 #include "augs/graphics/OpenGL_includes.h"
 #include "augs/misc/lua_readwrite.h"

@@ -28,12 +28,6 @@ void convex_partitioned_shape::scale(const vec2 mult) {
 			v *= mult;
 		}
 	}
-
-#if ENABLE_POLYGONIZATION
-	for (auto& v : debug_original) {
-		v *= mult;
-	}
-#endif
 }
 
 void convex_partitioned_shape::add_concave_polygon(const std::vector<vec2> &verts) {

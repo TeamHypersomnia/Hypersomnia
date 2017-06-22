@@ -79,26 +79,19 @@ namespace augs {
 
 	struct font_loading_input {
 		// GEN INTROSPECTOR struct augs::font_loading_input
-		std::string source_font_path;
 		std::string charset_path;
-		
 		unsigned pt = 0u;
 		// END GEN INTROSPECTOR
-
-		bool operator==(const font_loading_input& b) const {
-			return 
-				source_font_path == b.source_font_path 
-				&& charset_path == b.charset_path 
-				&& pt == b.pt
-			;
-		}
 	};
 
 	struct font {
 		font_metadata_from_file meta;
 		std::vector<augs::image> glyph_bitmaps;
 
-		void from_file(const font_loading_input&);
+		void from_file(
+			const std::string& source_font_path,
+			const font_loading_input&
+		);
 	};
 }
 

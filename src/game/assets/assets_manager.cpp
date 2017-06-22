@@ -55,23 +55,12 @@ void assets_manager::load_baked_metadata(
 			assign_atlas_entry(baked_image.texture_maps[texture_map_type::DESATURATED], request.get_desaturation_path());
 		}
 
-		baked_image.settings = request.gui_usage;
+		if (request.gui_usage.has_value()) {
+			baked_image.settings = request.gui_usage.value();
+		}
 
-		{
-			const auto polygonization_path = request.get_polygonization_output_path();
-
-			if (augs::file_exists(polygonization_path)) {
-				const auto lines = augs::get_file_lines(polygonization_path);
-
-				for (const auto& l : lines) {
-					std::istringstream in(l);
-
-					vec2u new_point;
-					in >> new_point;
-
-					baked_image.polygonized.push_back(new_point);
-				}
-			}
+		if (request.physical_shape.has_value()) {
+			baked_image.polygonized = request.physical_shape.value();
 		}
 	}
 

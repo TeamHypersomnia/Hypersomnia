@@ -50,7 +50,6 @@ game_image_definitions load_test_scene_images() {
 		auto& in = output[game_image_id::JMIX114];
 		in.texture_maps[DIFFUSE] = { "content/gfx/jmix114.png", GAME_WORLD_ATLAS };
 		in.texture_maps[NEON] = { "generated/neon_maps/jmix114.png", GAME_WORLD_ATLAS };
-		in.polygonization_path = "generated/polygonizations_of_images/jmix114.points";
 	}
 
 	{

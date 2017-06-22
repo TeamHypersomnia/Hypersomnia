@@ -128,7 +128,6 @@ namespace augs {
 		unsigned get_columns() const;
 
 		bool in_bounds(const vec2u at_coordinates) const;
-		std::vector<vec2i> get_polygonized() const;
 		const rgba_channel* get_data() const;
 		const rgba& pixel(const vec2u at_coordinates) const;
 
