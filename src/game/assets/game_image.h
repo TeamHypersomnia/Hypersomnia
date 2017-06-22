@@ -38,7 +38,6 @@ struct game_image_definition {
 	game_image_gui_usage gui_usage;
 	bool generate_desaturation = false;
 
-	std::optional<button_with_corners_input> button_with_corners;
 	std::optional<scripted_image_input> scripted_image;
 	// END GEN INTROSPECTOR
 
@@ -48,16 +47,11 @@ struct game_image_definition {
 
 	std::string get_source_image_path(const std::string& from_definition_path) const;
 	
-	std::vector<std::string> get_diffuse_map_paths(const std::string& from_definition_path) const;
-
 	std::string get_neon_map_path(const std::string& from_definition_path) const;
 	std::string get_desaturation_path(const std::string& from_definition_path) const;
 
 	std::string get_scripted_image_path(const std::string& from_definition_path) const;
 	
-	std::string get_button_with_corners_path_template(const std::string& from_definition_path) const;
-	std::vector<std::string> get_button_with_corners_paths(const std::string& from_definition_path) const;
-
 	void regenerate_resources(
 		const std::string& definition_path, 
 		const bool force_regenerate

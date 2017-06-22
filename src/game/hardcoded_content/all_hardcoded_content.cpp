@@ -15,6 +15,8 @@
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 
+#include "augs/gui/button_corners_type.h"
+#include "augs/gui/button_corners.h"
 #include "generated/introspectors.h"
 
 using namespace augs::graphics;
@@ -82,27 +84,26 @@ void load_all_requisite(const config_lua_table& cfg) {
 		}
 	}
 
-	/*
-	augs::for_each_enum<game_image_id>(
-		[&images](const game_image_id id){
-			if (
-				id != game_image_id::INVALID
-				&& id != game_image_id::REQUISITE_COUNT
-				&& id != game_image_id::BLANK
-				&& id != game_image_id::COUNT
-			) {
-				const std::string stem = augs::enum_to_string(id);
-				game_image_definition rq;
-				rq.source_image_path = stem;
-				images[stem] = rq;
-			}
-		}
-	);
-	*/
-
 	LOG("\n--------------------------------------------\nChecking content integrity...");
 
 	const bool force_regenerate = cfg.debug_regenerate_content_every_launch;
+	
+	load_button_with_corners(
+		cfg.menu_button,
+		images,
+		assets::game_image_id::MENU_BUTTON_INSIDE,
+		"generated/content/requisite/gfx/buttons_with_corners/menu_button_%x.png",
+		cfg.debug_regenerate_content_every_launch
+	);
+
+	load_button_with_corners(
+		cfg.hotbar_button,
+		images,
+		assets::game_image_id::HOTBAR_BUTTON_INSIDE,
+		"generated/content/requisite/gfx/buttons_with_corners/hotbar_button_%x.png",
+		cfg.debug_regenerate_content_every_launch
+	);
+
 	regenerate_what_is_needed_for(images, force_regenerate);
 
 	atlases_regeneration_input in;

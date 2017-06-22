@@ -129,5 +129,23 @@ return {
   survey_num_file_path = "",
   window_border = true,
   window_name = "example",
-  window_pos = {x = 100, y = 10 }
+  window_pos = {x = 100, y = 10 },
+
+  hotbar_button = {
+    border_color = "255 255 255 255",
+    inside_color = "255 255 255 255",
+    lower_side = 20,
+    upper_side = 8,
+    inside_border_padding = 4,
+    make_lb_complement = true
+  },
+
+  menu_button = {
+    border_color = "255 255 255 255",
+    inside_color = "255 255 255 255",
+    lower_side = 12,
+    upper_side = 8,
+    inside_border_padding = 4,
+    make_lb_complement = false
+  }
 }

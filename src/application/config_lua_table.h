@@ -12,6 +12,7 @@
 #include "game/view/game_drawing_settings.h"
 #include "game/view/world_camera.h"
 
+#include "application/content_generation/buttons_with_corners.h"
 #include "application/config_structs/hotbar_settings.h"
 #include "application/config_structs/debug_drawing_settings.h"
 
@@ -133,6 +134,8 @@ public:
 	game_drawing_settings drawing_settings;
 	input_context controls;
 
+	button_with_corners_input menu_button;
+	button_with_corners_input hotbar_button;
 	// END GEN INTROSPECTOR
 
 	launch_type get_launch_mode() const;

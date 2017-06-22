@@ -18,71 +18,81 @@ void assets_manager::load_baked_metadata(
 ) {
 	auto& self = *this;
 
-	const std::string requisite_dir = "content/requisite/";
+	auto is_reserved_path = [](auto p) {
+		const std::string requisite_dir[] = { 
+			"content\\requisite\\", 
+			"generated\\content\\requisite\\",
+			"content/requisite/",
+			"generated/content/requisite/"
+		};
+		
+		for (auto dir : requisite_dir) {
+			if (dir == p.substr(0, dir.length())) {
+				return true;
+			}
+		}
+
+		return false;
+	};
 
 	for (const auto& requested_image : images) {
 		const auto definition_path = requested_image.first;
 		const auto& request = requested_image.second;
 
-		const bool is_reserved_asset =
-			requisite_dir == definition_path.substr(0, requisite_dir.length())
-		;
+		const bool is_reserved_asset = is_reserved_path(definition_path);
+		const auto diffuse_map_path = request.get_source_image_path(definition_path);
 
-		for (const auto& diffuse_map_path : request.get_diffuse_map_paths(definition_path)) {
-			assets::game_image_id image_id = assets::game_image_id::INVALID;
+		assets::game_image_id image_id = assets::game_image_id::INVALID;
 
-			if (is_reserved_asset) {
-				image_id = augs::string_to_enum_or<assets::game_image_id>(to_uppercase(augs::get_stem(diffuse_map_path)));
-			}
-			else {
-				// if it is not reserved, dynamically allocate id
-			}
+		if (is_reserved_asset) {
+			image_id = augs::string_to_enum_or<assets::game_image_id>(to_uppercase(augs::get_stem(diffuse_map_path)));
+		}
+		else {
+			// if it is not reserved, dynamically allocate id
+		}
 
-			ensure(is_reserved_asset);
-			ensure(image_id != assets::game_image_id::INVALID);
+		ensure(is_reserved_asset);
+		ensure(image_id != assets::game_image_id::INVALID);
 
-			auto& baked_image = self[image_id];
+		auto& baked_image = self[image_id];
 
-			auto assign_atlas_entry = [&](
-				augs::texture_atlas_entry& into, 
-				const source_image_identifier& p
-			) {
-				for (const auto& a : atlases.metadatas) {
-					const auto it = a.second.images.find(p);
+		auto assign_atlas_entry = [&](
+			augs::texture_atlas_entry& into, 
+			const source_image_identifier& p
+		) {
+			for (const auto& a : atlases.metadatas) {
+				const auto it = a.second.images.find(p);
 
-					if (it != a.second.images.end()) {
-						const auto found_atlas_entry = (*it).second;
-						into = found_atlas_entry;
+				if (it != a.second.images.end()) {
+					const auto found_atlas_entry = (*it).second;
+					into = found_atlas_entry;
 
-						break;
-					}
+					break;
 				}
-			};
-
-			assign_atlas_entry(baked_image.texture_maps[texture_map_type::DIFFUSE], diffuse_map_path);
-
-			if (request.neon_map || request.custom_neon_map_path) {
-				assign_atlas_entry(baked_image.texture_maps[texture_map_type::NEON], request.get_neon_map_path(diffuse_map_path));
 			}
+		};
 
-			if (request.generate_desaturation) {
-				assign_atlas_entry(baked_image.texture_maps[texture_map_type::DESATURATED], request.get_desaturation_path(diffuse_map_path));
-			}
+		assign_atlas_entry(baked_image.texture_maps[texture_map_type::DIFFUSE], diffuse_map_path);
 
-			baked_image.gui_usage = request.gui_usage;
+		if (request.neon_map || request.custom_neon_map_path) {
+			assign_atlas_entry(baked_image.texture_maps[texture_map_type::NEON], request.get_neon_map_path(definition_path));
+		}
 
-			if (request.physical_shape.has_value()) {
-				baked_image.polygonized = request.physical_shape.value();
-			}
+		if (request.generate_desaturation) {
+			assign_atlas_entry(baked_image.texture_maps[texture_map_type::DESATURATED], request.get_desaturation_path(definition_path));
+		}
+
+		baked_image.gui_usage = request.gui_usage;
+
+		if (request.physical_shape.has_value()) {
+			baked_image.polygonized = request.physical_shape.value();
 		}
 	}
 
 	for (const auto& requested_font : fonts) {
 		const auto definition_path = requested_font.first;
 
-		const bool is_reserved_asset =
-			requisite_dir == definition_path.substr(0, requisite_dir.length())
-		;
+		const bool is_reserved_asset = is_reserved_path(definition_path);
 
 		assets::font_id font_id = assets::font_id::INVALID;
 

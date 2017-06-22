@@ -6,6 +6,8 @@
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 
+#include "generated/introspectors.h"
+
 void regenerate_button_with_corners(
 	const std::string& output_path_template,
 	const button_with_corners_input input,
@@ -255,4 +257,30 @@ void create_and_save_button_with_corners(
 		inside.fill(in.inside_color);
 		save(button_corner_type::INSIDE, inside);
 	}
+}
+
+void load_button_with_corners(
+	const button_with_corners_input in,
+	game_image_definitions& into,
+	const assets::game_image_id first,
+	const std::string& path_template,
+	const bool force_regenerate
+) {
+	regenerate_button_with_corners(path_template, in, force_regenerate);
+
+	augs::for_each_enum<button_corner_type>([&](const button_corner_type type) {
+		if (type == button_corner_type::COUNT) {
+			return;
+		}
+
+		if (!in.make_lb_complement && is_lb_complement(type)) {
+			return;
+		}
+
+		const auto fictional_definition_path = augs::replace_extension(
+			typesafe_sprintf(path_template, get_filename_for(type)), ".lua"
+		);
+
+		into[fictional_definition_path] = game_image_definition();
+	});
 }
