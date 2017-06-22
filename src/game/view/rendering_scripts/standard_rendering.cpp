@@ -81,8 +81,8 @@ namespace rendering_scripts {
 			
 			vec2 upper(0.0f, 0.0f);
 			vec2 lower(1.0f, 1.0f);
-			upper = manager[assets::game_image_id::HUD_CIRCULAR_BAR_MEDIUM].texture_maps[texture_map_type::DIFFUSE].get_atlas_space_uv(upper);
-			lower = manager[assets::game_image_id::HUD_CIRCULAR_BAR_MEDIUM].texture_maps[texture_map_type::DIFFUSE].get_atlas_space_uv(lower);
+			upper = manager[assets::game_image_id::CIRCULAR_BAR_MEDIUM].texture_maps[texture_map_type::DIFFUSE].get_atlas_space_uv(upper);
+			lower = manager[assets::game_image_id::CIRCULAR_BAR_MEDIUM].texture_maps[texture_map_type::DIFFUSE].get_atlas_space_uv(lower);
 			const auto center = (upper + lower) / 2;
 		
 			glUniform2f(glGetUniformLocation(circular_bars_shader.id, "texture_center"), center.x, center.y);

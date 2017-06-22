@@ -5,8 +5,10 @@
 #include <experimental/filesystem>
 
 namespace augs {
-	bool create_directory(const std::string& filename);
-	bool create_directories(const std::string& filename);
+
+	bool create_directory(const std::string& dir_path);
+	bool create_directories(const std::string& dir_path);
+
 	std::vector<std::string> get_all_files_in_directory(const std::string& dir);
 
 	template <class P, class F>
@@ -18,7 +20,7 @@ namespace augs {
 
 		for (fs::recursive_directory_iterator i(path), end; i != end; ++i) {
 			if (!is_directory(i->path())) {
-				callback(i->path().filename().generic_string());
+				callback(i->path().generic_string());
 			}
 		}
 	}

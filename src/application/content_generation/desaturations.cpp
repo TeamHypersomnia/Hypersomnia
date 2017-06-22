@@ -50,6 +50,7 @@ void regenerate_desaturation(
 		source_image.from_file(source_path);
 		source_image.get_desaturated().save(output_path);
 
+		augs::create_directories(desaturation_stamp_path);
 		augs::create_binary_file(desaturation_stamp_path, new_stamp_stream);
 	}
 }

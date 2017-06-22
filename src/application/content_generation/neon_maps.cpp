@@ -2,6 +2,7 @@
 
 #include "neon_maps.h"
 #include "augs/filesystem/file.h"
+#include "augs/filesystem/directory.h"
 
 #include "augs/ensure.h"
 #include "augs/misc/streams.h"
@@ -80,6 +81,7 @@ void regenerate_neon_map(
 
 		source_image.save(neon_map_path);
 
+		augs::create_directories(neon_map_stamp_path);
 		augs::create_binary_file(neon_map_stamp_path, new_stamp_stream);
 	}
 }

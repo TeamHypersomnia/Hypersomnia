@@ -304,14 +304,14 @@ namespace rendering_scripts {
 			glUniform2f(glGetUniformLocation(circular_bars_shader.id, "texture_center"), center.x, center.y);
 		};
 
-		set_center_uniform(assets::game_image_id::HUD_CIRCULAR_BAR_MEDIUM);
+		set_center_uniform(assets::game_image_id::CIRCULAR_BAR_MEDIUM);
 
 		const auto textual_infos = draw_circular_bars_and_get_textual_info(step);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
 		
-		set_center_uniform(assets::game_image_id::HUD_CIRCULAR_BAR_SMALL);
+		set_center_uniform(assets::game_image_id::CIRCULAR_BAR_SMALL);
 
 		draw_hud_for_released_explosives(
 			output,

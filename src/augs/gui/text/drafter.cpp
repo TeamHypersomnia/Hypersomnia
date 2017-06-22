@@ -196,12 +196,14 @@ namespace augs {
 					/* if we allowed a null glyph in string, it must be newline */
 					const auto* const final_ptr = g ? g : ff.meta_from_file.get_glyph(L' ');
 
-					cached.push_back(final_ptr);
-					
-					cached_atlas_entries.push_back(
-						final_ptr ? 
-						&ff.glyphs_in_atlas[final_ptr - ff.meta_from_file.glyphs.data()] : nullptr
-					);
+					if (final_ptr != nullptr) {
+						cached.push_back(final_ptr);
+
+						cached_atlas_entries.push_back(
+							final_ptr ?
+							&ff.glyphs_in_atlas[final_ptr - ff.meta_from_file.glyphs.data()] : nullptr
+						);
+					}
 				}
 
 				vec2i pen(0, 0);

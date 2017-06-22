@@ -31,7 +31,7 @@ void create_default_definitions_in_dir(const std::string& dir_path) {
 		dir_path,
 		[](const std::string& path) {
 			if (augs::get_extension(path) == ".png") {
-				const auto path_of_meta = augs::replace_filename(path, ".lua");
+				const auto path_of_meta = augs::replace_extension(path, ".lua");
 
 				if (!augs::file_exists(path_of_meta)) {
 					augs::create_text_file(path_of_meta, "return {}");
@@ -55,7 +55,7 @@ void add_definitions_recursively_from_dir(const std::string& dir_path, T& into) 
 
 void load_all_requisite(const config_lua_table& cfg) {
 	auto& manager = get_assets_manager();
-
+	
 	game_image_definitions images;
 	game_font_definitions fonts;
 
@@ -66,7 +66,22 @@ void load_all_requisite(const config_lua_table& cfg) {
 	add_definitions_recursively_from_dir("content/official/gfx/", images);
 	add_definitions_recursively_from_dir("content/official/fonts/", fonts);
 #endif
-	
+
+	for (auto& f : fonts) {
+		// let the font definitions in .lua specify "path" relatively to the font definition file path
+		// usually just font name
+		const auto full_definition_path = f.first;
+
+		{
+			auto& relative_path = f.second.loading_input.path;
+			relative_path = augs::replace_filename(full_definition_path, relative_path);
+		}
+		{
+			auto& relative_path = f.second.loading_input.input.charset_path;
+			relative_path = augs::replace_filename(full_definition_path, relative_path);
+		}
+	}
+
 	/*
 	augs::for_each_enum<game_image_id>(
 		[&images](const game_image_id id){
@@ -96,7 +111,7 @@ void load_all_requisite(const config_lua_table& cfg) {
 		concatenate(in.images, i.second.get_atlas_inputs(i.first));
 	}
 
-	for (const auto& f : fonts) {
+	for (const auto f : fonts) {
 		in.fonts.push_back({ f.second.loading_input, f.second.target_atlas });
 	}
 

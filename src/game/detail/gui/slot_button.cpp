@@ -88,7 +88,7 @@ void slot_button::draw(const viewing_game_gui_context context, const const_this_
 		}
 
 		if (slot_type == slot_function::GUN_DETACHABLE_MAGAZINE) {
-			draw_centered_texture(context, this_id, info, augs::gui::material(assets::game_image_id::DETACHABLE_MAGAZINE_ICON, border_col));
+			draw_centered_texture(context, this_id, info, augs::gui::material(assets::game_image_id::DETACHABLE_MAGAZINE_SLOT_ICON, border_col));
 		}
 	}
 

@@ -19,8 +19,8 @@ namespace augs {
 				std::declval<const T>()
 			),
 			from_lua_value(
-				std::declval<T>(),
-				std::declval<sol::object>()
+				std::declval<sol::object>(),
+				std::declval<T>()
 			),
 			void()
 		)
@@ -41,7 +41,7 @@ namespace augs {
 	struct key_representable_as_lua_value : std::false_type {};
 
 	template <class T>
-	struct key_representable_as_lua_value<T, decltype(typename T::key_type, void())> 
+	struct key_representable_as_lua_value<T, decltype(typename T::key_type(), void())> 
 		: std::bool_constant<representable_as_lua_value_v<typename T::key_type>> {
 	};
 

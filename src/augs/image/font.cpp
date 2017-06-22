@@ -39,7 +39,9 @@ namespace augs {
 
 		FT_UInt g_index;
 
+		ensure_existence(in.charset_path);
 		const auto& chars = augs::get_file_contents(in.charset_path, wchar_t());
+		ensure(chars.size() > 0);
 
 		meta.glyphs.reserve(chars.size());
 		glyph_bitmaps.reserve(chars.size());

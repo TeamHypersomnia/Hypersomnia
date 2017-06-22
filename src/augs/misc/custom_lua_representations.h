@@ -8,6 +8,6 @@ namespace augs {
 
 	template <class I>
 	void from_lua_value(I& in, rgba& r) {
-		r.from_stream(std::istringstream(in.get<std::string>()));
+		r.from_stream(std::istringstream(in.as<std::string>()));
 	}
 }

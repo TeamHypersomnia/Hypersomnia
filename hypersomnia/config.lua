@@ -1,4 +1,4 @@
-{
+return {
   alternative_port = 0,
   audio_output_device = "",
   bpp = 24,
@@ -19,166 +19,46 @@
   connect_port = 0,
   controls = {
     key_to_intent = {
-      {
-        "Left Mouse Button",
-        "CROSSHAIR_PRIMARY_ACTION"
-      },
-      {
-        "Right Mouse Button",
-        "CROSSHAIR_SECONDARY_ACTION"
-      },
-      {
-        "Mouse Button 4",
-        "SWITCH_TO_GUI"
-      },
-      {
-        "Backspace",
-        "CLEAR_DEBUG_LINES"
-      },
-      {
-        "Caps Lock",
-        "DEBUG_SWITCH_CHARACTER"
-      },
-      {
-        "Space",
-        "SPACE_BUTTON"
-      },
-      {
-        "F2",
-        "SPECIAL_ACTION_BUTTON_8"
-      },
-      {
-        "F3",
-        "SPECIAL_ACTION_BUTTON_9"
-      },
-      {
-        "F4",
-        "SPECIAL_ACTION_BUTTON_10"
-      },
-      {
-        "F5",
-        "SPECIAL_ACTION_BUTTON_11"
-      },
-      {
-        "F6",
-        "SPECIAL_ACTION_BUTTON_12"
-      },
-      {
-        "A",
-        "MOVE_LEFT"
-      },
-      {
-        "B",
-        "SPECIAL_ACTION_BUTTON_5"
-      },
-      {
-        "C",
-        "SPECIAL_ACTION_BUTTON_3"
-      },
-      {
-        "D",
-        "MOVE_RIGHT"
-      },
-      {
-        "E",
-        "USE_BUTTON"
-      },
-      {
-        "F",
-        "SWITCH_WEAPON_LASER"
-      },
-      {
-        "G",
-        "THROW"
-      },
-      {
-        "H",
-        "HOLSTER"
-      },
-      {
-        "M",
-        "SPECIAL_ACTION_BUTTON_7"
-      },
-      {
-        "N",
-        "SPECIAL_ACTION_BUTTON_6"
-      },
-      {
-        "Q",
-        "PREVIOUS_HOTBAR_SELECTION_SETUP"
-      },
-      {
-        "S",
-        "MOVE_BACKWARD"
-      },
-      {
-        "V",
-        "SPECIAL_ACTION_BUTTON_4"
-      },
-      {
-        "W",
-        "MOVE_FORWARD"
-      },
-      {
-        "X",
-        "SPECIAL_ACTION_BUTTON_2"
-      },
-      {
-        "Z",
-        "SPECIAL_ACTION_BUTTON_1"
-      },
-      {
-        "0",
-        "HOTBAR_BUTTON_9"
-      },
-      {
-        "1",
-        "HOTBAR_BUTTON_0"
-      },
-      {
-        "2",
-        "HOTBAR_BUTTON_1"
-      },
-      {
-        "3",
-        "HOTBAR_BUTTON_2"
-      },
-      {
-        "4",
-        "HOTBAR_BUTTON_3"
-      },
-      {
-        "5",
-        "HOTBAR_BUTTON_4"
-      },
-      {
-        "6",
-        "HOTBAR_BUTTON_5"
-      },
-      {
-        "7",
-        "HOTBAR_BUTTON_6"
-      },
-      {
-        "8",
-        "HOTBAR_BUTTON_7"
-      },
-      {
-        "9",
-        "HOTBAR_BUTTON_8"
-      },
-      {
-        "Left Shift",
-        "SPRINT"
-      },
-      {
-        "Left Control",
-        "START_PICKING_UP_ITEMS"
-      },
-      {
-        "Dash",
-        "OPEN_DEVELOPER_CONSOLE"
-      }
+      ["0"] = "HOTBAR_BUTTON_9",
+      ["1"] = "HOTBAR_BUTTON_0",
+      ["2"] = "HOTBAR_BUTTON_1",
+      ["3"] = "HOTBAR_BUTTON_2",
+      ["4"] = "HOTBAR_BUTTON_3",
+      ["5"] = "HOTBAR_BUTTON_4",
+      ["6"] = "HOTBAR_BUTTON_5",
+      ["7"] = "HOTBAR_BUTTON_6",
+      ["8"] = "HOTBAR_BUTTON_7",
+      ["9"] = "HOTBAR_BUTTON_8",
+      A = "MOVE_LEFT",
+      B = "SPECIAL_ACTION_BUTTON_5",
+      Backspace = "CLEAR_DEBUG_LINES",
+      C = "SPECIAL_ACTION_BUTTON_3",
+      CapsLock = "DEBUG_SWITCH_CHARACTER",
+      D = "MOVE_RIGHT",
+      Dash = "OPEN_DEVELOPER_CONSOLE",
+      E = "USE_BUTTON",
+      F = "SWITCH_WEAPON_LASER",
+      F2 = "SPECIAL_ACTION_BUTTON_8",
+      F3 = "SPECIAL_ACTION_BUTTON_9",
+      F4 = "SPECIAL_ACTION_BUTTON_10",
+      F5 = "SPECIAL_ACTION_BUTTON_11",
+      F6 = "SPECIAL_ACTION_BUTTON_12",
+      G = "THROW",
+      H = "HOLSTER",
+      LeftControl = "START_PICKING_UP_ITEMS",
+      LeftMouseButton = "CROSSHAIR_PRIMARY_ACTION",
+      LeftShift = "SPRINT",
+      M = "SPECIAL_ACTION_BUTTON_7",
+      MouseButton4 = "SWITCH_TO_GUI",
+      N = "SPECIAL_ACTION_BUTTON_6",
+      Q = "PREVIOUS_HOTBAR_SELECTION_SETUP",
+      RightMouseButton = "CROSSHAIR_SECONDARY_ACTION",
+      S = "MOVE_BACKWARD",
+      Space = "SPACE_BUTTON",
+      V = "SPECIAL_ACTION_BUTTON_4",
+      W = "MOVE_FORWARD",
+      X = "SPECIAL_ACTION_BUTTON_2",
+      Z = "SPECIAL_ACTION_BUTTON_1"
     },
     map_mouse_motion_to = "MOVE_CROSSHAIR"
   },

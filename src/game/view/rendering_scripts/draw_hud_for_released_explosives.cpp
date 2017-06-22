@@ -42,8 +42,8 @@ namespace rendering_scripts {
 						components::sprite spr;
 
 						spr.set(
-							assets::game_image_id::HUD_CIRCULAR_BAR_SMALL, 
-							manager[assets::game_image_id::HUD_CIRCULAR_BAR_SMALL].get_size(),
+							assets::game_image_id::CIRCULAR_BAR_SMALL, 
+							manager[assets::game_image_id::CIRCULAR_BAR_SMALL].get_size(),
 							col
 						);
 

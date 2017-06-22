@@ -50,9 +50,10 @@ atlases_regeneration_output regenerate_atlases(
 	const auto& manager = get_assets_manager();
 
 	const std::string atlases_directory = "generated/atlases/";
+	augs::create_directories(atlases_directory);
 
 	for (const auto& input_for_this_atlas : per_atlas_inputs) {
-		const auto atlas_stem = typesafe_sprintf("%x", static_cast<int>(input_for_this_atlas.first));
+		const auto atlas_stem = augs::enum_to_string(input_for_this_atlas.first);
 		const auto atlas_image_path = atlases_directory + atlas_stem + (save_atlases_as_binary ? ".bin" : ".png");
 		const auto atlas_metadata_path = atlases_directory + atlas_stem + ".meta";
 		const auto atlas_stamp_path = atlases_directory + atlas_stem + ".stamp";

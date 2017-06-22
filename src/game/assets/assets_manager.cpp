@@ -18,58 +18,80 @@ void assets_manager::load_baked_metadata(
 ) {
 	auto& self = *this;
 
+	const std::string requisite_dir = "content/requisite/";
+
 	for (const auto& requested_image : images) {
-		const auto image_id = augs::string_to_enum_or<assets::game_image_id>(to_uppercase(requested_image.first));
-		const bool is_reserved_asset = image_id != assets::game_image_id::INVALID;
-
-		ensure(is_reserved_asset);
-
-		// if it is not reserved, dynamically allocate id
-		if (!is_reserved_asset) {
-
-		}
-
-		auto& baked_image = self[image_id];
-
-		const auto& definition_file_path = requested_image.first;
+		const auto definition_path = requested_image.first;
 		const auto& request = requested_image.second;
 
-		auto assign_atlas_entry = [&](
-			augs::texture_atlas_entry& into, 
-			const source_image_identifier& p
-		) {
-			for (const auto& a : atlases.metadatas) {
-				const auto it = a.second.images.find(p);
+		const bool is_reserved_asset =
+			requisite_dir == definition_path.substr(0, requisite_dir.length())
+		;
 
-				if (it != a.second.images.end()) {
-					const auto found_atlas_entry = (*it).second;
-					into = found_atlas_entry;
+		for (const auto& diffuse_map_path : request.get_diffuse_map_paths(definition_path)) {
+			assets::game_image_id image_id = assets::game_image_id::INVALID;
 
-					break;
-				}
+			if (is_reserved_asset) {
+				image_id = augs::string_to_enum_or<assets::game_image_id>(to_uppercase(augs::get_stem(diffuse_map_path)));
 			}
-		};
+			else {
+				// if it is not reserved, dynamically allocate id
+			}
 
-		assign_atlas_entry(baked_image.texture_maps[texture_map_type::DIFFUSE], request.get_source_image_path(definition_file_path));
+			ensure(is_reserved_asset);
+			ensure(image_id != assets::game_image_id::INVALID);
 
-		if (request.neon_map || request.custom_neon_map_path) {
-			assign_atlas_entry(baked_image.texture_maps[texture_map_type::NEON], request.get_neon_map_path(definition_file_path));
-		}
+			auto& baked_image = self[image_id];
 
-		if (request.generate_desaturation) {
-			assign_atlas_entry(baked_image.texture_maps[texture_map_type::DESATURATED], request.get_desaturation_path(definition_file_path));
-		}
+			auto assign_atlas_entry = [&](
+				augs::texture_atlas_entry& into, 
+				const source_image_identifier& p
+			) {
+				for (const auto& a : atlases.metadatas) {
+					const auto it = a.second.images.find(p);
 
-		baked_image.gui_usage = request.gui_usage;
+					if (it != a.second.images.end()) {
+						const auto found_atlas_entry = (*it).second;
+						into = found_atlas_entry;
 
-		if (request.physical_shape.has_value()) {
-			baked_image.polygonized = request.physical_shape.value();
+						break;
+					}
+				}
+			};
+
+			assign_atlas_entry(baked_image.texture_maps[texture_map_type::DIFFUSE], diffuse_map_path);
+
+			if (request.neon_map || request.custom_neon_map_path) {
+				assign_atlas_entry(baked_image.texture_maps[texture_map_type::NEON], request.get_neon_map_path(diffuse_map_path));
+			}
+
+			if (request.generate_desaturation) {
+				assign_atlas_entry(baked_image.texture_maps[texture_map_type::DESATURATED], request.get_desaturation_path(diffuse_map_path));
+			}
+
+			baked_image.gui_usage = request.gui_usage;
+
+			if (request.physical_shape.has_value()) {
+				baked_image.polygonized = request.physical_shape.value();
+			}
 		}
 	}
 
 	for (const auto& requested_font : fonts) {
-		const auto font_id = augs::string_to_enum_or<assets::font_id>(to_uppercase(requested_font.first));
-		const bool is_reserved_asset = font_id != assets::font_id::INVALID;
+		const auto definition_path = requested_font.first;
+
+		const bool is_reserved_asset =
+			requisite_dir == definition_path.substr(0, requisite_dir.length())
+		;
+
+		assets::font_id font_id = assets::font_id::INVALID;
+
+		if (is_reserved_asset) {
+			font_id = augs::string_to_enum_or<assets::font_id>(to_uppercase(augs::get_stem(definition_path)));
+		}
+		else {
+			// if it is not reserved, dynamically allocate id
+		}
 
 		ensure(is_reserved_asset);
 
@@ -109,10 +131,10 @@ void assets_manager::create(
 	augs::image atlas_image;
 
 	if (load_as_binary) {
-		atlas_image.from_binary_file(typesafe_sprintf("generated/atlases/%x.bin", static_cast<int>(id)));
+		atlas_image.from_binary_file(typesafe_sprintf("generated/atlases/%x.bin", augs::enum_to_string(id)));
 	}
 	else {
-		atlas_image.from_file(typesafe_sprintf("generated/atlases/%x.png", static_cast<int>(id)));
+		atlas_image.from_file(typesafe_sprintf("generated/atlases/%x.png", augs::enum_to_string(id)));
 	}
 
 	tex.create(atlas_image);

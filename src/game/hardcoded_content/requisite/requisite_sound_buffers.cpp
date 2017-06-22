@@ -4,11 +4,11 @@
 void load_requisite_sound_buffers(assets_manager& manager) {
 	{
 		auto& buf = manager[assets::sound_buffer_id::BUTTON_HOVER];
-		buf.from_file("content/sfx/button_hover.wav");
+		buf.from_file("content/requisite/sfx/button_hover.wav");
 	}
 
 	{
 		auto& buf = manager[assets::sound_buffer_id::BUTTON_CLICK];
-		buf.from_file("content/sfx/button_click.wav");
+		buf.from_file("content/requisite/sfx/button_click.wav");
 	}
 }

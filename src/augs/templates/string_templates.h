@@ -59,8 +59,9 @@ struct str_ops_impl {
 		return *this;
 	}
 
+	template <class Container>
 	auto multi_replace_all(
-		const std::vector<Str>& from, 
+		const Container& from,
 		const Str& to
 	) const {
 		for (const auto& f : from) {
@@ -68,6 +69,13 @@ struct str_ops_impl {
 		}
 
 		return *this;
+	}
+
+	auto multi_replace_all(
+		const std::initializer_list<Str>& from,
+		const Str& to
+	) const {
+		return multi_replace_all<decltype(from)>(from, to);
 	}
 
 	auto to_lowercase() const {
@@ -86,7 +94,7 @@ struct str_ops_impl {
 			subject.begin(),
 			subject.end(),
 			subject.begin(),
-			::tolower
+			::toupper
 		);
 		
 		return *this;

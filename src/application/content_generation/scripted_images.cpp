@@ -50,6 +50,7 @@ void regenerate_scripted_image(
 
 		resultant.save(output_image_path);
 
+		augs::create_directories(output_image_stamp_path);
 		augs::create_binary_file(output_image_stamp_path, new_stamp_stream);
 	}
 }
