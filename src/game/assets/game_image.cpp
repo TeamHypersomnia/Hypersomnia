@@ -3,7 +3,7 @@
 #include "game_image.h"
 #include "augs/filesystem/file.h"
 #include "application/content_generation/desaturations.h"
-#include "augs/gui/button_corners_type.h"
+#include "augs/gui/button_corner_type.h"
 #include "augs/gui/button_corners.h"
 
 #include "generated/introspectors.h"

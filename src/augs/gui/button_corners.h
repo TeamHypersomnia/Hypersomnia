@@ -3,7 +3,7 @@
 #include "augs/math/rects.h"
 #include "game/assets/game_image_id.h"
 #include "game/assets/assets_manager.h"
-#include "button_corners_type.h"
+#include "button_corner_type.h"
 
 std::string get_filename_for(const button_corner_type);
 

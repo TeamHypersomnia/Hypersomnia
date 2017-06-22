@@ -15,7 +15,7 @@
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 
-#include "augs/gui/button_corners_type.h"
+#include "augs/gui/button_corner_type.h"
 #include "augs/gui/button_corners.h"
 #include "generated/introspectors.h"
 
