@@ -17,6 +17,26 @@ void aabb_highlighter::update(const float delta_ms) {
 	timer = fmod(timer, cycle_duration_ms);
 }
 
+bool aabb_highlighter::is_hoverable(const const_entity_handle e) {
+	if (!e.is_inferred_state_activated()) {
+		return false;
+	}
+
+	const auto maybe_render = e.find<components::render>();
+
+	if (maybe_render && maybe_render->layer < render_layer::SMALL_DYNAMIC_BODY) {
+		return false;
+	}
+
+	if (e.has<components::particles_existence>()) {
+		return false;
+	}
+
+	LOG_NVPS(to_string(e.get_name()));
+
+	return true;
+}
+
 void aabb_highlighter::draw(
 	augs::vertex_triangle_buffer& output,
 	const const_entity_handle subject,
@@ -26,11 +46,7 @@ void aabb_highlighter::draw(
 	ltrb aabb;
 
 	const auto aabb_expansion_lambda = [&aabb, &interp](const const_entity_handle e) {
-		if (!e.is_inferred_state_activated()) {
-			return false;
-		}
-
-		if (e.has<components::particles_existence>() || e.has<components::crosshair>()) {
+		if (!is_hoverable(e)) {
 			return false;
 		}
 

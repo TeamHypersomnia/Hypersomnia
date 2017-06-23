@@ -149,5 +149,5 @@ return {
     make_lb_complement = false
   },
 
-  debug_minimal_test_scene = true
+  debug_minimal_test_scene = false
 }
