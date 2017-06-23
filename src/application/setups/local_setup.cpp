@@ -5,7 +5,7 @@
 #include "game/assets/assets_manager.h"
 
 #include "game/hardcoded_content/test_scenes/testbed.h"
-#include "game/hardcoded_content/test_scenes/one_entity.h"
+#include "game/hardcoded_content/test_scenes/minimal_scene.h"
 
 #include "game/transcendental/types_specification/all_component_includes.h"
 
@@ -34,7 +34,6 @@
 using namespace augs::window::event::keys;
 
 void local_setup::process(
-	
 	game_window& window,
 	viewing_session& session
 ) {
@@ -53,11 +52,20 @@ void local_setup::process(
 	if (!hypersomnia.load_from_file("save.state")) {
 		hypersomnia.set_fixed_delta(session.config.default_tickrate);
 		
-		test_scenes::testbed().populate_world_with_entities(
-			hypersomnia, 
-			metas_of_assets,
-			session.get_standard_post_solve()
-		);
+		if (session.config.debug_minimal_test_scene) {
+			test_scenes::minimal_scene().populate_world_with_entities(
+				hypersomnia,
+				metas_of_assets,
+				session.get_standard_post_solve()
+			);
+		}
+		else {
+			test_scenes::testbed().populate_world_with_entities(
+				hypersomnia, 
+				metas_of_assets,
+				session.get_standard_post_solve()
+			);
+		}
 	}
 
 	characters.acquire_available_characters(hypersomnia);

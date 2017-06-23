@@ -70,6 +70,8 @@ public:
 	bool debug_regenerate_content_every_launch = false;
 	unsigned packer_detail_max_atlas_size = 8192;
 
+	bool debug_minimal_test_scene = false;
+
 	bool debug_run_unit_tests = false;
 	bool debug_log_successful_unit_tests = false;
 	bool debug_break_on_unit_test_failure = false;

@@ -248,7 +248,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/enums/item_transfer_result_type.cpp"
 	"src/game/enums/slot_physical_behaviour.cpp"
 	"src/game/detail/ai/create_standard_behaviour_trees.cpp"
-	"src/game/hardcoded_content/test_scenes/one_entity.cpp"
+	"src/game/hardcoded_content/test_scenes/minimal_scene.cpp"
 	"src/game/hardcoded_content/test_scenes/testbed.cpp"
 	"src/game/systems_audiovisual/exploding_ring_system.cpp"
 	"src/game/systems_audiovisual/gui_element_system.cpp"

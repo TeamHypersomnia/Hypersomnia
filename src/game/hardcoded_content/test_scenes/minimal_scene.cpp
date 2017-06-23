@@ -1,9 +1,9 @@
 #include "generated/setting_build_test_scenes.h"
-#include "one_entity.h"
+#include "minimal_scene.h"
 
 #if BUILD_TEST_SCENES
 
-#include "one_entity.h"
+#include "minimal_scene.h"
 #include "game/hardcoded_content/ingredients/ingredients.h"
 #include "game/transcendental/cosmos.h"
 #include "game/assets/game_image_id.h"
@@ -44,7 +44,7 @@
 #include "game/hardcoded_content/all_hardcoded_content.h"
 #endif
 namespace test_scenes {
-	void one_entity::populate(const logic_step step) {
+	void minimal_scene::populate(const logic_step step) {
 #if BUILD_TEST_SCENES
 		auto& world = step.cosm;
 

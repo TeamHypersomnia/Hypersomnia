@@ -13,5 +13,14 @@ return {
       radius_towards_x_axis = 80,
       radius_towards_y_axis = 80,
       standard_deviation = 6
-    }
+    },
+
+    physical_shape = {
+    { x = 0, y = 0},
+{ x = 69, y = 0},
+{ x = 97, y = 58},
+{ x = 97, y = 191},
+{ x = 70, y = 249},
+{ x = 0, y = 249}
+  }
 }

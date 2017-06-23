@@ -147,5 +147,7 @@ return {
     upper_side = 8,
     inside_border_padding = 4,
     make_lb_complement = false
-  }
+  },
+
+  debug_minimal_test_scene = true
 }

@@ -14,7 +14,7 @@
 class cosmos;
 
 namespace test_scenes {
-	class one_entity {
+	class minimal_scene {
 		void populate(const logic_step);
 	public:
 
