@@ -101,10 +101,10 @@ return {
   jitter_buffer_ms = 0,
   last_session_update_link = "",
   latest_news_url = "",
-  launch_mode = "MAIN_MENU",
+  launch_mode = "LOCAL",
   max_number_of_sound_sources = 0,
   menu_intro_scene_entropy_path = "",
-  menu_intro_scene_cosmos_path = "", -- paste whatever to work
+  menu_intro_scene_cosmos_path = "abc", -- paste whatever to work
   menu_theme_path = "",
   misprediction_smoothing_multiplier = 1.2000000476837158,
   mouse_sensitivity = {

@@ -1,1 +1,3 @@
-return {}
+return {
+	generate_desaturation = true
+}

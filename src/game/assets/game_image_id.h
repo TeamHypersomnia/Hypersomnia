@@ -119,8 +119,6 @@ namespace assets {
 
 #if BUILD_TEST_SCENES
 		CRATE,
-		CRATE_DESTROYED,
-		CAR_INSIDE,
 		CAR_FRONT,
 
 		TRUCK_INSIDE,

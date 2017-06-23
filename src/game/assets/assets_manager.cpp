@@ -19,11 +19,15 @@ void assets_manager::load_baked_metadata(
 	auto& self = *this;
 
 	auto is_reserved_path = [](auto p) {
-		const std::string requisite_dir[] = { 
-			"content\\requisite\\", 
+		const std::string requisite_dir[] = {
+			"content\\requisite\\",
 			"generated\\content\\requisite\\",
 			"content/requisite/",
-			"generated/content/requisite/"
+			"generated/content/requisite/",
+			"content\\official\\",
+			"generated\\content\\official\\",
+			"content/official/",
+			"generated/content/official/"
 		};
 		
 		for (auto dir : requisite_dir) {

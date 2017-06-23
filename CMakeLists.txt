@@ -15,7 +15,7 @@ option(BUILD_VERSION_FILE_GENERATOR "Build version file generator to generate co
 option(BUILD_ENET "Build ENet networking library." ON)
 option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ON)
 option(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE "Add command to archive builds in Release." ON)
-set(BUILD_TEST_SCENES FALSE)
+
 if (NOT HYPERSOMNIA_RUNTIME_ARCHIVE_DIR)
 	# By default, we set output directory for archives to completely outside of the source tree,
 	# because it might be useful to preserve some older builds even if the repository is deleted.

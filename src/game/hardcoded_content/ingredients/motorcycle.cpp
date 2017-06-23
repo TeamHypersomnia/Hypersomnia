@@ -122,7 +122,7 @@ namespace prefabs {
 
 			render.layer = render_layer::CAR_WHEEL;
 
-			sprite.set(assets::game_image_id::CAR_INSIDE, { 40, 20 }, rgba(255, 255, 255, 0));
+			sprite.set(assets::game_image_id::BLANK, { 40, 20 }, rgba(255, 255, 255, 0));
 
 			vec2 offset(0, 0);
 			//((front.get<components::sprite>().get_size(metas).x / 2 + sprite.get_size(metas).x / 2) *  -1, 0);

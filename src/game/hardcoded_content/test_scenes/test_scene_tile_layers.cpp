@@ -12,7 +12,7 @@ void load_test_scene_tile_layers(assets_manager& manager) {
 
 		auto& metropolis_floor = manager[assets::tile_layer_id::METROPOLIS_FLOOR];
 
-		for (int i = int(assets::game_image_id::CATHEDRAL_TILE_1); i < int(assets::game_image_id::CATHEDRAL_TILE_49); ++i) {
+		for (int i = int(assets::game_image_id::CATHEDRAL_TILE_1); i <= int(assets::game_image_id::CATHEDRAL_TILE_49); ++i) {
 			components::sprite tt;
 			tt.set(assets::game_image_id(i), manager[assets::game_image_id(i)].get_size());
 			//if (
