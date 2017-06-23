@@ -37,8 +37,6 @@ namespace prefabs {
 
 		const auto si = world.get_si();
 
-		
-
 		const vec2 front_size = metas[assets::game_image_id::TRUCK_FRONT].get_size();
 		const vec2 interior_size = metas[assets::game_image_id::TRUCK_INSIDE].get_size();
 

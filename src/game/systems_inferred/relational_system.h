@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/misc/parent_child_tracker.h"
+#include "augs/misc/children_vector_tracker.h"
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
@@ -30,8 +30,8 @@ class relational_system {
 
 	void handle_deletion_of_potential_parent(const entity_id);
 
-	augs::parent_child_tracker<unversioned_entity_id, 1> fixtures_of_bodies;
-	augs::parent_child_tracker<unversioned_entity_id, 2> joints_of_bodies;
+	augs::children_vector_tracker<unversioned_entity_id, 1> fixtures_of_bodies;
+	augs::children_vector_tracker<unversioned_entity_id, 2> joints_of_bodies;
 
 	template <class F>
 	void for_each_tracker(F f) {

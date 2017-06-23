@@ -8,7 +8,7 @@
 
 namespace augs {
 	template <class id_type, std::size_t parent_count>
-	class parent_child_tracker {
+	class children_vector_tracker {
 	public:
 		using parent_array_type = std::array<id_type, parent_count>;
 	private:
@@ -27,7 +27,7 @@ namespace augs {
 		std::vector<parent_state> parent_caches;
 
 	public:
-		parent_child_tracker() {
+		children_vector_tracker() {
 			ensure(!is_valid_cache_id(id_type()));
 		}
 

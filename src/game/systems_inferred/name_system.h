@@ -2,7 +2,7 @@
 #include <unordered_set>
 #include <unordered_map>
 
-#include "augs/misc/parent_child_tracker.h"
+#include "augs/misc/children_vector_tracker.h"
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/components/name_component.h"

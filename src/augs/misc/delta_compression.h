@@ -47,7 +47,7 @@ namespace augs {
 		return output;
 	}
 
-	typedef char delta_unit;
+	using delta_unit = char;
 
 	template <class T, class = void>
 	class object_delta;
