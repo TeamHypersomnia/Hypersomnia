@@ -534,7 +534,7 @@ void perform_transfer(
 
 				fixtures_offset = sum_attachment_offsets(step.cosm, step.input.metas_of_assets, descendant.get_address_from_root(first_with_body));
 				
-				if (slot->physical_behaviour == slot_physical_behaviour::CONNECT_BODIES_BY_JOINT) {
+				if (slot->physical_behaviour == slot_physical_behaviour::CONNECT_AS_JOINTED_BODY) {
 					slot_requests_connection_of_bodies = true;
 					force_joint_offset = fixtures_offset;
 					target_transform = first_with_body.get_logic_transform() * force_joint_offset;

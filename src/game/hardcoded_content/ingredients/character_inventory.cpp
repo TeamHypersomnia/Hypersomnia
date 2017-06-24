@@ -20,7 +20,7 @@ namespace ingredients {
 
 		{
 			inventory_slot slot_def;
-			slot_def.physical_behaviour = slot_physical_behaviour::MAKE_BODIES_FIXTURES;
+			slot_def.physical_behaviour = slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY;
 			slot_def.always_allow_exactly_one_item = true;
 			slot_def.attachment_sticking_mode = rectangle_sticking::BOTTOM;
 			slot_def.attachment_offset.pos = { 0, -40 };
@@ -31,7 +31,7 @@ namespace ingredients {
 
 		{
 			inventory_slot slot_def;
-			slot_def.physical_behaviour = slot_physical_behaviour::MAKE_BODIES_FIXTURES;
+			slot_def.physical_behaviour = slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY;
 			slot_def.always_allow_exactly_one_item = true;
 			slot_def.attachment_sticking_mode = rectangle_sticking::TOP;
 			slot_def.attachment_offset.pos = { 0, 40 };
@@ -43,7 +43,7 @@ namespace ingredients {
 		{
 			inventory_slot slot_def;
 			slot_def.category_allowed = item_category::SHOULDER_CONTAINER;
-			slot_def.physical_behaviour = slot_physical_behaviour::MAKE_BODIES_FIXTURES;
+			slot_def.physical_behaviour = slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY;
 			slot_def.always_allow_exactly_one_item = true;
 			slot_def.attachment_sticking_mode = rectangle_sticking::LEFT;
 			slot_def.attachment_offset.pos = vec2(-bbox.x / 2 + 4, 0);
@@ -78,7 +78,7 @@ namespace prefabs {
 		{
 			inventory_slot slot_def;
 			slot_def.category_allowed = item_category::ARM_FRONT;
-			slot_def.physical_behaviour = slot_physical_behaviour::CONNECT_BODIES_BY_JOINT;
+			slot_def.physical_behaviour = slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY;
 			slot_def.always_allow_exactly_one_item = true;
 			slot_def.attachment_sticking_mode = rectangle_sticking::RIGHT;
 			slot_def.attachment_offset.pos = vec2(size.x / 2, primary ? -40 : 40);
@@ -113,7 +113,7 @@ namespace prefabs {
 		{
 			inventory_slot slot_def;
 			slot_def.category_allowed = item_category::GENERAL;
-			slot_def.physical_behaviour = slot_physical_behaviour::CONNECT_BODIES_BY_JOINT;
+			slot_def.physical_behaviour = slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY;
 			slot_def.always_allow_exactly_one_item = true;
 			slot_def.attachment_sticking_mode = rectangle_sticking::RIGHT;
 			slot_def.attachment_offset.pos = vec2(size.x / 2, 0);

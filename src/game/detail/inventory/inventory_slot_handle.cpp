@@ -116,7 +116,7 @@ typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot
 	const auto slot = get_container().get_current_slot();
 
 	if (slot.alive()) {
-		if (slot->physical_behaviour == slot_physical_behaviour::CONNECT_BODIES_BY_JOINT) {
+		if (slot->physical_behaviour == slot_physical_behaviour::CONNECT_AS_JOINTED_BODY) {
 			return get_container();
 		}
 

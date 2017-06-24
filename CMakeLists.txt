@@ -484,7 +484,7 @@ if(MSVC)
 	set(HYPERSOMNIA_LINKER_RELEASE_FLAGS "/LTCG /INCREMENTAL:NO /OPT:REF")
 
 	# We enable incremental LTCG for at least one release configuration,
-	# because LTCG takes vastly long even with just a single source file modified.
+	# because LTCG takes very long even with just a single source file modified.
 
 	set(HYPERSOMNIA_LINKER_RELWITHDEBINFO_FLAGS "/LTCG:incremental /INCREMENTAL:NO")
 else()

@@ -2,6 +2,6 @@
 
 enum class slot_physical_behaviour : unsigned char {
 	DEACTIVATE_BODIES,
-	MAKE_BODIES_FIXTURES,
-	CONNECT_BODIES_BY_JOINT
+	CONNECT_AS_FIXTURE_OF_BODY,
+	CONNECT_AS_JOINTED_BODY
 };

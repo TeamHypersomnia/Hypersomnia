@@ -63,7 +63,7 @@ namespace ingredients {
 
 		{
 			inventory_slot slot_def;
-			slot_def.physical_behaviour = slot_physical_behaviour::MAKE_BODIES_FIXTURES;
+			slot_def.physical_behaviour = slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY;
 			slot_def.always_allow_exactly_one_item = true;
 			slot_def.category_allowed = item_category::MAGAZINE;
 			slot_def.attachment_sticking_mode = rectangle_sticking::TOP;
@@ -85,7 +85,7 @@ namespace ingredients {
 
 		{
 			inventory_slot slot_def;
-			slot_def.physical_behaviour = slot_physical_behaviour::MAKE_BODIES_FIXTURES;
+			slot_def.physical_behaviour = slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY;
 			slot_def.always_allow_exactly_one_item = true;
 			slot_def.category_allowed = item_category::MUZZLE_ATTACHMENT;
 			slot_def.attachment_sticking_mode = rectangle_sticking::RIGHT;
