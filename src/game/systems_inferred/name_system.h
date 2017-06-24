@@ -44,10 +44,11 @@ class name_system {
 
 	void create_additional_inferred_state(const cosmos_global_state&);
 	void destroy_additional_inferred_state(const cosmos_global_state&);
-
-public:
-	std::unordered_set<entity_id> get_entities_by_name_id(const entity_name_id) const;
-	std::unordered_set<entity_id> get_entities_by_name(const entity_name_type& full_name) const;
+	
+	
+	/* 
+		For access of name synchronizer
+	*/
 
 	/*
 		If a name exists, assigns the id of the existent name to the name component.
@@ -56,16 +57,20 @@ public:
 
 	void set_name(
 		entity_name_metas& metas,
-		const entity_name_type& full_name, 
-		components::name& name_of_subject, 
+		const entity_name_type& full_name,
+		components::name& name_of_subject,
 		const entity_id subject
 	);
 
 	void set_name_id(
-		const entity_name_id name_id, 
-		components::name& name_of_subject, 
+		const entity_name_id name_id,
+		components::name& name_of_subject,
 		const entity_id subject
 	);
+
+public:
+	std::unordered_set<entity_id> get_entities_by_name_id(const entity_name_id) const;
+	std::unordered_set<entity_id> get_entities_by_name(const entity_name_type& full_name) const;
 
 	const entity_name_type& get_name(
 		const entity_name_metas& metas,

@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/build_settings/setting_entity_tracks_name_for_debug.h"
 #include "augs/misc/pooled_object_id.h"
 #include "augs/misc/trivially_copyable_tuple.h"
 #include "augs/templates/type_matching_and_indexing.h"
@@ -31,6 +32,9 @@ namespace augs {
 
 		fundamental_components_tuple fundamentals;
 		dynamic_component_id_tuple component_ids;
+#if ENTITY_TRACKS_NAME_FOR_DEBUG
+		const std::wstring* debug_name = nullptr;
+#endif
 
 		template <class component>
 		void set_id(const pooled_object_id<component> to) {

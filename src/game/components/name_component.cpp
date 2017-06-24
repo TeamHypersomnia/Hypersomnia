@@ -1,8 +1,12 @@
-#include "name_component.h"
+#include "augs/build_settings/setting_entity_tracks_name_for_debug.h"
+
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/systems_inferred/name_system.h"
+
 #include "game/components/all_inferred_state_component.h"
+#include "game/components/name_component.h"
+
+#include "game/systems_inferred/name_system.h"
 
 entity_id get_first_named_ancestor(const const_entity_handle p) {
 	entity_id iterator = p;
@@ -50,6 +54,12 @@ void component_synchronizer<false, N>::set_name(const entity_name_type& full_nam
 		get_data(),
 		handle
 	);
+
+#if ENTITY_TRACKS_NAME_FOR_DEBUG
+	const auto* new_name = &get_name();
+	auto& debug_name = handle.get().debug_name;
+	debug_name = new_name;
+#endif
 }
 
 void component_synchronizer<false, N>::set_name_id(const entity_name_id id) const {
@@ -58,6 +68,12 @@ void component_synchronizer<false, N>::set_name_id(const entity_name_id id) cons
 		get_data(),
 		handle
 	);
+
+#if ENTITY_TRACKS_NAME_FOR_DEBUG
+	const auto* new_name = &get_name();
+	auto& debug_name = handle.get().debug_name;
+	debug_name = new_name;
+#endif
 }
 
 template class basic_name_synchronizer<false>;

@@ -70,6 +70,8 @@ private:
 	template <bool, class> friend class relations_mixin;
 	template <bool, class> friend class basic_relations_mixin;
 	template <bool> friend class basic_entity_handle;
+	// for debug names
+	friend class component_synchronizer<false, components::name>;
 
 	using owner_reference = maybe_const_ref_t<is_const, cosmos>;
 	using aggregate_ptr = maybe_const_ptr_t<is_const, put_all_components_into_t<augs::component_aggregate>>;
