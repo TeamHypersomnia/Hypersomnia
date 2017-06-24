@@ -10,7 +10,7 @@
 #include "game/enums/renderable_drawing_type.h"
 
 #include "augs/graphics/drawers.h"
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 
 namespace components {
 	struct sprite {

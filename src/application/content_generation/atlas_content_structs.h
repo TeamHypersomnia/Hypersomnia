@@ -7,7 +7,7 @@
 #include "game/assets/game_image_id.h"
 #include "game/assets/font_id.h"
 
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 
 using source_image_identifier = std::string;
 

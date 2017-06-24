@@ -5,7 +5,7 @@
 #include "game/enums/render_layer.h"
 #include "augs/graphics/rgba.h"
 
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 
 namespace components {
 	struct render {

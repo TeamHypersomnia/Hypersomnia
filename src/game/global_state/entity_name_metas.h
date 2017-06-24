@@ -1,6 +1,6 @@
 #pragma once
 #include <unordered_map>
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 #include "game/components/name_component_declaration.h"
 #include "augs/templates/container_templates.h"
 

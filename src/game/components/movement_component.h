@@ -6,7 +6,7 @@
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 
 struct movement_subscribtion {
 	// GEN INTROSPECTOR struct movement_subscribtion

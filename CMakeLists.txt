@@ -408,6 +408,12 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/hardcoded_content/requisite/requisite_sound_buffers.cpp"
 )
 
+if(MSVC)
+	list(APPEND HYPERSOMNIA_CODEBASE_SRCS
+		"src/game/transcendental/entity_handle.natvis"
+	)
+endif()
+
 if(BUILD_TEST_SCENES)
 	list(APPEND HYPERSOMNIA_CODEBASE_SRCS
 		${HYPERSOMNIA_TEST_SCENES_SRCS}

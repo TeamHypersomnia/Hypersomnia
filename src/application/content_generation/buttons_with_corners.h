@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/graphics/rgba.h"
 #include "augs/misc/templated_readwrite.h"
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 
 #include "game/assets/game_image_structs.h"
 

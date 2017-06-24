@@ -1,6 +1,6 @@
 #pragma once
 #include <array>
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 #include "augs/graphics/rgba.h"
 
 struct hotbar_settings {

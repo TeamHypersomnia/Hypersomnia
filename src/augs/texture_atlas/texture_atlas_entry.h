@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/math/vec2.h"
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 
 namespace augs {
 	struct texture_atlas_entry {

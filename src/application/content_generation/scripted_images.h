@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/graphics/rgba.h"
 #include "augs/misc/templated_readwrite.h"
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 #include "augs/image/image.h"
 
 struct scripted_image_input {

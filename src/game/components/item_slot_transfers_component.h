@@ -7,7 +7,7 @@
 
 #include "game/transcendental/entity_handle_declaration.h"
 #include "augs/misc/stepped_timing.h"
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 
 struct item_slot_mounting_operation {
 	// GEN INTROSPECTOR struct item_slot_mounting_operation

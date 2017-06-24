@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 
 struct pathfinding_settings {
 	// GEN INTROSPECTOR struct pathfinding_settings

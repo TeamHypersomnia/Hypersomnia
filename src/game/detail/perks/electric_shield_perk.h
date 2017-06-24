@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 #include "game/detail/perks/perk_structs.h"
 
 struct electric_shield_perk_instance {

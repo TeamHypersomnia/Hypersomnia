@@ -2,7 +2,7 @@
 #include "augs/math/vec2.h"
 #include "game/transcendental/entity_id.h"
 #include "3rdparty/Box2D/Dynamics/b2Fixture.h"
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 
 class pathfinding_system;
 

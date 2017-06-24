@@ -2,7 +2,7 @@
 #include "augs/math/vec2.h"
 #include "augs/misc/randomization.h"
 #include "augs/misc/minmax.h"
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 
 class processing_system;
 

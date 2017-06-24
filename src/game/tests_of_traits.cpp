@@ -11,7 +11,7 @@
 #include "augs/templates/container_traits.h"
 #include "game/components/pathfinding_component.h"
 
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 
 namespace templates_detail {
 	template <class T>

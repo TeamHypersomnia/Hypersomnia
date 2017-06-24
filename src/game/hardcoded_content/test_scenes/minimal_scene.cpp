@@ -72,7 +72,7 @@ namespace test_scenes {
 				transform.pos.x += 200;
 			}
 
-			const auto new_character = prefabs::create_sample_complete_character(step, transform, typesafe_sprintf("player%x", i), 0);
+			const auto new_character = prefabs::create_sample_complete_character(step, transform, typesafe_sprintf("player%x", i), 1);
 
 			new_characters[i] = new_character;
 

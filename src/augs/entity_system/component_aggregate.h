@@ -5,6 +5,7 @@
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/templates/transform_types.h"
 #include "augs/templates/component_traits.h"
+#include "augs/pad_bytes.h"
 
 namespace augs {
 	template <class... components>
@@ -34,6 +35,9 @@ namespace augs {
 		dynamic_component_id_tuple component_ids;
 #if ENTITY_TRACKS_NAME_FOR_DEBUG
 		const std::wstring* debug_name = nullptr;
+#else
+		/* For Release/Debug compatibility of savefiles */
+		pad_bytes<sizeof(const std::wstring*)> pad;
 #endif
 
 		template <class component>

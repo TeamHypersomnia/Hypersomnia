@@ -7,7 +7,7 @@
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "game/detail/gui/game_gui_context.h"
 
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 
 struct slot_button : game_gui_rect_node {
 	typedef dereferenced_location<slot_button_in_container> this_in_container;

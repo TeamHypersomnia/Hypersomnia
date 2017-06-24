@@ -3,7 +3,7 @@
 #include "augs/math/vec2.h"
 #include "game/enums/input_recording_type.h"
 
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 #include "augs/graphics/rgba.h"
 #include "augs/misc/basic_input_context.h"
 

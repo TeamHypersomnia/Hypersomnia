@@ -6,7 +6,7 @@
 
 #include "augs/misc/stepped_timing.h"
 
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/step_declaration.h"

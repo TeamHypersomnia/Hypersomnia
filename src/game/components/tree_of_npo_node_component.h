@@ -3,7 +3,7 @@
 #include "game/enums/tree_of_npo_type.h"
 #include "augs/math/vec2.h"
 #include "augs/math/rects.h"
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 
 /* NPO stands for "non-physical objects" */
 

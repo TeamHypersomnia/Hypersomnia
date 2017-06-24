@@ -1,7 +1,7 @@
 #pragma once
 #include <type_traits>
 #include "augs/ensure.h"
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 
 #include "augs/templates/memcpy_safety.h"
 #include "augs/templates/type_matching_and_indexing.h"

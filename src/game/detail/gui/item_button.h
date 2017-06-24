@@ -7,7 +7,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/assets/assets_manager.h"
 
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 #include "game/assets/assets_manager.h"
 
 #include "game_gui_context.h"

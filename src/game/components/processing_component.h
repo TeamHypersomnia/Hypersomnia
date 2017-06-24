@@ -2,7 +2,7 @@
 #include "game/enums/processing_subjects.h"
 #include "game/transcendental/component_synchronizer.h"
 
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 #include "augs/misc/enum_boolset.h"
 
 namespace components {

@@ -7,7 +7,7 @@
 
 #include "game/transcendental/component_synchronizer.h"
 
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 #include "game/components/all_inferred_state_component.h"
 
 namespace components {

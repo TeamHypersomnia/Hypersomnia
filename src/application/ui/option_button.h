@@ -3,7 +3,7 @@
 #include "augs/gui/appearance_detector.h"
 #include "augs/gui/material.h"
 
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 
 #include "game/assets/game_image_id.h"
 

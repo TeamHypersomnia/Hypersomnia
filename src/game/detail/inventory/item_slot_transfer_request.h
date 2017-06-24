@@ -1,7 +1,7 @@
 #pragma once
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/memcpy_safety.h"
 

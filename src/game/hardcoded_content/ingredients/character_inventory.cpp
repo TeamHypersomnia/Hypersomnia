@@ -20,7 +20,7 @@ namespace ingredients {
 
 		{
 			inventory_slot slot_def;
-			slot_def.physical_behaviour = slot_physical_behaviour::CONNECT_BODIES_BY_JOINT;
+			slot_def.physical_behaviour = slot_physical_behaviour::MAKE_BODIES_FIXTURES;
 			slot_def.always_allow_exactly_one_item = true;
 			slot_def.attachment_sticking_mode = rectangle_sticking::BOTTOM;
 			slot_def.attachment_offset.pos = { 0, -40 };
@@ -31,7 +31,7 @@ namespace ingredients {
 
 		{
 			inventory_slot slot_def;
-			slot_def.physical_behaviour = slot_physical_behaviour::CONNECT_BODIES_BY_JOINT;
+			slot_def.physical_behaviour = slot_physical_behaviour::MAKE_BODIES_FIXTURES;
 			slot_def.always_allow_exactly_one_item = true;
 			slot_def.attachment_sticking_mode = rectangle_sticking::TOP;
 			slot_def.attachment_offset.pos = { 0, 40 };

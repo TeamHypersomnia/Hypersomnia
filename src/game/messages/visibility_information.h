@@ -7,7 +7,7 @@
 #include "game/components/transform_component.h"
 #include "3rdparty/Box2D/Dynamics/b2Fixture.h"
 #include "augs/math/vec2.h"
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 
 enum class visibility_type {
 	NONE,

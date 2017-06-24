@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 
 #include "augs/audio/sound_effect_modifier.h"
 

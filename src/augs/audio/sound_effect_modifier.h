@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 
 namespace augs {
 	struct sound_effect_modifier {

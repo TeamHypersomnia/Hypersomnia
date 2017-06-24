@@ -19,7 +19,7 @@
 #include "augs/misc/delta.h"
 #include "gui_event.h"
 #include "gui_traversal_structs.h"
-#include "augs/padding_byte.h"
+#include "augs/pad_bytes.h"
 
 namespace augs {
 	namespace gui {
