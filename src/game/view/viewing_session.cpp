@@ -13,7 +13,7 @@
 
 viewing_session::viewing_session(
 	const vec2i screen_size,
-	config_lua_table& config
+	const config_lua_table& config
 ) : config(config) {
 	systems_audiovisual.get<sound_system>().initialize_sound_sources(32u);
 	

@@ -85,7 +85,7 @@ return {
   doublebuffer = true,
   drawing_settings = {
     draw_character_gui = true,
-    draw_gui_overlays = true,
+    draw_crosshairs = true,
     draw_weapon_laser = true,
     show_profile_details = false
   },
@@ -102,7 +102,7 @@ return {
   jitter_buffer_ms = 0,
   last_session_update_link = "",
   latest_news_url = "",
-  launch_mode = "LOCAL",
+  launch_mode = "MAIN_MENU",
   max_number_of_sound_sources = 0,
   menu_intro_scene_entropy_path = "",
   menu_intro_scene_cosmos_path = "abc", -- paste whatever to work

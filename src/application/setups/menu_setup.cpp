@@ -38,8 +38,10 @@
 #include "augs/graphics/drawers.h"
 #include "game/detail/visible_entities.h"
 #include "application/config_lua_table.h"
+#include "augs/misc/lua_readwrite.h"
 
 #include "augs/audio/sound_samples_from_file.h"
+#include "generated/introspectors.h"
 
 using namespace augs::window::event::keys;
 using namespace augs::gui::text;
@@ -56,6 +58,7 @@ void menu_setup::process(
 	cosmos intro_scene(3000);
 
 	session.reserve_caches_for_entities(3000);
+	augs::load_from_lua_table(session.config, "content/menu/config.lua");
 
 	augs::single_sound_buffer menu_theme;
 	augs::sound_source menu_theme_source;

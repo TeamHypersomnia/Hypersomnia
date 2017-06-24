@@ -44,7 +44,7 @@ namespace augs {
 
 class viewing_session {
 public:
-	config_lua_table& config;
+	config_lua_table config;
 
 	world_camera camera;
 	vec2i viewport_coordinates;
@@ -66,7 +66,7 @@ public:
 
 	viewing_session(
 		const vec2i screen_size,
-		config_lua_table&
+		const config_lua_table&
 	);
 
 	void set_screen_size(const vec2i);
