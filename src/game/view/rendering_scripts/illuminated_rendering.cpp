@@ -371,7 +371,7 @@ namespace rendering_scripts {
 			camera
 		);
 
-		if (settings.draw_gui_overlays && controlled_entity.alive()) {
+		if (settings.draw_character_gui && controlled_entity.alive()) {
 			if (controlled_entity.has<components::item_slot_transfers>()) {
 				step.session.systems_audiovisual.get<gui_element_system>().get_character_gui(controlled_entity).draw(
 					step,

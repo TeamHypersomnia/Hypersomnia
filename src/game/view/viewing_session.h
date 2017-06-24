@@ -51,7 +51,6 @@ public:
 	aabb_highlighter world_hover_highlighter;
 	storage_for_all_systems_audiovisual systems_audiovisual;
 
-	bool show_profile_details = true;
 	bool gui_look_enabled = false;
 
 	augs::variable_delta_timer frame_timer;

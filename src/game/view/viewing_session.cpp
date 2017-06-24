@@ -82,7 +82,7 @@ void viewing_session::control_and_remove_fetched_intents(game_intent_vector& int
 			fetch = true;
 
 			if (intent.is_pressed) {
-				show_profile_details = !show_profile_details;
+				config.drawing_settings.show_profile_details = !config.drawing_settings.show_profile_details;
 			}
 		}
 		else if (intent.intent == intent_type::SWITCH_WEAPON_LASER) {
@@ -245,7 +245,7 @@ void viewing_session::view(
 
 	using namespace augs::gui::text;
 
-	if (show_profile_details) {
+	if (config.drawing_settings.show_profile_details) {
 		quick_print(
 			renderer.triangles, 
 			multiply_alpha(augs::gui::text::format_recent_global_log(assets::font_id::GUI_FONT), 150.f / 255), 
@@ -284,7 +284,7 @@ void viewing_session::view(
 				rot,
 				vel.x,
 				vel.y
-			) + summary() + cosmos.profiler.sorted_summary(show_profile_details) + L"\n",
+			) + summary() + cosmos.profiler.sorted_summary(config.drawing_settings.show_profile_details) + L"\n",
 
 			gui_style
 		);

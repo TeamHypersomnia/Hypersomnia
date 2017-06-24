@@ -51,7 +51,6 @@ void choreographic_setup::process(
 	game_window& window,
 	viewing_session& session
 ) {
-	session.show_profile_details = false;
 	session.reserve_caches_for_entities(3000);
 
 	const auto lines = augs::get_file_lines(session.config.choreographic_input_scenario_path);

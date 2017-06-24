@@ -56,11 +56,6 @@ void menu_setup::process(
 	cosmos intro_scene(3000);
 
 	session.reserve_caches_for_entities(3000);
-	session.show_profile_details = true;
-	session.config.camera_settings.averages_per_sec /= 2;
-
-	session.config.drawing_settings.draw_gui_overlays = false;
-	session.config.drawing_settings.draw_crosshairs = false;
 
 	augs::single_sound_buffer menu_theme;
 	augs::sound_source menu_theme_source;

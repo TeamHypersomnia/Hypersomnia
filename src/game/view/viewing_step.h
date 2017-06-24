@@ -24,8 +24,8 @@ public:
 		const visible_entities&
 	);
 
-	camera_cone camera;
-	entity_id viewed_character;
+	const camera_cone camera;
+	const entity_id viewed_character;
 	const visible_entities& visible;
 	const double interpolation_ratio = 0.0;
 
