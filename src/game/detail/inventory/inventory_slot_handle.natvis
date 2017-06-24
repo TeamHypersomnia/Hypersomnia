@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="basic_inventory_slot_handle&lt;*&gt;">
+    <DisplayString>{{ Type={raw_id.type} Container={raw_id.container_entity} }}</DisplayString>
+</Type>
+</AutoVisualizer>

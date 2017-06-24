@@ -23,7 +23,7 @@ struct basic_inventory_slot_id {
 	bool operator!=(const basic_inventory_slot_id b) const;
 };
 
-typedef basic_inventory_slot_id<entity_id> inventory_slot_id;
+using inventory_slot_id = basic_inventory_slot_id<entity_id>;
 
 struct inventory_item_address {
 	entity_id root_container;

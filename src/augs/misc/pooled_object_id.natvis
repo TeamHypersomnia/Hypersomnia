@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="augs::pooled_object_id&lt;*&gt;">
+    <DisplayString>{{ {indirection_index}:{version} }}</DisplayString>
+  </Type>
+  <Type Name="augs::unversioned_id&lt;*&gt;">
+    <DisplayString>{{ {indirection_index} }}</DisplayString>
+  </Type>
+</AutoVisualizer>

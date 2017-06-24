@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
   <Type Name="basic_entity_handle&lt;*&gt;">
-    <DisplayString>{{ Name={ptr->debug_name} }}</DisplayString>
+    <DisplayString>{{ Name={ptr->debug_name} Id={raw_id} }}</DisplayString>
 <!-- <Expand>
 
       <Item Name="[capacity]" ExcludeView="simple">{{ std::get<components::guid>(ptr->fundamentals).guid }}</Item>

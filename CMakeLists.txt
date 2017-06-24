@@ -411,6 +411,8 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 if(MSVC)
 	list(APPEND HYPERSOMNIA_CODEBASE_SRCS
 		"src/game/transcendental/entity_handle.natvis"
+		"src/game/detail/inventory/inventory_slot_handle.natvis"
+		"src/augs/misc/pooled_object_id.natvis"
 	)
 endif()
 
