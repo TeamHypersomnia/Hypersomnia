@@ -32,7 +32,7 @@ namespace augs {
 
 				if constexpr(!is_component_fundamental_v<component>) {
 					auto& component_pool = self.template get_component_pool<component>();
-					component_pool.initialize_space(n);
+					component_pool.reserve(n);
 				}
 			};
 

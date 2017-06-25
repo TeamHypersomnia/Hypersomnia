@@ -181,7 +181,7 @@ void cosmos::complete_reinference(const const_entity_handle h) {
 }
 
 void cosmos::reserve_storage_for_entities(const size_t n) {
-	get_aggregate_pool().initialize_space(n);
+	get_aggregate_pool().reserve(n);
 	reserve_storage_for_all_components(n);
 
 	auto reservation_lambda = [n](auto& sys) {

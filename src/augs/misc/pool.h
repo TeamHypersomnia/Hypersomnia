@@ -9,12 +9,12 @@
 
 namespace augs {
 	template<class T>
-	class EMPTY_BASES pool_base : public subscript_operator_for_get_handle_mixin<pool_base<T>> {
+	class EMPTY_BASES pool : public subscript_operator_for_get_handle_mixin<pool<T>> {
 	public:
 		using id_type = pooled_object_id<T>;
 		using unversioned_id_type = unversioned_id<T>;
-		using handle_type = handle_for_pool_container<false, pool_base<T>, T>;
-		using const_handle_type = handle_for_pool_container<true, pool_base<T>, T>;
+		using handle_type = handle_for_pool_container<false, pool<T>, T>;
+		using const_handle_type = handle_for_pool_container<true, pool<T>, T>;
 
 		using pooled_container_type = std::vector<T>;
 
@@ -22,7 +22,7 @@ namespace augs {
 	
 	protected:
 		struct metadata {
-			int pointing_indirector = -1;
+			std::size_t pointing_indirector = -1;
 		};
 
 		struct indirector {
@@ -33,48 +33,15 @@ namespace augs {
 		pooled_container_type pooled;
 		std::vector<metadata> slots;
 		std::vector<indirector> indirectors;
-		std::vector<int> free_indirectors;
-
-		template<class F>
-		bool internal_free(
-			const id_type object, 
-			F custom_mover
-		) {
-			if (!alive(object)) {
-				return false;
-			}
-
-			const unsigned dead_index = get_real_index(object);
-
-			// add dead object's indirector to the free indirection list
-			free_indirectors.push_back(slots[dead_index].pointing_indirector);
-
-			// therefore we must increase version of the dead indirector
-			++indirectors[object.indirection_index].version;
-
-			if (dead_index != size() - 1) {
-				int indirector_of_last_element = slots[size() - 1].pointing_indirector;
-
-				// change last element's indirector - set it to the dead element's index
-				indirectors[indirector_of_last_element].real_index = dead_index;
-
-				slots[dead_index] = std::move(slots[size() - 1]);
-				pooled[dead_index] = std::move(pooled[size() - 1]);
-				custom_mover(dead_index, size() - 1);
-			}
-
-			slots.pop_back();
-			pooled.pop_back();
-
-			return true;
-		}
+		std::vector<std::size_t> free_indirectors;
 
 	public:
-		pool_base(const std::size_t slot_count = 0u) {
-			initialize_space(slot_count);
+		pool(const std::size_t slot_count = 0u) {
+			reserve(slot_count);
 		}
 
-		void initialize_space(const std::size_t slot_count) {
+		/* right now that call overwrites of free_indirectors */
+		void reserve(const std::size_t slot_count) {
 			pooled.clear();
 			indirectors.clear();
 			slots.clear();
@@ -98,7 +65,7 @@ namespace augs {
 				throw std::runtime_error("Pool is full!");
 			}
 
-			const int next_free_indirector = free_indirectors.back();
+			const auto next_free_indirector = free_indirectors.back();
 			free_indirectors.pop_back();
 
 			indirector& indirector = indirectors[next_free_indirector];
@@ -114,13 +81,38 @@ namespace augs {
 			allocated_id.indirection_index = next_free_indirector;
 
 			slots.push_back(new_slot);
-			pooled.push_back(T(std::forward<Args>(args)...));
+			pooled.emplace_back(std::forward<Args>(args)...);
 
 			return allocated_id;
 		}
 
 		bool free(const id_type object) {
-			return internal_free(object, [](auto...) {});
+			if (!alive(object)) {
+				return false;
+			}
+
+			const auto dead_index = get_real_index(object);
+
+			// add dead object's indirector to the list of free indirectors
+			free_indirectors.push_back(slots[dead_index].pointing_indirector);
+
+			// therefore we must increase version of the dead indirector
+			++indirectors[object.indirection_index].version;
+
+			if (dead_index != size() - 1) {
+				const auto indirector_of_last_element = slots[size() - 1].pointing_indirector;
+
+				// change last element's indirector - set it to the dead element's index
+				indirectors[indirector_of_last_element].real_index = dead_index;
+
+				slots[dead_index] = std::move(slots[size() - 1]);
+				pooled[dead_index] = std::move(pooled[size() - 1]);
+			}
+
+			slots.pop_back();
+			pooled.pop_back();
+
+			return true;
 		}
 
 		id_type make_versioned(const unversioned_id_type unv) const {
@@ -199,7 +191,7 @@ namespace augs {
 			std::for_each(pooled.begin(), pooled.end(), f);
 		}
 		
-		unsigned get_real_index(const id_type obj) const {
+		auto get_real_index(const id_type obj) const {
 			return indirectors[obj.indirection_index].real_index;
 		}
 
@@ -237,11 +229,11 @@ namespace augs {
 			return pooled.data();
 		}
 
-		std::size_t size() const {
+		auto size() const {
 			return slots.size();
 		}
 
-		std::size_t capacity() const {
+		auto capacity() const {
 			return indirectors.size();
 		}
 
@@ -264,10 +256,6 @@ namespace augs {
 			augs::read_with_capacity(ar, indirectors);
 			augs::read_with_capacity(ar, free_indirectors);
 		}
-	};
-
-	template <class T>
-	class pool : public pool_base<T> {
 	};
 
 	template <class T>

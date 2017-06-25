@@ -306,17 +306,29 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				}
 
 				if (total_recoil_amount > 0.f) {
-					auto& rigid_body = it.get<components::rigid_body>();
+					auto& rigid_body_of_gun = it.get<components::rigid_body>();
 					const auto recoil_dir = vec2().set_from_degrees(muzzle_transform.rotation);
 
-					rigid_body.apply_impulse(
-						recoil_dir * (-total_recoil_amount) * 800.f * rigid_body.get_mass()
-					);
-					
-					rigid_body.apply_impulse(
-						recoil_dir.perpendicular_cw() * (-total_recoil_amount) * 380.f * rigid_body.get_mass(),
-						-recoil_dir * 55.f
-					);
+					if (rigid_body_of_gun.is_activated()) {
+						rigid_body_of_gun.apply_impulse(
+							recoil_dir * (-total_recoil_amount) * 800.f * rigid_body_of_gun.get_mass()
+						);
+
+						rigid_body_of_gun.apply_impulse(
+							recoil_dir.perpendicular_cw() * (-total_recoil_amount) * 380.f * rigid_body_of_gun.get_mass(),
+							-recoil_dir * 55.f
+						);
+					}
+					else {
+						const auto recoil_body = owning_sentience
+							[child_entity_name::CHARACTER_CROSSHAIR]
+							[child_entity_name::CROSSHAIR_RECOIL_BODY]
+						.get<components::rigid_body>();
+
+						recoil_body.apply_angular_impulse(
+							total_recoil_amount * recoil_body.get_inertia() * 10.f
+						);
+					}
 
 					gun.current_heat = std::min(gun.maximum_heat, gun.current_heat + gun.gunshot_adds_heat);
 				}

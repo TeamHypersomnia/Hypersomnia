@@ -82,8 +82,7 @@ TEST_CASE("Ca TriviallyCopyableTuple") {
 
 	{
 		static_assert(alignof(cosmos_base::aggregate_pool_type) == 4, "Trait failed");
-		cosmos_base::aggregate_pool_type pool;
-		pool.initialize_space(2);
+		cosmos_base::aggregate_pool_type pool(2);
 		REQUIRE(pool.size() == 0);
 		pool.allocate();
 		REQUIRE(pool.size() == 1);
