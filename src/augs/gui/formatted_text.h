@@ -43,6 +43,7 @@ namespace augs {
 			);
 
 			formatted_string multiply_alpha(formatted_string, const float);
+			formatted_string set_alpha(formatted_string, const rgba_channel);
 			formatted_string set_alpha(formatted_string, const float);
 
 			std::wstring formatted_string_to_wstring(const formatted_string& f);

@@ -14,13 +14,11 @@ namespace augs {
 				const assets::font_id f,
 				unsigned lines_remaining
 			) {
-				using g_log = global_log;
-
 				formatted_string result;
 
-				lines_remaining = std::min(lines_remaining, g_log::all_entries.size());
+				lines_remaining = std::min(lines_remaining, global_log::all_entries.size());
 
-				for (auto it = g_log::all_entries.end() - lines_remaining; it != g_log::all_entries.end(); ++it) {
+				for (auto it = global_log::all_entries.end() - lines_remaining; it != global_log::all_entries.end(); ++it) {
 					auto wstr = to_wstring((*it).text + "\n");
 					result += format(wstr, style(f, rgba((*it).color)));
 
@@ -33,7 +31,7 @@ namespace augs {
 			std::wstring formatted_string_to_wstring(
 				const formatted_string& f
 			) {
-				const size_t l = f.size();
+				const std::size_t l = f.size();
 				
 				std::wstring out;
 				out.reserve(l);
@@ -58,13 +56,20 @@ namespace augs {
 
 			formatted_string set_alpha(
 				formatted_string f, 
-				const float m
+				const rgba_channel m
 			) {
 				for (auto& c : f) {
-					c.format.color.a = static_cast<unsigned char>(m);
+					c.format.color.a = m;
 				}
 
 				return f;
+			}
+
+			formatted_string set_alpha(
+				formatted_string f,
+				const float m
+			) {
+				return set_alpha(f, static_cast<rgba_channel>(255 * m));
 			}
 
 			void format(
@@ -102,7 +107,7 @@ namespace augs {
 				const std::wstring& input_str, 
 				const style default_style
 			) {
-				typedef unsigned char flag;
+				using flag = unsigned char;
 				std::vector<flag> characters_to_skip;
 
 				characters_to_skip.resize(input_str.size());
@@ -170,24 +175,29 @@ namespace augs {
 						new_style.color = turquoise;
 					}
 
-					for (size_t i = begin_of_opening_tag; i < end_of_opening_tag; ++i) {
+					for (std::size_t i = begin_of_opening_tag; i < end_of_opening_tag; ++i) {
 						characters_to_skip[i] = 1u;
 					}
 
-					for (size_t i = begin_of_closing_tag; i < end_of_closing_tag; ++i) {
+					for (std::size_t i = begin_of_closing_tag; i < end_of_closing_tag; ++i) {
 						characters_to_skip[i] = 1u;
 					}
 
-					for (size_t c = end_of_opening_tag; c < begin_of_closing_tag; ++c) {
+					for (std::size_t c = end_of_opening_tag; c < begin_of_closing_tag; ++c) {
 						output[c].set_format(new_style);
 					}
 
 					begin_of_opening_tag = input_str.find(opening_tag_body, end_of_closing_tag);
 				}
 
-				size_t idx = 0;
+				std::size_t idx = 0;
 
-				erase_if(output, [&characters_to_skip, &idx](auto){ return characters_to_skip[idx++] != 0u; });
+				erase_if(
+					output, 
+					[&characters_to_skip, &idx](auto){ 
+						return characters_to_skip[idx++] != 0u; 
+					}
+				);
 
 				return output;
 			}

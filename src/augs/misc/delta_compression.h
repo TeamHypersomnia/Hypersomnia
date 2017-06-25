@@ -241,11 +241,11 @@ namespace augs {
 
 	template <class T>
 	void read_delta(
-		T& decode_target,
+		T& into,
 		stream& in,
 		const bool read_changed_bit = false
 	) {
 		auto dt = object_delta<T>(in, read_changed_bit);
-		dt.decode_into(decode_target);
+		dt.decode_into(into);
 	}
 }

@@ -9,15 +9,15 @@ namespace augs {
 			return
 				(s1 > s2) &&
 				(s1 - s2 <= std::numeric_limits<T>::max() / 2)
-				||
-				(s2 > s1) &&
-				(s2 - s1  > std::numeric_limits<T>::max() / 2);
+			||	(s2 > s1) &&
+				(s2 - s1  > std::numeric_limits<T>::max() / 2)
+			;
 		}
 		
 		template <class T>
-		T sequence_distance(T _s1, T _s2) {
-			T& s1 = _s1 > _s2 ? _s1 : _s2;
-			T& s2 = _s1 > _s2 ? _s2 : _s1;
+		T sequence_distance(const T _s1, const T _s2) {
+			const auto s1 = _s1 > _s2 ? _s1 : _s2;
+			const auto s2 = _s1 > _s2 ? _s2 : _s1;
 
 			if (s1 - s2 <= std::numeric_limits<T>::max() / 2) {
 				return s1 - s2;
