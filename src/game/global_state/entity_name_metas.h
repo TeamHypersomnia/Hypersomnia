@@ -25,6 +25,10 @@ public:
 		return name;
 	}
 
+	bool has_description() const {
+		return description != L"No description";
+	}
+
 	entity_name_meta(const entity_name_type& name = L"Invalid") : name(name) {}
 };
 

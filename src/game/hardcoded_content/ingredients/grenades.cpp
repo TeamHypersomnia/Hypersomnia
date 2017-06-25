@@ -21,7 +21,7 @@
 namespace prefabs {
 	entity_handle create_force_grenade(const logic_step step, vec2 pos) {
 		auto& world = step.cosm;
-		const auto grenade_entity = world.create_entity("force_grenade");
+		const auto grenade_entity = world.create_entity("Force grenade");
 
 		auto& sender = grenade_entity += components::sender();
 		auto& explosive = grenade_entity += components::explosive();
@@ -53,13 +53,21 @@ namespace prefabs {
 		grenade_entity += shape_circle;
 
 		grenade_entity.add_standard_components(step);
+		
+		auto& meta = grenade_entity.get_meta_of_name();
+
+		if (!meta.has_description()) {
+			meta.description =
+				L"Throwable explosive with a three seconds delay.\nDeals damage to [color=red]Health[/color]."
+			;
+		}
 
 		return grenade_entity;
 	}
 
 	entity_handle create_ped_grenade(const logic_step step, vec2 pos) {
 		auto& world = step.cosm;
-		const auto grenade_entity = world.create_entity("ped_grenade");
+		const auto grenade_entity = world.create_entity("PED grenade");
 
 		auto& sender = grenade_entity += components::sender();
 		auto& explosive = grenade_entity += components::explosive();
@@ -93,12 +101,20 @@ namespace prefabs {
 
 		grenade_entity.add_standard_components(step);
 
+		auto& meta = grenade_entity.get_meta_of_name();
+
+		if (!meta.has_description()) {
+			meta.description =
+				L"Throwable explosive with a three seconds delay.\nDrains [color=cyan]Personal Electricity[/color].\nIf the subject has [color=turquoise]Electric Shield[/color] enabled,\n the effect is doubled."
+				;
+		}
+
 		return grenade_entity;
 	}
 
 	entity_handle create_interference_grenade(const logic_step step, vec2 pos) {
 		auto& world = step.cosm;
-		const auto grenade_entity = world.create_entity("interference_grenade");
+		const auto grenade_entity = world.create_entity("Interference grenade");
 		
 		auto& sender = grenade_entity += components::sender();
 		auto& explosive = grenade_entity += components::explosive();
@@ -131,6 +147,14 @@ namespace prefabs {
 		grenade_entity += shape_circle;
 
 		grenade_entity.add_standard_components(step);
+
+		auto& meta = grenade_entity.get_meta_of_name();
+
+		if (!meta.has_description()) {
+			meta.description =
+				L"Throwable explosive with a three seconds delay.\nDeals damage to [color=orange]Consciousness[/color].\nCauses massive aimpunch."
+			;
+		}
 
 		return grenade_entity;
 	}
