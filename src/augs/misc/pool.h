@@ -11,14 +11,14 @@ namespace augs {
 	template<class T>
 	class EMPTY_BASES pool_base : public subscript_operator_for_get_handle_mixin<pool_base<T>> {
 	public:
-		typedef pooled_object_id<T> id_type;
-		typedef unversioned_id<T> unversioned_id_type;
-		typedef handle_for_pool_container<false, pool_base<T>, T> handle_type;
-		typedef handle_for_pool_container<true, pool_base<T>, T> const_handle_type;
+		using id_type = pooled_object_id<T>;
+		using unversioned_id_type = unversioned_id<T>;
+		using handle_type = handle_for_pool_container<false, pool_base<T>, T>;
+		using const_handle_type = handle_for_pool_container<true, pool_base<T>, T>;
 
-		typedef std::vector<T> pooled_container_type;
+		using pooled_container_type = std::vector<T>;
 
-		typedef T element_type;
+		using element_type = T;
 	
 	protected:
 		struct metadata {
@@ -70,11 +70,11 @@ namespace augs {
 		}
 
 	public:
-		pool_base(const size_t slot_count = 0u) {
+		pool_base(const std::size_t slot_count = 0u) {
 			initialize_space(slot_count);
 		}
 
-		void initialize_space(const size_t slot_count) {
+		void initialize_space(const std::size_t slot_count) {
 			pooled.clear();
 			indirectors.clear();
 			slots.clear();
@@ -87,7 +87,7 @@ namespace augs {
 
 			free_indirectors.resize(slot_count);
 
-			for (size_t i = 0; i < slot_count; ++i) {
+			for (std::size_t i = 0; i < slot_count; ++i) {
 				free_indirectors[i] = i;
 			}
 		}
@@ -103,7 +103,7 @@ namespace augs {
 
 			indirector& indirector = indirectors[next_free_indirector];
 
-			const size_t new_slot_index = size();
+			const std::size_t new_slot_index = size();
 
 			metadata new_slot;
 			new_slot.pointing_indirector = next_free_indirector;
@@ -142,7 +142,7 @@ namespace augs {
 		void for_each_object_and_id(Pred f) {
 			id_type id;
 
-			for (size_t i = 0; i < size(); ++i) {
+			for (std::size_t i = 0; i < size(); ++i) {
 				const metadata& s = slots[i];
 				id.indirection_index = s.pointing_indirector;
 				id.version = indirectors[s.pointing_indirector].version;
@@ -155,7 +155,7 @@ namespace augs {
 		void for_each_object_and_id(Pred f) const {
 			id_type id;
 
-			for (size_t i = 0; i < size(); ++i) {
+			for (std::size_t i = 0; i < size(); ++i) {
 				const metadata& s = slots[i];
 				id.indirection_index = s.pointing_indirector;
 				id.version = indirectors[s.pointing_indirector].version;
@@ -167,7 +167,7 @@ namespace augs {
 		void for_each_id(Pred f) {
 			id_type id;
 
-			for (size_t i = 0; i < size(); ++i) {
+			for (std::size_t i = 0; i < size(); ++i) {
 				const metadata& s = slots[i];
 				id.indirection_index = s.pointing_indirector;
 				id.version = indirectors[s.pointing_indirector].version;
@@ -180,7 +180,7 @@ namespace augs {
 		void for_each_id(Pred f) const {
 			id_type id;
 
-			for (size_t i = 0; i < size(); ++i) {
+			for (std::size_t i = 0; i < size(); ++i) {
 				const metadata& s = slots[i];
 				id.indirection_index = s.pointing_indirector;
 				id.version = indirectors[s.pointing_indirector].version;
@@ -237,11 +237,11 @@ namespace augs {
 			return pooled.data();
 		}
 
-		size_t size() const {
+		std::size_t size() const {
 			return slots.size();
 		}
 
-		size_t capacity() const {
+		std::size_t capacity() const {
 			return indirectors.size();
 		}
 
@@ -271,7 +271,7 @@ namespace augs {
 	};
 
 	template <class T>
-	struct make_pool { typedef pool<T> type; };
+	struct make_pool { using type = pool<T>; };
 }
 
 namespace augs {
