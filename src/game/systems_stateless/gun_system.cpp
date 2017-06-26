@@ -50,30 +50,30 @@ void components::gun::load_next_round(
 	const logic_step step
 ) {
 	auto& cosmos = step.cosm;
-	const auto it = step.cosm[subject];
+	const auto gun_entity = step.cosm[subject];
 
-	thread_local decltype(inventory_slot::items_inside) take_next_catridge_for_chamber_from;
-	take_next_catridge_for_chamber_from.clear();
+	thread_local decltype(inventory_slot::items_inside) next_catridge_from;
+	next_catridge_from.clear();
 
-	const auto chamber_magazine_slot = it[slot_function::GUN_CHAMBER_MAGAZINE];
+	const auto chamber_magazine_slot = gun_entity[slot_function::GUN_CHAMBER_MAGAZINE];
 
 	if (chamber_magazine_slot.alive()) {
-		take_next_catridge_for_chamber_from = chamber_magazine_slot.get_items_inside();
+		next_catridge_from = chamber_magazine_slot.get_items_inside();
 	}
 	else {
-		const auto detachable_magazine_slot = it[slot_function::GUN_DETACHABLE_MAGAZINE];
+		const auto detachable_magazine_slot = gun_entity[slot_function::GUN_DETACHABLE_MAGAZINE];
 
 		if (detachable_magazine_slot.alive() && detachable_magazine_slot.has_items()) {
 			const auto magazine = cosmos[detachable_magazine_slot.get_items_inside()[0]];
 
-			take_next_catridge_for_chamber_from = magazine[slot_function::ITEM_DEPOSIT].get_items_inside();
+			next_catridge_from = magazine[slot_function::ITEM_DEPOSIT].get_items_inside();
 		}
 	}
 
-	if (take_next_catridge_for_chamber_from.size() > 0) {
+	if (next_catridge_from.size() > 0) {
 		const item_slot_transfer_request into_chamber_transfer{ 
-			take_next_catridge_for_chamber_from[take_next_catridge_for_chamber_from.size() - 1], 
-			it[slot_function::GUN_CHAMBER], 
+			next_catridge_from[next_catridge_from.size() - 1], 
+			gun_entity[slot_function::GUN_CHAMBER], 
 			1, 
 			true 
 		};
@@ -87,8 +87,8 @@ void gun_system::consume_gun_intents(const logic_step step) {
 	const auto& delta = step.get_delta();
 	const auto& events = step.transient.messages.get_queue<messages::intent_message>();
 
-	for (const auto& it : events) {
-		auto* const maybe_gun = cosmos[it.subject].find<components::gun>();
+	for (const auto& gun_entity : events) {
+		auto* const maybe_gun = cosmos[gun_entity.subject].find<components::gun>();
 		
 		if (maybe_gun == nullptr) {
 			continue;
@@ -96,11 +96,11 @@ void gun_system::consume_gun_intents(const logic_step step) {
 
 		auto& gun = *maybe_gun;
 
-		if (it.intent == intent_type::PRESS_GUN_TRIGGER) {
-			gun.is_trigger_pressed = it.is_pressed;
+		if (gun_entity.intent == intent_type::PRESS_GUN_TRIGGER) {
+			gun.is_trigger_pressed = gun_entity.is_pressed;
 		}
 
-		if (it.intent == intent_type::RELOAD && it.is_pressed) {
+		if (gun_entity.intent == intent_type::RELOAD && gun_entity.is_pressed) {
 			
 		}
 	}
@@ -122,15 +122,15 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 	cosmos.for_each(
 		processing_subjects::WITH_GUN,
-		[&](const auto it) {
-			const auto gun_transform = it.get_logic_transform();
-			const auto owning_capability = it.get_owning_transfer_capability();
+		[&](const auto gun_entity) {
+			const auto gun_transform = gun_entity.get_logic_transform();
+			const auto owning_capability = gun_entity.get_owning_transfer_capability();
 			
 			const auto owning_sentience = 
 				(owning_capability.alive() && owning_capability.has<components::sentience>()) ? owning_capability : cosmos[entity_id()]
 			;
 
-			components::gun& gun = it.get<components::gun>();
+			components::gun& gun = gun_entity.get<components::gun>();
 
 			const auto magic_missile_def = cosmos[gun.magic_missile_definition];
 			const auto is_magic_launcher = magic_missile_def.alive();
@@ -142,7 +142,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				has_enough_physical_bullets = true;
 			}
 			else {
-				has_enough_physical_bullets = it[slot_function::GUN_CHAMBER].get_items_inside().size() > 0;
+				has_enough_physical_bullets = gun_entity[slot_function::GUN_CHAMBER].get_items_inside().size() > 0;
 			}
 
 			const bool has_enough_mana = (
@@ -168,7 +168,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				messages::gunshot_response response;
 
 				response.muzzle_transform = muzzle_transform;
-				response.subject = it;
+				response.subject = gun_entity;
 
 				float total_recoil_amount = 0.f;
 
@@ -176,7 +176,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					const auto round_entity = cosmos.clone_entity(magic_missile_def); //??
 
 					auto& sender = round_entity.get<components::sender>();
-					sender.set(it);
+					sender.set(gun_entity);
 
 					auto& missile = round_entity.get<components::missile>();
 					total_recoil_amount += missile.recoil_multiplier;
@@ -203,7 +203,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					step.transient.messages.post(request);
 				}
 				else {
-					const auto chamber_slot = it[slot_function::GUN_CHAMBER];
+					const auto chamber_slot = gun_entity[slot_function::GUN_CHAMBER];
 					const auto catridge_in_chamber = cosmos[chamber_slot.get_items_inside()[0]];
 
 					response.catridge_definition = catridge_in_chamber.get<components::catridge>();
@@ -238,7 +238,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							const auto round_entity = cosmos.clone_entity(single_bullet_or_pellet_stack[child_entity_name::CATRIDGE_BULLET]);
 
 							auto& sender = round_entity.get<components::sender>();
-							sender.set(it);
+							sender.set(gun_entity);
 
 							auto& missile = round_entity.get<components::missile>();
 							missile.damage_amount *= gun.damage_multiplier;
@@ -301,12 +301,12 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					chamber_slot->items_inside.clear();
 
 					if (gun.action_mode >= gun_action_type::SEMI_AUTOMATIC) {
-						components::gun::load_next_round(it, step);
+						components::gun::load_next_round(gun_entity, step);
 					}
 				}
 
 				if (total_recoil_amount > 0.f) {
-					auto& rigid_body_of_gun = it.get<components::rigid_body>();
+					auto& rigid_body_of_gun = gun_entity.get<components::rigid_body>();
 					const auto recoil_dir = vec2().set_from_degrees(muzzle_transform.rotation);
 
 					if (rigid_body_of_gun.is_activated()) {
