@@ -3,6 +3,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/components/sprite_component.h"
 #include "game/components/hand_fuse_component.h"
+#include "game/components/fixtures_component.h"
 
 namespace rendering_scripts {
 	void draw_hud_for_released_explosives(
@@ -21,7 +22,7 @@ namespace rendering_scripts {
 			[&](const auto it) {
 				const components::hand_fuse& hand_fuse = it.get<components::hand_fuse>();
 
-				if (!it.get<components::rigid_body>().is_activated()) {
+				if (!it.get<components::fixtures>().is_activated()) {
 					return;
 				}
 
