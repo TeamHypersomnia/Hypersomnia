@@ -133,7 +133,7 @@ namespace ingredients {
 
 		rotation_copying.target = crosshair_entity;
 		rotation_copying.look_mode = components::rotation_copying::look_type::POSITION;
-		rotation_copying.colinearize_item_in_hand = false;
+		rotation_copying.colinearize_item_in_hand = true;
 
 		add_character_movement(e);
 	}
