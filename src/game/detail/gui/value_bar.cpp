@@ -11,7 +11,7 @@
 #include "augs/tweaker.h"
 #include "augs/gui/text_drawer.h"
 #include "augs/gui/stroke.h"
-#include "augs/templates/visit_list.h"
+#include "augs/templates/visit_gettable.h"
 
 static constexpr std::size_t num_sentience_meters = num_types_in_list_v<decltype(components::sentience::meters)>;
 
@@ -27,7 +27,7 @@ decltype(auto) visit_by_vertical_index(
 		meter_id id;
 		id.set_index(index);
 
-		return visit_list(sentience.meters, id, 
+		return visit_gettable(sentience.meters, id, 
 			[&cosm, &meter_callback](const auto& meter){
 				return meter_callback(meter, get_meta_of(meter, cosm.get_global_state().meters));
 			}
@@ -38,7 +38,7 @@ decltype(auto) visit_by_vertical_index(
 		perk_id id;
 		id.set_index(index - num_sentience_meters);
 
-		return visit_list(sentience.perks, id, 
+		return visit_gettable(sentience.perks, id, 
 			[&cosm, &perk_callback](const auto& perk){
 				return perk_callback(perk, get_meta_of(perk, cosm.get_global_state().perks));
 			}
@@ -181,7 +181,7 @@ void value_bar::draw(
 		if (is_sentience_meter(this_id)) {
 			id.set_index(vertical_index);
 
-			const auto value = visit_list(
+			const auto value = visit_gettable(
 				sentience.meters,
 				id,
 				[](const auto& meter) {

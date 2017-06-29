@@ -8,7 +8,7 @@
 #include "game/assets/assets_manager.h"
 
 #include "augs/graphics/drawers.h"
-#include "augs/templates/visit_list.h"
+#include "augs/templates/visit_gettable.h"
 
 void action_button::draw(
 	const viewing_game_gui_context context,
@@ -30,7 +30,7 @@ void action_button::draw(
 		const auto bound_spell = get_bound_spell(context, this_id);
 
 		if (bound_spell.is_set()) {
-			visit_list(
+			visit_gettable(
 				sentience.spells,
 				bound_spell,
 				[&](const auto& spell){

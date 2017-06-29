@@ -30,7 +30,7 @@
 #include "game/view/viewing_session.h"
 
 #include "augs/graphics/drawers.h"
-#include "augs/templates/visit_list.h"
+#include "augs/templates/visit_gettable.h"
 #include "game/detail/wielding_result.h"
 #include "game/detail/spells/spell_structs.h"
 
@@ -535,7 +535,7 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 					if (bound_spell.is_set()) {
 						const auto& sentience = gui_entity.get<components::sentience>();
 
-						tooltip_text = visit_list(
+						tooltip_text = visit_gettable(
 							sentience.spells,
 							bound_spell,
 							[&](const auto& spell) {
