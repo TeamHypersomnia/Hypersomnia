@@ -78,7 +78,7 @@ void assets_manager::load_baked_metadata(
 
 		assign_atlas_entry(baked_image.texture_maps[texture_map_type::DIFFUSE], diffuse_map_path);
 
-		if (request.neon_map || request.custom_neon_map_path) {
+		if (request.has_neon_map()) {
 			assign_atlas_entry(baked_image.texture_maps[texture_map_type::NEON], request.get_neon_map_path(definition_path));
 		}
 

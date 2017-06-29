@@ -18,7 +18,7 @@ std::string game_image_definition::get_source_image_path(const std::string& from
 
 std::string game_image_definition::get_neon_map_path(const std::string& from_definition_path) const {
 	if (custom_neon_map_path) {
-		return custom_neon_map_path.value();
+		return augs::replace_filename(from_definition_path, custom_neon_map_path.value());
 	}
 
 	const auto filename = augs::replace_extension(augs::get_filename(from_definition_path), ".png");
@@ -74,7 +74,7 @@ std::vector<source_image_loading_input> game_image_definition::get_atlas_inputs(
 
 	output.push_back({ get_source_image_path(definition_path), assets::gl_texture_id::GAME_WORLD_ATLAS });
 
-	if (neon_map) {
+	if (has_neon_map()) {
 		output.push_back({ get_neon_map_path(definition_path), assets::gl_texture_id::GAME_WORLD_ATLAS });
 	}
 

@@ -45,6 +45,10 @@ struct game_image_definition {
 		return generate_desaturation;// generate_desaturation.has_value() && generate_desaturation.value();
 	}
 
+	bool has_neon_map() const {
+		return custom_neon_map_path.has_value() || neon_map.has_value();
+	}
+
 	std::string get_source_image_path(const std::string& from_definition_path) const;
 	
 	std::string get_neon_map_path(const std::string& from_definition_path) const;
